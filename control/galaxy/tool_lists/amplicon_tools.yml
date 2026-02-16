@@ -1,0 +1,91 @@
+# Galaxy tool installation list — 16S rRNA amplicon analysis
+#
+# These tools replicate the computational pipeline used in:
+# - "Pond Crash Forensics" (Smallwood et al.)
+# - "Biotic countermeasures" (Smallwood, Cahill et al.)
+#
+# Install via Galaxy Admin → Install New Tools, or use:
+#   shed-tools install -g http://localhost:8080 -a <api_key> -t amplicon_tools.yml
+
+tools:
+  # ── Quality Control ────────────────────────────────────
+  - name: fastqc
+    owner: devteam
+    tool_panel_section_label: "QC"
+    tool_shed_url: https://toolshed.g2.bx.psu.edu
+
+  - name: trimmomatic
+    owner: pjbriggs
+    tool_panel_section_label: "QC"
+    tool_shed_url: https://toolshed.g2.bx.psu.edu
+
+  - name: cutadapt
+    owner: lparsons
+    tool_panel_section_label: "QC"
+    tool_shed_url: https://toolshed.g2.bx.psu.edu
+
+  # ── 16S rRNA / Amplicon Pipeline ──────────────────────
+  - name: qiime2__dada2__denoise_paired
+    owner: q2d2
+    tool_panel_section_label: "Amplicon"
+    tool_shed_url: https://toolshed.g2.bx.psu.edu
+
+  - name: qiime2__feature_table__summarize
+    owner: q2d2
+    tool_panel_section_label: "Amplicon"
+    tool_shed_url: https://toolshed.g2.bx.psu.edu
+
+  - name: qiime2__taxa__barplot
+    owner: q2d2
+    tool_panel_section_label: "Amplicon"
+    tool_shed_url: https://toolshed.g2.bx.psu.edu
+
+  - name: qiime2__diversity__core_metrics_phylogenetic
+    owner: q2d2
+    tool_panel_section_label: "Amplicon"
+    tool_shed_url: https://toolshed.g2.bx.psu.edu
+
+  # ── Taxonomic Classification ──────────────────────────
+  - name: kraken2
+    owner: iuc
+    tool_panel_section_label: "Taxonomy"
+    tool_shed_url: https://toolshed.g2.bx.psu.edu
+
+  - name: mothur_classify_seqs
+    owner: iuc
+    tool_panel_section_label: "Taxonomy"
+    tool_shed_url: https://toolshed.g2.bx.psu.edu
+
+  # ── Assembly & Annotation ─────────────────────────────
+  - name: spades
+    owner: iuc
+    tool_panel_section_label: "Assembly"
+    tool_shed_url: https://toolshed.g2.bx.psu.edu
+
+  - name: prokka
+    owner: crs4
+    tool_panel_section_label: "Annotation"
+    tool_shed_url: https://toolshed.g2.bx.psu.edu
+
+  # ── Phage Analysis ────────────────────────────────────
+  - name: pharokka
+    owner: iuc
+    tool_panel_section_label: "Phage"
+    tool_shed_url: https://toolshed.g2.bx.psu.edu
+
+  # ── Alignment & Search ────────────────────────────────
+  - name: ncbi_blast_plus
+    owner: devteam
+    tool_panel_section_label: "Alignment"
+    tool_shed_url: https://toolshed.g2.bx.psu.edu
+
+  - name: bowtie2
+    owner: devteam
+    tool_panel_section_label: "Alignment"
+    tool_shed_url: https://toolshed.g2.bx.psu.edu
+
+  # ── Statistics & Visualization ────────────────────────
+  - name: ggplot2_heatmap
+    owner: iuc
+    tool_panel_section_label: "Viz"
+    tool_shed_url: https://toolshed.g2.bx.psu.edu

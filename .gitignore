@@ -1,0 +1,30 @@
+# Rust
+target/
+Cargo.lock
+
+# Galaxy data (large, not tracked)
+control/galaxy/galaxy-data/
+
+# Datasets (downloaded separately)
+data/*.fastq
+data/*.fastq.gz
+data/*.fasta
+data/*.bam
+data/*.sam
+data/*.vcf
+
+# Reference databases (multi-GB)
+data/silva/
+data/greengenes/
+data/kraken2_db/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+
+# IDE
+.idea/
+.vscode/
+*.swp

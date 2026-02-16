@@ -1,0 +1,51 @@
+# Galaxy Project — Self-Hosted on Eastgate
+#
+# Provides a full Galaxy bioinformatics platform with:
+# - Galaxy web UI on port 8080
+# - PostgreSQL database (persistent)
+# - Persistent data volumes for datasets, tools, and workflows
+#
+# Usage:
+#   cd wetSpring/control/galaxy
+#   docker compose up -d
+#   # Access: http://localhost:8080
+#   # Default admin: admin@galaxy.org / admin (change immediately)
+#
+# Requirements:
+#   - Docker 20.10+ with compose v2
+#   - ~8 GB disk for initial image + tools
+#   - ~4 GB RAM minimum (8+ recommended for NGS pipelines)
+
+services:
+  galaxy:
+    image: bgruening/galaxy-stable:latest
+    container_name: wetspring-galaxy
+    restart: unless-stopped
+    ports:
+      - "8080:80"       # Galaxy web interface
+      - "8021:21"       # FTP upload
+      - "8022:22"       # SFTP upload
+    volumes:
+      - galaxy-data:/export     # Persistent Galaxy data (datasets, DBs, configs)
+      - ./tool_lists:/tool_lists:ro  # Custom tool install lists
+    environment:
+      - GALAXY_CONFIG_BRAND=wetSpring
+      - GALAXY_CONFIG_ADMIN_USERS=admin@galaxy.org
+      - GALAXY_CONFIG_ALLOW_USER_CREATION=True
+      - GALAXY_CONFIG_ALLOW_USER_DATASET_PURGE=True
+      - GALAXY_CONFIG_ENABLE_QUOTAS=False
+      - GALAXY_CONFIG_CLEANUP_JOB=onsuccess
+      - GALAXY_CONFIG_RETRY_METADATA_INTERNALLY=True
+      # Performance tuning for Eastgate (i9-12900K, 64GB RAM)
+      - GALAXY_HANDLER_NUMPROCS=2
+      - UWSGI_PROCESSES=4
+    deploy:
+      resources:
+        limits:
+          memory: 16G
+        reservations:
+          memory: 4G
+
+volumes:
+  galaxy-data:
+    driver: local

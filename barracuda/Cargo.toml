@@ -1,0 +1,20 @@
+[package]
+name = "wetspring-barracuda"
+version = "0.1.0"
+edition = "2021"
+authors = ["Squirrel Team"]
+license = "AGPL-3.0-or-later"
+description = "Life science computational pipelines — Rust + GPU via BarraCUDA/ToadStool"
+
+[dependencies]
+# Phase 2 dependencies (uncomment as needed):
+# needletail = "0.5"       # FASTQ/FASTA parsing (fast, Rust-native)
+# bio = "1.6"              # Rust bioinformatics library (sequences, alignment)
+# noodles = "0.84"         # BAM/SAM/VCF/FASTQ parsers
+# ndarray = "0.16"         # N-dimensional arrays (spectral data, matrices)
+# rayon = "1.10"           # Parallel iterators
+# serde = { version = "1", features = ["derive"] }
+# serde_json = "1"
+
+[dev-dependencies]
+# criterion = "0.5"        # Benchmarking
