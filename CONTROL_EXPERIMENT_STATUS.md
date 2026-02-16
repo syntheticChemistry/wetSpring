@@ -1,7 +1,7 @@
 # wetSpring Control Experiment — Status Report
 
 **Date**: 2026-02-12 (Project initialized)
-**Updated**: 2026-02-16 (Exp001 VALIDATED: 8/8 checks PASS, deterministic)
+**Updated**: 2026-02-16 (Exp002 COMPLETE: 2273 ASVs, 41 phyla, real SRA data)
 **Gate**: Eastgate (i9-12900K, 64 GB DDR5, RTX 4070 12GB, Pop!_OS 22.04)
 **Galaxy**: quay.io/bgruening/galaxy:24.1 (Docker) — upgraded from 20.09
 **License**: AGPL-3.0-or-later
@@ -288,6 +288,23 @@ of $500K instruments with proprietary software.
 - Grouped samples: Early (F3D0-F3D9), Late (F3D141-F3D150), Mock
 - Viewable at https://view.qiime2.org with the QZV file
 
+### 2026-02-16: Experiment 002 — Phytoplankton Microbiome
+
+- **Data source**: PRJNA1195978 (80 per-sample SRA runs, 1.9 GB total)
+- Downloaded 10 samples (860K reads) via SRA Toolkit `fastq-dump`
+- Note: PRJNA382322 (Nannochloropsis) rejected — single multiplexed run
+  requiring custom barcode demux, replaced with per-sample dataset
+- **V3-V4 amplicon (2x151bp)**: too short for paired-end merge (~440bp amplicon)
+  → used DADA2 `denoise-single` on forward reads (trunc=140)
+- **Results**: 2,273 ASVs, 820,548 reads retained from 860K input (95.4%)
+- **Taxonomy**: 41 phyla — rich marine diversity as expected:
+  - Proteobacteria: 822 ASVs (36%) with Rhodobacteraceae, Colwelliaceae
+  - Bacteroidota: 200 ASVs (8.8%) with Flavobacteriaceae — known algae-associated
+  - Nanoarchaeota: 162 ASVs (7.1%) — marine archaea
+  - Patescibacteria: 130 ASVs — ultra-small bacteria, marine
+  - Verrucomicrobiota: 125 ASVs — environmental bacteria
+- **Pipeline time**: 95.6s (import 13.6s, DADA2 68.0s, taxonomy 9.5s, barplot 0.1s)
+
 ### 2026-02-16: Validation Rerun — 8/8 PASS
 
 - Automated validation script: `scripts/validate_exp001.py`
@@ -321,18 +338,23 @@ of $500K instruments with proprietary software.
 - [x] SILVA 138 taxonomy → 9 phyla, 40 families, 11.2s (Firmicutes dominant)
 - [x] Taxonomy barplot generated (`taxa-barplot.qzv`, 427 KB)
 
-### Experiment 002: 16S Amplicon Replication — NOT STARTED
+### Experiment 002: Phytoplankton Microbiome 16S — COMPLETE
 
-**Goal**: Run Nannochloropsis microbiome (D2) through full 16S pipeline.
+**Goal**: Download real algae microbiome data from SRA, run full 16S pipeline.
+**BioProject**: PRJNA1195978 (phytoplankton-associated bacterial communities)
+**Note**: Replaced D2 (PRJNA382322, single multiplexed run) with per-sample dataset.
 
-- [ ] FASTQ downloaded from SRA
-- [ ] Quality control (FastQC + Trimmomatic/Cutadapt)
-- [ ] DADA2 denoising → ASV table
-- [ ] SILVA taxonomy classification
+- [x] 10 samples downloaded from SRA (860K paired reads, 151bp MiSeq V3-V4)
+- [x] DADA2 denoise-single (forward only — V3-V4 too long for 2x151 merge)
+- [x] 2,273 ASVs, 820,548 reads retained, 95.6s total pipeline
+- [x] SILVA 138 taxonomy → 41 phyla (marine diversity confirmed)
+- [x] Proteobacteria dominant (822 ASVs, Rhodobacteraceae 67)
+- [x] Bacteroidota second (200 ASVs, Flavobacteriaceae 95) — as expected
+- [x] Marine-specific: Nanoarchaeota, Woesearchaeales, Bdellovibrionota
+- [x] Taxonomy barplot generated (587 KB)
+- [ ] Download remaining 70 samples for full analysis
 - [ ] Alpha diversity (Shannon, Simpson, Chao1)
 - [ ] Beta diversity (Bray-Curtis PCoA)
-- [ ] Compare: do we see Bacteroidetes + Alphaproteobacteria dominance?
-- [ ] Compare: do we see Saprospiraceae correlation with growth?
 
 ### Experiment 003: Phage Annotation — NOT STARTED
 
@@ -502,3 +524,4 @@ Together they build a general-purpose sovereign compute platform.
 *DADA2 denoise-paired complete (232 ASVs): February 16, 2026*
 *Experiment 001 COMPLETE (SILVA taxonomy + barplot): February 16, 2026*
 *Experiment 001 VALIDATED (8/8 deterministic, 71.5s): February 16, 2026*
+*Experiment 002 COMPLETE (2273 ASVs, 41 phyla, real SRA data): February 16, 2026*
