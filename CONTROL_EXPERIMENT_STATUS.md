@@ -1,7 +1,7 @@
 # wetSpring Control Experiment — Status Report
 
 **Date**: 2026-02-12 (Project initialized)
-**Updated**: 2026-02-16 (DADA2 complete: 232 ASVs, 124K reads, 20 samples)
+**Updated**: 2026-02-16 (Exp001 COMPLETE: DADA2→232 ASVs, SILVA taxonomy, barplot)
 **Gate**: Eastgate (i9-12900K, 64 GB DDR5, RTX 4070 12GB, Pop!_OS 22.04)
 **Galaxy**: quay.io/bgruening/galaxy:24.1 (Docker) — upgraded from 20.09
 **License**: AGPL-3.0-or-later
@@ -257,11 +257,42 @@ of $500K instruments with proprietary software.
   rate as expected (defined community, no chimeras)
 - **Artifacts saved**: `dada2-table.qza`, `dada2-rep-seqs.qza`, `dada2-stats.qza`
 
+### 2026-02-16: SILVA Taxonomy Classification
+
+- Installed complete QIIME2 2026.1.0 amplicon distribution (fresh conda env)
+  - Includes q2-feature-classifier, q2-dada2, q2-taxa, q2-diversity, qiime CLI
+- Downloaded pre-trained SILVA 138 NB classifier (209 MB, sklearn 1.4.2)
+- **Classification**: 232 ASVs classified in 11.2 seconds (NB, 8 jobs)
+- **Phylum distribution** (9 phyla detected):
+
+| Phylum | ASVs | Expected in Mouse Gut |
+|--------|-----:|:--------------------:|
+| Firmicutes | 191 | Yes (dominant) |
+| Bacteroidota | 20 | Yes (major) |
+| Proteobacteria | 7 | Yes (minor) |
+| Actinobacteriota | 6 | Yes (minor) |
+| Cyanobacteria | 3 | Yes (chloroplast) |
+| Patescibacteria | 2 | Yes (rare) |
+| Campylobacterota | 1 | Yes (rare) |
+| Deinococcota | 1 | Rare |
+| Verrucomicrobiota | 1 | Yes (Akkermansia) |
+
+- **Key families**: Lachnospiraceae (121 ASVs), Oscillospiraceae (16),
+  Muribaculaceae (15) — classic mouse gut profile
+- All classifications >95% confidence (NB posterior probability)
+- **Mock community**: correctly classified with highest per-read retention
+
+### 2026-02-16: Taxonomy Barplot Generated
+
+- Generated interactive taxonomy barplot (`taxa-barplot.qzv`, 427 KB)
+- Grouped samples: Early (F3D0-F3D9), Late (F3D141-F3D150), Mock
+- Viewable at https://view.qiime2.org with the QZV file
+
 ---
 
 ## Experiment Log
 
-### Experiment 001: Galaxy Bootstrap — IN PROGRESS
+### Experiment 001: Galaxy Bootstrap — COMPLETE
 
 **Goal**: Self-host Galaxy, install tools, validate with training dataset.
 
@@ -275,8 +306,8 @@ of $500K instruments with proprietary software.
 - [x] Uploaded all 20 paired samples (40 FASTQ files) via Galaxy API
 - [x] QIIME2 import → `paired-end-demux.qza` (36.9 MB)
 - [x] DADA2 denoise-paired → 232 ASVs, 124,249 reads, 43.5s runtime
-- [ ] SILVA taxonomy classification
-- [ ] Taxonomy barplot generated (QIIME2)
+- [x] SILVA 138 taxonomy → 9 phyla, 40 families, 11.2s (Firmicutes dominant)
+- [x] Taxonomy barplot generated (`taxa-barplot.qzv`, 427 KB)
 
 ### Experiment 002: 16S Amplicon Replication — NOT STARTED
 
@@ -457,3 +488,4 @@ Together they build a general-purpose sovereign compute platform.
 *Track 2 (blueFish) added: February 12, 2026*
 *Galaxy 24.1 operational, FastQC validated: February 16, 2026*
 *DADA2 denoise-paired complete (232 ASVs): February 16, 2026*
+*Experiment 001 COMPLETE (SILVA taxonomy + barplot): February 16, 2026*
