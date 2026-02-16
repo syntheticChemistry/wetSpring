@@ -1,7 +1,7 @@
 # wetSpring Control Experiment — Status Report
 
 **Date**: 2026-02-12 (Project initialized)
-**Updated**: 2026-02-16 (Galaxy 24.1, tools installed, FastQC validated)
+**Updated**: 2026-02-16 (Galaxy 24.1, 32 tools, FastQC validated, DADA2 next)
 **Gate**: Eastgate (i9-12900K, 64 GB DDR5, RTX 4070 12GB, Pop!_OS 22.04)
 **Galaxy**: quay.io/bgruening/galaxy:24.1 (Docker) — upgraded from 20.09
 **License**: AGPL-3.0-or-later
@@ -174,20 +174,76 @@ of $500K instruments with proprietary software.
 
 ---
 
+## Run Log
+
+### 2026-02-12: Project Initialization
+
+- Created wetSpring repository (github.com/syntheticChemistry/wetSpring)
+- Scaffolded Track 1 (Life Science): Galaxy Docker setup, data download scripts,
+  experiment protocols for 16S amplicon, phage annotation, spectral, and VOC pipelines
+- Downloaded MiSeq SOP validation dataset from Zenodo (44 files, 372 MB)
+- Downloaded SILVA 138.1 reference (QIIME2 format, 100 MB)
+
+### 2026-02-12: Track 2 Added (blueFish)
+
+- Added PFAS analytical chemistry as Track 2 (codename blueFish)
+- Wired in A. Daniel Jones (MSU) as principal collaborator
+- Added Pipelines 5-7: asari LC-MS, PFΔScreen PFAS screening, PFAS ML/MD
+- Added Experiments 005-008 protocols
+- Added datasets D6-D11 (asari demo, EPA CompTox, MassBank, Michigan DEQ)
+
+### 2026-02-16: Galaxy 24.1 Operational
+
+- **Attempted Galaxy 20.09** (bgruening/galaxy-stable:latest):
+  - Tools installed via ephemeris but 10/15 failed to load
+  - Error: modern tool revisions target Galaxy 22.05-24.2
+  - FastQC 0.74 requires Galaxy 23.0, QIIME2 requires 22.05, Kraken2 requires 24.2
+- **Upgraded to Galaxy 24.1** (quay.io/bgruening/galaxy:24.1):
+  - Fresh volume, first boot 80s (DB migration, conda init)
+  - 15/15 repositories installed in 50s via ephemeris
+  - 32 individual tools loaded (BLAST+ expands to 12 sub-tools)
+- **Conda dependency resolution**:
+  - Initial FastQC run failed: `fastqc: command not found`
+  - Enabled `conda_auto_install: true` and `conda_prefix: /tool_deps/_conda`
+  - Container restart required for config changes
+  - Subsequent runs auto-resolve conda environments
+- **Fixed SPAdes owner**: YAML had `owner: iuc`, correct is `owner: nml`
+
+### 2026-02-16: FastQC Validation
+
+- Uploaded F3D0_R1.fastq and F3D0_R2.fastq (first paired sample from MiSeq SOP)
+- **FastQC F3D0_R1** (forward reads):
+  - 7,793 sequences, 1.9 Mbp, 249-251 bp
+  - Encoding: Sanger/Illumina 1.9 (Phred33)
+  - GC: 54%, poor quality sequences: 0
+  - Per-base quality: PASS (Q32-38+ across all positions)
+  - All modules: PASS
+- **FastQC F3D0_R2** (reverse reads):
+  - 7,793 sequences, 1.9 Mbp, 247-251 bp
+  - GC: 55%, poor quality sequences: 0
+  - Per-base quality: FAIL (expected — reverse reads degrade toward 3' end)
+  - This is normal for paired-end Illumina and handled by DADA2's error model
+- Galaxy history: 10 items (2 uploads + 4 errored from v20.09 + 4 ok from v24.1)
+
+---
+
 ## Experiment Log
 
 ### Experiment 001: Galaxy Bootstrap — IN PROGRESS
 
 **Goal**: Self-host Galaxy, install tools, validate with training dataset.
 
-- [x] Galaxy Docker running on localhost:8080 (v24.1)
-- [x] Admin account created and activated
+- [x] Galaxy Docker running on localhost:8080 (v24.1, upgraded from v20.09)
+- [x] Admin account created and activated (via psql + master API key)
 - [x] Amplicon tools installed (FastQC, DADA2, QIIME2, Kraken2) — 15 repos, 32 tools
 - [x] Assembly tools installed (SPAdes, Prokka, Pharokka)
-- [x] Training dataset (D1) uploaded (F3D0 paired-end)
-- [x] FastQC run on training data — PASS (7793 seqs, Q32-38+, 0 poor quality)
-- [ ] DADA2 denoise on paired-end 16S
-- [ ] Taxonomy barplot generated
+- [x] Training dataset (D1) uploaded (F3D0 paired-end, 7793 sequences)
+- [x] FastQC on R1 — PASS (Q32-38+, 0 poor quality, 54% GC)
+- [x] FastQC on R2 — expected quality drop (normal for Illumina R2)
+- [ ] Upload all 20 MiSeq SOP paired samples
+- [ ] DADA2 denoise-paired on full dataset → ASV table
+- [ ] SILVA taxonomy classification
+- [ ] Taxonomy barplot generated (QIIME2)
 
 ### Experiment 002: 16S Amplicon Replication — NOT STARTED
 
@@ -366,3 +422,4 @@ Together they build a general-purpose sovereign compute platform.
 
 *Initialized: February 12, 2026*
 *Track 2 (blueFish) added: February 12, 2026*
+*Galaxy 24.1 operational, FastQC validated: February 16, 2026*
