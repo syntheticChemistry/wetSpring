@@ -1,9 +1,9 @@
 # wetSpring Control Experiment — Status Report
 
 **Date**: 2026-02-12 (Project initialized)
-**Updated**: 2026-02-12 (Track 2: PFAS/blueFish added)
+**Updated**: 2026-02-16 (Galaxy 24.1, tools installed, FastQC validated)
 **Gate**: Eastgate (i9-12900K, 64 GB DDR5, RTX 4070 12GB, Pop!_OS 22.04)
-**Galaxy**: bgruening/galaxy-stable:latest (Docker)
+**Galaxy**: quay.io/bgruening/galaxy:24.1 (Docker) — upgraded from 20.09
 **License**: AGPL-3.0-or-later
 
 ---
@@ -176,16 +176,16 @@ of $500K instruments with proprietary software.
 
 ## Experiment Log
 
-### Experiment 001: Galaxy Bootstrap — NOT STARTED
+### Experiment 001: Galaxy Bootstrap — IN PROGRESS
 
 **Goal**: Self-host Galaxy, install tools, validate with training dataset.
 
-- [ ] Galaxy Docker running on localhost:8080
-- [ ] Admin account created
-- [ ] Amplicon tools installed (FastQC, DADA2, QIIME2, Kraken2)
-- [ ] Assembly tools installed (SPAdes, Prokka)
-- [ ] Training dataset (D1) uploaded
-- [ ] FastQC run on training data
+- [x] Galaxy Docker running on localhost:8080 (v24.1)
+- [x] Admin account created and activated
+- [x] Amplicon tools installed (FastQC, DADA2, QIIME2, Kraken2) — 15 repos, 32 tools
+- [x] Assembly tools installed (SPAdes, Prokka, Pharokka)
+- [x] Training dataset (D1) uploaded (F3D0 paired-end)
+- [x] FastQC run on training data — PASS (7793 seqs, Q32-38+, 0 poor quality)
 - [ ] DADA2 denoise on paired-end 16S
 - [ ] Taxonomy barplot generated
 

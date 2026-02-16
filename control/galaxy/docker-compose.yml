@@ -2,7 +2,7 @@
 #
 # Provides a full Galaxy bioinformatics platform with:
 # - Galaxy web UI on port 8080
-# - PostgreSQL database (persistent)
+# - PostgreSQL 15 database (persistent)
 # - Persistent data volumes for datasets, tools, and workflows
 #
 # Usage:
@@ -13,12 +13,15 @@
 #
 # Requirements:
 #   - Docker 20.10+ with compose v2
-#   - ~8 GB disk for initial image + tools
+#   - ~10 GB disk for initial image + tools
 #   - ~4 GB RAM minimum (8+ recommended for NGS pipelines)
+#
+# Galaxy 24.1 (Nov 2024) — Ubuntu 22.04, Python 3.10, PostgreSQL 15
+# Upgraded from 20.09 to support modern toolshed revisions (QIIME2, Kraken2, etc.)
 
 services:
   galaxy:
-    image: bgruening/galaxy-stable:latest
+    image: quay.io/bgruening/galaxy:24.1
     container_name: wetspring-galaxy
     restart: unless-stopped
     ports:
@@ -36,9 +39,7 @@ services:
       - GALAXY_CONFIG_ENABLE_QUOTAS=False
       - GALAXY_CONFIG_CLEANUP_JOB=onsuccess
       - GALAXY_CONFIG_RETRY_METADATA_INTERNALLY=True
-      # Performance tuning for Eastgate (i9-12900K, 64GB RAM)
-      - GALAXY_HANDLER_NUMPROCS=2
-      - UWSGI_PROCESSES=4
+      - GALAXY_CONFIG_MASTER_API_KEY=wetspring-bootstrap-key-2026
     deploy:
       resources:
         limits:

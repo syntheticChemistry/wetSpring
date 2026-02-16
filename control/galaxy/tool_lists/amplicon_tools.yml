@@ -58,7 +58,7 @@ tools:
 
   # ── Assembly & Annotation ─────────────────────────────
   - name: spades
-    owner: iuc
+    owner: nml
     tool_panel_section_label: "Assembly"
     tool_shed_url: https://toolshed.g2.bx.psu.edu
 
