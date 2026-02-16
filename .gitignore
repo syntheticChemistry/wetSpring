@@ -13,10 +13,22 @@ data/*.bam
 data/*.sam
 data/*.vcf
 
+# Track 2: Mass spec data (large, not tracked)
+data/*.mzML
+data/*.mzXML
+data/*.raw
+data/*.wiff
+data/asari-demo-data/
+data/pfas-hrms-test/
+data/metabolights/
+
 # Reference databases (multi-GB)
 data/silva/
 data/greengenes/
 data/kraken2_db/
+data/epa-comptox/
+data/massbank/
+data/norman-susdat/
 
 # Python
 __pycache__/

@@ -147,8 +147,183 @@ FASTQ → FastQC → SPAdes assembly → Prokka/Pharokka annotation
 
 ---
 
+---
+
+# Track 2: PFAS Analytical Chemistry (Codename: blueFish)
+
+**Goal**: Break vendor-specific analytical instrument lock-in for water
+chemistry monitoring. Replace proprietary LC-MS/HRMS data processing
+pipelines with open-source Rust+GPU equivalents — ultimately enabling
+live water monitoring for pennies.
+
+**Principal Collaborator**: A. Daniel Jones, PhD — Professor, Biochemistry
+& Molecular Biology, Michigan State University. Associate Director, MSU
+Center for PFAS Research. ~25 years in analytical chemistry. Co-developed
+**asari** (Nature Communications 2023), an open-source LC-MS metabolomics
+processing tool. Leads MSU Mass Spectrometry and Metabolomics Core facility.
+
+**Why PFAS**: Per- and polyfluoroalkyl substances ("forever chemicals") are
+the defining environmental contamination crisis. Current detection requires
+$500K+ instruments (LC-MS/MS) and vendor-locked software (Waters MassLynx,
+Thermo Xcalibur, Agilent MassHunter, AB SCIEX Analyst). If we can replicate
+and exceed these vendor pipelines in open-source Rust+GPU, we break the
+analytical instrument monopoly for water safety.
+
+---
+
+## Pipeline 5: LC-MS Metabolomics Processing (asari)
+
+**Source**: Li, S. et al. "Trackable and scalable LC-MS metabolomics data
+processing using asari." Nature Communications 14, 4113 (2023).
+
+### What asari computes
+
+1. **mzML parsing**: Read vendor-neutral mass spectrometry data format
+2. **Mass track extraction**: Extract ion chromatograms from 2D (m/z, RT) data
+3. **Peak detection**: Find chromatographic peaks via composite scoring
+4. **Mass alignment**: Align features across samples using reference mapping
+5. **Feature table**: Produce sample × feature intensity matrix for statistics
+6. **Quality control**: Filter features by blank ratio, CV, missingness
+
+### Current tool chain
+
+```
+Raw vendor files → msconvert (ProteoWizard) → mzML
+  → asari (Python) → Feature table
+  → Statistical analysis (R/Python)
+```
+
+### Rust evolution targets
+
+| Stage | Python tool | Rust replacement | GPU potential |
+|-------|------------|------------------|:------------:|
+| mzML parsing | pyteomics / asari | Rust XML/binary parser | Low |
+| Mass track extraction | asari (numpy) | Rust ndarray + SIMD | Medium |
+| Peak detection | asari (scipy) | Rust signal processing | **High** |
+| Mass alignment | asari (custom) | Rust alignment engine | Medium |
+| Feature quantification | asari (numpy) | Rust + GPU reduction | **High** |
+| Statistical analysis | scipy/statsmodels | Rust stats + GPU linalg | **High** |
+
+### Public datasets for validation
+
+- **MetaboLights**: EMBL-EBI metabolomics repository (MTBLS studies)
+- **Metabolomics Workbench**: NIH metabolomics data repository
+- **asari demo data**: Test datasets from shuzhao-li-lab/data on GitHub
+
+---
+
+## Pipeline 6: PFAS Non-Targeted Screening (HRMS)
+
+**Source papers**: Jones et al. (MSU Center for PFAS Research);
+PFΔScreen (Zweigle et al., Analytical and Bioanalytical Chemistry 2023)
+
+### What the pipeline computes
+
+1. **HRMS data acquisition**: High-resolution mass spectrometry (LC-HRMS)
+   of water/soil/biosolid samples, vendor-neutral mzML format
+2. **Feature detection**: Extract MS1 features (m/z, RT, intensity) using
+   pyOpenMS or XCMS
+3. **PFAS prioritization**: Screen features for PFAS signatures:
+   - Mass defect / carbon number (MD/C-m/C) analysis
+   - Kendrick mass defect (KMD) for homologous series
+   - Diagnostic fragment ions (MS2): CF3⁻ (m/z 68.9952), C2F5⁻ (118.9920),
+     C3F7⁻ (168.9888), etc.
+   - Fragment mass differences (ΔF = CF2 = 49.9968 Da)
+4. **Compound annotation**: Match against PFAS spectral libraries and
+   NORMAN SusDat suspect list (~65,000 PFAS entries)
+5. **Quantification**: Semi-quantitative estimation using isotope-labeled
+   internal standards
+
+### Current tool chain
+
+```
+Raw vendor files → msconvert → mzML
+  → pyOpenMS feature detection
+  → PFΔScreen (Python) → PFAS candidate list
+  → Manual verification + library matching
+```
+
+### Open-source tools to replicate
+
+| Tool | Source | Language | Purpose |
+|------|--------|----------|---------|
+| PFΔScreen | github.com/JonZwe/PFAScreen | Python | PFAS feature prioritization |
+| FindPFΔS | github.com/JonZwe/FindPFAS | Python | MS2 fragment mass difference mining |
+| pyOpenMS | OpenMS.de | Python/C++ | Feature detection, mass spec core |
+| msconvert | ProteoWizard | C++ | Vendor → mzML conversion |
+| patRoon | github.com/rickhelmus/patRoon | R | Non-target screening framework |
+
+### Rust evolution targets
+
+| Stage | Python/C++ tool | Rust replacement | GPU potential |
+|-------|----------------|------------------|:------------:|
+| mzML I/O | pyteomics/pyOpenMS | Rust mzML parser | Low |
+| Feature detection | pyOpenMS | Rust centroiding + peak pick | **High** |
+| KMD analysis | PFΔScreen (numpy) | Rust mass defect engine | Medium |
+| MS2 scoring | PFΔScreen (scipy) | Rust cosine similarity | **High** |
+| Suspect screening | pandas matching | Rust hash-based lookup | **High** |
+| Homologous series | PFΔScreen custom | Rust pattern matching | Medium |
+
+### Public datasets for validation
+
+- **NORMAN Digital Sample Freezing Platform**: Real HRMS datasets for
+  non-target screening benchmarking
+- **MassBank**: Open mass spectral database with PFAS reference spectra
+- **EPA CompTox**: PFAS structure/property database (~14,000 PFAS)
+- **MSU PFAS Center publications**: Supplementary HRMS data from
+  Jones lab publications
+
+---
+
+## Pipeline 7: PFAS Machine Learning & Molecular Dynamics
+
+**Source papers**: MSU Center for PFAS Research ML publications (2023-2025)
+
+### What the papers compute
+
+1. **Toxicity prediction**: ML screening of 260,000 PFAS structures for
+   toxicity via molecular docking + MD simulations
+2. **Drinking water monitoring**: Region-specific ML models predicting PFAS
+   levels from water utility characteristics (Random Forest, GBM)
+3. **Adsorption prediction**: GBDT models for PFAS removal efficiency on
+   carbon-based materials
+4. **Molecular dynamics**: PFAS-soil mineral interactions (kaolinite, clay),
+   PFAS-receptor binding (PPARγ, thyroid, estrogen)
+5. **Molecular probe design**: Active learning for designing selective PFAS
+   capture molecules
+
+### Current tool chain
+
+```
+PFAS SMILES/structures → RDKit molecular descriptors
+  → scikit-learn / XGBoost / PyTorch models
+  → GROMACS / AMBER molecular dynamics
+  → Analysis (MDAnalysis, numpy)
+```
+
+### Rust evolution targets
+
+| Stage | Python tool | Rust replacement | GPU potential |
+|-------|------------|------------------|:------------:|
+| Molecular descriptors | RDKit (C++/Python) | Rust cheminformatics | Medium |
+| Random Forest / GBM | scikit-learn / XGBoost | Rust smartcore / LightGBM-rs | Medium |
+| Neural networks | PyTorch | Rust burn / candle | **High** |
+| MD simulation | GROMACS (C++) | Rust MD engine | **High** |
+| Force field eval | GROMACS | Rust + ToadStool GPU | **High** |
+| Trajectory analysis | MDAnalysis (Python) | Rust ndarray + GPU | **High** |
+
+### Public datasets for validation
+
+- **EPA CompTox PFAS**: Structures, properties, toxicity data
+- **ToxCast/Tox21**: High-throughput screening assay results
+- **PDBbind**: Protein-ligand binding affinity data
+- **Michigan DEQ water data**: Public PFAS monitoring results
+
+---
+
 ## Priority Order
 
+### Track 1: Life Science (Algae / Metagenomics)
 1. **Pipeline 1 (16S amplicon)** — Most mature tools, public data
    abundant, directly replicates Pond Crash Forensics. Start here.
 2. **Pipeline 2 (Phage annotation)** — Builds on Pipeline 1 assembly
@@ -158,12 +333,66 @@ FASTQ → FastQC → SPAdes assembly → Prokka/Pharokka annotation
 4. **Pipeline 4 (VOC)** — Mass spec domain, lower priority but
    exercises peak detection + statistical modeling.
 
+### Track 2: PFAS Analytical Chemistry (blueFish)
+5. **Pipeline 5 (LC-MS / asari)** — Open-source baseline exists
+   (Nature Communications). Start here to learn mass spec data I/O.
+6. **Pipeline 6 (PFAS non-target)** — PFΔScreen is open-source Python,
+   directly replicable. Exercises HRMS data processing → Rust.
+7. **Pipeline 7 (PFAS ML/MD)** — Heaviest compute, best GPU target.
+   Molecular dynamics + neural nets → ToadStool kernels.
+
+### Why Two Tracks
+
+| Track | Exercises | Shader/GPU Kernel Value |
+|-------|-----------|------------------------|
+| Track 1 (Life Science) | Sequence alignment, k-mer ops, FFT | String matching, hash tables, signal processing |
+| Track 2 (PFAS/Analytical) | Peak detection, mass defect math, ML, MD | Spectral correlation, force field eval, NN inference |
+
+Both tracks produce GPU kernels that are useful **far beyond** their
+original domain — exactly the ecoPrimals thesis.
+
+---
+
+## blueFish Vision: Breaking Vendor Lock-In
+
+The ultimate goal of Track 2 is codename **blueFish**: an open-source,
+GPU-accelerated analytical chemistry engine that replaces vendor-locked
+instrument software.
+
+### Current State of Analytical Chemistry Software
+
+| Vendor | Instrument | Software | License | Cost |
+|--------|-----------|----------|---------|------|
+| Waters | Xevo TQ-XS | MassLynx | Proprietary | $$$$ |
+| Thermo Fisher | Orbitrap | Xcalibur/FreeStyle | Proprietary | $$$$ |
+| Agilent | 6546 QTOF | MassHunter | Proprietary | $$$$ |
+| AB SCIEX | TripleTOF | Analyst/SCIEX OS | Proprietary | $$$$ |
+| Shimadzu | LCMS-9050 | LabSolutions | Proprietary | $$$$ |
+
+Every instrument ships with vendor-locked data processing. Scientists
+cannot easily compare results across instruments, reproduce analyses
+on different hardware, or modify algorithms.
+
+### blueFish Roadmap
+
+```
+Phase B0: Replicate vendor pipelines with open-source Python (asari, PFΔScreen)
+Phase B1: Port to Rust — vendor-neutral mzML → features → PFAS screen
+Phase B2: GPU-accelerate critical paths (peak detection, spectral matching, ML)
+Phase B3: Real-time processing — stream from instrument → Rust+GPU → results
+Phase B4: Penny monitoring — low-cost sensor + Rust+GPU replaces $500K LC-MS
+```
+
+The endgame: a Raspberry Pi + cheap sensor + Rust+GPU backend that monitors
+water quality in real time, for pennies per sample. The analytical intelligence
+moves from the instrument to the software.
+
 ---
 
 ## Success Criteria (Matching hotSpring Pattern)
 
 For each pipeline:
-1. **Baseline**: Run in Galaxy, produce identical results to published
+1. **Baseline**: Run in Galaxy/Python, produce identical results to published
 2. **Rust port**: Implement critical stages in Rust, validate output
 3. **GPU acceleration**: Profile and accelerate via ToadStool
 4. **Benchmark**: Rust+GPU vs Galaxy/Python, measure speedup
