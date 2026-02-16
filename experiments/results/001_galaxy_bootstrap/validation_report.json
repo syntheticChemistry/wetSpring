@@ -1,0 +1,43 @@
+{
+  "timestamp": "2026-02-16T14:09:57",
+  "pipeline_time_s": 71.5,
+  "dada2_time_s": 42.5,
+  "taxonomy_time_s": 10.5,
+  "checks_passed": 8,
+  "checks_failed": 0,
+  "dada2": {
+    "asv_count": 232,
+    "sample_count": 20,
+    "total_nonchimeric": 124249,
+    "mock_nonchimeric": 4269,
+    "mock_retention_pct": 89.3
+  },
+  "taxonomy": {
+    "classified": 232,
+    "phyla_count": 9,
+    "phyla": {
+      "Firmicutes": 191,
+      "Bacteroidota": 20,
+      "Proteobacteria": 7,
+      "Actinobacteriota": 6,
+      "Cyanobacteria": 3,
+      "Patescibacteria": 2,
+      "Campylobacterota": 1,
+      "Deinococcota": 1,
+      "Verrucomicrobiota": 1
+    },
+    "top_families": {
+      "Lachnospiraceae": 121,
+      "Oscillospiraceae": 16,
+      "Muribaculaceae": 15,
+      "Ruminococcaceae": 7,
+      "Clostridia_vadinBB60_group": 7,
+      "Streptococcaceae": 6,
+      "Clostridia_UCG-014": 6,
+      "RF39": 5,
+      "Unassigned": 4,
+      "Bacteroidaceae": 3
+    }
+  },
+  "validation": "PASS"
+}

@@ -1,7 +1,7 @@
 # wetSpring Control Experiment — Status Report
 
 **Date**: 2026-02-12 (Project initialized)
-**Updated**: 2026-02-16 (Exp001 COMPLETE: DADA2→232 ASVs, SILVA taxonomy, barplot)
+**Updated**: 2026-02-16 (Exp001 VALIDATED: 8/8 checks PASS, deterministic)
 **Gate**: Eastgate (i9-12900K, 64 GB DDR5, RTX 4070 12GB, Pop!_OS 22.04)
 **Galaxy**: quay.io/bgruening/galaxy:24.1 (Docker) — upgraded from 20.09
 **License**: AGPL-3.0-or-later
@@ -288,6 +288,18 @@ of $500K instruments with proprietary software.
 - Grouped samples: Early (F3D0-F3D9), Late (F3D141-F3D150), Mock
 - Viewable at https://view.qiime2.org with the QZV file
 
+### 2026-02-16: Validation Rerun — 8/8 PASS
+
+- Automated validation script: `scripts/validate_exp001.py`
+- Clean rerun from raw FASTQs → import → DADA2 → SILVA → barplot
+- **All 8 checks passed** (exact match to original run):
+  - ASV count: 232, Samples: 20, Total reads: 124,249
+  - Phyla: 9, Firmicutes: 191, Bacteroidota: 20
+  - Mock community: 4,269 reads, 89.3% retention
+- **Pipeline is deterministic**: identical results across independent runs
+- **Total time**: 71.5s (import: 14.0s, DADA2: 42.5s, taxonomy: 10.5s)
+- Report: `experiments/results/001_galaxy_bootstrap/validation_report.json`
+
 ---
 
 ## Experiment Log
@@ -489,3 +501,4 @@ Together they build a general-purpose sovereign compute platform.
 *Galaxy 24.1 operational, FastQC validated: February 16, 2026*
 *DADA2 denoise-paired complete (232 ASVs): February 16, 2026*
 *Experiment 001 COMPLETE (SILVA taxonomy + barplot): February 16, 2026*
+*Experiment 001 VALIDATED (8/8 deterministic, 71.5s): February 16, 2026*
