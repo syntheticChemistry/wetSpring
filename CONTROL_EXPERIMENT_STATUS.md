@@ -1,7 +1,7 @@
 # wetSpring Control Experiment — Status Report
 
 **Date**: 2026-02-12 (Project initialized)
-**Updated**: 2026-02-16 (ALL validation COMPLETE + evolution analysis written)
+**Updated**: 2026-02-16 (BarraCUDA Rust validation — 36/36 PASS)
 **Gate**: Eastgate (i9-12900K, 64 GB DDR5, RTX 4070 12GB, Pop!_OS 22.04)
 **Galaxy**: quay.io/bgruening/galaxy:24.1 (Docker) — upgraded from 20.09
 **License**: AGPL-3.0-or-later
@@ -361,6 +361,32 @@ of $500K instruments with proprietary software.
 
 ---
 
+### 2026-02-16: BarraCUDA Rust Validation — 36/36 PASS
+
+- **Architecture**: `wetspring-barracuda` crate, depends on `barracuda` (phase1/toadstool)
+- **Pattern**: Same as hotSpring — hardcoded Python baseline values in Rust validation binaries
+- **Crate**: 6 modules (3 I/O parsers, 3 bio algorithms), 4 validation binaries, 20 unit tests
+- **Dependencies**: barracuda, needletail, quick-xml, base64, flate2, serde, rayon
+
+**Track 1 — Life Science (FASTQ + Diversity):**
+- `validate_fastq`: **9/9 PASS** — F3D0 7,793 seqs, 40 files 304,720 seqs, GC 54.7%, Q 35.8
+- `validate_diversity`: **14/14 PASS** — Shannon/Simpson/Chao1 analytical + marine simulation + k-mers
+
+**Track 2 — PFAS Analytical Chemistry (mzML + PFAS):**
+- `validate_mzml`: **7/7 PASS** — 8 files, 6,256 spectra, 6M peaks, m/z 80-1000, base64+zlib
+- `validate_pfas`: **6/6 PASS** — 738 spectra, 62 candidates, 25 unique precursors (exact match)
+
+**Total: 36/36 checks PASS, 20/20 unit tests PASS**
+
+| Binary | Track | Checks | Status |
+|--------|-------|--------|--------|
+| validate_fastq | T1 | 9/9 | PASS |
+| validate_diversity | T1 | 14/14 | PASS |
+| validate_mzml | T2 | 7/7 | PASS |
+| validate_pfas | T2 | 6/6 | PASS |
+
+---
+
 ## Experiment Log
 
 ### Experiment 001: Galaxy Bootstrap — COMPLETE
@@ -426,15 +452,18 @@ of $500K instruments with proprietary software.
   - A4.3: 99.67% complete (High-quality, AAI-based), 202 viral genes, 0 contamination
   - L73: 100% complete (DTR detected), 259 viral genes, 0 contamination
 
-### Experiment 004: Rust FASTQ Parser — NOT STARTED
+### Experiment 004: Rust FASTQ + Diversity — IN PROGRESS (B2 validation)
 
-**Goal**: First Rust module — FASTQ parsing + quality filtering.
+**Goal**: Rust I/O parsers + diversity metrics — validated against Python baselines.
 
-- [ ] Implement FASTQ reader (gzip-aware)
-- [ ] Quality score parsing (Phred33/64)
+- [x] Implement FASTQ reader (needletail, gzip-aware, Phred33)
+- [x] Validate: 7,793 seqs in F3D0, 304,720 across all 40 files — **9/9 PASS**
+- [x] Implement k-mer engine (2-bit encoding, canonical k-mers, HashMap counting)
+- [x] Implement alpha diversity (Shannon, Simpson, Chao1, observed features)
+- [x] Implement Bray-Curtis dissimilarity + distance matrix
+- [x] Validate diversity: analytical tests + simulated marine community — **14/14 PASS**
 - [ ] Adapter trimming
 - [ ] Quality filtering (sliding window, min length)
-- [ ] Validate: identical output to Trimmomatic on D1
 - [ ] Benchmark: Rust vs Trimmomatic throughput
 
 ---
@@ -469,15 +498,19 @@ of $500K instruments with proprietary software.
   - CAS 375-62-2 (m/z 313.08, [M+Na]+)
 - [x] Algorithm validated: mass defect + fragment differences + suspect list
 
-### Experiment 007: Rust mzML Parser — NOT STARTED
+### Experiment 007: Rust mzML + PFAS Screening — IN PROGRESS (B2 validation)
 
-**Goal**: First Rust module for Track 2 — vendor-neutral mass spec data I/O.
+**Goal**: Rust mass spectrometry parsers + PFAS screening — validated against Python baselines.
 
-- [ ] Implement mzML XML parser (Rust quick-xml or roxmltree)
-- [ ] Parse spectrum metadata (m/z array, intensity array, RT, MS level)
-- [ ] Support binary-encoded and text-encoded arrays
-- [ ] Support gzip/zlib compressed spectra
-- [ ] Validate: identical parsed data to pyteomics on demo mzML
+- [x] Implement mzML XML parser (quick-xml, base64+zlib, 64-bit float)
+- [x] Parse spectrum metadata (m/z array, intensity array, RT, MS level)
+- [x] Support base64-encoded + zlib-compressed binary arrays
+- [x] Validate: 8 files, 6,256 spectra, 6M+ peaks, m/z 80-1000 — **7/7 PASS**
+- [x] Implement MS2 text parser (S/I/Z headers + peak lists)
+- [x] Validate: 738 spectra from PFAS Standard Mix (exact match)
+- [x] Implement ppm-tolerance binary search (core of suspect screening)
+- [x] Implement PFAS fragment screening (CF2/C2F4/HF mass differences)
+- [x] Validate: 62 candidates, 25 unique PFAS precursors (exact match) — **6/6 PASS**
 - [ ] Benchmark: Rust vs pyteomics parsing throughput
 
 ### Experiment 008: PFAS ML Water Monitoring — NOT STARTED
@@ -499,15 +532,15 @@ of $500K instruments with proprietary software.
 Track 1 (Life Science):
   Phase 0 [DONE]:     Galaxy hosting + tool validation (Exp001)
   Phase 1 [DONE]:     Pipeline replication with public data (Exp002, Exp003)
-  Phase 2 [NEXT]:     Rust ports of critical stages (Exp004: FASTQ parser)
-  Phase 3:            GPU acceleration via ToadStool
+  Phase 2 [ACTIVE]:   Rust ports — FASTQ+kmer+diversity validated (36/36 PASS)
+  Phase 3 [NEXT]:     GPU acceleration via ToadStool
   Phase 4:            End-to-end sovereign pipeline
 
 Track 2 (PFAS / blueFish):
   Phase B0 [DONE]:    asari + PFΔScreen validation (Exp005, Exp006)
   Phase B1:           Replicate Jones/MSU LC-MS and PFAS pipelines
-  Phase B2 [NEXT]:    Rust ports (Exp007: mzML parser, peak detection, PFAS screening)
-  Phase B3:           GPU acceleration (spectral matching, ML, MD)
+  Phase B2 [ACTIVE]:  Rust ports — mzML+MS2+PFAS screening validated (36/36 PASS)
+  Phase B3 [NEXT]:    GPU acceleration (spectral matching, ML, MD)
   Phase B4:           Penny monitoring (real-time, low-cost sensors)
 ```
 
@@ -738,3 +771,4 @@ Together they build a general-purpose sovereign compute platform.
 *Experiment 006 COMPLETE (FindPFAS: 25 PFAS precursors, 2 suspect matches): February 16, 2026*
 *Track 2 VALIDATED (8/8 deterministic, asari+FindPFAS): February 16, 2026*
 *Evolution analysis written (BarraCUDA 12 modules, ToadStool 8 shaders): February 16, 2026*
+*BarraCUDA Rust validation — 36/36 PASS (FASTQ, mzML, diversity, PFAS): February 16, 2026*
