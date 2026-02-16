@@ -74,16 +74,23 @@ download_url() {
 
 if [[ "$MODE" == "--all" || "$MODE" == "--validation" ]]; then
     echo "── Dataset 1: Galaxy Training (16S validation) ──────────"
-    download_url \
-        "https://zenodo.org/records/800651/files/MiSeq_SOP.tar.gz" \
-        "$DATA_DIR/validation/MiSeq_SOP.tar.gz" \
-        "Schloss MiSeq SOP (mouse gut 16S)"
+    # Download individual FASTQ files from Zenodo (no tar.gz available)
+    ZENODO_BASE="https://zenodo.org/records/800651/files"
+    VALIDATION_DIR="$DATA_DIR/validation/MiSeq_SOP"
+    mkdir -p "$VALIDATION_DIR"
 
-    if [ -f "$DATA_DIR/validation/MiSeq_SOP.tar.gz" ] && [ ! -d "$DATA_DIR/validation/MiSeq_SOP" ]; then
-        echo "  [EXTRACT] MiSeq_SOP.tar.gz..."
-        tar -xzf "$DATA_DIR/validation/MiSeq_SOP.tar.gz" -C "$DATA_DIR/validation/" 2>/dev/null || true
-        echo "  [OK] Extracted"
-    fi
+    # Paired-end samples from Schloss MiSeq SOP tutorial
+    SAMPLES=("F3D0" "F3D141" "F3D142" "F3D143" "F3D144" "F3D145" "F3D146" "F3D147" "F3D148" "F3D149" "F3D150" "F3D1" "F3D2" "F3D3" "F3D5" "F3D6" "F3D7" "F3D8" "F3D9" "Mock")
+    for sample in "${SAMPLES[@]}"; do
+        download_url "$ZENODO_BASE/${sample}_R1.fastq?download=1" "$VALIDATION_DIR/${sample}_R1.fastq" "$sample R1"
+        download_url "$ZENODO_BASE/${sample}_R2.fastq?download=1" "$VALIDATION_DIR/${sample}_R2.fastq" "$sample R2"
+    done
+
+    # Reference files needed for the tutorial
+    download_url "$ZENODO_BASE/silva.v4.fasta?download=1" "$VALIDATION_DIR/silva.v4.fasta" "SILVA v4 reference"
+    download_url "$ZENODO_BASE/trainset9_032012.pds.fasta?download=1" "$VALIDATION_DIR/trainset9.pds.fasta" "RDP trainset9 (FASTA)"
+    download_url "$ZENODO_BASE/trainset9_032012.pds.tax?download=1" "$VALIDATION_DIR/trainset9.pds.tax" "RDP trainset9 (taxonomy)"
+    download_url "$ZENODO_BASE/HMP_MOCK.v35.fasta?download=1" "$VALIDATION_DIR/HMP_MOCK.v35.fasta" "HMP mock community"
     echo
 fi
 
