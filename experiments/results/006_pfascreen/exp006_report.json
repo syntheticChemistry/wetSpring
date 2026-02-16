@@ -1,0 +1,195 @@
+{
+  "timestamp": "2026-02-16T09:51:31",
+  "tool": "FindPFAS",
+  "test_file": "TestSample_PFAS_Standard_MIX_ddMS2_20eV_Inj5.ms2",
+  "total_spectra": 738,
+  "pfas_candidates": 62,
+  "unique_precursors": 25,
+  "screening_time_s": 0.01,
+  "fragment_differences": {
+    "CF2": 49.99681,
+    "C2F4": 99.99361,
+    "HF": 20.00623
+  },
+  "top_hits": [
+    {
+      "mz": 812.9402,
+      "rt": 11.25,
+      "diffs": 13,
+      "fragments": {
+        "CF2": 7,
+        "C2F4": 6
+      }
+    },
+    {
+      "mz": 768.9506,
+      "rt": 11.33,
+      "diffs": 13,
+      "fragments": {
+        "CF2": 7,
+        "C2F4": 6
+      }
+    },
+    {
+      "mz": 912.9347,
+      "rt": 12.37,
+      "diffs": 13,
+      "fragments": {
+        "CF2": 7,
+        "C2F4": 6
+      }
+    },
+    {
+      "mz": 612.9529,
+      "rt": 9.04,
+      "diffs": 11,
+      "fragments": {
+        "CF2": 6,
+        "C2F4": 5
+      }
+    },
+    {
+      "mz": 662.9495,
+      "rt": 9.54,
+      "diffs": 11,
+      "fragments": {
+        "CF2": 6,
+        "C2F4": 5
+      }
+    },
+    {
+      "mz": 712.9465,
+      "rt": 10.07,
+      "diffs": 11,
+      "fragments": {
+        "CF2": 6,
+        "C2F4": 5
+      }
+    },
+    {
+      "mz": 668.9569,
+      "rt": 10.16,
+      "diffs": 11,
+      "fragments": {
+        "CF2": 6,
+        "C2F4": 5
+      }
+    },
+    {
+      "mz": 568.9631,
+      "rt": 8.98,
+      "diffs": 10,
+      "fragments": {
+        "CF2": 6,
+        "C2F4": 4
+      }
+    },
+    {
+      "mz": 868.9451,
+      "rt": 12.45,
+      "diffs": 10,
+      "fragments": {
+        "CF2": 5,
+        "C2F4": 5
+      }
+    },
+    {
+      "mz": 518.9661,
+      "rt": 8.42,
+      "diffs": 9,
+      "fragments": {
+        "CF2": 5,
+        "C2F4": 4
+      }
+    },
+    {
+      "mz": 468.9691,
+      "rt": 7.99,
+      "diffs": 8,
+      "fragments": {
+        "CF2": 5,
+        "C2F4": 3
+      }
+    },
+    {
+      "mz": 418.9729,
+      "rt": 7.49,
+      "diffs": 5,
+      "fragments": {
+        "CF2": 3,
+        "C2F4": 2
+      }
+    },
+    {
+      "mz": 146.9657,
+      "rt": 4.81,
+      "diffs": 3,
+      "fragments": {
+        "CF2": 2,
+        "C2F4": 1
+      }
+    },
+    {
+      "mz": 230.9858,
+      "rt": 4.93,
+      "diffs": 3,
+      "fragments": {
+        "CF2": 2,
+        "C2F4": 1
+      }
+    },
+    {
+      "mz": 268.9827,
+      "rt": 6.19,
+      "diffs": 3,
+      "fragments": {
+        "CF2": 2,
+        "C2F4": 1
+      }
+    },
+    {
+      "mz": 168.9889,
+      "rt": 6.31,
+      "diffs": 3,
+      "fragments": {
+        "CF2": 1,
+        "C2F4": 2
+      }
+    },
+    {
+      "mz": 368.9757,
+      "rt": 7.06,
+      "diffs": 3,
+      "fragments": {
+        "CF2": 2,
+        "C2F4": 1
+      }
+    },
+    {
+      "mz": 583.9822,
+      "rt": 8.54,
+      "diffs": 3,
+      "fragments": {
+        "CF2": 2,
+        "C2F4": 1
+      }
+    },
+    {
+      "mz": 292.9826,
+      "rt": 6.79,
+      "diffs": 2,
+      "fragments": {
+        "CF2": 1,
+        "C2F4": 1
+      }
+    },
+    {
+      "mz": 218.9858,
+      "rt": 5.49,
+      "diffs": 1,
+      "fragments": {
+        "C2F4": 1
+      }
+    }
+  ]
+}
