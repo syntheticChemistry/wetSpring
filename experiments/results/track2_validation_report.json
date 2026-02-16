@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-02-16T09:57:59",
+  "total_passed": 8,
+  "total_checks": 8,
+  "total_time_s": 16.4,
+  "validation": "PASS",
+  "exp005_asari": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "runtime": 15.4,
+    "features": 5951,
+    "compounds": 4101
+  },
+  "exp006_findpfas": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "runtime": 0.77,
+    "candidates": 62,
+    "unique": 25
+  }
+}

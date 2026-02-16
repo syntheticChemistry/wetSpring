@@ -1,7 +1,7 @@
 # wetSpring Control Experiment — Status Report
 
 **Date**: 2026-02-12 (Project initialized)
-**Updated**: 2026-02-16 (Track 1+2 validation COMPLETE: Exp001-003, Exp005-006)
+**Updated**: 2026-02-16 (ALL validation COMPLETE + evolution analysis written)
 **Gate**: Eastgate (i9-12900K, 64 GB DDR5, RTX 4070 12GB, Pop!_OS 22.04)
 **Galaxy**: quay.io/bgruening/galaxy:24.1 (Docker) — upgraded from 20.09
 **License**: AGPL-3.0-or-later
@@ -305,6 +305,16 @@ of $500K instruments with proprietary software.
   - Verrucomicrobiota: 125 ASVs — environmental bacteria
 - **Pipeline time**: 95.6s (import 13.6s, DADA2 68.0s, taxonomy 9.5s, barplot 0.1s)
 
+### 2026-02-16: Track 2 Validation Rerun — 8/8 PASS
+
+- Automated validation script: `scripts/validate_track2.py`
+- **Exp005 (asari)**: 5/5 checks PASS (15.4s)
+  - Feature detection is deterministic: 5,951 preferred, 8,659 full (exact match)
+  - Unique compounds ~4,101-4,107 (±0.1%, khipu clustering stochastic, within tolerance)
+- **Exp006 (FindPFAS)**: 3/3 checks PASS (0.77s)
+  - 738 spectra, 62 candidates, 25 unique precursors (exact match)
+- **Track 2 is deterministic and reproducible**
+
 ### 2026-02-16: Experiment 005 — asari LC-MS Metabolomics
 
 - Installed asari 1.13.1 in dedicated Python venv
@@ -487,16 +497,16 @@ of $500K instruments with proprietary software.
 
 ```
 Track 1 (Life Science):
-  Phase 0 (current):  Galaxy hosting + tool validation
-  Phase 1:            Pipeline replication with public data
-  Phase 2:            Rust ports of critical stages
+  Phase 0 [DONE]:     Galaxy hosting + tool validation (Exp001)
+  Phase 1 [DONE]:     Pipeline replication with public data (Exp002, Exp003)
+  Phase 2 [NEXT]:     Rust ports of critical stages (Exp004: FASTQ parser)
   Phase 3:            GPU acceleration via ToadStool
   Phase 4:            End-to-end sovereign pipeline
 
 Track 2 (PFAS / blueFish):
-  Phase B0 (current): asari + PFΔScreen validation
+  Phase B0 [DONE]:    asari + PFΔScreen validation (Exp005, Exp006)
   Phase B1:           Replicate Jones/MSU LC-MS and PFAS pipelines
-  Phase B2:           Rust ports (mzML, peak detection, PFAS screening)
+  Phase B2 [NEXT]:    Rust ports (Exp007: mzML parser, peak detection, PFAS screening)
   Phase B3:           GPU acceleration (spectral matching, ML, MD)
   Phase B4:           Penny monitoring (real-time, low-cost sensors)
 ```
@@ -542,6 +552,93 @@ These ToadStool kernels serve **both tracks** and are useful beyond wetSpring:
 
 ---
 
+## Evolution Analysis — What To Build
+
+*Based on validated baseline pipelines (Exp001–006), profiled Feb 16, 2026.*
+
+### Computational Kernels Extracted from Baselines
+
+| Kernel | DADA2 (T1) | asari (T2) | FindPFAS (T2) | Shared |
+|--------|:----------:|:----------:|:-------------:|:------:|
+| FASTQ/mzML/MS2 parsing | FASTQ | mzML | MS2 | Parsers |
+| Peak detection (find_peaks) | — | scipy | — | Signal |
+| Gaussian fitting (curve_fit) | — | scipy | — | Fitting |
+| Smoothing (uniform_filter1d) | — | scipy | — | Signal |
+| LOWESS regression | Error model | RT alignment | — | Regression |
+| K-mer counting / hashing | Core | — | — | Hash |
+| Pairwise distance matrix | Seq comparison | m/z alignment | m/z meshgrid | MatOps |
+| Tolerance search (ismembertol) | — | Centurion tree | Suspect + diag | Search |
+| Hash table (dereplication) | Core | m/z buckets | Precursor dedup | Hash |
+| Reduction / summation | Abundance | Peak area, SNR | Fragment counts | Reduce |
+| Sort / argsort | Abundance order | m/z ordering | KMD series | Sort |
+| PCA / eigensolve | PCoA diversity | Feature PCA | — | LinAlg |
+
+### BarraCUDA Evolution — Rust Modules Needed
+
+**Priority 1 — Parsers + Search (both tracks immediately):**
+
+| Module | Replaces | Track 1 | Track 2 |
+|--------|----------|:-------:|:-------:|
+| `barracuda::io::fastq` | Python FASTQ parsing | DADA2 input | — |
+| `barracuda::io::mzml` | pymzml / pyteomics | — | asari + FindPFAS |
+| `barracuda::io::ms2` | pyteomics MS2 | — | FindPFAS input |
+| `barracuda::search::tolerance` | ismembertolerance | Taxonomy lookup | Suspect + KMD |
+| `barracuda::hash::kmer` | DADA2 dereplication | K-mer counting | — |
+| `barracuda::hash::mz_bucket` | Centurion tree | — | m/z indexing |
+
+**Priority 2 — Signal Processing:**
+
+| Module | Replaces | Track 1 | Track 2 |
+|--------|----------|:-------:|:-------:|
+| `barracuda::signal::peaks` | scipy.signal.find_peaks | — | asari peak detect |
+| `barracuda::signal::smooth` | uniform_filter1d | — | Mass track smoothing |
+| `barracuda::signal::gaussian_fit` | scipy.optimize.curve_fit | — | Peak shape fitting |
+| `barracuda::stats::lowess` | statsmodels LOWESS | DADA2 error model | asari RT align |
+
+**Priority 3 — Linear Algebra:**
+
+| Module | Replaces | Track 1 | Track 2 |
+|--------|----------|:-------:|:-------:|
+| `barracuda::linalg::distance` | skbio / numpy | Bray-Curtis, PCoA | m/z alignment |
+| `barracuda::linalg::pca` | sklearn PCA | Diversity ordination | Feature PCA |
+
+### ToadStool Evolution — New GPU Shaders
+
+*Beyond hotSpring's eigensolve/Hamiltonian, wetSpring demands:*
+
+| Shader | Operation | hotSpring Ancestor | O(?) |
+|--------|-----------|-------------------|------|
+| `batched_distance_f64.wgsl` | Pairwise distance (m/z, seq) | batched_hfb_hamiltonian | O(N²)→GPU |
+| `hash_table_u64.wgsl` | GPU hash insert/lookup | New | O(1) amort |
+| `tolerance_search_f64.wgsl` | Binary search ± tolerance | New | O(N log M) |
+| `uniform_filter_f64.wgsl` | 1D moving average | New | O(N)/track |
+| `find_peaks_f64.wgsl` | Local maxima + prominence | New | O(N)/track |
+| `reduction_f64.wgsl` | Parallel sum/min/max | Exists partial | O(log N) |
+| `sort_f64.wgsl` | Bitonic sort | New | O(N log²N) |
+| `cosine_similarity_f64.wgsl` | Spectral dot product | New | O(N)/pair |
+
+### Build Order
+
+```
+Phase 2 / B2: Rust Ports (Exp004 + Exp007)
+  ┌─ barracuda::io::fastq ──── validates vs Trimmomatic (Exp004)
+  ├─ barracuda::io::mzml ───── validates vs pyteomics (Exp007)
+  ├─ barracuda::io::ms2 ────── validates vs pyteomics
+  ├─ barracuda::search::tolerance  validates vs ismembertolerance
+  ├─ barracuda::hash::kmer ──── validates vs DADA2 dereplication
+  └─ barracuda::hash::mz_bucket ─ validates vs Centurion tree
+
+Phase 3 / B3: GPU Acceleration
+  ┌─ batched_distance_f64 ──── m/z align + Bray-Curtis (both)
+  ├─ hash_table_u64 ────────── k-mer + m/z index (both)
+  ├─ tolerance_search_f64 ──── suspect PFAS + taxonomy (both)
+  ├─ find_peaks_f64 ────────── mass spec peak detect (T2)
+  ├─ uniform_filter_f64 ────── smoothing (T2)
+  └─ cosine_similarity_f64 ── MS2 spectral matching (T2)
+```
+
+---
+
 ## Relationship to hotSpring
 
 wetSpring follows the same validation methodology as hotSpring:
@@ -583,3 +680,5 @@ Together they build a general-purpose sovereign compute platform.
 *Experiment 003 COMPLETE (phage assembly+annotation, 100% CheckV): February 16, 2026*
 *Experiment 005 COMPLETE (asari: 5951 features, 4107 compounds, 15.6s): February 16, 2026*
 *Experiment 006 COMPLETE (FindPFAS: 25 PFAS precursors, 2 suspect matches): February 16, 2026*
+*Track 2 VALIDATED (8/8 deterministic, asari+FindPFAS): February 16, 2026*
+*Evolution analysis written (BarraCUDA 12 modules, ToadStool 8 shaders): February 16, 2026*
