@@ -13,6 +13,29 @@ toolchains to Rust via BarraCUDA/ToadStool.
 
 ---
 
+## Quick Start (Full Replication)
+
+```bash
+git clone git@github.com:syntheticChemistry/wetSpring.git
+cd wetSpring
+
+# 1. Install tools (SRA Toolkit for NCBI data, checks Docker/Rust)
+./scripts/setup_tools.sh
+
+# 2. Download public datasets (~5-10 GB from NCBI SRA, Zenodo, SILVA)
+./scripts/download_data.sh --all
+
+# 3. Start Galaxy bioinformatics platform (Docker, first run pulls ~4 GB)
+./scripts/start_galaxy.sh
+
+# Galaxy is now at http://localhost:8080 — follow experiments/ for protocols
+```
+
+Requirements: Linux (Ubuntu/Pop!_OS), Docker 20.10+, ~20 GB disk.
+No institutional access needed. All data is public.
+
+---
+
 ## Origin
 
 This work builds on published research by **Chuck Smallwood** (Principal
