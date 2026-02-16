@@ -31,6 +31,7 @@ services:
     volumes:
       - galaxy-data:/export     # Persistent Galaxy data (datasets, DBs, configs)
       - ./tool_lists:/tool_lists:ro  # Custom tool install lists
+      - /var/run/docker.sock:/var/run/docker.sock:rw  # Host Docker for QIIME2 containers
     environment:
       - GALAXY_CONFIG_BRAND=wetSpring
       - GALAXY_CONFIG_ADMIN_USERS=admin@galaxy.org

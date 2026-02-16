@@ -6,12 +6,9 @@ Cargo.lock
 control/galaxy/galaxy-data/
 
 # Datasets (downloaded separately)
-data/*.fastq
-data/*.fastq.gz
-data/*.fasta
-data/*.bam
-data/*.sam
-data/*.vcf
+data/
+experiments/results/*.qza
+experiments/results/**/*.qza
 
 # Track 2: Mass spec data (large, not tracked)
 data/*.mzML

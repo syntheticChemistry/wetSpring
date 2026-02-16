@@ -1,7 +1,7 @@
 # wetSpring Control Experiment — Status Report
 
 **Date**: 2026-02-12 (Project initialized)
-**Updated**: 2026-02-16 (Galaxy 24.1, 32 tools, FastQC validated, DADA2 next)
+**Updated**: 2026-02-16 (DADA2 complete: 232 ASVs, 124K reads, 20 samples)
 **Gate**: Eastgate (i9-12900K, 64 GB DDR5, RTX 4070 12GB, Pop!_OS 22.04)
 **Galaxy**: quay.io/bgruening/galaxy:24.1 (Docker) — upgraded from 20.09
 **License**: AGPL-3.0-or-later
@@ -223,7 +223,39 @@ of $500K instruments with proprietary software.
   - GC: 55%, poor quality sequences: 0
   - Per-base quality: FAIL (expected — reverse reads degrade toward 3' end)
   - This is normal for paired-end Illumina and handled by DADA2's error model
-- Galaxy history: 10 items (2 uploads + 4 errored from v20.09 + 4 ok from v24.1)
+
+### 2026-02-16: QIIME2 + DADA2 Operational
+
+- Installed QIIME2 2026.1.0 in Galaxy's conda (`qiime2-amplicon-2026.1` env)
+  - Packages: q2-dada2, q2-feature-table, q2-taxa, q2-diversity, q2galaxy
+  - R 4.3.3, DADA2 1.30.0, Rcpp 1.1.0
+  - Fixed `pkg_resources` (downgraded setuptools to 69.5.1)
+  - Created `/usr/local/bin/q2galaxy` wrapper (unsets Galaxy venv, uses conda env)
+- Uploaded all 40 FASTQ files (20 paired samples) via Galaxy API
+- Created `list:paired` collection "MiSeq SOP Paired Reads"
+- Imported into QIIME2 artifact: `paired-end-demux.qza` (36.9 MB)
+  - `SampleData[PairedEndSequencesWithQuality]`, UUID: 86df290c
+
+### 2026-02-16: DADA2 Denoise-Paired
+
+- **Parameters**: trunc_len_f=240, trunc_len_r=160, n_threads=8
+- **Runtime**: 43.5 seconds (i9-12900K, 8 threads)
+- **Results**:
+  - 232 ASVs detected across 20 samples
+  - 124,249 total reads retained (mean 6,212/sample)
+  - Input: 162,360 reads → Filtered: 148,641 (91.5%) → Non-chimeric: 124,249 (76.5%)
+- **Per-sample retention** (input → non-chimeric):
+
+| Sample | Input | Filtered | Denoised | Merged | Non-chimeric | % Retained |
+|--------|-------|----------|----------|--------|-------------|-----------|
+| F3D0 | 7,793 | 7,113 | 6,976 | 6,540 | 6,528 | 83.8% |
+| F3D2 | 19,620 | 18,075 | 17,907 | 17,431 | 16,835 | 85.8% |
+| F3D147 | 17,070 | 15,637 | 15,433 | 14,233 | 13,006 | 76.2% |
+| Mock | 4,779 | 4,314 | 4,287 | 4,269 | 4,269 | 89.3% |
+
+- **Mock community**: 89.3% retention with 4,269 reads — highest retention
+  rate as expected (defined community, no chimeras)
+- **Artifacts saved**: `dada2-table.qza`, `dada2-rep-seqs.qza`, `dada2-stats.qza`
 
 ---
 
@@ -240,8 +272,9 @@ of $500K instruments with proprietary software.
 - [x] Training dataset (D1) uploaded (F3D0 paired-end, 7793 sequences)
 - [x] FastQC on R1 — PASS (Q32-38+, 0 poor quality, 54% GC)
 - [x] FastQC on R2 — expected quality drop (normal for Illumina R2)
-- [ ] Upload all 20 MiSeq SOP paired samples
-- [ ] DADA2 denoise-paired on full dataset → ASV table
+- [x] Uploaded all 20 paired samples (40 FASTQ files) via Galaxy API
+- [x] QIIME2 import → `paired-end-demux.qza` (36.9 MB)
+- [x] DADA2 denoise-paired → 232 ASVs, 124,249 reads, 43.5s runtime
 - [ ] SILVA taxonomy classification
 - [ ] Taxonomy barplot generated (QIIME2)
 
@@ -423,3 +456,4 @@ Together they build a general-purpose sovereign compute platform.
 *Initialized: February 12, 2026*
 *Track 2 (blueFish) added: February 12, 2026*
 *Galaxy 24.1 operational, FastQC validated: February 16, 2026*
+*DADA2 denoise-paired complete (232 ASVs): February 16, 2026*
