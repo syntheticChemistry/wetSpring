@@ -1,0 +1,44 @@
+{
+  "timestamp": "2026-02-16T14:32:26",
+  "rarefaction_depth": 40834,
+  "n_samples": 10,
+  "alpha_diversity": {
+    "shannon": {
+      "mean": 2.9337,
+      "std": 0.8145,
+      "min": 1.7769,
+      "max": 3.8507
+    },
+    "observed_features": {
+      "mean": 300.7,
+      "std": 222.2951,
+      "min": 91.0,
+      "max": 856.0
+    },
+    "chao1": {
+      "mean": 348.0,
+      "std": 329.0258,
+      "min": 91.3,
+      "max": 1222.2183
+    },
+    "simpson": {
+      "mean": 0.859,
+      "std": 0.0915,
+      "min": 0.728,
+      "max": 0.939
+    }
+  },
+  "beta_diversity": {
+    "metric": "braycurtis",
+    "mean_pairwise": 0.6902,
+    "min_pairwise": 0.0595,
+    "max_pairwise": 0.9518,
+    "pcoa_variance_explained": {
+      "PC1": 49.71,
+      "PC2": 30.84,
+      "PC3": 11.12,
+      "PC4": 5.53,
+      "PC5": 2.0
+    }
+  }
+}

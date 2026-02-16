@@ -1,0 +1,37 @@
+{
+  "timestamp": "2026-02-16",
+  "phages": {
+    "A4.3": {
+      "sra_accession": "SRR36584166",
+      "assembly": {
+        "length_bp": 139846,
+        "checkv_quality": "High-quality",
+        "completeness_pct": 99.67,
+        "completeness_method": "AAI-based (high-confidence)",
+        "viral_genes": 202,
+        "host_genes": 0,
+        "contamination": 0.0
+      },
+      "prokka": {
+        "CDS": 219,
+        "tRNA": 7
+      }
+    },
+    "L73": {
+      "sra_accession": "SRR36584167",
+      "assembly": {
+        "length_bp": 166966,
+        "checkv_quality": "Complete",
+        "completeness_pct": 100.0,
+        "completeness_method": "DTR (high-confidence)",
+        "viral_genes": 259,
+        "host_genes": 0,
+        "contamination": 0.0
+      },
+      "prokka": {
+        "CDS": 277,
+        "tRNA": 11
+      }
+    }
+  }
+}
