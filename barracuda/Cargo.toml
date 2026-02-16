@@ -2,30 +2,45 @@
 name = "wetspring-barracuda"
 version = "0.1.0"
 edition = "2021"
+rust-version = "1.82"
 authors = ["Squirrel Team"]
 license = "AGPL-3.0-or-later"
 description = "Life science + PFAS analytical chemistry pipelines — Rust + GPU via BarraCUDA/ToadStool"
+repository = "https://github.com/syntheticChemistry/wetSpring"
+keywords = ["bioinformatics", "mass-spectrometry", "pfas", "gpu", "wgsl"]
+categories = ["science", "command-line-utilities"]
 
 [workspace]
 
+[features]
+default = []
+# GPU acceleration via BarraCUDA/ToadStool (Phase 3).
+# Enable with `cargo build --features gpu` when wiring GPU dispatch.
+# Pulls in wgpu (WebGPU), barracuda (ToadStool tensor compute),
+# tokio (async device creation), and bytemuck (shader params).
+gpu = ["dep:barracuda", "dep:wgpu", "dep:tokio", "dep:bytemuck"]
+
 [dependencies]
-# BarraCUDA: All scientific computing from the shared library
-barracuda = { path = "../../phase1/toadstool/crates/barracuda" }
+# BarraCUDA: shared scientific computing library (ToadStool GPU compute).
+# Provides SumReduceF64, WgpuDevice, TensorContext, math_f64 shaders.
+barracuda = { path = "../../phase1/toadstool/crates/barracuda", optional = true }
 
-# I/O: FASTQ parsing
-needletail = "0.6"
+# wgpu: WebGPU compute — hardware-agnostic GPU via Vulkan/Metal/DX12.
+# Same version as barracuda to prevent duplicate symbol linking errors.
+wgpu = { version = "0.19", features = ["wgsl"], optional = true }
 
-# I/O: mzML XML parsing + binary array decoding
-quick-xml = "0.37"
-base64 = "0.22"
+# Async runtime for GPU device creation (barracuda already brings tokio in).
+tokio = { version = "1", features = ["rt", "macros"], optional = true }
+
+# Safe byte casting for GPU uniform/storage buffer params.
+bytemuck = { version = "1.14", features = ["derive"], optional = true }
+
+# I/O: zlib decompression (mzML binary arrays) + GzDecoder (FASTQ .gz)
+# XML parsing is sovereign (src/io/xml.rs); no quick-xml dependency.
 flate2 = "1.0"
 
-# Data + serialization
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-
-# Parallelism
-rayon = "1.10"
+[dev-dependencies]
+tempfile = "3"
 
 # ── Track 1 validation binaries ──────────────────────────────────
 [[bin]]
@@ -44,3 +59,9 @@ path = "src/bin/validate_mzml.rs"
 [[bin]]
 name = "validate_pfas"
 path = "src/bin/validate_pfas.rs"
+
+# ── GPU validation binaries (require --features gpu) ─────────────
+[[bin]]
+name = "validate_diversity_gpu"
+path = "src/bin/validate_diversity_gpu.rs"
+required-features = ["gpu"]

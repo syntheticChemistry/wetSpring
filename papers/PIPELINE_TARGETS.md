@@ -36,14 +36,14 @@ FASTQ → FastQC → Cutadapt/Trimmomatic → DADA2 denoise
 
 | Stage | Python/Galaxy tool | Rust replacement | GPU potential |
 |-------|-------------------|------------------|:------------:|
-| FASTQ parsing | BioPython / cutadapt | `needletail` or custom | Low |
+| FASTQ parsing | BioPython / cutadapt | `io::fastq` (sovereign, gzip-aware) | Low |
 | Quality filtering | Trimmomatic | Custom Rust filter | Low |
-| K-mer counting | DADA2 (R/C++) | Custom k-mer engine | **High** |
-| Denoising (error model) | DADA2 core | Rust reimpl | **High** |
-| Sequence alignment | vsearch / BLAST | Rust SW / minimap2-rs | **High** |
-| Taxonomic classify | sklearn NBC / Kraken2 | Rust k-mer classifier | **High** |
-| Diversity metrics | scikit-bio | Rust linalg (BarraCUDA) | Medium |
-| Distance matrices | UniFrac (scipy) | Rust tree traversal + GPU | **High** |
+| K-mer counting | DADA2 (R/C++) | `bio::kmer` (2-bit canonical) ✓ | **High** |
+| Denoising (error model) | DADA2 core | Rust reimpl (planned) | **High** |
+| Sequence alignment | vsearch / BLAST | Rust SW / minimap2-rs (planned) | **High** |
+| Taxonomic classify | sklearn NBC / Kraken2 | Rust k-mer classifier (planned) | **High** |
+| Diversity metrics | scikit-bio | `bio::diversity` + GPU shaders ✓ | **High** |
+| Distance matrices | UniFrac (scipy) | `bio::diversity_gpu` (BC done) + GPU | **High** |
 
 ### Public datasets for validation
 
@@ -197,7 +197,7 @@ Raw vendor files → msconvert (ProteoWizard) → mzML
 
 | Stage | Python tool | Rust replacement | GPU potential |
 |-------|------------|------------------|:------------:|
-| mzML parsing | pyteomics / asari | Rust XML/binary parser | Low |
+| mzML parsing | pyteomics / asari | `io::mzml` + `io::xml` (sovereign) ✓ | Low |
 | Mass track extraction | asari (numpy) | Rust ndarray + SIMD | Medium |
 | Peak detection | asari (scipy) | Rust signal processing | **High** |
 | Mass alignment | asari (custom) | Rust alignment engine | Medium |
@@ -257,7 +257,7 @@ Raw vendor files → msconvert → mzML
 
 | Stage | Python/C++ tool | Rust replacement | GPU potential |
 |-------|----------------|------------------|:------------:|
-| mzML I/O | pyteomics/pyOpenMS | Rust mzML parser | Low |
+| mzML I/O | pyteomics/pyOpenMS | `io::mzml` (sovereign) ✓ | Low |
 | Feature detection | pyOpenMS | Rust centroiding + peak pick | **High** |
 | KMD analysis | PFΔScreen (numpy) | Rust mass defect engine | Medium |
 | MS2 scoring | PFΔScreen (scipy) | Rust cosine similarity | **High** |

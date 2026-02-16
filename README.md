@@ -23,6 +23,31 @@ kernels useful far beyond their original domain.
 
 ---
 
+## Current Status
+
+```
+wetspring-barracuda v0.1.0
+  293 tests (251 unit + 42 integration), ~98% line coverage
+  0 clippy pedantic warnings (lib + gpu), 0 doc warnings
+  63/63 CPU validation checks PASS (FASTQ, quality, merge, derep, diversity, mzML, PFAS)
+  31/31 GPU validation checks PASS (Shannon, Simpson, BC, PCoA, alpha, spectral match)
+  1 runtime dep (flate2); GPU deps feature-gated (barracuda, wgpu, tokio, bytemuck)
+  ToadStool primitives: FusedMapReduceF64, BatchedEighGpu, GemmF64
+  1 custom WGSL shader: bray_curtis_pairs_f64 (all-pairs distance matrix)
+  Sovereign parsers: FASTQ, mzML/XML, MS2, base64 — all in-tree
+  16S pipeline: FASTQ → quality filter → adapter trim → merge pairs → derep → diversity → PCoA
+  LC-MS pipeline: mzML → mass tracks → EIC → peaks → feature table
+  PFAS pipeline: mzML/MS2 → tolerance search → spectral match → KMD → homologue grouping
+```
+
+| Track | Phase | Status |
+|-------|-------|--------|
+| T1 Life Science | Phase 4 (Sovereign) | **Active** — 16S pipeline through dereplication, GPU diversity |
+| T2 PFAS/blueFish | Phase B2 (Rust) | **Done** — mzML + MS2 + PFAS + feature extraction validated |
+| Both | GPU (ToadStool) | **Active** — 31/31 GPU PASS (RTX 4070, f64) |
+
+---
+
 ## Quick Start (Full Replication)
 
 ```bash
@@ -180,61 +205,69 @@ machine learning"** (MSU Center for PFAS Research)
 
 ### Track 1: Life Science (Phases 0-4)
 
-#### Phase 0: Galaxy Hosting (Current)
-- Self-host Galaxy Project via Docker on Eastgate
-- Import standard bioinformatics tools (QIIME2, DADA2, FastQC, Trimmomatic,
-  BLAST, Kraken2, MetaPhlAn, SPAdes, Prokka)
-- Validate with public 16S rRNA datasets (Human Microbiome Project, etc.)
-- Establish baseline: tool versions, runtimes, reproducibility
+#### Phase 0: Galaxy Hosting — DONE
+- Galaxy 24.1 Docker on Eastgate, 32 tools installed (QIIME2, DADA2, etc.)
+- Validated with MiSeq SOP (Zenodo 800651), SILVA 138 taxonomy
 
-#### Phase 1: Pipeline Replication
-- Replicate Paper 1 (Pond Crash Forensics) pipeline end-to-end
-- Replicate Paper 2 (Phage Biocontrol) bioinformatics
+#### Phase 1: Pipeline Replication — DONE
+- Exp001: 232 ASVs, 124K reads, 9 phyla (deterministic, 8/8 PASS)
+- Exp002: 2,273 ASVs from real SRA data (PRJNA1195978), 41 phyla
+- Exp003: Phage assembly + annotation (100% CheckV completeness)
 
-#### Phase 2: Rust Evolution (BarraCUDA)
-- FASTQ parsing, k-mer counting, denoising, alignment, classification
-- Validate: identical results to Galaxy baseline
+#### Phase 2: Rust Evolution (BarraCUDA) — DONE
+- Sovereign FASTQ parser (gzip-aware, streaming, no needletail)
+- K-mer counting (2-bit canonical), alpha/beta diversity (Shannon/Simpson/Chao1/BC)
+- `Validator` harness: typed `check_count`/`check_count_u64` — zero precision-loss casts
+- NaN-safe tolerance search, Result-based error propagation throughout
 
-#### Phase 3: GPU Acceleration (ToadStool)
-- GPU sequence alignment, k-mer counting, FFT, peak detection
-- Benchmark: Rust+GPU vs Python+Galaxy
+#### Phase 3: GPU Acceleration (ToadStool) — DONE
+- `GpuF64` bridge: wgpu device → ToadStool `WgpuDevice`/`TensorContext`
+- Shannon + Simpson rewired to ToadStool `FusedMapReduceF64`
+- Observed features, Pielou evenness, full alpha diversity on GPU
+- Pairwise spectral cosine similarity via `GemmF64` + `FusedMapReduceF64`
+- PCoA ordination: CPU Jacobi + GPU `BatchedEighGpu` eigendecomposition
+- 1 custom WGSL shader: `bray_curtis_pairs_f64` (all-pairs distance matrix)
+- **31/31 GPU validation PASS** (RTX 4070, SHADER_F64)
+- Found/fixed 2× coefficient bug in ToadStool `math_f64.wgsl` log_f64 (absorbed upstream)
 
-#### Phase 4: Sovereign Pipeline
-- End-to-end Rust: FASTQ → taxonomy → diversity → report
+#### Phase 4: Sovereign Pipeline — ACTIVE
+- Quality filtering + adapter trimming (Trimmomatic/Cutadapt equivalent)
+- Paired-end read merging (VSEARCH/FLASH equivalent)
+- Dereplication with abundance tracking (VSEARCH equivalent)
+- 1D peak detection (`scipy.signal.find_peaks` equivalent)
+- EIC extraction + mass track detection
+- Feature table extraction (asari pipeline equivalent)
+- MS2 cosine similarity (matched + weighted)
+- Kendrick mass defect analysis + PFAS homologue grouping
+- **63/63 CPU + 31/31 GPU = 94/94 validation checks PASS**
+- Next: DADA2 denoising, chimera detection, taxonomy classification
 
 ### Track 2: PFAS Analytical Chemistry — blueFish (Phases B0-B4)
 
-#### Phase B0: Open-Source Baseline (Start Here)
-- Install and run **asari** on demo LC-MS datasets
-- Install and run **PFΔScreen** on public HRMS data
-- Validate: reproduce published feature tables and PFAS identifications
-- Establish baseline: tool versions, runtimes, accuracy
+#### Phase B0: Open-Source Baseline — DONE
+- asari 1.13.1: 5,951 features, 4,107 compounds from MT02 demo data
+- FindPFAS: 25 PFAS precursors from standard mix (exact match)
 
-#### Phase B1: Pipeline Replication
-- Replicate Jones lab LC-MS metabolomics workflow (asari → feature table)
-- Replicate PFΔScreen PFAS screening on contaminated water/soil data
-- Replicate MSU ML models for PFAS drinking water prediction
-- Compare: same PFAS identified? same concentrations?
+#### Phase B1: Pipeline Replication — PENDING
+- Replicate Jones/MSU LC-MS and PFAS pipelines on real water data
 
-#### Phase B2: Rust Evolution (BarraCUDA)
-- Port mzML parsing to Rust (vendor-neutral mass spec I/O)
-- Port peak detection and mass alignment to Rust
-- Port PFAS mass defect / KMD analysis to Rust
-- Port ML models to Rust (smartcore / burn)
-- Validate: identical results to Python baseline
+#### Phase B2: Rust Evolution (BarraCUDA) — DONE
+- Sovereign mzML parser (in-tree XML pull parser, base64+zlib decoding)
+- Sovereign MS2 parser (streaming)
+- ppm-tolerance search + PFAS fragment screening
+- MS2 cosine similarity (matched + weighted) + Stein-Scott weighting
+- Kendrick mass defect analysis + PFAS homologue grouping
+- 1D peak detection, EIC extraction, feature table construction
+- **7/7 mzML + 10/10 PFAS validation PASS**, streaming I/O
 
-#### Phase B3: GPU Acceleration (ToadStool)
-- GPU peak detection (embarrassingly parallel across scans)
-- GPU spectral cosine similarity (MS2 library matching)
-- GPU force field evaluation (molecular dynamics)
-- GPU neural network inference (toxicity prediction)
-- Benchmark: Rust+GPU vs Python for each stage
+#### Phase B3: GPU Acceleration (ToadStool) — DONE
+- GPU pairwise spectral cosine similarity via `GemmF64` + `FusedMapReduceF64`
+- **31/31 GPU validation PASS** including spectral match checks
+- See `EVOLUTION_READINESS.md` for remaining promotion targets
 
 #### Phase B4: Penny Monitoring (blueFish Endgame)
-- Real-time streaming: instrument → Rust+GPU → results
-- Low-cost sensor integration (replace $500K LC-MS)
-- Edge deployment (Raspberry Pi + GPU backend)
-- Live water monitoring for pennies per sample
+- Real-time: instrument → Rust+GPU → results
+- Low-cost sensor integration, edge deployment
 
 ---
 
@@ -242,19 +275,58 @@ machine learning"** (MSU Center for PFAS Research)
 
 ```
 wetSpring/
-  barracuda/           — Rust crate (future: BarraCUDA life science + analytical modules)
+  barracuda/                — Rust crate: life science + analytical chemistry pipelines
     src/
+      bio/                  — Bioinformatics + analytical chemistry algorithms
+        quality.rs          —   Quality filtering + adapter trimming (Trimmomatic/Cutadapt)
+        merge_pairs.rs      —   Paired-end read merging (VSEARCH/FLASH)
+        derep.rs            —   Dereplication + abundance tracking (VSEARCH)
+        kmer.rs             —   2-bit canonical k-mer counting
+        diversity.rs        —   Shannon, Simpson, Chao1, Bray-Curtis, Pielou, rarefaction
+        pcoa.rs             —   PCoA ordination (CPU Jacobi eigensolve)
+        signal.rs           —   1D peak detection (scipy.signal.find_peaks equivalent)
+        eic.rs              —   Extracted Ion Chromatogram / mass track detection
+        feature_table.rs    —   End-to-end asari-style feature extraction
+        tolerance_search.rs —   ppm/Da search + PFAS fragment screening
+        spectral_match.rs   —   MS2 cosine similarity (matched + weighted)
+        kmd.rs              —   Kendrick mass defect + PFAS homologue grouping
+        diversity_gpu.rs    —   GPU: Shannon/Simpson/observed/evenness/alpha/Bray-Curtis
+        pcoa_gpu.rs         —   GPU: PCoA via ToadStool BatchedEighGpu
+        spectral_match_gpu.rs — GPU: pairwise cosine via GemmF64
+      io/                   — Streaming I/O parsers (all sovereign, zero external parsers)
+        fastq.rs            —   FASTQ parser (gzip-aware via flate2)
+        mzml.rs             —   mzML mass spectrometry parser
+        ms2.rs              —   MS2 text format parser
+        xml.rs              —   Minimal XML pull parser (for mzML)
+      bin/                  — Validation binaries (hotSpring pattern: pass/fail, exit 0/1)
+        validate_fastq.rs   —   28/28 checks: quality + merge + derep + Galaxy FastQC
+        validate_diversity.rs — 18/18 checks: analytical + simulated + evenness + rarefaction
+        validate_mzml.rs    —   7/7 checks vs asari/pyteomics baseline
+        validate_pfas.rs    —   10/10 checks: cosine + KMD + FindPFAS
+        validate_diversity_gpu.rs — 31/31 GPU vs CPU (--features gpu)
+      encoding.rs           — Sovereign base64 encoder/decoder (RFC 4648)
+      error.rs              — Typed error chain (Error enum + std::error::Error)
+      gpu.rs                — GpuF64 device wrapper (cfg(gpu)), ToadStool bridge
+      tolerances.rs         — Centralized CPU + GPU validation tolerances
+      validation.rs         — Validator struct + check/check_count/finish framework
+      shaders/              — Custom WGSL f64 compute shaders
+        bray_curtis_pairs_f64.wgsl — All-pairs BC distance matrix
+    tests/
+      io_roundtrip.rs       — 42 integration tests (round-trip, pipeline, edge cases)
   control/
-    galaxy/            — Galaxy Project Docker deployment (Track 1)
-    asari/             — asari LC-MS processing config (Track 2)
-    pfascreen/         — PFΔScreen PFAS screening config (Track 2)
-    pipelines/         — Workflow definitions (.ga, .yaml)
-  data/                — Public datasets, SRA accessions, reference DBs
-  experiments/         — Numbered experiment logs (like hotSpring)
-    001-004            — Track 1: Life science experiments
-    005-007+           — Track 2: PFAS analytical chemistry experiments
-  papers/              — Target paper analysis and replication notes
-  scripts/             — Helper scripts (download, preprocess, validate)
+    galaxy/                 — Galaxy 24.1 Docker deployment (Track 1)
+    asari/                  — asari LC-MS processing config (Track 2)
+    pfascreen/              — PFΔScreen PFAS screening config (Track 2)
+  data/                     — Public datasets (Zenodo, SRA, EPA)
+  experiments/              — Numbered experiment protocols and logs
+  papers/
+    PIPELINE_TARGETS.md     — Target paper → pipeline → Rust module mapping
+  scripts/                  — Download, preprocess, validate helpers
+  whitePaper/
+    README.md               — Study overview and key results
+    METHODOLOGY.md          — Two-track validation protocol and acceptance criteria
+  CONTROL_EXPERIMENT_STATUS.md — Experiment logs, validation counts, evolution roadmap
+  EVOLUTION_READINESS.md    — Module-by-module GPU promotion readiness
 ```
 
 ---

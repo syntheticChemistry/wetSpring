@@ -1,105 +1,99 @@
-//! Validate diversity metrics against skbio reference values (Exp002 baseline).
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//! Validate diversity metrics against analytical known values and skbio baselines.
 //!
-//! Uses hardcoded ASV abundance tables — no file I/O required.
-//! Reference: skbio.diversity from exp002_diversity_v2.py
-//!   Shannon: 2.93 ± 0.81 (range 1.78–3.85)
-//!   Simpson: 0.86 ± 0.09 (range 0.73–0.94)
-//!   Observed: 301 ± 222 (range 91–856)
-//!   Bray-Curtis mean: 0.69 (range 0.06–0.95)
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline script | `scripts/run_exp002.py` (skbio.diversity) |
+//! | Baseline commit | `21d43a0` (Exp002 complete — 2,273 ASVs) |
+//! | Baseline date | 2026-02-16 |
+//! | Dataset | PRJNA1195978 (phytoplankton microbiome) |
+//! | Reference | skbio 0.6.0, scipy 1.12 |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, Pop!\_OS 22.04) |
+//!
+//! # Methodology
+//!
+//! - **Analytical tests**: known closed-form values (Shannon of uniform = ln(S), etc.)
+//! - **K-mer tests**: deterministic counting with exact expected values
+//!
+//! TODO(Phase 3): Replace simulated community with real Exp002 ASV table
+//! and exact skbio diversity values for Python-parity validation.
 
-use wetspring_barracuda::bio::diversity;
-
-fn check(label: &str, actual: f64, expected: f64, tolerance: f64) -> bool {
-    let pass = (actual - expected).abs() <= tolerance;
-    let tag = if pass { "OK" } else { "FAIL" };
-    println!(
-        "  [{}]  {}: {:.4} (expected {:.4}, tol {:.4})",
-        tag, label, actual, expected, tolerance
-    );
-    pass
-}
+use wetspring_barracuda::bio::{diversity, kmer};
+use wetspring_barracuda::tolerances;
+use wetspring_barracuda::validation::Validator;
 
 fn main() {
-    println!("═══════════════════════════════════════════════════════════");
-    println!("  wetSpring Diversity Metrics Validation");
-    println!("  Reference: skbio (Exp002 phytoplankton microbiome)");
-    println!("═══════════════════════════════════════════════════════════\n");
+    let mut v = Validator::new("wetSpring Diversity Metrics Validation");
 
-    let mut total = 0u32;
-    let mut passed = 0u32;
+    validate_analytical(&mut v);
+    validate_simulated_community(&mut v);
+    validate_bray_curtis_matrix(&mut v);
+    validate_kmer(&mut v);
+    validate_evenness_and_rarefaction(&mut v);
 
-    // ── Unit tests: known analytical values ──────────────────────
-    println!("── Analytical unit tests ──");
+    v.finish();
+}
+
+fn validate_analytical(v: &mut Validator) {
+    v.section("── Analytical unit tests ──");
 
     // Shannon of uniform distribution with S species = ln(S)
-    {
-        let uniform_4 = vec![25.0; 4];
-        let h = diversity::shannon(&uniform_4);
-        total += 1;
-        if check("Shannon(uniform, S=4)", h, 4.0f64.ln(), 1e-10) {
-            passed += 1;
-        }
+    let uniform_4 = vec![25.0; 4];
+    let shannon_4 = diversity::shannon(&uniform_4);
+    v.check(
+        "Shannon(uniform, S=4)",
+        shannon_4,
+        4.0_f64.ln(),
+        tolerances::ANALYTICAL_F64,
+    );
 
-        let uniform_100 = vec![10.0; 100];
-        let h100 = diversity::shannon(&uniform_100);
-        total += 1;
-        if check("Shannon(uniform, S=100)", h100, 100.0f64.ln(), 1e-10) {
-            passed += 1;
-        }
-    }
+    let uniform_100 = vec![10.0; 100];
+    let shannon_100 = diversity::shannon(&uniform_100);
+    v.check(
+        "Shannon(uniform, S=100)",
+        shannon_100,
+        100.0_f64.ln(),
+        tolerances::ANALYTICAL_F64,
+    );
 
     // Simpson of uniform = 1 - 1/S
-    {
-        let uniform = vec![100.0; 10];
-        let s = diversity::simpson(&uniform);
-        total += 1;
-        if check("Simpson(uniform, S=10)", s, 0.9, 1e-10) {
-            passed += 1;
-        }
-    }
+    let uniform_10 = vec![100.0; 10];
+    let simpson_10 = diversity::simpson(&uniform_10);
+    v.check(
+        "Simpson(uniform, S=10)",
+        simpson_10,
+        0.9,
+        tolerances::ANALYTICAL_F64,
+    );
 
     // Bray-Curtis symmetry and bounds
-    {
-        let a = vec![10.0, 20.0, 30.0, 0.0, 5.0];
-        let b = vec![15.0, 10.0, 25.0, 5.0, 0.0];
-        let bc_ab = diversity::bray_curtis(&a, &b);
-        let bc_ba = diversity::bray_curtis(&b, &a);
-        total += 1;
-        if check("Bray-Curtis symmetry", (bc_ab - bc_ba).abs(), 0.0, 1e-15) {
-            passed += 1;
-        }
-        total += 1;
-        if check("Bray-Curtis in [0,1]", bc_ab, 0.3, 0.3) {
-            passed += 1;
-        }
-    }
+    let sample_a = vec![10.0, 20.0, 30.0, 0.0, 5.0];
+    let sample_b = vec![15.0, 10.0, 25.0, 5.0, 0.0];
+    let bc_ab = diversity::bray_curtis(&sample_a, &sample_b);
+    let bc_ba = diversity::bray_curtis(&sample_b, &sample_a);
+    v.check(
+        "Bray-Curtis symmetry",
+        (bc_ab - bc_ba).abs(),
+        0.0,
+        tolerances::BRAY_CURTIS_SYMMETRY,
+    );
+    v.check("Bray-Curtis in [0,1]", bc_ab, 0.3, 0.3);
+}
 
-    // ── Simulated phytoplankton-like community ───────────────────
-    println!("\n── Simulated marine microbiome community ──");
-    println!("  (Mimics Exp002 structure: Proteobacteria-dominant, high evenness)");
+fn validate_simulated_community(v: &mut Validator) {
+    v.section("── Simulated marine microbiome community ──");
 
-    // Simulate a realistic community: ~300 ASVs, dominated by
-    // Proteobacteria (~36%), Bacteroidota (~9%), others
+    // NOTE: This uses fabricated data matching Exp002 *structure* but not
+    // exact values. Replace with real ASV table + exact skbio baseline
+    // when provenance script is committed.
     let mut community = Vec::new();
-    // Dominant: 100 ASVs with abundance 50-200
-    for i in 0..100 {
-        community.push(50.0 + (i as f64 * 1.5));
-    }
-    // Medium: 100 ASVs with abundance 10-50
-    for i in 0..100 {
-        community.push(10.0 + (i as f64 * 0.4));
-    }
-    // Rare: 100 ASVs with abundance 1-10
-    for i in 0..100 {
-        community.push(1.0 + (i as f64 * 0.09));
-    }
-    // Singletons/doubletons
-    for _ in 0..20 {
-        community.push(1.0);
-    }
-    for _ in 0..10 {
-        community.push(2.0);
-    }
+    community.extend((0..100).map(|i| 50.0 + (f64::from(i) * 1.5)));
+    community.extend((0..100).map(|i| 10.0 + (f64::from(i) * 0.4)));
+    community.extend((0..100).map(|i| 1.0 + (f64::from(i) * 0.09)));
+    community.extend(std::iter::repeat_n(1.0, 20));
+    community.extend(std::iter::repeat_n(2.0, 10));
 
     let alpha = diversity::alpha_diversity(&community);
     println!(
@@ -107,35 +101,38 @@ fn main() {
         alpha.observed, alpha.shannon, alpha.simpson, alpha.chao1
     );
 
-    // These should be in reasonable range for a marine community
-    total += 1;
-    if check("Observed features", alpha.observed, 330.0, 30.0) {
-        passed += 1;
-    }
+    v.check("Observed features", alpha.observed, 330.0, 1.0);
+    v.check(
+        "Shannon in marine range",
+        alpha.shannon,
+        4.9,
+        tolerances::SHANNON_SIMULATED,
+    );
+    v.check(
+        "Simpson > 0.9",
+        alpha.simpson,
+        0.95,
+        tolerances::SIMPSON_SIMULATED,
+    );
+    v.check(
+        "Chao1 >= observed",
+        alpha.chao1 - alpha.observed,
+        50.0,
+        tolerances::CHAO1_RANGE,
+    );
+}
 
-    // Shannon for ~330 species with moderate evenness: expect 3-5
-    total += 1;
-    if check("Shannon in marine range", alpha.shannon, 4.5, 1.5) {
-        passed += 1;
-    }
+fn validate_bray_curtis_matrix(v: &mut Validator) {
+    v.section("── Bray-Curtis distance matrix ──");
 
-    // Simpson for diverse community: 0.8-0.99
-    total += 1;
-    if check("Simpson > 0.8", alpha.simpson, 0.95, 0.15) {
-        passed += 1;
-    }
+    let mut community = Vec::new();
+    community.extend((0..100).map(|i| 50.0 + (f64::from(i) * 1.5)));
+    community.extend((0..100).map(|i| 10.0 + (f64::from(i) * 0.4)));
+    community.extend((0..100).map(|i| 1.0 + (f64::from(i) * 0.09)));
+    community.extend(std::iter::repeat_n(1.0, 20));
+    community.extend(std::iter::repeat_n(2.0, 10));
 
-    // Chao1 >= observed
-    total += 1;
-    if check("Chao1 >= observed", alpha.chao1, alpha.observed + 50.0, 100.0) {
-        passed += 1;
-    }
-
-    // ── Bray-Curtis distance matrix ─────────────────────────────
-    println!("\n── Bray-Curtis distance matrix ──");
-
-    // Create 3 samples with varying compositions
-    let sample_a: Vec<f64> = community.iter().map(|&c| c * 1.0).collect();
+    let sample_a: Vec<f64> = community.clone();
     let sample_b: Vec<f64> = community.iter().map(|&c| c * 0.8 + 5.0).collect();
     let sample_c: Vec<f64> = community
         .iter()
@@ -143,81 +140,82 @@ fn main() {
         .map(|(i, &c)| if i % 2 == 0 { c * 2.0 } else { 0.5 })
         .collect();
 
-    let dm = diversity::bray_curtis_matrix(&[
-        sample_a.clone(),
-        sample_b.clone(),
-        sample_c.clone(),
-    ]);
+    let dm = diversity::bray_curtis_matrix(&[sample_a, sample_b, sample_c]);
 
-    let bc_ab = dm[0 * 3 + 1];
-    let bc_ac = dm[0 * 3 + 2];
-    let bc_bc = dm[1 * 3 + 2];
-
-    println!("  BC(A,B) = {:.4}, BC(A,C) = {:.4}, BC(B,C) = {:.4}", bc_ab, bc_ac, bc_bc);
-
-    // A and B are similar (scaled + offset), A and C very different
-    total += 1;
-    if check("BC(A,B) < BC(A,C)", bc_ab, bc_ac * 0.5, bc_ac) {
-        passed += 1;
-    }
-
-    // Diagonal should be zero
-    total += 1;
-    if check("BC(A,A) = 0", dm[0], 0.0, 1e-15) {
-        passed += 1;
-    }
-
-    // ── K-mer counting (validates bio::kmer) ────────────────────
-    println!("\n── K-mer counting validation ──");
-    {
-        use wetspring_barracuda::bio::kmer;
-
-        let seq = b"ACGTACGTACGT";
-        let counts = kmer::count_kmers(seq, 4);
-        println!(
-            "  k=4, seq=ACGTACGTACGT: {} unique, {} total",
-            counts.unique_count(),
-            counts.total_count()
-        );
-
-        // 12 bases, k=4: 12-4+1 = 9 k-mers
-        total += 1;
-        if check("Total 4-mers", counts.total_count() as f64, 9.0, 0.0) {
-            passed += 1;
-        }
-
-        // ACGT is a palindrome, so canonical count may be less
-        total += 1;
-        if check("Unique canonical 4-mers > 0", counts.unique_count() as f64, 5.0, 4.0) {
-            passed += 1;
-        }
-
-        // K=8 on a longer sequence
-        let long_seq = b"ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT";
-        let counts8 = kmer::count_kmers(long_seq, 8);
-        println!(
-            "  k=8, 40bp seq: {} unique, {} total",
-            counts8.unique_count(),
-            counts8.total_count()
-        );
-        total += 1;
-        if check("Total 8-mers", counts8.total_count() as f64, 33.0, 0.0) {
-            passed += 1;
-        }
-    }
-
-    // ── Summary ─────────────────────────────────────────────────
-    println!("\n═══════════════════════════════════════════════════════════");
     println!(
-        "  Diversity + K-mer Validation: {}/{} checks passed",
-        passed, total
+        "  BC(A,B) = {:.4}, BC(A,C) = {:.4}, BC(B,C) = {:.4}",
+        dm[1], dm[2], dm[5]
     );
-    if passed == total {
-        println!("  RESULT: PASS");
-    } else {
-        println!("  RESULT: FAIL ({} checks failed)", total - passed);
-    }
-    println!("═══════════════════════════════════════════════════════════");
 
-    std::process::exit(if passed == total { 0 } else { 1 });
+    v.check("BC(A,B) < BC(A,C)", dm[1], dm[2] * 0.5, dm[2]);
+    v.check("BC(A,A) = 0", dm[0], 0.0, tolerances::BRAY_CURTIS_SYMMETRY);
+}
+
+fn validate_kmer(v: &mut Validator) {
+    v.section("── K-mer counting validation ──");
+
+    let seq = b"ACGTACGTACGT";
+    let counts = kmer::count_kmers(seq, 4);
+    println!(
+        "  k=4, seq=ACGTACGTACGT: {} unique, {} total",
+        counts.unique_count(),
+        counts.total_count()
+    );
+
+    // 12 bases, k=4: 12-4+1 = 9 k-mers (exact)
+    v.check_count_u64("Total 4-mers", counts.total_count(), 9);
+
+    // ACGTACGTACGT k=4 generates: ACGT (palindrome), CGTA=TACG, GTAC (palindrome) = 3
+    v.check_count("Unique canonical 4-mers", counts.unique_count(), 3);
+
+    // K=8 on a longer sequence: 40-8+1 = 33 k-mers (exact)
+    let long_seq = b"ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT";
+    let counts8 = kmer::count_kmers(long_seq, 8);
+    println!(
+        "  k=8, 40bp seq: {} unique, {} total",
+        counts8.unique_count(),
+        counts8.total_count()
+    );
+    v.check_count_u64("Total 8-mers", counts8.total_count(), 33);
+}
+
+fn validate_evenness_and_rarefaction(v: &mut Validator) {
+    v.section("── Evenness + Rarefaction ──");
+
+    // Pielou evenness: perfectly even = 1.0
+    let uniform = vec![25.0; 4];
+    v.check(
+        "Pielou(uniform S=4) = 1.0",
+        diversity::pielou_evenness(&uniform),
+        1.0,
+        tolerances::ANALYTICAL_F64,
+    );
+
+    // Uneven community: J' < 1
+    let uneven = vec![99.0, 1.0, 0.0, 0.0];
+    let j = diversity::pielou_evenness(&uneven);
+    v.check("Pielou(uneven) in [0,1)", j, 0.5, 0.5);
+
+    // Rarefaction: at full depth = observed species
+    let community = vec![50.0, 30.0, 20.0, 10.0, 5.0, 3.0, 2.0, 1.0];
+    let total: f64 = community.iter().sum();
+    let curve = diversity::rarefaction_curve(&community, &[total]);
+    v.check(
+        "Rarefaction at full depth = S_obs",
+        curve[0],
+        8.0,
+        tolerances::ANALYTICAL_F64,
+    );
+
+    // Rarefaction monotonicity: check increasing with depth
+    #[allow(clippy::cast_precision_loss)]
+    let depths: Vec<f64> = (1..=total as u64).map(|x| x as f64).collect();
+    let curve = diversity::rarefaction_curve(&community, &depths);
+    let monotonic = curve.windows(2).all(|w| w[1] >= w[0] - 1e-10);
+    v.check(
+        "Rarefaction monotonic",
+        f64::from(u8::from(monotonic)),
+        1.0,
+        0.0,
+    );
 }

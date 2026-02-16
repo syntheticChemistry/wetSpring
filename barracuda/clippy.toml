@@ -1,0 +1,5 @@
+# clippy configuration for wetSpring barracuda
+# https://doc.rust-lang.org/clippy/configuration.html
+
+# Maximum lines allowed in a single function (clippy::too_many_lines)
+too-many-lines-threshold = 120

@@ -1,16 +1,17 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //! K-mer counting engine with 2-bit DNA encoding.
 //!
 //! Encodes DNA sequences as packed u64 k-mers (k <= 32),
 //! uses canonical form (min of forward/reverse complement),
-//! and counts via HashMap.
+//! and counts via `HashMap`.
 //!
 //! This is the core operation behind DADA2's dereplication step
-//! and is a primary target for GPU acceleration (hash_table_u64.wgsl).
+//! and is a primary target for GPU acceleration (`hash_table_u64.wgsl`).
 
 use std::collections::HashMap;
 
 /// 2-bit DNA encoding: A=0, C=1, G=2, T=3.
-/// Returns None for ambiguous bases (N, etc).
+/// Returns `None` for ambiguous bases (N, etc).
 #[inline]
 fn encode_base(b: u8) -> Option<u64> {
     match b {
@@ -30,7 +31,7 @@ fn complement_2bit(b: u64) -> u64 {
 
 /// Compute reverse complement of a k-mer encoded as u64.
 fn reverse_complement(kmer: u64, k: usize) -> u64 {
-    let mut rc = 0u64;
+    let mut rc = 0_u64;
     let mut fwd = kmer;
     for _ in 0..k {
         let base = fwd & 3;
@@ -40,7 +41,7 @@ fn reverse_complement(kmer: u64, k: usize) -> u64 {
     rc
 }
 
-/// Canonical k-mer: min(forward, reverse_complement).
+/// Canonical k-mer: min(forward, `reverse_complement`).
 /// This ensures each k-mer and its reverse complement are counted together.
 fn canonical(kmer: u64, k: usize) -> u64 {
     let rc = reverse_complement(kmer, k);
@@ -50,28 +51,31 @@ fn canonical(kmer: u64, k: usize) -> u64 {
 /// K-mer counting result.
 #[derive(Debug, Clone)]
 pub struct KmerCounts {
-    /// k-mer size
+    /// k-mer size.
     pub k: usize,
-    /// Canonical k-mer -> count
+    /// Canonical k-mer -> count.
     pub counts: HashMap<u64, u32>,
-    /// Total k-mers processed (including those with ambiguous bases)
+    /// Total k-mers processed (excluding those with ambiguous bases).
     pub total_valid_kmers: u64,
-    /// Number of k-mers skipped due to ambiguous bases
+    /// Number of k-mers skipped due to ambiguous bases.
     pub skipped_ambiguous: u64,
 }
 
 impl KmerCounts {
     /// Number of unique canonical k-mers.
+    #[must_use]
     pub fn unique_count(&self) -> usize {
         self.counts.len()
     }
 
     /// Total k-mer occurrences (sum of all counts).
+    #[must_use]
     pub fn total_count(&self) -> u64 {
-        self.counts.values().map(|&c| c as u64).sum()
+        self.counts.values().map(|&c| u64::from(c)).sum()
     }
 
     /// Top N most abundant k-mers.
+    #[must_use]
     pub fn top_n(&self, n: usize) -> Vec<(u64, u32)> {
         let mut entries: Vec<_> = self.counts.iter().map(|(&k, &v)| (k, v)).collect();
         entries.sort_by(|a, b| b.1.cmp(&a.1));
@@ -81,21 +85,8 @@ impl KmerCounts {
 }
 
 /// Decode a 2-bit encoded k-mer back to a DNA string.
+#[must_use]
 pub fn decode_kmer(kmer: u64, k: usize) -> String {
-    let mut s = Vec::with_capacity(k);
-    let mut val = kmer;
-    for _ in 0..k {
-        let base = match (val >> (2 * (k - 1 - s.len()))) & 3 {
-            0 => b'A',
-            1 => b'C',
-            2 => b'G',
-            3 => b'T',
-            _ => b'N',
-        };
-        s.push(base);
-        val &= !(3u64 << (2 * (k - 1 - (s.len() - 1))));
-    }
-    // Simpler approach: extract from MSB to LSB
     let mut result = Vec::with_capacity(k);
     for i in (0..k).rev() {
         let base = (kmer >> (2 * i)) & 3;
@@ -104,20 +95,29 @@ pub fn decode_kmer(kmer: u64, k: usize) -> String {
             1 => b'C',
             2 => b'G',
             3 => b'T',
-            _ => b'N',
+            _ => unreachable!(),
         });
     }
     String::from_utf8(result).unwrap_or_default()
 }
 
 /// Count canonical k-mers in a single sequence.
+///
+/// # Panics
+///
+/// Panics if `k` is 0 or greater than 32.
+#[must_use]
 pub fn count_kmers(sequence: &[u8], k: usize) -> KmerCounts {
     assert!(k > 0 && k <= 32, "k must be in [1, 32]");
 
-    let mask = if k == 32 { u64::MAX } else { (1u64 << (2 * k)) - 1 };
+    let mask = if k == 32 {
+        u64::MAX
+    } else {
+        (1_u64 << (2 * k)) - 1
+    };
     let mut counts: HashMap<u64, u32> = HashMap::new();
-    let mut total_valid = 0u64;
-    let mut skipped = 0u64;
+    let mut total_valid = 0_u64;
+    let mut skipped = 0_u64;
 
     if sequence.len() < k {
         return KmerCounts {
@@ -128,10 +128,10 @@ pub fn count_kmers(sequence: &[u8], k: usize) -> KmerCounts {
         };
     }
 
-    let mut kmer = 0u64;
-    let mut valid_bases = 0usize;
+    let mut kmer = 0_u64;
+    let mut valid_bases = 0_usize;
 
-    for &base in sequence.iter() {
+    for &base in sequence {
         if let Some(encoded) = encode_base(base) {
             kmer = ((kmer << 2) | encoded) & mask;
             valid_bases += 1;
@@ -158,6 +158,11 @@ pub fn count_kmers(sequence: &[u8], k: usize) -> KmerCounts {
 }
 
 /// Count canonical k-mers across multiple sequences.
+///
+/// # Panics
+///
+/// Panics if `k` is 0 or greater than 32.
+#[must_use]
 pub fn count_kmers_multi(sequences: &[&[u8]], k: usize) -> KmerCounts {
     let mut combined = KmerCounts {
         k,
@@ -195,7 +200,7 @@ mod tests {
     fn test_reverse_complement() {
         // ACGT -> ACGT (palindrome)
         let k = 4;
-        let acgt = 0b00_01_10_11u64; // A=00, C=01, G=10, T=11
+        let acgt = 0b00_01_10_11_u64; // A=00, C=01, G=10, T=11
         let rc = reverse_complement(acgt, k);
         assert_eq!(rc, acgt, "ACGT should be its own reverse complement");
     }
@@ -203,7 +208,7 @@ mod tests {
     #[test]
     fn test_canonical_palindrome() {
         let k = 4;
-        let acgt = 0b00_01_10_11u64;
+        let acgt = 0b00_01_10_11_u64;
         assert_eq!(canonical(acgt, k), acgt);
     }
 
@@ -220,13 +225,120 @@ mod tests {
         let seq = b"ACGTNACGT";
         let counts = count_kmers(seq, 4);
         assert_eq!(counts.skipped_ambiguous, 1);
-        // Window resets at N, so we get kmers from ACGT (1) and NACGT after reset (1)
         assert!(counts.total_valid_kmers > 0);
     }
 
     #[test]
     fn test_decode() {
-        let kmer = 0b00_01_10_11u64; // ACGT
+        let kmer = 0b00_01_10_11_u64; // ACGT
         assert_eq!(decode_kmer(kmer, 4), "ACGT");
+    }
+
+    #[test]
+    fn test_sequence_too_short() {
+        let counts = count_kmers(b"AC", 4);
+        assert_eq!(counts.total_valid_kmers, 0);
+        assert_eq!(counts.unique_count(), 0);
+    }
+
+    #[test]
+    fn test_multi_sequence() {
+        let seqs: Vec<&[u8]> = vec![b"ACGTACGT", b"ACGTACGT"];
+        let counts = count_kmers_multi(&seqs, 4);
+        // Each sequence has 5 k-mers, so 10 total
+        assert_eq!(counts.total_valid_kmers, 10);
+    }
+
+    #[test]
+    fn test_decode_round_trip() {
+        // Encode GCAT, then decode
+        let encoded = (2 << 6) | (1 << 4) | 3; // G=10, C=01, A=00, T=11
+        assert_eq!(decode_kmer(encoded, 4), "GCAT");
+    }
+
+    #[test]
+    fn test_top_n() {
+        let seq = b"AAAAAAAAAACCCCC";
+        let counts = count_kmers(seq, 3);
+        let top = counts.top_n(1);
+        assert_eq!(top.len(), 1);
+        // AAA or its canonical form should be the most abundant
+        assert!(top[0].1 >= 2);
+    }
+
+    #[test]
+    fn test_top_n_more_than_available() {
+        let counts = count_kmers(b"ACGT", 4);
+        let top = counts.top_n(100);
+        assert!(top.len() <= 100);
+        assert!(!top.is_empty());
+    }
+
+    #[test]
+    fn test_lowercase_bases() {
+        let upper = count_kmers(b"ACGTACGT", 4);
+        let lower = count_kmers(b"acgtacgt", 4);
+        assert_eq!(upper.total_valid_kmers, lower.total_valid_kmers);
+        assert_eq!(upper.unique_count(), lower.unique_count());
+    }
+
+    #[test]
+    fn test_k_equals_1() {
+        let counts = count_kmers(b"ACGT", 1);
+        assert_eq!(counts.total_valid_kmers, 4);
+        // Canonical: A<->T (both map to min), C<->G (both map to min)
+        // So we expect 2 unique canonical 1-mers
+        assert_eq!(counts.unique_count(), 2);
+    }
+
+    #[test]
+    fn test_all_ambiguous() {
+        let counts = count_kmers(b"NNNNN", 3);
+        assert_eq!(counts.total_valid_kmers, 0);
+        assert_eq!(counts.skipped_ambiguous, 5);
+    }
+
+    #[test]
+    fn test_complement_2bit_symmetry() {
+        // A(0)<->T(3), C(1)<->G(2)
+        assert_eq!(complement_2bit(0), 3);
+        assert_eq!(complement_2bit(3), 0);
+        assert_eq!(complement_2bit(1), 2);
+        assert_eq!(complement_2bit(2), 1);
+    }
+
+    #[test]
+    fn test_count_kmers_multi_empty() {
+        let seqs: Vec<&[u8]> = vec![];
+        let counts = count_kmers_multi(&seqs, 4);
+        assert_eq!(counts.total_valid_kmers, 0);
+        assert_eq!(counts.unique_count(), 0);
+    }
+
+    #[test]
+    fn test_decode_kmer_single_base() {
+        assert_eq!(decode_kmer(0, 1), "A");
+        assert_eq!(decode_kmer(1, 1), "C");
+        assert_eq!(decode_kmer(2, 1), "G");
+        assert_eq!(decode_kmer(3, 1), "T");
+    }
+
+    #[test]
+    fn test_total_count_method() {
+        let counts = count_kmers(b"ACGTACGT", 4);
+        assert!(counts.total_count() > 0);
+        // total_count == total_valid_kmers for non-overlapping canonical k-mers
+        assert_eq!(counts.total_count(), counts.total_valid_kmers);
+    }
+
+    #[test]
+    fn test_k_equals_32() {
+        // Exercises the u64::MAX mask path
+        let seq = b"ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT";
+        assert!(seq.len() >= 32);
+        let counts = count_kmers(seq, 32);
+        // 40 - 32 + 1 = 9 k-mers
+        assert_eq!(counts.total_valid_kmers, 9);
+        assert!(counts.unique_count() > 0);
     }
 }

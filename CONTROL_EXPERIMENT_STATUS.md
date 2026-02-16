@@ -1,7 +1,7 @@
 # wetSpring Control Experiment — Status Report
 
 **Date**: 2026-02-12 (Project initialized)
-**Updated**: 2026-02-16 (BarraCUDA Rust validation — 36/36 PASS)
+**Updated**: 2026-02-16 (Phase 4 — 16S pipeline through dereplication, 293 tests, ~98% coverage, 94/94 validation PASS)
 **Gate**: Eastgate (i9-12900K, 64 GB DDR5, RTX 4070 12GB, Pop!_OS 22.04)
 **Galaxy**: quay.io/bgruening/galaxy:24.1 (Docker) — upgraded from 20.09
 **License**: AGPL-3.0-or-later
@@ -361,29 +361,34 @@ of $500K instruments with proprietary software.
 
 ---
 
-### 2026-02-16: BarraCUDA Rust Validation — 36/36 PASS
+### 2026-02-16: BarraCUDA Rust Validation — 94/94 PASS
 
 - **Architecture**: `wetspring-barracuda` crate, depends on `barracuda` (phase1/toadstool)
 - **Pattern**: Same as hotSpring — hardcoded Python baseline values in Rust validation binaries
-- **Crate**: 6 modules (3 I/O parsers, 3 bio algorithms), 4 validation binaries, 20 unit tests
-- **Dependencies**: barracuda, needletail, quick-xml, base64, flate2, serde, rayon
+- **Crate**: 22 modules (4 I/O parsers, 15 bio/signal algorithms, encoding, error, validation, tolerances, gpu), 5 validation binaries, 251 unit tests + 42 integration tests, ~98% line coverage
+- **Dependencies**: flate2 only (barracuda optional/feature-gated; base64, needletail, quick-xml, serde, rayon all removed)
+- **Code quality**: `Validator` struct (typed `check_count`/`check_count_u64`), NaN-safe tolerance search, Result-based GPU dispatch, 0 library clippy warnings, 0 `unsafe`, 0 production panics
 
-**Track 1 — Life Science (FASTQ + Diversity):**
-- `validate_fastq`: **9/9 PASS** — F3D0 7,793 seqs, 40 files 304,720 seqs, GC 54.7%, Q 35.8
-- `validate_diversity`: **14/14 PASS** — Shannon/Simpson/Chao1 analytical + marine simulation + k-mers
+**Track 1 — Life Science (FASTQ → diversity pipeline):**
+- `validate_fastq`: **28/28 PASS** — quality filter + adapter trim + merge pairs + derep + F3D0 7,793 seqs, 40 files 304,720 seqs
+- `validate_diversity`: **18/18 PASS** — Shannon/Simpson/Chao1/Pielou/rarefaction + marine simulation + k-mers
 
-**Track 2 — PFAS Analytical Chemistry (mzML + PFAS):**
+**Track 2 — PFAS Analytical Chemistry (mzML + PFAS + feature extraction):**
 - `validate_mzml`: **7/7 PASS** — 8 files, 6,256 spectra, 6M peaks, m/z 80-1000, base64+zlib
-- `validate_pfas`: **6/6 PASS** — 738 spectra, 62 candidates, 25 unique precursors (exact match)
+- `validate_pfas`: **10/10 PASS** — cosine similarity + KMD + FindPFAS (external data optional)
 
-**Total: 36/36 checks PASS, 20/20 unit tests PASS**
+**GPU Acceleration (ToadStool):**
+- `validate_diversity_gpu`: **31/31 PASS** — Shannon, Simpson, BC, PCoA, alpha diversity, spectral match
+
+**Total: 63/63 CPU + 31/31 GPU = 94/94 checks PASS, 293 tests (251 unit + 42 integration), ~98% coverage**
 
 | Binary | Track | Checks | Status |
 |--------|-------|--------|--------|
-| validate_fastq | T1 | 9/9 | PASS |
-| validate_diversity | T1 | 14/14 | PASS |
+| validate_fastq | T1 | 28/28 | PASS |
+| validate_diversity | T1 | 18/18 | PASS |
 | validate_mzml | T2 | 7/7 | PASS |
-| validate_pfas | T2 | 6/6 | PASS |
+| validate_pfas | T2 | 10/10 | PASS |
+| validate_diversity_gpu | GPU | 31/31 | PASS |
 
 ---
 
@@ -452,18 +457,21 @@ of $500K instruments with proprietary software.
   - A4.3: 99.67% complete (High-quality, AAI-based), 202 viral genes, 0 contamination
   - L73: 100% complete (DTR detected), 259 viral genes, 0 contamination
 
-### Experiment 004: Rust FASTQ + Diversity — IN PROGRESS (B2 validation)
+### Experiment 004: Rust FASTQ + Diversity — COMPLETE
 
 **Goal**: Rust I/O parsers + diversity metrics — validated against Python baselines.
 
-- [x] Implement FASTQ reader (needletail, gzip-aware, Phred33)
+- [x] Implement FASTQ reader (sovereign parser, gzip-aware, Phred33)
 - [x] Validate: 7,793 seqs in F3D0, 304,720 across all 40 files — **9/9 PASS**
 - [x] Implement k-mer engine (2-bit encoding, canonical k-mers, HashMap counting)
 - [x] Implement alpha diversity (Shannon, Simpson, Chao1, observed features)
 - [x] Implement Bray-Curtis dissimilarity + distance matrix
-- [x] Validate diversity: analytical tests + simulated marine community — **14/14 PASS**
-- [ ] Adapter trimming
-- [ ] Quality filtering (sliding window, min length)
+- [x] Validate diversity: analytical tests + simulated marine community — **18/18 PASS**
+- [x] Quality filtering (sliding window trim, leading/trailing, min length) — Trimmomatic equivalent
+- [x] Adapter trimming (semi-global alignment, IUPAC support) — Cutadapt equivalent
+- [x] Paired-end read merging (quality-weighted overlap, posterior quality) — VSEARCH equivalent
+- [x] Dereplication (abundance tracking, best-representative selection) — VSEARCH equivalent
+- [x] Pielou evenness + rarefaction curves (exact hypergeometric)
 - [ ] Benchmark: Rust vs Trimmomatic throughput
 
 ---
@@ -498,11 +506,11 @@ of $500K instruments with proprietary software.
   - CAS 375-62-2 (m/z 313.08, [M+Na]+)
 - [x] Algorithm validated: mass defect + fragment differences + suspect list
 
-### Experiment 007: Rust mzML + PFAS Screening — IN PROGRESS (B2 validation)
+### Experiment 007: Rust mzML + PFAS Screening — COMPLETE
 
 **Goal**: Rust mass spectrometry parsers + PFAS screening — validated against Python baselines.
 
-- [x] Implement mzML XML parser (quick-xml, base64+zlib, 64-bit float)
+- [x] Implement mzML XML parser (sovereign in-tree XML pull parser, base64+zlib, f32/f64)
 - [x] Parse spectrum metadata (m/z array, intensity array, RT, MS level)
 - [x] Support base64-encoded + zlib-compressed binary arrays
 - [x] Validate: 8 files, 6,256 spectra, 6M+ peaks, m/z 80-1000 — **7/7 PASS**
@@ -532,15 +540,15 @@ of $500K instruments with proprietary software.
 Track 1 (Life Science):
   Phase 0 [DONE]:     Galaxy hosting + tool validation (Exp001)
   Phase 1 [DONE]:     Pipeline replication with public data (Exp002, Exp003)
-  Phase 2 [ACTIVE]:   Rust ports — FASTQ+kmer+diversity validated (36/36 PASS)
-  Phase 3 [NEXT]:     GPU acceleration via ToadStool
-  Phase 4:            End-to-end sovereign pipeline
+  Phase 2 [DONE]:     Rust ports — FASTQ, diversity, k-mer (sovereign parsers, 1 runtime dep)
+  Phase 3 [DONE]:     GPU acceleration — ToadStool integrated, 31/31 GPU PASS (RTX 4070)
+  Phase 4 [ACTIVE]:   Sovereign pipeline — quality → merge → derep → diversity (94/94 PASS)
 
 Track 2 (PFAS / blueFish):
   Phase B0 [DONE]:    asari + PFΔScreen validation (Exp005, Exp006)
   Phase B1:           Replicate Jones/MSU LC-MS and PFAS pipelines
-  Phase B2 [ACTIVE]:  Rust ports — mzML+MS2+PFAS screening validated (36/36 PASS)
-  Phase B3 [NEXT]:    GPU acceleration (spectral matching, ML, MD)
+  Phase B2 [DONE]:    Rust ports — mzML+MS2+PFAS+EIC+peaks+features (sovereign, streaming I/O)
+  Phase B3 [DONE]:    GPU acceleration — spectral match via GemmF64 (31/31 GPU PASS)
   Phase B4:           Penny monitoring (real-time, low-cost sensors)
 ```
 
@@ -606,34 +614,59 @@ These ToadStool kernels serve **both tracks** and are useful beyond wetSpring:
 | Sort / argsort | Abundance order | m/z ordering | KMD series | Sort |
 | PCA / eigensolve | PCoA diversity | Feature PCA | — | LinAlg |
 
-### BarraCUDA Evolution — Rust Modules Needed
+### BarraCUDA Evolution — Rust Modules
 
-**Priority 1 — Parsers + Search (both tracks immediately):**
+**Priority 1 — Parsers + Search (DONE — sovereign):**
 
-| Module | Replaces | Track 1 | Track 2 |
-|--------|----------|:-------:|:-------:|
-| `barracuda::io::fastq` | Python FASTQ parsing | DADA2 input | — |
-| `barracuda::io::mzml` | pymzml / pyteomics | — | asari + FindPFAS |
-| `barracuda::io::ms2` | pyteomics MS2 | — | FindPFAS input |
-| `barracuda::search::tolerance` | ismembertolerance | Taxonomy lookup | Suspect + KMD |
-| `barracuda::hash::kmer` | DADA2 dereplication | K-mer counting | — |
-| `barracuda::hash::mz_bucket` | Centurion tree | — | m/z indexing |
+| Module | Replaces | Track 1 | Track 2 | Status |
+|--------|----------|:-------:|:-------:|--------|
+| `io::fastq` | Python FASTQ parsing | DADA2 input | — | **Sovereign** |
+| `io::mzml` + `io::xml` | pymzml / pyteomics | — | asari + FindPFAS | **Sovereign** |
+| `io::ms2` | pyteomics MS2 | — | FindPFAS input | **Sovereign** |
+| `bio::tolerance_search` | ismembertolerance | Taxonomy lookup | Suspect + KMD | **Done** |
+| `bio::kmer` | DADA2 dereplication | K-mer counting | — | **Done** |
+| `bio::diversity` | skbio / numpy | Shannon, BC, PCoA | — | **Done** |
+| `encoding` | base64 crate | mzML arrays | — | **Sovereign** |
 
-**Priority 2 — Signal Processing:**
+**Priority 2 — GPU Diversity + PCoA + Spectral Match (DONE — 31/31 GPU PASS):**
 
-| Module | Replaces | Track 1 | Track 2 |
-|--------|----------|:-------:|:-------:|
-| `barracuda::signal::peaks` | scipy.signal.find_peaks | — | asari peak detect |
-| `barracuda::signal::smooth` | uniform_filter1d | — | Mass track smoothing |
-| `barracuda::signal::gaussian_fit` | scipy.optimize.curve_fit | — | Peak shape fitting |
-| `barracuda::stats::lowess` | statsmodels LOWESS | DADA2 error model | asari RT align |
+| Module | ToadStool Primitive | Track | Status |
+|--------|---------------------|:-----:|--------|
+| `diversity_gpu::shannon_gpu` | `FusedMapReduceF64` | T1 | **3/3 PASS** |
+| `diversity_gpu::simpson_gpu` | `FusedMapReduceF64` | T1 | **3/3 PASS** |
+| `diversity_gpu::bray_curtis_condensed_gpu` | `bray_curtis_pairs_f64.wgsl` | T1 | **6/6 PASS** |
+| `diversity_gpu::observed_features_gpu` | `FusedMapReduceF64.sum()` | T1 | **PASS** |
+| `diversity_gpu::pielou_evenness_gpu` | Shannon + observed compose | T1 | **PASS** |
+| `diversity_gpu::alpha_diversity_gpu` | FusedMapReduceF64 bundle | T1 | **6/6 PASS** |
+| `pcoa_gpu` | `BatchedEighGpu` | T1 | **5/5 PASS** |
+| `spectral_match_gpu::pairwise_cosine_gpu` | `GemmF64` + `FusedMapReduceF64` | T2 | **8/8 PASS** |
 
-**Priority 3 — Linear Algebra:**
+**Priority 3 — 16S Pipeline Stages (DONE — CPU):**
 
-| Module | Replaces | Track 1 | Track 2 |
-|--------|----------|:-------:|:-------:|
-| `barracuda::linalg::distance` | skbio / numpy | Bray-Curtis, PCoA | m/z alignment |
-| `barracuda::linalg::pca` | sklearn PCA | Diversity ordination | Feature PCA |
+| Module | Replaces | Track 1 | Status |
+|--------|----------|:-------:|--------|
+| `bio::quality` | Trimmomatic / Cutadapt | Quality filter + adapter trim | **Done** |
+| `bio::merge_pairs` | VSEARCH / FLASH | Paired-end merging | **Done** |
+| `bio::derep` | VSEARCH `--derep_fulllength` | Dereplication + abundance | **Done** |
+
+**Priority 4 — Signal Processing + Feature Extraction (DONE — CPU):**
+
+| Module | Replaces | Track 2 | Status |
+|--------|----------|:-------:|--------|
+| `bio::signal` | `scipy.signal.find_peaks` | 1D peak detection | **Done** |
+| `bio::eic` | asari mass track detection | EIC extraction | **Done** |
+| `bio::feature_table` | asari pipeline | Feature table extraction | **Done** |
+| `bio::spectral_match` | matchms / PFAScreen | MS2 cosine similarity | **Done** |
+| `bio::kmd` | PFAScreen KMD analysis | PFAS homologue grouping | **Done** |
+
+**Priority 5 — Remaining (NEXT):**
+
+| Module | Replaces | Track | Status |
+|--------|----------|:-----:|--------|
+| DADA2 denoising | DADA2 error model | T1 | Not started |
+| Chimera detection | uchime3 | T1 | Not started |
+| Taxonomy classification | Naive Bayes / BLAST | T1 | Not started |
+| UniFrac distance | scikit-bio | T1 | Not started |
 
 ### ToadStool Inventory — What Already Exists (443 shaders, 15,700 tests)
 
@@ -660,29 +693,36 @@ These ToadStool kernels serve **both tracks** and are useful beyond wetSpring:
 | `prng_xoshiro.wgsl` | `shaders/numerical/` | Monte Carlo rarefaction, bootstrap CI |
 | `weighted_dot_f64.wgsl` | `shaders/reduce/` | Weighted inner products (quadrature, integration) |
 
-**New shaders needed (not in ToadStool yet):**
+**New shaders — written by wetSpring:**
+
+| Shader | Operation | Status |
+|--------|-----------|--------|
+| `FusedMapReduceF64` (ToadStool) | Shannon/Simpson fused map-reduce (replaced custom shaders) | **DONE** ✓ |
+| `BatchedEighGpu` (ToadStool) | PCoA eigendecomposition on double-centered BC matrix | **DONE** ✓ |
+| `bray_curtis_pairs_f64.wgsl` | All-pairs BC distance matrix (condensed) | **DONE** ✓ |
+
+**Shaders still needed (not in ToadStool yet):**
 
 | Shader | Operation | Closest Ancestor | O(?) |
 |--------|-----------|-----------------|------|
-| `batched_distance_f64.wgsl` | All-pairs distance (m/z, sequence) | `pairwise_distance.wgsl` → lift to f64+batched | O(N²)→GPU |
 | `hash_table_u64.wgsl` | GPU hash insert/lookup (k-mer, m/z) | New (no hash table shader exists) | O(1) amort |
 | `tolerance_search_f64.wgsl` | Binary search with ± ppm tolerance | `batched_bisection_f64.wgsl` (adapt) | O(N log M) |
 | `uniform_filter_f64.wgsl` | 1D moving average (mass track smooth) | New (signal processing) | O(N)/track |
 | `find_peaks_f64.wgsl` | Local maxima + prominence detect | New (signal processing) | O(N)/track |
 | `sort_f64.wgsl` | Bitonic sort (m/z ordering, abundance) | New (requires workgroup coordination) | O(N log²N) |
 | `cosine_similarity_f64.wgsl` | f64 variant of existing shader | `cosine_similarity.wgsl` → lift to f64 | O(N)/pair |
-| `bray_curtis_f64.wgsl` | Specialized ecological distance | `pairwise_distance.wgsl` (adapt formula) | O(N)/pair |
 
 **Rewiring strategy — 3 tiers:**
 
 ```
-Tier A: Pure rewire (existing shaders, new orchestrators only)
-  cosine_similarity.wgsl ─→ f64 variant + MS2 spectral matcher Rust wrapper
-  pairwise_distance.wgsl ─→ f64 variant + Bray-Curtis formula
-  eigh_f64 + PCA ──────────→ PCoA ordination (T1 diversity, T2 feature PCA)
-  sum/variance/norm reduce ─→ Alpha diversity metrics on GPU
-  PipelineBuilder ──────────→ LC-MS multi-scan pipeline + 16S multi-sample pipeline
-  prng_xoshiro + cumsum ───→ GPU rarefaction (random subsample + accumulate)
+Tier A: Alpha/beta diversity (3 shaders DONE, 3 pending)
+  ✓ FusedMapReduceF64 ─→ GPU Shannon entropy (ToadStool, 3/3 PASS)
+  ✓ FusedMapReduceF64 ─→ GPU Simpson index (ToadStool, 3/3 PASS)
+  ✓ bray_curtis_pairs_f64.wgsl ─→ GPU all-pairs BC (custom, 6/6 PASS)
+  ✓ BatchedEighGpu ─→ GPU PCoA eigensolve (ToadStool, 5/5 PASS)
+  ┌─ eigh_f64 + PCA ──────────→ PCoA ordination (wire from ToadStool)
+  ├─ prng_xoshiro + cumsum ───→ GPU rarefaction (wire from ToadStool)
+  └─ cosine_similarity_f64 ───→ MS2 spectral matching (lift to f64)
 
 Tier B: Adapt existing patterns (minor shader modifications)
   batched_bisection_f64 ──→ tolerance_search_f64 (adapt objective function)
@@ -699,31 +739,43 @@ Tier C: New shaders (fresh WGSL)
 ### Build Order
 
 ```
-Phase 2 / B2: Rust I/O Ports (Exp004 + Exp007)
-  ┌─ barracuda::io::fastq ──── validates vs Trimmomatic (Exp004)
-  ├─ barracuda::io::mzml ───── validates vs pyteomics (Exp007)
-  ├─ barracuda::io::ms2 ────── validates vs pyteomics
-  ├─ barracuda::search::tolerance  validates vs ismembertolerance
-  ├─ barracuda::hash::kmer ──── validates vs DADA2 dereplication
-  └─ barracuda::hash::mz_bucket ─ validates vs Centurion tree
+Phase 2 / B2: Rust I/O + CPU Algorithms — DONE ✓ (63/63 CPU PASS)
+  ✓ io::fastq ──────────── sovereign parser, gzip-aware (validates vs FastQC)
+  ✓ io::mzml + io::xml ─── sovereign XML pull parser (validates vs pyteomics)
+  ✓ io::ms2 ─────────────── sovereign MS2 parser (validates vs pyteomics)
+  ✓ bio::quality ────────── sliding window trim + adapter removal (Trimmomatic)
+  ✓ bio::merge_pairs ────── paired-end merging (VSEARCH/FLASH)
+  ✓ bio::derep ──────────── dereplication + abundance tracking (VSEARCH)
+  ✓ bio::kmer ───────────── 2-bit canonical k-mer counting
+  ✓ bio::diversity ──────── Shannon, Simpson, Chao1, BC, Pielou, rarefaction
+  ✓ bio::pcoa ───────────── PCoA ordination (CPU Jacobi)
+  ✓ bio::tolerance_search ─ ppm/Da search + PFAS screening
+  ✓ bio::signal ─────────── 1D peak detection (scipy.find_peaks)
+  ✓ bio::eic ────────────── EIC extraction + mass track detection
+  ✓ bio::feature_table ──── asari-style feature extraction
+  ✓ bio::spectral_match ─── MS2 cosine similarity (matched + weighted)
+  ✓ bio::kmd ────────────── Kendrick mass defect + PFAS homologues
+  ✓ encoding ────────────── sovereign base64 (RFC 4648)
 
-Phase 3A: GPU Tier A — Rewire existing ToadStool shaders
-  ┌─ cosine_similarity_f64 ── f64 lift (MS2 matching)
-  ├─ batched_distance_f64 ──── f64 lift + Bray-Curtis (diversity)
-  ├─ GPU PCoA ─────────────── eigh_f64 on distance matrix (diversity)
-  ├─ GPU rarefaction ───────── prng_xoshiro + cumsum (ecology)
-  └─ GPU alpha diversity ──── reduce suite (Shannon, Simpson, Chao1)
+Phase 3: GPU Acceleration — DONE ✓ (31/31 GPU PASS)
+  ✓ FusedMapReduceF64 ──── GPU Shannon, Simpson, observed, evenness, alpha
+  ✓ BatchedEighGpu ──────── GPU PCoA eigendecomposition
+  ✓ GemmF64 ─────────────── GPU pairwise spectral cosine similarity
+  ✓ bray_curtis_pairs_f64.wgsl ── GPU all-pairs BC distance matrix
 
-Phase 3B: GPU Tier B — Adapt existing patterns
-  ┌─ tolerance_search_f64 ──── from batched_bisection (suspect PFAS)
-  ├─ sparse feature ops ────── from sparse_matvec_f64 (asari tables)
-  └─ weighted peak fitting ─── from weighted_dot_f64 (Gaussian)
+Phase 4: Sovereign Pipeline — ACTIVE
+  ✓ FASTQ → quality → merge → derep → diversity → PCoA (end-to-end)
+  ✓ mzML → mass tracks → EIC → peaks → features (end-to-end)
+  ┌─ DADA2 denoising ────── sequence error correction model
+  ├─ Chimera detection ──── reference-free uchime3 equivalent
+  ├─ Taxonomy classification ── naive Bayes / BLAST
+  └─ UniFrac distance ───── phylogeny-weighted beta diversity
 
-Phase 3C: GPU Tier C — New shaders
-  ┌─ hash_table_u64 ────────── k-mer + m/z index (both tracks)
-  ├─ find_peaks_f64 ────────── mass spec peak detect (T2)
-  ├─ uniform_filter_f64 ────── mass track smoothing (T2)
-  └─ sort_f64 ─────────────── bitonic sort (m/z ordering, abundance)
+Future GPU promotion:
+  ┌─ EIC extraction GPU ─── parallel m/z binning across scans
+  ├─ Peak detection GPU ─── batch chromatogram processing
+  ├─ BC → ToadStool ─────── promote custom shader to general kernel
+  └─ Rarefaction GPU ────── prng_xoshiro for bootstrap CI
 ```
 
 ---
@@ -771,4 +823,18 @@ Together they build a general-purpose sovereign compute platform.
 *Experiment 006 COMPLETE (FindPFAS: 25 PFAS precursors, 2 suspect matches): February 16, 2026*
 *Track 2 VALIDATED (8/8 deterministic, asari+FindPFAS): February 16, 2026*
 *Evolution analysis written (BarraCUDA 12 modules, ToadStool 8 shaders): February 16, 2026*
-*BarraCUDA Rust validation — 36/36 PASS (FASTQ, mzML, diversity, PFAS): February 16, 2026*
+*BarraCUDA Phase 2 audit — deep refactor, sovereign parsers, full validation: February 16, 2026*
+
+  Audit results (initial → current):
+  - 63/63 CPU validation PASS, 31/31 GPU validation PASS (94/94 total)
+  - 293 tests (251 unit + 42 integration), ~98% line coverage
+  - 0 library clippy warnings, 0 doc warnings
+  - 22 modules: 4 I/O parsers, 12 bio/signal CPU, 3 GPU, encoding, error, validation, tolerances
+  - Sovereign parsers: FASTQ (gzip-aware), XML/mzML (f32/f64 + zlib), MS2, base64 — all in-tree
+  - 16S pipeline: FASTQ → quality → merge → derep → diversity → PCoA
+  - LC-MS pipeline: mzML → mass tracks → EIC → peaks → features
+  - PFAS pipeline: mzML/MS2 → tolerance search → spectral match → KMD → homologues
+  - GPU: FusedMapReduceF64, BatchedEighGpu, GemmF64, bray_curtis_pairs_f64.wgsl
+  - 1 runtime dep: flate2 (pure-Rust miniz_oxide for zlib/gzip)
+  - 0 unsafe blocks, 0 production panic!, 0 production unwrap()/expect()
+  - SPDX license headers on all .rs files
