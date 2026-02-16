@@ -602,25 +602,71 @@ These ToadStool kernels serve **both tracks** and are useful beyond wetSpring:
 | `barracuda::linalg::distance` | skbio / numpy | Bray-Curtis, PCoA | m/z alignment |
 | `barracuda::linalg::pca` | sklearn PCA | Diversity ordination | Feature PCA |
 
-### ToadStool Evolution — New GPU Shaders
+### ToadStool Inventory — What Already Exists (443 shaders, 15,700 tests)
 
-*Beyond hotSpring's eigensolve/Hamiltonian, wetSpring demands:*
+*Reviewed Feb 16, 2026 from `phase1/toadstool/` pull.*
 
-| Shader | Operation | hotSpring Ancestor | O(?) |
-|--------|-----------|-------------------|------|
-| `batched_distance_f64.wgsl` | Pairwise distance (m/z, seq) | batched_hfb_hamiltonian | O(N²)→GPU |
-| `hash_table_u64.wgsl` | GPU hash insert/lookup | New | O(1) amort |
-| `tolerance_search_f64.wgsl` | Binary search ± tolerance | New | O(N log M) |
-| `uniform_filter_f64.wgsl` | 1D moving average | New | O(N)/track |
-| `find_peaks_f64.wgsl` | Local maxima + prominence | New | O(N)/track |
-| `reduction_f64.wgsl` | Parallel sum/min/max | Exists partial | O(log N) |
-| `sort_f64.wgsl` | Bitonic sort | New | O(N log²N) |
-| `cosine_similarity_f64.wgsl` | Spectral dot product | New | O(N)/pair |
+**Directly rewirable for wetSpring (exist in ToadStool today):**
+
+| Existing Asset | Location | wetSpring Use |
+|----------------|----------|---------------|
+| `cosine_similarity.wgsl` | `shaders/math/` (f32) | MS2 spectral matching (T2) — **needs f64 variant** |
+| `pairwise_distance.wgsl` | `shaders/math/` (f32, p-norm) | Bray-Curtis distance (T1), m/z meshgrid (T2) — **needs f64 + batched variant** |
+| `Fft1DF64` / `Fft3DF64` | `ops/fft/` | Signal processing, peak detection assist |
+| `eigh_f64.wgsl` / `BatchedEighGpu` | `shaders/linalg/` | PCA/PCoA eigensolve for diversity (T1) + feature PCA (T2) |
+| `sum_reduce_f64.wgsl` | `shaders/reduce/` | Abundance sums, peak areas, fragment counts |
+| `variance_reduce_f64.wgsl` | `shaders/reduce/` | Statistical spread of alpha diversity |
+| `norm_reduce_f64.wgsl` | `shaders/reduce/` | L1/L2/Linf norms for distance matrices |
+| `max_abs_diff_f64.wgsl` | `shaders/reduce/` | Convergence checks in iterative alignment |
+| `cumsum_f64.wgsl` | `shaders/reduce/` | Cumulative distributions, rarefaction curves |
+| `PipelineBuilder` | `pipeline/mod.rs` | Multi-kernel chaining (parse→peak→align→quantify) |
+| `BufferPool` / `SolverBufferSet` | `device/tensor_context.rs` | Persistent buffers across LC-MS scans |
+| `sparse_matvec_f64.wgsl` | `shaders/linalg/` | Sparse feature tables (most entries zero) |
+| `CgGpu` / `BiCgStabGpu` | `ops/linalg/` | Large sparse linear systems (khipu network) |
+| `batched_bisection_f64.wgsl` | `shaders/optimizer/` | Tolerance-based root finding (mass matching) |
+| `prng_xoshiro.wgsl` | `shaders/numerical/` | Monte Carlo rarefaction, bootstrap CI |
+| `weighted_dot_f64.wgsl` | `shaders/reduce/` | Weighted inner products (quadrature, integration) |
+
+**New shaders needed (not in ToadStool yet):**
+
+| Shader | Operation | Closest Ancestor | O(?) |
+|--------|-----------|-----------------|------|
+| `batched_distance_f64.wgsl` | All-pairs distance (m/z, sequence) | `pairwise_distance.wgsl` → lift to f64+batched | O(N²)→GPU |
+| `hash_table_u64.wgsl` | GPU hash insert/lookup (k-mer, m/z) | New (no hash table shader exists) | O(1) amort |
+| `tolerance_search_f64.wgsl` | Binary search with ± ppm tolerance | `batched_bisection_f64.wgsl` (adapt) | O(N log M) |
+| `uniform_filter_f64.wgsl` | 1D moving average (mass track smooth) | New (signal processing) | O(N)/track |
+| `find_peaks_f64.wgsl` | Local maxima + prominence detect | New (signal processing) | O(N)/track |
+| `sort_f64.wgsl` | Bitonic sort (m/z ordering, abundance) | New (requires workgroup coordination) | O(N log²N) |
+| `cosine_similarity_f64.wgsl` | f64 variant of existing shader | `cosine_similarity.wgsl` → lift to f64 | O(N)/pair |
+| `bray_curtis_f64.wgsl` | Specialized ecological distance | `pairwise_distance.wgsl` (adapt formula) | O(N)/pair |
+
+**Rewiring strategy — 3 tiers:**
+
+```
+Tier A: Pure rewire (existing shaders, new orchestrators only)
+  cosine_similarity.wgsl ─→ f64 variant + MS2 spectral matcher Rust wrapper
+  pairwise_distance.wgsl ─→ f64 variant + Bray-Curtis formula
+  eigh_f64 + PCA ──────────→ PCoA ordination (T1 diversity, T2 feature PCA)
+  sum/variance/norm reduce ─→ Alpha diversity metrics on GPU
+  PipelineBuilder ──────────→ LC-MS multi-scan pipeline + 16S multi-sample pipeline
+  prng_xoshiro + cumsum ───→ GPU rarefaction (random subsample + accumulate)
+
+Tier B: Adapt existing patterns (minor shader modifications)
+  batched_bisection_f64 ──→ tolerance_search_f64 (adapt objective function)
+  weighted_dot_f64 ────────→ Gaussian peak fitting inner product
+  sparse_matvec_f64 ──────→ Sparse feature table operations
+
+Tier C: New shaders (fresh WGSL)
+  hash_table_u64 ──────────→ K-mer hashing + m/z bucket indexing
+  uniform_filter_f64 ──────→ Mass track smoothing
+  find_peaks_f64 ──────────→ Peak detection (local maxima + prominence)
+  sort_f64 ────────────────→ Bitonic merge sort on GPU
+```
 
 ### Build Order
 
 ```
-Phase 2 / B2: Rust Ports (Exp004 + Exp007)
+Phase 2 / B2: Rust I/O Ports (Exp004 + Exp007)
   ┌─ barracuda::io::fastq ──── validates vs Trimmomatic (Exp004)
   ├─ barracuda::io::mzml ───── validates vs pyteomics (Exp007)
   ├─ barracuda::io::ms2 ────── validates vs pyteomics
@@ -628,13 +674,23 @@ Phase 2 / B2: Rust Ports (Exp004 + Exp007)
   ├─ barracuda::hash::kmer ──── validates vs DADA2 dereplication
   └─ barracuda::hash::mz_bucket ─ validates vs Centurion tree
 
-Phase 3 / B3: GPU Acceleration
-  ┌─ batched_distance_f64 ──── m/z align + Bray-Curtis (both)
-  ├─ hash_table_u64 ────────── k-mer + m/z index (both)
-  ├─ tolerance_search_f64 ──── suspect PFAS + taxonomy (both)
+Phase 3A: GPU Tier A — Rewire existing ToadStool shaders
+  ┌─ cosine_similarity_f64 ── f64 lift (MS2 matching)
+  ├─ batched_distance_f64 ──── f64 lift + Bray-Curtis (diversity)
+  ├─ GPU PCoA ─────────────── eigh_f64 on distance matrix (diversity)
+  ├─ GPU rarefaction ───────── prng_xoshiro + cumsum (ecology)
+  └─ GPU alpha diversity ──── reduce suite (Shannon, Simpson, Chao1)
+
+Phase 3B: GPU Tier B — Adapt existing patterns
+  ┌─ tolerance_search_f64 ──── from batched_bisection (suspect PFAS)
+  ├─ sparse feature ops ────── from sparse_matvec_f64 (asari tables)
+  └─ weighted peak fitting ─── from weighted_dot_f64 (Gaussian)
+
+Phase 3C: GPU Tier C — New shaders
+  ┌─ hash_table_u64 ────────── k-mer + m/z index (both tracks)
   ├─ find_peaks_f64 ────────── mass spec peak detect (T2)
-  ├─ uniform_filter_f64 ────── smoothing (T2)
-  └─ cosine_similarity_f64 ── MS2 spectral matching (T2)
+  ├─ uniform_filter_f64 ────── mass track smoothing (T2)
+  └─ sort_f64 ─────────────── bitonic sort (m/z ordering, abundance)
 ```
 
 ---
