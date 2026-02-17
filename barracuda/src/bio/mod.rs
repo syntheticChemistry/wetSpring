@@ -9,6 +9,8 @@ pub mod eic;
 pub mod feature_table;
 pub mod kmd;
 pub mod kmer;
+#[cfg(feature = "gpu")]
+pub mod kriging;
 pub mod merge_pairs;
 pub mod pcoa;
 #[cfg(feature = "gpu")]

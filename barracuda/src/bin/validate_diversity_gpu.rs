@@ -7,7 +7,7 @@
 //! Tests Tier A GPU promotion readiness:
 //! - Shannon entropy (via `ToadStool`'s `FusedMapReduceF64`)
 //! - Simpson diversity (via `ToadStool`'s `FusedMapReduceF64`)
-//! - Bray-Curtis condensed distance matrix (`bray_curtis_pairs_f64.wgsl`)
+//! - Bray-Curtis condensed distance matrix (via `ToadStool`'s `BrayCurtisF64`)
 //! - `PCoA` ordination (via `ToadStool`'s `BatchedEighGpu`)
 //! - Observed features, Pielou evenness, alpha diversity bundle
 //! - Pairwise cosine similarity (via `ToadStool`'s `GemmF64` + `FusedMapReduceF64`)

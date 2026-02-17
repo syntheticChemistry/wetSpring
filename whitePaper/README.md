@@ -48,7 +48,7 @@ The study answers three questions:
 |-------------------|-----------|-----------|--------|
 | `FusedMapReduceF64` (ToadStool) | GPU Shannon entropy | `≤ 1e-10` vs CPU | 3/3 PASS |
 | `FusedMapReduceF64` (ToadStool) | GPU Simpson index | `≤ 1e-6` vs CPU | 3/3 PASS |
-| `bray_curtis_pairs_f64.wgsl` (custom) | GPU all-pairs BC distance | `≤ 1e-10` vs CPU | 6/6 PASS |
+| `BrayCurtisF64` (ToadStool, absorbed) | GPU all-pairs BC distance | `≤ 1e-10` vs CPU | 6/6 PASS |
 | `BatchedEighGpu` (ToadStool) | GPU PCoA ordination | `≤ 1e-6` vs CPU | 5/5 PASS |
 
 **Discovery**: The Shannon shader initially required a portable `log_f64()` implementation because native `log(f64)` crashes the NVIDIA NVVM compiler. A 2× coefficient bug was found and fixed in ToadStool's `math_f64.wgsl`. Shannon and Simpson have since been rewired to ToadStool's `FusedMapReduceF64` (single-dispatch fused map-reduce), and the deprecated custom shaders were removed.

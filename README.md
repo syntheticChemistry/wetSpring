@@ -32,8 +32,8 @@ wetspring-barracuda v0.1.0
   63/63 CPU validation checks PASS (FASTQ, quality, merge, derep, diversity, mzML, PFAS)
   31/31 GPU validation checks PASS (Shannon, Simpson, BC, PCoA, alpha, spectral match)
   1 runtime dep (flate2); GPU deps feature-gated (barracuda, wgpu, tokio, bytemuck)
-  ToadStool primitives: FusedMapReduceF64, BatchedEighGpu, GemmF64
-  1 custom WGSL shader: bray_curtis_pairs_f64 (all-pairs distance matrix)
+  ToadStool primitives: FusedMapReduceF64, BrayCurtisF64, BatchedEighGpu, GemmF64, KrigingF64
+  0 custom WGSL shaders — all GPU through ToadStool primitives
   Sovereign parsers: FASTQ, mzML/XML, MS2, base64 — all in-tree
   16S pipeline: FASTQ → quality filter → adapter trim → merge pairs → derep → diversity → PCoA
   LC-MS pipeline: mzML → mass tracks → EIC → peaks → feature table
@@ -226,8 +226,10 @@ machine learning"** (MSU Center for PFAS Research)
 - Observed features, Pielou evenness, full alpha diversity on GPU
 - Pairwise spectral cosine similarity via `GemmF64` + `FusedMapReduceF64`
 - PCoA ordination: CPU Jacobi + GPU `BatchedEighGpu` eigendecomposition
-- 1 custom WGSL shader: `bray_curtis_pairs_f64` (all-pairs distance matrix)
+- Bray-Curtis → `BrayCurtisF64` (absorbed upstream, custom shader deleted)
+- Spatial interpolation via `KrigingF64` (ordinary + simple kriging, 4 variograms)
 - **31/31 GPU validation PASS** (RTX 4070, SHADER_F64)
+- **Zero custom WGSL shaders** — all GPU through ToadStool primitives
 - Found/fixed 2× coefficient bug in ToadStool `math_f64.wgsl` log_f64 (absorbed upstream)
 
 #### Phase 4: Sovereign Pipeline — ACTIVE
@@ -290,9 +292,11 @@ wetSpring/
         tolerance_search.rs —   ppm/Da search + PFAS fragment screening
         spectral_match.rs   —   MS2 cosine similarity (matched + weighted)
         kmd.rs              —   Kendrick mass defect + PFAS homologue grouping
-        diversity_gpu.rs    —   GPU: Shannon/Simpson/observed/evenness/alpha/Bray-Curtis
+        diversity_gpu.rs    —   GPU: Shannon/Simpson/observed/evenness/alpha via FusedMapReduceF64,
+                                      BC via BrayCurtisF64 (absorbed upstream)
         pcoa_gpu.rs         —   GPU: PCoA via ToadStool BatchedEighGpu
         spectral_match_gpu.rs — GPU: pairwise cosine via GemmF64
+        kriging.rs          —   Spatial diversity interpolation via ToadStool KrigingF64
       io/                   — Streaming I/O parsers (all sovereign, zero external parsers)
         fastq.rs            —   FASTQ parser (gzip-aware via flate2)
         mzml.rs             —   mzML mass spectrometry parser
@@ -309,8 +313,7 @@ wetSpring/
       gpu.rs                — GpuF64 device wrapper (cfg(gpu)), ToadStool bridge
       tolerances.rs         — Centralized CPU + GPU validation tolerances
       validation.rs         — Validator struct + check/check_count/finish framework
-      shaders/              — Custom WGSL f64 compute shaders
-        bray_curtis_pairs_f64.wgsl — All-pairs BC distance matrix
+      shaders/              — (empty — all GPU through ToadStool primitives)
     tests/
       io_roundtrip.rs       — 42 integration tests (round-trip, pipeline, edge cases)
   control/

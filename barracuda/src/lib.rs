@@ -29,9 +29,11 @@
 //!
 //! # GPU acceleration (feature = "gpu")
 //! - `gpu` — GPU device wrapper bridging to `ToadStool` `WgpuDevice`
-//! - `bio::diversity_gpu` — Shannon, Simpson, observed, evenness, alpha, Bray-Curtis on GPU
+//! - `bio::diversity_gpu` — Shannon, Simpson, observed, evenness, alpha via `FusedMapReduceF64`,
+//!   Bray-Curtis via `BrayCurtisF64` (absorbed upstream)
 //! - `bio::pcoa_gpu` — `PCoA` ordination via `ToadStool`'s `BatchedEighGpu`
 //! - `bio::spectral_match_gpu` — Pairwise cosine via `GemmF64` + `FusedMapReduceF64`
+//! - `bio::kriging` — Spatial interpolation via `ToadStool`'s `KrigingF64`
 //! - [`tolerances`] — Centralized validation tolerances (CPU, GPU vs CPU)
 //!
 //! # Evolution path

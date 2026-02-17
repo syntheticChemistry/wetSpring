@@ -1,7 +1,7 @@
 # Evolution Readiness — Rust Module → WGSL Shader → Pipeline Stage
 
-**Date**: 2026-02-16
-**Status**: Phase 4 active — 16S pipeline complete through dereplication, 31/31 GPU + 63/63 CPU validation PASS
+**Date**: 2026-02-17
+**Status**: Phase 4 active — zero custom WGSL shaders, all GPU through ToadStool primitives, 31/31 GPU + 63/63 CPU validation PASS
 
 ---
 
@@ -29,9 +29,10 @@
 | `validation` | 245 | 10 | 92.5%** | Framework — `Validator` struct + `check_count`/`check_count_u64` |
 | `bio::pcoa` | 190 | 7 | 97.9% | Production — CPU `PCoA` (Jacobi eigensolve) |
 | `gpu` | 262 | — | — | GPU bridge — `GpuF64` wraps wgpu + `ToadStool` `TensorContext` |
-| `bio::diversity_gpu` | ~220 | — | — | GPU: Shannon/Simpson/observed/evenness/alpha via `FusedMapReduceF64`, BC via WGSL |
+| `bio::diversity_gpu` | ~200 | — | — | GPU: Shannon/Simpson/observed/evenness/alpha via `FusedMapReduceF64`, BC via `BrayCurtisF64` |
 | `bio::pcoa_gpu` | 120 | — | — | GPU `PCoA` via `ToadStool`'s `BatchedEighGpu` |
 | `bio::spectral_match_gpu` | ~180 | — | — | GPU pairwise cosine via `GemmF64` + `FusedMapReduceF64` |
+| `bio::kriging` | ~200 | — | — | Spatial interpolation via `ToadStool`'s `KrigingF64` |
 | `tolerances` | 84 | — | — | Centralized CPU + GPU tolerance constants |
 
 **Total: 293 tests (251 unit + 42 integration)**
@@ -70,7 +71,7 @@ GPU modules require `--features gpu` and are validated by `validate_diversity_gp
 |-------------|----------------------------------|----------------|--------|
 | `bio::diversity::shannon` | `FusedMapReduceF64.shannon_entropy()` | Fused map-reduce (single dispatch) | **DONE** — rewired to ToadStool |
 | `bio::diversity::simpson` | `FusedMapReduceF64.simpson_index()` | Fused map-reduce (1 − Σ p²) | **DONE** — rewired to ToadStool |
-| `bio::diversity::bray_curtis_condensed` | `bray_curtis_pairs_f64.wgsl` (custom) | All-pairs BC, 1 thread/pair | **DONE** — custom shader |
+| `bio::diversity::bray_curtis_condensed` | `BrayCurtisF64` (ToadStool, absorbed) | All-pairs BC, 1 thread/pair | **DONE** — ToadStool primitive |
 | `bio::pcoa` | `BatchedEighGpu.execute_f64()` | BC → double-center → eigensolve | **DONE** — CPU + GPU validated |
 | `bio::diversity::observed_features` | `FusedMapReduceF64.sum()` | Binarize + reduce | **DONE** — GPU validated |
 | `bio::diversity::pielou_evenness` | Shannon GPU + observed GPU | Compose H / ln(S) | **DONE** — GPU validated |
@@ -158,9 +159,11 @@ Checks: 3 Shannon + 3 Simpson + 6 BC + 5 PCoA + 6 Alpha + 8 Spectral Match.
 
 ### Custom Shaders (src/shaders/)
 
-| Shader | Type | Input | Output |
-|--------|------|-------|--------|
-| `bray_curtis_pairs_f64.wgsl` | Parallel pairs | samples[N×D] | distances[N*(N-1)/2] |
+**Zero custom WGSL shaders.** All GPU computation now goes through ToadStool primitives.
+
+Previously removed shaders:
+- `shannon_map_f64.wgsl` / `simpson_map_f64.wgsl` → replaced by `FusedMapReduceF64`
+- `bray_curtis_pairs_f64.wgsl` → absorbed upstream as `BrayCurtisF64`
 
 ### ToadStool Primitives Used (via `barracuda` crate)
 
@@ -170,11 +173,10 @@ Checks: 3 Shannon + 3 Simpson + 6 BC + 5 PCoA + 6 Alpha + 8 Spectral Match.
 | `FusedMapReduceF64` | `simpson_index()` | Simpson D = Σ p² — diversity = 1 - D |
 | `FusedMapReduceF64` | `sum()` | Observed features (binarize + reduce) |
 | `FusedMapReduceF64` | `sum_of_squares()` | Vector norms for cosine similarity |
+| `BrayCurtisF64` | `condensed_distance_matrix()` | All-pairs Bray-Curtis distance (absorbed from wetSpring) |
 | `BatchedEighGpu` | `execute_f64()` / `execute_single_dispatch()` | PCoA eigendecomposition on double-centered BC matrix |
 | `GemmF64` | `execute()` | Pairwise dot products for spectral cosine similarity |
-
-**Deprecated shaders removed:** `shannon_map_f64.wgsl` and `simpson_map_f64.wgsl` — replaced
-by `FusedMapReduceF64` which uses ToadStool's corrected `log_f64` (bug fixed upstream).
+| `KrigingF64` | `interpolate()` / `fit_variogram()` | Spatial diversity interpolation across sampling sites |
 
 ---
 
@@ -182,30 +184,35 @@ by `FusedMapReduceF64` which uses ToadStool's corrected `log_f64` (bug fixed ups
 
 **Full handoff document:** [`HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_16_2026.md`](HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_16_2026.md)
 
-**Absorbed from ToadStool (commit `0c477306`):**
+**Absorbed from ToadStool (commit `0c477306` + `2f1d8316`):**
 
 1. **`FusedMapReduceF64`** — Shannon and Simpson now use single-dispatch fused
    map-reduce instead of custom WGSL shaders + CPU sum. Deprecated shaders removed.
 2. **`BatchedEighGpu`** — PCoA eigendecomposition wired and validated (5/5 checks).
-3. **`log_f64` coefficient fix** — confirmed absorbed upstream, ToadStool's
+3. **`BrayCurtisF64`** — Custom `bray_curtis_pairs_f64.wgsl` absorbed upstream as
+   `barracuda::ops::bray_curtis_f64::BrayCurtisF64`. Local shader deleted.
+4. **`KrigingF64`** — Spatial interpolation for diversity metrics across sampling sites,
+   wired as `bio::kriging` with ordinary/simple kriging + empirical variogram fitting.
+5. **`log_f64` coefficient fix** — confirmed absorbed upstream, ToadStool's
    `math_f64.wgsl` now has corrected coefficients.
+6. **`pow_f64` fix (TS-001)** — fractional exponents now work via `exp(e * log(b))`.
+7. **`acos`/`sin` precision (TS-003)** — zero-bias literal pattern applied.
+8. **`FusedMapReduceF64` buffer fix (TS-004)** — N >= 1024 buffer conflict resolved.
 
 **Remaining evolution opportunities:**
 
-1. **Bray-Curtis → ToadStool**: Custom `bray_curtis_pairs_f64.wgsl` could be
-   promoted to ToadStool as a general-purpose condensed distance kernel.
-2. **Rarefaction GPU (bootstrap CI)**: Wire `prng_xoshiro.wgsl` for Monte Carlo
+1. **Rarefaction GPU (bootstrap CI)**: Wire `prng_xoshiro.wgsl` for Monte Carlo
    confidence intervals (CPU exact rarefaction is analytically sufficient).
-3. **m/z tolerance search GPU**: Adapt `batched_bisection_f64.wgsl` for ppm-bounded
+2. **m/z tolerance search GPU**: Adapt `batched_bisection_f64.wgsl` for ppm-bounded
    binary search on sorted m/z arrays.
-4. **EIC extraction GPU**: Parallel m/z binning across scans via custom WGSL kernel.
-5. **Peak detection GPU**: Promote `bio::signal::find_peaks` to GPU for parallel
+3. **EIC extraction GPU**: Parallel m/z binning across scans via custom WGSL kernel.
+4. **Peak detection GPU**: Promote `bio::signal::find_peaks` to GPU for parallel
    chromatogram processing (STFT windowing available in ToadStool).
-6. **DADA2-equivalent denoising**: Sequence error correction model for 16S amplicons.
-7. **Chimera detection**: Reference-free chimera filtering (uchime3 equivalent).
-8. **Taxonomy classification**: Naive Bayes / BLAST for 16S ASV taxonomy assignment.
-9. **UniFrac distance**: Phylogeny-weighted beta diversity.
+5. **DADA2-equivalent denoising**: Sequence error correction model for 16S amplicons.
+6. **Chimera detection**: Reference-free chimera filtering (uchime3 equivalent).
+7. **Taxonomy classification**: Naive Bayes / BLAST for 16S ASV taxonomy assignment.
+8. **UniFrac distance**: Phylogeny-weighted beta diversity.
 
 ---
 
-*Updated from wetSpring Phase 4 — 16S pipeline through dereplication + LC-MS feature extraction, February 16, 2026.*
+*Updated from wetSpring Phase 4 — zero custom WGSL shaders, all GPU through ToadStool primitives + KrigingF64 wired, February 17, 2026.*

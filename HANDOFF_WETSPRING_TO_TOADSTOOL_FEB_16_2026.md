@@ -3,7 +3,7 @@
 > **Note:** This is a historical document from the initial ToadStool integration
 > (Phase 3, 17/17 GPU checks). wetSpring has since expanded significantly —
 > see [`EVOLUTION_READINESS.md`](EVOLUTION_READINESS.md) for current status
-> (Phase 4, 94/94 total checks, 293 tests, 22 modules).
+> (Phase 4, 94/94 total checks, 293 tests, 24 modules, zero custom WGSL shaders).
 
 **Date:** February 16, 2026
 **From:** wetSpring (Life science + analytical chemistry validation study)

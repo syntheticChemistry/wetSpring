@@ -133,7 +133,7 @@ Compare:
 |--------|-------------------|-----------|-----------|
 | Shannon | `FusedMapReduceF64` (ToadStool) | `1e-10` | Transcendental `log_f64` in WGSL |
 | Simpson | `FusedMapReduceF64` (ToadStool) | `1e-6` | Pure arithmetic, generous margin |
-| Bray-Curtis | `bray_curtis_pairs_f64.wgsl` (custom) | `1e-10` | f64 absolute value and division |
+| Bray-Curtis | `BrayCurtisF64` (ToadStool, absorbed) | `1e-10` | f64 absolute value and division |
 | PCoA eigenvalues | `BatchedEighGpu` (ToadStool) | `1e-6` | Jacobi rotation convergence |
 | PCoA distances | Reconstructed from eigenvectors | `1e-6` | Accumulated eigenvector error |
 | PCoA proportions | Computed from eigenvalues | `1e-6` | Division by positive sum |

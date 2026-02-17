@@ -1,7 +1,7 @@
 # wetSpring Control Experiment — Status Report
 
 **Date**: 2026-02-12 (Project initialized)
-**Updated**: 2026-02-16 (Phase 4 — 16S pipeline through dereplication, 293 tests, ~98% coverage, 94/94 validation PASS)
+**Updated**: 2026-02-17 (Phase 4 — zero custom WGSL, all GPU via ToadStool primitives, 293 tests, ~98% coverage, 94/94 validation PASS)
 **Gate**: Eastgate (i9-12900K, 64 GB DDR5, RTX 4070 12GB, Pop!_OS 22.04)
 **Galaxy**: quay.io/bgruening/galaxy:24.1 (Docker) — upgraded from 20.09
 **License**: AGPL-3.0-or-later
@@ -361,13 +361,14 @@ of $500K instruments with proprietary software.
 
 ---
 
-### 2026-02-16: BarraCUDA Rust Validation — 94/94 PASS
+### 2026-02-17: BarraCUDA Rust Validation — 94/94 PASS (zero custom WGSL)
 
 - **Architecture**: `wetspring-barracuda` crate, depends on `barracuda` (phase1/toadstool)
 - **Pattern**: Same as hotSpring — hardcoded Python baseline values in Rust validation binaries
-- **Crate**: 22 modules (4 I/O parsers, 15 bio/signal algorithms, encoding, error, validation, tolerances, gpu), 5 validation binaries, 251 unit tests + 42 integration tests, ~98% line coverage
+- **Crate**: 24 modules (4 I/O parsers, 16 bio/signal algorithms + kriging, encoding, error, validation, tolerances, gpu), 5 validation binaries, 251 unit tests + 42 integration tests, ~98% line coverage
 - **Dependencies**: flate2 only (barracuda optional/feature-gated; base64, needletail, quick-xml, serde, rayon all removed)
 - **Code quality**: `Validator` struct (typed `check_count`/`check_count_u64`), NaN-safe tolerance search, Result-based GPU dispatch, 0 library clippy warnings, 0 `unsafe`, 0 production panics
+- **GPU sovereignty**: **Zero custom WGSL shaders** — all GPU compute through ToadStool primitives (FusedMapReduceF64, BrayCurtisF64, BatchedEighGpu, GemmF64, KrigingF64)
 
 **Track 1 — Life Science (FASTQ → diversity pipeline):**
 - `validate_fastq`: **28/28 PASS** — quality filter + adapter trim + merge pairs + derep + F3D0 7,793 seqs, 40 files 304,720 seqs
@@ -378,7 +379,7 @@ of $500K instruments with proprietary software.
 - `validate_pfas`: **10/10 PASS** — cosine similarity + KMD + FindPFAS (external data optional)
 
 **GPU Acceleration (ToadStool):**
-- `validate_diversity_gpu`: **31/31 PASS** — Shannon, Simpson, BC, PCoA, alpha diversity, spectral match
+- `validate_diversity_gpu`: **31/31 PASS** — Shannon, Simpson, BC (via BrayCurtisF64), PCoA, alpha diversity, spectral match
 
 **Total: 63/63 CPU + 31/31 GPU = 94/94 checks PASS, 293 tests (251 unit + 42 integration), ~98% coverage**
 
@@ -634,7 +635,7 @@ These ToadStool kernels serve **both tracks** and are useful beyond wetSpring:
 |--------|---------------------|:-----:|--------|
 | `diversity_gpu::shannon_gpu` | `FusedMapReduceF64` | T1 | **3/3 PASS** |
 | `diversity_gpu::simpson_gpu` | `FusedMapReduceF64` | T1 | **3/3 PASS** |
-| `diversity_gpu::bray_curtis_condensed_gpu` | `bray_curtis_pairs_f64.wgsl` | T1 | **6/6 PASS** |
+| `diversity_gpu::bray_curtis_condensed_gpu` | `BrayCurtisF64` (ToadStool) | T1 | **6/6 PASS** |
 | `diversity_gpu::observed_features_gpu` | `FusedMapReduceF64.sum()` | T1 | **PASS** |
 | `diversity_gpu::pielou_evenness_gpu` | Shannon + observed compose | T1 | **PASS** |
 | `diversity_gpu::alpha_diversity_gpu` | FusedMapReduceF64 bundle | T1 | **6/6 PASS** |
@@ -699,7 +700,7 @@ These ToadStool kernels serve **both tracks** and are useful beyond wetSpring:
 |--------|-----------|--------|
 | `FusedMapReduceF64` (ToadStool) | Shannon/Simpson fused map-reduce (replaced custom shaders) | **DONE** ✓ |
 | `BatchedEighGpu` (ToadStool) | PCoA eigendecomposition on double-centered BC matrix | **DONE** ✓ |
-| `bray_curtis_pairs_f64.wgsl` | All-pairs BC distance matrix (condensed) | **DONE** ✓ |
+| `BrayCurtisF64` (ToadStool) | All-pairs BC distance matrix (condensed) | **DONE** ✓ |
 
 **Shaders still needed (not in ToadStool yet):**
 
@@ -718,7 +719,7 @@ These ToadStool kernels serve **both tracks** and are useful beyond wetSpring:
 Tier A: Alpha/beta diversity (3 shaders DONE, 3 pending)
   ✓ FusedMapReduceF64 ─→ GPU Shannon entropy (ToadStool, 3/3 PASS)
   ✓ FusedMapReduceF64 ─→ GPU Simpson index (ToadStool, 3/3 PASS)
-  ✓ bray_curtis_pairs_f64.wgsl ─→ GPU all-pairs BC (custom, 6/6 PASS)
+  ✓ BrayCurtisF64 ─→ GPU all-pairs BC (ToadStool, absorbed from wetSpring, 6/6 PASS)
   ✓ BatchedEighGpu ─→ GPU PCoA eigensolve (ToadStool, 5/5 PASS)
   ┌─ eigh_f64 + PCA ──────────→ PCoA ordination (wire from ToadStool)
   ├─ prng_xoshiro + cumsum ───→ GPU rarefaction (wire from ToadStool)
@@ -761,7 +762,7 @@ Phase 3: GPU Acceleration — DONE ✓ (31/31 GPU PASS)
   ✓ FusedMapReduceF64 ──── GPU Shannon, Simpson, observed, evenness, alpha
   ✓ BatchedEighGpu ──────── GPU PCoA eigendecomposition
   ✓ GemmF64 ─────────────── GPU pairwise spectral cosine similarity
-  ✓ bray_curtis_pairs_f64.wgsl ── GPU all-pairs BC distance matrix
+  ✓ BrayCurtisF64 ────────────── GPU all-pairs BC distance matrix (absorbed upstream)
 
 Phase 4: Sovereign Pipeline — ACTIVE
   ✓ FASTQ → quality → merge → derep → diversity → PCoA (end-to-end)
@@ -834,7 +835,7 @@ Together they build a general-purpose sovereign compute platform.
   - 16S pipeline: FASTQ → quality → merge → derep → diversity → PCoA
   - LC-MS pipeline: mzML → mass tracks → EIC → peaks → features
   - PFAS pipeline: mzML/MS2 → tolerance search → spectral match → KMD → homologues
-  - GPU: FusedMapReduceF64, BatchedEighGpu, GemmF64, bray_curtis_pairs_f64.wgsl
+  - GPU: FusedMapReduceF64, BrayCurtisF64, BatchedEighGpu, GemmF64, KrigingF64 (all ToadStool)
   - 1 runtime dep: flate2 (pure-Rust miniz_oxide for zlib/gzip)
   - 0 unsafe blocks, 0 production panic!, 0 production unwrap()/expect()
   - SPDX license headers on all .rs files
