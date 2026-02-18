@@ -15,25 +15,25 @@ categories = ["science", "command-line-utilities"]
 [features]
 default = []
 # GPU acceleration via BarraCUDA/ToadStool (Phase 3).
-# Enable with `cargo build --features gpu` when wiring GPU dispatch.
-# Pulls in wgpu (WebGPU), barracuda (ToadStool tensor compute),
-# tokio (async device creation), and bytemuck (shader params).
-gpu = ["dep:barracuda", "dep:wgpu", "dep:tokio", "dep:bytemuck"]
+# Enable with `cargo build --features gpu`.
+# All GPU dispatch goes through ToadStool primitives (zero custom WGSL).
+# Pulls in wgpu v22 (device creation), barracuda (9 ToadStool primitives),
+# and tokio (async device init).
+gpu = ["dep:barracuda", "dep:wgpu", "dep:tokio"]
 
 [dependencies]
 # BarraCUDA: shared scientific computing library (ToadStool GPU compute).
-# Provides SumReduceF64, WgpuDevice, TensorContext, math_f64 shaders.
+# Provides FusedMapReduceF64, BrayCurtisF64, BatchedEighGpu, GemmF64,
+# KrigingF64, VarianceF64, CorrelationF64, CovarianceF64, WeightedDotF64.
 barracuda = { path = "../../phase1/toadstool/crates/barracuda", optional = true }
 
 # wgpu: WebGPU compute — hardware-agnostic GPU via Vulkan/Metal/DX12.
 # Same version as barracuda to prevent duplicate symbol linking errors.
-wgpu = { version = "0.19", features = ["wgsl"], optional = true }
+wgpu = { version = "22", optional = true }
 
 # Async runtime for GPU device creation (barracuda already brings tokio in).
 tokio = { version = "1", features = ["rt", "macros"], optional = true }
 
-# Safe byte casting for GPU uniform/storage buffer params.
-bytemuck = { version = "1.14", features = ["derive"], optional = true }
 
 # I/O: zlib decompression (mzML binary arrays) + GzDecoder (FASTQ .gz)
 # XML parsing is sovereign (src/io/xml.rs); no quick-xml dependency.
@@ -60,8 +60,24 @@ path = "src/bin/validate_mzml.rs"
 name = "validate_pfas"
 path = "src/bin/validate_pfas.rs"
 
+# ── Feature pipeline validation binary (Exp009) ──────────────────
+[[bin]]
+name = "validate_features"
+path = "src/bin/validate_features.rs"
+
+# ── Peak detection validation binary (Exp010) ────────────────────
+[[bin]]
+name = "validate_peaks"
+path = "src/bin/validate_peaks.rs"
+
 # ── GPU validation binaries (require --features gpu) ─────────────
 [[bin]]
 name = "validate_diversity_gpu"
 path = "src/bin/validate_diversity_gpu.rs"
+required-features = ["gpu"]
+
+# ── CPU vs GPU benchmark (require --features gpu) ────────────────
+[[bin]]
+name = "benchmark_cpu_gpu"
+path = "src/bin/benchmark_cpu_gpu.rs"
 required-features = ["gpu"]

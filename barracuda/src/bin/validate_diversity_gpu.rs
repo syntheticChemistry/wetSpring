@@ -11,10 +11,16 @@
 //! - `PCoA` ordination (via `ToadStool`'s `BatchedEighGpu`)
 //! - Observed features, Pielou evenness, alpha diversity bundle
 //! - Pairwise cosine similarity (via `ToadStool`'s `GemmF64` + `FusedMapReduceF64`)
+//! - Variance/std dev (via `ToadStool`'s `VarianceF64`)
+//! - Pearson correlation (via `ToadStool`'s `CorrelationF64`)
+//! - Sample covariance (via `ToadStool`'s `CovarianceF64`)
+//! - Weighted/plain dot product (via `ToadStool`'s `WeightedDotF64`)
 //!
 //! Run: `cargo run --features gpu --bin validate_diversity_gpu`
 
-use wetspring_barracuda::bio::{diversity, diversity_gpu, pcoa, pcoa_gpu, spectral_match_gpu};
+use wetspring_barracuda::bio::{
+    diversity, diversity_gpu, pcoa, pcoa_gpu, spectral_match_gpu, stats_gpu,
+};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
@@ -45,6 +51,7 @@ async fn main() {
     validate_pcoa(&gpu, &mut v);
     validate_alpha_diversity(&gpu, &mut v);
     validate_spectral_match(&gpu, &mut v);
+    validate_stats_gpu(&mut v, &gpu);
 
     v.finish();
 }
@@ -427,6 +434,63 @@ fn validate_spectral_match(gpu: &GpuF64, v: &mut Validator) {
             0.0,
         );
     }
+}
+
+fn validate_stats_gpu(v: &mut Validator, gpu: &GpuF64) {
+    v.section("Statistics GPU vs CPU");
+
+    let data = vec![2.0, 4.0, 4.0, 4.0, 5.0, 5.0, 7.0, 9.0];
+    let n = data.len() as f64;
+    let mean = data.iter().sum::<f64>() / n;
+    let cpu_var: f64 = data.iter().map(|&x| (x - mean).powi(2)).sum::<f64>() / n;
+    let cpu_sample_var = cpu_var * n / (n - 1.0);
+    let cpu_std = cpu_sample_var.sqrt();
+
+    let gpu_var = stats_gpu::variance_gpu(gpu, &data).expect("variance GPU");
+    let gpu_sample_var = stats_gpu::sample_variance_gpu(gpu, &data).expect("sample variance GPU");
+    let gpu_std = stats_gpu::std_dev_gpu(gpu, &data).expect("std dev GPU");
+
+    v.check("Population variance", gpu_var, cpu_var, 1e-10);
+    v.check("Sample variance", gpu_sample_var, cpu_sample_var, 1e-10);
+    v.check("Sample std dev", gpu_std, cpu_std, 1e-10);
+
+    let x = vec![1.0, 2.0, 3.0, 4.0, 5.0];
+    let y = vec![2.0, 4.0, 5.0, 4.0, 5.0];
+
+    let x_mean = x.iter().sum::<f64>() / x.len() as f64;
+    let y_mean = y.iter().sum::<f64>() / y.len() as f64;
+    let cpu_cov: f64 = x
+        .iter()
+        .zip(y.iter())
+        .map(|(&xi, &yi)| (xi - x_mean) * (yi - y_mean))
+        .sum::<f64>()
+        / (x.len() as f64 - 1.0);
+    let x_std =
+        (x.iter().map(|&xi| (xi - x_mean).powi(2)).sum::<f64>() / (x.len() as f64 - 1.0)).sqrt();
+    let y_std =
+        (y.iter().map(|&yi| (yi - y_mean).powi(2)).sum::<f64>() / (y.len() as f64 - 1.0)).sqrt();
+    let cpu_corr = cpu_cov / (x_std * y_std);
+
+    let gpu_cov = stats_gpu::covariance_gpu(gpu, &x, &y).expect("covariance GPU");
+    let gpu_corr = stats_gpu::correlation_gpu(gpu, &x, &y).expect("correlation GPU");
+
+    v.check("Sample covariance", gpu_cov, cpu_cov, 1e-10);
+    v.check("Pearson correlation", gpu_corr, cpu_corr, 1e-10);
+
+    let w = vec![1.0, 2.0, 3.0, 4.0, 5.0];
+    let a = vec![1.0, 0.0, 1.0, 0.0, 1.0];
+    let b = vec![0.0, 1.0, 0.0, 1.0, 0.0];
+    let cpu_wdot: f64 = w
+        .iter()
+        .zip(a.iter().zip(b.iter()))
+        .map(|(&wi, (&ai, &bi))| wi * ai * bi)
+        .sum();
+    let gpu_wdot = stats_gpu::weighted_dot_gpu(gpu, &w, &a, &b).expect("weighted dot GPU");
+    v.check("Weighted dot product", gpu_wdot, cpu_wdot, 1e-10);
+
+    let cpu_dot: f64 = x.iter().zip(y.iter()).map(|(&xi, &yi)| xi * yi).sum();
+    let gpu_dot = stats_gpu::dot_gpu(gpu, &x, &y).expect("dot GPU");
+    v.check("Dot product", gpu_dot, cpu_dot, 1e-10);
 }
 
 fn euclidean_dist(a: &[f64], b: &[f64]) -> f64 {

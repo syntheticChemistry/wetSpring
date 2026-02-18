@@ -1,6 +1,7 @@
 # Handoff: All Springs → ToadStool Wiring Team
 
 **Date:** February 17, 2026
+**Updated:** February 18, 2026 — **Nearly all items RESOLVED by ToadStool deep debt work**
 **From:** hotSpring, wetSpring, airSpring validation teams
 **To:** ToadStool/BarraCUDA core team
 **License:** AGPL-3.0-or-later
@@ -9,38 +10,41 @@
 
 ## Executive Summary
 
-ToadStool has **~500 WGSL shaders** but only **~95 have Rust orchestrators**.
-The shaders are complete, tested in WGSL, and ready to wire. The springs are
-blocked on missing orchestrators for ~15 high-value shaders that would unlock
-the next phase of GPU acceleration across nuclear physics, life science, and
-precision agriculture.
+> **Update Feb 18:** ToadStool completed a massive evolution since this
+> handoff was drafted. Of the 14 high-priority items listed below,
+> **13 are now wired with full Rust orchestrators**. The remaining item
+> (Kriging GPU-side LU) is a known low-priority optimization.
+>
+> Additionally, ToadStool completed:
+> - wgpu 0.19 → v22 migration across all crates
+> - Fully concurrent test infrastructure with shared device pool
+> - Capability-based dispatch refactoring
+> - 5 new statistical f64 orchestrators (correlation, covariance, variance, beta, digamma)
+> - 10+ new f64 scientific orchestrators (bessel, legendre, spherical harmonics)
+> - Sparse solver architecture split (spmv, dot_reduce, vector_ops, cg_kernels)
+> - Coulomb GPU energy path, tridiagonal serial kernel
+>
+> **wetSpring rewire result:** 9 ToadStool primitives, 38/38 GPU PASS, 101/101 total.
 
-**Ask:** Wire the shaders listed below. Each entry includes the shader path,
-binding layout, entry points, which spring needs it, and estimated effort.
-Most are easy — the hard work (shader authoring, f64 precision, math
-correctness) is already done.
+~~ToadStool has **~500 WGSL shaders** but only **~95 have Rust orchestrators**.~~
+ToadStool has wired nearly all requested orchestrators.
 
-**Combined validation after wiring:** 313+ existing checks will be joined by
-new GPU-vs-CPU checks from each spring team. We will validate everything.
+**Combined validation after wiring:** 101 wetSpring + hotSpring + airSpring checks.
 
 ---
 
-## Quick Win: Export Missing Module
+## Quick Win: Export Missing Module — RESOLVED
 
-`ops/cyclic_reduction_wgsl.rs` exists and works but is **not in `ops/mod.rs`**.
+~~`ops/cyclic_reduction_wgsl.rs` exists and works but is **not in `ops/mod.rs`**.~~
 
-```rust
-// ops/mod.rs — add this line:
-pub mod cyclic_reduction_wgsl;
-```
-
-This immediately unblocks tridiagonal solves for all springs. Takes 10 seconds.
+**Status:** DONE — `cyclic_reduction_f64` is now exported in `ops/mod.rs` and has
+a full orchestrator with `solve()` and `solve_batch()` methods.
 
 ---
 
 ## Priority 1: Cross-Spring (all three benefit)
 
-### 1.1 `cyclic_reduction_f64.wgsl` — f64 Tridiagonal Solve
+### 1.1 `cyclic_reduction_f64.wgsl` — f64 Tridiagonal Solve — RESOLVED
 
 **Shader:** `shaders/linalg/cyclic_reduction_f64.wgsl`
 **Entry points:** `reduction_f64`, `substitution_f64`, `solve_serial_f64`, `reduction_batch_f64`, `substitution_batch_f64`, `solve_batch_serial_f64`
@@ -66,7 +70,7 @@ This immediately unblocks tridiagonal solves for all springs. Takes 10 seconds.
 | wetSpring | Diversity metric interpolation across sampling sites |
 | hotSpring | Spatial data analysis |
 
-### 1.3 `weighted_dot_f64.wgsl` — Weighted Dot Product
+### 1.3 `weighted_dot_f64.wgsl` — Weighted Dot Product — RESOLVED
 
 **Shader:** `shaders/reduce/weighted_dot_f64.wgsl`
 **Entry points:** `weighted_dot_simple`, `weighted_dot_parallel`, `final_reduce`, `weighted_dot_batched`, `dot_parallel`, `norm_squared_parallel`
@@ -79,7 +83,7 @@ This immediately unblocks tridiagonal solves for all springs. Takes 10 seconds.
 | wetSpring | Galerkin inner products, weighted correlation |
 | airSpring | Weighted sensor fusion |
 
-### 1.4 `correlation.wgsl` + `covariance.wgsl` — Statistical Kernels
+### 1.4 `correlation.wgsl` + `covariance.wgsl` — Statistical Kernels — RESOLVED
 
 **Shader:** `shaders/special/correlation.wgsl`
 **Entry point:** `main`
@@ -103,7 +107,7 @@ This immediately unblocks tridiagonal solves for all springs. Takes 10 seconds.
 
 ## Priority 2: hotSpring Critical Path
 
-### 2.1 `eigh_f64.wgsl` — Single-Matrix Eigendecomposition
+### 2.1 `eigh_f64.wgsl` — Single-Matrix Eigendecomposition — RESOLVED (batched_eigh_gpu fixed)
 
 **Shader:** `shaders/linalg/eigh_f64.wgsl`
 **Entry points:** `init_V`, `compute_jacobi_angle`, `jacobi_rotate_A`, `jacobi_update_block`, `jacobi_rotate_V`, `extract_eigenvalues`, `find_max_off_diag`
@@ -112,7 +116,7 @@ This immediately unblocks tridiagonal solves for all springs. Takes 10 seconds.
 
 **Why critical:** hotSpring's HFB eigensolve is the #1 bottleneck (760K queue submissions for batched 12×12). This single-matrix variant could be the basis for the single-dispatch Jacobi kernel identified in the previous handoff.
 
-### 2.2 `hermite_f64.wgsl` — Hermite Polynomials
+### 2.2 `hermite_f64.wgsl` — Hermite Polynomials — RESOLVED
 
 **Shader:** `shaders/special/hermite_f64.wgsl`
 **Entry points:** `main`, `hermite_function_kernel`
@@ -123,7 +127,7 @@ This immediately unblocks tridiagonal solves for all springs. Takes 10 seconds.
 |----------|----------|
 | hotSpring | Quantum oscillator basis functions, nuclear structure |
 
-### 2.3 `laguerre_f64.wgsl` — Laguerre Polynomials
+### 2.3 `laguerre_f64.wgsl` — Laguerre Polynomials — RESOLVED
 
 **Shader:** `shaders/special/laguerre_f64.wgsl`
 **Entry points:** `main`, `radial_laguerre`
@@ -138,7 +142,7 @@ This immediately unblocks tridiagonal solves for all springs. Takes 10 seconds.
 
 ## Priority 3: PDE/ODE Infrastructure (hotSpring + airSpring)
 
-### 3.1 `crank_nicolson.wgsl` — Implicit PDE Solver
+### 3.1 `crank_nicolson.wgsl` — Implicit PDE Solver — RESOLVED
 
 **Shader:** `shaders/pde/crank_nicolson.wgsl`
 **Entry points:** `compute_rhs`, `build_matrix`, `apply_source`, `adi_rhs_x_sweep`, `adi_rhs_y_sweep`, `compute_laplacian`
@@ -150,7 +154,7 @@ This immediately unblocks tridiagonal solves for all springs. Takes 10 seconds.
 | airSpring | Richards equation (unsaturated flow), soil heat (critical path) |
 | hotSpring | Time-dependent Schrodinger, Two-Temperature Model |
 
-### 3.2 `rk_stage.wgsl` — Runge-Kutta ODE Integrator
+### 3.2 `rk_stage.wgsl` — Runge-Kutta ODE Integrator — RESOLVED
 
 **Shader:** `shaders/numerical/rk_stage.wgsl`
 **Entry points:** `prepare_stage`, `update_solution`, `compute_error`, `error_norm`, `axpy`
@@ -166,7 +170,7 @@ This immediately unblocks tridiagonal solves for all springs. Takes 10 seconds.
 
 ## Priority 4: wetSpring Specific
 
-### 4.1 `cosine_similarity_f64.wgsl` — f64 Spectral Matching
+### 4.1 `cosine_similarity_f64.wgsl` — f64 Spectral Matching — RESOLVED
 
 **Shader:** `shaders/math/cosine_similarity_f64.wgsl`
 **Entry points:** `main` (all-pairs, workgroup 16x16), `cosine_single_pair` (single pair, workgroup 256, shared-memory reduction)
@@ -181,9 +185,9 @@ This immediately unblocks tridiagonal solves for all springs. Takes 10 seconds.
 
 ---
 
-## Priority 5: MD Forces (hotSpring + Future)
+## Priority 5: MD Forces (hotSpring + Future) — ALL RESOLVED
 
-These are already-written f64 force shaders with no orchestrators:
+These shaders now have full Rust orchestrators:
 
 | Shader | Entry Points | Effort |
 |--------|-------------|--------|
@@ -229,27 +233,33 @@ Existing orchestrators to copy from:
 
 ---
 
-## Effort Summary
+## Effort Summary — Resolution Status
 
-| Priority | Shader | Effort | Springs |
-|----------|--------|--------|---------|
-| Quick win | Export `cyclic_reduction_wgsl` in `mod.rs` | 10 seconds | All |
-| P1.1 | `cyclic_reduction_f64` | Easy | All |
-| P1.2 | `kriging_f64` GPU | Moderate | airSpring, wetSpring |
-| P1.3 | `weighted_dot_f64` | Easy | All |
-| P1.4 | `correlation` + `covariance` | Easy | All |
-| P2.1 | `eigh_f64` single-matrix | Hard | hotSpring (critical) |
-| P2.2 | `hermite_f64` | Trivial | hotSpring |
-| P2.3 | `laguerre_f64` | Trivial | hotSpring |
-| P3.1 | `crank_nicolson` | Moderate | airSpring, hotSpring |
-| P3.2 | `rk_stage` | Moderate | airSpring, hotSpring |
-| P4.1 | `cosine_similarity_f64` | Easy | wetSpring |
-| P5 | MD forces f64 (6 shaders) | Easy–Moderate | hotSpring |
+| Priority | Shader | Status | Wired By |
+|----------|--------|--------|----------|
+| Quick win | Export `cyclic_reduction_wgsl` in `mod.rs` | **DONE** | ToadStool `d69c472b` |
+| P1.1 | `cyclic_reduction_f64` | **DONE** | ToadStool `d69c472b` |
+| P1.2 | `kriging_f64` GPU | Partial (CPU LU) | Original `0c477306` |
+| P1.3 | `weighted_dot_f64` | **DONE** | ToadStool `d69c472b` |
+| P1.4 | `correlation` + `covariance` + f64 | **DONE** | ToadStool `d69c472b` + `d67b4ee0` |
+| P2.1 | `eigh_f64` single-matrix | **DONE** | ToadStool `728838fa` |
+| P2.2 | `hermite_f64` | **DONE** | ToadStool `acfaa454` |
+| P2.3 | `laguerre_f64` | **DONE** | ToadStool `acfaa454` |
+| P3.1 | `crank_nicolson` | **DONE** | ToadStool `d69c472b` |
+| P3.2 | `rk_stage` | **DONE** | ToadStool `d69c472b` |
+| P4.1 | `cosine_similarity_f64` | **DONE** | ToadStool `d69c472b` |
+| P5 | MD forces f64 (6 shaders) | **DONE** | ToadStool `acfaa454` + `5ae47207` |
 
-**Total: 14 orchestrators** to unlock the next GPU evolution phase.
+**Result: 13/14 fully wired, 1 partial (Kriging LU on CPU — low priority).**
 
-Estimated total effort: ~3–5 days for one developer familiar with the codebase.
-The 5 trivial/easy P1+P2 items could ship in an afternoon.
+Additional bonus items wired (not in original handoff):
+- `VarianceF64` (population, sample, std dev)
+- `CorrelationF64` (Pearson f64)
+- `CovarianceF64` (population, sample, custom ddof)
+- `BetaF64`, `DigammaF64` (special functions)
+- Bessel I₀/J₀/J₁/K₀ f64, Legendre f64, Spherical Harmonics f64
+- Born-Mayer f64, Velocity Verlet f64, Kinetic Energy f64, RDF f64
+- Sparse solver split: spmv, dot_reduce, vector_ops, cg_kernels
 
 ---
 
@@ -263,7 +273,7 @@ Each spring team will:
 
 Current baselines:
 - hotSpring: 195 checks
-- wetSpring: 94 checks (63 CPU + 31 GPU)
+- wetSpring: **101 checks** (63 CPU + 38 GPU) — **7 new GPU stats checks since handoff**
 - airSpring: 70 checks
 
 ---
@@ -288,3 +298,6 @@ cargo run --features gpu --bin validate_*_gpu
 ---
 
 *February 17, 2026 — Shaders are done. Wire them and the springs flow.*
+
+*February 18, 2026 — They wired them. The springs flow. wetSpring: wgpu v22,
+9 ToadStool primitives, 38/38 GPU PASS, 101/101 total. Zero custom WGSL.*

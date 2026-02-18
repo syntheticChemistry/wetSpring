@@ -1,11 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Bioinformatics and analytical chemistry algorithms.
 
+pub mod chimera;
+pub mod dada2;
 pub mod derep;
 pub mod diversity;
 #[cfg(feature = "gpu")]
 pub mod diversity_gpu;
 pub mod eic;
+#[cfg(feature = "gpu")]
+pub mod eic_gpu;
 pub mod feature_table;
 pub mod kmd;
 pub mod kmer;
@@ -16,8 +20,14 @@ pub mod pcoa;
 #[cfg(feature = "gpu")]
 pub mod pcoa_gpu;
 pub mod quality;
+#[cfg(feature = "gpu")]
+pub mod rarefaction_gpu;
 pub mod signal;
 pub mod spectral_match;
 #[cfg(feature = "gpu")]
 pub mod spectral_match_gpu;
+#[cfg(feature = "gpu")]
+pub mod stats_gpu;
+pub mod taxonomy;
 pub mod tolerance_search;
+pub mod unifrac;

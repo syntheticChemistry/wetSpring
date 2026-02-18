@@ -1,0 +1,66 @@
+{
+  "generator": "scipy 1.15.3",
+  "cases": [
+    {
+      "name": "single_gaussian",
+      "n_data": 200,
+      "n_peaks": 1,
+      "params": {
+        "min_height": 50.0,
+        "min_prominence": 50.0,
+        "min_width": 2.0
+      },
+      "indices": [
+        101
+      ]
+    },
+    {
+      "name": "three_chromatographic",
+      "n_data": 500,
+      "n_peaks": 3,
+      "params": {
+        "min_height": 100.0,
+        "min_prominence": 200.0,
+        "min_width": 2.0
+      },
+      "indices": [
+        80,
+        249,
+        400
+      ]
+    },
+    {
+      "name": "noisy_with_spikes",
+      "n_data": 1000,
+      "n_peaks": 3,
+      "params": {
+        "min_height": 300.0,
+        "min_prominence": 200.0,
+        "distance": 20
+      },
+      "indices": [
+        150,
+        500,
+        800
+      ]
+    },
+    {
+      "name": "overlapping_peaks",
+      "n_data": 200,
+      "n_peaks": 1,
+      "params": {
+        "min_prominence": 100.0
+      },
+      "indices": [
+        103
+      ]
+    },
+    {
+      "name": "monotonic_no_peaks",
+      "n_data": 100,
+      "n_peaks": 0,
+      "params": {},
+      "indices": []
+    }
+  ]
+}

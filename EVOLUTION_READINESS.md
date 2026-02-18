@@ -1,7 +1,7 @@
 # Evolution Readiness — Rust Module → WGSL Shader → Pipeline Stage
 
-**Date**: 2026-02-17
-**Status**: Phase 4 active — zero custom WGSL shaders, all GPU through ToadStool primitives, 31/31 GPU + 63/63 CPU validation PASS
+**Date**: 2026-02-18
+**Status**: Phase 4 COMPLETE — 30 modules, 284 tests, 127/127 validation PASS, 11 ToadStool primitives, 0 custom WGSL shaders
 
 ---
 
@@ -33,14 +33,21 @@
 | `bio::pcoa_gpu` | 120 | — | — | GPU `PCoA` via `ToadStool`'s `BatchedEighGpu` |
 | `bio::spectral_match_gpu` | ~180 | — | — | GPU pairwise cosine via `GemmF64` + `FusedMapReduceF64` |
 | `bio::kriging` | ~200 | — | — | Spatial interpolation via `ToadStool`'s `KrigingF64` |
+| `bio::stats_gpu` | ~150 | — | — | GPU: variance/correlation/covariance/weighted dot |
+| `bio::dada2` | ~350 | 9 | 98% | Production — DADA2 ASV denoising (Callahan et al. 2016) |
+| `bio::chimera` | ~250 | 8 | 98% | Production — UCHIME-style reference-free chimera detection |
+| `bio::taxonomy` | ~300 | 8 | 98% | Production — Naive Bayes classifier (RDP/SILVA 138) |
+| `bio::unifrac` | ~300 | 8 | 98% | Production — weighted + unweighted UniFrac (Newick parser) |
+| `bio::eic_gpu` | ~200 | — | — | GPU: batch EIC integration via `FusedMapReduceF64` + `WeightedDotF64` |
+| `bio::rarefaction_gpu` | ~200 | — | — | GPU: bootstrap rarefaction via `FusedMapReduceF64` |
 | `tolerances` | 84 | — | — | Centralized CPU + GPU tolerance constants |
 
-**Total: 293 tests (251 unit + 42 integration)**
+**Total: 284 tests, 30 modules**
 
 \* `encoding.rs` — `build_decode_table()` is a `const fn` evaluated at compile time; llvm-cov cannot instrument it.
 \** `validation.rs` — remaining uncovered code is `exit_with_result()`/`exit_skipped()`/`finish()` which call `process::exit()` — untestable without forking.
 
-GPU modules require `--features gpu` and are validated by `validate_diversity_gpu` (31/31 PASS).
+GPU modules require `--features gpu` and are validated by `validate_diversity_gpu` (38/38 PASS).
 
 ---
 
@@ -77,7 +84,7 @@ GPU modules require `--features gpu` and are validated by `validate_diversity_gp
 | `bio::diversity::pielou_evenness` | Shannon GPU + observed GPU | Compose H / ln(S) | **DONE** — GPU validated |
 | `bio::diversity::alpha_diversity` | `FusedMapReduceF64` compose | Full alpha suite on GPU | **DONE** — GPU validated |
 | `bio::spectral_match::pairwise_cosine` | `GemmF64` + `FusedMapReduceF64` | Dot product matrix + norms | **DONE** — GPU validated |
-| Rarefaction curves | `prng_xoshiro.wgsl` + `FusedMapReduceF64` | Random subsample + diversity | Ready — ToadStool PRNG available |
+| Rarefaction curves | `FusedMapReduceF64` + LCG PRNG | Random subsample + diversity | **DONE** — `bio::rarefaction_gpu` |
 
 ### Tier B: Adapt Existing Patterns (minor shader modifications)
 
@@ -142,16 +149,26 @@ GPU modules require `--features gpu` and are validated by `validate_diversity_gp
 | `validate_diversity` | 18/18 | PASS | Analytical + simulated + evenness + rarefaction |
 | `validate_mzml` | 7/7 | PASS | shuzhao-li-lab/data (MT02) |
 | `validate_pfas` | 10/10 | PASS | Cosine similarity + KMD + FindPFAS (external data optional) |
-| **CPU Total** | **63/63** | **PASS** | |
+| `validate_features` | 9/9 | PASS | EIC + peaks + features vs asari MT02 (Exp009) |
+| `validate_peaks` | 17/17 | PASS | Peak detection vs scipy.signal.find_peaks (Exp010) |
+| **CPU Total** | **89/89** | **PASS** | |
 
 ### GPU Validation (`--features gpu`)
 
 | Binary | Checks | Status | Comparison |
 |--------|--------|--------|------------|
-| `validate_diversity_gpu` | 31/31 | PASS | GPU f64 vs CPU f64 (RTX 4070) |
-| **GPU Total** | **31/31** | **PASS** | |
+| `validate_diversity_gpu` | 38/38 | PASS | GPU f64 vs CPU f64 (RTX 4070) |
+| **GPU Total** | **38/38** | **PASS** | |
 
-Checks: 3 Shannon + 3 Simpson + 6 BC + 5 PCoA + 6 Alpha + 8 Spectral Match.
+Checks: 3 Shannon + 3 Simpson + 6 BC + 5 PCoA + 6 Alpha + 8 Spectral + 3 Var + 1 Corr + 1 Cov + 2 WDot.
+
+### Benchmark (`--features gpu`)
+
+| Binary | Purpose |
+|--------|---------|
+| `benchmark_cpu_gpu` | CPU vs GPU performance comparison across 7 workloads |
+
+Headline: spectral cosine 200×200 → GPU 3.7ms vs CPU 3,937ms = **1,077× speedup**.
 
 ---
 
@@ -165,18 +182,22 @@ Previously removed shaders:
 - `shannon_map_f64.wgsl` / `simpson_map_f64.wgsl` → replaced by `FusedMapReduceF64`
 - `bray_curtis_pairs_f64.wgsl` → absorbed upstream as `BrayCurtisF64`
 
-### ToadStool Primitives Used (via `barracuda` crate)
+### ToadStool Primitives Used (via `barracuda` crate) — 11 Primitives
 
 | Primitive | API | wetSpring Use |
 |-----------|-----|---------------|
 | `FusedMapReduceF64` | `shannon_entropy()` | Shannon H = -Σ p ln(p) — single-dispatch fused map-reduce |
 | `FusedMapReduceF64` | `simpson_index()` | Simpson D = Σ p² — diversity = 1 - D |
-| `FusedMapReduceF64` | `sum()` | Observed features (binarize + reduce) |
+| `FusedMapReduceF64` | `sum()` | Observed features, EIC intensity summation, rarefaction bootstrap |
 | `FusedMapReduceF64` | `sum_of_squares()` | Vector norms for cosine similarity |
 | `BrayCurtisF64` | `condensed_distance_matrix()` | All-pairs Bray-Curtis distance (absorbed from wetSpring) |
 | `BatchedEighGpu` | `execute_f64()` / `execute_single_dispatch()` | PCoA eigendecomposition on double-centered BC matrix |
 | `GemmF64` | `execute()` | Pairwise dot products for spectral cosine similarity |
 | `KrigingF64` | `interpolate()` / `fit_variogram()` | Spatial diversity interpolation across sampling sites |
+| `VarianceF64` | `variance()` / `std_dev()` | Population/sample variance, standard deviation |
+| `CorrelationF64` | `pearson()` | Pearson correlation coefficient |
+| `CovarianceF64` | `covariance()` | Sample covariance matrix |
+| `WeightedDotF64` | `dot()` | Trapezoidal peak integration, weighted inner products |
 
 ---
 
@@ -199,20 +220,24 @@ Previously removed shaders:
 7. **`acos`/`sin` precision (TS-003)** — zero-bias literal pattern applied.
 8. **`FusedMapReduceF64` buffer fix (TS-004)** — N >= 1024 buffer conflict resolved.
 
+**Completed since last handoff (Feb 17–18, 2026):**
+
+1. ~~**Rarefaction GPU**~~ → **DONE** — `bio::rarefaction_gpu` with `FusedMapReduceF64` + bootstrap CI
+2. ~~**EIC extraction GPU**~~ → **DONE** — `bio::eic_gpu` with `FusedMapReduceF64` + `WeightedDotF64`
+3. ~~**DADA2 denoising**~~ → **DONE** — `bio::dada2` (error model + divisive partitioning, 9 tests)
+4. ~~**Chimera detection**~~ → **DONE** — `bio::chimera` (UCHIME-style reference-free, 8 tests)
+5. ~~**Taxonomy classification**~~ → **DONE** — `bio::taxonomy` (naive Bayes / SILVA 138, 8 tests)
+6. ~~**UniFrac distance**~~ → **DONE** — `bio::unifrac` (weighted + unweighted + Newick parser, 8 tests)
+
 **Remaining evolution opportunities:**
 
-1. **Rarefaction GPU (bootstrap CI)**: Wire `prng_xoshiro.wgsl` for Monte Carlo
-   confidence intervals (CPU exact rarefaction is analytically sufficient).
-2. **m/z tolerance search GPU**: Adapt `batched_bisection_f64.wgsl` for ppm-bounded
+1. **m/z tolerance search GPU**: Adapt `batched_bisection_f64.wgsl` for ppm-bounded
    binary search on sorted m/z arrays.
-3. **EIC extraction GPU**: Parallel m/z binning across scans via custom WGSL kernel.
-4. **Peak detection GPU**: Promote `bio::signal::find_peaks` to GPU for parallel
+2. **Peak detection GPU**: Promote `bio::signal::find_peaks` to GPU for parallel
    chromatogram processing (STFT windowing available in ToadStool).
-5. **DADA2-equivalent denoising**: Sequence error correction model for 16S amplicons.
-6. **Chimera detection**: Reference-free chimera filtering (uchime3 equivalent).
-7. **Taxonomy classification**: Naive Bayes / BLAST for 16S ASV taxonomy assignment.
-8. **UniFrac distance**: Phylogeny-weighted beta diversity.
+3. **DADA2 GPU**: Error model learning on GPU (matrix of transition probabilities).
+4. **Taxonomy GPU**: k-mer frequency scoring across reference DB on GPU.
 
 ---
 
-*Updated from wetSpring Phase 4 — zero custom WGSL shaders, all GPU through ToadStool primitives + KrigingF64 wired, February 17, 2026.*
+*Updated from wetSpring Phase 4 COMPLETE — 30 modules, 284 tests, 127/127 PASS, 11 ToadStool primitives, February 18, 2026.*

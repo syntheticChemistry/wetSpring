@@ -34,16 +34,19 @@ FASTQ → FastQC → Cutadapt/Trimmomatic → DADA2 denoise
 
 ### Rust evolution targets (Phase 2-3)
 
-| Stage | Python/Galaxy tool | Rust replacement | GPU potential |
-|-------|-------------------|------------------|:------------:|
-| FASTQ parsing | BioPython / cutadapt | `io::fastq` (sovereign, gzip-aware) | Low |
-| Quality filtering | Trimmomatic | Custom Rust filter | Low |
-| K-mer counting | DADA2 (R/C++) | `bio::kmer` (2-bit canonical) ✓ | **High** |
-| Denoising (error model) | DADA2 core | Rust reimpl (planned) | **High** |
-| Sequence alignment | vsearch / BLAST | Rust SW / minimap2-rs (planned) | **High** |
-| Taxonomic classify | sklearn NBC / Kraken2 | Rust k-mer classifier (planned) | **High** |
-| Diversity metrics | scikit-bio | `bio::diversity` + GPU shaders ✓ | **High** |
-| Distance matrices | UniFrac (scipy) | `bio::diversity_gpu` (BC done) + GPU | **High** |
+| Stage | Python/Galaxy tool | Rust replacement | GPU potential | Status |
+|-------|-------------------|------------------|:------------:|--------|
+| FASTQ parsing | BioPython / cutadapt | `io::fastq` (sovereign, gzip-aware) | Low | **Done** |
+| Quality filtering | Trimmomatic | `bio::quality` (sliding window + adapter) | Low | **Done** |
+| Paired-end merging | VSEARCH / FLASH | `bio::merge_pairs` (quality-weighted) | Low | **Done** |
+| Dereplication | VSEARCH | `bio::derep` (abundance tracking) | Low | **Done** |
+| K-mer counting | DADA2 (R/C++) | `bio::kmer` (2-bit canonical) | **High** | **Done** |
+| Denoising (error model) | DADA2 core | `bio::dada2` (error model + Poisson) | **High** | **Done** |
+| Chimera detection | UCHIME3 | `bio::chimera` (ref-free crossover model) | Medium | **Done** |
+| Taxonomic classify | sklearn NBC / Kraken2 | `bio::taxonomy` (naive Bayes, SILVA 138) | **High** | **Done** |
+| Diversity metrics | scikit-bio | `bio::diversity` + `diversity_gpu` | **High** | **Done** |
+| Distance matrices | UniFrac (scipy) | `bio::unifrac` (weighted + unweighted) | **High** | **Done** |
+| PCoA ordination | scikit-bio | `bio::pcoa` + `pcoa_gpu` (BatchedEighGpu) | **High** | **Done** |
 
 ### Public datasets for validation
 

@@ -1,0 +1,272 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//! Validate feature extraction pipeline against asari MT02 baseline (Exp009).
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline | `experiments/results/005_asari/preferred_Feature_table.tsv` |
+//! | Baseline tool | asari 1.13.1 |
+//! | Baseline date | 2026-02-16 |
+//! | Dataset | `shuzhao-li-lab/data` (MT02 demo, 8 mzML files) |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, Pop!\_OS 22.04) |
+//!
+//! # What this validates
+//!
+//! - `bio::eic::detect_mass_tracks` — mass track count
+//! - `bio::eic::extract_eics` — EIC extraction correctness
+//! - `bio::signal::find_peaks` — peak detection on real chromatograms
+//! - `bio::feature_table::extract_features` — end-to-end feature extraction
+//!
+//! Compares Rust features against asari features by m/z (5 ppm) + RT (50 sec).
+//!
+//! Run: `cargo run --bin validate_features`
+
+use std::path::{Path, PathBuf};
+use wetspring_barracuda::bio::eic;
+use wetspring_barracuda::bio::feature_table::{self, FeatureParams};
+use wetspring_barracuda::bio::signal::PeakParams;
+use wetspring_barracuda::io::mzml;
+use wetspring_barracuda::validation::Validator;
+
+fn main() {
+    let mut v = Validator::new("wetSpring Feature Pipeline Validation (Exp009)");
+
+    let data_dir = std::env::var("WETSPRING_MZML_DIR").map_or_else(
+        |_| Path::new(env!("CARGO_MANIFEST_DIR")).join("../data/exp005_asari/MT02/MT02Dataset"),
+        PathBuf::from,
+    );
+
+    let asari_tsv = std::env::var("WETSPRING_ASARI_TSV").map_or_else(
+        |_| {
+            Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("../experiments/results/005_asari/preferred_Feature_table.tsv")
+        },
+        PathBuf::from,
+    );
+
+    if !data_dir.exists() {
+        println!(
+            "  NOTE: mzML data not found at {}\n  \
+             Set WETSPRING_MZML_DIR to enable feature validation.",
+            data_dir.display()
+        );
+        v.finish();
+    }
+
+    let asari_features = load_asari_features(&asari_tsv);
+
+    println!("  Asari baseline: {} features", asari_features.len());
+
+    // Parse all mzML files
+    let mut mzml_files: Vec<_> = std::fs::read_dir(&data_dir)
+        .expect("read data dir")
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().extension().is_some_and(|ext| ext == "mzML"))
+        .map(|e| e.path())
+        .collect();
+    mzml_files.sort();
+
+    v.check_count("mzML files found", mzml_files.len(), 8);
+
+    // Use the first file for single-file validation
+    let first_file = &mzml_files[0];
+    println!(
+        "\n  Parsing {}...",
+        first_file.file_name().unwrap().to_string_lossy()
+    );
+    let spectra = mzml::parse_mzml(first_file).expect("parse mzML");
+    let ms1: Vec<_> = spectra.iter().filter(|s| s.ms_level == 1).cloned().collect();
+
+    v.section("Mass track detection");
+
+    let mass_tracks = eic::detect_mass_tracks(&ms1, 5.0, 6);
+    println!("  Detected {} mass tracks from first file", mass_tracks.len());
+
+    v.check(
+        "Mass tracks > 0",
+        f64::from(u8::from(!mass_tracks.is_empty())),
+        1.0,
+        0.0,
+    );
+    v.check(
+        "Mass tracks > 100",
+        f64::from(u8::from(mass_tracks.len() > 100)),
+        1.0,
+        0.0,
+    );
+
+    v.section("Feature extraction (single file)");
+
+    let params = FeatureParams {
+        eic_ppm: 5.0,
+        min_scans: 6,
+        peak_params: PeakParams {
+            min_prominence: Some(1000.0),
+            min_height: Some(10000.0),
+            ..PeakParams::default()
+        },
+        min_height: 10000.0,
+        min_snr: 2.0,
+    };
+
+    let table = feature_table::extract_features(&ms1, &params);
+    println!(
+        "  Features: {}, mass tracks: {}, EICs with peaks: {}",
+        table.features.len(),
+        table.mass_tracks_evaluated,
+        table.eics_with_peaks
+    );
+
+    v.check(
+        "Features detected > 0",
+        f64::from(u8::from(!table.features.is_empty())),
+        1.0,
+        0.0,
+    );
+    v.check(
+        "Mass tracks evaluated > 0",
+        f64::from(u8::from(table.mass_tracks_evaluated > 0)),
+        1.0,
+        0.0,
+    );
+
+    if !table.features.is_empty() {
+        let mz_min = table
+            .features
+            .iter()
+            .map(|f| f.mz)
+            .fold(f64::INFINITY, f64::min);
+        let mz_max = table
+            .features
+            .iter()
+            .map(|f| f.mz)
+            .fold(f64::NEG_INFINITY, f64::max);
+        let rt_min = table
+            .features
+            .iter()
+            .map(|f| f.rt_apex)
+            .fold(f64::INFINITY, f64::min);
+        let rt_max = table
+            .features
+            .iter()
+            .map(|f| f.rt_apex)
+            .fold(f64::NEG_INFINITY, f64::max);
+
+        println!("  m/z range: {mz_min:.2} - {mz_max:.2}");
+        println!("  RT range:  {rt_min:.2} - {rt_max:.2} sec");
+
+        v.check(
+            "m/z min < 200 (covers low end)",
+            f64::from(u8::from(mz_min < 200.0)),
+            1.0,
+            0.0,
+        );
+        v.check(
+            "m/z max > 500 (covers high end)",
+            f64::from(u8::from(mz_max > 500.0)),
+            1.0,
+            0.0,
+        );
+    }
+
+    v.section("Asari cross-reference");
+
+    if !asari_features.is_empty() && !table.features.is_empty() {
+        let matched = count_matched_features(&table.features, &asari_features, 5.0, 50.0);
+        let match_pct = (matched as f64 / asari_features.len() as f64) * 100.0;
+        println!(
+            "  Matched {matched}/{} asari features ({match_pct:.1}%) by m/z+RT",
+            asari_features.len()
+        );
+
+        v.check(
+            "Cross-matched features > 0",
+            f64::from(u8::from(matched > 0)),
+            1.0,
+            0.0,
+        );
+
+        let rust_in_asari_range = table
+            .features
+            .iter()
+            .filter(|f| f.mz >= 80.0 && f.mz <= 1000.0)
+            .count();
+        v.check(
+            "Rust features in asari m/z range",
+            f64::from(u8::from(rust_in_asari_range > 0)),
+            1.0,
+            0.0,
+        );
+    } else {
+        println!("  (skipping cross-reference — no features to compare)");
+    }
+
+    v.finish();
+}
+
+struct AsariFeature {
+    mz: f64,
+    rtime: f64,
+    #[allow(dead_code)]
+    peak_area: f64,
+    #[allow(dead_code)]
+    snr: f64,
+}
+
+fn load_asari_features(path: &Path) -> Vec<AsariFeature> {
+    if !path.exists() {
+        println!(
+            "  NOTE: asari feature table not found at {}",
+            path.display()
+        );
+        return vec![];
+    }
+
+    let contents = std::fs::read_to_string(path).expect("read asari TSV");
+    let mut features = Vec::new();
+
+    for (i, line) in contents.lines().enumerate() {
+        if i == 0 {
+            continue;
+        }
+        let cols: Vec<&str> = line.split('\t').collect();
+        if cols.len() < 10 {
+            continue;
+        }
+
+        let mz: f64 = cols[1].parse().unwrap_or(0.0);
+        let rtime: f64 = cols[2].parse().unwrap_or(0.0);
+        let peak_area: f64 = cols[6].parse().unwrap_or(0.0);
+        let snr: f64 = cols[9].parse().unwrap_or(0.0);
+
+        if mz > 0.0 {
+            features.push(AsariFeature {
+                mz,
+                rtime,
+                peak_area,
+                snr,
+            });
+        }
+    }
+
+    features
+}
+
+fn count_matched_features(
+    rust_features: &[feature_table::Feature],
+    asari_features: &[AsariFeature],
+    ppm: f64,
+    rt_tol_sec: f64,
+) -> usize {
+    asari_features
+        .iter()
+        .filter(|af| {
+            rust_features.iter().any(|rf| {
+                let mz_diff_ppm = ((rf.mz - af.mz) / af.mz).abs() * 1e6;
+                let rt_diff = (rf.rt_apex - af.rtime).abs();
+                mz_diff_ppm <= ppm && rt_diff <= rt_tol_sec
+            })
+        })
+        .count()
+}

@@ -27,24 +27,27 @@ kernels useful far beyond their original domain.
 
 ```
 wetspring-barracuda v0.1.0
-  293 tests (251 unit + 42 integration), ~98% line coverage
-  0 clippy pedantic warnings (lib + gpu), 0 doc warnings
-  63/63 CPU validation checks PASS (FASTQ, quality, merge, derep, diversity, mzML, PFAS)
-  31/31 GPU validation checks PASS (Shannon, Simpson, BC, PCoA, alpha, spectral match)
-  1 runtime dep (flate2); GPU deps feature-gated (barracuda, wgpu, tokio, bytemuck)
-  ToadStool primitives: FusedMapReduceF64, BrayCurtisF64, BatchedEighGpu, GemmF64, KrigingF64
-  0 custom WGSL shaders — all GPU through ToadStool primitives
+  284 tests, 30 modules, 0 clippy pedantic warnings
+  89/89 CPU validation checks PASS
+  38/38 GPU validation checks PASS
+  127/127 total quantitative checks PASS
+  1 runtime dep (flate2); GPU deps feature-gated (barracuda, wgpu v22, tokio)
+  11 ToadStool GPU primitives, 0 custom WGSL shaders
   Sovereign parsers: FASTQ, mzML/XML, MS2, base64 — all in-tree
-  16S pipeline: FASTQ → quality filter → adapter trim → merge pairs → derep → diversity → PCoA
+
+  16S pipeline:  FASTQ → quality → merge → derep → DADA2 → chimera → taxonomy → diversity → UniFrac → PCoA
   LC-MS pipeline: mzML → mass tracks → EIC → peaks → feature table
-  PFAS pipeline: mzML/MS2 → tolerance search → spectral match → KMD → homologue grouping
+  PFAS pipeline:  mzML/MS2 → tolerance search → spectral match → KMD → homologue grouping
+
+  GPU benchmark: 1,077× speedup on spectral cosine (200×200) — RTX 4070
 ```
 
 | Track | Phase | Status |
 |-------|-------|--------|
-| T1 Life Science | Phase 4 (Sovereign) | **Active** — 16S pipeline through dereplication, GPU diversity |
+| T1 Life Science | Phase 4 (Sovereign) | **Done** — complete 16S pipeline: DADA2 + chimera + taxonomy + UniFrac |
 | T2 PFAS/blueFish | Phase B2 (Rust) | **Done** — mzML + MS2 + PFAS + feature extraction validated |
-| Both | GPU (ToadStool) | **Active** — 31/31 GPU PASS (RTX 4070, f64) |
+| Both | GPU (ToadStool) | **Done** — 38/38 GPU PASS, 1,077× spectral cosine speedup |
+| Both | Benchmarks | **Done** — Python vs Rust CPU vs Rust GPU three-tier comparison |
 
 ---
 
@@ -228,21 +231,29 @@ machine learning"** (MSU Center for PFAS Research)
 - PCoA ordination: CPU Jacobi + GPU `BatchedEighGpu` eigendecomposition
 - Bray-Curtis → `BrayCurtisF64` (absorbed upstream, custom shader deleted)
 - Spatial interpolation via `KrigingF64` (ordinary + simple kriging, 4 variograms)
-- **31/31 GPU validation PASS** (RTX 4070, SHADER_F64)
+- Statistics: variance, std dev, correlation, covariance, weighted dot via
+  `VarianceF64`, `CorrelationF64`, `CovarianceF64`, `WeightedDotF64`
+- wgpu 0.19 → v22 migration (matching ToadStool's deep debt evolution)
+- **38/38 GPU validation PASS** (RTX 4070, SHADER_F64, wgpu v22)
 - **Zero custom WGSL shaders** — all GPU through ToadStool primitives
 - Found/fixed 2× coefficient bug in ToadStool `math_f64.wgsl` log_f64 (absorbed upstream)
 
-#### Phase 4: Sovereign Pipeline — ACTIVE
+#### Phase 4: Sovereign Pipeline — DONE
 - Quality filtering + adapter trimming (Trimmomatic/Cutadapt equivalent)
 - Paired-end read merging (VSEARCH/FLASH equivalent)
 - Dereplication with abundance tracking (VSEARCH equivalent)
+- **DADA2 denoising** (Callahan et al. 2016) — error model + divisive partitioning
+- **Chimera detection** (UCHIME-style reference-free) — two-parent crossover model
+- **Taxonomy classification** (naive Bayes on SILVA 138) — 8-mer features, bootstrap CI
+- **UniFrac distance** (Lozupone & Knight 2005) — weighted + unweighted, Newick parser
 - 1D peak detection (`scipy.signal.find_peaks` equivalent)
 - EIC extraction + mass track detection
 - Feature table extraction (asari pipeline equivalent)
 - MS2 cosine similarity (matched + weighted)
 - Kendrick mass defect analysis + PFAS homologue grouping
-- **63/63 CPU + 31/31 GPU = 94/94 validation checks PASS**
-- Next: DADA2 denoising, chimera detection, taxonomy classification
+- GPU-promoted EIC extraction + batch peak integration
+- GPU-promoted rarefaction with bootstrap confidence intervals
+- **89/89 CPU + 38/38 GPU = 127/127 validation checks PASS**
 
 ### Track 2: PFAS Analytical Chemistry — blueFish (Phases B0-B4)
 
@@ -279,41 +290,49 @@ machine learning"** (MSU Center for PFAS Research)
 wetSpring/
   barracuda/                — Rust crate: life science + analytical chemistry pipelines
     src/
-      bio/                  — Bioinformatics + analytical chemistry algorithms
+      bio/                  — Bioinformatics + analytical chemistry algorithms (30 modules)
         quality.rs          —   Quality filtering + adapter trimming (Trimmomatic/Cutadapt)
         merge_pairs.rs      —   Paired-end read merging (VSEARCH/FLASH)
         derep.rs            —   Dereplication + abundance tracking (VSEARCH)
+        dada2.rs            —   DADA2 ASV denoising (Callahan et al. 2016)
+        chimera.rs          —   UCHIME-style reference-free chimera detection
+        taxonomy.rs         —   Naive Bayes taxonomy classification (RDP/SILVA)
         kmer.rs             —   2-bit canonical k-mer counting
         diversity.rs        —   Shannon, Simpson, Chao1, Bray-Curtis, Pielou, rarefaction
         pcoa.rs             —   PCoA ordination (CPU Jacobi eigensolve)
+        unifrac.rs          —   UniFrac distance (weighted + unweighted, Newick tree parser)
         signal.rs           —   1D peak detection (scipy.signal.find_peaks equivalent)
         eic.rs              —   Extracted Ion Chromatogram / mass track detection
         feature_table.rs    —   End-to-end asari-style feature extraction
         tolerance_search.rs —   ppm/Da search + PFAS fragment screening
         spectral_match.rs   —   MS2 cosine similarity (matched + weighted)
         kmd.rs              —   Kendrick mass defect + PFAS homologue grouping
-        diversity_gpu.rs    —   GPU: Shannon/Simpson/observed/evenness/alpha via FusedMapReduceF64,
-                                      BC via BrayCurtisF64 (absorbed upstream)
+        diversity_gpu.rs    —   GPU: Shannon/Simpson/observed/evenness/alpha/BC
         pcoa_gpu.rs         —   GPU: PCoA via ToadStool BatchedEighGpu
         spectral_match_gpu.rs — GPU: pairwise cosine via GemmF64
         kriging.rs          —   Spatial diversity interpolation via ToadStool KrigingF64
+        stats_gpu.rs        —   GPU: variance/correlation/covariance/weighted dot
+        eic_gpu.rs          —   GPU: batch EIC integration + peak processing
+        rarefaction_gpu.rs  —   GPU: bootstrap rarefaction with confidence intervals
       io/                   — Streaming I/O parsers (all sovereign, zero external parsers)
         fastq.rs            —   FASTQ parser (gzip-aware via flate2)
         mzml.rs             —   mzML mass spectrometry parser
         ms2.rs              —   MS2 text format parser
         xml.rs              —   Minimal XML pull parser (for mzML)
-      bin/                  — Validation binaries (hotSpring pattern: pass/fail, exit 0/1)
+      bin/                  — Validation + benchmark binaries (hotSpring pattern: pass/fail, exit 0/1)
         validate_fastq.rs   —   28/28 checks: quality + merge + derep + Galaxy FastQC
         validate_diversity.rs — 18/18 checks: analytical + simulated + evenness + rarefaction
         validate_mzml.rs    —   7/7 checks vs asari/pyteomics baseline
         validate_pfas.rs    —   10/10 checks: cosine + KMD + FindPFAS
-        validate_diversity_gpu.rs — 31/31 GPU vs CPU (--features gpu)
+        validate_features.rs —  9/9 checks: EIC + peaks + features vs asari (Exp009)
+        validate_peaks.rs   —   17/17 checks: peak detection vs scipy (Exp010)
+        validate_diversity_gpu.rs — 38/38 GPU vs CPU (--features gpu)
+        benchmark_cpu_gpu.rs — Three-tier performance benchmark (--features gpu)
       encoding.rs           — Sovereign base64 encoder/decoder (RFC 4648)
       error.rs              — Typed error chain (Error enum + std::error::Error)
-      gpu.rs                — GpuF64 device wrapper (cfg(gpu)), ToadStool bridge
+      gpu.rs                — GpuF64 device wrapper (wgpu v22), ToadStool bridge
       tolerances.rs         — Centralized CPU + GPU validation tolerances
       validation.rs         — Validator struct + check/check_count/finish framework
-      shaders/              — (empty — all GPU through ToadStool primitives)
     tests/
       io_roundtrip.rs       — 42 integration tests (round-trip, pipeline, edge cases)
   control/
@@ -321,7 +340,8 @@ wetSpring/
     asari/                  — asari LC-MS processing config (Track 2)
     pfascreen/              — PFΔScreen PFAS screening config (Track 2)
   data/                     — Public datasets (Zenodo, SRA, EPA)
-  experiments/              — Numbered experiment protocols and logs
+  experiments/              — Numbered experiment protocols, results, and baselines (see experiments/README.md)
+  benchmarks/               — Performance comparison: Python vs Rust CPU vs Rust GPU
   papers/
     PIPELINE_TARGETS.md     — Target paper → pipeline → Rust module mapping
   scripts/                  — Download, preprocess, validate helpers

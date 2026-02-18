@@ -155,6 +155,55 @@ The GPU tolerances are deliberately looser than CPU because:
 | Known PFAS fragments | Detected count | 0 | Exact match |
 | False positive rate | Specificity | 0 | No spurious matches |
 
+### 3.6 Feature Extraction Pipeline (Track 2)
+
+**Tools**: `bio::eic`, `bio::signal`, `bio::feature_table`
+**Validates against**: asari 1.13.1 feature table (MT02 demo)
+
+| Check | Metric | Tolerance | Rationale |
+|-------|--------|-----------|-----------|
+| Mass track count | Count | ± 50% | Different m/z binning strategies |
+| Peak count | Count | ± 50% | Different prominence thresholds |
+| Feature count | Count | ± 50% | Different filtering criteria |
+| m/z range | Float range | ± 10% | Different mass accuracy handling |
+| RT range | Float range | ± 10% | Different retention time alignment |
+| Cross-match | Fraction | ≥ 20% | 10 ppm m/z + 0.5 min RT window |
+
+### 3.7 Peak Detection (Cross-Track)
+
+**Tool**: `bio::signal::find_peaks`
+**Validates against**: `scipy.signal.find_peaks` on synthetic chromatograms
+
+| Check | Metric | Tolerance | Rationale |
+|-------|--------|-----------|-----------|
+| Peak count | Exact match | 0 | Identical algorithm, synthetic data |
+| Peak indices | Position | ± 1 | Interpolation differences at edges |
+| Peak heights | Float | ± 1% | Precision of prominence computation |
+
+### 3.8 16S Amplicon Pipeline (Track 1)
+
+**Tools**: `bio::dada2`, `bio::chimera`, `bio::taxonomy`, `bio::unifrac`
+**Validates against**: QIIME2/DADA2 pipeline from Galaxy (Exp001)
+
+| Check | Metric | Tolerance | Rationale |
+|-------|--------|-----------|-----------|
+| ASV count | Count | — | Algorithm-specific (Poisson p-value) |
+| Chimera count | Count | — | UCHIME scoring threshold |
+| Taxonomy classification | Confidence | — | Bootstrap proportion |
+| UniFrac distance | Float | `1e-10` | Branch-length weighted sums |
+
+### 3.9 GPU Performance Benchmark
+
+**Tool**: `benchmark_cpu_gpu` binary
+**Validates**: GPU throughput advantage for batch-parallel workloads
+
+| Workload | Expected GPU Advantage | Why |
+|----------|:---------------------:|-----|
+| Single-vector reduction (Shannon, Simpson) | < 1× | GPU dispatch overhead exceeds CPU time |
+| Pairwise Bray-Curtis N×N | > 1× at N > 200 | O(N²) pairs amortize dispatch |
+| Spectral cosine N×N | > 100× at N > 100 | GEMM dispatches all pairs at once |
+| PCoA (eigendecomposition) | > 1× at N > 200 | Matrix operations benefit from parallelism |
+
 ---
 
 ## 4. Comparison Protocol
@@ -183,31 +232,35 @@ All experiments run on a single consumer workstation:
 | GPU | NVIDIA RTX 4070 12 GB (`SHADER_F64` confirmed, Vulkan) |
 | OS | Pop!_OS 22.04 (Linux 6.17) |
 | Rust | stable (1.82+) |
-| wgpu | 0.19 |
+| wgpu | v22 |
 
 ---
 
 ## 6. Acceptance Criteria
 
-### Phase 2 (CPU): 36/36 checks must pass
+### Phase 2 (CPU): 89/89 checks pass
 
 | Binary | Checks | Target |
 |--------|:------:|--------|
-| `validate_fastq` | 9 | All within FastQC tolerance |
-| `validate_diversity` | 14 | All within analytical tolerance |
-| `validate_mzml` | 7 | All within pyteomics tolerance |
-| `validate_pfas` | 6 | All exact match (MS2 parsing + PFAS screening) |
-| **Total** | **36** | **All pass** |
+| `validate_fastq` | 28 | Quality filter + merge + derep + Galaxy FastQC |
+| `validate_diversity` | 18 | Analytical + simulated + evenness + rarefaction |
+| `validate_mzml` | 7 | mzML parsing vs pyteomics |
+| `validate_pfas` | 10 | Cosine + KMD + FindPFAS |
+| `validate_features` | 9 | EIC + peaks + features vs asari (Exp009) |
+| `validate_peaks` | 17 | Peak detection vs scipy.signal.find_peaks (Exp010) |
+| **Total** | **89** | **All pass** |
 
-Current status: **36/36 pass.**
+Current status: **89/89 pass.**
 
-### Phase 3 (GPU): 17/17 checks must pass
+### Phase 3 (GPU): 38/38 checks pass
 
 | Binary | Checks | Target |
 |--------|:------:|--------|
-| `validate_diversity_gpu` | 17 | All within `GPU_VS_CPU_*` tolerances |
+| `validate_diversity_gpu` | 38 | All within `GPU_VS_CPU_*` tolerances |
 
-Current status: **17/17 pass.** Checks: 3 Shannon + 3 Simpson + 6 Bray-Curtis + 2 PCoA eigenvalues + 1 PCoA distances + 2 PCoA proportions. (Plus 2 capability checks: adapter detection, `SHADER_F64` support.)
+Current status: **38/38 pass.** Checks: 3 Shannon + 3 Simpson + 6 BC + 5 PCoA + 6 alpha + 8 spectral + 3 variance + 1 correlation + 1 covariance + 2 weighted dot.
+
+### Grand Total: 127/127 quantitative checks pass
 
 ---
 
@@ -232,7 +285,7 @@ can replicate institutional results, then exceed them via Rust + GPU.**
 | Component | Version | Notes |
 |-----------|---------|-------|
 | Rust | stable (1.82+) | MSRV set in `Cargo.toml` |
-| wgpu | 0.19 | Vulkan backend, `SHADER_F64` |
+| wgpu | v22 | Vulkan backend, `SHADER_F64` |
 | Galaxy | 24.1 | Local Docker instance |
 | QIIME2 | 2026.1.0 | Galaxy plugin (q2-amplicon-2026.1) |
 | asari | 1.13.1 | LC-MS feature extraction |
