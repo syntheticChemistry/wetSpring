@@ -130,7 +130,7 @@ inference — that are useful far beyond their original domain.
 **"Pond Crash Forensics: Presumptive identification of pond crash agents by
 next generation sequencing in replicate raceway mass cultures of
 *Nannochloropsis salina*"**
-- DOI: OSTI 1271304
+- Carney, L.T. et al. *Algal Research* 17 (2016). DOI: [10.1016/j.algal.2016.05.011](https://doi.org/10.1016/j.algal.2016.05.011). OSTI 1271304.
 - Methods: 16S rRNA amplicon sequencing, microbiome profiling
 - Compute: QIIME/DADA2-style OTU/ASV pipeline, taxonomic classification
 - Data: Replicate raceway time-series before/after crash events
@@ -139,7 +139,7 @@ next generation sequencing in replicate raceway mass cultures of
 #### Paper 2: Phage Biocontrol
 **"Biotic countermeasures that rescue *Nannochloropsis gaditana* from a
 *Bacillus safensis* infection"**
-- DOI: OSTI 2311389
+- Humphrey, B. et al. (incl. Smallwood, C.R. and Cahill, J.) *Frontiers in Microbiology* (2023). OSTI 2311389.
 - Methods: 16S rRNA amplicon sequencing, phage isolation, bacteriome
   transplant experiments
 - Compute: Amplicon pipeline + phage genome annotation + diversity metrics
@@ -149,7 +149,7 @@ next generation sequencing in replicate raceway mass cultures of
 #### Paper 3: Spectroradiometric Detection
 **"Spectroradiometric detection of competitor diatoms and the grazer
 *Poteriochromonas* in algal cultures"**
-- DOI: OSTI 1828029
+- Reichardt, T.A. et al. *Algal Research* (2020). DOI: [10.1016/j.algal.2020.102020](https://doi.org/10.1016/j.algal.2020.102020). OSTI 1828029.
 - Methods: Hyperspectral reflectance every 5 minutes, statistical
   classification of algal health states
 - Compute: Time-series spectral analysis, anomaly detection, PCA/PLS
@@ -158,7 +158,7 @@ next generation sequencing in replicate raceway mass cultures of
 #### Paper 4: VOC Early Warning
 **"Chemical Profiling of Volatile Organic Compounds in the Headspace of
 Algal Cultures as Early Biomarkers of Algal Pond Crashes"**
-- DOI: OSTI 1570268
+- Reese, K.L. et al. (incl. Jones, A.D.) *Scientific Reports* 9 (2019). DOI: [10.1038/s41598-019-50125-z](https://doi.org/10.1038/s41598-019-50125-z). OSTI 1570268.
 - Methods: GC-MS headspace analysis, metabolomic profiling
 - Compute: Peak detection, compound identification, statistical modeling
   of crash precursors
@@ -374,42 +374,71 @@ progressively migrate to Rust+GPU, validating accuracy at every step.
 
 ### Track 1: Life Science
 
-1. Smallwood, C. et al. "Pond Crash Forensics: Presumptive identification
-   of pond crash agents by next generation sequencing in replicate raceway
-   mass cultures of *Nannochloropsis salina*." Algal Research (2016).
+1. Carney, L.T., Wilkenfeld, J.S., Lane, P.D. et al. "Pond Crash
+   Forensics: Presumptive identification of pond crash agents by next
+   generation sequencing in replicate raceway mass cultures of
+   *Nannochloropsis salina*." *Algal Research* 17 (2016).
+   DOI: [10.1016/j.algal.2016.05.011](https://doi.org/10.1016/j.algal.2016.05.011). OSTI 1271304.
 
-2. Smallwood, C., Cahill, J. et al. "Biotic countermeasures that rescue
-   *Nannochloropsis gaditana* from a *Bacillus safensis* infection."
-   Sandia National Laboratories (2023). OSTI 2311389.
+2. Humphrey, B., Mackenzie, M., Lobitz, M. et al. (incl. Smallwood, C.R.
+   and Cahill, J.) "Biotic countermeasures that rescue *Nannochloropsis
+   gaditana* from a *Bacillus safensis* infection." *Frontiers in
+   Microbiology* (2023). OSTI 2311389.
 
-3. Lane, T. et al. "Spectroradiometric detection of competitor diatoms
-   and the grazer *Poteriochromonas* in algal cultures." Sandia National
-   Laboratories (2021). OSTI 1828029.
+3. Reichardt, T.A., Maes, D., Jensen, T.J. et al. "Spectroradiometric
+   detection of competitor diatoms and the grazer *Poteriochromonas* in
+   algal cultures." *Algal Research* (2020).
+   DOI: [10.1016/j.algal.2020.102020](https://doi.org/10.1016/j.algal.2020.102020). OSTI 1828029.
 
-4. Lane, T. et al. "Chemical Profiling of Volatile Organic Compounds in
-   the Headspace of Algal Cultures as Early Biomarkers of Algal Pond
-   Crashes." Sandia National Laboratories (2019). OSTI 1570268.
+4. Reese, K.L., Fisher, C.L., Lane, P.D. et al. (incl. Jones, A.D.)
+   "Chemical Profiling of Volatile Organic Compounds in the Headspace of
+   Algal Cultures as Early Biomarkers of Algal Pond Crashes." *Scientific
+   Reports* 9 (2019). DOI: [10.1038/s41598-019-50125-z](https://doi.org/10.1038/s41598-019-50125-z). OSTI 1570268.
 
 ### Track 2: PFAS Analytical Chemistry (blueFish)
 
 5. Li, S. et al. "Trackable and scalable LC-MS metabolomics data processing
-   using asari." Nature Communications 14, 4113 (2023).
+   using asari." *Nature Communications* 14, 4113 (2023).
+   DOI: [10.1038/s41467-023-39889-1](https://doi.org/10.1038/s41467-023-39889-1).
 
 6. Zweigle, J. et al. "PFΔScreen — an open-source tool for automated PFAS
-   feature prioritization in non-target HRMS data." Analytical and
-   Bioanalytical Chemistry (2023).
+   feature prioritization in non-target HRMS data." *Analytical and
+   Bioanalytical Chemistry* (2023).
+   DOI: [10.1007/s00216-023-05070-2](https://doi.org/10.1007/s00216-023-05070-2).
 
 7. Jones, A.D. et al. "Quantitative identification of nonpolar perfluoroalkyl
    substances by mass spectrometry." MSU Center for PFAS Research.
 
 8. Nejadhashemi, A.P. et al. "Using machine learning techniques to monitor
-   PFAS in Michigan drinking water." Water Research (2023).
+   PFAS in Michigan drinking water." *Water Research* (2023).
 
 9. MSU Center for PFAS Research. "Molecular screening and toxicity estimation
    of 260,000 PFAS through machine learning." (2022).
 
+### Algorithms Implemented
+
+10. Callahan, B.J. et al. "DADA2: High-resolution sample inference from
+    Illumina amplicon data." *Nature Methods* 13, 581–583 (2016).
+    DOI: [10.1038/nmeth.3869](https://doi.org/10.1038/nmeth.3869).
+
+11. Edgar, R.C. "UCHIME improves sensitivity and speed of chimera detection."
+    *Bioinformatics* 27, 2194–2200 (2011).
+    DOI: [10.1093/bioinformatics/btr381](https://doi.org/10.1093/bioinformatics/btr381).
+
+12. Wang, Q. et al. "Naive Bayesian Classifier for Rapid Assignment of rRNA
+    Sequences into the New Bacterial Taxonomy." *Appl. Environ. Microbiol.*
+    73, 5261–5267 (2007). DOI: [10.1128/AEM.00062-07](https://doi.org/10.1128/AEM.00062-07).
+
+13. Lozupone, C. & Knight, R. "UniFrac: a new phylogenetic method for
+    comparing microbial communities." *Appl. Environ. Microbiol.* 71,
+    8228–8235 (2005). DOI: [10.1128/AEM.71.12.8228-8235.2005](https://doi.org/10.1128/AEM.71.12.8228-8235.2005).
+
+14. Virtanen, P. et al. "SciPy 1.0: Fundamental Algorithms for Scientific
+    Computing in Python." *Nature Methods* 17, 261–272 (2020).
+    DOI: [10.1038/s41592-019-0686-2](https://doi.org/10.1038/s41592-019-0686-2).
+
 ### Platforms & Tools
 
-10. The Galaxy Project. https://galaxyproject.org/ (accessed Feb 2026).
-11. asari. https://github.com/shuzhao-li-lab/asari (accessed Feb 2026).
-12. PFΔScreen. https://github.com/JonZwe/PFAScreen (accessed Feb 2026).
+15. The Galaxy Project. https://galaxyproject.org/ (accessed Feb 2026).
+16. asari. https://github.com/shuzhao-li-lab/asari (accessed Feb 2026).
+17. PFΔScreen. https://github.com/JonZwe/PFAScreen (accessed Feb 2026).

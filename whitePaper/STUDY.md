@@ -60,8 +60,9 @@ against CPU baselines within f64 tolerance (≤ 1e-10 for most operations).
 ### 2.2 Tracks
 
 **Track 1 (Life Science)**: 16S rRNA amplicon metagenomics for algal
-pond crash forensics and phage biocontrol. Source papers from Sandia
-National Labs (OSTI 1271304, 2311389).
+pond crash forensics and phage biocontrol. Source papers: Carney et al.
+2016 (DOI: 10.1016/j.algal.2016.05.011), Humphrey et al. 2023 (OSTI
+2311389).
 
 **Track 2 (PFAS / blueFish)**: Per- and polyfluoroalkyl substance
 detection in water via LC-MS. Source papers: asari (Nature Communications
@@ -216,16 +217,40 @@ python3 scripts/benchmark_python_baseline.py
 
 ## References
 
-1. Callahan BJ et al. "DADA2: High-resolution sample inference from
-   Illumina amplicon data." Nature Methods 13, 581–583 (2016).
-2. Li S et al. "Trackable and scalable LC-MS metabolomics data
-   processing using asari." Nature Communications 14, 4113 (2023).
-3. Zweigle J et al. "PFΔScreen — an optimised screening tool for PFAS."
-   Analytical and Bioanalytical Chemistry (2023).
-4. Wang Q et al. "Naive Bayesian Classifier for Rapid Assignment of rRNA
-   Sequences." Applied and Environmental Microbiology 73, 5261–5267 (2007).
-5. Lozupone C & Knight R. "UniFrac: a new phylogenetic method for
-   comparing microbial communities." Applied and Environmental
-   Microbiology 71, 8228–8235 (2005).
-6. Edgar RC. "UCHIME improves sensitivity and speed of chimera
-   detection." Bioinformatics 27, 2194–2200 (2011).
+### Source Papers
+
+1. Carney, L.T. et al. "Pond Crash Forensics: Presumptive identification
+   of pond crash agents by next generation sequencing in replicate raceway
+   mass cultures of *Nannochloropsis salina*." *Algal Research* 17 (2016).
+   DOI: 10.1016/j.algal.2016.05.011.
+2. Humphrey, B. et al. (incl. Smallwood, C.R. and Cahill, J.) "Biotic
+   countermeasures that rescue *Nannochloropsis gaditana* from a *Bacillus
+   safensis* infection." *Frontiers in Microbiology* (2023). OSTI 2311389.
+3. Reese, K.L. et al. (incl. Jones, A.D.) "Chemical Profiling of Volatile
+   Organic Compounds in the Headspace of Algal Cultures as Early Biomarkers
+   of Algal Pond Crashes." *Scientific Reports* 9 (2019).
+   DOI: 10.1038/s41598-019-50125-z.
+4. Li, S. et al. "Trackable and scalable LC-MS metabolomics data
+   processing using asari." *Nature Communications* 14, 4113 (2023).
+   DOI: 10.1038/s41467-023-39889-1.
+5. Zweigle, J. et al. "PFΔScreen — an optimised screening tool for PFAS."
+   *Analytical and Bioanalytical Chemistry* (2023).
+   DOI: 10.1007/s00216-023-05070-2.
+
+### Algorithms Implemented
+
+6. Callahan, B.J. et al. "DADA2: High-resolution sample inference from
+   Illumina amplicon data." *Nature Methods* 13, 581–583 (2016).
+   DOI: 10.1038/nmeth.3869.
+7. Edgar, R.C. "UCHIME improves sensitivity and speed of chimera
+   detection." *Bioinformatics* 27, 2194–2200 (2011).
+   DOI: 10.1093/bioinformatics/btr381.
+8. Wang, Q. et al. "Naive Bayesian Classifier for Rapid Assignment of
+   rRNA Sequences into the New Bacterial Taxonomy." *Appl. Environ.
+   Microbiol.* 73, 5261–5267 (2007). DOI: 10.1128/AEM.00062-07.
+9. Lozupone, C. & Knight, R. "UniFrac: a new phylogenetic method for
+   comparing microbial communities." *Appl. Environ. Microbiol.* 71,
+   8228–8235 (2005). DOI: 10.1128/AEM.71.12.8228-8235.2005.
+10. Virtanen, P. et al. "SciPy 1.0: Fundamental Algorithms for Scientific
+    Computing in Python." *Nature Methods* 17, 261–272 (2020).
+    DOI: 10.1038/s41592-019-0686-2.

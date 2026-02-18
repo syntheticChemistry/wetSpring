@@ -1,0 +1,25 @@
+# wetSpring Python dependencies
+# Install: pip install -r requirements.txt
+#
+# These are needed for:
+# - Galaxy control experiments (Phase 1)
+# - Python baseline benchmarks
+# - Peak detection baseline generation (scipy)
+# - Track 2 validation scripts (asari, FindPFAS)
+
+# Core scientific stack (benchmarks + baselines)
+numpy>=1.24
+scipy>=1.12
+
+# Track 2: LC-MS metabolomics
+asari-metabolomics>=1.13
+
+# Track 2: PFAS screening
+pyopenms>=3.0
+
+# Diversity baseline (Python benchmark)
+scikit-bio>=0.6
+
+# Galaxy tool management
+ephemeris>=0.10
+bioblend>=1.0

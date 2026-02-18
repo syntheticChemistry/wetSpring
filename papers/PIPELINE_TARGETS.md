@@ -7,7 +7,7 @@ tools, datasets, and Rust evolution targets.
 
 ## Pipeline 1: 16S rRNA Amplicon Microbiome Profiling
 
-**Source papers:** Pond Crash Forensics; Biotic Countermeasures
+**Source papers:** Carney et al. 2016 (Pond Crash Forensics, DOI: 10.1016/j.algal.2016.05.011); Humphrey et al. 2023 (Biotic Countermeasures, OSTI 2311389)
 
 ### What the papers compute
 
@@ -60,7 +60,7 @@ FASTQ → FastQC → Cutadapt/Trimmomatic → DADA2 denoise
 
 ## Pipeline 2: Phage Genome Annotation
 
-**Source paper:** Biotic Countermeasures
+**Source paper:** Humphrey et al. 2023, *Frontiers in Microbiology* (OSTI 2311389)
 
 ### What the paper computes
 
@@ -98,7 +98,7 @@ FASTQ → FastQC → SPAdes assembly → Prokka/Pharokka annotation
 
 ## Pipeline 3: Spectroradiometric Anomaly Detection
 
-**Source paper:** Spectroradiometric Detection
+**Source paper:** Reichardt et al. 2020, *Algal Research* (DOI: 10.1016/j.algal.2020.102020)
 
 ### What the paper computes
 
@@ -127,7 +127,7 @@ FASTQ → FastQC → SPAdes assembly → Prokka/Pharokka annotation
 
 ## Pipeline 4: VOC Metabolomic Profiling
 
-**Source paper:** Chemical Profiling of VOCs
+**Source paper:** Reese et al. 2019, *Scientific Reports* (DOI: 10.1038/s41598-019-50125-z)
 
 ### What the paper computes
 

@@ -165,10 +165,10 @@ of $500K instruments with proprietary software.
 
 | Dataset | Source | Notes |
 |---------|--------|-------|
-| Pond Crash Forensics raw reads | Smallwood et al. 2016 | Check OSTI/SRA for data deposit |
-| Biotic Countermeasures 16S | Smallwood/Cahill 2023 | Check OSTI 2311389 supplementary |
-| Spectroradiometric time-series | Lane et al. 2021 | May be in paper supplementary |
-| VOC GC-MS profiles | Lane et al. 2019 | May be in paper supplementary |
+| Pond Crash Forensics raw reads | Carney et al. 2016 (10.1016/j.algal.2016.05.011) | Check OSTI/SRA for data deposit |
+| Biotic Countermeasures 16S | Humphrey et al. 2023 (OSTI 2311389) | Check Frontiers in Microbiology supplementary |
+| Spectroradiometric time-series | Reichardt et al. 2020 (10.1016/j.algal.2020.102020) | May be in paper supplementary |
+| VOC GC-MS profiles | Reese et al. 2019 (10.1038/s41598-019-50125-z) | May be in paper supplementary |
 | Jones lab PFAS HRMS data | MSU publications | Check supplementary data |
 | PFΔScreen validation HRMS | Zweigle et al. 2023 | Check paper supplementary |
 

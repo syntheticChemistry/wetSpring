@@ -60,7 +60,7 @@ Options (in priority order):
 4. Generate synthetic mzML test data with known PFAS signatures
 
 ```bash
-cd /home/eastgate/Development/ecoPrimals/wetSpring/data
+cd "$(git rev-parse --show-toplevel)/data"
 mkdir -p pfas-hrms-test
 # Download commands TBD based on data source
 ```

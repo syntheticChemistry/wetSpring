@@ -43,7 +43,7 @@ asari --version
 ### Step 2: Get Demo Data
 
 ```bash
-cd /home/eastgate/Development/ecoPrimals/wetSpring/data
+cd "$(git rev-parse --show-toplevel)/data"
 
 # Clone asari demo datasets
 git clone https://github.com/shuzhao-li-lab/data.git asari-demo-data
