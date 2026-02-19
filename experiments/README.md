@@ -26,7 +26,7 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 011 | 16S Pipeline End-to-End | 1 | DONE | DADA2/UCHIME/RDP/UniFrac | bio::dada2, bio::chimera, bio::taxonomy, bio::unifrac, bio::derep, bio::diversity | 37 |
 | 012 | [Algae Pond 16S](012_algae_pond_16s_validation.md) | 1 | DONE | PRJNA488170 (real NCBI data) | io::fastq, bio::quality, bio::derep, bio::dada2, bio::chimera, bio::taxonomy, bio::unifrac, bio::diversity | 29 |
 | 013 | [VOC Peak Validation](013_voc_peak_validation.md) | 1/cross | DONE | Reese 2019 Table 1 (PMC6761164) | bio::signal, bio::tolerance_search | 22 |
-| 014 | [Public Data Benchmarks](014_public_data_benchmarks.md) | 1 | DONE | 10 samples, 4 BioProjects vs paper ground truth | io::fastq, bio::quality, bio::derep, bio::dada2, bio::diversity | 97 |
+| 014 | [Public Data Benchmarks](014_public_data_benchmarks.md) | 1 | DONE | 22 samples, 4 BioProjects vs paper ground truth | io::fastq, bio::quality, bio::derep, bio::dada2, bio::diversity | 202 |
 
 ---
 
@@ -98,10 +98,10 @@ thresholds from `src/tolerances.rs`.
 | `validate_16s_pipeline` | 011 | 37 | `cargo run --bin validate_16s_pipeline` |
 | `validate_algae_16s` | 012 | 29 | `cargo run --bin validate_algae_16s` |
 | `validate_voc_peaks` | 013 | 22 | `cargo run --bin validate_voc_peaks` |
-| `validate_public_benchmarks` | 014 | 97 | `cargo run --bin validate_public_benchmarks` |
+| `validate_public_benchmarks` | 014 | 202 | `cargo run --bin validate_public_benchmarks` |
 | `benchmark_cpu_gpu` | — | — | `cargo run --release --features gpu --bin benchmark_cpu_gpu` |
 
-**Total validation checks**: 321 (283 CPU + 38 GPU)
+**Total validation checks**: 426 (388 CPU + 38 GPU)
 
 ---
 

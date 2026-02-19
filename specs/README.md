@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 19, 2026
-**Status**: Phase 6 complete — 283/283 CPU + 38/38 GPU = 321/321 checks
+**Status**: Phase 6 complete — 388/388 CPU + 38/38 GPU = 426/426 checks
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -10,10 +10,10 @@
 
 | Metric | Value |
 |--------|-------|
-| Phase 2 (Rust CPU) | 283/283 PASS — FASTQ, diversity, 16S pipeline, mzML, PFAS, features, peaks, real NCBI data, VOC baselines, public benchmarks (4 BioProjects) |
+| Phase 2 (Rust CPU) | 388/388 PASS — FASTQ, diversity, 16S pipeline, mzML, PFAS, features, peaks, real NCBI data, VOC baselines, public benchmarks (4 BioProjects) |
 | Phase 3 (GPU) | 38/38 PASS — Shannon, Simpson, BC, PCoA, spectral cosine (1,077x speedup) |
 | Phase 5 (Paper Parity) | Honest data audit, VOC baselines from Reese 2019, proxy NCBI data |
-| Phase 6 (Public Benchmark) | 10 samples from 4 independent BioProjects, 2.7M reads, marine + freshwater |
+| Phase 6 (Public Benchmark) | 22 samples from 4 independent BioProjects, 2.7M reads, marine + freshwater |
 | Rust modules | 30 sovereign modules, 284 tests |
 | Dependencies | 1 runtime (flate2), everything else sovereign |
 | Faculty (Track 1) | Waters (MMG, MSU), Cahill (Sandia), Smallwood (Sandia) |

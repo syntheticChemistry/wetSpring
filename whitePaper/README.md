@@ -26,7 +26,7 @@ wetSpring validates published computational life science and analytical chemistr
 The evolution path is: **Python baseline → Rust validation → GPU acceleration → sovereign pipeline.**
 
 The study answers three questions:
-1. **Can published bioinformatics and analytical chemistry be independently reproduced?** (Answer: yes — 283 CPU validation checks pass across FASTQ, mzML, diversity, 16S pipeline, PFAS screening, feature extraction, peak detection, real NCBI algae-pond data, VOC biomarker baselines, and public open data benchmarked against paper ground truth. 14 experiments complete with baselines from Galaxy, QIIME2, asari, FindPFAS, scipy, NCBI SRA, and published paper data.)
+1. **Can published bioinformatics and analytical chemistry be independently reproduced?** (Answer: yes — 388 CPU validation checks pass across FASTQ, mzML, diversity, 16S pipeline, PFAS screening, feature extraction, peak detection, real NCBI algae-pond data, VOC biomarker baselines, and public open data benchmarked against paper ground truth. 14 experiments complete with baselines from Galaxy, QIIME2, asari, FindPFAS, scipy, NCBI SRA, and published paper data.)
 2. **Can Rust replace the Python scientific stack for these domains?** (Answer: yes — 30 sovereign Rust modules cover the complete 16S pipeline (FASTQ → quality → merge → derep → DADA2 → chimera → taxonomy → diversity → UniFrac) and the full LC-MS feature pipeline (mzML → EIC → peaks → features). 284 tests, 0 clippy pedantic warnings, 0 production unwrap/expect. Only runtime dependency: `flate2` for gzip.)
 3. **Can consumer GPUs accelerate ecological and analytical computation at f64 precision?** (Answer: yes — 38/38 GPU validation checks pass. 11 ToadStool primitives (wgpu v22). GPU spectral cosine achieves **1,077× speedup** over CPU at 200×200 matrix. Zero custom WGSL shaders.)
 
@@ -34,7 +34,7 @@ The study answers three questions:
 
 ## Key Results
 
-### Phase 2 (Rust Ports): 283/283 CPU checks pass
+### Phase 2 (Rust Ports): 388/388 CPU checks pass
 
 | Validation Binary | Modules Tested | Checks | Status |
 |-------------------|----------------|:------:|--------|
@@ -154,15 +154,15 @@ No institutional access required. AGPL-3.0 licensed.
 
 ---
 
-## Grand Total: 321/321 Quantitative Checks Pass
+## Grand Total: 426/426 Quantitative Checks Pass
 
 | Phase | Checks | Description |
 |-------|:------:|-------------|
 | Phase 2 (CPU) | 135 | 28 FASTQ + 27 diversity + 37 16S pipeline + 7 mzML + 10 PFAS + 9 features + 17 peaks |
 | Phase 3 (GPU) | 38 | 3 Shannon + 3 Simpson + 6 BC + 5 PCoA + 6 alpha + 8 spectral + 7 stats |
 | Phase 5 (Paper Parity) | 51 | 29 algae pond (real NCBI data) + 22 VOC peaks (Reese 2019) |
-| Phase 6 (Public Benchmark) | 97 | 10 samples, 4 BioProjects vs paper ground truth |
-| **Total** | **321** | **All pass** |
+| Phase 6 (Public Benchmark) | 202 | 22 samples, 4 BioProjects vs paper ground truth |
+| **Total** | **426** | **All pass** |
 
 ---
 

@@ -28,9 +28,9 @@ kernels useful far beyond their original domain.
 ```
 wetspring-barracuda v0.1.0
   284 tests, 30 modules, 0 clippy pedantic warnings
-  283/283 CPU validation checks PASS (incl. real public NCBI data benchmarked against papers)
+  388/388 CPU validation checks PASS (incl. real public NCBI data benchmarked against papers)
   38/38 GPU validation checks PASS
-  321/321 total quantitative checks PASS
+  426/426 total quantitative checks PASS
   1 runtime dep (flate2); GPU deps feature-gated (barracuda, wgpu v22, tokio)
   11 ToadStool GPU primitives, 0 custom WGSL shaders
   Sovereign parsers: FASTQ, mzML/XML, MS2, base64 — all in-tree
@@ -253,7 +253,7 @@ machine learning"** (MSU Center for PFAS Research)
 - Kendrick mass defect analysis + PFAS homologue grouping
 - GPU-promoted EIC extraction + batch peak integration
 - GPU-promoted rarefaction with bootstrap confidence intervals
-- **283/283 CPU + 38/38 GPU = 321/321 validation checks PASS** (public NCBI data benchmarked against papers)
+- **388/388 CPU + 38/38 GPU = 426/426 validation checks PASS** (public NCBI data benchmarked against papers)
 
 ### Track 2: PFAS Analytical Chemistry — blueFish (Phases B0-B4)
 

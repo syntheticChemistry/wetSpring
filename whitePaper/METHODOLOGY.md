@@ -238,7 +238,7 @@ All experiments run on a single consumer workstation:
 
 ## 6. Acceptance Criteria
 
-### Phase 2 (CPU): 283/283 checks pass
+### Phase 2 (CPU): 388/388 checks pass
 
 | Binary | Checks | Target |
 |--------|:------:|--------|
@@ -253,10 +253,10 @@ All experiments run on a single consumer workstation:
 | `validate_peaks` | 17 | Peak detection vs scipy.signal.find_peaks (Exp010) |
 | `validate_algae_16s` | 29 | Real NCBI data + Humphrey 2023 reference (Exp012) |
 | `validate_voc_peaks` | 22 | Reese 2019 VOC baselines + RI matching (Exp013) |
-| `validate_public_benchmarks` | 97 | 10 samples, 4 BioProjects vs paper ground truth (Exp014) |
-| **Total** | **283** | **All pass** |
+| `validate_public_benchmarks` | 202 | 22 samples, 4 BioProjects vs paper ground truth (Exp014) |
+| **Total** | **388** | **All pass** |
 
-Current status: **283/283 pass.** (includes real public NCBI data benchmarked against papers, VOC baselines, and 97 public data benchmark checks)
+Current status: **388/388 pass.** (includes real public NCBI data benchmarked against papers, VOC baselines, and 202 public data benchmark checks)
 
 ### Phase 3 (GPU): 38/38 checks pass
 
@@ -266,7 +266,7 @@ Current status: **283/283 pass.** (includes real public NCBI data benchmarked ag
 
 Current status: **38/38 pass.** Checks: 3 Shannon + 3 Simpson + 6 BC + 5 PCoA + 6 alpha + 8 spectral + 3 variance + 1 correlation + 1 covariance + 2 weighted dot.
 
-### Grand Total: 321/321 quantitative checks pass
+### Grand Total: 426/426 quantitative checks pass
 
 ---
 

@@ -1,7 +1,7 @@
 # Evolution Readiness — Rust Module → WGSL Shader → Pipeline Stage
 
 **Date**: 2026-02-19
-**Status**: Phase 6 COMPLETE — 30 modules, 284 tests, 321/321 validation PASS, 11 ToadStool primitives, 0 custom WGSL shaders, public NCBI data benchmarked against papers
+**Status**: Phase 6 COMPLETE — 30 modules, 284 tests, 426/426 validation PASS, 11 ToadStool primitives, 0 custom WGSL shaders, public NCBI data benchmarked against papers
 
 ---
 
@@ -154,8 +154,8 @@ GPU modules require `--features gpu` and are validated by `validate_diversity_gp
 | `validate_peaks` | 17/17 | PASS | Peak detection vs scipy.signal.find_peaks (Exp010) |
 | `validate_algae_16s` | 29/29 | PASS | Real NCBI data (PRJNA488170) + Humphrey 2023 reference (Exp012) |
 | `validate_voc_peaks` | 22/22 | PASS | Reese 2019 VOC baselines + RI matching (Exp013) |
-| `validate_public_benchmarks` | 97/97 | PASS | 10 samples, 4 BioProjects, marine + freshwater vs paper ground truth (Exp014) |
-| **CPU Total** | **283/283** | **PASS** | |
+| `validate_public_benchmarks` | 202/202 | PASS | 22 samples, 4 BioProjects, marine + freshwater vs paper ground truth (Exp014) |
+| **CPU Total** | **388/388** | **PASS** | |
 
 ### GPU Validation (`--features gpu`)
 
@@ -244,4 +244,4 @@ Previously removed shaders:
 
 ---
 
-*Updated from wetSpring Phase 6 COMPLETE — 30 modules, 284 tests, 321/321 PASS, 11 ToadStool primitives, public NCBI data benchmarked against papers, February 19, 2026.*
+*Updated from wetSpring Phase 6 COMPLETE — 30 modules, 284 tests, 426/426 PASS, 11 ToadStool primitives, public NCBI data benchmarked against papers, February 19, 2026.*

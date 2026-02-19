@@ -1,7 +1,7 @@
 # wetSpring Control Experiment — Status Report
 
 **Date**: 2026-02-12 (Project initialized)
-**Updated**: 2026-02-19 (Phase 6: Public Data Benchmark — 30 modules, 284 tests, 321/321 validation PASS, 11 ToadStool primitives, 1,077× GPU speedup, public NCBI data benchmarked against papers)
+**Updated**: 2026-02-19 (Phase 6: Public Data Benchmark — 30 modules, 284 tests, 426/426 validation PASS, 22 samples, SILVA taxonomy, 11 ToadStool primitives, 1,077× GPU speedup, public NCBI data benchmarked against papers)
 **Gate**: Eastgate (i9-12900K, 64 GB DDR5, RTX 4070 12GB, Pop!_OS 22.04)
 **Galaxy**: quay.io/bgruening/galaxy:24.1 (Docker) — upgraded from 20.09
 **License**: AGPL-3.0-or-later
@@ -367,20 +367,22 @@ of $500K instruments with proprietary software.
 
 ### 2026-02-18: BarraCUDA Rust Validation — 173/173 PASS (zero custom WGSL, wgpu v22, 11 ToadStool primitives)
 
-### 2026-02-19: Public Data Benchmark — 321/321 PASS (10 samples, 4 BioProjects, paper benchmarks, NCBI scan)
+### 2026-02-19: Public Data Benchmark — 426/426 PASS (22 samples, 4 BioProjects, paper benchmarks, SILVA taxonomy, NCBI scan)
 
-- **Public data benchmark (Exp014)**: 10 samples from 4 BioProjects — PRJNA1114688
-  (N. oculata + B. plicatilis, V4 16S), PRJNA629095 (N. oceanica phycosphere probiotic,
-  Ocean University of China), PRJNA1178324 (freshwater cyanobacteria toxin,
-  sewage/fertilizer nutrient effects), PRJNA516219 (Lake Erie cyanotoxin, N/P/temp
-  effects on microcystin). Full Rust pipeline validated against paper ground truth.
+- **Public data benchmark (Exp014)**: 22 samples from 4 BioProjects — PRJNA1114688
+  (16 samples: full N. oculata + B. plicatilis time series, V4 16S), PRJNA629095 (2 samples,
+  N. oceanica phycosphere probiotic, Ocean University of China), PRJNA1178324 (2 samples,
+  freshwater cyanobacteria toxin, sewage/fertilizer nutrient effects), PRJNA516219 (2 samples,
+  Lake Erie cyanotoxin, N/P/temp effects on microcystin). Full Rust pipeline validated
+  against paper ground truth.
 - **Paper benchmark data**: Structured JSON/TSV for all 4 papers in
   `experiments/results/paper_benchmarks/` — OTU tables, diversity targets, VOC compounds.
 - **NCBI dataset search**: `scripts/search_ncbi_datasets.py` found PRJNA1114688
   (exact organism match) + 30 SRA experiments across algae/aquaculture microbiomes.
-- **New binary**: `validate_public_benchmarks` (97/97 PASS) — real public data
-  through FASTQ→QC→derep→DADA2→diversity pipeline, benchmarked against Humphrey 2023
-  and Carney 2016 findings.
+- **New binary**: `validate_public_benchmarks` (202/202 PASS) — real public data
+  through FASTQ→QC→derep→DADA2→taxonomy→diversity pipeline, SILVA 138.1 NR99 classification,
+  benchmarked against Humphrey 2023 and Carney 2016 findings. Temporal analysis (6
+  organism×timepoint groups, replicate CV=0.03/0.01), taxonomy (10 phyla, 26 genera).
 
 ### 2026-02-19: Paper Parity — 224/224 PASS (real NCBI data, VOC baselines, honest data audit)
 
@@ -394,7 +396,7 @@ of $500K instruments with proprietary software.
 - **New binaries**: `validate_algae_16s` (29/29 PASS), `validate_voc_peaks` (22/22 PASS)
 - **New experiments**: Exp012 (Algae Pond 16S), Exp013 (VOC Peak Validation)
 - **NCBI bulk download**: `scripts/ncbi_bulk_download.sh` for GPU-scale profiling
-- **Total**: 224/224 PASS (186 CPU + 38 GPU) across 10 CPU binaries + 1 GPU binary
+- **Total**: 329/329 PASS (291 CPU + 38 GPU) across 10 CPU binaries + 1 GPU binary
 
 - **Architecture**: `wetspring-barracuda` crate, depends on `barracuda` (phase1/toadstool)
 - **Pattern**: Same as hotSpring — hardcoded Python baseline values in Rust validation binaries
@@ -428,7 +430,7 @@ of $500K instruments with proprietary software.
 - Headline: spectral cosine 200×200 → GPU 3.7ms vs CPU 3,937ms = **1,077× speedup**
 - Python baseline: `scripts/benchmark_python_baseline.py` (numpy, scipy, scikit-bio)
 
-**Total: 283/283 CPU + 38/38 GPU = 321/321 checks PASS, 284 tests**
+**Total: 388/388 CPU + 38/38 GPU = 426/426 checks PASS, 284 tests**
 
 | Binary | Track | Checks | Status |
 |--------|-------|--------|--------|
@@ -437,7 +439,7 @@ of $500K instruments with proprietary software.
 | validate_16s_pipeline | T1 | 37/37 | PASS |
 | validate_algae_16s | T1 | 29/29 | PASS |
 | validate_voc_peaks | T1/cross | 22/22 | PASS |
-| validate_public_benchmarks | T1 | 97/97 | PASS |
+| validate_public_benchmarks | T1 | 202/202 | PASS |
 | validate_mzml | T2 | 7/7 | PASS |
 | validate_pfas | T2 | 10/10 | PASS |
 | validate_features | T2 | 9/9 | PASS |
@@ -713,7 +715,7 @@ Track 1 (Life Science):
   Phase 3 [DONE]:     GPU acceleration — ToadStool integrated, 38/38 GPU PASS (RTX 4070)
   Phase 4 [DONE]:     Sovereign pipeline — complete 16S: DADA2 + chimera + taxonomy + UniFrac (173/173 PASS)
   Phase 5 [DONE]:     Paper parity — real NCBI data, VOC baselines, honest data audit (224/224 PASS)
-  Phase 6 [DONE]:     Public data benchmark — 10 samples, 4 BioProjects, paper ground truth (321/321 PASS)
+  Phase 6 [DONE]:     Public data benchmark — 22 samples, 4 BioProjects, paper ground truth (426/426 PASS)
 
 Track 2 (PFAS / blueFish):
   Phase B0 [DONE]:    asari + PFΔScreen validation (Exp005, Exp006)
@@ -956,7 +958,7 @@ Phase 3: GPU Acceleration — DONE ✓ (38/38 GPU PASS, wgpu v22, 9 ToadStool pr
 
 Phase 4: Sovereign Pipeline — DONE ✓ (173/173 PASS)
 Phase 5: Paper Parity — DONE ✓ (224/224 PASS, real NCBI data + VOC baselines)
-Phase 6: Public Data Benchmark — DONE ✓ (321/321 PASS, 10 samples from 4 BioProjects benchmarked against papers)
+Phase 6: Public Data Benchmark — DONE ✓ (426/426 PASS, 22 samples from 4 BioProjects benchmarked against papers)
   ✓ FASTQ → quality → merge → derep → diversity → PCoA (end-to-end)
   ✓ mzML → mass tracks → EIC → peaks → features (end-to-end)
   ✓ DADA2 denoising ────── Callahan et al. 2016 (error model + divisive partitioning)
@@ -1020,7 +1022,7 @@ Together they build a general-purpose sovereign compute platform.
 *BarraCUDA Phase 2 audit — deep refactor, sovereign parsers, full validation: February 16, 2026*
 
   Audit results (initial → current):
-  - 283/283 CPU validation PASS, 38/38 GPU validation PASS (321/321 total)
+  - 388/388 CPU validation PASS, 38/38 GPU validation PASS (426/426 total)
   - 284 tests, 30 modules
   - 0 library clippy warnings, 0 doc warnings
   - 30 modules: 4 I/O parsers, 23 bio/signal/pipeline + GPU, encoding, error, validation, tolerances
