@@ -127,18 +127,39 @@ Rust binary replaces the ~4GB Galaxy/QIIME2 Docker ecosystem. Post-GPU projectio
 
 **68/68 checks PASS.** CPU and GPU produce identical scientific results.
 
-| Metric | Galaxy/Python | Rust CPU | Rust GPU | GPU/CPU |
-|--------|--------------|----------|----------|---------|
-| 10-sample pipeline | 95.6 s | 616.4 s* | 39.0 s | **15.8×** |
-| DADA2 per-sample | 6.80 s | 0.32 s | 0.32 s | 1× |
-| Chimera per-sample | ~1 s | 145.8 s | 1.5 s | **97×** |
-| Shannon error (GPU vs CPU) | — | — | 0.00 | exact |
-| Chimera agreement | — | — | 100% | exact |
-| Taxonomy agreement | — | — | 100% | exact |
-| Cost per 10K samples | $0.40 | $2.57 | **$0.26** | 9.9× |
+### After chimera optimization (k-mer sketch + prefix-sum + early termination)
 
-*CPU chimera is O(n³) unoptimized; GPU eliminates via GemmF64 pairwise encoding.
+| Metric | Galaxy/Python | Rust CPU | Speedup |
+|--------|--------------|----------|---------|
+| Per-sample pipeline | 9.56 s | **3.27 s** | **2.9×** |
+| Per-sample DADA2 | 6.80 s | **0.33 s** | **20.5×** |
+| Per-sample chimera | ~1 s | **0.16 s** | **6.3×** |
+| Dependencies | 7 + Galaxy | 1 (flate2) | — |
+| Cost at 10K samples | $0.40 | **$0.14** | **2.9× cheaper** |
 
-**Conclusion:** Rust allows hardware abstraction — same math, CPU or GPU.
-GPU chimera (85-104×) eliminates the sole remaining bottleneck. Run with
-`cargo run --release --features gpu --bin validate_16s_pipeline_gpu`.
+The chimera algorithm was optimized from O(N³L²) brute-force to O(N×K²×L) with
+k-mer sketch parent selection (K=8), prefix-sum crossover scoring, and early
+termination. This yielded a **1,256× speedup** (1,985s → 1.6s for 10 samples).
+
+Rust CPU now **beats Galaxy by 2.9×** and is the cheapest option. The remaining
+pipeline bottleneck is taxonomy classification (NB k-mer scoring, 24.5s of 32.7s).
+
+### GPU parity
+
+| Metric | CPU | GPU | Δ |
+|--------|-----|-----|---|
+| Shannon | exact | exact | 0.00 |
+| Simpson | exact | exact | 0.00 |
+| Observed | exact | exact | 0.00 |
+| Chimera decisions | — | — | 100% agree |
+| Taxonomy genus | — | — | 100% match |
+
+### ToadStool dispatch findings
+
+ToadStool has `PipelineBuilder`, `BufferPool`, `TensorContext`, and
+`UnidirectionalPipeline` — but wetSpring's GPU modules don't use them yet.
+Current `GemmF64` recompiles shaders per call; `FusedMapReduceF64` allocates
+new buffers per call. Wiring these optimizations is the path to making
+GPU dispatch efficient enough to justify offloading the taxonomy stage.
+
+Run with `cargo run --release --features gpu --bin validate_16s_pipeline_gpu`.

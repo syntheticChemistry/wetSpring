@@ -9,11 +9,20 @@
 //! # Algorithm
 //!
 //! 1. Sort sequences by abundance (descending).
-//! 2. For each query, find the two best-matching parents from the pool
-//!    of more-abundant sequences.
-//! 3. For each possible crossover point, compute a score comparing the
-//!    two-parent chimera model against the best single-parent model.
+//! 2. For each query, use k-mer sketch to find the top-K most similar
+//!    parents from the pool of more-abundant sequences.
+//! 3. For the top parent pairs, compute chimera scores using prefix-sum
+//!    match vectors for O(1) crossover evaluation.
 //! 4. If the best chimera score exceeds the threshold, flag the sequence.
+//!
+//! # Performance
+//!
+//! Uses k-mer sketching (8-mers) for parent candidate selection instead
+//! of exhaustive all-pairs. For N ASVs with K candidate parents per query
+//! and L base sequence length:
+//!
+//! - Previous: O(N × P² × L) where P ≈ N → O(N³L)
+//! - Current:  O(N × K² × L) where K = min(8, P) → O(N × 64 × L)
 //!
 //! # References
 //!
@@ -22,10 +31,13 @@
 //! - DADA2 `removeBimeraDenovo` (Callahan et al. 2016).
 
 use crate::bio::dada2::Asv;
+use std::collections::HashMap;
 
 const DEFAULT_MIN_SCORE: f64 = 2.0;
 const DEFAULT_MIN_PARENT_ABUNDANCE: f64 = 2.0;
 const MIN_SEGMENT_LEN: usize = 3;
+const SKETCH_K: usize = 8;
+const MAX_PARENT_CANDIDATES: usize = 8;
 
 /// Result of chimera detection for a single sequence.
 #[derive(Debug, Clone)]
@@ -78,6 +90,50 @@ pub struct ChimeraStats {
     pub retained: usize,
 }
 
+type KmerSketch = HashMap<u64, u16>;
+
+/// Build a k-mer sketch (8-mer presence counts) for a DNA sequence.
+fn build_sketch(seq: &[u8]) -> KmerSketch {
+    let mut sketch = HashMap::new();
+    if seq.len() < SKETCH_K {
+        return sketch;
+    }
+    let mut kmer = 0_u64;
+    let mask = (1_u64 << (2 * SKETCH_K)) - 1;
+    let mut valid = 0_usize;
+
+    for (i, &b) in seq.iter().enumerate() {
+        let enc = match b {
+            b'A' | b'a' => 0_u64,
+            b'C' | b'c' => 1,
+            b'G' | b'g' => 2,
+            b'T' | b't' => 3,
+            _ => {
+                valid = 0;
+                continue;
+            }
+        };
+        kmer = ((kmer << 2) | enc) & mask;
+        valid += 1;
+        if valid >= SKETCH_K {
+            *sketch.entry(kmer).or_insert(0) += 1;
+            if i >= seq.len().saturating_sub(1) {
+                break;
+            }
+        }
+    }
+    sketch
+}
+
+/// Count shared k-mers between two sketches (Jaccard-like similarity).
+fn sketch_similarity(a: &KmerSketch, b: &KmerSketch) -> u32 {
+    let (smaller, larger) = if a.len() <= b.len() { (a, b) } else { (b, a) };
+    smaller
+        .iter()
+        .filter_map(|(k, &va)| larger.get(k).map(|&vb| va.min(vb) as u32))
+        .sum()
+}
+
 /// Detect chimeras in a set of ASVs (or abundance-sorted unique sequences).
 ///
 /// Sequences must be sorted by abundance (descending). Returns chimera
@@ -90,9 +146,11 @@ pub fn detect_chimeras(
     let n = seqs.len();
     let mut results = Vec::with_capacity(n);
 
+    // Precompute k-mer sketches for all sequences
+    let sketches: Vec<KmerSketch> = seqs.iter().map(|a| build_sketch(&a.sequence)).collect();
+
     for i in 0..n {
         if i < 2 {
-            // First two sequences cannot be chimeras (no two parents available)
             results.push(ChimeraResult {
                 query_idx: i,
                 is_chimera: false,
@@ -106,14 +164,14 @@ pub fn detect_chimeras(
 
         let query = &seqs[i];
 
-        // Find chimera among more-abundant parents
-        let parents: Vec<usize> = (0..i)
+        // Find eligible parents (more abundant by min_parent_fold)
+        let eligible: Vec<usize> = (0..i)
             .filter(|&j| {
                 seqs[j].abundance as f64 >= query.abundance as f64 * params.min_parent_fold
             })
             .collect();
 
-        if parents.len() < 2 {
+        if eligible.len() < 2 {
             results.push(ChimeraResult {
                 query_idx: i,
                 is_chimera: false,
@@ -125,7 +183,18 @@ pub fn detect_chimeras(
             continue;
         }
 
-        let result = test_chimera(query, &seqs, &parents, i, params);
+        // K-mer sketch: rank parents by shared k-mer count with query
+        let query_sketch = &sketches[i];
+        let mut scored: Vec<(usize, u32)> = eligible
+            .iter()
+            .map(|&j| (j, sketch_similarity(query_sketch, &sketches[j])))
+            .collect();
+        scored.sort_unstable_by(|a, b| b.1.cmp(&a.1));
+
+        let top_k = scored.len().min(MAX_PARENT_CANDIDATES);
+        let candidates: Vec<usize> = scored[..top_k].iter().map(|&(j, _)| j).collect();
+
+        let result = test_chimera_fast(query, seqs, &candidates, i, params);
         results.push(result);
     }
 
@@ -150,11 +219,16 @@ pub fn remove_chimeras(seqs: &[Asv], params: &ChimeraParams) -> (Vec<Asv>, Chime
     (filtered, stats)
 }
 
-/// Test a single query for chimera formation.
-fn test_chimera(
+/// Test a single query for chimera formation using prefix-sum optimization.
+///
+/// For each parent pair, precomputes cumulative match vectors once (O(L)),
+/// then evaluates all crossover points in O(1) each. Early termination
+/// when score exceeds threshold.
+#[allow(clippy::cast_precision_loss)]
+fn test_chimera_fast(
     query: &Asv,
     seqs: &[Asv],
-    parents: &[usize],
+    candidates: &[usize],
     query_idx: usize,
     params: &ChimeraParams,
 ) -> ChimeraResult {
@@ -177,37 +251,66 @@ fn test_chimera(
     let mut best_right = None;
     let mut best_cross = None;
 
-    // Try all pairs of parents
-    for (pi, &pa) in parents.iter().enumerate() {
+    for (pi, &pa) in candidates.iter().enumerate() {
         let aseq = &seqs[pa].sequence;
         if aseq.len() < qlen {
             continue;
         }
 
-        for &pb in &parents[pi + 1..] {
+        for &pb in &candidates[pi + 1..] {
             let bseq = &seqs[pb].sequence;
             if bseq.len() < qlen {
                 continue;
             }
 
-            // Try each crossover point
-            for cross in MIN_SEGMENT_LEN..qlen.saturating_sub(MIN_SEGMENT_LEN) {
+            let len = qlen.min(aseq.len()).min(bseq.len());
+
+            // Precompute cumulative match counts (O(L), done once per pair)
+            let mut cum_a = vec![0_u32; len + 1]; // cumulative matches with parent A
+            let mut cum_b = vec![0_u32; len + 1]; // cumulative matches with parent B
+            for j in 0..len {
+                cum_a[j + 1] = cum_a[j] + u32::from(qseq[j] == aseq[j]);
+                cum_b[j + 1] = cum_b[j] + u32::from(qseq[j] == bseq[j]);
+            }
+
+            // Evaluate all crossover points in O(1) each
+            for cross in MIN_SEGMENT_LEN..len.saturating_sub(MIN_SEGMENT_LEN) {
                 // Left from A, right from B
-                let score_ab = chimera_score(qseq, aseq, bseq, cross, params.min_diffs);
-                if score_ab > best_score {
-                    best_score = score_ab;
+                let s_ab = score_from_prefix(&cum_a, &cum_b, cross, len, params.min_diffs);
+                if s_ab > best_score {
+                    best_score = s_ab;
                     best_left = Some(pa);
                     best_right = Some(pb);
                     best_cross = Some(cross);
+                    if best_score >= params.min_score {
+                        return ChimeraResult {
+                            query_idx,
+                            is_chimera: true,
+                            score: best_score,
+                            left_parent: best_left,
+                            right_parent: best_right,
+                            crossover: best_cross,
+                        };
+                    }
                 }
 
                 // Left from B, right from A
-                let score_ba = chimera_score(qseq, bseq, aseq, cross, params.min_diffs);
-                if score_ba > best_score {
-                    best_score = score_ba;
+                let s_ba = score_from_prefix(&cum_b, &cum_a, cross, len, params.min_diffs);
+                if s_ba > best_score {
+                    best_score = s_ba;
                     best_left = Some(pb);
                     best_right = Some(pa);
                     best_cross = Some(cross);
+                    if best_score >= params.min_score {
+                        return ChimeraResult {
+                            query_idx,
+                            is_chimera: true,
+                            score: best_score,
+                            left_parent: best_left,
+                            right_parent: best_right,
+                            crossover: best_cross,
+                        };
+                    }
                 }
             }
         }
@@ -223,66 +326,35 @@ fn test_chimera(
     }
 }
 
-/// Compute chimera score for query = left_parent[..cross] + right_parent[cross..].
-///
-/// Score = (mismatches to best single parent) / (mismatches to chimera model).
-/// Higher score means the chimera model explains the query much better
-/// than any single parent.
+/// O(1) chimera score evaluation using precomputed prefix sums.
 #[allow(clippy::cast_precision_loss)]
-fn chimera_score(
-    query: &[u8],
-    left_parent: &[u8],
-    right_parent: &[u8],
+fn score_from_prefix(
+    cum_left: &[u32],
+    cum_right: &[u32],
     crossover: usize,
+    len: usize,
     min_diffs: usize,
 ) -> f64 {
-    let len = query.len().min(left_parent.len()).min(right_parent.len());
-    if crossover >= len {
-        return 0.0;
-    }
-
-    // Count mismatches in left segment
-    let mut left_match_l = 0_usize; // matches with left_parent in left segment
-    let mut left_match_r = 0_usize; // matches with right_parent in left segment
-    for i in 0..crossover {
-        if query[i] == left_parent[i] {
-            left_match_l += 1;
-        }
-        if query[i] == right_parent[i] {
-            left_match_r += 1;
-        }
-    }
-
-    // Count mismatches in right segment
-    let mut right_match_l = 0_usize;
-    let mut right_match_r = 0_usize;
-    for i in crossover..len {
-        if query[i] == left_parent[i] {
-            right_match_l += 1;
-        }
-        if query[i] == right_parent[i] {
-            right_match_r += 1;
-        }
-    }
+    let left_match_l = cum_left[crossover] as usize;
+    let left_match_r = cum_right[crossover] as usize;
+    let right_match_l = (cum_left[len] - cum_left[crossover]) as usize;
+    let right_match_r = (cum_right[len] - cum_right[crossover]) as usize;
 
     // Chimera model: left from left_parent, right from right_parent
     let chimera_matches = left_match_l + right_match_r;
     let chimera_mismatches = len - chimera_matches;
 
-    // Best single parent: whichever parent matches more overall
+    // Best single parent
     let parent_l_total = left_match_l + right_match_l;
     let parent_r_total = left_match_r + right_match_r;
     let best_single = parent_l_total.max(parent_r_total);
     let best_single_mismatches = len - best_single;
 
-    // The chimera model should show distinct parent contributions
-    let _left_diffs = crossover - left_match_l.min(crossover);
-    let _right_diffs = (len - crossover) - right_match_r.min(len - crossover);
+    // Must show distinct parent contributions in each segment
     if left_match_l <= left_match_r || right_match_r <= right_match_l {
         return 0.0;
     }
 
-    // Need minimum differences from the "wrong" parent in each segment
     let wrong_left = crossover.saturating_sub(left_match_r);
     let wrong_right = (len - crossover).saturating_sub(right_match_l);
     if wrong_left < min_diffs || wrong_right < min_diffs {
@@ -333,15 +405,9 @@ mod tests {
 
     #[test]
     fn obvious_chimera_detected() {
-        // Parent A: AAAAAACCCCCC (12 bases)
-        // Parent B: CCCCCCAAAAAA (12 bases)
-        // Chimera:  AAAAAAAAAAAA (left from A, right from B) — nah, that's all the same
-        //
-        // Better: Parent A: AAAAAGGGGG, Parent B: CCCCCTTTTTT
-        //         Chimera:  AAAAATTTTT (left from A, right from B)
         let parent_a = b"AAAAAGGGGG";
         let parent_b = b"CCCCCTTTTTT";
-        let chimera = b"AAAAATTTTT"; // left 5 from A, right 5 from B
+        let chimera = b"AAAAATTTTT";
 
         let asvs = vec![
             make_asv(parent_a, 1000),
@@ -350,8 +416,6 @@ mod tests {
         ];
 
         let (results, stats) = detect_chimeras(&asvs, &ChimeraParams::default());
-
-        // The chimera should be detected
         assert!(
             results[2].is_chimera,
             "chimera not detected, score={}",
@@ -362,10 +426,8 @@ mod tests {
 
     #[test]
     fn real_looking_chimera() {
-        // Two 20bp parent sequences that differ in the first and second half
         let parent_a = b"ACGTACGTACTTTTTTTTTT";
         let parent_b = b"TTTTTTTTTTACGTACGTAC";
-        // Chimera: first 10 from A, last 10 from B
         let chimera = b"ACGTACGTACACGTACGTAC";
 
         let asvs = vec![
@@ -381,10 +443,9 @@ mod tests {
 
     #[test]
     fn non_chimeric_variant_not_flagged() {
-        // A sequence with minor variation should not be flagged
         let parent_a = b"AAAAAAAAAA";
         let parent_b = b"CCCCCCCCCC";
-        let variant = b"AAAAAAAAAT"; // 1-base variant of parent_a
+        let variant = b"AAAAAAAAAT";
 
         let asvs = vec![
             make_asv(parent_a, 1000),
@@ -426,7 +487,6 @@ mod tests {
         let parent_b = b"TTTTTTTTTTACGTACGTAC";
         let chimera = b"ACGTACGTACACGTACGTAC";
 
-        // If chimera abundance is similar to parents, parents don't qualify
         let asvs = vec![
             make_asv(parent_a, 100),
             make_asv(parent_b, 100),
@@ -438,7 +498,6 @@ mod tests {
             ..ChimeraParams::default()
         };
         let (results, _) = detect_chimeras(&asvs, &params);
-        // Parents aren't 2x more abundant, so no chimera detection
         assert!(!results[2].is_chimera);
     }
 }

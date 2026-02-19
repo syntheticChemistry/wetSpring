@@ -34,7 +34,7 @@ wetspring-barracuda v0.1.0
   1 runtime dep (flate2); GPU deps feature-gated (barracuda, wgpu v22, tokio)
   11 ToadStool GPU primitives, 0 custom WGSL shaders
   100% math parity: CPU ↔ GPU (Shannon, Simpson, chimera, taxonomy — zero error)
-  15.8× GPU speedup, 97× chimera GPU speedup, 21× DADA2 Rust vs Python
+  2.9× faster than Galaxy (Rust CPU), 20.5× DADA2, 1,256× chimera optimization
   Sovereign parsers: FASTQ, mzML/XML, MS2, base64 — all in-tree
 
   16S pipeline:  FASTQ → quality → merge → derep → DADA2 → chimera → taxonomy → diversity → UniFrac → PCoA
