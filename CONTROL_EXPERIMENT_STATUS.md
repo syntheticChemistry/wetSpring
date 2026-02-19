@@ -1,7 +1,7 @@
 # wetSpring Control Experiment — Status Report
 
 **Date**: 2026-02-12 (Project initialized)
-**Updated**: 2026-02-19 (Phase 6: Public Data Benchmark — 30 modules, 284 tests, 426/426 validation PASS, 22 samples, SILVA taxonomy, 11 ToadStool primitives, 1,077× GPU speedup, public NCBI data benchmarked against papers)
+**Updated**: 2026-02-19 (Phase 7: GPU Pipeline Parity — 30 modules, 284 tests, 494/494 validation PASS, 68 GPU parity checks, 15.8× GPU speedup, 100% math parity CPU↔GPU, 3-tier benchmark Galaxy/Python vs Rust CPU vs Rust GPU)
 **Gate**: Eastgate (i9-12900K, 64 GB DDR5, RTX 4070 12GB, Pop!_OS 22.04)
 **Galaxy**: quay.io/bgruening/galaxy:24.1 (Docker) — upgraded from 20.09
 **License**: AGPL-3.0-or-later

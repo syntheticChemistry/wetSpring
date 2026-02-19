@@ -101,6 +101,12 @@ name = "validate_diversity_gpu"
 path = "src/bin/validate_diversity_gpu.rs"
 required-features = ["gpu"]
 
+# ── GPU 16S pipeline parity (Exp016: CPU vs GPU math parity) ─────
+[[bin]]
+name = "validate_16s_pipeline_gpu"
+path = "src/bin/validate_16s_pipeline_gpu.rs"
+required-features = ["gpu"]
+
 # ── CPU vs GPU benchmark (require --features gpu) ────────────────
 [[bin]]
 name = "benchmark_cpu_gpu"

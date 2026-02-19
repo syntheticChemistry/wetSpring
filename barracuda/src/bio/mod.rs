@@ -2,6 +2,8 @@
 //! Bioinformatics and analytical chemistry algorithms.
 
 pub mod chimera;
+#[cfg(feature = "gpu")]
+pub mod chimera_gpu;
 pub mod dada2;
 pub mod derep;
 pub mod diversity;
@@ -21,6 +23,8 @@ pub mod pcoa;
 pub mod pcoa_gpu;
 pub mod quality;
 #[cfg(feature = "gpu")]
+pub mod quality_gpu;
+#[cfg(feature = "gpu")]
 pub mod rarefaction_gpu;
 pub mod signal;
 pub mod spectral_match;
@@ -29,5 +33,7 @@ pub mod spectral_match_gpu;
 #[cfg(feature = "gpu")]
 pub mod stats_gpu;
 pub mod taxonomy;
+#[cfg(feature = "gpu")]
+pub mod taxonomy_gpu;
 pub mod tolerance_search;
 pub mod unifrac;

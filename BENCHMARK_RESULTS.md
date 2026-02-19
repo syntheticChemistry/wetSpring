@@ -120,3 +120,25 @@ dominates runtime (98.5%, O(n³)) — the primary GPU acceleration target. A 700
 Rust binary replaces the ~4GB Galaxy/QIIME2 Docker ecosystem. Post-GPU projection:
 3× cheaper than Galaxy at 100K samples ($1.30 vs $3.98). Run with
 `cargo run --release --bin benchmark_pipeline`.
+
+---
+
+## GPU Pipeline Parity (Exp016) — Three-Tier 16S Benchmark
+
+**68/68 checks PASS.** CPU and GPU produce identical scientific results.
+
+| Metric | Galaxy/Python | Rust CPU | Rust GPU | GPU/CPU |
+|--------|--------------|----------|----------|---------|
+| 10-sample pipeline | 95.6 s | 616.4 s* | 39.0 s | **15.8×** |
+| DADA2 per-sample | 6.80 s | 0.32 s | 0.32 s | 1× |
+| Chimera per-sample | ~1 s | 145.8 s | 1.5 s | **97×** |
+| Shannon error (GPU vs CPU) | — | — | 0.00 | exact |
+| Chimera agreement | — | — | 100% | exact |
+| Taxonomy agreement | — | — | 100% | exact |
+| Cost per 10K samples | $0.40 | $2.57 | **$0.26** | 9.9× |
+
+*CPU chimera is O(n³) unoptimized; GPU eliminates via GemmF64 pairwise encoding.
+
+**Conclusion:** Rust allows hardware abstraction — same math, CPU or GPU.
+GPU chimera (85-104×) eliminates the sole remaining bottleneck. Run with
+`cargo run --release --features gpu --bin validate_16s_pipeline_gpu`.

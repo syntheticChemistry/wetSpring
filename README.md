@@ -29,10 +29,12 @@ kernels useful far beyond their original domain.
 wetspring-barracuda v0.1.0
   284 tests, 30 modules, 0 clippy pedantic warnings
   388/388 CPU validation checks PASS (incl. real public NCBI data benchmarked against papers)
-  38/38 GPU validation checks PASS
-  426/426 total quantitative checks PASS
+  106/106 GPU validation checks PASS (38 diversity + 68 pipeline parity)
+  494/494 total quantitative checks PASS
   1 runtime dep (flate2); GPU deps feature-gated (barracuda, wgpu v22, tokio)
   11 ToadStool GPU primitives, 0 custom WGSL shaders
+  100% math parity: CPU ↔ GPU (Shannon, Simpson, chimera, taxonomy — zero error)
+  15.8× GPU speedup, 97× chimera GPU speedup, 21× DADA2 Rust vs Python
   Sovereign parsers: FASTQ, mzML/XML, MS2, base64 — all in-tree
 
   16S pipeline:  FASTQ → quality → merge → derep → DADA2 → chimera → taxonomy → diversity → UniFrac → PCoA
