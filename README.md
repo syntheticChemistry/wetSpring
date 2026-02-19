@@ -40,6 +40,7 @@ wetspring-barracuda v0.1.0
   PFAS pipeline:  mzML/MS2 → tolerance search → spectral match → KMD → homologue grouping
 
   GPU benchmark: 1,077× speedup on spectral cosine (200×200) — RTX 4070
+  Pipeline benchmark (Exp015): Rust DADA2 21× faster than Galaxy; 700KB binary vs 4GB Docker
 ```
 
 | Track | Phase | Status |

@@ -110,3 +110,13 @@ python3 scripts/benchmark_python_baseline.py
 # Rust CPU vs GPU
 cargo run --release --features gpu --bin benchmark_cpu_gpu
 ```
+
+---
+
+## Full Pipeline Benchmark (Exp015)
+
+Rust DADA2 is **21× faster** than Galaxy's DADA2-R (C/Rcpp). Chimera detection
+dominates runtime (98.5%, O(n³)) — the primary GPU acceleration target. A 700KB
+Rust binary replaces the ~4GB Galaxy/QIIME2 Docker ecosystem. Post-GPU projection:
+3× cheaper than Galaxy at 100K samples ($1.30 vs $3.98). Run with
+`cargo run --release --bin benchmark_pipeline`.

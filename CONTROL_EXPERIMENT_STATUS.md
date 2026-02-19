@@ -384,6 +384,13 @@ of $500K instruments with proprietary software.
   benchmarked against Humphrey 2023 and Carney 2016 findings. Temporal analysis (6
   organism×timepoint groups, replicate CV=0.03/0.01), taxonomy (10 phyla, 26 genera).
 
+### 2026-02-19: Experiment 015 — Pipeline Benchmark (Rust CPU vs Galaxy/QIIME2)
+
+- **Full pipeline benchmark (Exp015)**: Rust DADA2 21× faster than Galaxy's DADA2-R (C/Rcpp).
+  Chimera detection is the bottleneck (98.5% of runtime, O(n³)) — the GPU case. 700KB binary
+  replaces 4GB Docker ecosystem. Post-GPU projection: 3× cheaper than Galaxy at 100K samples
+  ($1.30 vs $3.98). New binary: `benchmark_pipeline`.
+
 ### 2026-02-19: Paper Parity — 224/224 PASS (real NCBI data, VOC baselines, honest data audit)
 
 - **Data Availability Audit**: Traced all 4 source papers' data availability:
@@ -396,11 +403,11 @@ of $500K instruments with proprietary software.
 - **New binaries**: `validate_algae_16s` (29/29 PASS), `validate_voc_peaks` (22/22 PASS)
 - **New experiments**: Exp012 (Algae Pond 16S), Exp013 (VOC Peak Validation)
 - **NCBI bulk download**: `scripts/ncbi_bulk_download.sh` for GPU-scale profiling
-- **Total**: 329/329 PASS (291 CPU + 38 GPU) across 10 CPU binaries + 1 GPU binary
+- **Total**: 329/329 PASS (291 CPU + 38 GPU) across 10 CPU binaries + 1 GPU binary + `benchmark_pipeline`
 
 - **Architecture**: `wetspring-barracuda` crate, depends on `barracuda` (phase1/toadstool)
 - **Pattern**: Same as hotSpring — hardcoded Python baseline values in Rust validation binaries
-- **Crate**: 30 modules (4 I/O parsers, 23 bio/signal/pipeline algorithms, encoding, error, validation, tolerances, gpu), 12 binaries (10 CPU + 2 GPU), 284 tests
+- **Crate**: 30 modules (4 I/O parsers, 23 bio/signal/pipeline algorithms, encoding, error, validation, tolerances, gpu), 13 binaries (11 CPU + 2 GPU), 284 tests
 - **Dependencies**: flate2 only (barracuda + wgpu v22 + tokio optional/feature-gated; bytemuck, base64, needletail, quick-xml, serde, rayon all removed)
 - **Code quality**: `Validator` struct (typed `check_count`/`check_count_u64`), NaN-safe tolerance search, Result-based GPU dispatch, 0 library clippy warnings, 0 `unsafe`, 0 production panics
 - **GPU sovereignty**: **Zero custom WGSL shaders** — all GPU compute through 11 ToadStool primitives
@@ -446,6 +453,7 @@ of $500K instruments with proprietary software.
 | validate_peaks | Cross | 17/17 | PASS |
 | validate_diversity_gpu | GPU | 38/38 | PASS |
 | benchmark_cpu_gpu | GPU | — | Benchmark |
+| benchmark_pipeline | CPU | — | Benchmark (Exp015: Rust vs Galaxy) |
 
 ### Compute Workload Coverage: CPU vs GPU
 
@@ -725,6 +733,7 @@ Track 2 (PFAS / blueFish):
   Phase B4:           Penny monitoring (real-time, low-cost sensors)
 
 Benchmarking [DONE]:  Python vs Rust CPU vs Rust GPU — 1,077× GPU speedup on spectral cosine
+  Pipeline [DONE]:     Exp015 — Rust DADA2 21× faster than Galaxy; chimera 98.5% bottleneck
 ```
 
 ### GPU Acceleration Targets — Track 1 (Phase 3)

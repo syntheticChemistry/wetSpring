@@ -148,6 +148,11 @@ For single-vector reductions (Shannon, Simpson, variance), Rust CPU is
 sizes. The GPU wins only when there is enough independent parallel work
 to amortize that overhead.
 
+**Pipeline benchmark (Exp015)**: Rust DADA2 is 21× faster than Galaxy's
+DADA2-R; chimera detection dominates runtime (98.5%, O(n³)). A 700KB binary
+replaces the ~4GB Galaxy/QIIME2 Docker ecosystem. Post-GPU projection: 3×
+cheaper than Galaxy at 100K samples.
+
 ### 3.5 Complete 16S Pipeline in Rust
 
 The full pipeline from raw reads to ecological analysis is now

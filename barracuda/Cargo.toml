@@ -90,6 +90,11 @@ path = "src/bin/validate_voc_peaks.rs"
 name = "validate_public_benchmarks"
 path = "src/bin/validate_public_benchmarks.rs"
 
+# ── Pipeline benchmark (Exp015: Rust CPU vs Galaxy/QIIME2) ───────
+[[bin]]
+name = "benchmark_pipeline"
+path = "src/bin/benchmark_pipeline.rs"
+
 # ── GPU validation binaries (require --features gpu) ─────────────
 [[bin]]
 name = "validate_diversity_gpu"
