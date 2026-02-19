@@ -1,0 +1,54 @@
+{
+  "paper": {
+    "title": "Biotic countermeasures that rescue Nannochloropsis gaditana from a Bacillus safensis infection",
+    "authors": "Humphrey et al.",
+    "year": 2023,
+    "doi": "10.3389/fmicb.2023.1271836",
+    "journal": "Frontiers in Microbiology",
+    "lab": "Sandia National Laboratories"
+  },
+  "sequencing": {
+    "method": "16S rRNA amplicon",
+    "region": "V3-V4",
+    "primers": {
+      "forward": "CCTACGGGGNGGCWGCAG",
+      "reverse": "GACTACHVGGGTATCTAATCC"
+    },
+    "provider": "Zymo Research Corporation (ZymoBIOMIC service)",
+    "platform": "Illumina",
+    "raw_reads_in_sra": false,
+    "raw_reads_location": "NOT deposited (DOE/Sandia restricted)"
+  },
+  "community_profile": {
+    "total_otus": 18,
+    "genus_resolved": 14,
+    "family_resolved": 3,
+    "class_only": 1,
+    "core_genera_count": 7,
+    "core_genera": [
+      "Thalassospira", "Marinobacter", "Oceanicaulis",
+      "Robiginitalea", "Nitratireductor", "Hoeflea", "Sulfitobacter"
+    ],
+    "dominant_phyla": ["Proteobacteria"],
+    "dominant_classes": ["Alphaproteobacteria", "Gammaproteobacteria"]
+  },
+  "key_findings": {
+    "pathogen": "Bacillus safensis (originally misidentified as B. pumilus)",
+    "pathogen_genome_ani": 98.91,
+    "pathogen_moi_lethal": [0.05, 0.1, 1.0],
+    "pathogen_moi_inhibitory": [0.001, 0.005, 0.01],
+    "phage_rescue": "Leo2 phage rescues at MOI 0.1, 1, 10",
+    "bacteriome_protective": true,
+    "bacteriome_transplant_restores_protection": true,
+    "phage_depends_on_bacteriome": true
+  },
+  "validation_targets": {
+    "description": "What a pipeline should detect on similar Nannochloropsis 16S data",
+    "expected_phyla": ["Proteobacteria", "Bacteroidetes", "Planctomycetes"],
+    "expected_genera_subset": ["Marinobacter", "Oceanicaulis", "Sulfitobacter"],
+    "expected_otu_range": [10, 500],
+    "expected_shannon_range": [1.0, 4.0],
+    "expected_simpson_range": [0.5, 1.0],
+    "notes": "Exact OTU composition will differ by strain, site, and conditions. Pipeline validates if it resolves marine-associated bacteria to genus level."
+  }
+}

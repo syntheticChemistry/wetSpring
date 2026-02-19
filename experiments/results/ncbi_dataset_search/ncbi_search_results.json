@@ -1,0 +1,806 @@
+{
+  "search_date": "2026-02-18",
+  "api_key_used": true,
+  "sra_results": [
+    {
+      "search_label": "Nannochloropsis 16S amplicon outdoor",
+      "uid": "10688630",
+      "accession": "",
+      "title": "  <Summary><Title>16S amplicon:phycosphere bacteria of Nannochloropsis</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"87440\" total_bases=",
+      "total_runs": "                                <Run acc=\"SRR11638224\" total_spots=\"87440\" total_bases=\"51648058\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Nannochloropsis 16S amplicon outdoor",
+      "uid": "10688629",
+      "accession": "",
+      "title": "  <Summary><Title>16S amplicon:phycosphere bacteria of Nannochloropsis</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"73004\" total_bases=",
+      "total_runs": "                                <Run acc=\"SRR11638225\" total_spots=\"73004\" total_bases=\"42749620\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Nannochloropsis 16S amplicon outdoor",
+      "uid": "10688628",
+      "accession": "",
+      "title": "  <Summary><Title>16S amplicon:phycosphere bacteria of Nannochloropsis</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"62454\" total_bases=",
+      "total_runs": "                                <Run acc=\"SRR11638226\" total_spots=\"62454\" total_bases=\"36683008\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Nannochloropsis 16S amplicon outdoor",
+      "uid": "10688627",
+      "accession": "",
+      "title": "  <Summary><Title>16S amplicon:phycosphere bacteria of Nannochloropsis</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"65252\" total_bases=",
+      "total_runs": "                                <Run acc=\"SRR11638227\" total_spots=\"65252\" total_bases=\"37932202\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Nannochloropsis 16S amplicon outdoor",
+      "uid": "10688626",
+      "accession": "",
+      "title": "  <Summary><Title>16S amplicon:phycosphere bacteria of Nannochloropsis</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"71165\" total_bases=",
+      "total_runs": "                                <Run acc=\"SRR11638228\" total_spots=\"71165\" total_bases=\"41789408\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Nannochloropsis 16S amplicon outdoor",
+      "uid": "10688625",
+      "accession": "",
+      "title": "  <Summary><Title>16S amplicon:phycosphere bacteria of Nannochloropsis</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"33992\" total_bases=",
+      "total_runs": "                                <Run acc=\"SRR11638229\" total_spots=\"33992\" total_bases=\"14125377\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Nannochloropsis 16S amplicon outdoor",
+      "uid": "10688624",
+      "accession": "",
+      "title": "  <Summary><Title>16S amplicon:phycosphere bacteria of Nannochloropsis</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"36255\" total_bases=",
+      "total_runs": "                                <Run acc=\"SRR11638230\" total_spots=\"36255\" total_bases=\"20589430\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Nannochloropsis 16S amplicon outdoor",
+      "uid": "10688623",
+      "accession": "",
+      "title": "  <Summary><Title>16S amplicon:phycosphere bacteria of Nannochloropsis</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"128196\" total_bases",
+      "total_runs": "                                <Run acc=\"SRR11638231\" total_spots=\"128196\" total_bases=\"75408354\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Nannochloropsis 16S amplicon outdoor",
+      "uid": "10688622",
+      "accession": "",
+      "title": "  <Summary><Title>16S amplicon:phycosphere bacteria of Nannochloropsis</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"50287\" total_bases=",
+      "total_runs": "                                <Run acc=\"SRR11638232\" total_spots=\"50287\" total_bases=\"30015369\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Nannochloropsis 16S amplicon outdoor",
+      "uid": "10688621",
+      "accession": "",
+      "title": "  <Summary><Title>16S amplicon:phycosphere bacteria of Nannochloropsis</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"117378\" total_bases",
+      "total_runs": "                                <Run acc=\"SRR11638233\" total_spots=\"117378\" total_bases=\"69248084\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Nannochloropsis 16S amplicon outdoor",
+      "uid": "10688620",
+      "accession": "",
+      "title": "  <Summary><Title>16S amplicon:phycosphere bacteria of Nannochloropsis</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"150182\" total_bases",
+      "total_runs": "                                <Run acc=\"SRR11638234\" total_spots=\"150182\" total_bases=\"88695348\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Nannochloropsis 16S amplicon outdoor",
+      "uid": "10688619",
+      "accession": "",
+      "title": "  <Summary><Title>16S amplicon:phycosphere bacteria of Nannochloropsis</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"87990\" total_bases=",
+      "total_runs": "                                <Run acc=\"SRR11638235\" total_spots=\"87990\" total_bases=\"51946221\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Nannochloropsis 16S amplicon outdoor",
+      "uid": "10688618",
+      "accession": "",
+      "title": "  <Summary><Title>16S amplicon:phycosphere bacteria of Nannochloropsis</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"158754\" total_bases",
+      "total_runs": "                                <Run acc=\"SRR11638236\" total_spots=\"158754\" total_bases=\"94667235\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Nannochloropsis 16S amplicon outdoor",
+      "uid": "10688617",
+      "accession": "",
+      "title": "  <Summary><Title>16S amplicon:phycosphere bacteria of Nannochloropsis</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"72125\" total_bases=",
+      "total_runs": "                                <Run acc=\"SRR11638237\" total_spots=\"72125\" total_bases=\"42396061\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Nannochloropsis 16S amplicon outdoor",
+      "uid": "10688616",
+      "accession": "",
+      "title": "  <Summary><Title>16S amplicon:phycosphere bacteria of Nannochloropsis</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"74024\" total_bases=",
+      "total_runs": "                                <Run acc=\"SRR11638238\" total_spots=\"74024\" total_bases=\"43096759\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae pond microbiome 16S",
+      "uid": "11774633",
+      "accession": "",
+      "title": "  <Summary><Title>16S of metagenome: pond water</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"101197\" total_bases=\"59706230\" total_size=",
+      "total_runs": "                                <Run acc=\"SRR12576546\" total_spots=\"101197\" total_bases=\"59706230\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae pond microbiome 16S",
+      "uid": "11774632",
+      "accession": "",
+      "title": "  <Summary><Title>16S of metagenome: pond water</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"122868\" total_bases=\"72492120\" total_size=",
+      "total_runs": "                                <Run acc=\"SRR12576547\" total_spots=\"122868\" total_bases=\"72492120\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae pond microbiome 16S",
+      "uid": "11774631",
+      "accession": "",
+      "title": "  <Summary><Title>16S of metagenome: pond water</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"98669\" total_bases=\"58214710\" total_size=\"",
+      "total_runs": "                                <Run acc=\"SRR12576548\" total_spots=\"98669\" total_bases=\"58214710\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae pond microbiome 16S",
+      "uid": "11774630",
+      "accession": "",
+      "title": "  <Summary><Title>16S of metagenome: pond water</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"78421\" total_bases=\"46268390\" total_size=\"",
+      "total_runs": "                                <Run acc=\"SRR12576549\" total_spots=\"78421\" total_bases=\"46268390\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae pond microbiome 16S",
+      "uid": "11774629",
+      "accession": "",
+      "title": "  <Summary><Title>16S of metagenome: pond water</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"123240\" total_bases=\"72711600\" total_size=",
+      "total_runs": "                                <Run acc=\"SRR12576550\" total_spots=\"123240\" total_bases=\"72711600\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae pond microbiome 16S",
+      "uid": "11774628",
+      "accession": "",
+      "title": "  <Summary><Title>16S of metagenome: pond water</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"104323\" total_bases=\"61550570\" total_size=",
+      "total_runs": "                                <Run acc=\"SRR12576551\" total_spots=\"104323\" total_bases=\"61550570\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae pond microbiome 16S",
+      "uid": "11774627",
+      "accession": "",
+      "title": "  <Summary><Title>16S of metagenome: pond water</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"108031\" total_bases=\"63738290\" total_size=",
+      "total_runs": "                                <Run acc=\"SRR12576552\" total_spots=\"108031\" total_bases=\"63738290\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae pond microbiome 16S",
+      "uid": "11774626",
+      "accession": "",
+      "title": "  <Summary><Title>16S of metagenome: pond water</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"94890\" total_bases=\"55985100\" total_size=\"",
+      "total_runs": "                                <Run acc=\"SRR12576553\" total_spots=\"94890\" total_bases=\"55985100\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae pond microbiome 16S",
+      "uid": "11774625",
+      "accession": "",
+      "title": "  <Summary><Title>16S of metagenome: pond water</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"90656\" total_bases=\"53487040\" total_size=\"",
+      "total_runs": "                                <Run acc=\"SRR12576554\" total_spots=\"90656\" total_bases=\"53487040\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae pond microbiome 16S",
+      "uid": "11774624",
+      "accession": "",
+      "title": "  <Summary><Title>16S of metagenome: pond water</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"82277\" total_bases=\"48543430\" total_size=\"",
+      "total_runs": "                                <Run acc=\"SRR12576555\" total_spots=\"82277\" total_bases=\"48543430\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae pond microbiome 16S",
+      "uid": "11774623",
+      "accession": "",
+      "title": "  <Summary><Title>16S of metagenome: pond water</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"152207\" total_bases=\"89802130\" total_size=",
+      "total_runs": "                                <Run acc=\"SRR12576556\" total_spots=\"152207\" total_bases=\"89802130\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae pond microbiome 16S",
+      "uid": "11774622",
+      "accession": "",
+      "title": "  <Summary><Title>16S of metagenome: pond water</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"133211\" total_bases=\"78594490\" total_size=",
+      "total_runs": "                                <Run acc=\"SRR12576557\" total_spots=\"133211\" total_bases=\"78594490\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae pond microbiome 16S",
+      "uid": "11774621",
+      "accession": "",
+      "title": "  <Summary><Title>16S of metagenome: pond water</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"139651\" total_bases=\"82394090\" total_size=",
+      "total_runs": "                                <Run acc=\"SRR12576558\" total_spots=\"139651\" total_bases=\"82394090\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae pond microbiome 16S",
+      "uid": "11774620",
+      "accession": "",
+      "title": "  <Summary><Title>16S of metagenome: pond water</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"127506\" total_bases=\"75228540\" total_size=",
+      "total_runs": "                                <Run acc=\"SRR12576559\" total_spots=\"127506\" total_bases=\"75228540\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae pond microbiome 16S",
+      "uid": "11774619",
+      "accession": "",
+      "title": "  <Summary><Title>16S of metagenome: pond water</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"102207\" total_bases=\"60302130\" total_size=",
+      "total_runs": "                                <Run acc=\"SRR12576560\" total_spots=\"102207\" total_bases=\"60302130\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Marine aquaculture microbiome 16S",
+      "uid": "42955990",
+      "accession": "",
+      "title": "  <Summary><Title>Gut metagenome from spotted knifejaw (Oplegnathus punctatus) with slow growth rate, sample 5</Title><Platform instrument_model=\"Illumina NovaSeq 6000\">ILLUMINA</Platform><Statistics ",
+      "total_runs": "                                <Run acc=\"SRR37217444\" total_spots=\"104370\" total_bases=\"53437440\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Marine aquaculture microbiome 16S",
+      "uid": "42955989",
+      "accession": "",
+      "title": "  <Summary><Title>Gut metagenome from spotted knifejaw (Oplegnathus punctatus) with slow growth rate, sample 4</Title><Platform instrument_model=\"Illumina NovaSeq 6000\">ILLUMINA</Platform><Statistics ",
+      "total_runs": "                                <Run acc=\"SRR37217445\" total_spots=\"104797\" total_bases=\"53656064\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Marine aquaculture microbiome 16S",
+      "uid": "42955988",
+      "accession": "",
+      "title": "  <Summary><Title>Gut metagenome from spotted knifejaw (Oplegnathus punctatus) with slow growth rate, sample 3</Title><Platform instrument_model=\"Illumina NovaSeq 6000\">ILLUMINA</Platform><Statistics ",
+      "total_runs": "                                <Run acc=\"SRR37217446\" total_spots=\"103234\" total_bases=\"52855808\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Marine aquaculture microbiome 16S",
+      "uid": "42955987",
+      "accession": "",
+      "title": "  <Summary><Title>Gut metagenome from spotted knifejaw (Oplegnathus punctatus) with slow growth rate, sample 2</Title><Platform instrument_model=\"Illumina NovaSeq 6000\">ILLUMINA</Platform><Statistics ",
+      "total_runs": "                                <Run acc=\"SRR37217447\" total_spots=\"106339\" total_bases=\"54445568\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Marine aquaculture microbiome 16S",
+      "uid": "42955986",
+      "accession": "",
+      "title": "  <Summary><Title>Gut metagenome from spotted knifejaw (Oplegnathus punctatus) with slow growth rate, sample 1</Title><Platform instrument_model=\"Illumina NovaSeq 6000\">ILLUMINA</Platform><Statistics ",
+      "total_runs": "                                <Run acc=\"SRR37217448\" total_spots=\"106647\" total_bases=\"54603264\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Marine aquaculture microbiome 16S",
+      "uid": "42955985",
+      "accession": "",
+      "title": "  <Summary><Title>Gut metagenome from spotted knifejaw (Oplegnathus punctatus) with fast growth rate, sample 5</Title><Platform instrument_model=\"Illumina NovaSeq 6000\">ILLUMINA</Platform><Statistics ",
+      "total_runs": "                                <Run acc=\"SRR37217449\" total_spots=\"105580\" total_bases=\"54056960\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Marine aquaculture microbiome 16S",
+      "uid": "42955984",
+      "accession": "",
+      "title": "  <Summary><Title>Gut metagenome from spotted knifejaw (Oplegnathus punctatus) with fast growth rate, sample 4</Title><Platform instrument_model=\"Illumina NovaSeq 6000\">ILLUMINA</Platform><Statistics ",
+      "total_runs": "                                <Run acc=\"SRR37217450\" total_spots=\"104020\" total_bases=\"53258240\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Marine aquaculture microbiome 16S",
+      "uid": "42955983",
+      "accession": "",
+      "title": "  <Summary><Title>Gut metagenome from spotted knifejaw (Oplegnathus punctatus) with fast growth rate, sample 3</Title><Platform instrument_model=\"Illumina NovaSeq 6000\">ILLUMINA</Platform><Statistics ",
+      "total_runs": "                                <Run acc=\"SRR37217451\" total_spots=\"110665\" total_bases=\"56660480\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Marine aquaculture microbiome 16S",
+      "uid": "42955982",
+      "accession": "",
+      "title": "  <Summary><Title>Gut metagenome from spotted knifejaw (Oplegnathus punctatus) with fast growth rate, sample 2</Title><Platform instrument_model=\"Illumina NovaSeq 6000\">ILLUMINA</Platform><Statistics ",
+      "total_runs": "                                <Run acc=\"SRR37217452\" total_spots=\"102749\" total_bases=\"52607488\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Marine aquaculture microbiome 16S",
+      "uid": "42955981",
+      "accession": "",
+      "title": "  <Summary><Title>Gut metagenome from spotted knifejaw (Oplegnathus punctatus) with fast growth rate, sample 1</Title><Platform instrument_model=\"Illumina NovaSeq 6000\">ILLUMINA</Platform><Statistics ",
+      "total_runs": "                                <Run acc=\"SRR37217453\" total_spots=\"105449\" total_bases=\"53989888\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Marine aquaculture microbiome 16S",
+      "uid": "42736693",
+      "accession": "",
+      "title": "  <Summary><Title>G-SA-Control</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"45832\" total_bases=\"19987367\" total_size=\"12801166\" load_do",
+      "total_runs": "                                <Run acc=\"SRR37058350\" total_spots=\"45832\" total_bases=\"19987367\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Marine aquaculture microbiome 16S",
+      "uid": "42736692",
+      "accession": "",
+      "title": "  <Summary><Title>G-SA-LP</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"40596\" total_bases=\"23562012\" total_size=\"16127038\" load_done=\"t",
+      "total_runs": "                                <Run acc=\"SRR37058351\" total_spots=\"40596\" total_bases=\"23562012\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Marine aquaculture microbiome 16S",
+      "uid": "42736691",
+      "accession": "",
+      "title": "  <Summary><Title>G-SA-OE</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"49759\" total_bases=\"29720023\" total_size=\"19380788\" load_done=\"t",
+      "total_runs": "                                <Run acc=\"SRR37058352\" total_spots=\"49759\" total_bases=\"29720023\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Marine aquaculture microbiome 16S",
+      "uid": "42736690",
+      "accession": "",
+      "title": "  <Summary><Title>G-SA-OP</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"55738\" total_bases=\"32814085\" total_size=\"21493695\" load_done=\"t",
+      "total_runs": "                                <Run acc=\"SRR37058353\" total_spots=\"55738\" total_bases=\"32814085\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Marine aquaculture microbiome 16S",
+      "uid": "42410537",
+      "accession": "",
+      "title": "  <Summary><Title>16S amplicon sequencing; aquaculture setting tank</Title><Platform instrument_model=\"NextSeq 2000\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"377341\" total_bases=\"226",
+      "total_runs": "                                <Run acc=\"SRR36740202\" total_spots=\"377341\" total_bases=\"226707229\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Harmful algal bloom microbiome",
+      "uid": "42124527",
+      "accession": "",
+      "title": "  <Summary><Title>STERILIZED SEDIMENT</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"50230\" total_bases=\"30238460\" total_size=\"10058637\" ",
+      "total_runs": "                                <Run acc=\"SRR36492347\" total_spots=\"50230\" total_bases=\"30238460\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Harmful algal bloom microbiome",
+      "uid": "42124526",
+      "accession": "",
+      "title": "  <Summary><Title>STERILIZED SEDIMENT</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"57432\" total_bases=\"34574064\" total_size=\"11392361\" ",
+      "total_runs": "                                <Run acc=\"SRR36492348\" total_spots=\"57432\" total_bases=\"34574064\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Harmful algal bloom microbiome",
+      "uid": "42124525",
+      "accession": "",
+      "title": "  <Summary><Title>STERILIZED SEDIMENT</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"56760\" total_bases=\"34169520\" total_size=\"11332799\" ",
+      "total_runs": "                                <Run acc=\"SRR36492349\" total_spots=\"56760\" total_bases=\"34169520\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Harmful algal bloom microbiome",
+      "uid": "42124524",
+      "accession": "",
+      "title": "  <Summary><Title>STERILIZED SEDIMENT</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"63635\" total_bases=\"38308270\" total_size=\"12206370\" ",
+      "total_runs": "                                <Run acc=\"SRR36492350\" total_spots=\"63635\" total_bases=\"38308270\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Harmful algal bloom microbiome",
+      "uid": "42124523",
+      "accession": "",
+      "title": "  <Summary><Title>CONTROL</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"52239\" total_bases=\"31447878\" total_size=\"10448633\" load_done=\"t",
+      "total_runs": "                                <Run acc=\"SRR36492351\" total_spots=\"52239\" total_bases=\"31447878\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Harmful algal bloom microbiome",
+      "uid": "42124522",
+      "accession": "",
+      "title": "  <Summary><Title>CONTROL</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"50963\" total_bases=\"30679726\" total_size=\"10318028\" load_done=\"t",
+      "total_runs": "                                <Run acc=\"SRR36492352\" total_spots=\"50963\" total_bases=\"30679726\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Harmful algal bloom microbiome",
+      "uid": "42124521",
+      "accession": "",
+      "title": "  <Summary><Title>CONTROL</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"48049\" total_bases=\"28925498\" total_size=\"9708856\" load_done=\"tr",
+      "total_runs": "                                <Run acc=\"SRR36492353\" total_spots=\"48049\" total_bases=\"28925498\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Harmful algal bloom microbiome",
+      "uid": "42124520",
+      "accession": "",
+      "title": "  <Summary><Title>H-Ca</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"49481\" total_bases=\"29787562\" total_size=\"9915625\" load_done=\"true\"",
+      "total_runs": "                                <Run acc=\"SRR36492354\" total_spots=\"49481\" total_bases=\"29787562\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Harmful algal bloom microbiome",
+      "uid": "42124519",
+      "accession": "",
+      "title": "  <Summary><Title>H-Ca</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"48855\" total_bases=\"29410710\" total_size=\"9805564\" load_done=\"true\"",
+      "total_runs": "                                <Run acc=\"SRR36492355\" total_spots=\"48855\" total_bases=\"29410710\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Harmful algal bloom microbiome",
+      "uid": "42124518",
+      "accession": "",
+      "title": "  <Summary><Title>H-Ca</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"47909\" total_bases=\"28841218\" total_size=\"9499435\" load_done=\"true\"",
+      "total_runs": "                                <Run acc=\"SRR36492356\" total_spots=\"47909\" total_bases=\"28841218\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Harmful algal bloom microbiome",
+      "uid": "42124517",
+      "accession": "",
+      "title": "  <Summary><Title>H-Ca</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"52676\" total_bases=\"31710952\" total_size=\"10546193\" load_done=\"true",
+      "total_runs": "                                <Run acc=\"SRR36492357\" total_spots=\"52676\" total_bases=\"31710952\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Harmful algal bloom microbiome",
+      "uid": "42124516",
+      "accession": "",
+      "title": "  <Summary><Title>CONTROL</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"71095\" total_bases=\"42799190\" total_size=\"13697939\" load_done=\"t",
+      "total_runs": "                                <Run acc=\"SRR36492358\" total_spots=\"71095\" total_bases=\"42799190\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Harmful algal bloom microbiome",
+      "uid": "42124515",
+      "accession": "",
+      "title": "  <Summary><Title>H-Ca</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"51835\" total_bases=\"31204670\" total_size=\"10313007\" load_done=\"true",
+      "total_runs": "                                <Run acc=\"SRR36492359\" total_spots=\"51835\" total_bases=\"31204670\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Harmful algal bloom microbiome",
+      "uid": "42124514",
+      "accession": "",
+      "title": "  <Summary><Title>H-Ca</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"60518\" total_bases=\"36431836\" total_size=\"11972497\" load_done=\"true",
+      "total_runs": "                                <Run acc=\"SRR36492360\" total_spots=\"60518\" total_bases=\"36431836\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Harmful algal bloom microbiome",
+      "uid": "42124513",
+      "accession": "",
+      "title": "  <Summary><Title>L-Ca</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"54729\" total_bases=\"32946858\" total_size=\"10950019\" load_done=\"true",
+      "total_runs": "                                <Run acc=\"SRR36492361\" total_spots=\"54729\" total_bases=\"32946858\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae wastewater treatment microbiome",
+      "uid": "42222553",
+      "accession": "",
+      "title": "  <Summary><Title>sample CAD5</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"60330\" total_bases=\"36318660\" total_size=\"11200849\" load_don",
+      "total_runs": "                                <Run acc=\"SRR36580736\" total_spots=\"60330\" total_bases=\"36318660\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae wastewater treatment microbiome",
+      "uid": "42222552",
+      "accession": "",
+      "title": "  <Summary><Title>sample CAD4</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"69015\" total_bases=\"41547030\" total_size=\"12814067\" load_don",
+      "total_runs": "                                <Run acc=\"SRR36580737\" total_spots=\"69015\" total_bases=\"41547030\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae wastewater treatment microbiome",
+      "uid": "42222551",
+      "accession": "",
+      "title": "  <Summary><Title>sample CAD3</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"46585\" total_bases=\"28044170\" total_size=\"9736120\" load_done",
+      "total_runs": "                                <Run acc=\"SRR36580738\" total_spots=\"46585\" total_bases=\"28044170\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae wastewater treatment microbiome",
+      "uid": "42222550",
+      "accession": "",
+      "title": "  <Summary><Title>sample CAD2</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"50654\" total_bases=\"30493708\" total_size=\"10558639\" load_don",
+      "total_runs": "                                <Run acc=\"SRR36580739\" total_spots=\"50654\" total_bases=\"30493708\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae wastewater treatment microbiome",
+      "uid": "42222549",
+      "accession": "",
+      "title": "  <Summary><Title>sample CAD1</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"53793\" total_bases=\"32383386\" total_size=\"11209590\" load_don",
+      "total_runs": "                                <Run acc=\"SRR36580740\" total_spots=\"53793\" total_bases=\"32383386\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae wastewater treatment microbiome",
+      "uid": "30652052",
+      "accession": "",
+      "title": "  <Summary><Title>16S rRNA amplicons: PigM wastewater microbiome 1</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"121226\" total_bases=\"72",
+      "total_runs": "                                <Run acc=\"SRR26945955\" total_spots=\"121226\" total_bases=\"72561465\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae wastewater treatment microbiome",
+      "uid": "30652046",
+      "accession": "",
+      "title": "  <Summary><Title>16S rRNA amplicons: mWW wastewater microbiome 1</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"145274\" total_bases=\"868",
+      "total_runs": "                                <Run acc=\"SRR26945961\" total_spots=\"145274\" total_bases=\"86830896\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae wastewater treatment microbiome",
+      "uid": "30652045",
+      "accession": "",
+      "title": "  <Summary><Title>16S rRNA amplicons: BGE wastewater microbiome 3</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"178029\" total_bases=\"106",
+      "total_runs": "                                <Run acc=\"SRR26945962\" total_spots=\"178029\" total_bases=\"106530224\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae wastewater treatment microbiome",
+      "uid": "30652044",
+      "accession": "",
+      "title": "  <Summary><Title>16S rRNA amplicons: BGE wastewater microbiome 2</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"178093\" total_bases=\"106",
+      "total_runs": "                                <Run acc=\"SRR26945963\" total_spots=\"178093\" total_bases=\"106578839\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae wastewater treatment microbiome",
+      "uid": "30652043",
+      "accession": "",
+      "title": "  <Summary><Title>16S rRNA amplicons: BGE wastewater microbiome 1</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"170302\" total_bases=\"101",
+      "total_runs": "                                <Run acc=\"SRR26945964\" total_spots=\"170302\" total_bases=\"101898505\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae wastewater treatment microbiome",
+      "uid": "30652042",
+      "accession": "",
+      "title": "  <Summary><Title>16S rRNA amplicons: PigM wastewater microbiome 3</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"179337\" total_bases=\"10",
+      "total_runs": "                                <Run acc=\"SRR26945965\" total_spots=\"179337\" total_bases=\"107347285\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae wastewater treatment microbiome",
+      "uid": "30652033",
+      "accession": "",
+      "title": "  <Summary><Title>16S rRNA amplicons: PigM wastewater microbiome 2</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"176853\" total_bases=\"10",
+      "total_runs": "                                <Run acc=\"SRR26945974\" total_spots=\"176853\" total_bases=\"105866892\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae wastewater treatment microbiome",
+      "uid": "30652027",
+      "accession": "",
+      "title": "  <Summary><Title>16S rRNA amplicons: CattleM wastewater microbiome 3</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"189842\" total_bases=",
+      "total_runs": "                                <Run acc=\"SRR26945980\" total_spots=\"189842\" total_bases=\"113612420\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae wastewater treatment microbiome",
+      "uid": "30652018",
+      "accession": "",
+      "title": "  <Summary><Title>16S rRNA amplicons: mWW wastewater microbiome 3</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"122789\" total_bases=\"731",
+      "total_runs": "                                <Run acc=\"SRR26945989\" total_spots=\"122789\" total_bases=\"73164129\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    },
+    {
+      "search_label": "Algae wastewater treatment microbiome",
+      "uid": "30652017",
+      "accession": "",
+      "title": "  <Summary><Title>16S rRNA amplicons: mWW wastewater microbiome 2</Title><Platform instrument_model=\"Illumina MiSeq\">ILLUMINA</Platform><Statistics total_runs=\"1\" total_spots=\"103564\" total_bases=\"619",
+      "total_runs": "                                <Run acc=\"SRR26945990\" total_spots=\"103564\" total_bases=\"61936682\" load_done=\"true\" is_public=\"true\" cluster_name=\"public\" static_data_available=\"true\"/>                                ",
+      "total_bases": ""
+    }
+  ],
+  "bioproject_results": [
+    {
+      "search_label": "Algae raceway pond BioProject",
+      "uid": "628839",
+      "accession": "PRJNA628839",
+      "title": "Phycosphere bacterial communities of Nannochloropsis oceanica KB1 Raw sequence reads",
+      "description": "Phycosphere bacterial communities of KB1 cultured in algae raceway pond and laboratory were profiled using 16S amplicon sequencing.",
+      "organism": "Nannochloropsis oceanica",
+      "data_type": "Raw sequence reads"
+    },
+    {
+      "search_label": "Microalgae grazer interaction",
+      "uid": "1114688",
+      "accession": "PRJNA1114688",
+      "title": "Metabarcoding of microalgae (Nannochloropsis oculata) and rotifer (Brachionus plicatilis) cultures",
+      "description": "To detect, by amplicon sequencing of the V4 region of the 16S ribosomal RNA gene, potential pathogens and probiotics in microalgae (Nannochloropsis oculata) and rotifer (Brachionus plicatilis) cultures used as live feed and to determine if physicochemical parameters affect the relative abundance of ",
+      "organism": "",
+      "data_type": "Raw sequence reads"
+    },
+    {
+      "search_label": "Algae pond crash or contamination",
+      "uid": "1402673",
+      "accession": "PRJNA1402673",
+      "title": "Preliminary Study of Potential Hydrocarbon Degrading Bacteria Identified by 16S rRNA Sequencing in Haina Port Water Samples, Dominican Republic",
+      "description": "Abstract: Microorganisms live in a wide range of environments, performing diverse roles either independently or in association with other organisms forming consortia. This study is focused on those with the ability to bioremediate environments contaminated with petroleum hydrocarbons (PHCs), that is",
+      "organism": "",
+      "data_type": "Raw sequence reads"
+    },
+    {
+      "search_label": "Algae pond crash or contamination",
+      "uid": "1147426",
+      "accession": "PRJNA1147426",
+      "title": "Biodiversity of multi-trophic biological communities within riverine sediments impacted by PAHs contamination and land use changes",
+      "description": "The aims of this study are to clarify how the spread of PAHs and land use changes at the catchment scale in the watershed influence the distribution of whole community biodiversity in sediments of river ecosystem. In the present study, the spatial distribution of species across multi-trophic levels,",
+      "organism": "",
+      "data_type": "Raw sequence reads"
+    },
+    {
+      "search_label": "Algae pond crash or contamination",
+      "uid": "515018",
+      "accession": "PRJEB29709",
+      "title": "Harnessing the microalgae microbiome for biotechnology",
+      "description": "Microalgae find use as feedstock for biofuel production, as animal feed or as producers of high valuable compounds. Due to increasing industrial demand, microalgae are cultivated in large-scale production processes. However, contamination of microorganisms affects reproducibility and controllability",
+      "organism": "",
+      "data_type": "Other"
+    },
+    {
+      "search_label": "Cyanobacteria toxin microbiome",
+      "uid": "1423136",
+      "accession": "PRJNA1423136",
+      "title": "Microbial ephilitic and sediment benthic communities from the river Areuse (Switzerland)",
+      "description": "Toxic species within the benthic Microcoleus cyanobacterial genus pose significant ecological and public health risks due to the production of the potent neurotoxin anatoxin. In Switzerland, M. anatoxicus, a known producer of anatoxin derivatives, has caused several dog fatalities causing alarm amon",
+      "organism": "",
+      "data_type": "Raw sequence reads"
+    },
+    {
+      "search_label": "Cyanobacteria toxin microbiome",
+      "uid": "1419196",
+      "accession": "PRJNA1419196",
+      "title": "Limnofasciculus delicatus (Coleofasciculaceae, Coleofasciculales), a new mat-forming cyanobacterium from Shenandoah River, Virginia, USA",
+      "description": "Benthic cyanobacterial mat proliferations in flowing waters are increasing worldwide, threatening ecosystem stability as well as wildlife and domestic animals due to their high biomass and toxin production. These complex communities typically comprise a mixture of taxa from the orders Coleofascicula",
+      "organism": "",
+      "data_type": "Raw sequence reads"
+    },
+    {
+      "search_label": "Cyanobacteria toxin microbiome",
+      "uid": "1178324",
+      "accession": "PRJNA1178324",
+      "title": "Sewage-and fertilizer-derived nutrients alter the intensity, diversity, and toxicity of harmful cyanobacterial blooms in eutrophic lakes",
+      "description": "Cyanobacterial harmful algal blooms, CHABs, are promoted by excessive nutrient loading and, while fertilizers and sewage are the most prevalent external nutrient sources in most watersheds, the differential effects of these nutrient sources on CHABs are unknown. Here, we tracked CHABs and performed ",
+      "organism": "",
+      "data_type": "Raw sequence reads"
+    },
+    {
+      "search_label": "Cyanobacteria toxin microbiome",
+      "uid": "786865",
+      "accession": "PRJNA786865",
+      "title": "Prophylactic glucose addition to Lake water suppresses Cyanobacteria abundance",
+      "description": "To mitigate harmful cyanobacterial blooms (HCBs), toxic algicides have been used but alternative methods of HCBs prevention are needed. Our goal was to test the prophylactic addition of glucose to inhibit HCBs development, using Microcystis and the toxin microcystin as the HCBs model. Water samples ",
+      "organism": "",
+      "data_type": "Raw sequence reads"
+    },
+    {
+      "search_label": "Cyanobacteria toxin microbiome",
+      "uid": "784125",
+      "accession": "PRJNA784125",
+      "title": "Bacteria diversity in freshwater  of springfield Missouri",
+      "description": "Cyanobacteria-dominated harmful algal blooms (CyanoHABs) are increasing in occurrence worldwide. These blooms are of concern due to the production of cyanotoxins when appropriate for growing conditions. These toxins have a range of effects that can be harmful to human and wildlife health. Despite th",
+      "organism": "",
+      "data_type": "Raw sequence reads"
+    },
+    {
+      "search_label": "Cyanobacteria toxin microbiome",
+      "uid": "783712",
+      "accession": "PRJNA783712",
+      "title": "Cyano-bacteria diversity in Springfield Missouri (Cyano-specific primers)",
+      "description": "Cyanobacteria-dominated harmful algal blooms (CyanoHABs) are increasing in occurrence worldwide. These blooms are of concern due to the production of cyanotoxins when appropriate for growing conditions. These toxins have a range of effects that can be harmful to human and wildlife health. Despite th",
+      "organism": "",
+      "data_type": "Raw sequence reads"
+    },
+    {
+      "search_label": "Cyanobacteria toxin microbiome",
+      "uid": "752140",
+      "accession": "PRJNA752140",
+      "title": "Cyanotoxin Encoding Genes as a Powerful Marker to Predict Cyanotoxin Production during Cyanobacterial Harmful Algal Blooms: A Confirmation Study in an Inland Freshwater Lake",
+      "description": "Harmful algal blooms due to excessive growth of cyanobacteria frequently occur in inland freshwater lakes and significantly threaten water resources and public health. William H. Harsha Lake (Ohio, USA) has a history of serious algal blooms. To deeply understand the bacterial (especially cyanobacter",
+      "organism": "",
+      "data_type": "Raw sequence reads"
+    },
+    {
+      "search_label": "Cyanobacteria toxin microbiome",
+      "uid": "727470",
+      "accession": "PRJNA727470",
+      "title": "Freshwater lake Constance Cyanobacteria Raw sequence reads",
+      "description": "Freshwater autotroph primary producers play a key role in the well functioning of the ecosystem. They synthetise organic molecules form inorganic molecules and provide nutrient for higher trophic levels organisms. Freshwater primary producers are composed of algae, unicellular algae and Cyanobacteri",
+      "organism": "lake water metagenome",
+      "data_type": "Raw sequence reads"
+    },
+    {
+      "search_label": "Cyanobacteria toxin microbiome",
+      "uid": "690287",
+      "accession": "PRJEB28160",
+      "title": "Occurrence of Cyanobacteria and microcystins in hydroelectric reservoirs used for fish farming",
+      "description": "1. Cyanobacteria have become a concern due to a globally accelerated eutrophication and climate changes. Aquaculture is one of the contributing factors for eutrophication of freshwater. Cyanobacteria can produce toxins with diverse chemical structures and toxicological properties. The most well-know",
+      "organism": "",
+      "data_type": "Other"
+    },
+    {
+      "search_label": "Cyanobacteria toxin microbiome",
+      "uid": "668731",
+      "accession": "PRJEB39826",
+      "title": "Microbial communities in urban recreational surface waters in Bogot\u00e1, Colombia using Next Generation Sequencing",
+      "description": "Microbial communities in surface waters used for recreational purposes are indicators of contamination and risk of contact with human pathogens. Hence, monitoring microbial communities in recreational waters is important for public health. Such monitoring is rare in Colombia, even in its capital, Bo",
+      "organism": "",
+      "data_type": "Other"
+    },
+    {
+      "search_label": "Cyanobacteria toxin microbiome",
+      "uid": "603838",
+      "accession": "PRJNA603838",
+      "title": "Molecular and morphological characterization of a novel dihydroanatoxin-a producing Microcoleus species (cyanobacteria) from the Russian River, California, USA",
+      "description": "Reports of anatoxin-a poisoning of wildlife and domestic animals by toxigenic cyanobacteria in streams and rivers are increasing globally. Little is known about the taxonomy, morphology and genomics of anatoxin-a producing species, limiting our knowledge about their environmental preferences. We iso",
+      "organism": "",
+      "data_type": "Genome sequencing and assembly"
+    },
+    {
+      "search_label": "Cyanobacteria toxin microbiome",
+      "uid": "595680",
+      "accession": "PRJEB27854",
+      "title": "Rapid assessment of phytoplankton assemblages using Next Generation Sequencing \u2013 Barcode of Life database: a widely applicable toolkit to monitor biodiversity and harmful algal blooms (HABs)",
+      "description": "Harmful algal blooms have important implications for the health, functioning and services of aquatic ecosystems. Our ability to detect and monitor these events is often challenged by the lack of rapid and cost-effective methods to identify bloom-forming organisms and their potential for toxin produc",
+      "organism": "",
+      "data_type": "Other"
+    },
+    {
+      "search_label": "Cyanobacteria toxin microbiome",
+      "uid": "516219",
+      "accession": "PRJNA516219",
+      "title": "Deciphering the effects of nitrogen, phosphorus, and temperature on cyanobacterial bloom intensification, diversity, and toxicity in western Lake Erie",
+      "description": "To gain further insight into the relationships between phytoplankton community dynamics, microcystin production, and environmental drivers, we used next generation amplicon sequencing (NGS) to evaluate changes in western Lake Erie cyanobacterial assemblages in response to natural and experimental gr",
+      "organism": "",
+      "data_type": "Raw sequence reads"
+    },
+    {
+      "search_label": "Cyanobacteria toxin microbiome",
+      "uid": "509557",
+      "accession": "PRJNA509557",
+      "title": "MICROALGAE IN TWO FRESHWATER LAKES AND AN ESTUARY AS A RESULT OF GROUNDWATER CONTAMINATION FROM HOUSEHOLDS",
+      "description": "The increasing incidence of cyanobacterial blooms in Southern African aquatic systems is raising concern about the potential for these microorganisms to contaminate potable water with toxic secondary metabolites. This study focused on two lakes, an estuary and the sea in a small rain-fed catchment i",
+      "organism": "",
+      "data_type": "Raw sequence reads"
+    },
+    {
+      "search_label": "Cyanobacteria toxin microbiome",
+      "uid": "416393",
+      "accession": "PRJNA416393",
+      "title": "Comparison of bacterial 16S rRNA variable regions in cyanobacteria",
+      "description": "Cyanobacteria blooms in freshwater often pose a threat to public health and the environment due to toxin production or taste and odour problems. Blooms can be caused by various genera of cyanobacteria and thus, characterization of the cyanobacterial community becomes critical. a mock community conta",
+      "organism": "",
+      "data_type": "Targeted loci environmental"
+    },
+    {
+      "search_label": "Chlorella or Spirulina microbiome",
+      "uid": "1218151",
+      "accession": "PRJEB85081",
+      "title": "This study explores the use of Spirulina spp. as a biofertilizer for Coriandrum sativum, focusing on its biostimulant effects. Soil samples treated with Spirulina biofertilizer were analyzed through m",
+      "description": "Spirulina, a genus of cyanobacteria, is gaining recognition as a promising biofertilizer due to its unique characteristics and potential biostimulant effects on plant growth. This study focuses on isolating, identifying, and producing a liquid biofertilizer from Spirulina spp. with the main objectiv",
+      "organism": "",
+      "data_type": "Other"
+    },
+    {
+      "search_label": "Chlorella or Spirulina microbiome",
+      "uid": "1136881",
+      "accession": "PRJNA1136881",
+      "title": "Sea cucumber grazing impacts on the reef sediment microbiome",
+      "description": "The activity of the sea cucumber Holothuria atra increases the survival of reef building corals. This study used metagenomic and 16S rRNA gene sequencing to characterize changes to the reef sediment microbiome that may contribute to increased coral survival.",
+      "organism": "",
+      "data_type": "Genome sequencing"
+    }
+  ]
+}

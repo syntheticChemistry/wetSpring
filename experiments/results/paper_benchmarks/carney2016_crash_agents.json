@@ -1,0 +1,53 @@
+{
+  "paper": {
+    "title": "Pond Crash Forensics: Presumptive identification of pond crash agents",
+    "authors": "Carney et al.",
+    "year": 2016,
+    "doi": "10.1016/j.algal.2016.05.011",
+    "journal": "Algal Research",
+    "lab": "Sandia National Laboratories"
+  },
+  "sequencing": {
+    "method": "16S rRNA amplicon",
+    "total_reads": "160M+",
+    "platform": "Illumina",
+    "raw_reads_in_sra": false,
+    "raw_reads_location": "NOT deposited (DOE/Sandia restricted)"
+  },
+  "crash_agents_identified": [
+    {
+      "organism": "Brachionus plicatilis",
+      "type": "rotifer/grazer",
+      "detection_method": "16S + microscopy",
+      "impact": "Can consume 200 algal cells/minute, doubles in 1-2 days",
+      "notes": "Marine rotifer, primary crash agent"
+    },
+    {
+      "organism": "Chaetonotus",
+      "type": "gastrotrich/grazer",
+      "detection_method": "16S",
+      "impact": "Algae consumption",
+      "notes": "Freshwater/brackish gastrotrich"
+    },
+    {
+      "organism": "Various bacteria",
+      "type": "pathogenic bacteria",
+      "detection_method": "16S",
+      "impact": "Bacteriome disruption",
+      "notes": "Multiple species contribute to crashes"
+    }
+  ],
+  "key_findings": {
+    "crash_loss_estimate": "30% of annualized algal production",
+    "detection_method": "RapTOR-adapted 16S metagenomics",
+    "culture_system": "Open raceway ponds",
+    "algae_species": "Nannochloropsis/Microchloropsis salina"
+  },
+  "validation_targets": {
+    "description": "What a pipeline should detect on algae-pond crash datasets",
+    "crash_indicator_taxa": ["Brachionus", "Chaetonotus"],
+    "crash_associated_phyla": ["Rotifera", "Gastrotricha"],
+    "healthy_dominant_phyla": ["Proteobacteria", "Bacteroidetes"],
+    "notes": "A validated pipeline should detect rotifer/grazer sequences when present and resolve them to genus. Crash events show taxonomic shift from healthy bacteriome to grazer-dominated."
+  }
+}

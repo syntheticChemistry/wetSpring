@@ -70,6 +70,26 @@ path = "src/bin/validate_features.rs"
 name = "validate_peaks"
 path = "src/bin/validate_peaks.rs"
 
+# ── 16S pipeline validation binary (dada2/chimera/taxonomy/unifrac) ──
+[[bin]]
+name = "validate_16s_pipeline"
+path = "src/bin/validate_16s_pipeline.rs"
+
+# ── Algae pond 16S validation binary (Exp012, paper proxy) ───────
+[[bin]]
+name = "validate_algae_16s"
+path = "src/bin/validate_algae_16s.rs"
+
+# ── VOC peak validation binary (Exp013, Reese 2019) ─────────────
+[[bin]]
+name = "validate_voc_peaks"
+path = "src/bin/validate_voc_peaks.rs"
+
+# ── Public data benchmark validation (Exp014, PRJNA1114688) ──────
+[[bin]]
+name = "validate_public_benchmarks"
+path = "src/bin/validate_public_benchmarks.rs"
+
 # ── GPU validation binaries (require --features gpu) ─────────────
 [[bin]]
 name = "validate_diversity_gpu"

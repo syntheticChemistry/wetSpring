@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-18
+**Updated**: 2026-02-19
 
 ---
 
@@ -23,6 +23,10 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 008 | PFAS ML Water Monitoring | 2 | NOT STARTED | Michigan DEQ data | — | — |
 | 009 | [Feature Pipeline](009_feature_pipeline_validation.md) | 2 | DONE | asari 1.13.1 (MT02) | bio::eic, bio::signal, bio::feature_table | 9 |
 | 010 | [Peak Detection](010_peak_detection_validation.md) | cross | DONE | scipy.signal.find_peaks | bio::signal | 17 |
+| 011 | 16S Pipeline End-to-End | 1 | DONE | DADA2/UCHIME/RDP/UniFrac | bio::dada2, bio::chimera, bio::taxonomy, bio::unifrac, bio::derep, bio::diversity | 37 |
+| 012 | [Algae Pond 16S](012_algae_pond_16s_validation.md) | 1 | DONE | PRJNA488170 (real NCBI data) | io::fastq, bio::quality, bio::derep, bio::dada2, bio::chimera, bio::taxonomy, bio::unifrac, bio::diversity | 29 |
+| 013 | [VOC Peak Validation](013_voc_peak_validation.md) | 1/cross | DONE | Reese 2019 Table 1 (PMC6761164) | bio::signal, bio::tolerance_search | 22 |
+| 014 | [Public Data Benchmarks](014_public_data_benchmarks.md) | 1 | DONE | 10 samples, 4 BioProjects vs paper ground truth | io::fastq, bio::quality, bio::derep, bio::dada2, bio::diversity | 97 |
 
 ---
 
@@ -60,6 +64,17 @@ experiments/
     │   ├── noisy_with_spikes.dat       ← test vector (1000 points, 3 peaks)
     │   ├── overlapping_peaks.dat       ← test vector (200 points, 1 peak)
     │   └── monotonic_no_peaks.dat      ← test vector (100 points, 0 peaks)
+    ├── 013_voc_baselines/
+    │   └── reese2019_table1.tsv        ← 14 VOC compounds from Reese 2019
+    ├── paper_benchmarks/
+    │   ├── README.md                    ← benchmark strategy
+    │   ├── humphrey2023_bacteriome.tsv  ← 18 OTUs, core genera
+    │   ├── humphrey2023_metrics.json    ← community profile, validation targets
+    │   ├── carney2016_crash_agents.json ← crash agents, detection methods
+    │   ├── reese2019_voc_biomarkers.json← 14 VOC compounds, RI values
+    │   └── reichardt2020_spectroradiometric.json ← organisms, methods
+    ├── ncbi_dataset_search/
+    │   └── ncbi_search_results.json     ← NCBI Entrez search results
     └── track2_validation_report.json   ← combined Track 2 validation
 ```
 
@@ -74,15 +89,19 @@ thresholds from `src/tolerances.rs`.
 | Binary | Experiment | Checks | Command |
 |--------|------------|--------|---------|
 | `validate_fastq` | 001 | 28 | `cargo run --bin validate_fastq` |
-| `validate_diversity` | 001/004 | 18 | `cargo run --bin validate_diversity` |
+| `validate_diversity` | 001/004 | 27 | `cargo run --bin validate_diversity` |
 | `validate_mzml` | 005 | 7 | `cargo run --bin validate_mzml` |
 | `validate_pfas` | 006 | 10 | `cargo run --bin validate_pfas` |
 | `validate_features` | 009 | 9 | `cargo run --bin validate_features` |
 | `validate_peaks` | 010 | 17 | `cargo run --bin validate_peaks` |
 | `validate_diversity_gpu` | — | 38 | `cargo run --features gpu --bin validate_diversity_gpu` |
+| `validate_16s_pipeline` | 011 | 37 | `cargo run --bin validate_16s_pipeline` |
+| `validate_algae_16s` | 012 | 29 | `cargo run --bin validate_algae_16s` |
+| `validate_voc_peaks` | 013 | 22 | `cargo run --bin validate_voc_peaks` |
+| `validate_public_benchmarks` | 014 | 97 | `cargo run --bin validate_public_benchmarks` |
 | `benchmark_cpu_gpu` | — | — | `cargo run --release --features gpu --bin benchmark_cpu_gpu` |
 
-**Total validation checks**: 127 (89 CPU + 38 GPU)
+**Total validation checks**: 321 (283 CPU + 38 GPU)
 
 ---
 

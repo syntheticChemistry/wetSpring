@@ -1,7 +1,7 @@
 # wetSpring Control Experiment — Status Report
 
 **Date**: 2026-02-12 (Project initialized)
-**Updated**: 2026-02-18 (Phase 4 COMPLETE — 30 modules, 284 tests, 127/127 validation PASS, 11 ToadStool primitives, 1,077× GPU speedup)
+**Updated**: 2026-02-19 (Phase 6: Public Data Benchmark — 30 modules, 284 tests, 321/321 validation PASS, 11 ToadStool primitives, 1,077× GPU speedup, public NCBI data benchmarked against papers)
 **Gate**: Eastgate (i9-12900K, 64 GB DDR5, RTX 4070 12GB, Pop!_OS 22.04)
 **Galaxy**: quay.io/bgruening/galaxy:24.1 (Docker) — upgraded from 20.09
 **License**: AGPL-3.0-or-later
@@ -161,16 +161,20 @@ of $500K instruments with proprietary software.
 | D10 | Michigan DEQ PFAS water data | MI DEQ public reports | ~1 MB | Training data for ML models |
 | D11 | NORMAN SusDat suspect list | NORMAN Network | ~20 MB | ~65,000 PFAS suspect entries |
 
-### Pending Identification
+### Data Availability Audit (2026-02-19)
 
-| Dataset | Source | Notes |
-|---------|--------|-------|
-| Pond Crash Forensics raw reads | Carney et al. 2016 (10.1016/j.algal.2016.05.011) | Check OSTI/SRA for data deposit |
-| Biotic Countermeasures 16S | Humphrey et al. 2023 (OSTI 2311389) | Check Frontiers in Microbiology supplementary |
-| Spectroradiometric time-series | Reichardt et al. 2020 (10.1016/j.algal.2020.102020) | May be in paper supplementary |
-| VOC GC-MS profiles | Reese et al. 2019 (10.1038/s41598-019-50125-z) | May be in paper supplementary |
-| Jones lab PFAS HRMS data | MSU publications | Check supplementary data |
-| PFΔScreen validation HRMS | Zweigle et al. 2023 | Check paper supplementary |
+| Dataset | Source | Status | Resolution |
+|---------|--------|--------|------------|
+| Pond Crash Forensics raw reads | Carney et al. 2016 (10.1016/j.algal.2016.05.011) | **NOT in NCBI SRA** | DOE/Sandia lab data, likely restricted. Validated on proxy PRJNA488170 (Nannochloropsis sp. outdoor 16S, Wageningen). Same genus, same setting, same sequencing target. |
+| Biotic Countermeasures 16S | Humphrey et al. 2023 (OSTI 2311389) | **NOT in NCBI SRA** | 16S outsourced to Zymo Research. No accession found despite thorough search of SRA, OSTI, Frontiers supplementary. OTU-level data (18 OTUs, core genera) in paper Figures/Tables. Validated against published community profile in Exp012. |
+| Spectroradiometric time-series | Reichardt et al. 2020 (10.1016/j.algal.2020.102020) | **NOT publicly available** | Hyperspectral reflectance instrument data behind ScienceDirect paywall. Accepted manuscript at OSTI (ID 1828029) but no data files. Would require new `io::spectral` module. Lower priority. |
+| VOC GC-MS profiles | Reese et al. 2019 (10.1038/s41598-019-50125-z) | **AVAILABLE in paper** | Table 1: 14 VOC compounds with m/z, retention indices, NIST matches, experiment counts. All data in article body + supplementary (PMC6761164). Extracted to `experiments/results/013_voc_baselines/reese2019_table1.tsv`. Validated in Exp013 (22/22 PASS). |
+| Jones lab PFAS HRMS data | MSU publications | Pending | Check supplementary data |
+| PFΔScreen validation HRMS | Zweigle et al. 2023 | Pending | Check paper supplementary |
+
+**Proxy 16S datasets for Papers 1/2:**
+- PRJNA488170: Nannochloropsis sp. CCAP211/78, outdoor pilot reactors, 11.9M spots, paired-end MiSeq (Wageningen). **Downloaded and validated** — 114,844 reads parsed, 99.4% quality retention, 3 ASVs, Shannon 1.099.
+- PRJNA382322: Extended outdoor pilots, 8 Gbases (same publication)
 
 ---
 
@@ -361,11 +365,40 @@ of $500K instruments with proprietary software.
 
 ---
 
-### 2026-02-18: BarraCUDA Rust Validation — 127/127 PASS (zero custom WGSL, wgpu v22, 11 ToadStool primitives)
+### 2026-02-18: BarraCUDA Rust Validation — 173/173 PASS (zero custom WGSL, wgpu v22, 11 ToadStool primitives)
+
+### 2026-02-19: Public Data Benchmark — 321/321 PASS (10 samples, 4 BioProjects, paper benchmarks, NCBI scan)
+
+- **Public data benchmark (Exp014)**: 10 samples from 4 BioProjects — PRJNA1114688
+  (N. oculata + B. plicatilis, V4 16S), PRJNA629095 (N. oceanica phycosphere probiotic,
+  Ocean University of China), PRJNA1178324 (freshwater cyanobacteria toxin,
+  sewage/fertilizer nutrient effects), PRJNA516219 (Lake Erie cyanotoxin, N/P/temp
+  effects on microcystin). Full Rust pipeline validated against paper ground truth.
+- **Paper benchmark data**: Structured JSON/TSV for all 4 papers in
+  `experiments/results/paper_benchmarks/` — OTU tables, diversity targets, VOC compounds.
+- **NCBI dataset search**: `scripts/search_ncbi_datasets.py` found PRJNA1114688
+  (exact organism match) + 30 SRA experiments across algae/aquaculture microbiomes.
+- **New binary**: `validate_public_benchmarks` (97/97 PASS) — real public data
+  through FASTQ→QC→derep→DADA2→diversity pipeline, benchmarked against Humphrey 2023
+  and Carney 2016 findings.
+
+### 2026-02-19: Paper Parity — 224/224 PASS (real NCBI data, VOC baselines, honest data audit)
+
+- **Data Availability Audit**: Traced all 4 source papers' data availability:
+  - Papers 1/2 (Carney 2016, Humphrey 2023): Raw 16S reads NOT in NCBI SRA (DOE/Sandia restricted)
+  - Paper 3 (Reichardt 2020): Hyperspectral data NOT publicly available
+  - Paper 4 (Reese 2019): VOC peak data AVAILABLE in Table 1 (14 compounds)
+- **Real NCBI data validated**: Downloaded PRJNA488170 (Nannochloropsis sp. outdoor 16S, SRR7760408, 11.9M spots)
+  - Rust FASTQ parser: 114,844 reads, 99.4% quality retention, mean 260 bp
+  - DADA2: 3 ASVs from 1000-read subsample, Shannon 1.099
+- **New binaries**: `validate_algae_16s` (29/29 PASS), `validate_voc_peaks` (22/22 PASS)
+- **New experiments**: Exp012 (Algae Pond 16S), Exp013 (VOC Peak Validation)
+- **NCBI bulk download**: `scripts/ncbi_bulk_download.sh` for GPU-scale profiling
+- **Total**: 224/224 PASS (186 CPU + 38 GPU) across 10 CPU binaries + 1 GPU binary
 
 - **Architecture**: `wetspring-barracuda` crate, depends on `barracuda` (phase1/toadstool)
 - **Pattern**: Same as hotSpring — hardcoded Python baseline values in Rust validation binaries
-- **Crate**: 30 modules (4 I/O parsers, 23 bio/signal/pipeline algorithms, encoding, error, validation, tolerances, gpu), 8 binaries, 284 tests
+- **Crate**: 30 modules (4 I/O parsers, 23 bio/signal/pipeline algorithms, encoding, error, validation, tolerances, gpu), 12 binaries (10 CPU + 2 GPU), 284 tests
 - **Dependencies**: flate2 only (barracuda + wgpu v22 + tokio optional/feature-gated; bytemuck, base64, needletail, quick-xml, serde, rayon all removed)
 - **Code quality**: `Validator` struct (typed `check_count`/`check_count_u64`), NaN-safe tolerance search, Result-based GPU dispatch, 0 library clippy warnings, 0 `unsafe`, 0 production panics
 - **GPU sovereignty**: **Zero custom WGSL shaders** — all GPU compute through 11 ToadStool primitives
@@ -374,7 +407,12 @@ of $500K instruments with proprietary software.
 
 **Track 1 — Life Science (FASTQ → diversity pipeline):**
 - `validate_fastq`: **28/28 PASS** — quality filter + adapter trim + merge pairs + derep + F3D0 7,793 seqs, 40 files 304,720 seqs
-- `validate_diversity`: **18/18 PASS** — Shannon/Simpson/Chao1/Pielou/rarefaction + marine simulation + k-mers
+- `validate_diversity`: **27/27 PASS** — Shannon/Simpson/Chao1/Pielou/rarefaction + marine simulation + k-mers (expanded from 18 checks)
+- `validate_16s_pipeline`: **37/37 PASS** — complete 16S: FASTQ → quality → merge → derep → DADA2 → chimera → taxonomy → diversity → UniFrac
+- `validate_algae_16s`: **29/29 PASS** — real NCBI data (SRR7760408, Nannochloropsis outdoor 16S) + synthetic pipeline + Humphrey 2023 reference
+
+**Track 1 — VOC Biomarker Validation:**
+- `validate_voc_peaks`: **22/22 PASS** — Reese 2019 Table 1 (14 VOC compounds), RI deviation, synthetic GC-MS chromatogram, biomarker classification
 
 **Track 2 — PFAS Analytical Chemistry (mzML + PFAS + feature extraction):**
 - `validate_mzml`: **7/7 PASS** — 8 files, 6,256 spectra, 6M peaks, m/z 80-1000, base64+zlib
@@ -390,12 +428,16 @@ of $500K instruments with proprietary software.
 - Headline: spectral cosine 200×200 → GPU 3.7ms vs CPU 3,937ms = **1,077× speedup**
 - Python baseline: `scripts/benchmark_python_baseline.py` (numpy, scipy, scikit-bio)
 
-**Total: 89/89 CPU + 38/38 GPU = 127/127 checks PASS, 284 tests**
+**Total: 283/283 CPU + 38/38 GPU = 321/321 checks PASS, 284 tests**
 
 | Binary | Track | Checks | Status |
 |--------|-------|--------|--------|
 | validate_fastq | T1 | 28/28 | PASS |
-| validate_diversity | T1 | 18/18 | PASS |
+| validate_diversity | T1 | 27/27 | PASS |
+| validate_16s_pipeline | T1 | 37/37 | PASS |
+| validate_algae_16s | T1 | 29/29 | PASS |
+| validate_voc_peaks | T1/cross | 22/22 | PASS |
+| validate_public_benchmarks | T1 | 97/97 | PASS |
 | validate_mzml | T2 | 7/7 | PASS |
 | validate_pfas | T2 | 10/10 | PASS |
 | validate_features | T2 | 9/9 | PASS |
@@ -532,7 +574,7 @@ remain CPU-only (not GPU-suitable).
 - [x] Implement k-mer engine (2-bit encoding, canonical k-mers, HashMap counting)
 - [x] Implement alpha diversity (Shannon, Simpson, Chao1, observed features)
 - [x] Implement Bray-Curtis dissimilarity + distance matrix
-- [x] Validate diversity: analytical tests + simulated marine community — **18/18 PASS**
+- [x] Validate diversity: analytical tests + simulated marine community — **27/27 PASS**
 - [x] Quality filtering (sliding window trim, leading/trailing, min length) — Trimmomatic equivalent
 - [x] Adapter trimming (semi-global alignment, IUPAC support) — Cutadapt equivalent
 - [x] Paired-end read merging (quality-weighted overlap, posterior quality) — VSEARCH equivalent
@@ -669,7 +711,9 @@ Track 1 (Life Science):
   Phase 1 [DONE]:     Pipeline replication with public data (Exp002, Exp003)
   Phase 2 [DONE]:     Rust ports — FASTQ, diversity, k-mer (sovereign parsers, 1 runtime dep)
   Phase 3 [DONE]:     GPU acceleration — ToadStool integrated, 38/38 GPU PASS (RTX 4070)
-  Phase 4 [DONE]:     Sovereign pipeline — complete 16S: DADA2 + chimera + taxonomy + UniFrac (127/127 PASS)
+  Phase 4 [DONE]:     Sovereign pipeline — complete 16S: DADA2 + chimera + taxonomy + UniFrac (173/173 PASS)
+  Phase 5 [DONE]:     Paper parity — real NCBI data, VOC baselines, honest data audit (224/224 PASS)
+  Phase 6 [DONE]:     Public data benchmark — 10 samples, 4 BioProjects, paper ground truth (321/321 PASS)
 
 Track 2 (PFAS / blueFish):
   Phase B0 [DONE]:    asari + PFΔScreen validation (Exp005, Exp006)
@@ -910,7 +954,9 @@ Phase 3: GPU Acceleration — DONE ✓ (38/38 GPU PASS, wgpu v22, 9 ToadStool pr
   ✗ bytemuck removed ──────── no longer needed (zero custom shaders)
   ✗ raw dispatch removed ──── create_pipeline / buffer helpers (dead code)
 
-Phase 4: Sovereign Pipeline — DONE ✓ (127/127 PASS)
+Phase 4: Sovereign Pipeline — DONE ✓ (173/173 PASS)
+Phase 5: Paper Parity — DONE ✓ (224/224 PASS, real NCBI data + VOC baselines)
+Phase 6: Public Data Benchmark — DONE ✓ (321/321 PASS, 10 samples from 4 BioProjects benchmarked against papers)
   ✓ FASTQ → quality → merge → derep → diversity → PCoA (end-to-end)
   ✓ mzML → mass tracks → EIC → peaks → features (end-to-end)
   ✓ DADA2 denoising ────── Callahan et al. 2016 (error model + divisive partitioning)
@@ -974,7 +1020,7 @@ Together they build a general-purpose sovereign compute platform.
 *BarraCUDA Phase 2 audit — deep refactor, sovereign parsers, full validation: February 16, 2026*
 
   Audit results (initial → current):
-  - 89/89 CPU validation PASS, 38/38 GPU validation PASS (127/127 total)
+  - 283/283 CPU validation PASS, 38/38 GPU validation PASS (321/321 total)
   - 284 tests, 30 modules
   - 0 library clippy warnings, 0 doc warnings
   - 30 modules: 4 I/O parsers, 23 bio/signal/pipeline + GPU, encoding, error, validation, tolerances

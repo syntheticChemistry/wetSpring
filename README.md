@@ -28,9 +28,9 @@ kernels useful far beyond their original domain.
 ```
 wetspring-barracuda v0.1.0
   284 tests, 30 modules, 0 clippy pedantic warnings
-  89/89 CPU validation checks PASS
+  283/283 CPU validation checks PASS (incl. real public NCBI data benchmarked against papers)
   38/38 GPU validation checks PASS
-  127/127 total quantitative checks PASS
+  321/321 total quantitative checks PASS
   1 runtime dep (flate2); GPU deps feature-gated (barracuda, wgpu v22, tokio)
   11 ToadStool GPU primitives, 0 custom WGSL shaders
   Sovereign parsers: FASTQ, mzML/XML, MS2, base64 — all in-tree
@@ -253,7 +253,7 @@ machine learning"** (MSU Center for PFAS Research)
 - Kendrick mass defect analysis + PFAS homologue grouping
 - GPU-promoted EIC extraction + batch peak integration
 - GPU-promoted rarefaction with bootstrap confidence intervals
-- **89/89 CPU + 38/38 GPU = 127/127 validation checks PASS**
+- **283/283 CPU + 38/38 GPU = 321/321 validation checks PASS** (public NCBI data benchmarked against papers)
 
 ### Track 2: PFAS Analytical Chemistry — blueFish (Phases B0-B4)
 
@@ -321,7 +321,10 @@ wetSpring/
         xml.rs              —   Minimal XML pull parser (for mzML)
       bin/                  — Validation + benchmark binaries (hotSpring pattern: pass/fail, exit 0/1)
         validate_fastq.rs   —   28/28 checks: quality + merge + derep + Galaxy FastQC
-        validate_diversity.rs — 18/18 checks: analytical + simulated + evenness + rarefaction
+        validate_diversity.rs — 27/27 checks: analytical + simulated + evenness + rarefaction (expanded from 18)
+        validate_16s_pipeline.rs — 37/37 checks: complete 16S FASTQ→DADA2→chimera→taxonomy→diversity→UniFrac
+        validate_algae_16s.rs — 29/29 checks: real NCBI data (PRJNA488170) + Humphrey 2023 reference
+        validate_voc_peaks.rs — 22/22 checks: Reese 2019 VOC baselines + synthetic GC-MS + RI matching
         validate_mzml.rs    —   7/7 checks vs asari/pyteomics baseline
         validate_pfas.rs    —   10/10 checks: cosine + KMD + FindPFAS
         validate_features.rs —  9/9 checks: EIC + peaks + features vs asari (Exp009)

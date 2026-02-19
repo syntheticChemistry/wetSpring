@@ -1,7 +1,7 @@
 # Evolution Readiness — Rust Module → WGSL Shader → Pipeline Stage
 
-**Date**: 2026-02-18
-**Status**: Phase 4 COMPLETE — 30 modules, 284 tests, 127/127 validation PASS, 11 ToadStool primitives, 0 custom WGSL shaders
+**Date**: 2026-02-19
+**Status**: Phase 6 COMPLETE — 30 modules, 284 tests, 321/321 validation PASS, 11 ToadStool primitives, 0 custom WGSL shaders, public NCBI data benchmarked against papers
 
 ---
 
@@ -146,12 +146,16 @@ GPU modules require `--features gpu` and are validated by `validate_diversity_gp
 | Binary | Checks | Status | Data Source |
 |--------|--------|--------|-------------|
 | `validate_fastq` | 28/28 | PASS | Quality filtering + merge pairs + derep + Zenodo 800651 (MiSeq SOP) |
-| `validate_diversity` | 18/18 | PASS | Analytical + simulated + evenness + rarefaction |
+| `validate_diversity` | 27/27 | PASS | Analytical + simulated + evenness + rarefaction (expanded from 18 checks) |
+| `validate_16s_pipeline` | 37/37 | PASS | Complete 16S: FASTQ → quality → merge → derep → DADA2 → chimera → taxonomy → diversity → UniFrac |
 | `validate_mzml` | 7/7 | PASS | shuzhao-li-lab/data (MT02) |
 | `validate_pfas` | 10/10 | PASS | Cosine similarity + KMD + FindPFAS (external data optional) |
 | `validate_features` | 9/9 | PASS | EIC + peaks + features vs asari MT02 (Exp009) |
 | `validate_peaks` | 17/17 | PASS | Peak detection vs scipy.signal.find_peaks (Exp010) |
-| **CPU Total** | **89/89** | **PASS** | |
+| `validate_algae_16s` | 29/29 | PASS | Real NCBI data (PRJNA488170) + Humphrey 2023 reference (Exp012) |
+| `validate_voc_peaks` | 22/22 | PASS | Reese 2019 VOC baselines + RI matching (Exp013) |
+| `validate_public_benchmarks` | 97/97 | PASS | 10 samples, 4 BioProjects, marine + freshwater vs paper ground truth (Exp014) |
+| **CPU Total** | **283/283** | **PASS** | |
 
 ### GPU Validation (`--features gpu`)
 
@@ -240,4 +244,4 @@ Previously removed shaders:
 
 ---
 
-*Updated from wetSpring Phase 4 COMPLETE — 30 modules, 284 tests, 127/127 PASS, 11 ToadStool primitives, February 18, 2026.*
+*Updated from wetSpring Phase 6 COMPLETE — 30 modules, 284 tests, 321/321 PASS, 11 ToadStool primitives, public NCBI data benchmarked against papers, February 19, 2026.*

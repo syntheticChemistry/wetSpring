@@ -26,7 +26,7 @@ wetSpring validates published computational life science and analytical chemistr
 The evolution path is: **Python baseline → Rust validation → GPU acceleration → sovereign pipeline.**
 
 The study answers three questions:
-1. **Can published bioinformatics and analytical chemistry be independently reproduced?** (Answer: yes — 89 CPU validation checks pass across FASTQ, mzML, diversity, PFAS screening, feature extraction, and peak detection. 8 of 10 experiments complete with baselines from Galaxy, QIIME2, asari, FindPFAS, and scipy.)
+1. **Can published bioinformatics and analytical chemistry be independently reproduced?** (Answer: yes — 283 CPU validation checks pass across FASTQ, mzML, diversity, 16S pipeline, PFAS screening, feature extraction, peak detection, real NCBI algae-pond data, VOC biomarker baselines, and public open data benchmarked against paper ground truth. 14 experiments complete with baselines from Galaxy, QIIME2, asari, FindPFAS, scipy, NCBI SRA, and published paper data.)
 2. **Can Rust replace the Python scientific stack for these domains?** (Answer: yes — 30 sovereign Rust modules cover the complete 16S pipeline (FASTQ → quality → merge → derep → DADA2 → chimera → taxonomy → diversity → UniFrac) and the full LC-MS feature pipeline (mzML → EIC → peaks → features). 284 tests, 0 clippy pedantic warnings, 0 production unwrap/expect. Only runtime dependency: `flate2` for gzip.)
 3. **Can consumer GPUs accelerate ecological and analytical computation at f64 precision?** (Answer: yes — 38/38 GPU validation checks pass. 11 ToadStool primitives (wgpu v22). GPU spectral cosine achieves **1,077× speedup** over CPU at 200×200 matrix. Zero custom WGSL shaders.)
 
@@ -34,12 +34,15 @@ The study answers three questions:
 
 ## Key Results
 
-### Phase 2 (Rust Ports): 89/89 CPU checks pass
+### Phase 2 (Rust Ports): 283/283 CPU checks pass
 
 | Validation Binary | Modules Tested | Checks | Status |
 |-------------------|----------------|:------:|--------|
 | `validate_fastq` | `io::fastq`, quality, merge, derep | 28 | PASS |
-| `validate_diversity` | `bio::diversity` + `bio::kmer` | 18 | PASS |
+| `validate_diversity` | `bio::diversity` + `bio::kmer` | 27 | PASS |
+| `validate_16s_pipeline` | Complete 16S pipeline | 37 | PASS |
+| `validate_algae_16s` | Real NCBI data (PRJNA488170) + Humphrey 2023 | 29 | PASS |
+| `validate_voc_peaks` | Reese 2019 VOC baselines + RI matching | 22 | PASS |
 | `validate_mzml` | `io::mzml` + `io::xml` (sovereign XML) | 7 | PASS |
 | `validate_pfas` | `io::ms2` + `bio::tolerance_search` + KMD | 10 | PASS |
 | `validate_features` | `bio::eic` + `bio::signal` + `bio::feature_table` | 9 | PASS |
@@ -118,7 +121,10 @@ bash scripts/start_galaxy.sh
 cd barracuda
 cargo test --release                              # 284 unit + integration tests
 cargo run --release --bin validate_fastq           # 28/28 PASS
-cargo run --release --bin validate_diversity        # 18/18 PASS
+cargo run --release --bin validate_diversity        # 27/27 PASS
+cargo run --release --bin validate_16s_pipeline     # 37/37 PASS
+cargo run --release --bin validate_algae_16s       # 29/29 PASS (requires data download)
+cargo run --release --bin validate_voc_peaks       # 22/22 PASS
 cargo run --release --bin validate_mzml            # 7/7 PASS
 cargo run --release --bin validate_pfas            # 10/10 PASS
 cargo run --release --bin validate_features         # 9/9 PASS
@@ -148,13 +154,75 @@ No institutional access required. AGPL-3.0 licensed.
 
 ---
 
-## Grand Total: 127/127 Quantitative Checks Pass
+## Grand Total: 321/321 Quantitative Checks Pass
 
 | Phase | Checks | Description |
 |-------|:------:|-------------|
-| Phase 2 (CPU) | 89 | 28 FASTQ + 18 diversity + 7 mzML + 10 PFAS + 9 features + 17 peaks |
+| Phase 2 (CPU) | 135 | 28 FASTQ + 27 diversity + 37 16S pipeline + 7 mzML + 10 PFAS + 9 features + 17 peaks |
 | Phase 3 (GPU) | 38 | 3 Shannon + 3 Simpson + 6 BC + 5 PCoA + 6 alpha + 8 spectral + 7 stats |
-| **Total** | **127** | **All pass** |
+| Phase 5 (Paper Parity) | 51 | 29 algae pond (real NCBI data) + 22 VOC peaks (Reese 2019) |
+| Phase 6 (Public Benchmark) | 97 | 10 samples, 4 BioProjects vs paper ground truth |
+| **Total** | **321** | **All pass** |
+
+---
+
+## Next Phase: Paper Review Candidates
+
+wetSpring's current work validates bioinformatics pipelines (16S, LC-MS, PFAS) in Galaxy/QIIME2/Python and Rust. The faculty network reveals a rich set of extensions, particularly through **Christopher Waters** (MMG, MSU — undergrad professor), **Kevin Liu** (CMSE, MSU — master's professor), and the Sandia connections (**Jesse Cahill**, **Chuck Smallwood**).
+
+### Track 1 — Microbial Ecology (Waters, Cahill, Smallwood)
+
+| Priority | Paper | Why |
+|----------|-------|-----|
+| **Tier 1** | Waters et al. (2008) "Quorum Sensing Controls Biofilm Formation in V. cholerae Through Modulation of Cyclic Di-GMP." J Bacteriology 190:2527-36 | Foundational QS ↔ c-di-GMP model. Fully specified ODE system for signal-dependent biofilm formation. Direct reproduction target — the signal dynamics are computable |
+| **Tier 1** | Massie et al. (2012) "Quantification of High Specificity Cyclic di-GMP Signaling." PNAS 109:12746-51 | How do cells resolve signal from noise when 60+ enzymes control one diffusible molecule? Quantitative signaling specificity model — exercises stochastic simulation primitives |
+| **Tier 1** | Hsueh, Severin et al. (2022) "A Broadly Conserved Deoxycytidine Deaminase Protects Bacteria from Phage Infection." Nature Microbiology 7:1210-1220 | Phage defense mechanism — evolutionary arms race dynamics. Connects to Cahill's phage biocontrol work at Sandia. Models predator-prey oscillations in microbial communities |
+| **Tier 2** | Fernandez et al. (2020) "V. cholerae adapts to sessile and motile lifestyles by c-di-GMP regulation of cell shape." PNAS 117:29046-29054 | Phenotypic switching as a bistable dynamical system — bifurcation analysis. Connects to groundSpring's sensing systems theme |
+| **Tier 2** | Mhatre et al. (2020) "One gene, multiple ecological strategies: a biofilm regulator is a capacitor for sustainable diversity." PNAS 117:21647-21657 | Single regulatory node enabling phenotypic diversity — direct analog to constrained evolution thesis |
+| **Tier 2** | Waters (2021) "Au naturale: use of biologically derived cyclic di-nucleotides for cancer immunotherapy." Open Biol 11:210277 | Bridge from fundamental microbiology to therapeutic applications. Shows translational value of c-di-GMP pathway understanding |
+| **Tier 2** | Bruger & Waters (2018) "Maximizing Growth Yield and Dispersal via QS Promotes Cooperation." AEM 84:e00402-18 | Game-theoretic optimization of cooperative behavior. Evolutionary strategy landscapes — connects to neuralSpring |
+| **Tier 3** | Cahill et al. — Phage-mediated biocontrol in algal raceway ponds | Sandia bioscience work. Time-series anomaly detection for pond crash prediction |
+| **Tier 3** | Smallwood et al. — Raceway pond metagenomic surveillance | Metagenomic community monitoring under perturbation. Real-world validation of wetSpring's 16S pipeline |
+
+### Track 1b — Comparative Genomics (Liu)
+
+| Priority | Paper | Why |
+|----------|-------|-----|
+| **Tier 1** | Liu et al. (2014) "An HMM-based Comparative Genomic Framework for Detecting Introgression in Eukaryotes." PLoS Comp Bio 10:e1003649 | PhyloNet-HMM implementation — validates HMM/sequence model primitives. State-space models on genomic data. neuralSpring bridge |
+| **Tier 1** | Alamin & Liu (2024) "Phylogenetic Placement of Aligned Genomes and Metagenomes with Non-tree-like Evolutionary Histories." IEEE/ACM TCBB | Metagenomic placement = classifying environmental samples. Directly applicable to wetSpring's pond/soil microbiome analysis |
+| **Tier 2** | Liu et al. (2009) "Rapid and accurate large-scale coestimation of sequence alignments and phylogenetic trees." Science 324:1561-1564 | SATé: divide-and-conquer + iterative refinement at massive scale. Benchmark for large-scale GEMM-heavy alignment computation |
+| **Tier 2** | Zheng et al. (2023) "The Impact of Species Tree Estimation Error on Cophylogenetic Reconstruction." BCB (top 10%) | Host-microbe coevolution — fungal endosymbiont studies. Method validation for co-phylogenetic inference |
+| **Tier 2** | Liu (working manuscript) "A phylogenomic study of adaptive co-evolution between early diverging fungi and obligate bacterial endosymbionts in the Burkholderiaceae" | Direct wetSpring relevance — fungal-bacterial symbiosis, the biology underneath soil health |
+
+### Track 2 — Analytical Chemistry (Jones)
+
+| Priority | Paper | Why |
+|----------|-------|-----|
+| **Tier 1** | Jones et al. — PFAS mass spectrometry detection pipelines | Extends current wetSpring PFAS screening (Exp 007-008). High-resolution mass spec peak identification and quantification |
+| **Tier 2** | Jones et al. — Environmental PFAS fate-and-transport modeling | Long-term: from detection to prediction. Where does PFAS go in the environment? |
+
+### BarraCUDA Kernel Coverage for New Papers
+
+| Paper Domain | Required Primitives | Current Status |
+|-------------|-------------------|---------------|
+| ODE solvers (c-di-GMP dynamics) | Runge-Kutta, adaptive stepping | **Gap**: need `rk4_f64.wgsl` or similar |
+| Stochastic simulation (Gillespie) | Random number generation, exponential sampling | Partial — PRNG exists, need Gillespie wrapper |
+| HMM (forward/backward/Viterbi) | Matrix chain multiplication, log-space ops | GEMM validated; need log-sum-exp shader |
+| Sequence alignment (Smith-Waterman) | Dynamic programming on GPU | **Gap**: alignment kernels not yet in BarraCUDA |
+| Phylogenetic likelihood | Parallel tree evaluation | **Gap**: Felsenstein pruning on GPU |
+| Bifurcation analysis | Parameter continuation, eigenvalue computation | Partial — `BatchedEighGpu` handles eigenvalues |
+
+### Faculty → wetSpring Mapping
+
+| Professor | Connection | Track |
+|-----------|-----------|-------|
+| **Christopher Waters** (undergrad professor) | c-di-GMP, quorum sensing, biofilm, phage defense | Track 1 |
+| **Kevin Liu** (master's professor) | Comparative genomics, phylogenetics, metagenomics | Track 1b |
+| **Jesse Cahill** (Sandia) | Phage biology, algae pond biocontrol | Track 1 |
+| **Chuck Smallwood** (Sandia) | Metagenomics, microbial community monitoring | Track 1 |
+| **A. Daniel Jones** (PFAS job) | PFAS mass spectrometry, analytical chemistry | Track 2 |
+
+---
 
 ## Rust Module Inventory (30 modules, 284 tests)
 

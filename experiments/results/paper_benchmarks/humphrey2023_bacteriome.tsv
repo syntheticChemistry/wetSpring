@@ -1,0 +1,30 @@
+# Paper Benchmark: Humphrey et al. 2023 — N. gaditana Bacteriome
+# Source: Front. Microbiol. 14:1271836 (10.3389/fmicb.2023.1271836)
+# Lab: Sandia National Laboratories
+# Organism: Nannochloropsis gaditana CCMP526
+# Sequencing: Zymo ZymoBIOMIC 16S service, V3-V4 (CCTACGGGGNGGCWGCAG / GACTACHVGGGTATCTAATCC)
+# Date extracted: 2026-02-19 from PMC full text
+#
+# PURPOSE: Ground truth for validating pipeline results on public Nannochloropsis data.
+# Any 16S pipeline run on Nannochloropsis outdoor cultures should detect a SUBSET of
+# these genera (not all — different strains/settings will have different communities).
+# The pipeline is validated if it can taxonomically resolve to genus level and detect
+# organisms in the same phyla/families.
+#
+# Columns: rank, otu_name, taxonomy_level, role, relative_abundance_category, notes
+rank	otu_name	taxonomy_level	role	abundance	notes
+1	Thalassospira	genus	core_bacteriome	dominant	Most abundant in NgMB+ control
+2	Marinobacter	genus	core_bacteriome	high	Second most abundant
+3	Oceanicaulis	genus	core_bacteriome	high	Increases in B. safensis infection
+4	Robiginitalea	genus	core_bacteriome	moderate	Consistent across conditions
+5	Nitratireductor	genus	core_bacteriome	moderate	Decreases in B. safensis infection
+6	Hoeflea	genus	core_bacteriome	moderate	Consistent across conditions
+7	Sulfitobacter	genus	core_bacteriome	moderate	Consistent across conditions
+8	Limnobacter	genus	minor_member	low	Less abundant
+9	Methylophaga	genus	minor_member	low	Less abundant
+10	Phycisphaeraceae	family	minor_member	low	Identified to family level only
+11	Rhodobiaceae	family	minor_member	low	Identified to family level only
+12	Rhodobacteraceae	family	minor_member	low	Identified to family level only
+13	Gammaproteobacteria_unclassified	class	minor_member	low	Not resolved beyond class
+14	Bacillus safensis	species	pathogen	variable	NOT native to bacteriome; pathogen tested
+15	Bacillus_phage_Leo2	phage	treatment	variable	Phage used for rescue

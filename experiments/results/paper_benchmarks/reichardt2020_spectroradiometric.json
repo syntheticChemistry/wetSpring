@@ -1,0 +1,63 @@
+{
+  "paper": {
+    "title": "Spectroradiometric detection of competitor diatoms and the grazer Poteriochromonas in algal cultures",
+    "authors": "Reichardt et al.",
+    "year": 2020,
+    "doi": "10.1016/j.algal.2020.102020",
+    "journal": "Algal Research",
+    "lab": "Sandia National Laboratories",
+    "osti_id": 1828029
+  },
+  "method": {
+    "technique": "Hyperspectral reflectance spectroscopy",
+    "wavelength_range_nm": [350, 2500],
+    "measurement_interval_min": 5,
+    "instrument": "Multi-channel fiber-coupled spectroradiometer",
+    "data_publicly_available": false,
+    "data_location": "ScienceDirect paywall, no public repository"
+  },
+  "organisms_detected": [
+    {
+      "organism": "Nannochloropsis oceanica",
+      "role": "culture",
+      "notes": "Primary culture monitored"
+    },
+    {
+      "organism": "Phaeodactylum tricornutum",
+      "role": "diatom_competitor",
+      "detection_demonstrated": true
+    },
+    {
+      "organism": "Thalassiosira weissflogii",
+      "role": "diatom_competitor",
+      "detection_demonstrated": true
+    },
+    {
+      "organism": "Thalassiosira pseudonana",
+      "role": "diatom_competitor",
+      "detection_demonstrated": true
+    },
+    {
+      "organism": "Poteriochromonas",
+      "role": "grazer",
+      "detection_demonstrated": true,
+      "host_culture": "Chlorella vulgaris"
+    },
+    {
+      "organism": "Microchloropsis salina",
+      "role": "culture",
+      "notes": "Mixed with diatoms for specificity testing"
+    }
+  ],
+  "key_findings": {
+    "detection_principle": "Numerical inversion of reflectance model (absorption + backscatter + pigment fluorescence + surface reflection)",
+    "drone_deployment_potential": true,
+    "validated_against": "microscopy and sequencing"
+  },
+  "validation_targets": {
+    "description": "Would require spectral I/O module and PCA — lower priority until data available",
+    "data_available": false,
+    "required_modules": ["io::spectral", "bio::pca"],
+    "notes": "Cannot validate without raw spectral data. Paper findings recorded for future use."
+  }
+}

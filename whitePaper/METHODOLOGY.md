@@ -238,19 +238,25 @@ All experiments run on a single consumer workstation:
 
 ## 6. Acceptance Criteria
 
-### Phase 2 (CPU): 89/89 checks pass
+### Phase 2 (CPU): 283/283 checks pass
 
 | Binary | Checks | Target |
 |--------|:------:|--------|
 | `validate_fastq` | 28 | Quality filter + merge + derep + Galaxy FastQC |
-| `validate_diversity` | 18 | Analytical + simulated + evenness + rarefaction |
+| `validate_diversity` | 27 | Analytical + simulated + evenness + rarefaction (expanded from 18) |
+| `validate_16s_pipeline` | 37 | Complete 16S: FASTQ → DADA2 → chimera → taxonomy → diversity → UniFrac |
+| `validate_algae_16s` | 29 | Real NCBI data (PRJNA488170, SRR7760408) + Humphrey 2023 reference |
+| `validate_voc_peaks` | 22 | Reese 2019 Table 1 (14 VOC compounds) + RI matching + peak detection |
 | `validate_mzml` | 7 | mzML parsing vs pyteomics |
 | `validate_pfas` | 10 | Cosine + KMD + FindPFAS |
 | `validate_features` | 9 | EIC + peaks + features vs asari (Exp009) |
 | `validate_peaks` | 17 | Peak detection vs scipy.signal.find_peaks (Exp010) |
-| **Total** | **89** | **All pass** |
+| `validate_algae_16s` | 29 | Real NCBI data + Humphrey 2023 reference (Exp012) |
+| `validate_voc_peaks` | 22 | Reese 2019 VOC baselines + RI matching (Exp013) |
+| `validate_public_benchmarks` | 97 | 10 samples, 4 BioProjects vs paper ground truth (Exp014) |
+| **Total** | **283** | **All pass** |
 
-Current status: **89/89 pass.**
+Current status: **283/283 pass.** (includes real public NCBI data benchmarked against papers, VOC baselines, and 97 public data benchmark checks)
 
 ### Phase 3 (GPU): 38/38 checks pass
 
@@ -260,7 +266,7 @@ Current status: **89/89 pass.**
 
 Current status: **38/38 pass.** Checks: 3 Shannon + 3 Simpson + 6 BC + 5 PCoA + 6 alpha + 8 spectral + 3 variance + 1 correlation + 1 covariance + 2 weighted dot.
 
-### Grand Total: 127/127 quantitative checks pass
+### Grand Total: 321/321 quantitative checks pass
 
 ---
 

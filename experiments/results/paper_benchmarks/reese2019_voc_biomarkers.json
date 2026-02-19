@@ -1,0 +1,80 @@
+{
+  "paper": {
+    "title": "Chemical Profiling of Volatile Organic Compounds in the Headspace of Algal Cultures as Early Biomarkers of Algal Pond Crashes",
+    "authors": "Reese et al.",
+    "year": 2019,
+    "doi": "10.1038/s41598-019-50125-z",
+    "pmc": "PMC6761164",
+    "journal": "Scientific Reports",
+    "labs": ["Lawrence Livermore National Laboratory", "Sandia National Laboratories", "Michigan State University"]
+  },
+  "method": {
+    "technique": "SPME-GC-MS",
+    "organism": "Microchloropsis salina",
+    "grazer": "Brachionus plicatilis",
+    "spme_fiber_exposure": "30-60 min",
+    "n_experiments": 3,
+    "raw_chromatograms_in_repository": false,
+    "data_in_paper": true
+  },
+  "grazer_specific_biomarkers": [
+    {
+      "compound_id": 1,
+      "base_peak_mz": 82,
+      "nist_id": "2,2,6-trimethylcyclohexanone",
+      "nist_match_pct": 79,
+      "class": "Carotenoid",
+      "experimental_ri": 1021,
+      "theoretical_ri": 1036,
+      "n_experiments_detected": 2
+    },
+    {
+      "compound_id": 4,
+      "base_peak_mz": 137,
+      "nist_id": "beta-cyclocitral",
+      "nist_match_pct": 81,
+      "class": "Carotenoid",
+      "experimental_ri": 1209,
+      "theoretical_ri": 1220,
+      "n_experiments_detected": 3,
+      "notes": "Key crash biomarker — carotenoid degradation product"
+    },
+    {
+      "compound_id": 5,
+      "base_peak_mz": 121,
+      "nist_id": "4-(2,6,6-trimethyl-1-cyclohexen-1-yl)-2-butanone",
+      "nist_match_pct": 76,
+      "class": "Carotenoid",
+      "experimental_ri": 1419,
+      "theoretical_ri": 1433,
+      "n_experiments_detected": 3
+    },
+    {
+      "compound_id": 6,
+      "base_peak_mz": 177,
+      "nist_id": "trans-beta-ionone",
+      "nist_match_pct": 94,
+      "class": "Carotenoid",
+      "experimental_ri": 1495,
+      "theoretical_ri": 1486,
+      "n_experiments_detected": 3,
+      "notes": "Highest-confidence identification (94% NIST match)"
+    }
+  ],
+  "key_findings": {
+    "total_biomarkers": 14,
+    "grazer_specific": 7,
+    "both_conditions": 7,
+    "primary_pathway": "Carotenoid oxidative cleavage of beta-carotene",
+    "detection_before_biomass_loss": true,
+    "notes": "VOCs detectable 24h before visible algal density change"
+  },
+  "validation_targets": {
+    "description": "What a peak detection pipeline should match on similar GC-MS data",
+    "expected_ri_range": [1000, 2200],
+    "key_ri_values": [1021, 1209, 1419, 1495, 1691],
+    "carotenoid_mz_values": [82, 121, 137, 177],
+    "ri_tolerance_pct": 5.0,
+    "notes": "Pipeline validates if it detects peaks at these retention indices with correct mass assignments. Not all peaks will be present in every algae strain — beta-carotene content varies."
+  }
+}

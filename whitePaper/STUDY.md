@@ -13,7 +13,9 @@ and (3) accelerated on consumer GPUs achieving up to 1,077× speedup over
 CPU for batch-parallel workloads. The study covers two tracks: 16S
 amplicon metagenomics (Track 1) and PFAS detection via LC-MS (Track 2),
 validating 30 Rust modules against baselines from Galaxy, QIIME2, asari,
-FindPFAS, and scipy with 127 quantitative checks — all passing.
+FindPFAS, scipy, real NCBI SRA data, and published paper baselines with
+321 quantitative checks — all passing. Includes 97 checks on public open data
+(PRJNA1114688) benchmarked against paper ground truth.
 
 ---
 
