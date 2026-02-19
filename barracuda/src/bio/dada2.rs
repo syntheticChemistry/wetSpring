@@ -381,7 +381,7 @@ fn find_new_centers(
 /// Uses the identity: P(X >= k | Poisson(λ)) = P(k, λ) where P is the
 /// regularized lower incomplete gamma function.
 #[allow(clippy::cast_precision_loss)]
-fn poisson_pvalue(k: usize, lambda: f64) -> f64 {
+pub fn poisson_pvalue(k: usize, lambda: f64) -> f64 {
     if lambda <= 0.0 || k == 0 {
         return 1.0;
     }

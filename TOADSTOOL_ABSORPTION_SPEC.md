@@ -8,93 +8,126 @@
 ## Summary
 
 wetSpring built local extensions to ToadStool primitives during GPU pipeline
-development. These extensions are working in production (68/68 parity checks,
-73.8% buffer reuse). This doc describes each extension and the recommended
-absorption path into ToadStool.
+development. These extensions are working in production (88/88 parity checks,
+93.0% buffer reuse, 2.45× GPU speedup). This doc describes each extension and
+the recommended absorption path into ToadStool.
 
-## Extension 1: GemmCached — Pre-compiled GEMM Pipeline
+## Extension 1: QualityFilterCached — Per-Read Parallel Filtering
 
-**File:** `wetSpring/barracuda/src/bio/gemm_cached.rs`
-**Problem:** `GemmF64::execute()` recreates shader module, bind group layout,
-and compute pipeline on every call. In streaming workloads (GEMM per sample),
-this adds ~0.5ms per dispatch.
+**Files:**
+- `wetSpring/barracuda/src/shaders/quality_filter.wgsl` — WGSL shader
+- `wetSpring/barracuda/src/bio/quality_gpu.rs` — Rust wrapper
 
-**Solution:** `GemmCached::new(device, ctx)` compiles once, stores the pipeline.
-`execute()` reuses the cached pipeline — only creates buffers + bind group.
+**Problem:** Quality filtering scans each read sequentially (leading trim,
+trailing trim, sliding window). With 80K-1.2M reads, this is embarrassingly
+parallel across reads but sequential within each read.
+
+**Solution:** Custom WGSL shader with one GPU thread per read. All integer
+arithmetic (u32), no f64. Quality bytes packed 4-per-u32 for efficient transfer.
+Pre-compiled pipeline + BufferPool integration.
 
 **Measured impact:**
-- Small workload (5 queries): 6.1ms → 3.9ms (**36% faster**)
-- First-sample penalty eliminated (36ms → 9.8ms)
-- Average per-sample: 14.3ms → 11.0ms (23% improvement)
+- Math parity: 100% (all read counts match CPU exactly)
+- Speed: ~0.85× vs CPU (QF is memory-bound, not compute-bound)
+- Proves GPU CAN handle per-read operations even if CPU is faster here
 
-**Absorption into ToadStool:**
+**ToadStool absorption → `ParallelFilter<T>`:**
+A per-element parallel scan-and-filter primitive where each thread processes
+one element independently. Shader template parameterized by element type
+and filter logic.
+
+## Extension 2: Dada2Gpu — Batch Pair-Wise Reduction
+
+**Files:**
+- `wetSpring/barracuda/src/shaders/dada2_e_step.wgsl` — WGSL shader
+- `wetSpring/barracuda/src/bio/dada2_gpu.rs` — Rust wrapper + EM loop
+
+**Problem:** DADA2's E-step computes `log_p_error(seq, center)` for all
+(sequence, center) pairs — O(seqs × centers × seq_length). This is the
+pipeline's largest bottleneck (326ms avg on CPU).
+
+**Solution:** GPU batch dispatch: one thread per (seq, center) pair. Each
+thread sums precomputed `ln(err[from][to][qual])` lookup values over all
+positions. **Key insight: no GPU transcendentals needed.** The ln() values
+are precomputed on CPU and uploaded as a flat f64 table (672 values = 5KB).
+
+The full EM loop stays on CPU (argmax, error model update, Poisson test,
+convergence check). Only the E-step dispatch is GPU. Data (bases, quals,
+lengths) uploaded once; only center_indices and log_err updated per iteration.
+
+**Measured impact:**
+- **24.4× average speedup** (326ms CPU → 13ms GPU)
+- Identical ASV counts and total reads across all 10 samples
+- Reduced pipeline total from 1.21× to 2.45× GPU speedup
+- BufferPool reuse: 93% (bases/quals buffers reused across iterations)
+
+**ToadStool absorption → `BatchPairReduce<f64>`:**
 
 ```rust
-// Current GemmF64 API:
-let c = GemmF64::execute(device, &a, &b, m, k, n, batch_size)?;
-
-// Proposed evolution:
-let gemm = GemmF64::new(device.clone());  // compile pipeline once
-let c = gemm.execute(&a, &b, m, k, n, batch_size)?;  // reuse cached pipeline
-let buf = gemm.execute_to_buffer(&a, &b, m, k, n, batch_size)?;  // no readback
+// Proposed ToadStool primitive:
+let reducer = BatchPairReduce::<f64>::new(device, reduce_shader);
+// Computes f(element_a[i], element_b[j]) reduced over shared dimension
+let scores = reducer.execute(
+    &data_a,      // [N × L] elements
+    &data_b,      // [M × L] elements  
+    &lookup_table, // precomputed per-element values
+    n, m, l,
+)?;
+// Returns [N × M] matrix of reduced values
 ```
 
-**Key code to absorb:**
-1. Hoist `compile_shader_f64()` + `create_compute_pipeline()` to `new()`
-2. Store pipeline + bind group layout as struct fields
-3. `execute()` creates only data buffers + bind group per call
-4. Add `execute_to_buffer()` returning `wgpu::Buffer` for chaining
-
-## Extension 2: BufferPool Integration for GEMM
-
-**File:** `wetSpring/barracuda/src/bio/gemm_cached.rs` (in `acquire_and_upload`)
-**Problem:** Every GEMM dispatch allocates 3 new GPU buffers (A, B, C). In
-streaming workloads, these are similar-sized across calls.
-
-**Solution:** Use `TensorContext::buffer_pool().acquire_pooled()` for A, B, C
-buffers. Power-of-2 bucketing enables cross-call reuse.
-
-**Measured impact:**
-- 16 allocations, 45 reuses = **73.8% reuse rate**
-- Eliminates ~30 buffer allocations across 10-sample pipeline
-
-**Absorption into ToadStool:**
-Modify `GemmF64::execute()` to accept an optional `&TensorContext` and use
-its buffer pool. Or add `GemmF64::execute_pooled(&self, ctx, ...)`.
-
-## Extension 3: execute_to_buffer() — Chaining Primitive
+## Extension 3: GemmCached — Pre-compiled GEMM Pipeline
 
 **File:** `wetSpring/barracuda/src/bio/gemm_cached.rs`
-**Problem:** GEMM always reads results back to CPU. For chaining (GEMM → argmax),
-the intermediate data should stay on GPU.
 
-**Solution:** `execute_to_buffer()` dispatches GEMM and returns the output
-`wgpu::Buffer` without readback. Caller decides when to read back.
+**Problem:** `GemmF64::execute()` recreates shader, BGL, and compute pipeline
+on every call (~0.5ms overhead per dispatch).
 
-**Absorption into ToadStool:**
-Add `execute_to_buffer()` as an alternative to `execute()` in `GemmF64`.
-This is the foundation for `PipelineBuilder` integration where GEMM output
-feeds directly into subsequent GPU stages.
+**Solution:** `GemmCached::new(device, ctx)` compiles once at init.
+`execute()` reuses cached pipeline — only buffer management per call.
 
-## Extension 4 (Future): GPU Argmax Kernel
+**Measured impact:**
+- First-sample penalty eliminated (36ms → 9.8ms)
+- Average per-sample: 14.3ms → 11.0ms (23% improvement)
+- Small workload (5 queries): 16.5× GPU speedup
 
-**Not yet implemented.** Currently, GEMM scores are read back to CPU for
-argmax + bootstrap confidence. A GPU argmax kernel would:
-- Reduce readback from ~3.5MB to ~1KB per taxonomy dispatch
-- Enable GEMM → argmax chaining via `execute_to_buffer()`
-- This would be a new ToadStool primitive: `ArgmaxF64`
+**ToadStool absorption:**
 
-## Infrastructure Already Working
+```rust
+// Current: GemmF64::execute(device, &a, &b, m, k, n, batch)?;
+// Proposed:
+let gemm = GemmF64::new(device);  // compile once
+let c = gemm.execute(&a, &b, m, k, n, batch)?;  // reuse cached
+let buf = gemm.execute_to_buffer(&a, &b, m, k, n, batch)?;  // no readback
+```
 
-These ToadStool systems are wired and actively used by wetSpring:
+## Extension 4: BufferPool Integration
+
+**Files:** All GPU modules (`gemm_cached.rs`, `quality_gpu.rs`, `dada2_gpu.rs`)
+
+**Problem:** GPU buffer allocation is expensive. Streaming workloads dispatch
+similar-sized operations repeatedly.
+
+**Solution:** All modules use `TensorContext::buffer_pool().acquire_pooled()`
+with power-of-2 bucketing. Buffers auto-returned on drop.
+
+**Measured impact:** 29 allocations, 385 reuses = **93.0% reuse rate**.
+
+## Extension 5 (Future): GPU Argmax Kernel
+
+**Not yet implemented.** GEMM scores are read back for CPU argmax + bootstrap.
+A GPU argmax kernel would reduce readback from ~3.5MB to ~1KB per dispatch.
+
+## Infrastructure Actively Used
 
 | System | Usage | Stats |
 |--------|-------|-------|
 | `TensorContext` | Session-level GPU context | Wired in `GpuPipelineSession` |
-| `BufferPool` | Buffer reuse for GEMM | 73.8% reuse rate |
+| `BufferPool` | Buffer reuse for all GPU modules | 93.0% reuse rate |
 | `FusedMapReduceF64` | Shannon, Simpson, sum | Pre-compiled, reused |
 | `GemmF64` (via GemmCached) | Taxonomy classification | Cached pipeline |
 | `BrayCurtisF64` | Beta diversity | Wired in `diversity_gpu.rs` |
+| `ShaderTemplate` | f64 driver workaround | Used by DADA2 + GEMM shaders |
 
 ## How to Test
 
@@ -103,5 +136,5 @@ cd wetSpring/barracuda
 cargo run --features gpu --release --bin validate_16s_pipeline_gpu
 ```
 
-Expects: 68/68 checks PASS, BufferPool stats > 0% reuse, scaling
-benchmark shows GPU advantage at all workload sizes.
+Expects: 88/88 checks PASS, BufferPool 93%+ reuse, DADA2 GPU 20×+ speedup,
+overall pipeline 2×+ GPU speedup.

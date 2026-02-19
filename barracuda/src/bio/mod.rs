@@ -5,6 +5,8 @@ pub mod chimera;
 #[cfg(feature = "gpu")]
 pub mod chimera_gpu;
 pub mod dada2;
+#[cfg(feature = "gpu")]
+pub mod dada2_gpu;
 pub mod derep;
 pub mod diversity;
 #[cfg(feature = "gpu")]

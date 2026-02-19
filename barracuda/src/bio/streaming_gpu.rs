@@ -1,14 +1,22 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Unidirectional streaming GPU pipeline — ToadStool infrastructure wired.
+//! Unidirectional streaming GPU pipeline — full-stage GPU coverage.
 //!
-//! # Architecture (v2 — ToadStool wiring)
+//! # Architecture (v3 — full pipeline GPU)
 //!
 //! ```text
 //! GpuPipelineSession::new(gpu)
 //!   ├── TensorContext          ← buffer pool + bind group cache + batching
+//!   ├── QualityFilterCached    ← pre-compiled QF shader (local extension)
+//!   ├── Dada2Gpu              ← pre-compiled DADA2 E-step shader (local extension)
 //!   ├── GemmCached             ← pre-compiled GEMM pipeline (local extension)
 //!   ├── FusedMapReduceF64      ← pre-compiled FMR pipeline (ToadStool)
 //!   └── warmup dispatches      ← prime driver caches
+//!
+//! session.filter_reads_gpu(reads, params)
+//!   └── QualityFilterCached::execute()  ← per-read parallel trimming
+//!
+//! session.denoise_gpu(uniques, params)
+//!   └── Dada2Gpu::batch_log_p_error()  ← E-step on GPU, EM control on CPU
 //!
 //! session.stream_sample(...)
 //!   ├── GemmCached::execute()  ← cached pipeline, per-call buffers only
@@ -17,50 +25,58 @@
 //!   └── FMR::observed()        ← reuses compiled pipeline
 //! ```
 //!
-//! # ToadStool systems wired
+//! # Pipeline stages on GPU
 //!
-//! - `TensorContext`: buffer pool, bind group cache, batch dispatch grouping
-//! - `GemmCached`: local extension — pre-compiled GEMM pipeline (ToadStool absorbs)
-//! - `FusedMapReduceF64`: pre-compiled at init, reused across all calls
-//! - `GLOBAL_CACHE`: pipeline cache (used by TensorContext internally)
+//! | Stage         | Primitive            | Status          |
+//! |---------------|----------------------|-----------------|
+//! | Quality filter| QualityFilterCached  | GPU (per-read)  |
+//! | Dereplication | —                    | CPU (hash)      |
+//! | DADA2 denoise | Dada2Gpu             | GPU E-step      |
+//! | Chimera       | —                    | CPU (k-mer)     |
+//! | Taxonomy      | GemmCached           | GPU (GEMM)      |
+//! | Diversity     | FusedMapReduceF64    | GPU/CPU (FMR)   |
 //!
 //! # Local extensions (for ToadStool absorption)
 //!
-//! - `GemmCached`: caches shader + pipeline + BGL at init (GemmF64 recreates per call)
-//! - `execute_to_buffer()`: returns GPU buffer without readback (chaining primitive)
+//! - `QualityFilterCached`: per-read parallel quality trimming WGSL shader
+//! - `Dada2Gpu`: batch pair-wise log_p_error with precomputed log-err table
+//! - `GemmCached`: caches shader + pipeline + BGL at init
+//! - `execute_to_buffer()`: returns GPU buffer without readback (chaining)
 
+use crate::bio::dada2::{Asv, Dada2Params, Dada2Stats};
+use crate::bio::dada2_gpu::{self, Dada2Gpu};
+use crate::bio::derep::UniqueSequence;
 use crate::bio::diversity;
 use crate::bio::gemm_cached::GemmCached;
+use crate::bio::quality::{FilterStats, QualityParams};
+use crate::bio::quality_gpu::QualityFilterCached;
 use crate::bio::taxonomy::{
     extract_kmers, ClassifyParams, Classification, NaiveBayesClassifier, TaxRank,
 };
 use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
+use crate::io::fastq::FastqRecord;
 use barracuda::device::TensorContext;
 use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
 use std::collections::HashSet;
 use std::sync::Arc;
 use std::time::Instant;
 
-/// Pre-warmed GPU pipeline session with ToadStool infrastructure.
+/// Pre-warmed GPU pipeline session with full-stage coverage.
 ///
-/// Wires TensorContext (pool + cache + batching) and GemmCached (pre-compiled
-/// pipeline) into the streaming architecture. All per-sample dispatches reuse
-/// compiled pipelines — only buffer allocation and data transfer per call.
+/// Holds pre-compiled pipelines for all GPU-accelerated stages:
+/// quality filter, DADA2 E-step, taxonomy GEMM, and diversity FMR.
 pub struct GpuPipelineSession {
     ctx: Arc<TensorContext>,
+    qf: QualityFilterCached,
+    dada2: Dada2Gpu,
     fmr: FusedMapReduceF64,
     gemm: GemmCached,
     pub warmup_ms: f64,
 }
 
 impl GpuPipelineSession {
-    /// Create a pre-warmed session with ToadStool infrastructure.
-    ///
-    /// - TensorContext: buffer pool, bind group cache
-    /// - GemmCached: pre-compiled GEMM shader + pipeline
-    /// - FMR: pre-compiled map-reduce shader + pipeline
-    /// - Warmup dispatches: prime driver caches
+    /// Create a pre-warmed session with all GPU pipelines compiled.
     pub fn new(gpu: &GpuF64) -> Result<Self> {
         if !gpu.has_f64 {
             return Err(Error::Gpu("SHADER_F64 required".into()));
@@ -70,9 +86,10 @@ impl GpuPipelineSession {
         let device = gpu.to_wgpu_device();
         let ctx = gpu.tensor_context().clone();
 
+        let qf = QualityFilterCached::new(device.clone(), ctx.clone());
+        let dada2 = Dada2Gpu::new(device.clone(), ctx.clone());
         let fmr = FusedMapReduceF64::new(device.clone())
             .map_err(|e| Error::Gpu(format!("FMR init: {e}")))?;
-
         let gemm = GemmCached::new(device.clone(), ctx.clone());
 
         // Prime driver caches with tiny dispatches
@@ -83,6 +100,8 @@ impl GpuPipelineSession {
 
         Ok(Self {
             ctx,
+            qf,
+            dada2,
             fmr,
             gemm,
             warmup_ms,
@@ -92,6 +111,51 @@ impl GpuPipelineSession {
     /// TensorContext stats: buffer pool reuse, bind group cache, batched ops.
     pub fn ctx_stats(&self) -> String {
         self.ctx.stats().to_string()
+    }
+
+    // ── Quality filter: real GPU dispatch ────────────────────────────────
+
+    /// GPU-accelerated quality filtering — real per-read parallel trimming.
+    pub fn filter_reads(
+        &self,
+        reads: &[FastqRecord],
+        params: &QualityParams,
+    ) -> Result<(Vec<FastqRecord>, FilterStats)> {
+        let trim_results = self.qf.execute(reads, params)?;
+        let mut output = Vec::with_capacity(reads.len());
+        let mut stats = FilterStats {
+            input_reads: reads.len(),
+            output_reads: 0,
+            discarded_reads: 0,
+            leading_bases_trimmed: 0,
+            trailing_bases_trimmed: 0,
+            window_bases_trimmed: 0,
+            adapter_bases_trimmed: 0,
+        };
+
+        for (record, trim) in reads.iter().zip(trim_results.iter()) {
+            if let Some((start, end)) = trim {
+                stats.leading_bases_trimmed += *start as u64;
+                stats.trailing_bases_trimmed += (record.quality.len() - end) as u64;
+                output.push(crate::bio::quality::apply_trim(record, *start, *end));
+                stats.output_reads += 1;
+            } else {
+                stats.discarded_reads += 1;
+            }
+        }
+
+        Ok((output, stats))
+    }
+
+    // ── DADA2: GPU E-step ────────────────────────────────────────────────
+
+    /// GPU-accelerated DADA2 denoising — E-step on GPU, EM control on CPU.
+    pub fn denoise(
+        &self,
+        seqs: &[UniqueSequence],
+        params: &Dada2Params,
+    ) -> Result<(Vec<Asv>, Dada2Stats)> {
+        dada2_gpu::denoise_gpu(&self.dada2, seqs, params)
     }
 
     // ── Diversity: pre-warmed FMR (no shader recompilation) ─────────────
@@ -210,7 +274,6 @@ impl GpuPipelineSession {
             }
         }
 
-        // GemmCached: reuses pre-compiled pipeline (no shader recompilation)
         let scores = self
             .gemm
             .execute(&q_compact, &t_compact, total_rows, n_active, n_taxa, 1)?;
@@ -261,8 +324,6 @@ impl GpuPipelineSession {
     // ── Streaming session: taxonomy + diversity in one call ──────────────
 
     /// Run taxonomy + diversity on GPU in a single streaming session.
-    ///
-    /// All pipelines are pre-compiled — this call is pure buffer + compute.
     pub fn stream_sample(
         &self,
         classifier: &NaiveBayesClassifier,

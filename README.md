@@ -29,13 +29,14 @@ kernels useful far beyond their original domain.
 wetspring-barracuda v0.1.0
   284 tests, 30 modules, 0 clippy pedantic warnings
   388/388 CPU validation checks PASS (incl. real public NCBI data benchmarked against papers)
-  106/106 GPU validation checks PASS (38 diversity + 68 pipeline parity)
-  494/494 total quantitative checks PASS
+  126/126 GPU validation checks PASS (38 diversity + 88 pipeline parity)
+  514/514 total quantitative checks PASS
   1 runtime dep (flate2); GPU deps feature-gated (barracuda, wgpu v22, tokio)
-  11 ToadStool GPU primitives, 0 custom WGSL shaders
-  100% math parity: CPU ↔ GPU (Shannon, Simpson, chimera, taxonomy — zero error)
-  13.4× faster than Galaxy (Rust CPU); GPU scaling benchmark 20–52× (5–500 queries)
-  Taxonomy: 188× faster via compact GEMM (HashMap → flat array → GPU GEMM)
+  11 ToadStool GPU primitives, 3 custom WGSL shaders (QF, DADA2 E-step, GEMM)
+  100% math parity: CPU ↔ GPU (Shannon, Simpson, chimera, DADA2, taxonomy — zero error)
+  13.1× faster than Galaxy (Rust CPU); GPU 2.45× faster than CPU (full pipeline)
+  DADA2: 24× GPU speedup (326ms CPU → 13ms GPU per sample)
+  Taxonomy: 223× faster via compact GEMM + GemmCached
   Chimera: 1,256× faster (O(N³) → k-mer sketch + prefix-sum)
   Sovereign parsers: FASTQ, mzML/XML, MS2, base64 — all in-tree
 
@@ -44,9 +45,10 @@ wetspring-barracuda v0.1.0
   PFAS pipeline:  mzML/MS2 → tolerance search → spectral match → KMD → homologue grouping
 
   GPU benchmark: 1,077× speedup on spectral cosine (200×200) — RTX 4070
-  Pipeline benchmark: Rust CPU 7.3s vs Galaxy 95.6s (10 samples); GPU streaming 6.0s (1.21×)
-  ToadStool wired: GemmCached + BufferPool (73.8% reuse) + TensorContext
-  Streaming GPU: taxonomy GEMM 11ms avg + diversity FMR 0ms; scaling 20–52×
+  Pipeline benchmark: Rust CPU 7.3s vs Galaxy 95.6s (10 samples); GPU pipeline 3.0s (2.45×)
+  ToadStool wired: QualityFilterCached + Dada2Gpu + GemmCached + BufferPool (93% reuse)
+  GPU stages: QF (per-read WGSL) + DADA2 E-step (24×) + taxonomy GEMM (60×) + diversity FMR
+  Scaling benchmark: 16–63× (5–500 queries)
 ```
 
 | Track | Phase | Status |

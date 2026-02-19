@@ -70,7 +70,7 @@ async fn main() {
     let session = GpuPipelineSession::new(&gpu).unwrap_or_else(|e| {
         validation::exit_skipped(&format!("GPU session init failed: {e}"));
     });
-    println!("  GPU session warmed in {:.1}ms (GemmCached + FMR pipelines compiled)",
+    println!("  GPU session warmed in {:.1}ms (QF + DADA2 + GemmCached + FMR pipelines compiled)",
         session.warmup_ms);
     println!("  ToadStool TensorContext wired (buffer pool + bind group cache)\n");
 
@@ -250,13 +250,11 @@ fn process_sample_gpu_vs_cpu(
     let cpu_qf_ms = cpu_t.elapsed().as_secs_f64() * 1000.0;
 
     let gpu_t = Instant::now();
-    let (gpu_filtered, _gpu_fstats) = wetspring_barracuda::bio::quality_gpu::filter_reads_gpu(
-        gpu, &records, &qparams,
-    )
-    .unwrap_or_else(|e| {
-        println!("  [GPU ERROR] quality: {e}");
-        quality::filter_reads(&records, &qparams)
-    });
+    let (gpu_filtered, _gpu_fstats) = session.filter_reads(&records, &qparams)
+        .unwrap_or_else(|e| {
+            println!("  [GPU ERROR] quality: {e}");
+            quality::filter_reads(&records, &qparams)
+        });
     let gpu_qf_ms = gpu_t.elapsed().as_secs_f64() * 1000.0;
 
     v.check(
@@ -283,11 +281,39 @@ fn process_sample_gpu_vs_cpu(
     let cpu_derep_ms = cpu_t.elapsed().as_secs_f64() * 1000.0;
     println!("  {label} derep: {} uniques ({:.1}ms)", uniques.len(), cpu_derep_ms);
 
-    // ── Stage 3: DADA2 denoise (CPU — iterative algorithm) ─────────────────
+    // ── Stage 3: DADA2 denoise (CPU vs GPU E-step) ─────────────────────────
+    let dada2_params = Dada2Params::default();
     let cpu_t = Instant::now();
-    let (asvs, _) = dada2::denoise(&uniques, &Dada2Params::default());
+    let (cpu_asvs, _) = dada2::denoise(&uniques, &dada2_params);
     let cpu_dada2_ms = cpu_t.elapsed().as_secs_f64() * 1000.0;
-    println!("  {label} DADA2: {} ASVs ({:.1}ms)", asvs.len(), cpu_dada2_ms);
+
+    let gpu_t = Instant::now();
+    let (gpu_asvs, _) = session.denoise(&uniques, &dada2_params)
+        .unwrap_or_else(|e| {
+            println!("  [GPU ERROR] DADA2: {e}");
+            dada2::denoise(&uniques, &dada2_params)
+        });
+    let gpu_dada2_ms = gpu_t.elapsed().as_secs_f64() * 1000.0;
+
+    v.check(
+        &format!("{label}: DADA2 ASV count CPU ≈ GPU"),
+        if cpu_asvs.len() == gpu_asvs.len() { 1.0 } else { 0.0 },
+        1.0,
+        0.0,
+    );
+    let cpu_dada2_reads: usize = cpu_asvs.iter().map(|a| a.abundance).sum();
+    let gpu_dada2_reads: usize = gpu_asvs.iter().map(|a| a.abundance).sum();
+    v.check(
+        &format!("{label}: DADA2 total reads CPU == GPU"),
+        if cpu_dada2_reads == gpu_dada2_reads { 1.0 } else { 0.0 },
+        1.0,
+        0.0,
+    );
+    println!(
+        "  {label} DADA2: CPU={} ASVs ({:.1}ms) GPU={} ASVs ({:.1}ms)",
+        cpu_asvs.len(), cpu_dada2_ms, gpu_asvs.len(), gpu_dada2_ms,
+    );
+    let asvs = cpu_asvs;
 
     // ── Stage 4: Chimera detection (CPU vs GPU) ────────────────────────────
     let cparams = ChimeraParams::default();
@@ -512,7 +538,7 @@ fn process_sample_gpu_vs_cpu(
     // ── Totals ──────────────────────────────────────────────────────────────
     let cpu_ms = cpu_qf_ms + cpu_derep_ms + cpu_dada2_ms + cpu_chimera_ms
         + cpu_div_ms + cpu_tax_ms;
-    let gpu_ms = gpu_qf_ms + cpu_derep_ms + cpu_dada2_ms + gpu_chimera_ms
+    let gpu_ms = gpu_qf_ms + cpu_derep_ms + gpu_dada2_ms + gpu_chimera_ms
         + gpu_div_ms + gpu_tax_ms;
 
     println!(
