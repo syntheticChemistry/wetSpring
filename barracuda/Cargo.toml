@@ -35,6 +35,10 @@ wgpu = { version = "22", optional = true }
 tokio = { version = "1", features = ["rt", "macros"], optional = true }
 
 
+# bytemuck: zero-copy casting for GPU uniform buffers (GemmCached params).
+# Already a transitive dep via barracuda; pinned here for local extensions.
+bytemuck = { version = "1", features = ["derive"] }
+
 # I/O: zlib decompression (mzML binary arrays) + GzDecoder (FASTQ .gz)
 # XML parsing is sovereign (src/io/xml.rs); no quick-xml dependency.
 flate2 = "1.0"

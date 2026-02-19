@@ -9,6 +9,8 @@ pub mod derep;
 pub mod diversity;
 #[cfg(feature = "gpu")]
 pub mod diversity_gpu;
+#[cfg(feature = "gpu")]
+pub mod gemm_cached;
 pub mod eic;
 #[cfg(feature = "gpu")]
 pub mod eic_gpu;

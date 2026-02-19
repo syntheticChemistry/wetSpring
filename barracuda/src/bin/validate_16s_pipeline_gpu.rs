@@ -70,8 +70,9 @@ async fn main() {
     let session = GpuPipelineSession::new(&gpu).unwrap_or_else(|e| {
         validation::exit_skipped(&format!("GPU session init failed: {e}"));
     });
-    println!("  GPU session warmed in {:.1}ms (FMR + GEMM shaders compiled)\n",
+    println!("  GPU session warmed in {:.1}ms (GemmCached + FMR pipelines compiled)",
         session.warmup_ms);
+    println!("  ToadStool TensorContext wired (buffer pool + bind group cache)\n");
 
     let base = std::env::var("WETSPRING_PUBLIC_DIR").map_or_else(
         |_| {
@@ -190,6 +191,16 @@ async fn main() {
     if let Some(clf) = &classifier {
         run_scaling_benchmark(&session, clf);
     }
+
+    // ── ToadStool infrastructure stats ──────────────────────────────────
+    println!("╔══════════════════════════════════════════════════════════════════════╗");
+    println!("║              TOADSTOOL INFRASTRUCTURE STATS                        ║");
+    println!("╠══════════════════════════════════════════════════════════════════════╣");
+    for line in session.ctx_stats().lines() {
+        println!("║  {:<66} ║", line);
+    }
+    println!("║  GemmCached: pipeline compiled once, reused across all dispatches  ║");
+    println!("╚══════════════════════════════════════════════════════════════════════╝");
 
     v.finish();
 }

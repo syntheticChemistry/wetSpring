@@ -1,54 +1,66 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Unidirectional streaming GPU pipeline — pre-warmed, zero per-call overhead.
+//! Unidirectional streaming GPU pipeline — ToadStool infrastructure wired.
 //!
-//! The `GpuPipelineSession` compiles all shaders once at init and reuses
-//! compiled pipelines across every subsequent dispatch.  This eliminates
-//! the per-call shader compilation that makes GPU lose to CPU on small
-//! workloads.
-//!
-//! # Architecture
+//! # Architecture (v2 — ToadStool wiring)
 //!
 //! ```text
-//! GpuPipelineSession::new()        ← compile FMR shader, warm GEMM shader
-//!   ├── session.classify_batch()   ← reuses warmed GEMM pipeline
-//!   ├── session.shannon()          ← reuses compiled FMR (no recompile)
-//!   ├── session.simpson()          ← reuses compiled FMR
-//!   ├── session.observed()         ← reuses compiled FMR
-//!   └── session.stream_sample()    ← taxonomy GEMM + diversity FMR, one call
+//! GpuPipelineSession::new(gpu)
+//!   ├── TensorContext          ← buffer pool + bind group cache + batching
+//!   ├── GemmCached             ← pre-compiled GEMM pipeline (local extension)
+//!   ├── FusedMapReduceF64      ← pre-compiled FMR pipeline (ToadStool)
+//!   └── warmup dispatches      ← prime driver caches
+//!
+//! session.stream_sample(...)
+//!   ├── GemmCached::execute()  ← cached pipeline, per-call buffers only
+//!   ├── FMR::shannon()         ← reuses compiled pipeline
+//!   ├── FMR::simpson()         ← reuses compiled pipeline
+//!   └── FMR::observed()        ← reuses compiled pipeline
 //! ```
 //!
-//! With pre-warming, even tiny workloads (5 ASVs, 50 counts) complete
-//! in ~2ms on GPU — competitive with CPU.  At scale (500+ queries),
-//! GPU parallelism dominates: 20-50× faster than CPU.
+//! # ToadStool systems wired
+//!
+//! - `TensorContext`: buffer pool, bind group cache, batch dispatch grouping
+//! - `GemmCached`: local extension — pre-compiled GEMM pipeline (ToadStool absorbs)
+//! - `FusedMapReduceF64`: pre-compiled at init, reused across all calls
+//! - `GLOBAL_CACHE`: pipeline cache (used by TensorContext internally)
+//!
+//! # Local extensions (for ToadStool absorption)
+//!
+//! - `GemmCached`: caches shader + pipeline + BGL at init (GemmF64 recreates per call)
+//! - `execute_to_buffer()`: returns GPU buffer without readback (chaining primitive)
 
 use crate::bio::diversity;
+use crate::bio::gemm_cached::GemmCached;
 use crate::bio::taxonomy::{
     extract_kmers, ClassifyParams, Classification, NaiveBayesClassifier, TaxRank,
 };
 use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
+use barracuda::device::TensorContext;
 use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
-use barracuda::ops::linalg::gemm_f64::GemmF64;
 use std::collections::HashSet;
 use std::sync::Arc;
 use std::time::Instant;
 
-/// Pre-warmed GPU pipeline session.
+/// Pre-warmed GPU pipeline session with ToadStool infrastructure.
 ///
-/// Compiles shaders once at creation, then all dispatches reuse the
-/// compiled pipelines.  This is the core of the unidirectional streaming
-/// architecture: no per-call overhead, just buffer management + compute.
+/// Wires TensorContext (pool + cache + batching) and GemmCached (pre-compiled
+/// pipeline) into the streaming architecture. All per-sample dispatches reuse
+/// compiled pipelines — only buffer allocation and data transfer per call.
 pub struct GpuPipelineSession {
-    device: Arc<barracuda::device::WgpuDevice>,
+    ctx: Arc<TensorContext>,
     fmr: FusedMapReduceF64,
+    gemm: GemmCached,
     pub warmup_ms: f64,
 }
 
 impl GpuPipelineSession {
-    /// Create a pre-warmed session.
+    /// Create a pre-warmed session with ToadStool infrastructure.
     ///
-    /// Compiles FMR shader + warms GEMM shader with a tiny dummy dispatch.
-    /// Typical warmup: ~30-50ms (one-time cost, amortized across all samples).
+    /// - TensorContext: buffer pool, bind group cache
+    /// - GemmCached: pre-compiled GEMM shader + pipeline
+    /// - FMR: pre-compiled map-reduce shader + pipeline
+    /// - Warmup dispatches: prime driver caches
     pub fn new(gpu: &GpuF64) -> Result<Self> {
         if !gpu.has_f64 {
             return Err(Error::Gpu("SHADER_F64 required".into()));
@@ -56,24 +68,30 @@ impl GpuPipelineSession {
 
         let warmup_start = Instant::now();
         let device = gpu.to_wgpu_device();
+        let ctx = gpu.tensor_context().clone();
 
-        // Compile FMR shader (reused for all diversity calls)
         let fmr = FusedMapReduceF64::new(device.clone())
             .map_err(|e| Error::Gpu(format!("FMR init: {e}")))?;
 
-        // Warm FMR with tiny dispatch (primes driver caches)
-        let _ = fmr.sum(&[1.0, 2.0, 3.0]);
+        let gemm = GemmCached::new(device.clone(), ctx.clone());
 
-        // Warm GEMM shader (primes wgpu shader compilation cache)
-        let _ = GemmF64::execute(device.clone(), &[1.0; 4], &[1.0; 4], 2, 2, 2, 1);
+        // Prime driver caches with tiny dispatches
+        let _ = fmr.sum(&[1.0, 2.0, 3.0]);
+        let _ = gemm.execute(&[1.0; 4], &[1.0; 4], 2, 2, 2, 1);
 
         let warmup_ms = warmup_start.elapsed().as_secs_f64() * 1000.0;
 
         Ok(Self {
-            device,
+            ctx,
             fmr,
+            gemm,
             warmup_ms,
         })
+    }
+
+    /// TensorContext stats: buffer pool reuse, bind group cache, batched ops.
+    pub fn ctx_stats(&self) -> String {
+        self.ctx.stats().to_string()
     }
 
     // ── Diversity: pre-warmed FMR (no shader recompilation) ─────────────
@@ -114,9 +132,9 @@ impl GpuPipelineSession {
             .map_err(|e| Error::Gpu(format!("observed: {e}")))
     }
 
-    // ── Taxonomy: compact GEMM (warmed shader) ──────────────────────────
+    // ── Taxonomy: cached GEMM pipeline ──────────────────────────────────
 
-    /// Batch-classify via compact GEMM using the warmed shader.
+    /// Batch-classify via compact GEMM using the cached pipeline.
     pub fn classify_batch(
         &self,
         classifier: &NaiveBayesClassifier,
@@ -163,7 +181,6 @@ impl GpuPipelineSession {
         let rows_per_query = 1 + n_boot;
         let total_rows = n_queries * rows_per_query;
 
-        // Build compact Q
         let mut q_compact = vec![0.0_f64; total_rows * n_active];
         for (qi, kmers) in query_kmer_lists.iter().enumerate() {
             let base_row = qi * rows_per_query;
@@ -185,7 +202,6 @@ impl GpuPipelineSession {
             }
         }
 
-        // Build compact T^T
         let dense = classifier.dense_log_probs();
         let mut t_compact = vec![0.0_f64; n_active * n_taxa];
         for (col, &ki) in active_indices.iter().enumerate() {
@@ -194,19 +210,11 @@ impl GpuPipelineSession {
             }
         }
 
-        // GEMM (uses warmed shader cache)
-        let scores = GemmF64::execute(
-            self.device.clone(),
-            &q_compact,
-            &t_compact,
-            total_rows,
-            n_active,
-            n_taxa,
-            1,
-        )
-        .map_err(|e| Error::Gpu(format!("taxonomy GEMM: {e}")))?;
+        // GemmCached: reuses pre-compiled pipeline (no shader recompilation)
+        let scores = self
+            .gemm
+            .execute(&q_compact, &t_compact, total_rows, n_active, n_taxa, 1)?;
 
-        // Post-process
         let log_priors = classifier.log_priors();
         let taxon_labels = classifier.taxon_labels();
         let mut results = Vec::with_capacity(n_queries);
@@ -254,7 +262,7 @@ impl GpuPipelineSession {
 
     /// Run taxonomy + diversity on GPU in a single streaming session.
     ///
-    /// All shaders are pre-warmed — this call is pure buffer + compute.
+    /// All pipelines are pre-compiled — this call is pure buffer + compute.
     pub fn stream_sample(
         &self,
         classifier: &NaiveBayesClassifier,

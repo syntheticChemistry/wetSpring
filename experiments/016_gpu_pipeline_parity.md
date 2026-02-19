@@ -1,4 +1,4 @@
-# Experiment 016: GPU Pipeline Math Parity — Streaming GEMM Architecture
+# Experiment 016: GPU Pipeline Math Parity — ToadStool Infrastructure
 
 **Date:** 2026-02-19
 **Status:** PASS (68/68 checks)
@@ -24,15 +24,39 @@ on CPU and GPU hardware, then benchmark all three tiers:
 | Rust | release mode, LLVM -O3 |
 | ToadStool | wgpu v22, Vulkan backend |
 
-## Architecture: Streaming GPU Pipeline
+## Architecture: ToadStool Infrastructure Wiring
 
 ```
-CPU I/O → FASTQ parse → QF → derep → DADA2 → chimera  (all CPU, <700ms)
-        ↓
-Upload ASV data → GPU: [taxonomy compact GEMM] → [diversity FMR] → Download
-        ↓
-CPU post-process: argmax, confidence, formatting  (~0.1ms)
+GpuPipelineSession::new(gpu)
+  ├── TensorContext          ← buffer pool + bind group cache + batching
+  ├── GemmCached             ← pre-compiled GEMM pipeline (local extension)
+  ├── FusedMapReduceF64      ← pre-compiled FMR pipeline (ToadStool)
+  └── warmup dispatches      ← prime driver caches (27ms one-time)
+
+session.stream_sample(classifier, seqs, counts, params)
+  ├── GemmCached::execute()  ← cached pipeline, pooled buffers
+  ├── FMR::shannon()         ← reuses compiled pipeline
+  ├── FMR::simpson()         ← reuses compiled pipeline
+  └── FMR::observed()        ← reuses compiled pipeline
 ```
+
+### ToadStool Systems Wired
+
+| System | Module | Purpose |
+|--------|--------|---------|
+| **TensorContext** | `barracuda::device` | Buffer pool, bind group cache, batch grouping |
+| **BufferPool** | `TensorContext::buffer_pool()` | Power-of-2 bucketed buffer reuse (73.8% reuse) |
+| **GLOBAL_CACHE** | `barracuda::device::pipeline_cache` | Shader/pipeline cache (used by TensorContext) |
+| **FusedMapReduceF64** | `barracuda::ops` | Pre-compiled FMR (Shannon, Simpson, sum) |
+| **GemmF64** (reference) | `barracuda::ops::linalg` | GEMM math — extended locally as GemmCached |
+
+### Local Extensions (ToadStool Absorption Path)
+
+| Extension | File | Pattern for ToadStool |
+|-----------|------|----------------------|
+| **GemmCached** | `bio/gemm_cached.rs` | `GemmF64::new()` + cached pipeline |
+| **BufferPool integration** | `bio/gemm_cached.rs` | Pool-managed A/B/C buffers via `acquire_pooled()` |
+| **execute_to_buffer()** | `bio/gemm_cached.rs` | Return GPU buffer for chaining (no readback) |
 
 ### Key Design Decisions
 
@@ -43,8 +67,11 @@ CPU post-process: argmax, confidence, formatting  (~0.1ms)
 2. **Stacked bootstrap**: Full classification + 50 bootstrap iterations
    are stacked into a single Q matrix, executing as one GEMM dispatch.
 
-3. **Streaming session**: Taxonomy GEMM + diversity FMR share a single
-   `WgpuDevice` and `TensorContext`, minimizing driver overhead.
+3. **GemmCached pipeline**: Shader compilation + pipeline creation hoisted
+   to session init. Per-call overhead: only buffer management + dispatch.
+
+4. **BufferPool**: A/B/C matrices use ToadStool's BufferPool with power-of-2
+   bucketing. Across 10+ GEMM calls: 16 allocs, 45 reuses (73.8% reuse).
 
 ## Pipeline Stages
 
@@ -107,23 +134,33 @@ Tolerance: `GPU_VS_CPU_F64 = 1e-6`
 The progression: HashMap (O(n) lookup) → flat array (O(1) lookup, 21×) →
 compact GEMM (GPU parallelism + reduced transfer, 188×).
 
-### GPU Streaming Session Breakdown
+### GPU Streaming Session Breakdown (GemmCached + BufferPool)
 
 | Sample | Tax GEMM (ms) | Div FMR (ms) | Session (ms) |
 |--------|--------------|-------------|-------------|
-| N.oculata D1-R1 | 36.0 | 0.0 | 36.0 |
-| N.oculata D14-R1 | 9.5 | 0.0 | 9.5 |
-| B.plicatilis D1-R2 | 10.0 | 0.0 | 10.0 |
-| B.plicatilis D14-R1 | 11.4 | 0.0 | 11.4 |
-| N.oceanica phyco-1 | 7.8 | 0.0 | 7.8 |
-| N.oceanica phyco-2 | 13.1 | 0.0 | 13.1 |
-| Cyano-tox-1 | 5.8 | 0.0 | 5.8 |
-| Cyano-tox-2 | 22.6 | 0.0 | 22.6 |
-| LakeErie-1 | 11.7 | 0.0 | 11.7 |
-| LakeErie-2 | 14.8 | 0.0 | 14.8 |
-| **Average** | **14.3** | **0.0** | **14.3** |
+| N.oculata D1-R1 | 9.8 | 0.0 | 9.8 |
+| N.oculata D14-R1 | 10.8 | 0.0 | 10.8 |
+| B.plicatilis D1-R2 | 9.0 | 0.0 | 9.0 |
+| B.plicatilis D14-R1 | 10.8 | 0.0 | 10.8 |
+| N.oceanica phyco-1 | 7.5 | 0.0 | 7.5 |
+| N.oceanica phyco-2 | 12.3 | 0.0 | 12.3 |
+| Cyano-tox-1 | 6.0 | 0.0 | 6.0 |
+| Cyano-tox-2 | 21.0 | 0.0 | 21.0 |
+| LakeErie-1 | 10.3 | 0.0 | 10.3 |
+| LakeErie-2 | 12.6 | 0.0 | 12.6 |
+| **Average** | **11.0** | **0.0** | **11.0** |
 
-First sample has warmup cost (shader compilation). Subsequent: ~7-16ms.
+GemmCached eliminates first-sample warmup penalty (was 36ms → now 9.8ms).
+Average per-sample from 14.3ms → **11.0ms** (23% improvement).
+
+### ToadStool BufferPool Stats
+
+| Metric | Value |
+|--------|-------|
+| Buffer allocations | 16 |
+| Buffer reuses | 45 |
+| **Reuse rate** | **73.8%** |
+| Bucketing | Power-of-2 (256 byte minimum) |
 
 ## Three-Tier Benchmark
 
@@ -161,53 +198,59 @@ a single chip for dedicated hardware. Both are 10-13× cheaper than Galaxy.**
 | Compact GEMM taxonomy | 0.13 s | 1.6 s | **6.1 s (GPU)** |
 | **Total speedup** | **188×** | **1,256×** | **335×** |
 
-## Scaling Benchmark — Dispatch Cleared
+## Scaling Benchmark — GemmCached + BufferPool
 
 | Queries | CPU (ms) | GPU (ms) | Speedup | GPU/query |
 |---------|----------|----------|---------|-----------|
-| 5       | 98       | 6.1      | 16×     | 1.22 ms   |
-| 25      | 421      | 17       | 24.7×   | 0.68 ms   |
-| 100     | 1,670    | 34       | 49.7×   | 0.34 ms   |
-| 500     | 8,053    | 145      | 55.5×   | 0.29 ms   |
+| 5       | 76       | 3.9      | **19.6×** | 0.77 ms |
+| 25      | 397      | 17.6     | **22.6×** | 0.70 ms |
+| 100     | 1,607    | 31.0     | **51.9×** | 0.31 ms |
+| 500     | 8,071    | 238      | **33.9×** | 0.48 ms |
 
-Pre-warming FMR + GEMM shaders at session init (23.8ms one-time cost) via
-`GpuPipelineSession` eliminates per-call shader compilation. With dispatch
-overhead cleared, GPU advantage grows from 16× at 5 queries to 55.5× at 500
-queries.
+GemmCached + BufferPool eliminates per-call pipeline creation AND buffer
+allocation. At 5 queries: 3.9ms GPU (was 6.1ms — **36% faster**). At 100
+queries: 31ms (was 34ms). Pipeline compiled once at init (27ms), buffers
+reused via power-of-2 bucketing (73.8% reuse rate).
 
-Pipeline totals (10 samples): CPU 7.7s, GPU 6.1s = **1.25×** overall.
+Pipeline totals (10 samples): CPU 7.3s, GPU 6.0s = **1.21×** overall.
 
 ## Conclusions
 
 1. **Math is identical across hardware.** Zero error for diversity, 100%
    chimera agreement, 100% taxonomy agreement. The science is preserved.
 
-2. **Streaming GEMM architecture validated.** Compact k-mer GEMM with
-   stacked bootstrap eliminates ~45× of GPU transfer overhead. Average
-   streaming session: 14.3ms (taxonomy 14.3ms + diversity 0.0ms, pre-warmed).
+2. **ToadStool infrastructure wired.** TensorContext (buffer pool + cache),
+   GemmCached (pre-compiled pipeline), and FMR are integrated into the
+   streaming session. BufferPool achieves 73.8% buffer reuse rate.
 
-3. **Dispatch cleared.** `GpuPipelineSession` pre-warms FMR + GEMM shaders at
-   init (23.8ms one-time). Per-call shader compilation eliminated; GPU
-   speedup scales from 16× at 5 queries to 55.5× at 500 queries.
+3. **Dispatch cleared.** GemmCached compiles the GEMM pipeline once at init
+   (27ms). Per-call overhead: only buffer management + dispatch. Small
+   workload speedup improved from 16× to **19.6×** at 5 queries.
 
-4. **The three tiers validate the full claim:**
-   - Galaxy → Rust CPU: 13.4× faster, 13× cheaper, zero dependencies
-   - Rust CPU → Rust GPU: 1.25× faster, 8.8× taxonomy speedup
+4. **Local extensions prove ToadStool absorption path:**
+   - `GemmCached`: GemmF64 should evolve to cache pipeline internally
+   - `execute_to_buffer()`: GEMM should return GPU buffer for chaining
+   - BufferPool integration: GEMM should use pool for buffer reuse
+
+5. **The three tiers validate the full claim:**
+   - Galaxy → Rust CPU: 12× faster, 13× cheaper, zero dependencies
+   - Rust CPU → Rust GPU: 1.21× faster, 8.8× taxonomy speedup
    - **Rust abstracts across hardware** — same algorithm, any chip
 
-5. **Isolating work to GPU is validated.** Taxonomy GEMM + diversity FMR
+6. **Isolating work to GPU is validated.** Taxonomy GEMM + diversity FMR
    run entirely on GPU. CPU handles I/O, hashing, and iterative stages.
-   Full GPU isolation (including DADA2/chimera) deferred to chipset phase.
 
-6. **ToadStool dispatch path**: PipelineBuilder, BufferPool, and
-   UnidirectionalPipeline are available for cross-stage buffer persistence
-   and zero-readback chaining — the next step for dedicated chipset work.
+7. **Next: GPU argmax kernel.** Currently, GEMM scores are read back to CPU
+   for argmax + bootstrap confidence. A GPU argmax kernel would reduce
+   readback from ~3.5MB to ~1KB per taxonomy dispatch — the key remaining
+   optimization before chipset-phase work.
 
 ## Files
 
+- `barracuda/src/bio/gemm_cached.rs` — **NEW**: Pre-compiled GEMM pipeline + BufferPool
+- `barracuda/src/bio/streaming_gpu.rs` — Streaming session (TensorContext + GemmCached + FMR)
 - `barracuda/src/bio/taxonomy.rs` — Dense flat-array NB classifier
-- `barracuda/src/bio/taxonomy_gpu.rs` — Compact GEMM GPU taxonomy
-- `barracuda/src/bio/streaming_gpu.rs` — Streaming GPU session wrapper
+- `barracuda/src/bio/taxonomy_gpu.rs` — Compact GEMM GPU taxonomy (standalone)
 - `barracuda/src/bio/chimera.rs` — k-mer sketch + prefix-sum chimera
-- `barracuda/src/bin/validate_16s_pipeline_gpu.rs` — Validation binary
+- `barracuda/src/bin/validate_16s_pipeline_gpu.rs` — Validation + benchmarking binary
 - `experiments/results/016_gpu_pipeline_parity/gpu_parity_results.json`
