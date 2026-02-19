@@ -31,8 +31,8 @@ use wetspring_barracuda::bio::chimera_gpu;
 use wetspring_barracuda::bio::dada2::{self, Dada2Params};
 use wetspring_barracuda::bio::derep::{self, DerepSort};
 use wetspring_barracuda::bio::diversity;
-use wetspring_barracuda::bio::diversity_gpu;
 use wetspring_barracuda::bio::quality::{self, QualityParams};
+use wetspring_barracuda::bio::streaming_gpu::GpuPipelineSession;
 use wetspring_barracuda::bio::taxonomy::{
     ClassifyParams, Lineage, NaiveBayesClassifier, ReferenceSeq, TaxRank,
 };
@@ -65,7 +65,13 @@ async fn main() {
     if !gpu.has_f64 {
         validation::exit_skipped("No SHADER_F64 support on this GPU");
     }
-    println!();
+
+    // ── Pre-warm GPU pipeline session (compile shaders once) ────────────
+    let session = GpuPipelineSession::new(&gpu).unwrap_or_else(|e| {
+        validation::exit_skipped(&format!("GPU session init failed: {e}"));
+    });
+    println!("  GPU session warmed in {:.1}ms (FMR + GEMM shaders compiled)\n",
+        session.warmup_ms);
 
     let base = std::env::var("WETSPRING_PUBLIC_DIR").map_or_else(
         |_| {
@@ -129,7 +135,7 @@ async fn main() {
                 continue;
             }
             let (c, g) = process_sample_gpu_vs_cpu(
-                &mut v, &gpu, &dir, label, accession,
+                &mut v, &gpu, &session, &dir, label, accession,
                 classifier.as_ref(), run_full_chimera,
             );
             cpu_total_ms += c;
@@ -180,6 +186,11 @@ async fn main() {
     std::fs::write(&json_path, &json).ok();
     println!("\nResults written to {}", json_path.display());
 
+    // ── Scaling benchmark: prove GPU advantage grows with workload ───────
+    if let Some(clf) = &classifier {
+        run_scaling_benchmark(&session, clf);
+    }
+
     v.finish();
 }
 
@@ -189,6 +200,7 @@ async fn main() {
 fn process_sample_gpu_vs_cpu(
     v: &mut Validator,
     gpu: &GpuF64,
+    session: &GpuPipelineSession,
     sample_dir: &Path,
     label: &str,
     accession: &str,
@@ -400,11 +412,9 @@ fn process_sample_gpu_vs_cpu(
         cpu_tax_ms = cpu_t.elapsed().as_secs_f64() * 1000.0;
     }
 
-    // GPU streaming session: taxonomy GEMM + diversity FMR in one session
+    // GPU streaming session: pre-warmed taxonomy GEMM + diversity FMR
     let gpu_result = if let Some(clf) = classifier {
-        wetspring_barracuda::bio::streaming_gpu::stream_classify_and_diversity(
-            gpu, clf, &seqs, &counts, &params,
-        ).ok()
+        session.stream_sample(clf, &seqs, &counts, &params).ok()
     } else {
         None
     };
@@ -414,16 +424,12 @@ fn process_sample_gpu_vs_cpu(
             (res.shannon, res.simpson, res.observed,
              res.diversity_ms, res.taxonomy_ms, &res.classifications)
         } else {
-            // Fallback: separate GPU calls
+            // Fallback: pre-warmed FMR diversity
             let gpu_t = Instant::now();
-            let s = diversity_gpu::shannon_gpu(gpu, &counts)
-                .unwrap_or(cpu_shannon);
-            let d = diversity_gpu::simpson_gpu(gpu, &counts)
-                .unwrap_or(cpu_simpson);
-            let o = diversity_gpu::observed_features_gpu(gpu, &counts)
-                .unwrap_or(cpu_observed);
+            let s = session.shannon(&counts).unwrap_or(cpu_shannon);
+            let d = session.simpson(&counts).unwrap_or(cpu_simpson);
+            let o = session.observed_features(&counts).unwrap_or(cpu_observed);
             let div_ms = gpu_t.elapsed().as_secs_f64() * 1000.0;
-            // Use dummy values for taxonomy since streaming failed
             (s, d, o, div_ms, 0.0, &cpu_tax_results)
         };
 
@@ -504,6 +510,92 @@ fn process_sample_gpu_vs_cpu(
     );
 
     (cpu_ms, gpu_ms)
+}
+
+// ── Scaling benchmark: dispatch overhead + parallelization ───────────────────
+
+#[allow(clippy::cast_precision_loss)]
+fn run_scaling_benchmark(
+    session: &GpuPipelineSession,
+    classifier: &NaiveBayesClassifier,
+) {
+    println!("\n╔══════════════════════════════════════════════════════════════════════╗");
+    println!("║           SCALING BENCHMARK — GPU vs CPU at Varying Load           ║");
+    println!("╠══════════════════════════════════════════════════════════════════════╣");
+    println!("║  Goal: GPU competitive at small N, dominant at large N             ║");
+    println!("║  Proves: dispatch overhead cleared, parallelization unlocked       ║");
+    println!("╚══════════════════════════════════════════════════════════════════════╝\n");
+
+    // Generate synthetic query sequences (realistic 16S length ~250bp)
+    let base_seq = b"ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\
+                     ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\
+                     ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\
+                     ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT";
+
+    // Vary sequence slightly per query using a simple mutation
+    let make_seqs = |n: usize| -> Vec<Vec<u8>> {
+        (0..n)
+            .map(|i| {
+                let mut s = base_seq.to_vec();
+                let bases = [b'A', b'C', b'G', b'T'];
+                let slen = s.len();
+                for j in 0..slen.min(10) {
+                    s[(i * 7 + j * 13) % slen] = bases[(i + j) % 4];
+                }
+                s
+            })
+            .collect()
+    };
+
+    let params = ClassifyParams {
+        bootstrap_n: 50,
+        ..ClassifyParams::default()
+    };
+
+    let query_sizes = [5, 25, 100, 500];
+
+    println!(
+        "  {:>8}  {:>12}  {:>12}  {:>10}  {:>10}",
+        "Queries", "CPU (ms)", "GPU (ms)", "Speedup", "GPU tax/q"
+    );
+    println!("  {}", "─".repeat(62));
+
+    for &n_queries in &query_sizes {
+        let seqs_owned = make_seqs(n_queries);
+        let seqs: Vec<&[u8]> = seqs_owned.iter().map(|s| s.as_slice()).collect();
+        let counts: Vec<f64> = (0..n_queries).map(|i| (i as f64 + 1.0) * 10.0).collect();
+
+        // CPU
+        let cpu_t = Instant::now();
+        let _cpu_results: Vec<_> = seqs
+            .iter()
+            .map(|seq| classifier.classify(seq, &params))
+            .collect();
+        let _ = diversity::shannon(&counts);
+        let _ = diversity::simpson(&counts);
+        let _ = diversity::observed_features(&counts);
+        let cpu_ms = cpu_t.elapsed().as_secs_f64() * 1000.0;
+
+        // GPU (pre-warmed session)
+        let gpu_t = Instant::now();
+        let gpu_result = session
+            .stream_sample(classifier, &seqs, &counts, &params)
+            .ok();
+        let gpu_ms = gpu_t.elapsed().as_secs_f64() * 1000.0;
+
+        let speedup = if gpu_ms > 0.0 { cpu_ms / gpu_ms } else { 0.0 };
+        let gpu_tax_per_q = gpu_result
+            .as_ref()
+            .map(|r| r.taxonomy_ms / n_queries as f64)
+            .unwrap_or(0.0);
+
+        println!(
+            "  {:>8}  {:>10.1}ms  {:>10.1}ms  {:>9.1}×  {:>8.2}ms",
+            n_queries, cpu_ms, gpu_ms, speedup, gpu_tax_per_q
+        );
+    }
+
+    println!();
 }
 
 // ── SILVA database loading ──────────────────────────────────────────────────

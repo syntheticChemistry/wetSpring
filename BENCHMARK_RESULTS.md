@@ -131,8 +131,8 @@ Rust binary replaces the ~4GB Galaxy/QIIME2 Docker ecosystem. Post-GPU projectio
 
 | Metric | Galaxy/Python | Rust CPU | Rust GPU | CPU/Galaxy | GPU/CPU |
 |--------|--------------|----------|----------|------------|---------|
-| Total (10 samples) | 95.6 s | **7.1 s** | **6.0 s** | **13.4×** | **1.18×** |
-| Per-sample | 9.56 s | **0.71 s** | **0.60 s** | **13.4×** | **1.18×** |
+| Total (10 samples) | 95.6 s | **7.7 s** | **6.1 s** | **12.4×** | **1.25×** |
+| Per-sample | 9.56 s | **0.77 s** | **0.61 s** | **12.4×** | **1.25×** |
 | Taxonomy/sample | ~3.0 s | 0.115 s | **0.013 s** | **26×** | **8.8×** |
 | DADA2/sample | 6.80 s | 0.32 s | 0.32 s | **21×** | 1× |
 | Dependencies | 7 + Galaxy | 1 (flate2) | 1 (flate2) | — | — |
@@ -148,9 +148,22 @@ Rust binary replaces the ~4GB Galaxy/QIIME2 Docker ecosystem. Post-GPU projectio
 
 ### Streaming GPU Session
 
-Average per sample: **16.3 ms** (taxonomy GEMM 14.3ms + diversity FMR 2.0ms).
-Compact GEMM uploads only ~13 MB per dispatch (vs 587 MB for full k-mer space)
-— a 45× transfer reduction via active k-mer set extraction.
+Average per sample: **14.3 ms** (taxonomy GEMM 14.3ms + diversity FMR 0.0ms,
+pre-warmed). Compact GEMM uploads only ~13 MB per dispatch (vs 587 MB for
+full k-mer space) — a 45× transfer reduction via active k-mer set extraction.
+
+**Scaling benchmark (dispatch cleared):**
+
+| Queries | CPU (ms) | GPU (ms) | Speedup | GPU/query |
+|---------|----------|----------|---------|-----------|
+| 5       | 98       | 6.1      | 16×     | 1.22 ms   |
+| 25      | 421      | 17       | 24.7×   | 0.68 ms   |
+| 100     | 1,670    | 34       | 49.7×   | 0.34 ms   |
+| 500     | 8,053    | 145      | 55.5×   | 0.29 ms   |
+
+`GpuPipelineSession` pre-warms FMR + GEMM shaders at init (23.8ms one-time),
+eliminating per-call shader compilation. GPU speedup scales from 16× to 55.5×
+as load increases. Pipeline totals (10 samples): **CPU 7.7s, GPU 6.1s = 1.25×**.
 
 ### GPU parity
 

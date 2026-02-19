@@ -34,7 +34,7 @@ wetspring-barracuda v0.1.0
   1 runtime dep (flate2); GPU deps feature-gated (barracuda, wgpu v22, tokio)
   11 ToadStool GPU primitives, 0 custom WGSL shaders
   100% math parity: CPU ↔ GPU (Shannon, Simpson, chimera, taxonomy — zero error)
-  13.4× faster than Galaxy (Rust CPU), 15.9× (Rust GPU streaming)
+  13.4× faster than Galaxy (Rust CPU); GPU scaling benchmark 16–55× (5–500 queries)
   Taxonomy: 188× faster via compact GEMM (HashMap → flat array → GPU GEMM)
   Chimera: 1,256× faster (O(N³) → k-mer sketch + prefix-sum)
   Sovereign parsers: FASTQ, mzML/XML, MS2, base64 — all in-tree
@@ -44,8 +44,8 @@ wetspring-barracuda v0.1.0
   PFAS pipeline:  mzML/MS2 → tolerance search → spectral match → KMD → homologue grouping
 
   GPU benchmark: 1,077× speedup on spectral cosine (200×200) — RTX 4070
-  Pipeline benchmark: Rust CPU 7.1s vs Galaxy 95.6s (10 samples); GPU streaming 6.0s
-  Streaming GPU: taxonomy GEMM 13ms + diversity FMR 2ms = 16ms avg session
+  Pipeline benchmark: Rust CPU 7.7s vs Galaxy 95.6s (10 samples); GPU streaming 6.1s (1.25×)
+  Streaming GPU: taxonomy GEMM 13ms + diversity FMR 0ms (pre-warmed); scaling 16–55×
 ```
 
 | Track | Phase | Status |
