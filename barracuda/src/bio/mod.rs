@@ -34,6 +34,8 @@ pub mod spectral_match_gpu;
 pub mod stats_gpu;
 pub mod taxonomy;
 #[cfg(feature = "gpu")]
+pub mod streaming_gpu;
+#[cfg(feature = "gpu")]
 pub mod taxonomy_gpu;
 pub mod tolerance_search;
 pub mod unifrac;

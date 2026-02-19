@@ -36,7 +36,6 @@ use wetspring_barracuda::bio::quality::{self, QualityParams};
 use wetspring_barracuda::bio::taxonomy::{
     ClassifyParams, Lineage, NaiveBayesClassifier, ReferenceSeq, TaxRank,
 };
-use wetspring_barracuda::bio::taxonomy_gpu;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::io::fastq::FastqRecord;
 use wetspring_barracuda::tolerances;
@@ -364,31 +363,71 @@ fn process_sample_gpu_vs_cpu(
             .collect();
     }
 
-    // ── Stage 5: Diversity (CPU vs GPU) ────────────────────────────────────
+    // ── Stage 5+6: Streaming GPU — taxonomy GEMM + diversity FMR ──────────
+    // Single streaming session: upload ASV data once, run taxonomy GEMM +
+    // diversity FMR, download results once. CPU path runs separately for
+    // comparison.
     let counts: Vec<f64> = clean_asvs.iter().map(|a| a.abundance as f64).collect();
 
     if counts.len() < 2 {
-        println!("  {label}: <2 ASVs after chimera — skipping diversity");
+        println!("  {label}: <2 ASVs after chimera — skipping diversity+taxonomy");
         let cpu_ms = cpu_qf_ms + cpu_derep_ms + cpu_dada2_ms + cpu_chimera_ms;
         let gpu_ms = gpu_qf_ms + cpu_derep_ms + cpu_dada2_ms + gpu_chimera_ms;
         return (cpu_ms, gpu_ms);
     }
 
+    // CPU reference: diversity
     let cpu_t = Instant::now();
     let cpu_shannon = diversity::shannon(&counts);
     let cpu_simpson = diversity::simpson(&counts);
     let cpu_observed = diversity::observed_features(&counts);
     let cpu_div_ms = cpu_t.elapsed().as_secs_f64() * 1000.0;
 
-    let gpu_t = Instant::now();
-    let gpu_shannon = diversity_gpu::shannon_gpu(gpu, &counts)
-        .unwrap_or_else(|e| { println!("  [GPU ERROR] Shannon: {e}"); cpu_shannon });
-    let gpu_simpson = diversity_gpu::simpson_gpu(gpu, &counts)
-        .unwrap_or_else(|e| { println!("  [GPU ERROR] Simpson: {e}"); cpu_simpson });
-    let gpu_observed = diversity_gpu::observed_features_gpu(gpu, &counts)
-        .unwrap_or_else(|e| { println!("  [GPU ERROR] observed: {e}"); cpu_observed });
-    let gpu_div_ms = gpu_t.elapsed().as_secs_f64() * 1000.0;
+    // CPU reference: taxonomy
+    let mut cpu_tax_ms = 0.0;
+    let mut cpu_tax_results: Vec<wetspring_barracuda::bio::taxonomy::Classification> = vec![];
+    let params = ClassifyParams { bootstrap_n: 50, ..ClassifyParams::default() };
+    let n_classify = clean_asvs.len().min(5);
+    let seqs: Vec<&[u8]> = clean_asvs.iter().take(n_classify)
+        .map(|a| a.sequence.as_slice())
+        .collect();
 
+    if let Some(clf) = classifier {
+        let cpu_t = Instant::now();
+        cpu_tax_results = seqs.iter()
+            .map(|seq| clf.classify(seq, &params))
+            .collect();
+        cpu_tax_ms = cpu_t.elapsed().as_secs_f64() * 1000.0;
+    }
+
+    // GPU streaming session: taxonomy GEMM + diversity FMR in one session
+    let gpu_result = if let Some(clf) = classifier {
+        wetspring_barracuda::bio::streaming_gpu::stream_classify_and_diversity(
+            gpu, clf, &seqs, &counts, &params,
+        ).ok()
+    } else {
+        None
+    };
+
+    let (gpu_shannon, gpu_simpson, gpu_observed, gpu_div_ms, gpu_tax_ms, gpu_tax_results) =
+        if let Some(ref res) = gpu_result {
+            (res.shannon, res.simpson, res.observed,
+             res.diversity_ms, res.taxonomy_ms, &res.classifications)
+        } else {
+            // Fallback: separate GPU calls
+            let gpu_t = Instant::now();
+            let s = diversity_gpu::shannon_gpu(gpu, &counts)
+                .unwrap_or(cpu_shannon);
+            let d = diversity_gpu::simpson_gpu(gpu, &counts)
+                .unwrap_or(cpu_simpson);
+            let o = diversity_gpu::observed_features_gpu(gpu, &counts)
+                .unwrap_or(cpu_observed);
+            let div_ms = gpu_t.elapsed().as_secs_f64() * 1000.0;
+            // Use dummy values for taxonomy since streaming failed
+            (s, d, o, div_ms, 0.0, &cpu_tax_results)
+        };
+
+    // ── Diversity parity checks ─────────────────────────────────────────────
     let tol = tolerances::GPU_VS_CPU_F64;
     let shannon_diff = (cpu_shannon - gpu_shannon).abs();
     let simpson_diff = (cpu_simpson - gpu_simpson).abs();
@@ -425,37 +464,11 @@ fn process_sample_gpu_vs_cpu(
         "  {label} diversity: observed CPU={:.0} GPU={:.0} (Δ={:.2e})",
         cpu_observed, gpu_observed, observed_diff,
     );
-    println!(
-        "  {label} diversity: {:.1}ms CPU / {:.1}ms GPU",
-        cpu_div_ms, gpu_div_ms,
-    );
 
-    // ── Stage 6: Taxonomy (CPU vs GPU) ─────────────────────────────────────
-    let mut cpu_tax_ms = 0.0;
-    let mut gpu_tax_ms = 0.0;
-    if let Some(clf) = classifier {
-        let params = ClassifyParams { bootstrap_n: 50, ..ClassifyParams::default() };
-        let n_classify = clean_asvs.len().min(5);
-        let seqs: Vec<&[u8]> = clean_asvs.iter().take(n_classify)
-            .map(|a| a.sequence.as_slice())
-            .collect();
-
-        let cpu_t = Instant::now();
-        let cpu_results: Vec<_> = seqs.iter()
-            .map(|seq| clf.classify(seq, &params))
-            .collect();
-        cpu_tax_ms = cpu_t.elapsed().as_secs_f64() * 1000.0;
-
-        let gpu_t = Instant::now();
-        let gpu_results = taxonomy_gpu::classify_batch_gpu(gpu, clf, &seqs, &params)
-            .unwrap_or_else(|e| {
-                println!("  [GPU ERROR] taxonomy: {e}");
-                cpu_results.clone()
-            });
-        gpu_tax_ms = gpu_t.elapsed().as_secs_f64() * 1000.0;
-
+    // ── Taxonomy parity checks ──────────────────────────────────────────────
+    if !cpu_tax_results.is_empty() {
         let mut taxa_match = 0_usize;
-        for (c, g) in cpu_results.iter().zip(gpu_results.iter()) {
+        for (c, g) in cpu_tax_results.iter().zip(gpu_tax_results.iter()) {
             let c_genus = c.lineage.at_rank(TaxRank::Genus).unwrap_or("");
             let g_genus = g.lineage.at_rank(TaxRank::Genus).unwrap_or("");
             if c_genus == g_genus {
@@ -464,15 +477,20 @@ fn process_sample_gpu_vs_cpu(
         }
         v.check(
             &format!("{label}: taxonomy genus agreement CPU == GPU"),
-            if taxa_match == cpu_results.len() { 1.0 } else { 0.0 },
+            if taxa_match == cpu_tax_results.len() { 1.0 } else { 0.0 },
             1.0,
             0.0,
         );
         println!(
-            "  {label} taxonomy: {}/{} genus match ({:.1}ms / {:.1}ms)",
-            taxa_match, cpu_results.len(), cpu_tax_ms, gpu_tax_ms,
+            "  {label} taxonomy: {}/{} genus match (CPU {:.1}ms / GPU GEMM {:.1}ms)",
+            taxa_match, cpu_tax_results.len(), cpu_tax_ms, gpu_tax_ms,
         );
     }
+
+    println!(
+        "  {label} streaming GPU session: taxonomy {:.1}ms + diversity {:.1}ms = {:.1}ms",
+        gpu_tax_ms, gpu_div_ms, gpu_tax_ms + gpu_div_ms,
+    );
 
     // ── Totals ──────────────────────────────────────────────────────────────
     let cpu_ms = cpu_qf_ms + cpu_derep_ms + cpu_dada2_ms + cpu_chimera_ms

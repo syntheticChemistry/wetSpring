@@ -105,12 +105,21 @@ pub struct ReferenceSeq {
 }
 
 /// A trained naive Bayes classifier.
+///
+/// Stores log-probabilities in a flat `n_taxa × kmer_space` array for
+/// O(1) lookup (no HashMap in the scoring hot path). For k=8, `kmer_space`
+/// = 4^8 = 65,536 entries per taxon.
 #[derive(Debug)]
+#[allow(dead_code)]
 pub struct NaiveBayesClassifier {
     k: usize,
-    /// For each genus (or lowest-rank taxon): taxon string -> kmer presence probabilities
-    /// taxon_kmer_probs[taxon_id][kmer] = P(kmer | taxon)
-    taxon_kmer_probs: Vec<HashMap<u64, f64>>,
+    /// Flat log-probability table: `dense_log_probs[taxon * kmer_space + kmer]`
+    /// = log P(kmer | taxon). Pre-filled with `default_log_p` for unseen k-mers.
+    dense_log_probs: Vec<f64>,
+    /// Number of possible k-mers: 4^k
+    kmer_space: usize,
+    /// Log-prior per taxon: ln P(taxon)
+    log_priors: Vec<f64>,
     /// Taxon labels (full lineage string)
     taxon_labels: Vec<Lineage>,
     /// Prior probabilities: P(taxon)
@@ -155,10 +164,11 @@ impl NaiveBayesClassifier {
     /// Train a classifier from reference sequences.
     ///
     /// Groups reference sequences by genus-level lineage, extracts k-mers,
-    /// and computes conditional probabilities with Laplace smoothing.
+    /// and precomputes a flat log-probability table for O(1) scoring.
     #[allow(clippy::cast_precision_loss)]
     pub fn train(refs: &[ReferenceSeq], k: usize) -> Self {
-        // Group references by genus-level lineage
+        let kmer_space = 1_usize << (2 * k); // 4^k
+
         let mut taxon_map: HashMap<String, Vec<usize>> = HashMap::new();
         for (i, r) in refs.iter().enumerate() {
             let key = r.lineage.to_string_at_rank(TaxRank::Genus);
@@ -166,15 +176,15 @@ impl NaiveBayesClassifier {
         }
 
         let mut taxon_labels = Vec::new();
-        let mut taxon_kmer_probs = Vec::new();
         let mut taxon_counts = Vec::new();
         let mut all_kmers: HashMap<u64, bool> = HashMap::new();
 
+        // First pass: collect all taxon data
+        let mut taxon_sparse: Vec<HashMap<u64, usize>> = Vec::new();
         for (taxon_key, ref_indices) in &taxon_map {
             taxon_labels.push(Lineage::from_taxonomy_string(taxon_key));
             taxon_counts.push(ref_indices.len());
 
-            // Collect all k-mers present in any reference in this taxon
             let mut kmer_presence: HashMap<u64, usize> = HashMap::new();
             for &ri in ref_indices {
                 let kmers = extract_kmers(&refs[ri].sequence, k);
@@ -183,18 +193,24 @@ impl NaiveBayesClassifier {
                     *kmer_presence.entry(kmer).or_insert(0) += 1;
                 }
             }
+            taxon_sparse.push(kmer_presence);
+        }
 
-            // Convert to probabilities with Laplace smoothing
-            let n_refs = ref_indices.len() as f64;
-            let probs: HashMap<u64, f64> = kmer_presence
-                .into_iter()
-                .map(|(kmer, count)| {
-                    let p = (count as f64 + 0.5) / (n_refs + 1.0);
-                    (kmer, p)
-                })
-                .collect();
+        let n_kmers_total = all_kmers.len();
+        let n_taxa = taxon_labels.len();
+        let default_log_p = (0.5 / (n_kmers_total.max(1) as f64 + 1.0))
+            .max(1e-300)
+            .ln();
 
-            taxon_kmer_probs.push(probs);
+        // Build dense log-probability table: n_taxa × kmer_space
+        let mut dense_log_probs = vec![default_log_p; n_taxa * kmer_space];
+        for (ti, (sparse, count)) in taxon_sparse.iter().zip(taxon_counts.iter()).enumerate() {
+            let n_refs = *count as f64;
+            let row_start = ti * kmer_space;
+            for (&kmer, &presence) in sparse {
+                let p = (presence as f64 + 0.5) / (n_refs + 1.0);
+                dense_log_probs[row_start + kmer as usize] = p.max(1e-300).ln();
+            }
         }
 
         let total_refs: f64 = taxon_counts.iter().sum::<usize>() as f64;
@@ -202,15 +218,43 @@ impl NaiveBayesClassifier {
             .iter()
             .map(|&c| c as f64 / total_refs)
             .collect();
+        let log_priors: Vec<f64> = taxon_priors
+            .iter()
+            .map(|&p| p.max(1e-300).ln())
+            .collect();
 
         NaiveBayesClassifier {
             k,
-            taxon_kmer_probs,
+            dense_log_probs,
+            kmer_space,
+            log_priors,
             taxon_labels,
             taxon_priors,
-            n_kmers_total: all_kmers.len(),
+            n_kmers_total,
         }
     }
+
+    /// Access the dense log-probability table for GPU GEMM dispatch.
+    /// Layout: `n_taxa × kmer_space`, row-major.
+    pub fn dense_log_probs(&self) -> &[f64] {
+        &self.dense_log_probs
+    }
+
+    /// K-mer space size (4^k).
+    pub fn kmer_space(&self) -> usize {
+        self.kmer_space
+    }
+
+    /// Log-prior per taxon.
+    pub fn log_priors(&self) -> &[f64] {
+        &self.log_priors
+    }
+
+    /// Taxon labels.
+    pub fn taxon_labels(&self) -> &[Lineage] {
+        &self.taxon_labels
+    }
+
 
     /// Classify a query sequence.
     #[allow(clippy::cast_precision_loss)]
@@ -241,17 +285,17 @@ impl NaiveBayesClassifier {
     }
 
     /// Score using all query k-mers and return best taxon index.
+    /// Uses flat array indexing — no HashMap lookups.
     fn score_all_kmers(&self, query_kmers: &[u64]) -> usize {
+        let n_taxa = self.taxon_labels.len();
         let mut best_score = f64::NEG_INFINITY;
         let mut best_idx = 0;
 
-        let default_p = 0.5 / (self.n_kmers_total.max(1) as f64 + 1.0);
-
-        for (ti, probs) in self.taxon_kmer_probs.iter().enumerate() {
-            let mut log_score = self.taxon_priors[ti].max(1e-300).ln();
-            for kmer in query_kmers {
-                let p = probs.get(kmer).copied().unwrap_or(default_p);
-                log_score += p.max(1e-300).ln();
+        for ti in 0..n_taxa {
+            let row = ti * self.kmer_space;
+            let mut log_score = self.log_priors[ti];
+            for &kmer in query_kmers {
+                log_score += self.dense_log_probs[row + kmer as usize];
             }
             if log_score > best_score {
                 best_score = log_score;
@@ -317,7 +361,7 @@ impl NaiveBayesClassifier {
 }
 
 /// Extract all k-mers from a DNA sequence (no canonicalization — direction matters for taxonomy).
-fn extract_kmers(seq: &[u8], k: usize) -> Vec<u64> {
+pub fn extract_kmers(seq: &[u8], k: usize) -> Vec<u64> {
     if seq.len() < k || k == 0 || k > 32 {
         return vec![];
     }

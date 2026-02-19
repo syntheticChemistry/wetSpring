@@ -123,26 +123,34 @@ Rust binary replaces the ~4GB Galaxy/QIIME2 Docker ecosystem. Post-GPU projectio
 
 ---
 
-## GPU Pipeline Parity (Exp016) — Three-Tier 16S Benchmark
+## GPU Pipeline Parity (Exp016) — Streaming GEMM Architecture
 
 **68/68 checks PASS.** CPU and GPU produce identical scientific results.
 
-### After chimera optimization (k-mer sketch + prefix-sum + early termination)
+### Three-Tier 16S Pipeline
 
-| Metric | Galaxy/Python | Rust CPU | Speedup |
-|--------|--------------|----------|---------|
-| Per-sample pipeline | 9.56 s | **3.27 s** | **2.9×** |
-| Per-sample DADA2 | 6.80 s | **0.33 s** | **20.5×** |
-| Per-sample chimera | ~1 s | **0.16 s** | **6.3×** |
-| Dependencies | 7 + Galaxy | 1 (flate2) | — |
-| Cost at 10K samples | $0.40 | **$0.14** | **2.9× cheaper** |
+| Metric | Galaxy/Python | Rust CPU | Rust GPU | CPU/Galaxy | GPU/CPU |
+|--------|--------------|----------|----------|------------|---------|
+| Total (10 samples) | 95.6 s | **7.1 s** | **6.0 s** | **13.4×** | **1.18×** |
+| Per-sample | 9.56 s | **0.71 s** | **0.60 s** | **13.4×** | **1.18×** |
+| Taxonomy/sample | ~3.0 s | 0.115 s | **0.013 s** | **26×** | **8.8×** |
+| DADA2/sample | 6.80 s | 0.32 s | 0.32 s | **21×** | 1× |
+| Dependencies | 7 + Galaxy | 1 (flate2) | 1 (flate2) | — | — |
+| Cost at 10K samples | $0.40 | **$0.03** | **$0.04** | **13× cheaper** | — |
 
-The chimera algorithm was optimized from O(N³L²) brute-force to O(N×K²×L) with
-k-mer sketch parent selection (K=8), prefix-sum crossover scoring, and early
-termination. This yielded a **1,256× speedup** (1,985s → 1.6s for 10 samples).
+### Optimization Progression (Taxonomy)
 
-Rust CPU now **beats Galaxy by 2.9×** and is the cheapest option. The remaining
-pipeline bottleneck is taxonomy classification (NB k-mer scoring, 24.5s of 32.7s).
+| Approach | Per-sample | 10 samples | vs HashMap |
+|----------|-----------|------------|------------|
+| HashMap lookups (original) | 2,450 ms | 24.5 s | 1× |
+| Flat array indexing (CPU) | 115 ms | 1.15 s | **21×** |
+| **Compact GEMM (GPU)** | **13 ms** | **0.13 s** | **188×** |
+
+### Streaming GPU Session
+
+Average per sample: **16.3 ms** (taxonomy GEMM 14.3ms + diversity FMR 2.0ms).
+Compact GEMM uploads only ~13 MB per dispatch (vs 587 MB for full k-mer space)
+— a 45× transfer reduction via active k-mer set extraction.
 
 ### GPU parity
 
@@ -154,12 +162,12 @@ pipeline bottleneck is taxonomy classification (NB k-mer scoring, 24.5s of 32.7s
 | Chimera decisions | — | — | 100% agree |
 | Taxonomy genus | — | — | 100% match |
 
-### ToadStool dispatch findings
+### Architecture: ToadStool Integration
 
-ToadStool has `PipelineBuilder`, `BufferPool`, `TensorContext`, and
-`UnidirectionalPipeline` — but wetSpring's GPU modules don't use them yet.
-Current `GemmF64` recompiles shaders per call; `FusedMapReduceF64` allocates
-new buffers per call. Wiring these optimizations is the path to making
-GPU dispatch efficient enough to justify offloading the taxonomy stage.
+- **Used**: `GemmF64` (compact GEMM taxonomy), `FusedMapReduceF64` (diversity),
+  `BrayCurtisF64` (beta diversity), shared `WgpuDevice`/`TensorContext`
+- **Available for chipset phase**: `PipelineBuilder` (zero-readback chaining),
+  `BufferPool` (buffer reuse), `UnidirectionalPipeline` (fire-and-forget),
+  `GpuRingBuffer` (host↔device staging)
 
 Run with `cargo run --release --features gpu --bin validate_16s_pipeline_gpu`.
