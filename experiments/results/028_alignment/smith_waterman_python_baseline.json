@@ -1,0 +1,51 @@
+{
+  "identical": {
+    "score": 16,
+    "aligned_query": "ACGTACGT",
+    "aligned_target": "ACGTACGT",
+    "query_start": 0,
+    "target_start": 0
+  },
+  "mismatch": {
+    "score": 5,
+    "aligned_query": "ACGT",
+    "aligned_target": "ACTT",
+    "query_start": 0,
+    "target_start": 0
+  },
+  "gap": {
+    "score": 10,
+    "aligned_query": "ACGTACGT",
+    "aligned_target": "ACG-ACGT",
+    "query_start": 0,
+    "target_start": 0
+  },
+  "local": {
+    "score": 16,
+    "aligned_query": "ACGTACGT",
+    "aligned_target": "ACGTACGT",
+    "query_start": 3,
+    "target_start": 0
+  },
+  "no_match": {
+    "score": 0,
+    "aligned_query": "",
+    "aligned_target": "",
+    "query_start": 0,
+    "target_start": 0
+  },
+  "16s_fragment": {
+    "score": 74,
+    "aligned_query": "GATCCTGGCTCAGGATGAACGCTGGCGGCGTGCCTAATAC",
+    "aligned_target": "GATCCTGGCTCAGAATGAACGCTGGCGGCATGCCTAATAC",
+    "query_start": 0,
+    "target_start": 0
+  },
+  "no_match_harsh": {
+    "score": 0,
+    "aligned_query": "",
+    "aligned_target": "",
+    "query_start": 0,
+    "target_start": 0
+  }
+}

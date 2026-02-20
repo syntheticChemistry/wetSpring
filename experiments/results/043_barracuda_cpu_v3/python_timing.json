@@ -1,0 +1,23 @@
+{
+  "total_us": 1749044.1269765142,
+  "domains": {
+    "D01: ODE Integration (RK4)": 182071.18002464995,
+    "D02: Gillespie SSA (100 reps)": 841565.5179996975,
+    "D03: HMM (Forward + Viterbi)": 28.957001632079482,
+    "D04: Smith-Waterman (40bp)": 5109.828984132037,
+    "D05: Felsenstein (20bp, 3 taxa)": 176.38999270275235,
+    "D06: Diversity (Shannon+Simpson)": 9.687995770946145,
+    "D07: Signal Processing": 25.399989681318402,
+    "D08: Cooperation ODE (100h)": 290541.86699795537,
+    "D09: Robinson-Foulds (4 taxa)": 13.865006621927023,
+    "D10: Multi-Signal QS (48h)": 252374.47299878113,
+    "D11: Phage Defense (48h)": 176695.00099145807,
+    "D12: Bootstrap (100 reps, 8bp)": 363.5970060713589,
+    "D13: Placement (3 taxa, 12bp)": 10.296003893017769,
+    "D14: Decision Tree (4 samples)": 2.2269960027188063,
+    "D15: Spectral Match (5 peaks)": 16.564008546993136,
+    "D16: Extended Diversity": 10.52400330081582,
+    "D17: K-mer Counting (16bp, k=4)": 20.42099367827177,
+    "D18: Integrated Pipeline": 8.329981938004494
+  }
+}

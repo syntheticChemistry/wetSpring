@@ -1,7 +1,7 @@
 # Handoff: All Springs → ToadStool Wiring Team
 
-> **SUPERSEDED** by [`HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_19_2026_v3.md`](HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_19_2026_v3.md)
-> (645 checks, 430 tests, 22 experiments, full evolution readiness).
+> **SUPERSEDED** by [`HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_20_2026.md`](HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_20_2026.md)
+> (v4 — ToadStool evolution review, updated remaining requests and shader designs).
 
 **Date:** February 17, 2026
 **Updated:** February 18, 2026 — **Nearly all items RESOLVED by ToadStool deep debt work**

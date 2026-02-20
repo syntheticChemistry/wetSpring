@@ -22,12 +22,17 @@ and ordination (PCoA).
 ### Track 1b: Comparative Genomics / Mathematical Biology
 
 Reproduce published mathematical models and phylogenetic algorithms from the
-Liu Lab (CMSE, MSU), Waters 2008, and Massie 2012. This exercises: Newick tree
+Liu Lab (CMSE, MSU), Waters Lab, and collaborators. This exercises: Newick tree
 parsing, Robinson-Foulds distance, RK4 ODE integration, Gillespie stochastic
-simulation, and decision tree inference.
+simulation, decision tree inference, HMM (forward/backward/Viterbi/posterior),
+Smith-Waterman local alignment, Felsenstein pruning phylogenetic likelihood,
+RAWR bootstrap resampling, phylogenetic placement, bistable phenotypic
+switching, multi-signal QS networks, game-theoretic cooperation, phenotypic
+capacitor models, and phage defense dynamics.
 
-**Source papers**: Waters 2008 (QS/c-di-GMP), Massie 2012 (Gillespie SSA),
-Liu 2014 (PhyloNet-HMM), dendropy (phylogenetic baseline)
+**Source papers**: Waters 2008, Massie 2012, Liu 2014, Fernandez 2020,
+Srivastava 2011, Bruger & Waters 2018, Mhatre 2020, Hsueh/Severin 2022,
+Wang 2021 (RAWR), Alamin & Liu 2024
 
 ### Track 2: PFAS Analytical Chemistry (codename blueFish)
 
@@ -286,43 +291,73 @@ All experiments run on a single consumer workstation:
 
 ## 6. Acceptance Criteria
 
-### Phase 2 (CPU): 519/519 checks pass
+### Phase 2 (CPU): 1,035/1,035 checks pass
 
 | Binary | Checks | Target |
 |--------|:------:|--------|
 | `validate_fastq` | 28 | Quality filter + merge + derep + Galaxy FastQC |
 | `validate_diversity` | 27 | Analytical + simulated + evenness + rarefaction |
 | `validate_16s_pipeline` | 37 | Complete 16S: FASTQ → DADA2 → chimera → taxonomy → diversity → UniFrac |
-| `validate_algae_16s` | 29 | Real NCBI data (PRJNA488170) + Humphrey 2023 reference |
+| `validate_algae_16s` | 34 | Real NCBI data (PRJNA488170) + Humphrey 2023 reference |
 | `validate_voc_peaks` | 22 | Reese 2019 Table 1 (14 VOC compounds) + RI matching |
 | `validate_mzml` | 7 | mzML parsing vs pyteomics |
 | `validate_pfas` | 10 | Cosine + KMD + FindPFAS |
-| `validate_features` | 9 | EIC + peaks + features vs asari (Exp009) |
+| `validate_features` | 8 | EIC + peaks + features vs asari (Exp009) |
 | `validate_peaks` | 17 | Peak detection vs scipy.signal.find_peaks (Exp010) |
 | `validate_public_benchmarks` | 202 | 22 samples, 4 BioProjects vs paper ground truth (Exp014) |
-| `validate_extended_algae` | 29 | PRJNA382322 Nannochloropsis (Exp017) |
-| `validate_pfas_library` | 21 | Jones Lab PFAS 175 compounds (Exp018) |
+| `validate_extended_algae` | 35 | PRJNA382322 Nannochloropsis (Exp017) |
+| `validate_pfas_library` | 26 | Jones Lab PFAS 175 compounds (Exp018) |
 | `validate_newick_parse` | 30 | Newick tree parsing vs dendropy (Exp019) |
 | `validate_qs_ode` | 16 | Waters 2008 QS ODE vs scipy (Exp020) |
 | `validate_rf_distance` | 23 | Robinson-Foulds vs dendropy (Exp021) |
 | `validate_gillespie` | 13 | Gillespie SSA vs analytical + numpy (Exp022) |
 | `validate_pfas_decision_tree` | 7 | Decision tree inference vs sklearn (Exp008) |
-| **Total** | **519** | **All pass** |
+| `validate_bistable` | 14 | Fernandez 2020 bistable switching (Exp023) |
+| `validate_multi_signal` | 19 | Srivastava 2011 multi-signal QS (Exp024) |
+| `validate_cooperation` | 20 | Bruger & Waters 2018 game theory (Exp025) |
+| `validate_hmm` | 21 | Liu 2014 HMM primitives (Exp026) |
+| `validate_capacitor` | 18 | Mhatre 2020 phenotypic capacitor (Exp027) |
+| `validate_alignment` | 15 | Smith-Waterman local alignment (Exp028) |
+| `validate_felsenstein` | 16 | Felsenstein pruning likelihood (Exp029) |
+| `validate_barracuda_cpu` | 21 | Cross-domain CPU parity v1 (9 domains) |
+| `validate_phage_defense` | 12 | Hsueh 2022 phage defense (Exp030) |
+| `validate_bootstrap` | 11 | Wang 2021 RAWR bootstrap (Exp031) |
+| `validate_placement` | 12 | Alamin & Liu 2024 placement (Exp032) |
+| `validate_neighbor_joining` | 16 | Liu 2009 NJ tree construction (Exp033) |
+| `validate_reconciliation` | 14 | Zheng 2023 DTL reconciliation (Exp034) |
+| `validate_barracuda_cpu_v2` | 18 | Batch/flat APIs (5 domains, Exp035) |
+| `validate_phynetpy_rf` | 15 | PhyNetPy RF gene trees (Exp036) |
+| `validate_phylohmm` | 10 | PhyloNet-HMM discordance (Exp037) |
+| `validate_sate_pipeline` | 17 | SATé pipeline benchmark (Exp038) |
+| `validate_algae_timeseries` | 11 | Algal pond time-series (Exp039) |
+| `validate_bloom_surveillance` | 15 | Bloom surveillance (Exp040) |
+| `validate_epa_pfas_ml` | 14 | EPA PFAS ML (Exp041) |
+| `validate_massbank_spectral` | 9 | MassBank spectral (Exp042) |
+| `validate_barracuda_cpu_v3` | 45 | 18-domain CPU parity (Exp043) |
+| **Total** | **1,035** | **All pass** |
 
-Current status: **519/519 pass.** Covers 22 experiments across 3 tracks, including
-real NCBI data, published paper models (Waters 2008, Massie 2012), phylogenetic
-algorithms (RF distance), and sovereign ML inference (decision tree).
+Current status: **1,035/1,035 pass.** 50 experiments across 3 tracks.
+84/84 BarraCUDA CPU parity checks across 18 algorithmic domains.
+~20× Rust speedup over Python (84,500µs vs 1,749,000µs).
 
-### Phase 3 (GPU): 126/126 checks pass
+### Phase 3 (GPU): 200/200 checks pass
 
 | Binary | Checks | Target |
 |--------|:------:|--------|
 | `validate_diversity_gpu` | 38 | All within `GPU_VS_CPU_*` tolerances |
-| `validate_16s_pipeline_gpu` | 88 | Full pipeline: QF + DADA2 + chimera + taxonomy + diversity (10 samples) |
+| `validate_16s_pipeline_gpu` | 88 | Full pipeline: QF + DADA2 + chimera + taxonomy + diversity |
+| `validate_barracuda_gpu_v3` | 14 | Extended diversity, spectral, stats GPU parity (Exp044) |
+| `validate_toadstool_bio` | 14 | ToadStool bio absorption: SW, Gillespie, DT (Exp045) |
+| `validate_gpu_phylo_compose` | 15 | FelsensteinGpu → bootstrap + placement (Exp046) |
+| `validate_gpu_hmm_forward` | 13 | Local WGSL HMM batch forward (Exp047) |
+| `benchmark_phylo_hmm_gpu` | 6 | CPU vs GPU Felsenstein + HMM timing (Exp048) |
+| `validate_gpu_ode_sweep` | 12 | GPU ODE sweep (7) + bifurcation eigenvalues (5) (Exp049-050) |
 
-Current status: **126/126 pass.** DADA2 GPU 24× speedup; full pipeline 2.45× GPU speedup.
+Current status: **200/200 pass.** 15 ToadStool primitives consumed.
+4 local WGSL shaders (Write → Absorb → Lean candidates).
+4 bio GPU primitives absorbed from ToadStool (Feb 20 cce8fe7c).
 
-### Grand Total: 645/645 quantitative checks pass
+### Grand Total: 1,235/1,235 quantitative checks pass
 
 ---
 
@@ -331,14 +366,17 @@ Current status: **126/126 pass.** DADA2 GPU 24× speedup; full pipeline 2.45× G
 | Aspect | hotSpring | wetSpring |
 |--------|-----------|-----------|
 | Domain | Nuclear physics | Life science + analytical chemistry |
-| Phase A/B | Python reproduction → `BarraCUDA` re-execution | Galaxy/Python → Rust sovereign port |
-| GPU workload | Large-matrix eigensolve, MD force evaluation | Diversity metrics, distance matrices, signal processing |
+| Phase A/B | Python reproduction → BarraCUDA re-execution | Galaxy/Python → Rust sovereign port |
+| GPU workload | Large-matrix eigensolve, MD force evaluation | Diversity, phylogenetics, ODE sweeps, HMM |
 | Validation metric | chi2/datum | Pass/fail within documented tolerance |
 | Data size | Small (52–2,042 nuclei) | Large (millions of reads, thousands of spectra) |
-| Key insight | GPU-resident hybrid beats CPU for matrix physics | Full GPU pipeline 2.45× faster; compute-bound stages (DADA2 24×, taxonomy 60×) vs memory-bound (QF 0.85×) |
+| Local shaders | 10+ WGSL (HFB, MD, lattice QCD) | 4 WGSL (HMM, ODE, DADA2, quality) |
+| Absorption tracking | `EVOLUTION_READINESS.md` with tiers | `EVOLUTION_READINESS.md` with tiers (adopted) |
+| Key insight | GPU-resident hybrid beats CPU for matrix physics | Full GPU pipeline 2.45× faster; ODE/HMM/phylo math portable to GPU |
 
-Both projects prove the same thesis: **sovereign compute on consumer hardware
-can replicate institutional results, then exceed them via Rust + GPU.**
+Both projects follow the **Write → Absorb → Lean** pattern and prove the same
+thesis: sovereign compute on consumer hardware can replicate institutional
+results, then exceed them via Rust + GPU.
 
 ---
 

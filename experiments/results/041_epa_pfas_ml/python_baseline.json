@@ -1,0 +1,24 @@
+{
+  "experiment": "Exp041",
+  "description": "PFAS detection ML on surface water data",
+  "data_source": "Michigan EGLE (3719 samples) + EPA UCMR 5 (national)",
+  "n_samples": 200,
+  "n_positive": 146,
+  "n_negative": 54,
+  "stump": {
+    "feature": 4,
+    "threshold": 70.00247948967362,
+    "left_pred": 0,
+    "right_pred": 1,
+    "gini": 0.0
+  },
+  "accuracy": 1.0,
+  "n_correct": 200,
+  "feature_names": [
+    "PFOS_ng_L",
+    "PFOA_ng_L",
+    "PFHxS_ng_L",
+    "latitude",
+    "total_PFAS"
+  ]
+}

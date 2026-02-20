@@ -1,0 +1,44 @@
+{
+  "experiment": "Exp040",
+  "description": "Bloom event detection and surveillance pipeline",
+  "proxy_for": "Smallwood #14 (raceway metagenomic surveillance)",
+  "data_source": "PRJNA1224988 (175 samples, cyanobacterial bloom)",
+  "n_timepoints": 90,
+  "n_taxa": 25,
+  "bloom_window": [
+    30,
+    45,
+    60
+  ],
+  "pre_bloom": {
+    "shannon_mean": 3.155875558157568,
+    "shannon_std": 0.0044081670385398355,
+    "evenness_mean": 0.980427866703055
+  },
+  "bloom_peak": {
+    "shannon": 2.3611132867269764,
+    "simpson": 0.2294588090778138,
+    "dominance": 0.4650323789019368,
+    "evenness": 0.733521084748168,
+    "bray_curtis_shift": 0.0879629209232969
+  },
+  "recovery": {
+    "shannon_mean": 3.159014501709364,
+    "recovery_fraction": 1.0009946347674203
+  },
+  "bloom_detected": true,
+  "shannon_first5": [
+    3.1607662620878583,
+    3.160762088974655,
+    3.1635809129803594,
+    3.1582657305602684,
+    3.1615296138999085
+  ],
+  "dominance_first5": [
+    0.05898127055108909,
+    0.06202810183971922,
+    0.05921978588785929,
+    0.05981069591408959,
+    0.059209057411659695
+  ]
+}

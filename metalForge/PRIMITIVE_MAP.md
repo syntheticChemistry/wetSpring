@@ -1,0 +1,132 @@
+# Primitive Map: wetSpring Rust → ToadStool GPU
+
+**Date:** February 20, 2026
+**Purpose:** Map every wetSpring Rust module to its ToadStool/BarraCUDA
+GPU primitive (or explain why it stays CPU-only). This guides the
+absorption pipeline and identifies what ToadStool needs to build next.
+
+---
+
+## Legend
+
+| Symbol | Meaning |
+|--------|---------|
+| **Lean** | Using upstream ToadStool primitive |
+| **Local** | wetSpring-authored WGSL shader (absorption candidate) |
+| **Compose** | Combining existing ToadStool primitives |
+| **CPU** | No GPU path (I/O-bound, sequential, or too small) |
+| **NPU** | Neural Processing Unit candidate |
+| **Blocked** | Needs new ToadStool primitive |
+
+---
+
+## Full Mapping
+
+### Diversity & Statistics (GPU-validated)
+
+| Rust Module | GPU Strategy | ToadStool Primitive | Exp |
+|-------------|-------------|-------------------|-----|
+| `diversity` (Shannon) | Lean | `FusedMapReduceF64::shannon_entropy()` | 004 |
+| `diversity` (Simpson) | Lean | `FusedMapReduceF64::simpson_index()` | 004 |
+| `diversity` (Bray-Curtis) | Lean | `BrayCurtisF64` | 004 |
+| `diversity` (Pielou, Chao1) | Lean | `FusedMapReduceF64` | 044 |
+| `diversity_gpu` | Lean | `BrayCurtisF64` + `FMR` | 016 |
+| `spectral_match_gpu` | Lean | `FMR` (spectral cosine) | 016 |
+| `stats_gpu` | Lean | `FMR` (variance, correlation) | 016 |
+| `pcoa_gpu` | Lean | `BatchedEighGpu` | 016 |
+| `tolerance_search` | Lean | `BatchTolSearchF64` | 016 |
+
+### Phylogenetics (GPU-composed)
+
+| Rust Module | GPU Strategy | ToadStool Primitive | Exp |
+|-------------|-------------|-------------------|-----|
+| `felsenstein` | Lean | `FelsensteinGpu` | 046 |
+| `bootstrap` | Compose | `FelsensteinGpu` per replicate | 046 |
+| `placement` | Compose | `FelsensteinGpu` per edge | 046 |
+| `neighbor_joining` | CPU | Sequential algorithm | — |
+| `robinson_foulds` | CPU | Per-node comparison | — |
+| `reconciliation` | CPU | Tree traversal | — |
+
+### ODE / Dynamical Systems (GPU-composed)
+
+| Rust Module | GPU Strategy | ToadStool Primitive | Exp |
+|-------------|-------------|-------------------|-----|
+| `ode` (RK4) | **Local** | `batched_qs_ode_rk4_f64.wgsl` | 049 |
+| `qs_biofilm` | **Local** | `batched_qs_ode_rk4_f64.wgsl` | 049 |
+| `bistable` | Compose | Same ODE sweep shader | — |
+| `multi_signal` | Compose | Same ODE sweep shader | — |
+| `phage_defense` | Compose | Same ODE sweep shader | — |
+| `gillespie` | Lean | `GillespieGpu` | 044 |
+| `cooperation` | CPU | Game-theoretic model | — |
+
+### Sequence Analysis (mixed)
+
+| Rust Module | GPU Strategy | ToadStool Primitive | Exp |
+|-------------|-------------|-------------------|-----|
+| `alignment` (SW) | Lean | `SmithWatermanGpu` | 044 |
+| `hmm` | **Local** | `hmm_forward_f64.wgsl` | 047 |
+| `kmer` | **Blocked** | Needs lock-free hash table (P3) | — |
+| `unifrac` | **Blocked** | Needs tree traversal (P3) | — |
+| `decision_tree` | Lean | `TreeInferenceGpu` | 044 |
+
+### 16S Pipeline (GPU-composed)
+
+| Rust Module | GPU Strategy | ToadStool Primitive | Exp |
+|-------------|-------------|-------------------|-----|
+| `quality` / `quality_gpu` | **Local** | `quality_filter.wgsl` | 016 |
+| `dada2` / `dada2_gpu` | **Local** | `dada2_e_step.wgsl` | 016 |
+| `chimera` / `chimera_gpu` | Lean | `FMR` | 016 |
+| `taxonomy` / `taxonomy_gpu` | Lean / **NPU** | `FMR` / FC model | 016 |
+| `streaming_gpu` | Lean | Multiple primitives | 016 |
+| `rarefaction_gpu` | Lean | `PrngXoshiro` | 016 |
+
+### Analytical Chemistry (CPU-focused)
+
+| Rust Module | GPU Strategy | ToadStool Primitive | Exp |
+|-------------|-------------|-------------------|-----|
+| `eic` / `eic_gpu` | Lean | `FMR` | 016 |
+| `kmd` | CPU | Lookup table | — |
+| `signal` | CPU | FFT-based, small data | — |
+| `capacitor` | CPU | Peak detection | — |
+| `feature_table` | CPU | Sparse matrix | — |
+
+### Infrastructure (CPU-only)
+
+| Rust Module | Reason for CPU |
+|-------------|----------------|
+| `phred` | Per-base quality lookup |
+| `derep` | Hash-based dereplication |
+| `merge_pairs` | Sequential per-pair |
+
+---
+
+## Substrate Decision Rules
+
+```
+Is the workload batch-parallel (N > 64)?
+  YES → Does it use f64 transcendentals?
+    YES → Force polyfill via ShaderTemplate::for_driver_auto(_, true)
+    NO  → Standard compile_shader_f64
+  NO → CPU (dispatch overhead exceeds compute)
+
+Is the data size < L2 cache (36 MB RTX 4070)?
+  YES → GPU friendly (single dispatch)
+  NO  → Stream via ToadStool unidirectional pipeline
+
+Is the model a neural network or lookup table?
+  YES → NPU candidate (AKD1000, int8 quantized)
+  NO  → GPU or CPU
+```
+
+---
+
+## Counts
+
+| Category | Count |
+|----------|-------|
+| **Lean** (upstream ToadStool) | 16 modules |
+| **Local** (WGSL shader) | 4 modules |
+| **Compose** (existing primitives) | 5 modules |
+| **CPU** (no GPU path) | 11 modules |
+| **NPU** (candidate) | 1 module |
+| **Blocked** (needs new primitive) | 2 modules |

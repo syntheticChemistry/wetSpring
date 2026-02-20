@@ -2,19 +2,23 @@
 //! GPU FP64 compute for wetSpring science workloads.
 //!
 //! Creates a wgpu device with `SHADER_F64` and bridges to `ToadStool`'s
-//! `WgpuDevice` + `TensorContext`. All GPU dispatch goes through `ToadStool`
-//! primitives — wetSpring has zero custom WGSL shaders.
+//! `WgpuDevice` + `TensorContext`. GPU dispatch goes through `ToadStool`
+//! primitives — wetSpring has only 2 local WGSL shaders (DADA2/QF).
 //!
 //! `ToadStool` primitives used:
 //! - `FusedMapReduceF64` — Shannon, Simpson, alpha diversity
 //! - `BrayCurtisF64` — condensed distance matrices
 //! - `BatchedEighGpu` — `PCoA` eigendecomposition
-//! - `GemmF64` — batch spectral cosine similarity
+//! - `GemmF64` / `GemmCachedF64` — batch spectral cosine, taxonomy
 //! - `KrigingF64` — spatial interpolation
 //! - `VarianceF64` — population/sample variance, std dev
 //! - `CorrelationF64` — Pearson correlation
 //! - `CovarianceF64` — sample covariance
 //! - `WeightedDotF64` — weighted/plain dot product
+//! - `FelsensteinGpu` — phylogenetic likelihood (site-parallel pruning)
+//! - `GillespieGpu` — parallel stochastic simulation (N trajectories)
+//! - `SmithWatermanGpu` — banded local alignment (wavefront)
+//! - `TreeInferenceGpu` — decision tree / random forest inference
 
 use barracuda::device::{GpuDriverProfile, TensorContext, WgpuDevice};
 use std::sync::Arc;
@@ -25,13 +29,17 @@ use std::sync::Arc;
 /// for batched dispatch and buffer pooling. All compute goes through
 /// `ToadStool` primitives via [`to_wgpu_device`](Self::to_wgpu_device).
 ///
-/// `ToadStool` primitives used:
+/// `ToadStool` primitives used (15 total):
 /// - `FusedMapReduceF64` — Shannon, Simpson, alpha diversity
 /// - `BrayCurtisF64` — condensed distance matrices
 /// - `BatchedEighGpu` — `PCoA` eigendecomposition
-/// - `GemmF64` — batch spectral cosine similarity
+/// - `GemmF64` / `GemmCachedF64` — GEMM, spectral cosine, taxonomy
 /// - `KrigingF64` — spatial interpolation
 /// - `VarianceF64` / `CorrelationF64` / `CovarianceF64` / `WeightedDotF64`
+/// - `FelsensteinGpu` — phylogenetic pruning (site × node parallel)
+/// - `GillespieGpu` — parallel SSA (N independent trajectories)
+/// - `SmithWatermanGpu` — banded SW alignment (anti-diagonal wavefront)
+/// - `TreeInferenceGpu` — decision tree / RF inference (sample × tree)
 ///
 /// Driver-specific capabilities (NVK workarounds, eigensolve strategy,
 /// latency model) are available via [`driver_profile`](Self::driver_profile).

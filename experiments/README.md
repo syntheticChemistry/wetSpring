@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-19 (Exp019–022, decision tree inference, Gillespie SSA)
+**Updated**: 2026-02-20 (Exp050: GPU ODE sweep + bifurcation eigenvalues)
 
 ---
 
@@ -35,6 +35,34 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 020 | [Waters 2008 QS/c-di-GMP ODE](020_waters2008_qs_ode.md) | 1 | DONE | scipy.integrate.odeint baseline | bio::ode, bio::qs_biofilm | 16 |
 | 021 | [Robinson-Foulds Validation](021_robinson_foulds_validation.md) | 1b | DONE | dendropy RF distance baseline | bio::robinson_foulds | 23 |
 | 022 | [Massie 2012 Gillespie SSA](022_massie2012_gillespie.md) | 1 | DONE | numpy SSA ensemble baseline | bio::gillespie | 13 |
+| 023 | [Fernandez 2020 Bistable Switching](023_fernandez2020_bistable.md) | 1 | DONE | scipy ODE bifurcation | bio::bistable, bio::ode | 14 |
+| 024 | [Srivastava 2011 Multi-Signal QS](024_srivastava2011_multi_signal.md) | 1 | DONE | scipy ODE multi-signal | bio::multi_signal, bio::ode | 19 |
+| 025 | [Bruger & Waters 2018 Cooperation](025_bruger2018_cooperation.md) | 1 | DONE | scipy ODE game theory | bio::cooperation, bio::ode | 20 |
+| 026 | [Liu 2014 HMM Primitives](026_liu2014_hmm.md) | 1b | DONE | numpy HMM sovereign | bio::hmm | 21 |
+| 027 | [Mhatre 2020 Capacitor](027_mhatre2020_capacitor.md) | 1 | DONE | scipy ODE capacitor | bio::capacitor, bio::ode | 18 |
+| 028 | [Smith-Waterman Alignment](028_smith_waterman_alignment.md) | 1b | DONE | Pure Python SW | bio::alignment | 15 |
+| 029 | [Felsenstein Pruning](029_felsenstein_pruning.md) | 1b/c | DONE | Pure Python JC69 | bio::felsenstein | 16 |
+| 030 | [Hsueh 2022 Phage Defense](030_hsueh2022_phage_defense.md) | 1 | DONE | scipy ODE deaminase | bio::phage_defense, bio::ode | 12 |
+| 031 | [Wang 2021 RAWR Bootstrap](031_wang2021_rawr_bootstrap.md) | 1b | DONE | Pure Python resampling | bio::bootstrap | 11 |
+| 032 | [Alamin & Liu 2024 Placement](032_alamin2024_placement.md) | 1b | DONE | Pure Python placement | bio::placement | 12 |
+| 033 | [Liu 2009 Neighbor-Joining](033_liu2009_neighbor_joining.md) | 1b | DONE | Pure Python NJ | bio::neighbor_joining | 16 |
+| 034 | [Zheng 2023 DTL Reconciliation](034_zheng2023_dtl_reconciliation.md) | 1b | DONE | Pure Python DTL | bio::reconciliation | 14 |
+| 035 | [BarraCUDA CPU Parity v2](035_barracuda_cpu_parity_v2.md) | cross | DONE | CPU v1 extension | batch/flat APIs (5 domains) | 18 |
+| 036 | [PhyNetPy RF Distances](036_phynetpy_rf_distances.md) | 1b | DONE | PhyNetPy gene trees | bio::robinson_foulds | 15 |
+| 037 | [PhyloNet-HMM Discordance](037_phylohmm_discordance.md) | 1b | DONE | PhyloNet-HMM | bio::hmm | 10 |
+| 038 | [SATé Pipeline Benchmark](038_sate_pipeline_benchmark.md) | 1b | DONE | SATé pipeline | bio::alignment, bio::neighbor_joining | 17 |
+| 039 | [Algal Pond Time-Series](039_algae_timeseries.md) | 1 | DONE | Cahill proxy | bio::diversity, time-series | 11 |
+| 040 | [Bloom Surveillance](040_bloom_surveillance.md) | 1 | DONE | Smallwood proxy | 16S pipeline, bio::diversity | 15 |
+| 041 | [EPA PFAS ML](041_epa_pfas_ml.md) | 2 | DONE | Jones F&T proxy | bio::decision_tree | 14 |
+| 042 | [MassBank Spectral](042_massbank_spectral.md) | 2 | DONE | Jones MS proxy | bio::spectral_match | 9 |
+| 043 | [BarraCUDA CPU Parity v3](043_barracuda_cpu_v3.md) | cross | DONE | 18-domain coverage | 9 new domains (84 total) | 45 |
+| 044 | [BarraCUDA GPU v3](044_barracuda_gpu_v3.md) | cross | DONE | GPU parity | diversity, spectral, stats | 14 |
+| 045 | [ToadStool Bio Absorption](045_toadstool_bio_absorption.md) | cross/GPU | DONE | ToadStool cce8fe7c | SmithWatermanGpu, TreeInferenceGpu, GillespieGpu | 10 |
+| 046 | [GPU Phylo Composition](046_gpu_phylo_composition.md) | GPU | DONE | CPU Felsenstein | FelsensteinGpu → bootstrap + placement | 15 |
+| 047 | [GPU HMM Batch Forward](047_gpu_hmm_forward.md) | GPU | DONE | CPU HMM forward | HmmGpuForward (local WGSL) | 13 |
+| 048 | [CPU vs GPU Benchmark](048_cpu_gpu_benchmark_phylo_hmm.md) | GPU | DONE | CPU baselines | Felsenstein, Bootstrap, HMM batch | 6 |
+| 049 | [GPU ODE Parameter Sweep](049_gpu_ode_parameter_sweep.md) | GPU | DONE | `qs_biofilm::run_scenario` | ODE sweep (local WGSL), pow_f64 polyfill | 7 |
+| 050 | [GPU Bifurcation Eigenvalues](050_gpu_bifurcation_eigenvalues.md) | GPU | DONE | Power iteration | BatchedEighGpu Jacobian eigenvalues | 5 |
 
 ---
 
@@ -122,10 +150,15 @@ thresholds from `src/tolerances.rs`.
 | `validate_rf_distance` | 021 | 23 | `cargo run --bin validate_rf_distance` |
 | `validate_gillespie` | 022 | 13 | `cargo run --bin validate_gillespie` |
 | `validate_pfas_decision_tree` | 008 | 7 | `cargo run --bin validate_pfas_decision_tree` |
+| `validate_gpu_phylo_compose` | 046 | 15 | `cargo run --features gpu --release --bin validate_gpu_phylo_compose` |
+| `validate_gpu_hmm_forward` | 047 | 13 | `cargo run --features gpu --release --bin validate_gpu_hmm_forward` |
+| `benchmark_phylo_hmm_gpu` | 048 | 6 | `cargo run --features gpu --release --bin benchmark_phylo_hmm_gpu` |
+| `validate_gpu_ode_sweep` | 049-050 | 12 | `cargo run --features gpu --bin validate_gpu_ode_sweep` |
 | `benchmark_cpu_gpu` | — | — | `cargo run --release --features gpu --bin benchmark_cpu_gpu` |
 
-**Total validation checks**: 645 (519 CPU + 126 GPU)
-**Rust unit/integration tests**: 430 (372 lib + 29 bio_integration + 21 io_roundtrip + 8 doc-tests)
+**Total validation checks**: 1,235 (1,035 CPU + 200 GPU)
+**Rust unit/integration tests**: 465 lib + integration + doc
+**Validation binaries**: 41 CPU + 8 GPU
 **Benchmark infrastructure**: `bench.rs` harness with RAPL + nvidia-smi energy profiling, JSON output
 
 ---

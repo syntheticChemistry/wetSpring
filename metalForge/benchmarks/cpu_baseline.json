@@ -1,0 +1,55 @@
+{
+  "timestamp": "2026-02-20T13:01:14",
+  "results": [
+    {
+      "name": "Felsenstein 100 sites",
+      "us_per_call": 662.7333399956115,
+      "n_iters": 100
+    },
+    {
+      "name": "Felsenstein 1000 sites",
+      "us_per_call": 6622.498598881066,
+      "n_iters": 10
+    },
+    {
+      "name": "Felsenstein 10000 sites",
+      "us_per_call": 70602.7391977841,
+      "n_iters": 10
+    },
+    {
+      "name": "SW 50\u00d750",
+      "us_per_call": 10388.02969851531,
+      "n_iters": 10
+    },
+    {
+      "name": "SW 100\u00d7100",
+      "us_per_call": 74332.62660051696,
+      "n_iters": 5
+    },
+    {
+      "name": "SW 200\u00d7200",
+      "us_per_call": 543666.5139975958,
+      "n_iters": 5
+    },
+    {
+      "name": "Bootstrap 10 reps \u00d7 100 sites",
+      "us_per_call": 6784.213799983263,
+      "n_iters": 10
+    },
+    {
+      "name": "Bootstrap 100 reps \u00d7 100 sites",
+      "us_per_call": 65606.82780109346,
+      "n_iters": 10
+    },
+    {
+      "name": "HMM forward T=100",
+      "us_per_call": 163.43971976311877,
+      "n_iters": 100
+    },
+    {
+      "name": "HMM forward T=1000",
+      "us_per_call": 1663.4958010399714,
+      "n_iters": 10
+    }
+  ]
+}

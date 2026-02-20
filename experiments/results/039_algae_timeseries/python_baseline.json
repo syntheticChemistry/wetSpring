@@ -1,0 +1,44 @@
+{
+  "experiment": "Exp039",
+  "description": "Algal pond time-series diversity surveillance",
+  "proxy_for": "Cahill #13 (phage biocontrol monitoring)",
+  "data_source": "PRJNA382322 (128 samples, Nannochloropsis raceway)",
+  "n_timepoints": 60,
+  "n_taxa": 20,
+  "crash_timepoint": 40,
+  "normal": {
+    "shannon_mean": 2.7888116852203946,
+    "shannon_std": 0.07969364377393978,
+    "bc_mean": 0.06374474235854155,
+    "max_abs_zscore": 4.569028226821603,
+    "shannon_first5": [
+      2.751438221320795,
+      2.840953691038498,
+      2.859993121688198,
+      2.8480193555105653,
+      2.85832264871062
+    ],
+    "bc_first5": [
+      0.06698879264822177,
+      0.05389233441501807,
+      0.04540443161918784,
+      0.05394799182219701,
+      0.05809646111166847
+    ]
+  },
+  "crash": {
+    "shannon_mean": 2.781162504637589,
+    "crash_zscore": 26.278610809906507,
+    "max_abs_zscore": 26.278610809906507,
+    "shannon_at_crash": 2.3987129767030027,
+    "bc_at_crash": 0.4462819627995014,
+    "shannon_first5": [
+      2.751438221320795,
+      2.840953691038498,
+      2.859993121688198,
+      2.8480193555105653,
+      2.85832264871062
+    ]
+  },
+  "anomaly_detected": true
+}

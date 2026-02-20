@@ -16,9 +16,9 @@ categories = ["science", "command-line-utilities"]
 default = []
 # GPU acceleration via BarraCUDA/ToadStool (Phase 3).
 # Enable with `cargo build --features gpu`.
-# Pulls in wgpu v22 (device creation), barracuda (11 ToadStool primitives),
-# and tokio (async device init). 2 custom WGSL shaders (QF, DADA2 E-step)
-# + 1 ToadStool shader (GEMM via GemmCached).
+# Pulls in wgpu v22 (device creation), barracuda (15 ToadStool primitives),
+# and tokio (async device init). 2 custom WGSL shaders (QF, DADA2 E-step).
+# GEMM uses GemmF64::WGSL (no cross-repo include_str!).
 gpu = ["dep:barracuda", "dep:wgpu", "dep:tokio"]
 
 [dependencies]
@@ -132,10 +132,132 @@ path = "src/bin/validate_newick_parse.rs"
 name = "validate_pfas_decision_tree"
 path = "src/bin/validate_pfas_decision_tree.rs"
 
+# ── Bistable phenotypic switching (Exp023, Fernandez 2020) ────────
+[[bin]]
+name = "validate_bistable"
+path = "src/bin/validate_bistable.rs"
+
+# ── Multi-input QS network (Exp024, Srivastava 2011) ─────────────
+[[bin]]
+name = "validate_multi_signal"
+path = "src/bin/validate_multi_signal.rs"
+
+# ── Cooperative QS game theory (Exp025, Bruger & Waters 2018) ────
+[[bin]]
+name = "validate_cooperation"
+path = "src/bin/validate_cooperation.rs"
+
+# ── HMM primitives (Exp026, Liu 2014) ────────────────────────────
+[[bin]]
+name = "validate_hmm"
+path = "src/bin/validate_hmm.rs"
+
+# ── Phenotypic capacitor (Exp027, Mhatre 2020) ──────────────────
+[[bin]]
+name = "validate_capacitor"
+path = "src/bin/validate_capacitor.rs"
+
+# ── Smith-Waterman alignment (Exp028, Liu track) ────────────────
+[[bin]]
+name = "validate_alignment"
+path = "src/bin/validate_alignment.rs"
+
+# ── Felsenstein pruning (Exp029, phylogenetic) ──────────────────
+[[bin]]
+name = "validate_felsenstein"
+path = "src/bin/validate_felsenstein.rs"
+
+# ── BarraCUDA CPU parity (all domains) ──────────────────────────
+[[bin]]
+name = "validate_barracuda_cpu"
+path = "src/bin/validate_barracuda_cpu.rs"
+
+# ── Phage defense (Exp030, Hsueh/Severin 2022) ─────────────────
+[[bin]]
+name = "validate_phage_defense"
+path = "src/bin/validate_phage_defense.rs"
+
+# ── RAWR bootstrap (Exp031, Wang 2021) ──────────────────────────
+[[bin]]
+name = "validate_bootstrap"
+path = "src/bin/validate_bootstrap.rs"
+
+# ── Phylogenetic placement (Exp032, Alamin & Liu 2024) ──────────
+[[bin]]
+name = "validate_placement"
+path = "src/bin/validate_placement.rs"
+
+# ── Neighbor-Joining (Exp033, Liu 2009 SATé) ─────────────────────
+[[bin]]
+name = "validate_neighbor_joining"
+path = "src/bin/validate_neighbor_joining.rs"
+
+# ── DTL Reconciliation (Exp034, Zheng 2023) ─────────────────────
+[[bin]]
+name = "validate_reconciliation"
+path = "src/bin/validate_reconciliation.rs"
+
+# ── BarraCUDA CPU Parity v2 (Exp035) ────────────────────────────
+[[bin]]
+name = "validate_barracuda_cpu_v2"
+path = "src/bin/validate_barracuda_cpu_v2.rs"
+
+# ── PhyNetPy RF distances (Exp036) ────────────────────────────────
+[[bin]]
+name = "validate_phynetpy_rf"
+path = "src/bin/validate_phynetpy_rf.rs"
+
+# ── PhyloNet-HMM discordance (Exp037) ────────────────────────────
+[[bin]]
+name = "validate_phylohmm"
+path = "src/bin/validate_phylohmm.rs"
+
+# ── SATe pipeline benchmark (Exp038) ─────────────────────────────
+[[bin]]
+name = "validate_sate_pipeline"
+path = "src/bin/validate_sate_pipeline.rs"
+
+# ── Algal pond time-series (Exp039, PRJNA382322 proxy) ───────────
+[[bin]]
+name = "validate_algae_timeseries"
+path = "src/bin/validate_algae_timeseries.rs"
+
+# ── Bloom surveillance (Exp040, PRJNA1224988 proxy) ──────────────
+[[bin]]
+name = "validate_bloom_surveillance"
+path = "src/bin/validate_bloom_surveillance.rs"
+
+# ── EPA PFAS ML (Exp041) ─────────────────────────────────────────
+[[bin]]
+name = "validate_epa_pfas_ml"
+path = "src/bin/validate_epa_pfas_ml.rs"
+
+# ── MassBank spectral matching (Exp042) ──────────────────────────
+[[bin]]
+name = "validate_massbank_spectral"
+path = "src/bin/validate_massbank_spectral.rs"
+
+# ── BarraCUDA CPU Parity v3 (Exp043 — all 18 domains) ───────────
+[[bin]]
+name = "validate_barracuda_cpu_v3"
+path = "src/bin/validate_barracuda_cpu_v3.rs"
+
 # ── Pipeline benchmark (Exp015: Rust CPU vs Galaxy/QIIME2) ───────
 [[bin]]
 name = "benchmark_pipeline"
 path = "src/bin/benchmark_pipeline.rs"
+
+# ── ToadStool Bio Absorption (Exp045) ────────────────────────────
+[[bin]]
+name = "validate_toadstool_bio"
+path = "src/bin/validate_toadstool_bio.rs"
+required-features = ["gpu"]
+
+# ── BarraCUDA GPU v3 (Exp044 — CPU→GPU parity for v3 domains) ────
+[[bin]]
+name = "validate_barracuda_gpu_v3"
+path = "src/bin/validate_barracuda_gpu_v3.rs"
+required-features = ["gpu"]
 
 # ── GPU validation binaries (require --features gpu) ─────────────
 [[bin]]
@@ -147,6 +269,30 @@ required-features = ["gpu"]
 [[bin]]
 name = "validate_16s_pipeline_gpu"
 path = "src/bin/validate_16s_pipeline_gpu.rs"
+required-features = ["gpu"]
+
+# ── GPU Phylogenetic Composition (Exp046) ────────────────────────
+[[bin]]
+name = "validate_gpu_phylo_compose"
+path = "src/bin/validate_gpu_phylo_compose.rs"
+required-features = ["gpu"]
+
+# ── GPU HMM Batch Forward (Exp047) ──────────────────────────────
+[[bin]]
+name = "validate_gpu_hmm_forward"
+path = "src/bin/validate_gpu_hmm_forward.rs"
+required-features = ["gpu"]
+
+# ── CPU vs GPU Phylo+HMM Benchmark (Exp048) ─────────────────────
+[[bin]]
+name = "benchmark_phylo_hmm_gpu"
+path = "src/bin/benchmark_phylo_hmm_gpu.rs"
+required-features = ["gpu"]
+
+# ── GPU ODE Sweep + Bifurcation (Exp049-050) ─────────────────────
+[[bin]]
+name = "validate_gpu_ode_sweep"
+path = "src/bin/validate_gpu_ode_sweep.rs"
 required-features = ["gpu"]
 
 # ── CPU vs GPU benchmark (require --features gpu) ────────────────

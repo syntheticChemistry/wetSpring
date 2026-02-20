@@ -15,9 +15,10 @@ three-tier profiling (Python → Rust CPU → Rust GPU) capturing wall time,
 energy, and memory in a unified benchmark harness. The study covers
 three tracks: 16S amplicon metagenomics (Track 1), comparative genomics
 and mathematical biology (Track 1b), and PFAS detection via LC-MS (Track 2),
-validating 36 Rust modules against baselines from Galaxy, QIIME2, asari,
-FindPFAS, scipy, sklearn, dendropy, real NCBI SRA data, and published paper
-models with 645 quantitative checks across 22 experiments — all passing.
+validating 49 Rust modules (34 CPU + 15 GPU) against baselines from Galaxy,
+QIIME2, asari, FindPFAS, scipy, sklearn, dendropy, real NCBI SRA data, and
+published paper models with 1,235 quantitative checks across 50 experiments
+— all passing.
 Decision tree inference achieves 100% prediction parity with sklearn on 744
 PFAS water samples. Gillespie stochastic simulation converges to analytical
 steady state within 0.2%. Robinson-Foulds tree distance matches dendropy
@@ -59,7 +60,7 @@ chemistry:
 | Baseline | Python scipy | Galaxy/QIIME2 | asari/PFΔScreen |
 | GPU layer | ToadStool (wgpu) | ToadStool (wgpu) | ToadStool (wgpu) |
 | Success metric | chi² match | Same taxonomy | Same PFAS detected |
-| Checks | 195/195 | 645/645 | (included in 645) |
+| Checks | 195/195 | 977/977 | (included in 977) |
 
 Both prove the ecoPrimals thesis: sovereign compute on consumer hardware
 can replicate institutional results, then exceed them via Rust + GPU.
@@ -132,7 +133,9 @@ detection in water via LC-MS. Source papers: asari (Nature Communications
 
 ### 3.2 Rust CPU Validation (Phase 2)
 
-519 CPU quantitative checks across 17 validation binaries — all pass:
+1,035 CPU quantitative checks across 27 self-contained validation binaries — all pass.
+In addition, the original 17 pipeline validation binaries (data-dependent) cover
+the Phase 1-3 checks. The following are the self-contained validators:
 
 | Binary | Checks | What's Validated |
 |--------|:------:|-----------------|
@@ -140,23 +143,34 @@ detection in water via LC-MS. Source papers: asari (Nature Communications
 | `validate_diversity` | 27 | Shannon, Simpson, Bray-Curtis, Chao1, Pielou, k-mers, rarefaction |
 | `validate_mzml` | 7 | mzML parsing, spectrum counts, m/z ranges, data types |
 | `validate_pfas` | 10 | MS2 parsing, fragment screening, cosine similarity, KMD |
-| `validate_features` | 9 | Feature pipeline: EIC extraction, mass tracks, feature table vs asari |
+| `validate_features` | 8 | Feature pipeline: EIC extraction, mass tracks, feature table vs asari |
 | `validate_peaks` | 17 | Peak detection across 5 test cases vs scipy |
 | `validate_16s_pipeline` | 37 | DADA2 + chimera + taxonomy + UniFrac (end-to-end) |
-| `validate_algae_16s` | 29 | Real NCBI data (PRJNA488170) vs paper baselines |
+| `validate_algae_16s` | 34 | Real NCBI data (PRJNA488170) vs paper baselines |
 | `validate_voc_peaks` | 22 | VOC biomarkers vs Reese 2019 published table |
 | `validate_public_benchmarks` | 202 | 22 samples, 4 BioProjects vs paper ground truth |
-| `validate_extended_algae` | 29 | PRJNA382322 Nannochloropsis outdoor pilot |
-| `validate_pfas_library` | 21 | Jones Lab PFAS library (175 compounds, Zenodo) |
+| `validate_extended_algae` | 35 | PRJNA382322 Nannochloropsis outdoor pilot |
+| `validate_pfas_library` | 26 | Jones Lab PFAS library (175 compounds, Zenodo) |
 | `validate_newick_parse` | 30 | Newick tree parsing vs dendropy (10 topologies) |
 | `validate_qs_ode` | 16 | Waters 2008 QS/c-di-GMP ODE vs scipy RK4 |
 | `validate_rf_distance` | 23 | Robinson-Foulds tree distance vs dendropy |
 | `validate_gillespie` | 13 | Gillespie SSA ensemble vs analytical steady state |
 | `validate_pfas_decision_tree` | 7 | Decision tree inference vs sklearn (744 samples) |
+| `validate_bistable` | 14 | Fernandez 2020 bistable switching vs scipy bifurcation |
+| `validate_multi_signal` | 19 | Srivastava 2011 multi-signal QS network |
+| `validate_cooperation` | 20 | Bruger & Waters 2018 QS game theory |
+| `validate_hmm` | 21 | Liu 2014 HMM (forward/backward/Viterbi/posterior) |
+| `validate_capacitor` | 18 | Mhatre 2020 phenotypic capacitor ODE |
+| `validate_alignment` | 15 | Smith-Waterman local alignment with affine gaps |
+| `validate_felsenstein` | 16 | Felsenstein pruning phylogenetic likelihood |
+| `validate_barracuda_cpu` | 21 | Cross-domain CPU parity (9 algorithmic domains) |
+| `validate_phage_defense` | 12 | Hsueh 2022 phage defense deaminase |
+| `validate_bootstrap` | 11 | Wang 2021 RAWR bootstrap resampling |
+| `validate_placement` | 12 | Alamin & Liu 2024 phylogenetic placement |
 
 ### 3.3 GPU Validation (Phase 3)
 
-126 GPU checks — all pass:
+200 GPU checks across 8 GPU validation binaries — all pass:
 
 **Individual operations (38 checks, tolerance ≤ 1e-10):**
 
@@ -202,18 +216,21 @@ Pipeline flow:
     → taxonomy GEMM (GPU) → diversity FMR (GPU) → results
 ```
 
-**Custom WGSL shaders (3):**
+**Custom WGSL shaders (4):**
 
 | Shader | Purpose | f64? | Approach |
 |--------|---------|------|----------|
 | `quality_filter.wgsl` | Per-read quality trimming | No (u32) | One thread per read |
 | `dada2_e_step.wgsl` | Batch log_p_error | Yes (addition only) | One thread per (seq,center) pair |
-| `gemm_f64.wgsl` | Compact taxonomy GEMM | Yes (full) | ToadStool shader |
+| `hmm_forward_f64.wgsl` | Batch HMM forward (log-space) | Yes (full) | One thread per sequence |
+| `batched_qs_ode_rk4_f64.wgsl` | QS ODE parameter sweep | Yes (full) | One thread per trajectory |
 
-**Key design: no GPU transcendentals for DADA2.** The error model
-`ln(err[from][to][qual])` is precomputed on CPU and uploaded as a
-flat f64 lookup table (672 values = 5 KB). The GPU shader only does
-f64 addition. This avoids driver-specific f64 transcendental issues.
+**Key design: forced f64 polyfills for NVVM.** RTX 4070 (Ada Lovelace)
+NVVM cannot compile native f64 `exp()`, `log()`, or `pow()`.
+All shaders using f64 transcendentals are compiled via
+`ShaderTemplate::for_driver_auto(source, true)` which injects
+`exp_f64`, `log_f64`, `pow_f64` as pure-arithmetic WGSL polyfills.
+DADA2 avoids this entirely by precomputing transcendentals on CPU.
 
 ### 3.5 Performance: Three-Tier Benchmark
 
@@ -331,13 +348,15 @@ determinism tests ensuring identical output across runs.
 
 ### 4.1 Replication success
 
-6 of 9 target papers have at least one baseline experiment. The remaining
-papers (spectroradiometric, VOC, femtosecond MS) involve specialized
-instrumentation that requires domain-specific data acquisition.
+13 of 14 actionable papers in the review queue are now reproduced, covering
+ODE systems (6 models), stochastic simulation, HMM, phylogenetic algorithms
+(Felsenstein, Robinson-Foulds, bootstrap, placement), sequence alignment
+(Smith-Waterman), and phage defense dynamics. The remaining queued items
+require external data access (Sandia, Jones Lab PFAS).
 
 ### 4.2 Rust as a scientific computing platform
 
-36 modules (including a structured benchmark harness) with minimal
+41+ modules (29 CPU bio, 12 GPU, plus I/O and benchmarking) with minimal
 runtime dependency (`flate2` for gzip) demonstrate that Rust can serve
 as a standalone platform for bioinformatics and analytical chemistry.
 The sovereign XML, FASTQ, mzML, and MS2 parsers eliminate the need for
@@ -409,15 +428,27 @@ Code quality gates (all enforced in CI):
 - 0 `unsafe` blocks, 0 `TODO`/`FIXME`, 0 production `unwrap()`/`expect()`
 - 6 determinism tests covering diversity, Bray-Curtis, DADA2, chimera, taxonomy, and the full 16S pipeline
 
-### 4.7 Local extensions for ToadStool absorption
+### 4.7 Write → Absorb → Lean (GPU evolution pattern)
 
-wetSpring built three local extensions that ToadStool should absorb:
+Following hotSpring's pattern, wetSpring writes local GPU extensions, validates
+them against CPU baselines, then hands off to ToadStool for absorption. Once
+upstream absorbs the primitive, wetSpring removes the local copy and leans on
+the shared crate. This cycle has completed for 4 bio primitives
+(SmithWatermanGpu, GillespieGpu, TreeInferenceGpu, FelsensteinGpu) and is
+in progress for 4 more (HMM forward, ODE sweep, DADA2 E-step, quality filter).
 
-| Extension | Proposed ToadStool Primitive | Impact |
-|-----------|------------------------------|--------|
-| `QualityFilterCached` | `ParallelFilter<T>` | Per-element scan + filter |
-| `Dada2Gpu` | `BatchPairReduce<f64>` | Pair-wise reduction (24×) |
-| `GemmCached` | `GemmF64` with cached pipeline | Pipeline caching + BufferPool |
+| Stage | Extensions | Status |
+|-------|-----------|--------|
+| **Absorbed** | SW, Gillespie, DT, Felsenstein, GEMM, diversity | Lean on upstream |
+| **Tier A** (handoff ready) | `hmm_forward_f64.wgsl` (13/13), `batched_qs_ode_rk4_f64.wgsl` (7/7), `dada2_e_step.wgsl`, `quality_filter.wgsl` | Handoff pending |
+| **Tier B** (needs refactor) | kmer, unifrac, taxonomy (NPU), multi-signal QS | GPU pattern identified |
+| **Tier C** (CPU-only) | chimera, cooperation, derep, NJ, reconciliation, RF | No GPU path |
+
+**NVVM driver profile bug**: ToadStool's driver profile incorrectly reports
+`needs_f64_exp_log_workaround() = false` for Ada Lovelace (RTX 40-series).
+Upstream fix: return `true` for all Ada Lovelace GPUs.
+
+Full absorption map: `barracuda/EVOLUTION_READINESS.md`.
 
 ---
 
@@ -427,7 +458,7 @@ All code, data paths, and validation binaries are in the `wetSpring`
 repository (AGPL-3.0). No institutional access required.
 
 ```bash
-# Run all CPU validations (519 checks)
+# Run all CPU validations (1,035 checks)
 cd barracuda
 cargo test --release          # 430 tests
 cargo run --release --bin validate_fastq
@@ -441,7 +472,7 @@ cargo run --release --bin validate_algae_16s
 cargo run --release --bin validate_voc_peaks
 cargo run --release --bin validate_public_benchmarks
 
-# GPU validation + benchmark (126 checks)
+# GPU validation + benchmark (200 checks)
 cargo run --release --features gpu --bin validate_diversity_gpu
 cargo run --release --features gpu --bin validate_16s_pipeline_gpu
 cargo run --release --features gpu --bin benchmark_cpu_gpu

@@ -115,7 +115,6 @@ pub struct ReferenceSeq {
 /// O(1) lookup (no `HashMap` in the scoring hot path). For `k`=8, `kmer_space`
 /// = 4^8 = 65,536 entries per taxon.
 #[derive(Debug)]
-#[allow(dead_code)]
 pub struct NaiveBayesClassifier {
     k: usize,
     /// Flat log-probability table: `dense_log_probs[taxon * kmer_space + kmer]`
@@ -127,9 +126,11 @@ pub struct NaiveBayesClassifier {
     log_priors: Vec<f64>,
     /// Taxon labels (full lineage string)
     taxon_labels: Vec<Lineage>,
-    /// Prior probabilities: P(taxon)
+    /// Prior probabilities: P(taxon) — kept for model introspection
+    #[allow(dead_code)]
     taxon_priors: Vec<f64>,
-    /// Total number of unique k-mers seen in training
+    /// Total number of unique k-mers seen in training — kept for model introspection
+    #[allow(dead_code)]
     n_kmers_total: usize,
 }
 

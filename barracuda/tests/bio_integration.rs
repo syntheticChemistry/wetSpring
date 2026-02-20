@@ -4,6 +4,7 @@
 //! feature extraction, EIC, paired-end merging, dereplication, and
 //! end-to-end 16S pipeline.
 
+use std::fmt::Write as _;
 use std::fs::File;
 use std::io::Write;
 use tempfile::TempDir;
@@ -914,11 +915,12 @@ fn generate_16s_reads(n: usize, len: usize, seed: u64) -> String {
             seq[pos] = bases[(rng >> 10) as usize % 4];
         }
         let qual = vec![b'I'; len];
-        out.push_str(&format!(
+        let _ = write!(
+            out,
             "@read{i}\n{}\n+\n{}\n",
             String::from_utf8_lossy(&seq),
             String::from_utf8_lossy(&qual)
-        ));
+        );
     }
     out
 }

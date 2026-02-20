@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
-**Last Updated**: February 19, 2026
-**Status**: Phase 7 complete — 430/430 CPU + 126/126 GPU = 556/556 checks
+**Last Updated**: February 20, 2026
+**Status**: Phase 12 — 1,035/1,035 CPU + 200/200 GPU = 1,235/1,235 checks, ALL PASS
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -10,16 +10,16 @@
 
 | Metric | Value |
 |--------|-------|
-| Phase 2 (Rust CPU) | 430/430 PASS — FASTQ, diversity, 16S pipeline, mzML, PFAS, features, peaks, real NCBI data, VOC baselines, public benchmarks (4 BioProjects), extended algae (Exp017), PFAS library (Exp018) |
-| Phase 3 (GPU) | 38/38 PASS — Shannon, Simpson, BC, PCoA, spectral cosine (1,077x speedup) |
-| Phase 5 (Paper Parity) | Honest data audit, VOC baselines from Reese 2019, proxy NCBI data |
-| Phase 6 (Public Benchmark) | 22 samples from 4 independent BioProjects, 2.7M reads, marine + freshwater |
-| Rust modules | 31 sovereign modules, 379 tests |
+| CPU validation | 1,035/1,035 PASS — 34 modules, 50 experiments, 18 domains |
+| GPU validation | 200/200 PASS — 15 ToadStool primitives, 4 local WGSL shaders, 8 GPU binaries |
+| BarraCUDA CPU parity | 84/84 — ~20x Rust speedup over Python |
+| Rust modules | 34 CPU + 15 GPU, 465 tests |
 | Dependencies | 1 runtime (flate2), everything else sovereign |
+| Paper queue | **ALL DONE** — 13/13 reproducible papers complete |
 | Faculty (Track 1) | Waters (MMG, MSU), Cahill (Sandia), Smallwood (Sandia) |
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
 | Faculty (Track 2) | Jones (BMB/Chemistry, MSU) — PFAS mass spectrometry |
-| Handoffs | Two delivered (Feb 16, Feb 17) |
+| Handoffs | Five delivered (Feb 16, 17, 19 v1-v3, 20 v4) |
 
 ---
 
@@ -54,7 +54,7 @@
 - **LC-MS feature extraction** — mzML → EIC → peaks → features → spectral matching
 - **PFAS screening** — KMD + tolerance search + MS2 fragment matching
 - **Microbial ecology** — Alpha/beta diversity, PCoA, rarefaction
-- **Sovereign Rust bioinformatics** — 31 modules, 1 runtime dependency
+- **Sovereign Rust bioinformatics** — 34 CPU + 15 GPU modules, 1 runtime dependency
 
 ### wetSpring IS NOT:
 - Sensor noise analysis (groundSpring)

@@ -1,34 +1,18 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! `GemmCached` — local extension: pre-compiled GEMM pipeline + buffer pool.
+//! `GemmCached` — pre-compiled GEMM pipeline + buffer pool.
 //!
-//! `ToadStool`'s `GemmF64` recreates the shader module, bind group layout,
-//! and compute pipeline on every `execute()` call. This works, but the
-//! per-call pipeline creation overhead (~0.5ms) adds up in streaming
-//! workloads where GEMM is dispatched per sample.
-//!
-//! `GemmCached` hoists all compilation to `new()` and reuses the
-//! compiled pipeline across all subsequent dispatches. Data buffers
-//! are managed through `ToadStool`'s `BufferPool` for cross-call reuse.
-//!
-//! # `ToadStool` absorption path
-//!
-//! 1. `GemmF64::new(device)` → compile pipeline once
-//! 2. `GemmF64::execute()` → reuse cached pipeline
-//! 3. `GemmF64::execute_to_buffer()` → return GPU buffer (chaining)
-//! 4. Internal `BufferPool` integration for buffer reuse
+//! Uses `GemmF64::WGSL` from ToadStool's barracuda crate (no cross-repo
+//! `include_str!`). Hoists shader compilation to `new()` and reuses the
+//! pipeline across dispatches. Data buffers via ToadStool's `BufferPool`.
 
 use crate::error::{Error, Result};
 use barracuda::device::{BufferPool, PooledBuffer, TensorContext, WgpuDevice};
+use barracuda::ops::linalg::gemm_f64::GemmF64;
 use barracuda::shaders::precision::ShaderTemplate;
 use bytemuck::{Pod, Zeroable};
 use std::sync::Arc;
 
-// FRAGILITY NOTE: This `include_str!` reaches outside the wetSpring project
-// into the ToadStool monorepo.  When barracuda exposes the compiled GEMM
-// pipeline directly (absorption step 1-2), remove this path reference and
-// use `barracuda::shaders::linalg::GEMM_F64_WGSL` or equivalent.
-const GEMM_WGSL: &str =
-    include_str!("../../../../phase1/toadstool/crates/barracuda/src/shaders/linalg/gemm_f64.wgsl");
+const GEMM_WGSL: &str = GemmF64::WGSL;
 
 #[repr(C)]
 #[derive(Copy, Clone, Pod, Zeroable)]

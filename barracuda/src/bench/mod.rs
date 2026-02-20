@@ -430,6 +430,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[allow(clippy::float_cmp)]
     fn energy_report_default_values() {
         let r = EnergyReport::default();
         assert_eq!(r.cpu_joules, 0.0);
@@ -462,8 +463,8 @@ mod tests {
         assert_eq!(pr.substrate, "BarraCUDA GPU");
         assert!((pr.wall_time_s - 2.5).abs() < 1e-9);
         assert_eq!(pr.n_evals, 10_000);
-        assert_eq!(pr.energy.cpu_joules, 1.5);
-        assert_eq!(pr.peak_rss_mb, 128.0);
+        assert!((pr.energy.cpu_joules - 1.5).abs() < f64::EPSILON);
+        assert!((pr.peak_rss_mb - 128.0).abs() < f64::EPSILON);
     }
 
     #[test]

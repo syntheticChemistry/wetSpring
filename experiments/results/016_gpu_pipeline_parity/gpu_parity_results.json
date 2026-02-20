@@ -4,7 +4,7 @@
   "description": "16S pipeline GPU vs CPU math parity validation",
   "tolerance": 0.000001,
   "samples_processed": 10,
-  "cpu_total_ms": 7219.1,
-  "gpu_total_ms": 3081.8,
-  "speedup": 2.34
+  "cpu_total_ms": 67006.7,
+  "gpu_total_ms": 30506.4,
+  "speedup": 2.20
 }
