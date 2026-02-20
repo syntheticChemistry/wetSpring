@@ -2,8 +2,8 @@
 //! GPU-accelerated DADA2 denoising — E-step on GPU, control flow on CPU.
 //!
 //! The DADA2 EM loop has two cost centres:
-//!   1. `assign_to_centers` (E-step): O(seqs × centers × seq_length) — **GPU**
-//!   2. `find_new_centers` (split): O(seqs × seq_length) log_p_error — **GPU**
+//!   1. `assign_to_centers` (E-step): O(seqs × centers × `seq_length`) — **GPU**
+//!   2. `find_new_centers` (split): O(seqs × `seq_length`) `log_p_error` — **GPU**
 //!
 //! Everything else (error model update, Poisson test, convergence) stays on CPU.
 //! The GPU computes all `log_p_error(seq, center)` pairs in a single batch dispatch.
@@ -15,11 +15,11 @@
 //! positions) — no exp, log, or other transcendentals. This avoids driver-specific
 //! f64 transcendental issues entirely.
 //!
-//! # ToadStool absorption path
+//! # `ToadStool` absorption path
 //!
 //! - `BatchPairReduce<f64>` — per-pair parallel reduction primitive
-//! - Pre-compiled pipeline cache (like GemmCached)
-//! - BufferPool for sequence data persistence across iterations
+//! - Pre-compiled pipeline cache (like `GemmCached`)
+//! - `BufferPool` for sequence data persistence across iterations
 
 use crate::bio::dada2::{self, Asv, Dada2Params, Dada2Stats};
 use crate::bio::derep::UniqueSequence;
@@ -48,7 +48,19 @@ struct EStepParams {
     _pad: u32,
 }
 
-/// Pre-compiled DADA2 E-step pipeline for batch log_p_error computation.
+/// Packed input for a single GPU E-step dispatch.
+struct BatchInput<'a> {
+    bases: &'a [u32],
+    quals: &'a [u32],
+    lengths: &'a [u32],
+    center_indices: &'a [u32],
+    log_err_flat: &'a [f64],
+    n_seqs: usize,
+    n_centers: usize,
+    max_len: usize,
+}
+
+/// Pre-compiled DADA2 E-step pipeline for batch `log_p_error` computation.
 pub struct Dada2Gpu {
     device: Arc<WgpuDevice>,
     ctx: Arc<TensorContext>,
@@ -58,10 +70,8 @@ pub struct Dada2Gpu {
 
 impl Dada2Gpu {
     pub fn new(device: Arc<WgpuDevice>, ctx: Arc<TensorContext>) -> Self {
-        let patched = ShaderTemplate::for_driver_auto(
-            E_STEP_WGSL,
-            device.needs_f64_exp_log_workaround(),
-        );
+        let patched =
+            ShaderTemplate::for_driver_auto(E_STEP_WGSL, device.needs_f64_exp_log_workaround());
         let shader = device
             .device()
             .create_shader_module(wgpu::ShaderModuleDescriptor {
@@ -92,17 +102,16 @@ impl Dada2Gpu {
                 push_constant_ranges: &[],
             });
 
-        let pipeline =
-            device
-                .device()
-                .create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
-                    label: Some("Dada2 EStep f64"),
-                    layout: Some(&pl),
-                    module: &shader,
-                    entry_point: "e_step",
-                    cache: None,
-                    compilation_options: Default::default(),
-                });
+        let pipeline = device
+            .device()
+            .create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
+                label: Some("Dada2 EStep f64"),
+                layout: Some(&pl),
+                module: &shader,
+                entry_point: "e_step",
+                cache: None,
+                compilation_options: wgpu::PipelineCompilationOptions::default(),
+            });
 
         Self {
             device,
@@ -112,20 +121,19 @@ impl Dada2Gpu {
         }
     }
 
-    /// Compute log_p_error for all (seq, center) pairs in a single GPU dispatch.
+    /// Compute `log_p_error` for all (seq, center) pairs in a single GPU dispatch.
     ///
     /// Returns an `n_seqs × n_centers` matrix (row-major).
-    fn batch_log_p_error(
-        &self,
-        bases: &[u32],
-        quals: &[u32],
-        lengths: &[u32],
-        center_indices: &[u32],
-        log_err_flat: &[f64],
-        n_seqs: usize,
-        n_centers: usize,
-        max_len: usize,
-    ) -> Result<Vec<f64>> {
+    #[allow(clippy::cast_possible_truncation)]
+    fn batch_log_p_error(&self, input: &BatchInput<'_>) -> Result<Vec<f64>> {
+        let bases = input.bases;
+        let quals = input.quals;
+        let lengths = input.lengths;
+        let center_indices = input.center_indices;
+        let log_err_flat = input.log_err_flat;
+        let n_seqs = input.n_seqs;
+        let n_centers = input.n_centers;
+        let max_len = input.max_len;
         let total_pairs = n_seqs * n_centers;
         let pool = self.ctx.buffer_pool();
 
@@ -228,9 +236,17 @@ impl Dada2Gpu {
 
 /// GPU-accelerated DADA2 denoising.
 ///
-/// Same EM algorithm as CPU, but the E-step (log_p_error for all pairs)
+/// Same EM algorithm as CPU, but the E-step (`log_p_error` for all pairs)
 /// runs as a single GPU dispatch per iteration.
-#[allow(clippy::cast_precision_loss)]
+///
+/// # Errors
+///
+/// Returns an error if GPU dispatch fails or the device lacks f64 support.
+#[allow(
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::too_many_lines
+)]
 pub fn denoise_gpu(
     dada2: &Dada2Gpu,
     seqs: &[UniqueSequence],
@@ -273,19 +289,19 @@ pub fn denoise_gpu(
         let center_indices: Vec<u32> = centers.iter().map(|&c| c as u32).collect();
 
         // E-step: GPU batch dispatch for all (seq, center) log_p_error values
-        let scores = dada2.batch_log_p_error(
-            &bases,
-            &quals,
-            &lengths,
-            &center_indices,
-            &log_err_flat,
-            seqs.len(),
-            centers.len(),
+        let scores = dada2.batch_log_p_error(&BatchInput {
+            bases: &bases,
+            quals: &quals,
+            lengths: &lengths,
+            center_indices: &center_indices,
+            log_err_flat: &log_err_flat,
+            n_seqs: seqs.len(),
+            n_centers: centers.len(),
             max_len,
-        )?;
+        })?;
 
         // Argmax on CPU (trivial: just find best center per sequence)
-        for i in 0..seqs.len() {
+        for (i, slot) in partition.iter_mut().enumerate() {
             let row_start = i * centers.len();
             let mut best_center = centers[0];
             let mut best_lp = f64::NEG_INFINITY;
@@ -296,7 +312,7 @@ pub fn denoise_gpu(
                     best_center = c;
                 }
             }
-            partition[i] = best_center;
+            *slot = best_center;
         }
 
         // M-step: error model re-estimation (CPU — cheap)
@@ -313,19 +329,24 @@ pub fn denoise_gpu(
         let split_log_err = flatten_log_error_model(&err);
         let split_center_indices: Vec<u32> = centers.iter().map(|&c| c as u32).collect();
 
-        let split_scores = dada2.batch_log_p_error(
-            &bases,
-            &quals,
-            &lengths,
-            &split_center_indices,
-            &split_log_err,
-            seqs.len(),
-            centers.len(),
+        let split_scores = dada2.batch_log_p_error(&BatchInput {
+            bases: &bases,
+            quals: &quals,
+            lengths: &lengths,
+            center_indices: &split_center_indices,
+            log_err_flat: &split_log_err,
+            n_seqs: seqs.len(),
+            n_centers: centers.len(),
             max_len,
-        )?;
+        })?;
 
-        let new_centers =
-            find_new_centers_from_matrix(&seqs, &partition, &centers, &split_scores, params.omega_a);
+        let new_centers = find_new_centers_from_matrix(
+            &seqs,
+            &partition,
+            &centers,
+            &split_scores,
+            params.omega_a,
+        );
 
         for &c in &new_centers {
             if !centers.contains(&c) {
@@ -343,18 +364,18 @@ pub fn denoise_gpu(
     // Final assignment with GPU E-step
     let log_err_flat = flatten_log_error_model(&err);
     let center_indices: Vec<u32> = centers.iter().map(|&c| c as u32).collect();
-    let scores = dada2.batch_log_p_error(
-        &bases,
-        &quals,
-        &lengths,
-        &center_indices,
-        &log_err_flat,
-        seqs.len(),
-        centers.len(),
+    let scores = dada2.batch_log_p_error(&BatchInput {
+        bases: &bases,
+        quals: &quals,
+        lengths: &lengths,
+        center_indices: &center_indices,
+        log_err_flat: &log_err_flat,
+        n_seqs: seqs.len(),
+        n_centers: centers.len(),
         max_len,
-    )?;
+    })?;
 
-    for i in 0..seqs.len() {
+    for (i, slot) in partition.iter_mut().enumerate() {
         let row_start = i * centers.len();
         let mut best_center = centers[0];
         let mut best_lp = f64::NEG_INFINITY;
@@ -365,7 +386,7 @@ pub fn denoise_gpu(
                 best_center = c;
             }
         }
-        partition[i] = best_center;
+        *slot = best_center;
     }
 
     let asvs = build_asvs(&seqs, &partition, &centers);
@@ -386,7 +407,8 @@ pub fn denoise_gpu(
 
 // ── Data packing for GPU ─────────────────────────────────────────────────────
 
-fn base_to_idx(b: u8) -> u32 {
+#[allow(clippy::match_same_arms)]
+const fn base_to_idx(b: u8) -> u32 {
     match b {
         b'A' | b'a' => 0,
         b'C' | b'c' => 1,
@@ -396,6 +418,7 @@ fn base_to_idx(b: u8) -> u32 {
     }
 }
 
+#[allow(clippy::cast_possible_truncation)]
 fn pack_sequences(seqs: &[&UniqueSequence], max_len: usize) -> (Vec<u32>, Vec<u32>, Vec<u32>) {
     let n = seqs.len();
     let mut bases = vec![0u32; n * max_len];
@@ -408,14 +431,20 @@ fn pack_sequences(seqs: &[&UniqueSequence], max_len: usize) -> (Vec<u32>, Vec<u3
         for (j, &b) in seq.sequence.iter().enumerate() {
             bases[base_offset + j] = base_to_idx(b);
         }
-        for (j, &q) in seq.representative_quality.iter().enumerate().take(seq.sequence.len()) {
-            quals[base_offset + j] = q.saturating_sub(33).min(41) as u32;
+        for (j, &q) in seq
+            .representative_quality
+            .iter()
+            .enumerate()
+            .take(seq.sequence.len())
+        {
+            quals[base_offset + j] = u32::from(q.saturating_sub(33).min(41));
         }
     }
 
     (bases, quals, lengths)
 }
 
+#[allow(clippy::cast_precision_loss, clippy::needless_range_loop)] // 3D array requires indexing by from/to/q
 fn init_error_model() -> ErrorModel {
     let mut err = [[[0.0_f64; MAX_QUAL]; NUM_BASES]; NUM_BASES];
     for q in 0..MAX_QUAL {
@@ -433,6 +462,7 @@ fn init_error_model() -> ErrorModel {
     err
 }
 
+#[allow(clippy::needless_range_loop)] // 3D array requires indexing by from/to/q
 fn flatten_log_error_model(err: &ErrorModel) -> Vec<f64> {
     let mut flat = vec![0.0_f64; NUM_BASES * NUM_BASES * MAX_QUAL];
     for from in 0..NUM_BASES {
@@ -448,7 +478,7 @@ fn flatten_log_error_model(err: &ErrorModel) -> Vec<f64> {
 
 // ── CPU helper functions (replicated from dada2.rs for the GPU EM loop) ──────
 
-#[allow(clippy::cast_precision_loss)]
+#[allow(clippy::cast_precision_loss, clippy::needless_range_loop)] // 3D array requires indexing by from/to/q
 fn estimate_error_model(
     seqs: &[&UniqueSequence],
     partition: &[usize],
@@ -502,6 +532,7 @@ fn estimate_error_model(
     err
 }
 
+#[allow(clippy::needless_range_loop)] // 3D array requires indexing by from/to/q
 fn err_model_converged(old: &ErrorModel, new: &ErrorModel) -> bool {
     let mut max_diff = 0.0_f64;
     for from in 0..NUM_BASES {
@@ -552,11 +583,7 @@ fn find_new_centers_from_matrix(
     new_centers
 }
 
-fn build_asvs(
-    seqs: &[&UniqueSequence],
-    partition: &[usize],
-    centers: &[usize],
-) -> Vec<Asv> {
+fn build_asvs(seqs: &[&UniqueSequence], partition: &[usize], centers: &[usize]) -> Vec<Asv> {
     let mut asvs: Vec<Asv> = centers
         .iter()
         .map(|&c| Asv {
@@ -577,7 +604,7 @@ fn build_asvs(
     asvs
 }
 
-fn bgl_entry(binding: u32, ty: wgpu::BufferBindingType) -> wgpu::BindGroupLayoutEntry {
+const fn bgl_entry(binding: u32, ty: wgpu::BufferBindingType) -> wgpu::BindGroupLayoutEntry {
     wgpu::BindGroupLayoutEntry {
         binding,
         visibility: wgpu::ShaderStages::COMPUTE,

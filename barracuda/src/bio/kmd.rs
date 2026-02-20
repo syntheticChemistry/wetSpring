@@ -121,12 +121,10 @@ pub fn group_homologues(kmd_results: &[KmdResult], kmd_tolerance: f64) -> Vec<Ve
         let last_kmd = kmd_results[last_idx].kmd;
         let this_kmd = kmd_results[idx].kmd;
 
-        if (this_kmd - last_kmd).abs() <= kmd_tolerance {
-            current_group.push(idx);
-        } else {
+        if (this_kmd - last_kmd).abs() > kmd_tolerance {
             groups.push(std::mem::take(&mut current_group));
-            current_group.push(idx);
         }
+        current_group.push(idx);
     }
     if !current_group.is_empty() {
         groups.push(current_group);

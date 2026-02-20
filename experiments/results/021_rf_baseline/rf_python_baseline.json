@@ -1,0 +1,111 @@
+{
+  "experiment": "021_robinson_foulds_validation",
+  "tool": "dendropy",
+  "dendropy_version": "5.0.8",
+  "python_version": "3.10.12",
+  "total_cases": 10,
+  "total_pass": 10,
+  "elapsed_seconds": 0.0025,
+  "cases": [
+    {
+      "name": "identical_4leaf",
+      "newick_a": "((A:0.1,B:0.2):0.3,(C:0.3,D:0.4):0.5);",
+      "newick_b": "((A:0.1,B:0.2):0.3,(C:0.3,D:0.4):0.5);",
+      "rf_distance": 0,
+      "expected_rf": 0,
+      "n_leaves": 4,
+      "description": "Identical 4-leaf trees \u2192 RF = 0",
+      "status": "PASS"
+    },
+    {
+      "name": "single_nni_4leaf",
+      "newick_a": "((A:0.1,B:0.2):0.3,(C:0.3,D:0.4):0.5);",
+      "newick_b": "((A:0.1,C:0.3):0.3,(B:0.2,D:0.4):0.5);",
+      "rf_distance": 2,
+      "expected_rf": 2,
+      "n_leaves": 4,
+      "description": "Single NNI on 4-leaf tree \u2192 RF = 2",
+      "status": "PASS"
+    },
+    {
+      "name": "identical_5leaf",
+      "newick_a": "(((A:0.1,B:0.1):0.2,C:0.3):0.1,(D:0.2,E:0.3):0.4);",
+      "newick_b": "(((A:0.1,B:0.1):0.2,C:0.3):0.1,(D:0.2,E:0.3):0.4);",
+      "rf_distance": 0,
+      "expected_rf": 0,
+      "n_leaves": 5,
+      "description": "Identical 5-leaf trees \u2192 RF = 0",
+      "status": "PASS"
+    },
+    {
+      "name": "rearranged_5leaf",
+      "newick_a": "(((A:0.1,B:0.1):0.2,C:0.3):0.1,(D:0.2,E:0.3):0.4);",
+      "newick_b": "(((A:0.1,C:0.3):0.2,B:0.1):0.1,(D:0.2,E:0.3):0.4);",
+      "rf_distance": 2,
+      "expected_rf": 2,
+      "n_leaves": 5,
+      "description": "B and C swapped in 5-leaf tree \u2192 RF = 2",
+      "status": "PASS"
+    },
+    {
+      "name": "fully_different_5leaf",
+      "newick_a": "(((A:0.1,B:0.1):0.2,C:0.3):0.1,(D:0.2,E:0.3):0.4);",
+      "newick_b": "(((A:0.1,D:0.2):0.2,E:0.3):0.1,(B:0.1,C:0.3):0.4);",
+      "rf_distance": 4,
+      "expected_rf": 4,
+      "n_leaves": 5,
+      "description": "Maximally different 5-leaf topologies \u2192 RF = 4",
+      "status": "PASS"
+    },
+    {
+      "name": "identical_6leaf",
+      "newick_a": "((A:0.1,(B:0.1,C:0.1):0.2):0.1,(D:0.1,(E:0.1,F:0.1):0.2):0.1);",
+      "newick_b": "((A:0.1,(B:0.1,C:0.1):0.2):0.1,(D:0.1,(E:0.1,F:0.1):0.2):0.1);",
+      "rf_distance": 0,
+      "expected_rf": 0,
+      "n_leaves": 6,
+      "description": "Identical 6-leaf balanced trees \u2192 RF = 0",
+      "status": "PASS"
+    },
+    {
+      "name": "caterpillar_vs_balanced_6leaf",
+      "newick_a": "(((((A:0.1,B:0.1):0.1,C:0.1):0.1,D:0.1):0.1,E:0.1):0.1,F:0.1);",
+      "newick_b": "((A:0.1,(B:0.1,C:0.1):0.2):0.1,(D:0.1,(E:0.1,F:0.1):0.2):0.1);",
+      "rf_distance": 2,
+      "expected_rf": 2,
+      "n_leaves": 6,
+      "description": "Caterpillar vs balanced 6-leaf \u2192 RF = 2 (dendropy confirmed)",
+      "status": "PASS"
+    },
+    {
+      "name": "two_leaf",
+      "newick_a": "(A:0.5,B:0.5);",
+      "newick_b": "(A:0.5,B:0.5);",
+      "rf_distance": 0,
+      "expected_rf": 0,
+      "n_leaves": 2,
+      "description": "Trivial 2-leaf tree \u2192 RF = 0",
+      "status": "PASS"
+    },
+    {
+      "name": "three_leaf_identical",
+      "newick_a": "((A:0.1,B:0.2):0.3,C:0.4);",
+      "newick_b": "((A:0.1,B:0.2):0.3,C:0.4);",
+      "rf_distance": 0,
+      "expected_rf": 0,
+      "n_leaves": 3,
+      "description": "Identical 3-leaf \u2192 RF = 0",
+      "status": "PASS"
+    },
+    {
+      "name": "three_leaf_rearranged",
+      "newick_a": "((A:0.1,B:0.2):0.3,C:0.4);",
+      "newick_b": "((A:0.1,C:0.4):0.3,B:0.2);",
+      "rf_distance": 0,
+      "expected_rf": 0,
+      "n_leaves": 3,
+      "description": "3-leaf trees are star topologies when unrooted \u2192 RF = 0",
+      "status": "PASS"
+    }
+  ]
+}

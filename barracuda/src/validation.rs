@@ -24,6 +24,13 @@
 ///
 /// Prints a formatted `[OK]` or `[FAIL]` line and returns whether
 /// the check passed. Tolerance of `0.0` requires exact match.
+///
+/// ```
+/// use wetspring_barracuda::validation::check;
+///
+/// assert!(check("Shannon(uniform,4)", 4.0_f64.ln(), 4.0_f64.ln(), 1e-12));
+/// assert!(!check("deliberate fail", 2.0, 1.0, 0.5));
+/// ```
 #[must_use]
 pub fn check(label: &str, actual: f64, expected: f64, tolerance: f64) -> bool {
     let pass = (actual - expected).abs() <= tolerance;
@@ -141,7 +148,7 @@ impl Validator {
 
     /// Retrieve current (passed, total) for external logic.
     #[must_use]
-    pub fn counts(&self) -> (u32, u32) {
+    pub const fn counts(&self) -> (u32, u32) {
         (self.passed, self.total)
     }
 

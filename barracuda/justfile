@@ -1,0 +1,82 @@
+# wetSpring-barracuda build recipes
+# Install: cargo install just
+
+default: check
+
+# Run all quality gates (fmt, clippy, test, doc)
+check: fmt clippy test doc
+
+# Format check (fail on drift)
+fmt:
+    cargo fmt --check
+
+# Format fix
+fmt-fix:
+    cargo fmt
+
+# Clippy (default lints, deny warnings)
+clippy:
+    cargo clippy --all-targets -- -D warnings
+
+# Clippy pedantic (advisory — not gated)
+clippy-pedantic:
+    cargo clippy --all-targets -- -W clippy::pedantic
+
+# Run all tests
+test:
+    cargo test
+
+# Run tests with output
+test-verbose:
+    cargo test -- --nocapture
+
+# Build docs (deny warnings)
+doc:
+    RUSTDOCFLAGS="-D warnings" cargo doc --no-deps
+
+# Coverage via cargo-llvm-cov (install: cargo install cargo-llvm-cov)
+coverage:
+    cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
+    cargo llvm-cov report --all-features --workspace
+
+# Coverage HTML report
+coverage-html:
+    cargo llvm-cov --all-features --workspace --html
+
+# GPU build check (requires --features gpu)
+check-gpu:
+    cargo check --features gpu --all-targets
+
+# GPU clippy
+clippy-gpu:
+    cargo clippy --features gpu --all-targets -- -D warnings
+
+# Run CPU validation binaries (skip if data absent)
+validate-cpu:
+    cargo run --release --bin validate_fastq; \
+    cargo run --release --bin validate_diversity; \
+    cargo run --release --bin validate_16s_pipeline; \
+    cargo run --release --bin validate_peaks; \
+    cargo run --release --bin validate_pfas
+
+# Run GPU validation binaries
+validate-gpu:
+    cargo run --release --features gpu --bin validate_diversity_gpu
+    cargo run --release --features gpu --bin validate_16s_pipeline_gpu
+
+# Full validation sweep
+validate: validate-cpu validate-gpu
+
+# Regenerate Python baselines (requires numpy, scipy, asari, findpfas)
+regenerate-baselines:
+    @echo "── Peak detection baselines (scipy) ──"
+    python3 ../scripts/generate_peak_baselines.py
+    @echo "── Python benchmark baselines (numpy/scipy) ──"
+    python3 ../scripts/benchmark_python_baseline.py
+    @echo "── Track 2 baselines (asari + FindPFAS) ──"
+    python3 ../scripts/validate_track2.py
+    @echo "Baselines regenerated. Diff against experiments/results/ to detect drift."
+
+# Clean build artifacts
+clean:
+    cargo clean

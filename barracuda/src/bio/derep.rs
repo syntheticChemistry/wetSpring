@@ -19,6 +19,7 @@
 
 use crate::io::fastq::FastqRecord;
 use std::collections::HashMap;
+use std::fmt::Write;
 
 /// A unique sequence with its abundance and representative.
 #[derive(Debug, Clone)]
@@ -90,8 +91,8 @@ pub fn dereplicate(
                 entry.abundance += 1;
                 if mean_q > entry.best_quality {
                     entry.best_quality = mean_q;
-                    entry.representative_id = record.id.clone();
-                    entry.representative_quality = record.quality.clone();
+                    entry.representative_id.clone_from(&record.id);
+                    entry.representative_quality.clone_from(&record.quality);
                 }
             })
             .or_insert_with(|| UniqueSequence {
@@ -171,11 +172,11 @@ pub fn to_fasta_with_abundance(uniques: &[UniqueSequence]) -> String {
     for (i, u) in uniques.iter().enumerate() {
         out.push('>');
         if u.representative_id.is_empty() {
-            out.push_str(&format!("seq{}", i + 1));
+            let _ = write!(out, "seq{}", i + 1);
         } else {
             out.push_str(&u.representative_id);
         }
-        out.push_str(&format!(";size={}\n", u.abundance));
+        let _ = writeln!(out, ";size={}", u.abundance);
         out.push_str(&String::from_utf8_lossy(&u.sequence));
         out.push('\n');
     }
@@ -187,6 +188,7 @@ pub fn to_fasta_with_abundance(uniques: &[UniqueSequence]) -> String {
 /// Returns a vector of f64 counts (one per unique sequence), sorted
 /// by abundance descending — ready for Shannon/Simpson/Chao1.
 #[must_use]
+#[allow(clippy::cast_precision_loss)] // abundance to f64 for diversity calculations
 pub fn abundance_vector(uniques: &[UniqueSequence]) -> Vec<f64> {
     let mut counts: Vec<f64> = uniques.iter().map(|u| u.abundance as f64).collect();
     counts.sort_by(|a, b| b.partial_cmp(a).unwrap_or(std::cmp::Ordering::Equal));

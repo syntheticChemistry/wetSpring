@@ -12,6 +12,14 @@
 //! | Machine | f64 arithmetic | 1e-12 for analytical formulas |
 //! | Instrument | Measurement error | 0.005 for GC content |
 //! | GPU vs CPU | Instruction reorder | 1e-6 for GPU f64 vs CPU f64 |
+//!
+//! ```
+//! use wetspring_barracuda::tolerances;
+//!
+//! // Analytical formulas should be within machine precision
+//! let h = 4.0_f64.ln();
+//! assert!((h - 4.0_f64.ln()).abs() <= tolerances::ANALYTICAL_F64);
+//! ```
 
 // ═══════════════════════════════════════════════════════════════════
 // Machine-precision tolerances (IEEE 754 f64)

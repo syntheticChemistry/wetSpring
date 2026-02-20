@@ -3,7 +3,7 @@
 //!
 //! Replaces N×T sequential scoring loops with a single matrix multiply:
 //!
-//!   scores = Q_compact × T_compact
+//!   scores = `Q_compact` × `T_compact`
 //!
 //! Only k-mers actually present in query sequences are included in the
 //! matrices.  For 5 queries with ~250 unique k-mers each, the active
@@ -14,7 +14,7 @@
 //! so the full classification + bootstrap execute as a single GEMM.
 
 use crate::bio::taxonomy::{
-    extract_kmers, ClassifyParams, Classification, NaiveBayesClassifier, TaxRank,
+    extract_kmers, Classification, ClassifyParams, NaiveBayesClassifier, TaxRank,
 };
 use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
@@ -31,6 +31,11 @@ use std::collections::HashSet;
 /// # Errors
 ///
 /// Returns [`Error::Gpu`] if the device lacks `SHADER_F64` or GEMM dispatch fails.
+#[allow(
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss
+)]
 pub fn classify_batch_gpu(
     gpu: &GpuF64,
     classifier: &NaiveBayesClassifier,
@@ -58,10 +63,8 @@ pub fn classify_batch_gpu(
 
     // ── Extract k-mers and find the active k-mer set ────────────────────────
     let k = (ks as f64).log(4.0).round() as usize;
-    let query_kmer_lists: Vec<Vec<u64>> = sequences
-        .iter()
-        .map(|seq| extract_kmers(seq, k))
-        .collect();
+    let query_kmer_lists: Vec<Vec<u64>> =
+        sequences.iter().map(|seq| extract_kmers(seq, k)).collect();
 
     // Active set: union of all k-mers across all queries (including duplicates
     // that bootstrap might sample). Since bootstrap samples from each query's
@@ -104,9 +107,7 @@ pub fn classify_batch_gpu(
         for bi in 0..n_boot {
             let boot_start = (base_row + 1 + bi) * n_active;
             for _ in 0..n_sample {
-                seed = seed
-                    .wrapping_mul(6_364_136_223_846_793_005)
-                    .wrapping_add(1);
+                seed = seed.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
                 let idx = (seed >> 33) as usize % kmers.len();
                 q_compact[boot_start + kmer_to_col[kmers[idx] as usize]] += 1.0;
             }

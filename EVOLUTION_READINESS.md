@@ -1,247 +1,167 @@
-# Evolution Readiness — Rust Module → WGSL Shader → Pipeline Stage
+# wetSpring — Evolution Readiness
 
-**Date**: 2026-02-19
-**Status**: Phase 6 COMPLETE — 30 modules, 284 tests, 426/426 validation PASS, 11 ToadStool primitives, 0 custom WGSL shaders, public NCBI data benchmarked against papers
-
----
-
-## Current Rust Modules (wetspring-barracuda)
-
-| Module | Lines | Tests | Coverage | Status |
-|--------|-------|-------|----------|--------|
-| `io::fastq` | 658 | 26 | 99.3% | Sovereign — in-tree parser, gzip-aware |
-| `io::mzml` | 740 | 19 | 99.4% | Sovereign — in-tree XML parser, f32/f64, zlib |
-| `io::xml` | 473 | 31 | 94.9% | Sovereign — minimal pull parser |
-| `io::ms2` | 278 | 12 | 98.1% | Production — streaming via `BufReader` |
-| `bio::kmer` | 349 | 20 | 99.5% | Production — canonical 2-bit encoding |
-| `bio::diversity` | ~400 | 27 | 100% | Production — Shannon/Simpson/Chao1/BC + Pielou + rarefaction |
-| `bio::quality` | ~340 | 20 | 98% | Production — sliding window trim + adapter removal (Trimmomatic) |
-| `bio::merge_pairs` | ~390 | 10 | 98% | Production — paired-end merging (VSEARCH/FLASH equivalent) |
-| `bio::derep` | ~250 | 9 | 98% | Production — dereplication + abundance tracking (VSEARCH) |
-| `bio::tolerance_search` | 260 | 11 | 100% | Production — NaN-safe ppm/Da search + PFAS screen |
-| `bio::signal` | ~300 | 11 | 98% | Production — 1D peak detection (scipy.find_peaks equivalent) |
-| `bio::eic` | ~200 | 8 | 98% | Production — EIC/XIC extraction + mass track detection |
-| `bio::feature_table` | ~250 | 6 | 98% | Production — end-to-end asari-style feature extraction |
-| `bio::spectral_match` | ~220 | 7 | 100% | Production — MS2 cosine similarity (matched + weighted) |
-| `bio::kmd` | ~200 | 6 | 100% | Production — Kendrick mass defect + homologue grouping |
-| `encoding` | 172 | 10 | 90.4%* | Sovereign — replaces base64 crate |
-| `error` | 141 | 5 | 100% | Production — typed error chain |
-| `validation` | 245 | 10 | 92.5%** | Framework — `Validator` struct + `check_count`/`check_count_u64` |
-| `bio::pcoa` | 190 | 7 | 97.9% | Production — CPU `PCoA` (Jacobi eigensolve) |
-| `gpu` | 262 | — | — | GPU bridge — `GpuF64` wraps wgpu + `ToadStool` `TensorContext` |
-| `bio::diversity_gpu` | ~200 | — | — | GPU: Shannon/Simpson/observed/evenness/alpha via `FusedMapReduceF64`, BC via `BrayCurtisF64` |
-| `bio::pcoa_gpu` | 120 | — | — | GPU `PCoA` via `ToadStool`'s `BatchedEighGpu` |
-| `bio::spectral_match_gpu` | ~180 | — | — | GPU pairwise cosine via `GemmF64` + `FusedMapReduceF64` |
-| `bio::kriging` | ~200 | — | — | Spatial interpolation via `ToadStool`'s `KrigingF64` |
-| `bio::stats_gpu` | ~150 | — | — | GPU: variance/correlation/covariance/weighted dot |
-| `bio::dada2` | ~350 | 9 | 98% | Production — DADA2 ASV denoising (Callahan et al. 2016) |
-| `bio::chimera` | ~250 | 8 | 98% | Production — UCHIME-style reference-free chimera detection |
-| `bio::taxonomy` | ~300 | 8 | 98% | Production — Naive Bayes classifier (RDP/SILVA 138) |
-| `bio::unifrac` | ~300 | 8 | 98% | Production — weighted + unweighted UniFrac (Newick parser) |
-| `bio::eic_gpu` | ~200 | — | — | GPU: batch EIC integration via `FusedMapReduceF64` + `WeightedDotF64` |
-| `bio::rarefaction_gpu` | ~200 | — | — | GPU: bootstrap rarefaction via `FusedMapReduceF64` |
-| `tolerances` | 84 | — | — | Centralized CPU + GPU tolerance constants |
-
-**Total: 284 tests, 30 modules**
-
-\* `encoding.rs` — `build_decode_table()` is a `const fn` evaluated at compile time; llvm-cov cannot instrument it.
-\** `validation.rs` — remaining uncovered code is `exit_with_result()`/`exit_skipped()`/`finish()` which call `process::exit()` — untestable without forking.
-
-GPU modules require `--features gpu` and are validated by `validate_diversity_gpu` (38/38 PASS).
+**Date:** February 2026
+**Status:** 23 CPU modules, 12 GPU modules, 11 ToadStool primitives validated
 
 ---
 
-## Code Quality Evolution (Feb 16, 2026)
+## Evolution Path
 
-| Improvement | Before | After |
-|-------------|--------|-------|
-| Tests | 103 (75 unit + 28 integration) | 293 (251 unit + 42 integration) |
-| Coverage | ~78% | ~98% |
-| `#[allow(clippy::...)]` | ~30 annotations | ~20 (all justified) |
-| `too_many_lines` | 4 binaries | 0 — all refactored into functions |
-| `cast_precision_loss` | ~20 count→f64 casts | 0 — `Validator::check_count`/`check_count_u64` |
-| Tolerance search | `unwrap()` panics on NaN | NaN-safe via `unwrap_or(Greater)` |
-| GPU dispatch | `dispatch_and_read` panics | Returns `Result<Vec<f64>>` |
-| mzML binary decode | bare `unwrap()` | infallible `copy_from_slice` (zero `expect`) |
-| Validation pattern | manual `total += 1` / `passed += 1` | `Validator` struct with typed methods |
-| `unsafe` blocks | 0 | 0 |
-| Production `panic!` | 0 | 0 |
-| Production `unwrap()`/`expect()` | ~15 calls | 0 — all replaced with `?` / `copy_from_slice` / `unwrap_or` |
+```
+Python baseline → Rust CPU validation → GPU acceleration → sovereign pipeline
+```
+
+wetSpring consumes BarraCUDA/ToadStool GPU primitives and feeds back
+requirements, bug reports, and evolution lessons via unidirectional handoffs.
 
 ---
 
-## Evolution Map: Rust → GPU
+## GPU Promotion Tiers
 
-### Tier A: Pure Rewire (existing ToadStool shaders, new orchestrators only)
+- **Tier A (Rewire):** GPU shader exists and is validated; wire into pipeline.
+- **Tier B (Adapt):** Could use modified ToadStool patterns or small new shaders.
+- **Tier C (New):** Needs new ToadStool primitives or substantial new shaders.
 
-| Rust Module | ToadStool Primitive / WGSL Shader | Pipeline Stage | Status |
-|-------------|----------------------------------|----------------|--------|
-| `bio::diversity::shannon` | `FusedMapReduceF64.shannon_entropy()` | Fused map-reduce (single dispatch) | **DONE** — rewired to ToadStool |
-| `bio::diversity::simpson` | `FusedMapReduceF64.simpson_index()` | Fused map-reduce (1 − Σ p²) | **DONE** — rewired to ToadStool |
-| `bio::diversity::bray_curtis_condensed` | `BrayCurtisF64` (ToadStool, absorbed) | All-pairs BC, 1 thread/pair | **DONE** — ToadStool primitive |
-| `bio::pcoa` | `BatchedEighGpu.execute_f64()` | BC → double-center → eigensolve | **DONE** — CPU + GPU validated |
-| `bio::diversity::observed_features` | `FusedMapReduceF64.sum()` | Binarize + reduce | **DONE** — GPU validated |
-| `bio::diversity::pielou_evenness` | Shannon GPU + observed GPU | Compose H / ln(S) | **DONE** — GPU validated |
-| `bio::diversity::alpha_diversity` | `FusedMapReduceF64` compose | Full alpha suite on GPU | **DONE** — GPU validated |
-| `bio::spectral_match::pairwise_cosine` | `GemmF64` + `FusedMapReduceF64` | Dot product matrix + norms | **DONE** — GPU validated |
-| Rarefaction curves | `FusedMapReduceF64` + LCG PRNG | Random subsample + diversity | **DONE** — `bio::rarefaction_gpu` |
+### Tier A — Ready to Rewire (10 modules)
 
-### Tier B: Adapt Existing Patterns (minor shader modifications)
+| CPU Module | GPU Module | ToadStool Primitives | Checks |
+|------------|-----------|---------------------|--------|
+| `diversity` | `diversity_gpu` | `FusedMapReduceF64`, `BrayCurtisF64` | 38 |
+| `pcoa` | `pcoa_gpu` | `BatchedEighGpu` | — |
+| `spectral_match` | `spectral_match_gpu` | `GemmF64`, `FusedMapReduceF64` | — |
+| `eic` | `eic_gpu` | `FusedMapReduceF64`, `WeightedDotF64` | — |
+| `taxonomy` | `taxonomy_gpu` | `GemmF64` | — |
+| `dada2` | `dada2_gpu` | Custom `dada2_e_step.wgsl` | — |
+| `quality` | `quality_gpu` | Custom `quality_filter.wgsl` | — |
+| `rarefaction` | `rarefaction_gpu` | `FusedMapReduceF64` | — |
+| `kriging` | `kriging` | `KrigingF64` | — |
+| `streaming` | `streaming_gpu` | `FusedMapReduceF64`, `GemmCached` | 88 |
 
-| Rust Module | WGSL Shader (base) | Modification Needed | Pipeline Stage |
-|-------------|---------------------|---------------------|----------------|
-| `bio::tolerance_search::find_within_ppm` | `batched_bisection_f64.wgsl` | Adapt objective to ±ppm bounds | Suspect PFAS screening |
-| `bio::tolerance_search::screen_pfas_fragments` | `pairwise_distance.wgsl` | Fragment diff matrix + threshold | PFAS difference scan |
-| Sparse feature tables | `sparse_matvec_f64.wgsl` | CSR format for asari tables | LC-MS quantification |
-| Peak shape fitting | `weighted_dot_f64.wgsl` | Gauss-Newton inner products | mzML peak fitting |
+### Tier B — Adapt Existing Patterns (5 modules)
 
-### Tier C: New Shaders (fresh WGSL, no existing ancestor)
+| CPU Module | GPU Path | Blocker |
+|------------|----------|---------|
+| `chimera` | GPU k-mer scoring kernel | Currently CPU pass-through |
+| `tolerance_search` | Adapt `batched_bisection_f64.wgsl` | ppm/Da bounds mapping |
+| `kmd` | `FusedMapReduceF64` for mass-defect grouping | Pattern adaptation |
+| `signal` | Map-reduce / parallel scan | Peak detection as GPU primitive |
+| `qs_biofilm` | Batched parameter sweeps via RK4 | Depends on `ode` GPU |
 
-| Rust Module | New WGSL Shader | Complexity | Pipeline Stage |
-|-------------|-----------------|------------|----------------|
-| `bio::kmer::count_kmers` | `hash_table_u64.wgsl` | High — GPU lock-free hash table | K-mer dereplication |
-| mzML peak detection | `find_peaks_f64.wgsl` | Medium — local maxima + prominence | LC-MS peak detect |
-| Mass track smoothing | `uniform_filter_f64.wgsl` | Low — 1D moving average | LC-MS preprocessing |
-| m/z sort | `sort_f64.wgsl` | Medium — bitonic merge sort | Spectral ordering |
-| MS2 spectral matching | ~~`cosine_similarity_f64.wgsl`~~ | **DONE** — via `GemmF64` + `FusedMapReduceF64` | Compound ID |
+### Tier C — New Primitives Needed (8 modules)
 
----
-
-## Blockers for GPU Promotion
-
-| Blocker | Affects | Resolution |
-|---------|---------|------------|
-| GPU hash table | Tier C (k-mer) | New shader — research lock-free GPU hash design |
-| ~~barracuda feature gate~~ | ~~All~~ | **DONE** — `#[cfg(feature = "gpu")]` wired, `GpuF64` bridge active |
-| ~~Test parity~~ | ~~All~~ | **DONE** — 17/17 GPU checks match CPU exactly |
-| ~~f64 shader variants~~ | ~~Tier A~~ | **DONE** — ToadStool `FusedMapReduceF64` + `BatchedEighGpu` f64 |
-| ~~ToadStool log bug~~ | ~~Shannon~~ | **DONE** — coefficients fixed upstream (commit `0c477306`) |
-| Data size threshold | All | GPU dispatch only beneficial above ~10K elements; CPU fallback needed |
+| CPU Module | Needed Primitive | Priority | Notes |
+|------------|-----------------|----------|-------|
+| `ode` | `rk4_batch_f64.wgsl` / `BatchedRK4F64` | P0 | Batched ODE for parameter sweeps |
+| `gillespie` | PRNG + exponential sampling | P1 | Parallel trajectory ensembles |
+| `decision_tree` | `rf_inference_f64.wgsl` / `RandomForestGpu` | P2 | Tree traversal on GPU |
+| `kmer` | GPU lock-free hash table | P2 | Hash-heavy, no current primitive |
+| `derep` | GPU lock-free hash table | P2 | Same blocker as kmer |
+| `unifrac` | `TreeTraversalF64` | P2 | Phylogenetic tree traversal |
+| `robinson_foulds` | Bipartition set ops | P3 | Pure set logic, low GPU benefit |
+| `merge_pairs` | Overlap scoring shader | P3 | Branching-heavy, new design needed |
 
 ---
 
-## Dependency Sovereignty Status
+## ToadStool Primitives Currently Used
 
-| Dependency | Status | Evolution |
-|------------|--------|-----------|
-| `base64` | **Replaced** — `src/encoding.rs` | Sovereign ✓ |
-| `serde` | **Removed** — unused | Clean ✓ |
-| `serde_json` | **Removed** — unused | Clean ✓ |
-| `rayon` | **Removed** — unused | Clean ✓ |
-| `needletail` | **Replaced** — `io::fastq` sovereign parser | Sovereign ✓ |
-| `quick-xml` | **Replaced** — `io::xml` sovereign pull parser | Sovereign ✓ |
-| `flate2` | Active | Keep — wraps pure-Rust miniz_oxide (zlib + gzip) |
-| `barracuda` | Feature-gated (`gpu`) | **Active** — `GpuF64` bridge to `ToadStool` `WgpuDevice`/`TensorContext` |
-| `wgpu` | Feature-gated (`gpu`) | **Active** — 0.19, matching barracuda pin |
-| `tokio` | Feature-gated (`gpu`) | **Active** — async GPU device creation |
-| `bytemuck` | Feature-gated (`gpu`) | **Active** — shader param structs |
-| `tempfile` | Dev only | Test infrastructure only |
+11 primitives from the shared `barracuda` crate:
 
----
+| Primitive | Usage |
+|-----------|-------|
+| `FusedMapReduceF64` | Diversity, EIC, rarefaction, spectral norms, stats |
+| `BrayCurtisF64` | Bray-Curtis condensed distance matrix |
+| `BatchedEighGpu` | PCoA eigendecomposition |
+| `GemmF64` | Taxonomy scoring, spectral cosine |
+| `KrigingF64` | Spatial interpolation |
+| `VarianceF64` | Population statistics |
+| `CorrelationF64` | Pearson correlation |
+| `CovarianceF64` | Population covariance |
+| `WeightedDotF64` | EIC integration, weighted sums |
+| `GemmCached` | Pipeline-cached GEMM (streaming) |
+| `FusedMapReduceF64` (streaming) | Streaming pipeline quality/diversity |
 
-## Validation Binary Coverage
-
-### CPU Validation (default build)
-
-| Binary | Checks | Status | Data Source |
-|--------|--------|--------|-------------|
-| `validate_fastq` | 28/28 | PASS | Quality filtering + merge pairs + derep + Zenodo 800651 (MiSeq SOP) |
-| `validate_diversity` | 27/27 | PASS | Analytical + simulated + evenness + rarefaction (expanded from 18 checks) |
-| `validate_16s_pipeline` | 37/37 | PASS | Complete 16S: FASTQ → quality → merge → derep → DADA2 → chimera → taxonomy → diversity → UniFrac |
-| `validate_mzml` | 7/7 | PASS | shuzhao-li-lab/data (MT02) |
-| `validate_pfas` | 10/10 | PASS | Cosine similarity + KMD + FindPFAS (external data optional) |
-| `validate_features` | 9/9 | PASS | EIC + peaks + features vs asari MT02 (Exp009) |
-| `validate_peaks` | 17/17 | PASS | Peak detection vs scipy.signal.find_peaks (Exp010) |
-| `validate_algae_16s` | 29/29 | PASS | Real NCBI data (PRJNA488170) + Humphrey 2023 reference (Exp012) |
-| `validate_voc_peaks` | 22/22 | PASS | Reese 2019 VOC baselines + RI matching (Exp013) |
-| `validate_public_benchmarks` | 202/202 | PASS | 22 samples, 4 BioProjects, marine + freshwater vs paper ground truth (Exp014) |
-| **CPU Total** | **388/388** | **PASS** | |
-
-### GPU Validation (`--features gpu`)
-
-| Binary | Checks | Status | Comparison |
-|--------|--------|--------|------------|
-| `validate_diversity_gpu` | 38/38 | PASS | GPU f64 vs CPU f64 (RTX 4070) |
-| **GPU Total** | **38/38** | **PASS** | |
-
-Checks: 3 Shannon + 3 Simpson + 6 BC + 5 PCoA + 6 Alpha + 8 Spectral + 3 Var + 1 Corr + 1 Cov + 2 WDot.
-
-### Benchmark (`--features gpu`)
-
-| Binary | Purpose |
-|--------|---------|
-| `benchmark_cpu_gpu` | CPU vs GPU performance comparison across 7 workloads |
-
-Headline: spectral cosine 200×200 → GPU 3.7ms vs CPU 3,937ms = **1,077× speedup**.
+Plus 2 custom WGSL shaders written by wetSpring:
+- `quality_filter.wgsl` — per-base quality filtering
+- `dada2_e_step.wgsl` — DADA2 E-step error model
 
 ---
 
-## WGSL Shaders and ToadStool Primitives
+## New Primitives Requested (for ToadStool/BarraCUDA)
 
-### Custom Shaders (src/shaders/)
+### P0: Batched RK4 ODE Solver
+- **Module:** `bio::ode`, `bio::qs_biofilm`
+- **What:** `BatchedRK4F64` — batch integrate N parameter sets in parallel
+- **Why:** Waters 2008 (5-variable, 4 scenarios) and future ODE models
+- **Shader spec:** `rk4_batch_f64.wgsl` — fixed-step RK4, N×M state vectors
 
-**Zero custom WGSL shaders.** All GPU computation now goes through ToadStool primitives.
+### P1: Stochastic Simulation Primitives
+- **Module:** `bio::gillespie`
+- **What:** GPU PRNG (LCG/xoshiro) + exponential sampling
+- **Why:** Massie 2012 ensemble (1000 trajectories, embarrassingly parallel)
+- **Shader spec:** Parallel birth-death SSA per workgroup
 
-Previously removed shaders:
-- `shannon_map_f64.wgsl` / `simpson_map_f64.wgsl` → replaced by `FusedMapReduceF64`
-- `bray_curtis_pairs_f64.wgsl` → absorbed upstream as `BrayCurtisF64`
+### P1: Log-Sum-Exp / HMM Forward-Backward
+- **Module:** Future `bio::hmm`
+- **What:** Numerically stable log-sum-exp reduction
+- **Why:** PhyloNet-HMM introgression detection (Liu 2014)
+- **Shader spec:** `log_sum_exp_f64.wgsl`
 
-### ToadStool Primitives Used (via `barracuda` crate) — 11 Primitives
+### P1: Smith-Waterman Alignment
+- **Module:** Future `bio::alignment`
+- **What:** Banded SW with affine gap penalties
+- **Why:** SATe/phylogenetic alignment (Liu 2009)
+- **Shader spec:** `smith_waterman_f64.wgsl`
 
-| Primitive | API | wetSpring Use |
-|-----------|-----|---------------|
-| `FusedMapReduceF64` | `shannon_entropy()` | Shannon H = -Σ p ln(p) — single-dispatch fused map-reduce |
-| `FusedMapReduceF64` | `simpson_index()` | Simpson D = Σ p² — diversity = 1 - D |
-| `FusedMapReduceF64` | `sum()` | Observed features, EIC intensity summation, rarefaction bootstrap |
-| `FusedMapReduceF64` | `sum_of_squares()` | Vector norms for cosine similarity |
-| `BrayCurtisF64` | `condensed_distance_matrix()` | All-pairs Bray-Curtis distance (absorbed from wetSpring) |
-| `BatchedEighGpu` | `execute_f64()` / `execute_single_dispatch()` | PCoA eigendecomposition on double-centered BC matrix |
-| `GemmF64` | `execute()` | Pairwise dot products for spectral cosine similarity |
-| `KrigingF64` | `interpolate()` / `fit_variogram()` | Spatial diversity interpolation across sampling sites |
-| `VarianceF64` | `variance()` / `std_dev()` | Population/sample variance, standard deviation |
-| `CorrelationF64` | `pearson()` | Pearson correlation coefficient |
-| `CovarianceF64` | `covariance()` | Sample covariance matrix |
-| `WeightedDotF64` | `dot()` | Trapezoidal peak integration, weighted inner products |
+### P2: Decision Tree / Random Forest GPU
+- **Module:** `bio::decision_tree`
+- **What:** Batch inference over N samples × M trees
+- **Why:** PFAS monitoring ML at field scale
+- **Shader spec:** `rf_inference_f64.wgsl`
 
----
-
-## Handoff to ToadStool/BarraCUDA Team
-
-**Full handoff document:** [`HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_16_2026.md`](HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_16_2026.md)
-
-**Absorbed from ToadStool (commit `0c477306` + `2f1d8316`):**
-
-1. **`FusedMapReduceF64`** — Shannon and Simpson now use single-dispatch fused
-   map-reduce instead of custom WGSL shaders + CPU sum. Deprecated shaders removed.
-2. **`BatchedEighGpu`** — PCoA eigendecomposition wired and validated (5/5 checks).
-3. **`BrayCurtisF64`** — Custom `bray_curtis_pairs_f64.wgsl` absorbed upstream as
-   `barracuda::ops::bray_curtis_f64::BrayCurtisF64`. Local shader deleted.
-4. **`KrigingF64`** — Spatial interpolation for diversity metrics across sampling sites,
-   wired as `bio::kriging` with ordinary/simple kriging + empirical variogram fitting.
-5. **`log_f64` coefficient fix** — confirmed absorbed upstream, ToadStool's
-   `math_f64.wgsl` now has corrected coefficients.
-6. **`pow_f64` fix (TS-001)** — fractional exponents now work via `exp(e * log(b))`.
-7. **`acos`/`sin` precision (TS-003)** — zero-bias literal pattern applied.
-8. **`FusedMapReduceF64` buffer fix (TS-004)** — N >= 1024 buffer conflict resolved.
-
-**Completed since last handoff (Feb 17–18, 2026):**
-
-1. ~~**Rarefaction GPU**~~ → **DONE** — `bio::rarefaction_gpu` with `FusedMapReduceF64` + bootstrap CI
-2. ~~**EIC extraction GPU**~~ → **DONE** — `bio::eic_gpu` with `FusedMapReduceF64` + `WeightedDotF64`
-3. ~~**DADA2 denoising**~~ → **DONE** — `bio::dada2` (error model + divisive partitioning, 9 tests)
-4. ~~**Chimera detection**~~ → **DONE** — `bio::chimera` (UCHIME-style reference-free, 8 tests)
-5. ~~**Taxonomy classification**~~ → **DONE** — `bio::taxonomy` (naive Bayes / SILVA 138, 8 tests)
-6. ~~**UniFrac distance**~~ → **DONE** — `bio::unifrac` (weighted + unweighted + Newick parser, 8 tests)
-
-**Remaining evolution opportunities:**
-
-1. **m/z tolerance search GPU**: Adapt `batched_bisection_f64.wgsl` for ppm-bounded
-   binary search on sorted m/z arrays.
-2. **Peak detection GPU**: Promote `bio::signal::find_peaks` to GPU for parallel
-   chromatogram processing (STFT windowing available in ToadStool).
-3. **DADA2 GPU**: Error model learning on GPU (matrix of transition probabilities).
-4. **Taxonomy GPU**: k-mer frequency scoring across reference DB on GPU.
+### P2: Phylogenetic Likelihood / Felsenstein Pruning
+- **Module:** Future `bio::phylo_likelihood`
+- **What:** Postorder tree traversal with site likelihood
+- **Why:** Maximum-likelihood phylogenetics
+- **Shader spec:** `felsenstein_f64.wgsl`
 
 ---
 
-*Updated from wetSpring Phase 6 COMPLETE — 30 modules, 284 tests, 426/426 PASS, 11 ToadStool primitives, public NCBI data benchmarked against papers, February 19, 2026.*
+## Local Extensions (Candidates for ToadStool Absorption)
+
+These are wetSpring-specific GPU code that should be generalized:
+
+| Local Extension | Current Location | Recommended Generalization |
+|----------------|-----------------|---------------------------|
+| `QualityFilterCached` | `quality_gpu.rs` | `ParallelFilter<T>` pattern |
+| `Dada2Gpu` (E-step) | `dada2_gpu.rs` | `BatchPairReduce<f64>` pattern |
+| `GemmCached` pipeline | `gemm_cached.rs` | `GemmF64::cached()` builder |
+| `StreamingGpu` pipeline | `streaming_gpu.rs` | Pipeline composition pattern |
+
+---
+
+## Completed Evolution Items
+
+| Version | Item | Date |
+|---------|------|------|
+| v0.1.0 | Initial 16S pipeline (CPU) | Feb 2026 |
+| v0.1.0 | mzML/MS2 sovereign parsers | Feb 2026 |
+| v0.1.0 | PFAS screening (KMD + spectral match) | Feb 2026 |
+| v0.1.0 | GPU diversity (FusedMapReduceF64) | Feb 2026 |
+| v0.1.0 | GPU streaming pipeline (88/88 parity) | Feb 2026 |
+| v0.1.0 | RK4 ODE solver (Waters 2008) | Feb 2026 |
+| v0.1.0 | Gillespie SSA (Massie 2012) | Feb 2026 |
+| v0.1.0 | Robinson-Foulds distance | Feb 2026 |
+| v0.1.0 | Decision tree inference (100% parity) | Feb 2026 |
+| v0.1.0 | Newick parsing validation | Feb 2026 |
+
+---
+
+## Gaps and Blockers
+
+| Gap | Impact | Status |
+|-----|--------|--------|
+| No GPU hash table primitive | Blocks kmer, derep GPU promotion | Waiting on ToadStool |
+| No GPU tree traversal primitive | Blocks unifrac, RF GPU promotion | Waiting on ToadStool |
+| `GPU_DISPATCH_THRESHOLD` = 10,000 | Small datasets fall back to CPU | By design |
+| Inline tolerances in binaries | Not blocking, but debt | Deferred refactor |
+| `include_str!` path to ToadStool shader | Brittle cross-crate path | ToadStool team to stabilize |

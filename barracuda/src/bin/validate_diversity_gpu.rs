@@ -1,6 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! GPU validation — compare all GPU results against CPU baselines.
 //!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | CPU diversity metrics (`bio::diversity`) |
+//! | Baseline version | GPU parity validation |
+//! | Baseline date | 2026-02-19 |
+//! | Data | Synthetic (Shannon, Simpson, Bray-Curtis, `PCoA`, etc.) |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
 //! Follows the hotSpring pattern: GPU result vs CPU result → harness check
 //! → exit 0 (pass) / 1 (fail) / 2 (skip).
 //!

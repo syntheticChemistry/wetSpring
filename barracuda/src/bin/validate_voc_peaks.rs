@@ -44,8 +44,13 @@ struct VocCompound {
 }
 
 fn parse_baseline(path: &Path) -> Vec<VocCompound> {
-    let contents = std::fs::read_to_string(path)
-        .unwrap_or_else(|e| panic!("Failed to read {}: {e}", path.display()));
+    let contents = match std::fs::read_to_string(path) {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("Failed to read {}: {e}", path.display());
+            std::process::exit(1);
+        }
+    };
 
     let mut compounds = Vec::new();
     for line in contents.lines() {
@@ -106,23 +111,41 @@ fn validate_parsing(v: &mut Validator, compounds: &[VocCompound]) {
 
     v.check_count("Total compounds", compounds.len(), 14);
 
-    let ar_only: Vec<_> = compounds.iter().filter(|c| c.condition == "A+R").collect();
-    v.check_count("A+R only compounds (grazer biomarkers)", ar_only.len(), 7);
-
-    let ar_a: Vec<_> = compounds.iter().filter(|c| c.condition == "A+R,A").collect();
-    v.check_count("A+R,A compounds (both conditions)", ar_a.len(), 7);
-
-    let identified: Vec<_> = compounds.iter().filter(|c| c.nist_match_pct > 0).collect();
-    v.check_count("NIST-identified compounds", identified.len(), 5);
-
-    let all_3_exps: Vec<_> = compounds.iter().filter(|c| c.n_experiments == 3).collect();
-    v.check_count("Compounds in all 3 experiments", all_3_exps.len(), 6);
+    v.check_count(
+        "A+R only compounds (grazer biomarkers)",
+        compounds.iter().filter(|c| c.condition == "A+R").count(),
+        7,
+    );
+    v.check_count(
+        "A+R,A compounds (both conditions)",
+        compounds.iter().filter(|c| c.condition == "A+R,A").count(),
+        7,
+    );
+    v.check_count(
+        "NIST-identified compounds",
+        compounds.iter().filter(|c| c.nist_match_pct > 0).count(),
+        5,
+    );
+    v.check_count(
+        "Compounds in all 3 experiments",
+        compounds.iter().filter(|c| c.n_experiments == 3).count(),
+        6,
+    );
 
     let trans_beta_ionone = compounds.iter().find(|c| c.id == 6);
     if let Some(tbi) = trans_beta_ionone {
         v.check("trans-beta-ionone m/z = 177", tbi.base_peak_mz, 177.0, 0.0);
-        v.check("trans-beta-ionone RI = 1495", tbi.experimental_ri, 1495.0, 0.0);
-        v.check_count("trans-beta-ionone NIST match = 94%", tbi.nist_match_pct as usize, 94);
+        v.check(
+            "trans-beta-ionone RI = 1495",
+            tbi.experimental_ri,
+            1495.0,
+            0.0,
+        );
+        v.check_count(
+            "trans-beta-ionone NIST match = 94%",
+            tbi.nist_match_pct as usize,
+            94,
+        );
     }
 }
 
@@ -167,16 +190,24 @@ fn validate_synthetic_chromatogram(v: &mut Validator, compounds: &[VocCompound])
     let mut expected_peak_indices = Vec::new();
     for c in &ar_only {
         let frac = (c.experimental_ri - ri_min) / (ri_max - ri_min);
+        #[allow(
+            clippy::cast_possible_truncation,
+            clippy::cast_sign_loss,
+            clippy::cast_precision_loss
+        )]
         let center = (frac * n_points as f64).round() as usize;
         let center = center.min(n_points - 1);
         expected_peak_indices.push(center);
 
         // Gaussian peak: height proportional to experiment reproducibility
-        let height = 1000.0 * (c.n_experiments as f64 / 3.0);
+        let height = 1000.0 * (f64::from(c.n_experiments) / 3.0);
         let sigma = 8.0;
-        for i in center.saturating_sub(40)..=(center + 40).min(n_points - 1) {
-            let x = i as f64 - center as f64;
-            chromatogram[i] += height * (-0.5 * (x / sigma).powi(2)).exp();
+        let lo = center.saturating_sub(40);
+        let hi = (center + 40).min(n_points - 1);
+        #[allow(clippy::cast_precision_loss)]
+        for (i, val) in chromatogram[lo..=hi].iter_mut().enumerate() {
+            let x = (lo + i) as f64 - center as f64;
+            *val += height * (-0.5 * (x / sigma).powi(2)).exp();
         }
     }
 
@@ -199,6 +230,7 @@ fn validate_synthetic_chromatogram(v: &mut Validator, compounds: &[VocCompound])
 
     let mut matched = 0_usize;
     for &expected_idx in &expected_peak_indices {
+        #[allow(clippy::cast_possible_wrap)]
         let found = peaks
             .iter()
             .any(|p| (p.index as i64 - expected_idx as i64).unsigned_abs() <= 3);
@@ -206,7 +238,11 @@ fn validate_synthetic_chromatogram(v: &mut Validator, compounds: &[VocCompound])
             matched += 1;
         }
     }
-    v.check_count("Peak indices matched (±3)", matched, expected_peak_indices.len());
+    v.check_count(
+        "Peak indices matched (±3)",
+        matched,
+        expected_peak_indices.len(),
+    );
 }
 
 fn validate_biomarker_classification(v: &mut Validator, compounds: &[VocCompound]) {
@@ -218,11 +254,11 @@ fn validate_biomarker_classification(v: &mut Validator, compounds: &[VocCompound
         .collect();
     v.check_count("Carotenoid compounds", carotenoids.len(), 5);
 
-    let ar_carotenoids: Vec<_> = carotenoids
-        .iter()
-        .filter(|c| c.condition == "A+R")
-        .collect();
-    v.check_count("Grazer-specific carotenoids (A+R)", ar_carotenoids.len(), 4);
+    v.check_count(
+        "Grazer-specific carotenoids (A+R)",
+        carotenoids.iter().filter(|c| c.condition == "A+R").count(),
+        4,
+    );
 
     let all_ar_only: Vec<_> = compounds.iter().filter(|c| c.condition == "A+R").collect();
     let all_ar_in_3 = all_ar_only.iter().all(|c| c.n_experiments >= 2);
@@ -243,19 +279,21 @@ fn validate_ri_tolerance_matching(v: &mut Validator, compounds: &[VocCompound]) 
         .collect();
 
     // Build a sorted array of theoretical RIs
-    let mut sorted_theoretical: Vec<f64> = with_theoretical.iter().map(|c| c.theoretical_ri).collect();
-    sorted_theoretical.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    let mut sorted_theoretical: Vec<f64> =
+        with_theoretical.iter().map(|c| c.theoretical_ri).collect();
+    sorted_theoretical.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
 
     // For each compound, check if its experimental RI matches the correct theoretical
     // value using Da-style absolute tolerance search (RI units, not Da, but same algorithm)
     let mut all_matched = true;
     for c in &with_theoretical {
         let tolerance = c.theoretical_ri * 0.05; // 5% tolerance
-        let matches = tolerance_search::find_within_da(&sorted_theoretical, c.experimental_ri, tolerance);
+        let matches =
+            tolerance_search::find_within_da(&sorted_theoretical, c.experimental_ri, tolerance);
 
-        let correct_found = matches.iter().any(|&idx| {
-            (sorted_theoretical[idx] - c.theoretical_ri).abs() < 0.1
-        });
+        let correct_found = matches
+            .iter()
+            .any(|&idx| (sorted_theoretical[idx] - c.theoretical_ri).abs() < 0.1);
 
         if !correct_found {
             all_matched = false;

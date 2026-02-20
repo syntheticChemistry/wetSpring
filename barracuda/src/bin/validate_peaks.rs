@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Validate `bio::signal::find_peaks` against scipy.signal.find_peaks (Exp010).
+//! Validate `bio::signal::find_peaks` against `scipy.signal.find_peaks` (Exp010).
 //!
 //! # Provenance
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline script | `scripts/generate_peak_baselines.py` |
-//! | Baseline tool | scipy.signal.find_peaks (scipy 1.14+) |
-//! | Baseline date | 2026-02-18 |
-//! | Test data | `experiments/results/010_peak_baselines/*.dat` |
-//! | Hardware | Eastgate (i9-12900K, 64 GB, Pop!\_OS 22.04) |
+//! | Baseline tool | `scipy.signal.find_peaks` (scipy 1.14+) |
+//! | Baseline version | scipy 1.14+ |
+//! | Baseline command | `scripts/generate_peak_baselines.py` (Exp010) |
+//! | Baseline date | 2026-02-19 |
+//! | Data | Synthetic (`experiments/results/010_peak_baselines/*.dat`) |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
 //! # Format of .dat files
 //!
@@ -28,10 +29,7 @@ fn main() {
     let mut v = Validator::new("wetSpring Peak Detection Validation (Exp010)");
 
     let baseline_dir = std::env::var("WETSPRING_PEAKS_DIR").map_or_else(
-        |_| {
-            Path::new(env!("CARGO_MANIFEST_DIR"))
-                .join("../experiments/results/010_peak_baselines")
-        },
+        |_| Path::new(env!("CARGO_MANIFEST_DIR")).join("../experiments/results/010_peak_baselines"),
         PathBuf::from,
     );
 
@@ -150,6 +148,7 @@ fn validate_case(v: &mut Validator, dir: &Path, name: &str, params: &PeakParams)
     // Index matching: allow ±1 for boundary rounding
     let mut indices_matched = 0_usize;
     for (i, &sci_idx) in scipy_indices.iter().enumerate() {
+        #[allow(clippy::cast_possible_wrap)]
         let found = rust_peaks
             .iter()
             .any(|p| (p.index as i64 - sci_idx as i64).unsigned_abs() <= 1);
@@ -170,6 +169,7 @@ fn validate_case(v: &mut Validator, dir: &Path, name: &str, params: &PeakParams)
 
     // Height matching: Rust and scipy process identical data, heights should be very close
     for (i, &sci_height) in scipy_heights.iter().enumerate() {
+        #[allow(clippy::cast_possible_wrap)]
         if let Some(rp) = rust_peaks.iter().find(|p| {
             let sci_idx = scipy_indices[i];
             (p.index as i64 - sci_idx as i64).unsigned_abs() <= 1
@@ -194,4 +194,3 @@ fn validate_case(v: &mut Validator, dir: &Path, name: &str, params: &PeakParams)
         }
     }
 }
-

@@ -40,6 +40,10 @@ fn require_f64(gpu: &GpuF64) -> Result<()> {
 /// steps are GPU-accelerated for large datasets.
 ///
 /// Falls back to CPU for datasets with < 256 MS1 scans.
+///
+/// # Errors
+///
+/// Returns an error if the device lacks `SHADER_F64` support.
 pub fn extract_eics_gpu(
     gpu: &GpuF64,
     spectra: &[MzmlSpectrum],
@@ -62,6 +66,10 @@ pub fn extract_eics_gpu(
 ///
 /// Integrates multiple peak areas in parallel using `WeightedDotF64`.
 /// Each peak's area = sum of (dt * (y[i] + y[i+1]) / 2) over the peak range.
+///
+/// # Errors
+///
+/// Returns an error if GPU dispatch fails or the device lacks f64 support.
 #[allow(clippy::cast_precision_loss)]
 pub fn batch_integrate_peaks_gpu(
     gpu: &GpuF64,
@@ -119,10 +127,11 @@ pub fn batch_integrate_peaks_gpu(
 ///
 /// Sums all intensities in each EIC using `FusedMapReduceF64::sum`.
 /// Useful for quick total-ion-count calculations across many chromatograms.
-pub fn batch_eic_total_intensity_gpu(
-    gpu: &GpuF64,
-    eics: &[Eic],
-) -> Result<Vec<f64>> {
+///
+/// # Errors
+///
+/// Returns an error if GPU dispatch fails or the device lacks f64 support.
+pub fn batch_eic_total_intensity_gpu(gpu: &GpuF64, eics: &[Eic]) -> Result<Vec<f64>> {
     require_f64(gpu)?;
 
     let fmr = FusedMapReduceF64::new(gpu.to_wgpu_device())
@@ -144,6 +153,11 @@ pub fn batch_eic_total_intensity_gpu(
 /// Runs peak detection on each EIC's intensity trace. The peak detection
 /// itself is CPU (data-dependent branching), but pre-filtering of
 /// intensities and post-scoring of peaks can use GPU primitives.
+///
+/// # Errors
+///
+/// Returns an error if GPU dispatch fails or the device lacks f64 support.
+#[allow(clippy::cast_precision_loss)]
 pub fn batch_find_peaks_gpu(
     gpu: &GpuF64,
     eics: &[Eic],
@@ -158,12 +172,12 @@ pub fn batch_find_peaks_gpu(
 
     for eic in eics {
         // Use GPU to compute noise floor (mean intensity) for dynamic thresholding
-        let mean_intensity = if !eic.intensity.is_empty() {
+        let mean_intensity = if eic.intensity.is_empty() {
+            0.0
+        } else {
             fmr.sum(&eic.intensity)
                 .map_err(|e| Error::Gpu(format!("mean intensity GPU: {e}")))?
                 / eic.intensity.len() as f64
-        } else {
-            0.0
         };
 
         // Apply peak detection with optional dynamic height threshold

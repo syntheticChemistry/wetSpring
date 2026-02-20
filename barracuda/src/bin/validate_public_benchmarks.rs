@@ -1,47 +1,41 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Validate Rust 16S pipeline on PUBLIC open data, benchmarked against paper findings.
+#![allow(clippy::cast_precision_loss)] // usize→f64 for stats/display; loss acceptable
 //!
 //! # Provenance
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Public datasets | PRJNA1114688 (16 samples), PRJNA629095, PRJNA1178324, PRJNA516219 |
-//! | Paper benchmarks | Humphrey 2023 (OTUs, genera), Carney 2016 (crash agents) |
-//! | Taxonomy DB | SILVA 138.1 NR99 (436 680 reference sequences) |
-//! | Strategy | Run pipeline on open data → temporal + taxonomy + diversity analysis |
-//! | Date | 2026-02-19 |
+//! | Paper | Humphrey 2023 (OTUs, genera), Carney 2016 (crash agents) |
+//! | Baseline tool | Published paper ground truth |
+//! | Baseline version | Exp014 |
+//! | Baseline date | 2026-02-19 |
+//! | Data | PRJNA1114688, PRJNA629095, PRJNA1178324, PRJNA516219 |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use wetspring_barracuda::bio::dada2::{self, Dada2Params};
 use wetspring_barracuda::bio::derep::{self, DerepSort};
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::bio::quality::{self, QualityParams};
 use wetspring_barracuda::bio::taxonomy::{
     ClassifyParams, Lineage, NaiveBayesClassifier, ReferenceSeq, TaxRank,
 };
-use wetspring_barracuda::bio::quality::{self, QualityParams};
 use wetspring_barracuda::io::fastq::FastqRecord;
 use wetspring_barracuda::validation::Validator;
 
 fn main() {
-    let mut v = Validator::new(
-        "wetSpring Public Data Benchmark — Full Time Series + Taxonomy",
-    );
+    let mut v = Validator::new("wetSpring Public Data Benchmark — Full Time Series + Taxonomy");
 
     let base = std::env::var("WETSPRING_PUBLIC_DIR").map_or_else(
-        |_| {
-            Path::new(env!("CARGO_MANIFEST_DIR"))
-                .join("../data/public_benchmarks")
-        },
+        |_| Path::new(env!("CARGO_MANIFEST_DIR")).join("../data/public_benchmarks"),
         PathBuf::from,
     );
 
     // ── Load SILVA reference database (if available) ─────────────────────
     let ref_dir = std::env::var("WETSPRING_REF_DIR").map_or_else(
-        |_| {
-            Path::new(env!("CARGO_MANIFEST_DIR"))
-                .join("../data/reference_dbs/silva_138")
-        },
+        |_| Path::new(env!("CARGO_MANIFEST_DIR")).join("../data/reference_dbs/silva_138"),
         PathBuf::from,
     );
     let classifier = load_silva_classifier(&ref_dir);
@@ -120,10 +114,7 @@ fn main() {
     let d4 = base.join("PRJNA516219");
     if d4.exists() {
         validate_manifest(&mut v, &d4);
-        let samples = [
-            ("SRR8472475", "LakeErie-1"),
-            ("SRR8472476", "LakeErie-2"),
-        ];
+        let samples = [("SRR8472475", "LakeErie-1"), ("SRR8472476", "LakeErie-2")];
         for (acc, label) in samples {
             let dir = d4.join(acc);
             if dir.exists() {
@@ -170,7 +161,10 @@ fn load_silva_classifier(ref_dir: &Path) -> Option<NaiveBayesClassifier> {
     let tax_path = ref_dir.join("silva_138_99_taxonomy.tsv");
 
     if !fasta_path.exists() || !tax_path.exists() {
-        println!("  [INFO] SILVA reference not found at {} — skipping taxonomy", ref_dir.display());
+        println!(
+            "  [INFO] SILVA reference not found at {} — skipping taxonomy",
+            ref_dir.display()
+        );
         return None;
     }
 
@@ -214,8 +208,9 @@ fn load_silva_classifier(ref_dir: &Path) -> Option<NaiveBayesClassifier> {
             current_seq.clear();
         } else {
             current_seq.extend(
-                line.trim().bytes()
-                    .filter(|b| b.is_ascii_alphabetic())
+                line.trim()
+                    .bytes()
+                    .filter(u8::is_ascii_alphabetic)
                     .map(|b| b.to_ascii_uppercase()),
             );
         }
@@ -233,7 +228,11 @@ fn load_silva_classifier(ref_dir: &Path) -> Option<NaiveBayesClassifier> {
         }
     }
 
-    println!("  Subsampled {} reference sequences from {} total", refs.len(), n_parsed);
+    println!(
+        "  Subsampled {} reference sequences from {} total",
+        refs.len(),
+        n_parsed
+    );
 
     if refs.is_empty() {
         println!("  [WARN] No reference sequences loaded — skipping taxonomy");
@@ -264,13 +263,17 @@ fn validate_manifest(v: &mut Validator, data_dir: &Path) {
             );
         }
     } else {
-        println!("  [SKIP] manifest.json not found at {}", manifest_path.display());
+        println!(
+            "  [SKIP] manifest.json not found at {}",
+            manifest_path.display()
+        );
         v.check("manifest.json exists", 0.0, 1.0, 0.0);
     }
 }
 
 // ── Process a single sample through the full 16S pipeline ───────────────────
 
+#[allow(clippy::too_many_lines)] // sequential validation: parse → filter → derep → DADA2 → diversity → taxonomy
 fn process_sample(
     v: &mut Validator,
     sample_dir: &Path,
@@ -326,7 +329,9 @@ fn process_sample(
     };
     println!(
         "  {label}: quality filter {}/{} retained ({:.1}%)",
-        filtered.len(), total_reads, retention * 100.0
+        filtered.len(),
+        total_reads,
+        retention * 100.0
     );
 
     v.check(
@@ -339,7 +344,11 @@ fn process_sample(
     let mean_len = if filtered.is_empty() {
         0.0
     } else {
-        filtered.iter().map(|r| r.sequence.len() as f64).sum::<f64>() / filtered.len() as f64
+        filtered
+            .iter()
+            .map(|r| r.sequence.len() as f64)
+            .sum::<f64>()
+            / filtered.len() as f64
     };
     println!("  {label}: mean read length = {mean_len:.0} bp");
 
@@ -352,13 +361,19 @@ fn process_sample(
 
     let sub: Vec<_> = filtered.into_iter().take(5000).collect();
     if sub.len() < 50 {
-        println!("  {label}: too few reads after filtering ({}) — skipping denoising", sub.len());
+        println!(
+            "  {label}: too few reads after filtering ({}) — skipping denoising",
+            sub.len()
+        );
         return None;
     }
 
     let (uniques, _) = derep::dereplicate(&sub, DerepSort::Abundance, 2);
     let n_unique = uniques.len();
-    println!("  {label}: {n_unique} unique sequences from {} reads", sub.len());
+    println!(
+        "  {label}: {n_unique} unique sequences from {} reads",
+        sub.len()
+    );
 
     v.check(
         &format!("{label}: >1 unique sequence"),
@@ -383,10 +398,9 @@ fn process_sample(
     let simpson = diversity::simpson(&counts);
     let observed = diversity::observed_features(&counts);
 
-    println!(
-        "  {label}: observed={}, Shannon={:.3}, Simpson={:.3}",
-        observed as usize, shannon, simpson
-    );
+    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    let observed_usize = observed as usize;
+    println!("  {label}: observed={observed_usize}, Shannon={shannon:.3}, Simpson={simpson:.3}",);
 
     v.check(
         &format!("{label}: Shannon > 0"),
@@ -397,7 +411,11 @@ fn process_sample(
 
     v.check(
         &format!("{label}: Simpson in (0,1)"),
-        if simpson > 0.0 && simpson < 1.0 { 1.0 } else { 0.0 },
+        if simpson > 0.0 && simpson < 1.0 {
+            1.0
+        } else {
+            0.0
+        },
         1.0,
         0.0,
     );
@@ -405,14 +423,21 @@ fn process_sample(
     // Taxonomy classification (top 5 ASVs)
     let mut top_taxa = Vec::new();
     if let Some(clf) = classifier {
-        let params = ClassifyParams { bootstrap_n: 50, ..ClassifyParams::default() };
+        let params = ClassifyParams {
+            bootstrap_n: 50,
+            ..ClassifyParams::default()
+        };
         let n_classify = n_asvs.min(5);
         for asv in asvs.iter().take(n_classify) {
             let result = clf.classify(&asv.sequence, &params);
-            let genus = result.lineage.at_rank(TaxRank::Genus)
+            let genus = result
+                .lineage
+                .at_rank(TaxRank::Genus)
                 .unwrap_or("Unclassified")
                 .to_string();
-            let phylum = result.lineage.at_rank(TaxRank::Phylum)
+            let phylum = result
+                .lineage
+                .at_rank(TaxRank::Phylum)
                 .unwrap_or("?")
                 .to_string();
             let conf = if result.confidence.len() > TaxRank::Genus.depth() {
@@ -420,8 +445,10 @@ fn process_sample(
             } else {
                 0.0
             };
-            top_taxa.push(format!("{genus} ({phylum}) [{conf:.0}%]",
-                conf = conf * 100.0));
+            top_taxa.push(format!(
+                "{genus} ({phylum}) [{conf:.0}%]",
+                conf = conf * 100.0
+            ));
         }
         if !top_taxa.is_empty() {
             println!("  {label} taxonomy: {}", top_taxa.join(", "));
@@ -445,25 +472,32 @@ fn process_sample(
 
 // ── Temporal analysis ───────────────────────────────────────────────────────
 
+#[allow(clippy::too_many_lines)] // sequential time-series checks across PRJNA1114688 samples
 fn temporal_analysis(v: &mut Validator, all_results: &[SampleResult]) {
     v.section("Temporal Analysis (PRJNA1114688 Time Series)");
 
-    let nanno_d1: Vec<&SampleResult> = all_results.iter()
+    let nanno_d1: Vec<&SampleResult> = all_results
+        .iter()
         .filter(|r| r.label.starts_with("N.oculata") && r.label.contains("D1"))
         .collect();
-    let nanno_d7: Vec<&SampleResult> = all_results.iter()
+    let nanno_d7: Vec<&SampleResult> = all_results
+        .iter()
         .filter(|r| r.label.starts_with("N.oculata") && r.label.contains("D7"))
         .collect();
-    let nanno_d14: Vec<&SampleResult> = all_results.iter()
+    let nanno_d14: Vec<&SampleResult> = all_results
+        .iter()
         .filter(|r| r.label.starts_with("N.oculata") && r.label.contains("D14"))
         .collect();
-    let brach_d1: Vec<&SampleResult> = all_results.iter()
+    let brach_d1: Vec<&SampleResult> = all_results
+        .iter()
         .filter(|r| r.label.starts_with("B.plicatilis") && r.label.contains("D1"))
         .collect();
-    let brach_d7: Vec<&SampleResult> = all_results.iter()
+    let brach_d7: Vec<&SampleResult> = all_results
+        .iter()
         .filter(|r| r.label.starts_with("B.plicatilis") && r.label.contains("D7"))
         .collect();
-    let brach_d14: Vec<&SampleResult> = all_results.iter()
+    let brach_d14: Vec<&SampleResult> = all_results
+        .iter()
         .filter(|r| r.label.starts_with("B.plicatilis") && r.label.contains("D14"))
         .collect();
 
@@ -476,11 +510,15 @@ fn temporal_analysis(v: &mut Validator, all_results: &[SampleResult]) {
         ("B.plicatilis Day 14", &brach_d14),
     ];
 
-    println!("\n  ┌────────────────────────┬──────┬──────────┬──────────┬──────┬────────┬─────────┐");
+    println!(
+        "\n  ┌────────────────────────┬──────┬──────────┬──────────┬──────┬────────┬─────────┐"
+    );
     println!("  │ Group                  │  n   │ Reads(μ) │ Filt(μ)  │ ASVs │Shannon │ Simpson │");
     println!("  ├────────────────────────┼──────┼──────────┼──────────┼──────┼────────┼─────────┤");
     for (name, grp) in &groups {
-        if grp.is_empty() { continue; }
+        if grp.is_empty() {
+            continue;
+        }
         let n = grp.len() as f64;
         let avg_reads = grp.iter().map(|r| r.total_reads as f64).sum::<f64>() / n;
         let avg_filt = grp.iter().map(|r| r.filtered_reads as f64).sum::<f64>() / n;
@@ -489,51 +527,69 @@ fn temporal_analysis(v: &mut Validator, all_results: &[SampleResult]) {
         let avg_simp = grp.iter().map(|r| r.simpson).sum::<f64>() / n;
         println!(
             "  │ {:22} │ {:>4} │ {:>8.0} │ {:>8.0} │ {:>4.0} │ {:>6.3} │ {:>7.3} │",
-            name, grp.len(), avg_reads, avg_filt, avg_asvs, avg_shan, avg_simp
+            name,
+            grp.len(),
+            avg_reads,
+            avg_filt,
+            avg_asvs,
+            avg_shan,
+            avg_simp
         );
     }
     println!("  └────────────────────────┴──────┴──────────┴──────────┴──────┴────────┴─────────┘");
 
     // Biological expectation: community composition changes over time
     let avg_shannon = |g: &[&SampleResult]| -> f64 {
-        if g.is_empty() { return 0.0; }
+        if g.is_empty() {
+            return 0.0;
+        }
         g.iter().map(|r| r.shannon).sum::<f64>() / g.len() as f64
     };
 
-    let nanno_d1_sh = avg_shannon(&nanno_d1);
-    let nanno_d14_sh = avg_shannon(&nanno_d14);
-    let brach_d1_sh = avg_shannon(&brach_d1);
-    let brach_d14_sh = avg_shannon(&brach_d14);
+    let nanno_shannon_d1 = avg_shannon(&nanno_d1);
+    let nanno_shannon_d14 = avg_shannon(&nanno_d14);
+    let brach_shannon_d1 = avg_shannon(&brach_d1);
+    let brach_shannon_d14 = avg_shannon(&brach_d14);
 
     v.check(
         "Temporal: N.oculata has diversity at Day 1 and Day 14",
-        if nanno_d1_sh > 0.0 && nanno_d14_sh > 0.0 { 1.0 } else { 0.0 },
+        if nanno_shannon_d1 > 0.0 && nanno_shannon_d14 > 0.0 {
+            1.0
+        } else {
+            0.0
+        },
         1.0,
         0.0,
     );
     v.check(
         "Temporal: B.plicatilis has diversity at Day 1 and Day 14",
-        if brach_d1_sh > 0.0 && brach_d14_sh > 0.0 { 1.0 } else { 0.0 },
+        if brach_shannon_d1 > 0.0 && brach_shannon_d14 > 0.0 {
+            1.0
+        } else {
+            0.0
+        },
         1.0,
         0.0,
     );
 
-    let nanno_delta = (nanno_d14_sh - nanno_d1_sh).abs();
-    let brach_delta = (brach_d14_sh - brach_d1_sh).abs();
+    let nanno_delta = (nanno_shannon_d14 - nanno_shannon_d1).abs();
+    let brach_delta = (brach_shannon_d14 - brach_shannon_d1).abs();
     println!(
-        "  N.oculata Shannon: D1={:.3} → D14={:.3} (Δ={:.3})",
-        nanno_d1_sh, nanno_d14_sh, nanno_delta
+        "  N.oculata Shannon: D1={nanno_shannon_d1:.3} → D14={nanno_shannon_d14:.3} (Δ={nanno_delta:.3})",
     );
     println!(
-        "  B.plicatilis Shannon: D1={:.3} → D14={:.3} (Δ={:.3})",
-        brach_d1_sh, brach_d14_sh, brach_delta
+        "  B.plicatilis Shannon: D1={brach_shannon_d1:.3} → D14={brach_shannon_d14:.3} (Δ={brach_delta:.3})",
     );
 
     // Replicate consistency: within-group CV of Shannon should be reasonable
     let cv = |g: &[&SampleResult]| -> f64 {
-        if g.len() < 2 { return 0.0; }
+        if g.len() < 2 {
+            return 0.0;
+        }
         let mean = g.iter().map(|r| r.shannon).sum::<f64>() / g.len() as f64;
-        if mean == 0.0 { return 0.0; }
+        if mean == 0.0 {
+            return 0.0;
+        }
         let var = g.iter().map(|r| (r.shannon - mean).powi(2)).sum::<f64>() / g.len() as f64;
         var.sqrt() / mean
     };
@@ -541,19 +597,23 @@ fn temporal_analysis(v: &mut Validator, all_results: &[SampleResult]) {
     let nanno_d7_cv = cv(&nanno_d7);
     let brach_d7_cv = cv(&brach_d7);
     println!(
-        "  Replicate consistency: N.oculata D7 CV={:.2}, B.plicatilis D7 CV={:.2}",
-        nanno_d7_cv, brach_d7_cv
+        "  Replicate consistency: N.oculata D7 CV={nanno_d7_cv:.2}, B.plicatilis D7 CV={brach_d7_cv:.2}",
     );
 
     v.check(
         "Temporal: replicates have CV < 1.0 (reasonable consistency)",
-        if nanno_d7.len() >= 2 && nanno_d7_cv < 1.0 { 1.0 } else { 0.0 },
+        if nanno_d7.len() >= 2 && nanno_d7_cv < 1.0 {
+            1.0
+        } else {
+            0.0
+        },
         1.0,
         0.0,
     );
 
     // All 16 samples produced results
-    let n_1114688 = all_results.iter()
+    let n_1114688 = all_results
+        .iter()
         .filter(|r| r.label.starts_with("N.oculata") || r.label.starts_with("B.plicatilis"))
         .count();
     println!("  PRJNA1114688 samples processed: {n_1114688}/16");
@@ -576,6 +636,7 @@ fn temporal_analysis(v: &mut Validator, all_results: &[SampleResult]) {
 
 // ── Cross-dataset benchmark ─────────────────────────────────────────────────
 
+#[allow(clippy::too_many_lines)] // sequential cross-BioProject validation checks
 fn cross_dataset_benchmark(v: &mut Validator, all_results: &[SampleResult]) {
     v.section("Cross-Dataset Paper Benchmark");
 
@@ -584,7 +645,10 @@ fn cross_dataset_benchmark(v: &mut Validator, all_results: &[SampleResult]) {
         return;
     }
 
-    println!("  Benchmarking {} samples across 4 BioProjects", all_results.len());
+    println!(
+        "  Benchmarking {} samples across 4 BioProjects",
+        all_results.len()
+    );
 
     let nanno_samples: Vec<&SampleResult> = all_results
         .iter()
@@ -609,18 +673,29 @@ fn cross_dataset_benchmark(v: &mut Validator, all_results: &[SampleResult]) {
 
         println!(
             "  Nannochloropsis ({} samples): Shannon={:.3}, Simpson={:.3}, ASVs={:.0}",
-            nanno_samples.len(), avg_shannon, avg_simpson, avg_asvs
+            nanno_samples.len(),
+            avg_shannon,
+            avg_simpson,
+            avg_asvs
         );
 
         v.check(
             "Humphrey: Nanno Shannon in [0.5, 5.0]",
-            if (0.5..=5.0).contains(&avg_shannon) { 1.0 } else { 0.0 },
+            if (0.5..=5.0).contains(&avg_shannon) {
+                1.0
+            } else {
+                0.0
+            },
             1.0,
             0.0,
         );
         v.check(
             "Humphrey: Nanno Simpson in [0.3, 1.0]",
-            if (0.3..=1.0).contains(&avg_simpson) { 1.0 } else { 0.0 },
+            if (0.3..=1.0).contains(&avg_simpson) {
+                1.0
+            } else {
+                0.0
+            },
             1.0,
             0.0,
         );
@@ -635,7 +710,11 @@ fn cross_dataset_benchmark(v: &mut Validator, all_results: &[SampleResult]) {
     if !brachio_samples.is_empty() {
         let avg_shannon =
             brachio_samples.iter().map(|r| r.shannon).sum::<f64>() / brachio_samples.len() as f64;
-        println!("  Brachionus ({} samples): Shannon={:.3}", brachio_samples.len(), avg_shannon);
+        println!(
+            "  Brachionus ({} samples): Shannon={:.3}",
+            brachio_samples.len(),
+            avg_shannon
+        );
 
         v.check(
             "Carney: Brachio Shannon > 0 (diverse community)",
@@ -650,11 +729,15 @@ fn cross_dataset_benchmark(v: &mut Validator, all_results: &[SampleResult]) {
             nanno_samples.iter().map(|r| r.observed).sum::<f64>() / nanno_samples.len() as f64;
         let brachio_obs =
             brachio_samples.iter().map(|r| r.observed).sum::<f64>() / brachio_samples.len() as f64;
-        println!("  Cross-condition: Nanno obs={:.0}, Brachio obs={:.0}", nanno_obs, brachio_obs);
+        println!("  Cross-condition: Nanno obs={nanno_obs:.0}, Brachio obs={brachio_obs:.0}",);
 
         v.check(
             "Cross: both Nanno and Brachio have >1 observed feature",
-            if nanno_obs > 1.0 && brachio_obs > 1.0 { 1.0 } else { 0.0 },
+            if nanno_obs > 1.0 && brachio_obs > 1.0 {
+                1.0
+            } else {
+                0.0
+            },
             1.0,
             0.0,
         );
@@ -667,7 +750,9 @@ fn cross_dataset_benchmark(v: &mut Validator, all_results: &[SampleResult]) {
             cyano_samples.iter().map(|r| r.n_asvs as f64).sum::<f64>() / cyano_samples.len() as f64;
         println!(
             "  Cyanobacteria/HAB ({} samples): Shannon={:.3}, ASVs={:.0}",
-            cyano_samples.len(), avg_shannon, avg_asvs
+            cyano_samples.len(),
+            avg_shannon,
+            avg_asvs
         );
 
         v.check(
@@ -691,13 +776,16 @@ fn cross_dataset_benchmark(v: &mut Validator, all_results: &[SampleResult]) {
             cyano_samples.iter().map(|r| r.shannon).sum::<f64>() / cyano_samples.len() as f64;
         let delta = (nanno_shannon - cyano_shannon).abs();
         println!(
-            "  Cross-domain: marine Shannon={:.3} vs freshwater Shannon={:.3} (Δ={:.3})",
-            nanno_shannon, cyano_shannon, delta
+            "  Cross-domain: marine Shannon={nanno_shannon:.3} vs freshwater Shannon={cyano_shannon:.3} (Δ={delta:.3})",
         );
 
         v.check(
             "Cross-domain: pipeline handles both marine and freshwater",
-            if nanno_shannon > 0.0 && cyano_shannon > 0.0 { 1.0 } else { 0.0 },
+            if nanno_shannon > 0.0 && cyano_shannon > 0.0 {
+                1.0
+            } else {
+                0.0
+            },
             1.0,
             0.0,
         );
@@ -721,16 +809,24 @@ fn cross_dataset_benchmark(v: &mut Validator, all_results: &[SampleResult]) {
         0.0,
     );
 
-    println!("\n  ┌────────────────────────────────┬──────────┬──────────┬────────┬────────┬─────────┐");
-    println!("  │ Sample                         │   Reads  │ Filtered │  ASVs  │Shannon │ Simpson │");
-    println!("  ├────────────────────────────────┼──────────┼──────────┼────────┼────────┼─────────┤");
+    println!(
+        "\n  ┌────────────────────────────────┬──────────┬──────────┬────────┬────────┬─────────┐"
+    );
+    println!(
+        "  │ Sample                         │   Reads  │ Filtered │  ASVs  │Shannon │ Simpson │"
+    );
+    println!(
+        "  ├────────────────────────────────┼──────────┼──────────┼────────┼────────┼─────────┤"
+    );
     for r in all_results {
         println!(
             "  │ {:30} │ {:>8} │ {:>8} │ {:>6} │ {:>6.3} │ {:>7.3} │",
             r.label, r.total_reads, r.filtered_reads, r.n_asvs, r.shannon, r.simpson
         );
     }
-    println!("  └────────────────────────────────┴──────────┴──────────┴────────┴────────┴─────────┘");
+    println!(
+        "  └────────────────────────────────┴──────────┴──────────┴────────┴────────┴─────────┘"
+    );
 }
 
 // ── Taxonomy benchmark ──────────────────────────────────────────────────────
@@ -744,10 +840,14 @@ fn taxonomy_benchmark(v: &mut Validator, all_results: &[SampleResult]) {
         return;
     }
 
-    let classified_samples = all_results.iter()
+    let classified_samples = all_results
+        .iter()
         .filter(|r| !r.top_taxa.is_empty())
         .count();
-    println!("  Samples with taxonomy: {classified_samples}/{}", all_results.len());
+    println!(
+        "  Samples with taxonomy: {classified_samples}/{}",
+        all_results.len()
+    );
 
     v.check(
         "Taxonomy: at least 1 sample classified",
@@ -799,15 +899,25 @@ fn taxonomy_benchmark(v: &mut Validator, all_results: &[SampleResult]) {
     );
 
     // Check for biologically expected phyla in aquaculture samples
-    let has_proteobacteria = all_phyla.keys().any(|p|
-        p.to_lowercase().contains("proteobacteria"));
-    let has_bacteroidetes = all_phyla.keys().any(|p|
-        p.to_lowercase().contains("bacteroid"));
+    let has_proteobacteria = all_phyla
+        .keys()
+        .any(|p| p.to_lowercase().contains("proteobacteria"));
+    let has_bacteroidetes = all_phyla
+        .keys()
+        .any(|p| p.to_lowercase().contains("bacteroid"));
 
     println!(
         "  Expected phyla: Proteobacteria={}, Bacteroidetes={}",
-        if has_proteobacteria { "found" } else { "not found" },
-        if has_bacteroidetes { "found" } else { "not found" },
+        if has_proteobacteria {
+            "found"
+        } else {
+            "not found"
+        },
+        if has_bacteroidetes {
+            "found"
+        } else {
+            "not found"
+        },
     );
 
     v.check(
@@ -836,18 +946,9 @@ fn decompress_gz_fastq(path: &Path) -> Result<Vec<FastqRecord>, String> {
             Some(Ok(_)) => continue,
             _ => break,
         };
-        let seq = match lines.next() {
-            Some(Ok(l)) => l,
-            _ => break,
-        };
-        match lines.next() {
-            Some(Ok(_)) => {}
-            _ => break,
-        };
-        let qual = match lines.next() {
-            Some(Ok(l)) => l,
-            _ => break,
-        };
+        let Some(Ok(seq)) = lines.next() else { break };
+        let Some(Ok(_)) = lines.next() else { break };
+        let Some(Ok(qual)) = lines.next() else { break };
 
         let id = header[1..]
             .split_whitespace()

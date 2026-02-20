@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GemmCached — local extension: pre-compiled GEMM pipeline + buffer pool.
+//! `GemmCached` — local extension: pre-compiled GEMM pipeline + buffer pool.
 //!
-//! ToadStool's `GemmF64` recreates the shader module, bind group layout,
+//! `ToadStool`'s `GemmF64` recreates the shader module, bind group layout,
 //! and compute pipeline on every `execute()` call. This works, but the
 //! per-call pipeline creation overhead (~0.5ms) adds up in streaming
 //! workloads where GEMM is dispatched per sample.
 //!
 //! `GemmCached` hoists all compilation to `new()` and reuses the
 //! compiled pipeline across all subsequent dispatches. Data buffers
-//! are managed through ToadStool's `BufferPool` for cross-call reuse.
+//! are managed through `ToadStool`'s `BufferPool` for cross-call reuse.
 //!
-//! # ToadStool absorption path
+//! # `ToadStool` absorption path
 //!
 //! 1. `GemmF64::new(device)` → compile pipeline once
 //! 2. `GemmF64::execute()` → reuse cached pipeline
@@ -23,9 +23,12 @@ use barracuda::shaders::precision::ShaderTemplate;
 use bytemuck::{Pod, Zeroable};
 use std::sync::Arc;
 
-const GEMM_WGSL: &str = include_str!(
-    "../../../../phase1/toadstool/crates/barracuda/src/shaders/linalg/gemm_f64.wgsl"
-);
+// FRAGILITY NOTE: This `include_str!` reaches outside the wetSpring project
+// into the ToadStool monorepo.  When barracuda exposes the compiled GEMM
+// pipeline directly (absorption step 1-2), remove this path reference and
+// use `barracuda::shaders::linalg::GEMM_F64_WGSL` or equivalent.
+const GEMM_WGSL: &str =
+    include_str!("../../../../phase1/toadstool/crates/barracuda/src/shaders/linalg/gemm_f64.wgsl");
 
 #[repr(C)]
 #[derive(Copy, Clone, Pod, Zeroable)]
@@ -41,10 +44,11 @@ struct GemmParams {
 }
 
 impl GemmParams {
+    #[allow(clippy::cast_possible_truncation)]
     fn new(m: u32, k: u32, n: u32, batch_size: u32, alpha: f64, beta: f64) -> Self {
         let alpha_bits = alpha.to_bits();
         let beta_bits = beta.to_bits();
-        GemmParams {
+        Self {
             m,
             k,
             n,
@@ -57,11 +61,11 @@ impl GemmParams {
     }
 }
 
-/// Pre-compiled GEMM pipeline with ToadStool buffer pool integration.
+/// Pre-compiled GEMM pipeline with `ToadStool` buffer pool integration.
 ///
 /// Holds the shader module, bind group layout, and compute pipeline
 /// for the lifetime of the session. Per-call resources (data buffers)
-/// are managed through ToadStool's `BufferPool` for cross-call reuse
+/// are managed through `ToadStool`'s `BufferPool` for cross-call reuse
 /// via power-of-2 bucketing.
 pub struct GemmCached {
     device: Arc<WgpuDevice>,
@@ -73,10 +77,8 @@ pub struct GemmCached {
 impl GemmCached {
     /// Compile the GEMM shader and create the pipeline (one-time cost).
     pub fn new(device: Arc<WgpuDevice>, ctx: Arc<TensorContext>) -> Self {
-        let patched = ShaderTemplate::for_driver_auto(
-            GEMM_WGSL,
-            device.needs_f64_exp_log_workaround(),
-        );
+        let patched =
+            ShaderTemplate::for_driver_auto(GEMM_WGSL, device.needs_f64_exp_log_workaround());
         let shader = device
             .device()
             .create_shader_module(wgpu::ShaderModuleDescriptor {
@@ -104,17 +106,16 @@ impl GemmCached {
                 push_constant_ranges: &[],
             });
 
-        let pipeline =
-            device
-                .device()
-                .create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
-                    label: Some("GemmCached f64"),
-                    layout: Some(&pl),
-                    module: &shader,
-                    entry_point: "gemm_f64",
-                    cache: None,
-                    compilation_options: Default::default(),
-                });
+        let pipeline = device
+            .device()
+            .create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
+                label: Some("GemmCached f64"),
+                layout: Some(&pl),
+                module: &shader,
+                entry_point: "gemm_f64",
+                cache: None,
+                compilation_options: wgpu::PipelineCompilationOptions::default(),
+            });
 
         Self {
             device,
@@ -127,8 +128,13 @@ impl GemmCached {
     /// Execute C = A × B using the cached pipeline and buffer pool.
     ///
     /// - Pipeline: reused from init (no shader recompilation)
-    /// - Buffers A, B, C: acquired from ToadStool BufferPool, auto-returned on drop
+    /// - Buffers A, B, C: acquired from `ToadStool` `BufferPool`, auto-returned on drop
     /// - Params: uniform buffer (too small to pool meaningfully)
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if GPU dispatch or readback fails.
+    #[allow(clippy::cast_possible_truncation, clippy::many_single_char_names)]
     pub fn execute(
         &self,
         a: &[f64],
@@ -141,11 +147,9 @@ impl GemmCached {
         let c_size = batch_size * m * n;
         let pool = self.ctx.buffer_pool();
 
-        let (a_buf, b_buf, c_buf) =
-            self.acquire_and_upload(pool, a, b, m, k, n, batch_size);
+        let (a_buf, b_buf, c_buf) = self.acquire_and_upload(pool, a, b, m, k, n, batch_size);
 
-        let params =
-            GemmParams::new(m as u32, k as u32, n as u32, batch_size as u32, 1.0, 0.0);
+        let params = GemmParams::new(m as u32, k as u32, n as u32, batch_size as u32, 1.0, 0.0);
         let params_buf = self
             .device
             .create_uniform_buffer("GemmCached Params", &params);
@@ -163,6 +167,11 @@ impl GemmCached {
     ///
     /// The returned buffer stays on GPU for chaining into subsequent
     /// dispatches. Caller is responsible for readback when needed.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if GPU dispatch fails.
+    #[allow(clippy::cast_possible_truncation, clippy::many_single_char_names)]
     pub fn execute_to_buffer(
         &self,
         a: &[f64],
@@ -174,11 +183,9 @@ impl GemmCached {
     ) -> Result<wgpu::Buffer> {
         let pool = self.ctx.buffer_pool();
 
-        let (a_buf, b_buf, c_buf) =
-            self.acquire_and_upload(pool, a, b, m, k, n, batch_size);
+        let (a_buf, b_buf, c_buf) = self.acquire_and_upload(pool, a, b, m, k, n, batch_size);
 
-        let params =
-            GemmParams::new(m as u32, k as u32, n as u32, batch_size as u32, 1.0, 0.0);
+        let params = GemmParams::new(m as u32, k as u32, n as u32, batch_size as u32, 1.0, 0.0);
         let params_buf = self
             .device
             .create_uniform_buffer("GemmCached Params", &params);
@@ -189,6 +196,7 @@ impl GemmCached {
         Ok(c_buf.into_buffer())
     }
 
+    #[allow(clippy::many_single_char_names, clippy::too_many_arguments)] // mirrors GEMM signature: pool + A + B + M × K × N × batch
     fn acquire_and_upload(
         &self,
         pool: &BufferPool,
@@ -250,6 +258,7 @@ impl GemmCached {
             })
     }
 
+    #[allow(clippy::cast_possible_truncation)]
     fn dispatch(&self, bg: &wgpu::BindGroup, m: usize, n: usize, batch_size: usize) {
         let wg_x = (n as u32).div_ceil(16);
         let wg_y = (m as u32).div_ceil(16);
@@ -274,7 +283,7 @@ impl GemmCached {
     }
 }
 
-fn bgl_entry(binding: u32, ty: wgpu::BufferBindingType) -> wgpu::BindGroupLayoutEntry {
+const fn bgl_entry(binding: u32, ty: wgpu::BufferBindingType) -> wgpu::BindGroupLayoutEntry {
     wgpu::BindGroupLayoutEntry {
         binding,
         visibility: wgpu::ShaderStages::COMPUTE,

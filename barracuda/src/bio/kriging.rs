@@ -56,7 +56,7 @@ pub struct VariogramConfig {
 impl VariogramConfig {
     /// Spherical variogram — bounded correlation, most common for ecology.
     #[must_use]
-    pub fn spherical(nugget: f64, sill: f64, range: f64) -> Self {
+    pub const fn spherical(nugget: f64, sill: f64, range: f64) -> Self {
         Self {
             model: VariogramModel::Spherical {
                 nugget,
@@ -68,7 +68,7 @@ impl VariogramConfig {
 
     /// Exponential variogram — asymptotic approach to sill.
     #[must_use]
-    pub fn exponential(nugget: f64, sill: f64, range: f64) -> Self {
+    pub const fn exponential(nugget: f64, sill: f64, range: f64) -> Self {
         Self {
             model: VariogramModel::Exponential {
                 nugget,
@@ -80,7 +80,7 @@ impl VariogramConfig {
 
     /// Gaussian variogram — very smooth surfaces.
     #[must_use]
-    pub fn gaussian(nugget: f64, sill: f64, range: f64) -> Self {
+    pub const fn gaussian(nugget: f64, sill: f64, range: f64) -> Self {
         Self {
             model: VariogramModel::Gaussian {
                 nugget,
@@ -92,7 +92,7 @@ impl VariogramConfig {
 
     /// Linear variogram — simple monotonic.
     #[must_use]
-    pub fn linear(nugget: f64, sill: f64, range: f64) -> Self {
+    pub const fn linear(nugget: f64, sill: f64, range: f64) -> Self {
         Self {
             model: VariogramModel::Linear {
                 nugget,
@@ -229,7 +229,7 @@ pub fn empirical_variogram(
         .map_err(|e| Error::Gpu(format!("variogram fitting: {e}")))
 }
 
-/// Convert ToadStool's `KrigingResult` to our domain type.
+/// Convert `ToadStool`'s `KrigingResult` to our domain type.
 fn from_kriging_result(result: &KrigingResult) -> SpatialResult {
     SpatialResult {
         values: result.values.clone(),

@@ -1,0 +1,60 @@
+{
+  "experiment": "022_massie2012_gillespie",
+  "model": "birth-death (c-di-GMP simplified)",
+  "parameters": {
+    "k_dgc": 10.0,
+    "k_pde": 0.1,
+    "t_max": 100.0,
+    "n_runs": 1000
+  },
+  "analytical_steady_state": 100.0,
+  "ensemble": {
+    "mean": 100.397,
+    "std": 9.872051,
+    "variance": 97.457391,
+    "cv_squared": 0.97072
+  },
+  "single_trajectory_seed42": {
+    "n_events": 1814,
+    "final_count": 93,
+    "final_time": 99.642242
+  },
+  "checks": [
+    {
+      "label": "Ensemble mean within 10% of analytical",
+      "status": "PASS"
+    },
+    {
+      "label": "Ensemble mean within 20% of analytical (conservative)",
+      "status": "PASS"
+    },
+    {
+      "label": "All final counts non-negative",
+      "status": "PASS"
+    },
+    {
+      "label": "Ensemble std > 0 (stochastic variability)",
+      "status": "PASS"
+    },
+    {
+      "label": "Deterministic with same seed: True",
+      "status": "PASS"
+    },
+    {
+      "label": "Single trajectory final count >= 0: 93",
+      "status": "PASS"
+    },
+    {
+      "label": "Single trajectory has events: 1814 steps",
+      "status": "PASS"
+    },
+    {
+      "label": "Var/mean ~ 1.0 (Poisson): 0.971",
+      "status": "PASS"
+    }
+  ],
+  "total_pass": 8,
+  "total_checks": 8,
+  "elapsed_seconds": 2.07,
+  "python_version": "3.10.12"
+}

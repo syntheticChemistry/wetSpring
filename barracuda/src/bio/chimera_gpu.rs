@@ -4,7 +4,7 @@
 //! Uses the same k-mer sketch + prefix-sum algorithm as the CPU version
 //! to guarantee math parity. The GPU `GemmF64` dispatch validates device
 //! availability and demonstrates the encoding pathway for future full-GPU
-//! chimera scoring (when PipelineBuilder chains GEMM → score → reduce).
+//! chimera scoring (when `PipelineBuilder` chains GEMM → score → reduce).
 
 use crate::bio::chimera::{self, ChimeraParams, ChimeraResult, ChimeraStats};
 use crate::bio::dada2::Asv;
@@ -16,6 +16,10 @@ use crate::gpu::GpuF64;
 /// Uses the same k-mer sketch parent selection and prefix-sum crossover
 /// scoring as [`super::chimera::detect_chimeras`]. GPU device is validated
 /// but the core algorithm runs on CPU for exact math parity.
+///
+/// # Errors
+///
+/// Returns an error if the device lacks `SHADER_F64` support.
 pub fn detect_chimeras_gpu(
     gpu: &GpuF64,
     seqs: &[Asv],
@@ -32,6 +36,10 @@ pub fn detect_chimeras_gpu(
 }
 
 /// GPU-accelerated chimera removal.
+///
+/// # Errors
+///
+/// Returns an error if the device lacks `SHADER_F64` support.
 pub fn remove_chimeras_gpu(
     gpu: &GpuF64,
     seqs: &[Asv],

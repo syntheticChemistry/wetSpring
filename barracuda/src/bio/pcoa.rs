@@ -5,7 +5,7 @@
 //! to ordination coordinates via Gower's double-centering + eigendecomposition.
 //!
 //! This is the CPU reference implementation. For GPU-accelerated `PCoA` on
-//! large sample counts, see [`super::pcoa_gpu`] (requires `gpu` feature).
+//! large sample counts, see `bio::pcoa_gpu` (requires the `gpu` feature).
 //!
 //! # Algorithm
 //!
@@ -271,7 +271,7 @@ mod tests {
             for j in (i + 1)..3 {
                 let dx = result.coordinates[i][0] - result.coordinates[j][0];
                 let dy = result.coordinates[i][1] - result.coordinates[j][1];
-                let dist = (dx * dx + dy * dy).sqrt();
+                let dist = dx.hypot(dy);
                 assert!(
                     (dist - 1.0).abs() < 1e-8,
                     "pair ({i},{j}): expected dist 1.0, got {dist}"

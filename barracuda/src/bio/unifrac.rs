@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! UniFrac distance — phylogeny-weighted beta diversity.
+//! `UniFrac` distance — phylogeny-weighted beta diversity.
 //!
-//! Implements unweighted and weighted UniFrac metrics (Lozupone & Knight 2005,
+//! Implements unweighted and weighted `UniFrac` metrics (Lozupone & Knight 2005,
 //! Lozupone et al. 2007) for comparing microbial communities using phylogenetic
 //! information.
 //!
 //! # Algorithm
 //!
-//! **Unweighted UniFrac**: Fraction of total branch length unique to either
+//! **Unweighted `UniFrac`**: Fraction of total branch length unique to either
 //! community. Captures presence/absence differences weighted by evolutionary
 //! distance.
 //!
-//! **Weighted UniFrac**: Branch lengths weighted by relative abundance
+//! **Weighted `UniFrac`**: Branch lengths weighted by relative abundance
 //! differences between communities. Captures quantitative composition changes.
 //!
 //! # Tree representation
@@ -21,10 +21,10 @@
 //!
 //! # References
 //!
-//! - Lozupone & Knight. "UniFrac: a new phylogenetic method for comparing
+//! - Lozupone & Knight. "`UniFrac`: a new phylogenetic method for comparing
 //!   microbial communities." Applied and Environmental Microbiology 71,
 //!   8228–8235 (2005).
-//! - Lozupone et al. "Quantitative and qualitative β diversity measures lead
+//! - Lozupone et al. "Quantitative and qualitative beta diversity measures lead
 //!   to different insights into factors that structure microbial communities."
 //!   Applied and Environmental Microbiology 73, 1576–1585 (2007).
 
@@ -33,11 +33,11 @@ use std::collections::HashMap;
 /// A node in the phylogenetic tree (array-based representation).
 #[derive(Debug, Clone)]
 pub struct TreeNode {
-    /// Index of the parent node (root has parent = itself).
+    /// Index of the `parent` node (root has parent = itself).
     pub parent: usize,
-    /// Branch length from this node to its parent.
+    /// `branch_length` from this node to its parent.
     pub branch_length: f64,
-    /// Leaf label (ASV/OTU ID), or empty for internal nodes.
+    /// `label` (ASV/OTU ID), or empty for internal nodes.
     pub label: String,
     /// Child indices.
     pub children: Vec<usize>,
@@ -56,6 +56,7 @@ impl PhyloTree {
     ///
     /// Handles the subset of Newick used by phylogenetic tools:
     /// `((A:0.1,B:0.2):0.3,(C:0.4,D:0.5):0.6);`
+    #[must_use]
     pub fn from_newick(newick: &str) -> Self {
         let trimmed = newick.trim().trim_end_matches(';');
         let mut nodes = Vec::new();
@@ -133,24 +134,27 @@ impl PhyloTree {
             }
         }
 
-        PhyloTree {
+        Self {
             nodes,
             root,
             leaf_index,
         }
     }
 
-    /// Get the index of a leaf by its label.
+    /// Get the index of a leaf by its `label`.
+    #[must_use]
     pub fn leaf_idx(&self, label: &str) -> Option<usize> {
         self.leaf_index.get(label).copied()
     }
 
     /// Total branch length of the tree.
+    #[must_use]
     pub fn total_branch_length(&self) -> f64 {
         self.nodes.iter().map(|n| n.branch_length).sum()
     }
 
     /// Number of leaves.
+    #[must_use]
     pub fn n_leaves(&self) -> usize {
         self.leaf_index.len()
     }
@@ -184,20 +188,24 @@ fn parse_label_length(chars: &[char]) -> (String, f64, usize) {
     (label, bl, i)
 }
 
-/// An abundance table: sample_id -> (leaf_label -> count).
+/// An abundance table: `sample_id` -> (`leaf_label` -> `count`).
 pub type AbundanceTable = HashMap<String, HashMap<String, f64>>;
 
-/// Compute the unweighted UniFrac distance between two samples.
+/// Compute the unweighted `UniFrac` distance between two samples.
 ///
-/// UniFrac_u = (unique branch length) / (total observed branch length)
+/// `UniFrac_u` = (`unique` `branch_length`) / (total observed `branch_length`)
 ///
-/// "Unique" means branches leading to leaves present in only one sample.
+/// "Unique" means branches leading to leaves present in only one `sample`.
 #[allow(clippy::cast_precision_loss)]
-pub fn unweighted_unifrac(
+#[must_use]
+pub fn unweighted_unifrac<S>(
     tree: &PhyloTree,
-    sample_a: &HashMap<String, f64>,
-    sample_b: &HashMap<String, f64>,
-) -> f64 {
+    sample_a: &HashMap<String, f64, S>,
+    sample_b: &HashMap<String, f64, S>,
+) -> f64
+where
+    S: std::hash::BuildHasher,
+{
     // For each node, determine if descendants include leaves from sample A, B, or both
     let n = tree.nodes.len();
     let mut has_a = vec![false; n];
@@ -247,17 +255,22 @@ pub fn unweighted_unifrac(
     }
 }
 
-/// Compute the weighted UniFrac distance between two samples.
+/// Compute the weighted `UniFrac` distance between two samples.
 ///
-/// UniFrac_w = Σ_branches |p_A - p_B| × branch_length / Σ_branches max(p_A, p_B) × branch_length
+/// `UniFrac_w` = Σ_`branches` |`p_A` - `p_B`| × `branch_length` /
+/// Σ_`branches` max(`p_A`, `p_B`) × `branch_length`
 ///
-/// where p_A, p_B are the proportional abundances of descendants in each sample.
+/// where `p_A`, `p_B` are the proportional abundances of descendants in each `sample`.
 #[allow(clippy::cast_precision_loss)]
-pub fn weighted_unifrac(
+#[must_use]
+pub fn weighted_unifrac<S>(
     tree: &PhyloTree,
-    sample_a: &HashMap<String, f64>,
-    sample_b: &HashMap<String, f64>,
-) -> f64 {
+    sample_a: &HashMap<String, f64, S>,
+    sample_b: &HashMap<String, f64, S>,
+) -> f64
+where
+    S: std::hash::BuildHasher,
+{
     let total_a: f64 = sample_a.values().sum();
     let total_b: f64 = sample_b.values().sum();
 
@@ -307,7 +320,8 @@ pub fn weighted_unifrac(
     }
 }
 
-/// Compute a pairwise UniFrac distance matrix for multiple samples.
+/// Compute a pairwise `UniFrac` distance matrix for multiple samples.
+#[must_use]
 pub fn unifrac_distance_matrix(
     tree: &PhyloTree,
     samples: &AbundanceTable,
@@ -362,10 +376,16 @@ mod tests {
         sample.insert("B".to_string(), 20.0);
 
         let d = unweighted_unifrac(&tree, &sample, &sample);
-        assert!((d - 0.0).abs() < 1e-10, "identical samples should have distance 0, got {d}");
+        assert!(
+            (d - 0.0).abs() < 1e-10,
+            "identical samples should have distance 0, got {d}"
+        );
 
         let d = weighted_unifrac(&tree, &sample, &sample);
-        assert!((d - 0.0).abs() < 1e-10, "identical samples should have distance 0, got {d}");
+        assert!(
+            (d - 0.0).abs() < 1e-10,
+            "identical samples should have distance 0, got {d}"
+        );
     }
 
     #[test]
@@ -378,7 +398,10 @@ mod tests {
         sb.insert("C".to_string(), 10.0);
 
         let d = unweighted_unifrac(&tree, &sa, &sb);
-        assert!(d > 0.5, "disjoint samples should have high distance, got {d}");
+        assert!(
+            d > 0.5,
+            "disjoint samples should have high distance, got {d}"
+        );
         assert!(d <= 1.0);
     }
 
@@ -411,7 +434,10 @@ mod tests {
 
         // One empty → maximum distance
         let d = weighted_unifrac(&tree, &sa, &empty);
-        assert!((d - 1.0).abs() < 1e-10, "one empty should give distance 1.0, got {d}");
+        assert!(
+            (d - 1.0).abs() < 1e-10,
+            "one empty should give distance 1.0, got {d}"
+        );
     }
 
     #[test]
@@ -431,8 +457,8 @@ mod tests {
 
         let (ids, matrix) = unifrac_distance_matrix(&tree, &samples, false);
         assert_eq!(ids.len(), 2);
-        assert_eq!(matrix[0][0], 0.0);
-        assert_eq!(matrix[1][1], 0.0);
+        assert!(matrix[0][0].abs() < f64::EPSILON);
+        assert!(matrix[1][1].abs() < f64::EPSILON);
         assert!((matrix[0][1] - matrix[1][0]).abs() < 1e-10);
     }
 
@@ -450,7 +476,10 @@ mod tests {
 
         let d = unweighted_unifrac(&tree, &sa, &sb);
         assert!(d > 0.0, "partial overlap should give non-zero distance");
-        assert!(d < 1.0, "partial overlap should give less than max distance");
+        assert!(
+            d < 1.0,
+            "partial overlap should give less than max distance"
+        );
     }
 
     #[test]

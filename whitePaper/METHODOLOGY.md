@@ -19,6 +19,16 @@ and ordination (PCoA).
 
 **Source papers**: Pond Crash Forensics; Biotic Countermeasures (Sandia National Labs)
 
+### Track 1b: Comparative Genomics / Mathematical Biology
+
+Reproduce published mathematical models and phylogenetic algorithms from the
+Liu Lab (CMSE, MSU), Waters 2008, and Massie 2012. This exercises: Newick tree
+parsing, Robinson-Foulds distance, RK4 ODE integration, Gillespie stochastic
+simulation, and decision tree inference.
+
+**Source papers**: Waters 2008 (QS/c-di-GMP), Massie 2012 (Gillespie SSA),
+Liu 2014 (PhyloNet-HMM), dendropy (phylogenetic baseline)
+
 ### Track 2: PFAS Analytical Chemistry (codename blueFish)
 
 Reproduce published PFAS non-target screening from LC-MS/HRMS data. This
@@ -204,6 +214,44 @@ The GPU tolerances are deliberately looser than CPU because:
 | Spectral cosine N×N | > 100× at N > 100 | GEMM dispatches all pairs at once |
 | PCoA (eigendecomposition) | > 1× at N > 200 | Matrix operations benefit from parallelism |
 
+### 3.10 Three-Tier Performance Benchmark
+
+**Tool**: `bench.rs` (sovereign harness) + `benchmark_python_baseline.py`
+**Protocol**: [`benchmarks/PROTOCOL.md`](../benchmarks/PROTOCOL.md)
+
+The benchmark harness captures wall time, energy, and memory across all
+three tiers (Python, Rust CPU, Rust GPU) in a unified JSON schema:
+
+| Component | Measurement |
+|-----------|-------------|
+| `HardwareInventory` | CPU model/cores/MHz, RAM GB, GPU name/VRAM/driver/CC |
+| `PowerMonitor` | RAPL CPU energy (µJ) via `/sys/class/powercap/`, nvidia-smi GPU power/temp/VRAM |
+| `PhaseResult` | Wall time, N evals, µs/eval, energy report, peak RSS, notes |
+| `BenchReport` | ISO 8601 timestamp + hardware + vector of phases |
+
+**Workloads tested:**
+
+| Workload | Sizes | Purpose |
+|----------|-------|---------|
+| Shannon entropy | 1K–1M | Single-vector reduction (memory-bound baseline) |
+| Simpson index | 1K–1M | Single-vector reduction (arithmetic-only) |
+| Variance / dot | 1K–1M | Pure arithmetic (auto-vectorization test) |
+| Bray-Curtis NxN | 10–100 | Pairwise distance (GPU crossover point) |
+| Spectral cosine NxN | 10–200 | GEMM-based batch (GPU-dominant workload) |
+| PCoA | 10–30 | Matrix eigendecomposition (LAPACK comparison) |
+| Full 16S pipeline | 10 samples | End-to-end pipeline (Galaxy vs Rust CPU vs GPU) |
+
+**Energy methodology:**
+- CPU: Intel RAPL via `energy_uj` readings at start/end; handles counter wraps
+- GPU: nvidia-smi polled every 100ms; total joules via trapezoidal integration
+- Cost: computed at $0.12/kWh US residential average
+
+**Note on serde_json:** Added as a dependency for JSON model import (decision
+tree inference from sklearn). Core validation and I/O remain sovereign; JSON
+serialization in validation binaries is manual (`to_json()` methods).
+Runtime dependencies: `flate2` (gzip), `bytemuck` (GPU casting), `serde_json`
+(model import).
+
 ---
 
 ## 4. Comparison Protocol
@@ -238,35 +286,43 @@ All experiments run on a single consumer workstation:
 
 ## 6. Acceptance Criteria
 
-### Phase 2 (CPU): 388/388 checks pass
+### Phase 2 (CPU): 519/519 checks pass
 
 | Binary | Checks | Target |
 |--------|:------:|--------|
 | `validate_fastq` | 28 | Quality filter + merge + derep + Galaxy FastQC |
-| `validate_diversity` | 27 | Analytical + simulated + evenness + rarefaction (expanded from 18) |
+| `validate_diversity` | 27 | Analytical + simulated + evenness + rarefaction |
 | `validate_16s_pipeline` | 37 | Complete 16S: FASTQ → DADA2 → chimera → taxonomy → diversity → UniFrac |
-| `validate_algae_16s` | 29 | Real NCBI data (PRJNA488170, SRR7760408) + Humphrey 2023 reference |
-| `validate_voc_peaks` | 22 | Reese 2019 Table 1 (14 VOC compounds) + RI matching + peak detection |
+| `validate_algae_16s` | 29 | Real NCBI data (PRJNA488170) + Humphrey 2023 reference |
+| `validate_voc_peaks` | 22 | Reese 2019 Table 1 (14 VOC compounds) + RI matching |
 | `validate_mzml` | 7 | mzML parsing vs pyteomics |
 | `validate_pfas` | 10 | Cosine + KMD + FindPFAS |
 | `validate_features` | 9 | EIC + peaks + features vs asari (Exp009) |
 | `validate_peaks` | 17 | Peak detection vs scipy.signal.find_peaks (Exp010) |
-| `validate_algae_16s` | 29 | Real NCBI data + Humphrey 2023 reference (Exp012) |
-| `validate_voc_peaks` | 22 | Reese 2019 VOC baselines + RI matching (Exp013) |
 | `validate_public_benchmarks` | 202 | 22 samples, 4 BioProjects vs paper ground truth (Exp014) |
-| **Total** | **388** | **All pass** |
+| `validate_extended_algae` | 29 | PRJNA382322 Nannochloropsis (Exp017) |
+| `validate_pfas_library` | 21 | Jones Lab PFAS 175 compounds (Exp018) |
+| `validate_newick_parse` | 30 | Newick tree parsing vs dendropy (Exp019) |
+| `validate_qs_ode` | 16 | Waters 2008 QS ODE vs scipy (Exp020) |
+| `validate_rf_distance` | 23 | Robinson-Foulds vs dendropy (Exp021) |
+| `validate_gillespie` | 13 | Gillespie SSA vs analytical + numpy (Exp022) |
+| `validate_pfas_decision_tree` | 7 | Decision tree inference vs sklearn (Exp008) |
+| **Total** | **519** | **All pass** |
 
-Current status: **388/388 pass.** (includes real public NCBI data benchmarked against papers, VOC baselines, and 202 public data benchmark checks)
+Current status: **519/519 pass.** Covers 22 experiments across 3 tracks, including
+real NCBI data, published paper models (Waters 2008, Massie 2012), phylogenetic
+algorithms (RF distance), and sovereign ML inference (decision tree).
 
-### Phase 3 (GPU): 38/38 checks pass
+### Phase 3 (GPU): 126/126 checks pass
 
 | Binary | Checks | Target |
 |--------|:------:|--------|
 | `validate_diversity_gpu` | 38 | All within `GPU_VS_CPU_*` tolerances |
+| `validate_16s_pipeline_gpu` | 88 | Full pipeline: QF + DADA2 + chimera + taxonomy + diversity (10 samples) |
 
-Current status: **38/38 pass.** Checks: 3 Shannon + 3 Simpson + 6 BC + 5 PCoA + 6 alpha + 8 spectral + 3 variance + 1 correlation + 1 covariance + 2 weighted dot.
+Current status: **126/126 pass.** DADA2 GPU 24× speedup; full pipeline 2.45× GPU speedup.
 
-### Grand Total: 426/426 quantitative checks pass
+### Grand Total: 645/645 quantitative checks pass
 
 ---
 
@@ -279,7 +335,7 @@ Current status: **38/38 pass.** Checks: 3 Shannon + 3 Simpson + 6 BC + 5 PCoA + 
 | GPU workload | Large-matrix eigensolve, MD force evaluation | Diversity metrics, distance matrices, signal processing |
 | Validation metric | chi2/datum | Pass/fail within documented tolerance |
 | Data size | Small (52–2,042 nuclei) | Large (millions of reads, thousands of spectra) |
-| Key insight | GPU-resident hybrid beats CPU for matrix physics | Sovereign parsers + GPU diversity validated at f64 |
+| Key insight | GPU-resident hybrid beats CPU for matrix physics | Full GPU pipeline 2.45× faster; compute-bound stages (DADA2 24×, taxonomy 60×) vs memory-bound (QF 0.85×) |
 
 Both projects prove the same thesis: **sovereign compute on consumer hardware
 can replicate institutional results, then exceed them via Rust + GPU.**

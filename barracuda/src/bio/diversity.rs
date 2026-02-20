@@ -18,6 +18,14 @@ pub fn observed_features(counts: &[f64]) -> f64 {
 /// Shannon entropy: H = -sum(p\_i \* ln(p\_i)).
 ///
 /// Uses natural log (base e), matching skbio default.
+///
+/// ```
+/// use wetspring_barracuda::bio::diversity;
+///
+/// let uniform = vec![25.0; 4];
+/// let h = diversity::shannon(&uniform);
+/// assert!((h - 4.0_f64.ln()).abs() < 1e-12);
+/// ```
 #[must_use]
 pub fn shannon(counts: &[f64]) -> f64 {
     let total: f64 = counts.iter().sum();
@@ -38,6 +46,14 @@ pub fn shannon(counts: &[f64]) -> f64 {
 /// Simpson's diversity index: 1 - sum(p\_i^2).
 ///
 /// Higher values = more diverse (0 to 1).
+///
+/// ```
+/// use wetspring_barracuda::bio::diversity;
+///
+/// let uniform = vec![100.0; 10];
+/// let d = diversity::simpson(&uniform);
+/// assert!((d - 0.9).abs() < 1e-12);
+/// ```
 #[must_use]
 pub fn simpson(counts: &[f64]) -> f64 {
     let total: f64 = counts.iter().sum();
@@ -401,7 +417,7 @@ mod tests {
     fn test_rarefaction_monotonic() {
         // Expected species should increase with depth
         let counts = vec![50.0, 30.0, 20.0, 10.0, 5.0, 3.0, 2.0, 1.0];
-        let depths: Vec<f64> = (1..=120).map(|x| x as f64).collect();
+        let depths: Vec<f64> = (1..=120).map(f64::from).collect();
         let curve = rarefaction_curve(&counts, &depths);
 
         for i in 1..curve.len() {

@@ -353,10 +353,9 @@ mod tests {
         // Gaussian-like peak with known width
         let n = 101;
         let sigma = 10.0;
-        #[allow(clippy::cast_precision_loss)]
         let data: Vec<f64> = (0..n)
             .map(|i| {
-                let x = (i as f64 - 50.0) / sigma;
+                let x = (f64::from(i) - 50.0) / sigma;
                 (-0.5 * x * x).exp()
             })
             .collect();
@@ -375,10 +374,9 @@ mod tests {
     fn chromatographic_peaks() {
         // Simulate LC-MS chromatogram with 3 peaks of varying size
         let n = 200;
-        #[allow(clippy::cast_precision_loss)]
         let data: Vec<f64> = (0..n)
             .map(|i| {
-                let x = i as f64;
+                let x = f64::from(i);
                 let p1 = 100.0 * (-0.5 * ((x - 40.0) / 5.0).powi(2)).exp();
                 let p2 = 500.0 * (-0.5 * ((x - 100.0) / 8.0).powi(2)).exp();
                 let p3 = 200.0 * (-0.5 * ((x - 160.0) / 6.0).powi(2)).exp();
@@ -394,9 +392,12 @@ mod tests {
         let peaks = find_peaks(&data, &params);
         assert_eq!(peaks.len(), 3);
         // Peaks should be near 40, 100, 160
-        assert!((peaks[0].index as f64 - 40.0).abs() < 2.0);
-        assert!((peaks[1].index as f64 - 100.0).abs() < 2.0);
-        assert!((peaks[2].index as f64 - 160.0).abs() < 2.0);
+        #[allow(clippy::cast_precision_loss)]
+        {
+            assert!((peaks[0].index as f64 - 40.0).abs() < 2.0);
+            assert!((peaks[1].index as f64 - 100.0).abs() < 2.0);
+            assert!((peaks[2].index as f64 - 160.0).abs() < 2.0);
+        }
         // Heights should approximate the peak amplitudes + baseline
         assert!(peaks[1].height > peaks[2].height);
         assert!(peaks[2].height > peaks[0].height);

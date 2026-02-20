@@ -1,0 +1,163 @@
+{
+  "timestamp": "2026-02-19T18:13:14",
+  "hardware": {
+    "gate_name": "wetSpring Pipeline",
+    "cpu_model": "12th Gen Intel(R) Core(TM) i9-12900K",
+    "cpu_cores": 16,
+    "cpu_threads": 24,
+    "cpu_cache_kb": 30720,
+    "ram_total_mb": 31900,
+    "gpu_name": "NVIDIA GeForce RTX 4070",
+    "gpu_vram_mb": 12282,
+    "gpu_driver": "580.82.09",
+    "gpu_compute_cap": "8.9",
+    "os_kernel": "6.17.4-76061704-generic",
+    "rust_version": ""
+  },
+  "phases": [
+    {
+      "phase": "SILVA training",
+      "substrate": "Rust CPU",
+      "wall_time_s": 2.054909,
+      "per_eval_us": 2054909.108,
+      "n_evals": 1,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 63.3394,
+      "gpu_watts_avg": 31.62,
+      "gpu_watts_peak": 31.65,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 724.0,
+      "gpu_samples": 21
+      },
+      "peak_rss_mb": 1949.8,
+      "notes": "one-time classifier training"
+    },
+    {
+      "phase": "FASTQ parse",
+      "substrate": "Rust CPU",
+      "wall_time_s": 2.275417,
+      "per_eval_us": 227541.712,
+      "n_evals": 10,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 57.3580,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 31.98,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 738.0,
+      "gpu_samples": 25
+      },
+      "peak_rss_mb": 1949.8,
+      "notes": ""
+    },
+    {
+      "phase": "Quality filter",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.912886,
+      "per_eval_us": 91288.596,
+      "n_evals": 10,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 25.2167,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 32.00,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 738.0,
+      "gpu_samples": 15
+      },
+      "peak_rss_mb": 1949.8,
+      "notes": ""
+    },
+    {
+      "phase": "Dereplication",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.083413,
+      "per_eval_us": 8341.349,
+      "n_evals": 10,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 2.0084,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 31.86,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 730.0,
+      "gpu_samples": 1
+      },
+      "peak_rss_mb": 1949.8,
+      "notes": ""
+    },
+    {
+      "phase": "DADA2 denoise",
+      "substrate": "Rust CPU",
+      "wall_time_s": 3.411365,
+      "per_eval_us": 341136.504,
+      "n_evals": 10,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 86.2419,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 32.00,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 739.0,
+      "gpu_samples": 37
+      },
+      "peak_rss_mb": 1949.8,
+      "notes": ""
+    },
+    {
+      "phase": "Chimera detect",
+      "substrate": "Rust CPU",
+      "wall_time_s": 1.621843,
+      "per_eval_us": 162184.274,
+      "n_evals": 10,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 41.7177,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 31.98,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 743.0,
+      "gpu_samples": 21
+      },
+      "peak_rss_mb": 1949.8,
+      "notes": ""
+    },
+    {
+      "phase": "Taxonomy classify",
+      "substrate": "Rust CPU",
+      "wall_time_s": 3.222431,
+      "per_eval_us": 322243.050,
+      "n_evals": 10,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 84.8601,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 31.98,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 744.0,
+      "gpu_samples": 36
+      },
+      "peak_rss_mb": 1949.8,
+      "notes": ""
+    },
+    {
+      "phase": "Diversity metrics",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000065,
+      "per_eval_us": 6.541,
+      "n_evals": 10,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 1949.8,
+      "notes": ""
+    }
+  ]
+}

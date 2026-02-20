@@ -22,6 +22,7 @@
 //! - Magoč, T. & Salzberg, S.L. (2011). FLASH: fast length adjustment of
 //!   short reads. Bioinformatics 27(21): 2957-2963.
 
+use crate::bio::phred::{decode_qual, error_prob_to_phred, phred_to_error_prob};
 use crate::io::fastq::FastqRecord;
 
 /// Configuration for paired-end merging.
@@ -119,7 +120,7 @@ fn find_best_overlap(
     let fwd_len = fwd.len();
     let rev_len = rev_rc.len();
 
-    let max_overlap = params.max_overlap.unwrap_or(fwd_len.min(rev_len));
+    let max_overlap = params.max_overlap.unwrap_or_else(|| fwd_len.min(rev_len));
     let max_overlap = max_overlap.min(fwd_len).min(rev_len);
 
     let mut best_score = i64::MIN;
@@ -191,15 +192,12 @@ pub fn merge_pair(fwd: &FastqRecord, rev: &FastqRecord, params: &MergeParams) ->
         params,
     );
 
-    let (offset, overlap, mismatches) = match overlap_result {
-        Some(v) => v,
-        None => {
-            return MergeResult {
-                merged: None,
-                overlap: 0,
-                mismatches: 0,
-            };
-        }
+    let Some((offset, overlap, mismatches)) = overlap_result else {
+        return MergeResult {
+            merged: None,
+            overlap: 0,
+            mismatches: 0,
+        };
     };
 
     // Build merged sequence:
@@ -274,7 +272,13 @@ pub fn merge_pair(fwd: &FastqRecord, rev: &FastqRecord, params: &MergeParams) ->
 /// Merge a batch of read pairs.
 ///
 /// Forward and reverse reads must be in the same order (paired).
+///
+/// # Panics
+///
+/// Panics if `fwd_reads.len() != rev_reads.len()` (forward and reverse read
+/// counts must match).
 #[allow(clippy::cast_precision_loss)]
+#[must_use]
 pub fn merge_pairs(
     fwd_reads: &[FastqRecord],
     rev_reads: &[FastqRecord],
@@ -328,7 +332,7 @@ pub fn merge_pairs(
 }
 
 /// Case-insensitive DNA base comparison.
-fn bases_equal(a: u8, b: u8) -> bool {
+const fn bases_equal(a: u8, b: u8) -> bool {
     a.eq_ignore_ascii_case(&b)
 }
 
@@ -338,21 +342,18 @@ fn bases_equal(a: u8, b: u8) -> bool {
 /// `P_merged = P_f * P_r / (1 - P_f)(1 - P_r) + P_f * P_r`
 ///
 /// Where P = 10^(-Q/10).
+#[must_use]
 fn posterior_quality_agree(fq: u8, rq: u8, offset: u8) -> u8 {
-    let qf = f64::from(fq.saturating_sub(offset));
-    let qr = f64::from(rq.saturating_sub(offset));
-    let pf = 10_f64.powf(-qf / 10.0);
-    let pr = 10_f64.powf(-qr / 10.0);
+    let qf = decode_qual(fq, offset);
+    let qr = decode_qual(rq, offset);
+    let pf = phred_to_error_prob(qf);
+    let pr = phred_to_error_prob(qr);
 
     let p_err = pf * pr / 3.0;
-    let p_correct = (1.0 - pf) * (1.0 - pr) + p_err;
+    let p_correct = (1.0 - pf).mul_add(1.0 - pr, p_err);
     let p_merged = p_err / p_correct;
 
-    let q_merged = if p_merged > 0.0 {
-        -10.0 * p_merged.log10()
-    } else {
-        41.0 // cap at Q41
-    };
+    let q_merged = error_prob_to_phred(p_merged);
 
     // Cap at Q41 (Illumina max), floor at 0
     let q_capped = q_merged.clamp(0.0, 41.0);
@@ -365,23 +366,16 @@ fn posterior_quality_agree(fq: u8, rq: u8, offset: u8) -> u8 {
 /// Posterior quality when two bases disagree.
 ///
 /// Take the difference of the error probabilities.
+#[must_use]
 fn posterior_quality_disagree(higher_q: u8, lower_q: u8, offset: u8) -> u8 {
-    let qh = f64::from(higher_q.saturating_sub(offset));
-    let ql = f64::from(lower_q.saturating_sub(offset));
-    let ph = 10_f64.powf(-qh / 10.0);
-    let pl = 10_f64.powf(-ql / 10.0);
+    let qh = decode_qual(higher_q, offset);
+    let ql = decode_qual(lower_q, offset);
+    let ph = phred_to_error_prob(qh);
+    let pl = phred_to_error_prob(ql);
 
-    // The merged error probability: the dominant base has error prob
-    // adjusted by the evidence from the conflicting base
-    let p_merged = ph * (1.0 - pl / 3.0) / (ph * (1.0 - pl / 3.0) + (1.0 - ph) * pl / 3.0);
+    let p_merged = ph * (1.0 - pl / 3.0) / ph.mul_add(1.0 - pl / 3.0, (1.0 - ph) * pl / 3.0);
 
-    let q_merged = if p_merged > 0.0 && p_merged < 1.0 {
-        -10.0 * p_merged.log10()
-    } else if p_merged <= 0.0 {
-        41.0
-    } else {
-        0.0
-    };
+    let q_merged = error_prob_to_phred(p_merged);
 
     let q_capped = q_merged.clamp(0.0, 41.0);
 
@@ -469,8 +463,8 @@ mod tests {
     #[test]
     fn merge_no_overlap() {
         // Completely different sequences
-        let fwd = make_record("fwd", b"AAAAAAAAAAAAAAAA", &phred(&vec![30; 16]));
-        let rev = make_record("rev", b"CCCCCCCCCCCCCCCC", &phred(&vec![30; 16]));
+        let fwd = make_record("fwd", b"AAAAAAAAAAAAAAAA", &phred(&[30; 16]));
+        let rev = make_record("rev", b"CCCCCCCCCCCCCCCC", &phred(&[30; 16]));
 
         let result = merge_pair(&fwd, &rev, &MergeParams::default());
         assert!(result.merged.is_none());
@@ -483,7 +477,7 @@ mod tests {
         let rev_rc = b"ACGTATTTTTTTTTT"; // 5bp overlap
         let rev_seq = reverse_complement(rev_rc);
 
-        let fwd = make_record("fwd", fwd_seq, &phred(&vec![30; 15]));
+        let fwd = make_record("fwd", fwd_seq, &phred(&[30; 15]));
         let rev = make_record("rev", &rev_seq, &phred(&vec![30; rev_rc.len()]));
 
         let params = MergeParams {
@@ -505,10 +499,10 @@ mod tests {
         rev_rc_seq[0] = b'T'; // mismatch at overlap position 0: fwd=A, rev_rc=T
         let rev_seq = reverse_complement(&rev_rc_seq);
 
-        let mut fwd_qual = phred(&vec![30; 20]);
+        let mut fwd_qual = phred(&[30; 20]);
         fwd_qual[10] = 33 + 35; // High quality for fwd at mismatch position
 
-        let mut rev_qual_rc = phred(&vec![30; 20]);
+        let mut rev_qual_rc = phred(&[30; 20]);
         rev_qual_rc[0] = 33 + 5; // Low quality for rev at mismatch position
         let rev_qual: Vec<u8> = rev_qual_rc.iter().rev().copied().collect();
 
@@ -539,8 +533,8 @@ mod tests {
         let rev_rc: Vec<u8> = [overlap_seq as &[u8], rev_suffix].concat(); // 30bp
         let rev_seq = reverse_complement(&rev_rc);
 
-        let fwd = make_record("pair1", &fwd_seq, &phred(&vec![30; 30]));
-        let rev = make_record("pair1", &rev_seq, &phred(&vec![30; 30]));
+        let fwd = make_record("pair1", &fwd_seq, &phred(&[30; 30]));
+        let rev = make_record("pair1", &rev_seq, &phred(&[30; 30]));
 
         let (merged, stats) = merge_pairs(
             &[fwd.clone(), fwd],

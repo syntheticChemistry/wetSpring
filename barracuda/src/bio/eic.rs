@@ -253,8 +253,8 @@ mod tests {
     fn integrate_invalid_range() {
         let rt = vec![0.0, 1.0];
         let intensity = vec![10.0, 20.0];
-        assert_eq!(integrate_peak(&rt, &intensity, 1, 0), 0.0);
-        assert_eq!(integrate_peak(&rt, &intensity, 0, 5), 0.0);
+        assert!(integrate_peak(&rt, &intensity, 1, 0).abs() < f64::EPSILON);
+        assert!(integrate_peak(&rt, &intensity, 0, 5).abs() < f64::EPSILON);
     }
 
     #[test]

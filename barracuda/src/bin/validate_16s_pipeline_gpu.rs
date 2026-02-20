@@ -1,10 +1,20 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! GPU validation of the full 16S pipeline — math parity across hardware.
 //!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | CPU path (this binary's own CPU reference) |
+//! | Baseline version | Exp016 |
+//! | Baseline date | 2026-02-19 |
+//! | Data | PRJNA1114688, PRJNA629095, PRJNA1178324, PRJNA516219 |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
 //! Runs the identical 16S pipeline on public datasets using both CPU and GPU
 //! implementations, then checks that results match within f64 tolerance.
 //! This proves the math is identical across hardware: Galaxy/Python ↔
-//! BarraCUDA CPU ↔ BarraCUDA GPU.
+//! `BarraCUDA` CPU ↔ `BarraCUDA` GPU.
 //!
 //! # Pipeline stages (CPU vs GPU)
 //!
@@ -14,7 +24,7 @@
 //! | Quality filter     | `bio::quality`          | `bio::quality_gpu`              |
 //! | Dereplication      | `bio::derep`            | `bio::derep` (hash, stays CPU)  |
 //! | DADA2 denoise      | `bio::dada2`            | `bio::dada2` (stays CPU)        |
-//! | Chimera detection  | `bio::chimera`          | `bio::chimera_gpu` (GemmF64)    |
+//! | Chimera detection  | `bio::chimera`          | `bio::chimera_gpu` (`GemmF64`)    |
 //! | Taxonomy           | `bio::taxonomy`         | `bio::taxonomy_gpu` (batch)     |
 //! | Diversity          | `bio::diversity`        | `bio::diversity_gpu` (GPU)      |
 //!
@@ -42,12 +52,16 @@ use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
+#[allow(clippy::too_many_lines)]
 async fn main() {
     println!("╔══════════════════════════════════════════════════════════════════════╗");
     println!("║  wetSpring 16S Pipeline GPU Validation — Math Parity Check         ║");
     println!("╠══════════════════════════════════════════════════════════════════════╣");
     println!("║  Goal: Prove CPU and GPU produce identical scientific results      ║");
-    println!("║  Tolerance: {:<54} ║", format!("{:.0e}", tolerances::GPU_VS_CPU_F64));
+    println!(
+        "║  Tolerance: {:<54} ║",
+        format!("{:.0e}", tolerances::GPU_VS_CPU_F64)
+    );
     println!("║  Datasets: PRJNA1114688, PRJNA629095, PRJNA1178324, PRJNA516219   ║");
     println!("╚══════════════════════════════════════════════════════════════════════╝\n");
 
@@ -70,23 +84,19 @@ async fn main() {
     let session = GpuPipelineSession::new(&gpu).unwrap_or_else(|e| {
         validation::exit_skipped(&format!("GPU session init failed: {e}"));
     });
-    println!("  GPU session warmed in {:.1}ms (QF + DADA2 + GemmCached + FMR pipelines compiled)",
-        session.warmup_ms);
+    println!(
+        "  GPU session warmed in {:.1}ms (QF + DADA2 + GemmCached + FMR pipelines compiled)",
+        session.warmup_ms
+    );
     println!("  ToadStool TensorContext wired (buffer pool + bind group cache)\n");
 
     let base = std::env::var("WETSPRING_PUBLIC_DIR").map_or_else(
-        |_| {
-            Path::new(env!("CARGO_MANIFEST_DIR"))
-                .join("../data/public_benchmarks")
-        },
+        |_| Path::new(env!("CARGO_MANIFEST_DIR")).join("../data/public_benchmarks"),
         PathBuf::from,
     );
 
     let ref_dir = std::env::var("WETSPRING_REF_DIR").map_or_else(
-        |_| {
-            Path::new(env!("CARGO_MANIFEST_DIR"))
-                .join("../data/reference_dbs/silva_138")
-        },
+        |_| Path::new(env!("CARGO_MANIFEST_DIR")).join("../data/reference_dbs/silva_138"),
         PathBuf::from,
     );
 
@@ -102,24 +112,33 @@ async fn main() {
     // 6 cross-dataset samples with chimera-skip (CPU chimera O(n³) is the
     // sole bottleneck; GPU chimera parity is already proven on 4 samples).
     let sample_sets: Vec<(&str, Vec<(&str, &str)>)> = vec![
-        ("PRJNA1114688", vec![
-            ("SRR29127218", "N.oculata D1-R1"),
-            ("SRR29127209", "N.oculata D14-R1"),
-            ("SRR29127205", "B.plicatilis D1-R2"),
-            ("SRR29127215", "B.plicatilis D14-R1"),
-        ]),
-        ("PRJNA629095", vec![
-            ("SRR11638224", "N.oceanica phyco-1"),
-            ("SRR11638231", "N.oceanica phyco-2"),
-        ]),
-        ("PRJNA1178324", vec![
-            ("SRR31143973", "Cyano-tox-1"),
-            ("SRR31143980", "Cyano-tox-2"),
-        ]),
-        ("PRJNA516219", vec![
-            ("SRR8472475", "LakeErie-1"),
-            ("SRR8472476", "LakeErie-2"),
-        ]),
+        (
+            "PRJNA1114688",
+            vec![
+                ("SRR29127218", "N.oculata D1-R1"),
+                ("SRR29127209", "N.oculata D14-R1"),
+                ("SRR29127205", "B.plicatilis D1-R2"),
+                ("SRR29127215", "B.plicatilis D14-R1"),
+            ],
+        ),
+        (
+            "PRJNA629095",
+            vec![
+                ("SRR11638224", "N.oceanica phyco-1"),
+                ("SRR11638231", "N.oceanica phyco-2"),
+            ],
+        ),
+        (
+            "PRJNA1178324",
+            vec![
+                ("SRR31143973", "Cyano-tox-1"),
+                ("SRR31143980", "Cyano-tox-2"),
+            ],
+        ),
+        (
+            "PRJNA516219",
+            vec![("SRR8472475", "LakeErie-1"), ("SRR8472476", "LakeErie-2")],
+        ),
     ];
     let full_chimera_project = "PRJNA1114688";
 
@@ -136,8 +155,14 @@ async fn main() {
                 continue;
             }
             let (c, g) = process_sample_gpu_vs_cpu(
-                &mut v, &gpu, &session, &dir, label, accession,
-                classifier.as_ref(), run_full_chimera,
+                &mut v,
+                &gpu,
+                &session,
+                &dir,
+                label,
+                accession,
+                classifier.as_ref(),
+                run_full_chimera,
             );
             cpu_total_ms += c;
             gpu_total_ms += g;
@@ -149,16 +174,22 @@ async fn main() {
     println!("\n╔══════════════════════════════════════════════════════════════════════╗");
     println!("║                    TIMING SUMMARY                                  ║");
     println!("╠══════════════════════════════════════════════════════════════════════╣");
-    println!("║  Samples: {:>4}                                                    ║",
-        samples_processed);
-    println!("║  CPU total: {:>10.1} ms ({:>8.2} s)                            ║",
-        cpu_total_ms, cpu_total_ms / 1000.0);
-    println!("║  GPU total: {:>10.1} ms ({:>8.2} s)                            ║",
-        gpu_total_ms, gpu_total_ms / 1000.0);
+    println!(
+        "║  Samples: {samples_processed:>4}                                                    ║"
+    );
+    println!(
+        "║  CPU total: {:>10.1} ms ({:>8.2} s)                            ║",
+        cpu_total_ms,
+        cpu_total_ms / 1000.0
+    );
+    println!(
+        "║  GPU total: {:>10.1} ms ({:>8.2} s)                            ║",
+        gpu_total_ms,
+        gpu_total_ms / 1000.0
+    );
     if gpu_total_ms > 0.0 {
         let speedup = cpu_total_ms / gpu_total_ms;
-        println!("║  GPU speedup: {:>6.2}×                                            ║",
-            speedup);
+        println!("║  GPU speedup: {speedup:>6.2}×                                            ║");
     }
     println!("╚══════════════════════════════════════════════════════════════════════╝");
 
@@ -181,7 +212,11 @@ async fn main() {
         samples_processed,
         cpu_total_ms,
         gpu_total_ms,
-        if gpu_total_ms > 0.0 { cpu_total_ms / gpu_total_ms } else { 0.0 },
+        if gpu_total_ms > 0.0 {
+            cpu_total_ms / gpu_total_ms
+        } else {
+            0.0
+        },
     );
     let json_path = out_dir.join("gpu_parity_results.json");
     std::fs::write(&json_path, &json).ok();
@@ -197,7 +232,7 @@ async fn main() {
     println!("║              TOADSTOOL INFRASTRUCTURE STATS                        ║");
     println!("╠══════════════════════════════════════════════════════════════════════╣");
     for line in session.ctx_stats().lines() {
-        println!("║  {:<66} ║", line);
+        println!("║  {line:<66} ║");
     }
     println!("║  GemmCached: pipeline compiled once, reused across all dispatches  ║");
     println!("╚══════════════════════════════════════════════════════════════════════╝");
@@ -207,7 +242,11 @@ async fn main() {
 
 // ── Process a sample through both CPU and GPU pipelines, comparing results ──
 
-#[allow(clippy::cast_precision_loss)]
+#[allow(
+    clippy::cast_precision_loss,
+    clippy::too_many_arguments,
+    clippy::too_many_lines
+)] // GPU parity validation requires all pipeline context
 fn process_sample_gpu_vs_cpu(
     v: &mut Validator,
     gpu: &GpuF64,
@@ -250,22 +289,31 @@ fn process_sample_gpu_vs_cpu(
     let cpu_qf_ms = cpu_t.elapsed().as_secs_f64() * 1000.0;
 
     let gpu_t = Instant::now();
-    let (gpu_filtered, _gpu_fstats) = session.filter_reads(&records, &qparams)
-        .unwrap_or_else(|e| {
-            println!("  [GPU ERROR] quality: {e}");
-            quality::filter_reads(&records, &qparams)
-        });
+    let (gpu_filtered, _gpu_fstats) =
+        session
+            .filter_reads(&records, &qparams)
+            .unwrap_or_else(|e| {
+                println!("  [GPU ERROR] quality: {e}");
+                quality::filter_reads(&records, &qparams)
+            });
     let gpu_qf_ms = gpu_t.elapsed().as_secs_f64() * 1000.0;
 
     v.check(
         &format!("{label}: QF read count CPU == GPU"),
-        if cpu_filtered.len() == gpu_filtered.len() { 1.0 } else { 0.0 },
+        if cpu_filtered.len() == gpu_filtered.len() {
+            1.0
+        } else {
+            0.0
+        },
         1.0,
         0.0,
     );
     println!(
         "  {label} QF: CPU={} GPU={} reads ({:.1}ms / {:.1}ms)",
-        cpu_filtered.len(), gpu_filtered.len(), cpu_qf_ms, gpu_qf_ms,
+        cpu_filtered.len(),
+        gpu_filtered.len(),
+        cpu_qf_ms,
+        gpu_qf_ms,
     );
 
     // ── Subsample for tractable denoising ──────────────────────────────────
@@ -279,7 +327,11 @@ fn process_sample_gpu_vs_cpu(
     let cpu_t = Instant::now();
     let (uniques, _) = derep::dereplicate(&sub, DerepSort::Abundance, 2);
     let cpu_derep_ms = cpu_t.elapsed().as_secs_f64() * 1000.0;
-    println!("  {label} derep: {} uniques ({:.1}ms)", uniques.len(), cpu_derep_ms);
+    println!(
+        "  {label} derep: {} uniques ({:.1}ms)",
+        uniques.len(),
+        cpu_derep_ms
+    );
 
     // ── Stage 3: DADA2 denoise (CPU vs GPU E-step) ─────────────────────────
     let dada2_params = Dada2Params::default();
@@ -288,7 +340,8 @@ fn process_sample_gpu_vs_cpu(
     let cpu_dada2_ms = cpu_t.elapsed().as_secs_f64() * 1000.0;
 
     let gpu_t = Instant::now();
-    let (gpu_asvs, _) = session.denoise(&uniques, &dada2_params)
+    let (gpu_asvs, _) = session
+        .denoise(&uniques, &dada2_params)
         .unwrap_or_else(|e| {
             println!("  [GPU ERROR] DADA2: {e}");
             dada2::denoise(&uniques, &dada2_params)
@@ -297,7 +350,11 @@ fn process_sample_gpu_vs_cpu(
 
     v.check(
         &format!("{label}: DADA2 ASV count CPU ≈ GPU"),
-        if cpu_asvs.len() == gpu_asvs.len() { 1.0 } else { 0.0 },
+        if cpu_asvs.len() == gpu_asvs.len() {
+            1.0
+        } else {
+            0.0
+        },
         1.0,
         0.0,
     );
@@ -305,13 +362,20 @@ fn process_sample_gpu_vs_cpu(
     let gpu_dada2_reads: usize = gpu_asvs.iter().map(|a| a.abundance).sum();
     v.check(
         &format!("{label}: DADA2 total reads CPU == GPU"),
-        if cpu_dada2_reads == gpu_dada2_reads { 1.0 } else { 0.0 },
+        if cpu_dada2_reads == gpu_dada2_reads {
+            1.0
+        } else {
+            0.0
+        },
         1.0,
         0.0,
     );
     println!(
         "  {label} DADA2: CPU={} ASVs ({:.1}ms) GPU={} ASVs ({:.1}ms)",
-        cpu_asvs.len(), cpu_dada2_ms, gpu_asvs.len(), gpu_dada2_ms,
+        cpu_asvs.len(),
+        cpu_dada2_ms,
+        gpu_asvs.len(),
+        gpu_dada2_ms,
     );
     let asvs = cpu_asvs;
 
@@ -328,30 +392,40 @@ fn process_sample_gpu_vs_cpu(
 
         let gpu_t = Instant::now();
         let (gpu_chimera_results, gpu_cstats) =
-            chimera_gpu::detect_chimeras_gpu(gpu, &asvs, &cparams)
-                .unwrap_or_else(|e| {
-                    println!("  [GPU ERROR] chimera: {e}");
-                    chimera::detect_chimeras(&asvs, &cparams)
-                });
+            chimera_gpu::detect_chimeras_gpu(gpu, &asvs, &cparams).unwrap_or_else(|e| {
+                println!("  [GPU ERROR] chimera: {e}");
+                chimera::detect_chimeras(&asvs, &cparams)
+            });
         gpu_chimera_ms = gpu_t.elapsed().as_secs_f64() * 1000.0;
 
         v.check(
             &format!("{label}: chimera count CPU == GPU"),
-            if cpu_cstats.chimeras_found == gpu_cstats.chimeras_found { 1.0 } else { 0.0 },
+            if cpu_cstats.chimeras_found == gpu_cstats.chimeras_found {
+                1.0
+            } else {
+                0.0
+            },
             1.0,
             0.0,
         );
         v.check(
             &format!("{label}: chimera retained CPU == GPU"),
-            if cpu_cstats.retained == gpu_cstats.retained { 1.0 } else { 0.0 },
+            if cpu_cstats.retained == gpu_cstats.retained {
+                1.0
+            } else {
+                0.0
+            },
             1.0,
             0.0,
         );
         println!(
             "  {label} chimera: CPU={}/{} GPU={}/{} ({:.1}ms / {:.1}ms)",
-            cpu_cstats.chimeras_found, cpu_cstats.input_sequences,
-            gpu_cstats.chimeras_found, gpu_cstats.input_sequences,
-            cpu_chimera_ms, gpu_chimera_ms,
+            cpu_cstats.chimeras_found,
+            cpu_cstats.input_sequences,
+            gpu_cstats.chimeras_found,
+            gpu_cstats.input_sequences,
+            cpu_chimera_ms,
+            gpu_chimera_ms,
         );
 
         let mut score_match_count = 0_usize;
@@ -375,7 +449,9 @@ fn process_sample_gpu_vs_cpu(
         );
         println!(
             "  {label} chimera agreement: {:.1}% ({}/{})",
-            chimera_agreement * 100.0, score_match_count, score_total,
+            chimera_agreement * 100.0,
+            score_match_count,
+            score_total,
         );
 
         clean_asvs = cpu_chimera_results
@@ -387,11 +463,10 @@ fn process_sample_gpu_vs_cpu(
         // GPU-only chimera for cross-dataset samples (CPU chimera O(n³) too slow)
         let gpu_t = Instant::now();
         let (gpu_chimera_results, gpu_cstats) =
-            chimera_gpu::detect_chimeras_gpu(gpu, &asvs, &cparams)
-                .unwrap_or_else(|e| {
-                    println!("  [GPU ERROR] chimera: {e}");
-                    chimera::detect_chimeras(&asvs, &cparams)
-                });
+            chimera_gpu::detect_chimeras_gpu(gpu, &asvs, &cparams).unwrap_or_else(|e| {
+                println!("  [GPU ERROR] chimera: {e}");
+                chimera::detect_chimeras(&asvs, &cparams)
+            });
         gpu_chimera_ms = gpu_t.elapsed().as_secs_f64() * 1000.0;
         cpu_chimera_ms = gpu_chimera_ms;
 
@@ -400,10 +475,7 @@ fn process_sample_gpu_vs_cpu(
             gpu_cstats.chimeras_found, gpu_cstats.input_sequences, gpu_chimera_ms,
         );
 
-        v.check(
-            &format!("{label}: GPU chimera completes"),
-            1.0, 1.0, 0.0,
-        );
+        v.check(&format!("{label}: GPU chimera completes"), 1.0, 1.0, 0.0);
 
         clean_asvs = gpu_chimera_results
             .iter()
@@ -435,17 +507,20 @@ fn process_sample_gpu_vs_cpu(
     // CPU reference: taxonomy
     let mut cpu_tax_ms = 0.0;
     let mut cpu_tax_results: Vec<wetspring_barracuda::bio::taxonomy::Classification> = vec![];
-    let params = ClassifyParams { bootstrap_n: 50, ..ClassifyParams::default() };
+    let params = ClassifyParams {
+        bootstrap_n: 50,
+        ..ClassifyParams::default()
+    };
     let n_classify = clean_asvs.len().min(5);
-    let seqs: Vec<&[u8]> = clean_asvs.iter().take(n_classify)
+    let seqs: Vec<&[u8]> = clean_asvs
+        .iter()
+        .take(n_classify)
         .map(|a| a.sequence.as_slice())
         .collect();
 
     if let Some(clf) = classifier {
         let cpu_t = Instant::now();
-        cpu_tax_results = seqs.iter()
-            .map(|seq| clf.classify(seq, &params))
-            .collect();
+        cpu_tax_results = seqs.iter().map(|seq| clf.classify(seq, &params)).collect();
         cpu_tax_ms = cpu_t.elapsed().as_secs_f64() * 1000.0;
     }
 
@@ -458,8 +533,14 @@ fn process_sample_gpu_vs_cpu(
 
     let (gpu_shannon, gpu_simpson, gpu_observed, gpu_div_ms, gpu_tax_ms, gpu_tax_results) =
         if let Some(ref res) = gpu_result {
-            (res.shannon, res.simpson, res.observed,
-             res.diversity_ms, res.taxonomy_ms, &res.classifications)
+            (
+                res.shannon,
+                res.simpson,
+                res.observed,
+                res.diversity_ms,
+                res.taxonomy_ms,
+                &res.classifications,
+            )
         } else {
             // Fallback: pre-warmed FMR diversity
             let gpu_t = Instant::now();
@@ -496,16 +577,13 @@ fn process_sample_gpu_vs_cpu(
     );
 
     println!(
-        "  {label} diversity: Shannon CPU={:.4} GPU={:.4} (Δ={:.2e})",
-        cpu_shannon, gpu_shannon, shannon_diff,
+        "  {label} diversity: Shannon CPU={cpu_shannon:.4} GPU={gpu_shannon:.4} (Δ={shannon_diff:.2e})",
     );
     println!(
-        "  {label} diversity: Simpson CPU={:.4} GPU={:.4} (Δ={:.2e})",
-        cpu_simpson, gpu_simpson, simpson_diff,
+        "  {label} diversity: Simpson CPU={cpu_simpson:.4} GPU={gpu_simpson:.4} (Δ={simpson_diff:.2e})",
     );
     println!(
-        "  {label} diversity: observed CPU={:.0} GPU={:.0} (Δ={:.2e})",
-        cpu_observed, gpu_observed, observed_diff,
+        "  {label} diversity: observed CPU={cpu_observed:.0} GPU={gpu_observed:.0} (Δ={observed_diff:.2e})",
     );
 
     // ── Taxonomy parity checks ──────────────────────────────────────────────
@@ -520,31 +598,35 @@ fn process_sample_gpu_vs_cpu(
         }
         v.check(
             &format!("{label}: taxonomy genus agreement CPU == GPU"),
-            if taxa_match == cpu_tax_results.len() { 1.0 } else { 0.0 },
+            if taxa_match == cpu_tax_results.len() {
+                1.0
+            } else {
+                0.0
+            },
             1.0,
             0.0,
         );
         println!(
             "  {label} taxonomy: {}/{} genus match (CPU {:.1}ms / GPU GEMM {:.1}ms)",
-            taxa_match, cpu_tax_results.len(), cpu_tax_ms, gpu_tax_ms,
+            taxa_match,
+            cpu_tax_results.len(),
+            cpu_tax_ms,
+            gpu_tax_ms,
         );
     }
 
     println!(
         "  {label} streaming GPU session: taxonomy {:.1}ms + diversity {:.1}ms = {:.1}ms",
-        gpu_tax_ms, gpu_div_ms, gpu_tax_ms + gpu_div_ms,
+        gpu_tax_ms,
+        gpu_div_ms,
+        gpu_tax_ms + gpu_div_ms,
     );
 
     // ── Totals ──────────────────────────────────────────────────────────────
-    let cpu_ms = cpu_qf_ms + cpu_derep_ms + cpu_dada2_ms + cpu_chimera_ms
-        + cpu_div_ms + cpu_tax_ms;
-    let gpu_ms = gpu_qf_ms + cpu_derep_ms + gpu_dada2_ms + gpu_chimera_ms
-        + gpu_div_ms + gpu_tax_ms;
+    let cpu_ms = cpu_qf_ms + cpu_derep_ms + cpu_dada2_ms + cpu_chimera_ms + cpu_div_ms + cpu_tax_ms;
+    let gpu_ms = gpu_qf_ms + cpu_derep_ms + gpu_dada2_ms + gpu_chimera_ms + gpu_div_ms + gpu_tax_ms;
 
-    println!(
-        "  {label} totals: CPU={:.1}ms GPU={:.1}ms\n",
-        cpu_ms, gpu_ms,
-    );
+    println!("  {label} totals: CPU={cpu_ms:.1}ms GPU={gpu_ms:.1}ms\n",);
 
     (cpu_ms, gpu_ms)
 }
@@ -552,10 +634,7 @@ fn process_sample_gpu_vs_cpu(
 // ── Scaling benchmark: dispatch overhead + parallelization ───────────────────
 
 #[allow(clippy::cast_precision_loss)]
-fn run_scaling_benchmark(
-    session: &GpuPipelineSession,
-    classifier: &NaiveBayesClassifier,
-) {
+fn run_scaling_benchmark(session: &GpuPipelineSession, classifier: &NaiveBayesClassifier) {
     println!("\n╔══════════════════════════════════════════════════════════════════════╗");
     println!("║           SCALING BENCHMARK — GPU vs CPU at Varying Load           ║");
     println!("╠══════════════════════════════════════════════════════════════════════╣");
@@ -599,7 +678,7 @@ fn run_scaling_benchmark(
 
     for &n_queries in &query_sizes {
         let seqs_owned = make_seqs(n_queries);
-        let seqs: Vec<&[u8]> = seqs_owned.iter().map(|s| s.as_slice()).collect();
+        let seqs: Vec<&[u8]> = seqs_owned.iter().map(std::vec::Vec::as_slice).collect();
         let counts: Vec<f64> = (0..n_queries).map(|i| (i as f64 + 1.0) * 10.0).collect();
 
         // CPU
@@ -623,12 +702,10 @@ fn run_scaling_benchmark(
         let speedup = if gpu_ms > 0.0 { cpu_ms / gpu_ms } else { 0.0 };
         let gpu_tax_per_q = gpu_result
             .as_ref()
-            .map(|r| r.taxonomy_ms / n_queries as f64)
-            .unwrap_or(0.0);
+            .map_or(0.0, |r| r.taxonomy_ms / n_queries as f64);
 
         println!(
-            "  {:>8}  {:>10.1}ms  {:>10.1}ms  {:>9.1}×  {:>8.2}ms",
-            n_queries, cpu_ms, gpu_ms, speedup, gpu_tax_per_q
+            "  {n_queries:>8}  {cpu_ms:>10.1}ms  {gpu_ms:>10.1}ms  {speedup:>9.1}×  {gpu_tax_per_q:>8.2}ms"
         );
     }
 
@@ -682,7 +759,7 @@ fn load_silva_classifier(ref_dir: &Path) -> Option<NaiveBayesClassifier> {
             current_seq.extend(
                 line.trim()
                     .bytes()
-                    .filter(|b| b.is_ascii_alphabetic())
+                    .filter(u8::is_ascii_alphabetic)
                     .map(|b| b.to_ascii_uppercase()),
             );
         }
@@ -729,18 +806,9 @@ fn decompress_gz_fastq(path: &Path) -> Result<Vec<FastqRecord>, String> {
             Some(Ok(_)) => continue,
             _ => break,
         };
-        let seq = match lines.next() {
-            Some(Ok(l)) => l,
-            _ => break,
-        };
-        match lines.next() {
-            Some(Ok(_)) => {}
-            _ => break,
-        };
-        let qual = match lines.next() {
-            Some(Ok(l)) => l,
-            _ => break,
-        };
+        let Some(Ok(seq)) = lines.next() else { break };
+        let Some(Ok(_)) = lines.next() else { break };
+        let Some(Ok(qual)) = lines.next() else { break };
 
         let id = header[1..]
             .split_whitespace()

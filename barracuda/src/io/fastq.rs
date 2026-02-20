@@ -159,6 +159,118 @@ pub fn parse_fastq(path: &Path) -> Result<Vec<FastqRecord>> {
     Ok(records)
 }
 
+/// Streaming FASTQ iterator — yields one record at a time without buffering.
+///
+/// For large files where you don't need all records in memory simultaneously.
+/// Handles both plain `.fastq` and gzip-compressed `.fastq.gz` files.
+///
+/// # Errors
+///
+/// The iterator yields `Result<FastqRecord>` — each item may fail with
+/// [`Error::Io`] or [`Error::Fastq`].
+///
+/// # Example
+///
+/// ```no_run
+/// use wetspring_barracuda::io::fastq;
+/// use std::path::Path;
+///
+/// let iter = fastq::FastqIter::open(Path::new("reads.fastq")).unwrap();
+/// for result in iter {
+///     let record = result.unwrap();
+///     // process record without buffering all reads
+/// }
+/// ```
+pub struct FastqIter {
+    reader: Box<dyn BufRead>,
+    path: std::path::PathBuf,
+    buf: String,
+    done: bool,
+}
+
+impl FastqIter {
+    /// Open a FASTQ file for streaming iteration.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Io`] if the file cannot be opened.
+    pub fn open(path: &Path) -> Result<Self> {
+        let reader = open_reader(path)?;
+        Ok(Self {
+            reader,
+            path: path.to_path_buf(),
+            buf: String::new(),
+            done: false,
+        })
+    }
+}
+
+impl Iterator for FastqIter {
+    type Item = Result<FastqRecord>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.done {
+            return None;
+        }
+
+        // Line 1: @identifier
+        self.buf.clear();
+        match read_line(self.reader.as_mut(), &mut self.buf, &self.path) {
+            Ok(0) => {
+                self.done = true;
+                return None;
+            }
+            Ok(_) => {}
+            Err(e) => {
+                self.done = true;
+                return Some(Err(e));
+            }
+        }
+        if self.buf.trim_end().is_empty() {
+            self.done = true;
+            return None;
+        }
+        if !self.buf.starts_with('@') {
+            self.done = true;
+            return Some(Err(header_error(&self.buf)));
+        }
+        let id = self.buf.trim_end()[1..]
+            .split_whitespace()
+            .next()
+            .unwrap_or("")
+            .to_string();
+
+        // Line 2: sequence
+        self.buf.clear();
+        if let Err(e) = read_line(self.reader.as_mut(), &mut self.buf, &self.path) {
+            self.done = true;
+            return Some(Err(e));
+        }
+        let sequence = self.buf.trim_end().as_bytes().to_vec();
+
+        // Line 3: + separator
+        self.buf.clear();
+        if let Err(e) = read_line(self.reader.as_mut(), &mut self.buf, &self.path) {
+            self.done = true;
+            return Some(Err(e));
+        }
+
+        // Line 4: quality scores
+        self.buf.clear();
+        if let Err(e) = read_line(self.reader.as_mut(), &mut self.buf, &self.path) {
+            self.done = true;
+            return Some(Err(e));
+        }
+        let quality = self.buf.trim_end().as_bytes().to_vec();
+
+        Some(Ok(FastqRecord {
+            id,
+            sequence,
+            quality,
+        }))
+    }
+}
+
 /// Compute summary statistics from parsed records.
 #[must_use]
 pub fn compute_stats(records: &[FastqRecord]) -> FastqStats {
@@ -667,5 +779,54 @@ mod tests {
         assert_eq!(stats.length_distribution[&6], 1);
         assert_eq!(stats.min_length, 4);
         assert_eq!(stats.max_length, 6);
+    }
+
+    #[test]
+    fn fastq_iter_matches_parse() {
+        let dir = tempfile::tempdir().unwrap();
+        let content = "@r1 desc\nACGTACGT\n+\nIIIIIIII\n@r2\nGGCC\n+\n!!!!\n";
+        let path = write_fastq(&dir, "iter.fastq", content);
+
+        let buffered = parse_fastq(&path).unwrap();
+        let streamed: Vec<FastqRecord> = FastqIter::open(&path)
+            .unwrap()
+            .collect::<Result<Vec<_>>>()
+            .unwrap();
+
+        assert_eq!(buffered.len(), streamed.len());
+        for (b, s) in buffered.iter().zip(streamed.iter()) {
+            assert_eq!(b.id, s.id);
+            assert_eq!(b.sequence, s.sequence);
+            assert_eq!(b.quality, s.quality);
+        }
+    }
+
+    #[test]
+    fn fastq_iter_empty_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_fastq(&dir, "empty.fastq", "");
+        let records: Vec<FastqRecord> = FastqIter::open(&path)
+            .unwrap()
+            .collect::<Result<Vec<_>>>()
+            .unwrap();
+        assert!(records.is_empty());
+    }
+
+    #[test]
+    fn fastq_iter_gzip() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("iter.fastq.gz");
+        let file = File::create(&path).unwrap();
+        let mut gz = flate2::write::GzEncoder::new(file, flate2::Compression::default());
+        gz.write_all(b"@g1\nACGT\n+\nIIII\n").unwrap();
+        gz.finish().unwrap();
+
+        let records: Vec<FastqRecord> = FastqIter::open(&path)
+            .unwrap()
+            .collect::<Result<Vec<_>>>()
+            .unwrap();
+        assert_eq!(records.len(), 1);
+        assert_eq!(records[0].id, "g1");
+        assert_eq!(records[0].sequence, b"ACGT");
     }
 }

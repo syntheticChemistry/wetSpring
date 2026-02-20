@@ -100,7 +100,12 @@ pub struct FeatureTable {
 /// # Returns
 ///
 /// [`FeatureTable`] with detected features.
-#[allow(clippy::cast_precision_loss)] // index → f64 for RT interpolation
+#[allow(
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss
+)] // index → f64 for RT interpolation; right_ips/left_ips are small
+#[must_use]
 pub fn extract_features(spectra: &[MzmlSpectrum], params: &FeatureParams) -> FeatureTable {
     // 1. Detect mass tracks
     let mass_tracks = eic::detect_mass_tracks(spectra, params.eic_ppm, params.min_scans);
@@ -216,7 +221,11 @@ fn estimate_noise(intensity: &[f64], peak_start: usize, peak_end: usize) -> f64 
 }
 
 /// Interpolate RT at a fractional index position.
-#[allow(clippy::cast_precision_loss)]
+#[allow(
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss
+)]
 fn interpolate_rt(rt: &[f64], fractional_idx: f64) -> f64 {
     if rt.is_empty() {
         return 0.0;
@@ -226,7 +235,7 @@ fn interpolate_rt(rt: &[f64], fractional_idx: f64) -> f64 {
         return rt[rt.len() - 1];
     }
     let frac = fractional_idx - idx as f64;
-    rt[idx] + frac * (rt[idx + 1] - rt[idx])
+    frac.mul_add(rt[idx + 1] - rt[idx], rt[idx])
 }
 
 #[cfg(test)]
@@ -265,10 +274,9 @@ mod tests {
 
         let spectra: Vec<MzmlSpectrum> = (0..n_scans)
             .map(|i| {
-                #[allow(clippy::cast_precision_loss)]
-                let rt = 3.0 + (i as f64) * 0.1; // 3.0 to 7.9 min
+                let rt = f64::from(i).mul_add(0.1, 3.0); // 3.0 to 7.9 min
                 let x = (rt - peak_rt) / sigma;
-                let int = 50000.0 * (-0.5 * x * x).exp() + 100.0; // baseline 100
+                let int = 50000.0f64.mul_add((-0.5 * x * x).exp(), 100.0); // baseline 100
                 make_ms1(rt, &[target_mz], &[int])
             })
             .collect();
@@ -305,8 +313,7 @@ mod tests {
         let n_scans = 100;
         let spectra: Vec<MzmlSpectrum> = (0..n_scans)
             .map(|i| {
-                #[allow(clippy::cast_precision_loss)]
-                let rt = 1.0 + (i as f64) * 0.1;
+                let rt = f64::from(i).mul_add(0.1, 1.0);
                 let x1 = (rt - 4.0) / 0.3;
                 let x2 = (rt - 7.0) / 0.4;
                 let int1 = 30000.0 * (-0.5 * x1 * x1).exp();

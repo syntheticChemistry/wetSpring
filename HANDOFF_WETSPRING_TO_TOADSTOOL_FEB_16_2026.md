@@ -1,9 +1,9 @@
 # Handoff: wetSpring → ToadStool/BarraCUDA
 
-> **Note:** This is a historical document from the initial ToadStool integration
-> (Phase 3, 17/17 GPU checks). wetSpring has since expanded significantly —
-> see [`EVOLUTION_READINESS.md`](EVOLUTION_READINESS.md) for current status
-> (Phase 4, 94/94 total checks, 293 tests, 24 modules, zero custom WGSL shaders).
+> **SUPERSEDED** by [`HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_19_2026_v3.md`](HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_19_2026_v3.md)
+> (645 checks, 430 tests, 22 experiments, full evolution readiness).
+>
+> Historical document from the initial ToadStool integration (Phase 3, 17/17 GPU checks).
 
 **Date:** February 16, 2026
 **From:** wetSpring (Life science + analytical chemistry validation study)

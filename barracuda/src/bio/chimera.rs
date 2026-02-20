@@ -126,11 +126,12 @@ fn build_sketch(seq: &[u8]) -> KmerSketch {
 }
 
 /// Count shared k-mers between two sketches (Jaccard-like similarity).
+#[must_use]
 fn sketch_similarity(a: &KmerSketch, b: &KmerSketch) -> u32 {
     let (smaller, larger) = if a.len() <= b.len() { (a, b) } else { (b, a) };
     smaller
         .iter()
-        .filter_map(|(k, &va)| larger.get(k).map(|&vb| va.min(vb) as u32))
+        .filter_map(|(k, &va)| larger.get(k).map(|&vb| u32::from(va.min(vb))))
         .sum()
 }
 
@@ -139,10 +140,8 @@ fn sketch_similarity(a: &KmerSketch, b: &KmerSketch) -> u32 {
 /// Sequences must be sorted by abundance (descending). Returns chimera
 /// results for each sequence and the filtered non-chimeric sequences.
 #[allow(clippy::cast_precision_loss)]
-pub fn detect_chimeras(
-    seqs: &[Asv],
-    params: &ChimeraParams,
-) -> (Vec<ChimeraResult>, ChimeraStats) {
+#[must_use]
+pub fn detect_chimeras(seqs: &[Asv], params: &ChimeraParams) -> (Vec<ChimeraResult>, ChimeraStats) {
     let n = seqs.len();
     let mut results = Vec::with_capacity(n);
 
@@ -209,6 +208,7 @@ pub fn detect_chimeras(
 }
 
 /// Remove chimeric sequences, returning only non-chimeric ASVs.
+#[must_use]
 pub fn remove_chimeras(seqs: &[Asv], params: &ChimeraParams) -> (Vec<Asv>, ChimeraStats) {
     let (results, stats) = detect_chimeras(seqs, params);
     let filtered: Vec<Asv> = results
@@ -345,9 +345,9 @@ fn score_from_prefix(
     let chimera_mismatches = len - chimera_matches;
 
     // Best single parent
-    let parent_l_total = left_match_l + right_match_l;
-    let parent_r_total = left_match_r + right_match_r;
-    let best_single = parent_l_total.max(parent_r_total);
+    let total_from_left_parent = left_match_l + right_match_l;
+    let total_from_right_parent = left_match_r + right_match_r;
+    let best_single = total_from_left_parent.max(total_from_right_parent);
     let best_single_mismatches = len - best_single;
 
     // Must show distinct parent contributions in each segment
@@ -394,10 +394,7 @@ mod tests {
 
     #[test]
     fn two_distinct_sequences_no_chimera() {
-        let asvs = vec![
-            make_asv(b"AAAAAAAAAA", 1000),
-            make_asv(b"CCCCCCCCCC", 500),
-        ];
+        let asvs = vec![make_asv(b"AAAAAAAAAA", 1000), make_asv(b"CCCCCCCCCC", 500)];
         let (_, stats) = detect_chimeras(&asvs, &ChimeraParams::default());
         assert_eq!(stats.chimeras_found, 0);
         assert_eq!(stats.retained, 2);

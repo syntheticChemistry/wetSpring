@@ -74,6 +74,17 @@
 | 21 | Jones et al. — PFAS mass spectrometry detection pipelines | — | Jones | Extends current PFAS screening (Exp 007-008) | Queued |
 | 22 | Jones et al. — Environmental PFAS fate-and-transport modeling | — | Jones | From detection to prediction | Future |
 
+### Cross-Spring — Spectral Theory (Kachkovskiy, via groundSpring/hotSpring)
+
+Kachkovskiy's spectral theory has an indirect but real connection to wetSpring
+through signal processing in mass spectrometry (Track 2) and through the
+mathematical framework for understanding quorum sensing as signal propagation
+in a noisy medium (Track 1).
+
+| # | Paper | Faculty | Why | Status |
+|---|-------|---------|-----|--------|
+| 23 | Bourgain & Kachkovskiy (2018) "Anderson localization for two interacting quasiperiodic particles." GAFA | Kachkovskiy | Quorum sensing = signal propagation through a "disordered" bacterial population. Anderson localization theory describes when signals (autoinducers) reach distant cells vs. when they're absorbed by local noise. Mathematical bridge to Waters' c-di-GMP specificity problem | Reference |
+
 ---
 
 ## Notes
@@ -83,3 +94,4 @@
 - Track 1b papers (Liu) bridge to neuralSpring via HMM ↔ LSTM isomorphism
 - Track 2 papers (Jones) depend on accessing PFAS mass spec data
 - Cahill/Smallwood papers may require Sandia data access agreements
+- Paper 23 (Kachkovskiy) is a cross-spring reference — reproduction happens in groundSpring, wetSpring consumes the mathematical framework

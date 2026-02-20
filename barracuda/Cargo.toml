@@ -16,12 +16,15 @@ categories = ["science", "command-line-utilities"]
 default = []
 # GPU acceleration via BarraCUDA/ToadStool (Phase 3).
 # Enable with `cargo build --features gpu`.
-# All GPU dispatch goes through ToadStool primitives (zero custom WGSL).
-# Pulls in wgpu v22 (device creation), barracuda (9 ToadStool primitives),
-# and tokio (async device init).
+# Pulls in wgpu v22 (device creation), barracuda (11 ToadStool primitives),
+# and tokio (async device init). 2 custom WGSL shaders (QF, DADA2 E-step)
+# + 1 ToadStool shader (GEMM via GemmCached).
 gpu = ["dep:barracuda", "dep:wgpu", "dep:tokio"]
 
 [dependencies]
+# serde_json: JSON parsing for validation data and model import.
+serde_json = "1"
+
 # BarraCUDA: shared scientific computing library (ToadStool GPU compute).
 # Provides FusedMapReduceF64, BrayCurtisF64, BatchedEighGpu, GemmF64,
 # KrigingF64, VarianceF64, CorrelationF64, CovarianceF64, WeightedDotF64.
@@ -84,6 +87,11 @@ path = "src/bin/validate_16s_pipeline.rs"
 name = "validate_algae_16s"
 path = "src/bin/validate_algae_16s.rs"
 
+# ── Extended algae validation binary (Exp017, PRJNA382322) ───────
+[[bin]]
+name = "validate_extended_algae"
+path = "src/bin/validate_extended_algae.rs"
+
 # ── VOC peak validation binary (Exp013, Reese 2019) ─────────────
 [[bin]]
 name = "validate_voc_peaks"
@@ -93,6 +101,36 @@ path = "src/bin/validate_voc_peaks.rs"
 [[bin]]
 name = "validate_public_benchmarks"
 path = "src/bin/validate_public_benchmarks.rs"
+
+# ── PFAS library validation binary (Exp018, Jones Lab) ───────────
+[[bin]]
+name = "validate_pfas_library"
+path = "src/bin/validate_pfas_library.rs"
+
+# ── Robinson-Foulds tree distance validation (Exp021) ───────────
+[[bin]]
+name = "validate_rf_distance"
+path = "src/bin/validate_rf_distance.rs"
+
+# ── QS/c-di-GMP ODE validation (Exp020, Waters 2008) ────────────
+[[bin]]
+name = "validate_qs_ode"
+path = "src/bin/validate_qs_ode.rs"
+
+# ── Gillespie SSA validation (Exp022, Massie 2012) ────────────────
+[[bin]]
+name = "validate_gillespie"
+path = "src/bin/validate_gillespie.rs"
+
+# ── Newick parsing validation (Exp019 Phase 1) ────────────────────
+[[bin]]
+name = "validate_newick_parse"
+path = "src/bin/validate_newick_parse.rs"
+
+# ── PFAS decision tree inference (Exp008 Phase 3) ─────────────────
+[[bin]]
+name = "validate_pfas_decision_tree"
+path = "src/bin/validate_pfas_decision_tree.rs"
 
 # ── Pipeline benchmark (Exp015: Rust CPU vs Galaxy/QIIME2) ───────
 [[bin]]

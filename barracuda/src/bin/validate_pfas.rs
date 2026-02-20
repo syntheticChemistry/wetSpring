@@ -173,11 +173,7 @@ fn validate_spectral_match(v: &mut Validator) {
     );
 
     // Pairwise cosine matrix
-    let spectra = vec![
-        (mz.clone(), int.clone()),
-        (mz.clone(), int.clone()),
-        (r_mz.clone(), r_int.clone()),
-    ];
+    let spectra = vec![(mz.clone(), int.clone()), (mz, int), (r_mz, r_int)];
     let scores = spectral_match::pairwise_cosine(&spectra, 0.5);
     v.check_count("Pairwise cosine pairs", scores.len(), 3);
     v.check(
@@ -195,9 +191,9 @@ fn validate_kmd(v: &mut Validator) {
     // Exact masses for sulfonate series [M-H]-
     let pfos = 498.930; // C8F17SO3-
     let pfhxs = 398.936; // C6F13SO3-
-    let pfbs = 298.943; // C4F9SO3-
+    let pfbs_mass = 298.943; // C4F9SO3-
 
-    let masses = vec![pfos, pfhxs, pfbs];
+    let masses = vec![pfos, pfhxs, pfbs_mass];
     let results =
         kmd::kendrick_mass_defect(&masses, kmd::units::CF2_EXACT, kmd::units::CF2_NOMINAL);
 
@@ -219,7 +215,7 @@ fn validate_kmd(v: &mut Validator) {
     v.check_count("Largest homologue group", max_group, 3);
 
     // Non-homologues should be separated
-    let mixed = vec![pfos, pfhxs, pfbs, 600.0, 312.5];
+    let mixed = vec![pfos, pfhxs, pfbs_mass, 600.0, 312.5];
     let (_, mixed_groups) = kmd::pfas_kmd_screen(&mixed, 0.005);
     let has_separation = mixed_groups.len() >= 2;
     v.check(

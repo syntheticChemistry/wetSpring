@@ -29,17 +29,17 @@
 //!
 //! | Stage         | Primitive            | Status          |
 //! |---------------|----------------------|-----------------|
-//! | Quality filter| QualityFilterCached  | GPU (per-read)  |
+//! | Quality filter| `QualityFilterCached`  | GPU (per-read)  |
 //! | Dereplication | —                    | CPU (hash)      |
-//! | DADA2 denoise | Dada2Gpu             | GPU E-step      |
+//! | DADA2 denoise | `Dada2Gpu`             | GPU E-step      |
 //! | Chimera       | —                    | CPU (k-mer)     |
-//! | Taxonomy      | GemmCached           | GPU (GEMM)      |
-//! | Diversity     | FusedMapReduceF64    | GPU/CPU (FMR)   |
+//! | Taxonomy      | `GemmCached`           | GPU (GEMM)      |
+//! | Diversity     | `FusedMapReduceF64`    | GPU/CPU (FMR)   |
 //!
-//! # Local extensions (for ToadStool absorption)
+//! # Local extensions (for `ToadStool` absorption)
 //!
 //! - `QualityFilterCached`: per-read parallel quality trimming WGSL shader
-//! - `Dada2Gpu`: batch pair-wise log_p_error with precomputed log-err table
+//! - `Dada2Gpu`: batch pair-wise `log_p_error` with precomputed log-err table
 //! - `GemmCached`: caches shader + pipeline + BGL at init
 //! - `execute_to_buffer()`: returns GPU buffer without readback (chaining)
 
@@ -51,7 +51,7 @@ use crate::bio::gemm_cached::GemmCached;
 use crate::bio::quality::{FilterStats, QualityParams};
 use crate::bio::quality_gpu::QualityFilterCached;
 use crate::bio::taxonomy::{
-    extract_kmers, ClassifyParams, Classification, NaiveBayesClassifier, TaxRank,
+    extract_kmers, Classification, ClassifyParams, NaiveBayesClassifier, TaxRank,
 };
 use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
@@ -77,6 +77,10 @@ pub struct GpuPipelineSession {
 
 impl GpuPipelineSession {
     /// Create a pre-warmed session with all GPU pipelines compiled.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the device lacks `SHADER_F64` or pipeline compilation fails.
     pub fn new(gpu: &GpuF64) -> Result<Self> {
         if !gpu.has_f64 {
             return Err(Error::Gpu("SHADER_F64 required".into()));
@@ -90,7 +94,7 @@ impl GpuPipelineSession {
         let dada2 = Dada2Gpu::new(device.clone(), ctx.clone());
         let fmr = FusedMapReduceF64::new(device.clone())
             .map_err(|e| Error::Gpu(format!("FMR init: {e}")))?;
-        let gemm = GemmCached::new(device.clone(), ctx.clone());
+        let gemm = GemmCached::new(device, ctx.clone());
 
         // Prime driver caches with tiny dispatches
         let _ = fmr.sum(&[1.0, 2.0, 3.0]);
@@ -108,7 +112,8 @@ impl GpuPipelineSession {
         })
     }
 
-    /// TensorContext stats: buffer pool reuse, bind group cache, batched ops.
+    /// `TensorContext` stats: buffer pool reuse, bind group cache, batched ops.
+    #[must_use]
     pub fn ctx_stats(&self) -> String {
         self.ctx.stats().to_string()
     }
@@ -116,6 +121,10 @@ impl GpuPipelineSession {
     // ── Quality filter: real GPU dispatch ────────────────────────────────
 
     /// GPU-accelerated quality filtering — real per-read parallel trimming.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if GPU dispatch or readback fails.
     pub fn filter_reads(
         &self,
         reads: &[FastqRecord],
@@ -150,6 +159,10 @@ impl GpuPipelineSession {
     // ── DADA2: GPU E-step ────────────────────────────────────────────────
 
     /// GPU-accelerated DADA2 denoising — E-step on GPU, EM control on CPU.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if GPU dispatch fails or the device lacks f64 support.
     pub fn denoise(
         &self,
         seqs: &[UniqueSequence],
@@ -161,6 +174,10 @@ impl GpuPipelineSession {
     // ── Diversity: pre-warmed FMR (no shader recompilation) ─────────────
 
     /// Shannon entropy via pre-warmed FMR.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if GPU dispatch fails.
     pub fn shannon(&self, counts: &[f64]) -> Result<f64> {
         if counts.is_empty() {
             return Ok(0.0);
@@ -171,6 +188,10 @@ impl GpuPipelineSession {
     }
 
     /// Simpson diversity (1 - dominance) via pre-warmed FMR.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if GPU dispatch fails.
     pub fn simpson(&self, counts: &[f64]) -> Result<f64> {
         if counts.is_empty() {
             return Ok(0.0);
@@ -183,6 +204,10 @@ impl GpuPipelineSession {
     }
 
     /// Observed features via pre-warmed FMR.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if GPU dispatch fails.
     pub fn observed_features(&self, counts: &[f64]) -> Result<f64> {
         if counts.is_empty() {
             return Ok(0.0);
@@ -199,6 +224,15 @@ impl GpuPipelineSession {
     // ── Taxonomy: cached GEMM pipeline ──────────────────────────────────
 
     /// Batch-classify via compact GEMM using the cached pipeline.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if GPU dispatch fails or GEMM readback fails.
+    #[allow(
+        clippy::cast_possible_truncation,
+        clippy::cast_precision_loss,
+        clippy::cast_sign_loss
+    )]
     pub fn classify_batch(
         &self,
         classifier: &NaiveBayesClassifier,
@@ -221,10 +255,8 @@ impl GpuPipelineSession {
         }
 
         let k = (ks as f64).log(4.0).round() as usize;
-        let query_kmer_lists: Vec<Vec<u64>> = sequences
-            .iter()
-            .map(|seq| extract_kmers(seq, k))
-            .collect();
+        let query_kmer_lists: Vec<Vec<u64>> =
+            sequences.iter().map(|seq| extract_kmers(seq, k)).collect();
 
         let mut active_set = HashSet::new();
         for kmers in &query_kmer_lists {
@@ -257,9 +289,7 @@ impl GpuPipelineSession {
             for bi in 0..n_boot {
                 let boot_start = (base_row + 1 + bi) * n_active;
                 for _ in 0..n_sample {
-                    seed = seed
-                        .wrapping_mul(6_364_136_223_846_793_005)
-                        .wrapping_add(1);
+                    seed = seed.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
                     let idx = (seed >> 33) as usize % kmers.len();
                     q_compact[boot_start + kmer_to_col[kmers[idx] as usize]] += 1.0;
                 }
@@ -324,6 +354,11 @@ impl GpuPipelineSession {
     // ── Streaming session: taxonomy + diversity in one call ──────────────
 
     /// Run taxonomy + diversity on GPU in a single streaming session.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if GPU dispatch fails for taxonomy or diversity.
+    #[allow(clippy::cast_precision_loss)]
     pub fn stream_sample(
         &self,
         classifier: &NaiveBayesClassifier,
@@ -376,6 +411,7 @@ pub struct StreamingGpuResult {
 }
 
 /// CPU equivalent for benchmarking comparison.
+#[must_use]
 pub fn stream_classify_and_diversity_cpu(
     classifier: &NaiveBayesClassifier,
     sequences: &[&[u8]],

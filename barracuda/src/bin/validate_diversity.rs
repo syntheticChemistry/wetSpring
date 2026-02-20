@@ -5,12 +5,12 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline script | `scripts/run_exp002.py` (skbio.diversity) |
-//! | Baseline commit | `21d43a0` (Exp002 complete — 2,273 ASVs) |
-//! | Baseline date | 2026-02-16 |
-//! | Dataset | PRJNA1195978 (phytoplankton microbiome) |
-//! | Reference | skbio 0.6.0, scipy 1.12 |
-//! | Hardware | Eastgate (i9-12900K, 64 GB, Pop!\_OS 22.04) |
+//! | Baseline tool | Analytical formulas (Shannon, Simpson, Chao1) |
+//! | Baseline version | skbio 0.6.0 (simulated community) |
+//! | Baseline command | No external Python tool for core metrics |
+//! | Baseline date | 2026-02-19 |
+//! | Data | PRJNA1195978 (phytoplankton), synthetic for analytical tests |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
 //! # Methodology
 //!
@@ -90,9 +90,9 @@ fn validate_simulated_community(v: &mut Validator) {
     // exact values. Replace with real ASV table + exact skbio baseline
     // when provenance script is committed.
     let mut community = Vec::new();
-    community.extend((0..100).map(|i| 50.0 + (f64::from(i) * 1.5)));
-    community.extend((0..100).map(|i| 10.0 + (f64::from(i) * 0.4)));
-    community.extend((0..100).map(|i| 1.0 + (f64::from(i) * 0.09)));
+    community.extend((0..100).map(|i| f64::from(i).mul_add(1.5, 50.0)));
+    community.extend((0..100).map(|i| f64::from(i).mul_add(0.4, 10.0)));
+    community.extend((0..100).map(|i| f64::from(i).mul_add(0.09, 1.0)));
     community.extend(std::iter::repeat_n(1.0, 20));
     community.extend(std::iter::repeat_n(2.0, 10));
 
@@ -127,14 +127,14 @@ fn validate_bray_curtis_matrix(v: &mut Validator) {
     v.section("── Bray-Curtis distance matrix ──");
 
     let mut community = Vec::new();
-    community.extend((0..100).map(|i| 50.0 + (f64::from(i) * 1.5)));
-    community.extend((0..100).map(|i| 10.0 + (f64::from(i) * 0.4)));
-    community.extend((0..100).map(|i| 1.0 + (f64::from(i) * 0.09)));
+    community.extend((0..100).map(|i| f64::from(i).mul_add(1.5, 50.0)));
+    community.extend((0..100).map(|i| f64::from(i).mul_add(0.4, 10.0)));
+    community.extend((0..100).map(|i| f64::from(i).mul_add(0.09, 1.0)));
     community.extend(std::iter::repeat_n(1.0, 20));
     community.extend(std::iter::repeat_n(2.0, 10));
 
     let sample_a: Vec<f64> = community.clone();
-    let sample_b: Vec<f64> = community.iter().map(|&c| c * 0.8 + 5.0).collect();
+    let sample_b: Vec<f64> = community.iter().map(|&c| c.mul_add(0.8, 5.0)).collect();
     let sample_c: Vec<f64> = community
         .iter()
         .enumerate()
@@ -209,7 +209,11 @@ fn validate_evenness_and_rarefaction(v: &mut Validator) {
     );
 
     // Rarefaction monotonicity: check increasing with depth
-    #[allow(clippy::cast_precision_loss)]
+    #[allow(
+        clippy::cast_possible_truncation,
+        clippy::cast_sign_loss,
+        clippy::cast_precision_loss
+    )]
     let depths: Vec<f64> = (1..=total as u64).map(|x| x as f64).collect();
     let curve = diversity::rarefaction_curve(&community, &depths);
     let monotonic = curve.windows(2).all(|w| w[1] >= w[0] - 1e-10);
@@ -244,8 +248,9 @@ fn validate_exp002_galaxy_baseline(v: &mut Validator) {
     let n_otus = 856; // all vectors padded to max OTU count for BC compatibility
     let mut low_div = vec![0.0_f64; n_otus];
     low_div[0] = 5000.0;
-    for i in 1..91 {
-        low_div[i] = (5000.0 * 0.92_f64.powi(i as i32)).max(1.0);
+    #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
+    for (i, val) in low_div[1..91].iter_mut().enumerate() {
+        *val = (5000.0 * 0.92_f64.powi((i + 1) as i32)).max(1.0);
     }
     let alpha_low = diversity::alpha_diversity(&low_div);
     println!(
@@ -270,8 +275,9 @@ fn validate_exp002_galaxy_baseline(v: &mut Validator) {
     // Construct a high-diversity sample (856 ASVs, Shannon ~3.85, Simpson ~0.94)
     // Power-law rank-abundance curve matching Exp002's high-diversity profile.
     let mut high_div = vec![0.0_f64; n_otus];
-    for i in 0..856 {
-        high_div[i] = 5000.0 / ((i as f64) + 1.0).powf(1.2);
+    #[allow(clippy::cast_precision_loss)]
+    for (i, val) in high_div[..856].iter_mut().enumerate() {
+        *val = 5000.0 / ((i as f64) + 1.0).powf(1.2);
     }
     let alpha_high = diversity::alpha_diversity(&high_div);
     println!(
@@ -300,7 +306,7 @@ fn validate_exp002_galaxy_baseline(v: &mut Validator) {
 
     // Bray-Curtis between low and high → should be dissimilar
     let bc = diversity::bray_curtis(&low_div, &high_div);
-    println!("  BC(low, high) = {:.4}", bc);
+    println!("  BC(low, high) = {bc:.4}");
     v.check(
         "Exp002: BC(low,high) in Galaxy range [0.05, 0.95]",
         bc,
@@ -310,8 +316,9 @@ fn validate_exp002_galaxy_baseline(v: &mut Validator) {
 
     // PCoA on 3 communities: eigenvalues should be non-negative
     let mut mid_div = vec![0.0_f64; n_otus];
-    for i in 0..300 {
-        mid_div[i] = 100.0 + (i as f64) * 0.5;
+    #[allow(clippy::cast_precision_loss)]
+    for (i, val) in mid_div[..300].iter_mut().enumerate() {
+        *val = (i as f64).mul_add(0.5, 100.0);
     }
     let samples = vec![low_div, mid_div, high_div];
     let dm = diversity::bray_curtis_condensed(&samples);

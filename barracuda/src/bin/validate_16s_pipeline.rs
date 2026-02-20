@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Validate the complete 16S amplicon pipeline: derep → DADA2 → chimera → taxonomy → UniFrac.
+//! Validate the complete 16S amplicon pipeline: derep → DADA2 → chimera → taxonomy → `UniFrac`.
 //!
 //! # Provenance
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline | Galaxy/QIIME2 Exp001 (232 ASVs, MiSeq SOP) |
-//! | Algorithms | DADA2 (Callahan 2016), UCHIME (Edgar 2011), RDP NBC (Wang 2007), UniFrac (Lozupone 2005) |
-//! | Baseline date | 2026-02-18 |
+//! | Baseline tool | QIIME2/DADA2 via Galaxy 24.1 |
+//! | Baseline version | Galaxy 24.1, QIIME2 2026.1.0 |
+//! | Baseline command | Pipeline integration (synthetic communities) |
+//! | Baseline date | 2026-02-19 |
+//! | Data | Synthetic (pipeline integration tests) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
 //! # Methodology
@@ -18,7 +20,7 @@
 //! 1. **DADA2**: Denoising separates true variants from errors
 //! 2. **Chimera**: Known chimeras are detected, non-chimeras pass
 //! 3. **Taxonomy**: Known taxa are classified correctly with high confidence
-//! 4. **UniFrac**: Phylogeny-weighted distances match analytical expectations
+//! 4. **`UniFrac`**: Phylogeny-weighted distances match analytical expectations
 //! 5. **Pipeline integration**: Stages compose correctly end-to-end
 
 use std::collections::HashMap;
@@ -73,10 +75,7 @@ fn validate_dada2(v: &mut Validator) {
     let center = b"ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT";
     let mut variant = center.to_vec();
     variant[5] = b'T';
-    let seqs = vec![
-        make_unique(center, 1000, 35),
-        make_unique(&variant, 3, 20),
-    ];
+    let seqs = vec![make_unique(center, 1000, 35), make_unique(&variant, 3, 20)];
     let (asvs, _) = dada2::denoise(&seqs, &Dada2Params::default());
     v.check_count("DADA2 error variant absorbed → 1 ASV", asvs.len(), 1);
 
@@ -99,8 +98,10 @@ fn validate_dada2(v: &mut Validator) {
         make_unique(b"ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT", 100, 30),
         make_unique(b"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT", 1, 30),
     ];
-    let mut params = Dada2Params::default();
-    params.min_abundance = 5;
+    let params = Dada2Params {
+        min_abundance: 5,
+        ..Dada2Params::default()
+    };
     let (asvs, _) = dada2::denoise(&seqs, &params);
     let all_above_min = asvs.iter().all(|a| a.abundance >= 5);
     v.check(
@@ -146,12 +147,9 @@ fn validate_chimera(v: &mut Validator) {
     let (clean, stats) = chimera::remove_chimeras(&asvs, &params);
 
     v.check_count("Chimera: input sequences", stats.input_sequences, 3);
-    v.check(
-        "Chimera: parents preserved",
-        clean.len() as f64,
-        2.0,
-        1.0,
-    );
+    #[allow(clippy::cast_precision_loss)]
+    let clean_len_f64 = clean.len() as f64;
+    v.check("Chimera: parents preserved", clean_len_f64, 2.0, 1.0);
 
     // Non-chimeric sequences should pass through unchanged
     let non_chimeric = vec![
@@ -215,12 +213,8 @@ fn validate_taxonomy(v: &mut Validator) {
     let params = ClassifyParams::default();
 
     // Classify a sequence identical to ref1 → should get Firmicutes
-    let result = classifier.classify(
-        b"ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT",
-        &params,
-    );
-    let kingdom_correct =
-        result.lineage.ranks.first().map(|s| s.as_str()) == Some("k__Bacteria");
+    let result = classifier.classify(b"ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT", &params);
+    let kingdom_correct = result.lineage.ranks.first().map(String::as_str) == Some("k__Bacteria");
     v.check(
         "Taxonomy: kingdom = Bacteria",
         if kingdom_correct { 1.0 } else { 0.0 },
@@ -228,8 +222,7 @@ fn validate_taxonomy(v: &mut Validator) {
         0.0,
     );
 
-    let phylum_correct =
-        result.lineage.ranks.get(1).map(|s| s.as_str()) == Some("p__Firmicutes");
+    let phylum_correct = result.lineage.ranks.get(1).map(String::as_str) == Some("p__Firmicutes");
     v.check(
         "Taxonomy: ref1 → Firmicutes",
         if phylum_correct { 1.0 } else { 0.0 },
@@ -238,11 +231,8 @@ fn validate_taxonomy(v: &mut Validator) {
     );
 
     // Classify ref2 → should get Proteobacteria
-    let result2 = classifier.classify(
-        b"TGCATGCATGCATGCATGCATGCATGCATGCATGCATGCA",
-        &params,
-    );
-    let phylum2 = result2.lineage.ranks.get(1).map(|s| s.as_str());
+    let result2 = classifier.classify(b"TGCATGCATGCATGCATGCATGCATGCATGCATGCATGCA", &params);
+    let phylum2 = result2.lineage.ranks.get(1).map(String::as_str);
     v.check(
         "Taxonomy: ref2 → Proteobacteria",
         if phylum2 == Some("p__Proteobacteria") {
@@ -325,12 +315,7 @@ fn validate_unifrac(v: &mut Validator) {
 
     // Symmetry: d(A,B) = d(B,A)
     let uw_ba = unifrac::unweighted_unifrac(&tree, &sample_b, &sample_a);
-    v.check(
-        "UniFrac: symmetry",
-        (uw_disjoint - uw_ba).abs(),
-        0.0,
-        1e-12,
-    );
+    v.check("UniFrac: symmetry", (uw_disjoint - uw_ba).abs(), 0.0, 1e-12);
 
     // Distance matrix: 2 samples → 2×2 matrix
     let mut table: HashMap<String, HashMap<String, f64>> = HashMap::new();
@@ -386,12 +371,12 @@ fn validate_end_to_end(v: &mut Validator) {
     v.check_count("Pipeline: reads conserved = 100", total_reads, 100);
 
     // Step 3: Chimera removal (no chimeras in clean data)
-    let (clean_asvs, chimera_stats) =
-        chimera::remove_chimeras(&asvs, &ChimeraParams::default());
+    let (clean_asvs, chimera_stats) = chimera::remove_chimeras(&asvs, &ChimeraParams::default());
     v.check_count("Pipeline: chimera → 3 clean ASVs", clean_asvs.len(), 3);
     v.check_count("Pipeline: 0 chimeras", chimera_stats.chimeras_found, 0);
 
     // Step 4: Diversity from abundance vector
+    #[allow(clippy::cast_precision_loss)]
     let counts: Vec<f64> = clean_asvs.iter().map(|a| a.abundance as f64).collect();
     let shannon = diversity::shannon(&counts);
     let simpson = diversity::simpson(&counts);
@@ -416,8 +401,10 @@ fn validate_end_to_end(v: &mut Validator) {
     );
 
     // Analytical Shannon for [50, 30, 20]: H = -Σ p_i ln(p_i)
-    let expected_shannon =
-        -(0.5_f64 * 0.5_f64.ln() + 0.3 * 0.3_f64.ln() + 0.2 * 0.2_f64.ln());
+    let expected_shannon = -0.2f64.mul_add(
+        0.2_f64.ln(),
+        0.5_f64.mul_add(0.5_f64.ln(), 0.3 * 0.3_f64.ln()),
+    );
     v.check(
         "Pipeline: Shannon analytical",
         shannon,

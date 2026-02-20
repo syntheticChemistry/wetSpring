@@ -136,6 +136,7 @@ fn trim_sliding_window(
         .map(|&q| u32::from(q.saturating_sub(phred_offset)))
         .sum();
 
+    #[allow(clippy::cast_possible_truncation)] // read lengths are always small
     let threshold = u32::from(min_quality) * window_size as u32;
 
     if window_sum < threshold {
@@ -222,6 +223,7 @@ pub fn apply_trim(record: &FastqRecord, start: usize, end: usize) -> FastqRecord
 /// Filter a batch of reads by quality.
 ///
 /// Applies all trimming operations and returns passing reads + statistics.
+#[must_use]
 pub fn filter_reads(
     records: &[FastqRecord],
     params: &QualityParams,
@@ -324,26 +326,28 @@ pub fn find_adapter_3prime(
 ///
 /// Returns a new record with the adapter removed, or the original if no
 /// adapter was found.
+#[must_use]
 pub fn trim_adapter_3prime(
     record: &FastqRecord,
     adapter: &[u8],
     max_mismatches: usize,
     min_overlap: usize,
 ) -> (FastqRecord, bool) {
-    if let Some(pos) = find_adapter_3prime(&record.sequence, adapter, max_mismatches, min_overlap) {
-        let trimmed = FastqRecord {
-            id: record.id.clone(),
-            sequence: record.sequence[..pos].to_vec(),
-            quality: record.quality[..pos].to_vec(),
-        };
-        (trimmed, true)
-    } else {
-        (record.clone(), false)
-    }
+    find_adapter_3prime(&record.sequence, adapter, max_mismatches, min_overlap).map_or_else(
+        || (record.clone(), false),
+        |pos| {
+            let trimmed = FastqRecord {
+                id: record.id.clone(),
+                sequence: record.sequence[..pos].to_vec(),
+                quality: record.quality[..pos].to_vec(),
+            };
+            (trimmed, true)
+        },
+    )
 }
 
 /// Case-insensitive base comparison with IUPAC ambiguity support.
-fn bases_match(a: u8, b: u8) -> bool {
+const fn bases_match(a: u8, b: u8) -> bool {
     let a = a.to_ascii_uppercase();
     let b = b.to_ascii_uppercase();
     if a == b {
@@ -422,7 +426,7 @@ mod tests {
         // Window of 4 starting at position 1: [30, 30, 30, 5] avg = 23.75 >= 20
         // So trim at position where window first fails
         let pos = trim_sliding_window(&qual, 4, 20, 33);
-        assert!(pos >= 2 && pos <= 5, "pos={pos}");
+        assert!((2..=5).contains(&pos), "pos={pos}");
     }
 
     #[test]
@@ -468,11 +472,11 @@ mod tests {
     fn filter_reads_batch() {
         let records = vec![
             // Good read
-            make_record(&vec![b'A'; 50], &qual_from_phred(&vec![30; 50])),
+            make_record(&[b'A'; 50], &qual_from_phred(&[30; 50])),
             // Bad read (all low quality)
-            make_record(&vec![b'A'; 50], &qual_from_phred(&vec![2; 50])),
+            make_record(&[b'A'; 50], &qual_from_phred(&[2; 50])),
             // Short but good
-            make_record(&vec![b'A'; 10], &qual_from_phred(&vec![30; 10])),
+            make_record(&[b'A'; 10], &qual_from_phred(&[30; 10])),
         ];
 
         let params = QualityParams {
@@ -523,7 +527,7 @@ mod tests {
 
     #[test]
     fn trim_adapter_3prime_found() {
-        let record = make_record(b"ACGTACGTAACTAGTCGA", &vec![33 + 30; 18]);
+        let record = make_record(b"ACGTACGTAACTAGTCGA", &[33 + 30; 18]);
         let (trimmed, found) = trim_adapter_3prime(&record, b"AACTAGTCGA", 0, 5);
         assert!(found);
         assert_eq!(trimmed.sequence.len(), 8);
@@ -531,7 +535,7 @@ mod tests {
 
     #[test]
     fn trim_adapter_3prime_not_found() {
-        let record = make_record(b"ACGTACGT", &vec![33 + 30; 8]);
+        let record = make_record(b"ACGTACGT", &[33 + 30; 8]);
         let (trimmed, found) = trim_adapter_3prime(&record, b"TTTTTTTTTT", 0, 5);
         assert!(!found);
         assert_eq!(trimmed.sequence.len(), 8);

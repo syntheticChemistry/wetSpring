@@ -9,12 +9,12 @@
 //!
 //! 1. **Error model**: For each nucleotide substitution (A→C, A→G, etc.) and
 //!    quality score, estimate the probability of that error occurring. The
-//!    initial model uses Phred quality: P_error = 10^(-Q/10).
+//!    initial model uses Phred quality: `P_error = 10^(-Q/10)`.
 //!
 //! 2. **Divisive partitioning**: Starting from abundance-sorted dereplicated
 //!    sequences, iteratively split partitions when a sequence's abundance
 //!    exceeds what the error model predicts as errors from the partition center.
-//!    Uses a Poisson abundance p-value test (OMEGA_A threshold).
+//!    Uses a Poisson abundance p-value test (`OMEGA_A` threshold).
 //!
 //! 3. **Error model refinement**: After partitioning, re-estimate error rates
 //!    from observed substitution patterns and iterate.
@@ -33,6 +33,7 @@
 //! - QIIME2 `dada2 denoise-paired` / `denoise-single`.
 
 use crate::bio::derep::UniqueSequence;
+use std::fmt::Write;
 
 const NUM_BASES: usize = 4;
 const MAX_QUAL: usize = 42;
@@ -56,7 +57,7 @@ pub struct Asv {
 /// Parameters for DADA2 denoising.
 #[derive(Debug, Clone)]
 pub struct Dada2Params {
-    /// Abundance p-value threshold. Sequences with p < omega_a are promoted
+    /// Abundance p-value threshold. Sequences with `p < omega_a` are promoted
     /// to new ASVs instead of being absorbed. Default: 1e-40.
     pub omega_a: f64,
     /// Maximum rounds of the partition–refine loop. Default: 10.
@@ -102,6 +103,7 @@ type ErrorModel = [[[f64; MAX_QUAL]; NUM_BASES]; NUM_BASES];
 /// This is the main entry point. Takes abundance-sorted `UniqueSequence`s
 /// (from `bio::derep::dereplicate`) and returns ASVs.
 #[allow(clippy::cast_precision_loss)]
+#[must_use]
 pub fn denoise(seqs: &[UniqueSequence], params: &Dada2Params) -> (Vec<Asv>, Dada2Stats) {
     let seqs: Vec<&UniqueSequence> = seqs
         .iter()
@@ -188,9 +190,11 @@ pub fn denoise(seqs: &[UniqueSequence], params: &Dada2Params) -> (Vec<Asv>, Dada
 }
 
 /// Initialize error model from Phred quality scores (no prior data).
+#[allow(clippy::needless_range_loop)] // 3D array requires indexing by from/to/q
 fn init_error_model() -> ErrorModel {
     let mut err = [[[0.0_f64; MAX_QUAL]; NUM_BASES]; NUM_BASES];
     for q in 0..MAX_QUAL {
+        #[allow(clippy::cast_precision_loss)] // q is 0..42, exact
         let p_err = (10.0_f64).powf(-(q as f64) / 10.0).clamp(MIN_ERR, MAX_ERR);
         for from in 0..NUM_BASES {
             for to in 0..NUM_BASES {
@@ -205,7 +209,8 @@ fn init_error_model() -> ErrorModel {
     err
 }
 
-fn base_to_idx(b: u8) -> usize {
+#[allow(clippy::match_same_arms)] // A/a and unknown bases both map to 0
+const fn base_to_idx(b: u8) -> usize {
     match b {
         b'A' | b'a' => 0,
         b'C' | b'c' => 1,
@@ -216,11 +221,7 @@ fn base_to_idx(b: u8) -> usize {
 }
 
 /// Compute log-probability that `seq` arose from `center` by errors.
-fn log_p_error(
-    seq: &UniqueSequence,
-    center: &UniqueSequence,
-    err: &ErrorModel,
-) -> f64 {
+fn log_p_error(seq: &UniqueSequence, center: &UniqueSequence, err: &ErrorModel) -> f64 {
     let len = seq.sequence.len().min(center.sequence.len());
     let mut log_p = 0.0_f64;
     for i in 0..len {
@@ -291,6 +292,7 @@ fn estimate_error_model(
     }
 
     let mut err = init_error_model();
+    #[allow(clippy::needless_range_loop)] // 3D array requires indexing by from/to/q
     for from in 0..NUM_BASES {
         for q in 0..MAX_QUAL {
             if totals[from][q] > 0.0 {
@@ -303,6 +305,7 @@ fn estimate_error_model(
     }
 
     // Ensure rows sum to ~1
+    #[allow(clippy::needless_range_loop)] // 3D array requires indexing by from/to/q
     for from in 0..NUM_BASES {
         for q in 0..MAX_QUAL {
             let sum: f64 = (0..NUM_BASES).map(|to| err[from][to][q]).sum();
@@ -317,6 +320,7 @@ fn estimate_error_model(
     err
 }
 
+#[allow(clippy::needless_range_loop)] // 3D array requires indexing by from/to/q
 fn err_model_converged(old: &ErrorModel, new: &ErrorModel) -> bool {
     let mut max_diff = 0.0_f64;
     for from in 0..NUM_BASES {
@@ -381,6 +385,7 @@ fn find_new_centers(
 /// Uses the identity: P(X >= k | Poisson(λ)) = P(k, λ) where P is the
 /// regularized lower incomplete gamma function.
 #[allow(clippy::cast_precision_loss)]
+#[must_use]
 pub fn poisson_pvalue(k: usize, lambda: f64) -> f64 {
     if lambda <= 0.0 || k == 0 {
         return 1.0;
@@ -390,6 +395,7 @@ pub fn poisson_pvalue(k: usize, lambda: f64) -> f64 {
 
 /// Regularized lower incomplete gamma function: P(a, x) = gamma(a, x) / Gamma(a).
 /// Uses series expansion: P(a, x) = e^(-x) * x^a * sum_{n=0}^{inf} x^n / (a*(a+1)*...*(a+n))
+#[must_use]
 fn regularized_gamma_lower(a: f64, x: f64) -> f64 {
     if x <= 0.0 {
         return 0.0;
@@ -405,14 +411,14 @@ fn regularized_gamma_lower(a: f64, x: f64) -> f64 {
     let mut term = 1.0 / a;
     sum += term;
     for n in 1..1000 {
-        term *= x / (a + n as f64);
+        term *= x / (a + f64::from(n));
         sum += term;
         if term.abs() < 1e-15 * sum.abs() {
             break;
         }
     }
 
-    let log_result = a * x.ln() - x - log_gamma_a + sum.ln();
+    let log_result = a.mul_add(x.ln(), -x) - log_gamma_a + sum.ln();
     if log_result > 0.0 {
         1.0
     } else {
@@ -421,6 +427,7 @@ fn regularized_gamma_lower(a: f64, x: f64) -> f64 {
 }
 
 /// Lanczos approximation for ln(Gamma(x)).
+#[allow(clippy::cast_precision_loss)] // index i is 0..6, exact
 fn ln_gamma(x: f64) -> f64 {
     if x <= 0.0 {
         return f64::INFINITY;
@@ -442,15 +449,11 @@ fn ln_gamma(x: f64) -> f64 {
     }
 
     let t = z + g + 0.5;
-    0.5 * (2.0 * std::f64::consts::PI).ln() + (z + 0.5) * t.ln() - t + sum.ln()
+    0.5f64.mul_add((2.0 * std::f64::consts::PI).ln(), (z + 0.5) * t.ln()) - t + sum.ln()
 }
 
 /// Build ASV structs from final partition assignments.
-fn build_asvs(
-    seqs: &[&UniqueSequence],
-    partition: &[usize],
-    centers: &[usize],
-) -> Vec<Asv> {
+fn build_asvs(seqs: &[&UniqueSequence], partition: &[usize], centers: &[usize]) -> Vec<Asv> {
     let mut asvs: Vec<Asv> = centers
         .iter()
         .map(|&c| Asv {
@@ -475,7 +478,7 @@ fn build_asvs(
 pub fn asvs_to_fasta(asvs: &[Asv]) -> String {
     let mut out = String::new();
     for (i, asv) in asvs.iter().enumerate() {
-        out.push_str(&format!(">ASV_{};size={}\n", i + 1, asv.abundance));
+        let _ = writeln!(out, ">ASV_{};size={}", i + 1, asv.abundance);
         out.push_str(&String::from_utf8_lossy(&asv.sequence));
         out.push('\n');
     }

@@ -1,0 +1,78 @@
+{
+  "PRJNA488170_SRR7760408": {
+    "name": "PRJNA488170 / SRR7760408 (Nannochloropsis outdoor 16S, Wageningen)",
+    "fastq": "/home/eastgate/Development/ecoPrimals/wetSpring/data/paper_proxy/nannochloropsis_16s/SRR7760408/SRR7760408_1.fastq.gz",
+    "reads_parsed": 50000,
+    "mean_read_length_bp": 301.0,
+    "reads_after_qc": 49650,
+    "quality_retention_pct": 99.3,
+    "unique_sequences": 1345,
+    "min_abundance_threshold": 2,
+    "diversity": {
+      "shannon": 7.030661,
+      "simpson": 0.998799,
+      "observed_features": 1345,
+      "chao1": 1345.0
+    },
+    "elapsed_seconds": 1.77,
+    "python_version": "3.10.12",
+    "numpy_version": "2.2.6"
+  },
+  "PRJNA382322_SRR5452557": {
+    "name": "PRJNA382322 / SRR5452557 (AlgaeParc 2013 bacterial community)",
+    "fastq": "/home/eastgate/Development/ecoPrimals/wetSpring/data/ncbi_bulk/PRJNA382322/SRR5452557/SRR5452557_1.fastq.gz",
+    "reads_parsed": 50000,
+    "mean_read_length_bp": 301.0,
+    "reads_after_qc": 49192,
+    "quality_retention_pct": 98.38,
+    "unique_sequences": 3308,
+    "min_abundance_threshold": 2,
+    "diversity": {
+      "shannon": 7.153355,
+      "simpson": 0.997277,
+      "observed_features": 3308,
+      "chao1": 3308.0
+    },
+    "elapsed_seconds": 1.76,
+    "python_version": "3.10.12",
+    "numpy_version": "2.2.6"
+  },
+  "PRJNA1114688_SRR29127204": {
+    "name": "PRJNA1114688 / SRR29127204 (N. oculata + B. plicatilis)",
+    "fastq": "/home/eastgate/Development/ecoPrimals/wetSpring/data/public_benchmarks/PRJNA1114688/SRR29127204/SRR29127204_1.fastq.gz",
+    "reads_parsed": 50000,
+    "mean_read_length_bp": 301.0,
+    "reads_after_qc": 45059,
+    "quality_retention_pct": 90.12,
+    "unique_sequences": 2493,
+    "min_abundance_threshold": 2,
+    "diversity": {
+      "shannon": 6.845533,
+      "simpson": 0.995042,
+      "observed_features": 2493,
+      "chao1": 2493.0
+    },
+    "elapsed_seconds": 1.66,
+    "python_version": "3.10.12",
+    "numpy_version": "2.2.6"
+  },
+  "PRJNA1114688_SRR29127205": {
+    "name": "PRJNA1114688 / SRR29127205 (N. oculata + B. plicatilis)",
+    "fastq": "/home/eastgate/Development/ecoPrimals/wetSpring/data/public_benchmarks/PRJNA1114688/SRR29127205/SRR29127205_1.fastq.gz",
+    "reads_parsed": 50000,
+    "mean_read_length_bp": 301.0,
+    "reads_after_qc": 45402,
+    "quality_retention_pct": 90.8,
+    "unique_sequences": 2944,
+    "min_abundance_threshold": 2,
+    "diversity": {
+      "shannon": 6.816345,
+      "simpson": 0.993396,
+      "observed_features": 2944,
+      "chao1": 2944.0
+    },
+    "elapsed_seconds": 1.66,
+    "python_version": "3.10.12",
+    "numpy_version": "2.2.6"
+  }
+}

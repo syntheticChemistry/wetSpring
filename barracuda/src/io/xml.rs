@@ -185,10 +185,9 @@ impl<R: BufRead> XmlReader<R> {
                 tag_str.trim()
             };
 
-            let (name_part, attr_part) = match body.find(|c: char| c.is_ascii_whitespace()) {
-                Some(pos) => (&body[..pos], body[pos..].trim()),
-                None => (body, ""),
-            };
+            let (name_part, attr_part) = body
+                .find(|c: char| c.is_ascii_whitespace())
+                .map_or((body, ""), |pos| (&body[..pos], body[pos..].trim()));
 
             let name = name_part.to_owned();
             let attrs = parse_attributes(attr_part);

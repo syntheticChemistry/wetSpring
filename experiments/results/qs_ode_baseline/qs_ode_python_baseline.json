@@ -1,0 +1,240 @@
+{
+  "experiment": "Waters 2008 QS/c-di-GMP ODE Model",
+  "references": [
+    "Waters et al. 2008, J Bacteriol 190:2527-36",
+    "Hammer & Bassler 2009, J Bacteriol 191:169-177",
+    "Massie et al. 2012, PNAS 109:12746-51",
+    "Bridges et al. 2022, PLoS Biol 20:e3001585"
+  ],
+  "model": {
+    "state_variables": [
+      "N (cell density)",
+      "A (autoinducer)",
+      "H (HapR)",
+      "C (c-di-GMP)",
+      "B (biofilm)"
+    ],
+    "parameters": {
+      "mu_max": 0.8,
+      "K_cap": 1.0,
+      "death_rate": 0.02,
+      "k_ai_prod": 5.0,
+      "d_ai": 1.0,
+      "k_hapr_max": 1.0,
+      "k_hapr_ai": 0.5,
+      "n_hapr": 2,
+      "d_hapr": 0.5,
+      "k_dgc_basal": 2.0,
+      "k_dgc_rep": 0.8,
+      "k_pde_basal": 0.5,
+      "k_pde_act": 2.0,
+      "d_cdg": 0.3,
+      "k_bio_max": 1.0,
+      "k_bio_cdg": 1.5,
+      "n_bio": 2,
+      "d_bio": 0.2
+    }
+  },
+  "scenarios": {
+    "Standard Growth (low\u2192high density)": {
+      "name": "Standard Growth (low\u2192high density)",
+      "steady_state": {
+        "cell_density": 0.974998,
+        "autoinducer": 4.874956,
+        "hapR": 1.978942,
+        "c_di_gmp": -0.0,
+        "biofilm": 0.02021
+      },
+      "checks": [
+        {
+          "label": "Cell density stays non-negative",
+          "status": "PASS"
+        },
+        {
+          "label": "Cell density bounded by carrying capacity",
+          "status": "PASS"
+        },
+        {
+          "label": "Autoinducer non-negative",
+          "status": "PASS"
+        },
+        {
+          "label": "HapR non-negative",
+          "status": "PASS"
+        },
+        {
+          "label": "c-di-GMP non-negative (tol 1e-6)",
+          "status": "PASS"
+        },
+        {
+          "label": "Biofilm in [0, 1]",
+          "status": "PASS"
+        },
+        {
+          "label": "Reaches steady state (N_ss=0.975)",
+          "status": "PASS"
+        },
+        {
+          "label": "c-di-GMP repressed at high density (C_ss=-0.000)",
+          "status": "PASS"
+        },
+        {
+          "label": "Biofilm disperses at high density (B_ss=0.020)",
+          "status": "PASS"
+        },
+        {
+          "label": "HapR active at high density (H_ss=1.979)",
+          "status": "PASS"
+        }
+      ],
+      "time_points": 500,
+      "duration_hours": 24.0
+    },
+    "High-Density Inoculum (dispersal)": {
+      "name": "High-Density Inoculum (dispersal)",
+      "steady_state": {
+        "cell_density": 0.97497,
+        "autoinducer": 4.874323,
+        "hapR": 1.971569,
+        "c_di_gmp": -0.0,
+        "biofilm": 0.10376
+      },
+      "checks": [
+        {
+          "label": "Cell density stays non-negative",
+          "status": "PASS"
+        },
+        {
+          "label": "Cell density bounded by carrying capacity",
+          "status": "PASS"
+        },
+        {
+          "label": "Autoinducer non-negative",
+          "status": "PASS"
+        },
+        {
+          "label": "HapR non-negative",
+          "status": "PASS"
+        },
+        {
+          "label": "c-di-GMP non-negative (tol 1e-6)",
+          "status": "PASS"
+        },
+        {
+          "label": "Biofilm in [0, 1]",
+          "status": "PASS"
+        },
+        {
+          "label": "Reaches steady state (N_ss=0.975)",
+          "status": "PASS"
+        },
+        {
+          "label": "Rapid dispersal from high-density start (B_ss=0.104)",
+          "status": "PASS"
+        }
+      ],
+      "time_points": 300,
+      "duration_hours": 12.0
+    },
+    "\u0394hapR Mutant (constitutive biofilm)": {
+      "name": "\u0394hapR Mutant (constitutive biofilm)",
+      "steady_state": {
+        "cell_density": 0.974998,
+        "autoinducer": 4.874956,
+        "hapR": 0.0,
+        "c_di_gmp": 2.5,
+        "biofilm": 0.786164
+      },
+      "checks": [
+        {
+          "label": "Cell density stays non-negative",
+          "status": "PASS"
+        },
+        {
+          "label": "Cell density bounded by carrying capacity",
+          "status": "PASS"
+        },
+        {
+          "label": "Autoinducer non-negative",
+          "status": "PASS"
+        },
+        {
+          "label": "HapR non-negative",
+          "status": "PASS"
+        },
+        {
+          "label": "c-di-GMP non-negative (tol 1e-6)",
+          "status": "PASS"
+        },
+        {
+          "label": "Biofilm in [0, 1]",
+          "status": "PASS"
+        },
+        {
+          "label": "Reaches steady state (N_ss=0.975)",
+          "status": "PASS"
+        },
+        {
+          "label": "\u0394hapR: constitutive biofilm (B_ss=0.786)",
+          "status": "PASS"
+        },
+        {
+          "label": "\u0394hapR: c-di-GMP stays high (C_ss=2.500)",
+          "status": "PASS"
+        }
+      ],
+      "time_points": 500,
+      "duration_hours": 24.0
+    },
+    "DGC Overexpression (elevated c-di-GMP)": {
+      "name": "DGC Overexpression (elevated c-di-GMP)",
+      "steady_state": {
+        "cell_density": 0.974998,
+        "autoinducer": 4.874956,
+        "hapR": 1.978942,
+        "c_di_gmp": 0.662143,
+        "biofilm": 0.451545
+      },
+      "checks": [
+        {
+          "label": "Cell density stays non-negative",
+          "status": "PASS"
+        },
+        {
+          "label": "Cell density bounded by carrying capacity",
+          "status": "PASS"
+        },
+        {
+          "label": "Autoinducer non-negative",
+          "status": "PASS"
+        },
+        {
+          "label": "HapR non-negative",
+          "status": "PASS"
+        },
+        {
+          "label": "c-di-GMP non-negative (tol 1e-6)",
+          "status": "PASS"
+        },
+        {
+          "label": "Biofilm in [0, 1]",
+          "status": "PASS"
+        },
+        {
+          "label": "Reaches steady state (N_ss=0.975)",
+          "status": "PASS"
+        },
+        {
+          "label": "DGC OE: elevated c-di-GMP (C_ss=0.662)",
+          "status": "PASS"
+        }
+      ],
+      "time_points": 500,
+      "duration_hours": 24.0
+    }
+  },
+  "total_checks": 35,
+  "total_pass": 35,
+  "elapsed_seconds": 0.004,
+  "python_version": "3.10.12"
+}

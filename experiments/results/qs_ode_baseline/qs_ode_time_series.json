@@ -1,0 +1,58 @@
+{
+  "Standard Growth (low\u2192high density)": {
+    "steady_state": {
+      "cell_density": 0.974998,
+      "autoinducer": 4.874956,
+      "hapR": 1.978942,
+      "c_di_gmp": -0.0,
+      "biofilm": 0.02021
+    },
+    "t_final": 24.0,
+    "N_final": 0.9749993024800698,
+    "C_final": -1.5177560083271126e-10,
+    "B_final": 0.015813735590466227,
+    "H_final": 1.9790555498840554
+  },
+  "High-Density Inoculum (dispersal)": {
+    "steady_state": {
+      "cell_density": 0.97497,
+      "autoinducer": 4.874323,
+      "hapR": 1.971569,
+      "c_di_gmp": -0.0,
+      "biofilm": 0.10376
+    },
+    "t_final": 12.0,
+    "N_final": 0.9749816360195264,
+    "C_final": -6.001463965740952e-12,
+    "B_final": 0.09213693993450282,
+    "H_final": 1.9735739390461788
+  },
+  "\u0394hapR Mutant (constitutive biofilm)": {
+    "steady_state": {
+      "cell_density": 0.974998,
+      "autoinducer": 4.874956,
+      "hapR": 0.0,
+      "c_di_gmp": 2.5,
+      "biofilm": 0.786164
+    },
+    "t_final": 24.0,
+    "N_final": 0.9749993023859936,
+    "C_final": 2.499999997705593,
+    "B_final": 0.786163521411441,
+    "H_final": 0.0
+  },
+  "DGC Overexpression (elevated c-di-GMP)": {
+    "steady_state": {
+      "cell_density": 0.974998,
+      "autoinducer": 4.874956,
+      "hapR": 1.978942,
+      "c_di_gmp": 0.662143,
+      "biofilm": 0.451545
+    },
+    "t_final": 24.0,
+    "N_final": 0.9749993026935628,
+    "C_final": 0.6620695269337847,
+    "B_final": 0.45065856361460305,
+    "H_final": 1.9790555477981409
+  }
+}

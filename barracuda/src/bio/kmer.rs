@@ -13,7 +13,7 @@ use std::collections::HashMap;
 /// 2-bit DNA encoding: A=0, C=1, G=2, T=3.
 /// Returns `None` for ambiguous bases (N, etc).
 #[inline]
-fn encode_base(b: u8) -> Option<u64> {
+const fn encode_base(b: u8) -> Option<u64> {
     match b {
         b'A' | b'a' => Some(0),
         b'C' | b'c' => Some(1),
@@ -25,7 +25,7 @@ fn encode_base(b: u8) -> Option<u64> {
 
 /// Complement of a 2-bit encoded base.
 #[inline]
-fn complement_2bit(b: u64) -> u64 {
+const fn complement_2bit(b: u64) -> u64 {
     3 - b // A(0)<->T(3), C(1)<->G(2)
 }
 

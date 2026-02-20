@@ -1,0 +1,914 @@
+{
+  "n_nodes": 65,
+  "n_features": 28,
+  "nodes": [
+    {
+      "id": 0,
+      "feature": 15,
+      "threshold": 1.9550000429153442,
+      "left_child": 1,
+      "right_child": 22,
+      "n_samples": 2975,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFOS"
+    },
+    {
+      "id": 1,
+      "feature": 4,
+      "threshold": 2.8049999475479126,
+      "left_child": 2,
+      "right_child": 13,
+      "n_samples": 1897,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFOA"
+    },
+    {
+      "id": 2,
+      "feature": 4,
+      "threshold": 2.490000009536743,
+      "left_child": 3,
+      "right_child": 10,
+      "n_samples": 1812,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFOA"
+    },
+    {
+      "id": 3,
+      "feature": 4,
+      "threshold": 2.1850000619888306,
+      "left_child": 4,
+      "right_child": 5,
+      "n_samples": 1769,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFOA"
+    },
+    {
+      "id": 4,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 1728,
+      "value": [
+        1,
+        0
+      ],
+      "feature_name": "leaf",
+      "prediction": 0
+    },
+    {
+      "id": 5,
+      "feature": 15,
+      "threshold": 1.600000023841858,
+      "left_child": 6,
+      "right_child": 7,
+      "n_samples": 41,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFOS"
+    },
+    {
+      "id": 6,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 36,
+      "value": [
+        1,
+        0
+      ],
+      "feature_name": "leaf",
+      "prediction": 0
+    },
+    {
+      "id": 7,
+      "feature": 17,
+      "threshold": 0.23999999463558197,
+      "left_child": 8,
+      "right_child": 9,
+      "n_samples": 5,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "NMeFOSAA"
+    },
+    {
+      "id": 8,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 1,
+      "value": [
+        1,
+        0
+      ],
+      "feature_name": "leaf",
+      "prediction": 0
+    },
+    {
+      "id": 9,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 4,
+      "value": [
+        0,
+        1
+      ],
+      "feature_name": "leaf",
+      "prediction": 1
+    },
+    {
+      "id": 10,
+      "feature": 15,
+      "threshold": 1.350000023841858,
+      "left_child": 11,
+      "right_child": 12,
+      "n_samples": 43,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFOS"
+    },
+    {
+      "id": 11,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 28,
+      "value": [
+        1,
+        0
+      ],
+      "feature_name": "leaf",
+      "prediction": 0
+    },
+    {
+      "id": 12,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 15,
+      "value": [
+        0,
+        1
+      ],
+      "feature_name": "leaf",
+      "prediction": 1
+    },
+    {
+      "id": 13,
+      "feature": 15,
+      "threshold": 0.6150000095367432,
+      "left_child": 14,
+      "right_child": 17,
+      "n_samples": 85,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFOS"
+    },
+    {
+      "id": 14,
+      "feature": 4,
+      "threshold": 3.700000047683716,
+      "left_child": 15,
+      "right_child": 16,
+      "n_samples": 15,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFOA"
+    },
+    {
+      "id": 15,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 5,
+      "value": [
+        1,
+        0
+      ],
+      "feature_name": "leaf",
+      "prediction": 0
+    },
+    {
+      "id": 16,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 10,
+      "value": [
+        0,
+        1
+      ],
+      "feature_name": "leaf",
+      "prediction": 1
+    },
+    {
+      "id": 17,
+      "feature": 15,
+      "threshold": 0.75,
+      "left_child": 18,
+      "right_child": 21,
+      "n_samples": 70,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFOS"
+    },
+    {
+      "id": 18,
+      "feature": 4,
+      "threshold": 3.299999952316284,
+      "left_child": 19,
+      "right_child": 20,
+      "n_samples": 7,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFOA"
+    },
+    {
+      "id": 19,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 1,
+      "value": [
+        1,
+        0
+      ],
+      "feature_name": "leaf",
+      "prediction": 0
+    },
+    {
+      "id": 20,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 6,
+      "value": [
+        0,
+        1
+      ],
+      "feature_name": "leaf",
+      "prediction": 1
+    },
+    {
+      "id": 21,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 63,
+      "value": [
+        0,
+        1
+      ],
+      "feature_name": "leaf",
+      "prediction": 1
+    },
+    {
+      "id": 22,
+      "feature": 4,
+      "threshold": 1.7050000429153442,
+      "left_child": 23,
+      "right_child": 50,
+      "n_samples": 1078,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFOA"
+    },
+    {
+      "id": 23,
+      "feature": 15,
+      "threshold": 2.584999918937683,
+      "left_child": 24,
+      "right_child": 37,
+      "n_samples": 179,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFOS"
+    },
+    {
+      "id": 24,
+      "feature": 27,
+      "threshold": 2.505393147468567,
+      "left_child": 25,
+      "right_child": 34,
+      "n_samples": 63,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "pfca_pfsa_ratio"
+    },
+    {
+      "id": 25,
+      "feature": 15,
+      "threshold": 2.475000023841858,
+      "left_child": 26,
+      "right_child": 31,
+      "n_samples": 60,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFOS"
+    },
+    {
+      "id": 26,
+      "feature": 23,
+      "threshold": 2.850000023841858,
+      "left_child": 27,
+      "right_child": 28,
+      "n_samples": 51,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "8:2 FTS"
+    },
+    {
+      "id": 27,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 49,
+      "value": [
+        1,
+        0
+      ],
+      "feature_name": "leaf",
+      "prediction": 0
+    },
+    {
+      "id": 28,
+      "feature": 27,
+      "threshold": 1.3913761377334595,
+      "left_child": 29,
+      "right_child": 30,
+      "n_samples": 2,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "pfca_pfsa_ratio"
+    },
+    {
+      "id": 29,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 1,
+      "value": [
+        0,
+        1
+      ],
+      "feature_name": "leaf",
+      "prediction": 1
+    },
+    {
+      "id": 30,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 1,
+      "value": [
+        1,
+        0
+      ],
+      "feature_name": "leaf",
+      "prediction": 0
+    },
+    {
+      "id": 31,
+      "feature": 4,
+      "threshold": 1.449999988079071,
+      "left_child": 32,
+      "right_child": 33,
+      "n_samples": 9,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFOA"
+    },
+    {
+      "id": 32,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 6,
+      "value": [
+        1,
+        0
+      ],
+      "feature_name": "leaf",
+      "prediction": 0
+    },
+    {
+      "id": 33,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 3,
+      "value": [
+        0,
+        1
+      ],
+      "feature_name": "leaf",
+      "prediction": 1
+    },
+    {
+      "id": 34,
+      "feature": 15,
+      "threshold": 2.149999976158142,
+      "left_child": 35,
+      "right_child": 36,
+      "n_samples": 3,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFOS"
+    },
+    {
+      "id": 35,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 1,
+      "value": [
+        1,
+        0
+      ],
+      "feature_name": "leaf",
+      "prediction": 0
+    },
+    {
+      "id": 36,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 2,
+      "value": [
+        0,
+        1
+      ],
+      "feature_name": "leaf",
+      "prediction": 1
+    },
+    {
+      "id": 37,
+      "feature": 26,
+      "threshold": 3.049999952316284,
+      "left_child": 38,
+      "right_child": 41,
+      "n_samples": 116,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "max_single_pfas"
+    },
+    {
+      "id": 38,
+      "feature": 10,
+      "threshold": 0.5999999940395355,
+      "left_child": 39,
+      "right_child": 40,
+      "n_samples": 8,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFHpA"
+    },
+    {
+      "id": 39,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 5,
+      "value": [
+        1,
+        0
+      ],
+      "feature_name": "leaf",
+      "prediction": 0
+    },
+    {
+      "id": 40,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 3,
+      "value": [
+        0,
+        1
+      ],
+      "feature_name": "leaf",
+      "prediction": 1
+    },
+    {
+      "id": 41,
+      "feature": 15,
+      "threshold": 2.75,
+      "left_child": 42,
+      "right_child": 45,
+      "n_samples": 108,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFOS"
+    },
+    {
+      "id": 42,
+      "feature": 10,
+      "threshold": 0.7050000131130219,
+      "left_child": 43,
+      "right_child": 44,
+      "n_samples": 11,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFHpA"
+    },
+    {
+      "id": 43,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 2,
+      "value": [
+        1,
+        0
+      ],
+      "feature_name": "leaf",
+      "prediction": 0
+    },
+    {
+      "id": 44,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 9,
+      "value": [
+        0,
+        1
+      ],
+      "feature_name": "leaf",
+      "prediction": 1
+    },
+    {
+      "id": 45,
+      "feature": 8,
+      "threshold": 0.3669999986886978,
+      "left_child": 46,
+      "right_child": 49,
+      "n_samples": 97,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFBA"
+    },
+    {
+      "id": 46,
+      "feature": 18,
+      "threshold": 6.6499998569488525,
+      "left_child": 47,
+      "right_child": 48,
+      "n_samples": 8,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFPeA"
+    },
+    {
+      "id": 47,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 7,
+      "value": [
+        0,
+        1
+      ],
+      "feature_name": "leaf",
+      "prediction": 1
+    },
+    {
+      "id": 48,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 1,
+      "value": [
+        1,
+        0
+      ],
+      "feature_name": "leaf",
+      "prediction": 0
+    },
+    {
+      "id": 49,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 89,
+      "value": [
+        0,
+        1
+      ],
+      "feature_name": "leaf",
+      "prediction": 1
+    },
+    {
+      "id": 50,
+      "feature": 24,
+      "threshold": 14.829999923706055,
+      "left_child": 51,
+      "right_child": 54,
+      "n_samples": 899,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "total_pfas"
+    },
+    {
+      "id": 51,
+      "feature": 1,
+      "threshold": -82.64673233032227,
+      "left_child": 52,
+      "right_child": 53,
+      "n_samples": 2,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "longitude"
+    },
+    {
+      "id": 52,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 1,
+      "value": [
+        1,
+        0
+      ],
+      "feature_name": "leaf",
+      "prediction": 0
+    },
+    {
+      "id": 53,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 1,
+      "value": [
+        0,
+        1
+      ],
+      "feature_name": "leaf",
+      "prediction": 1
+    },
+    {
+      "id": 54,
+      "feature": 15,
+      "threshold": 1.9950000047683716,
+      "left_child": 55,
+      "right_child": 58,
+      "n_samples": 897,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFOS"
+    },
+    {
+      "id": 55,
+      "feature": 17,
+      "threshold": 1.2599999904632568,
+      "left_child": 56,
+      "right_child": 57,
+      "n_samples": 3,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "NMeFOSAA"
+    },
+    {
+      "id": 56,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 2,
+      "value": [
+        0,
+        1
+      ],
+      "feature_name": "leaf",
+      "prediction": 1
+    },
+    {
+      "id": 57,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 1,
+      "value": [
+        1,
+        0
+      ],
+      "feature_name": "leaf",
+      "prediction": 0
+    },
+    {
+      "id": 58,
+      "feature": 4,
+      "threshold": 1.9049999713897705,
+      "left_child": 59,
+      "right_child": 64,
+      "n_samples": 894,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFOA"
+    },
+    {
+      "id": 59,
+      "feature": 15,
+      "threshold": 2.149999976158142,
+      "left_child": 60,
+      "right_child": 63,
+      "n_samples": 43,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFOS"
+    },
+    {
+      "id": 60,
+      "feature": 2,
+      "threshold": 2.149999976158142,
+      "left_child": 61,
+      "right_child": 62,
+      "n_samples": 3,
+      "value": [
+        0,
+        0
+      ],
+      "feature_name": "PFHxA"
+    },
+    {
+      "id": 61,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 1,
+      "value": [
+        0,
+        1
+      ],
+      "feature_name": "leaf",
+      "prediction": 1
+    },
+    {
+      "id": 62,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 2,
+      "value": [
+        1,
+        0
+      ],
+      "feature_name": "leaf",
+      "prediction": 0
+    },
+    {
+      "id": 63,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 40,
+      "value": [
+        0,
+        1
+      ],
+      "feature_name": "leaf",
+      "prediction": 1
+    },
+    {
+      "id": 64,
+      "feature": -2,
+      "threshold": -2.0,
+      "left_child": -1,
+      "right_child": -1,
+      "n_samples": 851,
+      "value": [
+        0,
+        1
+      ],
+      "feature_name": "leaf",
+      "prediction": 1
+    }
+  ],
+  "feature_names": [
+    "latitude",
+    "longitude",
+    "PFHxA",
+    "PFDoA",
+    "PFOA",
+    "PFDA",
+    "PFDS",
+    "PFHxS",
+    "PFBA",
+    "PFBS",
+    "PFHpA",
+    "PFHpS",
+    "PFNA",
+    "PFTeA",
+    "PFOSA",
+    "PFOS",
+    "PFUnA",
+    "NMeFOSAA",
+    "PFPeA",
+    "PFPeS",
+    "NEtFOSAA",
+    "GenX",
+    "6:2 FTS",
+    "8:2 FTS",
+    "total_pfas",
+    "pfas_count",
+    "max_single_pfas",
+    "pfca_pfsa_ratio"
+  ]
+}

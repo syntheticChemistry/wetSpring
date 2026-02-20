@@ -1,0 +1,143 @@
+{
+  "experiment": "008_pfas_ml_water_monitoring",
+  "data_source": "Michigan EGLE PFAS Surface Water Sampling",
+  "data_url": "https://gisagoegle.state.mi.us/arcgis/rest/services/EGLE/PfasOpenData/MapServer/0",
+  "total_records": 3719,
+  "valid_samples": 3719,
+  "target_threshold_ngl": 4.0,
+  "target_positive_pct": 37.21,
+  "n_features": 28,
+  "feature_names": [
+    "latitude",
+    "longitude",
+    "PFHxA",
+    "PFDoA",
+    "PFOA",
+    "PFDA",
+    "PFDS",
+    "PFHxS",
+    "PFBA",
+    "PFBS",
+    "PFHpA",
+    "PFHpS",
+    "PFNA",
+    "PFTeA",
+    "PFOSA",
+    "PFOS",
+    "PFUnA",
+    "NMeFOSAA",
+    "PFPeA",
+    "PFPeS",
+    "NEtFOSAA",
+    "GenX",
+    "6:2 FTS",
+    "8:2 FTS",
+    "total_pfas",
+    "pfas_count",
+    "max_single_pfas",
+    "pfca_pfsa_ratio"
+  ],
+  "models": {
+    "RandomForest": {
+      "accuracy": 0.983867,
+      "f1_score": 0.978417,
+      "auc_roc": 0.998971,
+      "elapsed_seconds": 1.41,
+      "top_features": [
+        {
+          "name": "PFOS",
+          "importance": 0.328894
+        },
+        {
+          "name": "PFOA",
+          "importance": 0.147674
+        },
+        {
+          "name": "total_pfas",
+          "importance": 0.123769
+        },
+        {
+          "name": "PFHxA",
+          "importance": 0.065297
+        },
+        {
+          "name": "PFHxS",
+          "importance": 0.065192
+        },
+        {
+          "name": "PFPeA",
+          "importance": 0.055954
+        },
+        {
+          "name": "PFHpA",
+          "importance": 0.035497
+        },
+        {
+          "name": "max_single_pfas",
+          "importance": 0.034739
+        },
+        {
+          "name": "PFBS",
+          "importance": 0.027027
+        },
+        {
+          "name": "pfca_pfsa_ratio",
+          "importance": 0.02615
+        }
+      ]
+    },
+    "GradientBoosting": {
+      "accuracy": 0.994084,
+      "f1_score": 0.992058,
+      "auc_roc": 0.999788,
+      "elapsed_seconds": 13.5,
+      "top_features": [
+        {
+          "name": "PFOS",
+          "importance": 0.849022
+        },
+        {
+          "name": "PFOA",
+          "importance": 0.140933
+        },
+        {
+          "name": "max_single_pfas",
+          "importance": 0.002428
+        },
+        {
+          "name": "PFDoA",
+          "importance": 0.001463
+        },
+        {
+          "name": "PFBS",
+          "importance": 0.001295
+        },
+        {
+          "name": "pfca_pfsa_ratio",
+          "importance": 0.000925
+        },
+        {
+          "name": "PFHpA",
+          "importance": 0.000911
+        },
+        {
+          "name": "PFDS",
+          "importance": 0.000557
+        },
+        {
+          "name": "PFPeA",
+          "importance": 0.000359
+        },
+        {
+          "name": "PFDA",
+          "importance": 0.000344
+        }
+      ]
+    }
+  },
+  "python_version": "3.10.12",
+  "acceptance_criteria": {
+    "f1_target": 0.8,
+    "auc_target": 0.85
+  }
+}

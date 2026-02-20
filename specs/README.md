@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 19, 2026
-**Status**: Phase 6 complete — 388/388 CPU + 38/38 GPU = 426/426 checks
+**Status**: Phase 7 complete — 430/430 CPU + 126/126 GPU = 556/556 checks
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -10,11 +10,11 @@
 
 | Metric | Value |
 |--------|-------|
-| Phase 2 (Rust CPU) | 388/388 PASS — FASTQ, diversity, 16S pipeline, mzML, PFAS, features, peaks, real NCBI data, VOC baselines, public benchmarks (4 BioProjects) |
+| Phase 2 (Rust CPU) | 430/430 PASS — FASTQ, diversity, 16S pipeline, mzML, PFAS, features, peaks, real NCBI data, VOC baselines, public benchmarks (4 BioProjects), extended algae (Exp017), PFAS library (Exp018) |
 | Phase 3 (GPU) | 38/38 PASS — Shannon, Simpson, BC, PCoA, spectral cosine (1,077x speedup) |
 | Phase 5 (Paper Parity) | Honest data audit, VOC baselines from Reese 2019, proxy NCBI data |
 | Phase 6 (Public Benchmark) | 22 samples from 4 independent BioProjects, 2.7M reads, marine + freshwater |
-| Rust modules | 30 sovereign modules, 284 tests |
+| Rust modules | 31 sovereign modules, 379 tests |
 | Dependencies | 1 runtime (flate2), everything else sovereign |
 | Faculty (Track 1) | Waters (MMG, MSU), Cahill (Sandia), Smallwood (Sandia) |
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
@@ -54,7 +54,7 @@
 - **LC-MS feature extraction** — mzML → EIC → peaks → features → spectral matching
 - **PFAS screening** — KMD + tolerance search + MS2 fragment matching
 - **Microbial ecology** — Alpha/beta diversity, PCoA, rarefaction
-- **Sovereign Rust bioinformatics** — 30 modules, 1 runtime dependency
+- **Sovereign Rust bioinformatics** — 31 modules, 1 runtime dependency
 
 ### wetSpring IS NOT:
 - Sensor noise analysis (groundSpring)

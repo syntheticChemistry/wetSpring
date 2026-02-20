@@ -43,27 +43,29 @@ pub enum TaxRank {
 }
 
 impl TaxRank {
-    pub fn all() -> &'static [TaxRank] {
+    #[must_use]
+    pub const fn all() -> &'static [Self] {
         &[
-            TaxRank::Kingdom,
-            TaxRank::Phylum,
-            TaxRank::Class,
-            TaxRank::Order,
-            TaxRank::Family,
-            TaxRank::Genus,
-            TaxRank::Species,
+            Self::Kingdom,
+            Self::Phylum,
+            Self::Class,
+            Self::Order,
+            Self::Family,
+            Self::Genus,
+            Self::Species,
         ]
     }
 
-    pub fn depth(self) -> usize {
+    #[must_use]
+    pub const fn depth(self) -> usize {
         match self {
-            TaxRank::Kingdom => 0,
-            TaxRank::Phylum => 1,
-            TaxRank::Class => 2,
-            TaxRank::Order => 3,
-            TaxRank::Family => 4,
-            TaxRank::Genus => 5,
-            TaxRank::Species => 6,
+            Self::Kingdom => 0,
+            Self::Phylum => 1,
+            Self::Class => 2,
+            Self::Order => 3,
+            Self::Family => 4,
+            Self::Genus => 5,
+            Self::Species => 6,
         }
     }
 }
@@ -76,20 +78,23 @@ pub struct Lineage {
 
 impl Lineage {
     /// Parse a semicolon-delimited taxonomy string (e.g., SILVA format).
-    /// "d__Bacteria;p__Firmicutes;c__Bacilli;o__Lactobacillales;..."
+    /// `d__Bacteria;p__Firmicutes;c__Bacilli;o__Lactobacillales;...`
+    #[must_use]
     pub fn from_taxonomy_string(s: &str) -> Self {
         let ranks: Vec<String> = s
             .split(';')
             .map(|r| r.trim().to_string())
             .filter(|r| !r.is_empty())
             .collect();
-        Lineage { ranks }
+        Self { ranks }
     }
 
+    #[must_use]
     pub fn at_rank(&self, rank: TaxRank) -> Option<&str> {
         self.ranks.get(rank.depth()).map(String::as_str)
     }
 
+    #[must_use]
     pub fn to_string_at_rank(&self, rank: TaxRank) -> String {
         let depth = rank.depth() + 1;
         self.ranks[..depth.min(self.ranks.len())].join(";")
@@ -106,8 +111,8 @@ pub struct ReferenceSeq {
 
 /// A trained naive Bayes classifier.
 ///
-/// Stores log-probabilities in a flat `n_taxa × kmer_space` array for
-/// O(1) lookup (no HashMap in the scoring hot path). For k=8, `kmer_space`
+/// Stores log-probabilities in a flat `n_taxa` × `kmer_space` array for
+/// O(1) lookup (no `HashMap` in the scoring hot path). For `k`=8, `kmer_space`
 /// = 4^8 = 65,536 entries per taxon.
 #[derive(Debug)]
 #[allow(dead_code)]
@@ -165,7 +170,8 @@ impl NaiveBayesClassifier {
     ///
     /// Groups reference sequences by genus-level lineage, extracts k-mers,
     /// and precomputes a flat log-probability table for O(1) scoring.
-    #[allow(clippy::cast_precision_loss)]
+    #[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
+    #[must_use]
     pub fn train(refs: &[ReferenceSeq], k: usize) -> Self {
         let kmer_space = 1_usize << (2 * k); // 4^k
 
@@ -198,9 +204,7 @@ impl NaiveBayesClassifier {
 
         let n_kmers_total = all_kmers.len();
         let n_taxa = taxon_labels.len();
-        let default_log_p = (0.5 / (n_kmers_total.max(1) as f64 + 1.0))
-            .max(1e-300)
-            .ln();
+        let default_log_p = (0.5 / (n_kmers_total.max(1) as f64 + 1.0)).max(1e-300).ln();
 
         // Build dense log-probability table: n_taxa × kmer_space
         let mut dense_log_probs = vec![default_log_p; n_taxa * kmer_space];
@@ -218,12 +222,9 @@ impl NaiveBayesClassifier {
             .iter()
             .map(|&c| c as f64 / total_refs)
             .collect();
-        let log_priors: Vec<f64> = taxon_priors
-            .iter()
-            .map(|&p| p.max(1e-300).ln())
-            .collect();
+        let log_priors: Vec<f64> = taxon_priors.iter().map(|&p| p.max(1e-300).ln()).collect();
 
-        NaiveBayesClassifier {
+        Self {
             k,
             dense_log_probs,
             kmer_space,
@@ -235,29 +236,33 @@ impl NaiveBayesClassifier {
     }
 
     /// Access the dense log-probability table for GPU GEMM dispatch.
-    /// Layout: `n_taxa × kmer_space`, row-major.
+    /// Layout: `n_taxa` × `kmer_space`, row-major.
+    #[must_use]
     pub fn dense_log_probs(&self) -> &[f64] {
         &self.dense_log_probs
     }
 
     /// K-mer space size (4^k).
-    pub fn kmer_space(&self) -> usize {
+    #[must_use]
+    pub const fn kmer_space(&self) -> usize {
         self.kmer_space
     }
 
     /// Log-prior per taxon.
+    #[must_use]
     pub fn log_priors(&self) -> &[f64] {
         &self.log_priors
     }
 
     /// Taxon labels.
+    #[must_use]
     pub fn taxon_labels(&self) -> &[Lineage] {
         &self.taxon_labels
     }
 
-
     /// Classify a query sequence.
     #[allow(clippy::cast_precision_loss)]
+    #[must_use]
     pub fn classify(&self, sequence: &[u8], params: &ClassifyParams) -> Classification {
         let query_kmers: Vec<u64> = extract_kmers(sequence, self.k);
 
@@ -285,7 +290,8 @@ impl NaiveBayesClassifier {
     }
 
     /// Score using all query k-mers and return best taxon index.
-    /// Uses flat array indexing — no HashMap lookups.
+    /// Uses flat array indexing — no `HashMap` lookups.
+    #[allow(clippy::cast_possible_truncation)]
     fn score_all_kmers(&self, query_kmers: &[u64]) -> usize {
         let n_taxa = self.taxon_labels.len();
         let mut best_score = f64::NEG_INFINITY;
@@ -309,7 +315,7 @@ impl NaiveBayesClassifier {
     /// Bootstrap confidence estimation.
     /// Repeatedly classify random subsets of k-mers and count how often
     /// each rank agrees with the full classification.
-    #[allow(clippy::cast_precision_loss)]
+    #[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
     fn bootstrap_confidence(
         &self,
         query_kmers: &[u64],
@@ -355,23 +361,29 @@ impl NaiveBayesClassifier {
     }
 
     /// Number of taxa in the classifier.
+    #[must_use]
     pub fn n_taxa(&self) -> usize {
         self.taxon_labels.len()
     }
 }
 
 /// Extract all k-mers from a DNA sequence (no canonicalization — direction matters for taxonomy).
+#[must_use]
 pub fn extract_kmers(seq: &[u8], k: usize) -> Vec<u64> {
     if seq.len() < k || k == 0 || k > 32 {
         return vec![];
     }
 
     let mut kmers = Vec::with_capacity(seq.len() - k + 1);
-    let mask = if k == 32 { u64::MAX } else { (1_u64 << (2 * k)) - 1 };
+    let mask = if k == 32 {
+        u64::MAX
+    } else {
+        (1_u64 << (2 * k)) - 1
+    };
     let mut kmer = 0_u64;
     let mut valid_len = 0_usize;
 
-    for &base in seq.iter() {
+    for &base in seq {
         if let Some(encoded) = encode_base(base) {
             kmer = ((kmer << 2) | encoded) & mask;
             valid_len += 1;
@@ -388,7 +400,7 @@ pub fn extract_kmers(seq: &[u8], k: usize) -> Vec<u64> {
     kmers
 }
 
-fn encode_base(b: u8) -> Option<u64> {
+const fn encode_base(b: u8) -> Option<u64> {
     match b {
         b'A' | b'a' => Some(0),
         b'C' | b'c' => Some(1),
@@ -400,6 +412,7 @@ fn encode_base(b: u8) -> Option<u64> {
 
 /// Parse a FASTA reference database into `ReferenceSeq` records.
 /// Expects SILVA-style headers: `>ID taxonomy_string`
+#[must_use]
 pub fn parse_reference_fasta(contents: &str) -> Vec<ReferenceSeq> {
     let mut refs = Vec::new();
     let mut current_id = String::new();
@@ -424,7 +437,7 @@ pub fn parse_reference_fasta(contents: &str) -> Vec<ReferenceSeq> {
             current_seq.extend(
                 line.trim()
                     .bytes()
-                    .filter(|b| b.is_ascii_alphabetic())
+                    .filter(u8::is_ascii_alphabetic)
                     .map(|b| b.to_ascii_uppercase()),
             );
         }
@@ -492,8 +505,16 @@ mod tests {
         let refs = vec![
             make_ref("r1", b"AAAAAAAAACCCCCCCCC", "Bacteria;Firmicutes;Bacilli"),
             make_ref("r2", b"AAAAAAAAACCCCCCCCC", "Bacteria;Firmicutes;Bacilli"),
-            make_ref("r3", b"GGGGGGGGGTTTTTTTTTT", "Bacteria;Proteobacteria;Gamma"),
-            make_ref("r4", b"GGGGGGGGGTTTTTTTTTT", "Bacteria;Proteobacteria;Gamma"),
+            make_ref(
+                "r3",
+                b"GGGGGGGGGTTTTTTTTTT",
+                "Bacteria;Proteobacteria;Gamma",
+            ),
+            make_ref(
+                "r4",
+                b"GGGGGGGGGTTTTTTTTTT",
+                "Bacteria;Proteobacteria;Gamma",
+            ),
         ];
 
         let classifier = NaiveBayesClassifier::train(&refs, 4);
@@ -501,7 +522,11 @@ mod tests {
 
         // Query similar to Firmicutes
         let result = classifier.classify(b"AAAAAAAAACCCCCCCCC", &ClassifyParams::default());
-        assert!(result.lineage.at_rank(TaxRank::Phylum).unwrap().contains("Firmicutes"));
+        assert!(result
+            .lineage
+            .at_rank(TaxRank::Phylum)
+            .unwrap()
+            .contains("Firmicutes"));
 
         // Query similar to Proteobacteria
         let result = classifier.classify(b"GGGGGGGGGTTTTTTTTTT", &ClassifyParams::default());
@@ -552,9 +577,7 @@ mod tests {
 
     #[test]
     fn classify_returns_confidence_per_rank() {
-        let refs = vec![
-            make_ref("r1", b"ACGTACGTACGTACGT", "K;P;C;O;F;G;S"),
-        ];
+        let refs = vec![make_ref("r1", b"ACGTACGTACGTACGT", "K;P;C;O;F;G;S")];
         let classifier = NaiveBayesClassifier::train(&refs, 4);
         let result = classifier.classify(b"ACGTACGTACGTACGT", &ClassifyParams::default());
         assert_eq!(result.confidence.len(), 7);

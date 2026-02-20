@@ -2,13 +2,13 @@
 //! GPU FP64 compute for wetSpring science workloads.
 //!
 //! Creates a wgpu device with `SHADER_F64` and bridges to `ToadStool`'s
-//! `WgpuDevice` + `TensorContext`. All GPU dispatch goes through ToadStool
+//! `WgpuDevice` + `TensorContext`. All GPU dispatch goes through `ToadStool`
 //! primitives — wetSpring has zero custom WGSL shaders.
 //!
-//! ToadStool primitives used:
+//! `ToadStool` primitives used:
 //! - `FusedMapReduceF64` — Shannon, Simpson, alpha diversity
 //! - `BrayCurtisF64` — condensed distance matrices
-//! - `BatchedEighGpu` — PCoA eigendecomposition
+//! - `BatchedEighGpu` — `PCoA` eigendecomposition
 //! - `GemmF64` — batch spectral cosine similarity
 //! - `KrigingF64` — spatial interpolation
 //! - `VarianceF64` — population/sample variance, std dev
@@ -16,14 +16,25 @@
 //! - `CovarianceF64` — sample covariance
 //! - `WeightedDotF64` — weighted/plain dot product
 
-use barracuda::device::{TensorContext, WgpuDevice};
+use barracuda::device::{GpuDriverProfile, TensorContext, WgpuDevice};
 use std::sync::Arc;
 
 /// GPU context with FP64 support for science workloads.
 ///
 /// Wraps a wgpu device with `SHADER_F64` + `ToadStool`'s `TensorContext`
 /// for batched dispatch and buffer pooling. All compute goes through
-/// ToadStool primitives via [`to_wgpu_device`](Self::to_wgpu_device).
+/// `ToadStool` primitives via [`to_wgpu_device`](Self::to_wgpu_device).
+///
+/// `ToadStool` primitives used:
+/// - `FusedMapReduceF64` — Shannon, Simpson, alpha diversity
+/// - `BrayCurtisF64` — condensed distance matrices
+/// - `BatchedEighGpu` — `PCoA` eigendecomposition
+/// - `GemmF64` — batch spectral cosine similarity
+/// - `KrigingF64` — spatial interpolation
+/// - `VarianceF64` / `CorrelationF64` / `CovarianceF64` / `WeightedDotF64`
+///
+/// Driver-specific capabilities (NVK workarounds, eigensolve strategy,
+/// latency model) are available via [`driver_profile`](Self::driver_profile).
 pub struct GpuF64 {
     /// GPU adapter name (e.g., "NVIDIA RTX 4070").
     pub adapter_name: String,
@@ -31,6 +42,7 @@ pub struct GpuF64 {
     pub has_f64: bool,
     wgpu_device: Arc<WgpuDevice>,
     tensor_ctx: Arc<TensorContext>,
+    driver_profile: GpuDriverProfile,
 }
 
 impl GpuF64 {
@@ -90,7 +102,7 @@ impl GpuF64 {
                             .min(16),
                         ..wgpu::Limits::default()
                     },
-                    memory_hints: Default::default(),
+                    memory_hints: wgpu::MemoryHints::default(),
                 },
                 None,
             )
@@ -102,12 +114,14 @@ impl GpuF64 {
 
         let wgpu_device = Arc::new(WgpuDevice::from_existing_simple(device, queue));
         let tensor_ctx = Arc::new(TensorContext::new(wgpu_device.clone()));
+        let driver_profile = GpuDriverProfile::from_device(&wgpu_device);
 
         Ok(Self {
             adapter_name: info.name.clone(),
             has_f64,
             wgpu_device,
             tensor_ctx,
+            driver_profile,
         })
     }
 
@@ -123,9 +137,39 @@ impl GpuF64 {
         &self.tensor_ctx
     }
 
+    /// `ToadStool` driver profile for this GPU.
+    ///
+    /// Provides driver-specific capabilities: f64 workarounds, optimal
+    /// eigensolve strategy, latency model for `WgslOptimizer`.
+    #[must_use]
+    pub const fn driver_profile(&self) -> &GpuDriverProfile {
+        &self.driver_profile
+    }
+
+    /// Whether this GPU's driver needs f64 `exp`/`log` polyfills.
+    #[must_use]
+    pub fn needs_f64_workaround(&self) -> bool {
+        self.driver_profile.needs_exp_f64_workaround()
+            || self.driver_profile.needs_log_f64_workaround()
+    }
+
     /// Print GPU capabilities to stdout.
     pub fn print_info(&self) {
         println!("  GPU: {}", self.adapter_name);
         println!("  SHADER_F64: {}", if self.has_f64 { "YES" } else { "NO" });
+        println!("  Arch: {:?}", self.driver_profile.arch);
+        println!("  Driver: {:?}", self.driver_profile.driver);
+        println!(
+            "  f64 workarounds: exp={}, log={}",
+            self.driver_profile.needs_exp_f64_workaround(),
+            self.driver_profile.needs_log_f64_workaround()
+        );
     }
 }
+
+/// Minimum element count for GPU dispatch to outperform CPU.
+///
+/// Below this threshold, GPU kernel launch overhead dominates.
+/// Measured on RTX 4070 for `FusedMapReduceF64` (Shannon/Simpson).
+/// Callers should fall back to the CPU path when `n < GPU_DISPATCH_THRESHOLD`.
+pub const GPU_DISPATCH_THRESHOLD: usize = 10_000;

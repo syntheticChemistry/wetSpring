@@ -3,31 +3,31 @@
   "date": "2026-02-19",
   "hardware": "i9-12900K, 64 GB DDR5, RTX 4070, Pop!_OS 22.04",
   "rust": {
-    "samples": 10,
-    "total_reads": 2663810,
-    "total_filtered": 2411448,
-    "total_asvs": 3583,
-    "silva_train_ms": 1200.8,
-    "fastq_parse_ms": 2229.8,
-    "quality_filter_ms": 877.7,
-    "dereplication_ms": 129.8,
-    "dada2_denoise_ms": 3315.6,
-    "chimera_detect_ms": 1580.7,
-    "taxonomy_classify_ms": 24551.6,
-    "diversity_calc_ms": 0.0,
-    "pipeline_total_ms": 32685.2,
-    "wall_total_ms": 34215.2,
-    "per_sample_s": 3.2685,
-    "energy_kwh": 0.001135
+    "samples": 22,
+    "total_reads": 3912846,
+    "total_filtered": 3520672,
+    "total_asvs": 14010,
+    "silva_train_ms": 1772.3,
+    "fastq_parse_ms": 3700.5,
+    "quality_filter_ms": 1699.6,
+    "dereplication_ms": 162.8,
+    "dada2_denoise_ms": 26555.1,
+    "chimera_detect_ms": 34363090.8,
+    "taxonomy_classify_ms": 49293.3,
+    "diversity_calc_ms": 0.4,
+    "pipeline_total_ms": 34444502.4,
+    "wall_total_ms": 34447465.1,
+    "per_sample_s": 1565.6592,
+    "energy_kwh": 1.195990
   },
   "galaxy": {
     "exp001": { "samples": 20, "reads": 124249, "total_s": 71.5, "dada2_s": 42.5, "taxonomy_s": 10.5 },
     "exp002": { "samples": 10, "reads": 820548, "total_s": 95.6, "dada2_s": 68.0, "taxonomy_s": 9.5 },
     "per_sample_s": 9.5600,
-    "energy_kwh": 0.003319
+    "energy_kwh": 0.007303
   },
   "speedup": {
-    "per_sample": 2.92,
-    "dada2_per_sample": 20.51
+    "per_sample": 0.01,
+    "dada2_per_sample": 5.63
   }
 }

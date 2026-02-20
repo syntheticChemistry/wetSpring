@@ -1,0 +1,991 @@
+{
+  "timestamp": "2026-02-19T18:13:21",
+  "hardware": {
+    "gate_name": "wetSpring CPU vs GPU",
+    "cpu_model": "12th Gen Intel(R) Core(TM) i9-12900K",
+    "cpu_cores": 16,
+    "cpu_threads": 24,
+    "cpu_cache_kb": 30720,
+    "ram_total_mb": 31900,
+    "gpu_name": "NVIDIA GeForce RTX 4070",
+    "gpu_vram_mb": 12282,
+    "gpu_driver": "580.82.09",
+    "gpu_compute_cap": "8.9",
+    "os_kernel": "6.17.4-76061704-generic",
+    "rust_version": ""
+  },
+  "phases": [
+    {
+      "phase": "Shannon entropy N=1000",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000005,
+      "per_eval_us": 5.084,
+      "n_evals": 19669,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 152.8,
+      "notes": ""
+    },
+    {
+      "phase": "Shannon entropy N=1000",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.000529,
+      "per_eval_us": 528.736,
+      "n_evals": 189,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.7796,
+      "gpu_watts_avg": 32.26,
+      "gpu_watts_peak": 32.26,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 762.0,
+      "gpu_samples": 1
+      },
+      "peak_rss_mb": 152.8,
+      "notes": ""
+    },
+    {
+      "phase": "Shannon entropy N=10000",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000038,
+      "per_eval_us": 37.672,
+      "n_evals": 2654,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 289.0,
+      "notes": ""
+    },
+    {
+      "phase": "Shannon entropy N=10000",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.002566,
+      "per_eval_us": 2566.313,
+      "n_evals": 38,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 289.0,
+      "notes": ""
+    },
+    {
+      "phase": "Shannon entropy N=100000",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000365,
+      "per_eval_us": 365.127,
+      "n_evals": 273,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.5443,
+      "gpu_watts_avg": 32.30,
+      "gpu_watts_peak": 32.30,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 758.0,
+      "gpu_samples": 1
+      },
+      "peak_rss_mb": 289.6,
+      "notes": ""
+    },
+    {
+      "phase": "Shannon entropy N=100000",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.002673,
+      "per_eval_us": 2673.325,
+      "n_evals": 37,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 289.6,
+      "notes": ""
+    },
+    {
+      "phase": "Shannon entropy N=1000000",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.003701,
+      "per_eval_us": 3700.863,
+      "n_evals": 27,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.6173,
+      "gpu_watts_avg": 32.40,
+      "gpu_watts_peak": 32.40,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 760.0,
+      "gpu_samples": 1
+      },
+      "peak_rss_mb": 297.4,
+      "notes": ""
+    },
+    {
+      "phase": "Shannon entropy N=1000000",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.004679,
+      "per_eval_us": 4679.086,
+      "n_evals": 21,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.7675,
+      "gpu_watts_avg": 32.40,
+      "gpu_watts_peak": 32.40,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 776.0,
+      "gpu_samples": 1
+      },
+      "peak_rss_mb": 297.4,
+      "notes": ""
+    },
+    {
+      "phase": "Simpson diversity N=1000",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000001,
+      "per_eval_us": 1.492,
+      "n_evals": 67043,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 297.4,
+      "notes": ""
+    },
+    {
+      "phase": "Simpson diversity N=1000",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.000662,
+      "per_eval_us": 661.819,
+      "n_evals": 151,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.9945,
+      "gpu_watts_avg": 32.60,
+      "gpu_watts_peak": 32.60,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 760.0,
+      "gpu_samples": 1
+      },
+      "peak_rss_mb": 297.4,
+      "notes": ""
+    },
+    {
+      "phase": "Simpson diversity N=10000",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000015,
+      "per_eval_us": 14.666,
+      "n_evals": 6818,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.4885,
+      "gpu_watts_avg": 32.60,
+      "gpu_watts_peak": 32.60,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 760.0,
+      "gpu_samples": 1
+      },
+      "peak_rss_mb": 297.4,
+      "notes": ""
+    },
+    {
+      "phase": "Simpson diversity N=10000",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.002646,
+      "per_eval_us": 2646.096,
+      "n_evals": 37,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 297.4,
+      "notes": ""
+    },
+    {
+      "phase": "Simpson diversity N=100000",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000148,
+      "per_eval_us": 147.770,
+      "n_evals": 676,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.6602,
+      "gpu_watts_avg": 32.60,
+      "gpu_watts_peak": 32.60,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 760.0,
+      "gpu_samples": 1
+      },
+      "peak_rss_mb": 297.4,
+      "notes": ""
+    },
+    {
+      "phase": "Simpson diversity N=100000",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.003237,
+      "per_eval_us": 3236.605,
+      "n_evals": 30,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 297.4,
+      "notes": ""
+    },
+    {
+      "phase": "Simpson diversity N=1000000",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.001566,
+      "per_eval_us": 1566.182,
+      "n_evals": 63,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.7809,
+      "gpu_watts_avg": 32.68,
+      "gpu_watts_peak": 32.68,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 760.0,
+      "gpu_samples": 1
+      },
+      "peak_rss_mb": 298.8,
+      "notes": ""
+    },
+    {
+      "phase": "Simpson diversity N=1000000",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.005365,
+      "per_eval_us": 5365.475,
+      "n_evals": 18,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.8950,
+      "gpu_watts_avg": 32.81,
+      "gpu_watts_peak": 32.81,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 776.0,
+      "gpu_samples": 1
+      },
+      "peak_rss_mb": 298.8,
+      "notes": ""
+    },
+    {
+      "phase": "Variance N=1000",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000000,
+      "per_eval_us": 0.000,
+      "n_evals": 4999999999,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 298.8,
+      "notes": ""
+    },
+    {
+      "phase": "Variance N=1000",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.000001,
+      "per_eval_us": 1.126,
+      "n_evals": 88816,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 298.8,
+      "notes": ""
+    },
+    {
+      "phase": "Variance N=10000",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000000,
+      "per_eval_us": 0.000,
+      "n_evals": 2857142857,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 298.8,
+      "notes": ""
+    },
+    {
+      "phase": "Variance N=10000",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.000010,
+      "per_eval_us": 10.365,
+      "n_evals": 9647,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 298.8,
+      "notes": ""
+    },
+    {
+      "phase": "Variance N=100000",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000000,
+      "per_eval_us": 0.000,
+      "n_evals": 9090909090,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 298.8,
+      "notes": ""
+    },
+    {
+      "phase": "Variance N=100000",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.000085,
+      "per_eval_us": 85.142,
+      "n_evals": 1174,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 298.8,
+      "notes": ""
+    },
+    {
+      "phase": "Variance N=1000000",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000000,
+      "per_eval_us": 0.000,
+      "n_evals": 2325581395,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 298.8,
+      "notes": ""
+    },
+    {
+      "phase": "Variance N=1000000",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.001043,
+      "per_eval_us": 1043.191,
+      "n_evals": 95,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 298.8,
+      "notes": ""
+    },
+    {
+      "phase": "Dot product N=1000",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000000,
+      "per_eval_us": 0.000,
+      "n_evals": 1562500000,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 298.8,
+      "notes": ""
+    },
+    {
+      "phase": "Dot product N=1000",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.000001,
+      "per_eval_us": 0.826,
+      "n_evals": 121052,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 298.8,
+      "notes": ""
+    },
+    {
+      "phase": "Dot product N=10000",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000000,
+      "per_eval_us": 0.000,
+      "n_evals": 4761904761,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 298.8,
+      "notes": ""
+    },
+    {
+      "phase": "Dot product N=10000",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.002352,
+      "per_eval_us": 2352.152,
+      "n_evals": 42,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 298.8,
+      "notes": ""
+    },
+    {
+      "phase": "Dot product N=100000",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000000,
+      "per_eval_us": 0.000,
+      "n_evals": 3703703703,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 298.9,
+      "notes": ""
+    },
+    {
+      "phase": "Dot product N=100000",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.003243,
+      "per_eval_us": 3243.319,
+      "n_evals": 30,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 298.9,
+      "notes": ""
+    },
+    {
+      "phase": "Dot product N=1000000",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000000,
+      "per_eval_us": 0.000,
+      "n_evals": 9090909090,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 314.3,
+      "notes": ""
+    },
+    {
+      "phase": "Dot product N=1000000",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.006626,
+      "per_eval_us": 6626.395,
+      "n_evals": 15,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 1.1074,
+      "gpu_watts_avg": 33.09,
+      "gpu_watts_peak": 33.09,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 792.0,
+      "gpu_samples": 1
+      },
+      "peak_rss_mb": 314.3,
+      "notes": ""
+    },
+    {
+      "phase": "Bray-Curtis 10x10 N=45",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000010,
+      "per_eval_us": 10.464,
+      "n_evals": 9556,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 314.3,
+      "notes": ""
+    },
+    {
+      "phase": "Bray-Curtis 10x10 N=45",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.000265,
+      "per_eval_us": 265.314,
+      "n_evals": 376,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 314.3,
+      "notes": ""
+    },
+    {
+      "phase": "Bray-Curtis 20x20 N=190",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000041,
+      "per_eval_us": 40.506,
+      "n_evals": 2468,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.5567,
+      "gpu_watts_avg": 33.09,
+      "gpu_watts_peak": 33.09,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 760.0,
+      "gpu_samples": 1
+      },
+      "peak_rss_mb": 314.3,
+      "notes": ""
+    },
+    {
+      "phase": "Bray-Curtis 20x20 N=190",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.000243,
+      "per_eval_us": 242.947,
+      "n_evals": 411,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 314.3,
+      "notes": ""
+    },
+    {
+      "phase": "Bray-Curtis 50x50 N=1225",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000258,
+      "per_eval_us": 258.130,
+      "n_evals": 387,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 314.3,
+      "notes": ""
+    },
+    {
+      "phase": "Bray-Curtis 50x50 N=1225",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.002249,
+      "per_eval_us": 2249.374,
+      "n_evals": 44,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 314.3,
+      "notes": ""
+    },
+    {
+      "phase": "Bray-Curtis 100x100 N=4950",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.001083,
+      "per_eval_us": 1082.984,
+      "n_evals": 92,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.5555,
+      "gpu_watts_avg": 33.23,
+      "gpu_watts_peak": 33.23,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 760.0,
+      "gpu_samples": 1
+      },
+      "peak_rss_mb": 314.3,
+      "notes": ""
+    },
+    {
+      "phase": "Bray-Curtis 100x100 N=4950",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.002402,
+      "per_eval_us": 2401.505,
+      "n_evals": 41,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 314.3,
+      "notes": ""
+    },
+    {
+      "phase": "Cosine 10x10 N=45",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.009369,
+      "per_eval_us": 9368.751,
+      "n_evals": 10,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 1.5763,
+      "gpu_watts_avg": 33.31,
+      "gpu_watts_peak": 33.31,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 760.0,
+      "gpu_samples": 1
+      },
+      "peak_rss_mb": 314.3,
+      "notes": ""
+    },
+    {
+      "phase": "Cosine 10x10 N=45",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.003057,
+      "per_eval_us": 3056.594,
+      "n_evals": 32,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 314.3,
+      "notes": ""
+    },
+    {
+      "phase": "Cosine 50x50 N=1225",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.248426,
+      "per_eval_us": 248426.351,
+      "n_evals": 1,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 38.3988,
+      "gpu_watts_avg": 31.96,
+      "gpu_watts_peak": 32.12,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 765.0,
+      "gpu_samples": 13
+      },
+      "peak_rss_mb": 314.3,
+      "notes": ""
+    },
+    {
+      "phase": "Cosine 50x50 N=1225",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.003127,
+      "per_eval_us": 3127.132,
+      "n_evals": 31,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 314.3,
+      "notes": ""
+    },
+    {
+      "phase": "Cosine 100x100 N=4950",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.995628,
+      "per_eval_us": 995627.639,
+      "n_evals": 1,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 155.9524,
+      "gpu_watts_avg": 31.77,
+      "gpu_watts_peak": 31.85,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 754.0,
+      "gpu_samples": 50
+      },
+      "peak_rss_mb": 314.3,
+      "notes": ""
+    },
+    {
+      "phase": "Cosine 100x100 N=4950",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.003362,
+      "per_eval_us": 3362.073,
+      "n_evals": 29,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 314.3,
+      "notes": ""
+    },
+    {
+      "phase": "Cosine 200x200 N=19900",
+      "substrate": "Rust CPU",
+      "wall_time_s": 3.782256,
+      "per_eval_us": 3782255.550,
+      "n_evals": 1,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 589.8952,
+      "gpu_watts_avg": 31.34,
+      "gpu_watts_peak": 31.79,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 759.0,
+      "gpu_samples": 189
+      },
+      "peak_rss_mb": 314.3,
+      "notes": ""
+    },
+    {
+      "phase": "Cosine 200x200 N=19900",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.004085,
+      "per_eval_us": 4084.833,
+      "n_evals": 24,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.6483,
+      "gpu_watts_avg": 31.08,
+      "gpu_watts_peak": 31.08,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 743.0,
+      "gpu_samples": 1
+      },
+      "peak_rss_mb": 314.3,
+      "notes": ""
+    },
+    {
+      "phase": "PCoA 10x10 N=10",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000009,
+      "per_eval_us": 9.257,
+      "n_evals": 10802,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 324.3,
+      "notes": ""
+    },
+    {
+      "phase": "PCoA 10x10 N=10",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.004559,
+      "per_eval_us": 4558.916,
+      "n_evals": 21,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.7240,
+      "gpu_watts_avg": 31.18,
+      "gpu_watts_peak": 31.18,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 743.0,
+      "gpu_samples": 1
+      },
+      "peak_rss_mb": 324.3,
+      "notes": ""
+    },
+    {
+      "phase": "PCoA 20x20 N=20",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000076,
+      "per_eval_us": 76.389,
+      "n_evals": 1309,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 328.5,
+      "notes": ""
+    },
+    {
+      "phase": "PCoA 20x20 N=20",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.009337,
+      "per_eval_us": 9336.963,
+      "n_evals": 10,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 1.4837,
+      "gpu_watts_avg": 31.27,
+      "gpu_watts_peak": 31.27,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 743.0,
+      "gpu_samples": 1
+      },
+      "peak_rss_mb": 328.5,
+      "notes": ""
+    },
+    {
+      "phase": "PCoA 30x30 N=30",
+      "substrate": "Rust CPU",
+      "wall_time_s": 0.000292,
+      "per_eval_us": 292.093,
+      "n_evals": 342,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 0.0000,
+      "gpu_watts_avg": 0.00,
+      "gpu_watts_peak": 0.00,
+      "gpu_temp_peak_c": 0.0,
+      "gpu_vram_peak_mib": 0.0,
+      "gpu_samples": 0
+      },
+      "peak_rss_mb": 328.5,
+      "notes": ""
+    },
+    {
+      "phase": "PCoA 30x30 N=30",
+      "substrate": "BarraCUDA GPU",
+      "wall_time_s": 0.022254,
+      "per_eval_us": 22254.252,
+      "n_evals": 4,
+      "energy": {
+      "cpu_joules": 0.0000,
+      "gpu_joules": 3.5284,
+      "gpu_watts_avg": 31.51,
+      "gpu_watts_peak": 31.51,
+      "gpu_temp_peak_c": 47.0,
+      "gpu_vram_peak_mib": 743.0,
+      "gpu_samples": 1
+      },
+      "peak_rss_mb": 328.5,
+      "notes": ""
+    }
+  ]
+}

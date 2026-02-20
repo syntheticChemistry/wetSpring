@@ -258,7 +258,7 @@ mod tests {
     #[test]
     fn empty_spectra() {
         let result = cosine_similarity(&[], &[], &[100.0], &[50.0], 0.5);
-        assert_eq!(result.score, 0.0);
+        assert!(result.score.abs() < f64::EPSILON);
     }
 
     #[test]

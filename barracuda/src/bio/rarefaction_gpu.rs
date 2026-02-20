@@ -18,7 +18,7 @@
 //! # References
 //!
 //! - Gotelli & Colwell (2001). "Quantifying biodiversity."
-//! - ToadStool `prng_xoshiro` for future full-GPU random sampling.
+//! - `ToadStool` `prng_xoshiro` for future full-GPU random sampling.
 
 use crate::bio::diversity;
 use crate::error::{Error, Result};
@@ -87,7 +87,15 @@ fn require_f64(gpu: &GpuF64) -> Result<()> {
 ///
 /// For each bootstrap replicate, subsamples `depth` reads from the community
 /// and computes diversity metrics on GPU.
-#[allow(clippy::cast_precision_loss)]
+///
+/// # Errors
+///
+/// Returns an error if GPU dispatch fails or the device lacks f64 support.
+#[allow(
+    clippy::cast_possible_truncation,
+    clippy::cast_precision_loss,
+    clippy::cast_sign_loss
+)]
 pub fn rarefaction_bootstrap_gpu(
     gpu: &GpuF64,
     counts: &[f64],
@@ -96,9 +104,7 @@ pub fn rarefaction_bootstrap_gpu(
     require_f64(gpu)?;
 
     let total: f64 = counts.iter().sum();
-    let depth = params
-        .depth
-        .unwrap_or_else(|| total as usize);
+    let depth = params.depth.unwrap_or(total as usize);
 
     if counts.is_empty() || depth == 0 {
         return Ok(RarefactionResult {
@@ -171,7 +177,11 @@ pub fn rarefaction_bootstrap_gpu(
 }
 
 /// Subsample a community to the given depth using multinomial sampling.
-#[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+#[allow(
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss
+)]
 fn subsample_community(counts: &[f64], depth: usize, rng: &mut u64) -> Vec<f64> {
     let total: f64 = counts.iter().sum();
     if total <= 0.0 {
@@ -190,11 +200,15 @@ fn subsample_community(counts: &[f64], depth: usize, rng: &mut u64) -> Vec<f64> 
 
     for _ in 0..depth {
         // Generate uniform random in [0, 1)
-        *rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1442695040888963407);
+        *rng = rng
+            .wrapping_mul(6_364_136_223_846_793_005)
+            .wrapping_add(1_442_695_040_888_963_407);
         let u = (*rng >> 11) as f64 / (1_u64 << 53) as f64;
 
         // Binary search for the species
-        let idx = match cumulative.binary_search_by(|p| p.partial_cmp(&u).unwrap_or(std::cmp::Ordering::Equal)) {
+        let idx = match cumulative
+            .binary_search_by(|p| p.partial_cmp(&u).unwrap_or(std::cmp::Ordering::Equal))
+        {
             Ok(i) => i,
             Err(i) => i.min(counts.len() - 1),
         };
@@ -205,7 +219,11 @@ fn subsample_community(counts: &[f64], depth: usize, rng: &mut u64) -> Vec<f64> 
 }
 
 /// Compute 95% confidence interval from bootstrap samples.
-#[allow(clippy::cast_precision_loss)]
+#[allow(
+    clippy::cast_possible_truncation,
+    clippy::cast_precision_loss,
+    clippy::cast_sign_loss
+)]
 fn compute_ci(samples: &[f64]) -> BootstrapCi {
     if samples.is_empty() {
         return BootstrapCi {
@@ -240,7 +258,15 @@ fn compute_ci(samples: &[f64]) -> BootstrapCi {
 ///
 /// Rarefies each sample to the specified depth (or minimum total across samples)
 /// and computes diversity with bootstrap CIs.
-#[allow(clippy::cast_precision_loss)]
+///
+/// # Errors
+///
+/// Returns an error if GPU dispatch fails or the device lacks f64 support.
+#[allow(
+    clippy::cast_possible_truncation,
+    clippy::cast_precision_loss,
+    clippy::cast_sign_loss
+)]
 pub fn batch_rarefaction_gpu(
     gpu: &GpuF64,
     samples: &[Vec<f64>],

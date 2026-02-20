@@ -44,6 +44,7 @@
 //! Python baseline → Rust validation (here) → GPU acceleration → sovereign pipeline
 //! ```
 
+pub mod bench;
 pub mod bio;
 pub mod encoding;
 pub mod error;

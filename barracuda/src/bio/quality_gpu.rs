@@ -20,11 +20,11 @@
 //!   └── CPU: apply trim results to create filtered FastqRecords
 //! ```
 //!
-//! # ToadStool absorption path
+//! # `ToadStool` absorption path
 //!
 //! - `ParallelFilter<T>` — per-element parallel scan + filter primitive
-//! - Pre-compiled pipeline cache (like GemmCached)
-//! - BufferPool integration for quality data buffers
+//! - Pre-compiled pipeline cache (like `GemmCached`)
+//! - `BufferPool` integration for quality data buffers
 
 use crate::bio::quality::{self, FilterStats, QualityParams};
 use crate::error::{Error, Result};
@@ -49,7 +49,7 @@ struct QfParams {
     _pad: u32,
 }
 
-/// Pre-compiled quality filter pipeline with BufferPool integration.
+/// Pre-compiled quality filter pipeline with `BufferPool` integration.
 pub struct QualityFilterCached {
     device: Arc<WgpuDevice>,
     ctx: Arc<TensorContext>,
@@ -87,17 +87,16 @@ impl QualityFilterCached {
                 push_constant_ranges: &[],
             });
 
-        let pipeline =
-            device
-                .device()
-                .create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
-                    label: Some("QualityFilter"),
-                    layout: Some(&pl),
-                    module: &shader,
-                    entry_point: "quality_filter",
-                    cache: None,
-                    compilation_options: Default::default(),
-                });
+        let pipeline = device
+            .device()
+            .create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
+                label: Some("QualityFilter"),
+                layout: Some(&pl),
+                module: &shader,
+                entry_point: "quality_filter",
+                cache: None,
+                compilation_options: wgpu::PipelineCompilationOptions::default(),
+            });
 
         Self {
             device,
@@ -108,6 +107,11 @@ impl QualityFilterCached {
     }
 
     /// Run quality filtering on GPU. Returns (start, end) per read, or None for failed reads.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if GPU dispatch or readback fails.
+    #[allow(clippy::cast_possible_truncation)]
     pub fn execute(
         &self,
         reads: &[FastqRecord],
@@ -132,9 +136,7 @@ impl QualityFilterCached {
             _pad: 0,
         };
 
-        let params_buf = self
-            .device
-            .create_uniform_buffer("QF Params", &gpu_params);
+        let params_buf = self.device.create_uniform_buffer("QF Params", &gpu_params);
 
         let qual_buf = pool.acquire_pooled(packed_quals.len() * 4);
         self.device
@@ -222,6 +224,10 @@ impl QualityFilterCached {
 }
 
 /// Quality-filter reads using GPU-accelerated quality computation.
+///
+/// # Errors
+///
+/// Returns an error if the device lacks `SHADER_F64` or GPU dispatch fails.
 pub fn filter_reads_gpu(
     gpu: &GpuF64,
     reads: &[FastqRecord],
@@ -263,6 +269,7 @@ pub fn filter_reads_gpu(
     }
 }
 
+#[allow(clippy::cast_possible_truncation)]
 fn pack_quality_data(reads: &[FastqRecord]) -> (Vec<u32>, Vec<u32>, Vec<u32>) {
     let mut offsets = Vec::with_capacity(reads.len());
     let mut lengths = Vec::with_capacity(reads.len());
@@ -275,7 +282,7 @@ fn pack_quality_data(reads: &[FastqRecord]) -> (Vec<u32>, Vec<u32>, Vec<u32>) {
     }
 
     let total_bytes = byte_offset as usize;
-    let n_words = (total_bytes + 3) / 4;
+    let n_words = total_bytes.div_ceil(4);
     let mut packed = vec![0u32; n_words.max(1)];
 
     let mut pos = 0usize;
@@ -283,7 +290,7 @@ fn pack_quality_data(reads: &[FastqRecord]) -> (Vec<u32>, Vec<u32>, Vec<u32>) {
         for &q in &read.quality {
             let word_idx = pos / 4;
             let byte_pos = pos % 4;
-            packed[word_idx] |= (q as u32) << (byte_pos * 8);
+            packed[word_idx] |= u32::from(q) << (byte_pos * 8);
             pos += 1;
         }
     }
@@ -291,7 +298,7 @@ fn pack_quality_data(reads: &[FastqRecord]) -> (Vec<u32>, Vec<u32>, Vec<u32>) {
     (packed, offsets, lengths)
 }
 
-fn bgl_entry(binding: u32, ty: wgpu::BufferBindingType) -> wgpu::BindGroupLayoutEntry {
+const fn bgl_entry(binding: u32, ty: wgpu::BufferBindingType) -> wgpu::BindGroupLayoutEntry {
     wgpu::BindGroupLayoutEntry {
         binding,
         visibility: wgpu::ShaderStages::COMPUTE,
