@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 2026
-**Status:** Validation study complete — 645/645 checks, 430 tests
+**Status:** Validation study complete — 668/668 checks, 430 tests
 **License:** AGPL-3.0-or-later
 
 ---
@@ -35,7 +35,7 @@
 
 | Claim | Evidence |
 |-------|----------|
-| Rust matches Python across 22 experiments | 519/519 CPU checks pass |
+| Rust matches Python across 22 experiments | 542/542 CPU checks pass |
 | GPU matches CPU (16S pipeline, diversity) | 126/126 GPU checks pass |
 | 926× spectral cosine GPU speedup | Exp016 benchmark |
 | 2.45× full 16S pipeline GPU speedup | Exp015/016 benchmark |
