@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 2026
-**Status:** Validation study complete — 1,235/1,235 checks, 465 tests, 50 experiments
+**Status:** Validation study complete — 1,501/1,501 checks, 582 tests, 63 experiments
 **License:** AGPL-3.0-or-later
 
 ---
@@ -26,8 +26,11 @@
 3. Can stochastic and dynamical systems models (ODE, Gillespie SSA) be ported
    from Python (scipy/numpy) to Rust with analytical convergence guarantees?
 
-4. Can sovereign ML (decision tree inference) reproduce Python sklearn
-   predictions with 100% parity, removing the Python runtime dependency?
+4. Can sovereign ML (decision tree, Random Forest, GBM inference) reproduce
+   Python sklearn predictions with 100% parity, removing the Python runtime?
+
+5. Is the math truly substrate-independent — does the same algorithm produce
+   identical results on CPU, GPU, and (eventually) NPU?
 
 ---
 
@@ -35,11 +38,12 @@
 
 | Claim | Evidence |
 |-------|----------|
-| Rust matches Python across 50 experiments | 1,035/1,035 CPU checks pass |
-| GPU matches CPU (pipeline, diversity, bio, ODE, HMM) | 200/200 GPU checks pass |
-| BarraCUDA CPU parity across 18 domains | 84/84 cross-domain checks pass |
+| Rust matches Python across 63 experiments | 1,241/1,241 CPU checks pass |
+| GPU matches CPU across all promoted domains | 260/260 GPU checks pass |
+| BarraCUDA CPU parity across 25 domains | 157/157 cross-domain checks pass |
 | 926× spectral cosine GPU speedup | Exp016 benchmark |
 | 2.45× full 16S pipeline GPU speedup | Exp015/016 benchmark |
+| 22.5× overall Rust vs Python (25 domains) | Exp059, peak 625× (SW) |
 | ODE (RK4) matches scipy across 6 models | Exp020/023/024/025/027/030 |
 | Gillespie SSA converges to analytical | Exp022, 13/13 checks |
 | HMM log-space (forward/Viterbi/posterior) | Exp026, 21/21 checks |
@@ -57,6 +61,17 @@
 | Phage defense dynamics match scipy | Exp030, 12/12 checks |
 | Robinson-Foulds matches dendropy exactly | Exp021, 23/23 checks |
 | Decision tree inference 100% Python parity | Exp008, 744/744 predictions |
+| Rare biosphere diversity (Anderson 2015) | Exp051, 35/35 checks |
+| Viral metagenomics dN/dS (Anderson 2014) | Exp052, 22/22 checks |
+| Sulfur phylogenomics molecular clock (Mateos 2023) | Exp053, 15/15 checks |
+| Phosphorus phylogenomics (Boden 2024) | Exp054, 13/13 checks |
+| Population genomics ANI/SNP (Anderson 2017) | Exp055, 24/24 checks |
+| Pangenomics Heap's law + enrichment (Moulana 2020) | Exp056, 24/24 checks |
+| GPU Track 1c: ANI + SNP + pangenome + dN/dS | Exp058, 27/27 GPU checks |
+| Random Forest ensemble (5 trees, 3 classes) | Exp061, 13/13 CPU checks |
+| GBM inference (binary + multi-class) | Exp062, 16/16 CPU checks |
+| GPU RF batch inference (SoA layout) | Exp063, 13/13 GPU checks |
+| metalForge cross-substrate CPU↔GPU parity | Exp060, 20/20 checks |
 
 ---
 
@@ -102,7 +117,7 @@
 | 037 | PhyloNet-HMM | Introgression discordance detection |
 | 038 | SATe pipeline | Divide-and-conquer alignment (Liu 2009) |
 
-### GPU Composition & Evolution (Phase 8)
+### GPU Composition & Evolution
 
 | Exp | Method | What We Prove |
 |-----|--------|---------------|
@@ -114,6 +129,29 @@
 | 048 | CPU vs GPU Benchmark | Felsenstein + Bootstrap + HMM timing (6/6) |
 | 049 | GPU ODE Parameter Sweep | 64-batch QS sweep via local WGSL (7/7) |
 | 050 | GPU Bifurcation Eigenvalues | Jacobian → BatchedEighGpu, bit-exact (5/5) |
+
+### Track 1c: Deep-Sea Metagenomics & Microbial Evolution (R. Anderson)
+
+| Exp | Paper | What We Prove |
+|-----|-------|---------------|
+| 051 | Anderson 2015 (rare biosphere) | Diversity, rarefaction, PCoA, rare lineage detection |
+| 052 | Anderson 2014 (viral metagenomics) | Community diversity, dN/dS (Nei-Gojobori 1986) |
+| 053 | Mateos 2023 (sulfur phylogenomics) | Molecular clock, DTL reconciliation, Robinson-Foulds |
+| 054 | Boden 2024 (phosphorus phylogenomics) | Cross-validation of clock/reconciliation pipeline |
+| 055 | Anderson 2017 (population genomics) | ANI, SNP calling, allele frequency, population pipeline |
+| 056 | Moulana 2020 (pangenomics) | Core/accessory/unique genes, Heap's law, enrichment, BH FDR |
+
+### GPU Track 1c + Cross-Substrate + ML Ensembles
+
+| Exp | Method | What We Prove |
+|-----|--------|---------------|
+| 057 | BarraCUDA CPU v4 (Track 1c) | 44/44 across 5 new domains, pure Rust math |
+| 058 | GPU Track 1c promotion | 27/27 ANI + SNP + pangenome + dN/dS GPU parity |
+| 059 | 25-domain Rust vs Python | 22.5× overall speedup, peak 625× |
+| 060 | metalForge cross-substrate | 20/20 CPU↔GPU parity for Track 1c |
+| 061 | Random Forest inference | 13/13 ensemble majority-vote (5 trees, 3 classes) |
+| 062 | GBM inference | 16/16 binary + multi-class (sigmoid + softmax) |
+| 063 | GPU RF batch inference | 13/13 GPU SoA layout (one thread per sample×tree) |
 
 ### Track 2: Analytical Chemistry (LC-MS, PFAS)
 
@@ -130,29 +168,22 @@
 
 ---
 
-## R. Anderson Extension: Deep-Sea Metagenomics & Microbial Evolution
+## R. Anderson Track 1c: Deep-Sea Metagenomics — COMPLETE
 
 Rika Anderson (Carleton College) studies microbial and viral evolution in deep-sea
-hydrothermal vents — her computational pipelines (MAGs, pangenomics, SNP analysis,
-tree reconciliation, viral metagenomics) are exactly what wetSpring's sovereign
-Rust pipeline validates.
+hydrothermal vents. All 6 papers reproduced (Exp051-056), validating 133 checks
+across 5 new sovereign Rust modules:
 
-Key connections:
-- **Pangenomics**: Moulana, Anderson et al. (2020) — gene gain/loss under geochemical
-  constraint. wetSpring's diversity/alignment primitives directly applicable.
-- **Enzyme evolution**: Mateos, Anderson et al. (2023 *Science Advances*) — tracing
-  sulfur-cycling enzymes across 3+ billion years using phylogenomics and tree
-  reconciliation. Pipeline uses the same bioinformatics methods wetSpring validates.
-- **Viral ecology**: Anderson et al. (2014) — phage-host interactions in vent systems.
-  Connects to Cahill (algae pond phage) and Waters (phage defense deaminase, Exp030).
-- **Rare biosphere**: Anderson et al. (2015) — when does a microbial lineage constitute
-  signal vs. sequencing noise? Directly extends groundSpring Exp004 and wetSpring's
-  rarefaction analysis.
+| Module | Algorithm | Paper |
+|--------|-----------|-------|
+| `bio::dnds` | Nei-Gojobori 1986 pairwise dN/dS | Anderson 2014, 2017 |
+| `bio::molecular_clock` | Strict/relaxed clock, calibration, CV | Mateos 2023, Boden 2024 |
+| `bio::ani` | Average Nucleotide Identity (pairwise + matrix) | Anderson 2017 |
+| `bio::snp` | SNP calling (ref/alt alleles, frequency, density) | Anderson 2017 |
+| `bio::pangenome` | Gene clustering, Heap's law, hypergeometric, BH FDR | Moulana 2020 |
 
-**Papers queued**: See `specs/PAPER_REVIEW_QUEUE.md` — Papers 24-29 (Track 1c).
-Reproduction targets use public genomes and metagenomes from NCBI — no wet lab
-required. wetSpring's sovereign pipeline (DADA2 + taxonomy + diversity + alignment)
-handles the bioinformatics.
+All 5 modules GPU-promoted (Exp058: 27/27 checks, 4 Track 1c WGSL shaders),
+cross-substrate validated (Exp060: 20/20 CPU↔GPU parity).
 
 ---
 
@@ -163,7 +194,7 @@ algorithms can be ported from interpreted languages to BarraCUDA/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD
 - **wetSpring** — Life science, analytical chemistry, environmental monitoring
-- **wateringHole** — Inter-primal coordination and semantic guidelines
+- **archive/handoffs/** — Fossil record of ToadStool handoffs (v1–v4)
 
 Springs follow the **Write → Absorb → Lean** pattern (pioneered by hotSpring):
 write and validate locally, hand off to ToadStool for absorption, then lean on
@@ -184,7 +215,7 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | asari | 1.13.1 | LC-MS feature extraction |
 | FindPFAS | (pyOpenMS) | PFAS suspect screening |
 | scipy | 1.11+ | Signal processing, ODE integration |
-| sklearn | 1.3+ | ML classification |
+| sklearn | 1.3+ | ML classification (DT, RF, GBM) |
 | dendropy | 5.0.8 | Phylogenetic tree analysis |
 | numpy | 1.24+ | Stochastic simulation |
 

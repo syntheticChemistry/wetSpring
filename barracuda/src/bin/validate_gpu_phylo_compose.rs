@@ -30,12 +30,12 @@ const PI: [f64; 4] = [0.25, 0.25, 0.25, 0.25];
 // ─── Tree ↔ PhyloTree conversion ─────────────────────────────────────────────
 
 struct TreeConversion {
-    phylo:            PhyloTree,
-    tip_likelihoods:  Vec<f64>,
+    phylo: PhyloTree,
+    tip_likelihoods: Vec<f64>,
     transition_probs: Vec<f64>,
-    n_sites:          usize,
-    n_nodes:          usize,
-    root_idx:         usize,
+    n_sites: usize,
+    n_nodes: usize,
+    root_idx: usize,
 }
 
 /// Pre-order traversal assigns indices and collects per-node data.
@@ -103,7 +103,12 @@ fn convert_tree(tree: &TreeNode, mu: f64) -> TreeConversion {
     );
 
     let n_nodes = left_child.len();
-    let n_sites = leaf_seqs.iter().filter(|s| !s.is_empty()).map(|s| s.len()).next().unwrap_or(0);
+    let n_sites = leaf_seqs
+        .iter()
+        .filter(|s| !s.is_empty())
+        .map(|s| s.len())
+        .next()
+        .unwrap_or(0);
 
     // Build levels (bottom-up): group by depth, reverse so deepest first
     let max_depth = depths.iter().copied().max().unwrap_or(0);
@@ -339,8 +344,18 @@ fn validate_felsenstein_parity(device: &Arc<WgpuDevice>, v: &mut Validator) {
         Ok(result) => {
             let gpu_ll = gpu_log_likelihood(&result, conv.root_idx);
             v.check("3-taxon: CPU ≈ GPU", cpu_ll, gpu_ll, 1e-6);
-            v.check("3-taxon: GPU LL finite", f64::from(gpu_ll.is_finite() as u8), 1.0, 0.0);
-            v.check("3-taxon: GPU LL negative", f64::from((gpu_ll < 0.0) as u8), 1.0, 0.0);
+            v.check(
+                "3-taxon: GPU LL finite",
+                f64::from(gpu_ll.is_finite() as u8),
+                1.0,
+                0.0,
+            );
+            v.check(
+                "3-taxon: GPU LL negative",
+                f64::from((gpu_ll < 0.0) as u8),
+                1.0,
+                0.0,
+            );
         }
         Err(e) => {
             println!("  [SKIP] FelsensteinGpu 3-taxon: {e}");
@@ -362,7 +377,12 @@ fn validate_felsenstein_parity(device: &Arc<WgpuDevice>, v: &mut Validator) {
         Ok(result) => {
             let gpu_ll5 = gpu_log_likelihood(&result, conv5.root_idx);
             v.check("5-taxon: CPU ≈ GPU", cpu_ll5, gpu_ll5, 1e-6);
-            v.check("5-taxon: GPU LL negative", f64::from((gpu_ll5 < 0.0) as u8), 1.0, 0.0);
+            v.check(
+                "5-taxon: GPU LL negative",
+                f64::from((gpu_ll5 < 0.0) as u8),
+                1.0,
+                0.0,
+            );
         }
         Err(e) => {
             println!("  [SKIP] FelsensteinGpu 5-taxon: {e}");
@@ -393,7 +413,13 @@ fn validate_gpu_bootstrap(device: &Arc<WgpuDevice>, v: &mut Validator) {
     for _ in 0..n_reps {
         let rep = bootstrap::resample_columns(&aln, &mut rng);
         let tips = rebuild_tips(&conv, &tree, &rep);
-        match pruner.prune(&conv.phylo, &tips, &conv.transition_probs, rep.n_sites, N_STATES) {
+        match pruner.prune(
+            &conv.phylo,
+            &tips,
+            &conv.transition_probs,
+            rep.n_sites,
+            N_STATES,
+        ) {
             Ok(result) => gpu_lls.push(gpu_log_likelihood(&result, conv.root_idx)),
             Err(e) => {
                 println!("  [SKIP] GPU bootstrap replicate failed: {e}");
@@ -406,18 +432,33 @@ fn validate_gpu_bootstrap(device: &Arc<WgpuDevice>, v: &mut Validator) {
     if gpu_ok {
         #[allow(clippy::cast_precision_loss)]
         {
-            v.check("Bootstrap: replicate count", gpu_lls.len() as f64, n_reps as f64, 0.0);
+            v.check(
+                "Bootstrap: replicate count",
+                gpu_lls.len() as f64,
+                n_reps as f64,
+                0.0,
+            );
         }
 
         let all_finite = gpu_lls.iter().all(|x| x.is_finite() && *x < 0.0);
-        v.check("Bootstrap: all GPU LLs finite & negative", f64::from(all_finite as u8), 1.0, 0.0);
+        v.check(
+            "Bootstrap: all GPU LLs finite & negative",
+            f64::from(all_finite as u8),
+            1.0,
+            0.0,
+        );
 
         // Per-replicate CPU ≈ GPU (within f64 tolerance)
         let mut max_diff = 0.0_f64;
         for (cpu, gpu) in cpu_lls.iter().zip(&gpu_lls) {
             max_diff = max_diff.max((cpu - gpu).abs());
         }
-        v.check("Bootstrap: max |CPU−GPU| < 1e-4", f64::from((max_diff < 1e-4) as u8), 1.0, 0.0);
+        v.check(
+            "Bootstrap: max |CPU−GPU| < 1e-4",
+            f64::from((max_diff < 1e-4) as u8),
+            1.0,
+            0.0,
+        );
         println!("    (max per-replicate diff = {max_diff:.2e})");
 
         // Statistical agreement: mean and variance should be close
@@ -455,7 +496,8 @@ fn validate_gpu_placement(device: &Arc<WgpuDevice>, v: &mut Validator) {
 
     for edge_idx in 0..n_edges {
         let mut idx = 0;
-        let (augmented, _) = insert_query_at_edge(&ref_tree, &query_states, edge_idx, 0.05, &mut idx);
+        let (augmented, _) =
+            insert_query_at_edge(&ref_tree, &query_states, edge_idx, 0.05, &mut idx);
         let conv = convert_tree(&augmented, MU);
         match pruner.prune(
             &conv.phylo,
@@ -476,7 +518,12 @@ fn validate_gpu_placement(device: &Arc<WgpuDevice>, v: &mut Validator) {
     if gpu_ok {
         #[allow(clippy::cast_precision_loss)]
         {
-            v.check("Placement: edge count", gpu_lls.len() as f64, n_edges as f64, 0.0);
+            v.check(
+                "Placement: edge count",
+                gpu_lls.len() as f64,
+                n_edges as f64,
+                0.0,
+            );
         }
 
         let all_finite = gpu_lls.iter().all(|x| x.is_finite() && *x < 0.0);
@@ -492,7 +539,12 @@ fn validate_gpu_placement(device: &Arc<WgpuDevice>, v: &mut Validator) {
         for (cpu_p, &gpu_ll) in cpu_scan.placements.iter().zip(&gpu_lls) {
             max_diff = max_diff.max((cpu_p.log_likelihood - gpu_ll).abs());
         }
-        v.check("Placement: max |CPU−GPU| < 1e-4", f64::from((max_diff < 1e-4) as u8), 1.0, 0.0);
+        v.check(
+            "Placement: max |CPU−GPU| < 1e-4",
+            f64::from((max_diff < 1e-4) as u8),
+            1.0,
+            0.0,
+        );
         println!("    (max per-edge diff = {max_diff:.2e})");
 
         // Best edge agreement

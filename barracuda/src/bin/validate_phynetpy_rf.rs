@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Exp036 — RF distances on real PhyNetPy DEFJ gene trees.
+//! Exp036 — RF distances on real `PhyNetPy` DEFJ gene trees.
 //!
 //! # Provenance
 //!
@@ -33,9 +33,21 @@ fn main() {
 
     // ── Section 1: Leaf counts ──────────────────────────────────
     v.section("── Leaf counts (25-leaf gene trees) ──");
-    let n0 = t0.nodes.iter().filter(|n| n.children.is_empty() && !n.label.is_empty()).count();
-    let n1 = t1.nodes.iter().filter(|n| n.children.is_empty() && !n.label.is_empty()).count();
-    let n2 = t2.nodes.iter().filter(|n| n.children.is_empty() && !n.label.is_empty()).count();
+    let n0 = t0
+        .nodes
+        .iter()
+        .filter(|n| n.children.is_empty() && !n.label.is_empty())
+        .count();
+    let n1 = t1
+        .nodes
+        .iter()
+        .filter(|n| n.children.is_empty() && !n.label.is_empty())
+        .count();
+    let n2 = t2
+        .nodes
+        .iter()
+        .filter(|n| n.children.is_empty() && !n.label.is_empty())
+        .count();
     v.check_count("tree_0 leaves", n0, 25);
     v.check_count("tree_1 leaves", n1, 25);
     v.check_count("tree_2 leaves", n2, 25);
@@ -48,9 +60,21 @@ fn main() {
 
     // ── Section 3: Symmetry ─────────────────────────────────────
     v.section("── RF symmetry ──");
-    v.check_count("RF(0,1) == RF(1,0)", rf_distance(&t0, &t1), rf_distance(&t1, &t0));
-    v.check_count("RF(0,2) == RF(2,0)", rf_distance(&t0, &t2), rf_distance(&t2, &t0));
-    v.check_count("RF(1,2) == RF(2,1)", rf_distance(&t1, &t2), rf_distance(&t2, &t1));
+    v.check_count(
+        "RF(0,1) == RF(1,0)",
+        rf_distance(&t0, &t1),
+        rf_distance(&t1, &t0),
+    );
+    v.check_count(
+        "RF(0,2) == RF(2,0)",
+        rf_distance(&t0, &t2),
+        rf_distance(&t2, &t0),
+    );
+    v.check_count(
+        "RF(1,2) == RF(2,1)",
+        rf_distance(&t1, &t2),
+        rf_distance(&t2, &t1),
+    );
 
     // ── Section 4: Identity ─────────────────────────────────────
     v.section("── RF self-distance = 0 ──");

@@ -223,10 +223,7 @@ fn validate_smith_waterman(device: &Arc<WgpuDevice>, v: &mut Validator) {
     let target: Vec<u32> = b"ACTTACTT".iter().map(|&b| dna_encode(b)).collect();
 
     let subst = vec![
-        2.0, -1.0, -1.0, -1.0,
-        -1.0, 2.0, -1.0, -1.0,
-        -1.0, -1.0, 2.0, -1.0,
-        -1.0, -1.0, -1.0, 2.0,
+        2.0, -1.0, -1.0, -1.0, -1.0, 2.0, -1.0, -1.0, -1.0, -1.0, 2.0, -1.0, -1.0, -1.0, -1.0, 2.0,
     ];
 
     let config = SwConfig::default();

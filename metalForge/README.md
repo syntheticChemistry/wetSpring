@@ -108,11 +108,11 @@ affinities. metalForge maps each validated algorithm to its optimal substrate.
 wetSpring follows hotSpring's pattern for ToadStool absorption:
 
 ```
-1. Validate in Rust CPU (barracuda/)          ← DONE: 34 modules, 465 tests, 50 experiments, 1235 checks
+1. Validate in Rust CPU (barracuda/)          ← DONE: 41 modules, 582 tests, 63 experiments, 1501 checks
 2. Characterize hardware (metalForge/)         ← THIS DIRECTORY
-3. Write Rust in GPU-friendly patterns         ← shapes absorption
-4. ToadStool absorbs as shared primitives      ← unidirectional handoff
-5. wetSpring consumes ToadStool primitives     ← pipeline closure
+3. Write Rust in GPU-friendly patterns         ← 9 local WGSL shaders written
+4. ToadStool absorbs as shared primitives      ← unidirectional handoff via archive/handoffs/
+5. wetSpring consumes ToadStool primitives     ← 15 consumed, pipeline closure
 ```
 
 ### What "GPU-Friendly Patterns" Means for Life Science
@@ -149,29 +149,43 @@ from either inform the other's hardware utilization strategy.
 
 ## Current Status (Feb 20, 2026)
 
-### CPU: 18 Domains Validated (Exp043)
-All 18 algorithmic domains proven correct in pure Rust CPU:
-- **84/84 CPU parity checks** across v1 (21) + v2 (18) + v3 (45)
-- **~20x speedup** over Python (Rust ~84,500µs vs Python ~1,749,000µs)
-- ODE-heavy domains (QS, phage, cooperation) show 3-5x raw speedup
-- SSA shows 4-8x speedup from Rust's memory layout
+### CPU: 25 Domains Validated (Exp001–063)
+All 25 algorithmic domains proven correct in pure Rust CPU:
+- **157/157 CPU parity checks** across v1 (21) + v2 (18) + v3 (45) + v4 (44) + v5 (29)
+- **1,241 total CPU checks** across 29 self-contained validation binaries
+- **5 Track 1c domains**: ANI, SNP, dN/dS, molecular clock, pangenomics
+- **2 ML ensemble domains**: Random Forest, Gradient Boosting Machine
+- **22.5× overall speedup** over Python (Exp059, peak 625× for SW)
 
-### GPU: 200 Checks Passing (Exp044–050)
-GPU math portability proven across 25 promoted domains:
-- **200/200 GPU checks** across 8 validation binaries
+### GPU: 260 Checks Passing (Exp044–063)
+GPU math portability proven across 30 promoted domains:
+- **260/260 GPU checks** across 12 validation binaries
 - **Absorbed** (Lean): SW, Gillespie, DT, Felsenstein, GEMM, diversity, PCoA, spectral
-- **Local WGSL** (Tier A): HMM forward (13/13), ODE sweep (7/7), DADA2 E-step, quality
+- **Local WGSL** (9 shaders): HMM, ODE, DADA2, quality, ANI, SNP, dN/dS, pangenome, RF
 - **Composed**: Bootstrap (15/15), placement (15/15), bifurcation eigenvalues (5/5)
-- **NVVM finding**: RTX 4070 cannot compile native f64 `exp/log/pow`;
-  all transcendentals require `ShaderTemplate::for_driver_auto(_, true)`
+- **metalForge validated**: CPU↔GPU parity for Track 1c (Exp060, 20/20)
+
+### Track 1c GPU Promotion — COMPLETE (Exp058)
+All 4 GPU-eligible Track 1c modules promoted with local WGSL shaders:
+- **ANI**: `ani_batch_f64.wgsl` — 7/7 GPU checks
+- **SNP**: `snp_calling_f64.wgsl` — 5/5 GPU checks
+- **dN/dS**: `dnds_batch_f64.wgsl` — 9/9 GPU checks, `log()` polyfill
+- **Pangenome**: `pangenome_classify.wgsl` — 6/6 GPU checks
+- **Molecular clock**: CPU-only (sequential tree traversal, too small for GPU)
+
+### ML Ensembles — GPU-Promoted (Exp063)
+- **Random Forest**: `rf_batch_inference.wgsl` — 13/13 GPU checks, SoA layout
+- **GBM**: CPU-only (sequential boosting across rounds)
 
 ### Cross-System Vision
 ```
-CPU: 1,035 checks (18 domains, reference ground truth)
-GPU: 200 checks (15 ToadStool primitives + 4 local WGSL + 6 composed)
-NPU: Characterized (AKD1000, taxonomy/anomaly inference at ~30mW)
+CPU: 1,241 checks (25 domains, reference ground truth)
+GPU: 260 checks (15 ToadStool primitives + 9 local WGSL + 6 composed)
+NPU: Characterized (AKD1000, taxonomy/anomaly/RF inference at ~30mW)
 
 Pipeline: FASTQ parse (CPU) → DADA2 (CPU+GPU) → Diversity (GPU) → Taxonomy (NPU)
+         → ANI/SNP (GPU batch) → Pangenome (GPU reduce) → dN/dS (GPU codon batch)
+         → RF/GBM (GPU/CPU) → metalForge substrate routing
 ```
 
 Full mapping: `PRIMITIVE_MAP.md` | Absorption tracking: `../barracuda/EVOLUTION_READINESS.md`

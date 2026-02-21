@@ -23,13 +23,14 @@ fn main() {
     // Build a stump matching Python baseline:
     // feature=4 (total_PFAS), threshold=70.0, left→0, right→1
     let tree = DecisionTree::from_arrays(
-        &[4, -1, -1],           // feature indices (-1 = leaf)
-        &[70.0, 0.0, 0.0],     // thresholds
-        &[1, -1, -1],          // left children (-1 = none)
-        &[2, -1, -1],          // right children
+        &[4, -1, -1],              // feature indices (-1 = leaf)
+        &[70.0, 0.0, 0.0],         // thresholds
+        &[1, -1, -1],              // left children (-1 = none)
+        &[2, -1, -1],              // right children
         &[None, Some(0), Some(1)], // predictions
-        5,                      // n_features
-    ).expect("valid tree");
+        5,                         // n_features
+    )
+    .expect("valid tree");
 
     // ── Section 1: Tree structure ───────────────────────────────
     v.section("── Decision tree structure ──");
@@ -57,9 +58,9 @@ fn main() {
     // ── Section 3: Batch prediction ─────────────────────────────
     v.section("── Batch prediction ──");
     let samples = vec![
-        vec![10.0, 5.0, 3.0, 42.5, 30.0],   // low
-        vec![80.0, 50.0, 30.0, 44.0, 200.0], // high
-        vec![20.0, 15.0, 10.0, 43.0, 60.0],  // low
+        vec![10.0, 5.0, 3.0, 42.5, 30.0],     // low
+        vec![80.0, 50.0, 30.0, 44.0, 200.0],  // high
+        vec![20.0, 15.0, 10.0, 43.0, 60.0],   // low
         vec![100.0, 80.0, 60.0, 45.0, 300.0], // high
     ];
     let preds = tree.predict_batch(&samples);

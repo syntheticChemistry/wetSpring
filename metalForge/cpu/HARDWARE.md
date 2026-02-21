@@ -45,9 +45,9 @@ The CPU is the mathematical ground truth:
 Python baseline → Rust CPU (reference) → GPU/NPU (must match CPU)
 ```
 
-### BarraCUDA CPU Parity — All 18 Domains (Exp035 + Exp043)
+### BarraCUDA CPU Parity — All 25 Domains (Exp035–Exp062)
 
-84/84 checks pass across 18 algorithmic domains, proving Rust CPU math
+157/157 checks pass across 25 algorithmic domains, proving Rust CPU math
 matches Python across every validated module:
 
 **v1: 21 checks (9 domains)**
@@ -121,12 +121,14 @@ the orchestrator should:
 
 | Workload | Time (release) | Notes |
 |----------|---------------|-------|
-| All 465 Rust tests | ~0.8s | Includes integration tests |
-| All 27 validation binaries | ~5s (total) | Sequential execution |
+| All 582 Rust tests | ~0.8s | Includes integration tests |
+| All 29 CPU validation binaries | ~5s (total) | Sequential execution |
 | Full 16S pipeline (10 samples) | ~2.1s | CPU path |
 | BarraCUDA CPU v1 (21 checks) | ~60ms | 9 domains (release) |
 | BarraCUDA CPU v3 (45 checks) | ~25ms | 9 new domains (release) |
-| All CPU parity (84 checks) | ~85ms | 18 domains total |
+| BarraCUDA CPU v4 (44 checks) | ~1.3ms | 5 new Track 1c domains (release) |
+| BarraCUDA CPU v5 (29 checks) | ~62µs | RF + GBM (release) |
+| All CPU parity (157 checks) | ~87ms | 25 domains total |
 | Spectral cosine (2048×2048) | ~4.8s | CPU baseline (926× slower than GPU) |
 
 The 16S pipeline is where CPU→GPU transition provides the most user-visible

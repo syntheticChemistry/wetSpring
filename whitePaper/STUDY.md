@@ -13,16 +13,21 @@ and (3) accelerated on consumer GPUs achieving up to 926× speedup for
 batch-parallel spectral operations and 24× for denoising, with structured
 three-tier profiling (Python → Rust CPU → Rust GPU) capturing wall time,
 energy, and memory in a unified benchmark harness. The study covers
-three tracks: 16S amplicon metagenomics (Track 1), comparative genomics
-and mathematical biology (Track 1b), and PFAS detection via LC-MS (Track 2),
-validating 49 Rust modules (34 CPU + 15 GPU) against baselines from Galaxy,
+four tracks: 16S amplicon metagenomics (Track 1), comparative genomics
+and mathematical biology (Track 1b), deep-sea metagenomics and microbial
+evolution (Track 1c), and PFAS detection via LC-MS (Track 2),
+validating 61 Rust modules (41 CPU + 20 GPU) against baselines from Galaxy,
 QIIME2, asari, FindPFAS, scipy, sklearn, dendropy, real NCBI SRA data, and
-published paper models with 1,235 quantitative checks across 50 experiments
-— all passing.
-Decision tree inference achieves 100% prediction parity with sklearn on 744
-PFAS water samples. Gillespie stochastic simulation converges to analytical
+published paper models with 1,501 quantitative checks across 63 experiments
+— all passing. The pipeline proves substrate independence: math produces
+identical results on CPU and GPU, validated via metalForge cross-substrate
+checks (Exp060). Random Forest ensemble and Gradient Boosting Machine
+inference achieve 100% specification parity, joining the existing decision
+tree engine to cover the three dominant ensemble ML methods in pure Rust.
+Gillespie stochastic simulation converges to analytical
 steady state within 0.2%. Robinson-Foulds tree distance matches dendropy
-exactly. The full 16S pipeline
+exactly. Rust runs 22.5× faster than Python across all 25 algorithmic domains
+(Exp059), with peak speedup of 625× for Smith-Waterman alignment. The full 16S pipeline
 runs 8.3–13× faster than Galaxy on CPU (depending on sample size) and
 2.45× faster again on GPU, with 88/88 math parity checks proving
 identical results across hardware.
@@ -60,7 +65,7 @@ chemistry:
 | Baseline | Python scipy | Galaxy/QIIME2 | asari/PFΔScreen |
 | GPU layer | ToadStool (wgpu) | ToadStool (wgpu) | ToadStool (wgpu) |
 | Success metric | chi² match | Same taxonomy | Same PFAS detected |
-| Checks | 195/195 | 977/977 | (included in 977) |
+| Checks | 418/418 | 1,501/1,501 | (included in 1,501) |
 
 Both prove the ecoPrimals thesis: sovereign compute on consumer hardware
 can replicate institutional results, then exceed them via Rust + GPU.
@@ -133,7 +138,7 @@ detection in water via LC-MS. Source papers: asari (Nature Communications
 
 ### 3.2 Rust CPU Validation (Phase 2)
 
-1,035 CPU quantitative checks across 27 self-contained validation binaries — all pass.
+1,241 CPU quantitative checks across 29 self-contained validation binaries — all pass.
 In addition, the original 17 pipeline validation binaries (data-dependent) cover
 the Phase 1-3 checks. The following are the self-contained validators:
 
@@ -167,10 +172,29 @@ the Phase 1-3 checks. The following are the self-contained validators:
 | `validate_phage_defense` | 12 | Hsueh 2022 phage defense deaminase |
 | `validate_bootstrap` | 11 | Wang 2021 RAWR bootstrap resampling |
 | `validate_placement` | 12 | Alamin & Liu 2024 phylogenetic placement |
+| `validate_neighbor_joining` | 16 | Liu 2009 NJ tree construction (Exp033) |
+| `validate_reconciliation` | 14 | Zheng 2023 DTL reconciliation (Exp034) |
+| `validate_barracuda_cpu_v2` | 18 | Batch/flat APIs (5 domains, Exp035) |
+| `validate_phynetpy_rf` | 15 | PhyNetPy RF gene trees (Exp036) |
+| `validate_phylohmm` | 10 | PhyloNet-HMM discordance (Exp037) |
+| `validate_sate_pipeline` | 17 | SATé pipeline benchmark (Exp038) |
+| `validate_algae_timeseries` | 11 | Algal pond time-series (Exp039) |
+| `validate_bloom_surveillance` | 15 | Bloom surveillance (Exp040) |
+| `validate_epa_pfas_ml` | 14 | EPA PFAS ML (Exp041) |
+| `validate_massbank_spectral` | 9 | MassBank spectral (Exp042) |
+| `validate_barracuda_cpu_v3` | 45 | 18-domain CPU parity (Exp043) |
+| `validate_rare_biosphere` | 35 | Anderson 2015 rare biosphere diversity (Exp051) |
+| `validate_viral_metagenomics` | 22 | Anderson 2014 viral dN/dS + diversity (Exp052) |
+| `validate_sulfur_phylogenomics` | 15 | Mateos 2023 molecular clock + DTL (Exp053) |
+| `validate_phosphorus_phylogenomics` | 13 | Boden 2024 clock + reconciliation (Exp054) |
+| `validate_population_genomics` | 24 | Anderson 2017 ANI + SNP calling (Exp055) |
+| `validate_pangenomics` | 24 | Moulana 2020 pangenome + enrichment (Exp056) |
+| `validate_barracuda_cpu_v4` | 44 | 5 Track 1c domains (Exp057) |
+| `validate_barracuda_cpu_v5` | 29 | RF + GBM ensemble ML (Exp061/062) |
 
 ### 3.3 GPU Validation (Phase 3)
 
-200 GPU checks across 8 GPU validation binaries — all pass:
+260 GPU checks across 12 GPU validation binaries — all pass:
 
 **Individual operations (38 checks, tolerance ≤ 1e-10):**
 
@@ -216,7 +240,7 @@ Pipeline flow:
     → taxonomy GEMM (GPU) → diversity FMR (GPU) → results
 ```
 
-**Custom WGSL shaders (4):**
+**Custom WGSL shaders (9):**
 
 | Shader | Purpose | f64? | Approach |
 |--------|---------|------|----------|
@@ -224,6 +248,11 @@ Pipeline flow:
 | `dada2_e_step.wgsl` | Batch log_p_error | Yes (addition only) | One thread per (seq,center) pair |
 | `hmm_forward_f64.wgsl` | Batch HMM forward (log-space) | Yes (full) | One thread per sequence |
 | `batched_qs_ode_rk4_f64.wgsl` | QS ODE parameter sweep | Yes (full) | One thread per trajectory |
+| `ani_batch_f64.wgsl` | ANI pairwise identity | Yes | One thread per pair |
+| `snp_calling_f64.wgsl` | SNP calling | Yes | One thread per position |
+| `dnds_batch_f64.wgsl` | dN/dS (Nei-Gojobori) | Yes (log polyfill) | One thread per pair |
+| `pangenome_classify.wgsl` | Pangenome gene classification | Yes | One thread per gene |
+| `rf_batch_inference.wgsl` | Random Forest batch inference | Yes (SoA) | One thread per (sample,tree) |
 
 **Key design: forced f64 polyfills for NVVM.** RTX 4070 (Ada Lovelace)
 NVVM cannot compile native f64 `exp()`, `log()`, or `pow()`.
@@ -328,7 +357,7 @@ FASTQ → quality filter → adapter trim → paired-end merge
   → diversity metrics → UniFrac distance → PCoA ordination
 ```
 
-Each stage has unit tests (430 total, 95%+ line coverage), end-to-end
+Each stage has unit tests (570 total, 95%+ line coverage), end-to-end
 validation against Galaxy baselines, GPU math parity checks, and
 determinism tests ensuring identical output across runs.
 
@@ -348,15 +377,17 @@ determinism tests ensuring identical output across runs.
 
 ### 4.1 Replication success
 
-13 of 14 actionable papers in the review queue are now reproduced, covering
+All 29 actionable papers in the review queue are now reproduced, covering
 ODE systems (6 models), stochastic simulation, HMM, phylogenetic algorithms
 (Felsenstein, Robinson-Foulds, bootstrap, placement), sequence alignment
-(Smith-Waterman), and phage defense dynamics. The remaining queued items
-require external data access (Sandia, Jones Lab PFAS).
+(Smith-Waterman), phage defense dynamics, and deep-sea metagenomics
+(dN/dS, molecular clock, ANI, SNP calling, pangenomics). Track 1c added
+6 R. Anderson papers requiring 5 new sovereign modules — all validated
+against Python baselines with public data.
 
 ### 4.2 Rust as a scientific computing platform
 
-41+ modules (29 CPU bio, 12 GPU, plus I/O and benchmarking) with minimal
+61 modules (41 CPU bio, 20 GPU, plus I/O and benchmarking) with minimal
 runtime dependency (`flate2` for gzip) demonstrate that Rust can serve
 as a standalone platform for bioinformatics and analytical chemistry.
 The sovereign XML, FASTQ, mzML, and MS2 parsers eliminate the need for
@@ -435,14 +466,17 @@ them against CPU baselines, then hands off to ToadStool for absorption. Once
 upstream absorbs the primitive, wetSpring removes the local copy and leans on
 the shared crate. This cycle has completed for 4 bio primitives
 (SmithWatermanGpu, GillespieGpu, TreeInferenceGpu, FelsensteinGpu) and is
-in progress for 4 more (HMM forward, ODE sweep, DADA2 E-step, quality filter).
+in progress for 9 local WGSL shaders spanning pipeline, bioinformatics,
+and ML ensemble domains.
 
 | Stage | Extensions | Status |
 |-------|-----------|--------|
 | **Absorbed** | SW, Gillespie, DT, Felsenstein, GEMM, diversity | Lean on upstream |
 | **Tier A** (handoff ready) | `hmm_forward_f64.wgsl` (13/13), `batched_qs_ode_rk4_f64.wgsl` (7/7), `dada2_e_step.wgsl`, `quality_filter.wgsl` | Handoff pending |
-| **Tier B** (needs refactor) | kmer, unifrac, taxonomy (NPU), multi-signal QS | GPU pattern identified |
-| **Tier C** (CPU-only) | chimera, cooperation, derep, NJ, reconciliation, RF | No GPU path |
+| **Tier A** (Track 1c) | `ani_batch_f64.wgsl` (7/7), `snp_calling_f64.wgsl` (5/5), `dnds_batch_f64.wgsl` (9/9), `pangenome_classify.wgsl` (6/6) | Validated, handoff ready |
+| **Tier A** (ML) | `rf_batch_inference.wgsl` (13/13) | SoA layout, validated |
+| **Tier B** (needs refactor) | kmer, unifrac, taxonomy (NPU) | GPU pattern identified |
+| **Tier C** (CPU-only) | chimera, cooperation, derep, NJ, reconciliation, GBM | No GPU path |
 
 **NVVM driver profile bug**: ToadStool's driver profile incorrectly reports
 `needs_f64_exp_log_workaround() = false` for Ada Lovelace (RTX 40-series).
@@ -458,9 +492,9 @@ All code, data paths, and validation binaries are in the `wetSpring`
 repository (AGPL-3.0). No institutional access required.
 
 ```bash
-# Run all CPU validations (1,035 checks)
+# Run all CPU validations (1,241 checks)
 cd barracuda
-cargo test --release          # 430 tests
+cargo test --release          # 582 tests
 cargo run --release --bin validate_fastq
 cargo run --release --bin validate_diversity
 cargo run --release --bin validate_mzml
@@ -472,7 +506,7 @@ cargo run --release --bin validate_algae_16s
 cargo run --release --bin validate_voc_peaks
 cargo run --release --bin validate_public_benchmarks
 
-# GPU validation + benchmark (200 checks)
+# GPU validation + benchmark (260 checks)
 cargo run --release --features gpu --bin validate_diversity_gpu
 cargo run --release --features gpu --bin validate_16s_pipeline_gpu
 cargo run --release --features gpu --bin benchmark_cpu_gpu

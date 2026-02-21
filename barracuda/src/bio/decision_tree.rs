@@ -129,6 +129,12 @@ impl DecisionTree {
         self.n_features
     }
 
+    /// Access a node by index.
+    #[must_use]
+    pub fn node_at(&self, index: usize) -> &TreeNode {
+        &self.nodes[index]
+    }
+
     /// Tree depth (longest root-to-leaf path).
     #[must_use]
     pub fn depth(&self) -> usize {

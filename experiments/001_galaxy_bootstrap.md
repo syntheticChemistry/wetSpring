@@ -1,7 +1,7 @@
 # Experiment 001: Galaxy Bootstrap
 
 **Date:** February 12-16, 2026
-**Status:** IN PROGRESS
+**Status:** DONE (Phase 1 — Galaxy/QIIME2 baseline established)
 **Goal:** Self-host Galaxy Project on Eastgate, install bioinformatics
 tools, validate with public 16S rRNA dataset.
 

@@ -1,7 +1,7 @@
 # Experiment 008: PFAS ML Water Monitoring
 
 **Date**: 2026-02-19
-**Status**: DESIGN COMPLETE — awaiting data download
+**Status**: DONE (Phase 3 — CPU parity via synthetic proxy, sklearn model export)
 **Track**: 2 (PFAS Analytical Chemistry)
 
 ---

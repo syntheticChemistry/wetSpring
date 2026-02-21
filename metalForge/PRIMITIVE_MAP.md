@@ -68,6 +68,8 @@ absorption pipeline and identifies what ToadStool needs to build next.
 | `kmer` | **Blocked** | Needs lock-free hash table (P3) | — |
 | `unifrac` | **Blocked** | Needs tree traversal (P3) | — |
 | `decision_tree` | Lean | `TreeInferenceGpu` | 044 |
+| `random_forest` / `random_forest_gpu` | **Local** | `rf_batch_inference.wgsl` (13 checks) | 063 |
+| `gbm` | CPU | Sequential boosting (batch-parallel within rounds) | 062 |
 
 ### 16S Pipeline (GPU-composed)
 
@@ -89,6 +91,16 @@ absorption pipeline and identifies what ToadStool needs to build next.
 | `signal` | CPU | FFT-based, small data | — |
 | `capacitor` | CPU | Peak detection | — |
 | `feature_table` | CPU | Sparse matrix | — |
+
+### Track 1c: Deep-Sea Metagenomics (GPU-promoted, Exp058)
+
+| Rust Module | GPU Strategy | ToadStool Primitive | Exp |
+|-------------|-------------|-------------------|-----|
+| `ani` / `ani_gpu` | **Local** | `ani_batch_f64.wgsl` (7 checks) | 058 |
+| `snp` / `snp_gpu` | **Local** | `snp_calling_f64.wgsl` (5 checks) | 058 |
+| `dnds` / `dnds_gpu` | **Local** | `dnds_batch_f64.wgsl` (9 checks) | 058 |
+| `pangenome` / `pangenome_gpu` | **Local** | `pangenome_classify.wgsl` (6 checks) | 058 |
+| `molecular_clock` | CPU | Small calibration data, tree traversal | 053/054 |
 
 ### Infrastructure (CPU-only)
 
@@ -125,8 +137,8 @@ Is the model a neural network or lookup table?
 | Category | Count |
 |----------|-------|
 | **Lean** (upstream ToadStool) | 16 modules |
-| **Local** (WGSL shader) | 4 modules |
+| **Local** (WGSL shader) | 9 modules (4 original + 4 Track 1c + 1 RF) |
 | **Compose** (existing primitives) | 5 modules |
-| **CPU** (no GPU path) | 11 modules |
+| **CPU** (no GPU path) | 13 modules |
 | **NPU** (candidate) | 1 module |
 | **Blocked** (needs new primitive) | 2 modules |

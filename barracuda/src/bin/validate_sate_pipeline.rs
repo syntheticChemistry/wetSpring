@@ -7,14 +7,16 @@
 //! |-----------------|-----------------------------------------------------------------|
 //! | Baseline script | `scripts/sate_alignment_baseline.py`                            |
 //! | Baseline output | `experiments/results/038_sate_pipeline/python_baseline.json`     |
-//! | Reference       | Liu 2009, DOI 10.1126/science.1171243 (SATe)                    |
+//! | Reference       | Liu 2009, DOI 10.1126/science.1171243 (`SATe`)                    |
 //! | Date            | 2026-02-20                                                      |
 //!
 //! Validates that the Rust NJ → SW → distance pipeline matches Python
 //! baseline on synthetic 16S-like sequences at 5, 8, and 12 taxa.
 
 use wetspring_barracuda::bio::alignment::{smith_waterman_score, ScoringParams};
-use wetspring_barracuda::bio::neighbor_joining::{distance_matrix, jukes_cantor_distance, neighbor_joining};
+use wetspring_barracuda::bio::neighbor_joining::{
+    distance_matrix, jukes_cantor_distance, neighbor_joining,
+};
 use wetspring_barracuda::validation::Validator;
 
 // 5-taxon sequences (200bp, seed=42, divergence=0.1) from Python baseline
@@ -63,11 +65,31 @@ fn main() {
         gap_extend: -2,
     };
     // Rust affine SW scores (gap_open=0, gap_extend=-2)
-    v.check_count("SW(t0,t1)", smith_waterman_score(SEQ_T0, SEQ_T1, &params) as usize, 402);
-    v.check_count("SW(t0,t2)", smith_waterman_score(SEQ_T0, SEQ_T2, &params) as usize, 381);
-    v.check_count("SW(t0,t3)", smith_waterman_score(SEQ_T0, SEQ_T3, &params) as usize, 366);
-    v.check_count("SW(t0,t4)", smith_waterman_score(SEQ_T0, SEQ_T4, &params) as usize, 348);
-    v.check_count("SW(t1,t2)", smith_waterman_score(SEQ_T1, SEQ_T2, &params) as usize, 381);
+    v.check_count(
+        "SW(t0,t1)",
+        smith_waterman_score(SEQ_T0, SEQ_T1, &params) as usize,
+        402,
+    );
+    v.check_count(
+        "SW(t0,t2)",
+        smith_waterman_score(SEQ_T0, SEQ_T2, &params) as usize,
+        381,
+    );
+    v.check_count(
+        "SW(t0,t3)",
+        smith_waterman_score(SEQ_T0, SEQ_T3, &params) as usize,
+        366,
+    );
+    v.check_count(
+        "SW(t0,t4)",
+        smith_waterman_score(SEQ_T0, SEQ_T4, &params) as usize,
+        348,
+    );
+    v.check_count(
+        "SW(t1,t2)",
+        smith_waterman_score(SEQ_T1, SEQ_T2, &params) as usize,
+        381,
+    );
 
     // ── Section 4: JC distance correctness ──────────────────────
     v.section("── Jukes-Cantor distance properties ──");
@@ -81,7 +103,10 @@ fn main() {
     // ── Section 5: Determinism ──────────────────────────────────
     v.section("── Determinism ──");
     let dmat2 = distance_matrix(&seqs_5);
-    let dmat_match = dmat.iter().zip(dmat2.iter()).all(|(a, b)| (a - b).abs() < 1e-15);
+    let dmat_match = dmat
+        .iter()
+        .zip(dmat2.iter())
+        .all(|(a, b)| (a - b).abs() < 1e-15);
     v.check_count("distance_matrix deterministic", usize::from(dmat_match), 1);
     let sw1 = smith_waterman_score(SEQ_T0, SEQ_T3, &params);
     let sw2 = smith_waterman_score(SEQ_T0, SEQ_T3, &params);

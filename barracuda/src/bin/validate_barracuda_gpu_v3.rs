@@ -13,7 +13,9 @@
 //! Python → CPU v1/v2/v3 → [THIS] GPU v3 → ToadStool sovereign
 //! ```
 
-use wetspring_barracuda::bio::{diversity, diversity_gpu, spectral_match, spectral_match_gpu, stats_gpu};
+use wetspring_barracuda::bio::{
+    diversity, diversity_gpu, spectral_match, spectral_match_gpu, stats_gpu,
+};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
@@ -51,7 +53,12 @@ fn validate_extended_diversity(gpu: &GpuF64, v: &mut Validator) {
         let counts = vec![25.0; 4];
         let cpu = diversity::pielou_evenness(&counts);
         let gpu_val = diversity_gpu::pielou_evenness_gpu(gpu, &counts).expect("GPU Pielou uniform");
-        v.check("Pielou GPU uniform ≈ 1.0", gpu_val, cpu, tolerances::GPU_VS_CPU_TRANSCENDENTAL);
+        v.check(
+            "Pielou GPU uniform ≈ 1.0",
+            gpu_val,
+            cpu,
+            tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+        );
     }
 
     // Pielou evenness: uneven
@@ -59,7 +66,12 @@ fn validate_extended_diversity(gpu: &GpuF64, v: &mut Validator) {
         let counts = vec![97.0, 1.0, 1.0, 1.0];
         let cpu = diversity::pielou_evenness(&counts);
         let gpu_val = diversity_gpu::pielou_evenness_gpu(gpu, &counts).expect("GPU Pielou uneven");
-        v.check("Pielou GPU uneven < 0.5", gpu_val, cpu, tolerances::GPU_VS_CPU_TRANSCENDENTAL);
+        v.check(
+            "Pielou GPU uneven < 0.5",
+            gpu_val,
+            cpu,
+            tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+        );
     }
 
     // Shannon on 100 species
@@ -68,7 +80,12 @@ fn validate_extended_diversity(gpu: &GpuF64, v: &mut Validator) {
         let counts: Vec<f64> = (1..=100).map(|i| i as f64).collect();
         let cpu = diversity::shannon(&counts);
         let gpu_val = diversity_gpu::shannon_gpu(gpu, &counts).expect("GPU Shannon 100");
-        v.check("Shannon GPU 100 species", gpu_val, cpu, tolerances::GPU_VS_CPU_TRANSCENDENTAL);
+        v.check(
+            "Shannon GPU 100 species",
+            gpu_val,
+            cpu,
+            tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+        );
     }
 
     // Simpson on 100 species
@@ -77,7 +94,12 @@ fn validate_extended_diversity(gpu: &GpuF64, v: &mut Validator) {
         let counts: Vec<f64> = (1..=100).map(|i| i as f64).collect();
         let cpu = diversity::simpson(&counts);
         let gpu_val = diversity_gpu::simpson_gpu(gpu, &counts).expect("GPU Simpson 100");
-        v.check("Simpson GPU 100 species", gpu_val, cpu, tolerances::GPU_VS_CPU_F64);
+        v.check(
+            "Simpson GPU 100 species",
+            gpu_val,
+            cpu,
+            tolerances::GPU_VS_CPU_F64,
+        );
     }
 
     // Observed features
@@ -96,7 +118,11 @@ fn validate_bray_curtis_matrix(gpu: &GpuF64, v: &mut Validator) {
     {
         #[allow(clippy::cast_precision_loss)]
         let samples: Vec<Vec<f64>> = (0..5)
-            .map(|i| (0..10).map(|j| ((i * 7 + j * 13 + 1) % 50) as f64).collect())
+            .map(|i| {
+                (0..10)
+                    .map(|j| ((i * 7 + j * 13 + 1) % 50) as f64)
+                    .collect()
+            })
             .collect();
         let cpu = diversity::bray_curtis_condensed(&samples);
         let gpu_val = diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).expect("GPU BC 5×10");
@@ -125,10 +151,15 @@ fn validate_bray_curtis_matrix(gpu: &GpuF64, v: &mut Validator) {
     {
         #[allow(clippy::cast_precision_loss)]
         let samples: Vec<Vec<f64>> = (0..20)
-            .map(|i| (0..50).map(|j| ((i * 11 + j * 7 + 3) % 100) as f64).collect())
+            .map(|i| {
+                (0..50)
+                    .map(|j| ((i * 11 + j * 7 + 3) % 100) as f64)
+                    .collect()
+            })
             .collect();
         let cpu = diversity::bray_curtis_condensed(&samples);
-        let gpu_val = diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).expect("GPU BC 20×50");
+        let gpu_val =
+            diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).expect("GPU BC 20×50");
 
         let n_pairs = 20 * 19 / 2;
         assert_eq!(gpu_val.len(), n_pairs);
@@ -162,7 +193,8 @@ fn validate_spectral_batch(gpu: &GpuF64, v: &mut Validator) {
         vec![500.0, 1000.0, 200.0, 800.0, 400.0],
     ];
 
-    let gpu_pw = spectral_match_gpu::pairwise_cosine_gpu(gpu, &spectra_gpu).expect("GPU pairwise cosine");
+    let gpu_pw =
+        spectral_match_gpu::pairwise_cosine_gpu(gpu, &spectra_gpu).expect("GPU pairwise cosine");
 
     let n_pairs = spectra_gpu.len() * (spectra_gpu.len() - 1) / 2;
     assert_eq!(gpu_pw.len(), n_pairs);
@@ -184,7 +216,8 @@ fn validate_spectral_batch(gpu: &GpuF64, v: &mut Validator) {
 
     // Self-match (identical vectors) should be ~1.0
     let self_spectra = vec![spectra_gpu[0].clone(), spectra_gpu[0].clone()];
-    let self_pw = spectral_match_gpu::pairwise_cosine_gpu(gpu, &self_spectra).expect("GPU self-match");
+    let self_pw =
+        spectral_match_gpu::pairwise_cosine_gpu(gpu, &self_spectra).expect("GPU self-match");
     v.check("Spectral GPU self-match ≈ 1.0", self_pw[0], 1.0, 0.001);
 
     // CPU baseline for cross-check
@@ -206,7 +239,12 @@ fn validate_statistics(gpu: &GpuF64, v: &mut Validator) {
         let data = vec![2.0, 4.0, 4.0, 4.0, 5.0, 5.0, 7.0, 9.0];
         let gpu_val = stats_gpu::variance_gpu(gpu, &data).expect("GPU variance");
         let cpu_pop_var = 4.0;
-        v.check("Variance GPU (population)", gpu_val, cpu_pop_var, tolerances::GPU_VS_CPU_F64);
+        v.check(
+            "Variance GPU (population)",
+            gpu_val,
+            cpu_pop_var,
+            tolerances::GPU_VS_CPU_F64,
+        );
     }
 
     // Correlation
@@ -215,7 +253,12 @@ fn validate_statistics(gpu: &GpuF64, v: &mut Validator) {
         let y = vec![2.0, 4.0, 5.0, 4.0, 5.0];
         let gpu_corr = stats_gpu::correlation_gpu(gpu, &x, &y).expect("GPU correlation");
         let cpu_corr = 0.774_596_669_241_483_4;
-        v.check("Pearson correlation", gpu_corr, cpu_corr, tolerances::GPU_VS_CPU_F64);
+        v.check(
+            "Pearson correlation",
+            gpu_corr,
+            cpu_corr,
+            tolerances::GPU_VS_CPU_F64,
+        );
     }
 
     // Weighted dot product
@@ -225,7 +268,12 @@ fn validate_statistics(gpu: &GpuF64, v: &mut Validator) {
         let b = vec![5.0, 4.0, 3.0, 2.0, 1.0];
         let gpu_dot = stats_gpu::weighted_dot_gpu(gpu, &w, &a, &b).expect("GPU weighted dot");
         let cpu_dot = 35.0;
-        v.check("Weighted dot product", gpu_dot, cpu_dot, tolerances::GPU_VS_CPU_F64);
+        v.check(
+            "Weighted dot product",
+            gpu_dot,
+            cpu_dot,
+            tolerances::GPU_VS_CPU_F64,
+        );
     }
 }
 

@@ -1,0 +1,49 @@
+{
+  "viral_shannon": 2.0934703767116676,
+  "cellular_shannon": 2.617167672551517,
+  "dnds_identical": {
+    "dn": 0.0,
+    "ds": 0.0,
+    "omega": null,
+    "syn_sites": 0.0,
+    "nonsyn_sites": 9.0,
+    "syn_diffs": 0.0,
+    "nonsyn_diffs": 0.0
+  },
+  "dnds_synonymous": {
+    "dn": 0.0,
+    "ds": 1.2070784343255758,
+    "omega": 0.0,
+    "syn_sites": 1.6666666666666665,
+    "nonsyn_sites": 7.333333333333332,
+    "syn_diffs": 1.0,
+    "nonsyn_diffs": 0.0
+  },
+  "dnds_nonsynonymous": {
+    "dn": 0.1673576634856574,
+    "ds": 0.0,
+    "omega": null,
+    "syn_sites": 2.333333333333333,
+    "nonsyn_sites": 6.666666666666666,
+    "syn_diffs": 0.0,
+    "nonsyn_diffs": 1.0
+  },
+  "dnds_mixed": {
+    "dn": 0.0,
+    "ds": 0.3205830111202047,
+    "omega": 0.0,
+    "syn_sites": 7.666666666666666,
+    "nonsyn_sites": 22.333333333333332,
+    "syn_diffs": 2.0,
+    "nonsyn_diffs": 0.0
+  },
+  "dnds_purifying": {
+    "dn": 0.0,
+    "ds": 0.1468084328445715,
+    "omega": 0.0,
+    "syn_sites": 15.0,
+    "nonsyn_sites": 33.0,
+    "syn_diffs": 2.0,
+    "nonsyn_diffs": 0.0
+  }
+}

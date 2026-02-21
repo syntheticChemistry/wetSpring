@@ -2,6 +2,10 @@
 //! Bioinformatics and analytical chemistry algorithms.
 
 pub mod alignment;
+#[allow(clippy::cast_precision_loss)]
+pub mod ani;
+#[cfg(feature = "gpu")]
+pub mod ani_gpu;
 pub mod bistable;
 pub mod bootstrap;
 pub mod capacitor;
@@ -17,11 +21,15 @@ pub mod derep;
 pub mod diversity;
 #[cfg(feature = "gpu")]
 pub mod diversity_gpu;
+pub mod dnds;
+#[cfg(feature = "gpu")]
+pub mod dnds_gpu;
 pub mod eic;
 #[cfg(feature = "gpu")]
 pub mod eic_gpu;
 pub mod feature_table;
 pub mod felsenstein;
+pub mod gbm;
 #[cfg(feature = "gpu")]
 pub mod gemm_cached;
 pub mod gillespie;
@@ -33,11 +41,16 @@ pub mod kmer;
 #[cfg(feature = "gpu")]
 pub mod kriging;
 pub mod merge_pairs;
+pub mod molecular_clock;
 pub mod multi_signal;
 pub mod neighbor_joining;
 pub mod ode;
 #[cfg(feature = "gpu")]
 pub mod ode_sweep_gpu;
+#[allow(clippy::cast_precision_loss)]
+pub mod pangenome;
+#[cfg(feature = "gpu")]
+pub mod pangenome_gpu;
 pub mod pcoa;
 #[cfg(feature = "gpu")]
 pub mod pcoa_gpu;
@@ -48,11 +61,18 @@ pub mod qs_biofilm;
 pub mod quality;
 #[cfg(feature = "gpu")]
 pub mod quality_gpu;
+pub mod random_forest;
+#[cfg(feature = "gpu")]
+pub mod random_forest_gpu;
 #[cfg(feature = "gpu")]
 pub mod rarefaction_gpu;
 pub mod reconciliation;
 pub mod robinson_foulds;
 pub mod signal;
+#[allow(clippy::cast_precision_loss)]
+pub mod snp;
+#[cfg(feature = "gpu")]
+pub mod snp_gpu;
 pub mod spectral_match;
 #[cfg(feature = "gpu")]
 pub mod spectral_match_gpu;

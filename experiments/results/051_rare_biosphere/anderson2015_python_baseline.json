@@ -1,0 +1,79 @@
+{
+  "piccard": {
+    "shannon": 1.2198143543811677,
+    "simpson": 0.6198300000000001,
+    "chao1": 15.25,
+    "observed": 13,
+    "pielou": 0.4755705413179721,
+    "rare_lineage_count": 0,
+    "total_reads": 1000,
+    "rarefaction": [
+      3.2024067439680133,
+      5.4329273801333535,
+      6.7706850538183385,
+      8.340310887395198,
+      10.843977596455677
+    ],
+    "rarefaction_depths": [
+      10,
+      50,
+      100,
+      200,
+      500
+    ]
+  },
+  "von_damm": {
+    "shannon": 2.275689671182933,
+    "simpson": 0.8499241861156532,
+    "chao1": 40.666666666666664,
+    "observed": 30,
+    "pielou": 0.6690848591888572,
+    "rare_lineage_count": 8,
+    "total_reads": 1085,
+    "rarefaction": [
+      5.85593412460037,
+      12.013708007405397,
+      15.229037155063988,
+      18.818649051990818,
+      24.339227047567906
+    ],
+    "rarefaction_depths": [
+      10,
+      50,
+      100,
+      200,
+      500
+    ]
+  },
+  "background": {
+    "shannon": 3.4042989440898292,
+    "simpson": 0.958638378160592,
+    "chao1": 62.1,
+    "observed": 50,
+    "pielou": 0.8702144489861584,
+    "rare_lineage_count": 0,
+    "total_reads": 638,
+    "rarefaction": [
+      8.423554819413354,
+      24.075423061060103,
+      31.344641218585974,
+      38.05395778692393,
+      47.3530043775792
+    ],
+    "rarefaction_depths": [
+      10,
+      50,
+      100,
+      200,
+      500
+    ]
+  },
+  "bray_curtis": {
+    "piccard_vs_piccard": 0.0,
+    "piccard_vs_von_damm": 0.3764988009592326,
+    "piccard_vs_background": 0.7496947496947497,
+    "von_damm_vs_von_damm": 0.0,
+    "von_damm_vs_background": 0.5078351712130006,
+    "background_vs_background": 0.0
+  }
+}

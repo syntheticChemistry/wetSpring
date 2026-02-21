@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Exp037 — HMM discordance detection on real PhyNetPy gene tree RF sequence.
+//! Exp037 — HMM discordance detection on real `PhyNetPy` gene tree RF sequence.
 //!
 //! # Provenance
 //!
@@ -7,7 +7,7 @@
 //! |-----------------|--------------------------------------------------------|
 //! | Baseline script | `scripts/phylohmm_introgression_baseline.py`           |
 //! | Baseline output | `experiments/results/037_phylohmm/python_baseline.json` |
-//! | Data source     | PhyNetPy DEFJ consecutive gene-tree RF distances       |
+//! | Data source     | `PhyNetPy` DEFJ consecutive gene-tree RF distances       |
 //! | Reference       | Liu 2014, DOI 10.1371/journal.pcbi.1003649             |
 //! | Date            | 2026-02-20                                             |
 //!
@@ -35,13 +35,17 @@ fn main() {
         n_states: 2,
         log_pi: vec![0.6_f64.ln(), 0.4_f64.ln()],
         log_trans: vec![
-            (1.0 - switch_prob).ln(), switch_prob.ln(),
-            switch_prob.ln(), (1.0 - switch_prob).ln(),
+            (1.0 - switch_prob).ln(),
+            switch_prob.ln(),
+            switch_prob.ln(),
+            (1.0 - switch_prob).ln(),
         ],
         n_symbols: 2,
         log_emit: vec![
-            0.8_f64.ln(), 0.2_f64.ln(), // state 0: emits obs=0 w/ 0.8, obs=1 w/ 0.2
-            0.2_f64.ln(), 0.8_f64.ln(), // state 1: emits obs=0 w/ 0.2, obs=1 w/ 0.8
+            0.8_f64.ln(),
+            0.2_f64.ln(), // state 0: emits obs=0 w/ 0.8, obs=1 w/ 0.2
+            0.2_f64.ln(),
+            0.8_f64.ln(), // state 1: emits obs=0 w/ 0.2, obs=1 w/ 0.8
         ],
     };
 
@@ -63,7 +67,11 @@ fn main() {
     // most of the Viterbi path should be state 1 (discordant).
     let n_state1: usize = vit.path.iter().filter(|&&s| s == 1).count();
     let mostly_discordant = n_state1 >= 15;
-    v.check_count("mostly_discordant(>=15/20)", usize::from(mostly_discordant), 1);
+    v.check_count(
+        "mostly_discordant(>=15/20)",
+        usize::from(mostly_discordant),
+        1,
+    );
 
     // The single obs=0 at position 12 might stay in state 1 due to transition cost
     // or switch briefly to state 0. Either is acceptable; just check it's valid.
@@ -81,7 +89,12 @@ fn main() {
     // ── Section 4: Determinism ──────────────────────────────────
     v.section("── Determinism ──");
     let fwd2 = forward(&model, &obs_20);
-    v.check("forward_deterministic", fwd2.log_likelihood, fwd.log_likelihood, 0.0);
+    v.check(
+        "forward_deterministic",
+        fwd2.log_likelihood,
+        fwd.log_likelihood,
+        0.0,
+    );
     let vit2 = viterbi(&model, &obs_20);
     v.check_count("viterbi_deterministic", vit2.path.len(), vit.path.len());
     let paths_match = vit2.path == vit.path;
@@ -93,7 +106,11 @@ fn main() {
     let vit_c = viterbi(&model, &obs_concordant);
     let n_state0: usize = vit_c.path.iter().filter(|&&s| s == 0).count();
     let mostly_concordant = n_state0 >= 15;
-    v.check_count("mostly_concordant(>=15/20)", usize::from(mostly_concordant), 1);
+    v.check_count(
+        "mostly_concordant(>=15/20)",
+        usize::from(mostly_concordant),
+        1,
+    );
 
     // ── Section 6: Edge case — single observation ───────────────
     v.section("── Single observation ──");

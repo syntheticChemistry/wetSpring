@@ -1,0 +1,19 @@
+{
+  "tree_height": 0.37,
+  "strict_clock_rate": 0.000148,
+  "root_age": 2500.0,
+  "node_ages": [
+    2500.0,
+    1486.4864864864865,
+    810.8108108108108,
+    945.945945945946,
+    1013.5135135135133,
+    0.0,
+    405.4054054054054
+  ],
+  "root_age_correct": true,
+  "all_ages_positive": true,
+  "ages_monotonic": true,
+  "pipeline_shared_with_exp053": true,
+  "n_nodes": 7
+}

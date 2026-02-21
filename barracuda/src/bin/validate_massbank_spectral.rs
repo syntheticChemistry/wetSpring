@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Exp042 — MassBank PFAS spectral matching validation.
+#![allow(clippy::similar_names)]
+//! Exp042 — `MassBank` PFAS spectral matching validation.
 //!
 //! # Provenance
 //!
@@ -21,11 +22,15 @@ fn main() {
     let mut v = Validator::new("Exp042: MassBank Spectral Matching Validation");
 
     // PFOS-like spectrum: characteristic CF₂ fragments
-    let pfos_mz = vec![80.0, 99.0, 119.0, 169.0, 219.0, 269.0, 319.0, 369.0, 419.0, 499.0];
+    let pfos_mz = vec![
+        80.0, 99.0, 119.0, 169.0, 219.0, 269.0, 319.0, 369.0, 419.0, 499.0,
+    ];
     let pfos_int = vec![30.0, 100.0, 45.0, 80.0, 55.0, 70.0, 40.0, 25.0, 15.0, 60.0];
 
     // Near-PFOS: slight instrument shift
-    let shifted_mz = vec![80.1, 99.05, 118.95, 169.1, 219.0, 268.9, 319.1, 369.0, 419.05, 499.0];
+    let shifted_mz = vec![
+        80.1, 99.05, 118.95, 169.1, 219.0, 268.9, 319.1, 369.0, 419.05, 499.0,
+    ];
     let shifted_int = vec![28.0, 98.0, 46.0, 78.0, 54.0, 72.0, 38.0, 26.0, 16.0, 58.0];
 
     // PFOA-like spectrum
@@ -59,7 +64,8 @@ fn main() {
 
     // ── Section 4: Unrelated compound ───────────────────────────
     v.section("── Unrelated match (PFOS vs caffeine) ──");
-    let cs_unrelated = cosine_similarity(&pfos_mz, &pfos_int, &caffeine_mz, &caffeine_int, tol).score;
+    let cs_unrelated =
+        cosine_similarity(&pfos_mz, &pfos_int, &caffeine_mz, &caffeine_int, tol).score;
     let unrelated_low = cs_unrelated < 0.3;
     v.check_count("unrelated_match < 0.3", usize::from(unrelated_low), 1);
 

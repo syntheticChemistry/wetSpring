@@ -26,7 +26,7 @@ fn dominance_index(counts: &[f64]) -> f64 {
     if total <= 0.0 {
         return 0.0;
     }
-    counts.iter().cloned().fold(0.0_f64, f64::max) / total
+    counts.iter().copied().fold(0.0_f64, f64::max) / total
 }
 
 fn main() {
@@ -34,8 +34,10 @@ fn main() {
 
     // ── Section 1: Pre-bloom baseline (even community) ──────────
     v.section("── Pre-bloom: even community ──");
-    let even = vec![40.0, 38.0, 42.0, 39.0, 41.0, 37.0, 43.0, 36.0, 44.0, 35.0,
-                    45.0, 34.0, 46.0, 33.0, 47.0, 32.0, 48.0, 31.0, 49.0, 30.0];
+    let even = vec![
+        40.0, 38.0, 42.0, 39.0, 41.0, 37.0, 43.0, 36.0, 44.0, 35.0, 45.0, 34.0, 46.0, 33.0, 47.0,
+        32.0, 48.0, 31.0, 49.0, 30.0,
+    ];
     let h_even = shannon(&even);
     let e_even = pielou_evenness(&even);
     let d_even = dominance_index(&even);
@@ -74,11 +76,17 @@ fn main() {
 
     // ── Section 4: Recovery detection ───────────────────────────
     v.section("── Recovery: community rebounds ──");
-    let recovery = vec![40.0, 38.0, 42.0, 39.0, 41.0, 37.0, 43.0, 36.0, 44.0, 35.0,
-                        45.0, 34.0, 46.0, 33.0, 47.0, 32.0, 48.0, 31.0, 49.0, 30.0];
+    let recovery = vec![
+        40.0, 38.0, 42.0, 39.0, 41.0, 37.0, 43.0, 36.0, 44.0, 35.0, 45.0, 34.0, 46.0, 33.0, 47.0,
+        32.0, 48.0, 31.0, 49.0, 30.0,
+    ];
     let h_recovery = shannon(&recovery);
     let recovery_near_baseline = (h_recovery - h_even).abs() < 0.1;
-    v.check_count("Shannon recovers to near baseline", usize::from(recovery_near_baseline), 1);
+    v.check_count(
+        "Shannon recovers to near baseline",
+        usize::from(recovery_near_baseline),
+        1,
+    );
 
     let bc_recovery = bray_curtis(&even, &recovery);
     let small_drift = bc_recovery < 0.1;
@@ -86,24 +94,48 @@ fn main() {
 
     // ── Section 5: Bloom detection threshold ────────────────────
     v.section("── Bloom detection algorithm ──");
-    let timepoints = vec![
-        vec![40.0, 38.0, 42.0, 39.0, 41.0],   // normal
-        vec![40.0, 39.0, 41.0, 38.0, 42.0],   // normal
-        vec![40.0, 37.0, 43.0, 36.0, 44.0],   // normal
-        vec![200.0, 10.0, 5.0, 3.0, 2.0],     // bloom!
-        vec![42.0, 38.0, 40.0, 39.0, 41.0],   // recovery
+    let timepoints: &[&[f64]] = &[
+        &[40.0, 38.0, 42.0, 39.0, 41.0], // normal
+        &[40.0, 39.0, 41.0, 38.0, 42.0], // normal
+        &[40.0, 37.0, 43.0, 36.0, 44.0], // normal
+        &[200.0, 10.0, 5.0, 3.0, 2.0],   // bloom!
+        &[42.0, 38.0, 40.0, 39.0, 41.0], // recovery
     ];
     let shannon_ts: Vec<f64> = timepoints.iter().map(|t| shannon(t)).collect();
     let pre_mean: f64 = shannon_ts[..3].iter().sum::<f64>() / 3.0;
-    let pre_std = (shannon_ts[..3].iter().map(|h| (h - pre_mean).powi(2)).sum::<f64>() / 3.0).sqrt();
+    let pre_std = (shannon_ts[..3]
+        .iter()
+        .map(|h| (h - pre_mean).powi(2))
+        .sum::<f64>()
+        / 3.0)
+        .sqrt();
     let bloom_detected = shannon_ts[3] < pre_mean - 2.0 * pre_std;
-    v.check_count("bloom detected (Shannon < mean-2σ)", usize::from(bloom_detected), 1);
+    v.check_count(
+        "bloom detected (Shannon < mean-2σ)",
+        usize::from(bloom_detected),
+        1,
+    );
 
     // ── Section 6: Determinism ──────────────────────────────────
     v.section("── Determinism ──");
-    v.check("Shannon deterministic", shannon(&bloom), shannon(&bloom), 0.0);
-    v.check("Simpson deterministic", simpson(&bloom), simpson(&bloom), 0.0);
-    v.check("BC deterministic", bray_curtis(&even, &bloom), bray_curtis(&even, &bloom), 0.0);
+    v.check(
+        "Shannon deterministic",
+        shannon(&bloom),
+        shannon(&bloom),
+        0.0,
+    );
+    v.check(
+        "Simpson deterministic",
+        simpson(&bloom),
+        simpson(&bloom),
+        0.0,
+    );
+    v.check(
+        "BC deterministic",
+        bray_curtis(&even, &bloom),
+        bray_curtis(&even, &bloom),
+        0.0,
+    );
 
     v.finish();
 }

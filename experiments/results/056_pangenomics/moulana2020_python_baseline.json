@@ -1,0 +1,17 @@
+{
+  "pangenome": {
+    "core": 2,
+    "accessory": 1,
+    "unique": 2,
+    "total": 5
+  },
+  "enriched_pvalue": 3.263440049305899e-07,
+  "not_enriched_pvalue": 1.0,
+  "bh_adjusted": [
+    0.04,
+    0.05333333333333334,
+    0.05333333333333334,
+    0.5
+  ],
+  "bh_all_in_range": true
+}

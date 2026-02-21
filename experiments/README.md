@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-20 (Exp050: GPU ODE sweep + bifurcation eigenvalues)
+**Updated**: 2026-02-20 (Exp063: GPU Random Forest batch inference)
 
 ---
 
@@ -63,6 +63,19 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 048 | [CPU vs GPU Benchmark](048_cpu_gpu_benchmark_phylo_hmm.md) | GPU | DONE | CPU baselines | Felsenstein, Bootstrap, HMM batch | 6 |
 | 049 | [GPU ODE Parameter Sweep](049_gpu_ode_parameter_sweep.md) | GPU | DONE | `qs_biofilm::run_scenario` | ODE sweep (local WGSL), pow_f64 polyfill | 7 |
 | 050 | [GPU Bifurcation Eigenvalues](050_gpu_bifurcation_eigenvalues.md) | GPU | DONE | Power iteration | BatchedEighGpu Jacobian eigenvalues | 5 |
+| 051 | [Rare Biosphere Diversity](051_rare_biosphere.md) | 1c | DONE | Anderson 2015 rare biosphere | bio::diversity, bio::ani | 35 |
+| 052 | [Viral Metagenomics](052_viral_metagenomics.md) | 1c | DONE | Anderson 2014 viral dN/dS | bio::dnds, bio::snp | 22 |
+| 053 | [Sulfur Phylogenomics](053_sulfur_phylogenomics.md) | 1c | DONE | Mateos 2023 molecular clock | bio::molecular_clock | 15 |
+| 054 | [Phosphorus Phylogenomics](054_phosphorus_phylogenomics.md) | 1c | DONE | Boden 2024 phosphorus clock | bio::molecular_clock | 13 |
+| 055 | [Population Genomics](055_population_genomics.md) | 1c | DONE | Anderson 2017 ANI/SNP | bio::ani, bio::snp | 24 |
+| 056 | [Pangenomics](056_pangenomics.md) | 1c | DONE | Moulana 2020 pangenome | bio::pangenome | 24 |
+| 057 | [BarraCUDA CPU Parity v4](057_barracuda_cpu_v4.md) | cross | DONE | Track 1c CPU | 5 new domains (128 total) | 44 |
+| 058 | [GPU Track 1c Promotion](058_gpu_track1c_promotion.md) | GPU | DONE | CPU Track 1c | ANI, SNP, dN/dS, pangenome WGSL shaders | 27 |
+| 059 | [23-Domain Benchmark](059_23_domain_benchmark.md) | cross | DONE | Rust vs Python | 22.5× overall speedup | 20 |
+| 060 | [Cross-Substrate metalForge](060_cross_substrate_metalforge.md) | cross | DONE | CPU↔GPU parity | metalForge substrate-independence | 20 |
+| 061 | [Random Forest Inference](061_random_forest_inference.md) | ML | DONE | RF majority vote | bio::random_forest, bio::random_forest_gpu | 13 |
+| 062 | [GBM Inference](062_gbm_inference.md) | ML | DONE | GBM sigmoid/softmax | bio::gbm | 16 |
+| 063 | GPU Random Forest Batch | GPU/ML | DONE | CPU RF | rf_batch_inference.wgsl (SoA layout) | 13 |
 
 ---
 
@@ -154,11 +167,23 @@ thresholds from `src/tolerances.rs`.
 | `validate_gpu_hmm_forward` | 047 | 13 | `cargo run --features gpu --release --bin validate_gpu_hmm_forward` |
 | `benchmark_phylo_hmm_gpu` | 048 | 6 | `cargo run --features gpu --release --bin benchmark_phylo_hmm_gpu` |
 | `validate_gpu_ode_sweep` | 049-050 | 12 | `cargo run --features gpu --bin validate_gpu_ode_sweep` |
+| `validate_rare_biosphere` | 051 | 35 | `cargo run --bin validate_rare_biosphere` |
+| `validate_viral_metagenomics` | 052 | 22 | `cargo run --bin validate_viral_metagenomics` |
+| `validate_sulfur_phylogenomics` | 053 | 15 | `cargo run --bin validate_sulfur_phylogenomics` |
+| `validate_phosphorus_phylogenomics` | 054 | 13 | `cargo run --bin validate_phosphorus_phylogenomics` |
+| `validate_population_genomics` | 055 | 24 | `cargo run --bin validate_population_genomics` |
+| `validate_pangenomics` | 056 | 24 | `cargo run --bin validate_pangenomics` |
+| `validate_barracuda_cpu_v4` | 057 | 44 | `cargo run --release --bin validate_barracuda_cpu_v4` |
+| `validate_gpu_track1c` | 058 | 27 | `cargo run --features gpu --bin validate_gpu_track1c` |
+| `validate_gpu_23_domain_benchmark` | 059 | 20 | `cargo run --features gpu --bin validate_gpu_23_domain_benchmark` |
+| `validate_gpu_cross_substrate` | 060 | skip | `cargo run --features gpu --bin validate_gpu_cross_substrate` |
+| `validate_barracuda_cpu_v5` | 061-062 | 29 | `cargo run --release --bin validate_barracuda_cpu_v5` |
+| `validate_gpu_rf` | 063 | 13 | `cargo run --features gpu --bin validate_gpu_rf` |
 | `benchmark_cpu_gpu` | — | — | `cargo run --release --features gpu --bin benchmark_cpu_gpu` |
 
-**Total validation checks**: 1,235 (1,035 CPU + 200 GPU)
-**Rust unit/integration tests**: 465 lib + integration + doc
-**Validation binaries**: 41 CPU + 8 GPU
+**Total validation checks**: 1,501 (1,241 CPU + 260 GPU)
+**Rust unit/integration tests**: 582 lib + integration + doc
+**Validation binaries**: 29 CPU + 12 GPU
 **Benchmark infrastructure**: `bench.rs` harness with RAPL + nvidia-smi energy profiling, JSON output
 
 ---

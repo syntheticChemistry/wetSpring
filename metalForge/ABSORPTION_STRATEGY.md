@@ -93,6 +93,11 @@ Every local shader must pass before handoff:
 | `quality_filter.wgsl` | `barracuda/src/shaders/` | 88 (pipeline) | New `ParallelFilter<T>` |
 | `hmm_forward_f64.wgsl` | `barracuda/src/shaders/` | 13 (Exp047) | New `HmmBatchForwardF64` |
 | `batched_qs_ode_rk4_f64.wgsl` | `barracuda/src/shaders/` | 7 (Exp049) | Fix upstream `BatchedOdeRK4F64` |
+| `ani_batch_f64.wgsl` | `barracuda/src/shaders/` | 7 (Exp058) | New `AniBatchF64` |
+| `snp_calling_f64.wgsl` | `barracuda/src/shaders/` | 5 (Exp058) | New `SnpCallingF64` |
+| `dnds_batch_f64.wgsl` | `barracuda/src/shaders/` | 9 (Exp058) | New `DnDsBatchF64` |
+| `pangenome_classify.wgsl` | `barracuda/src/shaders/` | 6 (Exp058) | New `PangenomeClassifyGpu` |
+| `rf_batch_inference.wgsl` | `barracuda/src/shaders/` | 13 (Exp063) | New `RfBatchInferenceGpu` |
 
 ### Completed Compositions (were candidates, now validated)
 
@@ -103,7 +108,30 @@ Every local shader must pass before handoff:
 | ODE parameter sweep | Local WGSL + `for_driver_auto` | 049 | 7 |
 | Bifurcation eigenvalues | CPU Jacobian + `BatchedEighGpu` | 050 | 5 |
 
-### Remaining Shader Candidates
+### Track 1c — GPU-Promoted (Exp058, Feb 21, 2026)
+
+| Algorithm | Shader | GPU Checks | Notes |
+|-----------|--------|:----------:|-------|
+| ANI pairwise | `ani_batch_f64.wgsl` | **7/7** | One thread per pair, integer counting + f64 division |
+| SNP calling | `snp_calling_f64.wgsl` | **5/5** | One thread per position, allele frequency |
+| dN/dS (Nei-Gojobori) | `dnds_batch_f64.wgsl` | **9/9** | One thread per pair, genetic code table, `log()` polyfill |
+| Pangenome classify | `pangenome_classify.wgsl` | **6/6** | One thread per gene, presence counting |
+| Molecular clock | CPU-only | — | Sequential tree traversal, too small for GPU |
+
+All 4 WGSL shaders validated against CPU baselines in `validate_gpu_track1c`.
+Total: 27/27 GPU checks PASS. These are ToadStool absorption candidates.
+
+### ML Ensembles — GPU-Promoted (Exp063, Feb 20, 2026)
+
+| Algorithm | Shader | GPU Checks | Notes |
+|-----------|--------|:----------:|-------|
+| Random Forest | `rf_batch_inference.wgsl` | **13/13** | One thread per (sample, tree) pair, SoA layout |
+| GBM | CPU-only | — | Sequential boosting across rounds |
+
+RF batch inference validated against CPU in `validate_gpu_rf`.
+SoA layout: separate node_features, node_thresholds (f64), node_children buffers.
+
+### Remaining Shader Candidates (Original)
 
 | Algorithm | Shader Design | Priority | Status |
 |-----------|--------------|----------|--------|

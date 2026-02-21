@@ -9,40 +9,50 @@
 
 | Algorithm | CPU (Rust) | GPU (wgpu) | NPU (AKD1000) | Status |
 |-----------|:----------:|:----------:|:--------------:|--------|
-| Shannon entropy | 84/84 | FusedMapReduceF64 | — | CPU+GPU |
-| Simpson diversity | 84/84 | FusedMapReduceF64 | — | CPU+GPU |
-| Pielou evenness | 84/84 | FusedMapReduceF64 | — | CPU+GPU |
-| Bray-Curtis (pairwise) | 84/84 | BrayCurtisF64 | — | CPU+GPU |
-| Observed features | 84/84 | FusedMapReduceF64 | — | CPU+GPU |
-| PCoA ordination | 84/84 | BatchedEighGpu | — | CPU+GPU |
-| Spectral cosine | 84/84 | GemmF64 + FMR | — | CPU+GPU |
-| Variance/StdDev | 84/84 | VarianceF64 | — | CPU+GPU |
-| Correlation | 84/84 | CorrelationF64 | — | CPU+GPU |
-| Covariance | 84/84 | CovarianceF64 | — | CPU+GPU |
-| Dot product | 84/84 | WeightedDotF64 | — | CPU+GPU |
-| Quality filtering | 84/84 | Custom WGSL | — | CPU+GPU |
-| DADA2 E-step | 84/84 | Custom WGSL | — | CPU+GPU |
-| Taxonomy GEMM | 84/84 | GemmCached | Candidate | CPU+GPU |
-| Smith-Waterman | 84/84 | **SmithWatermanGpu** (3/3) | — | **CPU+GPU** |
-| Felsenstein pruning | 84/84 | **FelsensteinGpu** (15/15) | — | **CPU+GPU** |
-| Decision tree | 84/84 | **TreeInferenceGpu** (6/6) | Candidate | **CPU+GPU** |
-| Gillespie SSA | 84/84 | **GillespieGpu** (driver skip) | — | CPU+GPU* |
-| HMM forward/Viterbi | 84/84 | **Local WGSL** (13/13) | — | **CPU+GPU** |
-| Bootstrap resampling | 84/84 | **Compose FelsensteinGpu** (15/15) | — | **CPU+GPU** |
-| K-mer counting | 84/84 | Blocked (lock-free hash) | — | CPU only |
-| ODE integration (RK4) | 84/84 | **Local WGSL** (7/7) | — | **CPU+GPU** |
-| Phylogenetic placement | 84/84 | **Compose FelsensteinGpu** (15/15) | — | **CPU+GPU** |
-| Bifurcation eigenvalues | 84/84 | **BatchedEighGpu** (5/5) | — | **CPU+GPU** |
-| Neighbor-Joining | 84/84 | Tier C | — | CPU only |
-| DTL Reconciliation | 84/84 | Tier C | — | CPU only |
-| Robinson-Foulds | 84/84 | Tier C | — | CPU only |
-| Signal processing | 84/84 | Tier C | — | CPU only |
+| Shannon entropy | ✓ | FusedMapReduceF64 | — | CPU+GPU |
+| Simpson diversity | ✓ | FusedMapReduceF64 | — | CPU+GPU |
+| Pielou evenness | ✓ | FusedMapReduceF64 | — | CPU+GPU |
+| Bray-Curtis (pairwise) | ✓ | BrayCurtisF64 | — | CPU+GPU |
+| Observed features | ✓ | FusedMapReduceF64 | — | CPU+GPU |
+| PCoA ordination | ✓ | BatchedEighGpu | — | CPU+GPU |
+| Spectral cosine | ✓ | GemmF64 + FMR | — | CPU+GPU |
+| Variance/StdDev | ✓ | VarianceF64 | — | CPU+GPU |
+| Correlation | ✓ | CorrelationF64 | — | CPU+GPU |
+| Covariance | ✓ | CovarianceF64 | — | CPU+GPU |
+| Dot product | ✓ | WeightedDotF64 | — | CPU+GPU |
+| Quality filtering | ✓ | Custom WGSL | — | CPU+GPU |
+| DADA2 E-step | ✓ | Custom WGSL | — | CPU+GPU |
+| Taxonomy GEMM | ✓ | GemmCached | Candidate | CPU+GPU |
+| Smith-Waterman | ✓ | **SmithWatermanGpu** (3/3) | — | **CPU+GPU** |
+| Felsenstein pruning | ✓ | **FelsensteinGpu** (15/15) | — | **CPU+GPU** |
+| Decision tree | ✓ | **TreeInferenceGpu** (6/6) | Candidate | **CPU+GPU** |
+| Gillespie SSA | ✓ | **GillespieGpu** (driver skip) | — | CPU+GPU* |
+| HMM forward/Viterbi | ✓ | **Local WGSL** (13/13) | — | **CPU+GPU** |
+| Bootstrap resampling | ✓ | **Compose FelsensteinGpu** (15/15) | — | **CPU+GPU** |
+| K-mer counting | ✓ | Blocked (lock-free hash) | — | CPU only |
+| ODE integration (RK4) | ✓ | **Local WGSL** (7/7) | — | **CPU+GPU** |
+| Phylogenetic placement | ✓ | **Compose FelsensteinGpu** (15/15) | — | **CPU+GPU** |
+| Bifurcation eigenvalues | ✓ | **BatchedEighGpu** (5/5) | — | **CPU+GPU** |
+| Neighbor-Joining | ✓ | Tier C | — | CPU only |
+| DTL Reconciliation | ✓ | Tier C | — | CPU only |
+| Robinson-Foulds | ✓ | Tier C | — | CPU only |
+| Signal processing | ✓ | Tier C | — | CPU only |
+| **— Track 1c —** | | | | |
+| ANI (pairwise identity) | 24/24 | **Local WGSL** (7/7) | — | **CPU+GPU** |
+| SNP calling | 24/24 | **Local WGSL** (5/5) | — | **CPU+GPU** |
+| dN/dS (Nei-Gojobori) | 22/22 | **Local WGSL** (9/9) | — | **CPU+GPU** |
+| Molecular clock | 15/15 | Tier C | — | CPU only |
+| Pangenome analysis | 24/24 | **Local WGSL** (6/6) | — | **CPU+GPU** |
+| Rare biosphere diversity | 35/35 | Lean (diversity) | — | CPU+GPU via existing |
+| **— ML Ensembles —** | | | | |
+| Random Forest | 29/29 | **Local WGSL** (13/13) | Candidate | **CPU+GPU** |
+| GBM (binary + multi) | 29/29 | CPU (sequential) | — | CPU only |
 
 *\* = Shader absorbed but driver skip on RTX 4070 (Gillespie uses native f64 exp)*
 
 ### Tier Legend
 - **CPU+GPU**: Validated on both, identical results
-- **Tier B**: CPU-validated, GPU-ready data layouts, needs ToadStool shader
+- **✓**: Validated in 157/157 CPU parity battery (25 domains)
 - **Tier C**: CPU-only (sequential/branching algorithms)
 - **Candidate**: NPU deployment possible with quantization
 
@@ -52,10 +62,10 @@
 
 | Substrate | Validated Checks | Algorithms |
 |-----------|:----------------:|:----------:|
-| CPU (Rust) | 1,035 | 18 domains (all) |
-| GPU (wgpu) | 200 | 25 promoted (15 ToadStool + 4 local WGSL + 6 composed) |
-| NPU | 0 | 0 (2 candidates) |
-| **Total** | **1,235** | — |
+| CPU (Rust) | 1,241 | 25 domains (18 original + 5 Track 1c + 2 ML ensemble) |
+| GPU (wgpu) | 260 | 30 promoted (15 ToadStool + 9 local WGSL + 6 composed) |
+| NPU | 0 | 0 (3 candidates) |
+| **Total** | **1,501** | — |
 
 ---
 
@@ -77,8 +87,11 @@
 │ NJ/DTL  │  ──→ │ Spectral     │  ──→  │ Anomaly      │
 │ Chimera │      │ PCoA/Eigen   │       │ PFAS screen  │
 │ Signal  │      │ QF + DADA2   │       │              │
-│         │      │ Phylo/HMM   │       │              │
+│ MolClk  │      │ Phylo/HMM   │       │              │
 │         │      │ ODE sweep    │       │              │
+│         │      │ ANI/SNP/Pan  │       │              │
+│         │      │ dN/dS        │       │              │
+│         │      │ RF ensemble  │       │              │
 └─────────┘      └──────────────┘       └──────────────┘
   125-241W            200W                   ~1W
   Sequential         Batch-parallel         Ultra-low-power

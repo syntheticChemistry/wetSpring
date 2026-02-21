@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 20, 2026
-**Status:** 50 experiments, 1235 validation checks, all PASS
+**Status:** 63 experiments, 1501 validation checks, all PASS
 
 ---
 
@@ -59,6 +59,19 @@
 | 048 | CPU vs GPU Benchmark (Phylo + HMM) | GPU | COMPLETE | 6 |
 | 049 | GPU ODE Parameter Sweep | GPU | COMPLETE | 7 |
 | 050 | GPU Bifurcation Eigenvalue Analysis | GPU | COMPLETE | 5 |
+| 051 | Anderson 2015 Rare Biosphere | 1c | COMPLETE | 35 |
+| 052 | Anderson 2014 Viral Metagenomics | 1c | COMPLETE | 22 |
+| 053 | Mateos 2023 Sulfur Phylogenomics | 1c | COMPLETE | 15 |
+| 054 | Boden 2024 Phosphorus Phylogenomics | 1c | COMPLETE | 13 |
+| 055 | Anderson 2017 Population Genomics | 1c | COMPLETE | 24 |
+| 056 | Moulana 2020 Pangenomics | 1c | COMPLETE | 24 |
+| 057 | BarraCUDA CPU Parity v4 (Track 1c) | cross | COMPLETE | 44 |
+| 058 | GPU Track 1c (ANI + SNP + Pangenome + dN/dS) | GPU | COMPLETE | 27 |
+| 059 | 23-Domain Rust vs Python Benchmark | cross | COMPLETE | Benchmark |
+| 060 | metalForge Cross-Substrate Validation | cross/GPU | COMPLETE | 20 |
+| 061 | Random Forest Ensemble Inference | cross | COMPLETE | 13 |
+| 062 | GBM Inference (Binary + Multi-Class) | cross | COMPLETE | 16 |
+| 063 | GPU Random Forest Batch Inference | GPU | COMPLETE | 13 |
 
 ---
 
@@ -66,12 +79,12 @@
 
 | Category | Count |
 |----------|-------|
-| Experiments completed | 50 |
-| CPU validation checks | 1,035 |
-| GPU validation checks | 200 |
-| **Total validation checks** | **1,235** |
-| Rust tests | 465 lib + integration + doc |
-| BarraCUDA CPU parity | 84/84 (18 domains) |
+| Experiments completed | 63 |
+| CPU validation checks | 1,241 |
+| GPU validation checks | 260 |
+| **Total validation checks** | **1,501** |
+| Rust tests | 524 lib + 58 integration/bin/doc |
+| BarraCUDA CPU parity | 157/157 (25 domains) |
 | ToadStool primitives consumed | 15 (11 original + 4 bio) |
 
 ---
@@ -108,6 +121,13 @@
 | `epa_pfas_ml_baseline.py` | Jones F&T proxy | Feb 2026 | GREEN |
 | `massbank_spectral_baseline.py` | Jones MS proxy | Feb 2026 | GREEN |
 | `benchmark_rust_vs_python.py` | 18-domain timing (Exp043) | Feb 2026 | GREEN |
+| `anderson2015_rare_biosphere.py` | diversity/rarefaction (Exp051) | Feb 2026 | GREEN |
+| `anderson2014_viral_metagenomics.py` | dN/dS + diversity (Exp052) | Feb 2026 | GREEN |
+| `mateos2023_sulfur_phylogenomics.py` | clock/reconciliation (Exp053) | Feb 2026 | GREEN |
+| `boden2024_phosphorus_phylogenomics.py` | clock/reconciliation (Exp054) | Feb 2026 | GREEN |
+| `anderson2017_population_genomics.py` | ANI/SNP (Exp055) | Feb 2026 | GREEN |
+| `moulana2020_pangenomics.py` | pangenome/enrichment (Exp056) | Feb 2026 | GREEN |
+| `barracuda_cpu_v4_baseline.py` | 5 Track 1c domain timing (Exp057) | Feb 2026 | GREEN |
 
 ---
 
@@ -119,10 +139,11 @@
 - Phase 3 (PhyloNet-HMM introgression): COMPLETE — 10/10 checks (Exp037)
 - Phase 4 (SATe 16S alignment): COMPLETE — 17/17 checks (Exp038)
 
-### Exp008 Full ML Pipeline
+### Exp008 Full ML Pipeline — COMPLETE
 - Phase 3 (Decision tree inference): COMPLETE — 7/7 checks, 100% parity
-- Future: Random Forest ensemble inference in Rust (multiple trees)
-- Future: GBM inference in Rust
+- Phase 4 (Random Forest ensemble): COMPLETE — Exp061, 13/13 checks
+- Phase 5 (GBM binary + multi-class): COMPLETE — Exp062, 16/16 checks
+- GPU RF batch inference: COMPLETE — Exp063, 13/13 checks
 
 ### Data Audit
 - Exp002 raw data: need to download 70 raw FASTQ pairs from SRA
@@ -151,6 +172,12 @@ SATe pipeline (Exp038). This provides a complete
 toolkit from sequence alignment through tree construction, evaluation,
 statistical confidence, and cophylogenetic analysis.
 
+### Track 1c: Deep-Sea Metagenomics (Anderson)
+**Status:** Comprehensive. 6 experiments (051-056) plus CPU parity (Exp057).
+Covers ANI, SNP calling, dN/dS, molecular clock, pangenome analysis,
+phylogenomics, and rare biosphere diversity — all validated against Python
+baselines and proved as pure Rust math via BarraCUDA CPU v4.
+
 ### Track 2: Analytical Chemistry (LC-MS, PFAS)
 **Status:** Comprehensive. 7 experiments (005, 006, 009, 013, 018, 041, 042) cover
 mzML parsing, feature extraction, peak detection, PFAS screening, and library
@@ -164,23 +191,27 @@ matching. Exp008 adds sovereign ML for environmental monitoring.
 cargo fmt --check      → clean
 cargo clippy --pedantic → 0 errors, 0 warnings
 cargo doc --no-deps    → clean
-cargo test             → 465 passed, 0 failed
-validations            → 30/30 binaries PASS (27 CPU + 9 GPU)
-barracuda_cpu          → 84/84 checks PASS (18 domains)
-barracuda_gpu          → 200 GPU checks PASS (9 binaries)
+cargo test             → 582 passed, 0 failed
+validations            → 36/36 binaries PASS (29 CPU + 12 GPU + 1 benchmark)
+barracuda_cpu          → 157/157 checks PASS (25 domains)
+barracuda_gpu          → 260 GPU checks PASS (12 binaries)
 toadstool_bio          → 10/10 checks PASS (4 new bio primitives)
+gpu_track1c            → 27/27 checks PASS (4 Track 1c WGSL shaders)
+gpu_rf                 → 13/13 checks PASS (1 local WGSL shader)
 ```
 
 ## BarraCUDA CPU Parity
 
-The `validate_barracuda_cpu`, `validate_barracuda_cpu_v2`, and
-`validate_barracuda_cpu_v3` binaries prove pure Rust math matches Python
-across all 18 algorithmic domains (v1: 9 domains, v2: 5 batch/Flat APIs,
-v3: 9 remaining domains including multi-signal QS, phage defense, bootstrap,
-placement, decision tree, spectral matching, extended diversity, k-mer, and
-integrated pipeline). Combined: 84/84 CPU parity checks. This is the bridge
-to pure GPU execution.
+The `validate_barracuda_cpu` v1-v4 binaries prove pure Rust math matches
+Python across all 23 algorithmic domains:
+- v1 (Exp035): 9 core domains
+- v2 (Exp035): +5 batch/flat APIs
+- v3 (Exp043): +9 domains (QS, phage, bootstrap, placement, decision tree, spectral, diversity, k-mer, pipeline)
+- v4 (Exp057): +5 Track 1c domains (ANI, SNP, dN/dS, molecular clock, pangenome)
+- v5 (Exp061/062): +2 ML domains (Random Forest, GBM)
+
+Combined: 157/157 CPU parity checks. This is the bridge to pure GPU execution.
 
 ```
-Total CPU time: ~84.5ms (release build, all 18 domains)
+Total CPU time: ~85ms (release build, all 25 domains, v4 adds ~0.4ms, v5 adds ~62µs)
 ```

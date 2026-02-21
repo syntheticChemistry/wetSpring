@@ -20,14 +20,15 @@ fn weather_model() -> HmmModel {
     HmmModel {
         n_states: 2,
         log_pi: vec![0.6_f64.ln(), 0.4_f64.ln()],
-        log_trans: vec![
-            0.7_f64.ln(), 0.3_f64.ln(),
-            0.4_f64.ln(), 0.6_f64.ln(),
-        ],
+        log_trans: vec![0.7_f64.ln(), 0.3_f64.ln(), 0.4_f64.ln(), 0.6_f64.ln()],
         n_symbols: 3,
         log_emit: vec![
-            0.1_f64.ln(), 0.4_f64.ln(), 0.5_f64.ln(),
-            0.6_f64.ln(), 0.3_f64.ln(), 0.1_f64.ln(),
+            0.1_f64.ln(),
+            0.4_f64.ln(),
+            0.5_f64.ln(),
+            0.6_f64.ln(),
+            0.3_f64.ln(),
+            0.1_f64.ln(),
         ],
     }
 }
@@ -41,15 +42,24 @@ fn genomic_model() -> HmmModel {
             (1.0_f64 / 3.0).ln(),
         ],
         log_trans: vec![
-            0.5_f64.ln(), 0.3_f64.ln(), 0.2_f64.ln(),
-            0.2_f64.ln(), 0.5_f64.ln(), 0.3_f64.ln(),
-            0.3_f64.ln(), 0.2_f64.ln(), 0.5_f64.ln(),
+            0.5_f64.ln(),
+            0.3_f64.ln(),
+            0.2_f64.ln(),
+            0.2_f64.ln(),
+            0.5_f64.ln(),
+            0.3_f64.ln(),
+            0.3_f64.ln(),
+            0.2_f64.ln(),
+            0.5_f64.ln(),
         ],
         n_symbols: 2,
         log_emit: vec![
-            0.9_f64.ln(), 0.1_f64.ln(),
-            0.2_f64.ln(), 0.8_f64.ln(),
-            0.5_f64.ln(), 0.5_f64.ln(),
+            0.9_f64.ln(),
+            0.1_f64.ln(),
+            0.2_f64.ln(),
+            0.8_f64.ln(),
+            0.5_f64.ln(),
+            0.5_f64.ln(),
         ],
     }
 }
@@ -96,12 +106,29 @@ fn validate_2state(gpu: &HmmGpuForward, v: &mut Validator) {
     match result {
         Ok(Ok(gpu_result)) => {
             let gpu_ll = gpu_result.log_likelihoods[0];
-            v.check("2-state: CPU ≈ GPU log-likelihood", cpu.log_likelihood, gpu_ll, 1e-6);
-            v.check("2-state: GPU LL finite", f64::from(gpu_ll.is_finite() as u8), 1.0, 0.0);
-            v.check("2-state: GPU LL negative", f64::from((gpu_ll < 0.0) as u8), 1.0, 0.0);
+            v.check(
+                "2-state: CPU ≈ GPU log-likelihood",
+                cpu.log_likelihood,
+                gpu_ll,
+                1e-6,
+            );
+            v.check(
+                "2-state: GPU LL finite",
+                f64::from(gpu_ll.is_finite() as u8),
+                1.0,
+                0.0,
+            );
+            v.check(
+                "2-state: GPU LL negative",
+                f64::from((gpu_ll < 0.0) as u8),
+                1.0,
+                0.0,
+            );
 
             let mut max_alpha_diff = 0.0_f64;
-            for (_, (&cpu_a, &gpu_a)) in cpu.log_alpha.iter()
+            for (_, (&cpu_a, &gpu_a)) in cpu
+                .log_alpha
+                .iter()
                 .zip(gpu_result.log_alpha.iter())
                 .enumerate()
             {
@@ -144,8 +171,18 @@ fn validate_3state(gpu: &HmmGpuForward, v: &mut Validator) {
     match result {
         Ok(Ok(gpu_result)) => {
             let gpu_ll = gpu_result.log_likelihoods[0];
-            v.check("3-state: CPU ≈ GPU log-likelihood", cpu.log_likelihood, gpu_ll, 1e-6);
-            v.check("3-state: GPU LL finite", f64::from(gpu_ll.is_finite() as u8), 1.0, 0.0);
+            v.check(
+                "3-state: CPU ≈ GPU log-likelihood",
+                cpu.log_likelihood,
+                gpu_ll,
+                1e-6,
+            );
+            v.check(
+                "3-state: GPU LL finite",
+                f64::from(gpu_ll.is_finite() as u8),
+                1.0,
+                0.0,
+            );
 
             // Viterbi path should be consistent (if alpha is correct,
             // GPU Viterbi would yield same path)
@@ -239,8 +276,7 @@ fn validate_batch(gpu: &HmmGpuForward, v: &mut Validator) {
             #[allow(clippy::cast_precision_loss)]
             {
                 let cpu_mean: f64 = cpu_lls.iter().sum::<f64>() / n_seqs as f64;
-                let gpu_mean: f64 =
-                    gpu_result.log_likelihoods.iter().sum::<f64>() / n_seqs as f64;
+                let gpu_mean: f64 = gpu_result.log_likelihoods.iter().sum::<f64>() / n_seqs as f64;
                 v.check("Batch: mean CPU ≈ GPU", cpu_mean, gpu_mean, 1e-4);
             }
         }

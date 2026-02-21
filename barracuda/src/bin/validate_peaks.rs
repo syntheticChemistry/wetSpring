@@ -102,9 +102,13 @@ fn validate_case(v: &mut Validator, dir: &Path, name: &str, params: &PeakParams)
     v.section(name);
 
     let path = dir.join(format!("{name}.dat"));
-    let contents = std::fs::read_to_string(&path).unwrap_or_else(|e| {
-        panic!("Failed to read {}: {e}", path.display());
-    });
+    let contents = match std::fs::read_to_string(&path) {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("FAIL: cannot read {}: {e}", path.display());
+            std::process::exit(1);
+        }
+    };
     let lines: Vec<&str> = contents.lines().collect();
 
     let data: Vec<f64> = lines[0]

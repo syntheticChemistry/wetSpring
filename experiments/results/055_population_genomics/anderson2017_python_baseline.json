@@ -1,0 +1,94 @@
+{
+  "ani_identical": {
+    "ani": 1.0,
+    "aligned": 9,
+    "identical": 9
+  },
+  "ani_half": {
+    "ani": 0.5,
+    "aligned": 4,
+    "identical": 2
+  },
+  "ani_with_gaps": {
+    "ani": 1.0,
+    "aligned": 3,
+    "identical": 3
+  },
+  "ani_same_species": {
+    "ani": 0.9607843137254902,
+    "aligned": 51,
+    "identical": 49
+  },
+  "ani_diff_species": {
+    "ani": 0.8823529411764706,
+    "aligned": 51,
+    "identical": 45
+  },
+  "snp_identical": {
+    "variants": [],
+    "aln_len": 6,
+    "n_variants": 0
+  },
+  "snp_single": {
+    "variants": [
+      {
+        "position": 3,
+        "ref": "A",
+        "alt": [
+          [
+            "T",
+            1
+          ]
+        ],
+        "depth": 3
+      }
+    ],
+    "aln_len": 6,
+    "n_variants": 1
+  },
+  "snp_multiple": {
+    "variants": [
+      {
+        "position": 0,
+        "ref": "A",
+        "alt": [
+          [
+            "C",
+            1
+          ]
+        ],
+        "depth": 3
+      },
+      {
+        "position": 3,
+        "ref": "A",
+        "alt": [
+          [
+            "T",
+            1
+          ]
+        ],
+        "depth": 3
+      }
+    ],
+    "aln_len": 6,
+    "n_variants": 2
+  },
+  "snp_frequency": {
+    "variants": [
+      {
+        "position": 0,
+        "ref": "A",
+        "alt": [
+          [
+            "T",
+            1
+          ]
+        ],
+        "depth": 4
+      }
+    ],
+    "aln_len": 1,
+    "n_variants": 1
+  }
+}

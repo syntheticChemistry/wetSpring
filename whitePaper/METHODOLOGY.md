@@ -34,6 +34,19 @@ capacitor models, and phage defense dynamics.
 Srivastava 2011, Bruger & Waters 2018, Mhatre 2020, Hsueh/Severin 2022,
 Wang 2021 (RAWR), Alamin & Liu 2024
 
+### Track 1c: Deep-Sea Metagenomics & Microbial Evolution
+
+Reproduce published metagenomic, population genomic, and pangenomic analyses
+from deep-sea hydrothermal vent systems. This exercises: average nucleotide
+identity (ANI), single nucleotide polymorphism (SNP) calling, pairwise dN/dS
+estimation (Nei-Gojobori 1986), strict and relaxed molecular clock calibration,
+pangenome analysis (core/accessory/unique gene partitioning), Heap's law
+(pangenome openness), hypergeometric enrichment testing, and Benjamini-Hochberg
+FDR correction.
+
+**Source papers**: Anderson et al. (2014, 2015, 2017), Mateos et al. (2023),
+Boden et al. (2024), Moulana et al. (2020)
+
 ### Track 2: PFAS Analytical Chemistry (codename blueFish)
 
 Reproduce published PFAS non-target screening from LC-MS/HRMS data. This
@@ -42,14 +55,16 @@ screening, and homologous series detection.
 
 **Source papers**: Jones et al. (MSU), Michigan PFAS monitoring studies
 
-### Why Two Tracks
+### Why Four Tracks
 
 | Track | Computational Primitives | GPU Shader Value |
 |-------|-------------------------|------------------|
 | Track 1 (Life Science) | Sequence I/O, k-mer ops, diversity metrics | Hash tables, reduce, distance matrices |
+| Track 1b (Comp. Genomics) | Tree traversal, alignment, HMM, ODE | Felsenstein, SW, batch forward, ODE sweep |
+| Track 1c (Metagenomics) | ANI, SNP, dN/dS, clock, pangenome | Pairwise alignment, batch comparison |
 | Track 2 (Analytical Chemistry) | Spectral I/O, peak detection, mass math | Signal processing, tolerance search, spectral correlation |
 
-Both tracks produce GPU kernels useful **far beyond** their original domain —
+All tracks produce GPU kernels useful **far beyond** their original domain —
 the ecoPrimals convergent evolution thesis in action.
 
 ---
@@ -291,7 +306,7 @@ All experiments run on a single consumer workstation:
 
 ## 6. Acceptance Criteria
 
-### Phase 2 (CPU): 1,035/1,035 checks pass
+### Phase 2 (CPU): 1,241/1,241 checks pass
 
 | Binary | Checks | Target |
 |--------|:------:|--------|
@@ -334,13 +349,21 @@ All experiments run on a single consumer workstation:
 | `validate_epa_pfas_ml` | 14 | EPA PFAS ML (Exp041) |
 | `validate_massbank_spectral` | 9 | MassBank spectral (Exp042) |
 | `validate_barracuda_cpu_v3` | 45 | 18-domain CPU parity (Exp043) |
-| **Total** | **1,035** | **All pass** |
+| `validate_rare_biosphere` | 35 | Anderson 2015 rare biosphere (Exp051) |
+| `validate_viral_metagenomics` | 22 | Anderson 2014 viral dN/dS (Exp052) |
+| `validate_sulfur_phylogenomics` | 15 | Mateos 2023 molecular clock (Exp053) |
+| `validate_phosphorus_phylogenomics` | 13 | Boden 2024 phosphorus clock (Exp054) |
+| `validate_population_genomics` | 24 | Anderson 2017 ANI/SNP (Exp055) |
+| `validate_pangenomics` | 24 | Moulana 2020 pangenome (Exp056) |
+| `validate_barracuda_cpu_v4` | 44 | 23-domain CPU parity (Exp057) |
+| `validate_barracuda_cpu_v5` | 29 | RF + GBM inference (Exp061-062) |
+| **Total** | **1,241** | **All pass** |
 
-Current status: **1,035/1,035 pass.** 50 experiments across 3 tracks.
-84/84 BarraCUDA CPU parity checks across 18 algorithmic domains.
-~20× Rust speedup over Python (84,500µs vs 1,749,000µs).
+Current status: **1,241/1,241 pass.** 63 experiments across 4 tracks.
+157/157 BarraCUDA CPU parity checks across 25 algorithmic domains.
+~22.5× Rust speedup over Python.
 
-### Phase 3 (GPU): 200/200 checks pass
+### Phase 3 (GPU): 260/260 checks pass
 
 | Binary | Checks | Target |
 |--------|:------:|--------|
@@ -353,11 +376,16 @@ Current status: **1,035/1,035 pass.** 50 experiments across 3 tracks.
 | `benchmark_phylo_hmm_gpu` | 6 | CPU vs GPU Felsenstein + HMM timing (Exp048) |
 | `validate_gpu_ode_sweep` | 12 | GPU ODE sweep (7) + bifurcation eigenvalues (5) (Exp049-050) |
 
-Current status: **200/200 pass.** 15 ToadStool primitives consumed.
-4 local WGSL shaders (Write → Absorb → Lean candidates).
+| `validate_gpu_track1c` | 27 | ANI + SNP + dN/dS + pangenome shaders (Exp058) |
+| `validate_gpu_23_domain_benchmark` | 20 | 23-domain GPU parity (Exp059) |
+| `validate_gpu_cross_substrate` | skip | metalForge substrate proof (Exp060) |
+| `validate_gpu_rf` | 13 | RF batch inference shader (Exp063) |
+
+Current status: **260/260 pass.** 15 ToadStool primitives consumed.
+9 local WGSL shaders (Write → Absorb → Lean candidates).
 4 bio GPU primitives absorbed from ToadStool (Feb 20 cce8fe7c).
 
-### Grand Total: 1,235/1,235 quantitative checks pass
+### Grand Total: 1,501/1,501 quantitative checks pass
 
 ---
 
@@ -370,7 +398,7 @@ Current status: **200/200 pass.** 15 ToadStool primitives consumed.
 | GPU workload | Large-matrix eigensolve, MD force evaluation | Diversity, phylogenetics, ODE sweeps, HMM |
 | Validation metric | chi2/datum | Pass/fail within documented tolerance |
 | Data size | Small (52–2,042 nuclei) | Large (millions of reads, thousands of spectra) |
-| Local shaders | 10+ WGSL (HFB, MD, lattice QCD) | 4 WGSL (HMM, ODE, DADA2, quality) |
+| Local shaders | 10+ WGSL (HFB, MD, lattice QCD) | 9 WGSL (HMM, ODE, ANI, SNP, dN/dS, pangenome, RF, DADA2, quality) |
 | Absorption tracking | `EVOLUTION_READINESS.md` with tiers | `EVOLUTION_READINESS.md` with tiers (adopted) |
 | Key insight | GPU-resident hybrid beats CPU for matrix physics | Full GPU pipeline 2.45× faster; ODE/HMM/phylo math portable to GPU |
 

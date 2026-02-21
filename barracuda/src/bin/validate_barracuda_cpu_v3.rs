@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![allow(clippy::similar_names)]
 //! `BarraCUDA` CPU Parity v3 — comprehensive coverage of ALL 18 algorithmic
 //! domains.  Extends v1 (9 domains) and v2 (batch/flat APIs) with the 9
 //! remaining math modules:  multi-signal QS, phage defense, bootstrap
@@ -11,8 +12,8 @@
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{
-    bootstrap, decision_tree::DecisionTree, diversity, felsenstein,
-    kmer, multi_signal, phage_defense, placement, spectral_match,
+    bootstrap, decision_tree::DecisionTree, diversity, felsenstein, kmer, multi_signal,
+    phage_defense, placement, spectral_match,
 };
 use wetspring_barracuda::validation::Validator;
 
@@ -318,12 +319,7 @@ fn main() {
         1.0,
         0.0,
     );
-    v.check(
-        "Bray-Curtis: identical = 0",
-        bc_same,
-        0.0,
-        1e-10,
-    );
+    v.check("Bray-Curtis: identical = 0", bc_same, 0.0, 1e-10);
     v.check(
         "Bray-Curtis: different > 0",
         f64::from(u8::from(bc_diff > 0.0)),
@@ -332,7 +328,7 @@ fn main() {
     );
     v.check(
         "Bray-Curtis: range [0,1]",
-        f64::from(u8::from(bc_diff >= 0.0 && bc_diff <= 1.0)),
+        f64::from(u8::from((0.0..=1.0).contains(&bc_diff))),
         1.0,
         0.0,
     );
@@ -362,7 +358,12 @@ fn main() {
         vec![5.0, 5.0, 5.0],
     ];
     let bc_matrix = diversity::bray_curtis_condensed(&samples);
-    v.check("BC condensed: 3 samples → 3 pairs", bc_matrix.len() as f64, 3.0, 0.0);
+    v.check(
+        "BC condensed: 3 samples → 3 pairs",
+        bc_matrix.len() as f64,
+        3.0,
+        0.0,
+    );
 
     timings.push(("Extended diversity suite", div_us as f64));
 
@@ -388,7 +389,7 @@ fn main() {
         (seq.len() - 4 + 1) as f64,
         0.0,
     );
-    let decoded = kmer::decode_kmer(0b00011011, 4);
+    let decoded = kmer::decode_kmer(0b0001_1011, 4);
     v.check(
         "Kmer: decode 0b00011011 = ACGT",
         f64::from(u8::from(decoded == "ACGT")),

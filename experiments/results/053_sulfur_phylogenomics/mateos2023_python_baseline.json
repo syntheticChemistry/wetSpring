@@ -1,0 +1,32 @@
+{
+  "tree_height": 0.2,
+  "strict_clock_rate": 6.666666666666667e-05,
+  "root_age": 3000.0,
+  "node_ages": [
+    3000.0,
+    1500.0,
+    0.0,
+    750.0,
+    750.0
+  ],
+  "root_age_correct": true,
+  "all_ages_positive": true,
+  "ages_monotonic": true,
+  "relaxed_rates": [
+    0.0,
+    6.666666666666667e-05,
+    6.666666666666667e-05,
+    6.666666666666667e-05,
+    6.666666666666667e-05
+  ],
+  "rate_cv": 0.0,
+  "cv_near_zero_strict": true,
+  "dtl_congruent_hgt": 0,
+  "dtl_congruent_dup": 0,
+  "dtl_congruent_loss": 0,
+  "dtl_congruent_cost": 0,
+  "dtl_incongruent_cost_positive": true,
+  "calibration_root_satisfied": true,
+  "rf_congruent": 0,
+  "rf_incongruent": 2
+}

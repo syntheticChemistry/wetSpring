@@ -112,10 +112,22 @@ impl OdeSweepGpu {
             label: Some("OdeSweep BG"),
             layout: &bgl,
             entries: &[
-                wgpu::BindGroupEntry { binding: 0, resource: cfg_buf.as_entire_binding() },
-                wgpu::BindGroupEntry { binding: 1, resource: init_buf.as_entire_binding() },
-                wgpu::BindGroupEntry { binding: 2, resource: param_buf.as_entire_binding() },
-                wgpu::BindGroupEntry { binding: 3, resource: out_buf.as_entire_binding() },
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: cfg_buf.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: init_buf.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 2,
+                    resource: param_buf.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 3,
+                    resource: out_buf.as_entire_binding(),
+                },
             ],
         });
 
@@ -137,8 +149,9 @@ impl OdeSweepGpu {
             compilation_options: Default::default(),
         });
 
-        let mut encoder =
-            d.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: Some("OdeSweep") });
+        let mut encoder = d.create_command_encoder(&wgpu::CommandEncoderDescriptor {
+            label: Some("OdeSweep"),
+        });
         {
             let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
                 label: Some("OdeSweep Pass"),
@@ -156,8 +169,9 @@ impl OdeSweepGpu {
             usage: wgpu::BufferUsages::MAP_READ | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
-        let mut enc2 =
-            d.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: Some("Copy") });
+        let mut enc2 = d.create_command_encoder(&wgpu::CommandEncoderDescriptor {
+            label: Some("Copy"),
+        });
         enc2.copy_buffer_to_buffer(&out_buf, 0, &staging, 0, out_size);
         dev.queue().submit(Some(enc2.finish()));
 

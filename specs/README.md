@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 20, 2026
-**Status**: Phase 12 — 1,035/1,035 CPU + 200/200 GPU = 1,235/1,235 checks, ALL PASS
+**Status**: Phase 14 — 1,241/1,241 CPU + 260/260 GPU = 1,501/1,501 checks, ALL PASS
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -10,16 +10,17 @@
 
 | Metric | Value |
 |--------|-------|
-| CPU validation | 1,035/1,035 PASS — 34 modules, 50 experiments, 18 domains |
-| GPU validation | 200/200 PASS — 15 ToadStool primitives, 4 local WGSL shaders, 8 GPU binaries |
-| BarraCUDA CPU parity | 84/84 — ~20x Rust speedup over Python |
-| Rust modules | 34 CPU + 15 GPU, 465 tests |
+| CPU validation | 1,241/1,241 PASS — 41 modules, 63 experiments, 25 domains |
+| GPU validation | 260/260 PASS — 15 ToadStool primitives, 9 local WGSL shaders, 12 GPU binaries |
+| BarraCUDA CPU parity | 157/157 — 22.5x Rust speedup over Python |
+| Rust modules | 41 CPU + 20 GPU, 582 tests |
 | Dependencies | 1 runtime (flate2), everything else sovereign |
-| Paper queue | **ALL DONE** — 13/13 reproducible papers complete |
+| Paper queue | **ALL DONE** — 29/29 reproducible papers complete (Track 1c added) |
 | Faculty (Track 1) | Waters (MMG, MSU), Cahill (Sandia), Smallwood (Sandia) |
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
+| Faculty (Track 1c) | R. Anderson (Carleton) — deep-sea metagenomics, population genomics |
 | Faculty (Track 2) | Jones (BMB/Chemistry, MSU) — PFAS mass spectrometry |
-| Handoffs | Five delivered (Feb 16, 17, 19 v1-v3, 20 v4) |
+| Handoffs | Six delivered (Feb 16, 17, 19 v1-v3, 20 v4-v5) |
 
 ---
 
@@ -29,21 +30,20 @@
 
 | Spec | Status | Description |
 |------|--------|-------------|
-| [PAPER_REVIEW_QUEUE.md](PAPER_REVIEW_QUEUE.md) | Active | Papers to review/reproduce across 3 tracks |
+| [PAPER_REVIEW_QUEUE.md](PAPER_REVIEW_QUEUE.md) | Complete | 29/29 papers reproduced across 3 tracks |
 | [BARRACUDA_REQUIREMENTS.md](BARRACUDA_REQUIREMENTS.md) | Active | GPU kernel requirements and gap analysis |
 
 ### Existing Documentation (in parent directories)
 
 | Document | Location | Description |
 |----------|----------|-------------|
-| CONTROL_EXPERIMENT_STATUS.md | `../` | Detailed experiment logs (995 lines) |
-| EVOLUTION_READINESS.md | `../` | Module-by-module GPU promotion assessment |
+| CONTROL_EXPERIMENT_STATUS.md | `../` | 63 experiments, 1,501 validation checks |
+| EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
-| HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_16_2026.md | `../` | First ToadStool handoff |
-| HANDOFF_SPRINGS_TO_TOADSTOOL_FEB_17_2026.md | `../` | Combined springs handoff |
+| HANDOFF (v5) | `../` | Current consolidated ToadStool handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
-| experiments/README.md | `../experiments/` | Galaxy experiment guide |
+| metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |
 
 ---
 
@@ -54,7 +54,9 @@
 - **LC-MS feature extraction** — mzML → EIC → peaks → features → spectral matching
 - **PFAS screening** — KMD + tolerance search + MS2 fragment matching
 - **Microbial ecology** — Alpha/beta diversity, PCoA, rarefaction
-- **Sovereign Rust bioinformatics** — 34 CPU + 15 GPU modules, 1 runtime dependency
+- **Deep-sea metagenomics** — ANI, SNP, dN/dS, molecular clock, pangenomics
+- **ML inference** — Decision tree, Random Forest, GBM (all sovereign, no Python)
+- **Sovereign Rust bioinformatics** — 41 CPU + 20 GPU modules, 1 runtime dependency
 
 ### wetSpring IS NOT:
 - Sensor noise analysis (groundSpring)
@@ -65,6 +67,7 @@
 ### wetSpring EXTENDS TO (via faculty):
 - **Waters**: c-di-GMP signaling dynamics, quorum sensing, biofilm regulation, phage defense
 - **Liu**: Comparative genomics, phylogenetic placement, introgression detection, cophylogenetics
+- **R. Anderson**: Deep-sea metagenomics, population genomics, pangenomics, viral ecology, molecular clock
 - **Cahill/Smallwood**: Algal pond metagenomics, phage biocontrol
 - **Jones**: PFAS fate-and-transport, high-resolution mass spec methods
 
@@ -78,10 +81,10 @@
 3. PAPER_REVIEW_QUEUE.md — what's next (5 min)
 
 **Deep dive** (2 hours):
-`../whitePaper/STUDY.md` → `../CONTROL_EXPERIMENT_STATUS.md` → `../EVOLUTION_READINESS.md` → BARRACUDA_REQUIREMENTS.md
+`../whitePaper/STUDY.md` → `../CONTROL_EXPERIMENT_STATUS.md` → `../barracuda/EVOLUTION_READINESS.md` → BARRACUDA_REQUIREMENTS.md
 
 **Integration partner**:
-`../HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_16_2026.md` → `../BENCHMARK_RESULTS.md`
+`../HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_20_2026.md` → `../BENCHMARK_RESULTS.md`
 
 ---
 

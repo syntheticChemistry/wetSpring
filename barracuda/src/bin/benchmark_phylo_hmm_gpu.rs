@@ -74,10 +74,7 @@ fn alignment_from_tree(tree: &TreeNode) -> Alignment {
 }
 
 /// Convert TreeNode to PhyloTree (same as Exp046).
-fn convert_tree(
-    tree: &TreeNode,
-    mu: f64,
-) -> (PhyloTree, Vec<f64>, Vec<f64>, usize) {
+fn convert_tree(tree: &TreeNode, mu: f64) -> (PhyloTree, Vec<f64>, Vec<f64>, usize) {
     let mut left_child = Vec::new();
     let mut right_child = Vec::new();
     let mut branch_lengths = Vec::new();
@@ -127,13 +124,24 @@ fn convert_tree(
     }
 
     walk(
-        tree, 0.0, 0,
-        &mut left_child, &mut right_child, &mut branch_lengths,
-        &mut leaf_seqs, &mut depths, &mut is_leaf,
+        tree,
+        0.0,
+        0,
+        &mut left_child,
+        &mut right_child,
+        &mut branch_lengths,
+        &mut leaf_seqs,
+        &mut depths,
+        &mut is_leaf,
     );
 
     let n_nodes = left_child.len();
-    let n_sites = leaf_seqs.iter().filter(|s| !s.is_empty()).map(|s| s.len()).next().unwrap_or(0);
+    let n_sites = leaf_seqs
+        .iter()
+        .filter(|s| !s.is_empty())
+        .map(|s| s.len())
+        .next()
+        .unwrap_or(0);
 
     let max_depth = depths.iter().copied().max().unwrap_or(0);
     let mut levels: Vec<Vec<u32>> = Vec::with_capacity(max_depth + 1);
@@ -273,7 +281,10 @@ fn bench_bootstrap(device: &Arc<barracuda::device::WgpuDevice>, v: &mut Validato
         let tips = rebuild_tips_from_leaves(&leaf_states, &phylo, &rep, n_sites);
         match pruner.prune(&phylo, &tips, &tp, rep.n_sites, N_STATES) {
             Ok(r) => gpu_lls.push(r.log_likelihood(0, &PI)),
-            Err(_) => { ok = false; break; }
+            Err(_) => {
+                ok = false;
+                break;
+            }
         }
     }
     let gpu_us = start.elapsed().as_micros();
@@ -288,8 +299,18 @@ fn bench_bootstrap(device: &Arc<barracuda::device::WgpuDevice>, v: &mut Validato
             let speedup = cpu_us as f64 / gpu_us.max(1) as f64;
             println!("    CPU: {cpu_us} µs, GPU: {gpu_us} µs, speedup: {speedup:.2}×");
             println!("    max |CPU−GPU| = {max_diff:.2e}");
-            v.check("Bootstrap: parity", f64::from((max_diff < 1e-4) as u8), 1.0, 0.0);
-            v.check("Bootstrap: GPU complete", gpu_lls.len() as f64, n_reps as f64, 0.0);
+            v.check(
+                "Bootstrap: parity",
+                f64::from((max_diff < 1e-4) as u8),
+                1.0,
+                0.0,
+            );
+            v.check(
+                "Bootstrap: GPU complete",
+                gpu_lls.len() as f64,
+                n_reps as f64,
+                0.0,
+            );
         }
     } else {
         v.check("Bootstrap: GPU (skipped)", 1.0, 1.0, 0.0);
@@ -307,15 +328,24 @@ fn bench_hmm_batch(device: &Arc<barracuda::device::WgpuDevice>, v: &mut Validato
             (1.0_f64 / 3.0).ln(),
         ],
         log_trans: vec![
-            0.5_f64.ln(), 0.3_f64.ln(), 0.2_f64.ln(),
-            0.2_f64.ln(), 0.5_f64.ln(), 0.3_f64.ln(),
-            0.3_f64.ln(), 0.2_f64.ln(), 0.5_f64.ln(),
+            0.5_f64.ln(),
+            0.3_f64.ln(),
+            0.2_f64.ln(),
+            0.2_f64.ln(),
+            0.5_f64.ln(),
+            0.3_f64.ln(),
+            0.3_f64.ln(),
+            0.2_f64.ln(),
+            0.5_f64.ln(),
         ],
         n_symbols: 2,
         log_emit: vec![
-            0.9_f64.ln(), 0.1_f64.ln(),
-            0.2_f64.ln(), 0.8_f64.ln(),
-            0.5_f64.ln(), 0.5_f64.ln(),
+            0.9_f64.ln(),
+            0.1_f64.ln(),
+            0.2_f64.ln(),
+            0.8_f64.ln(),
+            0.5_f64.ln(),
+            0.5_f64.ln(),
         ],
     };
 
@@ -359,7 +389,12 @@ fn bench_hmm_batch(device: &Arc<barracuda::device::WgpuDevice>, v: &mut Validato
                 let speedup = cpu_us as f64 / gpu_us.max(1) as f64;
                 println!("    CPU: {cpu_us} µs, GPU: {gpu_us} µs, speedup: {speedup:.2}×");
                 println!("    max |CPU−GPU| = {max_diff:.2e}");
-                v.check("HMM batch: parity", f64::from((max_diff < 1e-3) as u8), 1.0, 0.0);
+                v.check(
+                    "HMM batch: parity",
+                    f64::from((max_diff < 1e-3) as u8),
+                    1.0,
+                    0.0,
+                );
                 v.check(
                     "HMM batch: GPU complete",
                     gpu_result.log_likelihoods.len() as f64,

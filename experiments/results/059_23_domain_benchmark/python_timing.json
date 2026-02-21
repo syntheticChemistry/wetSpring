@@ -1,0 +1,28 @@
+{
+  "total_us": 1798608.3520227112,
+  "domains": {
+    "D01: ODE Integration (RK4)": 183652.66799810342,
+    "D02: Gillespie SSA (100 reps)": 897813.3119817358,
+    "D03: HMM (Forward + Viterbi)": 33.12199260108173,
+    "D04: Smith-Waterman (40bp)": 4998.2510099653155,
+    "D05: Felsenstein (20bp, 3 taxa)": 176.62098980508745,
+    "D06: Diversity (Shannon+Simpson)": 8.81499727256596,
+    "D07: Signal Processing": 23.120985133573413,
+    "D08: Cooperation ODE (100h)": 284986.5749885794,
+    "D09: Robinson-Foulds (4 taxa)": 13.657991075888276,
+    "D10: Multi-Signal QS (48h)": 249729.10599899478,
+    "D11: Phage Defense (48h)": 176551.21299321763,
+    "D12: Bootstrap (100 reps, 8bp)": 369.12900395691395,
+    "D13: Placement (3 taxa, 12bp)": 11.250987881794572,
+    "D14: Decision Tree (4 samples)": 2.3500178940594196,
+    "D15: Spectral Match (5 peaks)": 16.61700662225485,
+    "D16: Extended Diversity": 11.510011972859502,
+    "D17: K-mer Counting (16bp, k=4)": 20.383013179525733,
+    "D18: Integrated Pipeline": 8.747010724619031,
+    "D19: ANI (3 seqs, 50bp)": 21.538027795031667,
+    "D20: SNP Calling (4 seqs, 50bp)": 55.73901580646634,
+    "D21: dN/dS (10 codons)": 85.87399497628212,
+    "D22: Molecular Clock (7 nodes)": 6.551010301336646,
+    "D23: Pangenome (7 genes)": 12.200995115563273
+  }
+}

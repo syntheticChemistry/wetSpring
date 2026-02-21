@@ -1,39 +1,50 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # wetSpring — Rust vs Python Head-to-Head Benchmark
-# Runs both BarraCUDA CPU (v1+v3 release) and Python baseline, captures timings.
+# Runs all BarraCUDA CPU validators (v1–v5 release) and Python baseline, captures timings.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(dirname "$SCRIPT_DIR")"
 BARRACUDA="$ROOT/barracuda"
-RESULTS="$ROOT/experiments/results/043_barracuda_cpu_v3"
+RESULTS="$ROOT/experiments/results/benchmark_head_to_head"
 mkdir -p "$RESULTS"
 
 echo "═══════════════════════════════════════════════════════════════"
 echo "  wetSpring — Rust vs Python Head-to-Head Benchmark"
+echo "  25 domains | 157/157 CPU parity checks | v1–v5"
 echo "═══════════════════════════════════════════════════════════════"
 echo ""
 
 echo "─── Phase 1: Rust (release build) ───"
 cd "$BARRACUDA"
-cargo build --release --bin validate_barracuda_cpu --bin validate_barracuda_cpu_v3 2>&1 | tail -1
+cargo build --release \
+    --bin validate_barracuda_cpu \
+    --bin validate_barracuda_cpu_v2 \
+    --bin validate_barracuda_cpu_v3 \
+    --bin validate_barracuda_cpu_v4 \
+    --bin validate_barracuda_cpu_v5 2>&1 | tail -1
 
-echo ""
-echo "  Running v1 (domains 1-9)..."
-RUST_V1_START=$(date +%s%N)
-cargo run --release --bin validate_barracuda_cpu 2>&1 | grep -E "TOTAL|RESULT"
-RUST_V1_END=$(date +%s%N)
-RUST_V1_US=$(( (RUST_V1_END - RUST_V1_START) / 1000 ))
+BINS=(
+    "validate_barracuda_cpu:v1 (9 domains)"
+    "validate_barracuda_cpu_v2:v2 (5 batch domains)"
+    "validate_barracuda_cpu_v3:v3 (9 new domains)"
+    "validate_barracuda_cpu_v4:v4 (5 Track 1c domains)"
+    "validate_barracuda_cpu_v5:v5 (RF + GBM)"
+)
 
-echo ""
-echo "  Running v3 (domains 10-18)..."
-RUST_V3_START=$(date +%s%N)
-cargo run --release --bin validate_barracuda_cpu_v3 2>&1 | grep -E "TOTAL|RESULT"
-RUST_V3_END=$(date +%s%N)
-RUST_V3_US=$(( (RUST_V3_END - RUST_V3_START) / 1000 ))
-
-RUST_TOTAL=$(( RUST_V1_US + RUST_V3_US ))
+RUST_TOTAL=0
+for entry in "${BINS[@]}"; do
+    BIN="${entry%%:*}"
+    LABEL="${entry##*:}"
+    echo ""
+    echo "  Running $LABEL..."
+    T_START=$(date +%s%N)
+    cargo run --release --bin "$BIN" 2>&1 | grep -E "TOTAL|RESULT"
+    T_END=$(date +%s%N)
+    T_US=$(( (T_END - T_START) / 1000 ))
+    RUST_TOTAL=$(( RUST_TOTAL + T_US ))
+done
 
 echo ""
 echo "─── Phase 2: Python ───"
@@ -59,5 +70,5 @@ if [ "$RUST_TOTAL" -gt 0 ]; then
     echo "  Rust speedup: ~${SPEEDUP}x over Python"
 fi
 echo ""
-echo "  All 18 domains validated. Pure Rust math: PROVEN."
+echo "  All 25 domains validated. Pure Rust math: PROVEN."
 echo ""

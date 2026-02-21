@@ -242,6 +242,51 @@ path = "src/bin/validate_massbank_spectral.rs"
 name = "validate_barracuda_cpu_v3"
 path = "src/bin/validate_barracuda_cpu_v3.rs"
 
+# ── BarraCUDA CPU Parity v4 (Exp057 — Track 1c, 23 total domains) ──
+[[bin]]
+name = "validate_barracuda_cpu_v4"
+path = "src/bin/validate_barracuda_cpu_v4.rs"
+
+# ── 23-domain head-to-head timing benchmark (Exp059) ─────────────
+[[bin]]
+name = "benchmark_23_domain_timing"
+path = "src/bin/benchmark_23_domain_timing.rs"
+
+# ── BarraCUDA CPU Parity v5 (Exp061/062 — RF + GBM, 25 total domains) ──
+[[bin]]
+name = "validate_barracuda_cpu_v5"
+path = "src/bin/validate_barracuda_cpu_v5.rs"
+
+# ── Rare biosphere validation (Exp051, Anderson 2015) ─────────────
+[[bin]]
+name = "validate_rare_biosphere"
+path = "src/bin/validate_rare_biosphere.rs"
+
+# ── Pangenomics validation (Exp056, Moulana 2020) ─────────────────
+[[bin]]
+name = "validate_pangenomics"
+path = "src/bin/validate_pangenomics.rs"
+
+# ── Population genomics validation (Exp055, Anderson 2017) ────────
+[[bin]]
+name = "validate_population_genomics"
+path = "src/bin/validate_population_genomics.rs"
+
+# ── Phosphorus phylogenomics validation (Exp054, Boden 2024) ──────
+[[bin]]
+name = "validate_phosphorus_phylogenomics"
+path = "src/bin/validate_phosphorus_phylogenomics.rs"
+
+# ── Sulfur phylogenomics validation (Exp053, Mateos 2023) ─────────
+[[bin]]
+name = "validate_sulfur_phylogenomics"
+path = "src/bin/validate_sulfur_phylogenomics.rs"
+
+# ── Viral metagenomics validation (Exp052, Anderson 2014) ─────────
+[[bin]]
+name = "validate_viral_metagenomics"
+path = "src/bin/validate_viral_metagenomics.rs"
+
 # ── Pipeline benchmark (Exp015: Rust CPU vs Galaxy/QIIME2) ───────
 [[bin]]
 name = "benchmark_pipeline"
@@ -293,6 +338,24 @@ required-features = ["gpu"]
 [[bin]]
 name = "validate_gpu_ode_sweep"
 path = "src/bin/validate_gpu_ode_sweep.rs"
+required-features = ["gpu"]
+
+# ── GPU Track 1c Promotion (Exp058: ANI + SNP + Pangenome GPU) ───
+[[bin]]
+name = "validate_gpu_track1c"
+path = "src/bin/validate_gpu_track1c.rs"
+required-features = ["gpu"]
+
+# ── metalForge cross-substrate validation (Exp060) ───────────────
+[[bin]]
+name = "validate_cross_substrate"
+path = "src/bin/validate_cross_substrate.rs"
+required-features = ["gpu"]
+
+# ── GPU Random Forest (Exp063) ────────────────────────────────────
+[[bin]]
+name = "validate_gpu_rf"
+path = "src/bin/validate_gpu_rf.rs"
 required-features = ["gpu"]
 
 # ── CPU vs GPU benchmark (require --features gpu) ────────────────

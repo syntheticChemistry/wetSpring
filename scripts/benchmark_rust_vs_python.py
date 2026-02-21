@@ -3,10 +3,10 @@
 """
 wetSpring — BarraCUDA CPU vs Python Timing Benchmark
 
-Runs equivalent operations to validate_barracuda_cpu + cpu_v2 + cpu_v3 in pure
+Runs equivalent operations to validate_barracuda_cpu v1–v4 in pure
 Python (numpy/scipy) and reports wall-clock timings for direct comparison.
 
-Coverage: all 18 algorithmic domains that BarraCUDA validates on CPU.
+Coverage: all 23 algorithmic domains that BarraCUDA validates on CPU.
 """
 
 import json
@@ -587,12 +587,232 @@ def domain_18_pipeline():
 
 
 # ════════════════════════════════════════════════════════════════════════════
+#  Domain 19: ANI (Average Nucleotide Identity)
+# ════════════════════════════════════════════════════════════════════════════
+
+def pairwise_ani(seq1, seq2):
+    aligned = identical = 0
+    for a, b in zip(seq1, seq2):
+        a, b = a.upper(), b.upper()
+        if a in ('-', '.', 'N') or b in ('-', '.', 'N'):
+            continue
+        aligned += 1
+        if a == b:
+            identical += 1
+    return (identical / aligned if aligned > 0 else 0.0), aligned, identical
+
+def domain_19_ani():
+    seqs = [
+        "ATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATG",
+        "ATGATGATGATGATGATCATGATGATGATGATGATGATGATGATGATGATG",
+        "CTGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGCTG",
+    ]
+    return [pairwise_ani(seqs[i], seqs[j])
+            for i in range(len(seqs)) for j in range(i)]
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  Domain 20: SNP Calling
+# ════════════════════════════════════════════════════════════════════════════
+
+VALID_BASES_SNP = ['A', 'C', 'G', 'T']
+
+def call_snps(sequences):
+    if not sequences:
+        return [], 0, 0
+    aln_len = len(sequences[0])
+    variants = []
+    for pos in range(aln_len):
+        counts = {b: 0 for b in VALID_BASES_SNP}
+        depth = 0
+        for seq in sequences:
+            base = seq[pos].upper() if pos < len(seq) else '-'
+            if base in ('-', '.', 'N'):
+                continue
+            depth += 1
+            if base in counts:
+                counts[base] += 1
+        n_alleles = sum(1 for c in counts.values() if c > 0)
+        if n_alleles < 2 or depth < 2:
+            continue
+        variants.append(pos)
+    return variants
+
+def domain_20_snp():
+    seqs = [
+        "ATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATG",
+        "ATGATGATGATGATGATCATGATGATGATGATGATGATGATGATGATGATG",
+        "CTGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGCTG",
+        "ATGATCATGATGATGATGATGATGATGATGATGATGATGATGATGATGATG",
+    ]
+    return call_snps(seqs)
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  Domain 21: dN/dS (Nei-Gojobori 1986)
+# ════════════════════════════════════════════════════════════════════════════
+
+GENETIC_CODE = {
+    'TTT': 'F', 'TTC': 'F', 'TTA': 'L', 'TTG': 'L',
+    'CTT': 'L', 'CTC': 'L', 'CTA': 'L', 'CTG': 'L',
+    'ATT': 'I', 'ATC': 'I', 'ATA': 'I', 'ATG': 'M',
+    'GTT': 'V', 'GTC': 'V', 'GTA': 'V', 'GTG': 'V',
+    'TCT': 'S', 'TCC': 'S', 'TCA': 'S', 'TCG': 'S',
+    'CCT': 'P', 'CCC': 'P', 'CCA': 'P', 'CCG': 'P',
+    'ACT': 'T', 'ACC': 'T', 'ACA': 'T', 'ACG': 'T',
+    'GCT': 'A', 'GCC': 'A', 'GCA': 'A', 'GCG': 'A',
+    'TAT': 'Y', 'TAC': 'Y', 'TAA': '*', 'TAG': '*',
+    'CAT': 'H', 'CAC': 'H', 'CAA': 'Q', 'CAG': 'Q',
+    'AAT': 'N', 'AAC': 'N', 'AAA': 'K', 'AAG': 'K',
+    'GAT': 'D', 'GAC': 'D', 'GAA': 'E', 'GAG': 'E',
+    'TGT': 'C', 'TGC': 'C', 'TGA': '*', 'TGG': 'W',
+    'CGT': 'R', 'CGC': 'R', 'CGA': 'R', 'CGG': 'R',
+    'AGT': 'S', 'AGC': 'S', 'AGA': 'R', 'AGG': 'R',
+    'GGT': 'G', 'GGC': 'G', 'GGA': 'G', 'GGG': 'G',
+}
+
+def translate_codon_d21(codon):
+    return GENETIC_CODE.get(codon.upper())
+
+def codon_sites_d21(codon):
+    orig_aa = translate_codon_d21(codon)
+    if orig_aa is None or orig_aa == '*':
+        return 0.0, 0.0
+    syn = 0.0
+    for pos in range(3):
+        syn_changes = total = 0
+        for base in 'ACGT':
+            if base == codon[pos].upper():
+                continue
+            mutant = list(codon.upper())
+            mutant[pos] = base
+            total += 1
+            new_aa = translate_codon_d21(''.join(mutant))
+            if new_aa and new_aa != '*' and new_aa == orig_aa:
+                syn_changes += 1
+        if total > 0:
+            syn += syn_changes / total
+    return syn, 3.0 - syn
+
+def pairwise_dnds(seq1, seq2):
+    from itertools import permutations
+    ts, tn, sd, nd = 0.0, 0.0, 0.0, 0.0
+    for i in range(0, len(seq1), 3):
+        c1, c2 = seq1[i:i+3], seq2[i:i+3]
+        if '-' in c1 or '.' in c1 or '-' in c2 or '.' in c2:
+            continue
+        s1s, s1n = codon_sites_d21(c1)
+        s2s, s2n = codon_sites_d21(c2)
+        ts += (s1s + s2s) / 2.0
+        tn += (s1n + s2n) / 2.0
+        diff_pos = [j for j in range(3) if c1[j].upper() != c2[j].upper()]
+        if not diff_pos:
+            continue
+        if len(diff_pos) == 1:
+            aa1 = translate_codon_d21(c1)
+            aa2 = translate_codon_d21(c2)
+            if aa1 and aa2 and aa1 == aa2:
+                sd += 1.0
+            else:
+                nd += 1.0
+        else:
+            ps, pn = 0.0, 0.0
+            for perm in permutations(diff_pos):
+                cur = list(c1.upper())
+                trg = list(c2.upper())
+                for p in perm:
+                    a_before = translate_codon_d21(''.join(cur))
+                    cur[p] = trg[p]
+                    a_after = translate_codon_d21(''.join(cur))
+                    if a_before and a_after and a_before == a_after:
+                        ps += 1.0
+                    else:
+                        pn += 1.0
+            np_ = math.factorial(len(diff_pos))
+            sd += ps / np_
+            nd += pn / np_
+    p_s = sd / ts if ts > 0 else 0.0
+    p_n = nd / tn if tn > 0 else 0.0
+    jc = lambda p: 0.0 if p <= 0 else (-0.75 * math.log(max(1 - 4*p/3, 1e-300)))
+    return jc(p_n), jc(p_s)
+
+def domain_21_dnds():
+    return pairwise_dnds("ATGGCTAAATTTGCTGCTGCTGCTGCTGCT",
+                         "ATGGCCGAATTTGCTGCTGCTGCTGCCGCT")
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  Domain 22: Molecular Clock
+# ════════════════════════════════════════════════════════════════════════════
+
+def domain_22_clock():
+    bl = [0.0, 0.1, 0.2, 0.05, 0.05, 0.15, 0.15]
+    par = [None, 0, 0, 1, 1, 2, 2]
+    dist = [0.0] * 7
+    for i in range(7):
+        if par[i] is not None:
+            dist[i] = dist[par[i]] + bl[i]
+    tree_h = max(dist)
+    rate = tree_h / 3500.0
+    ages = [3500.0 - d / rate for d in dist]
+    rates = [0.0] * 7
+    for i in range(7):
+        if par[i] is not None:
+            span = ages[par[i]] - ages[i]
+            if span > 0:
+                rates[i] = bl[i] / span
+    pos = [r for r in rates if r > 0]
+    mean = sum(pos) / len(pos)
+    var = sum((r - mean)**2 for r in pos) / (len(pos) - 1)
+    cv = math.sqrt(var) / mean
+    return rate, ages, cv
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  Domain 23: Pangenome Analysis
+# ════════════════════════════════════════════════════════════════════════════
+
+def domain_23_pangenome():
+    presence = [
+        [True]*5, [True]*5, [True]*5,
+        [True, True, False, False, False],
+        [False, True, True, False, False],
+        [True, False, False, False, False],
+        [False, False, False, False, True],
+    ]
+    core = acc = uniq = 0
+    for row in presence:
+        c = sum(row)
+        if c == 5: core += 1
+        elif c == 1: uniq += 1
+        elif c > 1: acc += 1
+    # Hypergeometric + BH
+    def hyper_p(k, n, big_k, big_n):
+        if big_n == 0: return 1.0
+        exp = n * big_k / big_n
+        if k <= exp: return 1.0
+        var = n*big_k*(big_n-big_k)*(big_n-n)/(big_n*big_n*max(big_n-1,1))
+        if var <= 0: return 0.0 if k > exp else 1.0
+        z = (k - exp) / math.sqrt(var)
+        return 1 - 0.5*(1 + math.erf(z / math.sqrt(2)))
+    pvals = [hyper_p(8,10,20,100), hyper_p(2,10,20,100), hyper_p(5,10,20,100)]
+    indexed = sorted(enumerate(pvals), key=lambda x: x[1])
+    adj = [0.0]*3
+    cm = float('inf')
+    for i in range(2, -1, -1):
+        a = indexed[i][1] * 3 / (i+1)
+        cm = min(cm, a, 1.0)
+        adj[indexed[i][0]] = cm
+    return core, acc, uniq, adj
+
+
+# ════════════════════════════════════════════════════════════════════════════
 #  Main: Run all domains, collect timings
 # ════════════════════════════════════════════════════════════════════════════
 
 def main():
     print("=" * 60)
-    print("  wetSpring — Python Timing Baseline (18 Domains)")
+    print("  wetSpring — Python Timing Baseline (23 Domains)")
     print("=" * 60)
     print()
 
@@ -616,6 +836,11 @@ def main():
         ("D16: Extended Diversity", domain_16_ext_diversity),
         ("D17: K-mer Counting (16bp, k=4)", domain_17_kmer),
         ("D18: Integrated Pipeline", domain_18_pipeline),
+        ("D19: ANI (3 seqs, 50bp)", domain_19_ani),
+        ("D20: SNP Calling (4 seqs, 50bp)", domain_20_snp),
+        ("D21: dN/dS (10 codons)", domain_21_dnds),
+        ("D22: Molecular Clock (7 nodes)", domain_22_clock),
+        ("D23: Pangenome (7 genes)", domain_23_pangenome),
     ]
 
     total_us = 0.0
@@ -629,7 +854,7 @@ def main():
     print(f"  {'TOTAL':<40} {total_us:>12.0f} µs")
     print()
 
-    out_dir = Path(__file__).parent.parent / "experiments" / "results" / "043_barracuda_cpu_v3"
+    out_dir = Path(__file__).parent.parent / "experiments" / "results" / "059_23_domain_benchmark"
     out_dir.mkdir(parents=True, exist_ok=True)
     out_file = out_dir / "python_timing.json"
     with open(out_file, "w") as f:

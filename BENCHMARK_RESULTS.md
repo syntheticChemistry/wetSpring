@@ -60,14 +60,22 @@ Tier 3: GPU (ToadStool/BarraCUDA, math parity with CPU)
 | `validate_bloom_surveillance` | 040 | 15 | PASS |
 | `validate_epa_pfas_ml` | 041 | 14 | PASS |
 | `validate_massbank_spectral` | 042 | 9 | PASS |
-| **CPU total** | | **1,035** | **PASS** |
+| `validate_rare_biosphere` | 051 | 35 | PASS |
+| `validate_viral_metagenomics` | 052 | 22 | PASS |
+| `validate_sulfur_phylogenomics` | 053 | 15 | PASS |
+| `validate_phosphorus_phylogenomics` | 054 | 13 | PASS |
+| `validate_population_genomics` | 055 | 24 | PASS |
+| `validate_pangenomics` | 056 | 24 | PASS |
+| `validate_barracuda_cpu_v4` | 057 | 44 | PASS |
+| `validate_barracuda_cpu_v5` | 061/062 | 29 | PASS |
+| **CPU total** | | **1,241** | **PASS** |
 
 ### Rust Unit/Integration Tests
 
 | Suite | Count | Status |
 |-------|-------|--------|
-| Library + integration tests | 465 | PASS |
-| **Total** | **465** | **PASS** (1 ignored) |
+| Library + integration tests | 582 | PASS |
+| **Total** | **582** | **PASS** (1 ignored) |
 
 ---
 
@@ -83,7 +91,10 @@ Tier 3: GPU (ToadStool/BarraCUDA, math parity with CPU)
 | `validate_gpu_hmm_forward` | 13 | PASS |
 | `benchmark_phylo_hmm_gpu` | 6 | PASS |
 | `validate_gpu_ode_sweep` | 12 | PASS |
-| **GPU total** | **200** | **PASS** |
+| `validate_gpu_track1c` | 27 | PASS |
+| `validate_cross_substrate` | 20 | PASS |
+| `validate_gpu_rf` | 13 | PASS |
+| **GPU total** | **260** | **PASS** |
 
 ### GPU Performance
 
@@ -135,22 +146,62 @@ Tier 3: GPU (ToadStool/BarraCUDA, math parity with CPU)
 | `epa_pfas_ml_baseline.py` | Jones F&T proxy | PASS |
 | `massbank_spectral_baseline.py` | Jones MS proxy | PASS |
 | `benchmark_rust_vs_python.py` | 18-domain timing (Exp043) | PASS |
+| `anderson2015_rare_biosphere.py` | diversity/rarefaction (Exp051) | PASS |
+| `anderson2014_viral_metagenomics.py` | dN/dS + diversity (Exp052) | PASS |
+| `mateos2023_sulfur_phylogenomics.py` | clock/reconciliation (Exp053) | PASS |
+| `boden2024_phosphorus_phylogenomics.py` | clock/reconciliation (Exp054) | PASS |
+| `anderson2017_population_genomics.py` | ANI/SNP (Exp055) | PASS |
+| `moulana2020_pangenomics.py` | pangenome/enrichment (Exp056) | PASS |
+| `barracuda_cpu_v4_baseline.py` | 5 Track 1c domain timing (Exp057) | PASS |
 
 ---
 
-## Exp043: Rust vs Python Timing (18 Domains)
+## Exp057: BarraCUDA CPU Parity v4 (Track 1c, 5 Domains)
 
-Head-to-head benchmark across all BarraCUDA CPU parity domains:
+| Domain | Module | Checks | Time (µs) |
+|--------|--------|--------|-----------|
+| 19 | ANI | 9 | 139 |
+| 20 | SNP calling | 8 | 193 |
+| 21 | dN/dS | 9 | 18 |
+| 22 | Molecular clock | 7 | 7 |
+| 23 | Pangenome | 11 | 16 |
+| **Total** | | **44** | **373** |
+
+All 5 Track 1c domains: pure Rust, zero dependencies, 44/44 checks PASS.
+Combined with v1-v3: **128/128 checks across 23 domains**.
+
+---
+
+## Exp061/062: BarraCUDA CPU Parity v5 (RF + GBM)
+
+| Domain | Module | Checks | Time (µs) |
+|--------|--------|--------|-----------|
+| 24 | Random Forest | 13 | 28 |
+| 25 | GBM (binary + multi-class) | 16 | 34 |
+| **Total** | | **29** | **62** |
+
+Two new ensemble ML domains: RF majority-vote and GBM sequential boosting.
+Combined v1-v5: **157/157 checks across 25 domains**.
+
+---
+
+## Exp059: Rust vs Python Timing (23 Domains)
+
+Head-to-head benchmark across all 23 BarraCUDA CPU parity domains:
 
 | Metric | Value |
 |--------|-------|
-| Rust (release) total | ~84,500 µs |
-| — v1 domains (1–9) | ~60,000 µs |
-| — v3 domains (10–18) | ~24,500 µs |
-| Python total | ~1,749,000 µs |
-| **Speedup** | **~20×** |
+| Rust (release) total | ~79,984 µs |
+| Python total | ~1,798,608 µs |
+| **Overall Speedup** | **22.5×** |
+| Peak speedup | 625× (Smith-Waterman) |
+| ODE domains | 15–28× |
+| Track 1c domains | 6–56× |
 
-Run with `scripts/benchmark_head_to_head.sh` or `python3 scripts/benchmark_rust_vs_python.py`.
+Run with `cargo run --release --bin benchmark_23_domain_timing` and
+`python3 scripts/benchmark_rust_vs_python.py`.
+
+(Previous Exp043 covered 18 domains at ~20× speedup.)
 
 ---
 
@@ -158,14 +209,14 @@ Run with `scripts/benchmark_head_to_head.sh` or `python3 scripts/benchmark_rust_
 
 | Category | Checks | Status |
 |----------|--------|--------|
-| Rust CPU validation | 1,035 | PASS |
-| GPU validation | 200 | PASS |
-| Rust tests | 465 | PASS |
-| Python baselines | 28 scripts | PASS |
-| BarraCUDA CPU parity | 84/84 (18 domains) | PASS |
+| Rust CPU validation | 1,241 | PASS |
+| GPU validation | 260 | PASS |
+| Rust tests | 582 | PASS |
+| Python baselines | 35 scripts | PASS |
+| BarraCUDA CPU parity | 157/157 (25 domains) | PASS |
 | ToadStool bio primitives | 15 consumed (4 bio absorbed) | PASS |
-| Local WGSL shaders | 4 (HMM, ODE, DADA2, quality) | PASS |
-| **Grand total** | **1,235 validation + 465 tests** | **ALL PASS** |
+| Local WGSL shaders | 9 (HMM, ODE, DADA2, quality, ANI, SNP, pangenome, dN/dS, RF) | PASS |
+| **Grand total** | **1,501 validation + 582 tests** | **ALL PASS** |
 
 ---
 
@@ -174,19 +225,22 @@ Run with `scripts/benchmark_head_to_head.sh` or `python3 scripts/benchmark_rust_
 ```bash
 cd barracuda
 
-# Tier 2: Rust CPU (1,035 checks)
-cargo test                         # 465 tests
-cargo run --release --bin validate_qs_ode  # ... repeat for all 27 CPU binaries
+# Tier 2: Rust CPU (1,241 checks)
+cargo test                         # 582 tests
+cargo run --release --bin validate_qs_ode  # ... repeat for all 29 CPU binaries
 
-# Tier 3: GPU (200 checks)
+# Tier 3: GPU (260 checks)
 cargo run --features gpu --bin validate_diversity_gpu          # 38
 cargo run --features gpu --bin validate_16s_pipeline_gpu       # 88
 cargo run --features gpu --bin validate_barracuda_gpu_v3       # 14
+cargo run --features gpu --bin validate_toadstool_bio          # 14
 cargo run --features gpu --bin validate_gpu_phylo_compose      # 15
 cargo run --features gpu --bin validate_gpu_hmm_forward        # 13
 cargo run --features gpu --bin benchmark_phylo_hmm_gpu         # 6
 cargo run --features gpu --bin validate_gpu_ode_sweep          # 12
-# validate_toadstool_bio also available (14 checks)
+cargo run --features gpu --bin validate_gpu_track1c            # 27
+cargo run --features gpu --bin validate_gpu_23_domain_benchmark # 20
+cargo run --features gpu --bin validate_gpu_rf                 # 13
 
 # Tier 1: Python
 cd ../scripts && python3 gillespie_baseline.py
