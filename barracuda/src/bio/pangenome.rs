@@ -1,12 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Pangenome analysis: gene presence-absence and core/accessory partitioning.
 //!
+//! Statistical functions (`normal_cdf`) are provided by [`super::special`].
+//!
 //! Constructs a binary presence-absence matrix from gene annotations across
 //! multiple genomes, then partitions genes into core (present in all),
 //! accessory (present in some), and unique (present in one) categories.
 //! Fits Heap's law to estimate pangenome openness.
 //!
 //! Used in Moulana & Anderson 2020 (Sulfurovum pangenomics).
+
+use super::special::normal_cdf;
 
 /// A gene cluster with its presence across genomes.
 #[derive(Debug, Clone)]
@@ -213,26 +217,6 @@ pub fn benjamini_hochberg(pvalues: &[f64]) -> Vec<f64> {
         adjusted[indexed[i].0] = cummin;
     }
     adjusted
-}
-
-fn normal_cdf(x: f64) -> f64 {
-    0.5 * (1.0 + erf(x / std::f64::consts::SQRT_2))
-}
-
-fn erf(x: f64) -> f64 {
-    let a1 = 0.254_829_592;
-    let a2 = -0.284_496_736;
-    let a3 = 1.421_413_741;
-    let a4 = -1.453_152_027;
-    let a5 = 1.061_405_429;
-    let p = 0.327_591_1;
-
-    let sign = if x < 0.0 { -1.0 } else { 1.0 };
-    let x = x.abs();
-    let t = 1.0 / (1.0 + p * x);
-    let y = ((a5 * t + a4).mul_add(t, a3).mul_add(t, a2).mul_add(t, a1) * t)
-        .mul_add(-(-x * x).exp(), 1.0);
-    sign * y
 }
 
 #[cfg(test)]

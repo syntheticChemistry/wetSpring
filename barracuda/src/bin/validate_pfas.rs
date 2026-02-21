@@ -8,6 +8,7 @@
 //! | Baseline script | `scripts/validate_track2.py` |
 //! | Baseline commit | `eb99b12` (Track 2 validation — 8/8 PASS) |
 //! | Baseline date | 2026-02-16 |
+//! | Exact command | `python3 scripts/validate_track2.py` |
 //! | Dataset | `FindPFAS` test data (PFAS Standard Mix, ddMS2, 20 eV) |
 //! | `FindPFAS` version | JonZwe/FindPFAS (GitHub) + pyOpenMS 3.5.0 |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, Pop!\_OS 22.04) |
@@ -75,7 +76,7 @@ fn validate_ms2_parsing(ms2_path: &Path, v: &mut Validator) {
 
     // ── PFAS fragment screening
     v.section("── PFAS fragment difference screening ──");
-    let tol_da = 0.001;
+    let tol_da = tolerances::MZ_FRAGMENT;
     let min_intensity_pct = 5.0;
 
     let mut pfas_hits = Vec::new();
@@ -203,11 +204,16 @@ fn validate_kmd(v: &mut Validator) {
     println!("  KMD spread (PFOS-PFHxS): {kmd_spread_01:.6}");
     println!("  KMD spread (PFOS-PFBS): {kmd_spread_02:.6}");
 
-    v.check("KMD homologue spread (01)", kmd_spread_01, 0.0, 0.01);
+    v.check(
+        "KMD homologue spread (01)",
+        kmd_spread_01,
+        0.0,
+        tolerances::KMD_GROUPING,
+    );
     v.check("KMD homologue spread (02)", kmd_spread_02, 0.0, 0.02);
 
     // Grouping should put homologues together
-    let (_, groups) = kmd::pfas_kmd_screen(&masses, 0.01);
+    let (_, groups) = kmd::pfas_kmd_screen(&masses, tolerances::KMD_GROUPING);
     let max_group = groups.iter().map(Vec::len).max().unwrap_or(0);
     v.check_count("Largest homologue group", max_group, 3);
 

@@ -199,7 +199,7 @@ impl Iterator for MzmlIter {
 
 /// Parse an mzML file and return all spectra, **streaming from disk**.
 ///
-/// Uses `BufReader` — the full XML is never held in memory.
+/// Delegates to [`MzmlIter`] — the full XML is never held in memory.
 ///
 /// # Errors
 ///
@@ -207,87 +207,7 @@ impl Iterator for MzmlIter {
 /// for XML structure errors, or [`Error::Base64`] / [`Error::Zlib`]
 /// for binary array decoding failures.
 pub fn parse_mzml(path: &Path) -> Result<Vec<MzmlSpectrum>> {
-    let file = File::open(path).map_err(|e| Error::Io {
-        path: path.to_path_buf(),
-        source: e,
-    })?;
-    let buf_reader = BufReader::new(file);
-    let mut reader = XmlReader::new(buf_reader);
-    reader.set_trim_text(true);
-
-    let mut spectra = Vec::new();
-    let mut builder: Option<SpectrumBuilder> = None;
-    let mut binary_state = BinaryArrayState::new();
-    let mut in_binary_data_array = false;
-    let mut in_binary = false;
-
-    loop {
-        match reader.next_event()? {
-            XmlEvent::StartElement {
-                ref name,
-                ref attrs,
-            } => match name.as_str() {
-                "spectrum" => {
-                    let idx = attrs
-                        .iter()
-                        .find(|(k, _)| k == "index")
-                        .and_then(|(_, v)| v.parse().ok())
-                        .unwrap_or(0);
-                    builder = Some(SpectrumBuilder::new(idx));
-                }
-                "binaryDataArray" => {
-                    in_binary_data_array = true;
-                    binary_state.reset();
-                }
-                "binary" => {
-                    in_binary = true;
-                    binary_state.text.clear();
-                }
-                "cvParam" if builder.is_some() => {
-                    let accession = attrs
-                        .iter()
-                        .find(|(k, _)| k == "accession")
-                        .map_or("", |(_, v)| v.as_str());
-                    let cv_value = attrs
-                        .iter()
-                        .find(|(k, _)| k == "value")
-                        .map_or("", |(_, v)| v.as_str());
-
-                    if in_binary_data_array {
-                        binary_state.apply_cv_param(accession);
-                    } else if let Some(ref mut b) = builder {
-                        b.apply_cv_param(accession, cv_value);
-                    }
-                }
-                _ => {}
-            },
-            XmlEvent::Text(ref text) => {
-                if in_binary {
-                    binary_state.text.push_str(text);
-                }
-            }
-            XmlEvent::EndElement { ref name } => match name.as_str() {
-                "spectrum" => {
-                    if let Some(b) = builder.take() {
-                        spectra.push(b.build());
-                    }
-                }
-                "binary" => in_binary = false,
-                "binaryDataArray" => {
-                    if let Some(ref mut b) = builder {
-                        if let Err(e) = binary_state.decode_into(b) {
-                            eprintln!("Warning: binary decode failed: {e}");
-                        }
-                    }
-                    in_binary_data_array = false;
-                }
-                _ => {}
-            },
-            XmlEvent::Eof => break,
-        }
-    }
-
-    Ok(spectra)
+    MzmlIter::open(path)?.collect()
 }
 
 /// Compute summary statistics in a single streaming pass (zero-copy path).

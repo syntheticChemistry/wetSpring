@@ -10,10 +10,12 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Baseline tool | BarraCUDA CPU v1 (recursive/sequential) + Python refs: `felsenstein_pruning_baseline.py`, `liu2014_hmm_baseline.py`, `smith_waterman_baseline.py`, `liu2009_neighbor_joining.py`, `zheng2023_dtl_reconciliation.py` |
 //! | Baseline version | Feb 2026 |
 //! | Baseline command | Batch/flat impl validated against sequential; `python3 scripts/liu2009_neighbor_joining.py` (NJ), `python3 scripts/zheng2023_dtl_reconciliation.py` (DTL) |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `cargo run --bin validate_barracuda_cpu_v2` |
 //! | Data | Synthetic test vectors (hardcoded) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
@@ -22,6 +24,7 @@ use wetspring_barracuda::bio::felsenstein::{encode_dna, log_likelihood, FlatTree
 use wetspring_barracuda::bio::hmm::{forward, forward_batch, viterbi, viterbi_batch, HmmModel};
 use wetspring_barracuda::bio::neighbor_joining::{distance_matrix, neighbor_joining};
 use wetspring_barracuda::bio::reconciliation::{reconcile_dtl, DtlCosts, FlatRecTree};
+use wetspring_barracuda::tolerances;
 
 const NO_CHILD: u32 = u32::MAX;
 
@@ -62,7 +65,7 @@ fn validate_flat_felsenstein(pass: &mut u32, fail: &mut u32) {
     let ll_flat = flat.log_likelihood();
     check(
         "FlatTree: LL matches recursive",
-        (ll_recursive - ll_flat).abs() < 1e-12,
+        (ll_recursive - ll_flat).abs() < tolerances::ANALYTICAL_F64,
         pass,
         fail,
     );
@@ -100,13 +103,13 @@ fn validate_batch_hmm(pass: &mut u32, fail: &mut u32) {
     let batch_fw = forward_batch(&model, &[&obs1, &obs2]);
     check(
         "Batch HMM: forward LL[0]",
-        (fw1.log_likelihood - batch_fw[0].log_likelihood).abs() < 1e-12,
+        (fw1.log_likelihood - batch_fw[0].log_likelihood).abs() < tolerances::ANALYTICAL_F64,
         pass,
         fail,
     );
     check(
         "Batch HMM: forward LL[1]",
-        (fw2.log_likelihood - batch_fw[1].log_likelihood).abs() < 1e-12,
+        (fw2.log_likelihood - batch_fw[1].log_likelihood).abs() < tolerances::ANALYTICAL_F64,
         pass,
         fail,
     );
@@ -190,7 +193,7 @@ fn validate_cross_module(pass: &mut u32, fail: &mut u32) {
     let ll_flat = flat.log_likelihood();
     check(
         "NJ→Felsenstein: flat matches recursive",
-        (ll - ll_flat).abs() < 1e-12,
+        (ll - ll_flat).abs() < tolerances::ANALYTICAL_F64,
         pass,
         fail,
     );

@@ -5,21 +5,24 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Paper | Bruger & Waters 2018, *AEM* 84:e00402-18 |
 //! | Baseline script | `scripts/bruger2018_cooperation.py` |
 //! | Baseline output | `experiments/results/025_cooperation/bruger2018_python_baseline.json` |
 //! | Date | 2026-02-20 |
+//! | Exact command | `python3 scripts/bruger2018_cooperation.py` |
+//! | Hardware | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04 |
 
 use wetspring_barracuda::bio::cooperation::{
     cooperator_frequency, scenario_cheat_dominated, scenario_coop_dominated, scenario_equal_start,
     scenario_pure_cheat, scenario_pure_coop, CooperationParams,
 };
 use wetspring_barracuda::bio::ode::steady_state_mean;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 const DT: f64 = 0.001;
 const SS_FRAC: f64 = 0.1;
-const METHOD_TOL: f64 = 1e-3;
 
 fn main() {
     let mut v = Validator::new("Exp025: Bruger & Waters 2018 Cooperative QS Game Theory");
@@ -34,14 +37,14 @@ fn main() {
     let freq = cooperator_frequency(&r);
     let f_coop = freq.last().copied().unwrap_or(0.5);
 
-    v.check("Equal: Nc_ss", nc, 0.370, 0.01);
-    v.check("Equal: Nd_ss", nd, 0.611, 0.01);
+    v.check("Equal: Nc_ss", nc, 0.370, tolerances::ODE_STEADY_STATE);
+    v.check("Equal: Nd_ss", nd, 0.611, tolerances::ODE_STEADY_STATE);
     v.check("Equal: AI_ss", ai, 1.854, 0.02);
     v.check(
         "Equal: coop_freq < 0.5 (cheater advantage)",
         f_coop,
         0.376,
-        0.01,
+        tolerances::ODE_STEADY_STATE,
     );
     check_non_negative(&mut v, &r, "Equal");
 
@@ -52,9 +55,24 @@ fn main() {
     let ai = steady_state_mean(&r, 2, SS_FRAC);
     let bio = steady_state_mean(&r, 3, SS_FRAC);
 
-    v.check("PureCoop: Nc_ss reaches K", nc, 0.980, 0.01);
-    v.check("PureCoop: signal produced", ai, 4.899, 0.05);
-    v.check("PureCoop: biofilm formed", bio, 0.767, 0.01);
+    v.check(
+        "PureCoop: Nc_ss reaches K",
+        nc,
+        0.980,
+        tolerances::ODE_STEADY_STATE,
+    );
+    v.check(
+        "PureCoop: signal produced",
+        ai,
+        4.899,
+        tolerances::ODE_NEAR_ZERO,
+    );
+    v.check(
+        "PureCoop: biofilm formed",
+        bio,
+        0.767,
+        tolerances::ODE_STEADY_STATE,
+    );
     check_non_negative(&mut v, &r, "PureCoop");
 
     // ── Pure cheaters ───────────────────────────────────────────────
@@ -64,9 +82,24 @@ fn main() {
     let ai = steady_state_mean(&r, 2, SS_FRAC);
     let bio = steady_state_mean(&r, 3, SS_FRAC);
 
-    v.check("PureCheat: Nd_ss reaches K", nd, 0.979, 0.01);
-    v.check("PureCheat: no signal", ai, 0.0, METHOD_TOL);
-    v.check("PureCheat: no biofilm", bio, 0.0, METHOD_TOL);
+    v.check(
+        "PureCheat: Nd_ss reaches K",
+        nd,
+        0.979,
+        tolerances::ODE_STEADY_STATE,
+    );
+    v.check(
+        "PureCheat: no signal",
+        ai,
+        0.0,
+        tolerances::ODE_METHOD_PARITY,
+    );
+    v.check(
+        "PureCheat: no biofilm",
+        bio,
+        0.0,
+        tolerances::ODE_METHOD_PARITY,
+    );
     check_non_negative(&mut v, &r, "PureCheat");
 
     // ── Coop-dominated ──────────────────────────────────────────────
@@ -75,7 +108,12 @@ fn main() {
     let freq = cooperator_frequency(&r);
     let f_coop = freq.last().copied().unwrap_or(0.5);
 
-    v.check("CoopDom: coop_freq", f_coop, 0.866, 0.01);
+    v.check(
+        "CoopDom: coop_freq",
+        f_coop,
+        0.866,
+        tolerances::ODE_STEADY_STATE,
+    );
     check_non_negative(&mut v, &r, "CoopDom");
 
     // ── Cheat-dominated ─────────────────────────────────────────────
@@ -84,7 +122,12 @@ fn main() {
     let freq = cooperator_frequency(&r);
     let f_coop = freq.last().copied().unwrap_or(0.5);
 
-    v.check("CheatDom: coop_freq", f_coop, 0.073, 0.01);
+    v.check(
+        "CheatDom: coop_freq",
+        f_coop,
+        0.073,
+        tolerances::ODE_STEADY_STATE,
+    );
     check_non_negative(&mut v, &r, "CheatDom");
 
     // ── Tragedy of the commons ──────────────────────────────────────

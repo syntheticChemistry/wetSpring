@@ -7,13 +7,14 @@
 //! |-------|-------|
 //! | Paper | Liu et al. 2014, *`PLoS` Comp Bio* 10:e1003649 |
 //! | Baseline script | `scripts/liu2014_hmm_baseline.py` |
+//! | Baseline commit | `e4358c5` |
 //! | Baseline output | `experiments/results/026_hmm/liu2014_hmm_python_baseline.json` |
-//! | Date | 2026-02-20 |
+//! | Date | 2026-02-21 |
+//! | Exact command | `python3 scripts/liu2014_hmm_baseline.py` |
 
 use wetspring_barracuda::bio::hmm::{forward, posterior, viterbi, HmmModel};
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
-
-const ANALYTICAL_TOL: f64 = 1e-10;
 
 fn weather_model() -> HmmModel {
     HmmModel {
@@ -73,7 +74,7 @@ fn main() {
         "2s: log-likelihood",
         fwd.log_likelihood,
         -5.758_240_012_089_921,
-        ANALYTICAL_TOL,
+        tolerances::PYTHON_PARITY,
     );
 
     let vit = viterbi(&model, &obs);
@@ -81,7 +82,7 @@ fn main() {
         "2s: Viterbi log-prob",
         vit.log_probability,
         -7.739_116_800_070_987,
-        ANALYTICAL_TOL,
+        tolerances::PYTHON_PARITY,
     );
 
     let expected_path_2 = [1, 0, 0, 1, 1];
@@ -102,7 +103,7 @@ fn main() {
             &format!("2s: posterior t={t} sums to 1"),
             row_sum,
             1.0,
-            ANALYTICAL_TOL,
+            tolerances::PYTHON_PARITY,
         );
     }
 
@@ -116,7 +117,7 @@ fn main() {
         "3s: log-likelihood",
         fwd3.log_likelihood,
         -5.017_483_023_983_44,
-        ANALYTICAL_TOL,
+        tolerances::PYTHON_PARITY,
     );
 
     let vit3 = viterbi(&model3, &obs3);
@@ -124,7 +125,7 @@ fn main() {
         "3s: Viterbi log-prob",
         vit3.log_probability,
         -9.202_600_799_882_006,
-        ANALYTICAL_TOL,
+        tolerances::PYTHON_PARITY,
     );
 
     let expected_path_3 = [0, 1, 0, 0, 1, 1, 0];
@@ -145,7 +146,7 @@ fn main() {
             &format!("3s: posterior t={t} sums to 1"),
             row_sum,
             1.0,
-            ANALYTICAL_TOL,
+            tolerances::PYTHON_PARITY,
         );
     }
 

@@ -5,10 +5,13 @@
 //!
 //! | Item            | Value                                                     |
 //! |-----------------|-----------------------------------------------------------|
+//! | Baseline commit | `e4358c5`                                                 |
 //! | Baseline script | `scripts/phynetpy_rf_baseline.py`                         |
 //! | Baseline output | `experiments/results/036_phynetpy_rf/python_baseline.json` |
 //! | Data source     | `NakhlehLab/PhyNetPy` DEFJ/ (1,160 gene trees)           |
 //! | Date            | 2026-02-20                                                |
+//! | Exact command   | `python3 scripts/phynetpy_rf_baseline.py`                 |
+//! | Hardware        | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04              |
 //!
 //! Validates that Rust RF distance module produces identical results to the
 //! Python baseline on real phylogenetic gene trees with 25 leaves each.

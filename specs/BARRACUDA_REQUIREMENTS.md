@@ -7,7 +7,7 @@
 
 ## Current Kernel Usage (Validated)
 
-### Rust CPU Modules (41 modules, 552 tests, 93.5% coverage)
+### Rust CPU Modules (41 modules, 610 tests, 93.5% coverage)
 
 | Module Domain | Modules | Status |
 |--------------|---------|--------|
@@ -21,7 +21,7 @@
 | Track 1c | ani, snp, dnds, molecular_clock, pangenome | Sovereign |
 | ML | decision_tree, random_forest, gbm | Sovereign |
 
-### GPU Primitives (15 ToadStool + 9 local WGSL, 260 checks)
+### GPU Primitives (15 ToadStool + 9 local WGSL, 451 checks)
 
 | ToadStool Primitive | wetSpring Use | Checks | Performance |
 |-------------------|---------------|--------|-------------|
@@ -93,14 +93,14 @@
 ### BarraCUDA Evolution Path
 
 ```
-DONE                                     CURRENT                          GOAL
+DONE                                     DONE/CURRENT                     GOAL
 ──────────────────────────               ────────────────────             ──────────────────
-Python baseline (35 scripts)  ────────→  Rust CPU parity (157/157) ──→  PURE GPU (all domains)
-GPU diversity (38/38)         ────────→  GPU Track 1c (27/27)  ──────→  metalForge cross-system
-GPU pipeline (88/88)          ────────→  GPU RF inference (13/13) ────→  NPU for low-power inference
-CPU 22.5× faster than Python  ────────→  GPU math PROVEN portable ───→  Scale via streaming
-9 local WGSL shaders          ────────→  ToadStool absorbs ─────────→  Full Write→Absorb→Lean cycle
-25 CPU domains validated      ────────→  metalForge substrate proof ──→  CPU/GPU/NPU routing
+Python baseline (35 scripts)  ────────→  Rust CPU parity (157/157) ────→  ✓ DONE
+GPU diversity (38/38)         ────────→  GPU Parity v1 (Exp064)  ──────→  ✓ DONE (8 domains)
+GPU pipeline (88/88)          ────────→  GPU RF inference (13/13) ──────→  NPU for low-power inference
+CPU 22.5× faster than Python  ────────→  GPU math PROVEN portable ─────→  Scale via streaming
+9 local WGSL shaders          ────────→  ToadStool absorbs ───────────→  Full Write→Absorb→Lean cycle
+25 CPU domains validated      ────────→  metalForge PROVEN (Exp065) ───→  CPU/GPU/NPU routing
 ```
 
 ---

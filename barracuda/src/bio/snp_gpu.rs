@@ -45,12 +45,29 @@ pub struct SnpGpuResult {
 
 pub struct SnpGpu {
     device: Arc<WgpuDevice>,
+    pipeline: wgpu::ComputePipeline,
+    bgl: wgpu::BindGroupLayout,
 }
 
 impl SnpGpu {
     pub fn new(device: &Arc<WgpuDevice>) -> Self {
+        let patched = ShaderTemplate::for_driver_auto(SNP_WGSL, false);
+        let module = device.compile_shader(&patched, Some("SnpCallingF64"));
+        let pipeline = device
+            .device()
+            .create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
+                label: Some("SnpCallingF64"),
+                layout: None,
+                module: &module,
+                entry_point: "main",
+                cache: None,
+                compilation_options: Default::default(),
+            });
+        let bgl = pipeline.get_bind_group_layout(0);
         Self {
             device: Arc::clone(device),
+            pipeline,
+            bgl,
         }
     }
 
@@ -130,21 +147,9 @@ impl SnpGpu {
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
         });
 
-        let patched = ShaderTemplate::for_driver_auto(SNP_WGSL, false);
-        let module = dev.compile_shader(&patched, Some("SnpCallingF64"));
-        let pipeline = d.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
-            label: Some("SnpCallingF64"),
-            layout: None,
-            module: &module,
-            entry_point: "main",
-            cache: None,
-            compilation_options: Default::default(),
-        });
-
-        let bgl = pipeline.get_bind_group_layout(0);
         let bg = d.create_bind_group(&wgpu::BindGroupDescriptor {
             label: None,
-            layout: &bgl,
+            layout: &self.bgl,
             entries: &[
                 wgpu::BindGroupEntry {
                     binding: 0,
@@ -178,7 +183,7 @@ impl SnpGpu {
         });
         {
             let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor::default());
-            pass.set_pipeline(&pipeline);
+            pass.set_pipeline(&self.pipeline);
             pass.set_bind_group(0, &bg, &[]);
             pass.dispatch_workgroups((aln_len as u32).div_ceil(256), 1, 1);
         }

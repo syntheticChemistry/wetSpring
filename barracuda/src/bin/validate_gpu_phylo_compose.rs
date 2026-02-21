@@ -16,10 +16,12 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Baseline tool | BarraCUDA CPU (reference) |
 //! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
 //! | Baseline command | bio::felsenstein::log_likelihood, placement::placement_scan, bootstrap |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `cargo run --release --features gpu --bin validate_gpu_phylo_compose` |
 //! | Data | 3-taxon/5-taxon trees, bootstrap replicates, placement edges |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
@@ -590,7 +592,7 @@ fn validate_gpu_placement(device: &Arc<WgpuDevice>, v: &mut Validator) {
         let gpu_best = gpu_lls
             .iter()
             .enumerate()
-            .max_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap())
+            .max_by(|(_, a), (_, b)| a.total_cmp(b))
             .map(|(i, _)| i)
             .unwrap_or(0);
         #[allow(clippy::cast_precision_loss)]

@@ -9,12 +9,15 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Paper | Moulana et al. (2020) mSystems 5:e00673-19 |
 //! | DOI | 10.1128/mSystems.00673-19 |
 //! | Faculty | R. Anderson (Carleton College) |
 //! | BioProjects | PRJNA283159, PRJEB5293 |
 //! | Baseline script | `scripts/moulana2020_pangenomics.py` |
 //! | Baseline date | 2026-02-20 |
+//! | Exact command | `python3 scripts/moulana2020_pangenomics.py` |
+//! | Hardware | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04 |
 
 use wetspring_barracuda::bio::pangenome::{self, GeneCluster};
 use wetspring_barracuda::tolerances;

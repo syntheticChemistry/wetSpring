@@ -5,10 +5,12 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Baseline tool | wang2021_rawr_bootstrap.py |
 //! | Baseline version | scripts/ |
 //! | Baseline command | python3 scripts/wang2021_rawr_bootstrap.py |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `python3 scripts/wang2021_rawr_bootstrap.py` |
 //! | Data | 3-taxon alignment, 100 replicates |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 

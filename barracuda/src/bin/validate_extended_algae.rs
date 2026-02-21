@@ -5,12 +5,14 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Dataset | PRJNA382322 (`AlgaeParc` 2013 bacterial community, Wageningen) |
 //! | Run | SRR5452557 (12.6M spots, paired-end, 16S V3-V4 amplicon) |
 //! | Paper | DOI 10.1007/s00253-022-11815-3 |
 //! | Cross-ref | Exp012 (PRJNA488170, SRR7760408, same organism/setting) |
 //! | Why | Independent outdoor Nannochloropsis pilot — cross-validate Exp012 |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `cargo run --bin validate_extended_algae` |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
 //! # Methodology

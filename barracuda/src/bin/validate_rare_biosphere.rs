@@ -15,12 +15,15 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Paper | Anderson, Sogin, Baross (2015) FEMS Microbiol Ecol 91:fiu016 |
 //! | DOI | 10.1093/femsec/fiu016 |
 //! | Faculty | R. Anderson (Carleton College) |
 //! | Baseline script | `scripts/anderson2015_rare_biosphere.py` |
 //! | Baseline output | `experiments/results/051_rare_biosphere/anderson2015_python_baseline.json` |
 //! | Baseline date | 2026-02-20 |
+//! | Exact command | `python3 scripts/anderson2015_rare_biosphere.py` |
+//! | Hardware | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04 |
 //! | Python version | 3.10+ (pure Python + math, no external dependencies) |
 //! | Data | Synthetic vent communities modeled after paper's Table S1 |
 //!

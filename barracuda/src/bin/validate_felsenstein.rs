@@ -7,15 +7,15 @@
 //! |-------|-------|
 //! | Algorithm | Felsenstein 1981, *J Mol Evol* 17:368-376 |
 //! | Baseline script | `scripts/felsenstein_pruning_baseline.py` |
-//! | Date | 2026-02-20 |
+//! | Baseline commit | `e4358c5` |
+//! | Date | 2026-02-21 |
+//! | Exact command | `python3 scripts/felsenstein_pruning_baseline.py` |
 
 use wetspring_barracuda::bio::felsenstein::{
     encode_dna, jc69_prob, log_likelihood, site_log_likelihoods, transition_matrix, TreeNode,
 };
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
-
-const TOL: f64 = 1e-8;
 
 fn make_tree_identical() -> TreeNode {
     TreeNode::Internal {
@@ -86,6 +86,7 @@ fn make_tree_16s() -> TreeNode {
     }
 }
 
+#[allow(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp029: Felsenstein Pruning Phylogenetic Likelihood");
 
@@ -125,7 +126,12 @@ fn main() {
     v.section("── Identical sequences ((A,B):0.2, C:0.3) ──");
     let tree = make_tree_identical();
     let ll = log_likelihood(&tree, 1.0);
-    v.check("LL matches Python", ll, -8.144_952_041_080_28, TOL);
+    v.check(
+        "LL matches Python",
+        ll,
+        -8.144_952_041_080_28,
+        tolerances::PHYLO_LIKELIHOOD,
+    );
     let sll = site_log_likelihoods(&tree, 1.0);
     v.check(
         "Per-site sum = total",
@@ -138,7 +144,12 @@ fn main() {
     v.section("── Different sequences (AAAA, CCCC, GGGG) ──");
     let tree = make_tree_different();
     let ll = log_likelihood(&tree, 1.0);
-    v.check("LL matches Python", ll, -25.053_907_628_517_04, TOL);
+    v.check(
+        "LL matches Python",
+        ll,
+        -25.053_907_628_517_04,
+        tolerances::PHYLO_LIKELIHOOD,
+    );
 
     // ── Identical > different likelihood ────────────────────────────
     v.check(
@@ -152,10 +163,25 @@ fn main() {
     v.section("── 16S fragment (20bp, 3 taxa) ──");
     let tree = make_tree_16s();
     let ll = log_likelihood(&tree, 1.0);
-    v.check("LL matches Python", ll, -40.881_169_027_599_25, TOL);
+    v.check(
+        "LL matches Python",
+        ll,
+        -40.881_169_027_599_25,
+        tolerances::PHYLO_LIKELIHOOD,
+    );
     let sll = site_log_likelihoods(&tree, 1.0);
-    v.check("Site 7 (mismatch)", sll[6], -5.713_413_379_154_645, TOL);
-    v.check("Site 11 (mismatch)", sll[10], -4.128_643_256_260_973, TOL);
+    v.check(
+        "Site 7 (mismatch)",
+        sll[6],
+        -5.713_413_379_154_645,
+        tolerances::PHYLO_LIKELIHOOD,
+    );
+    v.check(
+        "Site 11 (mismatch)",
+        sll[10],
+        -4.128_643_256_260_973,
+        tolerances::PHYLO_LIKELIHOOD,
+    );
 
     // ── Branch length effect ────────────────────────────────────────
     v.section("── Branch length effect ──");

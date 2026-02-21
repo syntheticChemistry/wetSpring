@@ -127,6 +127,73 @@ pub const EVOLUTIONARY_DISTANCE: f64 = 1e-3;
 pub const SPECTRAL_COSINE: f64 = 1e-3;
 
 // ═══════════════════════════════════════════════════════════════════
+// ODE / dynamical system tolerances
+// ═══════════════════════════════════════════════════════════════════
+
+/// ODE steady-state check: ±0.01 for species concentrations at equilibrium.
+///
+/// Used by Waters 2008 QS, Mhatre 2020 capacitor, Bruger 2018 cooperation,
+/// and Fernandez 2020 bistable ODE models. RK4 vs `scipy.integrate` at
+/// identical dt accumulates ~1e-3 difference for multi-species systems.
+pub const ODE_STEADY_STATE: f64 = 0.01;
+
+/// ODE method parity: RK4 vs LSODA integrator differences.
+///
+/// Fixed-step RK4 diverges from adaptive LSODA by up to ~1e-3 in
+/// concentration for stiff systems. Validated against Python baselines.
+pub const ODE_METHOD_PARITY: f64 = 1e-3;
+
+/// Near-zero species concentrations (repressed pathways).
+///
+/// Biologically "off" species may float slightly above zero due to
+/// integrator residual. 0.05 accommodates the numerical floor.
+pub const ODE_NEAR_ZERO: f64 = 0.05;
+
+// ═══════════════════════════════════════════════════════════════════
+// Phylogenetic tolerances
+// ═══════════════════════════════════════════════════════════════════
+
+/// Phylogenetic log-likelihood (Felsenstein pruning): Python vs Rust.
+///
+/// Matrix exponentiation and per-site LL accumulation differ at ~1e-8
+/// between `NumPy` and Rust due to loop ordering and FMA behavior.
+pub const PHYLO_LIKELIHOOD: f64 = 1e-8;
+
+/// JC69 transition probability comparisons.
+///
+/// Analytic formula P(t) = 0.25 + 0.75·exp(-4μt/3) rounding at 1e-6.
+pub const JC69_PROBABILITY: f64 = 1e-6;
+
+// ═══════════════════════════════════════════════════════════════════
+// PFAS / analytical chemistry tolerances
+// ═══════════════════════════════════════════════════════════════════
+
+/// KMD homologue grouping: unitless Kendrick mass defect difference.
+///
+/// PFAS compounds in the same series differ by < 0.01 KMD.
+pub const KMD_GROUPING: f64 = 0.01;
+
+/// KMD series spread: max intra-series range for PFCA/PFSA.
+pub const KMD_SPREAD: f64 = 0.02;
+
+/// Fragment m/z tolerance (Da) for suspect screening.
+///
+/// Tighter than `MZ_TOLERANCE` for high-resolution fragment matching.
+pub const MZ_FRAGMENT: f64 = 0.001;
+
+/// Spectral matching m/z window for unit-resolution MS2.
+///
+/// Used as the matching window parameter for `cosine_similarity`.
+pub const SPECTRAL_MZ_WINDOW: f64 = 0.5;
+
+// ═══════════════════════════════════════════════════════════════════
+// Peak detection / signal processing tolerances
+// ═══════════════════════════════════════════════════════════════════
+
+/// Relative peak height tolerance (1%) vs scipy baseline.
+pub const PEAK_HEIGHT_REL: f64 = 0.01;
+
+// ═══════════════════════════════════════════════════════════════════
 // GPU vs CPU tolerances
 // ═══════════════════════════════════════════════════════════════════
 
@@ -162,6 +229,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[allow(clippy::assertions_on_constants)]
     fn tolerance_hierarchy_is_monotonic() {
         assert!(EXACT < EXACT_F64);
         assert!(EXACT_F64 < ANALYTICAL_F64);
@@ -192,6 +260,16 @@ mod tests {
             SIMPSON_SIMULATED,
             CHAO1_RANGE,
             BRAY_CURTIS_SYMMETRY,
+            ODE_STEADY_STATE,
+            ODE_METHOD_PARITY,
+            ODE_NEAR_ZERO,
+            PHYLO_LIKELIHOOD,
+            JC69_PROBABILITY,
+            KMD_GROUPING,
+            KMD_SPREAD,
+            MZ_FRAGMENT,
+            SPECTRAL_MZ_WINDOW,
+            PEAK_HEIGHT_REL,
             GPU_VS_CPU_F64,
             GPU_VS_CPU_TRANSCENDENTAL,
             GPU_VS_CPU_BRAY_CURTIS,

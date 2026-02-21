@@ -19,10 +19,12 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Baseline tool | BarraCUDA CPU (reference) |
 //! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
 //! | Baseline command | bio::ani, bio::snp, bio::pangenome, bio::dnds |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `cargo run --release --features gpu --bin validate_gpu_track1c` |
 //! | Data | Synthetic pairs, sequences, gene clusters, codon pairs |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!

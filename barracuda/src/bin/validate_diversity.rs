@@ -5,10 +5,12 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Baseline tool | Analytical formulas (Shannon, Simpson, Chao1) |
 //! | Baseline version | skbio 0.6.0 (simulated community) |
 //! | Baseline command | No external Python tool for core metrics |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `cargo run --bin validate_diversity` |
 //! | Data | PRJNA1195978 (phytoplankton), synthetic for analytical tests |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!

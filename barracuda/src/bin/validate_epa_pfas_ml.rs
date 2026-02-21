@@ -5,11 +5,14 @@
 //!
 //! | Item            | Value                                                        |
 //! |-----------------|--------------------------------------------------------------|
+//! | Baseline commit | `e4358c5`                                                    |
 //! | Baseline script | `scripts/epa_pfas_ml_baseline.py`                            |
 //! | Baseline output | `experiments/results/041_epa_pfas_ml/python_baseline.json`    |
 //! | Data source     | Michigan EGLE (3,719 samples) + EPA UCMR 5 (national)        |
 //! | Proxy for       | Paper #22, Jones PFAS fate-and-transport                     |
 //! | Date            | 2026-02-20                                                   |
+//! | Exact command   | `python3 scripts/epa_pfas_ml_baseline.py`                    |
+//! | Hardware        | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04                 |
 //!
 //! Validates decision tree classification of PFAS contamination levels
 //! using the Rust `DecisionTree` module.

@@ -206,7 +206,7 @@ mod tests {
             0.001,
             None,
         );
-        let r = (result.y_final[0].powi(2) + result.y_final[1].powi(2)).sqrt();
+        let r = result.y_final[0].hypot(result.y_final[1]);
         assert!(
             (r - 1.0).abs() < 1e-6,
             "circular orbit radius should be 1.0, got {r}"

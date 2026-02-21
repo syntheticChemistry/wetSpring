@@ -300,14 +300,16 @@ impl BenchReport {
                 continue;
             }
 
-            let fastest = matching
-                .iter()
-                .min_by(|a, b| a.wall_time_s.total_cmp(&b.wall_time_s))
-                .expect("matching has >= 2 elements");
-            let slowest = matching
-                .iter()
-                .max_by(|a, b| a.wall_time_s.total_cmp(&b.wall_time_s))
-                .expect("matching has >= 2 elements");
+            let (Some(fastest), Some(slowest)) = (
+                matching
+                    .iter()
+                    .min_by(|a, b| a.wall_time_s.total_cmp(&b.wall_time_s)),
+                matching
+                    .iter()
+                    .max_by(|a, b| a.wall_time_s.total_cmp(&b.wall_time_s)),
+            ) else {
+                continue; // matching non-empty, so min/max are Some; defensive fallback
+            };
 
             if fastest.wall_time_s > 0.0 && slowest.wall_time_s > fastest.wall_time_s {
                 let speedup = slowest.wall_time_s / fastest.wall_time_s;

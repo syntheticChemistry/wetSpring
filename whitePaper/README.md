@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 21, 2026
-**Status:** Validation study complete — 1,501/1,501 checks, 552 tests, 93.5% coverage, 63 experiments
+**Status:** Validation study complete — 1,742/1,742 checks, 610 tests, 93.5% coverage, 76 experiments
 **License:** AGPL-3.0-or-later
 
 ---
@@ -38,8 +38,8 @@
 
 | Claim | Evidence |
 |-------|----------|
-| Rust matches Python across 63 experiments | 1,241/1,241 CPU checks pass |
-| GPU matches CPU across all promoted domains | 260/260 GPU checks pass |
+| Rust matches Python across 76 experiments | 1,291/1,291 CPU checks pass |
+| GPU matches CPU across all promoted domains | 451/451 GPU checks pass |
 | BarraCUDA CPU parity across 25 domains | 157/157 cross-domain checks pass |
 | 926× spectral cosine GPU speedup | Exp016 benchmark |
 | 2.45× full 16S pipeline GPU speedup | Exp015/016 benchmark |
@@ -72,6 +72,11 @@
 | GBM inference (binary + multi-class) | Exp062, 16/16 CPU checks |
 | GPU RF batch inference (SoA layout) | Exp063, 13/13 GPU checks |
 | metalForge cross-substrate CPU↔GPU parity | Exp060, 20/20 checks |
+| GPU streaming 1.27× speedup over individual dispatch | Exp072, 17/17 checks |
+| Dispatch overhead: streaming wins at all batch sizes | Exp073, 21/21 checks |
+| GPU↔NPU↔CPU substrate router with PCIe topology | Exp074, 20/20 checks |
+| Pure GPU 5-stage analytics: 0.1% pipeline overhead | Exp075, 31/31 checks |
+| Cross-substrate GPU→NPU→CPU pipeline profiled | Exp076, 17/17 checks |
 
 ---
 
@@ -153,6 +158,21 @@
 | 062 | GBM inference | 16/16 binary + multi-class (sigmoid + softmax) |
 | 063 | GPU RF batch inference | 13/13 GPU SoA layout (one thread per sample×tree) |
 
+### Consolidation, Streaming & Cross-Substrate Proofs
+
+| Exp | Method | What We Prove |
+|-----|--------|---------------|
+| 064 | BarraCUDA GPU v1 consolidated | 26/26 all GPU-eligible domains in one binary |
+| 065 | metalForge full portfolio | 35/35 CPU↔GPU parity for entire portfolio |
+| 066 | CPU vs GPU scaling (all domains) | Scaling curves across batch sizes |
+| 070 | BarraCUDA CPU full (25 domains) | 50/50 consolidated pure Rust math proof |
+| 071 | BarraCUDA GPU full (11 domains) | 24/24 consolidated GPU portability proof |
+| 072 | GPU streaming pipeline | 17/17 pre-warmed FMR, 1.27× streaming speedup |
+| 073 | Dispatch overhead proof | 21/21 streaming beats individual at all batch sizes |
+| 074 | metalForge substrate router | 20/20 GPU↔NPU↔CPU routing with PCIe topology |
+| 075 | Pure GPU analytics pipeline | 31/31 five-stage GPU pipeline, 0.1% overhead |
+| 076 | Cross-substrate pipeline | 17/17 GPU→NPU→CPU with latency profiling |
+
 ### Track 2: Analytical Chemistry (LC-MS, PFAS)
 
 | Exp | Paper/Tool | What We Prove |
@@ -193,7 +213,7 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCUDA/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34 WGSL shaders, 454 tests)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (9 WGSL shaders, 552 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (9 WGSL shaders, 610 tests)
 - **archive/handoffs/** — Fossil record of ToadStool handoffs (v1–v4)
 
 Springs follow the **Write → Absorb → Lean** pattern (pioneered by hotSpring):
@@ -212,7 +232,7 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | Line coverage (`cargo-llvm-cov`) | **93.5%** |
 | `unsafe` in production | 0 |
 | `.unwrap()` in production | 0 |
-| Named tolerance constants | 22 (all scientifically justified) |
+| Named tolerance constants | 32 (all scientifically justified) |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 

@@ -5,12 +5,14 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Proxy dataset | PRJNA488170 (Nannochloropsis sp. outdoor 16S, Wageningen) |
 //! | Run | SRR7760408 (11.9M spots, paired-end `MiSeq`, 27F/338R V1-V2) |
 //! | Paper | DOI 10.1007/s00253-022-11815-3 |
 //! | Original papers | Carney 2016 (Pond Crash), Humphrey 2023 (Biotic Countermeasures) |
 //! | Why proxy | Papers 1/2 raw reads NOT found in NCBI SRA (DOE/Sandia restricted) |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `cargo run --bin validate_algae_16s` |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
 //! # Methodology

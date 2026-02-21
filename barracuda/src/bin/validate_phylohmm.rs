@@ -5,11 +5,14 @@
 //!
 //! | Item            | Value                                                  |
 //! |-----------------|--------------------------------------------------------|
+//! | Baseline commit | `e4358c5`                                              |
 //! | Baseline script | `scripts/phylohmm_introgression_baseline.py`           |
 //! | Baseline output | `experiments/results/037_phylohmm/python_baseline.json` |
 //! | Data source     | `PhyNetPy` DEFJ consecutive gene-tree RF distances       |
 //! | Reference       | Liu 2014, DOI 10.1371/journal.pcbi.1003649             |
 //! | Date            | 2026-02-20                                             |
+//! | Exact command   | `python3 scripts/phylohmm_introgression_baseline.py`   |
+//! | Hardware        | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04          |
 //!
 //! Validates Rust HMM forward + Viterbi against Python baseline on a
 //! binary observation sequence derived from real gene tree RF distances.

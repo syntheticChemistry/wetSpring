@@ -5,9 +5,11 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Baseline tool | CPU path (this binary's own CPU reference) |
 //! | Baseline version | Exp016 |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `cargo run --features gpu --release --bin validate_16s_pipeline_gpu` |
 //! | Data | PRJNA1114688, PRJNA629095, PRJNA1178324, PRJNA516219 |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!

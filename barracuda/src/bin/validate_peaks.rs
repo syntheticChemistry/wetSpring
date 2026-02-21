@@ -5,10 +5,12 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Baseline tool | `scipy.signal.find_peaks` (scipy 1.14+) |
 //! | Baseline version | scipy 1.14+ |
 //! | Baseline command | `scripts/generate_peak_baselines.py` (Exp010) |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `python3 scripts/generate_peak_baselines.py` |
 //! | Data | Synthetic (`experiments/results/010_peak_baselines/*.dat`) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
@@ -23,6 +25,7 @@
 
 use std::path::Path;
 use wetspring_barracuda::bio::signal::{find_peaks, PeakParams};
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 fn main() {
@@ -187,9 +190,9 @@ fn validate_case(v: &mut Validator, dir: &Path, name: &str, params: &PeakParams)
                 &format!("{name} peak {i} height"),
                 rp.height,
                 sci_height,
-                sci_height * 0.01,
+                sci_height * tolerances::PEAK_HEIGHT_REL,
             );
-            if rel_err > 0.01 {
+            if rel_err > tolerances::PEAK_HEIGHT_REL {
                 println!(
                     "  Height drift peak {i}: rust={:.4} scipy={sci_height:.4} err={rel_err:.6}",
                     rp.height

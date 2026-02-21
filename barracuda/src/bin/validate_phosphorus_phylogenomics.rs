@@ -10,11 +10,14 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Paper | Boden et al. (2024) Nature Communications 15:3703 |
 //! | DOI | 10.1038/s41467-024-47914-0 |
 //! | Faculty | R. Anderson (Carleton College) |
 //! | Baseline script | `scripts/boden2024_phosphorus_phylogenomics.py` |
 //! | Baseline date | 2026-02-20 |
+//! | Exact command | `python3 scripts/boden2024_phosphorus_phylogenomics.py` |
+//! | Hardware | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04 |
 //! | Data | OSF vt5rw (synthetic proxy for validation) |
 
 use wetspring_barracuda::bio::{

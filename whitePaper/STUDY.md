@@ -18,7 +18,7 @@ and mathematical biology (Track 1b), deep-sea metagenomics and microbial
 evolution (Track 1c), and PFAS detection via LC-MS (Track 2),
 validating 61 Rust modules (41 CPU + 20 GPU) against baselines from Galaxy,
 QIIME2, asari, FindPFAS, scipy, sklearn, dendropy, real NCBI SRA data, and
-published paper models with 1,501 quantitative checks across 63 experiments
+published paper models with 1,742 quantitative checks across 76 experiments
 — all passing. The pipeline proves substrate independence: math produces
 identical results on CPU and GPU, validated via metalForge cross-substrate
 checks (Exp060). Random Forest ensemble and Gradient Boosting Machine
@@ -30,7 +30,11 @@ exactly. Rust runs 22.5× faster than Python across all 25 algorithmic domains
 (Exp059), with peak speedup of 625× for Smith-Waterman alignment. The full 16S pipeline
 runs 8.3–13× faster than Galaxy on CPU (depending on sample size) and
 2.45× faster again on GPU, with 88/88 math parity checks proving
-identical results across hardware.
+identical results across hardware. A 5-stage pure GPU analytics pipeline
+(diversity → Bray-Curtis → PCoA → stats → spectral cosine) runs with
+0.1% pipeline overhead and zero CPU round-trips (Exp075), while
+cross-substrate routing (GPU → NPU → CPU) validates math parity across
+all three hardware substrates with PCIe topology awareness (Exp076).
 
 ---
 
@@ -65,7 +69,7 @@ chemistry:
 | Baseline | Python scipy | Galaxy/QIIME2 | asari/PFΔScreen |
 | GPU layer | ToadStool (wgpu) | ToadStool (wgpu) | ToadStool (wgpu) |
 | Success metric | chi² match | Same taxonomy | Same PFAS detected |
-| Checks | 418/418 | 1,501/1,501 | (included in 1,501) |
+| Checks | 418/418 | 1,742/1,742 | (included in 1,742) |
 
 Both prove the ecoPrimals thesis: sovereign compute on consumer hardware
 can replicate institutional results, then exceed them via Rust + GPU.
@@ -138,7 +142,7 @@ detection in water via LC-MS. Source papers: asari (Nature Communications
 
 ### 3.2 Rust CPU Validation (Phase 2)
 
-1,241 CPU quantitative checks across 29 self-contained validation binaries — all pass.
+1,291 CPU quantitative checks across 29 self-contained validation binaries — all pass.
 In addition, the original 17 pipeline validation binaries (data-dependent) cover
 the Phase 1-3 checks. The following are the self-contained validators:
 
@@ -191,10 +195,11 @@ the Phase 1-3 checks. The following are the self-contained validators:
 | `validate_pangenomics` | 24 | Moulana 2020 pangenome + enrichment (Exp056) |
 | `validate_barracuda_cpu_v4` | 44 | 5 Track 1c domains (Exp057) |
 | `validate_barracuda_cpu_v5` | 29 | RF + GBM ensemble ML (Exp061/062) |
+| `validate_barracuda_cpu_full` | 50 | 25-domain consolidated parity proof (Exp070) |
 
 ### 3.3 GPU Validation (Phase 3)
 
-260 GPU checks across 12 GPU validation binaries — all pass:
+451 GPU checks across 18 GPU validation binaries — all pass:
 
 **Individual operations (38 checks, tolerance ≤ 1e-10):**
 
@@ -312,7 +317,59 @@ DADA2 avoids this entirely by precomputing transcendentals on CPU.
 Rust GPU is cheapest per sample because the 2.45× speed advantage more
 than compensates for higher TDP.
 
-### 3.7 Three-Tier Profiling Infrastructure
+### 3.7 GPU Streaming & Cross-Substrate Validation (Exp064–076)
+
+Beyond individual GPU parity, wetSpring validates the full ToadStool dispatch
+model: pre-compiled pipelines, buffer pool reuse, unidirectional streaming,
+and cross-substrate routing.
+
+**Consolidation proofs:**
+
+| Exp | Binary | Checks | What's Proven |
+|-----|--------|:------:|---------------|
+| 064 | `validate_barracuda_gpu_v1` | 26 | All GPU-eligible domains in one binary |
+| 065 | `validate_metalforge_full` | 35 | CPU↔GPU parity for full portfolio |
+| 070 | `validate_barracuda_cpu_full` | 50 | 25-domain pure Rust math, 22.5× vs Python |
+| 071 | `validate_barracuda_gpu_full` | 24 | 11-domain GPU portability proof |
+
+**Streaming and dispatch:**
+
+| Exp | Binary | Checks | Key Finding |
+|-----|--------|:------:|-------------|
+| 072 | `validate_gpu_streaming_pipeline` | 17 | Pre-warmed FMR: 5µs vs 110ms individual dispatch; 1.27× streaming speedup |
+| 073 | `validate_dispatch_overhead_proof` | 21 | Streaming beats individual dispatch at all batch sizes [64, 256, 1K, 4K] |
+
+**Cross-substrate and mixed hardware:**
+
+| Exp | Binary | Checks | Key Finding |
+|-----|--------|:------:|-------------|
+| 074 | `validate_substrate_router` | 20 | GPU↔NPU↔CPU routing validated; PCIe topology-aware |
+| 075 | `validate_pure_gpu_pipeline` | 31 | 5-stage GPU pipeline (diversity→BC→PCoA→stats→spectral), 0.1% overhead |
+| 076 | `validate_cross_substrate_pipeline` | 17 | GPU→NPU→CPU latency profiled; all 3 substrates operational |
+
+**Streaming pipeline architecture:**
+
+```
+Traditional:  CPU → GPU → CPU → GPU → CPU → GPU → CPU  (6 PCIe transfers)
+Streaming:    CPU → GPU ───→ GPU ───→ GPU → CPU          (2 PCIe transfers)
+```
+
+The `GpuPipelineSession` pre-compiles all pipelines at init (27ms warmup).
+Subsequent dispatches reuse cached pipelines and pooled buffers. For the
+5-stage pure GPU pipeline (Exp075), 99.9% of wall time is useful compute.
+The substrate router (Exp074) correctly dispatches to NPU for inference
+workloads (AKD1000 detected via `/dev/akida0`) and falls back to CPU when
+hardware is unavailable — math parity maintained across all paths.
+
+**PCIe hardware topology (Eastgate system):**
+
+| Device | Bus | PCIe | Role |
+|--------|-----|------|------|
+| RTX 4070 | 01:00.0 | Gen4 x16 (32 GB/s) | Primary GPU — ToadStool dispatch |
+| Titan V | 05:00.0 | Gen3 x16 (16 GB/s) | Secondary GPU — native f64 (Volta) |
+| AKD1000 NPU | 08:00.0 | 2.0 x1 (500 MB/s) | Inference — taxonomy/anomaly |
+
+### 3.8 Three-Tier Profiling Infrastructure
 
 A sovereign benchmark harness (`barracuda/src/bench.rs`) captures
 performance and energy data across all three tiers in a single JSON
@@ -346,7 +403,7 @@ tools.
 Protocol: [`benchmarks/PROTOCOL.md`](../benchmarks/PROTOCOL.md) |
 Results: [`benchmarks/results/`](../benchmarks/results/)
 
-### 3.8 Complete 16S Pipeline in Rust
+### 3.9 Complete 16S Pipeline in Rust
 
 The full pipeline from raw reads to ecological analysis:
 
@@ -357,11 +414,11 @@ FASTQ → quality filter → adapter trim → paired-end merge
   → diversity metrics → UniFrac distance → PCoA ordination
 ```
 
-Each stage has unit tests (570 total, 95%+ line coverage), end-to-end
+Each stage has unit tests (610 total, 95%+ line coverage), end-to-end
 validation against Galaxy baselines, GPU math parity checks, and
 determinism tests ensuring identical output across runs.
 
-### 3.9 Optimization History
+### 3.10 Optimization History
 
 | Change | Before | After | Speedup |
 |--------|--------|-------|---------|
@@ -456,7 +513,9 @@ Code quality gates (all enforced in CI):
 - `cargo clippy --all-targets -- -D warnings` — zero warnings (CPU and GPU)
 - `cargo clippy --all-targets --features gpu -- -D warnings` — zero GPU-specific warnings
 - `RUSTDOCFLAGS="-D warnings" cargo doc --no-deps` — zero doc warnings
-- 0 `unsafe` blocks, 0 `TODO`/`FIXME`, 0 production `unwrap()`/`expect()`
+- 0 `unsafe` blocks (`#![forbid(unsafe_code)]` enforced crate-wide), 0 `TODO`/`FIXME`, 0 production `unwrap()`/`expect()`
+- 32 named tolerance constants in `tolerances.rs` (scientifically justified, hierarchy-tested)
+- Shared math consolidated in `bio::special` (erf, ln_gamma, `regularized_gamma_lower`) — no duplication
 - 6 determinism tests covering diversity, Bray-Curtis, DADA2, chimera, taxonomy, and the full 16S pipeline
 
 ### 4.7 Write → Absorb → Lean (GPU evolution pattern)
@@ -482,15 +541,23 @@ and ML ensemble domains.
 `needs_f64_exp_log_workaround() = false` for Ada Lovelace (RTX 40-series).
 Upstream fix: return `true` for all Ada Lovelace GPUs.
 
-**CPU math evolution**: 4 local functions (`erf`, `ln_gamma`,
-`regularized_gamma_lower`, `integrate_peak`) duplicate barracuda upstream
-primitives (`barracuda::special::erf`, `barracuda::special::ln_gamma`,
-`barracuda::special::regularized_gamma_p`, `barracuda::numerical::trapz`).
-Migration blocked on barracuda adding a CPU-only `math` feature gate that
-does not pull in wgpu/akida-driver/toadstool-core.
+**CPU math evolution**: `bio::special` consolidates 3 local math functions
+(`erf`, `ln_gamma`, `regularized_gamma_lower`) that duplicate barracuda upstream
+primitives. These are shaped for extraction to `barracuda::math` — a proposed
+CPU-only feature gate that does not pull in wgpu/akida-driver/toadstool-core.
+A fourth function (`integrate_peak` in `bio::eic`) duplicates
+`barracuda::numerical::trapz`. Migration blocked on the feature gate proposal.
+
+**Absorption engineering**: Following hotSpring's pattern, all Rust modules are
+shaped for ToadStool absorption via GPU-friendly patterns: flat arrays (SoA),
+`#[repr(C)]` parameter structs, batch APIs, preallocated buffers, and
+deterministic math. The `metalForge/` directory characterizes local hardware
+(GPU, NPU, CPU) and documents substrate routing for each algorithm. 32 named
+tolerance constants in `tolerances.rs` ensure all validation thresholds are
+scientifically justified and ready for cross-Spring adoption.
 
 Full absorption map: `barracuda/EVOLUTION_READINESS.md`.
-Active handoff: `wateringHole/handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md`.
+Active handoff: `../wateringHole/handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md`.
 
 ---
 
@@ -500,9 +567,9 @@ All code, data paths, and validation binaries are in the `wetSpring`
 repository (AGPL-3.0). No institutional access required.
 
 ```bash
-# Run all CPU validations (1,241 checks)
+# Run all CPU validations (1,291 checks)
 cd barracuda
-cargo test --release          # 552 tests (539 lib + 13 doc)
+cargo test --release          # 610 tests (547 lib + 50 integration + 13 doc)
 cargo run --release --bin validate_fastq
 cargo run --release --bin validate_diversity
 cargo run --release --bin validate_mzml
@@ -514,7 +581,7 @@ cargo run --release --bin validate_algae_16s
 cargo run --release --bin validate_voc_peaks
 cargo run --release --bin validate_public_benchmarks
 
-# GPU validation + benchmark (260 checks)
+# GPU validation + benchmark (451 checks)
 cargo run --release --features gpu --bin validate_diversity_gpu
 cargo run --release --features gpu --bin validate_16s_pipeline_gpu
 cargo run --release --features gpu --bin benchmark_cpu_gpu

@@ -68,20 +68,21 @@ Tier 3: GPU (ToadStool/BarraCUDA, math parity with CPU)
 | `validate_pangenomics` | 056 | 24 | PASS |
 | `validate_barracuda_cpu_v4` | 057 | 44 | PASS |
 | `validate_barracuda_cpu_v5` | 061/062 | 29 | PASS |
-| **CPU total** | | **1,241** | **PASS** |
+| **CPU total** | | **1,291** | **PASS** |
 
 ### Rust Unit/Integration Tests
 
 | Suite | Count | Status |
 |-------|-------|--------|
-| Library unit tests | 539 | PASS (+ 1 ignored — hardware-dependent) |
+| Library unit tests | 547 | PASS (+ 1 ignored — hardware-dependent) |
+| Integration tests | 50 | PASS |
 | Doc-tests | 13 | PASS |
-| **Total** | **552** | **PASS** |
+| **Total** | **610** | **PASS** |
 | Line coverage | 93.5% | Exceeds 90% target |
 
 ---
 
-## Tier 3: GPU Validation
+## Tier 3: GPU Validation (18 GPU validation binaries, 451 checks)
 
 | Binary | Checks | Status |
 |--------|--------|--------|
@@ -95,8 +96,16 @@ Tier 3: GPU (ToadStool/BarraCUDA, math parity with CPU)
 | `validate_gpu_ode_sweep` | 12 | PASS |
 | `validate_gpu_track1c` | 27 | PASS |
 | `validate_cross_substrate` | 20 | PASS |
+| `validate_barracuda_gpu_v1` | 26 | PASS |
+| `validate_metalforge_full` | 35 | PASS |
 | `validate_gpu_rf` | 13 | PASS |
-| **GPU total** | **260** | **PASS** |
+| `validate_barracuda_gpu_full` | 24 | PASS |
+| `validate_gpu_streaming_pipeline` | 17 | PASS |
+| `validate_dispatch_overhead_proof` | 21 | PASS |
+| `validate_substrate_router` | 20 | PASS |
+| `validate_pure_gpu_pipeline` | 31 | PASS |
+| `validate_cross_substrate_pipeline` | 17 | PASS |
+| **GPU total** | **451** | **PASS** |
 
 ### GPU Performance
 
@@ -187,9 +196,9 @@ Combined v1-v5: **157/157 checks across 25 domains**.
 
 ---
 
-## Exp059: Rust vs Python Timing (23 Domains)
+## Exp059: Rust vs Python Timing (25 Domains)
 
-Head-to-head benchmark across all 23 BarraCUDA CPU parity domains:
+Head-to-head benchmark across all 25 BarraCUDA CPU parity domains:
 
 | Metric | Value |
 |--------|-------|
@@ -211,14 +220,14 @@ Run with `cargo run --release --bin benchmark_23_domain_timing` and
 
 | Category | Checks | Status |
 |----------|--------|--------|
-| Rust CPU validation | 1,241 | PASS |
-| GPU validation | 260 | PASS |
-| Rust tests | 552 (539 lib + 13 doc) | PASS |
+| Rust CPU validation | 1,291 | PASS |
+| GPU validation | 451 | PASS |
+| Rust tests | 610 (547 lib + 50 integration + 13 doc) | PASS |
 | Python baselines | 40 scripts | PASS |
 | BarraCUDA CPU parity | 157/157 (25 domains) | PASS |
 | ToadStool bio primitives | 15 consumed (4 bio absorbed) | PASS |
 | Local WGSL shaders | 9 (HMM, ODE, DADA2, quality, ANI, SNP, pangenome, dN/dS, RF) | PASS |
-| **Grand total** | **1,501 validation + 552 tests** | **ALL PASS** |
+| **Grand total** | **1,742 validation + 610 tests** | **ALL PASS** |
 
 ---
 
@@ -227,11 +236,11 @@ Run with `cargo run --release --bin benchmark_23_domain_timing` and
 ```bash
 cd barracuda
 
-# Tier 2: Rust CPU (1,241 checks)
-cargo test                         # 552 tests (539 lib + 13 doc)
-cargo run --release --bin validate_qs_ode  # ... repeat for all 29 CPU binaries
+# Tier 2: Rust CPU (1,291 checks)
+cargo test                         # 610 tests (547 lib + 50 integration + 13 doc)
+cargo run --release --bin validate_qs_ode  # ... repeat for all 50 CPU binaries
 
-# Tier 3: GPU (260 checks)
+# Tier 3: GPU (451 checks)
 cargo run --features gpu --bin validate_diversity_gpu          # 38
 cargo run --features gpu --bin validate_16s_pipeline_gpu       # 88
 cargo run --features gpu --bin validate_barracuda_gpu_v3       # 14

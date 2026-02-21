@@ -132,6 +132,38 @@ Is the model a neural network or lookup table?
 
 ---
 
+## Absorption Readiness Gaps
+
+Modules with local WGSL shaders (Tier A) that are missing absorption-friendly
+patterns in their CPU implementations:
+
+| Module | Has Batch API | Has `repr(C)` | Has Flat Layout | Gap |
+|--------|:------------:|:------------:|:---------------:|-----|
+| `dada2` | No | No (GPU module does) | No | Denoise is single-sample; GPU module bridges |
+| `hmm` | Yes | No (GPU module does) | No | `forward_batch` present; GPU module has `repr(C)` |
+| `ani` | Yes | Yes | No | Ready — `ani_matrix`, `AniParams` |
+| `snp` | Partial | Yes | Yes (`SnpFlatResult`) | No batch over multiple alignments |
+| `dnds` | Yes | Yes | No | Ready — `pairwise_dnds_batch`, `DnDsParams` |
+| `pangenome` | Partial | Yes | Yes (`presence_matrix_flat`) | No batch for many cluster sets |
+| `quality` | No | No (GPU module does) | No | `filter_reads` is single-sample |
+| `random_forest` | Yes | No (GPU module does) | No | `predict_batch` present; GPU module bridges |
+| `felsenstein` | Per-site | No | Yes (`FlatTree`) | Already absorbed; `FlatTree` is the pattern |
+
+For Tier A modules, the GPU companion modules (`*_gpu`) provide the `repr(C)`
+bridge layer between CPU structs and WGSL bindings. This is the correct
+architecture: CPU modules own the algorithm, GPU modules own the dispatch.
+
+### Shared Math (bio::special) — Ready for Extraction
+
+| Function | Consumers | Absorption Target |
+|----------|-----------|-------------------|
+| `erf()` | `normal_cdf()` | `barracuda::special::erf` |
+| `normal_cdf()` | `bio::pangenome` (enrichment FDR) | `barracuda::special::normal_cdf` |
+| `ln_gamma()` | `regularized_gamma_lower()` | `barracuda::special::ln_gamma` |
+| `regularized_gamma_lower()` | `bio::dada2` (Poisson p-value) | `barracuda::special::regularized_gamma_p` |
+
+---
+
 ## Counts
 
 | Category | Count |

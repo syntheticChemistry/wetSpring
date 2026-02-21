@@ -5,11 +5,14 @@
 //!
 //! | Item            | Value                                                           |
 //! |-----------------|-----------------------------------------------------------------|
+//! | Baseline commit | `e4358c5`                                                       |
 //! | Baseline script | `scripts/bloom_surveillance_baseline.py`                        |
 //! | Baseline output | `experiments/results/040_bloom_surveillance/python_baseline.json`|
 //! | Data source     | PRJNA1224988 (175 samples, cyanobacterial bloom time series)    |
 //! | Proxy for       | Smallwood #14 (raceway metagenomic surveillance)                |
 //! | Date            | 2026-02-20                                                      |
+//! | Exact command   | `python3 scripts/bloom_surveillance_baseline.py`                |
+//! | Hardware        | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04                    |
 //!
 //! Validates bloom detection via:
 //! - Shannon diversity collapse during bloom

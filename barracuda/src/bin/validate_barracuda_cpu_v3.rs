@@ -10,10 +10,12 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Baseline tool | scipy, numpy, pure Python (`srivastava2011_multi_signal`, `hsueh2022_phage_defense`, `wang2021_rawr_bootstrap`, `alamin2024_placement`, spectral/diversity/decision-tree refs) |
 //! | Baseline version | Feb 2026 |
 //! | Baseline command | `python3 scripts/benchmark_rust_vs_python.py` (18-domain coverage) |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `python3 scripts/benchmark_rust_vs_python.py` |
 //! | Data | Synthetic test vectors (hardcoded) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
@@ -148,7 +150,7 @@ fn main() {
     let deterministic = lls
         .iter()
         .zip(lls2.iter())
-        .all(|(a, b)| (a - b).abs() < 1e-15);
+        .all(|(a, b)| (a - b).abs() < tolerances::EXACT_F64);
     v.check(
         "Bootstrap: deterministic (same seed)",
         f64::from(u8::from(deterministic)),
@@ -273,7 +275,12 @@ fn main() {
     let diff_match = spectral_match::cosine_similarity(&mz_a, &int_a, &mz_c, &int_c, 0.5);
     let sm_us = t0.elapsed().as_micros();
 
-    v.check("Spectral: self-match ≈ 1.0", self_match.score, 1.0, 0.001);
+    v.check(
+        "Spectral: self-match ≈ 1.0",
+        self_match.score,
+        1.0,
+        tolerances::SPECTRAL_COSINE,
+    );
     v.check(
         "Spectral: near-match > 0.95",
         f64::from(u8::from(near_match.score > 0.95)),
@@ -441,7 +448,7 @@ fn main() {
         "Pipeline: Shannon consistent",
         pipeline_diversity.shannon,
         diversity::shannon(&[10.0, 20.0, 30.0, 15.0, 25.0]),
-        1e-15,
+        tolerances::EXACT_F64,
     );
     v.check(
         "Pipeline: BC ∈ (0,1)",

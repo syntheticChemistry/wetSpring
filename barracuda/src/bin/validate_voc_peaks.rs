@@ -5,11 +5,13 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Paper | Reese et al. 2019. Sci. Rep. 9:13866 (PMC6761164) |
 //! | DOI | 10.1038/s41598-019-50125-z |
 //! | Baseline | Table 1: 14 VOC compounds (m/z, RI, NIST ID, match %) |
 //! | Baseline file | `experiments/results/013_voc_baselines/reese2019_table1.tsv` |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `cargo run --bin validate_voc_peaks` |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
 //! # Methodology

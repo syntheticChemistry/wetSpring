@@ -9,16 +9,19 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Baseline tool | liu2009_neighbor_joining.py |
 //! | Baseline version | scripts/ |
 //! | Baseline command | python3 scripts/liu2009_neighbor_joining.py |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `python3 scripts/liu2009_neighbor_joining.py` |
 //! | Data | synthetic distance matrices, 3–5 taxa |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::bio::neighbor_joining::{
     distance_matrix, jukes_cantor_distance, neighbor_joining,
 };
+use wetspring_barracuda::tolerances;
 
 fn main() {
     let mut pass = 0_u32;
@@ -106,15 +109,21 @@ fn main() {
     // ── Test 4: JC distance validation ──
     println!("\n─── JC distance checks ───");
     let d_ident = jukes_cantor_distance(b"ACGTACGT", b"ACGTACGT");
-    check!("JC: identical = 0", d_ident.abs() < 1e-12);
+    check!(
+        "JC: identical = 0",
+        d_ident.abs() < tolerances::ANALYTICAL_F64
+    );
     let d_small = jukes_cantor_distance(b"ACGTACGTACGT", b"ACGTACGTACTT");
     // Python: 0.088337
     check!(
         "JC: small diff matches Python",
-        (d_small - 0.088_337_276_742_287_64).abs() < 1e-6
+        (d_small - 0.088_337_276_742_287_64).abs() < tolerances::JC69_PROBABILITY
     );
     let d_sat = jukes_cantor_distance(b"AAAA", b"CCCC");
-    check!("JC: saturated = 10.0", (d_sat - 10.0).abs() < 1e-12);
+    check!(
+        "JC: saturated = 10.0",
+        (d_sat - 10.0).abs() < tolerances::ANALYTICAL_F64
+    );
 
     // ── Test 5: Distance matrix symmetry ──
     println!("\n─── Distance matrix checks ───");
@@ -122,7 +131,7 @@ fn main() {
     let mut symmetric = true;
     for i in 0..n {
         for j in 0..n {
-            if (dm[i * n + j] - dm[j * n + i]).abs() > 1e-12 {
+            if (dm[i * n + j] - dm[j * n + i]).abs() > tolerances::ANALYTICAL_F64 {
                 symmetric = false;
             }
         }
@@ -130,7 +139,7 @@ fn main() {
     check!("Distance matrix symmetric", symmetric);
     let mut diag_zero = true;
     for i in 0..n {
-        if dm[i * n + i].abs() > 1e-12 {
+        if dm[i * n + i].abs() > tolerances::ANALYTICAL_F64 {
             diag_zero = false;
         }
     }

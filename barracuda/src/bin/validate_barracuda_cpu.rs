@@ -21,10 +21,12 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Baseline tool | scipy.odeint, numpy, dendropy, pure Python (per-domain scripts) |
 //! | Baseline version | Feb 2026 |
 //! | Baseline command | `python3 scripts/benchmark_rust_vs_python.py` (domains 1–9); per-domain: `waters2008_qs_ode.py`, `gillespie_baseline.py`, `liu2014_hmm_baseline.py`, `smith_waterman_baseline.py`, `felsenstein_pruning_baseline.py`, `bruger2018_cooperation.py`, `rf_distance_baseline.py` |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `python3 scripts/benchmark_rust_vs_python.py` |
 //! | Data | Synthetic test vectors (hardcoded) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
@@ -56,13 +58,23 @@ fn main() {
     let qs = qs_biofilm::scenario_standard_growth(&qs_biofilm::QsBiofilmParams::default(), 0.001);
     let ode_us = t0.elapsed().as_micros();
     let b_ss = ode::steady_state_mean(&qs, 4, 0.1);
-    v.check("QS-ODE: biofilm dispersed (B≈0.02)", b_ss, 0.020, 0.01);
+    v.check(
+        "QS-ODE: biofilm dispersed (B≈0.02)",
+        b_ss,
+        0.020,
+        tolerances::ODE_STEADY_STATE,
+    );
 
     let t0 = Instant::now();
     let cap = capacitor::scenario_normal(&capacitor::CapacitorParams::default(), 0.001);
     let cap_us = t0.elapsed().as_micros();
     let vpsr = ode::steady_state_mean(&cap, 2, 0.1);
-    v.check("Capacitor: VpsR steady-state", vpsr, 0.766, 0.01);
+    v.check(
+        "Capacitor: VpsR steady-state",
+        vpsr,
+        0.766,
+        tolerances::ODE_STEADY_STATE,
+    );
 
     let bi = bistable::BistableParams::default();
     let br = bistable::bifurcation_scan(&bi, 0.0, 10.0, 50, 0.001, 48.0);
@@ -257,7 +269,7 @@ fn main() {
         "Felsenstein LL (20bp, 3 taxa)",
         ll,
         -40.881_169_027_599_25,
-        1e-8,
+        tolerances::PHYLO_LIKELIHOOD,
     );
     #[allow(clippy::cast_precision_loss)]
     {

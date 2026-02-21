@@ -5,9 +5,11 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Baseline tool | CPU diversity metrics (`bio::diversity`) |
 //! | Baseline version | GPU parity validation |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `cargo run --features gpu --bin validate_diversity_gpu` |
 //! | Data | Synthetic (Shannon, Simpson, Bray-Curtis, `PCoA`, etc.) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!

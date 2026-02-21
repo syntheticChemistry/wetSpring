@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-21 (Phase 16: BarraCUDA Evolution + Absorption Readiness)
+**Updated**: 2026-02-21 (Phase 18: Streaming Dispatch + Cross-Substrate Validation)
 
 ---
 
@@ -76,6 +76,16 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 061 | [Random Forest Inference](061_random_forest_inference.md) | ML | DONE | RF majority vote | bio::random_forest, bio::random_forest_gpu | 13 |
 | 062 | [GBM Inference](062_gbm_inference.md) | ML | DONE | GBM sigmoid/softmax | bio::gbm | 16 |
 | 063 | GPU Random Forest Batch | GPU/ML | DONE | CPU RF | rf_batch_inference.wgsl (SoA layout) | 13 |
+| 064 | [BarraCUDA GPU Parity v1](064_barracuda_gpu_parity_v1.md) | cross/GPU | DONE | CPU reference | diversity, BC, ANI, SNP, dN/dS, pangenome, RF, HMM | 26 |
+| 065 | [metalForge Full Cross-System](065_metalforge_full_cross_system.md) | cross | DONE | CPU↔GPU parity | Full portfolio substrate-independence proof | 35 |
+| 066 | [CPU vs GPU Scaling Benchmark](066_cpu_vs_gpu_scaling_all_domains.md) | GPU | DONE | CPU vs GPU timing | benchmark_all_domains_cpu_gpu | Benchmark |
+| 067 | [ToadStool Dispatch Overhead Profiling](067_dispatch_overhead_profiling.md) | GPU | DONE | Dispatch profiling | benchmark_dispatch_overhead | Benchmark |
+| 068 | [Pipeline Caching Optimization](068_pipeline_caching_optimization.md) | GPU | DONE | Optimization | benchmark_dispatch_overhead (reuses) | Benchmark |
+| 069 | [Python vs Rust CPU vs GPU Three-Tier Benchmark](069_python_vs_rust_cpu_vs_gpu.md) | cross | DONE | Three-tier timing | benchmark_three_tier | Benchmark |
+| 070 | [BarraCUDA CPU 25-Domain Pure Rust Math Proof](070_barracuda_cpu_25_domain_proof.md) | cross | COMPLETE | 25 domains consolidated | validate_barracuda_cpu_full | 50 |
+| 071 | [BarraCUDA GPU Math Portability Proof](071_barracuda_gpu_portability_proof.md) | GPU | COMPLETE | GPU math portability | validate_barracuda_gpu_full | 24 |
+| 075 | [Pure GPU Analytics Pipeline](075_pure_gpu_analytics_pipeline.md) | GPU | DONE | Pure GPU pipeline | validate_pure_gpu_pipeline | 31 |
+| 076 | [Cross-Substrate Pipeline](076_metalforge_cross_substrate_pipeline.md) | cross/GPU | DONE | Cross-substrate pipeline | validate_cross_substrate_pipeline | 17 |
 
 ---
 
@@ -179,11 +189,23 @@ thresholds from `src/tolerances.rs`.
 | `validate_cross_substrate` | 060 | 20 | `cargo run --features gpu --bin validate_cross_substrate` |
 | `validate_barracuda_cpu_v5` | 061-062 | 29 | `cargo run --release --bin validate_barracuda_cpu_v5` |
 | `validate_gpu_rf` | 063 | 13 | `cargo run --features gpu --bin validate_gpu_rf` |
+| `validate_barracuda_gpu_v1` | 064 | 26 | `cargo run --features gpu --release --bin validate_barracuda_gpu_v1` |
+| `validate_metalforge_full` | 065 | 35 | `cargo run --features gpu --release --bin validate_metalforge_full` |
+| `benchmark_all_domains_cpu_gpu` | 066 | — | `cargo run --release --features gpu --bin benchmark_all_domains_cpu_gpu` |
+| `benchmark_dispatch_overhead` | 067/068 | — | `cargo run --release --features gpu --bin benchmark_dispatch_overhead` |
+| `benchmark_three_tier` | 069 | — | `cargo run --release --features gpu --bin benchmark_three_tier` |
 | `benchmark_cpu_gpu` | — | — | `cargo run --release --features gpu --bin benchmark_cpu_gpu` |
+| `validate_barracuda_cpu_full` | 070 | 50 | `cargo run --release --bin validate_barracuda_cpu_full` |
+| `validate_barracuda_gpu_full` | 071 | 24 | `cargo run --features gpu --release --bin validate_barracuda_gpu_full` |
+| `validate_gpu_streaming_pipeline` | 072 | 17 | `cargo run --features gpu --release --bin validate_gpu_streaming_pipeline` |
+| `validate_dispatch_overhead_proof` | 073 | 21 | `cargo run --features gpu --release --bin validate_dispatch_overhead_proof` |
+| `validate_substrate_router` | 074 | 20 | `cargo run --features gpu --release --bin validate_substrate_router` |
+| `validate_pure_gpu_pipeline` | 075 | 31 | `cargo run --features gpu --release --bin validate_pure_gpu_pipeline` |
+| `validate_cross_substrate_pipeline` | 076 | 17 | `cargo run --features gpu --release --bin validate_cross_substrate_pipeline` |
 
-**Total validation checks**: 1,501 (1,241 CPU + 260 GPU)
-**Rust tests**: 552 (539 lib + 13 doc)
-**Binaries**: 47 CPU + 10 GPU + 4 benchmark = 61 total
+**Total validation checks**: 1,742 (1,291 CPU + 451 GPU)
+**Rust tests**: 610 (547 lib + 50 integration + 13 doc)
+**Binaries**: 50 CPU + 18 GPU validate + 5 benchmark = 73 total
 **Line coverage**: 93.5% (`cargo-llvm-cov`)
 **Benchmark infrastructure**: `bench.rs` harness with RAPL + nvidia-smi energy profiling, JSON output
 

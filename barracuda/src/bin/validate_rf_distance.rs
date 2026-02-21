@@ -8,11 +8,14 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Baseline script | `scripts/rf_distance_baseline.py` |
 //! | Baseline output | `experiments/results/021_rf_baseline/rf_python_baseline.json` |
 //! | Python library | dendropy 5.0.8 |
 //! | Reference | Robinson & Foulds 1981, Math Biosci 53:131-147 |
 //! | Date | 2026-02-19 |
+//! | Exact command | `python3 scripts/rf_distance_baseline.py` |
+//! | Hardware | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04 |
 
 use wetspring_barracuda::bio::robinson_foulds::{rf_distance, rf_distance_normalized};
 use wetspring_barracuda::bio::unifrac::PhyloTree;

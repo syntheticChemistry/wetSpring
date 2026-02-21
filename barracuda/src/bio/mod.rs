@@ -73,6 +73,7 @@ pub mod signal;
 pub mod snp;
 #[cfg(feature = "gpu")]
 pub mod snp_gpu;
+pub mod special;
 pub mod spectral_match;
 #[cfg(feature = "gpu")]
 pub mod spectral_match_gpu;

@@ -1,6 +1,6 @@
 # Cross-System Benchmark Status
 
-**Date:** February 20, 2026
+**Date:** February 21, 2026
 **Purpose:** Track which algorithms are validated on which substrates
 
 ---
@@ -62,10 +62,36 @@
 
 | Substrate | Validated Checks | Algorithms |
 |-----------|:----------------:|:----------:|
-| CPU (Rust) | 1,241 | 25 domains (18 original + 5 Track 1c + 2 ML ensemble) |
-| GPU (wgpu) | 260 | 30 promoted (15 ToadStool + 9 local WGSL + 6 composed) |
+| CPU (Rust) | 1,291 | 25 domains (18 original + 5 Track 1c + 2 ML ensemble) |
+| GPU (wgpu) | 345 | 30 promoted (15 ToadStool + 9 local WGSL + 6 composed + consolidated) |
 | NPU | 0 | 0 (3 candidates) |
-| **Total** | **1,501** | — |
+| **Total** | **1,636** | — |
+
+### Cross-System Proof (Exp064–067)
+
+| Experiment | What It Proves |
+|-----------|---------------|
+| Exp064 (GPU Parity v1) | Pure GPU math correct across 8 consolidated domains |
+| Exp065 (metalForge Full) | CPU↔GPU substrate-independence: same input → same output |
+| Exp066 (Scaling) | GPU crossover: dN/dS at ~200 pairs; most domains CPU-optimal at small N |
+| Exp067 (Dispatch) | GPU dispatch overhead: ~5ms average (local WGSL), ~1ms (ToadStool) |
+
+### GPU Dispatch Overhead (Exp067 — measured on RTX 4070)
+
+| Domain | CPU (µs) | GPU (µs) | Fixed Overhead |
+|--------|:--------:|:--------:|:--------------:|
+| Shannon (FMR) | <1 | 994 | ~1ms |
+| Bray-Curtis | <1 | 335 | ~0.3ms |
+| ANI (local WGSL) | <1 | 5,855 | ~6ms |
+| SNP (local WGSL) | <1 | 10,169 | ~10ms |
+| dN/dS (local WGSL) | 1 | 9,900 | ~10ms |
+| Pangenome (local WGSL) | <1 | 5,788 | ~6ms |
+| RF (local WGSL) | <1 | 2,493 | ~2.5ms |
+| HMM (local WGSL) | 1 | 5,086 | ~5ms |
+
+**Routing rule**: GPU wins when `batch_compute_time > dispatch_overhead`.
+At small N, CPU always wins. ToadStool streaming amortizes dispatch across
+chained stages (1 upload + N dispatches + 1 readback).
 
 ---
 

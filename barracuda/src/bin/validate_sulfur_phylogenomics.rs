@@ -10,11 +10,14 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Paper | Mateos et al. (2023) Science Advances 9:eade4847 |
 //! | DOI | 10.1126/sciadv.ade4847 |
 //! | Faculty | R. Anderson (Carleton College) |
 //! | Baseline script | `scripts/mateos2023_sulfur_phylogenomics.py` |
 //! | Baseline date | 2026-02-20 |
+//! | Exact command | `python3 scripts/mateos2023_sulfur_phylogenomics.py` |
+//! | Hardware | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04 |
 //! | Data | Figshare project 144267 (synthetic proxy for validation) |
 
 use wetspring_barracuda::bio::{

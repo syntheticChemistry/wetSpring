@@ -307,8 +307,8 @@ mod tests {
             alt_alleles: vec![],
             depth: 0,
         };
-        assert_eq!(v.ref_frequency(), 0.0);
-        assert_eq!(v.alt_frequency(), 0.0);
+        assert!(v.ref_frequency().abs() < f64::EPSILON);
+        assert!(v.alt_frequency().abs() < f64::EPSILON);
     }
 
     #[test]
@@ -318,6 +318,6 @@ mod tests {
             alignment_length: 0,
             n_sequences: 0,
         };
-        assert_eq!(result.snp_density(), 0.0);
+        assert!(result.snp_density().abs() < f64::EPSILON);
     }
 }

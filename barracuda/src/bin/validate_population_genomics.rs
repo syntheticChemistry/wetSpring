@@ -10,12 +10,15 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Paper | Anderson et al. (2017) Nature Communications 8:1114 |
 //! | DOI | 10.1038/s41467-017-01228-6 |
 //! | Faculty | R. Anderson (Carleton College) |
 //! | BioProject | PRJNA283159 |
 //! | Baseline script | `scripts/anderson2017_population_genomics.py` |
 //! | Baseline date | 2026-02-20 |
+//! | Exact command | `python3 scripts/anderson2017_population_genomics.py` |
+//! | Hardware | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04 |
 
 use wetspring_barracuda::bio::{ani, diversity, dnds, snp};
 use wetspring_barracuda::tolerances;

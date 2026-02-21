@@ -113,9 +113,32 @@ the Titan V's HBM2 bandwidth helps.
 
 ---
 
+## NVVM f64 Transcendental Limitation
+
+**CRITICAL (Feb 20)**: RTX 4070 (Ada Lovelace) NVVM compiler cannot compile
+native f64 `exp()`, `log()`, or `pow()` in WGSL shaders. Driver profile
+incorrectly reports `needs_f64_exp_log_workaround() = false`.
+
+**Workaround**: `ShaderTemplate::for_driver_auto(source, true)` injects
+pure-arithmetic polyfills. Affects 5/9 local WGSL shaders.
+
+**Upstream fix proposed**: `needs_f64_exp_log_workaround()` should return
+`true` for all Ada Lovelace GPUs (sm_89).
+
+---
+
+## Absorption Status (Feb 21, 2026)
+
+| Category | Count | Status |
+|----------|:-----:|--------|
+| Absorbed (lean on ToadStool) | 11 modules | Active |
+| Local WGSL (handoff candidates) | 9 shaders | Handoff submitted |
+| CPU-only (sequential/branching) | 15 modules | Stable |
+| Blocked (needs new primitive) | 3 modules | Waiting on ToadStool |
+
 ## Next Steps
 
-1. Run Felsenstein pruning on GPU via ToadStool dispatch
-2. Measure per-site throughput (target: 1M sites/sec on RTX 4070)
-3. Profile Smith-Waterman wavefront on both GPUs
-4. Compare bootstrap replicate throughput: GPU vs 24-thread CPU
+1. **Absorption**: 9 Tier A shaders submitted via `../../../wateringHole/handoffs/`
+2. **NVVM fix**: Propose Ada Lovelace driver profile correction upstream
+3. **Titan V**: Validate all 9 local shaders on Volta (avoids NVVM bug)
+4. **Scaling**: ODE sweep from B=64 to B=10,000 via ToadStool streaming

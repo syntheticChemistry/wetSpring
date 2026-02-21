@@ -17,10 +17,12 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Baseline tool | BarraCUDA CPU (reference) |
 //! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
 //! | Baseline command | bio::diversity, bio::spectral_match, CPU stats |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `cargo run --release --features gpu --bin validate_barracuda_gpu_v3` |
 //! | Data | Count vectors, Bray-Curtis matrices, spectra, variance/correlation |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
@@ -231,7 +233,12 @@ fn validate_spectral_batch(gpu: &GpuF64, v: &mut Validator) {
     let self_spectra = vec![spectra_gpu[0].clone(), spectra_gpu[0].clone()];
     let self_pw =
         spectral_match_gpu::pairwise_cosine_gpu(gpu, &self_spectra).expect("GPU self-match");
-    v.check("Spectral GPU self-match ≈ 1.0", self_pw[0], 1.0, 0.001);
+    v.check(
+        "Spectral GPU self-match ≈ 1.0",
+        self_pw[0],
+        1.0,
+        tolerances::SPECTRAL_COSINE,
+    );
 
     // CPU baseline for cross-check
     let cpu_self = spectral_match::cosine_similarity(
@@ -241,7 +248,12 @@ fn validate_spectral_batch(gpu: &GpuF64, v: &mut Validator) {
         &spectra_gpu[0],
         0.5,
     );
-    v.check("Spectral CPU self-match = 1.0", cpu_self.score, 1.0, 0.001);
+    v.check(
+        "Spectral CPU self-match = 1.0",
+        cpu_self.score,
+        1.0,
+        tolerances::SPECTRAL_COSINE,
+    );
 }
 
 fn validate_statistics(gpu: &GpuF64, v: &mut Validator) {

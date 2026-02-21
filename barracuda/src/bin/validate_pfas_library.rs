@@ -5,11 +5,13 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Reference | Jones Lab PFAS Multidimensional Library |
 //! | DOI | 10.1038/s41597-024-04363-0 |
 //! | Content | 175 PFAS, 281 ion types |
 //! | Cross-ref | Exp006 (`FindPFAS` screening, 10/10 PASS) |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `cargo run --bin validate_pfas_library` |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
 //! # Methodology
@@ -231,7 +233,7 @@ fn validate_tolerance_search_systematic(v: &mut Validator) {
     let all = all_pfas();
     let sorted_mz: Vec<f64> = {
         let mut v: Vec<f64> = all.iter().map(|p| p.mh_neg).collect();
-        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        v.sort_by(f64::total_cmp);
         v
     };
 
@@ -523,7 +525,7 @@ fn validate_cross_series_discrimination(v: &mut Validator) {
     // that compound (or possibly one very close neighbor)
     let sorted_mz: Vec<f64> = {
         let mut mzs: Vec<f64> = all.iter().map(|p| p.mh_neg).collect();
-        mzs.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        mzs.sort_by(f64::total_cmp);
         mzs
     };
 
@@ -657,7 +659,7 @@ fn validate_jones_library_expansion(v: &mut Validator) {
     // Cross-validate: our 22 hardcoded PFAS should have matching m/z in Jones
     let all = all_pfas();
     let mut sorted_jones: Vec<f64> = mz_values;
-    sorted_jones.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    sorted_jones.sort_by(f64::total_cmp);
 
     let mut cross_hits = 0_usize;
     for compound in &all {

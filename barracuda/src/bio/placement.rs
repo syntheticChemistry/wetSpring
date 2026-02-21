@@ -185,7 +185,7 @@ pub fn placement_scan(
 
     // Confidence: ratio of best to second-best
     let mut sorted_lls: Vec<f64> = placements.iter().map(|p| p.log_likelihood).collect();
-    sorted_lls.sort_by(|a, b| b.partial_cmp(a).unwrap());
+    sorted_lls.sort_by(|a, b| b.total_cmp(a));
     let confidence = if sorted_lls.len() >= 2 {
         (sorted_lls[0] - sorted_lls[1]).exp()
     } else {

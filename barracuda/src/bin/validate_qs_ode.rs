@@ -8,6 +8,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Baseline script | `scripts/waters2008_qs_ode.py` |
 //! | Baseline output | `experiments/results/qs_ode_baseline/qs_ode_python_baseline.json` |
 //! | Python version | 3.10.12 |
@@ -15,6 +16,8 @@
 //! | Rust integrator | RK4 fixed-step (dt = 0.001 h) |
 //! | References | Waters 2008 J Bacteriol 190:2527-36; Massie 2012 PNAS 109:12746-51 |
 //! | Date | 2026-02-19 |
+//! | Exact command | `python3 scripts/waters2008_qs_ode.py` |
+//! | Hardware | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04 |
 
 use wetspring_barracuda::bio::ode::steady_state_mean;
 use wetspring_barracuda::bio::qs_biofilm::{
@@ -51,8 +54,18 @@ fn main() {
         0.975,
         METHOD_TOL,
     );
-    v.check("S1: H_ss matches Python (HapR active)", h_ss, 1.979, 0.01);
-    v.check("S1: C_ss near zero (c-di-GMP repressed)", c_ss, 0.0, 0.05);
+    v.check(
+        "S1: H_ss matches Python (HapR active)",
+        h_ss,
+        1.979,
+        tolerances::ODE_STEADY_STATE,
+    );
+    v.check(
+        "S1: C_ss near zero (c-di-GMP repressed)",
+        c_ss,
+        0.0,
+        tolerances::ODE_NEAR_ZERO,
+    );
     v.check(
         "S1: B_ss matches Python (biofilm dispersed)",
         b_ss,
@@ -101,7 +114,7 @@ fn main() {
         "S3: B_ss matches Python (constitutive biofilm)",
         b_ss,
         0.786,
-        0.01,
+        tolerances::ODE_STEADY_STATE,
     );
     check_non_negative(&mut v, &r, "S3");
 
@@ -122,7 +135,7 @@ fn main() {
         "S4: B_ss matches Python (partial biofilm)",
         b_ss,
         0.452,
-        0.01,
+        tolerances::ODE_STEADY_STATE,
     );
     check_non_negative(&mut v, &r, "S4");
 

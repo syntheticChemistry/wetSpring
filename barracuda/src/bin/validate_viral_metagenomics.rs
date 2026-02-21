@@ -9,12 +9,15 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Paper | Anderson et al. (2014) PLoS ONE 9:e109696 |
 //! | DOI | 10.1371/journal.pone.0109696 |
 //! | Faculty | R. Anderson (Carleton College) |
 //! | Baseline script | `scripts/anderson2014_viral_metagenomics.py` |
 //! | Baseline output | `experiments/results/052_viral_metagenomics/anderson2014_python_baseline.json` |
 //! | Baseline date | 2026-02-20 |
+//! | Exact command | `python3 scripts/anderson2014_viral_metagenomics.py` |
+//! | Hardware | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04 |
 //! | Python version | 3.10+ (pure Python, no external dependencies) |
 
 use wetspring_barracuda::bio::{diversity, dnds};

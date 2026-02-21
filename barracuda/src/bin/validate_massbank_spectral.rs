@@ -6,11 +6,14 @@
 //!
 //! | Item            | Value                                                              |
 //! |-----------------|--------------------------------------------------------------------|
+//! | Baseline commit | `e4358c5`                                                          |
 //! | Baseline script | `scripts/massbank_spectral_baseline.py`                            |
 //! | Baseline output | `experiments/results/042_massbank_spectral/python_baseline.json`    |
 //! | Data source     | MassBank/MassBank-data (PFAS reference spectra)                    |
 //! | Proxy for       | Paper #21, Jones PFAS mass spectrometry                            |
 //! | Date            | 2026-02-20                                                         |
+//! | Exact command   | `python3 scripts/massbank_spectral_baseline.py`                    |
+//! | Hardware        | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04                      |
 //!
 //! Validates cosine similarity spectral matching on synthetic PFAS-like
 //! mass spectra, matching Python baseline exactly.

@@ -7,6 +7,7 @@
 //! |-------|-------|
 //! | Baseline script | `scripts/validate_track2.py` |
 //! | Baseline commit | `eb99b12` (Track 2 validation — 8/8 PASS) |
+//! | Exact command | `python3 scripts/validate_track2.py` |
 //! | Baseline date | 2026-02-16 |
 //! | Dataset | `shuzhao-li-lab/data` (MT02 demo, 8 mzML files) |
 //! | asari version | 1.13.1 |

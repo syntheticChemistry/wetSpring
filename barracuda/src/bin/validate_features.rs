@@ -5,10 +5,12 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Baseline tool | asari 1.13.1 |
 //! | Baseline version | asari 1.13.1 |
 //! | Baseline file | `experiments/results/005_asari/preferred_Feature_table.tsv` (Exp009) |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `cargo run --bin validate_features` |
 //! | Data | shuzhao-li-lab/data (MT02 HILIC-pos, 8 mzML files, Orbitrap HRMS) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //! | Asari features | 5,951 (filtered from 8,659 total) |

@@ -7,7 +7,9 @@
 //! |-------|-------|
 //! | Algorithm | Smith & Waterman 1981, *J Mol Biol* 147:195-197 |
 //! | Baseline script | `scripts/smith_waterman_baseline.py` |
-//! | Date | 2026-02-20 |
+//! | Baseline commit | `e4358c5` |
+//! | Date | 2026-02-21 |
+//! | Exact command | `python3 scripts/smith_waterman_baseline.py` |
 
 use wetspring_barracuda::bio::alignment::{
     pairwise_scores, smith_waterman, smith_waterman_score, AlignmentResult, ScoringParams,

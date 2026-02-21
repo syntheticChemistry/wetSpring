@@ -15,10 +15,12 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Baseline tool | Pure Python (`scripts/barracuda_cpu_v4_baseline.py`) |
 //! | Baseline version | Feb 2026 |
 //! | Baseline command | `python3 scripts/barracuda_cpu_v4_baseline.py` |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `python3 scripts/barracuda_cpu_v4_baseline.py` |
 //! | Data | Synthetic test vectors (ANI, SNP, dN/dS, clock, pangenome) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 

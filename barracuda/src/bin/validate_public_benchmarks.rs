@@ -6,10 +6,12 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Paper | Humphrey 2023 (OTUs, genera), Carney 2016 (crash agents) |
 //! | Baseline tool | Published paper ground truth |
 //! | Baseline version | Exp014 |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `cargo run --bin validate_public_benchmarks` |
 //! | Data | PRJNA1114688, PRJNA629095, PRJNA1178324, PRJNA516219 |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 

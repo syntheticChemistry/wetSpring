@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! DADA2-style amplicon sequence variant (ASV) denoising.
 //!
+//! Special math functions (`ln_gamma`, `regularized_gamma_lower`) are
+//! provided by [`super::special`] — the shared sovereign math module.
+//!
 //! Implements the core algorithm from Callahan et al. "DADA2: High-resolution
 //! sample inference from Illumina amplicon data." Nature Methods 13, 581–583
 //! (2016).
@@ -32,6 +35,7 @@
 //! - Callahan et al. Nature Methods 13, 581–583 (2016).
 //! - QIIME2 `dada2 denoise-paired` / `denoise-single`.
 
+use super::special::regularized_gamma_lower;
 use crate::bio::derep::UniqueSequence;
 use std::fmt::Write;
 
@@ -391,65 +395,6 @@ pub fn poisson_pvalue(k: usize, lambda: f64) -> f64 {
         return 1.0;
     }
     regularized_gamma_lower(k as f64, lambda)
-}
-
-/// Regularized lower incomplete gamma function: P(a, x) = gamma(a, x) / Gamma(a).
-/// Uses series expansion: P(a, x) = e^(-x) * x^a * sum_{n=0}^{inf} x^n / (a*(a+1)*...*(a+n))
-#[must_use]
-fn regularized_gamma_lower(a: f64, x: f64) -> f64 {
-    if x <= 0.0 {
-        return 0.0;
-    }
-    if x > a + 200.0 {
-        return 1.0;
-    }
-
-    let log_gamma_a = ln_gamma(a);
-
-    // Series expansion
-    let mut sum = 0.0_f64;
-    let mut term = 1.0 / a;
-    sum += term;
-    for n in 1..1000 {
-        term *= x / (a + f64::from(n));
-        sum += term;
-        if term.abs() < 1e-15 * sum.abs() {
-            break;
-        }
-    }
-
-    let log_result = a.mul_add(x.ln(), -x) - log_gamma_a + sum.ln();
-    if log_result > 0.0 {
-        1.0
-    } else {
-        log_result.exp().clamp(0.0, 1.0)
-    }
-}
-
-/// Lanczos approximation for ln(Gamma(x)).
-#[allow(clippy::cast_precision_loss)] // index i is 0..6, exact
-fn ln_gamma(x: f64) -> f64 {
-    if x <= 0.0 {
-        return f64::INFINITY;
-    }
-    let coeffs = [
-        76.180_091_729_471_46,
-        -86.505_320_329_416_77,
-        24.014_098_240_830_91,
-        -1.231_739_572_450_155,
-        0.001_208_650_973_866_179,
-        -5.395_239_384_953_e-6,
-    ];
-
-    let g = 5.0;
-    let z = x - 1.0;
-    let mut sum = 0.999_999_999_999_997_1_f64;
-    for (i, &c) in coeffs.iter().enumerate() {
-        sum += c / (z + 1.0 + i as f64);
-    }
-
-    let t = z + g + 0.5;
-    0.5f64.mul_add((2.0 * std::f64::consts::PI).ln(), (z + 0.5) * t.ln()) - t + sum.ln()
 }
 
 /// Build ASV structs from final partition assignments.

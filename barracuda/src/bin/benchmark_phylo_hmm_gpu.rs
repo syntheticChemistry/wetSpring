@@ -13,10 +13,12 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Baseline tool | timing harness |
 //! | Baseline version | N/A (performance measurement, not correctness) |
 //! | Baseline command | cargo run --release --features gpu --bin benchmark_phylo_hmm_gpu |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `cargo run --release --features gpu --bin benchmark_phylo_hmm_gpu` |
 //! | Data | synthetic trees, alignments, HMM models |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 

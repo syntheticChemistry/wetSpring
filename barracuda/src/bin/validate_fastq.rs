@@ -5,12 +5,14 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Paper | Kozich et al. 2013. Appl. Environ. Microbiol. (`MiSeq` SOP) |
 //! | DOI | 10.1128/AEM.01043-13 |
 //! | Baseline tool | `FastQC` + Galaxy 24.1 |
 //! | Baseline version | Galaxy 24.1, QIIME2 2026.1.0 |
 //! | Baseline command | `scripts/validate_exp001.py` (Exp001) |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `python3 scripts/validate_exp001.py` |
 //! | Data | Zenodo 800651 (`MiSeq` SOP, mouse gut 16S) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
@@ -22,6 +24,7 @@
 use std::path::Path;
 use wetspring_barracuda::bio::{derep, merge_pairs, quality};
 use wetspring_barracuda::io::fastq;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 fn main() {
@@ -72,8 +75,18 @@ fn validate_r1(data_dir: &Path, v: &mut Validator) {
             v.check_count("Sequence count", stats.num_sequences, 7793);
             v.check_count("Min length", stats.min_length, 249);
             v.check_count("Max length", stats.max_length, 251);
-            v.check("GC content", stats.gc_content, 0.547, 0.005);
-            v.check("Mean quality", stats.mean_quality, 35.8, 0.5);
+            v.check(
+                "GC content",
+                stats.gc_content,
+                0.547,
+                tolerances::GC_CONTENT,
+            );
+            v.check(
+                "Mean quality",
+                stats.mean_quality,
+                35.8,
+                tolerances::MEAN_QUALITY,
+            );
         }
         Err(e) => {
             println!("  FAILED: {e}");
@@ -102,7 +115,12 @@ fn validate_r2(data_dir: &Path, v: &mut Validator) {
             // Cross-validated against Galaxy FastQC report (Exp001, commit d71227d,
             // 2026-02-16) which reports per-base quality ~32-34 for R2 reverse reads.
             // Tolerance ±0.5 accounts for read-level Phred33 rounding.
-            v.check("R2 mean quality", stats.mean_quality, 33.67, 0.5);
+            v.check(
+                "R2 mean quality",
+                stats.mean_quality,
+                33.67,
+                tolerances::MEAN_QUALITY,
+            );
         }
         Err(e) => {
             println!("  FAILED: {e}");

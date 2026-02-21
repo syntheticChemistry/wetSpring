@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 21, 2026
-**Status**: Phase 16 — 1,241/1,241 CPU + 260/260 GPU = 1,501/1,501 checks, ALL PASS
+**Status**: Phase 18 — 1,291/1,291 CPU + 451/451 GPU = 1,742/1,742 checks, ALL PASS
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -10,10 +10,12 @@
 
 | Metric | Value |
 |--------|-------|
-| CPU validation | 1,241/1,241 PASS — 41 modules, 63 experiments, 25 domains |
-| GPU validation | 260/260 PASS — 15 ToadStool primitives, 9 local WGSL shaders, 12 GPU binaries |
+| CPU validation | 1,291/1,291 PASS — 41 modules, 76 experiments, 25 domains |
+| GPU validation | 451/451 PASS — 15 ToadStool primitives, 9 local WGSL shaders, 18 GPU binaries |
 | BarraCUDA CPU parity | 157/157 — 22.5x Rust speedup over Python |
-| Rust modules | 41 CPU + 20 GPU, 552 tests (93.5% coverage) |
+| BarraCUDA GPU parity | 8 consolidated domains (Exp064) — pure GPU math proven |
+| metalForge cross-system | 8 domains CPU↔GPU proven (Exp065) — substrate-independent |
+| Rust modules | 41 CPU + 20 GPU, 610 tests (93.5% coverage) |
 | Dependencies | 1 runtime (flate2), everything else sovereign |
 | Paper queue | **ALL DONE** — 29/29 reproducible papers complete (Track 1c added) |
 | Faculty (Track 1) | Waters (MMG, MSU), Cahill (Sandia), Smallwood (Sandia) |
@@ -37,7 +39,7 @@
 
 | Document | Location | Description |
 |----------|----------|-------------|
-| CONTROL_EXPERIMENT_STATUS.md | `../` | 63 experiments, 1,501 validation checks |
+| CONTROL_EXPERIMENT_STATUS.md | `../` | 76 experiments, 1,742 validation checks |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
 | HANDOFF (v5) | `../` | Current consolidated ToadStool handoff |

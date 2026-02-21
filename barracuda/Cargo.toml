@@ -258,6 +258,11 @@ path = "src/bin/benchmark_23_domain_timing.rs"
 name = "validate_barracuda_cpu_v5"
 path = "src/bin/validate_barracuda_cpu_v5.rs"
 
+# ── Exp070: BarraCUDA CPU Full — 25-Domain Pure Rust Math Proof ──
+[[bin]]
+name = "validate_barracuda_cpu_full"
+path = "src/bin/validate_barracuda_cpu_full.rs"
+
 # ── Rare biosphere validation (Exp051, Anderson 2015) ─────────────
 [[bin]]
 name = "validate_rare_biosphere"
@@ -303,6 +308,12 @@ required-features = ["gpu"]
 [[bin]]
 name = "validate_barracuda_gpu_v3"
 path = "src/bin/validate_barracuda_gpu_v3.rs"
+required-features = ["gpu"]
+
+# ── Exp071: BarraCUDA GPU Full — Math Portability Proof ──
+[[bin]]
+name = "validate_barracuda_gpu_full"
+path = "src/bin/validate_barracuda_gpu_full.rs"
 required-features = ["gpu"]
 
 # ── GPU validation binaries (require --features gpu) ─────────────
@@ -359,8 +370,68 @@ name = "validate_gpu_rf"
 path = "src/bin/validate_gpu_rf.rs"
 required-features = ["gpu"]
 
+# ── BarraCUDA GPU Parity v1 (Exp064 — consolidated GPU domains) ────
+[[bin]]
+name = "validate_barracuda_gpu_v1"
+path = "src/bin/validate_barracuda_gpu_v1.rs"
+required-features = ["gpu"]
+
+# ── metalForge Full Cross-System (Exp065) ────────────────────────
+[[bin]]
+name = "validate_metalforge_full"
+path = "src/bin/validate_metalforge_full.rs"
+required-features = ["gpu"]
+
+# ── CPU vs GPU All-Domain Scaling (Exp066) ───────────────────────
+[[bin]]
+name = "benchmark_all_domains_cpu_gpu"
+path = "src/bin/benchmark_all_domains_cpu_gpu.rs"
+required-features = ["gpu"]
+
+# ── Dispatch Overhead Profiling (Exp067) ─────────────────────────
+[[bin]]
+name = "benchmark_dispatch_overhead"
+path = "src/bin/benchmark_dispatch_overhead.rs"
+required-features = ["gpu"]
+
+# ── Three-Tier Benchmark: Python vs CPU vs GPU (Exp069) ─────────
+[[bin]]
+name = "benchmark_three_tier"
+path = "src/bin/benchmark_three_tier.rs"
+required-features = ["gpu"]
+
 # ── CPU vs GPU benchmark (require --features gpu) ────────────────
 [[bin]]
 name = "benchmark_cpu_gpu"
 path = "src/bin/benchmark_cpu_gpu.rs"
+required-features = ["gpu"]
+
+# ── GPU Streaming Pipeline Proof (Exp072) ────────────────────────
+[[bin]]
+name = "validate_gpu_streaming_pipeline"
+path = "src/bin/validate_gpu_streaming_pipeline.rs"
+required-features = ["gpu"]
+
+# ── Dispatch Overhead Proof (Exp073) ─────────────────────────────
+[[bin]]
+name = "validate_dispatch_overhead_proof"
+path = "src/bin/validate_dispatch_overhead_proof.rs"
+required-features = ["gpu"]
+
+# ── metalForge Substrate Router (Exp074) ─────────────────────────
+[[bin]]
+name = "validate_substrate_router"
+path = "src/bin/validate_substrate_router.rs"
+required-features = ["gpu"]
+
+# ── Pure GPU Analytics Pipeline (Exp075) ─────────────────────────
+[[bin]]
+name = "validate_pure_gpu_pipeline"
+path = "src/bin/validate_pure_gpu_pipeline.rs"
+required-features = ["gpu"]
+
+# ── Cross-Substrate Pipeline (Exp076) ────────────────────────────
+[[bin]]
+name = "validate_cross_substrate_pipeline"
+path = "src/bin/validate_cross_substrate_pipeline.rs"
 required-features = ["gpu"]

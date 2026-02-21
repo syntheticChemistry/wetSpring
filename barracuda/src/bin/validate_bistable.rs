@@ -9,6 +9,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Paper | Fernandez et al. 2020, *PNAS* 117:29046-29054 |
 //! | Baseline script | `scripts/fernandez2020_bistable.py` |
 //! | Baseline output | `experiments/results/023_bistable/fernandez2020_python_baseline.json` |
@@ -16,16 +17,16 @@
 //! | scipy integrator | `odeint` (LSODA: adaptive BDF/Adams) |
 //! | Rust integrator | RK4 fixed-step (dt = 0.001 h) |
 //! | Date | 2026-02-20 |
+//! | Exact command | `python3 scripts/fernandez2020_bistable.py` |
+//! | Hardware | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04 |
 
 use wetspring_barracuda::bio::bistable::{bifurcation_scan, run_bistable, BistableParams};
 use wetspring_barracuda::bio::ode::steady_state_mean;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 const DT: f64 = 0.001;
 const SS_FRAC: f64 = 0.1;
-
-/// RK4 vs LSODA method tolerance (same as Exp020).
-const METHOD_TOL: f64 = 1e-3;
 
 fn main() {
     let mut v = Validator::new("Exp023: Fernandez 2020 Bistable Phenotypic Switching");
@@ -41,9 +42,19 @@ fn main() {
     let b_ss = steady_state_mean(&r, 4, SS_FRAC);
     let c_ss = steady_state_mean(&r, 3, SS_FRAC);
 
-    v.check("S1: N_ss (carrying capacity)", n_ss, 0.975, METHOD_TOL);
+    v.check(
+        "S1: N_ss (carrying capacity)",
+        n_ss,
+        0.975,
+        tolerances::ODE_METHOD_PARITY,
+    );
     v.check("S1: B_ss (low biofilm)", b_ss, 0.040, 0.005);
-    v.check("S1: C_ss (moderate c-di-GMP)", c_ss, 0.454, 0.01);
+    v.check(
+        "S1: C_ss (moderate c-di-GMP)",
+        c_ss,
+        0.454,
+        tolerances::ODE_STEADY_STATE,
+    );
     check_non_negative(&mut v, &r, "S1");
 
     // ── Scenario 2: Default feedback (high-B attractor) ──────────────
@@ -53,7 +64,12 @@ fn main() {
     let b_ss = steady_state_mean(&r, 4, SS_FRAC);
     let c_ss = steady_state_mean(&r, 3, SS_FRAC);
 
-    v.check("S2: B_ss matches Python (sessile)", b_ss, 0.745, 0.01);
+    v.check(
+        "S2: B_ss matches Python (sessile)",
+        b_ss,
+        0.745,
+        tolerances::ODE_STEADY_STATE,
+    );
     v.check("S2: C_ss matches Python", c_ss, 1.634, 0.02);
     check_non_negative(&mut v, &r, "S2");
 
@@ -67,8 +83,18 @@ fn main() {
     let b_ss = steady_state_mean(&r, 4, SS_FRAC);
     let c_ss = steady_state_mean(&r, 3, SS_FRAC);
 
-    v.check("S3: B_ss matches Python", b_ss, 0.831, 0.01);
-    v.check("S3: C_ss matches Python", c_ss, 3.967, 0.05);
+    v.check(
+        "S3: B_ss matches Python",
+        b_ss,
+        0.831,
+        tolerances::ODE_STEADY_STATE,
+    );
+    v.check(
+        "S3: C_ss matches Python",
+        c_ss,
+        3.967,
+        tolerances::ODE_NEAR_ZERO,
+    );
     check_non_negative(&mut v, &r, "S3");
 
     // ── Bifurcation / Hysteresis ─────────────────────────────────────
@@ -80,7 +106,7 @@ fn main() {
         "Hysteresis width > 0 (bistability)",
         bif.hysteresis_width,
         bif.hysteresis_width.max(0.5),
-        0.01,
+        tolerances::ODE_STEADY_STATE,
     );
 
     let fwd_stays_low = bif.b_forward.iter().all(|&b| b < 0.1);

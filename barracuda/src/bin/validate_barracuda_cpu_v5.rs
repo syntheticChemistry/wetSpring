@@ -12,10 +12,12 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Baseline tool | sklearn (RandomForest, GradientBoostingClassifier; functional spec) |
 //! | Baseline version | sklearn 1.x |
 //! | Baseline command | Hand-trace of sklearn inference (DT splits, RF majority vote, GBM additive model) |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `cargo run --bin validate_barracuda_cpu_v5` |
 //! | Data | Synthetic test vectors (hand-computed majority votes / raw scores) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 

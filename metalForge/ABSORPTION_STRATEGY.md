@@ -144,16 +144,34 @@ SoA layout: separate node_features, node_thresholds (f64), node_children buffers
 
 ## BarraCUDA CPU Math Evolution
 
-wetSpring maintains local implementations of 4 math functions that barracuda
-already provides. These should switch to barracuda when a `math` feature
-(CPU-only, no wgpu) is available:
+wetSpring consolidated local math into `bio::special` (erf, ln_gamma,
+`regularized_gamma_lower`) during Phase 15. These functions duplicate
+barracuda upstream primitives and are shaped for extraction:
 
-| Local Implementation | File | Lines | BarraCUDA Primitive | Impact |
-|---------------------|------|:-----:|---------------------|--------|
-| `erf()`, `normal_cdf()` | `bio/pangenome.rs` | 218–236 | `barracuda::special::erf` | Pangenome FDR |
-| `ln_gamma()` | `bio/dada2.rs` | 431–453 | `barracuda::special::ln_gamma` | DADA2 Poisson p-value |
-| `regularized_gamma_lower()` | `bio/dada2.rs` | 399–427 | `barracuda::special::regularized_gamma_p` | DADA2 Poisson p-value |
-| `integrate_peak()` | `bio/eic.rs` | 165–176 | `barracuda::numerical::trapz` | LC-MS peak area |
+| Local Implementation | File | BarraCUDA Primitive | Status |
+|---------------------|------|---------------------|--------|
+| `erf()`, `normal_cdf()` | `bio/special.rs` | `barracuda::special::erf` | Consolidated; uses `mul_add` chains |
+| `ln_gamma()` | `bio/special.rs` | `barracuda::special::ln_gamma` | Lanczos approximation, Horner form |
+| `regularized_gamma_lower()` | `bio/special.rs` | `barracuda::special::regularized_gamma_p` | Series expansion, 1e-15 convergence |
+| `integrate_peak()` | `bio/eic.rs` | `barracuda::numerical::trapz` | Trapezoidal integration |
+
+### Extraction Plan
+
+The `bio::special` module is designed for clean extraction:
+
+1. **No internal dependencies** — does not import any other `bio::*` module
+2. **Pure math** — no I/O, no allocation, no state
+3. **`mul_add` optimized** — FMA-friendly for both CPU and GPU
+4. **Test coverage** — known-value tests with documented precision bounds
+5. **Consumers**: `bio::dada2` (via `regularized_gamma_lower`), `bio::pangenome` (via `normal_cdf`)
+
+When barracuda adds `[features] math = []`, the migration is:
+```
+bio::special::erf              → barracuda::special::erf
+bio::special::ln_gamma         → barracuda::special::ln_gamma
+bio::special::regularized_gamma_lower → barracuda::special::regularized_gamma_p
+bio::eic::integrate_peak       → barracuda::numerical::trapz
+```
 
 **Why not now?** `barracuda` currently requires wgpu + akida-driver + toadstool-core
 as mandatory dependencies. Importing it for CPU math would force GPU/NPU stack into
@@ -164,6 +182,67 @@ all builds. hotSpring accepts this (always-GPU). wetSpring keeps barracuda optio
 gates `numerical`, `special`, `stats`, `optimize`, `sample` modules without
 pulling in wgpu/akida/toadstool-core. This enables Springs to lean on shared
 CPU math without forcing GPU stack.
+
+## Absorption Engineering Patterns
+
+Rust modules shaped for ToadStool absorption follow these patterns from
+hotSpring's proven methodology:
+
+| Pattern | Why | wetSpring Example |
+|---------|-----|-------------------|
+| Flat arrays (SoA) | GPU buffers are 1D; no pointers | `FlatTree` in `bio::felsenstein` |
+| `#[repr(C)]` params | WGSL uniform/storage layout matches Rust | `GemmParams`, `FelsensteinParams` |
+| Batch APIs | Single dispatch for N instances | `forward_batch()`, `score_batch()` |
+| Preallocated buffers | No alloc in hot path; reuse via `BufferPool` | `GemmCached` pipeline |
+| Deterministic math | Same input → same output (bit-exact f64) | All `bio::*` modules |
+| `mul_add` chains | FMA-friendly for both CPU SIMD and GPU | `bio::special::erf` polynomial |
+| Named tolerances | Central constants, not magic numbers | 32 constants in `tolerances.rs` |
+| Provenance headers | Script, commit, command, hardware | All 73 validation binaries |
+
+### What Makes Code Absorbable (Lessons from hotSpring)
+
+1. WGSL templates in Rust source (or structured `.wgsl` files), not opaque blobs
+2. Binding layout docs: binding index, type, purpose
+3. Dispatch docs: workgroup size, grid size
+4. CPU reference validated against known values (Python baselines)
+5. Tolerances in `tolerances.rs`, not ad-hoc constants
+6. Handoff document with locations and validation results
+7. Zero unsafe code — `#![forbid(unsafe_code)]` enforced
+
+---
+
+## Dispatch Overhead Data (Exp067/068)
+
+Pipeline caching reduced dispatch overhead by 38% (Exp068). These numbers
+inform ToadStool's absorption priorities — shaders with highest overhead
+benefit most from upstream pipeline management:
+
+| Shader | Before Cache | After Cache | Remaining Overhead |
+|--------|:----------:|:---------:|:-----------------:|
+| `ani_batch_f64.wgsl` | 5,855µs | 5,398µs | Buffer alloc + readback |
+| `snp_calling_f64.wgsl` | 10,169µs | 6,384µs | Large flat buffer |
+| `dnds_batch_f64.wgsl` | 9,900µs | 4,703µs | Polyfill + genetic code table |
+| `pangenome_classify.wgsl` | 5,788µs | 3,043µs | Presence matrix upload |
+| `rf_batch_inference.wgsl` | 2,493µs | 1,600µs | SoA tree upload |
+| `hmm_forward_f64.wgsl` | 5,086µs | 3,229µs | Model params + alpha buffer |
+
+ToadStool streaming (1 upload + N dispatches + 1 readback) would reduce
+the remaining ~3ms average to ~0.5ms by amortizing buffer operations across
+chained stages.
+
+### Streaming Pipeline Proof (Exp072-076)
+
+| Exp | What | Result |
+|-----|------|--------|
+| 072 | Pre-warmed FMR vs individual dispatch | 1.27x speedup, 5µs vs 110ms first call |
+| 073 | Dispatch overhead at [64, 256, 1K, 4K] | Streaming beats individual at all sizes |
+| 074 | Substrate router (GPU↔NPU↔CPU) | Correct routing, fallback parity |
+| 075 | Pure GPU 5-stage pipeline | 0.1% overhead, 31 checks PASS |
+| 076 | Cross-substrate GPU→NPU→CPU | Latency profiled, 17 checks PASS |
+
+These experiments validate the full ToadStool dispatch model: pre-compile
+pipelines once, share buffer pools, chain stages without CPU round-trips,
+and route workloads to the optimal substrate.
 
 ---
 

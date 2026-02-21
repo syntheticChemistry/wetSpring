@@ -15,10 +15,12 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Baseline tool | timing harness |
 //! | Baseline version | N/A (performance measurement, not correctness) |
 //! | Baseline command | cargo run --release --bin benchmark_23_domain_timing |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `cargo run --release --bin benchmark_23_domain_timing` |
 //! | Data | 23 BarraCUDA domains, matches benchmark_rust_vs_python.py workloads |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 

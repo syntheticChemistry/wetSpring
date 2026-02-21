@@ -5,11 +5,14 @@
 //!
 //! | Item            | Value                                                               |
 //! |-----------------|---------------------------------------------------------------------|
+//! | Baseline commit | `e4358c5`                                                           |
 //! | Baseline script | `scripts/algae_timeseries_baseline.py`                              |
 //! | Baseline output | `experiments/results/039_algae_timeseries/python_baseline.json`      |
 //! | Data source     | PRJNA382322 (128 samples, Nannochloropsis raceway, 4-month series)  |
 //! | Proxy for       | Cahill #13 (phage biocontrol monitoring)                            |
 //! | Date            | 2026-02-20                                                          |
+//! | Exact command   | `python3 scripts/algae_timeseries_baseline.py`                      |
+//! | Hardware        | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04                       |
 //!
 //! Validates time-series diversity tracking: Shannon over time, Bray-Curtis
 //! between consecutive timepoints, and Z-score anomaly detection.

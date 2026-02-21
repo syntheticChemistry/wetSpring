@@ -5,19 +5,22 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Paper | Mhatre et al. 2020, *PNAS* 117:21647-21657 |
 //! | Baseline script | `scripts/mhatre2020_capacitor.py` |
 //! | Date | 2026-02-20 |
+//! | Exact command | `python3 scripts/mhatre2020_capacitor.py` |
+//! | Hardware | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04 |
 
 use wetspring_barracuda::bio::capacitor::{
     scenario_low_cdg, scenario_normal, scenario_stress, scenario_vpsr_knockout, CapacitorParams,
 };
 use wetspring_barracuda::bio::ode::steady_state_mean;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 const DT: f64 = 0.001;
 const SS_FRAC: f64 = 0.1;
-const TOL: f64 = 1e-3;
 
 fn main() {
     let mut v = Validator::new("Exp027: Mhatre 2020 Phenotypic Capacitor");
@@ -30,31 +33,31 @@ fn main() {
         "Normal: N_ss",
         steady_state_mean(&r, 0, SS_FRAC),
         0.975,
-        TOL,
+        tolerances::ODE_METHOD_PARITY,
     );
     v.check(
         "Normal: VpsR_ss",
         steady_state_mean(&r, 2, SS_FRAC),
         0.766,
-        0.01,
+        tolerances::ODE_STEADY_STATE,
     );
     v.check(
         "Normal: B_ss",
         steady_state_mean(&r, 3, SS_FRAC),
         0.671,
-        0.01,
+        tolerances::ODE_STEADY_STATE,
     );
     v.check(
         "Normal: M_ss",
         steady_state_mean(&r, 4, SS_FRAC),
         0.319,
-        0.01,
+        tolerances::ODE_STEADY_STATE,
     );
     v.check(
         "Normal: R_ss",
         steady_state_mean(&r, 5, SS_FRAC),
         0.439,
-        0.01,
+        tolerances::ODE_STEADY_STATE,
     );
     check_non_neg(&mut v, &r, "Normal");
 
@@ -65,19 +68,19 @@ fn main() {
         "Stress: VpsR_ss (saturated)",
         steady_state_mean(&r, 2, SS_FRAC),
         0.769,
-        0.01,
+        tolerances::ODE_STEADY_STATE,
     );
     v.check(
         "Stress: B_ss",
         steady_state_mean(&r, 3, SS_FRAC),
         0.672,
-        0.01,
+        tolerances::ODE_STEADY_STATE,
     );
     v.check(
         "Stress: R_ss (elevated)",
         steady_state_mean(&r, 5, SS_FRAC),
         0.441,
-        0.01,
+        tolerances::ODE_STEADY_STATE,
     );
     check_non_neg(&mut v, &r, "Stress");
 
@@ -96,20 +99,30 @@ fn main() {
         "LowCdG: VpsR_ss (low)",
         steady_state_mean(&r, 2, SS_FRAC),
         0.357,
-        0.01,
+        tolerances::ODE_STEADY_STATE,
     );
     check_non_neg(&mut v, &r, "LowCdG");
 
     // ── VpsR knockout ───────────────────────────────────────────────
     v.section("── ΔvpsR knockout ──");
     let r = scenario_vpsr_knockout(&params, DT);
-    v.check("KO: B_ss ≈ 0", steady_state_mean(&r, 3, SS_FRAC), 0.0, 0.01);
-    v.check("KO: R_ss ≈ 0", steady_state_mean(&r, 5, SS_FRAC), 0.0, 0.01);
+    v.check(
+        "KO: B_ss ≈ 0",
+        steady_state_mean(&r, 3, SS_FRAC),
+        0.0,
+        tolerances::ODE_STEADY_STATE,
+    );
+    v.check(
+        "KO: R_ss ≈ 0",
+        steady_state_mean(&r, 5, SS_FRAC),
+        0.0,
+        tolerances::ODE_STEADY_STATE,
+    );
     v.check(
         "KO: M_ss (high, default motile)",
         steady_state_mean(&r, 4, SS_FRAC),
         0.667,
-        0.01,
+        tolerances::ODE_STEADY_STATE,
     );
     check_non_neg(&mut v, &r, "KO");
 

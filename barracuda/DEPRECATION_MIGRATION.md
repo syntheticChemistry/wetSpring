@@ -55,6 +55,22 @@ yet absorbed. They remain active and maintained in wetSpring.
 | `molecular_clock` | Strict/relaxed clock | Exp053 |
 | `pangenome` | Gene clustering + enrichment | Exp056 |
 
+### Shared Math (bio::special — extraction candidate)
+
+| Function | Consumers | barracuda Target | Extraction Status |
+|----------|-----------|------------------|-------------------|
+| `erf()` | `normal_cdf()` | `barracuda::special::erf` | Ready — `mul_add` chains, tested |
+| `normal_cdf()` | `bio::pangenome` | `barracuda::special::normal_cdf` | Ready — thin wrapper |
+| `ln_gamma()` | `regularized_gamma_lower()` | `barracuda::special::ln_gamma` | Ready — Lanczos, tested |
+| `regularized_gamma_lower()` | `bio::dada2` | `barracuda::special::regularized_gamma_p` | Ready — series expansion, 1e-15 |
+
+**Extraction plan**: When barracuda adds `[features] math = []`:
+1. Delete `bio/special.rs`
+2. Change `bio/dada2.rs`: `use barracuda::special::regularized_gamma_p`
+3. Change `bio/pangenome.rs`: `use barracuda::special::normal_cdf`
+4. Change `bio/eic.rs`: `use barracuda::numerical::trapz`
+5. Update `EVOLUTION_READINESS.md`: mark as ✅ Absorbed
+
 ---
 
 ## Migration Steps (When ToadStool Absorbs)

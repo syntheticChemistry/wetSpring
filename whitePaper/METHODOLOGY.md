@@ -306,7 +306,7 @@ All experiments run on a single consumer workstation:
 
 ## 6. Acceptance Criteria
 
-### Phase 2 (CPU): 1,241/1,241 checks pass
+### Phase 2 (CPU): 1,291/1,291 checks pass
 
 | Binary | Checks | Target |
 |--------|:------:|--------|
@@ -357,13 +357,13 @@ All experiments run on a single consumer workstation:
 | `validate_pangenomics` | 24 | Moulana 2020 pangenome (Exp056) |
 | `validate_barracuda_cpu_v4` | 44 | 23-domain CPU parity (Exp057) |
 | `validate_barracuda_cpu_v5` | 29 | RF + GBM inference (Exp061-062) |
-| **Total** | **1,241** | **All pass** |
+| **Total** | **1,291** | **All pass** |
 
-Current status: **1,241/1,241 pass.** 63 experiments across 4 tracks.
+Current status: **1,291/1,291 pass.** 76 experiments across 4 tracks.
 157/157 BarraCUDA CPU parity checks across 25 algorithmic domains.
 ~22.5× Rust speedup over Python.
 
-### Phase 3 (GPU): 260/260 checks pass
+### Phase 3 (GPU): 451/451 checks pass
 
 | Binary | Checks | Target |
 |--------|:------:|--------|
@@ -380,11 +380,11 @@ Current status: **1,241/1,241 pass.** 63 experiments across 4 tracks.
 | `validate_cross_substrate` | 20 | metalForge cross-substrate CPU↔GPU parity (Exp060) |
 | `validate_gpu_rf` | 13 | RF batch inference shader (Exp063) |
 
-Current status: **260/260 pass.** 15 ToadStool primitives consumed.
+Current status: **451/451 pass.** 15 ToadStool primitives consumed.
 9 local WGSL shaders (Write → Absorb → Lean candidates).
 4 bio GPU primitives absorbed from ToadStool (Feb 20 cce8fe7c).
 
-### Grand Total: 1,501/1,501 quantitative checks pass
+### Grand Total: 1,742/1,742 quantitative checks pass
 
 ---
 
@@ -432,8 +432,8 @@ results, then exceed them via Rust + GPU.
 | `cargo-llvm-cov` | **93.5%** line coverage |
 | `unsafe` in production | 0 |
 | `.unwrap()` in production | 0 |
-| Named tolerances | 22 constants in `tolerances.rs`, hierarchy-tested |
-| Provenance headers | All 61 validation/benchmark binaries |
+| Named tolerances | 32 constants in `tolerances.rs`, hierarchy-tested |
+| Provenance headers | All 73 validation/benchmark binaries |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` and `.wgsl` files |

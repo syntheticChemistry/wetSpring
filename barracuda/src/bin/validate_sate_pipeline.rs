@@ -5,10 +5,13 @@
 //!
 //! | Item            | Value                                                           |
 //! |-----------------|-----------------------------------------------------------------|
+//! | Baseline commit | `e4358c5`                                                       |
 //! | Baseline script | `scripts/sate_alignment_baseline.py`                            |
 //! | Baseline output | `experiments/results/038_sate_pipeline/python_baseline.json`     |
 //! | Reference       | Liu 2009, DOI 10.1126/science.1171243 (`SATe`)                    |
 //! | Date            | 2026-02-20                                                      |
+//! | Exact command   | `python3 scripts/sate_alignment_baseline.py`                     |
+//! | Hardware        | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04                      |
 //!
 //! Validates that the Rust NJ → SW → distance pipeline matches Python
 //! baseline on synthetic 16S-like sequences at 5, 8, and 12 taxa.

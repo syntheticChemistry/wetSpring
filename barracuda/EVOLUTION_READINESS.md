@@ -8,8 +8,8 @@
 
 All modules pass `clippy::pedantic` + `clippy::nursery` (0 warnings), `cargo fmt`
 (0 diffs), `cargo doc` (0 warnings). 93.5% line coverage via `cargo-llvm-cov`.
-All tolerances centralized in `tolerances.rs` (22 named constants). Zero `unsafe`
-and zero `.unwrap()` in production code. All 61 binaries carry `# Provenance`
+All tolerances centralized in `tolerances.rs` (32 named constants). Zero `unsafe`
+and zero `.unwrap()` in production code. All 73 binaries carry `# Provenance`
 headers. Data paths use `validation::data_dir()` for capability-based discovery.
 `flate2` uses `rust_backend` — zero C dependencies (ecoBin compliant).
 
@@ -117,6 +117,9 @@ headers. Data paths use `validation::data_dir()` for capability-based discovery.
 
 ### Shader Compilation Notes
 
+All 6 pipeline-dispatched local WGSL shaders have been upgraded with pipeline
+caching (Exp068, 38% dispatch overhead reduction).
+
 All 9 local shaders except `quality_filter.wgsl` require
 `ShaderTemplate::for_driver_auto(source, ...)` on RTX 4070 (Ada Lovelace).
 The `dN/dS` shader requires forced polyfill (`true`) for `log()`.
@@ -184,7 +187,7 @@ Plus **NVVM driver profile fix** — Ada Lovelace RTX 40-series
 | A (handoff ready) | 10 | 9 (local WGSL) | 400+ | 60+ |
 | B (needs refactor) | 6 | 0 | 150+ | 0 |
 | C (CPU-only) | 15 | 0 | 191+ | 0 |
-| **Total** | **41** | **20** | **1,241** | **260** |
+| **Total** | **41** | **20** | **1,291** | **451** |
 
 ---
 
@@ -209,9 +212,25 @@ Plus **NVVM driver profile fix** — Ada Lovelace RTX 40-series
 | Feb 20 | Exp061/062: RF + GBM inference — 29/29 CPU checks (domains 24-25) |
 | Feb 20 | Exp063: GPU RF batch inference — 13/13 GPU checks (SoA WGSL shader) |
 | Feb 21 | Phase 15: Code quality hardening — pedantic clippy, tolerance centralization, provenance headers |
-| Feb 21 | 93.5% line coverage, 552 tests (539 lib + 13 doc), 0 clippy warnings |
-| Feb 21 | All inline tolerance literals → 22 named constants in `tolerances.rs` |
+| Feb 21 | 93.5% line coverage, 610 tests (547 lib + 50 integration + 13 doc), 0 clippy warnings |
+| Feb 21 | All inline tolerance literals → 32 named constants in `tolerances.rs` |
 | Feb 21 | All data paths → `validation::data_dir()` for capability-based discovery |
+| Feb 21 | Phase 17: metalForge absorption engineering — shaped all modules for ToadStool readiness |
+| Feb 21 | `bio::special` consolidated (erf, ln_gamma, regularized_gamma) for extraction to `barracuda::math` |
+| Feb 21 | PRIMITIVE_MAP updated with absorption readiness gaps and shared math extraction plan |
+| Feb 21 | DEPRECATION_MIGRATION updated with `bio::special` extraction steps |
+| Feb 21 | Exp064: GPU Parity v1 — 26/26 checks across 8 consolidated GPU domains |
+| Feb 21 | Exp065: metalForge Full Cross-System — 35/35 substrate-independence proof |
+| Feb 21 | Exp066: CPU vs GPU scaling benchmark — crossover characterization all domains |
+| Feb 21 | Exp067: Dispatch overhead profiling — measured fixed GPU dispatch cost per domain |
+| Feb 21 | Exp068: Pipeline caching — 38% dispatch overhead reduction (6 local WGSL modules) |
+| Feb 21 | Exp069: Python → Rust CPU → GPU three-tier — full value chain proven |
+| Feb 21 | PCIe topology documented: RTX 4070 + Titan V + AKD1000, P2P DMA paths |
+| Feb 21 | Exp072: GPU streaming pipeline — pre-warmed FMR, 1.27x speedup over individual dispatch |
+| Feb 21 | Exp073: Dispatch overhead quantified — streaming beats individual at all batch sizes |
+| Feb 21 | Exp074: Substrate router — GPU↔NPU↔CPU routing, PCIe topology-aware, fallback proven |
+| Feb 21 | Exp075: Pure GPU 5-stage pipeline — diversity→Bray-Curtis→PCoA→stats→spectral, 0.1% overhead |
+| Feb 21 | Exp076: Cross-substrate pipeline — GPU→NPU→CPU data flow, 12 samples, latency profiled |
 
 ---
 
@@ -225,11 +244,19 @@ Plus **NVVM driver profile fix** — Ada Lovelace RTX 40-series
 | Absorbed | complex64, SU(3), plaquette, HMC, CellList | SW, Gillespie, DT, Felsenstein, GEMM |
 | WGSL pattern | `pub const WGSL: &str` inline | `include_str!("../shaders/...")` |
 | metalForge | GPU + NPU hardware characterization | GPU + NPU + cross-substrate validation |
-| Handoffs | `wateringHole/handoffs/` (16+ docs) | `archive/handoffs/` (consolidated) |
-| Tests | 454 | 552 |
-| Validation | 418 checks | 1,501 checks |
-| Experiments | 31 suites | 63 experiments |
+| Handoffs | `../wateringHole/handoffs/` (16+ docs) | `archive/handoffs/` (consolidated) |
+| Tests | 454 | 610+ |
+| Validation | 418 checks | 1,742 checks |
+| Experiments | 31 suites | 76 experiments |
 | Line coverage | — | 93.5% |
+| Pipeline caching | Upstream (ToadStool native) | Local (Exp068, 38% overhead reduction) |
+| Three-tier proof | CPU→GPU→NPU | Python→CPU→GPU→NPU (Exp069) |
+| PCIe topology | Documented | Documented + P2P routing (PCIE_TOPOLOGY.md) |
+| Streaming dispatch | — | Pre-warmed pipeline, 1.27x speedup (Exp072) |
+| Dispatch overhead | — | Quantified at 4 batch sizes (Exp073) |
+| Substrate routing | — | GPU↔NPU↔CPU router validated (Exp074) |
+| Pure GPU pipeline | — | 5-stage, 0.1% overhead, 31 checks (Exp075) |
+| Cross-substrate E2E | — | GPU→NPU→CPU, latency profiled (Exp076) |
 
 Both Springs follow the same pipeline: Python → Rust CPU → GPU → ToadStool absorption.
 The patterns should converge: hotSpring's `pub const WGSL` inline approach and

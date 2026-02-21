@@ -12,10 +12,12 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Baseline tool | gillespie_baseline.py |
 //! | Baseline version | scripts/ |
 //! | Baseline command | python3 scripts/gillespie_baseline.py |
 //! | Baseline date | 2026-02-19 |
+//! | Exact command | `python3 scripts/gillespie_baseline.py` |
 //! | Data | Massie 2012 c-di-GMP birth-death model, N=1000 ensemble |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
@@ -88,6 +90,8 @@ fn main() {
 
     let stats = gillespie::birth_death_ensemble(K_DGC, K_PDE, T_MAX, N_RUNS, BASE_SEED);
 
+    // Stochastic tolerances (0.1, 0.5, 0.15): no centralized constant — Gillespie
+    // ensemble mean/variance/Fano depend on PRNG and run count; domain-specific.
     v.check(
         "Ensemble mean ~ analytical (100.0)",
         stats.mean,

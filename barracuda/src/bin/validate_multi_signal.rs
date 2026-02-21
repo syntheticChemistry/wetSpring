@@ -5,6 +5,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline commit | `e4358c5` |
 //! | Paper | Srivastava et al. 2011, *J Bacteriology* 193:6331-41 |
 //! | Baseline script | `scripts/srivastava2011_multi_signal.py` |
 //! | Baseline output | `experiments/results/024_multi_signal/srivastava2011_python_baseline.json` |
@@ -12,17 +13,19 @@
 //! | scipy integrator | `odeint` (LSODA) |
 //! | Rust integrator | RK4 fixed-step (dt = 0.001 h) |
 //! | Date | 2026-02-20 |
+//! | Exact command | `python3 scripts/srivastava2011_multi_signal.py` |
+//! | Hardware | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04 |
 
 use wetspring_barracuda::bio::multi_signal::{
     scenario_ai2_only, scenario_cai1_only, scenario_exogenous_cai1, scenario_no_qs,
     scenario_wild_type, MultiSignalParams,
 };
 use wetspring_barracuda::bio::ode::steady_state_mean;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 const DT: f64 = 0.001;
 const SS_FRAC: f64 = 0.1;
-const METHOD_TOL: f64 = 1e-3;
 
 fn main() {
     let mut v = Validator::new("Exp024: Srivastava 2011 Multi-Input QS Network");
@@ -36,10 +39,10 @@ fn main() {
     let c_ss = steady_state_mean(&r, 5, SS_FRAC);
     let b_ss = steady_state_mean(&r, 6, SS_FRAC);
 
-    v.check("WT: N_ss", n_ss, 0.975, METHOD_TOL);
-    v.check("WT: HapR_ss", h_ss, 0.543, 0.01);
-    v.check("WT: CdG_ss", c_ss, 0.600, 0.01);
-    v.check("WT: B_ss", b_ss, 0.413, 0.01);
+    v.check("WT: N_ss", n_ss, 0.975, tolerances::ODE_METHOD_PARITY);
+    v.check("WT: HapR_ss", h_ss, 0.543, tolerances::ODE_STEADY_STATE);
+    v.check("WT: CdG_ss", c_ss, 0.600, tolerances::ODE_STEADY_STATE);
+    v.check("WT: B_ss", b_ss, 0.413, tolerances::ODE_STEADY_STATE);
     check_non_negative(&mut v, &r, "WT");
 
     // ── CAI-1 only (ΔluxS) ─────────────────────────────────────────
@@ -48,8 +51,13 @@ fn main() {
     let h_ss = steady_state_mean(&r, 4, SS_FRAC);
     let b_ss = steady_state_mean(&r, 6, SS_FRAC);
 
-    v.check("CAI1: HapR_ss", h_ss, 0.238, 0.01);
-    v.check("CAI1: B_ss (more biofilm)", b_ss, 0.676, 0.01);
+    v.check("CAI1: HapR_ss", h_ss, 0.238, tolerances::ODE_STEADY_STATE);
+    v.check(
+        "CAI1: B_ss (more biofilm)",
+        b_ss,
+        0.676,
+        tolerances::ODE_STEADY_STATE,
+    );
     check_non_negative(&mut v, &r, "CAI1");
 
     // ── AI-2 only (ΔcqsA) ──────────────────────────────────────────
@@ -58,8 +66,18 @@ fn main() {
     let h_ss = steady_state_mean(&r, 4, SS_FRAC);
     let b_ss = steady_state_mean(&r, 6, SS_FRAC);
 
-    v.check("AI2: HapR_ss (symmetric with CAI1)", h_ss, 0.238, 0.01);
-    v.check("AI2: B_ss (symmetric with CAI1)", b_ss, 0.676, 0.01);
+    v.check(
+        "AI2: HapR_ss (symmetric with CAI1)",
+        h_ss,
+        0.238,
+        tolerances::ODE_STEADY_STATE,
+    );
+    v.check(
+        "AI2: B_ss (symmetric with CAI1)",
+        b_ss,
+        0.676,
+        tolerances::ODE_STEADY_STATE,
+    );
     check_non_negative(&mut v, &r, "AI2");
 
     // ── No QS (ΔluxS ΔcqsA) ────────────────────────────────────────
@@ -69,7 +87,12 @@ fn main() {
     let b_ss = steady_state_mean(&r, 6, SS_FRAC);
 
     v.check("NoQS: HapR_ss (very low)", h_ss, 0.031, 0.005);
-    v.check("NoQS: B_ss (constitutive biofilm)", b_ss, 0.777, 0.01);
+    v.check(
+        "NoQS: B_ss (constitutive biofilm)",
+        b_ss,
+        0.777,
+        tolerances::ODE_STEADY_STATE,
+    );
     check_non_negative(&mut v, &r, "NoQS");
 
     // ── Exogenous CAI-1 ─────────────────────────────────────────────
@@ -81,7 +104,7 @@ fn main() {
         "ExoCAI: HapR activated by exogenous signal",
         h_ss,
         0.543,
-        0.01,
+        tolerances::ODE_STEADY_STATE,
     );
     check_non_negative(&mut v, &r, "ExoCAI");
 

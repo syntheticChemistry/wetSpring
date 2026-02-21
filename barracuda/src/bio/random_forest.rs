@@ -273,6 +273,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::cast_precision_loss)]
     fn avg_depth_positive() {
         let rf = RandomForest::from_trees(vec![tree_a(), tree_b(), tree_c()], 2).unwrap();
         let avg = rf.avg_depth();

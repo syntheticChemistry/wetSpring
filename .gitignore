@@ -1,6 +1,5 @@
 # Rust
 target/
-Cargo.lock
 
 # Galaxy data (large, not tracked)
 control/galaxy/galaxy-data/
@@ -37,4 +36,9 @@ __pycache__/
 .idea/
 .vscode/
 *.swp
-khipu.log
+
+# Temp / backup / logs
+*.tmp
+*.bak
+*.orig
+*.log

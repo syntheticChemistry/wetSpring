@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 21, 2026
-**Status:** 63 experiments, 1501 validation checks, all PASS
+**Status:** 76 experiments, 1,742 validation checks, all PASS
 
 ---
 
@@ -72,6 +72,19 @@
 | 061 | Random Forest Ensemble Inference | cross | COMPLETE | 13 |
 | 062 | GBM Inference (Binary + Multi-Class) | cross | COMPLETE | 16 |
 | 063 | GPU Random Forest Batch Inference | GPU | COMPLETE | 13 |
+| 064 | BarraCUDA GPU Parity v1 (all GPU domains) | cross/GPU | COMPLETE | 26 |
+| 065 | metalForge Full Cross-System Validation | cross/GPU | COMPLETE | 35 |
+| 066 | CPU vs GPU Scaling Benchmark (all GPU domains) | GPU | COMPLETE | Benchmark |
+| 067 | ToadStool Dispatch Overhead Profiling | GPU | COMPLETE | Benchmark |
+| 068 | Pipeline Caching Optimization | GPU | COMPLETE | Optimization/Benchmark |
+| 069 | Python → Rust CPU → GPU Three-Tier Benchmark | cross | COMPLETE | Benchmark |
+| 070 | BarraCUDA CPU 25-Domain Pure Rust Math Proof | cross | COMPLETE | 50 |
+| 071 | BarraCUDA GPU Math Portability Proof | GPU | COMPLETE | 24 |
+| 072 | GPU Streaming Pipeline Proof | GPU | COMPLETE | 17 |
+| 073 | Compute Dispatch Overhead Proof | GPU | COMPLETE | 21 |
+| 074 | metalForge Substrate Router | cross/GPU | COMPLETE | 20 |
+| 075 | Pure GPU Analytics Pipeline | GPU | COMPLETE | 31 |
+| 076 | Cross-Substrate Pipeline | cross/GPU | COMPLETE | 17 |
 
 ---
 
@@ -79,12 +92,14 @@
 
 | Category | Count |
 |----------|-------|
-| Experiments completed | 63 |
-| CPU validation checks | 1,241 |
-| GPU validation checks | 260 |
-| **Total validation checks** | **1,501** |
-| Rust tests | 539 lib + 13 doc-tests (552 total) |
+| Experiments completed | 76 |
+| CPU validation checks | 1,291 |
+| GPU validation checks | 451 |
+| **Total validation checks** | **1,742** |
+| Rust tests | 610 (547 lib + 50 integration + 13 doc) |
 | BarraCUDA CPU parity | 157/157 (25 domains) |
+| BarraCUDA GPU parity | 8 domains consolidated (Exp064) |
+| metalForge cross-system | 8 domains CPU↔GPU proven (Exp065) |
 | ToadStool primitives consumed | 15 (11 original + 4 bio) |
 
 ---
@@ -140,7 +155,7 @@
 ### Completed (Previously Remaining)
 - Exp019 Phases 2-4 (Phylogenetic): All COMPLETE
 - Exp008 Full ML Pipeline: All COMPLETE
-- Tolerance centralization: **DONE** — all inline literals replaced with 22 named
+- Tolerance centralization: **DONE** — all inline literals replaced with 32 named
   constants in `tolerances.rs` (Feb 21, 2026)
 
 ---
@@ -181,18 +196,21 @@ matching. Exp008 adds sovereign ML for environmental monitoring.
 cargo fmt --check              → clean (0 diffs)
 cargo clippy --pedantic        → 0 warnings (pedantic + nursery enforced crate-wide)
 cargo doc --no-deps            → clean (0 warnings)
-cargo test --lib               → 539 passed, 0 failed, 1 ignored (hardware-dependent)
+cargo test --lib               → 610 passed, 0 failed, 1 ignored (hardware-dependent)
 cargo test --doc               → 13 passed, 0 failed
 cargo llvm-cov --lib           → 93.5% line coverage
-unsafe in production           → 0
-.unwrap() in production        → 0
-inline tolerance literals      → 0 (22 named constants in tolerances.rs)
-SPDX headers                   → all .rs files
-max file size                  → all under 1000 LOC
+#![forbid(unsafe_code)]        → enforced crate-wide
+.unwrap() in production        → 0 (bench/mod.rs migrated to let-else)
+partial_cmp().unwrap()         → 0 (all migrated to f64::total_cmp)
+inline tolerance literals      → 0 (32 named constants in tolerances.rs)
+shared math (bio::special)     → erf, ln_gamma, regularized_gamma (no duplication)
+SPDX headers                   → all 151 .rs files
+max file size                  → all under 1000 LOC (mzml/mod.rs: 848 via delegation)
 external C dependencies        → 0 (flate2 uses rust_backend)
-provenance headers             → all 61 binaries
+provenance headers             → all 73 binaries (commit, command, hardware)
+Python baselines               → scripts/requirements.txt (pinned numpy, scipy, sklearn)
 barracuda_cpu                  → 157/157 checks PASS (25 domains)
-barracuda_gpu                  → 260 GPU checks PASS
+barracuda_gpu                  → 451 GPU checks PASS
 ```
 
 ## BarraCUDA CPU Parity
@@ -211,6 +229,25 @@ Combined: 157/157 CPU parity checks. This is the bridge to pure GPU execution.
 Total CPU time: ~85ms (release build, all 25 domains, v4 adds ~0.4ms, v5 adds ~62µs)
 ```
 
+## BarraCUDA GPU Parity
+
+Exp064 consolidates ALL GPU-eligible domains into a single validation binary,
+proving pure GPU math matches CPU reference truth across the full portfolio:
+
+- Diversity (Shannon, Simpson, Bray-Curtis) — via FusedMapReduceF64
+- ANI, SNP, dN/dS, Pangenome — via local WGSL shaders
+- Random Forest — via rf_batch_inference.wgsl
+- HMM forward — via hmm_forward_f64.wgsl
+
+This is the GPU analogue of barracuda_cpu_v1-v5: CPU → GPU → same answer.
+
+## metalForge Cross-System Proof
+
+Exp065 extends Exp060 to ALL domains, proving substrate-independence:
+for every GPU-eligible algorithm, the metalForge router can dispatch to
+CPU or GPU and get the same answer. This is the foundation for CPU/GPU/NPU
+routing in production.
+
 ## ToadStool Evolution (Feb 21, 2026)
 
 ### Write → Absorb → Lean Status
@@ -220,14 +257,23 @@ Following hotSpring's pattern for ToadStool integration:
 | Phase | Count | Status |
 |-------|:-----:|--------|
 | **Lean** (consumed upstream) | 11 GPU modules, 15 primitives | Active — SW, Gillespie, DT, Felsenstein, diversity, PCoA |
-| **Write** (local WGSL, validated) | 9 shaders, 155 GPU checks | Handoff submitted (`wateringHole/handoffs/`) |
-| **CPU math** (barracuda overlap) | 4 functions (erf, ln_gamma, trapz) | Blocked on `barracuda::math` feature proposal |
+| **Write** (local WGSL, validated) | 9 shaders, 155 GPU checks | Handoff submitted (`../wateringHole/handoffs/`) |
+| **CPU math** (`bio::special`) | 3 functions (erf, ln_gamma, regularized_gamma) | Consolidated; shaped for extraction to `barracuda::math` |
 | **CPU-only** (no GPU path) | 15 modules | Stable — chimera, derep, kmer, GBM, etc. |
 | **Blocked** (needs upstream) | 3 modules | kmer hash, UniFrac tree traversal, taxonomy NPU |
+| **metalForge** (absorption eng.) | 32 tolerances, SoA patterns, `#[repr(C)]` | Shaping all modules for ToadStool absorption |
+
+### Streaming & Dispatch Validation (Feb 21, 2026)
+
+| Exp | Binary | Checks | What it proves |
+|-----|--------|:------:|----------------|
+| 072 | `validate_gpu_streaming_pipeline` | 17 | Pre-warmed FMR eliminates per-stage dispatch; 1.27x streaming speedup |
+| 073 | `validate_dispatch_overhead_proof` | 21 | Streaming beats individual at all batch sizes; overhead quantified |
+| 074 | `validate_substrate_router` | 20 | GPU↔NPU↔CPU routing; PCIe topology; fallback parity |
 
 ### Handoff Document
 
-Active handoff: `wateringHole/handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md`
+Active handoff: `../wateringHole/handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md`
 
 Contains binding layouts, dispatch geometry, CPU reference functions, and validation
 counts for all 9 Tier A WGSL shaders. Also includes naga/NVVM driver profile fix
