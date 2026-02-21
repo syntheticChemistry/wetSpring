@@ -19,10 +19,10 @@
 //! - `F3D0_R1`: 7,793 sequences, 249–251 bp, GC ~54.7%, mean Q ~35.8
 //! - All 40 files: 304,720 total sequences (20 paired samples)
 
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use wetspring_barracuda::bio::{derep, merge_pairs, quality};
 use wetspring_barracuda::io::fastq;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{self, Validator};
 
 fn main() {
     let mut v = Validator::new("wetSpring FASTQ Parser Validation");
@@ -33,10 +33,7 @@ fn main() {
     validate_dereplication(&mut v);
 
     // External data-dependent validation
-    let data_dir = std::env::var("WETSPRING_FASTQ_DIR").map_or_else(
-        |_| Path::new(env!("CARGO_MANIFEST_DIR")).join("../data/validation/MiSeq_SOP"),
-        PathBuf::from,
-    );
+    let data_dir = validation::data_dir("WETSPRING_FASTQ_DIR", "data/validation/MiSeq_SOP");
 
     if data_dir.exists() {
         validate_r1(&data_dir, &mut v);

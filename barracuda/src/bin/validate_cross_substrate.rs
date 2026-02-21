@@ -7,6 +7,17 @@
 //! truth, then GPU, and compare.
 //!
 //! This is the metalForge proof: the math is substrate-independent.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | BarraCUDA CPU (reference implementation) |
+//! | Baseline version | Feb 2026 |
+//! | Baseline command | CPU run first as ground truth; GPU validated against CPU |
+//! | Baseline date | 2026-02-19 |
+//! | Data | Synthetic test vectors (ANI, SNP, pangenome, dN/dS pairs) |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{

@@ -284,4 +284,40 @@ mod tests {
             assert_eq!(v1.ref_allele, v2.ref_allele);
         }
     }
+
+    #[test]
+    fn flat_matches_structured() {
+        let seqs: Vec<&[u8]> = vec![b"ATGATG", b"CTGATG", b"ATGTTG"];
+        let structured = call_snps(&seqs);
+        let flat = call_snps_flat(&seqs);
+        assert_eq!(flat.positions.len(), structured.variants.len());
+        for (i, v) in structured.variants.iter().enumerate() {
+            assert_eq!(flat.positions[i], v.position as u32);
+            assert_eq!(flat.ref_alleles[i], v.ref_allele);
+            assert_eq!(flat.depths[i], v.depth as u32);
+            assert!((flat.alt_frequencies[i] - v.alt_frequency()).abs() < 1e-15);
+        }
+    }
+
+    #[test]
+    fn variant_zero_depth() {
+        let v = Variant {
+            position: 0,
+            ref_allele: b'A',
+            alt_alleles: vec![],
+            depth: 0,
+        };
+        assert_eq!(v.ref_frequency(), 0.0);
+        assert_eq!(v.alt_frequency(), 0.0);
+    }
+
+    #[test]
+    fn snp_density_empty_alignment() {
+        let result = SnpResult {
+            variants: vec![],
+            alignment_length: 0,
+            n_sequences: 0,
+        };
+        assert_eq!(result.snp_density(), 0.0);
+    }
 }

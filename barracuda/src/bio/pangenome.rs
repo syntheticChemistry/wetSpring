@@ -154,12 +154,15 @@ fn fit_heaps_law(clusters: &[GeneCluster], n_genomes: usize) -> Option<f64> {
     let sum_xy: f64 = log_points.iter().map(|(x, y)| x * y).sum();
     let sum_xx: f64 = log_points.iter().map(|(x, _)| x * x).sum();
 
-    let denom = n * sum_xx - sum_x * sum_x;
+    // Linear regression denominator: n*Σ(x²) - (Σx)². Clippy
+    // `suspicious_operation_groupings` is a false positive here.
+    #[allow(clippy::suspicious_operation_groupings)]
+    let denom = n.mul_add(sum_xx, -(sum_x * sum_x));
     if denom.abs() < 1e-15 {
         return None;
     }
 
-    let alpha = (n * sum_xy - sum_x * sum_y) / denom;
+    let alpha = n.mul_add(sum_xy, -(sum_x * sum_y)) / denom;
     Some(alpha)
 }
 
@@ -227,7 +230,8 @@ fn erf(x: f64) -> f64 {
     let sign = if x < 0.0 { -1.0 } else { 1.0 };
     let x = x.abs();
     let t = 1.0 / (1.0 + p * x);
-    let y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * (-x * x).exp();
+    let y = ((a5 * t + a4).mul_add(t, a3).mul_add(t, a2).mul_add(t, a1) * t)
+        .mul_add(-(-x * x).exp(), 1.0);
     sign * y
 }
 

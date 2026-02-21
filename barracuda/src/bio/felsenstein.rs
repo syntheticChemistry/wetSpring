@@ -31,9 +31,13 @@ pub enum TreeNode {
     },
     /// Internal node with left child, right child, and branch lengths.
     Internal {
-        left: Box<TreeNode>,
-        right: Box<TreeNode>,
+        /// Left child subtree.
+        left: Box<Self>,
+        /// Right child subtree.
+        right: Box<Self>,
+        /// Branch length to left child.
         left_branch: f64,
+        /// Branch length to right child.
         right_branch: f64,
     },
 }

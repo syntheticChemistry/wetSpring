@@ -35,7 +35,7 @@
 //! - `AlgaeParc` outdoor pilots show seasonal bacterial turnover
 
 use std::collections::HashMap;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use wetspring_barracuda::bio::chimera::{self, ChimeraParams};
 use wetspring_barracuda::bio::dada2::{self, Dada2Params};
 use wetspring_barracuda::bio::derep::{self, DerepSort};
@@ -46,7 +46,8 @@ use wetspring_barracuda::bio::taxonomy::{
 };
 use wetspring_barracuda::bio::unifrac::{self, PhyloTree};
 use wetspring_barracuda::io::fastq::{self, FastqRecord};
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::tolerances;
+use wetspring_barracuda::validation::{self, Validator};
 
 fn main() {
     let mut v = Validator::new("wetSpring Extended Algae 16S Validation (Exp017)");
@@ -55,9 +56,9 @@ fn main() {
     validate_cross_dataset_reference(&mut v);
     validate_python_control(&mut v);
 
-    let data_dir = std::env::var("WETSPRING_EXTENDED_ALGAE_DIR").map_or_else(
-        |_| Path::new(env!("CARGO_MANIFEST_DIR")).join("../data/ncbi_bulk/PRJNA382322/SRR5452557"),
-        PathBuf::from,
+    let data_dir = validation::data_dir(
+        "WETSPRING_EXTENDED_ALGAE_DIR",
+        "data/ncbi_bulk/PRJNA382322/SRR5452557",
     );
 
     if data_dir.exists() {
@@ -167,7 +168,12 @@ fn validate_synthetic_pipeline(v: &mut Validator) {
             p * p.ln()
         })
         .sum::<f64>();
-    v.check("Shannon analytical match", shannon, expected_shannon, 1e-10);
+    v.check(
+        "Shannon analytical match",
+        shannon,
+        expected_shannon,
+        tolerances::PYTHON_PARITY,
+    );
 
     // Step 5: Taxonomy classification
     let refs = vec![
@@ -275,7 +281,12 @@ fn validate_synthetic_pipeline(v: &mut Validator) {
     }
 
     let uw_self = unifrac::unweighted_unifrac(&tree, &sample, &sample);
-    v.check("UniFrac: self-distance = 0", uw_self, 0.0, 1e-12);
+    v.check(
+        "UniFrac: self-distance = 0",
+        uw_self,
+        0.0,
+        tolerances::ANALYTICAL_F64,
+    );
 
     // Community shift: seasonal crash scenario (dominance shifts from
     // Saprospiraceae to Flavobacterium after environmental stress)
@@ -407,7 +418,7 @@ fn validate_python_control(v: &mut Validator) {
         "Python/Rust Shannon agree on analytical input",
         rust_shannon,
         expected_shannon,
-        1e-12,
+        tolerances::ANALYTICAL_F64,
     );
 
     let expected_simpson = 1.0 - abundances.iter().map(|&c| (c / n).powi(2)).sum::<f64>();
@@ -416,7 +427,7 @@ fn validate_python_control(v: &mut Validator) {
         "Python/Rust Simpson agree on analytical input",
         rust_simpson,
         expected_simpson,
-        1e-12,
+        tolerances::ANALYTICAL_F64,
     );
 
     // Python baseline plausibility bounds for PRJNA382322

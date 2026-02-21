@@ -28,11 +28,15 @@ use super::ode::{rk4_integrate, OdeResult};
 /// Parameters for the phenotypic capacitor model.
 #[derive(Debug, Clone)]
 pub struct CapacitorParams {
+    /// Maximum growth rate.
     pub mu_max: f64,
+    /// Carrying capacity (cell density).
     pub k_cap: f64,
+    /// Per-capita death rate.
     pub death_rate: f64,
     /// c-di-GMP production rate.
     pub k_cdg_prod: f64,
+    /// c-di-GMP degradation rate.
     pub d_cdg: f64,
     /// `VpsR` activation by c-di-GMP (capacitor charging).
     pub k_vpsr_charge: f64,
@@ -48,9 +52,11 @@ pub struct CapacitorParams {
     pub w_motility: f64,
     /// Rugose colony output weight from `VpsR`.
     pub w_rugose: f64,
-    /// Phenotype decay rates.
+    /// Biofilm phenotype decay rate.
     pub d_bio: f64,
+    /// Motility phenotype decay rate.
     pub d_mot: f64,
+    /// Rugose phenotype decay rate.
     pub d_rug: f64,
     /// Environmental modifier: nutrient stress increases c-di-GMP.
     pub stress_factor: f64,
@@ -99,7 +105,7 @@ fn capacitor_rhs(state: &[f64], _t: f64, p: &CapacitorParams) -> Vec<f64> {
     let rug = state[5].max(0.0);
 
     let d_cell = (p.mu_max * cell).mul_add(1.0 - cell / p.k_cap, -(p.death_rate * cell));
-    let d_cdg = p.stress_factor * p.k_cdg_prod * cell - p.d_cdg * cdg;
+    let d_cdg = (p.stress_factor * p.k_cdg_prod).mul_add(cell, -(p.d_cdg * cdg));
 
     // VpsR charges with c-di-GMP, discharges constitutively
     let charge = p.k_vpsr_charge * hill(cdg, p.k_vpsr_cdg, p.n_vpsr) * (1.0 - vpsr);
@@ -107,9 +113,9 @@ fn capacitor_rhs(state: &[f64], _t: f64, p: &CapacitorParams) -> Vec<f64> {
     let d_vpsr = charge - discharge;
 
     // Three phenotypic outputs from the capacitor
-    let d_bio = p.w_biofilm * vpsr * (1.0 - bio) - p.d_bio * bio;
-    let d_mot = p.w_motility * (1.0 - vpsr) * (1.0 - mot) - p.d_mot * mot;
-    let d_rug = p.w_rugose * vpsr * vpsr * (1.0 - rug) - p.d_rug * rug;
+    let d_bio = (p.w_biofilm * vpsr).mul_add(1.0 - bio, -(p.d_bio * bio));
+    let d_mot = (p.w_motility * (1.0 - vpsr)).mul_add(1.0 - mot, -(p.d_mot * mot));
+    let d_rug = (p.w_rugose * vpsr * vpsr).mul_add(1.0 - rug, -(p.d_rug * rug));
 
     vec![d_cell, d_cdg, d_vpsr, d_bio, d_mot, d_rug]
 }

@@ -46,7 +46,9 @@ pub struct TreeNode {
 /// A phylogenetic tree in array representation.
 #[derive(Debug, Clone)]
 pub struct PhyloTree {
+    /// All nodes in the tree (leaves and internal).
     pub nodes: Vec<TreeNode>,
+    /// Index of the root node.
     pub root: usize,
     leaf_index: HashMap<String, usize>,
 }
@@ -222,7 +224,7 @@ where
     // Propagate up from leaves to root (nodes are in insertion order, so
     // processing in reverse gives a bottom-up traversal)
     for i in (0..n).rev() {
-        for &child in &tree.nodes[i].children.clone() {
+        for &child in &tree.nodes[i].children {
             if has_a[child] {
                 has_a[i] = true;
             }
@@ -294,7 +296,7 @@ where
 
     // Propagate up
     for i in (0..n).rev() {
-        for &child in &tree.nodes[i].children.clone() {
+        for &child in &tree.nodes[i].children {
             prop_a[i] += prop_a[child];
             prop_b[i] += prop_b[child];
         }

@@ -1,5 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Validation: Hsueh/Severin 2022 phage defense deaminase (Exp030).
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | hsueh2022_phage_defense.py |
+//! | Baseline version | scripts/ |
+//! | Baseline command | python3 scripts/hsueh2022_phage_defense.py |
+//! | Baseline date | 2026-02-19 |
+//! | Data | phage-bacteria ODE scenarios |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::bio::ode::steady_state_mean;
 use wetspring_barracuda::bio::phage_defense::{

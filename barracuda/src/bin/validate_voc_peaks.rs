@@ -24,10 +24,10 @@
 //! 4. **Biomarker classification**: Separate A+R-only from A+R,A compounds
 //! 5. **Tolerance matching**: Use `bio::tolerance_search` for RI matching
 
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use wetspring_barracuda::bio::signal::{find_peaks, PeakParams};
 use wetspring_barracuda::bio::tolerance_search;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{self, Validator};
 
 #[derive(Debug)]
 struct VocCompound {
@@ -79,12 +79,9 @@ fn parse_baseline(path: &Path) -> Vec<VocCompound> {
 fn main() {
     let mut v = Validator::new("wetSpring VOC Peak Validation (Exp013 — Reese 2019)");
 
-    let baseline_path = std::env::var("WETSPRING_VOC_DIR").map_or_else(
-        |_| {
-            Path::new(env!("CARGO_MANIFEST_DIR"))
-                .join("../experiments/results/013_voc_baselines/reese2019_table1.tsv")
-        },
-        PathBuf::from,
+    let baseline_path = validation::data_dir(
+        "WETSPRING_VOC_DIR",
+        "experiments/results/013_voc_baselines/reese2019_table1.tsv",
     );
 
     if !baseline_path.exists() {

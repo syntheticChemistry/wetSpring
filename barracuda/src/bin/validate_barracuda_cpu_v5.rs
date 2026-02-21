@@ -1,12 +1,23 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![allow(clippy::too_many_lines, clippy::cast_precision_loss)]
-//! Exp061/062: BarraCUDA CPU Parity v5 — Random Forest + GBM
+//! Exp061/062: `BarraCUDA` CPU Parity v5 — Random Forest + GBM
 //!
 //! Validates the sovereign Random Forest and Gradient Boosting Machine
 //! inference engines in pure Rust. Proves parity with the functional
 //! specifications from sklearn.
 //!
 //! Combined: domains 24 (Random Forest) and 25 (GBM).
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | sklearn (RandomForest, GradientBoostingClassifier; functional spec) |
+//! | Baseline version | sklearn 1.x |
+//! | Baseline command | Hand-trace of sklearn inference (DT splits, RF majority vote, GBM additive model) |
+//! | Baseline date | 2026-02-19 |
+//! | Data | Synthetic test vectors (hand-computed majority votes / raw scores) |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{
@@ -14,6 +25,7 @@ use wetspring_barracuda::bio::{
     gbm::{GbmClassifier, GbmMultiClassifier, GbmTree},
     random_forest::RandomForest,
 };
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn main() {
@@ -98,7 +110,12 @@ fn main() {
     // Sample [7.0, 6.0]: tree1→2, tree2→2, tree3→2, tree4→2, tree5→1 (f[0]=7≤7 → class 1)
     let pred2 = rf.predict_with_votes(&[7.0, 6.0]);
     v.check("RF: [7,6] → class 2", pred2.class as f64, 2.0, 0.0);
-    v.check("RF: [7,6] conf = 0.8", pred2.confidence, 0.8, 1e-10);
+    v.check(
+        "RF: [7,6] conf = 0.8",
+        pred2.confidence,
+        0.8,
+        tolerances::ML_PREDICTION,
+    );
 
     // Batch predict
     let batch = rf.predict_batch(&[vec![3.0, 1.0], vec![7.0, 6.0], vec![5.5, 3.5]]);
@@ -165,7 +182,12 @@ fn main() {
 
     // Structural checks
     v.check("GBM: n_estimators = 3", gbm.n_estimators() as f64, 3.0, 0.0);
-    v.check("GBM: lr = 0.1", gbm.learning_rate(), 0.1, 1e-10);
+    v.check(
+        "GBM: lr = 0.1",
+        gbm.learning_rate(),
+        0.1,
+        tolerances::ML_PREDICTION,
+    );
 
     // [3.0, 2.0]: s1=-1.0, s2=-0.8, s3=-0.5 → score=0.1*(-2.3)=-0.23 → sigmoid<0.5 → class 0
     let pred_neg = gbm.predict_proba(&[3.0, 2.0]);
@@ -175,7 +197,7 @@ fn main() {
         "GBM: [3,2] raw score",
         pred_neg.raw_score,
         expected_score_neg,
-        1e-10,
+        tolerances::ML_PREDICTION,
     );
     v.check(
         "GBM: [3,2] prob < 0.5",
@@ -192,7 +214,7 @@ fn main() {
         "GBM: [8,5] raw score",
         pred_pos.raw_score,
         expected_score_pos,
-        1e-10,
+        tolerances::ML_PREDICTION,
     );
     v.check(
         "GBM: [8,5] prob > 0.5",
@@ -207,7 +229,7 @@ fn main() {
         "GBM: sigmoid(0.33) correct",
         pred_pos.probability,
         expected_prob,
-        1e-10,
+        tolerances::ML_PREDICTION,
     );
 
     // Batch prediction
@@ -275,7 +297,7 @@ fn main() {
         "GBM-MC: probabilities sum to 1",
         mc_pred.probabilities.iter().sum::<f64>(),
         1.0,
-        1e-10,
+        tolerances::ML_PREDICTION,
     );
     v.check(
         "GBM-MC: 3 probabilities",

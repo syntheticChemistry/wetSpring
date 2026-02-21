@@ -33,28 +33,22 @@
 //!
 //! Run: `cargo run --bin validate_features`
 
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use wetspring_barracuda::bio::eic;
 use wetspring_barracuda::bio::feature_table::{self, FeatureParams};
 use wetspring_barracuda::bio::signal::PeakParams;
 use wetspring_barracuda::io::mzml;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{self, Validator};
 
 #[allow(clippy::too_many_lines)] // sequential feature validation: parse → tracks → EIC → features → asari cross-reference
 fn main() {
     let mut v = Validator::new("wetSpring Feature Pipeline Validation (Exp009)");
 
-    let data_dir = std::env::var("WETSPRING_MZML_DIR").map_or_else(
-        |_| Path::new(env!("CARGO_MANIFEST_DIR")).join("../data/exp005_asari/MT02/MT02Dataset"),
-        PathBuf::from,
-    );
+    let data_dir = validation::data_dir("WETSPRING_MZML_DIR", "data/exp005_asari/MT02/MT02Dataset");
 
-    let asari_tsv = std::env::var("WETSPRING_ASARI_TSV").map_or_else(
-        |_| {
-            Path::new(env!("CARGO_MANIFEST_DIR"))
-                .join("../experiments/results/005_asari/preferred_Feature_table.tsv")
-        },
-        PathBuf::from,
+    let asari_tsv = validation::data_dir(
+        "WETSPRING_ASARI_TSV",
+        "experiments/results/005_asari/preferred_Feature_table.tsv",
     );
 
     if !data_dir.exists() {

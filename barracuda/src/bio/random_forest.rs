@@ -18,7 +18,7 @@
 //! - Each thread traverses its tree for one sample
 //! - Reduce via voting/averaging
 //!
-//! This module is a ToadStool absorption candidate: the same array-based
+//! This module is a `ToadStool` absorption candidate: the same array-based
 //! tree representation used by `TreeInferenceGpu` can be extended to
 //! multi-tree dispatch.
 
@@ -81,6 +81,7 @@ impl RandomForest {
             .max_by_key(|(_, &v)| v)
             .unwrap_or((0, &0));
 
+        #[allow(clippy::cast_precision_loss)] // vote counts are small
         let confidence = if self.trees.is_empty() {
             0.0
         } else {
@@ -239,5 +240,48 @@ mod tests {
     fn empty_forest_error() {
         let result = RandomForest::from_trees(vec![], 2);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn predict_matches_predict_with_votes() {
+        let rf = RandomForest::from_trees(vec![tree_a(), tree_b(), tree_c()], 2).unwrap();
+        let features = [0.3, 0.7];
+        assert_eq!(
+            rf.predict(&features),
+            rf.predict_with_votes(&features).class
+        );
+    }
+
+    #[test]
+    fn predict_batch_with_votes_matches_individual() {
+        let rf = RandomForest::from_trees(vec![tree_a(), tree_b(), tree_c()], 2).unwrap();
+        let samples = vec![vec![0.3, 0.7], vec![0.7, 0.3]];
+        let batch = rf.predict_batch_with_votes(&samples);
+        assert_eq!(batch.len(), 2);
+        for (i, s) in samples.iter().enumerate() {
+            let individual = rf.predict_with_votes(s);
+            assert_eq!(batch[i].class, individual.class);
+            assert_eq!(batch[i].votes, individual.votes);
+        }
+    }
+
+    #[test]
+    fn tree_at_returns_expected() {
+        let rf = RandomForest::from_trees(vec![tree_a(), tree_b(), tree_c()], 2).unwrap();
+        assert_eq!(rf.tree_at(0).n_nodes(), tree_a().n_nodes());
+        assert_eq!(rf.tree_at(2).n_nodes(), tree_c().n_nodes());
+    }
+
+    #[test]
+    fn avg_depth_positive() {
+        let rf = RandomForest::from_trees(vec![tree_a(), tree_b(), tree_c()], 2).unwrap();
+        let avg = rf.avg_depth();
+        assert!(avg > 0.0);
+        let manual: f64 = [tree_a(), tree_b(), tree_c()]
+            .iter()
+            .map(|t| t.depth() as f64)
+            .sum::<f64>()
+            / 3.0;
+        assert!((avg - manual).abs() < 1e-15);
     }
 }

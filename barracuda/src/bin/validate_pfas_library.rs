@@ -37,7 +37,7 @@
 
 use wetspring_barracuda::bio::{kmd, spectral_match, tolerance_search};
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{self, Validator};
 
 /// PFAS compound with known exact mass.
 ///
@@ -607,8 +607,8 @@ fn validate_cross_series_discrimination(v: &mut Validator) {
 fn validate_jones_library_expansion(v: &mut Validator) {
     v.section("Jones Lab PFAS Library (175 compounds, Zenodo 14341321)");
 
-    let lib_path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../data/jones_pfas_library/pfas_library_parsed.json");
+    let lib_path = validation::data_dir("WETSPRING_PFAS_LIBRARY_DIR", "data/jones_pfas_library")
+        .join("pfas_library_parsed.json");
 
     if !lib_path.exists() {
         println!(

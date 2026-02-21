@@ -14,6 +14,19 @@
 //! ```text
 //! CPU v4 (23 domains) → [THIS] GPU promotion (ANI, SNP, Pan, dN/dS) → ToadStool absorption
 //! ```
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | BarraCUDA CPU (reference) |
+//! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
+//! | Baseline command | bio::ani, bio::snp, bio::pangenome, bio::dnds |
+//! | Baseline date | 2026-02-19 |
+//! | Data | Synthetic pairs, sequences, gene clusters, codon pairs |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Local WGSL shaders: ANI batch, SNP calling, Pangenome classify, dN/dS batch (Nei-Gojobori).
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{
@@ -21,6 +34,7 @@ use wetspring_barracuda::bio::{
     snp_gpu::SnpGpu,
 };
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
@@ -380,12 +394,27 @@ fn validate_dnds_gpu(gpu: &DnDsGpu, v: &mut Validator, timings: &mut Vec<(&str, 
         Ok(Ok(gpu_result)) => {
             // Pair 0: identical → dN=0, dS=0
             let cpu0 = cpu_results[0].as_ref().unwrap();
-            v.check("dN/dS GPU: identical dN=0", gpu_result.dn[0], cpu0.dn, 1e-6);
-            v.check("dN/dS GPU: identical dS=0", gpu_result.ds[0], cpu0.ds, 1e-6);
+            v.check(
+                "dN/dS GPU: identical dN=0",
+                gpu_result.dn[0],
+                cpu0.dn,
+                tolerances::GPU_VS_CPU_F64,
+            );
+            v.check(
+                "dN/dS GPU: identical dS=0",
+                gpu_result.ds[0],
+                cpu0.ds,
+                tolerances::GPU_VS_CPU_F64,
+            );
 
             // Pair 1: synonymous only → dS>0, dN=0
             let cpu1 = cpu_results[1].as_ref().unwrap();
-            v.check("dN/dS GPU: syn-only dN=0", gpu_result.dn[1], cpu1.dn, 1e-6);
+            v.check(
+                "dN/dS GPU: syn-only dN=0",
+                gpu_result.dn[1],
+                cpu1.dn,
+                tolerances::GPU_VS_CPU_F64,
+            );
             v.check(
                 "dN/dS GPU: syn-only dS>0",
                 f64::from(u8::from(gpu_result.ds[1] > 0.0)),

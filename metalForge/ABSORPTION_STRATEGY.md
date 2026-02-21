@@ -1,7 +1,8 @@
 # Absorption Strategy: wetSpring → ToadStool
 
-**Date:** February 20, 2026
+**Date:** February 21, 2026
 **Pattern:** Write → Absorb → Lean (from hotSpring)
+**Status:** 5 absorbed, 9 Tier A handoff candidates, 4 barracuda CPU math opportunities
 
 ---
 
@@ -138,6 +139,31 @@ SoA layout: separate node_features, node_thresholds (f64), node_children buffers
 | K-mer counting | GPU hash table (lock-free) | P3 | Blocked |
 | UniFrac traversal | GPU tree traversal primitive | P3 | Blocked |
 | Taxonomy FC model | Naive Bayes → int8 FC → NPU | P3 | NPU candidate |
+
+---
+
+## BarraCUDA CPU Math Evolution
+
+wetSpring maintains local implementations of 4 math functions that barracuda
+already provides. These should switch to barracuda when a `math` feature
+(CPU-only, no wgpu) is available:
+
+| Local Implementation | File | Lines | BarraCUDA Primitive | Impact |
+|---------------------|------|:-----:|---------------------|--------|
+| `erf()`, `normal_cdf()` | `bio/pangenome.rs` | 218–236 | `barracuda::special::erf` | Pangenome FDR |
+| `ln_gamma()` | `bio/dada2.rs` | 431–453 | `barracuda::special::ln_gamma` | DADA2 Poisson p-value |
+| `regularized_gamma_lower()` | `bio/dada2.rs` | 399–427 | `barracuda::special::regularized_gamma_p` | DADA2 Poisson p-value |
+| `integrate_peak()` | `bio/eic.rs` | 165–176 | `barracuda::numerical::trapz` | LC-MS peak area |
+
+**Why not now?** `barracuda` currently requires wgpu + akida-driver + toadstool-core
+as mandatory dependencies. Importing it for CPU math would force GPU/NPU stack into
+all builds. hotSpring accepts this (always-GPU). wetSpring keeps barracuda optional
+(`--features gpu`) until barracuda adds a granular `math` feature.
+
+**Proposal for ToadStool:** Add `[features] math = []` to barracuda crate that
+gates `numerical`, `special`, `stats`, `optimize`, `sample` modules without
+pulling in wgpu/akida/toadstool-core. This enables Springs to lean on shared
+CPU math without forcing GPU stack.
 
 ---
 

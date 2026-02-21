@@ -109,7 +109,7 @@ pub fn neighbor_joining(dist: &[f64], labels: &[String]) -> NjResult {
         let mut best_pair = (active[0], active[1]);
         for (ai, &i) in active.iter().enumerate() {
             for &j in &active[(ai + 1)..] {
-                let q = (r - 2.0) * d[i * max_nodes + j] - row_sums[i] - row_sums[j];
+                let q = (r - 2.0).mul_add(d[i * max_nodes + j], -row_sums[i]) - row_sums[j];
                 if q < best_q {
                     best_q = q;
                     best_pair = (i, j);

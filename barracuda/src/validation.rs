@@ -43,6 +43,15 @@ pub fn check(label: &str, actual: f64, expected: f64, tolerance: f64) -> bool {
 ///
 /// Prints a formatted `[OK]` or `[FAIL]` line and returns whether
 /// the check passed.
+///
+/// # Examples
+///
+/// ```
+/// use wetspring_barracuda::validation::check_count;
+///
+/// assert!(check_count("record count", 42, 42));
+/// assert!(!check_count("mismatched", 10, 20));
+/// ```
 #[must_use]
 pub fn check_count(label: &str, actual: usize, expected: usize) -> bool {
     let pass = actual == expected;
@@ -82,16 +91,40 @@ pub fn exit_skipped(reason: &str) -> ! {
     std::process::exit(2)
 }
 
+/// Resolve a data directory using env-var override or repo-relative default.
+///
+/// Checks `env_var` first (capability-based discovery at runtime), then
+/// falls back to `CARGO_MANIFEST_DIR/../{default_subpath}`.
+///
+/// ```text
+/// let dir = data_dir("WETSPRING_FASTQ_DIR", "data/validation/MiSeq_SOP");
+/// ```
+#[must_use]
+pub fn data_dir(env_var: &str, default_subpath: &str) -> std::path::PathBuf {
+    std::env::var(env_var).map_or_else(
+        |_| {
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("..")
+                .join(default_subpath)
+        },
+        std::path::PathBuf::from,
+    )
+}
+
 // ── Validator: structured check accumulator ───────────────────
 
 /// Accumulated validation state, removing manual pass/fail bookkeeping.
 ///
-/// ```text
-/// let mut v = Validator::new("FASTQ Validation");
-/// v.section("── F3D0_R1 ──");
-/// v.check("Shannon", 1.386, 4.0_f64.ln(), 1e-12);
-/// v.check_count("Sequences", 7793, 7793);
-/// v.finish();
+/// # Examples
+///
+/// ```
+/// use wetspring_barracuda::validation::Validator;
+///
+/// let mut v = Validator::new("doc-test");
+/// v.check("pi", std::f64::consts::PI, 3.14159, 1e-4);
+/// v.check_count("records", 10, 10);
+/// let (passed, total) = v.counts();
+/// assert_eq!((passed, total), (2, 2));
 /// ```
 pub struct Validator {
     name: String,
@@ -248,5 +281,23 @@ mod tests {
         v.check_count("count fail", 4, 5);
         v.check_count_u64("u64 ok", 100, 100);
         assert_eq!(v.counts(), (3, 5));
+    }
+
+    #[test]
+    fn data_dir_fallback_uses_manifest() {
+        let dir = data_dir("WETSPRING_NONEXISTENT_12345", "data/test");
+        let s = dir.to_string_lossy();
+        assert!(s.contains("data/test"), "path should contain subpath");
+    }
+
+    #[test]
+    fn data_dir_env_override() {
+        let key = "WETSPRING_TEST_DATA_DIR_UNIT";
+        // SAFETY: test-only env mutation; unique key avoids cross-test races.
+        unsafe { std::env::set_var(key, "/tmp/override") };
+        let dir = data_dir(key, "data/default");
+        assert_eq!(dir, std::path::PathBuf::from("/tmp/override"));
+        // SAFETY: cleanup matching the set_var above.
+        unsafe { std::env::remove_var(key) };
     }
 }

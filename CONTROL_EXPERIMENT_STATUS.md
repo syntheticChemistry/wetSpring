@@ -1,6 +1,6 @@
 # wetSpring Control Experiment Status
 
-**Date:** February 20, 2026
+**Date:** February 21, 2026
 **Status:** 63 experiments, 1501 validation checks, all PASS
 
 ---
@@ -83,7 +83,7 @@
 | CPU validation checks | 1,241 |
 | GPU validation checks | 260 |
 | **Total validation checks** | **1,501** |
-| Rust tests | 524 lib + 58 integration/bin/doc |
+| Rust tests | 539 lib + 13 doc-tests (552 total) |
 | BarraCUDA CPU parity | 157/157 (25 domains) |
 | ToadStool primitives consumed | 15 (11 original + 4 bio) |
 
@@ -133,25 +133,15 @@
 
 ## Remaining Work
 
-### Exp019 Phases 2-4 (Phylogenetic) — COMPLETE
-- Phase 1 (Newick parsing): COMPLETE — 30/30 checks (Exp019)
-- Phase 2 (Gene tree RF distances): COMPLETE — 15/15 checks (Exp036)
-- Phase 3 (PhyloNet-HMM introgression): COMPLETE — 10/10 checks (Exp037)
-- Phase 4 (SATe 16S alignment): COMPLETE — 17/17 checks (Exp038)
-
-### Exp008 Full ML Pipeline — COMPLETE
-- Phase 3 (Decision tree inference): COMPLETE — 7/7 checks, 100% parity
-- Phase 4 (Random Forest ensemble): COMPLETE — Exp061, 13/13 checks
-- Phase 5 (GBM binary + multi-class): COMPLETE — Exp062, 16/16 checks
-- GPU RF batch inference: COMPLETE — Exp063, 13/13 checks
-
 ### Data Audit
 - Exp002 raw data: need to download 70 raw FASTQ pairs from SRA
 - Trimmomatic/pyteomics baselines: deferred (not blocking)
 
-### Tolerance Centralization
-- Many validation binaries use inline tolerances
-- Deferred: refactor to use `tolerances.rs` constants throughout
+### Completed (Previously Remaining)
+- Exp019 Phases 2-4 (Phylogenetic): All COMPLETE
+- Exp008 Full ML Pipeline: All COMPLETE
+- Tolerance centralization: **DONE** — all inline literals replaced with 22 named
+  constants in `tolerances.rs` (Feb 21, 2026)
 
 ---
 
@@ -185,19 +175,24 @@ matching. Exp008 adds sovereign ML for environmental monitoring.
 
 ---
 
-## Linting Status
+## Code Quality (Feb 21, 2026)
 
 ```
-cargo fmt --check      → clean
-cargo clippy --pedantic → 0 errors, 0 warnings
-cargo doc --no-deps    → clean
-cargo test             → 582 passed, 0 failed
-validations            → 36/36 binaries PASS (29 CPU + 12 GPU + 1 benchmark)
-barracuda_cpu          → 157/157 checks PASS (25 domains)
-barracuda_gpu          → 260 GPU checks PASS (12 binaries)
-toadstool_bio          → 10/10 checks PASS (4 new bio primitives)
-gpu_track1c            → 27/27 checks PASS (4 Track 1c WGSL shaders)
-gpu_rf                 → 13/13 checks PASS (1 local WGSL shader)
+cargo fmt --check              → clean (0 diffs)
+cargo clippy --pedantic        → 0 warnings (pedantic + nursery enforced crate-wide)
+cargo doc --no-deps            → clean (0 warnings)
+cargo test --lib               → 539 passed, 0 failed, 1 ignored (hardware-dependent)
+cargo test --doc               → 13 passed, 0 failed
+cargo llvm-cov --lib           → 93.5% line coverage
+unsafe in production           → 0
+.unwrap() in production        → 0
+inline tolerance literals      → 0 (22 named constants in tolerances.rs)
+SPDX headers                   → all .rs files
+max file size                  → all under 1000 LOC
+external C dependencies        → 0 (flate2 uses rust_backend)
+provenance headers             → all 61 binaries
+barracuda_cpu                  → 157/157 checks PASS (25 domains)
+barracuda_gpu                  → 260 GPU checks PASS
 ```
 
 ## BarraCUDA CPU Parity
@@ -215,3 +210,25 @@ Combined: 157/157 CPU parity checks. This is the bridge to pure GPU execution.
 ```
 Total CPU time: ~85ms (release build, all 25 domains, v4 adds ~0.4ms, v5 adds ~62µs)
 ```
+
+## ToadStool Evolution (Feb 21, 2026)
+
+### Write → Absorb → Lean Status
+
+Following hotSpring's pattern for ToadStool integration:
+
+| Phase | Count | Status |
+|-------|:-----:|--------|
+| **Lean** (consumed upstream) | 11 GPU modules, 15 primitives | Active — SW, Gillespie, DT, Felsenstein, diversity, PCoA |
+| **Write** (local WGSL, validated) | 9 shaders, 155 GPU checks | Handoff submitted (`wateringHole/handoffs/`) |
+| **CPU math** (barracuda overlap) | 4 functions (erf, ln_gamma, trapz) | Blocked on `barracuda::math` feature proposal |
+| **CPU-only** (no GPU path) | 15 modules | Stable — chimera, derep, kmer, GBM, etc. |
+| **Blocked** (needs upstream) | 3 modules | kmer hash, UniFrac tree traversal, taxonomy NPU |
+
+### Handoff Document
+
+Active handoff: `wateringHole/handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md`
+
+Contains binding layouts, dispatch geometry, CPU reference functions, and validation
+counts for all 9 Tier A WGSL shaders. Also includes naga/NVVM driver profile fix
+proposal and `barracuda::math` feature proposal for CPU-only math imports.

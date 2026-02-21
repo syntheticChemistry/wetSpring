@@ -15,6 +15,7 @@
 //! between consecutive timepoints, and Z-score anomaly detection.
 
 use wetspring_barracuda::bio::diversity::{bray_curtis, shannon};
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn rolling_zscore(values: &[f64], window: usize) -> Vec<f64> {
@@ -43,7 +44,7 @@ fn main() {
         "Shannon(uniform,4)",
         shannon(&uniform_4),
         4.0_f64.ln(),
-        1e-10,
+        tolerances::PYTHON_PARITY,
     );
 
     let dominant = vec![90.0, 5.0, 3.0, 2.0];
@@ -55,7 +56,12 @@ fn main() {
     v.section("── Bray-Curtis between consecutive timepoints ──");
     let s1 = vec![50.0, 30.0, 20.0];
     let s2 = vec![50.0, 30.0, 20.0];
-    v.check("BC(identical)", bray_curtis(&s1, &s2), 0.0, 1e-10);
+    v.check(
+        "BC(identical)",
+        bray_curtis(&s1, &s2),
+        0.0,
+        tolerances::PYTHON_PARITY,
+    );
 
     let s3 = vec![100.0, 0.1, 0.1];
     let bc_shift = bray_curtis(&s1, &s3);
@@ -65,13 +71,17 @@ fn main() {
     // ── Section 3: Anomaly detection via Z-score ───────────────
     v.section("── Z-score anomaly detection ──");
     // Use slight variation so std > 0, then inject a strong anomaly
-    let mut anomaly_vals: Vec<f64> = (0..30).map(|i| 3.0 + 0.01 * f64::from(i)).collect();
+    let mut anomaly_vals: Vec<f64> = (0..30)
+        .map(|i| 0.01f64.mul_add(f64::from(i), 3.0))
+        .collect();
     anomaly_vals[20] = 0.5;
     let zscores = rolling_zscore(&anomaly_vals, 5);
     let has_spike = zscores[20..].iter().any(|&z| z.abs() > 2.0);
     v.check_count("Z-score detects anomaly", usize::from(has_spike), 1);
 
-    let stable: Vec<f64> = (0..30).map(|i| 3.0 + 0.001 * f64::from(i)).collect();
+    let stable: Vec<f64> = (0..30)
+        .map(|i| 0.001f64.mul_add(f64::from(i), 3.0))
+        .collect();
     let z_stable = rolling_zscore(&stable, 5);
     let no_spike = z_stable[5..].iter().all(|&z| z.abs() < 3.0);
     v.check_count("stable series: no large anomaly", usize::from(no_spike), 1);
@@ -80,7 +90,7 @@ fn main() {
     v.section("── Shannon time series ──");
     let communities: Vec<Vec<f64>> = (0..20)
         .map(|t| {
-            let base = 50.0 + 10.0 * (f64::from(t) * 0.3).sin();
+            let base = 10.0f64.mul_add((f64::from(t) * 0.3).sin(), 50.0);
             vec![base, 100.0 - base, 30.0, 20.0]
         })
         .collect();
@@ -92,7 +102,9 @@ fn main() {
 
     // ── Section 5: Crash detection scenario ────────────────────
     v.section("── Crash detection ──");
-    let mut crash_ts: Vec<f64> = (0..50).map(|i| 3.0 + 0.01 * f64::from(i)).collect();
+    let mut crash_ts: Vec<f64> = (0..50)
+        .map(|i| 0.01f64.mul_add(f64::from(i), 3.0))
+        .collect();
     crash_ts[35] = 0.5; // simulate pond crash
     let z_crash = rolling_zscore(&crash_ts, 5);
     let crash_detected = z_crash[35].abs() > 2.0;

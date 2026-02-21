@@ -436,7 +436,12 @@ fn validate_spectral_match(gpu: &GpuF64, v: &mut Validator) {
         let gpu_scores =
             spectral_match_gpu::cosine_vs_library_gpu(gpu, &query, &refs).expect("GPU vs library");
 
-        v.check("Library match: identical", gpu_scores[0], 1.0, 1e-6);
+        v.check(
+            "Library match: identical",
+            gpu_scores[0],
+            1.0,
+            tolerances::GPU_VS_CPU_F64,
+        );
         v.check(
             "Library match: reversed < 1",
             f64::from(u8::from(gpu_scores[1] < 1.0)),
@@ -460,9 +465,24 @@ fn validate_stats_gpu(v: &mut Validator, gpu: &GpuF64) {
     let gpu_sample_var = stats_gpu::sample_variance_gpu(gpu, &data).expect("sample variance GPU");
     let gpu_std = stats_gpu::std_dev_gpu(gpu, &data).expect("std dev GPU");
 
-    v.check("Population variance", gpu_var, cpu_var, 1e-10);
-    v.check("Sample variance", gpu_sample_var, cpu_sample_var, 1e-10);
-    v.check("Sample std dev", gpu_std, cpu_std, 1e-10);
+    v.check(
+        "Population variance",
+        gpu_var,
+        cpu_var,
+        tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+    );
+    v.check(
+        "Sample variance",
+        gpu_sample_var,
+        cpu_sample_var,
+        tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+    );
+    v.check(
+        "Sample std dev",
+        gpu_std,
+        cpu_std,
+        tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+    );
 
     let x = vec![1.0, 2.0, 3.0, 4.0, 5.0];
     let y = vec![2.0, 4.0, 5.0, 4.0, 5.0];
@@ -484,8 +504,18 @@ fn validate_stats_gpu(v: &mut Validator, gpu: &GpuF64) {
     let gpu_cov = stats_gpu::covariance_gpu(gpu, &x, &y).expect("covariance GPU");
     let gpu_corr = stats_gpu::correlation_gpu(gpu, &x, &y).expect("correlation GPU");
 
-    v.check("Sample covariance", gpu_cov, cpu_cov, 1e-10);
-    v.check("Pearson correlation", gpu_corr, cpu_corr, 1e-10);
+    v.check(
+        "Sample covariance",
+        gpu_cov,
+        cpu_cov,
+        tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+    );
+    v.check(
+        "Pearson correlation",
+        gpu_corr,
+        cpu_corr,
+        tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+    );
 
     let w = vec![1.0, 2.0, 3.0, 4.0, 5.0];
     let a = vec![1.0, 0.0, 1.0, 0.0, 1.0];
@@ -496,11 +526,21 @@ fn validate_stats_gpu(v: &mut Validator, gpu: &GpuF64) {
         .map(|(&wi, (&ai, &bi))| wi * ai * bi)
         .sum();
     let gpu_wdot = stats_gpu::weighted_dot_gpu(gpu, &w, &a, &b).expect("weighted dot GPU");
-    v.check("Weighted dot product", gpu_wdot, cpu_wdot, 1e-10);
+    v.check(
+        "Weighted dot product",
+        gpu_wdot,
+        cpu_wdot,
+        tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+    );
 
     let cpu_dot: f64 = x.iter().zip(y.iter()).map(|(&xi, &yi)| xi * yi).sum();
     let gpu_dot = stats_gpu::dot_gpu(gpu, &x, &y).expect("dot GPU");
-    v.check("Dot product", gpu_dot, cpu_dot, 1e-10);
+    v.check(
+        "Dot product",
+        gpu_dot,
+        cpu_dot,
+        tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+    );
 }
 
 fn euclidean_dist(a: &[f64], b: &[f64]) -> f64 {

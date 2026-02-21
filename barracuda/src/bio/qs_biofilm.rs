@@ -29,28 +29,41 @@ use super::ode::{rk4_integrate, OdeResult};
 /// Default values are from the literature (see module-level references).
 #[derive(Debug, Clone)]
 pub struct QsBiofilmParams {
-    // Cell growth
+    /// Maximum growth rate (h⁻¹). Logistic term uses `1 - N/K`.
     pub mu_max: f64,
+    /// Carrying capacity (OD-equivalent). Cell density caps at this value.
     pub k_cap: f64,
+    /// Cell death rate (h⁻¹).
     pub death_rate: f64,
-    // Autoinducer
+    /// Autoinducer (CAI-1/AI-2) production rate per cell.
     pub k_ai_prod: f64,
+    /// Autoinducer degradation/dilution rate.
     pub d_ai: f64,
-    // HapR
+    /// Max `HapR` production rate. Activated by AI via Hill function.
     pub k_hapr_max: f64,
+    /// Half-saturation for AI activation of `HapR`.
     pub k_hapr_ai: f64,
+    /// Hill coefficient for `HapR` activation by AI.
     pub n_hapr: f64,
+    /// `HapR` degradation rate. Represses DGC, activates PDE.
     pub d_hapr: f64,
-    // c-di-GMP
+    /// Basal diguanylate cyclase activity. Produces c-di-GMP.
     pub k_dgc_basal: f64,
+    /// DGC repression factor by `HapR`.
     pub k_dgc_rep: f64,
+    /// Basal phosphodiesterase activity. Degrades c-di-GMP.
     pub k_pde_basal: f64,
+    /// PDE activation by `HapR`. High QS → dispersal.
     pub k_pde_act: f64,
+    /// c-di-GMP turnover/dilution rate.
     pub d_cdg: f64,
-    // Biofilm
+    /// Maximum biofilm promotion rate. Hill-saturated by c-di-GMP.
     pub k_bio_max: f64,
+    /// Half-saturation for c-di-GMP activation of biofilm.
     pub k_bio_cdg: f64,
+    /// Hill coefficient for biofilm promotion.
     pub n_bio: f64,
+    /// Biofilm loss (dispersal) rate.
     pub d_bio: f64,
 }
 

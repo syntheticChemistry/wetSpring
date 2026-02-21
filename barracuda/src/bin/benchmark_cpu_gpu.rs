@@ -11,6 +11,17 @@
 //!
 //! Run: `cargo run --release --features gpu --bin benchmark_cpu_gpu`
 //!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | timing harness |
+//! | Baseline version | N/A (performance measurement, not correctness) |
+//! | Baseline command | cargo run --release --features gpu --bin benchmark_cpu_gpu |
+//! | Baseline date | 2026-02-19 |
+//! | Data | synthetic counts, diversity/spectral workloads |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
 //! # Workloads (grouped by parallelism type)
 //!
 //! ## Single-vector (GPU overhead vs data size)

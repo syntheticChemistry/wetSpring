@@ -5,6 +5,19 @@
 //! Validates the local WGSL shader for batch RF inference against
 //! CPU majority-vote results. Proves that ensemble ML inference
 //! is portable to GPU.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | BarraCUDA CPU (reference) |
+//! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
+//! | Baseline command | RandomForest::predict_batch_with_votes |
+//! | Baseline date | 2026-02-19 |
+//! | Data | 6 samples × 5-tree forest (same as CPU v5) |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Local WGSL shader: batch RF inference (RandomForestGpu).
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{

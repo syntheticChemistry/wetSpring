@@ -5,6 +5,7 @@
 **To:** ToadStool / BarraCUDA core team
 **License:** AGPL-3.0-or-later
 **Supersedes:** All prior handoffs (v1–v4, archived in `archive/handoffs/`)
+**Supplemented by:** `wateringHole/handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md`
 **ToadStool reviewed:** barracuda v0.2.0 at commit cce8fe7c (bio absorption confirmed)
 
 ---
@@ -25,8 +26,9 @@ life science, analytical chemistry, and environmental monitoring workloads.
 5. **GPU RF batch inference** — SoA WGSL shader, 13/13 GPU checks (Exp063)
 6. **Total local WGSL shaders** increased from 4 to **9**, all validated
 
-**wetSpring totals:** 1,501 validation checks (1,241 CPU + 260 GPU), 582 tests,
-63 experiments, 36 validation binaries, 25 CPU domains, 9 local WGSL shaders
+**wetSpring totals:** 1,501 validation checks (1,241 CPU + 260 GPU), 552 tests
+(539 lib + 13 doc), 93.5% line coverage, 63 experiments, 61 binaries,
+25 CPU domains, 9 local WGSL shaders
 
 ---
 
@@ -135,10 +137,10 @@ This validates the metalForge thesis: **math is substrate-independent**.
 | CPU checks | 1,035 | **1,241** |
 | GPU checks | 222 | **260** |
 | Total checks | 1,257 | **1,501** |
-| Tests | 465 | **582** |
+| Tests | 465 | **552** |
 | CPU domains | 18 | **25** |
 | Local WGSL shaders | 4 | **9** |
-| Binaries | 35 | **36** |
+| Binaries | 35 | **61** |
 
 ---
 
@@ -164,7 +166,7 @@ This validates the metalForge thesis: **math is substrate-independent**.
 ```bash
 cd barracuda
 
-# Full test suite (582 tests)
+# Full test suite (552 tests)
 cargo test
 
 # All CPU validation binaries (1,241 checks)

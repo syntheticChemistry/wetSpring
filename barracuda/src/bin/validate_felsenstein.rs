@@ -12,6 +12,7 @@
 use wetspring_barracuda::bio::felsenstein::{
     encode_dna, jc69_prob, log_likelihood, site_log_likelihoods, transition_matrix, TreeNode,
 };
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 const TOL: f64 = 1e-8;
@@ -90,8 +91,18 @@ fn main() {
 
     // ── JC69 transition model ───────────────────────────────────────
     v.section("── JC69 transition probabilities ──");
-    v.check("P(same, t=0) = 1", jc69_prob(0, 0, 0.0, 1.0), 1.0, 1e-12);
-    v.check("P(diff, t=0) = 0", jc69_prob(0, 1, 0.0, 1.0), 0.0, 1e-12);
+    v.check(
+        "P(same, t=0) = 1",
+        jc69_prob(0, 0, 0.0, 1.0),
+        1.0,
+        tolerances::ANALYTICAL_F64,
+    );
+    v.check(
+        "P(diff, t=0) = 0",
+        jc69_prob(0, 1, 0.0, 1.0),
+        0.0,
+        tolerances::ANALYTICAL_F64,
+    );
     v.check(
         "P(same, t=∞) = 0.25",
         jc69_prob(0, 0, 1000.0, 1.0),
@@ -102,7 +113,12 @@ fn main() {
     let mat = transition_matrix(0.5, 1.0);
     for (i, row) in mat.iter().enumerate() {
         let sum: f64 = row.iter().sum();
-        v.check(&format!("Row {i} sums to 1"), sum, 1.0, 1e-12);
+        v.check(
+            &format!("Row {i} sums to 1"),
+            sum,
+            1.0,
+            tolerances::ANALYTICAL_F64,
+        );
     }
 
     // ── Identical sequences tree ────────────────────────────────────
@@ -111,7 +127,12 @@ fn main() {
     let ll = log_likelihood(&tree, 1.0);
     v.check("LL matches Python", ll, -8.144_952_041_080_28, TOL);
     let sll = site_log_likelihoods(&tree, 1.0);
-    v.check("Per-site sum = total", sll.iter().sum::<f64>(), ll, 1e-12);
+    v.check(
+        "Per-site sum = total",
+        sll.iter().sum::<f64>(),
+        ll,
+        tolerances::ANALYTICAL_F64,
+    );
 
     // ── Different sequences tree ────────────────────────────────────
     v.section("── Different sequences (AAAA, CCCC, GGGG) ──");

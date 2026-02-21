@@ -12,6 +12,19 @@
 //! ```text
 //! Python → CPU v1/v2/v3 → [THIS] GPU v3 → ToadStool sovereign
 //! ```
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | BarraCUDA CPU (reference) |
+//! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
+//! | Baseline command | bio::diversity, bio::spectral_match, CPU stats |
+//! | Baseline date | 2026-02-19 |
+//! | Data | Count vectors, Bray-Curtis matrices, spectra, variance/correlation |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! GPU modules: diversity_gpu (Pielou, Shannon, Simpson, Bray-Curtis), spectral_match_gpu, stats_gpu.
 
 use wetspring_barracuda::bio::{
     diversity, diversity_gpu, spectral_match, spectral_match_gpu, stats_gpu,

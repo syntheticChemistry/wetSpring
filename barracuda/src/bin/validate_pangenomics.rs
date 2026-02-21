@@ -17,6 +17,7 @@
 //! | Baseline date | 2026-02-20 |
 
 use wetspring_barracuda::bio::pangenome::{self, GeneCluster};
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn main() {
@@ -99,19 +100,21 @@ fn validate_heaps_law(v: &mut Validator) {
     );
 
     // Large open pangenome: many unique genes per genome
-    let mut open_clusters = Vec::new();
-    for i in 0..20 {
-        let mut presence = vec![false; 5];
-        if i < 3 {
-            presence = vec![true; 5]; // core
-        } else {
-            presence[i % 5] = true; // unique to one genome
-        }
-        open_clusters.push(GeneCluster {
-            id: format!("g{i}"),
-            presence,
-        });
-    }
+    let open_clusters: Vec<GeneCluster> = (0..20)
+        .map(|i| {
+            let presence = if i < 3 {
+                vec![true; 5] // core
+            } else {
+                let mut p = vec![false; 5];
+                p[i % 5] = true; // unique to one genome
+                p
+            };
+            GeneCluster {
+                id: format!("g{i}"),
+                presence,
+            }
+        })
+        .collect();
     let open_result = pangenome::analyze(&open_clusters, 5);
     v.check(
         "Open pangenome: unique > core",
@@ -190,10 +193,15 @@ fn validate_python_parity(v: &mut Validator) {
 
     let py_enriched = 3.263_440e-7;
     let rust_enriched = pangenome::hypergeometric_pvalue(8, 10, 20, 100);
-    v.check("Python: enriched p-value", rust_enriched, py_enriched, 1e-5);
+    v.check(
+        "Python: enriched p-value",
+        rust_enriched,
+        py_enriched,
+        tolerances::PYTHON_PVALUE,
+    );
 
     let pvals = [0.01, 0.04, 0.03, 0.5];
     let adj = pangenome::benjamini_hochberg(&pvals);
-    v.check("Python: BH adj[0]", adj[0], 0.04, 1e-10);
-    v.check("Python: BH adj[3]", adj[3], 0.5, 1e-10);
+    v.check("Python: BH adj[0]", adj[0], 0.04, tolerances::PYTHON_PARITY);
+    v.check("Python: BH adj[3]", adj[3], 0.5, tolerances::PYTHON_PARITY);
 }

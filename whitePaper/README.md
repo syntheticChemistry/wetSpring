@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
-**Date:** February 2026
-**Status:** Validation study complete — 1,501/1,501 checks, 582 tests, 63 experiments
+**Date:** February 21, 2026
+**Status:** Validation study complete — 1,501/1,501 checks, 552 tests, 93.5% coverage, 63 experiments
 **License:** AGPL-3.0-or-later
 
 ---
@@ -192,8 +192,8 @@ cross-substrate validated (Exp060: 20/20 CPU↔GPU parity).
 wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCUDA/ToadStool:
 
-- **hotSpring** — Nuclear physics, plasma, lattice QCD
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring
+- **hotSpring** — Nuclear physics, plasma, lattice QCD (34 WGSL shaders, 454 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (9 WGSL shaders, 552 tests)
 - **archive/handoffs/** — Fossil record of ToadStool handoffs (v1–v4)
 
 Springs follow the **Write → Absorb → Lean** pattern (pioneered by hotSpring):
@@ -201,6 +201,20 @@ write and validate locally, hand off to ToadStool for absorption, then lean on
 upstream primitives. This reduces dispatch overhead and round-trips via streaming
 pipeline composition. wetSpring's `metalForge/` directory characterizes available
 hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
+
+## Code Quality
+
+| Metric | Value |
+|--------|-------|
+| `cargo fmt --check` | Clean |
+| `cargo clippy --pedantic --nursery` | 0 warnings |
+| `cargo doc --no-deps` | 0 warnings |
+| Line coverage (`cargo-llvm-cov`) | **93.5%** |
+| `unsafe` in production | 0 |
+| `.unwrap()` in production | 0 |
+| Named tolerance constants | 22 (all scientifically justified) |
+| External C dependencies | 0 (`flate2` uses `rust_backend`) |
+| Max file size | All under 1000 LOC |
 
 ---
 

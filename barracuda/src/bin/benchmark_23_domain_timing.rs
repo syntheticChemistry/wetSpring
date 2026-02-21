@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Exp059: 23-Domain Head-to-Head Timing Benchmark
 //!
-//! Runs all 23 BarraCUDA CPU domains with wall-clock timing,
+//! Runs all 23 `BarraCUDA` CPU domains with wall-clock timing,
 //! matching the Python `benchmark_rust_vs_python.py` workloads
 //! for direct Rust vs Python comparison.
 //!
@@ -10,6 +10,17 @@
 //! cargo run --release --bin benchmark_23_domain_timing
 //! python3 scripts/benchmark_rust_vs_python.py
 //! ```
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | timing harness |
+//! | Baseline version | N/A (performance measurement, not correctness) |
+//! | Baseline command | cargo run --release --bin benchmark_23_domain_timing |
+//! | Baseline date | 2026-02-19 |
+//! | Data | 23 BarraCUDA domains, matches benchmark_rust_vs_python.py workloads |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{
@@ -119,8 +130,11 @@ fn main() {
     let t0 = Instant::now();
     let test_signal: Vec<f64> = (0..256)
         .map(|i| {
-            let x = i as f64 / 256.0;
-            (x * 2.0 * std::f64::consts::PI).sin() + 0.5 * (x * 4.0 * std::f64::consts::PI).sin()
+            let x = f64::from(i) / 256.0;
+            0.5f64.mul_add(
+                (x * 4.0 * std::f64::consts::PI).sin(),
+                (x * 2.0 * std::f64::consts::PI).sin(),
+            )
         })
         .collect();
     let _peaks = signal::find_peaks(&test_signal, &signal::PeakParams::default());

@@ -7,6 +7,17 @@
 //!
 //! Run: `cargo run --release --bin benchmark_pipeline`
 //!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | timing harness |
+//! | Baseline version | N/A (performance measurement, not correctness) |
+//! | Baseline command | `cargo run --release --bin benchmark_pipeline` |
+//! | Baseline date | 2026-02-19 |
+//! | Data | PRJNA1114688, PRJNA629095, PRJNA1178324, PRJNA516219 |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
 //! # Galaxy Reference Times (same hardware, Docker)
 //!
 //! | Experiment | Samples | Reads    | Total   | DADA2   | Taxonomy |
@@ -15,7 +26,7 @@
 //! | Exp002     | 10      | 820,548  | 95.6s   | 68.0s   | 9.5s     |
 
 use std::collections::HashMap;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::time::Instant;
 use wetspring_barracuda::bench::{
     self, BenchReport, EnergyReport, HardwareInventory, PhaseResult, PowerMonitor,
@@ -29,6 +40,7 @@ use wetspring_barracuda::bio::taxonomy::{
     ClassifyParams, Lineage, NaiveBayesClassifier, ReferenceSeq,
 };
 use wetspring_barracuda::io::fastq::FastqRecord;
+use wetspring_barracuda::validation;
 
 #[derive(Default)]
 struct TimingAccumulator {
@@ -81,14 +93,8 @@ fn main() {
     println!("║  wetSpring Pipeline Benchmark — Rust CPU vs Galaxy/QIIME2          ║");
     println!("╚══════════════════════════════════════════════════════════════════════╝\n");
 
-    let base = std::env::var("WETSPRING_PUBLIC_DIR").map_or_else(
-        |_| Path::new(env!("CARGO_MANIFEST_DIR")).join("../data/public_benchmarks"),
-        PathBuf::from,
-    );
-    let ref_dir = std::env::var("WETSPRING_REF_DIR").map_or_else(
-        |_| Path::new(env!("CARGO_MANIFEST_DIR")).join("../data/reference_dbs/silva_138"),
-        PathBuf::from,
-    );
+    let base = validation::data_dir("WETSPRING_PUBLIC_DIR", "data/public_benchmarks");
+    let ref_dir = validation::data_dir("WETSPRING_REF_DIR", "data/reference_dbs/silva_138");
 
     // ── Phase 1: SILVA classifier training (one-time cost) ──────────────
     println!("── Phase 1: SILVA 138.1 Classifier Training ─────────────────────");

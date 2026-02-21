@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-20 (Exp063: GPU Random Forest batch inference)
+**Updated**: 2026-02-21 (Phase 16: BarraCUDA Evolution + Absorption Readiness)
 
 ---
 
@@ -21,15 +21,15 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 006 | [PFΔScreen Validation](006_pfascreen_validation.md) | 2 | DONE | FindPFAS / pyOpenMS | bio::tolerance_search, bio::spectral_match, bio::kmd | 10 |
 | 007 | Rust mzML + PFAS | 2 | DONE | Exp005/006 baselines | io::mzml, io::ms2, bio::kmd, bio::spectral_match | — |
 | 008 | [PFAS ML Water Monitoring](008_pfas_ml_water_monitoring.md) | 2 | DONE (Phase 3) | Michigan DEQ PFAS surface water (3,719 records) | bio::decision_tree | 7 |
-| 009 | [Feature Pipeline](009_feature_pipeline_validation.md) | 2 | DONE | asari 1.13.1 (MT02) | bio::eic, bio::signal, bio::feature_table | 9 |
+| 009 | [Feature Pipeline](009_feature_pipeline_validation.md) | 2 | DONE | asari 1.13.1 (MT02) | bio::eic, bio::signal, bio::feature_table | 8 |
 | 010 | [Peak Detection](010_peak_detection_validation.md) | cross | DONE | scipy.signal.find_peaks | bio::signal | 17 |
 | 011 | 16S Pipeline End-to-End | 1 | DONE | DADA2/UCHIME/RDP/UniFrac | bio::dada2, bio::chimera, bio::taxonomy, bio::unifrac, bio::derep, bio::diversity | 37 |
-| 012 | [Algae Pond 16S](012_algae_pond_16s_validation.md) | 1 | DONE | PRJNA488170 (real NCBI data) | io::fastq, bio::quality, bio::derep, bio::dada2, bio::chimera, bio::taxonomy, bio::unifrac, bio::diversity | 29 |
+| 012 | [Algae Pond 16S](012_algae_pond_16s_validation.md) | 1 | DONE | PRJNA488170 (real NCBI data) | io::fastq, bio::quality, bio::derep, bio::dada2, bio::chimera, bio::taxonomy, bio::unifrac, bio::diversity | 34 |
 | 013 | [VOC Peak Validation](013_voc_peak_validation.md) | 1/cross | DONE | Reese 2019 Table 1 (PMC6761164) | bio::signal, bio::tolerance_search | 22 |
 | 014 | [Public Data Benchmarks](014_public_data_benchmarks.md) | 1 | DONE | 22 samples, 4 BioProjects vs paper ground truth | io::fastq, bio::quality, bio::derep, bio::dada2, bio::diversity | 202 |
 | 015 | [Pipeline Benchmark](015_pipeline_benchmark.md) | 1 | DONE | Rust CPU vs Galaxy/QIIME2 DADA2-R | — | Benchmark |
 | 016 | [GPU Pipeline Parity](016_gpu_pipeline_parity.md) | 1 | DONE | CPU vs GPU math parity (10 samples, 4 BioProjects) | bio::quality_gpu, bio::dada2_gpu, bio::chimera_gpu, bio::taxonomy_gpu, bio::diversity_gpu, bio::streaming_gpu | 88 |
-| 017 | [Extended Algae Validation](017_extended_algae_validation.md) | 1 | DONE | PRJNA382322 (Nannochloropsis outdoor pilot, 162K reads) | io::fastq, bio::quality, bio::derep, bio::dada2, bio::chimera, bio::taxonomy, bio::unifrac, bio::diversity | 29 |
+| 017 | [Extended Algae Validation](017_extended_algae_validation.md) | 1 | DONE | PRJNA382322 (Nannochloropsis outdoor pilot, 162K reads) | io::fastq, bio::quality, bio::derep, bio::dada2, bio::chimera, bio::taxonomy, bio::unifrac, bio::diversity | 35 |
 | 018 | [PFAS Library Validation](018_pfas_library_validation.md) | 2 | DONE | 175 PFAS (Jones Lab Zenodo 14341321) + 22 hardcoded | bio::tolerance_search, bio::spectral_match, bio::kmd | 26 |
 | 019 | [Phylogenetic Validation](019_phylogenetic_validation.md) | 1b | DONE (Phase 1) | PhyNetPy gene trees (1,284 Newick), SATe 16S (Dryad) | bio::unifrac (Newick parser), bio::robinson_foulds | 30 |
 | 020 | [Waters 2008 QS/c-di-GMP ODE](020_waters2008_qs_ode.md) | 1 | DONE | scipy.integrate.odeint baseline | bio::ode, bio::qs_biofilm | 16 |
@@ -147,17 +147,17 @@ thresholds from `src/tolerances.rs`.
 | `validate_diversity` | 001/004 | 27 | `cargo run --bin validate_diversity` |
 | `validate_mzml` | 005 | 7 | `cargo run --bin validate_mzml` |
 | `validate_pfas` | 006 | 10 | `cargo run --bin validate_pfas` |
-| `validate_features` | 009 | 9 | `cargo run --bin validate_features` |
+| `validate_features` | 009 | 8 | `cargo run --bin validate_features` |
 | `validate_peaks` | 010 | 17 | `cargo run --bin validate_peaks` |
 | `validate_diversity_gpu` | — | 38 | `cargo run --features gpu --bin validate_diversity_gpu` |
 | `validate_16s_pipeline` | 011 | 37 | `cargo run --bin validate_16s_pipeline` |
-| `validate_algae_16s` | 012 | 29 | `cargo run --bin validate_algae_16s` |
+| `validate_algae_16s` | 012 | 34 | `cargo run --bin validate_algae_16s` |
 | `validate_voc_peaks` | 013 | 22 | `cargo run --bin validate_voc_peaks` |
 | `validate_public_benchmarks` | 014 | 202 | `cargo run --bin validate_public_benchmarks` |
 | `benchmark_pipeline` | 015 | — | `cargo run --release --bin benchmark_pipeline` |
 | `validate_16s_pipeline_gpu` | 016 | 88 | `cargo run --features gpu --release --bin validate_16s_pipeline_gpu` |
-| `validate_extended_algae` | 017 | 29 | `cargo run --bin validate_extended_algae` |
-| `validate_pfas_library` | 018 | 21 | `cargo run --bin validate_pfas_library` |
+| `validate_extended_algae` | 017 | 35 | `cargo run --bin validate_extended_algae` |
+| `validate_pfas_library` | 018 | 26 | `cargo run --bin validate_pfas_library` |
 | `validate_newick_parse` | 019 | 30 | `cargo run --bin validate_newick_parse` |
 | `validate_qs_ode` | 020 | 16 | `cargo run --bin validate_qs_ode` |
 | `validate_rf_distance` | 021 | 23 | `cargo run --bin validate_rf_distance` |
@@ -175,15 +175,16 @@ thresholds from `src/tolerances.rs`.
 | `validate_pangenomics` | 056 | 24 | `cargo run --bin validate_pangenomics` |
 | `validate_barracuda_cpu_v4` | 057 | 44 | `cargo run --release --bin validate_barracuda_cpu_v4` |
 | `validate_gpu_track1c` | 058 | 27 | `cargo run --features gpu --bin validate_gpu_track1c` |
-| `validate_gpu_23_domain_benchmark` | 059 | 20 | `cargo run --features gpu --bin validate_gpu_23_domain_benchmark` |
-| `validate_gpu_cross_substrate` | 060 | skip | `cargo run --features gpu --bin validate_gpu_cross_substrate` |
+| `benchmark_23_domain_timing` | 059 | — | `cargo run --release --bin benchmark_23_domain_timing` |
+| `validate_cross_substrate` | 060 | 20 | `cargo run --features gpu --bin validate_cross_substrate` |
 | `validate_barracuda_cpu_v5` | 061-062 | 29 | `cargo run --release --bin validate_barracuda_cpu_v5` |
 | `validate_gpu_rf` | 063 | 13 | `cargo run --features gpu --bin validate_gpu_rf` |
 | `benchmark_cpu_gpu` | — | — | `cargo run --release --features gpu --bin benchmark_cpu_gpu` |
 
 **Total validation checks**: 1,501 (1,241 CPU + 260 GPU)
-**Rust unit/integration tests**: 582 lib + integration + doc
-**Validation binaries**: 29 CPU + 12 GPU
+**Rust tests**: 552 (539 lib + 13 doc)
+**Binaries**: 47 CPU + 10 GPU + 4 benchmark = 61 total
+**Line coverage**: 93.5% (`cargo-llvm-cov`)
 **Benchmark infrastructure**: `bench.rs` harness with RAPL + nvidia-smi energy profiling, JSON output
 
 ---

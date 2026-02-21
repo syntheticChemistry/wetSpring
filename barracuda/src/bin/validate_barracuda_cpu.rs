@@ -17,6 +17,17 @@
 //! 8. **Game theory** — Cooperation ODE
 //! 9. **Tree distance** — Robinson-Foulds
 //!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | scipy.odeint, numpy, dendropy, pure Python (per-domain scripts) |
+//! | Baseline version | Feb 2026 |
+//! | Baseline command | `python3 scripts/benchmark_rust_vs_python.py` (domains 1–9); per-domain: `waters2008_qs_ode.py`, `gillespie_baseline.py`, `liu2014_hmm_baseline.py`, `smith_waterman_baseline.py`, `felsenstein_pruning_baseline.py`, `bruger2018_cooperation.py`, `rf_distance_baseline.py` |
+//! | Baseline date | 2026-02-19 |
+//! | Data | Synthetic test vectors (hardcoded) |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
 //! # Evolution path
 //!
 //! ```text
@@ -28,6 +39,7 @@ use wetspring_barracuda::bio::{
     alignment, bistable, capacitor, cooperation, diversity, felsenstein, gillespie, hmm, ode,
     qs_biofilm, robinson_foulds, signal, unifrac::PhyloTree,
 };
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 #[allow(clippy::too_many_lines)]
@@ -166,7 +178,12 @@ fn main() {
         let sum: f64 = posterior[t_idx * n_states..(t_idx + 1) * n_states]
             .iter()
             .sum();
-        v.check(&format!("Posterior t={t_idx} sums to 1"), sum, 1.0, 1e-10);
+        v.check(
+            &format!("Posterior t={t_idx} sums to 1"),
+            sum,
+            1.0,
+            tolerances::PYTHON_PARITY,
+        );
     }
     #[allow(clippy::cast_precision_loss)]
     {
@@ -257,7 +274,12 @@ fn main() {
     let sh = diversity::shannon(counts);
     let si = diversity::simpson(counts);
     let div_us = t0.elapsed().as_micros();
-    v.check("Shannon (5 OTUs)", sh, 1.544_479_521_096_86, 1e-10);
+    v.check(
+        "Shannon (5 OTUs)",
+        sh,
+        1.544_479_521_096_86,
+        tolerances::PYTHON_PARITY,
+    );
     v.check("Simpson (5 OTUs, 1-D)", si, 0.775, 0.001);
     #[allow(clippy::cast_precision_loss)]
     {

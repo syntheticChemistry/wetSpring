@@ -163,7 +163,12 @@ fn validate_python_parity(v: &mut Validator) {
     let py_rate = 1.480_000_000_000e-4;
     let result = molecular_clock::strict_clock(&branch_lengths, &parents, 2500.0, &[]).unwrap();
 
-    v.check("Python: clock rate", result.rate, py_rate, 1e-14);
+    v.check(
+        "Python: clock rate",
+        result.rate,
+        py_rate,
+        tolerances::PYTHON_PARITY_TIGHT,
+    );
     v.check(
         "Python: root age",
         result.node_ages[0],

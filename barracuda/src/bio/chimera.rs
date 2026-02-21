@@ -497,4 +497,35 @@ mod tests {
         let (results, _) = detect_chimeras(&asvs, &params);
         assert!(!results[2].is_chimera);
     }
+
+    #[test]
+    fn default_params_values() {
+        let p = ChimeraParams::default();
+        assert!((p.min_score - DEFAULT_MIN_SCORE).abs() < f64::EPSILON);
+        assert!((p.min_parent_fold - DEFAULT_MIN_PARENT_ABUNDANCE).abs() < f64::EPSILON);
+        assert_eq!(p.min_diffs, MIN_SEGMENT_LEN);
+    }
+
+    #[test]
+    fn high_min_score_suppresses_detection() {
+        let parent_a = b"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+        let parent_b = b"CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC";
+        let chimera = b"AAAAAAAAAAAAAAAAAAAACCCCCCCCCCCCCCCCCCCC";
+
+        let asvs = vec![
+            make_asv(parent_a, 1000),
+            make_asv(parent_b, 1000),
+            make_asv(chimera, 10),
+        ];
+
+        let strict = ChimeraParams {
+            min_score: 100.0,
+            ..ChimeraParams::default()
+        };
+        let (results, _) = detect_chimeras(&asvs, &strict);
+        assert!(
+            !results[2].is_chimera,
+            "high min_score should suppress detection"
+        );
+    }
 }

@@ -134,7 +134,9 @@ pub fn forward(model: &HmmModel, observations: &[usize]) -> ForwardResult {
 pub struct BackwardResult {
     /// Log-backward variables: `beta[t][i]` = `log P(o_{t+1}..o_T | q_t = i)`.
     pub log_beta: Vec<f64>,
+    /// Number of observation time steps.
     pub n_steps: usize,
+    /// Number of hidden states.
     pub n_states: usize,
 }
 

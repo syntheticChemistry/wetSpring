@@ -3,6 +3,17 @@
 //!
 //! Validates Rust DTL reconciliation against Python baseline
 //! (Zheng et al. 2023, Bansal et al. 2012).
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | zheng2023_dtl_reconciliation.py |
+//! | Baseline version | scripts/ |
+//! | Baseline command | python3 scripts/zheng2023_dtl_reconciliation.py |
+//! | Baseline date | 2026-02-19 |
+//! | Data | synthetic host/parasite trees |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::bio::reconciliation::{
     reconcile_batch, reconcile_dtl, DtlCosts, DtlEvent, FlatRecTree,

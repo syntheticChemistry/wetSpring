@@ -19,17 +19,14 @@
 //! - m/z range ~80–1000, 64-bit float + zlib compressed
 //! - ~6M total decoded peaks
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use wetspring_barracuda::io::mzml;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{self, Validator};
 
 fn main() {
     let mut v = Validator::new("wetSpring mzML Parser Validation");
 
-    let data_dir = std::env::var("WETSPRING_MZML_DIR").map_or_else(
-        |_| Path::new(env!("CARGO_MANIFEST_DIR")).join("../data/exp005_asari/MT02/MT02Dataset"),
-        PathBuf::from,
-    );
+    let data_dir = validation::data_dir("WETSPRING_MZML_DIR", "data/exp005_asari/MT02/MT02Dataset");
 
     // Collect all mzML files
     let mut mzml_files: Vec<_> = match std::fs::read_dir(&data_dir) {

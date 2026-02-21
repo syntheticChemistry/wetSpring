@@ -16,6 +16,7 @@
 //! mass spectra, matching Python baseline exactly.
 
 use wetspring_barracuda::bio::spectral_match::cosine_similarity;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn main() {
@@ -46,12 +47,22 @@ fn main() {
     // ── Section 1: Self-match ───────────────────────────────────
     v.section("── Self-match (cosine = 1.0) ──");
     let cs_self = cosine_similarity(&pfos_mz, &pfos_int, &pfos_mz, &pfos_int, tol).score;
-    v.check("cosine(PFOS, PFOS)", cs_self, 1.0, 1e-10);
+    v.check(
+        "cosine(PFOS, PFOS)",
+        cs_self,
+        1.0,
+        tolerances::PYTHON_PARITY,
+    );
 
     // ── Section 2: Near-match ───────────────────────────────────
     v.section("── Near-match (instrument variation) ──");
     let cs_near = cosine_similarity(&pfos_mz, &pfos_int, &shifted_mz, &shifted_int, tol).score;
-    v.check("cosine(PFOS, shifted)", cs_near, 0.999_662, 1e-3);
+    v.check(
+        "cosine(PFOS, shifted)",
+        cs_near,
+        0.999_662,
+        tolerances::SPECTRAL_COSINE,
+    );
     let near_high = cs_near > 0.99;
     v.check_count("near_match > 0.99", usize::from(near_high), 1);
 
@@ -73,7 +84,12 @@ fn main() {
     v.section("── Cosine symmetry ──");
     let cs_ab = cosine_similarity(&pfos_mz, &pfos_int, &pfoa_mz, &pfoa_int, tol).score;
     let cs_ba = cosine_similarity(&pfoa_mz, &pfoa_int, &pfos_mz, &pfos_int, tol).score;
-    v.check("cosine(A,B) = cosine(B,A)", cs_ab, cs_ba, 1e-10);
+    v.check(
+        "cosine(A,B) = cosine(B,A)",
+        cs_ab,
+        cs_ba,
+        tolerances::PYTHON_PARITY,
+    );
 
     // ── Section 6: Pairwise matrix ──────────────────────────────
     v.section("── Pairwise matrix properties ──");
@@ -82,7 +98,7 @@ fn main() {
     let mut diagonal_ones = true;
     for i in 0..4 {
         let cs = cosine_similarity(all_mz[i], all_int[i], all_mz[i], all_int[i], tol).score;
-        if (cs - 1.0).abs() > 1e-10 {
+        if (cs - 1.0).abs() > tolerances::PYTHON_PARITY {
             diagonal_ones = false;
         }
     }
@@ -92,7 +108,7 @@ fn main() {
     for i in 0..4 {
         for j in 0..4 {
             let cs = cosine_similarity(all_mz[i], all_int[i], all_mz[j], all_int[j], tol).score;
-            if cs < -1e-10 {
+            if cs < -tolerances::PYTHON_PARITY {
                 all_nonneg = false;
             }
         }

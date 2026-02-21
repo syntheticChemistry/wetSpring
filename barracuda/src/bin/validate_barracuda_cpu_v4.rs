@@ -10,9 +10,21 @@
 //! ```
 //!
 //! Total: **23 algorithmic domains** validated in pure Rust.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | Pure Python (`scripts/barracuda_cpu_v4_baseline.py`) |
+//! | Baseline version | Feb 2026 |
+//! | Baseline command | `python3 scripts/barracuda_cpu_v4_baseline.py` |
+//! | Baseline date | 2026-02-19 |
+//! | Data | Synthetic test vectors (ANI, SNP, dN/dS, clock, pangenome) |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{ani, dnds, molecular_clock, pangenome, snp};
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 #[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
@@ -28,13 +40,28 @@ fn main() {
     let t0 = Instant::now();
 
     let identical = ani::pairwise_ani(b"ATGATGATG", b"ATGATGATG");
-    v.check("ANI: identical → 1.0", identical.ani, 1.0, 1e-15);
+    v.check(
+        "ANI: identical → 1.0",
+        identical.ani,
+        1.0,
+        tolerances::EXACT_F64,
+    );
 
     let different = ani::pairwise_ani(b"AAAA", b"TTTT");
-    v.check("ANI: completely different → 0.0", different.ani, 0.0, 1e-15);
+    v.check(
+        "ANI: completely different → 0.0",
+        different.ani,
+        0.0,
+        tolerances::EXACT_F64,
+    );
 
     let half = ani::pairwise_ani(b"AATT", b"AAGC");
-    v.check("ANI: half-match → 0.5", half.ani, 0.5, 1e-15);
+    v.check(
+        "ANI: half-match → 0.5",
+        half.ani,
+        0.5,
+        tolerances::EXACT_F64,
+    );
 
     let with_gaps = ani::pairwise_ani(b"A-TG", b"ACTG");
     v.check(
@@ -43,7 +70,12 @@ fn main() {
         3.0,
         0.0,
     );
-    v.check("ANI: gap-excluded still 1.0", with_gaps.ani, 1.0, 1e-15);
+    v.check(
+        "ANI: gap-excluded still 1.0",
+        with_gaps.ani,
+        1.0,
+        tolerances::EXACT_F64,
+    );
 
     let seqs: Vec<&[u8]> = vec![b"ATGATG", b"ATGATG", b"CTGATG"];
     let matrix = ani::ani_matrix(&seqs);
@@ -59,15 +91,20 @@ fn main() {
         "ANI batch: identical → 1.0",
         batch_results[0].ani,
         1.0,
-        1e-15,
+        tolerances::EXACT_F64,
     );
     v.check(
         "ANI batch: different → 0.0",
         batch_results[1].ani,
         0.0,
-        1e-15,
+        tolerances::EXACT_F64,
     );
-    v.check("ANI batch: half → 0.5", batch_results[2].ani, 0.5, 1e-15);
+    v.check(
+        "ANI batch: half → 0.5",
+        batch_results[2].ani,
+        0.5,
+        tolerances::EXACT_F64,
+    );
 
     let ani_us = t0.elapsed().as_micros();
     timings.push(("ANI (pairwise + matrix + batch)", ani_us as f64));
@@ -109,13 +146,13 @@ fn main() {
         "SNP: ref freq = 0.75",
         freq_result.variants[0].ref_frequency(),
         0.75,
-        1e-10,
+        tolerances::PYTHON_PARITY,
     );
     v.check(
         "SNP: alt freq = 0.25",
         freq_result.variants[0].alt_frequency(),
         0.25,
-        1e-10,
+        tolerances::PYTHON_PARITY,
     );
 
     let multi_snp_seqs: Vec<&[u8]> = vec![b"ATGATG", b"CTGATG", b"ATGTTG"];
@@ -152,8 +189,18 @@ fn main() {
     let t0 = Instant::now();
 
     let identical_dnds = dnds::pairwise_dnds(b"ATGATGATG", b"ATGATGATG").unwrap();
-    v.check("dN/dS: identical → dN=0", identical_dnds.dn, 0.0, 1e-12);
-    v.check("dN/dS: identical → dS=0", identical_dnds.ds, 0.0, 1e-12);
+    v.check(
+        "dN/dS: identical → dN=0",
+        identical_dnds.dn,
+        0.0,
+        tolerances::ANALYTICAL_F64,
+    );
+    v.check(
+        "dN/dS: identical → dS=0",
+        identical_dnds.ds,
+        0.0,
+        tolerances::ANALYTICAL_F64,
+    );
 
     // TTT→TTC: Phe→Phe (synonymous at pos 3)
     let syn_result = dnds::pairwise_dnds(b"TTTGCTAAA", b"TTCGCTAAA").unwrap();
@@ -163,12 +210,17 @@ fn main() {
         1.0,
         0.0,
     );
-    v.check("dN/dS: syn-only → dN = 0", syn_result.dn, 0.0, 1e-12);
+    v.check(
+        "dN/dS: syn-only → dN = 0",
+        syn_result.dn,
+        0.0,
+        tolerances::ANALYTICAL_F64,
+    );
     v.check(
         "dN/dS: syn-only → omega = 0",
         syn_result.omega.unwrap_or(f64::NAN),
         0.0,
-        1e-12,
+        tolerances::ANALYTICAL_F64,
     );
 
     let mixed = dnds::pairwise_dnds(
@@ -196,7 +248,7 @@ fn main() {
         "dN/dS batch: first identical dN=0",
         batch[0].as_ref().unwrap().dn,
         0.0,
-        1e-12,
+        tolerances::ANALYTICAL_F64,
     );
     v.check(
         "dN/dS batch: second syn-only dS>0",
@@ -247,7 +299,12 @@ fn main() {
     let relaxed = molecular_clock::relaxed_clock_rates(&branch_lengths, &clock.node_ages, &parents);
     let positive_rates: Vec<f64> = relaxed.iter().copied().filter(|&r| r > 0.0).collect();
     let cv = molecular_clock::rate_variation_cv(&positive_rates);
-    v.check("Clock: strict tree CV ≈ 0", cv, 0.0, 1e-10);
+    v.check(
+        "Clock: strict tree CV ≈ 0",
+        cv,
+        0.0,
+        tolerances::PYTHON_PARITY,
+    );
 
     let cal = molecular_clock::CalibrationPoint {
         node_id: 0,
@@ -353,7 +410,12 @@ fn main() {
     );
 
     let not_enriched_p = pangenome::hypergeometric_pvalue(2, 10, 20, 100);
-    v.check("Pan: not-enriched p = 1.0", not_enriched_p, 1.0, 1e-10);
+    v.check(
+        "Pan: not-enriched p = 1.0",
+        not_enriched_p,
+        1.0,
+        tolerances::PYTHON_PARITY,
+    );
 
     let pvals = vec![0.01, 0.04, 0.03, 0.5];
     let adj = pangenome::benjamini_hochberg(&pvals);

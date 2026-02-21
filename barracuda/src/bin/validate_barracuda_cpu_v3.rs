@@ -6,6 +6,17 @@
 //! resampling, phylogenetic placement, decision-tree inference, spectral
 //! matching, extended diversity, k-mer counting, and alpha-diversity pipeline.
 //!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | scipy, numpy, pure Python (`srivastava2011_multi_signal`, `hsueh2022_phage_defense`, `wang2021_rawr_bootstrap`, `alamin2024_placement`, spectral/diversity/decision-tree refs) |
+//! | Baseline version | Feb 2026 |
+//! | Baseline command | `python3 scripts/benchmark_rust_vs_python.py` (18-domain coverage) |
+//! | Baseline date | 2026-02-19 |
+//! | Data | Synthetic test vectors (hardcoded) |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
 //! ```text
 //! Python baseline → v1 (9) → v2 (+5 batch) → [THIS] v3 (+9) → GPU
 //! ```
@@ -15,6 +26,7 @@ use wetspring_barracuda::bio::{
     bootstrap, decision_tree::DecisionTree, diversity, felsenstein, kmer, multi_signal,
     phage_defense, placement, spectral_match,
 };
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 #[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
@@ -281,11 +293,7 @@ fn main() {
         0.0,
     );
 
-    let spectra = vec![
-        (mz_a.clone(), int_a.clone()),
-        (mz_b.clone(), int_b.clone()),
-        (mz_c.clone(), int_c.clone()),
-    ];
+    let spectra = vec![(mz_a, int_a), (mz_b, int_b), (mz_c, int_c)];
     let pw = spectral_match::pairwise_cosine(&spectra, 0.5);
     v.check("Spectral: pairwise 3 → 3 pairs", pw.len() as f64, 3.0, 0.0);
 
@@ -319,7 +327,12 @@ fn main() {
         1.0,
         0.0,
     );
-    v.check("Bray-Curtis: identical = 0", bc_same, 0.0, 1e-10);
+    v.check(
+        "Bray-Curtis: identical = 0",
+        bc_same,
+        0.0,
+        tolerances::PYTHON_PARITY,
+    );
     v.check(
         "Bray-Curtis: different > 0",
         f64::from(u8::from(bc_diff > 0.0)),

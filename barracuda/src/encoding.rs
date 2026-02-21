@@ -31,6 +31,15 @@ const DECODE_TABLE: [u8; 256] = build_decode_table();
 ///
 /// Returns an error message if the input contains invalid characters
 /// or has malformed padding.
+///
+/// # Examples
+///
+/// ```
+/// use wetspring_barracuda::encoding::base64_decode;
+///
+/// let bytes = base64_decode("SGVsbG8=").unwrap();
+/// assert_eq!(bytes, b"Hello");
+/// ```
 pub fn base64_decode(input: &str) -> Result<Vec<u8>, String> {
     let mut buf = Vec::with_capacity(input.len() * 3 / 4);
     let mut accum: u32 = 0;
@@ -58,6 +67,14 @@ pub fn base64_decode(input: &str) -> Result<Vec<u8>, String> {
 }
 
 /// Encode bytes to standard base64 with `=` padding.
+///
+/// # Examples
+///
+/// ```
+/// use wetspring_barracuda::encoding::base64_encode;
+///
+/// assert_eq!(base64_encode(b"Hello"), "SGVsbG8=");
+/// ```
 #[must_use]
 pub fn base64_encode(data: &[u8]) -> String {
     let mut result = String::with_capacity(data.len().div_ceil(3) * 4);

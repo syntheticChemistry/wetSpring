@@ -21,6 +21,7 @@ use wetspring_barracuda::bio::qs_biofilm::{
     scenario_dgc_overexpression, scenario_hapr_mutant, scenario_high_density,
     scenario_standard_growth, QsBiofilmParams,
 };
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 const DT: f64 = 0.001;
@@ -84,7 +85,12 @@ fn main() {
     let b_ss = steady_state_mean(&r, 4, SS_FRAC);
 
     // Python: H_ss = 0.0, C_ss = 2.5, B_ss = 0.786164
-    v.check("S3: H_ss zero (HapR knocked out)", h_ss, 0.0, 1e-10);
+    v.check(
+        "S3: H_ss zero (HapR knocked out)",
+        h_ss,
+        0.0,
+        tolerances::PYTHON_PARITY,
+    );
     v.check(
         "S3: C_ss matches Python (c-di-GMP high)",
         c_ss,

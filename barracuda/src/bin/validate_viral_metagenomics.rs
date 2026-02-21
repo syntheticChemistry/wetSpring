@@ -152,11 +152,21 @@ fn validate_dnds_python_parity(v: &mut Validator) {
 
     // Synonymous case
     let r = dnds::pairwise_dnds(b"TTTGCTAAA", b"TTCGCTAAA").unwrap();
-    v.check("Python: syn dS", r.ds, 1.207_078_434_326, 1e-10);
+    v.check(
+        "Python: syn dS",
+        r.ds,
+        1.207_078_434_326,
+        tolerances::PYTHON_PARITY,
+    );
 
     // Nonsynonymous case
     let r = dnds::pairwise_dnds(b"AAAGCTGCT", b"GAAGCTGCT").unwrap();
-    v.check("Python: nonsyn dN", r.dn, 0.167_357_663_486, 1e-10);
+    v.check(
+        "Python: nonsyn dN",
+        r.dn,
+        0.167_357_663_486,
+        tolerances::PYTHON_PARITY,
+    );
 
     // Mixed case
     let r = dnds::pairwise_dnds(
@@ -170,7 +180,12 @@ fn validate_dnds_python_parity(v: &mut Validator) {
         0.0,
         tolerances::ANALYTICAL_F64,
     );
-    v.check("Python: mixed dS", r.ds, 0.320_583_011_120, 1e-10);
+    v.check(
+        "Python: mixed dS",
+        r.ds,
+        0.320_583_011_120,
+        tolerances::PYTHON_PARITY,
+    );
 
     // Purifying selection example
     let r = dnds::pairwise_dnds(
@@ -178,7 +193,12 @@ fn validate_dnds_python_parity(v: &mut Validator) {
         b"ATGGCCGCTGCTGCTGCTGCTGCTGCCGCTGCTGCTGCTGCTGCTGCT",
     )
     .unwrap();
-    v.check("Python: purifying dS", r.ds, 0.146_808_432_845, 1e-10);
+    v.check(
+        "Python: purifying dS",
+        r.ds,
+        0.146_808_432_845,
+        tolerances::PYTHON_PARITY,
+    );
     v.check(
         "Python: purifying dN = 0",
         r.dn,

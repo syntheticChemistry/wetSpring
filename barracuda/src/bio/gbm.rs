@@ -21,7 +21,7 @@
 //! GBM is inherently sequential across trees (tree N depends on tree N-1
 //! cumulative sum). However, within each tree, the batch of samples can
 //! be dispatched in parallel. For multi-class, the K class chains can
-//! also run in parallel. ToadStool absorption as `GbmBatchInferenceGpu`.
+//! also run in parallel. `ToadStool` absorption as `GbmBatchInferenceGpu`.
 
 /// A regression tree for GBM (predicts f64 residuals, not class labels).
 #[derive(Debug, Clone)]
@@ -32,9 +32,13 @@ pub struct GbmTree {
 /// Node in a GBM regression tree.
 #[derive(Debug, Clone)]
 pub struct GbmNode {
+    /// Feature index to split on (negative = leaf node).
     pub feature: i32,
+    /// Split threshold; samples with `feat_val <= threshold` go left.
     pub threshold: f64,
+    /// Left child node index.
     pub left_child: i32,
+    /// Right child node index.
     pub right_child: i32,
     /// Leaf value (predicted residual for this node).
     pub value: f64,
@@ -209,8 +213,11 @@ pub struct GbmMultiClassifier {
 /// Multi-class GBM prediction.
 #[derive(Debug, Clone)]
 pub struct GbmMultiPrediction {
+    /// Predicted class index (argmax of `probabilities`).
     pub class: usize,
+    /// Per-class probabilities (softmax over `raw_scores`).
     pub probabilities: Vec<f64>,
+    /// Raw log-odds scores before softmax.
     pub raw_scores: Vec<f64>,
 }
 
@@ -245,6 +252,9 @@ impl GbmMultiClassifier {
     }
 
     /// Predict with per-class probabilities (softmax).
+    ///
+    /// Returns the predicted class, per-class probabilities, and raw scores.
+    /// Falls back to class 0 if the probability vector is empty.
     #[must_use]
     pub fn predict_proba(&self, features: &[f64]) -> GbmMultiPrediction {
         let mut scores = self.initial_predictions.clone();
@@ -255,7 +265,7 @@ impl GbmMultiClassifier {
         }
 
         // Softmax
-        let max_score = scores.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
+        let max_score = scores.iter().copied().fold(f64::NEG_INFINITY, f64::max);
         let exp_scores: Vec<f64> = scores.iter().map(|&s| (s - max_score).exp()).collect();
         let sum_exp: f64 = exp_scores.iter().sum();
         let probabilities: Vec<f64> = exp_scores.iter().map(|&e| e / sum_exp).collect();
@@ -263,7 +273,7 @@ impl GbmMultiClassifier {
         let (class, _) = probabilities
             .iter()
             .enumerate()
-            .max_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap())
+            .max_by(|(_, a), (_, b)| a.total_cmp(b))
             .unwrap_or((0, &0.0));
 
         GbmMultiPrediction {

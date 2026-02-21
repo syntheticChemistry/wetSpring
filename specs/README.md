@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
-**Last Updated**: February 20, 2026
-**Status**: Phase 14 — 1,241/1,241 CPU + 260/260 GPU = 1,501/1,501 checks, ALL PASS
+**Last Updated**: February 21, 2026
+**Status**: Phase 16 — 1,241/1,241 CPU + 260/260 GPU = 1,501/1,501 checks, ALL PASS
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -13,7 +13,7 @@
 | CPU validation | 1,241/1,241 PASS — 41 modules, 63 experiments, 25 domains |
 | GPU validation | 260/260 PASS — 15 ToadStool primitives, 9 local WGSL shaders, 12 GPU binaries |
 | BarraCUDA CPU parity | 157/157 — 22.5x Rust speedup over Python |
-| Rust modules | 41 CPU + 20 GPU, 582 tests |
+| Rust modules | 41 CPU + 20 GPU, 552 tests (93.5% coverage) |
 | Dependencies | 1 runtime (flate2), everything else sovereign |
 | Paper queue | **ALL DONE** — 29/29 reproducible papers complete (Track 1c added) |
 | Faculty (Track 1) | Waters (MMG, MSU), Cahill (Sandia), Smallwood (Sandia) |

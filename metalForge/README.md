@@ -108,7 +108,7 @@ affinities. metalForge maps each validated algorithm to its optimal substrate.
 wetSpring follows hotSpring's pattern for ToadStool absorption:
 
 ```
-1. Validate in Rust CPU (barracuda/)          ← DONE: 41 modules, 582 tests, 63 experiments, 1501 checks
+1. Validate in Rust CPU (barracuda/)          ← DONE: 41 modules, 552 tests, 93.5% coverage, 63 experiments, 1501 checks
 2. Characterize hardware (metalForge/)         ← THIS DIRECTORY
 3. Write Rust in GPU-friendly patterns         ← 9 local WGSL shaders written
 4. ToadStool absorbs as shared primitives      ← unidirectional handoff via archive/handoffs/
@@ -147,7 +147,7 @@ from either inform the other's hardware utilization strategy.
 
 ---
 
-## Current Status (Feb 20, 2026)
+## Current Status (Feb 21, 2026)
 
 ### CPU: 25 Domains Validated (Exp001–063)
 All 25 algorithmic domains proven correct in pure Rust CPU:
@@ -213,13 +213,16 @@ Delete local shader copy. Use the crate-level re-export
 (e.g., `barracuda::SmithWatermanGpu`). Local extensions that still need work
 remain in wetSpring until absorption.
 
-### Current Status (Feb 20)
+### Current Status (Feb 21)
 
-| Phase | Items |
-|-------|-------|
-| **Absorbed** | SmithWatermanGpu, GillespieGpu, TreeInferenceGpu, FelsensteinGpu, GemmF64::WGSL |
-| **Local (2 WGSL)** | `dada2_e_step.wgsl`, `quality_filter.wgsl` |
-| **Candidates** | ODE parameter sweep (compose `rk_stage`), HMM (compose `logsumexp_wgsl`), Bootstrap (compose `FelsensteinGpu` + PRNG) |
+| Phase | Count | Items |
+|-------|:-----:|-------|
+| **Absorbed** (Lean) | 11 modules | SW, Gillespie, DT, Felsenstein, GEMM, diversity, PCoA, spectral, stats, EIC, rarefaction |
+| **Local WGSL** (Write) | 9 shaders | HMM, ODE, DADA2, QF, ANI, SNP, dN/dS, pangenome, RF |
+| **CPU math** (barracuda overlap) | 4 functions | erf, ln_gamma, regularized_gamma, integrate_peak |
+| **Blocked** | 3 modules | kmer (lock-free hash), UniFrac (tree traversal), taxonomy (NPU) |
+
+Active handoff: `wateringHole/handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md`
 
 ---
 
@@ -295,14 +298,23 @@ it and rely on `compile_shader_f64` or `ShaderTemplate` preprocessing.
 
 ## Next Steps
 
-1. **GPU**: Scale ODE sweep to B=10,000 with ToadStool unidirectional
+1. **ToadStool absorption**: 9 Tier A shaders submitted via handoff doc.
+   Priority: HMM forward (compose `logsumexp_wgsl`), ODE sweep (fix
+   upstream `BatchedOdeRK4F64`), RF inference (extend `TreeInferenceGpu`
+   to ensemble/SoA).
+
+2. **barracuda `math` feature**: Propose CPU-only feature gate for
+   `numerical`, `special`, `stats` modules. Unblocks switching 4 local
+   math functions to upstream primitives.
+
+3. **GPU**: Scale ODE sweep to B=10,000 with ToadStool unidirectional
    streaming. Current: 64 batches in 2s. Target: 10,000 in <1s.
 
-2. **NPU**: Train taxonomy FC model from Naive Bayes weights, quantize int8,
+4. **NPU**: Train taxonomy FC model from Naive Bayes weights, quantize int8,
    validate classification accuracy NPU vs CPU.
 
-3. **CPU**: Profile P-core vs E-core for ODE-heavy workloads. Consider
+5. **CPU**: Profile P-core vs E-core for ODE-heavy workloads. Consider
    P-core pinning for latency-sensitive stages (DADA2, parsing).
 
-4. **GPU**: Remaining P3 items (K-mer counting, UniFrac) require new
+6. **GPU**: Remaining P3 items (K-mer counting, UniFrac) require new
    ToadStool primitives — wait for upstream absorption cycle.

@@ -4,6 +4,17 @@
 //! Validates Rust NJ against Python baseline (Saitou & Nei 1987).
 //! Checks: topology (sister pairs), branch lengths, distance matrix
 //! symmetry, determinism.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | liu2009_neighbor_joining.py |
+//! | Baseline version | scripts/ |
+//! | Baseline command | python3 scripts/liu2009_neighbor_joining.py |
+//! | Baseline date | 2026-02-19 |
+//! | Data | synthetic distance matrices, 3–5 taxa |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::bio::neighbor_joining::{
     distance_matrix, jukes_cantor_distance, neighbor_joining,

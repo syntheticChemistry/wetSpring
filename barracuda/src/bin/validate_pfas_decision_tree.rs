@@ -7,19 +7,30 @@
 //!
 //! Follows the `hotSpring` pattern: hardcoded expected values from
 //! `decision_tree_test_data.json`, explicit pass/fail, exit code 0/1.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | sklearn export (pfas_tree_export.py) |
+//! | Baseline version | scripts/ |
+//! | Baseline command | python3 scripts/pfas_tree_export.py + decision_tree_test_data.json |
+//! | Baseline date | 2026-02-19 |
+//! | Data | 744 test samples, decision_tree_exported.json |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use std::fs;
 use wetspring_barracuda::bio::decision_tree::DecisionTree;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::tolerances;
+use wetspring_barracuda::validation::{self, Validator};
 
 #[allow(clippy::cast_possible_truncation)]
 fn load_tree() -> DecisionTree {
+    let tree_path =
+        validation::data_dir("WETSPRING_PFAS_ML_DIR", "experiments/results/008_pfas_ml")
+            .join("decision_tree_exported.json");
     let tree_json =
-        fs::read_to_string("experiments/results/008_pfas_ml/decision_tree_exported.json")
-            .or_else(|_| {
-                fs::read_to_string("../experiments/results/008_pfas_ml/decision_tree_exported.json")
-            })
-            .expect("cannot read decision_tree_exported.json");
+        fs::read_to_string(&tree_path).expect("cannot read decision_tree_exported.json");
 
     let tree_data: serde_json::Value =
         serde_json::from_str(&tree_json).expect("cannot parse tree JSON");
@@ -64,14 +75,10 @@ struct TestData {
 
 #[allow(clippy::cast_possible_truncation)]
 fn load_test_data() -> TestData {
-    let test_json =
-        fs::read_to_string("experiments/results/008_pfas_ml/decision_tree_test_data.json")
-            .or_else(|_| {
-                fs::read_to_string(
-                    "../experiments/results/008_pfas_ml/decision_tree_test_data.json",
-                )
-            })
-            .expect("cannot read test data");
+    let test_path =
+        validation::data_dir("WETSPRING_PFAS_ML_DIR", "experiments/results/008_pfas_ml")
+            .join("decision_tree_test_data.json");
+    let test_json = fs::read_to_string(&test_path).expect("cannot read test data");
 
     let test_data: serde_json::Value =
         serde_json::from_str(&test_json).expect("cannot parse test JSON");
@@ -182,7 +189,12 @@ fn main() {
         data.expected_accuracy,
         1e-6,
     );
-    v.check("Rust F1 matches Python", rust_f1, data.expected_f1, 1e-4);
+    v.check(
+        "Rust F1 matches Python",
+        rust_f1,
+        data.expected_f1,
+        tolerances::ML_F1_SCORE,
+    );
     let acc_ok = rust_accuracy >= 0.80;
     v.check(
         "Accuracy above 0.80 threshold",

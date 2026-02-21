@@ -34,7 +34,7 @@
 //!
 //! Run: `cargo run --features gpu --release --bin validate_16s_pipeline_gpu`
 
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::time::Instant;
 use wetspring_barracuda::bio::chimera::{self, ChimeraParams};
 use wetspring_barracuda::bio::chimera_gpu;
@@ -90,15 +90,8 @@ async fn main() {
     );
     println!("  ToadStool TensorContext wired (buffer pool + bind group cache)\n");
 
-    let base = std::env::var("WETSPRING_PUBLIC_DIR").map_or_else(
-        |_| Path::new(env!("CARGO_MANIFEST_DIR")).join("../data/public_benchmarks"),
-        PathBuf::from,
-    );
-
-    let ref_dir = std::env::var("WETSPRING_REF_DIR").map_or_else(
-        |_| Path::new(env!("CARGO_MANIFEST_DIR")).join("../data/reference_dbs/silva_138"),
-        PathBuf::from,
-    );
+    let base = validation::data_dir("WETSPRING_PUBLIC_DIR", "data/public_benchmarks");
+    let ref_dir = validation::data_dir("WETSPRING_REF_DIR", "data/reference_dbs/silva_138");
 
     let classifier = load_silva_classifier(&ref_dir);
 
@@ -194,8 +187,10 @@ async fn main() {
     println!("╚══════════════════════════════════════════════════════════════════════╝");
 
     // Write machine-readable results
-    let out_dir = Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../experiments/results/016_gpu_pipeline_parity");
+    let out_dir = validation::data_dir(
+        "WETSPRING_GPU_PIPELINE_PARITY_DIR",
+        "experiments/results/016_gpu_pipeline_parity",
+    );
     std::fs::create_dir_all(&out_dir).ok();
     let json = format!(
         r#"{{

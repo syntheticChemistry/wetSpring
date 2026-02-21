@@ -34,6 +34,7 @@ pub struct TreeNode {
 }
 
 impl TreeNode {
+    /// Returns `true` if this node is a leaf (no children).
     #[must_use]
     pub const fn is_leaf(&self) -> bool {
         self.feature < 0

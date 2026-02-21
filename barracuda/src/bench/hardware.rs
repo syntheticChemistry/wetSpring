@@ -7,17 +7,29 @@ use std::process::Command;
 /// Complete hardware description captured once at the start of a run.
 #[derive(Debug, Clone)]
 pub struct HardwareInventory {
+    /// Machine or gate identifier (e.g., `"eastgate"`, `"ci-linux"`).
     pub gate_name: String,
+    /// CPU model string from `/proc/cpuinfo` (e.g., `"Intel(R) Core(TM) i9-12900K"`).
     pub cpu_model: String,
+    /// Number of physical cores (from `core id`).
     pub cpu_cores: usize,
+    /// Number of logical threads (from `processor` entries).
     pub cpu_threads: usize,
+    /// L3 cache size in KB (from `cache size`).
     pub cpu_cache_kb: usize,
+    /// Total RAM in MB (from `MemTotal` in `/proc/meminfo`).
     pub ram_total_mb: usize,
+    /// GPU product name from nvidia-smi (or `"N/A"` if none).
     pub gpu_name: String,
+    /// GPU VRAM in MB.
     pub gpu_vram_mb: usize,
+    /// NVIDIA driver version.
     pub gpu_driver: String,
+    /// Compute capability (e.g., `"8.9"`).
     pub gpu_compute_cap: String,
+    /// OS kernel version from `uname -r`.
     pub os_kernel: String,
+    /// Rust toolchain version (if populated).
     pub rust_version: String,
 }
 

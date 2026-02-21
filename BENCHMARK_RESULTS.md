@@ -1,6 +1,6 @@
 # wetSpring Benchmark Results
 
-**Date:** February 20, 2026
+**Date:** February 21, 2026
 **Status:** Three-tier validation complete (Python → Rust CPU → GPU)
 
 ---
@@ -74,8 +74,10 @@ Tier 3: GPU (ToadStool/BarraCUDA, math parity with CPU)
 
 | Suite | Count | Status |
 |-------|-------|--------|
-| Library + integration tests | 582 | PASS |
-| **Total** | **582** | **PASS** (1 ignored) |
+| Library unit tests | 539 | PASS (+ 1 ignored — hardware-dependent) |
+| Doc-tests | 13 | PASS |
+| **Total** | **552** | **PASS** |
+| Line coverage | 93.5% | Exceeds 90% target |
 
 ---
 
@@ -211,12 +213,12 @@ Run with `cargo run --release --bin benchmark_23_domain_timing` and
 |----------|--------|--------|
 | Rust CPU validation | 1,241 | PASS |
 | GPU validation | 260 | PASS |
-| Rust tests | 582 | PASS |
-| Python baselines | 35 scripts | PASS |
+| Rust tests | 552 (539 lib + 13 doc) | PASS |
+| Python baselines | 40 scripts | PASS |
 | BarraCUDA CPU parity | 157/157 (25 domains) | PASS |
 | ToadStool bio primitives | 15 consumed (4 bio absorbed) | PASS |
 | Local WGSL shaders | 9 (HMM, ODE, DADA2, quality, ANI, SNP, pangenome, dN/dS, RF) | PASS |
-| **Grand total** | **1,501 validation + 582 tests** | **ALL PASS** |
+| **Grand total** | **1,501 validation + 552 tests** | **ALL PASS** |
 
 ---
 
@@ -226,7 +228,7 @@ Run with `cargo run --release --bin benchmark_23_domain_timing` and
 cd barracuda
 
 # Tier 2: Rust CPU (1,241 checks)
-cargo test                         # 582 tests
+cargo test                         # 552 tests (539 lib + 13 doc)
 cargo run --release --bin validate_qs_ode  # ... repeat for all 29 CPU binaries
 
 # Tier 3: GPU (260 checks)
@@ -239,7 +241,7 @@ cargo run --features gpu --bin validate_gpu_hmm_forward        # 13
 cargo run --features gpu --bin benchmark_phylo_hmm_gpu         # 6
 cargo run --features gpu --bin validate_gpu_ode_sweep          # 12
 cargo run --features gpu --bin validate_gpu_track1c            # 27
-cargo run --features gpu --bin validate_gpu_23_domain_benchmark # 20
+cargo run --features gpu --bin validate_cross_substrate         # 20
 cargo run --features gpu --bin validate_gpu_rf                 # 13
 
 # Tier 1: Python

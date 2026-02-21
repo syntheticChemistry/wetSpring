@@ -87,22 +87,26 @@ fn defense_rhs(state: &[f64], _t: f64, p: &PhageDefenseParams) -> Vec<f64> {
     let mu_d = p.mu_max * (1.0 - p.defense_cost) * growth_limit;
     let infection_d = p.adsorption_rate * bd * phage;
     let kill_d = infection_d * (1.0 - p.defense_efficiency);
-    let growth_defended = mu_d * bd - kill_d - p.death_rate * bd;
+    let growth_defended = p.death_rate.mul_add(-bd, mu_d * bd - kill_d);
 
     // Undefended bacteria: full growth, full phage kill
     let mu_u = p.mu_max * growth_limit;
     let infection_u = p.adsorption_rate * bu * phage;
-    let growth_undefended = mu_u * bu - infection_u - p.death_rate * bu;
+    let growth_undefended = p.death_rate.mul_add(-bu, mu_u * bu - infection_u);
 
     // Phage: bursts from killed bacteria, decay
     let burst_from_u = p.burst_size * infection_u;
     let burst_from_d = p.burst_size * (1.0 - p.defense_efficiency) * infection_d;
-    let d_phage =
-        burst_from_u + burst_from_d - p.phage_decay * phage - p.adsorption_rate * (bd + bu) * phage;
+    let d_phage = (p.adsorption_rate * (bd + bu)).mul_add(
+        -phage,
+        p.phage_decay.mul_add(-phage, burst_from_u + burst_from_d),
+    );
 
     // Resources: inflow - consumption - dilution
     let consumption = p.yield_coeff * (mu_d * bd + mu_u * bu);
-    let d_r = p.resource_inflow - consumption - p.resource_dilution * r;
+    let d_r = p
+        .resource_dilution
+        .mul_add(-r, p.resource_inflow - consumption);
 
     vec![growth_defended, growth_undefended, d_phage, d_r]
 }

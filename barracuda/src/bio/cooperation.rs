@@ -30,6 +30,7 @@ pub struct CooperationParams {
     pub mu_cheat: f64,
     /// Carrying capacity (total `N_c + N_d`).
     pub k_cap: f64,
+    /// Per-capita death rate.
     pub death_rate: f64,
     /// AI production rate per cooperator cell.
     pub k_ai_prod: f64,
@@ -77,7 +78,7 @@ fn hill(x: f64, k: f64) -> f64 {
         return 0.0;
     }
     let x2 = x * x;
-    x2 / (k * k + x2)
+    x2 / k.mul_add(k, x2)
 }
 
 /// Right-hand side of the cooperation game ODE.
@@ -100,7 +101,7 @@ fn coop_rhs(state: &[f64], _t: f64, p: &CooperationParams) -> Vec<f64> {
     let growth_coop = fitness_coop.mul_add(nc, -(p.death_rate * nc));
     let growth_cheat = fitness_cheat.mul_add(nd, -(p.death_rate * nd));
     let d_ai = p.k_ai_prod.mul_add(nc, -p.d_ai * ai);
-    let d_bio = p.k_bio * hill(ai, p.k_bio_ai) * (1.0 - bio) - p.d_bio * bio;
+    let d_bio = (p.k_bio * hill(ai, p.k_bio_ai)).mul_add(1.0 - bio, -(p.d_bio * bio));
 
     vec![growth_coop, growth_cheat, d_ai, d_bio]
 }

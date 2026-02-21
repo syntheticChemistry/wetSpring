@@ -4,6 +4,19 @@
 //!
 //! Section 1-2: 64-batch GPU ODE sweep via local workaround shader, CPU parity
 //! Section 3:   Jacobian eigenvalue decomposition via BatchedEighGpu
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | BarraCUDA CPU (reference) |
+//! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
+//! | Baseline command | qs_biofilm::run_scenario, CPU deflated power iteration |
+//! | Baseline date | 2026-02-19 |
+//! | Data | 64 batches QS/c-di-GMP, Jacobian J^T*J at steady state |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Local WGSL: batched RK4 ODE sweep. ToadStool: BatchedEighGpu for bifurcation eigenvalues.
 
 use barracuda::device::WgpuDevice;
 use barracuda::ops::linalg::BatchedEighGpu;

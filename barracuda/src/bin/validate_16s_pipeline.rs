@@ -33,6 +33,7 @@ use wetspring_barracuda::bio::taxonomy::{
 };
 use wetspring_barracuda::bio::unifrac::{self, PhyloTree};
 use wetspring_barracuda::io::fastq::FastqRecord;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn main() {
@@ -276,7 +277,12 @@ fn validate_unifrac(v: &mut Validator) {
     sample_a.insert("A".into(), 10.0);
     sample_a.insert("B".into(), 20.0);
     let uw = unifrac::unweighted_unifrac(&tree, &sample_a, &sample_a);
-    v.check("UniFrac: identical = 0", uw, 0.0, 1e-12);
+    v.check(
+        "UniFrac: identical = 0",
+        uw,
+        0.0,
+        tolerances::ANALYTICAL_F64,
+    );
 
     // Disjoint communities (A,B) vs (C,D) → high distance
     let mut sample_b: HashMap<String, f64> = HashMap::new();
@@ -311,11 +317,21 @@ fn validate_unifrac(v: &mut Validator) {
 
     // Weighted UniFrac: identical = 0
     let wuf_same = unifrac::weighted_unifrac(&tree, &sample_a, &sample_a);
-    v.check("UniFrac: weighted identical = 0", wuf_same, 0.0, 1e-12);
+    v.check(
+        "UniFrac: weighted identical = 0",
+        wuf_same,
+        0.0,
+        tolerances::ANALYTICAL_F64,
+    );
 
     // Symmetry: d(A,B) = d(B,A)
     let uw_ba = unifrac::unweighted_unifrac(&tree, &sample_b, &sample_a);
-    v.check("UniFrac: symmetry", (uw_disjoint - uw_ba).abs(), 0.0, 1e-12);
+    v.check(
+        "UniFrac: symmetry",
+        (uw_disjoint - uw_ba).abs(),
+        0.0,
+        tolerances::ANALYTICAL_F64,
+    );
 
     // Distance matrix: 2 samples → 2×2 matrix
     let mut table: HashMap<String, HashMap<String, f64>> = HashMap::new();

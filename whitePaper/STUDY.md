@@ -1,6 +1,6 @@
 # wetSpring: Replicable Life Science and Analytical Chemistry on Consumer GPU Hardware
 
-**Working Draft** — February 2026
+**Working Draft** — February 21, 2026
 
 ---
 
@@ -482,7 +482,15 @@ and ML ensemble domains.
 `needs_f64_exp_log_workaround() = false` for Ada Lovelace (RTX 40-series).
 Upstream fix: return `true` for all Ada Lovelace GPUs.
 
+**CPU math evolution**: 4 local functions (`erf`, `ln_gamma`,
+`regularized_gamma_lower`, `integrate_peak`) duplicate barracuda upstream
+primitives (`barracuda::special::erf`, `barracuda::special::ln_gamma`,
+`barracuda::special::regularized_gamma_p`, `barracuda::numerical::trapz`).
+Migration blocked on barracuda adding a CPU-only `math` feature gate that
+does not pull in wgpu/akida-driver/toadstool-core.
+
 Full absorption map: `barracuda/EVOLUTION_READINESS.md`.
+Active handoff: `wateringHole/handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md`.
 
 ---
 
@@ -494,7 +502,7 @@ repository (AGPL-3.0). No institutional access required.
 ```bash
 # Run all CPU validations (1,241 checks)
 cd barracuda
-cargo test --release          # 582 tests
+cargo test --release          # 552 tests (539 lib + 13 doc)
 cargo run --release --bin validate_fastq
 cargo run --release --bin validate_diversity
 cargo run --release --bin validate_mzml

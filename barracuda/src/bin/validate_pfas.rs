@@ -19,11 +19,11 @@
 //! - 25 unique PFAS precursor m/z values
 
 use std::collections::HashSet;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use wetspring_barracuda::bio::{kmd, spectral_match, tolerance_search};
 use wetspring_barracuda::io::ms2;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{self, Validator};
 
 fn main() {
     let mut v = Validator::new("wetSpring PFAS Screening Validation");
@@ -33,12 +33,9 @@ fn main() {
     validate_kmd(&mut v);
 
     // External data-dependent validations
-    let ms2_path = std::env::var("WETSPRING_PFAS_MS2").map_or_else(
-        |_| {
-            Path::new(env!("CARGO_MANIFEST_DIR"))
-                .join("../data/exp006_pfascreen/TestSample_PFAS_Standard_MIX_ddMS2_20eV_Inj5.ms2")
-        },
-        PathBuf::from,
+    let ms2_path = validation::data_dir(
+        "WETSPRING_PFAS_MS2",
+        "data/exp006_pfascreen/TestSample_PFAS_Standard_MIX_ddMS2_20eV_Inj5.ms2",
     );
 
     if ms2_path.exists() {

@@ -1,5 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Validation: Alamin & Liu 2024 phylogenetic placement (Exp032).
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | alamin2024_placement.py |
+//! | Baseline version | scripts/ |
+//! | Baseline command | python3 scripts/alamin2024_placement.py |
+//! | Baseline date | 2026-02-19 |
+//! | Data | reference tree, 12bp query sequences |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::bio::felsenstein::{encode_dna, TreeNode};
 use wetspring_barracuda::bio::placement::{batch_placement, placement_scan};

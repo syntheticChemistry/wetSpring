@@ -8,6 +8,17 @@
 //!
 //! Follows the `hotSpring` pattern: hardcoded expected values from
 //! `newick_parse_python_baseline.json`, explicit pass/fail, exit code 0/1.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | newick_parse_baseline.py |
+//! | Baseline version | scripts/ |
+//! | Baseline command | python3 scripts/newick_parse_baseline.py |
+//! | Baseline date | 2026-02-19 |
+//! | Data | synthetic Newick strings (2–8 leaves) |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::bio::unifrac::PhyloTree;
 use wetspring_barracuda::validation::Validator;

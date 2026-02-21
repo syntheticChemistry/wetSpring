@@ -11,6 +11,19 @@
 //!
 //! Each GPU result is compared to the CPU Rust module to prove
 //! identical math across hardware.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | BarraCUDA CPU (reference) |
+//! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
+//! | Baseline command | DecisionTree::predict, Gillespie SSA, bio::alignment::smith_waterman_score |
+//! | Baseline date | 2026-02-19 |
+//! | Data | Decision tree samples, SSA trajectories, SW alignment pairs |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! ToadStool primitives: TreeInferenceGpu, GillespieGpu, SmithWatermanGpu.
 
 use barracuda::device::WgpuDevice;
 use barracuda::{FlatForest, TreeInferenceGpu};

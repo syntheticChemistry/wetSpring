@@ -21,16 +21,16 @@
 //!
 //! Run: `cargo run --bin validate_peaks`
 
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use wetspring_barracuda::bio::signal::{find_peaks, PeakParams};
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{self, Validator};
 
 fn main() {
     let mut v = Validator::new("wetSpring Peak Detection Validation (Exp010)");
 
-    let baseline_dir = std::env::var("WETSPRING_PEAKS_DIR").map_or_else(
-        |_| Path::new(env!("CARGO_MANIFEST_DIR")).join("../experiments/results/010_peak_baselines"),
-        PathBuf::from,
+    let baseline_dir = validation::data_dir(
+        "WETSPRING_PEAKS_DIR",
+        "experiments/results/010_peak_baselines",
     );
 
     if !baseline_dir.exists() {

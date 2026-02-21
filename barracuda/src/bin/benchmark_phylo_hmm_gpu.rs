@@ -8,6 +8,17 @@
 //! 4. HMM batch forward: CPU sequential vs GPU batch shader
 //!
 //! Reports speedup ratios and validates parity.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | timing harness |
+//! | Baseline version | N/A (performance measurement, not correctness) |
+//! | Baseline command | cargo run --release --features gpu --bin benchmark_phylo_hmm_gpu |
+//! | Baseline date | 2026-02-19 |
+//! | Data | synthetic trees, alignments, HMM models |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use barracuda::{FelsensteinGpu, PhyloTree};
 use std::sync::Arc;
@@ -19,6 +30,7 @@ use wetspring_barracuda::bio::felsenstein::{
 use wetspring_barracuda::bio::hmm::{self, HmmModel};
 use wetspring_barracuda::bio::hmm_gpu::HmmGpuForward;
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 const MU: f64 = 1.0;
@@ -236,7 +248,12 @@ fn bench_felsenstein(device: &Arc<barracuda::device::WgpuDevice>, v: &mut Valida
             {
                 let speedup = cpu_us as f64 / gpu_us.max(1) as f64;
                 println!("    CPU: {cpu_us} µs, GPU: {gpu_us} µs, speedup: {speedup:.2}×");
-                v.check("Fels: parity (CPU ≈ GPU)", cpu_ll, gpu_ll, 1e-4);
+                v.check(
+                    "Fels: parity (CPU ≈ GPU)",
+                    cpu_ll,
+                    gpu_ll,
+                    tolerances::GPU_VS_CPU_ENSEMBLE,
+                );
                 v.check(
                     "Fels: GPU completed",
                     f64::from(gpu_ll.is_finite() as u8),
@@ -301,7 +318,7 @@ fn bench_bootstrap(device: &Arc<barracuda::device::WgpuDevice>, v: &mut Validato
             println!("    max |CPU−GPU| = {max_diff:.2e}");
             v.check(
                 "Bootstrap: parity",
-                f64::from((max_diff < 1e-4) as u8),
+                f64::from((max_diff < tolerances::GPU_VS_CPU_ENSEMBLE) as u8),
                 1.0,
                 0.0,
             );

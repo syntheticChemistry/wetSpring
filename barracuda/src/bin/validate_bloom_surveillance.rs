@@ -19,6 +19,7 @@
 //! - Berger-Parker dominance index
 
 use wetspring_barracuda::bio::diversity::{bray_curtis, pielou_evenness, shannon, simpson};
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn dominance_index(counts: &[f64]) -> f64 {
@@ -72,7 +73,7 @@ fn main() {
     v.check_count("BC(pre,bloom) > 0.5", usize::from(large_shift), 1);
 
     let bc_self = bray_curtis(&even, &even);
-    v.check("BC(self) = 0", bc_self, 0.0, 1e-10);
+    v.check("BC(self) = 0", bc_self, 0.0, tolerances::PYTHON_PARITY);
 
     // ── Section 4: Recovery detection ───────────────────────────
     v.section("── Recovery: community rebounds ──");
@@ -109,7 +110,7 @@ fn main() {
         .sum::<f64>()
         / 3.0)
         .sqrt();
-    let bloom_detected = shannon_ts[3] < pre_mean - 2.0 * pre_std;
+    let bloom_detected = shannon_ts[3] < 2.0f64.mul_add(-pre_std, pre_mean);
     v.check_count(
         "bloom detected (Shannon < mean-2σ)",
         usize::from(bloom_detected),

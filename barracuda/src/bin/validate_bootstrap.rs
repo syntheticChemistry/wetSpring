@@ -1,5 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Validation: Wang 2021 RAWR bootstrap resampling (Exp031).
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | wang2021_rawr_bootstrap.py |
+//! | Baseline version | scripts/ |
+//! | Baseline command | python3 scripts/wang2021_rawr_bootstrap.py |
+//! | Baseline date | 2026-02-19 |
+//! | Data | 3-taxon alignment, 100 replicates |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::bio::bootstrap::{
     bootstrap_likelihoods, bootstrap_support, resample_columns, Alignment,

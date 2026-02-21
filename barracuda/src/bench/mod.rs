@@ -25,13 +25,21 @@ pub use power::{EnergyReport, PowerMonitor};
 /// Result from a single benchmark phase.
 #[derive(Debug, Clone)]
 pub struct PhaseResult {
+    /// Phase name (e.g., `"shannon_1m"`, `"felsenstein"`).
     pub phase: String,
+    /// Substrate label (e.g., `"Python"`, `"BarraCUDA CPU"`, `"BarraCUDA GPU"`).
     pub substrate: String,
+    /// Total wall-clock time in seconds.
     pub wall_time_s: f64,
+    /// Microseconds per evaluation (`wall_time_s` / `n_evals` * 1e6). Zero if no evals.
     pub per_eval_us: f64,
+    /// Number of evaluations/computations performed.
     pub n_evals: usize,
+    /// CPU (RAPL) and GPU (nvidia-smi) energy/power measurements.
     pub energy: EnergyReport,
+    /// Peak resident set size in MB (`VmHWM` from `/proc/self/status`).
     pub peak_rss_mb: f64,
+    /// Optional free-form notes (e.g., `"smoke test"`).
     pub notes: String,
 }
 
@@ -69,8 +77,11 @@ impl PhaseResult {
 /// Full benchmark report for a validation run.
 #[derive(Debug, Clone)]
 pub struct BenchReport {
+    /// ISO8601 timestamp when the report was created.
     pub timestamp: String,
+    /// Hardware snapshot (CPU, GPU, RAM) at run start.
     pub hardware: HardwareInventory,
+    /// Per-phase results. Multiple phases may share the same name across substrates.
     pub phases: Vec<PhaseResult>,
 }
 
@@ -374,6 +385,7 @@ pub(crate) fn json_escape(s: &str) -> String {
         .replace('\t', "\\t")
 }
 
+/// Current time as ISO8601 string (e.g., `2025-02-21T14:30:00`). No timezone.
 #[allow(
     clippy::cast_possible_truncation,
     clippy::cast_possible_wrap,
@@ -401,6 +413,7 @@ pub fn now_iso8601() -> String {
     format!("{y:04}-{m:02}-{d:02}T{hour:02}:{minute:02}:{second:02}")
 }
 
+/// Format seconds as human-readable string (us, ms, s, min).
 #[must_use]
 pub fn format_duration(secs: f64) -> String {
     if secs < 0.001 {
@@ -414,6 +427,7 @@ pub fn format_duration(secs: f64) -> String {
     }
 }
 
+/// Format per-eval time in microseconds as human-readable string (us, ms, s).
 #[must_use]
 pub fn format_eval_time(us: f64) -> String {
     if us < 1000.0 {

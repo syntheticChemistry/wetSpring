@@ -41,7 +41,7 @@
 //! - Bacterial composition shifts with reactor type and nitrate
 
 use std::collections::HashMap;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use wetspring_barracuda::bio::chimera::{self, ChimeraParams};
 use wetspring_barracuda::bio::dada2::{self, Dada2Params};
 use wetspring_barracuda::bio::derep::{self, DerepSort};
@@ -52,7 +52,8 @@ use wetspring_barracuda::bio::taxonomy::{
 };
 use wetspring_barracuda::bio::unifrac::{self, PhyloTree};
 use wetspring_barracuda::io::fastq::{self, FastqRecord};
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::tolerances;
+use wetspring_barracuda::validation::{self, Validator};
 
 fn main() {
     let mut v = Validator::new("wetSpring Algae Pond 16S Validation (Exp012)");
@@ -61,12 +62,9 @@ fn main() {
     validate_humphrey_reference(&mut v);
     validate_python_control(&mut v);
 
-    let data_dir = std::env::var("WETSPRING_ALGAE_DIR").map_or_else(
-        |_| {
-            Path::new(env!("CARGO_MANIFEST_DIR"))
-                .join("../data/paper_proxy/nannochloropsis_16s/SRR7760408")
-        },
-        PathBuf::from,
+    let data_dir = validation::data_dir(
+        "WETSPRING_ALGAE_DIR",
+        "data/paper_proxy/nannochloropsis_16s/SRR7760408",
     );
 
     if data_dir.exists() {
@@ -171,7 +169,12 @@ fn validate_synthetic_pipeline(v: &mut Validator) {
             p * p.ln()
         })
         .sum::<f64>();
-    v.check("Shannon analytical match", shannon, expected_shannon, 1e-10);
+    v.check(
+        "Shannon analytical match",
+        shannon,
+        expected_shannon,
+        tolerances::PYTHON_PARITY,
+    );
 
     // Step 5: Taxonomy classification
     let refs = vec![
@@ -256,7 +259,12 @@ fn validate_synthetic_pipeline(v: &mut Validator) {
     }
 
     let uw_self = unifrac::unweighted_unifrac(&tree, &sample, &sample);
-    v.check("UniFrac: self-distance = 0", uw_self, 0.0, 1e-12);
+    v.check(
+        "UniFrac: self-distance = 0",
+        uw_self,
+        0.0,
+        tolerances::ANALYTICAL_F64,
+    );
 
     // Healthy community vs pathogen-dominated community
     let mut pathogen_dominated: HashMap<String, f64> = HashMap::new();
@@ -372,7 +380,7 @@ fn validate_python_control(v: &mut Validator) {
         "Python/Rust Shannon agree on analytical input",
         rust_shannon,
         expected_shannon,
-        1e-12,
+        tolerances::ANALYTICAL_F64,
     );
 
     let expected_simpson = 1.0 - abundances.iter().map(|&c| (c / n).powi(2)).sum::<f64>();
@@ -380,7 +388,7 @@ fn validate_python_control(v: &mut Validator) {
         "Python/Rust Simpson agree on analytical input",
         rust_simpson,
         expected_simpson,
-        1e-12,
+        tolerances::ANALYTICAL_F64,
     );
 
     // The Python baseline on real data shows high-diversity marine community:

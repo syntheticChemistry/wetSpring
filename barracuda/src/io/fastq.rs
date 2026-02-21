@@ -272,6 +272,22 @@ impl Iterator for FastqIter {
 }
 
 /// Compute summary statistics from parsed records.
+///
+/// # Examples
+///
+/// ```
+/// use wetspring_barracuda::io::fastq::{compute_stats, FastqRecord};
+///
+/// let records = vec![FastqRecord {
+///     id: "read1".into(),
+///     sequence: b"ATGC".to_vec(),
+///     quality: b"IIII".to_vec(),  // Q40
+/// }];
+/// let stats = compute_stats(&records);
+/// assert_eq!(stats.num_sequences, 1);
+/// assert_eq!(stats.total_bases, 4);
+/// assert!((stats.gc_content - 0.5).abs() < 1e-6);
+/// ```
 #[must_use]
 pub fn compute_stats(records: &[FastqRecord]) -> FastqStats {
     if records.is_empty() {

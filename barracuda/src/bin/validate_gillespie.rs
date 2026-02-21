@@ -7,6 +7,17 @@
 //!
 //! Follows the `hotSpring` pattern: hardcoded expected values, explicit
 //! pass/fail, exit code 0/1.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | gillespie_baseline.py |
+//! | Baseline version | scripts/ |
+//! | Baseline command | python3 scripts/gillespie_baseline.py |
+//! | Baseline date | 2026-02-19 |
+//! | Data | Massie 2012 c-di-GMP birth-death model, N=1000 ensemble |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::bio::gillespie;
 use wetspring_barracuda::validation::Validator;

@@ -17,6 +17,7 @@ use wetspring_barracuda::bio::alignment::{smith_waterman_score, ScoringParams};
 use wetspring_barracuda::bio::neighbor_joining::{
     distance_matrix, jukes_cantor_distance, neighbor_joining,
 };
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 // 5-taxon sequences (200bp, seed=42, divergence=0.1) from Python baseline
@@ -36,12 +37,17 @@ fn main() {
     v.section("── 5-taxon JC distance matrix ──");
     let dmat = distance_matrix(&seqs_5);
     v.check_count("distance_matrix_len", dmat.len(), 25);
-    v.check("d(t0,t0) = 0", dmat[0], 0.0, 1e-10);
+    v.check("d(t0,t0) = 0", dmat[0], 0.0, tolerances::PYTHON_PARITY);
     // Python: d(t0,t1) ≈ -0.0 (identical sequences)
-    v.check("d(t0,t1) ≈ 0", dmat[1], 0.0, 1e-10);
+    v.check("d(t0,t1) ≈ 0", dmat[1], 0.0, tolerances::PYTHON_PARITY);
     // Rust JC: d(t0,t2) ≈ 0.03566 (differs from Python due to byte-level comparison)
-    v.check("d(t0,t2)", dmat[2], 0.035_660, 1e-3);
-    let symmetric = (dmat[1] - dmat[5]).abs() < 1e-12;
+    v.check(
+        "d(t0,t2)",
+        dmat[2],
+        0.035_660,
+        tolerances::EVOLUTIONARY_DISTANCE,
+    );
+    let symmetric = (dmat[1] - dmat[5]).abs() < tolerances::EXACT_F64;
     v.check_count("matrix_symmetric", usize::from(symmetric), 1);
 
     // ── Section 2: Neighbor-Joining ─────────────────────────────
@@ -94,7 +100,12 @@ fn main() {
     // ── Section 4: JC distance correctness ──────────────────────
     v.section("── Jukes-Cantor distance properties ──");
     let d_identical = jukes_cantor_distance(SEQ_T0, SEQ_T1);
-    v.check("JC(identical) ≈ 0", d_identical, 0.0, 1e-10);
+    v.check(
+        "JC(identical) ≈ 0",
+        d_identical,
+        0.0,
+        tolerances::PYTHON_PARITY,
+    );
     let d_t0_t2 = jukes_cantor_distance(SEQ_T0, SEQ_T2);
     let d_t0_t4 = jukes_cantor_distance(SEQ_T0, SEQ_T4);
     let more_diverged = d_t0_t4 > d_t0_t2;

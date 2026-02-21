@@ -420,4 +420,27 @@ mod tests {
             r2.ds
         );
     }
+
+    #[test]
+    fn batch_matches_individual() {
+        let s1 = b"ATGGCTAAATTT";
+        let s2 = b"ATGGCCAAATTT";
+        let s3 = b"ATGATGAAA";
+        let pairs: Vec<(&[u8], &[u8])> = vec![(s1, s2), (s1, s1), (s3, s3)];
+        let batch = pairwise_dnds_batch(&pairs);
+        assert_eq!(batch.len(), 3);
+        let individual = pairwise_dnds(s1, s2).unwrap();
+        let batch_0 = batch[0].as_ref().unwrap();
+        assert!((batch_0.dn - individual.dn).abs() < 1e-15);
+        assert!((batch_0.ds - individual.ds).abs() < 1e-15);
+    }
+
+    #[test]
+    fn batch_propagates_errors() {
+        let ok_pair: (&[u8], &[u8]) = (b"ATGATG", b"CTGATG");
+        let bad_pair: (&[u8], &[u8]) = (b"ATG", b"ATGATG");
+        let batch = pairwise_dnds_batch(&[ok_pair, bad_pair]);
+        assert!(batch[0].is_ok());
+        assert!(batch[1].is_err());
+    }
 }

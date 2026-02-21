@@ -1,13 +1,13 @@
 # wetSpring — BarraCUDA Requirements
 
-**Last Updated**: February 20, 2026
+**Last Updated**: February 21, 2026
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---
 
 ## Current Kernel Usage (Validated)
 
-### Rust CPU Modules (41 modules, 582 tests)
+### Rust CPU Modules (41 modules, 552 tests, 93.5% coverage)
 
 | Module Domain | Modules | Status |
 |--------------|---------|--------|

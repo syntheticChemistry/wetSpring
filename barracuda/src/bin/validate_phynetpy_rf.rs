@@ -15,6 +15,7 @@
 
 use wetspring_barracuda::bio::robinson_foulds::{rf_distance, rf_distance_normalized};
 use wetspring_barracuda::bio::unifrac::PhyloTree;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 // First 3 gene trees from DEFJ/10Genes/withOG/E/g10/n3/t20/r1
@@ -84,9 +85,14 @@ fn main() {
     // ── Section 5: Normalized RF ────────────────────────────────
     v.section("── Normalized RF ──");
     let nrf_self = rf_distance_normalized(&t0, &t0);
-    v.check("nRF(self)", nrf_self, 0.0, 1e-12);
+    v.check("nRF(self)", nrf_self, 0.0, tolerances::ANALYTICAL_F64);
     let nrf_01 = rf_distance_normalized(&t0, &t1);
-    v.check("nRF(0,1) in [0,1]", nrf_01.clamp(0.0, 1.0), nrf_01, 1e-12);
+    v.check(
+        "nRF(0,1) in [0,1]",
+        nrf_01.clamp(0.0, 1.0),
+        nrf_01,
+        tolerances::ANALYTICAL_F64,
+    );
 
     // ── Section 6: Determinism ──────────────────────────────────
     v.section("── Determinism ──");

@@ -1,4 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![warn(missing_docs, clippy::pedantic, clippy::nursery)]
+#![allow(
+    clippy::module_name_repetitions,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::similar_names
+)]
 //! wetSpring `BarraCUDA` — Life Science + PFAS Analytical Chemistry Pipelines
 //!
 //! Rust implementations validated against Python/Galaxy/QIIME2/asari/`FindPFAS`

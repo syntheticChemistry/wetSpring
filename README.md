@@ -4,9 +4,9 @@
 faithfully ported to BarraCUDA (Rust) and eventually promoted to ToadStool
 (GPU shaders), then shown substrate-independent via metalForge.
 
-**Date:** February 2026
+**Date:** February 21, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 14 — 25-Domain Parity + GPU RF + metalForge Cross-Substrate
+**Status:** Phase 15 — Code Quality Hardening + Coverage
 
 ---
 
@@ -38,17 +38,20 @@ Four tracks cover the life science and environmental monitoring domains:
 | Validation checks (CPU) | 1,241 |
 | Validation checks (GPU) | 260 |
 | **Total validation checks** | **1,501** |
-| Rust unit/integration tests | 582 |
+| Rust library unit tests | 539 (+ 1 ignored — hardware-dependent) |
+| Rust doc-tests | 13 |
+| **Total Rust tests** | **552** |
+| Line coverage (`cargo-llvm-cov`) | **93.5%** |
 | Experiments completed | 63 |
-| Validation binaries | 29 CPU + 12 GPU + 1 benchmark |
+| Validation/benchmark binaries | 47 CPU + 10 GPU + 4 benchmark |
 | CPU bio modules | 41 |
 | GPU bio modules | 20 (+4 ToadStool bio primitives consumed directly) |
-| Python baselines | 35 scripts |
+| Python baselines | 40 scripts |
 | BarraCUDA CPU parity | 157/157 (25 domains) |
 | ToadStool primitives | 15 (inc. 4 bio: Felsenstein, Gillespie, SW, TreeInference) |
 | Local WGSL shaders | 9 (Write → Absorb → Lean candidates) |
 
-All 1,501 validation checks **PASS**. All 582 tests **PASS** (1 ignored — GPU-only).
+All 1,501 validation checks **PASS**. All 552 tests **PASS**.
 
 ### GPU Performance
 
@@ -116,11 +119,59 @@ with sigmoid/softmax) — both proven as pure Rust math (29/29 CPU checks).
 RF promoted to GPU via local WGSL shader (13/13 GPU checks, SoA layout).
 Combined v1-v5: **157/157 checks across 25 domains**.
 
-### Phase 14: Current — Evolution Readiness
+### Phase 14: Evolution Readiness
 Following hotSpring's patterns: shaping all validated Rust modules for
 ToadStool absorption. 9 local WGSL shaders as handoff candidates.
 metalForge proving substrate independence across CPU, GPU, and NPU
 characterization. wetSpring writes extensions, ToadStool absorbs, we lean.
+
+### Phase 15: Code Quality Hardening
+Comprehensive audit and evolution of the codebase:
+- Crate-level `clippy::pedantic` + `clippy::nursery` lints enforced (0 warnings)
+- `rustfmt.toml` with `max_width = 100` enforced across all 78 source files
+- All inline tolerance literals replaced with 22 named constants in `tolerances.rs`
+- All 61 validation binaries carry structured `# Provenance` headers
+- All data paths use `validation::data_dir()` for capability-based discovery
+- `flate2` explicitly uses `rust_backend` (no C dependencies, ecoBin compliant)
+- 11 new unit tests targeting coverage gaps; line coverage at **93.5%**
+- 6 new doc-tests on key public API functions
+- Zero `unsafe` in production code, zero `.unwrap()` in production code
+- All I/O parsers confirmed streaming (no whole-file buffering)
+- Smart refactoring: duplicated FASTQ decompression removed in favor of library
+
+### Phase 16: Current — BarraCUDA Evolution + Absorption Readiness
+Following hotSpring's Write → Absorb → Lean pattern for ToadStool integration:
+- **Handoff document** submitted to `wateringHole/handoffs/` with all 9 Tier A
+  shaders: binding layouts, dispatch geometry, CPU references, validation counts
+- **CPU math evolution** identified: 4 local functions (`erf`, `ln_gamma`,
+  `regularized_gamma`, `trapz`) that duplicate `barracuda::special`/`numerical`
+  — blocked on proposed `barracuda::math` feature (CPU-only, no wgpu)
+- **metalForge evolution**: hardware characterization updated with substrate
+  routing, absorption strategy, and cross-system validation status
+- **naga/NVVM driver profile fix** proposed: `needs_f64_exp_log_workaround()`
+  should return `true` for Ada Lovelace (RTX 40-series, sm_89)
+- **Evolution narrative** aligned with hotSpring: Springs write validated
+  extensions, ToadStool absorbs as shared primitives, Springs lean on upstream
+
+---
+
+## Code Quality
+
+| Check | Status |
+|-------|--------|
+| `cargo fmt --check` | Clean (0 diffs) |
+| `cargo clippy --pedantic --nursery` | Clean (0 warnings) |
+| `cargo doc --no-deps` | Clean (0 warnings) |
+| Line coverage (`cargo-llvm-cov`) | **93.5%** |
+| `unsafe` in production code | **0** |
+| `.unwrap()` in production code | **0** |
+| TODO/FIXME markers | **0** |
+| Inline tolerance literals | **0** (all use `tolerances::` constants) |
+| SPDX-License-Identifier | All `.rs` files |
+| Max file size | All under 1000 LOC |
+| External C dependencies | **0** (`flate2` uses `rust_backend`) |
+| Named tolerance constants | 22 (scientifically justified, hierarchy-tested) |
+| Provenance headers | All 61 validation/benchmark binaries |
 
 ---
 
@@ -212,18 +263,30 @@ wetSpring/
 ├── BENCHMARK_RESULTS.md           ← three-tier benchmark results
 ├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (63 experiments)
 ├── HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_20_2026.md  ← ToadStool handoff
-├── barracuda/                     ← Rust crate (src/, tests/, Cargo.toml)
+├── barracuda/                     ← Rust crate (src/, Cargo.toml, rustfmt.toml)
 │   ├── EVOLUTION_READINESS.md    ← absorption map (tiers, primitives, shaders)
-│   └── src/shaders/              ← 9 local WGSL shaders (Write → Absorb → Lean)
+│   ├── src/
+│   │   ├── lib.rs               ← crate root (pedantic + nursery lints enforced)
+│   │   ├── tolerances.rs        ← 22 named tolerance constants
+│   │   ├── validation.rs        ← hotSpring validation framework
+│   │   ├── encoding.rs          ← sovereign base64 (zero dependencies)
+│   │   ├── error.rs             ← error types (no external crates)
+│   │   ├── bio/                 ← 41 CPU + 20 GPU bio modules
+│   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML)
+│   │   ├── bench/               ← benchmark harness + power monitoring
+│   │   ├── bin/                 ← 61 validation/benchmark binaries
+│   │   └── shaders/             ← 9 local WGSL shaders (Write → Absorb → Lean)
+│   └── rustfmt.toml             ← max_width = 100, edition = 2021
 ├── experiments/                   ← 63 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── PRIMITIVE_MAP.md          ← Rust module ↔ ToadStool primitive mapping
-│   ├── ABSORPTION_STRATEGY.md   ← Write → Absorb → Lean methodology
+│   ├── ABSORPTION_STRATEGY.md   ← Write → Absorb → Lean methodology + CPU math evolution
 │   └── benchmarks/
 │       └── CROSS_SYSTEM_STATUS.md ← algorithm × substrate matrix
+├── ../wateringHole/handoffs/      ← inter-primal ToadStool handoffs (shared)
 ├── archive/
 │   └── handoffs/                  ← fossil record of ToadStool handoffs (v1–v4)
-├── scripts/                       ← Python baselines (35 scripts)
+├── scripts/                       ← Python baselines (40 scripts)
 ├── specs/                         ← specifications and paper queue
 ├── whitePaper/                    ← validation study draft
 └── data/                          ← local datasets (not committed)
@@ -234,39 +297,33 @@ wetSpring/
 ## Quick Start
 
 ```bash
-# Run all tests (582 tests)
-cd barracuda && cargo test
+cd barracuda
 
-# Run CPU validation binaries (1,241 checks across 29 binaries)
-for bin in validate_qs_ode validate_rf_distance validate_gillespie \
-           validate_newick_parse validate_bistable validate_multi_signal \
-           validate_cooperation validate_hmm validate_capacitor \
-           validate_alignment validate_felsenstein validate_barracuda_cpu \
-           validate_barracuda_cpu_v2 validate_barracuda_cpu_v3 \
-           validate_barracuda_cpu_v4 validate_barracuda_cpu_v5 \
-           validate_phage_defense validate_bootstrap validate_placement \
-           validate_phynetpy_rf validate_phylohmm validate_sate_pipeline \
-           validate_algae_timeseries validate_bloom_surveillance \
-           validate_epa_pfas_ml validate_massbank_spectral \
-           validate_rare_biosphere validate_viral_metagenomics \
-           validate_sulfur_phylogenomics validate_phosphorus_phylogenomics \
-           validate_population_genomics validate_pangenomics; do
-    cargo run --release --bin $bin
+# Run all tests (552: 539 lib + 13 doc-tests)
+cargo test
+
+# Code quality checks
+cargo fmt -- --check
+cargo clippy --lib -- -W clippy::pedantic -W clippy::nursery
+cargo doc --no-deps
+
+# Line coverage (requires cargo-llvm-cov)
+cargo llvm-cov --lib --summary-only
+
+# Run all CPU validation binaries (1,241 checks)
+for bin in $(ls src/bin/validate_*.rs | grep -v gpu | sed 's|src/bin/||;s|\.rs||'); do
+    cargo run --release --bin "$bin"
 done
 
-# Run GPU validation (requires GPU + --features gpu, 260 checks across 12 binaries)
-for gpu_bin in validate_diversity_gpu validate_16s_pipeline_gpu \
-               validate_barracuda_gpu_v3 validate_gpu_phylo_compose \
-               validate_gpu_hmm_forward benchmark_phylo_hmm_gpu \
-               validate_gpu_ode_sweep validate_toadstool_bio \
-               validate_gpu_track1c validate_cross_substrate \
-               validate_gpu_rf; do
-    cargo run --features gpu --release --bin $gpu_bin
+# Run GPU validation (requires --features gpu, 260 checks)
+for bin in $(ls src/bin/validate_*gpu*.rs src/bin/validate_toadstool*.rs \
+    src/bin/validate_cross*.rs 2>/dev/null | sed 's|src/bin/||;s|\.rs||' | sort -u); do
+    cargo run --features gpu --release --bin "$bin"
 done
 
 # 25-domain Rust vs Python benchmark
 cargo run --release --bin benchmark_23_domain_timing
-python3 scripts/benchmark_rust_vs_python.py
+python3 ../scripts/benchmark_rust_vs_python.py
 ```
 
 ---
@@ -294,6 +351,8 @@ All validation data comes from public repositories:
 
 ## Related
 
-- **hotSpring** — Nuclear/plasma physics validation (sibling Spring)
-- **ToadStool** — GPU compute engine (BarraCUDA crate)
+- **hotSpring** — Nuclear/plasma physics validation (sibling Spring, 34 WGSL shaders, 454 tests)
+- **ToadStool** — GPU compute engine (BarraCUDA crate, shared primitives)
+- **wateringHole** — Inter-primal standards and handoff documents
+  - `handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md` — active handoff
 - **ecoPrimals** — Parent ecosystem

@@ -14,7 +14,7 @@
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use std::collections::HashMap;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use wetspring_barracuda::bio::dada2::{self, Dada2Params};
 use wetspring_barracuda::bio::derep::{self, DerepSort};
 use wetspring_barracuda::bio::diversity;
@@ -22,22 +22,15 @@ use wetspring_barracuda::bio::quality::{self, QualityParams};
 use wetspring_barracuda::bio::taxonomy::{
     ClassifyParams, Lineage, NaiveBayesClassifier, ReferenceSeq, TaxRank,
 };
-use wetspring_barracuda::io::fastq::FastqRecord;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{self, Validator};
 
 fn main() {
     let mut v = Validator::new("wetSpring Public Data Benchmark — Full Time Series + Taxonomy");
 
-    let base = std::env::var("WETSPRING_PUBLIC_DIR").map_or_else(
-        |_| Path::new(env!("CARGO_MANIFEST_DIR")).join("../data/public_benchmarks"),
-        PathBuf::from,
-    );
+    let base = validation::data_dir("WETSPRING_PUBLIC_DIR", "data/public_benchmarks");
 
     // ── Load SILVA reference database (if available) ─────────────────────
-    let ref_dir = std::env::var("WETSPRING_REF_DIR").map_or_else(
-        |_| Path::new(env!("CARGO_MANIFEST_DIR")).join("../data/reference_dbs/silva_138"),
-        PathBuf::from,
-    );
+    let ref_dir = validation::data_dir("WETSPRING_REF_DIR", "data/reference_dbs/silva_138");
     let classifier = load_silva_classifier(&ref_dir);
 
     let mut all_results: Vec<SampleResult> = Vec::new();
@@ -294,7 +287,7 @@ fn process_sample(
         return None;
     };
 
-    let records = match decompress_gz_fastq(&fastq_path) {
+    let records = match wetspring_barracuda::io::fastq::parse_fastq(&fastq_path) {
         Ok(recs) => recs,
         Err(e) => {
             println!("  [ERROR] Failed to parse {}: {e}", fastq_path.display());
@@ -926,46 +919,4 @@ fn taxonomy_benchmark(v: &mut Validator, all_results: &[SampleResult]) {
         1.0,
         0.0,
     );
-}
-
-// ── Gzipped FASTQ decompression ─────────────────────────────────────────────
-
-fn decompress_gz_fastq(path: &Path) -> Result<Vec<FastqRecord>, String> {
-    use std::io::{BufRead, BufReader};
-
-    let file = std::fs::File::open(path).map_err(|e| e.to_string())?;
-    let decoder = flate2::read::GzDecoder::new(file);
-    let reader = BufReader::new(decoder);
-
-    let mut records = Vec::new();
-    let mut lines = reader.lines();
-
-    loop {
-        let header = match lines.next() {
-            Some(Ok(l)) if l.starts_with('@') => l,
-            Some(Ok(_)) => continue,
-            _ => break,
-        };
-        let Some(Ok(seq)) = lines.next() else { break };
-        let Some(Ok(_)) = lines.next() else { break };
-        let Some(Ok(qual)) = lines.next() else { break };
-
-        let id = header[1..]
-            .split_whitespace()
-            .next()
-            .unwrap_or("")
-            .to_string();
-        records.push(FastqRecord {
-            id,
-            sequence: seq.into_bytes(),
-            quality: qual.into_bytes(),
-        });
-    }
-
-    if records.is_empty() {
-        Err("No complete FASTQ records".to_string())
-    } else {
-        println!("  Parsed {} records from {}", records.len(), path.display());
-        Ok(records)
-    }
 }

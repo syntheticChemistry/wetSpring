@@ -29,9 +29,13 @@ pub struct AlignmentResult {
 /// Scoring parameters for alignment.
 #[derive(Debug, Clone, Copy)]
 pub struct ScoringParams {
+    /// Score for matching residues.
     pub match_score: i32,
+    /// Penalty for mismatching residues.
     pub mismatch_penalty: i32,
+    /// Penalty for opening a gap.
     pub gap_open: i32,
+    /// Penalty per residue in an extended gap.
     pub gap_extend: i32,
 }
 
@@ -48,7 +52,7 @@ impl Default for ScoringParams {
 
 /// BLOSUM62-style nucleotide scoring: match/mismatch.
 #[inline]
-fn score_pair(a: u8, b: u8, params: &ScoringParams) -> i32 {
+const fn score_pair(a: u8, b: u8, params: &ScoringParams) -> i32 {
     let a_upper = a.to_ascii_uppercase();
     let b_upper = b.to_ascii_uppercase();
     if a_upper == b_upper {

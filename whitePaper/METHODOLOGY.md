@@ -377,8 +377,7 @@ Current status: **1,241/1,241 pass.** 63 experiments across 4 tracks.
 | `validate_gpu_ode_sweep` | 12 | GPU ODE sweep (7) + bifurcation eigenvalues (5) (Exp049-050) |
 
 | `validate_gpu_track1c` | 27 | ANI + SNP + dN/dS + pangenome shaders (Exp058) |
-| `validate_gpu_23_domain_benchmark` | 20 | 23-domain GPU parity (Exp059) |
-| `validate_gpu_cross_substrate` | skip | metalForge substrate proof (Exp060) |
+| `validate_cross_substrate` | 20 | metalForge cross-substrate CPU↔GPU parity (Exp060) |
 | `validate_gpu_rf` | 13 | RF batch inference shader (Exp063) |
 
 Current status: **260/260 pass.** 15 ToadStool primitives consumed.
@@ -418,4 +417,23 @@ results, then exceed them via Rust + GPU.
 | QIIME2 | 2026.1.0 | Galaxy plugin (q2-amplicon-2026.1) |
 | asari | 1.13.1 | LC-MS feature extraction |
 | `PFΔScreen` | Latest | PFAS non-target screening |
-| flate2 | 1.0 | Only runtime dependency (gzip) |
+| flate2 | 1.0 | Pure Rust backend (`rust_backend`), no C dependencies |
+| barracuda | 0.2.0 (path dep) | 15 ToadStool primitives consumed |
+
+---
+
+## 9. Code Quality
+
+| Gate | Status |
+|------|--------|
+| `cargo fmt --check` | Clean (0 diffs, `max_width = 100`) |
+| `cargo clippy -W pedantic -W nursery` | 0 warnings (crate-level enforcement) |
+| `cargo doc --no-deps` | 0 warnings |
+| `cargo-llvm-cov` | **93.5%** line coverage |
+| `unsafe` in production | 0 |
+| `.unwrap()` in production | 0 |
+| Named tolerances | 22 constants in `tolerances.rs`, hierarchy-tested |
+| Provenance headers | All 61 validation/benchmark binaries |
+| External C dependencies | 0 (`flate2` uses `rust_backend`) |
+| Max file size | All under 1000 LOC |
+| SPDX headers | All `.rs` and `.wgsl` files |

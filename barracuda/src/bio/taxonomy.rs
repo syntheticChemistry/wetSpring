@@ -31,18 +31,28 @@ const DEFAULT_BOOTSTRAP_N: usize = 100;
 const DEFAULT_MIN_CONFIDENCE: f64 = 0.8;
 
 /// Taxonomic ranks used in 16S classification.
+///
+/// Follows the standard hierarchy from kingdom down to species.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum TaxRank {
+    /// Domain/kingdom (e.g., Bacteria, Archaea).
     Kingdom,
+    /// Phylum-level classification.
     Phylum,
+    /// Class-level classification.
     Class,
+    /// Order-level classification.
     Order,
+    /// Family-level classification.
     Family,
+    /// Genus-level classification.
     Genus,
+    /// Species-level classification.
     Species,
 }
 
 impl TaxRank {
+    /// Return all ranks from kingdom to species, in order.
     #[must_use]
     pub const fn all() -> &'static [Self] {
         &[
@@ -56,6 +66,7 @@ impl TaxRank {
         ]
     }
 
+    /// Zero-based index for this rank (Kingdom=0, Species=6). Use with `ranks.get(depth)`.
     #[must_use]
     pub const fn depth(self) -> usize {
         match self {
@@ -73,6 +84,7 @@ impl TaxRank {
 /// A taxonomic lineage (one entry per rank from kingdom to species).
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Lineage {
+    /// Taxon names at each rank (index matches `TaxRank::depth()`).
     pub ranks: Vec<String>,
 }
 
@@ -89,11 +101,13 @@ impl Lineage {
         Self { ranks }
     }
 
+    /// Lookup taxon name at a specific rank. Returns `None` if rank exceeds lineage depth.
     #[must_use]
     pub fn at_rank(&self, rank: TaxRank) -> Option<&str> {
         self.ranks.get(rank.depth()).map(String::as_str)
     }
 
+    /// Format lineage up to (and including) the given rank, semicolon-separated.
     #[must_use]
     pub fn to_string_at_rank(&self, rank: TaxRank) -> String {
         let depth = rank.depth() + 1;
@@ -104,8 +118,11 @@ impl Lineage {
 /// A reference sequence for training the classifier.
 #[derive(Debug, Clone)]
 pub struct ReferenceSeq {
+    /// Accession or identifier from the FASTA header.
     pub id: String,
+    /// DNA sequence as bytes (A,C,G,T in uppercase).
     pub sequence: Vec<u8>,
+    /// Taxonomic lineage parsed from header or taxonomy file.
     pub lineage: Lineage,
 }
 

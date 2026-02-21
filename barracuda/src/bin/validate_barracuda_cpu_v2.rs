@@ -5,6 +5,17 @@
 //! batch HMM, batch Smith-Waterman, `NeighborJoining`, DTL Reconciliation.
 //! Proves the new batch/flat APIs produce identical results to their
 //! sequential counterparts, validating GPU-ready data layouts on CPU.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | BarraCUDA CPU v1 (recursive/sequential) + Python refs: `felsenstein_pruning_baseline.py`, `liu2014_hmm_baseline.py`, `smith_waterman_baseline.py`, `liu2009_neighbor_joining.py`, `zheng2023_dtl_reconciliation.py` |
+//! | Baseline version | Feb 2026 |
+//! | Baseline command | Batch/flat impl validated against sequential; `python3 scripts/liu2009_neighbor_joining.py` (NJ), `python3 scripts/zheng2023_dtl_reconciliation.py` (DTL) |
+//! | Baseline date | 2026-02-19 |
+//! | Data | Synthetic test vectors (hardcoded) |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::bio::alignment::{score_batch, smith_waterman_score, ScoringParams};
 use wetspring_barracuda::bio::felsenstein::{encode_dna, log_likelihood, FlatTree, TreeNode};

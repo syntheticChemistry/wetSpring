@@ -10,10 +10,24 @@
 //! 2. **3-state parity** — genomic HMM, single sequence
 //! 3. **Batch parity** — N independent sequences, CPU vs GPU
 //! 4. **Forward-backward consistency** — sum_i alpha[t][i]*beta[t][i] = P(O)
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | BarraCUDA CPU (reference) |
+//! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
+//! | Baseline command | bio::hmm::forward |
+//! | Baseline date | 2026-02-19 |
+//! | Data | Weather HMM, genomic HMM, 64-seq batch |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Local WGSL shader: hmm_forward_f64.wgsl (ToadStool absorption candidate).
 
 use wetspring_barracuda::bio::hmm::{self, HmmModel};
 use wetspring_barracuda::bio::hmm_gpu::HmmGpuForward;
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 fn weather_model() -> HmmModel {
@@ -267,7 +281,7 @@ fn validate_batch(gpu: &HmmGpuForward, v: &mut Validator) {
             }
             v.check(
                 "Batch: max |CPU−GPU| < 1e-4",
-                f64::from((max_diff < 1e-4) as u8),
+                f64::from((max_diff < tolerances::GPU_VS_CPU_ENSEMBLE) as u8),
                 1.0,
                 0.0,
             );
@@ -277,7 +291,12 @@ fn validate_batch(gpu: &HmmGpuForward, v: &mut Validator) {
             {
                 let cpu_mean: f64 = cpu_lls.iter().sum::<f64>() / n_seqs as f64;
                 let gpu_mean: f64 = gpu_result.log_likelihoods.iter().sum::<f64>() / n_seqs as f64;
-                v.check("Batch: mean CPU ≈ GPU", cpu_mean, gpu_mean, 1e-4);
+                v.check(
+                    "Batch: mean CPU ≈ GPU",
+                    cpu_mean,
+                    gpu_mean,
+                    tolerances::GPU_VS_CPU_ENSEMBLE,
+                );
             }
         }
         Ok(Err(e)) => {

@@ -29,39 +29,53 @@ use super::ode::{rk4_integrate, OdeResult};
 /// Parameters for the dual-signal QS network.
 #[derive(Debug, Clone)]
 pub struct MultiSignalParams {
-    // Growth
+    /// Maximum growth rate (h⁻¹). Logistic term uses `1 - N/K`.
     pub mu_max: f64,
+    /// Carrying capacity (OD-equivalent). Cell density caps at this value.
     pub k_cap: f64,
+    /// Cell death rate (h⁻¹). Subtracted from growth.
     pub death_rate: f64,
-    // CAI-1 (intraspecies)
+    /// CAI-1 production rate per cell. Intraspecies signal in *V. cholerae*.
     pub k_cai1_prod: f64,
+    /// CAI-1 degradation/dilution rate.
     pub d_cai1: f64,
     /// Half-sat for CAI-1 dephosphorylation of `CqsS`.
     pub k_cqs: f64,
-    // AI-2 (interspecies)
+    /// AI-2 production rate per cell. Interspecies signal.
     pub k_ai2_prod: f64,
+    /// AI-2 degradation/dilution rate.
     pub d_ai2: f64,
     /// Half-sat for AI-2 dephosphorylation of `LuxPQ`.
     pub k_luxpq: f64,
-    // `LuxO` phosphorylation
+    /// `LuxO` kinase rate. Phosphorylated `LuxO` represses `HapR`.
     pub k_luxo_phos: f64,
+    /// LuxO~P dephosphorylation rate. Signal-bound CqsS/LuxPQ enhance this.
     pub d_luxo_p: f64,
-    // `HapR` (repressed by `LuxO`~P)
+    /// Max `HapR` production rate. Actual rate scaled by LuxO~P repression.
     pub k_hapr_max: f64,
     /// Hill coefficient for `LuxO`~P repression of `HapR`.
     pub n_repress: f64,
     /// Half-sat for `LuxO`~P repression.
     pub k_repress: f64,
+    /// `HapR` degradation rate. Master regulator of virulence and biofilm.
     pub d_hapr: f64,
-    // c-di-GMP / biofilm (same as Waters 2008)
+    /// Basal diguanylate cyclase (DGC) activity. Produces c-di-GMP.
     pub k_dgc_basal: f64,
+    /// DGC repression factor by `HapR`. Higher `HapR` → less c-di-GMP.
     pub k_dgc_rep: f64,
+    /// Basal phosphodiesterase (PDE) activity. Degrades c-di-GMP.
     pub k_pde_basal: f64,
+    /// PDE activation by `HapR`. High QS → high PDE → low c-di-GMP → dispersal.
     pub k_pde_act: f64,
+    /// c-di-GMP turnover/dilution rate.
     pub d_cdg: f64,
+    /// Maximum biofilm promotion rate. Hill-saturated by c-di-GMP.
     pub k_bio_max: f64,
+    /// Half-saturation for c-di-GMP activation of biofilm.
     pub k_bio_cdg: f64,
+    /// Hill coefficient for biofilm promotion by c-di-GMP.
     pub n_bio: f64,
+    /// Biofilm loss (dispersal) rate.
     pub d_bio: f64,
 }
 
@@ -138,7 +152,7 @@ fn multi_rhs(state: &[f64], _t: f64, p: &MultiSignalParams) -> Vec<f64> {
     let dephos_cai1 = hill(cai1, p.k_cqs, 2.0);
     let dephos_ai2 = hill(ai2, p.k_luxpq, 2.0);
     let total_dephos = dephos_cai1 + dephos_ai2;
-    let d_luxo_p = p.k_luxo_phos - (p.d_luxo_p + total_dephos) * luxo_p;
+    let d_luxo_p = (p.d_luxo_p + total_dephos).mul_add(-luxo_p, p.k_luxo_phos);
 
     // HapR: repressed by LuxO~P
     let d_hapr = p.k_hapr_max.mul_add(

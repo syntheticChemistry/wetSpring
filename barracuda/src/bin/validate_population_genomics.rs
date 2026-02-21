@@ -212,7 +212,12 @@ fn validate_python_parity(v: &mut Validator) {
         b"ATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATG",
         &seq2,
     );
-    v.check("Python: ANI same species", r.ani, 0.960_784, 1e-4);
+    v.check(
+        "Python: ANI same species",
+        r.ani,
+        0.960_784,
+        tolerances::ANI_CROSS_SPECIES,
+    );
 
     let seqs: Vec<&[u8]> = vec![b"ATGATG", b"ATGATG", b"ATGTTG"];
     let r = snp::call_snps(&seqs);

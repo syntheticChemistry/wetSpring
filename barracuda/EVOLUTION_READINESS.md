@@ -1,8 +1,17 @@
 # wetSpring Evolution Readiness
 
-**Date:** February 20, 2026
+**Date:** February 21, 2026
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
 **Status:** 41 CPU + 20 GPU modules, 9 local WGSL shaders, 15 ToadStool primitives consumed
+
+### Code Quality (Phase 15)
+
+All modules pass `clippy::pedantic` + `clippy::nursery` (0 warnings), `cargo fmt`
+(0 diffs), `cargo doc` (0 warnings). 93.5% line coverage via `cargo-llvm-cov`.
+All tolerances centralized in `tolerances.rs` (22 named constants). Zero `unsafe`
+and zero `.unwrap()` in production code. All 61 binaries carry `# Provenance`
+headers. Data paths use `validation::data_dir()` for capability-based discovery.
+`flate2` uses `rust_backend` — zero C dependencies (ecoBin compliant).
 
 ---
 
@@ -199,6 +208,10 @@ Plus **NVVM driver profile fix** — Ada Lovelace RTX 40-series
 | Feb 20 | Exp060: metalForge cross-substrate — 20/20 CPU↔GPU parity |
 | Feb 20 | Exp061/062: RF + GBM inference — 29/29 CPU checks (domains 24-25) |
 | Feb 20 | Exp063: GPU RF batch inference — 13/13 GPU checks (SoA WGSL shader) |
+| Feb 21 | Phase 15: Code quality hardening — pedantic clippy, tolerance centralization, provenance headers |
+| Feb 21 | 93.5% line coverage, 552 tests (539 lib + 13 doc), 0 clippy warnings |
+| Feb 21 | All inline tolerance literals → 22 named constants in `tolerances.rs` |
+| Feb 21 | All data paths → `validation::data_dir()` for capability-based discovery |
 
 ---
 
@@ -213,9 +226,10 @@ Plus **NVVM driver profile fix** — Ada Lovelace RTX 40-series
 | WGSL pattern | `pub const WGSL: &str` inline | `include_str!("../shaders/...")` |
 | metalForge | GPU + NPU hardware characterization | GPU + NPU + cross-substrate validation |
 | Handoffs | `wateringHole/handoffs/` (16+ docs) | `archive/handoffs/` (consolidated) |
-| Tests | 418 | 582 |
+| Tests | 454 | 552 |
 | Validation | 418 checks | 1,501 checks |
 | Experiments | 31 suites | 63 experiments |
+| Line coverage | — | 93.5% |
 
 Both Springs follow the same pipeline: Python → Rust CPU → GPU → ToadStool absorption.
 The patterns should converge: hotSpring's `pub const WGSL` inline approach and

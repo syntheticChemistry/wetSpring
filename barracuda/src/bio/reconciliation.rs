@@ -40,8 +40,11 @@ pub enum DtlEvent {
 /// Cost parameters for DTL events.
 #[derive(Debug, Clone, Copy)]
 pub struct DtlCosts {
+    /// Cost of a duplication event.
     pub duplication: u32,
+    /// Cost of a transfer event.
     pub transfer: u32,
+    /// Cost of a loss event.
     pub loss: u32,
 }
 

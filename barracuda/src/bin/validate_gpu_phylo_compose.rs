@@ -11,6 +11,19 @@
 //! This validates the *composition* of an absorbed ToadStool primitive into
 //! higher-level phylogenetic workflows — the core Write → Absorb → Lean
 //! pattern applied to the most compute-heavy bioinformatics operation.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline tool | BarraCUDA CPU (reference) |
+//! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
+//! | Baseline command | bio::felsenstein::log_likelihood, placement::placement_scan, bootstrap |
+//! | Baseline date | 2026-02-19 |
+//! | Data | 3-taxon/5-taxon trees, bootstrap replicates, placement edges |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! ToadStool primitive: FelsensteinGpu (site-parallel pruning). GPU bootstrap + placement.
 
 use barracuda::device::WgpuDevice;
 use barracuda::{FelsensteinGpu, FelsensteinResult, PhyloTree};
@@ -22,6 +35,7 @@ use wetspring_barracuda::bio::felsenstein::{
 use wetspring_barracuda::bio::gillespie::Lcg64;
 use wetspring_barracuda::bio::placement;
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 const MU: f64 = 1.0;
@@ -331,7 +345,12 @@ fn validate_felsenstein_parity(device: &Arc<WgpuDevice>, v: &mut Validator) {
     let flat = FlatTree::from_tree(&tree3, MU);
     let flat_ll = flat.log_likelihood();
 
-    v.check("3-taxon: recursive ≈ flat", cpu_ll, flat_ll, 1e-12);
+    v.check(
+        "3-taxon: recursive ≈ flat",
+        cpu_ll,
+        flat_ll,
+        tolerances::ANALYTICAL_F64,
+    );
 
     let conv = convert_tree(&tree3, MU);
     match pruner.prune(
@@ -343,7 +362,12 @@ fn validate_felsenstein_parity(device: &Arc<WgpuDevice>, v: &mut Validator) {
     ) {
         Ok(result) => {
             let gpu_ll = gpu_log_likelihood(&result, conv.root_idx);
-            v.check("3-taxon: CPU ≈ GPU", cpu_ll, gpu_ll, 1e-6);
+            v.check(
+                "3-taxon: CPU ≈ GPU",
+                cpu_ll,
+                gpu_ll,
+                tolerances::GPU_VS_CPU_F64,
+            );
             v.check(
                 "3-taxon: GPU LL finite",
                 f64::from(gpu_ll.is_finite() as u8),
@@ -376,7 +400,12 @@ fn validate_felsenstein_parity(device: &Arc<WgpuDevice>, v: &mut Validator) {
     ) {
         Ok(result) => {
             let gpu_ll5 = gpu_log_likelihood(&result, conv5.root_idx);
-            v.check("5-taxon: CPU ≈ GPU", cpu_ll5, gpu_ll5, 1e-6);
+            v.check(
+                "5-taxon: CPU ≈ GPU",
+                cpu_ll5,
+                gpu_ll5,
+                tolerances::GPU_VS_CPU_F64,
+            );
             v.check(
                 "5-taxon: GPU LL negative",
                 f64::from((gpu_ll5 < 0.0) as u8),
@@ -455,7 +484,7 @@ fn validate_gpu_bootstrap(device: &Arc<WgpuDevice>, v: &mut Validator) {
         }
         v.check(
             "Bootstrap: max |CPU−GPU| < 1e-4",
-            f64::from((max_diff < 1e-4) as u8),
+            f64::from((max_diff < tolerances::GPU_VS_CPU_ENSEMBLE) as u8),
             1.0,
             0.0,
         );
@@ -464,13 +493,23 @@ fn validate_gpu_bootstrap(device: &Arc<WgpuDevice>, v: &mut Validator) {
         // Statistical agreement: mean and variance should be close
         let cpu_mean: f64 = cpu_lls.iter().sum::<f64>() / n_reps as f64;
         let gpu_mean: f64 = gpu_lls.iter().sum::<f64>() / n_reps as f64;
-        v.check("Bootstrap: mean CPU ≈ GPU", cpu_mean, gpu_mean, 1e-4);
+        v.check(
+            "Bootstrap: mean CPU ≈ GPU",
+            cpu_mean,
+            gpu_mean,
+            tolerances::GPU_VS_CPU_ENSEMBLE,
+        );
 
         let cpu_var: f64 =
             cpu_lls.iter().map(|x| (x - cpu_mean).powi(2)).sum::<f64>() / n_reps as f64;
         let gpu_var: f64 =
             gpu_lls.iter().map(|x| (x - gpu_mean).powi(2)).sum::<f64>() / n_reps as f64;
-        v.check("Bootstrap: variance CPU ≈ GPU", cpu_var, gpu_var, 1e-4);
+        v.check(
+            "Bootstrap: variance CPU ≈ GPU",
+            cpu_var,
+            gpu_var,
+            tolerances::GPU_VS_CPU_ENSEMBLE,
+        );
     } else {
         v.check("Bootstrap: GPU available (skipped)", 1.0, 1.0, 0.0);
     }
@@ -541,7 +580,7 @@ fn validate_gpu_placement(device: &Arc<WgpuDevice>, v: &mut Validator) {
         }
         v.check(
             "Placement: max |CPU−GPU| < 1e-4",
-            f64::from((max_diff < 1e-4) as u8),
+            f64::from((max_diff < tolerances::GPU_VS_CPU_ENSEMBLE) as u8),
             1.0,
             0.0,
         );
