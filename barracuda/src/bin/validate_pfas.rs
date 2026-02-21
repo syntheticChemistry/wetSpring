@@ -210,7 +210,12 @@ fn validate_kmd(v: &mut Validator) {
         0.0,
         tolerances::KMD_GROUPING,
     );
-    v.check("KMD homologue spread (02)", kmd_spread_02, 0.0, 0.02);
+    v.check(
+        "KMD homologue spread (02)",
+        kmd_spread_02,
+        0.0,
+        tolerances::KMD_SPREAD,
+    );
 
     // Grouping should put homologues together
     let (_, groups) = kmd::pfas_kmd_screen(&masses, tolerances::KMD_GROUPING);

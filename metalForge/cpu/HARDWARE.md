@@ -121,7 +121,7 @@ the orchestrator should:
 
 | Workload | Time (release) | Notes |
 |----------|---------------|-------|
-| All 610 Rust tests | ~0.8s | 547 lib + 50 integration + 13 doc |
+| All 650 Rust tests | ~0.8s | 587 lib + 50 integration + 13 doc |
 | All 48 CPU validation binaries | ~5s (total) | Sequential execution |
 | Full 16S pipeline (10 samples) | ~2.1s | CPU path |
 | BarraCUDA CPU v1 (21 checks) | ~60ms | 9 domains (release) |

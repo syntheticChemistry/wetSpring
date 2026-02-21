@@ -233,10 +233,11 @@ impl BenchReport {
                 "—".to_string()
             };
 
+            let substrate = &p.substrate;
             let sub_label = if is_gpu {
-                format!("{} [G]", p.substrate)
+                format!("{substrate} [G]")
             } else {
-                format!("{} [C]", p.substrate)
+                format!("{substrate} [C]")
             };
 
             println!(
@@ -442,6 +443,7 @@ pub fn format_eval_time(us: f64) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
 
@@ -584,10 +586,215 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "requires nvidia-smi and RAPL"]
-    fn power_monitor_start_stop() {
-        let monitor = PowerMonitor::start();
-        std::thread::sleep(std::time::Duration::from_millis(50));
-        let _ = monitor.stop();
+    fn phase_result_to_json_structure() {
+        let pr = PhaseResult {
+            phase: "test_phase".to_string(),
+            substrate: "BarraCUDA CPU".to_string(),
+            wall_time_s: 1.0,
+            per_eval_us: 10.0,
+            n_evals: 100,
+            energy: EnergyReport::default(),
+            peak_rss_mb: 64.0,
+            notes: "unit test".to_string(),
+        };
+        let json = pr.to_json();
+        assert!(json.contains("\"phase\": \"test_phase\""));
+        assert!(json.contains("\"substrate\": \"BarraCUDA CPU\""));
+        assert!(json.contains("\"n_evals\": 100"));
+        assert!(json.contains("\"notes\": \"unit test\""));
+    }
+
+    #[test]
+    fn bench_report_save_json_creates_file() {
+        let hw = HardwareInventory {
+            gate_name: "test".to_string(),
+            cpu_model: "Test".to_string(),
+            cpu_cores: 1,
+            cpu_threads: 1,
+            cpu_cache_kb: 0,
+            ram_total_mb: 0,
+            gpu_name: "N/A".to_string(),
+            gpu_vram_mb: 0,
+            gpu_driver: "N/A".to_string(),
+            gpu_compute_cap: "N/A".to_string(),
+            os_kernel: "test".to_string(),
+            rust_version: String::new(),
+        };
+        let report = BenchReport::new(hw);
+        let dir = std::env::temp_dir().join("wetspring_bench_test");
+        let path = report.save_json(dir.to_str().unwrap());
+        assert!(path.is_ok());
+        let path = path.unwrap();
+        assert!(std::path::Path::new(&path).exists());
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_dir(&dir);
+    }
+
+    #[test]
+    fn bench_report_multiple_phases() {
+        let hw = HardwareInventory {
+            gate_name: "test".to_string(),
+            cpu_model: "Test".to_string(),
+            cpu_cores: 1,
+            cpu_threads: 1,
+            cpu_cache_kb: 0,
+            ram_total_mb: 0,
+            gpu_name: "N/A".to_string(),
+            gpu_vram_mb: 0,
+            gpu_driver: "N/A".to_string(),
+            gpu_compute_cap: "N/A".to_string(),
+            os_kernel: "test".to_string(),
+            rust_version: String::new(),
+        };
+        let mut report = BenchReport::new(hw);
+        report.add_phase(PhaseResult {
+            phase: "phase_a".to_string(),
+            substrate: "CPU".to_string(),
+            wall_time_s: 1.0,
+            per_eval_us: 100.0,
+            n_evals: 10,
+            energy: EnergyReport::default(),
+            peak_rss_mb: 32.0,
+            notes: String::new(),
+        });
+        report.add_phase(PhaseResult {
+            phase: "phase_a".to_string(),
+            substrate: "GPU".to_string(),
+            wall_time_s: 0.1,
+            per_eval_us: 10.0,
+            n_evals: 10,
+            energy: EnergyReport {
+                gpu_joules: 0.5,
+                gpu_watts_avg: 50.0,
+                gpu_watts_peak: 80.0,
+                gpu_temp_peak_c: 65.0,
+                gpu_vram_peak_mib: 2048.0,
+                gpu_samples: 5,
+                ..Default::default()
+            },
+            peak_rss_mb: 64.0,
+            notes: String::new(),
+        });
+        let json = report.to_json();
+        assert!(json.contains("\"phase\": \"phase_a\""));
+        assert_eq!(report.phases.len(), 2);
+    }
+
+    #[test]
+    fn format_duration_boundary_values() {
+        assert!(format_duration(0.0).contains("us"));
+        assert!(format_duration(0.001).contains("ms"));
+        assert!(format_duration(59.9).contains('s'));
+        assert!(format_duration(60.0).contains("min"));
+    }
+
+    fn test_hw() -> HardwareInventory {
+        HardwareInventory {
+            gate_name: "test".to_string(),
+            cpu_model: "Test CPU".to_string(),
+            cpu_cores: 4,
+            cpu_threads: 8,
+            cpu_cache_kb: 8192,
+            ram_total_mb: 16384,
+            gpu_name: "Test GPU".to_string(),
+            gpu_vram_mb: 8192,
+            gpu_driver: "500.0".to_string(),
+            gpu_compute_cap: "8.0".to_string(),
+            os_kernel: "6.0".to_string(),
+            rust_version: String::new(),
+        }
+    }
+
+    fn cpu_phase(name: &str, wall: f64, cpu_j: f64) -> PhaseResult {
+        PhaseResult {
+            phase: name.to_string(),
+            substrate: "BarraCUDA CPU".to_string(),
+            wall_time_s: wall,
+            per_eval_us: wall * 1e6 / 1000.0,
+            n_evals: 1000,
+            energy: EnergyReport {
+                cpu_joules: cpu_j,
+                ..Default::default()
+            },
+            peak_rss_mb: 64.0,
+            notes: String::new(),
+        }
+    }
+
+    fn gpu_phase(name: &str, wall: f64, gpu_j: f64) -> PhaseResult {
+        PhaseResult {
+            phase: name.to_string(),
+            substrate: "BarraCUDA GPU".to_string(),
+            wall_time_s: wall,
+            per_eval_us: wall * 1e6 / 1000.0,
+            n_evals: 1000,
+            energy: EnergyReport {
+                gpu_joules: gpu_j,
+                gpu_watts_avg: if wall > 0.0 { gpu_j / wall } else { 0.0 },
+                gpu_watts_peak: if wall > 0.0 { gpu_j / wall * 1.5 } else { 0.0 },
+                gpu_temp_peak_c: 65.0,
+                gpu_vram_peak_mib: 2048.0,
+                gpu_samples: 10,
+                ..Default::default()
+            },
+            peak_rss_mb: 128.0,
+            notes: String::new(),
+        }
+    }
+
+    #[test]
+    fn print_summary_cpu_only() {
+        let mut report = BenchReport::new(test_hw());
+        report.add_phase(cpu_phase("shannon", 0.005, 0.5));
+        report.add_phase(cpu_phase("felsenstein", 0.02, 1.8));
+        report.print_summary();
+    }
+
+    #[test]
+    fn print_summary_cpu_gpu_with_speedup() {
+        let mut report = BenchReport::new(test_hw());
+        report.add_phase(cpu_phase("shannon", 0.5, 5.0));
+        report.add_phase(gpu_phase("shannon", 0.05, 0.8));
+        report.add_phase(cpu_phase("felsenstein", 1.0, 10.0));
+        report.add_phase(gpu_phase("felsenstein", 0.1, 1.5));
+        report.print_summary();
+    }
+
+    #[test]
+    fn print_summary_single_phase_no_speedup() {
+        let mut report = BenchReport::new(test_hw());
+        report.add_phase(cpu_phase("diversity", 0.001, 0.01));
+        report.print_summary();
+    }
+
+    #[test]
+    fn print_summary_gpu_detail_table() {
+        let mut report = BenchReport::new(test_hw());
+        report.add_phase(gpu_phase("hmm_batch", 2.0, 150.0));
+        report.add_phase(gpu_phase("ode_sweep", 1.5, 120.0));
+        report.print_summary();
+    }
+
+    #[test]
+    fn print_summary_zero_energy_phases() {
+        let mut report = BenchReport::new(test_hw());
+        report.add_phase(PhaseResult {
+            phase: "quick".to_string(),
+            substrate: "CPU".to_string(),
+            wall_time_s: 0.000_001,
+            per_eval_us: 0.0,
+            n_evals: 0,
+            energy: EnergyReport::default(),
+            peak_rss_mb: 0.0,
+            notes: String::new(),
+        });
+        report.print_summary();
+    }
+
+    #[test]
+    fn json_escape_tabs_and_carriage_returns() {
+        assert_eq!(json_escape("a\tb"), "a\\tb");
+        assert_eq!(json_escape("a\rb"), "a\\rb");
+        assert_eq!(json_escape("plain"), "plain");
     }
 }

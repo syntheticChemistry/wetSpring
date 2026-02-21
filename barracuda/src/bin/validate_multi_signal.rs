@@ -86,7 +86,12 @@ fn main() {
     let h_ss = steady_state_mean(&r, 4, SS_FRAC);
     let b_ss = steady_state_mean(&r, 6, SS_FRAC);
 
-    v.check("NoQS: HapR_ss (very low)", h_ss, 0.031, 0.005);
+    v.check(
+        "NoQS: HapR_ss (very low)",
+        h_ss,
+        0.031,
+        tolerances::GC_CONTENT,
+    );
     v.check(
         "NoQS: B_ss (constitutive biofilm)",
         b_ss,

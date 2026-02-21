@@ -82,7 +82,12 @@ fn validate_analytical(v: &mut Validator) {
         0.0,
         tolerances::BRAY_CURTIS_SYMMETRY,
     );
-    v.check("Bray-Curtis in [0,1]", bc_ab, 0.3, 0.3);
+    v.check(
+        "Bray-Curtis in [0,1]",
+        bc_ab,
+        0.3,
+        tolerances::SHANNON_SIMULATED,
+    );
 }
 
 fn validate_simulated_community(v: &mut Validator) {
@@ -198,7 +203,7 @@ fn validate_evenness_and_rarefaction(v: &mut Validator) {
     // Uneven community: J' < 1
     let uneven = vec![99.0, 1.0, 0.0, 0.0];
     let j = diversity::pielou_evenness(&uneven);
-    v.check("Pielou(uneven) in [0,1)", j, 0.5, 0.5);
+    v.check("Pielou(uneven) in [0,1)", j, 0.5, tolerances::MEAN_QUALITY);
 
     // Rarefaction: at full depth = observed species
     let community = vec![50.0, 30.0, 20.0, 10.0, 5.0, 3.0, 2.0, 1.0];

@@ -38,11 +38,11 @@ Four tracks cover the life science and environmental monitoring domains:
 | Validation checks (CPU) | 1,291 |
 | Validation checks (GPU) | 451 |
 | **Total validation checks** | **1,742** |
-| Rust library unit tests | 547 (+ 1 ignored — hardware-dependent) |
+| Rust library unit tests | 587 (+ 1 ignored — hardware-dependent) |
 | Integration tests | 50 |
 | Rust doc-tests | 13 |
-| **Total Rust tests** | **610** |
-| Line coverage (`cargo-llvm-cov`) | **93.5%** |
+| **Total Rust tests** | **650** |
+| Line coverage (`cargo-llvm-cov`) | **97% bio+io modules (55% overall including bench)** |
 | Experiments completed | 76 |
 | Validation/benchmark binaries | 50 CPU + 18 GPU validate + 5 benchmark = 73 total |
 | CPU bio modules | 41 |
@@ -54,7 +54,7 @@ Four tracks cover the life science and environmental monitoring domains:
 | ToadStool primitives | 15 (inc. 4 bio: Felsenstein, Gillespie, SW, TreeInference) |
 | Local WGSL shaders | 9 (Write → Absorb → Lean candidates) |
 
-All 1,742 validation checks **PASS**. All 610 tests **PASS**.
+All 1,742 validation checks **PASS**. All 650 tests **PASS**.
 
 ### GPU Performance
 
@@ -136,7 +136,7 @@ Comprehensive audit and evolution of the codebase:
 - All 73 validation/benchmark binaries carry structured `# Provenance` headers
 - All data paths use `validation::data_dir()` for capability-based discovery
 - `flate2` explicitly uses `rust_backend` (no C dependencies, ecoBin compliant)
-- 11 new unit tests targeting coverage gaps; line coverage at **93.5%**
+- 11 new unit tests targeting coverage gaps; line coverage 97% bio+io (55% overall)
 - 6 new doc-tests on key public API functions
 - Zero `unsafe` in production code, zero `.unwrap()` in production code
 - All I/O parsers confirmed streaming (no whole-file buffering)
@@ -171,8 +171,8 @@ Evolving Rust implementations for ToadStool/BarraCUDA team absorption:
 - **Absorption engineering**: Following hotSpring's pattern where Springs write
   extensions as proposals to ToadStool/BarraCUDA, get absorbed, then lean on
   upstream. 9 WGSL shaders + 4 CPU math functions ready for absorption
-- **Code quality gate**: 32 named tolerances, `#![forbid(unsafe_code)]`, 93.5%
-  coverage, all 73 binaries with provenance headers — absorption-grade quality
+- **Code quality gate**: 32 named tolerances, `#![forbid(unsafe_code)]`, 97% bio+io
+  (55% overall) coverage, all 73 binaries with provenance headers — absorption-grade quality
 
 ### Phase 18: Current — Streaming Dispatch + Cross-Substrate Validation
 Proving the full ToadStool dispatch model and multi-substrate routing:
@@ -201,9 +201,9 @@ Proving the full ToadStool dispatch model and multi-substrate routing:
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy --pedantic --nursery` | Clean (0 warnings) |
 | `cargo doc --no-deps` | Clean (0 warnings) |
-| Line coverage (`cargo-llvm-cov`) | **93.5%** |
-| `unsafe` in production code | **0** |
-| `.unwrap()` in production code | **0** |
+| Line coverage (`cargo-llvm-cov`) | **97% bio+io (55% overall)** |
+| `#![forbid(unsafe_code)]` | **Enforced crate-wide** |
+| `#![deny(clippy::expect_used, unwrap_used)]` | **Enforced crate-wide** |
 | TODO/FIXME markers | **0** |
 | Inline tolerance literals | **0** (all use `tolerances::` constants) |
 | SPDX-License-Identifier | All `.rs` files |
@@ -304,6 +304,7 @@ wetSpring/
 ├── HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_21_2026.md  ← ToadStool handoff v6 (current)
 ├── barracuda/                     ← Rust crate (src/, Cargo.toml, rustfmt.toml)
 │   ├── EVOLUTION_READINESS.md    ← absorption map (tiers, primitives, shaders)
+│   ├── ABSORPTION_MANIFEST.md    ← what's absorbed, local, planned (hotSpring pattern)
 │   ├── src/
 │   │   ├── lib.rs               ← crate root (pedantic + nursery lints enforced)
 │   │   ├── tolerances.rs        ← 32 named tolerance constants
@@ -318,6 +319,9 @@ wetSpring/
 │   └── rustfmt.toml             ← max_width = 100, edition = 2021
 ├── experiments/                   ← 76 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
+│   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
+│   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs
+│   │   └── examples/             ← inventory discovery demo
 │   ├── PRIMITIVE_MAP.md          ← Rust module ↔ ToadStool primitive mapping
 │   ├── ABSORPTION_STRATEGY.md   ← Write → Absorb → Lean methodology + CPU math evolution
 │   └── benchmarks/
@@ -338,7 +342,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (610: 547 lib + 50 integration + 13 doc)
+# Run all tests (650: 587 lib + 50 integration + 13 doc)
 cargo test
 
 # Code quality checks

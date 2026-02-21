@@ -81,7 +81,7 @@ async fn main() {
             &format!("ANI pair {i}: CPU == GPU"),
             *gpu_val,
             cpu_r.ani,
-            1e-10,
+            wetspring_barracuda::tolerances::GPU_VS_CPU_TRANSCENDENTAL,
         );
     }
     timings.push(("ANI (5 pairs)", cpu_us, gpu_us));
@@ -231,13 +231,13 @@ async fn main() {
                 &format!("dN/dS pair {i}: dN CPU == GPU"),
                 gpu_dnds_result.dn[i],
                 cr.dn,
-                1e-6,
+                wetspring_barracuda::tolerances::GPU_VS_CPU_F64,
             );
             v.check(
                 &format!("dN/dS pair {i}: dS CPU == GPU"),
                 gpu_dnds_result.ds[i],
                 cr.ds,
-                1e-6,
+                wetspring_barracuda::tolerances::GPU_VS_CPU_F64,
             );
         }
     }

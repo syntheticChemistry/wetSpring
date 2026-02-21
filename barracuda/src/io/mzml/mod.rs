@@ -366,6 +366,7 @@ pub fn compute_stats(spectra: &[MzmlSpectrum]) -> MzmlStats {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use std::io::Write;

@@ -15,7 +15,7 @@
 | BarraCUDA CPU parity | 157/157 — 22.5x Rust speedup over Python |
 | BarraCUDA GPU parity | 8 consolidated domains (Exp064) — pure GPU math proven |
 | metalForge cross-system | 8 domains CPU↔GPU proven (Exp065) — substrate-independent |
-| Rust modules | 41 CPU + 20 GPU, 610 tests (93.5% coverage) |
+| Rust modules | 41 CPU + 20 GPU, 650 tests (97% bio+io coverage) |
 | Dependencies | 1 runtime (flate2), everything else sovereign |
 | Paper queue | **ALL DONE** — 29/29 reproducible papers complete (Track 1c added) |
 | Faculty (Track 1) | Waters (MMG, MSU), Cahill (Sandia), Smallwood (Sandia) |

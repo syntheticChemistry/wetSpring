@@ -275,6 +275,7 @@ fn xml_unescape(s: &str) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use std::io::{BufReader, Cursor};

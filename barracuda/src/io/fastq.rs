@@ -472,6 +472,7 @@ pub fn stats_from_file(path: &Path) -> Result<FastqStats> {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use std::io::Write;

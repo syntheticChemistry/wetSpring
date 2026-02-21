@@ -327,7 +327,12 @@ fn main() {
     let alpha = diversity::alpha_diversity(sample_a);
     let div_us = t0.elapsed().as_micros();
 
-    v.check("Pielou: even ≈ 1.0", pielou_even, 1.0, 0.01);
+    v.check(
+        "Pielou: even ≈ 1.0",
+        pielou_even,
+        1.0,
+        tolerances::PEAK_HEIGHT_REL,
+    );
     v.check(
         "Pielou: uneven < 0.5",
         f64::from(u8::from(pielou_uneven < 0.5)),

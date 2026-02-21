@@ -153,6 +153,7 @@ fn root_tree_height(branch_lengths: &[f64], parent_indices: &[Option<usize>]) ->
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
 

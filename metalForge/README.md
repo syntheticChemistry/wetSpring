@@ -47,8 +47,19 @@ them to life science workloads.
 ```
 metalForge/
 ├── README.md              ← this file
+├── PRIMITIVE_MAP.md       ← Rust module ↔ ToadStool primitive mapping
 ├── ABSORPTION_STRATEGY.md ← Write → Absorb → Lean methodology
 ├── PCIE_TOPOLOGY.md       ← PCIe topology and device mapping
+├── forge/                 ← Rust crate: wetspring-forge (hardware discovery + dispatch)
+│   ├── Cargo.toml
+│   ├── src/
+│   │   ├── lib.rs         ← crate root
+│   │   ├── substrate.rs   ← Substrate, Capability, Identity types
+│   │   ├── probe.rs       ← GPU (wgpu), CPU (/proc), NPU (/dev/akida*)
+│   │   ├── inventory.rs   ← unified discovery
+│   │   └── dispatch.rs    ← capability-based workload routing
+│   └── examples/
+│       └── inventory.rs   ← discover + print + dispatch demo
 ├── gpu/
 │   ├── nvidia/
 │   │   └── HARDWARE.md    ← RTX 4070 + Titan V for life science workloads
@@ -63,6 +74,20 @@ metalForge/
     ├── CROSS_SYSTEM_STATUS.md ← algorithm × substrate matrix
     ├── cpu_baseline.json      ← CPU performance baselines
     └── profile_gpu_candidates.py ← GPU candidate profiling
+```
+
+### Forge Crate
+
+The `forge/` directory is a standalone Rust crate (`wetspring-forge`) that
+discovers compute substrates at runtime and routes workloads by capability.
+It follows hotSpring's `metalForge/forge/` pattern — same substrate types,
+same capability-based dispatch, same wgpu GPU probing — adapted for life
+science workloads. 24 unit tests, clippy clean, forbid(unsafe_code).
+
+```bash
+cd metalForge/forge
+cargo test          # 24 tests
+cargo run --example inventory  # discover + dispatch demo
 ```
 
 ---
@@ -109,7 +134,7 @@ affinities. metalForge maps each validated algorithm to its optimal substrate.
 wetSpring follows hotSpring's pattern for ToadStool absorption:
 
 ```
-1. Validate in Rust CPU (barracuda/)          ← DONE: 41 modules, 610 tests, 93.5% coverage, 76 experiments, 1,742 checks. 38% dispatch overhead reduction via pipeline caching (Exp068).
+1. Validate in Rust CPU (barracuda/)          ← DONE: 41 modules, 650 tests, 97% bio+io (56% overall), 76 experiments, 1,742 checks. 38% dispatch overhead reduction via pipeline caching (Exp068).
 2. Characterize hardware (metalForge/)         ← THIS DIRECTORY
 3. Write Rust in GPU-friendly patterns         ← 9 local WGSL shaders written
 4. ToadStool absorbs as shared primitives      ← unidirectional handoff via archive/handoffs/

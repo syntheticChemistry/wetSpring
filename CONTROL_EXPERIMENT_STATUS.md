@@ -67,7 +67,7 @@
 | 056 | Moulana 2020 Pangenomics | 1c | COMPLETE | 24 |
 | 057 | BarraCUDA CPU Parity v4 (Track 1c) | cross | COMPLETE | 44 |
 | 058 | GPU Track 1c (ANI + SNP + Pangenome + dN/dS) | GPU | COMPLETE | 27 |
-| 059 | 23-Domain Rust vs Python Benchmark | cross | COMPLETE | Benchmark |
+| 059 | 25-Domain Rust vs Python Benchmark | cross | COMPLETE | Benchmark |
 | 060 | metalForge Cross-Substrate Validation | cross/GPU | COMPLETE | 20 |
 | 061 | Random Forest Ensemble Inference | cross | COMPLETE | 13 |
 | 062 | GBM Inference (Binary + Multi-Class) | cross | COMPLETE | 16 |
@@ -96,7 +96,7 @@
 | CPU validation checks | 1,291 |
 | GPU validation checks | 451 |
 | **Total validation checks** | **1,742** |
-| Rust tests | 610 (547 lib + 50 integration + 13 doc) |
+| Rust tests | 650 (587 lib + 50 integration + 13 doc) |
 | BarraCUDA CPU parity | 157/157 (25 domains) |
 | BarraCUDA GPU parity | 8 domains consolidated (Exp064) |
 | metalForge cross-system | 8 domains CPU↔GPU proven (Exp065) |
@@ -148,15 +148,16 @@
 
 ## Remaining Work
 
-### Data Audit
-- Exp002 raw data: need to download 70 raw FASTQ pairs from SRA
-- Trimmomatic/pyteomics baselines: deferred (not blocking)
+### Deferred (not blocking)
+- Exp002 raw data: 70 FASTQ pairs from SRA (Galaxy bootstrap, not needed for validation)
+- Trimmomatic/pyteomics baselines: superseded by sovereign Rust implementations
 
-### Completed (Previously Remaining)
+### Completed
 - Exp019 Phases 2-4 (Phylogenetic): All COMPLETE
 - Exp008 Full ML Pipeline: All COMPLETE
-- Tolerance centralization: **DONE** — all inline literals replaced with 32 named
-  constants in `tolerances.rs` (Feb 21, 2026)
+- Tolerance centralization: **DONE** — 32 named constants in `tolerances.rs`
+- Code quality hardening: **DONE** — `forbid(unsafe_code)`, `deny(expect_used, unwrap_used)`, pedantic clippy
+- metalForge forge crate: **DONE** — `wetspring-forge` (24 tests, substrate discovery + dispatch)
 
 ---
 
@@ -196,11 +197,11 @@ matching. Exp008 adds sovereign ML for environmental monitoring.
 cargo fmt --check              → clean (0 diffs)
 cargo clippy --pedantic        → 0 warnings (pedantic + nursery enforced crate-wide)
 cargo doc --no-deps            → clean (0 warnings)
-cargo test --lib               → 610 passed, 0 failed, 1 ignored (hardware-dependent)
+cargo test --lib               → 587 passed, 0 failed, 1 ignored (hardware-dependent)
 cargo test --doc               → 13 passed, 0 failed
-cargo llvm-cov --lib           → 93.5% line coverage
+cargo llvm-cov --lib           → 97% bio+io (55% overall)
 #![forbid(unsafe_code)]        → enforced crate-wide
-.unwrap() in production        → 0 (bench/mod.rs migrated to let-else)
+#![deny(expect_used, unwrap_used)] → enforced crate-wide (test modules #[allow])
 partial_cmp().unwrap()         → 0 (all migrated to f64::total_cmp)
 inline tolerance literals      → 0 (32 named constants in tolerances.rs)
 shared math (bio::special)     → erf, ln_gamma, regularized_gamma (no duplication)
@@ -215,8 +216,8 @@ barracuda_gpu                  → 451 GPU checks PASS
 
 ## BarraCUDA CPU Parity
 
-The `validate_barracuda_cpu` v1-v4 binaries prove pure Rust math matches
-Python across all 23 algorithmic domains:
+The `validate_barracuda_cpu` v1-v5 binaries prove pure Rust math matches
+Python across all 25 algorithmic domains:
 - v1 (Exp035): 9 core domains
 - v2 (Exp035): +5 batch/flat APIs
 - v3 (Exp043): +9 domains (QS, phage, bootstrap, placement, decision tree, spectral, diversity, k-mer, pipeline)

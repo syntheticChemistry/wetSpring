@@ -272,7 +272,12 @@ fn validate_unifrac(v: &mut Validator) {
     v.check_count("UniFrac: tree leaves", tree.n_leaves(), 4);
 
     let total_bl = tree.total_branch_length();
-    v.check("UniFrac: total branch length = 5.0", total_bl, 5.0, 0.1);
+    v.check(
+        "UniFrac: total branch length = 5.0",
+        total_bl,
+        5.0,
+        tolerances::ODE_NEAR_ZERO,
+    );
 
     // Identical communities → distance 0
     let mut sample_a: HashMap<String, f64> = HashMap::new();
@@ -427,6 +432,6 @@ fn validate_end_to_end(v: &mut Validator) {
         "Pipeline: Shannon analytical",
         shannon,
         expected_shannon,
-        1e-10,
+        tolerances::PYTHON_PARITY,
     );
 }

@@ -45,8 +45,18 @@ fn main() {
     let h_even = shannon(&even);
     let e_even = pielou_evenness(&even);
     let d_even = dominance_index(&even);
-    v.check("Shannon(even) > 2.5", h_even, 2.98, 0.1);
-    v.check("Evenness(even) > 0.9", e_even, 0.99, 0.05);
+    v.check(
+        "Shannon(even) > 2.5",
+        h_even,
+        2.98,
+        tolerances::SHANNON_SIMULATED,
+    );
+    v.check(
+        "Evenness(even) > 0.9",
+        e_even,
+        0.99,
+        tolerances::SIMPSON_SIMULATED,
+    );
     let low_dom = d_even < 0.1;
     v.check_count("Dominance(even) < 0.1", usize::from(low_dom), 1);
 

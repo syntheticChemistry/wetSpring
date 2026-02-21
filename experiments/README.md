@@ -204,9 +204,9 @@ thresholds from `src/tolerances.rs`.
 | `validate_cross_substrate_pipeline` | 076 | 17 | `cargo run --features gpu --release --bin validate_cross_substrate_pipeline` |
 
 **Total validation checks**: 1,742 (1,291 CPU + 451 GPU)
-**Rust tests**: 610 (547 lib + 50 integration + 13 doc)
+**Rust tests**: 650 (587 lib + 50 integration + 13 doc)
 **Binaries**: 50 CPU + 18 GPU validate + 5 benchmark = 73 total
-**Line coverage**: 93.5% (`cargo-llvm-cov`)
+**Line coverage**: 97% bio+io, 56% overall (`cargo-llvm-cov`)
 **Benchmark infrastructure**: `bench.rs` harness with RAPL + nvidia-smi energy profiling, JSON output
 
 ---

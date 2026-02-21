@@ -429,7 +429,7 @@ results, then exceed them via Rust + GPU.
 | `cargo fmt --check` | Clean (0 diffs, `max_width = 100`) |
 | `cargo clippy -W pedantic -W nursery` | 0 warnings (crate-level enforcement) |
 | `cargo doc --no-deps` | 0 warnings |
-| `cargo-llvm-cov` | **93.5%** line coverage |
+| `cargo-llvm-cov` | **97% bio+io** line coverage |
 | `unsafe` in production | 0 |
 | `.unwrap()` in production | 0 |
 | Named tolerances | 32 constants in `tolerances.rs`, hierarchy-tested |

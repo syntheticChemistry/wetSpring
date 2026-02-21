@@ -74,11 +74,11 @@ Tier 3: GPU (ToadStool/BarraCUDA, math parity with CPU)
 
 | Suite | Count | Status |
 |-------|-------|--------|
-| Library unit tests | 547 | PASS (+ 1 ignored — hardware-dependent) |
+| Library unit tests | 587 | PASS (+ 1 ignored — hardware-dependent) |
 | Integration tests | 50 | PASS |
 | Doc-tests | 13 | PASS |
-| **Total** | **610** | **PASS** |
-| Line coverage | 93.5% | Exceeds 90% target |
+| **Total** | **650** | **PASS** |
+| Line coverage | 97% bio+io (56% overall) | Exceeds 90% target |
 
 ---
 
@@ -222,12 +222,12 @@ Run with `cargo run --release --bin benchmark_23_domain_timing` and
 |----------|--------|--------|
 | Rust CPU validation | 1,291 | PASS |
 | GPU validation | 451 | PASS |
-| Rust tests | 610 (547 lib + 50 integration + 13 doc) | PASS |
+| Rust tests | 650 (587 lib + 50 integration + 13 doc) | PASS |
 | Python baselines | 40 scripts | PASS |
 | BarraCUDA CPU parity | 157/157 (25 domains) | PASS |
 | ToadStool bio primitives | 15 consumed (4 bio absorbed) | PASS |
 | Local WGSL shaders | 9 (HMM, ODE, DADA2, quality, ANI, SNP, pangenome, dN/dS, RF) | PASS |
-| **Grand total** | **1,742 validation + 610 tests** | **ALL PASS** |
+| **Grand total** | **1,742 validation + 650 tests** | **ALL PASS** |
 
 ---
 
@@ -237,7 +237,7 @@ Run with `cargo run --release --bin benchmark_23_domain_timing` and
 cd barracuda
 
 # Tier 2: Rust CPU (1,291 checks)
-cargo test                         # 610 tests (547 lib + 50 integration + 13 doc)
+cargo test                         # 650 tests (587 lib + 50 integration + 13 doc)
 cargo run --release --bin validate_qs_ode  # ... repeat for all 50 CPU binaries
 
 # Tier 3: GPU (451 checks)

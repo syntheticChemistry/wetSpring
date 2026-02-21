@@ -473,6 +473,7 @@ pub fn parse_reference_fasta(contents: &str) -> Vec<ReferenceSeq> {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
 

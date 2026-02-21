@@ -108,6 +108,7 @@ pub fn base64_encode(data: &[u8]) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
 

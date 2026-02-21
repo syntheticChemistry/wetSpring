@@ -414,7 +414,7 @@ FASTQ → quality filter → adapter trim → paired-end merge
   → diversity metrics → UniFrac distance → PCoA ordination
 ```
 
-Each stage has unit tests (610 total, 95%+ line coverage), end-to-end
+Each stage has unit tests (650 total, 97% bio+io line coverage), end-to-end
 validation against Galaxy baselines, GPU math parity checks, and
 determinism tests ensuring identical output across runs.
 
@@ -513,7 +513,7 @@ Code quality gates (all enforced in CI):
 - `cargo clippy --all-targets -- -D warnings` — zero warnings (CPU and GPU)
 - `cargo clippy --all-targets --features gpu -- -D warnings` — zero GPU-specific warnings
 - `RUSTDOCFLAGS="-D warnings" cargo doc --no-deps` — zero doc warnings
-- 0 `unsafe` blocks (`#![forbid(unsafe_code)]` enforced crate-wide), 0 `TODO`/`FIXME`, 0 production `unwrap()`/`expect()`
+- 0 `unsafe` blocks (`#![forbid(unsafe_code)]`), 0 `TODO`/`FIXME`, 0 production `unwrap()`/`expect()` (`#![deny(clippy::expect_used, clippy::unwrap_used)]` enforced crate-wide)
 - 32 named tolerance constants in `tolerances.rs` (scientifically justified, hierarchy-tested)
 - Shared math consolidated in `bio::special` (erf, ln_gamma, `regularized_gamma_lower`) — no duplication
 - 6 determinism tests covering diversity, Bray-Curtis, DADA2, chimera, taxonomy, and the full 16S pipeline
@@ -569,7 +569,7 @@ repository (AGPL-3.0). No institutional access required.
 ```bash
 # Run all CPU validations (1,291 checks)
 cd barracuda
-cargo test --release          # 610 tests (547 lib + 50 integration + 13 doc)
+cargo test --release          # 650 tests (587 lib + 50 integration + 13 doc)
 cargo run --release --bin validate_fastq
 cargo run --release --bin validate_diversity
 cargo run --release --bin validate_mzml

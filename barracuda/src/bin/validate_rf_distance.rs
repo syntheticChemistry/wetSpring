@@ -115,13 +115,13 @@ fn main() {
         "normalized_identical",
         rf_distance_normalized(&t5a, &t5a),
         0.0,
-        1e-12,
+        wetspring_barracuda::tolerances::ANALYTICAL_F64,
     );
     v.check(
         "normalized_max_5leaf",
         rf_distance_normalized(&t5a, &t5b),
         1.0,
-        1e-12,
+        wetspring_barracuda::tolerances::ANALYTICAL_F64,
     );
 
     // ── Determinism ─────────────────────────────────────────────

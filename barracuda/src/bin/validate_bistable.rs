@@ -48,7 +48,12 @@ fn main() {
         0.975,
         tolerances::ODE_METHOD_PARITY,
     );
-    v.check("S1: B_ss (low biofilm)", b_ss, 0.040, 0.005);
+    v.check(
+        "S1: B_ss (low biofilm)",
+        b_ss,
+        0.040,
+        tolerances::GC_CONTENT,
+    );
     v.check(
         "S1: C_ss (moderate c-di-GMP)",
         c_ss,
@@ -70,7 +75,12 @@ fn main() {
         0.745,
         tolerances::ODE_STEADY_STATE,
     );
-    v.check("S2: C_ss matches Python", c_ss, 1.634, 0.02);
+    v.check(
+        "S2: C_ss matches Python",
+        c_ss,
+        1.634,
+        tolerances::KMD_SPREAD,
+    );
     check_non_negative(&mut v, &r, "S2");
 
     // ── Scenario 3: Strong feedback (alpha_fb = 8.0) ─────────────────

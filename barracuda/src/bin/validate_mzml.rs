@@ -22,6 +22,7 @@
 
 use std::path::PathBuf;
 use wetspring_barracuda::io::mzml;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 fn main() {
@@ -61,7 +62,12 @@ fn main() {
     v.check_count("Total spectra", aggregates.spectra, 6256);
     v.check_count("MS1 spectra", aggregates.ms1, 6256);
     v.check_count("Total decoded peaks", aggregates.peaks, 6_066_434);
-    v.check("Min m/z", aggregates.min_mz.unwrap_or(0.0), 80.001_03, 0.01);
+    v.check(
+        "Min m/z",
+        aggregates.min_mz.unwrap_or(0.0),
+        80.001_03,
+        tolerances::MZ_TOLERANCE,
+    );
     v.check(
         "Max m/z",
         aggregates.max_mz.unwrap_or(0.0),

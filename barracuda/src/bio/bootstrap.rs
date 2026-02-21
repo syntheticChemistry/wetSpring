@@ -35,11 +35,9 @@ impl Alignment {
     pub fn from_rows(rows: &[Vec<usize>]) -> Self {
         let n_taxa = rows.len();
         let n_sites = rows.first().map_or(0, Vec::len);
-        let mut columns = Vec::with_capacity(n_sites);
-        for site in 0..n_sites {
-            let col: Vec<usize> = rows.iter().map(|row| row[site]).collect();
-            columns.push(col);
-        }
+        let columns: Vec<Vec<usize>> = (0..n_sites)
+            .map(|site| rows.iter().map(|row| row[site]).collect())
+            .collect();
         Self {
             n_taxa,
             n_sites,

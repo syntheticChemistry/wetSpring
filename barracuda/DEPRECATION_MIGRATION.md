@@ -1,6 +1,6 @@
 # Deprecation & Migration Tracking
 
-**Date:** February 20, 2026
+**Date:** February 21, 2026
 **Pattern:** Following hotSpring's `DEPRECATION_MIGRATION.md`
 
 When ToadStool absorbs a wetSpring shader or pattern, the local copy becomes

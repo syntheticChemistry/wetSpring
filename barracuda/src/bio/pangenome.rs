@@ -92,13 +92,12 @@ pub struct PangenomeParams {
 /// counts presence, classifies as core/accessory/unique.
 #[must_use]
 pub fn presence_matrix_flat(clusters: &[GeneCluster], n_genomes: usize) -> Vec<u8> {
-    let mut flat = Vec::with_capacity(clusters.len() * n_genomes);
-    for cluster in clusters {
-        for g in 0..n_genomes {
-            flat.push(u8::from(cluster.presence.get(g).copied().unwrap_or(false)));
-        }
-    }
-    flat
+    clusters
+        .iter()
+        .flat_map(|cluster| {
+            (0..n_genomes).map(move |g| u8::from(cluster.presence.get(g).copied().unwrap_or(false)))
+        })
+        .collect()
 }
 
 /// Construct gene clusters from a raw presence-absence matrix.

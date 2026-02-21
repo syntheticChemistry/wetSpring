@@ -385,6 +385,7 @@ fn posterior_quality_disagree(higher_q: u8, lower_q: u8, offset: u8) -> u8 {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
 

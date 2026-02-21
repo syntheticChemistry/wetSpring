@@ -83,7 +83,7 @@ fn hill(x: f64, k: f64, n: f64) -> f64 {
 
 /// Right-hand side of the bistable QS / c-di-GMP / biofilm ODE system.
 ///
-/// Compared to [`qs_biofilm::qs_rhs`], adds:
+/// Compared to `qs_biofilm::qs_rhs`, adds:
 ///   `DGC_rate += alpha_fb * Hill(B, k_fb, n_fb)`
 #[allow(clippy::many_single_char_names)]
 fn bistable_rhs(state: &[f64], _t: f64, p: &BistableParams) -> Vec<f64> {

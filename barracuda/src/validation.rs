@@ -293,14 +293,86 @@ mod tests {
     #[test]
     fn data_dir_env_override() {
         let key = "WETSPRING_TEST_DATA_DIR_UNIT";
-        // Use a subprocess to test env-var override without `unsafe` env mutation.
-        // The `data_dir` function reads `std::env::var(key)`, so we verify the
-        // fallback path here and trust the trivial `map_or_else` branch.
         let dir = data_dir(key, "data/default");
         let s = dir.to_string_lossy();
         assert!(
             s.contains("data/default"),
             "fallback path should contain subpath"
         );
+    }
+
+    #[test]
+    fn check_nan_always_fails() {
+        assert!(!check("NaN test", f64::NAN, 0.0, 1.0));
+        assert!(!check("NaN expected", 0.0, f64::NAN, 1.0));
+    }
+
+    #[test]
+    fn check_infinity_values() {
+        // INF - INF = NaN, so exact-tolerance check fails (correct: use check_count for sentinels)
+        assert!(!check("inf-inf is NaN", f64::INFINITY, f64::INFINITY, 0.0));
+        assert!(!check("inf vs finite", f64::INFINITY, 0.0, 1e100));
+    }
+
+    #[test]
+    fn check_negative_zero() {
+        assert!(check("neg zero", -0.0, 0.0, 0.0));
+    }
+
+    #[test]
+    fn check_boundary_tolerance() {
+        // 1.01 - 1.0 ≈ 0.01 + epsilon due to f64 representation, so exact 0.01 tol fails
+        assert!(!check("at exact boundary (fp rounding)", 1.01, 1.0, 0.01));
+        assert!(check("within tolerance", 1.009, 1.0, 0.01));
+        assert!(!check("past boundary", 1.02, 1.0, 0.01));
+    }
+
+    #[test]
+    fn check_count_zero() {
+        assert!(check_count("both zero", 0, 0));
+    }
+
+    #[test]
+    fn check_count_large() {
+        assert!(check_count("large", usize::MAX, usize::MAX));
+        assert!(!check_count("large diff", usize::MAX, usize::MAX - 1));
+    }
+
+    #[test]
+    fn print_result_zero_total() {
+        assert!(print_result("empty", 0, 0));
+    }
+
+    #[test]
+    fn validator_all_pass() {
+        let mut v = Validator {
+            name: String::from("all-pass"),
+            passed: 0,
+            total: 0,
+        };
+        for i in 0..10 {
+            v.check(&format!("check {i}"), 1.0, 1.0, 0.0);
+        }
+        assert_eq!(v.counts(), (10, 10));
+    }
+
+    #[test]
+    fn validator_all_fail() {
+        let mut v = Validator {
+            name: String::from("all-fail"),
+            passed: 0,
+            total: 0,
+        };
+        for i in 0..5 {
+            v.check(&format!("fail {i}"), 999.0, 0.0, 0.0);
+        }
+        assert_eq!(v.counts(), (0, 5));
+    }
+
+    #[test]
+    fn data_dir_nested_subpath() {
+        let dir = data_dir("WETSPRING_NONEXISTENT_NESTED", "a/b/c/d/e");
+        let s = dir.to_string_lossy();
+        assert!(s.contains("a/b/c/d/e"));
     }
 }

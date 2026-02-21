@@ -7,7 +7,7 @@
 
 ## Current Kernel Usage (Validated)
 
-### Rust CPU Modules (41 modules, 610 tests, 93.5% coverage)
+### Rust CPU Modules (41 modules, 650 tests, 97% bio+io coverage)
 
 | Module Domain | Modules | Status |
 |--------------|---------|--------|

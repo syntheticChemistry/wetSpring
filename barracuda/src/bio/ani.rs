@@ -23,23 +23,18 @@ pub struct AniResult {
 /// Gaps (`-` or `.`) and `N`s are excluded from both numerator and denominator.
 #[must_use]
 pub fn pairwise_ani(seq1: &[u8], seq2: &[u8]) -> AniResult {
-    let len = seq1.len().min(seq2.len());
-    let mut identical = 0usize;
-    let mut aligned = 0usize;
-
-    for i in 0..len {
-        let a = seq1[i].to_ascii_uppercase();
-        let b = seq2[i].to_ascii_uppercase();
-
-        if a == b'-' || a == b'.' || a == b'N' || b == b'-' || b == b'.' || b == b'N' {
-            continue;
-        }
-
-        aligned += 1;
-        if a == b {
-            identical += 1;
-        }
+    const fn is_gap_or_n(b: u8) -> bool {
+        matches!(b, b'-' | b'.' | b'N')
     }
+
+    let (identical, aligned) = seq1
+        .iter()
+        .zip(seq2.iter())
+        .map(|(&a, &b)| (a.to_ascii_uppercase(), b.to_ascii_uppercase()))
+        .filter(|&(a, b)| !is_gap_or_n(a) && !is_gap_or_n(b))
+        .fold((0usize, 0usize), |(ident, aln), (a, b)| {
+            (ident + usize::from(a == b), aln + 1)
+        });
 
     let ani = if aligned > 0 {
         identical as f64 / aligned as f64

@@ -23,10 +23,10 @@ portability path for life science, analytical chemistry, and environmental monit
 4. **Substrate router** — GPU↔NPU↔CPU routing with PCIe topology awareness, fallback parity (Exp074)
 5. **Pure GPU 5-stage pipeline** — diversity→BC→PCoA→stats→spectral, 0.1% overhead (Exp075)
 6. **Cross-substrate pipeline** — GPU→NPU→CPU data flow with latency profiling (Exp076)
-7. **Test suite grown** — 610 tests (547 lib + 50 integration + 13 doc), up from 552
+7. **Test suite grown** — 650 tests (587 lib + 50 integration + 13 doc), up from 552
 8. **Binary count** — 73 total (50 CPU + 18 GPU validate + 5 benchmark)
 
-**wetSpring totals:** 1,742 checks (1,291 CPU + 451 GPU), 610 tests, 93.5% line coverage,
+**wetSpring totals:** 1,742 checks (1,291 CPU + 451 GPU), 650 tests, 97% bio+io coverage,
 76 experiments, 73 binaries, 25 CPU domains, 9 local WGSL shaders, 151 source files
 
 ---
@@ -403,13 +403,13 @@ All 9 wetSpring shaders meet criteria 1–7. Edge case coverage varies (document
 | CPU checks | 1,241 | **1,291** | +50 |
 | GPU checks | 260 | **451** | +191 |
 | Total checks | 1,501 | **1,742** | +241 |
-| Tests | 552 | **610** | +58 |
+| Tests | 552 | **650** | +98 |
 | CPU domains | 25 | **25** | — |
 | GPU domains (consolidated) | 8 | **11** | +3 |
 | Local WGSL shaders | 9 | **9** | — |
 | Binaries | 61 | **73** | +12 |
 | Source files | — | **151** | — |
-| Line coverage | 93.5% | **93.5%** | — |
+| Line coverage | 93.5% | **97% bio+io** | — |
 
 ---
 
@@ -438,7 +438,7 @@ All 9 wetSpring shaders meet criteria 1–7. Edge case coverage varies (document
 ```bash
 cd barracuda
 
-# Full test suite (610 tests)
+# Full test suite (650 tests)
 cargo test --features gpu
 
 # Consolidated CPU proof (1,291 checks across 50 binaries)
@@ -481,7 +481,7 @@ cargo run --release --bin benchmark_23_domain_timing
 | `barracuda/EVOLUTION_READINESS.md` | Updated with streaming/dispatch/router results |
 | `metalForge/ABSORPTION_STRATEGY.md` | Updated with streaming pipeline proof table |
 | `metalForge/PCIE_TOPOLOGY.md` | Updated with cross-substrate verification entries |
-| `README.md` | Updated metrics (73 binaries, 610 tests, 151 source files) |
+| `README.md` | Updated metrics (73 binaries, 650 tests, 151 source files) |
 | `CONTROL_EXPERIMENT_STATUS.md` | Added Exp070-076 to main table |
 | `BENCHMARK_RESULTS.md` | Updated binary counts and reproduction commands |
 | `whitePaper/STUDY.md` | Added §3.7 GPU Streaming & Cross-Substrate Validation |

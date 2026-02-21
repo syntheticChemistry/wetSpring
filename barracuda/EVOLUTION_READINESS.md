@@ -7,11 +7,15 @@
 ### Code Quality (Phase 15)
 
 All modules pass `clippy::pedantic` + `clippy::nursery` (0 warnings), `cargo fmt`
-(0 diffs), `cargo doc` (0 warnings). 93.5% line coverage via `cargo-llvm-cov`.
-All tolerances centralized in `tolerances.rs` (32 named constants). Zero `unsafe`
-and zero `.unwrap()` in production code. All 73 binaries carry `# Provenance`
-headers. Data paths use `validation::data_dir()` for capability-based discovery.
-`flate2` uses `rust_backend` — zero C dependencies (ecoBin compliant).
+(0 diffs), `cargo doc` (0 warnings). 97% line coverage for bio+io modules
+(56% overall including bench) via `cargo-llvm-cov`.
+All tolerances centralized in `tolerances.rs` (32 named constants).
+`#![forbid(unsafe_code)]` and `#![deny(clippy::expect_used, clippy::unwrap_used)]`
+enforced crate-wide. All 73 binaries carry `# Provenance` headers. Data paths
+use `validation::data_dir()` for capability-based discovery. `flate2` uses
+`rust_backend` — zero C dependencies (ecoBin compliant).
+
+See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 
 ---
 
@@ -212,7 +216,7 @@ Plus **NVVM driver profile fix** — Ada Lovelace RTX 40-series
 | Feb 20 | Exp061/062: RF + GBM inference — 29/29 CPU checks (domains 24-25) |
 | Feb 20 | Exp063: GPU RF batch inference — 13/13 GPU checks (SoA WGSL shader) |
 | Feb 21 | Phase 15: Code quality hardening — pedantic clippy, tolerance centralization, provenance headers |
-| Feb 21 | 93.5% line coverage, 610 tests (547 lib + 50 integration + 13 doc), 0 clippy warnings |
+| Feb 21 | 97% bio+io, bench/mod 97.5% coverage (56% overall), 650 tests (587 lib + 50 integration + 13 doc), 0 clippy warnings |
 | Feb 21 | All inline tolerance literals → 32 named constants in `tolerances.rs` |
 | Feb 21 | All data paths → `validation::data_dir()` for capability-based discovery |
 | Feb 21 | Phase 17: metalForge absorption engineering — shaped all modules for ToadStool readiness |
@@ -245,10 +249,10 @@ Plus **NVVM driver profile fix** — Ada Lovelace RTX 40-series
 | WGSL pattern | `pub const WGSL: &str` inline | `include_str!("../shaders/...")` |
 | metalForge | GPU + NPU hardware characterization | GPU + NPU + cross-substrate validation |
 | Handoffs | `../wateringHole/handoffs/` (16+ docs) | `archive/handoffs/` (consolidated) |
-| Tests | 454 | 610+ |
+| Tests | 454 | 650+ |
 | Validation | 418 checks | 1,742 checks |
 | Experiments | 31 suites | 76 experiments |
-| Line coverage | — | 93.5% |
+| Line coverage | — | 97% bio+io (55% overall) |
 | Pipeline caching | Upstream (ToadStool native) | Local (Exp068, 38% overhead reduction) |
 | Three-tier proof | CPU→GPU→NPU | Python→CPU→GPU→NPU (Exp069) |
 | PCIe topology | Documented | Documented + P2P routing (PCIE_TOPOLOGY.md) |

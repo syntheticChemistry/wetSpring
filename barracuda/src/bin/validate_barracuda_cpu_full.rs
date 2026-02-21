@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![allow(clippy::too_many_lines, clippy::cast_precision_loss)]
-//! Exp070: BarraCUDA CPU — 25-Domain Pure Rust Math Proof
+//! Exp070: `BarraCUDA` CPU — 25-Domain Pure Rust Math Proof
 //!
 //! Consolidates all 25 algorithmic domains into one definitive validation
 //! binary. Proves: (a) pure Rust math matches Python/paper baselines,
@@ -119,7 +119,7 @@ fn main() {
         "HMM forward LL",
         fwd.log_likelihood,
         -5.625_948_481_320_407,
-        1e-6,
+        tolerances::PYTHON_PARITY,
     );
     let vit = hmm::viterbi(&model, &obs);
     v.check(
@@ -322,7 +322,7 @@ fn main() {
     };
     let t0 = Instant::now();
     let scan = placement::placement_scan(&ref_tree, "ACGTACGTACGT", 0.05, 1.0);
-    let pl_us = t0.elapsed().as_micros() as f64;
+    let place_us = t0.elapsed().as_micros() as f64;
     v.check(
         "Placement: found edges",
         f64::from(u8::from(!scan.placements.is_empty())),
@@ -335,7 +335,7 @@ fn main() {
         1.0,
         0.0,
     );
-    timings.push(("D13: Placement (3 taxa, 12bp)", pl_us));
+    timings.push(("D13: Placement (3 taxa, 12bp)", place_us));
 
     // ═══ D14: Decision Tree ═══════════════════════════════════════
     v.section("D14: Decision Tree Classification");
@@ -362,14 +362,14 @@ fn main() {
     let int_a = vec![1000.0, 500.0, 800.0, 300.0, 600.0];
     let t0 = Instant::now();
     let self_match = spectral_match::cosine_similarity(&mz_a, &int_a, &mz_a, &int_a, 0.5);
-    let sm_us = t0.elapsed().as_micros() as f64;
+    let spec_us = t0.elapsed().as_micros() as f64;
     v.check(
         "Spectral: self-match ≈ 1.0",
         self_match.score,
         1.0,
         tolerances::SPECTRAL_COSINE,
     );
-    timings.push(("D15: Spectral cosine (5 peaks)", sm_us));
+    timings.push(("D15: Spectral cosine (5 peaks)", spec_us));
 
     // ═══ D16: Extended Diversity ══════════════════════════════════
     v.section("D16: Extended Diversity Suite");
@@ -386,7 +386,12 @@ fn main() {
         0.0,
         tolerances::PYTHON_PARITY,
     );
-    v.check("Pielou: even ≈ 1.0", pielou, 1.0, 0.01);
+    v.check(
+        "Pielou: even ≈ 1.0",
+        pielou,
+        1.0,
+        tolerances::PEAK_HEIGHT_REL,
+    );
     v.check(
         "Chao1 ≥ observed",
         f64::from(u8::from(chao1 >= 4.0)),
@@ -549,7 +554,7 @@ fn main() {
         "Clock: root age = 3500 Ma",
         clock.node_ages[0],
         3500.0,
-        1e-6,
+        tolerances::JC69_PROBABILITY,
     );
     v.check(
         "Clock: strict tree CV ≈ 0",
@@ -655,7 +660,7 @@ fn main() {
     v.check(
         "GBM: raw score for x<5 = base + lr*(-0.3)",
         pred_gbm.raw_score,
-        0.0 + 0.1 * (-0.3),
+        0.1_f64.mul_add(-0.3, 0.0),
         tolerances::EXACT_F64,
     );
     v.check(
