@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![allow(clippy::too_many_lines, clippy::cast_precision_loss)]
-//! Exp079: `BarraCUDA` CPU Parity v6 — ODE Flat Param Fidelity
+//! Exp079: `BarraCuda` CPU Parity v6 — ODE Flat Param Fidelity
 //!
 //! Validates that the GPU-compatible flat parameter APIs (`to_flat`/`from_flat`)
 //! produce bitwise-identical ODE integration results across all 6 biological
@@ -42,7 +42,7 @@ const DT: f64 = 0.001;
 const SS_FRAC: f64 = 0.1;
 
 fn main() {
-    let mut v = Validator::new("BarraCUDA CPU v6 — ODE Flat Param Fidelity (6 Modules)");
+    let mut v = Validator::new("BarraCuda CPU v6 — ODE Flat Param Fidelity (6 Modules)");
     let t_total = Instant::now();
 
     validate_qs_biofilm(&mut v);

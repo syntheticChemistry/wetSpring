@@ -18,7 +18,7 @@ default = []
 # GPU acceleration via BarraCUDA/ToadStool (Phase 3).
 # Enable with `cargo build --features gpu`.
 # Pulls in wgpu v22 (device creation), barracuda (23 ToadStool primitives),
-# and tokio (async device init). 4 local WGSL shaders (ODE, kmer, unifrac, taxonomy).
+# and tokio (async device init). 0 local WGSL (Lean phase complete; all absorbed).
 # GEMM uses GemmF64::WGSL (no cross-repo include_str!).
 gpu = ["dep:barracuda", "dep:wgpu", "dep:tokio"]
 # JSON model import (2 bins: validate_pfas_decision_tree, benchmark_three_tier).

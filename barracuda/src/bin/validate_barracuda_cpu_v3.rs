@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![allow(clippy::similar_names)]
-//! `BarraCUDA` CPU Parity v3 — comprehensive coverage of ALL 18 algorithmic
+//! `BarraCuda` CPU Parity v3 — comprehensive coverage of ALL 18 algorithmic
 //! domains.  Extends v1 (9 domains) and v2 (batch/flat APIs) with the 9
 //! remaining math modules:  multi-signal QS, phage defense, bootstrap
 //! resampling, phylogenetic placement, decision-tree inference, spectral
@@ -33,7 +33,7 @@ use wetspring_barracuda::validation::Validator;
 
 #[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {
-    let mut v = Validator::new("BarraCUDA CPU v3 — All 18 Domains");
+    let mut v = Validator::new("BarraCuda CPU v3 — All 18 Domains");
     let mut timings: Vec<(&str, f64)> = Vec::new();
 
     // ════════════════════════════════════════════════════════════════
@@ -473,7 +473,7 @@ fn main() {
     // ════════════════════════════════════════════════════════════════
     //  Timing Summary
     // ════════════════════════════════════════════════════════════════
-    v.section("═══ BarraCUDA CPU v3 Timing Summary ═══");
+    v.section("═══ BarraCuda CPU v3 Timing Summary ═══");
     println!("\n  {:<35} {:>12}", "Domain", "Time (µs)");
     println!("  {}", "-".repeat(50));
     for (name, us) in &timings {

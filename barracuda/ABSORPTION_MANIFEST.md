@@ -1,8 +1,8 @@
-# Absorption Manifest: wetSpring → ToadStool/BarraCUDA
+# Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
 **Date:** February 22, 2026
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**Status:** 24 absorbed (lean), 4 local WGSL shaders (write), 7 Tier A candidates
+**Status:** 28 absorbed + 4 fully leaned (32 total), 0 local WGSL shaders, 7 Tier A candidates
 
 ---
 
@@ -21,7 +21,7 @@ WGSL          known physics   handoffs/                        delete local
 ### Principles
 
 1. **Biome model** — Springs don't import each other. wetSpring, hotSpring,
-   neuralSpring each lean on ToadStool/BarraCUDA independently. ToadStool
+   neuralSpring each lean on ToadStool/BarraCuda independently. ToadStool
    absorbs what works; all Springs benefit.
 
 2. **Shaders in `.wgsl` files** — `include_str!` for large, `pub const` for small.
@@ -54,7 +54,7 @@ WGSL          known physics   handoffs/                        delete local
 
 ## Absorbed (Lean Phase — 24 primitives)
 
-These modules consume upstream ToadStool/BarraCUDA primitives.
+These modules consume upstream ToadStool/BarraCuda primitives.
 Local WGSL deleted; wetSpring imports from `barracuda::*`.
 
 | wetSpring Module / Primitive | Upstream Primitive | Absorbed Date | Exp |

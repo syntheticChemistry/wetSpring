@@ -7,7 +7,7 @@
     clippy::cast_possible_truncation,
     clippy::cast_sign_loss
 )]
-//! Benchmark: CPU Rust vs GPU (`ToadStool`/`BarraCUDA`) across scientific workloads.
+//! Benchmark: CPU Rust vs GPU (`ToadStool`/`BarraCuda`) across scientific workloads.
 //!
 //! Measures wall-clock time and energy for each workload at multiple data sizes
 //! to demonstrate GPU parallelism advantage. Emits structured JSON via
@@ -155,7 +155,7 @@ fn display_and_record(
     });
     report.add_phase(PhaseResult {
         phase: phase_name,
-        substrate: "BarraCUDA GPU".to_string(),
+        substrate: "BarraCuda GPU".to_string(),
         wall_time_s: gpu_us / 1e6,
         per_eval_us: gpu_us,
         n_evals: gpu_iters,

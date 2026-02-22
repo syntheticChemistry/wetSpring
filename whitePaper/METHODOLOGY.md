@@ -95,7 +95,7 @@ Re-implement critical I/O and compute stages in sovereign Rust. Compare:
 
 ### Phase 3: GPU Acceleration
 
-Promote validated Rust code to WGSL f64 shaders via `ToadStool` / `BarraCUDA`.
+Promote validated Rust code to WGSL f64 shaders via `ToadStool` / `BarraCuda`.
 Compare:
 
 - **Accuracy**: GPU results match CPU within `GPU_VS_CPU_*` tolerances
@@ -360,7 +360,7 @@ All experiments run on a single consumer workstation:
 | **Total** | **1,291** | **All pass** |
 
 Current status: **1,349/1,349 CPU pass + 35 dispatch pass.** 83 experiments across 4 tracks.
-205/205 BarraCUDA CPU parity checks across 25 domains + 6 ODE flat modules.
+205/205 BarraCuda CPU parity checks across 25 domains + 6 ODE flat modules.
 ~22.5× Rust speedup over Python.
 
 ### Phase 3 (GPU): 451/451 checks pass
@@ -380,9 +380,8 @@ Current status: **1,349/1,349 CPU pass + 35 dispatch pass.** 83 experiments acro
 | `validate_cross_substrate` | 20 | metalForge cross-substrate CPU↔GPU parity (Exp060) |
 | `validate_gpu_rf` | 13 | RF batch inference shader (Exp063) |
 
-Current status: **451/451 pass.** 23 ToadStool primitives consumed.
-4 local WGSL shaders (ODE, kmer, unifrac, taxonomy).
-24 GPU primitives absorbed (lean).
+Current status: **451/451 pass.** 32 ToadStool primitives consumed.
+0 local WGSL shaders (Lean phase complete).
 
 ### Grand Total: 1,835/1,835 quantitative checks pass
 
@@ -393,11 +392,11 @@ Current status: **451/451 pass.** 23 ToadStool primitives consumed.
 | Aspect | hotSpring | wetSpring |
 |--------|-----------|-----------|
 | Domain | Nuclear physics | Life science + analytical chemistry |
-| Phase A/B | Python reproduction → BarraCUDA re-execution | Galaxy/Python → Rust sovereign port |
+| Phase A/B | Python reproduction → BarraCuda re-execution | Galaxy/Python → Rust sovereign port |
 | GPU workload | Large-matrix eigensolve, MD force evaluation | Diversity, phylogenetics, ODE sweeps, HMM |
 | Validation metric | chi2/datum | Pass/fail within documented tolerance |
 | Data size | Small (52–2,042 nuclei) | Large (millions of reads, thousands of spectra) |
-| Local shaders | 10+ WGSL (HFB, MD, lattice QCD) | 4 WGSL (ODE, kmer, unifrac, taxonomy; 24 absorbed lean) |
+| Local shaders | 10+ WGSL (HFB, MD, lattice QCD) | 0 WGSL (32 ToadStool primitives, Lean complete) |
 | Absorption tracking | `EVOLUTION_READINESS.md` with tiers | `EVOLUTION_READINESS.md` with tiers (adopted) |
 | Key insight | GPU-resident hybrid beats CPU for matrix physics | Full GPU pipeline 2.45× faster; ODE/HMM/phylo math portable to GPU |
 

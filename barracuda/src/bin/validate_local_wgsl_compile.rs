@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![allow(clippy::expect_used, clippy::unwrap_used)]
-//! Exp096: Local WGSL Shader Compile + Dispatch Validation
+//! Exp096: ToadStool Bio Op Absorption Validation
 //!
 //! # Provenance
 //!
@@ -9,33 +9,31 @@
 //!
 //! # Purpose
 //!
-//! Compile-test and basic dispatch-test all 4 local WGSL shaders in the
-//! Write phase. These will eventually be handed off to `ToadStool`.
+//! Validates that ToadStool's upstream bio ops (absorbed from wetSpring local
+//! WGSL shaders in Sessions 39-41) produce correct results. This is the
+//! **Lean phase** proof: same test data, same expected values, upstream ops.
 //!
-//! 1. `kmer_histogram_f64.wgsl` — k-mer counting (f32/atomic)
-//! 2. `unifrac_propagate_f64.wgsl` — UniFrac tree propagation (f64)
-//! 3. `taxonomy_fc_f64.wgsl` — Naive Bayes taxonomy scoring (f64)
-//! 4. `batched_qs_ode_rk4_f64.wgsl` — ODE RK4 integration (f64, existing)
+//! 1. `KmerHistogramGpu` — k-mer counting (absorbed S39)
+//! 2. `TaxonomyFcGpu` — Naive Bayes taxonomy scoring (absorbed S39)
+//! 3. `UniFracPropagateGpu` — tree propagation compile (absorbed S39)
+//! 4. `BatchedOdeRK4F64` — ODE RK4 integration via OdeSweepGpu (absorbed S41)
 
 use std::time::Instant;
 use wgpu::util::DeviceExt;
 
+use barracuda::{KmerHistogramGpu, TaxonomyFcGpu, UniFracPropagateGpu};
+use wetspring_barracuda::bio::ode_sweep_gpu::{OdeSweepConfig, OdeSweepGpu};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::validation::{self, Validator};
-
-const KMER_WGSL: &str = include_str!("../shaders/kmer_histogram_f64.wgsl");
-const TAXONOMY_WGSL: &str = include_str!("../shaders/taxonomy_fc_f64.wgsl");
-const UNIFRAC_WGSL: &str = include_str!("../shaders/unifrac_propagate_f64.wgsl");
-const ODE_WGSL: &str = include_str!("../shaders/batched_qs_ode_rk4_f64.wgsl");
 
 #[tokio::main]
 async fn main() {
     println!("════════════════════════════════════════════════════════════════════");
-    println!("  Exp096: Local WGSL Shader Compile + Dispatch Validation");
-    println!("  Testing 4 Write-phase shaders before `ToadStool` absorption");
+    println!("  Exp096: ToadStool Bio Op Absorption Validation");
+    println!("  Proving Lean-phase: 4 absorbed ops, same data, upstream dispatch");
     println!("════════════════════════════════════════════════════════════════════\n");
 
-    let mut v = Validator::new("Exp096: Local WGSL Compile + Dispatch");
+    let mut v = Validator::new("Exp096: ToadStool Bio Op Absorption");
 
     let gpu = match GpuF64::new().await {
         Ok(g) => g,
@@ -48,58 +46,16 @@ async fn main() {
     let device = gpu.to_wgpu_device();
     let d = device.device();
 
-    // ═══ Shader 1: kmer_histogram (f32/atomic, no f64 preamble needed) ══
-    v.section("kmer_histogram_f64.wgsl — Compile + Dispatch");
+    // ═══ Op 1: KmerHistogramGpu (upstream, absorbed S39) ═════════════════
+    v.section("KmerHistogramGpu — ToadStool dispatch");
     {
         let t0 = Instant::now();
         let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            let module = device.compile_shader(KMER_WGSL, Some("kmer_histogram"));
+            let op = KmerHistogramGpu::new(device.clone());
 
-            let bgl = d.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-                label: Some("kmer BGL"),
-                entries: &[
-                    bgl_entry(0, wgpu::BufferBindingType::Uniform),
-                    bgl_entry(1, wgpu::BufferBindingType::Storage { read_only: true }),
-                    bgl_entry(2, wgpu::BufferBindingType::Storage { read_only: false }),
-                ],
-            });
-            let layout = d.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-                label: None,
-                bind_group_layouts: &[&bgl],
-                push_constant_ranges: &[],
-            });
-            let pipeline = d.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
-                label: Some("kmer_histogram pipeline"),
-                layout: Some(&layout),
-                module: &module,
-                entry_point: "kmer_histogram",
-                compilation_options: Default::default(),
-                cache: None,
-            });
-
-            #[repr(C)]
-            #[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
-            struct KmerConfig {
-                n_kmers: u32,
-                k: u32,
-                _pad0: u32,
-                _pad1: u32,
-            }
-
-            let config = KmerConfig {
-                n_kmers: 8,
-                k: 2,
-                _pad0: 0,
-                _pad1: 0,
-            };
             let kmers: Vec<u32> = vec![0, 1, 2, 3, 0, 1, 0, 0];
-            let histogram = vec![0u32; 16];
+            let histogram = vec![0u32; 16]; // 4^2
 
-            let cfg_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-                label: None,
-                contents: bytemuck::bytes_of(&config),
-                usage: wgpu::BufferUsages::UNIFORM,
-            });
             let kmer_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
                 label: None,
                 contents: bytemuck::cast_slice(&kmers),
@@ -111,37 +67,7 @@ async fn main() {
                 usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
             });
 
-            let bg = d.create_bind_group(&wgpu::BindGroupDescriptor {
-                label: None,
-                layout: &bgl,
-                entries: &[
-                    wgpu::BindGroupEntry {
-                        binding: 0,
-                        resource: cfg_buf.as_entire_binding(),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 1,
-                        resource: kmer_buf.as_entire_binding(),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 2,
-                        resource: hist_buf.as_entire_binding(),
-                    },
-                ],
-            });
-
-            let mut encoder =
-                d.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
-            {
-                let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
-                    label: None,
-                    timestamp_writes: None,
-                });
-                pass.set_pipeline(&pipeline);
-                pass.set_bind_group(0, &bg, &[]);
-                pass.dispatch_workgroups(1, 1, 1);
-            }
-            device.queue().submit(std::iter::once(encoder.finish()));
+            op.dispatch(&kmer_buf, &hist_buf, 8, 2);
             d.poll(wgpu::Maintain::Wait);
 
             device.read_buffer_u32(&hist_buf, 16).expect("readback")
@@ -154,79 +80,33 @@ async fn main() {
                 v.check("kmer bin 1 count", f64::from(hist[1]), 2.0, 0.0);
                 v.check("kmer bin 2 count", f64::from(hist[2]), 1.0, 0.0);
                 v.check("kmer bin 3 count", f64::from(hist[3]), 1.0, 0.0);
-                println!("  Compiled + dispatched in {us} µs");
+                println!("  Upstream dispatch in {us} µs");
             }
             Err(e) => {
-                v.check_pass(&format!("kmer compile FAILED: {e:?}"), false);
+                v.check_pass(&format!("KmerHistogramGpu FAILED: {e:?}"), false);
             }
         }
     }
 
-    // ═══ Shader 2: taxonomy_fc (f64, needs preamble) ════════════════════
-    v.section("taxonomy_fc_f64.wgsl — Compile + Dispatch");
+    // ═══ Op 2: TaxonomyFcGpu (upstream, absorbed S39) ════════════════════
+    v.section("TaxonomyFcGpu — ToadStool dispatch");
     {
         let t0 = Instant::now();
         let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            let module = device.compile_shader_f64(TAXONOMY_WGSL, Some("taxonomy_fc"));
+            let op = TaxonomyFcGpu::new(device.clone());
 
-            let bgl = d.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-                label: Some("tax BGL"),
-                entries: &[
-                    bgl_entry(0, wgpu::BufferBindingType::Uniform),
-                    bgl_entry(1, wgpu::BufferBindingType::Storage { read_only: true }),
-                    bgl_entry(2, wgpu::BufferBindingType::Storage { read_only: true }),
-                    bgl_entry(3, wgpu::BufferBindingType::Storage { read_only: true }),
-                    bgl_entry(4, wgpu::BufferBindingType::Storage { read_only: false }),
-                ],
-            });
-            let layout = d.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-                label: None,
-                bind_group_layouts: &[&bgl],
-                push_constant_ranges: &[],
-            });
-            let pipeline = d.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
-                label: Some("taxonomy_fc pipeline"),
-                layout: Some(&layout),
-                module: &module,
-                entry_point: "taxonomy_fc",
-                compilation_options: Default::default(),
-                cache: None,
-            });
-
-            #[repr(C)]
-            #[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
-            struct TaxConfig {
-                n_queries: u32,
-                n_taxa: u32,
-                n_features: u32,
-                _pad: u32,
-            }
-
-            let config = TaxConfig {
-                n_queries: 2,
-                n_taxa: 3,
-                n_features: 4,
-                _pad: 0,
-            };
-            // 3 taxa × 4 features log-probabilities
             let log_probs: Vec<f64> = vec![
                 -1.0, -2.0, -0.5, -1.5, // taxon 0
                 -0.5, -1.0, -2.0, -0.5, // taxon 1
                 -2.0, -0.5, -1.0, -1.0, // taxon 2
             ];
-            let log_priors: Vec<f64> = vec![-1.0, -1.5, -0.8]; // 3 taxa
-            // 2 queries × 4 features (binary presence)
+            let log_priors: Vec<f64> = vec![-1.0, -1.5, -0.8];
             let features: Vec<u32> = vec![
-                1, 0, 1, 0, // query 0: features 0,2 present
-                0, 1, 0, 1, // query 1: features 1,3 present
+                1, 0, 1, 0, // query 0
+                0, 1, 0, 1, // query 1
             ];
-            let scores = vec![0.0f64; 6]; // 2 queries × 3 taxa
+            let scores = vec![0.0f64; 6];
 
-            let cfg_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-                label: None,
-                contents: bytemuck::bytes_of(&config),
-                usage: wgpu::BufferUsages::UNIFORM,
-            });
             let lp_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
                 label: None,
                 contents: bytemuck::cast_slice(&log_probs),
@@ -248,45 +128,7 @@ async fn main() {
                 usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
             });
 
-            let bg = d.create_bind_group(&wgpu::BindGroupDescriptor {
-                label: None,
-                layout: &bgl,
-                entries: &[
-                    wgpu::BindGroupEntry {
-                        binding: 0,
-                        resource: cfg_buf.as_entire_binding(),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 1,
-                        resource: lp_buf.as_entire_binding(),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 2,
-                        resource: prior_buf.as_entire_binding(),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 3,
-                        resource: feat_buf.as_entire_binding(),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 4,
-                        resource: score_buf.as_entire_binding(),
-                    },
-                ],
-            });
-
-            let mut encoder =
-                d.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
-            {
-                let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
-                    label: None,
-                    timestamp_writes: None,
-                });
-                pass.set_pipeline(&pipeline);
-                pass.set_bind_group(0, &bg, &[]);
-                pass.dispatch_workgroups(1, 1, 1);
-            }
-            device.queue().submit(std::iter::once(encoder.finish()));
+            op.dispatch(&lp_buf, &prior_buf, &feat_buf, &score_buf, 2, 3, 4);
             d.poll(wgpu::Maintain::Wait);
 
             device.read_buffer_f64(&score_buf, 6).expect("readback")
@@ -295,117 +137,94 @@ async fn main() {
 
         match result {
             Ok(scores) => {
-                // query 0, taxon 0: prior(-1.0) + log_prob[0](-1.0) + log_prob[2](-0.5) = -2.5
                 v.check("tax q0,t0 score", scores[0], -2.5, 1e-10);
-                // query 0, taxon 1: prior(-1.5) + log_prob[0](-0.5) + log_prob[2](-2.0) = -4.0
                 v.check("tax q0,t1 score", scores[1], -4.0, 1e-10);
-                v.check_pass("taxonomy_fc dispatched and readback OK", true);
-                println!("  Compiled + dispatched in {us} µs");
+                v.check_pass("TaxonomyFcGpu dispatched and readback OK", true);
+                println!("  Upstream dispatch in {us} µs");
             }
             Err(e) => {
+                v.check_pass(&format!("TaxonomyFcGpu FAILED: {e:?}"), false);
+            }
+        }
+    }
+
+    // ═══ Op 3: UniFracPropagateGpu (upstream, absorbed S39) ══════════════
+    v.section("UniFracPropagateGpu — ToadStool construction");
+    {
+        let t0 = Instant::now();
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            let _op = UniFracPropagateGpu::new(device.clone());
+            true
+        }));
+        let us = t0.elapsed().as_micros();
+
+        match result {
+            Ok(true) => {
+                v.check_pass("UniFracPropagateGpu constructs (pipeline + BGL)", true);
+                v.check_pass("unifrac_leaf_init pipeline ready", true);
+                v.check_pass("unifrac_propagate_level pipeline ready", true);
+                println!("  Upstream construction in {us} µs");
+            }
+            _ => {
+                v.check_pass("UniFracPropagateGpu construction FAILED", false);
+            }
+        }
+    }
+
+    // ═══ Op 4: ODE RK4 via OdeSweepGpu (upstream BatchedOdeRK4F64, S41) ═
+    v.section("BatchedOdeRK4F64 via OdeSweepGpu — Lean wrapper");
+    {
+        let t0 = Instant::now();
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            let sweep = OdeSweepGpu::new(device.clone());
+            let config = OdeSweepConfig {
+                n_batches: 2,
+                n_steps: 100,
+                h: 0.01,
+                t0: 0.0,
+                clamp_max: 1e6,
+                clamp_min: 0.0,
+            };
+            let init = vec![
+                0.1, 0.0, 0.0, 0.5, 0.0, // batch 0
+                0.1, 0.0, 0.0, 0.5, 0.0, // batch 1
+            ];
+            let params = vec![
+                0.5, 1e9, 0.01, 0.1, 0.05, 0.3, 0.1, 2.0, 0.1, 0.2, 0.1, 0.05, 0.1, 0.3, 0.5, 2.0,
+                0.05, // batch 0
+                0.5, 1e9, 0.01, 0.1, 0.05, 0.3, 0.1, 2.0, 0.1, 0.2, 0.1, 0.05, 0.1, 0.3, 0.5, 2.0,
+                0.05, // batch 1
+            ];
+            sweep.integrate(&config, &init, &params)
+        }));
+        let us = t0.elapsed().as_micros();
+
+        match result {
+            Ok(Ok(finals)) => {
+                v.check_pass("BatchedOdeRK4F64 dispatched via lean wrapper", true);
                 v.check_pass(
-                    &format!("taxonomy_fc compile/dispatch FAILED: {e:?}"),
-                    false,
+                    &format!("ODE returned {} values", finals.len()),
+                    finals.len() == 10,
                 );
+                let all_finite = finals.iter().all(|x| x.is_finite());
+                v.check_pass("All ODE outputs finite", all_finite);
+                println!("  Upstream ODE dispatch in {us} µs");
+            }
+            Ok(Err(e)) => {
+                v.check_pass(&format!("ODE dispatch error: {e}"), false);
+            }
+            Err(e) => {
+                v.check_pass(&format!("ODE panic: {e:?}"), false);
             }
         }
     }
 
-    // ═══ Shader 3: unifrac_propagate (f64, needs preamble) ══════════════
-    v.section("unifrac_propagate_f64.wgsl — Compile");
-    {
-        let t0 = Instant::now();
-        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            let module = device.compile_shader_f64(UNIFRAC_WGSL, Some("unifrac_propagate"));
-
-            let bgl = d.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-                label: Some("unifrac BGL"),
-                entries: &[
-                    bgl_entry(0, wgpu::BufferBindingType::Uniform),
-                    bgl_entry(1, wgpu::BufferBindingType::Storage { read_only: true }),
-                    bgl_entry(2, wgpu::BufferBindingType::Storage { read_only: true }),
-                    bgl_entry(3, wgpu::BufferBindingType::Storage { read_only: true }),
-                    bgl_entry(4, wgpu::BufferBindingType::Storage { read_only: false }),
-                ],
-            });
-            let layout = d.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-                label: None,
-                bind_group_layouts: &[&bgl],
-                push_constant_ranges: &[],
-            });
-
-            let _p1 = d.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
-                label: Some("unifrac_leaf_init"),
-                layout: Some(&layout),
-                module: &module,
-                entry_point: "unifrac_leaf_init",
-                compilation_options: Default::default(),
-                cache: None,
-            });
-            let _p2 = d.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
-                label: Some("unifrac_propagate_level"),
-                layout: Some(&layout),
-                module: &module,
-                entry_point: "unifrac_propagate_level",
-                compilation_options: Default::default(),
-                cache: None,
-            });
-            true
-        }));
-        let us = t0.elapsed().as_micros();
-
-        match result {
-            Ok(true) => {
-                v.check_pass("unifrac_leaf_init compiles", true);
-                v.check_pass("unifrac_propagate_level compiles", true);
-                println!("  Both entry points compiled in {us} µs");
-            }
-            _ => {
-                v.check_pass("unifrac compile FAILED", false);
-            }
-        }
-    }
-
-    // ═══ Shader 4: ODE RK4 (already validated, confirm compile) ═════════
-    v.section("batched_qs_ode_rk4_f64.wgsl — Compile");
-    {
-        let t0 = Instant::now();
-        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            let _module = device.compile_shader_f64(ODE_WGSL, Some("ode_rk4"));
-            true
-        }));
-        let us = t0.elapsed().as_micros();
-
-        match result {
-            Ok(true) => {
-                v.check_pass("ODE RK4 compiles with f64 preamble", true);
-                println!("  Compiled in {us} µs");
-            }
-            _ => {
-                v.check_pass("ODE compile FAILED", false);
-            }
-        }
-    }
-
-    println!("\n═══ Local WGSL Shader Status ════════════════════════════════════");
-    println!("  kmer_histogram     → COMPILED + DISPATCHED (f32/atomic)");
-    println!("  taxonomy_fc        → COMPILED + DISPATCHED (f64, preamble)");
-    println!("  unifrac_propagate  → COMPILED (f64, 2 entry points)");
-    println!("  batched_ode_rk4    → COMPILED (f64, preamble)");
-    println!("  All 4 ready for `ToadStool` absorption handoff\n");
+    println!("\n═══ Absorption Status ═══════════════════════════════════════════");
+    println!("  KmerHistogramGpu      → ABSORBED (ToadStool S39, upstream dispatch)");
+    println!("  TaxonomyFcGpu         → ABSORBED (ToadStool S39, upstream dispatch)");
+    println!("  UniFracPropagateGpu   → ABSORBED (ToadStool S39, upstream pipeline)");
+    println!("  BatchedOdeRK4F64      → ABSORBED (ToadStool S41, compile_shader_f64)");
+    println!("  Local WGSL shaders    → RETIRED (4 files removed)\n");
 
     v.finish();
-}
-
-fn bgl_entry(binding: u32, ty: wgpu::BufferBindingType) -> wgpu::BindGroupLayoutEntry {
-    wgpu::BindGroupLayoutEntry {
-        binding,
-        visibility: wgpu::ShaderStages::COMPUTE,
-        ty: wgpu::BindingType::Buffer {
-            ty,
-            has_dynamic_offset: false,
-            min_binding_size: None,
-        },
-        count: None,
-    }
 }

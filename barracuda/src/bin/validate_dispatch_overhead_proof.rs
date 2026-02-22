@@ -19,7 +19,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | current HEAD |
-//! | Baseline tool | BarraCUDA CPU (sovereign Rust reference) |
+//! | Baseline tool | BarraCuda CPU (sovereign Rust reference) |
 //! | Baseline date | 2026-02-21 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_dispatch_overhead_proof` |
 //! | Data | Synthetic abundance vectors at [64, 256, 1024, 4096] |

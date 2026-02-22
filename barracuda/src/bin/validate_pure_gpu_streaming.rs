@@ -31,7 +31,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | current HEAD |
-//! | Baseline tool | `BarraCUDA` CPU + GPU streaming via `ToadStool` |
+//! | Baseline tool | `BarraCuda` CPU + GPU streaming via `ToadStool` |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --features gpu --release --bin validate_pure_gpu_streaming` |
 //! | Data | Synthetic communities (8 samples × 256 features) |

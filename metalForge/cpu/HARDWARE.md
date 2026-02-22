@@ -45,7 +45,7 @@ The CPU is the mathematical ground truth:
 Python baseline → Rust CPU (reference) → GPU/NPU (must match CPU)
 ```
 
-### BarraCUDA CPU Parity — All 25 Domains (Exp035–Exp062)
+### BarraCuda CPU Parity — All 25 Domains (Exp035–Exp062)
 
 205/205 checks pass across 25 algorithmic domains + 6 ODE flat modules,
 proving Rust CPU math matches Python across every validated module:
@@ -124,10 +124,10 @@ the orchestrator should:
 | All 650 Rust tests | ~0.8s | 587 lib + 50 integration + 13 doc |
 | All 48 CPU validation binaries | ~5s (total) | Sequential execution |
 | Full 16S pipeline (10 samples) | ~2.1s | CPU path |
-| BarraCUDA CPU v1 (21 checks) | ~60ms | 9 domains (release) |
-| BarraCUDA CPU v3 (45 checks) | ~25ms | 9 new domains (release) |
-| BarraCUDA CPU v4 (44 checks) | ~1.3ms | 5 new Track 1c domains (release) |
-| BarraCUDA CPU v5 (29 checks) | ~62µs | RF + GBM (release) |
+| BarraCuda CPU v1 (21 checks) | ~60ms | 9 domains (release) |
+| BarraCuda CPU v3 (45 checks) | ~25ms | 9 new domains (release) |
+| BarraCuda CPU v4 (44 checks) | ~1.3ms | 5 new Track 1c domains (release) |
+| BarraCuda CPU v5 (29 checks) | ~62µs | RF + GBM (release) |
 | All CPU parity (157 checks) | ~87ms | 25 domains total |
 | Spectral cosine (2048×2048) | ~4.8s | CPU baseline (926× slower than GPU) |
 

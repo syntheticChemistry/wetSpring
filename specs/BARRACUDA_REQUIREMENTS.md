@@ -1,4 +1,4 @@
-# wetSpring — BarraCUDA Requirements
+# wetSpring — BarraCuda Requirements
 
 **Last Updated**: February 22, 2026
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
@@ -21,7 +21,7 @@
 | Track 1c | ani, snp, dnds, molecular_clock, pangenome | Sovereign |
 | ML | decision_tree, random_forest, gbm | Sovereign |
 
-### GPU Primitives (28 ToadStool + 4 local WGSL shaders, 609 checks)
+### GPU Primitives (32 ToadStool primitives, 0 local WGSL, 609 checks)
 
 | ToadStool Primitive | wetSpring Use | Checks | Performance |
 |-------------------|---------------|--------|-------------|
@@ -38,17 +38,11 @@
 | `FelsensteinGpu` | Phylogenetic pruning likelihood | 15/15 | **Absorbed + composed** |
 | `GemmF64::WGSL` | Eliminates fragile include_str! path | — | **Absorbed Feb 20** |
 
-### Local WGSL Shaders (4 — Write phase, pending absorption)
+### Local WGSL Shaders (0 — Lean phase complete)
 
-8 of 9 original local shaders absorbed by ToadStool (sessions 31d/31g, Feb 22).
-4 remain in Write phase:
-
-| Shader | Domain | GPU Checks | Blocker |
-|--------|--------|:----------:|---------|
-| `batched_qs_ode_rk4_f64.wgsl` | ODE parameter sweep | 7 | Upstream `compile_shader` needs `compile_shader_f64` |
-| `kmer_histogram_f64.wgsl` | K-mer counting | — | Pending absorption handoff |
-| `unifrac_propagate_f64.wgsl` | UniFrac distance | — | Pending absorption handoff |
-| `taxonomy_fc_f64.wgsl` | Taxonomy scoring (NPU) | — | Pending absorption handoff |
+All 12 original local shaders absorbed by ToadStool (sessions 31d/31g + 39-41).
+The `shaders/` directory is empty. Final 4 absorbed Feb 22: ODE (S41 fixed
+`compile_shader_f64`), kmer (S40), unifrac (S40), taxonomy (S40).
 
 ---
 
@@ -88,7 +82,7 @@
 | UniFrac GPU | Tree traversal primitive | **P3** | High — new ToadStool primitive |
 | Taxonomy NPU | Naive Bayes → FC model → int8 | **P3** | NPU candidate |
 
-### BarraCUDA Evolution Path
+### BarraCuda Evolution Path
 
 ```
 DONE                                     DONE/CURRENT                     GOAL
@@ -97,7 +91,7 @@ Python baseline (35 scripts)  ────────→  Rust CPU parity (205/
 GPU diversity (38/38)         ────────→  GPU Parity v1 (Exp064)  ──────→  ✓ DONE (8 domains)
 GPU pipeline (88/88)          ────────→  GPU RF inference (13/13) ──────→  NPU for low-power inference
 CPU 22.5× faster than Python  ────────→  GPU math PROVEN portable ─────→  Scale via streaming
-8 bio shaders absorbed Feb 22  ────────→  28 ToadStool primitives ────→  Full Write→Absorb→Lean cycle
+12 shaders absorbed (S31d/g + S39-41) ─→  32 ToadStool primitives  ────→  Full Write→Absorb→Lean cycle
 25 CPU domains validated      ────────→  metalForge PROVEN (Exp065) ───→  CPU/GPU/NPU routing
 ```
 
@@ -110,6 +104,6 @@ CPU 22.5× faster than Python  ────────→  GPU math PROVEN port
 - **NVVM workaround**: force `ShaderTemplate::for_driver_auto(source, true)` for shaders using exp/log
 - Spectral cosine achieves 926× GPU speedup — the first "GPU wins decisively" benchmark from any spring
 - 41 CPU + 25 GPU Rust modules with 1 runtime dependency (flate2) — highest sovereignty ratio in the ecosystem
-- **8 shaders absorbed, 4 in Write phase (ODE, kmer, unifrac, taxonomy)** — see `barracuda/EVOLUTION_READINESS.md` for status
+- **12 shaders absorbed (Lean phase complete)** — 0 local WGSL; see `barracuda/EVOLUTION_READINESS.md` for status
 - **Rust edition 2024**, MSRV 1.85 — `f64::midpoint()`, `usize::midpoint()`, `const fn` promotions
 - **`#![deny(unsafe_code)]`** — edition 2024 makes `std::env::set_var` unsafe; `#[allow]` confined to test env-var calls

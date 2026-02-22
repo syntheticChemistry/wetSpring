@@ -141,8 +141,8 @@ No proprietary data dependencies.
 
 | Tier | Description | Experiments | Checks |
 |------|-------------|:-----------:|:------:|
-| **BarraCUDA CPU** | Rust math matches Python baselines | Exp035,043,057,070,079,085 | 205/205 |
-| **BarraCUDA GPU** | GPU math matches CPU reference | Exp064,071,087,092 | 609 |
+| **BarraCuda CPU** | Rust math matches Python baselines | Exp035,043,057,070,079,085 | 205/205 |
+| **BarraCuda GPU** | GPU math matches CPU reference | Exp064,071,087,092 | 609 |
 | **metalForge** | Substrate-independent output (CPU/GPU/NPU) | Exp060,065,080,084,086,088,093 | 172+ |
 | **Streaming** | Pure GPU pipeline, zero CPU round-trips | Exp072,073,075,089,090,091 | 180+ |
 | **Cross-spring** | neuralSpring primitives validated | Exp094,095 | 46 |

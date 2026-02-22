@@ -2,17 +2,16 @@
 
 **Date:** February 22, 2026
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 41 CPU + 25 GPU modules, 4 local WGSL shaders in Write phase, 28 ToadStool primitives consumed, 740 tests passing
+**Status:** 41 CPU + 25 GPU modules, 0 local WGSL shaders (Lean phase complete), 32 ToadStool primitives consumed, 740 tests passing
 
-### Feb 22 Rewire: 8 local WGSL shaders absorbed into ToadStool
+### Feb 22 Lean Phase Complete: All 4 local WGSL shaders absorbed (ToadStool S39-41)
 
-ToadStool sessions 31d and 31g absorbed all 8 remaining bio WGSL shaders.
-wetSpring rewired all 8 GPU modules to delegate to `barracuda::ops::bio::*`,
-deleted the absorbed shaders (25 KB), and verified: 633 tests pass, 0 clippy
-warnings (pedantic), clean docs. Four local WGSL shaders remain in Write phase:
-ODE sweep (blocked on ToadStool `compile_shader` vs `compile_shader_f64`),
-kmer histogram, unifrac propagation, and taxonomy FC scoring. See
-`ABSORPTION_MANIFEST.md` for details.
+ToadStool sessions 39-41 absorbed the final 4 local WGSL shaders (ODE sweep,
+kmer histogram, unifrac propagate, taxonomy FC). wetSpring rewired to
+`barracuda::ops::bio::*`, deleted the shaders, and verified: 740 tests pass.
+The `shaders/` directory is now empty. ODE blocker resolved: ToadStool S41
+fixed `compile_shader_f64` in `batched_ode_rk4.rs`. See `ABSORPTION_MANIFEST.md`
+for details.
 
 ### Code Quality (Phase 15+)
 
@@ -69,18 +68,18 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 | `gillespie` | Stochastic SSA | ✅ Absorbed | `GillespieGpu` | Exp044 |
 | `hmm` | Hidden Markov Model | ✅ Absorbed | `HmmBatchForwardF64` | Rewired Feb 22, 2026 |
 | `kmd` | Kendrick mass defect | C | — | Lookup table |
-| `kmer` | K-mer counting | **A** | Local WGSL | `kmer_histogram_f64.wgsl` + sorted pairs (Exp081) |
+| `kmer` | K-mer counting | ✅ Absorbed | `KmerHistogramF64` | ToadStool S40 (Exp081) |
 | `merge_pairs` | Read merging | C | — | Sequential per-pair |
 | `molecular_clock` | Strict/relaxed clock | C | — | Small calibration data, CPU-optimal |
 | `multi_signal` | Multi-signal QS | **A** | — | GPU flat API (Exp078), maps to ODE sweep |
 | `neighbor_joining` | NJ tree construction | C | — | Sequential algorithm |
-| `ode` | RK4 integrator | **A** | Local WGSL | `batched_qs_ode_rk4_f64.wgsl` (Exp049) |
+| `ode` | RK4 integrator | ✅ Absorbed | `BatchedOdeRK4F64` | ToadStool S41 (Exp049) |
 | `pangenome` | Gene clustering | ✅ Absorbed | `PangenomeClassifyGpu` | Rewired Feb 22, 2026 |
 | `pcoa` | PCoA ordination | ✅ Absorbed | `BatchedEighGpu` | Exp016 |
 | `phage_defense` | CRISPR/RM model | **A** | — | GPU flat API (Exp078), maps to ODE sweep |
 | `phred` | Quality scoring | C | — | Per-base lookup |
 | `placement` | Phylo placement | ✅ Absorbed | Compose `FelsensteinGpu` | Exp046 |
-| `qs_biofilm` | QS/c-di-GMP ODE | **A** | Local WGSL | `batched_qs_ode_rk4_f64.wgsl` (Exp049) |
+| `qs_biofilm` | QS/c-di-GMP ODE | ✅ Absorbed | `BatchedOdeRK4F64` | ToadStool S41 (Exp049) |
 | `quality` | Read quality | ✅ Absorbed | `QualityFilterGpu` | Rewired Feb 22, 2026. Adapter logic extracted to `adapter.rs` |
 | `random_forest` | RF ensemble | ✅ Absorbed | `RfBatchInferenceGpu` | Rewired Feb 22, 2026 |
 | `reconciliation` | DTL reconciliation | C | — | Tree traversal |
@@ -88,9 +87,9 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 | `signal` | Signal processing | C | — | FFT-based, small data |
 | `snp` | SNP calling | ✅ Absorbed | `SnpCallingF64` | Rewired Feb 22, 2026 |
 | `spectral_match` | Spectral cosine | ✅ Absorbed | `FMR` spectral cosine | Exp016 |
-| `taxonomy/` | Naive Bayes classify | **A** / NPU | Local WGSL | Refactored: `types`, `kmers`, `classifier` submodules. `taxonomy_fc_f64.wgsl` + NPU int8 (Exp083) |
+| `taxonomy/` | Naive Bayes classify | ✅ Absorbed / NPU | `TaxonomyFcF64` | ToadStool S40; `types`, `kmers`, `classifier` submodules (Exp083) |
 | `tolerance_search` | Tolerance search | ✅ Absorbed | `BatchTolSearchF64` | Exp016 |
-| `unifrac/` | UniFrac distance | **A** | Local WGSL | Refactored: `tree`, `flat_tree`, `distance` submodules. `unifrac_propagate_f64.wgsl` + CSR flat tree (Exp082) |
+| `unifrac/` | UniFrac distance | ✅ Absorbed | `UniFracPropagateF64` | ToadStool S40; `tree`, `flat_tree`, `distance` submodules (Exp082) |
 
 ---
 
@@ -112,7 +111,7 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 | `gemm_cached` | Matrix multiply | `GemmCachedF64` | Lean |
 | `hmm_gpu` | HMM forward | `HmmBatchForwardF64` | ✅ Lean (Feb 22) |
 | `kriging` | Spatial interpolation | `KrigingF64` | Lean |
-| `ode_sweep_gpu` | ODE parameter sweep | Local WGSL | **A** — blocked: upstream uses `compile_shader` not `compile_shader_f64` |
+| `ode_sweep_gpu` | ODE parameter sweep | `BatchedOdeRK4F64` | ✅ Lean (ToadStool S41 fixed compile_shader_f64) |
 | `pangenome_gpu` | Pangenome classify | `PangenomeClassifyGpu` | ✅ Lean (Feb 22) |
 | `pcoa_gpu` | PCoA eigenvalues | `BatchedEighGpu` | Lean |
 | `quality_gpu` | Quality filtering | `QualityFilterGpu` | ✅ Lean (Feb 22) |
@@ -126,31 +125,27 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 
 ---
 
-## Local WGSL Shader Inventory (4 in Write phase)
+## Local WGSL Shader Inventory (0 — Lean phase complete)
 
-| Shader | Domain | GPU Checks | Status | Blocker |
-|--------|--------|:----------:|--------|---------|
-| `batched_qs_ode_rk4_f64.wgsl` | QS ODE sweep | 7 (Exp049) | **A** | Upstream `compile_shader` needs `compile_shader_f64` (session 39) |
-| `kmer_histogram_f64.wgsl` | K-mer counting | pending | **A** | Needs validation binary |
-| `unifrac_propagate_f64.wgsl` | UniFrac distance | pending | **A** | Multi-pass tree levels |
-| `taxonomy_fc_f64.wgsl` | Taxonomy scoring | pending | **A** | NPU int8 variant pending |
-
-8 shaders deleted on Feb 22 (25 KB) — all absorbed into ToadStool `barracuda::ops::bio::*`.
+All 12 original local WGSL shaders have been absorbed by ToadStool (sessions 31d/31g + 39-41).
+The `shaders/` directory is empty. Final 4 absorbed Feb 22: ODE (S41), kmer (S40),
+unifrac (S40), taxonomy (S40). ODE blocker resolved: ToadStool S41 fixed
+`compile_shader_f64` in `batched_ode_rk4.rs`.
 
 ### Shader Compilation Notes
 
-The sole remaining local shader uses `ShaderTemplate::for_driver_auto(_, true)`
+All GPU modules now lean on ToadStool. Historical note: local shaders used `ShaderTemplate::for_driver_auto(_, true)`
 for RTX 4070 (Ada Lovelace) f64 exp/log polyfill. ToadStool's absorbed shaders
 handle this automatically via `WgpuDevice::compile_shader_f64()`.
 
-**naga quirks (still relevant for ODE shader):**
+**naga quirks (historical; absorbed shaders):**
 - `enable f64;` not supported — omit from all WGSL
 - Bare f32 literals in f64 builtins fail type check — use `f64(0.0)`
 - `pow()` on f64 crashes NVVM — use `pow_f64()` polyfill
 
 ---
 
-## ToadStool Primitives Consumed (28)
+## ToadStool Primitives Consumed (32)
 
 ### Original 15 (pre-Feb 22)
 
@@ -170,7 +165,7 @@ handle this automatically via `WgpuDevice::compile_shader_f64()`.
 | `FelsensteinGpu` | felsenstein, bootstrap, placement | 046 |
 | `ShaderTemplate::for_driver_auto` | ode_sweep_gpu, gemm_cached | 047+ |
 | `LogsumexpWgsl` | (available, not yet wired) | — |
-| `BatchedOdeRK4F64` | (blocked: `enable f64;` + `pow` crash) | — |
+| `BatchedOdeRK4F64` | ode_sweep_gpu, qs_biofilm, bistable, multi_signal, phage_defense | S41 (Exp049) |
 
 ### 8 Bio Primitives (absorbed Feb 22, cross-spring evolution)
 
@@ -203,22 +198,13 @@ hotSpring's precision f64 polyfills improve wetSpring's numerical accuracy.
 
 ## Absorption Queue (handoff to ToadStool)
 
-### Ready Now (Tier A) — 4 local WGSL shaders
+### Completed (Feb 22) — All 12 shaders absorbed (Lean phase complete)
 
-1. **`batched_qs_ode_rk4_f64.wgsl`** — 7/7 GPU checks (Exp049)
-   - Blocked on ToadStool's upstream shader containing `enable f64;` (line 35)
-   - Once ToadStool removes the directive, wetSpring replaces with thin wrapper
-2. **`kmer_histogram_f64.wgsl`** — Tier A k-mer counting shader
-   - Atomic histogram into 4^k flat buffer; pending validation binary
-   - CPU ref: `bio::kmer::count_kmers` (Exp081)
-3. **`unifrac_propagate_f64.wgsl`** — Tier A UniFrac tree propagation
-   - Bottom-up CSR tree traversal + sample matrix; multi-pass levels
-   - CPU ref: `bio::unifrac::unweighted_unifrac` (Exp082)
-4. **`taxonomy_fc_f64.wgsl`** — Tier A taxonomy Naive Bayes scoring
-   - Log-posterior accumulation per (query, taxon); NPU int8 variant planned
-   - CPU ref: `bio::taxonomy::NaiveBayesClassifier::classify` (Exp083)
+ToadStool sessions 39-41 absorbed the final 4 local WGSL shaders: ODE sweep
+(S41: fixed `compile_shader_f64` in batched_ode_rk4.rs), kmer histogram (S40),
+unifrac propagate (S40), taxonomy FC (S40). wetSpring rewired; `shaders/` empty.
 
-### Completed (Feb 22) — 8 shaders absorbed
+### Completed (Feb 22) — 8 bio shaders absorbed (sessions 31d/31g)
 
 All 8 bio shaders successfully absorbed by ToadStool sessions 31d/31g and
 rewired in wetSpring. 451 GPU checks pass. Two ToadStool bugs fixed during
@@ -231,9 +217,9 @@ the rewire (SNP binding layout, AdapterInfo propagation).
 
 ### GPU/NPU-Ready (Tier A) — Promoted via Exp081–083
 
-4. **`kmer`** — GPU histogram (4^k flat buffer) + sorted pairs, pending WGSL shader
-5. **`unifrac`** — CSR flat tree + dense sample matrix, pending tree-propagation WGSL
-6. **`taxonomy`** — Int8 quantized weights for NPU FC dispatch, pending AKD1000 integration
+4. **`kmer`** — ✅ Absorbed (ToadStool S40: `KmerHistogramF64`)
+5. **`unifrac`** — ✅ Absorbed (ToadStool S40: `UniFracPropagateF64`)
+6. **`taxonomy`** — ✅ Absorbed (ToadStool S40: `TaxonomyFcF64`); NPU int8 variant planned
 
 ### Needs Refactoring (Tier B)
 
@@ -245,8 +231,8 @@ the rewire (SNP binding layout, AdapterInfo propagation).
 
 | Tier | CPU Modules | GPU Modules | CPU Checks | GPU Checks |
 |------|:-----------:|:-----------:|:----------:|:----------:|
-| ✅ Absorbed (Lean) | 18 | 19 (ToadStool) | 900+ | 400+ |
-| A (GPU/NPU-ready) | 7 | 4 (ODE, kmer, unifrac, taxonomy) | 81+ | 12+ |
+| ✅ Absorbed (Lean) | 25 | 25 (ToadStool) | 900+ | 400+ |
+| A (GPU/NPU-ready) | 2 | 0 | 81+ | 12+ |
 | B (needs refactor) | 2 | 0 | 60+ | 0 |
 | C (CPU-only) | 14 | 0 | 171+ | 0 |
 | Dispatch routing | — | — | 80 | — |
@@ -269,7 +255,7 @@ the rewire (SNP binding layout, AdapterInfo propagation).
 | Feb 20 | Exp050: BatchedEighGpu validated for bifurcation (bit-exact) |
 | Feb 20 | Track 1c: 5 new modules (ani, dnds, molecular_clock, pangenome, snp) |
 | Feb 20 | Exp051-056: R. Anderson deep-sea metagenomics (133 new checks) |
-| Feb 20 | Exp057: BarraCUDA CPU v4 — 23 domains, 128/128 parity checks |
+| Feb 20 | Exp057: BarraCuda CPU v4 — 23 domains, 128/128 parity checks |
 | Feb 20 | Exp058: GPU Track 1c — 4 new WGSL shaders, 27/27 GPU checks |
 | Feb 20 | Exp059: 25-domain benchmark — 22.5× Rust over Python |
 | Feb 20 | Exp060: metalForge cross-substrate — 20/20 CPU↔GPU parity |
@@ -303,7 +289,7 @@ the rewire (SNP binding layout, AdapterInfo propagation).
 | Feb 22 | Exp078: ODE GPU sweep readiness — flat param APIs for 5 ODE modules (10 new tests) |
 | Feb 22 | Tier promotions: multi_signal B→A, phage_defense B→A, cooperation C→B |
 | Feb 22 | Benchmarked: CPU vs GPU scaling, dispatch overhead, phylo+HMM, streaming pipeline (all 23 ToadStool primitives) |
-| Feb 22 | Exp079: BarraCUDA CPU v6 — 48 checks proving flat API preserves bitwise ODE math (6 modules) |
+| Feb 22 | Exp079: BarraCuda CPU v6 — 48 checks proving flat API preserves bitwise ODE math (6 modules) |
 | Feb 22 | Exp080: metalForge dispatch routing — 35 checks across 5 substrate configs (forge crate) |
 | Feb 22 | Exp081: kmer GPU histogram (4^k flat buffer + sorted pairs) — promoted B→A |
 | Feb 22 | Exp082: unifrac CSR flat tree + sample matrix — promoted B→A |
@@ -357,7 +343,7 @@ the rewire (SNP binding layout, AdapterInfo propagation).
 |--------|-----------|-----------|
 | Domain | Computational physics | Life science & analytical chemistry |
 | CPU modules | 50+ (physics, lattice, MD, spectral) | 41 (bio, signal, ML) |
-| GPU modules | 34 WGSL shaders | 20 modules, 4 local WGSL shaders |
+| GPU modules | 34 WGSL shaders | 25 modules, 0 local WGSL (Lean complete) |
 | Absorbed | complex64, SU(3), plaquette, HMC, CellList | SW, Gillespie, DT, Felsenstein, GEMM, HMM, ANI, SNP, dN/dS, Pangenome, QF, DADA2, RF + 5 neuralSpring (PairwiseHamming, PairwiseJaccard, SpatialPayoff, BatchFitness, LocusVariance) |
 | WGSL pattern | `pub const WGSL: &str` inline | `include_str!("../shaders/...")` |
 | metalForge | GPU + NPU hardware characterization | GPU + NPU + cross-substrate validation |

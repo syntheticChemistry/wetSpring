@@ -51,8 +51,8 @@ implementations into upstream ToadStool/BarraCUDA primitives:
 4. **Absorb** — ToadStool integrates as `ops::bio::*` shaders
 5. **Lean** — wetSpring rewires to upstream imports, deletes local code
 
-**Current status:** 24 GPU modules lean on upstream (19 wetSpring + 5 neuralSpring); 4 local WGSL shaders
-in Write phase (ODE sweep, kmer histogram, unifrac propagation, taxonomy FC).
+**Current status:** 25 GPU modules lean on upstream (32 ToadStool primitives); 0 local WGSL shaders
+(Lean phase complete — all absorbed by ToadStool S39-41).
 Phase 23 structurally evolved all trajectory types to flat contiguous layouts,
 unified the DADA2 error model, and eliminated per-step clones — all directly
 GPU-buffer-compatible. The forge crate (`metalForge/forge/` v0.2.0) provides
@@ -279,7 +279,7 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCUDA/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34 WGSL shaders, 637 tests)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (4 local WGSL shaders, 740 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 32 ToadStool primitives, 740 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **archive/handoffs/** — Fossil record of ToadStool handoffs (v1–v7)
 

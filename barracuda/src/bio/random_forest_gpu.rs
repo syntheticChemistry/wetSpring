@@ -152,11 +152,12 @@ impl RandomForestGpu {
                     votes[pred] += 1;
                 }
             }
-            let (class, &max_votes) = votes
+            let (class, max_votes) = votes
                 .iter()
+                .copied()
                 .enumerate()
-                .max_by_key(|(_, &v)| v)
-                .unwrap_or((0, &0));
+                .max_by_key(|&(_, v)| v)
+                .unwrap_or((0, 0));
             #[allow(clippy::cast_precision_loss)]
             let confidence = max_votes as f64 / n_trees as f64;
             results.push(RfPrediction {

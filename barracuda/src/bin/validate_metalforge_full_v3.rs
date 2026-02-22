@@ -18,7 +18,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | current HEAD |
-//! | Baseline tool | `BarraCUDA` CPU reference |
+//! | Baseline tool | `BarraCuda` CPU reference |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --features gpu --release --bin validate_metalforge_full_v3` |
 //! | Data | Synthetic test vectors (self-contained) |

@@ -6,7 +6,7 @@
 //! Bray-Curtis dissimilarity.
 //!
 //! These are the core metrics from QIIME2/skbio used in Exp002.
-//! Pure math — future GPU targets via `BarraCUDA` reduce shaders.
+//! Pure math — future GPU targets via `BarraCuda` reduce shaders.
 
 /// Observed features: count of non-zero entries.
 #[inline]

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Exp044: `BarraCUDA` GPU parity for v3 domains — proves CPU→GPU portability.
+//! Exp044: `BarraCuda` GPU parity for v3 domains — proves CPU→GPU portability.
 //!
 //! Tests GPU implementations of domains validated in CPU v3 that have
 //! `ToadStool` primitives available: extended diversity (Pielou, Bray-Curtis
@@ -18,7 +18,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | `BarraCUDA` CPU (reference) |
+//! | Baseline tool | `BarraCuda` CPU (reference) |
 //! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
 //! | Baseline command | `bio::diversity`, `bio::spectral_match`, CPU stats |
 //! | Baseline date | 2026-02-19 |
@@ -45,7 +45,7 @@ use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
 async fn main() {
-    let mut v = Validator::new("Exp044: BarraCUDA GPU v3 — CPU→GPU Parity");
+    let mut v = Validator::new("Exp044: BarraCuda GPU v3 — CPU→GPU Parity");
 
     let gpu = match GpuF64::new().await {
         Ok(g) => g,

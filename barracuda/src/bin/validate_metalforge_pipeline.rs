@@ -20,7 +20,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | current HEAD |
-//! | Baseline tool | `BarraCUDA` CPU + `metalForge` dispatch |
+//! | Baseline tool | `BarraCuda` CPU + `metalForge` dispatch |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --release --bin validate_metalforge_pipeline` |
 //! | Data | Synthetic test vectors (self-contained) |

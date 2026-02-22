@@ -6,7 +6,7 @@
 //! GPU power/temperature/VRAM (nvidia-smi), and process memory for every
 //! validation phase.  Produces machine-readable JSON and human-readable
 //! summary tables so that identical pipelines can be compared across
-//! substrates (Python, `BarraCUDA` CPU, `BarraCUDA` GPU) and gates.
+//! substrates (Python, `BarraCuda` CPU, `BarraCuda` GPU) and gates.
 //!
 //! See `benchmarks/PROTOCOL.md` for the full measurement specification.
 //!
@@ -27,7 +27,7 @@ pub use power::{EnergyReport, PowerMonitor};
 pub struct PhaseResult {
     /// Phase name (e.g., `"shannon_1m"`, `"felsenstein"`).
     pub phase: String,
-    /// Substrate label (e.g., `"Python"`, `"BarraCUDA CPU"`, `"BarraCUDA GPU"`).
+    /// Substrate label (e.g., `"Python"`, `"BarraCuda CPU"`, `"BarraCuda GPU"`).
     pub substrate: String,
     /// Total wall-clock time in seconds.
     pub wall_time_s: f64,
@@ -481,7 +481,7 @@ mod tests {
         };
         let pr = PhaseResult {
             phase: "shannon_1m".to_string(),
-            substrate: "BarraCUDA GPU".to_string(),
+            substrate: "BarraCuda GPU".to_string(),
             wall_time_s: 2.5,
             per_eval_us: 0.42,
             n_evals: 10_000,
@@ -490,7 +490,7 @@ mod tests {
             notes: "smoke test".to_string(),
         };
         assert_eq!(pr.phase, "shannon_1m");
-        assert_eq!(pr.substrate, "BarraCUDA GPU");
+        assert_eq!(pr.substrate, "BarraCuda GPU");
         assert!((pr.wall_time_s - 2.5).abs() < 1e-9);
         assert_eq!(pr.n_evals, 10_000);
         assert!((pr.energy.cpu_joules - 1.5).abs() < f64::EPSILON);
@@ -613,7 +613,7 @@ mod tests {
     fn phase_result_to_json_structure() {
         let pr = PhaseResult {
             phase: "test_phase".to_string(),
-            substrate: "BarraCUDA CPU".to_string(),
+            substrate: "BarraCuda CPU".to_string(),
             wall_time_s: 1.0,
             per_eval_us: 10.0,
             n_evals: 100,
@@ -623,7 +623,7 @@ mod tests {
         };
         let json = pr.to_json();
         assert!(json.contains("\"phase\": \"test_phase\""));
-        assert!(json.contains("\"substrate\": \"BarraCUDA CPU\""));
+        assert!(json.contains("\"substrate\": \"BarraCuda CPU\""));
         assert!(json.contains("\"n_evals\": 100"));
         assert!(json.contains("\"notes\": \"unit test\""));
     }
@@ -732,7 +732,7 @@ mod tests {
     fn cpu_phase(name: &str, wall: f64, cpu_j: f64) -> PhaseResult {
         PhaseResult {
             phase: name.to_string(),
-            substrate: "BarraCUDA CPU".to_string(),
+            substrate: "BarraCuda CPU".to_string(),
             wall_time_s: wall,
             per_eval_us: wall * 1e6 / 1000.0,
             n_evals: 1000,
@@ -748,7 +748,7 @@ mod tests {
     fn gpu_phase(name: &str, wall: f64, gpu_j: f64) -> PhaseResult {
         PhaseResult {
             phase: name.to_string(),
-            substrate: "BarraCUDA GPU".to_string(),
+            substrate: "BarraCuda GPU".to_string(),
             wall_time_s: wall,
             per_eval_us: wall * 1e6 / 1000.0,
             n_evals: 1000,

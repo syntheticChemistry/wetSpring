@@ -7,9 +7,9 @@
     clippy::cast_possible_truncation,
     clippy::similar_names
 )]
-//! Exp092: `BarraCUDA` CPU vs GPU — All 16 Domains Head-to-Head
+//! Exp092: `BarraCuda` CPU vs GPU — All 16 Domains Head-to-Head
 //!
-//! Consolidated proof that BarraCUDA's pure Rust math produces identical
+//! Consolidated proof that BarraCuda's pure Rust math produces identical
 //! results on CPU and GPU across all 16 GPU-eligible domains. For each
 //! domain: CPU computes reference truth; GPU must match within tolerance.
 //! Wall-clock timing captured for both paths.
@@ -19,7 +19,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | current HEAD |
-//! | Baseline tool | `BarraCUDA` CPU (sovereign Rust reference) |
+//! | Baseline tool | `BarraCuda` CPU (sovereign Rust reference) |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --features gpu --release --bin validate_cpu_vs_gpu_all_domains` |
 //! | Data | Synthetic test vectors (self-contained) |
@@ -48,7 +48,7 @@ struct Timing {
 
 #[tokio::main]
 async fn main() {
-    let mut v = Validator::new("Exp092: BarraCUDA CPU vs GPU — All 16 Domains Head-to-Head");
+    let mut v = Validator::new("Exp092: BarraCuda CPU vs GPU — All 16 Domains Head-to-Head");
 
     let gpu = match GpuF64::new().await {
         Ok(g) => g,

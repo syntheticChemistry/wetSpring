@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![allow(clippy::too_many_lines, clippy::cast_precision_loss)]
-//! Exp061/062: `BarraCUDA` CPU Parity v5 — Random Forest + GBM
+//! Exp061/062: `BarraCuda` CPU Parity v5 — Random Forest + GBM
 //!
 //! Validates the sovereign Random Forest and Gradient Boosting Machine
 //! inference engines in pure Rust. Proves parity with the functional
@@ -31,7 +31,7 @@ use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn main() {
-    let mut v = Validator::new("BarraCUDA CPU v5 — RF + GBM (Domains 24-25)");
+    let mut v = Validator::new("BarraCuda CPU v5 — RF + GBM (Domains 24-25)");
     let mut timings: Vec<(&str, f64)> = Vec::new();
 
     // ════════════════════════════════════════════════════════════════
@@ -323,7 +323,7 @@ fn main() {
     // ════════════════════════════════════════════════════════════════
     //  Timing Summary
     // ════════════════════════════════════════════════════════════════
-    v.section("═══ BarraCUDA CPU v5 Timing Summary ═══");
+    v.section("═══ BarraCuda CPU v5 Timing Summary ═══");
     println!();
     println!("  {:<40} {:>12}", "Domain", "Time (µs)");
     println!("  {}", "─".repeat(55));

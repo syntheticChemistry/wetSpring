@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![allow(clippy::too_many_lines, clippy::cast_precision_loss)]
-//! Exp085: `BarraCUDA` CPU Parity v7 — Tier A Data Layout Fidelity
+//! Exp085: `BarraCuda` CPU Parity v7 — Tier A Data Layout Fidelity
 //!
 //! Proves that the 3 newly Tier A modules (kmer, unifrac, taxonomy) preserve
 //! mathematical correctness through their GPU/NPU-ready data layouts:
@@ -16,7 +16,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | current HEAD |
-//! | Baseline tool | BarraCUDA CPU (sovereign Rust reference) |
+//! | Baseline tool | BarraCuda CPU (sovereign Rust reference) |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --release --bin validate_barracuda_cpu_v7` |
 //! | Data | Synthetic test vectors (self-contained) |
@@ -32,7 +32,7 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::validation::Validator;
 
 fn main() {
-    let mut v = Validator::new("Exp085: BarraCUDA CPU v7 — Tier A Data Layout Fidelity");
+    let mut v = Validator::new("Exp085: BarraCuda CPU v7 — Tier A Data Layout Fidelity");
     let t0 = Instant::now();
 
     validate_kmer_histogram(&mut v);

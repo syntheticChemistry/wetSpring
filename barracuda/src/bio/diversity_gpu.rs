@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated diversity metrics via `BarraCUDA` / `ToadStool`.
+//! GPU-accelerated diversity metrics via `BarraCuda` / `ToadStool`.
 //!
 //! Each function computes the same metric as its CPU counterpart in
 //! [`super::diversity`], but dispatches to GPU. Results should match

@@ -8,7 +8,7 @@ Three-tier benchmark comparing identical scientific workloads across substrates:
 |------|-----------|----------------|
 | 1 | Python (numpy/scipy) | `scripts/benchmark_python_baseline.py` |
 | 2 | Rust CPU | `barracuda/src/bin/benchmark_pipeline.rs` |
-| 3 | Rust GPU (BarraCUDA/ToadStool) | `barracuda/src/bin/benchmark_cpu_gpu.rs` |
+| 3 | Rust GPU (BarraCuda/ToadStool) | `barracuda/src/bin/benchmark_cpu_gpu.rs` |
 
 ## How to Run
 
@@ -76,7 +76,7 @@ All tiers emit JSON matching this schema. Files are saved to `benchmarks/results
   "phases": [
     {
       "phase": "Shannon entropy N=1000000",
-      "substrate": "Python (numpy/scipy) | Rust CPU | BarraCUDA GPU",
+      "substrate": "Python (numpy/scipy) | Rust CPU | BarraCuda GPU",
       "wall_time_s": 0.007,
       "per_eval_us": 7000.0,
       "n_evals": 142,

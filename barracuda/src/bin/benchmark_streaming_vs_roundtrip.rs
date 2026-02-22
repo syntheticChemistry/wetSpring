@@ -24,7 +24,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | current HEAD |
-//! | Baseline tool | `BarraCUDA` CPU + GPU |
+//! | Baseline tool | `BarraCuda` CPU + GPU |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --features gpu --release --bin benchmark_streaming_vs_roundtrip` |
 //! | Data | Synthetic communities (variable batch × 256 features) |

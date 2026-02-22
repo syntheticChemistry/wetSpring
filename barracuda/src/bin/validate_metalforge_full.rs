@@ -18,7 +18,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | BarraCUDA CPU (sovereign Rust reference) |
+//! | Baseline tool | BarraCuda CPU (sovereign Rust reference) |
 //! | Baseline version | Feb 2026 |
 //! | Baseline command | CPU run first as ground truth; GPU validated against CPU |
 //! | Baseline date | 2026-02-21 |

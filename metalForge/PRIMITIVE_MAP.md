@@ -5,8 +5,8 @@
 GPU primitive (or explain why it stays CPU-only). This guides the
 absorption pipeline and identifies what ToadStool needs to build next.
 
-> **Feb 22 update (latest):** 19 modules lean on upstream. 4 local WGSL shaders
-> in Write phase: ODE sweep, kmer histogram, unifrac propagate, taxonomy FC.
+> **Feb 22 update (latest):** 32 ToadStool primitives consumed. 0 local WGSL
+> (Lean phase complete — S39-41 absorbed ODE, kmer, unifrac, taxonomy).
 > Forge crate v0.2.0 adds streaming dispatch module.
 
 ---
@@ -55,8 +55,8 @@ absorption pipeline and identifies what ToadStool needs to build next.
 
 | Rust Module | GPU Strategy | ToadStool Primitive | Exp |
 |-------------|-------------|-------------------|-----|
-| `ode` (RK4) | **Local** | `batched_qs_ode_rk4_f64.wgsl` | 049 |
-| `qs_biofilm` | **Local** | `batched_qs_ode_rk4_f64.wgsl` | 049 |
+| `ode` (RK4) | Lean | `BatchedOdeRK4F64` (ToadStool S41) | 049 |
+| `qs_biofilm` | Lean | `BatchedOdeRK4F64` (ToadStool S41) | 049 |
 | `bistable` | Compose | Same ODE sweep shader | — |
 | `multi_signal` | Compose | Same ODE sweep shader | — |
 | `phage_defense` | Compose | Same ODE sweep shader | — |
@@ -69,8 +69,8 @@ absorption pipeline and identifies what ToadStool needs to build next.
 |-------------|-------------|-------------------|-----|
 | `alignment` (SW) | Lean | `SmithWatermanGpu` | 044 |
 | `hmm` | Lean | `HmmBatchForwardF64` (ToadStool, absorbed Feb 22) | 047 |
-| `kmer` | **Local** | `kmer_histogram_f64.wgsl` — atomic 4^k histogram + sorted pairs | 081 |
-| `unifrac` | **Local** | `unifrac_propagate_f64.wgsl` — CSR tree propagation + pairwise | 082 |
+| `kmer` | Lean | `KmerHistogramF64` (ToadStool S40) | 081 |
+| `unifrac` | Lean | `UniFracPropagateF64` (ToadStool S40) | 082 |
 | `decision_tree` | Lean | `TreeInferenceGpu` | 044 |
 | `random_forest` / `random_forest_gpu` | Lean | `RfBatchInferenceGpu` (ToadStool, absorbed Feb 22) | 063 |
 | `gbm` | CPU | Sequential boosting (batch-parallel within rounds) | 062 |
@@ -82,7 +82,7 @@ absorption pipeline and identifies what ToadStool needs to build next.
 | `quality` / `quality_gpu` | Lean | `QualityFilterGpu` (ToadStool, absorbed Feb 22) | 016 |
 | `dada2` / `dada2_gpu` | Lean | `Dada2EStepGpu` (ToadStool, absorbed Feb 22) | 016 |
 | `chimera` / `chimera_gpu` | Lean | `FMR` | 016 |
-| `taxonomy` / `taxonomy_gpu` | Lean / **Local** | `FMR` / `taxonomy_fc_f64.wgsl` + NPU int8 (`to_int8_weights`) | 016/083 |
+| `taxonomy` / `taxonomy_gpu` | Lean | `TaxonomyFcF64` (ToadStool S40) + NPU int8 (`to_int8_weights`) | 016/083 |
 | `streaming_gpu` | Lean | Multiple primitives | 016 |
 | `rarefaction_gpu` | Lean | `PrngXoshiro` | 016 |
 
@@ -154,7 +154,7 @@ remain as the bridge between domain types and ToadStool's raw buffer API.
 | `random_forest` | `RfBatchInferenceGpu` | `predict_batch` | Feb 22 |
 | `felsenstein` | `FelsensteinGpu` | Per-site (already absorbed) | Earlier |
 
-Only the ODE sweep shader remains local (blocked: upstream uses `compile_shader` not `compile_shader_f64`).
+All shaders absorbed; ODE blocker resolved (ToadStool S41 fixed `compile_shader_f64`).
 
 ### Shared Math (`crate::special`) — Extracted
 
@@ -175,8 +175,8 @@ The `bio::special` re-export shim has been removed (Phase 24).
 | Category | Count |
 |----------|-------|
 | **Lean** (upstream ToadStool) | 24 modules (16 original + 8 bio absorbed Feb 22) |
-| **Local** (WGSL shader) | 1 module (ODE sweep, blocked: upstream uses `compile_shader` not `compile_shader_f64`) |
+| **Local** (WGSL shader) | 0 modules (Lean phase complete) |
 | **Compose** (existing primitives) | 5 modules |
 | **CPU** (no GPU path) | 13 modules |
 | **NPU** (candidate) | 1 module |
-| **Local WGSL** (Write phase — pending absorption) | 4 shaders (ODE, kmer, unifrac, taxonomy) |
+| **Local WGSL** (Write phase) | 0 (Lean phase complete) |

@@ -26,7 +26,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | `BarraCUDA` CPU (reference) |
+//! | Baseline tool | `BarraCuda` CPU (reference) |
 //! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
 //! | Baseline command | `bio::ani`, `bio::snp`, `bio::pangenome`, `bio::dnds` |
 //! | Baseline date | 2026-02-19 |
@@ -210,7 +210,7 @@ fn validate_snp_gpu(gpu: &SnpGpu, v: &mut Validator, timings: &mut Vec<(&str, f6
                 .is_variant
                 .iter()
                 .enumerate()
-                .filter(|(_, &v)| v == 1)
+                .filter(|(_, v)| **v == 1)
                 .map(|(i, _)| i)
                 .collect();
             let cpu_variant_positions: Vec<usize> =
@@ -254,8 +254,7 @@ fn validate_snp_gpu(gpu: &SnpGpu, v: &mut Validator, timings: &mut Vec<(&str, f6
                 .is_variant
                 .iter()
                 .enumerate()
-                .filter(|(_, &v)| v == 0)
-                .all(|(i, _)| gpu_result.alt_frequencies[i].abs() < 1e-15);
+                .all(|(i, v)| *v != 0 || gpu_result.alt_frequencies[i].abs() < 1e-15);
             v.check(
                 "SNP GPU: non-variant alt_freq = 0",
                 f64::from(u8::from(non_variants_clean)),
@@ -367,9 +366,8 @@ fn validate_pangenome_gpu(gpu: &PangenomeGpu, v: &mut Validator, timings: &mut V
             let core_correct = gpu_result
                 .classifications
                 .iter()
-                .zip(&gpu_result.genome_counts)
-                .filter(|(&c, _)| c == 3)
-                .all(|(_, &cnt)| cnt == n_genomes as u32);
+                .zip(gpu_result.genome_counts.iter())
+                .all(|(c, cnt)| *c != 3 || *cnt == n_genomes as u32);
             v.check(
                 "Pan GPU: core genes have count = n_genomes",
                 f64::from(u8::from(core_correct)),

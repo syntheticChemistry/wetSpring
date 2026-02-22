@@ -92,8 +92,5 @@ Following hotSpring's pattern:
 
 ## Deprecation Candidates (Pending Upstream)
 
-4 local WGSL shaders in Write phase. All others were absorbed on Feb 22 (ToadStool 31d/31g).
-
-| Priority | Shader | Why | Blocker |
-|----------|--------|-----|---------|
-| **P1** | `batched_qs_ode_rk4_f64.wgsl` | 7/7 validated, ODE sweep pattern | Upstream `batched_ode_rk4.rs:209` uses `compile_shader` instead of `compile_shader_f64` |
+0 local WGSL shaders. All 12 absorbed by ToadStool (sessions 31d/31g + 39-41).
+Lean phase complete. ODE blocker resolved (S41 fixed `compile_shader_f64`).

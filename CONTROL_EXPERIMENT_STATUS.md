@@ -104,7 +104,7 @@
 | 093 | metalForge Full v3 (16 domains) | metalForge | COMPLETE | 28 (16 domains substrate-independent) |
 | 094 | Cross-Spring Evolution Validation | GPU/parity | COMPLETE | 39 (5 neuralSpring primitives CPU↔GPU) |
 | 095 | Cross-Spring Scaling Benchmark | GPU/benchmark | COMPLETE | 7 (scaling across 3 Springs) |
-| 096 | Local WGSL Compile + Dispatch | GPU/shader | COMPLETE | 10 (4 shaders compile + dispatch) |
+| 096 | ToadStool Bio Op Absorption Validation | GPU/shader | COMPLETE | 10 (4 upstream ops validated) |
 | 097 | Structural Evolution Pass | code quality | COMPLETE | — (22-file refactor: flat layouts, DRY models, zero-clone APIs) |
 
 ---
@@ -304,7 +304,7 @@ Following hotSpring's pattern for ToadStool integration:
 | Phase | Count | Status |
 |-------|:-----:|--------|
 | **Lean** (consumed upstream) | 20 GPU modules, 23 primitives | Active — 15 original + 8 bio (HMM, ANI, SNP, dN/dS, Pangenome, QF, DADA2, RF) |
-| **Write** (local WGSL, pending absorption) | 4 shaders (ODE, kmer, unifrac, taxonomy) | ODE blocked: upstream `compile_shader` needs `compile_shader_f64`; others pending validation |
+| **Write** (local WGSL, pending absorption) | **0** — all 4 retired (Phase 25) | ODE, kmer, taxonomy, unifrac absorbed by ToadStool S39-S41; Lean phase complete |
 | **CPU math** (`crate::special`) | 4 functions (erf, ln_gamma, regularized_gamma, normal_cdf) | Consolidated; `bio::special` shim removed (Phase 24); shaped for `barracuda::math` |
 | **CPU-only** (no GPU path) | 12 modules | Stable — chimera, derep, GBM, merge_pairs, etc. |
 | **Blocked** (needs upstream) | 3 modules | kmer hash, UniFrac tree traversal, taxonomy NPU |
@@ -381,7 +381,7 @@ Bugs found and fixed: SNP binding layout (ToadStool), AdapterInfo propagation (w
 | 093 | metalForge Full v3 (16 domains) | 28 | 16 domains substrate-independent (--features gpu) |
 | 094 | Cross-Spring Evolution Validation | 39 | 5 neuralSpring primitives CPU↔GPU parity (--features gpu) |
 | 095 | Cross-Spring Scaling Benchmark | 7 | Cross-spring scaling at realistic sizes (--release --features gpu) |
-| 096 | Local WGSL Compile + Dispatch | 10 | 4 Write-phase shaders compile + dispatch (--features gpu) |
+| 096 | ToadStool Bio Op Absorption | 10 | 4 upstream ops validated (--features gpu), Lean phase complete |
 
 ### Structural Evolution (Phase 23, Exp097)
 

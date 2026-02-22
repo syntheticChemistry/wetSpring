@@ -1,8 +1,8 @@
-# wetSpring → ToadStool/BarraCUDA Handoff v12
+# wetSpring → ToadStool/BarraCuda Handoff v12
 
 **Date:** February 22, 2026
 **From:** wetSpring (life science & analytical chemistry biome)
-**To:** ToadStool / BarraCUDA core team
+**To:** ToadStool / BarraCuda core team
 **License:** AGPL-3.0-or-later
 **Context:** Phase 24 — Edition 2024, structural audit, coverage verification, bio::special migration
 
@@ -153,7 +153,7 @@ removed in Phase 24 — all consumers now use `crate::special::*` directly.
 
 ## Part 5: Concrete Next Steps
 
-### For ToadStool/BarraCUDA Team
+### For ToadStool/BarraCuda Team
 
 1. Implement `compile_shader_f64()` to unblock ODE shader absorption (P1)
 2. Absorb `kmer_histogram_f64.wgsl` as `barracuda::ops::bio::kmer_histogram` (P2)
@@ -206,8 +206,8 @@ archive/WETSPRING_TOADSTOOL_V7_FEB22_2026.md
 
 | Tier | What | Count |
 |------|------|:-----:|
-| **BarraCUDA CPU** | Rust math matches Python across 25 domains | 205/205 |
-| **BarraCUDA GPU** | GPU math matches CPU across 16 domains | 609 checks |
+| **BarraCuda CPU** | Rust math matches Python across 25 domains | 205/205 |
+| **BarraCuda GPU** | GPU math matches CPU across 16 domains | 609 checks |
 | **metalForge** | Substrate-independent output across CPU/GPU/NPU | 80 dispatch + 35 layout + 57 transfer |
 | **Cross-spring** | neuralSpring primitives validated in wetSpring | 39/39 |
 | **Streaming** | Pure GPU pipeline, zero CPU round-trips | 80/80 (441-837× over round-trip) |

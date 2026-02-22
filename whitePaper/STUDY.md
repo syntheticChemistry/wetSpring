@@ -532,8 +532,7 @@ the shared crate. This cycle has completed for **12 bio primitives**: the origin
 4 (SmithWatermanGpu, GillespieGpu, TreeInferenceGpu, FelsensteinGpu) plus
 8 absorbed on Feb 22, 2026 (HmmBatchForwardF64, AniBatchF64, SnpCallingF64,
 DnDsBatchF64, PangenomeClassifyGpu, QualityFilterGpu, Dada2EStepGpu,
-RfBatchInferenceGpu). 4 local WGSL shaders in Write phase (ODE blocked:
-upstream `batched_ode_rk4.rs` uses `compile_shader` not `compile_shader_f64`).
+RfBatchInferenceGpu). 0 local WGSL shaders (Lean phase complete; ToadStool S41 fixed `compile_shader_f64`).
 The rewire process itself discovered
 and fixed two ToadStool bugs: an SNP binding layout mismatch and an
 AdapterInfo propagation failure that broke f64 polyfill detection on RTX 4070.

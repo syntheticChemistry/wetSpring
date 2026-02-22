@@ -18,7 +18,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | current HEAD |
-//! | Baseline tool | `BarraCUDA` CPU + `metalForge` substrate routing |
+//! | Baseline tool | `BarraCuda` CPU + `metalForge` substrate routing |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --release --bin validate_pcie_direct` |
 //! | Data | Synthetic test vectors (self-contained) |

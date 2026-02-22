@@ -1,6 +1,6 @@
 # wetSpring Experiments
 
-Experiment protocols and results for BarraCUDA/ToadStool validation against
+Experiment protocols and results for BarraCuda/ToadStool validation against
 published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
@@ -47,7 +47,7 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 032 | [Alamin & Liu 2024 Placement](032_alamin2024_placement.md) | 1b | DONE | Pure Python placement | bio::placement | 12 |
 | 033 | [Liu 2009 Neighbor-Joining](033_liu2009_neighbor_joining.md) | 1b | DONE | Pure Python NJ | bio::neighbor_joining | 16 |
 | 034 | [Zheng 2023 DTL Reconciliation](034_zheng2023_dtl_reconciliation.md) | 1b | DONE | Pure Python DTL | bio::reconciliation | 14 |
-| 035 | [BarraCUDA CPU Parity v2](035_barracuda_cpu_parity_v2.md) | cross | DONE | CPU v1 extension | batch/flat APIs (5 domains) | 18 |
+| 035 | [BarraCuda CPU Parity v2](035_barracuda_cpu_parity_v2.md) | cross | DONE | CPU v1 extension | batch/flat APIs (5 domains) | 18 |
 | 036 | [PhyNetPy RF Distances](036_phynetpy_rf_distances.md) | 1b | DONE | PhyNetPy gene trees | bio::robinson_foulds | 15 |
 | 037 | [PhyloNet-HMM Discordance](037_phylohmm_discordance.md) | 1b | DONE | PhyloNet-HMM | bio::hmm | 10 |
 | 038 | [SATé Pipeline Benchmark](038_sate_pipeline_benchmark.md) | 1b | DONE | SATé pipeline | bio::alignment, bio::neighbor_joining | 17 |
@@ -55,8 +55,8 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 040 | [Bloom Surveillance](040_bloom_surveillance.md) | 1 | DONE | Smallwood proxy | 16S pipeline, bio::diversity | 15 |
 | 041 | [EPA PFAS ML](041_epa_pfas_ml.md) | 2 | DONE | Jones F&T proxy | bio::decision_tree | 14 |
 | 042 | [MassBank Spectral](042_massbank_spectral.md) | 2 | DONE | Jones MS proxy | bio::spectral_match | 9 |
-| 043 | [BarraCUDA CPU Parity v3](043_barracuda_cpu_v3.md) | cross | DONE | 18-domain coverage | 9 new domains (84 total) | 45 |
-| 044 | [BarraCUDA GPU v3](044_barracuda_gpu_v3.md) | cross | DONE | GPU parity | diversity, spectral, stats | 14 |
+| 043 | [BarraCuda CPU Parity v3](043_barracuda_cpu_v3.md) | cross | DONE | 18-domain coverage | 9 new domains (84 total) | 45 |
+| 044 | [BarraCuda GPU v3](044_barracuda_gpu_v3.md) | cross | DONE | GPU parity | diversity, spectral, stats | 14 |
 | 045 | [ToadStool Bio Absorption](045_toadstool_bio_absorption.md) | cross/GPU | DONE | ToadStool cce8fe7c | SmithWatermanGpu, TreeInferenceGpu, GillespieGpu | 10 |
 | 046 | [GPU Phylo Composition](046_gpu_phylo_composition.md) | GPU | DONE | CPU Felsenstein | FelsensteinGpu → bootstrap + placement | 15 |
 | 047 | [GPU HMM Batch Forward](047_gpu_hmm_forward.md) | GPU | DONE | CPU HMM forward | HmmGpuForward (local WGSL) | 13 |
@@ -69,21 +69,21 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 054 | [Phosphorus Phylogenomics](054_phosphorus_phylogenomics.md) | 1c | DONE | Boden 2024 phosphorus clock | bio::molecular_clock | 13 |
 | 055 | [Population Genomics](055_population_genomics.md) | 1c | DONE | Anderson 2017 ANI/SNP | bio::ani, bio::snp | 24 |
 | 056 | [Pangenomics](056_pangenomics.md) | 1c | DONE | Moulana 2020 pangenome | bio::pangenome | 24 |
-| 057 | [BarraCUDA CPU Parity v4](057_barracuda_cpu_v4.md) | cross | DONE | Track 1c CPU | 5 new domains (128 total) | 44 |
+| 057 | [BarraCuda CPU Parity v4](057_barracuda_cpu_v4.md) | cross | DONE | Track 1c CPU | 5 new domains (128 total) | 44 |
 | 058 | [GPU Track 1c Promotion](058_gpu_track1c_promotion.md) | GPU | DONE | CPU Track 1c | ANI, SNP, dN/dS, pangenome WGSL shaders | 27 |
 | 059 | [23-Domain Benchmark](059_23_domain_benchmark.md) | cross | DONE | Rust vs Python | 22.5× overall speedup | 20 |
 | 060 | [Cross-Substrate metalForge](060_cross_substrate_metalforge.md) | cross | DONE | CPU↔GPU parity | metalForge substrate-independence | 20 |
 | 061 | [Random Forest Inference](061_random_forest_inference.md) | ML | DONE | RF majority vote | bio::random_forest, bio::random_forest_gpu | 13 |
 | 062 | [GBM Inference](062_gbm_inference.md) | ML | DONE | GBM sigmoid/softmax | bio::gbm | 16 |
 | 063 | GPU Random Forest Batch | GPU/ML | DONE | CPU RF | rf_batch_inference.wgsl (SoA layout) | 13 |
-| 064 | [BarraCUDA GPU Parity v1](064_barracuda_gpu_parity_v1.md) | cross/GPU | DONE | CPU reference | diversity, BC, ANI, SNP, dN/dS, pangenome, RF, HMM | 26 |
+| 064 | [BarraCuda GPU Parity v1](064_barracuda_gpu_parity_v1.md) | cross/GPU | DONE | CPU reference | diversity, BC, ANI, SNP, dN/dS, pangenome, RF, HMM | 26 |
 | 065 | [metalForge Full Cross-System](065_metalforge_full_cross_system.md) | cross | DONE | CPU↔GPU parity | Full portfolio substrate-independence proof | 35 |
 | 066 | [CPU vs GPU Scaling Benchmark](066_cpu_vs_gpu_scaling_all_domains.md) | GPU | DONE | CPU vs GPU timing | benchmark_all_domains_cpu_gpu | Benchmark |
 | 067 | [ToadStool Dispatch Overhead Profiling](067_dispatch_overhead_profiling.md) | GPU | DONE | Dispatch profiling | benchmark_dispatch_overhead | Benchmark |
 | 068 | [Pipeline Caching Optimization](068_pipeline_caching_optimization.md) | GPU | DONE | Optimization | benchmark_dispatch_overhead (reuses) | Benchmark |
 | 069 | [Python vs Rust CPU vs GPU Three-Tier Benchmark](069_python_vs_rust_cpu_vs_gpu.md) | cross | DONE | Three-tier timing | benchmark_three_tier | Benchmark |
-| 070 | [BarraCUDA CPU 25-Domain Pure Rust Math Proof](070_barracuda_cpu_25_domain_proof.md) | cross | COMPLETE | 25 domains consolidated | validate_barracuda_cpu_full | 50 |
-| 071 | [BarraCUDA GPU Math Portability Proof](071_barracuda_gpu_portability_proof.md) | GPU | COMPLETE | GPU math portability | validate_barracuda_gpu_full | 24 |
+| 070 | [BarraCuda CPU 25-Domain Pure Rust Math Proof](070_barracuda_cpu_25_domain_proof.md) | cross | COMPLETE | 25 domains consolidated | validate_barracuda_cpu_full | 50 |
+| 071 | [BarraCuda GPU Math Portability Proof](071_barracuda_gpu_portability_proof.md) | GPU | COMPLETE | GPU math portability | validate_barracuda_gpu_full | 24 |
 | 075 | [Pure GPU Analytics Pipeline](075_pure_gpu_analytics_pipeline.md) | GPU | DONE | Pure GPU pipeline | validate_pure_gpu_pipeline | 31 |
 | 076 | [Cross-Substrate Pipeline](076_metalforge_cross_substrate_pipeline.md) | cross/GPU | DONE | Cross-substrate pipeline | validate_cross_substrate_pipeline | 17 |
 | 077 | [ToadStool Bio Rewire](077_toadstool_bio_rewire.md) | GPU/cross | DONE | ToadStool bio primitive rewire | (all GPU binaries) | 451 (re-validated) |

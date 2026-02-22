@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![allow(clippy::similar_names)]
-//! `BarraCUDA` CPU Parity v4 — Track 1c domains (deep-sea metagenomics).
+//! `BarraCuda` CPU Parity v4 — Track 1c domains (deep-sea metagenomics).
 //!
 //! Extends v1-v3 (18 domains) with the 5 Track 1c modules:
 //! ANI, SNP calling, dN/dS, molecular clock, and pangenome analysis.
@@ -31,7 +31,7 @@ use wetspring_barracuda::validation::Validator;
 
 #[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {
-    let mut v = Validator::new("BarraCUDA CPU v4 — Track 1c (5 Domains)");
+    let mut v = Validator::new("BarraCuda CPU v4 — Track 1c (5 Domains)");
     let mut timings: Vec<(&str, f64)> = Vec::new();
 
     // ════════════════════════════════════════════════════════════════
@@ -440,7 +440,7 @@ fn main() {
     // ════════════════════════════════════════════════════════════════
     //  Timing Summary
     // ════════════════════════════════════════════════════════════════
-    v.section("═══ BarraCUDA CPU v4 Timing Summary ═══");
+    v.section("═══ BarraCuda CPU v4 Timing Summary ═══");
     println!("\n  {:<45} {:>12}", "Domain", "Time (µs)");
     println!("  {}", "-".repeat(60));
     for (name, us) in &timings {

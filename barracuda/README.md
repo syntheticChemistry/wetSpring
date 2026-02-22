@@ -10,23 +10,23 @@
 
 Rust validation crate for wetSpring — life science, analytical chemistry,
 and environmental monitoring algorithms. Proves the full path from Python
-baseline through Rust CPU to GPU acceleration via ToadStool/BarraCUDA.
+baseline through Rust CPU to GPU acceleration via ToadStool/BarraCuda.
 
 ## Architecture
 
 ```
 wetspring-barracuda
 ├── 41 CPU bio modules          (pure Rust math, no external C deps)
-├── 20 GPU bio modules          (19 lean on ToadStool, 4 local WGSL shaders (ODE, kmer, unifrac, taxonomy))
+├── 20 GPU bio modules          (all lean on ToadStool; 0 local WGSL — Lean phase complete)
 ├── 3 streaming I/O parsers     (FASTQ/gzip, mzML/base64, MS2)
 ├── 73 validation/benchmark bins (50 CPU + 18 GPU + 5 benchmark)
 └── depends on: barracuda (ToadStool) via path dependency
 ```
 
 All GPU modules delegate to `barracuda::ops::*` primitives from ToadStool.
-No local WGSL shader compilation except for 4 Write-phase shaders (ODE, kmer, unifrac, taxonomy; ODE blocked: upstream uses `compile_shader` not `compile_shader_f64`).
+No local WGSL shaders — all GPU modules delegate to ToadStool (Lean phase complete; shaders/ empty).
 
-## ToadStool Primitives Consumed (23)
+## ToadStool Primitives Consumed (32)
 
 | # | Primitive | Category | Origin | Consumed Since |
 |---|-----------|----------|--------|:--------------:|
@@ -115,7 +115,7 @@ No local WGSL shader compilation except for 4 Write-phase shaders (ODE, kmer, un
 | `gemm_cached` | `GemmF64` | ✅ Lean |
 | `hmm_gpu` | `HmmBatchForwardF64` | ✅ Lean |
 | `kriging` | `KrigingF64` | ✅ Lean |
-| `ode_sweep_gpu` | local WGSL | ⚠️ Local |
+| `ode_sweep_gpu` | `BatchedOdeRK4F64` | ✅ Lean |
 | `pangenome_gpu` | `PangenomeClassifyGpu` | ✅ Lean |
 | `pcoa_gpu` | `BatchedEighGpu` | ✅ Lean |
 | `quality_gpu` | `QualityFilterGpu` | ✅ Lean |

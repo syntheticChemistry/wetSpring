@@ -7,7 +7,7 @@
 //! Exp069: Python → Rust CPU → GPU Three-Tier Benchmark
 //!
 //! Formalizes the full value chain: Python (numpy/scipy) → Rust CPU
-//! (BarraCUDA) → Rust GPU (ToadStool + local WGSL). Reads Python baseline
+//! (BarraCuda) → Rust GPU (ToadStool + local WGSL). Reads Python baseline
 //! JSON results and benchmarks the same workloads on Rust CPU and GPU.
 //!
 //! # Provenance

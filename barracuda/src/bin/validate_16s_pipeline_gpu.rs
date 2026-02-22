@@ -16,7 +16,7 @@
 //! Runs the identical 16S pipeline on public datasets using both CPU and GPU
 //! implementations, then checks that results match within f64 tolerance.
 //! This proves the math is identical across hardware: Galaxy/Python ↔
-//! `BarraCUDA` CPU ↔ `BarraCUDA` GPU.
+//! `BarraCuda` CPU ↔ `BarraCuda` GPU.
 //!
 //! # Pipeline stages (CPU vs GPU)
 //!

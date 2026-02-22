@@ -22,7 +22,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | current HEAD |
-//! | Baseline tool | `BarraCUDA` CPU (sovereign Rust reference) |
+//! | Baseline tool | `BarraCuda` CPU (sovereign Rust reference) |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --features gpu --release --bin validate_gpu_extended` |
 //! | Data | Synthetic test vectors (self-contained) |

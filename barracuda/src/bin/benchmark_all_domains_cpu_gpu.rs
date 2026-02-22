@@ -20,7 +20,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | BarraCUDA CPU (timing harness) |
+//! | Baseline tool | BarraCuda CPU (timing harness) |
 //! | Baseline date | 2026-02-21 |
 //! | Exact command | `cargo run --features gpu --release --bin benchmark_all_domains_cpu_gpu` |
 //! | Data | Synthetic sequences at increasing sizes |

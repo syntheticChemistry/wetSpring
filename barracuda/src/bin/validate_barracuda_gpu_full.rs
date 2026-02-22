@@ -7,7 +7,7 @@
     clippy::cast_possible_truncation,
     clippy::too_many_lines
 )]
-//! Exp071: `BarraCUDA` GPU — Full Math Portability Proof
+//! Exp071: `BarraCuda` GPU — Full Math Portability Proof
 //!
 //! Consolidates all GPU-eligible domains into one definitive binary.
 //! Proves: same Rust math, same answers, different substrate.
@@ -18,7 +18,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | current HEAD |
-//! | Baseline tool | BarraCUDA CPU (sovereign Rust reference) |
+//! | Baseline tool | BarraCuda CPU (sovereign Rust reference) |
 //! | Baseline date | 2026-02-21 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_barracuda_gpu_full` |
 //! | Data | Synthetic test vectors (self-contained) |
@@ -37,7 +37,7 @@ use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
 async fn main() {
-    let mut v = Validator::new("Exp071: BarraCUDA GPU — Full Math Portability Proof");
+    let mut v = Validator::new("Exp071: BarraCuda GPU — Full Math Portability Proof");
 
     let gpu = match GpuF64::new().await {
         Ok(g) => g,
@@ -395,7 +395,7 @@ async fn main() {
     // ═══ Summary: Math Portability Proof ══════════════════════════
     println!();
     println!("╔═══════════════════════════════════════════════════════════════════════════╗");
-    println!("║  BarraCUDA GPU — Full Math Portability Proof                              ║");
+    println!("║  BarraCuda GPU — Full Math Portability Proof                              ║");
     println!("║  Same Rust math. Same answers. Different substrate.                       ║");
     println!("╠═══════════════════════════════════════════════════════════════════════════╣");
     println!(
@@ -414,7 +414,7 @@ async fn main() {
         "TOTAL", "", total_cpu, total_gpu
     );
     println!("╠═══════════════════════════════════════════════════════════════════════════╣");
-    println!("║  24 absorbed (lean on ToadStool)  +  4 local WGSL (Write phase)        ║");
+    println!("║  32 ToadStool primitives (Lean complete), 0 local WGSL                 ║");
     println!("║  Math is substrate-independent. Ready for pure GPU streaming pipeline.   ║");
     println!("╚═══════════════════════════════════════════════════════════════════════════╝");
     println!();

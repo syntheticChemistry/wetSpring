@@ -24,7 +24,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | `BarraCUDA` CPU (reference) |
+//! | Baseline tool | `BarraCuda` CPU (reference) |
 //! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
 //! | Baseline command | `DecisionTree::predict`, Gillespie SSA, `bio::alignment::smith_waterman_score` |
 //! | Baseline date | 2026-02-19 |

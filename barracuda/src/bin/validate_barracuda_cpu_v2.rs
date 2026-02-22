@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Validation binary for Exp035: `BarraCUDA` CPU Parity v2.
+//! Validation binary for Exp035: `BarraCuda` CPU Parity v2.
 //!
 //! Extends CPU parity validation to new modules: `FlatTree` Felsenstein,
 //! batch HMM, batch Smith-Waterman, `NeighborJoining`, DTL Reconciliation.
@@ -11,7 +11,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | BarraCUDA CPU v1 (recursive/sequential) + Python refs: `felsenstein_pruning_baseline.py`, `liu2014_hmm_baseline.py`, `smith_waterman_baseline.py`, `liu2009_neighbor_joining.py`, `zheng2023_dtl_reconciliation.py` |
+//! | Baseline tool | BarraCuda CPU v1 (recursive/sequential) + Python refs: `felsenstein_pruning_baseline.py`, `liu2014_hmm_baseline.py`, `smith_waterman_baseline.py`, `liu2009_neighbor_joining.py`, `zheng2023_dtl_reconciliation.py` |
 //! | Baseline version | Feb 2026 |
 //! | Baseline command | Batch/flat impl validated against sequential; `python3 scripts/liu2009_neighbor_joining.py` (NJ), `python3 scripts/zheng2023_dtl_reconciliation.py` (DTL) |
 //! | Baseline date | 2026-02-19 |
@@ -204,7 +204,7 @@ fn main() {
     let mut pass = 0_u32;
     let mut fail = 0_u32;
 
-    println!("=== Exp035: BarraCUDA CPU Parity v2 ===\n");
+    println!("=== Exp035: BarraCuda CPU Parity v2 ===\n");
 
     validate_flat_felsenstein(&mut pass, &mut fail);
     validate_batch_hmm(&mut pass, &mut fail);
@@ -213,7 +213,7 @@ fn main() {
     validate_cross_module(&mut pass, &mut fail);
 
     println!("\n========================================");
-    println!("Exp035 BarraCUDA CPU v2: {pass} PASS, {fail} FAIL");
+    println!("Exp035 BarraCuda CPU v2: {pass} PASS, {fail} FAIL");
     if fail > 0 {
         std::process::exit(1);
     }

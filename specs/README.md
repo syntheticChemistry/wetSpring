@@ -11,10 +11,10 @@
 | Metric | Value |
 |--------|-------|
 | CPU validation | 1,392/1,392 PASS — 41 modules, 93 experiments, 25 domains + 6 ODE flat + 3 layout |
-| GPU validation | 609/609 PASS — 23 ToadStool primitives, 4 local WGSL shaders, 80 streaming + 48 head-to-head + 28 metalForge v3 |
+| GPU validation | 609/609 PASS — 32 ToadStool primitives, 0 local WGSL (Lean complete), 80 streaming + 48 head-to-head + 28 metalForge v3 |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
-| BarraCUDA CPU parity | 205/205 — 22.5x Rust speedup over Python |
-| BarraCUDA GPU parity | 16 domains (Exp064/087) — pure GPU math proven |
+| BarraCuda CPU parity | 205/205 — 22.5x Rust speedup over Python |
+| BarraCuda GPU parity | 16 domains (Exp064/087) — pure GPU math proven |
 | Pure GPU streaming | 80 checks, 441-837× over round-trip (Exp090/091) |
 | metalForge cross-system | 12 domains CPU↔GPU (Exp084) + dispatch (Exp080) + pipeline (Exp086) + PCIe (Exp088) |
 | Rust modules | 41 CPU + 25 GPU, 740 tests (~97% bio+io coverage) |
@@ -25,7 +25,7 @@
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
 | Faculty (Track 1c) | R. Anderson (Carleton) — deep-sea metagenomics, population genomics |
 | Faculty (Track 2) | Jones (BMB/Chemistry, MSU) — PFAS mass spectrometry |
-| Handoffs | Twelve delivered (v1–v6, rewire, cross-spring, v7–v12) |
+| Handoffs | Thirteen delivered (v1–v6, rewire, cross-spring, v7–v13) |
 
 ---
 
@@ -36,8 +36,8 @@ Every paper in the queue goes through the full evolution path. Status:
 | Stage | What It Proves | Status |
 |-------|---------------|--------|
 | **Python baseline** | Algorithm correctness against published tools | 40 scripts, all reproducible |
-| **BarraCUDA CPU** | Pure Rust math matches Python | 1,392 checks, 205/205 cross-domain parity |
-| **BarraCUDA GPU** | GPU produces same answer as CPU | 533 checks, 16 GPU domains |
+| **BarraCuda CPU** | Pure Rust math matches Python | 1,392 checks, 205/205 cross-domain parity |
+| **BarraCuda GPU** | GPU produces same answer as CPU | 533 checks, 16 GPU domains |
 | **Pure GPU streaming** | Zero CPU round-trips, data stays on-device | 80 checks, 441-837× over round-trip |
 | **metalForge mixed** | Same answer on CPU, GPU, NPU — substrate-independent | 12 domains, 35+ checks + PCIe direct |
 
@@ -53,7 +53,7 @@ but blocked: upstream `batched_ode_rk4.rs` uses `compile_shader` not `compile_sh
 | 2 | asari LC-MS | Y | Y | Y | — |
 | 3 | FindPFAS screening | Y | Y | Y | — |
 | 4 | GPU diversity + spectral | Y | Y | Y | — |
-| 5 | Waters 2008 QS ODE | Y | Y | N | ODE in Write phase (local WGSL) |
+| 5 | Waters 2008 QS ODE | Y | Y | N | ODE absorbed (ToadStool S41); not in MF16 |
 | 6 | Massie 2012 Gillespie | Y | Y | Y | — |
 | 7 | Hsueh 2022 Phage defense | Y | Partial | N | ODE compose; not in MF |
 | 8 | Fernandez 2020 Bistable | Y | Y | N | ODE+bifurcation; not in MF |
@@ -112,7 +112,7 @@ but blocked: upstream `batched_ode_rk4.rs` uses `compile_shader` not `compile_sh
 | CONTROL_EXPERIMENT_STATUS.md | `../` | 97 experiments, 2,229+ validation checks |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
-| Handoff (v12) | `../wateringHole/handoffs/` | Current ToadStool handoff |
+| Handoff (v13) | `../wateringHole/handoffs/` | Current ToadStool handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |
@@ -156,7 +156,7 @@ but blocked: upstream `batched_ode_rk4.rs` uses `compile_shader` not `compile_sh
 `../whitePaper/STUDY.md` → `../CONTROL_EXPERIMENT_STATUS.md` → `../barracuda/EVOLUTION_READINESS.md` → BARRACUDA_REQUIREMENTS.md
 
 **Integration partner**:
-`../wateringHole/handoffs/WETSPRING_TOADSTOOL_V12_FEB22_2026.md` → `../BENCHMARK_RESULTS.md`
+`../wateringHole/handoffs/WETSPRING_TOADSTOOL_V13_FEB22_2026.md` → `../BENCHMARK_RESULTS.md`
 
 ---
 

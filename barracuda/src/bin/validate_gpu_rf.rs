@@ -18,7 +18,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | `BarraCUDA` CPU (reference) |
+//! | Baseline tool | `BarraCuda` CPU (reference) |
 //! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
 //! | Baseline command | `RandomForest::predict_batch_with_votes` |
 //! | Baseline date | 2026-02-19 |

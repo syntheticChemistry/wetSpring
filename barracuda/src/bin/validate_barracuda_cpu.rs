@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! `BarraCUDA` CPU parity validation — proves pure Rust math matches Python.
+//! `BarraCuda` CPU parity validation — proves pure Rust math matches Python.
 //!
 //! This is the bridge between Python baselines and GPU promotion. It runs
 //! each algorithmic domain through the Rust CPU implementation and validates
@@ -33,7 +33,7 @@
 //! # Evolution path
 //!
 //! ```text
-//! Python baseline → [THIS] BarraCUDA CPU → BarraCUDA GPU → sovereign pipeline
+//! Python baseline → [THIS] BarraCuda CPU → BarraCuda GPU → sovereign pipeline
 //! ```
 
 use std::time::Instant;
@@ -46,7 +46,7 @@ use wetspring_barracuda::validation::Validator;
 
 #[allow(clippy::too_many_lines)]
 fn main() {
-    let mut v = Validator::new("BarraCUDA CPU Parity — Pure Rust Math vs Python");
+    let mut v = Validator::new("BarraCuda CPU Parity — Pure Rust Math vs Python");
     let mut timings: Vec<(&str, f64)> = Vec::new();
 
     // ════════════════════════════════════════════════════════════════
@@ -373,7 +373,7 @@ fn main() {
     // ════════════════════════════════════════════════════════════════
     //  Timing Summary
     // ════════════════════════════════════════════════════════════════
-    v.section("═══ BarraCUDA CPU Timing Summary ═══");
+    v.section("═══ BarraCuda CPU Timing Summary ═══");
     println!("\n  {:<35} {:>12}", "Domain", "Time (µs)");
     println!("  {}", "-".repeat(50));
     for (name, us) in &timings {

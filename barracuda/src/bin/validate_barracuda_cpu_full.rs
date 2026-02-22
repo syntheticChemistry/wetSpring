@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![allow(clippy::too_many_lines, clippy::cast_precision_loss)]
-//! Exp070: `BarraCUDA` CPU — 25-Domain Pure Rust Math Proof
+//! Exp070: `BarraCuda` CPU — 25-Domain Pure Rust Math Proof
 //!
 //! Consolidates all 25 algorithmic domains into one definitive validation
 //! binary. Proves: (a) pure Rust math matches Python/paper baselines,
@@ -33,7 +33,7 @@ use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn main() {
-    let mut v = Validator::new("Exp070: BarraCUDA CPU — 25-Domain Pure Rust Math Proof");
+    let mut v = Validator::new("Exp070: BarraCuda CPU — 25-Domain Pure Rust Math Proof");
     let mut timings: Vec<(&str, f64)> = Vec::new();
 
     // ═══ D01: ODE Integration (RK4) ═══════════════════════════════
@@ -676,7 +676,7 @@ fn main() {
     // ═══ Comprehensive Timing Summary ═════════════════════════════
     println!();
     println!("╔══════════════════════════════════════════════════════════════╗");
-    println!("║  BarraCUDA CPU — 25-Domain Pure Rust Math Timing Summary    ║");
+    println!("║  BarraCuda CPU — 25-Domain Pure Rust Math Timing Summary    ║");
     println!("╠══════════════════════════════════════════════════════════════╣");
     println!("║  {:<42} {:>12}   ║", "Domain", "Time (µs)");
     println!("╠══════════════════════════════════════════════════════════════╣");
@@ -690,7 +690,7 @@ fn main() {
     println!();
     println!("  Pure Rust math. No Python. No interpreters. No FFI.");
     println!("  Every domain validated against paper baselines.");
-    println!("  Ready for GPU promotion via BarraCUDA GPU.");
+    println!("  Ready for GPU promotion via BarraCuda GPU.");
     println!();
 
     v.finish();

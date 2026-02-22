@@ -20,7 +20,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | current HEAD |
-//! | Baseline tool | BarraCUDA CPU (sovereign Rust reference) |
+//! | Baseline tool | BarraCuda CPU (sovereign Rust reference) |
 //! | Baseline date | 2026-02-21 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_substrate_router` |
 //! | Data | Synthetic test vectors (self-contained) |

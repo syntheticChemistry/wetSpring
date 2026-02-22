@@ -7,7 +7,7 @@
     clippy::cast_possible_truncation,
     clippy::too_many_lines
 )]
-//! Exp064: `BarraCUDA` GPU Parity v1 — Consolidated GPU Domain Validation
+//! Exp064: `BarraCuda` GPU Parity v1 — Consolidated GPU Domain Validation
 //!
 //! The GPU analogue of `barracuda_cpu_v1-v5`: a single binary that proves
 //! pure GPU math matches CPU reference truth across all GPU-eligible domains.
@@ -20,7 +20,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | BarraCUDA CPU (sovereign Rust reference) |
+//! | Baseline tool | BarraCuda CPU (sovereign Rust reference) |
 //! | Baseline version | Feb 2026 |
 //! | Baseline command | CPU run first as ground truth; GPU validated against CPU |
 //! | Baseline date | 2026-02-21 |
@@ -39,7 +39,7 @@ use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
 async fn main() {
-    let mut v = Validator::new("Exp064: BarraCUDA GPU Parity v1 — All GPU Domains");
+    let mut v = Validator::new("Exp064: BarraCuda GPU Parity v1 — All GPU Domains");
 
     let gpu = match GpuF64::new().await {
         Ok(g) => g,
@@ -430,7 +430,7 @@ async fn main() {
     // ════════════════════════════════════════════════════════════════
     //  Summary
     // ════════════════════════════════════════════════════════════════
-    v.section("═══ BarraCUDA GPU Parity v1 Summary ═══");
+    v.section("═══ BarraCuda GPU Parity v1 Summary ═══");
     println!();
     println!(
         "  {:<40} {:>10} {:>10} {:>10}",

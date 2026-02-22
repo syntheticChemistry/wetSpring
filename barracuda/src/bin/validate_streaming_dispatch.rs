@@ -17,7 +17,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | current HEAD |
-//! | Baseline tool | `BarraCUDA` CPU reference |
+//! | Baseline tool | `BarraCuda` CPU reference |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --release --bin validate_streaming_dispatch` |
 //! | Data | Synthetic test vectors (self-contained) |

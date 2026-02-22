@@ -11,9 +11,8 @@
 
 ## Purpose
 
-Compile-test and dispatch-test all 4 local WGSL shaders in the Write phase
-of Write -> Absorb -> Lean. These shaders will be handed off to ToadStool
-for absorption once tested.
+Compiled and dispatch-tested all 4 local WGSL shaders before absorption.
+All 4 were subsequently absorbed by ToadStool S39-41; Lean phase complete.
 
 ## Results
 
