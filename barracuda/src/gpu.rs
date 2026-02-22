@@ -3,7 +3,7 @@
 //!
 //! Creates a wgpu device with `SHADER_F64` and bridges to `ToadStool`'s
 //! `WgpuDevice` + `TensorContext`. GPU dispatch goes through `ToadStool`
-//! primitives — wetSpring has 0 local WGSL (Lean phase complete; all absorbed by ToadStool S39-41).
+//! primitives — wetSpring has 0 local WGSL (Lean phase complete; all absorbed by `ToadStool` S39-41).
 //!
 //! `ToadStool` primitives used:
 //! - `FusedMapReduceF64` — Shannon, Simpson, alpha diversity

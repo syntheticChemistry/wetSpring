@@ -2,7 +2,7 @@
 //! GPU ODE parameter sweep for QS/c-di-GMP 5-variable system.
 //!
 //! **Lean phase**: thin wrapper around `barracuda::ops::BatchedOdeRK4F64`.
-//! The local WGSL workaround was retired once ToadStool S41 switched to
+//! The local WGSL workaround was retired once `ToadStool` S41 switched to
 //! `compile_shader_f64()` in `batched_ode_rk4.rs`. This module preserves
 //! the wetSpring-facing API (`OdeSweepConfig`, `OdeSweepGpu`) while
 //! delegating all GPU work to upstream.
@@ -34,7 +34,7 @@ pub struct OdeSweepConfig {
 
 /// GPU-backed ODE parameter sweep for the QS biofilm 5-variable system.
 ///
-/// Delegates to `barracuda::ops::BatchedOdeRK4F64` (ToadStool upstream).
+/// Delegates to `barracuda::ops::BatchedOdeRK4F64` (`ToadStool` upstream).
 pub struct OdeSweepGpu {
     device: Arc<WgpuDevice>,
 }

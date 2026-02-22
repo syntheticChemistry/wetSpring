@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCUDA absorption. Follows the
 
 **Date:** February 22, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 24 — Edition 2024, structural audit complete; 740 tests, 97 experiments, flat layouts throughout
+**Status:** Phase 26 — upstream GPU fixes, full control validation green; 740 tests, 98 experiments
 
 ---
 
@@ -479,7 +479,7 @@ All absorbed by ToadStool S39-41. ODE blocker resolved (S41 fixed `compile_shade
 wetSpring/
 ├── README.md                      ← this file
 ├── BENCHMARK_RESULTS.md           ← three-tier benchmark results
-├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (97 experiments)
+├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (98 experiments)
 ├── barracuda/                     ← Rust crate (src/, Cargo.toml, rustfmt.toml)
 │   ├── EVOLUTION_READINESS.md    ← absorption map (tiers, primitives, shaders)
 │   ├── ABSORPTION_MANIFEST.md    ← what's absorbed, local, planned (hotSpring pattern)

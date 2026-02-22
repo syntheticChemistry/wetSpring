@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 22, 2026
-**Status**: Phase 24 — 1,392 CPU + 609 GPU + 80 dispatch + 35 layout + 57 transfer/streaming = 2,229+/2,229+ checks, ALL PASS (740 tests)
+**Status**: Phase 26 — 1,392 CPU + 609 GPU + 80 dispatch + 35 layout + 57 transfer/streaming = 2,229+/2,229+ checks, ALL PASS (740 tests, 98 experiments)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -25,7 +25,7 @@
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
 | Faculty (Track 1c) | R. Anderson (Carleton) — deep-sea metagenomics, population genomics |
 | Faculty (Track 2) | Jones (BMB/Chemistry, MSU) — PFAS mass spectrometry |
-| Handoffs | Thirteen delivered (v1–v6, rewire, cross-spring, v7–v13) |
+| Handoffs | Fourteen delivered (v1–v6, rewire, cross-spring, v7–v14) |
 
 ---
 
@@ -112,7 +112,7 @@ but blocked: upstream `batched_ode_rk4.rs` uses `compile_shader` not `compile_sh
 | CONTROL_EXPERIMENT_STATUS.md | `../` | 97 experiments, 2,229+ validation checks |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
-| Handoff (v13) | `../wateringHole/handoffs/` | Current ToadStool handoff |
+| Handoff (v14) | `../wateringHole/handoffs/` | Current ToadStool handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |
@@ -156,7 +156,7 @@ but blocked: upstream `batched_ode_rk4.rs` uses `compile_shader` not `compile_sh
 `../whitePaper/STUDY.md` → `../CONTROL_EXPERIMENT_STATUS.md` → `../barracuda/EVOLUTION_READINESS.md` → BARRACUDA_REQUIREMENTS.md
 
 **Integration partner**:
-`../wateringHole/handoffs/WETSPRING_TOADSTOOL_V13_FEB22_2026.md` → `../BENCHMARK_RESULTS.md`
+`../wateringHole/handoffs/WETSPRING_TOADSTOOL_V14_FEB22_2026.md` → `../BENCHMARK_RESULTS.md`
 
 ---
 

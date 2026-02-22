@@ -29,7 +29,7 @@ struct GemmParams {
 
 impl GemmParams {
     #[allow(clippy::cast_possible_truncation)]
-    fn new(m: u32, k: u32, n: u32, batch_size: u32, alpha: f64, beta: f64) -> Self {
+    const fn new(m: u32, k: u32, n: u32, batch_size: u32, alpha: f64, beta: f64) -> Self {
         let alpha_bits = alpha.to_bits();
         let beta_bits = beta.to_bits();
         Self {
