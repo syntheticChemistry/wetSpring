@@ -6,7 +6,7 @@ faithfully ported to BarraCUDA (Rust) and eventually promoted to ToadStool
 
 **Date:** February 22, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 19 — Absorption Engineering + Debt Resolution + metalForge Bridge
+**Status:** Phase 20 — ToadStool Bio Rewire + Cross-Spring Evolution
 
 ---
 
@@ -38,23 +38,22 @@ Four tracks cover the life science and environmental monitoring domains:
 | Validation checks (CPU) | 1,291 |
 | Validation checks (GPU) | 451 |
 | **Total validation checks** | **1,742** |
-| Rust library unit tests | 628 (+ 1 ignored — hardware-dependent) |
+| Rust library unit tests | 633 (+ 1 ignored — hardware-dependent) |
 | Integration tests | 60 (23 bio + 16 determinism + 21 I/O) |
 | Rust doc-tests | 14 |
-| **Total Rust tests** | **702** |
-| Line coverage (`cargo-llvm-cov`) | **96.21% overall (22,036 lines measured)** |
-| Experiments completed | 76 |
+| **Total Rust tests** | **707** |
+| Experiments completed | 77 |
 | Validation/benchmark binaries | 50 CPU + 18 GPU validate + 5 benchmark = 73 total |
 | CPU bio modules | 41 |
-| GPU bio modules | 20 (+4 ToadStool bio primitives consumed directly) |
+| GPU bio modules | 20 (19 lean on ToadStool, 1 local ODE shader) |
 | Python baselines | 40 scripts |
 | BarraCUDA CPU parity | 157/157 (25 domains) |
 | BarraCUDA GPU parity | 8 consolidated domains (Exp064) |
 | metalForge cross-system | 8 domains substrate-independent (Exp065) |
-| ToadStool primitives | 15 (inc. 4 bio: Felsenstein, Gillespie, SW, TreeInference) |
-| Local WGSL shaders | 9 (Write → Absorb → Lean candidates) |
+| ToadStool primitives consumed | **23** (15 original + 8 bio absorbed Feb 22) |
+| Local WGSL shaders | **1** (ODE sweep — blocked on ToadStool `enable f64;`) |
 
-All 1,742 validation checks **PASS**. All 702 tests **PASS**.
+All 1,742 validation checks **PASS**. All 707 tests **PASS**.
 
 ### GPU Performance
 
@@ -124,7 +123,8 @@ Combined v1-v5: **157/157 checks across 25 domains**.
 
 ### Phase 14: Evolution Readiness
 Following hotSpring's patterns: shaping all validated Rust modules for
-ToadStool absorption. 9 local WGSL shaders as handoff candidates.
+ToadStool absorption. 9 local WGSL shaders as handoff candidates
+(8 absorbed in Phase 20; 1 ODE remains).
 metalForge proving substrate independence across CPU, GPU, and NPU
 characterization. wetSpring writes extensions, ToadStool absorbs, we lean.
 
@@ -171,6 +171,7 @@ Evolving Rust implementations for ToadStool/BarraCUDA team absorption:
 - **Absorption engineering**: Following hotSpring's pattern where Springs write
   extensions as proposals to ToadStool/BarraCUDA, get absorbed, then lean on
   upstream. 9 WGSL shaders + 4 CPU math functions ready for absorption
+  (8 shaders absorbed in Phase 20)
 - **Code quality gate**: named tolerances, `#![forbid(unsafe_code)]`, pedantic clippy,
   all 73 binaries with provenance headers — absorption-grade quality
 
@@ -192,7 +193,25 @@ Proving the full ToadStool dispatch model and multi-substrate routing:
   binding layouts, dispatch geometry, NVVM driver profile bug, CPU math extraction plan,
   and streaming pipeline findings. See `HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_21_2026.md`.
 
-### Phase 19: Current — Absorption Engineering + Debt Resolution
+### Phase 20: Current — ToadStool Bio Rewire + Cross-Spring Evolution
+
+ToadStool sessions 31d/31g absorbed all 8 wetSpring bio WGSL shaders.
+On Feb 22, wetSpring rewired all 8 GPU modules to delegate to
+`barracuda::ops::bio::*`, deleted 8 local shaders (25 KB), and verified
+633 tests pass with 0 clippy warnings:
+
+- **8 bio modules rewired** — HMM, ANI, SNP, dN/dS, Pangenome, QF, DADA2, RF
+  now delegate to ToadStool primitives (no local shaders)
+- **2 ToadStool bugs found and fixed** during validation:
+  1. SNP binding layout: `is_variant` marked read-only but shader writes to it
+  2. AdapterInfo propagation: `from_existing_simple()` broke f64 polyfill detection
+- **Cross-spring evolution documented** — ToadStool serves as convergence hub:
+  hotSpring (precision/lattice QCD), wetSpring (bio/genomics), neuralSpring (ML/eigen)
+- **Only 1 local WGSL shader remains** — ODE sweep, blocked on ToadStool `enable f64;`
+- **23 ToadStool primitives consumed** (up from 15)
+- **New handoff** submitted: `wateringHole/handoffs/WETSPRING_TOADSTOOL_REWIRE_FEB22_2026.md`
+
+### Phase 19: Absorption Engineering + Debt Resolution
 
 Deep codebase evolution following hotSpring's absorption patterns:
 
@@ -217,7 +236,7 @@ Deep codebase evolution following hotSpring's absorption patterns:
   device creation (following hotSpring's forge↔barracuda pattern)
 - **ABSORPTION_MANIFEST.md** — tracking absorbed/ready/local modules
   (following hotSpring's manifest pattern)
-- **Coverage**: 96.21% overall (up from 55%), 702 tests (up from 650),
+- **Coverage**: 96.21% overall (up from 55%), 707 tests (up from 650),
   37 named tolerances (up from 32)
 
 ---
@@ -298,22 +317,16 @@ Deep codebase evolution following hotSpring's absorption patterns:
 `random_forest_gpu`, `snp_gpu`, `spectral_match_gpu`, `stats_gpu`,
 `streaming_gpu`, `taxonomy_gpu`
 
-Plus 4 ToadStool bio primitives consumed directly: `SmithWatermanGpu`,
-`GillespieGpu`, `TreeInferenceGpu`, `FelsensteinGpu`.
+All 20 GPU modules delegate to ToadStool primitives (19 lean + 1 local ODE shader).
+8 bio primitives absorbed by ToadStool and rewired on Feb 22, 2026:
+`HmmBatchForwardF64`, `AniBatchF64`, `SnpCallingF64`, `DnDsBatchF64`,
+`PangenomeClassifyGpu`, `QualityFilterGpu`, `Dada2EStepGpu`, `RfBatchInferenceGpu`.
 
-### Local WGSL Shaders (9)
+### Local WGSL Shaders (1 remaining)
 
-| Shader | Domain | Absorption Target |
-|--------|--------|-------------------|
-| `quality_filter.wgsl` | Read quality trimming | `ParallelFilter<T>` |
-| `dada2_e_step.wgsl` | DADA2 error model | `BatchPairReduce<f64>` |
-| `hmm_forward_f64.wgsl` | HMM batch forward | `HmmBatchForwardF64` |
-| `batched_qs_ode_rk4_f64.wgsl` | ODE parameter sweep | Fix upstream `BatchedOdeRK4F64` |
-| `ani_batch_f64.wgsl` | ANI pairwise identity | `AniBatchF64` |
-| `snp_calling_f64.wgsl` | SNP calling | `SnpCallingF64` |
-| `dnds_batch_f64.wgsl` | dN/dS (Nei-Gojobori) | `DnDsBatchF64` |
-| `pangenome_classify.wgsl` | Pangenome classification | `PangenomeClassifyGpu` |
-| `rf_batch_inference.wgsl` | Random Forest batch inference | `RfBatchInferenceGpu` |
+| Shader | Domain | Blocker |
+|--------|--------|---------|
+| `batched_qs_ode_rk4_f64.wgsl` | ODE parameter sweep | ToadStool `enable f64;` in upstream shader line 35 |
 
 ### I/O Modules
 
@@ -328,8 +341,8 @@ Plus 4 ToadStool bio primitives consumed directly: `SmithWatermanGpu`,
 wetSpring/
 ├── README.md                      ← this file
 ├── BENCHMARK_RESULTS.md           ← three-tier benchmark results
-├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (76 experiments)
-├── HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_21_2026.md  ← ToadStool handoff v6 (current)
+├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (77 experiments)
+├── HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_21_2026.md  ← ToadStool handoff v6
 ├── barracuda/                     ← Rust crate (src/, Cargo.toml, rustfmt.toml)
 │   ├── EVOLUTION_READINESS.md    ← absorption map (tiers, primitives, shaders)
 │   ├── ABSORPTION_MANIFEST.md    ← what's absorbed, local, planned (hotSpring pattern)
@@ -344,9 +357,9 @@ wetSpring/
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML)
 │   │   ├── bench/               ← benchmark harness + power monitoring
 │   │   ├── bin/                 ← 73 validation/benchmark binaries
-│   │   └── shaders/             ← 9 local WGSL shaders (Write → Absorb → Lean)
+│   │   └── shaders/             ← 1 local WGSL shader (ODE; 8 absorbed by ToadStool)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2021
-├── experiments/                   ← 76 experiment protocols + results
+├── experiments/                   ← 77 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
 │   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs, bridge.rs
@@ -355,6 +368,8 @@ wetSpring/
 │   ├── ABSORPTION_STRATEGY.md   ← Write → Absorb → Lean methodology + CPU math evolution
 │   └── benchmarks/
 │       └── CROSS_SYSTEM_STATUS.md ← algorithm × substrate matrix
+├── wateringHole/                   ← spring-local handoffs (following hotSpring pattern)
+│   └── handoffs/                  ← ToadStool rewire + cross-spring evolution docs
 ├── ../wateringHole/handoffs/      ← inter-primal ToadStool handoffs (shared)
 ├── archive/
 │   └── handoffs/                  ← fossil record of ToadStool handoffs (v1–v5)
@@ -371,7 +386,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (702: 628 lib + 60 integration + 14 doc)
+# Run all tests (707: 633 lib + 60 integration + 14 doc)
 cargo test
 
 # Code quality checks
@@ -423,9 +438,11 @@ All validation data comes from public repositories:
 
 ## Related
 
-- **hotSpring** — Nuclear/plasma physics validation (sibling Spring, 34 WGSL shaders, 454 tests)
-- **ToadStool** — GPU compute engine (BarraCUDA crate, shared primitives)
+- **hotSpring** — Nuclear/plasma physics validation (sibling Spring, 34 WGSL shaders, 637 tests)
+- **neuralSpring** — ML/neural inference validation (sibling Spring, eigensolvers, batch IPR)
+- **ToadStool** — GPU compute engine (BarraCUDA crate, 570+ WGSL shaders, shared primitives)
 - **wateringHole** — Inter-primal standards and handoff documents
-  - `handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md` — shader detail handoff
+  - `handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md` — original shader detail handoff
+  - `handoffs/WETSPRING_TOADSTOOL_REWIRE_FEB22_2026.md` — rewire results + bugs + cross-spring evolution
 - **Root handoff** — `HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_21_2026.md` — comprehensive v6
 - **ecoPrimals** — Parent ecosystem

@@ -400,7 +400,7 @@ fn bench_hmm_batch(device: &Arc<barracuda::device::WgpuDevice>, v: &mut Validato
         .collect();
     let cpu_us = start.elapsed().as_micros();
 
-    let hmm_gpu = HmmGpuForward::new(device);
+    let hmm_gpu = HmmGpuForward::new(device).expect("HMM GPU shader");
     let start = Instant::now();
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         hmm_gpu.forward_batch(&model, &all_obs_u32, n_seqs, n_steps)

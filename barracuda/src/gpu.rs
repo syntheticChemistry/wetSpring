@@ -3,7 +3,8 @@
 //!
 //! Creates a wgpu device with `SHADER_F64` and bridges to `ToadStool`'s
 //! `WgpuDevice` + `TensorContext`. GPU dispatch goes through `ToadStool`
-//! primitives — wetSpring has only 2 local WGSL shaders (DADA2/QF).
+//! primitives — wetSpring has 1 local WGSL shader (ODE, blocked on
+//! `enable f64;` in `ToadStool`'s upstream).
 //!
 //! `ToadStool` primitives used:
 //! - `FusedMapReduceF64` — Shannon, Simpson, alpha diversity
@@ -119,13 +120,14 @@ impl GpuF64 {
 
         let device = Arc::new(device);
         let queue = Arc::new(queue);
+        let adapter_name = info.name.clone();
 
-        let wgpu_device = Arc::new(WgpuDevice::from_existing_simple(device, queue));
+        let wgpu_device = Arc::new(WgpuDevice::from_existing(device, queue, info));
         let tensor_ctx = Arc::new(TensorContext::new(wgpu_device.clone()));
         let driver_profile = GpuDriverProfile::from_device(&wgpu_device);
 
         Ok(Self {
-            adapter_name: info.name.clone(),
+            adapter_name,
             has_f64,
             wgpu_device,
             tensor_ctx,
@@ -175,9 +177,37 @@ impl GpuF64 {
     }
 }
 
-/// Minimum element count for GPU dispatch to outperform CPU.
+/// Default minimum element count for GPU dispatch to outperform CPU.
 ///
 /// Below this threshold, GPU kernel launch overhead dominates.
 /// Measured on RTX 4070 for `FusedMapReduceF64` (Shannon/Simpson).
 /// Callers should fall back to the CPU path when `n < GPU_DISPATCH_THRESHOLD`.
+///
+/// Use [`GpuF64::dispatch_threshold`] for a capability-aware value that
+/// adapts to the detected GPU's latency profile.
 pub const GPU_DISPATCH_THRESHOLD: usize = 10_000;
+
+impl GpuF64 {
+    /// Capability-aware dispatch threshold for this GPU.
+    ///
+    /// Uses the driver profile's instruction-level latency to estimate
+    /// the crossover point where GPU dispatch outperforms CPU. Higher
+    /// instruction latency (software f64 emulation) means a higher
+    /// element count is needed to amortize launch overhead.
+    ///
+    /// Falls back to [`GPU_DISPATCH_THRESHOLD`] for unknown hardware.
+    #[must_use]
+    pub fn dispatch_threshold(&self) -> usize {
+        use barracuda::device::latency::WgslOpClass;
+
+        let model = self.driver_profile.latency_model();
+        let dfma_cycles = model.raw_latency(WgslOpClass::F64Fma);
+
+        match dfma_cycles {
+            0..=4 => 5_000,   // Fast f64 (AMD RDNA2+): lower threshold
+            5..=8 => 10_000,  // Native f64 (NVIDIA Volta+): default
+            9..=16 => 25_000, // Software f64 (Apple M, Intel): higher threshold
+            _ => 50_000,      // Unknown / very slow: conservative
+        }
+    }
+}

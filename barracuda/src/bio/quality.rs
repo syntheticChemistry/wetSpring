@@ -488,7 +488,7 @@ const fn bases_match(a: u8, b: u8) -> bool {
 }
 
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
+#[allow(clippy::expect_used, clippy::unwrap_used, clippy::naive_bytecount)]
 mod tests {
     use super::*;
 

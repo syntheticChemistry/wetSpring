@@ -187,6 +187,7 @@ fn require_f64(gpu: &GpuF64) -> Result<()> {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used, clippy::cast_precision_loss)]
 mod tests {
     use super::*;
     use crate::tolerances::GPU_VS_CPU_TRANSCENDENTAL;
@@ -213,14 +214,14 @@ mod tests {
         //  but the logic is validated via validate_diversity_gpu binary.)
     }
 
-    /// Shannon entropy of uniform distribution: H = ln(n).
-    /// For n equal-probability species, p_i = 1/n, so -sum(p_i ln(p_i)) = ln(n).
+    /// Shannon entropy of uniform distribution: `H = ln(n)`.
+    /// For `n` equal-probability species, `p_i = 1/n`, so `-Σ(p_i ln(p_i)) = ln(n)`.
     #[tokio::test]
-    #[ignore] // requires GPU hardware
+    #[ignore = "requires GPU hardware"]
     async fn known_value_shannon_uniform() {
         let gpu = GpuF64::new().await.expect("GPU init");
         if !gpu.has_f64 {
-            return; // skip if no f64 support
+            return;
         }
         let n = 4_usize;
         let counts = vec![1.0; n];
@@ -232,14 +233,14 @@ mod tests {
         );
     }
 
-    /// Simpson diversity of uniform distribution: 1 - sum(p_i^2) = (n-1)/n.
-    /// For p_i = 1/n, sum(p_i^2) = n * (1/n)^2 = 1/n, so diversity = 1 - 1/n.
+    /// Simpson diversity of uniform distribution: `1 - Σ(p_i²) = (n-1)/n`.
+    /// For `p_i = 1/n`, `Σ(p_i²) = n × (1/n)² = 1/n`, so `diversity = 1 - 1/n`.
     #[tokio::test]
-    #[ignore] // requires GPU hardware
+    #[ignore = "requires GPU hardware"]
     async fn known_value_simpson_uniform() {
         let gpu = GpuF64::new().await.expect("GPU init");
         if !gpu.has_f64 {
-            return; // skip if no f64 support
+            return;
         }
         let n = 4_usize;
         let counts = vec![1.0; n];
@@ -251,13 +252,13 @@ mod tests {
         );
     }
 
-    /// Shannon entropy of single-species community: H = 0 (no uncertainty).
+    /// Shannon entropy of single-species community: `H = 0` (no uncertainty).
     #[tokio::test]
-    #[ignore] // requires GPU hardware
+    #[ignore = "requires GPU hardware"]
     async fn known_value_shannon_single_species() {
         let gpu = GpuF64::new().await.expect("GPU init");
         if !gpu.has_f64 {
-            return; // skip if no f64 support
+            return;
         }
         let counts = vec![100.0, 0.0, 0.0, 0.0];
         let result = shannon_gpu(&gpu, &counts).unwrap();

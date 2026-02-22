@@ -1,5 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::too_many_lines, clippy::cast_precision_loss)]
+#![allow(
+    clippy::too_many_lines,
+    clippy::cast_precision_loss,
+    clippy::doc_markdown
+)]
 //! Exp069: Python → Rust CPU → GPU Three-Tier Benchmark
 //!
 //! Formalizes the full value chain: Python (numpy/scipy) → Rust CPU
@@ -41,13 +45,14 @@ async fn main() {
     }
 
     let py_json = load_python_baseline();
+    let py_ref = py_json.as_ref();
 
     println!("╔══════════════════════════════════════════════════════════════════════════════╗");
     println!("║  Exp069: Python → Rust CPU → GPU  Three-Tier Benchmark                    ║");
     println!("║  GPU: {:<68} ║", gpu.adapter_name);
     println!("╚══════════════════════════════════════════════════════════════════════════════╝");
 
-    if py_json.is_some() {
+    if py_ref.is_some() {
         println!("  Python baseline loaded from benchmarks/results/python_baseline_latest.json");
     } else {
         println!("  No Python baseline — run scripts/benchmark_python_baseline.py first.");
@@ -61,7 +66,7 @@ async fn main() {
         "SINGLE-VECTOR REDUCTIONS",
         &mut rows,
         &gpu,
-        &py_json,
+        py_ref,
         |rows, gpu, py| {
             for &n in &[1_000, 10_000, 100_000, 1_000_000] {
                 let data = gen_counts(n, 42);
@@ -105,7 +110,7 @@ async fn main() {
         "PAIRWISE N×N WORKLOADS",
         &mut rows,
         &gpu,
-        &py_json,
+        py_ref,
         |rows, gpu, py| {
             for &(ns, nsp) in &[(10, 500), (20, 500), (50, 500), (100, 500)] {
                 let samples: Vec<Vec<f64>> =
@@ -148,7 +153,7 @@ async fn main() {
         "MATRIX ALGEBRA",
         &mut rows,
         &gpu,
-        &py_json,
+        py_ref,
         |rows, gpu, py| {
             for &ns in &[10, 20, 30] {
                 let samples: Vec<Vec<f64>> =
@@ -172,7 +177,7 @@ async fn main() {
     println!("  SUMMARY: Value Chain Evidence");
     println!("  ═══════════════════════════════════════════════════════════════════════");
 
-    let (mut py_wins, mut rust_wins, mut gpu_wins) = (0, 0, 0);
+    let (mut py_wins, mut rust_wins, mut gpu_wins) = (0_usize, 0_usize, 0_usize);
     for r in &rows {
         if let Some(py) = r.python_us {
             if r.cpu_us < py {
@@ -189,7 +194,9 @@ async fn main() {
     let with_py = rows.iter().filter(|r| r.python_us.is_some()).count();
 
     if with_py > 0 {
-        println!("  Python vs Rust CPU: Rust faster in {rust_wins}/{with_py} workloads");
+        println!(
+            "  Python vs Rust CPU: Rust faster in {rust_wins}/{with_py} ({py_wins} Python-faster)"
+        );
     }
     println!("  Rust CPU vs GPU:    GPU faster in {gpu_wins}/{total} workloads");
     println!();
@@ -221,10 +228,10 @@ fn bench_section<F>(
     title: &str,
     rows: &mut Vec<Row>,
     gpu: &GpuF64,
-    py: &Option<serde_json::Value>,
+    py: Option<&serde_json::Value>,
     f: F,
 ) where
-    F: FnOnce(&mut Vec<Row>, &GpuF64, &Option<serde_json::Value>),
+    F: FnOnce(&mut Vec<Row>, &GpuF64, Option<&serde_json::Value>),
 {
     let before = rows.len();
     println!("┌─────────────────────────────────────────────────────────────────────────────┐");
@@ -239,7 +246,7 @@ fn bench_section<F>(
     f(rows, gpu, py);
 
     for r in &rows[before..] {
-        let py_str = r.python_us.map_or("—".to_string(), |v| fmt_us(v));
+        let py_str = r.python_us.map_or_else(|| "—".to_string(), fmt_us);
         let py_cpu = r.python_us.map_or("—".into(), |py_v| {
             if r.cpu_us > 0.01 {
                 format!("{:.0}×", py_v / r.cpu_us)
@@ -327,12 +334,12 @@ fn load_python_baseline() -> Option<serde_json::Value> {
     serde_json::from_str(&content).ok()
 }
 
-fn py_lookup(py: &Option<serde_json::Value>, phase_name: &str) -> Option<f64> {
-    let phases = py.as_ref()?.get("phases")?.as_array()?;
+fn py_lookup(py: Option<&serde_json::Value>, phase_name: &str) -> Option<f64> {
+    let phases = py?.get("phases")?.as_array()?;
     for p in phases {
         if let Some(name) = p.get("phase").and_then(|v| v.as_str()) {
             if name == phase_name {
-                return p.get("per_eval_us").and_then(|v| v.as_f64());
+                return p.get("per_eval_us").and_then(serde_json::Value::as_f64);
             }
         }
     }

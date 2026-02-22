@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
-**Date:** February 21, 2026
-**Status:** 76 experiments, 1,742 validation checks, all PASS
+**Date:** February 22, 2026
+**Status:** 77 experiments, 1,742 validation checks, all PASS
 
 ---
 
@@ -85,6 +85,7 @@
 | 074 | metalForge Substrate Router | cross/GPU | COMPLETE | 20 |
 | 075 | Pure GPU Analytics Pipeline | GPU | COMPLETE | 31 |
 | 076 | Cross-Substrate Pipeline | cross/GPU | COMPLETE | 17 |
+| 077 | ToadStool Bio Rewire | GPU/cross | COMPLETE | 451 (re-validated) |
 
 ---
 
@@ -100,7 +101,7 @@
 | BarraCUDA CPU parity | 157/157 (25 domains) |
 | BarraCUDA GPU parity | 8 domains consolidated (Exp064) |
 | metalForge cross-system | 8 domains CPU↔GPU proven (Exp065) |
-| ToadStool primitives consumed | 15 (11 original + 4 bio) |
+| ToadStool primitives consumed | 23 (15 original + 8 bio) |
 
 ---
 
@@ -158,7 +159,7 @@
 - Tolerance centralization: **DONE** — 37 named constants in `tolerances.rs`
 - Code quality hardening: **DONE** — `forbid(unsafe_code)`, `deny(expect_used, unwrap_used)`, pedantic + nursery clippy
 - metalForge forge crate: **DONE** — `wetspring-forge` (24 tests, substrate discovery + dispatch)
-- GPU workgroup constants: **DONE** — all 9 `*_gpu.rs` modules use named `WORKGROUP_SIZE` matching WGSL
+- GPU workgroup constants: **DONE** — all GPU modules use named `WORKGROUP_SIZE` matching ToadStool shaders
 - Hardware abstraction: **DONE** — `HardwareInventory::from_content()`, injectable `/proc` parsing
 - I/O streaming: **DONE** — zero-copy FASTQ (`FastqRefRecord`), mzML buffer reuse (`DecodeBuffer`)
 - Determinism tests: **DONE** — 16 bitwise-exact tests across non-stochastic algorithms
@@ -199,16 +200,15 @@ matching. Exp008 adds sovereign ML for environmental monitoring.
 
 ---
 
-## Code Quality (Feb 21, 2026)
+## Code Quality (Feb 22, 2026)
 
 ```
 cargo fmt --check              → clean (0 diffs, both crates)
 cargo clippy --pedantic        → 0 warnings (pedantic + nursery, default + GPU features)
 cargo doc --features gpu       → clean (0 warnings, strict: -D missing_docs -D broken_intra_doc_links)
-cargo test --lib               → 628 passed, 0 failed, 1 ignored (hardware-dependent)
+cargo test --lib               → 633 passed, 0 failed, 1 ignored (hardware-dependent)
 cargo test --tests             → 60 integration (23 bio + 16 determinism + 21 I/O)
 cargo test --doc               → 14 passed, 0 failed
-cargo llvm-cov --lib           → 96.21% line coverage (22,036 lines, 835 missed)
 #![forbid(unsafe_code)]        → enforced crate-wide
 #![deny(expect_used, unwrap_used)] → enforced crate-wide (test modules #[allow])
 partial_cmp().unwrap()         → 0 (all migrated to f64::total_cmp)
@@ -248,12 +248,18 @@ Total CPU time: ~85ms (release build, all 25 domains, v4 adds ~0.4ms, v5 adds ~6
 Exp064 consolidates ALL GPU-eligible domains into a single validation binary,
 proving pure GPU math matches CPU reference truth across the full portfolio:
 
-- Diversity (Shannon, Simpson, Bray-Curtis) — via FusedMapReduceF64
-- ANI, SNP, dN/dS, Pangenome — via local WGSL shaders
-- Random Forest — via rf_batch_inference.wgsl
-- HMM forward — via hmm_forward_f64.wgsl
+- Diversity (Shannon, Simpson, Bray-Curtis) — via `FusedMapReduceF64`
+- ANI — via `barracuda::ops::bio::ani::AniBatchF64` (ToadStool)
+- SNP — via `barracuda::ops::bio::snp::SnpCallingF64` (ToadStool)
+- dN/dS — via `barracuda::ops::bio::dnds::DnDsBatchF64` (ToadStool)
+- Pangenome — via `barracuda::ops::bio::pangenome::PangenomeClassifyGpu` (ToadStool)
+- Random Forest — via `barracuda::ops::bio::rf_inference::RfBatchInferenceGpu` (ToadStool)
+- HMM forward — via `barracuda::ops::bio::hmm::HmmBatchForwardF64` (ToadStool)
 
 This is the GPU analogue of barracuda_cpu_v1-v5: CPU → GPU → same answer.
+All 8 bio primitives now flow through ToadStool's absorbed shaders, which
+benefit from cross-spring precision evolution (hotSpring f64 polyfills,
+neuralSpring eigensolvers).
 
 ## metalForge Cross-System Proof
 
@@ -262,7 +268,7 @@ for every GPU-eligible algorithm, the metalForge router can dispatch to
 CPU or GPU and get the same answer. This is the foundation for CPU/GPU/NPU
 routing in production.
 
-## ToadStool Evolution (Feb 21, 2026)
+## ToadStool Evolution (Feb 22, 2026)
 
 ### Write → Absorb → Lean Status
 
@@ -270,25 +276,62 @@ Following hotSpring's pattern for ToadStool integration:
 
 | Phase | Count | Status |
 |-------|:-----:|--------|
-| **Lean** (consumed upstream) | 11 GPU modules, 15 primitives | Active — SW, Gillespie, DT, Felsenstein, diversity, PCoA |
-| **Write** (local WGSL, validated) | 9 shaders, 155 GPU checks | Handoff submitted (`../wateringHole/handoffs/`) |
+| **Lean** (consumed upstream) | 20 GPU modules, 23 primitives | Active — 15 original + 8 bio (HMM, ANI, SNP, dN/dS, Pangenome, QF, DADA2, RF) |
+| **Write** (local WGSL, validated) | 1 shader (ODE sweep) | Blocked on ToadStool `enable f64;` in `batched_qs_ode_rk4_f64.wgsl:35` |
 | **CPU math** (`bio::special`) | 3 functions (erf, ln_gamma, regularized_gamma) | Consolidated; shaped for extraction to `barracuda::math` |
 | **CPU-only** (no GPU path) | 15 modules | Stable — chimera, derep, kmer, GBM, etc. |
 | **Blocked** (needs upstream) | 3 modules | kmer hash, UniFrac tree traversal, taxonomy NPU |
 | **metalForge** (absorption eng.) | 32 tolerances, SoA patterns, `#[repr(C)]` | Shaping all modules for ToadStool absorption |
 
-### Streaming & Dispatch Validation (Feb 21, 2026)
+### Feb 22 Rewire: 8 Bio Primitives Absorbed
+
+ToadStool sessions 31d/31g absorbed all 8 wetSpring bio WGSL shaders. On Feb 22,
+wetSpring rewired all 8 GPU modules to delegate to `barracuda::ops::bio::*`,
+deleted the local shaders (25 KB), and verified 633 tests pass with 0 clippy
+warnings. Two ToadStool bugs found and fixed during validation:
+
+1. **SNP binding layout** — `is_variant` (binding 2) was declared `read_only` but
+   the shader writes to it; extra phantom binding 6. Fixed in ToadStool `snp.rs`.
+2. **AdapterInfo propagation** — wetSpring's `GpuF64::new()` used
+   `WgpuDevice::from_existing_simple()` which sets synthetic adapter info, breaking
+   ToadStool's RTX 4070 Ada Lovelace detection and f64 exp/log polyfill. Fixed to
+   use `WgpuDevice::from_existing()` with real `AdapterInfo`.
+
+### Cross-Spring Evolution
+
+ToadStool `barracuda` v0.2.0 is the convergence hub for three springs:
+
+| Spring | Contribution | Primitives |
+|--------|-------------|-----------|
+| **hotSpring** | Precision shaders, lattice QCD, spectral theory | Dirac, CG, plaquette, Higgs U(1), SU(3) HMC, Lanczos, Anderson, Hofstadter |
+| **wetSpring** | Bio/genomics WGSL shaders, math_f64, Hill kinetics | HMM, ANI, SNP, dN/dS, Pangenome, QF, DADA2, RF, SW, Gillespie, Felsenstein |
+| **neuralSpring** | ML inference, eigensolvers, TensorSession | Batch IPR, RF inference, HMM forward log, pairwise Hamming/Jaccard, batch fitness, Eigh |
+
+All three springs now lean on the same ToadStool primitives, benefiting from
+cross-spring evolution: hotSpring's precision fixes improve wetSpring's bio
+shaders; neuralSpring's eigensolver powers wetSpring's PCoA; wetSpring's
+bio primitives are available to neuralSpring's metalForge pipeline.
+
+### Streaming & Dispatch Validation (Feb 22, 2026)
 
 | Exp | Binary | Checks | What it proves |
 |-----|--------|:------:|----------------|
-| 072 | `validate_gpu_streaming_pipeline` | 17 | Pre-warmed FMR eliminates per-stage dispatch; 1.27x streaming speedup |
+| 072 | `validate_gpu_streaming_pipeline` | 17 | Pre-warmed FMR eliminates per-stage dispatch; 1.22x streaming speedup |
 | 073 | `validate_dispatch_overhead_proof` | 21 | Streaming beats individual at all batch sizes; overhead quantified |
 | 074 | `validate_substrate_router` | 20 | GPU↔NPU↔CPU routing; PCIe topology; fallback parity |
 
-### Handoff Document
+### ToadStool Bio Rewire (Feb 22, 2026)
 
-Active handoff: `../wateringHole/handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md`
+| Exp | Binary | Checks | What it proves |
+|-----|--------|:------:|----------------|
+| 077 | (all GPU binaries) | 451 | Full revalidation after 8-module rewire to ToadStool primitives |
 
-Contains binding layouts, dispatch geometry, CPU reference functions, and validation
-counts for all 9 Tier A WGSL shaders. Also includes naga/NVVM driver profile fix
-proposal and `barracuda::math` feature proposal for CPU-only math imports.
+Bugs found and fixed: SNP binding layout (ToadStool), AdapterInfo propagation (wetSpring).
+
+### Handoff Documents
+
+| Document | Location | Purpose |
+|----------|----------|---------|
+| Tier A shader specs | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md` | Original binding layouts, dispatch geometry |
+| Rewire results | `wateringHole/handoffs/WETSPRING_TOADSTOOL_REWIRE_FEB22_2026.md` | Rewire outcomes, bugs, cross-spring evolution |
+| Cross-spring evolution | `wateringHole/handoffs/CROSS_SPRING_EVOLUTION_WETSPRING_FEB22_2026.md` | wetSpring perspective on biome model |

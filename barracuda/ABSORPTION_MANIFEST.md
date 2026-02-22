@@ -14,6 +14,8 @@ and delete local code. This manifest tracks that lifecycle.
 Modules that were written locally, absorbed by ToadStool, and now
 consumed as upstream primitives via `barracuda::ops::*`.
 
+### Original Shared Primitives (15)
+
 | Primitive | Upstream Module | Absorbed In | wetSpring Consumer |
 |-----------|----------------|-------------|-------------------|
 | `FusedMapReduceF64` | `barracuda::ops::fmr` | v0.4 | `diversity_gpu`, `stats_gpu`, `chimera_gpu` |
@@ -32,35 +34,35 @@ consumed as upstream primitives via `barracuda::ops::*`.
 | `BatchTolSearchF64` | `barracuda::ops::search` | v0.4 | `tolerance_search` |
 | `PrngXoshiro` | `barracuda::ops::prng` | v0.4 | `rarefaction_gpu` |
 
-**Count:** 15 upstream primitives consumed.
+### Bio Primitives — Absorbed Feb 2026 (Session 31d/31g), Rewired Feb 22 (8)
+
+These were written as local WGSL shaders in wetSpring, absorbed by
+ToadStool in sessions 31d (HMM, ANI, SNP, dN/dS, Pangenome, Quality,
+DADA2) and 31g (RF), and **rewired on Feb 22, 2026**: local shaders
+deleted, modules now delegate to `barracuda::ops::bio::*`.
+
+| Primitive | Upstream Module | wetSpring Wrapper | Local WGSL (deleted) |
+|-----------|----------------|-------------------|---------------------|
+| `HmmBatchForwardF64` | `barracuda::ops::bio::hmm` | `hmm_gpu::HmmGpuForward` | `hmm_forward_f64.wgsl` |
+| `AniBatchF64` | `barracuda::ops::bio::ani` | `ani_gpu::AniGpu` | `ani_batch_f64.wgsl` |
+| `SnpCallingF64` | `barracuda::ops::bio::snp` | `snp_gpu::SnpGpu` | `snp_calling_f64.wgsl` |
+| `DnDsBatchF64` | `barracuda::ops::bio::dnds` | `dnds_gpu::DnDsGpu` | `dnds_batch_f64.wgsl` |
+| `PangenomeClassifyGpu` | `barracuda::ops::bio::pangenome` | `pangenome_gpu::PangenomeGpu` | `pangenome_classify.wgsl` |
+| `QualityFilterGpu` | `barracuda::ops::bio::quality_filter` | `quality_gpu::QualityFilterCached` | `quality_filter.wgsl` |
+| `Dada2EStepGpu` | `barracuda::ops::bio::dada2` | `dada2_gpu::Dada2Gpu` | `dada2_e_step.wgsl` |
+| `RfBatchInferenceGpu` | `barracuda::ops::bio::rf_inference` | `random_forest_gpu::RandomForestGpu` | `rf_batch_inference.wgsl` |
+
+**Total Lean primitives:** 23 (15 original + 8 bio).
 
 ---
 
 ## Ready for Absorption (Write)
 
-Local WGSL shaders and CPU math validated and documented for ToadStool
-team handoff. See `../wateringHole/handoffs/` for binding layouts and
-dispatch geometry.
+### Tier A: Local WGSL Shaders (1 remaining)
 
-### Tier A: Local WGSL Shaders (9)
-
-| Shader | File | Checks | Target Primitive |
-|--------|------|:------:|-----------------|
-| Quality filter | `quality_filter.wgsl` | 88 | `ParallelFilter<T>` |
-| DADA2 E-step | `dada2_e_step.wgsl` | 88 | `BatchPairReduce<f64>` |
-| HMM forward | `hmm_forward_f64.wgsl` | 13 | `HmmBatchForwardF64` |
-| ODE sweep | `batched_qs_ode_rk4_f64.wgsl` | 7 | Fix `BatchedOdeRK4F64` |
-| ANI batch | `ani_batch_f64.wgsl` | 7 | `AniBatchF64` |
-| SNP calling | `snp_calling_f64.wgsl` | 5 | `SnpCallingF64` |
-| dN/dS batch | `dnds_batch_f64.wgsl` | 9 | `DnDsBatchF64` |
-| Pangenome | `pangenome_classify.wgsl` | 6 | `PangenomeClassifyGpu` |
-| RF inference | `rf_batch_inference.wgsl` | 13 | `RfBatchInferenceGpu` |
-
-All 9 shaders have:
-- Named `WORKGROUP_SIZE` constants matching WGSL `@workgroup_size(N)`
-- `#[repr(C)]` GPU parameter structs
-- CPU reference implementations with batch APIs
-- Documented binding layouts and dispatch geometry
+| Shader | File | Checks | Target Primitive | Blocker |
+|--------|------|:------:|-----------------|---------|
+| ODE sweep | `batched_qs_ode_rk4_f64.wgsl` | 7 | `BatchedOdeRK4F64` | ToadStool `enable f64;` in shader line 35 |
 
 ### Tier B: CPU Math Functions (4)
 
@@ -110,13 +112,13 @@ sequential algorithms without GPU benefit.
 
 ## Absorption Readiness Summary
 
-| Category | Count |
-|----------|-------|
-| **Lean** (consumed upstream) | 15 primitives |
-| **Write** (local WGSL, ready) | 9 shaders |
-| **Write** (CPU math, ready) | 4 functions |
-| **Local** (no GPU path) | 13 modules |
-| **Blocked** | 3 modules |
+| Category | Count | Change |
+|----------|-------|--------|
+| **Lean** (consumed upstream) | 23 primitives | +8 (Feb 22 rewire) |
+| **Write** (local WGSL, ready) | 1 shader | -8 (absorbed) |
+| **Write** (CPU math, ready) | 4 functions | — |
+| **Local** (no GPU path) | 13 modules | — |
+| **Blocked** | 3 modules | — |
 
 ## Process
 

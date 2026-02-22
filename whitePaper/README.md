@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 22, 2026
-**Status:** Validation study complete — 1,742/1,742 checks, 702 tests, 96.21% line coverage, 76 experiments
+**Status:** Validation study complete — 1,742/1,742 checks, 707 tests, 96.21% line coverage, 77 experiments
 **License:** AGPL-3.0-or-later
 
 ---
@@ -38,7 +38,7 @@
 
 | Claim | Evidence |
 |-------|----------|
-| Rust matches Python across 76 experiments | 1,291/1,291 CPU checks pass |
+| Rust matches Python across 77 experiments | 1,291/1,291 CPU checks pass |
 | GPU matches CPU across all promoted domains | 451/451 GPU checks pass |
 | BarraCUDA CPU parity across 25 domains | 157/157 cross-domain checks pass |
 | 926× spectral cosine GPU speedup | Exp016 benchmark |
@@ -77,6 +77,7 @@
 | GPU↔NPU↔CPU substrate router with PCIe topology | Exp074, 20/20 checks |
 | Pure GPU 5-stage analytics: 0.1% pipeline overhead | Exp075, 31/31 checks |
 | Cross-substrate GPU→NPU→CPU pipeline profiled | Exp076, 17/17 checks |
+| ToadStool bio rewire: 8 modules lean, 2 bugs fixed | Exp077, 451/451 GPU re-validated |
 
 ---
 
@@ -212,9 +213,10 @@ cross-substrate validated (Exp060: 20/20 CPU↔GPU parity).
 wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCUDA/ToadStool:
 
-- **hotSpring** — Nuclear physics, plasma, lattice QCD (34 WGSL shaders, 454 tests)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (9 WGSL shaders, 702 tests)
-- **archive/handoffs/** — Fossil record of ToadStool handoffs (v1–v4)
+- **hotSpring** — Nuclear physics, plasma, lattice QCD (34 WGSL shaders, 637 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (1 local WGSL shader, 707 tests)
+- **neuralSpring** — ML inference, eigensolvers, TensorSession
+- **archive/handoffs/** — Fossil record of ToadStool handoffs (v1–v6)
 
 Springs follow the **Write → Absorb → Lean** pattern (pioneered by hotSpring):
 write and validate locally, hand off to ToadStool for absorption, then lean on

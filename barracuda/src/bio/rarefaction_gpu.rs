@@ -302,17 +302,18 @@ pub fn batch_rarefaction_gpu(
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
 
     /// Single-species community: every bootstrap replicate yields the same
-    /// rarefied vector, so Shannon=0, Simpson=0, observed=1 deterministically.
+    /// rarefied vector, so `Shannon=0`, `Simpson=0`, `observed=1` deterministically.
     #[tokio::test]
-    #[ignore] // requires GPU hardware (or CPU path for n < 50, but still needs async)
+    #[ignore = "requires GPU hardware"]
     async fn known_value_single_species_shannon_simpson_observed() {
         let gpu = crate::gpu::GpuF64::new().await.expect("GPU init");
         if !gpu.has_f64 {
-            return; // skip if no f64 support
+            return;
         }
         // Single species: all counts in one bin
         let counts = vec![100.0];

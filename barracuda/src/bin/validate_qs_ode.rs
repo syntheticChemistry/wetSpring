@@ -30,10 +30,8 @@ use wetspring_barracuda::validation::Validator;
 const DT: f64 = 0.001;
 const SS_FRAC: f64 = 0.1;
 
-/// Tolerance for Rust RK4 vs Python LSODA steady-state comparison.
-/// RK4 (fixed 0.001 h) vs LSODA (adaptive) differ by integration method;
-/// 1e-3 is conservative and justified by the method order difference.
-const METHOD_TOL: f64 = 1e-3;
+/// ODE method parity — centralized in `tolerances::ODE_METHOD_PARITY`.
+const METHOD_TOL: f64 = tolerances::ODE_METHOD_PARITY;
 
 fn main() {
     let mut v = Validator::new("validate_qs_ode (Exp020: Waters 2008 QS/c-di-GMP)");

@@ -68,7 +68,7 @@ async fn main() {
     let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
     let t_gpu = Instant::now();
-    let gpu_ani = AniGpu::new(&device);
+    let gpu_ani = AniGpu::new(&device).expect("ANI GPU shader");
     let gpu_results = gpu_ani.batch_ani(&ani_pairs).unwrap();
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
@@ -100,7 +100,7 @@ async fn main() {
     let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
     let t_gpu = Instant::now();
-    let gpu_snp = SnpGpu::new(&device);
+    let gpu_snp = SnpGpu::new(&device).expect("SNP GPU shader");
     let gpu_snp_result = gpu_snp.call_snps(&snp_seqs).unwrap();
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
@@ -165,7 +165,7 @@ async fn main() {
         .collect();
 
     let t_gpu = Instant::now();
-    let gpu_pan = PangenomeGpu::new(&device);
+    let gpu_pan = PangenomeGpu::new(&device).expect("Pangenome GPU shader");
     let gpu_pan_result = gpu_pan.classify(&presence_flat, 5, 4).unwrap();
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
@@ -221,7 +221,7 @@ async fn main() {
     let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
     let t_gpu = Instant::now();
-    let gpu_dnds_mod = DnDsGpu::new(&device);
+    let gpu_dnds_mod = DnDsGpu::new(&device).expect("dN/dS GPU shader");
     let gpu_dnds_result = gpu_dnds_mod.batch_dnds(&dnds_pairs).unwrap();
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 

@@ -199,18 +199,19 @@ pub fn batch_find_peaks_gpu(
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use crate::bio::eic::Eic;
     use crate::bio::signal::Peak;
 
-    /// Sum of intensities: sum([1, 2, 3]) = 6 (analytical).
+    /// Sum of intensities: `sum([1, 2, 3]) = 6` (analytical).
     #[tokio::test]
-    #[ignore] // requires GPU hardware
+    #[ignore = "requires GPU hardware"]
     async fn known_value_batch_eic_total_intensity() {
         let gpu = crate::gpu::GpuF64::new().await.expect("GPU init");
         if !gpu.has_f64 {
-            return; // skip if no f64 support
+            return;
         }
         let eics = vec![Eic {
             target_mz: 100.0,
@@ -227,14 +228,14 @@ mod tests {
         );
     }
 
-    /// Trapezoidal integration of a triangle (0,0)-(1,h)-(2,0): area = base * height / 2 = 2.
-    /// With rt=[0,1,2], intensity=[0,2,0], peak spanning left_base=0, right_base=2.
+    /// Trapezoidal integration of a triangle `(0,0)-(1,h)-(2,0)`: area = 2.
+    /// With `rt=[0,1,2]`, `intensity=[0,2,0]`, peak spanning `left_base=0`, `right_base=2`.
     #[tokio::test]
-    #[ignore] // requires GPU hardware
+    #[ignore = "requires GPU hardware"]
     async fn known_value_batch_integrate_peaks_trapezoidal() {
         let gpu = crate::gpu::GpuF64::new().await.expect("GPU init");
         if !gpu.has_f64 {
-            return; // skip if no f64 support
+            return;
         }
         let eic = Eic {
             target_mz: 100.0,
@@ -252,7 +253,7 @@ mod tests {
             right_ips: 2.0,
         };
         let areas = batch_integrate_peaks_gpu(&gpu, &[eic], &[vec![peak]]).unwrap();
-        let expected = 2.0; // trapezoidal: (1*(0+2)/2) + (1*(2+0)/2) = 2
+        let expected = 2.0;
         assert!(
             (areas[0][0] - expected).abs() < 1e-10,
             "Peak area: got {}, expected {}",

@@ -1,9 +1,12 @@
 # Primitive Map: wetSpring Rust → ToadStool GPU
 
-**Date:** February 21, 2026
+**Date:** February 22, 2026
 **Purpose:** Map every wetSpring Rust module to its ToadStool/BarraCUDA
 GPU primitive (or explain why it stays CPU-only). This guides the
 absorption pipeline and identifies what ToadStool needs to build next.
+
+> **Feb 22 update:** 8 bio modules rewired from local WGSL to ToadStool
+> `barracuda::ops::bio::*`. Only ODE remains local (blocked on `enable f64;`).
 
 ---
 
@@ -64,19 +67,19 @@ absorption pipeline and identifies what ToadStool needs to build next.
 | Rust Module | GPU Strategy | ToadStool Primitive | Exp |
 |-------------|-------------|-------------------|-----|
 | `alignment` (SW) | Lean | `SmithWatermanGpu` | 044 |
-| `hmm` | **Local** | `hmm_forward_f64.wgsl` | 047 |
+| `hmm` | Lean | `HmmBatchForwardF64` (ToadStool, absorbed Feb 22) | 047 |
 | `kmer` | **Blocked** | Needs lock-free hash table (P3) | — |
 | `unifrac` | **Blocked** | Needs tree traversal (P3) | — |
 | `decision_tree` | Lean | `TreeInferenceGpu` | 044 |
-| `random_forest` / `random_forest_gpu` | **Local** | `rf_batch_inference.wgsl` (13 checks) | 063 |
+| `random_forest` / `random_forest_gpu` | Lean | `RfBatchInferenceGpu` (ToadStool, absorbed Feb 22) | 063 |
 | `gbm` | CPU | Sequential boosting (batch-parallel within rounds) | 062 |
 
 ### 16S Pipeline (GPU-composed)
 
 | Rust Module | GPU Strategy | ToadStool Primitive | Exp |
 |-------------|-------------|-------------------|-----|
-| `quality` / `quality_gpu` | **Local** | `quality_filter.wgsl` | 016 |
-| `dada2` / `dada2_gpu` | **Local** | `dada2_e_step.wgsl` | 016 |
+| `quality` / `quality_gpu` | Lean | `QualityFilterGpu` (ToadStool, absorbed Feb 22) | 016 |
+| `dada2` / `dada2_gpu` | Lean | `Dada2EStepGpu` (ToadStool, absorbed Feb 22) | 016 |
 | `chimera` / `chimera_gpu` | Lean | `FMR` | 016 |
 | `taxonomy` / `taxonomy_gpu` | Lean / **NPU** | `FMR` / FC model | 016 |
 | `streaming_gpu` | Lean | Multiple primitives | 016 |
@@ -92,14 +95,14 @@ absorption pipeline and identifies what ToadStool needs to build next.
 | `capacitor` | CPU | Peak detection | — |
 | `feature_table` | CPU | Sparse matrix | — |
 
-### Track 1c: Deep-Sea Metagenomics (GPU-promoted, Exp058)
+### Track 1c: Deep-Sea Metagenomics (ToadStool-absorbed, Exp058)
 
 | Rust Module | GPU Strategy | ToadStool Primitive | Exp |
 |-------------|-------------|-------------------|-----|
-| `ani` / `ani_gpu` | **Local** | `ani_batch_f64.wgsl` (7 checks) | 058 |
-| `snp` / `snp_gpu` | **Local** | `snp_calling_f64.wgsl` (5 checks) | 058 |
-| `dnds` / `dnds_gpu` | **Local** | `dnds_batch_f64.wgsl` (9 checks) | 058 |
-| `pangenome` / `pangenome_gpu` | **Local** | `pangenome_classify.wgsl` (6 checks) | 058 |
+| `ani` / `ani_gpu` | Lean | `AniBatchF64` (ToadStool, absorbed Feb 22) | 058 |
+| `snp` / `snp_gpu` | Lean | `SnpCallingF64` (ToadStool, absorbed Feb 22) | 058 |
+| `dnds` / `dnds_gpu` | Lean | `DnDsBatchF64` (ToadStool, absorbed Feb 22) | 058 |
+| `pangenome` / `pangenome_gpu` | Lean | `PangenomeClassifyGpu` (ToadStool, absorbed Feb 22) | 058 |
 | `molecular_clock` | CPU | Small calibration data, tree traversal | 053/054 |
 
 ### Infrastructure (CPU-only)
@@ -132,26 +135,25 @@ Is the model a neural network or lookup table?
 
 ---
 
-## Absorption Readiness Gaps
+## Absorption Status
 
-Modules with local WGSL shaders (Tier A) that are missing absorption-friendly
-patterns in their CPU implementations:
+All 8 bio WGSL shaders were absorbed by ToadStool (sessions 31d/31g) and
+rewired on Feb 22, 2026. The CPU-side batch APIs and `repr(C)` patterns
+remain as the bridge between domain types and ToadStool's raw buffer API.
 
-| Module | Has Batch API | Has `repr(C)` | Has Flat Layout | Gap |
-|--------|:------------:|:------------:|:---------------:|-----|
-| `dada2` | No | No (GPU module does) | No | Denoise is single-sample; GPU module bridges |
-| `hmm` | Yes | No (GPU module does) | No | `forward_batch` present; GPU module has `repr(C)` |
-| `ani` | Yes | Yes | No | Ready — `ani_matrix`, `AniParams` |
-| `snp` | **Yes** | Yes | Yes (`SnpFlatResult`) | Ready — `call_snps_batch` for multi-alignment dispatch |
-| `dnds` | Yes | Yes | No | Ready — `pairwise_dnds_batch`, `DnDsParams` |
-| `pangenome` | **Yes** | Yes | Yes (`presence_matrix_flat`) | Ready — `analyze_batch` for multi-dataset dispatch |
-| `quality` | **Yes** | **Yes** (`QualityGpuParams`) | **Yes** (`QualityFlatResult`) | Ready — `filter_reads_flat` for contiguous array dispatch |
-| `random_forest` | Yes | No (GPU module does) | No | `predict_batch` present; GPU module bridges |
-| `felsenstein` | Per-site | No | Yes (`FlatTree`) | Already absorbed; `FlatTree` is the pattern |
+| Module | ToadStool Primitive | Batch API | Rewired |
+|--------|-------------------|-----------|---------|
+| `dada2` | `Dada2EStepGpu` | GPU module bridges | Feb 22 |
+| `hmm` | `HmmBatchForwardF64` | `forward_batch` | Feb 22 |
+| `ani` | `AniBatchF64` | `ani_matrix` | Feb 22 |
+| `snp` | `SnpCallingF64` | `call_snps_batch` | Feb 22 |
+| `dnds` | `DnDsBatchF64` | `pairwise_dnds_batch` | Feb 22 |
+| `pangenome` | `PangenomeClassifyGpu` | `analyze_batch` | Feb 22 |
+| `quality` | `QualityFilterGpu` | `filter_reads_flat` | Feb 22 |
+| `random_forest` | `RfBatchInferenceGpu` | `predict_batch` | Feb 22 |
+| `felsenstein` | `FelsensteinGpu` | Per-site (already absorbed) | Earlier |
 
-For Tier A modules, the GPU companion modules (`*_gpu`) provide the `repr(C)`
-bridge layer between CPU structs and WGSL bindings. This is the correct
-architecture: CPU modules own the algorithm, GPU modules own the dispatch.
+Only the ODE sweep shader remains local (blocked on ToadStool `enable f64;`).
 
 ### Shared Math (`crate::special`) — Extracted
 
@@ -171,8 +173,8 @@ Promoted from `bio::special` to top-level `crate::special` module.
 
 | Category | Count |
 |----------|-------|
-| **Lean** (upstream ToadStool) | 16 modules |
-| **Local** (WGSL shader) | 9 modules (4 original + 4 Track 1c + 1 RF) |
+| **Lean** (upstream ToadStool) | 24 modules (16 original + 8 bio absorbed Feb 22) |
+| **Local** (WGSL shader) | 1 module (ODE sweep, blocked on ToadStool `enable f64;`) |
 | **Compose** (existing primitives) | 5 modules |
 | **CPU** (no GPU path) | 13 modules |
 | **NPU** (candidate) | 1 module |

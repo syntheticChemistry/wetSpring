@@ -107,7 +107,7 @@ async fn main() {
                 let _ = ani::pairwise_ani(a, b);
             }
         });
-        let gpu_ani = AniGpu::new(&device);
+        let gpu_ani = AniGpu::new(&device).expect("ANI GPU shader");
         let gpu_t = bench(|| {
             let _ = gpu_ani.batch_ani(&pairs);
         });
@@ -121,7 +121,7 @@ async fn main() {
         let cpu = bench(|| {
             let _ = snp::call_snps(&seqs);
         });
-        let gpu_snp = SnpGpu::new(&device);
+        let gpu_snp = SnpGpu::new(&device).expect("SNP GPU shader");
         let gpu_t = bench(|| {
             let _ = gpu_snp.call_snps(&seqs);
         });
@@ -140,7 +140,7 @@ async fn main() {
                 let _ = dnds::pairwise_dnds(a, b);
             }
         });
-        let gpu_mod = DnDsGpu::new(&device);
+        let gpu_mod = DnDsGpu::new(&device).expect("dN/dS GPU shader");
         let gpu_t = bench(|| {
             let _ = gpu_mod.batch_dnds(&pairs);
         });
@@ -180,7 +180,7 @@ async fn main() {
         let cpu = bench(|| {
             let _ = pangenome::analyze(&clusters, 4);
         });
-        let gpu_pan = PangenomeGpu::new(&device);
+        let gpu_pan = PangenomeGpu::new(&device).expect("Pangenome GPU shader");
         let gpu_t = bench(|| {
             let _ = gpu_pan.classify(&flat, 5, 4);
         });
@@ -249,7 +249,7 @@ async fn main() {
             let _ = hmm::forward(&model, &obs);
             let _ = hmm::forward(&model, &obs);
         });
-        let hmm_gpu = HmmGpuForward::new(&device);
+        let hmm_gpu = HmmGpuForward::new(&device).expect("HMM GPU shader");
         let gpu_t = bench(|| {
             let _ = hmm_gpu.forward_batch(&model, &flat, 2, 4);
         });

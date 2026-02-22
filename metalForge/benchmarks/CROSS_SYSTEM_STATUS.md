@@ -63,7 +63,7 @@
 | Substrate | Validated Checks | Algorithms |
 |-----------|:----------------:|:----------:|
 | CPU (Rust) | 1,291 | 25 domains (18 original + 5 Track 1c + 2 ML ensemble) |
-| GPU (wgpu) | 345 | 30 promoted (15 ToadStool + 9 local WGSL + 6 composed + consolidated) |
+| GPU (wgpu) | 345 | 30 promoted (23 ToadStool + 1 local WGSL + 6 composed + consolidated) |
 | NPU | 0 | 0 (3 candidates) |
 | **Total** | **1,636** | — |
 

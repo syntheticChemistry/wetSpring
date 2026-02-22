@@ -1,6 +1,6 @@
 # wetSpring: Replicable Life Science and Analytical Chemistry on Consumer GPU Hardware
 
-**Working Draft** — February 21, 2026
+**Working Draft** — February 22, 2026
 
 ---
 
@@ -18,7 +18,7 @@ and mathematical biology (Track 1b), deep-sea metagenomics and microbial
 evolution (Track 1c), and PFAS detection via LC-MS (Track 2),
 validating 61 Rust modules (41 CPU + 20 GPU) against baselines from Galaxy,
 QIIME2, asari, FindPFAS, scipy, sklearn, dendropy, real NCBI SRA data, and
-published paper models with 1,742 quantitative checks across 76 experiments
+published paper models with 1,742 quantitative checks across 77 experiments
 — all passing. The pipeline proves substrate independence: math produces
 identical results on CPU and GPU, validated via metalForge cross-substrate
 checks (Exp060). Random Forest ensemble and Gradient Boosting Machine
@@ -523,10 +523,14 @@ Code quality gates (all enforced in CI):
 Following hotSpring's pattern, wetSpring writes local GPU extensions, validates
 them against CPU baselines, then hands off to ToadStool for absorption. Once
 upstream absorbs the primitive, wetSpring removes the local copy and leans on
-the shared crate. This cycle has completed for 4 bio primitives
-(SmithWatermanGpu, GillespieGpu, TreeInferenceGpu, FelsensteinGpu) and is
-in progress for 9 local WGSL shaders spanning pipeline, bioinformatics,
-and ML ensemble domains.
+the shared crate. This cycle has completed for **12 bio primitives**: the original
+4 (SmithWatermanGpu, GillespieGpu, TreeInferenceGpu, FelsensteinGpu) plus
+8 absorbed on Feb 22, 2026 (HmmBatchForwardF64, AniBatchF64, SnpCallingF64,
+DnDsBatchF64, PangenomeClassifyGpu, QualityFilterGpu, Dada2EStepGpu,
+RfBatchInferenceGpu). Only 1 local WGSL shader remains (ODE sweep, blocked
+on ToadStool's `enable f64;` directive). The rewire process itself discovered
+and fixed two ToadStool bugs: an SNP binding layout mismatch and an
+AdapterInfo propagation failure that broke f64 polyfill detection on RTX 4070.
 
 | Stage | Extensions | Status |
 |-------|-----------|--------|
@@ -537,9 +541,10 @@ and ML ensemble domains.
 | **Tier B** (needs refactor) | kmer, unifrac, taxonomy (NPU) | GPU pattern identified |
 | **Tier C** (CPU-only) | chimera, cooperation, derep, NJ, reconciliation, GBM | No GPU path |
 
-**NVVM driver profile bug**: ToadStool's driver profile incorrectly reports
-`needs_f64_exp_log_workaround() = false` for Ada Lovelace (RTX 40-series).
-Upstream fix: return `true` for all Ada Lovelace GPUs.
+**NVVM driver profile bug** (fixed Feb 22): wetSpring's `GpuF64::new()` was using
+`WgpuDevice::from_existing_simple()` which sets synthetic adapter info, breaking
+ToadStool's RTX 4070 Ada Lovelace detection. Fixed to pass real `AdapterInfo`
+via `WgpuDevice::from_existing()`. ToadStool's detection logic itself is correct.
 
 **CPU math evolution**: `bio::special` consolidates 3 local math functions
 (`erf`, `ln_gamma`, `regularized_gamma_lower`) that duplicate barracuda upstream
@@ -557,7 +562,8 @@ tolerance constants in `tolerances.rs` ensure all validation thresholds are
 scientifically justified and ready for cross-Spring adoption.
 
 Full absorption map: `barracuda/EVOLUTION_READINESS.md`.
-Active handoff: `../wateringHole/handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md`.
+Handoffs: `../wateringHole/handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md` (original),
+`wateringHole/handoffs/WETSPRING_TOADSTOOL_REWIRE_FEB22_2026.md` (rewire results).
 
 ---
 

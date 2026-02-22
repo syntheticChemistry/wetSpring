@@ -6,9 +6,6 @@
 **License:** AGPL-3.0-or-later
 **Supersedes:** All prior handoffs (v1–v5, archived in `archive/handoffs/`)
 **ToadStool reviewed:** barracuda v0.2.0 at commit cce8fe7c (bio absorption confirmed)
-**Status:** Archived — 8 of 9 shaders absorbed by ToadStool (Feb 22, sessions 31d+31g).
-  See `wateringHole/handoffs/WETSPRING_TOADSTOOL_REWIRE_FEB22_2026.md` for post-rewire state.
-  This document preserved as spec reference for binding layouts and dispatch geometry.
 
 ---
 

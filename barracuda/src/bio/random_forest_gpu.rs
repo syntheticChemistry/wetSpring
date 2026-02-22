@@ -1,65 +1,36 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated batch Random Forest inference.
+//! GPU-accelerated batch Random Forest inference via `ToadStool`.
 //!
-//! Dispatches one thread per (sample, tree) pair. Each thread traverses
-//! its tree for one sample. Results reduced on CPU via majority vote.
+//! Delegates to `barracuda::ops::bio::rf_inference::RfBatchInferenceGpu` —
+//! the absorbed shader from wetSpring handoff v5. wetSpring provides the
+//! high-level API that marshals `RandomForest` to `SoA` GPU buffers and
+//! reduces per-tree predictions via majority vote.
 //!
 //! Uses a `SoA` (Structure of Arrays) layout with separate buffers for
 //! node features (i32), thresholds (f64), and children (i32) to avoid
 //! bitcast issues in WGSL.
 
 use barracuda::device::WgpuDevice;
-use barracuda::shaders::precision::ShaderTemplate;
-use bytemuck::{Pod, Zeroable};
+use barracuda::ops::bio::rf_inference::RfBatchInferenceGpu;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
 use super::random_forest::{RandomForest, RfPrediction};
 
-const RF_WGSL: &str = include_str!("../shaders/rf_batch_inference.wgsl");
-
-/// Workgroup size — must match `@workgroup_size(N)` in `shaders/rf_batch_inference.wgsl`.
-const WORKGROUP_SIZE: u32 = 256;
-
-/// GPU params for RF batch inference.
-#[repr(C)]
-#[derive(Copy, Clone, Pod, Zeroable)]
-#[allow(clippy::struct_field_names)]
-struct RfGpuParams {
-    n_samples: u32,
-    n_trees: u32,
-    n_nodes_max: u32,
-    n_features: u32,
-}
-
 /// GPU-accelerated random forest batch inference.
 pub struct RandomForestGpu {
     device: Arc<WgpuDevice>,
-    pipeline: wgpu::ComputePipeline,
-    bgl: wgpu::BindGroupLayout,
+    inner: RfBatchInferenceGpu,
 }
 
 impl RandomForestGpu {
     /// Create a new random forest GPU instance.
     #[must_use]
     pub fn new(device: &Arc<WgpuDevice>) -> Self {
-        let patched = ShaderTemplate::for_driver_auto(RF_WGSL, false);
-        let module = device.compile_shader(&patched, Some("RfBatchInference"));
-        let pipeline = device
-            .device()
-            .create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
-                label: Some("RfBatchInference"),
-                layout: None,
-                module: &module,
-                entry_point: "main",
-                cache: None,
-                compilation_options: wgpu::PipelineCompilationOptions::default(),
-            });
-        let bgl = pipeline.get_bind_group_layout(0);
+        let inner = RfBatchInferenceGpu::new(Arc::clone(device));
         Self {
             device: Arc::clone(device),
-            pipeline,
-            bgl,
+            inner,
         }
     }
 
@@ -93,31 +64,29 @@ impl RandomForestGpu {
             .max()
             .unwrap_or(1);
 
-        // SoA buffers
         let flat_nodes = n_trees * n_nodes_max;
-        let mut node_features_buf: Vec<i32> = vec![-1; flat_nodes];
-        let mut node_thresh_buf: Vec<f64> = vec![0.0; flat_nodes];
-        let mut node_children_buf: Vec<i32> = vec![0; flat_nodes * 2];
+        let mut node_features_flat: Vec<i32> = vec![-1; flat_nodes];
+        let mut node_thresh_flat: Vec<f64> = vec![0.0; flat_nodes];
+        let mut node_children_flat: Vec<i32> = vec![0; flat_nodes * 2];
 
         for t in 0..n_trees {
             let tree = forest.tree_at(t);
             let base = t * n_nodes_max;
             for n in 0..tree.n_nodes() {
                 let node = tree.node_at(n);
-                node_features_buf[base + n] = node.feature;
-                node_thresh_buf[base + n] = node.threshold;
+                node_features_flat[base + n] = node.feature;
+                node_thresh_flat[base + n] = node.threshold;
                 let coff = (base + n) * 2;
                 if node.feature < 0 {
-                    node_children_buf[coff] = node.prediction.unwrap_or(0) as i32;
-                    node_children_buf[coff + 1] = -1;
+                    node_children_flat[coff] = node.prediction.unwrap_or(0) as i32;
+                    node_children_flat[coff + 1] = -1;
                 } else {
-                    node_children_buf[coff] = node.left_child;
-                    node_children_buf[coff + 1] = node.right_child;
+                    node_children_flat[coff] = node.left_child;
+                    node_children_flat[coff + 1] = node.right_child;
                 }
             }
         }
 
-        // Flatten features: [n_samples × n_features]
         let mut features_flat: Vec<f64> = vec![0.0; n_samples * n_features];
         for (i, sample) in samples.iter().enumerate() {
             for (j, &val) in sample.iter().enumerate() {
@@ -127,34 +96,21 @@ impl RandomForestGpu {
             }
         }
 
-        let dev = &self.device;
-        let d = dev.device();
+        let d = self.device.device();
 
-        let params = RfGpuParams {
-            n_samples: n_samples as u32,
-            n_trees: n_trees as u32,
-            n_nodes_max: n_nodes_max as u32,
-            n_features: n_features as u32,
-        };
-
-        let params_gpu = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("RF params"),
-            contents: bytemuck::bytes_of(&params),
-            usage: wgpu::BufferUsages::UNIFORM,
-        });
         let nf_gpu = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("RF node features"),
-            contents: bytemuck::cast_slice(&node_features_buf),
+            contents: bytemuck::cast_slice(&node_features_flat),
             usage: wgpu::BufferUsages::STORAGE,
         });
         let nt_gpu = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("RF node thresholds"),
-            contents: bytemuck::cast_slice(&node_thresh_buf),
+            contents: bytemuck::cast_slice(&node_thresh_flat),
             usage: wgpu::BufferUsages::STORAGE,
         });
         let nc_gpu = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("RF node children"),
-            contents: bytemuck::cast_slice(&node_children_buf),
+            contents: bytemuck::cast_slice(&node_children_flat),
             usage: wgpu::BufferUsages::STORAGE,
         });
         let feat_gpu = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
@@ -168,56 +124,25 @@ impl RandomForestGpu {
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
         });
 
-        let bg = d.create_bind_group(&wgpu::BindGroupDescriptor {
-            label: None,
-            layout: &self.bgl,
-            entries: &[
-                wgpu::BindGroupEntry {
-                    binding: 0,
-                    resource: params_gpu.as_entire_binding(),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 1,
-                    resource: nf_gpu.as_entire_binding(),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 2,
-                    resource: nt_gpu.as_entire_binding(),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 3,
-                    resource: nc_gpu.as_entire_binding(),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 4,
-                    resource: feat_gpu.as_entire_binding(),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 5,
-                    resource: out_gpu.as_entire_binding(),
-                },
-            ],
-        });
+        self.inner.dispatch(
+            &nf_gpu,
+            &nt_gpu,
+            &nc_gpu,
+            &feat_gpu,
+            &out_gpu,
+            n_samples as u32,
+            n_trees as u32,
+            n_nodes_max as u32,
+            n_features as u32,
+        );
 
-        let total = (n_samples * n_trees) as u32;
-        let mut encoder = d.create_command_encoder(&wgpu::CommandEncoderDescriptor {
-            label: Some("RF batch"),
-        });
-        {
-            let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor::default());
-            pass.set_pipeline(&self.pipeline);
-            pass.set_bind_group(0, &bg, &[]);
-            pass.dispatch_workgroups(total.div_ceil(WORKGROUP_SIZE), 1, 1);
-        }
-
-        dev.queue().submit(Some(encoder.finish()));
         d.poll(wgpu::Maintain::Wait);
 
-        let raw = dev
+        let raw = self
+            .device
             .read_buffer_u32(&out_gpu, n_samples * n_trees)
             .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
 
-        // Majority vote per sample
         let mut results = Vec::with_capacity(n_samples);
         for s in 0..n_samples {
             let mut votes = vec![0usize; n_classes];
@@ -232,7 +157,6 @@ impl RandomForestGpu {
                 .enumerate()
                 .max_by_key(|(_, &v)| v)
                 .unwrap_or((0, &0));
-            // Safe: tree counts and vote counts are small (usize), f64 has plenty of precision.
             #[allow(clippy::cast_precision_loss)]
             let confidence = max_votes as f64 / n_trees as f64;
             results.push(RfPrediction {

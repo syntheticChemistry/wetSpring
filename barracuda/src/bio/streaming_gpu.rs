@@ -56,18 +56,16 @@ use crate::bio::taxonomy::{
 use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
 use crate::io::fastq::FastqRecord;
-use barracuda::device::TensorContext;
 use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
 use std::collections::HashSet;
-use std::sync::Arc;
 use std::time::Instant;
 
 /// Pre-warmed GPU pipeline session with full-stage coverage.
 ///
 /// Holds pre-compiled pipelines for all GPU-accelerated stages:
 /// quality filter, DADA2 E-step, taxonomy GEMM, and diversity FMR.
+/// Quality and DADA2 now delegate to `ToadStool` absorbed primitives.
 pub struct GpuPipelineSession {
-    ctx: Arc<TensorContext>,
     qf: QualityFilterCached,
     dada2: Dada2Gpu,
     fmr: FusedMapReduceF64,
@@ -91,11 +89,11 @@ impl GpuPipelineSession {
         let device = gpu.to_wgpu_device();
         let ctx = gpu.tensor_context().clone();
 
-        let qf = QualityFilterCached::new(device.clone(), ctx.clone());
-        let dada2 = Dada2Gpu::new(device.clone(), ctx.clone());
+        let qf = QualityFilterCached::new(device.clone())?;
+        let dada2 = Dada2Gpu::new(device.clone())?;
         let fmr = FusedMapReduceF64::new(device.clone())
             .map_err(|e| Error::Gpu(format!("FMR init: {e}")))?;
-        let gemm = GemmCached::new(device, ctx.clone());
+        let gemm = GemmCached::new(device, ctx);
 
         // Prime driver caches with tiny dispatches
         let _ = fmr.sum(&[1.0, 2.0, 3.0]);
@@ -104,7 +102,6 @@ impl GpuPipelineSession {
         let warmup_ms = warmup_start.elapsed().as_secs_f64() * 1000.0;
 
         Ok(Self {
-            ctx,
             qf,
             dada2,
             fmr,
@@ -113,10 +110,10 @@ impl GpuPipelineSession {
         })
     }
 
-    /// `TensorContext` stats: buffer pool reuse, bind group cache, batched ops.
+    /// Pipeline session info string.
     #[must_use]
     pub fn ctx_stats(&self) -> String {
-        self.ctx.stats().to_string()
+        format!("warmup={:.1}ms", self.warmup_ms)
     }
 
     // ── Quality filter: real GPU dispatch ────────────────────────────────

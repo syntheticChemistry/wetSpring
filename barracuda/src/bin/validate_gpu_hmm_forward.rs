@@ -9,8 +9,8 @@
 //! Exp047: GPU HMM Batch Forward
 //!
 //! Validates the GPU batch HMM forward algorithm against the CPU
-//! implementation. Uses a local WGSL shader (`hmm_forward_f64.wgsl`)
-//! — a `ToadStool` absorption candidate following Write → Absorb → Lean.
+//! implementation. Uses `ToadStool` `barracuda::ops::bio::hmm::HmmBatchForwardF64`
+//! (rewired from local WGSL on 2026-02-22).
 //!
 //! Sections:
 //! 1. **2-state parity** — classic weather HMM, single sequence
@@ -31,7 +31,7 @@
 //! | Data | Weather HMM, genomic HMM, 64-seq batch |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
-//! Local WGSL shader: `hmm_forward_f64.wgsl` (`ToadStool` absorption candidate).
+//! `ToadStool` `barracuda::ops::bio::hmm::HmmBatchForwardF64` (rewired 2026-02-22).
 
 use wetspring_barracuda::bio::hmm::{self, HmmModel};
 use wetspring_barracuda::bio::hmm_gpu::HmmGpuForward;
@@ -104,7 +104,7 @@ async fn main() {
     println!();
 
     let device = gpu.to_wgpu_device();
-    let hmm_gpu = HmmGpuForward::new(&device);
+    let hmm_gpu = HmmGpuForward::new(&device).expect("HMM GPU shader");
 
     validate_2state(&hmm_gpu, &mut v);
     validate_3state(&hmm_gpu, &mut v);
@@ -133,7 +133,7 @@ fn validate_2state(gpu: &HmmGpuForward, v: &mut Validator) {
                 "2-state: CPU ≈ GPU log-likelihood",
                 cpu.log_likelihood,
                 gpu_ll,
-                1e-6,
+                wetspring_barracuda::tolerances::GPU_VS_CPU_F64,
             );
             v.check(
                 "2-state: GPU LL finite",
@@ -156,8 +156,10 @@ fn validate_2state(gpu: &HmmGpuForward, v: &mut Validator) {
                 }
             }
             v.check(
-                "2-state: max |alpha CPU−GPU| < 1e-6",
-                f64::from(u8::from(max_alpha_diff < 1e-6)),
+                "2-state: max |alpha CPU−GPU| < GPU_VS_CPU_F64",
+                f64::from(u8::from(
+                    max_alpha_diff < wetspring_barracuda::tolerances::GPU_VS_CPU_F64,
+                )),
                 1.0,
                 0.0,
             );
@@ -193,7 +195,7 @@ fn validate_3state(gpu: &HmmGpuForward, v: &mut Validator) {
                 "3-state: CPU ≈ GPU log-likelihood",
                 cpu.log_likelihood,
                 gpu_ll,
-                1e-6,
+                wetspring_barracuda::tolerances::GPU_VS_CPU_F64,
             );
             v.check(
                 "3-state: GPU LL finite",
@@ -346,7 +348,9 @@ fn validate_forward_backward(gpu: &HmmGpuForward, v: &mut Validator) {
             }
             v.check(
                 "FB: GPU alpha + CPU beta consistent",
-                f64::from(u8::from(max_fb_diff < 1e-6)),
+                f64::from(u8::from(
+                    max_fb_diff < wetspring_barracuda::tolerances::GPU_VS_CPU_F64,
+                )),
                 1.0,
                 0.0,
             );

@@ -8,7 +8,7 @@
 )]
 //! Exp058: GPU Track 1c Promotion — ANI + SNP + Pangenome + dN/dS
 //!
-//! Validates four local WGSL shaders against CPU baselines:
+//! Validates four `ToadStool` primitives (delegating to `barracuda::ops::bio::*`) against CPU baselines:
 //! 1. **ANI batch** — pairwise nucleotide identity (pair-parallel)
 //! 2. **SNP calling** — position-parallel variant detection
 //! 3. **Pangenome classify** — gene classification (gene-parallel)
@@ -34,7 +34,7 @@
 //! | Data | Synthetic pairs, sequences, gene clusters, codon pairs |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
-//! Local WGSL shaders: ANI batch, SNP calling, Pangenome classify, dN/dS batch (Nei-Gojobori).
+//! `ToadStool` primitives: ANI batch, SNP calling, Pangenome classify, dN/dS batch (Nei-Gojobori).
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{
@@ -64,10 +64,26 @@ async fn main() {
     let device = gpu.to_wgpu_device();
     let mut timings: Vec<(&str, f64)> = Vec::new();
 
-    validate_ani_gpu(&AniGpu::new(&device), &mut v, &mut timings);
-    validate_snp_gpu(&SnpGpu::new(&device), &mut v, &mut timings);
-    validate_pangenome_gpu(&PangenomeGpu::new(&device), &mut v, &mut timings);
-    validate_dnds_gpu(&DnDsGpu::new(&device), &mut v, &mut timings);
+    validate_ani_gpu(
+        &AniGpu::new(&device).expect("ANI GPU shader"),
+        &mut v,
+        &mut timings,
+    );
+    validate_snp_gpu(
+        &SnpGpu::new(&device).expect("SNP GPU shader"),
+        &mut v,
+        &mut timings,
+    );
+    validate_pangenome_gpu(
+        &PangenomeGpu::new(&device).expect("Pangenome GPU shader"),
+        &mut v,
+        &mut timings,
+    );
+    validate_dnds_gpu(
+        &DnDsGpu::new(&device).expect("dN/dS GPU shader"),
+        &mut v,
+        &mut timings,
+    );
 
     // Timing summary
     v.section("═══ GPU Track 1c Timing Summary ═══");

@@ -58,9 +58,16 @@ pub const MZ_TOLERANCE: f64 = 0.01;
 pub const SHANNON_SIMULATED: f64 = 0.3;
 
 /// Simpson range for simulated marine community.
+///
+/// Simulated 330-species community with Exp002 relative abundances.
+/// Expected ~0.9 ± 0.05 (validated against skbio 0.6.0, commit `e4358c5`).
 pub const SIMPSON_SIMULATED: f64 = 0.05;
 
 /// Chao1 range above observed features (singleton/doubleton dependent).
+///
+/// Chao1 ≥ observed by definition; for Exp002 Galaxy community
+/// (330 species, ~910 expected), allow up to +100 above observed
+/// (validated against skbio 0.6.0, commit `e4358c5`).
 pub const CHAO1_RANGE: f64 = 100.0;
 
 /// Bray-Curtis: f64 symmetry tolerance.
@@ -208,6 +215,10 @@ pub const GILLESPIE_FANO: f64 = 0.5;
 pub const KMD_GROUPING: f64 = 0.01;
 
 /// KMD series spread: max intra-series range for PFCA/PFSA.
+///
+/// Homologous series (e.g. PFCAs C4-C14) span < 0.02 KMD units.
+/// Validated against EPA Method 533 reference standards (Exp006,
+/// commit `eb99b12`).
 pub const KMD_SPREAD: f64 = 0.02;
 
 /// Fragment m/z tolerance (Da) for suspect screening.
@@ -230,6 +241,15 @@ pub const PEAK_HEIGHT_REL: f64 = 0.01;
 // ═══════════════════════════════════════════════════════════════════
 // GPU vs CPU tolerances
 // ═══════════════════════════════════════════════════════════════════
+
+/// Regularized incomplete gamma series convergence epsilon.
+///
+/// Used by `special::regularized_gamma_p` for series termination.
+/// Matches scipy's `gammainc` convergence behavior at 1e-15.
+pub const GAMMA_SERIES_CONVERGENCE: f64 = 1e-15;
+
+/// Maximum iterations for regularized gamma series expansion.
+pub const GAMMA_SERIES_MAX_ITER: usize = 1000;
 
 /// GPU f64 vs CPU f64 for exact arithmetic (add, mul, comparison).
 ///

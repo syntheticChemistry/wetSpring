@@ -108,8 +108,7 @@ fn validate_case(v: &mut Validator, dir: &Path, name: &str, params: &PeakParams)
     let contents = match std::fs::read_to_string(&path) {
         Ok(c) => c,
         Err(e) => {
-            eprintln!("FAIL: cannot read {}: {e}", path.display());
-            std::process::exit(1);
+            validation::exit_skipped(&format!("Cannot read {}: {e}", path.display()));
         }
     };
     let lines: Vec<&str> = contents.lines().collect();

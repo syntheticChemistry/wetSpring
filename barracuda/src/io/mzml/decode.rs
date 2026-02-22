@@ -300,6 +300,7 @@ pub fn custom_binary_mzml(
 
 /// Write text to a temp mzML file and return the path.
 #[cfg(test)]
+#[allow(clippy::unwrap_used)]
 pub fn write_temp_mzml(dir: &tempfile::TempDir, name: &str, xml: &str) -> std::path::PathBuf {
     use std::io::Write;
     let path = dir.path().join(name);
@@ -309,6 +310,7 @@ pub fn write_temp_mzml(dir: &tempfile::TempDir, name: &str, xml: &str) -> std::p
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
 

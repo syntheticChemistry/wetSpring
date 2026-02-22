@@ -124,9 +124,9 @@ async fn main() {
     }
 
     // ════════════════════════════════════════════════════════════════
-    //  Domain 3: ANI — Local WGSL
+    //  Domain 3: ANI — ToadStool (absorbed)
     // ════════════════════════════════════════════════════════════════
-    v.section("═══ GPU Domain 3: ANI (Local WGSL) ═══");
+    v.section("═══ GPU Domain 3: ANI (ToadStool absorbed) ═══");
     {
         let pairs: Vec<(&[u8], &[u8])> = vec![
             (b"ATGATGATG", b"ATGATGATG"),
@@ -139,7 +139,7 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
         let t_gpu = Instant::now();
-        let gpu_ani = AniGpu::new(&device);
+        let gpu_ani = AniGpu::new(&device).expect("ANI GPU shader");
         let gpu_results = gpu_ani.batch_ani(&pairs).unwrap();
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
@@ -159,7 +159,7 @@ async fn main() {
     }
 
     // ════════════════════════════════════════════════════════════════
-    //  Domain 4: SNP Calling — Local WGSL
+    //  Domain 4: SNP Calling — ToadStool (absorbed)
     // ════════════════════════════════════════════════════════════════
     v.section("═══ GPU Domain 4: SNP Calling ═══");
     {
@@ -175,7 +175,7 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
         let t_gpu = Instant::now();
-        let gpu_snp = SnpGpu::new(&device);
+        let gpu_snp = SnpGpu::new(&device).expect("SNP GPU shader");
         let gpu_snp_result = gpu_snp.call_snps(&seqs).unwrap();
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
@@ -207,7 +207,7 @@ async fn main() {
     }
 
     // ════════════════════════════════════════════════════════════════
-    //  Domain 5: dN/dS — Local WGSL
+    //  Domain 5: dN/dS — ToadStool (absorbed)
     // ════════════════════════════════════════════════════════════════
     v.section("═══ GPU Domain 5: dN/dS ═══");
     {
@@ -225,7 +225,7 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
         let t_gpu = Instant::now();
-        let gpu_dnds_mod = DnDsGpu::new(&device);
+        let gpu_dnds_mod = DnDsGpu::new(&device).expect("dN/dS GPU shader");
         let gpu_dnds_result = gpu_dnds_mod.batch_dnds(&pairs).unwrap();
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
@@ -249,7 +249,7 @@ async fn main() {
     }
 
     // ════════════════════════════════════════════════════════════════
-    //  Domain 6: Pangenome — Local WGSL
+    //  Domain 6: Pangenome — ToadStool (absorbed)
     // ════════════════════════════════════════════════════════════════
     v.section("═══ GPU Domain 6: Pangenome ═══");
     {
@@ -286,7 +286,7 @@ async fn main() {
             .collect();
 
         let t_gpu = Instant::now();
-        let gpu_pan = PangenomeGpu::new(&device);
+        let gpu_pan = PangenomeGpu::new(&device).expect("Pangenome GPU shader");
         let gpu_result = gpu_pan.classify(&presence_flat, 5, 4).unwrap();
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
@@ -324,7 +324,7 @@ async fn main() {
     }
 
     // ════════════════════════════════════════════════════════════════
-    //  Domain 7: Random Forest — Local WGSL
+    //  Domain 7: Random Forest — ToadStool (absorbed)
     // ════════════════════════════════════════════════════════════════
     v.section("═══ GPU Domain 7: Random Forest ═══");
     {
@@ -385,7 +385,7 @@ async fn main() {
     }
 
     // ════════════════════════════════════════════════════════════════
-    //  Domain 8: HMM Forward — Local WGSL
+    //  Domain 8: HMM Forward — ToadStool (absorbed)
     // ════════════════════════════════════════════════════════════════
     v.section("═══ GPU Domain 8: HMM Forward ═══");
     {
@@ -408,7 +408,7 @@ async fn main() {
 
         let flat_obs: Vec<u32> = obs1.iter().chain(obs2.iter()).map(|&x| x as u32).collect();
         let t_gpu = Instant::now();
-        let hmm_gpu = HmmGpuForward::new(&device);
+        let hmm_gpu = HmmGpuForward::new(&device).expect("HMM GPU shader");
         let gpu_result = hmm_gpu.forward_batch(&model, &flat_obs, 2, 4).unwrap();
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 

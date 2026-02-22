@@ -120,7 +120,8 @@ native f64 `exp()`, `log()`, or `pow()` in WGSL shaders. Driver profile
 incorrectly reports `needs_f64_exp_log_workaround() = false`.
 
 **Workaround**: `ShaderTemplate::for_driver_auto(source, true)` injects
-pure-arithmetic polyfills. Affects 5/9 local WGSL shaders.
+pure-arithmetic polyfills. Affects the remaining ODE local shader and all
+ToadStool-absorbed bio shaders (handled by `compile_shader_f64()`).
 
 **Upstream fix proposed**: `needs_f64_exp_log_workaround()` should return
 `true` for all Ada Lovelace GPUs (sm_89).
@@ -132,7 +133,8 @@ pure-arithmetic polyfills. Affects 5/9 local WGSL shaders.
 | Category | Count | Status |
 |----------|:-----:|--------|
 | Absorbed (lean on ToadStool) | 11 modules | Active |
-| Local WGSL (handoff candidates) | 9 shaders | Handoff submitted |
+| Absorbed by ToadStool (Feb 22) | 8 shaders | Lean |
+| Local WGSL (ODE) | 1 shader | Blocked on `enable f64;` |
 | CPU-only (sequential/branching) | 15 modules | Stable |
 | Blocked (needs new primitive) | 3 modules | Waiting on ToadStool |
 
@@ -140,5 +142,5 @@ pure-arithmetic polyfills. Affects 5/9 local WGSL shaders.
 
 1. **Absorption**: 9 Tier A shaders submitted via `../../../wateringHole/handoffs/`
 2. **NVVM fix**: Propose Ada Lovelace driver profile correction upstream
-3. **Titan V**: Validate all 9 local shaders on Volta (avoids NVVM bug)
+3. **Titan V**: Validate ODE local shader on Volta (avoids NVVM bug)
 4. **Scaling**: ODE sweep from B=64 to B=10,000 via ToadStool streaming

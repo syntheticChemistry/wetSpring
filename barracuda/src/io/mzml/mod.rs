@@ -180,7 +180,7 @@ impl Iterator for MzmlIter {
                                 if let Err(e) = binary_state
                                     .decode_into_with_buffer(b, Some(&mut self.decode_buffer))
                                 {
-                                    eprintln!("Warning: binary decode failed: {e}");
+                                    return Some(Err(e));
                                 }
                             }
                             in_binary_data_array = false;
@@ -201,9 +201,11 @@ impl Iterator for MzmlIter {
     }
 }
 
-/// Parse an mzML file and return all spectra, **streaming from disk**.
+/// Parse an mzML file and collect **all** spectra into memory.
 ///
-/// Delegates to [`MzmlIter`] — the full XML is never held in memory.
+/// Delegates to [`MzmlIter`] — XML streams from disk, but results are
+/// collected into a `Vec`. For large files, prefer iterating with
+/// [`MzmlIter`] directly.
 ///
 /// # Errors
 ///

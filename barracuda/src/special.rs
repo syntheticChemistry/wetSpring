@@ -88,10 +88,10 @@ pub fn regularized_gamma_lower(a: f64, x: f64) -> f64 {
     let mut sum = 0.0_f64;
     let mut term = 1.0 / a;
     sum += term;
-    for n in 1..1000 {
-        term *= x / (a + f64::from(n));
+    for n in 1..crate::tolerances::GAMMA_SERIES_MAX_ITER {
+        term *= x / (a + f64::from(n as u32));
         sum += term;
-        if term.abs() < 1e-15 * sum.abs() {
+        if term.abs() < crate::tolerances::GAMMA_SERIES_CONVERGENCE * sum.abs() {
             break;
         }
     }

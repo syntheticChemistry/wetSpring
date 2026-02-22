@@ -1,13 +1,13 @@
 # wetSpring — BarraCUDA Requirements
 
-**Last Updated**: February 21, 2026
+**Last Updated**: February 22, 2026
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---
 
 ## Current Kernel Usage (Validated)
 
-### Rust CPU Modules (41 modules, 650 tests, 97% bio+io coverage)
+### Rust CPU Modules (41 modules, 707 tests, 96.21% coverage)
 
 | Module Domain | Modules | Status |
 |--------------|---------|--------|
@@ -21,7 +21,7 @@
 | Track 1c | ani, snp, dnds, molecular_clock, pangenome | Sovereign |
 | ML | decision_tree, random_forest, gbm | Sovereign |
 
-### GPU Primitives (15 ToadStool + 9 local WGSL, 451 checks)
+### GPU Primitives (23 ToadStool + 1 local WGSL, 451 checks)
 
 | ToadStool Primitive | wetSpring Use | Checks | Performance |
 |-------------------|---------------|--------|-------------|
@@ -99,7 +99,7 @@ Python baseline (35 scripts)  ────────→  Rust CPU parity (157/
 GPU diversity (38/38)         ────────→  GPU Parity v1 (Exp064)  ──────→  ✓ DONE (8 domains)
 GPU pipeline (88/88)          ────────→  GPU RF inference (13/13) ──────→  NPU for low-power inference
 CPU 22.5× faster than Python  ────────→  GPU math PROVEN portable ─────→  Scale via streaming
-9 local WGSL shaders          ────────→  ToadStool absorbs ───────────→  Full Write→Absorb→Lean cycle
+8 bio shaders absorbed Feb 22  ────────→  23 ToadStool primitives ────→  Full Write→Absorb→Lean cycle
 25 CPU domains validated      ────────→  metalForge PROVEN (Exp065) ───→  CPU/GPU/NPU routing
 ```
 
@@ -112,4 +112,4 @@ CPU 22.5× faster than Python  ────────→  GPU math PROVEN port
 - **NVVM workaround**: force `ShaderTemplate::for_driver_auto(source, true)` for shaders using exp/log
 - Spectral cosine achieves 926× GPU speedup — the first "GPU wins decisively" benchmark from any spring
 - 41 CPU + 20 GPU Rust modules with 1 runtime dependency (flate2) — highest sovereignty ratio in the ecosystem
-- **9 shaders ready for absorption** — see `barracuda/EVOLUTION_READINESS.md` for full handoff queue
+- **8 shaders absorbed, 1 remaining (ODE)** — see `barracuda/EVOLUTION_READINESS.md` for status

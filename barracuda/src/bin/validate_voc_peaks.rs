@@ -49,8 +49,7 @@ fn parse_baseline(path: &Path) -> Vec<VocCompound> {
     let contents = match std::fs::read_to_string(path) {
         Ok(c) => c,
         Err(e) => {
-            eprintln!("Failed to read {}: {e}", path.display());
-            std::process::exit(1);
+            validation::exit_skipped(&format!("Cannot read {}: {e}", path.display()));
         }
     };
 

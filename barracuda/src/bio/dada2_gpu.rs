@@ -1,38 +1,27 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated DADA2 denoising — E-step on GPU, control flow on CPU.
+//! GPU-accelerated DADA2 denoising via `ToadStool`.
 //!
 //! The DADA2 EM loop has two cost centres:
 //!   1. `assign_to_centers` (E-step): O(seqs × centers × `seq_length`) — **GPU**
 //!   2. `find_new_centers` (split): O(seqs × `seq_length`) `log_p_error` — **GPU**
 //!
 //! Everything else (error model update, Poisson test, convergence) stays on CPU.
-//! The GPU computes all `log_p_error(seq, center)` pairs in a single batch dispatch.
+//! The GPU computes all `log_p_error(seq, center)` pairs in a single batch dispatch
+//! via `barracuda::ops::bio::dada2::Dada2EStepGpu`.
 //!
 //! # Key design: no GPU transcendentals
 //!
 //! The error model `ln(err[from][to][qual])` is precomputed on CPU and uploaded
 //! as a flat f64 lookup table. The GPU shader only does f64 addition (sum over
-//! positions) — no exp, log, or other transcendentals. This avoids driver-specific
-//! f64 transcendental issues entirely.
-//!
-//! # `ToadStool` absorption path
-//!
-//! - `BatchPairReduce<f64>` — per-pair parallel reduction primitive
-//! - Pre-compiled pipeline cache (like `GemmCached`)
-//! - `BufferPool` for sequence data persistence across iterations
+//! positions) — no exp, log, or other transcendentals.
 
 use crate::bio::dada2::{self, Asv, Dada2Params, Dada2Stats};
 use crate::bio::derep::UniqueSequence;
 use crate::error::{Error, Result};
-use barracuda::device::{TensorContext, WgpuDevice};
-use barracuda::shaders::precision::ShaderTemplate;
-use bytemuck::{Pod, Zeroable};
+use barracuda::device::WgpuDevice;
+use barracuda::ops::bio::dada2::Dada2EStepGpu;
 use std::sync::Arc;
-
-const E_STEP_WGSL: &str = include_str!("../shaders/dada2_e_step.wgsl");
-
-/// Workgroup size — must match `@workgroup_size(N)` in `shaders/dada2_e_step.wgsl`.
-const WORKGROUP_SIZE: u32 = 256;
+use wgpu::util::DeviceExt;
 
 const NUM_BASES: usize = 4;
 const MAX_QUAL: usize = 42;
@@ -42,196 +31,88 @@ const MAX_ERR_ITERS: usize = 6;
 
 type ErrorModel = [[[f64; MAX_QUAL]; NUM_BASES]; NUM_BASES];
 
-#[repr(C)]
-#[derive(Copy, Clone, Pod, Zeroable)]
-struct EStepParams {
-    n_seqs: u32,
-    n_centers: u32,
-    max_len: u32,
-    _pad: u32,
-}
-
-/// Packed input for a single GPU E-step dispatch.
-struct BatchInput<'a> {
-    bases: &'a [u32],
-    quals: &'a [u32],
-    lengths: &'a [u32],
-    center_indices: &'a [u32],
-    log_err_flat: &'a [f64],
-    n_seqs: usize,
-    n_centers: usize,
-    max_len: usize,
-}
-
-/// Pre-compiled DADA2 E-step pipeline for batch `log_p_error` computation.
+/// Pre-compiled DADA2 E-step pipeline via `ToadStool`.
 pub struct Dada2Gpu {
     device: Arc<WgpuDevice>,
-    ctx: Arc<TensorContext>,
-    pipeline: wgpu::ComputePipeline,
-    bgl: wgpu::BindGroupLayout,
+    inner: Dada2EStepGpu,
 }
 
 impl Dada2Gpu {
     /// Create a new DADA2 GPU E-step instance.
-    #[must_use]
-    pub fn new(device: Arc<WgpuDevice>, ctx: Arc<TensorContext>) -> Self {
-        let patched =
-            ShaderTemplate::for_driver_auto(E_STEP_WGSL, device.needs_f64_exp_log_workaround());
-        let shader = device
-            .device()
-            .create_shader_module(wgpu::ShaderModuleDescriptor {
-                label: Some("Dada2 EStep"),
-                source: wgpu::ShaderSource::Wgsl(patched.into()),
-            });
-
-        let bgl = device
-            .device()
-            .create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-                label: Some("Dada2 BGL"),
-                entries: &[
-                    bgl_entry(0, wgpu::BufferBindingType::Uniform),
-                    bgl_entry(1, wgpu::BufferBindingType::Storage { read_only: true }),
-                    bgl_entry(2, wgpu::BufferBindingType::Storage { read_only: true }),
-                    bgl_entry(3, wgpu::BufferBindingType::Storage { read_only: true }),
-                    bgl_entry(4, wgpu::BufferBindingType::Storage { read_only: true }),
-                    bgl_entry(5, wgpu::BufferBindingType::Storage { read_only: true }),
-                    bgl_entry(6, wgpu::BufferBindingType::Storage { read_only: false }),
-                ],
-            });
-
-        let pl = device
-            .device()
-            .create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-                label: Some("Dada2 PL"),
-                bind_group_layouts: &[&bgl],
-                push_constant_ranges: &[],
-            });
-
-        let pipeline = device
-            .device()
-            .create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
-                label: Some("Dada2 EStep f64"),
-                layout: Some(&pl),
-                module: &shader,
-                entry_point: "e_step",
-                cache: None,
-                compilation_options: wgpu::PipelineCompilationOptions::default(),
-            });
-
-        Self {
-            device,
-            ctx,
-            pipeline,
-            bgl,
-        }
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if `ToadStool` shader compilation fails.
+    pub fn new(device: Arc<WgpuDevice>) -> Result<Self> {
+        let inner = Dada2EStepGpu::new(Arc::clone(&device))
+            .map_err(|e| Error::Gpu(format!("Dada2EStepGpu: {e}")))?;
+        Ok(Self { device, inner })
     }
 
     /// Compute `log_p_error` for all (seq, center) pairs in a single GPU dispatch.
     ///
     /// Returns an `n_seqs × n_centers` matrix (row-major).
-    #[allow(clippy::cast_possible_truncation)]
-    fn batch_log_p_error(&self, input: &BatchInput<'_>) -> Result<Vec<f64>> {
-        let bases = input.bases;
-        let quals = input.quals;
-        let lengths = input.lengths;
-        let center_indices = input.center_indices;
-        let log_err_flat = input.log_err_flat;
-        let n_seqs = input.n_seqs;
-        let n_centers = input.n_centers;
-        let max_len = input.max_len;
+    #[allow(clippy::cast_possible_truncation, clippy::too_many_arguments)]
+    fn batch_log_p_error(
+        &self,
+        bases: &[u32],
+        quals: &[u32],
+        lengths: &[u32],
+        center_indices: &[u32],
+        log_err_flat: &[f64],
+        n_seqs: usize,
+        n_centers: usize,
+        max_len: usize,
+    ) -> Result<Vec<f64>> {
         let total_pairs = n_seqs * n_centers;
-        let pool = self.ctx.buffer_pool();
+        let d = self.device.device();
 
-        let params = EStepParams {
-            n_seqs: n_seqs as u32,
-            n_centers: n_centers as u32,
-            max_len: max_len as u32,
-            _pad: 0,
-        };
-        let params_buf = self.device.create_uniform_buffer("Dada2 Params", &params);
+        let bases_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("Dada2 bases"),
+            contents: bytemuck::cast_slice(bases),
+            usage: wgpu::BufferUsages::STORAGE,
+        });
+        let quals_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("Dada2 quals"),
+            contents: bytemuck::cast_slice(quals),
+            usage: wgpu::BufferUsages::STORAGE,
+        });
+        let lengths_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("Dada2 lengths"),
+            contents: bytemuck::cast_slice(lengths),
+            usage: wgpu::BufferUsages::STORAGE,
+        });
+        let centers_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("Dada2 centers"),
+            contents: bytemuck::cast_slice(center_indices),
+            usage: wgpu::BufferUsages::STORAGE,
+        });
+        let log_err_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("Dada2 log_err"),
+            contents: bytemuck::cast_slice(log_err_flat),
+            usage: wgpu::BufferUsages::STORAGE,
+        });
+        let scores_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("Dada2 scores"),
+            contents: bytemuck::cast_slice(&vec![0.0_f64; total_pairs]),
+            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+        });
 
-        let bases_buf = pool.acquire_pooled(bases.len() * 4);
-        self.device
-            .queue()
-            .write_buffer(&bases_buf, 0, bytemuck::cast_slice(bases));
+        self.inner
+            .dispatch(
+                n_seqs as u32,
+                n_centers as u32,
+                max_len as u32,
+                &bases_buf,
+                &quals_buf,
+                &lengths_buf,
+                &centers_buf,
+                &log_err_buf,
+                &scores_buf,
+            )
+            .map_err(|e| Error::Gpu(format!("Dada2 dispatch: {e}")))?;
 
-        let quals_buf = pool.acquire_pooled(quals.len() * 4);
-        self.device
-            .queue()
-            .write_buffer(&quals_buf, 0, bytemuck::cast_slice(quals));
-
-        let lengths_buf = pool.acquire_pooled(lengths.len() * 4);
-        self.device
-            .queue()
-            .write_buffer(&lengths_buf, 0, bytemuck::cast_slice(lengths));
-
-        let centers_buf = pool.acquire_pooled(center_indices.len() * 4);
-        self.device
-            .queue()
-            .write_buffer(&centers_buf, 0, bytemuck::cast_slice(center_indices));
-
-        let log_err_buf = pool.acquire_pooled(log_err_flat.len() * 8);
-        self.device
-            .queue()
-            .write_buffer(&log_err_buf, 0, bytemuck::cast_slice(log_err_flat));
-
-        let scores_buf = pool.acquire_pooled(total_pairs * 8);
-
-        let bg = self
-            .device
-            .device()
-            .create_bind_group(&wgpu::BindGroupDescriptor {
-                label: Some("Dada2 BG"),
-                layout: &self.bgl,
-                entries: &[
-                    wgpu::BindGroupEntry {
-                        binding: 0,
-                        resource: params_buf.as_entire_binding(),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 1,
-                        resource: bases_buf.as_entire_binding(),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 2,
-                        resource: quals_buf.as_entire_binding(),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 3,
-                        resource: lengths_buf.as_entire_binding(),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 4,
-                        resource: centers_buf.as_entire_binding(),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 5,
-                        resource: log_err_buf.as_entire_binding(),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 6,
-                        resource: scores_buf.as_entire_binding(),
-                    },
-                ],
-            });
-
-        let wg_x = (total_pairs as u32).div_ceil(WORKGROUP_SIZE);
-        let mut encoder =
-            self.device
-                .device()
-                .create_command_encoder(&wgpu::CommandEncoderDescriptor {
-                    label: Some("Dada2 Encoder"),
-                });
-        {
-            let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
-                label: Some("Dada2 EStep"),
-                timestamp_writes: None,
-            });
-            pass.set_pipeline(&self.pipeline);
-            pass.set_bind_group(0, &bg, &[]);
-            pass.dispatch_workgroups(wg_x, 1, 1);
-        }
-        self.device.queue().submit(Some(encoder.finish()));
+        d.poll(wgpu::Maintain::Wait);
 
         self.device
             .read_buffer_f64(&scores_buf, total_pairs)
@@ -293,19 +174,17 @@ pub fn denoise_gpu(
         let log_err_flat = flatten_log_error_model(&err);
         let center_indices: Vec<u32> = centers.iter().map(|&c| c as u32).collect();
 
-        // E-step: GPU batch dispatch for all (seq, center) log_p_error values
-        let scores = dada2.batch_log_p_error(&BatchInput {
-            bases: &bases,
-            quals: &quals,
-            lengths: &lengths,
-            center_indices: &center_indices,
-            log_err_flat: &log_err_flat,
-            n_seqs: seqs.len(),
-            n_centers: centers.len(),
+        let scores = dada2.batch_log_p_error(
+            &bases,
+            &quals,
+            &lengths,
+            &center_indices,
+            &log_err_flat,
+            seqs.len(),
+            centers.len(),
             max_len,
-        })?;
+        )?;
 
-        // Argmax on CPU (trivial: just find best center per sequence)
         for (i, slot) in partition.iter_mut().enumerate() {
             let row_start = i * centers.len();
             let mut best_center = centers[0];
@@ -320,7 +199,6 @@ pub fn denoise_gpu(
             *slot = best_center;
         }
 
-        // M-step: error model re-estimation (CPU — cheap)
         for _ in 0..MAX_ERR_ITERS {
             let new_err = estimate_error_model(&seqs, &partition, &centers);
             if err_model_converged(&err, &new_err) {
@@ -330,20 +208,19 @@ pub fn denoise_gpu(
             err = new_err;
         }
 
-        // Split step: GPU batch log_p_error for Poisson test
         let split_log_err = flatten_log_error_model(&err);
         let split_center_indices: Vec<u32> = centers.iter().map(|&c| c as u32).collect();
 
-        let split_scores = dada2.batch_log_p_error(&BatchInput {
-            bases: &bases,
-            quals: &quals,
-            lengths: &lengths,
-            center_indices: &split_center_indices,
-            log_err_flat: &split_log_err,
-            n_seqs: seqs.len(),
-            n_centers: centers.len(),
+        let split_scores = dada2.batch_log_p_error(
+            &bases,
+            &quals,
+            &lengths,
+            &split_center_indices,
+            &split_log_err,
+            seqs.len(),
+            centers.len(),
             max_len,
-        })?;
+        )?;
 
         let new_centers = find_new_centers_from_matrix(
             &seqs,
@@ -366,19 +243,18 @@ pub fn denoise_gpu(
         last_n_centers = centers.len();
     }
 
-    // Final assignment with GPU E-step
     let log_err_flat = flatten_log_error_model(&err);
     let center_indices: Vec<u32> = centers.iter().map(|&c| c as u32).collect();
-    let scores = dada2.batch_log_p_error(&BatchInput {
-        bases: &bases,
-        quals: &quals,
-        lengths: &lengths,
-        center_indices: &center_indices,
-        log_err_flat: &log_err_flat,
-        n_seqs: seqs.len(),
-        n_centers: centers.len(),
+    let scores = dada2.batch_log_p_error(
+        &bases,
+        &quals,
+        &lengths,
+        &center_indices,
+        &log_err_flat,
+        seqs.len(),
+        centers.len(),
         max_len,
-    })?;
+    )?;
 
     for (i, slot) in partition.iter_mut().enumerate() {
         let row_start = i * centers.len();
@@ -449,7 +325,7 @@ fn pack_sequences(seqs: &[&UniqueSequence], max_len: usize) -> (Vec<u32>, Vec<u3
     (bases, quals, lengths)
 }
 
-#[allow(clippy::cast_precision_loss, clippy::needless_range_loop)] // 3D array requires indexing by from/to/q
+#[allow(clippy::cast_precision_loss, clippy::needless_range_loop)]
 fn init_error_model() -> ErrorModel {
     let mut err = [[[0.0_f64; MAX_QUAL]; NUM_BASES]; NUM_BASES];
     for q in 0..MAX_QUAL {
@@ -467,7 +343,7 @@ fn init_error_model() -> ErrorModel {
     err
 }
 
-#[allow(clippy::needless_range_loop)] // 3D array requires indexing by from/to/q
+#[allow(clippy::needless_range_loop)]
 fn flatten_log_error_model(err: &ErrorModel) -> Vec<f64> {
     let mut flat = vec![0.0_f64; NUM_BASES * NUM_BASES * MAX_QUAL];
     for from in 0..NUM_BASES {
@@ -481,9 +357,7 @@ fn flatten_log_error_model(err: &ErrorModel) -> Vec<f64> {
     flat
 }
 
-// ── CPU helper functions (replicated from dada2.rs for the GPU EM loop) ──────
-
-#[allow(clippy::cast_precision_loss, clippy::needless_range_loop)] // 3D array requires indexing by from/to/q
+#[allow(clippy::cast_precision_loss, clippy::needless_range_loop)]
 fn estimate_error_model(
     seqs: &[&UniqueSequence],
     partition: &[usize],
@@ -537,7 +411,7 @@ fn estimate_error_model(
     err
 }
 
-#[allow(clippy::needless_range_loop)] // 3D array requires indexing by from/to/q
+#[allow(clippy::needless_range_loop)]
 fn err_model_converged(old: &ErrorModel, new: &ErrorModel) -> bool {
     let mut max_diff = 0.0_f64;
     for from in 0..NUM_BASES {
@@ -553,7 +427,6 @@ fn err_model_converged(old: &ErrorModel, new: &ErrorModel) -> bool {
     max_diff < crate::tolerances::DADA2_ERR_CONVERGENCE
 }
 
-/// Poisson upper-tail p-value using GPU E-step scores matrix.
 #[allow(clippy::cast_precision_loss)]
 fn find_new_centers_from_matrix(
     seqs: &[&UniqueSequence],
@@ -607,17 +480,4 @@ fn build_asvs(seqs: &[&UniqueSequence], partition: &[usize], centers: &[usize]) 
 
     asvs.sort_by(|a, b| b.abundance.cmp(&a.abundance));
     asvs
-}
-
-const fn bgl_entry(binding: u32, ty: wgpu::BufferBindingType) -> wgpu::BindGroupLayoutEntry {
-    wgpu::BindGroupLayoutEntry {
-        binding,
-        visibility: wgpu::ShaderStages::COMPUTE,
-        ty: wgpu::BindingType::Buffer {
-            ty,
-            has_dynamic_offset: false,
-            min_binding_size: None,
-        },
-        count: None,
-    }
 }

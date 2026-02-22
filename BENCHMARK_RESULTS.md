@@ -1,6 +1,6 @@
 # wetSpring Benchmark Results
 
-**Date:** February 21, 2026
+**Date:** February 22, 2026
 **Status:** Three-tier validation complete (Python → Rust CPU → GPU)
 
 ---
@@ -226,8 +226,9 @@ Run with `cargo run --release --bin benchmark_23_domain_timing` and
 | Python baselines | 40 scripts | PASS |
 | BarraCUDA CPU parity | 157/157 (25 domains) | PASS |
 | ToadStool bio primitives | 15 consumed (4 bio absorbed) | PASS |
-| Local WGSL shaders | 9 (HMM, ODE, DADA2, quality, ANI, SNP, pangenome, dN/dS, RF) | PASS |
-| **Grand total** | **1,742 validation + 650 tests** | **ALL PASS** |
+| ToadStool bio primitives (absorbed Feb 22) | 8 (HMM, DADA2, quality, ANI, SNP, pangenome, dN/dS, RF) | PASS |
+| Local WGSL shader | 1 (ODE sweep) | PASS |
+| **Grand total** | **1,742 validation + 707 tests** | **ALL PASS** |
 
 ---
 
@@ -237,7 +238,7 @@ Run with `cargo run --release --bin benchmark_23_domain_timing` and
 cd barracuda
 
 # Tier 2: Rust CPU (1,291 checks)
-cargo test                         # 650 tests (587 lib + 50 integration + 13 doc)
+cargo test                         # 707 tests (633 lib + 60 integration + 14 doc)
 cargo run --release --bin validate_qs_ode  # ... repeat for all 50 CPU binaries
 
 # Tier 3: GPU (451 checks)

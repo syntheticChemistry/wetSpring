@@ -146,7 +146,7 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
         let t_gpu = Instant::now();
-        let gpu_ani = AniGpu::new(&device);
+        let gpu_ani = AniGpu::new(&device).expect("ANI GPU shader");
         let gpu_r = gpu_ani.batch_ani(&pairs).unwrap();
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
@@ -179,7 +179,7 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
         let t_gpu = Instant::now();
-        let gpu_snp = SnpGpu::new(&device);
+        let gpu_snp = SnpGpu::new(&device).expect("SNP GPU shader");
         let gpu_r = gpu_snp.call_snps(&seqs).unwrap();
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
@@ -229,7 +229,7 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
         let t_gpu = Instant::now();
-        let gpu_mod = DnDsGpu::new(&device);
+        let gpu_mod = DnDsGpu::new(&device).expect("dN/dS GPU shader");
         let gpu_r = gpu_mod.batch_dnds(&pairs).unwrap();
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
@@ -295,7 +295,7 @@ async fn main() {
             .collect();
 
         let t_gpu = Instant::now();
-        let gpu_pan = PangenomeGpu::new(&device);
+        let gpu_pan = PangenomeGpu::new(&device).expect("Pangenome GPU shader");
         let gpu_r = gpu_pan.classify(&flat, 6, n_genomes).unwrap();
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
@@ -419,7 +419,7 @@ async fn main() {
             .collect();
 
         let t_gpu = Instant::now();
-        let hmm_gpu = HmmGpuForward::new(&device);
+        let hmm_gpu = HmmGpuForward::new(&device).expect("HMM GPU shader");
         let gpu_r = hmm_gpu
             .forward_batch(&model, &flat_obs, 3, n_steps)
             .unwrap();

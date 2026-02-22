@@ -171,8 +171,8 @@ async fn main() {
         timings.push(("G05: Variance", "FMR (absorbed)", 0.0, gpu_us));
     }
 
-    // ═══ G06: ANI — Local WGSL ═══════════════════════════════════
-    v.section("G06: ANI (Local WGSL)");
+    // ═══ G06: ANI — ToadStool bio ═══════════════════════════════════
+    v.section("G06: ANI (ToadStool bio)");
     {
         let pairs: Vec<(&[u8], &[u8])> = vec![
             (b"ATGATGATG", b"ATGATGATG"),
@@ -183,7 +183,7 @@ async fn main() {
         let cpu_r: Vec<_> = pairs.iter().map(|(a, b)| ani::pairwise_ani(a, b)).collect();
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
         let t_gpu = Instant::now();
-        let gpu_ani = AniGpu::new(&device);
+        let gpu_ani = AniGpu::new(&device).expect("ANI GPU shader");
         let gpu_r = gpu_ani.batch_ani(&pairs).unwrap();
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
         for (i, (c, g)) in cpu_r.iter().zip(gpu_r.ani_values.iter()).enumerate() {
@@ -194,11 +194,11 @@ async fn main() {
                 tolerances::GPU_VS_CPU_F64,
             );
         }
-        timings.push(("G06: ANI", "Local WGSL (handoff)", cpu_us, gpu_us));
+        timings.push(("G06: ANI", "ToadStool (absorbed)", cpu_us, gpu_us));
     }
 
-    // ═══ G07: SNP Calling — Local WGSL ═══════════════════════════
-    v.section("G07: SNP Calling (Local WGSL)");
+    // ═══ G07: SNP Calling — ToadStool bio ═══════════════════════════
+    v.section("G07: SNP Calling (ToadStool bio)");
     {
         let seqs: Vec<&[u8]> = vec![
             b"ATGATGATGATG",
@@ -210,7 +210,7 @@ async fn main() {
         let cpu_snp = snp::call_snps(&seqs);
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
         let t_gpu = Instant::now();
-        let gpu_snp = SnpGpu::new(&device);
+        let gpu_snp = SnpGpu::new(&device).expect("SNP GPU shader");
         let gpu_r = gpu_snp.call_snps(&seqs).unwrap();
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
         let gpu_count = gpu_r.is_variant.iter().filter(|&&x| x != 0).count();
@@ -220,11 +220,11 @@ async fn main() {
             cpu_snp.variants.len() as f64,
             0.0,
         );
-        timings.push(("G07: SNP calling", "Local WGSL (handoff)", cpu_us, gpu_us));
+        timings.push(("G07: SNP calling", "ToadStool (absorbed)", cpu_us, gpu_us));
     }
 
-    // ═══ G08: dN/dS — Local WGSL ════════════════════════════════
-    v.section("G08: dN/dS (Local WGSL)");
+    // ═══ G08: dN/dS — ToadStool bio ════════════════════════════════
+    v.section("G08: dN/dS (ToadStool bio)");
     {
         let pairs: Vec<(&[u8], &[u8])> = vec![
             (b"ATGATGATG", b"ATGATGATG"),
@@ -238,7 +238,7 @@ async fn main() {
             .collect();
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
         let t_gpu = Instant::now();
-        let gpu_mod = DnDsGpu::new(&device);
+        let gpu_mod = DnDsGpu::new(&device).expect("dN/dS GPU shader");
         let gpu_r = gpu_mod.batch_dnds(&pairs).unwrap();
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
         for (i, cpu_r) in cpu_dnds.iter().enumerate() {
@@ -257,11 +257,11 @@ async fn main() {
                 );
             }
         }
-        timings.push(("G08: dN/dS", "Local WGSL (handoff)", cpu_us, gpu_us));
+        timings.push(("G08: dN/dS", "ToadStool (absorbed)", cpu_us, gpu_us));
     }
 
-    // ═══ G09: Pangenome — Local WGSL ═════════════════════════════
-    v.section("G09: Pangenome (Local WGSL)");
+    // ═══ G09: Pangenome — ToadStool bio ═════════════════════════════
+    v.section("G09: Pangenome (ToadStool bio)");
     {
         let clusters = vec![
             pangenome::GeneCluster {
@@ -293,7 +293,7 @@ async fn main() {
             .flat_map(|c| c.presence.iter().map(|&p| u8::from(p)))
             .collect();
         let t_gpu = Instant::now();
-        let gpu_pan = PangenomeGpu::new(&device);
+        let gpu_pan = PangenomeGpu::new(&device).expect("Pangenome GPU shader");
         let gpu_r = gpu_pan.classify(&flat, 5, 4).unwrap();
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
         let gpu_core = gpu_r.classifications.iter().filter(|&&c| c == 3).count();
@@ -303,11 +303,11 @@ async fn main() {
             cpu_pan.core_size as f64,
             0.0,
         );
-        timings.push(("G09: Pangenome", "Local WGSL (handoff)", cpu_us, gpu_us));
+        timings.push(("G09: Pangenome", "ToadStool (absorbed)", cpu_us, gpu_us));
     }
 
-    // ═══ G10: Random Forest — Local WGSL ═════════════════════════
-    v.section("G10: Random Forest (Local WGSL)");
+    // ═══ G10: Random Forest — ToadStool bio ═════════════════════════
+    v.section("G10: Random Forest (ToadStool bio)");
     {
         let t1 = DecisionTree::from_arrays(
             &[0, -2, 1, -2, -2],
@@ -353,11 +353,11 @@ async fn main() {
                 0.0,
             );
         }
-        timings.push(("G10: Random Forest", "Local WGSL (handoff)", cpu_us, gpu_us));
+        timings.push(("G10: Random Forest", "ToadStool (absorbed)", cpu_us, gpu_us));
     }
 
-    // ═══ G11: HMM Forward — Local WGSL ═══════════════════════════
-    v.section("G11: HMM Forward (Local WGSL)");
+    // ═══ G11: HMM Forward — ToadStool bio ═══════════════════════════
+    v.section("G11: HMM Forward (ToadStool bio)");
     {
         let model = hmm::HmmModel {
             n_states: 2,
@@ -374,7 +374,7 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
         let flat_obs: Vec<u32> = obs1.iter().chain(obs2.iter()).map(|&x| x as u32).collect();
         let t_gpu = Instant::now();
-        let hmm_gpu = HmmGpuForward::new(&device);
+        let hmm_gpu = HmmGpuForward::new(&device).expect("HMM GPU shader");
         let gpu_r = hmm_gpu.forward_batch(&model, &flat_obs, 2, 4).unwrap();
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
         v.check(
@@ -389,7 +389,7 @@ async fn main() {
             cpu_ll2,
             tolerances::GPU_VS_CPU_F64,
         );
-        timings.push(("G11: HMM forward", "Local WGSL (handoff)", cpu_us, gpu_us));
+        timings.push(("G11: HMM forward", "ToadStool (absorbed)", cpu_us, gpu_us));
     }
 
     // ═══ Summary: Math Portability Proof ══════════════════════════

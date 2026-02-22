@@ -361,7 +361,7 @@ mod tests {
     #[test]
     fn batch_snps_single_alignment_matches_direct() {
         let aln = vec![b"ATGATG".to_vec(), b"CTGATG".to_vec(), b"ATGTTG".to_vec()];
-        let batch = call_snps_batch(&[aln.clone()]);
+        let batch = call_snps_batch(std::slice::from_ref(&aln));
         let refs: Vec<&[u8]> = aln.iter().map(Vec::as_slice).collect();
         let direct = call_snps_flat(&refs);
         assert_eq!(batch[0].positions, direct.positions);

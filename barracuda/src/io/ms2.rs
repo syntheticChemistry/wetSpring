@@ -60,12 +60,15 @@ pub struct Ms2Stats {
     pub mean_peaks_per_spectrum: f64,
 }
 
-/// Parse an MS2 file and return all spectra, **streaming from disk**.
+/// Parse an MS2 file and collect **all** spectra into memory.
+///
+/// For large files, prefer [`Ms2Iter`] which streams spectra without
+/// buffering the entire dataset.
 ///
 /// # Errors
 ///
-/// Returns [`Error::Io`] if the file cannot be opened or a line cannot
-/// be read.
+/// Returns [`Error::Io`] if the file cannot be opened, or
+/// [`Error::Ms2`] if a record is malformed.
 pub fn parse_ms2(path: &Path) -> Result<Vec<Ms2Spectrum>> {
     let file = File::open(path).map_err(|e| Error::Io {
         path: path.to_path_buf(),
@@ -90,14 +93,18 @@ pub fn parse_ms2(path: &Path) -> Result<Vec<Ms2Spectrum>> {
         match first_byte {
             b'H' => { /* header — skip */ }
             b'S' => {
-                // Save previous spectrum
                 if let Some(spec) = current.take() {
                     spectra.push(spec);
                 }
-                // Parse: S scan scan precursor_mz
                 let mut parts = line.split_whitespace();
-                let scan = parts.nth(1).and_then(|s| s.parse().ok()).unwrap_or(0);
-                let pmz = parts.nth(1).and_then(|s| s.parse().ok()).unwrap_or(0.0);
+                let scan: u32 = parts
+                    .nth(1)
+                    .and_then(|s| s.parse().ok())
+                    .ok_or_else(|| Error::Ms2(format!("S-line missing scan number: {line}")))?;
+                let pmz: f64 = parts
+                    .nth(1)
+                    .and_then(|s| s.parse().ok())
+                    .ok_or_else(|| Error::Ms2(format!("S-line missing precursor m/z: {line}")))?;
                 current = Some(Ms2Spectrum {
                     scan,
                     precursor_mz: pmz,
@@ -116,9 +123,21 @@ pub fn parse_ms2(path: &Path) -> Result<Vec<Ms2Spectrum>> {
                         (parts.next(), parts.next(), parts.next())
                     {
                         match key {
-                            "RTime" => spec.rt_minutes = val.parse().unwrap_or(0.0),
-                            "TIC" => spec.tic = val.parse().unwrap_or(0.0),
-                            "BPI" => spec.bpi = val.parse().unwrap_or(0.0),
+                            "RTime" => {
+                                spec.rt_minutes = val.parse().map_err(|_| {
+                                    Error::Ms2(format!("I-line invalid RTime: {val}"))
+                                })?;
+                            }
+                            "TIC" => {
+                                spec.tic = val.parse().map_err(|_| {
+                                    Error::Ms2(format!("I-line invalid TIC: {val}"))
+                                })?;
+                            }
+                            "BPI" => {
+                                spec.bpi = val.parse().map_err(|_| {
+                                    Error::Ms2(format!("I-line invalid BPI: {val}"))
+                                })?;
+                            }
                             _ => {}
                         }
                     }
@@ -127,7 +146,9 @@ pub fn parse_ms2(path: &Path) -> Result<Vec<Ms2Spectrum>> {
             b'Z' => {
                 if let Some(ref mut spec) = current {
                     if let Some(charge_str) = line.split_whitespace().nth(1) {
-                        spec.charge = charge_str.parse().unwrap_or(0);
+                        spec.charge = charge_str.parse().map_err(|_| {
+                            Error::Ms2(format!("Z-line invalid charge: {charge_str}"))
+                        })?;
                     }
                 }
             }
@@ -197,6 +218,31 @@ impl Ms2Iter {
             done: false,
         })
     }
+
+    fn parse_i_line(spec: &mut Ms2Spectrum, line: &str) -> std::result::Result<(), Error> {
+        let mut parts = line.split_whitespace();
+        if let (Some(_), Some(key), Some(val)) = (parts.next(), parts.next(), parts.next()) {
+            match key {
+                "RTime" => {
+                    spec.rt_minutes = val
+                        .parse()
+                        .map_err(|_| Error::Ms2(format!("I-line invalid RTime: {val}")))?;
+                }
+                "TIC" => {
+                    spec.tic = val
+                        .parse()
+                        .map_err(|_| Error::Ms2(format!("I-line invalid TIC: {val}")))?;
+                }
+                "BPI" => {
+                    spec.bpi = val
+                        .parse()
+                        .map_err(|_| Error::Ms2(format!("I-line invalid BPI: {val}")))?;
+                }
+                _ => {}
+            }
+        }
+        Ok(())
+    }
 }
 
 impl Iterator for Ms2Iter {
@@ -219,8 +265,22 @@ impl Iterator for Ms2Iter {
                         b'S' => {
                             let emit = self.pending.take();
                             let mut parts = line.split_whitespace();
-                            let scan = parts.nth(1).and_then(|s| s.parse().ok()).unwrap_or(0);
-                            let pmz = parts.nth(1).and_then(|s| s.parse().ok()).unwrap_or(0.0);
+                            let scan: u32 = match parts.nth(1).and_then(|s| s.parse().ok()) {
+                                Some(v) => v,
+                                None => {
+                                    return Some(Err(Error::Ms2(format!(
+                                        "S-line missing scan number: {line}"
+                                    ))));
+                                }
+                            };
+                            let pmz: f64 = match parts.nth(1).and_then(|s| s.parse().ok()) {
+                                Some(v) => v,
+                                None => {
+                                    return Some(Err(Error::Ms2(format!(
+                                        "S-line missing precursor m/z: {line}"
+                                    ))));
+                                }
+                            };
                             self.pending = Some(Ms2Spectrum {
                                 scan,
                                 precursor_mz: pmz,
@@ -237,25 +297,22 @@ impl Iterator for Ms2Iter {
                         }
                         b'I' => {
                             if let Some(ref mut spec) = self.pending {
-                                let mut parts = line.split_whitespace();
-                                if let (Some(_), Some(key), Some(val)) =
-                                    (parts.next(), parts.next(), parts.next())
-                                {
-                                    match key {
-                                        "RTime" => {
-                                            spec.rt_minutes = val.parse().unwrap_or(0.0);
-                                        }
-                                        "TIC" => spec.tic = val.parse().unwrap_or(0.0),
-                                        "BPI" => spec.bpi = val.parse().unwrap_or(0.0),
-                                        _ => {}
-                                    }
+                                if let Err(e) = Self::parse_i_line(spec, &line) {
+                                    return Some(Err(e));
                                 }
                             }
                         }
                         b'Z' => {
                             if let Some(ref mut spec) = self.pending {
-                                if let Some(charge_str) = line.split_whitespace().nth(1) {
-                                    spec.charge = charge_str.parse().unwrap_or(0);
+                                if let Some(cs) = line.split_whitespace().nth(1) {
+                                    match cs.parse() {
+                                        Ok(v) => spec.charge = v,
+                                        Err(_) => {
+                                            return Some(Err(Error::Ms2(format!(
+                                                "Z-line invalid charge: {cs}"
+                                            ))));
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -428,6 +485,7 @@ pub fn compute_stats(spectra: &[Ms2Spectrum]) -> Ms2Stats {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use std::io::Write;
@@ -662,22 +720,27 @@ mod tests {
     }
 
     #[test]
-    fn parse_ms2_s_line_missing_fields() {
-        // S-line with missing scan/pmz fields exercises unwrap_or fallbacks
+    fn parse_ms2_s_line_missing_scan_returns_error() {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("malformed_s.ms2");
         let mut f = File::create(&path).unwrap();
-        writeln!(f, "S").unwrap(); // no scan, no pmz -> scan=0, pmz=0
+        writeln!(f, "S").unwrap();
         writeln!(f, "50.0\t100.0").unwrap();
-        writeln!(f, "S\t1").unwrap(); // only scan, no pmz -> pmz=0
+
+        let result = parse_ms2(&path);
+        assert!(result.is_err(), "S-line without scan should error");
+    }
+
+    #[test]
+    fn parse_ms2_s_line_missing_pmz_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("malformed_pmz.ms2");
+        let mut f = File::create(&path).unwrap();
+        writeln!(f, "S\t1").unwrap();
         writeln!(f, "100.0\t200.0").unwrap();
 
-        let spectra = parse_ms2(&path).unwrap();
-        assert_eq!(spectra.len(), 2);
-        assert_eq!(spectra[0].scan, 0);
-        assert!((spectra[0].precursor_mz - 0.0).abs() < f64::EPSILON);
-        assert_eq!(spectra[1].scan, 1);
-        assert!((spectra[1].precursor_mz - 0.0).abs() < f64::EPSILON);
+        let result = parse_ms2(&path);
+        assert!(result.is_err(), "S-line without precursor m/z should error");
     }
 
     #[test]

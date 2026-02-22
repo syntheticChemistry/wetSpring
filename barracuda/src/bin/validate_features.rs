@@ -74,8 +74,7 @@ fn main() {
             .map(|e| e.path())
             .collect(),
         Err(e) => {
-            eprintln!("Cannot read data dir {}: {e}", data_dir.display());
-            std::process::exit(1);
+            validation::exit_skipped(&format!("Cannot read data dir {}: {e}", data_dir.display()));
         }
     };
     mzml_files.sort();

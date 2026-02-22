@@ -1,36 +1,20 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated pangenome gene classification.
+//! GPU-accelerated pangenome gene classification via `ToadStool`.
 //!
-//! One thread per gene cluster. Each thread reads its presence row
-//! and classifies: core (all genomes), accessory (2+ but not all),
-//! unique (exactly 1).
-//!
-//! Uses a local WGSL shader (`pangenome_classify.wgsl`) — a `ToadStool`
-//! absorption candidate following Write → Absorb → Lean.
+//! Delegates to `barracuda::ops::bio::pangenome::PangenomeClassifyGpu` —
+//! the absorbed shader from wetSpring handoff v6. wetSpring provides the
+//! high-level API that converts presence matrices to GPU buffers.
 //!
 //! # GPU Strategy
 //!
-//! Gene classification is row-independent → one thread per gene.
+//! Gene classification is row-independent — one thread per gene.
 //! The presence matrix is uploaded as flat `u32` (0/1). Pure integer
 //! arithmetic, no transcendentals.
 
 use barracuda::device::WgpuDevice;
-use barracuda::shaders::precision::ShaderTemplate;
-use bytemuck::{Pod, Zeroable};
+use barracuda::ops::bio::pangenome::PangenomeClassifyGpu as ToadStoolPangenome;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
-
-const PAN_WGSL: &str = include_str!("../shaders/pangenome_classify.wgsl");
-
-/// Workgroup size — must match `@workgroup_size(N)` in `shaders/pangenome_classify.wgsl`.
-const WORKGROUP_SIZE: u32 = 256;
-
-#[repr(C)]
-#[derive(Copy, Clone, Pod, Zeroable)]
-struct PanGpuParams {
-    n_genes: u32,
-    n_genomes: u32,
-}
 
 /// GPU pangenome classification result.
 pub struct PangenomeGpuResult {
@@ -63,32 +47,22 @@ impl PangenomeGpuResult {
 /// GPU-accelerated pangenome gene classification.
 pub struct PangenomeGpu {
     device: Arc<WgpuDevice>,
-    pipeline: wgpu::ComputePipeline,
-    bgl: wgpu::BindGroupLayout,
+    inner: ToadStoolPangenome,
 }
 
 impl PangenomeGpu {
     /// Create a new pangenome GPU instance.
-    #[must_use]
-    pub fn new(device: &Arc<WgpuDevice>) -> Self {
-        let patched = ShaderTemplate::for_driver_auto(PAN_WGSL, false);
-        let module = device.compile_shader(&patched, Some("PangenomeClassify"));
-        let pipeline = device
-            .device()
-            .create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
-                label: Some("PangenomeClassify"),
-                layout: None,
-                module: &module,
-                entry_point: "main",
-                cache: None,
-                compilation_options: wgpu::PipelineCompilationOptions::default(),
-            });
-        let bgl = pipeline.get_bind_group_layout(0);
-        Self {
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if `ToadStool` shader compilation fails.
+    pub fn new(device: &Arc<WgpuDevice>) -> crate::error::Result<Self> {
+        let inner = ToadStoolPangenome::new(Arc::clone(device))
+            .map_err(|e| crate::error::Error::Gpu(format!("PangenomeClassifyGpu: {e}")))?;
+        Ok(Self {
             device: Arc::clone(device),
-            pipeline,
-            bgl,
-        }
+            inner,
+        })
     }
 
     /// Classify genes from a flat presence matrix on the GPU.
@@ -113,20 +87,8 @@ impl PangenomeGpu {
         }
 
         let presence_u32: Vec<u32> = presence_flat.iter().map(|&b| u32::from(b)).collect();
+        let d = self.device.device();
 
-        let dev = &self.device;
-        let d = dev.device();
-
-        let params = PanGpuParams {
-            n_genes: n_genes as u32,
-            n_genomes: n_genomes as u32,
-        };
-
-        let params_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("Pan params"),
-            contents: bytemuck::bytes_of(&params),
-            usage: wgpu::BufferUsages::UNIFORM,
-        });
         let presence_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Pan presence"),
             contents: bytemuck::cast_slice(&presence_u32),
@@ -143,46 +105,24 @@ impl PangenomeGpu {
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
         });
 
-        let bg = d.create_bind_group(&wgpu::BindGroupDescriptor {
-            label: None,
-            layout: &self.bgl,
-            entries: &[
-                wgpu::BindGroupEntry {
-                    binding: 0,
-                    resource: params_buf.as_entire_binding(),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 1,
-                    resource: presence_buf.as_entire_binding(),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 2,
-                    resource: class_buf.as_entire_binding(),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 3,
-                    resource: count_buf.as_entire_binding(),
-                },
-            ],
-        });
+        self.inner
+            .dispatch(
+                n_genes as u32,
+                n_genomes as u32,
+                &presence_buf,
+                &class_buf,
+                &count_buf,
+            )
+            .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
 
-        let mut encoder = d.create_command_encoder(&wgpu::CommandEncoderDescriptor {
-            label: Some("Pangenome classify"),
-        });
-        {
-            let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor::default());
-            pass.set_pipeline(&self.pipeline);
-            pass.set_bind_group(0, &bg, &[]);
-            pass.dispatch_workgroups((n_genes as u32).div_ceil(WORKGROUP_SIZE), 1, 1);
-        }
-
-        dev.queue().submit(Some(encoder.finish()));
         d.poll(wgpu::Maintain::Wait);
 
-        let classifications = dev
+        let classifications = self
+            .device
             .read_buffer_u32(&class_buf, n_genes)
             .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
-        let genome_counts = dev
+        let genome_counts = self
+            .device
             .read_buffer_u32(&count_buf, n_genes)
             .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
 

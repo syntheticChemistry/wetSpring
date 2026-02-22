@@ -156,7 +156,7 @@ fn bench_ani(device: &Arc<WgpuDevice>) {
                 let _ = ani::pairwise_ani(a, b);
             }
         });
-        let gpu_ani = AniGpu::new(device);
+        let gpu_ani = AniGpu::new(device).expect("ANI GPU shader");
         let gpu = time_fn(|| {
             let _ = gpu_ani.batch_ani(&pairs);
         });
@@ -177,7 +177,7 @@ fn bench_snp(device: &Arc<WgpuDevice>) {
         let cpu = time_fn(|| {
             let _ = snp::call_snps(&refs);
         });
-        let gpu_snp = SnpGpu::new(device);
+        let gpu_snp = SnpGpu::new(device).expect("SNP GPU shader");
         let gpu = time_fn(|| {
             let _ = gpu_snp.call_snps(&refs);
         });
@@ -208,7 +208,7 @@ fn bench_dnds(device: &Arc<WgpuDevice>) {
                 let _ = dnds::pairwise_dnds(a, b);
             }
         });
-        let gpu_mod = DnDsGpu::new(device);
+        let gpu_mod = DnDsGpu::new(device).expect("dN/dS GPU shader");
         let gpu = time_fn(|| {
             let _ = gpu_mod.batch_dnds(&pairs);
         });
@@ -245,7 +245,7 @@ fn bench_pangenome(device: &Arc<WgpuDevice>) {
         let cpu = time_fn(|| {
             let _ = pangenome::analyze(&clusters, n_genomes);
         });
-        let gpu_pan = PangenomeGpu::new(device);
+        let gpu_pan = PangenomeGpu::new(device).expect("Pangenome GPU shader");
         let gpu = time_fn(|| {
             let _ = gpu_pan.classify(&flat, n_genes, n_genomes);
         });
@@ -345,7 +345,7 @@ fn bench_hmm(device: &Arc<WgpuDevice>) {
                 let _ = hmm::forward(&model, seq);
             }
         });
-        let hmm_gpu = HmmGpuForward::new(device);
+        let hmm_gpu = HmmGpuForward::new(device).expect("HMM GPU shader");
         let gpu = time_fn(|| {
             let _ = hmm_gpu.forward_batch(&model, &flat_obs, n_seqs, n_steps);
         });

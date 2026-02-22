@@ -38,8 +38,7 @@ fn main() {
             .map(|e| e.path())
             .collect(),
         Err(e) => {
-            println!("  FAILED: Cannot read data dir: {e}");
-            std::process::exit(1);
+            validation::exit_skipped(&format!("Cannot read data dir: {e}"));
         }
     };
     mzml_files.sort();

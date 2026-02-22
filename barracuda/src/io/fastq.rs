@@ -118,9 +118,12 @@ fn trimmed_len(buf: &str) -> usize {
 
 // ── Public API ───────────────────────────────────────────────────
 
-/// Parse a FASTQ file and collect all records.
+/// Parse a FASTQ file and collect **all** records into memory.
 ///
 /// Handles plain `.fastq` and gzip-compressed `.fastq.gz` files.
+///
+/// For large files, prefer [`FastqIter`] or [`for_each_record`] which
+/// stream records without buffering the entire file.
 ///
 /// # Errors
 ///

@@ -2,11 +2,15 @@
 //! GPU ODE parameter sweep for QS/c-di-GMP 5-variable system.
 //!
 //! Local workaround for `ToadStool`'s `BatchedOdeRK4F64` which ships a shader
-//! containing `enable f64;` that naga rejects. This wrapper uses a local copy
-//! of the shader (without `enable f64;`) compiled via `compile_shader_f64`.
+//! containing `enable f64;` that naga rejects (still present as of session 31h,
+//! `shaders/numerical/batched_qs_ode_rk4_f64.wgsl:35`). This wrapper uses a
+//! local copy of the shader (without `enable f64;`) compiled via
+//! `compile_shader_f64`.
 //!
-//! **Write → Absorb → Lean**: once `ToadStool` fixes the `enable f64;` issue
-//! in `batched_ode_rk4.rs`, this module can be removed and we lean on upstream.
+//! **Write → Absorb → Lean**: once `ToadStool` removes the `enable f64;`
+//! directive from its ODE shader, this module can be replaced with a thin
+//! wrapper around `barracuda::ops::BatchedOdeRK4F64`, matching the pattern
+//! used by the other 8 rewired GPU modules.
 
 use barracuda::device::WgpuDevice;
 use barracuda::shaders::precision::ShaderTemplate;

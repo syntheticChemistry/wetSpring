@@ -589,7 +589,7 @@ mod tests {
 
     #[test]
     fn parse_peak_rss_mb_empty() {
-        assert_eq!(parse_peak_rss_mb(""), 0.0);
+        assert!(parse_peak_rss_mb("").abs() < f64::EPSILON);
     }
 
     #[test]

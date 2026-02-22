@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated HMM batch forward algorithm.
+//! GPU-accelerated HMM batch forward algorithm via `ToadStool`.
 //!
-//! Runs the forward algorithm for N independent observation sequences
-//! through the same HMM model, with one thread per sequence.
-//!
-//! Uses a local WGSL shader (`hmm_forward_f64.wgsl`) with native f64
-//! — a `ToadStool` absorption candidate following Write → Absorb → Lean.
+//! Delegates to `barracuda::ops::bio::hmm::HmmBatchForwardF64` — the
+//! absorbed shader from wetSpring handoff v6. wetSpring provides the
+//! high-level API that marshals [`HmmModel`] to GPU buffers.
 //!
 //! # GPU Strategy
 //!
@@ -14,33 +12,16 @@
 //! forward for one sequence, yielding one log-likelihood per sequence.
 
 use barracuda::device::WgpuDevice;
-use barracuda::shaders::precision::ShaderTemplate;
-use bytemuck::{Pod, Zeroable};
+use barracuda::ops::bio::hmm::HmmBatchForwardF64;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
 use super::hmm::HmmModel;
 
-const HMM_WGSL: &str = include_str!("../shaders/hmm_forward_f64.wgsl");
-
-/// Workgroup size — must match `@workgroup_size(N)` in `shaders/hmm_forward_f64.wgsl`.
-const WORKGROUP_SIZE: u32 = 256;
-
-#[repr(C)]
-#[derive(Copy, Clone, Pod, Zeroable)]
-#[allow(clippy::struct_field_names)]
-struct HmmParams {
-    n_states: u32,
-    n_symbols: u32,
-    n_steps: u32,
-    n_seqs: u32,
-}
-
 /// GPU-accelerated HMM batch forward algorithm.
 pub struct HmmGpuForward {
     device: Arc<WgpuDevice>,
-    pipeline: wgpu::ComputePipeline,
-    bgl: wgpu::BindGroupLayout,
+    inner: HmmBatchForwardF64,
 }
 
 /// Result of GPU batch forward.
@@ -59,26 +40,17 @@ pub struct HmmGpuResult {
 
 impl HmmGpuForward {
     /// Create a new HMM GPU forward instance.
-    #[must_use]
-    pub fn new(device: &Arc<WgpuDevice>) -> Self {
-        let patched = ShaderTemplate::for_driver_auto(HMM_WGSL, true);
-        let module = device.compile_shader(&patched, Some("HmmForwardF64"));
-        let pipeline = device
-            .device()
-            .create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
-                label: Some("HmmForwardF64"),
-                layout: None,
-                module: &module,
-                entry_point: "main",
-                cache: None,
-                compilation_options: wgpu::PipelineCompilationOptions::default(),
-            });
-        let bgl = pipeline.get_bind_group_layout(0);
-        Self {
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if `ToadStool` shader compilation fails.
+    pub fn new(device: &Arc<WgpuDevice>) -> crate::error::Result<Self> {
+        let inner = HmmBatchForwardF64::new(Arc::clone(device))
+            .map_err(|e| crate::error::Error::Gpu(format!("HmmBatchForwardF64: {e}")))?;
+        Ok(Self {
             device: Arc::clone(device),
-            pipeline,
-            bgl,
-        }
+            inner,
+        })
     }
 
     /// Run batch forward on N observation sequences.
@@ -89,6 +61,7 @@ impl HmmGpuForward {
     /// # Errors
     ///
     /// Returns `Err` if GPU dispatch or buffer readback fails.
+    #[allow(clippy::cast_possible_truncation)]
     pub fn forward_batch(
         &self,
         model: &HmmModel,
@@ -96,26 +69,10 @@ impl HmmGpuForward {
         n_seqs: usize,
         n_steps: usize,
     ) -> crate::error::Result<HmmGpuResult> {
-        let dev = &self.device;
-        let d = dev.device();
+        let d = self.device.device();
         let s = model.n_states;
-
         let alpha_size = n_seqs * n_steps * s;
-        let alpha_init: Vec<f64> = vec![0.0; alpha_size];
-        let lik_init: Vec<f64> = vec![0.0; n_seqs];
 
-        let params = HmmParams {
-            n_states: s as u32,
-            n_symbols: model.n_symbols as u32,
-            n_steps: n_steps as u32,
-            n_seqs: n_seqs as u32,
-        };
-
-        let params_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("HMM params"),
-            contents: bytemuck::bytes_of(&params),
-            usage: wgpu::BufferUsages::UNIFORM,
-        });
         let trans_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("HMM log_trans"),
             contents: bytemuck::cast_slice(&model.log_trans),
@@ -138,68 +95,38 @@ impl HmmGpuForward {
         });
         let alpha_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("HMM log_alpha"),
-            contents: bytemuck::cast_slice(&alpha_init),
+            contents: bytemuck::cast_slice(&vec![0.0_f64; alpha_size]),
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
         });
         let lik_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("HMM log_lik"),
-            contents: bytemuck::cast_slice(&lik_init),
+            contents: bytemuck::cast_slice(&vec![0.0_f64; n_seqs]),
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
         });
 
-        let bg = d.create_bind_group(&wgpu::BindGroupDescriptor {
-            label: None,
-            layout: &self.bgl,
-            entries: &[
-                wgpu::BindGroupEntry {
-                    binding: 0,
-                    resource: params_buf.as_entire_binding(),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 1,
-                    resource: trans_buf.as_entire_binding(),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 2,
-                    resource: emit_buf.as_entire_binding(),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 3,
-                    resource: pi_buf.as_entire_binding(),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 4,
-                    resource: obs_buf.as_entire_binding(),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 5,
-                    resource: alpha_buf.as_entire_binding(),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 6,
-                    resource: lik_buf.as_entire_binding(),
-                },
-            ],
-        });
+        self.inner
+            .dispatch(
+                s as u32,
+                model.n_symbols as u32,
+                n_steps as u32,
+                n_seqs as u32,
+                &trans_buf,
+                &emit_buf,
+                &pi_buf,
+                &obs_buf,
+                &alpha_buf,
+                &lik_buf,
+            )
+            .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
 
-        let mut encoder = d.create_command_encoder(&wgpu::CommandEncoderDescriptor {
-            label: Some("HMM forward"),
-        });
-        {
-            let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor::default());
-            pass.set_pipeline(&self.pipeline);
-            pass.set_bind_group(0, &bg, &[]);
-            let n_workgroups = (n_seqs as u32).div_ceil(WORKGROUP_SIZE);
-            pass.dispatch_workgroups(n_workgroups, 1, 1);
-        }
-
-        dev.queue().submit(Some(encoder.finish()));
         d.poll(wgpu::Maintain::Wait);
 
-        let log_alpha = dev
+        let log_alpha = self
+            .device
             .read_buffer_f64(&alpha_buf, alpha_size)
             .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
-        let log_likelihoods = dev
+        let log_likelihoods = self
+            .device
             .read_buffer_f64(&lik_buf, n_seqs)
             .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
 

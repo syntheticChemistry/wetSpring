@@ -1,114 +1,49 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated quality filtering — real per-read parallel trimming.
+//! GPU-accelerated quality filtering via `ToadStool`.
 //!
-//! Custom WGSL shader processes all reads in parallel (one GPU thread per read).
-//! Replicates CPU logic exactly: leading trim → trailing trim → sliding window → min length.
+//! Delegates to `barracuda::ops::bio::quality_filter::QualityFilterGpu` —
+//! the absorbed shader from wetSpring handoff v6. wetSpring provides the
+//! high-level API that packs FASTQ quality bytes and applies trim results.
 //!
 //! # Architecture
 //!
 //! ```text
-//! QualityFilterCached::new(device, ctx)
-//!   ├── compile quality_filter.wgsl (one-time)
-//!   ├── create pipeline + bind group layout
-//!   └── warm driver with tiny dispatch
+//! QualityFilterCached::new(device)
+//!   └── QualityFilterGpu::new(device)  ← ToadStool pre-compiles shader
 //!
 //! filter_reads_gpu(gpu, reads, params)
 //!   ├── pack quality bytes (4 per u32) → GPU storage buffer
 //!   ├── upload offsets + lengths → GPU storage buffers
-//!   ├── dispatch: 1 thread per read, all reads in parallel
+//!   ├── dispatch: ToadStool handles pipeline + bind group + workgroups
 //!   ├── readback: packed (start, end) per read
 //!   └── CPU: apply trim results to create filtered FastqRecords
 //! ```
-//!
-//! # `ToadStool` absorption path
-//!
-//! - `ParallelFilter<T>` — per-element parallel scan + filter primitive
-//! - Pre-compiled pipeline cache (like `GemmCached`)
-//! - `BufferPool` integration for quality data buffers
 
 use crate::bio::quality::{self, FilterStats, QualityParams};
 use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
 use crate::io::fastq::FastqRecord;
-use barracuda::device::{TensorContext, WgpuDevice};
-use bytemuck::{Pod, Zeroable};
+use barracuda::device::WgpuDevice;
+use barracuda::ops::bio::quality_filter::{QualityConfig, QualityFilterGpu as ToadStoolQF};
 use std::sync::Arc;
+use wgpu::util::DeviceExt;
 
-const QF_WGSL: &str = include_str!("../shaders/quality_filter.wgsl");
-
-/// Workgroup size — must match `@workgroup_size(N)` in `shaders/quality_filter.wgsl`.
-const WORKGROUP_SIZE: u32 = 256;
-
-#[repr(C)]
-#[derive(Copy, Clone, Pod, Zeroable)]
-struct QfParams {
-    n_reads: u32,
-    leading_min_quality: u32,
-    trailing_min_quality: u32,
-    window_min_quality: u32,
-    window_size: u32,
-    min_length: u32,
-    phred_offset: u32,
-    _pad: u32,
-}
-
-/// Pre-compiled quality filter pipeline with `BufferPool` integration.
+/// Pre-compiled quality filter pipeline via `ToadStool`.
 pub struct QualityFilterCached {
     device: Arc<WgpuDevice>,
-    ctx: Arc<TensorContext>,
-    pipeline: wgpu::ComputePipeline,
-    bgl: wgpu::BindGroupLayout,
+    inner: ToadStoolQF,
 }
 
 impl QualityFilterCached {
     /// Create a new quality filter GPU instance.
-    #[must_use]
-    pub fn new(device: Arc<WgpuDevice>, ctx: Arc<TensorContext>) -> Self {
-        let shader = device
-            .device()
-            .create_shader_module(wgpu::ShaderModuleDescriptor {
-                label: Some("QualityFilter"),
-                source: wgpu::ShaderSource::Wgsl(QF_WGSL.into()),
-            });
-
-        let bgl = device
-            .device()
-            .create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-                label: Some("QF BGL"),
-                entries: &[
-                    bgl_entry(0, wgpu::BufferBindingType::Uniform),
-                    bgl_entry(1, wgpu::BufferBindingType::Storage { read_only: true }),
-                    bgl_entry(2, wgpu::BufferBindingType::Storage { read_only: true }),
-                    bgl_entry(3, wgpu::BufferBindingType::Storage { read_only: true }),
-                    bgl_entry(4, wgpu::BufferBindingType::Storage { read_only: false }),
-                ],
-            });
-
-        let pl = device
-            .device()
-            .create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-                label: Some("QF PL"),
-                bind_group_layouts: &[&bgl],
-                push_constant_ranges: &[],
-            });
-
-        let pipeline = device
-            .device()
-            .create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
-                label: Some("QualityFilter"),
-                layout: Some(&pl),
-                module: &shader,
-                entry_point: "quality_filter",
-                cache: None,
-                compilation_options: wgpu::PipelineCompilationOptions::default(),
-            });
-
-        Self {
-            device,
-            ctx,
-            pipeline,
-            bgl,
-        }
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if `ToadStool` shader compilation fails.
+    pub fn new(device: Arc<WgpuDevice>) -> Result<Self> {
+        let inner = ToadStoolQF::new(Arc::clone(&device))
+            .map_err(|e| Error::Gpu(format!("QualityFilterGpu: {e}")))?;
+        Ok(Self { device, inner })
     }
 
     /// Run quality filtering on GPU. Returns (start, end) per read, or None for failed reads.
@@ -127,86 +62,51 @@ impl QualityFilterCached {
             return Ok(vec![]);
         }
 
-        let pool = self.ctx.buffer_pool();
         let (packed_quals, offsets, lengths) = pack_quality_data(reads);
+        let d = self.device.device();
 
-        let gpu_params = QfParams {
-            n_reads: n as u32,
+        let config = QualityConfig {
             leading_min_quality: u32::from(params.leading_min_quality),
             trailing_min_quality: u32::from(params.trailing_min_quality),
             window_min_quality: u32::from(params.window_min_quality),
             window_size: params.window_size as u32,
             min_length: params.min_length as u32,
             phred_offset: u32::from(params.phred_offset),
-            _pad: 0,
         };
 
-        let params_buf = self.device.create_uniform_buffer("QF Params", &gpu_params);
+        let qual_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("QF qual_data"),
+            contents: bytemuck::cast_slice(&packed_quals),
+            usage: wgpu::BufferUsages::STORAGE,
+        });
+        let offsets_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("QF offsets"),
+            contents: bytemuck::cast_slice(&offsets),
+            usage: wgpu::BufferUsages::STORAGE,
+        });
+        let lengths_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("QF lengths"),
+            contents: bytemuck::cast_slice(&lengths),
+            usage: wgpu::BufferUsages::STORAGE,
+        });
+        let results_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("QF results"),
+            contents: bytemuck::cast_slice(&vec![0u32; n]),
+            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+        });
 
-        let qual_buf = pool.acquire_pooled(packed_quals.len() * 4);
-        self.device
-            .queue()
-            .write_buffer(&qual_buf, 0, bytemuck::cast_slice(&packed_quals));
+        self.inner
+            .dispatch(
+                n as u32,
+                &config,
+                &qual_buf,
+                &offsets_buf,
+                &lengths_buf,
+                &results_buf,
+            )
+            .map_err(|e| Error::Gpu(format!("QF dispatch: {e}")))?;
 
-        let offsets_buf = pool.acquire_pooled(offsets.len() * 4);
-        self.device
-            .queue()
-            .write_buffer(&offsets_buf, 0, bytemuck::cast_slice(&offsets));
-
-        let lengths_buf = pool.acquire_pooled(lengths.len() * 4);
-        self.device
-            .queue()
-            .write_buffer(&lengths_buf, 0, bytemuck::cast_slice(&lengths));
-
-        let results_buf = pool.acquire_pooled(n * 4);
-
-        let bg = self
-            .device
-            .device()
-            .create_bind_group(&wgpu::BindGroupDescriptor {
-                label: Some("QF BG"),
-                layout: &self.bgl,
-                entries: &[
-                    wgpu::BindGroupEntry {
-                        binding: 0,
-                        resource: params_buf.as_entire_binding(),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 1,
-                        resource: qual_buf.as_entire_binding(),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 2,
-                        resource: offsets_buf.as_entire_binding(),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 3,
-                        resource: lengths_buf.as_entire_binding(),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 4,
-                        resource: results_buf.as_entire_binding(),
-                    },
-                ],
-            });
-
-        let wg_x = (n as u32).div_ceil(WORKGROUP_SIZE);
-        let mut encoder =
-            self.device
-                .device()
-                .create_command_encoder(&wgpu::CommandEncoderDescriptor {
-                    label: Some("QF Encoder"),
-                });
-        {
-            let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
-                label: Some("QF Pass"),
-                timestamp_writes: None,
-            });
-            pass.set_pipeline(&self.pipeline);
-            pass.set_bind_group(0, &bg, &[]);
-            pass.dispatch_workgroups(wg_x, 1, 1);
-        }
-        self.device.queue().submit(Some(encoder.finish()));
+        d.poll(wgpu::Maintain::Wait);
 
         let raw_results = self
             .device
@@ -301,17 +201,4 @@ fn pack_quality_data(reads: &[FastqRecord]) -> (Vec<u32>, Vec<u32>, Vec<u32>) {
     }
 
     (packed, offsets, lengths)
-}
-
-const fn bgl_entry(binding: u32, ty: wgpu::BufferBindingType) -> wgpu::BindGroupLayoutEntry {
-    wgpu::BindGroupLayoutEntry {
-        binding,
-        visibility: wgpu::ShaderStages::COMPUTE,
-        ty: wgpu::BindingType::Buffer {
-            ty,
-            has_dynamic_offset: false,
-            min_binding_size: None,
-        },
-        count: None,
-    }
 }

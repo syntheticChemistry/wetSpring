@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-21 (Phase 18: Streaming Dispatch + Cross-Substrate Validation)
+**Updated**: 2026-02-22 (Phase 20: ToadStool Bio Rewire + Cross-Spring Evolution)
 
 ---
 
@@ -86,6 +86,7 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 071 | [BarraCUDA GPU Math Portability Proof](071_barracuda_gpu_portability_proof.md) | GPU | COMPLETE | GPU math portability | validate_barracuda_gpu_full | 24 |
 | 075 | [Pure GPU Analytics Pipeline](075_pure_gpu_analytics_pipeline.md) | GPU | DONE | Pure GPU pipeline | validate_pure_gpu_pipeline | 31 |
 | 076 | [Cross-Substrate Pipeline](076_metalforge_cross_substrate_pipeline.md) | cross/GPU | DONE | Cross-substrate pipeline | validate_cross_substrate_pipeline | 17 |
+| 077 | [ToadStool Bio Rewire](077_toadstool_bio_rewire.md) | GPU/cross | DONE | ToadStool bio primitive rewire | (all GPU binaries) | 451 (re-validated) |
 
 ---
 
@@ -204,9 +205,10 @@ thresholds from `src/tolerances.rs`.
 | `validate_cross_substrate_pipeline` | 076 | 17 | `cargo run --features gpu --release --bin validate_cross_substrate_pipeline` |
 
 **Total validation checks**: 1,742 (1,291 CPU + 451 GPU)
-**Rust tests**: 650 (587 lib + 50 integration + 13 doc)
+**Rust tests**: 707 (633 lib + 60 integration + 14 doc)
 **Binaries**: 50 CPU + 18 GPU validate + 5 benchmark = 73 total
-**Line coverage**: 97% bio+io, 56% overall (`cargo-llvm-cov`)
+**ToadStool primitives**: 23 consumed (8 bio absorbed Feb 22)
+**Local WGSL shaders**: 1 (ODE sweep — blocked on upstream `enable f64;`)
 **Benchmark infrastructure**: `bench.rs` harness with RAPL + nvidia-smi energy profiling, JSON output
 
 ---
