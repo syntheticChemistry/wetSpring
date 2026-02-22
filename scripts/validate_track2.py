@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Date: 2026-02-16
 """
 wetSpring Track 2 Validation — Deterministic Rerun of Exp005 + Exp006
 Reruns asari (LC-MS feature extraction) and FindPFAS (PFAS screening)

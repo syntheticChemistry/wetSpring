@@ -110,7 +110,7 @@ pub fn find_peaks(data: &[f64], params: &PeakParams) -> Vec<Peak> {
                 i += 1;
             }
             if i + 1 < data.len() && data[i + 1] < data[i] {
-                let mid = (start + i) / 2;
+                let mid = usize::midpoint(start, i);
                 if !candidates.contains(&mid) {
                     candidates.push(mid);
                 }

@@ -159,7 +159,7 @@ Only the ODE sweep shader remains local (blocked: upstream uses `compile_shader`
 ### Shared Math (`crate::special`) — Extracted
 
 Promoted from `bio::special` to top-level `crate::special` module.
-`bio::special` remains as a re-export for backward compatibility.
+The `bio::special` re-export shim has been removed (Phase 24).
 
 | Function | Consumers | Location |
 |----------|-----------|----------|

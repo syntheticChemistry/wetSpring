@@ -68,7 +68,7 @@ impl<R: BufRead> XmlReader<R> {
     }
 
     /// Enable or disable whitespace trimming of text events.
-    pub fn set_trim_text(&mut self, trim: bool) {
+    pub const fn set_trim_text(&mut self, trim: bool) {
         self.trim_text = trim;
     }
 

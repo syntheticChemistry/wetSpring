@@ -12,7 +12,7 @@
 //! | Exact command | `python3 scripts/smith_waterman_baseline.py` |
 
 use wetspring_barracuda::bio::alignment::{
-    pairwise_scores, smith_waterman, smith_waterman_score, AlignmentResult, ScoringParams,
+    AlignmentResult, ScoringParams, pairwise_scores, smith_waterman, smith_waterman_score,
 };
 use wetspring_barracuda::validation::Validator;
 

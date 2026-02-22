@@ -15,7 +15,7 @@
 //! Column resampling and per-replicate likelihood are embarrassingly
 //! parallel. Each replicate can be processed independently.
 
-use super::felsenstein::{log_likelihood, TreeNode};
+use super::felsenstein::{TreeNode, log_likelihood};
 use super::gillespie::Lcg64;
 
 /// A multiple sequence alignment stored column-major.

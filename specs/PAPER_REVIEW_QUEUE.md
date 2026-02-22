@@ -117,6 +117,38 @@ in a noisy medium (Track 1).
 
 ---
 
+## Open Data Provenance Audit
+
+All 29 reproductions use publicly accessible data or published model parameters.
+No proprietary data dependencies.
+
+| Category | Papers | Data Source | Access |
+|----------|:------:|------------|--------|
+| **ODE/Stochastic models** | 5-12 | Model parameters from published paper equations | Open (journal) |
+| **Real 16S amplicon** | Exp001,012,014,017 | NCBI SRA (PRJNA488170, PRJNA382322, PRJNA1114688, etc.) | Open (NCBI) |
+| **VOC biomarkers** | Exp013 | Table 1 from Reese 2019 (PMC6761164) | Open (PMC) |
+| **PFAS screening** | Exp005-006 | asari test data (MT02) | Open (asari package) |
+| **PFAS library** | Exp018 | Jones Lab (Zenodo 14341321) | Open (Zenodo) |
+| **PFAS monitoring** | Exp008 | Michigan EGLE (ArcGIS REST API) | Open (state gov) |
+| **PFAS ML** | Exp041 | EPA public PFAS data | Open (EPA) |
+| **Spectral library** | Exp042 | MassBank | Open (MassBank) |
+| **Phylogenetics** | 15-20 | Algorithms from published papers; PhyNetPy/SATé public datasets | Open (journal + repo) |
+| **Deep-sea genomics** | Exp051-056 | NCBI SRA (PRJNA283159, PRJEB5293), MBL darchive, MG-RAST, Figshare, OSF | Open (public repos) |
+| **Sandia proxy** | Exp039-040 | Synthetic proxy data (not original Sandia datasets) | Open (generated) |
+| **Cross-spring** | Paper 23 | Mathematical framework reference (no reproduction data) | Reference only |
+
+### Validation Tiers by Hardware
+
+| Tier | Description | Experiments | Checks |
+|------|-------------|:-----------:|:------:|
+| **BarraCUDA CPU** | Rust math matches Python baselines | Exp035,043,057,070,079,085 | 205/205 |
+| **BarraCUDA GPU** | GPU math matches CPU reference | Exp064,071,087,092 | 609 |
+| **metalForge** | Substrate-independent output (CPU/GPU/NPU) | Exp060,065,080,084,086,088,093 | 172+ |
+| **Streaming** | Pure GPU pipeline, zero CPU round-trips | Exp072,073,075,089,090,091 | 180+ |
+| **Cross-spring** | neuralSpring primitives validated | Exp094,095 | 46 |
+
+---
+
 ## Notes
 
 - wetSpring has the largest paper queue because it spans three scientific domains

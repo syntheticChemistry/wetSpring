@@ -27,7 +27,7 @@
 //! 5. **Tolerance matching**: Use `bio::tolerance_search` for RI matching
 
 use std::path::Path;
-use wetspring_barracuda::bio::signal::{find_peaks, PeakParams};
+use wetspring_barracuda::bio::signal::{PeakParams, find_peaks};
 use wetspring_barracuda::bio::tolerance_search;
 use wetspring_barracuda::validation::{self, Validator};
 

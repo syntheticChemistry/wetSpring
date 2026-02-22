@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Date: 2026-02-19
 """Python 16S control baseline for public BioProject data.
 
 Runs a pure-Python 16S pipeline (no QIIME2 dependency) on the same FASTQ

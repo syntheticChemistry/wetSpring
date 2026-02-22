@@ -228,7 +228,7 @@ impl Validator {
 }
 
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
+#[allow(clippy::expect_used, clippy::unwrap_used, unsafe_code)]
 mod tests {
     use super::*;
 
@@ -349,9 +349,11 @@ mod tests {
     fn data_dir_explicit_env_override() {
         let key = "WETSPRING_DATA_DIR_EXPLICIT_OVERRIDE_TEST";
         let expected = "/tmp/wetspring_explicit_override_test";
-        std::env::set_var(key, expected);
+        // SAFETY: test-only, cargo test runs each #[test] in its own thread but
+        // these env vars are unique per test so no concurrent mutation.
+        unsafe { std::env::set_var(key, expected) };
         let dir = data_dir(key, "data/default");
-        std::env::remove_var(key);
+        unsafe { std::env::remove_var(key) };
         assert_eq!(dir.to_string_lossy(), expected);
     }
 
@@ -363,14 +365,15 @@ mod tests {
         std::fs::create_dir_all(&full).unwrap();
 
         let old = std::env::var("WETSPRING_DATA_ROOT").ok();
-        std::env::set_var("WETSPRING_DATA_ROOT", tmp.path());
+        // SAFETY: test-only env var with unique key per test function.
+        unsafe { std::env::set_var("WETSPRING_DATA_ROOT", tmp.path()) };
 
         let dir = data_dir("WETSPRING_NONEXISTENT_FOR_ROOT_TEST", subpath);
 
         if let Some(v) = old {
-            std::env::set_var("WETSPRING_DATA_ROOT", v);
+            unsafe { std::env::set_var("WETSPRING_DATA_ROOT", v) };
         } else {
-            std::env::remove_var("WETSPRING_DATA_ROOT");
+            unsafe { std::env::remove_var("WETSPRING_DATA_ROOT") };
         }
 
         assert_eq!(dir, full, "WETSPRING_DATA_ROOT + subpath should be used");
@@ -380,13 +383,14 @@ mod tests {
     fn data_dir_cwd_fallback() {
         // Temporarily clear WETSPRING_DATA_ROOT so we hit cwd fallback.
         let old = std::env::var("WETSPRING_DATA_ROOT").ok();
-        std::env::remove_var("WETSPRING_DATA_ROOT");
+        // SAFETY: test-only env var cleanup, unique key per test.
+        unsafe { std::env::remove_var("WETSPRING_DATA_ROOT") };
 
         let subpath = "___wetspring_cwd_fallback_nonexistent_xyz/data";
         let dir = data_dir("WETSPRING_NONEXISTENT_CWD_TEST", subpath);
 
         if let Some(v) = old {
-            std::env::set_var("WETSPRING_DATA_ROOT", v);
+            unsafe { std::env::set_var("WETSPRING_DATA_ROOT", v) };
         }
 
         assert_eq!(dir.to_string_lossy(), subpath);

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Date: 2026-02-19
 """Quorum sensing / c-di-GMP ODE model — Python baseline.
 
 Implements a simplified ODE model for quorum sensing (QS) control of biofilm

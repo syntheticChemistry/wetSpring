@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Date: 2026-02-16
 """
 wetSpring Experiment 001 — Full Pipeline Validation
 Runs the complete 16S amplicon pipeline end-to-end and validates outputs.

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Date: 2026-02-19
 """Gillespie SSA baseline — Python/numpy reference.
 
 Implements a simple birth-death process for c-di-GMP signal modeling

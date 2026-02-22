@@ -98,7 +98,7 @@ impl KmerCounts {
         hist
     }
 
-    /// Reconstruct `KmerCounts` from a flat histogram produced by [`to_histogram`].
+    /// Reconstruct `KmerCounts` from a flat histogram produced by [`Self::to_histogram`].
     #[must_use]
     pub fn from_histogram(histogram: &[u32], k: usize) -> Self {
         let mut counts = HashMap::new();
@@ -128,7 +128,7 @@ impl KmerCounts {
         pairs
     }
 
-    /// Reconstruct `KmerCounts` from sorted pairs produced by [`to_sorted_pairs`].
+    /// Reconstruct `KmerCounts` from sorted pairs produced by [`Self::to_sorted_pairs`].
     #[must_use]
     pub fn from_sorted_pairs(pairs: &[(u64, u32)], k: usize) -> Self {
         let mut counts = HashMap::with_capacity(pairs.len());

@@ -106,11 +106,7 @@ fn correlation_cpu(x: &[f64], y: &[f64]) -> f64 {
         / n;
     let sx = variance_cpu(x).sqrt();
     let sy = variance_cpu(y).sqrt();
-    if sx * sy > 0.0 {
-        cov / (sx * sy)
-    } else {
-        0.0
-    }
+    if sx * sy > 0.0 { cov / (sx * sy) } else { 0.0 }
 }
 
 #[tokio::main]
@@ -268,8 +264,12 @@ async fn main() {
     // ═══════════════════════════════════════════════════════════════════
     v.section("Stage 4: Statistical Summary (GPU FMR)");
 
-    let pc1: Vec<f64> = (0..gpu_pcoa.n_samples).map(|i| gpu_pcoa.coord(i, 0)).collect();
-    let pc2: Vec<f64> = (0..gpu_pcoa.n_samples).map(|i| gpu_pcoa.coord(i, 1)).collect();
+    let pc1: Vec<f64> = (0..gpu_pcoa.n_samples)
+        .map(|i| gpu_pcoa.coord(i, 0))
+        .collect();
+    let pc2: Vec<f64> = (0..gpu_pcoa.n_samples)
+        .map(|i| gpu_pcoa.coord(i, 1))
+        .collect();
 
     let t4 = Instant::now();
     let gpu_var_pc1 = stats_gpu::variance_gpu(&gpu, &pc1).unwrap();

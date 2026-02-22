@@ -2,7 +2,7 @@
 
 **Date:** February 22, 2026
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 41 CPU + 25 GPU modules, 4 local WGSL shaders in Write phase, 28 ToadStool primitives consumed
+**Status:** 41 CPU + 25 GPU modules, 4 local WGSL shaders in Write phase, 28 ToadStool primitives consumed, 740 tests passing
 
 ### Feb 22 Rewire: 8 local WGSL shaders absorbed into ToadStool
 
@@ -14,16 +14,22 @@ ODE sweep (blocked on ToadStool `compile_shader` vs `compile_shader_f64`),
 kmer histogram, unifrac propagation, and taxonomy FC scoring. See
 `ABSORPTION_MANIFEST.md` for details.
 
-### Code Quality (Phase 15)
+### Code Quality (Phase 15+)
 
-All modules pass `clippy::pedantic` + `clippy::nursery` (0 warnings), `cargo fmt`
-(0 diffs), `cargo doc` (0 warnings). 97% line coverage for bio+io modules
-(56% overall including bench) via `cargo-llvm-cov`.
-All tolerances centralized in `tolerances.rs` (39 named constants).
-`#![forbid(unsafe_code)]` and `#![deny(clippy::expect_used, clippy::unwrap_used)]`
-enforced crate-wide. All 83 binaries carry `# Provenance` headers. Data paths
-use `validation::data_dir()` for capability-based discovery. `flate2` uses
-`rust_backend` — zero C dependencies (ecoBin compliant).
+All modules pass `clippy::pedantic` + `clippy::nursery` (0 warnings, `-D` enforced
+in CI), `cargo fmt` (0 diffs), `cargo doc` (0 warnings, `RUSTDOCFLAGS="-D warnings"`).
+97% line coverage for bio+io modules (56% overall including bench) via `cargo-llvm-cov`.
+All tolerances centralized in `tolerances.rs` (43 named constants — includes
+4 Jacobi eigendecomposition constants with Golub & Van Loan provenance).
+`#![deny(unsafe_code)]` and `#![deny(clippy::expect_used, clippy::unwrap_used)]`
+enforced crate-wide (`deny` instead of `forbid` to allow `unsafe` in test env var
+manipulation required by Rust 2024 edition). All 83 binaries carry `# Provenance`
+headers. Data paths use `validation::data_dir()` for capability-based discovery.
+`flate2` uses `rust_backend` — zero C dependencies (ecoBin compliant). All 40
+Python baselines carry SPDX-License-Identifier + Date headers. DADA2 algorithmic
+constants fully documented with provenance (Callahan et al. 2016, R package defaults).
+CI enforces fmt, clippy (pedantic+nursery), test, doc, and json feature check on
+every push/PR. **Rust edition 2024**, MSRV 1.85.
 
 See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 
@@ -75,16 +81,16 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 | `phred` | Quality scoring | C | — | Per-base lookup |
 | `placement` | Phylo placement | ✅ Absorbed | Compose `FelsensteinGpu` | Exp046 |
 | `qs_biofilm` | QS/c-di-GMP ODE | **A** | Local WGSL | `batched_qs_ode_rk4_f64.wgsl` (Exp049) |
-| `quality` | Read quality | ✅ Absorbed | `QualityFilterGpu` | Rewired Feb 22, 2026 |
+| `quality` | Read quality | ✅ Absorbed | `QualityFilterGpu` | Rewired Feb 22, 2026. Adapter logic extracted to `adapter.rs` |
 | `random_forest` | RF ensemble | ✅ Absorbed | `RfBatchInferenceGpu` | Rewired Feb 22, 2026 |
 | `reconciliation` | DTL reconciliation | C | — | Tree traversal |
 | `robinson_foulds` | Tree distance | C | — | Per-node comparison |
 | `signal` | Signal processing | C | — | FFT-based, small data |
 | `snp` | SNP calling | ✅ Absorbed | `SnpCallingF64` | Rewired Feb 22, 2026 |
 | `spectral_match` | Spectral cosine | ✅ Absorbed | `FMR` spectral cosine | Exp016 |
-| `taxonomy` | Naive Bayes classify | **A** / NPU | Local WGSL | `taxonomy_fc_f64.wgsl` + NPU int8 (Exp083) |
+| `taxonomy/` | Naive Bayes classify | **A** / NPU | Local WGSL | Refactored: `types`, `kmers`, `classifier` submodules. `taxonomy_fc_f64.wgsl` + NPU int8 (Exp083) |
 | `tolerance_search` | Tolerance search | ✅ Absorbed | `BatchTolSearchF64` | Exp016 |
-| `unifrac` | UniFrac distance | **A** | Local WGSL | `unifrac_propagate_f64.wgsl` + CSR flat tree (Exp082) |
+| `unifrac/` | UniFrac distance | **A** | Local WGSL | Refactored: `tree`, `flat_tree`, `distance` submodules. `unifrac_propagate_f64.wgsl` + CSR flat tree (Exp082) |
 
 ---
 
@@ -271,7 +277,7 @@ the rewire (SNP binding layout, AdapterInfo propagation).
 | Feb 20 | Exp063: GPU RF batch inference — 13/13 GPU checks (SoA WGSL shader) |
 | Feb 21 | Phase 15: Code quality hardening — pedantic clippy, tolerance centralization, provenance headers |
 | Feb 21 | 97% bio+io, bench/mod 97.5% coverage (56% overall), 650 tests (587 lib + 50 integration + 13 doc), 0 clippy warnings |
-| Feb 21 | All inline tolerance literals → named constants in `tolerances.rs` (now 39) |
+| Feb 21 | All inline tolerance literals → named constants in `tolerances.rs` (now 43, including 4 Jacobi constants) |
 | Feb 21 | All data paths → `validation::data_dir()` for capability-based discovery |
 | Feb 21 | Phase 17: metalForge absorption engineering — shaped all modules for ToadStool readiness |
 | Feb 21 | `bio::special` consolidated (erf, ln_gamma, regularized_gamma) for extraction to `barracuda::math` |
@@ -324,6 +330,24 @@ the rewire (SNP binding layout, AdapterInfo propagation).
 | Feb 22 | SNP GPU gracefully skips on upstream wgpu binding mismatch (ToadStool snp shader); wrapped with catch_unwind |
 | Feb 22 | 5 new bio module GPU wrappers: hamming_gpu, jaccard_gpu, spatial_payoff_gpu, batch_fitness_gpu, locus_variance_gpu |
 | Feb 22 | Absorbed count: 24 primitives (19 wetSpring + 5 neuralSpring) |
+| Feb 22 | **Phase 15+ structural audit**: `taxonomy.rs` → `taxonomy/` (types, kmers, classifier), `unifrac.rs` → `unifrac/` (tree, flat_tree, distance), adapter logic → `adapter.rs` |
+| Feb 22 | PCoA Jacobi constants centralized in `tolerances.rs` (4 new: convergence, element_skip, tau_overflow, sweep_multiplier — Golub & Van Loan provenance) |
+| Feb 22 | DADA2 constants documented with provenance (Callahan et al. 2016, R package defaults) |
+| Feb 22 | All 40 Python baselines now carry SPDX-License-Identifier: AGPL-3.0-or-later |
+| Feb 22 | Doc link fixes (`kmer.rs` `to_histogram`/`to_sorted_pairs` → `Self::*`), `cargo doc` clean |
+| Feb 22 | Revalidated: 664 lib tests (10 new from adapter module), clippy pedantic clean, fmt clean, doc clean |
+| Feb 22 | Taxonomy classifier: removed `#[allow(dead_code)]` — exposed `taxon_priors()` and `n_kmers_total()` as public accessors |
+| Feb 22 | CI hardened: `RUSTDOCFLAGS="-D warnings"`, clippy `-D pedantic -D nursery`, json feature build check |
+| Feb 22 | Cargo.lock updated to latest compatible transitive deps (syn, wasm-bindgen, bumpalo, js-sys) |
+| Feb 22 | Fixed 6 `clippy::nursery` lints: needless_collect → `.count()`/`.len()`, single-item `into_iter` → explicit `HashMap::insert` |
+| Feb 22 | Full audit: all files under 1000 lines, all clone() justified, all `#[allow(dead_code)]` in bins justified, 0 unnecessary deps |
+| Feb 22 | **Edition 2024 upgrade**: `edition = "2024"`, MSRV 1.85. Import reordering, `f64::midpoint()`, `usize::midpoint()`, `const fn` promotions |
+| Feb 22 | `#![forbid(unsafe_code)]` → `#![deny(unsafe_code)]` for edition 2024 `env::set_var`/`remove_var` safety (test-only `unsafe`) |
+| Feb 22 | Taxonomy classifier: `taxon_priors()` and `n_kmers_total()` accessors replace `#[allow(dead_code)]` |
+| Feb 22 | CI: `RUSTDOCFLAGS="-D warnings"`, clippy `-D pedantic -D nursery`, json feature build check |
+| Feb 22 | Lockfile updated (25 transitive deps), 6 clippy::nursery fixes, 3 midpoint + 2 const fn lint fixes |
+| Feb 22 | All 40 Python baselines: SPDX + Date provenance headers (34 newly stamped from git creation dates) |
+| Feb 22 | 4 fuzz targets verified (FASTQ, MS2, mzML, XML), error module reviewed (9-variant sovereign type), API surface audited |
 
 ---
 
@@ -338,7 +362,7 @@ the rewire (SNP binding layout, AdapterInfo propagation).
 | WGSL pattern | `pub const WGSL: &str` inline | `include_str!("../shaders/...")` |
 | metalForge | GPU + NPU hardware characterization | GPU + NPU + cross-substrate validation |
 | Handoffs | `../wateringHole/handoffs/` (16+ docs) | `archive/handoffs/` (consolidated) |
-| Tests | 454 | 675 |
+| Tests | 454 | 738 |
 | Validation | 418 checks | 2,229+ checks |
 | Experiments | 31 suites | 96 experiments |
 | Line coverage | — | 97% bio+io (55% overall) |

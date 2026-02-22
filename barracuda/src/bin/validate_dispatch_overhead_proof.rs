@@ -146,7 +146,9 @@ async fn main() {
 
         results.push((n, cpu_us, ind_us, stream_us));
 
-        println!("  N={n:<5}: CPU {cpu_us:>8.0} µs | Indiv {ind_us:>8.0} µs | Stream {stream_us:>8.0} µs");
+        println!(
+            "  N={n:<5}: CPU {cpu_us:>8.0} µs | Indiv {ind_us:>8.0} µs | Stream {stream_us:>8.0} µs"
+        );
     }
 
     // Overall: streaming should beat individual at least 3/4 of the time

@@ -171,8 +171,8 @@ pub fn pairwise_dnds(seq1: &[u8], seq2: &[u8]) -> Result<DnDsResult> {
 
         let (s1_syn, s1_non) = codon_sites(c1);
         let (s2_syn, s2_non) = codon_sites(c2);
-        total_syn_sites += (s1_syn + s2_syn) / 2.0;
-        total_nonsyn_sites += (s1_non + s2_non) / 2.0;
+        total_syn_sites += f64::midpoint(s1_syn, s2_syn);
+        total_nonsyn_sites += f64::midpoint(s1_non, s2_non);
 
         let diffs = count_codon_diffs(c1, c2);
         total_syn_diffs += diffs.0;

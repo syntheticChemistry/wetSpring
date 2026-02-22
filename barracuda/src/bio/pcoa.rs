@@ -23,6 +23,7 @@
 //! - Legendre, P. & Legendre, L. (2012). Numerical Ecology, 3rd ed. §9.2.
 
 use crate::error::{Error, Result};
+use crate::tolerances;
 
 /// `PCoA` ordination result.
 ///
@@ -186,41 +187,40 @@ fn condensed_index(i: usize, j: usize) -> usize {
 /// Jacobi eigendecomposition for a symmetric matrix.
 ///
 /// Returns (eigenvalues, eigenvectors) where eigenvectors is row-major N×N.
-/// Convergence: off-diagonal norm < 1e-24 absolute, max 100×N sweeps.
+/// All thresholds from [`tolerances`]: convergence, element skip, tau overflow,
+/// and sweep multiplier — see Golub & Van Loan (2013) §8.5.
 #[allow(clippy::many_single_char_names)] // standard notation: a=matrix, v=eigvecs, t/c/s=Givens
 fn jacobi_eigen(matrix: &[f64], n: usize) -> (Vec<f64>, Vec<f64>) {
     let mut a = matrix.to_vec();
     let mut v = vec![0.0; n * n];
 
-    // Initialize eigenvectors to identity
     for i in 0..n {
         v[i * n + i] = 1.0;
     }
 
-    let max_sweeps = 100 * n;
+    let max_sweeps = tolerances::JACOBI_SWEEP_MULTIPLIER * n;
     for _sweep in 0..max_sweeps {
-        // Check convergence: sum of squared off-diagonal elements
         let mut off_diag = 0.0;
         for i in 0..n {
             for j in (i + 1)..n {
                 off_diag += a[i * n + j] * a[i * n + j];
             }
         }
-        if off_diag < 1e-24 {
+        if off_diag < tolerances::JACOBI_CONVERGENCE {
             break;
         }
 
         for p in 0..n {
             for q in (p + 1)..n {
                 let apq = a[p * n + q];
-                if apq.abs() < 1e-15 {
+                if apq.abs() < tolerances::JACOBI_ELEMENT_SKIP {
                     continue;
                 }
 
                 let app = a[p * n + p];
                 let aqq = a[q * n + q];
                 let tau = (aqq - app) / (2.0 * apq);
-                let t = if tau.abs() > 1e15 {
+                let t = if tau.abs() > tolerances::JACOBI_TAU_OVERFLOW {
                     1.0 / (2.0 * tau)
                 } else {
                     let sign = if tau >= 0.0 { 1.0 } else { -1.0 };

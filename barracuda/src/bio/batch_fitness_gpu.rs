@@ -48,14 +48,10 @@ impl BatchFitnessGpuWrapper {
         genome_len: usize,
     ) -> crate::error::Result<Vec<f32>> {
         if population.len() != pop_size * genome_len {
-            return Err(crate::error::Error::Gpu(
-                "Population size mismatch".into(),
-            ));
+            return Err(crate::error::Error::Gpu("Population size mismatch".into()));
         }
         if weights.len() != genome_len {
-            return Err(crate::error::Error::Gpu(
-                "Weights length mismatch".into(),
-            ));
+            return Err(crate::error::Error::Gpu("Weights length mismatch".into()));
         }
 
         let d = self.device.device();
@@ -77,8 +73,13 @@ impl BatchFitnessGpuWrapper {
             mapped_at_creation: false,
         });
 
-        self.inner
-            .dispatch(&pop_buf, &w_buf, &fit_buf, pop_size as u32, genome_len as u32);
+        self.inner.dispatch(
+            &pop_buf,
+            &w_buf,
+            &fit_buf,
+            pop_size as u32,
+            genome_len as u32,
+        );
         d.poll(wgpu::Maintain::Wait);
 
         self.device

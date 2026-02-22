@@ -15,9 +15,9 @@
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::bio::bootstrap::{
-    bootstrap_likelihoods, bootstrap_support, resample_columns, Alignment,
+    Alignment, bootstrap_likelihoods, bootstrap_support, resample_columns,
 };
-use wetspring_barracuda::bio::felsenstein::{encode_dna, log_likelihood, TreeNode};
+use wetspring_barracuda::bio::felsenstein::{TreeNode, encode_dna, log_likelihood};
 use wetspring_barracuda::bio::gillespie::Lcg64;
 use wetspring_barracuda::validation::Validator;
 

@@ -420,7 +420,7 @@ mod tests {
         let shared = b"ACGTACGTACGTACG"; // 15bp overlap
         let fwd_seq: Vec<u8> = [b"AAAAAAAAAAAAAAAA" as &[u8], shared].concat(); // 16 + 15 = 31
         let rev_seq_rc: Vec<u8> = [shared as &[u8], b"TTTTTTTTTTTTTTTT"].concat(); // 15 + 16 = 31
-                                                                                   // Reverse of the reverse-complement = what the sequencer gives
+        // Reverse of the reverse-complement = what the sequencer gives
         let rev_seq = reverse_complement(&rev_seq_rc);
 
         let fwd = make_record("fwd", &fwd_seq, &phred(&vec![30; fwd_seq.len()]));

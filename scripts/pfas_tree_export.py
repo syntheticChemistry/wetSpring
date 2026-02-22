@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Date: 2026-02-19
 """Export a trained decision tree for Rust inference validation.
 
 Trains a single decision tree on the full PFAS dataset, exports the tree

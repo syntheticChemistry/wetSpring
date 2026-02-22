@@ -22,7 +22,7 @@
 //! | 3 | C | c-di-GMP concentration (µM) |
 //! | 4 | B | Biofilm state (VPS expression, 0–1) |
 
-use super::ode::{rk4_integrate, OdeResult};
+use super::ode::{OdeResult, rk4_integrate};
 
 /// Model parameters for the QS / c-di-GMP / biofilm system.
 ///

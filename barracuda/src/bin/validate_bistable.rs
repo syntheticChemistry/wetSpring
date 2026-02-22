@@ -20,7 +20,7 @@
 //! | Exact command | `python3 scripts/fernandez2020_bistable.py` |
 //! | Hardware | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04 |
 
-use wetspring_barracuda::bio::bistable::{bifurcation_scan, run_bistable, BistableParams};
+use wetspring_barracuda::bio::bistable::{BistableParams, bifurcation_scan, run_bistable};
 use wetspring_barracuda::bio::ode::steady_state_mean;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
@@ -156,11 +156,7 @@ fn check_non_negative(
     result: &wetspring_barracuda::bio::ode::OdeResult,
     prefix: &str,
 ) {
-    let min_val: f64 = result
-        .y
-        .iter()
-        .copied()
-        .fold(f64::INFINITY, f64::min);
+    let min_val: f64 = result.y.iter().copied().fold(f64::INFINITY, f64::min);
     v.check(
         &format!("{prefix}: all variables non-negative (min={min_val:.2e})"),
         min_val.max(0.0),

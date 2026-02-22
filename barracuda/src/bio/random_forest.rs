@@ -78,7 +78,7 @@ impl RandomForest {
         let (class, &max_votes) = votes
             .iter()
             .enumerate()
-            .max_by_key(|(_, &v)| v)
+            .max_by_key(|&(_, &v)| v)
             .unwrap_or((0, &0));
 
         #[allow(clippy::cast_precision_loss)] // vote counts are small

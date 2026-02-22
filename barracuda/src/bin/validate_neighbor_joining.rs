@@ -28,7 +28,7 @@ fn main() {
     let mut fail = 0_u32;
 
     macro_rules! check {
-        ($name:expr, $cond:expr) => {
+        ($name:expr_2021, $cond:expr_2021) => {
             if $cond {
                 println!("[PASS] {}", $name);
                 pass += 1;

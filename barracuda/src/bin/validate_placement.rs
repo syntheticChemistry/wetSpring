@@ -14,7 +14,7 @@
 //! | Data | reference tree, 12bp query sequences |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
-use wetspring_barracuda::bio::felsenstein::{encode_dna, TreeNode};
+use wetspring_barracuda::bio::felsenstein::{TreeNode, encode_dna};
 use wetspring_barracuda::bio::placement::{batch_placement, placement_scan};
 use wetspring_barracuda::validation::Validator;
 

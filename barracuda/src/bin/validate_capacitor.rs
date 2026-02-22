@@ -13,7 +13,7 @@
 //! | Hardware | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04 |
 
 use wetspring_barracuda::bio::capacitor::{
-    scenario_low_cdg, scenario_normal, scenario_stress, scenario_vpsr_knockout, CapacitorParams,
+    CapacitorParams, scenario_low_cdg, scenario_normal, scenario_stress, scenario_vpsr_knockout,
 };
 use wetspring_barracuda::bio::ode::steady_state_mean;
 use wetspring_barracuda::tolerances;
@@ -142,10 +142,7 @@ fn main() {
 }
 
 fn check_non_neg(v: &mut Validator, r: &wetspring_barracuda::bio::ode::OdeResult, pre: &str) {
-    let min: f64 =
-        r.y.iter()
-            .copied()
-            .fold(f64::INFINITY, f64::min);
+    let min: f64 = r.y.iter().copied().fold(f64::INFINITY, f64::min);
     v.check(
         &format!("{pre}: non-negative (min={min:.2e})"),
         min.max(0.0),

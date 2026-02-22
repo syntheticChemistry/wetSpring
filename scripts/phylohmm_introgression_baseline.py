@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Date: 2026-02-20
 """Exp037 baseline — HMM-based gene tree discordance detection.
 
 Uses PhyNetPy DEFJ gene trees to test HMM classification of loci as

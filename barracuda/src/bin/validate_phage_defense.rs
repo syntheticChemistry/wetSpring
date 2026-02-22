@@ -16,8 +16,8 @@
 
 use wetspring_barracuda::bio::ode::steady_state_mean;
 use wetspring_barracuda::bio::phage_defense::{
-    scenario_high_cost, scenario_no_phage, scenario_phage_attack, scenario_pure_defended,
-    scenario_pure_undefended, PhageDefenseParams,
+    PhageDefenseParams, scenario_high_cost, scenario_no_phage, scenario_phage_attack,
+    scenario_pure_defended, scenario_pure_undefended,
 };
 use wetspring_barracuda::validation::Validator;
 
@@ -87,11 +87,7 @@ fn main() {
         scenario_no_phage(&params, DT),
         scenario_phage_attack(&params, DT),
     ] {
-        let min: f64 = result
-            .y
-            .iter()
-            .copied()
-            .fold(f64::INFINITY, f64::min);
+        let min: f64 = result.y.iter().copied().fold(f64::INFINITY, f64::min);
         v.check("All vars ≥ 0", min.max(0.0), min.max(0.0), 0.0);
     }
 

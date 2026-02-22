@@ -155,7 +155,7 @@ SoA layout: separate node_features, node_thresholds (f64), node_children buffers
 
 ## BarraCUDA CPU Math Evolution
 
-wetSpring consolidated local math into `bio::special` (erf, ln_gamma,
+wetSpring consolidated local math into `crate::special` (erf, ln_gamma,
 `regularized_gamma_lower`) during Phase 15. These functions duplicate
 barracuda upstream primitives and are shaped for extraction:
 
@@ -168,7 +168,7 @@ barracuda upstream primitives and are shaped for extraction:
 
 ### Extraction Plan
 
-The `bio::special` module is designed for clean extraction:
+The `crate::special` module is designed for clean extraction:
 
 1. **No internal dependencies** — does not import any other `bio::*` module
 2. **Pure math** — no I/O, no allocation, no state
@@ -178,9 +178,9 @@ The `bio::special` module is designed for clean extraction:
 
 When barracuda adds `[features] math = []`, the migration is:
 ```
-bio::special::erf              → barracuda::special::erf
-bio::special::ln_gamma         → barracuda::special::ln_gamma
-bio::special::regularized_gamma_lower → barracuda::special::regularized_gamma_p
+crate::special::erf              → barracuda::special::erf
+crate::special::ln_gamma         → barracuda::special::ln_gamma
+crate::special::regularized_gamma_lower → barracuda::special::regularized_gamma_p
 bio::eic::integrate_peak       → barracuda::numerical::trapz
 ```
 
@@ -206,7 +206,7 @@ hotSpring's proven methodology:
 | Batch APIs | Single dispatch for N instances | `forward_batch()`, `score_batch()` |
 | Preallocated buffers | No alloc in hot path; reuse via `BufferPool` | `GemmCached` pipeline |
 | Deterministic math | Same input → same output (bit-exact f64) | All `bio::*` modules |
-| `mul_add` chains | FMA-friendly for both CPU SIMD and GPU | `bio::special::erf` polynomial |
+| `mul_add` chains | FMA-friendly for both CPU SIMD and GPU | `crate::special::erf` polynomial |
 | Named tolerances | Central constants, not magic numbers | 32 constants in `tolerances.rs` |
 | Provenance headers | Script, commit, command, hardware | All 73 validation binaries |
 
@@ -218,7 +218,7 @@ hotSpring's proven methodology:
 4. CPU reference validated against known values (Python baselines)
 5. Tolerances in `tolerances.rs`, not ad-hoc constants
 6. Handoff document with locations and validation results
-7. Zero unsafe code — `#![forbid(unsafe_code)]` enforced
+7. Zero production unsafe code — `#![deny(unsafe_code)]` enforced (test-only `allow` for edition 2024 `env::set_var`)
 
 ---
 

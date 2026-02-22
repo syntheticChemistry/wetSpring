@@ -252,11 +252,26 @@ async fn main() {
                 label: None,
                 layout: &bgl,
                 entries: &[
-                    wgpu::BindGroupEntry { binding: 0, resource: cfg_buf.as_entire_binding() },
-                    wgpu::BindGroupEntry { binding: 1, resource: lp_buf.as_entire_binding() },
-                    wgpu::BindGroupEntry { binding: 2, resource: prior_buf.as_entire_binding() },
-                    wgpu::BindGroupEntry { binding: 3, resource: feat_buf.as_entire_binding() },
-                    wgpu::BindGroupEntry { binding: 4, resource: score_buf.as_entire_binding() },
+                    wgpu::BindGroupEntry {
+                        binding: 0,
+                        resource: cfg_buf.as_entire_binding(),
+                    },
+                    wgpu::BindGroupEntry {
+                        binding: 1,
+                        resource: lp_buf.as_entire_binding(),
+                    },
+                    wgpu::BindGroupEntry {
+                        binding: 2,
+                        resource: prior_buf.as_entire_binding(),
+                    },
+                    wgpu::BindGroupEntry {
+                        binding: 3,
+                        resource: feat_buf.as_entire_binding(),
+                    },
+                    wgpu::BindGroupEntry {
+                        binding: 4,
+                        resource: score_buf.as_entire_binding(),
+                    },
                 ],
             });
 
@@ -274,9 +289,7 @@ async fn main() {
             device.queue().submit(std::iter::once(encoder.finish()));
             d.poll(wgpu::Maintain::Wait);
 
-            device
-                .read_buffer_f64(&score_buf, 6)
-                .expect("readback")
+            device.read_buffer_f64(&score_buf, 6).expect("readback")
         }));
         let us = t0.elapsed().as_micros();
 
@@ -290,7 +303,10 @@ async fn main() {
                 println!("  Compiled + dispatched in {us} µs");
             }
             Err(e) => {
-                v.check_pass(&format!("taxonomy_fc compile/dispatch FAILED: {e:?}"), false);
+                v.check_pass(
+                    &format!("taxonomy_fc compile/dispatch FAILED: {e:?}"),
+                    false,
+                );
             }
         }
     }
@@ -300,8 +316,7 @@ async fn main() {
     {
         let t0 = Instant::now();
         let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            let module =
-                device.compile_shader_f64(UNIFRAC_WGSL, Some("unifrac_propagate"));
+            let module = device.compile_shader_f64(UNIFRAC_WGSL, Some("unifrac_propagate"));
 
             let bgl = d.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
                 label: Some("unifrac BGL"),
@@ -356,8 +371,7 @@ async fn main() {
     {
         let t0 = Instant::now();
         let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            let _module =
-                device.compile_shader_f64(ODE_WGSL, Some("ode_rk4"));
+            let _module = device.compile_shader_f64(ODE_WGSL, Some("ode_rk4"));
             true
         }));
         let us = t0.elapsed().as_micros();

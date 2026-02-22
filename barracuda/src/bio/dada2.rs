@@ -39,12 +39,43 @@ use crate::bio::derep::UniqueSequence;
 use crate::special::regularized_gamma_lower;
 use std::fmt::Write;
 
+/// Number of canonical nucleotide bases (A, C, G, T).
 pub(crate) const NUM_BASES: usize = 4;
+
+/// Maximum Phred quality score tracked in the error matrix.
+///
+/// Illumina instruments report Q0–Q41; Q42 covers edge cases.
+/// Matches DADA2 R package `MAX_QUAL` (Callahan et al. 2016, §Methods).
 pub(crate) const MAX_QUAL: usize = 42;
+
+/// Abundance p-value threshold for partition splitting.
+///
+/// A sequence is split from its current partition when the Poisson
+/// probability of observing its abundance as errors from the center
+/// falls below this threshold. Default from DADA2 R package `OMEGA_A`
+/// (Callahan et al. 2016, §Methods; R source `dada.cpp:22`).
 const OMEGA_A: f64 = 1e-40;
+
+/// Maximum outer iterations of denoise → re-estimate error model.
+///
+/// DADA2 R package default `MAX_CONSIST = 10` (`dada.R:113`).
 const MAX_DADA_ITERS: usize = 10;
+
+/// Maximum iterations for error-rate self-consistency loop.
+///
+/// DADA2 R package `learnErrors()` default convergence rounds.
 pub(crate) const MAX_ERR_ITERS: usize = 6;
+
+/// Floor for per-substitution error rate.
+///
+/// Prevents log(0) in Poisson abundance calculations. DADA2 R package
+/// `MIN_ERR_RATE` (`dada.cpp:24`).
 pub(crate) const MIN_ERR: f64 = 1e-7;
+
+/// Ceiling for per-substitution error rate.
+///
+/// Caps unreliable estimates from low-coverage substitution classes.
+/// DADA2 R package `MAX_ERR_RATE` (`dada.cpp:25`).
 pub(crate) const MAX_ERR: f64 = 0.25;
 
 /// An Amplicon Sequence Variant — the output of denoising.
@@ -214,6 +245,12 @@ pub(crate) fn init_error_model() -> ErrorModel {
 }
 
 #[allow(clippy::match_same_arms)]
+/// Map nucleotide to error-matrix index: A=0, C=1, G=2, T=3.
+///
+/// Ambiguous/unknown bases (N, IUPAC degenerate) map to 0 (A).
+/// This matches the DADA2 R package behavior where non-ACGT bases
+/// are treated as A for error-rate indexing — rare in quality-filtered
+/// reads and has negligible effect on the error model.
 pub(crate) const fn base_to_idx(b: u8) -> usize {
     match b {
         b'A' | b'a' => 0,

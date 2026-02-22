@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Date: 2026-02-19
 """Robinson-Foulds distance baseline — Python/dendropy reference.
 
 Generates ground-truth RF distances for synthetic Newick tree pairs.

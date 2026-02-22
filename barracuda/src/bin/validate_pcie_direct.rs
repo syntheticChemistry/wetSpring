@@ -235,12 +235,9 @@ fn validate_gpu_chain(v: &mut Validator) {
 
     let mut abundance: unifrac::AbundanceTable = HashMap::new();
     for (i, label) in ["A", "B", "C", "D"].iter().enumerate() {
-        abundance.insert(
-            format!("sample_{label}"),
-            [((*label).to_string(), counts[i].total_valid_kmers as f64)]
-                .into_iter()
-                .collect(),
-        );
+        let mut sample = HashMap::new();
+        sample.insert((*label).to_string(), counts[i].total_valid_kmers as f64);
+        abundance.insert(format!("sample_{label}"), sample);
     }
 
     let (matrix, n_s, n_l) = unifrac::to_sample_matrix(&flat, &abundance);
@@ -403,10 +400,10 @@ fn validate_buffer_layout_contracts(v: &mut Validator) {
     v.check_pass("GPU buffer: sorted pairs ordered", {
         pairs.windows(2).all(|w| w[0].0 <= w[1].0)
     });
-    let flat_pairs: Vec<u64> = pairs.iter().flat_map(|&(k, c)| [k, u64::from(c)]).collect();
+    let flat_pairs_count = pairs.iter().flat_map(|&(k, c)| [k, u64::from(c)]).count();
     v.check(
         "GPU buffer: flat pairs = 2 × unique",
-        flat_pairs.len() as f64,
+        flat_pairs_count as f64,
         (2 * pairs.len()) as f64,
         0.0,
     );

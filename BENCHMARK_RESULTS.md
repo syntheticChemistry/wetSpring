@@ -241,15 +241,16 @@ GemmF64 at small sizes are transfer-dominated (see Exp066 for larger sizes).
 
 | Category | Checks | Status |
 |----------|--------|--------|
-| Rust CPU validation | 1,291 | PASS |
-| GPU validation | 451 | PASS |
-| Rust tests | 728 (654 lib + 60 integration + 14 doc) | PASS |
+| Rust CPU validation | 1,392 | PASS |
+| GPU validation | 609 | PASS |
+| Dispatch + layout + transfer | 172 | PASS |
+| Rust tests | 740 (666 lib + 60 integration + 14 doc) | PASS |
 | Python baselines | 40 scripts | PASS |
 | BarraCUDA CPU parity | 205/205 (25 domains + 6 ODE flat) | PASS |
-| ToadStool bio primitives | 23 consumed (12 bio absorbed) | PASS |
+| ToadStool bio primitives | 28 consumed (12 bio absorbed) | PASS |
 | ToadStool bio primitives (absorbed Feb 22) | 8 (HMM, DADA2, quality, ANI, SNP, pangenome, dN/dS, RF) | PASS |
 | Local WGSL shaders (Write phase) | 4 (ODE, kmer, unifrac, taxonomy) | ODE: PASS; others: pending validation |
-| **Grand total** | **2,219+ validation + 728 tests** | **ALL PASS** |
+| **Grand total** | **2,229+ validation + 740 tests** | **ALL PASS** |
 
 ---
 
@@ -258,11 +259,11 @@ GemmF64 at small sizes are transfer-dominated (see Exp066 for larger sizes).
 ```bash
 cd barracuda
 
-# Tier 2: Rust CPU (1,291 checks)
-cargo test                         # 728 tests (654 lib + 60 integration + 14 doc)
+# Tier 2: Rust CPU (1,392 checks)
+cargo test                         # 740 tests (666 lib + 60 integration + 14 doc)
 cargo run --release --bin validate_qs_ode  # ... repeat for all 50 CPU binaries
 
-# Tier 3: GPU (451 checks)
+# Tier 3: GPU (609 checks)
 cargo run --features gpu --bin validate_diversity_gpu          # 38
 cargo run --features gpu --bin validate_16s_pipeline_gpu       # 88
 cargo run --features gpu --bin validate_barracuda_gpu_v3       # 14

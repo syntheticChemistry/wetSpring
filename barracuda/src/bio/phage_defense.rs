@@ -21,7 +21,7 @@
 //! The defense (`DCD`) deaminates cytosine in phage DNA, reducing phage
 //! burst size. Defended bacteria pay a growth cost but survive infection.
 
-use super::ode::{rk4_integrate, OdeResult};
+use super::ode::{OdeResult, rk4_integrate};
 
 /// Parameters for the phage-bacteria defense model.
 #[derive(Debug, Clone)]

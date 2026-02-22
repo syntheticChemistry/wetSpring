@@ -37,7 +37,7 @@ use std::sync::Arc;
 use std::time::Instant;
 use wetspring_barracuda::bio::bootstrap::{self, Alignment};
 use wetspring_barracuda::bio::felsenstein::{
-    encode_dna, log_likelihood, transition_matrix, TreeNode, N_STATES,
+    N_STATES, TreeNode, encode_dna, log_likelihood, transition_matrix,
 };
 use wetspring_barracuda::bio::hmm::{self, HmmModel};
 use wetspring_barracuda::bio::hmm_gpu::HmmGpuForward;

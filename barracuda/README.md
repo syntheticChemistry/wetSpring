@@ -153,12 +153,12 @@ No local WGSL shader compilation except for 4 Write-phase shaders (ODE, kmer, un
 | `cargo fmt --check` | Clean |
 | `cargo clippy --pedantic --nursery` | 0 warnings |
 | `cargo doc --no-deps` | 0 warnings |
-| `#![forbid(unsafe_code)]` | Enforced crate-wide |
+| `#![deny(unsafe_code)]` | Enforced crate-wide (test-only `allow` for `env::set_var` in edition 2024) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | Enforced |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
-| Line coverage | 96.21% |
-| Tests | 730 (654 lib + 60 integration + 14 doc + 2 bench) |
-| Validation checks | 1,835 (1,349 CPU + 451 GPU + 35 dispatch) |
+| Line coverage | ~97% bio+io modules |
+| Tests | 740 (666 lib + 60 integration + 14 doc) |
+| Validation checks | 2,229+ (1,392 CPU + 609 GPU + 80 dispatch + layout/transfer) |
 
 ## Quick Start
 

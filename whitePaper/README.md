@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 22, 2026
-**Status:** Validation study complete — 2,229+/2,229+ checks, 728 tests, 96.21% line coverage, 97 experiments
+**Status:** Validation study complete — 2,229+/2,229+ checks, 740 tests, 97% bio+io line coverage, 97 experiments
 **License:** AGPL-3.0-or-later
 
 ---
@@ -279,7 +279,7 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCUDA/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34 WGSL shaders, 637 tests)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (4 local WGSL shaders, 728 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (4 local WGSL shaders, 740 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **archive/handoffs/** — Fossil record of ToadStool handoffs (v1–v7)
 
@@ -296,14 +296,14 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy --pedantic --nursery` | 0 warnings |
 | `cargo doc --no-deps` | 0 warnings |
-| Line coverage (`cargo-llvm-cov`) | **96.21% overall (22,036 lines)** |
-| `#![forbid(unsafe_code)]` | Enforced crate-wide |
+| Line coverage (`cargo-llvm-cov`) | **~97% bio+io modules** |
+| `#![deny(unsafe_code)]` | Enforced crate-wide (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, clippy::unwrap_used)]` | Enforced crate-wide |
-| Named tolerance constants | 39 (all scientifically justified) |
+| Named tolerance constants | 43 (all scientifically justified) |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` files |
-| Provenance headers | All 86 validation/benchmark binaries |
+| Provenance headers | All 87 validation/benchmark binaries |
 
 ## metalForge — Hardware Discovery
 

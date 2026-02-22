@@ -12,7 +12,7 @@
 //! | Date | 2026-02-21 |
 //! | Exact command | `python3 scripts/liu2014_hmm_baseline.py` |
 
-use wetspring_barracuda::bio::hmm::{forward, posterior, viterbi, HmmModel};
+use wetspring_barracuda::bio::hmm::{HmmModel, forward, posterior, viterbi};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 

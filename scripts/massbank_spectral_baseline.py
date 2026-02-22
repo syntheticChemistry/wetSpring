@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Date: 2026-02-20
 """Exp042 baseline — MassBank PFAS spectral matching validation.
 
 Validates spectral matching (cosine similarity) on synthetic PFAS-like

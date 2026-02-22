@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-22 (Phase 22: 96 experiments, Write → Absorb → Lean + Full Validation Proof)
+**Updated**: 2026-02-22 (Phase 24: 97 experiments, Edition 2024 + Structural Audit)
 
 ---
 
@@ -235,8 +235,8 @@ thresholds from `src/tolerances.rs`.
 | `validate_local_wgsl_compile` | 096 | 10 | `cargo run --features gpu --bin validate_local_wgsl_compile` |
 
 **Total validation checks**: 2,229+ (1,392 CPU + 609 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 39 cross-spring + 10 local WGSL)
-**Rust tests**: 675 (661 lib + 14 doc with `--features gpu`)
-**Binaries**: 78 validate + 8 benchmark = 86 total
+**Rust tests**: 740 (666 lib + 60 integration + 14 doc)
+**Binaries**: 78 validate + 9 benchmark = 87 total
 **ToadStool primitives**: 28 consumed (8 bio absorbed Feb 22 + 5 neuralSpring)
 **Local WGSL shaders**: 4 (ODE, kmer, unifrac, taxonomy)
 **Tier A (GPU/NPU-ready)**: 7 modules | **Tier B**: 1 remaining (cooperation)

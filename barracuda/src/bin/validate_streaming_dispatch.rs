@@ -216,7 +216,10 @@ fn validate_five_stage_chain(v: &mut Validator) {
     let uw_original = unifrac::unweighted_unifrac(&tree, &sa, &sb);
     let uw_flat = unifrac::unweighted_unifrac(&reconstructed, &sa, &sb);
 
-    v.check_pass("5-stage: 4 Shannon values", shannon_vals.len() == 4);
+    v.check_pass(
+        "5-stage: 4 Shannon values",
+        shannon_vals.len() == 4 && shannon_vals.iter().all(|s| s.is_finite()),
+    );
     v.check(
         "5-stage: BC condensed count",
         bc_condensed.len() as f64,

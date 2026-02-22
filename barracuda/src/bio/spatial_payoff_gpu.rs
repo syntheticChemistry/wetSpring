@@ -87,10 +87,7 @@ impl SpatialPayoffGpuWrapper {
             .read_buffer_f32(&fit_buf, n)
             .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
 
-        Ok(SpatialPayoffResult {
-            fitness,
-            grid_size,
-        })
+        Ok(SpatialPayoffResult { fitness, grid_size })
     }
 }
 

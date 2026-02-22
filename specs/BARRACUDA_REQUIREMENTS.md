@@ -7,7 +7,7 @@
 
 ## Current Kernel Usage (Validated)
 
-### Rust CPU Modules (41 modules, 730 tests, 96.21% coverage)
+### Rust CPU Modules (41 modules, 740 tests, ~97% bio+io coverage)
 
 | Module Domain | Modules | Status |
 |--------------|---------|--------|
@@ -21,7 +21,7 @@
 | Track 1c | ani, snp, dnds, molecular_clock, pangenome | Sovereign |
 | ML | decision_tree, random_forest, gbm | Sovereign |
 
-### GPU Primitives (23 ToadStool + 4 local WGSL shaders, 451 checks)
+### GPU Primitives (28 ToadStool + 4 local WGSL shaders, 609 checks)
 
 | ToadStool Primitive | wetSpring Use | Checks | Performance |
 |-------------------|---------------|--------|-------------|
@@ -38,23 +38,21 @@
 | `FelsensteinGpu` | Phylogenetic pruning likelihood | 15/15 | **Absorbed + composed** |
 | `GemmF64::WGSL` | Eliminates fragile include_str! path | — | **Absorbed Feb 20** |
 
-### Local WGSL Shaders (9 — absorption candidates)
+### Local WGSL Shaders (4 — Write phase, pending absorption)
 
-| Shader | Domain | GPU Checks |
-|--------|--------|:----------:|
-| `quality_filter.wgsl` | Read quality trimming | 88 (pipeline) |
-| `dada2_e_step.wgsl` | DADA2 error model | 88 (pipeline) |
-| `hmm_forward_f64.wgsl` | HMM batch forward | 13 |
-| `batched_qs_ode_rk4_f64.wgsl` | ODE parameter sweep | 7 |
-| `ani_batch_f64.wgsl` | ANI pairwise identity | 7 |
-| `snp_calling_f64.wgsl` | SNP calling | 5 |
-| `dnds_batch_f64.wgsl` | dN/dS (Nei-Gojobori) | 9 |
-| `pangenome_classify.wgsl` | Pangenome classification | 6 |
-| `rf_batch_inference.wgsl` | Random Forest batch | 13 |
+8 of 9 original local shaders absorbed by ToadStool (sessions 31d/31g, Feb 22).
+4 remain in Write phase:
+
+| Shader | Domain | GPU Checks | Blocker |
+|--------|--------|:----------:|---------|
+| `batched_qs_ode_rk4_f64.wgsl` | ODE parameter sweep | 7 | Upstream `compile_shader` needs `compile_shader_f64` |
+| `kmer_histogram_f64.wgsl` | K-mer counting | — | Pending absorption handoff |
+| `unifrac_propagate_f64.wgsl` | UniFrac distance | — | Pending absorption handoff |
+| `taxonomy_fc_f64.wgsl` | Taxonomy scoring (NPU) | — | Pending absorption handoff |
 
 ---
 
-## GPU Promotion Status (Feb 20, 2026)
+## GPU Promotion Status (Feb 22, 2026)
 
 ### Resolved (ToadStool absorbed)
 
@@ -99,7 +97,7 @@ Python baseline (35 scripts)  ────────→  Rust CPU parity (205/
 GPU diversity (38/38)         ────────→  GPU Parity v1 (Exp064)  ──────→  ✓ DONE (8 domains)
 GPU pipeline (88/88)          ────────→  GPU RF inference (13/13) ──────→  NPU for low-power inference
 CPU 22.5× faster than Python  ────────→  GPU math PROVEN portable ─────→  Scale via streaming
-8 bio shaders absorbed Feb 22  ────────→  23 ToadStool primitives ────→  Full Write→Absorb→Lean cycle
+8 bio shaders absorbed Feb 22  ────────→  28 ToadStool primitives ────→  Full Write→Absorb→Lean cycle
 25 CPU domains validated      ────────→  metalForge PROVEN (Exp065) ───→  CPU/GPU/NPU routing
 ```
 
@@ -111,5 +109,7 @@ CPU 22.5× faster than Python  ────────→  GPU math PROVEN port
 - Native `log(f64)` crashes NVIDIA NVVM compiler — all transcendentals must use portable implementations
 - **NVVM workaround**: force `ShaderTemplate::for_driver_auto(source, true)` for shaders using exp/log
 - Spectral cosine achieves 926× GPU speedup — the first "GPU wins decisively" benchmark from any spring
-- 41 CPU + 20 GPU Rust modules with 1 runtime dependency (flate2) — highest sovereignty ratio in the ecosystem
+- 41 CPU + 25 GPU Rust modules with 1 runtime dependency (flate2) — highest sovereignty ratio in the ecosystem
 - **8 shaders absorbed, 4 in Write phase (ODE, kmer, unifrac, taxonomy)** — see `barracuda/EVOLUTION_READINESS.md` for status
+- **Rust edition 2024**, MSRV 1.85 — `f64::midpoint()`, `usize::midpoint()`, `const fn` promotions
+- **`#![deny(unsafe_code)]`** — edition 2024 makes `std::env::set_var` unsafe; `#[allow]` confined to test env-var calls

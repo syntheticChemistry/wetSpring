@@ -43,7 +43,7 @@ use barracuda::{FelsensteinGpu, FelsensteinResult, PhyloTree};
 use std::sync::Arc;
 use wetspring_barracuda::bio::bootstrap::{self, Alignment};
 use wetspring_barracuda::bio::felsenstein::{
-    encode_dna, log_likelihood, transition_matrix, FlatTree, TreeNode, N_STATES,
+    FlatTree, N_STATES, TreeNode, encode_dna, log_likelihood, transition_matrix,
 };
 use wetspring_barracuda::bio::gillespie::Lcg64;
 use wetspring_barracuda::bio::placement;

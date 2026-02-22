@@ -92,8 +92,7 @@ const CASES: &[TestCase] = &[
     },
     TestCase {
         name: "deep_caterpillar_8leaf",
-        newick:
-            "((((((A:0.1,B:0.1):0.1,C:0.1):0.1,D:0.1):0.1,E:0.1):0.1,F:0.1):0.1,(G:0.1,H:0.1):0.1);",
+        newick: "((((((A:0.1,B:0.1):0.1,C:0.1):0.1,D:0.1):0.1,E:0.1):0.1,F:0.1):0.1,(G:0.1,H:0.1):0.1);",
         expected_leaves: 8,
         expected_branch_length: 1.4,
         expected_labels: &["A", "B", "C", "D", "E", "F", "G", "H"],

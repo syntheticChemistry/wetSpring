@@ -115,7 +115,7 @@ pub fn screen_pfas_fragments(
     let mzs: Vec<f64> = mz_array
         .iter()
         .zip(intensity_array.iter())
-        .filter(|(_, &i)| i >= threshold)
+        .filter(|&(_, &i)| i >= threshold)
         .map(|(&m, _)| m)
         .collect();
 

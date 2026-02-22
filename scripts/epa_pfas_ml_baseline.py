@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Date: 2026-02-20
 """Exp041 baseline — PFAS detection ML on Michigan surface water data.
 
 Trains a decision tree classifier to predict PFAS contamination class

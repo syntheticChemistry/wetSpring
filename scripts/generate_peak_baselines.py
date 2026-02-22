@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Date: 2026-02-18
 """Generate scipy.signal.find_peaks baselines for Exp010.
 
 Produces per-case .dat files and a summary JSON for provenance.

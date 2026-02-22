@@ -23,7 +23,7 @@
 //! The capacitor `VpsR` integrates c-di-GMP over time and distributes
 //! its output to three phenotypic channels depending on parameter context.
 
-use super::ode::{rk4_integrate, OdeResult};
+use super::ode::{OdeResult, rk4_integrate};
 
 /// Parameters for the phenotypic capacitor model.
 #[derive(Debug, Clone)]

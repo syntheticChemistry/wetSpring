@@ -19,11 +19,11 @@
 //! | Data | Synthetic test vectors (hardcoded) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
-use wetspring_barracuda::bio::alignment::{score_batch, smith_waterman_score, ScoringParams};
-use wetspring_barracuda::bio::felsenstein::{encode_dna, log_likelihood, FlatTree, TreeNode};
-use wetspring_barracuda::bio::hmm::{forward, forward_batch, viterbi, viterbi_batch, HmmModel};
+use wetspring_barracuda::bio::alignment::{ScoringParams, score_batch, smith_waterman_score};
+use wetspring_barracuda::bio::felsenstein::{FlatTree, TreeNode, encode_dna, log_likelihood};
+use wetspring_barracuda::bio::hmm::{HmmModel, forward, forward_batch, viterbi, viterbi_batch};
 use wetspring_barracuda::bio::neighbor_joining::{distance_matrix, neighbor_joining};
-use wetspring_barracuda::bio::reconciliation::{reconcile_dtl, DtlCosts, FlatRecTree};
+use wetspring_barracuda::bio::reconciliation::{DtlCosts, FlatRecTree, reconcile_dtl};
 use wetspring_barracuda::tolerances;
 
 const NO_CHILD: u32 = u32::MAX;

@@ -72,7 +72,7 @@ pub fn extract_eics(spectra: &[MzmlSpectrum], target_mzs: &[f64], ppm: f64) -> V
                     .mz_array
                     .iter()
                     .zip(spectrum.intensity_array.iter())
-                    .filter(|(&mz, _)| mz >= lo && mz <= hi)
+                    .filter(|&(&mz, _)| mz >= lo && mz <= hi)
                     .map(|(_, &int)| int)
                     .sum();
 

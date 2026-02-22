@@ -24,7 +24,7 @@
 //! Run: `cargo run --bin validate_peaks`
 
 use std::path::Path;
-use wetspring_barracuda::bio::signal::{find_peaks, PeakParams};
+use wetspring_barracuda::bio::signal::{PeakParams, find_peaks};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 

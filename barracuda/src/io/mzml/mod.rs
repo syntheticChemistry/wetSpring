@@ -807,8 +807,8 @@ mod tests {
 
     #[test]
     fn mzml_iter_zlib_compressed() {
-        use flate2::write::ZlibEncoder;
         use flate2::Compression;
+        use flate2::write::ZlibEncoder;
 
         let mz_vals = [100.0_f64, 200.0, 300.0];
         let int_vals = [500.0_f64, 1500.0, 1000.0];

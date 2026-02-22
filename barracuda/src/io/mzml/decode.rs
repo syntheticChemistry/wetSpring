@@ -189,7 +189,7 @@ impl BinaryArrayState {
     /// # Errors
     ///
     /// Returns [`Error::Base64`], [`Error::Zlib`], or [`Error::BinaryFormat`] on decode failure.
-    #[allow(dead_code)] // public API, prefer decode_into_with_buffer in streaming paths
+    #[allow(dead_code)]
     pub fn decode_into(&self, builder: &mut SpectrumBuilder) -> Result<()> {
         self.decode_into_with_buffer(builder, None)
     }
@@ -391,8 +391,8 @@ mod tests {
 
     #[test]
     fn decode_zlib_f64() {
-        use flate2::write::ZlibEncoder;
         use flate2::Compression;
+        use flate2::write::ZlibEncoder;
 
         let values = [42.0_f64, 99.0];
         let raw: Vec<u8> = values.iter().flat_map(|v| v.to_le_bytes()).collect();
@@ -447,8 +447,8 @@ mod tests {
 
     #[test]
     fn parse_mzml_zlib_f64_arrays() {
-        use flate2::write::ZlibEncoder;
         use flate2::Compression;
+        use flate2::write::ZlibEncoder;
 
         use super::super::parse_mzml;
 
@@ -495,8 +495,8 @@ mod tests {
 
     #[test]
     fn decode_buffer_reuse_zlib() {
-        use flate2::write::ZlibEncoder;
         use flate2::Compression;
+        use flate2::write::ZlibEncoder;
 
         let values1 = [42.0_f64, 99.0];
         let values2 = [1.5_f64, 2.5, 3.5];

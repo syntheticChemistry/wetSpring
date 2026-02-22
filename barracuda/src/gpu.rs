@@ -110,9 +110,7 @@ impl GpuF64 {
                         max_storage_buffer_binding_size: limits
                             .max_storage_buffer_binding_size
                             .min(MAX_STORAGE_BINDING_BYTES),
-                        max_buffer_size: limits
-                            .max_buffer_size
-                            .min(MAX_BUFFER_SIZE_BYTES),
+                        max_buffer_size: limits.max_buffer_size.min(MAX_BUFFER_SIZE_BYTES),
                         max_storage_buffers_per_shader_stage: limits
                             .max_storage_buffers_per_shader_stage
                             .min(MAX_STORAGE_BUFFERS_PER_STAGE),

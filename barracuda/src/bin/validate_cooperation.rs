@@ -14,8 +14,8 @@
 //! | Hardware | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04 |
 
 use wetspring_barracuda::bio::cooperation::{
-    cooperator_frequency, scenario_cheat_dominated, scenario_coop_dominated, scenario_equal_start,
-    scenario_pure_cheat, scenario_pure_coop, CooperationParams,
+    CooperationParams, cooperator_frequency, scenario_cheat_dominated, scenario_coop_dominated,
+    scenario_equal_start, scenario_pure_cheat, scenario_pure_coop,
 };
 use wetspring_barracuda::bio::ode::steady_state_mean;
 use wetspring_barracuda::tolerances;
@@ -169,11 +169,7 @@ fn check_non_negative(
     result: &wetspring_barracuda::bio::ode::OdeResult,
     prefix: &str,
 ) {
-    let min_val: f64 = result
-        .y
-        .iter()
-        .copied()
-        .fold(f64::INFINITY, f64::min);
+    let min_val: f64 = result.y.iter().copied().fold(f64::INFINITY, f64::min);
     v.check(
         &format!("{prefix}: all variables non-negative (min={min_val:.2e})"),
         min_val.max(0.0),

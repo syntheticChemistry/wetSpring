@@ -17,7 +17,7 @@
 //! - **CPU fallback**: Small datasets (< 256 scans) use CPU path directly.
 
 use crate::bio::eic::{self, Eic};
-use crate::bio::signal::{find_peaks, Peak, PeakParams};
+use crate::bio::signal::{Peak, PeakParams, find_peaks};
 use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
 use crate::io::mzml::MzmlSpectrum;

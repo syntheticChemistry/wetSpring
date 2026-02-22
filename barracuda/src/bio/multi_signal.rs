@@ -24,7 +24,7 @@
 //! | 5 | C | c-di-GMP (µM) |
 //! | 6 | B | Biofilm state (0–1) |
 
-use super::ode::{rk4_integrate, OdeResult};
+use super::ode::{OdeResult, rk4_integrate};
 
 /// Parameters for the dual-signal QS network.
 #[derive(Debug, Clone)]

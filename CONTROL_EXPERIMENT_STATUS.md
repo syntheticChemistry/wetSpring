@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 22, 2026
-**Status:** 97 experiments, 2,229+ validation checks, all PASS (728 Rust tests)
+**Status:** 97 experiments, 2,229+ validation checks, all PASS (740 Rust tests)
 
 ---
 
@@ -113,17 +113,21 @@
 
 | Category | Count |
 |----------|-------|
-| Experiments completed | 89 |
-| CPU validation checks | 1,349 |
-| GPU validation checks | 451 |
-| Dispatch validation checks | 35 |
-| **Total validation checks** | **1,835** |
-| Rust tests | 730 (654 lib + 60 integration + 14 doc + 2 bench) |
+| Experiments completed | 97 |
+| CPU validation checks | 1,392 |
+| GPU validation checks | 609 |
+| Dispatch validation checks | 80 |
+| Layout fidelity checks | 35 |
+| Transfer/streaming checks | 57 |
+| Cross-spring checks | 39 |
+| Local WGSL checks | 10 |
+| **Total validation checks** | **2,229+** |
+| Rust tests | 740 (666 lib + 60 integration + 14 doc) |
 | BarraCUDA CPU parity | 205/205 (25 domains + 6 ODE flat) |
-| BarraCUDA GPU parity | 8 domains consolidated (Exp064) |
-| metalForge cross-system | 8 domains CPU↔GPU proven (Exp065) |
+| BarraCUDA GPU parity | 16 domains (Exp064/087/092) |
+| metalForge cross-system | 16 domains CPU↔GPU proven (Exp093) |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
-| ToadStool primitives consumed | 23 (15 original + 8 bio) |
+| ToadStool primitives consumed | 28 (15 original + 8 bio + 5 neuralSpring) |
 
 ---
 
@@ -178,8 +182,9 @@
 ### Completed
 - Exp019 Phases 2-4 (Phylogenetic): All COMPLETE
 - Exp008 Full ML Pipeline: All COMPLETE
-- Tolerance centralization: **DONE** — 39 named constants in `tolerances.rs`
-- Code quality hardening: **DONE** — `forbid(unsafe_code)`, `deny(expect_used, unwrap_used)`, pedantic + nursery clippy
+- Tolerance centralization: **DONE** — 43 named constants in `tolerances.rs`
+- Code quality hardening: **DONE** — `deny(unsafe_code)`, `deny(expect_used, unwrap_used)`, pedantic + nursery clippy
+- Rust edition 2024: **DONE** — MSRV 1.85, `f64::midpoint()`, `usize::midpoint()`, `const fn` promotions
 - metalForge forge crate: **DONE** — `wetspring-forge` (24 tests, substrate discovery + dispatch)
 - GPU workgroup constants: **DONE** — all GPU modules use named `WORKGROUP_SIZE` matching ToadStool shaders
 - Hardware abstraction: **DONE** — `HardwareInventory::from_content()`, injectable `/proc` parsing
@@ -187,7 +192,7 @@
 - Determinism tests: **DONE** — 16 bitwise-exact tests across non-stochastic algorithms
 - Fuzz testing: **DONE** — 4 harnesses (FASTQ, mzML, MS2, XML) via cargo-fuzz
 - Doc strictness: **DONE** — `-D missing_docs -D rustdoc::broken_intra_doc_links` pass
-- Math extraction: **DONE** — `bio::special` → `crate::special` (top-level, re-export for compat)
+- Math extraction: **DONE** — `bio::special` → `crate::special` (top-level, re-export shim removed)
 - Absorption batch APIs: **DONE** — `snp::call_snps_batch`, `quality::filter_reads_flat`, `pangenome::analyze_batch`
 
 ---
@@ -228,20 +233,20 @@ matching. Exp008 adds sovereign ML for environmental monitoring.
 cargo fmt --check              → clean (0 diffs, both crates)
 cargo clippy --pedantic        → 0 warnings (pedantic + nursery, default + GPU features)
 cargo doc --features gpu       → clean (0 warnings, strict: -D missing_docs -D broken_intra_doc_links)
-cargo test --lib               → 633 passed, 0 failed, 1 ignored (hardware-dependent)
+cargo test --lib               → 666 passed, 0 failed, 1 ignored (hardware-dependent)
 cargo test --tests             → 60 integration (23 bio + 16 determinism + 21 I/O)
 cargo test --doc               → 14 passed, 0 failed
-#![forbid(unsafe_code)]        → enforced crate-wide
+#![deny(unsafe_code)]          → enforced crate-wide (edition 2024; #[allow] only in test env-var calls)
 #![deny(expect_used, unwrap_used)] → enforced crate-wide (test modules #[allow])
 partial_cmp().unwrap()         → 0 (all migrated to f64::total_cmp)
-inline tolerance literals      → 0 (39 named constants in tolerances.rs)
+inline tolerance literals      → 0 (43 named constants in tolerances.rs)
 GPU workgroup sizes            → named constants in all 9 *_gpu.rs (match WGSL shaders)
-shared math (bio::special)     → erf, ln_gamma, regularized_gamma (no duplication)
+shared math (crate::special)   → erf, ln_gamma, regularized_gamma (bio::special shim removed)
 hardware detection             → injectable (from_content / parse_*), no direct /proc in library
 SPDX headers                   → all .rs files
-max file size                  → all under 1000 LOC (fastq.rs: 907 largest)
+max file size                  → all under 1000 LOC (fastq.rs: 878 largest)
 external C dependencies        → 0 (flate2 uses rust_backend)
-provenance headers             → all 79 binaries (commit, command, hardware)
+provenance headers             → all 87 binaries (commit, command, hardware)
 Python baselines               → scripts/requirements.txt (pinned numpy, scipy, sklearn)
 barracuda_cpu                  → 205/205 checks PASS (25 domains + 6 ODE flat)
 barracuda_gpu                  → 451 GPU checks PASS
@@ -300,7 +305,7 @@ Following hotSpring's pattern for ToadStool integration:
 |-------|:-----:|--------|
 | **Lean** (consumed upstream) | 20 GPU modules, 23 primitives | Active — 15 original + 8 bio (HMM, ANI, SNP, dN/dS, Pangenome, QF, DADA2, RF) |
 | **Write** (local WGSL, pending absorption) | 4 shaders (ODE, kmer, unifrac, taxonomy) | ODE blocked: upstream `compile_shader` needs `compile_shader_f64`; others pending validation |
-| **CPU math** (`bio::special`) | 3 functions (erf, ln_gamma, regularized_gamma) | Consolidated; shaped for extraction to `barracuda::math` |
+| **CPU math** (`crate::special`) | 4 functions (erf, ln_gamma, regularized_gamma, normal_cdf) | Consolidated; `bio::special` shim removed (Phase 24); shaped for `barracuda::math` |
 | **CPU-only** (no GPU path) | 12 modules | Stable — chimera, derep, GBM, merge_pairs, etc. |
 | **Blocked** (needs upstream) | 3 modules | kmer hash, UniFrac tree traversal, taxonomy NPU |
 | **metalForge** (absorption eng.) | 32 tolerances, SoA patterns, `#[repr(C)]` | Shaping all modules for ToadStool absorption |
@@ -382,7 +387,7 @@ Bugs found and fixed: SNP binding layout (ToadStool), AdapterInfo propagation (w
 
 | Target | Change | Validation |
 |--------|--------|------------|
-| ODE trajectory | `Vec<Vec<f64>>` → flat `Vec<f64>` + `state_at()`/`states()` | 728 tests, all ODE scenarios pass |
+| ODE trajectory | `Vec<Vec<f64>>` → flat `Vec<f64>` + `state_at()`/`states()` | 740 tests, all ODE scenarios pass |
 | Gillespie trajectory | `Vec<Vec<i64>>` → flat `Vec<i64>` + `states_iter()` | SSA convergence pass |
 | DADA2 error model | 5 functions unified; GPU delegates | Denoising parity preserved |
 | UniFrac distance matrix | N×N → condensed upper-triangle | UniFrac distance parity |
@@ -390,7 +395,7 @@ Bugs found and fixed: SNP binding layout (ToadStool), AdapterInfo propagation (w
 | PCoA coordinates | `Vec<Vec<f64>>` → flat + `coord()` | PCoA eigendecomposition pass |
 | ODE GPU polyfill | Hardcoded → `dev.needs_f64_exp_log_workaround()` | ODE GPU sweep pass |
 
-728 tests. 48/48 CPU-GPU. 39/39 cross-spring. 0 clippy warnings.
+740 tests. 48/48 CPU-GPU. 39/39 cross-spring. 0 clippy warnings.
 
 ### Handoff Documents
 

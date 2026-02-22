@@ -45,7 +45,7 @@ impl Lcg64 {
     }
 
     /// Advance state and return raw `u64`.
-    pub fn next_u64(&mut self) -> u64 {
+    pub const fn next_u64(&mut self) -> u64 {
         self.state = self.state.wrapping_mul(Self::MULT).wrapping_add(Self::INC);
         self.state
     }

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Date: 2026-02-20
 """Exp036 baseline — Robinson-Foulds distances on real PhyNetPy gene trees.
 
 Source: NakhlehLab/PhyNetPy DEFJ/ directory

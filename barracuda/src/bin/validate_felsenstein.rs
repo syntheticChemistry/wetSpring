@@ -12,7 +12,7 @@
 //! | Exact command | `python3 scripts/felsenstein_pruning_baseline.py` |
 
 use wetspring_barracuda::bio::felsenstein::{
-    encode_dna, jc69_prob, log_likelihood, site_log_likelihoods, transition_matrix, TreeNode,
+    TreeNode, encode_dna, jc69_prob, log_likelihood, site_log_likelihoods, transition_matrix,
 };
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;

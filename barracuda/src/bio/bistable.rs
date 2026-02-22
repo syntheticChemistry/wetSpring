@@ -26,7 +26,7 @@
 //! enters the sessile state requires a stronger dispersal signal to leave it
 //! than was needed to enter it.
 
-use super::ode::{rk4_integrate, steady_state_mean, OdeResult};
+use super::ode::{OdeResult, rk4_integrate, steady_state_mean};
 use super::qs_biofilm::QsBiofilmParams;
 
 /// Extended parameters for the bistable model (Fernandez 2020).

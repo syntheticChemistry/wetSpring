@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Date: 2026-02-18
 """Python baseline benchmark for the same workloads as benchmark_cpu_gpu.
 
 Measures wall-clock time for numpy/scipy implementations of the same

@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 22, 2026
-**Status**: Phase 23 — 1,392 CPU + 609 GPU + 80 dispatch + 35 layout + 57 transfer/streaming = 2,229+/2,229+ checks, ALL PASS (728 tests)
+**Status**: Phase 24 — 1,392 CPU + 609 GPU + 80 dispatch + 35 layout + 57 transfer/streaming = 2,229+/2,229+ checks, ALL PASS (740 tests)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -17,7 +17,7 @@
 | BarraCUDA GPU parity | 16 domains (Exp064/087) — pure GPU math proven |
 | Pure GPU streaming | 80 checks, 441-837× over round-trip (Exp090/091) |
 | metalForge cross-system | 12 domains CPU↔GPU (Exp084) + dispatch (Exp080) + pipeline (Exp086) + PCIe (Exp088) |
-| Rust modules | 41 CPU + 25 GPU, 728 tests (96.21% coverage) |
+| Rust modules | 41 CPU + 25 GPU, 740 tests (~97% bio+io coverage) |
 | Tier A (GPU/NPU-ready) | 7 modules with flat layouts (kmer, unifrac, taxonomy + 4 ODE) |
 | Dependencies | 1 runtime (flate2), everything else sovereign |
 | Paper queue | **ALL DONE** — 29/29 reproducible papers complete (Track 1c added) |
@@ -25,7 +25,7 @@
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
 | Faculty (Track 1c) | R. Anderson (Carleton) — deep-sea metagenomics, population genomics |
 | Faculty (Track 2) | Jones (BMB/Chemistry, MSU) — PFAS mass spectrometry |
-| Handoffs | Eleven delivered (v1–v6, rewire, cross-spring, v7–v10, **v11 structural evolution**) |
+| Handoffs | Twelve delivered (v1–v6, rewire, cross-spring, v7–v12) |
 
 ---
 
@@ -112,7 +112,7 @@ but blocked: upstream `batched_ode_rk4.rs` uses `compile_shader` not `compile_sh
 | CONTROL_EXPERIMENT_STATUS.md | `../` | 97 experiments, 2,229+ validation checks |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
-| Handoff (v11) | `../wateringHole/handoffs/` | Current ToadStool handoff |
+| Handoff (v12) | `../wateringHole/handoffs/` | Current ToadStool handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |
@@ -156,7 +156,7 @@ but blocked: upstream `batched_ode_rk4.rs` uses `compile_shader` not `compile_sh
 `../whitePaper/STUDY.md` → `../CONTROL_EXPERIMENT_STATUS.md` → `../barracuda/EVOLUTION_READINESS.md` → BARRACUDA_REQUIREMENTS.md
 
 **Integration partner**:
-`../wateringHole/handoffs/WETSPRING_TOADSTOOL_V11_FEB22_2026.md` → `../BENCHMARK_RESULTS.md`
+`../wateringHole/handoffs/WETSPRING_TOADSTOOL_V12_FEB22_2026.md` → `../BENCHMARK_RESULTS.md`
 
 ---
 

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Bioinformatics and analytical chemistry algorithms.
 
+pub mod adapter;
 pub mod alignment;
 #[allow(clippy::cast_precision_loss)]
 pub mod ani;
@@ -81,7 +82,6 @@ pub mod signal;
 pub mod snp;
 #[cfg(feature = "gpu")]
 pub mod snp_gpu;
-pub mod special;
 #[cfg(feature = "gpu")]
 pub mod spatial_payoff_gpu;
 pub mod spectral_match;

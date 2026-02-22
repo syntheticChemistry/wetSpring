@@ -16,9 +16,9 @@ energy, and memory in a unified benchmark harness. The study covers
 four tracks: 16S amplicon metagenomics (Track 1), comparative genomics
 and mathematical biology (Track 1b), deep-sea metagenomics and microbial
 evolution (Track 1c), and PFAS detection via LC-MS (Track 2),
-validating 61 Rust modules (41 CPU + 20 GPU) against baselines from Galaxy,
+validating 66 Rust modules (41 CPU + 25 GPU) against baselines from Galaxy,
 QIIME2, asari, FindPFAS, scipy, sklearn, dendropy, real NCBI SRA data, and
-published paper models with 1,835 quantitative checks across 83 experiments
+published paper models with 2,229+ quantitative checks across 97 experiments
 — all passing. The pipeline proves substrate independence: math produces
 identical results on CPU and GPU, validated via metalForge cross-substrate
 checks (Exp060). Random Forest ensemble and Gradient Boosting Machine
@@ -69,7 +69,7 @@ chemistry:
 | Baseline | Python scipy | Galaxy/QIIME2 | asari/PFΔScreen |
 | GPU layer | ToadStool (wgpu) | ToadStool (wgpu) | ToadStool (wgpu) |
 | Success metric | chi² match | Same taxonomy | Same PFAS detected |
-| Checks | 418/418 | 1,835/1,835 | (included in 1,835) |
+| Checks | 418/418 | 2,229+/2,229+ | (included in 2,229+) |
 
 Both prove the ecoPrimals thesis: sovereign compute on consumer hardware
 can replicate institutional results, then exceed them via Rust + GPU.
@@ -119,7 +119,7 @@ detection in water via LC-MS. Source papers: asari (Nature Communications
 | RAM | 64 GB DDR5 |
 | GPU | NVIDIA RTX 4070 12 GB (SHADER_F64) |
 | OS | Pop!_OS 22.04 (Linux 6.17) |
-| Rust | stable 1.82+ |
+| Rust | stable 1.85+ (edition 2024) |
 | wgpu | v22 (Vulkan backend) |
 
 ---
@@ -518,9 +518,9 @@ Code quality gates (all enforced in CI):
 - `cargo clippy --all-targets -- -D warnings` — zero warnings (CPU and GPU)
 - `cargo clippy --all-targets --features gpu -- -D warnings` — zero GPU-specific warnings
 - `RUSTDOCFLAGS="-D warnings" cargo doc --no-deps` — zero doc warnings
-- 0 `unsafe` blocks (`#![forbid(unsafe_code)]`), 0 `TODO`/`FIXME`, 0 production `unwrap()`/`expect()` (`#![deny(clippy::expect_used, clippy::unwrap_used)]` enforced crate-wide)
-- 39 named tolerance constants in `tolerances.rs` (scientifically justified, hierarchy-tested)
-- Shared math consolidated in `bio::special` (erf, ln_gamma, `regularized_gamma_lower`) — no duplication
+- 0 production `unsafe` blocks (`#![deny(unsafe_code)]`; test-only `allow` for edition 2024 `env::set_var`), 0 `TODO`/`FIXME`, 0 production `unwrap()`/`expect()` (`#![deny(clippy::expect_used, clippy::unwrap_used)]` enforced crate-wide)
+- 43 named tolerance constants in `tolerances.rs` (scientifically justified, hierarchy-tested)
+- Shared math consolidated in `crate::special` (erf, ln_gamma, `regularized_gamma_lower`, `normal_cdf`) — no duplication
 - 6 determinism tests covering diversity, Bray-Curtis, DADA2, chimera, taxonomy, and the full 16S pipeline
 
 ### 4.7 Write → Absorb → Lean (GPU evolution pattern)
@@ -552,7 +552,7 @@ AdapterInfo propagation failure that broke f64 polyfill detection on RTX 4070.
 ToadStool's RTX 4070 Ada Lovelace detection. Fixed to pass real `AdapterInfo`
 via `WgpuDevice::from_existing()`. ToadStool's detection logic itself is correct.
 
-**CPU math evolution**: `bio::special` consolidates 3 local math functions
+**CPU math evolution**: `crate::special` consolidates 4 local math functions
 (`erf`, `ln_gamma`, `regularized_gamma_lower`) that duplicate barracuda upstream
 primitives. These are shaped for extraction to `barracuda::math` — a proposed
 CPU-only feature gate that does not pull in wgpu/akida-driver/toadstool-core.
@@ -581,7 +581,7 @@ repository (AGPL-3.0). No institutional access required.
 ```bash
 # Run all CPU validations (1,291 checks)
 cd barracuda
-cargo test --release          # 730 tests (654 lib + 60 integration + 14 doc + 2 bench)
+cargo test --release          # 740 tests (666 lib + 60 integration + 14 doc)
 cargo run --release --bin validate_fastq
 cargo run --release --bin validate_diversity
 cargo run --release --bin validate_mzml

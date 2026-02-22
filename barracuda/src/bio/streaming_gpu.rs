@@ -51,7 +51,7 @@ use crate::bio::gemm_cached::GemmCached;
 use crate::bio::quality::{FilterStats, QualityParams};
 use crate::bio::quality_gpu::QualityFilterCached;
 use crate::bio::taxonomy::{
-    extract_kmers, Classification, ClassifyParams, NaiveBayesClassifier, TaxRank,
+    Classification, ClassifyParams, NaiveBayesClassifier, TaxRank, extract_kmers,
 };
 use crate::error::{Error, Result};
 use crate::gpu::GpuF64;

@@ -11,8 +11,8 @@ use tempfile::TempDir;
 use wetspring_barracuda::encoding::base64_encode;
 use wetspring_barracuda::io::{fastq, ms2, mzml};
 
-use flate2::write::GzEncoder;
 use flate2::Compression;
+use flate2::write::GzEncoder;
 
 // ── MS2 round-trip ──────────────────────────────────────────────
 

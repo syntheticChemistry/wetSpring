@@ -19,7 +19,7 @@
 //! | 2 | A | Autoinducer (public good, produced by cooperators) |
 //! | 3 | B | Biofilm state (shared, depends on total QS) |
 
-use super::ode::{rk4_integrate, OdeResult};
+use super::ode::{OdeResult, rk4_integrate};
 
 /// Parameters for the cooperation game.
 #[derive(Debug, Clone)]
@@ -222,11 +222,7 @@ pub fn cooperator_frequency(result: &OdeResult) -> Vec<f64> {
             let nc = row[0].max(0.0);
             let nd = row[1].max(0.0);
             let total = nc + nd;
-            if total < 1e-15 {
-                0.5
-            } else {
-                nc / total
-            }
+            if total < 1e-15 { 0.5 } else { nc / total }
         })
         .collect()
 }

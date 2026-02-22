@@ -18,7 +18,7 @@
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::bio::reconciliation::{
-    reconcile_batch, reconcile_dtl, DtlCosts, DtlEvent, FlatRecTree,
+    DtlCosts, DtlEvent, FlatRecTree, reconcile_batch, reconcile_dtl,
 };
 
 const NO_CHILD: u32 = u32::MAX;
@@ -28,7 +28,7 @@ fn main() {
     let mut fail = 0_u32;
 
     macro_rules! check {
-        ($name:expr, $cond:expr) => {
+        ($name:expr_2021, $cond:expr_2021) => {
             if $cond {
                 println!("[PASS] {}", $name);
                 pass += 1;

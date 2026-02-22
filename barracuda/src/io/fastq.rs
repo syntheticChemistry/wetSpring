@@ -659,8 +659,8 @@ mod tests {
 
     /// Write a gzip-compressed FASTQ file and return its path.
     fn write_fastq_gz(dir: &tempfile::TempDir, name: &str, content: &str) -> std::path::PathBuf {
-        use flate2::write::GzEncoder;
         use flate2::Compression;
+        use flate2::write::GzEncoder;
         let path = dir.path().join(name);
         let file = File::create(&path).unwrap();
         let mut gz = GzEncoder::new(file, Compression::default());

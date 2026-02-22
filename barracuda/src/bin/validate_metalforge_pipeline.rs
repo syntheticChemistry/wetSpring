@@ -200,7 +200,10 @@ fn validate_pipeline_cpu_only(v: &mut Validator) {
         .iter()
         .map(|s| classifier.classify(s, &params))
         .collect();
-    v.check_pass("taxonomy: 4 classifications", classifications.len() == 4);
+    v.check_pass(
+        "taxonomy: 4 classifications",
+        classifications.len() == 4 && classifications.iter().all(|c| !c.confidence.is_empty()),
+    );
 
     let mut sample_a: HashMap<String, f64> = HashMap::new();
     let mut sample_b: HashMap<String, f64> = HashMap::new();
@@ -318,10 +321,10 @@ fn validate_flat_layout_chain(v: &mut Validator) {
 
     let counts: Vec<kmer::KmerCounts> = sequences.iter().map(|s| kmer::count_kmers(s, k)).collect();
     let histograms: Vec<Vec<u32>> = counts.iter().map(kmer::KmerCounts::to_histogram).collect();
-    let all_flat: Vec<u32> = histograms.iter().flat_map(|h| h.iter().copied()).collect();
+    let all_flat_count: usize = histograms.iter().map(Vec::len).sum();
     v.check(
         "kmer: flattened buffer = 4 × 256",
-        all_flat.len() as f64,
+        all_flat_count as f64,
         1024.0,
         0.0,
     );
@@ -339,12 +342,9 @@ fn validate_flat_layout_chain(v: &mut Validator) {
 
     let mut abundance_table: unifrac::AbundanceTable = HashMap::new();
     for (i, label) in ["A", "B", "C", "D"].iter().enumerate() {
-        abundance_table.insert(
-            format!("sample_{label}"),
-            [((*label).to_string(), counts[i].total_valid_kmers as f64)]
-                .into_iter()
-                .collect(),
-        );
+        let mut sample = HashMap::new();
+        sample.insert((*label).to_string(), counts[i].total_valid_kmers as f64);
+        abundance_table.insert(format!("sample_{label}"), sample);
     }
 
     let (sample_matrix, n_samples, n_leaves) =

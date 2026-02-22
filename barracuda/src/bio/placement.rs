@@ -15,7 +15,7 @@
 //! Edge-parallel: each candidate placement is independent. One workgroup
 //! per edge computes the Felsenstein likelihood with the query inserted.
 
-use super::felsenstein::{encode_dna, log_likelihood, TreeNode};
+use super::felsenstein::{TreeNode, encode_dna, log_likelihood};
 
 /// Result of placing a query at a specific edge.
 #[derive(Debug, Clone)]

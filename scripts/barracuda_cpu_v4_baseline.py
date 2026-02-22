@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Date: 2026-02-21
 """
 wetSpring — BarraCUDA CPU v4: Track 1c Python Timing Baseline
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Date: 2026-02-20
 """
 Hsueh/Severin 2022 phage defense deaminase — Python baseline.
 

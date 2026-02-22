@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Date: 2026-02-19
 """Newick parsing baseline — Python/dendropy reference.
 
 Parses a set of Newick trees and extracts leaf counts, branch length sums,

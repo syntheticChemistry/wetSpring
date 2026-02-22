@@ -21,8 +21,8 @@
 
 use wetspring_barracuda::bio::ode::steady_state_mean;
 use wetspring_barracuda::bio::qs_biofilm::{
-    scenario_dgc_overexpression, scenario_hapr_mutant, scenario_high_density,
-    scenario_standard_growth, QsBiofilmParams,
+    QsBiofilmParams, scenario_dgc_overexpression, scenario_hapr_mutant, scenario_high_density,
+    scenario_standard_growth,
 };
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
@@ -157,11 +157,7 @@ fn check_non_negative(
     result: &wetspring_barracuda::bio::ode::OdeResult,
     prefix: &str,
 ) {
-    let min_val: f64 = result
-        .y
-        .iter()
-        .copied()
-        .fold(f64::INFINITY, f64::min);
+    let min_val: f64 = result.y.iter().copied().fold(f64::INFINITY, f64::min);
     // min_val should be ≥ 0; we check it's within tolerance of 0 from below
     // by verifying actual ≥ expected (0.0) - tolerance (0.0)
     v.check(

@@ -27,8 +27,8 @@
 //! | Data | Synthetic test vectors (self-contained) |
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, Pop!\_OS 22.04 |
 
-use barracuda::device::WgpuDevice;
 use barracuda::TreeInferenceGpu;
+use barracuda::device::WgpuDevice;
 use barracuda::{FlatForest, GillespieConfig, GillespieGpu, SmithWatermanGpu, SwConfig};
 use std::sync::Arc;
 use std::time::Instant;

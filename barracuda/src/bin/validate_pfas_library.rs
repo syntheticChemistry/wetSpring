@@ -315,7 +315,7 @@ fn validate_tolerance_search_systematic(v: &mut Validator) {
     // between PFCA adjacent members (CF2 = ~50 Da apart)
     let pfhxa_mz = 312.972_6_f64;
     let pfhpa_mz = 362.969_4_f64;
-    let between = (pfhxa_mz + pfhpa_mz) / 2.0;
+    let between = f64::midpoint(pfhxa_mz, pfhpa_mz);
     let result_between = tolerance_search::find_within_ppm(&sorted_mz, between, 5.0);
     v.check(
         "5 ppm resolves adjacent PFCA (no false match midpoint)",

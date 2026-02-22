@@ -199,7 +199,7 @@ pub fn call_snps(sequences: &[&[u8]]) -> SnpResult {
         let ref_idx = counts
             .iter()
             .enumerate()
-            .max_by_key(|(_, &c)| c)
+            .max_by_key(|&(_, &c)| c)
             .map_or(0, |(i, _)| i);
 
         let alt_alleles: Vec<(u8, usize)> = counts

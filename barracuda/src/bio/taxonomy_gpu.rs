@@ -14,7 +14,7 @@
 //! so the full classification + bootstrap execute as a single GEMM.
 
 use crate::bio::taxonomy::{
-    extract_kmers, Classification, ClassifyParams, NaiveBayesClassifier, TaxRank,
+    Classification, ClassifyParams, NaiveBayesClassifier, TaxRank, extract_kmers,
 };
 use crate::error::{Error, Result};
 use crate::gpu::GpuF64;

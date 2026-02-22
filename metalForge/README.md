@@ -149,7 +149,7 @@ affinities. metalForge maps each validated algorithm to its optimal substrate.
 wetSpring follows hotSpring's pattern for ToadStool absorption:
 
 ```
-1. Validate in Rust CPU (barracuda/)          ← DONE: 41 modules, 730 tests, 96.21% coverage, 83 experiments, 1,835 checks. 38% dispatch overhead reduction via pipeline caching (Exp068).
+1. Validate in Rust CPU (barracuda/)          ← DONE: 41 modules, 740 tests, ~97% bio+io coverage, 97 experiments, 2,229+ checks. 38% dispatch overhead reduction via pipeline caching (Exp068).
 2. Characterize hardware (metalForge/)         ← THIS DIRECTORY
 3. Write Rust in GPU-friendly patterns         ← 8 absorbed by ToadStool, 4 local WGSL (ODE, kmer, unifrac, taxonomy)
 4. ToadStool absorbs as shared primitives      ← unidirectional handoff via archive/handoffs/
@@ -355,7 +355,7 @@ ToadStool/BarraCUDA team absorption. Following hotSpring's pattern:
 |-----------|--------|-----------------|
 | 8 WGSL shaders (absorbed Feb 22) | Lean — delegating to ToadStool | `ops::bio::*` |
 | 4 WGSL shaders (ODE, kmer, unifrac, taxonomy) | Local — ODE blocked: upstream uses `compile_shader` not `compile_shader_f64` | `ops::bio::*` |
-| `bio::special` (erf, ln_gamma, regularized_gamma) | Consolidated, `mul_add`-optimized | `barracuda::math` feature |
+| `crate::special` (erf, ln_gamma, regularized_gamma) | Consolidated, `mul_add`-optimized | `barracuda::math` feature |
 | `bio::eic::integrate_peak` | Validated against Python | `barracuda::numerical::trapz` |
 | 32 tolerance constants | Hierarchy-tested | `barracuda::tolerances` cross-Spring standard |
 | SoA/batch patterns | GPU-friendly, `#[repr(C)]` | Direct shader translation |

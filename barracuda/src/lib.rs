@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![forbid(unsafe_code)]
+#![deny(unsafe_code)]
 #![deny(clippy::expect_used, clippy::unwrap_used)]
 #![warn(missing_docs, clippy::pedantic, clippy::nursery)]
 #![allow(
@@ -12,7 +12,7 @@
 //!
 //! Rust implementations validated against Python/Galaxy/QIIME2/asari/`FindPFAS`
 //! baselines. Each module mirrors a pipeline stage from the validated
-//! experiments (Exp001–093, 29 reproduced papers across 4 tracks).
+//! experiments (Exp001–097, 29 reproduced papers across 4 tracks).
 //!
 //! # Track 1: Life Science (16S amplicon, phage, diversity)
 //! - [`io::fastq`] — FASTQ parsing + quality statistics

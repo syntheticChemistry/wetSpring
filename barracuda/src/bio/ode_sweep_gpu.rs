@@ -163,10 +163,7 @@ impl OdeSweepGpu {
             ],
         });
 
-        let patched = ShaderTemplate::for_driver_auto(
-            ODE_WGSL,
-            dev.needs_f64_exp_log_workaround(),
-        );
+        let patched = ShaderTemplate::for_driver_auto(ODE_WGSL, dev.needs_f64_exp_log_workaround());
         let module = dev.compile_shader(&patched, Some("OdeSweepRK4"));
 
         let pl = d.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {

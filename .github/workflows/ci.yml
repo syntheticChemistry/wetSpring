@@ -9,6 +9,7 @@ on:
 env:
   CARGO_TERM_COLOR: always
   RUSTFLAGS: "-D warnings"
+  RUSTDOCFLAGS: "-D warnings"
 
 jobs:
   fmt:
@@ -33,7 +34,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: barracuda
-      - run: cargo clippy --all-targets -- -W clippy::pedantic
+      - run: cargo clippy --all-targets -- -D clippy::pedantic -D clippy::nursery
         working-directory: barracuda
 
   test:
@@ -46,6 +47,18 @@ jobs:
         with:
           workspaces: barracuda
       - run: cargo test --verbose
+        working-directory: barracuda
+
+  test-features:
+    name: Test (json feature)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: barracuda
+      - run: cargo check --features json
         working-directory: barracuda
 
   doc:

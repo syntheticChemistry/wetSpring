@@ -239,6 +239,41 @@ pub const SPECTRAL_MZ_WINDOW: f64 = 0.5;
 pub const PEAK_HEIGHT_REL: f64 = 0.01;
 
 // ═══════════════════════════════════════════════════════════════════
+// Jacobi eigendecomposition (PCoA)
+// ═══════════════════════════════════════════════════════════════════
+
+/// Jacobi convergence: sum of squared off-diagonal elements.
+///
+/// Iteration stops when the off-diagonal Frobenius norm drops below this
+/// threshold. 1e-24 is ~(1e-12)² — squaring machine epsilon ensures
+/// eigenvalues are accurate to full f64 precision even for ill-conditioned
+/// centering matrices. Reference: Golub & Van Loan (2013), Matrix
+/// Computations, 4th ed. §8.5.2 — "classical Jacobi method."
+pub const JACOBI_CONVERGENCE: f64 = 1e-24;
+
+/// Jacobi element skip: off-diagonal elements below this are treated as zero.
+///
+/// Avoids unnecessary Givens rotations for near-zero elements.
+/// `1e-15` ≈ `f64::EPSILON` × 1000, allowing for accumulated rounding in
+/// the centering step. Standard practice per Golub & Van Loan §8.5.
+pub const JACOBI_ELEMENT_SKIP: f64 = 1e-15;
+
+/// Jacobi tau overflow guard for Givens rotation parameter.
+///
+/// When `|τ| = |(a_qq - a_pp) / (2·a_pq)|` exceeds this threshold, the
+/// tangent approximation `t ≈ 1/(2τ)` is used instead of the full formula
+/// to avoid f64 overflow in `τ² + 1`. `1e15` is conservative — overflow
+/// occurs at ~`1.34e154` for f64. Reference: Golub & Van Loan §8.5.2.
+pub const JACOBI_TAU_OVERFLOW: f64 = 1e15;
+
+/// Jacobi maximum sweeps multiplier.
+///
+/// Total sweeps = this × N for an N×N matrix. Classical Jacobi converges
+/// quadratically after O(N²) rotations; 100×N is generous for the matrix
+/// sizes in `PCoA` (typically N < 10,000). Reference: Golub & Van Loan §8.5.
+pub const JACOBI_SWEEP_MULTIPLIER: usize = 100;
+
+// ═══════════════════════════════════════════════════════════════════
 // GPU vs CPU tolerances
 // ═══════════════════════════════════════════════════════════════════
 
@@ -329,6 +364,9 @@ mod tests {
             MZ_FRAGMENT,
             SPECTRAL_MZ_WINDOW,
             PEAK_HEIGHT_REL,
+            JACOBI_CONVERGENCE,
+            JACOBI_ELEMENT_SKIP,
+            JACOBI_TAU_OVERFLOW,
             GPU_VS_CPU_F64,
             GPU_VS_CPU_TRANSCENDENTAL,
             GPU_VS_CPU_BRAY_CURTIS,

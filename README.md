@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCUDA absorption. Follows the
 
 **Date:** February 22, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 23 — Structural evolution complete; 728 tests, 97 experiments, flat layouts throughout
+**Status:** Phase 24 — Edition 2024, structural audit complete; 740 tests, 97 experiments, flat layouts throughout
 
 ---
 
@@ -90,8 +90,8 @@ absorbs forge, the bridge module becomes the integration point.
 | Layout fidelity checks | 35 |
 | Transfer/streaming checks | 57 |
 | **Total validation checks** | **2,229+** |
-| Rust library unit tests | 654 + 74 integration/doc |
-| **Total Rust tests** | **728** |
+| Rust library unit tests | 666 + 74 integration/doc |
+| **Total Rust tests** | **740** |
 | Experiments completed | 97 |
 | Validation/benchmark binaries | 79 validate + 8 benchmark = 87 total |
 | CPU bio modules | 41 |
@@ -107,7 +107,7 @@ absorbs forge, the bridge module becomes the integration point.
 | ToadStool primitives consumed | **28** (15 original + 8 bio absorbed Feb 22 + 5 neuralSpring absorbed) |
 | Local WGSL shaders | **4** (ODE, kmer histogram, unifrac propagate, taxonomy FC) |
 
-All 2,229+ validation checks **PASS**. All 728 tests **PASS**.
+All 2,229+ validation checks **PASS**. All 740 tests **PASS**.
 
 ### GPU Performance
 
@@ -312,7 +312,7 @@ ToadStool's unidirectional streaming — zero CPU round-trips between stages:
 - **Exp095: Cross-Spring Scaling Benchmark** — 7 benchmarks across 5
   neuralSpring primitives at realistic problem sizes (6.5×–277× GPU speedup).
 
-**Tier A: 7 modules** | **Tier B: 1 remaining** | **728 tests** | **2,229+ checks** | **87 binaries**
+**Tier A: 7 modules** | **Tier B: 1 remaining** | **740 tests** | **2,229+ checks** | **87 binaries**
 
 ### Phase 23: Structural Evolution — Flat Layouts, DRY Models, Zero-Clone APIs
 
@@ -339,6 +339,22 @@ Deep two-pass evolution of the barracuda codebase (Exp097):
 
 728 tests pass. 48/48 CPU-GPU domain parity. 39/39 cross-spring evolution.
 
+### Phase 24: Edition 2024 + Structural Audit
+
+Deep quality audit and evolution (Rust edition 2024, MSRV 1.85):
+
+- **Rust edition 2024** — migrated from 2021, all import/formatting rules applied
+- **`forbid(unsafe_code)` → `deny(unsafe_code)`** — Rust 2024 makes `std::env::set_var`
+  unsafe; `#[allow(unsafe_code)]` confined to test-only env-var manipulation with SAFETY docs
+- **CI hardened** — `RUSTDOCFLAGS="-D warnings"`, `clippy -D pedantic -D nursery`,
+  `cargo check --features json` added to workflow
+- **`bio::special` shim removed** — migration to `crate::special` complete, zero consumers
+- **New clippy lints resolved** — `f64::midpoint()`, `usize::midpoint()`, `const fn` promotions
+- **Python baseline provenance** — all 34 scripts now carry `# Date:` headers (git creation date)
+- **Coverage verified** — `cargo-llvm-cov` confirms bio+io modules avg ~97% line coverage;
+  new tests for taxonomy classifier accessors (`taxon_priors`, `n_kmers_total`)
+- **740 tests pass** (666 lib + 74 integration/doc). Zero clippy, fmt, doc warnings.
+
 ### Phase 19: Absorption Engineering + Debt Resolution
 
 Deep codebase evolution following hotSpring's absorption patterns:
@@ -364,7 +380,7 @@ Deep codebase evolution following hotSpring's absorption patterns:
   device creation (following hotSpring's forge↔barracuda pattern)
 - **ABSORPTION_MANIFEST.md** — tracking absorbed/ready/local modules
   (following hotSpring's manifest pattern)
-- **Coverage**: 96.21% overall (up from 55%), 728 tests (up from 650),
+- **Coverage**: 96.21% overall (up from 55%), 740 tests (up from 650),
   39 named tolerances (up from 32)
 
 ---
@@ -377,7 +393,7 @@ Deep codebase evolution following hotSpring's absorption patterns:
 | `cargo clippy --pedantic --nursery` | Clean (0 warnings) |
 | `cargo doc --no-deps` | Clean (0 warnings) |
 | Line coverage (`cargo-llvm-cov`) | **96.21% overall** |
-| `#![forbid(unsafe_code)]` | **Enforced crate-wide** |
+| `#![deny(unsafe_code)]` | **Enforced crate-wide** (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | **Enforced crate-wide** |
 | TODO/FIXME markers | **0** |
 | Inline tolerance literals | **0** (all use `tolerances::` constants) |
@@ -485,7 +501,7 @@ wetSpring/
 │   │   ├── bench/               ← benchmark harness + power monitoring
 │   │   ├── bin/                 ← 86 validation/benchmark binaries
 │   │   └── shaders/             ← 4 local WGSL shaders (ODE, kmer, unifrac, taxonomy; 8 absorbed by ToadStool)
-│   └── rustfmt.toml             ← max_width = 100, edition = 2021
+│   └── rustfmt.toml             ← max_width = 100, edition = 2024
 ├── experiments/                   ← 97 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
@@ -513,12 +529,12 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (728: 654 lib + 74 integration/doc)
+# Run all tests (740: 666 lib + 74 integration/doc)
 cargo test
 
 # Code quality checks
 cargo fmt -- --check
-cargo clippy --lib -- -W clippy::pedantic -W clippy::nursery
+cargo clippy --all-targets -- -D clippy::pedantic -D clippy::nursery
 cargo doc --no-deps
 
 # Line coverage (requires cargo-llvm-cov)

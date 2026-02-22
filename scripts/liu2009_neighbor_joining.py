@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Date: 2026-02-20
 """
 Python baseline: Neighbor-Joining tree construction (Saitou & Nei 1987).
 
