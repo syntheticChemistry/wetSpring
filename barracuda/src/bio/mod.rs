@@ -46,6 +46,8 @@ pub mod jaccard_gpu;
 pub mod kmd;
 pub mod kmer;
 #[cfg(feature = "gpu")]
+pub mod kmer_gpu;
+#[cfg(feature = "gpu")]
 pub mod kriging;
 #[cfg(feature = "gpu")]
 pub mod locus_variance_gpu;
@@ -64,6 +66,8 @@ pub mod pcoa;
 #[cfg(feature = "gpu")]
 pub mod pcoa_gpu;
 pub mod phage_defense;
+#[cfg(feature = "gpu")]
+pub mod phage_defense_gpu;
 pub mod phred;
 pub mod placement;
 pub mod qs_biofilm;
@@ -96,4 +100,6 @@ pub mod taxonomy;
 pub mod taxonomy_gpu;
 pub mod tolerance_search;
 pub mod unifrac;
+#[cfg(feature = "gpu")]
+pub mod unifrac_gpu;
 pub mod validation_helpers;

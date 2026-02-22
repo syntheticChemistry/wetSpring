@@ -426,6 +426,12 @@ name = "validate_local_wgsl_compile"
 path = "src/bin/validate_local_wgsl_compile.rs"
 required-features = ["gpu"]
 
+# ── Expanded CPU vs GPU + metalForge (Exp099) ────────────────────
+[[bin]]
+name = "validate_cpu_gpu_expanded"
+path = "src/bin/validate_cpu_gpu_expanded.rs"
+required-features = ["gpu"]
+
 # ── Cross-Spring Scaling Benchmark (Exp095) ──────────────────────
 [[bin]]
 name = "benchmark_cross_spring_scaling"

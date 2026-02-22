@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 22, 2026
-**Status:** 98 experiments, 2,229+ validation checks, all PASS (740 Rust tests)
+**Status:** 99 experiments, 2,256+ validation checks, all PASS (740 Rust tests)
 
 ---
 
@@ -107,6 +107,7 @@
 | 096 | ToadStool Bio Op Absorption Validation | GPU/shader | COMPLETE | 10 (4 upstream ops validated) |
 | 097 | Structural Evolution Pass | code quality | COMPLETE | — (22-file refactor: flat layouts, DRY models, zero-clone APIs) |
 | 098 | Upstream GPU Fixes | GPU/shader | COMPLETE | — (3 ToadStool bugs: SNP BGL, ODE f64, Jacobi eigenvectors) |
+| 099 | CPU vs GPU Expanded + metalForge | GPU/metalForge | COMPLETE | 27 (k-mer, UniFrac, ODE, phage defense, mixed-HW pipeline) |
 
 ---
 
