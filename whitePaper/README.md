@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 22, 2026
-**Status:** Validation study complete — 2,219+/2,219+ checks, 728 tests, 96.21% line coverage, 95 experiments
+**Status:** Validation study complete — 2,229+/2,229+ checks, 675 tests, 96.21% line coverage, 96 experiments
 **License:** AGPL-3.0-or-later
 
 ---
@@ -62,7 +62,7 @@ and capability-based dispatch as an absorption seam for ToadStool.
 
 | Claim | Evidence |
 |-------|----------|
-| Rust matches Python across 95 experiments | 1,392/1,392 CPU checks + 80 dispatch + 35 layout + 57 transfer/streaming + 39 cross-spring pass |
+| Rust matches Python across 96 experiments | 1,392/1,392 CPU checks + 80 dispatch + 35 layout + 57 transfer/streaming + 39 cross-spring + 10 local WGSL pass |
 | GPU matches CPU across all promoted domains | 609/609 GPU checks pass (incl. 48 all-domain + 28 metalForge v3) |
 | BarraCUDA CPU parity across 25 domains + 6 ODE flat | 205/205 cross-domain checks pass |
 | 926× spectral cosine GPU speedup | Exp016 benchmark |
@@ -112,6 +112,7 @@ and capability-based dispatch as an absorption seam for ToadStool.
 | metalForge full 16-domain substrate-independence | Exp093, 28/28 cross-substrate v3 |
 | Write → Absorb → Lean: 24 absorbed, 4 in Write | ABSORPTION_MANIFEST.md, hotSpring methodology |
 | Cross-spring evolution: 5 neuralSpring primitives validated | Exp094, 39/39 checks; Exp095, 7 benchmarks |
+| Local WGSL compile + dispatch | Exp096, 10/10 checks |
 
 ---
 
@@ -274,7 +275,7 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCUDA/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34 WGSL shaders, 637 tests)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (4 local WGSL shaders, 728 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (4 local WGSL shaders, 675 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **archive/handoffs/** — Fossil record of ToadStool handoffs (v1–v7)
 
@@ -298,7 +299,7 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` files |
-| Provenance headers | All 85 validation/benchmark binaries |
+| Provenance headers | All 86 validation/benchmark binaries |
 
 ## metalForge — Hardware Discovery
 

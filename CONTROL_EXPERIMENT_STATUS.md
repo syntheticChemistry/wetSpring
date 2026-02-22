@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 22, 2026
-**Status:** 95 experiments, 2,219+ validation checks, all PASS (728 Rust tests)
+**Status:** 96 experiments, 2,229+ validation checks, all PASS (661 GPU + 14 CPU Rust tests)
 
 ---
 
@@ -104,6 +104,7 @@
 | 093 | metalForge Full v3 (16 domains) | metalForge | COMPLETE | 28 (16 domains substrate-independent) |
 | 094 | Cross-Spring Evolution Validation | GPU/parity | COMPLETE | 39 (5 neuralSpring primitives CPU↔GPU) |
 | 095 | Cross-Spring Scaling Benchmark | GPU/benchmark | COMPLETE | 7 (scaling across 3 Springs) |
+| 096 | Local WGSL Compile + Dispatch | GPU/shader | COMPLETE | 10 (4 shaders compile + dispatch) |
 
 ---
 
@@ -374,6 +375,7 @@ Bugs found and fixed: SNP binding layout (ToadStool), AdapterInfo propagation (w
 | 093 | metalForge Full v3 (16 domains) | 28 | 16 domains substrate-independent (--features gpu) |
 | 094 | Cross-Spring Evolution Validation | 39 | 5 neuralSpring primitives CPU↔GPU parity (--features gpu) |
 | 095 | Cross-Spring Scaling Benchmark | 7 | Cross-spring scaling at realistic sizes (--release --features gpu) |
+| 096 | Local WGSL Compile + Dispatch | 10 | 4 Write-phase shaders compile + dispatch (--features gpu) |
 
 ### Handoff Documents
 

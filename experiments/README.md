@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-22 (Phase 22: 95 experiments, Write → Absorb → Lean + Full Validation Proof)
+**Updated**: 2026-02-22 (Phase 22: 96 experiments, Write → Absorb → Lean + Full Validation Proof)
 
 ---
 
@@ -96,6 +96,7 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 093 | metalForge Full v3 (16 domains) | metalForge | DONE | — | validate_metalforge_full_v3 | 28 |
 | 094 | [Cross-Spring Evolution Validation](094_cross_spring_evolution.md) | cross/GPU | DONE | CPU baselines | validate_cross_spring_evolution | 39 |
 | 095 | [Cross-Spring Scaling Benchmark](095_cross_spring_scaling_benchmark.md) | GPU/benchmark | DONE | — | benchmark_cross_spring_scaling | Benchmark |
+| 096 | Local WGSL Compile + Dispatch | GPU | DONE | — | validate_local_wgsl_compile | 10 |
 
 ---
 
@@ -231,10 +232,11 @@ thresholds from `src/tolerances.rs`.
 | `validate_metalforge_full_v3` | 093 | 28 | `cargo run --features gpu --release --bin validate_metalforge_full_v3` |
 | `validate_cross_spring_evolution` | 094 | 39 | `cargo run --features gpu --bin validate_cross_spring_evolution` |
 | `benchmark_cross_spring_scaling` | 095 | — | `cargo run --release --features gpu --bin benchmark_cross_spring_scaling` |
+| `validate_local_wgsl_compile` | 096 | 10 | `cargo run --features gpu --bin validate_local_wgsl_compile` |
 
-**Total validation checks**: 2,219+ (1,392 CPU + 609 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 39 cross-spring)
-**Rust tests**: 728 (654 lib + 60 integration + 14 doc)
-**Binaries**: 77 validate + 8 benchmark = 85 total
+**Total validation checks**: 2,229+ (1,392 CPU + 609 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 39 cross-spring + 10 local WGSL)
+**Rust tests**: 675 (661 lib + 14 doc with `--features gpu`)
+**Binaries**: 78 validate + 8 benchmark = 86 total
 **ToadStool primitives**: 28 consumed (8 bio absorbed Feb 22 + 5 neuralSpring)
 **Local WGSL shaders**: 4 (ODE, kmer, unifrac, taxonomy)
 **Tier A (GPU/NPU-ready)**: 7 modules | **Tier B**: 1 remaining (cooperation)

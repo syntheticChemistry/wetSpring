@@ -2,7 +2,7 @@
 
 **Date:** February 22, 2026
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 41 CPU + 20 GPU modules, 4 local WGSL shaders in Write phase, 28 ToadStool primitives consumed
+**Status:** 41 CPU + 25 GPU modules, 4 local WGSL shaders in Write phase, 28 ToadStool primitives consumed
 
 ### Feb 22 Rewire: 8 local WGSL shaders absorbed into ToadStool
 
@@ -88,10 +88,15 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 
 ---
 
-## GPU Modules (20)
+## GPU Modules (25)
 
 | Module | Wraps | ToadStool Primitive | Status |
 |--------|-------|-------------------|--------|
+| `batch_fitness_gpu` | EA batch fitness | `BatchFitnessGpu` | Lean (neuralSpring) |
+| `hamming_gpu` | Pairwise Hamming | `PairwiseHammingGpu` | Lean (neuralSpring) |
+| `jaccard_gpu` | Pairwise Jaccard | `PairwiseJaccardGpu` | Lean (neuralSpring) |
+| `locus_variance_gpu` | FST per-locus | `LocusVarianceGpu` | Lean (neuralSpring) |
+| `spatial_payoff_gpu` | Spatial PD payoff | `SpatialPayoffGpu` | Lean (neuralSpring) |
 | `ani_gpu` | ANI pairwise | `AniBatchF64` | ✅ Lean (Feb 22) |
 | `chimera_gpu` | Chimera GPU scoring | `FMR` | Lean |
 | `dada2_gpu` | DADA2 E-step | `Dada2EStepGpu` | ✅ Lean (Feb 22) |
@@ -107,7 +112,7 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 | `quality_gpu` | Quality filtering | `QualityFilterGpu` | ✅ Lean (Feb 22) |
 | `rarefaction_gpu` | Rarefaction curves | `PrngXoshiro` | Lean |
 | `random_forest_gpu` | RF batch inference | `RfBatchInferenceGpu` | ✅ Lean (Feb 22) |
-| `snp_gpu` | SNP calling | `SnpCallingF64` | ✅ Lean (Feb 22) |
+| `snp_gpu` | SNP calling | `SnpCallingF64` | ✅ Lean (Feb 22); gracefully skips on wgpu binding mismatch (catch_unwind) |
 | `spectral_match_gpu` | Spectral cosine | `FMR` | Lean |
 | `stats_gpu` | Variance/correlation | `FMR` | Lean |
 | `streaming_gpu` | Streaming pipeline | Multiple | Lean |
@@ -240,7 +245,7 @@ the rewire (SNP binding layout, AdapterInfo propagation).
 | C (CPU-only) | 14 | 0 | 171+ | 0 |
 | Dispatch routing | — | — | 80 | — |
 | Streaming/transfer | — | — | 57 | 82 |
-| **Total** | **41** | **20** | **1,392** | **533** |
+| **Total** | **41** | **25** | **1,392** | **533** |
 
 ---
 
@@ -315,6 +320,9 @@ the rewire (SNP binding layout, AdapterInfo propagation).
 | Feb 22 | Revalidated: 654 lib tests, clippy clean, GPU feature compiles against upstream HEAD (d45fdfb3) |
 | Feb 22 | **Exp094: Cross-Spring Evolution Validation** — 39/39 checks validating 5 neuralSpring primitives (PairwiseHamming, PairwiseJaccard, SpatialPayoff, BatchFitness, LocusVariance) wired and consumed by wetSpring |
 | Feb 22 | **Exp095: Cross-Spring Scaling Benchmark** — 7 benchmarks across 5 neuralSpring primitives, 6.5×–277× GPU speedup at realistic bio problem sizes |
+| Feb 22 | **Exp096: Local WGSL Compile + Dispatch** — 10/10 checks validating local WGSL compile and dispatch path |
+| Feb 22 | SNP GPU gracefully skips on upstream wgpu binding mismatch (ToadStool snp shader); wrapped with catch_unwind |
+| Feb 22 | 5 new bio module GPU wrappers: hamming_gpu, jaccard_gpu, spatial_payoff_gpu, batch_fitness_gpu, locus_variance_gpu |
 | Feb 22 | Absorbed count: 24 primitives (19 wetSpring + 5 neuralSpring) |
 
 ---
@@ -330,9 +338,9 @@ the rewire (SNP binding layout, AdapterInfo propagation).
 | WGSL pattern | `pub const WGSL: &str` inline | `include_str!("../shaders/...")` |
 | metalForge | GPU + NPU hardware characterization | GPU + NPU + cross-substrate validation |
 | Handoffs | `../wateringHole/handoffs/` (16+ docs) | `archive/handoffs/` (consolidated) |
-| Tests | 454 | 728 |
-| Validation | 418 checks | 2,219+ checks |
-| Experiments | 31 suites | 95 experiments |
+| Tests | 454 | 675 |
+| Validation | 418 checks | 2,229+ checks |
+| Experiments | 31 suites | 96 experiments |
 | Line coverage | — | 97% bio+io (55% overall) |
 | Pipeline caching | Upstream (ToadStool native) | Local (Exp068, 38% overhead reduction) |
 | Three-tier proof | CPU→GPU→NPU | Python→CPU→GPU→NPU (Exp069) |

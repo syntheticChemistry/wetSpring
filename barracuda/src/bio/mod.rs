@@ -6,6 +6,8 @@ pub mod alignment;
 pub mod ani;
 #[cfg(feature = "gpu")]
 pub mod ani_gpu;
+#[cfg(feature = "gpu")]
+pub mod batch_fitness_gpu;
 pub mod bistable;
 pub mod bootstrap;
 pub mod capacitor;
@@ -33,13 +35,19 @@ pub mod gbm;
 #[cfg(feature = "gpu")]
 pub mod gemm_cached;
 pub mod gillespie;
+#[cfg(feature = "gpu")]
+pub mod hamming_gpu;
 pub mod hmm;
 #[cfg(feature = "gpu")]
 pub mod hmm_gpu;
+#[cfg(feature = "gpu")]
+pub mod jaccard_gpu;
 pub mod kmd;
 pub mod kmer;
 #[cfg(feature = "gpu")]
 pub mod kriging;
+#[cfg(feature = "gpu")]
+pub mod locus_variance_gpu;
 pub mod merge_pairs;
 pub mod molecular_clock;
 pub mod multi_signal;
@@ -74,6 +82,8 @@ pub mod snp;
 #[cfg(feature = "gpu")]
 pub mod snp_gpu;
 pub mod special;
+#[cfg(feature = "gpu")]
+pub mod spatial_payoff_gpu;
 pub mod spectral_match;
 #[cfg(feature = "gpu")]
 pub mod spectral_match_gpu;

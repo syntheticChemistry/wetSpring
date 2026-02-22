@@ -420,6 +420,12 @@ name = "validate_cross_spring_evolution"
 path = "src/bin/validate_cross_spring_evolution.rs"
 required-features = ["gpu"]
 
+# ── Local WGSL Compile Test (Exp096) ─────────────────────────────
+[[bin]]
+name = "validate_local_wgsl_compile"
+path = "src/bin/validate_local_wgsl_compile.rs"
+required-features = ["gpu"]
+
 # ── Cross-Spring Scaling Benchmark (Exp095) ──────────────────────
 [[bin]]
 name = "benchmark_cross_spring_scaling"
