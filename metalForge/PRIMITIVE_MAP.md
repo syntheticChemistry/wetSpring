@@ -5,8 +5,8 @@
 GPU primitive (or explain why it stays CPU-only). This guides the
 absorption pipeline and identifies what ToadStool needs to build next.
 
-> **Feb 22 update (latest):** 32 ToadStool primitives consumed. 0 local WGSL
-> (Lean phase complete — S39-41 absorbed ODE, kmer, unifrac, taxonomy).
+> **Feb 22 update (latest):** 30 ToadStool primitives consumed. 3 local WGSL
+> (Lean phase complete; Write phase active — S39-41 absorbed ODE, kmer, unifrac, taxonomy).
 > Forge crate v0.2.0 adds streaming dispatch module.
 
 ---
@@ -175,8 +175,8 @@ The `bio::special` re-export shim has been removed (Phase 24).
 | Category | Count |
 |----------|-------|
 | **Lean** (upstream ToadStool) | 24 modules (16 original + 8 bio absorbed Feb 22) |
-| **Local** (WGSL shader) | 0 modules (Lean phase complete) |
+| **Local** (WGSL shader) | 3 modules (Write phase active) |
 | **Compose** (existing primitives) | 5 modules |
 | **CPU** (no GPU path) | 13 modules |
 | **NPU** (candidate) | 1 module |
-| **Local WGSL** (Write phase) | 0 (Lean phase complete) |
+| **Local WGSL** (Write phase) | 3 (Write phase active) |

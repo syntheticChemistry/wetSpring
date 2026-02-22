@@ -380,8 +380,8 @@ Current status: **1,349/1,349 CPU pass + 35 dispatch pass.** 83 experiments acro
 | `validate_cross_substrate` | 20 | metalForge cross-substrate CPU↔GPU parity (Exp060) |
 | `validate_gpu_rf` | 13 | RF batch inference shader (Exp063) |
 
-Current status: **451/451 pass.** 32 ToadStool primitives consumed.
-0 local WGSL shaders (Lean phase complete).
+Current status: **451/451 pass.** 30 ToadStool primitives consumed.
+3 local WGSL shaders (Lean phase complete).
 
 ### Grand Total: 1,835/1,835 quantitative checks pass
 
@@ -396,7 +396,7 @@ Current status: **451/451 pass.** 32 ToadStool primitives consumed.
 | GPU workload | Large-matrix eigensolve, MD force evaluation | Diversity, phylogenetics, ODE sweeps, HMM |
 | Validation metric | chi2/datum | Pass/fail within documented tolerance |
 | Data size | Small (52–2,042 nuclei) | Large (millions of reads, thousands of spectra) |
-| Local shaders | 10+ WGSL (HFB, MD, lattice QCD) | 0 WGSL (32 ToadStool primitives, Lean complete) |
+| Local shaders | 10+ WGSL (HFB, MD, lattice QCD) | 3 WGSL (30 ToadStool primitives, Lean complete) |
 | Absorption tracking | `EVOLUTION_READINESS.md` with tiers | `EVOLUTION_READINESS.md` with tiers (adopted) |
 | Key insight | GPU-resident hybrid beats CPU for matrix physics | Full GPU pipeline 2.45× faster; ODE/HMM/phylo math portable to GPU |
 

@@ -250,7 +250,7 @@ GemmF64 at small sizes are transfer-dominated (see Exp066 for larger sizes).
 | ToadStool bio primitives | 28 consumed (12 bio absorbed) | PASS |
 | ToadStool bio primitives (absorbed Feb 22) | 8 (HMM, DADA2, quality, ANI, SNP, pangenome, dN/dS, RF) | PASS |
 | Local WGSL shaders (Write phase) | 4 (ODE, kmer, unifrac, taxonomy) | ODE: PASS; others: pending validation |
-| **Grand total** | **2,229+ validation + 740 tests** | **ALL PASS** |
+| **Grand total** | **2,284+ validation + 740 tests** | **ALL PASS** |
 
 ---
 

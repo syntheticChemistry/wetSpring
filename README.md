@@ -264,9 +264,9 @@ On Feb 22, wetSpring rewired all 8 GPU modules to delegate to
   2. AdapterInfo propagation: `from_existing_simple()` broke f64 polyfill detection
 - **Cross-spring evolution documented** — ToadStool serves as convergence hub:
   hotSpring (precision/lattice QCD), wetSpring (bio/genomics), neuralSpring (ML/eigen)
-- **0 local WGSL shaders** — All absorbed by ToadStool S39-41; Lean phase complete (ODE blocker resolved: S41 fixed `compile_shader_f64`)
-- **32 ToadStool primitives consumed** (28 + 4 newly leaned)
-- **New handoff** submitted: `wateringHole/handoffs/WETSPRING_TOADSTOOL_REWIRE_FEB22_2026.md`
+- **0 local WGSL shaders** at end of Phase 20 (all absorbed by ToadStool S39-41)
+- **32 ToadStool primitives consumed** at Phase 20 (recounted to 30 in Phase 27)
+- Rewire handoff archived: `wateringHole/handoffs/archive/WETSPRING_TOADSTOOL_REWIRE_FEB22_2026.md`
 
 ### Phase 21: GPU/NPU Readiness + Dispatch Validation
 
@@ -597,7 +597,7 @@ All validation data comes from public repositories:
 - **ToadStool** — GPU compute engine (BarraCUDA crate, shared primitives across all Springs)
 - **wateringHole** — Inter-primal standards and handoff documents
   - `handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md` — original shader detail handoff
-  - `handoffs/WETSPRING_TOADSTOOL_REWIRE_FEB22_2026.md` — rewire results + bugs + cross-spring evolution
-  - `handoffs/WETSPRING_TOADSTOOL_V10_FEB22_2026.md` — v10 (neuralSpring wiring, cross-spring scaling)
-  - `handoffs/WETSPRING_TOADSTOOL_V11_FEB22_2026.md` — v11 (flat layouts, DRY models, zero-clone APIs)
+  - `handoffs/WETSPRING_TOADSTOOL_V14_FEB22_2026.md` — current (Write phase, ODE shaders, forge v0.3.0)
+  - `handoffs/WETSPRING_TOADSTOOL_V13_FEB22_2026.md` — edition 2024, structural evolution
+  - `handoffs/archive/` — V7-V12, rewire (fossil record)
 - **ecoPrimals** — Parent ecosystem

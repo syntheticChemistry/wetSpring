@@ -234,14 +234,19 @@ pub fn multi_signal_ode() -> BioWorkload {
 /// Chimera detection (CPU-only, sequential branching).
 #[must_use]
 pub fn chimera() -> BioWorkload {
-    BioWorkload::new_static(ShaderOrigin::CpuOnly).named("chimera", vec![Capability::CpuCompute])
+    BioWorkload::new_static(ShaderOrigin::CpuOnly).named(
+        "chimera",
+        vec![Capability::CpuCompute],
+    )
 }
 
 /// FASTQ parsing (CPU-only, I/O-bound).
 #[must_use]
 pub fn fastq_parsing() -> BioWorkload {
-    BioWorkload::new_static(ShaderOrigin::CpuOnly)
-        .named("fastq_parsing", vec![Capability::CpuCompute])
+    BioWorkload::new_static(ShaderOrigin::CpuOnly).named(
+        "fastq_parsing",
+        vec![Capability::CpuCompute],
+    )
 }
 
 // ── Inventory ───────────────────────────────────────────────────────
@@ -274,10 +279,7 @@ pub fn origin_summary() -> (usize, usize, usize) {
     let all = all_workloads();
     let absorbed = all.iter().filter(|w| w.is_absorbed()).count();
     let local = all.iter().filter(|w| w.is_local()).count();
-    let cpu_only = all
-        .iter()
-        .filter(|w| matches!(w.origin, ShaderOrigin::CpuOnly))
-        .count();
+    let cpu_only = all.iter().filter(|w| matches!(w.origin, ShaderOrigin::CpuOnly)).count();
     (absorbed, local, cpu_only)
 }
 
@@ -304,11 +306,7 @@ mod tests {
     fn local_ode_workloads_have_dims() {
         for w in [phage_defense_ode(), bistable_ode(), multi_signal_ode()] {
             assert!(w.is_local());
-            assert!(
-                w.ode_dims.is_some(),
-                "{} should have ODE dims",
-                w.workload.name
-            );
+            assert!(w.ode_dims.is_some(), "{} should have ODE dims", w.workload.name);
         }
     }
 

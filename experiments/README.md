@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-22 (Phase 26: 98 experiments, upstream GPU fixes + full control validation)
+**Updated**: 2026-02-22 (Phase 27: 100 experiments, upstream GPU fixes + full control validation)
 
 ---
 

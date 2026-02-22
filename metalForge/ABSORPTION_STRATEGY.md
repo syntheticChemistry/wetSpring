@@ -2,7 +2,7 @@
 
 **Date:** February 22, 2026
 **Pattern:** Write → Absorb → Lean (from hotSpring)
-**Status:** 32 ToadStool primitives (Lean complete), 0 local WGSL, 7 Tier A CPU modules
+**Status:** 30 ToadStool primitives (Lean complete), 3 local WGSL, 7 Tier A CPU modules
 
 ---
 
@@ -100,7 +100,7 @@ Every local shader must pass before handoff:
 | `PrngXoshiro` | `bio::rarefaction_gpu` | `ops::random::xoshiro` | Feb 22 |
 | `BatchTolSearchF64` | `bio::tolerance_search` | `ops::search::tol_search` | Feb 22 |
 
-### Local WGSL Shaders (0 — Lean phase complete)
+### Local WGSL Shaders (3 — Write phase active)
 
 All 12 shaders absorbed by ToadStool (sessions 31d/31g + 39-41). The `shaders/`
 directory is empty. Final 4 absorbed Feb 22: ODE (S41 fixed `compile_shader_f64`),

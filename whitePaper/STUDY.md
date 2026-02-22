@@ -16,9 +16,9 @@ energy, and memory in a unified benchmark harness. The study covers
 four tracks: 16S amplicon metagenomics (Track 1), comparative genomics
 and mathematical biology (Track 1b), deep-sea metagenomics and microbial
 evolution (Track 1c), and PFAS detection via LC-MS (Track 2),
-validating 66 Rust modules (41 CPU + 25 GPU) against baselines from Galaxy,
+validating 66 Rust modules (41 CPU + 30 GPU) against baselines from Galaxy,
 QIIME2, asari, FindPFAS, scipy, sklearn, dendropy, real NCBI SRA data, and
-published paper models with 2,229+ quantitative checks across 97 experiments
+published paper models with 2,284+ quantitative checks across 100 experiments
 — all passing. The pipeline proves substrate independence: math produces
 identical results on CPU and GPU, validated via metalForge cross-substrate
 checks (Exp060). Random Forest ensemble and Gradient Boosting Machine
@@ -69,7 +69,7 @@ chemistry:
 | Baseline | Python scipy | Galaxy/QIIME2 | asari/PFΔScreen |
 | GPU layer | ToadStool (wgpu) | ToadStool (wgpu) | ToadStool (wgpu) |
 | Success metric | chi² match | Same taxonomy | Same PFAS detected |
-| Checks | 418/418 | 2,229+/2,229+ | (included in 2,229+) |
+| Checks | 418/418 | 2,284+/2,284+ | (included in 2,284+) |
 
 Both prove the ecoPrimals thesis: sovereign compute on consumer hardware
 can replicate institutional results, then exceed them via Rust + GPU.
@@ -532,7 +532,7 @@ the shared crate. This cycle has completed for **12 bio primitives**: the origin
 4 (SmithWatermanGpu, GillespieGpu, TreeInferenceGpu, FelsensteinGpu) plus
 8 absorbed on Feb 22, 2026 (HmmBatchForwardF64, AniBatchF64, SnpCallingF64,
 DnDsBatchF64, PangenomeClassifyGpu, QualityFilterGpu, Dada2EStepGpu,
-RfBatchInferenceGpu). 0 local WGSL shaders (Lean phase complete; ToadStool S41 fixed `compile_shader_f64`).
+RfBatchInferenceGpu). 3 local WGSL shaders (Lean phase complete; ToadStool S41 fixed `compile_shader_f64`).
 The rewire process itself discovered
 and fixed two ToadStool bugs: an SNP binding layout mismatch and an
 AdapterInfo propagation failure that broke f64 polyfill detection on RTX 4070.

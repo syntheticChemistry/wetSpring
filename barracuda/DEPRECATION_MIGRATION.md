@@ -92,5 +92,5 @@ Following hotSpring's pattern:
 
 ## Deprecation Candidates (Pending Upstream)
 
-0 local WGSL shaders. All 12 absorbed by ToadStool (sessions 31d/31g + 39-41).
-Lean phase complete. ODE blocker resolved (S41 fixed `compile_shader_f64`).
+3 local WGSL shaders. All 12 absorbed by ToadStool (sessions 31d/31g + 39-41).
+Write phase active. ODE blocker resolved (S41 fixed `compile_shader_f64`).

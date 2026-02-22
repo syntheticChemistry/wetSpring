@@ -116,7 +116,7 @@
 
 | Category | Count |
 |----------|-------|
-| Experiments completed | 97 |
+| Experiments completed | 100 |
 | CPU validation checks | 1,392 |
 | GPU validation checks | 609 |
 | Dispatch validation checks | 80 |
@@ -124,7 +124,7 @@
 | Transfer/streaming checks | 57 |
 | Cross-spring checks | 39 |
 | Local WGSL checks | 10 |
-| **Total validation checks** | **2,229+** |
+| **Total validation checks** | **2,284+** |
 | Rust tests | 740 (666 lib + 60 integration + 14 doc) |
 | BarraCUDA CPU parity | 205/205 (25 domains + 6 ODE flat) |
 | BarraCUDA GPU parity | 16 domains (Exp064/087/092) |
