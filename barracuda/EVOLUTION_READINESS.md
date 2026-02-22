@@ -10,8 +10,9 @@ ToadStool sessions 31d and 31g absorbed all 8 remaining bio WGSL shaders.
 wetSpring rewired all 8 GPU modules to delegate to `barracuda::ops::bio::*`,
 deleted the absorbed shaders (25 KB), and verified: 633 tests pass, 0 clippy
 warnings (pedantic), clean docs. Four local WGSL shaders remain in Write phase:
-ODE sweep (blocked on ToadStool `enable f64;`), kmer histogram, unifrac
-propagation, and taxonomy FC scoring. See `ABSORPTION_MANIFEST.md` for details.
+ODE sweep (blocked on ToadStool `compile_shader` vs `compile_shader_f64`),
+kmer histogram, unifrac propagation, and taxonomy FC scoring. See
+`ABSORPTION_MANIFEST.md` for details.
 
 ### Code Quality (Phase 15)
 
@@ -100,7 +101,7 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 | `gemm_cached` | Matrix multiply | `GemmCachedF64` | Lean |
 | `hmm_gpu` | HMM forward | `HmmBatchForwardF64` | ✅ Lean (Feb 22) |
 | `kriging` | Spatial interpolation | `KrigingF64` | Lean |
-| `ode_sweep_gpu` | ODE parameter sweep | Local WGSL | **A** — blocked on ToadStool `enable f64;` |
+| `ode_sweep_gpu` | ODE parameter sweep | Local WGSL | **A** — blocked: upstream uses `compile_shader` not `compile_shader_f64` |
 | `pangenome_gpu` | Pangenome classify | `PangenomeClassifyGpu` | ✅ Lean (Feb 22) |
 | `pcoa_gpu` | PCoA eigenvalues | `BatchedEighGpu` | Lean |
 | `quality_gpu` | Quality filtering | `QualityFilterGpu` | ✅ Lean (Feb 22) |
@@ -118,7 +119,7 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 
 | Shader | Domain | GPU Checks | Status | Blocker |
 |--------|--------|:----------:|--------|---------|
-| `batched_qs_ode_rk4_f64.wgsl` | QS ODE sweep | 7 (Exp049) | **A** | ToadStool `enable f64;` in upstream shader line 35 |
+| `batched_qs_ode_rk4_f64.wgsl` | QS ODE sweep | 7 (Exp049) | **A** | Upstream `compile_shader` needs `compile_shader_f64` (session 39) |
 | `kmer_histogram_f64.wgsl` | K-mer counting | pending | **A** | Needs validation binary |
 | `unifrac_propagate_f64.wgsl` | UniFrac distance | pending | **A** | Multi-pass tree levels |
 | `taxonomy_fc_f64.wgsl` | Taxonomy scoring | pending | **A** | NPU int8 variant pending |
@@ -299,6 +300,9 @@ the rewire (SNP binding layout, AdapterInfo propagation).
 | Feb 22 | WGSL Write phase: kmer_histogram_f64, unifrac_propagate_f64, taxonomy_fc_f64 shaders |
 | Feb 22 | ABSORPTION_MANIFEST.md created — tracking Write → Absorb → Lean cycle |
 | Feb 22 | metalForge forge crate v0.2.0 — streaming dispatch module, CpuCompute capability |
+| Feb 22 | ToadStool review (session 39): 5 new bio primitives available (LocusVariance, PairwiseHamming, PairwiseJaccard, SpatialPayoff, BatchFitness) |
+| Feb 22 | ODE blocker updated: `enable f64;` cleared but `compile_shader` vs `compile_shader_f64` bug in upstream `batched_ode_rk4.rs:209` |
+| Feb 22 | Revalidated: 654 lib tests, clippy clean, GPU feature compiles against upstream HEAD (d45fdfb3) |
 
 ---
 

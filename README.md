@@ -263,7 +263,7 @@ On Feb 22, wetSpring rewired all 8 GPU modules to delegate to
   2. AdapterInfo propagation: `from_existing_simple()` broke f64 polyfill detection
 - **Cross-spring evolution documented** — ToadStool serves as convergence hub:
   hotSpring (precision/lattice QCD), wetSpring (bio/genomics), neuralSpring (ML/eigen)
-- **4 local WGSL shaders in Write phase** — ODE, kmer histogram, unifrac propagate, taxonomy FC (ODE blocked on ToadStool `enable f64;`; others ready for absorption)
+- **4 local WGSL shaders in Write phase** — ODE, kmer histogram, unifrac propagate, taxonomy FC (ODE blocked: upstream `compile_shader` needs `compile_shader_f64`; others ready for absorption)
 - **23 ToadStool primitives consumed** (up from 15)
 - **New handoff** submitted: `wateringHole/handoffs/WETSPRING_TOADSTOOL_REWIRE_FEB22_2026.md`
 
@@ -426,7 +426,7 @@ All 20 GPU modules delegate to ToadStool primitives (19 lean + 4 local WGSL shad
 
 | Shader | Domain | Blocker |
 |--------|--------|---------|
-| `batched_qs_ode_rk4_f64.wgsl` | ODE parameter sweep | ToadStool `enable f64;` in upstream shader line 35 |
+| `batched_qs_ode_rk4_f64.wgsl` | ODE parameter sweep | Upstream uses `compile_shader` not `compile_shader_f64` (session 39) |
 
 ### I/O Modules
 

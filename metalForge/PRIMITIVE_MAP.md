@@ -154,7 +154,7 @@ remain as the bridge between domain types and ToadStool's raw buffer API.
 | `random_forest` | `RfBatchInferenceGpu` | `predict_batch` | Feb 22 |
 | `felsenstein` | `FelsensteinGpu` | Per-site (already absorbed) | Earlier |
 
-Only the ODE sweep shader remains local (blocked on ToadStool `enable f64;`).
+Only the ODE sweep shader remains local (blocked: upstream uses `compile_shader` not `compile_shader_f64`).
 
 ### Shared Math (`crate::special`) — Extracted
 
@@ -175,7 +175,7 @@ Promoted from `bio::special` to top-level `crate::special` module.
 | Category | Count |
 |----------|-------|
 | **Lean** (upstream ToadStool) | 24 modules (16 original + 8 bio absorbed Feb 22) |
-| **Local** (WGSL shader) | 1 module (ODE sweep, blocked on ToadStool `enable f64;`) |
+| **Local** (WGSL shader) | 1 module (ODE sweep, blocked: upstream uses `compile_shader` not `compile_shader_f64`) |
 | **Compose** (existing primitives) | 5 modules |
 | **CPU** (no GPU path) | 13 modules |
 | **NPU** (candidate) | 1 module |

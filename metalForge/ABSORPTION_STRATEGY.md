@@ -106,7 +106,7 @@ Every local shader must pass before handoff:
 
 | Shader | File | GPU Checks | Absorption Path |
 |--------|------|:----------:|-----------------|
-| `batched_qs_ode_rk4_f64.wgsl` | `barracuda/src/shaders/` | 7 (Exp049) | Fix upstream `BatchedOdeRK4F64` |
+| `batched_qs_ode_rk4_f64.wgsl` | `barracuda/src/shaders/` | 7 (Exp049) | Upstream `batched_ode_rk4.rs:209` uses `compile_shader` not `compile_shader_f64` |
 | `kmer_histogram_f64.wgsl` | `barracuda/src/shaders/` | pending | New `KmerHistogramF64` |
 | `unifrac_propagate_f64.wgsl` | `barracuda/src/shaders/` | pending | New `UniFracPropagateF64` |
 | `taxonomy_fc_f64.wgsl` | `barracuda/src/shaders/` | pending | New `TaxonomyFcF64` + NPU int8 |

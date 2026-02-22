@@ -162,7 +162,7 @@ GPU workload — hotSpring's RK4 physics integrators would benefit directly.
 
 | Item | Blocker | Owner |
 |------|---------|-------|
-| ODE sweep shader | `enable f64;` in ToadStool upstream | ToadStool team |
+| ODE sweep shader | `compile_shader` not `compile_shader_f64` in `batched_ode_rk4.rs:209` | ToadStool team |
 | CPU math feature | `barracuda::math` feature proposal | ToadStool team |
 | `from_existing_simple()` deprecation | Design decision | ToadStool team |
 | Auto-dispatch thresholds | Performance profiling needed | Collaboration |

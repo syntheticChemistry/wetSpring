@@ -1,16 +1,18 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! GPU ODE parameter sweep for QS/c-di-GMP 5-variable system.
 //!
-//! Local workaround for `ToadStool`'s `BatchedOdeRK4F64` which ships a shader
-//! containing `enable f64;` that naga rejects (still present as of session 31h,
-//! `shaders/numerical/batched_qs_ode_rk4_f64.wgsl:35`). This wrapper uses a
-//! local copy of the shader (without `enable f64;`) compiled via
-//! `compile_shader_f64`.
+//! Local workaround for `ToadStool`'s `BatchedOdeRK4F64`. As of session 39
+//! (d45fdfb3), `ToadStool` removed `enable f64;` from the shader (line 35 is
+//! now a comment), BUT `batched_ode_rk4.rs:209` calls `compile_shader()`
+//! instead of `compile_shader_f64()`. Without f64 preamble injection the
+//! shader won't compile on naga/Vulkan backends. This local copy uses
+//! `ShaderTemplate::for_driver_auto` which injects the f64 preamble and
+//! `pow_f64`/`exp_f64`/`log_f64` polyfills for Ada Lovelace GPUs.
 //!
-//! **Write → Absorb → Lean**: once `ToadStool` removes the `enable f64;`
-//! directive from its ODE shader, this module can be replaced with a thin
-//! wrapper around `barracuda::ops::BatchedOdeRK4F64`, matching the pattern
-//! used by the other 8 rewired GPU modules.
+//! **Write → Absorb → Lean**: once `ToadStool` switches to `compile_shader_f64()`
+//! in `batched_ode_rk4.rs`, this module becomes a thin wrapper around
+//! `barracuda::ops::BatchedOdeRK4F64`, matching the pattern used by the
+//! other 19 rewired GPU modules. Filed as handoff feedback item.
 
 use barracuda::device::WgpuDevice;
 use barracuda::shaders::precision::ShaderTemplate;

@@ -24,7 +24,7 @@ wetspring-barracuda
 ```
 
 All GPU modules delegate to `barracuda::ops::*` primitives from ToadStool.
-No local WGSL shader compilation except for 4 Write-phase shaders (ODE, kmer, unifrac, taxonomy; ODE blocked on upstream `enable f64;` directive).
+No local WGSL shader compilation except for 4 Write-phase shaders (ODE, kmer, unifrac, taxonomy; ODE blocked: upstream uses `compile_shader` not `compile_shader_f64`).
 
 ## ToadStool Primitives Consumed (23)
 

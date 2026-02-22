@@ -43,7 +43,7 @@ Every paper in the queue goes through the full evolution path. Status:
 
 Papers with **no GPU path** (sequential algorithms: chimera, derep, NJ) stay CPU-only.
 Papers with **ODE models** (Waters, Fernandez, Mhatre) are GPU-ready via flat params
-but blocked by ToadStool's `enable f64;` issue.
+but blocked: upstream `batched_ode_rk4.rs` uses `compile_shader` not `compile_shader_f64`.
 
 ### Gaps
 

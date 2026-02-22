@@ -41,7 +41,7 @@ yet absorbed. They remain active and maintained in wetSpring.
 
 | Shader | Module | GPU Checks | Since | Blocker |
 |--------|--------|:----------:|-------|---------|
-| `batched_qs_ode_rk4_f64.wgsl` | `ode_sweep_gpu` | 7 | Exp049 | ToadStool `enable f64;` (upstream shader line 35) |
+| `batched_qs_ode_rk4_f64.wgsl` | `ode_sweep_gpu` | 7 | Exp049 | Upstream `batched_ode_rk4.rs:209` uses `compile_shader` not `compile_shader_f64` |
 
 ### CPU-Only Modules (Stable)
 
@@ -93,4 +93,4 @@ Following hotSpring's pattern:
 
 | Priority | Shader | Why | Blocker |
 |----------|--------|-----|---------|
-| **P1** | `batched_qs_ode_rk4_f64.wgsl` | 7/7 validated, ODE sweep pattern | ToadStool `enable f64;` directive on upstream shader line 35 |
+| **P1** | `batched_qs_ode_rk4_f64.wgsl` | 7/7 validated, ODE sweep pattern | Upstream `batched_ode_rk4.rs:209` uses `compile_shader` instead of `compile_shader_f64` |

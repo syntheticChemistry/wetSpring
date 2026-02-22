@@ -203,7 +203,7 @@ GPU math portability proven across all promoted domains:
 - **451/451 GPU checks** across 18 validation binaries
 - **Absorbed** (Lean): SW, Gillespie, DT, Felsenstein, GEMM, diversity, PCoA, spectral
 - **Absorbed** (Lean, Feb 22): HMM, DADA2, quality, ANI, SNP, dN/dS, pangenome, RF
-- **Local WGSL** (4 shaders): ODE, kmer, unifrac, taxonomy (ODE blocked on ToadStool `enable f64;`)
+- **Local WGSL** (4 shaders): ODE, kmer, unifrac, taxonomy (ODE blocked: upstream `compile_shader` needs `compile_shader_f64`)
 - **Composed**: Bootstrap (15/15), placement (15/15), bifurcation eigenvalues (5/5)
 - **GPU Parity v1** (Exp064): 8 domains consolidated in single binary
 - **metalForge Full** (Exp065): CPU↔GPU substrate-independence for full portfolio
@@ -336,8 +336,9 @@ it and rely on `compile_shader_f64` or `ShaderTemplate` preprocessing.
 ## ToadStool Absorption Candidates
 
 1. **`hmm_forward_f64.wgsl`** — batch HMM forward in log-space. 13/13 checks.
-2. **`batched_qs_ode_rk4_f64.wgsl`** — local fix of upstream shader
-   (strip `enable f64;`, replace `pow` with `pow_f64`, add `f64()` casts).
+2. **`batched_qs_ode_rk4_f64.wgsl`** — local fix: upstream `batched_ode_rk4.rs:209`
+   uses `compile_shader` not `compile_shader_f64`; wetSpring uses
+   `compile_shader_f64()` (ToadStool removed `enable f64;` session 39).
 3. **NVVM driver profile fix** — `needs_f64_exp_log_workaround()` should
    return `true` for Ada Lovelace (RTX 4070/4080/4090).
 
@@ -353,7 +354,7 @@ ToadStool/BarraCUDA team absorption. Following hotSpring's pattern:
 | Component | Status | Absorption Path |
 |-----------|--------|-----------------|
 | 8 WGSL shaders (absorbed Feb 22) | Lean — delegating to ToadStool | `ops::bio::*` |
-| 4 WGSL shaders (ODE, kmer, unifrac, taxonomy) | Local — ODE blocked on `enable f64;` | `ops::bio::*` |
+| 4 WGSL shaders (ODE, kmer, unifrac, taxonomy) | Local — ODE blocked: upstream uses `compile_shader` not `compile_shader_f64` | `ops::bio::*` |
 | `bio::special` (erf, ln_gamma, regularized_gamma) | Consolidated, `mul_add`-optimized | `barracuda::math` feature |
 | `bio::eic::integrate_peak` | Validated against Python | `barracuda::numerical::trapz` |
 | 32 tolerance constants | Hierarchy-tested | `barracuda::tolerances` cross-Spring standard |

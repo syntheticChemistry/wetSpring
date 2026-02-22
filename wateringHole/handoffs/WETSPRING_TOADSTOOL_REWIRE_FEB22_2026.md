@@ -17,7 +17,7 @@ ToadStool `barracuda::ops::bio::*` primitives, deleted 8 local WGSL
 shaders (25 KB), and confirmed all 451 GPU validation checks pass.
 Two ToadStool bugs were found and fixed during the process. 23 ToadStool
 primitives are now consumed (up from 15). 4 local WGSL shaders in Write phase
-(ODE, kmer, unifrac, taxonomy; ODE blocked on `enable f64;`).
+(ODE, kmer, unifrac, taxonomy; ODE blocked: upstream `compile_shader` needs `compile_shader_f64`).
 
 ---
 
@@ -85,11 +85,10 @@ explicit `AdapterInfo`.
 
 | Shader | Blocker |
 |--------|---------|
-| `batched_qs_ode_rk4_f64.wgsl` | ToadStool's upstream `BatchedOdeRK4F64` shader contains `enable f64;` (line 35), which causes Naga compilation failure on many drivers. wetSpring's local copy avoids this directive by using `compile_shader_f64()` (math_f64 preamble injection). |
+| `batched_qs_ode_rk4_f64.wgsl` | Upstream `batched_ode_rk4.rs:209` uses `compile_shader` instead of `compile_shader_f64`; f64 preamble not injected. ToadStool removed `enable f64;` (session 39) but shader still fails without preamble. wetSpring's local copy uses `compile_shader_f64()`. |
 
-**Recommended fix:** Remove `enable f64;` from ToadStool's ODE shader and
-rely on `compile_shader_f64()` preamble injection, matching the pattern
-used by all other bio shaders.
+**Recommended fix:** Change `batched_ode_rk4.rs:209` from `compile_shader` to
+`compile_shader_f64()` (or use `ShaderTemplate::for_driver_auto`).
 
 ---
 
@@ -190,10 +189,12 @@ hotSpring (physics) ──→ barracuda ←── wetSpring (bio)
 
 ## 8. Recommendations for ToadStool Team
 
-### Priority 1: Fix ODE shader `enable f64;`
-Remove `enable f64;` from `batched_qs_ode_rk4_f64.wgsl` line 35.
-Use `compile_shader_f64()` preamble injection instead. This is the only
-blocker preventing wetSpring from fully leaning on ToadStool.
+### Priority 1: Fix ODE shader compilation
+Upstream `batched_ode_rk4.rs:209` uses `compile_shader` instead of
+`compile_shader_f64` — change to `compile_shader_f64()` so f64 preamble
+is injected. ToadStool removed `enable f64;` (session 39) but the shader
+still won't work without preamble. This is the only blocker preventing
+wetSpring from fully leaning on ToadStool.
 
 ### Priority 2: Deprecate `from_existing_simple()`
 This method silently creates `AdapterInfo` with name `"External Device"`,

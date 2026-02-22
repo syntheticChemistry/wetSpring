@@ -249,7 +249,7 @@ Pipeline flow:
 
 | Shader | Purpose | f64? | Status |
 |--------|---------|------|--------|
-| `batched_qs_ode_rk4_f64.wgsl` | QS ODE parameter sweep | Yes (full) | Local — blocked on `enable f64;` in naga |
+| `batched_qs_ode_rk4_f64.wgsl` | QS ODE parameter sweep | Yes (full) | Local — blocked: upstream uses `compile_shader` not `compile_shader_f64` |
 
 **Previously local, now upstream ToadStool primitives (8 absorbed):**
 
@@ -532,18 +532,19 @@ the shared crate. This cycle has completed for **12 bio primitives**: the origin
 4 (SmithWatermanGpu, GillespieGpu, TreeInferenceGpu, FelsensteinGpu) plus
 8 absorbed on Feb 22, 2026 (HmmBatchForwardF64, AniBatchF64, SnpCallingF64,
 DnDsBatchF64, PangenomeClassifyGpu, QualityFilterGpu, Dada2EStepGpu,
-RfBatchInferenceGpu). 4 local WGSL shaders in Write phase (ODE blocked
-on ToadStool's `enable f64;` directive). The rewire process itself discovered
+RfBatchInferenceGpu). 4 local WGSL shaders in Write phase (ODE blocked:
+upstream `batched_ode_rk4.rs` uses `compile_shader` not `compile_shader_f64`).
+The rewire process itself discovered
 and fixed two ToadStool bugs: an SNP binding layout mismatch and an
 AdapterInfo propagation failure that broke f64 polyfill detection on RTX 4070.
 
 | Stage | Extensions | Status |
 |-------|-----------|--------|
 | **Absorbed** (23) | SW, Gillespie, DT, Felsenstein, GEMM, diversity, HMM, ANI, SNP, dN/dS, Pangenome, QF, DADA2, RF | Lean on upstream |
-| **Tier A** (ODE, local) | `batched_qs_ode_rk4_f64.wgsl` (7/7) + 5 ODE flat APIs | Blocked: `enable f64;` |
+| **Tier A** (ODE, local) | `batched_qs_ode_rk4_f64.wgsl` (7/7) + 5 ODE flat APIs | Blocked: `compile_shader` needs `compile_shader_f64` |
 | **Tier A** (GPU-ready) | kmer (4^k histogram, Exp081), unifrac (CSR flat tree, Exp082) | Flat layout validated |
 | **Tier A/NPU** | taxonomy (int8 quantized, Exp083) | NPU FC dispatch ready |
-| **Tier B** (2 remaining) | cooperation (flat API done, ODE blocked) | Same `enable f64;` blocker |
+| **Tier B** (2 remaining) | cooperation (flat API done, ODE blocked) | Same `compile_shader` vs `compile_shader_f64` blocker |
 | **Tier C** (CPU-only) | chimera, derep, NJ, reconciliation, GBM, capacitor | No GPU path |
 
 **NVVM driver profile bug** (fixed Feb 22): wetSpring's `GpuF64::new()` was using

@@ -87,7 +87,7 @@ Shaders written locally, pending ToadStool absorption.
 
 | Shader | File | Domain | GPU Checks | Blocker |
 |--------|------|--------|:----------:|---------|
-| `batched_qs_ode_rk4_f64.wgsl` | `src/shaders/` | QS/c-di-GMP ODE | 7 (Exp049) | ToadStool `enable f64;` |
+| `batched_qs_ode_rk4_f64.wgsl` | `src/shaders/` | QS/c-di-GMP ODE | 7 (Exp049) | Upstream uses `compile_shader` not `compile_shader_f64` |
 | `kmer_histogram_f64.wgsl` | `src/shaders/` | K-mer counting | pending | Needs validation binary |
 | `unifrac_propagate_f64.wgsl` | `src/shaders/` | UniFrac distance | pending | Multi-pass tree levels |
 | `taxonomy_fc_f64.wgsl` | `src/shaders/` | Taxonomy scoring | pending | NPU int8 variant |
@@ -153,6 +153,34 @@ The `metalForge/forge/` crate (`wetspring-forge` v0.2.0) provides:
 
 **Bridge docstring:** "When ToadStool absorbs forge, this bridge becomes the
 integration point — substrate discovery feeds directly into device creation."
+
+---
+
+## New Upstream Primitives Available (ToadStool Session 39)
+
+ToadStool has added 5 new bio primitives since the v4 handoff absorption.
+These are available in `barracuda::ops::bio` but not yet consumed by wetSpring.
+
+| Primitive | Module | Potential wetSpring Use |
+|-----------|--------|----------------------|
+| `LocusVarianceGpu` | `ops::bio::locus_variance` | FST per-locus AF variance for population genetics |
+| `PairwiseHammingGpu` | `ops::bio::pairwise_hamming` | SNP-based strain distance matrices |
+| `PairwiseJaccardGpu` | `ops::bio::pairwise_jaccard` | Gene presence/absence similarity |
+| `SpatialPayoffGpu` | `ops::bio::spatial_payoff` | Spatial PD payoff for cooperation models |
+| `BatchFitnessGpu` | `ops::bio::batch_fitness` | EA batch fitness for evolutionary simulations |
+
+### ToadStool ODE Status (Session 39)
+
+`BatchedOdeRK4F64` exists in `ops::batched_ode_rk4` with the correct API
+shape (5 vars, 17 params, same as wetSpring). The `enable f64;` directive
+was removed from the WGSL shader (line 35 is now a comment). **However**,
+`batched_ode_rk4.rs:209` calls `compile_shader()` instead of
+`compile_shader_f64()`, which means the f64 preamble is not injected.
+Without this, the shader fails on naga/Vulkan backends.
+
+**Feedback for ToadStool**: change line 209 from `dev.compile_shader(...)` to
+`dev.compile_shader_f64(...)` (or use `ShaderTemplate::for_driver_auto`).
+Once fixed, wetSpring's `ode_sweep_gpu.rs` becomes a thin wrapper.
 
 ---
 

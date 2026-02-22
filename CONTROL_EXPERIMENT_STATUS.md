@@ -295,7 +295,7 @@ Following hotSpring's pattern for ToadStool integration:
 | Phase | Count | Status |
 |-------|:-----:|--------|
 | **Lean** (consumed upstream) | 20 GPU modules, 23 primitives | Active — 15 original + 8 bio (HMM, ANI, SNP, dN/dS, Pangenome, QF, DADA2, RF) |
-| **Write** (local WGSL, pending absorption) | 4 shaders (ODE, kmer, unifrac, taxonomy) | ODE blocked on ToadStool `enable f64;`; others pending validation |
+| **Write** (local WGSL, pending absorption) | 4 shaders (ODE, kmer, unifrac, taxonomy) | ODE blocked: upstream `compile_shader` needs `compile_shader_f64`; others pending validation |
 | **CPU math** (`bio::special`) | 3 functions (erf, ln_gamma, regularized_gamma) | Consolidated; shaped for extraction to `barracuda::math` |
 | **CPU-only** (no GPU path) | 12 modules | Stable — chimera, derep, GBM, merge_pairs, etc. |
 | **Blocked** (needs upstream) | 3 modules | kmer hash, UniFrac tree traversal, taxonomy NPU |
