@@ -245,7 +245,7 @@ Proving the full ToadStool dispatch model and multi-substrate routing:
   per-stage latency profiling. 17/17 PASS.
 - **Handoff v6** — comprehensive ToadStool/BarraCUDA team handoff with all 9 shader
   binding layouts, dispatch geometry, NVVM driver profile bug, CPU math extraction plan,
-  and streaming pipeline findings. See `HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_21_2026.md`.
+  and streaming pipeline findings. See `wateringHole/handoffs/` for current handoffs.
 
 ### Phase 20: Current — ToadStool Bio Rewire + Cross-Spring Evolution
 
@@ -470,7 +470,6 @@ wetSpring/
 ├── README.md                      ← this file
 ├── BENCHMARK_RESULTS.md           ← three-tier benchmark results
 ├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (97 experiments)
-├── HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_21_2026.md  ← ToadStool handoff v6
 ├── barracuda/                     ← Rust crate (src/, Cargo.toml, rustfmt.toml)
 │   ├── EVOLUTION_READINESS.md    ← absorption map (tiers, primitives, shaders)
 │   ├── ABSORPTION_MANIFEST.md    ← what's absorbed, local, planned (hotSpring pattern)
@@ -574,5 +573,4 @@ All validation data comes from public repositories:
   - `handoffs/WETSPRING_TOADSTOOL_REWIRE_FEB22_2026.md` — rewire results + bugs + cross-spring evolution
   - `handoffs/WETSPRING_TOADSTOOL_V10_FEB22_2026.md` — v10 (neuralSpring wiring, cross-spring scaling)
   - `handoffs/WETSPRING_TOADSTOOL_V11_FEB22_2026.md` — v11 (flat layouts, DRY models, zero-clone APIs)
-- **Root handoff** — `HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_21_2026.md` — comprehensive v6
 - **ecoPrimals** — Parent ecosystem

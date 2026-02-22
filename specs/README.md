@@ -112,7 +112,7 @@ but blocked: upstream `batched_ode_rk4.rs` uses `compile_shader` not `compile_sh
 | CONTROL_EXPERIMENT_STATUS.md | `../` | 97 experiments, 2,229+ validation checks |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
-| HANDOFF (v6) | `../` | Current consolidated ToadStool handoff |
+| Handoff (v11) | `../wateringHole/handoffs/` | Current ToadStool handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |
@@ -156,7 +156,7 @@ but blocked: upstream `batched_ode_rk4.rs` uses `compile_shader` not `compile_sh
 `../whitePaper/STUDY.md` → `../CONTROL_EXPERIMENT_STATUS.md` → `../barracuda/EVOLUTION_READINESS.md` → BARRACUDA_REQUIREMENTS.md
 
 **Integration partner**:
-`../HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_21_2026.md` → `../BENCHMARK_RESULTS.md`
+`../wateringHole/handoffs/WETSPRING_TOADSTOOL_V11_FEB22_2026.md` → `../BENCHMARK_RESULTS.md`
 
 ---
 
