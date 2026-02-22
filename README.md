@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCUDA absorption. Follows the
 
 **Date:** February 22, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 22 — 19/20 GPU modules lean on upstream; 4 WGSL shaders in Write phase
+**Status:** Phase 23 — Structural evolution complete; 728 tests, 97 experiments, flat layouts throughout
 
 ---
 
@@ -90,11 +90,10 @@ absorbs forge, the bridge module becomes the integration point.
 | Layout fidelity checks | 35 |
 | Transfer/streaming checks | 57 |
 | **Total validation checks** | **2,229+** |
-| Rust library unit tests | 661 (with `--features gpu`) |
-| Rust doc-tests | 14 |
-| **Total Rust tests** | **675** (661 GPU + 14 CPU) |
-| Experiments completed | 96 |
-| Validation/benchmark binaries | 78 validate + 8 benchmark = 86 total |
+| Rust library unit tests | 654 + 74 integration/doc |
+| **Total Rust tests** | **728** |
+| Experiments completed | 97 |
+| Validation/benchmark binaries | 79 validate + 8 benchmark = 87 total |
 | CPU bio modules | 41 |
 | GPU bio modules | 25 (20 lean on ToadStool, 5 new wrappers: hamming_gpu, jaccard_gpu, spatial_payoff_gpu, batch_fitness_gpu, locus_variance_gpu; 4 local WGSL shaders (ODE, kmer, unifrac, taxonomy)) |
 | Tier A (GPU/NPU-ready) | 7 modules with flat layouts |
@@ -108,7 +107,7 @@ absorbs forge, the bridge module becomes the integration point.
 | ToadStool primitives consumed | **28** (15 original + 8 bio absorbed Feb 22 + 5 neuralSpring absorbed) |
 | Local WGSL shaders | **4** (ODE, kmer histogram, unifrac propagate, taxonomy FC) |
 
-All 2,229+ validation checks **PASS**. All 675 tests **PASS**.
+All 2,229+ validation checks **PASS**. All 728 tests **PASS**.
 
 ### GPU Performance
 
@@ -313,7 +312,32 @@ ToadStool's unidirectional streaming — zero CPU round-trips between stages:
 - **Exp095: Cross-Spring Scaling Benchmark** — 7 benchmarks across 5
   neuralSpring primitives at realistic problem sizes (6.5×–277× GPU speedup).
 
-**Tier A: 7 modules** | **Tier B: 1 remaining** | **675 tests** | **2,229+ checks** | **86 binaries**
+**Tier A: 7 modules** | **Tier B: 1 remaining** | **728 tests** | **2,229+ checks** | **87 binaries**
+
+### Phase 23: Structural Evolution — Flat Layouts, DRY Models, Zero-Clone APIs
+
+Deep two-pass evolution of the barracuda codebase (Exp097):
+
+- **ODE trajectory flattened** — `OdeResult.y: Vec<Vec<f64>>` → flat `Vec<f64>` with
+  `n_vars`, `state_at()`, `states()`, `var_at()` accessors. Per-step `.clone()` eliminated
+  via `extend_from_slice()`. Affects all 6 ODE modules + 6 validation binaries.
+- **Gillespie trajectory flattened** — `Trajectory.states: Vec<Vec<i64>>` → flat `Vec<i64>`
+  with `n_species`, `state_at()`, `states_iter()`. Same clone elimination pattern.
+- **DADA2 error model unified** — `init_error_model`, `estimate_error_model`,
+  `err_model_converged`, `base_to_idx`, and 5 constants shared from `dada2.rs` as
+  `pub(crate)`. GPU module delegates instead of duplicating. Single source of truth.
+- **UniFrac distance matrix condensed** — Returns `UnifracDistanceMatrix` with condensed
+  upper-triangle `Vec<f64>` instead of `Vec<Vec<f64>>` N×N. Halves memory, aligns
+  directly with `pcoa()` condensed input format.
+- **Adapter trim zero-clone** — `trim_adapter_3prime` returns `Option<FastqRecord>` instead
+  of `(FastqRecord, bool)`, eliminating the common-path clone.
+- **PCoA coordinates flat** — `PcoaResult.coordinates: Vec<Vec<f64>>` → flat with accessors.
+- **Capability-based ODE polyfill** — `dev.needs_f64_exp_log_workaround()` replaces
+  hardcoded `true`.
+- **Full audit clean** — Zero unsafe, zero TODO/FIXME, zero cross-primal coupling,
+  zero `unimplemented!()`, zero production mocks.
+
+728 tests pass. 48/48 CPU-GPU domain parity. 39/39 cross-spring evolution.
 
 ### Phase 19: Absorption Engineering + Debt Resolution
 
@@ -445,7 +469,7 @@ All 20 GPU modules delegate to ToadStool primitives (24 lean including 5 neuralS
 wetSpring/
 ├── README.md                      ← this file
 ├── BENCHMARK_RESULTS.md           ← three-tier benchmark results
-├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (96 experiments)
+├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (97 experiments)
 ├── HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_21_2026.md  ← ToadStool handoff v6
 ├── barracuda/                     ← Rust crate (src/, Cargo.toml, rustfmt.toml)
 │   ├── EVOLUTION_READINESS.md    ← absorption map (tiers, primitives, shaders)
@@ -463,7 +487,7 @@ wetSpring/
 │   │   ├── bin/                 ← 86 validation/benchmark binaries
 │   │   └── shaders/             ← 4 local WGSL shaders (ODE, kmer, unifrac, taxonomy; 8 absorbed by ToadStool)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2021
-├── experiments/                   ← 96 experiment protocols + results
+├── experiments/                   ← 97 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
 │   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs, bridge.rs
@@ -490,7 +514,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (675: 661 lib + 14 doc with --features gpu)
+# Run all tests (728: 654 lib + 74 integration/doc)
 cargo test
 
 # Code quality checks
@@ -548,7 +572,7 @@ All validation data comes from public repositories:
 - **wateringHole** — Inter-primal standards and handoff documents
   - `handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md` — original shader detail handoff
   - `handoffs/WETSPRING_TOADSTOOL_REWIRE_FEB22_2026.md` — rewire results + bugs + cross-spring evolution
-  - `handoffs/WETSPRING_TOADSTOOL_V7_FEB22_2026.md` — v7 handoff (dispatch, layouts, streaming)
-  - `handoffs/WETSPRING_TOADSTOOL_V8_FEB22_2026.md` — v8 handoff (pure GPU streaming, absorption learnings)
+  - `handoffs/WETSPRING_TOADSTOOL_V10_FEB22_2026.md` — v10 (neuralSpring wiring, cross-spring scaling)
+  - `handoffs/WETSPRING_TOADSTOOL_V11_FEB22_2026.md` — v11 (flat layouts, DRY models, zero-clone APIs)
 - **Root handoff** — `HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_21_2026.md` — comprehensive v6
 - **ecoPrimals** — Parent ecosystem

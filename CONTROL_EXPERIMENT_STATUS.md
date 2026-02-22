@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 22, 2026
-**Status:** 96 experiments, 2,229+ validation checks, all PASS (661 GPU + 14 CPU Rust tests)
+**Status:** 97 experiments, 2,229+ validation checks, all PASS (728 Rust tests)
 
 ---
 
@@ -105,6 +105,7 @@
 | 094 | Cross-Spring Evolution Validation | GPU/parity | COMPLETE | 39 (5 neuralSpring primitives CPU↔GPU) |
 | 095 | Cross-Spring Scaling Benchmark | GPU/benchmark | COMPLETE | 7 (scaling across 3 Springs) |
 | 096 | Local WGSL Compile + Dispatch | GPU/shader | COMPLETE | 10 (4 shaders compile + dispatch) |
+| 097 | Structural Evolution Pass | code quality | COMPLETE | — (22-file refactor: flat layouts, DRY models, zero-clone APIs) |
 
 ---
 
@@ -377,6 +378,20 @@ Bugs found and fixed: SNP binding layout (ToadStool), AdapterInfo propagation (w
 | 095 | Cross-Spring Scaling Benchmark | 7 | Cross-spring scaling at realistic sizes (--release --features gpu) |
 | 096 | Local WGSL Compile + Dispatch | 10 | 4 Write-phase shaders compile + dispatch (--features gpu) |
 
+### Structural Evolution (Phase 23, Exp097)
+
+| Target | Change | Validation |
+|--------|--------|------------|
+| ODE trajectory | `Vec<Vec<f64>>` → flat `Vec<f64>` + `state_at()`/`states()` | 728 tests, all ODE scenarios pass |
+| Gillespie trajectory | `Vec<Vec<i64>>` → flat `Vec<i64>` + `states_iter()` | SSA convergence pass |
+| DADA2 error model | 5 functions unified; GPU delegates | Denoising parity preserved |
+| UniFrac distance matrix | N×N → condensed upper-triangle | UniFrac distance parity |
+| Adapter trim | `(FastqRecord, bool)` → `Option<FastqRecord>` | FASTQ trimming pass |
+| PCoA coordinates | `Vec<Vec<f64>>` → flat + `coord()` | PCoA eigendecomposition pass |
+| ODE GPU polyfill | Hardcoded → `dev.needs_f64_exp_log_workaround()` | ODE GPU sweep pass |
+
+728 tests. 48/48 CPU-GPU. 39/39 cross-spring. 0 clippy warnings.
+
 ### Handoff Documents
 
 | Document | Location | Purpose |
@@ -384,3 +399,4 @@ Bugs found and fixed: SNP binding layout (ToadStool), AdapterInfo propagation (w
 | Tier A shader specs | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md` | Original binding layouts, dispatch geometry |
 | Rewire results | `wateringHole/handoffs/WETSPRING_TOADSTOOL_REWIRE_FEB22_2026.md` | Rewire outcomes, bugs, cross-spring evolution |
 | Cross-spring evolution | `wateringHole/handoffs/CROSS_SPRING_EVOLUTION_WETSPRING_FEB22_2026.md` | wetSpring perspective on biome model |
+| Structural evolution handoff | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V11_FEB22_2026.md` | Flat layouts, DRY models, zero-clone patterns for absorption |

@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 22, 2026
-**Status:** Validation study complete — 2,229+/2,229+ checks, 675 tests, 96.21% line coverage, 96 experiments
+**Status:** Validation study complete — 2,229+/2,229+ checks, 728 tests, 96.21% line coverage, 97 experiments
 **License:** AGPL-3.0-or-later
 
 ---
@@ -53,8 +53,11 @@ implementations into upstream ToadStool/BarraCUDA primitives:
 
 **Current status:** 24 GPU modules lean on upstream (19 wetSpring + 5 neuralSpring); 4 local WGSL shaders
 in Write phase (ODE sweep, kmer histogram, unifrac propagation, taxonomy FC).
-The forge crate (`metalForge/forge/` v0.2.0) provides substrate discovery
-and capability-based dispatch as an absorption seam for ToadStool.
+Phase 23 structurally evolved all trajectory types to flat contiguous layouts,
+unified the DADA2 error model, and eliminated per-step clones — all directly
+GPU-buffer-compatible. The forge crate (`metalForge/forge/` v0.2.0) provides
+substrate discovery and capability-based dispatch as an absorption seam for
+ToadStool.
 
 ---
 
@@ -113,6 +116,7 @@ and capability-based dispatch as an absorption seam for ToadStool.
 | Write → Absorb → Lean: 24 absorbed, 4 in Write | ABSORPTION_MANIFEST.md, hotSpring methodology |
 | Cross-spring evolution: 5 neuralSpring primitives validated | Exp094, 39/39 checks; Exp095, 7 benchmarks |
 | Local WGSL compile + dispatch | Exp096, 10/10 checks |
+| Structural evolution: flat layouts + DRY models + zero-clone APIs | Exp097, 728 tests, 48/48 GPU, 39/39 cross-spring |
 
 ---
 
@@ -275,7 +279,7 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCUDA/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34 WGSL shaders, 637 tests)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (4 local WGSL shaders, 675 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (4 local WGSL shaders, 728 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **archive/handoffs/** — Fossil record of ToadStool handoffs (v1–v7)
 

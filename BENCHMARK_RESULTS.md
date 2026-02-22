@@ -74,9 +74,9 @@ Tier 3: GPU (ToadStool/BarraCUDA, math parity with CPU)
 
 | Suite | Count | Status |
 |-------|-------|--------|
-| Library unit tests | 587 | PASS (+ 1 ignored — hardware-dependent) |
-| Integration tests | 50 | PASS |
-| Doc-tests | 13 | PASS |
+| Library unit tests | 654 | PASS (+ 1 ignored — hardware-dependent) |
+| Integration tests | 60 | PASS |
+| Doc-tests | 14 | PASS |
 | **Total** | **650** | **PASS** |
 | Line coverage | 97% bio+io (56% overall) | Exceeds 90% target |
 
@@ -243,7 +243,7 @@ GemmF64 at small sizes are transfer-dominated (see Exp066 for larger sizes).
 |----------|--------|--------|
 | Rust CPU validation | 1,291 | PASS |
 | GPU validation | 451 | PASS |
-| Rust tests | 650 (587 lib + 50 integration + 13 doc) | PASS |
+| Rust tests | 728 (654 lib + 60 integration + 14 doc) | PASS |
 | Python baselines | 40 scripts | PASS |
 | BarraCUDA CPU parity | 205/205 (25 domains + 6 ODE flat) | PASS |
 | ToadStool bio primitives | 23 consumed (12 bio absorbed) | PASS |
