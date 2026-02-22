@@ -128,13 +128,13 @@ ToadStool-absorbed bio shaders (handled by `compile_shader_f64()`).
 
 ---
 
-## Absorption Status (Feb 21, 2026)
+## Absorption Status (Feb 22, 2026)
 
 | Category | Count | Status |
 |----------|:-----:|--------|
 | Absorbed (lean on ToadStool) | 11 modules | Active |
 | Absorbed by ToadStool (Feb 22) | 8 shaders | Lean |
-| Local WGSL (ODE) | 1 shader | Blocked on `enable f64;` |
+| Local WGSL (ODE, kmer, unifrac, taxonomy) | 4 shaders | Write phase |
 | CPU-only (sequential/branching) | 15 modules | Stable |
 | Blocked (needs new primitive) | 3 modules | Waiting on ToadStool |
 

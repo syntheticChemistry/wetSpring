@@ -190,6 +190,150 @@ fn parse_label_length(chars: &[char]) -> (String, f64, usize) {
     (label, bl, i)
 }
 
+/// GPU-compatible flat tree representation (CSR layout).
+///
+/// All tree topology in contiguous arrays for GPU buffer upload.
+/// Children stored in compressed sparse row format: node `i` has children
+/// at `children_flat[children_offset[i] .. children_offset[i] + n_children[i]]`.
+#[derive(Debug, Clone)]
+pub struct FlatTree {
+    /// Parent index for each node (root points to itself).
+    pub parent: Vec<u32>,
+    /// Branch length from node to its parent.
+    pub branch_length: Vec<f64>,
+    /// Number of children per node.
+    pub n_children: Vec<u32>,
+    /// Offset into `children_flat` for each node.
+    pub children_offset: Vec<u32>,
+    /// Flattened children indices.
+    pub children_flat: Vec<u32>,
+    /// Number of nodes.
+    pub n_nodes: u32,
+    /// Root index.
+    pub root: u32,
+    /// Leaf node indices (for sample mapping).
+    pub leaf_indices: Vec<u32>,
+    /// Leaf labels in the same order as `leaf_indices`.
+    pub leaf_labels: Vec<String>,
+}
+
+impl PhyloTree {
+    /// Convert to a GPU-compatible flat tree (CSR layout).
+    #[must_use]
+    #[allow(clippy::cast_possible_truncation)]
+    pub fn to_flat_tree(&self) -> FlatTree {
+        let n = self.nodes.len();
+        let mut parent = Vec::with_capacity(n);
+        let mut branch_length = Vec::with_capacity(n);
+        let mut n_children = Vec::with_capacity(n);
+        let mut children_offset = Vec::with_capacity(n);
+        let mut children_flat = Vec::new();
+
+        for node in &self.nodes {
+            parent.push(node.parent as u32);
+            branch_length.push(node.branch_length);
+            n_children.push(node.children.len() as u32);
+            children_offset.push(children_flat.len() as u32);
+            for &c in &node.children {
+                children_flat.push(c as u32);
+            }
+        }
+
+        let mut leaf_indices = Vec::new();
+        let mut leaf_labels = Vec::new();
+        for (idx, node) in self.nodes.iter().enumerate() {
+            if node.children.is_empty() && !node.label.is_empty() {
+                leaf_indices.push(idx as u32);
+                leaf_labels.push(node.label.clone());
+            }
+        }
+
+        FlatTree {
+            parent,
+            branch_length,
+            n_children,
+            children_offset,
+            children_flat,
+            n_nodes: n as u32,
+            root: self.root as u32,
+            leaf_indices,
+            leaf_labels,
+        }
+    }
+}
+
+impl FlatTree {
+    /// Reconstruct a `PhyloTree` from flat arrays.
+    #[must_use]
+    pub fn to_phylo_tree(&self) -> PhyloTree {
+        let n = self.n_nodes as usize;
+        let mut nodes = Vec::with_capacity(n);
+
+        for i in 0..n {
+            let nc = self.n_children[i] as usize;
+            let off = self.children_offset[i] as usize;
+            let children: Vec<usize> = self.children_flat[off..off + nc]
+                .iter()
+                .map(|&c| c as usize)
+                .collect();
+
+            let label = self
+                .leaf_indices
+                .iter()
+                .position(|&li| li == i as u32)
+                .map(|pos| self.leaf_labels[pos].clone())
+                .unwrap_or_default();
+
+            nodes.push(TreeNode {
+                parent: self.parent[i] as usize,
+                branch_length: self.branch_length[i],
+                label,
+                children,
+            });
+        }
+
+        let mut leaf_index = HashMap::new();
+        for (idx, node) in nodes.iter().enumerate() {
+            if node.children.is_empty() && !node.label.is_empty() {
+                leaf_index.insert(node.label.clone(), idx);
+            }
+        }
+
+        PhyloTree {
+            nodes,
+            root: self.root as usize,
+            leaf_index,
+        }
+    }
+}
+
+/// Build a dense sample × leaf matrix for GPU dispatch.
+///
+/// Returns `(matrix, n_samples, n_leaves)` where `matrix[s * n_leaves + l]` =
+/// abundance of leaf `l` in sample `s`. Leaf ordering matches `flat_tree.leaf_labels`.
+#[must_use]
+pub fn to_sample_matrix(
+    flat_tree: &FlatTree,
+    samples: &AbundanceTable,
+) -> (Vec<f64>, usize, usize) {
+    let sample_ids: Vec<&String> = samples.keys().collect();
+    let n_samples = sample_ids.len();
+    let n_leaves = flat_tree.leaf_labels.len();
+    let mut matrix = vec![0.0_f64; n_samples * n_leaves];
+
+    for (si, sid) in sample_ids.iter().enumerate() {
+        if let Some(abundances) = samples.get(*sid) {
+            for (li, label) in flat_tree.leaf_labels.iter().enumerate() {
+                if let Some(&val) = abundances.get(label) {
+                    matrix[si * n_leaves + li] = val;
+                }
+            }
+        }
+    }
+
+    (matrix, n_samples, n_leaves)
+}
+
 /// An abundance table: `sample_id` -> (`leaf_label` -> `count`).
 pub type AbundanceTable = HashMap<String, HashMap<String, f64>>;
 
@@ -501,5 +645,100 @@ mod tests {
             (d - 1.0).abs() < 1e-10,
             "completely disjoint on star tree should be 1.0, got {d}"
         );
+    }
+
+    #[test]
+    fn flat_tree_round_trip() {
+        let tree = simple_tree();
+        let flat = tree.to_flat_tree();
+        assert_eq!(flat.n_nodes as usize, tree.nodes.len());
+        assert_eq!(flat.leaf_indices.len(), 4);
+        assert_eq!(flat.leaf_labels.len(), 4);
+
+        let restored = flat.to_phylo_tree();
+        assert_eq!(restored.n_leaves(), tree.n_leaves());
+        for label in &["A", "B", "C", "D"] {
+            assert_eq!(
+                restored.leaf_idx(label),
+                tree.leaf_idx(label),
+                "leaf {label} index mismatch"
+            );
+        }
+        assert!(
+            (restored.total_branch_length() - tree.total_branch_length()).abs() < 1e-12,
+            "branch length mismatch"
+        );
+    }
+
+    #[test]
+    fn flat_tree_unifrac_parity() {
+        let tree = simple_tree();
+        let flat = tree.to_flat_tree();
+        let restored = flat.to_phylo_tree();
+
+        let mut sa: HashMap<String, f64> = HashMap::new();
+        sa.insert("A".to_string(), 10.0);
+        sa.insert("B".to_string(), 5.0);
+        let mut sb: HashMap<String, f64> = HashMap::new();
+        sb.insert("C".to_string(), 10.0);
+        sb.insert("D".to_string(), 5.0);
+
+        let d_orig = unweighted_unifrac(&tree, &sa, &sb);
+        let d_flat = unweighted_unifrac(&restored, &sa, &sb);
+        assert!(
+            (d_orig - d_flat).abs() < 1e-12,
+            "unweighted UniFrac mismatch: {d_orig} vs {d_flat}"
+        );
+
+        let d_orig_w = weighted_unifrac(&tree, &sa, &sb);
+        let d_flat_w = weighted_unifrac(&restored, &sa, &sb);
+        assert!(
+            (d_orig_w - d_flat_w).abs() < 1e-12,
+            "weighted UniFrac mismatch: {d_orig_w} vs {d_flat_w}"
+        );
+    }
+
+    #[test]
+    fn sample_matrix_layout() {
+        let tree = simple_tree();
+        let flat = tree.to_flat_tree();
+
+        let mut samples: AbundanceTable = HashMap::new();
+        let mut s1: HashMap<String, f64> = HashMap::new();
+        s1.insert("A".to_string(), 10.0);
+        s1.insert("C".to_string(), 5.0);
+        samples.insert("sample1".to_string(), s1);
+        let mut s2: HashMap<String, f64> = HashMap::new();
+        s2.insert("B".to_string(), 8.0);
+        s2.insert("D".to_string(), 3.0);
+        samples.insert("sample2".to_string(), s2);
+
+        let (matrix, n_samples, n_leaves) = to_sample_matrix(&flat, &samples);
+        assert_eq!(n_samples, 2);
+        assert_eq!(n_leaves, 4);
+        assert_eq!(matrix.len(), 8);
+        let total: f64 = matrix.iter().sum();
+        assert!((total - 26.0).abs() < 1e-10, "total abundance mismatch");
+    }
+
+    #[test]
+    fn flat_tree_csr_consistency() {
+        let tree = simple_tree();
+        let flat = tree.to_flat_tree();
+
+        for i in 0..flat.n_nodes as usize {
+            let nc = flat.n_children[i] as usize;
+            let off = flat.children_offset[i] as usize;
+            assert!(
+                off + nc <= flat.children_flat.len(),
+                "CSR overflow at node {i}"
+            );
+            for &child in &flat.children_flat[off..off + nc] {
+                assert_eq!(
+                    flat.parent[child as usize], i as u32,
+                    "parent mismatch for child {child}"
+                );
+            }
+        }
     }
 }

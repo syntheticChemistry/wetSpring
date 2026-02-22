@@ -247,13 +247,16 @@ fn bench_section<F>(
 
     for r in &rows[before..] {
         let py_str = r.python_us.map_or_else(|| "—".to_string(), fmt_us);
-        let py_cpu = r.python_us.map_or("—".into(), |py_v| {
-            if r.cpu_us > 0.01 {
-                format!("{:.0}×", py_v / r.cpu_us)
-            } else {
-                "—".into()
-            }
-        });
+        let py_cpu = r.python_us.map_or_else(
+            || "—".into(),
+            |py_v| {
+                if r.cpu_us > 0.01 {
+                    format!("{:.0}×", py_v / r.cpu_us)
+                } else {
+                    "—".into()
+                }
+            },
+        );
         let cpu_gpu = if r.gpu_us > 0.01 {
             let ratio = r.cpu_us / r.gpu_us;
             if ratio >= 1.0 {

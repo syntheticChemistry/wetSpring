@@ -52,7 +52,7 @@
 
 ### Tier Legend
 - **CPU+GPU**: Validated on both, identical results
-- **✓**: Validated in 157/157 CPU parity battery (25 domains)
+- **✓**: Validated in 205/205 CPU parity battery (25 domains + 6 ODE flat)
 - **Tier C**: CPU-only (sequential/branching algorithms)
 - **Candidate**: NPU deployment possible with quantization
 
@@ -63,7 +63,7 @@
 | Substrate | Validated Checks | Algorithms |
 |-----------|:----------------:|:----------:|
 | CPU (Rust) | 1,291 | 25 domains (18 original + 5 Track 1c + 2 ML ensemble) |
-| GPU (wgpu) | 345 | 30 promoted (23 ToadStool + 1 local WGSL + 6 composed + consolidated) |
+| GPU (wgpu) | 345 | 30 promoted (23 ToadStool + 4 local WGSL shaders + 6 composed + consolidated) |
 | NPU | 0 | 0 (3 candidates) |
 | **Total** | **1,636** | — |
 

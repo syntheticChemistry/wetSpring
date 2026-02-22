@@ -337,8 +337,10 @@ fn determinism_signal_peak() {
     let data: Vec<f64> = (0..n)
         .map(|i| {
             let x = f64::from(i);
-            10000.0 * (-0.5 * ((x - 30.0) / 5.0).powi(2)).exp()
-                + 5000.0 * (-0.5 * ((x - 70.0) / 4.0).powi(2)).exp()
+            10000.0f64.mul_add(
+                (-0.5 * ((x - 30.0) / 5.0).powi(2)).exp(),
+                5000.0 * (-0.5 * ((x - 70.0) / 4.0).powi(2)).exp(),
+            )
         })
         .collect();
     let params = signal::PeakParams::default();

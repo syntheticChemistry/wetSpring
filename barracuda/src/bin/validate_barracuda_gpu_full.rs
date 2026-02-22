@@ -414,7 +414,7 @@ async fn main() {
         "TOTAL", "", total_cpu, total_gpu
     );
     println!("╠═══════════════════════════════════════════════════════════════════════════╣");
-    println!("║  5 absorbed (ToadStool FMR/BrayCurtis)  +  6 local WGSL (handoff ready) ║");
+    println!("║  19 absorbed (lean on ToadStool)  +  4 local WGSL (Write phase)        ║");
     println!("║  Math is substrate-independent. Ready for pure GPU streaming pipeline.   ║");
     println!("╚═══════════════════════════════════════════════════════════════════════════╝");
     println!();

@@ -12,7 +12,7 @@
 //!
 //! Rust implementations validated against Python/Galaxy/QIIME2/asari/`FindPFAS`
 //! baselines. Each module mirrors a pipeline stage from the validated
-//! experiments (Exp001–006).
+//! experiments (Exp001–093, 29 reproduced papers across 4 tracks).
 //!
 //! # Track 1: Life Science (16S amplicon, phage, diversity)
 //! - [`io::fastq`] — FASTQ parsing + quality statistics

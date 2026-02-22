@@ -47,8 +47,8 @@ Python baseline → Rust CPU (reference) → GPU/NPU (must match CPU)
 
 ### BarraCUDA CPU Parity — All 25 Domains (Exp035–Exp062)
 
-157/157 checks pass across 25 algorithmic domains, proving Rust CPU math
-matches Python across every validated module:
+205/205 checks pass across 25 algorithmic domains + 6 ODE flat modules,
+proving Rust CPU math matches Python across every validated module:
 
 **v1: 21 checks (9 domains)**
 

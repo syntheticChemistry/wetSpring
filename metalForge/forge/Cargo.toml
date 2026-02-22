@@ -2,7 +2,7 @@
 
 [package]
 name = "wetspring-forge"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 rust-version = "1.82"
 description = "Hardware discovery and cross-substrate dispatch for wetSpring"
@@ -19,6 +19,10 @@ wgpu = { version = "22", default-features = false, features = [
 ] }
 
 tokio = { version = "1", features = ["rt"] }
+
+[[bin]]
+name = "validate_dispatch_routing"
+path = "src/bin/validate_dispatch_routing.rs"
 
 [dev-dependencies]
 

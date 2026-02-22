@@ -1,8 +1,8 @@
 # Absorption Strategy: wetSpring → ToadStool
 
-**Date:** February 21, 2026
+**Date:** February 22, 2026
 **Pattern:** Write → Absorb → Lean (from hotSpring)
-**Status:** 5 absorbed, 9 Tier A handoff candidates, 4 barracuda CPU math opportunities
+**Status:** 19 absorbed (lean), 4 local WGSL shaders (write), 7 Tier A candidates
 
 ---
 
@@ -76,7 +76,7 @@ Every local shader must pass before handoff:
 
 ## Current Absorption Ledger
 
-### Absorbed into ToadStool (crate-level re-exports)
+### Absorbed into ToadStool (crate-level re-exports) — 19 total
 
 | Primitive | wetSpring Source | ToadStool Module | Handoff Date |
 |-----------|-----------------|------------------|-------------|
@@ -85,20 +85,31 @@ Every local shader must pass before handoff:
 | `TreeInferenceGpu` | `bio::decision_tree` (Exp008) | `ops::bio::tree_inference` | Feb 20 |
 | `FelsensteinGpu` | `bio::felsenstein` (Exp029) | `ops::bio::felsenstein` | Feb 20 |
 | `GemmF64::WGSL` | `bio::gemm_cached` | `ops::linalg::gemm_f64` | Feb 20 |
+| `AniBatchF64` | `bio::ani_gpu` (Exp058) | `ops::bio::ani_batch` | Feb 22 |
+| `DnDsBatchF64` | `bio::dnds_gpu` (Exp058) | `ops::bio::dnds_batch` | Feb 22 |
+| `SnpCallingF64` | `bio::snp_gpu` (Exp058) | `ops::bio::snp_calling` | Feb 22 |
+| `PangenomeClassifyGpu` | `bio::pangenome_gpu` (Exp058) | `ops::bio::pangenome` | Feb 22 |
+| `HmmBatchForwardF64` | `bio::hmm_gpu` (Exp047) | `ops::bio::hmm_forward` | Feb 22 |
+| `Dada2EStepGpu` | `bio::dada2_gpu` | `ops::bio::dada2_e_step` | Feb 22 |
+| `QualityFilterGpu` | `bio::quality_gpu` | `ops::bio::quality_filter` | Feb 22 |
+| `RfBatchInferenceGpu` | `bio::random_forest_gpu` (Exp063) | `ops::bio::rf_inference` | Feb 22 |
+| `FusedMapReduceF64` | `bio::diversity_gpu` | `ops::reduce::fmr_f64` | Feb 22 |
+| `BrayCurtisF64` | `bio::diversity_gpu` | `ops::bio::bray_curtis` | Feb 22 |
+| `KrigingF64` | `bio::kriging` (Exp087) | `ops::interpolate::kriging` | Feb 22 |
+| `BatchedEighGpu` | `bio::pcoa_gpu` (Exp087) | `ops::linalg::eigh` | Feb 22 |
+| `PrngXoshiro` | `bio::rarefaction_gpu` | `ops::random::xoshiro` | Feb 22 |
+| `BatchTolSearchF64` | `bio::tolerance_search` | `ops::search::tol_search` | Feb 22 |
 
-### Local WGSL Shaders (Tier A — handoff candidates)
+### Local WGSL Shaders (Write Phase — 4 remaining)
+
+8 shaders deleted on Feb 22 (25 KB) — all absorbed into ToadStool `barracuda::ops::bio::*`.
 
 | Shader | File | GPU Checks | Absorption Path |
 |--------|------|:----------:|-----------------|
-| `dada2_e_step.wgsl` | `barracuda/src/shaders/` | 88 (pipeline) | New `BatchPairReduce<f64>` |
-| `quality_filter.wgsl` | `barracuda/src/shaders/` | 88 (pipeline) | New `ParallelFilter<T>` |
-| `hmm_forward_f64.wgsl` | `barracuda/src/shaders/` | 13 (Exp047) | New `HmmBatchForwardF64` |
 | `batched_qs_ode_rk4_f64.wgsl` | `barracuda/src/shaders/` | 7 (Exp049) | Fix upstream `BatchedOdeRK4F64` |
-| `ani_batch_f64.wgsl` | `barracuda/src/shaders/` | 7 (Exp058) | New `AniBatchF64` |
-| `snp_calling_f64.wgsl` | `barracuda/src/shaders/` | 5 (Exp058) | New `SnpCallingF64` |
-| `dnds_batch_f64.wgsl` | `barracuda/src/shaders/` | 9 (Exp058) | New `DnDsBatchF64` |
-| `pangenome_classify.wgsl` | `barracuda/src/shaders/` | 6 (Exp058) | New `PangenomeClassifyGpu` |
-| `rf_batch_inference.wgsl` | `barracuda/src/shaders/` | 13 (Exp063) | New `RfBatchInferenceGpu` |
+| `kmer_histogram_f64.wgsl` | `barracuda/src/shaders/` | pending | New `KmerHistogramF64` |
+| `unifrac_propagate_f64.wgsl` | `barracuda/src/shaders/` | pending | New `UniFracPropagateF64` |
+| `taxonomy_fc_f64.wgsl` | `barracuda/src/shaders/` | pending | New `TaxonomyFcF64` + NPU int8 |
 
 ### Completed Compositions (were candidates, now validated)
 

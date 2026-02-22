@@ -50,16 +50,20 @@ metalForge/
 ├── PRIMITIVE_MAP.md       ← Rust module ↔ ToadStool primitive mapping
 ├── ABSORPTION_STRATEGY.md ← Write → Absorb → Lean methodology
 ├── PCIE_TOPOLOGY.md       ← PCIe topology and device mapping
-├── forge/                 ← Rust crate: wetspring-forge (hardware discovery + dispatch)
+├── forge/                 ← Rust crate: wetspring-forge v0.2.0 (discovery + dispatch)
 │   ├── Cargo.toml
 │   ├── src/
 │   │   ├── lib.rs         ← crate root
 │   │   ├── substrate.rs   ← Substrate, Capability, Identity types
 │   │   ├── probe.rs       ← GPU (wgpu), CPU (/proc), NPU (/dev/akida*)
 │   │   ├── inventory.rs   ← unified discovery
-│   │   └── dispatch.rs    ← capability-based workload routing
-│   └── examples/
-│       └── inventory.rs   ← discover + print + dispatch demo
+│   │   ├── dispatch.rs    ← capability-based workload routing
+│   │   ├── streaming.rs   ← multi-stage GPU pipeline analysis (v0.2.0)
+│   │   └── bridge.rs      ← forge ↔ barracuda device bridge
+│   ├── examples/
+│   │   └── inventory.rs   ← discover + print + dispatch demo
+│   └── src/bin/
+│       └── validate_dispatch_routing.rs ← Exp080 validation
 ├── gpu/
 │   ├── nvidia/
 │   │   └── HARDWARE.md    ← RTX 4070 + Titan V for life science workloads
@@ -76,17 +80,28 @@ metalForge/
     └── profile_gpu_candidates.py ← GPU candidate profiling
 ```
 
-### Forge Crate
+### Forge Crate (v0.2.0)
 
-The `forge/` directory is a standalone Rust crate (`wetspring-forge`) that
-discovers compute substrates at runtime and routes workloads by capability.
+The `forge/` directory is a standalone Rust crate (`wetspring-forge` v0.2.0)
+that discovers compute substrates at runtime and routes workloads by capability.
 It follows hotSpring's `metalForge/forge/` pattern — same substrate types,
 same capability-based dispatch, same wgpu GPU probing — adapted for life
-science workloads. 24 unit tests, clippy clean, forbid(unsafe_code).
+science workloads. **32 unit tests**, clippy clean, `forbid(unsafe_code)`.
+
+**v0.2.0 additions:**
+- `streaming` module — multi-stage GPU pipeline analysis
+- `CpuCompute` capability variant
+- `StreamingSession` for pipeline topology analysis
+
+**Absorption seam:** when ToadStool absorbs forge, the `bridge` module
+becomes the integration point. `substrate_from_device` wraps an existing
+barracuda `WgpuDevice` as a forge `Substrate`; `create_device` goes the
+other direction. The streaming module's `StreamingSession` maps to
+ToadStool's unidirectional pipeline model.
 
 ```bash
 cd metalForge/forge
-cargo test          # 24 tests
+cargo test          # 32 tests
 cargo run --example inventory  # discover + dispatch demo
 ```
 
@@ -134,9 +149,9 @@ affinities. metalForge maps each validated algorithm to its optimal substrate.
 wetSpring follows hotSpring's pattern for ToadStool absorption:
 
 ```
-1. Validate in Rust CPU (barracuda/)          ← DONE: 41 modules, 707 tests, 96.21% coverage, 77 experiments, 1,742 checks. 38% dispatch overhead reduction via pipeline caching (Exp068).
+1. Validate in Rust CPU (barracuda/)          ← DONE: 41 modules, 730 tests, 96.21% coverage, 83 experiments, 1,835 checks. 38% dispatch overhead reduction via pipeline caching (Exp068).
 2. Characterize hardware (metalForge/)         ← THIS DIRECTORY
-3. Write Rust in GPU-friendly patterns         ← 8 absorbed by ToadStool, 1 local (ODE)
+3. Write Rust in GPU-friendly patterns         ← 8 absorbed by ToadStool, 4 local WGSL (ODE, kmer, unifrac, taxonomy)
 4. ToadStool absorbs as shared primitives      ← unidirectional handoff via archive/handoffs/
 5. wetSpring consumes ToadStool primitives     ← 15 consumed, pipeline closure
 ```
@@ -173,11 +188,11 @@ from either inform the other's hardware utilization strategy.
 
 ---
 
-## Current Status (Feb 21, 2026)
+## Current Status (Feb 22, 2026)
 
 ### CPU: 25 Domains Validated (Exp001–063)
 All 25 algorithmic domains proven correct in pure Rust CPU:
-- **157/157 CPU parity checks** across v1 (21) + v2 (18) + v3 (45) + v4 (44) + v5 (29)
+- **205/205 CPU parity checks** across v1 (21) + v2 (18) + v3 (45) + v4 (44) + v5 (29) + v6 (48)
 - **1,291 total CPU checks** across 50 CPU validation binaries
 - **5 Track 1c domains**: ANI, SNP, dN/dS, molecular clock, pangenomics
 - **2 ML ensemble domains**: Random Forest, Gradient Boosting Machine
@@ -188,7 +203,7 @@ GPU math portability proven across all promoted domains:
 - **451/451 GPU checks** across 18 validation binaries
 - **Absorbed** (Lean): SW, Gillespie, DT, Felsenstein, GEMM, diversity, PCoA, spectral
 - **Absorbed** (Lean, Feb 22): HMM, DADA2, quality, ANI, SNP, dN/dS, pangenome, RF
-- **Local WGSL** (1 shader): ODE sweep (blocked on ToadStool `enable f64;`)
+- **Local WGSL** (4 shaders): ODE, kmer, unifrac, taxonomy (ODE blocked on ToadStool `enable f64;`)
 - **Composed**: Bootstrap (15/15), placement (15/15), bifurcation eigenvalues (5/5)
 - **GPU Parity v1** (Exp064): 8 domains consolidated in single binary
 - **metalForge Full** (Exp065): CPU↔GPU substrate-independence for full portfolio
@@ -208,7 +223,7 @@ All 4 GPU-eligible Track 1c modules promoted with local WGSL shaders:
 ### Cross-System Vision
 ```
 CPU: 1,291 checks (25 domains, reference ground truth)
-GPU: 451 checks (23 ToadStool primitives + 1 local WGSL + 6 composed + consolidated)
+GPU: 451 checks (23 ToadStool primitives + 4 local WGSL + 6 composed + consolidated)
 NPU: Characterized (AKD1000, taxonomy/anomaly/RF inference at ~30mW)
 
 Proven: substrate-independence across 8 domains (Exp065 — metalForge Full)
@@ -244,13 +259,13 @@ Delete local shader copy. Use the crate-level re-export
 (e.g., `barracuda::SmithWatermanGpu`). Local extensions that still need work
 remain in wetSpring until absorption.
 
-### Current Status (Feb 21)
+### Current Status (Feb 22)
 
 | Phase | Count | Items |
 |-------|:-----:|-------|
 | **Absorbed** (Lean) | 11 modules | SW, Gillespie, DT, Felsenstein, GEMM, diversity, PCoA, spectral, stats, EIC, rarefaction |
 | **Absorbed** (Lean, Feb 22) | 8 shaders | HMM, DADA2, QF, ANI, SNP, dN/dS, pangenome, RF |
-| **Local WGSL** (Write) | 1 shader | ODE sweep |
+| **Local WGSL** (Write) | 4 shaders | ODE, kmer, unifrac, taxonomy |
 | **CPU math** (barracuda overlap) | 4 functions | erf, ln_gamma, regularized_gamma, integrate_peak |
 | **Blocked** | 3 modules | kmer (lock-free hash), UniFrac (tree traversal), taxonomy (NPU) |
 
@@ -338,7 +353,7 @@ ToadStool/BarraCUDA team absorption. Following hotSpring's pattern:
 | Component | Status | Absorption Path |
 |-----------|--------|-----------------|
 | 8 WGSL shaders (absorbed Feb 22) | Lean — delegating to ToadStool | `ops::bio::*` |
-| 1 WGSL shader (ODE) | Local — blocked on `enable f64;` | `ops::bio::ode` |
+| 4 WGSL shaders (ODE, kmer, unifrac, taxonomy) | Local — ODE blocked on `enable f64;` | `ops::bio::*` |
 | `bio::special` (erf, ln_gamma, regularized_gamma) | Consolidated, `mul_add`-optimized | `barracuda::math` feature |
 | `bio::eic::integrate_peak` | Validated against Python | `barracuda::numerical::trapz` |
 | 32 tolerance constants | Hierarchy-tested | `barracuda::tolerances` cross-Spring standard |

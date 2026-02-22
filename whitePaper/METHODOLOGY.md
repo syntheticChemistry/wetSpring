@@ -359,8 +359,8 @@ All experiments run on a single consumer workstation:
 | `validate_barracuda_cpu_v5` | 29 | RF + GBM inference (Exp061-062) |
 | **Total** | **1,291** | **All pass** |
 
-Current status: **1,291/1,291 pass.** 77 experiments across 4 tracks.
-157/157 BarraCUDA CPU parity checks across 25 algorithmic domains.
+Current status: **1,349/1,349 CPU pass + 35 dispatch pass.** 83 experiments across 4 tracks.
+205/205 BarraCUDA CPU parity checks across 25 domains + 6 ODE flat modules.
 ~22.5× Rust speedup over Python.
 
 ### Phase 3 (GPU): 451/451 checks pass
@@ -381,10 +381,10 @@ Current status: **1,291/1,291 pass.** 77 experiments across 4 tracks.
 | `validate_gpu_rf` | 13 | RF batch inference shader (Exp063) |
 
 Current status: **451/451 pass.** 23 ToadStool primitives consumed.
-1 local WGSL shader (ODE sweep — blocked on upstream `enable f64;`).
-12 bio GPU primitives absorbed from ToadStool (4 on Feb 20, 8 on Feb 22).
+4 local WGSL shaders (ODE, kmer, unifrac, taxonomy).
+19 GPU primitives absorbed (lean).
 
-### Grand Total: 1,742/1,742 quantitative checks pass
+### Grand Total: 1,835/1,835 quantitative checks pass
 
 ---
 
@@ -397,7 +397,7 @@ Current status: **451/451 pass.** 23 ToadStool primitives consumed.
 | GPU workload | Large-matrix eigensolve, MD force evaluation | Diversity, phylogenetics, ODE sweeps, HMM |
 | Validation metric | chi2/datum | Pass/fail within documented tolerance |
 | Data size | Small (52–2,042 nuclei) | Large (millions of reads, thousands of spectra) |
-| Local shaders | 10+ WGSL (HFB, MD, lattice QCD) | 1 WGSL (ODE; 8 bio absorbed by ToadStool Feb 22) |
+| Local shaders | 10+ WGSL (HFB, MD, lattice QCD) | 4 WGSL (ODE, kmer, unifrac, taxonomy; 19 absorbed lean) |
 | Absorption tracking | `EVOLUTION_READINESS.md` with tiers | `EVOLUTION_READINESS.md` with tiers (adopted) |
 | Key insight | GPU-resident hybrid beats CPU for matrix physics | Full GPU pipeline 2.45× faster; ODE/HMM/phylo math portable to GPU |
 

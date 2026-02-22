@@ -18,7 +18,7 @@ default = []
 # GPU acceleration via BarraCUDA/ToadStool (Phase 3).
 # Enable with `cargo build --features gpu`.
 # Pulls in wgpu v22 (device creation), barracuda (23 ToadStool primitives),
-# and tokio (async device init). 1 local WGSL shader (ODE sweep).
+# and tokio (async device init). 4 local WGSL shaders (ODE, kmer, unifrac, taxonomy).
 # GEMM uses GemmF64::WGSL (no cross-repo include_str!).
 gpu = ["dep:barracuda", "dep:wgpu", "dep:tokio"]
 # JSON model import (2 bins: validate_pfas_decision_tree, benchmark_three_tier).
@@ -262,6 +262,16 @@ path = "src/bin/benchmark_23_domain_timing.rs"
 name = "validate_barracuda_cpu_v5"
 path = "src/bin/validate_barracuda_cpu_v5.rs"
 
+# ── Exp079: BarraCUDA CPU v6 — ODE Flat Param Fidelity ──
+[[bin]]
+name = "validate_barracuda_cpu_v6"
+path = "src/bin/validate_barracuda_cpu_v6.rs"
+
+# ── Exp085: BarraCUDA CPU v7 — Tier A Data Layout Fidelity ──
+[[bin]]
+name = "validate_barracuda_cpu_v7"
+path = "src/bin/validate_barracuda_cpu_v7.rs"
+
 # ── Exp070: BarraCUDA CPU Full — 25-Domain Pure Rust Math Proof ──
 [[bin]]
 name = "validate_barracuda_cpu_full"
@@ -385,6 +395,57 @@ required-features = ["gpu"]
 name = "validate_metalforge_full"
 path = "src/bin/validate_metalforge_full.rs"
 required-features = ["gpu"]
+
+# ── metalForge Full Cross-Substrate v2 (Exp084) ──────────────────
+[[bin]]
+name = "validate_metalforge_full_v2"
+path = "src/bin/validate_metalforge_full_v2.rs"
+required-features = ["gpu"]
+
+# ── CPU vs GPU All Domains (Exp092) ───────────────────────────────
+[[bin]]
+name = "validate_cpu_vs_gpu_all_domains"
+path = "src/bin/validate_cpu_vs_gpu_all_domains.rs"
+required-features = ["gpu"]
+
+# ── metalForge Full v3 (Exp093) ──────────────────────────────────
+[[bin]]
+name = "validate_metalforge_full_v3"
+path = "src/bin/validate_metalforge_full_v3.rs"
+required-features = ["gpu"]
+
+# ── Pure GPU Streaming Pipeline (Exp090) ──────────────────────────
+[[bin]]
+name = "validate_pure_gpu_streaming"
+path = "src/bin/validate_pure_gpu_streaming.rs"
+required-features = ["gpu"]
+
+# ── Streaming vs Round-Trip Benchmark (Exp091) ───────────────────
+[[bin]]
+name = "benchmark_streaming_vs_roundtrip"
+path = "src/bin/benchmark_streaming_vs_roundtrip.rs"
+required-features = ["gpu"]
+
+# ── GPU Extended Domains (Exp087) ─────────────────────────────────
+[[bin]]
+name = "validate_gpu_extended"
+path = "src/bin/validate_gpu_extended.rs"
+required-features = ["gpu"]
+
+# ── metalForge PCIe Direct Transfer Proof (Exp088) ───────────────
+[[bin]]
+name = "validate_pcie_direct"
+path = "src/bin/validate_pcie_direct.rs"
+
+# ── ToadStool Streaming Dispatch Proof (Exp089) ──────────────────
+[[bin]]
+name = "validate_streaming_dispatch"
+path = "src/bin/validate_streaming_dispatch.rs"
+
+# ── metalForge End-to-End Pipeline Proof (Exp086) ────────────────
+[[bin]]
+name = "validate_metalforge_pipeline"
+path = "src/bin/validate_metalforge_pipeline.rs"
 
 # ── CPU vs GPU All-Domain Scaling (Exp066) ───────────────────────
 [[bin]]

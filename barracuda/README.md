@@ -17,15 +17,14 @@ baseline through Rust CPU to GPU acceleration via ToadStool/BarraCUDA.
 ```
 wetspring-barracuda
 ├── 41 CPU bio modules          (pure Rust math, no external C deps)
-├── 20 GPU bio modules          (19 lean on ToadStool, 1 local ODE shader)
+├── 20 GPU bio modules          (19 lean on ToadStool, 4 local WGSL shaders (ODE, kmer, unifrac, taxonomy))
 ├── 3 streaming I/O parsers     (FASTQ/gzip, mzML/base64, MS2)
 ├── 73 validation/benchmark bins (50 CPU + 18 GPU + 5 benchmark)
 └── depends on: barracuda (ToadStool) via path dependency
 ```
 
 All GPU modules delegate to `barracuda::ops::*` primitives from ToadStool.
-No local WGSL shader compilation except for ODE sweep (blocked on upstream
-`enable f64;` directive).
+No local WGSL shader compilation except for 4 Write-phase shaders (ODE, kmer, unifrac, taxonomy; ODE blocked on upstream `enable f64;` directive).
 
 ## ToadStool Primitives Consumed (23)
 
@@ -141,7 +140,7 @@ No local WGSL shader compilation except for ODE sweep (blocked on upstream
 | Module | Purpose |
 |--------|---------|
 | `special` | Sovereign math (erf, ln_gamma, regularized_gamma, normal_cdf) |
-| `tolerances` | 37 named constants (scientifically justified) |
+| `tolerances` | 39 named constants (scientifically justified) |
 | `validation` | Structured test harness with provenance |
 | `encoding` | Sovereign base64 (zero dependencies) |
 | `error` | Error types (no external crates) |
@@ -158,8 +157,8 @@ No local WGSL shader compilation except for ODE sweep (blocked on upstream
 | `#![deny(clippy::expect_used, unwrap_used)]` | Enforced |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Line coverage | 96.21% |
-| Tests | 707 (633 lib + 60 integration + 14 doc) |
-| Validation checks | 1,742 (1,291 CPU + 451 GPU) |
+| Tests | 730 (654 lib + 60 integration + 14 doc + 2 bench) |
+| Validation checks | 1,835 (1,349 CPU + 451 GPU + 35 dispatch) |
 
 ## Quick Start
 

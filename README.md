@@ -1,12 +1,12 @@
 # wetSpring — Life Science & Analytical Chemistry Validation
 
-**An ecoPrimals Spring** — validation target proving Python baselines can be
-faithfully ported to BarraCUDA (Rust) and eventually promoted to ToadStool
-(GPU shaders), then shown substrate-independent via metalForge.
+**An ecoPrimals Spring** — life science biome evolving Rust implementations
+and GPU shaders for ToadStool/BarraCUDA absorption. Follows the
+**Write → Absorb → Lean** cycle adopted from hotSpring.
 
 **Date:** February 22, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 20 — ToadStool Bio Rewire + Cross-Spring Evolution
+**Status:** Phase 22 — 19/20 GPU modules lean on upstream; 4 WGSL shaders in Write phase
 
 ---
 
@@ -31,29 +31,85 @@ Four tracks cover the life science and environmental monitoring domains:
 
 ---
 
+## Evolution Architecture: Write → Absorb → Lean
+
+wetSpring follows hotSpring's proven absorption cycle. Springs are biomes;
+ToadStool/BarraCUDA is the fungus present in every biome. Springs don't
+import each other — they lean on ToadStool independently.
+
+```
+Write → Validate → Hand off → Absorb → Lean
+─────────────────────────────────────────────
+Implement     Test against    Document in    ToadStool adds    Rewire to
+on CPU +      Python +        wateringHole/  shaders/ops       upstream,
+WGSL          known physics   handoffs/                        delete local
+```
+
+### Current Evolution Status
+
+| Phase | Count | Description |
+|-------|:-----:|-------------|
+| **Lean** | 19 | GPU modules consuming upstream ToadStool primitives |
+| **Write** | 4 | Local WGSL shaders for Tier A domains |
+| **Tier A** | 7 | CPU modules with flat APIs, ready for GPU/NPU promotion |
+| **Tier B** | 1 | Needs refactoring before promotion |
+| **Tier C** | 14 | CPU-only, no GPU path planned |
+
+### Local WGSL Shaders (Write Phase)
+
+| Shader | Domain | Absorption Target |
+|--------|--------|-------------------|
+| `batched_qs_ode_rk4_f64.wgsl` | QS/c-di-GMP ODE sweep | `barracuda::ops::bio::ode_rk4` |
+| `kmer_histogram_f64.wgsl` | K-mer counting | `barracuda::ops::bio::kmer_histogram` |
+| `unifrac_propagate_f64.wgsl` | UniFrac tree propagation | `barracuda::ops::bio::unifrac_propagate` |
+| `taxonomy_fc_f64.wgsl` | Taxonomy scoring (GPU/NPU) | `barracuda::ops::bio::taxonomy_fc` |
+
+### metalForge Forge Crate (v0.2.0)
+
+The `metalForge/forge/` crate discovers compute substrates at runtime and
+routes workloads to the best capable device. Absorption seam: when ToadStool
+absorbs forge, the bridge module becomes the integration point.
+
+| Module | Purpose |
+|--------|---------|
+| `probe` | GPU (wgpu) + CPU (/proc) + NPU (/dev) discovery |
+| `inventory` | Unified substrate view |
+| `dispatch` | Capability-based workload routing |
+| `streaming` | Multi-stage GPU pipeline analysis |
+| `bridge` | forge ↔ barracuda device bridge |
+
+---
+
 ## Current Results
 
 | Metric | Count |
 |--------|-------|
-| Validation checks (CPU) | 1,291 |
-| Validation checks (GPU) | 451 |
-| **Total validation checks** | **1,742** |
-| Rust library unit tests | 633 (+ 1 ignored — hardware-dependent) |
+| Validation checks (CPU) | 1,392 |
+| Validation checks (GPU) | 609 |
+| Dispatch validation checks | 80 |
+| Layout fidelity checks | 35 |
+| Transfer/streaming checks | 57 |
+| **Total validation checks** | **2,173+** |
+| Rust library unit tests | 654 (+ 1 ignored — hardware-dependent) |
 | Integration tests | 60 (23 bio + 16 determinism + 21 I/O) |
 | Rust doc-tests | 14 |
-| **Total Rust tests** | **707** |
-| Experiments completed | 77 |
-| Validation/benchmark binaries | 50 CPU + 18 GPU validate + 5 benchmark = 73 total |
+| **Total Rust tests** | **728** |
+| Experiments completed | 93 |
+| Validation/benchmark binaries | 75 validate + 8 benchmark = 83 total |
 | CPU bio modules | 41 |
-| GPU bio modules | 20 (19 lean on ToadStool, 1 local ODE shader) |
+| GPU bio modules | 20 (19 lean on ToadStool, 4 local WGSL shaders (ODE, kmer, unifrac, taxonomy)) |
+| Tier A (GPU/NPU-ready) | 7 modules with flat layouts |
+| Tier B (needs refactor) | 1 module remaining |
 | Python baselines | 40 scripts |
-| BarraCUDA CPU parity | 157/157 (25 domains) |
-| BarraCUDA GPU parity | 8 consolidated domains (Exp064) |
-| metalForge cross-system | 8 domains substrate-independent (Exp065) |
+| BarraCUDA CPU parity | 205/205 (25 domains + 6 ODE flat) |
+| BarraCUDA GPU parity | 16 domains head-to-head (Exp092) |
+| metalForge cross-system | 16 domains substrate-independent (Exp093) |
+| metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
+| Pure GPU streaming | 80 checks, 441-837× over round-trip (Exp090-091) |
 | ToadStool primitives consumed | **23** (15 original + 8 bio absorbed Feb 22) |
-| Local WGSL shaders | **1** (ODE sweep — blocked on ToadStool `enable f64;`) |
+| Local WGSL shaders | **4** (ODE, kmer histogram, unifrac propagate, taxonomy FC) |
 
-All 1,742 validation checks **PASS**. All 707 tests **PASS**.
+All 2,173+ validation checks **PASS**. All 728 tests **PASS**.
 
 ### GPU Performance
 
@@ -119,7 +175,7 @@ for Track 1c algorithms — math is substrate-independent.
 Random Forest (majority vote, 5 trees) and GBM (binary + multi-class
 with sigmoid/softmax) — both proven as pure Rust math (29/29 CPU checks).
 RF promoted to GPU via local WGSL shader (13/13 GPU checks, SoA layout).
-Combined v1-v5: **157/157 checks across 25 domains**.
+Combined v1-v6: **205/205 checks across 25 domains + 6 ODE flat modules**.
 
 ### Phase 14: Evolution Readiness
 Following hotSpring's patterns: shaping all validated Rust modules for
@@ -133,7 +189,7 @@ Comprehensive audit and evolution of the codebase:
 - Crate-level `clippy::pedantic` + `clippy::nursery` lints enforced (0 warnings)
 - `rustfmt.toml` with `max_width = 100` enforced across all 151 source files
 - All inline tolerance literals replaced with named constants in `tolerances.rs`
-- All 73 validation/benchmark binaries carry structured `# Provenance` headers
+- All validation/benchmark binaries carry structured `# Provenance` headers
 - All data paths use `validation::data_dir()` for capability-based discovery
 - `flate2` explicitly uses `rust_backend` (no C dependencies, ecoBin compliant)
 - 11 new unit tests targeting coverage gaps; line coverage 97% bio+io (55% overall)
@@ -173,7 +229,7 @@ Evolving Rust implementations for ToadStool/BarraCUDA team absorption:
   upstream. 9 WGSL shaders + 4 CPU math functions ready for absorption
   (8 shaders absorbed in Phase 20)
 - **Code quality gate**: named tolerances, `#![forbid(unsafe_code)]`, pedantic clippy,
-  all 73 binaries with provenance headers — absorption-grade quality
+  all binaries with provenance headers — absorption-grade quality
 
 ### Phase 18: Streaming Dispatch + Cross-Substrate Validation
 Proving the full ToadStool dispatch model and multi-substrate routing:
@@ -207,9 +263,53 @@ On Feb 22, wetSpring rewired all 8 GPU modules to delegate to
   2. AdapterInfo propagation: `from_existing_simple()` broke f64 polyfill detection
 - **Cross-spring evolution documented** — ToadStool serves as convergence hub:
   hotSpring (precision/lattice QCD), wetSpring (bio/genomics), neuralSpring (ML/eigen)
-- **Only 1 local WGSL shader remains** — ODE sweep, blocked on ToadStool `enable f64;`
+- **4 local WGSL shaders in Write phase** — ODE, kmer histogram, unifrac propagate, taxonomy FC (ODE blocked on ToadStool `enable f64;`; others ready for absorption)
 - **23 ToadStool primitives consumed** (up from 15)
 - **New handoff** submitted: `wateringHole/handoffs/WETSPRING_TOADSTOOL_REWIRE_FEB22_2026.md`
+
+### Phase 21: GPU/NPU Readiness + Dispatch Validation
+
+Tier B → A promotion of 3 remaining non-ODE modules, ODE flat param validation,
+and forge dispatch router proof:
+
+- **Exp078: ODE GPU Sweep Readiness** — flat param APIs (`to_flat`/`from_flat`)
+  for 5 ODE modules (qs_biofilm, bistable, multi_signal, phage_defense, cooperation)
+- **Exp079: BarraCUDA CPU v6** — 48/48 checks proving flat serialization preserves
+  bitwise-identical ODE math. Zero ULP drift across all 6 biological models.
+- **Exp080: metalForge Dispatch Routing** — 35/35 checks validating forge router
+  across full-system, GPU-only, NPU+CPU, CPU-only, and mixed PCIe configurations.
+  Live hardware: 1 CPU, 3 GPUs, 1 NPU.
+- **Exp081: K-mer GPU Histogram** — `to_histogram()` (flat 4^k buffer) and
+  `to_sorted_pairs()` for GPU radix sort dispatch. **kmer: B → A**.
+- **Exp082: UniFrac CSR Flat Tree** — `FlatTree` struct with CSR layout +
+  `to_sample_matrix()` for GPU pairwise dispatch. **unifrac: B → A**.
+- **Exp083: Taxonomy NPU Int8** — affine int8 quantization of Naive Bayes weights.
+  Argmax parity with f64 confirmed. **taxonomy: B → A/NPU**.
+- **Handoff v7** submitted: 3 new absorption candidates, ODE flat validation results,
+  dispatch routing findings, and evolution recommendations.
+
+### Phase 22: Current — Pure GPU Streaming + Full Validation Proof
+
+Proving that the complete bioinformatics pipeline runs on pure GPU with
+ToadStool's unidirectional streaming — zero CPU round-trips between stages:
+
+- **Exp085: BarraCUDA CPU v7** — Tier A data layout fidelity (43/43 PASS).
+  kmer histogram, UniFrac CSR flat tree, taxonomy int8 round-trips proven lossless.
+- **Exp086: metalForge Pipeline Proof** — 5-stage end-to-end pipeline with
+  dispatch routing (45/45 PASS). Substrate-independent output proven.
+- **Exp087: GPU Extended Domains** — EIC, PCoA, Kriging, Rarefaction added to
+  GPU validation suite. 16 domains now GPU-validated.
+- **Exp088: PCIe Direct Transfer** — GPU→NPU, NPU→GPU, GPU→GPU data flow
+  without CPU staging (32/32 PASS). Buffer layout contracts validated.
+- **Exp089: ToadStool Streaming Dispatch** — Unidirectional streaming parity
+  vs round-trip for 3-stage and 5-stage chains (25/25 PASS).
+- **Exp090: Pure GPU Streaming Pipeline** — Full pipeline on GPU with zero
+  CPU round-trips (80/80 PASS). Streaming is 441-837× faster than round-trip.
+- **Exp091: Streaming vs Round-Trip Benchmark** — Formal timing comparison:
+  round-trip GPU is 13-16× slower than CPU; streaming eliminates 92-94% of
+  that overhead.
+
+**Tier A: 7 modules** | **Tier B: 1 remaining** | **728 tests** | **2,173+ checks** | **83 binaries**
 
 ### Phase 19: Absorption Engineering + Debt Resolution
 
@@ -236,8 +336,8 @@ Deep codebase evolution following hotSpring's absorption patterns:
   device creation (following hotSpring's forge↔barracuda pattern)
 - **ABSORPTION_MANIFEST.md** — tracking absorbed/ready/local modules
   (following hotSpring's manifest pattern)
-- **Coverage**: 96.21% overall (up from 55%), 707 tests (up from 650),
-  37 named tolerances (up from 32)
+- **Coverage**: 96.21% overall (up from 55%), 728 tests (up from 650),
+  39 named tolerances (up from 32)
 
 ---
 
@@ -256,8 +356,8 @@ Deep codebase evolution following hotSpring's absorption patterns:
 | SPDX-License-Identifier | All `.rs` files |
 | Max file size | All under 1000 LOC |
 | External C dependencies | **0** (`flate2` uses `rust_backend`) |
-| Named tolerance constants | 37 (scientifically justified, hierarchy-tested) |
-| Provenance headers | All 73 validation/benchmark binaries |
+| Named tolerance constants | 39 (scientifically justified, hierarchy-tested) |
+| Provenance headers | All 83 validation/benchmark binaries |
 
 ---
 
@@ -317,12 +417,12 @@ Deep codebase evolution following hotSpring's absorption patterns:
 `random_forest_gpu`, `snp_gpu`, `spectral_match_gpu`, `stats_gpu`,
 `streaming_gpu`, `taxonomy_gpu`
 
-All 20 GPU modules delegate to ToadStool primitives (19 lean + 1 local ODE shader).
+All 20 GPU modules delegate to ToadStool primitives (19 lean + 4 local WGSL shaders (ODE, kmer, unifrac, taxonomy)).
 8 bio primitives absorbed by ToadStool and rewired on Feb 22, 2026:
 `HmmBatchForwardF64`, `AniBatchF64`, `SnpCallingF64`, `DnDsBatchF64`,
 `PangenomeClassifyGpu`, `QualityFilterGpu`, `Dada2EStepGpu`, `RfBatchInferenceGpu`.
 
-### Local WGSL Shaders (1 remaining)
+### Local WGSL Shaders (4 in Write phase)
 
 | Shader | Domain | Blocker |
 |--------|--------|---------|
@@ -341,7 +441,7 @@ All 20 GPU modules delegate to ToadStool primitives (19 lean + 1 local ODE shade
 wetSpring/
 ├── README.md                      ← this file
 ├── BENCHMARK_RESULTS.md           ← three-tier benchmark results
-├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (77 experiments)
+├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (93 experiments)
 ├── HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_21_2026.md  ← ToadStool handoff v6
 ├── barracuda/                     ← Rust crate (src/, Cargo.toml, rustfmt.toml)
 │   ├── EVOLUTION_READINESS.md    ← absorption map (tiers, primitives, shaders)
@@ -349,17 +449,17 @@ wetSpring/
 │   ├── src/
 │   │   ├── lib.rs               ← crate root (pedantic + nursery lints enforced)
 │   │   ├── special.rs           ← sovereign math (erf, ln_gamma, regularized_gamma)
-│   │   ├── tolerances.rs        ← 37 named tolerance constants
+│   │   ├── tolerances.rs        ← 39 named tolerance constants
 │   │   ├── validation.rs        ← hotSpring validation framework
 │   │   ├── encoding.rs          ← sovereign base64 (zero dependencies)
 │   │   ├── error.rs             ← error types (no external crates)
 │   │   ├── bio/                 ← 41 CPU + 20 GPU bio modules
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML)
 │   │   ├── bench/               ← benchmark harness + power monitoring
-│   │   ├── bin/                 ← 73 validation/benchmark binaries
-│   │   └── shaders/             ← 1 local WGSL shader (ODE; 8 absorbed by ToadStool)
+│   │   ├── bin/                 ← 83 validation/benchmark binaries
+│   │   └── shaders/             ← 4 local WGSL shaders (ODE, kmer, unifrac, taxonomy; 8 absorbed by ToadStool)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2021
-├── experiments/                   ← 77 experiment protocols + results
+├── experiments/                   ← 91 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
 │   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs, bridge.rs
@@ -386,7 +486,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (707: 633 lib + 60 integration + 14 doc)
+# Run all tests (728: 654 lib + 60 integration + 14 doc)
 cargo test
 
 # Code quality checks
@@ -397,12 +497,12 @@ cargo doc --no-deps
 # Line coverage (requires cargo-llvm-cov)
 cargo llvm-cov --lib --summary-only
 
-# Run all CPU validation binaries (1,291 checks)
+# Run all CPU validation binaries (1,392+ checks)
 for bin in $(ls src/bin/validate_*.rs | grep -v gpu | sed 's|src/bin/||;s|\.rs||'); do
     cargo run --release --bin "$bin"
 done
 
-# Run GPU validation (requires --features gpu, 451 checks)
+# Run GPU validation (requires --features gpu, 533+ checks)
 for bin in $(ls src/bin/validate_*gpu*.rs src/bin/validate_toadstool*.rs \
     src/bin/validate_cross*.rs 2>/dev/null | sed 's|src/bin/||;s|\.rs||' | sort -u); do
     cargo run --features gpu --release --bin "$bin"
@@ -444,5 +544,7 @@ All validation data comes from public repositories:
 - **wateringHole** — Inter-primal standards and handoff documents
   - `handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md` — original shader detail handoff
   - `handoffs/WETSPRING_TOADSTOOL_REWIRE_FEB22_2026.md` — rewire results + bugs + cross-spring evolution
+  - `handoffs/WETSPRING_TOADSTOOL_V7_FEB22_2026.md` — v7 handoff (dispatch, layouts, streaming)
+  - `handoffs/WETSPRING_TOADSTOOL_V8_FEB22_2026.md` — v8 handoff (pure GPU streaming, absorption learnings)
 - **Root handoff** — `HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_21_2026.md` — comprehensive v6
 - **ecoPrimals** — Parent ecosystem

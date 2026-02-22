@@ -383,6 +383,129 @@ impl NaiveBayesClassifier {
     pub fn n_taxa(&self) -> usize {
         self.taxon_labels.len()
     }
+
+    /// Quantize log-probability table to int8 for NPU inference.
+    ///
+    /// Maps the f64 log-probability range to `[-128, 127]` using affine
+    /// quantization: `q = round((x - zero_point) / scale)`.
+    /// Returns `(quantized_table, scale, zero_point)`.
+    ///
+    /// The NPU dispatches `Q × T_q` where `T_q` is the int8 weight matrix
+    /// and dequantizes the argmax result.
+    #[must_use]
+    #[allow(clippy::cast_possible_truncation, clippy::cast_precision_loss)]
+    pub fn to_int8_weights(&self) -> NpuWeights {
+        if self.dense_log_probs.is_empty() {
+            return NpuWeights {
+                weights_i8: Vec::new(),
+                priors_i8: Vec::new(),
+                scale: 1.0,
+                zero_point: 0.0,
+                n_taxa: 0,
+                kmer_space: self.kmer_space,
+            };
+        }
+
+        let min_val = self
+            .dense_log_probs
+            .iter()
+            .copied()
+            .fold(f64::INFINITY, f64::min);
+        let max_val = self
+            .dense_log_probs
+            .iter()
+            .copied()
+            .fold(f64::NEG_INFINITY, f64::max);
+
+        let range = max_val - min_val;
+        let scale = if range > 0.0 { range / 255.0 } else { 1.0 };
+        let zero_point = min_val;
+
+        let weights_i8: Vec<i8> = self
+            .dense_log_probs
+            .iter()
+            .map(|&v| {
+                let q = ((v - zero_point) / scale).round() as i64 - 128;
+                q.clamp(-128, 127) as i8
+            })
+            .collect();
+
+        let priors_i8: Vec<i8> = self
+            .log_priors
+            .iter()
+            .map(|&v| {
+                let q = ((v - zero_point) / scale).round() as i64 - 128;
+                q.clamp(-128, 127) as i8
+            })
+            .collect();
+
+        NpuWeights {
+            weights_i8,
+            priors_i8,
+            scale,
+            zero_point,
+            n_taxa: self.taxon_labels.len(),
+            kmer_space: self.kmer_space,
+        }
+    }
+
+    /// Classify using int8-quantized weights (NPU path).
+    ///
+    /// Produces the same argmax as full-precision for well-separated taxa.
+    /// Uses integer accumulation with final dequantization.
+    #[allow(
+        clippy::cast_precision_loss,
+        clippy::cast_possible_truncation,
+        clippy::cast_possible_wrap
+    )]
+    #[must_use]
+    pub fn classify_quantized(&self, sequence: &[u8]) -> usize {
+        let query_kmers = extract_kmers(sequence, self.k);
+        if query_kmers.is_empty() || self.taxon_labels.is_empty() {
+            return 0;
+        }
+
+        let npu = self.to_int8_weights();
+        let n_taxa = npu.n_taxa;
+        let ks = npu.kmer_space;
+
+        let mut best_score = i64::MIN;
+        let mut best_idx = 0;
+
+        for ti in 0..n_taxa {
+            let row = ti * ks;
+            let mut acc = i64::from(npu.priors_i8[ti]);
+            for &kmer in &query_kmers {
+                acc += i64::from(npu.weights_i8[row + kmer as usize]);
+            }
+            if acc > best_score {
+                best_score = acc;
+                best_idx = ti;
+            }
+        }
+
+        best_idx
+    }
+}
+
+/// NPU-compatible int8 weight buffers for taxonomy classification.
+///
+/// Layout matches NPU FC layer requirements: weights as int8 with
+/// affine quantization parameters for dequantization.
+#[derive(Debug, Clone)]
+pub struct NpuWeights {
+    /// Quantized log-probability table: `n_taxa × kmer_space`, row-major.
+    pub weights_i8: Vec<i8>,
+    /// Quantized log-prior per taxon.
+    pub priors_i8: Vec<i8>,
+    /// Quantization scale: `real_value = quantized * scale + zero_point`.
+    pub scale: f64,
+    /// Quantization zero point.
+    pub zero_point: f64,
+    /// Number of taxa.
+    pub n_taxa: usize,
+    /// K-mer space size (4^k).
+    pub kmer_space: usize,
 }
 
 /// Extract all k-mers from a DNA sequence (no canonicalization — direction matters for taxonomy).
@@ -600,5 +723,84 @@ mod tests {
         let classifier = NaiveBayesClassifier::train(&refs, 4);
         let result = classifier.classify(b"ACGTACGTACGTACGT", &ClassifyParams::default());
         assert_eq!(result.confidence.len(), 7);
+    }
+
+    #[test]
+    fn int8_quantization_round_trip() {
+        let refs = vec![
+            make_ref("r1", b"AAAAAAAAACCCCCCCCC", "Bacteria;Firmicutes;Bacilli"),
+            make_ref("r2", b"AAAAAAAAACCCCCCCCC", "Bacteria;Firmicutes;Bacilli"),
+            make_ref(
+                "r3",
+                b"GGGGGGGGGTTTTTTTTTT",
+                "Bacteria;Proteobacteria;Gamma",
+            ),
+            make_ref(
+                "r4",
+                b"GGGGGGGGGTTTTTTTTTT",
+                "Bacteria;Proteobacteria;Gamma",
+            ),
+        ];
+
+        let classifier = NaiveBayesClassifier::train(&refs, 4);
+        let npu = classifier.to_int8_weights();
+
+        assert_eq!(npu.n_taxa, 2);
+        assert_eq!(npu.kmer_space, 256); // 4^4
+        assert_eq!(npu.weights_i8.len(), 2 * 256);
+        assert_eq!(npu.priors_i8.len(), 2);
+        assert!(npu.scale > 0.0);
+    }
+
+    #[test]
+    fn quantized_classification_parity() {
+        let refs = vec![
+            make_ref("r1", b"AAAAAAAAACCCCCCCCC", "Bacteria;Firmicutes;Bacilli"),
+            make_ref("r2", b"AAAAAAAAACCCCCCCCC", "Bacteria;Firmicutes;Bacilli"),
+            make_ref(
+                "r3",
+                b"GGGGGGGGGTTTTTTTTTT",
+                "Bacteria;Proteobacteria;Gamma",
+            ),
+            make_ref(
+                "r4",
+                b"GGGGGGGGGTTTTTTTTTT",
+                "Bacteria;Proteobacteria;Gamma",
+            ),
+        ];
+
+        let classifier = NaiveBayesClassifier::train(&refs, 4);
+
+        let full_result = classifier.classify(b"AAAAAAAAACCCCCCCCC", &ClassifyParams::default());
+        let quant_idx = classifier.classify_quantized(b"AAAAAAAAACCCCCCCCC");
+        assert_eq!(
+            full_result.taxon_idx, quant_idx,
+            "int8 argmax must match f64 for Firmicutes query"
+        );
+
+        let full_result2 = classifier.classify(b"GGGGGGGGGTTTTTTTTTT", &ClassifyParams::default());
+        let quant_idx2 = classifier.classify_quantized(b"GGGGGGGGGTTTTTTTTTT");
+        assert_eq!(
+            full_result2.taxon_idx, quant_idx2,
+            "int8 argmax must match f64 for Proteobacteria query"
+        );
+    }
+
+    #[test]
+    fn npu_buffer_sizes() {
+        let refs = vec![
+            make_ref("r1", b"AAAAAAAAACCCCCCCCC", "Bac;Firm;Bac"),
+            make_ref("r2", b"GGGGGGGGGTTTTTTTTTT", "Bac;Prot;Gam"),
+            make_ref("r3", b"ACACACACACACACAC", "Bac;Bact;Del"),
+        ];
+
+        let classifier = NaiveBayesClassifier::train(&refs, 8);
+        let npu = classifier.to_int8_weights();
+        assert_eq!(npu.kmer_space, 65_536); // 4^8
+        assert_eq!(
+            npu.weights_i8.len(),
+            npu.n_taxa * 65_536,
+            "weight buffer size = n_taxa × 4^k"
+        );
     }
 }

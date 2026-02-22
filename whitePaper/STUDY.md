@@ -18,7 +18,7 @@ and mathematical biology (Track 1b), deep-sea metagenomics and microbial
 evolution (Track 1c), and PFAS detection via LC-MS (Track 2),
 validating 61 Rust modules (41 CPU + 20 GPU) against baselines from Galaxy,
 QIIME2, asari, FindPFAS, scipy, sklearn, dendropy, real NCBI SRA data, and
-published paper models with 1,742 quantitative checks across 77 experiments
+published paper models with 1,835 quantitative checks across 83 experiments
 — all passing. The pipeline proves substrate independence: math produces
 identical results on CPU and GPU, validated via metalForge cross-substrate
 checks (Exp060). Random Forest ensemble and Gradient Boosting Machine
@@ -69,7 +69,7 @@ chemistry:
 | Baseline | Python scipy | Galaxy/QIIME2 | asari/PFΔScreen |
 | GPU layer | ToadStool (wgpu) | ToadStool (wgpu) | ToadStool (wgpu) |
 | Success metric | chi² match | Same taxonomy | Same PFAS detected |
-| Checks | 418/418 | 1,742/1,742 | (included in 1,742) |
+| Checks | 418/418 | 1,835/1,835 | (included in 1,835) |
 
 Both prove the ecoPrimals thesis: sovereign compute on consumer hardware
 can replicate institutional results, then exceed them via Rust + GPU.
@@ -128,7 +128,7 @@ detection in water via LC-MS. Source papers: asari (Nature Communications
 
 ### 3.1 Science Replication (Phase 1)
 
-8 of 10 planned experiments completed:
+Phase 1 replication experiments (8 completed):
 
 | Exp | Dataset | Baseline Tool | Key Result |
 |-----|---------|---------------|------------|
@@ -142,7 +142,7 @@ detection in water via LC-MS. Source papers: asari (Nature Communications
 
 ### 3.2 Rust CPU Validation (Phase 2)
 
-1,291 CPU quantitative checks across 29 self-contained validation binaries — all pass.
+1,349 CPU quantitative checks across 67 validation binaries — all pass.
 In addition, the original 17 pipeline validation binaries (data-dependent) cover
 the Phase 1-3 checks. The following are the self-contained validators:
 
@@ -245,19 +245,24 @@ Pipeline flow:
     → taxonomy GEMM (GPU) → diversity FMR (GPU) → results
 ```
 
-**Custom WGSL shaders (9):**
+**Local WGSL shaders (4 in Write phase — 19 absorbed lean):**
 
-| Shader | Purpose | f64? | Approach |
-|--------|---------|------|----------|
-| `quality_filter.wgsl` | Per-read quality trimming | No (u32) | One thread per read |
-| `dada2_e_step.wgsl` | Batch log_p_error | Yes (addition only) | One thread per (seq,center) pair |
-| `hmm_forward_f64.wgsl` | Batch HMM forward (log-space) | Yes (full) | One thread per sequence |
-| `batched_qs_ode_rk4_f64.wgsl` | QS ODE parameter sweep | Yes (full) | One thread per trajectory |
-| `ani_batch_f64.wgsl` | ANI pairwise identity | Yes | One thread per pair |
-| `snp_calling_f64.wgsl` | SNP calling | Yes | One thread per position |
-| `dnds_batch_f64.wgsl` | dN/dS (Nei-Gojobori) | Yes (log polyfill) | One thread per pair |
-| `pangenome_classify.wgsl` | Pangenome gene classification | Yes | One thread per gene |
-| `rf_batch_inference.wgsl` | Random Forest batch inference | Yes (SoA) | One thread per (sample,tree) |
+| Shader | Purpose | f64? | Status |
+|--------|---------|------|--------|
+| `batched_qs_ode_rk4_f64.wgsl` | QS ODE parameter sweep | Yes (full) | Local — blocked on `enable f64;` in naga |
+
+**Previously local, now upstream ToadStool primitives (8 absorbed):**
+
+| Primitive | Was Shader | Bio Module |
+|-----------|-----------|------------|
+| `HmmBatchForwardF64` | `hmm_forward_f64.wgsl` | hmm_gpu |
+| `AniBatchF64` | `ani_batch_f64.wgsl` | ani_gpu |
+| `SnpCallingF64` | `snp_calling_f64.wgsl` | snp_gpu |
+| `DnDsBatchF64` | `dnds_batch_f64.wgsl` | dnds_gpu |
+| `PangenomeClassifyGpu` | `pangenome_classify.wgsl` | pangenome_gpu |
+| `QualityFilterGpu` | `quality_filter.wgsl` | quality_gpu |
+| `Dada2EStepGpu` | `dada2_e_step.wgsl` | dada2_gpu |
+| `RfBatchInferenceGpu` | `rf_batch_inference.wgsl` | random_forest_gpu |
 
 **Key design: forced f64 polyfills for NVVM.** RTX 4070 (Ada Lovelace)
 NVVM cannot compile native f64 `exp()`, `log()`, or `pow()`.
@@ -514,7 +519,7 @@ Code quality gates (all enforced in CI):
 - `cargo clippy --all-targets --features gpu -- -D warnings` — zero GPU-specific warnings
 - `RUSTDOCFLAGS="-D warnings" cargo doc --no-deps` — zero doc warnings
 - 0 `unsafe` blocks (`#![forbid(unsafe_code)]`), 0 `TODO`/`FIXME`, 0 production `unwrap()`/`expect()` (`#![deny(clippy::expect_used, clippy::unwrap_used)]` enforced crate-wide)
-- 32 named tolerance constants in `tolerances.rs` (scientifically justified, hierarchy-tested)
+- 39 named tolerance constants in `tolerances.rs` (scientifically justified, hierarchy-tested)
 - Shared math consolidated in `bio::special` (erf, ln_gamma, `regularized_gamma_lower`) — no duplication
 - 6 determinism tests covering diversity, Bray-Curtis, DADA2, chimera, taxonomy, and the full 16S pipeline
 
@@ -527,19 +532,19 @@ the shared crate. This cycle has completed for **12 bio primitives**: the origin
 4 (SmithWatermanGpu, GillespieGpu, TreeInferenceGpu, FelsensteinGpu) plus
 8 absorbed on Feb 22, 2026 (HmmBatchForwardF64, AniBatchF64, SnpCallingF64,
 DnDsBatchF64, PangenomeClassifyGpu, QualityFilterGpu, Dada2EStepGpu,
-RfBatchInferenceGpu). Only 1 local WGSL shader remains (ODE sweep, blocked
+RfBatchInferenceGpu). 4 local WGSL shaders in Write phase (ODE blocked
 on ToadStool's `enable f64;` directive). The rewire process itself discovered
 and fixed two ToadStool bugs: an SNP binding layout mismatch and an
 AdapterInfo propagation failure that broke f64 polyfill detection on RTX 4070.
 
 | Stage | Extensions | Status |
 |-------|-----------|--------|
-| **Absorbed** | SW, Gillespie, DT, Felsenstein, GEMM, diversity | Lean on upstream |
-| **Tier A** (handoff ready) | `hmm_forward_f64.wgsl` (13/13), `batched_qs_ode_rk4_f64.wgsl` (7/7), `dada2_e_step.wgsl`, `quality_filter.wgsl` | Handoff pending |
-| **Tier A** (Track 1c) | `ani_batch_f64.wgsl` (7/7), `snp_calling_f64.wgsl` (5/5), `dnds_batch_f64.wgsl` (9/9), `pangenome_classify.wgsl` (6/6) | Validated, handoff ready |
-| **Tier A** (ML) | `rf_batch_inference.wgsl` (13/13) | SoA layout, validated |
-| **Tier B** (needs refactor) | kmer, unifrac, taxonomy (NPU) | GPU pattern identified |
-| **Tier C** (CPU-only) | chimera, cooperation, derep, NJ, reconciliation, GBM | No GPU path |
+| **Absorbed** (23) | SW, Gillespie, DT, Felsenstein, GEMM, diversity, HMM, ANI, SNP, dN/dS, Pangenome, QF, DADA2, RF | Lean on upstream |
+| **Tier A** (ODE, local) | `batched_qs_ode_rk4_f64.wgsl` (7/7) + 5 ODE flat APIs | Blocked: `enable f64;` |
+| **Tier A** (GPU-ready) | kmer (4^k histogram, Exp081), unifrac (CSR flat tree, Exp082) | Flat layout validated |
+| **Tier A/NPU** | taxonomy (int8 quantized, Exp083) | NPU FC dispatch ready |
+| **Tier B** (2 remaining) | cooperation (flat API done, ODE blocked) | Same `enable f64;` blocker |
+| **Tier C** (CPU-only) | chimera, derep, NJ, reconciliation, GBM, capacitor | No GPU path |
 
 **NVVM driver profile bug** (fixed Feb 22): wetSpring's `GpuF64::new()` was using
 `WgpuDevice::from_existing_simple()` which sets synthetic adapter info, breaking
@@ -557,7 +562,7 @@ A fourth function (`integrate_peak` in `bio::eic`) duplicates
 shaped for ToadStool absorption via GPU-friendly patterns: flat arrays (SoA),
 `#[repr(C)]` parameter structs, batch APIs, preallocated buffers, and
 deterministic math. The `metalForge/` directory characterizes local hardware
-(GPU, NPU, CPU) and documents substrate routing for each algorithm. 32 named
+(GPU, NPU, CPU) and documents substrate routing for each algorithm. 39 named
 tolerance constants in `tolerances.rs` ensure all validation thresholds are
 scientifically justified and ready for cross-Spring adoption.
 
@@ -575,7 +580,7 @@ repository (AGPL-3.0). No institutional access required.
 ```bash
 # Run all CPU validations (1,291 checks)
 cd barracuda
-cargo test --release          # 650 tests (587 lib + 50 integration + 13 doc)
+cargo test --release          # 730 tests (654 lib + 60 integration + 14 doc + 2 bench)
 cargo run --release --bin validate_fastq
 cargo run --release --bin validate_diversity
 cargo run --release --bin validate_mzml

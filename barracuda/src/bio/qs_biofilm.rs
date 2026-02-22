@@ -92,6 +92,72 @@ impl Default for QsBiofilmParams {
     }
 }
 
+/// Number of state variables in the QS biofilm ODE system.
+pub const N_VARS: usize = 5;
+/// Number of f64 parameters when flattened for GPU dispatch.
+pub const N_PARAMS: usize = 18;
+
+impl QsBiofilmParams {
+    /// Flatten parameters into a contiguous `f64` slice for GPU dispatch.
+    ///
+    /// Layout matches the field declaration order of [`QsBiofilmParams`].
+    /// The existing ODE sweep shader reads the first 17; `d_bio` at index 17
+    /// is included for lossless round-trip and future shader extensions.
+    #[must_use]
+    pub const fn to_flat(&self) -> [f64; N_PARAMS] {
+        [
+            self.mu_max,
+            self.k_cap,
+            self.death_rate,
+            self.k_ai_prod,
+            self.d_ai,
+            self.k_hapr_max,
+            self.k_hapr_ai,
+            self.n_hapr,
+            self.d_hapr,
+            self.k_dgc_basal,
+            self.k_dgc_rep,
+            self.k_pde_basal,
+            self.k_pde_act,
+            self.d_cdg,
+            self.k_bio_max,
+            self.k_bio_cdg,
+            self.n_bio,
+            self.d_bio,
+        ]
+    }
+
+    /// Reconstruct from a flat `f64` slice (inverse of [`to_flat`](Self::to_flat)).
+    ///
+    /// # Panics
+    ///
+    /// Panics if `flat.len() < N_PARAMS`.
+    #[must_use]
+    pub fn from_flat(flat: &[f64]) -> Self {
+        assert!(flat.len() >= N_PARAMS, "need {N_PARAMS} values");
+        Self {
+            mu_max: flat[0],
+            k_cap: flat[1],
+            death_rate: flat[2],
+            k_ai_prod: flat[3],
+            d_ai: flat[4],
+            k_hapr_max: flat[5],
+            k_hapr_ai: flat[6],
+            n_hapr: flat[7],
+            d_hapr: flat[8],
+            k_dgc_basal: flat[9],
+            k_dgc_rep: flat[10],
+            k_pde_basal: flat[11],
+            k_pde_act: flat[12],
+            d_cdg: flat[13],
+            k_bio_max: flat[14],
+            k_bio_cdg: flat[15],
+            n_bio: flat[16],
+            d_bio: flat[17],
+        }
+    }
+}
+
 /// Hill activation: x^n / (k^n + x^n).
 #[inline]
 fn hill(x: f64, k: f64, n: f64) -> f64 {
@@ -311,6 +377,34 @@ mod tests {
                 a.to_bits(),
                 b.to_bits(),
                 "ODE should be bitwise deterministic"
+            );
+        }
+    }
+
+    #[test]
+    fn flat_params_round_trip() {
+        let p = QsBiofilmParams::default();
+        let flat = p.to_flat();
+        assert_eq!(flat.len(), N_PARAMS);
+        let p2 = QsBiofilmParams::from_flat(&flat);
+        let flat2 = p2.to_flat();
+        for (a, b) in flat.iter().zip(&flat2) {
+            assert_eq!(a.to_bits(), b.to_bits(), "round-trip must be bitwise exact");
+        }
+    }
+
+    #[test]
+    fn flat_params_gpu_parity() {
+        let p = QsBiofilmParams::default();
+        let flat = p.to_flat();
+        let p2 = QsBiofilmParams::from_flat(&flat);
+        let r1 = scenario_standard_growth(&p, DT);
+        let r2 = scenario_standard_growth(&p2, DT);
+        for (a, b) in r1.y_final.iter().zip(&r2.y_final) {
+            assert_eq!(
+                a.to_bits(),
+                b.to_bits(),
+                "flat round-trip must produce identical ODE results"
             );
         }
     }

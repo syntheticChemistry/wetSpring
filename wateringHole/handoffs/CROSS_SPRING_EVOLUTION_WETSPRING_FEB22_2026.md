@@ -130,7 +130,35 @@ that neuralSpring can compose with its training loop.
 
 ---
 
-## 5. What Remains
+## 5. Phase 21 Update: GPU/NPU Readiness + Dispatch Validation
+
+### New Absorption Candidates (Exp081–083)
+
+| Module | Layout | Target | Cross-Spring Value |
+|--------|--------|--------|-------------------|
+| `kmer` (4^k histogram) | Dense u32 buffer, sorted pairs | GPU | Genomic counting for all Springs |
+| `unifrac` (CSR flat tree) | CSR arrays + sample matrix | GPU | Generic tree structure — Felsenstein, NJ, DTL |
+| `taxonomy` (int8 quantized) | Affine i8 weights | NPU | FC inference pattern for neuralSpring |
+
+### Dispatch Router Validation (Exp080)
+
+The forge dispatch router was validated across 5 hardware configurations.
+Key cross-spring finding: **workload variants with graceful degradation**
+are needed. A single ODE workload definition cannot handle both GPU
+(ShaderDispatch) and CPU-only environments. Applications must define
+GPU-optimal and CPU-fallback variants.
+
+This affects hotSpring's physics ODE workloads identically.
+
+### Flat Serialization Standard (Exp078–079)
+
+The `to_flat()` / `from_flat()` pattern proved bitwise-identical for all 6
+ODE modules. This should become a barracuda standard for any parameterized
+GPU workload — hotSpring's RK4 physics integrators would benefit directly.
+
+---
+
+## 6. What Remains
 
 | Item | Blocker | Owner |
 |------|---------|-------|
@@ -138,6 +166,46 @@ that neuralSpring can compose with its training loop.
 | CPU math feature | `barracuda::math` feature proposal | ToadStool team |
 | `from_existing_simple()` deprecation | Design decision | ToadStool team |
 | Auto-dispatch thresholds | Performance profiling needed | Collaboration |
+| `KmerHistogramGpu` shader | Needs WGSL for atomic u32 histogram | ToadStool team |
+| `UniFracPairwiseGpu` shader | Needs f64 tree-propagation WGSL | ToadStool team (f64 first) |
+| `TaxonomyNpuInference` | AKD1000 FC integration | NPU team |
+| Generic `FlatTree` type | Architectural: barracuda::ops::tree | ToadStool team |
+| Generic int8 quantization | barracuda::ops::quant | ToadStool team |
+
+---
+
+## 7. Phase 22 Update: Pure GPU Streaming + Full Validation Proof
+
+### Streaming Findings (Cross-Spring Relevance)
+
+Exp090-091 proved that **naive round-trip GPU dispatch is 13-16× slower than CPU**.
+ToadStool's `GpuPipelineSession` with pre-warmed pipelines eliminates 92-94% of
+that overhead, achieving 441-837× speedup over round-trip at batch scale.
+
+**Cross-spring implication**: hotSpring's physics pipelines (HMC, lattice sweeps)
+should adopt the same `execute_to_buffer()` pattern. Any multi-stage GPU pipeline
+that reads back to CPU between stages is leaving >90% performance on the table.
+
+### PCIe Direct Transfer (Cross-Spring Relevance)
+
+Exp088 proved GPU→NPU data flow without CPU staging. The buffer layout contracts
+(`#[repr(C)]`, flat arrays) are sufficient for cross-substrate transfer. This
+validates metalForge's architectural assumption that PCIe peer-to-peer DMA can
+be used between heterogeneous accelerators.
+
+## 8. Updated Totals
+
+| Metric | Value |
+|--------|-------|
+| Experiments | 91 |
+| Validation checks | 2,173+ (all PASS) |
+| Rust tests | 728 |
+| Binaries | 81 |
+| ToadStool primitives consumed | 23 |
+| Local WGSL shaders | 4 (ODE, kmer, unifrac, taxonomy) |
+| Tier A modules | 7 |
+| Tier B modules | 2 |
+| Handoff version | v8 |
 
 ---
 

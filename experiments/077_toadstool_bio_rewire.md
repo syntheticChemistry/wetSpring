@@ -85,7 +85,7 @@ Replace local shader compilation (`include_str!`, `ShaderTemplate`,
 
 All 451 GPU validation checks pass with ToadStool-backed primitives.
 8 local WGSL shaders deleted (25 KB). 23 ToadStool primitives consumed
-(up from 15). Only 1 local shader remains (ODE, blocked).
+(up from 15). 4 local WGSL shaders in Write phase (ODE, kmer, unifrac, taxonomy; ODE blocked).
 
 ## Cross-Spring Evolution
 

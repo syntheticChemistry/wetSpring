@@ -71,6 +71,46 @@ impl Default for BistableParams {
     }
 }
 
+/// Number of state variables (same as `qs_biofilm`).
+pub const N_VARS: usize = 5;
+/// Number of f64 parameters when flattened for GPU dispatch.
+///
+/// 18 from [`QsBiofilmParams`] + 3 feedback params = 21.
+pub const N_PARAMS: usize = 21;
+
+impl BistableParams {
+    /// Flatten parameters into a contiguous `f64` slice for GPU dispatch.
+    ///
+    /// The first 18 values are the base [`QsBiofilmParams`] layout, followed
+    /// by `[alpha_fb, n_fb, k_fb]`.
+    #[must_use]
+    pub fn to_flat(&self) -> [f64; N_PARAMS] {
+        let base = self.base.to_flat();
+        let mut out = [0.0; N_PARAMS];
+        out[..super::qs_biofilm::N_PARAMS].copy_from_slice(&base);
+        out[18] = self.alpha_fb;
+        out[19] = self.n_fb;
+        out[20] = self.k_fb;
+        out
+    }
+
+    /// Reconstruct from a flat `f64` slice (inverse of [`to_flat`](Self::to_flat)).
+    ///
+    /// # Panics
+    ///
+    /// Panics if `flat.len() < N_PARAMS`.
+    #[must_use]
+    pub fn from_flat(flat: &[f64]) -> Self {
+        assert!(flat.len() >= N_PARAMS, "need {N_PARAMS} values");
+        Self {
+            base: QsBiofilmParams::from_flat(flat),
+            alpha_fb: flat[18],
+            n_fb: flat[19],
+            k_fb: flat[20],
+        }
+    }
+}
+
 /// Hill activation: x^n / (k^n + x^n).
 #[inline]
 fn hill(x: f64, k: f64, n: f64) -> f64 {
@@ -350,5 +390,33 @@ mod tests {
         assert_eq!(bif.param_values.len(), 11);
         assert_eq!(bif.b_forward.len(), 11);
         assert_eq!(bif.b_backward.len(), 11);
+    }
+
+    #[test]
+    fn flat_params_round_trip() {
+        let p = BistableParams::default();
+        let flat = p.to_flat();
+        assert_eq!(flat.len(), N_PARAMS);
+        let p2 = BistableParams::from_flat(&flat);
+        let flat2 = p2.to_flat();
+        for (a, b) in flat.iter().zip(&flat2) {
+            assert_eq!(a.to_bits(), b.to_bits(), "round-trip must be bitwise exact");
+        }
+    }
+
+    #[test]
+    fn flat_params_gpu_parity() {
+        let p = BistableParams::default();
+        let flat = p.to_flat();
+        let p2 = BistableParams::from_flat(&flat);
+        let r1 = run_bistable(&[0.01, 0.0, 0.0, 2.0, 0.5], 24.0, DT, &p);
+        let r2 = run_bistable(&[0.01, 0.0, 0.0, 2.0, 0.5], 24.0, DT, &p2);
+        for (a, b) in r1.y_final.iter().zip(&r2.y_final) {
+            assert_eq!(
+                a.to_bits(),
+                b.to_bits(),
+                "flat round-trip must produce identical ODE results"
+            );
+        }
     }
 }

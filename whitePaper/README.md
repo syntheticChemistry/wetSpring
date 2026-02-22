@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 22, 2026
-**Status:** Validation study complete — 1,742/1,742 checks, 707 tests, 96.21% line coverage, 77 experiments
+**Status:** Validation study complete — 2,173+/2,173+ checks, 728 tests, 96.21% line coverage, 93 experiments
 **License:** AGPL-3.0-or-later
 
 ---
@@ -32,15 +32,39 @@
 5. Is the math truly substrate-independent — does the same algorithm produce
    identical results on CPU, GPU, and (eventually) NPU?
 
+6. Does ToadStool's unidirectional streaming eliminate the GPU round-trip
+   overhead that makes naive GPU dispatch slower than CPU for small workloads?
+
+7. Can local WGSL shaders be structured for clean absorption into ToadStool,
+   following the Write → Absorb → Lean cycle proven by hotSpring?
+
+---
+
+## Evolution Methodology: Write → Absorb → Lean
+
+wetSpring adopts hotSpring's proven absorption cycle for evolving local
+implementations into upstream ToadStool/BarraCUDA primitives:
+
+1. **Write** — Implement on CPU with WGSL shader templates in `.wgsl` files
+2. **Validate** — Test CPU ↔ GPU parity against Python baselines
+3. **Hand off** — Document in `wateringHole/handoffs/` with binding layouts
+4. **Absorb** — ToadStool integrates as `ops::bio::*` shaders
+5. **Lean** — wetSpring rewires to upstream imports, deletes local code
+
+**Current status:** 19 GPU modules lean on upstream; 4 local WGSL shaders
+in Write phase (ODE sweep, kmer histogram, unifrac propagation, taxonomy FC).
+The forge crate (`metalForge/forge/` v0.2.0) provides substrate discovery
+and capability-based dispatch as an absorption seam for ToadStool.
+
 ---
 
 ## Key Results
 
 | Claim | Evidence |
 |-------|----------|
-| Rust matches Python across 77 experiments | 1,291/1,291 CPU checks pass |
-| GPU matches CPU across all promoted domains | 451/451 GPU checks pass |
-| BarraCUDA CPU parity across 25 domains | 157/157 cross-domain checks pass |
+| Rust matches Python across 93 experiments | 1,392/1,392 CPU checks + 80 dispatch + 35 layout + 57 transfer/streaming pass |
+| GPU matches CPU across all promoted domains | 609/609 GPU checks pass (incl. 48 all-domain + 28 metalForge v3) |
+| BarraCUDA CPU parity across 25 domains + 6 ODE flat | 205/205 cross-domain checks pass |
 | 926× spectral cosine GPU speedup | Exp016 benchmark |
 | 2.45× full 16S pipeline GPU speedup | Exp015/016 benchmark |
 | 22.5× overall Rust vs Python (25 domains) | Exp059, peak 625× (SW) |
@@ -78,6 +102,15 @@
 | Pure GPU 5-stage analytics: 0.1% pipeline overhead | Exp075, 31/31 checks |
 | Cross-substrate GPU→NPU→CPU pipeline profiled | Exp076, 17/17 checks |
 | ToadStool bio rewire: 8 modules lean, 2 bugs fixed | Exp077, 451/451 GPU re-validated |
+| BarraCUDA CPU v7: Tier A layouts lossless | Exp085, 43/43 kmer/UniFrac/taxonomy round-trips |
+| metalForge 5-stage pipeline: substrate-independent | Exp086, 45/45 dispatch routing + parity |
+| GPU extended to 16 domains (EIC, PCoA, Kriging, Rarefaction) | Exp087, 50+ GPU checks |
+| PCIe direct transfer: no CPU staging | Exp088, 32/32 buffer contract checks |
+| Pure GPU streaming: 441-837× over round-trip | Exp090, 80/80 zero CPU round-trip pipeline |
+| Streaming eliminates 92-94% of round-trip overhead | Exp091, formal benchmark at 1-128 batch |
+| CPU vs GPU parity across all 16 domains | Exp092, 48/48 all-domain head-to-head |
+| metalForge full 16-domain substrate-independence | Exp093, 28/28 cross-substrate v3 |
+| Write → Absorb → Lean: 19 absorbed, 4 in Write | ABSORPTION_MANIFEST.md, hotSpring methodology |
 
 ---
 
@@ -174,6 +207,30 @@
 | 075 | Pure GPU analytics pipeline | 31/31 five-stage GPU pipeline, 0.1% overhead |
 | 076 | Cross-substrate pipeline | 17/17 GPU→NPU→CPU with latency profiling |
 
+### GPU/NPU Readiness + Dispatch Validation (Phase 21)
+
+| Exp | Method | What We Prove |
+|-----|--------|---------------|
+| 077 | ToadStool bio rewire | 451/451 GPU re-validated after 8-module absorption |
+| 078 | ODE GPU sweep readiness | Flat param APIs (to_flat/from_flat) for 5 ODE modules |
+| 079 | BarraCUDA CPU v6 (ODE flat) | 48/48 bitwise-identical ODE math through flat serialization |
+| 080 | metalForge dispatch routing | 35/35 router across 5 substrate configs (live hardware) |
+| 081 | K-mer GPU histogram | Dense 4^k histogram + sorted pairs for GPU dispatch |
+| 082 | UniFrac CSR flat tree | FlatTree with CSR layout + sample matrix for GPU pairwise |
+| 083 | Taxonomy NPU int8 | Affine int8 quantization, argmax parity with f64 |
+
+### Pure GPU Streaming + Full Validation (Phase 22)
+
+| Exp | Method | What We Prove |
+|-----|--------|---------------|
+| 085 | BarraCUDA CPU v7 (Tier A layouts) | 43/43 kmer histogram, UniFrac CSR, taxonomy int8 round-trip fidelity |
+| 086 | metalForge pipeline proof | 45/45 five-stage dispatch routing + substrate-independent output |
+| 087 | GPU extended domains | EIC, PCoA, Kriging, Rarefaction added to GPU suite |
+| 088 | PCIe direct transfer proof | 32/32 GPU→NPU, NPU→GPU, GPU→GPU without CPU staging |
+| 089 | ToadStool streaming dispatch | 25/25 streaming vs round-trip parity (3-stage, 5-stage chains) |
+| 090 | Pure GPU streaming pipeline | 80/80 zero CPU round-trips, 441-837× streaming advantage |
+| 091 | Streaming vs round-trip benchmark | CPU vs RT GPU vs streaming: streaming eliminates 92-94% overhead |
+
 ### Track 2: Analytical Chemistry (LC-MS, PFAS)
 
 | Exp | Paper/Tool | What We Prove |
@@ -214,9 +271,9 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCUDA/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34 WGSL shaders, 637 tests)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (1 local WGSL shader, 707 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (4 local WGSL shaders, 728 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
-- **archive/handoffs/** — Fossil record of ToadStool handoffs (v1–v6)
+- **archive/handoffs/** — Fossil record of ToadStool handoffs (v1–v7)
 
 Springs follow the **Write → Absorb → Lean** pattern (pioneered by hotSpring):
 write and validate locally, hand off to ToadStool for absorption, then lean on
@@ -234,11 +291,11 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | Line coverage (`cargo-llvm-cov`) | **96.21% overall (22,036 lines)** |
 | `#![forbid(unsafe_code)]` | Enforced crate-wide |
 | `#![deny(clippy::expect_used, clippy::unwrap_used)]` | Enforced crate-wide |
-| Named tolerance constants | 37 (all scientifically justified) |
+| Named tolerance constants | 39 (all scientifically justified) |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` files |
-| Provenance headers | All 73 validation binaries |
+| Provenance headers | All 83 validation/benchmark binaries |
 
 ## metalForge — Hardware Discovery
 

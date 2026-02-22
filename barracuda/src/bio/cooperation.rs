@@ -72,6 +72,58 @@ impl Default for CooperationParams {
     }
 }
 
+/// Number of state variables in the cooperation ODE system.
+pub const N_VARS: usize = 4;
+/// Number of f64 parameters when flattened for GPU dispatch.
+pub const N_PARAMS: usize = 13;
+
+impl CooperationParams {
+    /// Flatten parameters into a contiguous `f64` slice for GPU dispatch.
+    #[must_use]
+    pub const fn to_flat(&self) -> [f64; N_PARAMS] {
+        [
+            self.mu_coop,
+            self.mu_cheat,
+            self.k_cap,
+            self.death_rate,
+            self.k_ai_prod,
+            self.d_ai,
+            self.benefit,
+            self.k_benefit,
+            self.cost,
+            self.k_bio,
+            self.k_bio_ai,
+            self.dispersal_bonus,
+            self.d_bio,
+        ]
+    }
+
+    /// Reconstruct from a flat `f64` slice (inverse of [`to_flat`](Self::to_flat)).
+    ///
+    /// # Panics
+    ///
+    /// Panics if `flat.len() < N_PARAMS`.
+    #[must_use]
+    pub fn from_flat(flat: &[f64]) -> Self {
+        assert!(flat.len() >= N_PARAMS, "need {N_PARAMS} values");
+        Self {
+            mu_coop: flat[0],
+            mu_cheat: flat[1],
+            k_cap: flat[2],
+            death_rate: flat[3],
+            k_ai_prod: flat[4],
+            d_ai: flat[5],
+            benefit: flat[6],
+            k_benefit: flat[7],
+            cost: flat[8],
+            k_bio: flat[9],
+            k_bio_ai: flat[10],
+            dispersal_bonus: flat[11],
+            d_bio: flat[12],
+        }
+    }
+}
+
 #[inline]
 fn hill(x: f64, k: f64) -> f64 {
     if x <= 0.0 {
@@ -279,6 +331,34 @@ mod tests {
                 a.to_bits(),
                 b.to_bits(),
                 "ODE should be bitwise deterministic"
+            );
+        }
+    }
+
+    #[test]
+    fn flat_params_round_trip() {
+        let p = CooperationParams::default();
+        let flat = p.to_flat();
+        assert_eq!(flat.len(), N_PARAMS);
+        let p2 = CooperationParams::from_flat(&flat);
+        let flat2 = p2.to_flat();
+        for (a, b) in flat.iter().zip(&flat2) {
+            assert_eq!(a.to_bits(), b.to_bits(), "round-trip must be bitwise exact");
+        }
+    }
+
+    #[test]
+    fn flat_params_gpu_parity() {
+        let p = CooperationParams::default();
+        let flat = p.to_flat();
+        let p2 = CooperationParams::from_flat(&flat);
+        let r1 = scenario_equal_start(&p, DT);
+        let r2 = scenario_equal_start(&p2, DT);
+        for (a, b) in r1.y_final.iter().zip(&r2.y_final) {
+            assert_eq!(
+                a.to_bits(),
+                b.to_bits(),
+                "flat round-trip must produce identical ODE results"
             );
         }
     }

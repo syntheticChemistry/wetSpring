@@ -68,6 +68,54 @@ impl Default for PhageDefenseParams {
     }
 }
 
+/// Number of state variables in the phage defense ODE system.
+pub const N_VARS: usize = 4;
+/// Number of f64 parameters when flattened for GPU dispatch.
+pub const N_PARAMS: usize = 11;
+
+impl PhageDefenseParams {
+    /// Flatten parameters into a contiguous `f64` slice for GPU dispatch.
+    #[must_use]
+    pub const fn to_flat(&self) -> [f64; N_PARAMS] {
+        [
+            self.mu_max,
+            self.defense_cost,
+            self.k_resource,
+            self.yield_coeff,
+            self.adsorption_rate,
+            self.burst_size,
+            self.defense_efficiency,
+            self.phage_decay,
+            self.resource_inflow,
+            self.resource_dilution,
+            self.death_rate,
+        ]
+    }
+
+    /// Reconstruct from a flat `f64` slice (inverse of [`to_flat`](Self::to_flat)).
+    ///
+    /// # Panics
+    ///
+    /// Panics if `flat.len() < N_PARAMS`.
+    #[must_use]
+    pub fn from_flat(flat: &[f64]) -> Self {
+        assert!(flat.len() >= N_PARAMS, "need {N_PARAMS} values");
+        Self {
+            mu_max: flat[0],
+            defense_cost: flat[1],
+            k_resource: flat[2],
+            yield_coeff: flat[3],
+            adsorption_rate: flat[4],
+            burst_size: flat[5],
+            defense_efficiency: flat[6],
+            phage_decay: flat[7],
+            resource_inflow: flat[8],
+            resource_dilution: flat[9],
+            death_rate: flat[10],
+        }
+    }
+}
+
 #[inline]
 fn monod(r: f64, k: f64) -> f64 {
     r / (k + r)
@@ -250,6 +298,34 @@ mod tests {
         let r2 = scenario_phage_attack(&p, DT);
         for (a, b) in r1.y_final.iter().zip(&r2.y_final) {
             assert_eq!(a.to_bits(), b.to_bits());
+        }
+    }
+
+    #[test]
+    fn flat_params_round_trip() {
+        let p = PhageDefenseParams::default();
+        let flat = p.to_flat();
+        assert_eq!(flat.len(), N_PARAMS);
+        let p2 = PhageDefenseParams::from_flat(&flat);
+        let flat2 = p2.to_flat();
+        for (a, b) in flat.iter().zip(&flat2) {
+            assert_eq!(a.to_bits(), b.to_bits(), "round-trip must be bitwise exact");
+        }
+    }
+
+    #[test]
+    fn flat_params_gpu_parity() {
+        let p = PhageDefenseParams::default();
+        let flat = p.to_flat();
+        let p2 = PhageDefenseParams::from_flat(&flat);
+        let r1 = scenario_phage_attack(&p, DT);
+        let r2 = scenario_phage_attack(&p2, DT);
+        for (a, b) in r1.y_final.iter().zip(&r2.y_final) {
+            assert_eq!(
+                a.to_bits(),
+                b.to_bits(),
+                "flat round-trip must produce identical ODE results"
+            );
         }
     }
 }

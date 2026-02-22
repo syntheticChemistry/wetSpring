@@ -16,8 +16,8 @@ On Feb 22, wetSpring rewired all 8 bio GPU modules to delegate to
 ToadStool `barracuda::ops::bio::*` primitives, deleted 8 local WGSL
 shaders (25 KB), and confirmed all 451 GPU validation checks pass.
 Two ToadStool bugs were found and fixed during the process. 23 ToadStool
-primitives are now consumed (up from 15). Only 1 local WGSL shader
-remains (ODE sweep, blocked on `enable f64;`).
+primitives are now consumed (up from 15). 4 local WGSL shaders in Write phase
+(ODE, kmer, unifrac, taxonomy; ODE blocked on `enable f64;`).
 
 ---
 

@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 22, 2026
-**Status:** 77 experiments, 1,742 validation checks, all PASS
+**Status:** 93 experiments, 2,173+ validation checks, all PASS (728 Rust tests)
 
 ---
 
@@ -86,6 +86,22 @@
 | 075 | Pure GPU Analytics Pipeline | GPU | COMPLETE | 31 |
 | 076 | Cross-Substrate Pipeline | cross/GPU | COMPLETE | 17 |
 | 077 | ToadStool Bio Rewire | GPU/cross | COMPLETE | 451 (re-validated) |
+| 078 | ODE GPU Sweep Readiness | cross/GPU | COMPLETE | 10 (round-trip + parity) |
+| 079 | BarraCUDA CPU v6 — ODE Flat Param | CPU/cross | COMPLETE | 48 (flat RT + ODE + Python) |
+| 080 | metalForge Dispatch Routing | cross/dispatch | COMPLETE | 35 (7 sections × 5 configs) |
+| 081 | K-mer GPU Histogram Prep | GPU/refactor | COMPLETE | 4 (round-trip + GPU sizing) |
+| 082 | UniFrac Flat Tree (CSR) | GPU/refactor | COMPLETE | 4 (CSR + parity + matrix) |
+| 083 | Taxonomy NPU Quantization | NPU/refactor | COMPLETE | 3 (int8 RT + parity + sizing) |
+| 084 | metalForge Full Cross-Substrate v2 | metalForge | COMPLETE | 35+ (12 domains CPU ↔ GPU) |
+| 085 | BarraCUDA CPU v7 — Tier A Layouts | CPU/layout | COMPLETE | 43 (kmer/unifrac/taxonomy flat) |
+| 086 | metalForge Pipeline Proof | metalForge | COMPLETE | 45 (5-stage dispatch + parity) |
+| 087 | GPU Extended Domains (EIC/PCoA/Kriging/Rarefaction) | GPU | COMPLETE | 50+ (4 new GPU domains) |
+| 088 | metalForge PCIe Direct Transfer | metalForge | COMPLETE | 32 (6 paths + buffer contracts) |
+| 089 | ToadStool Streaming Dispatch | streaming | COMPLETE | 25 (5 patterns + determinism) |
+| 090 | Pure GPU Streaming Pipeline | GPU/streaming | COMPLETE | 80 (4 modes: RT, stream, parity, scaling) |
+| 091 | Streaming vs Round-Trip Benchmark | GPU/benchmark | COMPLETE | 2 (parity + Bray-Curtis error) |
+| 092 | CPU vs GPU All 16 Domains | GPU/parity | COMPLETE | 48 (16 domains head-to-head) |
+| 093 | metalForge Full v3 (16 domains) | metalForge | COMPLETE | 28 (16 domains substrate-independent) |
 
 ---
 
@@ -93,14 +109,16 @@
 
 | Category | Count |
 |----------|-------|
-| Experiments completed | 76 |
-| CPU validation checks | 1,291 |
+| Experiments completed | 89 |
+| CPU validation checks | 1,349 |
 | GPU validation checks | 451 |
-| **Total validation checks** | **1,742** |
-| Rust tests | 702 (628 lib + 60 integration + 14 doc) |
-| BarraCUDA CPU parity | 157/157 (25 domains) |
+| Dispatch validation checks | 35 |
+| **Total validation checks** | **1,835** |
+| Rust tests | 730 (654 lib + 60 integration + 14 doc + 2 bench) |
+| BarraCUDA CPU parity | 205/205 (25 domains + 6 ODE flat) |
 | BarraCUDA GPU parity | 8 domains consolidated (Exp064) |
 | metalForge cross-system | 8 domains CPU↔GPU proven (Exp065) |
+| metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | ToadStool primitives consumed | 23 (15 original + 8 bio) |
 
 ---
@@ -156,7 +174,7 @@
 ### Completed
 - Exp019 Phases 2-4 (Phylogenetic): All COMPLETE
 - Exp008 Full ML Pipeline: All COMPLETE
-- Tolerance centralization: **DONE** — 37 named constants in `tolerances.rs`
+- Tolerance centralization: **DONE** — 39 named constants in `tolerances.rs`
 - Code quality hardening: **DONE** — `forbid(unsafe_code)`, `deny(expect_used, unwrap_used)`, pedantic + nursery clippy
 - metalForge forge crate: **DONE** — `wetspring-forge` (24 tests, substrate discovery + dispatch)
 - GPU workgroup constants: **DONE** — all GPU modules use named `WORKGROUP_SIZE` matching ToadStool shaders
@@ -212,16 +230,16 @@ cargo test --doc               → 14 passed, 0 failed
 #![forbid(unsafe_code)]        → enforced crate-wide
 #![deny(expect_used, unwrap_used)] → enforced crate-wide (test modules #[allow])
 partial_cmp().unwrap()         → 0 (all migrated to f64::total_cmp)
-inline tolerance literals      → 0 (37 named constants in tolerances.rs)
+inline tolerance literals      → 0 (39 named constants in tolerances.rs)
 GPU workgroup sizes            → named constants in all 9 *_gpu.rs (match WGSL shaders)
 shared math (bio::special)     → erf, ln_gamma, regularized_gamma (no duplication)
 hardware detection             → injectable (from_content / parse_*), no direct /proc in library
 SPDX headers                   → all .rs files
 max file size                  → all under 1000 LOC (fastq.rs: 907 largest)
 external C dependencies        → 0 (flate2 uses rust_backend)
-provenance headers             → all 73 binaries (commit, command, hardware)
+provenance headers             → all 79 binaries (commit, command, hardware)
 Python baselines               → scripts/requirements.txt (pinned numpy, scipy, sklearn)
-barracuda_cpu                  → 157/157 checks PASS (25 domains)
+barracuda_cpu                  → 205/205 checks PASS (25 domains + 6 ODE flat)
 barracuda_gpu                  → 451 GPU checks PASS
 fuzz harnesses                 → 4 (FASTQ, mzML, MS2, XML)
 zero-copy I/O                  → FastqRefRecord, DecodeBuffer reuse, streaming iterators
@@ -237,7 +255,7 @@ Python across all 25 algorithmic domains:
 - v4 (Exp057): +5 Track 1c domains (ANI, SNP, dN/dS, molecular clock, pangenome)
 - v5 (Exp061/062): +2 ML domains (Random Forest, GBM)
 
-Combined: 157/157 CPU parity checks. This is the bridge to pure GPU execution.
+Combined: 205/205 CPU parity checks. This is the bridge to pure GPU execution.
 
 ```
 Total CPU time: ~85ms (release build, all 25 domains, v4 adds ~0.4ms, v5 adds ~62µs)
@@ -277,9 +295,9 @@ Following hotSpring's pattern for ToadStool integration:
 | Phase | Count | Status |
 |-------|:-----:|--------|
 | **Lean** (consumed upstream) | 20 GPU modules, 23 primitives | Active — 15 original + 8 bio (HMM, ANI, SNP, dN/dS, Pangenome, QF, DADA2, RF) |
-| **Write** (local WGSL, validated) | 1 shader (ODE sweep) | Blocked on ToadStool `enable f64;` in `batched_qs_ode_rk4_f64.wgsl:35` |
+| **Write** (local WGSL, pending absorption) | 4 shaders (ODE, kmer, unifrac, taxonomy) | ODE blocked on ToadStool `enable f64;`; others pending validation |
 | **CPU math** (`bio::special`) | 3 functions (erf, ln_gamma, regularized_gamma) | Consolidated; shaped for extraction to `barracuda::math` |
-| **CPU-only** (no GPU path) | 15 modules | Stable — chimera, derep, kmer, GBM, etc. |
+| **CPU-only** (no GPU path) | 12 modules | Stable — chimera, derep, GBM, merge_pairs, etc. |
 | **Blocked** (needs upstream) | 3 modules | kmer hash, UniFrac tree traversal, taxonomy NPU |
 | **metalForge** (absorption eng.) | 32 tolerances, SoA patterns, `#[repr(C)]` | Shaping all modules for ToadStool absorption |
 
@@ -327,6 +345,31 @@ bio primitives are available to neuralSpring's metalForge pipeline.
 | 077 | (all GPU binaries) | 451 | Full revalidation after 8-module rewire to ToadStool primitives |
 
 Bugs found and fixed: SNP binding layout (ToadStool), AdapterInfo propagation (wetSpring).
+
+### ODE Flat API + Dispatch Routing (Feb 22, 2026)
+
+| Exp | Binary | Checks | What it proves |
+|-----|--------|:------:|----------------|
+| 079 | `validate_barracuda_cpu_v6` | 48 | GPU-compatible flat param APIs preserve bitwise ODE math across all 6 bio models |
+| 080 | `validate_dispatch_routing` (forge) | 35 | Forge router correctly classifies 11 workloads across 5 substrate configs |
+
+### Tier B → A Module Refactoring (Feb 22, 2026)
+
+| Exp | Module | Tests | What it proves |
+|-----|--------|:-----:|----------------|
+| 081 | `kmer` | 4 | Histogram (4^k) + sorted pairs GPU layouts, round-trip fidelity |
+| 082 | `unifrac` | 4 | CSR flat tree + sample matrix, UniFrac parity through flat path |
+| 083 | `taxonomy` | 3 | Int8 affine quantization, argmax parity with f64 for NPU inference |
+| 084 | metalForge full | 35+ | 12-domain cross-substrate (extends Exp065: +SW, Gillespie, DT, spectral) |
+| 085 | Tier A layouts | 43 | kmer histogram/sorted-pairs RT, unifrac CSR RT, taxonomy int8 parity |
+| 086 | metalForge pipeline | 45 | 5-stage dispatch routing + CPU/NPU parity + flat buffer readiness |
+| 087 | GPU Extended Domains | 50+ | EIC, PCoA, Kriging, Rarefaction — 4 new GPU domains (--features gpu) |
+| 088 | metalForge PCIe Direct | 32 | 6 paths + buffer contracts (CPU-only binary) |
+| 089 | ToadStool Streaming Dispatch | 25 | 5 patterns + determinism (CPU-only binary) |
+| 090 | Pure GPU Streaming Pipeline | 80 | 4 modes: round-trip, streaming, parity, batch scaling (--features gpu) |
+| 091 | Streaming vs Round-Trip Benchmark | 2 | CPU ↔ RT ↔ streaming parity + Bray-Curtis error (--features gpu) |
+| 092 | CPU vs GPU All 16 Domains | 48 | 16 domains CPU↔GPU parity (--features gpu) |
+| 093 | metalForge Full v3 (16 domains) | 28 | 16 domains substrate-independent (--features gpu) |
 
 ### Handoff Documents
 

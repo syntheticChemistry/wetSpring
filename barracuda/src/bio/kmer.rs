@@ -82,6 +82,67 @@ impl KmerCounts {
         entries.truncate(n);
         entries
     }
+
+    /// Flat histogram of size 4^k, indexed by canonical k-mer value.
+    ///
+    /// For k <= 12 (4^12 = 16M entries), this produces a dense GPU buffer
+    /// suitable for parallel histogram reduction or radix sort dispatch.
+    #[must_use]
+    pub fn to_histogram(&self) -> Vec<u32> {
+        let kmer_space = 1_usize << (2 * self.k);
+        let mut hist = vec![0_u32; kmer_space];
+        for (&kmer, &count) in &self.counts {
+            hist[kmer as usize] = count;
+        }
+        hist
+    }
+
+    /// Reconstruct `KmerCounts` from a flat histogram produced by [`to_histogram`].
+    #[must_use]
+    pub fn from_histogram(histogram: &[u32], k: usize) -> Self {
+        let mut counts = HashMap::new();
+        let mut total_valid = 0_u64;
+        for (kmer, &count) in histogram.iter().enumerate() {
+            if count > 0 {
+                counts.insert(kmer as u64, count);
+                total_valid += u64::from(count);
+            }
+        }
+        Self {
+            k,
+            counts,
+            total_valid_kmers: total_valid,
+            skipped_ambiguous: 0,
+        }
+    }
+
+    /// Sorted (kmer, count) pairs for GPU binary-search or merge operations.
+    ///
+    /// Sorted ascending by canonical k-mer value. Compact representation
+    /// for large k where 4^k histogram would be too sparse.
+    #[must_use]
+    pub fn to_sorted_pairs(&self) -> Vec<(u64, u32)> {
+        let mut pairs: Vec<_> = self.counts.iter().map(|(&k, &v)| (k, v)).collect();
+        pairs.sort_unstable_by_key(|&(k, _)| k);
+        pairs
+    }
+
+    /// Reconstruct `KmerCounts` from sorted pairs produced by [`to_sorted_pairs`].
+    #[must_use]
+    pub fn from_sorted_pairs(pairs: &[(u64, u32)], k: usize) -> Self {
+        let mut counts = HashMap::with_capacity(pairs.len());
+        let mut total_valid = 0_u64;
+        for &(kmer, count) in pairs {
+            counts.insert(kmer, count);
+            total_valid += u64::from(count);
+        }
+        Self {
+            k,
+            counts,
+            total_valid_kmers: total_valid,
+            skipped_ambiguous: 0,
+        }
+    }
 }
 
 /// Decode a 2-bit encoded k-mer back to a DNA string.
@@ -340,5 +401,51 @@ mod tests {
         // 40 - 32 + 1 = 9 k-mers
         assert_eq!(counts.total_valid_kmers, 9);
         assert!(counts.unique_count() > 0);
+    }
+
+    #[test]
+    fn histogram_round_trip() {
+        let counts = count_kmers(b"ACGTACGTACGTACGTAAACCCC", 4);
+        let hist = counts.to_histogram();
+        assert_eq!(hist.len(), 256); // 4^4
+        let restored = KmerCounts::from_histogram(&hist, 4);
+        assert_eq!(restored.unique_count(), counts.unique_count());
+        for (&kmer, &count) in &counts.counts {
+            assert_eq!(restored.counts.get(&kmer).copied(), Some(count));
+        }
+    }
+
+    #[test]
+    fn sorted_pairs_round_trip() {
+        let counts = count_kmers(b"ACGTACGTACGTACGTAAACCCC", 4);
+        let pairs = counts.to_sorted_pairs();
+        for w in pairs.windows(2) {
+            assert!(w[0].0 < w[1].0, "pairs must be sorted by kmer");
+        }
+        let restored = KmerCounts::from_sorted_pairs(&pairs, 4);
+        assert_eq!(restored.unique_count(), counts.unique_count());
+        for (&kmer, &count) in &counts.counts {
+            assert_eq!(restored.counts.get(&kmer).copied(), Some(count));
+        }
+    }
+
+    #[test]
+    fn histogram_preserves_top_n() {
+        let counts = count_kmers(b"AAAAAAAAAACCCCC", 3);
+        let hist = counts.to_histogram();
+        let restored = KmerCounts::from_histogram(&hist, 3);
+        let top_orig = counts.top_n(1);
+        let top_rest = restored.top_n(1);
+        assert_eq!(top_orig.len(), 1);
+        assert_eq!(top_rest.len(), 1);
+        assert_eq!(top_orig[0].0, top_rest[0].0, "top kmer mismatch");
+        assert_eq!(top_orig[0].1, top_rest[0].1, "top count mismatch");
+    }
+
+    #[test]
+    fn histogram_gpu_buffer_size() {
+        let counts = count_kmers(b"ACGT", 8);
+        let hist = counts.to_histogram();
+        assert_eq!(hist.len(), 65_536); // 4^8 = GPU-friendly
     }
 }

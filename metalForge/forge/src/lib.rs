@@ -3,12 +3,13 @@
 #![forbid(unsafe_code)]
 #![deny(clippy::expect_used, clippy::unwrap_used)]
 
-//! wetSpring Forge — local hardware discovery and cross-substrate dispatch.
+//! wetSpring Forge v0.2.0 — hardware discovery, dispatch, and streaming analysis.
 //!
 //! Forge discovers what compute substrates exist on THIS machine at runtime
 //! and routes life science workloads to the best capable substrate. It leans
 //! on toadstool/barracuda for GPU discovery and device management, and adds
-//! NPU probing and cross-substrate orchestration locally.
+//! NPU probing, cross-substrate orchestration, and streaming pipeline
+//! topology analysis locally.
 //!
 //! # Design Principle
 //!
@@ -50,4 +51,5 @@ pub mod bridge;
 pub mod dispatch;
 pub mod inventory;
 pub mod probe;
+pub mod streaming;
 pub mod substrate;

@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 22, 2026
-**Status**: Phase 20 — 1,291/1,291 CPU + 451/451 GPU = 1,742/1,742 checks, ALL PASS
+**Status**: Phase 22 — 1,392 CPU + 609 GPU + 80 dispatch + 35 layout + 57 transfer/streaming = 2,173+/2,173+ checks, ALL PASS
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -10,19 +10,49 @@
 
 | Metric | Value |
 |--------|-------|
-| CPU validation | 1,291/1,291 PASS — 41 modules, 77 experiments, 25 domains |
-| GPU validation | 451/451 PASS — 23 ToadStool primitives, 1 local WGSL shader, 18 GPU binaries |
-| BarraCUDA CPU parity | 157/157 — 22.5x Rust speedup over Python |
-| BarraCUDA GPU parity | 8 consolidated domains (Exp064) — pure GPU math proven |
-| metalForge cross-system | 8 domains CPU↔GPU proven (Exp065) — substrate-independent |
-| Rust modules | 41 CPU + 20 GPU, 707 tests (96.21% coverage) |
+| CPU validation | 1,392/1,392 PASS — 41 modules, 93 experiments, 25 domains + 6 ODE flat + 3 layout |
+| GPU validation | 609/609 PASS — 23 ToadStool primitives, 4 local WGSL shaders, 80 streaming + 48 head-to-head + 28 metalForge v3 |
+| Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
+| BarraCUDA CPU parity | 205/205 — 22.5x Rust speedup over Python |
+| BarraCUDA GPU parity | 16 domains (Exp064/087) — pure GPU math proven |
+| Pure GPU streaming | 80 checks, 441-837× over round-trip (Exp090/091) |
+| metalForge cross-system | 12 domains CPU↔GPU (Exp084) + dispatch (Exp080) + pipeline (Exp086) + PCIe (Exp088) |
+| Rust modules | 41 CPU + 20 GPU, 728 tests (96.21% coverage) |
+| Tier A (GPU/NPU-ready) | 7 modules with flat layouts (kmer, unifrac, taxonomy + 4 ODE) |
 | Dependencies | 1 runtime (flate2), everything else sovereign |
 | Paper queue | **ALL DONE** — 29/29 reproducible papers complete (Track 1c added) |
 | Faculty (Track 1) | Waters (MMG, MSU), Cahill (Sandia), Smallwood (Sandia) |
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
 | Faculty (Track 1c) | R. Anderson (Carleton) — deep-sea metagenomics, population genomics |
 | Faculty (Track 2) | Jones (BMB/Chemistry, MSU) — PFAS mass spectrometry |
-| Handoffs | Eight delivered (Feb 16, 17, 19 v1-v3, 20 v4-v5, 21 v6, 22 rewire) |
+| Handoffs | Ten delivered (v1–v6, rewire, cross-spring, v7, **v8 handoff**) |
+
+---
+
+## Validation Chain (Per-Paper Status)
+
+Every paper in the queue goes through the full evolution path. Status:
+
+| Stage | What It Proves | Status |
+|-------|---------------|--------|
+| **Python baseline** | Algorithm correctness against published tools | 40 scripts, all reproducible |
+| **BarraCUDA CPU** | Pure Rust math matches Python | 1,392 checks, 205/205 cross-domain parity |
+| **BarraCUDA GPU** | GPU produces same answer as CPU | 533 checks, 16 GPU domains |
+| **Pure GPU streaming** | Zero CPU round-trips, data stays on-device | 80 checks, 441-837× over round-trip |
+| **metalForge mixed** | Same answer on CPU, GPU, NPU — substrate-independent | 12 domains, 35+ checks + PCIe direct |
+
+Papers with **no GPU path** (sequential algorithms: chimera, derep, NJ) stay CPU-only.
+Papers with **ODE models** (Waters, Fernandez, Mhatre) are GPU-ready via flat params
+but blocked by ToadStool's `enable f64;` issue.
+
+### Gaps
+
+| Paper | Gap | Priority |
+|-------|-----|----------|
+| Massie 2012 (Exp022) | GillespieGpu blocked by NVVM driver on RTX 4070 | Low |
+| Waters 2021 (Paper 11) | Reference only — no computational reproduction target | N/A |
+| Liu fungi-bacteria (Paper 19) | Manuscript in progress | Watch |
+| Kachkovskiy 2018 (Paper 23) | Cross-spring reference; reproduction in groundSpring | N/A |
 
 ---
 
@@ -39,7 +69,7 @@
 
 | Document | Location | Description |
 |----------|----------|-------------|
-| CONTROL_EXPERIMENT_STATUS.md | `../` | 77 experiments, 1,742 validation checks |
+| CONTROL_EXPERIMENT_STATUS.md | `../` | 93 experiments, 2,173+ validation checks |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
 | HANDOFF (v6) | `../` | Current consolidated ToadStool handoff |

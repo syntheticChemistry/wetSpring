@@ -192,7 +192,7 @@ Combined with v1-v3: **128/128 checks across 23 domains**.
 | **Total** | | **29** | **62** |
 
 Two new ensemble ML domains: RF majority-vote and GBM sequential boosting.
-Combined v1-v5: **157/157 checks across 25 domains**.
+Combined v1-v6: **205/205 checks across 25 domains + 6 ODE flat modules**.
 
 ---
 
@@ -224,11 +224,11 @@ Run with `cargo run --release --bin benchmark_23_domain_timing` and
 | GPU validation | 451 | PASS |
 | Rust tests | 650 (587 lib + 50 integration + 13 doc) | PASS |
 | Python baselines | 40 scripts | PASS |
-| BarraCUDA CPU parity | 157/157 (25 domains) | PASS |
-| ToadStool bio primitives | 15 consumed (4 bio absorbed) | PASS |
+| BarraCUDA CPU parity | 205/205 (25 domains + 6 ODE flat) | PASS |
+| ToadStool bio primitives | 23 consumed (12 bio absorbed) | PASS |
 | ToadStool bio primitives (absorbed Feb 22) | 8 (HMM, DADA2, quality, ANI, SNP, pangenome, dN/dS, RF) | PASS |
-| Local WGSL shader | 1 (ODE sweep) | PASS |
-| **Grand total** | **1,742 validation + 707 tests** | **ALL PASS** |
+| Local WGSL shaders (Write phase) | 4 (ODE, kmer, unifrac, taxonomy) | ODE: PASS; others: pending validation |
+| **Grand total** | **2,173+ validation + 728 tests** | **ALL PASS** |
 
 ---
 
@@ -238,7 +238,7 @@ Run with `cargo run --release --bin benchmark_23_domain_timing` and
 cd barracuda
 
 # Tier 2: Rust CPU (1,291 checks)
-cargo test                         # 707 tests (633 lib + 60 integration + 14 doc)
+cargo test                         # 728 tests (654 lib + 60 integration + 14 doc)
 cargo run --release --bin validate_qs_ode  # ... repeat for all 50 CPU binaries
 
 # Tier 3: GPU (451 checks)

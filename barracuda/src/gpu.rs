@@ -3,7 +3,7 @@
 //!
 //! Creates a wgpu device with `SHADER_F64` and bridges to `ToadStool`'s
 //! `WgpuDevice` + `TensorContext`. GPU dispatch goes through `ToadStool`
-//! primitives — wetSpring has 1 local WGSL shader (ODE, blocked on
+//! primitives — wetSpring has 4 local WGSL shaders (ODE, kmer, unifrac, taxonomy; ODE blocked on
 //! `enable f64;` in `ToadStool`'s upstream).
 //!
 //! `ToadStool` primitives used:

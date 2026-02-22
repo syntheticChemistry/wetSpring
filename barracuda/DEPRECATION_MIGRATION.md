@@ -1,6 +1,6 @@
 # Deprecation & Migration Tracking
 
-**Date:** February 21, 2026
+**Date:** February 22, 2026
 **Pattern:** Following hotSpring's `DEPRECATION_MIGRATION.md`
 
 When ToadStool absorbs a wetSpring shader or pattern, the local copy becomes
@@ -21,6 +21,14 @@ consume from the barracuda crate. **Do not modify local copies.**
 | `decision_tree::predict_batch` | `TreeInferenceGpu` | cce8fe7c (Feb 20) | Rewired in Exp044/045 |
 | `felsenstein::log_likelihood` | `FelsensteinGpu` | cce8fe7c (Feb 20) | Rewired in Exp046 |
 | `gemm_cached` (include_str path) | `GemmF64::WGSL` constant | cce8fe7c (Feb 20) | Path eliminated in Exp045 |
+| `hmm_forward_f64.wgsl` | `HmmBatchForwardF64` | ToadStool 31d (Feb 22) | Rewired in Exp077; local shader deleted |
+| `ani_batch_f64.wgsl` | `AniBatchF64` | ToadStool 31d (Feb 22) | Rewired in Exp077; local shader deleted |
+| `snp_calling_f64.wgsl` | `SnpCallingF64` | ToadStool 31d (Feb 22) | Rewired in Exp077; SNP binding layout fix |
+| `dnds_batch_f64.wgsl` | `DnDsBatchF64` | ToadStool 31d (Feb 22) | Rewired in Exp077; local shader deleted |
+| `pangenome_classify.wgsl` | `PangenomeClassifyGpu` | ToadStool 31d (Feb 22) | Rewired in Exp077; local shader deleted |
+| `quality_filter.wgsl` | `QualityFilterGpu` | ToadStool 31d (Feb 22) | Rewired in Exp077; local shader deleted |
+| `dada2_e_step.wgsl` | `Dada2EStepGpu` | ToadStool 31d (Feb 22) | Rewired in Exp077; local shader deleted |
+| `rf_batch_inference.wgsl` | `RfBatchInferenceGpu` | ToadStool 31g (Feb 22) | Rewired in Exp077; local shader deleted |
 
 ---
 
@@ -31,19 +39,11 @@ yet absorbed. They remain active and maintained in wetSpring.
 
 ### Local WGSL Shaders (Tier A — absorption candidates)
 
-| Shader | Module | GPU Checks | Since |
-|--------|--------|:----------:|-------|
-| `quality_filter.wgsl` | `quality_gpu` | 88 (pipeline) | Exp016 |
-| `dada2_e_step.wgsl` | `dada2_gpu` | 88 (pipeline) | Exp016 |
-| `hmm_forward_f64.wgsl` | `hmm_gpu` | 13 | Exp047 |
-| `batched_qs_ode_rk4_f64.wgsl` | `ode_sweep_gpu` | 7 | Exp049 |
-| `ani_batch_f64.wgsl` | `ani_gpu` | 7 | Exp058 |
-| `snp_calling_f64.wgsl` | `snp_gpu` | 5 | Exp058 |
-| `dnds_batch_f64.wgsl` | `dnds_gpu` | 9 | Exp058 |
-| `pangenome_classify.wgsl` | `pangenome_gpu` | 6 | Exp058 |
-| `rf_batch_inference.wgsl` | `random_forest_gpu` | 13 | Exp063 |
+| Shader | Module | GPU Checks | Since | Blocker |
+|--------|--------|:----------:|-------|---------|
+| `batched_qs_ode_rk4_f64.wgsl` | `ode_sweep_gpu` | 7 | Exp049 | ToadStool `enable f64;` (upstream shader line 35) |
 
-### CPU-Only Modules (New Since Last Absorption)
+### CPU-Only Modules (Stable)
 
 | Module | Domain | Since |
 |--------|--------|-------|
@@ -89,16 +89,8 @@ Following hotSpring's pattern:
 
 ## Deprecation Candidates (Pending Upstream)
 
-When ToadStool next absorbs, these are the highest-value candidates:
+4 local WGSL shaders in Write phase. All others were absorbed on Feb 22 (ToadStool 31d/31g).
 
-| Priority | Shader | Why |
-|----------|--------|-----|
-| **P1** | `hmm_forward_f64.wgsl` | 13/13 validated, clean batch API, log-space numerics |
-| **P1** | `batched_qs_ode_rk4_f64.wgsl` | Fixes upstream `enable f64;` bug |
-| **P2** | `rf_batch_inference.wgsl` | SoA layout, (sample,tree) parallelism |
-| **P2** | `ani_batch_f64.wgsl` | Simple integer counting + f64 division |
-| **P2** | `snp_calling_f64.wgsl` | Per-position parallel, allele frequency |
-| **P2** | `dnds_batch_f64.wgsl` | Complex (genetic code, `log()` polyfill) |
-| **P3** | `pangenome_classify.wgsl` | Presence/absence counting |
-| **P3** | `dada2_e_step.wgsl` | Pipeline-specific, needs generalization |
-| **P3** | `quality_filter.wgsl` | Pipeline-specific, u32 only |
+| Priority | Shader | Why | Blocker |
+|----------|--------|-----|---------|
+| **P1** | `batched_qs_ode_rk4_f64.wgsl` | 7/7 validated, ODE sweep pattern | ToadStool `enable f64;` directive on upstream shader line 35 |

@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: February 20, 2026
+**Last Updated**: February 22, 2026
 **Purpose**: Track papers for reproduction/review across three tracks
 
 ---

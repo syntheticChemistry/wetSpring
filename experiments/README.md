@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-22 (Phase 20: ToadStool Bio Rewire + Cross-Spring Evolution)
+**Updated**: 2026-02-22 (Phase 22: Write → Absorb → Lean + Full Validation Proof)
 
 ---
 
@@ -87,6 +87,13 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 075 | [Pure GPU Analytics Pipeline](075_pure_gpu_analytics_pipeline.md) | GPU | DONE | Pure GPU pipeline | validate_pure_gpu_pipeline | 31 |
 | 076 | [Cross-Substrate Pipeline](076_metalforge_cross_substrate_pipeline.md) | cross/GPU | DONE | Cross-substrate pipeline | validate_cross_substrate_pipeline | 17 |
 | 077 | [ToadStool Bio Rewire](077_toadstool_bio_rewire.md) | GPU/cross | DONE | ToadStool bio primitive rewire | (all GPU binaries) | 451 (re-validated) |
+| 087 | GPU Extended Domains (EIC/PCoA/Kriging/Rarefaction) | GPU | DONE | — | validate_gpu_extended | 50+ |
+| 088 | metalForge PCIe Direct Transfer | metalForge | DONE | — | validate_pcie_direct | 32 |
+| 089 | ToadStool Streaming Dispatch | streaming | DONE | — | validate_streaming_dispatch | 25 |
+| 090 | Pure GPU Streaming Pipeline | GPU/streaming | DONE | — | validate_pure_gpu_streaming | 80 |
+| 091 | Streaming vs Round-Trip Benchmark | GPU/benchmark | DONE | — | benchmark_streaming_vs_roundtrip | 2 |
+| 092 | CPU vs GPU All 16 Domains | GPU/parity | DONE | — | validate_cpu_vs_gpu_all_domains | 48 |
+| 093 | metalForge Full v3 (16 domains) | metalForge | DONE | — | validate_metalforge_full_v3 | 28 |
 
 ---
 
@@ -203,12 +210,30 @@ thresholds from `src/tolerances.rs`.
 | `validate_substrate_router` | 074 | 20 | `cargo run --features gpu --release --bin validate_substrate_router` |
 | `validate_pure_gpu_pipeline` | 075 | 31 | `cargo run --features gpu --release --bin validate_pure_gpu_pipeline` |
 | `validate_cross_substrate_pipeline` | 076 | 17 | `cargo run --features gpu --release --bin validate_cross_substrate_pipeline` |
+| *(ToadStool Bio Rewire)* | 077 | 451 | All GPU binaries re-validated after 8-module rewire |
+| *(ODE GPU Sweep Readiness)* | 078 | 10 | Flat param APIs for 5 ODE modules (unit tests) |
+| `validate_barracuda_cpu_v6` | 079 | 48 | `cargo run --release --bin validate_barracuda_cpu_v6` |
+| `validate_dispatch_routing` (forge) | 080 | 35 | `cd metalForge/forge && cargo run --bin validate_dispatch_routing` |
+| *(K-mer GPU Histogram)* | 081 | 4 | Flat histogram + sorted pairs (unit tests) |
+| *(UniFrac CSR Flat Tree)* | 082 | 4 | CSR tree + sample matrix (unit tests) |
+| *(Taxonomy NPU Int8)* | 083 | 3 | Int8 quantization + argmax parity (unit tests) |
+| `validate_metalforge_full_v2` | 084 | 35+ | `cargo run --features gpu --release --bin validate_metalforge_full_v2` |
+| `validate_barracuda_cpu_v7` | 085 | 43 | `cargo run --release --bin validate_barracuda_cpu_v7` |
+| `validate_metalforge_pipeline` | 086 | 45 | `cargo run --release --bin validate_metalforge_pipeline` |
+| `validate_gpu_extended` | 087 | 50+ | `cargo run --features gpu --bin validate_gpu_extended` |
+| `validate_pcie_direct` | 088 | 32 | `cargo run --bin validate_pcie_direct` |
+| `validate_streaming_dispatch` | 089 | 25 | `cargo run --bin validate_streaming_dispatch` |
+| `validate_pure_gpu_streaming` | 090 | 80 | `cargo run --features gpu --release --bin validate_pure_gpu_streaming` |
+| `benchmark_streaming_vs_roundtrip` | 091 | 2 | `cargo run --features gpu --release --bin benchmark_streaming_vs_roundtrip` |
+| `validate_cpu_vs_gpu_all_domains` | 092 | 48 | `cargo run --features gpu --release --bin validate_cpu_vs_gpu_all_domains` |
+| `validate_metalforge_full_v3` | 093 | 28 | `cargo run --features gpu --release --bin validate_metalforge_full_v3` |
 
-**Total validation checks**: 1,742 (1,291 CPU + 451 GPU)
-**Rust tests**: 707 (633 lib + 60 integration + 14 doc)
-**Binaries**: 50 CPU + 18 GPU validate + 5 benchmark = 73 total
+**Total validation checks**: 2,173+ (1,392 CPU + 609 GPU + 80 dispatch + 35 layout + 57 transfer/streaming)
+**Rust tests**: 728 (654 lib + 60 integration + 14 doc)
+**Binaries**: 75 validate + 8 benchmark = 83 total
 **ToadStool primitives**: 23 consumed (8 bio absorbed Feb 22)
-**Local WGSL shaders**: 1 (ODE sweep — blocked on upstream `enable f64;`)
+**Local WGSL shaders**: 4 (ODE, kmer, unifrac, taxonomy)
+**Tier A (GPU/NPU-ready)**: 7 modules | **Tier B**: 1 remaining (cooperation)
 **Benchmark infrastructure**: `bench.rs` harness with RAPL + nvidia-smi energy profiling, JSON output
 
 ---

@@ -92,6 +92,8 @@ pub enum Capability {
     ScalarReduce,
     /// WGSL shader dispatch via wgpu.
     ShaderDispatch,
+    /// General CPU compute (always available).
+    CpuCompute,
     /// AVX2/SSE SIMD on CPU.
     SimdVector,
     /// GPU timestamp query support.
@@ -149,6 +151,7 @@ impl Capability {
             Self::WeightMutation => "weight-mut",
             Self::ScalarReduce => "reduce",
             Self::ShaderDispatch => "shader",
+            Self::CpuCompute => "cpu",
             Self::SimdVector => "simd",
             Self::TimestampQuery => "timestamps",
         }

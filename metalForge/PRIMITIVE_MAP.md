@@ -5,8 +5,9 @@
 GPU primitive (or explain why it stays CPU-only). This guides the
 absorption pipeline and identifies what ToadStool needs to build next.
 
-> **Feb 22 update:** 8 bio modules rewired from local WGSL to ToadStool
-> `barracuda::ops::bio::*`. Only ODE remains local (blocked on `enable f64;`).
+> **Feb 22 update (latest):** 19 modules lean on upstream. 4 local WGSL shaders
+> in Write phase: ODE sweep, kmer histogram, unifrac propagate, taxonomy FC.
+> Forge crate v0.2.0 adds streaming dispatch module.
 
 ---
 
@@ -68,8 +69,8 @@ absorption pipeline and identifies what ToadStool needs to build next.
 |-------------|-------------|-------------------|-----|
 | `alignment` (SW) | Lean | `SmithWatermanGpu` | 044 |
 | `hmm` | Lean | `HmmBatchForwardF64` (ToadStool, absorbed Feb 22) | 047 |
-| `kmer` | **Blocked** | Needs lock-free hash table (P3) | — |
-| `unifrac` | **Blocked** | Needs tree traversal (P3) | — |
+| `kmer` | **Local** | `kmer_histogram_f64.wgsl` — atomic 4^k histogram + sorted pairs | 081 |
+| `unifrac` | **Local** | `unifrac_propagate_f64.wgsl` — CSR tree propagation + pairwise | 082 |
 | `decision_tree` | Lean | `TreeInferenceGpu` | 044 |
 | `random_forest` / `random_forest_gpu` | Lean | `RfBatchInferenceGpu` (ToadStool, absorbed Feb 22) | 063 |
 | `gbm` | CPU | Sequential boosting (batch-parallel within rounds) | 062 |
@@ -81,7 +82,7 @@ absorption pipeline and identifies what ToadStool needs to build next.
 | `quality` / `quality_gpu` | Lean | `QualityFilterGpu` (ToadStool, absorbed Feb 22) | 016 |
 | `dada2` / `dada2_gpu` | Lean | `Dada2EStepGpu` (ToadStool, absorbed Feb 22) | 016 |
 | `chimera` / `chimera_gpu` | Lean | `FMR` | 016 |
-| `taxonomy` / `taxonomy_gpu` | Lean / **NPU** | `FMR` / FC model | 016 |
+| `taxonomy` / `taxonomy_gpu` | Lean / **Local** | `FMR` / `taxonomy_fc_f64.wgsl` + NPU int8 (`to_int8_weights`) | 016/083 |
 | `streaming_gpu` | Lean | Multiple primitives | 016 |
 | `rarefaction_gpu` | Lean | `PrngXoshiro` | 016 |
 
@@ -178,4 +179,4 @@ Promoted from `bio::special` to top-level `crate::special` module.
 | **Compose** (existing primitives) | 5 modules |
 | **CPU** (no GPU path) | 13 modules |
 | **NPU** (candidate) | 1 module |
-| **Blocked** (needs new primitive) | 2 modules |
+| **Local WGSL** (Write phase — pending absorption) | 4 shaders (ODE, kmer, unifrac, taxonomy) |
