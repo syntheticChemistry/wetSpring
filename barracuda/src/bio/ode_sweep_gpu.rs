@@ -12,7 +12,7 @@
 //! **Write → Absorb → Lean**: once `ToadStool` switches to `compile_shader_f64()`
 //! in `batched_ode_rk4.rs`, this module becomes a thin wrapper around
 //! `barracuda::ops::BatchedOdeRK4F64`, matching the pattern used by the
-//! other 19 rewired GPU modules. Filed as handoff feedback item.
+//! other 24 rewired GPU modules. Filed as handoff feedback item.
 
 use barracuda::device::WgpuDevice;
 use barracuda::shaders::precision::ShaderTemplate;

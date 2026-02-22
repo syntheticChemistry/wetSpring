@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 22, 2026
-**Status:** Validation study complete — 2,173+/2,173+ checks, 728 tests, 96.21% line coverage, 93 experiments
+**Status:** Validation study complete — 2,219+/2,219+ checks, 728 tests, 96.21% line coverage, 95 experiments
 **License:** AGPL-3.0-or-later
 
 ---
@@ -51,7 +51,7 @@ implementations into upstream ToadStool/BarraCUDA primitives:
 4. **Absorb** — ToadStool integrates as `ops::bio::*` shaders
 5. **Lean** — wetSpring rewires to upstream imports, deletes local code
 
-**Current status:** 19 GPU modules lean on upstream; 4 local WGSL shaders
+**Current status:** 24 GPU modules lean on upstream (19 wetSpring + 5 neuralSpring); 4 local WGSL shaders
 in Write phase (ODE sweep, kmer histogram, unifrac propagation, taxonomy FC).
 The forge crate (`metalForge/forge/` v0.2.0) provides substrate discovery
 and capability-based dispatch as an absorption seam for ToadStool.
@@ -62,7 +62,7 @@ and capability-based dispatch as an absorption seam for ToadStool.
 
 | Claim | Evidence |
 |-------|----------|
-| Rust matches Python across 93 experiments | 1,392/1,392 CPU checks + 80 dispatch + 35 layout + 57 transfer/streaming pass |
+| Rust matches Python across 95 experiments | 1,392/1,392 CPU checks + 80 dispatch + 35 layout + 57 transfer/streaming + 39 cross-spring pass |
 | GPU matches CPU across all promoted domains | 609/609 GPU checks pass (incl. 48 all-domain + 28 metalForge v3) |
 | BarraCUDA CPU parity across 25 domains + 6 ODE flat | 205/205 cross-domain checks pass |
 | 926× spectral cosine GPU speedup | Exp016 benchmark |
@@ -110,7 +110,8 @@ and capability-based dispatch as an absorption seam for ToadStool.
 | Streaming eliminates 92-94% of round-trip overhead | Exp091, formal benchmark at 1-128 batch |
 | CPU vs GPU parity across all 16 domains | Exp092, 48/48 all-domain head-to-head |
 | metalForge full 16-domain substrate-independence | Exp093, 28/28 cross-substrate v3 |
-| Write → Absorb → Lean: 19 absorbed, 4 in Write | ABSORPTION_MANIFEST.md, hotSpring methodology |
+| Write → Absorb → Lean: 24 absorbed, 4 in Write | ABSORPTION_MANIFEST.md, hotSpring methodology |
+| Cross-spring evolution: 5 neuralSpring primitives validated | Exp094, 39/39 checks; Exp095, 7 benchmarks |
 
 ---
 
@@ -230,6 +231,8 @@ and capability-based dispatch as an absorption seam for ToadStool.
 | 089 | ToadStool streaming dispatch | 25/25 streaming vs round-trip parity (3-stage, 5-stage chains) |
 | 090 | Pure GPU streaming pipeline | 80/80 zero CPU round-trips, 441-837× streaming advantage |
 | 091 | Streaming vs round-trip benchmark | CPU vs RT GPU vs streaming: streaming eliminates 92-94% overhead |
+| 094 | Cross-spring evolution validation | 39/39 checks — 5 neuralSpring primitives (PairwiseHamming, PairwiseJaccard, SpatialPayoff, BatchFitness, LocusVariance) |
+| 095 | Cross-spring scaling benchmark | 7 benchmarks — 6.5×–277× GPU speedup at realistic bio sizes |
 
 ### Track 2: Analytical Chemistry (LC-MS, PFAS)
 
@@ -295,7 +298,7 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` files |
-| Provenance headers | All 83 validation/benchmark binaries |
+| Provenance headers | All 85 validation/benchmark binaries |
 
 ## metalForge — Hardware Discovery
 

@@ -216,6 +216,27 @@ Run with `cargo run --release --bin benchmark_23_domain_timing` and
 
 ---
 
+## Exp095: Cross-Spring Scaling Benchmark
+
+Benchmark cross-spring evolved primitives at realistic bioinformatics problem
+sizes. Run with `cargo run --release --features gpu --bin benchmark_cross_spring_scaling`.
+
+| Primitive | Evolved By | Problem Size | CPU (µs) | GPU (µs) | Speedup |
+|-----------|-----------|-------------|----------|----------|---------|
+| PairwiseHamming | neuralSpring | 500×1000 (125K pairs) | 15,999 | 978 | **16.4×** |
+| PairwiseJaccard | neuralSpring | 200×2000 (20K pairs) | 41,780 | 151 | **276.7×** |
+| SpatialPayoff | neuralSpring | 256×256 (65K cells) | 1,019 | 52 | **19.6×** |
+| BatchFitness | neuralSpring | 4096×256 (1M elems) | 537 | 82 | **6.5×** |
+| LocusVariance | neuralSpring | 100×10K (1M elems) | 1,097 | 57 | **19.2×** |
+| FusedMapReduce | hotSpring | 100K f64 | <1 | 2,699 | N/A |
+| GemmF64 | wetSpring | 256×256 f64 | 3,684 | 3,463 | **1.1×** |
+
+Key findings: PairwiseJaccard achieves 277× GPU speedup; SpatialPayoff and
+LocusVariance ~20×; PairwiseHamming 16×; BatchFitness 6.5×. FusedMapReduce and
+GemmF64 at small sizes are transfer-dominated (see Exp066 for larger sizes).
+
+---
+
 ## Grand Total
 
 | Category | Checks | Status |
@@ -228,7 +249,7 @@ Run with `cargo run --release --bin benchmark_23_domain_timing` and
 | ToadStool bio primitives | 23 consumed (12 bio absorbed) | PASS |
 | ToadStool bio primitives (absorbed Feb 22) | 8 (HMM, DADA2, quality, ANI, SNP, pangenome, dN/dS, RF) | PASS |
 | Local WGSL shaders (Write phase) | 4 (ODE, kmer, unifrac, taxonomy) | ODE: PASS; others: pending validation |
-| **Grand total** | **2,173+ validation + 728 tests** | **ALL PASS** |
+| **Grand total** | **2,219+ validation + 728 tests** | **ALL PASS** |
 
 ---
 

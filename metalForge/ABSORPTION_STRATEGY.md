@@ -2,7 +2,7 @@
 
 **Date:** February 22, 2026
 **Pattern:** Write → Absorb → Lean (from hotSpring)
-**Status:** 19 absorbed (lean), 4 local WGSL shaders (write), 7 Tier A candidates
+**Status:** 24 absorbed (lean), 4 local WGSL shaders (write), 7 Tier A candidates
 
 ---
 

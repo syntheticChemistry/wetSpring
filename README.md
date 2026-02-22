@@ -49,7 +49,7 @@ WGSL          known physics   handoffs/                        delete local
 
 | Phase | Count | Description |
 |-------|:-----:|-------------|
-| **Lean** | 19 | GPU modules consuming upstream ToadStool primitives |
+| **Lean** | 24 | GPU modules consuming upstream ToadStool primitives |
 | **Write** | 4 | Local WGSL shaders for Tier A domains |
 | **Tier A** | 7 | CPU modules with flat APIs, ready for GPU/NPU promotion |
 | **Tier B** | 1 | Needs refactoring before promotion |
@@ -89,13 +89,13 @@ absorbs forge, the bridge module becomes the integration point.
 | Dispatch validation checks | 80 |
 | Layout fidelity checks | 35 |
 | Transfer/streaming checks | 57 |
-| **Total validation checks** | **2,173+** |
+| **Total validation checks** | **2,219+** |
 | Rust library unit tests | 654 (+ 1 ignored — hardware-dependent) |
 | Integration tests | 60 (23 bio + 16 determinism + 21 I/O) |
 | Rust doc-tests | 14 |
 | **Total Rust tests** | **728** |
-| Experiments completed | 93 |
-| Validation/benchmark binaries | 75 validate + 8 benchmark = 83 total |
+| Experiments completed | 95 |
+| Validation/benchmark binaries | 77 validate + 8 benchmark = 85 total |
 | CPU bio modules | 41 |
 | GPU bio modules | 20 (19 lean on ToadStool, 4 local WGSL shaders (ODE, kmer, unifrac, taxonomy)) |
 | Tier A (GPU/NPU-ready) | 7 modules with flat layouts |
@@ -106,10 +106,10 @@ absorbs forge, the bridge module becomes the integration point.
 | metalForge cross-system | 16 domains substrate-independent (Exp093) |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 80 checks, 441-837× over round-trip (Exp090-091) |
-| ToadStool primitives consumed | **23** (15 original + 8 bio absorbed Feb 22) |
+| ToadStool primitives consumed | **28** (15 original + 8 bio absorbed Feb 22 + 5 neuralSpring absorbed) |
 | Local WGSL shaders | **4** (ODE, kmer histogram, unifrac propagate, taxonomy FC) |
 
-All 2,173+ validation checks **PASS**. All 728 tests **PASS**.
+All 2,219+ validation checks **PASS**. All 728 tests **PASS**.
 
 ### GPU Performance
 
@@ -308,8 +308,13 @@ ToadStool's unidirectional streaming — zero CPU round-trips between stages:
 - **Exp091: Streaming vs Round-Trip Benchmark** — Formal timing comparison:
   round-trip GPU is 13-16× slower than CPU; streaming eliminates 92-94% of
   that overhead.
+- **Exp094: Cross-Spring Evolution Validation** — 39/39 checks validating 5
+  neuralSpring-evolved primitives (PairwiseHamming, PairwiseJaccard,
+  SpatialPayoff, BatchFitness, LocusVariance) now consumed by wetSpring.
+- **Exp095: Cross-Spring Scaling Benchmark** — 7 benchmarks across 5
+  neuralSpring primitives at realistic problem sizes (6.5×–277× GPU speedup).
 
-**Tier A: 7 modules** | **Tier B: 1 remaining** | **728 tests** | **2,173+ checks** | **83 binaries**
+**Tier A: 7 modules** | **Tier B: 1 remaining** | **728 tests** | **2,219+ checks** | **85 binaries**
 
 ### Phase 19: Absorption Engineering + Debt Resolution
 
@@ -357,7 +362,7 @@ Deep codebase evolution following hotSpring's absorption patterns:
 | Max file size | All under 1000 LOC |
 | External C dependencies | **0** (`flate2` uses `rust_backend`) |
 | Named tolerance constants | 39 (scientifically justified, hierarchy-tested) |
-| Provenance headers | All 83 validation/benchmark binaries |
+| Provenance headers | All 85 validation/benchmark binaries |
 
 ---
 
@@ -417,7 +422,7 @@ Deep codebase evolution following hotSpring's absorption patterns:
 `random_forest_gpu`, `snp_gpu`, `spectral_match_gpu`, `stats_gpu`,
 `streaming_gpu`, `taxonomy_gpu`
 
-All 20 GPU modules delegate to ToadStool primitives (19 lean + 4 local WGSL shaders (ODE, kmer, unifrac, taxonomy)).
+All 20 GPU modules delegate to ToadStool primitives (24 lean including 5 neuralSpring + 4 local WGSL shaders (ODE, kmer, unifrac, taxonomy)).
 8 bio primitives absorbed by ToadStool and rewired on Feb 22, 2026:
 `HmmBatchForwardF64`, `AniBatchF64`, `SnpCallingF64`, `DnDsBatchF64`,
 `PangenomeClassifyGpu`, `QualityFilterGpu`, `Dada2EStepGpu`, `RfBatchInferenceGpu`.
@@ -441,7 +446,7 @@ All 20 GPU modules delegate to ToadStool primitives (19 lean + 4 local WGSL shad
 wetSpring/
 ├── README.md                      ← this file
 ├── BENCHMARK_RESULTS.md           ← three-tier benchmark results
-├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (93 experiments)
+├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (95 experiments)
 ├── HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_21_2026.md  ← ToadStool handoff v6
 ├── barracuda/                     ← Rust crate (src/, Cargo.toml, rustfmt.toml)
 │   ├── EVOLUTION_READINESS.md    ← absorption map (tiers, primitives, shaders)
@@ -456,10 +461,10 @@ wetSpring/
 │   │   ├── bio/                 ← 41 CPU + 20 GPU bio modules
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML)
 │   │   ├── bench/               ← benchmark harness + power monitoring
-│   │   ├── bin/                 ← 83 validation/benchmark binaries
+│   │   ├── bin/                 ← 85 validation/benchmark binaries
 │   │   └── shaders/             ← 4 local WGSL shaders (ODE, kmer, unifrac, taxonomy; 8 absorbed by ToadStool)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2021
-├── experiments/                   ← 91 experiment protocols + results
+├── experiments/                   ← 95 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
 │   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs, bridge.rs

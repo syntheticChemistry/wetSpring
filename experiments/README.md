@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-22 (Phase 22: Write → Absorb → Lean + Full Validation Proof)
+**Updated**: 2026-02-22 (Phase 22: 95 experiments, Write → Absorb → Lean + Full Validation Proof)
 
 ---
 
@@ -94,6 +94,8 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 091 | Streaming vs Round-Trip Benchmark | GPU/benchmark | DONE | — | benchmark_streaming_vs_roundtrip | 2 |
 | 092 | CPU vs GPU All 16 Domains | GPU/parity | DONE | — | validate_cpu_vs_gpu_all_domains | 48 |
 | 093 | metalForge Full v3 (16 domains) | metalForge | DONE | — | validate_metalforge_full_v3 | 28 |
+| 094 | [Cross-Spring Evolution Validation](094_cross_spring_evolution.md) | cross/GPU | DONE | CPU baselines | validate_cross_spring_evolution | 39 |
+| 095 | [Cross-Spring Scaling Benchmark](095_cross_spring_scaling_benchmark.md) | GPU/benchmark | DONE | — | benchmark_cross_spring_scaling | Benchmark |
 
 ---
 
@@ -227,11 +229,13 @@ thresholds from `src/tolerances.rs`.
 | `benchmark_streaming_vs_roundtrip` | 091 | 2 | `cargo run --features gpu --release --bin benchmark_streaming_vs_roundtrip` |
 | `validate_cpu_vs_gpu_all_domains` | 092 | 48 | `cargo run --features gpu --release --bin validate_cpu_vs_gpu_all_domains` |
 | `validate_metalforge_full_v3` | 093 | 28 | `cargo run --features gpu --release --bin validate_metalforge_full_v3` |
+| `validate_cross_spring_evolution` | 094 | 39 | `cargo run --features gpu --bin validate_cross_spring_evolution` |
+| `benchmark_cross_spring_scaling` | 095 | — | `cargo run --release --features gpu --bin benchmark_cross_spring_scaling` |
 
-**Total validation checks**: 2,173+ (1,392 CPU + 609 GPU + 80 dispatch + 35 layout + 57 transfer/streaming)
+**Total validation checks**: 2,219+ (1,392 CPU + 609 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 39 cross-spring)
 **Rust tests**: 728 (654 lib + 60 integration + 14 doc)
-**Binaries**: 75 validate + 8 benchmark = 83 total
-**ToadStool primitives**: 23 consumed (8 bio absorbed Feb 22)
+**Binaries**: 77 validate + 8 benchmark = 85 total
+**ToadStool primitives**: 28 consumed (8 bio absorbed Feb 22 + 5 neuralSpring)
 **Local WGSL shaders**: 4 (ODE, kmer, unifrac, taxonomy)
 **Tier A (GPU/NPU-ready)**: 7 modules | **Tier B**: 1 remaining (cooperation)
 **Benchmark infrastructure**: `bench.rs` harness with RAPL + nvidia-smi energy profiling, JSON output

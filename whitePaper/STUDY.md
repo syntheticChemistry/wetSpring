@@ -245,7 +245,7 @@ Pipeline flow:
     → taxonomy GEMM (GPU) → diversity FMR (GPU) → results
 ```
 
-**Local WGSL shaders (4 in Write phase — 19 absorbed lean):**
+**Local WGSL shaders (4 in Write phase — 24 absorbed lean):**
 
 | Shader | Purpose | f64? | Status |
 |--------|---------|------|--------|

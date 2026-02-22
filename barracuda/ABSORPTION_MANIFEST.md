@@ -2,7 +2,7 @@
 
 **Date:** February 22, 2026
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**Status:** 19 absorbed (lean), 4 local WGSL shaders (write), 7 Tier A candidates
+**Status:** 24 absorbed (lean), 4 local WGSL shaders (write), 7 Tier A candidates
 
 ---
 
@@ -47,17 +47,17 @@ WGSL          known physics   handoffs/                        delete local
 | Write | Local WGSL shaders for Tier A modules | **4 shaders** (ODE, kmer, unifrac, taxonomy) |
 | Validate | CPU ↔ GPU parity for all shaders | ODE: 7/7; others: pending |
 | Hand off | wateringHole/handoffs/ documents | v8 active, 6 archived |
-| Absorb | ToadStool integrates as `ops::bio::*` | **19 primitives** absorbed |
-| Lean | Rewire to upstream, delete local code | 19/20 GPU modules lean |
+| Absorb | ToadStool integrates as `ops::bio::*` | **24 primitives** absorbed |
+| Lean | Rewire to upstream, delete local code | 24 primitives lean (19 wetSpring + 5 neuralSpring) |
 
 ---
 
-## Absorbed (Lean Phase — 19 modules)
+## Absorbed (Lean Phase — 24 primitives)
 
 These modules consume upstream ToadStool/BarraCUDA primitives.
 Local WGSL deleted; wetSpring imports from `barracuda::*`.
 
-| wetSpring Module | Upstream Primitive | Absorbed Date | Exp |
+| wetSpring Module / Primitive | Upstream Primitive | Absorbed Date | Exp |
 |------------------|-------------------|---------------|-----|
 | `alignment` | `SmithWatermanGpu` | Feb 20 | 044 |
 | `ani_gpu` | `AniBatchF64` | Feb 22 | 058 |
@@ -78,6 +78,11 @@ Local WGSL deleted; wetSpring imports from `barracuda::*`.
 | `rarefaction_gpu` | `FusedMapReduceF64`, `PrngXoshiro` | Feb 22 | 087 |
 | `snp_gpu` | `SnpCallingF64` | Feb 22 | 058 |
 | `spectral_match_gpu` | `FusedMapReduceF64`, `GemmF64` | Feb 22 | 016 |
+| (cross-spring) | `PairwiseHammingGpu` | Feb 22 | 094 |
+| (cross-spring) | `PairwiseJaccardGpu` | Feb 22 | 094 |
+| (cross-spring) | `SpatialPayoffGpu` | Feb 22 | 094 |
+| (cross-spring) | `BatchFitnessGpu` | Feb 22 | 094 |
+| (cross-spring) | `LocusVarianceGpu` | Feb 22 | 094 |
 
 ---
 
@@ -158,16 +163,8 @@ integration point — substrate discovery feeds directly into device creation."
 
 ## New Upstream Primitives Available (ToadStool Session 39)
 
-ToadStool has added 5 new bio primitives since the v4 handoff absorption.
-These are available in `barracuda::ops::bio` but not yet consumed by wetSpring.
-
-| Primitive | Module | Potential wetSpring Use |
-|-----------|--------|----------------------|
-| `LocusVarianceGpu` | `ops::bio::locus_variance` | FST per-locus AF variance for population genetics |
-| `PairwiseHammingGpu` | `ops::bio::pairwise_hamming` | SNP-based strain distance matrices |
-| `PairwiseJaccardGpu` | `ops::bio::pairwise_jaccard` | Gene presence/absence similarity |
-| `SpatialPayoffGpu` | `ops::bio::spatial_payoff` | Spatial PD payoff for cooperation models |
-| `BatchFitnessGpu` | `ops::bio::batch_fitness` | EA batch fitness for evolutionary simulations |
+5 neuralSpring-evolved bio primitives are now absorbed and consumed by
+wetSpring (Exp094, 39 checks PASS). See "neuralSpring-evolved (5)" above.
 
 ### ToadStool ODE Status (Session 39)
 
@@ -208,4 +205,4 @@ Patterns from hotSpring and neuralSpring that wetSpring leans on:
 | Streaming dispatch | 80 | ALL PASS |
 | Layout fidelity (Tier A) | 35 | ALL PASS |
 | Transfer/streaming | 57 | ALL PASS |
-| **Total** | **2,173+** | **ALL PASS** |
+| **Total** | **2,219+** | **ALL PASS** |

@@ -414,6 +414,18 @@ name = "validate_metalforge_full_v3"
 path = "src/bin/validate_metalforge_full_v3.rs"
 required-features = ["gpu"]
 
+# ── Cross-Spring Evolution (Exp094) ──────────────────────────────
+[[bin]]
+name = "validate_cross_spring_evolution"
+path = "src/bin/validate_cross_spring_evolution.rs"
+required-features = ["gpu"]
+
+# ── Cross-Spring Scaling Benchmark (Exp095) ──────────────────────
+[[bin]]
+name = "benchmark_cross_spring_scaling"
+path = "src/bin/benchmark_cross_spring_scaling.rs"
+required-features = ["gpu"]
+
 # ── Pure GPU Streaming Pipeline (Exp090) ──────────────────────────
 [[bin]]
 name = "validate_pure_gpu_streaming"

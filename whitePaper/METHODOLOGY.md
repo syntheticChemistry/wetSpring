@@ -382,7 +382,7 @@ Current status: **1,349/1,349 CPU pass + 35 dispatch pass.** 83 experiments acro
 
 Current status: **451/451 pass.** 23 ToadStool primitives consumed.
 4 local WGSL shaders (ODE, kmer, unifrac, taxonomy).
-19 GPU primitives absorbed (lean).
+24 GPU primitives absorbed (lean).
 
 ### Grand Total: 1,835/1,835 quantitative checks pass
 
@@ -397,7 +397,7 @@ Current status: **451/451 pass.** 23 ToadStool primitives consumed.
 | GPU workload | Large-matrix eigensolve, MD force evaluation | Diversity, phylogenetics, ODE sweeps, HMM |
 | Validation metric | chi2/datum | Pass/fail within documented tolerance |
 | Data size | Small (52–2,042 nuclei) | Large (millions of reads, thousands of spectra) |
-| Local shaders | 10+ WGSL (HFB, MD, lattice QCD) | 4 WGSL (ODE, kmer, unifrac, taxonomy; 19 absorbed lean) |
+| Local shaders | 10+ WGSL (HFB, MD, lattice QCD) | 4 WGSL (ODE, kmer, unifrac, taxonomy; 24 absorbed lean) |
 | Absorption tracking | `EVOLUTION_READINESS.md` with tiers | `EVOLUTION_READINESS.md` with tiers (adopted) |
 | Key insight | GPU-resident hybrid beats CPU for matrix physics | Full GPU pipeline 2.45× faster; ODE/HMM/phylo math portable to GPU |
 

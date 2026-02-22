@@ -2,7 +2,7 @@
 
 **Date:** February 22, 2026
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 41 CPU + 20 GPU modules, 4 local WGSL shaders in Write phase, 23 ToadStool primitives consumed
+**Status:** 41 CPU + 20 GPU modules, 4 local WGSL shaders in Write phase, 28 ToadStool primitives consumed
 
 ### Feb 22 Rewire: 8 local WGSL shaders absorbed into ToadStool
 
@@ -139,7 +139,7 @@ handle this automatically via `WgpuDevice::compile_shader_f64()`.
 
 ---
 
-## ToadStool Primitives Consumed (23)
+## ToadStool Primitives Consumed (28)
 
 ### Original 15 (pre-Feb 22)
 
@@ -177,6 +177,16 @@ handle this automatically via `WgpuDevice::compile_shader_f64()`.
 These primitives live in `barracuda::ops::bio::*` and are available to all
 springs. neuralSpring's metalForge pipeline can use wetSpring's bio shaders;
 hotSpring's precision f64 polyfills improve wetSpring's numerical accuracy.
+
+### 5 neuralSpring Primitives (Exp094, consumed by wetSpring)
+
+| Primitive | wetSpring Use | Exp |
+|-----------|---------------|-----|
+| `PairwiseHammingGpu` | SNP-based strain distance matrices | 094 |
+| `PairwiseJaccardGpu` | Gene presence/absence similarity | 094 |
+| `SpatialPayoffGpu` | Spatial PD payoff for cooperation models | 094 |
+| `BatchFitnessGpu` | EA batch fitness for evolutionary simulations | 094 |
+| `LocusVarianceGpu` | FST per-locus AF variance for population genetics | 094 |
 
 ---
 
@@ -303,6 +313,9 @@ the rewire (SNP binding layout, AdapterInfo propagation).
 | Feb 22 | ToadStool review (session 39): 5 new bio primitives available (LocusVariance, PairwiseHamming, PairwiseJaccard, SpatialPayoff, BatchFitness) |
 | Feb 22 | ODE blocker updated: `enable f64;` cleared but `compile_shader` vs `compile_shader_f64` bug in upstream `batched_ode_rk4.rs:209` |
 | Feb 22 | Revalidated: 654 lib tests, clippy clean, GPU feature compiles against upstream HEAD (d45fdfb3) |
+| Feb 22 | **Exp094: Cross-Spring Evolution Validation** — 39/39 checks validating 5 neuralSpring primitives (PairwiseHamming, PairwiseJaccard, SpatialPayoff, BatchFitness, LocusVariance) wired and consumed by wetSpring |
+| Feb 22 | **Exp095: Cross-Spring Scaling Benchmark** — 7 benchmarks across 5 neuralSpring primitives, 6.5×–277× GPU speedup at realistic bio problem sizes |
+| Feb 22 | Absorbed count: 24 primitives (19 wetSpring + 5 neuralSpring) |
 
 ---
 
@@ -313,13 +326,13 @@ the rewire (SNP binding layout, AdapterInfo propagation).
 | Domain | Computational physics | Life science & analytical chemistry |
 | CPU modules | 50+ (physics, lattice, MD, spectral) | 41 (bio, signal, ML) |
 | GPU modules | 34 WGSL shaders | 20 modules, 4 local WGSL shaders |
-| Absorbed | complex64, SU(3), plaquette, HMC, CellList | SW, Gillespie, DT, Felsenstein, GEMM, HMM, ANI, SNP, dN/dS, Pangenome, QF, DADA2, RF |
+| Absorbed | complex64, SU(3), plaquette, HMC, CellList | SW, Gillespie, DT, Felsenstein, GEMM, HMM, ANI, SNP, dN/dS, Pangenome, QF, DADA2, RF + 5 neuralSpring (PairwiseHamming, PairwiseJaccard, SpatialPayoff, BatchFitness, LocusVariance) |
 | WGSL pattern | `pub const WGSL: &str` inline | `include_str!("../shaders/...")` |
 | metalForge | GPU + NPU hardware characterization | GPU + NPU + cross-substrate validation |
 | Handoffs | `../wateringHole/handoffs/` (16+ docs) | `archive/handoffs/` (consolidated) |
 | Tests | 454 | 728 |
-| Validation | 418 checks | 2,173+ checks |
-| Experiments | 31 suites | 93 experiments |
+| Validation | 418 checks | 2,219+ checks |
+| Experiments | 31 suites | 95 experiments |
 | Line coverage | — | 97% bio+io (55% overall) |
 | Pipeline caching | Upstream (ToadStool native) | Local (Exp068, 38% overhead reduction) |
 | Three-tier proof | CPU→GPU→NPU | Python→CPU→GPU→NPU (Exp069) |

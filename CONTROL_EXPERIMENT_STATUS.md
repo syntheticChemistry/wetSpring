@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 22, 2026
-**Status:** 93 experiments, 2,173+ validation checks, all PASS (728 Rust tests)
+**Status:** 95 experiments, 2,219+ validation checks, all PASS (728 Rust tests)
 
 ---
 
@@ -102,6 +102,8 @@
 | 091 | Streaming vs Round-Trip Benchmark | GPU/benchmark | COMPLETE | 2 (parity + Bray-Curtis error) |
 | 092 | CPU vs GPU All 16 Domains | GPU/parity | COMPLETE | 48 (16 domains head-to-head) |
 | 093 | metalForge Full v3 (16 domains) | metalForge | COMPLETE | 28 (16 domains substrate-independent) |
+| 094 | Cross-Spring Evolution Validation | GPU/parity | COMPLETE | 39 (5 neuralSpring primitives CPU↔GPU) |
+| 095 | Cross-Spring Scaling Benchmark | GPU/benchmark | COMPLETE | 7 (scaling across 3 Springs) |
 
 ---
 
@@ -370,6 +372,8 @@ Bugs found and fixed: SNP binding layout (ToadStool), AdapterInfo propagation (w
 | 091 | Streaming vs Round-Trip Benchmark | 2 | CPU ↔ RT ↔ streaming parity + Bray-Curtis error (--features gpu) |
 | 092 | CPU vs GPU All 16 Domains | 48 | 16 domains CPU↔GPU parity (--features gpu) |
 | 093 | metalForge Full v3 (16 domains) | 28 | 16 domains substrate-independent (--features gpu) |
+| 094 | Cross-Spring Evolution Validation | 39 | 5 neuralSpring primitives CPU↔GPU parity (--features gpu) |
+| 095 | Cross-Spring Scaling Benchmark | 7 | Cross-spring scaling at realistic sizes (--release --features gpu) |
 
 ### Handoff Documents
 
