@@ -270,9 +270,8 @@ pub fn run_multi_signal(
     dt: f64,
     params: &MultiSignalParams,
 ) -> OdeResult {
-    let p = params.clone();
     rk4_integrate(
-        move |y, t| multi_rhs(y, t, &p),
+        |y, t| multi_rhs(y, t, params),
         y0,
         0.0,
         t_end,

@@ -24,7 +24,7 @@
 //!   Microbiology 73, 5261–5267 (2007).
 //! - SILVA 138 SSU reference database.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 const DEFAULT_K: usize = 8;
 const DEFAULT_BOOTSTRAP_N: usize = 100;
@@ -201,9 +201,8 @@ impl NaiveBayesClassifier {
 
         let mut taxon_labels = Vec::new();
         let mut taxon_counts = Vec::new();
-        let mut all_kmers: HashMap<u64, bool> = HashMap::new();
+        let mut all_kmers = HashSet::new();
 
-        // First pass: collect all taxon data
         let mut taxon_sparse: Vec<HashMap<u64, usize>> = Vec::new();
         for (taxon_key, ref_indices) in &taxon_map {
             taxon_labels.push(Lineage::from_taxonomy_string(taxon_key));
@@ -213,7 +212,7 @@ impl NaiveBayesClassifier {
             for &ri in ref_indices {
                 let kmers = extract_kmers(&refs[ri].sequence, k);
                 for kmer in kmers {
-                    all_kmers.insert(kmer, true);
+                    all_kmers.insert(kmer);
                     *kmer_presence.entry(kmer).or_insert(0) += 1;
                 }
             }
@@ -309,6 +308,7 @@ impl NaiveBayesClassifier {
 
     /// Score using all query k-mers and return best taxon index.
     /// Uses flat array indexing — no `HashMap` lookups.
+    #[inline]
     #[allow(clippy::cast_possible_truncation)]
     fn score_all_kmers(&self, query_kmers: &[u64]) -> usize {
         let n_taxa = self.taxon_labels.len();
@@ -509,6 +509,7 @@ pub struct NpuWeights {
 }
 
 /// Extract all k-mers from a DNA sequence (no canonicalization — direction matters for taxonomy).
+#[inline]
 #[must_use]
 pub fn extract_kmers(seq: &[u8], k: usize) -> Vec<u64> {
     if seq.len() < k || k == 0 || k > 32 {
@@ -564,12 +565,11 @@ pub fn parse_reference_fasta(contents: &str) -> Vec<ReferenceSeq> {
         if let Some(header) = line.strip_prefix('>') {
             if !current_id.is_empty() && !current_seq.is_empty() {
                 refs.push(ReferenceSeq {
-                    id: current_id.clone(),
-                    sequence: current_seq.clone(),
+                    id: std::mem::take(&mut current_id),
+                    sequence: std::mem::take(&mut current_seq),
                     lineage: Lineage::from_taxonomy_string(&current_tax),
                 });
             }
-            // Parse header: ID followed by taxonomy (space-separated)
             let parts: Vec<&str> = header.splitn(2, |c: char| c.is_whitespace()).collect();
             current_id = parts[0].to_string();
             current_tax = parts.get(1).unwrap_or(&"").to_string();

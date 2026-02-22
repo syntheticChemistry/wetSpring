@@ -132,9 +132,8 @@ const CLAMP: [(f64, f64); 6] = [
 /// Run the capacitor model.
 #[must_use]
 pub fn run_capacitor(y0: &[f64; 6], t_end: f64, dt: f64, params: &CapacitorParams) -> OdeResult {
-    let p = params.clone();
     rk4_integrate(
-        move |y, t| capacitor_rhs(y, t, &p),
+        |y, t| capacitor_rhs(y, t, params),
         y0,
         0.0,
         t_end,

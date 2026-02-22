@@ -25,14 +25,39 @@
 use crate::error::{Error, Result};
 
 /// `PCoA` ordination result.
+///
+/// Coordinates are stored in a flat row-major `Vec<f64>` of length
+/// `n_samples * n_axes` for cache-friendly access. Use [`coord`](Self::coord)
+/// or [`sample_coords`](Self::sample_coords) for ergonomic indexing.
 #[derive(Debug, Clone)]
 pub struct PcoaResult {
-    /// Ordination coordinates \[n\_samples\]\[n\_axes\], each inner vec has `n_axes` elements.
-    pub coordinates: Vec<Vec<f64>>,
+    /// Number of samples.
+    pub n_samples: usize,
+    /// Number of ordination axes retained.
+    pub n_axes: usize,
+    /// Flat row-major coordinates: `[sample_0_axis_0, sample_0_axis_1, ..., sample_N_axis_K]`.
+    pub coordinates: Vec<f64>,
     /// Eigenvalues for the retained axes (descending order).
     pub eigenvalues: Vec<f64>,
     /// Proportion of variance explained by each axis.
     pub proportion_explained: Vec<f64>,
+}
+
+impl PcoaResult {
+    /// Single coordinate value for `(sample, axis)`.
+    #[inline]
+    #[must_use]
+    pub fn coord(&self, sample: usize, axis: usize) -> f64 {
+        self.coordinates[sample * self.n_axes + axis]
+    }
+
+    /// Slice of all axis values for one sample.
+    #[inline]
+    #[must_use]
+    pub fn sample_coords(&self, sample: usize) -> &[f64] {
+        let start = sample * self.n_axes;
+        &self.coordinates[start..start + self.n_axes]
+    }
 }
 
 /// Run `PCoA` on a condensed distance matrix.
@@ -130,16 +155,18 @@ pub fn pcoa(condensed: &[f64], n_samples: usize, n_axes: usize) -> Result<PcoaRe
         .collect();
 
     // 6. Coordinates: X[i,j] = eigvec[i,j] * sqrt(max(eigenval[j], 0))
-    let mut coordinates = vec![vec![0.0; k]; n];
+    let mut coordinates = vec![0.0; n * k];
     for axis in 0..k {
         let col_idx = order[axis];
         let scale = sorted_vals[axis].max(0.0).sqrt();
         for sample in 0..n {
-            coordinates[sample][axis] = eigenvectors[sample * n + col_idx] * scale;
+            coordinates[sample * k + axis] = eigenvectors[sample * n + col_idx] * scale;
         }
     }
 
     Ok(PcoaResult {
+        n_samples: n,
+        n_axes: k,
         coordinates,
         eigenvalues: sorted_vals[..k].to_vec(),
         proportion_explained: proportion,
@@ -242,42 +269,34 @@ mod tests {
 
     #[test]
     fn pcoa_identical_samples_gives_zero_coordinates() {
-        // All distances = 0 → all coordinates = 0
         let condensed = vec![0.0; 3]; // 3 samples, 3 pairs
         let result = pcoa(&condensed, 3, 2).unwrap();
-        assert_eq!(result.coordinates.len(), 3);
-        for coord in &result.coordinates {
-            for &v in coord {
-                assert!(v.abs() < 1e-10, "expected ~0, got {v}");
-            }
+        assert_eq!(result.n_samples, 3);
+        for &v in &result.coordinates {
+            assert!(v.abs() < 1e-10, "expected ~0, got {v}");
         }
     }
 
     #[test]
     fn pcoa_two_samples_single_axis() {
-        // Two samples at distance 1.0 → single axis, coordinates ±0.5
         let condensed = vec![1.0];
         let result = pcoa(&condensed, 2, 1).unwrap();
-        assert_eq!(result.coordinates.len(), 2);
+        assert_eq!(result.n_samples, 2);
         assert_eq!(result.eigenvalues.len(), 1);
-        // Points should be equidistant from origin
-        let d = (result.coordinates[0][0] - result.coordinates[1][0]).abs();
+        let d = (result.coord(0, 0) - result.coord(1, 0)).abs();
         assert!((d - 1.0).abs() < 1e-10, "expected distance 1.0, got {d}");
     }
 
     #[test]
     fn pcoa_equilateral_triangle() {
-        // Three samples, all pairwise distances = 1.0
-        // Should produce 2D coordinates forming an equilateral triangle
         let condensed = vec![1.0, 1.0, 1.0]; // (1,0), (2,0), (2,1)
         let result = pcoa(&condensed, 3, 2).unwrap();
-        assert_eq!(result.coordinates.len(), 3);
+        assert_eq!(result.n_samples, 3);
 
-        // Verify reconstructed distances ≈ 1.0
         for i in 0..3 {
             for j in (i + 1)..3 {
-                let dx = result.coordinates[i][0] - result.coordinates[j][0];
-                let dy = result.coordinates[i][1] - result.coordinates[j][1];
+                let dx = result.coord(i, 0) - result.coord(j, 0);
+                let dy = result.coord(i, 1) - result.coord(j, 1);
                 let dist = dx.hypot(dy);
                 assert!(
                     (dist - 1.0).abs() < 1e-8,
@@ -307,11 +326,10 @@ mod tests {
 
     #[test]
     fn pcoa_axes_capped_at_n_minus_one() {
-        // Request 10 axes but only 3 samples → capped at 2
         let condensed = vec![1.0, 0.5, 0.8];
         let result = pcoa(&condensed, 3, 10).unwrap();
         assert_eq!(result.eigenvalues.len(), 2);
-        assert_eq!(result.coordinates[0].len(), 2);
+        assert_eq!(result.n_axes, 2);
     }
 
     #[test]
@@ -327,7 +345,7 @@ mod tests {
         let condensed = diversity::bray_curtis_condensed(&samples);
         let result = pcoa(&condensed, 4, 2).unwrap();
 
-        assert_eq!(result.coordinates.len(), 4);
+        assert_eq!(result.n_samples, 4);
         assert_eq!(result.eigenvalues.len(), 2);
         assert!(result.eigenvalues[0] >= result.eigenvalues[1]);
 

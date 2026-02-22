@@ -254,8 +254,8 @@ pub const GAMMA_SERIES_MAX_ITER: usize = 1000;
 /// GPU f64 vs CPU f64 for exact arithmetic (add, mul, comparison).
 ///
 /// GPU `SHADER_F64` uses IEEE 754 f64, but different instruction ordering
-/// and FMA behavior can introduce small differences. On RTX 4070:
-/// max observed diff 8e-8 for `exp()` (hotSpring Exp001 §4.4).
+/// and FMA behavior can introduce small differences. Typical max observed
+/// diff ~8e-8 for `exp()` on current hardware (hotSpring Exp001 §4.4).
 ///
 /// For simple add/mul chains (diversity metrics), expect < 1e-10.
 pub const GPU_VS_CPU_F64: f64 = 1e-6;

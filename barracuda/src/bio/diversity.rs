@@ -9,6 +9,7 @@
 //! Pure math — future GPU targets via `BarraCUDA` reduce shaders.
 
 /// Observed features: count of non-zero entries.
+#[inline]
 #[must_use]
 #[allow(clippy::cast_precision_loss)] // ecological counts always fit in f64
 pub fn observed_features(counts: &[f64]) -> f64 {
@@ -26,6 +27,7 @@ pub fn observed_features(counts: &[f64]) -> f64 {
 /// let h = diversity::shannon(&uniform);
 /// assert!((h - 4.0_f64.ln()).abs() < 1e-12);
 /// ```
+#[inline]
 #[must_use]
 pub fn shannon(counts: &[f64]) -> f64 {
     let total: f64 = counts.iter().sum();
@@ -54,6 +56,7 @@ pub fn shannon(counts: &[f64]) -> f64 {
 /// let d = diversity::simpson(&uniform);
 /// assert!((d - 0.9).abs() < 1e-12);
 /// ```
+#[inline]
 #[must_use]
 pub fn simpson(counts: &[f64]) -> f64 {
     let total: f64 = counts.iter().sum();
@@ -75,6 +78,7 @@ pub fn simpson(counts: &[f64]) -> f64 {
 ///
 /// `Chao1` = `S_obs` + f1\*(f1-1) / (2\*(f2+1))
 /// where f1 = singletons, f2 = doubletons.
+#[inline]
 #[must_use]
 #[allow(clippy::cast_precision_loss)]
 pub fn chao1(counts: &[f64]) -> f64 {
@@ -99,6 +103,7 @@ pub fn chao1(counts: &[f64]) -> f64 {
 /// # Panics
 ///
 /// Panics if `a` and `b` have different lengths.
+#[inline]
 #[must_use]
 pub fn bray_curtis(a: &[f64], b: &[f64]) -> f64 {
     assert_eq!(a.len(), b.len(), "Samples must have same length");
@@ -142,6 +147,7 @@ pub fn bray_curtis_condensed(samples: &[Vec<f64>]) -> Vec<f64> {
 /// # Panics
 ///
 /// Panics if `i == j`.
+#[inline]
 #[must_use]
 pub fn condensed_index(i: usize, j: usize) -> usize {
     assert_ne!(i, j, "diagonal entries are always zero");
@@ -176,6 +182,7 @@ pub fn bray_curtis_matrix(samples: &[Vec<f64>]) -> Vec<f64> {
 /// Range \[0, 1\]: 0 = completely uneven, 1 = perfectly even.
 ///
 /// Returns 0.0 when S ≤ 1 (undefined).
+#[inline]
 #[must_use]
 pub fn pielou_evenness(counts: &[f64]) -> f64 {
     let s = observed_features(counts);

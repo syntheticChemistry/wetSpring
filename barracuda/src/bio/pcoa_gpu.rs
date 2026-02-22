@@ -14,7 +14,7 @@
 //! ```ignore
 //! let condensed = bray_curtis_condensed_gpu(&gpu, &samples)?;
 //! let result = pcoa_gpu(&gpu, &condensed, n_samples, 2)?;
-//! // result.coordinates[i] = [axis1, axis2] for sample i
+//! // result.sample_coords(i) = &[axis1, axis2] for sample i
 //! ```
 
 use crate::bio::pcoa::PcoaResult;
@@ -107,16 +107,18 @@ pub fn pcoa_gpu(
         .collect();
 
     // 5. Coordinates: X[i,j] = eigvec[i,j] * sqrt(max(eigenval[j], 0))
-    let mut coordinates = vec![vec![0.0; k]; n];
+    let mut coordinates = vec![0.0; n * k];
     for axis in 0..k {
         let col_idx = order[axis];
         let scale = sorted_vals[axis].max(0.0).sqrt();
         for sample in 0..n {
-            coordinates[sample][axis] = raw_eigenvectors[sample * n + col_idx] * scale;
+            coordinates[sample * k + axis] = raw_eigenvectors[sample * n + col_idx] * scale;
         }
     }
 
     Ok(PcoaResult {
+        n_samples: n,
+        n_axes: k,
         coordinates,
         eigenvalues: sorted_vals[..k].to_vec(),
         proportion_explained: proportion,

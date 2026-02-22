@@ -27,7 +27,7 @@ use barracuda::ops::weighted_dot_f64::WeightedDotF64;
 /// Minimum MS1 scans to justify GPU dispatch overhead.
 ///
 /// Below 256 scans, the CPU path is faster than the GPU dispatch +
-/// transfer latency. Determined empirically on RTX 4070 (Exp066).
+/// transfer latency. Determined empirically (Exp066).
 const GPU_MIN_SCANS: usize = 256;
 
 fn require_f64(gpu: &GpuF64) -> Result<()> {
@@ -182,17 +182,15 @@ pub fn batch_find_peaks_gpu(
                 / eic.intensity.len() as f64
         };
 
-        // Apply peak detection with optional dynamic height threshold
-        let effective_params = if params.min_height.is_none() && mean_intensity > 0.0 {
-            PeakParams {
+        if params.min_height.is_none() && mean_intensity > 0.0 {
+            let effective = PeakParams {
                 min_height: Some(mean_intensity * 3.0),
                 ..params.clone()
-            }
+            };
+            all_peaks.push(find_peaks(&eic.intensity, &effective));
         } else {
-            params.clone()
-        };
-
-        all_peaks.push(find_peaks(&eic.intensity, &effective_params));
+            all_peaks.push(find_peaks(&eic.intensity, params));
+        }
     }
 
     Ok(all_peaks)

@@ -195,6 +195,7 @@ fn trim_sliding_window(
 /// Order: leading trim → trailing trim → sliding window → min length check.
 ///
 /// Returns `Some((start, end))` if the read passes, or `None` if it's too short.
+#[inline]
 #[must_use]
 pub fn trim_read(record: &FastqRecord, params: &QualityParams) -> Option<(usize, usize)> {
     let len = record.quality.len();
@@ -245,6 +246,7 @@ pub fn trim_read(record: &FastqRecord, params: &QualityParams) -> Option<(usize,
 }
 
 /// Apply a trim result to create a new trimmed record.
+#[inline]
 #[must_use]
 pub fn apply_trim(record: &FastqRecord, start: usize, end: usize) -> FastqRecord {
     FastqRecord {

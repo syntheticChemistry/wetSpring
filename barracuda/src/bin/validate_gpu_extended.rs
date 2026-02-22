@@ -146,8 +146,8 @@ fn validate_pcoa(v: &mut Validator, gpu: &GpuF64) {
     );
     v.check(
         "PCoA: coordinate rows",
-        gpu_result.coordinates.len() as f64,
-        cpu_result.coordinates.len() as f64,
+        gpu_result.n_samples as f64,
+        cpu_result.n_samples as f64,
         0.0,
     );
 
@@ -179,13 +179,10 @@ fn validate_pcoa(v: &mut Validator, gpu: &GpuF64) {
         );
     }
 
-    for (si, (cc, gc)) in cpu_result
-        .coordinates
-        .iter()
-        .zip(gpu_result.coordinates.iter())
-        .enumerate()
-    {
-        for (ai, (cv, gv)) in cc.iter().zip(gc.iter()).enumerate() {
+    for si in 0..cpu_result.n_samples {
+        let cc = cpu_result.sample_coords(si);
+        let gc = gpu_result.sample_coords(si);
+        for (ai, (&cv, &gv)) in cc.iter().zip(gc.iter()).enumerate() {
             let sign_flip = if cv.signum() != gv.signum() && cv.abs() > 1e-6 {
                 -1.0
             } else {
@@ -194,7 +191,7 @@ fn validate_pcoa(v: &mut Validator, gpu: &GpuF64) {
             v.check(
                 &format!("PCoA: sample {si} axis {ai} CPU ↔ GPU"),
                 gv * sign_flip,
-                *cv,
+                cv,
                 tolerances::GPU_VS_CPU_F64 * 10.0,
             );
         }

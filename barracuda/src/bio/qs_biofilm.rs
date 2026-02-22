@@ -208,9 +208,8 @@ const CLAMP: [(f64, f64); 5] = [
 /// Run a scenario with given initial conditions and integration time.
 #[must_use]
 pub fn run_scenario(y0: &[f64; 5], t_end: f64, dt: f64, params: &QsBiofilmParams) -> OdeResult {
-    let p = params.clone();
     rk4_integrate(
-        move |y, t| qs_rhs(y, t, &p),
+        |y, t| qs_rhs(y, t, params),
         y0,
         0.0,
         t_end,

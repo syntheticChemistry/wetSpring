@@ -360,6 +360,98 @@ impl Iterator for FastqIter {
     }
 }
 
+/// Incremental accumulator for FASTQ statistics.
+///
+/// Single implementation shared by [`compute_stats`] (from records) and
+/// [`stats_from_file`] (streaming). Eliminates duplication and guarantees
+/// both paths produce identical results.
+struct StatsAccumulator {
+    num_sequences: usize,
+    total_bases: u64,
+    total_quality_sum: u64,
+    total_quality_count: u64,
+    gc_count: u64,
+    min_len: usize,
+    max_len: usize,
+    q30_count: usize,
+    length_dist: HashMap<usize, usize>,
+}
+
+impl StatsAccumulator {
+    fn new() -> Self {
+        Self {
+            num_sequences: 0,
+            total_bases: 0,
+            total_quality_sum: 0,
+            total_quality_count: 0,
+            gc_count: 0,
+            min_len: usize::MAX,
+            max_len: 0,
+            q30_count: 0,
+            length_dist: HashMap::new(),
+        }
+    }
+
+    #[inline]
+    fn add_record(&mut self, sequence: &[u8], quality: &[u8]) {
+        self.num_sequences += 1;
+        let len = sequence.len();
+        self.total_bases += len as u64;
+        self.min_len = self.min_len.min(len);
+        self.max_len = self.max_len.max(len);
+        *self.length_dist.entry(len).or_insert(0) += 1;
+
+        for &base in sequence {
+            if base == b'G' || base == b'C' || base == b'g' || base == b'c' {
+                self.gc_count += 1;
+            }
+        }
+
+        if !quality.is_empty() {
+            let mut q_sum: u64 = 0;
+            for &q in quality {
+                q_sum += u64::from(q.saturating_sub(33));
+            }
+            self.total_quality_sum += q_sum;
+            self.total_quality_count += quality.len() as u64;
+
+            #[allow(clippy::cast_precision_loss)]
+            let mean_q = q_sum as f64 / quality.len() as f64;
+            if mean_q >= 30.0 {
+                self.q30_count += 1;
+            }
+        }
+    }
+
+    #[allow(clippy::cast_precision_loss)]
+    fn finish(self) -> FastqStats {
+        let n = self.num_sequences;
+        FastqStats {
+            num_sequences: n,
+            total_bases: self.total_bases,
+            min_length: if n == 0 { 0 } else { self.min_len },
+            max_length: self.max_len,
+            mean_length: if n > 0 {
+                self.total_bases as f64 / n as f64
+            } else {
+                0.0
+            },
+            mean_quality: if self.total_quality_count > 0 {
+                self.total_quality_sum as f64 / self.total_quality_count as f64
+            } else {
+                0.0
+            },
+            gc_content: if self.total_bases > 0 {
+                self.gc_count as f64 / self.total_bases as f64
+            } else {
+                0.0
+            },
+            q30_count: self.q30_count,
+            length_distribution: self.length_dist,
+        }
+    }
+}
+
 /// Compute summary statistics from parsed records.
 ///
 /// # Examples
@@ -379,79 +471,11 @@ impl Iterator for FastqIter {
 /// ```
 #[must_use]
 pub fn compute_stats(records: &[FastqRecord]) -> FastqStats {
-    if records.is_empty() {
-        return FastqStats {
-            num_sequences: 0,
-            total_bases: 0,
-            min_length: 0,
-            max_length: 0,
-            mean_length: 0.0,
-            mean_quality: 0.0,
-            gc_content: 0.0,
-            q30_count: 0,
-            length_distribution: HashMap::new(),
-        };
-    }
-
-    let mut total_bases: u64 = 0;
-    let mut total_quality_sum: u64 = 0;
-    let mut total_quality_count: u64 = 0;
-    let mut gc_count: u64 = 0;
-    let mut min_len = usize::MAX;
-    let mut max_len = 0_usize;
-    let mut q30_count = 0_usize;
-    let mut length_dist: HashMap<usize, usize> = HashMap::new();
-
+    let mut acc = StatsAccumulator::new();
     for rec in records {
-        let len = rec.sequence.len();
-        total_bases += len as u64;
-        min_len = min_len.min(len);
-        max_len = max_len.max(len);
-        *length_dist.entry(len).or_insert(0) += 1;
-
-        for &base in &rec.sequence {
-            if base == b'G' || base == b'C' || base == b'g' || base == b'c' {
-                gc_count += 1;
-            }
-        }
-
-        if !rec.quality.is_empty() {
-            let mut q_sum: u64 = 0;
-            for &q in &rec.quality {
-                q_sum += u64::from(q.saturating_sub(33));
-            }
-            total_quality_sum += q_sum;
-            total_quality_count += rec.quality.len() as u64;
-
-            #[allow(clippy::cast_precision_loss)] // quality sums fit in f64 mantissa
-            let mean_q = q_sum as f64 / rec.quality.len() as f64;
-            if mean_q >= 30.0 {
-                q30_count += 1;
-            }
-        }
+        acc.add_record(&rec.sequence, &rec.quality);
     }
-
-    let n = records.len();
-    #[allow(clippy::cast_precision_loss)] // all values are small enough for exact f64
-    FastqStats {
-        num_sequences: n,
-        total_bases,
-        min_length: min_len,
-        max_length: max_len,
-        mean_length: total_bases as f64 / n as f64,
-        mean_quality: if total_quality_count > 0 {
-            total_quality_sum as f64 / total_quality_count as f64
-        } else {
-            0.0
-        },
-        gc_content: if total_bases > 0 {
-            gc_count as f64 / total_bases as f64
-        } else {
-            0.0
-        },
-        q30_count,
-        length_distribution: length_dist,
-    }
+    acc.finish()
 }
 
 /// Compute FASTQ statistics in a single streaming pass (zero-copy path).
@@ -466,98 +490,42 @@ pub fn compute_stats(records: &[FastqRecord]) -> FastqStats {
 /// [`Error::Fastq`] if a record is malformed.
 pub fn stats_from_file(path: &Path) -> Result<FastqStats> {
     let mut reader = open_reader(path)?;
-    let mut buf = String::new();
-
-    let mut num_sequences = 0_usize;
-    let mut total_bases: u64 = 0;
-    let mut total_quality_sum: u64 = 0;
-    let mut total_quality_count: u64 = 0;
-    let mut gc_count: u64 = 0;
-    let mut min_len = usize::MAX;
-    let mut max_len = 0_usize;
-    let mut q30_count = 0_usize;
-    let mut length_dist: HashMap<usize, usize> = HashMap::new();
+    let mut header_buf = String::new();
+    let mut seq_buf = String::new();
+    let mut sep_buf = String::new();
+    let mut qual_buf = String::new();
+    let mut acc = StatsAccumulator::new();
 
     loop {
-        // Line 1: @identifier (or EOF)
-        buf.clear();
-        if read_line(reader.as_mut(), &mut buf, path)? == 0 {
+        header_buf.clear();
+        if read_line(reader.as_mut(), &mut header_buf, path)? == 0 {
             break;
         }
-        if buf.trim_end().is_empty() {
+        if header_buf.trim_end().is_empty() {
             break;
         }
-        if !buf.starts_with('@') {
-            return Err(header_error(&buf));
-        }
-        num_sequences += 1;
-
-        // Line 2: sequence — process GC and length in-place
-        buf.clear();
-        read_line(reader.as_mut(), &mut buf, path)?;
-        let seq_len = trimmed_len(&buf);
-        total_bases += seq_len as u64;
-        min_len = min_len.min(seq_len);
-        max_len = max_len.max(seq_len);
-        *length_dist.entry(seq_len).or_insert(0) += 1;
-        for &base in &buf.as_bytes()[..seq_len] {
-            if base == b'G' || base == b'C' || base == b'g' || base == b'c' {
-                gc_count += 1;
-            }
+        if !header_buf.starts_with('@') {
+            return Err(header_error(&header_buf));
         }
 
-        // Line 3: + separator (skip)
-        buf.clear();
-        read_line(reader.as_mut(), &mut buf, path)?;
+        seq_buf.clear();
+        read_line(reader.as_mut(), &mut seq_buf, path)?;
+        let seq_len = trimmed_len(&seq_buf);
 
-        // Line 4: quality — process Phred33 scores in-place
-        buf.clear();
-        read_line(reader.as_mut(), &mut buf, path)?;
-        let qual_len = trimmed_len(&buf);
-        if qual_len > 0 {
-            let mut q_sum: u64 = 0;
-            for &q in &buf.as_bytes()[..qual_len] {
-                q_sum += u64::from(q.saturating_sub(33));
-            }
-            total_quality_sum += q_sum;
-            total_quality_count += qual_len as u64;
+        sep_buf.clear();
+        read_line(reader.as_mut(), &mut sep_buf, path)?;
 
-            #[allow(clippy::cast_precision_loss)]
-            let mean_q = q_sum as f64 / qual_len as f64;
-            if mean_q >= 30.0 {
-                q30_count += 1;
-            }
-        }
+        qual_buf.clear();
+        read_line(reader.as_mut(), &mut qual_buf, path)?;
+        let qual_len = trimmed_len(&qual_buf);
+
+        acc.add_record(
+            &seq_buf.as_bytes()[..seq_len],
+            &qual_buf.as_bytes()[..qual_len],
+        );
     }
 
-    if num_sequences == 0 {
-        min_len = 0;
-    }
-
-    #[allow(clippy::cast_precision_loss)]
-    Ok(FastqStats {
-        num_sequences,
-        total_bases,
-        min_length: min_len,
-        max_length: max_len,
-        mean_length: if num_sequences > 0 {
-            total_bases as f64 / num_sequences as f64
-        } else {
-            0.0
-        },
-        mean_quality: if total_quality_count > 0 {
-            total_quality_sum as f64 / total_quality_count as f64
-        } else {
-            0.0
-        },
-        gc_content: if total_bases > 0 {
-            gc_count as f64 / total_bases as f64
-        } else {
-            0.0
-        },
-        q30_count,
-        length_distribution: length_dist,
-    })
+    Ok(acc.finish())
 }
 
 #[cfg(test)]

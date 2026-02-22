@@ -24,6 +24,11 @@
 use barracuda::device::{GpuDriverProfile, TensorContext, WgpuDevice};
 use std::sync::Arc;
 
+const DEVICE_LABEL: &str = "FP64 Science Device";
+const MAX_STORAGE_BINDING_BYTES: u32 = 512 * 1024 * 1024; // 512 MiB
+const MAX_BUFFER_SIZE_BYTES: u64 = 1024 * 1024 * 1024; // 1 GiB
+const MAX_STORAGE_BUFFERS_PER_STAGE: u32 = 16;
+
 /// GPU context with FP64 support for science workloads.
 ///
 /// Wraps a wgpu device with `SHADER_F64` + `ToadStool`'s `TensorContext`
@@ -45,7 +50,7 @@ use std::sync::Arc;
 /// Driver-specific capabilities (NVK workarounds, eigensolve strategy,
 /// latency model) are available via [`driver_profile`](Self::driver_profile).
 pub struct GpuF64 {
-    /// GPU adapter name (e.g., "NVIDIA RTX 4070").
+    /// GPU adapter name (e.g., `"NVIDIA GeForce RTX 4070"`).
     pub adapter_name: String,
     /// Whether the GPU supports f64 in shaders.
     pub has_f64: bool,
@@ -99,16 +104,18 @@ impl GpuF64 {
         let (device, queue) = adapter
             .request_device(
                 &wgpu::DeviceDescriptor {
-                    label: Some("wetSpring FP64 Science Device"),
+                    label: Some(DEVICE_LABEL),
                     required_features,
                     required_limits: wgpu::Limits {
                         max_storage_buffer_binding_size: limits
                             .max_storage_buffer_binding_size
-                            .min(512 * 1024 * 1024),
-                        max_buffer_size: limits.max_buffer_size.min(1024 * 1024 * 1024),
+                            .min(MAX_STORAGE_BINDING_BYTES),
+                        max_buffer_size: limits
+                            .max_buffer_size
+                            .min(MAX_BUFFER_SIZE_BYTES),
                         max_storage_buffers_per_shader_stage: limits
                             .max_storage_buffers_per_shader_stage
-                            .min(16),
+                            .min(MAX_STORAGE_BUFFERS_PER_STAGE),
                         ..wgpu::Limits::default()
                     },
                     memory_hints: wgpu::MemoryHints::default(),
@@ -180,7 +187,7 @@ impl GpuF64 {
 /// Default minimum element count for GPU dispatch to outperform CPU.
 ///
 /// Below this threshold, GPU kernel launch overhead dominates.
-/// Measured on RTX 4070 for `FusedMapReduceF64` (Shannon/Simpson).
+/// Measured on representative f64-capable GPUs for `FusedMapReduceF64`.
 /// Callers should fall back to the CPU path when `n < GPU_DISPATCH_THRESHOLD`.
 ///
 /// Use [`GpuF64::dispatch_threshold`] for a capability-aware value that

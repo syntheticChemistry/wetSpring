@@ -236,7 +236,7 @@ async fn main() {
     );
     v.check(
         "PCoA: correct n_samples",
-        gpu_pcoa.coordinates.len() as f64,
+        gpu_pcoa.n_samples as f64,
         N_SAMPLES as f64,
         0.0,
     );
@@ -268,8 +268,8 @@ async fn main() {
     // ═══════════════════════════════════════════════════════════════════
     v.section("Stage 4: Statistical Summary (GPU FMR)");
 
-    let pc1: Vec<f64> = gpu_pcoa.coordinates.iter().map(|c| c[0]).collect();
-    let pc2: Vec<f64> = gpu_pcoa.coordinates.iter().map(|c| c[1]).collect();
+    let pc1: Vec<f64> = (0..gpu_pcoa.n_samples).map(|i| gpu_pcoa.coord(i, 0)).collect();
+    let pc2: Vec<f64> = (0..gpu_pcoa.n_samples).map(|i| gpu_pcoa.coord(i, 1)).collect();
 
     let t4 = Instant::now();
     let gpu_var_pc1 = stats_gpu::variance_gpu(&gpu, &pc1).unwrap();

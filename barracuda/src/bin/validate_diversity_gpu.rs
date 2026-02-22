@@ -291,9 +291,9 @@ fn validate_pcoa(gpu: &GpuF64, v: &mut Validator) {
         for i in 0..n {
             for j in (i + 1)..n {
                 let cpu_dist =
-                    euclidean_dist(&cpu_result.coordinates[i], &cpu_result.coordinates[j]);
+                    euclidean_dist(cpu_result.sample_coords(i), cpu_result.sample_coords(j));
                 let gpu_dist =
-                    euclidean_dist(&gpu_result.coordinates[i], &gpu_result.coordinates[j]);
+                    euclidean_dist(gpu_result.sample_coords(i), gpu_result.sample_coords(j));
                 let diff = (cpu_dist - gpu_dist).abs();
                 max_dist_diff = max_dist_diff.max(diff);
                 if diff > tolerances::GPU_VS_CPU_F64 {

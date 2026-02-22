@@ -1,9 +1,9 @@
 // batched_qs_ode_rk4_f64.wgsl — Full-GPU RK4 parameter sweep for QS/c-di-GMP ODE
 //
 // Local copy for wetSpring (Write → Absorb → Lean).
-// Uses pow_f64() polyfill instead of native pow() because RTX 4070 NVVM
-// cannot compile native f64 transcendentals. ShaderTemplate::for_driver_auto
-// with force=true auto-injects pow_f64, exp_f64, log_f64 polyfills.
+// Uses pow_f64() polyfill instead of native pow() for drivers that lack
+// native f64 transcendental support. ShaderTemplate::for_driver_auto
+// auto-detects capability and injects pow_f64, exp_f64, log_f64 polyfills.
 
 const N_VARS:   u32 = 5u;
 const N_PARAMS: u32 = 17u;

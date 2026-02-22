@@ -346,7 +346,7 @@ async fn main() {
                 println!("  Both entry points compiled in {us} µs");
             }
             _ => {
-                v.check_pass(&format!("unifrac compile FAILED"), false);
+                v.check_pass("unifrac compile FAILED", false);
             }
         }
     }
@@ -368,7 +368,7 @@ async fn main() {
                 println!("  Compiled in {us} µs");
             }
             _ => {
-                v.check_pass(&format!("ODE compile FAILED"), false);
+                v.check_pass("ODE compile FAILED", false);
             }
         }
     }

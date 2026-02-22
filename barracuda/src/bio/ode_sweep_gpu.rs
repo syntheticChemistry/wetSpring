@@ -7,7 +7,7 @@
 //! instead of `compile_shader_f64()`. Without f64 preamble injection the
 //! shader won't compile on naga/Vulkan backends. This local copy uses
 //! `ShaderTemplate::for_driver_auto` which injects the f64 preamble and
-//! `pow_f64`/`exp_f64`/`log_f64` polyfills for Ada Lovelace GPUs.
+//! `pow_f64`/`exp_f64`/`log_f64` polyfills for drivers lacking native f64 transcendentals.
 //!
 //! **Write → Absorb → Lean**: once `ToadStool` switches to `compile_shader_f64()`
 //! in `batched_ode_rk4.rs`, this module becomes a thin wrapper around
@@ -81,6 +81,7 @@ impl OdeSweepGpu {
     ///
     /// Panics if `initial_states.len() != n_batches * N_VARS` or
     /// `batch_params.len() != n_batches * N_PARAMS`.
+    #[allow(clippy::too_many_lines)]
     pub fn integrate(
         &self,
         config: &OdeSweepConfig,
@@ -162,8 +163,10 @@ impl OdeSweepGpu {
             ],
         });
 
-        // Force polyfill: RTX 4070 NVVM cannot compile f64 pow() natively
-        let patched = ShaderTemplate::for_driver_auto(ODE_WGSL, true);
+        let patched = ShaderTemplate::for_driver_auto(
+            ODE_WGSL,
+            dev.needs_f64_exp_log_workaround(),
+        );
         let module = dev.compile_shader(&patched, Some("OdeSweepRK4"));
 
         let pl = d.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {

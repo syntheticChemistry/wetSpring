@@ -28,7 +28,7 @@ use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
 /// Minimum species count to justify GPU rarefaction dispatch.
 ///
 /// Below 50 species, CPU bootstrap is faster than GPU dispatch +
-/// buffer transfer. Determined empirically on RTX 4070 (Exp066).
+/// buffer transfer. Determined empirically (Exp066).
 const GPU_MIN_SPECIES: usize = 50;
 const DEFAULT_BOOTSTRAP_N: usize = 1000;
 

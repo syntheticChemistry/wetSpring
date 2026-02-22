@@ -18,6 +18,9 @@ use crate::error::{Error, Result};
 use std::collections::VecDeque;
 use std::io::BufRead;
 
+const INITIAL_TEXT_BUF_CAPACITY: usize = 4096;
+const INITIAL_TAG_BUF_CAPACITY: usize = 512;
+
 /// An XML event produced by the pull parser.
 #[derive(Debug)]
 pub enum XmlEvent {
@@ -58,8 +61,8 @@ impl<R: BufRead> XmlReader<R> {
             reader,
             trim_text: false,
             queue: VecDeque::with_capacity(4),
-            text_buf: Vec::with_capacity(4096),
-            tag_buf: Vec::with_capacity(512),
+            text_buf: Vec::with_capacity(INITIAL_TEXT_BUF_CAPACITY),
+            tag_buf: Vec::with_capacity(INITIAL_TAG_BUF_CAPACITY),
             eof: false,
         }
     }

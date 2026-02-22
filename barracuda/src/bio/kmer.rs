@@ -87,6 +87,7 @@ impl KmerCounts {
     ///
     /// For k <= 12 (4^12 = 16M entries), this produces a dense GPU buffer
     /// suitable for parallel histogram reduction or radix sort dispatch.
+    #[inline]
     #[must_use]
     pub fn to_histogram(&self) -> Vec<u32> {
         let kmer_space = 1_usize << (2 * self.k);

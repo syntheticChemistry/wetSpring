@@ -173,9 +173,8 @@ pub fn run_cooperation(
     dt: f64,
     params: &CooperationParams,
 ) -> OdeResult {
-    let p = params.clone();
     rk4_integrate(
-        move |y, t| coop_rhs(y, t, &p),
+        |y, t| coop_rhs(y, t, params),
         y0,
         0.0,
         t_end,

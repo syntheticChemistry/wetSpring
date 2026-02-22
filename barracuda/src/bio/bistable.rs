@@ -169,9 +169,8 @@ const CLAMP: [(f64, f64); 5] = [
 /// Run the bistable model from given initial conditions.
 #[must_use]
 pub fn run_bistable(y0: &[f64; 5], t_end: f64, dt: f64, params: &BistableParams) -> OdeResult {
-    let p = params.clone();
     rk4_integrate(
-        move |y, t| bistable_rhs(y, t, &p),
+        |y, t| bistable_rhs(y, t, params),
         y0,
         0.0,
         t_end,

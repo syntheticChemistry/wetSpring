@@ -277,7 +277,7 @@ fn validate_pcoa(v: &mut Validator, piccard: &[f64], von_damm: &[f64], backgroun
     );
     v.check(
         "PCoA: coordinates have 3 samples",
-        result.coordinates.len() as f64,
+        result.n_samples as f64,
         3.0,
         0.0,
     );
