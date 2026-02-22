@@ -1,5 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Benchmark: CPU Rust vs GPU (ToadStool/BarraCUDA) across scientific workloads.
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss
+)]
+//! Benchmark: CPU Rust vs GPU (`ToadStool`/`BarraCUDA`) across scientific workloads.
 //!
 //! Measures wall-clock time and energy for each workload at multiple data sizes
 //! to demonstrate GPU parallelism advantage. Emits structured JSON via
@@ -18,7 +26,7 @@
 //! | Baseline commit | `e4358c5` |
 //! | Baseline tool | timing harness |
 //! | Baseline version | N/A (performance measurement, not correctness) |
-//! | Baseline command | cargo run --release --features gpu --bin benchmark_cpu_gpu |
+//! | Baseline command | cargo run --release --features gpu --bin `benchmark_cpu_gpu` |
 //! | Baseline date | 2026-02-19 |
 //! | Exact command | `cargo run --release --features gpu --bin benchmark_cpu_gpu` |
 //! | Data | synthetic counts, diversity/spectral workloads |

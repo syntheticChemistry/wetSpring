@@ -1,5 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::similar_names)]
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation
+)]
 //! Exp058: GPU Track 1c Promotion — ANI + SNP + Pangenome + dN/dS
 //!
 //! Validates four local WGSL shaders against CPU baselines:
@@ -20,9 +26,9 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | BarraCUDA CPU (reference) |
+//! | Baseline tool | `BarraCUDA` CPU (reference) |
 //! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
-//! | Baseline command | bio::ani, bio::snp, bio::pangenome, bio::dnds |
+//! | Baseline command | `bio::ani`, `bio::snp`, `bio::pangenome`, `bio::dnds` |
 //! | Baseline date | 2026-02-19 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_gpu_track1c` |
 //! | Data | Synthetic pairs, sequences, gene clusters, codon pairs |

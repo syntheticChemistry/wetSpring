@@ -1,0 +1,31 @@
+[package]
+name = "wetspring-barracuda-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+tempfile = "3"
+
+[dependencies.wetspring-barracuda]
+path = ".."
+
+[[bin]]
+name = "fuzz_fastq"
+path = "fuzz_targets/fuzz_fastq.rs"
+
+[[bin]]
+name = "fuzz_mzml"
+path = "fuzz_targets/fuzz_mzml.rs"
+
+[[bin]]
+name = "fuzz_ms2"
+path = "fuzz_targets/fuzz_ms2.rs"
+
+[[bin]]
+name = "fuzz_xml"
+path = "fuzz_targets/fuzz_xml.rs"

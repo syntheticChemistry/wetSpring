@@ -47,6 +47,20 @@ pub struct FastqStats {
     pub length_distribution: HashMap<usize, usize>,
 }
 
+/// Borrowed FASTQ record — references data in the parser's internal buffer.
+///
+/// Avoids allocation for high-throughput single-pass processing. The references
+/// are only valid during the callback invocation in [`for_each_record`].
+#[derive(Debug, Clone, Copy)]
+pub struct FastqRefRecord<'a> {
+    /// Record identifier (first word after `@`).
+    pub id: &'a str,
+    /// Nucleotide sequence.
+    pub sequence: &'a [u8],
+    /// Phred33 quality scores (raw ASCII bytes).
+    pub quality: &'a [u8],
+}
+
 /// A parsed FASTQ record with owned data.
 #[derive(Debug, Clone)]
 pub struct FastqRecord {
@@ -157,6 +171,78 @@ pub fn parse_fastq(path: &Path) -> Result<Vec<FastqRecord>> {
     }
 
     Ok(records)
+}
+
+/// Process each record without per-record allocation.
+///
+/// The callback receives borrowed slices into the parser's internal buffers.
+/// For single-pass processing (statistics, filtering), this avoids the
+/// per-record `Vec` allocation of [`FastqIter`].
+///
+/// # Errors
+///
+/// Returns [`Error::Io`] if the file cannot be opened, [`Error::Fastq`] if a
+/// record is malformed, or propagates the callback's [`Result`].
+///
+/// # Examples
+///
+/// ```
+/// use std::path::Path;
+/// use wetspring_barracuda::io::fastq::{for_each_record, FastqRefRecord};
+///
+/// # fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// let path = Path::new("reads.fastq");
+/// let mut count = 0_usize;
+/// for_each_record(path, |record: FastqRefRecord<'_>| {
+///     count += 1;
+///     Ok(())
+/// })?;
+/// # Ok(())
+/// # }
+/// ```
+pub fn for_each_record<F>(path: &Path, mut f: F) -> Result<()>
+where
+    F: FnMut(FastqRefRecord<'_>) -> Result<()>,
+{
+    let mut reader = open_reader(path)?;
+    let mut buf_header = String::new();
+    let mut buf_sequence = String::new();
+    let mut buf_sep = String::new();
+    let mut buf_quality = String::new();
+
+    loop {
+        buf_header.clear();
+        if read_line(reader.as_mut(), &mut buf_header, path)? == 0 {
+            break;
+        }
+        if buf_header.trim_end().is_empty() {
+            break;
+        }
+        if !buf_header.starts_with('@') {
+            return Err(header_error(&buf_header));
+        }
+        let id = buf_header.trim_end()[1..]
+            .split_whitespace()
+            .next()
+            .unwrap_or("");
+
+        buf_sequence.clear();
+        read_line(reader.as_mut(), &mut buf_sequence, path)?;
+
+        buf_sep.clear();
+        read_line(reader.as_mut(), &mut buf_sep, path)?;
+
+        buf_quality.clear();
+        read_line(reader.as_mut(), &mut buf_quality, path)?;
+
+        let record = FastqRefRecord {
+            id,
+            sequence: buf_sequence.trim_end().as_bytes(),
+            quality: buf_quality.trim_end().as_bytes(),
+        };
+        f(record)?;
+    }
+    Ok(())
 }
 
 /// Streaming FASTQ iterator — yields one record at a time without buffering.
@@ -486,94 +572,6 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_fastq_two_records() {
-        let dir = tempfile::tempdir().unwrap();
-        let content = "@seq1 description\nACGTACGT\n+\nIIIIIIII\n@seq2\nGGCC\n+\n!!!!\n";
-        let path = write_fastq(&dir, "test.fastq", content);
-        let records = parse_fastq(&path).unwrap();
-        assert_eq!(records.len(), 2);
-        assert_eq!(records[0].id, "seq1");
-        assert_eq!(records[0].sequence, b"ACGTACGT");
-        assert_eq!(records[0].quality, b"IIIIIIII");
-        assert_eq!(records[1].id, "seq2");
-        assert_eq!(records[1].sequence, b"GGCC");
-    }
-
-    #[test]
-    fn test_parse_fastq_empty_file() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = write_fastq(&dir, "empty.fastq", "");
-        let records = parse_fastq(&path).unwrap();
-        assert!(records.is_empty());
-    }
-
-    #[test]
-    fn test_parse_fastq_trailing_blank_line() {
-        let dir = tempfile::tempdir().unwrap();
-        let content = "@seq1\nACGT\n+\nIIII\n\n";
-        let path = write_fastq(&dir, "trailing.fastq", content);
-        let records = parse_fastq(&path).unwrap();
-        assert_eq!(records.len(), 1);
-        assert_eq!(records[0].id, "seq1");
-    }
-
-    #[test]
-    fn test_parse_fastq_bad_header() {
-        let dir = tempfile::tempdir().unwrap();
-        let content = "NOT_A_HEADER\nACGT\n+\nIIII\n";
-        let path = write_fastq(&dir, "bad.fastq", content);
-        let result = parse_fastq(&path);
-        assert!(result.is_err());
-        let msg = format!("{}", result.unwrap_err());
-        assert!(msg.contains("expected '@' header"));
-    }
-
-    #[test]
-    fn test_parse_fastq_nonexistent_file() {
-        let path = std::env::temp_dir().join("nonexistent_wetspring_9f8a2.fastq");
-        let result = parse_fastq(&path);
-        assert!(result.is_err());
-    }
-
-    #[test]
-    fn test_stats_from_file_two_records() {
-        let dir = tempfile::tempdir().unwrap();
-        let content = "@r1\nACGTACGT\n+\nIIIIIIII\n@r2\nGGCC\n+\n!!!!\n";
-        let path = write_fastq(&dir, "stats.fastq", content);
-        let stats = stats_from_file(&path).unwrap();
-        assert_eq!(stats.num_sequences, 2);
-        assert_eq!(stats.total_bases, 12);
-        assert_eq!(stats.min_length, 4);
-        assert_eq!(stats.max_length, 8);
-        assert!(stats.gc_content > 0.0);
-        assert!(stats.mean_quality > 0.0);
-    }
-
-    #[test]
-    fn test_stats_from_file_empty() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = write_fastq(&dir, "empty.fastq", "");
-        let stats = stats_from_file(&path).unwrap();
-        assert_eq!(stats.num_sequences, 0);
-        assert_eq!(stats.min_length, 0);
-    }
-
-    #[test]
-    fn test_stats_from_file_bad_header() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = write_fastq(&dir, "bad.fastq", "BAD\nACGT\n+\nIIII\n");
-        let result = stats_from_file(&path);
-        assert!(result.is_err());
-    }
-
-    #[test]
-    fn test_stats_from_file_nonexistent() {
-        let path = std::env::temp_dir().join("nonexistent_wetspring_9f8a2.fastq");
-        let result = stats_from_file(&path);
-        assert!(result.is_err());
-    }
-
-    #[test]
     fn test_stats_from_file_single_record_quality() {
         let dir = tempfile::tempdir().unwrap();
         // Q=40 for 'I' (73-33=40)
@@ -701,29 +699,6 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_fastq_gzip() {
-        let dir = tempfile::tempdir().unwrap();
-        let content = "@gz1\nACGT\n+\nIIII\n@gz2\nTTTT\n+\n!!!!\n";
-        let path = write_fastq_gz(&dir, "reads.fastq.gz", content);
-        let records = parse_fastq(&path).unwrap();
-        assert_eq!(records.len(), 2);
-        assert_eq!(records[0].id, "gz1");
-        assert_eq!(records[0].sequence, b"ACGT");
-        assert_eq!(records[1].id, "gz2");
-    }
-
-    #[test]
-    fn test_stats_from_file_gzip() {
-        let dir = tempfile::tempdir().unwrap();
-        let content = "@gz1\nACGT\n+\nIIII\n";
-        let path = write_fastq_gz(&dir, "stats.fastq.gz", content);
-        let stats = stats_from_file(&path).unwrap();
-        assert_eq!(stats.num_sequences, 1);
-        assert_eq!(stats.total_bases, 4);
-        assert!((stats.gc_content - 0.5).abs() < 1e-10);
-    }
-
-    #[test]
     fn test_stats_from_file_trailing_blank_line() {
         let dir = tempfile::tempdir().unwrap();
         let content = "@r1\nACGT\n+\nIIII\n\n";
@@ -827,6 +802,89 @@ mod tests {
             .collect::<Result<Vec<_>>>()
             .unwrap();
         assert!(records.is_empty());
+    }
+
+    #[test]
+    fn for_each_record_matches_parse() {
+        let dir = tempfile::tempdir().unwrap();
+        let content = "@r1 desc\nACGTACGT\n+\nIIIIIIII\n@r2\nGGCC\n+\n!!!!\n";
+        let path = write_fastq(&dir, "foreach.fastq", content);
+
+        let mut collected: Vec<FastqRecord> = Vec::new();
+        for_each_record(&path, |r: FastqRefRecord<'_>| {
+            collected.push(FastqRecord {
+                id: r.id.to_string(),
+                sequence: r.sequence.to_vec(),
+                quality: r.quality.to_vec(),
+            });
+            Ok(())
+        })
+        .unwrap();
+
+        let parsed = parse_fastq(&path).unwrap();
+        assert_eq!(collected.len(), parsed.len());
+        for (c, p) in collected.iter().zip(parsed.iter()) {
+            assert_eq!(c.id, p.id);
+            assert_eq!(c.sequence, p.sequence);
+            assert_eq!(c.quality, p.quality);
+        }
+    }
+
+    #[test]
+    fn for_each_record_empty_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_fastq(&dir, "empty.fastq", "");
+        let mut count = 0_usize;
+        for_each_record(&path, |_| {
+            count += 1;
+            Ok(())
+        })
+        .unwrap();
+        assert_eq!(count, 0);
+    }
+
+    #[test]
+    fn for_each_record_propagates_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let content = "@r1\nACGT\n+\nIIII\n";
+        let path = write_fastq(&dir, "err.fastq", content);
+        let result = for_each_record(&path, |r: FastqRefRecord<'_>| {
+            if r.id == "r1" {
+                Err(Error::Fastq("stop".to_string()))
+            } else {
+                Ok(())
+            }
+        });
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn for_each_record_bad_header() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_fastq(&dir, "bad.fastq", "NOT_HEADER\nACGT\n+\nIIII\n");
+        let result = for_each_record(&path, |_| Ok(()));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn for_each_record_gzip() {
+        let dir = tempfile::tempdir().unwrap();
+        let content = "@gz1\nACGT\n+\nIIII\n@gz2\nTTTT\n+\n!!!!\n";
+        let path = write_fastq_gz(&dir, "foreach.fastq.gz", content);
+        let mut count = 0_usize;
+        for_each_record(&path, |r: FastqRefRecord<'_>| {
+            if count == 0 {
+                assert_eq!(r.id, "gz1");
+                assert_eq!(r.sequence, b"ACGT");
+            } else {
+                assert_eq!(r.id, "gz2");
+                assert_eq!(r.sequence, b"TTTT");
+            }
+            count += 1;
+            Ok(())
+        })
+        .unwrap();
+        assert_eq!(count, 2);
     }
 
     #[test]

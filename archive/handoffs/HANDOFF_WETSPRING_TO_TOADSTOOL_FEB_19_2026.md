@@ -1,6 +1,6 @@
 # Handoff: wetSpring → ToadStool / BarraCUDA Team
 
-> **SUPERSEDED** by [`HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_20_2026.md`](HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_20_2026.md)
+> **SUPERSEDED** by [`HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_21_2026.md`](../../HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_21_2026.md)
 > (v4 — ToadStool evolution review, updated remaining requests and shader designs).
 
 **Date:** February 19, 2026

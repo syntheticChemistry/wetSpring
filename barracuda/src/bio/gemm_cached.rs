@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! `GemmCached` — pre-compiled GEMM pipeline + buffer pool.
 //!
-//! Uses `GemmF64::WGSL` from ToadStool's barracuda crate (no cross-repo
+//! Uses `GemmF64::WGSL` from `ToadStool`'s barracuda crate (no cross-repo
 //! `include_str!`). Hoists shader compilation to `new()` and reuses the
-//! pipeline across dispatches. Data buffers via ToadStool's `BufferPool`.
+//! pipeline across dispatches. Data buffers via `ToadStool`'s `BufferPool`.
 
 use crate::error::{Error, Result};
 use barracuda::device::{BufferPool, PooledBuffer, TensorContext, WgpuDevice};

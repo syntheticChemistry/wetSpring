@@ -11,6 +11,7 @@ keywords = ["bioinformatics", "mass-spectrometry", "pfas", "gpu", "wgsl"]
 categories = ["science", "command-line-utilities"]
 
 [workspace]
+members = ["fuzz"]
 
 [features]
 default = []

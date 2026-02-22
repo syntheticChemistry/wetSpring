@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
-**Last Updated**: February 21, 2026
-**Status**: Phase 18 — 1,291/1,291 CPU + 451/451 GPU = 1,742/1,742 checks, ALL PASS
+**Last Updated**: February 22, 2026
+**Status**: Phase 19 — 1,291/1,291 CPU + 451/451 GPU = 1,742/1,742 checks, ALL PASS
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -15,14 +15,14 @@
 | BarraCUDA CPU parity | 157/157 — 22.5x Rust speedup over Python |
 | BarraCUDA GPU parity | 8 consolidated domains (Exp064) — pure GPU math proven |
 | metalForge cross-system | 8 domains CPU↔GPU proven (Exp065) — substrate-independent |
-| Rust modules | 41 CPU + 20 GPU, 650 tests (97% bio+io coverage) |
+| Rust modules | 41 CPU + 20 GPU, 702 tests (96.21% coverage) |
 | Dependencies | 1 runtime (flate2), everything else sovereign |
 | Paper queue | **ALL DONE** — 29/29 reproducible papers complete (Track 1c added) |
 | Faculty (Track 1) | Waters (MMG, MSU), Cahill (Sandia), Smallwood (Sandia) |
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
 | Faculty (Track 1c) | R. Anderson (Carleton) — deep-sea metagenomics, population genomics |
 | Faculty (Track 2) | Jones (BMB/Chemistry, MSU) — PFAS mass spectrometry |
-| Handoffs | Six delivered (Feb 16, 17, 19 v1-v3, 20 v4-v5) |
+| Handoffs | Seven delivered (Feb 16, 17, 19 v1-v3, 20 v4-v5, 21 v6) |
 
 ---
 
@@ -42,7 +42,7 @@
 | CONTROL_EXPERIMENT_STATUS.md | `../` | 76 experiments, 1,742 validation checks |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
-| HANDOFF (v5) | `../` | Current consolidated ToadStool handoff |
+| HANDOFF (v6) | `../` | Current consolidated ToadStool handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |
@@ -86,7 +86,7 @@
 `../whitePaper/STUDY.md` → `../CONTROL_EXPERIMENT_STATUS.md` → `../barracuda/EVOLUTION_READINESS.md` → BARRACUDA_REQUIREMENTS.md
 
 **Integration partner**:
-`../HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_20_2026.md` → `../BENCHMARK_RESULTS.md`
+`../HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_21_2026.md` → `../BENCHMARK_RESULTS.md`
 
 ---
 

@@ -6,4 +6,4 @@
 pub mod fastq;
 pub mod ms2;
 pub mod mzml;
-pub(crate) mod xml;
+pub mod xml;

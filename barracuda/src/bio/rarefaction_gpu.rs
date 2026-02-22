@@ -25,6 +25,10 @@ use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
 use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
 
+/// Minimum species count to justify GPU rarefaction dispatch.
+///
+/// Below 50 species, CPU bootstrap is faster than GPU dispatch +
+/// buffer transfer. Determined empirically on RTX 4070 (Exp066).
 const GPU_MIN_SPECIES: usize = 50;
 const DEFAULT_BOOTSTRAP_N: usize = 1000;
 
@@ -299,5 +303,39 @@ pub fn batch_rarefaction_gpu(
 
 #[cfg(test)]
 mod tests {
-    // GPU tests require hardware; integration tests in validate_diversity_gpu.rs
+    use super::*;
+
+    /// Single-species community: every bootstrap replicate yields the same
+    /// rarefied vector, so Shannon=0, Simpson=0, observed=1 deterministically.
+    #[tokio::test]
+    #[ignore] // requires GPU hardware (or CPU path for n < 50, but still needs async)
+    async fn known_value_single_species_shannon_simpson_observed() {
+        let gpu = crate::gpu::GpuF64::new().await.expect("GPU init");
+        if !gpu.has_f64 {
+            return; // skip if no f64 support
+        }
+        // Single species: all counts in one bin
+        let counts = vec![100.0];
+        let params = RarefactionGpuParams {
+            depth: Some(50),
+            ..Default::default()
+        };
+        let result = rarefaction_bootstrap_gpu(&gpu, &counts, &params).unwrap();
+        // Deterministic: every subsample gives [50.0], so Shannon=0, Simpson=0, observed=1
+        assert!(
+            result.shannon.mean.abs() < 1e-10,
+            "Shannon single-species: got {}",
+            result.shannon.mean
+        );
+        assert!(
+            result.simpson.mean.abs() < 1e-10,
+            "Simpson single-species: got {}",
+            result.simpson.mean
+        );
+        assert!(
+            (result.observed.mean - 1.0).abs() < 1e-10,
+            "Observed single-species: got {}",
+            result.observed.mean
+        );
+    }
 }

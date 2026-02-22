@@ -1,6 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::too_many_lines, clippy::cast_precision_loss)]
-//! Exp071: BarraCUDA GPU — Full Math Portability Proof
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::too_many_lines
+)]
+//! Exp071: `BarraCUDA` GPU — Full Math Portability Proof
 //!
 //! Consolidates all GPU-eligible domains into one definitive binary.
 //! Proves: same Rust math, same answers, different substrate.

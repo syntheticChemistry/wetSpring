@@ -36,6 +36,16 @@
 //!
 //! Run: `cargo run --features gpu --release --bin validate_16s_pipeline_gpu`
 
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::useless_let_if_seq,
+    clippy::option_if_let_else
+)]
+
 use std::path::Path;
 use std::time::Instant;
 use wetspring_barracuda::bio::chimera::{self, ChimeraParams};
@@ -45,9 +55,8 @@ use wetspring_barracuda::bio::derep::{self, DerepSort};
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::bio::quality::{self, QualityParams};
 use wetspring_barracuda::bio::streaming_gpu::GpuPipelineSession;
-use wetspring_barracuda::bio::taxonomy::{
-    ClassifyParams, Lineage, NaiveBayesClassifier, ReferenceSeq, TaxRank,
-};
+use wetspring_barracuda::bio::taxonomy::{ClassifyParams, NaiveBayesClassifier, TaxRank};
+use wetspring_barracuda::bio::validation_helpers;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::io::fastq::FastqRecord;
 use wetspring_barracuda::tolerances;
@@ -95,7 +104,7 @@ async fn main() {
     let base = validation::data_dir("WETSPRING_PUBLIC_DIR", "data/public_benchmarks");
     let ref_dir = validation::data_dir("WETSPRING_REF_DIR", "data/reference_dbs/silva_138");
 
-    let classifier = load_silva_classifier(&ref_dir);
+    let classifier = validation_helpers::load_silva_classifier(&ref_dir);
 
     // ── Timing accumulators ─────────────────────────────────────────────────
     let mut cpu_total_ms = 0.0_f64;
@@ -295,15 +304,9 @@ fn process_sample_gpu_vs_cpu(
             });
     let gpu_qf_ms = gpu_t.elapsed().as_secs_f64() * 1000.0;
 
-    v.check(
+    v.check_pass(
         &format!("{label}: QF read count CPU == GPU"),
-        if cpu_filtered.len() == gpu_filtered.len() {
-            1.0
-        } else {
-            0.0
-        },
-        1.0,
-        0.0,
+        cpu_filtered.len() == gpu_filtered.len(),
     );
     println!(
         "  {label} QF: CPU={} GPU={} reads ({:.1}ms / {:.1}ms)",
@@ -345,27 +348,15 @@ fn process_sample_gpu_vs_cpu(
         });
     let gpu_dada2_ms = gpu_t.elapsed().as_secs_f64() * 1000.0;
 
-    v.check(
+    v.check_pass(
         &format!("{label}: DADA2 ASV count CPU ≈ GPU"),
-        if cpu_asvs.len() == gpu_asvs.len() {
-            1.0
-        } else {
-            0.0
-        },
-        1.0,
-        0.0,
+        cpu_asvs.len() == gpu_asvs.len(),
     );
     let cpu_dada2_reads: usize = cpu_asvs.iter().map(|a| a.abundance).sum();
     let gpu_dada2_reads: usize = gpu_asvs.iter().map(|a| a.abundance).sum();
-    v.check(
+    v.check_pass(
         &format!("{label}: DADA2 total reads CPU == GPU"),
-        if cpu_dada2_reads == gpu_dada2_reads {
-            1.0
-        } else {
-            0.0
-        },
-        1.0,
-        0.0,
+        cpu_dada2_reads == gpu_dada2_reads,
     );
     println!(
         "  {label} DADA2: CPU={} ASVs ({:.1}ms) GPU={} ASVs ({:.1}ms)",
@@ -395,25 +386,13 @@ fn process_sample_gpu_vs_cpu(
             });
         gpu_chimera_ms = gpu_t.elapsed().as_secs_f64() * 1000.0;
 
-        v.check(
+        v.check_pass(
             &format!("{label}: chimera count CPU == GPU"),
-            if cpu_cstats.chimeras_found == gpu_cstats.chimeras_found {
-                1.0
-            } else {
-                0.0
-            },
-            1.0,
-            0.0,
+            cpu_cstats.chimeras_found == gpu_cstats.chimeras_found,
         );
-        v.check(
+        v.check_pass(
             &format!("{label}: chimera retained CPU == GPU"),
-            if cpu_cstats.retained == gpu_cstats.retained {
-                1.0
-            } else {
-                0.0
-            },
-            1.0,
-            0.0,
+            cpu_cstats.retained == gpu_cstats.retained,
         );
         println!(
             "  {label} chimera: CPU={}/{} GPU={}/{} ({:.1}ms / {:.1}ms)",
@@ -438,11 +417,9 @@ fn process_sample_gpu_vs_cpu(
         } else {
             1.0
         };
-        v.check(
+        v.check_pass(
             &format!("{label}: chimera decision agreement > 95%"),
-            if chimera_agreement > 0.95 { 1.0 } else { 0.0 },
-            1.0,
-            0.0,
+            chimera_agreement > 0.95,
         );
         println!(
             "  {label} chimera agreement: {:.1}% ({}/{})",
@@ -472,7 +449,7 @@ fn process_sample_gpu_vs_cpu(
             gpu_cstats.chimeras_found, gpu_cstats.input_sequences, gpu_chimera_ms,
         );
 
-        v.check(&format!("{label}: GPU chimera completes"), 1.0, 1.0, 0.0);
+        v.check_pass(&format!("{label}: GPU chimera completes"), true);
 
         clean_asvs = gpu_chimera_results
             .iter()
@@ -554,23 +531,17 @@ fn process_sample_gpu_vs_cpu(
     let simpson_diff = (cpu_simpson - gpu_simpson).abs();
     let observed_diff = (cpu_observed - gpu_observed).abs();
 
-    v.check(
+    v.check_pass(
         &format!("{label}: Shannon CPU ≈ GPU (tol {tol:.0e})"),
-        if shannon_diff <= tol { 1.0 } else { 0.0 },
-        1.0,
-        0.0,
+        shannon_diff <= tol,
     );
-    v.check(
+    v.check_pass(
         &format!("{label}: Simpson CPU ≈ GPU (tol {tol:.0e})"),
-        if simpson_diff <= tol { 1.0 } else { 0.0 },
-        1.0,
-        0.0,
+        simpson_diff <= tol,
     );
-    v.check(
+    v.check_pass(
         &format!("{label}: observed CPU ≈ GPU (tol {tol:.0e})"),
-        if observed_diff <= tol { 1.0 } else { 0.0 },
-        1.0,
-        0.0,
+        observed_diff <= tol,
     );
 
     println!(
@@ -593,15 +564,9 @@ fn process_sample_gpu_vs_cpu(
                 taxa_match += 1;
             }
         }
-        v.check(
+        v.check_pass(
             &format!("{label}: taxonomy genus agreement CPU == GPU"),
-            if taxa_match == cpu_tax_results.len() {
-                1.0
-            } else {
-                0.0
-            },
-            1.0,
-            0.0,
+            taxa_match == cpu_tax_results.len(),
         );
         println!(
             "  {label} taxonomy: {}/{} genus match (CPU {:.1}ms / GPU GEMM {:.1}ms)",
@@ -707,82 +672,6 @@ fn run_scaling_benchmark(session: &GpuPipelineSession, classifier: &NaiveBayesCl
     }
 
     println!();
-}
-
-// ── SILVA database loading ──────────────────────────────────────────────────
-
-fn load_silva_classifier(ref_dir: &Path) -> Option<NaiveBayesClassifier> {
-    let fasta_path = ref_dir.join("silva_138_99_seqs.fasta");
-    let tax_path = ref_dir.join("silva_138_99_taxonomy.tsv");
-
-    if !fasta_path.exists() || !tax_path.exists() {
-        println!("  [INFO] SILVA not found — taxonomy checks will be skipped");
-        return None;
-    }
-
-    println!("  Loading SILVA 138.1 NR99...");
-    let tax_content = std::fs::read_to_string(&tax_path).ok()?;
-    let mut tax_map = std::collections::HashMap::new();
-    for line in tax_content.lines().skip(1) {
-        let parts: Vec<&str> = line.splitn(2, '\t').collect();
-        if parts.len() == 2 {
-            tax_map.insert(parts[0].to_string(), parts[1].trim().to_string());
-        }
-    }
-
-    let fasta_content = std::fs::read_to_string(&fasta_path).ok()?;
-    let mut refs = Vec::new();
-    let mut current_id = String::new();
-    let mut current_seq: Vec<u8> = Vec::new();
-    let mut n_parsed = 0_usize;
-
-    for line in fasta_content.lines() {
-        if let Some(header) = line.strip_prefix('>') {
-            if !current_id.is_empty() && !current_seq.is_empty() {
-                n_parsed += 1;
-                if n_parsed % 87 == 0 {
-                    if let Some(tax) = tax_map.get(&current_id) {
-                        refs.push(ReferenceSeq {
-                            id: current_id.clone(),
-                            sequence: current_seq.clone(),
-                            lineage: Lineage::from_taxonomy_string(tax),
-                        });
-                    }
-                }
-            }
-            current_id = header.split_whitespace().next().unwrap_or("").to_string();
-            current_seq.clear();
-        } else {
-            current_seq.extend(
-                line.trim()
-                    .bytes()
-                    .filter(u8::is_ascii_alphabetic)
-                    .map(|b| b.to_ascii_uppercase()),
-            );
-        }
-    }
-    if !current_id.is_empty() && !current_seq.is_empty() {
-        n_parsed += 1;
-        if n_parsed % 87 == 0 {
-            if let Some(tax) = tax_map.get(&current_id) {
-                refs.push(ReferenceSeq {
-                    id: current_id,
-                    sequence: current_seq,
-                    lineage: Lineage::from_taxonomy_string(tax),
-                });
-            }
-        }
-    }
-
-    println!("  Subsampled {} refs from {} total", refs.len(), n_parsed);
-    if refs.is_empty() {
-        return None;
-    }
-
-    println!("  Training NaiveBayes (k=8)...");
-    let classifier = NaiveBayesClassifier::train(&refs, 8);
-    println!("  Classifier ready: {} taxa\n", classifier.n_taxa());
-    Some(classifier)
 }
 
 // ── Gzipped FASTQ decompression ─────────────────────────────────────────────

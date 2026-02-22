@@ -5,7 +5,7 @@
 //! through the same HMM model, with one thread per sequence.
 //!
 //! Uses a local WGSL shader (`hmm_forward_f64.wgsl`) with native f64
-//! — a ToadStool absorption candidate following Write → Absorb → Lean.
+//! — a `ToadStool` absorption candidate following Write → Absorb → Lean.
 //!
 //! # GPU Strategy
 //!
@@ -23,8 +23,12 @@ use super::hmm::HmmModel;
 
 const HMM_WGSL: &str = include_str!("../shaders/hmm_forward_f64.wgsl");
 
+/// Workgroup size — must match `@workgroup_size(N)` in `shaders/hmm_forward_f64.wgsl`.
+const WORKGROUP_SIZE: u32 = 256;
+
 #[repr(C)]
 #[derive(Copy, Clone, Pod, Zeroable)]
+#[allow(clippy::struct_field_names)]
 struct HmmParams {
     n_states: u32,
     n_symbols: u32,
@@ -32,6 +36,7 @@ struct HmmParams {
     n_seqs: u32,
 }
 
+/// GPU-accelerated HMM batch forward algorithm.
 pub struct HmmGpuForward {
     device: Arc<WgpuDevice>,
     pipeline: wgpu::ComputePipeline,
@@ -44,12 +49,17 @@ pub struct HmmGpuResult {
     pub log_alpha: Vec<f64>,
     /// Per-sequence log-likelihoods: `[n_seqs]`.
     pub log_likelihoods: Vec<f64>,
+    /// Number of sequences.
     pub n_seqs: usize,
+    /// Number of time steps per sequence.
     pub n_steps: usize,
+    /// Number of HMM states.
     pub n_states: usize,
 }
 
 impl HmmGpuForward {
+    /// Create a new HMM GPU forward instance.
+    #[must_use]
     pub fn new(device: &Arc<WgpuDevice>) -> Self {
         let patched = ShaderTemplate::for_driver_auto(HMM_WGSL, true);
         let module = device.compile_shader(&patched, Some("HmmForwardF64"));
@@ -61,7 +71,7 @@ impl HmmGpuForward {
                 module: &module,
                 entry_point: "main",
                 cache: None,
-                compilation_options: Default::default(),
+                compilation_options: wgpu::PipelineCompilationOptions::default(),
             });
         let bgl = pipeline.get_bind_group_layout(0);
         Self {
@@ -75,6 +85,10 @@ impl HmmGpuForward {
     ///
     /// All sequences must have the same length `n_steps`.
     /// `observations` is row-major `[n_seqs × n_steps]` with symbol indices.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` if GPU dispatch or buffer readback fails.
     pub fn forward_batch(
         &self,
         model: &HmmModel,
@@ -175,7 +189,7 @@ impl HmmGpuForward {
             let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor::default());
             pass.set_pipeline(&self.pipeline);
             pass.set_bind_group(0, &bg, &[]);
-            let n_workgroups = (n_seqs as u32).div_ceil(256);
+            let n_workgroups = (n_seqs as u32).div_ceil(WORKGROUP_SIZE);
             pass.dispatch_workgroups(n_workgroups, 1, 1);
         }
 

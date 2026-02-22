@@ -1,5 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::too_many_lines, clippy::cast_precision_loss)]
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::too_many_lines
+)]
 //! Exp076: metalForge Cross-Substrate Pipeline
 //!
 //! Demonstrates a heterogeneous compute pipeline across GPU, NPU, and CPU:
@@ -8,7 +15,7 @@
 //! - Stage 3 (CPU): aggregation and summary
 //!
 //! Profiles per-stage and per-transition latency to characterize the
-//! mixed-hardware pipeline for ToadStool absorption.
+//! mixed-hardware pipeline for `ToadStool` absorption.
 //!
 //! # Provenance
 //!
@@ -55,6 +62,7 @@ struct StageLatency {
 }
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 struct SampleResult {
     shannon: f64,
     simpson: f64,

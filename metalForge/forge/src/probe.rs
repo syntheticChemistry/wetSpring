@@ -7,7 +7,7 @@
 //! directly from the Vulkan/wgpu layer — no sysfs reimplementation needed.
 //!
 //! NPU discovery is local (probing `/dev/akida*`). This is evolution that
-//! ToadStool can absorb once NPU substrate support matures upstream.
+//! `ToadStool` can absorb once NPU substrate support matures upstream.
 //!
 //! CPU discovery reads `/proc/cpuinfo` and `/proc/meminfo`.
 
@@ -19,6 +19,7 @@ use std::fs;
 /// Uses the same wgpu instance/backend configuration that barracuda uses.
 /// Each adapter becomes a substrate with capabilities derived from its
 /// feature flags (`SHADER_F64` → [`Capability::F64Compute`], etc.).
+#[must_use]
 pub fn probe_gpus() -> Vec<Substrate> {
     let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
         backends: wgpu::Backends::all(),
@@ -71,6 +72,7 @@ pub fn probe_gpus() -> Vec<Substrate> {
 }
 
 /// Probe CPU via `/proc/cpuinfo` and `/proc/meminfo`.
+#[must_use]
 pub fn probe_cpu() -> Substrate {
     let cpuinfo = fs::read_to_string("/proc/cpuinfo").unwrap_or_default();
     let (model, cores, threads, cache_kb, has_avx2) = parse_cpuinfo(&cpuinfo);
@@ -100,9 +102,10 @@ pub fn probe_cpu() -> Substrate {
 
 /// Probe for NPU devices.
 ///
-/// Currently discovers BrainChip AKD1000 via `/dev/akida0`. This is local
-/// evolution — ToadStool doesn't have NPU substrate support yet, so we
-/// probe directly. Once ToadStool absorbs NPU dispatch, we lean on that.
+/// Currently discovers `BrainChip` AKD1000 via `/dev/akida0`. This is local
+/// evolution — `ToadStool` doesn't have NPU substrate support yet, so we
+/// probe directly. Once `ToadStool` absorbs NPU dispatch, we lean on that.
+#[must_use]
 pub fn probe_npus() -> Vec<Substrate> {
     let mut npus = Vec::new();
 
@@ -130,9 +133,7 @@ pub fn probe_npus() -> Vec<Substrate> {
 }
 
 /// Parse `/proc/cpuinfo` content into (model, cores, threads, `cache_kb`, `has_avx2`).
-fn parse_cpuinfo(
-    content: &str,
-) -> (Option<String>, Option<u32>, Option<u32>, Option<u32>, bool) {
+fn parse_cpuinfo(content: &str) -> (Option<String>, Option<u32>, Option<u32>, Option<u32>, bool) {
     let mut model = None;
     let mut cores = None;
     let mut siblings = None;

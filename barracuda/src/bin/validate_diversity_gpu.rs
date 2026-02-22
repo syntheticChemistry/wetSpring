@@ -1,4 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::many_single_char_names
+)]
 //! GPU validation — compare all GPU results against CPU baselines.
 //!
 //! # Provenance
@@ -211,7 +219,6 @@ fn validate_bray_curtis(gpu: &GpuF64, v: &mut Validator) {
     {
         let n = 10;
         let d = 50;
-        #[allow(clippy::cast_precision_loss)] // deterministic test data generation
         let samples: Vec<Vec<f64>> = (0..n)
             .map(|i| {
                 (0..d)

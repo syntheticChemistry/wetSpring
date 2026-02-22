@@ -4,7 +4,7 @@
 //! One thread per sequence pair — embarrassingly parallel. Each thread
 //! walks the alignment, counts identical non-gap bases, and divides.
 //!
-//! Uses a local WGSL shader (`ani_batch_f64.wgsl`) — a ToadStool
+//! Uses a local WGSL shader (`ani_batch_f64.wgsl`) — a `ToadStool`
 //! absorption candidate following Write → Absorb → Lean.
 //!
 //! # GPU Strategy
@@ -20,6 +20,9 @@ use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
 const ANI_WGSL: &str = include_str!("../shaders/ani_batch_f64.wgsl");
+
+/// Workgroup size — must match `@workgroup_size(N)` in `shaders/ani_batch_f64.wgsl`.
+const WORKGROUP_SIZE: u32 = 256;
 
 #[repr(C)]
 #[derive(Copy, Clone, Pod, Zeroable)]
@@ -38,6 +41,7 @@ pub struct AniGpuResult {
     pub identical_counts: Vec<u32>,
 }
 
+/// GPU-accelerated batch ANI computation.
 pub struct AniGpu {
     device: Arc<WgpuDevice>,
     pipeline: wgpu::ComputePipeline,
@@ -45,6 +49,8 @@ pub struct AniGpu {
 }
 
 impl AniGpu {
+    /// Create a new ANI GPU compute instance.
+    #[must_use]
     pub fn new(device: &Arc<WgpuDevice>) -> Self {
         let patched = ShaderTemplate::for_driver_auto(ANI_WGSL, false);
         let module = device.compile_shader(&patched, Some("AniBatchF64"));
@@ -56,7 +62,7 @@ impl AniGpu {
                 module: &module,
                 entry_point: "main",
                 cache: None,
-                compilation_options: Default::default(),
+                compilation_options: wgpu::PipelineCompilationOptions::default(),
             });
         let bgl = pipeline.get_bind_group_layout(0);
         Self {
@@ -70,6 +76,10 @@ impl AniGpu {
     ///
     /// Sequences are `(seq_a, seq_b)` pairs of equal-length byte slices.
     /// Bases: A/C/G/T as ASCII. Gaps (`-`, `.`) and `N` are excluded.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` if GPU dispatch or buffer readback fails.
     #[allow(clippy::cast_possible_truncation)]
     pub fn batch_ani(&self, pairs: &[(&[u8], &[u8])]) -> crate::error::Result<AniGpuResult> {
         let n_pairs = pairs.len();
@@ -94,7 +104,6 @@ impl AniGpu {
                 b'G' => 2,
                 b'T' => 3,
                 b'-' | b'.' => 4,
-                b'N' => 5,
                 _ => 5,
             }
         };
@@ -119,6 +128,47 @@ impl AniGpu {
             max_seq_len: max_seq_len as u32,
         };
 
+        let buffers =
+            self.create_buffers_and_bind_group(d, params, &seq_a_flat, &seq_b_flat, n_pairs);
+
+        let mut encoder = d.create_command_encoder(&wgpu::CommandEncoderDescriptor {
+            label: Some("ANI batch"),
+        });
+        {
+            let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor::default());
+            pass.set_pipeline(&self.pipeline);
+            pass.set_bind_group(0, &buffers.bind_group, &[]);
+            pass.dispatch_workgroups((n_pairs as u32).div_ceil(WORKGROUP_SIZE), 1, 1);
+        }
+
+        dev.queue().submit(Some(encoder.finish()));
+        d.poll(wgpu::Maintain::Wait);
+
+        let ani_values = dev
+            .read_buffer_f64(&buffers.ani_buf, n_pairs)
+            .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
+        let aligned_counts = dev
+            .read_buffer_u32(&buffers.aligned_buf, n_pairs)
+            .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
+        let identical_counts = dev
+            .read_buffer_u32(&buffers.identical_buf, n_pairs)
+            .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
+
+        Ok(AniGpuResult {
+            ani_values,
+            aligned_counts,
+            identical_counts,
+        })
+    }
+
+    fn create_buffers_and_bind_group(
+        &self,
+        d: &wgpu::Device,
+        params: AniGpuParams,
+        seq_a_flat: &[u32],
+        seq_b_flat: &[u32],
+        n_pairs: usize,
+    ) -> AniBatchBuffers {
         let params_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("ANI params"),
             contents: bytemuck::bytes_of(&params),
@@ -126,12 +176,12 @@ impl AniGpu {
         });
         let seq_a_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("ANI seq_a"),
-            contents: bytemuck::cast_slice(&seq_a_flat),
+            contents: bytemuck::cast_slice(seq_a_flat),
             usage: wgpu::BufferUsages::STORAGE,
         });
         let seq_b_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("ANI seq_b"),
-            contents: bytemuck::cast_slice(&seq_b_flat),
+            contents: bytemuck::cast_slice(seq_b_flat),
             usage: wgpu::BufferUsages::STORAGE,
         });
         let ani_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
@@ -149,8 +199,7 @@ impl AniGpu {
             contents: bytemuck::cast_slice(&vec![0u32; n_pairs]),
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
         });
-
-        let bg = d.create_bind_group(&wgpu::BindGroupDescriptor {
+        let bind_group = d.create_bind_group(&wgpu::BindGroupDescriptor {
             label: None,
             layout: &self.bgl,
             entries: &[
@@ -180,34 +229,24 @@ impl AniGpu {
                 },
             ],
         });
-
-        let mut encoder = d.create_command_encoder(&wgpu::CommandEncoderDescriptor {
-            label: Some("ANI batch"),
-        });
-        {
-            let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor::default());
-            pass.set_pipeline(&self.pipeline);
-            pass.set_bind_group(0, &bg, &[]);
-            pass.dispatch_workgroups((n_pairs as u32).div_ceil(256), 1, 1);
+        AniBatchBuffers {
+            _params_buf: params_buf,
+            _seq_a_buf: seq_a_buf,
+            _seq_b_buf: seq_b_buf,
+            ani_buf,
+            aligned_buf,
+            identical_buf,
+            bind_group,
         }
-
-        dev.queue().submit(Some(encoder.finish()));
-        d.poll(wgpu::Maintain::Wait);
-
-        let ani_values = dev
-            .read_buffer_f64(&ani_buf, n_pairs)
-            .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
-        let aligned_counts = dev
-            .read_buffer_u32(&aligned_buf, n_pairs)
-            .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
-        let identical_counts = dev
-            .read_buffer_u32(&identical_buf, n_pairs)
-            .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
-
-        Ok(AniGpuResult {
-            ani_values,
-            aligned_counts,
-            identical_counts,
-        })
     }
+}
+
+struct AniBatchBuffers {
+    _params_buf: wgpu::Buffer,
+    _seq_a_buf: wgpu::Buffer,
+    _seq_b_buf: wgpu::Buffer,
+    ani_buf: wgpu::Buffer,
+    aligned_buf: wgpu::Buffer,
+    identical_buf: wgpu::Buffer,
+    bind_group: wgpu::BindGroup,
 }

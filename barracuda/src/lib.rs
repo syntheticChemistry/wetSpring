@@ -47,6 +47,9 @@
 //!   `VarianceF64`, `CorrelationF64`, `CovarianceF64`, `WeightedDotF64`
 //! - [`tolerances`] — Centralized validation tolerances (CPU, GPU vs CPU)
 //!
+//! # Shared Mathematics
+//! - [`special`] — Error function, gamma, regularized gamma (sovereign, no libm)
+//!
 //! # Evolution path
 //!
 //! ```text
@@ -60,5 +63,6 @@ pub mod error;
 #[cfg(feature = "gpu")]
 pub mod gpu;
 pub mod io;
+pub mod special;
 pub mod tolerances;
 pub mod validation;

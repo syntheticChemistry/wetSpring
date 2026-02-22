@@ -1,5 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::too_many_lines, clippy::cast_precision_loss)]
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::too_many_lines
+)]
 //! Exp065: metalForge Full Cross-System Validation
 //!
 //! Extends Exp060 (Track 1c only) to ALL GPU-eligible domains. For each
@@ -450,10 +457,7 @@ async fn main() {
     );
     println!("  {}", "─".repeat(72));
     for (name, cpu, gpu_t, result) in &timings {
-        println!(
-            "  {:<40} {:>10.0} {:>10.0} {:>10}",
-            name, cpu, gpu_t, result
-        );
+        println!("  {name:<40} {cpu:>10.0} {gpu_t:>10.0} {result:>10}");
     }
     println!("  {}", "─".repeat(72));
     let total_cpu: f64 = timings.iter().map(|(_, c, _, _)| c).sum();

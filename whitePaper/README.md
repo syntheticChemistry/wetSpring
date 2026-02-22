@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
-**Date:** February 21, 2026
-**Status:** Validation study complete — 1,742/1,742 checks, 650 tests, 97% bio+io coverage (56% overall), 76 experiments
+**Date:** February 22, 2026
+**Status:** Validation study complete — 1,742/1,742 checks, 702 tests, 96.21% line coverage, 76 experiments
 **License:** AGPL-3.0-or-later
 
 ---
@@ -213,7 +213,7 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCUDA/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34 WGSL shaders, 454 tests)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (9 WGSL shaders, 650 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (9 WGSL shaders, 702 tests)
 - **archive/handoffs/** — Fossil record of ToadStool handoffs (v1–v4)
 
 Springs follow the **Write → Absorb → Lean** pattern (pioneered by hotSpring):
@@ -229,10 +229,10 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy --pedantic --nursery` | 0 warnings |
 | `cargo doc --no-deps` | 0 warnings |
-| Line coverage (`cargo-llvm-cov`) | **97% bio+io (56% overall)** |
+| Line coverage (`cargo-llvm-cov`) | **96.21% overall (22,036 lines)** |
 | `#![forbid(unsafe_code)]` | Enforced crate-wide |
 | `#![deny(clippy::expect_used, clippy::unwrap_used)]` | Enforced crate-wide |
-| Named tolerance constants | 32 (all scientifically justified) |
+| Named tolerance constants | 37 (all scientifically justified) |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` files |
@@ -250,8 +250,9 @@ following hotSpring's `metalForge/forge/` pattern:
 | `probe.rs` | GPU (wgpu), CPU (`/proc`), NPU (`/dev/akida*`) |
 | `inventory.rs` | Unified discovery |
 | `dispatch.rs` | Capability-based routing (GPU > NPU > CPU) |
+| `bridge.rs` | Forge substrate ↔ barracuda `WgpuDevice` bridge |
 
-24 tests, clippy clean, `#![forbid(unsafe_code)]`.
+29 tests, clippy clean, `#![forbid(unsafe_code)]`.
 
 ---
 

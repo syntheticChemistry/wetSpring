@@ -4,9 +4,9 @@
 faithfully ported to BarraCUDA (Rust) and eventually promoted to ToadStool
 (GPU shaders), then shown substrate-independent via metalForge.
 
-**Date:** February 21, 2026
+**Date:** February 22, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 18 — Streaming Dispatch + Cross-Substrate Validation + Handoff v6
+**Status:** Phase 19 — Absorption Engineering + Debt Resolution + metalForge Bridge
 
 ---
 
@@ -38,11 +38,11 @@ Four tracks cover the life science and environmental monitoring domains:
 | Validation checks (CPU) | 1,291 |
 | Validation checks (GPU) | 451 |
 | **Total validation checks** | **1,742** |
-| Rust library unit tests | 587 (+ 1 ignored — hardware-dependent) |
-| Integration tests | 50 |
-| Rust doc-tests | 13 |
-| **Total Rust tests** | **650** |
-| Line coverage (`cargo-llvm-cov`) | **97% bio+io modules (55% overall including bench)** |
+| Rust library unit tests | 628 (+ 1 ignored — hardware-dependent) |
+| Integration tests | 60 (23 bio + 16 determinism + 21 I/O) |
+| Rust doc-tests | 14 |
+| **Total Rust tests** | **702** |
+| Line coverage (`cargo-llvm-cov`) | **96.21% overall (22,036 lines measured)** |
 | Experiments completed | 76 |
 | Validation/benchmark binaries | 50 CPU + 18 GPU validate + 5 benchmark = 73 total |
 | CPU bio modules | 41 |
@@ -54,7 +54,7 @@ Four tracks cover the life science and environmental monitoring domains:
 | ToadStool primitives | 15 (inc. 4 bio: Felsenstein, Gillespie, SW, TreeInference) |
 | Local WGSL shaders | 9 (Write → Absorb → Lean candidates) |
 
-All 1,742 validation checks **PASS**. All 650 tests **PASS**.
+All 1,742 validation checks **PASS**. All 702 tests **PASS**.
 
 ### GPU Performance
 
@@ -132,7 +132,7 @@ characterization. wetSpring writes extensions, ToadStool absorbs, we lean.
 Comprehensive audit and evolution of the codebase:
 - Crate-level `clippy::pedantic` + `clippy::nursery` lints enforced (0 warnings)
 - `rustfmt.toml` with `max_width = 100` enforced across all 151 source files
-- All inline tolerance literals replaced with 32 named constants in `tolerances.rs`
+- All inline tolerance literals replaced with named constants in `tolerances.rs`
 - All 73 validation/benchmark binaries carry structured `# Provenance` headers
 - All data paths use `validation::data_dir()` for capability-based discovery
 - `flate2` explicitly uses `rust_backend` (no C dependencies, ecoBin compliant)
@@ -171,10 +171,10 @@ Evolving Rust implementations for ToadStool/BarraCUDA team absorption:
 - **Absorption engineering**: Following hotSpring's pattern where Springs write
   extensions as proposals to ToadStool/BarraCUDA, get absorbed, then lean on
   upstream. 9 WGSL shaders + 4 CPU math functions ready for absorption
-- **Code quality gate**: 32 named tolerances, `#![forbid(unsafe_code)]`, 97% bio+io
-  (55% overall) coverage, all 73 binaries with provenance headers — absorption-grade quality
+- **Code quality gate**: named tolerances, `#![forbid(unsafe_code)]`, pedantic clippy,
+  all 73 binaries with provenance headers — absorption-grade quality
 
-### Phase 18: Current — Streaming Dispatch + Cross-Substrate Validation
+### Phase 18: Streaming Dispatch + Cross-Substrate Validation
 Proving the full ToadStool dispatch model and multi-substrate routing:
 - **Exp070/071: Consolidated proofs** — 25-domain CPU (50/50) + 11-domain GPU (24/24)
   in single binaries. Pure Rust math, fully portable.
@@ -192,6 +192,34 @@ Proving the full ToadStool dispatch model and multi-substrate routing:
   binding layouts, dispatch geometry, NVVM driver profile bug, CPU math extraction plan,
   and streaming pipeline findings. See `HANDOFF_WETSPRING_TO_TOADSTOOL_FEB_21_2026.md`.
 
+### Phase 19: Current — Absorption Engineering + Debt Resolution
+
+Deep codebase evolution following hotSpring's absorption patterns:
+
+- **`crate::special` extraction** — sovereign math (`erf`, `ln_gamma`,
+  `regularized_gamma_lower`, `normal_cdf`) promoted from `bio::special` to
+  top-level module, first step toward upstream `barracuda::math` feature
+- **GPU workgroup constants** — all 9 `*_gpu.rs` modules use named
+  `WORKGROUP_SIZE` constants linked to their WGSL shader counterparts
+- **Hardware abstraction** — `HardwareInventory::from_content()` makes
+  `/proc` reads injectable; `parse_peak_rss_mb()` for testable RSS parsing
+- **Absorption batch APIs** — `snp::call_snps_batch`,
+  `quality::filter_reads_flat` + `QualityGpuParams` with `#[repr(C)]`,
+  `pangenome::analyze_batch` — closing PRIMITIVE_MAP absorption gaps
+- **Zero-copy I/O** — `FastqRefRecord` for borrowed iteration, `DecodeBuffer`
+  reuse in mzML, streaming iterators throughout
+- **Determinism suite** — 16 bitwise-exact tests across non-stochastic
+  algorithms using `f64::to_bits()`
+- **Fuzz harnesses** — 4 `cargo-fuzz` targets (FASTQ, mzML, MS2, XML)
+- **Doc strictness** — `-D missing_docs -D rustdoc::broken_intra_doc_links`
+  passes on both default and `gpu` features
+- **metalForge bridge** — `bridge.rs` connecting forge discovery to barracuda
+  device creation (following hotSpring's forge↔barracuda pattern)
+- **ABSORPTION_MANIFEST.md** — tracking absorbed/ready/local modules
+  (following hotSpring's manifest pattern)
+- **Coverage**: 96.21% overall (up from 55%), 702 tests (up from 650),
+  37 named tolerances (up from 32)
+
 ---
 
 ## Code Quality
@@ -201,7 +229,7 @@ Proving the full ToadStool dispatch model and multi-substrate routing:
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy --pedantic --nursery` | Clean (0 warnings) |
 | `cargo doc --no-deps` | Clean (0 warnings) |
-| Line coverage (`cargo-llvm-cov`) | **97% bio+io (55% overall)** |
+| Line coverage (`cargo-llvm-cov`) | **96.21% overall** |
 | `#![forbid(unsafe_code)]` | **Enforced crate-wide** |
 | `#![deny(clippy::expect_used, unwrap_used)]` | **Enforced crate-wide** |
 | TODO/FIXME markers | **0** |
@@ -209,7 +237,7 @@ Proving the full ToadStool dispatch model and multi-substrate routing:
 | SPDX-License-Identifier | All `.rs` files |
 | Max file size | All under 1000 LOC |
 | External C dependencies | **0** (`flate2` uses `rust_backend`) |
-| Named tolerance constants | 32 (scientifically justified, hierarchy-tested) |
+| Named tolerance constants | 37 (scientifically justified, hierarchy-tested) |
 | Provenance headers | All 73 validation/benchmark binaries |
 
 ---
@@ -307,7 +335,8 @@ wetSpring/
 │   ├── ABSORPTION_MANIFEST.md    ← what's absorbed, local, planned (hotSpring pattern)
 │   ├── src/
 │   │   ├── lib.rs               ← crate root (pedantic + nursery lints enforced)
-│   │   ├── tolerances.rs        ← 32 named tolerance constants
+│   │   ├── special.rs           ← sovereign math (erf, ln_gamma, regularized_gamma)
+│   │   ├── tolerances.rs        ← 37 named tolerance constants
 │   │   ├── validation.rs        ← hotSpring validation framework
 │   │   ├── encoding.rs          ← sovereign base64 (zero dependencies)
 │   │   ├── error.rs             ← error types (no external crates)
@@ -320,7 +349,7 @@ wetSpring/
 ├── experiments/                   ← 76 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
-│   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs
+│   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs, bridge.rs
 │   │   └── examples/             ← inventory discovery demo
 │   ├── PRIMITIVE_MAP.md          ← Rust module ↔ ToadStool primitive mapping
 │   ├── ABSORPTION_STRATEGY.md   ← Write → Absorb → Lean methodology + CPU math evolution
@@ -342,7 +371,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (650: 587 lib + 50 integration + 13 doc)
+# Run all tests (702: 628 lib + 60 integration + 14 doc)
 cargo test
 
 # Code quality checks

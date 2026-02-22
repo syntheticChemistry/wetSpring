@@ -5,7 +5,7 @@
 //! frequencies across all sequences at its position and reports
 //! whether the site is polymorphic.
 //!
-//! Uses a local WGSL shader (`snp_calling_f64.wgsl`) — a ToadStool
+//! Uses a local WGSL shader (`snp_calling_f64.wgsl`) — a `ToadStool`
 //! absorption candidate following Write → Absorb → Lean.
 //!
 //! # GPU Strategy
@@ -22,6 +22,9 @@ use wgpu::util::DeviceExt;
 
 const SNP_WGSL: &str = include_str!("../shaders/snp_calling_f64.wgsl");
 
+/// Workgroup size — must match `@workgroup_size(N)` in `shaders/snp_calling_f64.wgsl`.
+const WORKGROUP_SIZE: u32 = 256;
+
 #[repr(C)]
 #[derive(Copy, Clone, Pod, Zeroable)]
 struct SnpGpuParams {
@@ -33,7 +36,7 @@ struct SnpGpuParams {
 
 /// GPU SNP calling result.
 pub struct SnpGpuResult {
-    /// 1 if position is a variant, 0 otherwise. Length = alignment_length.
+    /// 1 if position is a variant, 0 otherwise. Length = `alignment_length`.
     pub is_variant: Vec<u32>,
     /// Reference allele at each position (0=A,1=C,2=G,3=T).
     pub ref_alleles: Vec<u32>,
@@ -43,13 +46,65 @@ pub struct SnpGpuResult {
     pub alt_frequencies: Vec<f64>,
 }
 
+/// GPU-accelerated batch SNP calling.
 pub struct SnpGpu {
     device: Arc<WgpuDevice>,
     pipeline: wgpu::ComputePipeline,
     bgl: wgpu::BindGroupLayout,
 }
 
+struct SnpBuffers {
+    params: wgpu::Buffer,
+    sequences: wgpu::Buffer,
+    variant: wgpu::Buffer,
+    ref_allele: wgpu::Buffer,
+    depth: wgpu::Buffer,
+    alt_freq: wgpu::Buffer,
+}
+
+fn create_snp_buffers(
+    d: &wgpu::Device,
+    params: &SnpGpuParams,
+    flat_seqs: &[u32],
+    aln_len: usize,
+) -> SnpBuffers {
+    SnpBuffers {
+        params: d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("SNP params"),
+            contents: bytemuck::bytes_of(params),
+            usage: wgpu::BufferUsages::UNIFORM,
+        }),
+        sequences: d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("SNP sequences"),
+            contents: bytemuck::cast_slice(flat_seqs),
+            usage: wgpu::BufferUsages::STORAGE,
+        }),
+        variant: d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("SNP is_variant"),
+            contents: bytemuck::cast_slice(&vec![0u32; aln_len]),
+            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+        }),
+        ref_allele: d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("SNP ref_allele"),
+            contents: bytemuck::cast_slice(&vec![0u32; aln_len]),
+            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+        }),
+        depth: d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("SNP depth"),
+            contents: bytemuck::cast_slice(&vec![0u32; aln_len]),
+            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+        }),
+        alt_freq: d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("SNP alt_freq"),
+            contents: bytemuck::cast_slice(&vec![0.0_f64; aln_len]),
+            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+        }),
+    }
+}
+
 impl SnpGpu {
+    /// Create a new SNP GPU instance.
+    #[must_use]
     pub fn new(device: &Arc<WgpuDevice>) -> Self {
         let patched = ShaderTemplate::for_driver_auto(SNP_WGSL, false);
         let module = device.compile_shader(&patched, Some("SnpCallingF64"));
@@ -61,7 +116,7 @@ impl SnpGpu {
                 module: &module,
                 entry_point: "main",
                 cache: None,
-                compilation_options: Default::default(),
+                compilation_options: wgpu::PipelineCompilationOptions::default(),
             });
         let bgl = pipeline.get_bind_group_layout(0);
         Self {
@@ -75,6 +130,10 @@ impl SnpGpu {
     ///
     /// Sequences as byte slices (ASCII A/C/G/T, gaps as `-`/`.`/`N`).
     /// All sequences must have the same length.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` if GPU buffer creation or readback fails.
     #[allow(clippy::cast_possible_truncation)]
     pub fn call_snps(&self, sequences: &[&[u8]]) -> crate::error::Result<SnpGpuResult> {
         let n_sequences = sequences.len();
@@ -116,36 +175,7 @@ impl SnpGpu {
             _pad: 0,
         };
 
-        let params_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("SNP params"),
-            contents: bytemuck::bytes_of(&params),
-            usage: wgpu::BufferUsages::UNIFORM,
-        });
-        let seqs_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("SNP sequences"),
-            contents: bytemuck::cast_slice(&flat_seqs),
-            usage: wgpu::BufferUsages::STORAGE,
-        });
-        let variant_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("SNP is_variant"),
-            contents: bytemuck::cast_slice(&vec![0u32; aln_len]),
-            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
-        });
-        let ref_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("SNP ref_allele"),
-            contents: bytemuck::cast_slice(&vec![0u32; aln_len]),
-            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
-        });
-        let depth_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("SNP depth"),
-            contents: bytemuck::cast_slice(&vec![0u32; aln_len]),
-            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
-        });
-        let freq_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("SNP alt_freq"),
-            contents: bytemuck::cast_slice(&vec![0.0_f64; aln_len]),
-            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
-        });
+        let bufs = create_snp_buffers(d, &params, &flat_seqs, aln_len);
 
         let bg = d.create_bind_group(&wgpu::BindGroupDescriptor {
             label: None,
@@ -153,27 +183,27 @@ impl SnpGpu {
             entries: &[
                 wgpu::BindGroupEntry {
                     binding: 0,
-                    resource: params_buf.as_entire_binding(),
+                    resource: bufs.params.as_entire_binding(),
                 },
                 wgpu::BindGroupEntry {
                     binding: 1,
-                    resource: seqs_buf.as_entire_binding(),
+                    resource: bufs.sequences.as_entire_binding(),
                 },
                 wgpu::BindGroupEntry {
                     binding: 2,
-                    resource: variant_buf.as_entire_binding(),
+                    resource: bufs.variant.as_entire_binding(),
                 },
                 wgpu::BindGroupEntry {
                     binding: 3,
-                    resource: ref_buf.as_entire_binding(),
+                    resource: bufs.ref_allele.as_entire_binding(),
                 },
                 wgpu::BindGroupEntry {
                     binding: 4,
-                    resource: depth_buf.as_entire_binding(),
+                    resource: bufs.depth.as_entire_binding(),
                 },
                 wgpu::BindGroupEntry {
                     binding: 5,
-                    resource: freq_buf.as_entire_binding(),
+                    resource: bufs.alt_freq.as_entire_binding(),
                 },
             ],
         });
@@ -185,23 +215,23 @@ impl SnpGpu {
             let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor::default());
             pass.set_pipeline(&self.pipeline);
             pass.set_bind_group(0, &bg, &[]);
-            pass.dispatch_workgroups((aln_len as u32).div_ceil(256), 1, 1);
+            pass.dispatch_workgroups((aln_len as u32).div_ceil(WORKGROUP_SIZE), 1, 1);
         }
 
         dev.queue().submit(Some(encoder.finish()));
         d.poll(wgpu::Maintain::Wait);
 
         let is_variant = dev
-            .read_buffer_u32(&variant_buf, aln_len)
+            .read_buffer_u32(&bufs.variant, aln_len)
             .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
         let ref_alleles = dev
-            .read_buffer_u32(&ref_buf, aln_len)
+            .read_buffer_u32(&bufs.ref_allele, aln_len)
             .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
         let depths = dev
-            .read_buffer_u32(&depth_buf, aln_len)
+            .read_buffer_u32(&bufs.depth, aln_len)
             .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
         let alt_frequencies = dev
-            .read_buffer_f64(&freq_buf, aln_len)
+            .read_buffer_f64(&bufs.alt_freq, aln_len)
             .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
 
         Ok(SnpGpuResult {

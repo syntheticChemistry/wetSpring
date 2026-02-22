@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Pangenome analysis: gene presence-absence and core/accessory partitioning.
 //!
-//! Statistical functions (`normal_cdf`) are provided by [`super::special`].
+//! Statistical functions (`normal_cdf`) are provided by [`crate::special`].
 //!
 //! Constructs a binary presence-absence matrix from gene annotations across
 //! multiple genomes, then partitions genes into core (present in all),
@@ -10,7 +10,7 @@
 //!
 //! Used in Moulana & Anderson 2020 (Sulfurovum pangenomics).
 
-use super::special::normal_cdf;
+use crate::special::normal_cdf;
 
 /// A gene cluster with its presence across genomes.
 #[derive(Debug, Clone)]
@@ -97,6 +97,19 @@ pub fn presence_matrix_flat(clusters: &[GeneCluster], n_genomes: usize) -> Vec<u
         .flat_map(|cluster| {
             (0..n_genomes).map(move |g| u8::from(cluster.presence.get(g).copied().unwrap_or(false)))
         })
+        .collect()
+}
+
+/// Analyze multiple pangenomes in batch.
+///
+/// Each entry is an independent pangenome dataset (cluster set + genome count).
+/// Returns one `PangenomeResult` per dataset. This is the entry point
+/// for GPU dispatch: each dataset maps to one kernel invocation.
+#[must_use]
+pub fn analyze_batch(datasets: &[(Vec<GeneCluster>, usize)]) -> Vec<PangenomeResult> {
+    datasets
+        .iter()
+        .map(|(clusters, n_genomes)| analyze(clusters, *n_genomes))
         .collect()
 }
 
@@ -317,5 +330,43 @@ mod tests {
     fn bh_empty() {
         let adj = benjamini_hochberg(&[]);
         assert!(adj.is_empty());
+    }
+
+    #[test]
+    fn analyze_batch_multiple_datasets() {
+        let ds1 = sample_clusters();
+        let ds2 = vec![
+            GeneCluster {
+                id: "g1".into(),
+                presence: vec![true, true],
+            },
+            GeneCluster {
+                id: "g2".into(),
+                presence: vec![true, true],
+            },
+        ];
+        let results = analyze_batch(&[(ds1, 3), (ds2, 2)]);
+        assert_eq!(results.len(), 2);
+        assert_eq!(results[0].core_size, 2);
+        assert_eq!(results[1].core_size, 2);
+        assert_eq!(results[1].accessory_size, 0);
+    }
+
+    #[test]
+    fn analyze_batch_empty() {
+        let results = analyze_batch(&[]);
+        assert!(results.is_empty());
+    }
+
+    #[test]
+    fn analyze_batch_single_matches_direct() {
+        let clusters = sample_clusters();
+        let direct = analyze(&clusters, 3);
+        let batch = analyze_batch(&[(clusters, 3)]);
+        assert_eq!(batch.len(), 1);
+        assert_eq!(batch[0].core_size, direct.core_size);
+        assert_eq!(batch[0].accessory_size, direct.accessory_size);
+        assert_eq!(batch[0].unique_size, direct.unique_size);
+        assert_eq!(batch[0].total_size, direct.total_size);
     }
 }

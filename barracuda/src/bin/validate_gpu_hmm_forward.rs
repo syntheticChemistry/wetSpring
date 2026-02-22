@@ -1,30 +1,37 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation
+)]
 //! Exp047: GPU HMM Batch Forward
 //!
 //! Validates the GPU batch HMM forward algorithm against the CPU
 //! implementation. Uses a local WGSL shader (`hmm_forward_f64.wgsl`)
-//! — a ToadStool absorption candidate following Write → Absorb → Lean.
+//! — a `ToadStool` absorption candidate following Write → Absorb → Lean.
 //!
 //! Sections:
 //! 1. **2-state parity** — classic weather HMM, single sequence
 //! 2. **3-state parity** — genomic HMM, single sequence
 //! 3. **Batch parity** — N independent sequences, CPU vs GPU
-//! 4. **Forward-backward consistency** — sum_i alpha[t][i]*beta[t][i] = P(O)
+//! 4. **Forward-backward consistency** — `sum_i` alpha\[t\]\[i\]*beta\[t\]\[i\] = P(O)
 //!
 //! # Provenance
 //!
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | BarraCUDA CPU (reference) |
+//! | Baseline tool | `BarraCUDA` CPU (reference) |
 //! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
-//! | Baseline command | bio::hmm::forward |
+//! | Baseline command | `bio::hmm::forward` |
 //! | Baseline date | 2026-02-19 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_gpu_hmm_forward` |
 //! | Data | Weather HMM, genomic HMM, 64-seq batch |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
-//! Local WGSL shader: hmm_forward_f64.wgsl (ToadStool absorption candidate).
+//! Local WGSL shader: `hmm_forward_f64.wgsl` (`ToadStool` absorption candidate).
 
 use wetspring_barracuda::bio::hmm::{self, HmmModel};
 use wetspring_barracuda::bio::hmm_gpu::HmmGpuForward;
@@ -130,24 +137,19 @@ fn validate_2state(gpu: &HmmGpuForward, v: &mut Validator) {
             );
             v.check(
                 "2-state: GPU LL finite",
-                f64::from(gpu_ll.is_finite() as u8),
+                f64::from(u8::from(gpu_ll.is_finite())),
                 1.0,
                 0.0,
             );
             v.check(
                 "2-state: GPU LL negative",
-                f64::from((gpu_ll < 0.0) as u8),
+                f64::from(u8::from(gpu_ll < 0.0)),
                 1.0,
                 0.0,
             );
 
             let mut max_alpha_diff = 0.0_f64;
-            for (_, (&cpu_a, &gpu_a)) in cpu
-                .log_alpha
-                .iter()
-                .zip(gpu_result.log_alpha.iter())
-                .enumerate()
-            {
+            for (&cpu_a, &gpu_a) in cpu.log_alpha.iter().zip(gpu_result.log_alpha.iter()) {
                 let diff = (cpu_a - gpu_a).abs();
                 if diff > max_alpha_diff {
                     max_alpha_diff = diff;
@@ -155,7 +157,7 @@ fn validate_2state(gpu: &HmmGpuForward, v: &mut Validator) {
             }
             v.check(
                 "2-state: max |alpha CPU−GPU| < 1e-6",
-                f64::from((max_alpha_diff < 1e-6) as u8),
+                f64::from(u8::from(max_alpha_diff < 1e-6)),
                 1.0,
                 0.0,
             );
@@ -195,7 +197,7 @@ fn validate_3state(gpu: &HmmGpuForward, v: &mut Validator) {
             );
             v.check(
                 "3-state: GPU LL finite",
-                f64::from(gpu_ll.is_finite() as u8),
+                f64::from(u8::from(gpu_ll.is_finite())),
                 1.0,
                 0.0,
             );
@@ -211,7 +213,7 @@ fn validate_3state(gpu: &HmmGpuForward, v: &mut Validator) {
             );
             v.check(
                 "3-state: Viterbi LL ≤ forward LL",
-                f64::from((vit.log_probability <= cpu.log_likelihood + 1e-10) as u8),
+                f64::from(u8::from(vit.log_probability <= cpu.log_likelihood + 1e-10)),
                 1.0,
                 0.0,
             );
@@ -272,7 +274,7 @@ fn validate_batch(gpu: &HmmGpuForward, v: &mut Validator) {
             let all_finite = gpu_result.log_likelihoods.iter().all(|x| x.is_finite());
             v.check(
                 "Batch: all GPU LLs finite",
-                f64::from(all_finite as u8),
+                f64::from(u8::from(all_finite)),
                 1.0,
                 0.0,
             );
@@ -283,7 +285,7 @@ fn validate_batch(gpu: &HmmGpuForward, v: &mut Validator) {
             }
             v.check(
                 "Batch: max |CPU−GPU| < 1e-4",
-                f64::from((max_diff < tolerances::GPU_VS_CPU_ENSEMBLE) as u8),
+                f64::from(u8::from(max_diff < tolerances::GPU_VS_CPU_ENSEMBLE)),
                 1.0,
                 0.0,
             );
@@ -344,7 +346,7 @@ fn validate_forward_backward(gpu: &HmmGpuForward, v: &mut Validator) {
             }
             v.check(
                 "FB: GPU alpha + CPU beta consistent",
-                f64::from((max_fb_diff < 1e-6) as u8),
+                f64::from(u8::from(max_fb_diff < 1e-6)),
                 1.0,
                 0.0,
             );

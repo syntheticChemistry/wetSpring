@@ -142,10 +142,10 @@ patterns in their CPU implementations:
 | `dada2` | No | No (GPU module does) | No | Denoise is single-sample; GPU module bridges |
 | `hmm` | Yes | No (GPU module does) | No | `forward_batch` present; GPU module has `repr(C)` |
 | `ani` | Yes | Yes | No | Ready — `ani_matrix`, `AniParams` |
-| `snp` | Partial | Yes | Yes (`SnpFlatResult`) | No batch over multiple alignments |
+| `snp` | **Yes** | Yes | Yes (`SnpFlatResult`) | Ready — `call_snps_batch` for multi-alignment dispatch |
 | `dnds` | Yes | Yes | No | Ready — `pairwise_dnds_batch`, `DnDsParams` |
-| `pangenome` | Partial | Yes | Yes (`presence_matrix_flat`) | No batch for many cluster sets |
-| `quality` | No | No (GPU module does) | No | `filter_reads` is single-sample |
+| `pangenome` | **Yes** | Yes | Yes (`presence_matrix_flat`) | Ready — `analyze_batch` for multi-dataset dispatch |
+| `quality` | **Yes** | **Yes** (`QualityGpuParams`) | **Yes** (`QualityFlatResult`) | Ready — `filter_reads_flat` for contiguous array dispatch |
 | `random_forest` | Yes | No (GPU module does) | No | `predict_batch` present; GPU module bridges |
 | `felsenstein` | Per-site | No | Yes (`FlatTree`) | Already absorbed; `FlatTree` is the pattern |
 
@@ -153,14 +153,17 @@ For Tier A modules, the GPU companion modules (`*_gpu`) provide the `repr(C)`
 bridge layer between CPU structs and WGSL bindings. This is the correct
 architecture: CPU modules own the algorithm, GPU modules own the dispatch.
 
-### Shared Math (bio::special) — Ready for Extraction
+### Shared Math (`crate::special`) — Extracted
 
-| Function | Consumers | Absorption Target |
-|----------|-----------|-------------------|
-| `erf()` | `normal_cdf()` | `barracuda::special::erf` |
-| `normal_cdf()` | `bio::pangenome` (enrichment FDR) | `barracuda::special::normal_cdf` |
-| `ln_gamma()` | `regularized_gamma_lower()` | `barracuda::special::ln_gamma` |
-| `regularized_gamma_lower()` | `bio::dada2` (Poisson p-value) | `barracuda::special::regularized_gamma_p` |
+Promoted from `bio::special` to top-level `crate::special` module.
+`bio::special` remains as a re-export for backward compatibility.
+
+| Function | Consumers | Location |
+|----------|-----------|----------|
+| `erf()` | `normal_cdf()` | `crate::special::erf` |
+| `normal_cdf()` | `bio::pangenome` (enrichment FDR) | `crate::special::normal_cdf` |
+| `ln_gamma()` | `regularized_gamma_lower()` | `crate::special::ln_gamma` |
+| `regularized_gamma_lower()` | `bio::dada2` (Poisson p-value) | `crate::special::regularized_gamma_lower` |
 
 ---
 

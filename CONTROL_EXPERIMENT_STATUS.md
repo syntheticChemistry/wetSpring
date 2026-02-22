@@ -96,7 +96,7 @@
 | CPU validation checks | 1,291 |
 | GPU validation checks | 451 |
 | **Total validation checks** | **1,742** |
-| Rust tests | 650 (587 lib + 50 integration + 13 doc) |
+| Rust tests | 702 (628 lib + 60 integration + 14 doc) |
 | BarraCUDA CPU parity | 157/157 (25 domains) |
 | BarraCUDA GPU parity | 8 domains consolidated (Exp064) |
 | metalForge cross-system | 8 domains CPU↔GPU proven (Exp065) |
@@ -155,9 +155,17 @@
 ### Completed
 - Exp019 Phases 2-4 (Phylogenetic): All COMPLETE
 - Exp008 Full ML Pipeline: All COMPLETE
-- Tolerance centralization: **DONE** — 32 named constants in `tolerances.rs`
-- Code quality hardening: **DONE** — `forbid(unsafe_code)`, `deny(expect_used, unwrap_used)`, pedantic clippy
+- Tolerance centralization: **DONE** — 37 named constants in `tolerances.rs`
+- Code quality hardening: **DONE** — `forbid(unsafe_code)`, `deny(expect_used, unwrap_used)`, pedantic + nursery clippy
 - metalForge forge crate: **DONE** — `wetspring-forge` (24 tests, substrate discovery + dispatch)
+- GPU workgroup constants: **DONE** — all 9 `*_gpu.rs` modules use named `WORKGROUP_SIZE` matching WGSL
+- Hardware abstraction: **DONE** — `HardwareInventory::from_content()`, injectable `/proc` parsing
+- I/O streaming: **DONE** — zero-copy FASTQ (`FastqRefRecord`), mzML buffer reuse (`DecodeBuffer`)
+- Determinism tests: **DONE** — 16 bitwise-exact tests across non-stochastic algorithms
+- Fuzz testing: **DONE** — 4 harnesses (FASTQ, mzML, MS2, XML) via cargo-fuzz
+- Doc strictness: **DONE** — `-D missing_docs -D rustdoc::broken_intra_doc_links` pass
+- Math extraction: **DONE** — `bio::special` → `crate::special` (top-level, re-export for compat)
+- Absorption batch APIs: **DONE** — `snp::call_snps_batch`, `quality::filter_reads_flat`, `pangenome::analyze_batch`
 
 ---
 
@@ -194,24 +202,29 @@ matching. Exp008 adds sovereign ML for environmental monitoring.
 ## Code Quality (Feb 21, 2026)
 
 ```
-cargo fmt --check              → clean (0 diffs)
-cargo clippy --pedantic        → 0 warnings (pedantic + nursery enforced crate-wide)
-cargo doc --no-deps            → clean (0 warnings)
-cargo test --lib               → 587 passed, 0 failed, 1 ignored (hardware-dependent)
-cargo test --doc               → 13 passed, 0 failed
-cargo llvm-cov --lib           → 97% bio+io (55% overall)
+cargo fmt --check              → clean (0 diffs, both crates)
+cargo clippy --pedantic        → 0 warnings (pedantic + nursery, default + GPU features)
+cargo doc --features gpu       → clean (0 warnings, strict: -D missing_docs -D broken_intra_doc_links)
+cargo test --lib               → 628 passed, 0 failed, 1 ignored (hardware-dependent)
+cargo test --tests             → 60 integration (23 bio + 16 determinism + 21 I/O)
+cargo test --doc               → 14 passed, 0 failed
+cargo llvm-cov --lib           → 96.21% line coverage (22,036 lines, 835 missed)
 #![forbid(unsafe_code)]        → enforced crate-wide
 #![deny(expect_used, unwrap_used)] → enforced crate-wide (test modules #[allow])
 partial_cmp().unwrap()         → 0 (all migrated to f64::total_cmp)
-inline tolerance literals      → 0 (32 named constants in tolerances.rs)
+inline tolerance literals      → 0 (37 named constants in tolerances.rs)
+GPU workgroup sizes            → named constants in all 9 *_gpu.rs (match WGSL shaders)
 shared math (bio::special)     → erf, ln_gamma, regularized_gamma (no duplication)
-SPDX headers                   → all 151 .rs files
-max file size                  → all under 1000 LOC (mzml/mod.rs: 848 via delegation)
+hardware detection             → injectable (from_content / parse_*), no direct /proc in library
+SPDX headers                   → all .rs files
+max file size                  → all under 1000 LOC (fastq.rs: 907 largest)
 external C dependencies        → 0 (flate2 uses rust_backend)
 provenance headers             → all 73 binaries (commit, command, hardware)
 Python baselines               → scripts/requirements.txt (pinned numpy, scipy, sklearn)
 barracuda_cpu                  → 157/157 checks PASS (25 domains)
 barracuda_gpu                  → 451 GPU checks PASS
+fuzz harnesses                 → 4 (FASTQ, mzML, MS2, XML)
+zero-copy I/O                  → FastqRefRecord, DecodeBuffer reuse, streaming iterators
 ```
 
 ## BarraCUDA CPU Parity

@@ -127,8 +127,30 @@ pub const EVOLUTIONARY_DISTANCE: f64 = 1e-3;
 pub const SPECTRAL_COSINE: f64 = 1e-3;
 
 // ═══════════════════════════════════════════════════════════════════
+// Algorithm guards and convergence thresholds
+// ═══════════════════════════════════════════════════════════════════
+
+/// Minimum dS value for omega ratio computation.
+///
+/// When dS is below this threshold, omega (dN/dS) is undefined
+/// because dividing by near-zero dS would produce an unstable ratio.
+pub const DNDS_OMEGA_GUARD: f64 = 1e-10;
+
+/// DADA2 error model convergence threshold.
+///
+/// Iteration stops when the max change in error rates between
+/// rounds falls below this value. Matches the DADA2 R package default.
+pub const DADA2_ERR_CONVERGENCE: f64 = 1e-6;
+
+// ═══════════════════════════════════════════════════════════════════
 // ODE / dynamical system tolerances
 // ═══════════════════════════════════════════════════════════════════
+
+/// ODE convergence epsilon for c-di-GMP concentration checks.
+///
+/// Used by QS biofilm, bistable, and multi-signal ODE models to
+/// determine when a species concentration has effectively reached zero.
+pub const ODE_CDG_CONVERGENCE: f64 = 1e-12;
 
 /// ODE steady-state check: ±0.01 for species concentrations at equilibrium.
 ///
@@ -163,6 +185,18 @@ pub const PHYLO_LIKELIHOOD: f64 = 1e-8;
 ///
 /// Analytic formula P(t) = 0.25 + 0.75·exp(-4μt/3) rounding at 1e-6.
 pub const JC69_PROBABILITY: f64 = 1e-6;
+
+/// Stochastic ensemble mean tolerance (10% relative for Gillespie SSA).
+///
+/// With 10,000 replicates, the sample mean of a birth-death process
+/// should be within ~10% of the analytical mean by CLT.
+pub const GILLESPIE_MEAN_REL: f64 = 0.1;
+
+/// Fano factor tolerance for birth-death process.
+///
+/// Analytical Fano = 1.0 for Poisson; stochastic ensemble variance
+/// yields Fano within ±0.5 of theoretical at 10,000 replicates.
+pub const GILLESPIE_FANO: f64 = 0.5;
 
 // ═══════════════════════════════════════════════════════════════════
 // PFAS / analytical chemistry tolerances
@@ -245,6 +279,9 @@ mod tests {
             EXACT,
             EXACT_F64,
             ANALYTICAL_F64,
+            DNDS_OMEGA_GUARD,
+            DADA2_ERR_CONVERGENCE,
+            ODE_CDG_CONVERGENCE,
             PYTHON_PARITY,
             PYTHON_PARITY_TIGHT,
             PYTHON_PVALUE,
@@ -265,6 +302,8 @@ mod tests {
             ODE_NEAR_ZERO,
             PHYLO_LIKELIHOOD,
             JC69_PROBABILITY,
+            GILLESPIE_MEAN_REL,
+            GILLESPIE_FANO,
             KMD_GROUPING,
             KMD_SPREAD,
             MZ_FRAGMENT,

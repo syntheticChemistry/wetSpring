@@ -1,7 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Exp045: ToadStool Bio Absorption Validation
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation
+)]
+//! Exp045: `ToadStool` Bio Absorption Validation
 //!
-//! Tests the 4 GPU bio primitives recently absorbed into ToadStool's
+//! Tests the 4 GPU bio primitives recently absorbed into `ToadStool`'s
 //! barracuda crate against wetSpring's CPU baselines:
 //!
 //! 1. `FelsensteinGpu` — phylogenetic pruning (site-parallel)
@@ -17,15 +24,15 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | BarraCUDA CPU (reference) |
+//! | Baseline tool | `BarraCUDA` CPU (reference) |
 //! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
-//! | Baseline command | DecisionTree::predict, Gillespie SSA, bio::alignment::smith_waterman_score |
+//! | Baseline command | `DecisionTree::predict`, Gillespie SSA, `bio::alignment::smith_waterman_score` |
 //! | Baseline date | 2026-02-19 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_toadstool_bio` |
 //! | Data | Decision tree samples, SSA trajectories, SW alignment pairs |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
-//! ToadStool primitives: TreeInferenceGpu, GillespieGpu, SmithWatermanGpu.
+//! `ToadStool` primitives: `TreeInferenceGpu`, `GillespieGpu`, `SmithWatermanGpu`.
 
 use barracuda::device::WgpuDevice;
 use barracuda::{FlatForest, TreeInferenceGpu};
@@ -290,7 +297,7 @@ fn validate_smith_waterman(device: &Arc<WgpuDevice>, v: &mut Validator) {
     }
 }
 
-fn dna_encode(base: u8) -> u32 {
+const fn dna_encode(base: u8) -> u32 {
     match base {
         b'A' | b'a' => 0,
         b'C' | b'c' => 1,

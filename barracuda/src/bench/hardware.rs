@@ -38,16 +38,23 @@ pub struct HardwareInventory {
 }
 
 impl HardwareInventory {
-    /// Auto-detect hardware from Linux sysfs / nvidia-smi.
+    /// Build a hardware inventory from pre-read system content.
+    ///
+    /// Accepts the raw content strings rather than reading filesystem
+    /// directly. This allows metalForge or other callers to provide
+    /// the hardware data, keeping barracuda independent of filesystem paths.
     #[must_use]
-    pub fn detect(gate_name: &str) -> Self {
-        let cpuinfo = std::fs::read_to_string("/proc/cpuinfo").unwrap_or_default();
-        let (cpu_model, cpu_cores, cpu_threads, cpu_cache_kb) = parse_cpuinfo(&cpuinfo);
-        let meminfo = std::fs::read_to_string("/proc/meminfo").unwrap_or_default();
-        let ram_total_mb = parse_meminfo(&meminfo);
-        let (gpu_name, gpu_vram_mb, gpu_driver, gpu_compute_cap) = query_nvidia_smi_inventory();
-        let os_kernel = read_stdout("uname", &["-r"]);
-
+    pub fn from_content(
+        gate_name: &str,
+        cpuinfo: &str,
+        meminfo: &str,
+        nvidia_csv: &str,
+        os_kernel: &str,
+    ) -> Self {
+        let (cpu_model, cpu_cores, cpu_threads, cpu_cache_kb) = parse_cpuinfo(cpuinfo);
+        let ram_total_mb = parse_meminfo(meminfo);
+        let (gpu_name, gpu_vram_mb, gpu_driver, gpu_compute_cap) =
+            parse_nvidia_smi_output(nvidia_csv);
         Self {
             gate_name: gate_name.to_string(),
             cpu_model,
@@ -59,9 +66,19 @@ impl HardwareInventory {
             gpu_vram_mb,
             gpu_driver,
             gpu_compute_cap,
-            os_kernel,
+            os_kernel: os_kernel.to_string(),
             rust_version: String::new(),
         }
+    }
+
+    /// Auto-detect hardware from Linux sysfs / nvidia-smi.
+    #[must_use]
+    pub fn detect(gate_name: &str) -> Self {
+        let cpuinfo = std::fs::read_to_string("/proc/cpuinfo").unwrap_or_default();
+        let meminfo = std::fs::read_to_string("/proc/meminfo").unwrap_or_default();
+        let nvidia_csv = query_nvidia_smi_csv();
+        let os_kernel = read_stdout("uname", &["-r"]);
+        Self::from_content(gate_name, &cpuinfo, &meminfo, &nvidia_csv, &os_kernel)
     }
 
     /// Pretty-print the inventory block.
@@ -196,8 +213,10 @@ pub fn parse_nvidia_smi_output(csv_line: &str) -> (String, usize, String, String
 
 // ── System I/O (thin wrappers for live detection) ───────────────
 
-/// Query nvidia-smi for GPU inventory. Returns fallback on failure.
-pub fn query_nvidia_smi_inventory() -> (String, usize, String, String) {
+/// Query nvidia-smi for GPU inventory. Returns raw CSV string for use with
+/// [`parse_nvidia_smi_output`] or [`HardwareInventory::from_content`].
+#[must_use]
+pub fn query_nvidia_smi_csv() -> String {
     let output = Command::new("nvidia-smi")
         .args([
             "--query-gpu=name,memory.total,driver_version,compute_cap",
@@ -206,11 +225,8 @@ pub fn query_nvidia_smi_inventory() -> (String, usize, String, String) {
         .output();
 
     match output {
-        Ok(out) if out.status.success() => {
-            let s = String::from_utf8_lossy(&out.stdout).trim().to_string();
-            parse_nvidia_smi_output(&s)
-        }
-        _ => ("N/A".into(), 0, "N/A".into(), "N/A".into()),
+        Ok(out) if out.status.success() => String::from_utf8_lossy(&out.stdout).trim().to_string(),
+        _ => String::new(),
     }
 }
 
@@ -312,6 +328,21 @@ cache size\t: 30720 KB
         let (name, vram, _, _) = parse_nvidia_smi_output(csv);
         assert_eq!(name, "Some GPU Only");
         assert_eq!(vram, 0);
+    }
+
+    #[test]
+    fn from_content_constructs_inventory() {
+        let hw = HardwareInventory::from_content(
+            "test",
+            "processor\t: 0\nmodel name\t: Test\ncore id\t\t: 0\n",
+            "MemTotal:       8192000 kB\n",
+            "Test GPU, 8192, 500.0, 8.0",
+            "6.0.0",
+        );
+        assert_eq!(hw.gate_name, "test");
+        assert_eq!(hw.cpu_model, "Test");
+        assert_eq!(hw.gpu_name, "Test GPU");
+        assert_eq!(hw.os_kernel, "6.0.0");
     }
 
     #[test]

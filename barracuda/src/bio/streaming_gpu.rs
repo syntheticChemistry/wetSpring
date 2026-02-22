@@ -72,6 +72,7 @@ pub struct GpuPipelineSession {
     dada2: Dada2Gpu,
     fmr: FusedMapReduceF64,
     gemm: GemmCached,
+    /// GPU warmup time in milliseconds.
     pub warmup_ms: f64,
 }
 
@@ -401,12 +402,19 @@ impl GpuPipelineSession {
 /// Results from the streaming GPU pipeline.
 #[derive(Debug)]
 pub struct StreamingGpuResult {
+    /// Per-read taxonomy classifications.
     pub classifications: Vec<Classification>,
+    /// Shannon diversity index.
     pub shannon: f64,
+    /// Simpson diversity index.
     pub simpson: f64,
+    /// Observed species count.
     pub observed: f64,
+    /// Taxonomy classification time in milliseconds.
     pub taxonomy_ms: f64,
+    /// Diversity computation time in milliseconds.
     pub diversity_ms: f64,
+    /// Total GPU pipeline time in milliseconds.
     pub total_gpu_ms: f64,
 }
 

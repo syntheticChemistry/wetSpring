@@ -202,8 +202,8 @@ mod tests {
         let gpu = make_gpu("GPU", vec![Capability::F64Compute]);
         let cpu = make_cpu();
         let subs = [gpu, cpu];
-        let work = Workload::new("validation", vec![Capability::F64Compute])
-            .prefer(SubstrateKind::Cpu);
+        let work =
+            Workload::new("validation", vec![Capability::F64Compute]).prefer(SubstrateKind::Cpu);
 
         let d = route(&work, &subs).expect("should route");
         assert_eq!(d.substrate.kind, SubstrateKind::Cpu);

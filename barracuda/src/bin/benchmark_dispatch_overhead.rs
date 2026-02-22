@@ -1,10 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![allow(
-    clippy::too_many_lines,
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names,
     clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::too_many_lines,
     clippy::approx_constant
 )]
-//! Exp067: ToadStool Dispatch Overhead Profiling
+//! Exp067: `ToadStool` Dispatch Overhead Profiling
 //!
 //! Measures actual dispatch overhead (buffer upload + shader dispatch +
 //! readback) for each GPU domain at minimal input size. This separates
@@ -290,8 +294,5 @@ fn row(label: &str, cpu_us: f64, gpu_us: f64) {
     } else {
         format!("{overhead:.0}µs")
     };
-    println!(
-        "  {:<30} {:>12.0} {:>12.0} {:>12}",
-        label, cpu_us, gpu_us, oh_str
-    );
+    println!("  {label:<30} {cpu_us:>12.0} {gpu_us:>12.0} {oh_str:>12}");
 }

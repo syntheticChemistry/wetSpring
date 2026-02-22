@@ -22,6 +22,7 @@
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::bio::gillespie;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 /// Python baseline values from `gillespie_python_baseline.json`.
@@ -90,15 +91,18 @@ fn main() {
 
     let stats = gillespie::birth_death_ensemble(K_DGC, K_PDE, T_MAX, N_RUNS, BASE_SEED);
 
-    // Stochastic tolerances (0.1, 0.5, 0.15): no centralized constant — Gillespie
-    // ensemble mean/variance/Fano depend on PRNG and run count; domain-specific.
     v.check(
         "Ensemble mean ~ analytical (100.0)",
         stats.mean,
         ANALYTICAL_MEAN,
-        ANALYTICAL_MEAN * 0.1,
+        ANALYTICAL_MEAN * tolerances::GILLESPIE_MEAN_REL,
     );
-    v.check("Fano factor ~ 1.0 (Poisson)", stats.fano_factor, 1.0, 0.5);
+    v.check(
+        "Fano factor ~ 1.0 (Poisson)",
+        stats.fano_factor,
+        1.0,
+        tolerances::GILLESPIE_FANO,
+    );
     v.check(
         "Std dev > 0 (stochastic variability)",
         stats.std_dev,

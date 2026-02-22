@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! GPU ODE parameter sweep for QS/c-di-GMP 5-variable system.
 //!
-//! Local workaround for ToadStool's `BatchedOdeRK4F64` which ships a shader
+//! Local workaround for `ToadStool`'s `BatchedOdeRK4F64` which ships a shader
 //! containing `enable f64;` that naga rejects. This wrapper uses a local copy
 //! of the shader (without `enable f64;`) compiled via `compile_shader_f64`.
 //!
-//! **Write → Absorb → Lean**: once ToadStool fixes the `enable f64;` issue
+//! **Write → Absorb → Lean**: once `ToadStool` fixes the `enable f64;` issue
 //! in `batched_ode_rk4.rs`, this module can be removed and we lean on upstream.
 
 use barracuda::device::WgpuDevice;
@@ -16,7 +16,12 @@ use wgpu::util::DeviceExt;
 
 const ODE_WGSL: &str = include_str!("../shaders/batched_qs_ode_rk4_f64.wgsl");
 
+/// Workgroup size — must match `@workgroup_size(N)` in `shaders/batched_qs_ode_rk4_f64.wgsl`.
+const WORKGROUP_SIZE: u32 = 256;
+
+/// Number of state variables in the QS biofilm ODE system.
 pub const N_VARS: usize = 5;
+/// Number of parameters per ODE batch element.
 pub const N_PARAMS: usize = 17;
 
 #[repr(C)]
@@ -32,24 +37,44 @@ struct QsOdeConfigGpu {
     clamp_min: f64,
 }
 
+/// Configuration for ODE parameter sweep.
 pub struct OdeSweepConfig {
+    /// Number of batch elements to integrate in parallel.
     pub n_batches: u32,
+    /// Number of RK4 steps per batch element.
     pub n_steps: u32,
+    /// Step size (time step) for integration.
     pub h: f64,
+    /// Initial time value.
     pub t0: f64,
+    /// Maximum clamp value for state variables.
     pub clamp_max: f64,
+    /// Minimum clamp value for state variables.
     pub clamp_min: f64,
 }
 
+/// GPU-backed ODE parameter sweep for the QS biofilm 5-variable system.
 pub struct OdeSweepGpu {
     device: Arc<WgpuDevice>,
 }
 
 impl OdeSweepGpu {
-    pub fn new(device: Arc<WgpuDevice>) -> Self {
+    /// Create a new ODE sweep instance for the given device.
+    #[must_use]
+    pub const fn new(device: Arc<WgpuDevice>) -> Self {
         Self { device }
     }
 
+    /// Run RK4 integration for all batch elements.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if GPU dispatch, buffer mapping, or readback fails.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `initial_states.len() != n_batches * N_VARS` or
+    /// `batch_params.len() != n_batches * N_PARAMS`.
     pub fn integrate(
         &self,
         config: &OdeSweepConfig,
@@ -146,7 +171,7 @@ impl OdeSweepGpu {
             module: &module,
             entry_point: "main",
             cache: None,
-            compilation_options: Default::default(),
+            compilation_options: wgpu::PipelineCompilationOptions::default(),
         });
 
         let mut encoder = d.create_command_encoder(&wgpu::CommandEncoderDescriptor {
@@ -159,7 +184,7 @@ impl OdeSweepGpu {
             });
             pass.set_pipeline(&pipeline);
             pass.set_bind_group(0, &bg, &[]);
-            pass.dispatch_workgroups((b as u32).div_ceil(256), 1, 1);
+            pass.dispatch_workgroups((b as u32).div_ceil(WORKGROUP_SIZE), 1, 1);
         }
         dev.queue().submit(Some(encoder.finish()));
 
@@ -193,7 +218,7 @@ impl OdeSweepGpu {
     }
 }
 
-fn bgl_entry(idx: u32, ty: wgpu::BufferBindingType) -> wgpu::BindGroupLayoutEntry {
+const fn bgl_entry(idx: u32, ty: wgpu::BufferBindingType) -> wgpu::BindGroupLayoutEntry {
     wgpu::BindGroupLayoutEntry {
         binding: idx,
         visibility: wgpu::ShaderStages::COMPUTE,

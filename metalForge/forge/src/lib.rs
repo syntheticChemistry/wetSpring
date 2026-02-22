@@ -12,15 +12,15 @@
 //!
 //! # Design Principle
 //!
-//! wetSpring is a biome. ToadStool (barracuda) is the fungus — it lives in
+//! wetSpring is a biome. `ToadStool` (barracuda) is the fungus — it lives in
 //! every biome. We lean on it for what it already provides (GPU enumeration,
 //! shader dispatch, buffer management), and evolve new capabilities locally
-//! (NPU probing, cross-substrate routing). ToadStool absorbs what works,
+//! (NPU probing, cross-substrate routing). `ToadStool` absorbs what works,
 //! then all Springs benefit.
 //!
 //! Springs don't reference each other. hotSpring doesn't import wetSpring.
-//! Both lean on ToadStool independently — hotSpring evolves physics shaders,
-//! wetSpring evolves bio shaders, and ToadStool absorbs both.
+//! Both lean on `ToadStool` independently — hotSpring evolves physics shaders,
+//! wetSpring evolves bio shaders, and `ToadStool` absorbs both.
 //!
 //! # Architecture
 //!
@@ -46,6 +46,7 @@
 //! - **NPU-optimal**: Taxonomy classification, anomaly detection, PFAS screening
 //! - **CPU-optimal**: FASTQ/mzML parsing, chimera detection, tree traversal
 
+pub mod bridge;
 pub mod dispatch;
 pub mod inventory;
 pub mod probe;

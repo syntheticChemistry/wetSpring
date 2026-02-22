@@ -31,6 +31,9 @@ use std::sync::Arc;
 
 const E_STEP_WGSL: &str = include_str!("../shaders/dada2_e_step.wgsl");
 
+/// Workgroup size — must match `@workgroup_size(N)` in `shaders/dada2_e_step.wgsl`.
+const WORKGROUP_SIZE: u32 = 256;
+
 const NUM_BASES: usize = 4;
 const MAX_QUAL: usize = 42;
 const MIN_ERR: f64 = 1e-7;
@@ -69,6 +72,8 @@ pub struct Dada2Gpu {
 }
 
 impl Dada2Gpu {
+    /// Create a new DADA2 GPU E-step instance.
+    #[must_use]
     pub fn new(device: Arc<WgpuDevice>, ctx: Arc<TensorContext>) -> Self {
         let patched =
             ShaderTemplate::for_driver_auto(E_STEP_WGSL, device.needs_f64_exp_log_workaround());
@@ -210,7 +215,7 @@ impl Dada2Gpu {
                 ],
             });
 
-        let wg_x = (total_pairs as u32).div_ceil(256);
+        let wg_x = (total_pairs as u32).div_ceil(WORKGROUP_SIZE);
         let mut encoder =
             self.device
                 .device()
@@ -545,7 +550,7 @@ fn err_model_converged(old: &ErrorModel, new: &ErrorModel) -> bool {
             }
         }
     }
-    max_diff < 1e-6
+    max_diff < crate::tolerances::DADA2_ERR_CONVERGENCE
 }
 
 /// Poisson upper-tail p-value using GPU E-step scores matrix.

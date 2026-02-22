@@ -6,7 +6,7 @@
 //! a GPU-resident genetic code lookup table, then applies
 //! Jukes-Cantor correction.
 //!
-//! Uses a local WGSL shader (`dnds_batch_f64.wgsl`) — a ToadStool
+//! Uses a local WGSL shader (`dnds_batch_f64.wgsl`) — a `ToadStool`
 //! absorption candidate following Write → Absorb → Lean.
 //!
 //! # GPU Strategy
@@ -22,6 +22,9 @@ use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
 const DNDS_WGSL: &str = include_str!("../shaders/dnds_batch_f64.wgsl");
+
+/// Workgroup size — must match `@workgroup_size(N)` in `shaders/dnds_batch_f64.wgsl`.
+const WORKGROUP_SIZE: u32 = 64;
 
 #[repr(C)]
 #[derive(Copy, Clone, Pod, Zeroable)]
@@ -56,6 +59,7 @@ const GENETIC_CODE_TABLE: [u32; 64] = [
    20, 19, 20, 19, 15, 15, 15, 15, 20,  1, 18,  1,  9,  4,  9,  4,  // TA*, TC*, TG*, TT*
 ];
 
+/// GPU-accelerated batch dN/dS (Nei-Gojobori method).
 pub struct DnDsGpu {
     device: Arc<WgpuDevice>,
     pipeline: wgpu::ComputePipeline,
@@ -63,6 +67,8 @@ pub struct DnDsGpu {
 }
 
 impl DnDsGpu {
+    /// Create a new dN/dS GPU compute instance.
+    #[must_use]
     pub fn new(device: &Arc<WgpuDevice>) -> Self {
         let patched = ShaderTemplate::for_driver_auto(DNDS_WGSL, true);
         let module = device.compile_shader(&patched, Some("DnDsBatchF64"));
@@ -74,7 +80,7 @@ impl DnDsGpu {
                 module: &module,
                 entry_point: "main",
                 cache: None,
-                compilation_options: Default::default(),
+                compilation_options: wgpu::PipelineCompilationOptions::default(),
             });
         let bgl = pipeline.get_bind_group_layout(0);
         Self {
@@ -88,6 +94,10 @@ impl DnDsGpu {
     ///
     /// Sequences as byte slices (ASCII A/C/G/T). Length must be divisible by 3.
     /// Gap codons (containing `-` or `.`) are skipped.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` if GPU dispatch or buffer readback fails.
     #[allow(clippy::cast_possible_truncation)]
     pub fn batch_dnds(&self, pairs: &[(&[u8], &[u8])]) -> crate::error::Result<DnDsGpuResult> {
         let n_pairs = pairs.len();
@@ -141,6 +151,43 @@ impl DnDsGpu {
             n_codons: n_codons as u32,
         };
 
+        let buffers =
+            self.create_buffers_and_bind_group(d, params, &seq_a_flat, &seq_b_flat, n_pairs);
+
+        let mut encoder = d.create_command_encoder(&wgpu::CommandEncoderDescriptor {
+            label: Some("dN/dS batch"),
+        });
+        {
+            let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor::default());
+            pass.set_pipeline(&self.pipeline);
+            pass.set_bind_group(0, &buffers.bind_group, &[]);
+            pass.dispatch_workgroups((n_pairs as u32).div_ceil(WORKGROUP_SIZE), 1, 1);
+        }
+
+        dev.queue().submit(Some(encoder.finish()));
+        d.poll(wgpu::Maintain::Wait);
+
+        let dn = dev
+            .read_buffer_f64(&buffers.dn_buf, n_pairs)
+            .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
+        let ds = dev
+            .read_buffer_f64(&buffers.ds_buf, n_pairs)
+            .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
+        let omega = dev
+            .read_buffer_f64(&buffers.omega_buf, n_pairs)
+            .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
+
+        Ok(DnDsGpuResult { dn, ds, omega })
+    }
+
+    fn create_buffers_and_bind_group(
+        &self,
+        d: &wgpu::Device,
+        params: DnDsGpuParams,
+        seq_a_flat: &[u32],
+        seq_b_flat: &[u32],
+        n_pairs: usize,
+    ) -> DnDsBatchBuffers {
         let params_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("dN/dS params"),
             contents: bytemuck::bytes_of(&params),
@@ -148,12 +195,12 @@ impl DnDsGpu {
         });
         let seq_a_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("dN/dS seq_a"),
-            contents: bytemuck::cast_slice(&seq_a_flat),
+            contents: bytemuck::cast_slice(seq_a_flat),
             usage: wgpu::BufferUsages::STORAGE,
         });
         let seq_b_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("dN/dS seq_b"),
-            contents: bytemuck::cast_slice(&seq_b_flat),
+            contents: bytemuck::cast_slice(seq_b_flat),
             usage: wgpu::BufferUsages::STORAGE,
         });
         let gc_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
@@ -176,8 +223,7 @@ impl DnDsGpu {
             contents: bytemuck::cast_slice(&vec![0.0_f64; n_pairs]),
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
         });
-
-        let bg = d.create_bind_group(&wgpu::BindGroupDescriptor {
+        let bind_group = d.create_bind_group(&wgpu::BindGroupDescriptor {
             label: None,
             layout: &self.bgl,
             entries: &[
@@ -211,30 +257,26 @@ impl DnDsGpu {
                 },
             ],
         });
-
-        let mut encoder = d.create_command_encoder(&wgpu::CommandEncoderDescriptor {
-            label: Some("dN/dS batch"),
-        });
-        {
-            let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor::default());
-            pass.set_pipeline(&self.pipeline);
-            pass.set_bind_group(0, &bg, &[]);
-            pass.dispatch_workgroups((n_pairs as u32).div_ceil(64), 1, 1);
+        DnDsBatchBuffers {
+            _params_buf: params_buf,
+            _seq_a_buf: seq_a_buf,
+            _seq_b_buf: seq_b_buf,
+            _gc_buf: gc_buf,
+            dn_buf,
+            ds_buf,
+            omega_buf,
+            bind_group,
         }
-
-        dev.queue().submit(Some(encoder.finish()));
-        d.poll(wgpu::Maintain::Wait);
-
-        let dn = dev
-            .read_buffer_f64(&dn_buf, n_pairs)
-            .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
-        let ds = dev
-            .read_buffer_f64(&ds_buf, n_pairs)
-            .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
-        let omega = dev
-            .read_buffer_f64(&omega_buf, n_pairs)
-            .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
-
-        Ok(DnDsGpuResult { dn, ds, omega })
     }
+}
+
+struct DnDsBatchBuffers {
+    _params_buf: wgpu::Buffer,
+    _seq_a_buf: wgpu::Buffer,
+    _seq_b_buf: wgpu::Buffer,
+    _gc_buf: wgpu::Buffer,
+    dn_buf: wgpu::Buffer,
+    ds_buf: wgpu::Buffer,
+    omega_buf: wgpu::Buffer,
+    bind_group: wgpu::BindGroup,
 }

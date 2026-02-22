@@ -108,7 +108,7 @@ fn main() {
         "P(same, t=∞) = 0.25",
         jc69_prob(0, 0, 1000.0, 1.0),
         0.25,
-        1e-6,
+        tolerances::JC69_PROBABILITY,
     );
 
     let mat = transition_matrix(0.5, 1.0);

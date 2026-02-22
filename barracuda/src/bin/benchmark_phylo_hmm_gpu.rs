@@ -1,8 +1,18 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::items_after_statements,
+    clippy::too_many_arguments,
+    clippy::single_match_else
+)]
 //! Exp048: CPU vs GPU Benchmark — Phylogenetics & HMM
 //!
 //! Head-to-head benchmarks for the newly GPU-composed domains:
-//! 1. Felsenstein pruning: CPU recursive vs GPU FelsensteinGpu
+//! 1. Felsenstein pruning: CPU recursive vs GPU `FelsensteinGpu`
 //! 2. Bootstrap resampling: CPU sequential vs GPU batch Felsenstein
 //! 3. Placement scan: CPU sequential vs GPU batch Felsenstein
 //! 4. HMM batch forward: CPU sequential vs GPU batch shader
@@ -50,7 +60,7 @@ fn make_large_tree(n_taxa: usize, seq_len: usize) -> TreeNode {
             };
         }
         let mid = taxa_left.len() / 2;
-        let bl = 0.1 + 0.01 * depth as f64;
+        let bl = 0.01f64.mul_add(depth as f64, 0.1);
         TreeNode::Internal {
             left: Box::new(build(&taxa_left[..mid], depth + 1)),
             right: Box::new(build(&taxa_left[mid..], depth + 1)),
@@ -87,7 +97,7 @@ fn alignment_from_tree(tree: &TreeNode) -> Alignment {
     Alignment::from_rows(&rows)
 }
 
-/// Convert TreeNode to PhyloTree (same as Exp046).
+/// Convert `TreeNode` to `PhyloTree` (same as Exp046).
 fn convert_tree(tree: &TreeNode, mu: f64) -> (PhyloTree, Vec<f64>, Vec<f64>, usize) {
     let mut left_child = Vec::new();
     let mut right_child = Vec::new();
@@ -153,7 +163,7 @@ fn convert_tree(tree: &TreeNode, mu: f64) -> (PhyloTree, Vec<f64>, Vec<f64>, usi
     let n_sites = leaf_seqs
         .iter()
         .filter(|s| !s.is_empty())
-        .map(|s| s.len())
+        .map(Vec::len)
         .next()
         .unwrap_or(0);
 
@@ -258,7 +268,7 @@ fn bench_felsenstein(device: &Arc<barracuda::device::WgpuDevice>, v: &mut Valida
                 );
                 v.check(
                     "Fels: GPU completed",
-                    f64::from(gpu_ll.is_finite() as u8),
+                    f64::from(u8::from(gpu_ll.is_finite())),
                     1.0,
                     0.0,
                 );
@@ -320,7 +330,7 @@ fn bench_bootstrap(device: &Arc<barracuda::device::WgpuDevice>, v: &mut Validato
             println!("    max |CPU−GPU| = {max_diff:.2e}");
             v.check(
                 "Bootstrap: parity",
-                f64::from((max_diff < tolerances::GPU_VS_CPU_ENSEMBLE) as u8),
+                f64::from(u8::from(max_diff < tolerances::GPU_VS_CPU_ENSEMBLE)),
                 1.0,
                 0.0,
             );
@@ -390,7 +400,7 @@ fn bench_hmm_batch(device: &Arc<barracuda::device::WgpuDevice>, v: &mut Validato
         .collect();
     let cpu_us = start.elapsed().as_micros();
 
-    let hmm_gpu = HmmGpuForward::new(&device);
+    let hmm_gpu = HmmGpuForward::new(device);
     let start = Instant::now();
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         hmm_gpu.forward_batch(&model, &all_obs_u32, n_seqs, n_steps)
@@ -410,7 +420,7 @@ fn bench_hmm_batch(device: &Arc<barracuda::device::WgpuDevice>, v: &mut Validato
                 println!("    max |CPU−GPU| = {max_diff:.2e}");
                 v.check(
                     "HMM batch: parity",
-                    f64::from((max_diff < 1e-3) as u8),
+                    f64::from(u8::from(max_diff < 1e-3)),
                     1.0,
                     0.0,
                 );

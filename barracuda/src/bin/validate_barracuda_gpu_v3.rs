@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Exp044: BarraCUDA GPU parity for v3 domains — proves CPU→GPU portability.
+//! Exp044: `BarraCUDA` GPU parity for v3 domains — proves CPU→GPU portability.
 //!
 //! Tests GPU implementations of domains validated in CPU v3 that have
-//! ToadStool primitives available: extended diversity (Pielou, Bray-Curtis
+//! `ToadStool` primitives available: extended diversity (Pielou, Bray-Curtis
 //! matrix), spectral matching (pairwise cosine), and statistics.
 //!
 //! Domains without GPU shaders yet (ODE, SSA, HMM, SW, DT, kmer, bootstrap,
 //! placement, Felsenstein) are validated on CPU and documented for GPU
-//! promotion via ToadStool.
+//! promotion via `ToadStool`.
 //!
 //! ```text
 //! Python → CPU v1/v2/v3 → [THIS] GPU v3 → ToadStool sovereign
@@ -18,15 +18,23 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | BarraCUDA CPU (reference) |
+//! | Baseline tool | `BarraCUDA` CPU (reference) |
 //! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
-//! | Baseline command | bio::diversity, bio::spectral_match, CPU stats |
+//! | Baseline command | `bio::diversity`, `bio::spectral_match`, CPU stats |
 //! | Baseline date | 2026-02-19 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_barracuda_gpu_v3` |
 //! | Data | Count vectors, Bray-Curtis matrices, spectra, variance/correlation |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
-//! GPU modules: diversity_gpu (Pielou, Shannon, Simpson, Bray-Curtis), spectral_match_gpu, stats_gpu.
+//! GPU modules: `diversity_gpu` (Pielou, Shannon, Simpson, Bray-Curtis), `spectral_match_gpu`, `stats_gpu`.
+
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation
+)]
 
 use wetspring_barracuda::bio::{
     diversity, diversity_gpu, spectral_match, spectral_match_gpu, stats_gpu,
@@ -91,8 +99,7 @@ fn validate_extended_diversity(gpu: &GpuF64, v: &mut Validator) {
 
     // Shannon on 100 species
     {
-        #[allow(clippy::cast_precision_loss)]
-        let counts: Vec<f64> = (1..=100).map(|i| i as f64).collect();
+        let counts: Vec<f64> = (1..=100).map(f64::from).collect();
         let cpu = diversity::shannon(&counts);
         let gpu_val = diversity_gpu::shannon_gpu(gpu, &counts).expect("GPU Shannon 100");
         v.check(
@@ -105,8 +112,7 @@ fn validate_extended_diversity(gpu: &GpuF64, v: &mut Validator) {
 
     // Simpson on 100 species
     {
-        #[allow(clippy::cast_precision_loss)]
-        let counts: Vec<f64> = (1..=100).map(|i| i as f64).collect();
+        let counts: Vec<f64> = (1..=100).map(f64::from).collect();
         let cpu = diversity::simpson(&counts);
         let gpu_val = diversity_gpu::simpson_gpu(gpu, &counts).expect("GPU Simpson 100");
         v.check(
@@ -131,11 +137,10 @@ fn validate_bray_curtis_matrix(gpu: &GpuF64, v: &mut Validator) {
 
     // 5 samples × 10 features
     {
-        #[allow(clippy::cast_precision_loss)]
         let samples: Vec<Vec<f64>> = (0..5)
-            .map(|i| {
+            .map(|i: i32| {
                 (0..10)
-                    .map(|j| ((i * 7 + j * 13 + 1) % 50) as f64)
+                    .map(|j: i32| f64::from((i * 7 + j * 13 + 1) % 50))
                     .collect()
             })
             .collect();
@@ -164,11 +169,10 @@ fn validate_bray_curtis_matrix(gpu: &GpuF64, v: &mut Validator) {
 
     // 20 samples × 50 features (larger batch)
     {
-        #[allow(clippy::cast_precision_loss)]
         let samples: Vec<Vec<f64>> = (0..20)
-            .map(|i| {
+            .map(|i: i32| {
                 (0..50)
-                    .map(|j| ((i * 11 + j * 7 + 3) % 100) as f64)
+                    .map(|j: i32| f64::from((i * 11 + j * 7 + 3) % 100))
                     .collect()
             })
             .collect();
@@ -305,8 +309,7 @@ fn validate_statistics(gpu: &GpuF64, v: &mut Validator) {
 fn validate_gpu_determinism(gpu: &GpuF64, v: &mut Validator) {
     v.section("── GPU Determinism ──");
 
-    #[allow(clippy::cast_precision_loss)]
-    let counts: Vec<f64> = (1..=50).map(|i| i as f64).collect();
+    let counts: Vec<f64> = (1..=50).map(f64::from).collect();
 
     let s1 = diversity_gpu::shannon_gpu(gpu, &counts).expect("GPU Shannon run 1");
     let s2 = diversity_gpu::shannon_gpu(gpu, &counts).expect("GPU Shannon run 2");

@@ -1,12 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![allow(
-    clippy::too_many_lines,
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names,
     clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::too_many_lines,
     unused_assignments
 )]
 //! Exp073: Compute Dispatch Overhead — Streaming vs Individual vs CPU
 //!
-//! Quantifies ToadStool's dispatch overhead reduction by measuring the
+//! Quantifies `ToadStool`'s dispatch overhead reduction by measuring the
 //! same diversity workload (Shannon + Simpson + Observed) across three
 //! strategies at multiple batch sizes.
 //!
@@ -30,7 +34,7 @@ use wetspring_barracuda::validation::{self, Validator};
 use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
 
 fn make_abundances(n: usize) -> Vec<f64> {
-    (0..n).map(|i| ((i + 1) as f64) * 1.5 + 0.5).collect()
+    (0..n).map(|i| ((i + 1) as f64).mul_add(1.5, 0.5)).collect()
 }
 
 const BATCH_SIZES: &[usize] = &[64, 256, 1024, 4096];
@@ -77,18 +81,18 @@ async fn main() {
         // Strategy B: GPU Individual (new FMR each call)
         let t_ind = Instant::now();
         let mut ind_shannon = 0.0;
-        let mut ind_simpson = 0.0;
-        let mut ind_observed = 0.0;
+        let mut _ind_simpson = 0.0;
+        let mut _ind_observed = 0.0;
         for _ in 0..REPEATS {
             let fmr = FusedMapReduceF64::new(gpu.to_wgpu_device()).unwrap();
             ind_shannon = fmr.shannon_entropy(&abundances).unwrap();
             let dom = fmr.simpson_index(&abundances).unwrap();
-            ind_simpson = 1.0 - dom;
+            _ind_simpson = 1.0 - dom;
             let binary: Vec<f64> = abundances
                 .iter()
                 .map(|&c| if c > 0.0 { 1.0 } else { 0.0 })
                 .collect();
-            ind_observed = fmr.sum(&binary).unwrap();
+            _ind_observed = fmr.sum(&binary).unwrap();
         }
         let ind_us = t_ind.elapsed().as_micros() as f64 / REPEATS as f64;
 
@@ -162,10 +166,7 @@ async fn main() {
     println!("├──────────┼────────────┼────────────┼────────────┼──────────────┤");
     for &(n, cpu, ind, stream) in &results {
         let ratio = if ind > 0.0 { stream / ind } else { f64::NAN };
-        println!(
-            "│ {:>8} │ {:>10.0} │ {:>10.0} │ {:>10.0} │ {:>11.3}x │",
-            n, cpu, ind, stream, ratio
-        );
+        println!("│ {n:>8} │ {cpu:>10.0} │ {ind:>10.0} │ {stream:>10.0} │ {ratio:>11.3}x │");
     }
     println!("└──────────┴────────────┴────────────┴────────────┴──────────────┘");
     println!("  TensorContext stats: {}", session.ctx_stats());

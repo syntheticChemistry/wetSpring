@@ -1,24 +1,33 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::needless_range_loop,
+    clippy::missing_const_for_fn
+)]
 //! Exp049: GPU ODE Parameter Sweep — QS/c-di-GMP
 //! Exp050: GPU Bifurcation Eigenvalue Analysis
 //!
 //! Section 1-2: 64-batch GPU ODE sweep via local workaround shader, CPU parity
-//! Section 3:   Jacobian eigenvalue decomposition via BatchedEighGpu
+//! Section 3:   Jacobian eigenvalue decomposition via `BatchedEighGpu`
 //!
 //! # Provenance
 //!
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | BarraCUDA CPU (reference) |
+//! | Baseline tool | `BarraCUDA` CPU (reference) |
 //! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
-//! | Baseline command | qs_biofilm::run_scenario, CPU deflated power iteration |
+//! | Baseline command | `qs_biofilm::run_scenario`, CPU deflated power iteration |
 //! | Baseline date | 2026-02-19 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_gpu_ode_sweep` |
 //! | Data | 64 batches QS/c-di-GMP, Jacobian J^T*J at steady state |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
-//! Local WGSL: batched RK4 ODE sweep. ToadStool: BatchedEighGpu for bifurcation eigenvalues.
+//! Local WGSL: batched RK4 ODE sweep. `ToadStool`: `BatchedEighGpu` for bifurcation eigenvalues.
 
 use barracuda::device::WgpuDevice;
 use barracuda::ops::linalg::BatchedEighGpu;
@@ -82,7 +91,7 @@ fn validate_ode_sweep(device: &Arc<WgpuDevice>, v: &mut Validator) {
     let n_batches = 64_u32;
     let n_steps = 1000_u32;
     let dt = 0.01;
-    let t_end = n_steps as f64 * dt;
+    let t_end = f64::from(n_steps) * dt;
     let y0_single: [f64; N_VARS] = [0.01, 0.0, 0.0, 1.0, 0.0];
 
     let base = QsBiofilmParams::default();
@@ -95,8 +104,8 @@ fn validate_ode_sweep(device: &Arc<WgpuDevice>, v: &mut Validator) {
         all_y0.extend_from_slice(&y0_single);
 
         let mut p = base.clone();
-        p.mu_max = 0.4 + 0.02 * i as f64;
-        p.k_ai_prod = 3.0 + 0.1 * i as f64;
+        p.mu_max = 0.02f64.mul_add(i as f64, 0.4);
+        p.k_ai_prod = 0.1f64.mul_add(i as f64, 3.0);
         all_params.extend_from_slice(&params_to_flat(&p));
 
         let cpu_result = qs_biofilm::run_scenario(&y0_single, t_end, dt, &p);
@@ -242,9 +251,9 @@ fn validate_bifurcation(device: &Arc<WgpuDevice>, v: &mut Validator) {
     let mut jtj_cpu = jtj.clone();
     let mut cpu_eigenvalues = vec![0.0_f64; N_VARS];
     for round in 0..N_VARS {
-        let mut v_vec = vec![1.0_f64 / (N_VARS as f64).sqrt(); N_VARS];
+        let mut v_vec = [1.0_f64 / (N_VARS as f64).sqrt(); N_VARS];
         for _ in 0..200 {
-            let mut av = vec![0.0_f64; N_VARS];
+            let mut av = [0.0_f64; N_VARS];
             for i in 0..N_VARS {
                 for j in 0..N_VARS {
                     av[i] += jtj_cpu[i * N_VARS + j] * v_vec[j];
@@ -298,7 +307,7 @@ fn validate_bifurcation(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 0.0,
             );
 
-            let gpu_max = gpu_eigs.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
+            let gpu_max = gpu_eigs.iter().copied().fold(f64::NEG_INFINITY, f64::max);
             let rel = (gpu_max - max_eigen).abs() / max_eigen.abs().max(1e-15);
             println!("    GPU max eigenvalue: {gpu_max:.6}");
             println!("    CPU max eigenvalue: {max_eigen:.6}");

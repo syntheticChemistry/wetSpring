@@ -36,6 +36,9 @@ use std::sync::Arc;
 
 const QF_WGSL: &str = include_str!("../shaders/quality_filter.wgsl");
 
+/// Workgroup size — must match `@workgroup_size(N)` in `shaders/quality_filter.wgsl`.
+const WORKGROUP_SIZE: u32 = 256;
+
 #[repr(C)]
 #[derive(Copy, Clone, Pod, Zeroable)]
 struct QfParams {
@@ -58,6 +61,8 @@ pub struct QualityFilterCached {
 }
 
 impl QualityFilterCached {
+    /// Create a new quality filter GPU instance.
+    #[must_use]
     pub fn new(device: Arc<WgpuDevice>, ctx: Arc<TensorContext>) -> Self {
         let shader = device
             .device()
@@ -185,7 +190,7 @@ impl QualityFilterCached {
                 ],
             });
 
-        let wg_x = (n as u32).div_ceil(256);
+        let wg_x = (n as u32).div_ceil(WORKGROUP_SIZE);
         let mut encoder =
             self.device
                 .device()

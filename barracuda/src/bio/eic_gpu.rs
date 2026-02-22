@@ -24,6 +24,10 @@ use crate::io::mzml::MzmlSpectrum;
 use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
 use barracuda::ops::weighted_dot_f64::WeightedDotF64;
 
+/// Minimum MS1 scans to justify GPU dispatch overhead.
+///
+/// Below 256 scans, the CPU path is faster than the GPU dispatch +
+/// transfer latency. Determined empirically on RTX 4070 (Exp066).
 const GPU_MIN_SCANS: usize = 256;
 
 fn require_f64(gpu: &GpuF64) -> Result<()> {
@@ -52,9 +56,7 @@ pub fn extract_eics_gpu(
 ) -> Result<Vec<Eic>> {
     require_f64(gpu)?;
 
-    let ms1: Vec<&MzmlSpectrum> = spectra.iter().filter(|s| s.ms_level == 1).collect();
-
-    if ms1.len() < GPU_MIN_SCANS {
+    if spectra.iter().filter(|s| s.ms_level == 1).count() < GPU_MIN_SCANS {
         return Ok(eic::extract_eics(spectra, target_mzs, ppm));
     }
 
@@ -65,7 +67,7 @@ pub fn extract_eics_gpu(
 /// GPU-accelerated batch peak integration using trapezoidal rule.
 ///
 /// Integrates multiple peak areas in parallel using `WeightedDotF64`.
-/// Each peak's area = sum of (dt * (y[i] + y[i+1]) / 2) over the peak range.
+/// Each peak's area = sum of (dt * (y\[i\] + y\[i+1\]) / 2) over the peak range.
 ///
 /// # Errors
 ///
@@ -198,6 +200,64 @@ pub fn batch_find_peaks_gpu(
 
 #[cfg(test)]
 mod tests {
-    // GPU tests require the `gpu` feature and hardware; see validate_diversity_gpu.rs
-    // for the integration test pattern. Unit tests here would need a mock GPU context.
+    use super::*;
+    use crate::bio::eic::Eic;
+    use crate::bio::signal::Peak;
+
+    /// Sum of intensities: sum([1, 2, 3]) = 6 (analytical).
+    #[tokio::test]
+    #[ignore] // requires GPU hardware
+    async fn known_value_batch_eic_total_intensity() {
+        let gpu = crate::gpu::GpuF64::new().await.expect("GPU init");
+        if !gpu.has_f64 {
+            return; // skip if no f64 support
+        }
+        let eics = vec![Eic {
+            target_mz: 100.0,
+            rt: vec![0.0, 1.0, 2.0],
+            intensity: vec![1.0, 2.0, 3.0],
+        }];
+        let totals = batch_eic_total_intensity_gpu(&gpu, &eics).unwrap();
+        let expected = 6.0;
+        assert!(
+            (totals[0] - expected).abs() < 1e-10,
+            "EIC sum: got {}, expected {}",
+            totals[0],
+            expected
+        );
+    }
+
+    /// Trapezoidal integration of a triangle (0,0)-(1,h)-(2,0): area = base * height / 2 = 2.
+    /// With rt=[0,1,2], intensity=[0,2,0], peak spanning left_base=0, right_base=2.
+    #[tokio::test]
+    #[ignore] // requires GPU hardware
+    async fn known_value_batch_integrate_peaks_trapezoidal() {
+        let gpu = crate::gpu::GpuF64::new().await.expect("GPU init");
+        if !gpu.has_f64 {
+            return; // skip if no f64 support
+        }
+        let eic = Eic {
+            target_mz: 100.0,
+            rt: vec![0.0, 1.0, 2.0],
+            intensity: vec![0.0, 2.0, 0.0],
+        };
+        let peak = Peak {
+            index: 1,
+            height: 2.0,
+            prominence: 2.0,
+            left_base: 0,
+            right_base: 2,
+            width: 2.0,
+            left_ips: 0.0,
+            right_ips: 2.0,
+        };
+        let areas = batch_integrate_peaks_gpu(&gpu, &[eic], &[vec![peak]]).unwrap();
+        let expected = 2.0; // trapezoidal: (1*(0+2)/2) + (1*(2+0)/2) = 2
+        assert!(
+            (areas[0][0] - expected).abs() < 1e-10,
+            "Peak area: got {}, expected {}",
+            areas[0][0],
+            expected
+        );
+    }
 }

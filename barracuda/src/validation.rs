@@ -91,24 +91,53 @@ pub fn exit_skipped(reason: &str) -> ! {
     std::process::exit(2)
 }
 
-/// Resolve a data directory using env-var override or repo-relative default.
+/// Resolve a data directory using a cascading discovery strategy.
 ///
-/// Checks `env_var` first (capability-based discovery at runtime), then
-/// falls back to `CARGO_MANIFEST_DIR/../{default_subpath}`.
+/// Implements capability-based discovery: primal code has no hardcoded paths and
+/// discovers data at runtime via explicit configuration or environment.
+///
+/// # Discovery cascade (in order)
+///
+/// 1. **Explicit env var** — If `env_var` is set, use it. Overrides everything.
+///    Use case: per-dataset override (e.g. `WETSPRING_FASTQ_DIR`).
+///
+/// 2. **General data root** — If `WETSPRING_DATA_ROOT` is set and
+///    `WETSPRING_DATA_ROOT/{default_subpath}` exists, use it.
+///    Use case: CI, shared data mounts.
+///
+/// 3. **Development fallback** — If `CARGO_MANIFEST_DIR/../{default_subpath}` exists,
+///    use it. Use case: local `cargo run` from repo.
+///
+/// 4. **Deployment fallback** — Otherwise return `default_subpath` (relative to cwd).
+///    Use case: standalone binaries run from a directory with data alongside.
+///
+/// # Example
 ///
 /// ```text
 /// let dir = data_dir("WETSPRING_FASTQ_DIR", "data/validation/MiSeq_SOP");
 /// ```
 #[must_use]
 pub fn data_dir(env_var: &str, default_subpath: &str) -> std::path::PathBuf {
-    std::env::var(env_var).map_or_else(
-        |_| {
-            std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-                .join("..")
-                .join(default_subpath)
-        },
-        std::path::PathBuf::from,
-    )
+    // 1. Specific env var override
+    if let Ok(dir) = std::env::var(env_var) {
+        return std::path::PathBuf::from(dir);
+    }
+    // 2. General data root
+    if let Ok(root) = std::env::var("WETSPRING_DATA_ROOT") {
+        let p = std::path::Path::new(&root).join(default_subpath);
+        if p.exists() {
+            return p;
+        }
+    }
+    // 3. Development: relative to crate manifest
+    let manifest = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("..")
+        .join(default_subpath);
+    if manifest.exists() {
+        return manifest;
+    }
+    // 4. Deployment: relative to cwd
+    std::path::PathBuf::from(default_subpath)
 }
 
 // ── Validator: structured check accumulator ───────────────────
@@ -158,6 +187,12 @@ impl Validator {
         if check(label, actual, expected, tolerance) {
             self.passed += 1;
         }
+    }
+
+    /// Check a boolean condition (pass = 1.0, fail = 0.0).
+    pub fn check_pass(&mut self, label: &str, pass: bool) {
+        let actual = if pass { 1.0 } else { 0.0 };
+        self.check(label, actual, 1.0, 0.0);
     }
 
     /// Check an exact count (`usize`) — no floating-point conversion.
@@ -271,6 +306,14 @@ mod tests {
     }
 
     #[test]
+    fn validator_check_pass() {
+        let mut v = Validator::new("check_pass test");
+        v.check_pass("pass", true);
+        v.check_pass("fail", false);
+        assert_eq!(v.counts(), (1, 2));
+    }
+
+    #[test]
     fn validator_full_workflow() {
         let mut v = Validator::new("integration");
         v.section("── section A ──");
@@ -299,6 +342,53 @@ mod tests {
             s.contains("data/default"),
             "fallback path should contain subpath"
         );
+    }
+
+    #[test]
+    fn data_dir_explicit_env_override() {
+        let key = "WETSPRING_DATA_DIR_EXPLICIT_OVERRIDE_TEST";
+        let expected = "/tmp/wetspring_explicit_override_test";
+        std::env::set_var(key, expected);
+        let dir = data_dir(key, "data/default");
+        std::env::remove_var(key);
+        assert_eq!(dir.to_string_lossy(), expected);
+    }
+
+    #[test]
+    fn data_dir_wetspring_data_root_override() {
+        let tmp = tempfile::tempdir().unwrap();
+        let subpath = "wetspring_data_root_test/data";
+        let full = tmp.path().join(subpath);
+        std::fs::create_dir_all(&full).unwrap();
+
+        let old = std::env::var("WETSPRING_DATA_ROOT").ok();
+        std::env::set_var("WETSPRING_DATA_ROOT", tmp.path());
+
+        let dir = data_dir("WETSPRING_NONEXISTENT_FOR_ROOT_TEST", subpath);
+
+        if let Some(v) = old {
+            std::env::set_var("WETSPRING_DATA_ROOT", v);
+        } else {
+            std::env::remove_var("WETSPRING_DATA_ROOT");
+        }
+
+        assert_eq!(dir, full, "WETSPRING_DATA_ROOT + subpath should be used");
+    }
+
+    #[test]
+    fn data_dir_cwd_fallback() {
+        // Temporarily clear WETSPRING_DATA_ROOT so we hit cwd fallback.
+        let old = std::env::var("WETSPRING_DATA_ROOT").ok();
+        std::env::remove_var("WETSPRING_DATA_ROOT");
+
+        let subpath = "___wetspring_cwd_fallback_nonexistent_xyz/data";
+        let dir = data_dir("WETSPRING_NONEXISTENT_CWD_TEST", subpath);
+
+        if let Some(v) = old {
+            std::env::set_var("WETSPRING_DATA_ROOT", v);
+        }
+
+        assert_eq!(dir.to_string_lossy(), subpath);
     }
 
     #[test]

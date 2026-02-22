@@ -1,8 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![allow(
-    clippy::too_many_lines,
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names,
     clippy::cast_precision_loss,
-    clippy::approx_constant
+    clippy::cast_possible_truncation,
+    clippy::too_many_lines,
+    clippy::approx_constant,
+    clippy::unnecessary_cast
 )]
 //! Exp066: CPU vs GPU Scaling Benchmark — All GPU Domains
 //!
@@ -167,7 +172,7 @@ fn bench_snp(device: &Arc<WgpuDevice>) {
         let seqs: Vec<Vec<u8>> = (0..n_seqs)
             .map(|i| gen_seq(seq_len, 100 + i as u64))
             .collect();
-        let refs: Vec<&[u8]> = seqs.iter().map(|s| s.as_slice()).collect();
+        let refs: Vec<&[u8]> = seqs.iter().map(Vec::as_slice).collect();
 
         let cpu = time_fn(|| {
             let _ = snp::call_snps(&refs);
@@ -271,7 +276,7 @@ fn bench_random_forest(device: &Arc<WgpuDevice>) {
     };
 
     let trees: Vec<DecisionTree> = (0..10)
-        .map(|i| mk_stump((i % 2) as i32, 5.0 + i as f64 * 0.3, 0, 1))
+        .map(|i| mk_stump((i % 2) as i32, f64::from(i).mul_add(0.3, 5.0), 0, 1))
         .collect();
     let rf = RandomForest::from_trees(trees, 2).unwrap();
 

@@ -359,11 +359,12 @@ impl BenchReport {
 //  Utility: read process RSS from /proc/self/status
 // ═══════════════════════════════════════════════════════════════════
 
-/// Read peak resident set size (`VmHWM`) in MB.
+/// Parse peak RSS from `/proc/self/status` content.
+///
+/// Extracted from `peak_rss_mb` for testability without filesystem access.
 #[must_use]
-pub fn peak_rss_mb() -> f64 {
-    let status = std::fs::read_to_string("/proc/self/status").unwrap_or_default();
-    for line in status.lines() {
+pub fn parse_peak_rss_mb(status_content: &str) -> f64 {
+    for line in status_content.lines() {
         if line.starts_with("VmHWM:") {
             let parts: Vec<&str> = line.split_whitespace().collect();
             if parts.len() >= 2 {
@@ -374,6 +375,13 @@ pub fn peak_rss_mb() -> f64 {
         }
     }
     0.0
+}
+
+/// Read peak resident set size (`VmHWM`) in MB from the live system.
+#[must_use]
+pub fn peak_rss_mb() -> f64 {
+    let status = std::fs::read_to_string("/proc/self/status").unwrap_or_default();
+    parse_peak_rss_mb(&status)
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -570,6 +578,18 @@ mod tests {
         assert_eq!(date[0].len(), 4);
         assert_eq!(date[1].len(), 2);
         assert_eq!(date[2].len(), 2);
+    }
+
+    #[test]
+    fn parse_peak_rss_mb_extracts_vmhwm() {
+        let content = "VmPeak:\t  1234567 kB\nVmHWM:\t   524288 kB\nVmRSS:\t   400000 kB\n";
+        let rss = parse_peak_rss_mb(content);
+        assert!((rss - 512.0).abs() < 0.001); // 524288 / 1024 = 512
+    }
+
+    #[test]
+    fn parse_peak_rss_mb_empty() {
+        assert_eq!(parse_peak_rss_mb(""), 0.0);
     }
 
     #[test]

@@ -1,14 +1,25 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::too_many_arguments,
+    clippy::map_unwrap_or,
+    clippy::items_after_statements,
+    clippy::redundant_closure_for_method_calls
+)]
 //! Exp046: GPU Phylogenetic Composition
 //!
-//! Demonstrates that ToadStool's `FelsensteinGpu` serves as a drop-in
+//! Demonstrates that `ToadStool`'s `FelsensteinGpu` serves as a drop-in
 //! GPU inner loop for:
 //!
 //! 1. **Felsenstein parity** — CPU recursive/flat vs GPU log-likelihood
 //! 2. **GPU bootstrap** — column resampling + GPU Felsenstein per replicate
 //! 3. **GPU placement** — edge-parallel GPU Felsenstein for metagenomic reads
 //!
-//! This validates the *composition* of an absorbed ToadStool primitive into
+//! This validates the *composition* of an absorbed `ToadStool` primitive into
 //! higher-level phylogenetic workflows — the core Write → Absorb → Lean
 //! pattern applied to the most compute-heavy bioinformatics operation.
 //!
@@ -17,15 +28,15 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | BarraCUDA CPU (reference) |
+//! | Baseline tool | `BarraCUDA` CPU (reference) |
 //! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
-//! | Baseline command | bio::felsenstein::log_likelihood, placement::placement_scan, bootstrap |
+//! | Baseline command | `bio::felsenstein::log_likelihood`, `placement::placement_scan`, bootstrap |
 //! | Baseline date | 2026-02-19 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_gpu_phylo_compose` |
 //! | Data | 3-taxon/5-taxon trees, bootstrap replicates, placement edges |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
-//! ToadStool primitive: FelsensteinGpu (site-parallel pruning). GPU bootstrap + placement.
+//! `ToadStool` primitive: `FelsensteinGpu` (site-parallel pruning). GPU bootstrap + placement.
 
 use barracuda::device::WgpuDevice;
 use barracuda::{FelsensteinGpu, FelsensteinResult, PhyloTree};
@@ -122,7 +133,7 @@ fn convert_tree(tree: &TreeNode, mu: f64) -> TreeConversion {
     let n_sites = leaf_seqs
         .iter()
         .filter(|s| !s.is_empty())
-        .map(|s| s.len())
+        .map(Vec::len)
         .next()
         .unwrap_or(0);
 
@@ -180,7 +191,7 @@ fn convert_tree(tree: &TreeNode, mu: f64) -> TreeConversion {
     }
 }
 
-/// Rebuild tip_likelihoods from a resampled alignment.
+/// Rebuild `tip_likelihoods` from a resampled alignment.
 fn rebuild_tips(conv: &TreeConversion, tree: &TreeNode, aln: &Alignment) -> Vec<f64> {
     let mut tips = vec![0.0_f64; conv.n_nodes * aln.n_sites * N_STATES];
     let leaf_states = collect_leaf_states(tree, aln);
@@ -194,7 +205,7 @@ fn rebuild_tips(conv: &TreeConversion, tree: &TreeNode, aln: &Alignment) -> Vec<
     tips
 }
 
-/// Collect (node_idx, states) for each leaf in pre-order.
+/// Collect (`node_idx`, states) for each leaf in pre-order.
 fn collect_leaf_states(tree: &TreeNode, aln: &Alignment) -> Vec<(usize, Vec<usize>)> {
     let mut result = Vec::new();
     let mut leaf_counter = 0_usize;
@@ -372,13 +383,13 @@ fn validate_felsenstein_parity(device: &Arc<WgpuDevice>, v: &mut Validator) {
             );
             v.check(
                 "3-taxon: GPU LL finite",
-                f64::from(gpu_ll.is_finite() as u8),
+                f64::from(u8::from(gpu_ll.is_finite())),
                 1.0,
                 0.0,
             );
             v.check(
                 "3-taxon: GPU LL negative",
-                f64::from((gpu_ll < 0.0) as u8),
+                f64::from(u8::from(gpu_ll < 0.0)),
                 1.0,
                 0.0,
             );
@@ -410,7 +421,7 @@ fn validate_felsenstein_parity(device: &Arc<WgpuDevice>, v: &mut Validator) {
             );
             v.check(
                 "5-taxon: GPU LL negative",
-                f64::from((gpu_ll5 < 0.0) as u8),
+                f64::from(u8::from(gpu_ll5 < 0.0)),
                 1.0,
                 0.0,
             );
@@ -474,7 +485,7 @@ fn validate_gpu_bootstrap(device: &Arc<WgpuDevice>, v: &mut Validator) {
         let all_finite = gpu_lls.iter().all(|x| x.is_finite() && *x < 0.0);
         v.check(
             "Bootstrap: all GPU LLs finite & negative",
-            f64::from(all_finite as u8),
+            f64::from(u8::from(all_finite)),
             1.0,
             0.0,
         );
@@ -486,7 +497,7 @@ fn validate_gpu_bootstrap(device: &Arc<WgpuDevice>, v: &mut Validator) {
         }
         v.check(
             "Bootstrap: max |CPU−GPU| < 1e-4",
-            f64::from((max_diff < tolerances::GPU_VS_CPU_ENSEMBLE) as u8),
+            f64::from(u8::from(max_diff < tolerances::GPU_VS_CPU_ENSEMBLE)),
             1.0,
             0.0,
         );
@@ -570,7 +581,7 @@ fn validate_gpu_placement(device: &Arc<WgpuDevice>, v: &mut Validator) {
         let all_finite = gpu_lls.iter().all(|x| x.is_finite() && *x < 0.0);
         v.check(
             "Placement: all GPU LLs finite & negative",
-            f64::from(all_finite as u8),
+            f64::from(u8::from(all_finite)),
             1.0,
             0.0,
         );
@@ -582,7 +593,7 @@ fn validate_gpu_placement(device: &Arc<WgpuDevice>, v: &mut Validator) {
         }
         v.check(
             "Placement: max |CPU−GPU| < 1e-4",
-            f64::from((max_diff < tolerances::GPU_VS_CPU_ENSEMBLE) as u8),
+            f64::from(u8::from(max_diff < tolerances::GPU_VS_CPU_ENSEMBLE)),
             1.0,
             0.0,
         );
@@ -609,7 +620,7 @@ fn validate_gpu_placement(device: &Arc<WgpuDevice>, v: &mut Validator) {
     }
 }
 
-/// Re-implementation of placement's insert_at_edge (the original is private).
+/// Re-implementation of placement's `insert_at_edge` (the original is private).
 fn insert_query_at_edge(
     tree: &TreeNode,
     query_states: &[usize],

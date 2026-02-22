@@ -4,7 +4,7 @@
 //! Dispatches one thread per (sample, tree) pair. Each thread traverses
 //! its tree for one sample. Results reduced on CPU via majority vote.
 //!
-//! Uses a SoA (Structure of Arrays) layout with separate buffers for
+//! Uses a `SoA` (Structure of Arrays) layout with separate buffers for
 //! node features (i32), thresholds (f64), and children (i32) to avoid
 //! bitcast issues in WGSL.
 
@@ -18,8 +18,13 @@ use super::random_forest::{RandomForest, RfPrediction};
 
 const RF_WGSL: &str = include_str!("../shaders/rf_batch_inference.wgsl");
 
+/// Workgroup size — must match `@workgroup_size(N)` in `shaders/rf_batch_inference.wgsl`.
+const WORKGROUP_SIZE: u32 = 256;
+
+/// GPU params for RF batch inference.
 #[repr(C)]
 #[derive(Copy, Clone, Pod, Zeroable)]
+#[allow(clippy::struct_field_names)]
 struct RfGpuParams {
     n_samples: u32,
     n_trees: u32,
@@ -27,6 +32,7 @@ struct RfGpuParams {
     n_features: u32,
 }
 
+/// GPU-accelerated random forest batch inference.
 pub struct RandomForestGpu {
     device: Arc<WgpuDevice>,
     pipeline: wgpu::ComputePipeline,
@@ -34,6 +40,8 @@ pub struct RandomForestGpu {
 }
 
 impl RandomForestGpu {
+    /// Create a new random forest GPU instance.
+    #[must_use]
     pub fn new(device: &Arc<WgpuDevice>) -> Self {
         let patched = ShaderTemplate::for_driver_auto(RF_WGSL, false);
         let module = device.compile_shader(&patched, Some("RfBatchInference"));
@@ -45,7 +53,7 @@ impl RandomForestGpu {
                 module: &module,
                 entry_point: "main",
                 cache: None,
-                compilation_options: Default::default(),
+                compilation_options: wgpu::PipelineCompilationOptions::default(),
             });
         let bgl = pipeline.get_bind_group_layout(0);
         Self {
@@ -56,8 +64,13 @@ impl RandomForestGpu {
     }
 
     /// Run batch RF inference on GPU, returns per-sample predictions.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` if GPU buffer creation or readback fails.
     #[allow(
         clippy::cast_possible_truncation,
+        clippy::cast_possible_wrap,
         clippy::cast_sign_loss,
         clippy::too_many_lines
     )]
@@ -194,7 +207,7 @@ impl RandomForestGpu {
             let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor::default());
             pass.set_pipeline(&self.pipeline);
             pass.set_bind_group(0, &bg, &[]);
-            pass.dispatch_workgroups(total.div_ceil(256), 1, 1);
+            pass.dispatch_workgroups(total.div_ceil(WORKGROUP_SIZE), 1, 1);
         }
 
         dev.queue().submit(Some(encoder.finish()));
@@ -219,6 +232,8 @@ impl RandomForestGpu {
                 .enumerate()
                 .max_by_key(|(_, &v)| v)
                 .unwrap_or((0, &0));
+            // Safe: tree counts and vote counts are small (usize), f64 has plenty of precision.
+            #[allow(clippy::cast_precision_loss)]
             let confidence = max_votes as f64 / n_trees as f64;
             results.push(RfPrediction {
                 class,

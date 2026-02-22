@@ -1,5 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::similar_names)]
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::too_many_lines
+)]
 //! Exp063: GPU Random Forest Batch Inference
 //!
 //! Validates the local WGSL shader for batch RF inference against
@@ -11,15 +18,15 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | BarraCUDA CPU (reference) |
+//! | Baseline tool | `BarraCUDA` CPU (reference) |
 //! | Baseline version | wetspring-barracuda 0.1.0 (CPU path) |
-//! | Baseline command | RandomForest::predict_batch_with_votes |
+//! | Baseline command | `RandomForest::predict_batch_with_votes` |
 //! | Baseline date | 2026-02-19 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_gpu_rf` |
 //! | Data | 6 samples × 5-tree forest (same as CPU v5) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
-//! Local WGSL shader: batch RF inference (RandomForestGpu).
+//! Local WGSL shader: batch RF inference (`RandomForestGpu`).
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{
@@ -29,7 +36,6 @@ use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
-#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
 async fn main() {
     let mut v = Validator::new("Exp063: GPU Random Forest Batch Inference");
 
@@ -149,7 +155,7 @@ async fn main() {
             println!(
                 "  GPU RF batch inference: {gpu_us} µs ({} samples × {} trees)",
                 samples.len(),
-                rf.n_trees()
+                rf.n_trees(),
             );
         }
         Ok(Err(e)) => {

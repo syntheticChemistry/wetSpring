@@ -1,6 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::too_many_lines, clippy::cast_precision_loss)]
-//! Exp064: BarraCUDA GPU Parity v1 — Consolidated GPU Domain Validation
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::too_many_lines
+)]
+//! Exp064: `BarraCUDA` GPU Parity v1 — Consolidated GPU Domain Validation
 //!
 //! The GPU analogue of `barracuda_cpu_v1-v5`: a single binary that proves
 //! pure GPU math matches CPU reference truth across all GPU-eligible domains.

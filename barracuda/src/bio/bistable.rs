@@ -107,7 +107,7 @@ fn bistable_rhs(state: &[f64], _t: f64, p: &BistableParams) -> Vec<f64> {
 
     let pde_rate = b.k_pde_act.mul_add(hapr, b.k_pde_basal);
     let mut d_cdg = b.d_cdg.mul_add(-cdg, dgc_rate - pde_rate * cdg);
-    if cdg < 1e-12 && d_cdg < 0.0 {
+    if cdg < crate::tolerances::ODE_CDG_CONVERGENCE && d_cdg < 0.0 {
         d_cdg = 0.0;
     }
 

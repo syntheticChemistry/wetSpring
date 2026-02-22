@@ -68,6 +68,78 @@ impl SpectrumBuilder {
     }
 }
 
+/// Reusable buffer for binary array decoding, avoiding per-spectrum allocation
+/// for the intermediate decompression step.
+///
+/// Use with [`BinaryArrayState::decode_into_with_buffer`] when streaming many
+/// spectra to amortize allocations.
+#[derive(Debug, Default)]
+pub struct DecodeBuffer {
+    decompressed: Vec<u8>,
+}
+
+impl DecodeBuffer {
+    /// Create a new empty decode buffer.
+    pub const fn new() -> Self {
+        Self {
+            decompressed: Vec::new(),
+        }
+    }
+
+    /// Decode a base64 + optional zlib-compressed array, reusing the internal buffer.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Base64`] for invalid base64, [`Error::Zlib`] for decompression
+    /// failures, or [`Error::BinaryFormat`] for length mismatches.
+    pub fn decode(&mut self, encoded: &str, is_zlib: bool, is_64bit: bool) -> Result<Vec<f64>> {
+        let bytes = base64_decode(encoded.trim()).map_err(Error::Base64)?;
+
+        let decompressed: &[u8] = if is_zlib {
+            self.decompressed.clear();
+            let mut decoder = ZlibDecoder::new(&bytes[..]);
+            decoder
+                .read_to_end(&mut self.decompressed)
+                .map_err(|e| Error::Zlib(format!("{e}")))?;
+            &self.decompressed[..]
+        } else {
+            &bytes[..]
+        };
+
+        if is_64bit {
+            if decompressed.len() % 8 != 0 {
+                return Err(Error::BinaryFormat(format!(
+                    "f64 array length {} not divisible by 8",
+                    decompressed.len()
+                )));
+            }
+            Ok(decompressed
+                .chunks_exact(8)
+                .map(|chunk| {
+                    let mut arr = [0_u8; 8];
+                    arr.copy_from_slice(chunk);
+                    f64::from_le_bytes(arr)
+                })
+                .collect())
+        } else {
+            if decompressed.len() % 4 != 0 {
+                return Err(Error::BinaryFormat(format!(
+                    "f32 array length {} not divisible by 4",
+                    decompressed.len()
+                )));
+            }
+            Ok(decompressed
+                .chunks_exact(4)
+                .map(|chunk| {
+                    let mut arr = [0_u8; 4];
+                    arr.copy_from_slice(chunk);
+                    f64::from(f32::from_le_bytes(arr))
+                })
+                .collect())
+        }
+    }
+}
+
 /// Tracks encoding properties for a `<binaryDataArray>`.
 #[allow(clippy::struct_excessive_bools)] // maps directly to mzML cvParam flags
 pub struct BinaryArrayState {
@@ -109,11 +181,39 @@ impl BinaryArrayState {
         }
     }
 
+    /// Decode the binary array into the spectrum builder.
+    ///
+    /// For backward compatibility, allocates per call. Prefer
+    /// [`decode_into_with_buffer`](Self::decode_into_with_buffer) when streaming many spectra.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Base64`], [`Error::Zlib`], or [`Error::BinaryFormat`] on decode failure.
+    #[allow(dead_code)] // public API, prefer decode_into_with_buffer in streaming paths
     pub fn decode_into(&self, builder: &mut SpectrumBuilder) -> Result<()> {
+        self.decode_into_with_buffer(builder, None)
+    }
+
+    /// Decode the binary array into the spectrum builder, optionally reusing a buffer.
+    ///
+    /// When `buffer` is `Some`, reuses the buffer for zlib decompression to avoid
+    /// per-spectrum allocation. Use with [`DecodeBuffer`] when streaming.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Base64`], [`Error::Zlib`], or [`Error::BinaryFormat`] on decode failure.
+    pub fn decode_into_with_buffer(
+        &self,
+        builder: &mut SpectrumBuilder,
+        buffer: Option<&mut DecodeBuffer>,
+    ) -> Result<()> {
         if self.text.is_empty() {
             return Ok(());
         }
-        let arr = decode_binary_array(&self.text, self.is_zlib, self.is_64bit)?;
+        let arr = match buffer {
+            Some(buf) => buf.decode(&self.text, self.is_zlib, self.is_64bit)?,
+            None => decode_binary_array(&self.text, self.is_zlib, self.is_64bit)?,
+        };
         if self.is_mz {
             builder.mz_array = arr;
         } else if self.is_intensity {
@@ -124,51 +224,16 @@ impl BinaryArrayState {
 }
 
 /// Decode a base64 + optional zlib-compressed array of f64 values.
+///
+/// For streaming use, prefer [`DecodeBuffer::decode`] to reuse the decompression buffer.
+///
+/// # Errors
+///
+/// Returns [`Error::Base64`] for invalid base64, [`Error::Zlib`] for decompression
+/// failures, or [`Error::BinaryFormat`] for length mismatches.
 pub fn decode_binary_array(encoded: &str, is_zlib: bool, is_64bit: bool) -> Result<Vec<f64>> {
-    let bytes = base64_decode(encoded.trim()).map_err(Error::Base64)?;
-
-    let decompressed = if is_zlib {
-        let mut decoder = ZlibDecoder::new(&bytes[..]);
-        let mut buf = Vec::new();
-        decoder
-            .read_to_end(&mut buf)
-            .map_err(|e| Error::Zlib(format!("{e}")))?;
-        buf
-    } else {
-        bytes
-    };
-
-    if is_64bit {
-        if decompressed.len() % 8 != 0 {
-            return Err(Error::BinaryFormat(format!(
-                "f64 array length {} not divisible by 8",
-                decompressed.len()
-            )));
-        }
-        Ok(decompressed
-            .chunks_exact(8)
-            .map(|chunk| {
-                let mut arr = [0_u8; 8];
-                arr.copy_from_slice(chunk);
-                f64::from_le_bytes(arr)
-            })
-            .collect())
-    } else {
-        if decompressed.len() % 4 != 0 {
-            return Err(Error::BinaryFormat(format!(
-                "f32 array length {} not divisible by 4",
-                decompressed.len()
-            )));
-        }
-        Ok(decompressed
-            .chunks_exact(4)
-            .map(|chunk| {
-                let mut arr = [0_u8; 4];
-                arr.copy_from_slice(chunk);
-                f64::from(f32::from_le_bytes(arr))
-            })
-            .collect())
-    }
+    let mut buffer = DecodeBuffer::new();
+    buffer.decode(encoded, is_zlib, is_64bit)
 }
 
 /// Build an mzML with configurable compression and precision per array.
@@ -406,6 +471,87 @@ mod tests {
         assert_eq!(spectra.len(), 1);
         assert_eq!(spectra[0].mz_array.len(), 3);
         assert!((spectra[0].mz_array[1] - 200.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn decode_buffer_matches_decode_binary_array() {
+        let values = [100.0_f64, 200.0, 300.0];
+        let bytes: Vec<u8> = values.iter().flat_map(|v| v.to_le_bytes()).collect();
+        let encoded = crate::encoding::base64_encode(&bytes);
+
+        let mut buffer = DecodeBuffer::new();
+        let decoded = buffer.decode(&encoded, false, true).unwrap();
+        assert_eq!(decoded.len(), 3);
+        for (a, &b) in decoded.iter().zip(values.iter()) {
+            assert!((*a - b).abs() < f64::EPSILON);
+        }
+
+        // Compare with decode_binary_array
+        let legacy = decode_binary_array(&encoded, false, true).unwrap();
+        assert_eq!(decoded, legacy);
+    }
+
+    #[test]
+    fn decode_buffer_reuse_zlib() {
+        use flate2::write::ZlibEncoder;
+        use flate2::Compression;
+
+        let values1 = [42.0_f64, 99.0];
+        let values2 = [1.5_f64, 2.5, 3.5];
+        let raw1: Vec<u8> = values1.iter().flat_map(|v| v.to_le_bytes()).collect();
+        let raw2: Vec<u8> = values2.iter().flat_map(|v| v.to_le_bytes()).collect();
+        let mut enc = ZlibEncoder::new(Vec::new(), Compression::default());
+        std::io::Write::write_all(&mut enc, &raw1).unwrap();
+        let compressed1 = enc.finish().unwrap();
+        let mut enc = ZlibEncoder::new(Vec::new(), Compression::default());
+        std::io::Write::write_all(&mut enc, &raw2).unwrap();
+        let compressed2 = enc.finish().unwrap();
+        let encoded1 = crate::encoding::base64_encode(&compressed1);
+        let encoded2 = crate::encoding::base64_encode(&compressed2);
+
+        let mut buffer = DecodeBuffer::new();
+        let decoded1 = buffer.decode(&encoded1, true, true).unwrap();
+        let decoded2 = buffer.decode(&encoded2, true, true).unwrap();
+
+        assert_eq!(decoded1.len(), 2);
+        assert!((decoded1[0] - 42.0).abs() < f64::EPSILON);
+        assert!((decoded1[1] - 99.0).abs() < f64::EPSILON);
+        assert_eq!(decoded2.len(), 3);
+        assert!((decoded2[0] - 1.5).abs() < f64::EPSILON);
+        assert!((decoded2[1] - 2.5).abs() < f64::EPSILON);
+        assert!((decoded2[2] - 3.5).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn decode_into_with_buffer_matches_decode_into() {
+        let values = [10.0_f64, 20.0, 30.0];
+        let bytes: Vec<u8> = values.iter().flat_map(|v| v.to_le_bytes()).collect();
+        let encoded = crate::encoding::base64_encode(&bytes);
+
+        let mut state = BinaryArrayState::new();
+        state.text = encoded.clone();
+        state.is_mz = true;
+        state.is_zlib = false;
+        state.is_64bit = true;
+
+        let mut builder_without = SpectrumBuilder::new(0);
+        state.decode_into(&mut builder_without).unwrap();
+
+        let mut builder_with = SpectrumBuilder::new(0);
+        state.text = encoded;
+        let mut buffer = DecodeBuffer::new();
+        state
+            .decode_into_with_buffer(&mut builder_with, Some(&mut buffer))
+            .unwrap();
+
+        assert_eq!(builder_without.mz_array.len(), builder_with.mz_array.len());
+        for (a, b) in builder_without
+            .mz_array
+            .iter()
+            .zip(builder_with.mz_array.iter())
+        {
+            assert!((a - b).abs() < f64::EPSILON);
+        }
     }
 
     #[test]

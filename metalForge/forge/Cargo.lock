@@ -1217,6 +1217,7 @@ name = "wetspring-forge"
 version = "0.1.0"
 dependencies = [
  "barracuda",
+ "tokio",
  "wgpu",
 ]
 

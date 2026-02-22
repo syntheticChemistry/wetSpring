@@ -1,13 +1,17 @@
-# wetSpring Python dependencies
+# wetSpring Python dependencies — runtime tools and experiment environment.
+#
+# WARNING: This file uses minimum-version ranges for broad compatibility.
+# It is NOT suitable for reproducing validation baselines. For baseline
+# reproduction, use scripts/requirements.txt which pins exact versions.
+#
 # Install: pip install -r requirements.txt
 #
 # These are needed for:
 # - Galaxy control experiments (Phase 1)
-# - Python baseline benchmarks
-# - Peak detection baseline generation (scipy)
 # - Track 2 validation scripts (asari, FindPFAS)
+# - Diversity baseline (Python benchmark)
 
-# Core scientific stack (benchmarks + baselines)
+# Core scientific stack
 numpy>=1.24
 scipy>=1.12
 

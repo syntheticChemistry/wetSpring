@@ -10,7 +10,7 @@ mod decode;
 
 use crate::error::{Error, Result};
 use crate::io::xml::{XmlEvent, XmlReader};
-use decode::{BinaryArrayState, SpectrumBuilder};
+use decode::{BinaryArrayState, DecodeBuffer, SpectrumBuilder};
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
@@ -85,6 +85,7 @@ pub struct MzmlStats {
 /// ```
 pub struct MzmlIter {
     reader: XmlReader<BufReader<File>>,
+    decode_buffer: DecodeBuffer,
     done: bool,
 }
 
@@ -104,6 +105,7 @@ impl MzmlIter {
         reader.set_trim_text(true);
         Ok(Self {
             reader,
+            decode_buffer: DecodeBuffer::new(),
             done: false,
         })
     }
@@ -175,7 +177,9 @@ impl Iterator for MzmlIter {
                         "binary" => in_binary = false,
                         "binaryDataArray" => {
                             if let Some(ref mut b) = builder {
-                                if let Err(e) = binary_state.decode_into(b) {
+                                if let Err(e) = binary_state
+                                    .decode_into_with_buffer(b, Some(&mut self.decode_buffer))
+                                {
                                     eprintln!("Warning: binary decode failed: {e}");
                                 }
                             }

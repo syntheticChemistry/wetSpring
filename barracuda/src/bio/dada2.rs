@@ -2,7 +2,7 @@
 //! DADA2-style amplicon sequence variant (ASV) denoising.
 //!
 //! Special math functions (`ln_gamma`, `regularized_gamma_lower`) are
-//! provided by [`super::special`] — the shared sovereign math module.
+//! provided by [`crate::special`] — the shared sovereign math module.
 //!
 //! Implements the core algorithm from Callahan et al. "DADA2: High-resolution
 //! sample inference from Illumina amplicon data." Nature Methods 13, 581–583
@@ -35,8 +35,8 @@
 //! - Callahan et al. Nature Methods 13, 581–583 (2016).
 //! - QIIME2 `dada2 denoise-paired` / `denoise-single`.
 
-use super::special::regularized_gamma_lower;
 use crate::bio::derep::UniqueSequence;
+use crate::special::regularized_gamma_lower;
 use std::fmt::Write;
 
 const NUM_BASES: usize = 4;

@@ -18,6 +18,8 @@ wgpu = { version = "22", default-features = false, features = [
     "vulkan-portability",
 ] }
 
+tokio = { version = "1", features = ["rt"] }
+
 [dev-dependencies]
 
 [lints.clippy]

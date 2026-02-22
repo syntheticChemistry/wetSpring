@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::too_many_lines, clippy::cast_precision_loss)]
-//! Exp072: ToadStool Unidirectional Streaming — Zero CPU Round-Trips
+#![allow(
+    clippy::too_many_lines,
+    clippy::cast_precision_loss,
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names
+)]
+//! Exp072: `ToadStool` Unidirectional Streaming — Zero CPU Round-Trips
 //!
 //! Proves that chaining GPU stages via pre-warmed pipelines eliminates
 //! per-stage dispatch overhead and delivers measurable throughput
@@ -9,14 +15,14 @@
 //! Three paths tested:
 //! - Path A: CPU baseline (sequential Rust math)
 //! - Path B: GPU individual dispatch (new FMR/BrayCurtis each time)
-//! - Path C: GPU streaming (GpuPipelineSession, pre-warmed pipelines)
+//! - Path C: GPU streaming (`GpuPipelineSession`, pre-warmed pipelines)
 //!
 //! # Provenance
 //!
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | current HEAD |
-//! | Baseline tool | BarraCUDA CPU (sovereign Rust reference) |
+//! | Baseline tool | `BarraCUDA` CPU (sovereign Rust reference) |
 //! | Baseline date | 2026-02-21 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_gpu_streaming_pipeline` |
 //! | Data | Synthetic abundance/spectral vectors (self-contained) |
@@ -54,7 +60,7 @@ fn pairwise_cosine_cpu(spectra: &[Vec<f64>]) -> Vec<f64> {
 }
 
 fn make_abundances(n: usize) -> Vec<f64> {
-    (0..n).map(|i| ((i + 1) as f64) * 2.5 + 1.0).collect()
+    (0..n).map(|i| ((i + 1) as f64).mul_add(2.5, 1.0)).collect()
 }
 
 fn make_samples(n_samples: usize, n_features: usize) -> Vec<Vec<f64>> {
@@ -288,31 +294,13 @@ async fn main() {
     println!("├──────────────────┬──────────────┬───────────────────┤");
     println!("│ Path             │ Time (µs)    │ Notes             │");
     println!("├──────────────────┼──────────────┼───────────────────┤");
-    println!(
-        "│ A: CPU           │ {:>12.0} │ baseline          │",
-        cpu_total_us
-    );
-    println!(
-        "│ B: GPU indiv.    │ {:>12.0} │ new FMR each time │",
-        ind_total_us
-    );
-    println!(
-        "│ C: GPU streaming │ {:>12.0} │ pre-warmed FMR    │",
-        stream_total_us
-    );
-    println!(
-        "│ 10x Individual   │ {:>12.0} │ repeated dispatch │",
-        ind_10_us
-    );
-    println!(
-        "│ 10x Streaming    │ {:>12.0} │ session reuse     │",
-        stream_10_us
-    );
+    println!("│ A: CPU           │ {cpu_total_us:>12.0} │ baseline          │");
+    println!("│ B: GPU indiv.    │ {ind_total_us:>12.0} │ new FMR each time │");
+    println!("│ C: GPU streaming │ {stream_total_us:>12.0} │ pre-warmed FMR    │");
+    println!("│ 10x Individual   │ {ind_10_us:>12.0} │ repeated dispatch │");
+    println!("│ 10x Streaming    │ {stream_10_us:>12.0} │ session reuse     │");
     println!("├──────────────────┼──────────────┼───────────────────┤");
-    println!(
-        "│ Speedup (10x)    │       {:>5.2}x │ streaming/indiv.  │",
-        speedup
-    );
+    println!("│ Speedup (10x)    │       {speedup:>5.2}x │ streaming/indiv.  │");
     println!("└──────────────────┴──────────────┴───────────────────┘");
 
     v.finish();

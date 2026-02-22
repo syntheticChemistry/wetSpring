@@ -134,6 +134,22 @@ pub fn call_snps_flat(sequences: &[&[u8]]) -> SnpFlatResult {
     }
 }
 
+/// Call SNPs across multiple independent alignments in batch.
+///
+/// Returns one `SnpFlatResult` per alignment. This is the entry point
+/// for GPU dispatch: each alignment maps to one workgroup, with
+/// positions distributed across threads.
+#[must_use]
+pub fn call_snps_batch(alignments: &[Vec<Vec<u8>>]) -> Vec<SnpFlatResult> {
+    alignments
+        .iter()
+        .map(|aln| {
+            let refs: Vec<&[u8]> = aln.iter().map(Vec::as_slice).collect();
+            call_snps_flat(&refs)
+        })
+        .collect()
+}
+
 /// Call SNPs from a set of aligned sequences.
 ///
 /// Each sequence must be the same length. Positions where all non-gap
@@ -319,5 +335,37 @@ mod tests {
             n_sequences: 0,
         };
         assert!(result.snp_density().abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn batch_snps_multiple_alignments() {
+        let aln1 = vec![b"ATGATG".to_vec(), b"CTGATG".to_vec()];
+        let aln2 = vec![b"GGGG".to_vec(), b"GGGG".to_vec()];
+        let aln3 = vec![b"ACGT".to_vec(), b"TCGT".to_vec(), b"ACGT".to_vec()];
+        let results = call_snps_batch(&[aln1, aln2, aln3]);
+        assert_eq!(results.len(), 3);
+        assert!(!results[0].positions.is_empty(), "aln1 should have SNPs");
+        assert!(
+            results[1].positions.is_empty(),
+            "aln2 (identical) should have no SNPs"
+        );
+        assert!(!results[2].positions.is_empty(), "aln3 should have SNPs");
+    }
+
+    #[test]
+    fn batch_snps_empty() {
+        let results = call_snps_batch(&[]);
+        assert!(results.is_empty());
+    }
+
+    #[test]
+    fn batch_snps_single_alignment_matches_direct() {
+        let aln = vec![b"ATGATG".to_vec(), b"CTGATG".to_vec(), b"ATGTTG".to_vec()];
+        let batch = call_snps_batch(&[aln.clone()]);
+        let refs: Vec<&[u8]> = aln.iter().map(Vec::as_slice).collect();
+        let direct = call_snps_flat(&refs);
+        assert_eq!(batch[0].positions, direct.positions);
+        assert_eq!(batch[0].ref_alleles, direct.ref_alleles);
+        assert_eq!(batch[0].alt_frequencies, direct.alt_frequencies);
     }
 }

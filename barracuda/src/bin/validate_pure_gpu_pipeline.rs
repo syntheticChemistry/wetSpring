@@ -1,11 +1,18 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::too_many_lines, clippy::cast_precision_loss)]
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::too_many_lines
+)]
 //! Exp075: Pure GPU Multi-Stage Analytics Pipeline
 //!
 //! Five chained GPU stages with zero intermediate CPU round-trips:
 //! 1. Alpha diversity (Shannon, Simpson, Observed, Evenness, Chao1)
 //! 2. Beta diversity (Bray-Curtis distance matrix)
-//! 3. Ordination (PCoA from distance matrix)
+//! 3. Ordination (`PCoA` from distance matrix)
 //! 4. Statistical summary (variance, correlation on PC axes)
 //! 5. Spectral cosine similarity (pairwise via GEMM + FMR)
 //!
@@ -52,7 +59,7 @@ fn make_spectra() -> Vec<Vec<f64>> {
     (0..N_SAMPLES)
         .map(|s| {
             (0..128)
-                .map(|f| ((s * 128 + f + 1) as f64) * 0.01 + (s as f64) * 0.001)
+                .map(|f| ((s * 128 + f + 1) as f64).mul_add(0.01, (s as f64) * 0.001))
                 .collect()
         })
         .collect()
@@ -254,10 +261,7 @@ async fn main() {
         0.0,
     );
 
-    println!(
-        "  Stage 3: {stage3_us:.0} µs (PCoA {N_SAMPLES}×{N_AXES}, prop_var={:.3})",
-        prop_sum
-    );
+    println!("  Stage 3: {stage3_us:.0} µs (PCoA {N_SAMPLES}×{N_AXES}, prop_var={prop_sum:.3})");
 
     // ═══════════════════════════════════════════════════════════════════
     // STAGE 4: Statistical Summary — GPU FMR
@@ -356,43 +360,20 @@ async fn main() {
     println!("├──────────────────────────┬──────────────┬────────────┤");
     println!("│ Stage                    │ GPU Time(µs) │ Status     │");
     println!("├──────────────────────────┼──────────────┼────────────┤");
-    println!(
-        "│ 1: Alpha diversity       │ {:>12.0} │ ✓ parity   │",
-        stage1_us
-    );
-    println!(
-        "│ 2: Bray-Curtis distance  │ {:>12.0} │ ✓ parity   │",
-        stage2_us
-    );
-    println!(
-        "│ 3: PCoA ordination       │ {:>12.0} │ ✓ parity   │",
-        stage3_us
-    );
-    println!(
-        "│ 4: Stats (var, corr)     │ {:>12.0} │ ✓ parity   │",
-        stage4_us
-    );
-    println!(
-        "│ 5: Spectral cosine       │ {:>12.0} │ ✓ parity   │",
-        stage5_us
-    );
+    println!("│ 1: Alpha diversity       │ {stage1_us:>12.0} │ ✓ parity   │");
+    println!("│ 2: Bray-Curtis distance  │ {stage2_us:>12.0} │ ✓ parity   │");
+    println!("│ 3: PCoA ordination       │ {stage3_us:>12.0} │ ✓ parity   │");
+    println!("│ 4: Stats (var, corr)     │ {stage4_us:>12.0} │ ✓ parity   │");
+    println!("│ 5: Spectral cosine       │ {stage5_us:>12.0} │ ✓ parity   │");
     println!("├──────────────────────────┼──────────────┼────────────┤");
-    println!(
-        "│ Sum of stages            │ {:>12.0} │            │",
-        stage_sum
-    );
-    println!(
-        "│ Total pipeline           │ {:>12.0} │            │",
-        pipeline_total
-    );
-    println!(
-        "│ Overhead                 │ {:>11.1}% │            │",
-        if stage_sum > 0.0 {
-            (pipeline_total - stage_sum) / pipeline_total * 100.0
-        } else {
-            0.0
-        }
-    );
+    println!("│ Sum of stages            │ {stage_sum:>12.0} │            │");
+    println!("│ Total pipeline           │ {pipeline_total:>12.0} │            │");
+    let overhead_pct = if stage_sum > 0.0 {
+        (pipeline_total - stage_sum) / pipeline_total * 100.0
+    } else {
+        0.0
+    };
+    println!("│ Overhead                 │ {overhead_pct:>11.1}% │            │");
     println!("└──────────────────────────┴──────────────┴────────────┘");
     println!("  {N_SAMPLES} samples × {N_FEATURES} features → 5 stages, all GPU");
 

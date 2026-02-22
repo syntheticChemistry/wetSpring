@@ -5,7 +5,7 @@
 //! and classifies: core (all genomes), accessory (2+ but not all),
 //! unique (exactly 1).
 //!
-//! Uses a local WGSL shader (`pangenome_classify.wgsl`) — a ToadStool
+//! Uses a local WGSL shader (`pangenome_classify.wgsl`) — a `ToadStool`
 //! absorption candidate following Write → Absorb → Lean.
 //!
 //! # GPU Strategy
@@ -21,6 +21,9 @@ use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
 const PAN_WGSL: &str = include_str!("../shaders/pangenome_classify.wgsl");
+
+/// Workgroup size — must match `@workgroup_size(N)` in `shaders/pangenome_classify.wgsl`.
+const WORKGROUP_SIZE: u32 = 256;
 
 #[repr(C)]
 #[derive(Copy, Clone, Pod, Zeroable)]
@@ -57,6 +60,7 @@ impl PangenomeGpuResult {
     }
 }
 
+/// GPU-accelerated pangenome gene classification.
 pub struct PangenomeGpu {
     device: Arc<WgpuDevice>,
     pipeline: wgpu::ComputePipeline,
@@ -64,6 +68,8 @@ pub struct PangenomeGpu {
 }
 
 impl PangenomeGpu {
+    /// Create a new pangenome GPU instance.
+    #[must_use]
     pub fn new(device: &Arc<WgpuDevice>) -> Self {
         let patched = ShaderTemplate::for_driver_auto(PAN_WGSL, false);
         let module = device.compile_shader(&patched, Some("PangenomeClassify"));
@@ -75,7 +81,7 @@ impl PangenomeGpu {
                 module: &module,
                 entry_point: "main",
                 cache: None,
-                compilation_options: Default::default(),
+                compilation_options: wgpu::PipelineCompilationOptions::default(),
             });
         let bgl = pipeline.get_bind_group_layout(0);
         Self {
@@ -88,6 +94,10 @@ impl PangenomeGpu {
     /// Classify genes from a flat presence matrix on the GPU.
     ///
     /// `presence_flat` is row-major `[n_genes × n_genomes]`, values 0 or 1.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` if GPU buffer creation or readback fails.
     #[allow(clippy::cast_possible_truncation)]
     pub fn classify(
         &self,
@@ -163,7 +173,7 @@ impl PangenomeGpu {
             let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor::default());
             pass.set_pipeline(&self.pipeline);
             pass.set_bind_group(0, &bg, &[]);
-            pass.dispatch_workgroups((n_genes as u32).div_ceil(256), 1, 1);
+            pass.dispatch_workgroups((n_genes as u32).div_ceil(WORKGROUP_SIZE), 1, 1);
         }
 
         dev.queue().submit(Some(encoder.finish()));

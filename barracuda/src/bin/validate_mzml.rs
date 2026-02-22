@@ -72,7 +72,7 @@ fn main() {
         "Max m/z",
         aggregates.max_mz.unwrap_or(0.0),
         999.992_92,
-        0.01,
+        tolerances::MZ_TOLERANCE,
     );
 
     v.finish();

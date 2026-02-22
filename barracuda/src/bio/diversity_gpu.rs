@@ -189,6 +189,7 @@ fn require_f64(gpu: &GpuF64) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::tolerances::GPU_VS_CPU_TRANSCENDENTAL;
 
     type ScalarGpuFn = fn(&GpuF64, &[f64]) -> Result<f64>;
     type MatrixGpuFn = fn(&GpuF64, &[Vec<f64>]) -> Result<Vec<f64>>;
@@ -210,5 +211,59 @@ mod tests {
         // These exercise the guard clauses without a device.
         // (We cannot call them directly since GpuF64 requires async init,
         //  but the logic is validated via validate_diversity_gpu binary.)
+    }
+
+    /// Shannon entropy of uniform distribution: H = ln(n).
+    /// For n equal-probability species, p_i = 1/n, so -sum(p_i ln(p_i)) = ln(n).
+    #[tokio::test]
+    #[ignore] // requires GPU hardware
+    async fn known_value_shannon_uniform() {
+        let gpu = GpuF64::new().await.expect("GPU init");
+        if !gpu.has_f64 {
+            return; // skip if no f64 support
+        }
+        let n = 4_usize;
+        let counts = vec![1.0; n];
+        let result = shannon_gpu(&gpu, &counts).unwrap();
+        let expected = (n as f64).ln();
+        assert!(
+            (result - expected).abs() < GPU_VS_CPU_TRANSCENDENTAL,
+            "Shannon uniform: got {result}, expected {expected}"
+        );
+    }
+
+    /// Simpson diversity of uniform distribution: 1 - sum(p_i^2) = (n-1)/n.
+    /// For p_i = 1/n, sum(p_i^2) = n * (1/n)^2 = 1/n, so diversity = 1 - 1/n.
+    #[tokio::test]
+    #[ignore] // requires GPU hardware
+    async fn known_value_simpson_uniform() {
+        let gpu = GpuF64::new().await.expect("GPU init");
+        if !gpu.has_f64 {
+            return; // skip if no f64 support
+        }
+        let n = 4_usize;
+        let counts = vec![1.0; n];
+        let result = simpson_gpu(&gpu, &counts).unwrap();
+        let expected = (n - 1) as f64 / n as f64;
+        assert!(
+            (result - expected).abs() < 1e-10,
+            "Simpson uniform: got {result}, expected {expected}"
+        );
+    }
+
+    /// Shannon entropy of single-species community: H = 0 (no uncertainty).
+    #[tokio::test]
+    #[ignore] // requires GPU hardware
+    async fn known_value_shannon_single_species() {
+        let gpu = GpuF64::new().await.expect("GPU init");
+        if !gpu.has_f64 {
+            return; // skip if no f64 support
+        }
+        let counts = vec![100.0, 0.0, 0.0, 0.0];
+        let result = shannon_gpu(&gpu, &counts).unwrap();
+        assert!(
+            result.abs() < GPU_VS_CPU_TRANSCENDENTAL,
+            "Shannon single-species: got {result}, expected 0"
+        );
     }
 }

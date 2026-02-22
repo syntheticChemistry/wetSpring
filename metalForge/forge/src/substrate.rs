@@ -63,7 +63,7 @@ pub struct Properties {
 pub enum SubstrateKind {
     /// GPU via wgpu/Vulkan.
     Gpu,
-    /// Neural Processing Unit (e.g. BrainChip AKD1000).
+    /// Neural Processing Unit (e.g. `BrainChip` AKD1000).
     Npu,
     /// Host CPU.
     Cpu,

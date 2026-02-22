@@ -164,7 +164,7 @@ fn multi_rhs(state: &[f64], _t: f64, p: &MultiSignalParams) -> Vec<f64> {
     let dgc_rate = p.k_dgc_basal * p.k_dgc_rep.mul_add(-hapr, 1.0).max(0.0);
     let pde_rate = p.k_pde_act.mul_add(hapr, p.k_pde_basal);
     let mut d_cdg = p.d_cdg.mul_add(-cdg, dgc_rate - pde_rate * cdg);
-    if cdg < 1e-12 && d_cdg < 0.0 {
+    if cdg < crate::tolerances::ODE_CDG_CONVERGENCE && d_cdg < 0.0 {
         d_cdg = 0.0;
     }
 

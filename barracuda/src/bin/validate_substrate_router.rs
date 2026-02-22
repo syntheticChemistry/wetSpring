@@ -1,6 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::too_many_lines, clippy::cast_precision_loss)]
-//! Exp074: metalForge Substrate Router — GPU↔NPU↔CPU Dispatch
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::similar_names,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::too_many_lines,
+    clippy::missing_const_for_fn
+)]
+//! Exp074: `metalForge` Substrate Router — GPU↔NPU↔CPU Dispatch
 //!
 //! Validates the substrate-aware compute router that dispatches workloads
 //! to GPU, NPU, or CPU based on batch size, workload type, and hardware
@@ -61,7 +69,7 @@ struct SubstrateRouter {
 }
 
 impl SubstrateRouter {
-    fn new(gpu_available: bool, npu_available: bool, ada_lovelace: bool) -> Self {
+    const fn new(gpu_available: bool, npu_available: bool, ada_lovelace: bool) -> Self {
         Self {
             gpu_available,
             npu_available,
@@ -70,7 +78,7 @@ impl SubstrateRouter {
         }
     }
 
-    fn route(&self, class: WorkloadClass, batch_size: usize) -> Substrate {
+    const fn route(&self, class: WorkloadClass, batch_size: usize) -> Substrate {
         match class {
             WorkloadClass::Inference => {
                 if self.npu_available {
@@ -90,7 +98,7 @@ impl SubstrateRouter {
         }
     }
 
-    fn needs_polyfill(&self) -> bool {
+    const fn needs_polyfill(&self) -> bool {
         self.ada_lovelace && self.gpu_available
     }
 }
@@ -258,7 +266,7 @@ async fn main() {
     // ═══════════════════════════════════════════════════════════════════
     v.section("Large Batch: GPU Path");
 
-    let large_counts: Vec<f64> = (0..512).map(|i| (i as f64 + 1.0) * 0.5).collect();
+    let large_counts: Vec<f64> = (0..512).map(|i| (f64::from(i) + 1.0) * 0.5).collect();
     let cpu_ref_shannon_lg = diversity::shannon(&large_counts);
     let cpu_ref_simpson_lg = diversity::simpson(&large_counts);
 
@@ -302,7 +310,7 @@ async fn main() {
     let samples: Vec<Vec<f64>> = (0..6)
         .map(|s| {
             (0..128)
-                .map(|f| ((s * 128 + f + 1) as f64).sqrt())
+                .map(|f| f64::from(s * 128 + f + 1).sqrt())
                 .collect()
         })
         .collect();
@@ -344,7 +352,7 @@ async fn main() {
     // ═══════════════════════════════════════════════════════════════════
     v.section("Mixed Pipeline: GPU → Classification Route");
 
-    let eco_counts: Vec<f64> = (0..256).map(|i| (i as f64 + 1.0).sqrt()).collect();
+    let eco_counts: Vec<f64> = (0..256).map(|i| (f64::from(i) + 1.0).sqrt()).collect();
 
     let pipeline_start = Instant::now();
     let diversity_result = route_shannon(&router, gpu.as_ref(), &eco_counts);
@@ -443,10 +451,7 @@ async fn main() {
         "│ Bray-Curtis (6×128) │ {:>8} │ {:.6}                │",
         bray_substrate, routed_bray[0]
     );
-    println!(
-        "│ Classification      │ {:>8} │ (routing only)          │",
-        classify_route
-    );
+    println!("│ Classification      │ {classify_route:>8} │ (routing only)          │");
     println!(
         "│ GPU-unavail fallbck │ {:>8} │ {:.6}                │",
         fallback_shannon.substrate, fallback_shannon.value

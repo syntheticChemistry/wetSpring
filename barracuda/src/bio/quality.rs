@@ -58,6 +58,40 @@ impl Default for QualityParams {
     }
 }
 
+/// GPU-compatible quality parameters for uniform buffer binding.
+///
+/// Maps directly to WGSL `var<uniform>` layout. Uses `u32` fields
+/// for GPU alignment (WGSL does not have `u8` or `usize`).
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct QualityGpuParams {
+    /// Sliding window size.
+    pub window_size: u32,
+    /// Minimum average quality within the sliding window.
+    pub window_min_quality: u32,
+    /// Minimum quality for leading bases.
+    pub leading_min_quality: u32,
+    /// Minimum quality for trailing bases.
+    pub trailing_min_quality: u32,
+    /// Minimum read length after all trimming.
+    pub min_length: u32,
+    /// Phred encoding offset.
+    pub phred_offset: u32,
+}
+
+impl From<&QualityParams> for QualityGpuParams {
+    fn from(p: &QualityParams) -> Self {
+        Self {
+            window_size: p.window_size as u32,
+            window_min_quality: u32::from(p.window_min_quality),
+            leading_min_quality: u32::from(p.leading_min_quality),
+            trailing_min_quality: u32::from(p.trailing_min_quality),
+            min_length: p.min_length as u32,
+            phred_offset: u32::from(p.phred_offset),
+        }
+    }
+}
+
 /// Result of quality filtering a batch of reads.
 #[derive(Debug, Clone)]
 pub struct FilterStats {
@@ -256,6 +290,99 @@ pub fn filter_reads(
     }
 
     (output, stats)
+}
+
+/// Flat quality filter results for a batch of reads.
+///
+/// Parallel arrays (`SoA`) where index `i` corresponds to read `i`.
+/// Maps directly to GPU storage buffer output.
+#[derive(Debug, Clone)]
+pub struct QualityFlatResult {
+    /// Trim start position for each read (0-based).
+    pub starts: Vec<u32>,
+    /// Trim end position for each read (exclusive).
+    pub ends: Vec<u32>,
+    /// Whether each read passed all filters (1 = pass, 0 = fail).
+    pub pass: Vec<u8>,
+}
+
+/// Batch quality filter using flat arrays.
+///
+/// Takes quality scores as contiguous flat arrays with per-read offsets,
+/// matching the GPU dispatch model where all reads are in a single buffer.
+///
+/// # Arguments
+///
+/// * `qualities` — Concatenated quality bytes for all reads.
+/// * `offsets` — Start offset of each read in `qualities`.
+/// * `lengths` — Length of each read.
+/// * `params` — Quality filtering parameters.
+#[must_use]
+#[allow(clippy::cast_possible_truncation)]
+pub fn filter_reads_flat(
+    qualities: &[u8],
+    offsets: &[usize],
+    lengths: &[usize],
+    params: &QualityParams,
+) -> QualityFlatResult {
+    let n = offsets.len();
+    let mut starts = Vec::with_capacity(n);
+    let mut ends = Vec::with_capacity(n);
+    let mut pass = Vec::with_capacity(n);
+
+    for i in 0..n {
+        let off = offsets[i];
+        let len = lengths[i];
+        if off + len > qualities.len() || len == 0 {
+            starts.push(0);
+            ends.push(0);
+            pass.push(0);
+            continue;
+        }
+        let qual = &qualities[off..off + len];
+
+        // Leading trim
+        let start = qual
+            .iter()
+            .position(|&q| q.saturating_sub(params.phred_offset) >= params.leading_min_quality)
+            .unwrap_or(len);
+        if start >= len {
+            starts.push(0);
+            ends.push(0);
+            pass.push(0);
+            continue;
+        }
+
+        // Trailing trim
+        let end = qual
+            .iter()
+            .rposition(|&q| q.saturating_sub(params.phred_offset) >= params.trailing_min_quality)
+            .map_or(0, |i| i + 1);
+        if end <= start {
+            starts.push(0);
+            ends.push(0);
+            pass.push(0);
+            continue;
+        }
+
+        // Sliding window on remaining region
+        let sub_qual = &qual[start..end];
+        let window_end = trim_sliding_window(
+            sub_qual,
+            params.window_size,
+            params.window_min_quality,
+            params.phred_offset,
+        );
+        let final_end = start + window_end;
+
+        // Min length check
+        starts.push(start as u32);
+        ends.push(final_end as u32);
+        let passed = final_end > start && (final_end - start) >= params.min_length;
+        pass.push(u8::from(passed));
+    }
+
+    QualityFlatResult { starts, ends, pass }
 }
 
 /// Find adapter sequence at the 3' end of a read.
@@ -553,5 +680,60 @@ mod tests {
     fn empty_record_returns_none() {
         let record = make_record(b"", &[]);
         assert!(trim_read(&record, &QualityParams::default()).is_none());
+    }
+
+    #[test]
+    fn gpu_params_from_quality_params() {
+        let params = QualityParams::default();
+        let gpu: QualityGpuParams = QualityGpuParams::from(&params);
+        assert_eq!(gpu.window_size, 4);
+        assert_eq!(gpu.window_min_quality, 20);
+        assert_eq!(gpu.phred_offset, 33);
+    }
+
+    #[test]
+    fn filter_reads_flat_matches_structured() {
+        let records = vec![
+            make_record(&[b'A'; 50], &qual_from_phred(&[30; 50])),
+            make_record(&[b'A'; 50], &qual_from_phred(&[2; 50])),
+            make_record(&[b'A'; 10], &qual_from_phred(&[30; 10])),
+        ];
+
+        let params = QualityParams {
+            min_length: 36,
+            ..QualityParams::default()
+        };
+
+        // Build flat arrays
+        let mut qualities = Vec::new();
+        let mut offsets = Vec::new();
+        let mut lengths = Vec::new();
+        for r in &records {
+            offsets.push(qualities.len());
+            lengths.push(r.quality.len());
+            qualities.extend_from_slice(&r.quality);
+        }
+
+        let flat = filter_reads_flat(&qualities, &offsets, &lengths, &params);
+        let (structured, stats) = filter_reads(&records, &params);
+
+        // Flat pass count should match structured output count
+        let flat_pass_count = flat.pass.iter().filter(|&&p| p == 1).count();
+        assert_eq!(flat_pass_count, stats.output_reads);
+        assert_eq!(flat_pass_count, structured.len());
+    }
+
+    #[test]
+    fn filter_reads_flat_empty() {
+        let result = filter_reads_flat(&[], &[], &[], &QualityParams::default());
+        assert!(result.starts.is_empty());
+        assert!(result.ends.is_empty());
+        assert!(result.pass.is_empty());
+    }
+
+    #[test]
+    fn filter_reads_flat_out_of_bounds_safe() {
+        let result = filter_reads_flat(&[30; 5], &[10], &[5], &QualityParams::default());
+        assert_eq!(result.pass[0], 0);
     }
 }
