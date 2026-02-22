@@ -234,12 +234,13 @@ thresholds from `src/tolerances.rs`.
 | `benchmark_cross_spring_scaling` | 095 | — | `cargo run --release --features gpu --bin benchmark_cross_spring_scaling` |
 | `validate_local_wgsl_compile` | 096 | 10 | `cargo run --features gpu --bin validate_local_wgsl_compile` |
 | `validate_cpu_gpu_expanded` | 099 | 27 | `cargo run --features gpu --bin validate_cpu_gpu_expanded` |
+| `validate_metalforge_v4` | 100 | 28 | `cargo run --features gpu --bin validate_metalforge_v4` |
 
-**Total validation checks**: 2,256+ (1,392 CPU + 636 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 39 cross-spring + 10 local WGSL + 27 expanded)
+**Total validation checks**: 2,284+ (1,392 CPU + 636 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 39 cross-spring + 10 local WGSL + 27 expanded)
 **Rust tests**: 740 (666 lib + 60 integration + 14 doc)
-**Binaries**: 79 validate + 9 benchmark = 88 total
+**Binaries**: 80 validate + 9 benchmark = 89 total
 **ToadStool primitives**: 30 consumed (8 bio absorbed Feb 22 + 5 neuralSpring + 2 new: KmerHistogram, UniFracPropagate)
-**Local WGSL shaders**: 5 (ODE, kmer, unifrac, taxonomy, phage_defense_ode)
+**Local WGSL shaders**: 7 (ODE, kmer, unifrac, taxonomy, phage_defense_ode, bistable_ode, multi_signal_ode)
 **Tier A (GPU/NPU-ready)**: 7 modules | **Tier B**: 1 remaining (cooperation)
 **Benchmark infrastructure**: `bench.rs` harness with RAPL + nvidia-smi energy profiling, JSON output
 

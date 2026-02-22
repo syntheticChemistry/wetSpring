@@ -10,6 +10,8 @@ pub mod ani_gpu;
 #[cfg(feature = "gpu")]
 pub mod batch_fitness_gpu;
 pub mod bistable;
+#[cfg(feature = "gpu")]
+pub mod bistable_gpu;
 pub mod bootstrap;
 pub mod capacitor;
 pub mod chimera;
@@ -54,6 +56,8 @@ pub mod locus_variance_gpu;
 pub mod merge_pairs;
 pub mod molecular_clock;
 pub mod multi_signal;
+#[cfg(feature = "gpu")]
+pub mod multi_signal_gpu;
 pub mod neighbor_joining;
 pub mod ode;
 #[cfg(feature = "gpu")]

@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 22, 2026
-**Status:** 99 experiments, 2,256+ validation checks, all PASS (740 Rust tests)
+**Status:** 100 experiments, 2,284+ validation checks, all PASS (740 Rust tests)
 
 ---
 
@@ -108,6 +108,7 @@
 | 097 | Structural Evolution Pass | code quality | COMPLETE | — (22-file refactor: flat layouts, DRY models, zero-clone APIs) |
 | 098 | Upstream GPU Fixes | GPU/shader | COMPLETE | — (3 ToadStool bugs: SNP BGL, ODE f64, Jacobi eigenvectors) |
 | 099 | CPU vs GPU Expanded + metalForge | GPU/metalForge | COMPLETE | 27 (k-mer, UniFrac, ODE, phage defense, mixed-HW pipeline) |
+| 100 | metalForge v4 ODE Domains + NPU | GPU/metalForge | COMPLETE | 28 (bistable, multi-signal, phage defense, NPU routing, PCIe pipeline) |
 
 ---
 

@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCUDA absorption. Follows the
 
 **Date:** February 22, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 27 — expanded CPU↔GPU parity (k-mer, UniFrac, phage defense), local WGSL evolution; 740 tests, 99 experiments
+**Status:** Phase 27 — 3 ODE GPU domains (phage/bistable/multi-signal), metalForge v4, 7 local WGSL shaders; 740 tests, 100 experiments
 
 ---
 
@@ -479,7 +479,7 @@ All absorbed by ToadStool S39-41. ODE blocker resolved (S41 fixed `compile_shade
 wetSpring/
 ├── README.md                      ← this file
 ├── BENCHMARK_RESULTS.md           ← three-tier benchmark results
-├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (99 experiments)
+├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (100 experiments)
 ├── barracuda/                     ← Rust crate (src/, Cargo.toml, rustfmt.toml)
 │   ├── EVOLUTION_READINESS.md    ← absorption map (tiers, primitives, shaders)
 │   ├── ABSORPTION_MANIFEST.md    ← what's absorbed, local, planned (hotSpring pattern)

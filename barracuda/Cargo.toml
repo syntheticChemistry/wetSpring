@@ -426,6 +426,12 @@ name = "validate_local_wgsl_compile"
 path = "src/bin/validate_local_wgsl_compile.rs"
 required-features = ["gpu"]
 
+# ── metalForge Cross-Substrate v4 (Exp100) ───────────────────────
+[[bin]]
+name = "validate_metalforge_v4"
+path = "src/bin/validate_metalforge_v4.rs"
+required-features = ["gpu"]
+
 # ── Expanded CPU vs GPU + metalForge (Exp099) ────────────────────
 [[bin]]
 name = "validate_cpu_gpu_expanded"
