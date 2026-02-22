@@ -58,7 +58,8 @@ metalForge/
 │   │   ├── probe.rs       ← GPU (wgpu), CPU (/proc), NPU (/dev/akida*)
 │   │   ├── inventory.rs   ← unified discovery
 │   │   ├── dispatch.rs    ← capability-based workload routing
-│   │   ├── streaming.rs   ← multi-stage GPU pipeline analysis (v0.2.0)
+│   │   ├── streaming.rs   ← multi-stage GPU pipeline analysis
+│   │   ├── workloads.rs   ← preset bio domains + shader origin tracking (v0.3.0)
 │   │   └── bridge.rs      ← forge ↔ barracuda device bridge
 │   ├── examples/
 │   │   └── inventory.rs   ← discover + print + dispatch demo
@@ -80,13 +81,21 @@ metalForge/
     └── profile_gpu_candidates.py ← GPU candidate profiling
 ```
 
-### Forge Crate (v0.2.0)
+### Forge Crate (v0.3.0)
 
-The `forge/` directory is a standalone Rust crate (`wetspring-forge` v0.2.0)
+The `forge/` directory is a standalone Rust crate (`wetspring-forge` v0.3.0)
 that discovers compute substrates at runtime and routes workloads by capability.
 It follows hotSpring's `metalForge/forge/` pattern — same substrate types,
 same capability-based dispatch, same wgpu GPU probing — adapted for life
-science workloads. **32 unit tests**, clippy clean, `forbid(unsafe_code)`.
+science workloads. **38 unit tests**, clippy clean, `forbid(unsafe_code)`.
+
+**v0.3.0 additions:**
+- `workloads` module — preset bio domain workloads with `ShaderOrigin` tracking
+  (Absorbed/Local/CpuOnly) for absorption planning and dispatch decisions
+- `OdeDims` struct for ODE system dimensions (vars, params) in dispatch sizing
+- `BioWorkload` type — wraps `Workload` with provenance: origin, primitive name, ODE dims
+- `all_workloads()` catalog with `origin_summary()` for Write → Absorb → Lean tracking
+- Edition 2024, MSRV 1.85
 
 **v0.2.0 additions:**
 - `streaming` module — multi-stage GPU pipeline analysis

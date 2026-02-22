@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 22, 2026
-**Status**: Phase 26 — 1,392 CPU + 609 GPU + 80 dispatch + 35 layout + 57 transfer/streaming = 2,229+/2,229+ checks, ALL PASS (740 tests, 98 experiments)
+**Status**: Phase 27 — 1,392 CPU + 664 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 56 ODE parity = 2,284+/2,284+ checks, ALL PASS (740 tests, 100 experiments)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -11,14 +11,14 @@
 | Metric | Value |
 |--------|-------|
 | CPU validation | 1,392/1,392 PASS — 41 modules, 93 experiments, 25 domains + 6 ODE flat + 3 layout |
-| GPU validation | 609/609 PASS — 32 ToadStool primitives, 0 local WGSL (Lean complete), 80 streaming + 48 head-to-head + 28 metalForge v3 |
+| GPU validation | 664/664 PASS — 30 ToadStool primitives, 3 local WGSL (Write phase), 80 streaming + 48 head-to-head + 28 metalForge v4 |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 205/205 — 22.5x Rust speedup over Python |
 | BarraCuda GPU parity | 16 domains (Exp064/087) — pure GPU math proven |
 | Pure GPU streaming | 80 checks, 441-837× over round-trip (Exp090/091) |
 | metalForge cross-system | 12 domains CPU↔GPU (Exp084) + dispatch (Exp080) + pipeline (Exp086) + PCIe (Exp088) |
-| Rust modules | 41 CPU + 25 GPU, 740 tests (~97% bio+io coverage) |
-| Tier A (GPU/NPU-ready) | 7 modules with flat layouts (kmer, unifrac, taxonomy + 4 ODE) |
+| Rust modules | 41 CPU + 30 GPU, 740 tests (~97% bio+io coverage) |
+| Write phase | 3 local WGSL ODE shaders (phage_defense, bistable, multi_signal) |
 | Dependencies | 1 runtime (flate2), everything else sovereign |
 | Paper queue | **ALL DONE** — 29/29 reproducible papers complete (Track 1c added) |
 | Faculty (Track 1) | Waters (MMG, MSU), Cahill (Sandia), Smallwood (Sandia) |
@@ -42,8 +42,9 @@ Every paper in the queue goes through the full evolution path. Status:
 | **metalForge mixed** | Same answer on CPU, GPU, NPU — substrate-independent | 12 domains, 35+ checks + PCIe direct |
 
 Papers with **no GPU path** (sequential algorithms: chimera, derep, NJ) stay CPU-only.
-Papers with **ODE models** (Waters, Fernandez, Mhatre) are GPU-ready via flat params
-but blocked: upstream `batched_ode_rk4.rs` uses `compile_shader` not `compile_shader_f64`.
+Papers with **ODE models** (Waters, Fernandez, Mhatre, Srivastava) now have GPU paths via
+local WGSL shaders (Write phase). Phage defense, bistable, and multi-signal achieve exact
+CPU ↔ GPU parity. Pending ToadStool absorption as generic ODE primitive.
 
 ### Three-Tier Control Matrix (Per Paper)
 
@@ -55,12 +56,12 @@ but blocked: upstream `batched_ode_rk4.rs` uses `compile_shader` not `compile_sh
 | 4 | GPU diversity + spectral | Y | Y | Y | — |
 | 5 | Waters 2008 QS ODE | Y | Y | N | ODE absorbed (ToadStool S41); not in MF16 |
 | 6 | Massie 2012 Gillespie | Y | Y | Y | — |
-| 7 | Hsueh 2022 Phage defense | Y | Partial | N | ODE compose; not in MF |
-| 8 | Fernandez 2020 Bistable | Y | Y | N | ODE+bifurcation; not in MF |
+| 7 | Hsueh 2022 Phage defense | Y | Y | N | Local WGSL ODE (Exp099); exact parity |
+| 8 | Fernandez 2020 Bistable | Y | Y | N | Local WGSL ODE (Exp100); exact parity |
 | 9 | Mhatre 2020 Capacitor | Y | N | N | CPU-only ODE |
 | 10 | Bruger 2018 Cooperation | Y | N | N | CPU-only game theory |
 | 11 | Waters 2021 immuno | — | — | — | Reference only |
-| 12 | Srivastava 2011 Multi-signal | Y | Partial | N | ODE compose; not in MF |
+| 12 | Srivastava 2011 Multi-signal | Y | Y | N | Local WGSL ODE (Exp100); exact parity |
 | 13 | Cahill proxy | Y | Y | Y | — |
 | 14 | Smallwood proxy | Y | Y | Y | — |
 | 15 | Liu 2014 HMM | Y | Y | Y | — |
@@ -85,10 +86,10 @@ but blocked: upstream `batched_ode_rk4.rs` uses `compile_shader` not `compile_sh
 
 | Gap | Papers Affected | Blocker | Priority |
 |-----|--------|---------|----------|
-| ODE models not in metalForge | 5, 7, 8, 9, 10, 12 | Local WGSL; upstream needs `compile_shader_f64` | Medium |
+| ODE models not in metalForge | 5, 7, 8, 9, 10, 12 | GPU parity achieved for 7, 8, 12 (Write phase); metalForge routing pending | Low |
 | DTL reconciliation CPU-only | 18, 26, 27 | Tree-recursive algorithm; no GPU benefit | Low |
 | Molecular clock not in metalForge | 26, 27 | CPU-only; no GPU path planned | Low |
-| k-mer histogram not in metalForge | 28 | GPU layout ready (Exp085); absorption pending | Medium |
+| k-mer histogram not in metalForge | 28 | GPU wrapper done (kmer_gpu, Exp099); metalForge routing pending | Low |
 | PCoA skipped in metalForge | 29 | naga WGSL compiler bug | Low (tracked upstream) |
 | Waters 2021 (Paper 11) | — | Reference only — no computational reproduction target | N/A |
 | Liu fungi-bacteria (Paper 19) | — | Manuscript in progress | Watch |
@@ -109,7 +110,7 @@ but blocked: upstream `batched_ode_rk4.rs` uses `compile_shader` not `compile_sh
 
 | Document | Location | Description |
 |----------|----------|-------------|
-| CONTROL_EXPERIMENT_STATUS.md | `../` | 97 experiments, 2,229+ validation checks |
+| CONTROL_EXPERIMENT_STATUS.md | `../` | 100 experiments, 2,284+ validation checks |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
 | Handoff (v14) | `../wateringHole/handoffs/` | Current ToadStool handoff |
@@ -128,7 +129,7 @@ but blocked: upstream `batched_ode_rk4.rs` uses `compile_shader` not `compile_sh
 - **Microbial ecology** — Alpha/beta diversity, PCoA, rarefaction
 - **Deep-sea metagenomics** — ANI, SNP, dN/dS, molecular clock, pangenomics
 - **ML inference** — Decision tree, Random Forest, GBM (all sovereign, no Python)
-- **Sovereign Rust bioinformatics** — 41 CPU + 20 GPU modules, 1 runtime dependency
+- **Sovereign Rust bioinformatics** — 41 CPU + 30 GPU modules, 1 runtime dependency
 
 ### wetSpring IS NOT:
 - Sensor noise analysis (groundSpring)

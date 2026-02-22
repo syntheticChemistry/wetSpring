@@ -10,20 +10,20 @@
 //! ```
 //!
 //! Each stage operates on GPU buffers directly — no intermediate readback.
-//! This is the metalForge analogue of ToadStool's unidirectional pipelines.
+//! This is the metalForge analogue of `ToadStool`'s unidirectional pipelines.
 //!
 //! # Write → Absorb → Lean
 //!
 //! This module evolves locally in wetSpring. Once validated (Exp090-091),
-//! the streaming dispatch model will be handed to ToadStool for absorption
+//! the streaming dispatch model will be handed to `ToadStool` for absorption
 //! as `barracuda::pipeline::streaming`. The absorption seam is the
-//! [`StreamingSession`] type — ToadStool replaces the implementation;
+//! [`StreamingSession`] type — `ToadStool` replaces the implementation;
 //! wetSpring switches to `use barracuda::pipeline::StreamingSession`.
 //!
 //! # Evidence
 //!
 //! - Exp090: 80/80 checks, 441-837× speedup over round-trip
-//! - Exp091: streaming eliminates 92-94% of PCIe overhead
+//! - Exp091: streaming eliminates 92-94% of `PCIe` overhead
 //! - Key insight: math is identical; only transfer topology changes
 
 use crate::substrate::{Capability, Substrate, SubstrateKind};
@@ -45,7 +45,7 @@ pub struct PipelineStage {
 ///
 /// The session pre-warms pipelines and manages buffer hand-off between
 /// stages without CPU round-trips. This is the absorption seam —
-/// ToadStool will replace the implementation while preserving the API.
+/// `ToadStool` will replace the implementation while preserving the API.
 #[derive(Debug)]
 pub struct StreamingSession {
     stages: Vec<PipelineStage>,

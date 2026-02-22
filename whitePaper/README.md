@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 22, 2026
-**Status:** Validation study complete — 2,229+/2,229+ checks, 740 tests, 97% bio+io line coverage, 97 experiments
+**Status:** Validation study active — 2,284+/2,284+ checks, 740 tests, 97% bio+io line coverage, 100 experiments
 **License:** AGPL-3.0-or-later
 
 ---
@@ -51,13 +51,13 @@ implementations into upstream ToadStool/BarraCUDA primitives:
 4. **Absorb** — ToadStool integrates as `ops::bio::*` shaders
 5. **Lean** — wetSpring rewires to upstream imports, deletes local code
 
-**Current status:** 25 GPU modules lean on upstream (32 ToadStool primitives); 0 local WGSL shaders
-(Lean phase complete — all absorbed by ToadStool S39-41).
-Phase 23 structurally evolved all trajectory types to flat contiguous layouts,
-unified the DADA2 error model, and eliminated per-step clones — all directly
-GPU-buffer-compatible. The forge crate (`metalForge/forge/` v0.2.0) provides
-substrate discovery and capability-based dispatch as an absorption seam for
-ToadStool.
+**Current status:** 30 GPU modules total — 27 lean on upstream ToadStool primitives,
+3 compile local WGSL ODE shaders (Write phase, pending absorption as
+`BatchedOdeRK4Generic`). The 3 local shaders (phage defense 4v/11p, bistable
+5v/21p, multi-signal 7v/24p) all achieve exact CPU ↔ GPU parity. This mirrors
+hotSpring's active Write phase for physics ODEs. The forge crate
+(`metalForge/forge/` v0.3.0) provides substrate discovery, capability-based
+dispatch, and shader origin tracking as an absorption seam for ToadStool.
 
 ---
 
@@ -65,8 +65,8 @@ ToadStool.
 
 | Claim | Evidence |
 |-------|----------|
-| Rust matches Python across 96 experiments | 1,392/1,392 CPU checks + 80 dispatch + 35 layout + 57 transfer/streaming + 39 cross-spring + 10 local WGSL pass |
-| GPU matches CPU across all promoted domains | 609/609 GPU checks pass (incl. 48 all-domain + 28 metalForge v3) |
+| Rust matches Python across 100 experiments | 1,392/1,392 CPU checks + 80 dispatch + 35 layout + 57 transfer/streaming + 39 cross-spring + 10 local WGSL pass |
+| GPU matches CPU across all promoted domains | 664/664 GPU checks pass (incl. 48 all-domain + 28 metalForge v4 + 56 local ODE parity) |
 | BarraCUDA CPU parity across 25 domains + 6 ODE flat | 205/205 cross-domain checks pass |
 | 926× spectral cosine GPU speedup | Exp016 benchmark |
 | 2.45× full 16S pipeline GPU speedup | Exp015/016 benchmark |
@@ -117,6 +117,9 @@ ToadStool.
 | Cross-spring evolution: 5 neuralSpring primitives validated | Exp094, 39/39 checks; Exp095, 7 benchmarks |
 | Local WGSL compile + dispatch | Exp096, 10/10 checks |
 | Structural evolution: flat layouts + DRY models + zero-clone APIs | Exp097, 728 tests, 48/48 GPU, 39/39 cross-spring |
+| CPU vs GPU expanded: kmer, unifrac, phage defense ODE | Exp099, exact parity + metalForge GPU→CPU→GPU pipeline |
+| metalForge v4: 3 local ODE domains + NPU routing + PCIe | Exp100, 28/28 checks, exact parity all ODE domains |
+| Local WGSL Write phase: 3 ODE shaders for ToadStool absorption | phage_defense (4v/11p), bistable (5v/21p), multi_signal (7v/24p) |
 
 ---
 
@@ -239,6 +242,13 @@ ToadStool.
 | 094 | Cross-spring evolution validation | 39/39 checks — 5 neuralSpring primitives (PairwiseHamming, PairwiseJaccard, SpatialPayoff, BatchFitness, LocusVariance) |
 | 095 | Cross-spring scaling benchmark | 7 benchmarks — 6.5×–277× GPU speedup at realistic bio sizes |
 
+### Local WGSL Write Phase + metalForge v4 (Phase 27)
+
+| Exp | Method | What We Prove |
+|-----|--------|---------------|
+| 099 | CPU vs GPU expanded | kmer_gpu, unifrac_gpu, phage_defense_gpu (local WGSL 4v/11p), metalForge GPU→CPU→GPU |
+| 100 | metalForge cross-substrate v4 | 28/28: bistable (5v/21p) + multi_signal (7v/24p) exact parity, NPU routing, GPU→GPU→CPU |
+
 ### Track 2: Analytical Chemistry (LC-MS, PFAS)
 
 | Exp | Paper/Tool | What We Prove |
@@ -278,8 +288,8 @@ cross-substrate validated (Exp060: 20/20 CPU↔GPU parity).
 wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCUDA/ToadStool:
 
-- **hotSpring** — Nuclear physics, plasma, lattice QCD (34 WGSL shaders, 637 tests)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 32 ToadStool primitives, 740 tests)
+- **hotSpring** — Nuclear physics, plasma, lattice QCD (34+ WGSL shaders, active Write phase)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (3 local WGSL + 30 ToadStool primitives, 740 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **archive/handoffs/** — Fossil record of ToadStool handoffs (v1–v7)
 
@@ -303,7 +313,7 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` files |
-| Provenance headers | All 87 validation/benchmark binaries |
+| Provenance headers | All 89 validation/benchmark binaries |
 
 ## metalForge — Hardware Discovery
 
@@ -319,7 +329,9 @@ following hotSpring's `metalForge/forge/` pattern:
 | `dispatch.rs` | Capability-based routing (GPU > NPU > CPU) |
 | `bridge.rs` | Forge substrate ↔ barracuda `WgpuDevice` bridge |
 
-29 tests, clippy clean, `#![forbid(unsafe_code)]`.
+29 tests, clippy clean, `#![forbid(unsafe_code)]`. The forge crate also routes
+ODE GPU workloads (local WGSL shaders) alongside ToadStool-absorbed primitives
+via capability-based dispatch.
 
 ---
 

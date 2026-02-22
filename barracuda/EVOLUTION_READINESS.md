@@ -2,16 +2,20 @@
 
 **Date:** February 22, 2026
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 41 CPU + 25 GPU modules, 0 local WGSL shaders (Lean phase complete), 32 ToadStool primitives consumed, 740 tests passing
+**Status:** 41 CPU + 30 GPU modules, 3 local WGSL shaders (Write phase), 30 ToadStool primitives consumed, 740 tests, 100 experiments, 2,284+ checks
 
-### Feb 22 Lean Phase Complete: All 4 local WGSL shaders absorbed (ToadStool S39-41)
+### Write Phase Active: 3 new local ODE WGSL shaders + 5 new GPU wrappers
 
-ToadStool sessions 39-41 absorbed the final 4 local WGSL shaders (ODE sweep,
-kmer histogram, unifrac propagate, taxonomy FC). wetSpring rewired to
-`barracuda::ops::bio::*`, deleted the shaders, and verified: 740 tests pass.
-The `shaders/` directory is now empty. ODE blocker resolved: ToadStool S41
-fixed `compile_shader_f64` in `batched_ode_rk4.rs`. See `ABSORPTION_MANIFEST.md`
-for details.
+After completing the Lean phase (all 12 original shaders absorbed by ToadStool
+S39-41), wetSpring entered a new **Write phase** for ODE domains. Three local
+WGSL shaders were created for phage defense (4v/11p), bistable QS (5v/21p), and
+dual-signal QS (7v/24p), achieving exact CPU ↔ GPU parity. Five new GPU wrappers
+added: `kmer_gpu`, `unifrac_gpu`, `bistable_gpu`, `multi_signal_gpu`, `phage_defense_gpu`.
+
+This follows the hotSpring pattern: write local extensions → validate → hand off
+to `ToadStool` for absorption as `BatchedOdeRK4Generic<N_VARS, N_PARAMS>`.
+
+See `ABSORPTION_MANIFEST.md` for the full ledger.
 
 ### Code Quality (Phase 15+)
 
@@ -51,7 +55,7 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 |--------|--------|----------|-------------------|-------|
 | `alignment` | Smith-Waterman | ✅ Absorbed | `SmithWatermanGpu` | Exp044 |
 | `ani` | Average Nucleotide Identity | ✅ Absorbed | `AniBatchF64` | Rewired Feb 22, 2026 |
-| `bistable` | ODE toggle switch | **A** | — | Map to `BatchedOdeRK4F64` |
+| `bistable` | ODE toggle switch | **Write** | Local WGSL (5v, 21p) | Exact CPU↔GPU parity (Exp100) |
 | `bootstrap` | Phylo resampling | ✅ Absorbed | Compose `FelsensteinGpu` | Exp046 |
 | `capacitor` | Signal peak | C | — | Too small for GPU |
 | `chimera` | Chimera detection | C | — | Sequential per-read |
@@ -71,12 +75,12 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 | `kmer` | K-mer counting | ✅ Absorbed | `KmerHistogramF64` | ToadStool S40 (Exp081) |
 | `merge_pairs` | Read merging | C | — | Sequential per-pair |
 | `molecular_clock` | Strict/relaxed clock | C | — | Small calibration data, CPU-optimal |
-| `multi_signal` | Multi-signal QS | **A** | — | GPU flat API (Exp078), maps to ODE sweep |
+| `multi_signal` | Multi-signal QS | **Write** | Local WGSL (7v, 24p) | Exact CPU↔GPU parity (Exp100) |
 | `neighbor_joining` | NJ tree construction | C | — | Sequential algorithm |
 | `ode` | RK4 integrator | ✅ Absorbed | `BatchedOdeRK4F64` | ToadStool S41 (Exp049) |
 | `pangenome` | Gene clustering | ✅ Absorbed | `PangenomeClassifyGpu` | Rewired Feb 22, 2026 |
 | `pcoa` | PCoA ordination | ✅ Absorbed | `BatchedEighGpu` | Exp016 |
-| `phage_defense` | CRISPR/RM model | **A** | — | GPU flat API (Exp078), maps to ODE sweep |
+| `phage_defense` | Phage-bacteria defense | **Write** | Local WGSL (4v, 11p) | Exact CPU↔GPU parity (Exp099) |
 | `phred` | Quality scoring | C | — | Per-base lookup |
 | `placement` | Phylo placement | ✅ Absorbed | Compose `FelsensteinGpu` | Exp046 |
 | `qs_biofilm` | QS/c-di-GMP ODE | ✅ Absorbed | `BatchedOdeRK4F64` | ToadStool S41 (Exp049) |
@@ -93,7 +97,7 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 
 ---
 
-## GPU Modules (25)
+## GPU Modules (30)
 
 | Module | Wraps | ToadStool Primitive | Status |
 |--------|-------|-------------------|--------|
@@ -122,26 +126,37 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 | `stats_gpu` | Variance/correlation | `FMR` | Lean |
 | `streaming_gpu` | Streaming pipeline | Multiple | Lean |
 | `taxonomy_gpu` | Taxonomy scoring | `FMR` | Lean |
+| `kmer_gpu` | K-mer histogram | `KmerHistogramGpu` | ✅ Lean (Exp099) |
+| `unifrac_gpu` | UniFrac propagation | `UniFracPropagateGpu` | ✅ Lean (Exp099) |
+| `bistable_gpu` | Bistable QS ODE | Local WGSL | Write (Exp100) |
+| `multi_signal_gpu` | Dual-signal QS ODE | Local WGSL | Write (Exp100) |
+| `phage_defense_gpu` | Phage defense ODE | Local WGSL | Write (Exp099) |
 
 ---
 
-## Local WGSL Shader Inventory (0 — Lean phase complete)
+## Local WGSL Shader Inventory (3 — Write phase active)
 
-All 12 original local WGSL shaders have been absorbed by ToadStool (sessions 31d/31g + 39-41).
-The `shaders/` directory is empty. Final 4 absorbed Feb 22: ODE (S41), kmer (S40),
-unifrac (S40), taxonomy (S40). ODE blocker resolved: ToadStool S41 fixed
-`compile_shader_f64` in `batched_ode_rk4.rs`.
+Original 12 shaders absorbed by ToadStool (S31d/31g + S39-41). Three new local
+shaders written for ODE domains pending absorption as `BatchedOdeRK4Generic`:
+
+| Shader | Vars | Params | Domain | Status |
+|--------|------|--------|--------|--------|
+| `phage_defense_ode_rk4_f64.wgsl` | 4 | 11 | Monod phage-bacteria defense | Write (Exp099) |
+| `bistable_ode_rk4_f64.wgsl` | 5 | 21 | QS + cooperative feedback | Write (Exp100) |
+| `multi_signal_ode_rk4_f64.wgsl` | 7 | 24 | V. cholerae dual-signal | Write (Exp100) |
 
 ### Shader Compilation Notes
 
-All GPU modules now lean on ToadStool. Historical note: local shaders used `ShaderTemplate::for_driver_auto(_, true)`
-for RTX 4070 (Ada Lovelace) f64 exp/log polyfill. ToadStool's absorbed shaders
-handle this automatically via `WgpuDevice::compile_shader_f64()`.
+All local shaders use `WgpuDevice::compile_shader_f64()` which:
+1. Injects the `enable f64;` preamble (naga-safe variant)
+2. Patches `exp_f64`/`log_f64` polyfills for the detected driver
+3. Runs `WgslOptimizer::optimize` for `@unroll_hint`/`@ilp_region`
 
-**naga quirks (historical; absorbed shaders):**
-- `enable f64;` not supported — omit from all WGSL
-- Bare f32 literals in f64 builtins fail type check — use `f64(0.0)`
-- `pow()` on f64 crashes NVVM — use `pow_f64()` polyfill
+**f64 WGSL patterns (established in this Write cycle):**
+- `fmax`/`fclamp`/`fpow` polyfills (naga lacks f64 overloads)
+- `(zero + literal)` for explicit f64 constant typing
+- Function names avoid `_f64` suffix to prevent `ShaderTemplate` rewriting
+- No `// @unroll_hint` in comments (optimizer matches via `contains()`)
 
 ---
 
@@ -210,20 +225,21 @@ All 8 bio shaders successfully absorbed by ToadStool sessions 31d/31g and
 rewired in wetSpring. 451 GPU checks pass. Two ToadStool bugs fixed during
 the rewire (SNP binding layout, AdapterInfo propagation).
 
-### GPU-Ready (Tier A) — Promoted via Exp078
+### Write Phase Active (3 local WGSL shaders)
 
-2. **`multi_signal`** — 7-var ODE, flat API, maps to `BatchedOdeRK4F64`
-3. **`phage_defense`** — 4-var ODE, flat API, maps to `BatchedOdeRK4F64`
+| Shader | ODE | Target Absorption |
+|--------|-----|-------------------|
+| `phage_defense_ode_rk4_f64.wgsl` | 4v, 11p | `BatchedOdeRK4Generic<4, 11>` |
+| `bistable_ode_rk4_f64.wgsl` | 5v, 21p | `BatchedOdeRK4Generic<5, 21>` |
+| `multi_signal_ode_rk4_f64.wgsl` | 7v, 24p | `BatchedOdeRK4Generic<7, 24>` |
 
-### GPU/NPU-Ready (Tier A) — Promoted via Exp081–083
-
-4. **`kmer`** — ✅ Absorbed (ToadStool S40: `KmerHistogramF64`)
-5. **`unifrac`** — ✅ Absorbed (ToadStool S40: `UniFracPropagateF64`)
-6. **`taxonomy`** — ✅ Absorbed (ToadStool S40: `TaxonomyFcF64`); NPU int8 variant planned
+All three achieve exact CPU ↔ GPU parity. Pending ToadStool generalization of
+`BatchedOdeRK4F64` (currently 4v/17p) to generic N_VARS/N_PARAMS.
 
 ### Needs Refactoring (Tier B)
 
-7. **`cooperation`** — 4-var ODE, flat API (Exp078), maps to ODE sweep
+7. **`cooperation`** — 4-var ODE, flat API (Exp078), maps to ODE sweep. Needs
+   payoff matrix restructuring for GPU-friendly layout.
 
 ---
 
@@ -231,13 +247,13 @@ the rewire (SNP binding layout, AdapterInfo propagation).
 
 | Tier | CPU Modules | GPU Modules | CPU Checks | GPU Checks |
 |------|:-----------:|:-----------:|:----------:|:----------:|
-| ✅ Absorbed (Lean) | 25 | 25 (ToadStool) | 900+ | 400+ |
-| A (GPU/NPU-ready) | 2 | 0 | 81+ | 12+ |
-| B (needs refactor) | 2 | 0 | 60+ | 0 |
-| C (CPU-only) | 14 | 0 | 171+ | 0 |
+| ✅ Absorbed (Lean) | 25 | 27 (ToadStool) | 900+ | 480+ |
+| Write (local WGSL) | 3 | 3 (local shaders) | 81+ | 55+ |
+| B (needs refactor) | 1 | 0 | 30+ | 0 |
+| C (CPU-only) | 12 | 0 | 171+ | 0 |
 | Dispatch routing | — | — | 80 | — |
 | Streaming/transfer | — | — | 57 | 82 |
-| **Total** | **41** | **25** | **1,392** | **533** |
+| **Total** | **41** | **30** | **1,392** | **892** |
 
 ---
 
@@ -334,6 +350,11 @@ the rewire (SNP binding layout, AdapterInfo propagation).
 | Feb 22 | Lockfile updated (25 transitive deps), 6 clippy::nursery fixes, 3 midpoint + 2 const fn lint fixes |
 | Feb 22 | All 40 Python baselines: SPDX + Date provenance headers (34 newly stamped from git creation dates) |
 | Feb 22 | 4 fuzz targets verified (FASTQ, MS2, mzML, XML), error module reviewed (9-variant sovereign type), API surface audited |
+| Feb 22 | **Phase 27: Write phase** — 3 new local WGSL ODE shaders created (phage_defense, bistable, multi_signal) |
+| Feb 22 | **Exp099: CPU vs GPU Expanded** — kmer_gpu, unifrac_gpu, phage_defense_gpu wrappers + metalForge GPU→CPU→GPU pipeline |
+| Feb 22 | **Exp100: metalForge Cross-Substrate v4** — 28/28 checks, 3 ODE domains exact parity, NPU routing, GPU→GPU→CPU pipeline |
+| Feb 22 | 5 new GPU wrappers: `kmer_gpu`, `unifrac_gpu`, `bistable_gpu`, `multi_signal_gpu`, `phage_defense_gpu` |
+| Feb 22 | GPU module count: 25 → 30. Local WGSL: 0 → 3. Absorbed ToadStool primitives: 32 → 30 (recounted after tier reclassification) |
 
 ---
 
@@ -343,14 +364,14 @@ the rewire (SNP binding layout, AdapterInfo propagation).
 |--------|-----------|-----------|
 | Domain | Computational physics | Life science & analytical chemistry |
 | CPU modules | 50+ (physics, lattice, MD, spectral) | 41 (bio, signal, ML) |
-| GPU modules | 34 WGSL shaders | 25 modules, 0 local WGSL (Lean complete) |
+| GPU modules | 34 WGSL shaders | 30 modules, 3 local WGSL (Write phase) |
 | Absorbed | complex64, SU(3), plaquette, HMC, CellList | SW, Gillespie, DT, Felsenstein, GEMM, HMM, ANI, SNP, dN/dS, Pangenome, QF, DADA2, RF + 5 neuralSpring (PairwiseHamming, PairwiseJaccard, SpatialPayoff, BatchFitness, LocusVariance) |
 | WGSL pattern | `pub const WGSL: &str` inline | `include_str!("../shaders/...")` |
 | metalForge | GPU + NPU hardware characterization | GPU + NPU + cross-substrate validation |
 | Handoffs | `../wateringHole/handoffs/` (16+ docs) | `archive/handoffs/` (consolidated) |
-| Tests | 454 | 738 |
-| Validation | 418 checks | 2,229+ checks |
-| Experiments | 31 suites | 96 experiments |
+| Tests | 454 | 740 |
+| Validation | 418 checks | 2,284+ checks |
+| Experiments | 31 suites | 100 experiments |
 | Line coverage | — | 97% bio+io (55% overall) |
 | Pipeline caching | Upstream (ToadStool native) | Local (Exp068, 38% overhead reduction) |
 | Three-tier proof | CPU→GPU→NPU | Python→CPU→GPU→NPU (Exp069) |
@@ -363,6 +384,10 @@ the rewire (SNP binding layout, AdapterInfo propagation).
 | Pure GPU streaming | — | Zero CPU round-trips, 441-837× over round-trip (Exp090) |
 | PCIe direct transfer | — | GPU→NPU without CPU staging (Exp088) |
 
-Both Springs follow the same pipeline: Python → Rust CPU → GPU → ToadStool absorption.
-The patterns should converge: hotSpring's `pub const WGSL` inline approach and
-wetSpring's `include_str!` file approach both work for absorption.
+| WGSL pattern | `pub const WGSL` inline | `include_str!("../shaders/...")` for local; upstream for Lean |
+| Write cycle | Active (physics ODEs) | Active (bio ODEs: phage, bistable, multi-signal) |
+
+Both Springs follow the same pipeline: **Python → Rust CPU → GPU → ToadStool absorption**.
+hotSpring's `pub const WGSL` inline approach and wetSpring's `include_str!` file
+approach both work for absorption. Both are actively in Write phases for new
+domain-specific ODE shaders, with convergent handoff patterns via `wateringHole/`.

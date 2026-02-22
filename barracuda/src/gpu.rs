@@ -2,23 +2,34 @@
 //! GPU FP64 compute for wetSpring science workloads.
 //!
 //! Creates a wgpu device with `SHADER_F64` and bridges to `ToadStool`'s
-//! `WgpuDevice` + `TensorContext`. GPU dispatch goes through `ToadStool`
-//! primitives — wetSpring has 0 local WGSL (Lean phase complete; all absorbed by `ToadStool` S39-41).
+//! `WgpuDevice` + `TensorContext`. Core dispatch goes through `ToadStool`
+//! primitives; ODE domains use local WGSL shaders (Write phase, pending
+//! `ToadStool` absorption as `BatchedOdeRK4Generic`).
 //!
-//! `ToadStool` primitives used:
+//! # Absorbed `ToadStool` primitives (30)
+//!
 //! - `FusedMapReduceF64` — Shannon, Simpson, alpha diversity
 //! - `BrayCurtisF64` — condensed distance matrices
 //! - `BatchedEighGpu` — `PCoA` eigendecomposition
+//! - `BatchedOdeRK4F64` — QS/c-di-GMP ODE integration
 //! - `GemmF64` / `GemmCachedF64` — batch spectral cosine, taxonomy
 //! - `KrigingF64` — spatial interpolation
-//! - `VarianceF64` — population/sample variance, std dev
-//! - `CorrelationF64` — Pearson correlation
-//! - `CovarianceF64` — sample covariance
-//! - `WeightedDotF64` — weighted/plain dot product
-//! - `FelsensteinGpu` — phylogenetic likelihood (site-parallel pruning)
-//! - `GillespieGpu` — parallel stochastic simulation (N trajectories)
-//! - `SmithWatermanGpu` — banded local alignment (wavefront)
-//! - `TreeInferenceGpu` — decision tree / random forest inference
+//! - `KmerHistogramGpu` — k-mer counting (atomic histogram)
+//! - `UniFracPropagateGpu` — phylogenetic tree propagation
+//! - `VarianceF64` / `CorrelationF64` / `CovarianceF64` / `WeightedDotF64`
+//! - `FelsensteinGpu` — phylogenetic pruning (site x node parallel)
+//! - `GillespieGpu` — parallel SSA (N independent trajectories)
+//! - `SmithWatermanGpu` — banded SW alignment (anti-diagonal wavefront)
+//! - `TreeInferenceGpu` — decision tree / RF inference (sample x tree)
+//!
+//! # Local WGSL shaders (3, Write phase)
+//!
+//! - `phage_defense_ode_rk4_f64.wgsl` — 4 vars, 11 params
+//! - `bistable_ode_rk4_f64.wgsl` — 5 vars, 21 params (QS + feedback)
+//! - `multi_signal_ode_rk4_f64.wgsl` — 7 vars, 24 params (dual-signal QS)
+//!
+//! All local shaders use `compile_shader_f64()` with `fmax`/`fclamp`/`fpow`
+//! polyfills and the `(zero + literal)` pattern for explicit f64 typing.
 
 use barracuda::device::{GpuDriverProfile, TensorContext, WgpuDevice};
 use std::sync::Arc;
@@ -31,20 +42,11 @@ const MAX_STORAGE_BUFFERS_PER_STAGE: u32 = 16;
 /// GPU context with FP64 support for science workloads.
 ///
 /// Wraps a wgpu device with `SHADER_F64` + `ToadStool`'s `TensorContext`
-/// for batched dispatch and buffer pooling. All compute goes through
-/// `ToadStool` primitives via [`to_wgpu_device`](Self::to_wgpu_device).
+/// for batched dispatch and buffer pooling.
 ///
-/// `ToadStool` primitives used (15 total):
-/// - `FusedMapReduceF64` — Shannon, Simpson, alpha diversity
-/// - `BrayCurtisF64` — condensed distance matrices
-/// - `BatchedEighGpu` — `PCoA` eigendecomposition
-/// - `GemmF64` / `GemmCachedF64` — GEMM, spectral cosine, taxonomy
-/// - `KrigingF64` — spatial interpolation
-/// - `VarianceF64` / `CorrelationF64` / `CovarianceF64` / `WeightedDotF64`
-/// - `FelsensteinGpu` — phylogenetic pruning (site × node parallel)
-/// - `GillespieGpu` — parallel SSA (N independent trajectories)
-/// - `SmithWatermanGpu` — banded SW alignment (anti-diagonal wavefront)
-/// - `TreeInferenceGpu` — decision tree / RF inference (sample × tree)
+/// Most domains dispatch through absorbed `ToadStool` primitives via
+/// [`to_wgpu_device`](Self::to_wgpu_device). ODE domains compile local
+/// WGSL shaders via `compile_shader_f64()` (Write phase, pending absorption).
 ///
 /// Driver-specific capabilities (NVK workarounds, eigensolve strategy,
 /// latency model) are available via [`driver_profile`](Self::driver_profile).

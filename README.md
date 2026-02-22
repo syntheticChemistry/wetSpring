@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCUDA absorption. Follows the
 
 **Date:** February 22, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 27 — 3 ODE GPU domains (phage/bistable/multi-signal), metalForge v4, 7 local WGSL shaders; 740 tests, 100 experiments
+**Status:** Phase 27 — 3 ODE GPU domains (phage/bistable/multi-signal), metalForge v4, 3 local WGSL shaders (Write phase); 740 tests, 100 experiments, 2,284+ checks
 
 ---
 
@@ -49,22 +49,29 @@ WGSL          known physics   handoffs/                        delete local
 
 | Phase | Count | Description |
 |-------|:-----:|-------------|
-| **Lean** | 24 | GPU modules consuming upstream ToadStool primitives |
-| **Write** | 0 | All absorbed; Lean phase complete |
-| **Tier A** | 7 | CPU modules with flat APIs, ready for GPU/NPU promotion |
-| **Tier B** | 1 | Needs refactoring before promotion |
-| **Tier C** | 14 | CPU-only, no GPU path planned |
+| **Lean** | 27 | GPU modules consuming upstream ToadStool primitives |
+| **Write** | 3 | Local WGSL ODE shaders (phage_defense, bistable, multi_signal) |
+| **Tier B** | 1 | Needs refactoring before promotion (cooperation) |
+| **Tier C** | 12 | CPU-only, no GPU path planned |
 
-### Local WGSL Shaders (0 — Lean phase complete)
+### Local WGSL Shaders (3 — Write phase active)
 
-All 4 former local shaders absorbed by ToadStool S39-41. The `shaders/` directory
-is empty. ODE blocker resolved (S41 fixed `compile_shader_f64`).
+| Shader | Vars | Params | CPU ↔ GPU |
+|--------|------|--------|-----------|
+| `phage_defense_ode_rk4_f64.wgsl` | 4 | 11 | Exact parity (Exp099) |
+| `bistable_ode_rk4_f64.wgsl` | 5 | 21 | Exact parity (Exp100) |
+| `multi_signal_ode_rk4_f64.wgsl` | 7 | 24 | Exact parity (Exp100) |
 
-### metalForge Forge Crate (v0.2.0)
+All use `compile_shader_f64()` with `fmax`/`fclamp`/`fpow` polyfills.
+Absorption target: ToadStool `BatchedOdeRK4Generic<N_VARS, N_PARAMS>`.
+
+### metalForge Forge Crate (v0.3.0)
 
 The `metalForge/forge/` crate discovers compute substrates at runtime and
-routes workloads to the best capable device. Absorption seam: when ToadStool
-absorbs forge, the bridge module becomes the integration point.
+routes workloads to the best capable device. v0.3.0 adds `workloads` module
+with `ShaderOrigin` tracking (Absorbed/Local/CpuOnly) for absorption planning.
+Absorption seam: when ToadStool absorbs forge, the bridge module becomes the
+integration point.
 
 | Module | Purpose |
 |--------|---------|
@@ -81,29 +88,29 @@ absorbs forge, the bridge module becomes the integration point.
 | Metric | Count |
 |--------|-------|
 | Validation checks (CPU) | 1,392 |
-| Validation checks (GPU) | 609 |
+| Validation checks (GPU) | 664 |
+| ODE CPU ↔ GPU parity | 56 (3 local WGSL ODE domains) |
 | Dispatch validation checks | 80 |
 | Layout fidelity checks | 35 |
 | Transfer/streaming checks | 57 |
-| **Total validation checks** | **2,229+** |
+| **Total validation checks** | **2,284+** |
 | Rust library unit tests | 666 + 74 integration/doc |
 | **Total Rust tests** | **740** |
-| Experiments completed | 97 |
-| Validation/benchmark binaries | 79 validate + 8 benchmark = 87 total |
+| Experiments completed | 100 |
+| Validation/benchmark binaries | 81 validate + 8 benchmark = 89 total |
 | CPU bio modules | 41 |
-| GPU bio modules | 25 (all lean on ToadStool; 0 local WGSL — Lean phase complete) |
-| Tier A (GPU/NPU-ready) | 7 modules with flat layouts |
-| Tier B (needs refactor) | 1 module remaining |
+| GPU bio modules | 30 (27 lean on ToadStool + 3 local WGSL Write phase) |
+| Tier B (needs refactor) | 1 module remaining (cooperation) |
 | Python baselines | 40 scripts |
 | BarraCUDA CPU parity | 205/205 (25 domains + 6 ODE flat) |
-| BarraCUDA GPU parity | 16 domains head-to-head (Exp092) |
+| BarraCUDA GPU parity | 19 domains (16 absorbed + 3 local ODE) |
 | metalForge cross-system | 16 domains substrate-independent (Exp093) |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 80 checks, 441-837× over round-trip (Exp090-091) |
-| ToadStool primitives consumed | **32** (28 + 4 newly leaned; Lean phase complete) |
-| Local WGSL shaders | **0** (all absorbed; `shaders/` empty) |
+| ToadStool primitives consumed | **30** (absorbed, Lean) |
+| Local WGSL shaders | **3** (Write phase — ODE domains pending absorption) |
 
-All 2,229+ validation checks **PASS**. All 740 tests **PASS**.
+All 2,284+ validation checks **PASS**. All 740 tests **PASS**.
 
 ### GPU Performance
 
@@ -308,7 +315,22 @@ ToadStool's unidirectional streaming — zero CPU round-trips between stages:
 - **Exp095: Cross-Spring Scaling Benchmark** — 7 benchmarks across 5
   neuralSpring primitives at realistic problem sizes (6.5×–277× GPU speedup).
 
-**Tier A: 7 modules** | **Tier B: 1 remaining** | **740 tests** | **2,229+ checks** | **87 binaries**
+### Phase 27: Current — Local WGSL ODE Write Phase + metalForge v4
+
+Following hotSpring's pattern: writing local extensions for ToadStool to absorb.
+Three new ODE WGSL shaders created for domains not covered by the existing
+`BatchedOdeRK4F64` (4v/17p). Five new GPU wrappers bridge ToadStool and local code:
+
+- **Exp099: CPU vs GPU Expanded** — `kmer_gpu` (wraps `KmerHistogramGpu`),
+  `unifrac_gpu` (wraps `UniFracPropagateGpu`), `phage_defense_gpu` (local WGSL
+  4v/11p, exact CPU ↔ GPU parity). metalForge GPU→CPU→GPU pipeline validated.
+- **Exp100: metalForge Cross-Substrate v4** — 28/28 checks. All three local
+  ODE shaders achieve exact CPU ↔ GPU parity. NPU-aware routing. GPU→GPU→CPU
+  PCIe pipeline proven.
+- **3 local WGSL shaders** pending ToadStool absorption as `BatchedOdeRK4Generic`
+- **30 GPU modules total** (27 Lean + 3 Write)
+
+**Tier B: 1 remaining (cooperation)** | **740 tests** | **2,284+ checks** | **89 binaries**
 
 ### Phase 23: Structural Evolution — Flat Layouts, DRY Models, Zero-Clone APIs
 
@@ -449,22 +471,17 @@ Deep codebase evolution following hotSpring's absorption patterns:
 | `tolerance_search` | ppm/Da m/z search | FindPFAS |
 | `unifrac` | Unweighted/weighted UniFrac + Newick parser | QIIME2 diversity |
 
-### GPU Modules (20)
+### GPU Modules (30)
 
+**Lean (27)** — delegate to ToadStool primitives:
 `ani_gpu`, `batch_fitness_gpu`, `chimera_gpu`, `dada2_gpu`, `diversity_gpu`, `dnds_gpu`,
-`eic_gpu`, `gemm_cached`, `hamming_gpu`, `hmm_gpu`, `jaccard_gpu`, `kriging`,
+`eic_gpu`, `gemm_cached`, `hamming_gpu`, `hmm_gpu`, `jaccard_gpu`, `kmer_gpu`, `kriging`,
 `locus_variance_gpu`, `ode_sweep_gpu`, `pangenome_gpu`, `pcoa_gpu`, `quality_gpu`,
 `rarefaction_gpu`, `random_forest_gpu`, `snp_gpu`, `spatial_payoff_gpu`,
-`spectral_match_gpu`, `stats_gpu`, `streaming_gpu`, `taxonomy_gpu`
+`spectral_match_gpu`, `stats_gpu`, `streaming_gpu`, `taxonomy_gpu`, `unifrac_gpu`
 
-All 25 GPU modules delegate to ToadStool primitives (32 primitives consumed; 0 local WGSL).
-8 bio primitives absorbed by ToadStool and rewired on Feb 22, 2026:
-`HmmBatchForwardF64`, `AniBatchF64`, `SnpCallingF64`, `DnDsBatchF64`,
-`PangenomeClassifyGpu`, `QualityFilterGpu`, `Dada2EStepGpu`, `RfBatchInferenceGpu`.
-
-### Local WGSL Shaders (0 — Lean phase complete)
-
-All absorbed by ToadStool S39-41. ODE blocker resolved (S41 fixed `compile_shader_f64`).
+**Write (3)** — compile local WGSL shaders (pending ToadStool absorption):
+`bistable_gpu`, `multi_signal_gpu`, `phage_defense_gpu`
 
 ### I/O Modules
 
@@ -490,13 +507,13 @@ wetSpring/
 │   │   ├── validation.rs        ← hotSpring validation framework
 │   │   ├── encoding.rs          ← sovereign base64 (zero dependencies)
 │   │   ├── error.rs             ← error types (no external crates)
-│   │   ├── bio/                 ← 41 CPU + 20 GPU bio modules
+│   │   ├── bio/                 ← 41 CPU + 30 GPU bio modules
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML)
 │   │   ├── bench/               ← benchmark harness + power monitoring
-│   │   ├── bin/                 ← 86 validation/benchmark binaries
-│   │   └── shaders/             ← empty (Lean phase complete; all absorbed by ToadStool)
+│   │   ├── bin/                 ← 89 validation/benchmark binaries
+│   │   └── shaders/             ← 3 local WGSL ODE shaders (Write phase)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024
-├── experiments/                   ← 97 experiment protocols + results
+├── experiments/                   ← 100 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
 │   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs, bridge.rs
@@ -575,9 +592,9 @@ All validation data comes from public repositories:
 
 ## Related
 
-- **hotSpring** — Nuclear/plasma physics validation (sibling Spring, 34 WGSL shaders, 637 tests)
+- **hotSpring** — Nuclear/plasma physics validation (sibling Spring, 34+ WGSL shaders)
 - **neuralSpring** — ML/neural inference validation (sibling Spring, eigensolvers, batch IPR)
-- **ToadStool** — GPU compute engine (BarraCUDA crate, 570+ WGSL shaders, shared primitives)
+- **ToadStool** — GPU compute engine (BarraCUDA crate, shared primitives across all Springs)
 - **wateringHole** — Inter-primal standards and handoff documents
   - `handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md` — original shader detail handoff
   - `handoffs/WETSPRING_TOADSTOOL_REWIRE_FEB22_2026.md` — rewire results + bugs + cross-spring evolution

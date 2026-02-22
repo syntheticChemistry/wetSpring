@@ -2,7 +2,7 @@
 
 **Date:** February 22, 2026
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**Status:** 28 absorbed + 4 fully leaned (32 total), 0 local WGSL shaders, 7 Tier A candidates
+**Status:** 30 ToadStool primitives consumed (Lean), 3 local WGSL shaders (Write phase), 5 new GPU wrappers, 1 Tier B remaining
 
 ---
 

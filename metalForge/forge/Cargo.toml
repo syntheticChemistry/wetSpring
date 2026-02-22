@@ -2,9 +2,9 @@
 
 [package]
 name = "wetspring-forge"
-version = "0.2.0"
-edition = "2021"
-rust-version = "1.82"
+version = "0.3.0"
+edition = "2024"
+rust-version = "1.85"
 description = "Hardware discovery and cross-substrate dispatch for wetSpring"
 license = "AGPL-3.0-or-later"
 
