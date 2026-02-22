@@ -144,7 +144,6 @@ fn main() {
 fn check_non_neg(v: &mut Validator, r: &wetspring_barracuda::bio::ode::OdeResult, pre: &str) {
     let min: f64 =
         r.y.iter()
-            .flat_map(|row| row.iter())
             .copied()
             .fold(f64::INFINITY, f64::min);
     v.check(

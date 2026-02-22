@@ -90,7 +90,6 @@ fn main() {
         let min: f64 = result
             .y
             .iter()
-            .flat_map(|r| r.iter())
             .copied()
             .fold(f64::INFINITY, f64::min);
         v.check("All vars ≥ 0", min.max(0.0), min.max(0.0), 0.0);

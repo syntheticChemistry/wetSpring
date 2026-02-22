@@ -416,7 +416,7 @@ mod tests {
             scenario_no_qs(&p, DT),
             scenario_exogenous_cai1(&p, DT),
         ] {
-            for (step, row) in result.y.iter().enumerate() {
+            for (step, row) in result.states().enumerate() {
                 for (var, &val) in row.iter().enumerate() {
                     assert!(
                         val >= 0.0,

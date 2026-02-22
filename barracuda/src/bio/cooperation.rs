@@ -217,8 +217,7 @@ pub fn scenario_pure_cheat(params: &CooperationParams, dt: f64) -> OdeResult {
 #[must_use]
 pub fn cooperator_frequency(result: &OdeResult) -> Vec<f64> {
     result
-        .y
-        .iter()
+        .states()
         .map(|row| {
             let nc = row[0].max(0.0);
             let nd = row[1].max(0.0);
@@ -309,7 +308,7 @@ mod tests {
             scenario_pure_coop(&p, DT),
             scenario_pure_cheat(&p, DT),
         ] {
-            for (step, row) in result.y.iter().enumerate() {
+            for (step, row) in result.states().enumerate() {
                 for (var, &val) in row.iter().enumerate() {
                     assert!(
                         val >= 0.0,

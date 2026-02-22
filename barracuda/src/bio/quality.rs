@@ -453,26 +453,21 @@ pub fn find_adapter_3prime(
 
 /// Trim adapter from the 3' end of a record.
 ///
-/// Returns a new record with the adapter removed, or the original if no
-/// adapter was found.
+/// Returns `Some(trimmed_record)` if an adapter was found and removed,
+/// or `None` if no adapter match — avoids cloning on the common path.
 #[must_use]
 pub fn trim_adapter_3prime(
     record: &FastqRecord,
     adapter: &[u8],
     max_mismatches: usize,
     min_overlap: usize,
-) -> (FastqRecord, bool) {
-    find_adapter_3prime(&record.sequence, adapter, max_mismatches, min_overlap).map_or_else(
-        || (record.clone(), false),
-        |pos| {
-            let trimmed = FastqRecord {
-                id: record.id.clone(),
-                sequence: record.sequence[..pos].to_vec(),
-                quality: record.quality[..pos].to_vec(),
-            };
-            (trimmed, true)
-        },
-    )
+) -> Option<FastqRecord> {
+    let pos = find_adapter_3prime(&record.sequence, adapter, max_mismatches, min_overlap)?;
+    Some(FastqRecord {
+        id: record.id.clone(),
+        sequence: record.sequence[..pos].to_vec(),
+        quality: record.quality[..pos].to_vec(),
+    })
 }
 
 /// Case-insensitive base comparison with IUPAC ambiguity support.
@@ -658,17 +653,16 @@ mod tests {
     #[test]
     fn trim_adapter_3prime_found() {
         let record = make_record(b"ACGTACGTAACTAGTCGA", &[33 + 30; 18]);
-        let (trimmed, found) = trim_adapter_3prime(&record, b"AACTAGTCGA", 0, 5);
-        assert!(found);
-        assert_eq!(trimmed.sequence.len(), 8);
+        let trimmed = trim_adapter_3prime(&record, b"AACTAGTCGA", 0, 5);
+        assert!(trimmed.is_some());
+        assert_eq!(trimmed.unwrap().sequence.len(), 8);
     }
 
     #[test]
     fn trim_adapter_3prime_not_found() {
         let record = make_record(b"ACGTACGT", &[33 + 30; 8]);
-        let (trimmed, found) = trim_adapter_3prime(&record, b"TTTTTTTTTT", 0, 5);
-        assert!(!found);
-        assert_eq!(trimmed.sequence.len(), 8);
+        let trimmed = trim_adapter_3prime(&record, b"TTTTTTTTTT", 0, 5);
+        assert!(trimmed.is_none());
     }
 
     #[test]

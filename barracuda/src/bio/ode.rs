@@ -23,16 +23,52 @@
 //! ```
 
 /// Result of an ODE integration.
+///
+/// State trajectory is stored as a flat row-major `Vec<f64>` of length
+/// `n_points * n_vars` for contiguous memory access. Use [`state_at`](Self::state_at)
+/// for ergonomic indexing.
 #[derive(Debug, Clone)]
 pub struct OdeResult {
     /// Time points sampled.
     pub t: Vec<f64>,
-    /// State trajectory: `y[i]` is the state vector at `t[i]`.
-    pub y: Vec<Vec<f64>>,
-    /// Final state vector (convenience alias for `y.last()`).
+    /// Number of state variables per time point.
+    pub n_vars: usize,
+    /// Flat row-major trajectory: `[y0_t0, y1_t0, ..., y0_t1, y1_t1, ...]`.
+    pub y: Vec<f64>,
+    /// Final state vector.
     pub y_final: Vec<f64>,
     /// Number of RK4 steps taken.
     pub steps: usize,
+}
+
+impl OdeResult {
+    /// Number of time points in the trajectory.
+    #[inline]
+    #[must_use]
+    pub fn n_points(&self) -> usize {
+        self.t.len()
+    }
+
+    /// Slice of all state variables at time point `i`.
+    #[inline]
+    #[must_use]
+    pub fn state_at(&self, i: usize) -> &[f64] {
+        let start = i * self.n_vars;
+        &self.y[start..start + self.n_vars]
+    }
+
+    /// Single variable value at `(time_point, var_index)`.
+    #[inline]
+    #[must_use]
+    pub fn var_at(&self, time_point: usize, var_idx: usize) -> f64 {
+        self.y[time_point * self.n_vars + var_idx]
+    }
+
+    /// Iterator over all state snapshots (each is a `&[f64]` slice of `n_vars` elements).
+    #[inline]
+    pub fn states(&self) -> impl Iterator<Item = &[f64]> {
+        self.y.chunks_exact(self.n_vars)
+    }
 }
 
 /// Perform a single RK4 step.
@@ -96,17 +132,18 @@ pub fn rk4_integrate<F>(
 where
     F: Fn(&[f64], f64) -> Vec<f64>,
 {
+    let n_vars = y0.len();
     #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
     let n_steps = ((t_end - t_start) / dt).ceil() as usize;
 
     let mut t_vec = Vec::with_capacity(n_steps + 1);
-    let mut y_vec = Vec::with_capacity(n_steps + 1);
+    let mut y_flat = Vec::with_capacity((n_steps + 1) * n_vars);
 
     let mut t = t_start;
     let mut y = y0.to_vec();
 
     t_vec.push(t);
-    y_vec.push(y.clone());
+    y_flat.extend_from_slice(&y);
 
     for _ in 0..n_steps {
         let actual_dt = dt.min(t_end - t);
@@ -123,13 +160,14 @@ where
 
         t += actual_dt;
         t_vec.push(t);
-        y_vec.push(y.clone());
+        y_flat.extend_from_slice(&y);
     }
 
     let y_final = y;
     OdeResult {
         t: t_vec,
-        y: y_vec,
+        n_vars,
+        y: y_flat,
         y_final,
         steps: n_steps,
     }
@@ -141,7 +179,7 @@ where
 /// the mean of variable 0 over the last 10% of time points.
 #[must_use]
 pub fn steady_state_mean(result: &OdeResult, var_idx: usize, frac: f64) -> f64 {
-    let n = result.y.len();
+    let n = result.n_points();
     #[allow(
         clippy::cast_possible_truncation,
         clippy::cast_sign_loss,
@@ -149,13 +187,13 @@ pub fn steady_state_mean(result: &OdeResult, var_idx: usize, frac: f64) -> f64 {
     )]
     let tail_len = (n as f64 * frac).ceil() as usize;
     let start = n.saturating_sub(tail_len);
-    let slice = &result.y[start..];
-    if slice.is_empty() {
+    let count = n - start;
+    if count == 0 {
         return 0.0;
     }
-    let sum: f64 = slice.iter().map(|row| row[var_idx]).sum();
+    let sum: f64 = (start..n).map(|i| result.var_at(i, var_idx)).sum();
     #[allow(clippy::cast_precision_loss)]
-    let mean = sum / slice.len() as f64;
+    let mean = sum / count as f64;
     mean
 }
 
@@ -251,7 +289,7 @@ mod tests {
         let result = rk4_integrate(|y, _t| vec![-y[0]], &[1.0], 0.0, 1.0, 0.1, None);
         assert_eq!(result.steps, 10);
         assert_eq!(result.t.len(), 11);
-        assert_eq!(result.y.len(), 11);
+        assert_eq!(result.n_points(), 11);
     }
 
     #[test]

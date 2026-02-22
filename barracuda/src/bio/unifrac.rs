@@ -466,19 +466,33 @@ where
     }
 }
 
+/// Pairwise `UniFrac` distance matrix result.
+#[derive(Debug, Clone)]
+pub struct UnifracDistanceMatrix {
+    /// Sample identifiers in order.
+    pub sample_ids: Vec<String>,
+    /// Condensed upper-triangle distances: N*(N-1)/2 values, row-major lower
+    /// triangle order matching [`super::diversity::bray_curtis_condensed`].
+    /// Use [`super::diversity::condensed_index`] to look up pairs.
+    pub condensed: Vec<f64>,
+}
+
 /// Compute a pairwise `UniFrac` distance matrix for multiple samples.
+///
+/// Returns condensed form (upper triangle only) for direct use with
+/// [`super::pcoa::pcoa`].
 #[must_use]
 pub fn unifrac_distance_matrix(
     tree: &PhyloTree,
     samples: &AbundanceTable,
     weighted: bool,
-) -> (Vec<String>, Vec<Vec<f64>>) {
+) -> UnifracDistanceMatrix {
     let sample_ids: Vec<String> = samples.keys().cloned().collect();
     let n = sample_ids.len();
-    let mut matrix = vec![vec![0.0_f64; n]; n];
+    let mut condensed = Vec::with_capacity(n * (n - 1) / 2);
 
-    for i in 0..n {
-        for j in (i + 1)..n {
+    for i in 1..n {
+        for j in 0..i {
             let sa = &samples[&sample_ids[i]];
             let sb = &samples[&sample_ids[j]];
             let dist = if weighted {
@@ -486,12 +500,14 @@ pub fn unifrac_distance_matrix(
             } else {
                 unweighted_unifrac(tree, sa, sb)
             };
-            matrix[i][j] = dist;
-            matrix[j][i] = dist;
+            condensed.push(dist);
         }
     }
 
-    (sample_ids, matrix)
+    UnifracDistanceMatrix {
+        sample_ids,
+        condensed,
+    }
 }
 
 #[cfg(test)]
@@ -601,11 +617,10 @@ mod tests {
         s2.insert("D".to_string(), 5.0);
         samples.insert("sample2".to_string(), s2);
 
-        let (ids, matrix) = unifrac_distance_matrix(&tree, &samples, false);
-        assert_eq!(ids.len(), 2);
-        assert!(matrix[0][0].abs() < f64::EPSILON);
-        assert!(matrix[1][1].abs() < f64::EPSILON);
-        assert!((matrix[0][1] - matrix[1][0]).abs() < 1e-10);
+        let dm = unifrac_distance_matrix(&tree, &samples, false);
+        assert_eq!(dm.sample_ids.len(), 2);
+        assert_eq!(dm.condensed.len(), 1);
+        assert!(dm.condensed[0] > 0.0, "distinct samples should have d > 0");
     }
 
     #[test]

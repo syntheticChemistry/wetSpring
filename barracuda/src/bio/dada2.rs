@@ -39,13 +39,13 @@ use crate::bio::derep::UniqueSequence;
 use crate::special::regularized_gamma_lower;
 use std::fmt::Write;
 
-const NUM_BASES: usize = 4;
-const MAX_QUAL: usize = 42;
+pub(crate) const NUM_BASES: usize = 4;
+pub(crate) const MAX_QUAL: usize = 42;
 const OMEGA_A: f64 = 1e-40;
 const MAX_DADA_ITERS: usize = 10;
-const MAX_ERR_ITERS: usize = 6;
-const MIN_ERR: f64 = 1e-7;
-const MAX_ERR: f64 = 0.25;
+pub(crate) const MAX_ERR_ITERS: usize = 6;
+pub(crate) const MIN_ERR: f64 = 1e-7;
+pub(crate) const MAX_ERR: f64 = 0.25;
 
 /// An Amplicon Sequence Variant — the output of denoising.
 #[derive(Debug, Clone)]
@@ -100,7 +100,7 @@ pub struct Dada2Stats {
 
 /// 4×4 error matrix indexed by quality score.
 /// `err[from][to][qual]` = P(observing `to` when truth is `from` at quality `qual`).
-type ErrorModel = [[[f64; MAX_QUAL]; NUM_BASES]; NUM_BASES];
+pub(crate) type ErrorModel = [[[f64; MAX_QUAL]; NUM_BASES]; NUM_BASES];
 
 /// Denoise a set of dereplicated sequences into ASVs.
 ///
@@ -195,7 +195,7 @@ pub fn denoise(seqs: &[UniqueSequence], params: &Dada2Params) -> (Vec<Asv>, Dada
 
 /// Initialize error model from Phred quality scores (no prior data).
 #[allow(clippy::needless_range_loop)] // 3D array requires indexing by from/to/q
-fn init_error_model() -> ErrorModel {
+pub(crate) fn init_error_model() -> ErrorModel {
     let mut err = [[[0.0_f64; MAX_QUAL]; NUM_BASES]; NUM_BASES];
     for q in 0..MAX_QUAL {
         #[allow(clippy::cast_precision_loss)] // q is 0..42, exact
@@ -213,8 +213,8 @@ fn init_error_model() -> ErrorModel {
     err
 }
 
-#[allow(clippy::match_same_arms)] // A/a and unknown bases both map to 0
-const fn base_to_idx(b: u8) -> usize {
+#[allow(clippy::match_same_arms)]
+pub(crate) const fn base_to_idx(b: u8) -> usize {
     match b {
         b'A' | b'a' => 0,
         b'C' | b'c' => 1,
@@ -266,7 +266,7 @@ fn assign_to_centers(
 
 /// Re-estimate error model from observed substitution patterns.
 #[allow(clippy::cast_precision_loss)]
-fn estimate_error_model(
+pub(crate) fn estimate_error_model(
     seqs: &[&UniqueSequence],
     partition: &[usize],
     _centers: &[usize],
@@ -324,8 +324,8 @@ fn estimate_error_model(
     err
 }
 
-#[allow(clippy::needless_range_loop)] // 3D array requires indexing by from/to/q
-fn err_model_converged(old: &ErrorModel, new: &ErrorModel) -> bool {
+#[allow(clippy::needless_range_loop)]
+pub(crate) fn err_model_converged(old: &ErrorModel, new: &ErrorModel) -> bool {
     let mut max_diff = 0.0_f64;
     for from in 0..NUM_BASES {
         for to in 0..NUM_BASES {
@@ -337,7 +337,7 @@ fn err_model_converged(old: &ErrorModel, new: &ErrorModel) -> bool {
             }
         }
     }
-    max_diff < 1e-6
+    max_diff < crate::tolerances::DADA2_ERR_CONVERGENCE
 }
 
 /// Find sequences that should become new centers (abundance p-value test).

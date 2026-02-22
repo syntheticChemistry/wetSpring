@@ -282,7 +282,7 @@ mod tests {
             scenario_pure_undefended(&p, DT),
             scenario_high_cost(&p, DT),
         ] {
-            for (step, row) in result.y.iter().enumerate() {
+            for (step, row) in result.states().enumerate() {
                 for (var, &val) in row.iter().enumerate() {
                     assert!(val >= 0.0, "var {var} negative ({val}) at step {step}");
                 }

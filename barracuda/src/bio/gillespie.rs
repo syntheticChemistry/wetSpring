@@ -78,19 +78,44 @@ pub struct Reaction {
 }
 
 /// Result of a single SSA trajectory.
+///
+/// States are stored in a flat `Vec<i64>` of length `n_points * n_species`
+/// for contiguous memory access. Use [`state_at`](Self::state_at) or
+/// [`states`](Self::states) for ergonomic indexing.
 #[derive(Debug, Clone)]
 pub struct Trajectory {
     /// Time points of state transitions.
     pub times: Vec<f64>,
-    /// State snapshots after each transition.
-    pub states: Vec<Vec<i64>>,
+    /// Number of species (state variables) per time point.
+    pub n_species: usize,
+    /// Flat row-major state history.
+    pub states: Vec<i64>,
 }
 
 impl Trajectory {
+    /// Number of recorded time points.
+    #[inline]
+    #[must_use]
+    pub fn n_points(&self) -> usize {
+        self.times.len()
+    }
+
+    /// Slice of all species at time point `i`.
+    #[inline]
+    #[must_use]
+    pub fn state_at(&self, i: usize) -> &[i64] {
+        let start = i * self.n_species;
+        &self.states[start..start + self.n_species]
+    }
+
     /// Final state (last recorded snapshot).
     #[must_use]
     pub fn final_state(&self) -> &[i64] {
-        self.states.last().map_or(&[], Vec::as_slice)
+        if self.states.is_empty() {
+            &[]
+        } else {
+            &self.states[self.states.len() - self.n_species..]
+        }
     }
 
     /// Final time.
@@ -103,6 +128,12 @@ impl Trajectory {
     #[must_use]
     pub fn n_events(&self) -> usize {
         self.times.len().saturating_sub(1)
+    }
+
+    /// Iterator over all state snapshots.
+    #[inline]
+    pub fn states_iter(&self) -> impl Iterator<Item = &[i64]> {
+        self.states.chunks_exact(self.n_species)
     }
 }
 
@@ -118,11 +149,12 @@ pub fn gillespie_ssa(
     t_max: f64,
     rng: &mut Lcg64,
 ) -> Trajectory {
+    let n_species = initial.len();
     let mut state = initial.to_vec();
     let mut t = 0.0;
 
     let mut times = vec![t];
-    let mut states = vec![state.clone()];
+    let mut flat_states = Vec::from(initial);
 
     loop {
         let propensities: Vec<f64> = reactions.iter().map(|r| (r.propensity)(&state)).collect();
@@ -157,10 +189,14 @@ pub fn gillespie_ssa(
         }
 
         times.push(t);
-        states.push(state.clone());
+        flat_states.extend_from_slice(&state);
     }
 
-    Trajectory { times, states }
+    Trajectory {
+        times,
+        n_species,
+        states: flat_states,
+    }
 }
 
 /// Run a birth-death SSA matching the Massie 2012 simplified c-di-GMP model.
@@ -306,7 +342,7 @@ mod tests {
     #[test]
     fn birth_death_non_negative() {
         let traj = birth_death_ssa(10.0, 0.1, 100.0, 42);
-        for state in &traj.states {
+        for state in traj.states_iter() {
             assert!(state[0] >= 0, "molecule count went negative");
         }
     }

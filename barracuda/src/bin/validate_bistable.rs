@@ -159,7 +159,6 @@ fn check_non_negative(
     let min_val: f64 = result
         .y
         .iter()
-        .flat_map(|row| row.iter())
         .copied()
         .fold(f64::INFINITY, f64::min);
     v.check(

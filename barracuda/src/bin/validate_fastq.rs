@@ -237,12 +237,19 @@ fn validate_quality_filtering(v: &mut Validator) {
         quality: vec![33 + 30; 44],
     };
     let adapter = b"AGATCGGAAGAG";
-    let (trimmed, found) = quality::trim_adapter_3prime(&with_adapter, adapter, 1, 8);
-    v.check("Adapter found", f64::from(u8::from(found)), 1.0, 0.0);
+    let trimmed = quality::trim_adapter_3prime(&with_adapter, adapter, 1, 8);
+    v.check(
+        "Adapter found",
+        f64::from(u8::from(trimmed.is_some())),
+        1.0,
+        0.0,
+    );
     v.check(
         "Adapter trimmed correctly",
         f64::from(u8::from(
-            trimmed.sequence.len() < with_adapter.sequence.len(),
+            trimmed
+                .as_ref()
+                .is_some_and(|t| t.sequence.len() < with_adapter.sequence.len()),
         )),
         1.0,
         0.0,

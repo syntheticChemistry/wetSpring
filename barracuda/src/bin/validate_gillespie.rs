@@ -65,7 +65,7 @@ fn main() {
         traj1.final_state()[0].max(0) as f64,
         0.0,
     );
-    let all_non_neg = traj1.states.iter().all(|s| s[0] >= 0);
+    let all_non_neg = traj1.states_iter().all(|s| s[0] >= 0);
     v.check(
         "All states non-negative",
         f64::from(u8::from(all_non_neg)),

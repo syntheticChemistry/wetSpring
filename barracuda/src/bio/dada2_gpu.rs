@@ -15,21 +15,15 @@
 //! as a flat f64 lookup table. The GPU shader only does f64 addition (sum over
 //! positions) — no exp, log, or other transcendentals.
 
-use crate::bio::dada2::{self, Asv, Dada2Params, Dada2Stats};
+use crate::bio::dada2::{
+    self, Asv, Dada2Params, Dada2Stats, ErrorModel, MAX_ERR_ITERS, MAX_QUAL, MIN_ERR, NUM_BASES,
+};
 use crate::bio::derep::UniqueSequence;
 use crate::error::{Error, Result};
 use barracuda::device::WgpuDevice;
 use barracuda::ops::bio::dada2::Dada2EStepGpu;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
-
-const NUM_BASES: usize = 4;
-const MAX_QUAL: usize = 42;
-const MIN_ERR: f64 = 1e-7;
-const MAX_ERR: f64 = 0.25;
-const MAX_ERR_ITERS: usize = 6;
-
-type ErrorModel = [[[f64; MAX_QUAL]; NUM_BASES]; NUM_BASES];
 
 /// Pre-compiled DADA2 E-step pipeline via `ToadStool`.
 pub struct Dada2Gpu {
@@ -288,15 +282,9 @@ pub fn denoise_gpu(
 
 // ── Data packing for GPU ─────────────────────────────────────────────────────
 
-#[allow(clippy::match_same_arms)]
+#[allow(clippy::cast_possible_truncation)]
 const fn base_to_idx(b: u8) -> u32 {
-    match b {
-        b'A' | b'a' => 0,
-        b'C' | b'c' => 1,
-        b'G' | b'g' => 2,
-        b'T' | b't' => 3,
-        _ => 0,
-    }
+    dada2::base_to_idx(b) as u32
 }
 
 #[allow(clippy::cast_possible_truncation)]
@@ -325,22 +313,8 @@ fn pack_sequences(seqs: &[&UniqueSequence], max_len: usize) -> (Vec<u32>, Vec<u3
     (bases, quals, lengths)
 }
 
-#[allow(clippy::cast_precision_loss, clippy::needless_range_loop)]
 fn init_error_model() -> ErrorModel {
-    let mut err = [[[0.0_f64; MAX_QUAL]; NUM_BASES]; NUM_BASES];
-    for q in 0..MAX_QUAL {
-        let p_err = (10.0_f64).powf(-(q as f64) / 10.0).clamp(MIN_ERR, MAX_ERR);
-        for from in 0..NUM_BASES {
-            for to in 0..NUM_BASES {
-                if from == to {
-                    err[from][to][q] = 1.0 - p_err;
-                } else {
-                    err[from][to][q] = p_err / 3.0;
-                }
-            }
-        }
-    }
-    err
+    dada2::init_error_model()
 }
 
 #[allow(clippy::needless_range_loop)]
@@ -357,74 +331,16 @@ fn flatten_log_error_model(err: &ErrorModel) -> Vec<f64> {
     flat
 }
 
-#[allow(clippy::cast_precision_loss, clippy::needless_range_loop)]
 fn estimate_error_model(
     seqs: &[&UniqueSequence],
     partition: &[usize],
-    _centers: &[usize],
+    centers: &[usize],
 ) -> ErrorModel {
-    let mut counts = [[[0.0_f64; MAX_QUAL]; NUM_BASES]; NUM_BASES];
-    let mut totals = [[0.0_f64; MAX_QUAL]; NUM_BASES];
-
-    for (i, seq) in seqs.iter().enumerate() {
-        let center_idx = partition[i];
-        let center = seqs[center_idx];
-        let len = seq.sequence.len().min(center.sequence.len());
-        let weight = seq.abundance as f64;
-
-        for pos in 0..len {
-            let from = base_to_idx(center.sequence[pos]) as usize;
-            let to = base_to_idx(seq.sequence[pos]) as usize;
-            let q = seq
-                .representative_quality
-                .get(pos)
-                .map_or(0, |&v| v.saturating_sub(33) as usize)
-                .min(MAX_QUAL - 1);
-            counts[from][to][q] += weight;
-            totals[from][q] += weight;
-        }
-    }
-
-    let mut err = init_error_model();
-    for from in 0..NUM_BASES {
-        for q in 0..MAX_QUAL {
-            if totals[from][q] > 0.0 {
-                for to in 0..NUM_BASES {
-                    let rate = counts[from][to][q] / totals[from][q];
-                    err[from][to][q] = rate.clamp(MIN_ERR, 1.0 - MIN_ERR);
-                }
-            }
-        }
-    }
-
-    for from in 0..NUM_BASES {
-        for q in 0..MAX_QUAL {
-            let sum: f64 = (0..NUM_BASES).map(|to| err[from][to][q]).sum();
-            if sum > 0.0 {
-                for to in 0..NUM_BASES {
-                    err[from][to][q] /= sum;
-                }
-            }
-        }
-    }
-
-    err
+    dada2::estimate_error_model(seqs, partition, centers)
 }
 
-#[allow(clippy::needless_range_loop)]
 fn err_model_converged(old: &ErrorModel, new: &ErrorModel) -> bool {
-    let mut max_diff = 0.0_f64;
-    for from in 0..NUM_BASES {
-        for to in 0..NUM_BASES {
-            for q in 0..MAX_QUAL {
-                let diff = (old[from][to][q] - new[from][to][q]).abs();
-                if diff > max_diff {
-                    max_diff = diff;
-                }
-            }
-        }
-    }
-    max_diff < crate::tolerances::DADA2_ERR_CONVERGENCE
+    dada2::err_model_converged(old, new)
 }
 
 #[allow(clippy::cast_precision_loss)]

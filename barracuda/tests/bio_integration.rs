@@ -189,9 +189,9 @@ fn quality_adapter_trim_integration() {
         quality: vec![33 + 30; seq.len()],
     };
 
-    let (trimmed, found) = quality::trim_adapter_3prime(&record, adapter, 1, 8);
-    assert!(found);
-    assert!(trimmed.sequence.len() < seq.len());
+    let trimmed = quality::trim_adapter_3prime(&record, adapter, 1, 8);
+    assert!(trimmed.is_some());
+    assert!(trimmed.unwrap().sequence.len() < seq.len());
 }
 
 // ── Signal processing integration ─────────────────────────────

@@ -245,7 +245,7 @@ mod tests {
             scenario_low_cdg(&p, DT),
             scenario_vpsr_knockout(&p, DT),
         ] {
-            for (step, row) in result.y.iter().enumerate() {
+            for (step, row) in result.states().enumerate() {
                 for (var, &val) in row.iter().enumerate() {
                     assert!(val >= 0.0, "var {var} negative ({val}) at step {step}");
                 }

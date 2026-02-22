@@ -160,7 +160,6 @@ fn check_non_negative(
     let min_val: f64 = result
         .y
         .iter()
-        .flat_map(|row| row.iter())
         .copied()
         .fold(f64::INFINITY, f64::min);
     // min_val should be ≥ 0; we check it's within tolerance of 0 from below

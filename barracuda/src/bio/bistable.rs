@@ -358,7 +358,7 @@ mod tests {
     fn all_variables_non_negative() {
         let p = BistableParams::default();
         let result = run_bistable(&[0.01, 0.0, 0.0, 2.0, 0.5], 24.0, DT, &p);
-        for (step, row) in result.y.iter().enumerate() {
+        for (step, row) in result.states().enumerate() {
             for (var, &val) in row.iter().enumerate() {
                 assert!(
                     val >= 0.0,

@@ -330,7 +330,7 @@ mod tests {
             scenario_hapr_mutant(&p, DT),
             scenario_dgc_overexpression(&p, DT),
         ] {
-            for (step, row) in result.y.iter().enumerate() {
+            for (step, row) in result.states().enumerate() {
                 for (var, &val) in row.iter().enumerate() {
                     assert!(
                         val >= 0.0,

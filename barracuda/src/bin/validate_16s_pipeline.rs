@@ -340,13 +340,13 @@ fn validate_unifrac(v: &mut Validator) {
         tolerances::ANALYTICAL_F64,
     );
 
-    // Distance matrix: 2 samples → 2×2 matrix
+    // Distance matrix: 2 samples → condensed (1 pair)
     let mut table: HashMap<String, HashMap<String, f64>> = HashMap::new();
     table.insert("sampleA".into(), sample_a.clone());
     table.insert("sampleB".into(), sample_b.clone());
-    let (ids, dm) = unifrac::unifrac_distance_matrix(&tree, &table, false);
-    v.check_count("UniFrac: distance matrix samples", ids.len(), 2);
-    v.check_count("UniFrac: distance matrix rows", dm.len(), 2);
+    let dm = unifrac::unifrac_distance_matrix(&tree, &table, false);
+    v.check_count("UniFrac: distance matrix samples", dm.sample_ids.len(), 2);
+    v.check_count("UniFrac: condensed pairs", dm.condensed.len(), 1);
 }
 
 // ── End-to-end pipeline ─────────────────────────────────────────────────────
