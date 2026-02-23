@@ -73,6 +73,7 @@ pub mod molecular_clock;
 #[cfg(feature = "gpu")]
 pub mod molecular_clock_gpu;
 pub mod multi_signal;
+pub mod ncbi_data;
 #[cfg(feature = "gpu")]
 pub mod multi_signal_gpu;
 pub mod neighbor_joining;

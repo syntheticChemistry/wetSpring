@@ -2,7 +2,7 @@
 
 **Track:** 1 — Bloom Surveillance & Environmental Monitoring
 **Papers reproduced:** 1 (Paper 14)
-**Total checks:** 49
+**Total checks:** 58
 **Domains:** Bloom event detection, diversity collapse, dominance metrics,
 16S pipeline validation, multi-ecosystem GPU bloom surveillance
 
@@ -293,4 +293,37 @@ position; it is a practical requirement for regulatory credibility.
 
 ```bash
 cargo run --release --bin validate_npu_bloom_sentinel
+```
+
+---
+
+## Temporal ESN Extension: Exp123 — Stateful vs Stateless Bloom (shared with Cahill)
+
+### Motivation
+
+Same experiment as Cahill Exp123. From the monitoring perspective, the
+question is whether a field sentinel needs temporal memory (carry state
+across sampling windows) or whether single-window classification suffices.
+
+### Results (9/9 PASS)
+
+| Metric | Value |
+|--------|-------|
+| Stateful = stateless accuracy | 45.0% (both modes) |
+| F64 ↔ NPU agreement | Exact |
+| Coin-cell feasibility | >534,000 days |
+
+### Key Finding
+
+The current diagonal regression does not differentiate stateful from
+stateless ESN — both achieve 45% accuracy. From a monitoring perspective,
+this means the simpler stateless sentinel (lower memory footprint, easier
+to audit) is sufficient with the current training approach. Full matrix
+ridge regression (ToadStool ESN v2) will test whether temporal memory
+provides the expected 2–4 window early detection advantage.
+
+### Reproduction
+
+```bash
+cargo run --release --bin validate_temporal_esn_bloom
 ```

@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 23, 2026
-**Status**: Phase 34 — 1,476 CPU + 702 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 56 ODE parity + 24 MF-v6 + 72 streaming-v2 + 25 spectral + 59 NPU reservoir + 9 cross-spring evolution = 2,673+/2,673+ checks, ALL PASS (750 tests, 120 experiments)
+**Status**: Phase 38 — 1,476 CPU + 702 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 56 ODE parity + 24 MF-v6 + 72 streaming-v2 + 25 spectral + 59 NPU reservoir + 9 cross-spring evolution + 146 NCBI-scale + 50 3D-Anderson + 50 geometry + 35 why-analysis + 36 extension-papers = 2,990+/2,990+ checks, ALL PASS (750 tests, 149 experiments)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -10,7 +10,7 @@
 
 | Metric | Value |
 |--------|-------|
-| CPU validation | 1,476/1,476 PASS — 41 modules, 120 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
+| CPU validation | 1,476/1,476 PASS — 41 modules, 138 experiments (GPU-confirmed Phase 36c), 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
 | GPU validation | 702/702 PASS — 30 ToadStool primitives, 5 local WGSL, 80 streaming + 48 head-to-head + 28 metalForge v4 + 38 pure GPU |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 380/380 — 22.5x Rust speedup over Python (v1–v8) |
@@ -26,7 +26,7 @@
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
 | Faculty (Track 1c) | R. Anderson (Carleton) — deep-sea metagenomics, population genomics |
 | Faculty (Track 2) | Jones (BMB/Chemistry, MSU) — PFAS mass spectrometry |
-| Handoffs | Fourteen delivered (v1–v6, rewire, cross-spring, v7–v18) |
+| Handoffs | Seventeen delivered (v1–v6, rewire, cross-spring, v7–v21) |
 
 ---
 
@@ -110,10 +110,10 @@ generic ODE primitive.
 
 | Document | Location | Description |
 |----------|----------|-------------|
-| CONTROL_EXPERIMENT_STATUS.md | `../` | 120 experiments, 2,673+ validation checks |
+| CONTROL_EXPERIMENT_STATUS.md | `../` | 130 experiments, 2,869+ validation checks |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
-| Handoff (v18) | `../wateringHole/handoffs/WETSPRING_V018_CROSS_SPRING_REWIRE_HANDOFF_FEB23_2026.md` | Current ToadStool handoff |
+| Handoff (v20) | `../wateringHole/handoffs/WETSPRING_V020_3D_ANDERSON_DIMENSIONAL_QS_FEB23_2026.md` | Current ToadStool handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |

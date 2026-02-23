@@ -636,3 +636,162 @@ path = "src/bin/validate_npu_disorder_classifier.rs"
 [[bin]]
 name = "benchmark_cross_spring_evolution"
 path = "src/bin/benchmark_cross_spring_evolution.rs"
+
+# ── NCBI Vibrio QS Parameter Landscape (Exp121) ───────────────────
+[[bin]]
+name = "validate_ncbi_vibrio_qs"
+path = "src/bin/validate_ncbi_vibrio_qs.rs"
+
+# ── 2D Anderson Spatial QS Lattice (Exp122) ──────────────────────
+[[bin]]
+name = "validate_anderson_2d_qs"
+path = "src/bin/validate_anderson_2d_qs.rs"
+required-features = ["gpu"]
+
+# ── Temporal ESN Bloom Cascade (Exp123) ──────────────────────────
+[[bin]]
+name = "validate_temporal_esn_bloom"
+path = "src/bin/validate_temporal_esn_bloom.rs"
+
+# ── MassBank Full-Scale NPU Spectral Triage (Exp124) ────────────
+[[bin]]
+name = "validate_npu_spectral_triage"
+path = "src/bin/validate_npu_spectral_triage.rs"
+
+# ── NCBI Campylobacterota Pangenome (Exp125) ────────────────────
+[[bin]]
+name = "validate_ncbi_pangenome"
+path = "src/bin/validate_ncbi_pangenome.rs"
+
+# ── Global QS-Disorder Atlas (Exp126) ──────────────────────────
+[[bin]]
+name = "validate_ncbi_qs_atlas"
+path = "src/bin/validate_ncbi_qs_atlas.rs"
+
+# ── 3D Anderson Dimensional QS Sweep (Exp127) ─────────────────
+[[bin]]
+name = "validate_anderson_3d_qs"
+path = "src/bin/validate_anderson_3d_qs.rs"
+required-features = ["gpu"]
+
+# ── Vent Chimney Geometry QS Prediction (Exp128) ──────────────
+[[bin]]
+name = "validate_vent_chimney_qs"
+path = "src/bin/validate_vent_chimney_qs.rs"
+required-features = ["gpu"]
+
+# ── Dimensional QS Phase Diagram (Exp129) ─────────────────────
+[[bin]]
+name = "validate_dimensional_phase_diagram"
+path = "src/bin/validate_dimensional_phase_diagram.rs"
+required-features = ["gpu"]
+
+# ── Thick Biofilm 3D QS Extension (Exp130) ────────────────────
+[[bin]]
+name = "validate_biofilm_3d_qs"
+path = "src/bin/validate_biofilm_3d_qs.rs"
+required-features = ["gpu"]
+
+# ── Finite-Size Scaling (Exp131) ──────────────────────────────
+[[bin]]
+name = "validate_finite_size_scaling"
+path = "src/bin/validate_finite_size_scaling.rs"
+required-features = ["gpu"]
+
+# ── Geometry Zoo (Exp132) ─────────────────────────────────────
+[[bin]]
+name = "validate_geometry_zoo"
+path = "src/bin/validate_geometry_zoo.rs"
+required-features = ["gpu"]
+
+# ── Cave, Hot Spring & Rhizosphere QS (Exp133) ───────────────
+[[bin]]
+name = "validate_ecosystem_geometry_qs"
+path = "src/bin/validate_ecosystem_geometry_qs.rs"
+required-features = ["gpu"]
+
+# ── Cross-Ecosystem QS Geometry Atlas (Exp134) ───────────────
+[[bin]]
+name = "validate_cross_ecosystem_atlas"
+path = "src/bin/validate_cross_ecosystem_atlas.rs"
+required-features = ["gpu"]
+
+# ── Mapping Sensitivity (Exp135) ─────────────────────────────
+[[bin]]
+name = "validate_mapping_sensitivity"
+path = "src/bin/validate_mapping_sensitivity.rs"
+required-features = ["gpu"]
+
+# ── Square-Cubed Law Scaling (Exp136) ────────────────────────
+[[bin]]
+name = "validate_square_cubed_scaling"
+path = "src/bin/validate_square_cubed_scaling.rs"
+required-features = ["gpu"]
+
+# ── Planktonic & Fluid 3D Dilution (Exp137) ──────────────────
+[[bin]]
+name = "validate_planktonic_dilution"
+path = "src/bin/validate_planktonic_dilution.rs"
+required-features = ["gpu"]
+
+# ── Eukaryote vs Bacteria Scaling (Exp138) ───────────────────
+[[bin]]
+name = "validate_eukaryote_scaling"
+path = "src/bin/validate_eukaryote_scaling.rs"
+required-features = ["gpu"]
+
+# ── QS Distance Scaling (Exp139) ─────────────────────────────
+[[bin]]
+name = "validate_qs_distance_scaling"
+path = "src/bin/validate_qs_distance_scaling.rs"
+required-features = ["gpu"]
+
+# ── QS Gene Prevalence by Habitat (Exp140) ───────────────────
+[[bin]]
+name = "validate_qs_gene_prevalence"
+path = "src/bin/validate_qs_gene_prevalence.rs"
+
+# ── NCBI QS Habitat Query (Exp141) ──────────────────────────
+[[bin]]
+name = "validate_ncbi_qs_habitat"
+path = "src/bin/validate_ncbi_qs_habitat.rs"
+
+# ── Producer vs Receiver QS (Exp142) ────────────────────────
+[[bin]]
+name = "validate_producer_receiver_qs"
+path = "src/bin/validate_producer_receiver_qs.rs"
+
+# ── Anderson Anomaly Hunter (Exp143) ────────────────────────
+[[bin]]
+name = "validate_anderson_anomalies"
+path = "src/bin/validate_anderson_anomalies.rs"
+
+# ── Cold Seep QS Gene Catalog (Exp144) ─────────────────────
+[[bin]]
+name = "validate_cold_seep_qs_catalog"
+path = "src/bin/validate_cold_seep_qs_catalog.rs"
+
+# ── Cold Seep QS Type vs Geometry (Exp145) ─────────────────
+[[bin]]
+name = "validate_cold_seep_qs_geometry"
+path = "src/bin/validate_cold_seep_qs_geometry.rs"
+
+# ── luxR Phylogeny × Geometry Overlay (Exp146) ─────────────
+[[bin]]
+name = "validate_luxr_phylogeny_geometry"
+path = "src/bin/validate_luxr_phylogeny_geometry.rs"
+
+# ── Mechanical Wave Anderson (Exp147) ──────────────────────
+[[bin]]
+name = "validate_mechanical_wave_anderson"
+path = "src/bin/validate_mechanical_wave_anderson.rs"
+
+# ── QS Wave × Localization (Exp148) ───────────────────────
+[[bin]]
+name = "validate_qs_wave_localization"
+path = "src/bin/validate_qs_wave_localization.rs"
+
+# ── Burst Statistics as Anderson (Exp149) ──────────────────
+[[bin]]
+name = "validate_burst_statistics_anderson"
+path = "src/bin/validate_burst_statistics_anderson.rs"

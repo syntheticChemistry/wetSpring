@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** February 23, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 34 — Cross-spring rewire + evolution benchmark; 16 bio imports modernized to ToadStool S42 root re-exports, cross-spring shader provenance documented (612 WGSL: 35 hotSpring, 22 wetSpring, 14 neuralSpring, 5 airSpring); 750 tests, 120 experiments, 2,673+ checks
+**Status:** Phase 38 — Extension papers: cold seep 299K QS genes, luxR phylogeny geometry, mechanical wave Anderson, wave-localization synthesis, burst statistics reinterpretation; 750 tests, 149 experiments, 3,028+ checks, 138 binaries
 
 ---
 
@@ -103,11 +103,16 @@ integration point.
 | Cross-spring spectral theory | 25 (Anderson 1D/2D/3D + Almost-Mathieu + QS bridge) |
 | NPU reservoir checks | 59 (ESN → int8 → NPU-simulated inference) |
 | Cross-spring evolution checks | 9 (Exp120 benchmark) |
-| **Total validation checks** | **2,673+** |
+| NCBI-scale hypothesis testing | 146 (GPU-confirmed: Vibrio QS, 2D Anderson, pangenome, atlas) |
+| 3D Anderson dimensional QS | 50 (GPU-confirmed: 1D→2D→3D sweep, vent chimney, phase diagram, biofilm 3D) |
+| Geometry verification + cross-ecosystem | 50 (finite-size scaling, geometry zoo, cave/spring/rhizosphere, 28×5 atlas) |
+| Why analysis: mapping, scaling, dilution, eukaryote | 35 (mapping sensitivity, square-cubed law, planktonic fluid 3D, cross-domain QS) |
+| Extension papers: cold seep, phylogeny, waves | 36 (cold seep 299K catalog, geometry overlay, luxR phylogeny, mechanical waves, wave-localization, burst statistics) |
+| **Total validation checks** | **2,990+** |
 | Rust library unit tests | 676 + 60 integration + 14 doc |
 | **Total Rust tests** | **750** |
-| Experiments completed | 120 |
-| Validation/benchmark binaries | 101 validate + 8 benchmark = 109 total |
+| Experiments completed | 140 |
+| Validation/benchmark binaries | 119 validate + 10 benchmark = 129 total |
 | CPU bio modules | 41 |
 | GPU bio modules | 42 (27 lean + 5 write + 7 compose + 3 passthrough) |
 | Tier B (needs refactor) | 0 (all promoted) |
@@ -119,7 +124,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | ToadStool primitives consumed | **31** (absorbed, Lean — aligned to ToadStool S42) |
 | Local WGSL shaders | **5** (Write phase — ODE domains pending absorption) |
-All 2,673+ validation checks **PASS**. All 750 tests **PASS**.
+All 2,990+ validation checks **PASS**. All 750 tests **PASS**.
 
 ### GPU Performance
 
@@ -377,7 +382,7 @@ GPU + metalForge validation:
 
 **750 tests at time** | **2,430+ checks at time**
 
-### Phase 30: Current — Pure GPU Streaming v2 (Multi-Domain)
+### Phase 30: Pure GPU Streaming v2 (Multi-Domain)
 
 Expanding streaming coverage from taxonomy+diversity to 10+ domains across
 analytics, ODE biology, and phylogenetics pipelines:
@@ -396,7 +401,7 @@ analytics, ODE biology, and phylogenetics pipelines:
 
 **750 tests at time** | **2,502+ checks at time**
 
-### Phase 31: Current — PCoA Debt Resolution + Spectral Cross-Spring
+### Phase 31: PCoA Debt Resolution + Spectral Cross-Spring
 
 Two exclusions from the metalForge/streaming coverage resolved:
 
@@ -445,6 +450,94 @@ Complete rewiring to modern ToadStool S42 BarraCuda APIs:
   (hotSpring/neuralSpring → wetSpring NPU), with full provenance table and evolution timeline
 
 **750 tests** | **2,673+ checks** | **109 binaries**
+
+### Phase 35: NCBI-Scale Hypothesis Testing (Exp121-126) — Current
+
+GPU-confirmed results on real NCBI data (146 checks, all PASS):
+
+- **Exp121** (14/14 GPU): Real Vibrio QS — all 200 assemblies converge to biofilm; real
+  genomes cluster in biofilm-favoring parameter space unlike Exp108 synthetic grid
+- **Exp122** (12/12 GPU): 2D Anderson — genuine extended plateau (8 points above midpoint
+  for W>2) absent in 1D; bloom QS-active in 2D but suppressed in 1D; J_c ≈ 0.41
+- **Exp123** (9/9): Temporal ESN bloom — stateful vs stateless comparison, coin-cell >1 year
+- **Exp124** (10/10): NPU spectral triage — 100% recall at 20% pass rate, 3.7× speedup
+- **Exp125** (11/11): Real Campylobacterota pangenome (158 NCBI assemblies, 4 ecosystems)
+- **Exp126** (90/90 GPU): 28-biome global QS atlas — W monotonic with J, all biomes
+  correctly placed in Anderson disorder-space
+
+### Phase 36: 3D Anderson Dimensional QS Phase Diagram (Exp127-130) — Current
+
+GPU-confirmed 3D Anderson extension using hotSpring spectral primitives (50 checks, all PASS):
+
+- **Exp127** (17/17 GPU): 1D→2D→3D dimensional sweep — plateau points: 1D=0, 2D=5, 3D=12;
+  J_c(3D) ≈ 1.28 >> J_c(2D) ≈ 0.56; gut/vent/soil/ocean flip to QS-active in 3D
+- **Exp128** (12/12 GPU): Vent chimney geometry — 3 of 4 zones QS-active in 3D but suppressed
+  in 2D; 2D slab model misses 75% of chimney QS capability
+- **Exp129** (12/12 GPU): 28-biome dimensional phase diagram — all 28 biomes QS-active in 3D,
+  zero in 1D or 2D; 3D metal-insulator W_c ≈ 16.5 exceeds all natural biome disorder
+- **Exp130** (9/9 GPU): Thick biofilm 3D extension — 3D block (8×8×6) has 4× wider plateau
+  than 2D slab; J_c(3D) ≈ 1.25, just 6 layers of depth transform QS capability
+
+**Novel contribution to hotSpring**: biological validation data for 3D Anderson spectral
+theory — microbial ecology provides natural systems where dimensional phase transitions
+have measurable consequences for collective behavior.
+
+### Phase 36b: Geometry Verification + Cross-Ecosystem Atlas (Exp131-134)
+
+Verification and ecosystem extension of Phase 36 findings (50 checks, all PASS):
+
+- **Exp131** (11/11 GPU): Finite-size scaling — L=6,7,8,9,10 cubes confirm W_c converges
+  to **16.53 at L=10**, almost exactly theoretical 16.5. L=8 results are RELIABLE.
+- **Exp132** (11/11 GPU): Geometry zoo — block(12) > cube(11) > thin_film(7) > slab(5)
+  = tube(5) > chain(0). Just 2 layers of depth add 40% more plateau than pure 2D.
+- **Exp133** (17/17 GPU): Cave/hot spring/rhizosphere — 12 ecosystem zones modeled with
+  physically appropriate geometries. Only 3D zones (sediments, soil pores) sustain QS.
+  Stalactite films, cave walls, and mycorrhizal tubes are QS-suppressed.
+- **Exp134** (11/11 GPU): 28-biome × 5-geometry atlas — block activates 28/28, thin film
+  3/28 (lowest diversity only), all other geometries 0/28. True 3D is required.
+
+### Phase 36c: Why Analysis — Mapping, Scaling, Dilution, Eukaryotes (Exp135-138)
+
+Deep interrogation of the 100%/0% atlas split (35 checks, all PASS):
+
+- **Exp135** (8/8 GPU): Mapping sensitivity — tested 9 α values (5–35). The 100%/0%
+  split is NOT an artifact; it reflects Anderson's theorem (d≤2 all localize, d≥3
+  genuine W_c≈16.5). Natural biomes J∈[0.73,0.99] always fall below 3D W_c.
+  Low-diversity systems (monocultures, early colonizers) CAN do 2D QS.
+- **Exp136** (6/6 GPU): Square-cubed law — interior fraction correlates r=0.53 with ⟨r⟩,
+  but the dominant effect is TOPOLOGICAL (random walk recurrence in d≤2). A 5×5×5 cube
+  (125 cells) beats a 30×30 sheet (900 cells). Qualitative, not quantitative.
+- **Exp137** (10/10 GPU): Planktonic dilution — QS breaks at 75% occupancy. Free plankton
+  (~0.1% occupancy) is QS-suppressed; particle-attached communities active. Matches
+  marine biology literature. Biofilm temporal stages: early colonization 2D-active,
+  climax community needs 3D.
+- **Exp138** (11/11 GPU): Eukaryote scaling — bacteria, yeast, protists all QS-active in
+  3D at W=13. Minimum colony: 64 cells (L=4). Tissue cells work via low diversity
+  (W<3), not geometry. QS is cross-domain if 3D structure exists.
+
+### Phase 38: Extension Papers — Cold Seep, Phylogeny, Mechanical Waves (Exp144-149)
+
+Extending the Anderson-QS framework using 5 key papers from the literature review
+(36 checks, all PASS):
+
+- **Exp144** (8/8): Cold seep QS gene catalog — 299,355 QS genes across 170 metagenomes
+  from Microbiome 2025. 34 QS types in 6 systems (AHL, AI-2, DSF, DPD, AIP, HAI).
+  Deep-sea sediment = 3D → Anderson predicts high QS. 5,000× more data than Exp141.
+- **Exp145** (5/5): Cold seep QS type vs geometry — signal molecule physics (diffusion,
+  half-life, characteristic length) predicts AHL + AI-2 dominant (>50%). 34 QS types =
+  frequency-division multiplexing in diverse 3D community.
+- **Exp146** (5/5): luxR phylogeny × geometry overlay — 12 evolutionary clades. 3D_dense:
+  100% retain luxR. 3D_dilute: 33% (inverted logic only). 2D_surface: 0%. Solo receptors
+  (eavesdroppers) enriched in mixed-species habitats. Connects to cross-species signaling.
+- **Exp147** (6/6): Mechanical wave Anderson — 4/6 bacterial communication modes subject to
+  Anderson localization (chemical QS, mechanical, electromagnetic, membrane potential).
+  Contact-dependent bypasses Anderson. Planktonic portfolio = zero channels.
+- **Exp148** (6/6): QS wave × localization synthesis — combines Meyer et al. (PRE 2020)
+  traveling wave model with Anderson framework. L_eff = min(L_QS, ξ). V. fischeri case:
+  W=1.95, chemistry-limited. Soil biofilm: wave speed reduced to 22% of maximum.
+- **Exp149** (6/6): Burst statistics reinterpretation — Jemielita et al. (SciRep 2019)
+  findings ARE Anderson localization. "Localized QS" = localized state. "Synchronized QS"
+  = extended state. Novel prediction: compute ⟨r⟩ from real cell coordinates.
 
 ### Phase 23: Structural Evolution — Flat Layouts, DRY Models, Zero-Clone APIs
 
@@ -533,7 +626,7 @@ Deep codebase evolution following hotSpring's absorption patterns:
 | Max file size | All under 1000 LOC |
 | External C dependencies | **0** (`flate2` uses `rust_backend`) |
 | Named tolerance constants | 43 (scientifically justified, hierarchy-tested) |
-| Provenance headers | All 109 validation/benchmark binaries |
+| Provenance headers | All 115 validation/benchmark binaries |
 
 ---
 
@@ -617,7 +710,7 @@ Deep codebase evolution following hotSpring's absorption patterns:
 wetSpring/
 ├── README.md                      ← this file
 ├── BENCHMARK_RESULTS.md           ← three-tier benchmark results
-├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (120 experiments)
+├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (126 experiments)
 ├── barracuda/                     ← Rust crate (src/, Cargo.toml, rustfmt.toml)
 │   ├── EVOLUTION_READINESS.md    ← absorption map (tiers, primitives, shaders)
 │   ├── ABSORPTION_MANIFEST.md    ← what's absorbed, local, planned (hotSpring pattern)
@@ -631,7 +724,7 @@ wetSpring/
 │   │   ├── bio/                 ← 41 CPU + 42 GPU bio modules
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML)
 │   │   ├── bench/               ← benchmark harness + power monitoring
-│   │   ├── bin/                 ← 109 validation/benchmark binaries
+│   │   ├── bin/                 ← 115 validation/benchmark binaries
 │   │   └── shaders/             ← 5 local WGSL ODE shaders (Write phase)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024
 ├── experiments/                   ← 120 experiment protocols + results
@@ -718,7 +811,9 @@ All validation data comes from public repositories:
 - **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
 - **ToadStool** — GPU compute engine (BarraCuda crate, 612 WGSL shaders, shared primitives)
 - **wateringHole** — Spring-local handoffs to ToadStool
-  - `handoffs/WETSPRING_V018_CROSS_SPRING_REWIRE_HANDOFF_FEB23_2026.md` — **current** (Phase 34, full rewire, 120 experiments)
+  - `handoffs/WETSPRING_V020_3D_ANDERSON_DIMENSIONAL_QS_FEB23_2026.md` — **current** (Phase 36, 3D Anderson, 130 experiments, GPU-confirmed)
+  - `handoffs/WETSPRING_V019_NCBI_HYPOTHESIS_TESTING_FEB23_2026.md` — Phase 35, NCBI-scale, 126 experiments, GPU-confirmed
+  - `handoffs/WETSPRING_V018_CROSS_SPRING_REWIRE_HANDOFF_FEB23_2026.md` — Phase 34, full rewire, 120 experiments
   - `handoffs/WETSPRING_TOADSTOOL_V17_NPU_RESERVOIR_FEB23_2026.md` — NPU reservoir, NCBI-scale, PCoA fix
   - `handoffs/WETSPRING_TOADSTOOL_V16_STREAMING_FEB23_2026.md` — streaming v2, metalForge v6
   - `handoffs/WETSPRING_TOADSTOOL_V15_ODE_GENERIC_FEB22_2026.md` — 5 ODE shaders → `BatchedOdeRK4Generic`

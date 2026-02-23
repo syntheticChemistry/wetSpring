@@ -2,7 +2,7 @@
 
 **Track:** 1 — Algal Pond Biocontrol & Environmental Surveillance
 **Papers reproduced:** 1 (Paper 13)
-**Total checks:** 45
+**Total checks:** 54
 **Domains:** Time-series diversity, anomaly detection, rolling surveillance,
 multi-ecosystem GPU bloom detection
 
@@ -315,4 +315,42 @@ reproducible.
 
 ```bash
 cargo run --release --bin validate_npu_bloom_sentinel
+```
+
+---
+
+## Temporal ESN Extension: Exp123 — Stateful vs Stateless Bloom Detection
+
+### Motivation
+
+Exp118 validated single-window ESN bloom classification. Exp123 asks whether
+*temporal memory* improves detection: a stateful ESN that carries reservoir
+state across consecutive windows should detect pre-bloom transitions earlier
+than a stateless ESN that resets between samples.
+
+### Results (9/9 PASS)
+
+| Metric | Value |
+|--------|-------|
+| Stateful f64 accuracy | 45.0% (4-class) |
+| Stateless f64 accuracy | 45.0% (4-class) |
+| NPU stateful accuracy | 45.0% |
+| NPU stateless accuracy | 45.0% |
+| F64 ↔ NPU agreement | Exact (both modes) |
+| Coin-cell feasibility | >534,000 days |
+
+### Key Finding
+
+With diagonal ridge regression (the current ESN training mode), stateful
+and stateless ESNs achieve identical accuracy — the memory advantage requires
+proper matrix ridge regression (ToadStool ESN v2) to exploit sequential
+correlations in bloom trajectories. The current result establishes the
+baseline: any improvement from stateful memory will be measured against
+this 45% floor. The energy budget (200 bytes reservoir state, 650 µs
+inference) confirms coin-cell feasibility for multi-year deployment.
+
+### Reproduction
+
+```bash
+cargo run --release --bin validate_temporal_esn_bloom
 ```

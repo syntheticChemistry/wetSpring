@@ -152,6 +152,35 @@ No proprietary data dependencies.
 | **NPU reservoir** | ESN → int8 → Akida deployment | Exp114-119 | 59 |
 | **Cross-spring evolution** | 612 WGSL shaders traced, imports rewired | Exp120 | 9 |
 
+### Phase 37 — Anderson-QS Extension Papers
+
+Papers identified during literature review for the Anderson-QS framework.
+Core finding: **no prior work applies Anderson localization to QS signaling**.
+
+#### Tier 1 — Directly Extends Framework
+
+| # | Paper | Journal | Year | Why | Status |
+|---|-------|---------|------|-----|--------|
+| 30 | "Physical communication pathways in bacteria: an extra layer to quorum sensing" | Biophys Rev Lett | 2025 | All microbial comm modes beyond QS (mechanical, EM, acoustic). Can Anderson apply to these? | Queue |
+| 31 | "Diverse QS systems regulate microbial communication in deep-sea cold seeps" | Microbiome | 2025 | **299,355 QS genes, 170 metagenomes, 34 QS types**. Massive dataset to test Anderson predictions in 3D sediment | **Exp144-145** |
+| 32 | "In silico protein analysis, ecophysiology, and reconstruction of evolutionary history of QS" | BMC Genomics | 2024 | Phylogenetic reconstruction of luxR. Correlate QS gene gain/loss with habitat geometry transitions | **Exp146** |
+| 33 | "Spatially propagating activation of QS in V. fischeri" — Meyer et al. | Phys Rev E 101:062421 | 2020 | Closest to our physics approach (traveling waves). Complementary: propagation vs localization | **Exp148** |
+
+#### Tier 2 — Validates or Challenges Predictions
+
+| # | Paper | Journal | Year | Why | Status |
+|---|-------|---------|------|-----|--------|
+| 34 | "Burst statistics in biofilm QS: role of spatial colony-growth heterogeneity" | Sci Rep | 2019 | Spatial disorder effects on QS timing. Their "disordered colony" ≈ our Anderson disorder | **Exp149** |
+| 35 | "Functional metagenomic analysis of QS in a nitrifying community" | npj Biofilms | 2021 | 13 luxI + 30 luxR from sludge. R:P = 2.3:1. Test eavesdropper prediction | Queue |
+| 36 | "A review of QS mediating interkingdom interactions in the ocean" | Commun Biol | 2025 | Marine QS review. Refine our "obligate plankton = no QS" prediction | Queue |
+
+#### Tier 3 — Experimental Validation Targets
+
+| # | Paper | Journal | Year | Why | Status |
+|---|-------|---------|------|-----|--------|
+| 37 | Rajagopalan et al. "Cell density, alignment, and orientation correlate with C-signal expression" | PNAS | 2021 | Myxococcus C-signal → 3D. Extract critical cell density for Anderson L_min prediction | Queue |
+| 38 | "Integrated cross-regulation pathway for cAMP relay in Dictyostelium" | Front Cell Dev Biol | 2023 | Updated relay circuit. Can we model relay as non-Hermitian Anderson? | Queue |
+
 ---
 
 ## Notes

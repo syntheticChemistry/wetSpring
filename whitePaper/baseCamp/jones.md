@@ -2,7 +2,7 @@
 
 **Track:** 2 — PFAS Mass Spectrometry & Environmental ML
 **Papers reproduced:** 2 (Papers 21–22)
-**Total checks:** 45
+**Total checks:** 55
 **Domains:** Spectral matching (cosine similarity), decision tree classification,
 PFAS detection pipelines, library-scale GPU spectral screening
 
@@ -324,4 +324,45 @@ MassBank reference spectrum is fully traversable.
 
 ```bash
 cargo run --release --bin validate_npu_spectral_screen
+```
+
+---
+
+## Full-Scale NPU Triage: Exp124 — Two-Stage NPU→GPU Pipeline
+
+### Motivation
+
+Exp117 validated int8 spectral pre-filtering on 2,048 spectra with 256
+queries. Exp124 scales to 5,000 library spectra and 100 queries, testing
+the full two-stage pipeline: NPU int8 fingerprint triage (stage 1) → GPU
+f64 precise cosine scoring on candidates only (stage 2). This is the
+MassBank-scale deployment scenario.
+
+### Results (10/10 PASS)
+
+| Metric | Value |
+|--------|-------|
+| Library size | 5,000 spectra |
+| Queries | 100 |
+| NPU pass rate | 20% (1,000 candidates per query) |
+| **Recall** | **100%** (100/100 true matches retained) |
+| **Top-1 match rate** | **100%** (100/100 correct) |
+| Two-stage pipeline time | 6.48 s |
+| GPU-only extrapolated | 24.1 s |
+| **Speedup** | **3.7×** |
+| NPU energy per query | ~1 µJ |
+
+### Key Finding
+
+The NPU triage achieves perfect recall and perfect top-1 matching while
+reducing the GPU workload to 20% of the library. The 3.7× throughput
+improvement over GPU-only processing scales favorably: at full MassBank
+scale (500K spectra), the NPU pre-filter would reduce GPU candidate load
+from 500K to ~100K per query, making real-time screening during LC-MS
+acquisition feasible even on modest GPU hardware.
+
+### Reproduction
+
+```bash
+cargo run --release --bin validate_npu_spectral_triage
 ```

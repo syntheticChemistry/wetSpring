@@ -42,13 +42,21 @@ impl Lcg {
 /// Echo State Network configuration.
 #[derive(Debug, Clone)]
 pub struct EsnConfig {
+    /// Number of input dimensions per time step.
     pub input_size: usize,
+    /// Number of reservoir neurons (state dimensionality).
     pub reservoir_size: usize,
+    /// Number of output classes or regression targets.
     pub output_size: usize,
+    /// Spectral radius of W_res (controls echo state property, typically < 1.0).
     pub spectral_radius: f64,
+    /// Fraction of non-zero reservoir connections (sparsity = 1 − connectivity).
     pub connectivity: f64,
+    /// Leaky integration rate: `state = (1-α)·old + α·tanh(...)`.
     pub leak_rate: f64,
+    /// Ridge regression regularization λ (Tikhonov).
     pub regularization: f64,
+    /// PRNG seed for deterministic reservoir generation.
     pub seed: u64,
 }
 
@@ -231,6 +239,110 @@ impl Esn {
 
             // Solve (S^T*S + λI) * w = S^T*y via Cholesky-like diagonal solve
             // (simplified: use diagonal approximation for speed)
+            for r in 0..n_res {
+                let diag = sts[r * n_res + r];
+                self.w_out[o * n_res + r] = if diag.abs() > 1e-15 {
+                    sty[r] / diag
+                } else {
+                    0.0
+                };
+            }
+        }
+
+        self.reset_state();
+    }
+
+    /// Train from sequences with reset between each trajectory.
+    /// State carries across windows within a trajectory; resets between trajectories.
+    pub fn train_stateful(&mut self, trajectories: &[Vec<(Vec<f64>, Vec<f64>)>]) {
+        let n_res = self.config.reservoir_size;
+        let n_out = self.config.output_size;
+        let mut states: Vec<Vec<f64>> = Vec::new();
+        let mut targets: Vec<Vec<f64>> = Vec::new();
+
+        for traj in trajectories {
+            self.reset_state();
+            for (input, target) in traj {
+                self.update(input);
+                states.push(self.state.clone());
+                targets.push(target.clone());
+            }
+        }
+
+        if states.is_empty() {
+            return;
+        }
+
+        let mut sts = vec![0.0_f64; n_res * n_res];
+        for s in &states {
+            for i in 0..n_res {
+                for j in 0..n_res {
+                    sts[i * n_res + j] += s[i] * s[j];
+                }
+            }
+        }
+        let reg = self.config.regularization;
+        for i in 0..n_res {
+            sts[i * n_res + i] += reg;
+        }
+
+        for o in 0..n_out {
+            let mut sty = vec![0.0_f64; n_res];
+            for (t, s) in states.iter().enumerate() {
+                if t < targets.len() && o < targets[t].len() {
+                    for r in 0..n_res {
+                        sty[r] += s[r] * targets[t][o];
+                    }
+                }
+            }
+            for r in 0..n_res {
+                let diag = sts[r * n_res + r];
+                self.w_out[o * n_res + r] = if diag.abs() > 1e-15 {
+                    sty[r] / diag
+                } else {
+                    0.0
+                };
+            }
+        }
+
+        self.reset_state();
+    }
+
+    /// Train with reset before each sample (stateless: each window independent).
+    pub fn train_stateless(&mut self, inputs: &[Vec<f64>], targets: &[Vec<f64>]) {
+        let n_res = self.config.reservoir_size;
+        let n_out = self.config.output_size;
+        let n_samples = inputs.len().min(targets.len());
+
+        let mut states = Vec::with_capacity(n_samples);
+        for input in inputs.iter().take(n_samples) {
+            self.reset_state();
+            self.update(input);
+            states.push(self.state.clone());
+        }
+
+        let mut sts = vec![0.0_f64; n_res * n_res];
+        for s in &states {
+            for i in 0..n_res {
+                for j in 0..n_res {
+                    sts[i * n_res + j] += s[i] * s[j];
+                }
+            }
+        }
+        let reg = self.config.regularization;
+        for i in 0..n_res {
+            sts[i * n_res + i] += reg;
+        }
+
+        for o in 0..n_out {
+            let mut sty = vec![0.0_f64; n_res];
+            for (t, s) in states.iter().enumerate() {
+                if t < targets.len() && o < targets[t].len() {
+                    for r in 0..n_res {
+                        sty[r] += s[r] * targets[t][o];
+                    }
+                }
+            }
             for r in 0..n_res {
                 let diag = sts[r * n_res + r];
                 self.w_out[o * n_res + r] = if diag.abs() > 1e-15 {

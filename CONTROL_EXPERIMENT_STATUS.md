@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 23, 2026
-**Status:** 120 experiments, 2,673+ validation checks, all PASS (750 Rust tests)
+**Status:** 149 experiments, 3,028+ validation checks, all PASS (750 Rust tests)
 
 ---
 
@@ -129,6 +129,35 @@
 | 118 | NPU bloom sentinel | `validate_npu_bloom_sentinel` | PASS | 11 |
 | 119 | NPU QS-disorder classifier | `validate_npu_disorder_classifier` | PASS | 9 |
 | 120 | Cross-spring evolution benchmark | `benchmark_cross_spring_evolution` | PASS | 9 |
+| 121 | NCBI Vibrio QS landscape | `validate_ncbi_vibrio_qs` | PASS (GPU) | 14 |
+| 122 | 2D Anderson spatial QS | `validate_anderson_2d_qs` | PASS (GPU) | 12 |
+| 123 | Temporal ESN bloom cascade | `validate_temporal_esn_bloom` | PASS | 9 |
+| 124 | NPU spectral triage | `validate_npu_spectral_triage` | PASS | 10 |
+| 125 | NCBI Campylobacterota pangenome | `validate_ncbi_pangenome` | PASS | 11 |
+| 126 | Global QS-disorder atlas | `validate_ncbi_qs_atlas` | PASS (GPU) | 90 |
+| 127 | 3D Anderson dimensional QS sweep | `validate_anderson_3d_qs` | PASS (GPU) | 17 |
+| 128 | Vent chimney geometry QS | `validate_vent_chimney_qs` | PASS (GPU) | 12 |
+| 129 | Dimensional QS phase diagram | `validate_dimensional_phase_diagram` | PASS (GPU) | 12 |
+| 130 | Thick biofilm 3D QS extension | `validate_biofilm_3d_qs` | PASS (GPU) | 9 |
+| 131 | Finite-size scaling (L=6→10) | `validate_finite_size_scaling` | PASS (GPU) | 11 |
+| 132 | Geometry zoo (6 shapes) | `validate_geometry_zoo` | PASS (GPU) | 11 |
+| 133 | Cave/hot spring/rhizosphere QS | `validate_ecosystem_geometry_qs` | PASS (GPU) | 17 |
+| 134 | Cross-ecosystem QS atlas (28×5) | `validate_cross_ecosystem_atlas` | PASS (GPU) | 11 |
+| 135 | Mapping sensitivity (9 α values) | `validate_mapping_sensitivity` | PASS (GPU) | 8 |
+| 136 | Square-cubed law scaling | `validate_square_cubed_scaling` | PASS (GPU) | 6 |
+| 137 | Planktonic/fluid 3D dilution | `validate_planktonic_dilution` | PASS (GPU) | 10 |
+| 138 | Eukaryote vs bacteria scaling | `validate_eukaryote_scaling` | PASS (GPU) | 11 |
+| 139 | QS distance scaling (bacteria vs humans) | `validate_qs_distance_scaling` | PASS (GPU) | 6 |
+| 140 | QS gene prevalence by habitat geometry | `validate_qs_gene_prevalence` | PASS | 7 |
+| 141 | NCBI QS habitat query (live data) | `validate_ncbi_qs_habitat` | PASS (NCBI) | 6 |
+| 142 | Producer vs receiver QS (NCBI live) | `validate_producer_receiver_qs` | PASS (NCBI) | 8 |
+| 143 | Anderson anomaly hunter (NP solutions) | `validate_anderson_anomalies` | PASS | 5 |
+| 144 | Cold seep QS gene catalog (299K genes) | `validate_cold_seep_qs_catalog` | PASS | 8 |
+| 145 | Cold seep QS type vs geometry | `validate_cold_seep_qs_geometry` | PASS | 5 |
+| 146 | luxR phylogeny × geometry overlay | `validate_luxr_phylogeny_geometry` | PASS | 5 |
+| 147 | Mechanical wave Anderson framework | `validate_mechanical_wave_anderson` | PASS | 6 |
+| 148 | QS wave × localization (PRE 2020) | `validate_qs_wave_localization` | PASS | 6 |
+| 149 | Burst statistics as Anderson (SciRep 2019) | `validate_burst_statistics_anderson` | PASS | 6 |
 
 ---
 
@@ -136,7 +165,7 @@
 
 | Category | Count |
 |----------|-------|
-| Experiments completed | 120 |
+| Experiments completed | 140 |
 | CPU validation checks | 1,476 |
 | GPU validation checks | 702 |
 | Dispatch validation checks | 80 |
@@ -151,7 +180,13 @@
 | Cross-spring spectral theory checks | 25 |
 | NPU reservoir deployment checks | 59 |
 | Cross-spring evolution checks | 9 |
-| **Total validation checks** | **2,673+** |
+| NCBI-scale + 2D Anderson + temporal ESN checks | 146 |
+| 3D Anderson dimensional QS checks | 50 |
+| Geometry verification + cross-ecosystem checks | 50 |
+| Why analysis: mapping, scaling, dilution, eukaryote checks | 35 |
+| Empirical validation: QS distance, gene prevalence, NCBI habitat query | 19 |
+| Anderson as null hypothesis: producer/receiver, anomalies | 13 |
+| **Total validation checks** | **2,992+** |
 | Rust tests | 750 (676 lib + 60 integration + 14 doc) |
 | BarraCuda CPU parity | 380/380 (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/092/101) |
@@ -294,7 +329,7 @@ SPDX headers                   → all .rs files
 max file size                  → all under 1000 LOC (fastq.rs: 913 largest)
 external C dependencies        → 0 (flate2 rust_backend; wgpu default-features = false)
 XML parser allocations         → Cow<str> for xml_unescape; 1 allocation per text event (was 2)
-provenance headers             → all 109 binaries (commit, command, hardware)
+provenance headers             → all 115 binaries (commit, command, hardware)
 duplicate math                 → 0 (crate::special delegates to ToadStool barracuda::special when gpu enabled)
 Python baselines               → scripts/requirements.txt (pinned numpy, scipy, sklearn)
 barracuda_cpu                  → 380/380 checks PASS (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted)
@@ -456,7 +491,11 @@ Bugs found and fixed: SNP binding layout (ToadStool), AdapterInfo propagation (w
 
 | Document | Location | Purpose |
 |----------|----------|---------|
-| **V18 — Cross-spring rewire** | `wateringHole/handoffs/WETSPRING_V018_CROSS_SPRING_REWIRE_HANDOFF_FEB23_2026.md` | Phase 34, full rewire, 120 experiments |
+| **V22 — Extension papers: cold seep, phylogeny, waves** | `wateringHole/handoffs/WETSPRING_V022_EXTENSION_PAPERS_FEB23_2026.md` | Phase 38, 149 experiments, baseCamp sub-theses |
+| V21 — Why analysis: mapping, scaling, dilution, eukaryotes | `wateringHole/handoffs/WETSPRING_V021_WHY_ANALYSIS_FEB23_2026.md` | Phase 36c, GPU-confirmed, 138 experiments |
+| V20 — 3D Anderson dimensional QS | `wateringHole/handoffs/WETSPRING_V020_3D_ANDERSON_DIMENSIONAL_QS_FEB23_2026.md` | Phase 36, GPU-confirmed, 130 experiments |
+| V19 — NCBI hypothesis testing | `wateringHole/handoffs/WETSPRING_V019_NCBI_HYPOTHESIS_TESTING_FEB23_2026.md` | Phase 35, GPU-confirmed, 126 experiments |
+| V18 — Cross-spring rewire | `wateringHole/handoffs/WETSPRING_V018_CROSS_SPRING_REWIRE_HANDOFF_FEB23_2026.md` | Phase 34, full rewire, 120 experiments |
 | V17 — NPU reservoir | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V17_NPU_RESERVOIR_FEB23_2026.md` | Phases 31-33, NPU deployment, NCBI-scale |
 | V16 — Streaming | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V16_STREAMING_FEB23_2026.md` | Streaming v2, metalForge v6 |
 | V15 — ODE generic | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V15_ODE_GENERIC_FEB22_2026.md` | 5 ODE shaders → BatchedOdeRK4Generic |

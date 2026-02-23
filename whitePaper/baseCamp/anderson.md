@@ -2,7 +2,7 @@
 
 **Track:** 1c — Deep-Sea Metagenomics & Population Genomics
 **Papers reproduced:** 6 (Papers 24–29)
-**Total checks:** 159
+**Total checks:** 170
 **Domains:** Diversity, k-mers, Bray-Curtis, PCoA, dN/dS, ANI, SNP calling,
 pangenome analysis, DTL reconciliation, molecular clock, cross-ecosystem
 population genomics
@@ -358,4 +358,47 @@ include quality metadata and SRA-deposited reads for reassembly.
 
 ```bash
 cargo run --release --bin validate_npu_genome_binning
+```
+
+---
+
+## NCBI Real-Data Extension: Exp125 — Real Campylobacterota Pangenome
+
+### Motivation
+
+Exp110 used 200 synthetic genomes across 3 ecosystems. Exp125 loads 158 real
+*Campylobacterota* genome assemblies from the NCBI Datasets v2 API and
+classifies them by isolation source into gut, water, vent, and unclassified
+ecosystems. This tests whether Anderson's open pangenome finding generalizes
+to real NCBI data with natural variation in gene count and genome size.
+
+### Results (11/11 PASS)
+
+| Ecosystem | Genomes | Core | Accessory | Unique | Core% |
+|-----------|:-------:|:----:|:---------:|:------:|:-----:|
+| gut | 10 | 2,273 | 1,475 | 559 | 52.8% |
+| unclassified | 118 | 1,530 | 3,561 | 6 | 30.0% |
+| water | 15 | 2,231 | 1,680 | 595 | 49.5% |
+| vent | 15 | 2,232 | 1,703 | 568 | 49.6% |
+
+| Metric | Value |
+|--------|-------|
+| Heap's α (all ecosystems) | > 0 (open pangenome confirmed) |
+| Gut vs vent accessory overlap | 46.1% |
+| Gut vs water overlap | 45.5% |
+| Water vs vent overlap | 43.9% |
+
+### Key Finding
+
+Real NCBI Campylobacterota assemblies confirm the open pangenome pattern
+from Exp056/110 with natural variation. Core fractions range from 30%
+(unclassified, large n=118) to 53% (gut, n=10) — consistent with compact
+bacterial genomes maintaining high essential gene density. Cross-ecosystem
+accessory overlap (44–46%) indicates substantial lateral gene transfer
+across environments, matching the prediction from Exp110.
+
+### Reproduction
+
+```bash
+cargo run --release --bin validate_ncbi_pangenome
 ```
