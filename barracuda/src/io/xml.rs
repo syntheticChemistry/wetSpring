@@ -15,6 +15,7 @@
 //! These limitations are acceptable for machine-generated mzML files.
 
 use crate::error::{Error, Result};
+use std::borrow::Cow;
 use std::collections::VecDeque;
 use std::io::BufRead;
 
@@ -103,20 +104,19 @@ impl<R: BufRead> XmlReader<R> {
                 self.text_buf.pop();
             }
 
-            // Convert text to owned String (releases borrow on self.text_buf).
             let text_owned = if self.text_buf.is_empty() {
                 None
             } else {
-                let raw = String::from_utf8_lossy(&self.text_buf).into_owned();
+                let raw = String::from_utf8_lossy(&self.text_buf);
                 if self.trim_text {
-                    let trimmed = raw.trim().to_owned();
+                    let trimmed = raw.trim();
                     if trimmed.is_empty() {
                         None
                     } else {
-                        Some(xml_unescape(&trimmed))
+                        Some(xml_unescape(trimmed).into_owned())
                     }
                 } else {
-                    Some(xml_unescape(&raw))
+                    Some(xml_unescape(&raw).into_owned())
                 }
             };
 
@@ -175,14 +175,13 @@ impl<R: BufRead> XmlReader<R> {
 
             // Start or self-closing element.
             let tag_str = std::str::from_utf8(&self.tag_buf)
-                .map_err(|e| Error::Xml(format!("invalid UTF-8 in tag: {e}")))?
-                .to_owned();
+                .map_err(|e| Error::Xml(format!("invalid UTF-8 in tag: {e}")))?;
             let is_empty = tag_str.trim_end().ends_with('/');
             let body = if is_empty {
                 tag_str
                     .trim_end()
                     .strip_suffix('/')
-                    .unwrap_or(&tag_str)
+                    .unwrap_or(tag_str)
                     .trim()
             } else {
                 tag_str.trim()
@@ -258,23 +257,28 @@ fn parse_attributes(s: &str) -> Vec<(String, String)> {
         let value = &rest[..end];
         rest = rest[end + 1..].trim();
 
-        attrs.push((key.to_owned(), xml_unescape(value)));
+        attrs.push((key.to_owned(), xml_unescape(value).into_owned()));
     }
 
     attrs
 }
 
 /// Unescape the 5 predefined XML character entities.
+///
+/// Returns `Cow::Borrowed` when no `&` is present (common case for
+/// machine-generated mzML), avoiding an allocation.
 #[must_use]
-fn xml_unescape(s: &str) -> String {
+fn xml_unescape(s: &str) -> Cow<'_, str> {
     if !s.contains('&') {
-        return s.to_owned();
+        return Cow::Borrowed(s);
     }
-    s.replace("&amp;", "&")
-        .replace("&lt;", "<")
-        .replace("&gt;", ">")
-        .replace("&quot;", "\"")
-        .replace("&apos;", "'")
+    Cow::Owned(
+        s.replace("&amp;", "&")
+            .replace("&lt;", "<")
+            .replace("&gt;", ">")
+            .replace("&quot;", "\"")
+            .replace("&apos;", "'"),
+    )
 }
 
 #[cfg(test)]

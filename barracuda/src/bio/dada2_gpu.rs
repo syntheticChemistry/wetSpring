@@ -21,7 +21,7 @@ use crate::bio::dada2::{
 use crate::bio::derep::UniqueSequence;
 use crate::error::{Error, Result};
 use barracuda::device::WgpuDevice;
-use barracuda::ops::bio::dada2::Dada2EStepGpu;
+use barracuda::Dada2EStepGpu;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 

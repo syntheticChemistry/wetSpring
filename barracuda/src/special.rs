@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Special mathematical functions for life-science computation.
 //!
-//! Sovereign implementations of `erf`, `ln_gamma`, and the regularized
-//! lower incomplete gamma function.  Promoted from `bio::special` to a
-//! top-level module as the first step toward `barracuda::math`.
+//! When the `gpu` feature is active, `erf`, `ln_gamma`, and
+//! `regularized_gamma_lower` delegate to `ToadStool`'s
+//! `barracuda::special` — one implementation, no duplicate math.
+//! Without `gpu`, sovereign local implementations are used.
+//!
+//! `normal_cdf` is always local (trivial wrapper over `erf`).
 //!
 //! # Consumers
 //!
@@ -16,9 +19,20 @@
 //! - Lanczos 1964 (gamma function via reflection)
 //! - DLMF §8.2 (regularized incomplete gamma series)
 
-/// Error function approximation (Abramowitz & Stegun 7.1.26).
+// ── GPU path: delegate to ToadStool barracuda::special ──────────
+
+/// Error function approximation.
 ///
-/// Maximum relative error < 1.5 × 10⁻⁷ for all real `x`.
+/// With `gpu`: delegates to `barracuda::special::erf` (A&S 7.1.26).
+/// Without `gpu`: sovereign A&S 7.1.26 (max relative error < 1.5 × 10⁻⁷).
+#[cfg(feature = "gpu")]
+#[must_use]
+pub fn erf(x: f64) -> f64 {
+    barracuda::special::erf(x)
+}
+
+/// Error function — sovereign A&S 7.1.26 (max relative error < 1.5 × 10⁻⁷).
+#[cfg(not(feature = "gpu"))]
 #[must_use]
 pub fn erf(x: f64) -> f64 {
     let sign = x.signum();
@@ -39,9 +53,21 @@ pub fn normal_cdf(x: f64) -> f64 {
     0.5 * (1.0 + erf(x / std::f64::consts::SQRT_2))
 }
 
-/// Lanczos approximation for ln(Γ(x)), g = 5, n = 6 coefficients.
+/// Lanczos approximation for ln(Γ(x)).
 ///
+/// With `gpu`: delegates to `barracuda::special::ln_gamma`.
+/// Without `gpu`: sovereign Lanczos g = 5, n = 6 coefficients.
 /// Returns `f64::INFINITY` for non-positive `x` (poles of the gamma function).
+#[cfg(feature = "gpu")]
+#[must_use]
+pub fn ln_gamma(x: f64) -> f64 {
+    barracuda::special::ln_gamma(x).unwrap_or(f64::INFINITY)
+}
+
+/// Lanczos approximation for ln(Γ(x)) — sovereign Lanczos g = 5, n = 6.
+///
+/// Returns `f64::INFINITY` for non-positive `x`.
+#[cfg(not(feature = "gpu"))]
 #[must_use]
 #[allow(clippy::cast_precision_loss)]
 pub fn ln_gamma(x: f64) -> f64 {
@@ -71,9 +97,19 @@ pub fn ln_gamma(x: f64) -> f64 {
 
 /// Regularized lower incomplete gamma function P(a, x) = γ(a, x) / Γ(a).
 ///
-/// Uses the series expansion with early termination at 1e-15 relative
-/// tolerance.  Returns 0.0 for non-positive `x`, 1.0 when `x` is far
-/// in the right tail.
+/// With `gpu`: delegates to `barracuda::special::regularized_gamma_p`.
+/// Without `gpu`: sovereign series expansion with early termination.
+/// Returns 0.0 for non-positive `x`, 1.0 when `x` is far in the right tail.
+#[cfg(feature = "gpu")]
+#[must_use]
+pub fn regularized_gamma_lower(a: f64, x: f64) -> f64 {
+    barracuda::special::regularized_gamma_p(a, x).unwrap_or(0.0)
+}
+
+/// Regularized lower incomplete gamma P(a, x) — sovereign series expansion.
+///
+/// Returns 0.0 for non-positive `x`, 1.0 in the far right tail.
+#[cfg(not(feature = "gpu"))]
 #[must_use]
 pub fn regularized_gamma_lower(a: f64, x: f64) -> f64 {
     if x <= 0.0 {

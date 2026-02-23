@@ -1,7 +1,7 @@
 # Primitive Map: wetSpring Rust → ToadStool GPU
 
 **Date:** February 22, 2026
-**Purpose:** Map every wetSpring Rust module to its ToadStool/BarraCUDA
+**Purpose:** Map every wetSpring Rust module to its ToadStool/BarraCuda
 GPU primitive (or explain why it stays CPU-only). This guides the
 absorption pipeline and identifies what ToadStool needs to build next.
 

@@ -4,8 +4,7 @@
     clippy::unwrap_used,
     clippy::similar_names,
     clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::too_many_lines
+    clippy::cast_possible_truncation
 )]
 //! Exp084: metalForge Full Cross-Substrate v2
 //!
@@ -42,6 +41,414 @@ use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
+fn validate_diversity(
+    v: &mut Validator,
+    gpu: &GpuF64,
+    timings: &mut Vec<(&'static str, f64, f64, &'static str)>,
+) {
+    v.section("═══ metalForge 1: Diversity CPU ↔ GPU ═══");
+    let counts: Vec<f64> = vec![
+        120.0, 85.0, 230.0, 55.0, 180.0, 12.0, 42.0, 310.0, 8.0, 95.0,
+    ];
+
+    let t_cpu = Instant::now();
+    let cpu_sh = diversity::shannon(&counts);
+    let cpu_si = diversity::simpson(&counts);
+    let cpu_us = t_cpu.elapsed().as_micros() as f64;
+
+    let t_gpu = Instant::now();
+    let gpu_sh = diversity_gpu::shannon_gpu(gpu, &counts).unwrap();
+    let gpu_si = diversity_gpu::simpson_gpu(gpu, &counts).unwrap();
+    let gpu_us = t_gpu.elapsed().as_micros() as f64;
+
+    v.check(
+        "Shannon: CPU ↔ GPU",
+        gpu_sh,
+        cpu_sh,
+        tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+    );
+    v.check(
+        "Simpson: CPU ↔ GPU",
+        gpu_si,
+        cpu_si,
+        tolerances::GPU_VS_CPU_F64,
+    );
+    timings.push(("Shannon + Simpson", cpu_us, gpu_us, "CPU=GPU"));
+}
+
+fn validate_bray_curtis(
+    v: &mut Validator,
+    gpu: &GpuF64,
+    timings: &mut Vec<(&'static str, f64, f64, &'static str)>,
+) {
+    v.section("═══ metalForge 2: Bray-Curtis CPU ↔ GPU ═══");
+    let a: Vec<f64> = vec![10.0, 20.0, 30.0, 0.0, 15.0, 5.0, 8.0, 12.0];
+    let b: Vec<f64> = vec![12.0, 18.0, 25.0, 5.0, 10.0, 7.0, 6.0, 14.0];
+
+    let t_cpu = Instant::now();
+    let cpu_bc = diversity::bray_curtis(&a, &b);
+    let cpu_us = t_cpu.elapsed().as_micros() as f64;
+
+    let t_gpu = Instant::now();
+    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(gpu, &[a, b]).unwrap()[0];
+    let gpu_us = t_gpu.elapsed().as_micros() as f64;
+
+    v.check(
+        "Bray-Curtis: CPU ↔ GPU",
+        gpu_bc,
+        cpu_bc,
+        tolerances::GPU_VS_CPU_F64,
+    );
+    timings.push(("Bray-Curtis", cpu_us, gpu_us, "CPU=GPU"));
+}
+
+fn validate_ani(
+    v: &mut Validator,
+    device: &Arc<WgpuDevice>,
+    timings: &mut Vec<(&'static str, f64, f64, &'static str)>,
+) {
+    v.section("═══ metalForge 3: ANI CPU ↔ GPU ═══");
+    let pairs: Vec<(&[u8], &[u8])> = vec![
+        (b"ATGATGATG", b"ATGATGATG"),
+        (b"ATGATGATG", b"CTGATGATG"),
+        (b"ATGATGATG", b"CTGCTGCTG"),
+    ];
+
+    let t_cpu = Instant::now();
+    let cpu_ani: Vec<_> = pairs.iter().map(|(a, b)| ani::pairwise_ani(a, b)).collect();
+    let cpu_us = t_cpu.elapsed().as_micros() as f64;
+
+    let t_gpu = Instant::now();
+    let gpu_ani_mod = AniGpu::new(device).expect("ANI GPU");
+    let gpu_ani = gpu_ani_mod.batch_ani(&pairs).unwrap();
+    let gpu_us = t_gpu.elapsed().as_micros() as f64;
+
+    for (i, (cpu_r, gpu_v)) in cpu_ani.iter().zip(gpu_ani.ani_values.iter()).enumerate() {
+        v.check(
+            &format!("ANI pair {i}: CPU ↔ GPU"),
+            *gpu_v,
+            cpu_r.ani,
+            tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+        );
+    }
+    timings.push(("ANI (3 pairs)", cpu_us, gpu_us, "CPU=GPU"));
+}
+
+fn validate_snp(
+    v: &mut Validator,
+    device: &Arc<WgpuDevice>,
+    timings: &mut Vec<(&'static str, f64, f64, &'static str)>,
+) {
+    v.section("═══ metalForge 4: SNP CPU ↔ GPU ═══");
+    let seqs: Vec<&[u8]> = vec![
+        b"ATGATGATGATG",
+        b"ATCATGATGATG",
+        b"ATGATCATGATG",
+        b"ATGATGATCATG",
+    ];
+
+    let t_cpu = Instant::now();
+    let cpu_snp = snp::call_snps(&seqs);
+    let cpu_us = t_cpu.elapsed().as_micros() as f64;
+
+    let t_gpu = Instant::now();
+    let gpu_snp_mod = SnpGpu::new(device).expect("SNP GPU");
+    let gpu_snp = gpu_snp_mod.call_snps(&seqs).unwrap();
+    let gpu_us = t_gpu.elapsed().as_micros() as f64;
+
+    let cpu_count = cpu_snp.variants.len();
+    let gpu_count = gpu_snp.is_variant.iter().filter(|&&x| x != 0).count();
+    v.check(
+        "SNP: variant count CPU ↔ GPU",
+        gpu_count as f64,
+        cpu_count as f64,
+        0.0,
+    );
+    timings.push(("SNP (4 seqs × 12bp)", cpu_us, gpu_us, "CPU=GPU"));
+}
+
+fn validate_dnds(
+    v: &mut Validator,
+    device: &Arc<WgpuDevice>,
+    timings: &mut Vec<(&'static str, f64, f64, &'static str)>,
+) {
+    v.section("═══ metalForge 5: dN/dS CPU ↔ GPU ═══");
+    let pairs: Vec<(&[u8], &[u8])> = vec![
+        (b"ATGATGATG", b"ATGATGATG"),
+        (b"TTTGCTAAA", b"TTCGCTAAA"),
+        (b"AAAGCTGCT", b"GAAGCTGCT"),
+    ];
+
+    let t_cpu = Instant::now();
+    let cpu_dnds: Vec<_> = pairs
+        .iter()
+        .map(|(a, b)| dnds::pairwise_dnds(a, b))
+        .collect();
+    let cpu_us = t_cpu.elapsed().as_micros() as f64;
+
+    let t_gpu = Instant::now();
+    let gpu_dnds_mod = DnDsGpu::new(device).expect("dN/dS GPU");
+    let gpu_dnds = gpu_dnds_mod.batch_dnds(&pairs).unwrap();
+    let gpu_us = t_gpu.elapsed().as_micros() as f64;
+
+    for (i, cpu_r) in cpu_dnds.iter().enumerate() {
+        if let Ok(cr) = cpu_r {
+            v.check(
+                &format!("dN/dS pair {i} dN: CPU ↔ GPU"),
+                gpu_dnds.dn[i],
+                cr.dn,
+                tolerances::GPU_VS_CPU_F64,
+            );
+            v.check(
+                &format!("dN/dS pair {i} dS: CPU ↔ GPU"),
+                gpu_dnds.ds[i],
+                cr.ds,
+                tolerances::GPU_VS_CPU_F64,
+            );
+        }
+    }
+    timings.push(("dN/dS (3 pairs)", cpu_us, gpu_us, "CPU=GPU"));
+}
+
+fn validate_pangenome(
+    v: &mut Validator,
+    device: &Arc<WgpuDevice>,
+    timings: &mut Vec<(&'static str, f64, f64, &'static str)>,
+) {
+    v.section("═══ metalForge 6: Pangenome CPU ↔ GPU ═══");
+    let clusters = vec![
+        pangenome::GeneCluster {
+            id: "g1".into(),
+            presence: vec![true, true, true, true],
+        },
+        pangenome::GeneCluster {
+            id: "g2".into(),
+            presence: vec![true, true, true, true],
+        },
+        pangenome::GeneCluster {
+            id: "g3".into(),
+            presence: vec![true, true, false, false],
+        },
+        pangenome::GeneCluster {
+            id: "g4".into(),
+            presence: vec![true, false, false, false],
+        },
+        pangenome::GeneCluster {
+            id: "g5".into(),
+            presence: vec![false, false, false, true],
+        },
+    ];
+
+    let t_cpu = Instant::now();
+    let cpu_pan = pangenome::analyze(&clusters, 4);
+    let cpu_us = t_cpu.elapsed().as_micros() as f64;
+
+    let presence_flat: Vec<u8> = clusters
+        .iter()
+        .flat_map(|c| c.presence.iter().map(|&p| u8::from(p)))
+        .collect();
+
+    let t_gpu = Instant::now();
+    let gpu_pan_mod = PangenomeGpu::new(device).expect("Pangenome GPU");
+    let gpu_pan = gpu_pan_mod.classify(&presence_flat, 5, 4).unwrap();
+    let gpu_us = t_gpu.elapsed().as_micros() as f64;
+
+    v.check(
+        "Pan: core CPU ↔ GPU",
+        gpu_pan.classifications.iter().filter(|&&c| c == 3).count() as f64,
+        cpu_pan.core_size as f64,
+        0.0,
+    );
+    v.check(
+        "Pan: accessory CPU ↔ GPU",
+        gpu_pan.classifications.iter().filter(|&&c| c == 2).count() as f64,
+        cpu_pan.accessory_size as f64,
+        0.0,
+    );
+    v.check(
+        "Pan: unique CPU ↔ GPU",
+        gpu_pan.classifications.iter().filter(|&&c| c == 1).count() as f64,
+        cpu_pan.unique_size as f64,
+        0.0,
+    );
+    timings.push(("Pangenome (5 genes × 4 genomes)", cpu_us, gpu_us, "CPU=GPU"));
+}
+
+fn validate_random_forest(
+    v: &mut Validator,
+    device: &Arc<WgpuDevice>,
+    timings: &mut Vec<(&'static str, f64, f64, &'static str)>,
+) {
+    v.section("═══ metalForge 7: Random Forest CPU ↔ GPU ═══");
+    let t1 = DecisionTree::from_arrays(
+        &[0, -1, -1],
+        &[5.0, 0.0, 0.0],
+        &[1, -1, -1],
+        &[2, -1, -1],
+        &[None, Some(0), Some(1)],
+        3,
+    )
+    .unwrap();
+    let t2 = DecisionTree::from_arrays(
+        &[1, -1, -1],
+        &[3.0, 0.0, 0.0],
+        &[1, -1, -1],
+        &[2, -1, -1],
+        &[None, Some(0), Some(1)],
+        3,
+    )
+    .unwrap();
+    let t3 = DecisionTree::from_arrays(
+        &[0, -1, -1],
+        &[4.5, 0.0, 0.0],
+        &[1, -1, -1],
+        &[2, -1, -1],
+        &[None, Some(0), Some(1)],
+        3,
+    )
+    .unwrap();
+
+    let rf = RandomForest::from_trees(vec![t1, t2, t3], 2).unwrap();
+    let samples = vec![
+        vec![3.0, 2.0, 0.0],
+        vec![6.0, 4.0, 0.0],
+        vec![4.8, 1.0, 0.0],
+        vec![2.0, 5.0, 0.0],
+    ];
+
+    let t_cpu = Instant::now();
+    let cpu_preds: Vec<usize> = samples.iter().map(|s| rf.predict(s)).collect();
+    let cpu_us = t_cpu.elapsed().as_micros() as f64;
+
+    let t_gpu = Instant::now();
+    let rf_gpu = RandomForestGpu::new(device);
+    let gpu_preds = rf_gpu.predict_batch(&rf, &samples).unwrap();
+    let gpu_us = t_gpu.elapsed().as_micros() as f64;
+
+    for (i, (cpu_p, gpu_p)) in cpu_preds.iter().zip(gpu_preds.iter()).enumerate() {
+        v.check(
+            &format!("RF sample {i}: CPU ↔ GPU"),
+            gpu_p.class as f64,
+            *cpu_p as f64,
+            0.0,
+        );
+    }
+    timings.push((
+        "Random Forest (4 samples × 3 trees)",
+        cpu_us,
+        gpu_us,
+        "CPU=GPU",
+    ));
+}
+
+fn validate_hmm(
+    v: &mut Validator,
+    device: &Arc<WgpuDevice>,
+    timings: &mut Vec<(&'static str, f64, f64, &'static str)>,
+) {
+    v.section("═══ metalForge 8: HMM Forward CPU ↔ GPU ═══");
+    let model = hmm::HmmModel {
+        n_states: 2,
+        n_symbols: 2,
+        log_pi: vec![-std::f64::consts::LN_2, -std::f64::consts::LN_2],
+        log_trans: vec![-0.3567, -1.2040, -1.2040, -0.3567],
+        log_emit: vec![-0.2231, -1.6094, -1.6094, -0.2231],
+    };
+    let obs1 = [0_usize, 1, 0, 1, 0];
+    let obs2 = [0_usize, 0, 0, 0, 0];
+    let obs3 = [1_usize, 1, 0, 1, 1];
+
+    let t_cpu = Instant::now();
+    let cpu_ll1 = hmm::forward(&model, &obs1).log_likelihood;
+    let cpu_ll2 = hmm::forward(&model, &obs2).log_likelihood;
+    let cpu_ll3 = hmm::forward(&model, &obs3).log_likelihood;
+    let cpu_us = t_cpu.elapsed().as_micros() as f64;
+
+    let n_steps = 5;
+    let flat_obs: Vec<u32> = obs1
+        .iter()
+        .chain(obs2.iter())
+        .chain(obs3.iter())
+        .map(|&x| x as u32)
+        .collect();
+
+    let t_gpu = Instant::now();
+    let hmm_gpu = HmmGpuForward::new(device).expect("HMM GPU");
+    let gpu_r = hmm_gpu
+        .forward_batch(&model, &flat_obs, 3, n_steps)
+        .unwrap();
+    let gpu_us = t_gpu.elapsed().as_micros() as f64;
+
+    v.check(
+        "HMM seq 0: CPU ↔ GPU",
+        gpu_r.log_likelihoods[0],
+        cpu_ll1,
+        tolerances::GPU_VS_CPU_F64,
+    );
+    v.check(
+        "HMM seq 1: CPU ↔ GPU",
+        gpu_r.log_likelihoods[1],
+        cpu_ll2,
+        tolerances::GPU_VS_CPU_F64,
+    );
+    v.check(
+        "HMM seq 2: CPU ↔ GPU",
+        gpu_r.log_likelihoods[2],
+        cpu_ll3,
+        tolerances::GPU_VS_CPU_F64,
+    );
+    timings.push(("HMM forward (3 seqs × 5 obs)", cpu_us, gpu_us, "CPU=GPU"));
+}
+
+fn validate_spectral_cosine(
+    v: &mut Validator,
+    gpu: &GpuF64,
+    timings: &mut Vec<(&'static str, f64, f64, &'static str)>,
+) {
+    v.section("═══ metalForge 12: Spectral Cosine CPU ↔ GPU ═══");
+    let spectra: Vec<Vec<f64>> = vec![
+        vec![1.0, 0.0, 0.5, 0.2, 0.0, 0.8, 0.0, 0.3],
+        vec![0.9, 0.1, 0.4, 0.3, 0.0, 0.7, 0.0, 0.2],
+        vec![0.0, 1.0, 0.0, 0.0, 0.9, 0.0, 0.6, 0.0],
+    ];
+
+    let t_gpu = Instant::now();
+    let gpu_cos = spectral_match_gpu::pairwise_cosine_gpu(gpu, &spectra).unwrap();
+    let gpu_us = t_gpu.elapsed().as_micros() as f64;
+
+    let t_cpu = Instant::now();
+    let n = spectra.len();
+    let mut cpu_cos = Vec::new();
+    for i in 0..n {
+        for j in (i + 1)..n {
+            let dot: f64 = spectra[i]
+                .iter()
+                .zip(spectra[j].iter())
+                .map(|(a, b)| a * b)
+                .sum();
+            let norm_a: f64 = spectra[i].iter().map(|x| x * x).sum::<f64>().sqrt();
+            let norm_b: f64 = spectra[j].iter().map(|x| x * x).sum::<f64>().sqrt();
+            let cos = if norm_a > 0.0 && norm_b > 0.0 {
+                dot / (norm_a * norm_b)
+            } else {
+                0.0
+            };
+            cpu_cos.push(cos);
+        }
+    }
+    let cpu_us = t_cpu.elapsed().as_micros() as f64;
+
+    for (i, (cpu_c, gpu_c)) in cpu_cos.iter().zip(gpu_cos.iter()).enumerate() {
+        v.check(
+            &format!("Spectral pair {i}: CPU ↔ GPU"),
+            *gpu_c,
+            *cpu_c,
+            tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+        );
+    }
+    timings.push(("Spectral cosine (3 spectra)", cpu_us, gpu_us, "CPU=GPU"));
+}
+
 #[tokio::main]
 async fn main() {
     let mut v = Validator::new("Exp084: metalForge Full Cross-Substrate v2 (12 domains)");
@@ -62,422 +469,18 @@ async fn main() {
     let device = gpu.to_wgpu_device();
     let mut timings: Vec<(&str, f64, f64, &str)> = Vec::new();
 
-    // ════════════════════════════════════════════════════════════════
-    //  Substrate 1: Diversity (Shannon + Simpson)
-    // ════════════════════════════════════════════════════════════════
-    v.section("═══ metalForge 1: Diversity CPU ↔ GPU ═══");
-    {
-        let counts: Vec<f64> = vec![
-            120.0, 85.0, 230.0, 55.0, 180.0, 12.0, 42.0, 310.0, 8.0, 95.0,
-        ];
-
-        let t_cpu = Instant::now();
-        let cpu_sh = diversity::shannon(&counts);
-        let cpu_si = diversity::simpson(&counts);
-        let cpu_us = t_cpu.elapsed().as_micros() as f64;
-
-        let t_gpu = Instant::now();
-        let gpu_sh = diversity_gpu::shannon_gpu(&gpu, &counts).unwrap();
-        let gpu_si = diversity_gpu::simpson_gpu(&gpu, &counts).unwrap();
-        let gpu_us = t_gpu.elapsed().as_micros() as f64;
-
-        v.check(
-            "Shannon: CPU ↔ GPU",
-            gpu_sh,
-            cpu_sh,
-            tolerances::GPU_VS_CPU_TRANSCENDENTAL,
-        );
-        v.check(
-            "Simpson: CPU ↔ GPU",
-            gpu_si,
-            cpu_si,
-            tolerances::GPU_VS_CPU_F64,
-        );
-        timings.push(("Shannon + Simpson", cpu_us, gpu_us, "CPU=GPU"));
-    }
-
-    // ════════════════════════════════════════════════════════════════
-    //  Substrate 2: Bray-Curtis
-    // ════════════════════════════════════════════════════════════════
-    v.section("═══ metalForge 2: Bray-Curtis CPU ↔ GPU ═══");
-    {
-        let a: Vec<f64> = vec![10.0, 20.0, 30.0, 0.0, 15.0, 5.0, 8.0, 12.0];
-        let b: Vec<f64> = vec![12.0, 18.0, 25.0, 5.0, 10.0, 7.0, 6.0, 14.0];
-
-        let t_cpu = Instant::now();
-        let cpu_bc = diversity::bray_curtis(&a, &b);
-        let cpu_us = t_cpu.elapsed().as_micros() as f64;
-
-        let t_gpu = Instant::now();
-        let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &[a, b]).unwrap()[0];
-        let gpu_us = t_gpu.elapsed().as_micros() as f64;
-
-        v.check(
-            "Bray-Curtis: CPU ↔ GPU",
-            gpu_bc,
-            cpu_bc,
-            tolerances::GPU_VS_CPU_F64,
-        );
-        timings.push(("Bray-Curtis", cpu_us, gpu_us, "CPU=GPU"));
-    }
-
-    // ════════════════════════════════════════════════════════════════
-    //  Substrate 3: ANI
-    // ════════════════════════════════════════════════════════════════
-    v.section("═══ metalForge 3: ANI CPU ↔ GPU ═══");
-    {
-        let pairs: Vec<(&[u8], &[u8])> = vec![
-            (b"ATGATGATG", b"ATGATGATG"),
-            (b"ATGATGATG", b"CTGATGATG"),
-            (b"ATGATGATG", b"CTGCTGCTG"),
-        ];
-
-        let t_cpu = Instant::now();
-        let cpu_ani: Vec<_> = pairs.iter().map(|(a, b)| ani::pairwise_ani(a, b)).collect();
-        let cpu_us = t_cpu.elapsed().as_micros() as f64;
-
-        let t_gpu = Instant::now();
-        let gpu_ani_mod = AniGpu::new(&device).expect("ANI GPU");
-        let gpu_ani = gpu_ani_mod.batch_ani(&pairs).unwrap();
-        let gpu_us = t_gpu.elapsed().as_micros() as f64;
-
-        for (i, (cpu_r, gpu_v)) in cpu_ani.iter().zip(gpu_ani.ani_values.iter()).enumerate() {
-            v.check(
-                &format!("ANI pair {i}: CPU ↔ GPU"),
-                *gpu_v,
-                cpu_r.ani,
-                tolerances::GPU_VS_CPU_TRANSCENDENTAL,
-            );
-        }
-        timings.push(("ANI (3 pairs)", cpu_us, gpu_us, "CPU=GPU"));
-    }
-
-    // ════════════════════════════════════════════════════════════════
-    //  Substrate 4: SNP Calling
-    // ════════════════════════════════════════════════════════════════
-    v.section("═══ metalForge 4: SNP CPU ↔ GPU ═══");
-    {
-        let seqs: Vec<&[u8]> = vec![
-            b"ATGATGATGATG",
-            b"ATCATGATGATG",
-            b"ATGATCATGATG",
-            b"ATGATGATCATG",
-        ];
-
-        let t_cpu = Instant::now();
-        let cpu_snp = snp::call_snps(&seqs);
-        let cpu_us = t_cpu.elapsed().as_micros() as f64;
-
-        let t_gpu = Instant::now();
-        let gpu_snp_mod = SnpGpu::new(&device).expect("SNP GPU");
-        let gpu_snp = gpu_snp_mod.call_snps(&seqs).unwrap();
-        let gpu_us = t_gpu.elapsed().as_micros() as f64;
-
-        let cpu_count = cpu_snp.variants.len();
-        let gpu_count = gpu_snp.is_variant.iter().filter(|&&x| x != 0).count();
-        v.check(
-            "SNP: variant count CPU ↔ GPU",
-            gpu_count as f64,
-            cpu_count as f64,
-            0.0,
-        );
-        timings.push(("SNP (4 seqs × 12bp)", cpu_us, gpu_us, "CPU=GPU"));
-    }
-
-    // ════════════════════════════════════════════════════════════════
-    //  Substrate 5: dN/dS
-    // ════════════════════════════════════════════════════════════════
-    v.section("═══ metalForge 5: dN/dS CPU ↔ GPU ═══");
-    {
-        let pairs: Vec<(&[u8], &[u8])> = vec![
-            (b"ATGATGATG", b"ATGATGATG"),
-            (b"TTTGCTAAA", b"TTCGCTAAA"),
-            (b"AAAGCTGCT", b"GAAGCTGCT"),
-        ];
-
-        let t_cpu = Instant::now();
-        let cpu_dnds: Vec<_> = pairs
-            .iter()
-            .map(|(a, b)| dnds::pairwise_dnds(a, b))
-            .collect();
-        let cpu_us = t_cpu.elapsed().as_micros() as f64;
-
-        let t_gpu = Instant::now();
-        let gpu_dnds_mod = DnDsGpu::new(&device).expect("dN/dS GPU");
-        let gpu_dnds = gpu_dnds_mod.batch_dnds(&pairs).unwrap();
-        let gpu_us = t_gpu.elapsed().as_micros() as f64;
-
-        for (i, cpu_r) in cpu_dnds.iter().enumerate() {
-            if let Ok(cr) = cpu_r {
-                v.check(
-                    &format!("dN/dS pair {i} dN: CPU ↔ GPU"),
-                    gpu_dnds.dn[i],
-                    cr.dn,
-                    tolerances::GPU_VS_CPU_F64,
-                );
-                v.check(
-                    &format!("dN/dS pair {i} dS: CPU ↔ GPU"),
-                    gpu_dnds.ds[i],
-                    cr.ds,
-                    tolerances::GPU_VS_CPU_F64,
-                );
-            }
-        }
-        timings.push(("dN/dS (3 pairs)", cpu_us, gpu_us, "CPU=GPU"));
-    }
-
-    // ════════════════════════════════════════════════════════════════
-    //  Substrate 6: Pangenome
-    // ════════════════════════════════════════════════════════════════
-    v.section("═══ metalForge 6: Pangenome CPU ↔ GPU ═══");
-    {
-        let clusters = vec![
-            pangenome::GeneCluster {
-                id: "g1".into(),
-                presence: vec![true, true, true, true],
-            },
-            pangenome::GeneCluster {
-                id: "g2".into(),
-                presence: vec![true, true, true, true],
-            },
-            pangenome::GeneCluster {
-                id: "g3".into(),
-                presence: vec![true, true, false, false],
-            },
-            pangenome::GeneCluster {
-                id: "g4".into(),
-                presence: vec![true, false, false, false],
-            },
-            pangenome::GeneCluster {
-                id: "g5".into(),
-                presence: vec![false, false, false, true],
-            },
-        ];
-
-        let t_cpu = Instant::now();
-        let cpu_pan = pangenome::analyze(&clusters, 4);
-        let cpu_us = t_cpu.elapsed().as_micros() as f64;
-
-        let presence_flat: Vec<u8> = clusters
-            .iter()
-            .flat_map(|c| c.presence.iter().map(|&p| u8::from(p)))
-            .collect();
-
-        let t_gpu = Instant::now();
-        let gpu_pan_mod = PangenomeGpu::new(&device).expect("Pangenome GPU");
-        let gpu_pan = gpu_pan_mod.classify(&presence_flat, 5, 4).unwrap();
-        let gpu_us = t_gpu.elapsed().as_micros() as f64;
-
-        v.check(
-            "Pan: core CPU ↔ GPU",
-            gpu_pan.classifications.iter().filter(|&&c| c == 3).count() as f64,
-            cpu_pan.core_size as f64,
-            0.0,
-        );
-        v.check(
-            "Pan: accessory CPU ↔ GPU",
-            gpu_pan.classifications.iter().filter(|&&c| c == 2).count() as f64,
-            cpu_pan.accessory_size as f64,
-            0.0,
-        );
-        v.check(
-            "Pan: unique CPU ↔ GPU",
-            gpu_pan.classifications.iter().filter(|&&c| c == 1).count() as f64,
-            cpu_pan.unique_size as f64,
-            0.0,
-        );
-        timings.push(("Pangenome (5 genes × 4 genomes)", cpu_us, gpu_us, "CPU=GPU"));
-    }
-
-    // ════════════════════════════════════════════════════════════════
-    //  Substrate 7: Random Forest
-    // ════════════════════════════════════════════════════════════════
-    v.section("═══ metalForge 7: Random Forest CPU ↔ GPU ═══");
-    {
-        let t1 = DecisionTree::from_arrays(
-            &[0, -1, -1],
-            &[5.0, 0.0, 0.0],
-            &[1, -1, -1],
-            &[2, -1, -1],
-            &[None, Some(0), Some(1)],
-            3,
-        )
-        .unwrap();
-        let t2 = DecisionTree::from_arrays(
-            &[1, -1, -1],
-            &[3.0, 0.0, 0.0],
-            &[1, -1, -1],
-            &[2, -1, -1],
-            &[None, Some(0), Some(1)],
-            3,
-        )
-        .unwrap();
-        let t3 = DecisionTree::from_arrays(
-            &[0, -1, -1],
-            &[4.5, 0.0, 0.0],
-            &[1, -1, -1],
-            &[2, -1, -1],
-            &[None, Some(0), Some(1)],
-            3,
-        )
-        .unwrap();
-
-        let rf = RandomForest::from_trees(vec![t1, t2, t3], 2).unwrap();
-        let samples = vec![
-            vec![3.0, 2.0, 0.0],
-            vec![6.0, 4.0, 0.0],
-            vec![4.8, 1.0, 0.0],
-            vec![2.0, 5.0, 0.0],
-        ];
-
-        let t_cpu = Instant::now();
-        let cpu_preds: Vec<usize> = samples.iter().map(|s| rf.predict(s)).collect();
-        let cpu_us = t_cpu.elapsed().as_micros() as f64;
-
-        let t_gpu = Instant::now();
-        let rf_gpu = RandomForestGpu::new(&device);
-        let gpu_preds = rf_gpu.predict_batch(&rf, &samples).unwrap();
-        let gpu_us = t_gpu.elapsed().as_micros() as f64;
-
-        for (i, (cpu_p, gpu_p)) in cpu_preds.iter().zip(gpu_preds.iter()).enumerate() {
-            v.check(
-                &format!("RF sample {i}: CPU ↔ GPU"),
-                gpu_p.class as f64,
-                *cpu_p as f64,
-                0.0,
-            );
-        }
-        timings.push((
-            "Random Forest (4 samples × 3 trees)",
-            cpu_us,
-            gpu_us,
-            "CPU=GPU",
-        ));
-    }
-
-    // ════════════════════════════════════════════════════════════════
-    //  Substrate 8: HMM Forward
-    // ════════════════════════════════════════════════════════════════
-    v.section("═══ metalForge 8: HMM Forward CPU ↔ GPU ═══");
-    {
-        let model = hmm::HmmModel {
-            n_states: 2,
-            n_symbols: 2,
-            log_pi: vec![-std::f64::consts::LN_2, -std::f64::consts::LN_2],
-            log_trans: vec![-0.3567, -1.2040, -1.2040, -0.3567],
-            log_emit: vec![-0.2231, -1.6094, -1.6094, -0.2231],
-        };
-        let obs1 = [0_usize, 1, 0, 1, 0];
-        let obs2 = [0_usize, 0, 0, 0, 0];
-        let obs3 = [1_usize, 1, 0, 1, 1];
-
-        let t_cpu = Instant::now();
-        let cpu_ll1 = hmm::forward(&model, &obs1).log_likelihood;
-        let cpu_ll2 = hmm::forward(&model, &obs2).log_likelihood;
-        let cpu_ll3 = hmm::forward(&model, &obs3).log_likelihood;
-        let cpu_us = t_cpu.elapsed().as_micros() as f64;
-
-        let n_steps = 5;
-        let flat_obs: Vec<u32> = obs1
-            .iter()
-            .chain(obs2.iter())
-            .chain(obs3.iter())
-            .map(|&x| x as u32)
-            .collect();
-
-        let t_gpu = Instant::now();
-        let hmm_gpu = HmmGpuForward::new(&device).expect("HMM GPU");
-        let gpu_r = hmm_gpu
-            .forward_batch(&model, &flat_obs, 3, n_steps)
-            .unwrap();
-        let gpu_us = t_gpu.elapsed().as_micros() as f64;
-
-        v.check(
-            "HMM seq 0: CPU ↔ GPU",
-            gpu_r.log_likelihoods[0],
-            cpu_ll1,
-            tolerances::GPU_VS_CPU_F64,
-        );
-        v.check(
-            "HMM seq 1: CPU ↔ GPU",
-            gpu_r.log_likelihoods[1],
-            cpu_ll2,
-            tolerances::GPU_VS_CPU_F64,
-        );
-        v.check(
-            "HMM seq 2: CPU ↔ GPU",
-            gpu_r.log_likelihoods[2],
-            cpu_ll3,
-            tolerances::GPU_VS_CPU_F64,
-        );
-        timings.push(("HMM forward (3 seqs × 5 obs)", cpu_us, gpu_us, "CPU=GPU"));
-    }
-
-    // ════════════════════════════════════════════════════════════════
-    //  Substrate 9: Smith-Waterman (NEW — closes Exp065 gap)
-    // ════════════════════════════════════════════════════════════════
-    v.section("═══ metalForge 9: Smith-Waterman CPU ↔ GPU ═══");
+    validate_diversity(&mut v, &gpu, &mut timings);
+    validate_bray_curtis(&mut v, &gpu, &mut timings);
+    validate_ani(&mut v, &device, &mut timings);
+    validate_snp(&mut v, &device, &mut timings);
+    validate_dnds(&mut v, &device, &mut timings);
+    validate_pangenome(&mut v, &device, &mut timings);
+    validate_random_forest(&mut v, &device, &mut timings);
+    validate_hmm(&mut v, &device, &mut timings);
     validate_smith_waterman(&device, &mut v, &mut timings);
-
-    // ════════════════════════════════════════════════════════════════
-    //  Substrate 10: Gillespie SSA (NEW — closes Exp065 gap)
-    // ════════════════════════════════════════════════════════════════
-    v.section("═══ metalForge 10: Gillespie SSA CPU ↔ GPU ═══");
     validate_gillespie(&device, &mut v, &mut timings);
-
-    // ════════════════════════════════════════════════════════════════
-    //  Substrate 11: Decision Tree (NEW — closes Exp065 gap)
-    // ════════════════════════════════════════════════════════════════
-    v.section("═══ metalForge 11: Decision Tree CPU ↔ GPU ═══");
     validate_decision_tree(&device, &mut v, &mut timings);
-
-    // ════════════════════════════════════════════════════════════════
-    //  Substrate 12: Spectral Cosine (NEW — closes Exp065 gap)
-    // ════════════════════════════════════════════════════════════════
-    v.section("═══ metalForge 12: Spectral Cosine CPU ↔ GPU ═══");
-    {
-        let spectra: Vec<Vec<f64>> = vec![
-            vec![1.0, 0.0, 0.5, 0.2, 0.0, 0.8, 0.0, 0.3],
-            vec![0.9, 0.1, 0.4, 0.3, 0.0, 0.7, 0.0, 0.2],
-            vec![0.0, 1.0, 0.0, 0.0, 0.9, 0.0, 0.6, 0.0],
-        ];
-
-        let t_gpu = Instant::now();
-        let gpu_cos = spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).unwrap();
-        let gpu_us = t_gpu.elapsed().as_micros() as f64;
-
-        let t_cpu = Instant::now();
-        let n = spectra.len();
-        let mut cpu_cos = Vec::new();
-        for i in 0..n {
-            for j in (i + 1)..n {
-                let dot: f64 = spectra[i]
-                    .iter()
-                    .zip(spectra[j].iter())
-                    .map(|(a, b)| a * b)
-                    .sum();
-                let norm_a: f64 = spectra[i].iter().map(|x| x * x).sum::<f64>().sqrt();
-                let norm_b: f64 = spectra[j].iter().map(|x| x * x).sum::<f64>().sqrt();
-                let cos = if norm_a > 0.0 && norm_b > 0.0 {
-                    dot / (norm_a * norm_b)
-                } else {
-                    0.0
-                };
-                cpu_cos.push(cos);
-            }
-        }
-        let cpu_us = t_cpu.elapsed().as_micros() as f64;
-
-        for (i, (cpu_c, gpu_c)) in cpu_cos.iter().zip(gpu_cos.iter()).enumerate() {
-            v.check(
-                &format!("Spectral pair {i}: CPU ↔ GPU"),
-                *gpu_c,
-                *cpu_c,
-                tolerances::GPU_VS_CPU_TRANSCENDENTAL,
-            );
-        }
-        timings.push(("Spectral cosine (3 spectra)", cpu_us, gpu_us, "CPU=GPU"));
-    }
+    validate_spectral_cosine(&mut v, &gpu, &mut timings);
 
     // ════════════════════════════════════════════════════════════════
     //  metalForge Full Cross-Substrate Summary
@@ -512,6 +515,7 @@ fn validate_smith_waterman(
     v: &mut Validator,
     timings: &mut Vec<(&'static str, f64, f64, &'static str)>,
 ) {
+    v.section("═══ metalForge 9: Smith-Waterman CPU ↔ GPU ═══");
     let cpu_params = alignment::ScoringParams {
         match_score: 2,
         mismatch_penalty: -1,
@@ -567,6 +571,7 @@ fn validate_gillespie(
     v: &mut Validator,
     timings: &mut Vec<(&'static str, f64, f64, &'static str)>,
 ) {
+    v.section("═══ metalForge 10: Gillespie SSA CPU ↔ GPU ═══");
     let rate_k = vec![0.5, 0.1];
     let initial = vec![100_i64];
     let max_time = 10.0;
@@ -647,6 +652,7 @@ fn validate_decision_tree(
     v: &mut Validator,
     timings: &mut Vec<(&'static str, f64, f64, &'static str)>,
 ) {
+    v.section("═══ metalForge 11: Decision Tree CPU ↔ GPU ═══");
     let cpu_tree = DecisionTree::from_arrays(
         &[0, -1, -1],
         &[5.0, 0.0, 0.0],

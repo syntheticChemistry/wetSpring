@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
-**Date:** February 22, 2026
-**Status:** 103 experiments, 2,406+ validation checks, all PASS (740 Rust tests)
+**Date:** February 23, 2026
+**Status:** 120 experiments, 2,673+ validation checks, all PASS (750 Rust tests)
 
 ---
 
@@ -43,7 +43,7 @@
 | 032 | Alamin & Liu 2024 Placement | 1b | COMPLETE | 12 |
 | 033 | Liu 2009 Neighbor-Joining (SATé core) | 1b | COMPLETE | 16 |
 | 034 | Zheng 2023 DTL Reconciliation | 1b | COMPLETE | 14 |
-| 035 | BarraCUDA CPU Parity v2 | cross | COMPLETE | 18 |
+| 035 | BarraCuda CPU Parity v2 | cross | COMPLETE | 18 |
 | 036 | PhyNetPy RF distances (Exp019 Phase 2) | 1b | COMPLETE | 15 |
 | 037 | PhyloNet-HMM discordance (Exp019 Phase 3) | 1b | COMPLETE | 10 |
 | 038 | SATe pipeline benchmark (Exp019 Phase 4) | 1b | COMPLETE | 17 |
@@ -51,8 +51,8 @@
 | 040 | Bloom surveillance (Smallwood proxy) | 1 | COMPLETE | 15 |
 | 041 | EPA PFAS ML (Jones F&T proxy) | 2 | COMPLETE | 14 |
 | 042 | MassBank spectral (Jones MS proxy) | 2 | COMPLETE | 9 |
-| 043 | BarraCUDA CPU Parity v3 | cross | COMPLETE | 45 |
-| 044 | BarraCUDA GPU v3 | cross | COMPLETE | 14 |
+| 043 | BarraCuda CPU Parity v3 | cross | COMPLETE | 45 |
+| 044 | BarraCuda GPU v3 | cross | COMPLETE | 14 |
 | 045 | ToadStool Bio Absorption | cross/GPU | COMPLETE | 10 |
 | 046 | GPU Phylogenetic Composition | GPU | COMPLETE | 15 |
 | 047 | GPU HMM Batch Forward | GPU | COMPLETE | 13 |
@@ -65,21 +65,21 @@
 | 054 | Boden 2024 Phosphorus Phylogenomics | 1c | COMPLETE | 13 |
 | 055 | Anderson 2017 Population Genomics | 1c | COMPLETE | 24 |
 | 056 | Moulana 2020 Pangenomics | 1c | COMPLETE | 24 |
-| 057 | BarraCUDA CPU Parity v4 (Track 1c) | cross | COMPLETE | 44 |
+| 057 | BarraCuda CPU Parity v4 (Track 1c) | cross | COMPLETE | 44 |
 | 058 | GPU Track 1c (ANI + SNP + Pangenome + dN/dS) | GPU | COMPLETE | 27 |
 | 059 | 25-Domain Rust vs Python Benchmark | cross | COMPLETE | Benchmark |
 | 060 | metalForge Cross-Substrate Validation | cross/GPU | COMPLETE | 20 |
 | 061 | Random Forest Ensemble Inference | cross | COMPLETE | 13 |
 | 062 | GBM Inference (Binary + Multi-Class) | cross | COMPLETE | 16 |
 | 063 | GPU Random Forest Batch Inference | GPU | COMPLETE | 13 |
-| 064 | BarraCUDA GPU Parity v1 (all GPU domains) | cross/GPU | COMPLETE | 26 |
+| 064 | BarraCuda GPU Parity v1 (all GPU domains) | cross/GPU | COMPLETE | 26 |
 | 065 | metalForge Full Cross-System Validation | cross/GPU | COMPLETE | 35 |
 | 066 | CPU vs GPU Scaling Benchmark (all GPU domains) | GPU | COMPLETE | Benchmark |
 | 067 | ToadStool Dispatch Overhead Profiling | GPU | COMPLETE | Benchmark |
 | 068 | Pipeline Caching Optimization | GPU | COMPLETE | Optimization/Benchmark |
 | 069 | Python → Rust CPU → GPU Three-Tier Benchmark | cross | COMPLETE | Benchmark |
-| 070 | BarraCUDA CPU 25-Domain Pure Rust Math Proof | cross | COMPLETE | 50 |
-| 071 | BarraCUDA GPU Math Portability Proof | GPU | COMPLETE | 24 |
+| 070 | BarraCuda CPU 25-Domain Pure Rust Math Proof | cross | COMPLETE | 50 |
+| 071 | BarraCuda GPU Math Portability Proof | GPU | COMPLETE | 24 |
 | 072 | GPU Streaming Pipeline Proof | GPU | COMPLETE | 17 |
 | 073 | Compute Dispatch Overhead Proof | GPU | COMPLETE | 21 |
 | 074 | metalForge Substrate Router | cross/GPU | COMPLETE | 20 |
@@ -87,13 +87,13 @@
 | 076 | Cross-Substrate Pipeline | cross/GPU | COMPLETE | 17 |
 | 077 | ToadStool Bio Rewire | GPU/cross | COMPLETE | 451 (re-validated) |
 | 078 | ODE GPU Sweep Readiness | cross/GPU | COMPLETE | 10 (round-trip + parity) |
-| 079 | BarraCUDA CPU v6 — ODE Flat Param | CPU/cross | COMPLETE | 48 (flat RT + ODE + Python) |
+| 079 | BarraCuda CPU v6 — ODE Flat Param | CPU/cross | COMPLETE | 48 (flat RT + ODE + Python) |
 | 080 | metalForge Dispatch Routing | cross/dispatch | COMPLETE | 35 (7 sections × 5 configs) |
 | 081 | K-mer GPU Histogram Prep | GPU/refactor | COMPLETE | 4 (round-trip + GPU sizing) |
 | 082 | UniFrac Flat Tree (CSR) | GPU/refactor | COMPLETE | 4 (CSR + parity + matrix) |
 | 083 | Taxonomy NPU Quantization | NPU/refactor | COMPLETE | 3 (int8 RT + parity + sizing) |
 | 084 | metalForge Full Cross-Substrate v2 | metalForge | COMPLETE | 35+ (12 domains CPU ↔ GPU) |
-| 085 | BarraCUDA CPU v7 — Tier A Layouts | CPU/layout | COMPLETE | 43 (kmer/unifrac/taxonomy flat) |
+| 085 | BarraCuda CPU v7 — Tier A Layouts | CPU/layout | COMPLETE | 43 (kmer/unifrac/taxonomy flat) |
 | 086 | metalForge Pipeline Proof | metalForge | COMPLETE | 45 (5-stage dispatch + parity) |
 | 087 | GPU Extended Domains (EIC/PCoA/Kriging/Rarefaction) | GPU | COMPLETE | 50+ (4 new GPU domains) |
 | 088 | metalForge PCIe Direct Transfer | metalForge | COMPLETE | 32 (6 paths + buffer contracts) |
@@ -110,8 +110,25 @@
 | 099 | CPU vs GPU Expanded + metalForge | GPU/metalForge | COMPLETE | 27 (k-mer, UniFrac, ODE, phage defense, mixed-HW pipeline) |
 | 100 | metalForge v4 ODE Domains + NPU | GPU/metalForge | COMPLETE | 28 (bistable, multi-signal, phage defense, NPU routing, PCIe pipeline) |
 | 101 | Pure GPU Promotion Complete (13 modules) | GPU/parity | COMPLETE | 38 (13 modules CPU↔GPU, 2 new WGSL shaders) |
-| 102 | BarraCUDA CPU v8 — Pure GPU Domains | CPU/cross | COMPLETE | 84 (13 GPU-promoted domains, known-value validation) |
+| 102 | BarraCuda CPU v8 — Pure GPU Domains | CPU/cross | COMPLETE | 84 (13 GPU-promoted domains, known-value validation) |
 | 103 | metalForge Cross-Substrate v5 | metalForge | COMPLETE | 38 (13 new GPU domains, substrate-independent) |
+| 104 | metalForge Cross-Substrate v6 | metalForge | COMPLETE | 24 (5 gap domains: QS ODE, UniFrac, DADA2, K-mer, Felsenstein — **25/25 papers three-tier**) |
+| 105 | Pure GPU Streaming v2 — Analytics | streaming | COMPLETE | 27 (alpha div + Bray-Curtis + spectral cosine + full pipeline) |
+| 106 | GPU Streaming — ODE + Phylogenetics | streaming | COMPLETE | 45 (6 pre-warmed primitives: ODE sweep, phage, bistable, multi-signal, Felsenstein, UniFrac) |
+| 107 | Spectral Cross-Spring (Anderson/QS) | cross | COMPLETE | 25 (Anderson 1D/2D/3D, Almost-Mathieu, Lanczos, QS-disorder analogy) |
+| 108 | Vibrio QS parameter landscape | `validate_vibrio_qs_landscape` | PASS | 8 |
+| 109 | Large-scale phylo placement | `validate_phylo_placement_scale` | PASS | 11 |
+| 110 | Cross-ecosystem pangenome | `validate_cross_ecosystem_pangenome` | PASS | 17 |
+| 111 | MassBank GPU spectral scale | `validate_massbank_gpu_scale` | PASS | 14 |
+| 112 | Real-bloom GPU surveillance | `validate_real_bloom_gpu` | PASS | 23 |
+| 113 | QS-disorder from real diversity | `validate_qs_disorder_real` | PASS | 5 |
+| 114 | NPU QS phase classifier | `validate_npu_qs_classifier` | PASS | 13 |
+| 115 | NPU phylogenetic placement | `validate_npu_phylo_placement` | PASS | 9 |
+| 116 | NPU genome binning | `validate_npu_genome_binning` | PASS | 9 |
+| 117 | NPU spectral screening | `validate_npu_spectral_screen` | PASS | 8 |
+| 118 | NPU bloom sentinel | `validate_npu_bloom_sentinel` | PASS | 11 |
+| 119 | NPU QS-disorder classifier | `validate_npu_disorder_classifier` | PASS | 9 |
+| 120 | Cross-spring evolution benchmark | `benchmark_cross_spring_evolution` | PASS | 9 |
 
 ---
 
@@ -119,7 +136,7 @@
 
 | Category | Count |
 |----------|-------|
-| Experiments completed | 103 |
+| Experiments completed | 120 |
 | CPU validation checks | 1,476 |
 | GPU validation checks | 702 |
 | Dispatch validation checks | 80 |
@@ -128,13 +145,21 @@
 | Cross-spring checks | 39 |
 | Local WGSL checks | 10 |
 | Pure GPU promotion checks | 38 |
-| **Total validation checks** | **2,406+** |
-| Rust tests | 740 (666 lib + 60 integration + 14 doc) |
-| BarraCUDA CPU parity | 380/380 (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted) |
-| BarraCUDA GPU parity | 29 domains (Exp064/087/092/101) |
-| metalForge cross-system | 29 domains CPU↔GPU proven (Exp103) |
+| metalForge v6 three-tier checks | 24 |
+| Pure GPU streaming v2 checks | 27 |
+| Streaming ODE + phylogenetics checks | 45 |
+| Cross-spring spectral theory checks | 25 |
+| NPU reservoir deployment checks | 59 |
+| Cross-spring evolution checks | 9 |
+| **Total validation checks** | **2,673+** |
+| Rust tests | 750 (676 lib + 60 integration + 14 doc) |
+| BarraCuda CPU parity | 380/380 (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted) |
+| BarraCuda GPU parity | 29 domains (Exp064/087/092/101) |
+| metalForge cross-system | 37 domains CPU↔GPU proven (Exp103+104), **25/25 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
-| ToadStool primitives consumed | 28 (15 original + 8 bio + 5 neuralSpring) |
+| ToadStool primitives consumed | 31 (15 original + 8 bio + 5 neuralSpring + 3 S39 bio) |
+| ToadStool session alignment | S42 (612 WGSL, 25 bio ops re-exported, 16 imports modernized) |
+| Cross-spring shader provenance | 35 hotSpring, 22 wetSpring, 14 neuralSpring, 5 airSpring, 100+ native |
 
 ---
 
@@ -189,8 +214,11 @@
 ### Completed
 - Exp019 Phases 2-4 (Phylogenetic): All COMPLETE
 - Exp008 Full ML Pipeline: All COMPLETE
-- Tolerance centralization: **DONE** — 43 named constants in `tolerances.rs`
-- Code quality hardening: **DONE** — `deny(unsafe_code)`, `deny(expect_used, unwrap_used)`, pedantic + nursery clippy
+- Tolerance centralization: **DONE** — 50 named constants in `tolerances.rs` (ODE dt, Galaxy ranges, bootstrap LL, phage population)
+- Ad-hoc tolerance elimination: **DONE** — all validation binaries use `tolerances::*` constants
+- Code quality hardening: **DONE** — `deny(unsafe_code)`, `deny(expect_used, unwrap_used)`, pedantic + nursery clippy (0 warnings, both default and GPU features)
+- Blanket lint tightening: **DONE** — removed `similar_names` blanket allow; targeted per-function `#[allow]` for domain-appropriate names
+- Unsafe code evolution: **DONE** — env var tests use `Mutex`-serialized helpers with centralized `set_env`/`remove_env`
 - Rust edition 2024: **DONE** — MSRV 1.85, `f64::midpoint()`, `usize::midpoint()`, `const fn` promotions
 - metalForge forge crate: **DONE** — `wetspring-forge` (24 tests, substrate discovery + dispatch)
 - GPU workgroup constants: **DONE** — all GPU modules use named `WORKGROUP_SIZE` matching ToadStool shaders
@@ -200,6 +228,15 @@
 - Fuzz testing: **DONE** — 4 harnesses (FASTQ, mzML, MS2, XML) via cargo-fuzz
 - Doc strictness: **DONE** — `-D missing_docs -D rustdoc::broken_intra_doc_links` pass
 - Math extraction: **DONE** — `bio::special` → `crate::special` (top-level, re-export shim removed)
+- Math delegation: **DONE** — `crate::special::{erf, ln_gamma, regularized_gamma_lower}` delegate to `barracuda::special` when `gpu` feature active; no duplicate math
+- wgpu feature tightening: **DONE** — `default-features = false, features = ["wgsl", "vulkan-portability"]`; no `renderdoc-sys` (C dep)
+- Validation binary refactoring: **DONE** — `validate_cpu_vs_gpu_all_domains.rs` refactored from monolithic main() to 16 domain-specific helper functions
+- Hardcoded path evolution: **DONE** — NPU device, PCI slots, benchmark output dirs all configurable via env vars (`WETSPRING_NPU_DEVICE`, `WETSPRING_GPU_PCI_SLOTS`, `WETSPRING_BENCHMARK_DIR`, `WETSPRING_PYTHON_BASELINE`)
+- Negative-case tests: **DONE** — 8 new tests for malformed/missing/truncated input (FASTQ 5, mzML 3)
+- Provenance manifest: **DONE** — `scripts/BASELINE_MANIFEST.md` maps 40 Python scripts to Rust binaries with SHA-256 hashes
+- XML parser zero-copy: **DONE** — `xml_unescape` returns `Cow<str>`, text event path avoids double allocation
+- Doc examples: **DONE** — `dada2::denoise`, `merge_pairs::merge_pair`, `parse_mzml`, `bray_curtis`, `smith_waterman` (19 doc tests total)
+- Binary refactoring: **DONE** — `metalforge_full_v2` (12 helpers), `metalforge_full_v3` (16 helpers); 8 stale `too_many_lines` allows removed
 - Absorption batch APIs: **DONE** — `snp::call_snps_batch`, `quality::filter_reads_flat`, `pangenome::analyze_batch`
 
 ---
@@ -225,7 +262,7 @@ statistical confidence, and cophylogenetic analysis.
 **Status:** Comprehensive. 6 experiments (051-056) plus CPU parity (Exp057).
 Covers ANI, SNP calling, dN/dS, molecular clock, pangenome analysis,
 phylogenomics, and rare biosphere diversity — all validated against Python
-baselines and proved as pure Rust math via BarraCUDA CPU v4.
+baselines and proved as pure Rust math via BarraCuda CPU v4.
 
 ### Track 2: Analytical Chemistry (LC-MS, PFAS)
 **Status:** Comprehensive. 7 experiments (005, 006, 009, 013, 018, 041, 042) cover
@@ -234,34 +271,39 @@ matching. Exp008 adds sovereign ML for environmental monitoring.
 
 ---
 
-## Code Quality (Feb 22, 2026)
+## Code Quality (Feb 23, 2026)
 
 ```
 cargo fmt --check              → clean (0 diffs, both crates)
-cargo clippy --pedantic        → 0 warnings (pedantic + nursery, default + GPU features)
+cargo clippy --pedantic        → 0 warnings (pedantic + nursery, default features)
+cargo clippy --features gpu    → 0 warnings (pedantic + nursery, GPU features)
 cargo doc --features gpu       → clean (0 warnings, strict: -D missing_docs -D broken_intra_doc_links)
-cargo test --lib               → 666 passed, 0 failed, 1 ignored (hardware-dependent)
+cargo test --lib               → 676 passed, 0 failed, 1 ignored (hardware-dependent)
 cargo test --tests             → 60 integration (23 bio + 16 determinism + 21 I/O)
-cargo test --doc               → 14 passed, 0 failed
-#![deny(unsafe_code)]          → enforced crate-wide (edition 2024; #[allow] only in test env-var calls)
+cargo test --doc               → 19 passed, 0 failed (5 new API examples)
+cargo llvm-cov --lib           → 96.21% line coverage (13,281 / 13,804)
+#![deny(unsafe_code)]          → enforced crate-wide (edition 2024; env-var tests use Mutex-serialized helpers)
 #![deny(expect_used, unwrap_used)] → enforced crate-wide (test modules #[allow])
 partial_cmp().unwrap()         → 0 (all migrated to f64::total_cmp)
-inline tolerance literals      → 0 (43 named constants in tolerances.rs)
+inline tolerance literals      → 0 (50 named constants in tolerances.rs, including ODE/Galaxy/bootstrap)
+blanket similar_names          → removed; targeted #[allow] per-function where domain-appropriate
 GPU workgroup sizes            → named constants in all 9 *_gpu.rs (match WGSL shaders)
-shared math (crate::special)   → erf, ln_gamma, regularized_gamma (bio::special shim removed)
+shared math (crate::special)   → delegates to barracuda::special when gpu active; sovereign otherwise
 hardware detection             → injectable (from_content / parse_*), no direct /proc in library
 SPDX headers                   → all .rs files
-max file size                  → all under 1000 LOC (fastq.rs: 878 largest)
-external C dependencies        → 0 (flate2 uses rust_backend)
-provenance headers             → all 87 binaries (commit, command, hardware)
+max file size                  → all under 1000 LOC (fastq.rs: 913 largest)
+external C dependencies        → 0 (flate2 rust_backend; wgpu default-features = false)
+XML parser allocations         → Cow<str> for xml_unescape; 1 allocation per text event (was 2)
+provenance headers             → all 109 binaries (commit, command, hardware)
+duplicate math                 → 0 (crate::special delegates to ToadStool barracuda::special when gpu enabled)
 Python baselines               → scripts/requirements.txt (pinned numpy, scipy, sklearn)
-barracuda_cpu                  → 205/205 checks PASS (25 domains + 6 ODE flat)
+barracuda_cpu                  → 380/380 checks PASS (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted)
 barracuda_gpu                  → 451 GPU checks PASS
 fuzz harnesses                 → 4 (FASTQ, mzML, MS2, XML)
 zero-copy I/O                  → FastqRefRecord, DecodeBuffer reuse, streaming iterators
 ```
 
-## BarraCUDA CPU Parity
+## BarraCuda CPU Parity
 
 The `validate_barracuda_cpu` v1-v8 binaries prove pure Rust math matches
 Python across all algorithmic domains:
@@ -280,7 +322,7 @@ Combined: 380/380 CPU parity checks. This is the bridge to pure GPU execution.
 Total CPU time: ~85ms (release build, all domains)
 ```
 
-## BarraCUDA GPU Parity
+## BarraCuda GPU Parity
 
 Exp064 + Exp101 consolidate ALL GPU-eligible domains into validation binaries,
 proving pure GPU math matches CPU reference truth across the full portfolio:
@@ -299,7 +341,7 @@ absorbed or composed shaders, benefiting from cross-spring precision evolution.
 
 ## metalForge Cross-System Proof
 
-Exp065 + Exp103 extends to ALL 29 GPU-eligible domains, proving
+Exp065 + Exp103 + Exp104 extends to ALL 37 metalForge domains, proving
 substrate-independence: for every GPU-eligible algorithm, the metalForge
 router can dispatch to CPU or GPU and get the same answer. This is the
 foundation for CPU/GPU/NPU routing in production.
@@ -391,6 +433,10 @@ Bugs found and fixed: SNP binding layout (ToadStool), AdapterInfo propagation (w
 | 094 | Cross-Spring Evolution Validation | 39 | 5 neuralSpring primitives CPU↔GPU parity (--features gpu) |
 | 095 | Cross-Spring Scaling Benchmark | 7 | Cross-spring scaling at realistic sizes (--release --features gpu) |
 | 096 | ToadStool Bio Op Absorption | 10 | 4 upstream ops validated (--features gpu), Lean phase complete |
+| 097–104 | (See above experiment table) | | metalForge v4-v6, CPU v8, GPU promotion |
+| 105 | Pure GPU Streaming v2 — Analytics | 27 | Pre-warmed Bray-Curtis + spectral cosine + full analytics pipeline (--features gpu) |
+| 106 | GPU Streaming — ODE + Phylogenetics | 45 | 6 pre-warmed primitives, multi-dispatch proof, zero recompilation (--features gpu) |
+| 107 | Spectral Cross-Spring (Anderson/QS) | 25 | Anderson 1D/2D/3D, Almost-Mathieu, Lanczos, QS-disorder analogy (--features gpu) |
 
 ### Structural Evolution (Phase 23, Exp097)
 
@@ -410,7 +456,13 @@ Bugs found and fixed: SNP binding layout (ToadStool), AdapterInfo propagation (w
 
 | Document | Location | Purpose |
 |----------|----------|---------|
-| Tier A shader specs | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md` | Original binding layouts, dispatch geometry |
-| Rewire results | `wateringHole/handoffs/WETSPRING_TOADSTOOL_REWIRE_FEB22_2026.md` | Rewire outcomes, bugs, cross-spring evolution |
+| **V18 — Cross-spring rewire** | `wateringHole/handoffs/WETSPRING_V018_CROSS_SPRING_REWIRE_HANDOFF_FEB23_2026.md` | Phase 34, full rewire, 120 experiments |
+| V17 — NPU reservoir | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V17_NPU_RESERVOIR_FEB23_2026.md` | Phases 31-33, NPU deployment, NCBI-scale |
+| V16 — Streaming | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V16_STREAMING_FEB23_2026.md` | Streaming v2, metalForge v6 |
+| V15 — ODE generic | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V15_ODE_GENERIC_FEB22_2026.md` | 5 ODE shaders → BatchedOdeRK4Generic |
+| V14 — Write phase | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V14_FEB22_2026.md` | ODE shaders, forge v0.3.0 |
+| V13 — Edition 2024 | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V13_FEB22_2026.md` | Structural evolution |
 | Cross-spring evolution | `wateringHole/handoffs/CROSS_SPRING_EVOLUTION_WETSPRING_FEB22_2026.md` | wetSpring perspective on biome model |
-| Structural evolution handoff | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V11_FEB22_2026.md` | Flat layouts, DRY models, zero-clone patterns for absorption |
+| Cross-spring provenance | `wateringHole/handoffs/CROSS_SPRING_PROVENANCE_FEB22_2026.md` | Shader origin tracking |
+| Shader evolution | `wateringHole/CROSS_SPRING_SHADER_EVOLUTION.md` | 612 WGSL shader provenance |
+| Archive | `wateringHole/handoffs/archive/` | V7-V12, rewire (fossil record) |

@@ -232,6 +232,32 @@ impl Validator {
 mod tests {
     use super::*;
 
+    use std::sync::Mutex;
+
+    /// Serializes tests that mutate process-wide environment variables.
+    ///
+    /// `std::env::set_var` / `remove_var` are unsafe in edition 2024 because
+    /// concurrent reads from other threads cause UB. This mutex ensures only
+    /// one env-mutating test runs at a time; combined with unique key names
+    /// per test, this eliminates data races.
+    static ENV_LOCK: Mutex<()> = Mutex::new(());
+
+    /// Set an env var while holding `ENV_LOCK`, returning the guard.
+    ///
+    /// # Safety
+    ///
+    /// Must only be called while `ENV_LOCK` is held (enforced by API).
+    fn set_env(key: &str, val: impl AsRef<std::ffi::OsStr>) {
+        // SAFETY: caller holds ENV_LOCK; no other test reads/writes env concurrently.
+        unsafe { std::env::set_var(key, val) };
+    }
+
+    /// Remove an env var while holding `ENV_LOCK`.
+    fn remove_env(key: &str) {
+        // SAFETY: caller holds ENV_LOCK; no other test reads/writes env concurrently.
+        unsafe { std::env::remove_var(key) };
+    }
+
     #[test]
     fn check_exact_match() {
         assert!(check("exact", 42.0, 42.0, 0.0));
@@ -347,33 +373,32 @@ mod tests {
 
     #[test]
     fn data_dir_explicit_env_override() {
+        let _guard = ENV_LOCK.lock().unwrap();
         let key = "WETSPRING_DATA_DIR_EXPLICIT_OVERRIDE_TEST";
         let expected = "/tmp/wetspring_explicit_override_test";
-        // SAFETY: test-only, cargo test runs each #[test] in its own thread but
-        // these env vars are unique per test so no concurrent mutation.
-        unsafe { std::env::set_var(key, expected) };
+        set_env(key, expected);
         let dir = data_dir(key, "data/default");
-        unsafe { std::env::remove_var(key) };
+        remove_env(key);
         assert_eq!(dir.to_string_lossy(), expected);
     }
 
     #[test]
     fn data_dir_wetspring_data_root_override() {
+        let _guard = ENV_LOCK.lock().unwrap();
         let tmp = tempfile::tempdir().unwrap();
         let subpath = "wetspring_data_root_test/data";
         let full = tmp.path().join(subpath);
         std::fs::create_dir_all(&full).unwrap();
 
         let old = std::env::var("WETSPRING_DATA_ROOT").ok();
-        // SAFETY: test-only env var with unique key per test function.
-        unsafe { std::env::set_var("WETSPRING_DATA_ROOT", tmp.path()) };
+        set_env("WETSPRING_DATA_ROOT", tmp.path());
 
         let dir = data_dir("WETSPRING_NONEXISTENT_FOR_ROOT_TEST", subpath);
 
         if let Some(v) = old {
-            unsafe { std::env::set_var("WETSPRING_DATA_ROOT", v) };
+            set_env("WETSPRING_DATA_ROOT", v);
         } else {
-            unsafe { std::env::remove_var("WETSPRING_DATA_ROOT") };
+            remove_env("WETSPRING_DATA_ROOT");
         }
 
         assert_eq!(dir, full, "WETSPRING_DATA_ROOT + subpath should be used");
@@ -381,16 +406,15 @@ mod tests {
 
     #[test]
     fn data_dir_cwd_fallback() {
-        // Temporarily clear WETSPRING_DATA_ROOT so we hit cwd fallback.
+        let _guard = ENV_LOCK.lock().unwrap();
         let old = std::env::var("WETSPRING_DATA_ROOT").ok();
-        // SAFETY: test-only env var cleanup, unique key per test.
-        unsafe { std::env::remove_var("WETSPRING_DATA_ROOT") };
+        remove_env("WETSPRING_DATA_ROOT");
 
         let subpath = "___wetspring_cwd_fallback_nonexistent_xyz/data";
         let dir = data_dir("WETSPRING_NONEXISTENT_CWD_TEST", subpath);
 
         if let Some(v) = old {
-            unsafe { std::env::set_var("WETSPRING_DATA_ROOT", v) };
+            set_env("WETSPRING_DATA_ROOT", v);
         }
 
         assert_eq!(dir.to_string_lossy(), subpath);

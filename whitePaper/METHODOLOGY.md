@@ -362,8 +362,8 @@ All experiments run on a single consumer workstation:
 | `validate_barracuda_cpu_v8` | 175 | 13 promoted GPU domains (Exp102) |
 | **Total** | **1,476** | **All pass** |
 
-Current status: **1,476/1,476 CPU pass + 35 dispatch pass.** 103 experiments across 4 tracks.
-380/380 BarraCUDA CPU parity checks across 31+ domains (v1-v8).
+Current status: **1,476/1,476 CPU pass + 35 dispatch pass.** 120 experiments across 4 tracks.
+380/380 BarraCuda CPU parity checks across 31+ domains (v1-v8).
 ~22.5× Rust speedup over Python.
 
 ### Phase 3 (GPU): 702+/702+ checks pass
@@ -386,7 +386,7 @@ Current status: **1,476/1,476 CPU pass + 35 dispatch pass.** 103 experiments acr
 Current status: **702+/702+ pass.** 30 ToadStool primitives consumed.
 5 local WGSL shaders (Write phase) + 7 Compose + 3 Passthrough = 42 GPU modules total.
 
-### Grand Total: 2,406+/2,406+ quantitative checks pass
+### Grand Total: 2,673+/2,673+ quantitative checks pass
 
 ---
 
@@ -435,7 +435,7 @@ results, then exceed them via Rust + GPU.
 | `unsafe` in production | 0 |
 | `.unwrap()` in production | 0 |
 | Named tolerances | 43 constants in `tolerances.rs`, hierarchy-tested |
-| Provenance headers | All 93 validation/benchmark binaries |
+| Provenance headers | All 109 validation/benchmark binaries |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` and `.wgsl` files |

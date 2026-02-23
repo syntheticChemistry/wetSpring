@@ -19,6 +19,7 @@ use wetspring_barracuda::bio::phage_defense::{
     PhageDefenseParams, scenario_high_cost, scenario_no_phage, scenario_phage_attack,
     scenario_pure_defended, scenario_pure_undefended,
 };
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 const DT: f64 = 0.001;
@@ -52,7 +53,12 @@ fn main() {
         0.0,
     );
     v.check("Attack: Bu ≈ 0 (crashed)", bu, 0.0, 1.0);
-    v.check("Attack: Bd matches Python", bd, 278.0, 10.0);
+    v.check(
+        "Attack: Bd matches Python",
+        bd,
+        278.0,
+        tolerances::PHAGE_POPULATION_ABSOLUTE,
+    );
 
     v.section("── Pure defended vs pure undefended ──");
     let r_def = scenario_pure_defended(&params, DT);

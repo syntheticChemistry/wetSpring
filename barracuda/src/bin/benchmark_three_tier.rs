@@ -329,10 +329,12 @@ fn gen_f64(n: usize, seed: u64) -> Vec<f64> {
 }
 
 fn load_python_baseline() -> Option<serde_json::Value> {
-    let path = format!(
-        "{}/../benchmarks/results/python_baseline_latest.json",
-        env!("CARGO_MANIFEST_DIR")
-    );
+    let path = std::env::var("WETSPRING_PYTHON_BASELINE").unwrap_or_else(|_| {
+        format!(
+            "{}/../benchmarks/results/python_baseline_latest.json",
+            env!("CARGO_MANIFEST_DIR")
+        )
+    });
     let content = std::fs::read_to_string(&path).ok()?;
     serde_json::from_str(&content).ok()
 }

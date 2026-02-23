@@ -179,6 +179,33 @@ fn find_best_overlap(
 ///
 /// The forward read and reverse read are expected as they come off the
 /// sequencer (reverse read is NOT pre-complemented).
+///
+/// # Examples
+///
+/// ```
+/// use wetspring_barracuda::bio::merge_pairs::{merge_pair, reverse_complement, MergeParams};
+/// use wetspring_barracuda::io::fastq::FastqRecord;
+///
+/// let shared: &[u8] = b"ACGTACGTACGTACG";
+/// let fwd_seq: Vec<u8> = [&b"AAAAAAAAAAAAAAAA"[..], shared].concat();
+/// let rev_rc: Vec<u8> = [shared, &b"TTTTTTTTTTTTTTTT"[..]].concat();
+/// let rev_seq = reverse_complement(&rev_rc);
+/// let phred = |len: usize| (0..len).map(|_| 33 + 30u8).collect::<Vec<_>>();
+///
+/// let fwd = FastqRecord {
+///     id: "fwd".into(),
+///     sequence: fwd_seq.clone(),
+///     quality: phred(fwd_seq.len()),
+/// };
+/// let rev = FastqRecord {
+///     id: "rev".into(),
+///     sequence: rev_seq,
+///     quality: phred(rev_rc.len()),
+/// };
+/// let result = merge_pair(&fwd, &rev, &MergeParams::default());
+/// assert!(result.merged.is_some());
+/// assert_eq!(result.overlap, 15);
+/// ```
 #[must_use]
 pub fn merge_pair(fwd: &FastqRecord, rev: &FastqRecord, params: &MergeParams) -> MergeResult {
     let rev_rc_seq = reverse_complement(&rev.sequence);

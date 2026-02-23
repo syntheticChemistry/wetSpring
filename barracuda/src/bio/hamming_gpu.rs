@@ -8,7 +8,7 @@
 //! sequences and returns normalized Hamming distances.
 
 use barracuda::device::WgpuDevice;
-use barracuda::ops::bio::pairwise_hamming::PairwiseHammingGpu;
+use barracuda::PairwiseHammingGpu;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
@@ -96,16 +96,14 @@ impl HammingGpu {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;
 
     #[tokio::test]
     async fn hamming_gpu_matches_cpu() {
-        let gpu = match GpuF64::new().await {
-            Ok(g) => g,
-            Err(_) => return,
-        };
+        let Ok(gpu) = GpuF64::new().await else { return };
         let device = gpu.to_wgpu_device();
         let hg = HammingGpu::new(&device);
 

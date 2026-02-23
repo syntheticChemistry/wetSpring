@@ -35,7 +35,8 @@ barracuda = { path = "../../phase1/toadstool/crates/barracuda", optional = true 
 
 # wgpu: WebGPU compute — hardware-agnostic GPU via Vulkan/Metal/DX12.
 # Same version as barracuda to prevent duplicate symbol linking errors.
-wgpu = { version = "22", optional = true }
+# default-features = false avoids pulling in renderdoc-sys (C dep).
+wgpu = { version = "22", optional = true, default-features = false, features = ["wgsl", "vulkan-portability"] }
 
 # Async runtime for GPU device creation (barracuda already brings tokio in).
 tokio = { version = "1", features = ["rt", "macros"], optional = true }
@@ -545,3 +546,93 @@ path = "src/bin/validate_barracuda_cpu_v8.rs"
 name = "validate_metalforge_v5"
 path = "src/bin/validate_metalforge_v5.rs"
 required-features = ["gpu"]
+
+[[bin]]
+name = "validate_metalforge_v6"
+path = "src/bin/validate_metalforge_v6.rs"
+required-features = ["gpu"]
+
+[[bin]]
+name = "validate_pure_gpu_streaming_v2"
+path = "src/bin/validate_pure_gpu_streaming_v2.rs"
+required-features = ["gpu"]
+
+[[bin]]
+name = "validate_streaming_ode_phylo"
+path = "src/bin/validate_streaming_ode_phylo.rs"
+required-features = ["gpu"]
+
+# ── Cross-Spring Spectral Theory (Exp107) ───────────────────────
+[[bin]]
+name = "validate_spectral_cross_spring"
+path = "src/bin/validate_spectral_cross_spring.rs"
+required-features = ["gpu"]
+
+# ── Vibrio QS Parameter Landscape (Exp108) ──────────────────────
+[[bin]]
+name = "validate_vibrio_qs_landscape"
+path = "src/bin/validate_vibrio_qs_landscape.rs"
+required-features = ["gpu"]
+
+# ── Large-Scale Phylogenetic Placement (Exp109) ─────────────────
+[[bin]]
+name = "validate_phylo_placement_scale"
+path = "src/bin/validate_phylo_placement_scale.rs"
+
+# ── Cross-Ecosystem Pangenome (Exp110) ──────────────────────────
+[[bin]]
+name = "validate_cross_ecosystem_pangenome"
+path = "src/bin/validate_cross_ecosystem_pangenome.rs"
+
+# ── MassBank GPU Spectral Screening (Exp111) ────────────────────
+[[bin]]
+name = "validate_massbank_gpu_scale"
+path = "src/bin/validate_massbank_gpu_scale.rs"
+required-features = ["gpu"]
+
+# ── Real-Bloom GPU Surveillance (Exp112) ────────────────────────
+[[bin]]
+name = "validate_real_bloom_gpu"
+path = "src/bin/validate_real_bloom_gpu.rs"
+required-features = ["gpu"]
+
+# ── QS-Disorder from Real Diversity (Exp113) ────────────────────
+[[bin]]
+name = "validate_qs_disorder_real"
+path = "src/bin/validate_qs_disorder_real.rs"
+required-features = ["gpu"]
+
+# ── NPU QS Phase Classifier (Exp114) ────────────────────────────
+[[bin]]
+name = "validate_npu_qs_classifier"
+path = "src/bin/validate_npu_qs_classifier.rs"
+
+# ── NPU Phylogenetic Placement (Exp115) ─────────────────────────
+[[bin]]
+name = "validate_npu_phylo_placement"
+path = "src/bin/validate_npu_phylo_placement.rs"
+
+# ── NPU Genome Binning (Exp116) ─────────────────────────────────
+[[bin]]
+name = "validate_npu_genome_binning"
+path = "src/bin/validate_npu_genome_binning.rs"
+
+# ── NPU Spectral Screening (Exp117) ─────────────────────────────
+[[bin]]
+name = "validate_npu_spectral_screen"
+path = "src/bin/validate_npu_spectral_screen.rs"
+
+# ── NPU Bloom Sentinel (Exp118) ─────────────────────────────────
+[[bin]]
+name = "validate_npu_bloom_sentinel"
+path = "src/bin/validate_npu_bloom_sentinel.rs"
+
+# ── NPU QS-Disorder Classifier (Exp119) ─────────────────────────
+[[bin]]
+name = "validate_npu_disorder_classifier"
+path = "src/bin/validate_npu_disorder_classifier.rs"
+
+# ── Cross-Spring Evolution Benchmark (Exp120) ──────────────────
+[[bin]]
+name = "benchmark_cross_spring_evolution"
+path = "src/bin/benchmark_cross_spring_evolution.rs"

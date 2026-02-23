@@ -100,6 +100,20 @@ pub fn chao1(counts: &[f64]) -> f64 {
 /// `BC` = sum(|a\_i - b\_i|) / sum(a\_i + b\_i).
 /// Range \[0, 1\]: 0 = identical, 1 = completely different.
 ///
+/// # Examples
+///
+/// ```
+/// use wetspring_barracuda::bio::diversity;
+///
+/// let a = vec![10.0, 20.0, 30.0];
+/// let b = vec![10.0, 20.0, 30.0];
+/// assert!(diversity::bray_curtis(&a, &b).abs() < 1e-10);
+///
+/// let c = vec![10.0, 0.0, 0.0];
+/// let d = vec![0.0, 0.0, 10.0];
+/// assert!((diversity::bray_curtis(&c, &d) - 1.0).abs() < 1e-10);
+/// ```
+///
 /// # Panics
 ///
 /// Panics if `a` and `b` have different lengths.

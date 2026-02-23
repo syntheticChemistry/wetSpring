@@ -241,7 +241,7 @@ mod tests {
     use super::*;
     use crate::bio::ode::steady_state_mean;
 
-    const DT: f64 = 0.001;
+    const DT: f64 = crate::tolerances::ODE_DEFAULT_DT;
     const SS_FRAC: f64 = 0.1;
 
     #[test]

@@ -2,7 +2,6 @@
 #![allow(
     clippy::expect_used,
     clippy::unwrap_used,
-    clippy::too_many_lines,
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation
 )]
@@ -371,7 +370,7 @@ fn validate_rarefaction(v: &mut Validator, gpu: &GpuF64) {
         seed: 123,
     };
 
-    let batch_samples = vec![counts.clone(), vec![50.0, 100.0, 200.0, 50.0, 100.0]];
+    let batch_samples = vec![counts, vec![50.0, 100.0, 200.0, 50.0, 100.0]];
     let batch_results =
         rarefaction_gpu::batch_rarefaction_gpu(gpu, &batch_samples, &params_batch).unwrap();
 

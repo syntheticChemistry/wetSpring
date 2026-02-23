@@ -7,7 +7,7 @@
 //! Computes linear fitness: fitness[i] = dot(population[i], weights).
 
 use barracuda::device::WgpuDevice;
-use barracuda::ops::bio::batch_fitness::BatchFitnessGpu;
+use barracuda::BatchFitnessGpu;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
@@ -89,16 +89,14 @@ impl BatchFitnessGpuWrapper {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;
 
     #[tokio::test]
     async fn batch_fitness_dot_product() {
-        let gpu = match GpuF64::new().await {
-            Ok(g) => g,
-            Err(_) => return,
-        };
+        let Ok(gpu) = GpuF64::new().await else { return };
         let device = gpu.to_wgpu_device();
         let bf = BatchFitnessGpuWrapper::new(&device);
 

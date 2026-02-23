@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
-**Last Updated**: February 22, 2026
-**Status**: Phase 28 — 1,476 CPU + 702 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 56 ODE parity = 2,406+/2,406+ checks, ALL PASS (740 tests, 103 experiments)
+**Last Updated**: February 23, 2026
+**Status**: Phase 34 — 1,476 CPU + 702 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 56 ODE parity + 24 MF-v6 + 72 streaming-v2 + 25 spectral + 59 NPU reservoir + 9 cross-spring evolution = 2,673+/2,673+ checks, ALL PASS (750 tests, 120 experiments)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -10,14 +10,15 @@
 
 | Metric | Value |
 |--------|-------|
-| CPU validation | 1,476/1,476 PASS — 41 modules, 93+ experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
+| CPU validation | 1,476/1,476 PASS — 41 modules, 120 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
 | GPU validation | 702/702 PASS — 30 ToadStool primitives, 5 local WGSL, 80 streaming + 48 head-to-head + 28 metalForge v4 + 38 pure GPU |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 380/380 — 22.5x Rust speedup over Python (v1–v8) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/101) — pure GPU math proven |
-| Pure GPU streaming | 80 checks, 441-837× over round-trip (Exp090/091) |
-| metalForge cross-system | 29 domains CPU↔GPU (Exp103) + dispatch (Exp080) + pipeline (Exp086) + PCIe (Exp088) |
-| Rust modules | 41 CPU + 42 GPU, 740 tests (~97% bio+io coverage) |
+| Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip (Exp090/091) |
+| metalForge cross-system | 37 domains CPU↔GPU (Exp103+104) + dispatch (Exp080) + pipeline (Exp086) + PCIe (Exp088) |
+| Cross-spring spectral | 25 checks — Anderson localization + QS-disorder analogy (Exp107) |
+| Rust modules | 41 CPU + 42 GPU, 750 tests (~97% bio+io coverage) |
 | Write phase | 5 local WGSL ODE shaders (phage_defense, bistable, multi_signal, cooperation, capacitor) |
 | Dependencies | 1 runtime (flate2), everything else sovereign |
 | Paper queue | **ALL DONE** — 29/29 reproducible papers complete (Track 1c added) |
@@ -25,7 +26,7 @@
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
 | Faculty (Track 1c) | R. Anderson (Carleton) — deep-sea metagenomics, population genomics |
 | Faculty (Track 2) | Jones (BMB/Chemistry, MSU) — PFAS mass spectrometry |
-| Handoffs | Fourteen delivered (v1–v6, rewire, cross-spring, v7–v14) |
+| Handoffs | Fourteen delivered (v1–v6, rewire, cross-spring, v7–v18) |
 
 ---
 
@@ -38,8 +39,8 @@ Every paper in the queue goes through the full evolution path. Status:
 | **Python baseline** | Algorithm correctness against published tools | 40 scripts, all reproducible |
 | **BarraCuda CPU** | Pure Rust math matches Python | 1,476 checks, 380/380 cross-domain parity (v1–v8) |
 | **BarraCuda GPU** | GPU produces same answer as CPU | 702 checks, 29 GPU domains |
-| **Pure GPU streaming** | Zero CPU round-trips, data stays on-device | 80 checks, 441-837× over round-trip |
-| **metalForge mixed** | Same answer on CPU, GPU, NPU — substrate-independent | 29 domains, 38+ checks + PCIe direct |
+| **Pure GPU streaming** | Zero CPU round-trips, data stays on-device | 152 checks, 10+ domains, 441-837× over round-trip (Exp090/105/106) |
+| **metalForge mixed** | Same answer on CPU, GPU, NPU — substrate-independent | 37 domains, 25/25 papers three-tier (Exp103/104) |
 
 **Pure GPU promotion complete** — all 13 formerly CPU-only modules now have GPU
 wrappers (Exp101). Papers 9, 10, 18, 26, 27 are no longer CPU-only. The only
@@ -51,48 +52,48 @@ generic ODE primitive.
 
 | # | Paper | CPU | GPU | metalForge | Gaps |
 |---|-------|:---:|:---:|:----------:|------|
-| 1 | Galaxy/QIIME2 16S | Y | Y | Partial | DADA2, chimera, UniFrac not in MF16 |
+| 1 | Galaxy/QIIME2 16S | Y | Y | Y | DADA2 (Exp104), chimera (Exp103), UniFrac (Exp104) |
 | 2 | asari LC-MS | Y | Y | Y | — |
 | 3 | FindPFAS screening | Y | Y | Y | — |
 | 4 | GPU diversity + spectral | Y | Y | Y | — |
-| 5 | Waters 2008 QS ODE | Y | Y | N | ODE absorbed (ToadStool S41); not in MF16 |
+| 5 | Waters 2008 QS ODE | Y | Y | Y | QS ODE sweep via Exp104 |
 | 6 | Massie 2012 Gillespie | Y | Y | Y | — |
-| 7 | Hsueh 2022 Phage defense | Y | Y | N | Local WGSL ODE (Exp099); exact parity |
-| 8 | Fernandez 2020 Bistable | Y | Y | N | Local WGSL ODE (Exp100); exact parity |
-| 9 | Mhatre 2020 Capacitor | Y | Y | Y | Local WGSL ODE (Exp101); exact parity |
-| 10 | Bruger 2018 Cooperation | Y | Y | Y | Local WGSL ODE (Exp101); exact parity |
+| 7 | Hsueh 2022 Phage defense | Y | Y | Y | Phage ODE via Exp100 (v4) |
+| 8 | Fernandez 2020 Bistable | Y | Y | Y | Bistable ODE via Exp100 (v4) |
+| 9 | Mhatre 2020 Capacitor | Y | Y | Y | Capacitor ODE via Exp103 (v5) |
+| 10 | Bruger 2018 Cooperation | Y | Y | Y | Cooperation ODE via Exp103 (v5) |
 | 11 | Waters 2021 immuno | — | — | — | Reference only |
-| 12 | Srivastava 2011 Multi-signal | Y | Y | N | Local WGSL ODE (Exp100); exact parity |
+| 12 | Srivastava 2011 Multi-signal | Y | Y | Y | Multi-signal ODE via Exp100 (v4) |
 | 13 | Cahill proxy | Y | Y | Y | — |
 | 14 | Smallwood proxy | Y | Y | Y | — |
 | 15 | Liu 2014 HMM | Y | Y | Y | — |
-| 16 | Alamin 2024 Placement | Y | Partial | N | Felsenstein GPU only; placement not in MF |
-| 17 | Liu 2009 SATe | Y | Partial | Partial | NJ, Felsenstein CPU-only in MF |
+| 16 | Alamin 2024 Placement | Y | Y | Y | Felsenstein via Exp104 (placement = Felsenstein per edge) |
+| 17 | Liu 2009 SATe | Y | Y | Y | NJ via Exp103, Felsenstein via Exp104 |
 | 18 | Zheng 2023 DTL | Y | Y | Y | Reconciliation GPU via batch workgroup (Exp101) |
-| 20 | Wang 2021 RAWR | Y | Partial | N | Bootstrap compose; not in MF |
+| 20 | Wang 2021 RAWR | Y | Y | Y | Felsenstein via Exp104 (bootstrap = Felsenstein per replicate) |
 | 21 | Jones PFAS MS | Y | Y | Y | — |
 | 22 | Jones PFAS F&T | Y | Y | Y | — |
 | 24 | Anderson 2017 Population | Y | Y | Y | — |
 | 25 | Moulana 2020 Pangenome | Y | Y | Y | — |
 | 26 | Mateos 2023 Sulfur | Y | Y | Y | DTL + clock GPU (Exp101/103) |
 | 27 | Boden 2024 Phosphorus | Y | Y | Y | DTL + clock GPU (Exp101/103) |
-| 28 | Anderson 2014 Viral | Y | Y | Partial | k-mer not in MF16 |
-| 29 | Anderson 2015 Rare biosphere | Y | Y | Y | PCoA skipped (naga bug) |
+| 28 | Anderson 2014 Viral | Y | Y | Y | K-mer via Exp104 |
+| 29 | Anderson 2015 Rare biosphere | Y | Y | Y | — (PCoA naga bug resolved in wgpu v22.1.0) |
 
-**Full three-tier coverage (CPU + GPU + metalForge):** Papers 2, 3, 4, 6, 9, 10, 13, 14, 15, 18, 21, 22, 24, 25, 26, 27, 29 — **17 of 25 actionable papers**.
-**CPU + GPU (no metalForge):** Papers 1, 5, 7, 8, 12, 16, 17, 20, 28 — 8 papers.
+**Full three-tier coverage (CPU + GPU + metalForge):** All **25 of 25 actionable papers**.
+**CPU + GPU (no metalForge):** None — all actionable papers now have full three-tier coverage.
 **CPU only:** None — all actionable papers have at least CPU + GPU paths.
 
-### Gaps
+### Remaining Exclusions (by design)
 
-| Gap | Papers Affected | Blocker | Priority |
-|-----|--------|---------|----------|
-| ODE models not in metalForge routing | 5, 7, 8, 12 | GPU parity achieved (Write phase + Exp101); metalForge routing pending | Low |
-| k-mer histogram not in metalForge routing | 28 | GPU wrapper done (kmer_gpu, Exp099); metalForge routing pending | Low |
-| PCoA skipped in metalForge | 29 | naga WGSL compiler bug | Low (tracked upstream) |
+| Item | Papers Affected | Reason | Priority |
+|------|--------|--------|----------|
 | Waters 2021 (Paper 11) | — | Reference only — no computational reproduction target | N/A |
 | Liu fungi-bacteria (Paper 19) | — | Manuscript in progress | Watch |
-| Kachkovskiy 2018 (Paper 23) | — | Cross-spring reference; reproduction in groundSpring | N/A |
+
+**Resolved in Phase 31:**
+- PCoA naga bug — fixed in wgpu v22.1.0; `catch_unwind` guards removed; Paper 29 now has full three-tier including PCoA GPU
+- Kachkovskiy 2018 (Paper 23) — validated via cross-spring spectral primitives (Exp107: 25/25 checks)
 
 ---
 
@@ -109,10 +110,10 @@ generic ODE primitive.
 
 | Document | Location | Description |
 |----------|----------|-------------|
-| CONTROL_EXPERIMENT_STATUS.md | `../` | 103 experiments, 2,406+ validation checks |
+| CONTROL_EXPERIMENT_STATUS.md | `../` | 120 experiments, 2,673+ validation checks |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
-| Handoff (v14) | `../wateringHole/handoffs/` | Current ToadStool handoff |
+| Handoff (v18) | `../wateringHole/handoffs/WETSPRING_V018_CROSS_SPRING_REWIRE_HANDOFF_FEB23_2026.md` | Current ToadStool handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |
@@ -156,7 +157,7 @@ generic ODE primitive.
 `../whitePaper/STUDY.md` → `../CONTROL_EXPERIMENT_STATUS.md` → `../barracuda/EVOLUTION_READINESS.md` → BARRACUDA_REQUIREMENTS.md
 
 **Integration partner**:
-`../wateringHole/handoffs/WETSPRING_TOADSTOOL_V14_FEB22_2026.md` → `../BENCHMARK_RESULTS.md`
+`../wateringHole/handoffs/WETSPRING_V018_CROSS_SPRING_REWIRE_HANDOFF_FEB23_2026.md` → `../BENCHMARK_RESULTS.md`
 
 ---
 

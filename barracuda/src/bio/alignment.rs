@@ -66,6 +66,19 @@ const fn score_pair(a: u8, b: u8, params: &ScoringParams) -> i32 {
 ///
 /// Returns the optimal local alignment. Time: O(mn), Space: O(mn).
 /// For GPU promotion, the anti-diagonal wavefront is embarrassingly parallel.
+///
+/// # Examples
+///
+/// ```
+/// use wetspring_barracuda::bio::alignment::{smith_waterman, ScoringParams};
+///
+/// let q = b"ACGTACGT";
+/// let t = b"ACGTACGT";
+/// let result = smith_waterman(q, t, &ScoringParams::default());
+/// assert_eq!(result.score, 16);
+/// assert_eq!(result.aligned_query, q);
+/// assert_eq!(result.aligned_target, t);
+/// ```
 #[must_use]
 #[allow(clippy::cast_possible_wrap, clippy::many_single_char_names)]
 pub fn smith_waterman(query: &[u8], target: &[u8], params: &ScoringParams) -> AlignmentResult {

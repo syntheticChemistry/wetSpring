@@ -128,16 +128,16 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
         // Round-trip GPU
-        let t_rt = Instant::now();
+        let roundtrip_start = Instant::now();
         let mut rt_sh = Vec::with_capacity(n);
         for c in &communities {
             rt_sh.push(diversity_gpu::shannon_gpu(&gpu, c).unwrap());
             let _ = diversity_gpu::simpson_gpu(&gpu, c).unwrap();
         }
-        let rt_us = t_rt.elapsed().as_micros() as f64;
+        let rt_us = roundtrip_start.elapsed().as_micros() as f64;
 
         // Streaming GPU
-        let t_st = Instant::now();
+        let streaming_start = Instant::now();
         let mut st_sh = Vec::with_capacity(n);
         for c in &communities {
             st_sh.push(session.shannon(c).unwrap());
@@ -146,7 +146,7 @@ async fn main() {
         let st_result = session
             .stream_sample(&classifier, &seq_refs, &communities[0], &params)
             .unwrap();
-        let st_us = t_st.elapsed().as_micros() as f64;
+        let st_us = streaming_start.elapsed().as_micros() as f64;
 
         let gpu_vs_cpu = if cpu_us > 0.0 { rt_us / cpu_us } else { 0.0 };
         let str_vs_rt = if rt_us > 0.0 { st_us / rt_us } else { 0.0 };

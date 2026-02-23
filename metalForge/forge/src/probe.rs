@@ -100,22 +100,30 @@ pub fn probe_cpu() -> Substrate {
     }
 }
 
+/// Default device node for `BrainChip` AKD1000 NPU.
+///
+/// Override with `WETSPRING_NPU_DEVICE` for alternate installations.
+const DEFAULT_NPU_DEVICE: &str = "/dev/akida0";
+
 /// Probe for NPU devices.
 ///
-/// Currently discovers `BrainChip` AKD1000 via `/dev/akida0`. This is local
-/// evolution — `ToadStool` doesn't have NPU substrate support yet, so we
-/// probe directly. Once `ToadStool` absorbs NPU dispatch, we lean on that.
+/// Discovers `BrainChip` AKD1000 via device node (default: `/dev/akida0`,
+/// override with `WETSPRING_NPU_DEVICE`). This is local evolution —
+/// `ToadStool` doesn't have NPU substrate support yet, so we probe
+/// directly. Once `ToadStool` absorbs NPU dispatch, we lean on that.
 #[must_use]
 pub fn probe_npus() -> Vec<Substrate> {
     let mut npus = Vec::new();
 
-    let akida_path = std::path::Path::new("/dev/akida0");
+    let npu_device =
+        std::env::var("WETSPRING_NPU_DEVICE").unwrap_or_else(|_| DEFAULT_NPU_DEVICE.to_string());
+    let akida_path = std::path::Path::new(&npu_device);
     if akida_path.exists() {
         npus.push(Substrate {
             kind: SubstrateKind::Npu,
             identity: Identity {
                 name: String::from("BrainChip AKD1000"),
-                device_node: Some(String::from("/dev/akida0")),
+                device_node: Some(npu_device.clone()),
                 ..Identity::named("BrainChip AKD1000")
             },
             properties: Properties::default(),

@@ -12,7 +12,7 @@
 //! using the CPU kernel for exact math parity — matching the pattern used
 //! by `random_forest_gpu` during its pre-absorption phase.
 
-use super::gbm::{self, GbmClassifier, GbmMultiClassifier, GbmMultiPrediction, GbmPrediction};
+use super::gbm::{GbmClassifier, GbmMultiClassifier, GbmMultiPrediction, GbmPrediction};
 use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
 

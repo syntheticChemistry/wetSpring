@@ -137,6 +137,27 @@ pub(crate) type ErrorModel = [[[f64; MAX_QUAL]; NUM_BASES]; NUM_BASES];
 ///
 /// This is the main entry point. Takes abundance-sorted `UniqueSequence`s
 /// (from `bio::derep::dereplicate`) and returns ASVs.
+///
+/// # Examples
+///
+/// ```
+/// use wetspring_barracuda::bio::dada2::{denoise, Dada2Params, Asv};
+/// use wetspring_barracuda::bio::derep::UniqueSequence;
+///
+/// let seqs = vec![
+///     UniqueSequence {
+///         sequence: b"ACGTACGT".to_vec(),
+///         abundance: 100,
+///         best_quality: 30.0,
+///         representative_id: String::new(),
+///         representative_quality: vec![33 + 30; 8],
+///     },
+/// ];
+/// let (asvs, stats) = denoise(&seqs, &Dada2Params::default());
+/// assert_eq!(asvs.len(), 1);
+/// assert_eq!(asvs[0].abundance, 100);
+/// assert_eq!(stats.output_reads, 100);
+/// ```
 #[allow(clippy::cast_precision_loss)]
 #[must_use]
 pub fn denoise(seqs: &[UniqueSequence], params: &Dada2Params) -> (Vec<Asv>, Dada2Stats) {

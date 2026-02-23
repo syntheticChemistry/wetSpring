@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
-**Date:** February 22, 2026
-**Status:** Validation study active — 2,406+/2,406+ checks, 740 tests, 97% bio+io line coverage, 103 experiments
+**Date:** February 23, 2026
+**Status:** Validation study active — 2,673+/2,673+ checks, 750 tests, 97% bio+io line coverage, 120 experiments
 **License:** AGPL-3.0-or-later
 
 ---
@@ -20,7 +20,7 @@
 1. Can published life science algorithms (DADA2, UCHIME, RDP, UniFrac, scipy,
    sklearn) be faithfully reimplemented in pure Rust with documented tolerances?
 
-2. Can those Rust CPU implementations be promoted to GPU via ToadStool/BarraCUDA
+2. Can those Rust CPU implementations be promoted to GPU via ToadStool/BarraCuda
    with math parity, and at what speedup?
 
 3. Can stochastic and dynamical systems models (ODE, Gillespie SSA) be ported
@@ -43,7 +43,7 @@
 ## Evolution Methodology: Write → Absorb → Lean
 
 wetSpring adopts hotSpring's proven absorption cycle for evolving local
-implementations into upstream ToadStool/BarraCUDA primitives:
+implementations into upstream ToadStool/BarraCuda primitives:
 
 1. **Write** — Implement on CPU with WGSL shader templates in `.wgsl` files
 2. **Validate** — Test CPU ↔ GPU parity against Python baselines
@@ -67,9 +67,9 @@ an absorption seam for ToadStool.
 
 | Claim | Evidence |
 |-------|----------|
-| Rust matches Python across 103 experiments | 1,476/1,476 CPU checks + 80 dispatch + 35 layout + 57 transfer/streaming + 39 cross-spring + 10 local WGSL pass |
+| Rust matches Python across 107 experiments | 1,476/1,476 CPU + 80 dispatch + 35 layout + 57 transfer/streaming + 39 cross-spring + 10 local WGSL + 24 MF-v6 + 72 streaming-v2 + 25 spectral cross-spring pass |
 | GPU matches CPU across all 42 GPU modules | 702+/702+ GPU checks pass (incl. 48 all-domain + 58 metalForge v5 + 82 local ODE parity) |
-| BarraCUDA CPU parity across 31+ domains (v1-v8) | 380/380 cross-domain checks pass |
+| BarraCuda CPU parity across 31+ domains (v1-v8) | 380/380 cross-domain checks pass |
 | 926× spectral cosine GPU speedup | Exp016 benchmark |
 | 2.45× full 16S pipeline GPU speedup | Exp015/016 benchmark |
 | 22.5× overall Rust vs Python (25 domains) | Exp059, peak 625× (SW) |
@@ -107,7 +107,7 @@ an absorption seam for ToadStool.
 | Pure GPU 5-stage analytics: 0.1% pipeline overhead | Exp075, 31/31 checks |
 | Cross-substrate GPU→NPU→CPU pipeline profiled | Exp076, 17/17 checks |
 | ToadStool bio rewire: 8 modules lean, 2 bugs fixed | Exp077, 451/451 GPU re-validated |
-| BarraCUDA CPU v7: Tier A layouts lossless | Exp085, 43/43 kmer/UniFrac/taxonomy round-trips |
+| BarraCuda CPU v7: Tier A layouts lossless | Exp085, 43/43 kmer/UniFrac/taxonomy round-trips |
 | metalForge 5-stage pipeline: substrate-independent | Exp086, 45/45 dispatch routing + parity |
 | GPU extended to 16 domains (EIC, PCoA, Kriging, Rarefaction) | Exp087, 50+ GPU checks |
 | PCIe direct transfer: no CPU staging | Exp088, 32/32 buffer contract checks |
@@ -123,8 +123,11 @@ an absorption seam for ToadStool.
 | metalForge v4: 3 local ODE domains + NPU routing + PCIe | Exp100, 28/28 checks, exact parity all ODE domains |
 | Local WGSL Write phase: 5 ODE shaders for ToadStool absorption | phage_defense (4v/11p), bistable (5v/21p), multi_signal (7v/24p), cooperation (4v/13p), capacitor (6v/16p) |
 | Pure GPU promotion: 13 modules, 0 Tier B/C remaining | Exp101: 2 Write + 7 Compose + 3 Passthrough + 1 upgraded |
-| BarraCUDA CPU v8: 175/175 pure Rust math | Exp102: 13 promoted domains analytical validation |
+| BarraCuda CPU v8: 175/175 pure Rust math | Exp102: 13 promoted domains analytical validation |
 | metalForge v5: 29 domains substrate-independent | Exp103: CPU↔GPU parity for all compose and write modules |
+| metalForge v6: 25/25 papers three-tier complete | Exp104: QS ODE + UniFrac + DADA2 + K-mer + Felsenstein through metalForge routing (24/24) |
+| Streaming v2: Bray-Curtis + spectral cosine + full pipeline | Exp105: pre-warmed `GpuPipelineSession` with BC + cosine + chained analytics (27/27) |
+| Streaming ODE + phylo: 6 pre-warmed primitives | Exp106: ODE sweep + phage + bistable + multi-signal + Felsenstein + UniFrac, zero recompilation (45/45) |
 
 ---
 
@@ -174,8 +177,8 @@ an absorption seam for ToadStool.
 
 | Exp | Method | What We Prove |
 |-----|--------|---------------|
-| 043 | BarraCUDA CPU v3 | 45/45 across 18 domains, ~20× over Python |
-| 044 | BarraCUDA GPU v3 | 14/14 SW/Gillespie/DT GPU parity |
+| 043 | BarraCuda CPU v3 | 45/45 across 18 domains, ~20× over Python |
+| 044 | BarraCuda GPU v3 | 14/14 SW/Gillespie/DT GPU parity |
 | 045 | ToadStool bio absorption | 10/10 rewired primitives |
 | 046 | GPU Phylo Composition | FelsensteinGpu → bootstrap + placement (15/15) |
 | 047 | GPU HMM Forward | Local WGSL shader, batch forward log-space (13/13) |
@@ -198,7 +201,7 @@ an absorption seam for ToadStool.
 
 | Exp | Method | What We Prove |
 |-----|--------|---------------|
-| 057 | BarraCUDA CPU v4 (Track 1c) | 44/44 across 5 new domains, pure Rust math |
+| 057 | BarraCuda CPU v4 (Track 1c) | 44/44 across 5 new domains, pure Rust math |
 | 058 | GPU Track 1c promotion | 27/27 ANI + SNP + pangenome + dN/dS GPU parity |
 | 059 | 25-domain Rust vs Python | 22.5× overall speedup, peak 625× |
 | 060 | metalForge cross-substrate | 20/20 CPU↔GPU parity for Track 1c |
@@ -210,11 +213,11 @@ an absorption seam for ToadStool.
 
 | Exp | Method | What We Prove |
 |-----|--------|---------------|
-| 064 | BarraCUDA GPU v1 consolidated | 26/26 all GPU-eligible domains in one binary |
+| 064 | BarraCuda GPU v1 consolidated | 26/26 all GPU-eligible domains in one binary |
 | 065 | metalForge full portfolio | 35/35 CPU↔GPU parity for entire portfolio |
 | 066 | CPU vs GPU scaling (all domains) | Scaling curves across batch sizes |
-| 070 | BarraCUDA CPU full (25 domains) | 50/50 consolidated pure Rust math proof |
-| 071 | BarraCUDA GPU full (11 domains) | 24/24 consolidated GPU portability proof |
+| 070 | BarraCuda CPU full (25 domains) | 50/50 consolidated pure Rust math proof |
+| 071 | BarraCuda GPU full (11 domains) | 24/24 consolidated GPU portability proof |
 | 072 | GPU streaming pipeline | 17/17 pre-warmed FMR, 1.27× streaming speedup |
 | 073 | Dispatch overhead proof | 21/21 streaming beats individual at all batch sizes |
 | 074 | metalForge substrate router | 20/20 GPU↔NPU↔CPU routing with PCIe topology |
@@ -227,7 +230,7 @@ an absorption seam for ToadStool.
 |-----|--------|---------------|
 | 077 | ToadStool bio rewire | 451/451 GPU re-validated after 8-module absorption |
 | 078 | ODE GPU sweep readiness | Flat param APIs (to_flat/from_flat) for 5 ODE modules |
-| 079 | BarraCUDA CPU v6 (ODE flat) | 48/48 bitwise-identical ODE math through flat serialization |
+| 079 | BarraCuda CPU v6 (ODE flat) | 48/48 bitwise-identical ODE math through flat serialization |
 | 080 | metalForge dispatch routing | 35/35 router across 5 substrate configs (live hardware) |
 | 081 | K-mer GPU histogram | Dense 4^k histogram + sorted pairs for GPU dispatch |
 | 082 | UniFrac CSR flat tree | FlatTree with CSR layout + sample matrix for GPU pairwise |
@@ -237,7 +240,7 @@ an absorption seam for ToadStool.
 
 | Exp | Method | What We Prove |
 |-----|--------|---------------|
-| 085 | BarraCUDA CPU v7 (Tier A layouts) | 43/43 kmer histogram, UniFrac CSR, taxonomy int8 round-trip fidelity |
+| 085 | BarraCuda CPU v7 (Tier A layouts) | 43/43 kmer histogram, UniFrac CSR, taxonomy int8 round-trip fidelity |
 | 086 | metalForge pipeline proof | 45/45 five-stage dispatch routing + substrate-independent output |
 | 087 | GPU extended domains | EIC, PCoA, Kriging, Rarefaction added to GPU suite |
 | 088 | PCIe direct transfer proof | 32/32 GPU→NPU, NPU→GPU, GPU→GPU without CPU staging |
@@ -253,6 +256,17 @@ an absorption seam for ToadStool.
 |-----|--------|---------------|
 | 099 | CPU vs GPU expanded | kmer_gpu, unifrac_gpu, phage_defense_gpu (local WGSL 4v/11p), metalForge GPU→CPU→GPU |
 | 100 | metalForge cross-substrate v4 | 28/28: bistable (5v/21p) + multi_signal (7v/24p) exact parity, NPU routing, GPU→GPU→CPU |
+
+### Pure GPU Promotion + metalForge v6 + Streaming v2 (Phase 28-30)
+
+| Exp | Method | What We Prove |
+|-----|--------|---------------|
+| 101 | Pure GPU promotion (13 modules) | 38/38: 2 Write + 7 Compose + 3 Passthrough, 0 Tier B/C remaining |
+| 102 | BarraCuda CPU v8 | 175/175: 13 promoted domains analytical validation |
+| 103 | metalForge v5 (29 domains) | 38/38: all compose + write modules substrate-independent |
+| 104 | metalForge v6 (25/25 papers) | 24/24: QS ODE + UniFrac + DADA2 + K-mer + Felsenstein through metalForge routing |
+| 105 | Pure GPU streaming v2 (analytics) | 27/27: alpha div + Bray-Curtis + spectral cosine + full chained pipeline |
+| 106 | Streaming ODE + phylogenetics | 45/45: 6 pre-warmed primitives, multi-dispatch, zero shader recompilation |
 
 ### Track 2: Analytical Chemistry (LC-MS, PFAS)
 
@@ -291,10 +305,10 @@ cross-substrate validated (Exp060: 20/20 CPU↔GPU parity).
 ## Relationship to ecoPrimals
 
 wetSpring is one of several **Springs** — validation targets that prove
-algorithms can be ported from interpreted languages to BarraCUDA/ToadStool:
+algorithms can be ported from interpreted languages to BarraCuda/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34+ WGSL shaders, active Write phase)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (5 local WGSL + 30 ToadStool primitives, 42 GPU modules, 740 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (5 local WGSL + 30 ToadStool primitives, 42 GPU modules, 750 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **archive/handoffs/** — Fossil record of ToadStool handoffs (v1–v7)
 
@@ -318,7 +332,7 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` files |
-| Provenance headers | All 93 validation/benchmark binaries |
+| Provenance headers | All 109 validation/benchmark binaries |
 
 ## metalForge — Hardware Discovery
 

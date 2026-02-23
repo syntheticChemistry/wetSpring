@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-22 (Phase 28: 103 experiments, pure GPU promotion complete, 0 Tier B/C)
+**Updated**: 2026-02-22 (Phase 28: 120 experiments, pure GPU promotion complete, 0 Tier B/C)
 
 ---
 
@@ -239,9 +239,9 @@ thresholds from `src/tolerances.rs`.
 | `validate_barracuda_cpu_v8` | 102 | 175 | `cargo run --release --bin validate_barracuda_cpu_v8` |
 | `validate_metalforge_v5` | 103 | 58 | `cargo run --features gpu --bin validate_metalforge_v5` |
 
-**Total validation checks**: 2,406+ (1,476 CPU + 702 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 39 cross-spring + 10 local WGSL + 7 expanded)
-**Rust tests**: 740 (666 lib + 60 integration + 14 doc)
-**Binaries**: 85 validate + 8 benchmark = 93 total
+**Total validation checks**: 2,673+ (1,476 CPU + 702 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 39 cross-spring + 10 local WGSL + 7 expanded)
+**Rust tests**: 750 (676 lib + 60 integration + 14 doc)
+**Binaries**: 101 validate + 8 benchmark = 109 total
 **ToadStool primitives**: 30 consumed (Lean)
 **Local WGSL shaders**: 5 ODE (phage_defense, bistable, multi_signal, cooperation, capacitor)
 **GPU modules**: 42 total (27 Lean + 5 Write + 7 Compose + 3 Passthrough)

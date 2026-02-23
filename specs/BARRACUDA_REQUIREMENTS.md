@@ -1,13 +1,13 @@
 # wetSpring — BarraCuda Requirements
 
-**Last Updated**: February 22, 2026
+**Last Updated**: February 23, 2026
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---
 
 ## Current Kernel Usage (Validated)
 
-### Rust CPU Modules (41 modules, 740 tests, ~97% bio+io coverage)
+### Rust CPU Modules (41 modules, 750 tests, ~97% bio+io coverage)
 
 | Module Domain | Modules | Status |
 |--------------|---------|--------|
@@ -122,9 +122,9 @@ DONE                                     DONE                              GOAL
 Python baseline (40 scripts)  ────────→  Rust CPU parity (380/380) ────→  ✓ DONE (v1–v8)
 GPU diversity (38/38)         ────────→  GPU Parity (29 domains)  ──────→  ✓ DONE (Exp101)
 GPU pipeline (88/88)          ────────→  GPU RF inference (13/13) ──────→  NPU for low-power inference
-CPU 22.5× faster than Python  ────────→  GPU math PROVEN portable ─────→  Scale via streaming
+CPU 22.5× faster than Python  ────────→  GPU math PROVEN portable ─────→  Streaming v2: 10 domains (Exp105+106)
 12 shaders absorbed (S31d/g + S39-41) ─→  42 GPU modules + 5 local ────→  Full Write→Absorb→Lean cycle
-29 GPU domains validated      ────────→  metalForge PROVEN (Exp103) ───→  CPU/GPU/NPU routing
+37 MF domains validated       ────────→  metalForge PROVEN (Exp104) ───→  ✓ 25/25 papers three-tier
 ```
 
 ---

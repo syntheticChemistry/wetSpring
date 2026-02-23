@@ -86,7 +86,6 @@ fn convert_tree(tree: &TreeNode, mu: f64) -> TreeConversion {
         il: &mut Vec<bool>,
     ) -> usize {
         let my_idx = lc.len();
-        // Placeholder — fill children later
         lc.push(-1);
         rc.push(-1);
         bl.push(parent_branch);

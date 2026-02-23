@@ -11,10 +11,6 @@
 //! encoded split comparisons when tree counts are large enough to justify
 //! GPU dispatch.
 
-use barracuda::device::WgpuDevice;
-use barracuda::ops::bio::pairwise_hamming::PairwiseHammingGpu;
-use std::sync::Arc;
-
 use super::robinson_foulds;
 use crate::bio::unifrac::tree::PhyloTree;
 use crate::error::{Error, Result};

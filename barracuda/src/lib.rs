@@ -4,9 +4,12 @@
 #![warn(missing_docs, clippy::pedantic, clippy::nursery)]
 #![allow(
     clippy::module_name_repetitions,
+    // GPU interop requires pervasive usize↔u32↔f64 conversion (wgpu APIs
+    // use u32 for buffer sizes, dispatch counts; f64 for scientific values).
+    // Individual modules add targeted #[allow] where precision loss is
+    // asserted safe by domain constraints (e.g., n_samples < 2^32).
     clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
-    clippy::similar_names
+    clippy::cast_sign_loss
 )]
 //! wetSpring `BarraCuda` — Life Science + PFAS Analytical Chemistry Pipelines
 //!

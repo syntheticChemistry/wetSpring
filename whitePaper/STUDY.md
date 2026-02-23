@@ -18,7 +18,7 @@ and mathematical biology (Track 1b), deep-sea metagenomics and microbial
 evolution (Track 1c), and PFAS detection via LC-MS (Track 2),
 validating 83 Rust modules (41 CPU + 42 GPU) against baselines from Galaxy,
 QIIME2, asari, FindPFAS, scipy, sklearn, dendropy, real NCBI SRA data, and
-published paper models with 2,406+ quantitative checks across 103 experiments
+published paper models with 2,673+ quantitative checks across 120 experiments
 — all passing. The pipeline proves substrate independence: math produces
 identical results on CPU and GPU, validated via metalForge cross-substrate
 checks (Exp060). Random Forest ensemble and Gradient Boosting Machine
@@ -54,7 +54,7 @@ This study asks whether:
 - Consumer GPU hardware (NVIDIA RTX 4070, $549) can accelerate the
   most compute-intensive stages at full f64 precision
 - The same math produces identical results on CPU and GPU, proving
-  that BarraCUDA solves math and ToadStool solves hardware
+  that BarraCuda solves math and ToadStool solves hardware
 
 ### 1.1 Relationship to hotSpring
 
@@ -69,7 +69,7 @@ chemistry:
 | Baseline | Python scipy | Galaxy/QIIME2 | asari/PFΔScreen |
 | GPU layer | ToadStool (wgpu) | ToadStool (wgpu) | ToadStool (wgpu) |
 | Success metric | chi² match | Same taxonomy | Same PFAS detected |
-| Checks | 418/418 | 2,406+/2,406+ | (included in 2,406+) |
+| Checks | 418/418 | 2,673+/2,673+ | (included in 2,673+) |
 
 Both prove the ecoPrimals thesis: sovereign compute on consumer hardware
 can replicate institutional results, then exceed them via Rust + GPU.
@@ -284,8 +284,8 @@ DADA2 avoids this entirely by precomputing transcendentals on CPU.
 | Tier | Implementation | Total Time | Per-Sample | vs Galaxy |
 |------|---------------|-----------|------------|-----------|
 | Galaxy/Python | QIIME2 + DADA2-R + Docker | 95.6 s | 9.56 s | baseline |
-| BarraCUDA CPU | Pure Rust, 1 binary | 7.3 s | 0.73 s | **13.1×** |
-| BarraCUDA GPU | Rust + ToadStool (RTX 4070) | **3.0 s** | **0.30 s** | **31.9×** |
+| BarraCuda CPU | Pure Rust, 1 binary | 7.3 s | 0.73 s | **13.1×** |
+| BarraCuda GPU | Rust + ToadStool (RTX 4070) | **3.0 s** | **0.30 s** | **31.9×** |
 
 **Per-stage CPU vs GPU:**
 
@@ -425,7 +425,7 @@ FASTQ → quality filter → adapter trim → paired-end merge
   → diversity metrics → UniFrac distance → PCoA ordination
 ```
 
-Each stage has unit tests (740 total, 97% bio+io line coverage), end-to-end
+Each stage has unit tests (750 total, 97% bio+io line coverage), end-to-end
 validation against Galaxy baselines, GPU math parity checks, and
 determinism tests ensuring identical output across runs.
 
@@ -464,12 +464,12 @@ inventory, RAPL CPU energy monitoring, nvidia-smi GPU power/temperature
 sampling, and JSON output — enabling reproducible cross-tier comparisons
 without external profiling tools.
 
-### 4.3 BarraCUDA solves math, ToadStool solves hardware
+### 4.3 BarraCuda solves math, ToadStool solves hardware
 
-The central architectural finding: separating math (BarraCUDA) from
+The central architectural finding: separating math (BarraCuda) from
 hardware dispatch (ToadStool) enables clean validation and optimization.
 
-**BarraCUDA solves math.** The same algorithms produce identical results
+**BarraCuda solves math.** The same algorithms produce identical results
 on CPU and GPU. 88/88 parity checks prove: same ASV counts, same reads,
 same taxonomy, same diversity metrics. The math is hardware-independent.
 
@@ -573,7 +573,7 @@ tolerance constants in `tolerances.rs` (43 total) ensure all validation
 thresholds are scientifically justified and ready for cross-Spring adoption.
 
 Full absorption map: `barracuda/EVOLUTION_READINESS.md`.
-Handoffs: `../wateringHole/handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md` (original),
+Handoffs: `../wateringHole/handoffs/WETSPRING_V018_CROSS_SPRING_REWIRE_HANDOFF_FEB23_2026.md` (original),
 `wateringHole/handoffs/WETSPRING_TOADSTOOL_REWIRE_FEB22_2026.md` (rewire results).
 
 ---
@@ -586,7 +586,7 @@ repository (AGPL-3.0). No institutional access required.
 ```bash
 # Run all CPU validations (1,476+ checks)
 cd barracuda
-cargo test --release          # 740 tests (666 lib + 60 integration + 14 doc)
+cargo test --release          # 750 tests (676 lib + 60 integration + 14 doc)
 cargo run --release --bin validate_fastq
 cargo run --release --bin validate_diversity
 cargo run --release --bin validate_mzml

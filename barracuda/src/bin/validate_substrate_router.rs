@@ -166,7 +166,9 @@ async fn main() {
     }
 
     let gpu_available = gpu.as_ref().is_some_and(|g| g.has_f64);
-    let npu_available = std::path::Path::new("/dev/akida0").exists();
+    let npu_device =
+        std::env::var("WETSPRING_NPU_DEVICE").unwrap_or_else(|_| String::from("/dev/akida0"));
+    let npu_available = std::path::Path::new(&npu_device).exists();
     let ada_lovelace = gpu_available;
 
     let router = SubstrateRouter::new(gpu_available, npu_available, ada_lovelace);
@@ -414,18 +416,26 @@ async fn main() {
     // ═══════════════════════════════════════════════════════════════════
     v.section("PCIe Topology");
 
-    let titan_v_exists = std::path::Path::new("/sys/bus/pci/devices/0000:05:00.0").exists();
-    let rtx_4070_exists = std::path::Path::new("/sys/bus/pci/devices/0000:01:00.0").exists();
+    let pci_gpu_slots: Vec<String> = std::env::var("WETSPRING_GPU_PCI_SLOTS")
+        .unwrap_or_else(|_| String::from("0000:05:00.0,0000:01:00.0"))
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .collect();
+    let pci_gpus_found: Vec<bool> = pci_gpu_slots
+        .iter()
+        .map(|slot| std::path::Path::new(&format!("/sys/bus/pci/devices/{slot}")).exists())
+        .collect();
     let akd1000_exists = npu_available;
 
     println!("  PCIe device map:");
-    println!("    RTX 4070 (01:00.0): {rtx_4070_exists}");
-    println!("    Titan V  (05:00.0): {titan_v_exists}");
-    println!("    AKD1000  (08:00.0): {akd1000_exists}");
+    for (slot, found) in pci_gpu_slots.iter().zip(&pci_gpus_found) {
+        println!("    GPU ({slot}): {found}");
+    }
+    println!("    NPU (AKD1000): {akd1000_exists}");
 
     v.check(
         "PCIe: at least one GPU detected",
-        f64::from(u8::from(rtx_4070_exists || titan_v_exists || gpu_available)),
+        f64::from(u8::from(pci_gpus_found.iter().any(|&f| f) || gpu_available)),
         1.0,
         0.0,
     );

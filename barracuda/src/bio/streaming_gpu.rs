@@ -56,6 +56,7 @@ use crate::bio::taxonomy::{
 use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
 use crate::io::fastq::FastqRecord;
+use barracuda::ops::bray_curtis_f64::BrayCurtisF64;
 use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
 use std::collections::HashSet;
 use std::time::Instant;
@@ -70,6 +71,7 @@ pub struct GpuPipelineSession {
     dada2: Dada2Gpu,
     fmr: FusedMapReduceF64,
     gemm: GemmCached,
+    bc: BrayCurtisF64,
     /// GPU warmup time in milliseconds.
     pub warmup_ms: f64,
 }
@@ -93,7 +95,9 @@ impl GpuPipelineSession {
         let dada2 = Dada2Gpu::new(device.clone())?;
         let fmr = FusedMapReduceF64::new(device.clone())
             .map_err(|e| Error::Gpu(format!("FMR init: {e}")))?;
-        let gemm = GemmCached::new(device, ctx);
+        let gemm = GemmCached::new(device.clone(), ctx);
+        let bc = BrayCurtisF64::new(device)
+            .map_err(|e| Error::Gpu(format!("BrayCurtisF64 init: {e}")))?;
 
         // Prime driver caches with tiny dispatches
         let _ = fmr.sum(&[1.0, 2.0, 3.0]);
@@ -106,6 +110,7 @@ impl GpuPipelineSession {
             dada2,
             fmr,
             gemm,
+            bc,
             warmup_ms,
         })
     }
@@ -349,6 +354,84 @@ impl GpuPipelineSession {
         Ok(results)
     }
 
+    // ── Bray-Curtis: pre-warmed pipeline ───────────────────────────────
+
+    /// All-pairs Bray-Curtis distance matrix via pre-warmed pipeline.
+    ///
+    /// Returns condensed upper-triangle: `n*(n-1)/2` distances.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if GPU dispatch or readback fails.
+    pub fn bray_curtis_matrix(&self, samples: &[&[f64]]) -> Result<Vec<f64>> {
+        let n = samples.len();
+        if n < 2 {
+            return Ok(vec![]);
+        }
+        let d = samples[0].len();
+        let flat: Vec<f64> = samples.iter().flat_map(|s| s.iter().copied()).collect();
+        self.bc
+            .condensed_distance_matrix(&flat, n, d)
+            .map_err(|e| Error::Gpu(format!("Bray-Curtis stream: {e}")))
+    }
+
+    // ── Spectral cosine: GEMM + FMR norms ───────────────────────────────
+
+    /// Pairwise cosine similarity matrix via pre-warmed GEMM + FMR.
+    ///
+    /// Returns condensed upper-triangle: `n*(n-1)/2` similarities.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if GPU dispatch fails.
+    #[allow(clippy::cast_precision_loss)]
+    pub fn spectral_cosine_matrix(&self, spectra: &[&[f64]]) -> Result<Vec<f64>> {
+        let n = spectra.len();
+        if n < 2 {
+            return Ok(vec![]);
+        }
+        let d = spectra[0].len();
+        let flat: Vec<f64> = spectra.iter().flat_map(|s| s.iter().copied()).collect();
+
+        // Transpose for GEMM: A[N×D] × A^T[D×N] = dot_products[N×N]
+        let mut flat_t = vec![0.0_f64; d * n];
+        for i in 0..n {
+            for j in 0..d {
+                flat_t[j * n + i] = flat[i * d + j];
+            }
+        }
+
+        let dot_matrix = self
+            .gemm
+            .execute(&flat, &flat_t, n, d, n, 1)
+            .map_err(|e| Error::Gpu(format!("spectral GEMM: {e}")))?;
+
+        // Norms via FMR sum_of_squares (pre-warmed)
+        let mut norms = Vec::with_capacity(n);
+        for i in 0..n {
+            let sq_sum = self
+                .fmr
+                .sum_of_squares(&flat[i * d..(i + 1) * d])
+                .map_err(|e| Error::Gpu(format!("norm FMR: {e}")))?;
+            norms.push(sq_sum.sqrt());
+        }
+
+        // Condensed cosine similarity
+        let mut condensed = Vec::with_capacity(n * (n - 1) / 2);
+        for i in 0..n {
+            for j in (i + 1)..n {
+                let denom = norms[i] * norms[j];
+                let cos = if denom > 1e-15 {
+                    dot_matrix[i * n + j] / denom
+                } else {
+                    0.0
+                };
+                condensed.push(cos.clamp(0.0, 1.0));
+            }
+        }
+        Ok(condensed)
+    }
+
     // ── Streaming session: taxonomy + diversity in one call ──────────────
 
     /// Run taxonomy + diversity on GPU in a single streaming session.
@@ -394,6 +477,110 @@ impl GpuPipelineSession {
             total_gpu_ms,
         })
     }
+
+    // ── Extended streaming: full analytics pipeline ────────────────────
+
+    /// Run taxonomy + diversity + Bray-Curtis in a single streaming session.
+    ///
+    /// Chains: GEMM taxonomy → FMR diversity → `BrayCurtisF64` beta diversity.
+    /// All use pre-warmed pipelines — zero shader recompilation.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if GPU dispatch fails for any stage.
+    #[allow(clippy::cast_precision_loss)]
+    pub fn stream_full_analytics(
+        &self,
+        classifier: &NaiveBayesClassifier,
+        sequences: &[&[u8]],
+        sample_counts: &[&[f64]],
+        params: &ClassifyParams,
+    ) -> Result<FullStreamingResult> {
+        let session_start = Instant::now();
+
+        // Stage 1: taxonomy
+        let tax_start = Instant::now();
+        let classifications = self.classify_batch(classifier, sequences, params)?;
+        let taxonomy_ms = tax_start.elapsed().as_secs_f64() * 1000.0;
+
+        // Stage 2: per-sample alpha diversity
+        let div_start = Instant::now();
+        let mut alpha = Vec::with_capacity(sample_counts.len());
+        for counts in sample_counts {
+            let shannon = if counts.len() < 2 {
+                0.0
+            } else {
+                self.shannon(counts)?
+            };
+            let simpson = if counts.len() < 2 {
+                0.0
+            } else {
+                self.simpson(counts)?
+            };
+            let observed = if counts.is_empty() {
+                0.0
+            } else {
+                self.observed_features(counts)?
+            };
+            alpha.push(AlphaDiversity {
+                shannon,
+                simpson,
+                observed,
+            });
+        }
+        let diversity_ms = div_start.elapsed().as_secs_f64() * 1000.0;
+
+        // Stage 3: Bray-Curtis beta diversity (if ≥ 2 samples)
+        let bc_start = Instant::now();
+        let bray_curtis = if sample_counts.len() >= 2 {
+            self.bray_curtis_matrix(sample_counts)?
+        } else {
+            vec![]
+        };
+        let bray_curtis_ms = bc_start.elapsed().as_secs_f64() * 1000.0;
+
+        let total_ms = session_start.elapsed().as_secs_f64() * 1000.0;
+
+        Ok(FullStreamingResult {
+            classifications,
+            alpha,
+            bray_curtis,
+            taxonomy_ms,
+            diversity_ms,
+            bray_curtis_ms,
+            total_ms,
+        })
+    }
+}
+
+/// Per-sample alpha diversity metrics.
+#[derive(Debug)]
+pub struct AlphaDiversity {
+    /// Shannon entropy.
+    pub shannon: f64,
+    /// Simpson diversity (1 - dominance).
+    pub simpson: f64,
+    /// Observed species count.
+    pub observed: f64,
+}
+
+/// Results from the full streaming analytics pipeline.
+#[derive(Debug)]
+pub struct FullStreamingResult {
+    /// Per-read taxonomy classifications.
+    pub classifications: Vec<Classification>,
+    /// Per-sample alpha diversity.
+    pub alpha: Vec<AlphaDiversity>,
+    /// Condensed Bray-Curtis distance matrix.
+    pub bray_curtis: Vec<f64>,
+    /// Taxonomy stage time in milliseconds.
+    pub taxonomy_ms: f64,
+    /// Diversity stage time in milliseconds.
+    pub diversity_ms: f64,
+    /// Bray-Curtis stage time in milliseconds.
+    pub bray_curtis_ms: f64,
+    /// Total pipeline time in milliseconds.
+    pub total_ms: f64,
 }
 
 /// Results from the streaming GPU pipeline.

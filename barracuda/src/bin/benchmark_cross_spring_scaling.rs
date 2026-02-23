@@ -5,6 +5,7 @@
     clippy::too_many_lines,
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
+    clippy::cast_possible_wrap,
     clippy::similar_names
 )]
 //! Exp095: Cross-Spring Scaling Benchmark
@@ -33,11 +34,7 @@
 //! | `FusedMapReduceF64` | hotSpring | Session 18 | wetSpring, neuralSpring |
 //! | `GemmF64` | wetSpring (60×) | Session 18 | hotSpring HFB |
 
-use barracuda::ops::bio::batch_fitness::BatchFitnessGpu;
-use barracuda::ops::bio::locus_variance::LocusVarianceGpu;
-use barracuda::ops::bio::pairwise_hamming::PairwiseHammingGpu;
-use barracuda::ops::bio::pairwise_jaccard::PairwiseJaccardGpu;
-use barracuda::ops::bio::spatial_payoff::SpatialPayoffGpu;
+use barracuda::{BatchFitnessGpu, LocusVarianceGpu, PairwiseHammingGpu, PairwiseJaccardGpu, SpatialPayoffGpu};
 use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
 use barracuda::ops::linalg::gemm_f64::GemmF64;
 use std::time::Instant;
@@ -176,7 +173,7 @@ async fn main() {
         let benefit: f32 = 3.0;
         let cost: f32 = 1.0;
         let n = (grid_size * grid_size) as usize;
-        let grid: Vec<u32> = (0..n).map(|i| (i % 3 == 0) as u32).collect();
+        let grid: Vec<u32> = (0..n).map(|i| u32::from(i % 3 == 0)).collect();
 
         let tc = Instant::now();
         cpu_spatial_payoff(&grid, grid_size as usize, benefit, cost);
@@ -247,7 +244,7 @@ async fn main() {
         });
         let fit_buf = d.create_buffer(&wgpu::BufferDescriptor {
             label: None,
-            size: (pop_size * 4) as u64,
+            size: u64::from(pop_size * 4),
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
             mapped_at_creation: false,
         });
@@ -292,7 +289,7 @@ async fn main() {
         });
         let var_buf = d.create_buffer(&wgpu::BufferDescriptor {
             label: None,
-            size: (n_loci * 4) as u64,
+            size: u64::from(n_loci * 4),
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
             mapped_at_creation: false,
         });
@@ -344,30 +341,27 @@ async fn main() {
             tg.elapsed().as_micros() as f64
         }));
 
-        match gpu_result {
-            Ok(gpu_us) => {
-                let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
-                println!("  CPU: {cpu_us:.0} µs | GPU: {gpu_us:.0} µs | Speedup: {speedup:.1}×");
-                results.push(BenchResult {
-                    primitive: "FusedMapReduce(Shannon)",
-                    evolved_by: "hotSpring",
-                    problem_size: "100K f64".to_string(),
-                    cpu_us,
-                    gpu_us,
-                    speedup,
-                });
-            }
-            Err(_) => {
-                println!("  SKIP: driver issue");
-                results.push(BenchResult {
-                    primitive: "FusedMapReduce(Shannon)",
-                    evolved_by: "hotSpring",
-                    problem_size: "100K f64".to_string(),
-                    cpu_us,
-                    gpu_us: 0.0,
-                    speedup: 0.0,
-                });
-            }
+        if let Ok(gpu_us) = gpu_result {
+            let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
+            println!("  CPU: {cpu_us:.0} µs | GPU: {gpu_us:.0} µs | Speedup: {speedup:.1}×");
+            results.push(BenchResult {
+                primitive: "FusedMapReduce(Shannon)",
+                evolved_by: "hotSpring",
+                problem_size: "100K f64".to_string(),
+                cpu_us,
+                gpu_us,
+                speedup,
+            });
+        } else {
+            println!("  SKIP: driver issue");
+            results.push(BenchResult {
+                primitive: "FusedMapReduce(Shannon)",
+                evolved_by: "hotSpring",
+                problem_size: "100K f64".to_string(),
+                cpu_us,
+                gpu_us: 0.0,
+                speedup: 0.0,
+            });
         }
     }
 
@@ -391,30 +385,27 @@ async fn main() {
             tg.elapsed().as_micros() as f64
         }));
 
-        match gpu_result {
-            Ok(gpu_us) => {
-                let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
-                println!("  CPU: {cpu_us:.0} µs | GPU: {gpu_us:.0} µs | Speedup: {speedup:.1}×");
-                results.push(BenchResult {
-                    primitive: "GemmF64 (256×256)",
-                    evolved_by: "wetSpring",
-                    problem_size: "256×256 f64 matmul".to_string(),
-                    cpu_us,
-                    gpu_us,
-                    speedup,
-                });
-            }
-            Err(_) => {
-                println!("  SKIP: driver issue");
-                results.push(BenchResult {
-                    primitive: "GemmF64 (256×256)",
-                    evolved_by: "wetSpring",
-                    problem_size: "256×256 f64".to_string(),
-                    cpu_us,
-                    gpu_us: 0.0,
-                    speedup: 0.0,
-                });
-            }
+        if let Ok(gpu_us) = gpu_result {
+            let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
+            println!("  CPU: {cpu_us:.0} µs | GPU: {gpu_us:.0} µs | Speedup: {speedup:.1}×");
+            results.push(BenchResult {
+                primitive: "GemmF64 (256×256)",
+                evolved_by: "wetSpring",
+                problem_size: "256×256 f64 matmul".to_string(),
+                cpu_us,
+                gpu_us,
+                speedup,
+            });
+        } else {
+            println!("  SKIP: driver issue");
+            results.push(BenchResult {
+                primitive: "GemmF64 (256×256)",
+                evolved_by: "wetSpring",
+                problem_size: "256×256 f64".to_string(),
+                cpu_us,
+                gpu_us: 0.0,
+                speedup: 0.0,
+            });
         }
     }
 

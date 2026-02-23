@@ -2,7 +2,6 @@
 #![allow(
     clippy::expect_used,
     clippy::unwrap_used,
-    clippy::too_many_lines,
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
     clippy::similar_names
@@ -598,7 +597,7 @@ fn validate_molecular_clock_mf(
     let parent_indices: Vec<i64> = vec![-1, 0, 0, 1, 1];
     let parent_opt: Vec<Option<usize>> = parent_indices
         .iter()
-        .map(|&p| if p < 0 { None } else { Some(p as usize) })
+        .map(|&p| u64::try_from(p).ok().map(|u| u as usize))
         .collect();
     let root_age = 100.0;
 

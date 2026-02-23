@@ -8,7 +8,7 @@
 //! the core building block for Weir-Cockerham FST estimation.
 
 use barracuda::device::WgpuDevice;
-use barracuda::ops::bio::locus_variance::LocusVarianceGpu;
+use barracuda::LocusVarianceGpu;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
@@ -80,16 +80,14 @@ impl LocusVarianceGpuWrapper {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;
 
     #[tokio::test]
     async fn locus_variance_uniform_is_zero() {
-        let gpu = match GpuF64::new().await {
-            Ok(g) => g,
-            Err(_) => return,
-        };
+        let Ok(gpu) = GpuF64::new().await else { return };
         let device = gpu.to_wgpu_device();
         let lv = LocusVarianceGpuWrapper::new(&device);
 
@@ -104,6 +102,6 @@ mod tests {
         let result = lv.compute(&freqs, 3, 2).expect("locus variance");
         assert_eq!(result.len(), 2);
         assert!(result[0].abs() < 1e-5, "uniform locus should be 0");
-        assert!((result[1] - 0.10666667).abs() < 1e-4);
+        assert!((result[1] - 0.106_666_67).abs() < 1e-4);
     }
 }

@@ -2,7 +2,7 @@
 
 **Date:** February 22, 2026
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 41 CPU + 42 GPU modules, 5 local WGSL shaders (Write phase), 30 ToadStool primitives consumed, 740+ tests, 103 experiments, 2,406+ checks
+**Status:** 41 CPU + 42 GPU modules, 5 local WGSL shaders (Write phase), 30 ToadStool primitives consumed, 750 tests, 120 experiments, 2,673+ checks
 
 ### Pure GPU Promotion Complete: 0 Tier B/C remaining
 
@@ -397,9 +397,9 @@ no parallelism benefit) and `fastq_parsing` (I/O-bound).
 | WGSL pattern | `pub const WGSL: &str` inline | `include_str!("../shaders/...")` |
 | metalForge | GPU + NPU hardware characterization | GPU + NPU + cross-substrate validation |
 | Handoffs | `../wateringHole/handoffs/` (16+ docs) | `archive/handoffs/` (consolidated) |
-| Tests | 454 | 740 |
-| Validation | 418 checks | 2,406+ checks |
-| Experiments | 31 suites | 103 experiments |
+| Tests | 454 | 750 |
+| Validation | 418 checks | 2,673+ checks |
+| Experiments | 31 suites | 120 experiments |
 | Line coverage | — | 97% bio+io (55% overall) |
 | Pipeline caching | Upstream (ToadStool native) | Local (Exp068, 38% overhead reduction) |
 | Three-tier proof | CPU→GPU→NPU | Python→CPU→GPU→NPU (Exp069) |

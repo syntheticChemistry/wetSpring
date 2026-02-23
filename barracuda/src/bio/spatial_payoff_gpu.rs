@@ -8,7 +8,7 @@
 //! and evolutionary game theory fitness landscapes.
 
 use barracuda::device::WgpuDevice;
-use barracuda::ops::bio::spatial_payoff::SpatialPayoffGpu;
+use barracuda::SpatialPayoffGpu;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
@@ -92,16 +92,14 @@ impl SpatialPayoffGpuWrapper {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;
 
     #[tokio::test]
     async fn spatial_payoff_all_cooperators() {
-        let gpu = match GpuF64::new().await {
-            Ok(g) => g,
-            Err(_) => return,
-        };
+        let Ok(gpu) = GpuF64::new().await else { return };
         let device = gpu.to_wgpu_device();
         let sp = SpatialPayoffGpuWrapper::new(&device);
 

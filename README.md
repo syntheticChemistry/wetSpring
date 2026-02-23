@@ -1,12 +1,12 @@
 # wetSpring — Life Science & Analytical Chemistry Validation
 
 **An ecoPrimals Spring** — life science biome evolving Rust implementations
-and GPU shaders for ToadStool/BarraCUDA absorption. Follows the
+and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 **Write → Absorb → Lean** cycle adopted from hotSpring.
 
-**Date:** February 22, 2026
+**Date:** February 23, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 28 — Pure GPU promotion complete (0 Tier B/C remaining), 5 local WGSL ODE shaders (Write phase), metalForge v5 (29 domains); 740 tests, 103 experiments, 2,406+ checks
+**Status:** Phase 34 — Cross-spring rewire + evolution benchmark; 16 bio imports modernized to ToadStool S42 root re-exports, cross-spring shader provenance documented (612 WGSL: 35 hotSpring, 22 wetSpring, 14 neuralSpring, 5 airSpring); 750 tests, 120 experiments, 2,673+ checks
 
 ---
 
@@ -14,7 +14,7 @@ and GPU shaders for ToadStool/BarraCUDA absorption. Follows the
 
 wetSpring validates the entire evolution path from interpreted-language
 scientific computing (Python/numpy/scipy/sklearn) to sovereign Rust CPU
-implementations, and then to GPU acceleration via ToadStool/BarraCUDA:
+implementations, and then to GPU acceleration via ToadStool/BarraCuda:
 
 ```
 Python baseline → Rust CPU validation → GPU acceleration → metalForge cross-substrate
@@ -34,7 +34,7 @@ Four tracks cover the life science and environmental monitoring domains:
 ## Evolution Architecture: Write → Absorb → Lean
 
 wetSpring follows hotSpring's proven absorption cycle. Springs are biomes;
-ToadStool/BarraCUDA is the fungus present in every biome. Springs don't
+ToadStool/BarraCuda is the fungus present in every biome. Springs don't
 import each other — they lean on ToadStool independently.
 
 ```
@@ -53,6 +53,7 @@ WGSL          known physics   handoffs/                        delete local
 | **Compose** | 7 | GPU wrappers wiring ToadStool primitives (kmd, merge_pairs, robinson_foulds, derep, neighbor_joining, reconciliation, molecular_clock) |
 | **Passthrough** | 3 | Accept GPU buffers, CPU kernel (gbm, feature_table, signal) |
 | **Write** | 5 | Local WGSL ODE shaders (phage_defense, bistable, multi_signal, cooperation, capacitor) |
+| **NPU** | 1 | ESN reservoir computing → int8 quantization → NPU deployment (esn) |
 | **Tier B** | 0 | All promoted |
 | **Tier C** | 0 | All promoted |
 
@@ -97,24 +98,28 @@ integration point.
 | Dispatch validation checks | 80 |
 | Layout fidelity checks | 35 |
 | Transfer/streaming checks | 57 |
-| **Total validation checks** | **2,406+** |
-| Rust library unit tests | 666 + 74 integration/doc |
-| **Total Rust tests** | **740** |
-| Experiments completed | 103 |
-| Validation/benchmark binaries | 85 validate + 8 benchmark = 93 total |
+| metalForge v6 three-tier | 24 (25/25 papers complete) |
+| Pure GPU streaming v2 | 72 (analytics + ODE + phylogenetics) |
+| Cross-spring spectral theory | 25 (Anderson 1D/2D/3D + Almost-Mathieu + QS bridge) |
+| NPU reservoir checks | 59 (ESN → int8 → NPU-simulated inference) |
+| Cross-spring evolution checks | 9 (Exp120 benchmark) |
+| **Total validation checks** | **2,673+** |
+| Rust library unit tests | 676 + 60 integration + 14 doc |
+| **Total Rust tests** | **750** |
+| Experiments completed | 120 |
+| Validation/benchmark binaries | 101 validate + 8 benchmark = 109 total |
 | CPU bio modules | 41 |
 | GPU bio modules | 42 (27 lean + 5 write + 7 compose + 3 passthrough) |
 | Tier B (needs refactor) | 0 (all promoted) |
 | Python baselines | 40 scripts |
-| BarraCUDA CPU parity | 380/380 (v1-v8: 25 domains + 6 ODE flat + 13 promoted) |
-| BarraCUDA GPU parity | 29 domains (16 absorbed + 5 local ODE + 7 compose + 1 passthrough) |
-| metalForge cross-system | 29 domains substrate-independent (Exp103) |
+| BarraCuda CPU parity | 380/380 (v1-v8: 25 domains + 6 ODE flat + 13 promoted) |
+| BarraCuda GPU parity | 29 domains (16 absorbed + 5 local ODE + 7 compose + 1 passthrough) |
+| metalForge cross-system | 37 domains CPU↔GPU (Exp103+104), **25/25 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
-| Pure GPU streaming | 80 checks, 441-837× over round-trip (Exp090-091) |
-| ToadStool primitives consumed | **30** (absorbed, Lean) |
+| Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
+| ToadStool primitives consumed | **31** (absorbed, Lean — aligned to ToadStool S42) |
 | Local WGSL shaders | **5** (Write phase — ODE domains pending absorption) |
-
-All 2,406+ validation checks **PASS**. All 740 tests **PASS**.
+All 2,673+ validation checks **PASS**. All 750 tests **PASS**.
 
 ### GPU Performance
 
@@ -144,7 +149,7 @@ All 2,406+ validation checks **PASS**. All 740 tests **PASS**.
 ### Phase 1–6: Foundation
 Python control baselines → Rust CPU validation → GPU acceleration →
 paper parity (29 papers, 10+ models) → sovereign ML (decision tree) →
-BarraCUDA CPU parity (18 domains).
+BarraCuda CPU parity (18 domains).
 
 ### Phase 7: ToadStool Bio Absorption
 ToadStool absorbed 4 GPU bio primitives from our handoff (commit `cce8fe7c`):
@@ -163,7 +168,7 @@ R. Anderson (Carleton) deep-sea hydrothermal vent papers (Exp051-056):
 5 new sovereign Rust modules (`dnds`, `molecular_clock`, `ani`, `snp`,
 `pangenome`) — 133 checks, 6 Python baselines.
 
-### Phase 10: BarraCUDA CPU Parity v4 (Track 1c)
+### Phase 10: BarraCuda CPU Parity v4 (Track 1c)
 All 5 Track 1c domains validated as pure Rust math (Exp057, 44/44).
 Combined v1-v4: 128/128 checks across 23 domains.
 
@@ -203,7 +208,7 @@ Comprehensive audit and evolution of the codebase:
 - All I/O parsers confirmed streaming (no whole-file buffering)
 - Smart refactoring: duplicated FASTQ decompression removed in favor of library
 
-### Phase 16: BarraCUDA Evolution + Absorption Readiness
+### Phase 16: BarraCuda Evolution + Absorption Readiness
 Following hotSpring's Write → Absorb → Lean pattern for ToadStool integration:
 - **Handoff document** submitted to `../wateringHole/handoffs/` with all 9 Tier A
   shaders: binding layouts, dispatch geometry, CPU references, validation counts
@@ -218,19 +223,19 @@ Following hotSpring's Write → Absorb → Lean pattern for ToadStool integratio
   extensions, ToadStool absorbs as shared primitives, Springs lean on upstream
 
 ### Phase 17: metalForge Absorption Engineering + Pure GPU Parity
-Evolving Rust implementations for ToadStool/BarraCUDA team absorption:
+Evolving Rust implementations for ToadStool/BarraCuda team absorption:
 - **`bio::special` consolidated** into shared module (erf, ln_gamma,
   `regularized_gamma_lower`) — shaped for extraction to `barracuda::math`
 - **metalForge local** characterization: GPU/NPU/CPU substrate routing with
   absorption-ready Rust patterns (SoA, `#[repr(C)]`, batch APIs, flat arrays)
-- **Exp064: BarraCUDA GPU Parity v1** — consolidated GPU domain validation
+- **Exp064: BarraCuda GPU Parity v1** — consolidated GPU domain validation
   across 8 domains (diversity, BC, ANI, SNP, dN/dS, pangenome, RF, HMM).
   Pure GPU math matches CPU reference truth in a single binary
 - **Exp065: metalForge Full Cross-System** — substrate-independence proof for
   full portfolio. CPU or GPU dispatch → same answer. Foundation for CPU/GPU/NPU
   routing in production
 - **Absorption engineering**: Following hotSpring's pattern where Springs write
-  extensions as proposals to ToadStool/BarraCUDA, get absorbed, then lean on
+  extensions as proposals to ToadStool/BarraCuda, get absorbed, then lean on
   upstream. 9 WGSL shaders + 4 CPU math functions ready for absorption
   (8 shaders absorbed in Phase 20)
 - **Code quality gate**: named tolerances, `#![forbid(unsafe_code)]`, pedantic clippy,
@@ -250,11 +255,11 @@ Proving the full ToadStool dispatch model and multi-substrate routing:
   Stats → Spectral Cosine. Single upload/readback. 0.1% pipeline overhead. 31/31 PASS.
 - **Exp076: Cross-substrate pipeline** — GPU→NPU→CPU heterogeneous data flow with
   per-stage latency profiling. 17/17 PASS.
-- **Handoff v6** — comprehensive ToadStool/BarraCUDA team handoff with all 9 shader
+- **Handoff v6** — comprehensive ToadStool/BarraCuda team handoff with all 9 shader
   binding layouts, dispatch geometry, NVVM driver profile bug, CPU math extraction plan,
   and streaming pipeline findings. See `wateringHole/handoffs/` for current handoffs.
 
-### Phase 20: Current — ToadStool Bio Rewire + Cross-Spring Evolution
+### Phase 20: ToadStool Bio Rewire + Cross-Spring Evolution
 
 ToadStool sessions 31d/31g absorbed all 8 wetSpring bio WGSL shaders.
 On Feb 22, wetSpring rewired all 8 GPU modules to delegate to
@@ -279,7 +284,7 @@ and forge dispatch router proof:
 
 - **Exp078: ODE GPU Sweep Readiness** — flat param APIs (`to_flat`/`from_flat`)
   for 5 ODE modules (qs_biofilm, bistable, multi_signal, phage_defense, cooperation)
-- **Exp079: BarraCUDA CPU v6** — 48/48 checks proving flat serialization preserves
+- **Exp079: BarraCuda CPU v6** — 48/48 checks proving flat serialization preserves
   bitwise-identical ODE math. Zero ULP drift across all 6 biological models.
 - **Exp080: metalForge Dispatch Routing** — 35/35 checks validating forge router
   across full-system, GPU-only, NPU+CPU, CPU-only, and mixed PCIe configurations.
@@ -293,12 +298,12 @@ and forge dispatch router proof:
 - **Handoff v7** submitted: 3 new absorption candidates, ODE flat validation results,
   dispatch routing findings, and evolution recommendations.
 
-### Phase 22: Current — Pure GPU Streaming + Full Validation Proof
+### Phase 22: Pure GPU Streaming + Full Validation Proof
 
 Proving that the complete bioinformatics pipeline runs on pure GPU with
 ToadStool's unidirectional streaming — zero CPU round-trips between stages:
 
-- **Exp085: BarraCUDA CPU v7** — Tier A data layout fidelity (43/43 PASS).
+- **Exp085: BarraCuda CPU v7** — Tier A data layout fidelity (43/43 PASS).
   kmer histogram, UniFrac CSR flat tree, taxonomy int8 round-trips proven lossless.
 - **Exp086: metalForge Pipeline Proof** — 5-stage end-to-end pipeline with
   dispatch routing (45/45 PASS). Substrate-independent output proven.
@@ -334,9 +339,9 @@ Three new ODE WGSL shaders created for domains not covered by the existing
 - **3 local WGSL shaders** pending ToadStool absorption as `BatchedOdeRK4Generic`
 - **30 GPU modules total** (27 Lean + 3 Write)
 
-**Tier B: 1 remaining (cooperation)** | **740 tests** | **2,284+ checks** | **89 binaries**
+**Tier B: 0 (all promoted Phase 28)** | **740 tests at time** | **2,284+ checks at time**
 
-### Phase 28: Current — Pure GPU Promotion Complete + CPU v8 + metalForge v5
+### Phase 28: Pure GPU Promotion Complete + CPU v8 + metalForge v5
 
 All 13 remaining Tier B/C modules promoted to GPU-capable. Zero Tier B/C
 modules remain. Pure GPU capability across all 42 bio GPU modules:
@@ -346,7 +351,7 @@ modules remain. Pure GPU capability across all 42 bio GPU modules:
   chimera, neighbor_joining, reconciliation, molecular_clock). 2 new WGSL
   shaders (cooperation 4v/13p, capacitor 6v/16p). 7 compose wrappers wiring
   ToadStool primitives. 3 passthrough wrappers accepting GPU buffers.
-- **Exp102: BarraCUDA CPU v8** — 175/175 checks validating pure Rust math for
+- **Exp102: BarraCuda CPU v8** — 175/175 checks validating pure Rust math for
   all 13 newly promoted domains. Analytical known-values, monotonicity,
   round-trip fidelity. Combined v1-v8: **380/380 across 31+ domains**.
 - **Exp103: metalForge v5** — 29 domains validated substrate-independent.
@@ -356,7 +361,90 @@ modules remain. Pure GPU capability across all 42 bio GPU modules:
   capacitor (pending ToadStool absorption as `BatchedOdeRK4Generic<N,P>`)
 - **42 GPU modules total** (27 Lean + 5 Write + 7 Compose + 3 Passthrough)
 
-**Tier B: 0** | **Tier C: 0** | **740 tests** | **2,406+ checks** | **93 binaries**
+**Tier B: 0** | **Tier C: 0** | **740 tests at time** | **2,406+ checks at time**
+
+### Phase 29: metalForge v6 — 25/25 Papers Three-Tier Complete
+
+Closing the final three-tier matrix gaps. Every actionable paper now has CPU +
+GPU + metalForge validation:
+
+- **Exp104: metalForge v6** — 5 remaining gap domains exercised through metalForge
+  routing (QS ODE, UniFrac, DADA2, K-mer, Felsenstein). 24/24 checks. 25 of 25
+  actionable papers now carry full three-tier (CPU + GPU + metalForge) coverage.
+- **3 new metalForge workloads** — `dada2`, `bootstrap`, `placement` registered
+  in `workloads.rs`, bringing total to 28 workloads (22 absorbed, 5 local, 1 CPU-only).
+- **37 metalForge domains** proven substrate-independent (Exp103+104).
+
+**750 tests at time** | **2,430+ checks at time**
+
+### Phase 30: Current — Pure GPU Streaming v2 (Multi-Domain)
+
+Expanding streaming coverage from taxonomy+diversity to 10+ domains across
+analytics, ODE biology, and phylogenetics pipelines:
+
+- **`GpuPipelineSession` expanded** — added pre-compiled `BrayCurtisF64`,
+  `spectral_cosine_matrix` (GEMM + FMR norms), `stream_full_analytics`
+  (taxonomy → diversity → Bray-Curtis chained, zero recompilation).
+- **Exp105: Pure GPU Streaming v2** — 27/27 checks. Alpha diversity, Bray-Curtis,
+  spectral cosine, full analytics pipeline — all through pre-warmed session.
+- **Exp106: Streaming ODE + Phylogenetics** — 45/45 checks. 6 GPU primitives
+  pre-warmed simultaneously (25 ms), each dispatched twice to prove zero
+  shader recompilation: ODE sweep, phage defense, bistable, multi-signal,
+  Felsenstein (1.3% GPU f64 relative error), UniFrac (exact leaf parity).
+- Streaming now proven for: diversity, taxonomy, Bray-Curtis, spectral cosine,
+  QS ODE, phage defense, bistable, multi-signal, Felsenstein, UniFrac.
+
+**750 tests at time** | **2,502+ checks at time**
+
+### Phase 31: Current — PCoA Debt Resolution + Spectral Cross-Spring
+
+Two exclusions from the metalForge/streaming coverage resolved:
+
+- **PCoA naga bug resolved** — `BatchedEighGpu` shader compilation now passes
+  with wgpu v22.1.0. `catch_unwind` guards removed from `validate_metalforge_full_v3`
+  and `validate_cpu_vs_gpu_all_domains`; PCoA promoted to direct GPU validation.
+  Naga "invalid function call" error was fixed upstream.
+- **Exp107: Spectral Cross-Spring** — 25/25 checks. Bridges Kachkovskiy/Bourgain
+  spectral theory (Anderson localization) to quorum-sensing domain. Exercises
+  `barracuda::spectral` primitives from wetSpring: Anderson 1D/2D/3D Hamiltonians,
+  Almost-Mathieu operator, Lanczos eigensolve, level statistics (⟨r⟩), Lyapunov
+  exponents, and a QS-disorder analogy showing population heterogeneity localizes
+  autoinducer signals.
+
+**750 tests at time** | **2,527+ checks at time**
+
+### Phase 32: NCBI-Scale GPU Extension (Exp108-113)
+
+Six new experiments extending validated pipelines to NCBI-scale data:
+- **Exp108**: Vibrio QS 1024-genome parameter landscape (GPU ODE sweep)
+- **Exp109**: 128-taxon phylogenetic placement (NJ + Felsenstein)
+- **Exp110**: 200-genome cross-ecosystem pangenome (ANI + dN/dS)
+- **Exp111**: 2048-spectrum GPU spectral cosine (2.1M pairs in 105 ms)
+- **Exp112**: Multi-ecosystem bloom surveillance (3 ecosystems, 1365 timepoints)
+- **Exp113**: QS-disorder prediction from 8 ecosystem diversity profiles
+
+**750 tests at time** | **2,605+ checks at time**
+
+### Phase 33: NPU Reservoir Deployment (Exp114-119)
+
+Six experiments deploying ESN reservoir computing models to BrainChip Akida
+NPU via int8 quantization — closing the CPU → GPU → NPU pipeline:
+- **Exp114**: QS phase classifier (biofilm/planktonic/intermediate) — 100% f64↔NPU agreement
+- **Exp115**: Phylogenetic clade placement — 97.7% quantization fidelity
+- **Exp116**: Genome binning (5 ecosystems) — int8 regularization effect
+- **Exp117**: Spectral library pre-filter — 84% top-10 overlap, 2-stage pipeline
+- **Exp118**: Bloom sentinel (coin-cell feasible, >1 year battery life)
+- **Exp119**: QS-disorder regime classifier — physics ordering preserved through int8
+
+### Phase 34: Cross-Spring Rewire + Evolution Benchmark (Exp120)
+
+Complete rewiring to modern ToadStool S42 BarraCuda APIs:
+- **16 bio imports modernized** from deep `ops::bio::module::Type` paths to crate-root re-exports
+- **Cross-spring shader provenance documented**: 612 WGSL shaders traced to origin springs
+- **Exp120**: Benchmarks diversity (wetSpring), QS ODE (hotSpring precision), ESN reservoir
+  (hotSpring/neuralSpring → wetSpring NPU), with full provenance table and evolution timeline
+
+**750 tests** | **2,673+ checks** | **109 binaries**
 
 ### Phase 23: Structural Evolution — Flat Layouts, DRY Models, Zero-Clone APIs
 
@@ -434,7 +522,7 @@ Deep codebase evolution following hotSpring's absorption patterns:
 | Check | Status |
 |-------|--------|
 | `cargo fmt --check` | Clean (0 diffs) |
-| `cargo clippy --pedantic --nursery` | Clean (0 warnings) |
+| `cargo clippy --pedantic --nursery` | Clean (0 warnings, lib) |
 | `cargo doc --no-deps` | Clean (0 warnings) |
 | Line coverage (`cargo-llvm-cov`) | **96.21% overall** |
 | `#![deny(unsafe_code)]` | **Enforced crate-wide** (edition 2024; `allow` only in test env-var calls) |
@@ -445,7 +533,7 @@ Deep codebase evolution following hotSpring's absorption patterns:
 | Max file size | All under 1000 LOC |
 | External C dependencies | **0** (`flate2` uses `rust_backend`) |
 | Named tolerance constants | 43 (scientifically justified, hierarchy-tested) |
-| Provenance headers | All 93 validation/benchmark binaries |
+| Provenance headers | All 109 validation/benchmark binaries |
 
 ---
 
@@ -529,7 +617,7 @@ Deep codebase evolution following hotSpring's absorption patterns:
 wetSpring/
 ├── README.md                      ← this file
 ├── BENCHMARK_RESULTS.md           ← three-tier benchmark results
-├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (103 experiments)
+├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (120 experiments)
 ├── barracuda/                     ← Rust crate (src/, Cargo.toml, rustfmt.toml)
 │   ├── EVOLUTION_READINESS.md    ← absorption map (tiers, primitives, shaders)
 │   ├── ABSORPTION_MANIFEST.md    ← what's absorbed, local, planned (hotSpring pattern)
@@ -543,10 +631,10 @@ wetSpring/
 │   │   ├── bio/                 ← 41 CPU + 42 GPU bio modules
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML)
 │   │   ├── bench/               ← benchmark harness + power monitoring
-│   │   ├── bin/                 ← 93 validation/benchmark binaries
+│   │   ├── bin/                 ← 109 validation/benchmark binaries
 │   │   └── shaders/             ← 5 local WGSL ODE shaders (Write phase)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024
-├── experiments/                   ← 103 experiment protocols + results
+├── experiments/                   ← 120 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
 │   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs, bridge.rs
@@ -573,7 +661,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (740: 666 lib + 74 integration/doc)
+# Run all tests (750: 676 lib + 60 integration + 14 doc)
 cargo test
 
 # Code quality checks
@@ -625,13 +713,17 @@ All validation data comes from public repositories:
 
 ## Related
 
-- **hotSpring** — Nuclear/plasma physics validation (sibling Spring, 34+ WGSL shaders)
+- **hotSpring** — Nuclear/plasma physics validation (sibling Spring, 35+ WGSL shaders absorbed)
 - **neuralSpring** — ML/neural inference validation (sibling Spring, eigensolvers, batch IPR)
-- **ToadStool** — GPU compute engine (BarraCUDA crate, shared primitives across all Springs)
-- **wateringHole** — Inter-primal standards and handoff documents
-  - `handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md` — original shader detail handoff
-  - `handoffs/WETSPRING_TOADSTOOL_V15_ODE_GENERIC_FEB22_2026.md` — current (5 ODE shaders → `BatchedOdeRK4Generic`)
+- **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
+- **ToadStool** — GPU compute engine (BarraCuda crate, 612 WGSL shaders, shared primitives)
+- **wateringHole** — Spring-local handoffs to ToadStool
+  - `handoffs/WETSPRING_V018_CROSS_SPRING_REWIRE_HANDOFF_FEB23_2026.md` — **current** (Phase 34, full rewire, 120 experiments)
+  - `handoffs/WETSPRING_TOADSTOOL_V17_NPU_RESERVOIR_FEB23_2026.md` — NPU reservoir, NCBI-scale, PCoA fix
+  - `handoffs/WETSPRING_TOADSTOOL_V16_STREAMING_FEB23_2026.md` — streaming v2, metalForge v6
+  - `handoffs/WETSPRING_TOADSTOOL_V15_ODE_GENERIC_FEB22_2026.md` — 5 ODE shaders → `BatchedOdeRK4Generic`
   - `handoffs/WETSPRING_TOADSTOOL_V14_FEB22_2026.md` — Write phase, ODE shaders, forge v0.3.0
   - `handoffs/WETSPRING_TOADSTOOL_V13_FEB22_2026.md` — edition 2024, structural evolution
   - `handoffs/archive/` — V7-V12, rewire (fossil record)
+  - `CROSS_SPRING_SHADER_EVOLUTION.md` — 612 shader provenance (35 hot, 22 wet, 14 neural, 5 air)
 - **ecoPrimals** — Parent ecosystem

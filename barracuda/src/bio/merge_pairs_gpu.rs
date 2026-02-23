@@ -48,6 +48,7 @@ pub fn merge_pairs_gpu(
     if !merged.is_empty() {
         let fmr = FusedMapReduceF64::new(gpu.to_wgpu_device())
             .map_err(|e| Error::Gpu(format!("FusedMapReduceF64: {e}")))?;
+        #[allow(clippy::cast_precision_loss)]
         let lengths: Vec<f64> = merged.iter().map(|r| r.sequence.len() as f64).collect();
         let _total = fmr.sum(&lengths).map_err(|e| Error::Gpu(format!("{e}")))?;
     }

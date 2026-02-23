@@ -12,7 +12,7 @@ wetSpring validates each algorithm at three levels:
 ```
 Tier 1: Python baseline (published tools, open data)
 Tier 2: Rust CPU (pure math, no unsafe, documented tolerances)
-Tier 3: GPU (ToadStool/BarraCUDA, math parity with CPU)
+Tier 3: GPU (ToadStool/BarraCuda, math parity with CPU)
 ```
 
 ---
@@ -74,15 +74,15 @@ Tier 3: GPU (ToadStool/BarraCUDA, math parity with CPU)
 
 | Suite | Count | Status |
 |-------|-------|--------|
-| Library unit tests | 654 | PASS (+ 1 ignored — hardware-dependent) |
+| Library unit tests | 676 | PASS (+ 1 ignored — hardware-dependent) |
 | Integration tests | 60 | PASS |
 | Doc-tests | 14 | PASS |
-| **Total** | **650** | **PASS** |
+| **Total** | **750** | **PASS** |
 | Line coverage | 97% bio+io (56% overall) | Exceeds 90% target |
 
 ---
 
-## Tier 2b: BarraCUDA CPU Parity (v1–v8)
+## Tier 2b: BarraCuda CPU Parity (v1–v8)
 
 | Binary | Checks | Domains | Status |
 |--------|--------|---------|--------|
@@ -187,7 +187,7 @@ Tier 3: GPU (ToadStool/BarraCUDA, math parity with CPU)
 
 ---
 
-## Exp057: BarraCUDA CPU Parity v4 (Track 1c, 5 Domains)
+## Exp057: BarraCuda CPU Parity v4 (Track 1c, 5 Domains)
 
 | Domain | Module | Checks | Time (µs) |
 |--------|--------|--------|-----------|
@@ -203,7 +203,7 @@ Combined with v1-v3: **128/128 checks across 23 domains**.
 
 ---
 
-## Exp061/062: BarraCUDA CPU Parity v5 (RF + GBM)
+## Exp061/062: BarraCuda CPU Parity v5 (RF + GBM)
 
 | Domain | Module | Checks | Time (µs) |
 |--------|--------|--------|-----------|
@@ -218,7 +218,7 @@ Combined v1-v6: **205/205 checks across 25 domains + 6 ODE flat modules**.
 
 ## Exp059: Rust vs Python Timing (25 Domains)
 
-Head-to-head benchmark across all 25 BarraCUDA CPU parity domains:
+Head-to-head benchmark across all 25 BarraCuda CPU parity domains:
 
 | Metric | Value |
 |--------|-------|
@@ -279,7 +279,7 @@ GemmF64 at small sizes are transfer-dominated (see Exp066 for larger sizes).
 | `feature_table_gpu` | Passthrough | validated | CPU kernel, GPU buffer acceptance |
 | `signal_gpu` | Passthrough | validated | CPU kernel, GPU buffer acceptance |
 
-### Exp102: BarraCUDA CPU v8 (13 Promoted Domains)
+### Exp102: BarraCuda CPU v8 (13 Promoted Domains)
 
 175/175 checks validating pure Rust math for all 13 newly GPU-promoted domains.
 Combined v1-v8: **380/380 across 31+ domains**.
@@ -298,14 +298,14 @@ matrix. CPU↔GPU parity proven for all compose and write modules.
 | Rust CPU validation | 1,476 | PASS |
 | GPU validation | 702+ | PASS |
 | Dispatch + layout + transfer | 172 | PASS |
-| Rust tests | 740 (666 lib + 60 integration + 14 doc) | PASS |
+| Rust tests | 750 (676 lib + 60 integration + 14 doc) | PASS |
 | Python baselines | 40 scripts | PASS |
-| BarraCUDA CPU parity | 380/380 (v1-v8: 31+ domains) | PASS |
+| BarraCuda CPU parity | 380/380 (v1-v8: 31+ domains) | PASS |
 | ToadStool bio primitives | 30 consumed (Lean) | PASS |
 | Local WGSL shaders (Write phase) | 5 ODE shaders (phage, bistable, multi_signal, cooperation, capacitor) | PASS |
 | Compose GPU wrappers | 7 (kmd, merge_pairs, robinson_foulds, derep, NJ, reconciliation, molecular_clock) | PASS |
 | Passthrough GPU wrappers | 3 (gbm, feature_table, signal) | PASS |
-| **Grand total** | **2,406+ validation + 740 tests** | **ALL PASS** |
+| **Grand total** | **2,673+ validation + 750 tests** | **ALL PASS** |
 
 ---
 
@@ -315,10 +315,10 @@ matrix. CPU↔GPU parity proven for all compose and write modules.
 cd barracuda
 
 # Tier 2: Rust CPU (1,476+ checks)
-cargo test                         # 740 tests (666 lib + 60 integration + 14 doc)
+cargo test                         # 750 tests (676 lib + 60 integration + 14 doc)
 cargo run --release --bin validate_qs_ode  # ... repeat for all CPU binaries
 
-# Tier 2b: BarraCUDA CPU parity (380/380)
+# Tier 2b: BarraCuda CPU parity (380/380)
 cargo run --release --bin validate_barracuda_cpu_v8   # 175 checks (13 promoted domains)
 
 # Tier 3: GPU (702+ checks)

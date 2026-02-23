@@ -11,7 +11,7 @@
 //! bitcast issues in WGSL.
 
 use barracuda::device::WgpuDevice;
-use barracuda::ops::bio::rf_inference::RfBatchInferenceGpu;
+use barracuda::RfBatchInferenceGpu;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
@@ -43,6 +43,7 @@ impl RandomForestGpu {
         clippy::cast_possible_truncation,
         clippy::cast_possible_wrap,
         clippy::cast_sign_loss,
+        clippy::similar_names,
         clippy::too_many_lines
     )]
     pub fn predict_batch(

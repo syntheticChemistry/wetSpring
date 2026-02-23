@@ -18,7 +18,7 @@
 | L2 Cache | 36 MB |
 | TDP | 200W |
 | PCIe Slot | `01:00.0` |
-| f64 throughput | **1:2 via wgpu** (BarraCUDA discovery) |
+| f64 throughput | **1:2 via wgpu** (BarraCuda discovery) |
 
 ### Titan V (Secondary — NVK)
 
@@ -109,7 +109,7 @@ For wetSpring's phylogenetic workloads (small working sets, compute-bound),
 the RTX 4070's larger L2 likely wins. For large-scale alignment (memory-bound),
 the Titan V's HBM2 bandwidth helps.
 
-**Both produce identical math** — validated via BarraCUDA's wgpu path.
+**Both produce identical math** — validated via BarraCuda's wgpu path.
 
 ---
 

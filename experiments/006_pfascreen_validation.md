@@ -2,7 +2,7 @@
 
 **Track**: 2 (PFAS / blueFish)
 **Date**: 2026-02-12
-**Status**: NOT STARTED
+**Status**: COMPLETE (10 checks)
 
 ## Objective
 
@@ -62,7 +62,7 @@ Options (in priority order):
 ```bash
 cd "$(git rev-parse --show-toplevel)/data"
 mkdir -p pfas-hrms-test
-# Download commands TBD based on data source
+# See scripts/download_public_data.sh for data download
 ```
 
 ### Step 4: Run PFΔScreen

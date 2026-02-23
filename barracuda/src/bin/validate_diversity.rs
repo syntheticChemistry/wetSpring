@@ -271,13 +271,13 @@ fn validate_exp002_galaxy_baseline(v: &mut Validator) {
         "Exp002 low: Shannon in Galaxy range",
         alpha_low.shannon,
         2.93,
-        1.50,
+        tolerances::GALAXY_SHANNON_RANGE,
     );
     v.check(
         "Exp002 low: Simpson in Galaxy range",
         alpha_low.simpson,
         0.86,
-        0.25,
+        tolerances::GALAXY_SIMPSON_RANGE,
     );
 
     // Construct a high-diversity sample (856 ASVs, Shannon ~3.85, Simpson ~0.94)
@@ -303,7 +303,7 @@ fn validate_exp002_galaxy_baseline(v: &mut Validator) {
         "Exp002 high: Shannon in Galaxy range",
         alpha_high.shannon,
         3.85,
-        1.50,
+        tolerances::GALAXY_SHANNON_RANGE,
     );
     v.check(
         "Exp002 high: Simpson > 0.85",
@@ -319,7 +319,7 @@ fn validate_exp002_galaxy_baseline(v: &mut Validator) {
         "Exp002: BC(low,high) in Galaxy range [0.05, 0.95]",
         bc,
         0.50,
-        0.50,
+        tolerances::GALAXY_BRAY_CURTIS_RANGE,
     );
 
     // PCoA on 3 communities: eigenvalues should be non-negative
@@ -353,7 +353,7 @@ fn validate_exp002_galaxy_baseline(v: &mut Validator) {
         } else {
             0.0
         },
-        0.50,
-        0.50,
+        tolerances::GALAXY_BRAY_CURTIS_RANGE,
+        tolerances::GALAXY_BRAY_CURTIS_RANGE,
     );
 }

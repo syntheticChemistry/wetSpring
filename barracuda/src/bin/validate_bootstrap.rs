@@ -19,6 +19,7 @@ use wetspring_barracuda::bio::bootstrap::{
 };
 use wetspring_barracuda::bio::felsenstein::{TreeNode, encode_dna, log_likelihood};
 use wetspring_barracuda::bio::gillespie::Lcg64;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn make_alignment() -> Alignment {
@@ -104,7 +105,12 @@ fn main() {
     v.check("All LLs negative", f64::from(u8::from(all_neg)), 1.0, 0.0);
 
     let mean: f64 = lls.iter().sum::<f64>() / 100.0;
-    v.check("Mean LL near original", (mean - orig_ll).abs(), 0.0, 5.0);
+    v.check(
+        "Mean LL near original",
+        (mean - orig_ll).abs(),
+        0.0,
+        tolerances::BOOTSTRAP_LL_ENSEMBLE,
+    );
 
     v.section("── Bootstrap support ──");
     let alt_tree = TreeNode::Internal {

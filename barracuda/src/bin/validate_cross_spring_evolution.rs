@@ -5,6 +5,7 @@
     clippy::too_many_lines,
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
+    clippy::cast_possible_wrap,
     clippy::similar_names
 )]
 //! Exp094: Cross-Spring Evolution Validation + Benchmark
@@ -37,11 +38,7 @@
 //! | `BatchFitnessGpu` | neuralSpring | Session 31f | wetSpring (new) |
 //! | `LocusVarianceGpu` | neuralSpring | Session 31f | wetSpring (new) |
 
-use barracuda::ops::bio::batch_fitness::BatchFitnessGpu;
-use barracuda::ops::bio::locus_variance::LocusVarianceGpu;
-use barracuda::ops::bio::pairwise_hamming::PairwiseHammingGpu;
-use barracuda::ops::bio::pairwise_jaccard::PairwiseJaccardGpu;
-use barracuda::ops::bio::spatial_payoff::SpatialPayoffGpu;
+use barracuda::{BatchFitnessGpu, LocusVarianceGpu, PairwiseHammingGpu, PairwiseJaccardGpu, SpatialPayoffGpu};
 use std::sync::Arc;
 use std::time::Instant;
 use wgpu::util::DeviceExt;
@@ -115,8 +112,8 @@ async fn main() {
         for (i, (cpu_d, gpu_d)) in cpu_dists.iter().zip(gpu_dists.iter()).enumerate() {
             v.check(
                 &format!("Hamming pair {i}"),
-                *gpu_d as f64,
-                *cpu_d as f64,
+                f64::from(*gpu_d),
+                f64::from(*cpu_d),
                 1e-6,
             );
         }
@@ -170,8 +167,8 @@ async fn main() {
         for (i, (cpu_d, gpu_d)) in cpu_dists.iter().zip(gpu_dists.iter()).enumerate() {
             v.check(
                 &format!("Jaccard pair {i}"),
-                *gpu_d as f64,
-                *cpu_d as f64,
+                f64::from(*gpu_d),
+                f64::from(*cpu_d),
                 1e-5,
             );
         }
@@ -191,7 +188,7 @@ async fn main() {
         let benefit: f32 = 3.0;
         let cost: f32 = 1.0;
         let grid: Vec<u32> = (0..(grid_size * grid_size))
-            .map(|i| if i % 3 == 0 { 1 } else { 0 })
+            .map(|i| u32::from(i % 3 == 0))
             .collect();
 
         let tc = Instant::now();
@@ -205,7 +202,7 @@ async fn main() {
         });
         let fit_buf = d.create_buffer(&wgpu::BufferDescriptor {
             label: Some("Spatial Fitness"),
-            size: (grid_size * grid_size * 4) as u64,
+            size: u64::from(grid_size * grid_size * 4),
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
             mapped_at_creation: false,
         });
@@ -218,14 +215,14 @@ async fn main() {
 
         let mut matching = 0usize;
         for (cf, gf) in cpu_fitness.iter().zip(gpu_fitness.iter()) {
-            if (*gf as f64 - *cf as f64).abs() < 1e-4 {
+            if (f64::from(*gf) - f64::from(*cf)).abs() < 1e-4 {
                 matching += 1;
             }
         }
         v.check(
             "SpatialPayoff cells matching",
             matching as f64,
-            (grid_size * grid_size) as f64,
+            f64::from(grid_size * grid_size),
             0.0,
         );
         results.push((
@@ -270,7 +267,7 @@ async fn main() {
         });
         let fit_buf = d.create_buffer(&wgpu::BufferDescriptor {
             label: Some("Fitness Output"),
-            size: (pop_size * 4) as u64,
+            size: u64::from(pop_size * 4),
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
             mapped_at_creation: false,
         });
@@ -284,8 +281,8 @@ async fn main() {
         for (i, (cf, gf)) in cpu_fit.iter().zip(gpu_fit.iter()).enumerate() {
             v.check(
                 &format!("Fitness individual {i}"),
-                *gf as f64,
-                *cf as f64,
+                f64::from(*gf),
+                f64::from(*cf),
                 1e-5,
             );
         }
@@ -327,7 +324,7 @@ async fn main() {
         });
         let var_buf = d.create_buffer(&wgpu::BufferDescriptor {
             label: Some("LocusVar Output"),
-            size: (n_loci * 4) as u64,
+            size: u64::from(n_loci * 4),
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
             mapped_at_creation: false,
         });
@@ -339,7 +336,12 @@ async fn main() {
         let gpu_us = tg.elapsed().as_micros() as f64;
 
         for (i, (cv, gv)) in cpu_var.iter().zip(gpu_var.iter()).enumerate() {
-            v.check(&format!("LocusVar locus {i}"), *gv as f64, *cv as f64, 1e-5);
+            v.check(
+                &format!("LocusVar locus {i}"),
+                f64::from(*gv),
+                f64::from(*cv),
+                1e-5,
+            );
         }
         results.push((
             "LocusVariance",

@@ -1,5 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::expect_used, clippy::unwrap_used)]
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::too_many_lines,
+    clippy::cast_precision_loss
+)]
 //! Exp100: metalForge Cross-Substrate v4 — 20 Domains + NPU Dispatch
 //!
 //! | Script  | `validate_metalforge_v4` |
@@ -7,7 +12,7 @@
 //!
 //! Validates CPU ↔ GPU parity for all ODE domains (phage defense, bistable,
 //! multi-signal) plus metalForge mixed-hardware dispatch scenarios including
-//! NPU-aware routing and PCIe direct transfer patterns.
+//! NPU-aware routing and `PCIe` direct transfer patterns.
 
 use std::time::Instant;
 use wetspring_barracuda::bio::bistable::{self, BistableParams};
@@ -45,9 +50,9 @@ async fn main() {
         let y0 = [100.0, 100.0, 10.0, 50.0];
         let n_batches = 8u32;
         let n_steps = 200u32;
-        let dt = 0.001;
+        let dt = wetspring_barracuda::tolerances::ODE_DEFAULT_DT;
 
-        let cpu_result = phage_defense::run_defense(&y0, n_steps as f64 * dt, dt, &params);
+        let cpu_result = phage_defense::run_defense(&y0, f64::from(n_steps) * dt, dt, &params);
         let cpu_finals: Vec<f64> = cpu_result.states().last().unwrap().to_vec();
 
         let gpu_engine = PhageDefenseGpu::new(device.clone()).expect("PhageDefense GPU compile");
@@ -90,7 +95,7 @@ async fn main() {
         let n_steps = 200u32;
         let dt = 0.01;
 
-        let cpu_result = bistable::run_bistable(&y0, n_steps as f64 * dt, dt, &params);
+        let cpu_result = bistable::run_bistable(&y0, f64::from(n_steps) * dt, dt, &params);
         let cpu_finals: Vec<f64> = cpu_result.states().last().unwrap().to_vec();
 
         let gpu_engine = BistableGpu::new(device.clone()).expect("Bistable GPU compile");
@@ -143,7 +148,7 @@ async fn main() {
         let n_steps = 200u32;
         let dt = 0.01;
 
-        let cpu_result = multi_signal::run_multi_signal(&y0, n_steps as f64 * dt, dt, &params);
+        let cpu_result = multi_signal::run_multi_signal(&y0, f64::from(n_steps) * dt, dt, &params);
         let cpu_finals: Vec<f64> = cpu_result.states().last().unwrap().to_vec();
 
         let gpu_engine = MultiSignalGpu::new(device.clone()).expect("MultiSignal GPU compile");
@@ -191,7 +196,9 @@ async fn main() {
     {
         let t0 = Instant::now();
 
-        let has_npu = std::path::Path::new("/dev/akida0").exists();
+        let npu_device =
+            std::env::var("WETSPRING_NPU_DEVICE").unwrap_or_else(|_| String::from("/dev/akida0"));
+        let has_npu = std::path::Path::new(&npu_device).exists();
         let npu_substrate = if has_npu {
             "NPU (AKD1000)"
         } else {
@@ -208,11 +215,11 @@ async fn main() {
         v.check_pass("small batch → CPU route", small_batch <= batch_threshold);
 
         // Simulated NPU classification: quantized int8 inference
-        let mock_features: Vec<f64> = vec![0.8, 0.1, 0.05, 0.05]; // class probabilities
-        let argmax = mock_features
+        let class_probabilities: Vec<f64> = vec![0.8, 0.1, 0.05, 0.05];
+        let argmax = class_probabilities
             .iter()
             .enumerate()
-            .max_by(|a, b| a.1.partial_cmp(b.1).unwrap())
+            .max_by(|a, b| a.1.total_cmp(b.1))
             .map(|(i, _)| i)
             .unwrap();
         v.check("NPU classify argmax", argmax as f64, 0.0, 0.0);
@@ -247,7 +254,7 @@ async fn main() {
             .expect("Stage 1 GPU");
 
         // Stage 2 (GPU→GPU): Feed defended bacteria count into bistable model
-        let bistable_gpu = BistableGpu::new(device.clone()).expect("Bistable GPU");
+        let bistable_gpu = BistableGpu::new(device).expect("Bistable GPU");
         let bparams = BistableParams::default();
         let bistable_y0 = [result[0] / 100.0, 0.0, 0.0, 0.5, 0.0]; // normalize
         let bflat = bparams.to_flat();

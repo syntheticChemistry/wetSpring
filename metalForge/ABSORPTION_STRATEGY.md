@@ -182,13 +182,13 @@ and the 3 Passthrough modules which need new ToadStool primitives:
 
 ---
 
-## BarraCUDA CPU Math Evolution
+## BarraCuda CPU Math Evolution
 
 wetSpring consolidated local math into `crate::special` (erf, ln_gamma,
 `regularized_gamma_lower`) during Phase 15. These functions duplicate
 barracuda upstream primitives and are shaped for extraction:
 
-| Local Implementation | File | BarraCUDA Primitive | Status |
+| Local Implementation | File | BarraCuda Primitive | Status |
 |---------------------|------|---------------------|--------|
 | `erf()`, `normal_cdf()` | `bio/special.rs` | `barracuda::special::erf` | Consolidated; uses `mul_add` chains |
 | `ln_gamma()` | `bio/special.rs` | `barracuda::special::ln_gamma` | Lanczos approximation, Horner form |
@@ -237,7 +237,7 @@ hotSpring's proven methodology:
 | Deterministic math | Same input → same output (bit-exact f64) | All `bio::*` modules |
 | `mul_add` chains | FMA-friendly for both CPU SIMD and GPU | `crate::special::erf` polynomial |
 | Named tolerances | Central constants, not magic numbers | 43 constants in `tolerances.rs` |
-| Provenance headers | Script, commit, command, hardware | All 93 validation binaries |
+| Provenance headers | Script, commit, command, hardware | All 109 validation binaries |
 
 ### What Makes Code Absorbable (Lessons from hotSpring)
 

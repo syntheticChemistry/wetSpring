@@ -12,7 +12,7 @@
 //! Jukes-Cantor — `ToadStool` handles polyfill on NVVM drivers.
 
 use barracuda::device::WgpuDevice;
-use barracuda::ops::bio::dnds::DnDsBatchF64;
+use barracuda::DnDsBatchF64;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
@@ -67,7 +67,7 @@ impl DnDsGpu {
     /// # Errors
     ///
     /// Returns `Err` if GPU dispatch or buffer readback fails.
-    #[allow(clippy::cast_possible_truncation)]
+    #[allow(clippy::cast_possible_truncation, clippy::similar_names)]
     pub fn batch_dnds(&self, pairs: &[(&[u8], &[u8])]) -> crate::error::Result<DnDsGpuResult> {
         let n_pairs = pairs.len();
         if n_pairs == 0 {

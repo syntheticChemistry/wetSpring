@@ -39,7 +39,7 @@ the entire computation fits in Infinity Cache. Zero DRAM pressure.
 
 ### wgpu Compatibility
 
-BarraCUDA/ToadStool already supports AMD via Vulkan backend. No code changes
+BarraCuda/ToadStool already supports AMD via Vulkan backend. No code changes
 needed — only characterization and tuning.
 
 ---

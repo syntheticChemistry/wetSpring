@@ -3,6 +3,7 @@
 
 pub mod adapter;
 pub mod alignment;
+pub mod esn;
 #[allow(clippy::cast_precision_loss)]
 pub mod ani;
 #[cfg(feature = "gpu")]

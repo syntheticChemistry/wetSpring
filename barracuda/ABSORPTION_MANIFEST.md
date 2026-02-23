@@ -48,7 +48,7 @@ WGSL          known physics   handoffs/                        delete local
 | Compose | GPU wrappers wiring ToadStool primitives | **7 modules** (kmd, merge_pairs, RF, derep, NJ, reconciliation, molecular_clock) |
 | Passthrough | Accept GPU buffers, CPU kernel | **3 modules** (gbm, feature_table, signal) |
 | Validate | CPU ↔ GPU parity for all shaders | All 5 ODE: exact parity (Exp099/100/101) |
-| Hand off | wateringHole/handoffs/ documents | v15 active (ODE generic), 7+ archived |
+| Hand off | wateringHole/handoffs/ documents | v18 active (ODE generic), 7+ archived |
 | Absorb | ToadStool integrates as `ops::bio::*` | **24 primitives** absorbed |
 | Lean | Rewire to upstream, delete local code | 27 primitives lean (22 wetSpring + 5 neuralSpring) |
 
@@ -239,8 +239,8 @@ Patterns from hotSpring and neuralSpring that wetSpring leans on:
 |----------|:------:|--------|
 | CPU parity (Python → Rust) | 1,476 | ALL PASS |
 | GPU parity (CPU → GPU) | 702+ | ALL PASS |
-| BarraCUDA CPU parity (v1-v8) | 380/380 | ALL PASS |
+| BarraCuda CPU parity (v1-v8) | 380/380 | ALL PASS |
 | Streaming dispatch | 80 | ALL PASS |
 | Layout fidelity | 35 | ALL PASS |
 | Transfer/streaming | 57 | ALL PASS |
-| **Total** | **2,406+** | **ALL PASS** |
+| **Total** | **2,673+** | **ALL PASS** |

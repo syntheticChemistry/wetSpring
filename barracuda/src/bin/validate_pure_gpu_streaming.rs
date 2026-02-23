@@ -2,7 +2,6 @@
 #![allow(
     clippy::expect_used,
     clippy::unwrap_used,
-    clippy::too_many_lines,
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation
 )]
@@ -130,10 +129,11 @@ fn validate_roundtrip_mode(v: &mut Validator, gpu: &GpuF64) {
         .iter()
         .map(|c| diversity_gpu::shannon_gpu(gpu, c).unwrap())
         .collect();
-    let rt_simpson: Vec<f64> = communities
-        .iter()
-        .map(|c| diversity_gpu::simpson_gpu(gpu, c).unwrap())
-        .collect();
+    let mut rt_simpson_n = 0usize;
+    for c in &communities {
+        diversity_gpu::simpson_gpu(gpu, c).unwrap();
+        rt_simpson_n += 1;
+    }
     let alpha_us = t_alpha.elapsed().as_micros();
 
     let t_bray = Instant::now();
@@ -152,7 +152,7 @@ fn validate_roundtrip_mode(v: &mut Validator, gpu: &GpuF64) {
     );
     v.check(
         "RT: Simpson count",
-        rt_simpson.len() as f64,
+        rt_simpson_n as f64,
         N_SAMPLES as f64,
         0.0,
     );
@@ -339,19 +339,19 @@ fn validate_batch_scaling(v: &mut Validator, gpu: &GpuF64) {
             })
             .collect();
 
-        let t_rt = Instant::now();
+        let roundtrip_start = Instant::now();
         for c in &communities {
             let _ = diversity_gpu::shannon_gpu(gpu, c).unwrap();
             let _ = diversity_gpu::simpson_gpu(gpu, c).unwrap();
         }
-        let rt_us = t_rt.elapsed().as_micros() as f64;
+        let rt_us = roundtrip_start.elapsed().as_micros() as f64;
 
-        let t_st = Instant::now();
+        let streaming_start = Instant::now();
         for c in &communities {
             let _ = session.shannon(c).unwrap();
             let _ = session.simpson(c).unwrap();
         }
-        let st_us = t_st.elapsed().as_micros() as f64;
+        let st_us = streaming_start.elapsed().as_micros() as f64;
 
         timings.push((n, rt_us, st_us));
         println!(

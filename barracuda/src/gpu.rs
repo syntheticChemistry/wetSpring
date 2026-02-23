@@ -198,7 +198,7 @@ impl GpuF64 {
     ///
     /// Uses the driver profile's instruction-level latency to estimate
     /// the crossover point where GPU dispatch outperforms CPU. Higher
-    /// instruction latency (software f64 emulation) means a higher
+    /// instruction latency (software exp/log transcendental fallback) means a higher
     /// element count is needed to amortize launch overhead.
     ///
     /// Falls back to [`GPU_DISPATCH_THRESHOLD`] for unknown hardware.

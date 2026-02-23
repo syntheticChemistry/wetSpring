@@ -12,7 +12,7 @@
 //! reads N values (column-wise). No transcendentals needed.
 
 use barracuda::device::WgpuDevice;
-use barracuda::ops::bio::snp::SnpCallingF64;
+use barracuda::SnpCallingF64;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 

@@ -3,7 +3,7 @@
 //!
 //! Chains `eic_gpu` (mass track detection + EIC extraction) and `signal_gpu`
 //! (peak detection) to build a complete feature table on GPU. Feature
-//! filtering (min_height, min_snr) is element-wise and GPU-friendly.
+//! filtering (`min_height`, `min_snr`) is element-wise and GPU-friendly.
 //!
 //! In a pure-GPU streaming pipeline, spectra arrive from the mzML parser
 //! and feature tables flow to the downstream KMD/PFAS screening stage

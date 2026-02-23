@@ -12,7 +12,7 @@
 //! arithmetic, no transcendentals.
 
 use barracuda::device::WgpuDevice;
-use barracuda::ops::bio::pangenome::PangenomeClassifyGpu as ToadStoolPangenome;
+use barracuda::PangenomeClassifyGpu as ToadStoolPangenome;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 

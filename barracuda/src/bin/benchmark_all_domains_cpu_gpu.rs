@@ -5,7 +5,6 @@
     clippy::similar_names,
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
-    clippy::too_many_lines,
     clippy::approx_constant,
     clippy::unnecessary_cast
 )]

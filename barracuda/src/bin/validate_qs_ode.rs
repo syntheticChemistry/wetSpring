@@ -68,7 +68,7 @@ fn main() {
         "S1: B_ss matches Python (biofilm dispersed)",
         b_ss,
         0.020,
-        0.03,
+        tolerances::ODE_BIOFILM_SS,
     );
     check_non_negative(&mut v, &r, "S1");
 
@@ -84,7 +84,7 @@ fn main() {
         "S2: B_ss matches Python (rapid dispersal)",
         b_ss,
         0.104,
-        0.03,
+        tolerances::ODE_BIOFILM_SS,
     );
     check_non_negative(&mut v, &r, "S2");
 

@@ -83,7 +83,8 @@ fn main() {
 
     report.print_summary();
 
-    let out_dir = format!("{}/../benchmarks/results", env!("CARGO_MANIFEST_DIR"));
+    let out_dir = std::env::var("WETSPRING_BENCHMARK_DIR")
+        .unwrap_or_else(|_| format!("{}/../benchmarks/results", env!("CARGO_MANIFEST_DIR")));
     match report.save_json(&out_dir) {
         Ok(path) => println!("JSON results saved to {path}"),
         Err(e) => eprintln!("Warning: could not save JSON: {e}"),

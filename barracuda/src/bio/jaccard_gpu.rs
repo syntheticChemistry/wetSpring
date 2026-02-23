@@ -8,7 +8,7 @@
 //! matrix and returns Jaccard distances.
 
 use barracuda::device::WgpuDevice;
-use barracuda::ops::bio::pairwise_jaccard::PairwiseJaccardGpu;
+use barracuda::PairwiseJaccardGpu;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
@@ -95,16 +95,14 @@ impl JaccardGpu {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;
 
     #[tokio::test]
     async fn jaccard_gpu_basic() {
-        let gpu = match GpuF64::new().await {
-            Ok(g) => g,
-            Err(_) => return,
-        };
+        let Ok(gpu) = GpuF64::new().await else { return };
         let device = gpu.to_wgpu_device();
         let jg = JaccardGpu::new(&device);
 

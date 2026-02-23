@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::expect_used, clippy::unwrap_used)]
-//! Exp096: ToadStool Bio Op Absorption Validation
+#![allow(clippy::expect_used, clippy::unwrap_used, clippy::too_many_lines)]
+//! Exp096: `ToadStool` Bio Op Absorption Validation
 //!
 //! # Provenance
 //!
@@ -9,14 +9,14 @@
 //!
 //! # Purpose
 //!
-//! Validates that ToadStool's upstream bio ops (absorbed from wetSpring local
+//! Validates that `ToadStool`'s upstream bio ops (absorbed from wetSpring local
 //! WGSL shaders in Sessions 39-41) produce correct results. This is the
 //! **Lean phase** proof: same test data, same expected values, upstream ops.
 //!
 //! 1. `KmerHistogramGpu` — k-mer counting (absorbed S39)
 //! 2. `TaxonomyFcGpu` — Naive Bayes taxonomy scoring (absorbed S39)
 //! 3. `UniFracPropagateGpu` — tree propagation compile (absorbed S39)
-//! 4. `BatchedOdeRK4F64` — ODE RK4 integration via OdeSweepGpu (absorbed S41)
+//! 4. `BatchedOdeRK4F64` — ODE RK4 integration via `OdeSweepGpu` (absorbed S41)
 
 use std::time::Instant;
 use wgpu::util::DeviceExt;

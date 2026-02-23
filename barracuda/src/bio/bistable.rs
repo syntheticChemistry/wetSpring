@@ -288,7 +288,7 @@ pub fn bifurcation_scan(
 mod tests {
     use super::*;
 
-    const DT: f64 = 0.001;
+    const DT: f64 = crate::tolerances::ODE_DEFAULT_DT;
     const SS_FRAC: f64 = 0.1;
 
     #[test]

@@ -24,7 +24,8 @@ use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
 use crate::io::fastq::FastqRecord;
 use barracuda::device::WgpuDevice;
-use barracuda::ops::bio::quality_filter::{QualityConfig, QualityFilterGpu as ToadStoolQF};
+use barracuda::ops::bio::quality_filter::QualityConfig;
+use barracuda::QualityFilterGpu as ToadStoolQF;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 

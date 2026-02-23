@@ -319,6 +319,70 @@ pub const GPU_VS_CPU_BRAY_CURTIS: f64 = 1e-10;
 /// over ~1000 replicates, accumulated rounding yields ~1e-4 drift.
 pub const GPU_VS_CPU_ENSEMBLE: f64 = 1e-4;
 
+// ═══════════════════════════════════════════════════════════════════
+// ODE integration parameters
+// ═══════════════════════════════════════════════════════════════════
+
+/// Default RK4 time step for ODE integration.
+///
+/// dt = 0.001 provides sub-percent accuracy for the stiff multi-species
+/// systems (QS biofilm, capacitor, phage defense) while keeping step
+/// counts reasonable. Validated against `scipy.integrate.odeint` (LSODA)
+/// across all 6 ODE models (Exp020/023/024/025/027/030).
+pub const ODE_DEFAULT_DT: f64 = 0.001;
+
+// ═══════════════════════════════════════════════════════════════════
+// Galaxy / Exp002 observational range tolerances
+// ═══════════════════════════════════════════════════════════════════
+
+/// ODE biofilm dispersed-state `B_ss` tolerance.
+///
+/// RK4 vs LSODA for biofilm concentration at near-zero steady states.
+/// `B_ss` ≈ 0.02–0.10 depending on scenario; 0.03 covers integrator drift
+/// between fixed-step RK4 and adaptive LSODA at dt=0.001.
+/// Validated: Exp020 (Waters 2008), `scripts/waters2008_qs_ode.py`.
+pub const ODE_BIOFILM_SS: f64 = 0.03;
+
+/// Bootstrap log-likelihood ensemble tolerance.
+///
+/// 100 bootstrap replicates produce mean LL near the original tree's LL.
+/// Sampling variance across resampled alignments yields a spread of
+/// ±5.0 log-likelihood units for typical 400-site alignments.
+/// Validated: Exp031 (Wang 2021 RAWR), `scripts/wang2021_rawr_bootstrap.py`.
+pub const BOOTSTRAP_LL_ENSEMBLE: f64 = 5.0;
+
+/// Phage defense population count tolerance (Bd vs Python baseline).
+///
+/// Phage attack scenario: large population ODE where absolute counts
+/// reach ~278 cells. RK4 vs LSODA at dt=0.001 differ by ~10 cells
+/// due to step-size sensitivity in rapid population crashes.
+/// Validated: Exp030 (Hsueh 2022), `scripts/hsueh2022_phage_defense.py`.
+pub const PHAGE_POPULATION_ABSOLUTE: f64 = 10.0;
+
+/// Exp002 Galaxy Shannon entropy range for rank-abundance curves.
+///
+/// Simulated communities derived from Exp002 phytoplankton rank-abundance
+/// profiles. Shannon varies from ~2.93 (low-diversity, 91 ASVs) to ~3.85
+/// (high-diversity, 856 ASVs). ±1.50 covers the full profile variability
+/// from geometric/power-law rank abundance curves.
+/// Source: `experiments/results/002_phytoplankton/diversity_report.json`.
+pub const GALAXY_SHANNON_RANGE: f64 = 1.50;
+
+/// Exp002 Galaxy Simpson range for rank-abundance curves.
+///
+/// Low-diversity community: Simpson ~0.86 ± 0.25. The wide range reflects
+/// sensitivity of Simpson to dominance in highly-skewed communities.
+/// Source: `experiments/results/002_phytoplankton/diversity_report.json`.
+pub const GALAXY_SIMPSON_RANGE: f64 = 0.25;
+
+/// Exp002 Galaxy Bray-Curtis range between dissimilar communities.
+///
+/// BC(low, high) diversity communities: expected near 0.50 but highly
+/// dependent on rank-abundance shape. ±0.50 covers [0.0, 1.0] for any
+/// biologically plausible community pair.
+/// Source: `experiments/results/002_phytoplankton/diversity_report.json`.
+pub const GALAXY_BRAY_CURTIS_RANGE: f64 = 0.50;
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -378,6 +442,13 @@ mod tests {
             GPU_VS_CPU_TRANSCENDENTAL,
             GPU_VS_CPU_BRAY_CURTIS,
             GPU_VS_CPU_ENSEMBLE,
+            ODE_DEFAULT_DT,
+            ODE_BIOFILM_SS,
+            BOOTSTRAP_LL_ENSEMBLE,
+            PHAGE_POPULATION_ABSOLUTE,
+            GALAXY_SHANNON_RANGE,
+            GALAXY_SIMPSON_RANGE,
+            GALAXY_BRAY_CURTIS_RANGE,
         ];
         for tol in all {
             assert!(tol >= 0.0, "tolerance {tol} must be non-negative");

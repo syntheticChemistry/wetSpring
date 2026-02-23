@@ -2,7 +2,7 @@
 
 **Parent**: ecoPrimals/wetSpring
 **Purpose**: Characterize available hardware substrates and guide Rust
-implementations for optimal absorption by ToadStool/BarraCUDA.
+implementations for optimal absorption by ToadStool/BarraCuda.
 
 ---
 
@@ -10,7 +10,7 @@ implementations for optimal absorption by ToadStool/BarraCUDA.
 
 wetSpring validates that life science and analytical chemistry algorithms
 can be faithfully ported from Python to Rust CPU, then promoted to GPU via
-ToadStool/BarraCUDA. metalForge characterizes the hardware those algorithms
+ToadStool/BarraCuda. metalForge characterizes the hardware those algorithms
 run on — what it can do, what the vendor SDK hides, and how to shape our
 Rust implementations so they absorb smoothly into ToadStool's multi-substrate
 dispatch system.
@@ -158,7 +158,7 @@ affinities. metalForge maps each validated algorithm to its optimal substrate.
 wetSpring follows hotSpring's pattern for ToadStool absorption:
 
 ```
-1. Validate in Rust CPU (barracuda/)          ← DONE: 41 CPU + 42 GPU modules, 740 tests, ~97% bio+io coverage, 103 experiments, 2,406+ checks.
+1. Validate in Rust CPU (barracuda/)          ← DONE: 41 CPU + 42 GPU modules, 750 tests, ~97% bio+io coverage, 120 experiments, 2,673+ checks.
 2. Characterize hardware (metalForge/)         ← THIS DIRECTORY
 3. Write Rust in GPU-friendly patterns         ← 24 absorbed by ToadStool (Lean); 5 local WGSL ODE; 7 Compose; 3 Passthrough
 4. ToadStool absorbs as shared primitives      ← unidirectional handoff via archive/handoffs/
@@ -277,7 +277,7 @@ remain in wetSpring until absorption.
 | **CPU math** (barracuda overlap) | 4 functions | erf, ln_gamma, regularized_gamma, integrate_peak |
 | **Blocked** | 3 modules | kmer (lock-free hash), UniFrac (tree traversal), taxonomy (NPU) |
 
-Active handoff: `../../wateringHole/handoffs/WETSPRING_TOADSTOOL_TIER_A_SHADERS_FEB21_2026.md`
+Active handoff: `../../wateringHole/handoffs/WETSPRING_V018_CROSS_SPRING_REWIRE_HANDOFF_FEB23_2026.md`
 
 ---
 
@@ -355,7 +355,7 @@ it and rely on `compile_shader_f64` or `ShaderTemplate` preprocessing.
 ## Absorption Engineering (Phase 17)
 
 wetSpring is now shaping all validated Rust implementations for
-ToadStool/BarraCUDA team absorption. Following hotSpring's pattern:
+ToadStool/BarraCuda team absorption. Following hotSpring's pattern:
 
 ### Ready for Absorption
 

@@ -12,7 +12,7 @@
 //! + one f64 division), so no polyfill required.
 
 use barracuda::device::WgpuDevice;
-use barracuda::ops::bio::ani::AniBatchF64;
+use barracuda::AniBatchF64;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
@@ -55,7 +55,7 @@ impl AniGpu {
     /// # Errors
     ///
     /// Returns `Err` if GPU dispatch or buffer readback fails.
-    #[allow(clippy::cast_possible_truncation)]
+    #[allow(clippy::cast_possible_truncation, clippy::similar_names)]
     pub fn batch_ani(&self, pairs: &[(&[u8], &[u8])]) -> crate::error::Result<AniGpuResult> {
         let n_pairs = pairs.len();
         if n_pairs == 0 {

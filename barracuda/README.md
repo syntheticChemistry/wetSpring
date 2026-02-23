@@ -19,7 +19,7 @@ wetspring-barracuda
 ├── 41 CPU bio modules          (pure Rust math, no external C deps)
 ├── 42 GPU bio modules          (27 Lean + 5 Write + 7 Compose + 3 Passthrough)
 ├── 3 streaming I/O parsers     (FASTQ/gzip, mzML/base64, MS2)
-├── 93 validation/benchmark bins (85 validate + 8 benchmark)
+├── 109 validation/benchmark binaries
 └── depends on: barracuda (ToadStool) via path dependency
 ```
 
@@ -157,8 +157,8 @@ wetspring-barracuda
 | `#![deny(clippy::expect_used, unwrap_used)]` | Enforced |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Line coverage | ~97% bio+io modules |
-| Tests | 740 (666 lib + 60 integration + 14 doc) |
-| Validation checks | 2,406+ (1,476 CPU + 702 GPU + 80 dispatch + layout/transfer) |
+| Tests | 750 (676 lib + 60 integration + 14 doc) |
+| Validation checks | 2,673+ (1,476 CPU + 702 GPU + 80 dispatch + layout/transfer) |
 
 ## Quick Start
 

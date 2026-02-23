@@ -207,6 +207,18 @@ impl Iterator for MzmlIter {
 /// collected into a `Vec`. For large files, prefer iterating with
 /// [`MzmlIter`] directly.
 ///
+/// # Examples
+///
+/// ```no_run
+/// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// use std::path::Path;
+/// use wetspring_barracuda::io::mzml;
+///
+/// let spectra = mzml::parse_mzml(Path::new("data.mzML"))?;
+/// assert!(!spectra.is_empty());
+/// # Ok(()) }
+/// ```
+///
 /// # Errors
 ///
 /// Returns [`Error::Io`] if the file cannot be opened, [`Error::Xml`]
@@ -851,5 +863,30 @@ mod tests {
         let results: Vec<Result<MzmlSpectrum>> = MzmlIter::open(&path).unwrap().collect();
         assert_eq!(results.len(), 1);
         assert!(results[0].is_err());
+    }
+
+    #[test]
+    fn mzml_nonexistent_file() {
+        let result = parse_mzml(std::path::Path::new("/nonexistent/data.mzML"));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn mzml_empty_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("empty.mzML");
+        std::fs::File::create(&path).unwrap();
+        let spectra = parse_mzml(&path).unwrap();
+        assert!(spectra.is_empty());
+    }
+
+    #[test]
+    fn mzml_stats_empty_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("empty.mzML");
+        std::fs::File::create(&path).unwrap();
+        let stats = stats_from_file(&path).unwrap();
+        assert_eq!(stats.num_spectra, 0);
+        assert_eq!(stats.total_peaks, 0);
     }
 }

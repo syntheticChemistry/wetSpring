@@ -5,7 +5,7 @@
 //! to be absorbed by `ToadStool` as `BatchedOdeRK4Generic<6, 16>`.
 //!
 //! Mhatre et al. 2020 capacitor model (6 variables, 16 parameters):
-//! - N: cell density, C: c-di-GMP, V: VpsR activity
+//! - N: cell density, C: c-di-GMP, V: `VpsR` activity
 //! - B: biofilm, M: motility, R: rugose colony phenotype
 
 use barracuda::device::WgpuDevice;

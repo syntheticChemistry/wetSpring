@@ -376,6 +376,41 @@ pub fn molecular_clock() -> BioWorkload {
         .with_primitive("FusedMapReduceF64")
 }
 
+// ── Composed GPU domains (Felsenstein → compose) ────────────────────
+
+/// DADA2 denoising — GPU E-step via `Dada2EStepGpu`.
+#[must_use]
+pub fn dada2() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "dada2",
+            vec![Capability::F64Compute, Capability::ShaderDispatch],
+        )
+        .with_primitive("Dada2EStepGpu")
+}
+
+/// Phylogenetic bootstrap — column resampling + `FelsensteinGpu` per replicate.
+#[must_use]
+pub fn bootstrap() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "bootstrap",
+            vec![Capability::F64Compute, Capability::ShaderDispatch],
+        )
+        .with_primitive("FelsensteinGpu")
+}
+
+/// Metagenomic placement — edge-parallel `FelsensteinGpu` for reads.
+#[must_use]
+pub fn placement() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "placement",
+            vec![Capability::F64Compute, Capability::ShaderDispatch],
+        )
+        .with_primitive("FelsensteinGpu")
+}
+
 // ── CPU-only domains (I/O-bound, no GPU benefit) ────────────────────
 
 /// FASTQ parsing (CPU-only, I/O-bound).
@@ -420,6 +455,10 @@ pub fn all_workloads() -> Vec<BioWorkload> {
         multi_signal_ode(),
         cooperation_ode(),
         capacitor_ode(),
+        // Felsenstein-composed domains
+        dada2(),
+        bootstrap(),
+        placement(),
         // CPU-only (I/O-bound)
         fastq_parsing(),
     ]
@@ -446,13 +485,13 @@ mod tests {
     #[test]
     fn all_workloads_has_entries() {
         let all = all_workloads();
-        assert!(all.len() >= 25, "expected at least 25 workloads");
+        assert!(all.len() >= 28, "expected at least 28 workloads");
     }
 
     #[test]
     fn origin_counts_match() {
         let (absorbed, local, cpu_only) = origin_summary();
-        assert_eq!(absorbed, 19, "19 absorbed domains");
+        assert_eq!(absorbed, 22, "22 absorbed domains");
         assert_eq!(local, 5, "5 local WGSL domains");
         assert_eq!(cpu_only, 1, "1 CPU-only domain");
     }

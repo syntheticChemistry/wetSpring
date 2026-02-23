@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: February 22, 2026
+**Last Updated**: February 23, 2026
 **Purpose**: Track papers for reproduction/review across three tracks
 
 ---
@@ -113,7 +113,7 @@ in a noisy medium (Track 1).
 
 | # | Paper | Faculty | Why | Status |
 |---|-------|---------|-----|--------|
-| 23 | Bourgain & Kachkovskiy (2018) "Anderson localization for two interacting quasiperiodic particles." GAFA | Kachkovskiy | Quorum sensing = signal propagation through a "disordered" bacterial population. Anderson localization theory describes when signals (autoinducers) reach distant cells vs. when they're absorbed by local noise. Mathematical bridge to Waters' c-di-GMP specificity problem | Reference |
+| 23 | Bourgain & Kachkovskiy (2018) "Anderson localization for two interacting quasiperiodic particles." GAFA | Kachkovskiy | Quorum sensing = signal propagation through a "disordered" bacterial population. Anderson localization theory describes when signals (autoinducers) reach distant cells vs. when they're absorbed by local noise. Mathematical bridge to Waters' c-di-GMP specificity problem | **DONE** (Exp107: 25/25 checks — Anderson 1D/2D/3D, Almost-Mathieu, Lanczos, QS-disorder analogy) |
 
 ---
 
@@ -135,17 +135,22 @@ No proprietary data dependencies.
 | **Phylogenetics** | 15-20 | Algorithms from published papers; PhyNetPy/SATé public datasets | Open (journal + repo) |
 | **Deep-sea genomics** | Exp051-056 | NCBI SRA (PRJNA283159, PRJEB5293), MBL darchive, MG-RAST, Figshare, OSF | Open (public repos) |
 | **Sandia proxy** | Exp039-040 | Synthetic proxy data (not original Sandia datasets) | Open (generated) |
-| **Cross-spring** | Paper 23 | Mathematical framework reference (no reproduction data) | Reference only |
+| **Cross-spring** | Paper 23 (Exp107) | `barracuda::spectral` primitives (Anderson, Lanczos, level statistics) | Open (algorithmic — no external data) |
+| **NCBI-scale GPU** | Exp108-113 | Synthetic at NCBI-realistic scale (Vibrio, MassBank, Campylobacterota, HAB, HMP/Tara) | Open (synthetic, mirrors NCBI) |
+| **NPU reservoir** | Exp114-119 | ESN trained on GPU output, int8 quantized for Akida AKD1000 | Open (ESN weights from open training data) |
 
 ### Validation Tiers by Hardware
 
 | Tier | Description | Experiments | Checks |
 |------|-------------|:-----------:|:------:|
-| **BarraCuda CPU** | Rust math matches Python baselines | Exp035,043,057,070,079,085 | 205/205 |
-| **BarraCuda GPU** | GPU math matches CPU reference | Exp064,071,087,092 | 609 |
-| **metalForge** | Substrate-independent output (CPU/GPU/NPU) | Exp060,065,080,084,086,088,093 | 172+ |
-| **Streaming** | Pure GPU pipeline, zero CPU round-trips | Exp072,073,075,089,090,091 | 180+ |
-| **Cross-spring** | neuralSpring primitives validated | Exp094,095 | 46 |
+| **BarraCuda CPU** | Rust math matches Python baselines | Exp035,043,057,070,079,085,102 | 380/380 |
+| **BarraCuda GPU** | GPU math matches CPU reference | Exp064,071,087,092,101 | 702+ |
+| **metalForge** | Substrate-independent output (CPU/GPU/NPU) | Exp060,065,080,084,086,088,093,103,104 | 234+ |
+| **Streaming** | Pure GPU pipeline, zero CPU round-trips | Exp072,073,075,089,090,091,105,106 | 252+ |
+| **Cross-spring** | neuralSpring + spectral theory primitives | Exp094,095,107 | 71 |
+| **NCBI-scale** | Real-scale data extensions | Exp108-113 | 78 |
+| **NPU reservoir** | ESN → int8 → Akida deployment | Exp114-119 | 59 |
+| **Cross-spring evolution** | 612 WGSL shaders traced, imports rewired | Exp120 | 9 |
 
 ---
 
@@ -156,4 +161,4 @@ No proprietary data dependencies.
 - Track 1b papers (Liu) bridge to neuralSpring via HMM ↔ LSTM isomorphism
 - Track 2 papers (Jones) depend on accessing PFAS mass spec data
 - Cahill/Smallwood papers may require Sandia data access agreements
-- Paper 23 (Kachkovskiy) is a cross-spring reference — reproduction happens in groundSpring, wetSpring consumes the mathematical framework
+- Paper 23 (Kachkovskiy) is now validated via cross-spring spectral primitives (Exp107: 25/25 checks)

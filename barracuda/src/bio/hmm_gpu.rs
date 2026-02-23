@@ -12,7 +12,7 @@
 //! forward for one sequence, yielding one log-likelihood per sequence.
 
 use barracuda::device::WgpuDevice;
-use barracuda::ops::bio::hmm::HmmBatchForwardF64;
+use barracuda::HmmBatchForwardF64;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 

@@ -492,7 +492,7 @@ pub fn stats_from_file(path: &Path) -> Result<FastqStats> {
     let mut reader = open_reader(path)?;
     let mut header_buf = String::new();
     let mut seq_buf = String::new();
-    let mut sep_buf = String::new();
+    let mut separator_buf = String::new();
     let mut qual_buf = String::new();
     let mut acc = StatsAccumulator::new();
 
@@ -512,8 +512,8 @@ pub fn stats_from_file(path: &Path) -> Result<FastqStats> {
         read_line(reader.as_mut(), &mut seq_buf, path)?;
         let seq_len = trimmed_len(&seq_buf);
 
-        sep_buf.clear();
-        read_line(reader.as_mut(), &mut sep_buf, path)?;
+        separator_buf.clear();
+        read_line(reader.as_mut(), &mut separator_buf, path)?;
 
         qual_buf.clear();
         read_line(reader.as_mut(), &mut qual_buf, path)?;
@@ -874,5 +874,43 @@ mod tests {
         assert_eq!(records.len(), 1);
         assert_eq!(records[0].id, "g1");
         assert_eq!(records[0].sequence, b"ACGT");
+    }
+
+    #[test]
+    fn parse_fastq_bad_header() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_fastq(&dir, "bad.fastq", "NOPE\nACGT\n+\nIIII\n");
+        assert!(parse_fastq(&path).is_err());
+    }
+
+    #[test]
+    fn stats_from_file_bad_header() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_fastq(&dir, "bad.fastq", "NOT_HEADER\nACGT\n+\nIIII\n");
+        assert!(stats_from_file(&path).is_err());
+    }
+
+    #[test]
+    fn fastq_iter_bad_header() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_fastq(&dir, "bad.fastq", "NOPE\nACGT\n+\nIIII\n");
+        let mut iter = FastqIter::open(&path).unwrap();
+        assert!(iter.next().unwrap().is_err());
+        assert!(iter.next().is_none());
+    }
+
+    #[test]
+    fn parse_fastq_truncated_record() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_fastq(&dir, "trunc.fastq", "@r1\nACGT\n+\n");
+        let records = parse_fastq(&path).unwrap();
+        assert_eq!(records.len(), 1);
+        assert!(records[0].quality.is_empty());
+    }
+
+    #[test]
+    fn fastq_nonexistent_file() {
+        let result = parse_fastq(std::path::Path::new("/nonexistent/reads.fastq"));
+        assert!(result.is_err());
     }
 }
