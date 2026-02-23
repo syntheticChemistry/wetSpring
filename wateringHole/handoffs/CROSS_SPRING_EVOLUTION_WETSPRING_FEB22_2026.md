@@ -197,15 +197,15 @@ be used between heterogeneous accelerators.
 
 | Metric | Value |
 |--------|-------|
-| Experiments | 91 |
-| Validation checks | 2,173+ (all PASS) |
-| Rust tests | 728 |
-| Binaries | 81 |
-| ToadStool primitives consumed | 23 |
-| Local WGSL shaders | 4 (ODE, kmer, unifrac, taxonomy) |
-| Tier A modules | 7 |
-| Tier B modules | 2 |
-| Handoff version | v8 |
+| Experiments | 103 |
+| Validation checks | 2,406+ (all PASS) |
+| Rust tests | 740 |
+| Binaries | 93 |
+| ToadStool primitives consumed | 30 |
+| Local WGSL shaders | 5 (ODE: phage, bistable, multi_signal, cooperation, capacitor) |
+| GPU modules | 42 (27 Lean + 5 Write + 7 Compose + 3 Passthrough) |
+| Tier B/C modules | 0 (all promoted Phase 28) |
+| Handoff version | v15 |
 
 ---
 

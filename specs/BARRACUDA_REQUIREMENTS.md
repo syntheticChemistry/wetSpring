@@ -21,7 +21,7 @@
 | Track 1c | ani, snp, dnds, molecular_clock, pangenome | Sovereign |
 | ML | decision_tree, random_forest, gbm | Sovereign |
 
-### GPU Primitives (30 ToadStool primitives + 3 local WGSL, 664 checks)
+### GPU Primitives (30 ToadStool primitives + 5 local WGSL + 12 GPU wrappers, 702 checks)
 
 | ToadStool Primitive | wetSpring Use | Checks | Performance |
 |-------------------|---------------|--------|-------------|
@@ -38,18 +38,39 @@
 | `FelsensteinGpu` | Phylogenetic pruning likelihood | 15/15 | **Absorbed + composed** |
 | `GemmF64::WGSL` | Eliminates fragile include_str! path | — | **Absorbed Feb 20** |
 
-### Local WGSL Shaders (3 — Write phase active)
+### Local WGSL Shaders (5 — Write phase active)
 
-Original 12 shaders absorbed by ToadStool (S31d/31g + S39-41). New Write cycle
-started for ODE domains not covered by the existing `BatchedOdeRK4F64` (4v/17p):
+Original 12 shaders absorbed by ToadStool (S31d/31g + S39-41). Write cycle
+covers all ODE domains not covered by the existing `BatchedOdeRK4F64` (4v/17p):
 
 | Shader | Vars | Params | CPU ↔ GPU | Exp |
 |--------|------|--------|-----------|-----|
 | `phage_defense_ode_rk4_f64.wgsl` | 4 | 11 | Exact parity | 099 |
 | `bistable_ode_rk4_f64.wgsl` | 5 | 21 | Exact parity | 100 |
 | `multi_signal_ode_rk4_f64.wgsl` | 7 | 24 | Exact parity | 100 |
+| `cooperation_ode_rk4_f64.wgsl` | 4 | 13 | Exact parity | 101 |
+| `capacitor_ode_rk4_f64.wgsl` | 6 | 16 | Exact parity | 101 |
 
 Absorption target: ToadStool `BatchedOdeRK4Generic<N_VARS, N_PARAMS>`.
+
+### GPU Wrappers (12 — Compose/Passthrough)
+
+Pure GPU promotion (Exp101) added 12 GPU wrappers via Compose strategy
+(wire existing ToadStool primitives) or Passthrough (GPU buffers + CPU core):
+
+| Module | ToadStool Primitive | Strategy |
+|--------|-------------------|----------|
+| `kmd_gpu` | `FusedMapReduceF64` | Compose |
+| `gbm_gpu` | `TreeInferenceGpu` | Compose |
+| `merge_pairs_gpu` | `FusedMapReduceF64` | Compose |
+| `signal_gpu` | `FusedMapReduceF64` | Compose |
+| `feature_table_gpu` | `FMR + WeightedDotF64` | Compose |
+| `robinson_foulds_gpu` | `PairwiseHammingGpu` | Compose |
+| `derep_gpu` | `KmerHistogramGpu` | Compose |
+| `chimera_gpu` | `GemmCachedF64` | Compose |
+| `neighbor_joining_gpu` | `FusedMapReduceF64` | Compose |
+| `reconciliation_gpu` | Batch workgroup | Passthrough |
+| `molecular_clock_gpu` | `FusedMapReduceF64` | Compose |
 
 ---
 
@@ -87,21 +108,23 @@ Absorption target: ToadStool `BatchedOdeRK4Generic<N_VARS, N_PARAMS>`.
 |-----------|----------|----------|--------|
 | ~~K-mer counting GPU~~ | ✅ `kmer_gpu` wraps `KmerHistogramGpu` (Exp099) | Done | — |
 | ~~UniFrac GPU~~ | ✅ `unifrac_gpu` wraps `UniFracPropagateGpu` (Exp099) | Done | — |
+| ~~Cooperation GPU~~ | ✅ Local WGSL ODE shader (Exp101) | Done | — |
+| ~~Capacitor GPU~~ | ✅ Local WGSL ODE shader (Exp101) | Done | — |
+| ~~13 Tier B/C modules~~ | ✅ Pure GPU promotion complete (Exp101) | Done | — |
 | Taxonomy NPU | Naive Bayes → FC model → int8 | **P3** | NPU candidate |
-| ODE generic absorption | 3 local shaders → `BatchedOdeRK4Generic` | **P2** | ToadStool generalization |
-| Cooperation GPU | CPU refactor (payoff matrix layout) | **P3** | Tier B |
+| ODE generic absorption | 5 local shaders → `BatchedOdeRK4Generic` | **P2** | ToadStool generalization |
 
 ### BarraCuda Evolution Path
 
 ```
-DONE                                     DONE/CURRENT                     GOAL
+DONE                                     DONE                              GOAL
 ──────────────────────────               ────────────────────             ──────────────────
-Python baseline (35 scripts)  ────────→  Rust CPU parity (205/205) ────→  ✓ DONE
-GPU diversity (38/38)         ────────→  GPU Parity v1 (Exp064)  ──────→  ✓ DONE (8 domains)
+Python baseline (40 scripts)  ────────→  Rust CPU parity (380/380) ────→  ✓ DONE (v1–v8)
+GPU diversity (38/38)         ────────→  GPU Parity (29 domains)  ──────→  ✓ DONE (Exp101)
 GPU pipeline (88/88)          ────────→  GPU RF inference (13/13) ──────→  NPU for low-power inference
 CPU 22.5× faster than Python  ────────→  GPU math PROVEN portable ─────→  Scale via streaming
-12 shaders absorbed (S31d/g + S39-41) ─→  30 ToadStool + 3 local   ────→  Full Write→Absorb→Lean cycle
-25 CPU domains validated      ────────→  metalForge PROVEN (Exp065) ───→  CPU/GPU/NPU routing
+12 shaders absorbed (S31d/g + S39-41) ─→  42 GPU modules + 5 local ────→  Full Write→Absorb→Lean cycle
+29 GPU domains validated      ────────→  metalForge PROVEN (Exp103) ───→  CPU/GPU/NPU routing
 ```
 
 ---
@@ -112,7 +135,7 @@ CPU 22.5× faster than Python  ────────→  GPU math PROVEN port
 - Native `log(f64)` crashes NVIDIA NVVM compiler — all transcendentals must use portable implementations
 - **NVVM workaround**: force `ShaderTemplate::for_driver_auto(source, true)` for shaders using exp/log
 - Spectral cosine achieves 926× GPU speedup — the first "GPU wins decisively" benchmark from any spring
-- 41 CPU + 30 GPU Rust modules with 1 runtime dependency (flate2) — highest sovereignty ratio in the ecosystem
-- **12 shaders absorbed + 3 local WGSL (Write phase)** — see `barracuda/EVOLUTION_READINESS.md` for status
+- 41 CPU + 42 GPU Rust modules with 1 runtime dependency (flate2) — highest sovereignty ratio in the ecosystem
+- **12 shaders absorbed + 5 local WGSL (Write phase) + 12 composed wrappers** — see `barracuda/EVOLUTION_READINESS.md` for status
 - **Rust edition 2024**, MSRV 1.85 — `f64::midpoint()`, `usize::midpoint()`, `const fn` promotions
 - **`#![deny(unsafe_code)]`** — edition 2024 makes `std::env::set_var` unsafe; `#[allow]` confined to test env-var calls

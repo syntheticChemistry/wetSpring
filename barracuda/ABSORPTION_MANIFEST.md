@@ -2,7 +2,7 @@
 
 **Date:** February 22, 2026
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**Status:** 30 ToadStool primitives consumed (Lean), 3 local WGSL shaders (Write phase), 5 new GPU wrappers, 1 Tier B remaining
+**Status:** 30 ToadStool primitives consumed (Lean), 5 local WGSL ODE shaders (Write phase), 42 GPU modules total, 0 Tier B/C remaining
 
 ---
 
@@ -44,11 +44,13 @@ WGSL          known physics   handoffs/                        delete local
 
 | Phase | Description | Status |
 |-------|-------------|--------|
-| Write | Local WGSL shaders for Tier A modules | **4 shaders** (ODE, kmer, unifrac, taxonomy) |
-| Validate | CPU ↔ GPU parity for all shaders | ODE: 7/7; others: pending |
-| Hand off | wateringHole/handoffs/ documents | v8 active, 6 archived |
+| Write | Local WGSL ODE shaders | **5 shaders** (phage_defense, bistable, multi_signal, cooperation, capacitor) |
+| Compose | GPU wrappers wiring ToadStool primitives | **7 modules** (kmd, merge_pairs, RF, derep, NJ, reconciliation, molecular_clock) |
+| Passthrough | Accept GPU buffers, CPU kernel | **3 modules** (gbm, feature_table, signal) |
+| Validate | CPU ↔ GPU parity for all shaders | All 5 ODE: exact parity (Exp099/100/101) |
+| Hand off | wateringHole/handoffs/ documents | v15 active (ODE generic), 7+ archived |
 | Absorb | ToadStool integrates as `ops::bio::*` | **24 primitives** absorbed |
-| Lean | Rewire to upstream, delete local code | 24 primitives lean (19 wetSpring + 5 neuralSpring) |
+| Lean | Rewire to upstream, delete local code | 27 primitives lean (22 wetSpring + 5 neuralSpring) |
 
 ---
 
@@ -86,16 +88,19 @@ Local WGSL deleted; wetSpring imports from `barracuda::*`.
 
 ---
 
-## Local WGSL Shaders (Write Phase — 4 shaders)
+## Local WGSL Shaders (Write Phase — 5 ODE shaders)
 
-Shaders written locally, pending ToadStool absorption.
+All 5 shaders are RK4 ODE integrators using `compile_shader_f64()` with
+`fmax`/`fclamp`/`fpow` polyfills. Pending ToadStool absorption as
+`BatchedOdeRK4Generic<N_VARS, N_PARAMS>`.
 
-| Shader | File | Domain | GPU Checks | Blocker |
-|--------|------|--------|:----------:|---------|
-| `batched_qs_ode_rk4_f64.wgsl` | `src/shaders/` | QS/c-di-GMP ODE | 7 (Exp049) | Upstream uses `compile_shader` not `compile_shader_f64` |
-| `kmer_histogram_f64.wgsl` | `src/shaders/` | K-mer counting | pending | Needs validation binary |
-| `unifrac_propagate_f64.wgsl` | `src/shaders/` | UniFrac distance | pending | Multi-pass tree levels |
-| `taxonomy_fc_f64.wgsl` | `src/shaders/` | Taxonomy scoring | pending | NPU int8 variant |
+| Shader | File | Vars | Params | CPU ↔ GPU | Exp |
+|--------|------|:----:|:------:|-----------|-----|
+| `phage_defense_ode_rk4_f64.wgsl` | `src/shaders/` | 4 | 11 | Exact parity | 099 |
+| `bistable_ode_rk4_f64.wgsl` | `src/shaders/` | 5 | 21 | Exact parity | 100 |
+| `multi_signal_ode_rk4_f64.wgsl` | `src/shaders/` | 7 | 24 | Exact parity | 100 |
+| `cooperation_ode_rk4_f64.wgsl` | `src/shaders/` | 4 | 13 | Exact parity | 101 |
+| `capacitor_ode_rk4_f64.wgsl` | `src/shaders/` | 6 | 16 | Exact parity | 101 |
 
 ### Shader Conventions (matching hotSpring)
 
@@ -108,23 +113,55 @@ Shaders written locally, pending ToadStool absorption.
 
 ---
 
-## Tier A Candidates (7 modules — GPU/NPU ready)
+## Compose Phase (7 GPU Wrappers)
 
-| Module | Domain | Flat API | WGSL Shader | Priority | Notes |
-|--------|--------|:--------:|:-----------:|:--------:|-------|
-| `ode` | RK4 integrator | ✅ | ✅ `batched_qs_ode_rk4_f64.wgsl` | P1 | Blocked on ToadStool |
-| `qs_biofilm` | QS/c-di-GMP | ✅ | ✅ (shares ODE shader) | P1 | Same shader, different params |
-| `multi_signal` | 7-var ODE | ✅ | Maps to ODE sweep | P2 | Flat API via Exp078 |
-| `phage_defense` | CRISPR/RM ODE | ✅ | Maps to ODE sweep | P2 | Flat API via Exp078 |
-| `kmer` | K-mer histogram | ✅ | ✅ `kmer_histogram_f64.wgsl` | P2 | 4^k flat buffer |
-| `unifrac` | UniFrac distance | ✅ | ✅ `unifrac_propagate_f64.wgsl` | P2 | CSR flat tree |
-| `taxonomy` | Naive Bayes | ✅ | ✅ `taxonomy_fc_f64.wgsl` | P3 | GPU f64 + NPU int8 |
+GPU wrappers that wire existing ToadStool primitives for GPU-accelerated
+workflows. No local WGSL needed — these compose upstream ops.
 
-### Tier B (1 module — needs refactoring)
+| Module | ToadStool Primitive | Strategy | Exp |
+|--------|-------------------|----------|-----|
+| `kmd_gpu` | `KmerHistogramGpu` | Kendrick mass defect via k-mer histogram | 101 |
+| `merge_pairs_gpu` | `PairwiseHammingGpu` | Overlap scoring via Hamming distance | 101 |
+| `robinson_foulds_gpu` | `PairwiseHammingGpu` | Bipartition distance via Hamming | 101 |
+| `derep_gpu` | `KmerHistogramGpu` | Sequence hashing via k-mer histogram | 101 |
+| `neighbor_joining_gpu` | `GemmCachedF64` | Distance matrix operations | 101 |
+| `reconciliation_gpu` | `TreeInferenceGpu` | DTL cost inference via tree traversal | 101 |
+| `molecular_clock_gpu` | `GemmCachedF64` | Rate matrix operations | 101 |
 
-| Module | Domain | Status | Notes |
-|--------|--------|--------|-------|
-| `cooperation` | Game theory QS | Flat API (Exp078) | Maps to ODE sweep once ODE blocker clears |
+---
+
+## Passthrough Phase (3 GPU Wrappers)
+
+Accept GPU buffers but run CPU kernels. Pending ToadStool primitives for
+full GPU dispatch.
+
+| Module | CPU Kernel | Needed Primitive | Exp |
+|--------|-----------|-----------------|-----|
+| `gbm_gpu` | Sequential boosting | `GbmBatchInferenceGpu` | 101 |
+| `feature_table_gpu` | Feature extraction pipeline | `FeatureExtractionGpu` | 101 |
+| `signal_gpu` | Peak detection (1D) | `PeakDetectGpu` | 101 |
+
+---
+
+## Tier B/C — All Promoted (Phase 28)
+
+All 13 former Tier B/C modules have been promoted to GPU-capable:
+
+| Former Tier | Module | Promoted To | Notes |
+|-------------|--------|-------------|-------|
+| B | `cooperation` | Write (local WGSL 4v/13p) | ODE RK4 f64 shader |
+| C | `capacitor` | Write (local WGSL 6v/16p) | ODE RK4 f64 shader |
+| C | `kmd` | Compose (`KmerHistogramGpu`) | Kendrick mass defect |
+| C | `gbm` | Passthrough | Sequential boosting |
+| C | `merge_pairs` | Compose (`PairwiseHammingGpu`) | Overlap merging |
+| C | `signal` | Passthrough | Peak detection |
+| C | `feature_table` | Passthrough | Feature extraction |
+| C | `robinson_foulds` | Compose (`PairwiseHammingGpu`) | Tree distance |
+| C | `derep` | Compose (`KmerHistogramGpu`) | Dereplication |
+| C | `chimera` | Compose (`GemmCachedF64`) | Chimera scoring (upgraded) |
+| C | `neighbor_joining` | Compose (`GemmCachedF64`) | NJ tree construction |
+| C | `reconciliation` | Compose (`TreeInferenceGpu`) | DTL reconciliation |
+| C | `molecular_clock` | Compose (`GemmCachedF64`) | Molecular clock |
 
 ---
 
@@ -200,9 +237,10 @@ Patterns from hotSpring and neuralSpring that wetSpring leans on:
 
 | Category | Checks | Status |
 |----------|:------:|--------|
-| CPU parity (Python → Rust) | 1,392 | ALL PASS |
-| GPU parity (CPU → GPU) | 609 | ALL PASS |
+| CPU parity (Python → Rust) | 1,476 | ALL PASS |
+| GPU parity (CPU → GPU) | 702+ | ALL PASS |
+| BarraCUDA CPU parity (v1-v8) | 380/380 | ALL PASS |
 | Streaming dispatch | 80 | ALL PASS |
-| Layout fidelity (Tier A) | 35 | ALL PASS |
+| Layout fidelity | 35 | ALL PASS |
 | Transfer/streaming | 57 | ALL PASS |
-| **Total** | **2,219+** | **ALL PASS** |
+| **Total** | **2,406+** | **ALL PASS** |

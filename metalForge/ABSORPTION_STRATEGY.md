@@ -2,7 +2,7 @@
 
 **Date:** February 22, 2026
 **Pattern:** Write → Absorb → Lean (from hotSpring)
-**Status:** 30 ToadStool primitives (Lean complete), 3 local WGSL, 7 Tier A CPU modules
+**Status:** 30 ToadStool primitives (Lean), 5 local WGSL ODE shaders (Write), 42 GPU modules total, 0 Tier B/C
 
 ---
 
@@ -100,11 +100,40 @@ Every local shader must pass before handoff:
 | `PrngXoshiro` | `bio::rarefaction_gpu` | `ops::random::xoshiro` | Feb 22 |
 | `BatchTolSearchF64` | `bio::tolerance_search` | `ops::search::tol_search` | Feb 22 |
 
-### Local WGSL Shaders (3 — Write phase active)
+### Local WGSL Shaders (5 — Write phase active)
 
-All 12 shaders absorbed by ToadStool (sessions 31d/31g + 39-41). The `shaders/`
-directory is empty. Final 4 absorbed Feb 22: ODE (S41 fixed `compile_shader_f64`),
-kmer (S40), unifrac (S40), taxonomy (S40).
+The `barracuda/src/shaders/` directory contains 5 ODE RK4 f64 WGSL shaders:
+
+| Shader | Vars | Params | Exp |
+|--------|:----:|:------:|-----|
+| `phage_defense_ode_rk4_f64.wgsl` | 4 | 11 | 099 |
+| `bistable_ode_rk4_f64.wgsl` | 5 | 21 | 100 |
+| `multi_signal_ode_rk4_f64.wgsl` | 7 | 24 | 100 |
+| `cooperation_ode_rk4_f64.wgsl` | 4 | 13 | 101 |
+| `capacitor_ode_rk4_f64.wgsl` | 6 | 16 | 101 |
+
+All use `compile_shader_f64()` with polyfills. Pending ToadStool absorption
+as `BatchedOdeRK4Generic<N_VARS, N_PARAMS>`.
+
+### Compose GPU Wrappers (7 — Phase 28)
+
+| Module | ToadStool Primitive | Domain |
+|--------|-------------------|--------|
+| `kmd_gpu` | `KmerHistogramGpu` | Kendrick mass defect |
+| `merge_pairs_gpu` | `PairwiseHammingGpu` | Paired-end overlap merging |
+| `robinson_foulds_gpu` | `PairwiseHammingGpu` | Bipartition tree distance |
+| `derep_gpu` | `KmerHistogramGpu` | Sequence dereplication |
+| `neighbor_joining_gpu` | `GemmCachedF64` | NJ tree construction |
+| `reconciliation_gpu` | `TreeInferenceGpu` | DTL reconciliation |
+| `molecular_clock_gpu` | `GemmCachedF64` | Molecular clock |
+
+### Passthrough GPU Wrappers (3 — Phase 28)
+
+| Module | CPU Kernel | Needed Primitive |
+|--------|-----------|-----------------|
+| `gbm_gpu` | Sequential boosting | `GbmBatchInferenceGpu` |
+| `feature_table_gpu` | Feature extraction | `FeatureExtractionGpu` |
+| `signal_gpu` | Peak detection (1D) | `PeakDetectGpu` |
 
 ### Completed Compositions (were candidates, now validated)
 
@@ -138,13 +167,18 @@ Total: 27/27 GPU checks PASS. These are ToadStool absorption candidates.
 RF batch inference validated against CPU in `validate_gpu_rf`.
 SoA layout: separate node_features, node_thresholds (f64), node_children buffers.
 
-### Remaining Shader Candidates (Original)
+### Remaining Absorption Candidates
 
-| Algorithm | Shader Design | Priority | Status |
-|-----------|--------------|----------|--------|
-| K-mer counting | GPU hash table (lock-free) | P3 | Blocked |
-| UniFrac traversal | GPU tree traversal primitive | P3 | Blocked |
-| Taxonomy FC model | Naive Bayes → int8 FC → NPU | P3 | NPU candidate |
+All former Tier A/B/C modules now have GPU paths. Remaining absorption
+candidates are the 5 ODE WGSL shaders → ToadStool `BatchedOdeRK4Generic`,
+and the 3 Passthrough modules which need new ToadStool primitives:
+
+| Candidate | Type | ToadStool Target |
+|-----------|------|-----------------|
+| 5 ODE WGSL shaders | Write → Absorb | `BatchedOdeRK4Generic<N_VARS, N_PARAMS>` |
+| `gbm_gpu` | Passthrough → Write | `GbmBatchInferenceGpu` (new primitive) |
+| `feature_table_gpu` | Passthrough → Write | `FeatureExtractionGpu` (new primitive) |
+| `signal_gpu` | Passthrough → Write | `PeakDetectGpu` (new primitive) |
 
 ---
 
@@ -202,8 +236,8 @@ hotSpring's proven methodology:
 | Preallocated buffers | No alloc in hot path; reuse via `BufferPool` | `GemmCached` pipeline |
 | Deterministic math | Same input → same output (bit-exact f64) | All `bio::*` modules |
 | `mul_add` chains | FMA-friendly for both CPU SIMD and GPU | `crate::special::erf` polynomial |
-| Named tolerances | Central constants, not magic numbers | 32 constants in `tolerances.rs` |
-| Provenance headers | Script, commit, command, hardware | All 73 validation binaries |
+| Named tolerances | Central constants, not magic numbers | 43 constants in `tolerances.rs` |
+| Provenance headers | Script, commit, command, hardware | All 93 validation binaries |
 
 ### What Makes Code Absorbable (Lessons from hotSpring)
 

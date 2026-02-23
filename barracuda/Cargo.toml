@@ -432,6 +432,12 @@ name = "validate_metalforge_v4"
 path = "src/bin/validate_metalforge_v4.rs"
 required-features = ["gpu"]
 
+# ── Pure GPU Promotion: All 13 Modules vs CPU Baselines ───────────
+[[bin]]
+name = "validate_pure_gpu_complete"
+path = "src/bin/validate_pure_gpu_complete.rs"
+required-features = ["gpu"]
+
 # ── Expanded CPU vs GPU + metalForge (Exp099) ────────────────────
 [[bin]]
 name = "validate_cpu_gpu_expanded"
@@ -529,4 +535,13 @@ required-features = ["gpu"]
 [[bin]]
 name = "validate_cross_substrate_pipeline"
 path = "src/bin/validate_cross_substrate_pipeline.rs"
+required-features = ["gpu"]
+
+[[bin]]
+name = "validate_barracuda_cpu_v8"
+path = "src/bin/validate_barracuda_cpu_v8.rs"
+
+[[bin]]
+name = "validate_metalforge_v5"
+path = "src/bin/validate_metalforge_v5.rs"
 required-features = ["gpu"]

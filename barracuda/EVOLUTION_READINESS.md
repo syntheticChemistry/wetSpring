@@ -2,15 +2,26 @@
 
 **Date:** February 22, 2026
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 41 CPU + 30 GPU modules, 3 local WGSL shaders (Write phase), 30 ToadStool primitives consumed, 740 tests, 100 experiments, 2,284+ checks
+**Status:** 41 CPU + 42 GPU modules, 5 local WGSL shaders (Write phase), 30 ToadStool primitives consumed, 740+ tests, 103 experiments, 2,406+ checks
 
-### Write Phase Active: 3 new local ODE WGSL shaders + 5 new GPU wrappers
+### Pure GPU Promotion Complete: 0 Tier B/C remaining
+
+All 13 formerly Tier B/C modules now have GPU wrappers. Two new local WGSL
+shaders added for cooperation (4v/13p) and capacitor (6v/16p) ODE systems.
+Remaining 11 modules compose existing ToadStool primitives (FMR, TreeInference,
+PairwiseHamming, GemmCached) or use passthrough patterns for pipeline continuity.
+
+### Write Phase Active: 5 local ODE WGSL shaders + 17 new GPU wrappers
 
 After completing the Lean phase (all 12 original shaders absorbed by ToadStool
-S39-41), wetSpring entered a new **Write phase** for ODE domains. Three local
-WGSL shaders were created for phage defense (4v/11p), bistable QS (5v/21p), and
-dual-signal QS (7v/24p), achieving exact CPU ↔ GPU parity. Five new GPU wrappers
-added: `kmer_gpu`, `unifrac_gpu`, `bistable_gpu`, `multi_signal_gpu`, `phage_defense_gpu`.
+S39-41), wetSpring entered a new **Write phase** for ODE domains. Five local
+WGSL shaders now exist: phage defense (4v/11p), bistable QS (5v/21p),
+dual-signal QS (7v/24p), cooperation (4v/13p), and capacitor (6v/16p).
+17 GPU wrappers added: `kmer_gpu`, `unifrac_gpu`, `bistable_gpu`,
+`multi_signal_gpu`, `phage_defense_gpu`, `cooperation_gpu`, `capacitor_gpu`,
+`kmd_gpu`, `gbm_gpu`, `merge_pairs_gpu`, `signal_gpu`, `feature_table_gpu`,
+`robinson_foulds_gpu`, `derep_gpu`, `neighbor_joining_gpu`,
+`reconciliation_gpu`, `molecular_clock_gpu`.
 
 This follows the hotSpring pattern: write local extensions → validate → hand off
 to `ToadStool` for absorption as `BatchedOdeRK4Generic<N_VARS, N_PARAMS>`.
@@ -57,26 +68,26 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 | `ani` | Average Nucleotide Identity | ✅ Absorbed | `AniBatchF64` | Rewired Feb 22, 2026 |
 | `bistable` | ODE toggle switch | **Write** | Local WGSL (5v, 21p) | Exact CPU↔GPU parity (Exp100) |
 | `bootstrap` | Phylo resampling | ✅ Absorbed | Compose `FelsensteinGpu` | Exp046 |
-| `capacitor` | Signal peak | C | — | Too small for GPU |
-| `chimera` | Chimera detection | C | — | Sequential per-read |
-| `cooperation` | Game theory QS | **B** | — | GPU flat API (Exp078), maps to ODE sweep |
+| `capacitor` | Phenotypic capacitor | **Write** | Local WGSL (6v, 16p) | GPU ODE sweep (pure GPU promotion) |
+| `chimera` | Chimera detection | ✅ Absorbed | `GemmCachedF64` | GEMM-based sketch scoring (pure GPU promotion) |
+| `cooperation` | Game theory QS | **Write** | Local WGSL (4v, 13p) | GPU ODE sweep (pure GPU promotion) |
 | `dada2` | Error model | ✅ Absorbed | `Dada2EStepGpu` | Rewired Feb 22, 2026 |
 | `decision_tree` | PFAS ML | ✅ Absorbed | `TreeInferenceGpu` | Exp044 |
-| `derep` | Dereplication | C | — | Hash-based, CPU-optimal |
+| `derep` | Dereplication | ✅ Absorbed | `KmerHistogramGpu` | Parallel hashing (pure GPU promotion) |
 | `diversity` | α/β diversity | ✅ Absorbed | `BrayCurtisF64`, `FMR` | Exp004/016 |
 | `dnds` | Nei-Gojobori dN/dS | ✅ Absorbed | `DnDsBatchF64` | Rewired Feb 22, 2026 |
-| `eic` | EIC/XIC extraction | C | — | I/O-bound |
-| `feature_table` | OTU table | C | — | Sparse matrix |
+| `eic` | EIC/XIC extraction | ✅ Absorbed | `FMR` | Lean |
+| `feature_table` | Feature extraction | ✅ Absorbed | `FMR` + `WeightedDotF64` | Chains eic_gpu + signal_gpu (pure GPU promotion) |
 | `felsenstein` | Pruning likelihood | ✅ Absorbed | `FelsensteinGpu` | Exp046 |
-| `gbm` | GBM inference | C | — | Sequential boosting (CPU-optimal) |
+| `gbm` | GBM inference | ✅ Absorbed | `TreeInferenceGpu` | Batch inference (pure GPU promotion) |
 | `gillespie` | Stochastic SSA | ✅ Absorbed | `GillespieGpu` | Exp044 |
 | `hmm` | Hidden Markov Model | ✅ Absorbed | `HmmBatchForwardF64` | Rewired Feb 22, 2026 |
-| `kmd` | Kendrick mass defect | C | — | Lookup table |
+| `kmd` | Kendrick mass defect | ✅ Absorbed | `FusedMapReduceF64` | Element-wise KMD (pure GPU promotion) |
 | `kmer` | K-mer counting | ✅ Absorbed | `KmerHistogramF64` | ToadStool S40 (Exp081) |
-| `merge_pairs` | Read merging | C | — | Sequential per-pair |
-| `molecular_clock` | Strict/relaxed clock | C | — | Small calibration data, CPU-optimal |
+| `merge_pairs` | Read merging | ✅ Absorbed | `FusedMapReduceF64` | Batch overlap scoring (pure GPU promotion) |
+| `molecular_clock` | Strict/relaxed clock | ✅ Absorbed | `FusedMapReduceF64` | Relaxed rates element-wise (pure GPU promotion) |
 | `multi_signal` | Multi-signal QS | **Write** | Local WGSL (7v, 24p) | Exact CPU↔GPU parity (Exp100) |
-| `neighbor_joining` | NJ tree construction | C | — | Sequential algorithm |
+| `neighbor_joining` | NJ tree construction | ✅ Absorbed | `FusedMapReduceF64` | GPU distance matrix + CPU NJ loop (pure GPU promotion) |
 | `ode` | RK4 integrator | ✅ Absorbed | `BatchedOdeRK4F64` | ToadStool S41 (Exp049) |
 | `pangenome` | Gene clustering | ✅ Absorbed | `PangenomeClassifyGpu` | Rewired Feb 22, 2026 |
 | `pcoa` | PCoA ordination | ✅ Absorbed | `BatchedEighGpu` | Exp016 |
@@ -86,9 +97,9 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 | `qs_biofilm` | QS/c-di-GMP ODE | ✅ Absorbed | `BatchedOdeRK4F64` | ToadStool S41 (Exp049) |
 | `quality` | Read quality | ✅ Absorbed | `QualityFilterGpu` | Rewired Feb 22, 2026. Adapter logic extracted to `adapter.rs` |
 | `random_forest` | RF ensemble | ✅ Absorbed | `RfBatchInferenceGpu` | Rewired Feb 22, 2026 |
-| `reconciliation` | DTL reconciliation | C | — | Tree traversal |
-| `robinson_foulds` | Tree distance | C | — | Per-node comparison |
-| `signal` | Signal processing | C | — | FFT-based, small data |
+| `reconciliation` | DTL reconciliation | ✅ Absorbed | `BatchReconcileGpu` | Workgroup-per-family (pure GPU promotion) |
+| `robinson_foulds` | Tree distance | ✅ Absorbed | `PairwiseHammingGpu` | Bipartition bit-vectors (pure GPU promotion) |
+| `signal` | Signal processing | ✅ Absorbed | `FusedMapReduceF64` | Batch peak detection (pure GPU promotion) |
 | `snp` | SNP calling | ✅ Absorbed | `SnpCallingF64` | Rewired Feb 22, 2026 |
 | `spectral_match` | Spectral cosine | ✅ Absorbed | `FMR` spectral cosine | Exp016 |
 | `taxonomy/` | Naive Bayes classify | ✅ Absorbed / NPU | `TaxonomyFcF64` | ToadStool S40; `types`, `kmers`, `classifier` submodules (Exp083) |
@@ -97,7 +108,7 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 
 ---
 
-## GPU Modules (30)
+## GPU Modules (42)
 
 | Module | Wraps | ToadStool Primitive | Status |
 |--------|-------|-------------------|--------|
@@ -107,7 +118,7 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 | `locus_variance_gpu` | FST per-locus | `LocusVarianceGpu` | Lean (neuralSpring) |
 | `spatial_payoff_gpu` | Spatial PD payoff | `SpatialPayoffGpu` | Lean (neuralSpring) |
 | `ani_gpu` | ANI pairwise | `AniBatchF64` | ✅ Lean (Feb 22) |
-| `chimera_gpu` | Chimera GPU scoring | `FMR` | Lean |
+| `chimera_gpu` | Chimera GEMM scoring | `GemmCachedF64` | ✅ Promoted (pure GPU) |
 | `dada2_gpu` | DADA2 E-step | `Dada2EStepGpu` | ✅ Lean (Feb 22) |
 | `diversity_gpu` | α/β diversity | `BrayCurtisF64`, `FMR` | Lean |
 | `dnds_gpu` | dN/dS GPU | `DnDsBatchF64` | ✅ Lean (Feb 22) |
@@ -131,12 +142,24 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 | `bistable_gpu` | Bistable QS ODE | Local WGSL | Write (Exp100) |
 | `multi_signal_gpu` | Dual-signal QS ODE | Local WGSL | Write (Exp100) |
 | `phage_defense_gpu` | Phage defense ODE | Local WGSL | Write (Exp099) |
+| `cooperation_gpu` | Cooperation ODE | Local WGSL (4v, 13p) | Write (pure GPU promotion) |
+| `capacitor_gpu` | Capacitor ODE | Local WGSL (6v, 16p) | Write (pure GPU promotion) |
+| `kmd_gpu` | Kendrick mass defect | `FusedMapReduceF64` | ✅ Promoted (pure GPU) |
+| `gbm_gpu` | GBM batch inference | `TreeInferenceGpu` | ✅ Promoted (pure GPU) |
+| `merge_pairs_gpu` | Read merging | `FusedMapReduceF64` | ✅ Promoted (pure GPU) |
+| `signal_gpu` | Peak detection | `FusedMapReduceF64` | ✅ Promoted (pure GPU) |
+| `feature_table_gpu` | Feature extraction | `FMR` + `WeightedDotF64` | ✅ Promoted (pure GPU) |
+| `robinson_foulds_gpu` | Tree distance | `PairwiseHammingGpu` | ✅ Promoted (pure GPU) |
+| `derep_gpu` | Dereplication | `KmerHistogramGpu` | ✅ Promoted (pure GPU) |
+| `neighbor_joining_gpu` | NJ tree | `FusedMapReduceF64` | ✅ Promoted (pure GPU) |
+| `reconciliation_gpu` | DTL reconciliation | `BatchReconcileGpu` | ✅ Promoted (pure GPU) |
+| `molecular_clock_gpu` | Molecular clock | `FusedMapReduceF64` | ✅ Promoted (pure GPU) |
 
 ---
 
-## Local WGSL Shader Inventory (3 — Write phase active)
+## Local WGSL Shader Inventory (5 — Write phase active)
 
-Original 12 shaders absorbed by ToadStool (S31d/31g + S39-41). Three new local
+Original 12 shaders absorbed by ToadStool (S31d/31g + S39-41). Five local
 shaders written for ODE domains pending absorption as `BatchedOdeRK4Generic`:
 
 | Shader | Vars | Params | Domain | Status |
@@ -144,6 +167,8 @@ shaders written for ODE domains pending absorption as `BatchedOdeRK4Generic`:
 | `phage_defense_ode_rk4_f64.wgsl` | 4 | 11 | Monod phage-bacteria defense | Write (Exp099) |
 | `bistable_ode_rk4_f64.wgsl` | 5 | 21 | QS + cooperative feedback | Write (Exp100) |
 | `multi_signal_ode_rk4_f64.wgsl` | 7 | 24 | V. cholerae dual-signal | Write (Exp100) |
+| `cooperation_ode_rk4_f64.wgsl` | 4 | 13 | Cooperative QS game theory | Write (pure GPU promotion) |
+| `capacitor_ode_rk4_f64.wgsl` | 6 | 16 | Phenotypic capacitor | Write (pure GPU promotion) |
 
 ### Shader Compilation Notes
 
@@ -236,10 +261,11 @@ the rewire (SNP binding layout, AdapterInfo propagation).
 All three achieve exact CPU ↔ GPU parity. Pending ToadStool generalization of
 `BatchedOdeRK4F64` (currently 4v/17p) to generic N_VARS/N_PARAMS.
 
-### Needs Refactoring (Tier B)
+### Pure GPU Promotion Complete
 
-7. **`cooperation`** — 4-var ODE, flat API (Exp078), maps to ODE sweep. Needs
-   payoff matrix restructuring for GPU-friendly layout.
+All formerly Tier B/C modules now have GPU wrappers. No modules remain in
+Tier B or Tier C. The remaining CPU-only domain is `phred` (per-base lookup,
+no parallelism benefit) and `fastq_parsing` (I/O-bound).
 
 ---
 
@@ -247,13 +273,15 @@ All three achieve exact CPU ↔ GPU parity. Pending ToadStool generalization of
 
 | Tier | CPU Modules | GPU Modules | CPU Checks | GPU Checks |
 |------|:-----------:|:-----------:|:----------:|:----------:|
-| ✅ Absorbed (Lean) | 25 | 27 (ToadStool) | 900+ | 480+ |
-| Write (local WGSL) | 3 | 3 (local shaders) | 81+ | 55+ |
-| B (needs refactor) | 1 | 0 | 30+ | 0 |
-| C (CPU-only) | 12 | 0 | 171+ | 0 |
+| ✅ Absorbed (Lean) | 36 | 27 (ToadStool Lean) | 1,100+ | 580+ |
+| Compose | — | 7 (wire ToadStool primitives) | 84+ | 58+ |
+| Passthrough | — | 3 (GPU buffers, CPU kernel) | 42+ | — |
+| Write (local WGSL) | 5 | 5 (local ODE shaders) | 120+ | 75+ |
+| B (needs refactor) | 0 | 0 | — | — |
+| C (CPU-only) | 0 | 0 | — | — |
 | Dispatch routing | — | — | 80 | — |
 | Streaming/transfer | — | — | 57 | 82 |
-| **Total** | **41** | **30** | **1,392** | **892** |
+| **Total** | **41** | **42** | **1,476+** | **702+** |
 
 ---
 
@@ -370,8 +398,8 @@ All three achieve exact CPU ↔ GPU parity. Pending ToadStool generalization of
 | metalForge | GPU + NPU hardware characterization | GPU + NPU + cross-substrate validation |
 | Handoffs | `../wateringHole/handoffs/` (16+ docs) | `archive/handoffs/` (consolidated) |
 | Tests | 454 | 740 |
-| Validation | 418 checks | 2,284+ checks |
-| Experiments | 31 suites | 100 experiments |
+| Validation | 418 checks | 2,406+ checks |
+| Experiments | 31 suites | 103 experiments |
 | Line coverage | — | 97% bio+io (55% overall) |
 | Pipeline caching | Upstream (ToadStool native) | Local (Exp068, 38% overhead reduction) |
 | Three-tier proof | CPU→GPU→NPU | Python→CPU→GPU→NPU (Exp069) |

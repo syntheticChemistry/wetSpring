@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 22, 2026
-**Status:** 100 experiments, 2,284+ validation checks, all PASS (740 Rust tests)
+**Status:** 103 experiments, 2,406+ validation checks, all PASS (740 Rust tests)
 
 ---
 
@@ -109,6 +109,9 @@
 | 098 | Upstream GPU Fixes | GPU/shader | COMPLETE | — (3 ToadStool bugs: SNP BGL, ODE f64, Jacobi eigenvectors) |
 | 099 | CPU vs GPU Expanded + metalForge | GPU/metalForge | COMPLETE | 27 (k-mer, UniFrac, ODE, phage defense, mixed-HW pipeline) |
 | 100 | metalForge v4 ODE Domains + NPU | GPU/metalForge | COMPLETE | 28 (bistable, multi-signal, phage defense, NPU routing, PCIe pipeline) |
+| 101 | Pure GPU Promotion Complete (13 modules) | GPU/parity | COMPLETE | 38 (13 modules CPU↔GPU, 2 new WGSL shaders) |
+| 102 | BarraCUDA CPU v8 — Pure GPU Domains | CPU/cross | COMPLETE | 84 (13 GPU-promoted domains, known-value validation) |
+| 103 | metalForge Cross-Substrate v5 | metalForge | COMPLETE | 38 (13 new GPU domains, substrate-independent) |
 
 ---
 
@@ -116,19 +119,20 @@
 
 | Category | Count |
 |----------|-------|
-| Experiments completed | 100 |
-| CPU validation checks | 1,392 |
-| GPU validation checks | 609 |
+| Experiments completed | 103 |
+| CPU validation checks | 1,476 |
+| GPU validation checks | 702 |
 | Dispatch validation checks | 80 |
 | Layout fidelity checks | 35 |
 | Transfer/streaming checks | 57 |
 | Cross-spring checks | 39 |
 | Local WGSL checks | 10 |
-| **Total validation checks** | **2,284+** |
+| Pure GPU promotion checks | 38 |
+| **Total validation checks** | **2,406+** |
 | Rust tests | 740 (666 lib + 60 integration + 14 doc) |
-| BarraCUDA CPU parity | 205/205 (25 domains + 6 ODE flat) |
-| BarraCUDA GPU parity | 16 domains (Exp064/087/092) |
-| metalForge cross-system | 16 domains CPU↔GPU proven (Exp093) |
+| BarraCUDA CPU parity | 380/380 (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted) |
+| BarraCUDA GPU parity | 29 domains (Exp064/087/092/101) |
+| metalForge cross-system | 29 domains CPU↔GPU proven (Exp103) |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | ToadStool primitives consumed | 28 (15 original + 8 bio + 5 neuralSpring) |
 
@@ -259,23 +263,26 @@ zero-copy I/O                  → FastqRefRecord, DecodeBuffer reuse, streaming
 
 ## BarraCUDA CPU Parity
 
-The `validate_barracuda_cpu` v1-v5 binaries prove pure Rust math matches
-Python across all 25 algorithmic domains:
+The `validate_barracuda_cpu` v1-v8 binaries prove pure Rust math matches
+Python across all algorithmic domains:
 - v1 (Exp035): 9 core domains
 - v2 (Exp035): +5 batch/flat APIs
 - v3 (Exp043): +9 domains (QS, phage, bootstrap, placement, decision tree, spectral, diversity, k-mer, pipeline)
 - v4 (Exp057): +5 Track 1c domains (ANI, SNP, dN/dS, molecular clock, pangenome)
 - v5 (Exp061/062): +2 ML domains (Random Forest, GBM)
+- v6 (Exp079): +6 ODE flat parameter round-trip
+- v7 (Exp085): +3 Tier A layout fidelity (kmer, unifrac, taxonomy)
+- v8 (Exp102): +13 GPU-promoted domains (cooperation, capacitor, kmd, gbm, merge_pairs, signal, feature_table, robinson_foulds, derep, chimera, neighbor_joining, reconciliation, molecular_clock)
 
-Combined: 205/205 CPU parity checks. This is the bridge to pure GPU execution.
+Combined: 380/380 CPU parity checks. This is the bridge to pure GPU execution.
 
 ```
-Total CPU time: ~85ms (release build, all 25 domains, v4 adds ~0.4ms, v5 adds ~62µs)
+Total CPU time: ~85ms (release build, all domains)
 ```
 
 ## BarraCUDA GPU Parity
 
-Exp064 consolidates ALL GPU-eligible domains into a single validation binary,
+Exp064 + Exp101 consolidate ALL GPU-eligible domains into validation binaries,
 proving pure GPU math matches CPU reference truth across the full portfolio:
 
 - Diversity (Shannon, Simpson, Bray-Curtis) — via `FusedMapReduceF64`
@@ -285,18 +292,17 @@ proving pure GPU math matches CPU reference truth across the full portfolio:
 - Pangenome — via `barracuda::ops::bio::pangenome::PangenomeClassifyGpu` (ToadStool)
 - Random Forest — via `barracuda::ops::bio::rf_inference::RfBatchInferenceGpu` (ToadStool)
 - HMM forward — via `barracuda::ops::bio::hmm::HmmBatchForwardF64` (ToadStool)
+- **13 new GPU domains** (Exp101): cooperation, capacitor, kmd, gbm, merge_pairs, signal, feature_table, robinson_foulds, derep, chimera, neighbor_joining, reconciliation, molecular_clock
 
-This is the GPU analogue of barracuda_cpu_v1-v5: CPU → GPU → same answer.
-All 8 bio primitives now flow through ToadStool's absorbed shaders, which
-benefit from cross-spring precision evolution (hotSpring f64 polyfills,
-neuralSpring eigensolvers).
+29 GPU domains total. All bio primitives now flow through ToadStool's
+absorbed or composed shaders, benefiting from cross-spring precision evolution.
 
 ## metalForge Cross-System Proof
 
-Exp065 extends Exp060 to ALL domains, proving substrate-independence:
-for every GPU-eligible algorithm, the metalForge router can dispatch to
-CPU or GPU and get the same answer. This is the foundation for CPU/GPU/NPU
-routing in production.
+Exp065 + Exp103 extends to ALL 29 GPU-eligible domains, proving
+substrate-independence: for every GPU-eligible algorithm, the metalForge
+router can dispatch to CPU or GPU and get the same answer. This is the
+foundation for CPU/GPU/NPU routing in production.
 
 ## ToadStool Evolution (Feb 22, 2026)
 
@@ -309,7 +315,7 @@ Following hotSpring's pattern for ToadStool integration:
 | **Lean** (consumed upstream) | 20 GPU modules, 23 primitives | Active — 15 original + 8 bio (HMM, ANI, SNP, dN/dS, Pangenome, QF, DADA2, RF) |
 | **Write** (local WGSL, pending absorption) | **0** — all 4 retired (Phase 25) | ODE, kmer, taxonomy, unifrac absorbed by ToadStool S39-S41; Lean phase complete |
 | **CPU math** (`crate::special`) | 4 functions (erf, ln_gamma, regularized_gamma, normal_cdf) | Consolidated; `bio::special` shim removed (Phase 24); shaped for `barracuda::math` |
-| **CPU-only** (no GPU path) | 12 modules | Stable — chimera, derep, GBM, merge_pairs, etc. |
+| **CPU-only** (no GPU path) | 1 module (phred) | Pure GPU promotion complete (Exp101) |
 | **Blocked** (needs upstream) | 3 modules | kmer hash, UniFrac tree traversal, taxonomy NPU |
 | **metalForge** (absorption eng.) | 32 tolerances, SoA patterns, `#[repr(C)]` | Shaping all modules for ToadStool absorption |
 

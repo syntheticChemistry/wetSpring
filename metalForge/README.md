@@ -158,11 +158,11 @@ affinities. metalForge maps each validated algorithm to its optimal substrate.
 wetSpring follows hotSpring's pattern for ToadStool absorption:
 
 ```
-1. Validate in Rust CPU (barracuda/)          ← DONE: 41 modules, 740 tests, ~97% bio+io coverage, 100 experiments, 2,284+ checks. 38% dispatch overhead reduction via pipeline caching (Exp068).
+1. Validate in Rust CPU (barracuda/)          ← DONE: 41 CPU + 42 GPU modules, 740 tests, ~97% bio+io coverage, 103 experiments, 2,406+ checks.
 2. Characterize hardware (metalForge/)         ← THIS DIRECTORY
-3. Write Rust in GPU-friendly patterns         ← 12 absorbed by ToadStool (Lean complete); 3 local WGSL
+3. Write Rust in GPU-friendly patterns         ← 24 absorbed by ToadStool (Lean); 5 local WGSL ODE; 7 Compose; 3 Passthrough
 4. ToadStool absorbs as shared primitives      ← unidirectional handoff via archive/handoffs/
-5. wetSpring consumes ToadStool primitives     ← 15 consumed, pipeline closure
+5. wetSpring consumes ToadStool primitives     ← 30 consumed, 42 GPU modules total
 ```
 
 ### What "GPU-Friendly Patterns" Means for Life Science
@@ -199,17 +199,16 @@ from either inform the other's hardware utilization strategy.
 
 ## Current Status (Feb 22, 2026)
 
-### CPU: 25 Domains Validated (Exp001–063)
-All 25 algorithmic domains proven correct in pure Rust CPU:
-- **205/205 CPU parity checks** across v1 (21) + v2 (18) + v3 (45) + v4 (44) + v5 (29) + v6 (48)
-- **1,291 total CPU checks** across 50 CPU validation binaries
-- **5 Track 1c domains**: ANI, SNP, dN/dS, molecular clock, pangenomics
-- **2 ML ensemble domains**: Random Forest, Gradient Boosting Machine
+### CPU: 31+ Domains Validated (Exp001–102)
+All 31+ algorithmic domains proven correct in pure Rust CPU:
+- **380/380 CPU parity checks** across v1-v8 (21+18+45+44+29+48+43+175)
+- **1,476 total CPU checks** across 71 CPU validation binaries
+- **13 newly promoted GPU domains** (Exp102): cooperation, capacitor, kmd, gbm, merge_pairs, signal, feature_table, robinson_foulds, derep, chimera, NJ, reconciliation, molecular_clock
 - **22.5× overall speedup** over Python (Exp059, peak 625× for SW)
 
-### GPU: 451 Checks Passing (Exp044–076)
-GPU math portability proven across all promoted domains:
-- **451/451 GPU checks** across 18 validation binaries
+### GPU: 702+ Checks Passing (Exp044–103)
+GPU math portability proven across all 42 GPU modules:
+- **702+/702+ GPU checks** across 22 validation binaries
 - **Absorbed** (Lean): SW, Gillespie, DT, Felsenstein, GEMM, diversity, PCoA, spectral
 - **Absorbed** (Lean, Feb 22): HMM, DADA2, quality, ANI, SNP, dN/dS, pangenome, RF
 - **Local WGSL**: 3 (Lean phase complete — S39-41 absorbed ODE, kmer, unifrac, taxonomy)

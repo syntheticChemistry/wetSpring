@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # wetSpring — Rust vs Python Head-to-Head Benchmark
-# Runs all BarraCUDA CPU validators (v1–v5 release) and Python baseline, captures timings.
+# Runs all BarraCUDA CPU validators (v1–v8 release) and Python baseline, captures timings.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -12,7 +12,7 @@ mkdir -p "$RESULTS"
 
 echo "═══════════════════════════════════════════════════════════════"
 echo "  wetSpring — Rust vs Python Head-to-Head Benchmark"
-echo "  25 domains | 157/157 CPU parity checks | v1–v5"
+echo "  31+ domains | 380/380 CPU parity checks | v1–v8"
 echo "═══════════════════════════════════════════════════════════════"
 echo ""
 
@@ -23,7 +23,10 @@ cargo build --release \
     --bin validate_barracuda_cpu_v2 \
     --bin validate_barracuda_cpu_v3 \
     --bin validate_barracuda_cpu_v4 \
-    --bin validate_barracuda_cpu_v5 2>&1 | tail -1
+    --bin validate_barracuda_cpu_v5 \
+    --bin validate_barracuda_cpu_v6 \
+    --bin validate_barracuda_cpu_v7 \
+    --bin validate_barracuda_cpu_v8 2>&1 | tail -1
 
 BINS=(
     "validate_barracuda_cpu:v1 (9 domains)"
@@ -31,6 +34,9 @@ BINS=(
     "validate_barracuda_cpu_v3:v3 (9 new domains)"
     "validate_barracuda_cpu_v4:v4 (5 Track 1c domains)"
     "validate_barracuda_cpu_v5:v5 (RF + GBM)"
+    "validate_barracuda_cpu_v6:v6 (6 ODE flat)"
+    "validate_barracuda_cpu_v7:v7 (Tier A layouts)"
+    "validate_barracuda_cpu_v8:v8 (13 promoted GPU domains)"
 )
 
 RUST_TOTAL=0
@@ -70,5 +76,5 @@ if [ "$RUST_TOTAL" -gt 0 ]; then
     echo "  Rust speedup: ~${SPEEDUP}x over Python"
 fi
 echo ""
-echo "  All 25 domains validated. Pure Rust math: PROVEN."
+echo "  All 31+ domains validated. Pure Rust math: PROVEN."
 echo ""

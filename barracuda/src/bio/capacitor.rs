@@ -62,6 +62,64 @@ pub struct CapacitorParams {
     pub stress_factor: f64,
 }
 
+/// Number of state variables in the capacitor ODE system.
+pub const N_VARS: usize = 6;
+/// Number of f64 parameters when flattened for GPU dispatch.
+pub const N_PARAMS: usize = 16;
+
+impl CapacitorParams {
+    /// Flatten parameters into a contiguous `f64` slice for GPU dispatch.
+    #[must_use]
+    pub const fn to_flat(&self) -> [f64; N_PARAMS] {
+        [
+            self.mu_max,
+            self.k_cap,
+            self.death_rate,
+            self.k_cdg_prod,
+            self.d_cdg,
+            self.k_vpsr_charge,
+            self.k_vpsr_discharge,
+            self.n_vpsr,
+            self.k_vpsr_cdg,
+            self.w_biofilm,
+            self.w_motility,
+            self.w_rugose,
+            self.d_bio,
+            self.d_mot,
+            self.d_rug,
+            self.stress_factor,
+        ]
+    }
+
+    /// Reconstruct from a flat `f64` slice (inverse of [`to_flat`](Self::to_flat)).
+    ///
+    /// # Panics
+    ///
+    /// Panics if `flat.len() < N_PARAMS`.
+    #[must_use]
+    pub fn from_flat(flat: &[f64]) -> Self {
+        assert!(flat.len() >= N_PARAMS, "need {N_PARAMS} values");
+        Self {
+            mu_max: flat[0],
+            k_cap: flat[1],
+            death_rate: flat[2],
+            k_cdg_prod: flat[3],
+            d_cdg: flat[4],
+            k_vpsr_charge: flat[5],
+            k_vpsr_discharge: flat[6],
+            n_vpsr: flat[7],
+            k_vpsr_cdg: flat[8],
+            w_biofilm: flat[9],
+            w_motility: flat[10],
+            w_rugose: flat[11],
+            d_bio: flat[12],
+            d_mot: flat[13],
+            d_rug: flat[14],
+            stress_factor: flat[15],
+        }
+    }
+}
+
 impl Default for CapacitorParams {
     fn default() -> Self {
         Self {
@@ -260,6 +318,34 @@ mod tests {
         let r2 = scenario_normal(&p, DT);
         for (a, b) in r1.y_final.iter().zip(&r2.y_final) {
             assert_eq!(a.to_bits(), b.to_bits());
+        }
+    }
+
+    #[test]
+    fn flat_params_round_trip() {
+        let p = CapacitorParams::default();
+        let flat = p.to_flat();
+        assert_eq!(flat.len(), N_PARAMS);
+        let p2 = CapacitorParams::from_flat(&flat);
+        let flat2 = p2.to_flat();
+        for (a, b) in flat.iter().zip(&flat2) {
+            assert_eq!(a.to_bits(), b.to_bits(), "round-trip must be bitwise exact");
+        }
+    }
+
+    #[test]
+    fn flat_params_gpu_parity() {
+        let p = CapacitorParams::default();
+        let flat = p.to_flat();
+        let p2 = CapacitorParams::from_flat(&flat);
+        let r1 = scenario_normal(&p, DT);
+        let r2 = scenario_normal(&p2, DT);
+        for (a, b) in r1.y_final.iter().zip(&r2.y_final) {
+            assert_eq!(
+                a.to_bits(),
+                b.to_bits(),
+                "flat round-trip must produce identical ODE results"
+            );
         }
     }
 }

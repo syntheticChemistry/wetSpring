@@ -29,31 +29,31 @@
 | Gillespie SSA | ✓ | **GillespieGpu** (driver skip) | — | CPU+GPU* |
 | HMM forward/Viterbi | ✓ | **Local WGSL** (13/13) | — | **CPU+GPU** |
 | Bootstrap resampling | ✓ | **Compose FelsensteinGpu** (15/15) | — | **CPU+GPU** |
-| K-mer counting | ✓ | Blocked (lock-free hash) | — | CPU only |
-| ODE integration (RK4) | ✓ | **Local WGSL** (7/7) | — | **CPU+GPU** |
+| K-mer counting | ✓ | **KmerHistogramGpu** (Lean) | — | **CPU+GPU** |
+| ODE integration (RK4) | ✓ | **Local WGSL** (5 shaders) | — | **CPU+GPU** |
 | Phylogenetic placement | ✓ | **Compose FelsensteinGpu** (15/15) | — | **CPU+GPU** |
 | Bifurcation eigenvalues | ✓ | **BatchedEighGpu** (5/5) | — | **CPU+GPU** |
-| Neighbor-Joining | ✓ | Tier C | — | CPU only |
-| DTL Reconciliation | ✓ | Tier C | — | CPU only |
-| Robinson-Foulds | ✓ | Tier C | — | CPU only |
-| Signal processing | ✓ | Tier C | — | CPU only |
+| Neighbor-Joining | ✓ | **Compose GemmCachedF64** | — | **CPU+GPU** |
+| DTL Reconciliation | ✓ | **Compose TreeInferenceGpu** | — | **CPU+GPU** |
+| Robinson-Foulds | ✓ | **Compose PairwiseHammingGpu** | — | **CPU+GPU** |
+| Signal processing | ✓ | Passthrough (CPU kernel) | — | CPU+GPU buffer |
 | **— Track 1c —** | | | | |
 | ANI (pairwise identity) | 24/24 | **Local WGSL** (7/7) | — | **CPU+GPU** |
 | SNP calling | 24/24 | **Local WGSL** (5/5) | — | **CPU+GPU** |
 | dN/dS (Nei-Gojobori) | 22/22 | **Local WGSL** (9/9) | — | **CPU+GPU** |
-| Molecular clock | 15/15 | Tier C | — | CPU only |
+| Molecular clock | 15/15 | **Compose GemmCachedF64** | — | **CPU+GPU** |
 | Pangenome analysis | 24/24 | **Local WGSL** (6/6) | — | **CPU+GPU** |
 | Rare biosphere diversity | 35/35 | Lean (diversity) | — | CPU+GPU via existing |
 | **— ML Ensembles —** | | | | |
 | Random Forest | 29/29 | **Local WGSL** (13/13) | Candidate | **CPU+GPU** |
-| GBM (binary + multi) | 29/29 | CPU (sequential) | — | CPU only |
+| GBM (binary + multi) | 29/29 | Passthrough (CPU kernel) | — | CPU+GPU buffer |
 
 *\* = Shader absorbed but driver skip on RTX 4070 (Gillespie uses native f64 exp)*
 
 ### Tier Legend
 - **CPU+GPU**: Validated on both, identical results
-- **✓**: Validated in 205/205 CPU parity battery (25 domains + 6 ODE flat)
-- **Tier C**: CPU-only (sequential/branching algorithms)
+- **✓**: Validated in 380/380 CPU parity battery (v1-v8, 31+ domains)
+- **Tier C**: All promoted (0 remaining as of Phase 28)
 - **Candidate**: NPU deployment possible with quantization
 
 ---
@@ -62,10 +62,10 @@
 
 | Substrate | Validated Checks | Algorithms |
 |-----------|:----------------:|:----------:|
-| CPU (Rust) | 1,291 | 25 domains (18 original + 5 Track 1c + 2 ML ensemble) |
-| GPU (wgpu) | 345 | 30 promoted (23 ToadStool + 4 local WGSL shaders + 6 composed + consolidated) |
+| CPU (Rust) | 1,476 | 31+ domains (v1-v8) |
+| GPU (wgpu) | 702+ | 42 modules (27 Lean + 5 Write + 7 Compose + 3 Passthrough) |
 | NPU | 0 | 0 (3 candidates) |
-| **Total** | **1,636** | — |
+| **Total** | **2,178+** | — |
 
 ### Cross-System Proof (Exp064–067)
 
@@ -110,14 +110,15 @@ chained stages (1 upload + N dispatches + 1 readback).
 │ i9-12900│      │ RTX 4070     │       │ AKD1000      │
 │         │      │ Titan V      │       │              │
 │ Parse   │      │ Diversity    │       │ Taxonomy     │
-│ NJ/DTL  │  ──→ │ Spectral     │  ──→  │ Anomaly      │
-│ Chimera │      │ PCoA/Eigen   │       │ PFAS screen  │
-│ Signal  │      │ QF + DADA2   │       │              │
-│ MolClk  │      │ Phylo/HMM   │       │              │
+│ Chimera │  ──→ │ Spectral     │  ──→  │ Anomaly      │
+│         │      │ PCoA/Eigen   │       │ PFAS screen  │
+│         │      │ QF + DADA2   │       │              │
+│         │      │ Phylo/HMM   │       │              │
 │         │      │ ODE sweep    │       │              │
 │         │      │ ANI/SNP/Pan  │       │              │
-│         │      │ dN/dS        │       │              │
-│         │      │ RF ensemble  │       │              │
+│         │      │ dN/dS + RF   │       │              │
+│         │      │ NJ/DTL/MolClk│       │              │
+│         │      │ Signal/KMD   │       │              │
 └─────────┘      └──────────────┘       └──────────────┘
   125-241W            200W                   ~1W
   Sequential         Batch-parallel         Ultra-low-power

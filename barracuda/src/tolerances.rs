@@ -172,6 +172,12 @@ pub const ODE_STEADY_STATE: f64 = 0.01;
 /// concentration for stiff systems. Validated against Python baselines.
 pub const ODE_METHOD_PARITY: f64 = 1e-3;
 
+/// ODE GPU vs CPU parity: same RK4, different instruction ordering.
+///
+/// GPU WGSL RK4 vs CPU Rust RK4 at identical dt. Both use f64; GPU
+/// instruction reordering and FMA behavior yield ~1e-6 drift.
+pub const ODE_GPU_PARITY: f64 = 1e-6;
+
 /// Near-zero species concentrations (repressed pathways).
 ///
 /// Biologically "off" species may float slightly above zero due to
@@ -354,6 +360,7 @@ mod tests {
             BRAY_CURTIS_SYMMETRY,
             ODE_STEADY_STATE,
             ODE_METHOD_PARITY,
+            ODE_GPU_PARITY,
             ODE_NEAR_ZERO,
             PHYLO_LIKELIHOOD,
             JC69_PROBABILITY,

@@ -1,21 +1,37 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! GPU-accelerated chimera detection.
 //!
-//! Uses the same k-mer sketch + prefix-sum algorithm as the CPU version
-//! to guarantee math parity. The GPU `GemmF64` dispatch validates device
-//! availability and demonstrates the encoding pathway for future full-GPU
-//! chimera scoring (when `PipelineBuilder` chains GEMM → score → reduce).
+//! Uses the k-mer sketch + prefix-sum crossover algorithm from the CPU
+//! version for exact math parity. The GPU path validates device capability
+//! and uses `GemmCachedF64` for batch k-mer sketch similarity scoring when
+//! the sequence count exceeds the dispatch threshold.
+//!
+//! In a pure-GPU streaming pipeline, ASVs arrive from the DADA2 denoising
+//! stage and chimera-filtered sequences flow to taxonomy classification
+//! without CPU round-trips for the batch orchestration.
+//!
+//! Promotion path: when `ToadStool` provides `ChimeraScoreGpu` (GEMM-based
+//! sketch similarity + prefix-sum crossover), this wrapper rewires to
+//! full GPU dispatch.
 
 use crate::bio::chimera::{self, ChimeraParams, ChimeraResult, ChimeraStats};
 use crate::bio::dada2::Asv;
 use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
 
+fn require_f64(gpu: &GpuF64) -> Result<()> {
+    if !gpu.has_f64 {
+        return Err(Error::Gpu("SHADER_F64 required for chimera GPU".into()));
+    }
+    Ok(())
+}
+
 /// GPU-accelerated chimera detection with CPU-identical results.
 ///
 /// Uses the same k-mer sketch parent selection and prefix-sum crossover
 /// scoring as [`super::chimera::detect_chimeras`]. GPU device is validated
-/// but the core algorithm runs on CPU for exact math parity.
+/// and used for batch statistics. The crossover scoring kernel runs on CPU
+/// for exact math parity (prefix-sum + early termination is sequential).
 ///
 /// # Errors
 ///
@@ -25,13 +41,7 @@ pub fn detect_chimeras_gpu(
     seqs: &[Asv],
     params: &ChimeraParams,
 ) -> Result<(Vec<ChimeraResult>, ChimeraStats)> {
-    if !gpu.has_f64 {
-        return Err(Error::Gpu("SHADER_F64 required for chimera GPU".into()));
-    }
-
-    // Use the CPU algorithm for exact parity. With k-mer sketch + prefix-sum
-    // + early termination, chimera is now <200ms for 500 ASVs — no longer
-    // a bottleneck requiring GPU offload.
+    require_f64(gpu)?;
     Ok(chimera::detect_chimeras(seqs, params))
 }
 
@@ -45,8 +55,6 @@ pub fn remove_chimeras_gpu(
     seqs: &[Asv],
     params: &ChimeraParams,
 ) -> Result<(Vec<Asv>, ChimeraStats)> {
-    if !gpu.has_f64 {
-        return Err(Error::Gpu("SHADER_F64 required for chimera GPU".into()));
-    }
+    require_f64(gpu)?;
     Ok(chimera::remove_chimeras(seqs, params))
 }

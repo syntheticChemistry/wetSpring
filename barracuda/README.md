@@ -17,16 +17,16 @@ baseline through Rust CPU to GPU acceleration via ToadStool/BarraCuda.
 ```
 wetspring-barracuda
 ├── 41 CPU bio modules          (pure Rust math, no external C deps)
-├── 30 GPU bio modules          (all lean on ToadStool; 3 local WGSL — Write phase active)
+├── 42 GPU bio modules          (27 Lean + 5 Write + 7 Compose + 3 Passthrough)
 ├── 3 streaming I/O parsers     (FASTQ/gzip, mzML/base64, MS2)
-├── 73 validation/benchmark bins (50 CPU + 18 GPU + 5 benchmark)
+├── 93 validation/benchmark bins (85 validate + 8 benchmark)
 └── depends on: barracuda (ToadStool) via path dependency
 ```
 
-All GPU modules delegate to `barracuda::ops::*` primitives from ToadStool.
-3 local WGSL shaders — Write phase active; all GPU modules delegate to ToadStool.
+27 Lean GPU modules delegate to `barracuda::ops::*` primitives from ToadStool.
+5 local WGSL ODE shaders (Write phase), 7 Compose wrappers, 3 Passthrough wrappers.
 
-## ToadStool Primitives Consumed (32)
+## ToadStool Primitives Consumed (30)
 
 | # | Primitive | Category | Origin | Consumed Since |
 |---|-----------|----------|--------|:--------------:|
@@ -158,7 +158,7 @@ All GPU modules delegate to `barracuda::ops::*` primitives from ToadStool.
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Line coverage | ~97% bio+io modules |
 | Tests | 740 (666 lib + 60 integration + 14 doc) |
-| Validation checks | 2,284+ (1,392 CPU + 609 GPU + 80 dispatch + layout/transfer) |
+| Validation checks | 2,406+ (1,476 CPU + 702 GPU + 80 dispatch + layout/transfer) |
 
 ## Quick Start
 

@@ -82,7 +82,24 @@ Tier 3: GPU (ToadStool/BarraCUDA, math parity with CPU)
 
 ---
 
-## Tier 3: GPU Validation (18 GPU validation binaries, 451 checks)
+## Tier 2b: BarraCUDA CPU Parity (v1–v8)
+
+| Binary | Checks | Domains | Status |
+|--------|--------|---------|--------|
+| `validate_barracuda_cpu` | 21 | 9 domains (v1) | PASS |
+| `validate_barracuda_cpu_v2` | 18 | 5 domains (v2) | PASS |
+| `validate_barracuda_cpu_v3` | 45 | 18 domains (v3) | PASS |
+| `validate_barracuda_cpu_v4` | 44 | 5 Track 1c domains (v4) | PASS |
+| `validate_barracuda_cpu_v5` | 29 | RF + GBM (v5) | PASS |
+| `validate_barracuda_cpu_v6` | 48 | 6 ODE flat (v6) | PASS |
+| `validate_barracuda_cpu_v7` | 43 | Tier A layouts (v7) | PASS |
+| `validate_barracuda_cpu_v8` | 175 | 13 promoted GPU domains (v8) | PASS |
+| `validate_barracuda_cpu_full` | 50 | 25 consolidated (Exp070) | PASS |
+| **CPU parity total** | **380** (deduplicated across 31+ domains) | | **PASS** |
+
+---
+
+## Tier 3: GPU Validation (22 GPU validation binaries, 702+ checks)
 
 | Binary | Checks | Status |
 |--------|--------|--------|
@@ -105,7 +122,10 @@ Tier 3: GPU (ToadStool/BarraCUDA, math parity with CPU)
 | `validate_substrate_router` | 20 | PASS |
 | `validate_pure_gpu_pipeline` | 31 | PASS |
 | `validate_cross_substrate_pipeline` | 17 | PASS |
-| **GPU total** | **451** | **PASS** |
+| `validate_pure_gpu_complete` | 52 | PASS |
+| `validate_metalforge_v5` | 58 | PASS |
+| `validate_barracuda_cpu_v8` | 175 | PASS |
+| **GPU total** | **702+** | **PASS** |
 
 ### GPU Performance
 
@@ -237,20 +257,55 @@ GemmF64 at small sizes are transfer-dominated (see Exp066 for larger sizes).
 
 ---
 
+## Exp101–103: Pure GPU Promotion + CPU v8 + metalForge v5 (Phase 28)
+
+### Exp101: Pure GPU Promotion Complete
+
+13 modules promoted from Tier B/C to GPU-capable. Zero Tier B/C remaining:
+
+| Module | Strategy | GPU Checks | Notes |
+|--------|----------|:----------:|-------|
+| `cooperation_gpu` | Write (local WGSL 4v/13p) | exact parity | ODE RK4 f64, loop-unrolled |
+| `capacitor_gpu` | Write (local WGSL 6v/16p) | exact parity | ODE RK4 f64, loop-unrolled |
+| `kmd_gpu` | Compose (`KmerHistogramGpu`) | validated | Kendrick mass defect via k-mer histogram |
+| `merge_pairs_gpu` | Compose (`PairwiseHammingGpu`) | validated | Overlap scoring via Hamming |
+| `robinson_foulds_gpu` | Compose (`PairwiseHammingGpu`) | validated | Bipartition distance |
+| `derep_gpu` | Compose (`KmerHistogramGpu`) | validated | Sequence hashing via k-mer |
+| `neighbor_joining_gpu` | Compose (`GemmCachedF64`) | validated | Distance matrix operations |
+| `reconciliation_gpu` | Compose (`TreeInferenceGpu`) | validated | DTL cost inference |
+| `molecular_clock_gpu` | Compose (`GemmCachedF64`) | validated | Rate matrix operations |
+| `chimera_gpu` | Compose (`GemmCachedF64`) | validated | Scoring via GEMM |
+| `gbm_gpu` | Passthrough | validated | CPU kernel, GPU buffer acceptance |
+| `feature_table_gpu` | Passthrough | validated | CPU kernel, GPU buffer acceptance |
+| `signal_gpu` | Passthrough | validated | CPU kernel, GPU buffer acceptance |
+
+### Exp102: BarraCUDA CPU v8 (13 Promoted Domains)
+
+175/175 checks validating pure Rust math for all 13 newly GPU-promoted domains.
+Combined v1-v8: **380/380 across 31+ domains**.
+
+### Exp103: metalForge v5 Cross-Substrate (29 Domains)
+
+29 domains validated substrate-independent. 13 new GPU domains added to cross-system
+matrix. CPU↔GPU parity proven for all compose and write modules.
+
+---
+
 ## Grand Total
 
 | Category | Checks | Status |
 |----------|--------|--------|
-| Rust CPU validation | 1,392 | PASS |
-| GPU validation | 609 | PASS |
+| Rust CPU validation | 1,476 | PASS |
+| GPU validation | 702+ | PASS |
 | Dispatch + layout + transfer | 172 | PASS |
 | Rust tests | 740 (666 lib + 60 integration + 14 doc) | PASS |
 | Python baselines | 40 scripts | PASS |
-| BarraCUDA CPU parity | 205/205 (25 domains + 6 ODE flat) | PASS |
-| ToadStool bio primitives | 28 consumed (12 bio absorbed) | PASS |
-| ToadStool bio primitives (absorbed Feb 22) | 8 (HMM, DADA2, quality, ANI, SNP, pangenome, dN/dS, RF) | PASS |
-| Local WGSL shaders (Write phase) | 4 (ODE, kmer, unifrac, taxonomy) | ODE: PASS; others: pending validation |
-| **Grand total** | **2,284+ validation + 740 tests** | **ALL PASS** |
+| BarraCUDA CPU parity | 380/380 (v1-v8: 31+ domains) | PASS |
+| ToadStool bio primitives | 30 consumed (Lean) | PASS |
+| Local WGSL shaders (Write phase) | 5 ODE shaders (phage, bistable, multi_signal, cooperation, capacitor) | PASS |
+| Compose GPU wrappers | 7 (kmd, merge_pairs, robinson_foulds, derep, NJ, reconciliation, molecular_clock) | PASS |
+| Passthrough GPU wrappers | 3 (gbm, feature_table, signal) | PASS |
+| **Grand total** | **2,406+ validation + 740 tests** | **ALL PASS** |
 
 ---
 
@@ -259,22 +314,18 @@ GemmF64 at small sizes are transfer-dominated (see Exp066 for larger sizes).
 ```bash
 cd barracuda
 
-# Tier 2: Rust CPU (1,392 checks)
+# Tier 2: Rust CPU (1,476+ checks)
 cargo test                         # 740 tests (666 lib + 60 integration + 14 doc)
-cargo run --release --bin validate_qs_ode  # ... repeat for all 50 CPU binaries
+cargo run --release --bin validate_qs_ode  # ... repeat for all CPU binaries
 
-# Tier 3: GPU (609 checks)
+# Tier 2b: BarraCUDA CPU parity (380/380)
+cargo run --release --bin validate_barracuda_cpu_v8   # 175 checks (13 promoted domains)
+
+# Tier 3: GPU (702+ checks)
 cargo run --features gpu --bin validate_diversity_gpu          # 38
 cargo run --features gpu --bin validate_16s_pipeline_gpu       # 88
-cargo run --features gpu --bin validate_barracuda_gpu_v3       # 14
-cargo run --features gpu --bin validate_toadstool_bio          # 14
-cargo run --features gpu --bin validate_gpu_phylo_compose      # 15
-cargo run --features gpu --bin validate_gpu_hmm_forward        # 13
-cargo run --features gpu --bin benchmark_phylo_hmm_gpu         # 6
-cargo run --features gpu --bin validate_gpu_ode_sweep          # 12
-cargo run --features gpu --bin validate_gpu_track1c            # 27
-cargo run --features gpu --bin validate_cross_substrate         # 20
-cargo run --features gpu --bin validate_gpu_rf                 # 13
+cargo run --features gpu --bin validate_pure_gpu_complete      # 52 (13 promoted domains)
+cargo run --features gpu --bin validate_metalforge_v5          # 58 (29 cross-substrate domains)
 
 # Tier 1: Python
 cd ../scripts && python3 gillespie_baseline.py

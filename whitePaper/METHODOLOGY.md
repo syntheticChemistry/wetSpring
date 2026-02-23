@@ -306,7 +306,7 @@ All experiments run on a single consumer workstation:
 
 ## 6. Acceptance Criteria
 
-### Phase 2 (CPU): 1,291/1,291 checks pass
+### Phase 2 (CPU): 1,476/1,476 checks pass
 
 | Binary | Checks | Target |
 |--------|:------:|--------|
@@ -357,13 +357,16 @@ All experiments run on a single consumer workstation:
 | `validate_pangenomics` | 24 | Moulana 2020 pangenome (Exp056) |
 | `validate_barracuda_cpu_v4` | 44 | 23-domain CPU parity (Exp057) |
 | `validate_barracuda_cpu_v5` | 29 | RF + GBM inference (Exp061-062) |
-| **Total** | **1,291** | **All pass** |
+| `validate_barracuda_cpu_v6` | 48 | ODE flat serialization (Exp079) |
+| `validate_barracuda_cpu_v7` | 43 | Tier A layouts (Exp085) |
+| `validate_barracuda_cpu_v8` | 175 | 13 promoted GPU domains (Exp102) |
+| **Total** | **1,476** | **All pass** |
 
-Current status: **1,349/1,349 CPU pass + 35 dispatch pass.** 83 experiments across 4 tracks.
-205/205 BarraCuda CPU parity checks across 25 domains + 6 ODE flat modules.
+Current status: **1,476/1,476 CPU pass + 35 dispatch pass.** 103 experiments across 4 tracks.
+380/380 BarraCUDA CPU parity checks across 31+ domains (v1-v8).
 ~22.5× Rust speedup over Python.
 
-### Phase 3 (GPU): 451/451 checks pass
+### Phase 3 (GPU): 702+/702+ checks pass
 
 | Binary | Checks | Target |
 |--------|:------:|--------|
@@ -380,10 +383,10 @@ Current status: **1,349/1,349 CPU pass + 35 dispatch pass.** 83 experiments acro
 | `validate_cross_substrate` | 20 | metalForge cross-substrate CPU↔GPU parity (Exp060) |
 | `validate_gpu_rf` | 13 | RF batch inference shader (Exp063) |
 
-Current status: **451/451 pass.** 30 ToadStool primitives consumed.
-3 local WGSL shaders (Lean phase complete).
+Current status: **702+/702+ pass.** 30 ToadStool primitives consumed.
+5 local WGSL shaders (Write phase) + 7 Compose + 3 Passthrough = 42 GPU modules total.
 
-### Grand Total: 1,835/1,835 quantitative checks pass
+### Grand Total: 2,406+/2,406+ quantitative checks pass
 
 ---
 
@@ -396,7 +399,7 @@ Current status: **451/451 pass.** 30 ToadStool primitives consumed.
 | GPU workload | Large-matrix eigensolve, MD force evaluation | Diversity, phylogenetics, ODE sweeps, HMM |
 | Validation metric | chi2/datum | Pass/fail within documented tolerance |
 | Data size | Small (52–2,042 nuclei) | Large (millions of reads, thousands of spectra) |
-| Local shaders | 10+ WGSL (HFB, MD, lattice QCD) | 3 WGSL (30 ToadStool primitives, Lean complete) |
+| Local shaders | 10+ WGSL (HFB, MD, lattice QCD) | 5 WGSL ODE (30 ToadStool primitives + 12 GPU wrappers) |
 | Absorption tracking | `EVOLUTION_READINESS.md` with tiers | `EVOLUTION_READINESS.md` with tiers (adopted) |
 | Key insight | GPU-resident hybrid beats CPU for matrix physics | Full GPU pipeline 2.45× faster; ODE/HMM/phylo math portable to GPU |
 
@@ -417,7 +420,7 @@ results, then exceed them via Rust + GPU.
 | asari | 1.13.1 | LC-MS feature extraction |
 | `PFΔScreen` | Latest | PFAS non-target screening |
 | flate2 | 1.0 | Pure Rust backend (`rust_backend`), no C dependencies |
-| barracuda | 0.2.0 (path dep) | 23 ToadStool primitives consumed |
+| barracuda | 0.2.0 (path dep) | 30 ToadStool primitives consumed |
 
 ---
 
@@ -431,8 +434,8 @@ results, then exceed them via Rust + GPU.
 | `cargo-llvm-cov` | **97% bio+io** line coverage |
 | `unsafe` in production | 0 |
 | `.unwrap()` in production | 0 |
-| Named tolerances | 32 constants in `tolerances.rs`, hierarchy-tested |
-| Provenance headers | All 73 validation/benchmark binaries |
+| Named tolerances | 43 constants in `tolerances.rs`, hierarchy-tested |
+| Provenance headers | All 93 validation/benchmark binaries |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` and `.wgsl` files |

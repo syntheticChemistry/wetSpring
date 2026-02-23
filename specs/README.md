@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 22, 2026
-**Status**: Phase 27 — 1,392 CPU + 664 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 56 ODE parity = 2,284+/2,284+ checks, ALL PASS (740 tests, 100 experiments)
+**Status**: Phase 28 — 1,476 CPU + 702 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 56 ODE parity = 2,406+/2,406+ checks, ALL PASS (740 tests, 103 experiments)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -10,15 +10,15 @@
 
 | Metric | Value |
 |--------|-------|
-| CPU validation | 1,392/1,392 PASS — 41 modules, 93 experiments, 25 domains + 6 ODE flat + 3 layout |
-| GPU validation | 664/664 PASS — 30 ToadStool primitives, 3 local WGSL (Write phase), 80 streaming + 48 head-to-head + 28 metalForge v4 |
+| CPU validation | 1,476/1,476 PASS — 41 modules, 93+ experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
+| GPU validation | 702/702 PASS — 30 ToadStool primitives, 5 local WGSL, 80 streaming + 48 head-to-head + 28 metalForge v4 + 38 pure GPU |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
-| BarraCuda CPU parity | 205/205 — 22.5x Rust speedup over Python |
-| BarraCuda GPU parity | 16 domains (Exp064/087) — pure GPU math proven |
+| BarraCuda CPU parity | 380/380 — 22.5x Rust speedup over Python (v1–v8) |
+| BarraCuda GPU parity | 29 domains (Exp064/087/101) — pure GPU math proven |
 | Pure GPU streaming | 80 checks, 441-837× over round-trip (Exp090/091) |
-| metalForge cross-system | 12 domains CPU↔GPU (Exp084) + dispatch (Exp080) + pipeline (Exp086) + PCIe (Exp088) |
-| Rust modules | 41 CPU + 30 GPU, 740 tests (~97% bio+io coverage) |
-| Write phase | 3 local WGSL ODE shaders (phage_defense, bistable, multi_signal) |
+| metalForge cross-system | 29 domains CPU↔GPU (Exp103) + dispatch (Exp080) + pipeline (Exp086) + PCIe (Exp088) |
+| Rust modules | 41 CPU + 42 GPU, 740 tests (~97% bio+io coverage) |
+| Write phase | 5 local WGSL ODE shaders (phage_defense, bistable, multi_signal, cooperation, capacitor) |
 | Dependencies | 1 runtime (flate2), everything else sovereign |
 | Paper queue | **ALL DONE** — 29/29 reproducible papers complete (Track 1c added) |
 | Faculty (Track 1) | Waters (MMG, MSU), Cahill (Sandia), Smallwood (Sandia) |
@@ -36,15 +36,16 @@ Every paper in the queue goes through the full evolution path. Status:
 | Stage | What It Proves | Status |
 |-------|---------------|--------|
 | **Python baseline** | Algorithm correctness against published tools | 40 scripts, all reproducible |
-| **BarraCuda CPU** | Pure Rust math matches Python | 1,392 checks, 205/205 cross-domain parity |
-| **BarraCuda GPU** | GPU produces same answer as CPU | 533 checks, 16 GPU domains |
+| **BarraCuda CPU** | Pure Rust math matches Python | 1,476 checks, 380/380 cross-domain parity (v1–v8) |
+| **BarraCuda GPU** | GPU produces same answer as CPU | 702 checks, 29 GPU domains |
 | **Pure GPU streaming** | Zero CPU round-trips, data stays on-device | 80 checks, 441-837× over round-trip |
-| **metalForge mixed** | Same answer on CPU, GPU, NPU — substrate-independent | 12 domains, 35+ checks + PCIe direct |
+| **metalForge mixed** | Same answer on CPU, GPU, NPU — substrate-independent | 29 domains, 38+ checks + PCIe direct |
 
-Papers with **no GPU path** (sequential algorithms: chimera, derep, NJ) stay CPU-only.
-Papers with **ODE models** (Waters, Fernandez, Mhatre, Srivastava) now have GPU paths via
-local WGSL shaders (Write phase). Phage defense, bistable, and multi-signal achieve exact
-CPU ↔ GPU parity. Pending ToadStool absorption as generic ODE primitive.
+**Pure GPU promotion complete** — all 13 formerly CPU-only modules now have GPU
+wrappers (Exp101). Papers 9, 10, 18, 26, 27 are no longer CPU-only. The only
+remaining CPU-only domain is `phred` (I/O-bound, no parallelism benefit).
+All ODE models have local WGSL shaders. Pending ToadStool absorption as
+generic ODE primitive.
 
 ### Three-Tier Control Matrix (Per Paper)
 
@@ -58,8 +59,8 @@ CPU ↔ GPU parity. Pending ToadStool absorption as generic ODE primitive.
 | 6 | Massie 2012 Gillespie | Y | Y | Y | — |
 | 7 | Hsueh 2022 Phage defense | Y | Y | N | Local WGSL ODE (Exp099); exact parity |
 | 8 | Fernandez 2020 Bistable | Y | Y | N | Local WGSL ODE (Exp100); exact parity |
-| 9 | Mhatre 2020 Capacitor | Y | N | N | CPU-only ODE |
-| 10 | Bruger 2018 Cooperation | Y | N | N | CPU-only game theory |
+| 9 | Mhatre 2020 Capacitor | Y | Y | Y | Local WGSL ODE (Exp101); exact parity |
+| 10 | Bruger 2018 Cooperation | Y | Y | Y | Local WGSL ODE (Exp101); exact parity |
 | 11 | Waters 2021 immuno | — | — | — | Reference only |
 | 12 | Srivastava 2011 Multi-signal | Y | Y | N | Local WGSL ODE (Exp100); exact parity |
 | 13 | Cahill proxy | Y | Y | Y | — |
@@ -67,29 +68,27 @@ CPU ↔ GPU parity. Pending ToadStool absorption as generic ODE primitive.
 | 15 | Liu 2014 HMM | Y | Y | Y | — |
 | 16 | Alamin 2024 Placement | Y | Partial | N | Felsenstein GPU only; placement not in MF |
 | 17 | Liu 2009 SATe | Y | Partial | Partial | NJ, Felsenstein CPU-only in MF |
-| 18 | Zheng 2023 DTL | Y | N | N | Reconciliation CPU-only |
+| 18 | Zheng 2023 DTL | Y | Y | Y | Reconciliation GPU via batch workgroup (Exp101) |
 | 20 | Wang 2021 RAWR | Y | Partial | N | Bootstrap compose; not in MF |
 | 21 | Jones PFAS MS | Y | Y | Y | — |
 | 22 | Jones PFAS F&T | Y | Y | Y | — |
 | 24 | Anderson 2017 Population | Y | Y | Y | — |
 | 25 | Moulana 2020 Pangenome | Y | Y | Y | — |
-| 26 | Mateos 2023 Sulfur | Y | N | Partial | DTL, clock not in MF |
-| 27 | Boden 2024 Phosphorus | Y | N | Partial | DTL, clock not in MF |
+| 26 | Mateos 2023 Sulfur | Y | Y | Y | DTL + clock GPU (Exp101/103) |
+| 27 | Boden 2024 Phosphorus | Y | Y | Y | DTL + clock GPU (Exp101/103) |
 | 28 | Anderson 2014 Viral | Y | Y | Partial | k-mer not in MF16 |
 | 29 | Anderson 2015 Rare biosphere | Y | Y | Y | PCoA skipped (naga bug) |
 
-**Full three-tier coverage (CPU + GPU + metalForge):** Papers 2, 3, 4, 6, 13, 14, 15, 21, 22, 24, 25, 29 — **12 of 25 actionable papers**.
-**CPU + GPU (no metalForge):** Papers 1, 5, 7, 8, 12, 16, 17, 20, 28 — 9 papers.
-**CPU only:** Papers 9, 10, 18, 26, 27 — 5 papers (CPU-appropriate: sequential ODE, game theory, DTL reconciliation).
+**Full three-tier coverage (CPU + GPU + metalForge):** Papers 2, 3, 4, 6, 9, 10, 13, 14, 15, 18, 21, 22, 24, 25, 26, 27, 29 — **17 of 25 actionable papers**.
+**CPU + GPU (no metalForge):** Papers 1, 5, 7, 8, 12, 16, 17, 20, 28 — 8 papers.
+**CPU only:** None — all actionable papers have at least CPU + GPU paths.
 
 ### Gaps
 
 | Gap | Papers Affected | Blocker | Priority |
 |-----|--------|---------|----------|
-| ODE models not in metalForge | 5, 7, 8, 9, 10, 12 | GPU parity achieved for 7, 8, 12 (Write phase); metalForge routing pending | Low |
-| DTL reconciliation CPU-only | 18, 26, 27 | Tree-recursive algorithm; no GPU benefit | Low |
-| Molecular clock not in metalForge | 26, 27 | CPU-only; no GPU path planned | Low |
-| k-mer histogram not in metalForge | 28 | GPU wrapper done (kmer_gpu, Exp099); metalForge routing pending | Low |
+| ODE models not in metalForge routing | 5, 7, 8, 12 | GPU parity achieved (Write phase + Exp101); metalForge routing pending | Low |
+| k-mer histogram not in metalForge routing | 28 | GPU wrapper done (kmer_gpu, Exp099); metalForge routing pending | Low |
 | PCoA skipped in metalForge | 29 | naga WGSL compiler bug | Low (tracked upstream) |
 | Waters 2021 (Paper 11) | — | Reference only — no computational reproduction target | N/A |
 | Liu fungi-bacteria (Paper 19) | — | Manuscript in progress | Watch |
@@ -110,7 +109,7 @@ CPU ↔ GPU parity. Pending ToadStool absorption as generic ODE primitive.
 
 | Document | Location | Description |
 |----------|----------|-------------|
-| CONTROL_EXPERIMENT_STATUS.md | `../` | 100 experiments, 2,284+ validation checks |
+| CONTROL_EXPERIMENT_STATUS.md | `../` | 103 experiments, 2,406+ validation checks |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
 | Handoff (v14) | `../wateringHole/handoffs/` | Current ToadStool handoff |
@@ -129,7 +128,7 @@ CPU ↔ GPU parity. Pending ToadStool absorption as generic ODE primitive.
 - **Microbial ecology** — Alpha/beta diversity, PCoA, rarefaction
 - **Deep-sea metagenomics** — ANI, SNP, dN/dS, molecular clock, pangenomics
 - **ML inference** — Decision tree, Random Forest, GBM (all sovereign, no Python)
-- **Sovereign Rust bioinformatics** — 41 CPU + 30 GPU modules, 1 runtime dependency
+- **Sovereign Rust bioinformatics** — 41 CPU + 42 GPU modules, 1 runtime dependency
 
 ### wetSpring IS NOT:
 - Sensor noise analysis (groundSpring)

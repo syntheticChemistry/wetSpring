@@ -229,24 +229,160 @@ pub fn multi_signal_ode() -> BioWorkload {
         .with_ode(7, 24)
 }
 
-// ── CPU-only domains ────────────────────────────────────────────────
+// ── Local WGSL domains (new Write phase — pure GPU promotion) ───────
 
-/// Chimera detection (CPU-only, sequential branching).
+/// Cooperation game theory ODE (4 vars, 13 params — local WGSL).
+#[must_use]
+pub fn cooperation_ode() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Local)
+        .named(
+            "cooperation_ode",
+            vec![Capability::F64Compute, Capability::ShaderDispatch],
+        )
+        .with_ode(4, 13)
+}
+
+/// Capacitor phenotype ODE (6 vars, 16 params — local WGSL).
+#[must_use]
+pub fn capacitor_ode() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Local)
+        .named(
+            "capacitor_ode",
+            vec![Capability::F64Compute, Capability::ShaderDispatch],
+        )
+        .with_ode(6, 16)
+}
+
+// ── Composed GPU domains (ToadStool primitives) ─────────────────────
+
+/// KMD (Kendrick mass defect) — element-wise via FMR.
+#[must_use]
+pub fn kmd() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "kmd",
+            vec![Capability::F64Compute, Capability::ScalarReduce],
+        )
+        .with_primitive("FusedMapReduceF64")
+}
+
+/// GBM batch inference — composes `TreeInferenceGpu`.
+#[must_use]
+pub fn gbm_inference() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "gbm_inference",
+            vec![Capability::F64Compute, Capability::ShaderDispatch],
+        )
+        .with_primitive("TreeInferenceGpu")
+}
+
+/// Merge pairs — batch overlap scoring via FMR.
+#[must_use]
+pub fn merge_pairs() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "merge_pairs",
+            vec![Capability::F64Compute, Capability::ScalarReduce],
+        )
+        .with_primitive("FusedMapReduceF64")
+}
+
+/// Signal processing / peak detection — batch via FMR.
+#[must_use]
+pub fn signal_processing() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "signal_processing",
+            vec![Capability::F64Compute, Capability::ScalarReduce],
+        )
+        .with_primitive("FusedMapReduceF64")
+}
+
+/// Feature table extraction — chains EIC + signal GPU.
+#[must_use]
+pub fn feature_table() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "feature_table",
+            vec![Capability::F64Compute, Capability::ScalarReduce],
+        )
+        .with_primitive("FusedMapReduceF64 + WeightedDotF64")
+}
+
+/// Robinson-Foulds tree distance — `PairwiseHammingGpu`.
+#[must_use]
+pub fn robinson_foulds() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "robinson_foulds",
+            vec![Capability::F64Compute, Capability::ShaderDispatch],
+        )
+        .with_primitive("PairwiseHammingGpu")
+}
+
+/// Dereplication — parallel hashing via `KmerHistogramGpu` pattern.
+#[must_use]
+pub fn dereplication() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "dereplication",
+            vec![Capability::F64Compute, Capability::ShaderDispatch],
+        )
+        .with_primitive("KmerHistogramGpu")
+}
+
+/// Chimera detection — GEMM-based sketch scoring.
 #[must_use]
 pub fn chimera() -> BioWorkload {
-    BioWorkload::new_static(ShaderOrigin::CpuOnly).named(
-        "chimera",
-        vec![Capability::CpuCompute],
-    )
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "chimera",
+            vec![Capability::F64Compute, Capability::ShaderDispatch],
+        )
+        .with_primitive("GemmCachedF64")
 }
+
+/// Neighbor joining — GPU distance matrix + CPU NJ loop.
+#[must_use]
+pub fn neighbor_joining() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "neighbor_joining",
+            vec![Capability::F64Compute, Capability::ScalarReduce],
+        )
+        .with_primitive("FusedMapReduceF64")
+}
+
+/// DTL reconciliation — batch workgroup-per-family.
+#[must_use]
+pub fn reconciliation() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "reconciliation",
+            vec![Capability::F64Compute, Capability::ShaderDispatch],
+        )
+        .with_primitive("BatchReconcileGpu")
+}
+
+/// Molecular clock — element-wise relaxed rates via FMR.
+#[must_use]
+pub fn molecular_clock() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "molecular_clock",
+            vec![Capability::F64Compute, Capability::ScalarReduce],
+        )
+        .with_primitive("FusedMapReduceF64")
+}
+
+// ── CPU-only domains (I/O-bound, no GPU benefit) ────────────────────
 
 /// FASTQ parsing (CPU-only, I/O-bound).
 #[must_use]
 pub fn fastq_parsing() -> BioWorkload {
-    BioWorkload::new_static(ShaderOrigin::CpuOnly).named(
-        "fastq_parsing",
-        vec![Capability::CpuCompute],
-    )
+    BioWorkload::new_static(ShaderOrigin::CpuOnly)
+        .named("fastq_parsing", vec![Capability::CpuCompute])
 }
 
 // ── Inventory ───────────────────────────────────────────────────────
@@ -257,6 +393,7 @@ pub fn fastq_parsing() -> BioWorkload {
 #[must_use]
 pub fn all_workloads() -> Vec<BioWorkload> {
     vec![
+        // Absorbed ToadStool domains
         diversity(),
         pcoa(),
         kmer_histogram(),
@@ -265,10 +402,25 @@ pub fn all_workloads() -> Vec<BioWorkload> {
         smith_waterman(),
         felsenstein(),
         taxonomy(),
+        // Pure GPU promotion: composed domains
+        kmd(),
+        gbm_inference(),
+        merge_pairs(),
+        signal_processing(),
+        feature_table(),
+        robinson_foulds(),
+        dereplication(),
+        chimera(),
+        neighbor_joining(),
+        reconciliation(),
+        molecular_clock(),
+        // Local WGSL ODE domains (Write phase)
         phage_defense_ode(),
         bistable_ode(),
         multi_signal_ode(),
-        chimera(),
+        cooperation_ode(),
+        capacitor_ode(),
+        // CPU-only (I/O-bound)
         fastq_parsing(),
     ]
 }
@@ -279,7 +431,10 @@ pub fn origin_summary() -> (usize, usize, usize) {
     let all = all_workloads();
     let absorbed = all.iter().filter(|w| w.is_absorbed()).count();
     let local = all.iter().filter(|w| w.is_local()).count();
-    let cpu_only = all.iter().filter(|w| matches!(w.origin, ShaderOrigin::CpuOnly)).count();
+    let cpu_only = all
+        .iter()
+        .filter(|w| matches!(w.origin, ShaderOrigin::CpuOnly))
+        .count();
     (absorbed, local, cpu_only)
 }
 
@@ -291,22 +446,32 @@ mod tests {
     #[test]
     fn all_workloads_has_entries() {
         let all = all_workloads();
-        assert!(all.len() >= 13, "expected at least 13 workloads");
+        assert!(all.len() >= 25, "expected at least 25 workloads");
     }
 
     #[test]
     fn origin_counts_match() {
         let (absorbed, local, cpu_only) = origin_summary();
-        assert_eq!(absorbed, 8, "8 absorbed domains");
-        assert_eq!(local, 3, "3 local WGSL domains");
-        assert_eq!(cpu_only, 2, "2 CPU-only domains");
+        assert_eq!(absorbed, 19, "19 absorbed domains");
+        assert_eq!(local, 5, "5 local WGSL domains");
+        assert_eq!(cpu_only, 1, "1 CPU-only domain");
     }
 
     #[test]
     fn local_ode_workloads_have_dims() {
-        for w in [phage_defense_ode(), bistable_ode(), multi_signal_ode()] {
+        for w in [
+            phage_defense_ode(),
+            bistable_ode(),
+            multi_signal_ode(),
+            cooperation_ode(),
+            capacitor_ode(),
+        ] {
             assert!(w.is_local());
-            assert!(w.ode_dims.is_some(), "{} should have ODE dims", w.workload.name);
+            assert!(
+                w.ode_dims.is_some(),
+                "{} should have ODE dims",
+                w.workload.name
+            );
         }
     }
 

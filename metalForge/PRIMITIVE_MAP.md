@@ -5,9 +5,11 @@
 GPU primitive (or explain why it stays CPU-only). This guides the
 absorption pipeline and identifies what ToadStool needs to build next.
 
-> **Feb 22 update (latest):** 30 ToadStool primitives consumed. 3 local WGSL
+> **Feb 22 update (latest):** 32 ToadStool primitives consumed. 5 local WGSL
 > (Lean phase complete; Write phase active — S39-41 absorbed ODE, kmer, unifrac, taxonomy).
-> Forge crate v0.2.0 adds streaming dispatch module.
+> Forge crate v0.3.0 adds streaming dispatch module. **Pure GPU promotion
+> complete: 0 Tier B/C remaining.** All 13 formerly CPU-only modules now have
+> GPU wrappers (12 new + 1 upgraded chimera_gpu).
 
 ---
 
@@ -47,9 +49,9 @@ absorption pipeline and identifies what ToadStool needs to build next.
 | `felsenstein` | Lean | `FelsensteinGpu` | 046 |
 | `bootstrap` | Compose | `FelsensteinGpu` per replicate | 046 |
 | `placement` | Compose | `FelsensteinGpu` per edge | 046 |
-| `neighbor_joining` | CPU | Sequential algorithm | — |
-| `robinson_foulds` | CPU | Per-node comparison | — |
-| `reconciliation` | CPU | Tree traversal | — |
+| `neighbor_joining` / `neighbor_joining_gpu` | Compose | GPU distance matrix + CPU NJ loop (`FMR`) | Pure GPU |
+| `robinson_foulds` / `robinson_foulds_gpu` | Compose | `PairwiseHammingGpu` bipartition bit-vectors | Pure GPU |
+| `reconciliation` / `reconciliation_gpu` | Compose | Batch workgroup-per-family | Pure GPU |
 
 ### ODE / Dynamical Systems (GPU-composed)
 
@@ -61,7 +63,7 @@ absorption pipeline and identifies what ToadStool needs to build next.
 | `multi_signal` | Compose | Same ODE sweep shader | — |
 | `phage_defense` | Compose | Same ODE sweep shader | — |
 | `gillespie` | Lean | `GillespieGpu` | 044 |
-| `cooperation` | CPU | Game-theoretic model | — |
+| `cooperation` / `cooperation_gpu` | Local | Local WGSL (4v, 13p) ODE sweep | Pure GPU |
 
 ### Sequence Analysis (mixed)
 
@@ -73,7 +75,7 @@ absorption pipeline and identifies what ToadStool needs to build next.
 | `unifrac` | Lean | `UniFracPropagateF64` (ToadStool S40) | 082 |
 | `decision_tree` | Lean | `TreeInferenceGpu` | 044 |
 | `random_forest` / `random_forest_gpu` | Lean | `RfBatchInferenceGpu` (ToadStool, absorbed Feb 22) | 063 |
-| `gbm` | CPU | Sequential boosting (batch-parallel within rounds) | 062 |
+| `gbm` / `gbm_gpu` | Compose | `TreeInferenceGpu` batch inference | Pure GPU |
 
 ### 16S Pipeline (GPU-composed)
 
@@ -86,15 +88,15 @@ absorption pipeline and identifies what ToadStool needs to build next.
 | `streaming_gpu` | Lean | Multiple primitives | 016 |
 | `rarefaction_gpu` | Lean | `PrngXoshiro` | 016 |
 
-### Analytical Chemistry (CPU-focused)
+### Analytical Chemistry (GPU-composed)
 
 | Rust Module | GPU Strategy | ToadStool Primitive | Exp |
 |-------------|-------------|-------------------|-----|
 | `eic` / `eic_gpu` | Lean | `FMR` | 016 |
-| `kmd` | CPU | Lookup table | — |
-| `signal` | CPU | FFT-based, small data | — |
-| `capacitor` | CPU | Peak detection | — |
-| `feature_table` | CPU | Sparse matrix | — |
+| `kmd` / `kmd_gpu` | Compose | `FusedMapReduceF64` element-wise | Pure GPU |
+| `signal` / `signal_gpu` | Compose | `FusedMapReduceF64` batch | Pure GPU |
+| `capacitor` / `capacitor_gpu` | Local | Local WGSL (6v, 16p) ODE sweep | Pure GPU |
+| `feature_table` / `feature_table_gpu` | Compose | Chains `eic_gpu` + `signal_gpu` | Pure GPU |
 
 ### Track 1c: Deep-Sea Metagenomics (ToadStool-absorbed, Exp058)
 
@@ -104,15 +106,15 @@ absorption pipeline and identifies what ToadStool needs to build next.
 | `snp` / `snp_gpu` | Lean | `SnpCallingF64` (ToadStool, absorbed Feb 22) | 058 |
 | `dnds` / `dnds_gpu` | Lean | `DnDsBatchF64` (ToadStool, absorbed Feb 22) | 058 |
 | `pangenome` / `pangenome_gpu` | Lean | `PangenomeClassifyGpu` (ToadStool, absorbed Feb 22) | 058 |
-| `molecular_clock` | CPU | Small calibration data, tree traversal | 053/054 |
+| `molecular_clock` / `molecular_clock_gpu` | Compose | `FusedMapReduceF64` relaxed rates | Pure GPU |
 
-### Infrastructure (CPU-only)
+### Infrastructure (GPU-promoted)
 
-| Rust Module | Reason for CPU |
-|-------------|----------------|
-| `phred` | Per-base quality lookup |
-| `derep` | Hash-based dereplication |
-| `merge_pairs` | Sequential per-pair |
+| Rust Module | GPU Strategy | ToadStool Primitive | Exp |
+|-------------|-------------|-------------------|-----|
+| `phred` | CPU | Per-base quality lookup (no parallelism benefit) | — |
+| `derep` / `derep_gpu` | Compose | `KmerHistogramGpu` parallel hashing | Pure GPU |
+| `merge_pairs` / `merge_pairs_gpu` | Compose | `FusedMapReduceF64` batch overlap | Pure GPU |
 
 ---
 
@@ -175,8 +177,8 @@ The `bio::special` re-export shim has been removed (Phase 24).
 | Category | Count |
 |----------|-------|
 | **Lean** (upstream ToadStool) | 24 modules (16 original + 8 bio absorbed Feb 22) |
-| **Local** (WGSL shader) | 3 modules (Write phase active) |
-| **Compose** (existing primitives) | 5 modules |
-| **CPU** (no GPU path) | 13 modules |
+| **Local** (WGSL shader) | 5 modules (Write phase active) |
+| **Compose** (existing primitives) | 16 modules (5 original + 11 pure GPU promotion) |
+| **CPU** (no GPU path) | 1 module (phred) |
 | **NPU** (candidate) | 1 module |
-| **Local WGSL** (Write phase) | 3 (Write phase active) |
+| **Local WGSL** (Write phase) | 5 (3 original + 2 pure GPU promotion) |

@@ -2,7 +2,7 @@
 
 Superseded handoff documents preserved as fossil record.
 
-**Current canonical handoff:** `../../wateringHole/handoffs/WETSPRING_TOADSTOOL_V11_FEB22_2026.md` (v11)
+**Current canonical handoff:** `../../wateringHole/handoffs/WETSPRING_TOADSTOOL_V15_ODE_GENERIC_FEB22_2026.md` (v15)
 
 ## Contents
 

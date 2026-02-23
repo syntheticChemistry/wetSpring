@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-22 (Phase 27: 100 experiments, upstream GPU fixes + full control validation)
+**Updated**: 2026-02-22 (Phase 28: 103 experiments, pure GPU promotion complete, 0 Tier B/C)
 
 ---
 
@@ -235,13 +235,17 @@ thresholds from `src/tolerances.rs`.
 | `validate_local_wgsl_compile` | 096 | 10 | `cargo run --features gpu --bin validate_local_wgsl_compile` |
 | `validate_cpu_gpu_expanded` | 099 | 27 | `cargo run --features gpu --bin validate_cpu_gpu_expanded` |
 | `validate_metalforge_v4` | 100 | 28 | `cargo run --features gpu --bin validate_metalforge_v4` |
+| `validate_pure_gpu_complete` | 101 | 52 | `cargo run --features gpu --bin validate_pure_gpu_complete` |
+| `validate_barracuda_cpu_v8` | 102 | 175 | `cargo run --release --bin validate_barracuda_cpu_v8` |
+| `validate_metalforge_v5` | 103 | 58 | `cargo run --features gpu --bin validate_metalforge_v5` |
 
-**Total validation checks**: 2,284+ (1,392 CPU + 636 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 39 cross-spring + 10 local WGSL + 27 expanded)
+**Total validation checks**: 2,406+ (1,476 CPU + 702 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 39 cross-spring + 10 local WGSL + 7 expanded)
 **Rust tests**: 740 (666 lib + 60 integration + 14 doc)
-**Binaries**: 80 validate + 9 benchmark = 89 total
-**ToadStool primitives**: 30 consumed (8 bio absorbed Feb 22 + 5 neuralSpring + 2 new: KmerHistogram, UniFracPropagate)
-**Local WGSL shaders**: 7 (ODE, kmer, unifrac, taxonomy, phage_defense_ode, bistable_ode, multi_signal_ode)
-**Tier A (GPU/NPU-ready)**: 7 modules | **Tier B**: 1 remaining (cooperation)
+**Binaries**: 85 validate + 8 benchmark = 93 total
+**ToadStool primitives**: 30 consumed (Lean)
+**Local WGSL shaders**: 5 ODE (phage_defense, bistable, multi_signal, cooperation, capacitor)
+**GPU modules**: 42 total (27 Lean + 5 Write + 7 Compose + 3 Passthrough)
+**Tier B/C**: 0 remaining (all promoted Phase 28)
 **Benchmark infrastructure**: `bench.rs` harness with RAPL + nvidia-smi energy profiling, JSON output
 
 ---
