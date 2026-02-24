@@ -38,7 +38,9 @@
 //! | `BatchFitnessGpu` | neuralSpring | Session 31f | wetSpring (new) |
 //! | `LocusVarianceGpu` | neuralSpring | Session 31f | wetSpring (new) |
 
-use barracuda::{BatchFitnessGpu, LocusVarianceGpu, PairwiseHammingGpu, PairwiseJaccardGpu, SpatialPayoffGpu};
+use barracuda::{
+    BatchFitnessGpu, LocusVarianceGpu, PairwiseHammingGpu, PairwiseJaccardGpu, SpatialPayoffGpu,
+};
 use std::sync::Arc;
 use std::time::Instant;
 use wgpu::util::DeviceExt;

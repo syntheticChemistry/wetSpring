@@ -1,4 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::print_stdout,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::cast_possible_wrap
+)]
 //! Exp118 — ESN Bloom Sentinel for NPU Edge Deployment
 //!
 //! Trains an ESN on diversity time-series data (Exp112 pattern) to predict
@@ -27,10 +36,10 @@ const N_TEST: usize = 300;
 
 fn simulate_diversity_window(seed: u64, state: usize) -> Vec<f64> {
     let base_shannon = match state {
-        0 => 3.5,  // normal: high diversity
-        1 => 2.8,  // pre-bloom: declining
-        2 => 1.2,  // active: collapsed
-        _ => 2.0,  // post: recovering
+        0 => 3.5, // normal: high diversity
+        1 => 2.8, // pre-bloom: declining
+        2 => 1.2, // active: collapsed
+        _ => 2.0, // post: recovering
     };
     let base_richness = match state {
         0 => 0.8,
@@ -57,14 +66,15 @@ fn simulate_diversity_window(seed: u64, state: usize) -> Vec<f64> {
 
     vec![
         (base_shannon + noise(seed, 0) * 0.5) / 4.5,
-        (1.0 - base_richness + noise(seed, 1) * 0.15).max(0.0).min(1.0),
+        (1.0 - base_richness + noise(seed, 1) * 0.15).clamp(0.0, 1.0),
         base_richness + noise(seed, 2) * 0.1,
         base_evenness + noise(seed, 3) * 0.1,
         base_bc_delta + noise(seed, 4) * 0.1,
-        (18.0 + state as f64 * 3.0 + noise(seed, 5) * 5.0) / 35.0,
+        ((state as f64).mul_add(3.0, 18.0) + noise(seed, 5) * 5.0) / 35.0,
     ]
 }
 
+#[allow(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp118: ESN Bloom Sentinel → NPU");
 
@@ -106,29 +116,42 @@ fn main() {
 
     v.section("F64 inference");
     let preds = esn.predict(&test_inputs);
-    let f64_classes: Vec<usize> = preds.iter().map(|p| {
-        p.iter().enumerate()
-            .max_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal))
-            .map(|(i, _)| i).unwrap_or(0)
-    }).collect();
-    let f64_correct = f64_classes.iter().zip(test_true.iter())
-        .filter(|(p, t)| *p == *t).count();
+    let f64_classes: Vec<usize> = preds
+        .iter()
+        .map(|p| {
+            p.iter()
+                .enumerate()
+                .max_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal))
+                .map_or(0, |(i, _)| i)
+        })
+        .collect();
+    let f64_correct = f64_classes
+        .iter()
+        .zip(test_true.iter())
+        .filter(|(p, t)| *p == *t)
+        .count();
     let f64_acc = f64_correct as f64 / N_TEST as f64;
     println!("  f64 accuracy: {f64_acc:.3} ({f64_correct}/{N_TEST})");
     v.check_pass("f64 accuracy > chance (25%)", f64_acc > 0.25);
 
     // Bloom-specific metrics: false negative rate for active-bloom
-    let bloom_indices: Vec<usize> = test_true.iter().enumerate()
-        .filter(|&(_, t)| *t == 2).map(|(i, _)| i).collect();
-    let bloom_detected = bloom_indices.iter()
-        .filter(|&&i| f64_classes[i] == 2).count();
+    let bloom_indices: Vec<usize> = test_true
+        .iter()
+        .enumerate()
+        .filter(|&(_, t)| *t == 2)
+        .map(|(i, _)| i)
+        .collect();
+    let bloom_detected = bloom_indices
+        .iter()
+        .filter(|&&i| f64_classes[i] == 2)
+        .count();
     let bloom_recall = bloom_detected as f64 / bloom_indices.len().max(1) as f64;
     println!("  Active-bloom recall (f64): {bloom_recall:.3}");
     v.check_pass("bloom recall > 0%", bloom_recall >= 0.0);
 
     v.section("Quantize → NPU int8");
     let npu = esn.to_npu_weights();
-    v.check_pass("NPU weights exported", npu.weights_i8.len() > 0);
+    v.check_pass("NPU weights exported", !npu.weights_i8.is_empty());
 
     let mut esn_npu = Esn::new(EsnConfig {
         input_size: FEATURE_DIM,
@@ -147,22 +170,30 @@ fn main() {
         npu_classes.push(npu.classify(esn_npu.state()));
     }
 
-    let npu_correct = npu_classes.iter().zip(test_true.iter())
-        .filter(|(p, t)| *p == *t).count();
+    let npu_correct = npu_classes
+        .iter()
+        .zip(test_true.iter())
+        .filter(|(p, t)| *p == *t)
+        .count();
     let npu_acc = npu_correct as f64 / N_TEST as f64;
     println!("  NPU int8 accuracy: {npu_acc:.3}");
     v.check_pass("NPU accuracy > chance (25%)", npu_acc > 0.25);
 
     // NPU bloom recall
-    let npu_bloom_detected = bloom_indices.iter()
-        .filter(|&&i| npu_classes[i] == 2).count();
+    let npu_bloom_detected = bloom_indices
+        .iter()
+        .filter(|&&i| npu_classes[i] == 2)
+        .count();
     let npu_bloom_recall = npu_bloom_detected as f64 / bloom_indices.len().max(1) as f64;
     println!("  Active-bloom recall (NPU): {npu_bloom_recall:.3}");
     v.check_pass("NPU bloom recall ≥ 0%", npu_bloom_recall >= 0.0);
 
     v.section("F64 ↔ NPU agreement");
-    let agree = f64_classes.iter().zip(npu_classes.iter())
-        .filter(|(a, b)| a == b).count();
+    let agree = f64_classes
+        .iter()
+        .zip(npu_classes.iter())
+        .filter(|(a, b)| a == b)
+        .count();
     let agreement = agree as f64 / N_TEST as f64;
     println!("  Agreement: {agreement:.3} ({agree}/{N_TEST})");
     v.check_pass("agreement > 65%", agreement > 0.65);
@@ -179,7 +210,10 @@ fn main() {
     println!("  Duty cycle: {duty_cycle:.10}");
     println!("  Average power: {avg_power_mw:.8} mW");
     println!("  Daily energy: {daily_energy_j:.6} J");
-    println!("  → coin-cell battery (500 J) lasts {:.0} days", 500.0 / daily_energy_j);
+    println!(
+        "  → coin-cell battery (500 J) lasts {:.0} days",
+        500.0 / daily_energy_j
+    );
     v.check_pass("coin-cell > 1 year", 500.0 / daily_energy_j > 365.0);
 
     v.section("HPC retrospective scan");

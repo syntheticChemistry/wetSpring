@@ -3,11 +3,11 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
-    dead_code,
+    dead_code
 )]
 //! # Exp149: Reinterpretation of QS Burst Statistics as Anderson Localization
 //!
-//! Jemielita et al. (SciRep 2019) found that spatial colony-growth
+//! Jemielita et al. (`SciRep` 2019) found that spatial colony-growth
 //! heterogeneity affects QS burst timing and synchronization. Their key
 //! findings map directly onto the Anderson localization framework:
 //! - "Clustered cells → earlier but more localized QS" = localized state
@@ -27,13 +27,13 @@ struct BurstObservation {
     effective_disorder: &'static str,
 }
 
-#[allow(clippy::cast_precision_loss)]
+#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp149: QS Burst Statistics as Anderson Localization");
 
     v.section("── S1: Jemielita et al. (SciRep 2019) key findings ──");
 
-    let observations = vec![
+    let observations = [
         BurstObservation {
             spatial_config: "Clustered cells (high local density)",
             burst_timing: "EARLY onset (fast local QS activation)",
@@ -75,21 +75,48 @@ fn main() {
         println!("  Disorder:   {}", obs.effective_disorder);
         println!();
     }
-    v.check_pass(&format!("{} observations reinterpreted", observations.len()), observations.len() >= 4);
+    v.check_pass(
+        &format!("{} observations reinterpreted", observations.len()),
+        observations.len() >= 4,
+    );
 
     v.section("── S2: Mapping their language to Anderson ──");
 
     println!("  TRANSLATION TABLE:");
     println!();
-    println!("  {:35} → {:35}", "Jemielita et al. term", "Anderson framework term");
+    println!(
+        "  {:35} → {:35}",
+        "Jemielita et al. term", "Anderson framework term"
+    );
     println!("  {:-<35}   {:-<35}", "", "");
-    println!("  {:35} → {:35}", "\"clustered cells\"", "high local density → density gradient → disorder");
-    println!("  {:35} → {:35}", "\"homogeneous distribution\"", "uniform lattice → low disorder W");
-    println!("  {:35} → {:35}", "\"localized QS burst\"", "LOCALIZED STATE (signal confined)");
-    println!("  {:35} → {:35}", "\"synchronized QS burst\"", "EXTENDED STATE (signal propagates)");
-    println!("  {:35} → {:35}", "\"spatial heterogeneity\"", "Anderson disorder W (random potential)");
-    println!("  {:35} → {:35}", "\"burst delay\"", "activation time ∝ 1/v_wave × L_system");
-    println!("  {:35} → {:35}", "\"colony-growth variability\"", "temporal disorder evolution");
+    println!(
+        "  {:35} → {:35}",
+        "\"clustered cells\"", "high local density → density gradient → disorder"
+    );
+    println!(
+        "  {:35} → {:35}",
+        "\"homogeneous distribution\"", "uniform lattice → low disorder W"
+    );
+    println!(
+        "  {:35} → {:35}",
+        "\"localized QS burst\"", "LOCALIZED STATE (signal confined)"
+    );
+    println!(
+        "  {:35} → {:35}",
+        "\"synchronized QS burst\"", "EXTENDED STATE (signal propagates)"
+    );
+    println!(
+        "  {:35} → {:35}",
+        "\"spatial heterogeneity\"", "Anderson disorder W (random potential)"
+    );
+    println!(
+        "  {:35} → {:35}",
+        "\"burst delay\"", "activation time ∝ 1/v_wave × L_system"
+    );
+    println!(
+        "  {:35} → {:35}",
+        "\"colony-growth variability\"", "temporal disorder evolution"
+    );
     println!();
     println!("  The mapping is EXACT. Their phenomenological observations");
     println!("  are quantitative consequences of Anderson localization theory.");

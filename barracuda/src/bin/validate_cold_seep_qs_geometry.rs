@@ -3,7 +3,7 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
-    dead_code,
+    dead_code
 )]
 //! # Exp145: Cold Seep QS Type vs Anderson Geometry
 //!
@@ -27,7 +27,7 @@ struct QsTypeGeometry {
     cold_seep_prediction: &'static str,
 }
 
-#[allow(clippy::cast_precision_loss)]
+#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp145: Cold Seep QS Type vs Anderson Geometry Predictions");
 
@@ -91,13 +91,21 @@ fn main() {
     ];
 
     println!("  QS signal molecule physics (relative to AHL = 1.0):");
-    println!("  {:6} {:>8} {:>10} {:>12}", "System", "D_rel", "t½_rel", "L_char_rel");
+    println!(
+        "  {:6} {:>8} {:>10} {:>12}",
+        "System", "D_rel", "t½_rel", "L_char_rel"
+    );
     println!("  {:-<6} {:-<8} {:-<10} {:-<12}", "", "", "", "");
     for q in &qs_types {
-        println!("  {:6} {:>8.1} {:>10.1} {:>12.2}", q.qs_system, q.diffusion_coeff_relative,
-            q.half_life_relative, q.char_length_relative);
+        println!(
+            "  {:6} {:>8.1} {:>10.1} {:>12.2}",
+            q.qs_system, q.diffusion_coeff_relative, q.half_life_relative, q.char_length_relative
+        );
     }
-    v.check_pass(&format!("{} QS types analyzed", qs_types.len()), qs_types.len() == 6);
+    v.check_pass(
+        &format!("{} QS types analyzed", qs_types.len()),
+        qs_types.len() == 6,
+    );
 
     v.section("── S2: Anderson predictions by QS type ──");
 
@@ -111,7 +119,10 @@ fn main() {
     println!();
 
     for q in &qs_types {
-        println!("  {:6}: {} → {}", q.qs_system, q.anderson_favored_geometry, q.cold_seep_prediction);
+        println!(
+            "  {:6}: {} → {}",
+            q.qs_system, q.anderson_favored_geometry, q.cold_seep_prediction
+        );
     }
     v.check_pass("all 6 QS systems predicted active in 3D sediment", true);
 
@@ -131,7 +142,10 @@ fn main() {
     println!("  in Gram-negative dominated marine sediment communities.");
 
     let ahl_ai2_pct = 30.0 + 25.0;
-    v.check_pass("AHL + AI-2 predicted > 50% of cold seep QS", ahl_ai2_pct > 50.0);
+    v.check_pass(
+        "AHL + AI-2 predicted > 50% of cold seep QS",
+        ahl_ai2_pct > 50.0,
+    );
 
     v.section("── S4: Frequency-division multiplexing hypothesis ──");
 

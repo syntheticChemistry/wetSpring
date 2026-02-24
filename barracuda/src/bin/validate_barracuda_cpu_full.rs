@@ -11,7 +11,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | current HEAD |
-//! | Baseline tool | scipy, numpy, dendropy, sklearn (per-domain Python scripts) |
+//! | Baseline tool | `scipy`, `numpy`, dendropy, `sklearn` (per-domain Python scripts) |
 //! | Baseline date | 2026-02-21 |
 //! | Exact command | `cargo run --release --bin validate_barracuda_cpu_full` |
 //! | Data | Synthetic test vectors (hardcoded, reproducible) |
@@ -37,7 +37,7 @@ fn main() {
     let mut timings: Vec<(&str, f64)> = Vec::new();
 
     // ═══ D01: ODE Integration (RK4) ═══════════════════════════════
-    v.section("D01: ODE Integration (RK4 vs scipy)");
+    v.section("D01: ODE Integration (RK4 vs `scipy`)");
     let t0 = Instant::now();
     let qs = qs_biofilm::scenario_standard_growth(&qs_biofilm::QsBiofilmParams::default(), 0.001);
     let ode_us = t0.elapsed().as_micros() as f64;

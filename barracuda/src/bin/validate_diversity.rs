@@ -233,15 +233,15 @@ fn validate_evenness_and_rarefaction(v: &mut Validator) {
     );
 }
 
-/// Validate against real QIIME2 Exp002 Galaxy baseline.
+/// Validate against real `QIIME2` Exp002 `Galaxy` baseline.
 ///
 /// Source: `experiments/results/002_phytoplankton/diversity_report.json`
 /// (10 samples, rarefied to depth 40834, PRJNA1195978 phytoplankton microbiome).
 ///
-/// We use the Galaxy-reported *ranges* to verify our Rust implementation
+/// We use the `Galaxy`-reported *ranges* to verify our Rust implementation
 /// produces consistent values when given equivalent abundance vectors.
 fn validate_exp002_galaxy_baseline(v: &mut Validator) {
-    v.section("── Exp002 QIIME2 Galaxy Baseline ──");
+    v.section("── Exp002 `QIIME2` `Galaxy` Baseline ──");
 
     // Galaxy Exp002 report values (diversity_report.json):
     //   Shannon:  mean=2.9337, min=1.7769, max=3.8507

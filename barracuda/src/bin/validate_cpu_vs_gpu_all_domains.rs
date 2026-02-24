@@ -36,6 +36,7 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::io::mzml::MzmlSpectrum;
+use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
@@ -579,13 +580,9 @@ fn validate_spectral_cosine(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<T
     let mut cpu_cos = Vec::new();
     for i in 0..n {
         for j in (i + 1)..n {
-            let dot: f64 = spectra[i]
-                .iter()
-                .zip(spectra[j].iter())
-                .map(|(a, b)| a * b)
-                .sum();
-            let na: f64 = spectra[i].iter().map(|x| x * x).sum::<f64>().sqrt();
-            let nb: f64 = spectra[j].iter().map(|x| x * x).sum::<f64>().sqrt();
+            let dot: f64 = special::dot(&spectra[i], &spectra[j]);
+            let na: f64 = special::l2_norm(&spectra[i]);
+            let nb: f64 = special::l2_norm(&spectra[j]);
             cpu_cos.push(if na > 0.0 && nb > 0.0 {
                 dot / (na * nb)
             } else {

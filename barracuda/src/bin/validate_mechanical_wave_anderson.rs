@@ -3,7 +3,7 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
-    dead_code,
+    dead_code
 )]
 //! # Exp147: Anderson Framework for Mechanical Wave Signaling
 //!
@@ -28,7 +28,7 @@ struct SignalMode {
     biological_example: &'static str,
 }
 
-#[allow(clippy::cast_precision_loss)]
+#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp147: Anderson Framework for Mechanical Wave Signaling");
 
@@ -98,17 +98,31 @@ fn main() {
     ];
 
     println!("  Bacterial communication modalities:");
-    println!("  {:30} {:>10} {:>8} {:>10} {:>10}", "Mode", "Speed_rel", "Range", "Anderson?", "Dim_dep");
-    println!("  {:-<30} {:-<10} {:-<8} {:-<10} {:-<10}", "", "", "", "", "");
+    println!(
+        "  {:30} {:>10} {:>8} {:>10} {:>10}",
+        "Mode", "Speed_rel", "Range", "Anderson?", "Dim_dep"
+    );
+    println!(
+        "  {:-<30} {:-<10} {:-<8} {:-<10} {:-<10}",
+        "", "", "", "", ""
+    );
     for m in &modes {
         let anderson_tag = if m.anderson_applies { "YES" } else { "no" };
-        println!("  {:30} {:>10.0} {:>8.1} {:>10} {:>10}",
-            m.name, m.speed_relative, m.range_relative, anderson_tag,
-            if m.anderson_applies { "Strong" } else { "Weak" });
+        println!(
+            "  {:30} {:>10.0} {:>8.1} {:>10} {:>10}",
+            m.name,
+            m.speed_relative,
+            m.range_relative,
+            anderson_tag,
+            if m.anderson_applies { "Strong" } else { "Weak" }
+        );
     }
 
     let anderson_modes = modes.iter().filter(|m| m.anderson_applies).count();
-    v.check_pass(&format!("{anderson_modes} modes subject to Anderson localization"), anderson_modes >= 3);
+    v.check_pass(
+        &format!("{anderson_modes} modes subject to Anderson localization"),
+        anderson_modes >= 3,
+    );
 
     v.section("── S2: Mechanical wave Anderson analysis ──");
 
@@ -143,7 +157,10 @@ fn main() {
     for m in &modes {
         println!("  {:30}", m.name);
         println!("    Physics: {}", m.physics);
-        println!("    Anderson applies: {}", if m.anderson_applies { "YES" } else { "NO" });
+        println!(
+            "    Anderson applies: {}",
+            if m.anderson_applies { "YES" } else { "NO" }
+        );
         println!("    Dimensional dependence: {}", m.dimensional_dependence);
         println!("    Example: {}", m.biological_example);
         if m.anderson_applies {

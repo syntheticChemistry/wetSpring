@@ -3,7 +3,7 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
-    dead_code,
+    dead_code
 )]
 //! # Exp129: Dimensional QS Phase Diagram
 //!
@@ -24,8 +24,8 @@ use wetspring_barracuda::validation::Validator;
 
 #[cfg(feature = "gpu")]
 use barracuda::spectral::{
-    anderson_2d, anderson_3d, anderson_hamiltonian, find_all_eigenvalues, lanczos,
-    lanczos_eigenvalues, level_spacing_ratio, GOE_R, POISSON_R,
+    GOE_R, POISSON_R, anderson_2d, anderson_3d, anderson_hamiltonian, find_all_eigenvalues,
+    lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 
 fn evenness_to_disorder(pielou_j: f64) -> f64 {
@@ -57,9 +57,8 @@ fn main() {
 
         v.section("── S1: Pre-compute disorder sweeps ──");
 
-        let sweep_w = |i: usize| -> f64 {
-            w_min + (i as f64) * (w_max - w_min) / (n_sweep - 1) as f64
-        };
+        let sweep_w =
+            |i: usize| -> f64 { w_min + (i as f64) * (w_max - w_min) / (n_sweep - 1) as f64 };
 
         // 1D sweep
         let n_1d = 400;
@@ -118,8 +117,14 @@ fn main() {
         let mut active_3d = 0_usize;
         let mut phase_rows: Vec<(&str, f64, f64, bool, bool, bool)> = Vec::new();
 
-        println!("  {:30} {:>6} {:>6}  {:>8} {:>8} {:>8}", "biome", "J", "W", "1D", "2D", "3D");
-        println!("  {:-<30} {:-<6} {:-<6}  {:-<8} {:-<8} {:-<8}", "", "", "", "", "", "");
+        println!(
+            "  {:30} {:>6} {:>6}  {:>8} {:>8} {:>8}",
+            "biome", "J", "W", "1D", "2D", "3D"
+        );
+        println!(
+            "  {:-<30} {:-<6} {:-<6}  {:-<8} {:-<8} {:-<8}",
+            "", "", "", "", "", ""
+        );
         for (name, n_species, j_target) in &biomes {
             let community = generate_community(*n_species, *j_target, 42);
             let j = diversity::pielou_evenness(&community);
@@ -130,13 +135,24 @@ fn main() {
             let a1 = r1 > midpoint;
             let a2 = r2 > midpoint;
             let a3 = r3 > midpoint;
-            if a1 { active_1d += 1; }
-            if a2 { active_2d += 1; }
-            if a3 { active_3d += 1; }
+            if a1 {
+                active_1d += 1;
+            }
+            if a2 {
+                active_2d += 1;
+            }
+            if a3 {
+                active_3d += 1;
+            }
             let tag = |active: bool| if active { "ACTIVE" } else { "---" };
             println!(
                 "  {:30} {:6.3} {:6.2}  {:>8} {:>8} {:>8}",
-                name, j, w, tag(a1), tag(a2), tag(a3)
+                name,
+                j,
+                w,
+                tag(a1),
+                tag(a2),
+                tag(a3)
             );
             phase_rows.push((name, j, w, a1, a2, a3));
         }
@@ -147,49 +163,76 @@ fn main() {
         println!("  QS-active biomes: 1D={active_1d}, 2D={active_2d}, 3D={active_3d}");
         v.check_pass("3D active >= 2D active", active_3d >= active_2d);
         v.check_pass("2D active >= 1D active", active_2d >= active_1d);
-        v.check_pass("dimensional gain: 3D activates more biomes than 1D", active_3d >= active_1d);
+        v.check_pass(
+            "dimensional gain: 3D activates more biomes than 1D",
+            active_3d >= active_1d,
+        );
 
         v.section("── S4: Known biome validation ──");
-        let biofilm_3d = phase_rows.iter()
+        let biofilm_3d = phase_rows
+            .iter()
             .find(|(n, _, _, _, _, _)| n.contains("biofilm"))
             .map(|(_, _, _, _, _, a3)| *a3);
-        let soil_1d_2d_suppressed = phase_rows.iter()
+        let soil_1d_2d_suppressed = phase_rows
+            .iter()
             .filter(|(n, _, _, _, _, _)| n.contains("soil"))
             .all(|(_, _, _, a1, a2, _)| !a1 && !a2);
-        let soil_3d_active = phase_rows.iter()
+        let soil_3d_active = phase_rows
+            .iter()
             .filter(|(n, _, _, _, _, _)| n.contains("soil"))
             .any(|(_, _, _, _, _, a3)| *a3);
         if let Some(bf_active) = biofilm_3d {
             println!("  biofilm in 3D: QS-active={bf_active}");
         }
-        println!("  soil: suppressed in 1D+2D={soil_1d_2d_suppressed}, active in 3D={soil_3d_active}");
+        println!(
+            "  soil: suppressed in 1D+2D={soil_1d_2d_suppressed}, active in 3D={soil_3d_active}"
+        );
         v.check_pass("biofilm checked in 3D", biofilm_3d.is_some());
         // Soil has very high evenness → high W → suppressed in 1D and 2D,
         // but 3D metal-insulator transition (W_c ≈ 16.5) exceeds soil's W ≈ 14.85
-        v.check_pass("soil suppressed in 1D and 2D (high diversity)", soil_1d_2d_suppressed);
+        v.check_pass(
+            "soil suppressed in 1D and 2D (high diversity)",
+            soil_1d_2d_suppressed,
+        );
 
         // Check vent biomes
-        let vent_any_3d = phase_rows.iter()
+        let vent_any_3d = phase_rows
+            .iter()
             .filter(|(n, _, _, _, _, _)| n.contains("vent"))
             .any(|(_, _, _, _, _, a3)| *a3);
         println!("  vent ecosystem 3D active: {vent_any_3d}");
         v.check_pass("vent biome 3D status checked", true);
 
         v.section("── S5: Dimensional gain summary ──");
-        let gained_2d_vs_1d: Vec<_> = phase_rows.iter()
+        let gained_2d_vs_1d: Vec<_> = phase_rows
+            .iter()
             .filter(|(_, _, _, a1, a2, _)| !a1 && *a2)
             .map(|(n, _, _, _, _, _)| *n)
             .collect();
-        let gained_3d_vs_2d: Vec<_> = phase_rows.iter()
+        let gained_3d_vs_2d: Vec<_> = phase_rows
+            .iter()
             .filter(|(_, _, _, _, a2, a3)| !a2 && *a3)
             .map(|(n, _, _, _, _, _)| *n)
             .collect();
 
-        println!("  Biomes gaining QS-active in 2D (vs 1D suppressed): {:?}", gained_2d_vs_1d);
-        println!("  Biomes gaining QS-active in 3D (vs 2D suppressed): {:?}", gained_3d_vs_2d);
-        println!("  Total dimensional gains: 1D→2D: {}, 2D→3D: {}", gained_2d_vs_1d.len(), gained_3d_vs_2d.len());
+        println!(
+            "  Biomes gaining QS-active in 2D (vs 1D suppressed): {:?}",
+            gained_2d_vs_1d
+        );
+        println!(
+            "  Biomes gaining QS-active in 3D (vs 2D suppressed): {:?}",
+            gained_3d_vs_2d
+        );
+        println!(
+            "  Total dimensional gains: 1D→2D: {}, 2D→3D: {}",
+            gained_2d_vs_1d.len(),
+            gained_3d_vs_2d.len()
+        );
         v.check_pass("dimensional gain computed", true);
-        v.check_pass("phase diagram complete for all biomes", phase_rows.len() == biomes.len());
+        v.check_pass(
+            "phase diagram complete for all biomes",
+            phase_rows.len() == biomes.len(),
+        );
     }
 
     #[cfg(not(feature = "gpu"))]

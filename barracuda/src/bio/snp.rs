@@ -21,6 +21,7 @@ pub struct Variant {
 impl Variant {
     /// Allele frequency of the reference allele.
     #[must_use]
+    #[allow(clippy::cast_precision_loss)]
     pub fn ref_frequency(&self) -> f64 {
         if self.depth == 0 {
             return 0.0;
@@ -31,6 +32,7 @@ impl Variant {
 
     /// Allele frequency of the major alternative allele.
     #[must_use]
+    #[allow(clippy::cast_precision_loss)]
     pub fn alt_frequency(&self) -> f64 {
         if self.depth == 0 {
             return 0.0;
@@ -54,6 +56,7 @@ pub struct SnpResult {
 impl SnpResult {
     /// SNP density: variants per base pair.
     #[must_use]
+    #[allow(clippy::cast_precision_loss)]
     pub fn snp_density(&self) -> f64 {
         if self.alignment_length == 0 {
             return 0.0;

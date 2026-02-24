@@ -1,5 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::expect_used, clippy::unwrap_used, clippy::print_stdout)]
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::print_stdout,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::cast_possible_wrap
+)]
 //! # Exp109: Large-Scale Phylogenetic Placement with GPU Felsenstein
 //!
 //! Validates phylogenetic distance computation and NJ tree construction at
@@ -37,7 +45,7 @@ fn generate_alignment(n_taxa: usize, seq_len: usize, seed: u64) -> Vec<Vec<u8>> 
         let mut seq = ancestor.clone();
         for site in &mut seq {
             rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-            if ((rng >> 33) as f64) / (u32::MAX as f64) < 0.05 {
+            if ((rng >> 33) as f64) / f64::from(u32::MAX) < 0.05 {
                 rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
                 *site = bases[((rng >> 33) % 4) as usize];
             }
@@ -49,23 +57,29 @@ fn generate_alignment(n_taxa: usize, seq_len: usize, seed: u64) -> Vec<Vec<u8>> 
 
 fn jukes_cantor_distance(a: &[u8], b: &[u8]) -> f64 {
     let n = a.len().min(b.len());
-    if n == 0 { return 0.0; }
+    if n == 0 {
+        return 0.0;
+    }
     let mismatches = a.iter().zip(b.iter()).filter(|(x, y)| x != y).count();
     let p = mismatches as f64 / n as f64;
-    if p >= 0.75 { return 3.0; }
+    if p >= 0.75 {
+        return 3.0;
+    }
     -0.75 * (1.0 - 4.0 * p / 3.0).ln()
 }
 
 fn seq_to_states(seq: &[u8]) -> Vec<usize> {
-    seq.iter().map(|&b| match b {
-        b'A' | b'a' => 0,
-        b'C' | b'c' => 1,
-        b'G' | b'g' => 2,
-        b'T' | b't' => 3,
-        _ => 0,
-    }).collect()
+    seq.iter()
+        .map(|&b| match b {
+            b'C' | b'c' => 1,
+            b'G' | b'g' => 2,
+            b'T' | b't' => 3,
+            _ => 0, // A/a and other
+        })
+        .collect()
 }
 
+#[allow(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp109: Large-Scale Phylogenetic Placement");
 
@@ -88,8 +102,11 @@ fn main() {
     let dist_ms = t0.elapsed().as_secs_f64() * 1000.0;
     println!("  JC distance matrix ({N_TAXA}x{N_TAXA}): {dist_ms:.1} ms");
 
-    let max_dist = dist_matrix.iter().cloned().fold(0.0_f64, f64::max);
-    let min_nonzero = dist_matrix.iter().filter(|&&d| d > 0.0).cloned()
+    let max_dist = dist_matrix.iter().copied().fold(0.0_f64, f64::max);
+    let min_nonzero = dist_matrix
+        .iter()
+        .filter(|&&d| d > 0.0)
+        .copied()
         .fold(f64::INFINITY, f64::min);
     println!("  Distance range: {min_nonzero:.4} - {max_dist:.4}");
     v.check_count("distances positive", usize::from(min_nonzero > 0.0), 1);
@@ -105,7 +122,11 @@ fn main() {
     println!("  NJ tree ({} joins): {nj_ms:.1} ms", nj_result.n_joins);
     println!("  Newick length: {} chars", nj_result.newick.len());
     v.check_count("NJ joins > 0", usize::from(nj_result.n_joins > 0), 1);
-    v.check_count("Newick non-empty", usize::from(!nj_result.newick.is_empty()), 1);
+    v.check_count(
+        "Newick non-empty",
+        usize::from(!nj_result.newick.is_empty()),
+        1,
+    );
 
     // ── S3: Felsenstein likelihood on subtrees ──
     v.section("── S3: Felsenstein likelihood at scale ──");
@@ -127,10 +148,19 @@ fn main() {
         let bl02 = dist_matrix[t0 * N_TAXA + t2] / 2.0;
 
         let tree = TreeNode::Internal {
-            left: Box::new(TreeNode::Leaf { name: format!("T{t0}"), states: s0 }),
+            left: Box::new(TreeNode::Leaf {
+                name: format!("T{t0}"),
+                states: s0,
+            }),
             right: Box::new(TreeNode::Internal {
-                left: Box::new(TreeNode::Leaf { name: format!("T{t1}"), states: s1 }),
-                right: Box::new(TreeNode::Leaf { name: format!("T{t2}"), states: s2 }),
+                left: Box::new(TreeNode::Leaf {
+                    name: format!("T{t1}"),
+                    states: s1,
+                }),
+                right: Box::new(TreeNode::Leaf {
+                    name: format!("T{t2}"),
+                    states: s2,
+                }),
                 left_branch: bl01.max(0.001),
                 right_branch: bl02.max(0.001),
             }),
@@ -149,8 +179,11 @@ fn main() {
     v.check_count("Felsenstein LLs finite", usize::from(all_finite), 1);
     v.check_count("Felsenstein LLs negative", usize::from(all_negative), 1);
 
-    let min_ll = fels_results.iter().cloned().fold(f64::INFINITY, f64::min);
-    let max_ll = fels_results.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
+    let min_ll = fels_results.iter().copied().fold(f64::INFINITY, f64::min);
+    let max_ll = fels_results
+        .iter()
+        .copied()
+        .fold(f64::NEG_INFINITY, f64::max);
     println!("  LL range: {min_ll:.2} - {max_ll:.2}");
 
     // ── S4: Placement queries ──
@@ -163,10 +196,13 @@ fn main() {
     let mut best_targets: Vec<usize> = Vec::with_capacity(N_QUERIES);
 
     for query in &queries {
-        let dists: Vec<f64> = alignment.iter()
+        let dists: Vec<f64> = alignment
+            .iter()
             .map(|ref_seq| jukes_cantor_distance(query, ref_seq))
             .collect();
-        let best = dists.iter().enumerate()
+        let best = dists
+            .iter()
+            .enumerate()
             .min_by(|a, b| a.1.partial_cmp(b.1).unwrap())
             .map(|(i, _)| i)
             .unwrap();
@@ -179,7 +215,11 @@ fn main() {
     println!("  Unique placement targets: {}", unique_targets.len());
 
     v.check_count("placements computed", best_targets.len(), N_QUERIES);
-    v.check_count("diverse placements (>1)", usize::from(unique_targets.len() > 1), 1);
+    v.check_count(
+        "diverse placements (>1)",
+        usize::from(unique_targets.len() > 1),
+        1,
+    );
 
     // ── S5: Scale characterization ──
     v.section("── S5: Scale characterization ──");

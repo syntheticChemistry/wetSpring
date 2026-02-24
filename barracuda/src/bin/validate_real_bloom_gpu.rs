@@ -37,7 +37,9 @@ fn generate_ecosystem(
     for t in 0..n_timepoints {
         let mut counts = Vec::with_capacity(n_species);
         for s in 0..n_species {
-            rng_state = rng_state.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
+            rng_state = rng_state
+                .wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1);
             let base = ((rng_state >> 33) as f64) / (u32::MAX as f64) * 50.0 + 5.0;
             if t >= bloom_start && t < bloom_end {
                 // During bloom: single species dominates
@@ -58,7 +60,9 @@ fn generate_ecosystem(
 
 fn dominance_index(counts: &[f64]) -> f64 {
     let total: f64 = counts.iter().sum();
-    if total == 0.0 { return 0.0; }
+    if total == 0.0 {
+        return 0.0;
+    }
     counts.iter().cloned().fold(0.0_f64, f64::max) / total
 }
 
@@ -85,12 +89,17 @@ fn main() {
     let mut all_shannon_cpu: Vec<Vec<f64>> = Vec::new();
     let mut all_bc_cpu: Vec<Vec<f64>> = Vec::new();
 
-    for (name, eco) in [("Erie", &lake_erie), ("Baltic", &baltic), ("Florida", &florida)] {
+    for (name, eco) in [
+        ("Erie", &lake_erie),
+        ("Baltic", &baltic),
+        ("Florida", &florida),
+    ] {
         let shannon_series: Vec<f64> = eco.iter().map(|c| diversity::shannon(c)).collect();
         let _simpson_series: Vec<f64> = eco.iter().map(|c| diversity::simpson(c)).collect();
 
         // Bray-Curtis between consecutive timepoints
-        let bc_series: Vec<f64> = eco.windows(2)
+        let bc_series: Vec<f64> = eco
+            .windows(2)
             .map(|w| diversity::bray_curtis(&w[0], &w[1]))
             .collect();
 
@@ -98,12 +107,17 @@ fn main() {
 
         // Bloom detection: Shannon < mean - 2σ
         let mean_h: f64 = shannon_series.iter().sum::<f64>() / shannon_series.len() as f64;
-        let var_h: f64 = shannon_series.iter().map(|h| (h - mean_h).powi(2)).sum::<f64>()
+        let var_h: f64 = shannon_series
+            .iter()
+            .map(|h| (h - mean_h).powi(2))
+            .sum::<f64>()
             / shannon_series.len() as f64;
         let sigma_h = var_h.sqrt();
         let threshold = mean_h - 2.0 * sigma_h;
 
-        let bloom_detected: Vec<usize> = shannon_series.iter().enumerate()
+        let bloom_detected: Vec<usize> = shannon_series
+            .iter()
+            .enumerate()
             .filter(|(_, h)| **h < threshold)
             .map(|(i, _)| i)
             .collect();
@@ -111,14 +125,25 @@ fn main() {
         let bloom_count = bloom_detected.len();
         let has_bloom = bloom_count > 0;
 
-        println!("  {name}: {bloom_count} bloom timepoints detected (H threshold = {threshold:.3})");
-        println!("    Shannon range: {:.3} – {:.3}", 
+        println!(
+            "  {name}: {bloom_count} bloom timepoints detected (H threshold = {threshold:.3})"
+        );
+        println!(
+            "    Shannon range: {:.3} – {:.3}",
             shannon_series.iter().cloned().fold(f64::INFINITY, f64::min),
-            shannon_series.iter().cloned().fold(f64::NEG_INFINITY, f64::max));
-        println!("    Max dominance during bloom: {:.4}",
-            dominance_series.iter().cloned().fold(0.0_f64, f64::max));
-        println!("    Max BC shift: {:.4}",
-            bc_series.iter().cloned().fold(0.0_f64, f64::max));
+            shannon_series
+                .iter()
+                .cloned()
+                .fold(f64::NEG_INFINITY, f64::max)
+        );
+        println!(
+            "    Max dominance during bloom: {:.4}",
+            dominance_series.iter().cloned().fold(0.0_f64, f64::max)
+        );
+        println!(
+            "    Max BC shift: {:.4}",
+            bc_series.iter().cloned().fold(0.0_f64, f64::max)
+        );
 
         v.check_count(&format!("{name} bloom detected"), usize::from(has_bloom), 1);
 
@@ -143,20 +168,27 @@ fn main() {
 
         let gpu_start = Instant::now();
 
-        for (idx, (name, eco)) in [("Erie", &lake_erie), ("Baltic", &baltic), ("Florida", &florida)]
-            .iter()
-            .enumerate()
+        for (idx, (name, eco)) in [
+            ("Erie", &lake_erie),
+            ("Baltic", &baltic),
+            ("Florida", &florida),
+        ]
+        .iter()
+        .enumerate()
         {
-            let gpu_shannon: Vec<f64> = eco.iter()
+            let gpu_shannon: Vec<f64> = eco
+                .iter()
                 .map(|c| diversity_gpu::shannon_gpu(&gpu, c).unwrap())
                 .collect();
 
-            let _gpu_simpson: Vec<f64> = eco.iter()
+            let _gpu_simpson: Vec<f64> = eco
+                .iter()
                 .map(|c| diversity_gpu::simpson_gpu(&gpu, c).unwrap())
                 .collect();
 
             // Parity: GPU Shannon ≈ CPU Shannon
-            let max_shannon_diff = gpu_shannon.iter()
+            let max_shannon_diff = gpu_shannon
+                .iter()
                 .zip(all_shannon_cpu[idx].iter())
                 .map(|(g, c)| (g - c).abs())
                 .fold(0.0_f64, f64::max);
@@ -170,14 +202,20 @@ fn main() {
             );
 
             // GPU Bray-Curtis between consecutive timepoints
-            let gpu_bc: Vec<f64> = eco.windows(2)
+            let gpu_bc: Vec<f64> = eco
+                .windows(2)
                 .map(|w| {
-                    let bc_mat = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &[w[0].clone(), w[1].clone()]).unwrap();
+                    let bc_mat = diversity_gpu::bray_curtis_condensed_gpu(
+                        &gpu,
+                        &[w[0].clone(), w[1].clone()],
+                    )
+                    .unwrap();
                     bc_mat[0]
                 })
                 .collect();
 
-            let max_bc_diff = gpu_bc.iter()
+            let max_bc_diff = gpu_bc
+                .iter()
                 .zip(all_bc_cpu[idx].iter())
                 .map(|(g, c)| (g - c).abs())
                 .fold(0.0_f64, f64::max);
@@ -217,7 +255,9 @@ fn main() {
         let post_bloom_h = diversity::shannon(&eco[(bloom_end + 5).min(eco.len() - 1)]);
 
         let drop_ratio = mid_bloom_h / pre_bloom_h;
-        println!("  {name}: H drop ratio = {drop_ratio:.3} (pre={pre_bloom_h:.3}, mid={mid_bloom_h:.3}, post={post_bloom_h:.3})");
+        println!(
+            "  {name}: H drop ratio = {drop_ratio:.3} (pre={pre_bloom_h:.3}, mid={mid_bloom_h:.3}, post={post_bloom_h:.3})"
+        );
 
         v.check_count(
             &format!("{name} bloom H drops > 50%"),

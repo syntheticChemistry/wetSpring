@@ -3,7 +3,7 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
-    dead_code,
+    dead_code
 )]
 //! # Exp137: Planktonic & Mixed Fluid 3D — Dilution Effects
 //!
@@ -33,7 +33,7 @@ use wetspring_barracuda::validation::Validator;
 
 #[cfg(feature = "gpu")]
 use barracuda::spectral::{
-    anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio, GOE_R, POISSON_R,
+    GOE_R, POISSON_R, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 
 #[allow(clippy::cast_precision_loss)]
@@ -56,7 +56,10 @@ fn main() {
         let base_w = 13.0; // typical biome diversity
         let occupancies = [1.0, 0.75, 0.50, 0.30, 0.20, 0.10, 0.05];
 
-        println!("  {:>10} {:>8} {:>8} {:>10}", "occupancy", "W_eff", "⟨r⟩", "regime");
+        println!(
+            "  {:>10} {:>8} {:>8} {:>10}",
+            "occupancy", "W_eff", "⟨r⟩", "regime"
+        );
         println!("  {:-<10} {:-<8} {:-<8} {:-<10}", "", "", "", "");
 
         let mut first_suppressed: Option<f64> = None;
@@ -67,16 +70,29 @@ fn main() {
             let tri = lanczos(&mat, n, 42);
             let eigs = lanczos_eigenvalues(&tri);
             let r = level_spacing_ratio(&eigs);
-            let regime = if r > midpoint { "QS-ACTIVE" } else { "suppressed" };
-            println!("  {:>9.0}% {:>8.1} {:>8.4} {:>10}",
-                occ * 100.0, w_eff, r, regime);
+            let regime = if r > midpoint {
+                "QS-ACTIVE"
+            } else {
+                "suppressed"
+            };
+            println!(
+                "  {:>9.0}% {:>8.1} {:>8.4} {:>10}",
+                occ * 100.0,
+                w_eff,
+                r,
+                regime
+            );
             if r <= midpoint && first_suppressed.is_none() {
                 first_suppressed = Some(occ);
             }
             v.check_pass(&format!("occupancy {:.0}% computed", occ * 100.0), true);
         }
         if let Some(occ) = first_suppressed {
-            println!("\n  QS breaks at occupancy ≤ {:.0}% (W_eff ≥ {:.1})", occ * 100.0, base_w / occ);
+            println!(
+                "\n  QS breaks at occupancy ≤ {:.0}% (W_eff ≥ {:.1})",
+                occ * 100.0,
+                base_w / occ
+            );
         }
 
         v.section("── S2: Sea plankton density mapping ──");
@@ -95,16 +111,22 @@ fn main() {
         // Even "dense" planktonic cultures have ~0.1% occupancy
 
         let planktonic_scenarios = [
-            ("dense_biofilm",       1.0,    "cells touching (solid)"),
-            ("loose_aggregate",     0.50,   "EPS matrix with gaps"),
-            ("floc/marine_snow",    0.10,   "detrital aggregates"),
-            ("dense_bloom",         0.01,   "10⁷ cells/mL"),
-            ("coastal_plankton",    0.001,  "10⁶ cells/mL"),
-            ("open_ocean",          0.0001, "10⁵ cells/mL"),
+            ("dense_biofilm", 1.0, "cells touching (solid)"),
+            ("loose_aggregate", 0.50, "EPS matrix with gaps"),
+            ("floc/marine_snow", 0.10, "detrital aggregates"),
+            ("dense_bloom", 0.01, "10⁷ cells/mL"),
+            ("coastal_plankton", 0.001, "10⁶ cells/mL"),
+            ("open_ocean", 0.0001, "10⁵ cells/mL"),
         ];
 
-        println!("  {:25} {:>10} {:>8} {:>8} {:>10}", "scenario", "occupancy", "W_eff", "⟨r⟩", "regime");
-        println!("  {:-<25} {:-<10} {:-<8} {:-<8} {:-<10}", "", "", "", "", "");
+        println!(
+            "  {:25} {:>10} {:>8} {:>8} {:>10}",
+            "scenario", "occupancy", "W_eff", "⟨r⟩", "regime"
+        );
+        println!(
+            "  {:-<25} {:-<10} {:-<8} {:-<8} {:-<10}",
+            "", "", "", "", ""
+        );
         for (name, occ, desc) in &planktonic_scenarios {
             let w_eff = base_w / occ;
             // Cap W_eff at 100 to avoid numerical issues
@@ -113,9 +135,20 @@ fn main() {
             let tri = lanczos(&mat, n, 42);
             let eigs = lanczos_eigenvalues(&tri);
             let r = level_spacing_ratio(&eigs);
-            let regime = if r > midpoint { "QS-ACTIVE" } else { "suppressed" };
-            println!("  {:25} {:>9.2}% {:>8.1} {:>8.4} {:>10}  [{}]",
-                name, occ * 100.0, w_capped, r, regime, desc);
+            let regime = if r > midpoint {
+                "QS-ACTIVE"
+            } else {
+                "suppressed"
+            };
+            println!(
+                "  {:25} {:>9.2}% {:>8.1} {:>8.4} {:>10}  [{}]",
+                name,
+                occ * 100.0,
+                w_capped,
+                r,
+                regime,
+                desc
+            );
         }
         v.check_pass("planktonic scenarios computed", true);
 
@@ -144,7 +177,10 @@ fn main() {
             ("climax_community", 0.95),
         ];
         println!("  Biofilm temporal stages:");
-        println!("  {:25} {:>6} {:>6}  {:>8} {:>8}", "stage", "J", "W", "2D ⟨r⟩", "3D ⟨r⟩");
+        println!(
+            "  {:25} {:>6} {:>6}  {:>8} {:>8}",
+            "stage", "J", "W", "2D ⟨r⟩", "3D ⟨r⟩"
+        );
         for (name, j) in &stages {
             let w = 0.5 + j * 14.5;
             let mat_2d = anderson_3d(14, 14, 2, w, 42);
@@ -155,8 +191,10 @@ fn main() {
             let r_3d = level_spacing_ratio(&lanczos_eigenvalues(&tri_3d));
             let tag_2d = if r_2d > midpoint { "ACTIVE" } else { "---" };
             let tag_3d = if r_3d > midpoint { "ACTIVE" } else { "---" };
-            println!("  {:25} {:>6.2} {:>6.2}  {:>6.4}({}) {:>6.4}({})",
-                name, j, w, r_2d, tag_2d, r_3d, tag_3d);
+            println!(
+                "  {:25} {:>6.2} {:>6.2}  {:>6.4}({}) {:>6.4}({})",
+                name, j, w, r_2d, tag_2d, r_3d, tag_3d
+            );
         }
         v.check_pass("turnover analysis computed", true);
 

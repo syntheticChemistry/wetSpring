@@ -42,6 +42,7 @@ use wetspring_barracuda::bio::{
     diversity, diversity_gpu, pcoa, pcoa_gpu, spectral_match_gpu, stats_gpu,
 };
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
@@ -406,13 +407,9 @@ fn validate_spectral_match(gpu: &GpuF64, v: &mut Validator) {
         let mut cpu_condensed = Vec::with_capacity(n * (n - 1) / 2);
         for i in 1..n {
             for j in 0..i {
-                let dot: f64 = spectra[i]
-                    .iter()
-                    .zip(spectra[j].iter())
-                    .map(|(a, b)| a * b)
-                    .sum();
-                let norm_i: f64 = spectra[i].iter().map(|x| x * x).sum::<f64>().sqrt();
-                let norm_j: f64 = spectra[j].iter().map(|x| x * x).sum::<f64>().sqrt();
+                let dot: f64 = special::dot(&spectra[i], &spectra[j]);
+                let norm_i: f64 = special::l2_norm(&spectra[i]);
+                let norm_j: f64 = special::l2_norm(&spectra[j]);
                 let denom = norm_i * norm_j;
                 let score = if denom > 0.0 { dot / denom } else { 0.0 };
                 cpu_condensed.push(score);
@@ -542,7 +539,7 @@ fn validate_stats_gpu(v: &mut Validator, gpu: &GpuF64) {
         tolerances::GPU_VS_CPU_TRANSCENDENTAL,
     );
 
-    let cpu_dot: f64 = x.iter().zip(y.iter()).map(|(&xi, &yi)| xi * yi).sum();
+    let cpu_dot: f64 = special::dot(&x, &y);
     let gpu_dot = stats_gpu::dot_gpu(gpu, &x, &y).expect("dot GPU");
     v.check(
         "Dot product",

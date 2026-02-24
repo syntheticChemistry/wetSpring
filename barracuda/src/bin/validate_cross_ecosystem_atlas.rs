@@ -3,7 +3,7 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
-    dead_code,
+    dead_code
 )]
 //! # Exp134: Cross-Ecosystem QS Geometry Atlas
 //!
@@ -24,8 +24,8 @@ use wetspring_barracuda::validation::Validator;
 
 #[cfg(feature = "gpu")]
 use barracuda::spectral::{
-    anderson_2d, anderson_3d, anderson_hamiltonian, find_all_eigenvalues, lanczos,
-    lanczos_eigenvalues, level_spacing_ratio, GOE_R, POISSON_R,
+    GOE_R, POISSON_R, anderson_2d, anderson_3d, anderson_hamiltonian, find_all_eigenvalues,
+    lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 
 fn evenness_to_disorder(pielou_j: f64) -> f64 {
@@ -58,48 +58,58 @@ fn main() {
         let w_at = |i: usize| -> f64 { 1.0 + (i as f64) * 21.0 / (n_sweep - 1) as f64 };
 
         // chain (1D, N=384)
-        let sweep_chain: Vec<(f64, f64)> = (0..n_sweep).map(|i| {
-            let w = w_at(i);
-            let (d, o) = anderson_hamiltonian(384, w, 42);
-            let eigs = find_all_eigenvalues(&d, &o);
-            (w, level_spacing_ratio(&eigs))
-        }).collect();
+        let sweep_chain: Vec<(f64, f64)> = (0..n_sweep)
+            .map(|i| {
+                let w = w_at(i);
+                let (d, o) = anderson_hamiltonian(384, w, 42);
+                let eigs = find_all_eigenvalues(&d, &o);
+                (w, level_spacing_ratio(&eigs))
+            })
+            .collect();
 
         // slab (2D, 20×20)
-        let sweep_slab: Vec<(f64, f64)> = (0..n_sweep).map(|i| {
-            let w = w_at(i);
-            let mat = anderson_2d(20, 20, w, 42);
-            let tri = lanczos(&mat, 400, 42);
-            let eigs = lanczos_eigenvalues(&tri);
-            (w, level_spacing_ratio(&eigs))
-        }).collect();
+        let sweep_slab: Vec<(f64, f64)> = (0..n_sweep)
+            .map(|i| {
+                let w = w_at(i);
+                let mat = anderson_2d(20, 20, w, 42);
+                let tri = lanczos(&mat, 400, 42);
+                let eigs = lanczos_eigenvalues(&tri);
+                (w, level_spacing_ratio(&eigs))
+            })
+            .collect();
 
         // thin film (14×14×2)
-        let sweep_film: Vec<(f64, f64)> = (0..n_sweep).map(|i| {
-            let w = w_at(i);
-            let mat = anderson_3d(14, 14, 2, w, 42);
-            let tri = lanczos(&mat, 392, 42);
-            let eigs = lanczos_eigenvalues(&tri);
-            (w, level_spacing_ratio(&eigs))
-        }).collect();
+        let sweep_film: Vec<(f64, f64)> = (0..n_sweep)
+            .map(|i| {
+                let w = w_at(i);
+                let mat = anderson_3d(14, 14, 2, w, 42);
+                let tri = lanczos(&mat, 392, 42);
+                let eigs = lanczos_eigenvalues(&tri);
+                (w, level_spacing_ratio(&eigs))
+            })
+            .collect();
 
         // tube (32×3×4)
-        let sweep_tube: Vec<(f64, f64)> = (0..n_sweep).map(|i| {
-            let w = w_at(i);
-            let mat = anderson_3d(32, 3, 4, w, 42);
-            let tri = lanczos(&mat, 384, 42);
-            let eigs = lanczos_eigenvalues(&tri);
-            (w, level_spacing_ratio(&eigs))
-        }).collect();
+        let sweep_tube: Vec<(f64, f64)> = (0..n_sweep)
+            .map(|i| {
+                let w = w_at(i);
+                let mat = anderson_3d(32, 3, 4, w, 42);
+                let tri = lanczos(&mat, 384, 42);
+                let eigs = lanczos_eigenvalues(&tri);
+                (w, level_spacing_ratio(&eigs))
+            })
+            .collect();
 
         // block (8×8×6)
-        let sweep_block: Vec<(f64, f64)> = (0..n_sweep).map(|i| {
-            let w = w_at(i);
-            let mat = anderson_3d(8, 8, 6, w, 42);
-            let tri = lanczos(&mat, 384, 42);
-            let eigs = lanczos_eigenvalues(&tri);
-            (w, level_spacing_ratio(&eigs))
-        }).collect();
+        let sweep_block: Vec<(f64, f64)> = (0..n_sweep)
+            .map(|i| {
+                let w = w_at(i);
+                let mat = anderson_3d(8, 8, 6, w, 42);
+                let tri = lanczos(&mat, 384, 42);
+                let eigs = lanczos_eigenvalues(&tri);
+                (w, level_spacing_ratio(&eigs))
+            })
+            .collect();
 
         v.check_count("chain sweep", sweep_chain.len(), n_sweep);
         v.check_count("slab sweep", sweep_slab.len(), n_sweep);
@@ -116,7 +126,8 @@ fn main() {
         ];
 
         fn nearest_r(sweep: &[(f64, f64)], w: f64) -> f64 {
-            sweep.iter()
+            sweep
+                .iter()
                 .min_by(|(wa, _), (wb, _)| (wa - w).abs().partial_cmp(&(wb - w).abs()).unwrap())
                 .map(|(_, r)| *r)
                 .unwrap_or(0.0)
@@ -125,10 +136,14 @@ fn main() {
         v.section("── S2: 28-biome × 5-geometry atlas ──");
         let biomes = ncbi_data::biome_diversity_params();
 
-        println!("  {:30} {:>5} {:>5}  {:>7} {:>7} {:>7} {:>7} {:>7}",
-            "biome", "J", "W", "chain", "slab", "film", "tube", "block");
-        println!("  {:-<30} {:-<5} {:-<5}  {:-<7} {:-<7} {:-<7} {:-<7} {:-<7}",
-            "", "", "", "", "", "", "", "");
+        println!(
+            "  {:30} {:>5} {:>5}  {:>7} {:>7} {:>7} {:>7} {:>7}",
+            "biome", "J", "W", "chain", "slab", "film", "tube", "block"
+        );
+        println!(
+            "  {:-<30} {:-<5} {:-<5}  {:-<7} {:-<7} {:-<7} {:-<7} {:-<7}",
+            "", "", "", "", "", "", "", ""
+        );
 
         let mut atlas: Vec<(&str, f64, f64, [bool; 5])> = Vec::new();
         let mut active_counts = [0_usize; 5];
@@ -144,11 +159,15 @@ fn main() {
                 let r = nearest_r(sweep, w);
                 let is_active = r > midpoint;
                 active[idx] = is_active;
-                if is_active { active_counts[idx] += 1; }
+                if is_active {
+                    active_counts[idx] += 1;
+                }
                 cols.push(if is_active { "ACTIVE" } else { "---" });
             }
-            println!("  {:30} {:5.3} {:5.2}  {:>7} {:>7} {:>7} {:>7} {:>7}",
-                name, j, w, cols[0], cols[1], cols[2], cols[3], cols[4]);
+            println!(
+                "  {:30} {:5.3} {:5.2}  {:>7} {:>7} {:>7} {:>7} {:>7}",
+                name, j, w, cols[0], cols[1], cols[2], cols[3], cols[4]
+            );
             atlas.push((name, j, w, active));
         }
 
@@ -157,16 +176,30 @@ fn main() {
         v.section("── S3: Geometry effectiveness summary ──");
         let shape_names = ["chain", "slab", "film", "tube", "block"];
         for (i, name) in shape_names.iter().enumerate() {
-            println!("  {:>8}: {}/{} biomes QS-active", name, active_counts[i], biomes.len());
+            println!(
+                "  {:>8}: {}/{} biomes QS-active",
+                name,
+                active_counts[i],
+                biomes.len()
+            );
         }
-        v.check_pass("block activates most biomes", active_counts[4] >= active_counts[0]);
-        v.check_pass("film >= slab (depth helps)", active_counts[2] >= active_counts[1]);
+        v.check_pass(
+            "block activates most biomes",
+            active_counts[4] >= active_counts[0],
+        );
+        v.check_pass(
+            "film >= slab (depth helps)",
+            active_counts[2] >= active_counts[1],
+        );
 
         // Geometry ordering: block >= film >= tube >= slab >= chain
         let monotonic = active_counts[4] >= active_counts[2]
             && active_counts[2] >= active_counts[1]
             && active_counts[1] >= active_counts[0];
-        v.check_pass("geometry effectiveness: block >= film >= slab >= chain", monotonic);
+        v.check_pass(
+            "geometry effectiveness: block >= film >= slab >= chain",
+            monotonic,
+        );
 
         v.section("── S4: Biomes that differentiate geometries ──");
         let mut differentiators = Vec::new();
@@ -176,9 +209,14 @@ fn main() {
                 differentiators.push((*name, n_active, *active));
             }
         }
-        println!("  Biomes active in SOME but not ALL geometries ({}):", differentiators.len());
+        println!(
+            "  Biomes active in SOME but not ALL geometries ({}):",
+            differentiators.len()
+        );
         for (name, n, active) in &differentiators {
-            let shapes: Vec<_> = shape_names.iter().zip(active.iter())
+            let shapes: Vec<_> = shape_names
+                .iter()
+                .zip(active.iter())
                 .filter(|(_, a)| **a)
                 .map(|(s, _)| *s)
                 .collect();
@@ -190,38 +228,49 @@ fn main() {
         println!("  GEOMETRY RECOMMENDATIONS BY ECOSYSTEM TYPE:");
         println!();
 
-        let cave_biomes = atlas.iter()
+        let cave_biomes = atlas
+            .iter()
             .filter(|(n, _, _, _)| n.contains("deep_sea") || n.contains("marine_sediment"))
             .map(|(n, _, _, a)| (*n, a[4]))
             .collect::<Vec<_>>();
         println!("    Cave analogs (deep-sea, sediment):");
         for (name, active_3d) in &cave_biomes {
-            println!("      {:30} block={}", name, if *active_3d { "ACTIVE" } else { "---" });
+            println!(
+                "      {:30} block={}",
+                name,
+                if *active_3d { "ACTIVE" } else { "---" }
+            );
         }
 
-        let hs_biomes = atlas.iter()
+        let hs_biomes = atlas
+            .iter()
             .filter(|(n, _, _, _)| n.contains("hot_spring") || n.contains("vent"))
             .map(|(n, _, _, a)| (*n, a[2], a[4]))
             .collect::<Vec<_>>();
         println!("    Hot spring / vent biomes:");
         for (name, film, block) in &hs_biomes {
-            println!("      {:30} film={} block={}",
+            println!(
+                "      {:30} film={} block={}",
                 name,
                 if *film { "ACTIVE" } else { "---" },
-                if *block { "ACTIVE" } else { "---" });
+                if *block { "ACTIVE" } else { "---" }
+            );
         }
 
-        let rhizo_biomes = atlas.iter()
+        let rhizo_biomes = atlas
+            .iter()
             .filter(|(n, _, _, _)| n.contains("rhizosphere") || n.contains("soil"))
             .map(|(n, _, _, a)| (*n, a[2], a[3], a[4]))
             .collect::<Vec<_>>();
         println!("    Rhizosphere / soil biomes:");
         for (name, film, tube, block) in &rhizo_biomes {
-            println!("      {:30} film={} tube={} block={}",
+            println!(
+                "      {:30} film={} tube={} block={}",
                 name,
                 if *film { "ACTIVE" } else { "---" },
                 if *tube { "ACTIVE" } else { "---" },
-                if *block { "ACTIVE" } else { "---" });
+                if *block { "ACTIVE" } else { "---" }
+            );
         }
         v.check_pass("recommendations complete", true);
     }

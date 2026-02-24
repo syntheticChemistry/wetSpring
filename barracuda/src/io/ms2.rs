@@ -348,11 +348,11 @@ impl Iterator for Ms2Iter {
     }
 }
 
-/// Compute summary statistics in a single streaming pass (zero-copy path).
+/// Compute summary statistics in a single streaming pass.
 ///
-/// No per-spectrum allocation — lines are processed in-place from a
-/// `BufReader`.  Use this for large files where only aggregate statistics
-/// are needed.
+/// Allocation-free per spectrum — lines are streamed via `BufReader` without
+/// buffering full spectra. Use this for large files where only aggregate
+/// statistics are needed.
 ///
 /// # Errors
 ///

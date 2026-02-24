@@ -21,6 +21,7 @@
 //! | Python version | 3.10+ (pure Python, no external dependencies) |
 
 use wetspring_barracuda::bio::{diversity, dnds};
+use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
@@ -242,9 +243,9 @@ fn validate_spectral_comparison(v: &mut Validator) {
 }
 
 fn vector_cosine(a: &[f64], b: &[f64]) -> f64 {
-    let dot: f64 = a.iter().zip(b).map(|(x, y)| x * y).sum();
-    let norm_a: f64 = a.iter().map(|x| x * x).sum::<f64>().sqrt();
-    let norm_b: f64 = b.iter().map(|x| x * x).sum::<f64>().sqrt();
+    let dot: f64 = special::dot(a, b);
+    let norm_a: f64 = special::l2_norm(a);
+    let norm_b: f64 = special::l2_norm(b);
     if norm_a == 0.0 || norm_b == 0.0 {
         return 0.0;
     }

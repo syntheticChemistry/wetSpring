@@ -19,7 +19,7 @@
 //! # References
 //!
 //! - Li, S. et al. "Trackable and scalable LC-MS metabolomics data processing
-//!   using asari." Nature Communications 14, 4113 (2023).
+//!   using `asari`." Nature Communications 14, 4113 (2023).
 
 use crate::io::mzml::MzmlSpectrum;
 
@@ -94,7 +94,7 @@ pub fn extract_eics(spectra: &[MzmlSpectrum], target_mzs: &[f64], ppm: f64) -> V
 /// the centroid m/z for each bin that appears in at least `min_scans`
 /// consecutive scans.
 ///
-/// This is the asari-style "mass track" extraction step.
+/// This is the `asari`-style "mass track" extraction step.
 ///
 /// # Arguments
 ///
@@ -186,10 +186,10 @@ mod tests {
             ms_level: 1,
             rt_minutes: rt,
             tic: intensity.iter().sum(),
-            base_peak_mz: mz.first().copied().unwrap_or(0.0),
+            base_peak_mz: mz.first().map_or(0.0, |x| *x),
             base_peak_intensity: intensity.iter().copied().fold(0.0_f64, f64::max),
-            lowest_mz: mz.first().copied().unwrap_or(0.0),
-            highest_mz: mz.last().copied().unwrap_or(0.0),
+            lowest_mz: mz.first().map_or(0.0, |x| *x),
+            highest_mz: mz.last().map_or(0.0, |x| *x),
             mz_array: mz.to_vec(),
             intensity_array: intensity.to_vec(),
         }

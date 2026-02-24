@@ -95,7 +95,7 @@ pub fn presence_matrix_flat(clusters: &[GeneCluster], n_genomes: usize) -> Vec<u
     clusters
         .iter()
         .flat_map(|cluster| {
-            (0..n_genomes).map(move |g| u8::from(cluster.presence.get(g).copied().unwrap_or(false)))
+            (0..n_genomes).map(move |g| u8::from(cluster.presence.get(g).is_some_and(|x| *x)))
         })
         .collect()
 }

@@ -16,7 +16,7 @@ energy, and memory in a unified benchmark harness. The study covers
 four tracks: 16S amplicon metagenomics (Track 1), comparative genomics
 and mathematical biology (Track 1b), deep-sea metagenomics and microbial
 evolution (Track 1c), and PFAS detection via LC-MS (Track 2),
-validating 83 Rust modules (41 CPU + 42 GPU) against baselines from Galaxy,
+validating 87 Rust modules (45 CPU + 42 GPU) against baselines from Galaxy,
 QIIME2, asari, FindPFAS, scipy, sklearn, dendropy, real NCBI SRA data, and
 published paper models with 3,028+ quantitative checks across 149 experiments
 — all passing. The pipeline proves substrate independence: math produces
@@ -455,7 +455,7 @@ against Python baselines with public data.
 
 ### 4.2 Rust as a scientific computing platform
 
-83 modules (41 CPU bio, 42 GPU, plus I/O and benchmarking) with minimal
+87 modules (45 CPU bio, 42 GPU, plus I/O and benchmarking) with minimal
 runtime dependency (`flate2` for gzip) demonstrate that Rust can serve
 as a standalone platform for bioinformatics and analytical chemistry.
 The sovereign XML, FASTQ, mzML, and MS2 parsers eliminate the need for
@@ -525,7 +525,7 @@ Code quality gates (all enforced in CI):
 - `cargo clippy --all-targets --features gpu -- -D warnings` — zero GPU-specific warnings
 - `RUSTDOCFLAGS="-D warnings" cargo doc --no-deps` — zero doc warnings
 - 0 production `unsafe` blocks (`#![deny(unsafe_code)]`; test-only `allow` for edition 2024 `env::set_var`), 0 `TODO`/`FIXME`, 0 production `unwrap()`/`expect()` (`#![deny(clippy::expect_used, clippy::unwrap_used)]` enforced crate-wide)
-- 43 named tolerance constants in `tolerances.rs` (scientifically justified, hierarchy-tested)
+- 53 named tolerance constants in `tolerances.rs` (scientifically justified, hierarchy-tested)
 - Shared math consolidated in `crate::special` (erf, ln_gamma, `regularized_gamma_lower`, `normal_cdf`) — no duplication
 - 6 determinism tests covering diversity, Bray-Curtis, DADA2, chimera, taxonomy, and the full 16S pipeline
 
@@ -586,7 +586,7 @@ repository (AGPL-3.0). No institutional access required.
 ```bash
 # Run all CPU validations (1,476+ checks)
 cd barracuda
-cargo test --release          # 750 tests (676 lib + 60 integration + 14 doc)
+cargo test --release          # 759 tests (680 lib + 79 integration/doc)
 cargo run --release --bin validate_fastq
 cargo run --release --bin validate_diversity
 cargo run --release --bin validate_mzml

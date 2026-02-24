@@ -3,7 +3,7 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
-    dead_code,
+    dead_code
 )]
 //! # Exp139: QS Distance Scaling — Bacteria Shouting vs Human Shouting
 //!
@@ -25,7 +25,7 @@ use wetspring_barracuda::validation::Validator;
 
 #[cfg(feature = "gpu")]
 use barracuda::spectral::{
-    anderson_2d, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio, GOE_R, POISSON_R,
+    GOE_R, POISSON_R, anderson_2d, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 
 #[allow(clippy::cast_precision_loss)]
@@ -66,21 +66,54 @@ fn main() {
         medium: &'static str,
     }
     let human_modes = [
-        CommMode { name: "whisper", range_m: 2.0, medium: "sound (air)" },
-        CommMode { name: "conversation", range_m: 5.0, medium: "sound (air)" },
-        CommMode { name: "shout", range_m: 100.0, medium: "sound (air)" },
-        CommMode { name: "loud horn/bell", range_m: 1_000.0, medium: "sound (air)" },
-        CommMode { name: "sight (person)", range_m: 5_000.0, medium: "light (air)" },
-        CommMode { name: "sight (bonfire)", range_m: 20_000.0, medium: "light (air)" },
-        CommMode { name: "sight (lighthouse)", range_m: 40_000.0, medium: "light (air)" },
+        CommMode {
+            name: "whisper",
+            range_m: 2.0,
+            medium: "sound (air)",
+        },
+        CommMode {
+            name: "conversation",
+            range_m: 5.0,
+            medium: "sound (air)",
+        },
+        CommMode {
+            name: "shout",
+            range_m: 100.0,
+            medium: "sound (air)",
+        },
+        CommMode {
+            name: "loud horn/bell",
+            range_m: 1_000.0,
+            medium: "sound (air)",
+        },
+        CommMode {
+            name: "sight (person)",
+            range_m: 5_000.0,
+            medium: "light (air)",
+        },
+        CommMode {
+            name: "sight (bonfire)",
+            range_m: 20_000.0,
+            medium: "light (air)",
+        },
+        CommMode {
+            name: "sight (lighthouse)",
+            range_m: 40_000.0,
+            medium: "light (air)",
+        },
     ];
 
-    println!("  {:25} {:>12} {:>12} {:>15}", "mode", "range", "body lengths", "medium");
+    println!(
+        "  {:25} {:>12} {:>12} {:>15}",
+        "mode", "range", "body lengths", "medium"
+    );
     println!("  {:-<25} {:-<12} {:-<12} {:-<15}", "", "", "", "");
     for mode in &human_modes {
         let body_lengths = mode.range_m / human_height_m;
-        println!("  {:25} {:>10.0} m {:>10.0}× {:>15}",
-            mode.name, mode.range_m, body_lengths, mode.medium);
+        println!(
+            "  {:25} {:>10.0} m {:>10.0}× {:>15}",
+            mode.name, mode.range_m, body_lengths, mode.medium
+        );
     }
     v.check_pass("human communication modes", true);
 
@@ -93,22 +126,70 @@ fn main() {
         mechanism: &'static str,
     }
     let bact_modes = [
-        BactCommMode { name: "contact (T6SS)", range_um: 0.5, medium: "direct contact", mechanism: "molecular syringe" },
-        BactCommMode { name: "contact (CDI)", range_um: 1.0, medium: "direct contact", mechanism: "growth inhibition" },
-        BactCommMode { name: "membrane vesicles", range_um: 5.0, medium: "OMV diffusion", mechanism: "cargo delivery" },
-        BactCommMode { name: "QS (dense biofilm)", range_um: 10.0, medium: "AHL diffusion", mechanism: "gene regulation" },
-        BactCommMode { name: "QS (loose biofilm)", range_um: 100.0, medium: "AHL diffusion", mechanism: "gene regulation" },
-        BactCommMode { name: "QS (liquid, max)", range_um: ahl_char_length_um, medium: "AHL diffusion", mechanism: "gene regulation" },
-        BactCommMode { name: "VOC (indole etc)", range_um: 10_000.0, medium: "gas phase", mechanism: "stress response" },
-        BactCommMode { name: "e-transfer (nanowire)", range_um: 50.0, medium: "pili/cytochrome", mechanism: "electron sharing" },
+        BactCommMode {
+            name: "contact (T6SS)",
+            range_um: 0.5,
+            medium: "direct contact",
+            mechanism: "molecular syringe",
+        },
+        BactCommMode {
+            name: "contact (CDI)",
+            range_um: 1.0,
+            medium: "direct contact",
+            mechanism: "growth inhibition",
+        },
+        BactCommMode {
+            name: "membrane vesicles",
+            range_um: 5.0,
+            medium: "OMV diffusion",
+            mechanism: "cargo delivery",
+        },
+        BactCommMode {
+            name: "QS (dense biofilm)",
+            range_um: 10.0,
+            medium: "AHL diffusion",
+            mechanism: "gene regulation",
+        },
+        BactCommMode {
+            name: "QS (loose biofilm)",
+            range_um: 100.0,
+            medium: "AHL diffusion",
+            mechanism: "gene regulation",
+        },
+        BactCommMode {
+            name: "QS (liquid, max)",
+            range_um: ahl_char_length_um,
+            medium: "AHL diffusion",
+            mechanism: "gene regulation",
+        },
+        BactCommMode {
+            name: "VOC (indole etc)",
+            range_um: 10_000.0,
+            medium: "gas phase",
+            mechanism: "stress response",
+        },
+        BactCommMode {
+            name: "e-transfer (nanowire)",
+            range_um: 50.0,
+            medium: "pili/cytochrome",
+            mechanism: "electron sharing",
+        },
     ];
 
-    println!("  {:25} {:>10} {:>10} {:>20} {:>20}", "mode", "range(µm)", "body×", "medium", "mechanism");
-    println!("  {:-<25} {:-<10} {:-<10} {:-<20} {:-<20}", "", "", "", "", "");
+    println!(
+        "  {:25} {:>10} {:>10} {:>20} {:>20}",
+        "mode", "range(µm)", "body×", "medium", "mechanism"
+    );
+    println!(
+        "  {:-<25} {:-<10} {:-<10} {:-<20} {:-<20}",
+        "", "", "", "", ""
+    );
     for mode in &bact_modes {
         let body_lengths = mode.range_um / bact_diameter_um;
-        println!("  {:25} {:>10.1} {:>10.0}× {:>20} {:>20}",
-            mode.name, mode.range_um, body_lengths, mode.medium, mode.mechanism);
+        println!(
+            "  {:25} {:>10.1} {:>10.0}× {:>20} {:>20}",
+            mode.name, mode.range_um, body_lengths, mode.medium, mode.mechanism
+        );
     }
     v.check_pass("bacterial communication modes", true);
 
@@ -120,8 +201,11 @@ fn main() {
     println!("  Membrane vesicles (5×)  ≈ Conversation distance (5× = 8.75m)");
     println!("  QS in biofilm (10×)     ≈ Speaking across a room (10× = 17.5m)");
     println!("  QS loose biofilm (100×) ≈ SHOUTING across a field (100× = 175m)");
-    println!("  QS max liquid ({ahl_body_lengths:.0}×)   ≈ Sight range! ({:.0}× = {:.0}km)",
-        ahl_body_lengths, ahl_body_lengths * human_height_m / 1000.0);
+    println!(
+        "  QS max liquid ({ahl_body_lengths:.0}×)   ≈ Sight range! ({:.0}× = {:.0}km)",
+        ahl_body_lengths,
+        ahl_body_lengths * human_height_m / 1000.0
+    );
     println!("  VOC gas phase (10000×)  ≈ Bonfire visibility (10000× = 17.5km)");
     println!();
     println!("  KEY INSIGHT: QS in a biofilm (~10-100 body lengths) is equivalent");
@@ -158,7 +242,10 @@ fn main() {
 
         // 2D: measure ⟨r⟩ vs L to estimate localization
         println!("  2D biofilm (slab):");
-        println!("  {:>5} {:>6} {:>8} {:>20}", "L", "cells", "⟨r⟩", "signal reaches");
+        println!(
+            "  {:>5} {:>6} {:>8} {:>20}",
+            "L", "cells", "⟨r⟩", "signal reaches"
+        );
         for &l in &[6_usize, 10, 20, 30] {
             let n = l * l;
             let mat = anderson_2d(l, l, w_typical, 42);
@@ -174,7 +261,10 @@ fn main() {
 
         println!();
         println!("  3D biofilm (block):");
-        println!("  {:>5} {:>6} {:>8} {:>20}", "L", "cells", "⟨r⟩", "signal reaches");
+        println!(
+            "  {:>5} {:>6} {:>8} {:>20}",
+            "L", "cells", "⟨r⟩", "signal reaches"
+        );
         for &l in &[4_usize, 6, 8, 10] {
             let n = l * l * l;
             let mat = anderson_3d(l, l, l, w_typical, 42);

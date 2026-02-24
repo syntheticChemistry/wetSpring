@@ -1,5 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::expect_used, clippy::unwrap_used, clippy::print_stdout)]
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::print_stdout,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::cast_possible_wrap
+)]
 //! # Exp110: Cross-Ecosystem Pangenome GPU Analysis
 //!
 //! Validates pangenome analysis (Heap's law, core/accessory/unique) at scale
@@ -15,10 +23,10 @@
 //! | Date        | 2026-02-23 |
 
 use std::time::Instant;
-use wetspring_barracuda::bio::pangenome::{self, GeneCluster};
 use wetspring_barracuda::bio::ani;
-use wetspring_barracuda::bio::dnds;
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::bio::dnds;
+use wetspring_barracuda::bio::pangenome::{self, GeneCluster};
 use wetspring_barracuda::validation::Validator;
 
 const N_GENOMES: usize = 200;
@@ -38,12 +46,12 @@ fn generate_pangenome(n_genomes: usize, n_genes: usize, seed: u64) -> Vec<GeneCl
 
         for _ in 0..n_genomes {
             rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-            let roll = ((rng >> 33) as f64) / (u32::MAX as f64);
+            let roll = ((rng >> 33) as f64) / f64::from(u32::MAX);
 
             let present = if gene_class < 0.4 {
                 roll < 0.97 // core
             } else if gene_class < 0.8 {
-                roll < 0.15 + gene_class * 0.7 // accessory
+                roll < gene_class.mul_add(0.7, 0.15) // accessory
             } else {
                 roll < 0.02 // unique
             };
@@ -73,7 +81,7 @@ fn generate_sequences(n_seqs: usize, seq_len: usize, seed: u64) -> Vec<Vec<u8>> 
         let mut seq = ancestor.clone();
         for site in &mut seq {
             rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-            if ((rng >> 33) as f64) / (u32::MAX as f64) < 0.03 {
+            if ((rng >> 33) as f64) / f64::from(u32::MAX) < 0.03 {
                 rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
                 *site = bases[((rng >> 33) % 4) as usize];
             }
@@ -83,6 +91,7 @@ fn generate_sequences(n_seqs: usize, seq_len: usize, seed: u64) -> Vec<Vec<u8>> 
     seqs
 }
 
+#[allow(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp110: Cross-Ecosystem Pangenome Analysis");
 
@@ -112,8 +121,10 @@ fn main() {
         let ms = t0.elapsed().as_secs_f64() * 1000.0;
 
         println!("  {name} ({n_genomes} genomes, {N_GENES} genes): {ms:.1} ms");
-        println!("    Core: {}, Accessory: {}, Unique: {}",
-            result.core_size, result.accessory_size, result.unique_size);
+        println!(
+            "    Core: {}, Accessory: {}, Unique: {}",
+            result.core_size, result.accessory_size, result.unique_size
+        );
 
         let total = result.core_size + result.accessory_size + result.unique_size;
         v.check_count(
@@ -129,7 +140,10 @@ fn main() {
             1,
         );
 
-        println!("    Core fraction: {:.1}%", result.core_size as f64 / N_GENES as f64 * 100.0);
+        println!(
+            "    Core fraction: {:.1}%",
+            result.core_size as f64 / N_GENES as f64 * 100.0
+        );
     }
 
     // ── S3: Combined pangenome (200 genomes) ──
@@ -142,10 +156,13 @@ fn main() {
     let combined_ms = t0.elapsed().as_secs_f64() * 1000.0;
 
     println!("  Combined ({N_GENOMES} genomes): {combined_ms:.1} ms");
-    println!("    Core: {}, Accessory: {}, Unique: {}",
-        combined_result.core_size, combined_result.accessory_size, combined_result.unique_size);
+    println!(
+        "    Core: {}, Accessory: {}, Unique: {}",
+        combined_result.core_size, combined_result.accessory_size, combined_result.unique_size
+    );
 
-    let combined_total = combined_result.core_size + combined_result.accessory_size + combined_result.unique_size;
+    let combined_total =
+        combined_result.core_size + combined_result.accessory_size + combined_result.unique_size;
     v.check_count(
         "combined genes classified > 0",
         usize::from(combined_total > 0),
@@ -174,7 +191,10 @@ fn main() {
     let ani_ms = ani_start.elapsed().as_secs_f64() * 1000.0;
 
     let mean_ani = ani_values.iter().sum::<f64>() / ani_values.len() as f64;
-    println!("  ANI ({} pairs): {ani_ms:.1} ms, mean = {mean_ani:.4}", ani_values.len());
+    println!(
+        "  ANI ({} pairs): {ani_ms:.1} ms, mean = {mean_ani:.4}",
+        ani_values.len()
+    );
 
     v.check_count("ANI values computed", ani_values.len(), 50 * 49 / 2);
     v.check_count("mean ANI > 0.90", usize::from(mean_ani > 0.90), 1);
@@ -196,10 +216,15 @@ fn main() {
     }
     let dnds_ms = dnds_start.elapsed().as_secs_f64() * 1000.0;
 
-    let mean_omega = if dnds_values.is_empty() { 0.0 } else {
+    let mean_omega = if dnds_values.is_empty() {
+        0.0
+    } else {
         dnds_values.iter().sum::<f64>() / dnds_values.len() as f64
     };
-    println!("  dN/dS ({} pairs): {dnds_ms:.1} ms, mean ω = {mean_omega:.4}", dnds_values.len());
+    println!(
+        "  dN/dS ({} pairs): {dnds_ms:.1} ms, mean ω = {mean_omega:.4}",
+        dnds_values.len()
+    );
 
     v.check_count(
         "dN/dS values computed",

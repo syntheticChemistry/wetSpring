@@ -11,8 +11,8 @@
 //! across observation sequences. Each thread runs the full T-step
 //! forward for one sequence, yielding one log-likelihood per sequence.
 
-use barracuda::device::WgpuDevice;
 use barracuda::HmmBatchForwardF64;
+use barracuda::device::WgpuDevice;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 

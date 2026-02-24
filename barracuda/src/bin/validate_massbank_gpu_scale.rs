@@ -19,6 +19,7 @@ use std::time::Instant;
 use wetspring_barracuda::bio::spectral_match_gpu;
 #[cfg(feature = "gpu")]
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
@@ -49,9 +50,9 @@ fn cpu_pairwise_cosine(spectra: &[Vec<f64>]) -> Vec<f64> {
     let mut condensed = Vec::with_capacity(n * (n - 1) / 2);
     for i in 0..n {
         for j in (i + 1)..n {
-            let dot: f64 = spectra[i].iter().zip(&spectra[j]).map(|(a, b)| a * b).sum();
-            let norm_a: f64 = spectra[i].iter().map(|x| x * x).sum::<f64>().sqrt();
-            let norm_b: f64 = spectra[j].iter().map(|x| x * x).sum::<f64>().sqrt();
+            let dot: f64 = special::dot(&spectra[i], &spectra[j]);
+            let norm_a: f64 = special::l2_norm(&spectra[i]);
+            let norm_b: f64 = special::l2_norm(&spectra[j]);
             let denom = norm_a * norm_b;
             if denom > 0.0 {
                 condensed.push(dot / denom);
@@ -82,10 +83,7 @@ fn main() {
     // ── S2: CPU baseline + timing at scale ──
     v.section("── S2: CPU cosine matrix scaling ──");
 
-    let sizes = [
-        ("64", &small_lib),
-        ("256", &medium_lib),
-    ];
+    let sizes = [("64", &small_lib), ("256", &medium_lib)];
 
     let mut cpu_times = Vec::new();
     let mut cpu_results = Vec::new();
@@ -100,7 +98,11 @@ fn main() {
 
         // Sanity: all values in [0, 1]
         let all_valid = cosine.iter().all(|&c| (0.0..=1.0).contains(&c));
-        v.check_count(&format!("N={label} cosine ∈ [0,1]"), usize::from(all_valid), 1);
+        v.check_count(
+            &format!("N={label} cosine ∈ [0,1]"),
+            usize::from(all_valid),
+            1,
+        );
 
         cpu_times.push(ms);
         cpu_results.push(cosine);
@@ -146,11 +148,16 @@ fn main() {
 
             // GPU values in [0, 1] (with small tolerance for rounding)
             let all_valid = gpu_cosine.iter().all(|&c| c >= -1e-10 && c <= 1.0 + 1e-10);
-            v.check_count(&format!("N={label} GPU cosine valid"), usize::from(all_valid), 1);
+            v.check_count(
+                &format!("N={label} GPU cosine valid"),
+                usize::from(all_valid),
+                1,
+            );
 
             // Parity with CPU for small/medium sizes
             if idx < cpu_results.len() {
-                let max_diff = gpu_cosine.iter()
+                let max_diff = gpu_cosine
+                    .iter()
                     .zip(cpu_results[idx].iter())
                     .map(|(g, c)| (g - c).abs())
                     .fold(0.0_f64, f64::max);
@@ -184,7 +191,10 @@ fn main() {
         let _ = cpu_pairwise_cosine(&lib);
         let cpu_ms = t0.elapsed().as_secs_f64() * 1000.0;
         let n_pairs = n * (n - 1) / 2;
-        println!("  N={n}: {n_pairs} pairs, CPU {cpu_ms:.1} ms ({:.0} pairs/ms)", n_pairs as f64 / cpu_ms);
+        println!(
+            "  N={n}: {n_pairs} pairs, CPU {cpu_ms:.1} ms ({:.0} pairs/ms)",
+            n_pairs as f64 / cpu_ms
+        );
     }
 
     v.check_count("scaling curve ran", 1, 1);

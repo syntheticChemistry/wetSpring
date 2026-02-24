@@ -25,9 +25,8 @@
 //! Run: `cargo run --features gpu --bin validate_spectral_cross_spring`
 
 use barracuda::spectral::{
-    anderson_2d, anderson_3d, anderson_hamiltonian, almost_mathieu_hamiltonian,
-    find_all_eigenvalues, lanczos, lanczos_eigenvalues, level_spacing_ratio,
-    lyapunov_exponent, GOE_R, POISSON_R,
+    GOE_R, POISSON_R, almost_mathieu_hamiltonian, anderson_2d, anderson_3d, anderson_hamiltonian,
+    find_all_eigenvalues, lanczos, lanczos_eigenvalues, level_spacing_ratio, lyapunov_exponent,
 };
 use std::time::Instant;
 use wetspring_barracuda::validation::Validator;
@@ -76,8 +75,14 @@ fn validate_anderson_1d(v: &mut Validator) {
     let e_max = eigenvalues.last().copied().unwrap_or(0.0);
     let lower_bound = -2.0 - w / 2.0;
     let upper_bound = 2.0 + w / 2.0;
-    v.check_pass("Gershgorin lower: E_min >= -2-W/2", e_min >= lower_bound - 1e-10);
-    v.check_pass("Gershgorin upper: E_max <= 2+W/2", e_max <= upper_bound + 1e-10);
+    v.check_pass(
+        "Gershgorin lower: E_min >= -2-W/2",
+        e_min >= lower_bound - 1e-10,
+    );
+    v.check_pass(
+        "Gershgorin upper: E_max <= 2+W/2",
+        e_max <= upper_bound + 1e-10,
+    );
     v.check_pass("eigenvalue count = N", eigenvalues.len() == n);
 
     // Lyapunov exponent at band centre: γ(0) > 0 (all states localized in 1D)
@@ -89,7 +94,9 @@ fn validate_anderson_1d(v: &mut Validator) {
     let gamma_expected = w * w / 96.0;
     let rel_err = (gamma_0 - gamma_expected).abs() / gamma_expected;
     v.check_pass(
-        &format!("Lyapunov γ(0) ≈ W²/96 = {gamma_expected:.4} (got {gamma_0:.4}, rel {rel_err:.4})"),
+        &format!(
+            "Lyapunov γ(0) ≈ W²/96 = {gamma_expected:.4} (got {gamma_0:.4}, rel {rel_err:.4})"
+        ),
         rel_err < LYAPUNOV_TOL * 10.0,
     );
 
@@ -99,12 +106,7 @@ fn validate_anderson_1d(v: &mut Validator) {
 
     // Level statistics: strong disorder → Poisson
     let r = level_spacing_ratio(&eigenvalues);
-    v.check(
-        "⟨r⟩ Poisson (W=4, 1D localized)",
-        r,
-        POISSON_R,
-        POISSON_TOL,
-    );
+    v.check("⟨r⟩ Poisson (W=4, 1D localized)", r, POISSON_R, POISSON_TOL);
     println!("  [INFO] ⟨r⟩ = {r:.4} (Poisson = {POISSON_R:.4})");
 }
 

@@ -3,7 +3,7 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
-    dead_code,
+    dead_code
 )]
 //! # Exp127: 3D Anderson Dimensional QS Sweep
 //!
@@ -22,8 +22,8 @@ use wetspring_barracuda::validation::Validator;
 
 #[cfg(feature = "gpu")]
 use barracuda::spectral::{
-    anderson_2d, anderson_3d, anderson_hamiltonian, find_all_eigenvalues, lanczos,
-    lanczos_eigenvalues, level_spacing_ratio, GOE_R, POISSON_R,
+    GOE_R, POISSON_R, anderson_2d, anderson_3d, anderson_hamiltonian, find_all_eigenvalues,
+    lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 
 const N_SWEEP: usize = 20;
@@ -139,11 +139,17 @@ fn main() {
         v.check_count("3D sweep points", sweep_3d.len(), N_SWEEP);
         let first_3d = sweep_3d[0].1;
         let last_3d = sweep_3d[N_SWEEP - 1].1;
-        v.check_pass("3D weak disorder ⟨r⟩ > POISSON_R", first_3d > POISSON_R + 0.02);
+        v.check_pass(
+            "3D weak disorder ⟨r⟩ > POISSON_R",
+            first_3d > POISSON_R + 0.02,
+        );
         v.check_pass("3D strong disorder ⟨r⟩ < 0.45", last_3d < 0.45);
         v.check_pass("3D ⟨r⟩ decreases with W", first_3d > last_3d);
         let p3d = plateau_count(&sweep_3d, midpoint, 2.0);
-        v.check_pass("3D extended plateau exists (>= 3 points above midpoint for W>2)", p3d >= 3);
+        v.check_pass(
+            "3D extended plateau exists (>= 3 points above midpoint for W>2)",
+            p3d >= 3,
+        );
         println!("  3D: first ⟨r⟩={first_3d:.4}, last ⟨r⟩={last_3d:.4}, plateau points(W>2)={p3d}");
 
         for (w, r) in &sweep_3d {
@@ -174,17 +180,48 @@ fn main() {
             (Some(_), None) => true, // 3D never localizes in range → wider window
             _ => true,
         };
-        v.check_pass("J_c hierarchy: J_c(3D) > J_c(2D) or 3D never localizes", hierarchy_ok);
+        v.check_pass(
+            "J_c hierarchy: J_c(3D) > J_c(2D) or 3D never localizes",
+            hierarchy_ok,
+        );
 
         v.section("── S5: Ecosystem mapping across dimensions ──");
-        struct Eco { name: &'static str, n: usize, j: f64 }
+        struct Eco {
+            name: &'static str,
+            n: usize,
+            j: f64,
+        }
         let ecosystems = [
-            Eco { name: "biofilm", n: 5, j: 0.03 },
-            Eco { name: "bloom", n: 8, j: 0.05 },
-            Eco { name: "gut", n: 300, j: 0.55 },
-            Eco { name: "vent", n: 150, j: 0.35 },
-            Eco { name: "soil", n: 1000, j: 0.85 },
-            Eco { name: "ocean", n: 800, j: 0.8 },
+            Eco {
+                name: "biofilm",
+                n: 5,
+                j: 0.03,
+            },
+            Eco {
+                name: "bloom",
+                n: 8,
+                j: 0.05,
+            },
+            Eco {
+                name: "gut",
+                n: 300,
+                j: 0.55,
+            },
+            Eco {
+                name: "vent",
+                n: 150,
+                j: 0.35,
+            },
+            Eco {
+                name: "soil",
+                n: 1000,
+                j: 0.85,
+            },
+            Eco {
+                name: "ocean",
+                n: 800,
+                j: 0.8,
+            },
         ];
 
         fn nearest_r(sweep: &[(f64, f64)], w: f64) -> f64 {
@@ -206,13 +243,27 @@ fn main() {
             let reg = |r: f64| if r > midpoint { "ACTIVE" } else { "suppressed" };
             println!(
                 "  {}: J={j_computed:.3} W={w:.2}  1D={:.4}({})  2D={:.4}({})  3D={:.4}({})",
-                eco.name, r1, reg(r1), r2, reg(r2), r3, reg(r3)
+                eco.name,
+                r1,
+                reg(r1),
+                r2,
+                reg(r2),
+                r3,
+                reg(r3)
             );
             if r3 > midpoint && r2 <= midpoint {
                 any_3d_gain = true;
             }
         }
-        v.check_pass("at least one ecosystem gains QS-active in 3D vs 2D (or all already active)", any_3d_gain || true);
+        v.check_pass(
+            "at least one ecosystem gains QS-active in 3D vs 2D (or all already active)",
+            any_3d_gain
+                || ecosystems.iter().all(|eco| {
+                    let c = generate_community(eco.n, eco.j, 42);
+                    let w = evenness_to_disorder(diversity::pielou_evenness(&c));
+                    nearest_r(&sweep_2d, w) > midpoint
+                }),
+        );
     }
 
     #[cfg(not(feature = "gpu"))]

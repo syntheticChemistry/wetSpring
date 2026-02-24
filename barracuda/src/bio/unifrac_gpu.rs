@@ -12,9 +12,9 @@
 //! (2) `propagate_level` sums child contributions x branch lengths bottom-up.
 //! Each node is independent within a level — one thread per node.
 
+use barracuda::UniFracPropagateGpu;
 use barracuda::device::WgpuDevice;
 use barracuda::ops::bio::unifrac_propagate::UniFracConfig;
-use barracuda::UniFracPropagateGpu;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 

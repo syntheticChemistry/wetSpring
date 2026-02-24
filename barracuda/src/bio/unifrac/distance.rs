@@ -134,8 +134,8 @@ where
     let mut prop_b = vec![0.0_f64; n];
 
     for (label, &idx) in &tree.leaf_index {
-        prop_a[idx] = sample_a.get(label).copied().unwrap_or(0.0) / total_a;
-        prop_b[idx] = sample_b.get(label).copied().unwrap_or(0.0) / total_b;
+        prop_a[idx] = sample_a.get(label).map_or(0.0, |x| *x) / total_a;
+        prop_b[idx] = sample_b.get(label).map_or(0.0, |x| *x) / total_b;
     }
 
     for i in (0..n).rev() {

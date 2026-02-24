@@ -7,8 +7,8 @@
 //! Used by `wetSpring` for cooperation dynamics in biofilm models (Exp025)
 //! and evolutionary game theory fitness landscapes.
 
-use barracuda::device::WgpuDevice;
 use barracuda::SpatialPayoffGpu;
+use barracuda::device::WgpuDevice;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
@@ -96,6 +96,7 @@ impl SpatialPayoffGpuWrapper {
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;
+    use crate::tolerances;
 
     #[tokio::test]
     async fn spatial_payoff_all_cooperators() {
@@ -109,7 +110,7 @@ mod tests {
         assert_eq!(result.fitness.len(), 16);
         // All cooperators with 8 neighbors: payoff = 8 × (benefit - cost) = 16.0
         for &f in &result.fitness {
-            assert!((f - 16.0).abs() < 1e-4);
+            assert!((f - 16.0).abs() < tolerances::GPU_F32_SPATIAL);
         }
     }
 }

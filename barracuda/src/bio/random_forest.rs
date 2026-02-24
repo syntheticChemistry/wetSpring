@@ -2,7 +2,7 @@
 //! Sovereign Random Forest inference engine.
 //!
 //! Ensemble of [`DecisionTree`]s with majority voting. Each tree is
-//! pre-trained in Python (sklearn) and serialized — this module
+//! pre-trained in Python (`sklearn`) and serialized — this module
 //! handles inference only (not training).
 //!
 //! # Design

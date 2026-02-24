@@ -189,7 +189,7 @@ impl BinaryArrayState {
     /// # Errors
     ///
     /// Returns [`Error::Base64`], [`Error::Zlib`], or [`Error::BinaryFormat`] on decode failure.
-    #[allow(dead_code)]
+    #[allow(dead_code)] // Public API for downstream consumers; used via decode_into_with_buffer
     pub fn decode_into(&self, builder: &mut SpectrumBuilder) -> Result<()> {
         self.decode_into_with_buffer(builder, None)
     }
@@ -385,7 +385,8 @@ mod tests {
         let encoded = crate::encoding::base64_encode(&[1, 2, 3]);
         let result = decode_binary_array(&encoded, false, false);
         assert!(result.is_err());
-        let msg = format!("{}", result.unwrap_err());
+        let err = result.unwrap_err();
+        let msg = format!("{err}");
         assert!(msg.contains("f32 array length"));
     }
 

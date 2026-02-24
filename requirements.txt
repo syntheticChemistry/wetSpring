@@ -5,11 +5,6 @@
 # reproduction, use scripts/requirements.txt which pins exact versions.
 #
 # Install: pip install -r requirements.txt
-#
-# These are needed for:
-# - Galaxy control experiments (Phase 1)
-# - Track 2 validation scripts (asari, FindPFAS)
-# - Diversity baseline (Python benchmark)
 
 # Core scientific stack
 numpy>=1.24
@@ -23,7 +18,3 @@ pyopenms>=3.0
 
 # Diversity baseline (Python benchmark)
 scikit-bio>=0.6
-
-# Galaxy tool management
-ephemeris>=0.10
-bioblend>=1.0

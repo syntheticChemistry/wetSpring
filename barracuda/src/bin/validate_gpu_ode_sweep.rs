@@ -35,6 +35,7 @@ use std::sync::Arc;
 use wetspring_barracuda::bio::ode_sweep_gpu::{N_PARAMS, N_VARS, OdeSweepConfig, OdeSweepGpu};
 use wetspring_barracuda::bio::qs_biofilm::{self, QsBiofilmParams};
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::special;
 use wetspring_barracuda::validation::{self, Validator};
 
 fn params_to_flat(p: &QsBiofilmParams) -> [f64; N_PARAMS] {
@@ -259,7 +260,7 @@ fn validate_bifurcation(device: &Arc<WgpuDevice>, v: &mut Validator) {
                     av[i] += jtj_cpu[i * N_VARS + j] * v_vec[j];
                 }
             }
-            let norm: f64 = av.iter().map(|x| x * x).sum::<f64>().sqrt();
+            let norm: f64 = special::l2_norm(&av);
             if norm < 1e-15 {
                 break;
             }

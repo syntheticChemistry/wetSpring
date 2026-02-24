@@ -1,6 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::expect_used, clippy::unwrap_used, clippy::print_stdout)]
-#![allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::print_stdout,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::cast_possible_wrap
+)]
 //! # Exp125: NCBI Campylobacterota Cross-Ecosystem Pangenome
 //!
 //! Loads Campylobacterota assembly metadata and generates ecosystem-specific
@@ -8,8 +15,8 @@
 
 use std::collections::HashMap;
 use std::time::Instant;
-use wetspring_barracuda::bio::ncbi_data::{load_campylobacterota, CampyAssembly};
-use wetspring_barracuda::bio::pangenome::{analyze, GeneCluster};
+use wetspring_barracuda::bio::ncbi_data::{CampyAssembly, load_campylobacterota};
+use wetspring_barracuda::bio::pangenome::{GeneCluster, analyze};
 use wetspring_barracuda::validation::Validator;
 
 fn ecosystem_category(source: &str) -> &'static str {
@@ -31,12 +38,8 @@ fn eco_modifier(eco: &str, gene_idx: usize) -> f64 {
     // environment-specific gene pools (sulfur metabolism in vents, adhesins in gut).
     let third = gene_idx % 3;
     match (eco, third) {
-        ("gut", 0) => 0.55,
-        ("gut", _, ) => 0.08,
-        ("vent", 1) => 0.55,
-        ("vent", _) => 0.08,
-        ("water", 2) => 0.55,
-        ("water", _) => 0.08,
+        ("gut", 0) | ("vent", 1) | ("water", 2) => 0.55,
+        ("gut" | "vent" | "water", _) => 0.08,
         _ => 0.15,
     }
 }
@@ -63,7 +66,7 @@ fn generate_global_pangenome(
 
         for (_, _, eco) in flat_assemblies {
             rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-            let roll = ((rng >> 33) as f64) / (u32::MAX as f64);
+            let roll = ((rng >> 33) as f64) / f64::from(u32::MAX);
             let eco_mod = eco_modifier(eco, g);
             let p = if gene_class < 0.3 {
                 0.95
@@ -111,7 +114,10 @@ fn main() {
     let t0 = Instant::now();
     let (assemblies, is_ncbi) = load_campylobacterota();
     let load_ms = t0.elapsed().as_secs_f64() * 1000.0;
-    println!("  Data source: {}", if is_ncbi { "NCBI" } else { "synthetic" });
+    println!(
+        "  Data source: {}",
+        if is_ncbi { "NCBI" } else { "synthetic" }
+    );
     println!("  Assembly count: {} ({load_ms:.1} ms)", assemblies.len());
     v.check_pass("assemblies >= 50", assemblies.len() >= 50);
 
@@ -148,8 +154,11 @@ fn main() {
     let global_clusters = generate_global_pangenome(&flat, 42);
 
     v.section("── S3: Per-ecosystem pangenome ──");
-    let mut results: Vec<(String, wetspring_barracuda::bio::pangenome::PangenomeResult, Vec<usize>)> =
-        Vec::new();
+    let mut results: Vec<(
+        String,
+        wetspring_barracuda::bio::pangenome::PangenomeResult,
+        Vec<usize>,
+    )> = Vec::new();
     for (name, start, end) in &eco_offsets {
         let n = end - start;
         let eco_clusters: Vec<GeneCluster> = global_clusters
@@ -165,13 +174,13 @@ fn main() {
         let core_frac = result.core_size as f64 / result.total_size.max(1) as f64;
         println!(
             "  {name}: core={} acc={} unique={} ({:.1}% core, {ms:.1} ms)",
-            result.core_size, result.accessory_size, result.unique_size, core_frac * 100.0
+            result.core_size,
+            result.accessory_size,
+            result.unique_size,
+            core_frac * 100.0
         );
-        let in_range = core_frac >= 0.15 && core_frac <= 0.75;
-        v.check_pass(
-            &format!("{name} core fraction 15-75%"),
-            in_range,
-        );
+        let in_range = (0.15..=0.75).contains(&core_frac);
+        v.check_pass(&format!("{name} core fraction 15-75%"), in_range);
         let acc_ids = accessory_gene_ids(&eco_clusters, n);
         results.push((name.clone(), result, acc_ids));
     }
@@ -180,10 +189,7 @@ fn main() {
     for (name, result, _) in &results {
         let alpha = result.heaps_alpha.unwrap_or(0.0);
         println!("  {name}: heaps_alpha = {alpha:.4}");
-        v.check_pass(
-            &format!("{name} alpha > 0 (open pangenome)"),
-            alpha > 0.0,
-        );
+        v.check_pass(&format!("{name} alpha > 0 (open pangenome)"), alpha > 0.0);
     }
 
     v.section("── S5: Cross-ecosystem overlap ──");
@@ -197,22 +203,26 @@ fn main() {
     for i in 0..results.len() {
         for j in (i + 1)..results.len() {
             let overlap = accessory_overlap(&results[i].2, &results[j].2);
-            println!("  {} vs {}: {:.1}%", results[i].0, results[j].0, overlap * 100.0);
+            println!(
+                "  {} vs {}: {:.1}%",
+                results[i].0,
+                results[j].0,
+                overlap * 100.0
+            );
         }
     }
 
     v.section("── S6: Summary table ──");
-    println!("  {:12} | {:>6} | {:>8} | {:>8} | {:>8} | {:>6}", "ecosystem", "genomes", "core", "accessory", "unique", "alpha");
+    println!(
+        "  {:12} | {:>6} | {:>8} | {:>8} | {:>8} | {:>6}",
+        "ecosystem", "genomes", "core", "accessory", "unique", "alpha"
+    );
     println!("  {}", "-".repeat(60));
     for (name, result, _) in &results {
         let alpha = result.heaps_alpha.unwrap_or(0.0);
         println!(
             "  {name:12} | {:>6} | {:>8} | {:>8} | {:>8} | {:>6.3}",
-            result.n_genomes,
-            result.core_size,
-            result.accessory_size,
-            result.unique_size,
-            alpha
+            result.n_genomes, result.core_size, result.accessory_size, result.unique_size, alpha
         );
     }
 

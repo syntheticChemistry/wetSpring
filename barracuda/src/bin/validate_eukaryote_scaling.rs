@@ -3,7 +3,7 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
-    dead_code,
+    dead_code
 )]
 //! # Exp138: Eukaryote vs Bacteria Colony Scaling
 //!
@@ -29,7 +29,7 @@ use wetspring_barracuda::validation::Validator;
 
 #[cfg(feature = "gpu")]
 use barracuda::spectral::{
-    anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio, GOE_R, POISSON_R,
+    GOE_R, POISSON_R, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 
 #[allow(clippy::cast_precision_loss)]
@@ -56,27 +56,74 @@ fn main() {
             domain: &'static str,
         }
         let cell_types = [
-            CellType { name: "bacteria", diameter_um: 1.0, l_eff: 10, domain: "Bacteria/Archaea" },
-            CellType { name: "yeast", diameter_um: 5.0, l_eff: 8, domain: "Fungi" },
-            CellType { name: "small_protist", diameter_um: 10.0, l_eff: 7, domain: "Protista" },
-            CellType { name: "large_protist", diameter_um: 20.0, l_eff: 6, domain: "Protista" },
-            CellType { name: "tissue_cell", diameter_um: 50.0, l_eff: 5, domain: "Metazoa" },
-            CellType { name: "few_cells", diameter_um: 100.0, l_eff: 4, domain: "any" },
-            CellType { name: "tiny_cluster", diameter_um: 200.0, l_eff: 3, domain: "any" },
+            CellType {
+                name: "bacteria",
+                diameter_um: 1.0,
+                l_eff: 10,
+                domain: "Bacteria/Archaea",
+            },
+            CellType {
+                name: "yeast",
+                diameter_um: 5.0,
+                l_eff: 8,
+                domain: "Fungi",
+            },
+            CellType {
+                name: "small_protist",
+                diameter_um: 10.0,
+                l_eff: 7,
+                domain: "Protista",
+            },
+            CellType {
+                name: "large_protist",
+                diameter_um: 20.0,
+                l_eff: 6,
+                domain: "Protista",
+            },
+            CellType {
+                name: "tissue_cell",
+                diameter_um: 50.0,
+                l_eff: 5,
+                domain: "Metazoa",
+            },
+            CellType {
+                name: "few_cells",
+                diameter_um: 100.0,
+                l_eff: 4,
+                domain: "any",
+            },
+            CellType {
+                name: "tiny_cluster",
+                diameter_um: 200.0,
+                l_eff: 3,
+                domain: "any",
+            },
         ];
 
-        println!("  {:20} {:>8} {:>5} {:>6} {:>20}", "cell_type", "diam(µm)", "L_eff", "N", "domain");
+        println!(
+            "  {:20} {:>8} {:>5} {:>6} {:>20}",
+            "cell_type", "diam(µm)", "L_eff", "N", "domain"
+        );
         println!("  {:-<20} {:-<8} {:-<5} {:-<6} {:-<20}", "", "", "", "", "");
         for ct in &cell_types {
-            println!("  {:20} {:>8.0} {:>5} {:>6} {:>20}",
-                ct.name, ct.diameter_um, ct.l_eff, ct.l_eff.pow(3), ct.domain);
+            println!(
+                "  {:20} {:>8.0} {:>5} {:>6} {:>20}",
+                ct.name,
+                ct.diameter_um,
+                ct.l_eff,
+                ct.l_eff.pow(3),
+                ct.domain
+            );
         }
         v.check_pass("cell types defined", true);
 
         v.section("── S2: QS at typical biome diversity (W=13) ──");
         let w_typical = 13.0;
         println!("  W={w_typical} (typical microbial community):");
-        println!("  {:20} {:>5} {:>6} {:>8} {:>10}", "cell_type", "L", "N", "⟨r⟩", "regime");
+        println!(
+            "  {:20} {:>5} {:>6} {:>8} {:>10}",
+            "cell_type", "L", "N", "⟨r⟩", "regime"
+        );
         println!("  {:-<20} {:-<5} {:-<6} {:-<8} {:-<10}", "", "", "", "", "");
         for ct in &cell_types {
             let l = ct.l_eff;
@@ -85,8 +132,15 @@ fn main() {
             let tri = lanczos(&mat, n, 42);
             let eigs = lanczos_eigenvalues(&tri);
             let r = level_spacing_ratio(&eigs);
-            let regime = if r > midpoint { "QS-ACTIVE" } else { "suppressed" };
-            println!("  {:20} {:>5} {:>6} {:>8.4} {:>10}", ct.name, l, n, r, regime);
+            let regime = if r > midpoint {
+                "QS-ACTIVE"
+            } else {
+                "suppressed"
+            };
+            println!(
+                "  {:20} {:>5} {:>6} {:>8.4} {:>10}",
+                ct.name, l, n, r, regime
+            );
             v.check_pass(&format!("{} computed at W={w_typical}", ct.name), true);
         }
 
@@ -94,7 +148,9 @@ fn main() {
         let test_w = [3.0, 7.0, 10.0, 13.0, 16.0, 20.0];
         println!("  ⟨r⟩ across W values (* = QS-ACTIVE):");
         print!("  {:20}", "cell_type");
-        for &w in &test_w { print!(" {:>7}", format!("W={w:.0}")); }
+        for &w in &test_w {
+            print!(" {:>7}", format!("W={w:.0}"));
+        }
         println!();
         for ct in &cell_types {
             let l = ct.l_eff;
@@ -115,7 +171,10 @@ fn main() {
         v.section("── S4: Minimum colony size for QS ──");
         // For each W, find minimum L where QS is active
         println!("  Minimum L (cube side) for QS at each diversity level:");
-        println!("  {:>6} {:>6} {:>8} {:>10}", "W", "J_eq", "min_L", "min_cells");
+        println!(
+            "  {:>6} {:>6} {:>8} {:>10}",
+            "W", "J_eq", "min_L", "min_cells"
+        );
         for &w in &[5.0, 8.0, 10.0, 13.0, 15.0] {
             let mut min_l: Option<usize> = None;
             for l in 3..=12 {
@@ -131,7 +190,7 @@ fn main() {
             }
             let j_eq = (w - 0.5) / 14.5;
             match min_l {
-                Some(l) => println!("  {:>6.1} {:>6.2} {:>8} {:>10}", w, j_eq, l, l*l*l),
+                Some(l) => println!("  {:>6.1} {:>6.2} {:>8} {:>10}", w, j_eq, l, l * l * l),
                 None => println!("  {:>6.1} {:>6.2} {:>8} {:>10}", w, j_eq, ">12", ">1728"),
             }
         }

@@ -1,10 +1,19 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::print_stdout,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::cast_possible_wrap
+)]
 //! Exp120 — Cross-Spring Evolution Benchmark
 //!
-//! Exercises BarraCuda primitives that evolved through cross-spring
+//! Exercises `BarraCuda` primitives that evolved through cross-spring
 //! collaboration: hotSpring precision shaders, wetSpring bio shaders,
-//! neuralSpring ML shaders, and airSpring IoT shaders — all meeting
-//! in ToadStool as the shared substrate.
+//! neuralSpring ML shaders, and airSpring `IoT` shaders — all meeting
+//! in `ToadStool` as the shared substrate.
 //!
 //! This benchmark tracks where each primitive came from, measures
 //! CPU vs GPU performance, and documents the cross-spring synergy.
@@ -25,6 +34,7 @@ fn bench<F: FnOnce() -> R, R>(label: &str, f: F) -> (R, f64) {
     (r, ms)
 }
 
+#[allow(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp120: Cross-Spring Evolution Benchmark");
 
@@ -42,14 +52,23 @@ fn main() {
         .collect();
 
     let (shannon_results, shannon_ms) = bench("Shannon entropy (500 communities)", || {
-        communities.iter().map(|c| diversity::shannon(c)).collect::<Vec<_>>()
+        communities
+            .iter()
+            .map(|c| diversity::shannon(c))
+            .collect::<Vec<_>>()
     });
     v.check_pass("all Shannon > 0", shannon_results.iter().all(|&h| h > 0.0));
 
     let (simpson_results, _simpson_ms) = bench("Simpson index (500 communities)", || {
-        communities.iter().map(|c| diversity::simpson(c)).collect::<Vec<_>>()
+        communities
+            .iter()
+            .map(|c| diversity::simpson(c))
+            .collect::<Vec<_>>()
     });
-    v.check_pass("all Simpson ∈ (0,1]", simpson_results.iter().all(|&s| s > 0.0 && s <= 1.0));
+    v.check_pass(
+        "all Simpson ∈ (0,1]",
+        simpson_results.iter().all(|&s| s > 0.0 && s <= 1.0),
+    );
 
     let (_bc_results, bc_ms) = bench("Bray-Curtis (500 pairs)", || {
         communities
@@ -73,23 +92,23 @@ fn main() {
             let n: f64 = state[0].max(0.0);
             let ai: f64 = state[3].max(0.0);
             let hapr: f64 = state[5].max(0.0);
-            let cdg: f64 = state[6].max(0.0).min(10.0);
+            let cdg: f64 = state[6].clamp(0.0, 10.0);
 
             let growth = params.mu_max * n * (1.0 - n / params.k_cap);
             let death = params.death_rate * n;
             let ai_prod = params.k_ai_prod * n;
             let ai_deg = params.d_ai * ai;
             let hapr_hill = ai.powi(params.n_hapr as i32)
-                / (params.k_hapr_ai.powi(params.n_hapr as i32)
-                    + ai.powi(params.n_hapr as i32));
+                / (params.k_hapr_ai.powi(params.n_hapr as i32) + ai.powi(params.n_hapr as i32));
             let hapr_prod = params.k_hapr_max * hapr_hill;
             let hapr_deg = params.d_hapr * hapr;
-            let dgc = params.k_dgc_basal + params.k_dgc_rep * hapr;
-            let pde = params.k_pde_basal + params.k_pde_act * (1.0 - hapr.min(1.0));
+            let dgc = params.k_dgc_rep.mul_add(hapr, params.k_dgc_basal);
+            let pde = params
+                .k_pde_act
+                .mul_add(1.0 - hapr.min(1.0), params.k_pde_basal);
             let cdg_dot = dgc - pde * cdg;
             let bio_hill = cdg.powi(params.n_bio as i32)
-                / (params.k_bio_cdg.powi(params.n_bio as i32)
-                    + cdg.powi(params.n_bio as i32));
+                / (params.k_bio_cdg.powi(params.n_bio as i32) + cdg.powi(params.n_bio as i32));
             let bio_prod = params.k_bio_max * bio_hill;
             let bio_deg = params.d_bio * state[7].max(0.0);
 
@@ -101,20 +120,25 @@ fn main() {
         }
         state
     });
-    v.check_pass("ODE integration finite", ode_result.iter().all(|x| x.is_finite()));
+    v.check_pass(
+        "ODE integration finite",
+        ode_result.iter().all(|x| x.is_finite()),
+    );
     println!("  Final biofilm: {:.4}", ode_result[7]);
 
     let (sweep_results, sweep_ms) = bench("QS parameter sweep (200 configs)", || {
         let mut results = Vec::with_capacity(200);
         for i in 0..200 {
-            let mut p = QsBiofilmParams::default();
-            p.mu_max = 0.3 + (i as f64) * 0.005;
-            p.k_ai_prod = 0.05 + (i as f64) * 0.002;
+            let p = QsBiofilmParams {
+                mu_max: f64::from(i).mul_add(0.005, 0.3),
+                k_ai_prod: f64::from(i).mul_add(0.002, 0.05),
+                ..Default::default()
+            };
             let mut state = [0.01_f64, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
             for _ in 0..500 {
                 let n: f64 = state[0].max(0.0);
-                state[0] += 0.01 * (p.mu_max * n * (1.0 - n / p.k_cap) - p.death_rate * n);
-                state[3] += 0.01 * (p.k_ai_prod * n - p.d_ai * state[3].max(0.0_f64));
+                state[0] += 0.01 * ((p.mu_max * n).mul_add(1.0 - n / p.k_cap, -(p.death_rate * n)));
+                state[3] += 0.01 * (p.k_ai_prod.mul_add(n, -(p.d_ai * state[3].max(0.0_f64))));
             }
             results.push(state[7]);
         }
@@ -142,11 +166,11 @@ fn main() {
     let train_inputs: Vec<Vec<f64>> = (0..300)
         .map(|i| {
             vec![
-                0.3 + (i % 50) as f64 * 0.02,
-                0.1 + (i % 30) as f64 * 0.03,
-                0.5 + (i % 20) as f64 * 0.05,
-                (i % 10) as f64 * 0.1,
-                0.2 + (i % 40) as f64 * 0.02,
+                f64::from(i % 50).mul_add(0.02, 0.3),
+                f64::from(i % 30).mul_add(0.03, 0.1),
+                f64::from(i % 20).mul_add(0.05, 0.5),
+                f64::from(i % 10) * 0.1,
+                f64::from(i % 40).mul_add(0.02, 0.2),
             ]
         })
         .collect();
@@ -170,11 +194,11 @@ fn main() {
     let test_inputs: Vec<Vec<f64>> = (0..100)
         .map(|i| {
             vec![
-                0.4 + (i % 30) as f64 * 0.02,
-                0.2 + (i % 20) as f64 * 0.03,
-                0.6 + (i % 15) as f64 * 0.05,
-                (i % 8) as f64 * 0.12,
-                0.3 + (i % 25) as f64 * 0.02,
+                f64::from(i % 30).mul_add(0.02, 0.4),
+                f64::from(i % 20).mul_add(0.03, 0.2),
+                f64::from(i % 15).mul_add(0.05, 0.6),
+                f64::from(i % 8) * 0.12,
+                f64::from(i % 25).mul_add(0.02, 0.3),
             ]
         })
         .collect();
@@ -226,13 +250,18 @@ fn main() {
 
     println!("\n  Performance Summary:");
     println!("  ───────────────────");
-    println!("  Diversity (500 communities):  {shannon_ms:.2} ms Shannon, {bc_ms:.2} ms Bray-Curtis");
+    println!(
+        "  Diversity (500 communities):  {shannon_ms:.2} ms Shannon, {bc_ms:.2} ms Bray-Curtis"
+    );
     println!("  QS ODE (2000 steps):          {ode_ms:.2} ms single, {sweep_ms:.2} ms (200 sweep)");
     println!("  ESN train (300×200):          {esn_train_ms:.2} ms");
     println!("  ESN f64 inference (100):      {esn_infer_ms:.2} ms");
     println!("  NPU int8 inference (100):     {npu_ms:.2} ms");
     if npu_ms > 0.0 && esn_infer_ms > 0.0 {
-        println!("  NPU vs f64 ratio:             {:.2}×", esn_infer_ms / npu_ms);
+        println!(
+            "  NPU vs f64 ratio:             {:.2}×",
+            esn_infer_ms / npu_ms
+        );
     }
 
     println!("\n  Shader Count by Origin (in ToadStool S42):");

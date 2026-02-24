@@ -1,4 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::print_stdout,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::cast_possible_wrap
+)]
 //! Exp115 — ESN Phylogenetic Placement Classifier for NPU Deployment
 //!
 //! Trains an ESN on distance-feature vectors derived from JC69 distance
@@ -7,7 +16,7 @@
 //! the need for full NJ tree construction at inference time.
 //!
 //! Deployment:
-//! - **Edge**: NPU on a portable sequencer (MinION) classifies reads to
+//! - **Edge**: NPU on a portable sequencer (`MinION`) classifies reads to
 //!   clades in real-time from k-mer distance profiles. Only novel or
 //!   high-interest placements are transmitted.
 //! - **HPC**: NPU scans millions of SRA reads against reference distance
@@ -23,18 +32,24 @@ const N_TRAIN: usize = 512;
 const N_TEST: usize = 256;
 
 fn jc69_distance(p: f64) -> f64 {
-    if p >= 0.75 { 3.0 } else { -0.75 * (1.0 - (4.0 / 3.0) * p).ln() }
+    if p >= 0.75 {
+        3.0
+    } else {
+        -0.75 * (4.0_f64 / 3.0).mul_add(-p, 1.0).ln()
+    }
 }
 
 fn generate_sample(seed: u64) -> (Vec<f64>, usize) {
     let clade = (seed % N_CLADES as u64) as usize;
-    let base_divergence = 0.05 + (clade as f64) * 0.08;
+    let base_divergence = (clade as f64).mul_add(0.08, 0.05);
 
     let mut features = vec![0.0_f64; FEAT_DIM];
-    for f in 0..FEAT_DIM {
+    for (f, feat) in features.iter_mut().enumerate().take(FEAT_DIM) {
         let noise = ((seed.wrapping_mul(31).wrapping_add(f as u64 * 97)) % 1000) as f64 / 5000.0;
-        let p = (base_divergence + noise * (f as f64 + 1.0) * 0.02).min(0.74);
-        features[f] = jc69_distance(p);
+        let p = (noise * (f as f64 + 1.0))
+            .mul_add(0.02, base_divergence)
+            .min(0.74);
+        *feat = jc69_distance(p);
     }
 
     (features, clade)
@@ -81,13 +96,20 @@ fn main() {
 
     v.section("F64 inference");
     let preds = esn.predict(&test_inputs);
-    let f64_classes: Vec<usize> = preds.iter().map(|p| {
-        p.iter().enumerate()
-            .max_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal))
-            .map(|(i, _)| i).unwrap_or(0)
-    }).collect();
-    let f64_correct = f64_classes.iter().zip(test_true.iter())
-        .filter(|(p, t)| *p == *t).count();
+    let f64_classes: Vec<usize> = preds
+        .iter()
+        .map(|p| {
+            p.iter()
+                .enumerate()
+                .max_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal))
+                .map_or(0, |(i, _)| i)
+        })
+        .collect();
+    let f64_correct = f64_classes
+        .iter()
+        .zip(test_true.iter())
+        .filter(|(p, t)| *p == *t)
+        .count();
     let f64_acc = f64_correct as f64 / N_TEST as f64;
     println!("  f64 accuracy: {f64_acc:.3} ({f64_correct}/{N_TEST})");
     v.check_pass("f64 accuracy > 20%", f64_acc > 0.20);
@@ -113,15 +135,21 @@ fn main() {
         npu_classes.push(npu.classify(esn_npu.state()));
     }
 
-    let npu_correct = npu_classes.iter().zip(test_true.iter())
-        .filter(|(p, t)| *p == *t).count();
+    let npu_correct = npu_classes
+        .iter()
+        .zip(test_true.iter())
+        .filter(|(p, t)| *p == *t)
+        .count();
     let npu_acc = npu_correct as f64 / N_TEST as f64;
     println!("  NPU int8 accuracy: {npu_acc:.3} ({npu_correct}/{N_TEST})");
     v.check_pass("NPU accuracy > 20%", npu_acc > 0.20);
 
     v.section("F64 ↔ NPU agreement");
-    let agree = f64_classes.iter().zip(npu_classes.iter())
-        .filter(|(a, b)| a == b).count();
+    let agree = f64_classes
+        .iter()
+        .zip(npu_classes.iter())
+        .filter(|(a, b)| a == b)
+        .count();
     let agreement = agree as f64 / N_TEST as f64;
     println!("  Agreement: {agreement:.3} ({agree}/{N_TEST})");
     v.check_pass("agreement > 70%", agreement > 0.70);
@@ -132,7 +160,10 @@ fn main() {
     println!("  NPU: {reads_per_sec:.0} placements/s");
     println!("  vs full distance matrix: ~10 placements/s at {N_TAXA} taxa");
     println!("  Speedup: ~{:.0}×", reads_per_sec / 10.0);
-    v.check_pass("NPU > 100× faster than full placement", reads_per_sec > 1000.0);
+    v.check_pass(
+        "NPU > 100× faster than full placement",
+        reads_per_sec > 1000.0,
+    );
 
     v.section("Energy: NPU vs GPU distance matrix");
     let gpu_j_per_1k = 0.5;

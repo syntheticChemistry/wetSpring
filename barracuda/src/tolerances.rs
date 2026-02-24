@@ -65,7 +65,7 @@ pub const SIMPSON_SIMULATED: f64 = 0.05;
 
 /// Chao1 range above observed features (singleton/doubleton dependent).
 ///
-/// Chao1 ≥ observed by definition; for Exp002 Galaxy community
+/// Chao1 ≥ observed by definition; for Exp002 `Galaxy` community
 /// (330 species, ~910 expected), allow up to +100 above observed
 /// (validated against skbio 0.6.0, commit `e4358c5`).
 pub const CHAO1_RANGE: f64 = 100.0;
@@ -241,7 +241,7 @@ pub const SPECTRAL_MZ_WINDOW: f64 = 0.5;
 // Peak detection / signal processing tolerances
 // ═══════════════════════════════════════════════════════════════════
 
-/// Relative peak height tolerance (1%) vs scipy baseline.
+/// Relative peak height tolerance (1%) vs `scipy` baseline.
 pub const PEAK_HEIGHT_REL: f64 = 0.01;
 
 // ═══════════════════════════════════════════════════════════════════
@@ -286,7 +286,7 @@ pub const JACOBI_SWEEP_MULTIPLIER: usize = 100;
 /// Regularized incomplete gamma series convergence epsilon.
 ///
 /// Used by `special::regularized_gamma_p` for series termination.
-/// Matches scipy's `gammainc` convergence behavior at 1e-15.
+/// Matches `scipy`'s `gammainc` convergence behavior at 1e-15.
 pub const GAMMA_SERIES_CONVERGENCE: f64 = 1e-15;
 
 /// Maximum iterations for regularized gamma series expansion.
@@ -319,6 +319,20 @@ pub const GPU_VS_CPU_BRAY_CURTIS: f64 = 1e-10;
 /// over ~1000 replicates, accumulated rounding yields ~1e-4 drift.
 pub const GPU_VS_CPU_ENSEMBLE: f64 = 1e-4;
 
+/// GPU f32 vs CPU f64 for integer-derived results (Hamming, Jaccard).
+///
+/// f32 has ~7 significant digits; operations on integer-derived values
+/// (count / total) yield results exact to ~1e-6. Allow 1e-5 to cover
+/// accumulated rounding in pairwise summation.
+pub const GPU_F32_PARITY: f64 = 1e-5;
+
+/// GPU f32 spatial computation tolerance (payoff, fitness, variance).
+///
+/// f32 grid operations (neighbor sums, dot products) accumulate
+/// rounding proportional to neighborhood size. For 8-neighbor grids,
+/// 1e-4 covers the worst-case f32 summation error.
+pub const GPU_F32_SPATIAL: f64 = 1e-4;
+
 // ═══════════════════════════════════════════════════════════════════
 // ODE integration parameters
 // ═══════════════════════════════════════════════════════════════════
@@ -332,7 +346,7 @@ pub const GPU_VS_CPU_ENSEMBLE: f64 = 1e-4;
 pub const ODE_DEFAULT_DT: f64 = 0.001;
 
 // ═══════════════════════════════════════════════════════════════════
-// Galaxy / Exp002 observational range tolerances
+// `Galaxy` / Exp002 observational range tolerances
 // ═══════════════════════════════════════════════════════════════════
 
 /// ODE biofilm dispersed-state `B_ss` tolerance.
@@ -359,7 +373,7 @@ pub const BOOTSTRAP_LL_ENSEMBLE: f64 = 5.0;
 /// Validated: Exp030 (Hsueh 2022), `scripts/hsueh2022_phage_defense.py`.
 pub const PHAGE_POPULATION_ABSOLUTE: f64 = 10.0;
 
-/// Exp002 Galaxy Shannon entropy range for rank-abundance curves.
+/// Exp002 `Galaxy` Shannon entropy range for rank-abundance curves.
 ///
 /// Simulated communities derived from Exp002 phytoplankton rank-abundance
 /// profiles. Shannon varies from ~2.93 (low-diversity, 91 ASVs) to ~3.85
@@ -368,14 +382,14 @@ pub const PHAGE_POPULATION_ABSOLUTE: f64 = 10.0;
 /// Source: `experiments/results/002_phytoplankton/diversity_report.json`.
 pub const GALAXY_SHANNON_RANGE: f64 = 1.50;
 
-/// Exp002 Galaxy Simpson range for rank-abundance curves.
+/// Exp002 `Galaxy` Simpson range for rank-abundance curves.
 ///
 /// Low-diversity community: Simpson ~0.86 ± 0.25. The wide range reflects
 /// sensitivity of Simpson to dominance in highly-skewed communities.
 /// Source: `experiments/results/002_phytoplankton/diversity_report.json`.
 pub const GALAXY_SIMPSON_RANGE: f64 = 0.25;
 
-/// Exp002 Galaxy Bray-Curtis range between dissimilar communities.
+/// Exp002 `Galaxy` Bray-Curtis range between dissimilar communities.
 ///
 /// BC(low, high) diversity communities: expected near 0.50 but highly
 /// dependent on rank-abundance shape. ±0.50 covers [0.0, 1.0] for any

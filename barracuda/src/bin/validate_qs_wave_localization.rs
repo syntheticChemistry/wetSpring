@@ -3,7 +3,7 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
-    dead_code,
+    dead_code
 )]
 //! # Exp148: QS Traveling Wave × Anderson Localization
 //!
@@ -12,7 +12,7 @@
 //! - Our model: Anderson localization determines WHETHER waves CAN propagate
 //!
 //! Their wave propagation speed × our localization length = effective QS range.
-//! At the Anderson transition (W ≈ W_c), traveling waves slow down / stop.
+//! At the Anderson transition (W ≈ `W_c`), traveling waves slow down / stop.
 //!
 //! Extension paper: "Spatially propagating activation of QS in V. fischeri"
 //! (PRE 101:062421, 2020).
@@ -29,7 +29,7 @@ struct WaveLocalizationRegime {
     regime: &'static str,
 }
 
-#[allow(clippy::cast_precision_loss)]
+#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp148: QS Traveling Wave × Anderson Localization");
 
@@ -61,63 +61,101 @@ fn main() {
 
     let regimes = vec![
         WaveLocalizationRegime {
-            disorder_w: 2.0, dimension: 3,
-            wave_speed_relative: 1.0, localization_length_relative: 100.0,
+            disorder_w: 2.0,
+            dimension: 3,
+            wave_speed_relative: 1.0,
+            localization_length_relative: 100.0,
             effective_range_relative: 1.0,
             regime: "EXTENDED — wave-limited (ξ >> L_QS)",
         },
         WaveLocalizationRegime {
-            disorder_w: 8.0, dimension: 3,
-            wave_speed_relative: 0.95, localization_length_relative: 50.0,
+            disorder_w: 8.0,
+            dimension: 3,
+            wave_speed_relative: 0.95,
+            localization_length_relative: 50.0,
             effective_range_relative: 0.95,
             regime: "EXTENDED — wave-limited but ξ shrinking",
         },
         WaveLocalizationRegime {
-            disorder_w: 14.0, dimension: 3,
-            wave_speed_relative: 0.8, localization_length_relative: 10.0,
+            disorder_w: 14.0,
+            dimension: 3,
+            wave_speed_relative: 0.8,
+            localization_length_relative: 10.0,
             effective_range_relative: 0.8,
             regime: "NEAR-CRITICAL — Anderson suppressing wave",
         },
         WaveLocalizationRegime {
-            disorder_w: 16.5, dimension: 3,
-            wave_speed_relative: 0.3, localization_length_relative: 3.0,
+            disorder_w: 16.5,
+            dimension: 3,
+            wave_speed_relative: 0.3,
+            localization_length_relative: 3.0,
             effective_range_relative: 0.3,
             regime: "CRITICAL — Anderson transition (W = W_c)",
         },
         WaveLocalizationRegime {
-            disorder_w: 20.0, dimension: 3,
-            wave_speed_relative: 0.0, localization_length_relative: 1.5,
+            disorder_w: 20.0,
+            dimension: 3,
+            wave_speed_relative: 0.0,
+            localization_length_relative: 1.5,
             effective_range_relative: 0.0,
             regime: "LOCALIZED — wave cannot propagate (ξ < cell size)",
         },
         WaveLocalizationRegime {
-            disorder_w: 5.0, dimension: 2,
-            wave_speed_relative: 0.0, localization_length_relative: 5.0,
+            disorder_w: 5.0,
+            dimension: 2,
+            wave_speed_relative: 0.0,
+            localization_length_relative: 5.0,
             effective_range_relative: 0.0,
             regime: "LOCALIZED (d=2) — all W > 0 localized",
         },
         WaveLocalizationRegime {
-            disorder_w: 5.0, dimension: 1,
-            wave_speed_relative: 0.0, localization_length_relative: 2.0,
+            disorder_w: 5.0,
+            dimension: 1,
+            wave_speed_relative: 0.0,
+            localization_length_relative: 2.0,
             effective_range_relative: 0.0,
             regime: "LOCALIZED (d=1) — all W > 0 localized",
         },
     ];
 
     println!("  Wave × Localization regime analysis:");
-    println!("  {:>5} {:>4} {:>8} {:>8} {:>8} {}", "W", "d", "v_wave", "ξ_rel", "L_eff", "Regime");
-    println!("  {:-<5} {:-<4} {:-<8} {:-<8} {:-<8} {:-<40}", "", "", "", "", "", "");
+    println!(
+        "  {:>5} {:>4} {:>8} {:>8} {:>8} Regime",
+        "W", "d", "v_wave", "ξ_rel", "L_eff"
+    );
+    println!(
+        "  {:-<5} {:-<4} {:-<8} {:-<8} {:-<8} {:-<40}",
+        "", "", "", "", "", ""
+    );
     for r in &regimes {
-        println!("  {:>5.1} {:>4} {:>8.2} {:>8.1} {:>8.2} {}",
-            r.disorder_w, r.dimension, r.wave_speed_relative,
-            r.localization_length_relative, r.effective_range_relative, r.regime);
+        println!(
+            "  {:>5.1} {:>4} {:>8.2} {:>8.1} {:>8.2} {}",
+            r.disorder_w,
+            r.dimension,
+            r.wave_speed_relative,
+            r.localization_length_relative,
+            r.effective_range_relative,
+            r.regime
+        );
     }
 
-    let extended = regimes.iter().filter(|r| r.regime.contains("EXTENDED") || r.regime.contains("wave-limited")).count();
-    let critical = regimes.iter().filter(|r| r.regime.contains("CRITICAL")).count();
-    let localized = regimes.iter().filter(|r| r.regime.starts_with("LOCALIZED")).count();
+    let extended = regimes
+        .iter()
+        .filter(|r| r.regime.contains("EXTENDED") || r.regime.contains("wave-limited"))
+        .count();
+    let critical = regimes
+        .iter()
+        .filter(|r| r.regime.contains("CRITICAL"))
+        .count();
+    let localized = regimes
+        .iter()
+        .filter(|r| r.regime.starts_with("LOCALIZED"))
+        .count();
 
-    v.check_pass(&format!("{extended} extended + {critical} critical + {localized} localized regimes"), true);
+    v.check_pass(
+        &format!("{extended} extended + {critical} critical + {localized} localized regimes"),
+        true,
+    );
 
     v.section("── S3: V. fischeri case study ──");
 

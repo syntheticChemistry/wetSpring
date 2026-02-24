@@ -10,8 +10,8 @@
 //! node features (i32), thresholds (f64), and children (i32) to avoid
 //! bitcast issues in WGSL.
 
-use barracuda::device::WgpuDevice;
 use barracuda::RfBatchInferenceGpu;
+use barracuda::device::WgpuDevice;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 

@@ -10,7 +10,7 @@
 //! | Exact command | `python3 scripts/validate_track2.py` |
 //! | Baseline date | 2026-02-16 |
 //! | Dataset | `shuzhao-li-lab/data` (MT02 demo, 8 mzML files) |
-//! | asari version | 1.13.1 |
+//! | `asari` version | 1.13.1 |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, Pop!\_OS 22.04) |
 //!
 //! # Expected values

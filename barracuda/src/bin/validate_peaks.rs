@@ -6,8 +6,8 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | `scipy.signal.find_peaks` (scipy 1.14+) |
-//! | Baseline version | scipy 1.14+ |
+//! | Baseline tool | `scipy.signal.find_peaks` (`scipy` 1.14+) |
+//! | Baseline version | `scipy` 1.14+ |
 //! | Baseline command | `scripts/generate_peak_baselines.py` (Exp010) |
 //! | Baseline date | 2026-02-19 |
 //! | Exact command | `python3 scripts/generate_peak_baselines.py` |

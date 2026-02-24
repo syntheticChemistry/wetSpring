@@ -3,7 +3,7 @@
 //!
 //! Connects the EIC extraction ([`super::eic`]), peak detection
 //! ([`super::signal`]), and integration pipelines into a complete
-//! asari-style feature extraction workflow.
+//! `asari`-style feature extraction workflow.
 //!
 //! # Pipeline
 //!
@@ -15,7 +15,7 @@
 //! # References
 //!
 //! - Li, S. et al. "Trackable and scalable LC-MS metabolomics data processing
-//!   using asari." Nature Communications 14, 4113 (2023).
+//!   using `asari`." Nature Communications 14, 4113 (2023).
 
 use crate::io::mzml::MzmlSpectrum;
 
@@ -86,7 +86,7 @@ pub struct FeatureTable {
 
 /// Extract features from parsed mzML spectra.
 ///
-/// Performs the complete asari-style pipeline:
+/// Performs the complete `asari`-style pipeline:
 /// 1. Detect mass tracks from MS1 spectra
 /// 2. Extract EIC for each mass track
 /// 3. Detect peaks in each EIC
@@ -249,10 +249,10 @@ mod tests {
             ms_level: 1,
             rt_minutes: rt,
             tic: intensity.iter().sum(),
-            base_peak_mz: mz.first().copied().unwrap_or(0.0),
+            base_peak_mz: mz.first().map_or(0.0, |x| *x),
             base_peak_intensity: intensity.iter().copied().fold(0.0_f64, f64::max),
-            lowest_mz: mz.first().copied().unwrap_or(0.0),
-            highest_mz: mz.last().copied().unwrap_or(0.0),
+            lowest_mz: mz.first().map_or(0.0, |x| *x),
+            highest_mz: mz.last().map_or(0.0, |x| *x),
             mz_array: mz.to_vec(),
             intensity_array: intensity.to_vec(),
         }

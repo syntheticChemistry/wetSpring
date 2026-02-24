@@ -16,7 +16,7 @@ baseline through Rust CPU to GPU acceleration via ToadStool/BarraCuda.
 
 ```
 wetspring-barracuda
-├── 41 CPU bio modules          (pure Rust math, no external C deps)
+├── 45 CPU bio modules          (pure Rust math, no external C deps)
 ├── 42 GPU bio modules          (27 Lean + 5 Write + 7 Compose + 3 Passthrough)
 ├── 3 streaming I/O parsers     (FASTQ/gzip, mzML/base64, MS2)
 ├── 109 validation/benchmark binaries

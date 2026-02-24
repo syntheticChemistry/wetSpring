@@ -51,6 +51,7 @@ use wetspring_barracuda::bio::{
     diversity, diversity_gpu, pcoa, pcoa_gpu, spectral_match, spectral_match_gpu, stats_gpu,
 };
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::special;
 
 fn main() {
     let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
@@ -256,7 +257,7 @@ fn bench_dot_product(gpu: &GpuF64, report: &mut BenchReport) {
         let a = generate_f64(n, 11);
         let b = generate_f64(n, 22);
         let (cpu, cpu_e) = bench_with_energy(|| {
-            let _dot: f64 = a.iter().zip(&b).map(|(x, y)| x * y).sum();
+            let _dot: f64 = special::dot(&a, &b);
         });
         let (gpu_t, gpu_e) = bench_with_energy(|| {
             let _ = stats_gpu::dot_gpu(gpu, &a, &b);

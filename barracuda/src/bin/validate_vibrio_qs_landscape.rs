@@ -15,9 +15,9 @@
 //! | Date        | 2026-02-23 |
 
 use std::time::Instant;
-use wetspring_barracuda::bio::qs_biofilm::{self, QsBiofilmParams};
 #[cfg(feature = "gpu")]
-use wetspring_barracuda::bio::ode_sweep_gpu::{OdeSweepConfig, OdeSweepGpu, N_PARAMS, N_VARS};
+use wetspring_barracuda::bio::ode_sweep_gpu::{N_PARAMS, N_VARS, OdeSweepConfig, OdeSweepGpu};
+use wetspring_barracuda::bio::qs_biofilm::{self, QsBiofilmParams};
 #[cfg(feature = "gpu")]
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::validation::{self, Validator};
@@ -28,10 +28,23 @@ const DT: f64 = 0.01;
 
 fn params_to_flat_17(p: &QsBiofilmParams) -> [f64; N_PARAMS] {
     [
-        p.mu_max, p.k_cap, p.death_rate, p.k_ai_prod, p.d_ai,
-        p.k_hapr_max, p.k_hapr_ai, p.n_hapr, p.d_hapr,
-        p.k_dgc_basal, p.k_dgc_rep, p.k_pde_basal, p.k_pde_act,
-        p.k_bio_max, p.k_bio_cdg, p.n_bio, p.d_bio,
+        p.mu_max,
+        p.k_cap,
+        p.death_rate,
+        p.k_ai_prod,
+        p.d_ai,
+        p.k_hapr_max,
+        p.k_hapr_ai,
+        p.n_hapr,
+        p.d_hapr,
+        p.k_dgc_basal,
+        p.k_dgc_rep,
+        p.k_pde_basal,
+        p.k_pde_act,
+        p.k_bio_max,
+        p.k_bio_cdg,
+        p.n_bio,
+        p.d_bio,
     ]
 }
 
@@ -102,7 +115,10 @@ fn main() {
         ]);
     }
     let cpu_elapsed = cpu_start.elapsed();
-    println!("  CPU ({cpu_subset_size} batches): {:.1} ms", cpu_elapsed.as_secs_f64() * 1000.0);
+    println!(
+        "  CPU ({cpu_subset_size} batches): {:.1} ms",
+        cpu_elapsed.as_secs_f64() * 1000.0
+    );
 
     let cpu_all_finite = cpu_results.iter().all(|r| r.iter().all(|x| x.is_finite()));
     v.check_count("CPU results finite", usize::from(cpu_all_finite), 1);
@@ -147,7 +163,10 @@ fn main() {
         let gpu_output = sweeper.integrate(&config, &all_y0, &all_params).unwrap();
         let gpu_elapsed = gpu_start.elapsed();
 
-        println!("  GPU ({N_BATCHES} batches): {:.1} ms", gpu_elapsed.as_secs_f64() * 1000.0);
+        println!(
+            "  GPU ({N_BATCHES} batches): {:.1} ms",
+            gpu_elapsed.as_secs_f64() * 1000.0
+        );
         println!("  GPU output length: {}", gpu_output.len());
 
         v.check_count("GPU output size", gpu_output.len(), N_BATCHES * N_VARS);
@@ -184,12 +203,24 @@ fn main() {
 
         let has_biofilm = gpu_classes.get("biofilm").copied().unwrap_or(0) > 0;
         let has_multiple = gpu_classes.len() > 1;
-        v.check_count("landscape has biofilm outcomes", usize::from(has_biofilm), 1);
-        v.check_count("landscape has diverse outcomes", usize::from(has_multiple), 1);
+        v.check_count(
+            "landscape has biofilm outcomes",
+            usize::from(has_biofilm),
+            1,
+        );
+        v.check_count(
+            "landscape has diverse outcomes",
+            usize::from(has_multiple),
+            1,
+        );
 
-        let cpu_extrapolated_ms = cpu_elapsed.as_secs_f64() * 1000.0 * (N_BATCHES as f64 / cpu_subset_size as f64);
+        let cpu_extrapolated_ms =
+            cpu_elapsed.as_secs_f64() * 1000.0 * (N_BATCHES as f64 / cpu_subset_size as f64);
         println!("  Estimated CPU for {N_BATCHES}: {cpu_extrapolated_ms:.0} ms");
-        println!("  GPU speedup: {:.1}x (actual vs extrapolated)", cpu_extrapolated_ms / (gpu_elapsed.as_secs_f64() * 1000.0));
+        println!(
+            "  GPU speedup: {:.1}x (actual vs extrapolated)",
+            cpu_extrapolated_ms / (gpu_elapsed.as_secs_f64() * 1000.0)
+        );
     }
 
     #[cfg(not(feature = "gpu"))]

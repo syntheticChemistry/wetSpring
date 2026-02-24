@@ -3,7 +3,7 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
-    dead_code,
+    dead_code
 )]
 //! # Exp130: Thick Biofilm 3D QS Extension
 //!
@@ -21,7 +21,7 @@ use wetspring_barracuda::validation::Validator;
 
 #[cfg(feature = "gpu")]
 use barracuda::spectral::{
-    anderson_2d, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio, GOE_R, POISSON_R,
+    GOE_R, POISSON_R, anderson_2d, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 
 const N_SWEEP: usize = 20;
@@ -122,7 +122,10 @@ fn main() {
             (Some(_), None) => true,
             _ => true,
         };
-        v.check_pass("J_c(3D) > J_c(2D) or 3D never localizes in range", hierarchy);
+        v.check_pass(
+            "J_c(3D) > J_c(2D) or 3D never localizes in range",
+            hierarchy,
+        );
         println!("  3D block plateau points: {p3d} vs 2D slab: {p2d}");
         v.check_pass("3D plateau >= 2D plateau", p3d >= p2d);
 
@@ -140,8 +143,16 @@ fn main() {
                 .min_by(|(wa, _), (wb, _)| (wa - w).abs().partial_cmp(&(wb - w).abs()).unwrap())
                 .map(|(_, r)| *r)
                 .unwrap_or(0.0);
-            let reg_2d = if r_2d > midpoint { "ACTIVE" } else { "suppressed" };
-            let reg_3d = if r_3d > midpoint { "ACTIVE" } else { "suppressed" };
+            let reg_2d = if r_2d > midpoint {
+                "ACTIVE"
+            } else {
+                "suppressed"
+            };
+            let reg_3d = if r_3d > midpoint {
+                "ACTIVE"
+            } else {
+                "suppressed"
+            };
             println!(
                 "  J={j_test:.1} W={w:.2}: 2D ⟨r⟩={r_2d:.4}({reg_2d}) → 3D ⟨r⟩={r_3d:.4}({reg_3d})"
             );

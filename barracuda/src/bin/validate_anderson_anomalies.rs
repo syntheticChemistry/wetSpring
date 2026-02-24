@@ -4,6 +4,10 @@
     clippy::unwrap_used,
     clippy::print_stdout,
     dead_code,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::cast_possible_wrap
 )]
 //! # Exp143: Anderson Anomaly Hunter — QS Where It Shouldn't Exist
 //!
@@ -28,6 +32,7 @@ struct AndersonAnomaly {
     np_solution_type: &'static str,
 }
 
+#[allow(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp143: Anderson Anomaly Hunter — Nature's NP Solutions");
 
@@ -134,14 +139,37 @@ fn main() {
     v.check_pass(&format!("{n} anomalies catalogued"), n >= 5);
 
     v.section("── S2: Anomaly classification ──");
-    let genuine: Vec<_> = anomalies.iter().filter(|a| a.anomaly_class.starts_with("GENUINE") || a.anomaly_class.starts_with("genuine")).collect();
-    let apparent: Vec<_> = anomalies.iter().filter(|a| a.anomaly_class.starts_with("apparent")).collect();
-    let chemistry: Vec<_> = anomalies.iter().filter(|a| a.anomaly_class.starts_with("chemistry")).collect();
+    let genuine: Vec<_> = anomalies
+        .iter()
+        .filter(|a| {
+            a.anomaly_class.starts_with("GENUINE") || a.anomaly_class.starts_with("genuine")
+        })
+        .collect();
+    let apparent: Vec<_> = anomalies
+        .iter()
+        .filter(|a| a.anomaly_class.starts_with("apparent"))
+        .collect();
+    let chemistry: Vec<_> = anomalies
+        .iter()
+        .filter(|a| a.anomaly_class.starts_with("chemistry"))
+        .collect();
 
     println!("  Classification:");
-    println!("    GENUINE NP solutions:  {} ({:.0}%)", genuine.len(), genuine.len() as f64 / n as f64 * 100.0);
-    println!("    Apparent (loopholes):   {} ({:.0}%)", apparent.len(), apparent.len() as f64 / n as f64 * 100.0);
-    println!("    Chemistry innovation:   {} ({:.0}%)", chemistry.len(), chemistry.len() as f64 / n as f64 * 100.0);
+    println!(
+        "    GENUINE NP solutions:  {} ({:.0}%)",
+        genuine.len(),
+        genuine.len() as f64 / n as f64 * 100.0
+    );
+    println!(
+        "    Apparent (loopholes):   {} ({:.0}%)",
+        apparent.len(),
+        apparent.len() as f64 / n as f64 * 100.0
+    );
+    println!(
+        "    Chemistry innovation:   {} ({:.0}%)",
+        chemistry.len(),
+        chemistry.len() as f64 / n as f64 * 100.0
+    );
     println!();
     println!("  Genuine NP solutions found:");
     for a in &genuine {

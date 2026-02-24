@@ -7,8 +7,8 @@
 //! `wetSpring` provides the high-level API that accepts `&[u8]` nucleotide
 //! sequences and returns normalized Hamming distances.
 
-use barracuda::device::WgpuDevice;
 use barracuda::PairwiseHammingGpu;
+use barracuda::device::WgpuDevice;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
@@ -100,6 +100,7 @@ impl HammingGpu {
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;
+    use crate::tolerances;
 
     #[tokio::test]
     async fn hamming_gpu_matches_cpu() {
@@ -115,8 +116,8 @@ mod tests {
             .pairwise_hamming(&[&s0, &s1, &s2])
             .expect("hamming dispatch");
         assert_eq!(result.distances.len(), 3);
-        assert!((result.distances[0] - 0.125).abs() < 1e-6); // s0 vs s1
-        assert!((result.distances[1] - 0.75).abs() < 1e-6); // s0 vs s2
-        assert!((result.distances[2] - 0.875).abs() < 1e-6); // s1 vs s2
+        assert!((result.distances[0] - 0.125).abs() < tolerances::GPU_VS_CPU_F64);
+        assert!((result.distances[1] - 0.75).abs() < tolerances::GPU_VS_CPU_F64);
+        assert!((result.distances[2] - 0.875).abs() < tolerances::GPU_VS_CPU_F64);
     }
 }

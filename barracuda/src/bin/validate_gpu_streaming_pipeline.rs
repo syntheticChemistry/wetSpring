@@ -31,15 +31,16 @@
 use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, diversity_gpu, spectral_match_gpu, streaming_gpu};
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
 
 fn cosine_cpu(a: &[f64], b: &[f64]) -> f64 {
-    let dot: f64 = a.iter().zip(b).map(|(x, y)| x * y).sum();
-    let na: f64 = a.iter().map(|x| x * x).sum::<f64>().sqrt();
-    let nb: f64 = b.iter().map(|x| x * x).sum::<f64>().sqrt();
+    let dot: f64 = special::dot(a, b);
+    let na: f64 = special::l2_norm(a);
+    let nb: f64 = special::l2_norm(b);
     let denom = na * nb;
     if denom > 0.0 {
         (dot / denom).clamp(0.0, 1.0)

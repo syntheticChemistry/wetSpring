@@ -6,8 +6,8 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | QIIME2/DADA2 via Galaxy 24.1 |
-//! | Baseline version | Galaxy 24.1, QIIME2 2026.1.0 |
+//! | Baseline tool | `QIIME2`/DADA2 via `Galaxy` 24.1 |
+//! | Baseline version | `Galaxy` 24.1, `QIIME2` 2026.1.0 |
 //! | Baseline command | Pipeline integration (synthetic communities) |
 //! | Baseline date | 2026-02-19 |
 //! | Exact command | `cargo run --bin validate_16s_pipeline` |

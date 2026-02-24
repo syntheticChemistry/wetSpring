@@ -63,21 +63,61 @@ fn main() {
 
     let ecosystems = vec![
         // HMP gut: moderate diversity, moderate evenness
-        EcosystemProfile { name: "HMP gut", n_species: 300, evenness: 0.4, seed: 42 },
+        EcosystemProfile {
+            name: "HMP gut",
+            n_species: 300,
+            evenness: 0.4,
+            seed: 42,
+        },
         // HMP oral: high diversity, high evenness
-        EcosystemProfile { name: "HMP oral", n_species: 500, evenness: 0.7, seed: 137 },
+        EcosystemProfile {
+            name: "HMP oral",
+            n_species: 500,
+            evenness: 0.7,
+            seed: 137,
+        },
         // Tara Oceans surface: very high diversity
-        EcosystemProfile { name: "Tara surface", n_species: 800, evenness: 0.8, seed: 999 },
+        EcosystemProfile {
+            name: "Tara surface",
+            n_species: 800,
+            evenness: 0.8,
+            seed: 999,
+        },
         // Tara Oceans deep: moderate diversity, low evenness (few dominants)
-        EcosystemProfile { name: "Tara deep", n_species: 200, evenness: 0.3, seed: 777 },
+        EcosystemProfile {
+            name: "Tara deep",
+            n_species: 200,
+            evenness: 0.3,
+            seed: 777,
+        },
         // EMP soil: highest diversity
-        EcosystemProfile { name: "EMP soil", n_species: 1000, evenness: 0.85, seed: 555 },
+        EcosystemProfile {
+            name: "EMP soil",
+            n_species: 1000,
+            evenness: 0.85,
+            seed: 555,
+        },
         // Algal pond (bloom): very low diversity
-        EcosystemProfile { name: "Algal bloom", n_species: 50, evenness: 0.15, seed: 333 },
+        EcosystemProfile {
+            name: "Algal bloom",
+            n_species: 50,
+            evenness: 0.15,
+            seed: 333,
+        },
         // Vent community: moderate diversity, skewed
-        EcosystemProfile { name: "Vent", n_species: 150, evenness: 0.35, seed: 111 },
+        EcosystemProfile {
+            name: "Vent",
+            n_species: 150,
+            evenness: 0.35,
+            seed: 111,
+        },
         // Biofilm (V. cholerae dominated): very low evenness
-        EcosystemProfile { name: "Biofilm", n_species: 20, evenness: 0.1, seed: 222 },
+        EcosystemProfile {
+            name: "Biofilm",
+            n_species: 20,
+            evenness: 0.1,
+            seed: 222,
+        },
     ];
 
     let mut diversity_data: Vec<(String, f64, f64, f64)> = Vec::new();
@@ -90,13 +130,16 @@ fn main() {
 
         let w = evenness_to_disorder(j);
 
-        println!("  {}: H={h:.3}, S={s:.3}, J={j:.3} → W={w:.2}",
-            eco.name);
+        println!("  {}: H={h:.3}, S={s:.3}, J={j:.3} → W={w:.2}", eco.name);
 
         diversity_data.push((eco.name.to_string(), j, w, h));
     }
 
-    v.check_count("ecosystems profiled", diversity_data.len(), ecosystems.len());
+    v.check_count(
+        "ecosystems profiled",
+        diversity_data.len(),
+        ecosystems.len(),
+    );
 
     // ── S2: Disorder → Localization mapping ──
     v.section("── S2: Anderson localization predictions ──");
@@ -114,20 +157,29 @@ fn main() {
 
             let gamma = lyapunov_exponent(&diagonal, 0.0);
 
-            let regime = if r < 0.42 { "localized" } else { "extended-like" };
+            let regime = if r < 0.42 {
+                "localized"
+            } else {
+                "extended-like"
+            };
             println!("  {name}: W={w:.2}, ⟨r⟩={r:.4}, γ={gamma:.4} → {regime}");
-            println!("    QS prediction: {}",
-                if r < 0.42 { "signals stay LOCAL (QS suppressed)" }
-                else { "signals PROPAGATE (QS active)" });
+            println!(
+                "    QS prediction: {}",
+                if r < 0.42 {
+                    "signals stay LOCAL (QS suppressed)"
+                } else {
+                    "signals PROPAGATE (QS active)"
+                }
+            );
 
             predictions.push((name.clone(), *w, r, gamma));
         }
 
         // Validation: monotonic relationship between W and localization
-        let low_w: Vec<&(String, f64, f64, f64)> = predictions.iter()
-            .filter(|(_, w, _, _)| *w < 5.0)
-            .collect();
-        let high_w: Vec<&(String, f64, f64, f64)> = predictions.iter()
+        let low_w: Vec<&(String, f64, f64, f64)> =
+            predictions.iter().filter(|(_, w, _, _)| *w < 5.0).collect();
+        let high_w: Vec<&(String, f64, f64, f64)> = predictions
+            .iter()
             .filter(|(_, w, _, _)| *w > 10.0)
             .collect();
 
@@ -146,11 +198,13 @@ fn main() {
         }
 
         // Lyapunov increases with W
-        let gamma_bloom = predictions.iter()
+        let gamma_bloom = predictions
+            .iter()
             .find(|(n, _, _, _)| n == "Algal bloom")
             .map(|(_, _, _, g)| *g)
             .unwrap_or(0.0);
-        let gamma_soil = predictions.iter()
+        let gamma_soil = predictions
+            .iter()
             .find(|(n, _, _, _)| n == "EMP soil")
             .map(|(_, _, _, g)| *g)
             .unwrap_or(0.0);
@@ -164,11 +218,13 @@ fn main() {
         // In 1D Anderson, all states localize for any W>0. The Lyapunov
         // exponent γ is the correct diagnostic: lower γ means weaker
         // localization (more extended signals).
-        let gamma_biofilm = predictions.iter()
+        let gamma_biofilm = predictions
+            .iter()
             .find(|(n, _, _, _)| n == "Biofilm")
             .map(|(_, _, _, g)| *g)
             .unwrap_or(0.0);
-        let gamma_soil_2 = predictions.iter()
+        let gamma_soil_2 = predictions
+            .iter()
             .find(|(n, _, _, _)| n == "EMP soil")
             .map(|(_, _, _, g)| *g)
             .unwrap_or(0.0);
@@ -197,7 +253,11 @@ fn main() {
         }
 
         println!("  Summary: {qs_active} QS-active, {qs_suppressed} QS-suppressed");
-        v.check_count("both regimes represented", usize::from(qs_active > 0 && qs_suppressed > 0), 1);
+        v.check_count(
+            "both regimes represented",
+            usize::from(qs_active > 0 && qs_suppressed > 0),
+            1,
+        );
     }
 
     #[cfg(not(feature = "gpu"))]

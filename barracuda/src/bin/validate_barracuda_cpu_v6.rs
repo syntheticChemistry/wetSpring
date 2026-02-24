@@ -17,8 +17,8 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | scipy `odeint` (LSODA) / pure Python RK4 |
-//! | Baseline version | scipy 1.12.0, numpy 1.26.4 |
+//! | Baseline tool | `scipy` `odeint` (LSODA) / pure Python RK4 |
+//! | Baseline version | `scipy` 1.12.0, `numpy` 1.26.4 |
 //! | Baseline command | `python scripts/waters2008_qs_ode.py` (and 5 others) |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --release --bin validate_barracuda_cpu_v6` |

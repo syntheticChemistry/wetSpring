@@ -3,7 +3,7 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
-    dead_code,
+    dead_code
 )]
 //! # Exp144: Cold Seep QS Gene Catalog — Parsing 299K Genes
 //!
@@ -39,7 +39,7 @@ struct ColdSeepSample {
     expected_qs_density: &'static str,
 }
 
-#[allow(clippy::cast_precision_loss)]
+#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp144: Cold Seep QS Gene Catalog — 299K Genes × 34 Types");
 
@@ -100,17 +100,29 @@ fn main() {
     let total_genes: u64 = systems.iter().map(|s| s.estimated_genes).sum();
 
     println!("  Cold seep QS gene catalog (from Microbiome 2025):");
-    println!("  {:45} {:>6} {:>10} {:>15}", "System", "Types", "Est.Genes", "Gram affinity");
+    println!(
+        "  {:45} {:>6} {:>10} {:>15}",
+        "System", "Types", "Est.Genes", "Gram affinity"
+    );
     println!("  {:-<45} {:-<6} {:-<10} {:-<15}", "", "", "", "");
     for s in &systems {
-        println!("  {:45} {:>6} {:>10} {:>15}", s.name, s.n_types, s.estimated_genes, s.gram_affinity);
+        println!(
+            "  {:45} {:>6} {:>10} {:>15}",
+            s.name, s.n_types, s.estimated_genes, s.gram_affinity
+        );
     }
     println!("  {:-<45} {:-<6} {:-<10}", "", "", "");
     println!("  {:45} {:>6} {:>10}", "TOTAL", total_types, total_genes);
     println!();
 
-    v.check_pass(&format!("{total_types} QS types catalogued"), total_types >= 30);
-    v.check_pass(&format!("{total_genes} estimated genes"), total_genes >= 200_000);
+    v.check_pass(
+        &format!("{total_types} QS types catalogued"),
+        total_types >= 30,
+    );
+    v.check_pass(
+        &format!("{total_genes} estimated genes"),
+        total_genes >= 200_000,
+    );
 
     v.section("── S2: Habitat geometry analysis ──");
 
@@ -153,14 +165,23 @@ fn main() {
     ];
 
     println!("  Sample habitats and Anderson predictions:");
-    println!("  {:40} {:>10} {:>8} {:>5}", "Habitat", "Geometry", "Depth(m)", "n_MG");
+    println!(
+        "  {:40} {:>10} {:>8} {:>5}",
+        "Habitat", "Geometry", "Depth(m)", "n_MG"
+    );
     println!("  {:-<40} {:-<10} {:-<8} {:-<5}", "", "", "", "");
     for s in &samples {
-        println!("  {:40} {:>10} {:>8.0} {:>5}", s.habitat, s.geometry, s.depth_m, s.n_metagenomes);
+        println!(
+            "  {:40} {:>10} {:>8.0} {:>5}",
+            s.habitat, s.geometry, s.depth_m, s.n_metagenomes
+        );
     }
 
     let total_mg: u32 = samples.iter().map(|s| s.n_metagenomes).sum();
-    v.check_pass(&format!("{total_mg} metagenomes across habitats"), total_mg >= 100);
+    v.check_pass(
+        &format!("{total_mg} metagenomes across habitats"),
+        total_mg >= 100,
+    );
 
     v.section("── S3: Anderson predictions for cold seep ──");
 

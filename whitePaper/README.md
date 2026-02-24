@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 23, 2026
-**Status:** Validation study active — 2,673+/2,673+ checks, 750 tests, 97% bio+io line coverage, 120 experiments
+**Status:** Validation study active — 2,673+/2,673+ checks, 759 tests, 97% bio+io line coverage, 120 experiments
 **License:** AGPL-3.0-or-later
 
 ---
@@ -308,7 +308,7 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCuda/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34+ WGSL shaders, active Write phase)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (5 local WGSL + 30 ToadStool primitives, 42 GPU modules, 750 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (5 local WGSL + 30 ToadStool primitives, 42 GPU modules, 759 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **archive/handoffs/** — Fossil record of ToadStool handoffs (v1–v7)
 

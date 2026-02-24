@@ -158,7 +158,7 @@ affinities. metalForge maps each validated algorithm to its optimal substrate.
 wetSpring follows hotSpring's pattern for ToadStool absorption:
 
 ```
-1. Validate in Rust CPU (barracuda/)          ← DONE: 41 CPU + 42 GPU modules, 750 tests, ~97% bio+io coverage, 120 experiments, 2,673+ checks.
+1. Validate in Rust CPU (barracuda/)          ← DONE: 45 CPU + 42 GPU modules, 759 tests, ~97% bio+io coverage, 120 experiments, 2,673+ checks.
 2. Characterize hardware (metalForge/)         ← THIS DIRECTORY
 3. Write Rust in GPU-friendly patterns         ← 24 absorbed by ToadStool (Lean); 5 local WGSL ODE; 7 Compose; 3 Passthrough
 4. ToadStool absorbs as shared primitives      ← unidirectional handoff via archive/handoffs/

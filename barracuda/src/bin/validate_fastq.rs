@@ -8,15 +8,15 @@
 //! | Baseline commit | `e4358c5` |
 //! | Paper | Kozich et al. 2013. Appl. Environ. Microbiol. (`MiSeq` SOP) |
 //! | DOI | 10.1128/AEM.01043-13 |
-//! | Baseline tool | `FastQC` + Galaxy 24.1 |
-//! | Baseline version | Galaxy 24.1, QIIME2 2026.1.0 |
+//! | Baseline tool | `FastQC` + `Galaxy` 24.1 |
+//! | Baseline version | `Galaxy` 24.1, `QIIME2` 2026.1.0 |
 //! | Baseline command | `scripts/validate_exp001.py` (Exp001) |
 //! | Baseline date | 2026-02-19 |
 //! | Exact command | `python3 scripts/validate_exp001.py` |
 //! | Data | Zenodo 800651 (`MiSeq` SOP, mouse gut 16S) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
-//! # Expected values (from Galaxy `FastQC` + QIIME2 Exp001)
+//! # Expected values (from `Galaxy` `FastQC` + `QIIME2` Exp001)
 //!
 //! - `F3D0_R1`: 7,793 sequences, 249–251 bp, GC ~54.7%, mean Q ~35.8
 //! - All 40 files: 304,720 total sequences (20 paired samples)

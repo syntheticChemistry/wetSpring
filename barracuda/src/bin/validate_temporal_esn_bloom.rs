@@ -1,5 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::expect_used, clippy::unwrap_used, clippy::print_stdout)]
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::print_stdout,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::cast_possible_wrap
+)]
 
 use wetspring_barracuda::bio::esn::{Esn, EsnConfig};
 use wetspring_barracuda::validation::Validator;
@@ -10,18 +18,18 @@ const FEATURE_DIM: usize = 6;
 
 fn lcg_next(seed: &mut u64) -> f64 {
     *seed = seed.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-    ((*seed >> 33) as f64) / (u32::MAX as f64)
+    ((*seed >> 33) as f64) / f64::from(u32::MAX)
 }
 
 fn lcg_noise(seed: &mut u64, center: f64, pct: f64) -> f64 {
-    let noise = (lcg_next(seed) * 2.0 - 1.0) * pct;
+    let noise = lcg_next(seed).mul_add(2.0, -1.0) * pct;
     center * (1.0 + noise)
 }
 
 fn simulate_bloom_trajectory(n_windows: usize, seed: u64) -> Vec<(Vec<f64>, usize)> {
     let mut out = Vec::with_capacity(n_windows);
     let n = n_windows as f64;
-    let mut _rng = seed;
+    let mut rng = seed;
 
     let normal = |rng: &mut u64| -> [f64; 6] {
         [
@@ -67,15 +75,15 @@ fn simulate_bloom_trajectory(n_windows: usize, seed: u64) -> Vec<(Vec<f64>, usiz
     for i in 0..n_windows {
         let t = i as f64 / n;
         let (feat, class) = if t < 0.30 {
-            (normal(&mut _rng), 0)
+            (normal(&mut rng), 0)
         } else if t < 0.45 {
-            (pre_bloom(&mut _rng), 1)
+            (pre_bloom(&mut rng), 1)
         } else if t < 0.70 {
-            (active(&mut _rng), 2)
+            (active(&mut rng), 2)
         } else if t < 0.85 {
-            (post_bloom(&mut _rng), 3)
+            (post_bloom(&mut rng), 3)
         } else {
-            (normal(&mut _rng), 0)
+            (normal(&mut rng), 0)
         };
         out.push((feat.to_vec(), class));
     }
@@ -88,6 +96,7 @@ fn one_hot(class: usize) -> Vec<f64> {
     v
 }
 
+#[allow(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp123: Temporal ESN Bloom Cascade");
 
@@ -134,8 +143,7 @@ fn main() {
                 .iter()
                 .enumerate()
                 .max_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal))
-                .map(|(i, _)| i)
-                .unwrap_or(0);
+                .map_or(0, |(i, _)| i);
             stateful_preds.push(pred);
             stateful_true.push(*true_class);
         }
@@ -154,8 +162,8 @@ fn main() {
     );
     v.check_pass("stateful f64 accuracy > 30%", stateful_acc > 0.30);
 
-    let mut per_class_recall = vec![0.0_f64; N_CLASSES];
-    let mut per_class_count = vec![0usize; N_CLASSES];
+    let mut per_class_recall = [0.0_f64; N_CLASSES];
+    let mut per_class_count = [0usize; N_CLASSES];
     for (p, t) in stateful_preds.iter().zip(stateful_true.iter()) {
         per_class_count[*t] += 1;
         if p == t {
@@ -168,7 +176,10 @@ fn main() {
         } else {
             0.0
         };
-        println!("  Class {} recall: {:.3} ({}/{})", c, r, per_class_recall[c] as usize, per_class_count[c]);
+        println!(
+            "  Class {} recall: {:.3} ({}/{})",
+            c, r, per_class_recall[c] as usize, per_class_count[c]
+        );
     }
     v.check_pass("per-class recall computed", true);
 
@@ -181,7 +192,7 @@ fn main() {
         .iter()
         .flat_map(|t| t.iter().map(|(_, y)| y.clone()))
         .collect();
-    let mut esn_stateless = Esn::new(config.clone());
+    let mut esn_stateless = Esn::new(config);
     esn_stateless.train_stateless(&all_inputs, &all_targets);
 
     let mut stateless_preds = Vec::new();
@@ -195,8 +206,7 @@ fn main() {
                 .iter()
                 .enumerate()
                 .max_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal))
-                .map(|(i, _)| i)
-                .unwrap_or(0);
+                .map_or(0, |(i, _)| i);
             stateless_preds.push(pred);
             stateless_true.push(*true_class);
         }
@@ -250,10 +260,7 @@ fn main() {
     } else {
         latencies.iter().sum::<i64>() as f64 / latencies.len() as f64
     };
-    println!(
-        "  Pre-bloom detection latency (windows from onset): avg {:.1}",
-        avg_latency
-    );
+    println!("  Pre-bloom detection latency (windows from onset): avg {avg_latency:.1}");
 
     v.section("── S5: NPU quantization ──");
     let npu_stateful = esn_stateful.to_npu_weights();
@@ -287,9 +294,12 @@ fn main() {
         .count();
     let npu_stateful_acc = npu_stateful_correct as f64 / stateful_true.len() as f64;
     let npu_stateless_acc = npu_stateless_correct as f64 / stateless_true.len() as f64;
-    println!("  NPU stateful accuracy: {:.3}", npu_stateful_acc);
-    println!("  NPU stateless accuracy: {:.3}", npu_stateless_acc);
-    v.check_pass("NPU stateful >= NPU stateless", npu_stateful_acc >= npu_stateless_acc);
+    println!("  NPU stateful accuracy: {npu_stateful_acc:.3}");
+    println!("  NPU stateless accuracy: {npu_stateless_acc:.3}");
+    v.check_pass(
+        "NPU stateful >= NPU stateless",
+        npu_stateful_acc >= npu_stateless_acc,
+    );
 
     v.section("── S6: Detection latency ──");
     let mut stateless_latencies = Vec::new();
@@ -321,7 +331,7 @@ fn main() {
     let avg_mw = 5.0 * duty;
     let daily_j = avg_mw * 0.001 * 86400.0;
     let days = coin_cell_j / daily_j;
-    println!("  Coin-cell (500 J) feasibility: {:.0} days", days);
+    println!("  Coin-cell (500 J) feasibility: {days:.0} days");
     v.check_pass("coin-cell feasible > 30 days", days > 30.0);
 
     v.finish();

@@ -13,8 +13,8 @@
 //! routing validation binary:
 //!
 //! - QS ODE (Paper 5 — Waters 2008)
-//! - `UniFrac` propagation (Paper 1 — Galaxy/QIIME2 pipeline)
-//! - DADA2 denoising (Paper 1 — Galaxy/QIIME2 pipeline)
+//! - `UniFrac` propagation (Paper 1 — `Galaxy`/`QIIME2` pipeline)
+//! - DADA2 denoising (Paper 1 — `Galaxy`/`QIIME2` pipeline)
 //! - K-mer histogram (Paper 28 — Anderson 2014 viral metagenomics)
 //! - Felsenstein pruning (Papers 16, 17, 20 — placement, `SATé`, bootstrap)
 //!

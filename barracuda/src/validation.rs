@@ -232,7 +232,7 @@ impl Validator {
 mod tests {
     use super::*;
 
-    use std::sync::Mutex;
+    use std::sync::{Mutex, MutexGuard};
 
     /// Serializes tests that mutate process-wide environment variables.
     ///
@@ -242,20 +242,49 @@ mod tests {
     /// per test, this eliminates data races.
     static ENV_LOCK: Mutex<()> = Mutex::new(());
 
-    /// Set an env var while holding `ENV_LOCK`, returning the guard.
-    ///
-    /// # Safety
-    ///
-    /// Must only be called while `ENV_LOCK` is held (enforced by API).
-    fn set_env(key: &str, val: impl AsRef<std::ffi::OsStr>) {
-        // SAFETY: caller holds ENV_LOCK; no other test reads/writes env concurrently.
-        unsafe { std::env::set_var(key, val) };
+    /// RAII guard that sets an env var on creation and restores the
+    /// previous value (or removes the key) on drop. Holds `ENV_LOCK`
+    /// for the guard's entire lifetime, preventing concurrent env access.
+    struct EnvGuard<'a> {
+        key: String,
+        previous: Option<String>,
+        _lock: MutexGuard<'a, ()>,
     }
 
-    /// Remove an env var while holding `ENV_LOCK`.
-    fn remove_env(key: &str) {
-        // SAFETY: caller holds ENV_LOCK; no other test reads/writes env concurrently.
-        unsafe { std::env::remove_var(key) };
+    impl EnvGuard<'_> {
+        fn set(key: &str, val: impl AsRef<std::ffi::OsStr>) -> Self {
+            let lock = ENV_LOCK.lock().unwrap();
+            let previous = std::env::var(key).ok();
+            // SAFETY: ENV_LOCK is held; no other test reads/writes env concurrently.
+            unsafe { std::env::set_var(key, val) };
+            Self {
+                key: key.to_string(),
+                previous,
+                _lock: lock,
+            }
+        }
+
+        fn remove(key: &str) -> Self {
+            let lock = ENV_LOCK.lock().unwrap();
+            let previous = std::env::var(key).ok();
+            // SAFETY: ENV_LOCK is held; no other test reads/writes env concurrently.
+            unsafe { std::env::remove_var(key) };
+            Self {
+                key: key.to_string(),
+                previous,
+                _lock: lock,
+            }
+        }
+    }
+
+    impl Drop for EnvGuard<'_> {
+        fn drop(&mut self) {
+            // SAFETY: self._lock is still held (dropped after this).
+            match &self.previous {
+                Some(val) => unsafe { std::env::set_var(&self.key, val) },
+                None => unsafe { std::env::remove_var(&self.key) },
+            }
+        }
     }
 
     #[test]
@@ -373,49 +402,32 @@ mod tests {
 
     #[test]
     fn data_dir_explicit_env_override() {
-        let _guard = ENV_LOCK.lock().unwrap();
         let key = "WETSPRING_DATA_DIR_EXPLICIT_OVERRIDE_TEST";
         let expected = "/tmp/wetspring_explicit_override_test";
-        set_env(key, expected);
+        let _guard = EnvGuard::set(key, expected);
         let dir = data_dir(key, "data/default");
-        remove_env(key);
         assert_eq!(dir.to_string_lossy(), expected);
     }
 
     #[test]
     fn data_dir_wetspring_data_root_override() {
-        let _guard = ENV_LOCK.lock().unwrap();
         let tmp = tempfile::tempdir().unwrap();
         let subpath = "wetspring_data_root_test/data";
         let full = tmp.path().join(subpath);
         std::fs::create_dir_all(&full).unwrap();
 
-        let old = std::env::var("WETSPRING_DATA_ROOT").ok();
-        set_env("WETSPRING_DATA_ROOT", tmp.path());
-
+        let _guard = EnvGuard::set("WETSPRING_DATA_ROOT", tmp.path());
         let dir = data_dir("WETSPRING_NONEXISTENT_FOR_ROOT_TEST", subpath);
-
-        if let Some(v) = old {
-            set_env("WETSPRING_DATA_ROOT", v);
-        } else {
-            remove_env("WETSPRING_DATA_ROOT");
-        }
 
         assert_eq!(dir, full, "WETSPRING_DATA_ROOT + subpath should be used");
     }
 
     #[test]
     fn data_dir_cwd_fallback() {
-        let _guard = ENV_LOCK.lock().unwrap();
-        let old = std::env::var("WETSPRING_DATA_ROOT").ok();
-        remove_env("WETSPRING_DATA_ROOT");
+        let _guard = EnvGuard::remove("WETSPRING_DATA_ROOT");
 
         let subpath = "___wetspring_cwd_fallback_nonexistent_xyz/data";
         let dir = data_dir("WETSPRING_NONEXISTENT_CWD_TEST", subpath);
-
-        if let Some(v) = old {
-            set_env("WETSPRING_DATA_ROOT", v);
-        }
 
         assert_eq!(dir.to_string_lossy(), subpath);
     }

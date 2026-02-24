@@ -3,7 +3,7 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
-    dead_code,
+    dead_code
 )]
 //! # Exp122: 2D Anderson Spatial QS Lattice
 //!
@@ -22,8 +22,8 @@ use wetspring_barracuda::validation::Validator;
 
 #[cfg(feature = "gpu")]
 use barracuda::spectral::{
-    anderson_2d, anderson_hamiltonian, find_all_eigenvalues, lanczos, lanczos_eigenvalues,
-    level_spacing_ratio, GOE_R, POISSON_R,
+    GOE_R, POISSON_R, anderson_2d, anderson_hamiltonian, find_all_eigenvalues, lanczos,
+    lanczos_eigenvalues, level_spacing_ratio,
 };
 
 const LATTICE_L: usize = 20;
@@ -105,7 +105,8 @@ fn main() {
         // 2D has a wider extended plateau (QS-active window) before localizing.
         // The 1D system localizes almost immediately (all W>0), so its "transition"
         // is trivially narrow. The 2D extended plateau is the meaningful finding.
-        let has_2d_plateau = sweep_2d.iter()
+        let has_2d_plateau = sweep_2d
+            .iter()
             .filter(|(w, r)| *w > 2.0 && *r > midpoint)
             .count();
         v.check_pass(
@@ -128,12 +129,36 @@ fn main() {
             j: f64,
         }
         let ecosystems = [
-            Eco { name: "biofilm", n: 5, j: 0.03 },
-            Eco { name: "bloom", n: 8, j: 0.05 },
-            Eco { name: "gut", n: 300, j: 0.55 },
-            Eco { name: "vent", n: 150, j: 0.35 },
-            Eco { name: "soil", n: 1000, j: 0.85 },
-            Eco { name: "ocean", n: 800, j: 0.8 },
+            Eco {
+                name: "biofilm",
+                n: 5,
+                j: 0.03,
+            },
+            Eco {
+                name: "bloom",
+                n: 8,
+                j: 0.05,
+            },
+            Eco {
+                name: "gut",
+                n: 300,
+                j: 0.55,
+            },
+            Eco {
+                name: "vent",
+                n: 150,
+                j: 0.35,
+            },
+            Eco {
+                name: "soil",
+                n: 1000,
+                j: 0.85,
+            },
+            Eco {
+                name: "ocean",
+                n: 800,
+                j: 0.8,
+            },
         ];
         let mut low_w_active = 0_usize;
         let mut high_w_suppressed = 0_usize;
@@ -156,8 +181,16 @@ fn main() {
                 })
                 .map(|(_, r)| *r)
                 .unwrap_or(0.0);
-            let regime_1d = if r_1d > midpoint { "QS-active" } else { "QS-suppressed" };
-            let regime_2d = if r_2d > midpoint { "QS-active" } else { "QS-suppressed" };
+            let regime_1d = if r_1d > midpoint {
+                "QS-active"
+            } else {
+                "QS-suppressed"
+            };
+            let regime_2d = if r_2d > midpoint {
+                "QS-active"
+            } else {
+                "QS-suppressed"
+            };
             println!(
                 "  {}: J={j_computed:.3} W={w:.2} 1D ⟨r⟩={r_1d:.4} ({regime_1d}) 2D ⟨r⟩={r_2d:.4} ({regime_2d}) H={h:.3}",
                 eco.name
@@ -170,7 +203,10 @@ fn main() {
             }
         }
         v.check_pass("low-diversity ecosystems QS-active in 2D", low_w_active > 0);
-        v.check_pass("high-diversity ecosystems QS-suppressed in 2D", high_w_suppressed > 0);
+        v.check_pass(
+            "high-diversity ecosystems QS-suppressed in 2D",
+            high_w_suppressed > 0,
+        );
 
         v.section("── S5: Critical diversity threshold ──");
         let mut j_c: Option<f64> = None;
@@ -186,9 +222,14 @@ fn main() {
         }
         if let Some(j) = j_c {
             println!("  Critical Pielou evenness J_c ≈ {j:.2}");
-            v.check_pass("J_c in ecologically meaningful range (0.2 - 0.7)", j >= 0.2 && j <= 0.7);
+            v.check_pass(
+                "J_c in ecologically meaningful range (0.2 - 0.7)",
+                j >= 0.2 && j <= 0.7,
+            );
         } else {
-            println!("  Critical Pielou evenness J_c not found in sweep (transition outside range)");
+            println!(
+                "  Critical Pielou evenness J_c not found in sweep (transition outside range)"
+            );
             v.check_pass("J_c fallback: sweep covers transition", true);
         }
     }
@@ -222,7 +263,10 @@ fn main() {
         v.check_count("6 ecosystems generated", 6, 6);
         let j_biofilm = j_vals[0];
         let j_soil = j_vals[4];
-        v.check_pass("biofilm J < soil J (community generation sanity)", j_biofilm < j_soil);
+        v.check_pass(
+            "biofilm J < soil J (community generation sanity)",
+            j_biofilm < j_soil,
+        );
         v.section("── S5: Critical diversity threshold ──");
         println!("  [skipped — no GPU feature]");
     }

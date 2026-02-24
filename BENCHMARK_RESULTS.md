@@ -298,14 +298,14 @@ matrix. CPU↔GPU parity proven for all compose and write modules.
 | Rust CPU validation | 1,476 | PASS |
 | GPU validation | 702+ | PASS |
 | Dispatch + layout + transfer | 172 | PASS |
-| Rust tests | 750 (676 lib + 60 integration + 14 doc) | PASS |
-| Python baselines | 40 scripts | PASS |
+| Rust tests | 759 (680 lib + 79 integration/doc) | PASS |
+| Python baselines | 41 scripts | PASS |
 | BarraCuda CPU parity | 380/380 (v1-v8: 31+ domains) | PASS |
 | ToadStool bio primitives | 30 consumed (Lean) | PASS |
 | Local WGSL shaders (Write phase) | 5 ODE shaders (phage, bistable, multi_signal, cooperation, capacitor) | PASS |
 | Compose GPU wrappers | 7 (kmd, merge_pairs, robinson_foulds, derep, NJ, reconciliation, molecular_clock) | PASS |
 | Passthrough GPU wrappers | 3 (gbm, feature_table, signal) | PASS |
-| **Grand total** | **2,673+ validation + 750 tests** | **ALL PASS** |
+| **Grand total** | **2,673+ validation + 759 tests** | **ALL PASS** |
 
 ---
 
@@ -315,7 +315,7 @@ matrix. CPU↔GPU parity proven for all compose and write modules.
 cd barracuda
 
 # Tier 2: Rust CPU (1,476+ checks)
-cargo test                         # 750 tests (676 lib + 60 integration + 14 doc)
+cargo test                         # 759 tests (680 lib + 79 integration/doc)
 cargo run --release --bin validate_qs_ode  # ... repeat for all CPU binaries
 
 # Tier 2b: BarraCuda CPU parity (380/380)

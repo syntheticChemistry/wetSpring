@@ -2,7 +2,7 @@
 //! Naive Bayes taxonomy classification for 16S rRNA sequences.
 //!
 //! Implements the RDP-style naive Bayes classifier (Wang et al. 2007) used by
-//! QIIME2's `feature-classifier classify-sklearn` and DADA2's `assignTaxonomy`.
+//! `QIIME2`'s `feature-classifier classify-sklearn` and DADA2's `assignTaxonomy`.
 //!
 //! # Algorithm
 //!

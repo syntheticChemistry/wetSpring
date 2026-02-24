@@ -87,7 +87,7 @@ impl GbmTree {
             if node.feature < 0 {
                 return node.value;
             }
-            let feat_val = features.get(node.feature as usize).copied().unwrap_or(0.0);
+            let feat_val = features.get(node.feature as usize).map_or(0.0, |x| *x);
             idx = if feat_val <= node.threshold {
                 node.left_child as usize
             } else {

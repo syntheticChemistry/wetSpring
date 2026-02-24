@@ -1,4 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::print_stdout,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::cast_possible_wrap
+)]
 //! Exp114 — ESN QS Phase Classifier for NPU Deployment
 //!
 //! Trains an Echo State Network on Vibrio QS ODE parameter sweep data
@@ -38,15 +47,15 @@ fn classify_outcome(final_state: &[f64; 8]) -> usize {
 fn simulate_qs(params: &QsBiofilmParams) -> [f64; 8] {
     let mut state = [0.1_f64; 8];
     state[0] = 0.01; // N
-    state[3] = 0.0;  // AI
-    state[7] = 0.0;  // biofilm
+    state[3] = 0.0; // AI
+    state[7] = 0.0; // biofilm
 
     let dt = 0.01;
     for _ in 0..2000 {
         let n = state[0].max(0.0);
         let ai = state[3].max(0.0);
         let hapr = state[5].max(0.0);
-        let cdg = (state[6].max(0.0)).min(10.0);
+        let cdg = state[6].clamp(0.0, 10.0);
         let bio = state[7].max(0.0);
 
         let growth = params.mu_max * n * (1.0 - n / params.k_cap);
@@ -57,8 +66,10 @@ fn simulate_qs(params: &QsBiofilmParams) -> [f64; 8] {
             / (params.k_hapr_ai.powi(params.n_hapr as i32) + ai.powi(params.n_hapr as i32));
         let hapr_prod = params.k_hapr_max * hapr_hill;
         let hapr_deg = params.d_hapr * hapr;
-        let dgc = params.k_dgc_basal + params.k_dgc_rep * hapr;
-        let pde = params.k_pde_basal + params.k_pde_act * (1.0 - hapr.min(1.0));
+        let dgc = params.k_dgc_rep.mul_add(hapr, params.k_dgc_basal);
+        let pde = params
+            .k_pde_act
+            .mul_add(1.0 - hapr.min(1.0), params.k_pde_basal);
         let cdg_dot = dgc - pde * cdg;
         let bio_hill = cdg.powi(params.n_bio as i32)
             / (params.k_bio_cdg.powi(params.n_bio as i32) + cdg.powi(params.n_bio as i32));
@@ -80,12 +91,14 @@ fn generate_dataset(offset: u64, count: usize) -> (Vec<Vec<f64>>, Vec<Vec<f64>>)
 
     for i in 0..count {
         let seed = offset + i as u64;
-        let mut params = QsBiofilmParams::default();
-        params.mu_max = 0.3 + 0.7 * ((seed * 7 % 100) as f64 / 100.0);
-        params.k_ai_prod = 0.05 + 0.45 * ((seed * 13 % 100) as f64 / 100.0);
-        params.k_hapr_ai = 0.1 + 0.9 * ((seed * 17 % 100) as f64 / 100.0);
-        params.k_dgc_basal = 0.05 + 0.35 * ((seed * 23 % 100) as f64 / 100.0);
-        params.k_bio_max = 0.1 + 0.9 * ((seed * 29 % 100) as f64 / 100.0);
+        let params = QsBiofilmParams {
+            mu_max: 0.7f64.mul_add((seed * 7 % 100) as f64 / 100.0, 0.3),
+            k_ai_prod: 0.45f64.mul_add((seed * 13 % 100) as f64 / 100.0, 0.05),
+            k_hapr_ai: 0.9f64.mul_add((seed * 17 % 100) as f64 / 100.0, 0.1),
+            k_dgc_basal: 0.35f64.mul_add((seed * 23 % 100) as f64 / 100.0, 0.05),
+            k_bio_max: 0.9f64.mul_add((seed * 29 % 100) as f64 / 100.0, 0.1),
+            ..Default::default()
+        };
 
         let final_state = simulate_qs(&params);
         let class = classify_outcome(&final_state);
@@ -134,31 +147,42 @@ fn main() {
 
     v.section("F64 inference on test set");
     let f64_predictions = esn.predict(&test_inputs);
-    let f64_classes: Vec<usize> = f64_predictions.iter().map(|p| {
-        p.iter().enumerate()
-            .max_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal))
-            .map(|(i, _)| i)
-            .unwrap_or(0)
-    }).collect();
-    v.check_pass("f64 inference produced predictions", !f64_predictions.is_empty());
+    let f64_classes: Vec<usize> = f64_predictions
+        .iter()
+        .map(|p| {
+            p.iter()
+                .enumerate()
+                .max_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal))
+                .map_or(0, |(i, _)| i)
+        })
+        .collect();
+    v.check_pass(
+        "f64 inference produced predictions",
+        !f64_predictions.is_empty(),
+    );
 
     let mut f64_correct = 0;
     for (pred, target) in f64_classes.iter().zip(test_targets.iter()) {
-        let true_class = target.iter().enumerate()
+        let true_class = target
+            .iter()
+            .enumerate()
             .max_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal))
-            .map(|(i, _)| i)
-            .unwrap_or(0);
+            .map_or(0, |(i, _)| i);
         if *pred == true_class {
             f64_correct += 1;
         }
     }
-    let f64_acc = f64_correct as f64 / N_TEST as f64;
+    let f64_acc = f64::from(f64_correct) / N_TEST as f64;
     println!("  f64 accuracy: {f64_acc:.3} ({f64_correct}/{N_TEST})");
     v.check_pass("f64 accuracy > 40%", f64_acc > 0.40);
 
     v.section("Quantize to int8 for NPU deployment");
     let npu_weights = esn.to_npu_weights();
-    v.check_count("NPU weight buffer size", npu_weights.weights_i8.len(), N_CLASSES * 200);
+    v.check_count(
+        "NPU weight buffer size",
+        npu_weights.weights_i8.len(),
+        N_CLASSES * 200,
+    );
     v.check_pass("NPU scale finite", npu_weights.scale.is_finite());
     v.check_pass("NPU zero_point finite", npu_weights.zero_point.is_finite());
 
@@ -185,15 +209,16 @@ fn main() {
 
     let mut npu_correct = 0;
     for (pred, target) in npu_classes.iter().zip(test_targets.iter()) {
-        let true_class = target.iter().enumerate()
+        let true_class = target
+            .iter()
+            .enumerate()
             .max_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal))
-            .map(|(i, _)| i)
-            .unwrap_or(0);
+            .map_or(0, |(i, _)| i);
         if *pred == true_class {
             npu_correct += 1;
         }
     }
-    let npu_acc = npu_correct as f64 / N_TEST as f64;
+    let npu_acc = f64::from(npu_correct) / N_TEST as f64;
     println!("  NPU int8 accuracy: {npu_acc:.3} ({npu_correct}/{N_TEST})");
     v.check_pass("NPU accuracy > 35%", npu_acc > 0.35);
 
@@ -204,7 +229,7 @@ fn main() {
             agree += 1;
         }
     }
-    let agreement = agree as f64 / N_TEST as f64;
+    let agreement = f64::from(agree) / N_TEST as f64;
     println!("  f64 ↔ NPU agreement: {agreement:.3} ({agree}/{N_TEST})");
     v.check_pass("f64 ↔ NPU agreement > 70%", agreement > 0.70);
 
@@ -213,7 +238,10 @@ fn main() {
     let npu_energy_j = gpu_energy_j / 9000.0;
     println!("  GPU sweep energy (est.): {gpu_energy_j:.2} J for {N_TEST} classifications");
     println!("  NPU inference energy (est.): {npu_energy_j:.6} J for {N_TEST} classifications");
-    println!("  Energy ratio: ~{:.0}× reduction", gpu_energy_j / npu_energy_j);
+    println!(
+        "  Energy ratio: ~{:.0}× reduction",
+        gpu_energy_j / npu_energy_j
+    );
     v.check_pass("NPU energy < GPU energy", npu_energy_j < gpu_energy_j);
 
     v.section("Deployment viability");

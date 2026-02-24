@@ -3,8 +3,6 @@
 
 pub mod adapter;
 pub mod alignment;
-pub mod esn;
-#[allow(clippy::cast_precision_loss)]
 pub mod ani;
 #[cfg(feature = "gpu")]
 pub mod ani_gpu;
@@ -39,6 +37,7 @@ pub mod dnds_gpu;
 pub mod eic;
 #[cfg(feature = "gpu")]
 pub mod eic_gpu;
+pub mod esn;
 pub mod feature_table;
 #[cfg(feature = "gpu")]
 pub mod feature_table_gpu;
@@ -73,9 +72,9 @@ pub mod molecular_clock;
 #[cfg(feature = "gpu")]
 pub mod molecular_clock_gpu;
 pub mod multi_signal;
-pub mod ncbi_data;
 #[cfg(feature = "gpu")]
 pub mod multi_signal_gpu;
+pub mod ncbi_data;
 pub mod neighbor_joining;
 #[cfg(feature = "gpu")]
 pub mod neighbor_joining_gpu;
@@ -112,7 +111,6 @@ pub mod robinson_foulds_gpu;
 pub mod signal;
 #[cfg(feature = "gpu")]
 pub mod signal_gpu;
-#[allow(clippy::cast_precision_loss)]
 pub mod snp;
 #[cfg(feature = "gpu")]
 pub mod snp_gpu;

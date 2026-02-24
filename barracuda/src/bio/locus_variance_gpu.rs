@@ -7,8 +7,8 @@
 //! Computes per-locus allele frequency variance across populations,
 //! the core building block for Weir-Cockerham FST estimation.
 
-use barracuda::device::WgpuDevice;
 use barracuda::LocusVarianceGpu;
+use barracuda::device::WgpuDevice;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
@@ -84,6 +84,7 @@ impl LocusVarianceGpuWrapper {
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;
+    use crate::tolerances;
 
     #[tokio::test]
     async fn locus_variance_uniform_is_zero() {
@@ -101,7 +102,10 @@ mod tests {
         ];
         let result = lv.compute(&freqs, 3, 2).expect("locus variance");
         assert_eq!(result.len(), 2);
-        assert!(result[0].abs() < 1e-5, "uniform locus should be 0");
-        assert!((result[1] - 0.106_666_67).abs() < 1e-4);
+        assert!(
+            result[0].abs() < tolerances::GPU_F32_PARITY,
+            "uniform locus should be 0"
+        );
+        assert!((result[1] - 0.106_666_67).abs() < tolerances::GPU_F32_SPATIAL);
     }
 }

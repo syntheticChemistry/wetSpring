@@ -7,7 +7,7 @@
 
 ## Current Kernel Usage (Validated)
 
-### Rust CPU Modules (41 modules, 750 tests, ~97% bio+io coverage)
+### Rust CPU Modules (45 modules, 759 tests, ~97% bio+io coverage)
 
 | Module Domain | Modules | Status |
 |--------------|---------|--------|
@@ -135,7 +135,7 @@ CPU 22.5× faster than Python  ────────→  GPU math PROVEN port
 - Native `log(f64)` crashes NVIDIA NVVM compiler — all transcendentals must use portable implementations
 - **NVVM workaround**: force `ShaderTemplate::for_driver_auto(source, true)` for shaders using exp/log
 - Spectral cosine achieves 926× GPU speedup — the first "GPU wins decisively" benchmark from any spring
-- 41 CPU + 42 GPU Rust modules with 1 runtime dependency (flate2) — highest sovereignty ratio in the ecosystem
+- 45 CPU + 42 GPU Rust modules with 1 runtime dependency (flate2) — highest sovereignty ratio in the ecosystem
 - **12 shaders absorbed + 5 local WGSL (Write phase) + 12 composed wrappers** — see `barracuda/EVOLUTION_READINESS.md` for status
 - **Rust edition 2024**, MSRV 1.85 — `f64::midpoint()`, `usize::midpoint()`, `const fn` promotions
 - **`#![deny(unsafe_code)]`** — edition 2024 makes `std::env::set_var` unsafe; `#[allow]` confined to test env-var calls

@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![allow(clippy::needless_range_loop)] // ESN uses 2D matrix indexing (i*n+j)
 //! Minimal Echo State Network (ESN) for NPU deployment validation.
 //!
 //! Implements reservoir computing: a fixed random recurrent network (reservoir)
 //! projects input into a high-dimensional state space. Only the readout layer
-//! (W_out) is trained via ridge regression. The reservoir weights (W_in, W_res)
+//! (`W_out`) is trained via ridge regression. The reservoir weights (`W_in`, `W_res`)
 //! are generated once and never updated.
 //!
 //! This is the wetSpring-local ESN used for training data → NPU pipeline
 //! validation. For production GPU/NPU ESN, use `barracuda::esn_v2::ESN`
-//! from ToadStool (hardware-agnostic, WGSL fused reservoir update).
+//! from `ToadStool` (hardware-agnostic, WGSL fused reservoir update).
 //!
 //! # NPU Deployment Path
 //!
@@ -28,8 +29,11 @@ impl Lcg {
         Self(seed)
     }
     fn next_f64(&mut self) -> f64 {
-        self.0 = self.0.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-        ((self.0 >> 33) as f64) / (u32::MAX as f64)
+        self.0 = self
+            .0
+            .wrapping_mul(6_364_136_223_846_793_005)
+            .wrapping_add(1);
+        f64::from((self.0 >> 33) as u32) / f64::from(u32::MAX)
     }
     fn next_gaussian(&mut self) -> f64 {
         // Box-Muller transform
@@ -48,7 +52,7 @@ pub struct EsnConfig {
     pub reservoir_size: usize,
     /// Number of output classes or regression targets.
     pub output_size: usize,
-    /// Spectral radius of W_res (controls echo state property, typically < 1.0).
+    /// Spectral radius of `W_res` (controls echo state property, typically < 1.0).
     pub spectral_radius: f64,
     /// Fraction of non-zero reservoir connections (sparsity = 1 − connectivity).
     pub connectivity: f64,
@@ -109,7 +113,7 @@ impl Esn {
 
         // W_in: input_size × reservoir_size, uniform [-1, 1]
         let w_in: Vec<f64> = (0..n_in * n_res)
-            .map(|_| rng.next_f64() * 2.0 - 1.0)
+            .map(|_| rng.next_f64().mul_add(2.0, -1.0))
             .collect();
 
         // W_res: reservoir_size × reservoir_size, sparse Gaussian
@@ -163,7 +167,7 @@ impl Esn {
             for i in 0..n_res {
                 val += self.w_res[i * n_res + j] * self.state[i];
             }
-            new_state[j] = (1.0 - leak) * self.state[j] + leak * val.tanh();
+            new_state[j] = (1.0 - leak).mul_add(self.state[j], leak * val.tanh());
         }
 
         self.state = new_state;
@@ -192,7 +196,7 @@ impl Esn {
     /// Train readout weights via ridge regression on collected states.
     ///
     /// `inputs`: sequence of input vectors, `targets`: corresponding outputs.
-    /// Runs reservoir on all inputs, collects states, solves for W_out.
+    /// Runs reservoir on all inputs, collects states, solves for `W_out`.
     pub fn train(&mut self, inputs: &[Vec<f64>], targets: &[Vec<f64>]) {
         let n_res = self.config.reservoir_size;
         let n_out = self.config.output_size;
@@ -383,14 +387,15 @@ impl Esn {
             };
         }
 
-        let min_val = self.w_out.iter().cloned().fold(f64::INFINITY, f64::min);
-        let max_val = self.w_out.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
+        let min_val = self.w_out.iter().copied().fold(f64::INFINITY, f64::min);
+        let max_val = self.w_out.iter().copied().fold(f64::NEG_INFINITY, f64::max);
 
         let range = max_val - min_val;
         let scale = if range > 0.0 { range / 255.0 } else { 1.0 };
         let zero_point = min_val;
 
-        let weights_i8: Vec<i8> = self.w_out
+        let weights_i8: Vec<i8> = self
+            .w_out
             .iter()
             .map(|&v| {
                 let q = ((v - zero_point) / scale).round() as i64 - 128;
@@ -419,21 +424,24 @@ impl NpuReadoutWeights {
         let mut output = vec![0.0_f64; n_out];
 
         // Quantize state to int8
-        let s_min = state.iter().cloned().fold(f64::INFINITY, f64::min);
-        let s_max = state.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
+        let s_min = state.iter().copied().fold(f64::INFINITY, f64::min);
+        let s_max = state.iter().copied().fold(f64::NEG_INFINITY, f64::max);
         let s_range = s_max - s_min;
         let s_scale = if s_range > 0.0 { s_range / 255.0 } else { 1.0 };
 
-        let state_i8: Vec<i8> = state.iter().map(|&v| {
-            let q = ((v - s_min) / s_scale).round() as i64 - 128;
-            q.clamp(-128, 127) as i8
-        }).collect();
+        let state_i8: Vec<i8> = state
+            .iter()
+            .map(|&v| {
+                let q = ((v - s_min) / s_scale).round() as i64 - 128;
+                q.clamp(-128, 127) as i8
+            })
+            .collect();
 
         // Int8 matmul: W_out_i8 · state_i8 → i32 accumulator → dequantize
         for o in 0..n_out {
             let mut acc = 0_i64;
             for r in 0..n_res.min(state_i8.len()) {
-                acc += (self.weights_i8[o * n_res + r] as i64) * (state_i8[r] as i64);
+                acc += i64::from(self.weights_i8[o * n_res + r]) * i64::from(state_i8[r]);
             }
             // Dequantize: real = (acc * w_scale * s_scale) + corrections
             output[o] = acc as f64 * self.scale * s_scale;
@@ -446,9 +454,10 @@ impl NpuReadoutWeights {
     #[must_use]
     pub fn classify(&self, state: &[f64]) -> usize {
         let output = self.infer(state);
-        output.iter().enumerate()
+        output
+            .iter()
+            .enumerate()
             .max_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal))
-            .map(|(i, _)| i)
-            .unwrap_or(0)
+            .map_or(0, |(i, _)| i)
     }
 }

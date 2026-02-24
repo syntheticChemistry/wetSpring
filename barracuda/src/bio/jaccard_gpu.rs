@@ -7,8 +7,8 @@
 //! `wetSpring` provides the high-level API that accepts a presence/absence
 //! matrix and returns Jaccard distances.
 
-use barracuda::device::WgpuDevice;
 use barracuda::PairwiseJaccardGpu;
+use barracuda::device::WgpuDevice;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
@@ -99,6 +99,7 @@ impl JaccardGpu {
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;
+    use crate::tolerances;
 
     #[tokio::test]
     async fn jaccard_gpu_basic() {
@@ -118,6 +119,6 @@ mod tests {
         let result = jg.pairwise_jaccard(&pa, 3, 4).expect("jaccard dispatch");
         assert_eq!(result.distances.len(), 3);
         // g0 vs g1: intersection={0,3}=2, union={0,1,2,3}=4, J=2/4=0.5, dist=0.5
-        assert!((result.distances[0] - 0.5).abs() < 1e-5);
+        assert!((result.distances[0] - 0.5).abs() < tolerances::GPU_F32_PARITY);
     }
 }

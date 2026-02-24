@@ -3,7 +3,7 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
-    dead_code,
+    dead_code
 )]
 //! # Exp146: luxR Phylogeny × Habitat Geometry Overlay
 //!
@@ -28,7 +28,7 @@ struct LuxrLineage {
     notes: &'static str,
 }
 
-#[allow(clippy::cast_precision_loss)]
+#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp146: luxR Phylogeny × Habitat Geometry Overlay");
 
@@ -160,40 +160,90 @@ fn main() {
     let n = lineages.len();
     println!("  luxR lineage catalog: {n} evolutionary clades");
     println!();
-    println!("  {:25} {:>12} {:>10} {:>8} {:>6}", "Clade", "Geometry", "LuxR", "LuxI?", "Cross?");
-    println!("  {:-<25} {:-<12} {:-<10} {:-<8} {:-<6}", "", "", "", "", "");
+    println!(
+        "  {:25} {:>12} {:>10} {:>8} {:>6}",
+        "Clade", "Geometry", "LuxR", "LuxI?", "Cross?"
+    );
+    println!(
+        "  {:-<25} {:-<12} {:-<10} {:-<8} {:-<6}",
+        "", "", "", "", ""
+    );
     for l in &lineages {
         let luxi_tag = if l.luxi_paired { "yes" } else { "no" };
-        let cross_tag = if l.cross_species_receptor { "YES" } else { "no" };
-        println!("  {:25} {:>12} {:>10} {:>8} {:>6}", l.clade, l.geometry, l.luxr_status.split(',').next().unwrap_or("?"), luxi_tag, cross_tag);
+        let cross_tag = if l.cross_species_receptor {
+            "YES"
+        } else {
+            "no"
+        };
+        println!(
+            "  {:25} {:>12} {:>10} {:>8} {:>6}",
+            l.clade,
+            l.geometry,
+            l.luxr_status.split(',').next().unwrap_or("?"),
+            luxi_tag,
+            cross_tag
+        );
     }
     v.check_pass(&format!("{n} lineages catalogued"), n >= 10);
 
     v.section("── S2: Geometry-LuxR correlation ──");
 
-    let dense_3d: Vec<_> = lineages.iter().filter(|l| l.geometry == "3D_dense").collect();
-    let dilute_3d: Vec<_> = lineages.iter().filter(|l| l.geometry == "3D_dilute").collect();
-    let surface_2d: Vec<_> = lineages.iter().filter(|l| l.geometry == "2D_surface").collect();
+    let dense_3d: Vec<_> = lineages
+        .iter()
+        .filter(|l| l.geometry == "3D_dense")
+        .collect();
+    let dilute_3d: Vec<_> = lineages
+        .iter()
+        .filter(|l| l.geometry == "3D_dilute")
+        .collect();
+    let surface_2d: Vec<_> = lineages
+        .iter()
+        .filter(|l| l.geometry == "2D_surface")
+        .collect();
 
-    let dense_with_luxr = dense_3d.iter().filter(|l| !l.luxr_status.starts_with("ABSENT")).count();
-    let dilute_with_luxr = dilute_3d.iter().filter(|l| !l.luxr_status.starts_with("ABSENT")).count();
-    let surface_with_luxr = surface_2d.iter().filter(|l| !l.luxr_status.starts_with("ABSENT")).count();
+    let dense_with_luxr = dense_3d
+        .iter()
+        .filter(|l| !l.luxr_status.starts_with("ABSENT"))
+        .count();
+    let dilute_with_luxr = dilute_3d
+        .iter()
+        .filter(|l| !l.luxr_status.starts_with("ABSENT"))
+        .count();
+    let surface_with_luxr = surface_2d
+        .iter()
+        .filter(|l| !l.luxr_status.starts_with("ABSENT"))
+        .count();
 
     println!("  LuxR presence by geometry:");
-    println!("    3D_dense:   {}/{} have luxR ({:.0}%)", dense_with_luxr, dense_3d.len(),
-        dense_with_luxr as f64 / dense_3d.len() as f64 * 100.0);
-    println!("    3D_dilute:  {}/{} have luxR ({:.0}%)", dilute_with_luxr, dilute_3d.len(),
-        dilute_with_luxr as f64 / dilute_3d.len() as f64 * 100.0);
-    println!("    2D_surface: {}/{} have luxR ({:.0}%)", surface_with_luxr, surface_2d.len(),
-        surface_with_luxr as f64 / surface_2d.len().max(1) as f64 * 100.0);
+    println!(
+        "    3D_dense:   {}/{} have luxR ({:.0}%)",
+        dense_with_luxr,
+        dense_3d.len(),
+        dense_with_luxr as f64 / dense_3d.len() as f64 * 100.0
+    );
+    println!(
+        "    3D_dilute:  {}/{} have luxR ({:.0}%)",
+        dilute_with_luxr,
+        dilute_3d.len(),
+        dilute_with_luxr as f64 / dilute_3d.len() as f64 * 100.0
+    );
+    println!(
+        "    2D_surface: {}/{} have luxR ({:.0}%)",
+        surface_with_luxr,
+        surface_2d.len(),
+        surface_with_luxr as f64 / surface_2d.len().max(1) as f64 * 100.0
+    );
 
     let pred1 = dense_with_luxr as f64 / dense_3d.len() as f64
-              > dilute_with_luxr as f64 / dilute_3d.len().max(1) as f64;
+        > dilute_with_luxr as f64 / dilute_3d.len().max(1) as f64;
     v.check_pass("P1: 3D_dense luxR% > 3D_dilute luxR%", pred1);
 
     v.section("── S3: Solo receptor (eavesdropper) analysis ──");
 
-    let solos: Vec<_> = lineages.iter().filter(|l| l.cross_species_receptor && !l.luxi_paired).collect();
+    let solos: Vec<_> = lineages
+        .iter()
+        .filter(|l| l.cross_species_receptor && !l.luxi_paired)
+        .collect();
     let paired: Vec<_> = lineages.iter().filter(|l| l.luxi_paired).collect();
 
     println!("  LuxR-only 'solo' receptors (eavesdroppers):");
@@ -206,10 +256,18 @@ fn main() {
         println!("    • {} ({}) — {}", p.representative, p.clade, p.notes);
     }
     println!();
-    println!("  Solo receptors: {} / {} total ({:.0}%)",
-        solos.len(), n, solos.len() as f64 / n as f64 * 100.0);
-    println!("  Paired systems: {} / {} total ({:.0}%)",
-        paired.len(), n, paired.len() as f64 / n as f64 * 100.0);
+    println!(
+        "  Solo receptors: {} / {} total ({:.0}%)",
+        solos.len(),
+        n,
+        solos.len() as f64 / n as f64 * 100.0
+    );
+    println!(
+        "  Paired systems: {} / {} total ({:.0}%)",
+        paired.len(),
+        n,
+        paired.len() as f64 / n as f64 * 100.0
+    );
 
     v.check_pass("solo receptors identified in 3D habitats", solos.len() >= 2);
 

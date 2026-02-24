@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Validate feature extraction pipeline against asari MT02 baseline (Exp009).
+//! Validate feature extraction pipeline against `asari` MT02 baseline (Exp009).
 //!
 //! # Provenance
 //!
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | asari 1.13.1 |
-//! | Baseline version | asari 1.13.1 |
+//! | Baseline tool | `asari` 1.13.1 |
+//! | Baseline version | `asari` 1.13.1 |
 //! | Baseline file | `experiments/results/005_asari/preferred_Feature_table.tsv` (Exp009) |
 //! | Baseline date | 2026-02-19 |
 //! | Exact command | `cargo run --bin validate_features` |
@@ -20,11 +20,11 @@
 //!
 //! # Acceptance criteria (from Exp009)
 //!
-//! 1. Mass track count within 2× of asari `parent_masstrack_id` range
-//! 2. Feature count in thousands (same order of magnitude as asari 5,951)
-//! 3. m/z range covers asari's range (83–999)
-//! 4. RT range covers asari's RT range
-//! 5. At least 30% of asari features matched by m/z (5 ppm) + RT (50 sec)
+//! 1. Mass track count within 2× of `asari` `parent_masstrack_id` range
+//! 2. Feature count in thousands (same order of magnitude as `asari` 5,951)
+//! 3. m/z range covers `asari`'s range (83–999)
+//! 4. RT range covers `asari`'s RT range
+//! 5. At least 30% of `asari` features matched by m/z (5 ppm) + RT (50 sec)
 //!
 //! # What this validates
 //!

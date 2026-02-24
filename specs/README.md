@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 23, 2026
-**Status**: Phase 38 — 1,476 CPU + 702 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 56 ODE parity + 24 MF-v6 + 72 streaming-v2 + 25 spectral + 59 NPU reservoir + 9 cross-spring evolution + 146 NCBI-scale + 50 3D-Anderson + 50 geometry + 35 why-analysis + 36 extension-papers = 2,990+/2,990+ checks, ALL PASS (750 tests, 149 experiments)
+**Status**: Phase 38 — 1,476 CPU + 702 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 56 ODE parity + 24 MF-v6 + 72 streaming-v2 + 25 spectral + 59 NPU reservoir + 9 cross-spring evolution + 146 NCBI-scale + 50 3D-Anderson + 50 geometry + 35 why-analysis + 36 extension-papers = 3,028+/3,028+ checks, ALL PASS (759 tests, 149 experiments)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -10,7 +10,7 @@
 
 | Metric | Value |
 |--------|-------|
-| CPU validation | 1,476/1,476 PASS — 41 modules, 138 experiments (GPU-confirmed Phase 36c), 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
+| CPU validation | 1,476/1,476 PASS — 45 modules, 149 experiments (GPU-confirmed Phase 36c), 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
 | GPU validation | 702/702 PASS — 30 ToadStool primitives, 5 local WGSL, 80 streaming + 48 head-to-head + 28 metalForge v4 + 38 pure GPU |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 380/380 — 22.5x Rust speedup over Python (v1–v8) |
@@ -18,7 +18,7 @@
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip (Exp090/091) |
 | metalForge cross-system | 37 domains CPU↔GPU (Exp103+104) + dispatch (Exp080) + pipeline (Exp086) + PCIe (Exp088) |
 | Cross-spring spectral | 25 checks — Anderson localization + QS-disorder analogy (Exp107) |
-| Rust modules | 41 CPU + 42 GPU, 750 tests (~97% bio+io coverage) |
+| Rust modules | 45 CPU + 42 GPU, 759 tests (~97% bio+io coverage) |
 | Write phase | 5 local WGSL ODE shaders (phage_defense, bistable, multi_signal, cooperation, capacitor) |
 | Dependencies | 1 runtime (flate2), everything else sovereign |
 | Paper queue | **ALL DONE** — 29/29 reproducible papers complete (Track 1c added) |
@@ -26,7 +26,7 @@
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
 | Faculty (Track 1c) | R. Anderson (Carleton) — deep-sea metagenomics, population genomics |
 | Faculty (Track 2) | Jones (BMB/Chemistry, MSU) — PFAS mass spectrometry |
-| Handoffs | Seventeen delivered (v1–v6, rewire, cross-spring, v7–v21) |
+| Handoffs | Twenty-two delivered (v1–v6, rewire, cross-spring, v7–v22) |
 
 ---
 
@@ -36,7 +36,7 @@ Every paper in the queue goes through the full evolution path. Status:
 
 | Stage | What It Proves | Status |
 |-------|---------------|--------|
-| **Python baseline** | Algorithm correctness against published tools | 40 scripts, all reproducible |
+| **Python baseline** | Algorithm correctness against published tools | 41 scripts, all reproducible |
 | **BarraCuda CPU** | Pure Rust math matches Python | 1,476 checks, 380/380 cross-domain parity (v1–v8) |
 | **BarraCuda GPU** | GPU produces same answer as CPU | 702 checks, 29 GPU domains |
 | **Pure GPU streaming** | Zero CPU round-trips, data stays on-device | 152 checks, 10+ domains, 441-837× over round-trip (Exp090/105/106) |
@@ -110,10 +110,10 @@ generic ODE primitive.
 
 | Document | Location | Description |
 |----------|----------|-------------|
-| CONTROL_EXPERIMENT_STATUS.md | `../` | 130 experiments, 2,869+ validation checks |
+| CONTROL_EXPERIMENT_STATUS.md | `../` | 149 experiments, 3,028+ validation checks |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
-| Handoff (v20) | `../wateringHole/handoffs/WETSPRING_V020_3D_ANDERSON_DIMENSIONAL_QS_FEB23_2026.md` | Current ToadStool handoff |
+| Handoff (v22) | `../wateringHole/handoffs/WETSPRING_V022_EXTENSION_PAPERS_FEB23_2026.md` | Current ToadStool handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |
@@ -129,7 +129,7 @@ generic ODE primitive.
 - **Microbial ecology** — Alpha/beta diversity, PCoA, rarefaction
 - **Deep-sea metagenomics** — ANI, SNP, dN/dS, molecular clock, pangenomics
 - **ML inference** — Decision tree, Random Forest, GBM (all sovereign, no Python)
-- **Sovereign Rust bioinformatics** — 41 CPU + 42 GPU modules, 1 runtime dependency
+- **Sovereign Rust bioinformatics** — 45 CPU + 42 GPU modules, 1 runtime dependency
 
 ### wetSpring IS NOT:
 - Sensor noise analysis (groundSpring)
@@ -157,7 +157,7 @@ generic ODE primitive.
 `../whitePaper/STUDY.md` → `../CONTROL_EXPERIMENT_STATUS.md` → `../barracuda/EVOLUTION_READINESS.md` → BARRACUDA_REQUIREMENTS.md
 
 **Integration partner**:
-`../wateringHole/handoffs/WETSPRING_V018_CROSS_SPRING_REWIRE_HANDOFF_FEB23_2026.md` → `../BENCHMARK_RESULTS.md`
+`../wateringHole/handoffs/WETSPRING_V022_EXTENSION_PAPERS_FEB23_2026.md` → `../BENCHMARK_RESULTS.md`
 
 ---
 

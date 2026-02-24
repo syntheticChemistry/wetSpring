@@ -121,7 +121,7 @@ impl Trajectory {
     /// Final time.
     #[must_use]
     pub fn final_time(&self) -> f64 {
-        self.times.last().copied().unwrap_or(0.0)
+        self.times.last().map_or(0.0, |x| *x)
     }
 
     /// Number of events (transitions).

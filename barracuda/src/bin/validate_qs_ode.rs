@@ -2,7 +2,7 @@
 //! Validation binary: Waters 2008 QS/c-di-GMP ODE model (Exp020).
 //!
 //! Runs 4 biological scenarios through the Rust RK4 integrator and compares
-//! steady-state values against the Python/scipy baseline.
+//! steady-state values against the Python/`scipy` baseline.
 //!
 //! # Provenance
 //!
@@ -12,7 +12,7 @@
 //! | Baseline script | `scripts/waters2008_qs_ode.py` |
 //! | Baseline output | `experiments/results/qs_ode_baseline/qs_ode_python_baseline.json` |
 //! | Python version | 3.10.12 |
-//! | scipy integrator | `odeint` (LSODA: adaptive BDF/Adams) |
+//! | `scipy` integrator | `odeint` (LSODA: adaptive BDF/Adams) |
 //! | Rust integrator | RK4 fixed-step (dt = 0.001 h) |
 //! | References | Waters 2008 J Bacteriol 190:2527-36; Massie 2012 PNAS 109:12746-51 |
 //! | Date | 2026-02-19 |

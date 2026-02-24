@@ -11,7 +11,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | scipy, numpy, pure Python (`srivastava2011_multi_signal`, `hsueh2022_phage_defense`, `wang2021_rawr_bootstrap`, `alamin2024_placement`, spectral/diversity/decision-tree refs) |
+//! | Baseline tool | `scipy`, `numpy`, pure Python (`srivastava2011_multi_signal`, `hsueh2022_phage_defense`, `wang2021_rawr_bootstrap`, `alamin2024_placement`, spectral/diversity/decision-tree refs) |
 //! | Baseline version | Feb 2026 |
 //! | Baseline command | `python3 scripts/benchmark_rust_vs_python.py` (18-domain coverage) |
 //! | Baseline date | 2026-02-19 |

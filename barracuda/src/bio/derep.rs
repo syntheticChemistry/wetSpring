@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Dereplication — unique sequence collapsing with abundance tracking.
 //!
-//! Replaces VSEARCH `--derep_fulllength` / QIIME2 `dereplicate-sequences`
+//! Replaces VSEARCH `--derep_fulllength` / `QIIME2` `dereplicate-sequences`
 //! in the 16S amplicon pipeline. Each unique sequence is kept once with
 //! a count of its occurrences and the highest-quality representative.
 //!

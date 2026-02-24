@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** February 23, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 38 — Extension papers: cold seep 299K QS genes, luxR phylogeny geometry, mechanical wave Anderson, wave-localization synthesis, burst statistics reinterpretation; 750 tests, 149 experiments, 3,028+ checks, 138 binaries
+**Status:** Phase 38 — Extension papers: cold seep 299K QS genes, luxR phylogeny geometry, mechanical wave Anderson, wave-localization synthesis, burst statistics reinterpretation; 759 tests, 149 experiments, 3,028+ checks, 138 binaries
 
 ---
 
@@ -108,15 +108,15 @@ integration point.
 | Geometry verification + cross-ecosystem | 50 (finite-size scaling, geometry zoo, cave/spring/rhizosphere, 28×5 atlas) |
 | Why analysis: mapping, scaling, dilution, eukaryote | 35 (mapping sensitivity, square-cubed law, planktonic fluid 3D, cross-domain QS) |
 | Extension papers: cold seep, phylogeny, waves | 36 (cold seep 299K catalog, geometry overlay, luxR phylogeny, mechanical waves, wave-localization, burst statistics) |
-| **Total validation checks** | **2,990+** |
-| Rust library unit tests | 676 + 60 integration + 14 doc |
-| **Total Rust tests** | **750** |
-| Experiments completed | 140 |
-| Validation/benchmark binaries | 119 validate + 10 benchmark = 129 total |
-| CPU bio modules | 41 |
+| **Total validation checks** | **3,028+** |
+| Rust library unit tests | 680 lib + 79 integration/doc |
+| **Total Rust tests** | **759** |
+| Experiments completed | 149 |
+| Validation/benchmark binaries | 128 validate + 10 benchmark = 138 total |
+| CPU bio modules | 45 |
 | GPU bio modules | 42 (27 lean + 5 write + 7 compose + 3 passthrough) |
 | Tier B (needs refactor) | 0 (all promoted) |
-| Python baselines | 40 scripts |
+| Python baselines | 41 scripts |
 | BarraCuda CPU parity | 380/380 (v1-v8: 25 domains + 6 ODE flat + 13 promoted) |
 | BarraCuda GPU parity | 29 domains (16 absorbed + 5 local ODE + 7 compose + 1 passthrough) |
 | metalForge cross-system | 37 domains CPU↔GPU (Exp103+104), **25/25 papers three-tier** |
@@ -124,7 +124,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | ToadStool primitives consumed | **31** (absorbed, Lean — aligned to ToadStool S42) |
 | Local WGSL shaders | **5** (Write phase — ODE domains pending absorption) |
-All 2,990+ validation checks **PASS**. All 750 tests **PASS**.
+All 3,028+ validation checks **PASS**. All 759 tests **PASS**.
 
 ### GPU Performance
 
@@ -264,6 +264,34 @@ Proving the full ToadStool dispatch model and multi-substrate routing:
   binding layouts, dispatch geometry, NVVM driver profile bug, CPU math extraction plan,
   and streaming pipeline findings. See `wateringHole/handoffs/` for current handoffs.
 
+### Phase 19: Absorption Engineering + Debt Resolution
+
+Deep codebase evolution following hotSpring's absorption patterns:
+
+- **`crate::special` extraction** — sovereign math (`erf`, `ln_gamma`,
+  `regularized_gamma_lower`, `normal_cdf`) promoted from `bio::special` to
+  top-level module, first step toward upstream `barracuda::math` feature
+- **GPU workgroup constants** — all 9 `*_gpu.rs` modules use named
+  `WORKGROUP_SIZE` constants linked to their WGSL shader counterparts
+- **Hardware abstraction** — `HardwareInventory::from_content()` makes
+  `/proc` reads injectable; `parse_peak_rss_mb()` for testable RSS parsing
+- **Absorption batch APIs** — `snp::call_snps_batch`,
+  `quality::filter_reads_flat` + `QualityGpuParams` with `#[repr(C)]`,
+  `pangenome::analyze_batch` — closing PRIMITIVE_MAP absorption gaps
+- **Zero-copy I/O** — `FastqRefRecord` for borrowed iteration, `DecodeBuffer`
+  reuse in mzML, streaming iterators throughout
+- **Determinism suite** — 16 bitwise-exact tests across non-stochastic
+  algorithms using `f64::to_bits()`
+- **Fuzz harnesses** — 4 `cargo-fuzz` targets (FASTQ, mzML, MS2, XML)
+- **Doc strictness** — `-D missing_docs -D rustdoc::broken_intra_doc_links`
+  passes on both default and `gpu` features
+- **metalForge bridge** — `bridge.rs` connecting forge discovery to barracuda
+  device creation (following hotSpring's forge↔barracuda pattern)
+- **ABSORPTION_MANIFEST.md** — tracking absorbed/ready/local modules
+  (following hotSpring's manifest pattern)
+- **Coverage**: 96.21% overall (up from 55%), 740 tests (up from 650),
+  39 named tolerances (up from 32)
+
 ### Phase 20: ToadStool Bio Rewire + Cross-Spring Evolution
 
 ToadStool sessions 31d/31g absorbed all 8 wetSpring bio WGSL shaders.
@@ -328,6 +356,47 @@ ToadStool's unidirectional streaming — zero CPU round-trips between stages:
   SpatialPayoff, BatchFitness, LocusVariance) now consumed by wetSpring.
 - **Exp095: Cross-Spring Scaling Benchmark** — 7 benchmarks across 5
   neuralSpring primitives at realistic problem sizes (6.5×–277× GPU speedup).
+
+### Phase 23: Structural Evolution — Flat Layouts, DRY Models, Zero-Clone APIs
+
+Deep two-pass evolution of the barracuda codebase (Exp097):
+
+- **ODE trajectory flattened** — `OdeResult.y: Vec<Vec<f64>>` → flat `Vec<f64>` with
+  `n_vars`, `state_at()`, `states()`, `var_at()` accessors. Per-step `.clone()` eliminated
+  via `extend_from_slice()`. Affects all 6 ODE modules + 6 validation binaries.
+- **Gillespie trajectory flattened** — `Trajectory.states: Vec<Vec<i64>>` → flat `Vec<i64>`
+  with `n_species`, `state_at()`, `states_iter()`. Same clone elimination pattern.
+- **DADA2 error model unified** — `init_error_model`, `estimate_error_model`,
+  `err_model_converged`, `base_to_idx`, and 5 constants shared from `dada2.rs` as
+  `pub(crate)`. GPU module delegates instead of duplicating. Single source of truth.
+- **UniFrac distance matrix condensed** — Returns `UnifracDistanceMatrix` with condensed
+  upper-triangle `Vec<f64>` instead of `Vec<Vec<f64>>` N×N. Halves memory, aligns
+  directly with `pcoa()` condensed input format.
+- **Adapter trim zero-clone** — `trim_adapter_3prime` returns `Option<FastqRecord>` instead
+  of `(FastqRecord, bool)`, eliminating the common-path clone.
+- **PCoA coordinates flat** — `PcoaResult.coordinates: Vec<Vec<f64>>` → flat with accessors.
+- **Capability-based ODE polyfill** — `dev.needs_f64_exp_log_workaround()` replaces
+  hardcoded `true`.
+- **Full audit clean** — Zero unsafe, zero TODO/FIXME, zero cross-primal coupling,
+  zero `unimplemented!()`, zero production mocks.
+
+728 tests pass. 48/48 CPU-GPU domain parity. 39/39 cross-spring evolution.
+
+### Phase 24: Edition 2024 + Structural Audit
+
+Deep quality audit and evolution (Rust edition 2024, MSRV 1.85):
+
+- **Rust edition 2024** — migrated from 2021, all import/formatting rules applied
+- **`forbid(unsafe_code)` → `deny(unsafe_code)`** — Rust 2024 makes `std::env::set_var`
+  unsafe; `#[allow(unsafe_code)]` confined to test-only env-var manipulation with SAFETY docs
+- **CI hardened** — `RUSTDOCFLAGS="-D warnings"`, `clippy -D pedantic -D nursery`,
+  `cargo check --features json` added to workflow
+- **`bio::special` shim removed** — migration to `crate::special` complete, zero consumers
+- **New clippy lints resolved** — `f64::midpoint()`, `usize::midpoint()`, `const fn` promotions
+- **Python baseline provenance** — all 34 scripts now carry `# Date:` headers (git creation date)
+- **Coverage verified** — `cargo-llvm-cov` confirms bio+io modules avg ~97% line coverage;
+  new tests for taxonomy classifier accessors (`taxon_priors`, `n_kmers_total`)
+- **740 tests pass** (666 lib + 74 integration/doc). Zero clippy, fmt, doc warnings.
 
 ### Phase 27: Local WGSL ODE Write Phase + metalForge v4
 
@@ -451,7 +520,7 @@ Complete rewiring to modern ToadStool S42 BarraCuda APIs:
 
 **750 tests** | **2,673+ checks** | **109 binaries**
 
-### Phase 35: NCBI-Scale Hypothesis Testing (Exp121-126) — Current
+### Phase 35: NCBI-Scale Hypothesis Testing (Exp121-126)
 
 GPU-confirmed results on real NCBI data (146 checks, all PASS):
 
@@ -465,7 +534,7 @@ GPU-confirmed results on real NCBI data (146 checks, all PASS):
 - **Exp126** (90/90 GPU): 28-biome global QS atlas — W monotonic with J, all biomes
   correctly placed in Anderson disorder-space
 
-### Phase 36: 3D Anderson Dimensional QS Phase Diagram (Exp127-130) — Current
+### Phase 36: 3D Anderson Dimensional QS Phase Diagram (Exp127-130)
 
 GPU-confirmed 3D Anderson extension using hotSpring spectral primitives (50 checks, all PASS):
 
@@ -539,75 +608,6 @@ Extending the Anderson-QS framework using 5 key papers from the literature revie
   findings ARE Anderson localization. "Localized QS" = localized state. "Synchronized QS"
   = extended state. Novel prediction: compute ⟨r⟩ from real cell coordinates.
 
-### Phase 23: Structural Evolution — Flat Layouts, DRY Models, Zero-Clone APIs
-
-Deep two-pass evolution of the barracuda codebase (Exp097):
-
-- **ODE trajectory flattened** — `OdeResult.y: Vec<Vec<f64>>` → flat `Vec<f64>` with
-  `n_vars`, `state_at()`, `states()`, `var_at()` accessors. Per-step `.clone()` eliminated
-  via `extend_from_slice()`. Affects all 6 ODE modules + 6 validation binaries.
-- **Gillespie trajectory flattened** — `Trajectory.states: Vec<Vec<i64>>` → flat `Vec<i64>`
-  with `n_species`, `state_at()`, `states_iter()`. Same clone elimination pattern.
-- **DADA2 error model unified** — `init_error_model`, `estimate_error_model`,
-  `err_model_converged`, `base_to_idx`, and 5 constants shared from `dada2.rs` as
-  `pub(crate)`. GPU module delegates instead of duplicating. Single source of truth.
-- **UniFrac distance matrix condensed** — Returns `UnifracDistanceMatrix` with condensed
-  upper-triangle `Vec<f64>` instead of `Vec<Vec<f64>>` N×N. Halves memory, aligns
-  directly with `pcoa()` condensed input format.
-- **Adapter trim zero-clone** — `trim_adapter_3prime` returns `Option<FastqRecord>` instead
-  of `(FastqRecord, bool)`, eliminating the common-path clone.
-- **PCoA coordinates flat** — `PcoaResult.coordinates: Vec<Vec<f64>>` → flat with accessors.
-- **Capability-based ODE polyfill** — `dev.needs_f64_exp_log_workaround()` replaces
-  hardcoded `true`.
-- **Full audit clean** — Zero unsafe, zero TODO/FIXME, zero cross-primal coupling,
-  zero `unimplemented!()`, zero production mocks.
-
-728 tests pass. 48/48 CPU-GPU domain parity. 39/39 cross-spring evolution.
-
-### Phase 24: Edition 2024 + Structural Audit
-
-Deep quality audit and evolution (Rust edition 2024, MSRV 1.85):
-
-- **Rust edition 2024** — migrated from 2021, all import/formatting rules applied
-- **`forbid(unsafe_code)` → `deny(unsafe_code)`** — Rust 2024 makes `std::env::set_var`
-  unsafe; `#[allow(unsafe_code)]` confined to test-only env-var manipulation with SAFETY docs
-- **CI hardened** — `RUSTDOCFLAGS="-D warnings"`, `clippy -D pedantic -D nursery`,
-  `cargo check --features json` added to workflow
-- **`bio::special` shim removed** — migration to `crate::special` complete, zero consumers
-- **New clippy lints resolved** — `f64::midpoint()`, `usize::midpoint()`, `const fn` promotions
-- **Python baseline provenance** — all 34 scripts now carry `# Date:` headers (git creation date)
-- **Coverage verified** — `cargo-llvm-cov` confirms bio+io modules avg ~97% line coverage;
-  new tests for taxonomy classifier accessors (`taxon_priors`, `n_kmers_total`)
-- **740 tests pass** (666 lib + 74 integration/doc). Zero clippy, fmt, doc warnings.
-
-### Phase 19: Absorption Engineering + Debt Resolution
-
-Deep codebase evolution following hotSpring's absorption patterns:
-
-- **`crate::special` extraction** — sovereign math (`erf`, `ln_gamma`,
-  `regularized_gamma_lower`, `normal_cdf`) promoted from `bio::special` to
-  top-level module, first step toward upstream `barracuda::math` feature
-- **GPU workgroup constants** — all 9 `*_gpu.rs` modules use named
-  `WORKGROUP_SIZE` constants linked to their WGSL shader counterparts
-- **Hardware abstraction** — `HardwareInventory::from_content()` makes
-  `/proc` reads injectable; `parse_peak_rss_mb()` for testable RSS parsing
-- **Absorption batch APIs** — `snp::call_snps_batch`,
-  `quality::filter_reads_flat` + `QualityGpuParams` with `#[repr(C)]`,
-  `pangenome::analyze_batch` — closing PRIMITIVE_MAP absorption gaps
-- **Zero-copy I/O** — `FastqRefRecord` for borrowed iteration, `DecodeBuffer`
-  reuse in mzML, streaming iterators throughout
-- **Determinism suite** — 16 bitwise-exact tests across non-stochastic
-  algorithms using `f64::to_bits()`
-- **Fuzz harnesses** — 4 `cargo-fuzz` targets (FASTQ, mzML, MS2, XML)
-- **Doc strictness** — `-D missing_docs -D rustdoc::broken_intra_doc_links`
-  passes on both default and `gpu` features
-- **metalForge bridge** — `bridge.rs` connecting forge discovery to barracuda
-  device creation (following hotSpring's forge↔barracuda pattern)
-- **ABSORPTION_MANIFEST.md** — tracking absorbed/ready/local modules
-  (following hotSpring's manifest pattern)
-- **Coverage**: 96.21% overall (up from 55%), 740 tests (up from 650),
-  39 named tolerances (up from 32)
-
 ---
 
 ## Code Quality
@@ -625,17 +625,18 @@ Deep codebase evolution following hotSpring's absorption patterns:
 | SPDX-License-Identifier | All `.rs` files |
 | Max file size | All under 1000 LOC |
 | External C dependencies | **0** (`flate2` uses `rust_backend`) |
-| Named tolerance constants | 43 (scientifically justified, hierarchy-tested) |
-| Provenance headers | All 115 validation/benchmark binaries |
+| Named tolerance constants | 53 (scientifically justified, hierarchy-tested) |
+| Provenance headers | All 138 validation/benchmark binaries |
 
 ---
 
 ## Module Inventory
 
-### CPU Bio Modules (41)
+### CPU Bio Modules (45)
 
 | Module | Algorithm | Validated Against |
 |--------|-----------|-------------------|
+| `adapter` | Adapter detection + 3' trimming | Trimmomatic/Cutadapt |
 | `alignment` | Smith-Waterman local alignment (affine gaps) | Pure Python SW |
 | `ani` | Average Nucleotide Identity (pairwise + matrix) | Pure Python ANI |
 | `bistable` | Fernandez 2020 bistable phenotypic switching | scipy ODE bifurcation |
@@ -649,6 +650,7 @@ Deep codebase evolution following hotSpring's absorption patterns:
 | `diversity` | Shannon, Simpson, Chao1, Bray-Curtis, Pielou, rarefaction | QIIME2 diversity |
 | `dnds` | Nei-Gojobori 1986 pairwise dN/dS | Pure Python + Jukes-Cantor |
 | `eic` | EIC/XIC extraction + peak integration | asari 1.13.1 |
+| `esn` | Echo State Network reservoir computing (NPU int8) | Pure Python ESN |
 | `feature_table` | Asari-style LC-MS feature extraction | asari 1.13.1 |
 | `felsenstein` | Felsenstein pruning phylogenetic likelihood | Pure Python JC69 |
 | `gbm` | Gradient Boosting Machine inference (binary + multi-class) | sklearn GBM specification |
@@ -659,6 +661,7 @@ Deep codebase evolution following hotSpring's absorption patterns:
 | `merge_pairs` | Paired-end overlap merging | VSEARCH --fastq_mergepairs |
 | `molecular_clock` | Strict/relaxed clock, calibration, CV | Pure Python clock |
 | `multi_signal` | Srivastava 2011 multi-input QS network | scipy ODE baseline |
+| `ncbi_data` | NCBI assembly data loading (Phase 35 experiments) | NCBI Entrez |
 | `neighbor_joining` | Neighbor-Joining tree construction (Saitou & Nei 1987) | Pure Python NJ |
 | `ode` | Generic RK4 ODE integrator | scipy.integrate.odeint |
 | `pangenome` | Gene clustering, Heap's law, enrichment, BH FDR | Pure Python pangenome |
@@ -677,6 +680,7 @@ Deep codebase evolution following hotSpring's absorption patterns:
 | `taxonomy` | Naive Bayes classifier (RDP-style) | QIIME2 classify-sklearn |
 | `tolerance_search` | ppm/Da m/z search | FindPFAS |
 | `unifrac` | Unweighted/weighted UniFrac + Newick parser | QIIME2 diversity |
+| `validation_helpers` | SILVA reference loading + streaming FASTA/TSV | SILVA 138.1 NR99 |
 
 ### GPU Modules (42)
 
@@ -710,24 +714,25 @@ Deep codebase evolution following hotSpring's absorption patterns:
 wetSpring/
 ├── README.md                      ← this file
 ├── BENCHMARK_RESULTS.md           ← three-tier benchmark results
-├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (126 experiments)
+├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (149 experiments)
 ├── barracuda/                     ← Rust crate (src/, Cargo.toml, rustfmt.toml)
 │   ├── EVOLUTION_READINESS.md    ← absorption map (tiers, primitives, shaders)
 │   ├── ABSORPTION_MANIFEST.md    ← what's absorbed, local, planned (hotSpring pattern)
 │   ├── src/
 │   │   ├── lib.rs               ← crate root (pedantic + nursery lints enforced)
 │   │   ├── special.rs           ← sovereign math (erf, ln_gamma, regularized_gamma)
-│   │   ├── tolerances.rs        ← 43 named tolerance constants
+│   │   ├── tolerances.rs        ← 53 named tolerance constants
 │   │   ├── validation.rs        ← hotSpring validation framework
+│   │   ├── ncbi.rs              ← NCBI Entrez helpers (API key, HTTP, E-search)
 │   │   ├── encoding.rs          ← sovereign base64 (zero dependencies)
 │   │   ├── error.rs             ← error types (no external crates)
-│   │   ├── bio/                 ← 41 CPU + 42 GPU bio modules
+│   │   ├── bio/                 ← 45 CPU + 42 GPU bio modules
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML)
 │   │   ├── bench/               ← benchmark harness + power monitoring
-│   │   ├── bin/                 ← 115 validation/benchmark binaries
+│   │   ├── bin/                 ← 138 validation/benchmark binaries
 │   │   └── shaders/             ← 5 local WGSL ODE shaders (Write phase)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024
-├── experiments/                   ← 120 experiment protocols + results
+├── experiments/                   ← 149 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
 │   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs, bridge.rs
@@ -741,7 +746,7 @@ wetSpring/
 ├── ../wateringHole/handoffs/      ← inter-primal ToadStool handoffs (shared)
 ├── archive/
 │   └── handoffs/                  ← fossil record of ToadStool handoffs (v1–v5)
-├── scripts/                       ← Python baselines (40 scripts)
+├── scripts/                       ← Python baselines (41 scripts)
 ├── specs/                         ← specifications and paper queue
 ├── whitePaper/                    ← validation study draft
 └── data/                          ← local datasets (not committed)
@@ -754,7 +759,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (750: 676 lib + 60 integration + 14 doc)
+# Run all tests (759: 680 lib + 79 integration/doc)
 cargo test
 
 # Code quality checks
@@ -811,8 +816,10 @@ All validation data comes from public repositories:
 - **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
 - **ToadStool** — GPU compute engine (BarraCuda crate, 612 WGSL shaders, shared primitives)
 - **wateringHole** — Spring-local handoffs to ToadStool
-  - `handoffs/WETSPRING_V020_3D_ANDERSON_DIMENSIONAL_QS_FEB23_2026.md` — **current** (Phase 36, 3D Anderson, 130 experiments, GPU-confirmed)
-  - `handoffs/WETSPRING_V019_NCBI_HYPOTHESIS_TESTING_FEB23_2026.md` — Phase 35, NCBI-scale, 126 experiments, GPU-confirmed
+  - `handoffs/WETSPRING_V022_EXTENSION_PAPERS_FEB23_2026.md` — **current** (Phase 38, extension papers, 149 experiments, 3,028+ checks)
+  - `handoffs/WETSPRING_V021_WHY_ANALYSIS_FEB23_2026.md` — Phase 36c, why analysis, 138 experiments
+  - `handoffs/WETSPRING_V020_3D_ANDERSON_DIMENSIONAL_QS_FEB23_2026.md` — Phase 36, 3D Anderson, 130 experiments
+  - `handoffs/WETSPRING_V019_NCBI_HYPOTHESIS_TESTING_FEB23_2026.md` — Phase 35, NCBI-scale, 126 experiments
   - `handoffs/WETSPRING_V018_CROSS_SPRING_REWIRE_HANDOFF_FEB23_2026.md` — Phase 34, full rewire, 120 experiments
   - `handoffs/WETSPRING_TOADSTOOL_V17_NPU_RESERVOIR_FEB23_2026.md` — NPU reservoir, NCBI-scale, PCoA fix
   - `handoffs/WETSPRING_TOADSTOOL_V16_STREAMING_FEB23_2026.md` — streaming v2, metalForge v6

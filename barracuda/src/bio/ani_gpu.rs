@@ -11,8 +11,8 @@
 //! L, dispatch N threads. No transcendentals needed (integer counting
 //! + one f64 division), so no polyfill required.
 
-use barracuda::device::WgpuDevice;
 use barracuda::AniBatchF64;
+use barracuda::device::WgpuDevice;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 

@@ -11,8 +11,8 @@
 //! full Nei-Gojobori analysis for one pair. Requires `log()` for
 //! Jukes-Cantor — `ToadStool` handles polyfill on NVVM drivers.
 
-use barracuda::device::WgpuDevice;
 use barracuda::DnDsBatchF64;
+use barracuda::device::WgpuDevice;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 

@@ -1,0 +1,368 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//! Sovereign FASTQ parser — zero external parsing dependencies.
+//!
+//! Streams records from disk via [`BufReader`]. Handles both plain and
+//! gzip-compressed files (`.gz` extension, via `flate2::read::GzDecoder`).
+//!
+//! # Format (standard 4-line FASTQ)
+//!
+//! ```text
+//! @identifier description
+//! SEQUENCE
+//! +
+//! QUALITY (Phred33 ASCII)
+//! ```
+//!
+//! [`parse_fastq`] collects all records for multi-pass analysis (k-mer
+//! counting, diversity). For single-pass statistics on large files,
+//! prefer [`stats_from_file`] which processes lines in-place and never
+//! allocates per-record storage.
+
+mod stats;
+#[cfg(test)]
+mod tests;
+
+pub use stats::{compute_stats, stats_from_file};
+
+use crate::error::{Error, Result};
+use std::collections::HashMap;
+use std::fs::File;
+use std::io::{BufRead, BufReader};
+use std::path::Path;
+
+/// Summary statistics from parsing a FASTQ file.
+#[derive(Debug, Clone)]
+pub struct FastqStats {
+    /// Total number of sequences.
+    pub num_sequences: usize,
+    /// Total number of bases.
+    pub total_bases: u64,
+    /// Minimum sequence length.
+    pub min_length: usize,
+    /// Maximum sequence length.
+    pub max_length: usize,
+    /// Mean sequence length.
+    pub mean_length: f64,
+    /// Mean Phred quality score (Phred33).
+    pub mean_quality: f64,
+    /// GC content as fraction \[0, 1\].
+    pub gc_content: f64,
+    /// Number of sequences with mean Q >= 30.
+    pub q30_count: usize,
+    /// Length distribution: length -> count.
+    pub length_distribution: HashMap<usize, usize>,
+}
+
+/// Borrowed FASTQ record — references data in the parser's internal buffer.
+///
+/// Avoids allocation for high-throughput single-pass processing. The references
+/// are only valid during the callback invocation in [`for_each_record`].
+#[derive(Debug, Clone, Copy)]
+pub struct FastqRefRecord<'a> {
+    /// Record identifier (first word after `@`).
+    pub id: &'a str,
+    /// Nucleotide sequence.
+    pub sequence: &'a [u8],
+    /// Phred33 quality scores (raw ASCII bytes).
+    pub quality: &'a [u8],
+}
+
+/// A parsed FASTQ record with owned data.
+#[derive(Debug, Clone)]
+pub struct FastqRecord {
+    /// Record identifier.
+    pub id: String,
+    /// Nucleotide sequence.
+    pub sequence: Vec<u8>,
+    /// Phred33 quality scores (raw ASCII bytes).
+    pub quality: Vec<u8>,
+}
+
+// ── Internal helpers ─────────────────────────────────────────────
+
+/// Open a FASTQ file for buffered reading.
+///
+/// Detects gzip compression from the `.gz` file extension and
+/// wraps the stream with [`flate2::read::GzDecoder`] when needed.
+pub(crate) fn open_reader(path: &Path) -> Result<Box<dyn BufRead>> {
+    let file = File::open(path).map_err(|e| Error::Io {
+        path: path.to_path_buf(),
+        source: e,
+    })?;
+    let ext = path
+        .extension()
+        .and_then(std::ffi::OsStr::to_str)
+        .unwrap_or("");
+    if ext.eq_ignore_ascii_case("gz") {
+        let decoder = flate2::read::GzDecoder::new(file);
+        Ok(Box::new(BufReader::new(decoder)))
+    } else {
+        Ok(Box::new(BufReader::new(file)))
+    }
+}
+
+/// Read one line into `buf`, returning bytes read.  Wraps I/O errors
+/// with path context.
+pub(crate) fn read_line(reader: &mut dyn BufRead, buf: &mut String, path: &Path) -> Result<usize> {
+    reader.read_line(buf).map_err(|e| Error::Io {
+        path: path.to_path_buf(),
+        source: e,
+    })
+}
+
+/// Return an error for a malformed header line.
+pub(crate) fn header_error(buf: &str) -> Error {
+    let snippet = buf.trim_end();
+    let end = snippet.len().min(40);
+    let s = &snippet[..end];
+    Error::Fastq(format!("expected '@' header, got: {s}"))
+}
+
+/// Count the trimmed length of `buf` (excluding trailing `\n` / `\r`).
+pub(crate) fn trimmed_len(buf: &str) -> usize {
+    buf.trim_end().len()
+}
+
+// ── Public API ───────────────────────────────────────────────────
+
+/// Parse a FASTQ file and collect **all** records into memory.
+///
+/// Handles plain `.fastq` and gzip-compressed `.fastq.gz` files.
+///
+/// For large files, prefer [`FastqIter`] or [`for_each_record`] which
+/// stream records without buffering the entire file.
+///
+/// # Errors
+///
+/// Returns [`Error::Io`] if the file cannot be opened, or
+/// [`Error::Fastq`] if a record is malformed.
+pub fn parse_fastq(path: &Path) -> Result<Vec<FastqRecord>> {
+    let mut reader = open_reader(path)?;
+    let mut records = Vec::new();
+    let mut buf = String::new();
+
+    loop {
+        // Line 1: @identifier
+        buf.clear();
+        if read_line(reader.as_mut(), &mut buf, path)? == 0 {
+            break;
+        }
+        if buf.trim_end().is_empty() {
+            break;
+        }
+        if !buf.starts_with('@') {
+            return Err(header_error(&buf));
+        }
+        let id = buf.trim_end()[1..]
+            .split_whitespace()
+            .next()
+            .unwrap_or("")
+            .to_string();
+
+        // Line 2: sequence
+        buf.clear();
+        read_line(reader.as_mut(), &mut buf, path)?;
+        let sequence = buf.trim_end().as_bytes().to_vec();
+
+        // Line 3: + separator (consumed, not validated beyond presence)
+        buf.clear();
+        read_line(reader.as_mut(), &mut buf, path)?;
+
+        // Line 4: quality scores
+        buf.clear();
+        read_line(reader.as_mut(), &mut buf, path)?;
+        let quality = buf.trim_end().as_bytes().to_vec();
+
+        records.push(FastqRecord {
+            id,
+            sequence,
+            quality,
+        });
+    }
+
+    Ok(records)
+}
+
+/// Process each record without per-record allocation.
+///
+/// The callback receives borrowed slices into the parser's internal buffers.
+/// For single-pass processing (statistics, filtering), this avoids the
+/// per-record `Vec` allocation of [`FastqIter`].
+///
+/// # Errors
+///
+/// Returns [`Error::Io`] if the file cannot be opened, [`Error::Fastq`] if a
+/// record is malformed, or propagates the callback's [`Result`].
+///
+/// # Examples
+///
+/// ```
+/// use std::path::Path;
+/// use wetspring_barracuda::io::fastq::{for_each_record, FastqRefRecord};
+///
+/// # fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// let path = Path::new("reads.fastq");
+/// let mut count = 0_usize;
+/// for_each_record(path, |record: FastqRefRecord<'_>| {
+///     count += 1;
+///     Ok(())
+/// })?;
+/// # Ok(())
+/// # }
+/// ```
+pub fn for_each_record<F>(path: &Path, mut f: F) -> Result<()>
+where
+    F: FnMut(FastqRefRecord<'_>) -> Result<()>,
+{
+    let mut reader = open_reader(path)?;
+    let mut buf_header = String::new();
+    let mut buf_sequence = String::new();
+    let mut buf_sep = String::new();
+    let mut buf_quality = String::new();
+
+    loop {
+        buf_header.clear();
+        if read_line(reader.as_mut(), &mut buf_header, path)? == 0 {
+            break;
+        }
+        if buf_header.trim_end().is_empty() {
+            break;
+        }
+        if !buf_header.starts_with('@') {
+            return Err(header_error(&buf_header));
+        }
+        let id = buf_header.trim_end()[1..]
+            .split_whitespace()
+            .next()
+            .unwrap_or("");
+
+        buf_sequence.clear();
+        read_line(reader.as_mut(), &mut buf_sequence, path)?;
+
+        buf_sep.clear();
+        read_line(reader.as_mut(), &mut buf_sep, path)?;
+
+        buf_quality.clear();
+        read_line(reader.as_mut(), &mut buf_quality, path)?;
+
+        let record = FastqRefRecord {
+            id,
+            sequence: buf_sequence.trim_end().as_bytes(),
+            quality: buf_quality.trim_end().as_bytes(),
+        };
+        f(record)?;
+    }
+    Ok(())
+}
+
+/// Streaming FASTQ iterator — yields one record at a time without buffering.
+///
+/// For large files where you don't need all records in memory simultaneously.
+/// Handles both plain `.fastq` and gzip-compressed `.fastq.gz` files.
+///
+/// # Errors
+///
+/// The iterator yields `Result<FastqRecord>` — each item may fail with
+/// [`Error::Io`] or [`Error::Fastq`].
+///
+/// # Example
+///
+/// ```no_run
+/// use wetspring_barracuda::io::fastq;
+/// use std::path::Path;
+///
+/// let iter = fastq::FastqIter::open(Path::new("reads.fastq")).unwrap();
+/// for result in iter {
+///     let record = result.unwrap();
+///     // process record without buffering all reads
+/// }
+/// ```
+pub struct FastqIter {
+    reader: Box<dyn BufRead>,
+    path: std::path::PathBuf,
+    buf: String,
+    done: bool,
+}
+
+impl FastqIter {
+    /// Open a FASTQ file for streaming iteration.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Io`] if the file cannot be opened.
+    pub fn open(path: &Path) -> Result<Self> {
+        let reader = open_reader(path)?;
+        Ok(Self {
+            reader,
+            path: path.to_path_buf(),
+            buf: String::new(),
+            done: false,
+        })
+    }
+}
+
+impl Iterator for FastqIter {
+    type Item = Result<FastqRecord>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.done {
+            return None;
+        }
+
+        // Line 1: @identifier
+        self.buf.clear();
+        match read_line(self.reader.as_mut(), &mut self.buf, &self.path) {
+            Ok(0) => {
+                self.done = true;
+                return None;
+            }
+            Ok(_) => {}
+            Err(e) => {
+                self.done = true;
+                return Some(Err(e));
+            }
+        }
+        if self.buf.trim_end().is_empty() {
+            self.done = true;
+            return None;
+        }
+        if !self.buf.starts_with('@') {
+            self.done = true;
+            return Some(Err(header_error(&self.buf)));
+        }
+        let id = self.buf.trim_end()[1..]
+            .split_whitespace()
+            .next()
+            .unwrap_or("")
+            .to_string();
+
+        // Line 2: sequence
+        self.buf.clear();
+        if let Err(e) = read_line(self.reader.as_mut(), &mut self.buf, &self.path) {
+            self.done = true;
+            return Some(Err(e));
+        }
+        let sequence = self.buf.trim_end().as_bytes().to_vec();
+
+        // Line 3: + separator
+        self.buf.clear();
+        if let Err(e) = read_line(self.reader.as_mut(), &mut self.buf, &self.path) {
+            self.done = true;
+            return Some(Err(e));
+        }
+
+        // Line 4: quality scores
+        self.buf.clear();
+        if let Err(e) = read_line(self.reader.as_mut(), &mut self.buf, &self.path) {
+            self.done = true;
+            return Some(Err(e));
+        }
+        let quality = self.buf.trim_end().as_bytes().to_vec();
+
+        Some(Ok(FastqRecord {
+            id,
+            sequence,
+            quality,
+        }))
+    }
+}

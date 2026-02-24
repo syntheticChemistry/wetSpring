@@ -36,6 +36,7 @@ use wetspring_barracuda::bio::taxonomy::{
     ClassifyParams, Lineage, NaiveBayesClassifier, ReferenceSeq,
 };
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
@@ -255,12 +256,12 @@ fn validate_full_pipeline(
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     // Build a trivial classifier (classify_batch returns early for empty sequences)
-    let dummy_ref = ReferenceSeq {
-        id: "dummy".to_string(),
+    let synthetic_ref = ReferenceSeq {
+        id: "synthetic_ref".to_string(),
         sequence: b"ACGTACGTACGTACGT".to_vec(),
         lineage: Lineage::from_taxonomy_string("k__Bacteria;p__Proteobacteria"),
     };
-    let classifier = NaiveBayesClassifier::train(&[dummy_ref], 8);
+    let classifier = NaiveBayesClassifier::train(&[synthetic_ref], 8);
     let params = ClassifyParams::default();
 
     // GPU streaming: full analytics (no taxonomy seqs for this test)
@@ -321,14 +322,11 @@ fn validate_full_pipeline(
 
 fn cpu_cosine_condensed(spectra: &[Vec<f64>]) -> Vec<f64> {
     let n = spectra.len();
-    let norms: Vec<f64> = spectra
-        .iter()
-        .map(|s| s.iter().map(|x| x * x).sum::<f64>().sqrt())
-        .collect();
+    let norms: Vec<f64> = spectra.iter().map(|s| special::l2_norm(s)).collect();
     let mut out = Vec::with_capacity(n * (n - 1) / 2);
     for i in 0..n {
         for j in (i + 1)..n {
-            let dot: f64 = spectra[i].iter().zip(&spectra[j]).map(|(a, b)| a * b).sum();
+            let dot: f64 = special::dot(&spectra[i], &spectra[j]);
             let denom = norms[i] * norms[j];
             let cos = if denom > 1e-15 { dot / denom } else { 0.0 };
             out.push(cos.clamp(0.0, 1.0));

@@ -3,7 +3,7 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
-    dead_code,
+    dead_code
 )]
 //! # Exp135: Mapping Sensitivity — Why 100%/0%?
 //!
@@ -32,8 +32,8 @@ use wetspring_barracuda::validation::Validator;
 
 #[cfg(feature = "gpu")]
 use barracuda::spectral::{
-    anderson_2d, anderson_3d, anderson_hamiltonian, find_all_eigenvalues, lanczos,
-    lanczos_eigenvalues, level_spacing_ratio, GOE_R, POISSON_R,
+    GOE_R, POISSON_R, anderson_2d, anderson_3d, anderson_hamiltonian, find_all_eigenvalues,
+    lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 
 fn generate_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
@@ -62,32 +62,40 @@ fn main() {
         // We need sweeps out to W=35 for the steepest mapping
         let w_at = |i: usize| -> f64 { 0.5 + (i as f64) * 34.5 / (n_sweep - 1) as f64 };
 
-        let sweep_chain: Vec<(f64, f64)> = (0..n_sweep).map(|i| {
-            let w = w_at(i);
-            let (d, o) = anderson_hamiltonian(384, w, 42);
-            (w, level_spacing_ratio(&find_all_eigenvalues(&d, &o)))
-        }).collect();
+        let sweep_chain: Vec<(f64, f64)> = (0..n_sweep)
+            .map(|i| {
+                let w = w_at(i);
+                let (d, o) = anderson_hamiltonian(384, w, 42);
+                (w, level_spacing_ratio(&find_all_eigenvalues(&d, &o)))
+            })
+            .collect();
 
-        let sweep_slab: Vec<(f64, f64)> = (0..n_sweep).map(|i| {
-            let w = w_at(i);
-            let mat = anderson_2d(20, 20, w, 42);
-            let tri = lanczos(&mat, 400, 42);
-            (w, level_spacing_ratio(&lanczos_eigenvalues(&tri)))
-        }).collect();
+        let sweep_slab: Vec<(f64, f64)> = (0..n_sweep)
+            .map(|i| {
+                let w = w_at(i);
+                let mat = anderson_2d(20, 20, w, 42);
+                let tri = lanczos(&mat, 400, 42);
+                (w, level_spacing_ratio(&lanczos_eigenvalues(&tri)))
+            })
+            .collect();
 
-        let sweep_film: Vec<(f64, f64)> = (0..n_sweep).map(|i| {
-            let w = w_at(i);
-            let mat = anderson_3d(14, 14, 2, w, 42);
-            let tri = lanczos(&mat, 392, 42);
-            (w, level_spacing_ratio(&lanczos_eigenvalues(&tri)))
-        }).collect();
+        let sweep_film: Vec<(f64, f64)> = (0..n_sweep)
+            .map(|i| {
+                let w = w_at(i);
+                let mat = anderson_3d(14, 14, 2, w, 42);
+                let tri = lanczos(&mat, 392, 42);
+                (w, level_spacing_ratio(&lanczos_eigenvalues(&tri)))
+            })
+            .collect();
 
-        let sweep_block: Vec<(f64, f64)> = (0..n_sweep).map(|i| {
-            let w = w_at(i);
-            let mat = anderson_3d(8, 8, 6, w, 42);
-            let tri = lanczos(&mat, 384, 42);
-            (w, level_spacing_ratio(&lanczos_eigenvalues(&tri)))
-        }).collect();
+        let sweep_block: Vec<(f64, f64)> = (0..n_sweep)
+            .map(|i| {
+                let w = w_at(i);
+                let mat = anderson_3d(8, 8, 6, w, 42);
+                let tri = lanczos(&mat, 384, 42);
+                (w, level_spacing_ratio(&lanczos_eigenvalues(&tri)))
+            })
+            .collect();
 
         v.check_count("chain sweep", sweep_chain.len(), n_sweep);
         v.check_count("slab sweep", sweep_slab.len(), n_sweep);
@@ -95,17 +103,25 @@ fn main() {
         v.check_count("block sweep", sweep_block.len(), n_sweep);
 
         fn nearest_r(sweep: &[(f64, f64)], w: f64) -> f64 {
-            sweep.iter()
+            sweep
+                .iter()
                 .min_by(|(wa, _), (wb, _)| (wa - w).abs().partial_cmp(&(wb - w).abs()).unwrap())
-                .map(|(_, r)| *r).unwrap_or(0.0)
+                .map(|(_, r)| *r)
+                .unwrap_or(0.0)
         }
 
         v.section("── S2: Vary mapping slope α ──");
         let biomes = ncbi_data::biome_diversity_params();
         let alphas = [5.0, 8.0, 10.0, 14.5, 18.0, 22.0, 26.0, 30.0, 35.0];
 
-        println!("  {:>5}  {:>6} {:>6} {:>6} {:>6}  {:>8}", "α", "chain", "slab", "film", "block", "W_range");
-        println!("  {:-<5}  {:-<6} {:-<6} {:-<6} {:-<6}  {:-<8}", "", "", "", "", "", "");
+        println!(
+            "  {:>5}  {:>6} {:>6} {:>6} {:>6}  {:>8}",
+            "α", "chain", "slab", "film", "block", "W_range"
+        );
+        println!(
+            "  {:-<5}  {:-<6} {:-<6} {:-<6} {:-<6}  {:-<8}",
+            "", "", "", "", "", ""
+        );
 
         let mut alpha_results: Vec<(f64, usize, usize, usize, usize)> = Vec::new();
         for &alpha in &alphas {
@@ -116,31 +132,48 @@ fn main() {
                 let community = generate_community(*n_species, *j_target, 42);
                 let j = diversity::pielou_evenness(&community);
                 let w = 0.5 + j * alpha;
-                if w < w_min { w_min = w; }
-                if w > w_max { w_max = w; }
-                let sweeps: [&[(f64, f64)]; 4] = [&sweep_chain, &sweep_slab, &sweep_film, &sweep_block];
+                if w < w_min {
+                    w_min = w;
+                }
+                if w > w_max {
+                    w_max = w;
+                }
+                let sweeps: [&[(f64, f64)]; 4] =
+                    [&sweep_chain, &sweep_slab, &sweep_film, &sweep_block];
                 for (idx, sweep) in sweeps.iter().enumerate() {
-                    if nearest_r(sweep, w) > midpoint { counts[idx] += 1; }
+                    if nearest_r(sweep, w) > midpoint {
+                        counts[idx] += 1;
+                    }
                 }
             }
-            println!("  {:5.1}  {:>4}/28 {:>4}/28 {:>4}/28 {:>4}/28  [{:.1}, {:.1}]",
-                alpha, counts[0], counts[1], counts[2], counts[3], w_min, w_max);
+            println!(
+                "  {:5.1}  {:>4}/28 {:>4}/28 {:>4}/28 {:>4}/28  [{:.1}, {:.1}]",
+                alpha, counts[0], counts[1], counts[2], counts[3], w_min, w_max
+            );
             alpha_results.push((alpha, counts[0], counts[1], counts[2], counts[3]));
         }
 
         v.section("── S3: Find critical alphas ──");
         // At what alpha does block drop below 28?
-        let alpha_block_drops = alpha_results.iter()
+        let alpha_block_drops = alpha_results
+            .iter()
             .find(|(_, _, _, _, b)| *b < 28)
             .map(|(a, _, _, _, _)| *a);
         // At what alpha does slab rise above 0?
-        let alpha_slab_rises = alpha_results.iter()
+        let alpha_slab_rises = alpha_results
+            .iter()
             .rev()
             .find(|(_, _, s, _, _)| *s > 0)
             .map(|(a, _, _, _, _)| *a);
 
-        println!("  Block drops below 28/28 at α ≈ {}", alpha_block_drops.map_or("never (robust)".to_string(), |a| format!("{a:.1}")));
-        println!("  Slab rises above 0/28 at α ≈ {}", alpha_slab_rises.map_or("never".to_string(), |a| format!("{a:.1} (low mapping)")));
+        println!(
+            "  Block drops below 28/28 at α ≈ {}",
+            alpha_block_drops.map_or("never (robust)".to_string(), |a| format!("{a:.1}"))
+        );
+        println!(
+            "  Slab rises above 0/28 at α ≈ {}",
+            alpha_slab_rises.map_or("never".to_string(), |a| format!("{a:.1} (low mapping)"))
+        );
         v.check_pass("sensitivity analysis complete", true);
 
         v.section("── S4: The physical argument ──");
@@ -178,7 +211,10 @@ fn main() {
             ("50_strain_hospital_biofilm", 50, 0.15),
         ];
         println!("\n  Low-diversity synthetic communities:");
-        println!("  {:30} {:>4} {:>6} {:>6}  {:>6} {:>6} {:>6} {:>6}", "name", "n", "J", "W", "chain", "slab", "film", "block");
+        println!(
+            "  {:30} {:>4} {:>6} {:>6}  {:>6} {:>6} {:>6} {:>6}",
+            "name", "n", "J", "W", "chain", "slab", "film", "block"
+        );
         for (name, n, j_target) in &synthetic_low {
             let community = generate_community(*n, *j_target, 42);
             let j = diversity::pielou_evenness(&community);
@@ -188,8 +224,17 @@ fn main() {
             let r_film = nearest_r(&sweep_film, w);
             let r_block = nearest_r(&sweep_block, w);
             let tag = |r: f64| if r > midpoint { "ACTIVE" } else { "---" };
-            println!("  {:30} {:>4} {:6.3} {:6.2}  {:>6} {:>6} {:>6} {:>6}",
-                name, n, j, w, tag(r_chain), tag(r_slab), tag(r_film), tag(r_block));
+            println!(
+                "  {:30} {:>4} {:6.3} {:6.2}  {:>6} {:>6} {:>6} {:>6}",
+                name,
+                n,
+                j,
+                w,
+                tag(r_chain),
+                tag(r_slab),
+                tag(r_film),
+                tag(r_block)
+            );
         }
         v.check_pass("synthetic low-diversity biomes tested", true);
 
@@ -220,7 +265,11 @@ fn main() {
     {
         v.section("── Spectral analysis requires --features gpu ──");
         println!("  [skipped — no GPU feature]");
-        v.check_count("biome params loaded", ncbi_data::biome_diversity_params().len(), 28);
+        v.check_count(
+            "biome params loaded",
+            ncbi_data::biome_diversity_params().len(),
+            28,
+        );
     }
 
     v.finish();

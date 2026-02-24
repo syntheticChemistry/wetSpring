@@ -1,6 +1,6 @@
 # Deprecation & Migration Tracking
 
-**Date:** February 22, 2026
+**Date:** February 23, 2026
 **Pattern:** Following hotSpring's `DEPRECATION_MIGRATION.md`
 
 When ToadStool absorbs a wetSpring shader or pattern, the local copy becomes
@@ -37,23 +37,23 @@ consume from the barracuda crate. **Do not modify local copies.**
 These are wetSpring-specific GPU modules and shaders that ToadStool has not
 yet absorbed. They remain active and maintained in wetSpring.
 
-### Local WGSL Shaders (Tier A — absorption candidates)
+### Local WGSL Shaders (5 — Write phase, absorption candidates)
 
-| Shader | Module | GPU Checks | Since | Blocker |
-|--------|--------|:----------:|-------|---------|
-| `batched_qs_ode_rk4_f64.wgsl` | `ode_sweep_gpu` | 7 | Exp049 | Upstream `batched_ode_rk4.rs:209` uses `compile_shader` not `compile_shader_f64` |
+| Shader | Module | GPU Checks | Since | Target |
+|--------|--------|:----------:|-------|--------|
+| `phage_defense_ode_rk4_f64.wgsl` | `phage_defense_gpu` | 4v/11p | Exp099 | `BatchedOdeRK4Generic<4,11>` |
+| `bistable_ode_rk4_f64.wgsl` | `bistable_gpu` | 5v/21p | Exp100 | `BatchedOdeRK4Generic<5,21>` |
+| `multi_signal_ode_rk4_f64.wgsl` | `multi_signal_gpu` | 7v/24p | Exp100 | `BatchedOdeRK4Generic<7,24>` |
+| `cooperation_ode_rk4_f64.wgsl` | `cooperation_gpu` | 4v/13p | Exp101 | `BatchedOdeRK4Generic<4,13>` |
+| `capacitor_ode_rk4_f64.wgsl` | `capacitor_gpu` | 6v/16p | Exp101 | `BatchedOdeRK4Generic<6,16>` |
 
-### CPU-Only Modules (Stable)
+All use `compile_shader_f64()` with `fmax`/`fclamp`/`fpow` polyfills.
 
-| Module | Domain | Since |
-|--------|--------|-------|
-| `random_forest` | RF ensemble inference | Exp061 |
-| `gbm` | GBM binary + multi-class | Exp062 |
-| `ani` | Average Nucleotide Identity | Exp055 |
-| `snp` | SNP calling | Exp055 |
-| `dnds` | Nei-Gojobori dN/dS | Exp052 |
-| `molecular_clock` | Strict/relaxed clock | Exp053 |
-| `pangenome` | Gene clustering + enrichment | Exp056 |
+### CPU-Only Modules (no GPU benefit)
+
+| Module | Domain | Reason |
+|--------|--------|--------|
+| `phred` | Phred quality decode/encode | I/O-bound, no parallelism benefit |
 
 ### Shared Math (`crate::special`) — MIGRATED
 
@@ -92,5 +92,7 @@ Following hotSpring's pattern:
 
 ## Deprecation Candidates (Pending Upstream)
 
-3 local WGSL shaders. All 12 absorbed by ToadStool (sessions 31d/31g + 39-41).
+5 local WGSL ODE shaders pending ToadStool absorption as `BatchedOdeRK4Generic<N_VARS, N_PARAMS>`.
+All 12 non-ODE shaders absorbed by ToadStool (sessions 31d/31g + 39-41).
 Write phase active. ODE blocker resolved (S41 fixed `compile_shader_f64`).
+All other CPU modules now have GPU wrappers (Lean, Compose, or Passthrough).

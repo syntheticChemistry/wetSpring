@@ -13,7 +13,7 @@
 )]
 //! wetSpring `BarraCuda` — Life Science + PFAS Analytical Chemistry Pipelines
 //!
-//! Rust implementations validated against Python/Galaxy/QIIME2/asari/`FindPFAS`
+//! Rust implementations validated against Python/`Galaxy`/`QIIME2`/`asari`/`FindPFAS`
 //! baselines. Each module mirrors a pipeline stage from the validated
 //! experiments (Exp001–097, 29 reproduced papers across 4 tracks).
 //!
@@ -37,7 +37,7 @@
 //! # Signal Processing + Feature Extraction
 //! - [`bio::signal`] — 1D peak detection (`find_peaks`, `scipy` equivalent)
 //! - [`bio::eic`] — Extracted Ion Chromatogram / mass track extraction
-//! - [`bio::feature_table`] — End-to-end feature extraction (asari pipeline)
+//! - [`bio::feature_table`] — End-to-end feature extraction (`asari` pipeline)
 //!
 //! # GPU acceleration (feature = "gpu")
 //! - `gpu` — GPU device wrapper bridging to `ToadStool` `WgpuDevice` (wgpu v22)
@@ -53,6 +53,13 @@
 //! # Shared Mathematics
 //! - [`special`] — Error function, gamma, regularized gamma (sovereign, no libm)
 //!
+//! # Infrastructure
+//! - [`validation`] — `hotSpring` validation framework (pass/fail checks, exit codes)
+//! - [`ncbi`] — NCBI Entrez helpers (API key discovery, HTTP GET, E-search)
+//! - [`encoding`] — Sovereign base64 encode/decode (RFC 4648, zero external deps)
+//! - [`error`] — Error types for all parsers and algorithms
+//! - [`bench`](mod@bench) — Benchmarking utilities and hardware detection
+//!
 //! # Evolution path
 //!
 //! ```text
@@ -66,6 +73,7 @@ pub mod error;
 #[cfg(feature = "gpu")]
 pub mod gpu;
 pub mod io;
+pub mod ncbi;
 pub mod special;
 pub mod tolerances;
 pub mod validation;

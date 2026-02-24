@@ -273,7 +273,7 @@ mod tests {
         let p = CooperationParams::default();
         let r = scenario_equal_start(&p, DT);
         let freq = cooperator_frequency(&r);
-        let final_freq = freq.last().copied().unwrap_or(0.5);
+        let final_freq = freq.last().map_or(0.5, |x| *x);
         assert!(
             final_freq < 0.5,
             "cheaters should have frequency advantage from cost: f_coop={final_freq}"

@@ -3,7 +3,7 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
-    dead_code,
+    dead_code
 )]
 //! # Exp128: Vent Chimney Geometry QS Prediction
 //!
@@ -22,7 +22,7 @@ use wetspring_barracuda::validation::Validator;
 
 #[cfg(feature = "gpu")]
 use barracuda::spectral::{
-    anderson_2d, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio, GOE_R, POISSON_R,
+    GOE_R, POISSON_R, anderson_2d, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 
 #[cfg(feature = "gpu")]
@@ -106,7 +106,11 @@ fn main() {
             let tri = lanczos(&mat, n, 42);
             let eigs = lanczos_eigenvalues(&tri);
             let r = level_spacing_ratio(&eigs);
-            let regime = if r > midpoint { "QS-active" } else { "QS-suppressed" };
+            let regime = if r > midpoint {
+                "QS-active"
+            } else {
+                "QS-suppressed"
+            };
             println!("  {}: W={w:.2} ⟨r⟩={r:.4} → {regime}", zone.name);
             v.check_pass(
                 &format!("{} ⟨r⟩ in valid range", zone.name),
@@ -135,11 +139,13 @@ fn main() {
         println!("  Young sulfide (high porosity, low heterogeneity): QS-active={young_active}");
         v.check_pass(
             "young sulfide has highest QS potential (high porosity, low heterogeneity)",
-            zone_results.iter()
+            zone_results
+                .iter()
                 .find(|(n, _, _, _)| *n == "young_sulfide")
                 .map(|(_, _, r, _)| *r)
                 .unwrap_or(0.0)
-                >= zone_results.iter()
+                >= zone_results
+                    .iter()
                     .find(|(n, _, _, _)| *n == "mature_anhydrite")
                     .map(|(_, _, r, _)| *r)
                     .unwrap_or(1.0),
@@ -173,16 +179,26 @@ fn main() {
                 .find(|(n, _, _, _)| *n == zone.name)
                 .map(|(_, _, r, _)| *r)
                 .unwrap_or(0.0);
-            let reg_2d = if r_2d > midpoint { "ACTIVE" } else { "suppressed" };
-            let reg_3d = if r_3d > midpoint { "ACTIVE" } else { "suppressed" };
+            let reg_2d = if r_2d > midpoint {
+                "ACTIVE"
+            } else {
+                "suppressed"
+            };
+            let reg_3d = if r_3d > midpoint {
+                "ACTIVE"
+            } else {
+                "suppressed"
+            };
             println!(
                 "  {}: 2D ⟨r⟩={r_2d:.4}({reg_2d}) vs 3D ⟨r⟩={r_3d:.4}({reg_3d})",
                 zone.name
             );
         }
-        let young_3d_r = zone_results.iter()
+        let young_3d_r = zone_results
+            .iter()
             .find(|(n, _, _, _)| *n == "young_sulfide")
-            .map(|(_, _, r, _)| *r).unwrap_or(0.0);
+            .map(|(_, _, r, _)| *r)
+            .unwrap_or(0.0);
         let young_w = chimney_to_disorder(&zones[0]);
         let mat_2d_young = anderson_2d(l2d, l2d, young_w, 42);
         let tri_2d_young = lanczos(&mat_2d_young, n2d, 42);

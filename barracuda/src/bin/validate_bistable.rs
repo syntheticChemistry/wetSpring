@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Validation: Fernandez 2020 bistable phenotypic switching (Exp023).
 //!
-//! Validates the Rust bistable ODE model against the Python/scipy baseline.
+//! Validates the Rust bistable ODE model against the Python/`scipy` baseline.
 //! Tests steady-state values for zero-feedback, default, and strong feedback
 //! scenarios, plus bifurcation hysteresis detection.
 //!
@@ -14,7 +14,7 @@
 //! | Baseline script | `scripts/fernandez2020_bistable.py` |
 //! | Baseline output | `experiments/results/023_bistable/fernandez2020_python_baseline.json` |
 //! | Python version | 3.10.12 |
-//! | scipy integrator | `odeint` (LSODA: adaptive BDF/Adams) |
+//! | `scipy` integrator | `odeint` (LSODA: adaptive BDF/Adams) |
 //! | Rust integrator | RK4 fixed-step (dt = 0.001 h) |
 //! | Date | 2026-02-20 |
 //! | Exact command | `python3 scripts/fernandez2020_bistable.py` |

@@ -625,7 +625,8 @@ mod tests {
         assert!(matches!(e1, XmlEvent::StartElement { name, .. } if name == "a"));
         let e2 = reader.next_event();
         assert!(e2.is_err());
-        let msg = format!("{}", e2.unwrap_err());
+        let err = e2.unwrap_err();
+        let msg = format!("{err}");
         assert!(msg.contains("EOF inside comment"));
     }
 }

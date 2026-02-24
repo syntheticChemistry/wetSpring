@@ -4,10 +4,10 @@
 //! Delegates to `barracuda::ops::bio::batch_fitness::BatchFitnessGpu` —
 //! evolved by `neuralSpring`, absorbed in `ToadStool` session 31f.
 //!
-//! Computes linear fitness: fitness[i] = dot(population[i], weights).
+//! Computes linear fitness: `fitness[i]` = dot(`population[i]`, weights).
 
-use barracuda::device::WgpuDevice;
 use barracuda::BatchFitnessGpu;
+use barracuda::device::WgpuDevice;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
@@ -93,6 +93,7 @@ impl BatchFitnessGpuWrapper {
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;
+    use crate::tolerances;
 
     #[tokio::test]
     async fn batch_fitness_dot_product() {
@@ -104,7 +105,7 @@ mod tests {
         let weights = vec![3.0f32, 5.0];
         let result = bf.evaluate(&pop, &weights, 2, 2).expect("fitness");
         assert_eq!(result.len(), 2);
-        assert!((result[0] - 3.0).abs() < 1e-5); // 1*3 + 0*5
-        assert!((result[1] - 5.0).abs() < 1e-5); // 0*3 + 1*5
+        assert!((result[0] - 3.0).abs() < tolerances::GPU_F32_PARITY); // 1*3 + 0*5
+        assert!((result[1] - 5.0).abs() < tolerances::GPU_F32_PARITY); // 0*3 + 1*5
     }
 }

@@ -11,8 +11,8 @@
 //! The presence matrix is uploaded as flat `u32` (0/1). Pure integer
 //! arithmetic, no transcendentals.
 
-use barracuda::device::WgpuDevice;
 use barracuda::PangenomeClassifyGpu as ToadStoolPangenome;
+use barracuda::device::WgpuDevice;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 

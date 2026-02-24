@@ -3,7 +3,7 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
-    dead_code,
+    dead_code
 )]
 //! # Exp132: Geometry Zoo — Shape Determines QS
 //!
@@ -22,8 +22,8 @@ use wetspring_barracuda::validation::Validator;
 
 #[cfg(feature = "gpu")]
 use barracuda::spectral::{
-    anderson_2d, anderson_3d, anderson_hamiltonian, find_all_eigenvalues, lanczos,
-    lanczos_eigenvalues, level_spacing_ratio, GOE_R, POISSON_R,
+    GOE_R, POISSON_R, anderson_2d, anderson_3d, anderson_hamiltonian, find_all_eigenvalues,
+    lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 
 const N_SWEEP: usize = 15;
@@ -69,16 +69,41 @@ fn main() {
             dims: (usize, usize, usize),
         }
         let geometries = [
-            Geom { name: "chain", kind: "1D", dims: (384, 0, 0) },
-            Geom { name: "slab_20x20", kind: "2D", dims: (20, 20, 0) },
-            Geom { name: "thin_film", kind: "quasi-2D", dims: (14, 14, 2) },
-            Geom { name: "tube", kind: "quasi-1D", dims: (32, 3, 4) },
-            Geom { name: "block", kind: "3D", dims: (8, 8, 6) },
-            Geom { name: "cube", kind: "3D", dims: (7, 7, 8) },
+            Geom {
+                name: "chain",
+                kind: "1D",
+                dims: (384, 0, 0),
+            },
+            Geom {
+                name: "slab_20x20",
+                kind: "2D",
+                dims: (20, 20, 0),
+            },
+            Geom {
+                name: "thin_film",
+                kind: "quasi-2D",
+                dims: (14, 14, 2),
+            },
+            Geom {
+                name: "tube",
+                kind: "quasi-1D",
+                dims: (32, 3, 4),
+            },
+            Geom {
+                name: "block",
+                kind: "3D",
+                dims: (8, 8, 6),
+            },
+            Geom {
+                name: "cube",
+                kind: "3D",
+                dims: (7, 7, 8),
+            },
         ];
 
         v.section("── S1: Disorder sweeps per geometry ──");
-        let mut geo_results: Vec<(&str, &str, usize, usize, Vec<(f64, f64)>, Option<f64>)> = Vec::new();
+        let mut geo_results: Vec<(&str, &str, usize, usize, Vec<(f64, f64)>, Option<f64>)> =
+            Vec::new();
 
         for g in &geometries {
             let (lx, ly, lz) = g.dims;
@@ -107,46 +132,101 @@ fn main() {
                     }
                 })
                 .collect();
-            let n_sites = if ly == 0 { lx } else if lz == 0 { lx * ly } else { lx * ly * lz };
+            let n_sites = if ly == 0 {
+                lx
+            } else if lz == 0 {
+                lx * ly
+            } else {
+                lx * ly * lz
+            };
             let p = plateau_count(&sweep, midpoint);
             let w_c = find_last_downward_crossing(&sweep, midpoint);
-            let shape = format!("{}×{}×{}", lx, if ly == 0 { 1 } else { ly }, if lz == 0 { 1 } else { lz });
-            println!("  {} ({}={}, N={}): plateau={}, W_c={}",
-                g.name, g.kind, shape, n_sites, p,
+            let shape = format!(
+                "{}×{}×{}",
+                lx,
+                if ly == 0 { 1 } else { ly },
+                if lz == 0 { 1 } else { lz }
+            );
+            println!(
+                "  {} ({}={}, N={}): plateau={}, W_c={}",
+                g.name,
+                g.kind,
+                shape,
+                n_sites,
+                p,
                 w_c.map_or("—".to_string(), |w| format!("{w:.2}"))
             );
-            v.check_pass(&format!("{} sweep computed", g.name), sweep.len() == N_SWEEP);
+            v.check_pass(
+                &format!("{} sweep computed", g.name),
+                sweep.len() == N_SWEEP,
+            );
             geo_results.push((g.name, g.kind, n_sites, p, sweep, w_c));
         }
 
         v.section("── S2: Geometry comparison table ──");
-        println!("  {:15} {:10} {:>5} {:>8} {:>8}", "geometry", "kind", "N", "plateau", "W_c");
+        println!(
+            "  {:15} {:10} {:>5} {:>8} {:>8}",
+            "geometry", "kind", "N", "plateau", "W_c"
+        );
         println!("  {:-<15} {:-<10} {:-<5} {:-<8} {:-<8}", "", "", "", "", "");
         for (name, kind, n, p, _, w_c) in &geo_results {
-            println!("  {:15} {:10} {:>5} {:>8} {:>8}",
-                name, kind, n, p,
+            println!(
+                "  {:15} {:10} {:>5} {:>8} {:>8}",
+                name,
+                kind,
+                n,
+                p,
                 w_c.map_or("—".to_string(), |w| format!("{w:.2}"))
             );
         }
 
         v.section("── S3: Effective dimensionality ranking ──");
         // Sort by plateau width → higher plateau = more 3D-like
-        let mut sorted: Vec<_> = geo_results.iter().map(|(n, k, _, p, _, _)| (*n, *k, *p)).collect();
+        let mut sorted: Vec<_> = geo_results
+            .iter()
+            .map(|(n, k, _, p, _, _)| (*n, *k, *p))
+            .collect();
         sorted.sort_by(|a, b| b.2.cmp(&a.2));
         println!("  Ranking (most QS-supportive → least):");
         for (i, (name, kind, p)) in sorted.iter().enumerate() {
             println!("    {}. {} ({}) — plateau={}", i + 1, name, kind, p);
         }
 
-        let chain_p = geo_results.iter().find(|(n, _, _, _, _, _)| *n == "chain").map(|(_, _, _, p, _, _)| *p).unwrap_or(0);
-        let cube_p = geo_results.iter().find(|(n, _, _, _, _, _)| *n == "cube").map(|(_, _, _, p, _, _)| *p).unwrap_or(0);
-        let tube_p = geo_results.iter().find(|(n, _, _, _, _, _)| *n == "tube").map(|(_, _, _, p, _, _)| *p).unwrap_or(0);
-        let thin_film_p = geo_results.iter().find(|(n, _, _, _, _, _)| *n == "thin_film").map(|(_, _, _, p, _, _)| *p).unwrap_or(0);
-        let slab_p = geo_results.iter().find(|(n, _, _, _, _, _)| *n == "slab_20x20").map(|(_, _, _, p, _, _)| *p).unwrap_or(0);
+        let chain_p = geo_results
+            .iter()
+            .find(|(n, _, _, _, _, _)| *n == "chain")
+            .map(|(_, _, _, p, _, _)| *p)
+            .unwrap_or(0);
+        let cube_p = geo_results
+            .iter()
+            .find(|(n, _, _, _, _, _)| *n == "cube")
+            .map(|(_, _, _, p, _, _)| *p)
+            .unwrap_or(0);
+        let tube_p = geo_results
+            .iter()
+            .find(|(n, _, _, _, _, _)| *n == "tube")
+            .map(|(_, _, _, p, _, _)| *p)
+            .unwrap_or(0);
+        let thin_film_p = geo_results
+            .iter()
+            .find(|(n, _, _, _, _, _)| *n == "thin_film")
+            .map(|(_, _, _, p, _, _)| *p)
+            .unwrap_or(0);
+        let slab_p = geo_results
+            .iter()
+            .find(|(n, _, _, _, _, _)| *n == "slab_20x20")
+            .map(|(_, _, _, p, _, _)| *p)
+            .unwrap_or(0);
 
         v.check_pass("cube > chain (3D beats 1D)", cube_p > chain_p);
-        v.check_pass("tube > chain (quasi-1D tube beats pure 1D)", tube_p >= chain_p);
-        v.check_pass("thin_film >= slab (depth helps even with 2 layers)", thin_film_p >= slab_p || (thin_film_p as i64 - slab_p as i64).unsigned_abs() <= 2);
+        v.check_pass(
+            "tube > chain (quasi-1D tube beats pure 1D)",
+            tube_p >= chain_p,
+        );
+        v.check_pass(
+            "thin_film >= slab (depth helps even with 2 layers)",
+            thin_film_p >= slab_p || (thin_film_p as i64 - slab_p as i64).unsigned_abs() <= 2,
+        );
 
         v.section("── S4: Ecological shape mapping ──");
         struct EcoShape {
@@ -155,23 +235,64 @@ fn main() {
             rationale: &'static str,
         }
         let eco_shapes = [
-            EcoShape { ecosystem: "cave wall biofilm", geometry: "slab_20x20", rationale: "thin coating on rock surface" },
-            EcoShape { ecosystem: "cave passage sediment", geometry: "block", rationale: "3D pore structure in mud/silt" },
-            EcoShape { ecosystem: "hot spring mat", geometry: "thin_film", rationale: "layered photosynthetic + heterotrophic mat" },
-            EcoShape { ecosystem: "rhizosphere coating", geometry: "thin_film", rationale: "root surface biofilm, few cell layers" },
-            EcoShape { ecosystem: "soil pore network", geometry: "cube", rationale: "3D interconnected pore space" },
-            EcoShape { ecosystem: "gut lumen", geometry: "tube", rationale: "tubular intestinal geometry" },
-            EcoShape { ecosystem: "blood vessel biofilm", geometry: "tube", rationale: "cylindrical inner surface" },
-            EcoShape { ecosystem: "thick hospital biofilm", geometry: "block", rationale: "multi-layer pathogenic biofilm" },
+            EcoShape {
+                ecosystem: "cave wall biofilm",
+                geometry: "slab_20x20",
+                rationale: "thin coating on rock surface",
+            },
+            EcoShape {
+                ecosystem: "cave passage sediment",
+                geometry: "block",
+                rationale: "3D pore structure in mud/silt",
+            },
+            EcoShape {
+                ecosystem: "hot spring mat",
+                geometry: "thin_film",
+                rationale: "layered photosynthetic + heterotrophic mat",
+            },
+            EcoShape {
+                ecosystem: "rhizosphere coating",
+                geometry: "thin_film",
+                rationale: "root surface biofilm, few cell layers",
+            },
+            EcoShape {
+                ecosystem: "soil pore network",
+                geometry: "cube",
+                rationale: "3D interconnected pore space",
+            },
+            EcoShape {
+                ecosystem: "gut lumen",
+                geometry: "tube",
+                rationale: "tubular intestinal geometry",
+            },
+            EcoShape {
+                ecosystem: "blood vessel biofilm",
+                geometry: "tube",
+                rationale: "cylindrical inner surface",
+            },
+            EcoShape {
+                ecosystem: "thick hospital biofilm",
+                geometry: "block",
+                rationale: "multi-layer pathogenic biofilm",
+            },
         ];
         for es in &eco_shapes {
-            let p = geo_results.iter()
+            let p = geo_results
+                .iter()
                 .find(|(n, _, _, _, _, _)| *n == es.geometry)
                 .map(|(_, _, _, p, _, _)| *p)
                 .unwrap_or(0);
-            let regime = if p >= 5 { "QS-CAPABLE" } else if p >= 2 { "marginal" } else { "QS-limited" };
-            println!("  {:25} → {:15} (plateau={:>2}) → {regime}  [{}]",
-                es.ecosystem, es.geometry, p, es.rationale);
+            let regime = if p >= 5 {
+                "QS-CAPABLE"
+            } else if p >= 2 {
+                "marginal"
+            } else {
+                "QS-limited"
+            };
+            println!(
+                "  {:25} → {:15} (plateau={:>2}) → {regime}  [{}]",
+                es.ecosystem, es.geometry, p, es.rationale
+            );
         }
         v.check_pass("ecosystem shape mapping complete", true);
 

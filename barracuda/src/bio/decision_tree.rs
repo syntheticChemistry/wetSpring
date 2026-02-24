@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Sovereign decision tree inference engine.
 //!
-//! Loads a trained decision tree (exported from sklearn as JSON) and performs
+//! Loads a trained decision tree (exported from `sklearn` as JSON) and performs
 //! inference in pure Rust. Proves that ML predictions are portable and
 //! reproducible without Python runtime dependency.
 //!
@@ -49,7 +49,7 @@ pub struct DecisionTree {
 }
 
 impl DecisionTree {
-    /// Build a tree from parallel arrays (mirrors sklearn's tree structure).
+    /// Build a tree from parallel arrays (mirrors `sklearn`'s tree structure).
     ///
     /// # Errors
     ///
@@ -97,7 +97,7 @@ impl DecisionTree {
             if node.is_leaf() {
                 return node.prediction.unwrap_or(0);
             }
-            let feat_val = features.get(node.feature as usize).copied().unwrap_or(0.0);
+            let feat_val = features.get(node.feature as usize).map_or(0.0, |x| *x);
             idx = if feat_val <= node.threshold {
                 node.left_child as usize
             } else {

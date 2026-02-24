@@ -10,7 +10,7 @@
 //! | Baseline script | `scripts/srivastava2011_multi_signal.py` |
 //! | Baseline output | `experiments/results/024_multi_signal/srivastava2011_python_baseline.json` |
 //! | Python version | 3.10.12 |
-//! | scipy integrator | `odeint` (LSODA) |
+//! | `scipy` integrator | `odeint` (LSODA) |
 //! | Rust integrator | RK4 fixed-step (dt = 0.001 h) |
 //! | Date | 2026-02-20 |
 //! | Exact command | `python3 scripts/srivastava2011_multi_signal.py` |

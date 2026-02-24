@@ -140,6 +140,24 @@ pub fn regularized_gamma_lower(a: f64, x: f64) -> f64 {
     }
 }
 
+/// L2 (Euclidean) norm of a slice: `sqrt(Σ x²)`.
+///
+/// Used in spectral comparison, signal normalization, and validation
+/// binaries. Prefer this over inline `.map(|x| x * x).sum().sqrt()`.
+#[must_use]
+pub fn l2_norm(xs: &[f64]) -> f64 {
+    xs.iter().map(|x| x * x).sum::<f64>().sqrt()
+}
+
+/// Dot product of two equal-length slices.
+///
+/// Panics in debug if lengths differ. Returns 0 for empty slices.
+#[must_use]
+pub fn dot(a: &[f64], b: &[f64]) -> f64 {
+    debug_assert_eq!(a.len(), b.len(), "dot: length mismatch");
+    a.iter().zip(b).map(|(x, y)| x * y).sum()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -22,7 +22,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | scipy.odeint, numpy, dendropy, pure Python (per-domain scripts) |
+//! | Baseline tool | `scipy`.odeint, `numpy`, dendropy, pure Python (per-domain scripts) |
 //! | Baseline version | Feb 2026 |
 //! | Baseline command | `python3 scripts/benchmark_rust_vs_python.py` (domains 1–9); per-domain: `waters2008_qs_ode.py`, `gillespie_baseline.py`, `liu2014_hmm_baseline.py`, `smith_waterman_baseline.py`, `felsenstein_pruning_baseline.py`, `bruger2018_cooperation.py`, `rf_distance_baseline.py` |
 //! | Baseline date | 2026-02-19 |
@@ -52,7 +52,7 @@ fn main() {
     // ════════════════════════════════════════════════════════════════
     //  Domain 1: ODE Integration (RK4)
     // ════════════════════════════════════════════════════════════════
-    v.section("═══ Domain 1: ODE Integration (RK4 vs scipy) ═══");
+    v.section("═══ Domain 1: ODE Integration (RK4 vs `scipy`) ═══");
 
     let t0 = Instant::now();
     let qs = qs_biofilm::scenario_standard_growth(&qs_biofilm::QsBiofilmParams::default(), 0.001);

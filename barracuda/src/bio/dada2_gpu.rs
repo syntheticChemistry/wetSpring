@@ -20,8 +20,8 @@ use crate::bio::dada2::{
 };
 use crate::bio::derep::UniqueSequence;
 use crate::error::{Error, Result};
-use barracuda::device::WgpuDevice;
 use barracuda::Dada2EStepGpu;
+use barracuda::device::WgpuDevice;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 

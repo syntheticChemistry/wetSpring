@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Validation: PFAS decision tree inference — Exp008 Phase 3.
 //!
-//! Loads a decision tree trained in Python (sklearn) and exported to JSON,
+//! Loads a decision tree trained in Python (`sklearn`) and exported to JSON,
 //! then runs inference on 744 test samples. Validates that every single
 //! prediction matches the Python baseline — proving pure math portability.
 //!
@@ -13,7 +13,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | sklearn export (pfas_tree_export.py) |
+//! | Baseline tool | `sklearn` export (pfas_tree_export.py) |
 //! | Baseline version | scripts/ |
 //! | Baseline command | python3 scripts/pfas_tree_export.py + decision_tree_test_data.json |
 //! | Baseline date | 2026-02-19 |

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Benchmark: Full 16S pipeline timing — Rust CPU vs Galaxy/Python reference.
+//! Benchmark: Full 16S pipeline timing — Rust CPU vs `Galaxy`/Python reference.
 //!
 //! Measures wall-clock time and energy for every pipeline stage on real public
-//! NCBI data, producing a direct comparison against Galaxy/QIIME2 control
+//! NCBI data, producing a direct comparison against `Galaxy`/`QIIME2` control
 //! experiments. Emits structured JSON via [`BenchReport`].
 //!
 //! Run: `cargo run --release --bin benchmark_pipeline`
@@ -20,7 +20,7 @@
 //! | Data | PRJNA1114688, PRJNA629095, PRJNA1178324, PRJNA516219 |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
-//! # Galaxy Reference Times (same hardware, Docker)
+//! # `Galaxy` Reference Times (same hardware, Docker)
 //!
 //! | Experiment | Samples | Reads    | Total   | DADA2   | Taxonomy |
 //! |------------|---------|----------|---------|---------|----------|

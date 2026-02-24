@@ -11,8 +11,8 @@
 //! For L positions × N sequences, dispatch L threads. Each thread
 //! reads N values (column-wise). No transcendentals needed.
 
-use barracuda::device::WgpuDevice;
 use barracuda::SnpCallingF64;
+use barracuda::device::WgpuDevice;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 

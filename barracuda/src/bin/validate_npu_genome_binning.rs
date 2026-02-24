@@ -1,4 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::print_stdout,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::cast_possible_wrap
+)]
 //! Exp116 — ESN Genome Binning Classifier for NPU Deployment
 //!
 //! Trains an ESN on gene content features (from Exp110 pangenome pattern)
@@ -20,18 +29,18 @@ const N_TEST: usize = 250;
 
 fn generate_genome_features(seed: u64, ecosystem: usize) -> Vec<f64> {
     let mut features = vec![0.0_f64; GENE_FEATURES];
-    let base_gc = 0.35 + ecosystem as f64 * 0.08;
-    let base_gene_density = 0.7 + ecosystem as f64 * 0.04;
+    let base_gc = (ecosystem as f64).mul_add(0.08, 0.35);
+    let base_gene_density = (ecosystem as f64).mul_add(0.04, 0.7);
 
-    for f in 0..GENE_FEATURES {
+    for (f, feat) in features.iter_mut().enumerate().take(GENE_FEATURES) {
         let noise = ((seed.wrapping_mul(41).wrapping_add(f as u64 * 73)) % 1000) as f64 / 2000.0;
-        features[f] = match f {
+        *feat = match f {
             0 => base_gc + noise * 0.1,
             1 => base_gene_density + noise * 0.05,
-            2 => (500.0 + ecosystem as f64 * 200.0 + noise * 100.0) / 2000.0,
-            3 => (ecosystem as f64 * 0.15 + noise * 0.1).min(1.0),
-            4 => 0.1 + ecosystem as f64 * 0.05 + noise * 0.05,
-            _ => (ecosystem as f64 * 0.1 + f as f64 * 0.05 + noise * 0.1).min(1.0),
+            2 => ((ecosystem as f64).mul_add(200.0, 500.0) + noise * 100.0) / 2000.0,
+            3 => ((ecosystem as f64).mul_add(0.15, noise * 0.1)).min(1.0),
+            4 => (ecosystem as f64).mul_add(0.05, 0.1) + noise * 0.05,
+            _ => ((ecosystem as f64).mul_add(0.1, f as f64 * 0.05) + noise * 0.1).min(1.0),
         };
     }
     features
@@ -80,13 +89,20 @@ fn main() {
 
     v.section("F64 binning accuracy");
     let preds = esn.predict(&test_inputs);
-    let f64_classes: Vec<usize> = preds.iter().map(|p| {
-        p.iter().enumerate()
-            .max_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal))
-            .map(|(i, _)| i).unwrap_or(0)
-    }).collect();
-    let f64_correct = f64_classes.iter().zip(test_true.iter())
-        .filter(|(p, t)| *p == *t).count();
+    let f64_classes: Vec<usize> = preds
+        .iter()
+        .map(|p| {
+            p.iter()
+                .enumerate()
+                .max_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal))
+                .map_or(0, |(i, _)| i)
+        })
+        .collect();
+    let f64_correct = f64_classes
+        .iter()
+        .zip(test_true.iter())
+        .filter(|(p, t)| *p == *t)
+        .count();
     let f64_acc = f64_correct as f64 / N_TEST as f64;
     println!("  f64 accuracy: {f64_acc:.3} ({f64_correct}/{N_TEST})");
     v.check_pass("f64 accuracy > 25%", f64_acc > 0.25);
@@ -111,15 +127,21 @@ fn main() {
         esn_npu.update(input);
         npu_classes.push(npu.classify(esn_npu.state()));
     }
-    let npu_correct = npu_classes.iter().zip(test_true.iter())
-        .filter(|(p, t)| *p == *t).count();
+    let npu_correct = npu_classes
+        .iter()
+        .zip(test_true.iter())
+        .filter(|(p, t)| *p == *t)
+        .count();
     let npu_acc = npu_correct as f64 / N_TEST as f64;
     println!("  NPU int8 accuracy: {npu_acc:.3} ({npu_correct}/{N_TEST})");
     v.check_pass("NPU accuracy > 30%", npu_acc > 0.30);
 
     v.section("F64 ↔ NPU bin agreement");
-    let agree = f64_classes.iter().zip(npu_classes.iter())
-        .filter(|(a, b)| a == b).count();
+    let agree = f64_classes
+        .iter()
+        .zip(npu_classes.iter())
+        .filter(|(a, b)| a == b)
+        .count();
     let agreement = agree as f64 / N_TEST as f64;
     println!("  Agreement: {agreement:.3} ({agree}/{N_TEST})");
     v.check_pass("agreement > 65%", agreement > 0.65);
@@ -131,14 +153,20 @@ fn main() {
     println!("  NPU throughput: {contigs_per_sec:.0} contigs/s");
     println!("  Daily capacity: {daily_contigs:.0} contigs (always-on)");
     println!("  Power: <10 mW (AKD1000 inference)");
-    v.check_pass("daily capacity > 100M contigs", daily_contigs > 100_000_000.0);
+    v.check_pass(
+        "daily capacity > 100M contigs",
+        daily_contigs > 100_000_000.0,
+    );
 
     v.section("Energy: NPU vs GPU pangenome analysis");
     let gpu_j_per_genome = 0.003;
     let npu_j_per_genome = gpu_j_per_genome / 9000.0;
     println!("  GPU: {gpu_j_per_genome:.4} J/genome");
     println!("  NPU: {npu_j_per_genome:.8} J/genome");
-    println!("  Ratio: ~{:.0}× reduction", gpu_j_per_genome / npu_j_per_genome);
+    println!(
+        "  Ratio: ~{:.0}× reduction",
+        gpu_j_per_genome / npu_j_per_genome
+    );
     v.check_pass("NPU energy << GPU", npu_j_per_genome < gpu_j_per_genome);
 
     v.finish();
