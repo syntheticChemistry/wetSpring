@@ -32,7 +32,11 @@ use barracuda::spectral::{
     GOE_R, POISSON_R, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 
-#[allow(clippy::cast_precision_loss, clippy::too_many_lines, clippy::items_after_statements)]
+#[allow(
+    clippy::cast_precision_loss,
+    clippy::too_many_lines,
+    clippy::items_after_statements
+)]
 fn main() {
     let mut v = Validator::new("Exp138: Eukaryote vs Bacteria Colony Scaling");
 

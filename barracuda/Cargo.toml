@@ -651,14 +651,17 @@ path = "src/bin/validate_fajgenbaum_pathway.rs"
 [[bin]]
 name = "validate_matrix_pharmacophenomics"
 path = "src/bin/validate_matrix_pharmacophenomics.rs"
+required-features = ["gpu"]
 
 [[bin]]
 name = "validate_nmf_drug_repurposing"
 path = "src/bin/validate_nmf_drug_repurposing.rs"
+required-features = ["gpu"]
 
 [[bin]]
 name = "validate_repodb_nmf"
 path = "src/bin/validate_repodb_nmf.rs"
+required-features = ["gpu"]
 
 [[bin]]
 name = "validate_knowledge_graph_embedding"
@@ -860,3 +863,4 @@ path = "src/bin/validate_burst_statistics_anderson.rs"
 [[bin]]
 name = "validate_cross_spring_s57"
 path = "src/bin/validate_cross_spring_s57.rs"
+required-features = ["gpu"]

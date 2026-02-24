@@ -35,8 +35,27 @@ use barracuda::device::{GpuDriverProfile, TensorContext, WgpuDevice};
 use std::sync::Arc;
 
 const DEVICE_LABEL: &str = "FP64 Science Device";
-const MAX_STORAGE_BINDING_BYTES: u32 = 512 * 1024 * 1024; // 512 MiB
-const MAX_BUFFER_SIZE_BYTES: u64 = 1024 * 1024 * 1024; // 1 GiB
+
+/// wgpu `maxStorageBufferBindingSize` override (512 MiB).
+///
+/// Default wgpu limit is 128 MiB; increased for large biology matrices
+/// (e.g. 4000 × 18000 drug-disease NMF, pairwise distance N=10000).
+/// Upper bound from Vulkan spec `maxStorageBufferRange` (typically 2 GiB
+/// on discrete GPUs). Validated on RTX 4070 / Titan V / AMD RDNA2.
+const MAX_STORAGE_BINDING_BYTES: u32 = 512 * 1024 * 1024;
+
+/// wgpu `maxBufferSize` override (1 GiB).
+///
+/// Default wgpu limit is 256 MiB; increased for large genomics datasets.
+/// Must be ≤ device `maxBufferSize` (typically 2-4 GiB on modern GPUs).
+/// Validated on RTX 4070 (12 GiB VRAM) and Titan V (12 GiB HBM2).
+const MAX_BUFFER_SIZE_BYTES: u64 = 1024 * 1024 * 1024;
+
+/// wgpu `maxStorageBuffersPerShaderStage` override.
+///
+/// Default wgpu limit is 8; many bio kernels need input + output + scratch
+/// buffers (e.g. NMF: V, W, H, WH, scratch = 5). 16 is conservative vs
+/// Vulkan minimum guarantee of 4 but matches D3D12/Metal typical limits.
 const MAX_STORAGE_BUFFERS_PER_STAGE: u32 = 16;
 
 /// GPU context with FP64 support for science workloads.
@@ -209,10 +228,14 @@ impl GpuF64 {
         let model = self.driver_profile.latency_model();
         let dfma_cycles = model.raw_latency(WgslOpClass::F64Fma);
 
+        // Thresholds derived from benchmarking `FusedMapReduceF64` across
+        // GPU families (hotSpring Exp001 §4.4, wetSpring Exp064/087).
+        // The crossover is where GPU throughput exceeds CPU throughput
+        // including kernel launch + PCIe transfer overhead (~50 μs).
         match dfma_cycles {
-            0..=4 => 5_000,   // Fast f64 (AMD RDNA2+): lower threshold
-            5..=8 => 10_000,  // Native f64 (NVIDIA Volta+): default
-            9..=16 => 25_000, // Software f64 (Apple M, Intel): higher threshold
+            0..=4 => 5_000,   // Fast f64 (AMD RDNA2+): ~4 cycles/DFMA
+            5..=8 => 10_000,  // Native f64 (NVIDIA Volta+): ~8 cycles/DFMA
+            9..=16 => 25_000, // Software f64 (Apple M, Intel): emulated
             _ => 50_000,      // Unknown / very slow: conservative
         }
     }

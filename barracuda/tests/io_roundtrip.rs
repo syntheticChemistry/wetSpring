@@ -4,6 +4,7 @@
 //!
 //! Each test creates synthetic data in a temporary directory,
 //! parses it with our production code, and verifies correctness.
+//! All tests use the streaming APIs (`Ms2Iter`, `MzmlIter`, `FastqIter`).
 
 use std::fs::File;
 use std::io::Write;
@@ -42,11 +43,18 @@ fn create_ms2_file(dir: &Path) -> std::path::PathBuf {
     path
 }
 
+fn collect_ms2(path: &Path) -> Vec<ms2::Ms2Spectrum> {
+    ms2::Ms2Iter::open(path)
+        .expect("open MS2")
+        .collect::<Result<Vec<_>, _>>()
+        .expect("parse MS2")
+}
+
 #[test]
 fn ms2_roundtrip_structure() {
     let dir = TempDir::new().unwrap();
     let path = create_ms2_file(dir.path());
-    let spectra = ms2::parse_ms2(&path).unwrap();
+    let spectra = collect_ms2(&path);
 
     assert_eq!(spectra.len(), 3, "should parse 3 spectra");
     assert_eq!(spectra[0].scan, 100);
@@ -61,7 +69,6 @@ fn ms2_roundtrip_structure() {
     assert_eq!(spectra[1].charge, 3);
     assert_eq!(spectra[1].mz_array.len(), 1);
 
-    // Empty spectrum: no peaks
     assert_eq!(spectra[2].scan, 300);
     assert!(spectra[2].mz_array.is_empty());
 }
@@ -71,8 +78,8 @@ fn ms2_determinism() {
     let dir = TempDir::new().unwrap();
     let path = create_ms2_file(dir.path());
 
-    let run1 = ms2::parse_ms2(&path).unwrap();
-    let run2 = ms2::parse_ms2(&path).unwrap();
+    let run1 = collect_ms2(&path);
+    let run2 = collect_ms2(&path);
 
     assert_eq!(run1.len(), run2.len());
     for (a, b) in run1.iter().zip(run2.iter()) {
@@ -89,7 +96,7 @@ fn ms2_determinism() {
 fn ms2_stats_correctness() {
     let dir = TempDir::new().unwrap();
     let path = create_ms2_file(dir.path());
-    let spectra = ms2::parse_ms2(&path).unwrap();
+    let spectra = collect_ms2(&path);
     let stats = ms2::compute_stats(&spectra);
 
     assert_eq!(stats.num_spectra, 3);
@@ -105,7 +112,7 @@ fn ms2_streaming_stats_match_collected() {
     let dir = TempDir::new().unwrap();
     let path = create_ms2_file(dir.path());
 
-    let spectra = ms2::parse_ms2(&path).unwrap();
+    let spectra = collect_ms2(&path);
     let collected = ms2::compute_stats(&spectra);
     let streamed = ms2::stats_from_file(&path).unwrap();
 
@@ -199,11 +206,18 @@ fn create_mzml_file(dir: &Path) -> std::path::PathBuf {
     path
 }
 
+fn collect_mzml(path: &Path) -> Vec<mzml::MzmlSpectrum> {
+    mzml::MzmlIter::open(path)
+        .expect("open mzML")
+        .collect::<Result<Vec<_>, _>>()
+        .expect("parse mzML")
+}
+
 #[test]
 fn mzml_synthetic_file_roundtrip() {
     let dir = TempDir::new().unwrap();
     let path = create_mzml_file(dir.path());
-    let spectra = mzml::parse_mzml(&path).unwrap();
+    let spectra = collect_mzml(&path);
 
     assert_eq!(spectra.len(), 2, "should parse 2 spectra");
 
@@ -228,8 +242,8 @@ fn mzml_synthetic_file_roundtrip() {
 fn mzml_determinism() {
     let dir = TempDir::new().unwrap();
     let path = create_mzml_file(dir.path());
-    let run1 = mzml::parse_mzml(&path).unwrap();
-    let run2 = mzml::parse_mzml(&path).unwrap();
+    let run1 = collect_mzml(&path);
+    let run2 = collect_mzml(&path);
 
     assert_eq!(run1.len(), run2.len());
     for (a, b) in run1.iter().zip(run2.iter()) {
@@ -244,7 +258,7 @@ fn mzml_determinism() {
 fn mzml_stats_from_synthetic() {
     let dir = TempDir::new().unwrap();
     let path = create_mzml_file(dir.path());
-    let spectra = mzml::parse_mzml(&path).unwrap();
+    let spectra = collect_mzml(&path);
     let stats = mzml::compute_stats(&spectra);
 
     assert_eq!(stats.num_spectra, 2);
@@ -260,7 +274,7 @@ fn mzml_streaming_stats_match_collected() {
     let dir = TempDir::new().unwrap();
     let path = create_mzml_file(dir.path());
 
-    let spectra = mzml::parse_mzml(&path).unwrap();
+    let spectra = collect_mzml(&path);
     let collected = mzml::compute_stats(&spectra);
     let streamed = mzml::stats_from_file(&path).unwrap();
 
@@ -273,7 +287,7 @@ fn mzml_streaming_stats_match_collected() {
 
 #[test]
 fn mzml_nonexistent_file() {
-    assert!(mzml::parse_mzml(Path::new("/nonexistent/file.mzML")).is_err());
+    assert!(mzml::MzmlIter::open(Path::new("/nonexistent/file.mzML")).is_err());
 }
 
 // ── FASTQ synthetic file round-trip ─────────────────────────────
@@ -459,7 +473,6 @@ fn fastq_gzip_roundtrip() {
     let dir = TempDir::new().unwrap();
     let path = dir.path().join("test.fastq.gz");
 
-    // Write gzip-compressed FASTQ
     let file = File::create(&path).unwrap();
     let mut gz = GzEncoder::new(file, Compression::default());
     writeln!(gz, "@gz_seq1").unwrap();
@@ -472,7 +485,6 @@ fn fastq_gzip_roundtrip() {
     writeln!(gz, "JJJJJJ").unwrap();
     gz.finish().unwrap();
 
-    // Parse with our sovereign parser
     let records: Vec<_> = fastq::FastqIter::open(&path)
         .expect("open")
         .collect::<Result<Vec<_>, _>>()
@@ -483,7 +495,6 @@ fn fastq_gzip_roundtrip() {
     assert_eq!(records[1].id, "gz_seq2");
     assert_eq!(records[1].sequence, b"GGCCGG");
 
-    // Verify streaming stats match collected stats
     let collected = fastq::compute_stats(&records);
     let streaming = fastq::stats_from_file(&path).unwrap();
     assert_eq!(collected.num_sequences, streaming.num_sequences);

@@ -191,9 +191,7 @@ fn main() {
             let r_3d = level_spacing_ratio(&lanczos_eigenvalues(&tri_3d));
             let tag_2d = if r_2d > midpoint { "ACTIVE" } else { "---" };
             let tag_3d = if r_3d > midpoint { "ACTIVE" } else { "---" };
-            println!(
-                "  {name:25} {j:>6.2} {w:>6.2}  {r_2d:>6.4}({tag_2d}) {r_3d:>6.4}({tag_3d})"
-            );
+            println!("  {name:25} {j:>6.2} {w:>6.2}  {r_2d:>6.4}({tag_2d}) {r_3d:>6.4}({tag_3d})");
         }
         v.check_pass("turnover analysis computed", true);
 

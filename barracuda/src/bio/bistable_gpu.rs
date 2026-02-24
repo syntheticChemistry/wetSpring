@@ -11,7 +11,7 @@ use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
 use super::bistable::{self, BistableParams};
-use super::ode_systems::BistableOde;
+use barracuda::numerical::BistableOde;
 
 /// Number of state variables.
 pub const N_VARS: usize = bistable::N_VARS;

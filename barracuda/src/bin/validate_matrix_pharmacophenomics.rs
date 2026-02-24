@@ -23,8 +23,28 @@
 //! | Phase       | 39 — Drug repurposing track |
 //! | Paper       | 40 (Fajgenbaum et al. Lancet Haematology 2025) |
 
-use wetspring_barracuda::bio::nmf::{self, NmfConfig, NmfObjective};
+use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective, NmfResult, cosine_similarity};
 use wetspring_barracuda::validation::Validator;
+
+fn top_k_cosine(result: &NmfResult, top_k: usize) -> Vec<(usize, usize, f64)> {
+    let m = result.m;
+    let n = result.n;
+    let k = result.k;
+
+    let mut pairs: Vec<(usize, usize, f64)> = Vec::with_capacity(m * n);
+    for i in 0..m {
+        let w_row = &result.w[i * k..(i + 1) * k];
+        for j in 0..n {
+            let h_col: Vec<f64> = (0..k).map(|kk| result.h[kk * n + j]).collect();
+            let sim = cosine_similarity(w_row, &h_col);
+            pairs.push((i, j, sim));
+        }
+    }
+
+    pairs.sort_by(|a, b| b.2.partial_cmp(&a.2).unwrap_or(std::cmp::Ordering::Equal));
+    pairs.truncate(top_k);
+    pairs
+}
 
 fn validate_matrix_scoring(
     v: &mut Validator,
@@ -84,7 +104,7 @@ fn validate_nmf_analysis(v: &mut Validator, matrix_scores: &[f64], ranked: &[(us
         objective: NmfObjective::Euclidean,
         seed: 42,
     };
-    let result = nmf::nmf(matrix_scores, n_drugs, n_diseases, &config);
+    let result = nmf::nmf(matrix_scores, n_drugs, n_diseases, &config).expect("NMF failed");
 
     let rel_err = nmf::relative_reconstruction_error(matrix_scores, &result);
     let rank = config.rank;
@@ -120,7 +140,7 @@ fn validate_nmf_analysis(v: &mut Validator, matrix_scores: &[f64], ranked: &[(us
 
     v.section("§6 Cosine Similarity Scoring");
 
-    let cos_top = nmf::top_k_cosine(&result, 10);
+    let cos_top = top_k_cosine(&result, 10);
     println!("\n  Top 10 by cosine similarity on latent factors:");
     println!("  {:>6} {:>8} {:>10}", "Drug", "Disease", "Cosine");
     for (d, dis, s) in cos_top.iter().take(10) {

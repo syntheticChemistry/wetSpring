@@ -45,7 +45,11 @@ fn generate_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     counts
 }
 
-#[allow(clippy::cast_precision_loss, clippy::too_many_lines, clippy::items_after_statements)]
+#[allow(
+    clippy::cast_precision_loss,
+    clippy::too_many_lines,
+    clippy::items_after_statements
+)]
 fn main() {
     let mut v = Validator::new("Exp134: Cross-Ecosystem QS Geometry Atlas");
 

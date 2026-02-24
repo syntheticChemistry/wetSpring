@@ -45,7 +45,11 @@ fn generate_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     counts
 }
 
-#[allow(clippy::cast_precision_loss, clippy::too_many_lines, clippy::items_after_statements)]
+#[allow(
+    clippy::cast_precision_loss,
+    clippy::too_many_lines,
+    clippy::items_after_statements
+)]
 fn main() {
     let mut v = Validator::new("Exp129: Dimensional QS Phase Diagram");
 
@@ -215,12 +219,8 @@ fn main() {
             .map(|(n, _, _, _, _, _)| *n)
             .collect();
 
-        println!(
-            "  Biomes gaining QS-active in 2D (vs 1D suppressed): {gained_2d_vs_1d:?}"
-        );
-        println!(
-            "  Biomes gaining QS-active in 3D (vs 2D suppressed): {gained_3d_vs_2d:?}"
-        );
+        println!("  Biomes gaining QS-active in 2D (vs 1D suppressed): {gained_2d_vs_1d:?}");
+        println!("  Biomes gaining QS-active in 3D (vs 2D suppressed): {gained_3d_vs_2d:?}");
         println!(
             "  Total dimensional gains: 1D→2D: {}, 2D→3D: {}",
             gained_2d_vs_1d.len(),

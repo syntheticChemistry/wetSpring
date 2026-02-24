@@ -83,8 +83,9 @@ pub fn simpson(counts: &[f64]) -> f64 {
 #[allow(clippy::cast_precision_loss)]
 pub fn chao1(counts: &[f64]) -> f64 {
     let s_obs = observed_features(counts);
-    let f1 = counts.iter().filter(|&&c| (c - 1.0).abs() < 0.5).count() as f64;
-    let f2 = counts.iter().filter(|&&c| (c - 2.0).abs() < 0.5).count() as f64;
+    let hw = crate::tolerances::CHAO1_COUNT_HALFWIDTH;
+    let f1 = counts.iter().filter(|&&c| (c - 1.0).abs() < hw).count() as f64;
+    let f2 = counts.iter().filter(|&&c| (c - 2.0).abs() < hw).count() as f64;
 
     if f2 > 0.0 {
         s_obs + (f1 * (f1 - 1.0)) / (2.0 * (f2 + 1.0))

@@ -84,16 +84,20 @@ Following hotSpring's pattern:
 1. **ToadStool absorbs** the shader as a new primitive (e.g., `ops::bio::hmm_forward`)
 2. **wetSpring verifies** — run the GPU validator against the upstream primitive
 3. **wetSpring rewires** — change `include_str!` to upstream `use barracuda::HmmBatchForwardF64`
-4. **Move local WGSL** to `shaders_toadstool_ref/` for divergence tracking
+4. **Delete local WGSL** — upstream is the source of truth (no local shaders remain)
 5. **Delete GPU module** if fully replaced (or simplify to thin wrapper)
 6. **Update EVOLUTION_READINESS.md** — change tier from A → ✅ Absorbed
 7. **Update this file** — move from Active to Absorbed table
 
 ---
 
-## Deprecation Candidates (Pending Upstream)
+## Deprecation Status (Resolved)
 
-5 local WGSL ODE shaders pending ToadStool absorption as `BatchedOdeRK4Generic<N_VARS, N_PARAMS>`.
-All 12 non-ODE shaders absorbed by ToadStool (sessions 31d/31g + 39-41).
-All 5 ODE shaders leaned — replaced by `generate_shader()`. Zero local shaders remain.
-All other CPU modules now have GPU wrappers (Lean, Compose, or Passthrough).
+All deprecation candidates have been resolved as of Phase 41 (S59):
+
+- **WGSL shaders:** Zero local shaders remain. All 17 absorbed by ToadStool or replaced by `generate_shader()`.
+- **CPU math:** NMF (482 lines), ODE systems (715 lines), Anderson builder (~115 lines), ridge (~100 lines) — all deleted, leaning upstream.
+- **Special functions:** `erf`, `ln_gamma`, `regularized_gamma_lower` delegate to `barracuda::special` on GPU; local fallback for no-GPU builds.
+- **`shaders/` directory:** Removed (was empty after lean).
+
+No pending deprecation candidates.

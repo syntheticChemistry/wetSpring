@@ -1,14 +1,14 @@
 # Cross-Spring Shader Evolution
 
-**Last updated**: Feb 23, 2026 — ToadStool S42 (612 WGSL shaders)
-**Validated by**: wetSpring Exp120 `benchmark_cross_spring_evolution`
+**Last updated**: Feb 24, 2026 — ToadStool S59 (650+ WGSL shaders)
+**Validated by**: wetSpring Exp120 `benchmark_cross_spring_evolution`, V30 lean validation
 
 ---
 
 ## Overview
 
 ToadStool BarraCuda is the shared GPU/NPU compute substrate for the ecoPrimals
-ecosystem. Its 612 WGSL shaders evolved through cross-spring contributions:
+ecosystem. Its 650+ WGSL shaders evolved through cross-spring contributions:
 each spring (hotSpring, wetSpring, neuralSpring, airSpring) contributed
 domain-specific shaders that were absorbed into ToadStool, refined, and made
 available to all springs. This document tracks that evolution.
@@ -19,12 +19,12 @@ available to all springs. This document tracks that evolution.
 
 | Origin | Shader Count | Op Count | Domains |
 |--------|-------------|----------|---------|
-| hotSpring | ~35 | ~25 | Nuclear HFB, lattice QCD, MD, ESN, precision |
-| wetSpring | ~22 | ~18 | Metagenomics, DADA2, ANI, dN/dS, PFAS, SSA |
-| neuralSpring | ~14 | ~12 | ML, pairwise metrics, evolutionary, spectral IPR |
+| hotSpring | ~35 | ~25 | Nuclear HFB, lattice QCD, MD, ESN, precision, df64 emulation |
+| wetSpring | ~22 | ~18 | Metagenomics, DADA2, ANI, dN/dS, PFAS, SSA, NMF, ODE bio |
+| neuralSpring | ~14 | ~12 | ML, pairwise metrics, evolutionary, spectral IPR, graph linalg |
 | airSpring | ~5 (shared) | ~8 | IoT, precision agriculture, Richards, Kriging |
 | ToadStool-native | 100+ | 200+ | Math, linalg, NN, FHE, attention |
-| **Total** | **612** | **265+** | |
+| **Total** | **650+** | **300+** | |
 
 ---
 
@@ -49,6 +49,70 @@ available to all springs. This document tracks that evolution.
 | Feb 23 | wetSpring Phase 32 | NCBI-scale GPU (6 exps) | wetSpring validates |
 | Feb 23 | wetSpring Phase 33 | NPU reservoir (6 exps) | wetSpring validates |
 | Feb 23 | wetSpring Phase 34 | Rewire + cross-spring benchmark | wetSpring validates |
+| Feb 24 | ToadStool S54 | graph_laplacian, effective_rank, numerical_hessian, spectral_density, Marchenko-Pastur | neuralSpring → ToadStool |
+| Feb 24 | ToadStool S56 | belief_propagation, boltzmann_sampling, disordered_laplacian | neuralSpring → ToadStool |
+| Feb 24 | ToadStool S58 | NMF (Euclidean+KL), 5 bio ODE systems, Fp64Strategy, df64_core.wgsl | wetSpring + hotSpring → ToadStool |
+| Feb 24 | ToadStool S59 | ridge_regression, anderson_3d_correlated, ValidationHarness, NMF re-exports | wetSpring + neuralSpring → ToadStool |
+| Feb 24 | wetSpring V30 | S59 lean: NMF, ridge, ODE, Anderson rewired upstream (~1,312 lines removed) | wetSpring leans on ToadStool |
+
+---
+
+## S58-S59 Cross-Spring Evolution: Where Things Evolved to Be Helpful
+
+The S58-S59 absorption cycle demonstrates the full power of cross-spring evolution.
+Primitives that originated in one biome became shared infrastructure benefiting all.
+
+### hotSpring precision shaders → used everywhere
+
+hotSpring's `df64_core.wgsl` and `Fp64Strategy` (S58) originated from lattice QCD
+where f64 precision is mandatory for gauge field computations. ToadStool absorbed
+this as a universal precision strategy: `Native` on hardware with f64, `Hybrid`
+(double-single emulation) on f32-only GPUs. This benefits:
+
+- **wetSpring**: ODE bio shaders now generate f64-correct code on all GPUs
+- **neuralSpring**: Spectral methods (IPR, Lanczos) maintain f64 across GPU tiers
+- **airSpring**: Kriging spatial interpolation benefits from f64 precision on mobile GPUs
+
+### wetSpring bio shaders → used by neuralSpring and beyond
+
+wetSpring's biological ODE systems (Capacitor, Cooperation, MultiSignal, Bistable,
+PhageDefense) were absorbed in S58 as `barracuda::numerical::ode_bio`. The ODE
+`OdeSystem` trait pattern and `BatchedOdeRK4` generic template that evolved from
+wetSpring's Write phase now powers:
+
+- **neuralSpring**: Evolutionary dynamics ODE (Wright-Fisher, Lotka-Volterra)
+- **hotSpring**: Nuclear structure ODE (HFB iterations use same batched pattern)
+- **ToadStool**: Any future ODE system gets GPU shaders for free via `generate_shader()`
+
+wetSpring NMF (S58) became `barracuda::linalg::nmf`, available to:
+
+- **neuralSpring**: Latent factor discovery in neural activity
+- **airSpring**: Sensor network decomposition
+
+### neuralSpring primitives → used by wetSpring
+
+neuralSpring's graph theory primitives (S54: `graph_laplacian`, `effective_rank`,
+`numerical_hessian`) are used by wetSpring for:
+
+- Community network analysis (species interaction graphs)
+- Hessian-based sensitivity analysis of ODE models
+- Effective rank of gene expression matrices
+
+neuralSpring's `ValidationHarness` (S59) provides structured tolerance-aware
+validation with `check_abs`/`check_rel`/`require!` macros.
+
+### Measured benefits (ODE lean benchmark)
+
+| System | Local CPU µs | Upstream µs | Speedup |
+|--------|-------------|-------------|---------|
+| Capacitor | 3,176 | 1,813 | **1.75×** |
+| Cooperation | 921 | 836 | **1.10×** |
+| MultiSignal | 1,568 | 1,229 | **1.28×** |
+| Bistable | 1,686 | 1,382 | **1.22×** |
+| PhageDefense | 83 | 64 | **1.30×** |
+
+Upstream integrators are 10-43% faster because ToadStool optimizes the shared
+`integrate_cpu()` across all springs' usage patterns.
 
 ---
 
@@ -149,8 +213,9 @@ S42 does not re-export them at the crate root.
 
 | Suite | Result | Count |
 |-------|--------|-------|
-| Library tests | PASS | 676/676 |
+| Library tests | PASS | 759/759 |
 | Integration tests | PASS | 21/21 |
+| Doc tests | PASS | 19/19 |
 | GPU feature compile | PASS | All bins + lib |
 | Exp114 NPU QS Classifier | PASS | 13/13 |
 | Exp115 NPU Phylo Placement | PASS | 9/9 |
@@ -159,3 +224,10 @@ S42 does not re-export them at the crate root.
 | Exp118 NPU Bloom Sentinel | PASS | 11/11 |
 | Exp119 NPU Disorder Classifier | PASS | 9/9 |
 | **Exp120 Cross-Spring Evolution** | **PASS** | **9/9** |
+| Exp151 Anderson Correlated Disorder (S59 lean) | PASS | 9/9 |
+| Exp158 MATRIX Pharmacophenomics (S59 lean) | PASS | 9/9 |
+| Exp159 NMF Drug Repurposing (S59 lean) | PASS | 7/7 |
+| Exp160 repoDB NMF Reproduction (S59 lean) | PASS | 9/9 |
+| **ODE Lean Benchmark (S59)** | **PASS** | **11/11** |
+| Clippy (pedantic+nursery, all features) | PASS | 0 warnings |
+| Format check | PASS | 0 diffs |

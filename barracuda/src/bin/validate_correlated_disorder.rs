@@ -39,7 +39,7 @@ use wetspring_barracuda::validation::Validator;
 
 #[cfg(feature = "gpu")]
 use barracuda::spectral::{
-    GOE_R, POISSON_R, SpectralCsrMatrix, lanczos, lanczos_eigenvalues, level_spacing_ratio,
+    GOE_R, POISSON_R, anderson_3d_correlated, lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 
 const L: usize = 8;
@@ -52,145 +52,6 @@ const N_REALIZATIONS: usize = 4;
 #[cfg(feature = "gpu")]
 fn sweep_w(i: usize) -> f64 {
     W_MIN + (i as f64) * (W_MAX - W_MIN) / (N_W_POINTS - 1) as f64
-}
-
-#[cfg(feature = "gpu")]
-struct LcgRng {
-    state: u64,
-}
-
-#[cfg(feature = "gpu")]
-impl LcgRng {
-    const fn new(seed: u64) -> Self {
-        Self {
-            state: seed.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1),
-        }
-    }
-    fn uniform(&mut self) -> f64 {
-        self.state = self
-            .state
-            .wrapping_mul(6_364_136_223_846_793_005)
-            .wrapping_add(1_442_695_040_888_963_407);
-        (self.state >> 11) as f64 / (1u64 << 53) as f64
-    }
-}
-
-#[cfg(feature = "gpu")]
-fn build_correlated_anderson_3d(
-    l: usize,
-    disorder: f64,
-    xi_corr: f64,
-    seed: u64,
-) -> SpectralCsrMatrix {
-    let n = l * l * l;
-    let mut rng = LcgRng::new(seed);
-
-    let raw: Vec<f64> = (0..n).map(|_| disorder * (rng.uniform() - 0.5)).collect();
-
-    let potential = if xi_corr < 0.01 {
-        raw
-    } else {
-        let idx_to_xyz = |i: usize| -> (usize, usize, usize) {
-            let iz = i % l;
-            let iy = (i / l) % l;
-            let ix = i / (l * l);
-            (ix, iy, iz)
-        };
-
-        let mut smoothed = vec![0.0; n];
-        let reach = (3.0 * xi_corr).ceil() as i64;
-        for (i, s_val) in smoothed.iter_mut().enumerate() {
-            let (ix, iy, iz) = idx_to_xyz(i);
-            let mut sum = 0.0;
-            let mut norm = 0.0;
-            for dx in -reach..=reach {
-                for dy in -reach..=reach {
-                    for dz in -reach..=reach {
-                        let jx = ix as i64 + dx;
-                        let jy = iy as i64 + dy;
-                        let jz = iz as i64 + dz;
-                        if (0..l as i64).contains(&jx)
-                            && (0..l as i64).contains(&jy)
-                            && (0..l as i64).contains(&jz)
-                        {
-                            let j = (jx as usize * l + jy as usize) * l + jz as usize;
-                            let r = ((dx * dx + dy * dy + dz * dz) as f64).sqrt();
-                            let kernel = (-r / xi_corr).exp();
-                            sum += kernel * raw[j];
-                            norm += kernel;
-                        }
-                    }
-                }
-            }
-            *s_val = sum / norm;
-        }
-
-        let var: f64 = {
-            let mean = smoothed.iter().sum::<f64>() / n as f64;
-            smoothed
-                .iter()
-                .map(|v| (v - mean) * (v - mean))
-                .sum::<f64>()
-                / n as f64
-        };
-        let target_var = disorder * disorder / 12.0;
-        let scale = if var > 1e-30 {
-            (target_var / var).sqrt()
-        } else {
-            1.0
-        };
-        smoothed.iter().map(|v| v * scale).collect()
-    };
-
-    let idx = |ix: usize, iy: usize, iz: usize| -> usize { (ix * l + iy) * l + iz };
-
-    let mut row_ptr = Vec::with_capacity(n + 1);
-    let mut col_idx = Vec::new();
-    let mut values = Vec::new();
-    row_ptr.push(0);
-
-    for ix in 0..l {
-        for iy in 0..l {
-            for iz in 0..l {
-                let site = idx(ix, iy, iz);
-                let mut entries: Vec<(usize, f64)> = Vec::new();
-
-                if ix > 0 {
-                    entries.push((idx(ix - 1, iy, iz), -1.0));
-                }
-                if iy > 0 {
-                    entries.push((idx(ix, iy - 1, iz), -1.0));
-                }
-                if iz > 0 {
-                    entries.push((idx(ix, iy, iz - 1), -1.0));
-                }
-                entries.push((site, potential[site]));
-                if iz + 1 < l {
-                    entries.push((idx(ix, iy, iz + 1), -1.0));
-                }
-                if iy + 1 < l {
-                    entries.push((idx(ix, iy + 1, iz), -1.0));
-                }
-                if ix + 1 < l {
-                    entries.push((idx(ix + 1, iy, iz), -1.0));
-                }
-
-                entries.sort_by_key(|&(c, _)| c);
-                for (c, v) in entries {
-                    col_idx.push(c);
-                    values.push(v);
-                }
-                row_ptr.push(col_idx.len());
-            }
-        }
-    }
-
-    SpectralCsrMatrix {
-        n,
-        row_ptr,
-        col_idx,
-        values,
-    }
 }
 
 fn main() {
@@ -238,7 +99,7 @@ fn main() {
                     let mut r_vals = Vec::with_capacity(N_REALIZATIONS);
                     for seed_off in 0..N_REALIZATIONS {
                         let seed = (42 + seed_off * 1000) as u64;
-                        let mat = build_correlated_anderson_3d(L, w, xi, seed);
+                        let mat = anderson_3d_correlated(L, w, xi, seed);
                         let tri = lanczos(&mat, n, seed);
                         let eigs = lanczos_eigenvalues(&tri);
                         r_vals.push(level_spacing_ratio(&eigs));
@@ -312,7 +173,8 @@ fn main() {
                 "  │ {:>8.1} │ {:22} │ {:>8} │",
                 cr.xi,
                 regime,
-                cr.w_c.map_or_else(|| "—".to_string(), |w| format!("{w:.2}"))
+                cr.w_c
+                    .map_or_else(|| "—".to_string(), |w| format!("{w:.2}"))
             );
         }
         println!("  └──────────┴────────────────────────┴──────────┘");

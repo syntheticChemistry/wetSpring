@@ -49,7 +49,11 @@ fn generate_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     counts
 }
 
-#[allow(clippy::cast_precision_loss, clippy::too_many_lines, clippy::items_after_statements)]
+#[allow(
+    clippy::cast_precision_loss,
+    clippy::too_many_lines,
+    clippy::items_after_statements
+)]
 fn main() {
     let mut v = Validator::new("Exp135: Mapping Sensitivity — Why 100%/0%?");
 
@@ -172,7 +176,8 @@ fn main() {
         );
         println!(
             "  Slab rises above 0/28 at α ≈ {}",
-            alpha_slab_rises.map_or_else(|| "never".to_string(), |a| format!("{a:.1} (low mapping)"))
+            alpha_slab_rises
+                .map_or_else(|| "never".to_string(), |a| format!("{a:.1} (low mapping)"))
         );
         v.check_pass("sensitivity analysis complete", true);
 

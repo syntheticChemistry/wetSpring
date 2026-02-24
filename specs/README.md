@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 24, 2026
-**Status**: Phase 40 — 3,198+/3,198+ checks, ALL PASS (881 tests, 162 experiments, 95.67% library coverage)
+**Status**: Phase 41 — 3,198+/3,198+ checks, ALL PASS (806 tests, 162 experiments, ToadStool S59 aligned, 42 primitives)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -10,8 +10,8 @@
 
 | Metric | Value |
 |--------|-------|
-| CPU validation | 1,476/1,476 PASS — 47 modules, 162 experiments (GPU-confirmed Phase 40), 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted + NMF |
-| GPU validation | 702/702 PASS — 37 ToadStool primitives, 0 local WGSL, 80 streaming + 48 head-to-head + 28 metalForge v4 + 38 pure GPU |
+| CPU validation | 1,476/1,476 PASS — 46 modules, 162 experiments (GPU-confirmed Phase 41), 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
+| GPU validation | 702/702 PASS — 42 ToadStool primitives, 0 local WGSL, 80 streaming + 48 head-to-head + 28 metalForge v4 + 38 pure GPU |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 380/380 — 22.5x Rust speedup over Python (v1–v8) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/101) — pure GPU math proven |
@@ -20,7 +20,7 @@
 | Cross-spring spectral | 25 checks — Anderson localization + QS-disorder analogy (Exp107) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
-| Rust modules | 47 CPU + 42 GPU, 881 tests (95.67% library coverage, llvm-cov) |
+| Rust modules | 46 CPU + 42 GPU, 806 tests |
 | Write phase | 0 local WGSL — GPU modules use `generate_shader()` from `OdeSystem` trait impls |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
 | Paper queue | **ALL DONE** — 43/43 reproducible papers complete (Track 1c + Track 3 + Phase 37 extensions) |
@@ -28,7 +28,7 @@
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
 | Faculty (Track 1c) | R. Anderson (Carleton) — deep-sea metagenomics, population genomics |
 | Faculty (Track 2) | Jones (BMB/Chemistry, MSU) — PFAS mass spectrometry |
-| Handoffs | Twenty-nine delivered (v1–v6, rewire, cross-spring, v7–v29) |
+| Handoffs | Thirty-one delivered (v1–v6, rewire, cross-spring, v7–v31) |
 
 ---
 
@@ -112,10 +112,10 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 
 | Document | Location | Description |
 |----------|----------|-------------|
-| CONTROL_EXPERIMENT_STATUS.md | `../` | 162 experiments, 3,198+ validation checks, 881 tests |
+| CONTROL_EXPERIMENT_STATUS.md | `../` | 162 experiments, 3,198+ validation checks, 806 tests |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
-| Handoff (v29) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V29_EVOLUTION_HANDOFF_FEB24_2026.md` | Current ToadStool handoff |
+| Handoff (v31) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V31_ABSORPTION_TARGETS_FEB24_2026.md` | Current ToadStool handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |
@@ -132,7 +132,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 - **Deep-sea metagenomics** — ANI, SNP, dN/dS, molecular clock, pangenomics
 - **ML inference** — Decision tree, Random Forest, GBM (all sovereign, no Python)
 - **Drug repurposing** — NMF, knowledge graph embeddings, pharmacophenomics (Track 3)
-- **Sovereign Rust bioinformatics** — 47 CPU + 42 GPU modules, 2 runtime dependencies (flate2 + bytemuck)
+- **Sovereign Rust bioinformatics** — 46 CPU + 42 GPU modules, 2 runtime dependencies (flate2 + bytemuck), 42 ToadStool primitives consumed
 
 ### wetSpring IS NOT:
 - Sensor noise analysis (groundSpring)
@@ -160,7 +160,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 `../whitePaper/STUDY.md` → `../CONTROL_EXPERIMENT_STATUS.md` → `../barracuda/EVOLUTION_READINESS.md` → BARRACUDA_REQUIREMENTS.md
 
 **Integration partner**:
-`../../wateringHole/handoffs/WETSPRING_TOADSTOOL_V29_EVOLUTION_HANDOFF_FEB24_2026.md` → `../BENCHMARK_RESULTS.md`
+`../wateringHole/handoffs/WETSPRING_TOADSTOOL_V31_ABSORPTION_TARGETS_FEB24_2026.md` → `../BENCHMARK_RESULTS.md`
 
 ---
 

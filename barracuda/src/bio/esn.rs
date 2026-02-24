@@ -73,7 +73,7 @@ impl Default for EsnConfig {
             spectral_radius: 0.9,
             connectivity: 0.1,
             leak_rate: 0.3,
-            regularization: 1e-6,
+            regularization: crate::tolerances::ESN_REGULARIZATION,
             seed: 42,
         }
     }
@@ -103,37 +103,8 @@ pub struct NpuReadoutWeights {
     pub reservoir_size: usize,
 }
 
-/// Cholesky decomposition of symmetric positive-definite matrix A (n×n, row-major).
-/// Returns lower-triangular L such that A = L·Lᵀ, or `None` if a leading minor
-/// is non-positive (matrix not SPD — should not happen with λ > 0).
-fn cholesky_factor(a: &[f64], n: usize) -> Option<Vec<f64>> {
-    let mut l = vec![0.0; n * n];
-    for i in 0..n {
-        for j in 0..=i {
-            let mut sum = 0.0;
-            for k in 0..j {
-                sum += l[i * n + k] * l[j * n + k];
-            }
-            if i == j {
-                let diag = a[i * n + i] - sum;
-                if diag <= 0.0 {
-                    return None;
-                }
-                l[i * n + j] = diag.sqrt();
-            } else {
-                l[i * n + j] = (a[i * n + j] - sum) / l[j * n + j];
-            }
-        }
-    }
-    Some(l)
-}
-
-/// Solve `(SᵀS + λI)·w = Sᵀy` for each output dimension via Cholesky factorization.
-///
-/// - `flat_states`:  `n_samples` × `n_res` row-major reservoir states.
-/// - `flat_targets`: `n_samples` × `n_out` row-major target vectors.
-///
-/// Falls back to diagonal solve if Cholesky decomposition fails.
+/// Solve `(SᵀS + λI)·w = Sᵀy` via `ToadStool`'s Cholesky-based ridge regression.
+#[cfg(feature = "gpu")]
 fn solve_ridge(
     w_out: &mut [f64],
     flat_states: &[f64],
@@ -143,7 +114,61 @@ fn solve_ridge(
     n_out: usize,
     regularization: f64,
 ) {
-    // Gram matrix: SᵀS + λI  (n_res × n_res)
+    match barracuda::linalg::ridge_regression(
+        flat_states,
+        flat_targets,
+        n_samples,
+        n_res,
+        n_out,
+        regularization,
+    ) {
+        Ok(result) => {
+            w_out[..result.weights.len()].copy_from_slice(&result.weights);
+        }
+        Err(_) => {
+            w_out.fill(0.0);
+        }
+    }
+}
+
+/// Solve `(SᵀS + λI)·w = Sᵀy` for each output dimension via Cholesky factorization.
+///
+/// - `flat_states`:  `n_samples` × `n_res` row-major reservoir states.
+/// - `flat_targets`: `n_samples` × `n_out` row-major target vectors.
+///
+/// Falls back to diagonal solve if Cholesky decomposition fails.
+#[cfg(not(feature = "gpu"))]
+fn solve_ridge(
+    w_out: &mut [f64],
+    flat_states: &[f64],
+    flat_targets: &[f64],
+    n_samples: usize,
+    n_res: usize,
+    n_out: usize,
+    regularization: f64,
+) {
+    fn cholesky_factor(a: &[f64], n: usize) -> Option<Vec<f64>> {
+        let mut l = vec![0.0; n * n];
+        for i in 0..n {
+            for j in 0..=i {
+                let mut sum = 0.0;
+                for k in 0..j {
+                    sum += l[i * n + k] * l[j * n + k];
+                }
+                if i == j {
+                    let diag = a[i * n + i] - sum;
+                    if diag <= 0.0 {
+                        return None;
+                    }
+                    l[i * n + j] = diag.sqrt();
+                } else {
+                    l[i * n + j] = (a[i * n + j] - sum) / l[j * n + j];
+                }
+            }
+        }
+        Some(l)
+    }
+
     let mut gram = vec![0.0_f64; n_res * n_res];
     for s in 0..n_samples {
         let row = &flat_states[s * n_res..(s + 1) * n_res];
@@ -160,7 +185,6 @@ fn solve_ridge(
     let chol = cholesky_factor(&gram, n_res);
 
     for o in 0..n_out {
-        // Sᵀ·y_o
         let mut sty = vec![0.0_f64; n_res];
         for s in 0..n_samples {
             let target_val = flat_targets[s * n_out + o];
@@ -172,7 +196,6 @@ fn solve_ridge(
 
         match &chol {
             Some(l) => {
-                // Forward substitution: L·z = Sᵀy
                 let mut z = vec![0.0; n_res];
                 for i in 0..n_res {
                     let mut sum = 0.0;
@@ -181,7 +204,6 @@ fn solve_ridge(
                     }
                     z[i] = (sty[i] - sum) / l[i * n_res + i];
                 }
-                // Backward substitution: Lᵀ·w = z
                 for i in (0..n_res).rev() {
                     let mut sum = 0.0;
                     for j in (i + 1)..n_res {
@@ -193,7 +215,7 @@ fn solve_ridge(
             None => {
                 for r in 0..n_res {
                     let diag = gram[r * n_res + r];
-                    w_out[o * n_res + r] = if diag.abs() > 1e-15 {
+                    w_out[o * n_res + r] = if diag.abs() > crate::tolerances::MATRIX_EPS {
                         sty[r] / diag
                     } else {
                         0.0

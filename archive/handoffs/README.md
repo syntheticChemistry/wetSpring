@@ -2,9 +2,9 @@
 
 Superseded handoff documents preserved as fossil record.
 
-**Current canonical handoff:** `../../wateringHole/handoffs/WETSPRING_V018_CROSS_SPRING_REWIRE_HANDOFF_FEB23_2026.md` (v18)
+**Current canonical handoff:** `../../wateringHole/handoffs/WETSPRING_TOADSTOOL_V31_ABSORPTION_TARGETS_FEB24_2026.md` (V31)
 
-## Contents
+## Contents (this archive)
 
 | File | Date | Version | Superseded By |
 |------|------|---------|---------------|
@@ -19,4 +19,6 @@ Superseded handoff documents preserved as fossil record.
 | `WETSPRING_TOADSTOOL_V9_FEB22_2026.md` | Feb 22 | v9 | v10 |
 | `TOADSTOOL_ABSORPTION_SPEC.md` | Feb 19 | — | `metalForge/ABSORPTION_STRATEGY.md` |
 
-V7 and V8 archived in `../../wateringHole/handoffs/archive/`.
+## Contents (wateringHole/handoffs/archive/)
+
+V7-V29 and cross-spring provenance docs archived there after V31 superseded them.

@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 24, 2026
-**Status:** Validation study active — 3,198+/3,198+ checks, 881 total tests, 95.67% library coverage, 162 experiments
+**Status:** Phase 41 — Validation study active — 3,198+/3,198+ checks, 806 tests, 162 experiments, ToadStool S59 aligned, 42 primitives consumed
 **License:** AGPL-3.0-or-later
 
 ---

@@ -11,7 +11,7 @@ use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
 use super::multi_signal::{self, MultiSignalParams};
-use super::ode_systems::MultiSignalOde;
+use barracuda::numerical::MultiSignalOde;
 
 /// Number of state variables.
 pub const N_VARS: usize = multi_signal::N_VARS;

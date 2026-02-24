@@ -99,30 +99,21 @@ pub fn cosine_similarity(
         };
     }
 
-    // Compute cosine similarity on matched peaks
-    let mut dot = 0.0;
-    let mut norm_q = 0.0;
-    let mut norm_r = 0.0;
+    // Dot product of matched-peak intensities only.
+    let matched_q: Vec<f64> = query_indices.iter().map(|&i| query_intensity[i]).collect();
+    let matched_r: Vec<f64> = reference_indices
+        .iter()
+        .map(|&i| ref_intensity[i])
+        .collect();
+    let dot = crate::special::dot(&matched_q, &matched_r);
 
-    for (&qi, &ri) in query_indices.iter().zip(reference_indices.iter()) {
-        dot += query_intensity[qi] * ref_intensity[ri];
-        norm_q += query_intensity[qi] * query_intensity[qi];
-        norm_r += ref_intensity[ri] * ref_intensity[ri];
-    }
+    // Norms include ALL peaks (matched + unmatched) for proper cosine —
+    // this differs from a simple `l2_norm` on matched subsets because
+    // unmatched peaks contribute to each spectrum's magnitude.
+    let norm_q = crate::special::l2_norm(query_intensity);
+    let norm_r = crate::special::l2_norm(ref_intensity);
 
-    // Include unmatched peaks in norms for proper cosine
-    for (i, &int) in query_intensity.iter().enumerate() {
-        if !query_indices.contains(&i) {
-            norm_q += int * int;
-        }
-    }
-    for (i, &int) in ref_intensity.iter().enumerate() {
-        if !reference_indices.contains(&i) {
-            norm_r += int * int;
-        }
-    }
-
-    let denom = norm_q.sqrt() * norm_r.sqrt();
+    let denom = norm_q * norm_r;
     let score = if denom > 0.0 { dot / denom } else { 0.0 };
 
     MatchResult {

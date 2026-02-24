@@ -365,9 +365,11 @@ fn fastq_iter_gzip() {
 fn parse_fastq_bad_header() {
     let dir = tempfile::tempdir().unwrap();
     let path = write_fastq(&dir, "bad.fastq", "NOPE\nACGT\n+\nIIII\n");
-    assert!(FastqIter::open(&path)
-        .and_then(|i| i.collect::<Result<Vec<_>>>())
-        .is_err());
+    assert!(
+        FastqIter::open(&path)
+            .and_then(|i| i.collect::<Result<Vec<_>>>())
+            .is_err()
+    );
 }
 
 #[test]

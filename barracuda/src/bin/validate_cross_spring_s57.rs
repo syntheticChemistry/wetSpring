@@ -49,10 +49,10 @@ use barracuda::linalg::{
     belief_propagation_chain, disordered_laplacian, effective_rank, graph_laplacian,
 };
 use barracuda::numerical::numerical_hessian;
-use barracuda::sample::{boltzmann_sampling, BoltzmannResult};
+use barracuda::sample::{BoltzmannResult, boltzmann_sampling};
 use barracuda::spectral::{
-    anderson_hamiltonian, find_all_eigenvalues, lanczos, lanczos_eigenvalues,
-    level_spacing_ratio, SpectralCsrMatrix,
+    SpectralCsrMatrix, anderson_hamiltonian, find_all_eigenvalues, lanczos, lanczos_eigenvalues,
+    level_spacing_ratio,
 };
 use barracuda::{
     BatchFitnessGpu, LocusVarianceGpu, PairwiseHammingGpu, PairwiseJaccardGpu, SpatialPayoffGpu,
@@ -204,24 +204,15 @@ async fn main() {
         // Uniform spectrum should give max rank
         let uniform: Vec<f64> = vec![1.0; 8];
         let rank_uniform = effective_rank(&uniform);
-        v.check(
-            "uniform spectrum: rank = n",
-            rank_uniform,
-            8.0,
-            1e-10,
-        );
+        v.check("uniform spectrum: rank = n", rank_uniform, 8.0, 1e-10);
 
         // Single eigenvalue should give rank 1
         let single: Vec<f64> = vec![5.0, 0.0, 0.0, 0.0];
         let rank_single = effective_rank(&single);
         v.check("single eigenvalue: rank = 1", rank_single, 1.0, 1e-10);
 
-        println!(
-            "    Diverse community effective rank: {rank_diverse:.2} / 8"
-        );
-        println!(
-            "    Dominated community effective rank: {rank_dominated:.2} / 8"
-        );
+        println!("    Diverse community effective rank: {rank_diverse:.2} / 8");
+        println!("    Dominated community effective rank: {rank_dominated:.2} / 8");
 
         bench_results.push(BenchEntry {
             primitive: "effective_rank",
@@ -239,9 +230,7 @@ async fn main() {
         // Hessian of a quadratic loss: f(x,y) = x^2 + 2*y^2 + x*y
         // Gradient: [2x+y, 4y+x], Hessian: [[2, 1], [1, 4]]
         let params = vec![1.0, 2.0];
-        let loss = |p: &[f64]| -> f64 {
-            p[0].mul_add(p[1], p[0].mul_add(p[0], 2.0 * p[1] * p[1]))
-        };
+        let loss = |p: &[f64]| -> f64 { p[0].mul_add(p[1], p[0].mul_add(p[0], 2.0 * p[1] * p[1])) };
 
         let t0 = Instant::now();
         let hessian = numerical_hessian(&loss, &params, 1e-5);
@@ -256,8 +245,18 @@ async fn main() {
         // Positive definite check (both eigenvalues > 0) → convex loss
         let trace = hessian[0] + hessian[3];
         let det = hessian[0].mul_add(hessian[3], -(hessian[1] * hessian[2]));
-        v.check("Hessian PD: trace > 0", if trace > 0.0 { 1.0 } else { 0.0 }, 1.0, 0.0);
-        v.check("Hessian PD: det > 0", if det > 0.0 { 1.0 } else { 0.0 }, 1.0, 0.0);
+        v.check(
+            "Hessian PD: trace > 0",
+            if trace > 0.0 { 1.0 } else { 0.0 },
+            1.0,
+            0.0,
+        );
+        v.check(
+            "Hessian PD: det > 0",
+            if det > 0.0 { 1.0 } else { 0.0 },
+            1.0,
+            0.0,
+        );
 
         let sqrt_disc = (trace.mul_add(trace, -4.0 * det)).sqrt();
         println!(
@@ -481,9 +480,7 @@ async fn main() {
 
         let t0 = Instant::now();
         let result: BoltzmannResult = boltzmann_sampling(
-            &loss,
-            &initial,
-            0.1,   // temperature
+            &loss, &initial, 0.1,   // temperature
             0.01,  // step size
             5_000, // n_steps
             42,    // seed
@@ -493,18 +490,10 @@ async fn main() {
         // The optimum is at (1,1) with loss=0
         // MCMC should find a point with loss < initial
         let final_loss = loss(&result.final_params);
-        let best_loss = result
-            .losses
-            .iter()
-            .copied()
-            .fold(f64::INFINITY, f64::min);
+        let best_loss = result.losses.iter().copied().fold(f64::INFINITY, f64::min);
         v.check(
             "MCMC finds loss < initial",
-            if best_loss < loss(&initial) {
-                1.0
-            } else {
-                0.0
-            },
+            if best_loss < loss(&initial) { 1.0 } else { 0.0 },
             1.0,
             0.0,
         );
@@ -576,7 +565,12 @@ async fn main() {
 
         // Compare with hotSpring's native anderson_hamiltonian on same chain
         let mean_h: f64 = env_heterogeneity.iter().sum::<f64>() / n as f64;
-        let disorder_w = 5.0 * env_heterogeneity.iter().map(|h| (h - mean_h).abs()).fold(0.0f64, f64::max) * 2.0;
+        let disorder_w = 5.0
+            * env_heterogeneity
+                .iter()
+                .map(|h| (h - mean_h).abs())
+                .fold(0.0f64, f64::max)
+            * 2.0;
         let (diag_a, offdiag_a) = anderson_hamiltonian(n, disorder_w, 42);
         let eigs_anderson = find_all_eigenvalues(&diag_a, &offdiag_a);
         let r_anderson = level_spacing_ratio(&eigs_anderson);
@@ -670,12 +664,7 @@ async fn main() {
         });
         jaccard.dispatch(&pa_buf, &jdist_buf, 2, 2);
         let j_dists = readback_f32(&device, &jdist_buf, 1);
-        v.check(
-            "Jaccard GPU smoke",
-            f64::from(j_dists[0]),
-            0.5,
-            1e-5,
-        );
+        v.check("Jaccard GPU smoke", f64::from(j_dists[0]), 0.5, 1e-5);
 
         // SpatialPayoff
         let grid: Vec<u32> = vec![1, 0, 0, 1];
@@ -759,9 +748,10 @@ async fn main() {
         ];
         let cpu_lv: Vec<f32> = (0..lv_loci as usize)
             .map(|l| {
-                let mean: f32 =
-                    (0..lv_pops as usize).map(|p| lv_freqs[p * lv_loci as usize + l]).sum::<f32>()
-                        / lv_pops as f32;
+                let mean: f32 = (0..lv_pops as usize)
+                    .map(|p| lv_freqs[p * lv_loci as usize + l])
+                    .sum::<f32>()
+                    / lv_pops as f32;
                 (0..lv_pops as usize)
                     .map(|p| {
                         let diff = lv_freqs[p * lv_loci as usize + l] - mean;
@@ -790,9 +780,7 @@ async fn main() {
             .zip(lv_out.iter())
             .filter(|(c, g)| (f64::from(**g) - f64::from(**c)).abs() < 0.01)
             .count();
-        println!(
-            "    LocusVar: {lv_matching}/{lv_loci} GPU↔CPU match (Exp094 validates at scale)"
-        );
+        println!("    LocusVar: {lv_matching}/{lv_loci} GPU↔CPU match (Exp094 validates at scale)");
 
         println!("    All 5 neuralSpring GPU primitives pass on ToadStool S57");
     }
@@ -815,14 +803,24 @@ async fn main() {
     println!("                    | boltzmann_sampling (CPU)             | (this experiment)");
     println!("  airSpring S54     | pow_f64, acos_f64, FMR buffer fixes  | ALL Springs\n");
 
-    println!("  {:<30} {:<22} {:<8} {:>10} {:<20} {:>6}",
-        "Primitive", "Evolved By", "Session", "Time (µs)", "Problem", "Checks");
-    println!("  {:<30} {:<22} {:<8} {:>10} {:<20} {:>6}",
-        "─".repeat(30), "─".repeat(22), "─".repeat(8), "─".repeat(10),
-        "─".repeat(20), "─".repeat(6));
+    println!(
+        "  {:<30} {:<22} {:<8} {:>10} {:<20} {:>6}",
+        "Primitive", "Evolved By", "Session", "Time (µs)", "Problem", "Checks"
+    );
+    println!(
+        "  {:<30} {:<22} {:<8} {:>10} {:<20} {:>6}",
+        "─".repeat(30),
+        "─".repeat(22),
+        "─".repeat(8),
+        "─".repeat(10),
+        "─".repeat(20),
+        "─".repeat(6)
+    );
     for b in &bench_results {
-        println!("  {:<30} {:<22} {:<8} {:>10.0} {:<20} {:>6}",
-            b.primitive, b.evolved_by, b.session, b.cpu_us, b.problem, b.checks);
+        println!(
+            "  {:<30} {:<22} {:<8} {:>10.0} {:<20} {:>6}",
+            b.primitive, b.evolved_by, b.session, b.cpu_us, b.problem, b.checks
+        );
     }
 
     println!("\n═══ The Biome Model Works at S57 ════════════════════════════════");

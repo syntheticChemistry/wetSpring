@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 24, 2026
-**Status:** 162 experiments, 3,198+ validation checks, all PASS (834 barracuda + 47 forge = 881 Rust tests)
+**Status:** Phase 41 — 162 experiments, 3,198+ validation checks, all PASS (759 barracuda + 47 forge = 806 Rust tests), ToadStool S59 aligned, 42 primitives consumed
 
 ---
 
@@ -399,7 +399,7 @@ substrate-independence: for every GPU-eligible algorithm, the metalForge
 router can dispatch to CPU or GPU and get the same answer. This is the
 foundation for CPU/GPU/NPU routing in production.
 
-## ToadStool Evolution (Feb 22, 2026)
+## ToadStool Evolution (Feb 24, 2026 — S59 Aligned)
 
 ### Write → Absorb → Lean Status
 
@@ -407,12 +407,12 @@ Following hotSpring's pattern for ToadStool integration:
 
 | Phase | Count | Status |
 |-------|:-----:|--------|
-| **Lean** (consumed upstream) | 20 GPU modules, 23 primitives | Active — 15 original + 8 bio (HMM, ANI, SNP, dN/dS, Pangenome, QF, DADA2, RF) |
-| **Write** (local WGSL, pending absorption) | **0** — all 4 retired (Phase 25) | ODE, kmer, taxonomy, unifrac absorbed by ToadStool S39-S41; Lean phase complete |
-| **CPU math** (`crate::special`) | 4 functions (erf, ln_gamma, regularized_gamma, normal_cdf) | Consolidated; `bio::special` shim removed (Phase 24); shaped for `barracuda::math` |
+| **Lean** (consumed upstream) | 42 primitives across GPU + CPU | S59: NMF, ridge, ODE bio, Anderson correlated, trapz added to 37 prior |
+| **Write** (local WGSL, pending absorption) | **0** — all retired | ODE shaders use `generate_shader()`; local WGSL deleted |
+| **CPU math** (`crate::special`) | 3 functions delegating on GPU | `erf`, `ln_gamma`, `regularized_gamma_lower` → `barracuda::special::*` when `gpu` active; sovereign fallback for no-GPU |
 | **CPU-only** (no GPU path) | 1 module (phred) | Pure GPU promotion complete (Exp101) |
-| **Blocked** (needs upstream) | 3 modules | kmer hash, UniFrac tree traversal, taxonomy NPU |
-| **metalForge** (absorption eng.) | 32 tolerances, SoA patterns, `#[repr(C)]` | Shaping all modules for ToadStool absorption |
+| **Removed** (leaning upstream) | NMF (482 lines), ODE systems (715 lines), Anderson builder (~115 lines), ridge (~100 lines) | ~1,312 lines deleted in V30 lean |
+| **metalForge** (absorption eng.) | 56 tolerances, SoA patterns, `#[repr(C)]` | Shaping all modules for ToadStool absorption |
 
 ### Feb 22 Rewire: 8 Bio Primitives Absorbed
 
@@ -428,20 +428,21 @@ warnings. Two ToadStool bugs found and fixed during validation:
    ToadStool's RTX 4070 Ada Lovelace detection and f64 exp/log polyfill. Fixed to
    use `WgpuDevice::from_existing()` with real `AdapterInfo`.
 
-### Cross-Spring Evolution
+### Cross-Spring Evolution (S59)
 
-ToadStool `barracuda` v0.2.0 is the convergence hub for three springs:
+ToadStool `barracuda` is the convergence hub for all springs (650+ WGSL shaders):
 
-| Spring | Contribution | Primitives |
+| Spring | Contribution | Key Primitives |
 |--------|-------------|-----------|
-| **hotSpring** | Precision shaders, lattice QCD, spectral theory | Dirac, CG, plaquette, Higgs U(1), SU(3) HMC, Lanczos, Anderson, Hofstadter |
-| **wetSpring** | Bio/genomics WGSL shaders, math_f64, Hill kinetics | HMM, ANI, SNP, dN/dS, Pangenome, QF, DADA2, RF, SW, Gillespie, Felsenstein |
-| **neuralSpring** | ML inference, eigensolvers, TensorSession | Batch IPR, RF inference, HMM forward log, pairwise Hamming/Jaccard, batch fitness, Eigh |
+| **hotSpring** | Precision shaders (`df64_core.wgsl`, `Fp64Strategy`), lattice QCD, spectral theory | CG solver, Lanczos, Anderson, Hofstadter, Hermite/Laguerre, ESN reservoir |
+| **wetSpring** | Bio ODE systems, NMF, genomics shaders, math_f64 | NMF (S58), 5 ODE bio (S58), ridge regression (S59), Anderson correlated (S59), HMM, ANI, SNP, dN/dS |
+| **neuralSpring** | Graph theory, ML inference, eigensolvers, TensorSession | graph_laplacian, effective_rank, numerical_hessian, belief_propagation, boltzmann_sampling, ValidationHarness |
+| **airSpring** | IoT, precision agriculture | Richards PDE, moving_window, Kriging, pow_f64/acos fixes |
 
-All three springs now lean on the same ToadStool primitives, benefiting from
-cross-spring evolution: hotSpring's precision fixes improve wetSpring's bio
-shaders; neuralSpring's eigensolver powers wetSpring's PCoA; wetSpring's
-bio primitives are available to neuralSpring's metalForge pipeline.
+Cross-spring benefits measured: upstream ODE integrators are **10-43% faster** than
+local (ToadStool optimizes across all springs' usage). hotSpring's `Fp64Strategy`
+gives wetSpring f64 on all GPUs. neuralSpring's graph primitives enable wetSpring
+community network analysis. 12 provenance tags track origins across springs.
 
 ### Streaming & Dispatch Validation (Feb 22, 2026)
 
@@ -517,7 +518,9 @@ Bugs found and fixed: SNP binding layout (ToadStool), AdapterInfo propagation (w
 
 | Document | Location | Purpose |
 |----------|----------|---------|
-| **V22 — Extension papers: cold seep, phylogeny, waves** | `wateringHole/handoffs/WETSPRING_V022_EXTENSION_PAPERS_FEB23_2026.md` | Phase 38, 149 experiments, baseCamp sub-theses |
+| **V30 — S59 Lean: NMF, ridge, ODE, Anderson** | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V30_S59_LEAN_FEB24_2026.md` | Phase 41, S59 lean, ~1,312 lines removed, 42 primitives |
+| V29 — Evolution handoff | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V29_EVOLUTION_HANDOFF_FEB24_2026.md` | Phase 40, cross-spring synthesis |
+| V22 — Extension papers: cold seep, phylogeny, waves | `wateringHole/handoffs/WETSPRING_V022_EXTENSION_PAPERS_FEB23_2026.md` | Phase 38, 149 experiments, baseCamp sub-theses |
 | V21 — Why analysis: mapping, scaling, dilution, eukaryotes | `wateringHole/handoffs/WETSPRING_V021_WHY_ANALYSIS_FEB23_2026.md` | Phase 36c, GPU-confirmed, 138 experiments |
 | V20 — 3D Anderson dimensional QS | `wateringHole/handoffs/WETSPRING_V020_3D_ANDERSON_DIMENSIONAL_QS_FEB23_2026.md` | Phase 36, GPU-confirmed, 130 experiments |
 | V19 — NCBI hypothesis testing | `wateringHole/handoffs/WETSPRING_V019_NCBI_HYPOTHESIS_TESTING_FEB23_2026.md` | Phase 35, GPU-confirmed, 126 experiments |

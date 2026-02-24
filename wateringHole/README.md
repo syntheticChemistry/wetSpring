@@ -9,34 +9,20 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V29** | `handoffs/WETSPRING_TOADSTOOL_V29_EVOLUTION_HANDOFF_FEB24_2026.md` | Feb 24 | Phase 40: cross-spring synthesis, deprecated API removal, dead-code cleanup, V29 handoff |
-| V28 | `handoffs/WETSPRING_TOADSTOOL_V28_S57_SYNC_FEB24_2026.md` | Feb 24 | Phase 40: S57 alignment, 6 new primitives wired, clippy cleanup, Exp162 |
-| V27 | `handoffs/WETSPRING_TOADSTOOL_V27_EVOLUTION_FEB24_2026.md` | Feb 24 | Barracuda evolution review, three-tier controls, Track 3 drug repurposing |
-| V26 | `handoffs/WETSPRING_TOADSTOOL_V26_SYNC_FEB24_2026.md` | Feb 24 | Code audit, revalidation, ToadStool S53 sync |
-| V25 | `handoffs/WETSPRING_TOADSTOOL_V25_FINITE_SIZE_FEB24_2026.md` | Feb 24 | Phase 39: finite-size scaling, correlated disorder, ToadStool absorption targets |
-| V24 | `handoffs/WETSPRING_TOADSTOOL_V24_LEAN_FEB24_2026.md` | Feb 24 | Complete ODE lean: 5 WGSL deleted, GPU rewired to `generate_shader()` |
-| V22 | `handoffs/WETSPRING_V022_EXTENSION_PAPERS_FEB23_2026.md` | Feb 23 | Phase 38: extension papers (Exps 144–149), baseCamp sub-theses |
-| V21 | `handoffs/WETSPRING_V021_WHY_ANALYSIS_FEB23_2026.md` | Feb 23 | Phase 36c: why analysis, GPU-confirmed |
-| V20 | `handoffs/WETSPRING_V020_3D_ANDERSON_DIMENSIONAL_QS_FEB23_2026.md` | Feb 23 | Phase 36: 3D Anderson dimensional QS |
-| V19 | `handoffs/WETSPRING_V019_NCBI_HYPOTHESIS_TESTING_FEB23_2026.md` | Feb 23 | Phase 35: NCBI hypothesis testing |
-| V18 | `handoffs/WETSPRING_V018_CROSS_SPRING_REWIRE_HANDOFF_FEB23_2026.md` | Feb 23 | Phase 34: full rewire, cross-spring benchmark |
-| V17 | `handoffs/WETSPRING_TOADSTOOL_V17_NPU_RESERVOIR_FEB23_2026.md` | Feb 23 | Phase 33: NPU reservoir, NCBI-scale GPU |
-| V16 | `handoffs/WETSPRING_TOADSTOOL_V16_STREAMING_FEB23_2026.md` | Feb 23 | Phase 30: streaming v2, metalForge v6 |
-| V15 | `handoffs/WETSPRING_TOADSTOOL_V15_ODE_GENERIC_FEB22_2026.md` | Feb 22 | ODE shaders → BatchedOdeRK4Generic |
-| V14 | `handoffs/WETSPRING_TOADSTOOL_V14_FEB22_2026.md` | Feb 22 | Write phase, ODE shaders, forge v0.3.0 |
-| V13 | `handoffs/WETSPRING_TOADSTOOL_V13_FEB22_2026.md` | Feb 22 | Edition 2024, structural evolution |
+| **V31** | `handoffs/WETSPRING_TOADSTOOL_V31_ABSORPTION_TARGETS_FEB24_2026.md` | Feb 24 | Phase 41: absorption targets for ToadStool, cross-spring evolution insights, architecture suggestions |
+| V30 | `handoffs/WETSPRING_TOADSTOOL_V30_S59_LEAN_FEB24_2026.md` | Feb 24 | Phase 41: S59 lean — NMF, ridge, ODE systems, correlated Anderson rewired upstream (~1,312 lines removed) |
+| API | `handoffs/TOADSTOOL_PRIMITIVES_API_REPORT_FEB24_2026.md` | Feb 24 | ToadStool primitives API reference |
 
 ## Cross-Spring Documents
 
 | File | Purpose |
 |------|---------|
-| `CROSS_SPRING_SHADER_EVOLUTION.md` | 650+ WGSL shader provenance map (cross-spring, ToadStool S57) |
-| `handoffs/CROSS_SPRING_EVOLUTION_WETSPRING_FEB22_2026.md` | wetSpring perspective on biome model |
-| `handoffs/CROSS_SPRING_PROVENANCE_FEB22_2026.md` | Shader origin tracking |
+| `CROSS_SPRING_SHADER_EVOLUTION.md` | 650+ WGSL shader provenance map (cross-spring, ToadStool S59) |
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` (V7-V12, rewire).
+Superseded handoffs in `handoffs/archive/` (V7-V29, rewire, cross-spring provenance).
+Cross-spring docs moved to archive: `CROSS_SPRING_EVOLUTION_WETSPRING_FEB22_2026.md`, `CROSS_SPRING_PROVENANCE_FEB22_2026.md`.
 
 ## Convention
 

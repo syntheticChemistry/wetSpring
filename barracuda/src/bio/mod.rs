@@ -78,21 +78,9 @@ pub mod ncbi_data;
 pub mod neighbor_joining;
 #[cfg(feature = "gpu")]
 pub mod neighbor_joining_gpu;
-#[allow(
-    clippy::many_single_char_names,
-    clippy::doc_markdown,
-    clippy::must_use_candidate,
-    clippy::missing_const_for_fn,
-    clippy::missing_panics_doc,
-    clippy::suboptimal_flops,
-    clippy::too_many_arguments
-)]
-pub mod nmf;
 pub mod ode;
 #[cfg(feature = "gpu")]
 pub mod ode_sweep_gpu;
-#[cfg(feature = "gpu")]
-pub mod ode_systems;
 #[allow(clippy::cast_precision_loss)]
 pub mod pangenome;
 #[cfg(feature = "gpu")]

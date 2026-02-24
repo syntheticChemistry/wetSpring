@@ -21,7 +21,7 @@
 //! | Phase       | 39 — Drug repurposing track |
 //! | Paper       | 42 (Gao et al. 2020, PMC7153111) |
 
-use wetspring_barracuda::bio::nmf::{self, NmfConfig, NmfObjective};
+use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 use wetspring_barracuda::validation::Validator;
 
 struct LcgRng(u64);
@@ -166,7 +166,7 @@ fn validate_rank_sensitivity(v: &mut Validator, matrix: &[f64]) {
             objective: NmfObjective::Euclidean,
             seed: 42,
         };
-        let res = nmf::nmf(matrix, N_DRUGS, N_DISEASES, &cfg);
+        let res = nmf::nmf(matrix, N_DRUGS, N_DISEASES, &cfg).expect("NMF failed");
         let re = nmf::relative_reconstruction_error(matrix, &res);
         let wh_r = reconstruct_wh(&res);
         let (wm, cm) = compute_block_discrimination(&wh_r);
@@ -245,7 +245,7 @@ fn main() {
     };
 
     let start = std::time::Instant::now();
-    let result = nmf::nmf(&matrix, N_DRUGS, N_DISEASES, &config);
+    let result = nmf::nmf(&matrix, N_DRUGS, N_DISEASES, &config).expect("NMF failed");
     let elapsed_ms = start.elapsed().as_millis();
     let rel_err = nmf::relative_reconstruction_error(&matrix, &result);
 

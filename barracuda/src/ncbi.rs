@@ -30,26 +30,49 @@ use std::path::{Path, PathBuf};
 
 const ENTREZ_BASE: &str = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
 
-/// Resolve the NCBI API key from environment or well-known TOML files.
+/// Resolve the NCBI API key via capability-based discovery.
 ///
-/// Search order:
-/// 1. `NCBI_API_KEY` environment variable
-/// 2. `../../../testing-secrets/api-keys.toml` (relative to manifest)
-/// 3. `../../testing-secrets/api-keys.toml`
+/// Search order (first match wins):
+/// 1. `NCBI_API_KEY` environment variable (production / CI)
+/// 2. `WETSPRING_DATA_ROOT/api-keys.toml` (capability-based data root)
+/// 3. `$HOME/.config/wetspring/api-keys.toml` (XDG convention)
+/// 4. Well-known development paths relative to workspace root
+///
+/// Returns `None` if no key is found — callers must degrade gracefully
+/// (NCBI allows 3 req/sec without a key, 10 req/sec with one).
 #[must_use]
 pub fn api_key() -> Option<String> {
     if let Ok(key) = std::env::var("NCBI_API_KEY") {
         return Some(key);
     }
-    let relative_paths = [
+
+    // Capability-based: check the validation data root
+    if let Ok(root) = std::env::var("WETSPRING_DATA_ROOT") {
+        let toml_path = Path::new(&root).join("api-keys.toml");
+        if let Some(key) = parse_api_key_toml(&toml_path) {
+            return Some(key);
+        }
+    }
+
+    // XDG config home (~/.config/wetspring/)
+    if let Ok(home) = std::env::var("HOME") {
+        let xdg = Path::new(&home).join(".config/wetspring/api-keys.toml");
+        if let Some(key) = parse_api_key_toml(&xdg) {
+            return Some(key);
+        }
+    }
+
+    // Legacy dev paths (kept for backwards compatibility during transition)
+    let legacy_paths = [
         "../../../testing-secrets/api-keys.toml",
         "../../testing-secrets/api-keys.toml",
     ];
-    for path in &relative_paths {
+    for path in &legacy_paths {
         if let Some(key) = parse_api_key_toml(Path::new(path)) {
             return Some(key);
         }
     }
+
     None
 }
 

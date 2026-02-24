@@ -25,7 +25,7 @@
 //! | Phase       | 39 — Drug repurposing track |
 //! | Paper       | 41 (Yang et al. 2020) |
 
-use wetspring_barracuda::bio::nmf::{self, NmfConfig, NmfObjective};
+use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 use wetspring_barracuda::validation::Validator;
 
 struct LcgRng(u64);
@@ -116,7 +116,7 @@ fn validate_factorisation(
             objective: NmfObjective::Euclidean,
             seed: 42,
         };
-        let result = nmf::nmf(train_matrix, n_drugs, n_diseases, &config);
+        let result = nmf::nmf(train_matrix, n_drugs, n_diseases, &config).expect("NMF failed");
         let rel_err = nmf::relative_reconstruction_error(train_matrix, &result);
 
         let top_k_preds = nmf::top_k_predictions(&result, n_test * 5);
@@ -162,7 +162,8 @@ fn validate_factorisation(
         objective: NmfObjective::Euclidean,
         seed: 42,
     };
-    let result_best = nmf::nmf(train_matrix, n_drugs, n_diseases, &config_best);
+    let result_best =
+        nmf::nmf(train_matrix, n_drugs, n_diseases, &config_best).expect("NMF failed");
     let rel_best = nmf::relative_reconstruction_error(train_matrix, &result_best);
     println!("  Best-rank reconstruction error: {rel_best:.4}");
     v.check_pass(
@@ -201,7 +202,7 @@ fn validate_kl_and_sparsity(
         seed: 42,
     };
     let train_kl: Vec<f64> = train_matrix.iter().map(|&x| x + 1e-10).collect();
-    let result_kl = nmf::nmf(&train_kl, n_drugs, n_diseases, &config_kl);
+    let result_kl = nmf::nmf(&train_kl, n_drugs, n_diseases, &config_kl).expect("KL NMF failed");
 
     let kl_top = nmf::top_k_predictions(&result_kl, n_test * 5);
     let kl_novel: Vec<(usize, usize, f64)> = kl_top
@@ -234,7 +235,8 @@ fn validate_kl_and_sparsity(
         objective: NmfObjective::Euclidean,
         seed: 42,
     };
-    let result_best = nmf::nmf(train_matrix, n_drugs, n_diseases, &config_best);
+    let result_best =
+        nmf::nmf(train_matrix, n_drugs, n_diseases, &config_best).expect("NMF failed");
 
     let w_sparsity =
         result_best.w.iter().filter(|&&x| x < 1e-8).count() as f64 / result_best.w.len() as f64;

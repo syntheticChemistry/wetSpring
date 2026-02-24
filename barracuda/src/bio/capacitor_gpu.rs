@@ -11,7 +11,7 @@ use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
 use super::capacitor::{self, CapacitorParams};
-use super::ode_systems::CapacitorOde;
+use barracuda::numerical::CapacitorOde;
 
 /// Number of state variables.
 pub const N_VARS: usize = capacitor::N_VARS;

@@ -254,8 +254,7 @@ fn main() {
         ("Florida", &florida, 120, 160),
     ] {
         let pre_bloom_h = diversity::shannon(&eco[bloom_start.saturating_sub(5)]);
-        let mid_bloom_h =
-            diversity::shannon(&eco[usize::midpoint(bloom_start, bloom_end)]);
+        let mid_bloom_h = diversity::shannon(&eco[usize::midpoint(bloom_start, bloom_end)]);
         let post_bloom_h = diversity::shannon(&eco[(bloom_end + 5).min(eco.len() - 1)]);
 
         let drop_ratio = mid_bloom_h / pre_bloom_h;

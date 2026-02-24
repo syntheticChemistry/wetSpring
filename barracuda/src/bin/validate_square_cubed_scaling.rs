@@ -183,10 +183,10 @@ fn main() {
         }
         println!(
             "    3D: {}",
-            min_l_3d.map_or_else(|| "needs L>12".to_string(), |l| format!(
-                "L>={l} ({} cells)",
-                l * l * l
-            ))
+            min_l_3d.map_or_else(
+                || "needs L>12".to_string(),
+                |l| format!("L>={l} ({} cells)", l * l * l)
+            )
         );
         v.check_pass("critical size analysis", true);
 

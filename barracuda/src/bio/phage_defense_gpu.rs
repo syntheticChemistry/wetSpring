@@ -10,8 +10,8 @@ use barracuda::numerical::ode_generic::BatchedOdeRK4;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
-use super::ode_systems::PhageDefenseOde;
 use super::phage_defense::{self, PhageDefenseParams};
+use barracuda::numerical::PhageDefenseOde;
 
 /// Number of state variables.
 pub const N_VARS: usize = phage_defense::N_VARS;

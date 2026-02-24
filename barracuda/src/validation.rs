@@ -118,13 +118,28 @@ pub fn exit_skipped(reason: &str) -> ! {
 /// ```
 #[must_use]
 pub fn data_dir(env_var: &str, default_subpath: &str) -> std::path::PathBuf {
-    // 1. Specific env var override
-    if let Ok(dir) = std::env::var(env_var) {
+    let specific = std::env::var(env_var).ok();
+    let data_root = std::env::var("WETSPRING_DATA_ROOT").ok();
+    resolve_data_dir(specific.as_deref(), data_root.as_deref(), default_subpath)
+}
+
+/// Pure logic for data directory resolution — no global state access.
+///
+/// Takes pre-read environment values so it can be tested without mutating
+/// process-wide environment variables (which is `unsafe` in edition 2024).
+#[must_use]
+pub fn resolve_data_dir(
+    specific_override: Option<&str>,
+    data_root: Option<&str>,
+    default_subpath: &str,
+) -> std::path::PathBuf {
+    // 1. Specific override
+    if let Some(dir) = specific_override {
         return std::path::PathBuf::from(dir);
     }
     // 2. General data root
-    if let Ok(root) = std::env::var("WETSPRING_DATA_ROOT") {
-        let p = std::path::Path::new(&root).join(default_subpath);
+    if let Some(root) = data_root {
+        let p = std::path::Path::new(root).join(default_subpath);
         if p.exists() {
             return p;
         }
@@ -228,64 +243,9 @@ impl Validator {
 }
 
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used, unsafe_code)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
-
-    use std::sync::{Mutex, MutexGuard};
-
-    /// Serializes tests that mutate process-wide environment variables.
-    ///
-    /// `std::env::set_var` / `remove_var` are unsafe in edition 2024 because
-    /// concurrent reads from other threads cause UB. This mutex ensures only
-    /// one env-mutating test runs at a time; combined with unique key names
-    /// per test, this eliminates data races.
-    static ENV_LOCK: Mutex<()> = Mutex::new(());
-
-    /// RAII guard that sets an env var on creation and restores the
-    /// previous value (or removes the key) on drop. Holds `ENV_LOCK`
-    /// for the guard's entire lifetime, preventing concurrent env access.
-    struct EnvGuard<'a> {
-        key: String,
-        previous: Option<String>,
-        _lock: MutexGuard<'a, ()>,
-    }
-
-    impl EnvGuard<'_> {
-        fn set(key: &str, val: impl AsRef<std::ffi::OsStr>) -> Self {
-            let lock = ENV_LOCK.lock().unwrap();
-            let previous = std::env::var(key).ok();
-            // SAFETY: ENV_LOCK is held; no other test reads/writes env concurrently.
-            unsafe { std::env::set_var(key, val) };
-            Self {
-                key: key.to_string(),
-                previous,
-                _lock: lock,
-            }
-        }
-
-        fn remove(key: &str) -> Self {
-            let lock = ENV_LOCK.lock().unwrap();
-            let previous = std::env::var(key).ok();
-            // SAFETY: ENV_LOCK is held; no other test reads/writes env concurrently.
-            unsafe { std::env::remove_var(key) };
-            Self {
-                key: key.to_string(),
-                previous,
-                _lock: lock,
-            }
-        }
-    }
-
-    impl Drop for EnvGuard<'_> {
-        fn drop(&mut self) {
-            // SAFETY: self._lock is still held (dropped after this).
-            match &self.previous {
-                Some(val) => unsafe { std::env::set_var(&self.key, val) },
-                None => unsafe { std::env::remove_var(&self.key) },
-            }
-        }
-    }
 
     #[test]
     fn check_exact_match() {
@@ -382,6 +342,49 @@ mod tests {
         assert_eq!(v.counts(), (3, 5));
     }
 
+    // ── resolve_data_dir: pure function tests (zero unsafe) ──────
+
+    #[test]
+    fn resolve_specific_override_wins() {
+        let dir = resolve_data_dir(Some("/explicit/path"), Some("/root"), "data/default");
+        assert_eq!(dir.to_string_lossy(), "/explicit/path");
+    }
+
+    #[test]
+    fn resolve_data_root_with_existing_subpath() {
+        let tmp = tempfile::tempdir().unwrap();
+        let subpath = "resolve_test/data";
+        let full = tmp.path().join(subpath);
+        std::fs::create_dir_all(&full).unwrap();
+
+        let root = tmp.path().to_string_lossy().to_string();
+        let dir = resolve_data_dir(None, Some(&root), subpath);
+        assert_eq!(dir, full);
+    }
+
+    #[test]
+    fn resolve_data_root_nonexistent_falls_through() {
+        let dir = resolve_data_dir(None, Some("/nonexistent_root"), "sub/path");
+        let s = dir.to_string_lossy();
+        assert!(s.contains("sub/path"));
+    }
+
+    #[test]
+    fn resolve_no_env_uses_cwd_fallback() {
+        let subpath = "___nonexistent_resolve_test/data";
+        let dir = resolve_data_dir(None, None, subpath);
+        assert_eq!(dir.to_string_lossy(), subpath);
+    }
+
+    #[test]
+    fn resolve_nested_subpath() {
+        let dir = resolve_data_dir(None, None, "a/b/c/d/e");
+        let s = dir.to_string_lossy();
+        assert!(s.contains("a/b/c/d/e"));
+    }
+
+    // ── data_dir: integration (reads real env, no mutation) ──────
+
     #[test]
     fn data_dir_fallback_uses_manifest() {
         let dir = data_dir("WETSPRING_NONEXISTENT_12345", "data/test");
@@ -400,37 +403,7 @@ mod tests {
         );
     }
 
-    #[test]
-    fn data_dir_explicit_env_override() {
-        let key = "WETSPRING_DATA_DIR_EXPLICIT_OVERRIDE_TEST";
-        let expected = "/tmp/wetspring_explicit_override_test";
-        let _guard = EnvGuard::set(key, expected);
-        let dir = data_dir(key, "data/default");
-        assert_eq!(dir.to_string_lossy(), expected);
-    }
-
-    #[test]
-    fn data_dir_wetspring_data_root_override() {
-        let tmp = tempfile::tempdir().unwrap();
-        let subpath = "wetspring_data_root_test/data";
-        let full = tmp.path().join(subpath);
-        std::fs::create_dir_all(&full).unwrap();
-
-        let _guard = EnvGuard::set("WETSPRING_DATA_ROOT", tmp.path());
-        let dir = data_dir("WETSPRING_NONEXISTENT_FOR_ROOT_TEST", subpath);
-
-        assert_eq!(dir, full, "WETSPRING_DATA_ROOT + subpath should be used");
-    }
-
-    #[test]
-    fn data_dir_cwd_fallback() {
-        let _guard = EnvGuard::remove("WETSPRING_DATA_ROOT");
-
-        let subpath = "___wetspring_cwd_fallback_nonexistent_xyz/data";
-        let dir = data_dir("WETSPRING_NONEXISTENT_CWD_TEST", subpath);
-
-        assert_eq!(dir.to_string_lossy(), subpath);
-    }
+    // ── check() edge cases ──────────────────────────────────────
 
     #[test]
     fn check_nan_always_fails() {
@@ -440,7 +413,6 @@ mod tests {
 
     #[test]
     fn check_infinity_values() {
-        // INF - INF = NaN, so exact-tolerance check fails (correct: use check_count for sentinels)
         assert!(!check("inf-inf is NaN", f64::INFINITY, f64::INFINITY, 0.0));
         assert!(!check("inf vs finite", f64::INFINITY, 0.0, 1e100));
     }
@@ -452,7 +424,6 @@ mod tests {
 
     #[test]
     fn check_boundary_tolerance() {
-        // 1.01 - 1.0 ≈ 0.01 + epsilon due to f64 representation, so exact 0.01 tol fails
         assert!(!check("at exact boundary (fp rounding)", 1.01, 1.0, 0.01));
         assert!(check("within tolerance", 1.009, 1.0, 0.01));
         assert!(!check("past boundary", 1.02, 1.0, 0.01));
@@ -498,12 +469,5 @@ mod tests {
             v.check(&format!("fail {i}"), 999.0, 0.0, 0.0);
         }
         assert_eq!(v.counts(), (0, 5));
-    }
-
-    #[test]
-    fn data_dir_nested_subpath() {
-        let dir = data_dir("WETSPRING_NONEXISTENT_NESTED", "a/b/c/d/e");
-        let s = dir.to_string_lossy();
-        assert!(s.contains("a/b/c/d/e"));
     }
 }

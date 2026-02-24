@@ -174,7 +174,7 @@ fn fit_heaps_law(clusters: &[GeneCluster], n_genomes: usize) -> Option<f64> {
     // `suspicious_operation_groupings` is a false positive here.
     #[allow(clippy::suspicious_operation_groupings)]
     let denom = n.mul_add(sum_xx, -(sum_x * sum_x));
-    if denom.abs() < 1e-15 {
+    if denom.abs() < crate::tolerances::MATRIX_EPS {
         return None;
     }
 

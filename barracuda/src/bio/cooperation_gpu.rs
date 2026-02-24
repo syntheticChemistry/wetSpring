@@ -11,7 +11,7 @@ use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
 use super::cooperation::{self, CooperationParams};
-use super::ode_systems::CooperationOde;
+use barracuda::numerical::CooperationOde;
 
 /// Number of state variables.
 pub const N_VARS: usize = cooperation::N_VARS;

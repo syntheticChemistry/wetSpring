@@ -175,7 +175,8 @@ fn main() {
             println!(
                 "    L={:>2}: W_c = {}",
                 sr.l,
-                sr.w_c.map_or_else(|| "—".to_string(), |w| format!("{w:.2}"))
+                sr.w_c
+                    .map_or_else(|| "—".to_string(), |w| format!("{w:.2}"))
             );
         }
 
@@ -291,7 +292,8 @@ fn main() {
                 sr.l * sr.l * sr.l,
                 r_min,
                 r_max,
-                sr.w_c.map_or_else(|| "—".to_string(), |w| format!("{w:.2}"))
+                sr.w_c
+                    .map_or_else(|| "—".to_string(), |w| format!("{w:.2}"))
             );
         }
         println!("  └──────┴──────┴──────────────────┴──────────┘");

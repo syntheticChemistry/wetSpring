@@ -150,6 +150,8 @@ pub fn detect_mass_tracks(spectra: &[MzmlSpectrum], ppm: f64, min_scans: usize) 
 /// Integrate the area under a chromatographic peak.
 ///
 /// Uses trapezoidal integration between `left_idx` and `right_idx`.
+/// With `gpu`: delegates to `barracuda::numerical::trapz`.
+/// Without `gpu`: sovereign trapezoidal rule.
 ///
 /// # Arguments
 ///
@@ -165,6 +167,15 @@ pub fn detect_mass_tracks(spectra: &[MzmlSpectrum], ppm: f64, min_scans: usize) 
 pub fn integrate_peak(rt: &[f64], intensity: &[f64], left_idx: usize, right_idx: usize) -> f64 {
     if left_idx >= right_idx || right_idx >= rt.len() {
         return 0.0;
+    }
+
+    #[cfg(feature = "gpu")]
+    {
+        let x_slice = &rt[left_idx..=right_idx];
+        let y_slice = &intensity[left_idx..=right_idx];
+        if let Ok(area) = barracuda::numerical::trapz(y_slice, x_slice) {
+            return area;
+        }
     }
 
     let mut area = 0.0;

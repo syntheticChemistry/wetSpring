@@ -32,13 +32,13 @@
 use std::time::Instant;
 
 use barracuda::numerical::ode_generic::{BatchedOdeRK4, OdeSystem};
+use barracuda::numerical::{
+    BistableOde, CapacitorOde, CooperationOde, MultiSignalOde, PhageDefenseOde,
+};
 use wetspring_barracuda::bio::bistable::BistableParams;
 use wetspring_barracuda::bio::capacitor::CapacitorParams;
 use wetspring_barracuda::bio::cooperation::CooperationParams;
 use wetspring_barracuda::bio::multi_signal::MultiSignalParams;
-use wetspring_barracuda::bio::ode_systems::{
-    BistableOde, CapacitorOde, CooperationOde, MultiSignalOde, PhageDefenseOde,
-};
 use wetspring_barracuda::bio::phage_defense::PhageDefenseParams;
 use wetspring_barracuda::validation::Validator;
 

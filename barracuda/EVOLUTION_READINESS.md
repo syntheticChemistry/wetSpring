@@ -2,7 +2,7 @@
 
 **Date:** February 24, 2026
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules, 0 local WGSL (Lean complete — ODE shaders use `generate_shader()`), 37 ToadStool primitives consumed (31 Lean + 6 S54-S57 CPU), 881 tests, 162 experiments, 3,198+ checks, 95.67% coverage, ToadStool S57 aligned
+**Status:** 46 CPU + 42 GPU modules, 0 local WGSL (Lean complete — ODE shaders use `generate_shader()`), 42 ToadStool primitives consumed (37 prior + NMF, ridge, ODE bio, correlated Anderson, trapz), 806 tests, 162 experiments, 3,198+ checks, ToadStool S59 aligned
 
 ### Pure GPU Promotion Complete: 0 Tier B/C remaining
 
@@ -31,17 +31,25 @@ See `ABSORPTION_MANIFEST.md` for the full ledger.
 ### Code Quality (Phase 15+)
 
 All modules pass `clippy::pedantic` + `clippy::nursery` (0 warnings, `-D` enforced
-in CI), `cargo fmt` (0 diffs), `cargo doc` (0 warnings, `RUSTDOCFLAGS="-D warnings"`).
-97% line coverage for bio+io modules (56% overall including bench) via `cargo-llvm-cov`.
-All tolerances centralized in `tolerances.rs` (59 named constants — includes
-4 Jacobi eigendecomposition constants with Golub & Van Loan provenance).
-`#![deny(unsafe_code)]` and `#![deny(clippy::expect_used, clippy::unwrap_used)]`
-enforced crate-wide (`deny` instead of `forbid` to allow `unsafe` in test env var
-manipulation required by Rust 2024 edition). All 83 binaries carry `# Provenance`
-headers. Data paths use `validation::data_dir()` for capability-based discovery.
-`flate2` uses `rust_backend` — zero C dependencies (ecoBin compliant). All 40
+in CI), `cargo fmt` (0 diffs), `cargo doc` (0 warnings with and without `--all-features`).
+All tolerances centralized in `tolerances.rs` (56 named constants — includes
+Jacobi eigendecomposition (Golub & Van Loan), ESN regularisation (Jaeger 2001/
+Lukoševičius 2012), and Chao1 count detection (skbio parity)). NMF convergence
+constants removed after lean to `barracuda::linalg::nmf`.
+`bio::spectral_match` uses `special::{dot, l2_norm}` instead of inline computation.
+`#![deny(unsafe_code)]` enforced crate-wide — **zero unsafe blocks** in library or
+test code as of Feb 24, 2026. Test env-var manipulation refactored to pure-function
+`resolve_data_dir()` pattern, eliminating all `unsafe { set_var/remove_var }` calls.
+All 152 binaries carry `# Provenance` headers. Data paths use `validation::data_dir()`
+for capability-based discovery. NCBI API key resolution evolved to capability-based
+cascade (env var → `WETSPRING_DATA_ROOT` → XDG config → legacy paths).
+`flate2` uses `rust_backend` — zero C dependencies (ecoBin compliant). All 42
 Python baselines carry SPDX-License-Identifier + Date headers. DADA2 algorithmic
 constants fully documented with provenance (Callahan et al. 2016, R package defaults).
+Integration tests use streaming APIs exclusively (`Ms2Iter`, `MzmlIter`, `FastqIter`)
+— deprecated buffering APIs (`parse_ms2`, `parse_mzml`, `parse_fastq`) are no longer
+exercised outside their own deprecation-gated unit tests.
+GPU buffer limits and dispatch thresholds fully documented with hardware provenance.
 CI enforces fmt, clippy (pedantic+nursery), test, doc, and json feature check on
 every push/PR. **Rust edition 2024**, MSRV 1.85.
 
@@ -60,7 +68,7 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 
 ---
 
-## CPU Modules (41)
+## CPU Modules (40)
 
 | Module | Domain | GPU Tier | ToadStool Primitive | Notes |
 |--------|--------|----------|-------------------|-------|

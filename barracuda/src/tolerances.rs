@@ -287,13 +287,25 @@ pub const JACOBI_SWEEP_MULTIPLIER: usize = 100;
 ///
 /// Applied as a denominator floor to prevent NaN/Inf. Smaller than
 /// `f64::EPSILON` (2.2e-16) so it never distorts non-degenerate results.
+/// Also used as the denominator guard in ESN Cholesky fallback and
+/// pangenome linear regression.
 pub const MATRIX_EPS: f64 = 1e-15;
 
-/// NMF initialisation floor: prevents zero entries in W/H matrices.
+/// ESN ridge regression regularisation (Tikhonov λ).
 ///
-/// Lee & Seung (1999) multiplicative updates require all-positive factors.
-/// Added to random init values to ensure positivity.
-pub const NMF_INIT_FLOOR: f64 = 1e-10;
+/// Jaeger (2001) "The echo state approach" recommends λ ∈ [1e-8, 1e-2].
+/// Default 1e-6 balances numerical stability with fitting accuracy,
+/// matching the common practice in Lukoševičius (2012) "A Practical
+/// Guide to Applying Echo State Networks."
+pub const ESN_REGULARIZATION: f64 = 1e-6;
+
+/// Chao1 singleton/doubleton count detection half-width.
+///
+/// Counts within 0.5 of 1.0 or 2.0 are classified as singletons or
+/// doubletons respectively. This accommodates floating-point abundance
+/// values (e.g. rarefied counts) while remaining exact for integer data.
+/// Matches the rounding behavior of `skbio.diversity.alpha.chao1`.
+pub const CHAO1_COUNT_HALFWIDTH: f64 = 0.5;
 
 /// Box-Muller u1 floor: avoids `ln(0)` in Gaussian generation.
 ///
@@ -501,6 +513,8 @@ mod tests {
             GALAXY_SHANNON_RANGE,
             GALAXY_SIMPSON_RANGE,
             GALAXY_BRAY_CURTIS_RANGE,
+            ESN_REGULARIZATION,
+            CHAO1_COUNT_HALFWIDTH,
         ];
         for tol in all {
             assert!(tol >= 0.0, "tolerance {tol} must be non-negative");

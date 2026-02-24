@@ -82,6 +82,12 @@ cargo run --bin <binary>               # Rust must match within tolerance
 | `benchmark_rust_vs_python.py` | `benchmark_23_domain_timing` | 043/059 | 18-domain timing | `27eea58f99a84db2` |
 | `benchmark_python_baseline.py` | `benchmark_three_tier` | 069 | Python baseline JSON | `6334b6d9a2a69b0f` |
 
+## Track 3: Drug Repurposing (Fajgenbaum / Every Cure)
+
+| Script | Rust Binary | Exp | Tool | SHA-256 (first 16) |
+|--------|-------------|-----|------|---------------------|
+| `nmf_drug_disease_pipeline.py` | `validate_nmf_drug_repurposing` | 159 | NMF (Lee & Seung) | `292b8186d345b666` |
+
 ## Utility (not baselines)
 
 | Script | Purpose | SHA-256 (first 16) |
