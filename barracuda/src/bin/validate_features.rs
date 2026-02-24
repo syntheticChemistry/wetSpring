@@ -89,6 +89,7 @@ fn main() {
             .file_name()
             .map_or_else(|| first_file.to_string_lossy(), |n| n.to_string_lossy())
     );
+    #[allow(deprecated)]
     let spectra = mzml::parse_mzml(first_file).expect("parse mzML");
     let ms1: Vec<_> = spectra
         .iter()

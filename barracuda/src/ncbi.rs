@@ -13,6 +13,18 @@
 //! principle. Shelling out to `curl` keeps the binary self-contained while
 //! still supporting HTTPS. Binaries fall back to cached/synthetic data when
 //! `curl` is unavailable.
+//!
+//! # Evolution path
+//!
+//! | Phase | Strategy | Status |
+//! |-------|----------|--------|
+//! | Current | `curl` subprocess — zero compile deps, runtime dep on system curl | active |
+//! | Phase 2 | metalForge HTTP substrate — route HTTPS through forge routing | blocked on forge HTTP |
+//! | Phase 3 | Sovereign TLS (if HTTPS becomes pipeline-critical) | not needed for validation |
+//!
+//! The `curl` approach is the correct tradeoff for validation-only network
+//! access. All callers degrade gracefully to cached/synthetic data when
+//! `curl` is absent.
 
 use std::path::{Path, PathBuf};
 
@@ -124,8 +136,10 @@ pub fn cache_file(filename: &str) -> PathBuf {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
+    use std::io::Write;
 
     #[test]
     fn encode_entrez_term_spaces_and_brackets() {
@@ -140,16 +154,91 @@ mod tests {
     }
 
     #[test]
+    fn encode_entrez_term_empty() {
+        assert_eq!(encode_entrez_term(""), "");
+    }
+
+    #[test]
+    fn encode_entrez_term_no_special_chars() {
+        assert_eq!(encode_entrez_term("simple"), "simple");
+    }
+
+    #[test]
+    fn encode_entrez_term_all_special() {
+        let encoded = encode_entrez_term("\"a\" [b] (c) d e");
+        assert_eq!(encoded, "%22a%22+%5Bb%5D+%28c%29+d+e");
+    }
+
+    #[test]
     fn cache_file_builds_relative_path() {
         let path = cache_file("test_cache.txt");
         assert!(path.ends_with("data/test_cache.txt"));
     }
 
     #[test]
+    fn cache_file_nested() {
+        let path = cache_file("sub/nested.json");
+        assert!(path.ends_with("data/sub/nested.json"));
+    }
+
+    #[test]
     fn api_key_returns_from_env() {
-        // Only test the env var path — don't depend on secrets file
         if std::env::var("NCBI_API_KEY").is_ok() {
             assert!(api_key().is_some());
         }
+    }
+
+    #[test]
+    fn parse_api_key_toml_valid() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("keys.toml");
+        let mut f = std::fs::File::create(&path).unwrap();
+        writeln!(f, "# API keys").unwrap();
+        writeln!(f, "ncbi_api_key = \"abc123def456\"").unwrap();
+        writeln!(f, "other_key = \"xyz\"").unwrap();
+
+        let key = parse_api_key_toml(&path);
+        assert_eq!(key, Some("abc123def456".to_string()));
+    }
+
+    #[test]
+    fn parse_api_key_toml_missing_key() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("nokey.toml");
+        let mut f = std::fs::File::create(&path).unwrap();
+        writeln!(f, "other_key = \"xyz\"").unwrap();
+
+        assert!(parse_api_key_toml(&path).is_none());
+    }
+
+    #[test]
+    fn parse_api_key_toml_nonexistent_file() {
+        let path = Path::new("/tmp/wetspring_nonexistent_toml_abc123.toml");
+        assert!(parse_api_key_toml(path).is_none());
+    }
+
+    #[test]
+    fn parse_api_key_toml_empty_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("empty.toml");
+        std::fs::File::create(&path).unwrap();
+
+        assert!(parse_api_key_toml(&path).is_none());
+    }
+
+    #[test]
+    fn parse_api_key_toml_no_quotes() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("noquotes.toml");
+        let mut f = std::fs::File::create(&path).unwrap();
+        writeln!(f, "ncbi_api_key = bare_value").unwrap();
+
+        assert!(parse_api_key_toml(&path).is_none());
+    }
+
+    #[test]
+    fn http_get_localhost_refused() {
+        let result = http_get("http://127.0.0.1:1/nonexistent");
+        assert!(result.is_err());
     }
 }

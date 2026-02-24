@@ -3,6 +3,7 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
+    clippy::type_complexity,
     dead_code
 )]
 //! # Exp131: Finite-Size Scaling for 3D Anderson QS

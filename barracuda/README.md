@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** February 22, 2026
+**Updated:** February 24, 2026
 
 ---
 
@@ -156,9 +156,10 @@ wetspring-barracuda
 | `#![deny(unsafe_code)]` | Enforced crate-wide (test-only `allow` for `env::set_var` in edition 2024) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | Enforced |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
-| Line coverage | ~97% bio+io modules |
-| Tests | 750 (676 lib + 60 integration + 14 doc) |
-| Validation checks | 2,673+ (1,476 CPU + 702 GPU + 80 dispatch + layout/transfer) |
+| Line coverage (`llvm-cov`) | **95.67%** (728 lib + 60 integration + 19 doc = 807 tests) |
+| ESN ridge regression | Proper Cholesky solve (not diagonal approximation) |
+| I/O parsers | Streaming-first; buffering APIs deprecated |
+| Validation checks | 3,028+ (1,476 CPU + 702 GPU + 80 dispatch + streaming + extensions) |
 
 ## Quick Start
 

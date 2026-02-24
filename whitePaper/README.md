@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
-**Date:** February 23, 2026
-**Status:** Validation study active — 2,673+/2,673+ checks, 759 tests, 97% bio+io line coverage, 120 experiments
+**Date:** February 24, 2026
+**Status:** Validation study active — 3,050+/3,050+ checks, 728 lib tests, 97% bio+io line coverage, 151 experiments
 **License:** AGPL-3.0-or-later
 
 ---

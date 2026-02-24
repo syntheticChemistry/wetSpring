@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: February 23, 2026
+**Last Updated**: February 24, 2026
 **Purpose**: Track papers for reproduction/review across three tracks
 
 ---
@@ -104,6 +104,49 @@ conclusions as the Galaxy/QIIME2/Python stack her lab uses. Furthermore, her
 co-authors include undergraduate students, suggesting the methods are well-documented
 and reproducible — ideal reproduction targets.
 
+### Track 3 — Drug Repurposing via Matrix Mathematics (Fajgenbaum / Every Cure)
+
+Dr. David Fajgenbaum (UPenn) — nearly died 5 times from idiopathic multicentric
+Castleman disease. He repurposed sirolimus (a 25-year-old transplant drug) to save
+his own life, then built the MATRIX platform (now Every Cure, everycure.org) to
+systematically match all ~4,000 FDA-approved drugs to ~18,000 diseases using matrix
+factorization, knowledge graph embeddings, and cosine similarity scoring.
+
+The math is linear algebra: NMF, SVD, sparse matrix operations on drug-disease
+scoring matrices (~4,000 × 18,000). This is within BarraCUDA's GEMM capability
+on a single GPU.
+
+**Connection**: BarraCUDA linear algebra applied to biomedical knowledge graphs.
+neuralSpring ML primitives for drug-disease scoring. wetSpring biology pipeline
+extended into pharmacology. Links to Jones (analytical chemistry / drug detection),
+Waters (c-di-GMP as a drug target), Murillo (surrogate learning for fast scoring).
+
+#### Tier 1 — Fajgenbaum Core Papers
+
+| # | Paper | Journal | Year | Faculty | Why | Status |
+|---|-------|---------|------|---------|-----|--------|
+| 39 | Fajgenbaum et al. "Identifying and targeting pathogenic PI3K/AKT/mTOR signaling in IL-6-blockade-refractory iMCD" | J Clin Invest 129(10):4451-4463 | 2019 | Fajgenbaum | The original sirolimus discovery. The paper that saved his life. Computational protocol for drug-pathway matching | **Exp157 DONE** (8/8) |
+| 40 | Fajgenbaum et al. "Pioneering a new field of computational pharmacophenomics" | Lancet Haematology 12(2):e94-e96 | 2025 | Fajgenbaum | MATRIX methodology overview. Defines the computational framework for systematic drug repurposing | **Exp158 DONE** (9/9) |
+
+#### Tier 2 — Matrix Factorization for Drug Repurposing (The Math)
+
+| # | Paper | Journal | Year | Faculty | Why | Status |
+|---|-------|---------|------|---------|-----|--------|
+| 41 | Yang et al. "Matrix Factorization-based Technique for Drug Repurposing Predictions" | PMC (pubmed 32365039) | 2020 | — | NMF/SVD applied to drug-disease scoring matrices. The core algorithm to reproduce | **Exp159 DONE** (7/7) |
+| 42 | Gao et al. "Non-Negative Matrix Factorization for Drug Repositioning: Experiments with the repoDB Dataset" | PMC7153111 | 2020 | — | NMF on the repoDB dataset (1,571 drugs × 1,209 diseases). Benchmark dataset for validation | **Exp160 DONE** (9/9) |
+| 43 | ROBOKOP knowledge graph papers | Various | — | — | Infrastructure behind MATRIX. Knowledge graph embedding for drug-disease relationships | **Exp161 DONE** (7/7) |
+
+#### BarraCUDA Requirements for Drug Repurposing
+
+| Primitive | Shader | Status | Notes |
+|-----------|--------|--------|-------|
+| GEMM (f64) | `gemm_f64.wgsl` | ✅ Exists | 4,000 × 18,000 well within single-GPU capacity |
+| SVD (f64) | `svd_f64.wgsl` | ✅ Exists | Jacobi SVD, one-sided |
+| NMF (f64) | `nmf_f64.wgsl` | ✅ CPU local (`bio::nmf`) | Multiplicative update rules. Lee & Seung (1999). ToadStool absorption target |
+| Sparse GEMM | — | **NEEDED** | Drug-disease matrices are sparse (~5% fill) |
+| Cosine similarity | — | ✅ CPU local (`bio::nmf::cosine_similarity`) | Pairwise scoring on factor matrices |
+| Top-K selection | — | ✅ CPU local (`bio::nmf::top_k_predictions`) | Rank drug-disease pairs by score |
+
 ### Cross-Spring — Spectral Theory (Kachkovskiy, via groundSpring/hotSpring)
 
 Kachkovskiy's spectral theory has an indirect but real connection to wetSpring
@@ -161,7 +204,7 @@ Core finding: **no prior work applies Anderson localization to QS signaling**.
 
 | # | Paper | Journal | Year | Why | Status |
 |---|-------|---------|------|-----|--------|
-| 30 | "Physical communication pathways in bacteria: an extra layer to quorum sensing" | Biophys Rev Lett | 2025 | All microbial comm modes beyond QS (mechanical, EM, acoustic). Can Anderson apply to these? | Queue |
+| 30 | "Physical communication pathways in bacteria: an extra layer to quorum sensing" | Biophys Rev Lett | 2025 | All microbial comm modes beyond QS (mechanical, EM, acoustic). Can Anderson apply to these? | **Exp152 DONE** (9/9) |
 | 31 | "Diverse QS systems regulate microbial communication in deep-sea cold seeps" | Microbiome | 2025 | **299,355 QS genes, 170 metagenomes, 34 QS types**. Massive dataset to test Anderson predictions in 3D sediment | **Exp144-145** |
 | 32 | "In silico protein analysis, ecophysiology, and reconstruction of evolutionary history of QS" | BMC Genomics | 2024 | Phylogenetic reconstruction of luxR. Correlate QS gene gain/loss with habitat geometry transitions | **Exp146** |
 | 33 | "Spatially propagating activation of QS in V. fischeri" — Meyer et al. | Phys Rev E 101:062421 | 2020 | Closest to our physics approach (traveling waves). Complementary: propagation vs localization | **Exp148** |
@@ -171,15 +214,15 @@ Core finding: **no prior work applies Anderson localization to QS signaling**.
 | # | Paper | Journal | Year | Why | Status |
 |---|-------|---------|------|-----|--------|
 | 34 | "Burst statistics in biofilm QS: role of spatial colony-growth heterogeneity" | Sci Rep | 2019 | Spatial disorder effects on QS timing. Their "disordered colony" ≈ our Anderson disorder | **Exp149** |
-| 35 | "Functional metagenomic analysis of QS in a nitrifying community" | npj Biofilms | 2021 | 13 luxI + 30 luxR from sludge. R:P = 2.3:1. Test eavesdropper prediction | Queue |
-| 36 | "A review of QS mediating interkingdom interactions in the ocean" | Commun Biol | 2025 | Marine QS review. Refine our "obligate plankton = no QS" prediction | Queue |
+| 35 | "Functional metagenomic analysis of QS in a nitrifying community" | npj Biofilms | 2021 | 13 luxI + 30 luxR from sludge. R:P = 2.3:1. Test eavesdropper prediction | **Exp153 DONE** (12/12) |
+| 36 | "A review of QS mediating interkingdom interactions in the ocean" | Commun Biol | 2025 | Marine QS review. Refine our "obligate plankton = no QS" prediction | **Exp154 DONE** (6/6) |
 
 #### Tier 3 — Experimental Validation Targets
 
 | # | Paper | Journal | Year | Why | Status |
 |---|-------|---------|------|-----|--------|
-| 37 | Rajagopalan et al. "Cell density, alignment, and orientation correlate with C-signal expression" | PNAS | 2021 | Myxococcus C-signal → 3D. Extract critical cell density for Anderson L_min prediction | Queue |
-| 38 | "Integrated cross-regulation pathway for cAMP relay in Dictyostelium" | Front Cell Dev Biol | 2023 | Updated relay circuit. Can we model relay as non-Hermitian Anderson? | Queue |
+| 37 | Rajagopalan et al. "Cell density, alignment, and orientation correlate with C-signal expression" | PNAS | 2021 | Myxococcus C-signal → 3D. Extract critical cell density for Anderson L_min prediction | **Exp155 DONE** (7/7) |
+| 38 | "Integrated cross-regulation pathway for cAMP relay in Dictyostelium" | Front Cell Dev Biol | 2023 | Updated relay circuit. Can we model relay as non-Hermitian Anderson? | **Exp156 DONE** (8/8) |
 
 ---
 

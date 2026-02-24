@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** February 22, 2026
+**Date:** February 24, 2026
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 45 CPU + 42 GPU modules, 5 local WGSL shaders (Write phase), 30 ToadStool primitives consumed, 759 tests, 149 experiments, 3,028+ checks
+**Status:** 45 CPU + 42 GPU modules, 5 local WGSL shaders (Write phase), 30 ToadStool primitives consumed, 845 tests, 149 experiments, 3,028+ checks, 95.67% coverage
 
 ### Pure GPU Promotion Complete: 0 Tier B/C remaining
 
@@ -157,29 +157,27 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 
 ---
 
-## Local WGSL Shader Inventory (5 — Write phase active)
+## Local WGSL Shader Inventory (0 — Lean COMPLETE)
 
-Original 12 shaders absorbed by ToadStool (S31d/31g + S39-41). Five local
-shaders written for ODE domains pending absorption as `BatchedOdeRK4Generic`:
+Original 12 shaders absorbed by ToadStool (S31d/31g + S39-41). All 5 ODE
+shaders **deleted** — replaced by `BatchedOdeRK4::<S>::generate_shader()` via
+`OdeSystem` trait implementations in `bio::ode_systems`. Per-variable clamping
+handled by derivative-level guards (`fmax_d` in WGSL, `.max(0.0)` in CPU).
 
-| Shader | Vars | Params | Domain | Status |
-|--------|------|--------|--------|--------|
-| `phage_defense_ode_rk4_f64.wgsl` | 4 | 11 | Monod phage-bacteria defense | Write (Exp099) |
-| `bistable_ode_rk4_f64.wgsl` | 5 | 21 | QS + cooperative feedback | Write (Exp100) |
-| `multi_signal_ode_rk4_f64.wgsl` | 7 | 24 | V. cholerae dual-signal | Write (Exp100) |
-| `cooperation_ode_rk4_f64.wgsl` | 4 | 13 | Cooperative QS game theory | Write (pure GPU promotion) |
-| `capacitor_ode_rk4_f64.wgsl` | 6 | 16 | Phenotypic capacitor | Write (pure GPU promotion) |
+| Shader (deleted) | Vars | Params | Domain | Status |
+|-------------------|------|--------|--------|--------|
+| ~~`phage_defense_ode_rk4_f64.wgsl`~~ | 4 | 11 | Monod phage-bacteria defense | **Lean COMPLETE** |
+| ~~`bistable_ode_rk4_f64.wgsl`~~ | 5 | 21 | QS + cooperative feedback | **Lean COMPLETE** |
+| ~~`multi_signal_ode_rk4_f64.wgsl`~~ | 7 | 24 | V. cholerae dual-signal | **Lean COMPLETE** |
+| ~~`cooperation_ode_rk4_f64.wgsl`~~ | 4 | 13 | Cooperative QS game theory | **Lean COMPLETE** |
+| ~~`capacitor_ode_rk4_f64.wgsl`~~ | 6 | 16 | Phenotypic capacitor | **Lean COMPLETE** |
 
-### Shader Compilation Notes
+### Shader Generation Notes
 
-All local shaders use `WgpuDevice::compile_shader_f64()` which:
-1. Injects the `enable f64;` preamble (naga-safe variant)
-2. Patches `exp_f64`/`log_f64` polyfills for the detected driver
-3. Runs `WgslOptimizer::optimize` for `@unroll_hint`/`@ilp_region`
-
-**f64 WGSL patterns (established in this Write cycle):**
-- `fmax`/`fclamp`/`fpow` polyfills (naga lacks f64 overloads)
-- `(zero + literal)` for explicit f64 constant typing
+All GPU ODE modules now use `BatchedOdeRK4::<S>::generate_shader()` which:
+1. Generates WGSL from `OdeSystem::wgsl_derivative()` at runtime
+2. Uses `WgpuDevice::compile_shader_f64()` for f64 preamble + polyfills
+3. Workgroup dispatch at 64 threads
 - Function names avoid `_f64` suffix to prevent `ShaderTemplate` rewriting
 - No `// @unroll_hint` in comments (optimizer matches via `contains()`)
 

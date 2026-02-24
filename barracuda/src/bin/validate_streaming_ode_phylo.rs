@@ -7,7 +7,8 @@
     clippy::similar_names,
     clippy::needless_range_loop,
     clippy::too_many_arguments,
-    clippy::items_after_statements
+    clippy::items_after_statements,
+    clippy::cloned_ref_to_slice_refs
 )]
 //! Exp106: Pure GPU Streaming — ODE Biology + Phylogenetics
 //!

@@ -104,9 +104,8 @@ fn parse_all_files(files: &[PathBuf], v: &Validator) -> Aggregates {
         print!("  Parsing {fname}... ");
 
         let t0 = std::time::Instant::now();
-        match mzml::parse_mzml(path) {
-            Ok(spectra) => {
-                let stats = mzml::compute_stats(&spectra);
+        match mzml::stats_from_file(path) {
+            Ok(stats) => {
                 let elapsed = t0.elapsed();
                 println!(
                     "{} spectra ({} MS1, {} MS2), {:.1}s",
@@ -128,10 +127,6 @@ fn parse_all_files(files: &[PathBuf], v: &Validator) -> Aggregates {
                 }
                 if let Some(hi) = stats.max_mz {
                     agg.max_mz = Some(agg.max_mz.map_or(hi, |v: f64| v.max(hi)));
-                }
-
-                if !spectra.is_empty() && spectra[0].mz_array.is_empty() {
-                    println!("    WARNING: First spectrum has empty m/z array!");
                 }
             }
             Err(e) => {

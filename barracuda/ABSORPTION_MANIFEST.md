@@ -1,8 +1,8 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** February 22, 2026
+**Date:** February 24, 2026
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**Status:** 30 ToadStool primitives consumed (Lean), 5 local WGSL ODE shaders (Write phase), 42 GPU modules total, 0 Tier B/C remaining
+**Status:** 30 ToadStool primitives consumed (Lean), 5 local WGSL ODE shaders **deleted** (replaced by `generate_shader()`), 5 GPU modules rewired to `BatchedOdeRK4<S>`, 42 GPU modules total, 0 Tier B/C remaining, 853 tests, 95.67% coverage
 
 ---
 
@@ -44,13 +44,13 @@ WGSL          known physics   handoffs/                        delete local
 
 | Phase | Description | Status |
 |-------|-------------|--------|
-| Write | Local WGSL ODE shaders | **5 shaders** (phage_defense, bistable, multi_signal, cooperation, capacitor) |
+| Write | Local WGSL ODE shaders | **5 shaders deleted** — GPU modules use `generate_shader()` from `OdeSystem` trait impls (`bio/ode_systems.rs`) |
 | Compose | GPU wrappers wiring ToadStool primitives | **7 modules** (kmd, merge_pairs, RF, derep, NJ, reconciliation, molecular_clock) |
 | Passthrough | Accept GPU buffers, CPU kernel | **3 modules** (gbm, feature_table, signal) |
 | Validate | CPU ↔ GPU parity for all shaders | All 5 ODE: exact parity (Exp099/100/101) |
-| Hand off | wateringHole/handoffs/ documents | v18 active (ODE generic), 7+ archived |
-| Absorb | ToadStool integrates as `ops::bio::*` | **24 primitives** absorbed |
-| Lean | Rewire to upstream, delete local code | 27 primitives lean (22 wetSpring + 5 neuralSpring) |
+| Hand off | wateringHole/handoffs/ documents | **v24** active (lean phase), v13–v17 archived |
+| Absorb | ToadStool integrates as `ops::bio::*` | **26 items** absorbed (ToadStool S52: all DONE) |
+| Lean | Rewire to upstream, delete local code | 27 primitives lean + 5 `OdeSystem` trait rewires |
 
 ---
 
@@ -88,28 +88,27 @@ Local WGSL deleted; wetSpring imports from `barracuda::*`.
 
 ---
 
-## Local WGSL Shaders (Write Phase — 5 ODE shaders)
+## Local WGSL Shaders (Write Phase — LEAN COMPLETE)
 
-All 5 shaders are RK4 ODE integrators using `compile_shader_f64()` with
-`fmax`/`fclamp`/`fpow` polyfills. Pending ToadStool absorption as
-`BatchedOdeRK4Generic<N_VARS, N_PARAMS>`.
+All 5 ODE shaders have been **deleted** (30,424 bytes). GPU modules now use
+`BatchedOdeRK4::<S>::generate_shader()` at runtime, producing WGSL from the
+`OdeSystem` trait implementations in `bio/ode_systems.rs`.
 
-| Shader | File | Vars | Params | CPU ↔ GPU | Exp |
-|--------|------|:----:|:------:|-----------|-----|
-| `phage_defense_ode_rk4_f64.wgsl` | `src/shaders/` | 4 | 11 | Exact parity | 099 |
-| `bistable_ode_rk4_f64.wgsl` | `src/shaders/` | 5 | 21 | Exact parity | 100 |
-| `multi_signal_ode_rk4_f64.wgsl` | `src/shaders/` | 7 | 24 | Exact parity | 100 |
-| `cooperation_ode_rk4_f64.wgsl` | `src/shaders/` | 4 | 13 | Exact parity | 101 |
-| `capacitor_ode_rk4_f64.wgsl` | `src/shaders/` | 6 | 16 | Exact parity | 101 |
+| System | Struct | Vars | Params | WGSL Lines | CPU Parity |
+|--------|--------|:----:|:------:|:----------:|:----------:|
+| Phage Defense | `PhageDefenseOde` | 4 | 11 | 142 | Derivative-level exact |
+| Bistable | `BistableOde` | 5 | 21 | 169 | Exact (0.00) |
+| Multi-Signal | `MultiSignalOde` | 7 | 24 | 199 | Exact (4.44e-16) |
+| Cooperation | `CooperationOde` | 4 | 13 | 148 | Exact (4.44e-16) |
+| Capacitor | `CapacitorOde` | 6 | 16 | 170 | Exact (0.00) |
 
-### Shader Conventions (matching hotSpring)
+### GPU Module Pattern (post-lean)
 
-- File: `src/shaders/<domain>_<op>_f64.wgsl`
-- Entry point: `@compute @workgroup_size(N) fn <name>(...)`
-- Binding layout documented in shader header
-- CPU reference documented in shader header
-- `f64()` explicit casts (naga type promotion bug)
-- `pow_f64()` polyfill for Ada Lovelace (injected by `ShaderTemplate::for_driver_auto`)
+```rust
+let wgsl = BatchedOdeRK4::<XxxOde>::generate_shader();
+let module = device.compile_shader_f64(&wgsl, Some("Xxx ODE"));
+// Pipeline setup unchanged, dispatch_workgroups(n.div_ceil(64), 1, 1)
+```
 
 ---
 
@@ -176,6 +175,8 @@ Local Rust implementations that duplicate barracuda upstream. Pending
 | `ln_gamma()` | `bio/special.rs` | `barracuda::special::ln_gamma` | Lanczos, Horner form |
 | `regularized_gamma_lower()` | `bio/special.rs` | `barracuda::special::regularized_gamma_p` | Series expansion |
 | `integrate_peak()` | `bio/eic.rs` | `barracuda::numerical::trapz` | Trapezoidal rule |
+| `cholesky_factor()` | `bio/esn.rs` | `barracuda::linalg::cholesky_solve` | SPD system solve (ridge regression, kriging, GP) |
+| `solve_ridge()` | `bio/esn.rs` | `barracuda::linalg::ridge_regression` | Cholesky-based ridge with flat buffer layout |
 
 **Blocker:** barracuda requires wgpu+akida+toadstool-core as mandatory deps.
 Proposed: `[features] math = []` gates CPU-only modules without GPU stack.
@@ -243,4 +244,22 @@ Patterns from hotSpring and neuralSpring that wetSpring leans on:
 | Streaming dispatch | 80 | ALL PASS |
 | Layout fidelity | 35 | ALL PASS |
 | Transfer/streaming | 57 | ALL PASS |
-| **Total** | **2,673+** | **ALL PASS** |
+| Finite-size scaling (Exp150) | 14 | ALL PASS |
+| Correlated disorder (Exp151) | 8 | ALL PASS |
+| ODE lean benchmark | 11 | ALL PASS |
+| Paper queue extensions (Exp152-156) | 42 | ALL PASS |
+| Drug repurposing track (Exp157-161) | 40 | ALL PASS |
+| **Total** | **3,132+** | **ALL PASS** |
+
+**Phase 39 additions (Feb 24, 2026):**
+- Exp150: W_c = 16.26 (disorder-averaged, L=6–12, 8 realizations)
+- Exp151: Correlated disorder pushes W_c > 28 (biofilm clustering facilitates QS)
+- Exp152: Physical communication pathways — 8 modes, 6/8 Anderson-susceptible (9 checks)
+- Exp153: Nitrifying QS — R:P = 2.3:1 matches eavesdropper prediction (12 checks)
+- Exp154: Marine interkingdom QS — 10/10 Anderson predictions correct (6 checks)
+- Exp155: Myxococcus — critical density + NP geometry bootstrap (7 checks)
+- Exp156: Dictyostelium — non-Hermitian relay defeats localization (8 checks)
+- Exp157-161: Drug repurposing track — NMF, pathway scoring, KG embedding (40 checks)
+  - New local module: `bio::nmf` (Lee & Seung multiplicative updates, cosine sim, top-K)
+  - ToadStool absorption targets: NMF update shader, sparse GEMM, weighted NMF mask
+- ODE lean benchmark: 5 systems × generate_shader(), upstream 20–33% faster

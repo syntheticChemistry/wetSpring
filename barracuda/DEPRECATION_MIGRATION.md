@@ -37,17 +37,18 @@ consume from the barracuda crate. **Do not modify local copies.**
 These are wetSpring-specific GPU modules and shaders that ToadStool has not
 yet absorbed. They remain active and maintained in wetSpring.
 
-### Local WGSL Shaders (5 — Write phase, absorption candidates)
+### Local WGSL Shaders (0 — Lean COMPLETE)
 
-| Shader | Module | GPU Checks | Since | Target |
-|--------|--------|:----------:|-------|--------|
-| `phage_defense_ode_rk4_f64.wgsl` | `phage_defense_gpu` | 4v/11p | Exp099 | `BatchedOdeRK4Generic<4,11>` |
-| `bistable_ode_rk4_f64.wgsl` | `bistable_gpu` | 5v/21p | Exp100 | `BatchedOdeRK4Generic<5,21>` |
-| `multi_signal_ode_rk4_f64.wgsl` | `multi_signal_gpu` | 7v/24p | Exp100 | `BatchedOdeRK4Generic<7,24>` |
-| `cooperation_ode_rk4_f64.wgsl` | `cooperation_gpu` | 4v/13p | Exp101 | `BatchedOdeRK4Generic<4,13>` |
-| `capacitor_ode_rk4_f64.wgsl` | `capacitor_gpu` | 6v/16p | Exp101 | `BatchedOdeRK4Generic<6,16>` |
+All 5 ODE shaders **deleted** — replaced by `BatchedOdeRK4::<S>::generate_shader()`
+via `OdeSystem` trait implementations. Absorption complete.
 
-All use `compile_shader_f64()` with `fmax`/`fclamp`/`fpow` polyfills.
+| Shader (deleted) | Module | Status |
+|-------------------|--------|--------|
+| ~~`phage_defense_ode_rk4_f64.wgsl`~~ | `phage_defense_gpu` | **Lean** — uses `generate_shader()` |
+| ~~`bistable_ode_rk4_f64.wgsl`~~ | `bistable_gpu` | **Lean** — uses `generate_shader()` |
+| ~~`multi_signal_ode_rk4_f64.wgsl`~~ | `multi_signal_gpu` | **Lean** — uses `generate_shader()` |
+| ~~`cooperation_ode_rk4_f64.wgsl`~~ | `cooperation_gpu` | **Lean** — uses `generate_shader()` |
+| ~~`capacitor_ode_rk4_f64.wgsl`~~ | `capacitor_gpu` | **Lean** — uses `generate_shader()` |
 
 ### CPU-Only Modules (no GPU benefit)
 
@@ -94,5 +95,5 @@ Following hotSpring's pattern:
 
 5 local WGSL ODE shaders pending ToadStool absorption as `BatchedOdeRK4Generic<N_VARS, N_PARAMS>`.
 All 12 non-ODE shaders absorbed by ToadStool (sessions 31d/31g + 39-41).
-Write phase active. ODE blocker resolved (S41 fixed `compile_shader_f64`).
+All 5 ODE shaders leaned — replaced by `generate_shader()`. Zero local shaders remain.
 All other CPU modules now have GPU wrappers (Lean, Compose, or Passthrough).

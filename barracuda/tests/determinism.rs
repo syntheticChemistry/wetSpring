@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![allow(deprecated)]
 //! Determinism tests: rerun identical inputs, expect bitwise-identical output
 //! via `to_bits()` equality.
 

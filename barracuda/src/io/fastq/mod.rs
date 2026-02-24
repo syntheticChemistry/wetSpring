@@ -136,6 +136,10 @@ pub(crate) fn trimmed_len(buf: &str) -> usize {
 ///
 /// Returns [`Error::Io`] if the file cannot be opened, or
 /// [`Error::Fastq`] if a record is malformed.
+#[deprecated(
+    since = "0.2.0",
+    note = "buffers entire file; use `FastqIter` or `for_each_record` for streaming"
+)]
 pub fn parse_fastq(path: &Path) -> Result<Vec<FastqRecord>> {
     let mut reader = open_reader(path)?;
     let mut records = Vec::new();

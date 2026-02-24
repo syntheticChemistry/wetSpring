@@ -86,22 +86,27 @@ pub fn dereplicate(
         let key: Vec<u8> = record.sequence.iter().map(u8::to_ascii_uppercase).collect();
         let mean_q = mean_quality(&record.quality);
 
-        map.entry(key.clone())
-            .and_modify(|entry| {
+        match map.entry(key) {
+            std::collections::hash_map::Entry::Occupied(mut e) => {
+                let entry = e.get_mut();
                 entry.abundance += 1;
                 if mean_q > entry.best_quality {
                     entry.best_quality = mean_q;
                     entry.representative_id.clone_from(&record.id);
                     entry.representative_quality.clone_from(&record.quality);
                 }
-            })
-            .or_insert_with(|| UniqueSequence {
-                sequence: key,
-                abundance: 1,
-                best_quality: mean_q,
-                representative_id: record.id.clone(),
-                representative_quality: record.quality.clone(),
-            });
+            }
+            std::collections::hash_map::Entry::Vacant(e) => {
+                let sequence = e.key().clone();
+                e.insert(UniqueSequence {
+                    sequence,
+                    abundance: 1,
+                    best_quality: mean_q,
+                    representative_id: record.id.clone(),
+                    representative_quality: record.quality.clone(),
+                });
+            }
+        }
     }
 
     // Filter by minimum abundance

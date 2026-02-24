@@ -69,6 +69,10 @@ pub struct Ms2Stats {
 ///
 /// Returns [`Error::Io`] if the file cannot be opened, or
 /// [`Error::Ms2`] if a record is malformed.
+#[deprecated(
+    since = "0.2.0",
+    note = "buffers entire file; use `Ms2Iter` for streaming"
+)]
 pub fn parse_ms2(path: &Path) -> Result<Vec<Ms2Spectrum>> {
     let file = File::open(path).map_err(|e| Error::Io {
         path: path.to_path_buf(),
@@ -485,7 +489,7 @@ pub fn compute_stats(spectra: &[Ms2Spectrum]) -> Ms2Stats {
 }
 
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
+#[allow(clippy::expect_used, clippy::unwrap_used, deprecated)]
 mod tests {
     use super::*;
     use std::io::Write;

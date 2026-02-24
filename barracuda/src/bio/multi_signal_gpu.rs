@@ -1,19 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! GPU-accelerated dual-signal QS ODE parameter sweep.
 //!
-//! **Local evolution** — compiles a local WGSL shader via `compile_shader_f64`,
-//! to be absorbed by `ToadStool` when promoted to a general batched ODE primitive.
-//!
-//! V. cholerae dual-signal quorum sensing: CAI-1 and AI-2 independently
-//! drive `LuxO` dephosphorylation, `HapR` activation, c-di-GMP, and biofilm.
+//! **Lean phase complete**: Uses `ToadStool`'s `BatchedOdeRK4<MultiSignalOde>::generate_shader()`
+//! via the `OdeSystem` trait (see `bio::ode_systems::MultiSignalOde`).
+//! Local WGSL file deleted — shader now generated from trait impl at runtime.
 
 use barracuda::device::WgpuDevice;
+use barracuda::numerical::ode_generic::BatchedOdeRK4;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
 use super::multi_signal::{self, MultiSignalParams};
-
-const WGSL_SOURCE: &str = include_str!("../shaders/multi_signal_ode_rk4_f64.wgsl");
+use super::ode_systems::MultiSignalOde;
 
 /// Number of state variables.
 pub const N_VARS: usize = multi_signal::N_VARS;
@@ -64,7 +62,8 @@ impl MultiSignalGpu {
     /// Returns `Err` if shader compilation fails.
     pub fn new(device: Arc<WgpuDevice>) -> crate::error::Result<Self> {
         let d = device.device();
-        let module = device.compile_shader_f64(WGSL_SOURCE, Some("MultiSignal ODE"));
+        let wgsl = BatchedOdeRK4::<MultiSignalOde>::generate_shader();
+        let module = device.compile_shader_f64(&wgsl, Some("MultiSignal ODE"));
 
         let bgl = d.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             label: Some("MultiSignal BGL"),
@@ -225,7 +224,7 @@ impl MultiSignalGpu {
             });
             pass.set_pipeline(&self.pipeline);
             pass.set_bind_group(0, &bg, &[]);
-            pass.dispatch_workgroups(config.n_batches.div_ceil(256), 1, 1);
+            pass.dispatch_workgroups(config.n_batches.div_ceil(64), 1, 1);
         }
         q.submit(std::iter::once(encoder.finish()));
         d.poll(wgpu::Maintain::Wait);

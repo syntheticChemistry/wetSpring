@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![allow(deprecated)]
 //! Integration tests for bio/pipeline modules: diversity, k-mer, PFAS,
 //! quality filtering, signal processing, spectral matching, KMD,
 //! feature extraction, EIC, paired-end merging, dereplication, and

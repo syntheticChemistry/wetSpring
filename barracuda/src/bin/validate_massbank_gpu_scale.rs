@@ -110,7 +110,7 @@ fn main() {
 
     // Large scale CPU (timing only, sample subset for parity)
     let t0 = Instant::now();
-    let large_cosine = cpu_pairwise_cosine(&large_lib[..128].to_vec());
+    let large_cosine = cpu_pairwise_cosine(&large_lib[..128]);
     let cpu_large_ms = t0.elapsed().as_secs_f64() * 1000.0;
     println!("  N=1024 (128-sample subset): CPU {cpu_large_ms:.1} ms");
 
@@ -147,7 +147,9 @@ fn main() {
             println!("  N={label}: {n_pairs} pairs, GPU {gpu_ms:.1} ms");
 
             // GPU values in [0, 1] (with small tolerance for rounding)
-            let all_valid = gpu_cosine.iter().all(|&c| c >= -1e-10 && c <= 1.0 + 1e-10);
+            let all_valid = gpu_cosine
+                .iter()
+                .all(|&c| (-1e-10..=1.0 + 1e-10).contains(&c));
             v.check_count(
                 &format!("N={label} GPU cosine valid"),
                 usize::from(all_valid),

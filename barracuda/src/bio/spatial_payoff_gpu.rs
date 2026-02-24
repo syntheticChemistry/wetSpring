@@ -110,7 +110,7 @@ mod tests {
         assert_eq!(result.fitness.len(), 16);
         // All cooperators with 8 neighbors: payoff = 8 × (benefit - cost) = 16.0
         for &f in &result.fitness {
-            assert!((f - 16.0).abs() < tolerances::GPU_F32_SPATIAL);
+            assert!((f - 16.0).abs() < tolerances::GPU_F32_SPATIAL as f32);
         }
     }
 }

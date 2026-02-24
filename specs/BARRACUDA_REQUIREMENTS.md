@@ -1,13 +1,13 @@
 # wetSpring — BarraCuda Requirements
 
-**Last Updated**: February 23, 2026
+**Last Updated**: February 24, 2026
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---
 
 ## Current Kernel Usage (Validated)
 
-### Rust CPU Modules (45 modules, 759 tests, ~97% bio+io coverage)
+### Rust CPU Modules (45 modules, 845 tests, 95.67% library coverage)
 
 | Module Domain | Modules | Status |
 |--------------|---------|--------|
@@ -38,10 +38,11 @@
 | `FelsensteinGpu` | Phylogenetic pruning likelihood | 15/15 | **Absorbed + composed** |
 | `GemmF64::WGSL` | Eliminates fragile include_str! path | — | **Absorbed Feb 20** |
 
-### Local WGSL Shaders (5 — Write phase active)
+### Local WGSL Shaders (0 — Lean COMPLETE)
 
-Original 12 shaders absorbed by ToadStool (S31d/31g + S39-41). Write cycle
-covers all ODE domains not covered by the existing `BatchedOdeRK4F64` (4v/17p):
+Original 12 shaders absorbed by ToadStool (S31d/31g + S39-41). All 5 ODE
+shaders deleted — replaced by `BatchedOdeRK4::<S>::generate_shader()`.
+Historical record of deleted shaders:
 
 | Shader | Vars | Params | CPU ↔ GPU | Exp |
 |--------|------|--------|-----------|-----|
@@ -112,7 +113,16 @@ Pure GPU promotion (Exp101) added 12 GPU wrappers via Compose strategy
 | ~~Capacitor GPU~~ | ✅ Local WGSL ODE shader (Exp101) | Done | — |
 | ~~13 Tier B/C modules~~ | ✅ Pure GPU promotion complete (Exp101) | Done | — |
 | Taxonomy NPU | Naive Bayes → FC model → int8 | **P3** | NPU candidate |
-| ODE generic absorption | 5 local shaders → `BatchedOdeRK4Generic` | **P2** | ToadStool generalization |
+| ~~ODE generic absorption~~ | ✅ All 5 ODE shaders → `generate_shader()` (Lean COMPLETE) | Done | — |
+
+### Track 3 — Drug Repurposing GPU Primitives (NEW)
+
+| Operation | Shader | Priority | Effort | Notes |
+|-----------|--------|----------|--------|-------|
+| NMF (f64) | `nmf_f64.wgsl` | **P1** | Medium | Multiplicative update rules (Lee & Seung 1999). ~4,000 × 18,000 drug-disease matrix |
+| Sparse GEMM | `sparse_gemm_f64.wgsl` | **P2** | High | CSR format. Drug-disease matrices ~5% fill |
+| Cosine similarity | `cosine_similarity_f64.wgsl` | **P2** | Low | Pairwise on NMF factor matrices. Compose from GEMM + FMR |
+| Top-K selection | `topk_f64.wgsl` | **P3** | Low | Rank drug-disease pairs by score. Parallel bitonic sort |
 
 ### BarraCuda Evolution Path
 
@@ -136,6 +146,6 @@ CPU 22.5× faster than Python  ────────→  GPU math PROVEN port
 - **NVVM workaround**: force `ShaderTemplate::for_driver_auto(source, true)` for shaders using exp/log
 - Spectral cosine achieves 926× GPU speedup — the first "GPU wins decisively" benchmark from any spring
 - 45 CPU + 42 GPU Rust modules with 1 runtime dependency (flate2) — highest sovereignty ratio in the ecosystem
-- **12 shaders absorbed + 5 local WGSL (Write phase) + 12 composed wrappers** — see `barracuda/EVOLUTION_READINESS.md` for status
+- **12 shaders absorbed + 5 ODE leaned (generate_shader) + 12 composed wrappers** — zero local WGSL remains; see `barracuda/EVOLUTION_READINESS.md`
 - **Rust edition 2024**, MSRV 1.85 — `f64::midpoint()`, `usize::midpoint()`, `const fn` promotions
 - **`#![deny(unsafe_code)]`** — edition 2024 makes `std::env::set_var` unsafe; `#[allow]` confined to test env-var calls

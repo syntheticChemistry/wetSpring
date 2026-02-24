@@ -103,9 +103,9 @@ mod tests {
         let result = lv.compute(&freqs, 3, 2).expect("locus variance");
         assert_eq!(result.len(), 2);
         assert!(
-            result[0].abs() < tolerances::GPU_F32_PARITY,
+            result[0].abs() < tolerances::GPU_F32_PARITY as f32,
             "uniform locus should be 0"
         );
-        assert!((result[1] - 0.106_666_67).abs() < tolerances::GPU_F32_SPATIAL);
+        assert!((result[1] - 0.106_666_67).abs() < tolerances::GPU_F32_SPATIAL as f32);
     }
 }

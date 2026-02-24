@@ -326,10 +326,10 @@ pub fn merge_pairs(
     for (fwd, rev) in fwd_reads.iter().zip(rev_reads.iter()) {
         let result = merge_pair(fwd, rev, params);
 
-        if let Some(ref rec) = result.merged {
+        if let Some(rec) = result.merged {
             total_overlap += result.overlap;
             total_merged_len += rec.sequence.len();
-            merged.push(rec.clone());
+            merged.push(rec);
         } else if result.overlap == 0 {
             no_overlap += 1;
         } else {

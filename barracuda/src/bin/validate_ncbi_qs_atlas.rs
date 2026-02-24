@@ -135,7 +135,7 @@ fn main() {
             });
             v.check_pass(
                 &format!("{name} ⟨r⟩ in [POISSON-0.05, GOE+0.05]"),
-                r >= POISSON_R - 0.05 && r <= GOE_R + 0.05,
+                (POISSON_R - 0.05..=GOE_R + 0.05).contains(&r),
             );
         }
 

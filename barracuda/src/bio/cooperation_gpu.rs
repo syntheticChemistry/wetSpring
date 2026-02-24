@@ -1,20 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! GPU-accelerated cooperative QS game theory ODE parameter sweep.
 //!
-//! **Local evolution** — compiles a local WGSL shader via `compile_shader_f64`,
-//! to be absorbed by `ToadStool` as `BatchedOdeRK4Generic<4, 13>`.
-//!
-//! Cooperator vs cheater dynamics (4 variables, 13 parameters):
-//! - Nc: cooperator density, Nd: cheater density, A: autoinducer, B: biofilm
-//! - Frequency-dependent fitness, Hill-kinetics signal benefit, crowding
+//! **Lean phase complete**: Uses `ToadStool`'s `BatchedOdeRK4<CooperationOde>::generate_shader()`
+//! via the `OdeSystem` trait (see `bio::ode_systems::CooperationOde`).
+//! Local WGSL file deleted — shader now generated from trait impl at runtime.
 
 use barracuda::device::WgpuDevice;
+use barracuda::numerical::ode_generic::BatchedOdeRK4;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
 use super::cooperation::{self, CooperationParams};
-
-const WGSL_SOURCE: &str = include_str!("../shaders/cooperation_ode_rk4_f64.wgsl");
+use super::ode_systems::CooperationOde;
 
 /// Number of state variables.
 pub const N_VARS: usize = cooperation::N_VARS;
@@ -65,7 +62,8 @@ impl CooperationGpu {
     /// Returns `Err` if shader compilation fails.
     pub fn new(device: Arc<WgpuDevice>) -> crate::error::Result<Self> {
         let d = device.device();
-        let module = device.compile_shader_f64(WGSL_SOURCE, Some("Cooperation ODE"));
+        let wgsl = BatchedOdeRK4::<CooperationOde>::generate_shader();
+        let module = device.compile_shader_f64(&wgsl, Some("Cooperation ODE"));
 
         let bgl = d.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             label: Some("Cooperation BGL"),
@@ -222,7 +220,7 @@ impl CooperationGpu {
             });
             pass.set_pipeline(&self.pipeline);
             pass.set_bind_group(0, &bg, &[]);
-            pass.dispatch_workgroups(config.n_batches.div_ceil(256), 1, 1);
+            pass.dispatch_workgroups(config.n_batches.div_ceil(64), 1, 1);
         }
         q.submit(std::iter::once(encoder.finish()));
         d.poll(wgpu::Maintain::Wait);

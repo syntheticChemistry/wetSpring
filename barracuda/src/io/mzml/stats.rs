@@ -66,6 +66,9 @@ pub fn stats_from_file(path: &Path) -> Result<MzmlStats> {
                         .map_or("", |(_, v)| v.as_str());
                     match accession {
                         "MS:1000511" => {
+                            // MS level defaults to 1 (MS1) when the cvParam
+                            // value is absent or non-numeric — matches
+                            // ProteoWizard's default behavior.
                             current_ms_level = cv_value.parse().unwrap_or(1);
                         }
                         "MS:1000016" => {

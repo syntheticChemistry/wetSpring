@@ -105,7 +105,7 @@ mod tests {
         let weights = vec![3.0f32, 5.0];
         let result = bf.evaluate(&pop, &weights, 2, 2).expect("fitness");
         assert_eq!(result.len(), 2);
-        assert!((result[0] - 3.0).abs() < tolerances::GPU_F32_PARITY); // 1*3 + 0*5
-        assert!((result[1] - 5.0).abs() < tolerances::GPU_F32_PARITY); // 0*3 + 1*5
+        assert!((result[0] - 3.0).abs() < tolerances::GPU_F32_PARITY as f32); // 1*3 + 0*5
+        assert!((result[1] - 5.0).abs() < tolerances::GPU_F32_PARITY as f32); // 0*3 + 1*5
     }
 }

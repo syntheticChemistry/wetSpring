@@ -4,9 +4,9 @@
 and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 **Write → Absorb → Lean** cycle adopted from hotSpring.
 
-**Date:** February 23, 2026
+**Date:** February 24, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 38 — Extension papers: cold seep 299K QS genes, luxR phylogeny geometry, mechanical wave Anderson, wave-localization synthesis, burst statistics reinterpretation; 759 tests, 149 experiments, 3,028+ checks, 138 binaries
+**Status:** Phase 39 — Paper queue ALL GREEN (43/43 papers); 811 tests (barracuda) + 38 forge = 849 total, 161 experiments, 3,132+ checks, 150 binaries, 95.67% library coverage
 
 ---
 
@@ -52,23 +52,25 @@ WGSL          known physics   handoffs/                        delete local
 | **Lean** | 27 | GPU modules consuming upstream ToadStool primitives |
 | **Compose** | 7 | GPU wrappers wiring ToadStool primitives (kmd, merge_pairs, robinson_foulds, derep, neighbor_joining, reconciliation, molecular_clock) |
 | **Passthrough** | 3 | Accept GPU buffers, CPU kernel (gbm, feature_table, signal) |
-| **Write** | 5 | Local WGSL ODE shaders (phage_defense, bistable, multi_signal, cooperation, capacitor) |
+| **Write → Lean** | 5 | ODE shaders fully lean — GPU modules use `generate_shader()` from `OdeSystem` traits (WGSL deleted) |
 | **NPU** | 1 | ESN reservoir computing → int8 quantization → NPU deployment (esn) |
 | **Tier B** | 0 | All promoted |
 | **Tier C** | 0 | All promoted |
 
-### Local WGSL Shaders (5 — Write phase active)
+### ODE Shader Lean (5 — Complete)
 
-| Shader | Vars | Params | CPU ↔ GPU |
-|--------|------|--------|-----------|
-| `phage_defense_ode_rk4_f64.wgsl` | 4 | 11 | Exact parity (Exp099) |
-| `bistable_ode_rk4_f64.wgsl` | 5 | 21 | Exact parity (Exp100) |
-| `multi_signal_ode_rk4_f64.wgsl` | 7 | 24 | Exact parity (Exp100) |
-| `cooperation_ode_rk4_f64.wgsl` | 4 | 13 | Exact parity (Exp101) |
-| `capacitor_ode_rk4_f64.wgsl` | 6 | 16 | Exact parity (Exp101) |
+All 5 biological ODE systems now use `BatchedOdeRK4<S>::generate_shader()` from
+ToadStool's generic framework. Local WGSL files deleted (30,424 bytes).
 
-All use `compile_shader_f64()` with `fmax`/`fclamp`/`fpow` polyfills.
-Absorption target: ToadStool `BatchedOdeRK4Generic<N_VARS, N_PARAMS>`.
+| System | Struct | Vars | Params | CPU Parity |
+|--------|--------|:----:|:------:|:----------:|
+| Phage Defense | `PhageDefenseOde` | 4 | 11 | Derivative-level exact |
+| Bistable | `BistableOde` | 5 | 21 | Exact (0.00) |
+| Multi-Signal | `MultiSignalOde` | 7 | 24 | Exact (4.44e-16) |
+| Cooperation | `CooperationOde` | 4 | 13 | Exact (4.44e-16) |
+| Capacitor | `CapacitorOde` | 6 | 16 | Exact (0.00) |
+
+Upstream `integrate_cpu()` is 20–33% faster than local integrators.
 
 ### metalForge Forge Crate (v0.3.0)
 
@@ -94,7 +96,7 @@ integration point.
 |--------|-------|
 | Validation checks (CPU) | 1,476 |
 | Validation checks (GPU) | 702 |
-| ODE CPU ↔ GPU parity | 82 (5 local WGSL ODE domains) |
+| ODE CPU ↔ GPU parity | 82 (5 ODE domains, lean on `generate_shader()`) |
 | Dispatch validation checks | 80 |
 | Layout fidelity checks | 35 |
 | Transfer/streaming checks | 57 |
@@ -109,8 +111,10 @@ integration point.
 | Why analysis: mapping, scaling, dilution, eukaryote | 35 (mapping sensitivity, square-cubed law, planktonic fluid 3D, cross-domain QS) |
 | Extension papers: cold seep, phylogeny, waves | 36 (cold seep 299K catalog, geometry overlay, luxR phylogeny, mechanical waves, wave-localization, burst statistics) |
 | **Total validation checks** | **3,028+** |
-| Rust library unit tests | 680 lib + 79 integration/doc |
-| **Total Rust tests** | **759** |
+| Rust library unit tests | 728 lib + 60 integration + 19 doc |
+| metalForge forge tests | 38 |
+| **Total Rust tests** | **845** (807 barracuda + 38 forge) |
+| Library code coverage | **95.67%** (llvm-cov) |
 | Experiments completed | 149 |
 | Validation/benchmark binaries | 128 validate + 10 benchmark = 138 total |
 | CPU bio modules | 45 |
@@ -123,8 +127,8 @@ integration point.
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | ToadStool primitives consumed | **31** (absorbed, Lean — aligned to ToadStool S42) |
-| Local WGSL shaders | **5** (Write phase — ODE domains pending absorption) |
-All 3,028+ validation checks **PASS**. All 759 tests **PASS**.
+| Local WGSL shaders | **0** (5 deleted — ODE modules lean on `generate_shader()`) |
+All 3,028+ validation checks **PASS**. All 845 tests **PASS** (1 ignored: GPU-only).
 
 ### GPU Performance
 
@@ -615,9 +619,9 @@ Extending the Anderson-QS framework using 5 key papers from the literature revie
 | Check | Status |
 |-------|--------|
 | `cargo fmt --check` | Clean (0 diffs) |
-| `cargo clippy --pedantic --nursery` | Clean (0 warnings, lib) |
+| `cargo clippy --all-targets -D warnings` | Clean (0 warnings, pedantic + nursery) |
 | `cargo doc --no-deps` | Clean (0 warnings) |
-| Line coverage (`cargo-llvm-cov`) | **96.21% overall** |
+| Line coverage (`cargo-llvm-cov`) | **95.67% overall** (728 lib + 60 integration + 19 doc) |
 | `#![deny(unsafe_code)]` | **Enforced crate-wide** (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | **Enforced crate-wide** |
 | TODO/FIXME markers | **0** |
@@ -627,6 +631,9 @@ Extending the Anderson-QS framework using 5 key papers from the literature revie
 | External C dependencies | **0** (`flate2` uses `rust_backend`) |
 | Named tolerance constants | 53 (scientifically justified, hierarchy-tested) |
 | Provenance headers | All 138 validation/benchmark binaries |
+| ESN ridge regression | **Proper Cholesky solve** (not diagonal approximation) |
+| I/O streaming | Buffering APIs deprecated; `stats_from_file` + iterators preferred |
+| Clone optimization | Hot-path clones eliminated (merge_pairs, derep entry API) |
 
 ---
 
@@ -698,7 +705,7 @@ Extending the Anderson-QS framework using 5 key papers from the literature revie
 **Passthrough (3)** — accept GPU buffers, CPU kernel (pending ToadStool primitives):
 `gbm_gpu`, `feature_table_gpu`, `signal_gpu`
 
-**Write (5)** — compile local WGSL shaders (pending ToadStool absorption):
+**Write → Lean (5)** — now using `BatchedOdeRK4<S>::generate_shader()` (WGSL deleted):
 `bistable_gpu`, `multi_signal_gpu`, `phage_defense_gpu`, `cooperation_gpu`, `capacitor_gpu`
 
 ### I/O Modules
@@ -730,7 +737,7 @@ wetSpring/
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML)
 │   │   ├── bench/               ← benchmark harness + power monitoring
 │   │   ├── bin/                 ← 138 validation/benchmark binaries
-│   │   └── shaders/             ← 5 local WGSL ODE shaders (Write phase)
+│   │   └── shaders/             ← shared WGSL utilities (ODE shaders now generated at runtime)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024
 ├── experiments/                   ← 149 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing

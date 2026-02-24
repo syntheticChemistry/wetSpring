@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![allow(deprecated)]
 //! Integration tests for I/O parsers: round-trip, determinism, edge cases.
 //!
 //! Each test creates synthetic data in a temporary directory,

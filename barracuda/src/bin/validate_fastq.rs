@@ -55,6 +55,7 @@ fn main() {
 fn validate_r1(data_dir: &Path, v: &mut Validator) {
     v.section("── F3D0_R1.fastq (forward reads) ──");
     let r1_path = data_dir.join("F3D0_R1.fastq");
+    #[allow(deprecated)]
     match fastq::parse_fastq(&r1_path) {
         Ok(records) => {
             let stats = fastq::compute_stats(&records);
@@ -101,6 +102,7 @@ fn validate_r1(data_dir: &Path, v: &mut Validator) {
 fn validate_r2(data_dir: &Path, v: &mut Validator) {
     v.section("── F3D0_R2.fastq (reverse reads) ──");
     let r2_path = data_dir.join("F3D0_R2.fastq");
+    #[allow(deprecated)]
     match fastq::parse_fastq(&r2_path) {
         Ok(records) => {
             let stats = fastq::compute_stats(&records);
@@ -143,9 +145,9 @@ fn validate_bulk(data_dir: &Path, v: &mut Validator) {
         fastq_files.sort_by_key(std::fs::DirEntry::path);
 
         for entry in &fastq_files {
-            match fastq::parse_fastq(&entry.path()) {
-                Ok(records) => {
-                    total_seqs += records.len();
+            match fastq::stats_from_file(&entry.path()) {
+                Ok(stats) => {
+                    total_seqs += stats.num_sequences;
                     total_files += 1;
                 }
                 Err(e) => {

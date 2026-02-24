@@ -310,7 +310,7 @@ pub fn write_temp_mzml(dir: &tempfile::TempDir, name: &str, xml: &str) -> std::p
 }
 
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
+#[allow(clippy::expect_used, clippy::unwrap_used, deprecated)]
 mod tests {
     use super::*;
 

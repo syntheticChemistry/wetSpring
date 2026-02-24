@@ -116,8 +116,8 @@ mod tests {
             .pairwise_hamming(&[&s0, &s1, &s2])
             .expect("hamming dispatch");
         assert_eq!(result.distances.len(), 3);
-        assert!((result.distances[0] - 0.125).abs() < tolerances::GPU_VS_CPU_F64);
-        assert!((result.distances[1] - 0.75).abs() < tolerances::GPU_VS_CPU_F64);
-        assert!((result.distances[2] - 0.875).abs() < tolerances::GPU_VS_CPU_F64);
+        assert!((result.distances[0] - 0.125).abs() < tolerances::GPU_VS_CPU_F64 as f32);
+        assert!((result.distances[1] - 0.75).abs() < tolerances::GPU_VS_CPU_F64 as f32);
+        assert!((result.distances[2] - 0.875).abs() < tolerances::GPU_VS_CPU_F64 as f32);
     }
 }

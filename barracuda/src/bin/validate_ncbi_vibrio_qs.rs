@@ -27,6 +27,8 @@ use wetspring_barracuda::bio::ode_sweep_gpu::{OdeSweepConfig, OdeSweepGpu};
 use wetspring_barracuda::bio::qs_biofilm::{self, QsBiofilmParams};
 #[cfg(feature = "gpu")]
 use wetspring_barracuda::gpu::GpuF64;
+#[cfg(feature = "gpu")]
+use wetspring_barracuda::validation;
 use wetspring_barracuda::validation::Validator;
 
 #[cfg(feature = "gpu")]
@@ -192,10 +194,7 @@ fn main() {
             clamp_min: 0.0,
         };
         let all_y0: Vec<f64> = (0..n).flat_map(|_| y0.iter().copied()).collect();
-        let all_params: Vec<f64> = derived_params
-            .iter()
-            .flat_map(|p| params_to_flat_17(p))
-            .collect();
+        let all_params: Vec<f64> = derived_params.iter().flat_map(params_to_flat_17).collect();
         let gpu_output = sweeper.integrate(&config, &all_y0, &all_params).unwrap();
 
         v.check_count("GPU output size", gpu_output.len(), n * N_VARS);

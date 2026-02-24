@@ -185,6 +185,7 @@ fn process_sample(
         return None;
     };
 
+    #[allow(deprecated)]
     let records = match wetspring_barracuda::io::fastq::parse_fastq(&fastq_path) {
         Ok(recs) => recs,
         Err(e) => {

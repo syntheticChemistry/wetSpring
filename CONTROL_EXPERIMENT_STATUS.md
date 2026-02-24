@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
-**Date:** February 23, 2026
-**Status:** 149 experiments, 3,028+ validation checks, all PASS (759 Rust tests)
+**Date:** February 24, 2026
+**Status:** 161 experiments, 3,132+ validation checks, all PASS (732 lib + 31 integration Rust tests)
 
 ---
 
@@ -158,6 +158,18 @@
 | 147 | Mechanical wave Anderson framework | `validate_mechanical_wave_anderson` | PASS | 6 |
 | 148 | QS wave × localization (PRE 2020) | `validate_qs_wave_localization` | PASS | 6 |
 | 149 | Burst statistics as Anderson (SciRep 2019) | `validate_burst_statistics_anderson` | PASS | 6 |
+| 150 | Finite-size scaling v2 (disorder-averaged) | `validate_finite_size_scaling_v2` | PASS (GPU) | 14 |
+| 151 | Correlated disorder lattices (biofilm) | `validate_correlated_disorder` | PASS (GPU) | 8 |
+| 152 | Physical comm pathways vs Anderson (8 modes) | `validate_physical_comm_anderson` | PASS | 9 |
+| 153 | Nitrifying community QS (npj Biofilms 2021) | `validate_nitrifying_qs` | PASS | 12 |
+| 154 | Marine interkingdom QS (10 organisms) | `validate_marine_interkingdom_qs` | PASS | 6 |
+| 155 | Myxococcus C-signal critical density (PNAS) | `validate_myxococcus_critical_density` | PASS | 7 |
+| 156 | Dictyostelium cAMP relay (non-Hermitian) | `validate_dictyostelium_relay` | PASS | 8 |
+| 157 | Fajgenbaum pathway scoring (JCI 2019) | `validate_fajgenbaum_pathway` | PASS | 8 |
+| 158 | MATRIX pharmacophenomics (Lancet 2025) | `validate_matrix_pharmacophenomics` | PASS | 9 |
+| 159 | NMF drug-disease factorization (Yang 2020) | `validate_nmf_drug_repurposing` | PASS | 7 |
+| 160 | repoDB NMF reproduction (Gao 2020) | `validate_repodb_nmf` | PASS | 9 |
+| 161 | Knowledge graph embedding (ROBOKOP) | `validate_knowledge_graph_embedding` | PASS | 7 |
 
 ---
 
@@ -472,6 +484,14 @@ Bugs found and fixed: SNP binding layout (ToadStool), AdapterInfo propagation (w
 | 105 | Pure GPU Streaming v2 — Analytics | 27 | Pre-warmed Bray-Curtis + spectral cosine + full analytics pipeline (--features gpu) |
 | 106 | GPU Streaming — ODE + Phylogenetics | 45 | 6 pre-warmed primitives, multi-dispatch proof, zero recompilation (--features gpu) |
 | 107 | Spectral Cross-Spring (Anderson/QS) | 25 | Anderson 1D/2D/3D, Almost-Mathieu, Lanczos, QS-disorder analogy (--features gpu) |
+
+### ODE Lean + Cross-Spring Benchmark (Phase 38 lean)
+
+| Benchmark | Checks | What it proves |
+|-----------|:------:|----------------|
+| `benchmark_ode_lean_crossspring` | 11 | 5 ODE systems → `generate_shader()` WGSL, CPU parity (4/5 exact, 1 clamping-divergent), upstream 20–33% faster, linear batch scaling (--release --features gpu) |
+
+5 local WGSL files deleted (30,424 bytes). All GPU modules use `BatchedOdeRK4<S>::generate_shader()`.
 
 ### Structural Evolution (Phase 23, Exp097)
 

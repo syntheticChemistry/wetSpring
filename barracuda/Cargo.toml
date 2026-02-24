@@ -637,6 +637,66 @@ path = "src/bin/validate_npu_disorder_classifier.rs"
 name = "benchmark_cross_spring_evolution"
 path = "src/bin/benchmark_cross_spring_evolution.rs"
 
+# ── ODE Lean + Cross-Spring Evolution Benchmark ───────────────
+[[bin]]
+name = "benchmark_ode_lean_crossspring"
+path = "src/bin/benchmark_ode_lean_crossspring.rs"
+required-features = ["gpu"]
+
+# ── Exp157-161: Drug Repurposing Track (Phase 39) ─────────────
+[[bin]]
+name = "validate_fajgenbaum_pathway"
+path = "src/bin/validate_fajgenbaum_pathway.rs"
+
+[[bin]]
+name = "validate_matrix_pharmacophenomics"
+path = "src/bin/validate_matrix_pharmacophenomics.rs"
+
+[[bin]]
+name = "validate_nmf_drug_repurposing"
+path = "src/bin/validate_nmf_drug_repurposing.rs"
+
+[[bin]]
+name = "validate_repodb_nmf"
+path = "src/bin/validate_repodb_nmf.rs"
+
+[[bin]]
+name = "validate_knowledge_graph_embedding"
+path = "src/bin/validate_knowledge_graph_embedding.rs"
+
+# ── Exp152-156: Paper Queue Extension (Phase 39) ──────────────
+[[bin]]
+name = "validate_physical_comm_anderson"
+path = "src/bin/validate_physical_comm_anderson.rs"
+
+[[bin]]
+name = "validate_nitrifying_qs"
+path = "src/bin/validate_nitrifying_qs.rs"
+
+[[bin]]
+name = "validate_marine_interkingdom_qs"
+path = "src/bin/validate_marine_interkingdom_qs.rs"
+
+[[bin]]
+name = "validate_myxococcus_critical_density"
+path = "src/bin/validate_myxococcus_critical_density.rs"
+
+[[bin]]
+name = "validate_dictyostelium_relay"
+path = "src/bin/validate_dictyostelium_relay.rs"
+
+# ── Exp151: Correlated Disorder Lattices (Phase 39) ───────────
+[[bin]]
+name = "validate_correlated_disorder"
+path = "src/bin/validate_correlated_disorder.rs"
+required-features = ["gpu"]
+
+# ── Exp150: Finite-Size Scaling v2 (Phase 39) ─────────────────
+[[bin]]
+name = "validate_finite_size_scaling_v2"
+path = "src/bin/validate_finite_size_scaling_v2.rs"
+required-features = ["gpu"]
+
 # ── NCBI Vibrio QS Parameter Landscape (Exp121) ───────────────────
 [[bin]]
 name = "validate_ncbi_vibrio_qs"

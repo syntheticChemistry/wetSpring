@@ -20,30 +20,17 @@
 use wetspring_barracuda::bio::reconciliation::{
     DtlCosts, DtlEvent, FlatRecTree, reconcile_batch, reconcile_dtl,
 };
+use wetspring_barracuda::validation::Validator;
 
 const NO_CHILD: u32 = u32::MAX;
 
 fn main() {
-    let mut pass = 0_u32;
-    let mut fail = 0_u32;
-
-    macro_rules! check {
-        ($name:expr_2021, $cond:expr_2021) => {
-            if $cond {
-                println!("[PASS] {}", $name);
-                pass += 1;
-            } else {
-                println!("[FAIL] {}", $name);
-                fail += 1;
-            }
-        };
-    }
+    let mut v = Validator::new("Exp034: DTL Reconciliation");
 
     let costs = DtlCosts::default();
-    println!("=== Exp034: DTL Reconciliation Validation ===\n");
 
     // ── Test 1: Congruent 2-leaf trees (zero cost) ──
-    println!("─── Congruent trees ───");
+    v.section("─── Congruent trees ───");
     let host_2 = FlatRecTree {
         names: vec!["H_A".into(), "H_B".into(), "H_AB".into()],
         left_child: vec![NO_CHILD, NO_CHILD, 0],
@@ -57,15 +44,15 @@ fn main() {
     let tip_map_cong = vec![("P_A".into(), "H_A".into()), ("P_B".into(), "H_B".into())];
     let r1 = reconcile_dtl(&host_2, &para_2, &tip_map_cong, &costs);
     // Python: cost=0, host=H_AB
-    check!("Congruent: cost=0", r1.optimal_cost == 0);
-    check!("Congruent: mapped to H_AB", r1.optimal_host == "H_AB");
-    check!(
+    v.check_pass("Congruent: cost=0", r1.optimal_cost == 0);
+    v.check_pass("Congruent: mapped to H_AB", r1.optimal_host == "H_AB");
+    v.check_pass(
         "Congruent: root event is speciation",
-        r1.event_table[2 * 3 + 2] == DtlEvent::Speciation
+        r1.event_table[2 * 3 + 2] == DtlEvent::Speciation,
     );
 
     // ── Test 2: Duplication scenario (4-leaf host) ──
-    println!("\n─── Duplication scenario ───");
+    v.section("─── Duplication scenario ───");
     let host_4 = FlatRecTree {
         names: vec![
             "H_A".into(),
@@ -97,12 +84,12 @@ fn main() {
     ];
     let r2 = reconcile_dtl(&host_4, &para_dup, &tip_map_dup, &costs);
     // Python: cost=4, host=H_root
-    check!("Duplication: cost matches Python (4)", r2.optimal_cost == 4);
-    check!("Duplication: mapped to H_root", r2.optimal_host == "H_root");
-    check!("Duplication: cost > 0", r2.optimal_cost > 0);
+    v.check_pass("Duplication: cost matches Python (4)", r2.optimal_cost == 4);
+    v.check_pass("Duplication: mapped to H_root", r2.optimal_host == "H_root");
+    v.check_pass("Duplication: cost > 0", r2.optimal_cost > 0);
 
     // ── Test 3: Simple loss scenario ──
-    println!("\n─── Loss/co-speciation scenario ───");
+    v.section("─── Loss/co-speciation scenario ───");
     let host_3 = FlatRecTree {
         names: vec![
             "H_A".into(),
@@ -122,43 +109,38 @@ fn main() {
     let tip_map_loss = vec![("P_A".into(), "H_A".into()), ("P_C".into(), "H_C".into())];
     let r3 = reconcile_dtl(&host_3, &para_loss, &tip_map_loss, &costs);
     // Python: cost=1, host=H_root
-    check!("Loss: cost matches Python (1)", r3.optimal_cost == 1);
-    check!("Loss: mapped to H_root", r3.optimal_host == "H_root");
+    v.check_pass("Loss: cost matches Python (1)", r3.optimal_cost == 1);
+    v.check_pass("Loss: mapped to H_root", r3.optimal_host == "H_root");
 
     // ── Test 4: DP table dimensions ──
-    println!("\n─── DP table checks ───");
-    check!(
+    v.section("─── DP table checks ───");
+    v.check_pass(
         "Table dimensions correct (congruent)",
-        r1.cost_table.len() == 3 * 3 && r1.event_table.len() == 3 * 3
+        r1.cost_table.len() == 3 * 3 && r1.event_table.len() == 3 * 3,
     );
-    check!(
+    v.check_pass(
         "Table dimensions correct (duplication)",
-        r2.cost_table.len() == 5 * 7 && r2.event_table.len() == 5 * 7
+        r2.cost_table.len() == 5 * 7 && r2.event_table.len() == 5 * 7,
     );
 
     // ── Test 5: Batch reconciliation ──
-    println!("\n─── Batch reconciliation ───");
+    v.section("─── Batch reconciliation ───");
     let batch_results = reconcile_batch(
         &host_2,
         &[(&para_2, &tip_map_cong), (&para_2, &tip_map_cong)],
         &costs,
     );
-    check!("Batch: returns 2 results", batch_results.len() == 2);
-    check!(
+    v.check_count("Batch: returns 2 results", batch_results.len(), 2);
+    v.check_pass(
         "Batch: both congruent = 0",
-        batch_results[0].optimal_cost == 0 && batch_results[1].optimal_cost == 0
+        batch_results[0].optimal_cost == 0 && batch_results[1].optimal_cost == 0,
     );
 
     // ── Test 6: Determinism ──
-    println!("\n─── Determinism ───");
+    v.section("─── Determinism ───");
     let r2b = reconcile_dtl(&host_4, &para_dup, &tip_map_dup, &costs);
-    check!("Deterministic (cost)", r2.optimal_cost == r2b.optimal_cost);
-    check!("Deterministic (host)", r2.optimal_host == r2b.optimal_host);
+    v.check_pass("Deterministic (cost)", r2.optimal_cost == r2b.optimal_cost);
+    v.check_pass("Deterministic (host)", r2.optimal_host == r2b.optimal_host);
 
-    // ── Summary ──
-    println!("\n========================================");
-    println!("Exp034 DTL Reconciliation: {pass} PASS, {fail} FAIL");
-    if fail > 0 {
-        std::process::exit(1);
-    }
+    v.finish();
 }

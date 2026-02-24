@@ -229,6 +229,10 @@ impl Iterator for MzmlIter {
 /// Returns [`Error::Io`] if the file cannot be opened, [`Error::Xml`]
 /// for XML structure errors, or [`Error::Base64`] / [`Error::Zlib`]
 /// for binary array decoding failures.
+#[deprecated(
+    since = "0.2.0",
+    note = "collects all spectra; use `MzmlIter` for streaming"
+)]
 pub fn parse_mzml(path: &Path) -> Result<Vec<MzmlSpectrum>> {
     MzmlIter::open(path)?.collect()
 }

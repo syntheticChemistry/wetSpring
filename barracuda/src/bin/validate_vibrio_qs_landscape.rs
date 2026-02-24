@@ -1,5 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::expect_used, clippy::unwrap_used, clippy::print_stdout)]
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::print_stdout,
+    clippy::field_reassign_with_default
+)]
 //! # Exp108: Vibrio QS Parameter Landscape via GPU ODE Sweep
 //!
 //! Sweeps 1024 QS parameter combinations through `OdeSweepGpu`, mapping the
@@ -157,7 +162,7 @@ fn main() {
         };
 
         let all_y0: Vec<f64> = (0..N_BATCHES).flat_map(|_| y0.iter().copied()).collect();
-        let all_params: Vec<f64> = params.iter().flat_map(|p| params_to_flat_17(p)).collect();
+        let all_params: Vec<f64> = params.iter().flat_map(params_to_flat_17).collect();
 
         let gpu_start = Instant::now();
         let gpu_output = sweeper.integrate(&config, &all_y0, &all_params).unwrap();

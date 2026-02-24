@@ -422,3 +422,157 @@ pub fn biome_diversity_params() -> Vec<(&'static str, usize, f64)> {
         ("algal_bloom_baltic", 80, 0.18),
     ]
 }
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn json_str_value_basic() {
+        let json = r#"{"accession": "GCF_000006745.1", "organism": "Vibrio cholerae"}"#;
+        assert_eq!(json_str_value(json, "accession"), "GCF_000006745.1");
+        assert_eq!(json_str_value(json, "organism"), "Vibrio cholerae");
+    }
+
+    #[test]
+    fn json_str_value_missing_key() {
+        let json = r#"{"accession": "GCF_000006745.1"}"#;
+        assert_eq!(json_str_value(json, "missing"), "");
+    }
+
+    #[test]
+    fn json_int_value_basic() {
+        let json = r#"{"genome_size_bp": 4000000, "gene_count": 3800}"#;
+        assert_eq!(json_int_value(json, "genome_size_bp"), 4_000_000);
+        assert_eq!(json_int_value(json, "gene_count"), 3800);
+    }
+
+    #[test]
+    fn json_int_value_missing() {
+        let json = r#"{"genome_size_bp": 4000000}"#;
+        assert_eq!(json_int_value(json, "missing"), 0);
+    }
+
+    #[test]
+    fn split_json_objects_empty() {
+        assert!(split_json_objects("").is_empty());
+        assert!(split_json_objects("[]").is_empty());
+    }
+
+    #[test]
+    fn split_json_objects_single() {
+        let input = r#"[{"a": 1}]"#;
+        let objects = split_json_objects(input);
+        assert_eq!(objects.len(), 1);
+        assert!(objects[0].contains("\"a\""));
+    }
+
+    #[test]
+    fn split_json_objects_multiple() {
+        let input = r#"[{"a": 1}, {"b": 2}, {"c": 3}]"#;
+        let objects = split_json_objects(input);
+        assert_eq!(objects.len(), 3);
+    }
+
+    #[test]
+    fn split_json_objects_nested() {
+        let input = r#"[{"a": {"inner": 1}}, {"b": 2}]"#;
+        let objects = split_json_objects(input);
+        assert_eq!(objects.len(), 2);
+        assert!(objects[0].contains("inner"));
+    }
+
+    #[test]
+    fn load_vibrio_assemblies_synthetic_fallback() {
+        let (assemblies, is_real) = load_vibrio_assemblies();
+        assert!(!assemblies.is_empty());
+        if !is_real {
+            assert_eq!(assemblies.len(), 150);
+            assert!(assemblies[0].accession.starts_with("GCF_SYN_"));
+            assert!(assemblies[0].genome_size_bp > 0);
+            assert!(assemblies[0].gene_count > 0);
+        }
+    }
+
+    #[test]
+    fn load_vibrio_assemblies_deterministic() {
+        let (a1, _) = load_vibrio_assemblies();
+        let (a2, _) = load_vibrio_assemblies();
+        assert_eq!(a1.len(), a2.len());
+        for (x, y) in a1.iter().zip(a2.iter()) {
+            assert_eq!(x.accession, y.accession);
+            assert_eq!(x.genome_size_bp, y.genome_size_bp);
+        }
+    }
+
+    #[test]
+    fn load_campylobacterota_synthetic_fallback() {
+        let (assemblies, is_real) = load_campylobacterota();
+        assert!(!assemblies.is_empty());
+        if !is_real {
+            assert_eq!(assemblies.len(), 80);
+            assert!(assemblies[0].accession.starts_with("GCF_CAM_"));
+            assert!(!assemblies[0].genus.is_empty());
+        }
+    }
+
+    #[test]
+    fn load_campylobacterota_genera_diverse() {
+        let (assemblies, _) = load_campylobacterota();
+        let genera: std::collections::HashSet<&str> =
+            assemblies.iter().map(|a| a.genus.as_str()).collect();
+        assert!(
+            genera.len() >= 5,
+            "should have multiple genera, got {}",
+            genera.len()
+        );
+    }
+
+    #[test]
+    fn load_biome_projects_synthetic_fallback() {
+        let (projects, is_real) = load_biome_projects();
+        assert!(!projects.is_empty());
+        if !is_real {
+            assert_eq!(projects.len(), 28);
+            assert!(projects[0].accession.starts_with("PRJNA_SYN_"));
+            assert!(!projects[0].biome.is_empty());
+        }
+    }
+
+    #[test]
+    fn load_biome_projects_biome_diversity() {
+        let (projects, _) = load_biome_projects();
+        let biomes: std::collections::HashSet<&str> =
+            projects.iter().map(|p| p.biome.as_str()).collect();
+        assert!(
+            biomes.len() >= 10,
+            "should cover many biomes, got {}",
+            biomes.len()
+        );
+    }
+
+    #[test]
+    fn biome_diversity_params_count() {
+        let params = biome_diversity_params();
+        assert_eq!(params.len(), 28);
+    }
+
+    #[test]
+    fn biome_diversity_params_ranges() {
+        for (name, n_species, j) in biome_diversity_params() {
+            assert!(!name.is_empty());
+            assert!(n_species > 0, "{name}: n_species should be > 0");
+            assert!(
+                (0.0..=1.0).contains(&j),
+                "{name}: Pielou J should be in [0,1], got {j}"
+            );
+        }
+    }
+
+    #[test]
+    fn data_dir_returns_path() {
+        let dir = data_dir();
+        assert!(dir.to_string_lossy().contains("ncbi_phase35"));
+    }
+}

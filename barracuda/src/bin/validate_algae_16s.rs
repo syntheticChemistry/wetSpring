@@ -486,6 +486,7 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
     println!("  Parsing R1: {}", r1.display());
 
     // Handle partial downloads: decompress to temp file, trim to complete records
+    #[allow(deprecated)]
     let records_result = fastq::parse_fastq(&r1).or_else(|_| {
         println!("  [NOTE] Partial gzip detected — decompressing what we can...");
         decompress_partial_gz(&r1)

@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
-**Last Updated**: February 23, 2026
-**Status**: Phase 38 — 1,476 CPU + 702 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 56 ODE parity + 24 MF-v6 + 72 streaming-v2 + 25 spectral + 59 NPU reservoir + 9 cross-spring evolution + 146 NCBI-scale + 50 3D-Anderson + 50 geometry + 35 why-analysis + 36 extension-papers = 3,028+/3,028+ checks, ALL PASS (759 tests, 149 experiments)
+**Last Updated**: February 24, 2026
+**Status**: Phase 39 — 3,132+/3,132+ checks, ALL PASS (849 tests, 161 experiments, 95.67% library coverage)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -10,7 +10,7 @@
 
 | Metric | Value |
 |--------|-------|
-| CPU validation | 1,476/1,476 PASS — 45 modules, 149 experiments (GPU-confirmed Phase 36c), 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
+| CPU validation | 1,476/1,476 PASS — 46 modules, 161 experiments (GPU-confirmed Phase 39), 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted + NMF |
 | GPU validation | 702/702 PASS — 30 ToadStool primitives, 5 local WGSL, 80 streaming + 48 head-to-head + 28 metalForge v4 + 38 pure GPU |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 380/380 — 22.5x Rust speedup over Python (v1–v8) |
@@ -18,15 +18,17 @@
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip (Exp090/091) |
 | metalForge cross-system | 37 domains CPU↔GPU (Exp103+104) + dispatch (Exp080) + pipeline (Exp086) + PCIe (Exp088) |
 | Cross-spring spectral | 25 checks — Anderson localization + QS-disorder analogy (Exp107) |
-| Rust modules | 45 CPU + 42 GPU, 759 tests (~97% bio+io coverage) |
-| Write phase | 5 local WGSL ODE shaders (phage_defense, bistable, multi_signal, cooperation, capacitor) |
+| Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
+| Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
+| Rust modules | 45 CPU + 42 GPU, 845 tests (95.67% library coverage, llvm-cov) |
+| Write phase | 5 local WGSL ODE shaders **deleted** — GPU modules use `generate_shader()` from `OdeSystem` trait impls |
 | Dependencies | 1 runtime (flate2), everything else sovereign |
 | Paper queue | **ALL DONE** — 29/29 reproducible papers complete (Track 1c added) |
 | Faculty (Track 1) | Waters (MMG, MSU), Cahill (Sandia), Smallwood (Sandia) |
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
 | Faculty (Track 1c) | R. Anderson (Carleton) — deep-sea metagenomics, population genomics |
 | Faculty (Track 2) | Jones (BMB/Chemistry, MSU) — PFAS mass spectrometry |
-| Handoffs | Twenty-two delivered (v1–v6, rewire, cross-spring, v7–v22) |
+| Handoffs | Twenty-five delivered (v1–v6, rewire, cross-spring, v7–v25) |
 
 ---
 
@@ -45,8 +47,8 @@ Every paper in the queue goes through the full evolution path. Status:
 **Pure GPU promotion complete** — all 13 formerly CPU-only modules now have GPU
 wrappers (Exp101). Papers 9, 10, 18, 26, 27 are no longer CPU-only. The only
 remaining CPU-only domain is `phred` (I/O-bound, no parallelism benefit).
-All ODE models have local WGSL shaders. Pending ToadStool absorption as
-generic ODE primitive.
+All ODE models now use `BatchedOdeRK4<S>::generate_shader()` — complete lean on
+ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 
 ### Three-Tier Control Matrix (Per Paper)
 
@@ -110,10 +112,10 @@ generic ODE primitive.
 
 | Document | Location | Description |
 |----------|----------|-------------|
-| CONTROL_EXPERIMENT_STATUS.md | `../` | 149 experiments, 3,028+ validation checks |
+| CONTROL_EXPERIMENT_STATUS.md | `../` | 161 experiments, 3,132+ validation checks |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
-| Handoff (v22) | `../wateringHole/handoffs/WETSPRING_V022_EXTENSION_PAPERS_FEB23_2026.md` | Current ToadStool handoff |
+| Handoff (v25) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V25_FINITE_SIZE_FEB24_2026.md` | Current ToadStool handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |
@@ -157,7 +159,7 @@ generic ODE primitive.
 `../whitePaper/STUDY.md` → `../CONTROL_EXPERIMENT_STATUS.md` → `../barracuda/EVOLUTION_READINESS.md` → BARRACUDA_REQUIREMENTS.md
 
 **Integration partner**:
-`../wateringHole/handoffs/WETSPRING_V022_EXTENSION_PAPERS_FEB23_2026.md` → `../BENCHMARK_RESULTS.md`
+`../../wateringHole/handoffs/WETSPRING_TOADSTOOL_V24_LEAN_FEB24_2026.md` → `../BENCHMARK_RESULTS.md`
 
 ---
 

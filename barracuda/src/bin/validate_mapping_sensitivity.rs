@@ -105,7 +105,7 @@ fn main() {
         fn nearest_r(sweep: &[(f64, f64)], w: f64) -> f64 {
             sweep
                 .iter()
-                .min_by(|(wa, _), (wb, _)| (wa - w).abs().partial_cmp(&(wb - w).abs()).unwrap())
+                .min_by(|(wa, _), (wb, _)| (wa - w).abs().total_cmp(&(wb - w).abs()))
                 .map(|(_, r)| *r)
                 .unwrap_or(0.0)
         }

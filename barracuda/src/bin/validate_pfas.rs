@@ -52,15 +52,15 @@ fn main() {
 }
 
 fn validate_ms2_parsing(ms2_path: &Path, v: &mut Validator) {
-    v.section("── MS2 parsing ──");
-    let spectra = match ms2::parse_ms2(ms2_path) {
+    v.section("── MS2 parsing (streaming) ──");
+
+    let stats = match ms2::stats_from_file(ms2_path) {
         Ok(s) => s,
         Err(e) => {
-            println!("  FAILED: {e}");
+            println!("  FAILED stats: {e}");
             std::process::exit(1);
         }
     };
-    let stats = ms2::compute_stats(&spectra);
     println!(
         "  Parsed {} spectra, {} total peaks",
         stats.num_spectra, stats.total_peaks
@@ -74,14 +74,28 @@ fn validate_ms2_parsing(ms2_path: &Path, v: &mut Validator) {
 
     v.check_count("Total spectra", stats.num_spectra, 738);
 
-    // ── PFAS fragment screening
+    // ── PFAS fragment screening (streaming — never buffers all spectra)
     v.section("── PFAS fragment difference screening ──");
     let tol_da = tolerances::MZ_FRAGMENT;
     let min_intensity_pct = 5.0;
 
     let mut pfas_hits = Vec::new();
-    for spec in &spectra {
-        if let Some(result) = tolerance_search::screen_pfas_fragments(
+    let iter = match ms2::Ms2Iter::open(ms2_path) {
+        Ok(it) => it,
+        Err(e) => {
+            println!("  FAILED iter: {e}");
+            std::process::exit(1);
+        }
+    };
+    for result in iter {
+        let spec = match result {
+            Ok(s) => s,
+            Err(e) => {
+                println!("  FAILED reading spectrum: {e}");
+                continue;
+            }
+        };
+        if let Some(hit) = tolerance_search::screen_pfas_fragments(
             &spec.mz_array,
             &spec.intensity_array,
             spec.precursor_mz,
@@ -89,7 +103,7 @@ fn validate_ms2_parsing(ms2_path: &Path, v: &mut Validator) {
             tol_da,
             min_intensity_pct,
         ) {
-            pfas_hits.push(result);
+            pfas_hits.push(hit);
         }
     }
 

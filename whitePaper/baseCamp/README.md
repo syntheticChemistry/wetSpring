@@ -1,8 +1,8 @@
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** February 23, 2026
+**Date:** February 24, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** 149 experiments, 3,028+ validation checks, ALL PASS (Phase 38: extension papers)
+**Status:** 161 experiments, 3,132+ validation checks, ALL PASS; 849 tests, 95.67% coverage
 
 ---
 
@@ -34,8 +34,8 @@ All code is AGPL-3.0.
 | [Jones](jones.md) | MSU BMB | 2 | 2 | 041,042,111,117,**124** | 55 | PFAS mass spectrometry, EPA ML, NPU spectral triage |
 | [Cahill](cahill.md) | Sandia | 1 | 1 | 039,112,118,**123** | 54 | Algal pond, NPU bloom sentinel, temporal ESN |
 | [Smallwood](smallwood.md) | Sandia | 1 | 1 | 040,112,118,**123** | 58 | Bloom surveillance, NPU sentinel, temporal ESN |
-| [Kachkovskiy](kachkovskiy.md) | MSU CMSE | cross | 1 | 107,113,119,**122,126,127-138,144-149** | 312 | Spectral theory, 2D/3D Anderson, geometry zoo, ecosystem atlas, finite-size scaling, mapping sensitivity, planktonic dilution, eukaryote scaling, extension papers |
-| **Total** | | | **24** | | **932+** | |
+| [Kachkovskiy](kachkovskiy.md) | MSU CMSE | cross | 1 | 107,113,119,**122,126,127-138,144-156** | 334 | Spectral theory, 2D/3D Anderson, geometry zoo, ecosystem atlas, finite-size scaling v1+v2, correlated disorder, mapping sensitivity, planktonic dilution, eukaryote scaling, extension papers, paper queue |
+| **Total** | | | **24** | | **954+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -85,15 +85,16 @@ Every paper goes through the full evolution. Status across all 25 actionable pap
 
 | Stage | What It Proves | Coverage |
 |-------|---------------|----------|
-| Python baseline | Algorithm correctness against published tools | 40 scripts |
+| Python baseline | Algorithm correctness against published tools | 41 scripts |
 | BarraCuda CPU | Rust matches Python within machine precision | 1,476 checks, 22.5x faster |
 | BarraCuda GPU | GPU matches CPU within 1e-6 | 702 checks, 29 domains |
 | Pure GPU streaming | Zero CPU round-trips, data stays on-device | 152 checks, 10+ domains |
 | metalForge | Same answer on CPU, GPU, NPU | 25/25 papers, 37 domains |
-| NPU reservoir | ESN → int8 → NPU preserves classification | 59 checks, 6 domains |
+| NPU reservoir | ESN → int8 → NPU preserves classification (Cholesky solve) | 59 checks, 6 domains |
 | Cross-spring evolution | 612 WGSL shaders traced to origin springs, rewired imports | 9 checks |
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
+| Code quality audit | 95.67% coverage, streaming I/O, 0 production mocks | 845 tests |
 
 ## Performance Summary
 
@@ -107,6 +108,16 @@ Every paper goes through the full evolution. Status across all 25 actionable pap
 | Galaxy vs Rust GPU (10 samples) | 95.6 s vs 3.0 s (**31.9x**) | Exp015/016 |
 | Energy cost (10K samples) | Galaxy $0.40, Rust GPU **$0.02** | Exp016 |
 | Hardware | Consumer GPU (RTX 4070), no HPC | All |
+
+## Sub-theses (Gen3 Ch. 14)
+
+| # | Sub-thesis | File | Key Experiments |
+|:-:|-----------|------|-----------------|
+| 01 | Anderson-QS null hypothesis | [sub_thesis_01](sub_thesis_01_anderson_qs.md) | 107, 126–138, 144–156 |
+| 02 | LTEE constrained evolution | [sub_thesis_02](sub_thesis_02_ltee.md) | 143, 146 |
+| 03 | BioAg rhizosphere QS | [sub_thesis_03](sub_thesis_03_bioag.md) | 129, 142, 146, 151, 153 |
+| 04 | Sentinels + NPU deployment | [sub_thesis_04](sub_thesis_04_sentinels.md) | 114, 118, 123, 124, 147 |
+| 05 | Cross-species eavesdropping | [sub_thesis_05](sub_thesis_05_cross_species.md) | 142, 144–146, 151, 153–154 |
 
 ## Open Data
 

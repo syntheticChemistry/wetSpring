@@ -224,7 +224,7 @@ fn main() {
             println!("  Critical Pielou evenness J_c ≈ {j:.2}");
             v.check_pass(
                 "J_c in ecologically meaningful range (0.2 - 0.7)",
-                j >= 0.2 && j <= 0.7,
+                (0.2..=0.7).contains(&j),
             );
         } else {
             println!(

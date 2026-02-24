@@ -119,6 +119,6 @@ mod tests {
         let result = jg.pairwise_jaccard(&pa, 3, 4).expect("jaccard dispatch");
         assert_eq!(result.distances.len(), 3);
         // g0 vs g1: intersection={0,3}=2, union={0,1,2,3}=4, J=2/4=0.5, dist=0.5
-        assert!((result.distances[0] - 0.5).abs() < tolerances::GPU_F32_PARITY);
+        assert!((result.distances[0] - 0.5).abs() < tolerances::GPU_F32_PARITY as f32);
     }
 }
