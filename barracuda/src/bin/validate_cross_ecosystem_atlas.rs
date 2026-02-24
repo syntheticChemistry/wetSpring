@@ -29,28 +29,29 @@ use barracuda::spectral::{
 };
 
 fn evenness_to_disorder(pielou_j: f64) -> f64 {
-    0.5 + pielou_j * 14.5
+    pielou_j.mul_add(14.5, 0.5)
 }
 
+#[allow(clippy::cast_precision_loss)] // u64/usize→f64 for RNG and species count; intentional in scientific code
 fn generate_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     let mut counts = Vec::with_capacity(n_species);
     let mut rng = seed;
     for i in 0..n_species {
         rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-        let noise = ((rng >> 33) as f64) / (u32::MAX as f64);
+        let noise = ((rng >> 33) as f64) / f64::from(u32::MAX);
         let rank_weight = (-(i as f64) / (n_species as f64 * evenness)).exp();
         counts.push((rank_weight * 1000.0 * (0.5 + noise)).max(1.0));
     }
     counts
 }
 
-#[allow(clippy::cast_precision_loss)]
+#[allow(clippy::cast_precision_loss, clippy::too_many_lines, clippy::items_after_statements)]
 fn main() {
     let mut v = Validator::new("Exp134: Cross-Ecosystem QS Geometry Atlas");
 
     #[cfg(feature = "gpu")]
     {
-        let midpoint = (GOE_R + POISSON_R) / 2.0;
+        let midpoint = f64::midpoint(GOE_R, POISSON_R);
         let n_sweep = 15_usize;
 
         v.section("── S1: Pre-compute geometry sweeps ──");
@@ -129,8 +130,7 @@ fn main() {
             sweep
                 .iter()
                 .min_by(|(wa, _), (wb, _)| (wa - w).abs().partial_cmp(&(wb - w).abs()).unwrap())
-                .map(|(_, r)| *r)
-                .unwrap_or(0.0)
+                .map_or(0.0, |(_, r)| *r)
         }
 
         v.section("── S2: 28-biome × 5-geometry atlas ──");
@@ -220,7 +220,7 @@ fn main() {
                 .filter(|(_, a)| **a)
                 .map(|(s, _)| *s)
                 .collect();
-            println!("    {:30} active in {}/5: {:?}", name, n, shapes);
+            println!("    {name:30} active in {n}/5: {shapes:?}");
         }
         v.check_pass("differentiator biomes identified", true);
 

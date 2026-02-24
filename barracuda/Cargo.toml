@@ -855,3 +855,8 @@ path = "src/bin/validate_qs_wave_localization.rs"
 [[bin]]
 name = "validate_burst_statistics_anderson"
 path = "src/bin/validate_burst_statistics_anderson.rs"
+
+# ── Cross-Spring S57 Evolution (Exp162) ───────────────────
+[[bin]]
+name = "validate_cross_spring_s57"
+path = "src/bin/validate_cross_spring_s57.rs"

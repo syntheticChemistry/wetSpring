@@ -2,7 +2,7 @@
 
 **Date:** February 24, 2026
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 45 CPU + 42 GPU modules, 5 local WGSL shaders (Write phase), 30 ToadStool primitives consumed, 845 tests, 149 experiments, 3,028+ checks, 95.67% coverage
+**Status:** 47 CPU + 42 GPU modules, 0 local WGSL (Lean complete — ODE shaders use `generate_shader()`), 37 ToadStool primitives consumed (31 Lean + 6 S54-S57 CPU), 881 tests, 162 experiments, 3,198+ checks, 95.67% coverage, ToadStool S57 aligned
 
 ### Pure GPU Promotion Complete: 0 Tier B/C remaining
 
@@ -33,7 +33,7 @@ See `ABSORPTION_MANIFEST.md` for the full ledger.
 All modules pass `clippy::pedantic` + `clippy::nursery` (0 warnings, `-D` enforced
 in CI), `cargo fmt` (0 diffs), `cargo doc` (0 warnings, `RUSTDOCFLAGS="-D warnings"`).
 97% line coverage for bio+io modules (56% overall including bench) via `cargo-llvm-cov`.
-All tolerances centralized in `tolerances.rs` (53 named constants — includes
+All tolerances centralized in `tolerances.rs` (59 named constants — includes
 4 Jacobi eigendecomposition constants with Golub & Van Loan provenance).
 `#![deny(unsafe_code)]` and `#![deny(clippy::expect_used, clippy::unwrap_used)]`
 enforced crate-wide (`deny` instead of `forbid` to allow `unsafe` in test env var

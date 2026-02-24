@@ -115,7 +115,7 @@ pub fn regularized_gamma_lower(a: f64, x: f64) -> f64 {
     if x <= 0.0 {
         return 0.0;
     }
-    if x > a + 200.0 {
+    if x > a + crate::tolerances::GAMMA_RIGHT_TAIL_OFFSET {
         return 1.0;
     }
 
@@ -211,5 +211,95 @@ mod tests {
     fn regularized_gamma_right_tail() {
         let val = regularized_gamma_lower(1.0, 300.0);
         assert!((val - 1.0).abs() < 1e-10);
+    }
+
+    #[test]
+    fn regularized_gamma_negative_x() {
+        assert!(regularized_gamma_lower(1.0, -1.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn regularized_gamma_exact_p1_1() {
+        let val = regularized_gamma_lower(1.0, 1.0);
+        let expected = 1.0 - (-1.0_f64).exp(); // P(1,1) = 1 - e^{-1}
+        assert!(
+            (val - expected).abs() < 1e-10,
+            "P(1,1) = {val}, expected {expected}"
+        );
+    }
+
+    #[test]
+    fn regularized_gamma_small_a() {
+        let val = regularized_gamma_lower(0.5, 1.0);
+        assert!(val > 0.68 && val < 0.85, "P(0.5, 1.0) ≈ 0.843, got {val}");
+    }
+
+    #[test]
+    fn erf_large_argument() {
+        assert!((erf(6.0) - 1.0).abs() < 1e-10, "erf(6) ≈ 1");
+        assert!((erf(-6.0) + 1.0).abs() < 1e-10, "erf(-6) ≈ -1");
+    }
+
+    #[test]
+    fn erf_symmetry() {
+        for &x in &[0.5, 1.0, 2.0, 3.5] {
+            assert!((erf(x) + erf(-x)).abs() < 1e-12, "erf is odd");
+        }
+    }
+
+    #[test]
+    fn normal_cdf_symmetry() {
+        assert!((normal_cdf(1.0) + normal_cdf(-1.0) - 1.0).abs() < 1e-7);
+    }
+
+    #[test]
+    fn l2_norm_empty() {
+        assert!(l2_norm(&[]).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn l2_norm_single() {
+        assert!((l2_norm(&[3.0]) - 3.0).abs() < f64::EPSILON);
+        assert!((l2_norm(&[-5.0]) - 5.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn l2_norm_3_4_5() {
+        assert!((l2_norm(&[3.0, 4.0]) - 5.0).abs() < 1e-12);
+    }
+
+    #[test]
+    fn l2_norm_unit_vectors() {
+        assert!((l2_norm(&[1.0, 0.0, 0.0]) - 1.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn dot_empty() {
+        assert!(dot(&[], &[]).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn dot_orthogonal() {
+        assert!(dot(&[1.0, 0.0], &[0.0, 1.0]).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn dot_parallel() {
+        assert!((dot(&[2.0, 3.0], &[2.0, 3.0]) - 13.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn dot_known_value() {
+        assert!((dot(&[1.0, 2.0, 3.0], &[4.0, 5.0, 6.0]) - 32.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn ln_gamma_large_argument() {
+        let val = ln_gamma(10.0);
+        let expected = (362_880.0_f64).ln(); // Γ(10) = 9! = 362880
+        assert!(
+            (val - expected).abs() < 1e-8,
+            "ln(Γ(10)) = {val}, expected {expected}"
+        );
     }
 }

@@ -5,6 +5,17 @@
 wetSpring Experiment 001 — Full Pipeline Validation
 Runs the complete 16S amplicon pipeline end-to-end and validates outputs.
 
+Environment:
+    Container: Galaxy Docker with QIIME2 conda environment
+    Conda env: qiime2-2026 (QIIME2 2025.3+ with DADA2 plugin)
+    Python:    /tool_deps/_conda/envs/qiime2-2026/bin/python3
+    Data:      Mothur MiSeq SOP (PRJNA488170 proxy) — auto-downloaded
+
+    Reproduction:
+        docker run -v $(pwd):/scripts quay.io/galaxy/galaxy:latest bash
+        conda activate qiime2-2026
+        python3 /scripts/validate_exp001.py
+
 Usage (inside Galaxy container with qiime2-2026 conda env):
     /tool_deps/_conda/envs/qiime2-2026/bin/python3 /scripts/validate_exp001.py
 

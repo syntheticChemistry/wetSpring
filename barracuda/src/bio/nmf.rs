@@ -105,14 +105,14 @@ pub fn nmf(v: &[f64], m: usize, n: usize, config: &NmfConfig) -> NmfResult {
     let mut w = vec![0.0; m * k];
     let mut h = vec![0.0; k * n];
     for val in &mut w {
-        *val = rng.next_f64() * 0.1 + 1e-10;
+        *val = rng.next_f64() * 0.1 + crate::tolerances::NMF_INIT_FLOOR;
     }
     for val in &mut h {
-        *val = rng.next_f64() * 0.1 + 1e-10;
+        *val = rng.next_f64() * 0.1 + crate::tolerances::NMF_INIT_FLOOR;
     }
 
     let mut errors = Vec::with_capacity(config.max_iter);
-    let eps = 1e-15;
+    let eps = crate::tolerances::MATRIX_EPS;
 
     match config.objective {
         NmfObjective::Euclidean => {
@@ -331,7 +331,7 @@ pub fn cosine_similarity(a: &[f64], b: &[f64]) -> f64 {
     let dot: f64 = a.iter().zip(b.iter()).map(|(x, y)| x * y).sum();
     let na: f64 = a.iter().map(|x| x * x).sum::<f64>().sqrt();
     let nb: f64 = b.iter().map(|x| x * x).sum::<f64>().sqrt();
-    if na < 1e-15 || nb < 1e-15 {
+    if na < crate::tolerances::MATRIX_EPS || nb < crate::tolerances::MATRIX_EPS {
         return 0.0;
     }
     dot / (na * nb)
@@ -364,7 +364,7 @@ pub fn top_k_predictions(result: &NmfResult, top_k: usize) -> Vec<(usize, usize,
 
 /// Score drug-disease pairs using cosine similarity on latent factors.
 ///
-/// For each (drug i, disease j), compute cosine(W[i,:], H[:,j]).
+/// For each (drug i, disease j), compute `cosine(W[i,:], H[:,j])`.
 /// Returns top-K by descending cosine similarity.
 pub fn top_k_cosine(result: &NmfResult, top_k: usize) -> Vec<(usize, usize, f64)> {
     let m = result.m;
@@ -392,7 +392,7 @@ pub fn relative_reconstruction_error(v: &[f64], result: &NmfResult) -> f64 {
     matmul(&result.w, &result.h, &mut wh, result.m, result.k, result.n);
     let err = frobenius_error(v, &wh);
     let v_norm: f64 = v.iter().map(|x| x * x).sum::<f64>().sqrt();
-    if v_norm < 1e-15 {
+    if v_norm < crate::tolerances::MATRIX_EPS {
         return 0.0;
     }
     err / v_norm

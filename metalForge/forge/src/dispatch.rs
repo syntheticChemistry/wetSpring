@@ -246,4 +246,18 @@ mod tests {
         let d = route(&work, &subs).expect("should route");
         assert_eq!(d.substrate.kind, SubstrateKind::Gpu);
     }
+
+    #[test]
+    fn workload_new_sets_name_and_caps() {
+        let w = Workload::new("test_workload", vec![Capability::F64Compute]);
+        assert_eq!(w.name, "test_workload");
+        assert_eq!(w.required.len(), 1);
+        assert!(w.preferred_substrate.is_none());
+    }
+
+    #[test]
+    fn workload_prefer_chain() {
+        let w = Workload::new("inference", vec![Capability::F32Compute]).prefer(SubstrateKind::Npu);
+        assert_eq!(w.preferred_substrate, Some(SubstrateKind::Npu));
+    }
 }

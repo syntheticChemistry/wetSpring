@@ -1,5 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::expect_used, clippy::unwrap_used, clippy::print_stdout)]
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::print_stdout,
+    clippy::many_single_char_names,
+    clippy::items_after_statements
+)]
 //! # Exp113: QS-Disorder Prediction from Real Metagenomics Diversity
 //!
 //! Maps real-world community diversity surveys to the Anderson localization
@@ -25,13 +31,14 @@ use barracuda::spectral::{
     anderson_hamiltonian, find_all_eigenvalues, level_spacing_ratio, lyapunov_exponent,
 };
 
+#[allow(clippy::cast_precision_loss)]
 fn generate_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     let mut counts = Vec::with_capacity(n_species);
     let mut rng = seed;
 
     for i in 0..n_species {
         rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-        let noise = ((rng >> 33) as f64) / (u32::MAX as f64);
+        let noise = ((rng >> 33) as f64) / f64::from(u32::MAX);
 
         // High evenness → flat distribution; low evenness → steep rank-abundance
         let rank_weight = (-(i as f64) / (n_species as f64 * evenness)).exp();
@@ -45,9 +52,10 @@ fn evenness_to_disorder(pielou_j: f64) -> f64 {
     // Low evenness (dominated community) → low W (ordered, extended signals)
     // High evenness (diverse community) → high W (disordered, localized signals)
     // W ∈ [0.5, 15.0]: covers sub-diffusive to strongly localized regime
-    0.5 + pielou_j * 14.5
+    pielou_j.mul_add(14.5, 0.5)
 }
 
+#[allow(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp113: QS-Disorder Prediction from Real Diversity");
 
@@ -184,7 +192,9 @@ fn main() {
             .collect();
 
         if !low_w.is_empty() && !high_w.is_empty() {
+            #[allow(clippy::cast_precision_loss)]
             let avg_r_low = low_w.iter().map(|(_, _, r, _)| r).sum::<f64>() / low_w.len() as f64;
+            #[allow(clippy::cast_precision_loss)]
             let avg_r_high = high_w.iter().map(|(_, _, r, _)| r).sum::<f64>() / high_w.len() as f64;
 
             println!("  Low-W ⟨r⟩ avg: {avg_r_low:.4}");
@@ -201,13 +211,11 @@ fn main() {
         let gamma_bloom = predictions
             .iter()
             .find(|(n, _, _, _)| n == "Algal bloom")
-            .map(|(_, _, _, g)| *g)
-            .unwrap_or(0.0);
+            .map_or(0.0, |(_, _, _, g)| *g);
         let gamma_soil = predictions
             .iter()
             .find(|(n, _, _, _)| n == "EMP soil")
-            .map(|(_, _, _, g)| *g)
-            .unwrap_or(0.0);
+            .map_or(0.0, |(_, _, _, g)| *g);
 
         v.check_count(
             "γ(soil) > γ(bloom) — high diversity more localized",
@@ -221,13 +229,11 @@ fn main() {
         let gamma_biofilm = predictions
             .iter()
             .find(|(n, _, _, _)| n == "Biofilm")
-            .map(|(_, _, _, g)| *g)
-            .unwrap_or(0.0);
+            .map_or(0.0, |(_, _, _, g)| *g);
         let gamma_soil_2 = predictions
             .iter()
             .find(|(n, _, _, _)| n == "EMP soil")
-            .map(|(_, _, _, g)| *g)
-            .unwrap_or(0.0);
+            .map_or(0.0, |(_, _, _, g)| *g);
 
         v.check_count(
             "γ(biofilm) < γ(soil) — biofilm less localized",

@@ -36,8 +36,6 @@ struct VocCompound {
     id: u32,
     base_peak_mz: f64,
     tentative_class: String,
-    #[allow(dead_code)]
-    nist_id: String,
     nist_match_pct: u32,
     experimental_ri: f64,
     theoretical_ri: f64,
@@ -66,7 +64,6 @@ fn parse_baseline(path: &Path) -> Vec<VocCompound> {
             id: fields[0].trim().parse().unwrap_or(0),
             base_peak_mz: fields[1].trim().parse().unwrap_or(0.0),
             tentative_class: fields[2].trim().to_string(),
-            nist_id: fields[3].trim().to_string(),
             nist_match_pct: fields[4].trim().parse().unwrap_or(0),
             experimental_ri: fields[5].trim().parse().unwrap_or(0.0),
             theoretical_ri: fields[6].trim().parse().unwrap_or(0.0),

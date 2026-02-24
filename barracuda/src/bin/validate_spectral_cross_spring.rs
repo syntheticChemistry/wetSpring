@@ -86,8 +86,7 @@ fn validate_anderson_1d(v: &mut Validator) {
     v.check_pass("eigenvalue count = N", eigenvalues.len() == n);
 
     // Lyapunov exponent at band centre: γ(0) > 0 (all states localized in 1D)
-    let potential: Vec<f64> = diag.clone();
-    let gamma_0 = lyapunov_exponent(&potential, 0.0);
+    let gamma_0 = lyapunov_exponent(&diag, 0.0);
     v.check_pass("Lyapunov γ(0) > 0 (localized)", gamma_0 > 0.0);
 
     // Kappus–Wegner: γ(0) ≈ W²/96 for moderate W
@@ -101,7 +100,7 @@ fn validate_anderson_1d(v: &mut Validator) {
     );
 
     // Lyapunov at band edge: γ(1.8) > 0
-    let gamma_edge = lyapunov_exponent(&potential, 1.8);
+    let gamma_edge = lyapunov_exponent(&diag, 1.8);
     v.check_pass("Lyapunov γ(1.8) > 0 (band edge)", gamma_edge > 0.0);
 
     // Level statistics: strong disorder → Poisson
@@ -120,8 +119,7 @@ fn validate_almost_mathieu(v: &mut Validator) {
     // Herman formula: λ > 1 → γ = ln(λ)
     for &lambda in &[1.5, 2.0, 3.0] {
         let (diag, _off) = almost_mathieu_hamiltonian(n, lambda, golden, 0.0);
-        let potential: Vec<f64> = diag.clone();
-        let gamma = lyapunov_exponent(&potential, 0.0);
+        let gamma = lyapunov_exponent(&diag, 0.0);
         let expected = lambda.ln();
         let err = (gamma - expected).abs();
         v.check(
@@ -151,7 +149,7 @@ fn validate_almost_mathieu(v: &mut Validator) {
 
     // Spectrum bounds: σ(H) ⊂ [-2 - 2λ, 2 + 2λ]
     let lambda = 2.0;
-    let bound = 2.0 + 2.0 * lambda;
+    let bound = 2.0f64.mul_add(lambda, 2.0);
     let eig_loc = find_all_eigenvalues(&diag_loc, &off_loc);
     v.check_pass(
         &format!("Almost-Mathieu spectrum bound: E_max <= {bound}"),
@@ -179,7 +177,7 @@ fn validate_lanczos_vs_sturm(v: &mut Validator) {
     let sturm_min = sturm_eigs.first().copied().unwrap_or(0.0);
     let sturm_max = sturm_eigs.last().copied().unwrap_or(0.0);
 
-    let mut sorted_lanczos = lanczos_eigs.clone();
+    let mut sorted_lanczos = lanczos_eigs;
     sorted_lanczos.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
     let lanczos_min = sorted_lanczos.first().copied().unwrap_or(0.0);
     let lanczos_max = sorted_lanczos.last().copied().unwrap_or(0.0);
@@ -237,7 +235,7 @@ fn validate_anderson_2d(v: &mut Validator) {
 
     // Gershgorin for 2D: σ(H) ⊂ [-4 - W/2, 4 + W/2]
     let bound = 4.0 + 20.0 / 2.0;
-    let mut sorted = eigs_strong.clone();
+    let mut sorted = eigs_strong;
     sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
     v.check_pass(
         &format!("2D spectrum bound: E_max <= {bound}"),
@@ -277,7 +275,7 @@ fn validate_anderson_3d_transition(v: &mut Validator) {
 
     // Gershgorin for 3D: σ(H) ⊂ [-6 - W/2, 6 + W/2]
     let bound = 6.0 + 25.0 / 2.0;
-    let mut sorted = eigs_strong.clone();
+    let mut sorted = eigs_strong;
     sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
     v.check_pass(
         &format!("3D spectrum bound: E_max <= {bound}"),

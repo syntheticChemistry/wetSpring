@@ -14,7 +14,7 @@
 //! the effective disorder is amplified because signal must traverse
 //! empty space (high W at vacant sites). We test:
 //!
-//! 1. Dense biofilm (W = base) → dilute suspension (W = base × dilution_factor)
+//! 1. Dense biofilm (W = base) → dilute suspension (W = base × `dilution_factor`)
 //! 2. Varying occupancy fractions (100%, 50%, 20%, 10%, 5%, 1%)
 //! 3. Whether sea plankton densities (~10⁶ cells/mL) are 3D-active
 //!
@@ -36,13 +36,13 @@ use barracuda::spectral::{
     GOE_R, POISSON_R, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 
-#[allow(clippy::cast_precision_loss)]
+#[allow(clippy::cast_precision_loss, clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp137: Planktonic & Mixed Fluid 3D — Dilution Effects");
 
     #[cfg(feature = "gpu")]
     {
-        let midpoint = (GOE_R + POISSON_R) / 2.0;
+        let midpoint = f64::midpoint(GOE_R, POISSON_R);
         let l = 8;
         let n = l * l * l;
 
@@ -192,8 +192,7 @@ fn main() {
             let tag_2d = if r_2d > midpoint { "ACTIVE" } else { "---" };
             let tag_3d = if r_3d > midpoint { "ACTIVE" } else { "---" };
             println!(
-                "  {:25} {:>6.2} {:>6.2}  {:>6.4}({}) {:>6.4}({})",
-                name, j, w, r_2d, tag_2d, r_3d, tag_3d
+                "  {name:25} {j:>6.2} {w:>6.2}  {r_2d:>6.4}({tag_2d}) {r_3d:>6.4}({tag_3d})"
             );
         }
         v.check_pass("turnover analysis computed", true);

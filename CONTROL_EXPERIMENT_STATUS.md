@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 24, 2026
-**Status:** 161 experiments, 3,132+ validation checks, all PASS (732 lib + 31 integration Rust tests)
+**Status:** 162 experiments, 3,198+ validation checks, all PASS (834 barracuda + 47 forge = 881 Rust tests)
 
 ---
 
@@ -170,6 +170,7 @@
 | 159 | NMF drug-disease factorization (Yang 2020) | `validate_nmf_drug_repurposing` | PASS | 7 |
 | 160 | repoDB NMF reproduction (Gao 2020) | `validate_repodb_nmf` | PASS | 9 |
 | 161 | Knowledge graph embedding (ROBOKOP) | `validate_knowledge_graph_embedding` | PASS | 7 |
+| 162 | Cross-spring S57 evolution | `validate_cross_spring_s57` | PASS | 66 |
 
 ---
 
@@ -177,7 +178,7 @@
 
 | Category | Count |
 |----------|-------|
-| Experiments completed | 140 |
+| Experiments completed | 162 |
 | CPU validation checks | 1,476 |
 | GPU validation checks | 702 |
 | Dispatch validation checks | 80 |
@@ -198,14 +199,17 @@
 | Why analysis: mapping, scaling, dilution, eukaryote checks | 35 |
 | Empirical validation: QS distance, gene prevalence, NCBI habitat query | 19 |
 | Anderson as null hypothesis: producer/receiver, anomalies | 13 |
-| **Total validation checks** | **2,992+** |
-| Rust tests | 750 (676 lib + 60 integration + 14 doc) |
+| Extension papers: cold seep, phylogeny, waves (Exp144-149) | 36 |
+| Phase 39: finite-size, correlated, comm, nitrifying, marine, myxo, dicty (Exp150-156) | 66 |
+| Drug repurposing: Fajgenbaum, MATRIX, NMF, repoDB, ROBOKOP (Exp157-161) | 40 |
+| **Total validation checks** | **3,198+** |
+| Rust tests | 881 (755 lib + 60 integration + 19 doc + 47 forge) |
 | BarraCuda CPU parity | 380/380 (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/092/101) |
 | metalForge cross-system | 37 domains CPU↔GPU proven (Exp103+104), **25/25 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
-| ToadStool primitives consumed | 31 (15 original + 8 bio + 5 neuralSpring + 3 S39 bio) |
-| ToadStool session alignment | S42 (612 WGSL, 25 bio ops re-exported, 16 imports modernized) |
+| ToadStool primitives consumed | 37 (31 Lean + 6 S54-S57) |
+| ToadStool session alignment | S57 (650+ WGSL, 25 bio ops re-exported, 46 cross-spring items absorbed, 4,224 core tests) |
 | Cross-spring shader provenance | 35 hotSpring, 22 wetSpring, 14 neuralSpring, 5 airSpring, 100+ native |
 
 ---
@@ -318,36 +322,38 @@ matching. Exp008 adds sovereign ML for environmental monitoring.
 
 ---
 
-## Code Quality (Feb 23, 2026)
+## Code Quality (Feb 24, 2026)
 
 ```
 cargo fmt --check              → clean (0 diffs, both crates)
 cargo clippy --pedantic        → 0 warnings (pedantic + nursery, default features)
 cargo clippy --features gpu    → 0 warnings (pedantic + nursery, GPU features)
 cargo doc --features gpu       → clean (0 warnings, strict: -D missing_docs -D broken_intra_doc_links)
-cargo test --lib               → 676 passed, 0 failed, 1 ignored (hardware-dependent)
+cargo test --lib               → 755 passed, 0 failed, 1 ignored (hardware-dependent)
 cargo test --tests             → 60 integration (23 bio + 16 determinism + 21 I/O)
-cargo test --doc               → 19 passed, 0 failed (5 new API examples)
-cargo llvm-cov --lib           → 96.21% line coverage (13,281 / 13,804)
+cargo test --doc               → 19 passed, 0 failed (5 API examples)
+cargo llvm-cov --lib           → 95.67% line coverage
 #![deny(unsafe_code)]          → enforced crate-wide (edition 2024; env-var tests use Mutex-serialized helpers)
 #![deny(expect_used, unwrap_used)] → enforced crate-wide (test modules #[allow])
 partial_cmp().unwrap()         → 0 (all migrated to f64::total_cmp)
-inline tolerance literals      → 0 (50 named constants in tolerances.rs, including ODE/Galaxy/bootstrap)
+inline tolerance literals      → 0 (59 named constants in tolerances.rs)
 blanket similar_names          → removed; targeted #[allow] per-function where domain-appropriate
-GPU workgroup sizes            → named constants in all 9 *_gpu.rs (match WGSL shaders)
+GPU workgroup sizes            → named constants in all *_gpu.rs (match WGSL shaders)
 shared math (crate::special)   → delegates to barracuda::special when gpu active; sovereign otherwise
 hardware detection             → injectable (from_content / parse_*), no direct /proc in library
 SPDX headers                   → all .rs files
 max file size                  → all under 1000 LOC (fastq.rs: 913 largest)
 external C dependencies        → 0 (flate2 rust_backend; wgpu default-features = false)
 XML parser allocations         → Cow<str> for xml_unescape; 1 allocation per text event (was 2)
-provenance headers             → all 115 binaries (commit, command, hardware)
+provenance headers             → all 152 binaries (commit, command, hardware)
 duplicate math                 → 0 (crate::special delegates to ToadStool barracuda::special when gpu enabled)
 Python baselines               → scripts/requirements.txt (pinned numpy, scipy, sklearn)
 barracuda_cpu                  → 380/380 checks PASS (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted)
-barracuda_gpu                  → 451 GPU checks PASS
+barracuda_gpu                  → 702 GPU checks PASS (770 with --features gpu, 9 ignored)
 fuzz harnesses                 → 4 (FASTQ, mzML, MS2, XML)
 zero-copy I/O                  → FastqRefRecord, DecodeBuffer reuse, streaming iterators
+ToadStool alignment            → S57 (all V16-V22 items absorbed, 46 cross-spring total)
+deprecated APIs                → 0 (parse_fastq → FastqIter::open in all binaries)
 ```
 
 ## BarraCuda CPU Parity

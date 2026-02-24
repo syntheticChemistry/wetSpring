@@ -94,7 +94,7 @@ async fn main() {
 
 // ═══ MF-V6-01: QS ODE Sweep ════════════════════════════════════════
 
-fn params_to_flat(p: &QsBiofilmParams) -> [f64; N_PARAMS] {
+const fn params_to_flat(p: &QsBiofilmParams) -> [f64; N_PARAMS] {
     [
         p.mu_max,
         p.k_cap,

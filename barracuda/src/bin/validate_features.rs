@@ -89,8 +89,10 @@ fn main() {
             .file_name()
             .map_or_else(|| first_file.to_string_lossy(), |n| n.to_string_lossy())
     );
-    #[allow(deprecated)]
-    let spectra = mzml::parse_mzml(first_file).expect("parse mzML");
+    let spectra: Vec<_> = mzml::MzmlIter::open(first_file)
+        .expect("open mzML")
+        .collect::<std::result::Result<Vec<_>, _>>()
+        .expect("parse mzML");
     let ms1: Vec<_> = spectra
         .iter()
         .filter(|s| s.ms_level == 1)
@@ -231,10 +233,6 @@ fn main() {
 struct AsariFeature {
     mz: f64,
     rtime: f64,
-    #[allow(dead_code)]
-    peak_area: f64,
-    #[allow(dead_code)]
-    snr: f64,
 }
 
 fn load_asari_features(path: &Path) -> Vec<AsariFeature> {
@@ -260,22 +258,15 @@ fn load_asari_features(path: &Path) -> Vec<AsariFeature> {
             continue;
         }
         let cols: Vec<&str> = line.split('\t').collect();
-        if cols.len() < 10 {
+        if cols.len() < 3 {
             continue;
         }
 
         let mz: f64 = cols[1].parse().unwrap_or(0.0);
         let rtime: f64 = cols[2].parse().unwrap_or(0.0);
-        let peak_area: f64 = cols[6].parse().unwrap_or(0.0);
-        let snr: f64 = cols[9].parse().unwrap_or(0.0);
 
         if mz > 0.0 {
-            features.push(AsariFeature {
-                mz,
-                rtime,
-                peak_area,
-                snr,
-            });
+            features.push(AsariFeature { mz, rtime });
         }
     }
 

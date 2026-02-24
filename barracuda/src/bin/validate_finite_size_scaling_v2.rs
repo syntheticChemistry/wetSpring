@@ -13,7 +13,7 @@
 //!
 //! Extends Exp131 with:
 //! - Disorder averaging (8 realizations per point)
-//! - Focused W range around expected W_c
+//! - Focused W range around expected `W_c`
 //! - Lattice sizes L = 6, 8, 10, 12
 //! - Scaling collapse analysis for critical exponent ν
 //!
@@ -21,8 +21,8 @@
 //!
 //! At the Anderson metal-insulator transition (3D), the level spacing ratio
 //! ⟨r⟩ transitions from GOE (≈0.531, extended) to Poisson (≈0.386, localized).
-//! The crossing point of ⟨r⟩(W) curves for different L defines W_c.
-//! Near the transition: ⟨r⟩ = f((W − W_c) · L^(1/ν)), where ν ≈ 1.57.
+//! The crossing point of ⟨r⟩(W) curves for different L defines `W_c`.
+//! Near the transition: ⟨r⟩ = f((W − `W_c`) · L^(1/ν)), where ν ≈ 1.57.
 //!
 //! # Provenance
 //!
@@ -91,7 +91,7 @@ fn find_crossing(sweep_a: &[(f64, f64, f64)], sweep_b: &[(f64, f64, f64)]) -> Op
         let diff1 = ra1 - rb1;
         if diff0 * diff1 < 0.0 {
             let t = diff0 / (diff0 - diff1);
-            return Some(w0 + t * (w1 - w0));
+            return Some(t.mul_add(w1 - w0, w0));
         }
     }
     None
@@ -105,7 +105,7 @@ fn main() {
     {
         use std::time::Instant;
 
-        let midpoint = (GOE_R + POISSON_R) / 2.0;
+        let midpoint = f64::midpoint(GOE_R, POISSON_R);
         println!("  midpoint (GOE+Poisson)/2 = {midpoint:.4}");
         println!("  GOE_R = {GOE_R:.4}, POISSON_R = {POISSON_R:.4}");
         println!("  Lattice sizes: {LATTICE_SIZES:?}");
@@ -137,7 +137,7 @@ fn main() {
                     let (w1, r1, _) = sweep[i];
                     if r0 > midpoint && r1 <= midpoint {
                         let t = (midpoint - r0) / (r1 - r0);
-                        last = Some(w0 + t * (w1 - w0));
+                        last = Some(t.mul_add(w1 - w0, w0));
                     }
                 }
                 last
@@ -175,7 +175,7 @@ fn main() {
             println!(
                 "    L={:>2}: W_c = {}",
                 sr.l,
-                sr.w_c.map_or("—".to_string(), |w| format!("{w:.2}"))
+                sr.w_c.map_or_else(|| "—".to_string(), |w| format!("{w:.2}"))
             );
         }
 
@@ -291,7 +291,7 @@ fn main() {
                 sr.l * sr.l * sr.l,
                 r_min,
                 r_max,
-                sr.w_c.map_or("—".to_string(), |w| format!("{w:.2}"))
+                sr.w_c.map_or_else(|| "—".to_string(), |w| format!("{w:.2}"))
             );
         }
         println!("  └──────┴──────┴──────────────────┴──────────┘");

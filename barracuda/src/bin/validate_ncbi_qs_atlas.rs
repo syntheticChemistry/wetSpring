@@ -120,7 +120,7 @@ fn main() {
 
     #[cfg(feature = "gpu")]
     {
-        let midpoint = (GOE_R + POISSON_R) / 2.0;
+        let midpoint = f64::midpoint(GOE_R, POISSON_R);
 
         v.section("── S4: Anderson localization ──");
         for (name, _, w, _, r_opt, regime_opt) in &mut atlas {

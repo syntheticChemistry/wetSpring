@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(deprecated)]
+#![allow(clippy::redundant_closure_for_method_calls)]
 //! Integration tests for I/O parsers: round-trip, determinism, edge cases.
 //!
 //! Each test creates synthetic data in a temporary directory,
@@ -301,7 +301,10 @@ fn create_fastq_file(dir: &Path) -> std::path::PathBuf {
 fn fastq_synthetic_roundtrip() {
     let dir = TempDir::new().unwrap();
     let path = create_fastq_file(dir.path());
-    let records = fastq::parse_fastq(&path).unwrap();
+    let records: Vec<_> = fastq::FastqIter::open(&path)
+        .expect("open")
+        .collect::<Result<Vec<_>, _>>()
+        .expect("parse");
 
     assert_eq!(records.len(), 3);
     assert_eq!(records[0].sequence, b"ACGTACGT");
@@ -313,7 +316,10 @@ fn fastq_synthetic_roundtrip() {
 fn fastq_stats_synthetic() {
     let dir = TempDir::new().unwrap();
     let path = create_fastq_file(dir.path());
-    let records = fastq::parse_fastq(&path).unwrap();
+    let records: Vec<_> = fastq::FastqIter::open(&path)
+        .expect("open")
+        .collect::<Result<Vec<_>, _>>()
+        .expect("parse");
     let stats = fastq::compute_stats(&records);
 
     assert_eq!(stats.num_sequences, 3);
@@ -327,7 +333,10 @@ fn fastq_streaming_stats_match_collected() {
     let dir = TempDir::new().unwrap();
     let path = create_fastq_file(dir.path());
 
-    let records = fastq::parse_fastq(&path).unwrap();
+    let records: Vec<_> = fastq::FastqIter::open(&path)
+        .expect("open")
+        .collect::<Result<Vec<_>, _>>()
+        .expect("parse");
     let collected_stats = fastq::compute_stats(&records);
     let streaming_stats = fastq::stats_from_file(&path).unwrap();
 
@@ -344,8 +353,14 @@ fn fastq_streaming_stats_match_collected() {
 fn fastq_determinism() {
     let dir = TempDir::new().unwrap();
     let path = create_fastq_file(dir.path());
-    let run1 = fastq::parse_fastq(&path).unwrap();
-    let run2 = fastq::parse_fastq(&path).unwrap();
+    let run1: Vec<_> = fastq::FastqIter::open(&path)
+        .expect("open")
+        .collect::<Result<Vec<_>, _>>()
+        .expect("parse");
+    let run2: Vec<_> = fastq::FastqIter::open(&path)
+        .expect("open")
+        .collect::<Result<Vec<_>, _>>()
+        .expect("parse");
 
     assert_eq!(run1.len(), run2.len());
     for (a, b) in run1.iter().zip(run2.iter()) {
@@ -356,7 +371,7 @@ fn fastq_determinism() {
 
 #[test]
 fn fastq_nonexistent_file() {
-    assert!(fastq::parse_fastq(Path::new("/nonexistent/file.fastq")).is_err());
+    assert!(fastq::FastqIter::open(Path::new("/nonexistent/file.fastq")).is_err());
 }
 
 #[test]
@@ -365,7 +380,10 @@ fn fastq_empty_file() {
     let path = dir.path().join("empty.fastq");
     File::create(&path).unwrap();
 
-    let records = fastq::parse_fastq(&path).unwrap();
+    let records: Vec<_> = fastq::FastqIter::open(&path)
+        .expect("open")
+        .collect::<Result<Vec<_>, _>>()
+        .expect("parse");
     assert!(records.is_empty());
 
     let stats = fastq::stats_from_file(&path).unwrap();
@@ -387,7 +405,10 @@ fn fastq_trailing_newlines() {
     writeln!(f).unwrap();
     writeln!(f).unwrap();
 
-    let records = fastq::parse_fastq(&path).unwrap();
+    let records: Vec<_> = fastq::FastqIter::open(&path)
+        .expect("open")
+        .collect::<Result<Vec<_>, _>>()
+        .expect("parse");
     assert_eq!(records.len(), 1);
     assert_eq!(records[0].sequence, b"ACGT");
 }
@@ -402,7 +423,7 @@ fn fastq_malformed_header() {
     writeln!(f, "+").unwrap();
     writeln!(f, "IIII").unwrap();
 
-    let result = fastq::parse_fastq(&path);
+    let result = fastq::FastqIter::open(&path).and_then(|i| i.collect::<Result<Vec<_>, _>>());
     assert!(result.is_err());
     let err_msg = result.unwrap_err().to_string();
     assert!(
@@ -425,7 +446,10 @@ fn fastq_id_extraction() {
     writeln!(f, "+").unwrap();
     writeln!(f, "JJJJ").unwrap();
 
-    let records = fastq::parse_fastq(&path).unwrap();
+    let records: Vec<_> = fastq::FastqIter::open(&path)
+        .expect("open")
+        .collect::<Result<Vec<_>, _>>()
+        .expect("parse");
     assert_eq!(records[0].id, "read1");
     assert_eq!(records[1].id, "read2/1");
 }
@@ -449,7 +473,10 @@ fn fastq_gzip_roundtrip() {
     gz.finish().unwrap();
 
     // Parse with our sovereign parser
-    let records = fastq::parse_fastq(&path).unwrap();
+    let records: Vec<_> = fastq::FastqIter::open(&path)
+        .expect("open")
+        .collect::<Result<Vec<_>, _>>()
+        .expect("parse");
     assert_eq!(records.len(), 2);
     assert_eq!(records[0].id, "gz_seq1");
     assert_eq!(records[0].sequence, b"ACGTACGTACGT");

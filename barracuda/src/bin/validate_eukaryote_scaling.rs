@@ -11,10 +11,10 @@
 //! volume, a eukaryotic colony has ~1000× fewer cells → smaller effective L.
 //!
 //! Does the Anderson model predict different QS capabilities for:
-//! - Bacterial biofilm (10⁹ cells/cm³, L_eff ~ 1000)
-//! - Yeast colony (10⁶ cells/cm³, L_eff ~ 100)
-//! - Protist colony (10³ cells/cm³, L_eff ~ 10)
-//! - Multicellular tissue (10² cells/mm³, L_eff ~ 5)
+//! - Bacterial biofilm (10⁹ cells/cm³, `L_eff` ~ 1000)
+//! - Yeast colony (10⁶ cells/cm³, `L_eff` ~ 100)
+//! - Protist colony (10³ cells/cm³, `L_eff` ~ 10)
+//! - Multicellular tissue (10² cells/mm³, `L_eff` ~ 5)
 //!
 //! Also tests: does this hold across different diversity levels?
 //!
@@ -32,29 +32,22 @@ use barracuda::spectral::{
     GOE_R, POISSON_R, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 
-#[allow(clippy::cast_precision_loss)]
+#[allow(clippy::cast_precision_loss, clippy::too_many_lines, clippy::items_after_statements)]
 fn main() {
     let mut v = Validator::new("Exp138: Eukaryote vs Bacteria Colony Scaling");
 
     #[cfg(feature = "gpu")]
     {
-        let midpoint = (GOE_R + POISSON_R) / 2.0;
-
-        v.section("── S1: Cell size → effective lattice size ──");
-        // In a 1mm³ volume:
-        // Bacteria (1µm): L = 1000/1 = 1000 → we test L=10 as proxy
-        // Yeast (5µm): L = 1000/5 = 200 → test L=8
-        // Protist (20µm): L = 1000/20 = 50 → test L=7
-        // Large eukaryote (50µm): L = 1000/50 = 20 → test L=6
-        // Tissue cell (100µm): L = 1000/100 = 10 → test L=5
-        // Tiny colony (few cells): L = 3-4 → test L=3,4
-
         struct CellType {
             name: &'static str,
             diameter_um: f64,
             l_eff: usize,
             domain: &'static str,
         }
+
+        let midpoint = f64::midpoint(GOE_R, POISSON_R);
+        v.section("── S1: Cell size → effective lattice size ──");
+
         let cell_types = [
             CellType {
                 name: "bacteria",
@@ -99,6 +92,13 @@ fn main() {
                 domain: "any",
             },
         ];
+        // In a 1mm³ volume:
+        // Bacteria (1µm): L = 1000/1 = 1000 → we test L=10 as proxy
+        // Yeast (5µm): L = 1000/5 = 200 → test L=8
+        // Protist (20µm): L = 1000/20 = 50 → test L=7
+        // Large eukaryote (50µm): L = 1000/50 = 20 → test L=6
+        // Tissue cell (100µm): L = 1000/100 = 10 → test L=5
+        // Tiny colony (few cells): L = 3-4 → test L=3,4
 
         println!(
             "  {:20} {:>8} {:>5} {:>6} {:>20}",
@@ -162,7 +162,7 @@ fn main() {
                 let eigs = lanczos_eigenvalues(&tri);
                 let r = level_spacing_ratio(&eigs);
                 let tag = if r > midpoint { "*" } else { " " };
-                print!(" {:>6.4}{tag}", r);
+                print!(" {r:>6.4}{tag}");
             }
             println!();
         }

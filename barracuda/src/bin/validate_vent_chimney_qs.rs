@@ -3,6 +3,7 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
+    clippy::many_single_char_names,
     dead_code
 )]
 //! # Exp128: Vent Chimney Geometry QS Prediction
@@ -38,19 +39,19 @@ fn chimney_to_disorder(zone: &ChimneyZone) -> f64 {
     // Mineral heterogeneity drives baseline disorder (0-1 maps to W=1-20)
     // Temperature gradient adds disorder (higher T → more chemical variation)
     // Porosity reduces effective disorder (more connected → more extended)
-    let w_mineral = 1.0 + zone.mineral_heterogeneity * 19.0;
+    let w_mineral = zone.mineral_heterogeneity.mul_add(19.0, 1.0);
     let w_temp = zone.temperature_c / 400.0 * 3.0;
-    let porosity_factor = 1.0 - 0.5 * zone.porosity;
+    let porosity_factor = 0.5f64.mul_add(-zone.porosity, 1.0);
     (w_mineral + w_temp) * porosity_factor
 }
 
-#[allow(clippy::cast_precision_loss)]
+#[allow(clippy::cast_precision_loss, clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp128: Vent Chimney Geometry QS Prediction");
 
     #[cfg(feature = "gpu")]
     {
-        let midpoint = (GOE_R + POISSON_R) / 2.0;
+        let midpoint = f64::midpoint(GOE_R, POISSON_R);
 
         v.section("── S1: Chimney zone parameterization ──");
         let zones = [
@@ -123,18 +124,15 @@ fn main() {
         let young_active = zone_results
             .iter()
             .find(|(n, _, _, _)| *n == "young_sulfide")
-            .map(|(_, _, _, reg)| *reg == "QS-active")
-            .unwrap_or(false);
+            .is_some_and(|(_, _, _, reg)| *reg == "QS-active");
         let mature_result = zone_results
             .iter()
             .find(|(n, _, _, _)| *n == "mature_anhydrite")
-            .map(|(_, _, r, _)| *r)
-            .unwrap_or(0.0);
+            .map_or(0.0, |(_, _, r, _)| *r);
         let silica_result = zone_results
             .iter()
             .find(|(n, _, _, _)| *n == "silica_conduit")
-            .map(|(_, _, r, _)| *r)
-            .unwrap_or(0.0);
+            .map_or(0.0, |(_, _, r, _)| *r);
 
         println!("  Young sulfide (high porosity, low heterogeneity): QS-active={young_active}");
         v.check_pass(
@@ -142,13 +140,11 @@ fn main() {
             zone_results
                 .iter()
                 .find(|(n, _, _, _)| *n == "young_sulfide")
-                .map(|(_, _, r, _)| *r)
-                .unwrap_or(0.0)
+                .map_or(0.0, |(_, _, r, _)| *r)
                 >= zone_results
                     .iter()
                     .find(|(n, _, _, _)| *n == "mature_anhydrite")
-                    .map(|(_, _, r, _)| *r)
-                    .unwrap_or(1.0),
+                    .map_or(1.0, |(_, _, r, _)| *r),
         );
 
         v.check_pass(
@@ -177,8 +173,7 @@ fn main() {
             let r_3d = zone_results
                 .iter()
                 .find(|(n, _, _, _)| *n == zone.name)
-                .map(|(_, _, r, _)| *r)
-                .unwrap_or(0.0);
+                .map_or(0.0, |(_, _, r, _)| *r);
             let reg_2d = if r_2d > midpoint {
                 "ACTIVE"
             } else {
@@ -197,8 +192,7 @@ fn main() {
         let young_3d_r = zone_results
             .iter()
             .find(|(n, _, _, _)| *n == "young_sulfide")
-            .map(|(_, _, r, _)| *r)
-            .unwrap_or(0.0);
+            .map_or(0.0, |(_, _, r, _)| *r);
         let young_w = chimney_to_disorder(&zones[0]);
         let mat_2d_young = anderson_2d(l2d, l2d, young_w, 42);
         let tri_2d_young = lanczos(&mat_2d_young, n2d, 42);

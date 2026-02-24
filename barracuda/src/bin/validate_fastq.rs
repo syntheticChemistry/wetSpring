@@ -55,10 +55,8 @@ fn main() {
 fn validate_r1(data_dir: &Path, v: &mut Validator) {
     v.section("── F3D0_R1.fastq (forward reads) ──");
     let r1_path = data_dir.join("F3D0_R1.fastq");
-    #[allow(deprecated)]
-    match fastq::parse_fastq(&r1_path) {
-        Ok(records) => {
-            let stats = fastq::compute_stats(&records);
+    match fastq::stats_from_file(&r1_path) {
+        Ok(stats) => {
             println!(
                 "  Parsed {} sequences, {} total bases",
                 stats.num_sequences, stats.total_bases
@@ -91,7 +89,6 @@ fn validate_r1(data_dir: &Path, v: &mut Validator) {
         }
         Err(e) => {
             println!("  FAILED: {e}");
-            // Register 5 failed checks for the missing section
             for _ in 0..5 {
                 v.check("(skipped — parse error)", 0.0, 1.0, 0.0);
             }
@@ -102,10 +99,8 @@ fn validate_r1(data_dir: &Path, v: &mut Validator) {
 fn validate_r2(data_dir: &Path, v: &mut Validator) {
     v.section("── F3D0_R2.fastq (reverse reads) ──");
     let r2_path = data_dir.join("F3D0_R2.fastq");
-    #[allow(deprecated)]
-    match fastq::parse_fastq(&r2_path) {
-        Ok(records) => {
-            let stats = fastq::compute_stats(&records);
+    match fastq::stats_from_file(&r2_path) {
+        Ok(stats) => {
             println!(
                 "  Parsed {} sequences, {} total bases",
                 stats.num_sequences, stats.total_bases

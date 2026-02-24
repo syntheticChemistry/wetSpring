@@ -36,25 +36,26 @@ use barracuda::spectral::{
     lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 
+#[allow(clippy::cast_precision_loss)]
 fn generate_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     let mut counts = Vec::with_capacity(n_species);
     let mut rng = seed;
     for i in 0..n_species {
         rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-        let noise = ((rng >> 33) as f64) / (u32::MAX as f64);
+        let noise = ((rng >> 33) as f64) / f64::from(u32::MAX);
         let rank_weight = (-(i as f64) / (n_species as f64 * evenness)).exp();
         counts.push((rank_weight * 1000.0 * (0.5 + noise)).max(1.0));
     }
     counts
 }
 
-#[allow(clippy::cast_precision_loss)]
+#[allow(clippy::cast_precision_loss, clippy::too_many_lines, clippy::items_after_statements)]
 fn main() {
     let mut v = Validator::new("Exp135: Mapping Sensitivity — Why 100%/0%?");
 
     #[cfg(feature = "gpu")]
     {
-        let midpoint = (GOE_R + POISSON_R) / 2.0;
+        let midpoint = f64::midpoint(GOE_R, POISSON_R);
         let n_sweep = 12_usize;
 
         v.section("── S1: Pre-compute sweeps per geometry ──");
@@ -106,8 +107,7 @@ fn main() {
             sweep
                 .iter()
                 .min_by(|(wa, _), (wb, _)| (wa - w).abs().total_cmp(&(wb - w).abs()))
-                .map(|(_, r)| *r)
-                .unwrap_or(0.0)
+                .map_or(0.0, |(_, r)| *r)
         }
 
         v.section("── S2: Vary mapping slope α ──");
@@ -168,11 +168,11 @@ fn main() {
 
         println!(
             "  Block drops below 28/28 at α ≈ {}",
-            alpha_block_drops.map_or("never (robust)".to_string(), |a| format!("{a:.1}"))
+            alpha_block_drops.map_or_else(|| "never (robust)".to_string(), |a| format!("{a:.1}"))
         );
         println!(
             "  Slab rises above 0/28 at α ≈ {}",
-            alpha_slab_rises.map_or("never".to_string(), |a| format!("{a:.1} (low mapping)"))
+            alpha_slab_rises.map_or_else(|| "never".to_string(), |a| format!("{a:.1} (low mapping)"))
         );
         v.check_pass("sensitivity analysis complete", true);
 

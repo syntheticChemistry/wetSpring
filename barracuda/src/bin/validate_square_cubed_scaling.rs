@@ -3,7 +3,8 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
-    dead_code
+    dead_code,
+    clippy::too_many_lines
 )]
 //! # Exp136: Square-Cubed Law & Interior Fraction Scaling
 //!
@@ -40,7 +41,7 @@ fn main() {
 
     #[cfg(feature = "gpu")]
     {
-        let midpoint = (GOE_R + POISSON_R) / 2.0;
+        let midpoint = f64::midpoint(GOE_R, POISSON_R);
         let w_typical = 13.0; // typical biome disorder
 
         v.section("── S1: 2D scaling (L=6 to 30) ──");
@@ -162,8 +163,8 @@ fn main() {
         }
         println!(
             "    2D: {}",
-            min_l_2d.map_or(
-                "NEVER active (confirmed: 2D localizes at W=13)".to_string(),
+            min_l_2d.map_or_else(
+                || "NEVER active (confirmed: 2D localizes at W=13)".to_string(),
                 |l| format!("L>={l}")
             )
         );
@@ -182,7 +183,7 @@ fn main() {
         }
         println!(
             "    3D: {}",
-            min_l_3d.map_or("needs L>12".to_string(), |l| format!(
+            min_l_3d.map_or_else(|| "needs L>12".to_string(), |l| format!(
                 "L>={l} ({} cells)",
                 l * l * l
             ))
@@ -197,7 +198,7 @@ fn main() {
         );
         for &l in &[5_usize, 7, 9, 12] {
             let n = l * l * l;
-            let mut row = format!("  {:>4}", l);
+            let mut row = format!("  {l:>4}");
             for &w in &[5.0, 10.0, 15.0, 20.0] {
                 let mat = anderson_3d(l, l, l, w, 42);
                 let tri = lanczos(&mat, n, 42);

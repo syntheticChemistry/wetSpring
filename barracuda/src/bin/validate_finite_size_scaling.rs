@@ -4,13 +4,17 @@
     clippy::unwrap_used,
     clippy::print_stdout,
     clippy::type_complexity,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_wrap,
+    clippy::too_many_lines,
+    clippy::collection_is_never_read,
     dead_code
 )]
 //! # Exp131: Finite-Size Scaling for 3D Anderson QS
 //!
 //! Runs 3D Anderson lattices at L=6,7,8,9,10 to extract the finite-size
-//! dependence of W_c and confirm that the Phase 36 results converge
-//! toward the thermodynamic-limit W_c ≈ 16.5.
+//! dependence of `W_c` and confirm that the Phase 36 results converge
+//! toward the thermodynamic-limit `W_c` ≈ 16.5.
 //!
 //! Verification strategy: if the QS-active window (plateau) narrows
 //! systematically with increasing L, the L=8 results from Exp127 are
@@ -47,7 +51,7 @@ fn find_last_downward_crossing(sweep: &[(f64, f64)], midpoint: f64) -> Option<f6
         let (w1, r1) = sweep[i];
         if r0 > midpoint && r1 <= midpoint {
             let t = (midpoint - r0) / (r1 - r0);
-            last = Some(w0 + t * (w1 - w0));
+            last = Some(t.mul_add(w1 - w0, w0));
         }
     }
     last
@@ -58,13 +62,12 @@ fn plateau_count(sweep: &[(f64, f64)], midpoint: f64) -> usize {
     sweep.iter().filter(|(_, r)| *r > midpoint).count()
 }
 
-#[allow(clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp131: Finite-Size Scaling for 3D Anderson QS");
 
     #[cfg(feature = "gpu")]
     {
-        let midpoint = (GOE_R + POISSON_R) / 2.0;
+        let midpoint = f64::midpoint(GOE_R, POISSON_R);
         let lattice_sizes: &[usize] = &[6, 7, 8, 9, 10];
 
         v.section("── S1: Sweep all lattice sizes ──");
@@ -85,7 +88,7 @@ fn main() {
             let w_c = find_last_downward_crossing(&sweep, midpoint);
             println!(
                 "  L={l} (N={n}): plateau={p}, W_c={}",
-                w_c.map_or("none".to_string(), |w| format!("{w:.2}"))
+                w_c.map_or_else(|| "none".to_string(), |w| format!("{w:.2}"))
             );
             for (w, r) in &sweep {
                 println!("    L={l} W={w:.2} ⟨r⟩={r:.4}");
@@ -107,7 +110,7 @@ fn main() {
                 l,
                 n,
                 p,
-                w_c.map_or("—".to_string(), |w| format!("{w:.2}"))
+                w_c.map_or_else(|| "—".to_string(), |w| format!("{w:.2}"))
             );
         }
 
@@ -169,7 +172,6 @@ fn main() {
         let test_w_values = [5.0, 10.0, 15.0, 20.0];
         for &w_test in &test_w_values {
             print!("  W={w_test:5.1}:");
-            let mut r_values = Vec::new();
             for (l, _, sweep, _) in &size_results {
                 let r = sweep
                     .iter()
@@ -179,10 +181,8 @@ fn main() {
                             .partial_cmp(&(wb - w_test).abs())
                             .unwrap()
                     })
-                    .map(|(_, r)| *r)
-                    .unwrap_or(0.0);
+                    .map_or(0.0, |(_, r)| *r);
                 print!("  L={l}:{r:.4}");
-                r_values.push(r);
             }
             println!();
         }
@@ -193,13 +193,11 @@ fn main() {
         let l8_p = size_results
             .iter()
             .find(|(l, _, _, _)| *l == 8)
-            .map(|(_, p, _, _)| *p)
-            .unwrap_or(0);
+            .map_or(0, |(_, p, _, _)| *p);
         let l10_p = size_results
             .iter()
             .find(|(l, _, _, _)| *l == 10)
-            .map(|(_, p, _, _)| *p)
-            .unwrap_or(0);
+            .map_or(0, |(_, p, _, _)| *p);
         let l8_w_c = size_results
             .iter()
             .find(|(l, _, _, _)| *l == 8)
@@ -210,11 +208,11 @@ fn main() {
             .and_then(|(_, _, _, w)| *w);
         println!(
             "  L=8: plateau={l8_p}, W_c={}",
-            l8_w_c.map_or("—".to_string(), |w| format!("{w:.2}"))
+            l8_w_c.map_or_else(|| "—".to_string(), |w| format!("{w:.2}"))
         );
         println!(
             "  L=10: plateau={l10_p}, W_c={}",
-            l10_w_c.map_or("—".to_string(), |w| format!("{w:.2}"))
+            l10_w_c.map_or_else(|| "—".to_string(), |w| format!("{w:.2}"))
         );
         let qualitative_agreement = (l8_p as i64 - l10_p as i64).unsigned_abs() <= 5;
         v.check_pass(

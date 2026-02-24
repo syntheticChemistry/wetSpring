@@ -35,103 +35,101 @@ struct MarineQsOrganism {
     is_anomaly: bool,
 }
 
-fn main() {
-    let mut v = Validator::new("Exp154: Marine Interkingdom QS — Planktonic Predictions");
+const ORGANISMS: &[MarineQsOrganism] = &[
+    MarineQsOrganism {
+        name: "Vibrio fischeri (light organ)",
+        lifestyle: "symbiotic → 3D dense",
+        geometry: "3D_dense",
+        qs_system: "AHL (luxI/luxR)",
+        has_qs: true,
+        anderson_prediction: true,
+        is_anomaly: false,
+    },
+    MarineQsOrganism {
+        name: "Vibrio fischeri (planktonic phase)",
+        lifestyle: "free-swimming → 3D dilute",
+        geometry: "3D_dilute",
+        qs_system: "AHL (silent)",
+        has_qs: false,
+        anderson_prediction: false,
+        is_anomaly: false,
+    },
+    MarineQsOrganism {
+        name: "Roseobacter (algal surface)",
+        lifestyle: "epiphytic → 2D + low diversity",
+        geometry: "2D_surface",
+        qs_system: "AHL (TDA-linked)",
+        has_qs: true,
+        anderson_prediction: true,
+        is_anomaly: false,
+    },
+    MarineQsOrganism {
+        name: "SAR11 (Pelagibacter)",
+        lifestyle: "obligate planktonic",
+        geometry: "3D_dilute",
+        qs_system: "none",
+        has_qs: false,
+        anderson_prediction: false,
+        is_anomaly: false,
+    },
+    MarineQsOrganism {
+        name: "Prochlorococcus",
+        lifestyle: "obligate planktonic",
+        geometry: "3D_dilute",
+        qs_system: "none (streamlined genome)",
+        has_qs: false,
+        anderson_prediction: false,
+        is_anomaly: false,
+    },
+    MarineQsOrganism {
+        name: "Pseudoalteromonas (biofilm)",
+        lifestyle: "particle-attached → 3D dense",
+        geometry: "3D_dense",
+        qs_system: "AHL",
+        has_qs: true,
+        anderson_prediction: true,
+        is_anomaly: false,
+    },
+    MarineQsOrganism {
+        name: "Marinobacter (particle-attached)",
+        lifestyle: "particle-attached → 3D moderate",
+        geometry: "3D_dense",
+        qs_system: "AHL",
+        has_qs: true,
+        anderson_prediction: true,
+        is_anomaly: false,
+    },
+    MarineQsOrganism {
+        name: "Phaeobacter (algal symbiont)",
+        lifestyle: "symbiotic → 3D dense",
+        geometry: "3D_dense",
+        qs_system: "AHL + TDA",
+        has_qs: true,
+        anderson_prediction: true,
+        is_anomaly: false,
+    },
+    MarineQsOrganism {
+        name: "Dinoflagellate-associated bacteria",
+        lifestyle: "phycosphere → 3D microhabitat",
+        geometry: "3D_dense",
+        qs_system: "AI-2",
+        has_qs: true,
+        anderson_prediction: true,
+        is_anomaly: false,
+    },
+    MarineQsOrganism {
+        name: "Trichodesmium (colony-forming)",
+        lifestyle: "colony → 3D aggregate",
+        geometry: "3D_dense",
+        qs_system: "putative AHL",
+        has_qs: true,
+        anderson_prediction: true,
+        is_anomaly: false,
+    },
+];
 
+fn validate_catalog(v: &mut Validator) {
     v.section("§1 Marine Organism QS Catalog");
-
-    let organisms = [
-        MarineQsOrganism {
-            name: "Vibrio fischeri (light organ)",
-            lifestyle: "symbiotic → 3D dense",
-            geometry: "3D_dense",
-            qs_system: "AHL (luxI/luxR)",
-            has_qs: true,
-            anderson_prediction: true,
-            is_anomaly: false,
-        },
-        MarineQsOrganism {
-            name: "Vibrio fischeri (planktonic phase)",
-            lifestyle: "free-swimming → 3D dilute",
-            geometry: "3D_dilute",
-            qs_system: "AHL (silent)",
-            has_qs: false,
-            anderson_prediction: false,
-            is_anomaly: false,
-        },
-        MarineQsOrganism {
-            name: "Roseobacter (algal surface)",
-            lifestyle: "epiphytic → 2D + low diversity",
-            geometry: "2D_surface",
-            qs_system: "AHL (TDA-linked)",
-            has_qs: true,
-            anderson_prediction: true,
-            is_anomaly: false,
-        },
-        MarineQsOrganism {
-            name: "SAR11 (Pelagibacter)",
-            lifestyle: "obligate planktonic",
-            geometry: "3D_dilute",
-            qs_system: "none",
-            has_qs: false,
-            anderson_prediction: false,
-            is_anomaly: false,
-        },
-        MarineQsOrganism {
-            name: "Prochlorococcus",
-            lifestyle: "obligate planktonic",
-            geometry: "3D_dilute",
-            qs_system: "none (streamlined genome)",
-            has_qs: false,
-            anderson_prediction: false,
-            is_anomaly: false,
-        },
-        MarineQsOrganism {
-            name: "Pseudoalteromonas (biofilm)",
-            lifestyle: "particle-attached → 3D dense",
-            geometry: "3D_dense",
-            qs_system: "AHL",
-            has_qs: true,
-            anderson_prediction: true,
-            is_anomaly: false,
-        },
-        MarineQsOrganism {
-            name: "Marinobacter (particle-attached)",
-            lifestyle: "particle-attached → 3D moderate",
-            geometry: "3D_dense",
-            qs_system: "AHL",
-            has_qs: true,
-            anderson_prediction: true,
-            is_anomaly: false,
-        },
-        MarineQsOrganism {
-            name: "Phaeobacter (algal symbiont)",
-            lifestyle: "symbiotic → 3D dense",
-            geometry: "3D_dense",
-            qs_system: "AHL + TDA",
-            has_qs: true,
-            anderson_prediction: true,
-            is_anomaly: false,
-        },
-        MarineQsOrganism {
-            name: "Dinoflagellate-associated bacteria",
-            lifestyle: "phycosphere → 3D microhabitat",
-            geometry: "3D_dense",
-            qs_system: "AI-2",
-            has_qs: true,
-            anderson_prediction: true,
-            is_anomaly: false,
-        },
-        MarineQsOrganism {
-            name: "Trichodesmium (colony-forming)",
-            lifestyle: "colony → 3D aggregate",
-            geometry: "3D_dense",
-            qs_system: "putative AHL",
-            has_qs: true,
-            anderson_prediction: true,
-            is_anomaly: false,
-        },
-    ];
 
     println!(
         "  {:38} {:20} {:20} {:8} {:8}",
@@ -141,7 +139,7 @@ fn main() {
         "  {:-<38} {:-<20} {:-<20} {:-<8} {:-<8}",
         "", "", "", "", ""
     );
-    for o in &organisms {
+    for o in ORGANISMS {
         println!(
             "  {:38} {:20} {:20} {:8} {:8}",
             o.name,
@@ -156,15 +154,17 @@ fn main() {
         );
     }
 
-    v.check_count("marine organisms catalogued", organisms.len(), 10);
+    v.check_count("marine organisms catalogued", ORGANISMS.len(), 10);
+}
 
+fn validate_predictions(v: &mut Validator) {
     v.section("§2 Anderson Prediction Accuracy");
 
-    let correct = organisms
+    let correct = ORGANISMS
         .iter()
         .filter(|o| o.has_qs == o.anderson_prediction)
         .count();
-    let total = organisms.len();
+    let total = ORGANISMS.len();
     println!("  Correct predictions: {correct}/{total}");
 
     v.check_count("Anderson predictions correct", correct, total);
@@ -172,7 +172,7 @@ fn main() {
 
     v.section("§3 Obligate Plankton Prediction");
 
-    let obligate_plankton: Vec<&MarineQsOrganism> = organisms
+    let obligate_plankton: Vec<&MarineQsOrganism> = ORGANISMS
         .iter()
         .filter(|o| o.lifestyle.contains("obligate planktonic"))
         .collect();
@@ -187,7 +187,9 @@ fn main() {
         "all obligate plankton lack QS (SAR11, Prochlorococcus)",
         plankton_no_qs == obligate_plankton.len(),
     );
+}
 
+fn validate_geometry_and_resolution(v: &mut Validator) {
     v.section("§4 Interkingdom QS — Geometry Gating");
     println!("\n  Marine interkingdom QS occurs exclusively in 3D microhabitats:");
     println!("  • Phycosphere (algal cell surface → 3D micro-niche)");
@@ -196,7 +198,7 @@ fn main() {
     println!("  • Colony (Trichodesmium → self-assembled 3D)");
     println!("  None occur in open water (3D dilute → Anderson localized)");
 
-    let interkingdom_3d = organisms
+    let interkingdom_3d = ORGANISMS
         .iter()
         .filter(|o| o.has_qs && o.geometry == "3D_dense")
         .count();
@@ -214,6 +216,14 @@ fn main() {
     println!("  • The Commun Biol 2025 review strongly supports the Anderson null hypothesis");
 
     v.check_pass("marine QS data consistent with Anderson framework", true);
+}
+
+fn main() {
+    let mut v = Validator::new("Exp154: Marine Interkingdom QS — Planktonic Predictions");
+
+    validate_catalog(&mut v);
+    validate_predictions(&mut v);
+    validate_geometry_and_resolution(&mut v);
 
     v.finish();
 }

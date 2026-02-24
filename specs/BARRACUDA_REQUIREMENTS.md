@@ -7,7 +7,7 @@
 
 ## Current Kernel Usage (Validated)
 
-### Rust CPU Modules (45 modules, 845 tests, 95.67% library coverage)
+### Rust CPU Modules (47 modules, 881 tests, 95.67% library coverage)
 
 | Module Domain | Modules | Status |
 |--------------|---------|--------|
@@ -20,8 +20,9 @@
 | Phylogenetics | felsenstein, robinson_foulds, hmm, alignment, bootstrap, placement, neighbor_joining, reconciliation | Sovereign |
 | Track 1c | ani, snp, dnds, molecular_clock, pangenome | Sovereign |
 | ML | decision_tree, random_forest, gbm | Sovereign |
+| Drug repurposing | nmf, transe | Sovereign (NEW — Track 3) |
 
-### GPU Primitives (30 ToadStool primitives + 5 local WGSL + 12 GPU wrappers, 702 checks)
+### GPU Primitives (37 ToadStool primitives + 0 local WGSL + 12 GPU wrappers, 702 checks)
 
 | ToadStool Primitive | wetSpring Use | Checks | Performance |
 |-------------------|---------------|--------|-------------|
@@ -145,7 +146,8 @@ CPU 22.5× faster than Python  ────────→  GPU math PROVEN port
 - Native `log(f64)` crashes NVIDIA NVVM compiler — all transcendentals must use portable implementations
 - **NVVM workaround**: force `ShaderTemplate::for_driver_auto(source, true)` for shaders using exp/log
 - Spectral cosine achieves 926× GPU speedup — the first "GPU wins decisively" benchmark from any spring
-- 45 CPU + 42 GPU Rust modules with 1 runtime dependency (flate2) — highest sovereignty ratio in the ecosystem
+- 47 CPU + 42 GPU Rust modules with 2 runtime dependencies (flate2 + bytemuck) — highest sovereignty ratio in the ecosystem
+- **V29 handoff**: cross-spring synthesis, deprecated API removal, dead-code cleanup, evolution handoff
 - **12 shaders absorbed + 5 ODE leaned (generate_shader) + 12 composed wrappers** — zero local WGSL remains; see `barracuda/EVOLUTION_READINESS.md`
 - **Rust edition 2024**, MSRV 1.85 — `f64::midpoint()`, `usize::midpoint()`, `const fn` promotions
 - **`#![deny(unsafe_code)]`** — edition 2024 makes `std::env::set_var` unsafe; `#[allow]` confined to test env-var calls

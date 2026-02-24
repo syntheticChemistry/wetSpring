@@ -134,6 +134,7 @@ impl StreamingSession {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
 
@@ -199,5 +200,73 @@ mod tests {
         assert!(!analysis.fully_streamable);
         assert_eq!(analysis.cpu_roundtrips, 2);
         assert_eq!(analysis.gpu_chained, 0);
+    }
+
+    #[test]
+    fn substrate_returns_target_kind() {
+        let session = StreamingSession::new(SubstrateKind::Npu);
+        assert_eq!(session.substrate(), SubstrateKind::Npu);
+    }
+
+    #[test]
+    fn single_stage_pipeline_analysis() {
+        let mut session = StreamingSession::new(SubstrateKind::Gpu);
+        session.add_stage(PipelineStage {
+            name: "solo".into(),
+            capability: Capability::F64Compute,
+            accepts_gpu_buffer: true,
+            produces_gpu_buffer: true,
+        });
+        let analysis = session.analyze();
+        assert_eq!(analysis.n_stages, 1);
+        assert_eq!(analysis.cpu_roundtrips, 0);
+        assert_eq!(analysis.gpu_chained, 0);
+        assert!(analysis.fully_streamable);
+    }
+
+    #[test]
+    fn select_substrate_finds_capable() {
+        use crate::substrate::{Identity, Properties};
+        let gpu = Substrate {
+            kind: SubstrateKind::Gpu,
+            identity: Identity::named("GPU"),
+            properties: Properties::default(),
+            capabilities: vec![Capability::F64Compute, Capability::ShaderDispatch],
+        };
+        let cpu = Substrate {
+            kind: SubstrateKind::Cpu,
+            identity: Identity::named("CPU"),
+            properties: Properties::default(),
+            capabilities: vec![Capability::CpuCompute],
+        };
+        let stage = PipelineStage {
+            name: "GEMM".into(),
+            capability: Capability::F64Compute,
+            accepts_gpu_buffer: true,
+            produces_gpu_buffer: true,
+        };
+        let inventory = [cpu, gpu];
+        let result = StreamingSession::select_substrate_for_stage(&stage, &inventory);
+        assert!(result.is_some());
+        assert_eq!(result.unwrap().kind, SubstrateKind::Gpu);
+    }
+
+    #[test]
+    fn select_substrate_returns_none_when_incapable() {
+        use crate::substrate::{Identity, Properties};
+        let cpu = Substrate {
+            kind: SubstrateKind::Cpu,
+            identity: Identity::named("CPU"),
+            properties: Properties::default(),
+            capabilities: vec![Capability::CpuCompute],
+        };
+        let stage = PipelineStage {
+            name: "NMF".into(),
+            capability: Capability::ShaderDispatch,
+            accepts_gpu_buffer: true,
+            produces_gpu_buffer: true,
+        };
+        let inventory = [cpu];
+        assert!(StreamingSession::select_substrate_for_stage(&stage, &inventory).is_none());
     }
 }

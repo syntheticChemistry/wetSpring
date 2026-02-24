@@ -3,6 +3,9 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
+    clippy::cast_precision_loss,
+    clippy::too_many_lines,
+    clippy::items_after_statements,
     dead_code
 )]
 //! # Exp127: 3D Anderson Dimensional QS Sweep
@@ -31,7 +34,7 @@ const W_MIN: f64 = 0.5;
 const W_MAX: f64 = 25.0;
 
 fn evenness_to_disorder(pielou_j: f64) -> f64 {
-    0.5 + pielou_j * 14.5
+    pielou_j.mul_add(14.5, 0.5)
 }
 
 fn generate_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
@@ -39,7 +42,7 @@ fn generate_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     let mut rng = seed;
     for i in 0..n_species {
         rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-        let noise = ((rng >> 33) as f64) / (u32::MAX as f64);
+        let noise = ((rng >> 33) as f64) / f64::from(u32::MAX);
         let rank_weight = (-(i as f64) / (n_species as f64 * evenness)).exp();
         counts.push((rank_weight * 1000.0 * (0.5 + noise)).max(1.0));
     }
@@ -47,6 +50,7 @@ fn generate_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
 }
 
 #[cfg(feature = "gpu")]
+#[allow(clippy::cast_precision_loss)]
 fn sweep_w(i: usize) -> f64 {
     W_MIN + (i as f64) * (W_MAX - W_MIN) / (N_SWEEP - 1) as f64
 }
@@ -70,20 +74,19 @@ fn find_j_c(sweep: &[(f64, f64)], midpoint: f64) -> Option<f64> {
         let (w1, r1) = sweep[i];
         if r0 > midpoint && r1 <= midpoint {
             let t = (midpoint - r0) / (r1 - r0);
-            let w_c = w0 + t * (w1 - w0);
+            let w_c = t.mul_add(w1 - w0, w0);
             last_crossing = Some((w_c - 0.5) / 14.5);
         }
     }
     last_crossing
 }
 
-#[allow(clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp127: 3D Anderson Dimensional QS Sweep");
 
     #[cfg(feature = "gpu")]
     {
-        let midpoint = (GOE_R + POISSON_R) / 2.0;
+        let midpoint = f64::midpoint(GOE_R, POISSON_R);
         println!("  GOE_R={GOE_R:.4}, POISSON_R={POISSON_R:.4}, midpoint={midpoint:.4}");
 
         v.section("── S1: 1D Anderson sweep ──");
@@ -177,7 +180,7 @@ fn main() {
         }
         let hierarchy_ok = match (j_c_2d, j_c_3d) {
             (Some(j2), Some(j3)) => j3 > j2,
-            (Some(_), None) => true, // 3D never localizes in range → wider window
+            // 3D never localizes in range → wider window
             _ => true,
         };
         v.check_pass(
@@ -228,8 +231,7 @@ fn main() {
             sweep
                 .iter()
                 .min_by(|(wa, _), (wb, _)| (wa - w).abs().partial_cmp(&(wb - w).abs()).unwrap())
-                .map(|(_, r)| *r)
-                .unwrap_or(0.0)
+                .map_or(0.0, |(_, r)| *r)
         }
 
         let mut any_3d_gain = false;

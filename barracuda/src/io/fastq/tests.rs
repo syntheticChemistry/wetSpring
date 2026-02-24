@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! FASTQ parser tests.
 
-#![allow(clippy::expect_used, clippy::unwrap_used, deprecated)]
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::redundant_closure_for_method_calls
+)]
 
 use super::*;
 use std::io::Write;
@@ -52,7 +56,10 @@ fn test_parse_and_stats_agree() {
     let dir = tempfile::tempdir().unwrap();
     let content = "@a\nACGTAC\n+\nIIIIII\n@b\nGGCC\n+\n!I!I\n";
     let path = write_fastq(&dir, "agree.fastq", content);
-    let records = parse_fastq(&path).unwrap();
+    let records: Vec<_> = FastqIter::open(&path)
+        .unwrap()
+        .collect::<Result<Vec<_>>>()
+        .unwrap();
     let stats_from_records = compute_stats(&records);
     let stats_from_stream = stats_from_file(&path).unwrap();
     assert_eq!(
@@ -222,7 +229,10 @@ fn fastq_iter_matches_parse() {
     let content = "@r1 desc\nACGTACGT\n+\nIIIIIIII\n@r2\nGGCC\n+\n!!!!\n";
     let path = write_fastq(&dir, "iter.fastq", content);
 
-    let buffered = parse_fastq(&path).unwrap();
+    let buffered: Vec<_> = FastqIter::open(&path)
+        .unwrap()
+        .collect::<Result<Vec<_>>>()
+        .unwrap();
     let streamed: Vec<FastqRecord> = FastqIter::open(&path)
         .unwrap()
         .collect::<Result<Vec<_>>>()
@@ -264,7 +274,10 @@ fn for_each_record_matches_parse() {
     })
     .unwrap();
 
-    let parsed = parse_fastq(&path).unwrap();
+    let parsed: Vec<_> = FastqIter::open(&path)
+        .unwrap()
+        .collect::<Result<Vec<_>>>()
+        .unwrap();
     assert_eq!(collected.len(), parsed.len());
     for (c, p) in collected.iter().zip(parsed.iter()) {
         assert_eq!(c.id, p.id);
@@ -352,7 +365,9 @@ fn fastq_iter_gzip() {
 fn parse_fastq_bad_header() {
     let dir = tempfile::tempdir().unwrap();
     let path = write_fastq(&dir, "bad.fastq", "NOPE\nACGT\n+\nIIII\n");
-    assert!(parse_fastq(&path).is_err());
+    assert!(FastqIter::open(&path)
+        .and_then(|i| i.collect::<Result<Vec<_>>>())
+        .is_err());
 }
 
 #[test]
@@ -375,13 +390,16 @@ fn fastq_iter_bad_header() {
 fn parse_fastq_truncated_record() {
     let dir = tempfile::tempdir().unwrap();
     let path = write_fastq(&dir, "trunc.fastq", "@r1\nACGT\n+\n");
-    let records = parse_fastq(&path).unwrap();
+    let records: Vec<_> = FastqIter::open(&path)
+        .unwrap()
+        .collect::<Result<Vec<_>>>()
+        .unwrap();
     assert_eq!(records.len(), 1);
     assert!(records[0].quality.is_empty());
 }
 
 #[test]
 fn fastq_nonexistent_file() {
-    let result = parse_fastq(std::path::Path::new("/nonexistent/reads.fastq"));
+    let result = FastqIter::open(std::path::Path::new("/nonexistent/reads.fastq"));
     assert!(result.is_err());
 }

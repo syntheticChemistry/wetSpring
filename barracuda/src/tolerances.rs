@@ -280,6 +280,44 @@ pub const JACOBI_TAU_OVERFLOW: f64 = 1e15;
 pub const JACOBI_SWEEP_MULTIPLIER: usize = 100;
 
 // ═══════════════════════════════════════════════════════════════════
+// Numerical stability guards
+// ═══════════════════════════════════════════════════════════════════
+
+/// Division-by-zero guard for matrix operations (NMF, cosine, norms).
+///
+/// Applied as a denominator floor to prevent NaN/Inf. Smaller than
+/// `f64::EPSILON` (2.2e-16) so it never distorts non-degenerate results.
+pub const MATRIX_EPS: f64 = 1e-15;
+
+/// NMF initialisation floor: prevents zero entries in W/H matrices.
+///
+/// Lee & Seung (1999) multiplicative updates require all-positive factors.
+/// Added to random init values to ensure positivity.
+pub const NMF_INIT_FLOOR: f64 = 1e-10;
+
+/// Box-Muller u1 floor: avoids `ln(0)` in Gaussian generation.
+///
+/// The Box-Muller transform computes `sqrt(-2 ln(u1))`, which diverges
+/// at u1 = 0. Clamping to this floor bounds the output to ~8.3σ.
+pub const BOX_MULLER_U1_FLOOR: f64 = 1e-15;
+
+/// Regularized gamma right-tail early exit threshold.
+///
+/// When `x > a + GAMMA_RIGHT_TAIL_OFFSET`, P(a,x) ≈ 1.0 to f64
+/// precision. Avoids expensive series summation in the deep right tail.
+pub const GAMMA_RIGHT_TAIL_OFFSET: f64 = 200.0;
+
+/// ODE division-by-zero guard for WGSL and CPU derivatives.
+///
+/// Applied in Hill function denominators and Monod kinetics to prevent
+/// NaN when concentrations are near zero. Small enough to not affect
+/// biologically meaningful concentration ranges (typically > 1e-9).
+pub const ODE_DIVISION_GUARD: f64 = 1e-30;
+
+/// Error message truncation length for API responses.
+pub const ERROR_BODY_PREVIEW_LEN: usize = 200;
+
+// ═══════════════════════════════════════════════════════════════════
 // GPU vs CPU tolerances
 // ═══════════════════════════════════════════════════════════════════
 

@@ -31,7 +31,7 @@ const N_BATCHES: usize = 1024;
 const N_STEPS: u32 = 500;
 const DT: f64 = 0.01;
 
-fn params_to_flat_17(p: &QsBiofilmParams) -> [f64; N_PARAMS] {
+const fn params_to_flat_17(p: &QsBiofilmParams) -> [f64; N_PARAMS] {
     [
         p.mu_max,
         p.k_cap,
@@ -65,11 +65,11 @@ fn generate_parameter_landscape() -> Vec<QsBiofilmParams> {
         for j in 0..kai_steps {
             let mut params = QsBiofilmParams::default();
             // mu_max: 0.2 – 1.2 (slow to fast growers)
-            params.mu_max = 0.2 + (i as f64) * 1.0 / (mu_steps as f64 - 1.0);
+            params.mu_max = 0.2 + f64::from(i) * 1.0 / (f64::from(mu_steps) - 1.0);
             // k_ai_prod: 1.0 – 10.0 (low to high AI production)
-            params.k_ai_prod = 1.0 + (j as f64) * 9.0 / (kai_steps as f64 - 1.0);
+            params.k_ai_prod = 1.0 + f64::from(j) * 9.0 / (f64::from(kai_steps) - 1.0);
             // Vary hapR AI threshold for bistability detection
-            params.k_hapr_ai = 0.3 + (i as f64) * 0.01;
+            params.k_hapr_ai = f64::from(i).mul_add(0.01, 0.3);
             params_vec.push(params);
         }
     }
@@ -91,6 +91,7 @@ fn classify_outcome(y_final: &[f64]) -> &'static str {
     }
 }
 
+#[allow(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp108: Vibrio QS Parameter Landscape");
 
@@ -153,6 +154,7 @@ fn main() {
         let sweeper = OdeSweepGpu::new(device);
 
         let config = OdeSweepConfig {
+            #[allow(clippy::cast_possible_truncation)]
             n_batches: N_BATCHES as u32,
             n_steps: N_STEPS,
             h: DT,
@@ -202,6 +204,7 @@ fn main() {
 
         println!("  Landscape classification ({N_BATCHES} genomes):");
         for (class, count) in &gpu_classes {
+            #[allow(clippy::cast_precision_loss)]
             let pct = (*count as f64) / (N_BATCHES as f64) * 100.0;
             println!("    {class}: {count} ({pct:.1}%)");
         }
@@ -219,6 +222,7 @@ fn main() {
             1,
         );
 
+        #[allow(clippy::cast_precision_loss)]
         let cpu_extrapolated_ms =
             cpu_elapsed.as_secs_f64() * 1000.0 * (N_BATCHES as f64 / cpu_subset_size as f64);
         println!("  Estimated CPU for {N_BATCHES}: {cpu_extrapolated_ms:.0} ms");

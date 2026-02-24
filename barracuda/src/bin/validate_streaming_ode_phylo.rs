@@ -4,11 +4,15 @@
     clippy::unwrap_used,
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
+    clippy::cast_possible_wrap,
     clippy::similar_names,
     clippy::needless_range_loop,
     clippy::too_many_arguments,
     clippy::items_after_statements,
-    clippy::cloned_ref_to_slice_refs
+    clippy::cloned_ref_to_slice_refs,
+    clippy::collection_is_never_read,
+    clippy::match_same_arms,
+    clippy::assigning_clones
 )]
 //! Exp106: Pure GPU Streaming — ODE Biology + Phylogenetics
 //!
@@ -18,12 +22,12 @@
 //!
 //! | Domain | Primitive | Pattern |
 //! |--------|-----------|---------|
-//! | QS biofilm ODE | `OdeSweepGpu` | ToadStool absorbed |
+//! | QS biofilm ODE | `OdeSweepGpu` | `ToadStool` absorbed |
 //! | Phage defense ODE | `PhageDefenseGpu` | Local WGSL |
 //! | Bistable switch ODE | `BistableGpu` | Local WGSL |
 //! | Multi-signal ODE | `MultiSignalGpu` | Local WGSL |
-//! | Felsenstein pruning | `FelsensteinGpu` | ToadStool absorbed |
-//! | UniFrac propagation | `UniFracGpu` | ToadStool absorbed |
+//! | Felsenstein pruning | `FelsensteinGpu` | `ToadStool` absorbed |
+//! | `UniFrac` propagation | `UniFracGpu` | `ToadStool` absorbed |
 //!
 //! # Provenance
 //!
@@ -127,7 +131,6 @@ fn validate_ode_streaming(
     let mu_values = [0.3, 0.5, 0.7, 0.9];
     let mut flat_y0 = Vec::with_capacity(n_batch * N_VARS);
     let mut flat_params = Vec::with_capacity(n_batch * N_PARAMS);
-    let mut cpu_finals = Vec::with_capacity(n_batch);
 
     let y0_init: [f64; N_VARS] = [0.01, 0.0, 0.0, 0.0, 0.0];
     let tc = Instant::now();
@@ -136,8 +139,7 @@ fn validate_ode_streaming(
             mu_max: mu,
             ..base.clone()
         };
-        let cpu_result = qs_biofilm::run_scenario(&y0_init, n_steps as f64 * h, h, &p);
-        cpu_finals.push(cpu_result.y_final.clone());
+        let _cpu_result = qs_biofilm::run_scenario(&y0_init, f64::from(n_steps) * h, h, &p);
         flat_y0.extend_from_slice(&y0_init);
         flat_params.extend_from_slice(&params_to_flat(&p));
     }
@@ -175,7 +177,7 @@ fn validate_ode_streaming(
     timings.push(("QS ODE (4-batch)", cpu_us, gpu_us));
 }
 
-fn params_to_flat(p: &QsBiofilmParams) -> [f64; N_PARAMS] {
+const fn params_to_flat(p: &QsBiofilmParams) -> [f64; N_PARAMS] {
     [
         p.mu_max,
         p.k_cap,
@@ -212,12 +214,12 @@ fn validate_phage_streaming(
     let h = 0.01;
 
     let tc = Instant::now();
-    let _cpu = phage_defense::run_defense(&y0, n_steps as f64 * h, h, &params);
+    let _cpu = phage_defense::run_defense(&y0, f64::from(n_steps) * h, h, &params);
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
     let gpu_result = phage_gpu
-        .integrate_params(&[params.clone()], &[y0], n_steps, h)
+        .integrate_params(&[params], &[y0], n_steps, h)
         .expect("Phage GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
@@ -256,12 +258,12 @@ fn validate_bistable_streaming(
     let h = 0.01;
 
     let tc = Instant::now();
-    let _cpu = bistable::run_bistable(&y0, n_steps as f64 * h, h, &params);
+    let _cpu = bistable::run_bistable(&y0, f64::from(n_steps) * h, h, &params);
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
     let gpu_result = bistable_gpu_inst
-        .integrate_params(&[params.clone()], &[y0], n_steps, h)
+        .integrate_params(&[params], &[y0], n_steps, h)
         .expect("Bistable GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
@@ -303,12 +305,12 @@ fn validate_multi_signal_streaming(
     let h = 0.01;
 
     let tc = Instant::now();
-    let _cpu = multi_signal::run_multi_signal(&y0, n_steps as f64 * h, h, &params);
+    let _cpu = multi_signal::run_multi_signal(&y0, f64::from(n_steps) * h, h, &params);
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
     let gpu_result = multi_gpu
-        .integrate_params(&[params.clone()], &[y0], n_steps, h)
+        .integrate_params(&[params], &[y0], n_steps, h)
         .expect("MultiSignal GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
@@ -344,7 +346,6 @@ const PI: [f64; N_STATES] = [0.25; 4];
 fn encode_dna(seq: &str) -> Vec<usize> {
     seq.bytes()
         .map(|b| match b {
-            b'A' => 0,
             b'C' => 1,
             b'G' => 2,
             b'T' => 3,
@@ -402,7 +403,7 @@ fn convert_tree(tree: &TreeNode, mu: f64) -> TreeConversion {
 
         match node {
             TreeNode::Leaf { states, .. } => {
-                seqs[my_idx] = states.clone();
+                seqs[my_idx].clone_from(states);
                 leaf[my_idx] = true;
             }
             TreeNode::Internal {

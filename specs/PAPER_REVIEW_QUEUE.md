@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: February 24, 2026
+**Last Updated**: February 24, 2026 (Phase 40)
 **Purpose**: Track papers for reproduction/review across three tracks
 
 ---
@@ -162,7 +162,7 @@ in a noisy medium (Track 1).
 
 ## Open Data Provenance Audit
 
-All 29 reproductions use publicly accessible data or published model parameters.
+All 43 reproductions use publicly accessible data or published model parameters.
 No proprietary data dependencies.
 
 | Category | Papers | Data Source | Access |
@@ -194,6 +194,9 @@ No proprietary data dependencies.
 | **NCBI-scale** | Real-scale data extensions | Exp108-113 | 78 |
 | **NPU reservoir** | ESN → int8 → Akida deployment | Exp114-119 | 59 |
 | **Cross-spring evolution** | 612 WGSL shaders traced, imports rewired | Exp120 | 9 |
+| **Phase 37-38 extensions** | Anderson-QS extension papers + cold seep + phylogeny | Exp144-149,152-156 | 102 |
+| **Phase 40 scaling** | Finite-size + correlated disorder + physical comm | Exp150-151 | 22 |
+| **Drug repurposing (Track 3)** | NMF, pathway scoring, KG embedding | Exp157-161 | 40 |
 
 ### Phase 37 — Anderson-QS Extension Papers
 
@@ -205,15 +208,15 @@ Core finding: **no prior work applies Anderson localization to QS signaling**.
 | # | Paper | Journal | Year | Why | Status |
 |---|-------|---------|------|-----|--------|
 | 30 | "Physical communication pathways in bacteria: an extra layer to quorum sensing" | Biophys Rev Lett | 2025 | All microbial comm modes beyond QS (mechanical, EM, acoustic). Can Anderson apply to these? | **Exp152 DONE** (9/9) |
-| 31 | "Diverse QS systems regulate microbial communication in deep-sea cold seeps" | Microbiome | 2025 | **299,355 QS genes, 170 metagenomes, 34 QS types**. Massive dataset to test Anderson predictions in 3D sediment | **Exp144-145** |
-| 32 | "In silico protein analysis, ecophysiology, and reconstruction of evolutionary history of QS" | BMC Genomics | 2024 | Phylogenetic reconstruction of luxR. Correlate QS gene gain/loss with habitat geometry transitions | **Exp146** |
-| 33 | "Spatially propagating activation of QS in V. fischeri" — Meyer et al. | Phys Rev E 101:062421 | 2020 | Closest to our physics approach (traveling waves). Complementary: propagation vs localization | **Exp148** |
+| 31 | "Diverse QS systems regulate microbial communication in deep-sea cold seeps" | Microbiome | 2025 | **299,355 QS genes, 170 metagenomes, 34 QS types**. Massive dataset to test Anderson predictions in 3D sediment | **Exp144 DONE** (8/8), **Exp145 DONE** (5/5) |
+| 32 | "In silico protein analysis, ecophysiology, and reconstruction of evolutionary history of QS" | BMC Genomics | 2024 | Phylogenetic reconstruction of luxR. Correlate QS gene gain/loss with habitat geometry transitions | **Exp146 DONE** (5/5) |
+| 33 | "Spatially propagating activation of QS in V. fischeri" — Meyer et al. | Phys Rev E 101:062421 | 2020 | Closest to our physics approach (traveling waves). Complementary: propagation vs localization | **Exp148 DONE** (6/6) |
 
 #### Tier 2 — Validates or Challenges Predictions
 
 | # | Paper | Journal | Year | Why | Status |
 |---|-------|---------|------|-----|--------|
-| 34 | "Burst statistics in biofilm QS: role of spatial colony-growth heterogeneity" | Sci Rep | 2019 | Spatial disorder effects on QS timing. Their "disordered colony" ≈ our Anderson disorder | **Exp149** |
+| 34 | "Burst statistics in biofilm QS: role of spatial colony-growth heterogeneity" | Sci Rep | 2019 | Spatial disorder effects on QS timing. Their "disordered colony" ≈ our Anderson disorder | **Exp149 DONE** (6/6) |
 | 35 | "Functional metagenomic analysis of QS in a nitrifying community" | npj Biofilms | 2021 | 13 luxI + 30 luxR from sludge. R:P = 2.3:1. Test eavesdropper prediction | **Exp153 DONE** (12/12) |
 | 36 | "A review of QS mediating interkingdom interactions in the ocean" | Commun Biol | 2025 | Marine QS review. Refine our "obligate plankton = no QS" prediction | **Exp154 DONE** (6/6) |
 
@@ -226,11 +229,31 @@ Core finding: **no prior work applies Anderson localization to QS signaling**.
 
 ---
 
+## Three-Tier Control Summary
+
+| Track | Papers | CPU | GPU | metalForge | Status |
+|-------|:------:|:---:|:---:|:----------:|--------|
+| Track 1 (Ecology + ODE) | 10 | 10/10 | 10/10 | 10/10 | Full three-tier |
+| Track 1b (Phylogenetics) | 5 | 5/5 | 5/5 | 5/5 | Full three-tier |
+| Track 1c (Metagenomics) | 6 | 6/6 | 6/6 | 6/6 | Full three-tier |
+| Track 2 (PFAS/LC-MS) | 4 | 4/4 | 4/4 | 4/4 | Full three-tier |
+| **Subtotal (actionable)** | **25** | **25/25** | **25/25** | **25/25** | **ALL three-tier** |
+| Track 3 (Drug repurposing) | 5 | 5/5 | 0/5 | 0/5 | CPU only — GPU pending ToadStool NMF/TransE |
+| Cross-spring (spectral) | 1 | 1/1 | 1/1 | — | CPU + GPU |
+| Extensions (Phase 37-39) | 9 | 9/9 | — | — | CPU only (by design — analytical/catalog) |
+| **Grand total** | **43** | **43/43** | **26/30** | **25/25** | |
+
+**Next GPU targets:** Track 3 requires `NmfUpdateGpu`, `TransEScoreGpu` from ToadStool.
+Extension papers are analytical models — GPU acceleration is not the bottleneck.
+
+---
+
 ## Notes
 
-- wetSpring has the largest paper queue because it spans three scientific domains
+- wetSpring has the largest paper queue because it spans four scientific domains + cross-spring
 - Track 1 papers (Waters) are the most immediately reproducible — fully specified ODE/stochastic models
 - Track 1b papers (Liu) bridge to neuralSpring via HMM ↔ LSTM isomorphism
 - Track 2 papers (Jones) depend on accessing PFAS mass spec data
+- Track 3 papers (Fajgenbaum) use publicly available repoDB + published algorithms
 - Cahill/Smallwood papers may require Sandia data access agreements
 - Paper 23 (Kachkovskiy) is now validated via cross-spring spectral primitives (Exp107: 25/25 checks)

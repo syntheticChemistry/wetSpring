@@ -3,6 +3,9 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
+    clippy::cast_precision_loss,
+    clippy::too_many_lines,
+    clippy::items_after_statements,
     dead_code
 )]
 //! # Exp122: 2D Anderson Spatial QS Lattice
@@ -30,7 +33,7 @@ const LATTICE_L: usize = 20;
 const N_DISORDER_POINTS: usize = 20;
 
 fn evenness_to_disorder(pielou_j: f64) -> f64 {
-    0.5 + pielou_j * 14.5
+    pielou_j.mul_add(14.5, 0.5)
 }
 
 fn generate_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
@@ -38,20 +41,19 @@ fn generate_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     let mut rng = seed;
     for i in 0..n_species {
         rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-        let noise = ((rng >> 33) as f64) / (u32::MAX as f64);
+        let noise = ((rng >> 33) as f64) / f64::from(u32::MAX);
         let rank_weight = (-(i as f64) / (n_species as f64 * evenness)).exp();
         counts.push((rank_weight * 1000.0 * (0.5 + noise)).max(1.0));
     }
     counts
 }
 
-#[allow(clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp122: 2D Anderson Spatial QS Lattice");
 
     #[cfg(feature = "gpu")]
     {
-        let midpoint = (GOE_R + POISSON_R) / 2.0;
+        let midpoint = f64::midpoint(GOE_R, POISSON_R);
         let n_sites = LATTICE_L * LATTICE_L;
 
         v.section("── S1: 1D Anderson baseline sweep ──");
@@ -63,8 +65,8 @@ fn main() {
             let r = level_spacing_ratio(&eigenvalues);
             sweep_1d.push((w, r));
         }
-        let first_1d = sweep_1d.first().map(|(_, r)| *r).unwrap_or(0.0);
-        let last_1d = sweep_1d.last().map(|(_, r)| *r).unwrap_or(0.0);
+        let first_1d = sweep_1d.first().map_or(0.0, |(_, r)| *r);
+        let last_1d = sweep_1d.last().map_or(0.0, |(_, r)| *r);
         v.check_count("1D sweep points", sweep_1d.len(), N_DISORDER_POINTS);
         v.check_pass("1D first point ⟨r⟩ > 0.4 (weak disorder)", first_1d > 0.4);
         v.check_pass("1D last point ⟨r⟩ < 0.45 (strong disorder)", last_1d < 0.45);
@@ -81,8 +83,8 @@ fn main() {
             let r = level_spacing_ratio(&eigenvalues);
             sweep_2d.push((w, r));
         }
-        let first_2d = sweep_2d.first().map(|(_, r)| *r).unwrap_or(0.0);
-        let last_2d = sweep_2d.last().map(|(_, r)| *r).unwrap_or(0.0);
+        let first_2d = sweep_2d.first().map_or(0.0, |(_, r)| *r);
+        let last_2d = sweep_2d.last().map_or(0.0, |(_, r)| *r);
         v.check_count("2D sweep points", sweep_2d.len(), N_DISORDER_POINTS);
         v.check_pass("2D first point ⟨r⟩ > 0.45 (weak disorder)", first_2d > 0.45);
         v.check_pass("2D last point ⟨r⟩ < 0.45 (strong disorder)", last_2d < 0.45);
@@ -172,15 +174,13 @@ fn main() {
                 .min_by(|(wa, _), (wb, _)| {
                     ((*wa - w).abs()).partial_cmp(&((*wb - w).abs())).unwrap()
                 })
-                .map(|(_, r)| *r)
-                .unwrap_or(0.0);
+                .map_or(0.0, |(_, r)| *r);
             let r_2d = sweep_2d
                 .iter()
                 .min_by(|(wa, _), (wb, _)| {
                     ((*wa - w).abs()).partial_cmp(&((*wb - w).abs())).unwrap()
                 })
-                .map(|(_, r)| *r)
-                .unwrap_or(0.0);
+                .map_or(0.0, |(_, r)| *r);
             let regime_1d = if r_1d > midpoint {
                 "QS-active"
             } else {
@@ -215,7 +215,7 @@ fn main() {
             let (w1, r1) = sweep_2d[i];
             if (r0 > midpoint && r1 <= midpoint) || (r0 <= midpoint && r1 > midpoint) {
                 let t = (midpoint - r0) / (r1 - r0);
-                let w_c = w0 + t * (w1 - w0);
+                let w_c = t.mul_add(w1 - w0, w0);
                 j_c = Some((w_c - 0.5) / 14.5);
                 break;
             }

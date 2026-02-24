@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(deprecated)]
 //! Determinism tests: rerun identical inputs, expect bitwise-identical output
 //! via `to_bits()` equality.
 
@@ -158,8 +157,14 @@ fn full_16s_pipeline_deterministic_across_runs() {
         .unwrap();
 
     let run = || {
-        let fwd_reads = fastq::parse_fastq(&fwd_path).unwrap();
-        let rev_reads = fastq::parse_fastq(&rev_path).unwrap();
+        let fwd_reads: Vec<_> = fastq::FastqIter::open(&fwd_path)
+            .expect("open")
+            .collect::<Result<Vec<_>, _>>()
+            .expect("parse");
+        let rev_reads: Vec<_> = fastq::FastqIter::open(&rev_path)
+            .expect("open")
+            .collect::<Result<Vec<_>, _>>()
+            .expect("parse");
 
         let qparams = quality::QualityParams {
             min_length: 20,

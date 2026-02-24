@@ -31,7 +31,7 @@ use wetspring_barracuda::validation::Validator;
 struct LcgRng(u64);
 
 impl LcgRng {
-    fn new(seed: u64) -> Self {
+    const fn new(seed: u64) -> Self {
         Self(seed.wrapping_add(1))
     }
     fn next_f64(&mut self) -> f64 {
@@ -44,20 +44,15 @@ impl LcgRng {
     }
 }
 
-fn main() {
-    let mut v = Validator::new("Exp159: NMF Drug-Disease Matrix Factorization (Yang 2020)");
-
-    v.section("§1 Drug-Disease Matrix Construction");
-
+#[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+fn build_block_matrix(rng: &mut LcgRng) -> (Vec<f64>, usize) {
     let n_drugs = 200;
     let n_diseases = 100;
     let target_sparsity = 0.05;
-    let n_known = ((n_drugs * n_diseases) as f64 * target_sparsity) as usize;
+    let n_known =
+        (f64::from(u32::try_from(n_drugs * n_diseases).unwrap()) * target_sparsity) as usize;
 
-    let mut rng = LcgRng::new(42);
     let mut matrix = vec![0.0; n_drugs * n_diseases];
-
-    // Plant known associations with block structure (drugs in clusters)
     let n_clusters = 5;
     let drugs_per_cluster = n_drugs / n_clusters;
     let diseases_per_cluster = n_diseases / n_clusters;
@@ -66,8 +61,11 @@ fn main() {
         let drug_start = c * drugs_per_cluster;
         let disease_start = c * diseases_per_cluster;
         for _ in 0..(n_known / n_clusters) {
-            let d = drug_start + (rng.next_f64() * drugs_per_cluster as f64) as usize;
-            let dis = disease_start + (rng.next_f64() * diseases_per_cluster as f64) as usize;
+            let d = drug_start
+                + (rng.next_f64() * f64::from(u32::try_from(drugs_per_cluster).unwrap())) as usize;
+            let dis = disease_start
+                + (rng.next_f64() * f64::from(u32::try_from(diseases_per_cluster).unwrap()))
+                    as usize;
             if d < n_drugs && dis < n_diseases {
                 matrix[d * n_diseases + dis] = 1.0;
             }
@@ -75,8 +73,15 @@ fn main() {
     }
 
     let actual_nonzero = matrix.iter().filter(|&&x| x > 0.0).count();
+    (matrix, actual_nonzero)
+}
+
+fn validate_matrix_construction(v: &mut Validator, actual_nonzero: usize) -> f64 {
+    let n_drugs: usize = 200;
+    let n_diseases: usize = 100;
+
     let actual_sparsity = actual_nonzero as f64 / (n_drugs * n_diseases) as f64;
-    println!("  Matrix: {} drugs × {} diseases", n_drugs, n_diseases);
+    println!("  Matrix: {n_drugs} drugs × {n_diseases} diseases");
     println!("  Known associations: {actual_nonzero}");
     println!("  Fill rate: {:.1}%", actual_sparsity * 100.0);
 
@@ -84,29 +89,18 @@ fn main() {
         "matrix sparsity in [1%, 10%]",
         (0.01..=0.10).contains(&actual_sparsity),
     );
+    actual_sparsity
+}
 
-    v.section("§2 Train/Test Split");
-
-    let mut test_pairs: Vec<(usize, usize)> = Vec::new();
-    let mut train_matrix = matrix.clone();
-    let test_frac = 0.2;
-    let n_test = ((actual_nonzero as f64) * test_frac) as usize;
-
-    let positives: Vec<(usize, usize)> = (0..n_drugs)
-        .flat_map(|d| (0..n_diseases).map(move |dis| (d, dis)))
-        .filter(|&(d, dis)| matrix[d * n_diseases + dis] > 0.0)
-        .collect();
-
-    // Deterministic test set: last n_test positives
-    for &(d, dis) in positives.iter().rev().take(n_test) {
-        test_pairs.push((d, dis));
-        train_matrix[d * n_diseases + dis] = 0.0;
-    }
-
-    println!("  Training associations: {}", actual_nonzero - n_test);
-    println!("  Test associations: {}", test_pairs.len());
-
-    v.check_pass("test set has expected size", test_pairs.len() == n_test);
+fn validate_factorisation(
+    v: &mut Validator,
+    train_matrix: &[f64],
+    test_pairs: &[(usize, usize)],
+    n_test: usize,
+    actual_sparsity: f64,
+) {
+    let n_drugs = 200;
+    let n_diseases = 100;
 
     v.section("§3 NMF Factorisation");
 
@@ -122,8 +116,8 @@ fn main() {
             objective: NmfObjective::Euclidean,
             seed: 42,
         };
-        let result = nmf::nmf(&train_matrix, n_drugs, n_diseases, &config);
-        let rel_err = nmf::relative_reconstruction_error(&train_matrix, &result);
+        let result = nmf::nmf(train_matrix, n_drugs, n_diseases, &config);
+        let rel_err = nmf::relative_reconstruction_error(train_matrix, &result);
 
         let top_k_preds = nmf::top_k_predictions(&result, n_test * 5);
         let novel_preds: Vec<(usize, usize, f64)> = top_k_preds
@@ -159,10 +153,8 @@ fn main() {
     }
 
     println!("\n  Best rank: {best_rank} (rel_err = {best_err:.4})");
-
     v.check_pass("NMF converges for all ranks", true);
 
-    // Check: within-cluster reconstruction > cross-cluster reconstruction
     let config_best = NmfConfig {
         rank: best_rank.max(5),
         max_iter: 200,
@@ -170,13 +162,34 @@ fn main() {
         objective: NmfObjective::Euclidean,
         seed: 42,
     };
-    let result_best = nmf::nmf(&train_matrix, n_drugs, n_diseases, &config_best);
-    let rel_best = nmf::relative_reconstruction_error(&train_matrix, &result_best);
+    let result_best = nmf::nmf(train_matrix, n_drugs, n_diseases, &config_best);
+    let rel_best = nmf::relative_reconstruction_error(train_matrix, &result_best);
     println!("  Best-rank reconstruction error: {rel_best:.4}");
     v.check_pass(
         "NMF reconstruction error < 0.8 for best rank",
         rel_best < 0.8,
     );
+
+    validate_kl_and_sparsity(
+        v,
+        train_matrix,
+        test_pairs,
+        n_test,
+        best_rank,
+        actual_sparsity,
+    );
+}
+
+fn validate_kl_and_sparsity(
+    v: &mut Validator,
+    train_matrix: &[f64],
+    test_pairs: &[(usize, usize)],
+    n_test: usize,
+    best_rank: usize,
+    actual_sparsity: f64,
+) {
+    let n_drugs = 200;
+    let n_diseases = 100;
 
     v.section("§4 Euclidean vs KL Divergence Comparison");
 
@@ -187,7 +200,6 @@ fn main() {
         objective: NmfObjective::KlDivergence,
         seed: 42,
     };
-    // Add small epsilon to avoid log(0) in KL
     let train_kl: Vec<f64> = train_matrix.iter().map(|&x| x + 1e-10).collect();
     let result_kl = nmf::nmf(&train_kl, n_drugs, n_diseases, &config_kl);
 
@@ -222,7 +234,7 @@ fn main() {
         objective: NmfObjective::Euclidean,
         seed: 42,
     };
-    let result_best = nmf::nmf(&train_matrix, n_drugs, n_diseases, &config_best);
+    let result_best = nmf::nmf(train_matrix, n_drugs, n_diseases, &config_best);
 
     let w_sparsity =
         result_best.w.iter().filter(|&&x| x < 1e-8).count() as f64 / result_best.w.len() as f64;
@@ -262,6 +274,44 @@ fn main() {
         "GPU shader analysis documented for ToadStool absorption",
         true,
     );
+}
+
+fn main() {
+    let mut v = Validator::new("Exp159: NMF Drug-Disease Matrix Factorization (Yang 2020)");
+
+    let n_drugs = 200;
+    let n_diseases = 100;
+
+    v.section("§1 Drug-Disease Matrix Construction");
+
+    let mut rng = LcgRng::new(42);
+    let (matrix, actual_nonzero) = build_block_matrix(&mut rng);
+    let actual_sparsity = validate_matrix_construction(&mut v, actual_nonzero);
+
+    v.section("§2 Train/Test Split");
+
+    let mut test_pairs: Vec<(usize, usize)> = Vec::new();
+    let mut train_matrix = matrix.clone();
+    let test_frac = 0.2;
+    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+    let n_test = ((actual_nonzero as f64) * test_frac) as usize;
+
+    let positives: Vec<(usize, usize)> = (0..n_drugs)
+        .flat_map(|d| (0..n_diseases).map(move |dis| (d, dis)))
+        .filter(|&(d, dis)| matrix[d * n_diseases + dis] > 0.0)
+        .collect();
+
+    for &(d, dis) in positives.iter().rev().take(n_test) {
+        test_pairs.push((d, dis));
+        train_matrix[d * n_diseases + dis] = 0.0;
+    }
+
+    println!("  Training associations: {}", actual_nonzero - n_test);
+    println!("  Test associations: {}", test_pairs.len());
+
+    v.check_pass("test set has expected size", test_pairs.len() == n_test);
+
+    validate_factorisation(&mut v, &train_matrix, &test_pairs, n_test, actual_sparsity);
 
     v.finish();
 }

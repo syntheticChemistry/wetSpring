@@ -2,7 +2,7 @@
 
 **Date:** February 24, 2026
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**Status:** 30 ToadStool primitives consumed (Lean), 5 local WGSL ODE shaders **deleted** (replaced by `generate_shader()`), 5 GPU modules rewired to `BatchedOdeRK4<S>`, 42 GPU modules total, 0 Tier B/C remaining, 853 tests, 95.67% coverage
+**Status:** 37 ToadStool primitives consumed (31 Lean + 6 S54-S57 CPU), 5 local WGSL ODE shaders **deleted** (replaced by `generate_shader()`), 5 GPU modules rewired to `BatchedOdeRK4<S>`, 42 GPU modules total, 0 Tier B/C remaining, 881 tests (834 barracuda + 47 forge), 95.67% coverage, ToadStool S57 aligned
 
 ---
 
@@ -48,8 +48,8 @@ WGSL          known physics   handoffs/                        delete local
 | Compose | GPU wrappers wiring ToadStool primitives | **7 modules** (kmd, merge_pairs, RF, derep, NJ, reconciliation, molecular_clock) |
 | Passthrough | Accept GPU buffers, CPU kernel | **3 modules** (gbm, feature_table, signal) |
 | Validate | CPU ↔ GPU parity for all shaders | All 5 ODE: exact parity (Exp099/100/101) |
-| Hand off | wateringHole/handoffs/ documents | **v24** active (lean phase), v13–v17 archived |
-| Absorb | ToadStool integrates as `ops::bio::*` | **26 items** absorbed (ToadStool S52: all DONE) |
+| Hand off | wateringHole/handoffs/ documents | **v27** active (evolution review), v13–v26 archived |
+| Absorb | ToadStool integrates as `ops::bio::*` | **26 items** absorbed (ToadStool S57: all DONE, +46 cross-spring total) |
 | Lean | Rewire to upstream, delete local code | 27 primitives lean + 5 `OdeSystem` trait rewires |
 
 ---
@@ -185,7 +185,7 @@ Proposed: `[features] math = []` gates CPU-only modules without GPU stack.
 
 ## metalForge Forge Crate
 
-The `metalForge/forge/` crate (`wetspring-forge` v0.2.0) provides:
+The `metalForge/forge/` crate (`wetspring-forge` v0.3.0, 47 tests) provides:
 
 | Module | Purpose | Absorption Path |
 |--------|---------|-----------------|
@@ -199,23 +199,46 @@ integration point — substrate discovery feeds directly into device creation."
 
 ---
 
-## New Upstream Primitives Available (ToadStool Session 39)
+## New Upstream Primitives Available (ToadStool S54-S57)
 
-5 neuralSpring-evolved bio primitives are now absorbed and consumed by
-wetSpring (Exp094, 39 checks PASS). See "neuralSpring-evolved (5)" above.
+### S54 Primitives (neuralSpring baseCamp → ToadStool)
 
-### ToadStool ODE Status (Session 39)
+| Primitive | Module | Tests | Potential wetSpring Use |
+|-----------|--------|:-----:|------------------------|
+| `graph_laplacian` | `barracuda::linalg` | 3 | Community network analysis |
+| `effective_rank` | `barracuda::linalg` | 3 | Spectral diagnostics |
+| `numerical_hessian` | `barracuda::numerical` | 3 | Optimization landscape |
 
-`BatchedOdeRK4F64` exists in `ops::batched_ode_rk4` with the correct API
-shape (5 vars, 17 params, same as wetSpring). The `enable f64;` directive
-was removed from the WGSL shader (line 35 is now a comment). **However**,
-`batched_ode_rk4.rs:209` calls `compile_shader()` instead of
-`compile_shader_f64()`, which means the f64 preamble is not injected.
-Without this, the shader fails on naga/Vulkan backends.
+5 new WGSL shaders: `symmetrize.wgsl`, `laplacian.wgsl` (linalg),
+`hessian_column.wgsl` (numerical), `histogram.wgsl` (stats),
+`metropolis.wgsl` (sample).
 
-**Feedback for ToadStool**: change line 209 from `dev.compile_shader(...)` to
-`dev.compile_shader_f64(...)` (or use `ShaderTemplate::for_driver_auto`).
-Once fixed, wetSpring's `ode_sweep_gpu.rs` becomes a thin wrapper.
+GPU fixes from airSpring also landed: `pow_f64` fractional exponent,
+`acos_simple` → `acos_f64`, `FusedMapReduceF64` buffer conflict resolution.
+
+### S56 Primitives (neuralSpring → ToadStool)
+
+| Primitive | Module | Tests | Potential wetSpring Use |
+|-----------|--------|:-----:|------------------------|
+| `belief_propagation_chain` | `barracuda::linalg::graph` | 3 | Chain PGM forward pass |
+| `boltzmann_sampling` | `barracuda::sample::metropolis` | 3 | CPU MCMC sampling |
+| `disordered_laplacian` | `barracuda::linalg::graph` | 3 | Anderson disorder — **directly relevant to QS-disorder coupling** |
+
+### S57 Status
+
+4,224 core tests, 650+ WGSL shaders, 46 cross-spring absorption items
+complete. All root docs synced. 222 lines commented-out code removed.
+
+### wetSpring Consumption of S54-S56 Primitives (Exp162)
+
+| Primitive | Module | Session | wetSpring Use | Exp |
+|-----------|--------|---------|---------------|-----|
+| `graph_laplacian` | `barracuda::linalg` | S54 | Community network spectral analysis | 162 |
+| `effective_rank` | `barracuda::linalg` | S54 | Diversity matrix diagnostics | 162 |
+| `numerical_hessian` | `barracuda::numerical` | S54 | ML model curvature analysis | 162 |
+| `disordered_laplacian` | `barracuda::linalg` | S56 | QS-disorder coupling on community graphs | 162 |
+| `belief_propagation_chain` | `barracuda::linalg` | S56 | Hierarchical taxonomy classification | 162 |
+| `boltzmann_sampling` | `barracuda::sample` | S56 | MCMC parameter optimization | 162 |
 
 ---
 

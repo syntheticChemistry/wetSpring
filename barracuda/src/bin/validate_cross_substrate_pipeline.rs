@@ -62,12 +62,9 @@ struct StageLatency {
 }
 
 #[derive(Debug, Clone)]
-#[allow(dead_code)]
 struct SampleResult {
     shannon: f64,
     simpson: f64,
-    observed: f64,
-    variance: f64,
     classification: &'static str,
     classify_substrate: Substrate,
 }
@@ -255,13 +252,11 @@ async fn main() {
     };
 
     let mut sample_results: Vec<SampleResult> = Vec::with_capacity(N_SAMPLES);
-    for (i, &(shannon, simpson, observed)) in gpu_results.iter().enumerate() {
+    for &(shannon, simpson, _observed) in &gpu_results {
         let class = classify_by_diversity(shannon);
         sample_results.push(SampleResult {
             shannon,
             simpson,
-            observed,
-            variance: if i == 0 { gpu_variance } else { 0.0 },
             classification: class,
             classify_substrate,
         });

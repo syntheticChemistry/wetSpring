@@ -79,11 +79,28 @@ mod tests {
     use crate::bio::gbm::GbmTree;
 
     fn stump_positive() -> GbmTree {
-        GbmTree::from_arrays(&[0], &[0.5], &[-1], &[-1], &[0.3, -0.1]).unwrap()
+        // Node 0: split on feature 0 at 0.5, left=1 right=2
+        // Node 1: leaf 0.3 (feature 0 <= 0.5)
+        // Node 2: leaf -0.1 (feature 0 > 0.5)
+        GbmTree::from_arrays(
+            &[0, -1, -1],
+            &[0.5, 0.0, 0.0],
+            &[1, -1, -1],
+            &[2, -1, -1],
+            &[0.0, 0.3, -0.1],
+        )
+        .unwrap()
     }
 
     fn stump_feature1() -> GbmTree {
-        GbmTree::from_arrays(&[1], &[0.3], &[-1], &[-1], &[0.2, -0.2]).unwrap()
+        GbmTree::from_arrays(
+            &[1, -1, -1],
+            &[0.3, 0.0, 0.0],
+            &[1, -1, -1],
+            &[2, -1, -1],
+            &[0.0, 0.2, -0.2],
+        )
+        .unwrap()
     }
 
     #[test]

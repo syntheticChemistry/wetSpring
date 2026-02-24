@@ -542,4 +542,30 @@ mod tests {
         let w = taxonomy();
         assert_eq!(w.workload.preferred_substrate, Some(SubstrateKind::Npu));
     }
+
+    #[test]
+    fn fastq_parsing_is_cpu_only() {
+        let w = fastq_parsing();
+        assert!(w.is_cpu_only());
+        assert!(!w.is_local());
+        assert!(!w.is_absorbed());
+    }
+
+    #[test]
+    fn diversity_is_absorbed() {
+        let w = diversity();
+        assert!(w.is_absorbed());
+        assert!(!w.is_local());
+        assert!(!w.is_cpu_only());
+    }
+
+    #[test]
+    fn all_workloads_no_duplicate_names() {
+        let all = all_workloads();
+        let mut names: Vec<&str> = all.iter().map(|w| w.workload.name.as_str()).collect();
+        names.sort_unstable();
+        let before = names.len();
+        names.dedup();
+        assert_eq!(before, names.len(), "duplicate workload names found");
+    }
 }

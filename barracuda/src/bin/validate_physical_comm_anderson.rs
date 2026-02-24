@@ -110,9 +110,7 @@ const MODES: &[SignalMode] = &[
     },
 ];
 
-fn main() {
-    let mut v = Validator::new("Exp152: Physical Communication Pathways vs Anderson");
-
+fn validate_signal_catalog(v: &mut Validator) {
     v.section("§1 Signal Mode Catalog");
     println!(
         "  {:30} {:10} {:>8} {:>8} {:>8} {:8} {:10}",
@@ -139,7 +137,9 @@ fn main() {
     let non_anderson_count = MODES.iter().filter(|m| !m.anderson_applies).count();
     v.check_count("Anderson-susceptible modes", anderson_count, 6);
     v.check_count("Anderson-immune modes", non_anderson_count, 2);
+}
 
+fn validate_range_and_geometry(v: &mut Validator) {
     v.section("§2 Effective Range Analysis");
     let diffusive: Vec<&SignalMode> = MODES
         .iter()
@@ -151,8 +151,8 @@ fn main() {
         let cell_diameter = 1.0_f64;
         let l_eff = l_diff / cell_diameter;
         println!(
-            "  {}: L_diff = {:.0} µm, L_eff = {:.0} cells",
-            m.name, l_diff, l_eff
+            "  {}: L_diff = {l_diff:.0} µm, L_eff = {l_eff:.0} cells",
+            m.name
         );
     }
     v.check_pass(
@@ -194,7 +194,9 @@ fn main() {
 
     v.check_pass("3D dense has most modes (>= 6)", true);
     v.check_pass("planktonic has fewest modes (0)", true);
+}
 
+fn validate_density_and_disorder(v: &mut Validator) {
     v.section("§4 Critical Cell Density for Each Mode");
     let cell_vol_um3 = 1.0_f64;
     for m in MODES.iter().filter(|m| m.anderson_applies) {
@@ -207,8 +209,8 @@ fn main() {
             f64::INFINITY
         };
         println!(
-            "  {}: range = {:.0} µm, min ~{:.0} cells in sphere for QS",
-            m.name, range, min_cells
+            "  {}: range = {range:.0} µm, min ~{min_cells:.0} cells in sphere for QS",
+            m.name
         );
     }
     v.check_pass(
@@ -230,7 +232,7 @@ fn main() {
         } else {
             ("Localized", "0/6 (contact only)")
         };
-        println!("  {:>6.1} {:>12} {:>8}", w, pred, modes);
+        println!("  {w:>6.1} {pred:>12} {modes:>8}");
     }
     v.check_pass("W < W_c → extended (all diffusive modes work)", true);
     v.check_pass("W > W_c → localized (only contact modes work)", true);
@@ -247,6 +249,14 @@ fn main() {
         "8 signaling modes catalogued with Anderson classification",
         true,
     );
+}
+
+fn main() {
+    let mut v = Validator::new("Exp152: Physical Communication Pathways vs Anderson");
+
+    validate_signal_catalog(&mut v);
+    validate_range_and_geometry(&mut v);
+    validate_density_and_disorder(&mut v);
 
     v.finish();
 }

@@ -24,7 +24,7 @@
 //! | Data | Synthetic test vectors (self-contained) |
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, Pop!\_OS 22.04 |
 
-use barracuda::{GillespieConfig, GillespieGpu, SmithWatermanGpu, SwConfig};
+use barracuda::{FlatForest, GillespieConfig, GillespieGpu, SmithWatermanGpu, SwConfig, TreeInferenceGpu};
 use std::sync::Arc;
 use std::time::Instant;
 use wetspring_barracuda::bio::decision_tree::DecisionTree;
@@ -512,7 +512,6 @@ fn validate_decision_tree(
     timings: &mut Vec<Timing>,
 ) {
     v.section("D11: Decision Tree");
-    use barracuda::{FlatForest, TreeInferenceGpu};
     let cpu_tree = DecisionTree::from_arrays(
         &[0, -1, -1],
         &[5.0, 0.0, 0.0],

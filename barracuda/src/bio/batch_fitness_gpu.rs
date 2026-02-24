@@ -96,6 +96,7 @@ mod tests {
     use crate::tolerances;
 
     #[tokio::test]
+    #[ignore = "requires GPU hardware"]
     async fn batch_fitness_dot_product() {
         let Ok(gpu) = GpuF64::new().await else { return };
         let device = gpu.to_wgpu_device();

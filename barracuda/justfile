@@ -51,7 +51,7 @@ check-gpu:
 clippy-gpu:
     cargo clippy --features gpu --all-targets -- -D warnings
 
-# Run CPU validation binaries (skip if data absent)
+# Run core CPU validation binaries (fast — no data download)
 validate-cpu:
     cargo run --release --bin validate_fastq; \
     cargo run --release --bin validate_diversity; \
@@ -59,15 +59,55 @@ validate-cpu:
     cargo run --release --bin validate_peaks; \
     cargo run --release --bin validate_pfas
 
+# Run self-contained CPU validations (no network, no large data)
+validate-cpu-selfcontained:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    bins=(validate_multi_signal validate_bistable validate_capacitor \
+          validate_phage_defense validate_bootstrap validate_qs_ode \
+          validate_felsenstein validate_hmm \
+          validate_newick_parse validate_placement validate_phylohmm \
+          validate_dictyostelium_relay validate_nitrifying_qs \
+          validate_myxococcus_critical_density validate_marine_interkingdom_qs \
+          validate_physical_comm_anderson validate_knowledge_graph_embedding \
+          validate_nmf_drug_repurposing validate_repodb_nmf \
+          validate_fajgenbaum_pathway validate_matrix_pharmacophenomics \
+          validate_barracuda_cpu validate_barracuda_cpu_v2 \
+          validate_barracuda_cpu_v3 validate_barracuda_cpu_v4 \
+          validate_barracuda_cpu_v5 validate_barracuda_cpu_v6 \
+          validate_barracuda_cpu_v7 validate_barracuda_cpu_v8 \
+          validate_barracuda_cpu_full)
+    pass=0; fail=0; skip=0
+    for bin in "${bins[@]}"; do
+      printf "  %-50s " "$bin"
+      if cargo run --release --bin "$bin" > /tmp/ws_val_"$bin".log 2>&1; then
+        echo "PASS"; ((pass++))
+      else
+        code=$?
+        if [ $code -eq 77 ]; then echo "SKIP"; ((skip++))
+        else echo "FAIL (exit $code)"; ((fail++)); fi
+      fi
+    done
+    echo "──────────────────────────────────────────────────────────"
+    echo "  PASS: $pass  SKIP: $skip  FAIL: $fail"
+    [ "$fail" -eq 0 ]
+
 # Run GPU validation binaries
 validate-gpu:
     cargo run --release --features gpu --bin validate_diversity_gpu
     cargo run --release --features gpu --bin validate_16s_pipeline_gpu
 
 # Full validation sweep
-validate: validate-cpu validate-gpu
+validate: validate-cpu validate-cpu-selfcontained validate-gpu
 
-# Regenerate Python baselines (requires numpy, scipy, asari, findpfas)
+# Regenerate Python baselines
+#
+# Python environment:
+#   pip install numpy scipy  (most scripts)
+#   QIIME2 (validate_exp001.py only — Galaxy container with qiime2-2026 conda env)
+#
+# All 42 scripts use only numpy/scipy + stdlib. The QIIME2 script
+# runs inside a Galaxy container and is not called by this recipe.
 regenerate-baselines:
     @echo "── Peak detection baselines (scipy) ──"
     python3 ../scripts/generate_peak_baselines.py
@@ -76,6 +116,27 @@ regenerate-baselines:
     @echo "── Track 2 baselines (asari + FindPFAS) ──"
     python3 ../scripts/validate_track2.py
     @echo "Baselines regenerated. Diff against experiments/results/ to detect drift."
+
+# Check for baseline drift: regenerate and diff against committed results
+check-drift:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    tmpdir=$(mktemp -d)
+    trap 'rm -rf "$tmpdir"' EXIT
+    echo "── Regenerating baselines to $tmpdir ──"
+    for script in ../scripts/generate_peak_baselines.py \
+                  ../scripts/benchmark_python_baseline.py; do
+      if [ -f "$script" ]; then
+        python3 "$script" --output-dir "$tmpdir" 2>/dev/null || true
+      fi
+    done
+    echo "── Diffing against committed results ──"
+    if [ -d "../experiments/results" ]; then
+      diff -rq "$tmpdir" "../experiments/results" && echo "No drift detected." || \
+        { echo "DRIFT DETECTED — review diff above."; exit 1; }
+    else
+      echo "No committed results/ directory to compare against."
+    fi
 
 # Clean build artifacts
 clean:

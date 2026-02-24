@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 24, 2026
-**Status**: Phase 39 — 3,132+/3,132+ checks, ALL PASS (849 tests, 161 experiments, 95.67% library coverage)
+**Status**: Phase 40 — 3,198+/3,198+ checks, ALL PASS (881 tests, 162 experiments, 95.67% library coverage)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -10,8 +10,8 @@
 
 | Metric | Value |
 |--------|-------|
-| CPU validation | 1,476/1,476 PASS — 46 modules, 161 experiments (GPU-confirmed Phase 39), 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted + NMF |
-| GPU validation | 702/702 PASS — 30 ToadStool primitives, 5 local WGSL, 80 streaming + 48 head-to-head + 28 metalForge v4 + 38 pure GPU |
+| CPU validation | 1,476/1,476 PASS — 47 modules, 162 experiments (GPU-confirmed Phase 40), 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted + NMF |
+| GPU validation | 702/702 PASS — 37 ToadStool primitives, 0 local WGSL, 80 streaming + 48 head-to-head + 28 metalForge v4 + 38 pure GPU |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 380/380 — 22.5x Rust speedup over Python (v1–v8) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/101) — pure GPU math proven |
@@ -20,15 +20,15 @@
 | Cross-spring spectral | 25 checks — Anderson localization + QS-disorder analogy (Exp107) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
-| Rust modules | 45 CPU + 42 GPU, 845 tests (95.67% library coverage, llvm-cov) |
-| Write phase | 5 local WGSL ODE shaders **deleted** — GPU modules use `generate_shader()` from `OdeSystem` trait impls |
-| Dependencies | 1 runtime (flate2), everything else sovereign |
-| Paper queue | **ALL DONE** — 29/29 reproducible papers complete (Track 1c added) |
+| Rust modules | 47 CPU + 42 GPU, 881 tests (95.67% library coverage, llvm-cov) |
+| Write phase | 0 local WGSL — GPU modules use `generate_shader()` from `OdeSystem` trait impls |
+| Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
+| Paper queue | **ALL DONE** — 43/43 reproducible papers complete (Track 1c + Track 3 + Phase 37 extensions) |
 | Faculty (Track 1) | Waters (MMG, MSU), Cahill (Sandia), Smallwood (Sandia) |
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
 | Faculty (Track 1c) | R. Anderson (Carleton) — deep-sea metagenomics, population genomics |
 | Faculty (Track 2) | Jones (BMB/Chemistry, MSU) — PFAS mass spectrometry |
-| Handoffs | Twenty-five delivered (v1–v6, rewire, cross-spring, v7–v25) |
+| Handoffs | Twenty-nine delivered (v1–v6, rewire, cross-spring, v7–v29) |
 
 ---
 
@@ -38,7 +38,7 @@ Every paper in the queue goes through the full evolution path. Status:
 
 | Stage | What It Proves | Status |
 |-------|---------------|--------|
-| **Python baseline** | Algorithm correctness against published tools | 41 scripts, all reproducible |
+| **Python baseline** | Algorithm correctness against published tools | 42 scripts, all reproducible |
 | **BarraCuda CPU** | Pure Rust math matches Python | 1,476 checks, 380/380 cross-domain parity (v1–v8) |
 | **BarraCuda GPU** | GPU produces same answer as CPU | 702 checks, 29 GPU domains |
 | **Pure GPU streaming** | Zero CPU round-trips, data stays on-device | 152 checks, 10+ domains, 441-837× over round-trip (Exp090/105/106) |
@@ -105,17 +105,17 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 
 | Spec | Status | Description |
 |------|--------|-------------|
-| [PAPER_REVIEW_QUEUE.md](PAPER_REVIEW_QUEUE.md) | Complete | 29/29 papers reproduced across 3 tracks |
+| [PAPER_REVIEW_QUEUE.md](PAPER_REVIEW_QUEUE.md) | Complete | 43/43 papers reproduced across 4 tracks + cross-spring |
 | [BARRACUDA_REQUIREMENTS.md](BARRACUDA_REQUIREMENTS.md) | Active | GPU kernel requirements and gap analysis |
 
 ### Existing Documentation (in parent directories)
 
 | Document | Location | Description |
 |----------|----------|-------------|
-| CONTROL_EXPERIMENT_STATUS.md | `../` | 161 experiments, 3,132+ validation checks |
+| CONTROL_EXPERIMENT_STATUS.md | `../` | 162 experiments, 3,198+ validation checks, 881 tests |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
-| Handoff (v25) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V25_FINITE_SIZE_FEB24_2026.md` | Current ToadStool handoff |
+| Handoff (v29) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V29_EVOLUTION_HANDOFF_FEB24_2026.md` | Current ToadStool handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |
@@ -131,7 +131,8 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 - **Microbial ecology** — Alpha/beta diversity, PCoA, rarefaction
 - **Deep-sea metagenomics** — ANI, SNP, dN/dS, molecular clock, pangenomics
 - **ML inference** — Decision tree, Random Forest, GBM (all sovereign, no Python)
-- **Sovereign Rust bioinformatics** — 45 CPU + 42 GPU modules, 1 runtime dependency
+- **Drug repurposing** — NMF, knowledge graph embeddings, pharmacophenomics (Track 3)
+- **Sovereign Rust bioinformatics** — 47 CPU + 42 GPU modules, 2 runtime dependencies (flate2 + bytemuck)
 
 ### wetSpring IS NOT:
 - Sensor noise analysis (groundSpring)
@@ -159,7 +160,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 `../whitePaper/STUDY.md` → `../CONTROL_EXPERIMENT_STATUS.md` → `../barracuda/EVOLUTION_READINESS.md` → BARRACUDA_REQUIREMENTS.md
 
 **Integration partner**:
-`../../wateringHole/handoffs/WETSPRING_TOADSTOOL_V24_LEAN_FEB24_2026.md` → `../BENCHMARK_RESULTS.md`
+`../../wateringHole/handoffs/WETSPRING_TOADSTOOL_V29_EVOLUTION_HANDOFF_FEB24_2026.md` → `../BENCHMARK_RESULTS.md`
 
 ---
 

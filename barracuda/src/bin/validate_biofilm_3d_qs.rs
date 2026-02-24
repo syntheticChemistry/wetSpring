@@ -29,6 +29,7 @@ const W_MIN: f64 = 0.5;
 const W_MAX: f64 = 20.0;
 
 #[cfg(feature = "gpu")]
+#[allow(clippy::cast_precision_loss)] // usize→f64 for sweep index; N_SWEEP small, intentional
 fn sweep_w(i: usize) -> f64 {
     W_MIN + (i as f64) * (W_MAX - W_MIN) / (N_SWEEP - 1) as f64
 }
@@ -43,7 +44,7 @@ fn find_j_c(sweep: &[(f64, f64)], midpoint: f64) -> Option<f64> {
         let (w1, r1) = sweep[i];
         if r0 > midpoint && r1 <= midpoint {
             let t = (midpoint - r0) / (r1 - r0);
-            let w_c = w0 + t * (w1 - w0);
+            let w_c = t.mul_add(w1 - w0, w0);
             last_crossing = Some((w_c - 0.5) / 14.5);
         }
     }
@@ -64,7 +65,7 @@ fn main() {
 
     #[cfg(feature = "gpu")]
     {
-        let midpoint = (GOE_R + POISSON_R) / 2.0;
+        let midpoint = f64::midpoint(GOE_R, POISSON_R);
 
         v.section("── S1: 2D slab sweep (20×20) ──");
         let l2d = 20;
@@ -119,7 +120,6 @@ fn main() {
         }
         let hierarchy = match (j_c_2d, j_c_3d) {
             (Some(j2), Some(j3)) => j3 > j2,
-            (Some(_), None) => true,
             _ => true,
         };
         v.check_pass(
@@ -136,13 +136,11 @@ fn main() {
             let r_2d = sweep_2d
                 .iter()
                 .min_by(|(wa, _), (wb, _)| (wa - w).abs().partial_cmp(&(wb - w).abs()).unwrap())
-                .map(|(_, r)| *r)
-                .unwrap_or(0.0);
+                .map_or(0.0, |(_, r)| *r);
             let r_3d = sweep_3d
                 .iter()
                 .min_by(|(wa, _), (wb, _)| (wa - w).abs().partial_cmp(&(wb - w).abs()).unwrap())
-                .map(|(_, r)| *r)
-                .unwrap_or(0.0);
+                .map_or(0.0, |(_, r)| *r);
             let reg_2d = if r_2d > midpoint {
                 "ACTIVE"
             } else {

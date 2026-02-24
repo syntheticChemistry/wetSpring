@@ -1,5 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::expect_used, clippy::unwrap_used, clippy::print_stdout)]
+#![allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::print_stdout,
+    clippy::cast_precision_loss,
+    clippy::too_many_lines
+)]
 //! # Exp112: Real-Bloom GPU Surveillance at Scale
 //!
 //! Validates bloom detection pipeline on GPU using realistic multi-ecosystem
@@ -40,7 +46,7 @@ fn generate_ecosystem(
             rng_state = rng_state
                 .wrapping_mul(6_364_136_223_846_793_005)
                 .wrapping_add(1);
-            let base = ((rng_state >> 33) as f64) / (u32::MAX as f64) * 50.0 + 5.0;
+            let base = (((rng_state >> 33) as f64) / f64::from(u32::MAX)).mul_add(50.0, 5.0);
             if t >= bloom_start && t < bloom_end {
                 // During bloom: single species dominates
                 if s == 0 {
@@ -63,7 +69,7 @@ fn dominance_index(counts: &[f64]) -> f64 {
     if total == 0.0 {
         return 0.0;
     }
-    counts.iter().cloned().fold(0.0_f64, f64::max) / total
+    counts.iter().copied().fold(0.0_f64, f64::max) / total
 }
 
 fn main() {
@@ -113,16 +119,13 @@ fn main() {
             .sum::<f64>()
             / shannon_series.len() as f64;
         let sigma_h = var_h.sqrt();
-        let threshold = mean_h - 2.0 * sigma_h;
+        let threshold = 2.0f64.mul_add(-sigma_h, mean_h);
 
-        let bloom_detected: Vec<usize> = shannon_series
+        let bloom_count = shannon_series
             .iter()
             .enumerate()
             .filter(|(_, h)| **h < threshold)
-            .map(|(i, _)| i)
-            .collect();
-
-        let bloom_count = bloom_detected.len();
+            .count();
         let has_bloom = bloom_count > 0;
 
         println!(
@@ -130,19 +133,19 @@ fn main() {
         );
         println!(
             "    Shannon range: {:.3} – {:.3}",
-            shannon_series.iter().cloned().fold(f64::INFINITY, f64::min),
+            shannon_series.iter().copied().fold(f64::INFINITY, f64::min),
             shannon_series
                 .iter()
-                .cloned()
+                .copied()
                 .fold(f64::NEG_INFINITY, f64::max)
         );
         println!(
             "    Max dominance during bloom: {:.4}",
-            dominance_series.iter().cloned().fold(0.0_f64, f64::max)
+            dominance_series.iter().copied().fold(0.0_f64, f64::max)
         );
         println!(
             "    Max BC shift: {:.4}",
-            bc_series.iter().cloned().fold(0.0_f64, f64::max)
+            bc_series.iter().copied().fold(0.0_f64, f64::max)
         );
 
         v.check_count(&format!("{name} bloom detected"), usize::from(has_bloom), 1);
@@ -251,7 +254,8 @@ fn main() {
         ("Florida", &florida, 120, 160),
     ] {
         let pre_bloom_h = diversity::shannon(&eco[bloom_start.saturating_sub(5)]);
-        let mid_bloom_h = diversity::shannon(&eco[(bloom_start + bloom_end) / 2]);
+        let mid_bloom_h =
+            diversity::shannon(&eco[usize::midpoint(bloom_start, bloom_end)]);
         let post_bloom_h = diversity::shannon(&eco[(bloom_end + 5).min(eco.len() - 1)]);
 
         let drop_ratio = mid_bloom_h / pre_bloom_h;
@@ -265,7 +269,7 @@ fn main() {
             1,
         );
 
-        let mid_dom = dominance_index(&eco[(bloom_start + bloom_end) / 2]);
+        let mid_dom = dominance_index(&eco[usize::midpoint(bloom_start, bloom_end)]);
         v.check_count(
             &format!("{name} bloom dominance > 0.5"),
             usize::from(mid_dom > 0.5),

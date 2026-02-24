@@ -14,7 +14,7 @@
 //! drug-disease-pathway relationships, inspired by ROBOKOP
 //! (Paper 43). Uses a simplified TransE-style embedding.
 //!
-//! TransE: h + r ≈ t for each triple (head, relation, tail).
+//! `TransE`: h + r ≈ t for each triple (head, relation, tail).
 //! The score for a triple is -‖h + r - t‖.
 //! Higher scores indicate more plausible relationships.
 //!
@@ -31,7 +31,7 @@ use wetspring_barracuda::validation::Validator;
 struct LcgRng(u64);
 
 impl LcgRng {
-    fn new(seed: u64) -> Self {
+    const fn new(seed: u64) -> Self {
         Self(seed.wrapping_add(1))
     }
     fn next_f64(&mut self) -> f64 {
@@ -60,10 +60,10 @@ impl KgEmbedding {
         let mut relation_embeddings = vec![0.0; n_relations * EMBED_DIM];
 
         for e in &mut entity_embeddings {
-            *e = rng.next_f64() * 0.2 - 0.1;
+            *e = rng.next_f64().mul_add(0.2, -0.1);
         }
         for r in &mut relation_embeddings {
-            *r = rng.next_f64() * 0.2 - 0.1;
+            *r = rng.next_f64().mul_add(0.2, -0.1);
         }
 
         // Normalise entity embeddings
@@ -152,123 +152,72 @@ impl KgEmbedding {
     }
 }
 
-fn main() {
-    let mut v = Validator::new("Exp161: Knowledge Graph Embedding Baseline (ROBOKOP)");
+const N_DRUGS: usize = 100;
+const N_DISEASES: usize = 100;
+const N_GENES: usize = 100;
+const N_PATHWAYS: usize = 10;
+const N_ENTITIES: usize = N_DRUGS + N_DISEASES + N_GENES + N_PATHWAYS;
+const N_RELATIONS: usize = 4;
 
-    v.section("§1 Knowledge Graph Structure");
-
-    // Entities: drugs (0..99), diseases (100..199), genes (200..299), pathways (300..309)
-    let n_drugs = 100;
-    let n_diseases = 100;
-    let n_genes = 100;
-    let n_pathways = 10;
-    let n_entities = n_drugs + n_diseases + n_genes + n_pathways;
-
-    // Relations: treats(0), targets(1), associated_with(2), part_of(3)
-    let n_relations = 4;
-
-    println!(
-        "  Entities: {} (drugs={}, diseases={}, genes={}, pathways={})",
-        n_entities, n_drugs, n_diseases, n_genes, n_pathways
-    );
-    println!(
-        "  Relations: {} (treats, targets, associated_with, part_of)",
-        n_relations
-    );
-
-    v.check_count("total entities", n_entities, 310);
-
-    v.section("§2 Triple Generation (Synthetic Biomedical KG)");
-
-    let mut rng = LcgRng::new(42);
+#[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+fn generate_triples(rng: &mut LcgRng) -> Vec<(usize, usize, usize)> {
     let mut triples: Vec<(usize, usize, usize)> = Vec::new();
 
-    // drug → treats → disease (5 per drug cluster)
-    let drug_cluster_size = n_drugs / 10;
-    let disease_cluster_size = n_diseases / 10;
+    let drug_cluster_size = N_DRUGS / 10;
+    let disease_cluster_size = N_DISEASES / 10;
     for cluster in 0..10 {
         for i in 0..drug_cluster_size {
             let drug = cluster * drug_cluster_size + i;
             let disease = 100
                 + cluster * disease_cluster_size
                 + (rng.next_f64() * disease_cluster_size as f64) as usize % disease_cluster_size;
-            triples.push((drug, 0, disease)); // treats
+            triples.push((drug, 0, disease));
         }
     }
 
-    // drug → targets → gene
-    for d in 0..n_drugs {
+    for d in 0..N_DRUGS {
         let n_targets = 1 + (rng.next_f64() * 3.0) as usize;
         for _ in 0..n_targets {
-            let gene = 200 + (rng.next_f64() * n_genes as f64) as usize % n_genes;
-            triples.push((d, 1, gene)); // targets
+            let gene = 200 + (rng.next_f64() * N_GENES as f64) as usize % N_GENES;
+            triples.push((d, 1, gene));
         }
     }
 
-    // gene → associated_with → disease
-    for g in 0..n_genes {
+    for g in 0..N_GENES {
         let n_assoc = 1 + (rng.next_f64() * 2.0) as usize;
         for _ in 0..n_assoc {
-            let disease = 100 + (rng.next_f64() * n_diseases as f64) as usize % n_diseases;
-            triples.push((200 + g, 2, disease)); // associated_with
+            let disease = 100 + (rng.next_f64() * N_DISEASES as f64) as usize % N_DISEASES;
+            triples.push((200 + g, 2, disease));
         }
     }
 
-    // gene → part_of → pathway
-    for g in 0..n_genes {
-        let pathway = 300 + (g % n_pathways);
-        triples.push((200 + g, 3, pathway)); // part_of
+    for g in 0..N_GENES {
+        let pathway = 300 + (g % N_PATHWAYS);
+        triples.push((200 + g, 3, pathway));
     }
 
-    println!("  Total triples: {}", triples.len());
-    let treats_count = triples.iter().filter(|t| t.1 == 0).count();
-    let targets_count = triples.iter().filter(|t| t.1 == 1).count();
-    let assoc_count = triples.iter().filter(|t| t.1 == 2).count();
-    let partof_count = triples.iter().filter(|t| t.1 == 3).count();
-    println!(
-        "  treats: {treats_count}, targets: {targets_count}, associated_with: {assoc_count}, part_of: {partof_count}"
-    );
+    triples
+}
 
-    v.check_pass("KG has > 300 triples", triples.len() > 300);
-
-    v.section("§3 TransE Training");
-
-    let mut kg = KgEmbedding::new(n_entities, n_relations, 42);
-
-    let n_epochs = 50;
-    let lr = 0.01;
-    let margin = 1.0;
-
-    let mut losses = Vec::new();
-    for epoch in 0..n_epochs {
-        let loss = kg.train_step(&triples, lr, margin, &mut rng);
-        if epoch % 10 == 0 || epoch == n_epochs - 1 {
-            println!("  Epoch {epoch}: avg loss = {loss:.4}");
-        }
-        losses.push(loss);
-    }
-
-    v.check_pass(
-        "training loss decreases",
-        losses.last().unwrap() < &losses[0],
-    );
-
+fn validate_link_prediction(
+    v: &mut Validator,
+    kg: &KgEmbedding,
+    triples: &[(usize, usize, usize)],
+) {
     v.section("§4 Link Prediction Evaluation");
 
-    // Hold out some treats triples
     let treats_triples: Vec<(usize, usize, usize)> =
         triples.iter().filter(|t| t.1 == 0).copied().collect();
     let n_eval = treats_triples.len().min(50);
     let eval_triples = &treats_triples[..n_eval];
 
-    let mut hits_at_10 = 0;
+    let mut hits_at_10: i32 = 0;
     let mut mean_rank = 0.0;
 
     for &(h, r, t) in eval_triples {
         let true_score = kg.score(h, r, t);
         let mut rank = 1_usize;
-        // Compare against random diseases
-        for dis in 100..100 + n_diseases {
+        for dis in 100..100 + N_DISEASES {
             if dis != t && kg.score(h, r, dis) > true_score {
                 rank += 1;
             }
@@ -279,7 +228,7 @@ fn main() {
         mean_rank += rank as f64;
     }
 
-    let hits10_pct = hits_at_10 as f64 / n_eval as f64;
+    let hits10_pct = f64::from(hits_at_10) / n_eval as f64;
     mean_rank /= n_eval as f64;
 
     println!(
@@ -293,6 +242,14 @@ fn main() {
         hits10_pct > 0.05,
     );
 
+    validate_novel_predictions(v, kg, &treats_triples);
+}
+
+fn validate_novel_predictions(
+    v: &mut Validator,
+    kg: &KgEmbedding,
+    treats_triples: &[(usize, usize, usize)],
+) {
     v.section("§5 Drug Repurposing via KG Paths");
 
     println!("\n  The ROBOKOP approach finds drug-disease connections via paths:");
@@ -300,13 +257,12 @@ fn main() {
     println!("  This 2-hop path corresponds to the Fajgenbaum pathway logic:");
     println!("  Sirolimus → targets → mTOR → part_of → PI3K/AKT/mTOR → activated_in → iMCD");
 
-    // Find novel drug-disease predictions via embedding
     let mut novel_predictions: Vec<(usize, usize, f64)> = Vec::new();
     let known_treats: std::collections::HashSet<(usize, usize)> =
         treats_triples.iter().map(|&(h, _, t)| (h, t)).collect();
 
-    for d in 0..n_drugs.min(20) {
-        for dis in 100..100 + n_diseases.min(20) {
+    for d in 0..N_DRUGS.min(20) {
+        for dis in 100..100 + N_DISEASES.min(20) {
             if !known_treats.contains(&(d, dis)) {
                 let score = kg.score(d, 0, dis);
                 novel_predictions.push((d, dis, score));
@@ -318,11 +274,15 @@ fn main() {
     println!("\n  Top 5 novel drug-disease predictions:");
     println!("  {:>6} {:>8} {:>10}", "Drug", "Disease", "Score");
     for (d, dis, s) in novel_predictions.iter().take(5) {
-        println!("  {:>6} {:>8} {:>10.4}", d, dis, s);
+        println!("  {d:>6} {dis:>8} {s:>10.4}");
     }
 
     v.check_pass("novel predictions generated", !novel_predictions.is_empty());
 
+    validate_roadmap(v);
+}
+
+fn validate_roadmap(v: &mut Validator) {
     v.section("§6 ROBOKOP Integration Roadmap");
 
     println!("\n  Integration with real ROBOKOP data:");
@@ -355,6 +315,60 @@ fn main() {
     println!("  All validated with open data / synthetic data matching published dimensions.");
 
     v.check_pass("cross-paper validation chain complete", true);
+}
+
+fn main() {
+    let mut v = Validator::new("Exp161: Knowledge Graph Embedding Baseline (ROBOKOP)");
+
+    v.section("§1 Knowledge Graph Structure");
+
+    println!(
+        "  Entities: {N_ENTITIES} (drugs={N_DRUGS}, diseases={N_DISEASES}, genes={N_GENES}, pathways={N_PATHWAYS})"
+    );
+    println!("  Relations: {N_RELATIONS} (treats, targets, associated_with, part_of)");
+
+    v.check_count("total entities", N_ENTITIES, 310);
+
+    v.section("§2 Triple Generation (Synthetic Biomedical KG)");
+
+    let mut rng = LcgRng::new(42);
+    let triples = generate_triples(&mut rng);
+
+    let n_triples = triples.len();
+    println!("  Total triples: {n_triples}");
+    let treats_count = triples.iter().filter(|t| t.1 == 0).count();
+    let targets_count = triples.iter().filter(|t| t.1 == 1).count();
+    let assoc_count = triples.iter().filter(|t| t.1 == 2).count();
+    let partof_count = triples.iter().filter(|t| t.1 == 3).count();
+    println!(
+        "  treats: {treats_count}, targets: {targets_count}, associated_with: {assoc_count}, part_of: {partof_count}"
+    );
+
+    v.check_pass("KG has > 300 triples", triples.len() > 300);
+
+    v.section("§3 TransE Training");
+
+    let mut kg = KgEmbedding::new(N_ENTITIES, N_RELATIONS, 42);
+
+    let n_epochs = 50;
+    let lr = 0.01;
+    let margin = 1.0;
+
+    let mut losses = Vec::new();
+    for epoch in 0..n_epochs {
+        let loss = kg.train_step(&triples, lr, margin, &mut rng);
+        if epoch % 10 == 0 || epoch == n_epochs - 1 {
+            println!("  Epoch {epoch}: avg loss = {loss:.4}");
+        }
+        losses.push(loss);
+    }
+
+    v.check_pass(
+        "training loss decreases",
+        losses.last().unwrap() < &losses[0],
+    );
+
+    validate_link_prediction(&mut v, &kg, &triples);
 
     v.finish();
 }

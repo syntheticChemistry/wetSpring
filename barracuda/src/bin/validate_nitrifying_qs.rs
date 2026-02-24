@@ -76,11 +76,8 @@ fn main() {
     );
     println!("  {:-<40} {:-<12} {:-<5} {:-<5} {:-<6}", "", "", "", "", "");
     for (hab, geom, luxi, luxr) in &habitats {
-        let ratio = *luxr as f64 / (*luxi).max(1) as f64;
-        println!(
-            "  {:40} {:12} {:>5} {:>5} {:>5.1}:1",
-            hab, geom, luxi, luxr, ratio
-        );
+        let ratio = f64::from(*luxr) / f64::from((*luxi).max(1));
+        println!("  {hab:40} {geom:12} {luxi:>5} {luxr:>5} {ratio:>5.1}:1");
     }
 
     let sludge_rp = 30.0 / 13.0;

@@ -87,6 +87,7 @@ mod tests {
     use crate::tolerances;
 
     #[tokio::test]
+    #[ignore = "requires GPU hardware"]
     async fn locus_variance_uniform_is_zero() {
         let Ok(gpu) = GpuF64::new().await else { return };
         let device = gpu.to_wgpu_device();

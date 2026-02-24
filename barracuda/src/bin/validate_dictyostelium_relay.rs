@@ -76,17 +76,14 @@ fn main() {
     );
     println!("  {:-<6} {:-<12} {:-<14} {:-<14}", "", "", "", "");
     for &n in &n_hops {
-        let range = n as f64 * relay_range_um;
+        let range = f64::from(n) * relay_range_um;
         let total_gain = relay_gain.powi(n);
         let pred = if total_gain > 1.0 {
             "Extended (relay)"
         } else {
             "Localized"
         };
-        println!(
-            "  {:>6} {:>12.0} {:>14.0e} {:>14}",
-            n, range, total_gain, pred
-        );
+        println!("  {n:>6} {range:>12.0} {total_gain:>14.0e} {pred:>14}");
     }
 
     v.check_pass(

@@ -3,7 +3,11 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
-    dead_code
+    dead_code,
+    clippy::similar_names,
+    clippy::too_many_lines,
+    clippy::items_after_statements,
+    clippy::no_effect_underscore_binding
 )]
 //! # Exp139: QS Distance Scaling — Bacteria Shouting vs Human Shouting
 //!
@@ -28,7 +32,6 @@ use barracuda::spectral::{
     GOE_R, POISSON_R, anderson_2d, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 
-#[allow(clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp139: QS Distance Scaling — Bacteria vs Humans");
 
@@ -221,7 +224,7 @@ fn main() {
     v.section("── S5: Anderson prediction — geometry limits range ──");
     #[cfg(feature = "gpu")]
     {
-        let midpoint = (GOE_R + POISSON_R) / 2.0;
+        let midpoint = f64::midpoint(GOE_R, POISSON_R);
         let w_typical = 13.0;
 
         // In Anderson terms, "range" = localization length ξ
@@ -256,7 +259,7 @@ fn main() {
             } else {
                 "LOCALIZED (limited)".to_string()
             };
-            println!("  {:>5} {:>6} {:>8.4} {:>20}", l, n, r, reaches);
+            println!("  {l:>5} {n:>6} {r:>8.4} {reaches:>20}");
         }
 
         println!();
@@ -271,11 +274,11 @@ fn main() {
             let tri = lanczos(&mat, n, 42);
             let r = level_spacing_ratio(&lanczos_eigenvalues(&tri));
             let reaches = if r > midpoint {
-                format!("all {} cells", n)
+                format!("all {n} cells")
             } else {
                 "LOCALIZED (limited)".to_string()
             };
-            println!("  {:>5} {:>6} {:>8.4} {:>20}", l, n, r, reaches);
+            println!("  {l:>5} {n:>6} {r:>8.4} {reaches:>20}");
         }
 
         println!();

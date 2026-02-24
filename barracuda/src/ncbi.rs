@@ -28,6 +28,8 @@
 
 use std::path::{Path, PathBuf};
 
+const ENTREZ_BASE: &str = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
+
 /// Resolve the NCBI API key from environment or well-known TOML files.
 ///
 /// Search order:
@@ -108,12 +110,13 @@ fn encode_entrez_term(term: &str) -> String {
 /// `<Count>` element, or the count cannot be parsed as `u64`.
 pub fn esearch_count(db: &str, term: &str, api_key: &str) -> Result<u64, String> {
     let encoded = encode_entrez_term(term);
-    let url = format!(
-        "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?\
-         db={db}&term={encoded}&rettype=count&api_key={api_key}"
-    );
+    let url = format!("{ENTREZ_BASE}?db={db}&term={encoded}&rettype=count&api_key={api_key}");
     let body = http_get(&url)?;
+    parse_esearch_count(&body)
+}
 
+/// Parse `<Count>...</Count>` from an Entrez E-search XML response body.
+fn parse_esearch_count(body: &str) -> Result<u64, String> {
     if let Some(start) = body.find("<Count>") {
         let rest = &body[start + 7..];
         if let Some(end) = rest.find("</Count>") {
@@ -122,7 +125,7 @@ pub fn esearch_count(db: &str, term: &str, api_key: &str) -> Result<u64, String>
     }
     Err(format!(
         "no <Count> in response: {}",
-        &body[..body.len().min(200)]
+        &body[..body.len().min(crate::tolerances::ERROR_BODY_PREVIEW_LEN)]
     ))
 }
 
@@ -240,5 +243,53 @@ mod tests {
     fn http_get_localhost_refused() {
         let result = http_get("http://127.0.0.1:1/nonexistent");
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn parse_esearch_count_valid() {
+        let xml = r#"<?xml version="1.0"?>
+<eSearchResult><Count>42</Count><RetMax>0</RetMax></eSearchResult>"#;
+        assert_eq!(parse_esearch_count(xml).unwrap(), 42);
+    }
+
+    #[test]
+    fn parse_esearch_count_with_whitespace() {
+        let xml = "<eSearchResult><Count>  1234  </Count></eSearchResult>";
+        assert_eq!(parse_esearch_count(xml).unwrap(), 1234);
+    }
+
+    #[test]
+    fn parse_esearch_count_missing_tag() {
+        let xml = "<eSearchResult><RetMax>0</RetMax></eSearchResult>";
+        assert!(parse_esearch_count(xml).is_err());
+    }
+
+    #[test]
+    fn parse_esearch_count_empty_body() {
+        assert!(parse_esearch_count("").is_err());
+    }
+
+    #[test]
+    fn parse_esearch_count_unclosed_tag() {
+        let xml = "<eSearchResult><Count>99";
+        assert!(parse_esearch_count(xml).is_err());
+    }
+
+    #[test]
+    fn parse_esearch_count_non_numeric() {
+        let xml = "<Count>abc</Count>";
+        assert!(parse_esearch_count(xml).is_err());
+    }
+
+    #[test]
+    fn parse_esearch_count_zero() {
+        let xml = "<Count>0</Count>";
+        assert_eq!(parse_esearch_count(xml).unwrap(), 0);
+    }
+
+    #[test]
+    fn parse_esearch_count_large_value() {
+        let xml = "<Count>9999999999</Count>";
+        assert_eq!(parse_esearch_count(xml).unwrap(), 9_999_999_999);
     }
 }

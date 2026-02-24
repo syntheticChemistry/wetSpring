@@ -7,13 +7,13 @@
 )]
 //! # Exp155: Myxococcus C-Signal Critical Density — Anderson NP Solution
 //!
-//! Analyzes the Myxococcus xanthus C-signal system using published data
-//! from Rajagopalan et al. PNAS 2021 (Paper 37). Myxococcus is Anomaly #5
+//! Analyzes the *Myxococcus xanthus* C-signal system using published data
+//! from Rajagopalan et al. PNAS 2021 (Paper 37). *Myxococcus* is Anomaly #5
 //! — a genuine NP solution that bootstraps 3D from 2D.
 //!
 //! The experiment quantifies:
 //! - Critical cell density for C-signal activation
-//! - Mapping to Anderson L_min prediction
+//! - Mapping to Anderson `L_min` prediction
 //! - The two-stage signaling architecture (contact → aggregation → diffusion)
 //!
 //! # Provenance
@@ -55,16 +55,11 @@ fn main() {
     let cells_per_um2 = critical_density_cells_per_mm2 / 1e6;
     let coverage = cells_per_um2 * cell_area_um2;
 
-    println!(
-        "  Critical density: {:.0e} cells/mm²",
-        critical_density_cells_per_mm2
-    );
+    println!("  Critical density: {critical_density_cells_per_mm2:.0e} cells/mm²");
     println!("  Cell dimensions: {cell_length_um} × {cell_width_um} µm");
     println!("  Cell area: {cell_area_um2:.1} µm²");
-    println!(
-        "  Surface coverage at critical density: {:.1}%",
-        coverage * 100.0
-    );
+    let coverage_pct = coverage * 100.0;
+    println!("  Surface coverage at critical density: {coverage_pct:.1}%");
 
     v.check_pass(
         "critical density > 1e5 cells/mm² (high density required)",
@@ -151,7 +146,7 @@ fn main() {
         "", "", "", "", ""
     );
     for (phase, geom, anderson, signal, _pass) in &phases {
-        println!("  {:30} {:12} {:14} {:30}", phase, geom, anderson, signal);
+        println!("  {phase:30} {geom:12} {anderson:14} {signal:30}");
     }
 
     v.check_pass("life cycle phases track Anderson transition", true);

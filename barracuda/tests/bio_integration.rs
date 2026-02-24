@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(deprecated)]
 //! Integration tests for bio/pipeline modules: diversity, k-mer, PFAS,
 //! quality filtering, signal processing, spectral matching, KMD,
 //! feature extraction, EIC, paired-end merging, dereplication, and
@@ -166,7 +165,10 @@ fn quality_filter_fastq_pipeline() {
     // All Q2
     writeln!(f, "###################################################").unwrap();
 
-    let records = fastq::parse_fastq(&path).unwrap();
+    let records: Vec<_> = fastq::FastqIter::open(&path)
+        .expect("open")
+        .collect::<Result<Vec<_>, _>>()
+        .expect("parse");
     assert_eq!(records.len(), 3);
 
     let params = quality::QualityParams {

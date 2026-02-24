@@ -4,6 +4,10 @@
     clippy::unwrap_used,
     clippy::print_stdout,
     clippy::type_complexity,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_wrap,
+    clippy::too_many_lines,
+    clippy::items_after_statements,
     dead_code
 )]
 //! # Exp132: Geometry Zoo — Shape Determines QS
@@ -49,19 +53,18 @@ fn find_last_downward_crossing(sweep: &[(f64, f64)], midpoint: f64) -> Option<f6
         let (w1, r1) = sweep[i];
         if r0 > midpoint && r1 <= midpoint {
             let t = (midpoint - r0) / (r1 - r0);
-            last = Some(w0 + t * (w1 - w0));
+            last = Some(t.mul_add(w1 - w0, w0));
         }
     }
     last
 }
 
-#[allow(clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp132: Geometry Zoo — Shape Determines QS");
 
     #[cfg(feature = "gpu")]
     {
-        let midpoint = (GOE_R + POISSON_R) / 2.0;
+        let midpoint = f64::midpoint(GOE_R, POISSON_R);
 
         // Six geometries, all ~384 sites
         struct Geom {
@@ -155,7 +158,7 @@ fn main() {
                 shape,
                 n_sites,
                 p,
-                w_c.map_or("—".to_string(), |w| format!("{w:.2}"))
+                w_c.map_or_else(|| "—".to_string(), |w| format!("{w:.2}"))
             );
             v.check_pass(
                 &format!("{} sweep computed", g.name),
@@ -177,7 +180,7 @@ fn main() {
                 kind,
                 n,
                 p,
-                w_c.map_or("—".to_string(), |w| format!("{w:.2}"))
+                w_c.map_or_else(|| "—".to_string(), |w| format!("{w:.2}"))
             );
         }
 
@@ -196,28 +199,23 @@ fn main() {
         let chain_p = geo_results
             .iter()
             .find(|(n, _, _, _, _, _)| *n == "chain")
-            .map(|(_, _, _, p, _, _)| *p)
-            .unwrap_or(0);
+            .map_or(0, |(_, _, _, p, _, _)| *p);
         let cube_p = geo_results
             .iter()
             .find(|(n, _, _, _, _, _)| *n == "cube")
-            .map(|(_, _, _, p, _, _)| *p)
-            .unwrap_or(0);
+            .map_or(0, |(_, _, _, p, _, _)| *p);
         let tube_p = geo_results
             .iter()
             .find(|(n, _, _, _, _, _)| *n == "tube")
-            .map(|(_, _, _, p, _, _)| *p)
-            .unwrap_or(0);
+            .map_or(0, |(_, _, _, p, _, _)| *p);
         let thin_film_p = geo_results
             .iter()
             .find(|(n, _, _, _, _, _)| *n == "thin_film")
-            .map(|(_, _, _, p, _, _)| *p)
-            .unwrap_or(0);
+            .map_or(0, |(_, _, _, p, _, _)| *p);
         let slab_p = geo_results
             .iter()
             .find(|(n, _, _, _, _, _)| *n == "slab_20x20")
-            .map(|(_, _, _, p, _, _)| *p)
-            .unwrap_or(0);
+            .map_or(0, |(_, _, _, p, _, _)| *p);
 
         v.check_pass("cube > chain (3D beats 1D)", cube_p > chain_p);
         v.check_pass(
@@ -281,8 +279,7 @@ fn main() {
             let p = geo_results
                 .iter()
                 .find(|(n, _, _, _, _, _)| *n == es.geometry)
-                .map(|(_, _, _, p, _, _)| *p)
-                .unwrap_or(0);
+                .map_or(0, |(_, _, _, p, _, _)| *p);
             let regime = if p >= 5 {
                 "QS-CAPABLE"
             } else if p >= 2 {

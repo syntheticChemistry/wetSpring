@@ -41,50 +41,93 @@ struct Drug {
     fda_approved: bool,
 }
 
-fn main() {
-    let mut v = Validator::new("Exp157: Fajgenbaum Pathway Scoring — PI3K/AKT/mTOR → Sirolimus");
+const PATHWAYS: &[Pathway] = &[
+    Pathway {
+        name: "PI3K/AKT/mTOR",
+        activation_score: 0.92,
+        key_proteins: &["PI3K", "AKT", "mTOR", "p70S6K", "4E-BP1"],
+    },
+    Pathway {
+        name: "JAK/STAT3",
+        activation_score: 0.85,
+        key_proteins: &["JAK1", "JAK2", "STAT3", "SOCS3"],
+    },
+    Pathway {
+        name: "NF-κB",
+        activation_score: 0.78,
+        key_proteins: &["IKK", "NF-κB", "IκBα", "p65"],
+    },
+    Pathway {
+        name: "MAPK/ERK",
+        activation_score: 0.65,
+        key_proteins: &["RAF", "MEK", "ERK", "RSK"],
+    },
+    Pathway {
+        name: "VEGF",
+        activation_score: 0.72,
+        key_proteins: &["VEGF-A", "VEGFR2", "HIF-1α"],
+    },
+    Pathway {
+        name: "IL-6/gp130",
+        activation_score: 0.88,
+        key_proteins: &["IL-6", "gp130", "JAK1", "STAT3"],
+    },
+];
 
+const DRUGS: &[Drug] = &[
+    Drug {
+        name: "Sirolimus (Rapamycin)",
+        generic: "sirolimus",
+        target_pathway: "PI3K/AKT/mTOR",
+        mechanism: "mTOR complex 1 inhibitor",
+        fda_approved: true,
+    },
+    Drug {
+        name: "Tocilizumab",
+        generic: "tocilizumab",
+        target_pathway: "IL-6/gp130",
+        mechanism: "IL-6 receptor antagonist",
+        fda_approved: true,
+    },
+    Drug {
+        name: "Siltuximab",
+        generic: "siltuximab",
+        target_pathway: "IL-6/gp130",
+        mechanism: "Anti-IL-6 monoclonal antibody",
+        fda_approved: true,
+    },
+    Drug {
+        name: "Ruxolitinib",
+        generic: "ruxolitinib",
+        target_pathway: "JAK/STAT3",
+        mechanism: "JAK1/JAK2 inhibitor",
+        fda_approved: true,
+    },
+    Drug {
+        name: "Everolimus",
+        generic: "everolimus",
+        target_pathway: "PI3K/AKT/mTOR",
+        mechanism: "mTOR inhibitor (rapalog)",
+        fda_approved: true,
+    },
+    Drug {
+        name: "Bortezomib",
+        generic: "bortezomib",
+        target_pathway: "NF-κB",
+        mechanism: "Proteasome inhibitor",
+        fda_approved: true,
+    },
+];
+
+fn validate_pathway_identification(v: &mut Validator) {
     v.section("§1 Pathogenic Pathway Identification (JCI 2019)");
-
-    let pathways = [
-        Pathway {
-            name: "PI3K/AKT/mTOR",
-            activation_score: 0.92,
-            key_proteins: &["PI3K", "AKT", "mTOR", "p70S6K", "4E-BP1"],
-        },
-        Pathway {
-            name: "JAK/STAT3",
-            activation_score: 0.85,
-            key_proteins: &["JAK1", "JAK2", "STAT3", "SOCS3"],
-        },
-        Pathway {
-            name: "NF-κB",
-            activation_score: 0.78,
-            key_proteins: &["IKK", "NF-κB", "IκBα", "p65"],
-        },
-        Pathway {
-            name: "MAPK/ERK",
-            activation_score: 0.65,
-            key_proteins: &["RAF", "MEK", "ERK", "RSK"],
-        },
-        Pathway {
-            name: "VEGF",
-            activation_score: 0.72,
-            key_proteins: &["VEGF-A", "VEGFR2", "HIF-1α"],
-        },
-        Pathway {
-            name: "IL-6/gp130",
-            activation_score: 0.88,
-            key_proteins: &["IL-6", "gp130", "JAK1", "STAT3"],
-        },
-    ];
 
     println!(
         "  {:20} {:>12} {:40}",
         "Pathway", "Activation", "Key Proteins"
     );
     println!("  {:-<20} {:-<12} {:-<40}", "", "", "");
-    for p in &pathways {
+    for p in PATHWAYS {
         println!(
             "  {:20} {:>12.2} {:40}",
             p.name,
@@ -93,7 +136,7 @@ fn main() {
         );
     }
 
-    let top_pathway = pathways
+    let top_pathway = PATHWAYS
         .iter()
         .max_by(|a, b| a.activation_score.partial_cmp(&b.activation_score).unwrap())
         .unwrap();
@@ -105,60 +148,17 @@ fn main() {
         "PI3K/AKT/mTOR activation > 0.9",
         top_pathway.activation_score > 0.9,
     );
+}
 
+fn validate_drug_matching(v: &Validator) {
     v.section("§2 Drug-Pathway Matching");
-
-    let drugs = [
-        Drug {
-            name: "Sirolimus (Rapamycin)",
-            generic: "sirolimus",
-            target_pathway: "PI3K/AKT/mTOR",
-            mechanism: "mTOR complex 1 inhibitor",
-            fda_approved: true,
-        },
-        Drug {
-            name: "Tocilizumab",
-            generic: "tocilizumab",
-            target_pathway: "IL-6/gp130",
-            mechanism: "IL-6 receptor antagonist",
-            fda_approved: true,
-        },
-        Drug {
-            name: "Siltuximab",
-            generic: "siltuximab",
-            target_pathway: "IL-6/gp130",
-            mechanism: "Anti-IL-6 monoclonal antibody",
-            fda_approved: true,
-        },
-        Drug {
-            name: "Ruxolitinib",
-            generic: "ruxolitinib",
-            target_pathway: "JAK/STAT3",
-            mechanism: "JAK1/JAK2 inhibitor",
-            fda_approved: true,
-        },
-        Drug {
-            name: "Everolimus",
-            generic: "everolimus",
-            target_pathway: "PI3K/AKT/mTOR",
-            mechanism: "mTOR inhibitor (rapalog)",
-            fda_approved: true,
-        },
-        Drug {
-            name: "Bortezomib",
-            generic: "bortezomib",
-            target_pathway: "NF-κB",
-            mechanism: "Proteasome inhibitor",
-            fda_approved: true,
-        },
-    ];
 
     println!(
         "\n  {:30} {:20} {:35} {:8}",
         "Drug", "Target Pathway", "Mechanism", "FDA"
     );
     println!("  {:-<30} {:-<20} {:-<35} {:-<8}", "", "", "", "");
-    for d in &drugs {
+    for d in DRUGS {
         println!(
             "  {:30} {:20} {:35} {:8}",
             d.name,
@@ -167,13 +167,15 @@ fn main() {
             if d.fda_approved { "YES" } else { "NO" }
         );
     }
+}
 
+fn validate_score_matrix(v: &mut Validator) {
     v.section("§3 Pathway-Drug Score Matrix");
 
-    let mut scores: Vec<(&Drug, f64)> = drugs
+    let mut scores: Vec<(&Drug, f64)> = DRUGS
         .iter()
         .map(|d| {
-            let pathway_score = pathways
+            let pathway_score = PATHWAYS
                 .iter()
                 .find(|p| p.name == d.target_pathway)
                 .map_or(0.0, |p| p.activation_score);
@@ -202,7 +204,9 @@ fn main() {
                 .unwrap()
                 .1,
     );
+}
 
+fn validate_discovery_logic(v: &mut Validator) {
     v.section("§4 The Fajgenbaum Discovery Logic");
 
     println!("\n  The paper's key insight:");
@@ -214,8 +218,8 @@ fn main() {
 
     v.check_pass("PI3K/AKT/mTOR is downstream of IL-6/gp130", true);
     v.check_pass("mTOR pathway score > IL-6 pathway score", {
-        let mtor = pathways.iter().find(|p| p.name == "PI3K/AKT/mTOR").unwrap();
-        let il6 = pathways.iter().find(|p| p.name == "IL-6/gp130").unwrap();
+        let mtor = PATHWAYS.iter().find(|p| p.name == "PI3K/AKT/mTOR").unwrap();
+        let il6 = PATHWAYS.iter().find(|p| p.name == "IL-6/gp130").unwrap();
         mtor.activation_score > il6.activation_score
     });
 
@@ -244,6 +248,15 @@ fn main() {
     println!("  • Clinical outcomes: JCI 2019 case series (published)");
 
     v.check_pass("all data sources are open/published", true);
+}
+
+fn main() {
+    let mut v = Validator::new("Exp157: Fajgenbaum Pathway Scoring — PI3K/AKT/mTOR → Sirolimus");
+
+    validate_pathway_identification(&mut v);
+    validate_drug_matching(&v);
+    validate_score_matrix(&mut v);
+    validate_discovery_logic(&mut v);
 
     v.finish();
 }

@@ -101,18 +101,14 @@ fn main() {
 
 // ── Sample processing result ────────────────────────────────────────────────
 
-#[allow(dead_code)]
 struct SampleResult {
     label: String,
     total_reads: usize,
     filtered_reads: usize,
-    mean_read_len: f64,
-    n_unique: usize,
     n_asvs: usize,
     shannon: f64,
     simpson: f64,
     observed: f64,
-    asv_counts: Vec<f64>,
     top_taxa: Vec<String>,
 }
 
@@ -185,8 +181,10 @@ fn process_sample(
         return None;
     };
 
-    #[allow(deprecated)]
-    let records = match wetspring_barracuda::io::fastq::parse_fastq(&fastq_path) {
+    #[allow(clippy::redundant_closure_for_method_calls)]
+    let records = match wetspring_barracuda::io::fastq::FastqIter::open(&fastq_path)
+        .and_then(|iter| iter.collect::<std::result::Result<Vec<_>, _>>())
+    {
         Ok(recs) => recs,
         Err(e) => {
             println!("  [ERROR] Failed to parse {}: {e}", fastq_path.display());
@@ -311,13 +309,10 @@ fn process_sample(
         label: label.to_string(),
         total_reads,
         filtered_reads: sub.len(),
-        mean_read_len: mean_len,
-        n_unique,
         n_asvs,
         shannon,
         simpson,
         observed,
-        asv_counts: counts,
         top_taxa,
     })
 }

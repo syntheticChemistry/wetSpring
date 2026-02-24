@@ -2,7 +2,7 @@
 
 **Date:** February 24, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** 161 experiments, 3,132+ validation checks, ALL PASS; 849 tests, 95.67% coverage
+**Status:** 162 experiments, 3,198+ validation checks, ALL PASS; 881 tests, 95.67% coverage
 
 ---
 
@@ -35,7 +35,8 @@ All code is AGPL-3.0.
 | [Cahill](cahill.md) | Sandia | 1 | 1 | 039,112,118,**123** | 54 | Algal pond, NPU bloom sentinel, temporal ESN |
 | [Smallwood](smallwood.md) | Sandia | 1 | 1 | 040,112,118,**123** | 58 | Bloom surveillance, NPU sentinel, temporal ESN |
 | [Kachkovskiy](kachkovskiy.md) | MSU CMSE | cross | 1 | 107,113,119,**122,126,127-138,144-156** | 334 | Spectral theory, 2D/3D Anderson, geometry zoo, ecosystem atlas, finite-size scaling v1+v2, correlated disorder, mapping sensitivity, planktonic dilution, eukaryote scaling, extension papers, paper queue |
-| **Total** | | | **24** | | **954+** | |
+| **Fajgenbaum** | UPenn | 3 | 2 | 157,158 | 17 | Drug repurposing, pharmacophenomics |
+| **Total** | | | **43** | | **1,071+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -85,7 +86,7 @@ Every paper goes through the full evolution. Status across all 25 actionable pap
 
 | Stage | What It Proves | Coverage |
 |-------|---------------|----------|
-| Python baseline | Algorithm correctness against published tools | 41 scripts |
+| Python baseline | Algorithm correctness against published tools | 42 scripts |
 | BarraCuda CPU | Rust matches Python within machine precision | 1,476 checks, 22.5x faster |
 | BarraCuda GPU | GPU matches CPU within 1e-6 | 702 checks, 29 domains |
 | Pure GPU streaming | Zero CPU round-trips, data stays on-device | 152 checks, 10+ domains |
@@ -94,7 +95,7 @@ Every paper goes through the full evolution. Status across all 25 actionable pap
 | Cross-spring evolution | 612 WGSL shaders traced to origin springs, rewired imports | 9 checks |
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
-| Code quality audit | 95.67% coverage, streaming I/O, 0 production mocks | 845 tests |
+| Code quality audit | 95.67% coverage, streaming I/O, 0 production mocks, ToadStool S57 sync | 881 tests |
 
 ## Performance Summary
 
@@ -121,8 +122,8 @@ Every paper goes through the full evolution. Status across all 25 actionable pap
 
 ## Open Data
 
-All 24 reproductions use publicly accessible data or published model parameters.
+All 43 reproductions use publicly accessible data or published model parameters.
 No proprietary data dependencies. Sources: NCBI SRA, Zenodo, MassBank, EPA,
-Michigan EGLE, published ODE parameters, algorithmic (no external data).
+Michigan EGLE, published ODE parameters, repoDB, algorithmic (no external data).
 
 See `../specs/PAPER_REVIEW_QUEUE.md` for the full provenance audit.

@@ -27,7 +27,7 @@ use wetspring_barracuda::validation::Validator;
 struct LcgRng(u64);
 
 impl LcgRng {
-    fn new(seed: u64) -> Self {
+    const fn new(seed: u64) -> Self {
         Self(seed.wrapping_add(1))
     }
     fn next_f64(&mut self) -> f64 {
@@ -38,73 +38,69 @@ impl LcgRng {
         let bits = (self.0 >> 11) | 0x3FF0_0000_0000_0000;
         f64::from_bits(bits) - 1.0
     }
+    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     fn next_usize(&mut self, max: usize) -> usize {
         (self.next_f64() * max as f64) as usize % max
     }
 }
 
-fn main() {
-    let mut v = Validator::new("Exp160: repoDB NMF Reproduction (Gao 2020)");
+const N_DRUGS: usize = 200;
+const N_DISEASES: usize = 150;
+const N_CLUSTERS: usize = 10;
+const DRUGS_PER_CLUSTER: usize = N_DRUGS / N_CLUSTERS;
+const DISEASES_PER_CLUSTER: usize = N_DISEASES / N_CLUSTERS;
 
-    v.section("§1 repoDB-Proportional Data (CPU Tier)");
+fn compute_block_discrimination(wh: &[f64]) -> (f64, f64) {
+    let mut within_sum = 0.0;
+    let mut within_count = 0;
+    let mut cross_sum = 0.0;
+    let mut cross_count = 0;
 
-    let n_drugs = 200;
-    let n_diseases = 150;
-    let total = n_drugs * n_diseases;
-
-    let mut rng = LcgRng::new(42);
-
-    // Block-structured matrix: 10 drug-disease clusters
-    let n_clusters = 10;
-    let drugs_per_cluster = n_drugs / n_clusters;
-    let diseases_per_cluster = n_diseases / n_clusters;
-    let entries_per_cluster = 80;
-
-    let mut matrix = vec![0.0_f64; total];
-    for c in 0..n_clusters {
-        let d_start = c * drugs_per_cluster;
-        let dis_start = c * diseases_per_cluster;
-        let mut planted = 0;
-        while planted < entries_per_cluster {
-            let d = d_start + rng.next_usize(drugs_per_cluster);
-            let dis = dis_start + rng.next_usize(diseases_per_cluster);
-            if matrix[d * n_diseases + dis] == 0.0 {
-                matrix[d * n_diseases + dis] = 1.0;
-                planted += 1;
+    for i in 0..N_DRUGS {
+        let drug_cluster = i / DRUGS_PER_CLUSTER;
+        for j in 0..N_DISEASES {
+            let dis_cluster = j / DISEASES_PER_CLUSTER;
+            let score = wh[i * N_DISEASES + j];
+            if drug_cluster == dis_cluster && drug_cluster < N_CLUSTERS {
+                within_sum += score;
+                within_count += 1;
+            } else if drug_cluster < N_CLUSTERS && dis_cluster < N_CLUSTERS {
+                cross_sum += score;
+                cross_count += 1;
             }
         }
     }
 
-    let n_nonzero = matrix.iter().filter(|&&x| x > 0.0).count();
-    let fill_rate = n_nonzero as f64 / total as f64;
-    println!("  Matrix: {} × {} ({} entries)", n_drugs, n_diseases, total);
-    println!("  Non-zero: {} ({:.1}% fill)", n_nonzero, fill_rate * 100.0);
-    println!("  Clusters: {n_clusters} blocks of ~{entries_per_cluster} each");
-    println!("  Proportional to repoDB: 1571×1209 at 0.35% fill (6,677 approved)");
+    let within_mean = within_sum / f64::from(within_count.max(1));
+    let cross_mean = cross_sum / f64::from(cross_count.max(1));
+    (within_mean, cross_mean)
+}
 
-    v.check_pass("fill rate in [1%, 10%]", (0.01..=0.10).contains(&fill_rate));
+fn reconstruct_wh(result: &nmf::NmfResult) -> Vec<f64> {
+    let total = N_DRUGS * N_DISEASES;
+    let mut wh = vec![0.0; total];
+    for i in 0..N_DRUGS {
+        for kk in 0..result.k {
+            let w_ik = result.w[i * result.k + kk];
+            for j in 0..N_DISEASES {
+                wh[i * N_DISEASES + j] += w_ik * result.h[kk * N_DISEASES + j];
+            }
+        }
+    }
+    wh
+}
 
-    v.section("§2 NMF Factorisation (Euclidean)");
-
-    let config = NmfConfig {
-        rank: n_clusters,
-        max_iter: 200,
-        tol: 1e-6,
-        objective: NmfObjective::Euclidean,
-        seed: 42,
-    };
-
-    let start = std::time::Instant::now();
-    let result = nmf::nmf(&matrix, n_drugs, n_diseases, &config);
-    let elapsed_ms = start.elapsed().as_millis();
-
-    let rel_err = nmf::relative_reconstruction_error(&matrix, &result);
-    println!(
-        "  NMF rank={}: {} iterations in {} ms",
-        config.rank,
-        result.errors.len(),
-        elapsed_ms
-    );
+fn validate_factorisation_and_structure(
+    v: &mut Validator,
+    matrix: &[f64],
+    result: &nmf::NmfResult,
+    elapsed_ms: u128,
+    rel_err: f64,
+    n_nonzero: usize,
+) {
+    let rank = result.k;
+    let n_iters = result.errors.len();
+    println!("  NMF rank={rank}: {n_iters} iterations in {elapsed_ms} ms");
     println!("  Relative reconstruction error: {rel_err:.4}");
 
     v.check_pass("NMF converges (error decreases)", {
@@ -115,45 +111,12 @@ fn main() {
 
     v.section("§3 Block Structure Recovery");
 
-    // For each cluster, compute within-cluster vs cross-cluster reconstruction
-    let mut wh = vec![0.0; total];
-    for i in 0..n_drugs {
-        for kk in 0..result.k {
-            let w_ik = result.w[i * result.k + kk];
-            for j in 0..n_diseases {
-                wh[i * n_diseases + j] += w_ik * result.h[kk * n_diseases + j];
-            }
-        }
-    }
-
-    let mut within_sum = 0.0;
-    let mut within_count = 0;
-    let mut cross_sum = 0.0;
-    let mut cross_count = 0;
-
-    for i in 0..n_drugs {
-        let drug_cluster = i / drugs_per_cluster;
-        for j in 0..n_diseases {
-            let dis_cluster = j / diseases_per_cluster;
-            let score = wh[i * n_diseases + j];
-            if drug_cluster == dis_cluster && drug_cluster < n_clusters {
-                within_sum += score;
-                within_count += 1;
-            } else if drug_cluster < n_clusters && dis_cluster < n_clusters {
-                cross_sum += score;
-                cross_count += 1;
-            }
-        }
-    }
-
-    let within_mean = within_sum / within_count.max(1) as f64;
-    let cross_mean = cross_sum / cross_count.max(1) as f64;
+    let wh = reconstruct_wh(result);
+    let (within_mean, cross_mean) = compute_block_discrimination(&wh);
+    let disc_ratio = within_mean / (cross_mean + 1e-10);
     println!("  Within-cluster mean score: {within_mean:.4}");
     println!("  Cross-cluster mean score: {cross_mean:.4}");
-    println!(
-        "  Block discrimination ratio: {:.2}×",
-        within_mean / (cross_mean + 1e-10)
-    );
+    println!("  Block discrimination ratio: {disc_ratio:.2}×");
 
     v.check_pass(
         "within-cluster > cross-cluster (block structure recovered)",
@@ -180,6 +143,11 @@ fn main() {
     );
     v.check_pass("W factors are sparse (< 80% dense)", w_nonzero_frac < 0.8);
 
+    validate_rank_sensitivity(v, matrix);
+    validate_gpu_roadmap(v, elapsed_ms, n_nonzero);
+}
+
+fn validate_rank_sensitivity(v: &mut Validator, matrix: &[f64]) {
     v.section("§5 Rank Sensitivity");
 
     println!(
@@ -198,48 +166,18 @@ fn main() {
             objective: NmfObjective::Euclidean,
             seed: 42,
         };
-        let res = nmf::nmf(&matrix, n_drugs, n_diseases, &cfg);
-        let re = nmf::relative_reconstruction_error(&matrix, &res);
-
-        let mut wh_r = vec![0.0; total];
-        for i in 0..n_drugs {
-            for kk in 0..res.k {
-                let w_ik = res.w[i * res.k + kk];
-                for j in 0..n_diseases {
-                    wh_r[i * n_diseases + j] += w_ik * res.h[kk * n_diseases + j];
-                }
-            }
-        }
-
-        let mut ws = 0.0;
-        let mut wc = 0;
-        let mut cs = 0.0;
-        let mut cc = 0;
-        for i in 0..n_drugs {
-            let dc = i / drugs_per_cluster;
-            for j in 0..n_diseases {
-                let disc = j / diseases_per_cluster;
-                let s = wh_r[i * n_diseases + j];
-                if dc == disc && dc < n_clusters {
-                    ws += s;
-                    wc += 1;
-                } else if dc < n_clusters && disc < n_clusters {
-                    cs += s;
-                    cc += 1;
-                }
-            }
-        }
-        let wm = ws / wc.max(1) as f64;
-        let cm = cs / cc.max(1) as f64;
+        let res = nmf::nmf(matrix, N_DRUGS, N_DISEASES, &cfg);
+        let re = nmf::relative_reconstruction_error(matrix, &res);
+        let wh_r = reconstruct_wh(&res);
+        let (wm, cm) = compute_block_discrimination(&wh_r);
         let ratio = wm / (cm + 1e-10);
-        println!(
-            "  {:>6} {:>10.4} {:>12.4} {:>12.4} {:>8.2}×",
-            rank, re, wm, cm, ratio
-        );
+        println!("  {rank:>6} {re:>10.4} {wm:>12.4} {cm:>12.4} {ratio:>8.2}×");
     }
 
     v.check_pass("rank sensitivity analysis complete", true);
+}
 
+fn validate_gpu_roadmap(v: &mut Validator, elapsed_ms: u128, n_nonzero: usize) {
     v.section("§6 GPU Tier Roadmap (Full repoDB)");
 
     println!("\n  CPU tier validates NMF math at 200×150 ({n_nonzero} entries).");
@@ -258,12 +196,60 @@ fn main() {
     println!();
     println!("  At full scale (1571×1209×rank20):");
     println!("  • 200 iterations ≈ 7.6G FLOPs → single GPU < 10ms");
-    println!(
-        "  • CPU baseline (this tier): {} ms for {}×{}",
-        elapsed_ms, n_drugs, n_diseases
-    );
+    println!("  • CPU baseline (this tier): {elapsed_ms} ms for {N_DRUGS}×{N_DISEASES}");
 
     v.check_pass("GPU roadmap documented", true);
+}
+
+fn main() {
+    let mut v = Validator::new("Exp160: repoDB NMF Reproduction (Gao 2020)");
+
+    v.section("§1 repoDB-Proportional Data (CPU Tier)");
+
+    let total = N_DRUGS * N_DISEASES;
+    let mut rng = LcgRng::new(42);
+    let entries_per_cluster = 80;
+
+    let mut matrix = vec![0.0_f64; total];
+    for c in 0..N_CLUSTERS {
+        let d_start = c * DRUGS_PER_CLUSTER;
+        let dis_start = c * DISEASES_PER_CLUSTER;
+        let mut planted = 0;
+        while planted < entries_per_cluster {
+            let d = d_start + rng.next_usize(DRUGS_PER_CLUSTER);
+            let dis = dis_start + rng.next_usize(DISEASES_PER_CLUSTER);
+            if matrix[d * N_DISEASES + dis] == 0.0 {
+                matrix[d * N_DISEASES + dis] = 1.0;
+                planted += 1;
+            }
+        }
+    }
+
+    let n_nonzero = matrix.iter().filter(|&&x| x > 0.0).count();
+    let fill_rate = n_nonzero as f64 / total as f64;
+    println!("  Matrix: {N_DRUGS} × {N_DISEASES} ({total} entries)");
+    println!("  Non-zero: {n_nonzero} ({:.1}% fill)", fill_rate * 100.0);
+    println!("  Clusters: {N_CLUSTERS} blocks of ~{entries_per_cluster} each");
+    println!("  Proportional to repoDB: 1571×1209 at 0.35% fill (6,677 approved)");
+
+    v.check_pass("fill rate in [1%, 10%]", (0.01..=0.10).contains(&fill_rate));
+
+    v.section("§2 NMF Factorisation (Euclidean)");
+
+    let config = NmfConfig {
+        rank: N_CLUSTERS,
+        max_iter: 200,
+        tol: 1e-6,
+        objective: NmfObjective::Euclidean,
+        seed: 42,
+    };
+
+    let start = std::time::Instant::now();
+    let result = nmf::nmf(&matrix, N_DRUGS, N_DISEASES, &config);
+    let elapsed_ms = start.elapsed().as_millis();
+    let rel_err = nmf::relative_reconstruction_error(&matrix, &result);
+
+    validate_factorisation_and_structure(&mut v, &matrix, &result, elapsed_ms, rel_err, n_nonzero);
 
     v.finish();
 }

@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 24, 2026
-**Status:** Validation study active — 3,050+/3,050+ checks, 728 lib tests, 97% bio+io line coverage, 151 experiments
+**Status:** Validation study active — 3,198+/3,198+ checks, 881 total tests, 95.67% library coverage, 162 experiments
 **License:** AGPL-3.0-or-later
 
 ---
@@ -51,15 +51,12 @@ implementations into upstream ToadStool/BarraCuda primitives:
 4. **Absorb** — ToadStool integrates as `ops::bio::*` shaders
 5. **Lean** — wetSpring rewires to upstream imports, deletes local code
 
-**Current status:** 42 GPU modules total — 27 lean on upstream ToadStool primitives,
-5 compile local WGSL ODE shaders (Write phase, pending absorption as
-`BatchedOdeRK4Generic<N_VARS, N_PARAMS>`), 7 compose ToadStool primitives for
-GPU-accelerated workflows, 3 passthrough (accept GPU buffers, CPU kernel). All
-5 local shaders (phage defense 4v/11p, bistable 5v/21p, multi-signal 7v/24p,
-cooperation 4v/13p, capacitor 6v/16p) achieve exact CPU ↔ GPU parity. Zero
-Tier B/C modules remain. The forge crate (`metalForge/forge/` v0.3.0) provides
-substrate discovery, capability-based dispatch, and shader origin tracking as
-an absorption seam for ToadStool.
+**Current status:** 42 GPU modules total — 31 lean on upstream ToadStool primitives
+(31 Lean + 6 S54-S57), 0 local WGSL (all ODE shaders use `BatchedOdeRK4<S>::generate_shader()`),
+7 compose ToadStool primitives for GPU-accelerated workflows, 3 passthrough (accept
+GPU buffers, CPU kernel). Zero Tier B/C modules remain. The forge crate
+(`metalForge/forge/` v0.3.0) provides substrate discovery, capability-based dispatch,
+and shader origin tracking as an absorption seam for ToadStool.
 
 ---
 
@@ -308,9 +305,9 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCuda/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34+ WGSL shaders, active Write phase)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (5 local WGSL + 30 ToadStool primitives, 42 GPU modules, 759 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL + 31 ToadStool primitives, 42 GPU modules, 881 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
-- **archive/handoffs/** — Fossil record of ToadStool handoffs (v1–v7)
+- **archive/handoffs/** — Fossil record of ToadStool handoffs (v1–v14)
 
 Springs follow the **Write → Absorb → Lean** pattern (pioneered by hotSpring):
 write and validate locally, hand off to ToadStool for absorption, then lean on
@@ -325,14 +322,14 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy --pedantic --nursery` | 0 warnings |
 | `cargo doc --no-deps` | 0 warnings |
-| Line coverage (`cargo-llvm-cov`) | **~97% bio+io modules** |
+| Line coverage (`cargo-llvm-cov`) | **95.67% overall** |
 | `#![deny(unsafe_code)]` | Enforced crate-wide (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, clippy::unwrap_used)]` | Enforced crate-wide |
-| Named tolerance constants | 43 (all scientifically justified) |
+| Named tolerance constants | 59 (all scientifically justified) |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` files |
-| Provenance headers | All 109 validation/benchmark binaries |
+| Provenance headers | All 151 validation/benchmark binaries |
 
 ## metalForge — Hardware Discovery
 
@@ -348,9 +345,8 @@ following hotSpring's `metalForge/forge/` pattern:
 | `dispatch.rs` | Capability-based routing (GPU > NPU > CPU) |
 | `bridge.rs` | Forge substrate ↔ barracuda `WgpuDevice` bridge |
 
-29 tests, clippy clean, `#![forbid(unsafe_code)]`. The forge crate also routes
-ODE GPU workloads (local WGSL shaders) alongside ToadStool-absorbed primitives
-via capability-based dispatch.
+47 tests, clippy clean, `#![forbid(unsafe_code)]`. The forge crate routes
+GPU workloads alongside ToadStool-absorbed primitives via capability-based dispatch.
 
 ---
 

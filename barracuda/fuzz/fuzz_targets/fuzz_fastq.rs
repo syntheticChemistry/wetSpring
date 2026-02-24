@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 #![no_main]
 use libfuzzer_sys::fuzz_target;
 use std::io::Write;
@@ -10,7 +11,8 @@ fuzz_target!(|data: &[u8]| {
     let path = f.path().to_path_buf();
 
     // Should not panic regardless of input
-    let _ = wetspring_barracuda::io::fastq::parse_fastq(&path);
+    let _ = wetspring_barracuda::io::fastq::FastqIter::open(&path)
+        .and_then(|iter| iter.collect::<std::result::Result<Vec<_>, _>>());
 
     // Also test stats_from_file
     let _ = wetspring_barracuda::io::fastq::stats_from_file(&path);

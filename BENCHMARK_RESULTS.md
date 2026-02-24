@@ -1,7 +1,7 @@
 # wetSpring Benchmark Results
 
-**Date:** February 22, 2026
-**Status:** Three-tier validation complete (Python → Rust CPU → GPU)
+**Date:** February 24, 2026
+**Status:** Three-tier validation complete (Python → Rust CPU → GPU → metalForge) — 25/25 actionable papers full three-tier; 881 tests, 3,198+ checks
 
 ---
 
@@ -298,14 +298,14 @@ matrix. CPU↔GPU parity proven for all compose and write modules.
 | Rust CPU validation | 1,476 | PASS |
 | GPU validation | 702+ | PASS |
 | Dispatch + layout + transfer | 172 | PASS |
-| Rust tests | 759 (680 lib + 79 integration/doc) | PASS |
+| Rust tests | 881 (834 barracuda + 47 forge) | PASS |
 | Python baselines | 41 scripts | PASS |
 | BarraCuda CPU parity | 380/380 (v1-v8: 31+ domains) | PASS |
-| ToadStool bio primitives | 30 consumed (Lean) | PASS |
+| ToadStool bio primitives | 37 (31 Lean + 6 S54-S57) | PASS |
 | Local WGSL shaders (Write phase) | 5 ODE shaders (phage, bistable, multi_signal, cooperation, capacitor) | PASS |
 | Compose GPU wrappers | 7 (kmd, merge_pairs, robinson_foulds, derep, NJ, reconciliation, molecular_clock) | PASS |
 | Passthrough GPU wrappers | 3 (gbm, feature_table, signal) | PASS |
-| **Grand total** | **2,673+ validation + 759 tests** | **ALL PASS** |
+| **Grand total** | **3,198+ validation + 881 tests** | **ALL PASS** |
 
 ---
 
@@ -315,7 +315,7 @@ matrix. CPU↔GPU parity proven for all compose and write modules.
 cd barracuda
 
 # Tier 2: Rust CPU (1,476+ checks)
-cargo test                         # 759 tests (680 lib + 79 integration/doc)
+cargo test                         # 881 tests (834 barracuda + 47 forge)
 cargo run --release --bin validate_qs_ode  # ... repeat for all CPU binaries
 
 # Tier 2b: BarraCuda CPU parity (380/380)

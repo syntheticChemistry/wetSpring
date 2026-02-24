@@ -42,7 +42,7 @@ const DT: f64 = 0.01;
 const T_END: f64 = 5.0;
 
 #[cfg(feature = "gpu")]
-fn params_to_flat_17(p: &QsBiofilmParams) -> [f64; N_PARAMS] {
+const fn params_to_flat_17(p: &QsBiofilmParams) -> [f64; N_PARAMS] {
     [
         p.mu_max,
         p.k_cap,
@@ -208,7 +208,7 @@ fn main() {
                 max_diff = max_diff.max((gpu_val - cpu_r[var]).abs());
             }
         }
-        println!("  max |GPU-CPU| ({} batches): {:.4}", cpu_n, max_diff);
+        println!("  max |GPU-CPU| ({cpu_n} batches): {max_diff:.4}");
         v.check_count("GPU≈CPU parity < 2.0", usize::from(max_diff < 2.0), 1);
 
         let mut gpu_classes = std::collections::HashMap::new();
@@ -239,10 +239,10 @@ fn main() {
         println!(
             "  Landscape diversity: {} distinct outcomes{}",
             gpu_classes.len(),
-            if !diverse {
-                " (all biofilm — real Vibrio cluster in biofilm space)"
-            } else {
+            if diverse {
                 ""
+            } else {
+                " (all biofilm — real Vibrio cluster in biofilm space)"
             }
         );
         v.check_count("landscape characterized", 1, 1);

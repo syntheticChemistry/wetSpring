@@ -6,22 +6,24 @@
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
     clippy::cast_sign_loss,
+    clippy::cast_possible_wrap,
     clippy::too_many_lines,
-    clippy::similar_names
+    clippy::similar_names,
+    clippy::items_after_statements
 )]
 //! # Exp151: Disorder-Correlated Lattices for Biofilm Disorder
 //!
 //! Models realistic biofilm disorder where species cluster spatially.
 //! In a real biofilm, species are not randomly distributed — they form
-//! microcolonies with spatial correlation length ξ_corr.
+//! microcolonies with spatial correlation length `ξ_corr`.
 //!
 //! Uses exponential smoothing of i.i.d. random potential:
-//! V_i = Σ_j K(|r_i - r_j|) · ε_j / Z, K(r) = exp(-r/ξ_corr)
+//! `V_i` = `Σ_j` `K`(|`r_i` - `r_j`|) · `ε_j` / Z, K(r) = exp(-r/`ξ_corr`)
 //!
 //! # Physics
 //!
 //! Spatially correlated disorder is "smoother" than uncorrelated — the
-//! effective scattering is weaker, so W_c should increase (harder to
+//! effective scattering is weaker, so `W_c` should increase (harder to
 //! localize). This means biofilm spatial clustering HELPS QS propagation
 //! beyond what the uncorrelated Anderson model predicts.
 //!
@@ -59,7 +61,7 @@ struct LcgRng {
 
 #[cfg(feature = "gpu")]
 impl LcgRng {
-    fn new(seed: u64) -> Self {
+    const fn new(seed: u64) -> Self {
         Self {
             state: seed.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1),
         }
@@ -191,7 +193,6 @@ fn build_correlated_anderson_3d(
     }
 }
 
-#[allow(clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp151: Disorder-Correlated Lattices for Biofilm Disorder");
 
@@ -200,7 +201,7 @@ fn main() {
         use std::time::Instant;
 
         let n = L * L * L;
-        let midpoint = (GOE_R + POISSON_R) / 2.0;
+        let midpoint = f64::midpoint(GOE_R, POISSON_R);
         println!("  L = {L}, N = {n}");
         println!("  Correlation lengths ξ_corr: {CORR_LENGTHS:?}");
         println!("  Biological mapping:");
@@ -258,7 +259,7 @@ fn main() {
                     let (w1, r1, _) = sweep[i];
                     if r0 > midpoint && r1 <= midpoint {
                         let t = (midpoint - r0) / (r1 - r0);
-                        last = Some(w0 + t * (w1 - w0));
+                        last = Some(t.mul_add(w1 - w0, w0));
                     }
                 }
                 last
@@ -311,7 +312,7 @@ fn main() {
                 "  │ {:>8.1} │ {:22} │ {:>8} │",
                 cr.xi,
                 regime,
-                cr.w_c.map_or("—".to_string(), |w| format!("{w:.2}"))
+                cr.w_c.map_or_else(|| "—".to_string(), |w| format!("{w:.2}"))
             );
         }
         println!("  └──────────┴────────────────────────┴──────────┘");

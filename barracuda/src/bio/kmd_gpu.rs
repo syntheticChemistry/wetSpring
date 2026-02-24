@@ -98,12 +98,18 @@ mod tests {
 
     #[test]
     fn kmd_gpu_matches_cpu_small() {
-        let masses = vec![412.966, 462.963, 512.960, 562.957];
+        // PFAS homologous series: compounds differing by CF2 have equal KMDs
+        let masses = vec![498.930, 398.936, 298.943];
         let cpu =
             kmd::kendrick_mass_defect(&masses, kmd::units::CF2_EXACT, kmd::units::CF2_NOMINAL);
-        assert_eq!(cpu.len(), 4);
-        for r in &cpu {
-            assert!(r.kmd.abs() < 0.1, "KMD should be small for PFAS series");
+        assert_eq!(cpu.len(), 3);
+        let kmd0 = cpu[0].kmd;
+        for r in &cpu[1..] {
+            assert!(
+                (r.kmd - kmd0).abs() < 0.01,
+                "homologous KMDs should be equal: {kmd0} vs {}",
+                r.kmd
+            );
         }
     }
 }

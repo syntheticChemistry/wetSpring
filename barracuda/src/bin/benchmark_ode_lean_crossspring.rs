@@ -19,14 +19,14 @@
 //!
 //! | System | Biology | Evolved By | Precision From | Template From |
 //! |--------|---------|-----------|---------------|--------------|
-//! | Capacitor | VpsR phenotypic capacitor | wetSpring Exp002 | hotSpring f64 | ToadStool S51 |
-//! | Cooperation | QS game theory | wetSpring Exp003 | hotSpring f64 | ToadStool S51 |
-//! | MultiSignal | Dual-signal QS | wetSpring Exp006 | hotSpring f64 | ToadStool S51 |
-//! | Bistable | Phenotypic switch | wetSpring Exp007 | hotSpring f64 | ToadStool S51 |
-//! | PhageDefense | Arms race | wetSpring Exp009 | hotSpring f64 | ToadStool S51 |
+//! | Capacitor | `VpsR` phenotypic capacitor | wetSpring Exp002 | hotSpring f64 | `ToadStool` S51 |
+//! | Cooperation | QS game theory | wetSpring Exp003 | hotSpring f64 | `ToadStool` S51 |
+//! | `MultiSignal` | Dual-signal QS | wetSpring Exp006 | hotSpring f64 | `ToadStool` S51 |
+//! | Bistable | Phenotypic switch | wetSpring Exp007 | hotSpring f64 | `ToadStool` S51 |
+//! | `PhageDefense` | Arms race | wetSpring Exp009 | hotSpring f64 | `ToadStool` S51 |
 //!
 //! The f64 emulation pattern in WGSL came from hotSpring's lattice QCD shaders.
-//! The generic `OdeSystem` trait + RK4 template came from ToadStool S51 absorption.
+//! The generic `OdeSystem` trait + RK4 template came from `ToadStool` S51 absorption.
 //! neuralSpring's adaptive RK45 influenced the stepping architecture.
 
 use std::time::Instant;

@@ -9,7 +9,11 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V25** | `handoffs/WETSPRING_TOADSTOOL_V25_FINITE_SIZE_FEB24_2026.md` | Feb 24 | Phase 39: finite-size scaling, correlated disorder, ToadStool absorption targets |
+| **V29** | `handoffs/WETSPRING_TOADSTOOL_V29_EVOLUTION_HANDOFF_FEB24_2026.md` | Feb 24 | Phase 40: cross-spring synthesis, deprecated API removal, dead-code cleanup, V29 handoff |
+| V28 | `handoffs/WETSPRING_TOADSTOOL_V28_S57_SYNC_FEB24_2026.md` | Feb 24 | Phase 40: S57 alignment, 6 new primitives wired, clippy cleanup, Exp162 |
+| V27 | `handoffs/WETSPRING_TOADSTOOL_V27_EVOLUTION_FEB24_2026.md` | Feb 24 | Barracuda evolution review, three-tier controls, Track 3 drug repurposing |
+| V26 | `handoffs/WETSPRING_TOADSTOOL_V26_SYNC_FEB24_2026.md` | Feb 24 | Code audit, revalidation, ToadStool S53 sync |
+| V25 | `handoffs/WETSPRING_TOADSTOOL_V25_FINITE_SIZE_FEB24_2026.md` | Feb 24 | Phase 39: finite-size scaling, correlated disorder, ToadStool absorption targets |
 | V24 | `handoffs/WETSPRING_TOADSTOOL_V24_LEAN_FEB24_2026.md` | Feb 24 | Complete ODE lean: 5 WGSL deleted, GPU rewired to `generate_shader()` |
 | V22 | `handoffs/WETSPRING_V022_EXTENSION_PAPERS_FEB23_2026.md` | Feb 23 | Phase 38: extension papers (Exps 144–149), baseCamp sub-theses |
 | V21 | `handoffs/WETSPRING_V021_WHY_ANALYSIS_FEB23_2026.md` | Feb 23 | Phase 36c: why analysis, GPU-confirmed |
@@ -26,7 +30,7 @@
 
 | File | Purpose |
 |------|---------|
-| `CROSS_SPRING_SHADER_EVOLUTION.md` | 612 WGSL shader provenance map (35 hot, 22 wet, 14 neural, 5 air) |
+| `CROSS_SPRING_SHADER_EVOLUTION.md` | 650+ WGSL shader provenance map (cross-spring, ToadStool S57) |
 | `handoffs/CROSS_SPRING_EVOLUTION_WETSPRING_FEB22_2026.md` | wetSpring perspective on biome model |
 | `handoffs/CROSS_SPRING_PROVENANCE_FEB22_2026.md` | Shader origin tracking |
 
