@@ -1,7 +1,7 @@
 # Cross-Spring Shader Evolution
 
-**Last updated**: Feb 24, 2026 — ToadStool S62 (660+ WGSL shaders, DF64 expansion)
-**Validated by**: wetSpring Exp120 `benchmark_cross_spring_evolution`, V30 lean validation
+**Last updated**: Feb 25, 2026 — ToadStool S62 (660+ WGSL shaders, cpu-math lean)
+**Validated by**: wetSpring Exp120 `benchmark_cross_spring_evolution`, V32 lean + cpu-math validation
 
 ---
 
@@ -54,6 +54,9 @@ available to all springs. This document tracks that evolution.
 | Feb 24 | ToadStool S58 | NMF (Euclidean+KL), 5 bio ODE systems, Fp64Strategy, df64_core.wgsl | wetSpring + hotSpring → ToadStool |
 | Feb 24 | ToadStool S59 | ridge_regression, anderson_3d_correlated, ValidationHarness, NMF re-exports | wetSpring + neuralSpring → ToadStool |
 | Feb 24 | wetSpring V30 | S59 lean: NMF, ridge, ODE, Anderson rewired upstream (~1,312 lines removed) | wetSpring leans on ToadStool |
+| Feb 24 | ToadStool S60 | TranseScoreF64, SparseGemmF64, BandwidthTier | neuralSpring + hotSpring → ToadStool |
+| Feb 24 | ToadStool S62 | PeakDetectF64, cpu-math feature gate | wetSpring + neuralSpring → ToadStool |
+| Feb 25 | wetSpring V33 | CPU-math lean: barracuda always-on, ~177 lines dual-path removed. PeakDetect + TransE GPU. | wetSpring full lean on ToadStool |
 
 ---
 
@@ -101,18 +104,43 @@ neuralSpring's graph theory primitives (S54: `graph_laplacian`, `effective_rank`
 neuralSpring's `ValidationHarness` (S59) provides structured tolerance-aware
 validation with `check_abs`/`check_rel`/`require!` macros.
 
-### Measured benefits (ODE lean benchmark)
+### S60-S62: Full CPU-math lean + new GPU primitives
+
+ToadStool S60-S62 introduced the `cpu-math` feature gate, making `barracuda::special`,
+`barracuda::linalg`, and `barracuda::numerical` available **without GPU dependencies**.
+wetSpring leveraged this architectural change to eliminate all `#[cfg(not(feature = "gpu"))]`
+fallback code:
+
+| What was removed | Lines | Now delegates to |
+|-----------------|:-----:|------------------|
+| `special.rs` local erf (A&S 7.1.26) | ~15 | `barracuda::special::erf` |
+| `special.rs` local ln_gamma (Lanczos) | ~30 | `barracuda::special::ln_gamma` |
+| `special.rs` local regularized_gamma (series) | ~30 | `barracuda::special::regularized_gamma_p` |
+| `esn.rs` local Cholesky ridge solver | ~95 | `barracuda::linalg::ridge_regression` |
+| `eic.rs` local trapezoidal loop | ~7 | `barracuda::numerical::trapz` |
+| **Total** | **~177** | **5 upstream functions** |
+
+New primitives wired in S60-S62:
+
+| Primitive | Origin | Used by wetSpring | Also benefits |
+|-----------|--------|-------------------|---------------|
+| `PeakDetectF64` (S62) | Shared need across springs | `bio/signal_gpu.rs` — LC-MS peak detection | neuralSpring (spike detection), airSpring (anomaly detection) |
+| `TranseScoreF64` (S60) | neuralSpring KG embeddings | `validate_knowledge_graph_embedding.rs` — drug repurposing | All springs with knowledge graphs |
+| `SparseGemmF64` (S60) | hotSpring sparse lattice ops | Available for drug-disease NMF (~5% fill) | neuralSpring (sparse attention), wetSpring (future) |
+
+### Measured benefits (ODE lean benchmark, S62)
 
 | System | Local CPU µs | Upstream µs | Speedup |
 |--------|-------------|-------------|---------|
-| Capacitor | 3,176 | 1,813 | **1.75×** |
-| Cooperation | 921 | 836 | **1.10×** |
-| MultiSignal | 1,568 | 1,229 | **1.28×** |
-| Bistable | 1,686 | 1,382 | **1.22×** |
-| PhageDefense | 83 | 64 | **1.30×** |
+| Capacitor | 1,165 | 774 | **1.51×** |
+| Cooperation | 837 | 623 | **1.34×** |
+| MultiSignal | 1,589 | 1,200 | **1.32×** |
+| Bistable | 1,715 | 1,415 | **1.21×** |
+| PhageDefense | 85 | 61 | **1.39×** |
 
-Upstream integrators are 10-43% faster because ToadStool optimizes the shared
-`integrate_cpu()` across all springs' usage patterns.
+Upstream integrators are 21-51% faster because ToadStool optimizes the shared
+`integrate_cpu()` across all springs' usage patterns. Performance improved since
+S59 (was 10-43%) due to ToadStool's continuous optimization across all consumers.
 
 ---
 

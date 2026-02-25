@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 24, 2026
-**Status**: Phase 41 — 3,198+/3,198+ checks, ALL PASS (806 tests, 162 experiments, ToadStool S62 aligned, 44 primitives)
+**Status**: Phase 41 — 3,198+/3,198+ checks, ALL PASS (806 tests, 162 experiments, ToadStool S62 aligned, 44 primitives, barracuda always-on)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -11,7 +11,7 @@
 | Metric | Value |
 |--------|-------|
 | CPU validation | 1,476/1,476 PASS — 46 modules, 162 experiments (GPU-confirmed Phase 41), 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
-| GPU validation | 702/702 PASS — 44 ToadStool primitives (S62), 0 local WGSL, PeakDetectF64 + TranseScoreF64 + SpMM wired |
+| GPU validation | 702/702 PASS — 44 ToadStool primitives (S62, always-on), 0 local WGSL, PeakDetectF64 + TranseScoreF64 + SpMM wired |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 380/380 — 22.5x Rust speedup over Python (v1–v8) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/101) — pure GPU math proven |
@@ -132,7 +132,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 - **Deep-sea metagenomics** — ANI, SNP, dN/dS, molecular clock, pangenomics
 - **ML inference** — Decision tree, Random Forest, GBM (all sovereign, no Python)
 - **Drug repurposing** — NMF, knowledge graph embeddings, pharmacophenomics (Track 3)
-- **Sovereign Rust bioinformatics** — 46 CPU + 42 GPU modules, 2 runtime dependencies (flate2 + bytemuck), 44 ToadStool primitives consumed (S62)
+- **Sovereign Rust bioinformatics** — 46 CPU + 42 GPU modules, 2 runtime dependencies (flate2 + bytemuck), 44 ToadStool primitives (S62, always-on, zero fallback)
 
 ### wetSpring IS NOT:
 - Sensor noise analysis (groundSpring)

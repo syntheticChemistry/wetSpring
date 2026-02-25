@@ -93,7 +93,7 @@ Following hotSpring's pattern:
 
 ## Deprecation Status (Resolved)
 
-All deprecation candidates have been resolved as of Phase 41 (S59):
+All deprecation candidates have been resolved as of Phase 41 (S62, barracuda always-on):
 
 - **WGSL shaders:** Zero local shaders remain. All 17 absorbed by ToadStool or replaced by `generate_shader()`.
 - **CPU math:** NMF (482 lines), ODE systems (715 lines), Anderson builder (~115 lines), ridge (~100 lines) — all deleted, leaning upstream.

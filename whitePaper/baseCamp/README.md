@@ -2,7 +2,7 @@
 
 **Date:** February 24, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 41 — 162 experiments, 3,198+ validation checks, ALL PASS; 806 tests, ToadStool S62 aligned, 44 upstream primitives
+**Status:** Phase 41 — 162 experiments, 3,198+ validation checks, ALL PASS; 806 tests, ToadStool S62 aligned, 44 primitives (barracuda always-on)
 
 ---
 

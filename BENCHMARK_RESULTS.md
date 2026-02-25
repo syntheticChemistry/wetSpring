@@ -1,7 +1,7 @@
 # wetSpring Benchmark Results
 
 **Date:** February 24, 2026
-**Status:** Phase 41 — Three-tier validation complete (Python → Rust CPU → GPU → metalForge) — 25/25 actionable papers full three-tier; 806 tests, 3,198+ checks, ToadStool S62, 44 primitives consumed
+**Status:** Phase 41 — Three-tier validation complete (Python → Rust CPU → GPU → metalForge) — 25/25 actionable papers full three-tier; 806 tests, 3,198+ checks, ToadStool S62, 44 primitives (barracuda always-on)
 
 ---
 

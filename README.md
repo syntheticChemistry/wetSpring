@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** February 24, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 41 — Paper queue ALL GREEN (43/43 papers); 759 tests (barracuda) + 47 forge = 806 total, 162 experiments, 3,198+ checks, 152 binaries, ToadStool S62 aligned, 44 primitives consumed
+**Status:** Phase 41 — Paper queue ALL GREEN (43/43 papers); 759 tests (barracuda) + 47 forge = 806 total, 162 experiments, 3,198+ checks, 152 binaries, ToadStool S62 aligned, 44 primitives (barracuda always-on)
 
 ---
 

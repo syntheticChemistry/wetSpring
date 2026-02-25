@@ -2,7 +2,7 @@
 
 **Date:** February 24, 2026
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 46 CPU + 42 GPU modules, 0 local WGSL (Lean complete), 44 ToadStool primitives consumed (42 prior + PeakDetectF64, TranseScoreF64), 806 tests, 162 experiments, 3,198+ checks, ToadStool S62 aligned
+**Status:** 46 CPU + 42 GPU modules, 0 local WGSL (Lean complete), 44 ToadStool primitives (barracuda always-on, zero fallback code), 806 tests, 162 experiments, 3,198+ checks, ToadStool S62 aligned
 
 ### Pure GPU Promotion Complete: 0 Tier B/C remaining
 

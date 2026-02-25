@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: February 24, 2026 (Phase 41 — ToadStool S59 aligned, 42 primitives consumed)
+**Last Updated**: February 25, 2026 (Phase 41 — ToadStool S62, 44 primitives, barracuda always-on)
 **Purpose**: Track papers for reproduction/review across three tracks
 
 ---

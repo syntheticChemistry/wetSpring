@@ -169,21 +169,9 @@ pub fn integrate_peak(rt: &[f64], intensity: &[f64], left_idx: usize, right_idx:
         return 0.0;
     }
 
-    #[cfg(feature = "gpu")]
-    {
-        let x_slice = &rt[left_idx..=right_idx];
-        let y_slice = &intensity[left_idx..=right_idx];
-        if let Ok(area) = barracuda::numerical::trapz(y_slice, x_slice) {
-            return area;
-        }
-    }
-
-    let mut area = 0.0;
-    for i in left_idx..right_idx {
-        let dt = rt[i + 1] - rt[i];
-        area += 0.5 * (intensity[i] + intensity[i + 1]) * dt;
-    }
-    area
+    let x_slice = &rt[left_idx..=right_idx];
+    let y_slice = &intensity[left_idx..=right_idx];
+    barracuda::numerical::trapz(y_slice, x_slice).unwrap_or(0.0)
 }
 
 #[cfg(test)]

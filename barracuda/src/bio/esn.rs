@@ -104,7 +104,9 @@ pub struct NpuReadoutWeights {
 }
 
 /// Solve `(SᵀS + λI)·w = Sᵀy` via `ToadStool`'s Cholesky-based ridge regression.
-#[cfg(feature = "gpu")]
+///
+/// `barracuda` is always available (default-features = false for CPU-only builds).
+/// Falls back to zero weights if the solve fails.
 fn solve_ridge(
     w_out: &mut [f64],
     flat_states: &[f64],
@@ -127,101 +129,6 @@ fn solve_ridge(
         }
         Err(_) => {
             w_out.fill(0.0);
-        }
-    }
-}
-
-/// Solve `(SᵀS + λI)·w = Sᵀy` for each output dimension via Cholesky factorization.
-///
-/// - `flat_states`:  `n_samples` × `n_res` row-major reservoir states.
-/// - `flat_targets`: `n_samples` × `n_out` row-major target vectors.
-///
-/// Falls back to diagonal solve if Cholesky decomposition fails.
-#[cfg(not(feature = "gpu"))]
-fn solve_ridge(
-    w_out: &mut [f64],
-    flat_states: &[f64],
-    flat_targets: &[f64],
-    n_samples: usize,
-    n_res: usize,
-    n_out: usize,
-    regularization: f64,
-) {
-    fn cholesky_factor(a: &[f64], n: usize) -> Option<Vec<f64>> {
-        let mut l = vec![0.0; n * n];
-        for i in 0..n {
-            for j in 0..=i {
-                let mut sum = 0.0;
-                for k in 0..j {
-                    sum += l[i * n + k] * l[j * n + k];
-                }
-                if i == j {
-                    let diag = a[i * n + i] - sum;
-                    if diag <= 0.0 {
-                        return None;
-                    }
-                    l[i * n + j] = diag.sqrt();
-                } else {
-                    l[i * n + j] = (a[i * n + j] - sum) / l[j * n + j];
-                }
-            }
-        }
-        Some(l)
-    }
-
-    let mut gram = vec![0.0_f64; n_res * n_res];
-    for s in 0..n_samples {
-        let row = &flat_states[s * n_res..(s + 1) * n_res];
-        for i in 0..n_res {
-            for j in 0..n_res {
-                gram[i * n_res + j] += row[i] * row[j];
-            }
-        }
-    }
-    for i in 0..n_res {
-        gram[i * n_res + i] += regularization;
-    }
-
-    let chol = cholesky_factor(&gram, n_res);
-
-    for o in 0..n_out {
-        let mut sty = vec![0.0_f64; n_res];
-        for s in 0..n_samples {
-            let target_val = flat_targets[s * n_out + o];
-            let row = &flat_states[s * n_res..(s + 1) * n_res];
-            for r in 0..n_res {
-                sty[r] += row[r] * target_val;
-            }
-        }
-
-        match &chol {
-            Some(l) => {
-                let mut z = vec![0.0; n_res];
-                for i in 0..n_res {
-                    let mut sum = 0.0;
-                    for j in 0..i {
-                        sum += l[i * n_res + j] * z[j];
-                    }
-                    z[i] = (sty[i] - sum) / l[i * n_res + i];
-                }
-                for i in (0..n_res).rev() {
-                    let mut sum = 0.0;
-                    for j in (i + 1)..n_res {
-                        sum += l[j * n_res + i] * w_out[o * n_res + j];
-                    }
-                    w_out[o * n_res + i] = (z[i] - sum) / l[i * n_res + i];
-                }
-            }
-            None => {
-                for r in 0..n_res {
-                    let diag = gram[r * n_res + r];
-                    w_out[o * n_res + r] = if diag.abs() > crate::tolerances::MATRIX_EPS {
-                        sty[r] / diag
-                    } else {
-                        0.0
-                    };
-                }
-            }
         }
     }
 }
