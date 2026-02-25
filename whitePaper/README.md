@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 25, 2026
-**Status:** Phase 43 — Validation study active — 3,261+ checks, 806 tests, 166 experiments, ToadStool S62+DF64 aligned, 44 primitives + 2 BGL helpers (barracuda always-on)
+**Status:** Phase 44 — Validation study active — 3,279+ checks, 812 tests, 167 experiments, ToadStool S62+DF64 aligned, 44 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on)
 **License:** AGPL-3.0-or-later
 
 ---
@@ -51,8 +51,9 @@ implementations into upstream ToadStool/BarraCuda primitives:
 4. **Absorb** — ToadStool integrates as `ops::bio::*` shaders
 5. **Lean** — wetSpring rewires to upstream imports, deletes local code
 
-**Current status:** 42 GPU modules total — 31 lean on upstream ToadStool primitives
-(31 Lean + 6 S54-S57), 0 local WGSL (all ODE shaders use `BatchedOdeRK4<S>::generate_shader()`),
+**Current status:** 42 GPU modules + 1 Write-phase WGSL extension — all 42 lean on
+upstream ToadStool primitives (44 consumed + 2 BGL helpers, S62+DF64). 1 new local WGSL
+extension (`diversity_fusion_f64.wgsl` — fused Shannon + Simpson + evenness, Exp167 18/18).
 7 compose ToadStool primitives for GPU-accelerated workflows, 3 passthrough (accept
 GPU buffers, CPU kernel). Zero Tier B/C modules remain. BGL helpers
 (`storage_bgl_entry`/`uniform_bgl_entry`) adopted from ToadStool S62+DF64
@@ -66,9 +67,9 @@ capability-based dispatch, and shader origin tracking as an absorption seam for 
 
 | Claim | Evidence |
 |-------|----------|
-| Rust matches Python across 107 experiments | 1,476/1,476 CPU + 80 dispatch + 35 layout + 57 transfer/streaming + 39 cross-spring + 10 local WGSL + 24 MF-v6 + 72 streaming-v2 + 25 spectral cross-spring pass |
-| GPU matches CPU across all 42 GPU modules | 702+/702+ GPU checks pass (incl. 48 all-domain + 58 metalForge v5 + 82 local ODE parity) |
-| BarraCuda CPU parity across 31+ domains (v1-v8) | 380/380 cross-domain checks pass |
+| Rust matches Python across 167 experiments | 3,279+ checks pass (CPU + GPU + metalForge + streaming + cross-spring) |
+| GPU matches CPU across all 42 GPU modules + 1 extension | 710+ GPU checks pass (incl. 48 all-domain + 58 metalForge v5 + 18 diversity fusion) |
+| BarraCuda CPU parity across 31+ domains (v1-v9) | 407/407 cross-domain checks pass |
 | 926× spectral cosine GPU speedup | Exp016 benchmark |
 | 2.45× full 16S pipeline GPU speedup | Exp015/016 benchmark |
 | 22.5× overall Rust vs Python (25 domains) | Exp059, peak 625× (SW) |
@@ -309,9 +310,9 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCuda/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34+ WGSL shaders, active Write phase)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 44 ToadStool primitives, barracuda always-on, 806 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (1 WGSL extension, 44 ToadStool primitives + 2 BGL helpers, barracuda always-on, 812 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
-- **archive/handoffs/** — Fossil record of ToadStool handoffs (v1–v14)
+- **ecoPrimals/archive/wetspring-early-handoffs-feb2026/** — Fossil record of early ToadStool handoffs (v1–v9)
 
 Springs follow the **Write → Absorb → Lean** pattern (pioneered by hotSpring):
 write and validate locally, hand off to ToadStool for absorption, then lean on

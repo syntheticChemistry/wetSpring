@@ -2,7 +2,7 @@
 
 **Date:** February 25, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 41 — 162 experiments, 3,198+ validation checks, ALL PASS; 806 tests, ToadStool S62 aligned, 44 primitives (barracuda always-on)
+**Status:** Phase 44 — 167 experiments, 3,279+ validation checks, ALL PASS; 812 tests, ToadStool S62+DF64 aligned, 44 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on)
 
 ---
 
@@ -35,8 +35,9 @@ All code is AGPL-3.0.
 | [Cahill](cahill.md) | Sandia | 1 | 1 | 039,112,118,**123** | 54 | Algal pond, NPU bloom sentinel, temporal ESN |
 | [Smallwood](smallwood.md) | Sandia | 1 | 1 | 040,112,118,**123** | 58 | Bloom surveillance, NPU sentinel, temporal ESN |
 | [Kachkovskiy](kachkovskiy.md) | MSU CMSE | cross | 1 | 107,113,119,**122,126,127-138,144-156** | 334 | Spectral theory, 2D/3D Anderson, geometry zoo, ecosystem atlas, finite-size scaling v1+v2, correlated disorder, mapping sensitivity, planktonic dilution, eukaryote scaling, extension papers, paper queue |
-| **Fajgenbaum** | UPenn | 3 | 2 | 157,158 | 17 | Drug repurposing, pharmacophenomics |
-| **Total** | | | **43** | | **1,071+** | |
+| **Fajgenbaum** | UPenn | 3 | 7 | 157–165 | 84 | Drug repurposing, pharmacophenomics, Track 3 completed |
+| **Diversity Fusion** | — | GPU | 1 | 167 | 18 | CPU↔GPU parity extension |
+| **Total** | | | **43** | | **3,279+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -87,15 +88,15 @@ Every paper goes through the full evolution. Status across all 25 actionable pap
 | Stage | What It Proves | Coverage |
 |-------|---------------|----------|
 | Python baseline | Algorithm correctness against published tools | 42 scripts |
-| BarraCuda CPU | Rust matches Python within machine precision | 1,476 checks, 22.5x faster |
+| BarraCuda CPU | Rust matches Python within machine precision | 1,476+ checks, 22.5x faster |
 | BarraCuda GPU | GPU matches CPU within 1e-6 | 702 checks, 29 domains |
 | Pure GPU streaming | Zero CPU round-trips, data stays on-device | 152 checks, 10+ domains |
 | metalForge | Same answer on CPU, GPU, NPU | 25/25 papers, 37 domains |
 | NPU reservoir | ESN → int8 → NPU preserves classification (Cholesky solve) | 59 checks, 6 domains |
-| Cross-spring evolution | 612 WGSL shaders traced to origin springs, rewired imports | 9 checks |
+| Cross-spring evolution | 660+ WGSL shaders traced to origin springs, rewired imports | 9 checks |
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
-| Code quality audit | 95.67% coverage, streaming I/O, 0 production mocks, ToadStool S62, barracuda always-on | 806 tests |
+| Code quality audit | 95.67% coverage, streaming I/O, 0 production mocks, ToadStool S62+DF64, barracuda always-on | 812 tests |
 
 ## Performance Summary
 

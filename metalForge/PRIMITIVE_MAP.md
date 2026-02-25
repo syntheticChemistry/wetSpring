@@ -6,10 +6,10 @@ GPU primitive (or explain why it stays CPU-only). This guides the
 absorption pipeline and identifies what ToadStool needs to build next.
 
 > **Feb 25 update (latest):** 44 ToadStool primitives + 2 BGL helpers consumed.
-> 0 local WGSL (all ODE shaders use `BatchedOdeRK4<S>::generate_shader()`).
-> S62+DF64 aligned. BGL boilerplate removed (~258 lines). **New Write phase:
-> diversity fusion WGSL extension** following hotSpring's absorption pattern.
-> Forge crate v0.3.0. 166 experiments, 3,261+ checks.
+> 1 local WGSL extension (`diversity_fusion_f64.wgsl` — Write phase, Exp167 18/18).
+> All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed).
+> S62+DF64 aligned. BGL boilerplate removed (~258 lines).
+> Forge crate v0.3.0. 167 experiments, 3,279+ checks, 812 tests.
 
 ---
 

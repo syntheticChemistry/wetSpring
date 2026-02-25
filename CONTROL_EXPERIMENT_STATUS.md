@@ -208,8 +208,9 @@
 | Phase 39: finite-size, correlated, comm, nitrifying, marine, myxo, dicty (Exp150-156) | 66 |
 | Drug repurposing: Fajgenbaum, MATRIX, NMF, repoDB, ROBOKOP (Exp157-161) | 40 |
 | Drug repurposing: CPU v9, GPU, metalForge (Exp163-165) | 44 |
-| **Total validation checks** | **3,242+** |
-| Rust tests | 806 (752 barracuda CPU + 7 GPU-only + 47 forge) |
+| Phase 44: modern systems S62+DF64, diversity fusion (Exp166-167) | 37 |
+| **Total validation checks** | **3,279+** |
+| Rust tests | 812 (765 barracuda + 47 forge) |
 | BarraCuda CPU parity | 380/380 (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/092/101) |
 | metalForge cross-system | 37 domains CPU↔GPU proven (Exp103+104+165), **30/30 papers three-tier** |
@@ -351,7 +352,7 @@ SPDX headers                   → all .rs files
 max file size                  → all under 1000 LOC (fastq.rs: 913 largest)
 external C dependencies        → 0 (flate2 rust_backend; wgpu default-features = false)
 XML parser allocations         → Cow<str> for xml_unescape; 1 allocation per text event (was 2)
-provenance headers             → all 152 binaries (commit, command, hardware)
+provenance headers             → all 157 binaries (commit, command, hardware)
 duplicate math                 → 0 (crate::special delegates to ToadStool barracuda::special when gpu enabled)
 Python baselines               → scripts/requirements.txt (pinned numpy, scipy, sklearn)
 barracuda_cpu                  → 380/380 checks PASS (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted)

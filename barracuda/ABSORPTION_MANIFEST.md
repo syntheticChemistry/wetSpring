@@ -2,7 +2,7 @@
 
 **Date:** February 25, 2026
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**Status:** 44 ToadStool primitives + 2 BGL helpers consumed, 0 local WGSL (all deleted), 5 GPU ODE modules use trait-generated WGSL via `BatchedOdeRK4<S>::generate_shader()`, 42 GPU modules total, 0 Tier B/C remaining, 806 tests (759 barracuda + 47 forge), ToadStool S62+DF64 aligned, 166 experiments, 3,261+ checks
+**Status:** 44 ToadStool primitives + 2 BGL helpers consumed, 1 local WGSL extension (Write phase — diversity fusion), 5 GPU ODE modules use trait-generated WGSL via `BatchedOdeRK4<S>::generate_shader()`, 42 GPU modules + 1 Write-phase extension, 0 Tier B/C remaining, 812 tests (765 barracuda + 47 forge), ToadStool S62+DF64 aligned, 167 experiments, 3,279+ checks
 
 ---
 

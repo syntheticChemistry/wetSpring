@@ -9,22 +9,19 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V34** | `handoffs/WETSPRING_TOADSTOOL_V34_ABSORPTION_EVOLUTION_HANDOFF_FEB25_2026.md` | Feb 25 | Phase 41: complete absorption accounting, evolution recommendations for ToadStool |
-| V33 | `handoffs/WETSPRING_TOADSTOOL_V33_CPUMATH_LEAN_FEB25_2026.md` | Feb 25 | Phase 41: barracuda always-on, ~177 lines dual-path removed, zero fallback code |
-| V32 | `handoffs/WETSPRING_TOADSTOOL_V32_S62_LEAN_FEB24_2026.md` | Feb 24 | Phase 41: S62 lean — PeakDetectF64, TranseScoreF64 wired, paper queue fully GPU-covered |
-| V31 | `handoffs/WETSPRING_TOADSTOOL_V31_ABSORPTION_TARGETS_FEB24_2026.md` | Feb 24 | Phase 41: absorption targets, cross-spring evolution insights |
-| V30 | `handoffs/WETSPRING_TOADSTOOL_V30_S59_LEAN_FEB24_2026.md` | Feb 24 | Phase 41: S59 lean — NMF, ridge, ODE systems, correlated Anderson (~1,312 lines removed) |
-| API | `handoffs/TOADSTOOL_PRIMITIVES_API_REPORT_FEB24_2026.md` | Feb 24 | ToadStool primitives API reference |
+| **V36** | `handoffs/WETSPRING_TOADSTOOL_V36_WRITE_PHASE_HANDOFF_FEB25_2026.md` | Feb 25 | Phase 44: Write-phase extension, full absorption accounting, lessons learned, bug reports |
+| V35 | `handoffs/WETSPRING_TOADSTOOL_V35_DF64_LEAN_FEB25_2026.md` | Feb 25 | Phase 43: DF64 evolution lean, BGL helpers adopted, PeakDetect bug reported |
+| V34 | `handoffs/WETSPRING_TOADSTOOL_V34_ABSORPTION_EVOLUTION_HANDOFF_FEB25_2026.md` | Feb 25 | Phase 41: complete absorption accounting, evolution recommendations |
 
 ## Cross-Spring Documents
 
 | File | Purpose |
 |------|---------|
-| `CROSS_SPRING_SHADER_EVOLUTION.md` | 660+ WGSL shader provenance map (cross-spring, ToadStool S62) |
+| `CROSS_SPRING_SHADER_EVOLUTION.md` | 660+ WGSL shader provenance map (cross-spring, ToadStool S62+DF64) |
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` (V7-V29, rewire, cross-spring provenance).
+Superseded handoffs in `handoffs/archive/` (V7-V33, API report, rewire, cross-spring provenance).
 Cross-spring docs moved to archive: `CROSS_SPRING_EVOLUTION_WETSPRING_FEB22_2026.md`, `CROSS_SPRING_PROVENANCE_FEB22_2026.md`.
 
 ## Convention

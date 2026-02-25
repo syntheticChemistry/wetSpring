@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: February 25, 2026 (Phase 42 — ToadStool S62, 44 primitives, barracuda always-on)
+**Last Updated**: February 25, 2026 (Phase 44 — ToadStool S62+DF64, 44 primitives + 2 BGL helpers + 1 WGSL extension, barracuda always-on)
 **Purpose**: Track papers for reproduction/review across three tracks
 
 ---
@@ -184,6 +184,8 @@ No proprietary data dependencies.
 | **Cross-spring** | Paper 23 (Exp107) | `barracuda::spectral` primitives (Anderson, Lanczos, level statistics) | Open (algorithmic — no external data) |
 | **NCBI-scale GPU** | Exp108-113 | Synthetic at NCBI-realistic scale (Vibrio, MassBank, Campylobacterota, HAB, HMP/Tara) | Open (synthetic, mirrors NCBI) |
 | **NPU reservoir** | Exp114-119 | ESN trained on GPU output, int8 quantized for Akida AKD1000 | Open (ESN weights from open training data) |
+| **Drug repurposing** | Exp157-165 | repoDB (1,571 × 1,209), published equations, ROBOKOP KG | Open (PMC, repoDB, algorithmic) |
+| **Diversity fusion** | Exp167 | Synthetic abundance data (CPU ↔ GPU parity) | Open (generated) |
 
 ### Validation Tiers by Hardware
 
@@ -196,10 +198,12 @@ No proprietary data dependencies.
 | **Cross-spring** | neuralSpring + spectral theory primitives | Exp094,095,107 | 71 |
 | **NCBI-scale** | Real-scale data extensions | Exp108-113 | 78 |
 | **NPU reservoir** | ESN → int8 → Akida deployment | Exp114-119 | 59 |
-| **Cross-spring evolution** | 612 WGSL shaders traced, imports rewired | Exp120 | 9 |
+| **Cross-spring evolution** | 660+ WGSL shaders traced, imports rewired | Exp120 | 9 |
 | **Phase 37-38 extensions** | Anderson-QS extension papers + cold seep + phylogeny | Exp144-149,152-156 | 102 |
 | **Phase 40 scaling** | Finite-size + correlated disorder + physical comm | Exp150-151 | 22 |
 | **Drug repurposing (Track 3)** | NMF, pathway scoring, KG embedding, metalForge | Exp157-165 | 84 |
+| **Modern systems (S62+DF64)** | BGL helpers, DF64, modern dispatch | Exp166 | 19 |
+| **Write-phase extensions** | Diversity fusion WGSL (CPU ↔ GPU parity) | Exp167 | 18 |
 
 ### Phase 37 — Anderson-QS Extension Papers
 
@@ -246,9 +250,11 @@ Core finding: **no prior work applies Anderson localization to QS signaling**.
 | Extensions (Phase 37-39) | 9 | 9/9 | — | — | CPU only (by design — analytical/catalog) |
 | **Grand total** | **43** | **43/43** | **31/31** | **30/30** | |
 
-**All GPU primitives upstream:** NMF (S58), TransE (S60), SpMM (S60), PeakDetect (S62).
+**All GPU primitives upstream:** NMF (S58), TransE (S60), SpMM (S60), PeakDetect (S62), BGL helpers (S62+DF64).
 **All 30 actionable papers now have full three-tier validation** (CPU, GPU, metalForge).
 Track 3 completed via Exp163 (CPU v9), Exp164 (GPU drug repurposing), Exp165 (metalForge).
+Modern systems validated via Exp166 (S62+DF64 benchmark, 19 checks).
+Diversity fusion WGSL extension validated via Exp167 (CPU ↔ GPU parity, 18 checks).
 Extension papers are analytical models — GPU acceleration is not the bottleneck.
 
 ---

@@ -112,13 +112,14 @@ integration point.
 | Extension papers: cold seep, phylogeny, waves | 36 (cold seep 299K catalog, geometry overlay, luxR phylogeny, mechanical waves, wave-localization, burst statistics) |
 | Phase 39: finite-size, correlated, comm, nitrifying, marine, myxo, dicty, drug repurposing | 104 (Exp150-161: scaling v2, correlated disorder, physical comm, nitrifying, interkingdom, Myxococcus, Dictyostelium, Fajgenbaum, MATRIX, NMF, repoDB, ROBOKOP) |
 | Phase 42: Track 3 full-tier (CPU v9, GPU drug, metalForge drug) | 44 (Exp163-165: CPU v9 27, GPU drug 8, metalForge drug 9) |
-| **Total validation checks** | **3,242+** |
-| Rust library unit tests | 752 (barracuda CPU-only) / 759 (with GPU) |
+| Phase 44: modern systems S62+DF64, diversity fusion extension | 37 (Exp166: 19, Exp167: 18) |
+| **Total validation checks** | **3,279+** |
+| Rust library unit tests | 765 (barracuda CPU+GPU) |
 | metalForge forge tests | 47 |
 | **Total Rust tests** | **806** (759 barracuda + 47 forge) |
 | Library code coverage | **95.67%** (llvm-cov) |
 | Experiments completed | 162 |
-| Validation/benchmark binaries | 141 validate + 11 benchmark = 152 total |
+| Validation/benchmark binaries | 146 validate + 11 benchmark = 157 total |
 | CPU bio modules | 47 |
 | GPU bio modules | 42 (27 lean + 5 write→lean + 7 compose + 3 passthrough) |
 | Tier B (needs refactor) | 0 (all promoted) |
@@ -129,8 +130,8 @@ integration point.
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | ToadStool primitives consumed | **44** + 2 BGL helpers (barracuda always-on, zero fallback code — ToadStool S62+DF64) |
-| Local WGSL shaders | **0** (full lean — all GPU ops dispatch to upstream) |
-All 3,242+ validation checks **PASS**. All 806 tests **PASS** (1 ignored: GPU-only).
+| Local WGSL shaders | **1** (diversity fusion — Write phase extension for ToadStool absorption) |
+All 3,279+ validation checks **PASS**. All 812 tests **PASS** (1 ignored: GPU-only).
 
 ### GPU Performance
 
@@ -524,7 +525,7 @@ Complete rewiring to modern ToadStool S42 BarraCuda APIs:
 - **Exp120**: Benchmarks diversity (wetSpring), QS ODE (hotSpring precision), ESN reservoir
   (hotSpring/neuralSpring → wetSpring NPU), with full provenance table and evolution timeline
 
-**806 tests** | **3,242+ checks** | **155 binaries**
+**812 tests** | **3,279+ checks** | **157 binaries**
 
 ### Phase 35: NCBI-Scale Hypothesis Testing (Exp121-126)
 

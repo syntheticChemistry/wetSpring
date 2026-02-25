@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 25, 2026
-**Status**: Phase 41 — 3,198+/3,198+ checks, ALL PASS (806 tests, 162 experiments, ToadStool S62 aligned, 44 primitives, barracuda always-on)
+**Status**: Phase 44 — 3,279+/3,279+ checks, ALL PASS (812 tests, 167 experiments, ToadStool S62+DF64 aligned, 44 primitives + 2 BGL helpers + 1 WGSL extension, barracuda always-on)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -10,25 +10,25 @@
 
 | Metric | Value |
 |--------|-------|
-| CPU validation | 1,476/1,476 PASS — 46 modules, 162 experiments (GPU-confirmed Phase 41), 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
-| GPU validation | 702/702 PASS — 44 ToadStool primitives (S62, always-on), 0 local WGSL, PeakDetectF64 + TranseScoreF64 + SpMM wired |
+| CPU validation | 1,476+/1,476+ PASS — 46 modules, 167 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
+| GPU validation | 710+/710+ PASS — 44 ToadStool primitives + 2 BGL helpers (S62+DF64, always-on), 1 local WGSL extension |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
-| BarraCuda CPU parity | 380/380 — 22.5x Rust speedup over Python (v1–v8) |
-| BarraCuda GPU parity | 29 domains (Exp064/087/101) — pure GPU math proven |
+| BarraCuda CPU parity | 407/407 — 22.5x Rust speedup over Python (v1–v9) |
+| BarraCuda GPU parity | 29 domains (Exp064/087/101/164) — pure GPU math proven |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip (Exp090/091) |
-| metalForge cross-system | 37 domains CPU↔GPU (Exp103+104) + dispatch (Exp080) + pipeline (Exp086) + PCIe (Exp088) |
+| metalForge cross-system | 37 domains CPU↔GPU (Exp103+104+165) + dispatch (Exp080) + pipeline (Exp086) + PCIe (Exp088) |
 | Cross-spring spectral | 25 checks — Anderson localization + QS-disorder analogy (Exp107) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
-| Rust modules | 46 CPU + 42 GPU, 806 tests |
-| Write phase | 0 local WGSL — GPU modules use `generate_shader()` from `OdeSystem` trait impls |
+| Rust modules | 46 CPU + 42 GPU + 1 Write-phase extension, 812 tests |
+| Write phase | 1 local WGSL extension (`diversity_fusion_f64.wgsl` — Exp167, 18/18) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
 | Paper queue | **ALL DONE** — 43/43 reproducible papers complete (Track 1c + Track 3 + Phase 37 extensions) |
 | Faculty (Track 1) | Waters (MMG, MSU), Cahill (Sandia), Smallwood (Sandia) |
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
 | Faculty (Track 1c) | R. Anderson (Carleton) — deep-sea metagenomics, population genomics |
 | Faculty (Track 2) | Jones (BMB/Chemistry, MSU) — PFAS mass spectrometry |
-| Handoffs | Thirty-three delivered (v1–v6, rewire, cross-spring, v7–v33) |
+| Handoffs | Thirty-six delivered (v1–v6, rewire, cross-spring, v7–v36) |
 
 ---
 
@@ -81,8 +81,13 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 | 27 | Boden 2024 Phosphorus | Y | Y | Y | DTL + clock GPU (Exp101/103) |
 | 28 | Anderson 2014 Viral | Y | Y | Y | K-mer via Exp104 |
 | 29 | Anderson 2015 Rare biosphere | Y | Y | Y | — (PCoA naga bug resolved in wgpu v22.1.0) |
+| 39 | Fajgenbaum 2019 PI3K/AKT/mTOR | Y | Y | Y | Exp157 (CPU), Exp164 (GPU), Exp165 (metalForge) |
+| 40 | Fajgenbaum 2025 MATRIX pharmacophenomics | Y | Y | Y | Exp158 (CPU), Exp164 (GPU), Exp165 (metalForge) |
+| 41 | Yang 2020 NMF drug repurposing | Y | Y | Y | Exp159 (CPU), Exp164 (GPU), Exp165 (metalForge) |
+| 42 | Gao 2020 repoDB NMF | Y | Y | Y | Exp160 (CPU), Exp164 (GPU), Exp165 (metalForge) |
+| 43 | ROBOKOP KG embedding | Y | Y | Y | Exp161 (CPU), Exp164 (GPU), Exp165 (metalForge) |
 
-**Full three-tier coverage (CPU + GPU + metalForge):** All **25 of 25 actionable papers**.
+**Full three-tier coverage (CPU + GPU + metalForge):** All **30 of 30 actionable papers** (25 Tracks 1-2 + 5 Track 3).
 **CPU + GPU (no metalForge):** None — all actionable papers now have full three-tier coverage.
 **CPU only:** None — all actionable papers have at least CPU + GPU paths.
 
@@ -112,10 +117,10 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 
 | Document | Location | Description |
 |----------|----------|-------------|
-| CONTROL_EXPERIMENT_STATUS.md | `../` | 162 experiments, 3,198+ validation checks, 806 tests |
+| CONTROL_EXPERIMENT_STATUS.md | `../` | 167 experiments, 3,279+ validation checks, 812 tests |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
-| Handoff (v33) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V33_CPUMATH_LEAN_FEB25_2026.md` | Current ToadStool handoff |
+| Handoff (v36) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V36_WRITE_PHASE_HANDOFF_FEB25_2026.md` | Current ToadStool handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |
@@ -132,7 +137,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 - **Deep-sea metagenomics** — ANI, SNP, dN/dS, molecular clock, pangenomics
 - **ML inference** — Decision tree, Random Forest, GBM (all sovereign, no Python)
 - **Drug repurposing** — NMF, knowledge graph embeddings, pharmacophenomics (Track 3)
-- **Sovereign Rust bioinformatics** — 46 CPU + 42 GPU modules, 2 runtime dependencies (flate2 + bytemuck), 44 ToadStool primitives (S62, always-on, zero fallback)
+- **Sovereign Rust bioinformatics** — 46 CPU + 42 GPU modules + 1 Write-phase WGSL extension, 2 runtime dependencies (flate2 + bytemuck), 44 ToadStool primitives + 2 BGL helpers (S62+DF64, always-on, zero fallback)
 
 ### wetSpring IS NOT:
 - Sensor noise analysis (groundSpring)
@@ -160,7 +165,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 `../whitePaper/STUDY.md` → `../CONTROL_EXPERIMENT_STATUS.md` → `../barracuda/EVOLUTION_READINESS.md` → BARRACUDA_REQUIREMENTS.md
 
 **Integration partner**:
-`../wateringHole/handoffs/WETSPRING_TOADSTOOL_V31_ABSORPTION_TARGETS_FEB24_2026.md` → `../BENCHMARK_RESULTS.md`
+`../wateringHole/handoffs/WETSPRING_TOADSTOOL_V36_WRITE_PHASE_HANDOFF_FEB25_2026.md` → `../BENCHMARK_RESULTS.md`
 
 ---
 

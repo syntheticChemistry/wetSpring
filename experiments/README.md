@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-25 (Phase 41: 162 experiments, ToadStool S62, 44 primitives, barracuda always-on, 806 tests)
+**Updated**: 2026-02-25 (Phase 44: 167 experiments, ToadStool S62+DF64, 44 primitives + 2 BGL helpers + 1 WGSL extension, barracuda always-on, 812 tests)
 
 ---
 
@@ -97,6 +97,25 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 094 | [Cross-Spring Evolution Validation](094_cross_spring_evolution.md) | cross/GPU | DONE | CPU baselines | validate_cross_spring_evolution | 39 |
 | 095 | [Cross-Spring Scaling Benchmark](095_cross_spring_scaling_benchmark.md) | GPU/benchmark | DONE | — | benchmark_cross_spring_scaling | Benchmark |
 | 096 | Local WGSL Compile + Dispatch | GPU | DONE | — | validate_local_wgsl_compile | 10 |
+| 099 | CPU/GPU expanded parity | cross/GPU | DONE | — | validate_cpu_gpu_expanded | 27 |
+| 100 | metalForge v4 (16 domains) | metalForge | DONE | — | validate_metalforge_v4 | 28 |
+| 101 | Pure GPU complete pipeline | GPU/streaming | DONE | — | validate_pure_gpu_complete | 52 |
+| 102 | BarraCuda CPU v8 (25 domains) | cross | DONE | — | validate_barracuda_cpu_v8 | 175 |
+| 103 | metalForge v5 (25/25 papers) | metalForge | DONE | — | validate_metalforge_v5 | 58 |
+| 104 | metalForge v6 (25/25 papers) | metalForge | DONE | — | validate_metalforge_v6 | 24 |
+| 105 | Pure GPU streaming v2 | streaming | DONE | — | validate_streaming_v2 | 27 |
+| 106 | Streaming ODE + phylo | streaming | DONE | — | validate_streaming_ode_phylo | 45 |
+| 157 | Fajgenbaum pathway scoring | 3 | DONE | Published equations | validate_fajgenbaum_pathway | 8 |
+| 158 | MATRIX pharmacophenomics | 3 | DONE | Lancet Haematology 2025 | validate_matrix_pharmacophenomics | 9 |
+| 159 | Yang 2020 NMF drug repurposing | 3 | DONE | PMC | validate_nmf_drug_repurposing | 7 |
+| 160 | Gao 2020 repoDB NMF | 3 | DONE | PMC | validate_repodb_nmf | 9 |
+| 161 | ROBOKOP KG embedding | 3 | DONE | KG infrastructure | validate_kg_embedding | 7 |
+| 162 | Cross-spring S57 evolution | cross | DONE | S57 rewire | benchmark_cross_spring_evolution | 66 |
+| 163 | BarraCuda CPU v9 (Track 3) | cross | DONE | CPU + Track 3 | validate_barracuda_cpu_v9 | 66 |
+| 164 | GPU drug repurposing | GPU | DONE | GPU Track 3 | validate_gpu_drug_repurposing | 48 |
+| 165 | metalForge drug repurposing | metalForge | DONE | Substrate-independent | validate_metalforge_drug | 25 |
+| 166 | Modern systems S62+DF64 | cross/GPU | DONE | Exp166 benchmark | benchmark_modern_systems_df64 | 19 |
+| 167 | Diversity fusion GPU extension | GPU | DONE | CPU ↔ GPU parity | validate_gpu_diversity_fusion | 18 |
 
 ---
 
@@ -238,13 +257,27 @@ thresholds from `src/tolerances.rs`.
 | `validate_pure_gpu_complete` | 101 | 52 | `cargo run --features gpu --bin validate_pure_gpu_complete` |
 | `validate_barracuda_cpu_v8` | 102 | 175 | `cargo run --release --bin validate_barracuda_cpu_v8` |
 | `validate_metalforge_v5` | 103 | 58 | `cargo run --features gpu --bin validate_metalforge_v5` |
+| `validate_metalforge_v6` | 104 | 24 | `cargo run --features gpu --bin validate_metalforge_v6` |
+| `validate_streaming_v2` | 105 | 27 | `cargo run --features gpu --bin validate_streaming_v2` |
+| `validate_streaming_ode_phylo` | 106 | 45 | `cargo run --features gpu --bin validate_streaming_ode_phylo` |
+| `validate_fajgenbaum_pathway` | 157 | 8 | `cargo run --bin validate_fajgenbaum_pathway` |
+| `validate_matrix_pharmacophenomics` | 158 | 9 | `cargo run --bin validate_matrix_pharmacophenomics` |
+| `validate_nmf_drug_repurposing` | 159 | 7 | `cargo run --bin validate_nmf_drug_repurposing` |
+| `validate_repodb_nmf` | 160 | 9 | `cargo run --bin validate_repodb_nmf` |
+| `validate_kg_embedding` | 161 | 7 | `cargo run --bin validate_kg_embedding` |
+| `benchmark_cross_spring_evolution` | 162 | 66 | `cargo run --features gpu --bin benchmark_cross_spring_evolution` |
+| `validate_barracuda_cpu_v9` | 163 | 66 | `cargo run --release --bin validate_barracuda_cpu_v9` |
+| `validate_gpu_drug_repurposing` | 164 | 48 | `cargo run --features gpu --bin validate_gpu_drug_repurposing` |
+| `validate_metalforge_drug` | 165 | 25 | `cargo run --features gpu --bin validate_metalforge_drug` |
+| `benchmark_modern_systems_df64` | 166 | 19 | `cargo run --features gpu --bin benchmark_modern_systems_df64` |
+| `validate_gpu_diversity_fusion` | 167 | 18 | `cargo run --features gpu --bin validate_gpu_diversity_fusion` |
 
-**Total validation checks**: 3,198+ (1,476 CPU + 702 GPU + 82 ODE parity + 80 dispatch + 35 layout + 57 transfer/streaming + 66 cross-spring + 146 NCBI-scale + 50 3D Anderson + 50 geometry + 35 why analysis + 36 extension + 104 Phase 39 + 279 other)
-**Rust tests**: 806 (752 barracuda CPU + 7 GPU-only + 47 forge)
-**Binaries**: 141 validate + 11 benchmark = 152 total
-**ToadStool primitives**: 44 consumed (barracuda always-on, zero fallback code — S62)
-**Local WGSL shaders**: 0 (full lean — all GPU ops dispatch to upstream)
-**GPU modules**: 42 total (all lean on upstream primitives)
+**Total validation checks**: 3,279+
+**Rust tests**: 812 (765 barracuda + 47 forge)
+**Binaries**: 146 validate + 11 benchmark = 157 total
+**ToadStool primitives**: 44 + 2 BGL helpers consumed (barracuda always-on, zero fallback code — S62+DF64)
+**Local WGSL shaders**: 1 (diversity_fusion_f64.wgsl — Write phase extension)
+**GPU modules**: 42 total (all lean on upstream primitives) + 1 Write-phase extension
 **Benchmark infrastructure**: `bench.rs` harness with RAPL + nvidia-smi energy profiling, JSON output
 
 ---

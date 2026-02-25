@@ -1,13 +1,13 @@
 # wetSpring — BarraCuda Requirements
 
-**Last Updated**: February 24, 2026
+**Last Updated**: February 25, 2026
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---
 
 ## Current Kernel Usage (Validated)
 
-### Rust CPU Modules (47 modules, 881 tests, 95.67% library coverage)
+### Rust CPU Modules (47 modules, 812 tests, 95.67% library coverage)
 
 | Module Domain | Modules | Status |
 |--------------|---------|--------|
@@ -22,7 +22,7 @@
 | ML | decision_tree, random_forest, gbm | Sovereign |
 | Drug repurposing | nmf, transe | Sovereign (NEW — Track 3) |
 
-### GPU Primitives (37 ToadStool primitives + 0 local WGSL + 12 GPU wrappers, 702 checks)
+### GPU Primitives (44 ToadStool primitives + 2 BGL helpers + 1 local WGSL extension, 710+ checks)
 
 | ToadStool Primitive | wetSpring Use | Checks | Performance |
 |-------------------|---------------|--------|-------------|

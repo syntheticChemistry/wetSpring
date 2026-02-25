@@ -158,11 +158,11 @@ affinities. metalForge maps each validated algorithm to its optimal substrate.
 wetSpring follows hotSpring's pattern for ToadStool absorption:
 
 ```
-1. Validate in Rust CPU (barracuda/)          ← DONE: 45 CPU + 42 GPU modules, 759 tests, ~97% bio+io coverage, 120 experiments, 2,673+ checks.
+1. Validate in Rust CPU (barracuda/)          ← DONE: 46 CPU + 42 GPU + 1 WGSL ext, 812 tests, 167 experiments, 3,279+ checks
 2. Characterize hardware (metalForge/)         ← THIS DIRECTORY
-3. Write Rust in GPU-friendly patterns         ← 24 absorbed by ToadStool (Lean); 5 local WGSL ODE; 7 Compose; 3 Passthrough
-4. ToadStool absorbs as shared primitives      ← unidirectional handoff via archive/handoffs/
-5. wetSpring consumes ToadStool primitives     ← 30 consumed, 42 GPU modules total
+3. Write Rust in GPU-friendly patterns         ← 27 absorbed (Lean); 1 local WGSL ext; 7 Compose; 3 Passthrough
+4. ToadStool absorbs as shared primitives      ← unidirectional handoff via wateringHole/handoffs/
+5. wetSpring consumes ToadStool primitives     ← 44 consumed + 2 BGL helpers, 42 GPU modules + 1 ext
 ```
 
 ### What "GPU-Friendly Patterns" Means for Life Science

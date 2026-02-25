@@ -2,14 +2,17 @@
 
 **Date:** February 25, 2026 (ToadStool S62+DF64, barracuda always-on)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 46 CPU + 42 GPU modules, 0 local WGSL (Lean complete), 44 ToadStool primitives + 2 BGL helpers (barracuda always-on, zero fallback code), 806 tests, 166 experiments, 3,261+ checks, ToadStool S62+DF64 aligned
+**Status:** 46 CPU + 42 GPU modules + 1 Write-phase WGSL extension, 44 ToadStool primitives + 2 BGL helpers (barracuda always-on, zero fallback code), 812 tests, 167 experiments, 3,279+ checks, ToadStool S62+DF64 aligned
 
-### Full Lean Achieved
+### Full Lean + Write Phase
 
-All local WGSL shaders have been absorbed by ToadStool and deleted from wetSpring.
-The 5 ODE systems (phage defense, bistable, multi_signal, cooperation, capacitor)
-completed the full Write → Absorb → Lean cycle: local WGSL written, validated,
-handed off to ToadStool (S58), and replaced by `BatchedOdeRK4::<S>::generate_shader()`.
+All previously local WGSL shaders have been absorbed by ToadStool and deleted.
+The 5 ODE systems completed the full Write → Absorb → Lean cycle (S58).
+
+wetSpring has now entered the **Write phase** for new bio-specific extensions
+following hotSpring's absorption pattern. First extension: `diversity_fusion_f64.wgsl`
+(fused Shannon + Simpson + evenness, Exp167, 18/18 checks). Structured for
+absorption as `ops::bio::diversity_fusion`.
 
 `barracuda` is now an **always-on** dependency (`default-features = false` for CPU
 builds, `barracuda/gpu` for GPU builds). This eliminated all `#[cfg(not(feature = "gpu"))]`
@@ -61,7 +64,7 @@ constants removed after lean to `barracuda::linalg::nmf`.
 `#![deny(unsafe_code)]` enforced crate-wide — **zero unsafe blocks** in library or
 test code as of Feb 24, 2026. Test env-var manipulation refactored to pure-function
 `resolve_data_dir()` pattern, eliminating all `unsafe { set_var/remove_var }` calls.
-All 156 binaries carry `# Provenance` headers. Data paths use `validation::data_dir()`
+All 157 binaries carry `# Provenance` headers. Data paths use `validation::data_dir()`
 for capability-based discovery. NCBI API key resolution evolved to capability-based
 cascade (env var → `WETSPRING_DATA_ROOT` → XDG config → legacy paths).
 `flate2` uses `rust_backend` — zero C dependencies (ecoBin compliant). All 42
@@ -435,7 +438,7 @@ no parallelism benefit) and `fastq_parsing` (I/O-bound).
 | Absorbed | complex64, SU(3), plaquette, HMC, CellList | SW, Gillespie, DT, Felsenstein, GEMM, HMM, ANI, SNP, dN/dS, Pangenome, QF, DADA2, RF + 5 neuralSpring (PairwiseHamming, PairwiseJaccard, SpatialPayoff, BatchFitness, LocusVariance) |
 | WGSL pattern | `pub const WGSL: &str` inline | `include_str!("../shaders/...")` |
 | metalForge | GPU + NPU hardware characterization | GPU + NPU + cross-substrate validation |
-| Handoffs | `../wateringHole/handoffs/` (16+ docs) | `archive/handoffs/` (consolidated) |
+| Handoffs | `../wateringHole/handoffs/` (36+ docs) | `ecoPrimals/archive/wetspring-early-handoffs-feb2026/` (v1-v9 fossil) |
 | Tests | 454 | 750 |
 | Validation | 418 checks | 2,673+ checks |
 | Experiments | 31 suites | 120 experiments |
