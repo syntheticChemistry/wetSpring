@@ -235,17 +235,12 @@ pub fn rarefaction_curve(counts: &[f64], depths: &[f64]) -> Vec<f64> {
         return vec![0.0; depths.len()];
     }
 
-    #[allow(
-        clippy::cast_precision_loss,
-        clippy::cast_possible_truncation,
-        clippy::cast_sign_loss
-    )]
+    #[allow(clippy::cast_precision_loss)]
     let total_n = total as u64;
 
     depths
         .iter()
         .map(|&depth| {
-            #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
             let n = depth.min(total) as u64;
             if n == 0 {
                 return 0.0;
@@ -259,7 +254,6 @@ pub fn rarefaction_curve(counts: &[f64], depths: &[f64]) -> Vec<f64> {
                 if c <= 0.0 {
                     continue;
                 }
-                #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
                 let ni = c as u64;
                 // P(species absent at depth n) = C(N-Ni, n) / C(N, n)
                 // In log-space: Σ ln(N-Ni-k+1) - Σ ln(N-k+1) for k=1..n

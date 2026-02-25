@@ -22,6 +22,16 @@
 //!   upstream.
 //! - **HPC**: NPU scans millions of ODE parameter combinations to map
 //!   bistability landscapes at ~10,000× lower energy than GPU sweep.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Validation type | Analytical (closed-form expected values) |
+//! | Expected values | Derived from Exp108 Vibrio QS ODE parameter sweep |
+//! | Reference | QsBiofilmParams ODE, ESN reservoir dynamics |
+//! | Date | 2026-02-25 |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::bio::esn::{Esn, EsnConfig};
 use wetspring_barracuda::bio::qs_biofilm::QsBiofilmParams;

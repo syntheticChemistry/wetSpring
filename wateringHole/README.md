@@ -9,6 +9,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
+| **V41** | `handoffs/WETSPRING_TOADSTOOL_V41_DEEP_AUDIT_HANDOFF_FEB25_2026.md` | Feb 25 | Phase 46: Deep audit, full barracuda usage map, evolution recommendations, coverage improvements, dependency analysis, paper control matrix |
 | **V40** | `handoffs/WETSPRING_TOADSTOOL_V40_CATCH_UP_FEB25_2026.md` | Feb 25 | Phase 45: ToadStool S39-S62+DF64 catch-up, 7/9 P0-P3 delivered, Track 3 GPU fully unblocked, 0 Passthrough, 49 primitives consumed |
 
 ## Cross-Spring Documents

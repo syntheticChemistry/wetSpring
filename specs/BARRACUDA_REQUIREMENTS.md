@@ -7,7 +7,7 @@
 
 ## Current Kernel Usage (Validated)
 
-### Rust CPU Modules (47 modules, 806 tests, 95.75% library coverage, V40 catch-up)
+### Rust CPU Modules (47 modules, 871 tests, 96.48% library coverage, V40 catch-up)
 
 | Module Domain | Modules | Status |
 |--------------|---------|--------|
@@ -145,6 +145,72 @@ CPU 22.5× faster than Python  ────────→  GPU math PROVEN port
 12 shaders absorbed (S31d/g + S39-41) ─→  42 GPU modules + 5 local ────→  Full Write→Absorb→Lean cycle
 37 MF domains validated       ────────→  metalForge PROVEN (Exp104) ───→  ✓ 25/25 papers three-tier
 ```
+
+---
+
+## Evolution Readiness: Rust Module → WGSL Shader → Pipeline Stage
+
+Tier classification for GPU shader promotion (Write → Absorb → Lean lifecycle):
+
+- **Tier A (Lean)**: Already uses upstream ToadStool primitives. Ready for sovereign pipeline.
+- **Tier B (Compose)**: Combines multiple ToadStool primitives. Ready with minor wiring.
+- **Tier C (Write)**: Requires new WGSL shader development or complex adaptation.
+
+### Tier A — Lean (direct upstream primitive, no local WGSL)
+
+| Rust Module | ToadStool Primitive | WGSL Shader (upstream) | Pipeline Stage |
+|-------------|--------------------|-----------------------|---------------|
+| `diversity_gpu` | `FusedMapReduceF64`, `BrayCurtisF64` | `fused_map_reduce_f64.wgsl`, `bray_curtis_f64.wgsl` | Alpha/beta diversity |
+| `ani_gpu` | `AniBatchF64` | `ani_batch_f64.wgsl` | Genome-level ANI |
+| `snp_gpu` | `SnpCallingF64` | `snp_calling_f64.wgsl` | Variant calling |
+| `dnds_gpu` | `DnDsBatchF64` | `dnds_batch_f64.wgsl` | Selection pressure |
+| `pangenome_gpu` | `PangenomeClassifyGpu` | `pangenome_classify.wgsl` | Gene presence/absence |
+| `hmm_gpu` | `HmmBatchForwardF64` | `hmm_forward_f64.wgsl` | Sequence classification |
+| `quality_gpu` | `QualityFilterGpu` | `quality_filter.wgsl` | Read QC |
+| `random_forest_gpu` | `RfBatchInferenceGpu` | `rf_batch_inference.wgsl` | ML inference |
+| `signal_gpu` | `PeakDetectF64` | `peak_detect_f64.wgsl` | Chromatographic peaks |
+| `pcoa_gpu` | `BatchedEighGpu` | `batched_eigh.wgsl` | Ordination |
+| `unifrac_gpu` | `UniFracPropagateGpu` | `unifrac_propagate.wgsl` | Phylogenetic distance |
+| `kmer_gpu` | `KmerHistogramGpu` | `kmer_histogram.wgsl` | K-mer counting |
+| `dada2_gpu` | `Dada2EStepGpu` | `dada2_e_step.wgsl` | Denoising E-step |
+| `felsenstein_gpu` | `FelsensteinGpu` | `felsenstein.wgsl` | Tree likelihood |
+| `bistable_gpu` | `BatchedOdeRK4::<Bistable>` | `generate_shader()` | ODE phenotypic switch |
+| `batch_fitness_gpu` | `BatchFitnessGpu` | `batch_fitness.wgsl` | Evolutionary fitness |
+| `hamming_gpu` | `PairwiseHammingGpu` | `pairwise_hamming.wgsl` | Distance metric |
+| `jaccard_gpu` | `JaccardGpu` | `jaccard.wgsl` | Set similarity |
+| `spatial_payoff_gpu` | `SpatialPayoffGpu` | `spatial_payoff.wgsl` | Game theory grid |
+| `locus_variance_gpu` | `LocusVarianceGpu` | `locus_variance.wgsl` | Population genetics |
+| `rarefaction_gpu` | `RarefactionGpu` | `rarefaction.wgsl` | Sampling curves |
+| `eic_gpu` | `FusedMapReduceF64` | `fused_map_reduce_f64.wgsl` | Ion chromatograms |
+
+### Tier B — Compose (multiple primitives, minor wiring)
+
+| Rust Module | ToadStool Primitives | Pipeline Stage |
+|-------------|---------------------|---------------|
+| `spectral_match_gpu` | `GemmF64` + `FusedMapReduceF64` | MS2 library matching (926× speedup) |
+| `gemm_cached` | `GemmCached` + `TensorContext` | Shared GEMM pipeline cache |
+| `streaming_gpu` | Multiple domain primitives | End-to-end GPU streaming |
+| `gbm_gpu` | `TreeInferenceGpu` | Gradient boosted inference |
+| `merge_pairs_gpu` | `FusedMapReduceF64` | Paired-end merging |
+| `robinson_foulds_gpu` | `PairwiseHammingGpu` | Tree distance metric |
+| `chimera_gpu` | `GemmCachedF64` | Chimera detection |
+| `neighbor_joining_gpu` | `FusedMapReduceF64` | Tree construction |
+| `reconciliation_gpu` | `TreeInferenceGpu` | Gene/species reconciliation |
+| `molecular_clock_gpu` | `FusedMapReduceF64` | Divergence dating |
+| `kmd_gpu` | `FusedMapReduceF64` | PFAS homologue detection |
+
+### Tier C — Write (local WGSL extension, pending absorption)
+
+| Rust Module | Local Shader | Absorption Target | Blocking |
+|-------------|-------------|-------------------|---------|
+| `diversity_fusion_gpu` | `diversity_fusion_f64.wgsl` | ToadStool P2-5 | Awaiting upstream absorption |
+
+### Blocking Items for Full Lean
+
+1. **`diversity_fusion_f64.wgsl` absorption** — the sole remaining local WGSL shader
+2. **`ComputeDispatch` migration** — P3, medium effort, replaces manual BGL setup
+3. **DF64 GEMM adoption** — P3, low effort, `Fp64Strategy::Hybrid` for consumer GPUs
+4. **`BandwidthTier` wiring** — P3, low effort, PCIe-aware dispatch in metalForge
 
 ---
 

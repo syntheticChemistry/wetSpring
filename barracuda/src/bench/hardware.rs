@@ -387,4 +387,127 @@ cache size\t: 30720 KB
         assert!(json.contains(r#"gate\"special"#));
         assert!(json.contains("CPU\\\\model"));
     }
+
+    #[test]
+    fn parse_cpuinfo_no_core_id() {
+        let content = "processor\t: 0\nmodel name\t: ARM CPU\n";
+        let (model, cores, threads, cache_kb) = parse_cpuinfo(content);
+        assert_eq!(model, "ARM CPU");
+        assert_eq!(cores, 1);
+        assert_eq!(threads, 1);
+        assert_eq!(cache_kb, 0);
+    }
+
+    #[test]
+    fn parse_cpuinfo_multiple_cores_many_threads() {
+        let content = "\
+processor\t: 0
+model name\t: Intel Xeon
+core id\t\t: 0
+cache size\t: 16384 KB
+
+processor\t: 1
+core id\t\t: 1
+
+processor\t: 2
+core id\t\t: 0
+
+processor\t: 3
+core id\t\t: 1
+
+processor\t: 4
+core id\t\t: 2
+
+processor\t: 5
+core id\t\t: 3
+
+processor\t: 6
+core id\t\t: 4
+
+processor\t: 7
+core id\t\t: 5
+
+processor\t: 8
+core id\t\t: 6
+
+processor\t: 9
+core id\t\t: 7
+
+processor\t: 10
+core id\t\t: 0
+
+processor\t: 11
+core id\t\t: 1
+
+processor\t: 12
+core id\t\t: 2
+
+processor\t: 13
+core id\t\t: 3
+
+processor\t: 14
+core id\t\t: 4
+
+processor\t: 15
+core id\t\t: 5
+";
+        let (_, cores, threads, _) = parse_cpuinfo(content);
+        assert_eq!(cores, 8);
+        assert_eq!(threads, 16);
+    }
+
+    #[test]
+    fn parse_cpuinfo_no_cache_size() {
+        let content = "processor\t: 0\nmodel name\t: Test\ncore id\t\t: 0\n";
+        let (_, _, _, cache_kb) = parse_cpuinfo(content);
+        assert_eq!(cache_kb, 0);
+    }
+
+    #[test]
+    fn parse_meminfo_memtotal_only() {
+        let content = "MemTotal:       16384000 kB\n";
+        let mb = parse_meminfo(content);
+        assert_eq!(mb, 16000);
+    }
+
+    #[test]
+    fn hardware_inventory_to_json_roundtrip_fields() {
+        let hw = HardwareInventory {
+            gate_name: "gate1".to_string(),
+            cpu_model: "CPU Model".to_string(),
+            cpu_cores: 4,
+            cpu_threads: 8,
+            cpu_cache_kb: 8192,
+            ram_total_mb: 16384,
+            gpu_name: "GPU Name".to_string(),
+            gpu_vram_mb: 8192,
+            gpu_driver: "550.0".to_string(),
+            gpu_compute_cap: "8.9".to_string(),
+            os_kernel: "6.0.0".to_string(),
+            rust_version: "1.82".to_string(),
+        };
+        let json = hw.to_json();
+        assert!(json.contains("\"gate_name\""));
+        assert!(json.contains("\"cpu_model\""));
+        assert!(json.contains("\"cpu_cores\""));
+        assert!(json.contains("\"cpu_threads\""));
+        assert!(json.contains("\"cpu_cache_kb\""));
+        assert!(json.contains("\"ram_total_mb\""));
+        assert!(json.contains("\"gpu_name\""));
+        assert!(json.contains("\"gpu_vram_mb\""));
+        assert!(json.contains("\"gpu_driver\""));
+        assert!(json.contains("\"gpu_compute_cap\""));
+        assert!(json.contains("\"os_kernel\""));
+        assert!(json.contains("\"rust_version\""));
+    }
+
+    #[test]
+    fn parse_nvidia_smi_output_invalid_vram() {
+        let csv = "NVIDIA GPU, not_a_number, 550.0, 8.9";
+        let (name, vram, driver, cc) = parse_nvidia_smi_output(csv);
+        assert_eq!(name, "NVIDIA GPU");
+        assert_eq!(vram, 0);
+        assert_eq!(driver, "550.0");
+        assert_eq!(cc, "8.9");
+    }
 }

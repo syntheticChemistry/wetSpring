@@ -79,7 +79,7 @@ fn main() {
 
 // ── Synthetic pipeline: AlgaeParc outdoor Nannochloropsis community ─────────
 
-#[allow(clippy::too_many_lines)]
+#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn validate_synthetic_pipeline(v: &mut Validator) {
     v.section("Synthetic AlgaeParc Pipeline");
 
@@ -137,7 +137,6 @@ fn validate_synthetic_pipeline(v: &mut Validator) {
     v.check_count("Chimera: 0 chimeras", chimera_stats.chimeras_found, 0);
 
     // Step 4: Diversity
-    #[allow(clippy::cast_precision_loss)]
     let counts: Vec<f64> = clean.iter().map(|a| a.abundance as f64).collect();
     let observed = diversity::observed_features(&counts);
     let shannon = diversity::shannon(&counts);
@@ -278,7 +277,6 @@ fn validate_synthetic_pipeline(v: &mut Validator) {
             "flavobacterium" => "Flavobacterium",
             _ => name,
         };
-        #[allow(clippy::cast_precision_loss)]
         sample.insert(genus.to_string(), count as f64);
     }
 
@@ -387,6 +385,7 @@ fn validate_cross_dataset_reference(v: &mut Validator) {
 
 // ── Python control cross-validation (scripts/validate_public_16s_python.py) ─
 
+#[allow(clippy::cast_precision_loss)]
 fn validate_python_control(v: &mut Validator) {
     v.section("Python Control Parity (PRJNA382322)");
 
@@ -453,7 +452,6 @@ fn validate_python_control(v: &mut Validator) {
     );
     v.check(
         "Python baseline unique sequences > 1000 (diverse dataset)",
-        #[allow(clippy::cast_precision_loss)]
         if py_unique_seqs > 1000 { 1.0 } else { 0.0 },
         1.0,
         tolerances::EXACT,
@@ -506,7 +504,7 @@ fn decompress_partial_gz(path: &Path) -> Result<Vec<FastqRecord>, String> {
 
 // ── Real data validation (when FASTQ files are available) ──────────────────
 
-#[allow(clippy::too_many_lines)]
+#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn validate_real_data(v: &mut Validator, data_dir: &Path) {
     v.section("Real FASTQ Data (SRR5452557 — PRJNA382322)");
 
@@ -558,7 +556,6 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
 
             let qparams = QualityParams::default();
             let (filtered, _filter_stats) = quality::filter_reads(&records, &qparams);
-            #[allow(clippy::cast_precision_loss)]
             let retention = filtered.len() as f64 / n as f64;
             println!(
                 "  Quality filter: {}/{} retained ({:.1}%)",
@@ -576,7 +573,6 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
 
             // V3-V4 amplicon: ~400-450 bp expected
             if !filtered.is_empty() {
-                #[allow(clippy::cast_precision_loss)]
                 let mean_len: f64 = filtered
                     .iter()
                     .map(|r| r.sequence.len() as f64)
@@ -626,7 +622,6 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
 
                     // Acceptance criteria from Exp017 design:
                     // ASVs detected > 10, Shannon range 1.0-5.0
-                    #[allow(clippy::cast_precision_loss)]
                     let counts: Vec<f64> = asvs.iter().map(|a| a.abundance as f64).collect();
                     let shannon = diversity::shannon(&counts);
                     let observed = diversity::observed_features(&counts);

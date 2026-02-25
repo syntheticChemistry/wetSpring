@@ -6,6 +6,7 @@
 //!
 //! Data lives in `data/ncbi_phase35/` relative to the crate manifest directory.
 
+use crate::validation;
 use std::path::PathBuf;
 
 /// Vibrio genome assembly record (Exp121).
@@ -25,6 +26,21 @@ pub struct VibrioAssembly {
     pub isolation_source: String,
 }
 
+impl VibrioAssembly {
+    /// Parse a `VibrioAssembly` from a JSON object string.
+    #[must_use]
+    pub fn from_json_obj(obj: &str) -> Self {
+        Self {
+            accession: json_str_value(obj, "accession"),
+            organism: json_str_value(obj, "organism"),
+            genome_size_bp: json_int_value(obj, "genome_size_bp"),
+            gene_count: json_int_value(obj, "gene_count") as u32,
+            scaffold_count: json_int_value(obj, "scaffold_count") as u32,
+            isolation_source: json_str_value(obj, "isolation_source"),
+        }
+    }
+}
+
 /// Campylobacterota assembly record (Exp125).
 #[derive(Debug, Clone)]
 pub struct CampyAssembly {
@@ -42,6 +58,21 @@ pub struct CampyAssembly {
     pub isolation_source: String,
 }
 
+impl CampyAssembly {
+    /// Parse a `CampyAssembly` from a JSON object string.
+    #[must_use]
+    pub fn from_json_obj(obj: &str) -> Self {
+        Self {
+            accession: json_str_value(obj, "accession"),
+            organism: json_str_value(obj, "organism"),
+            genus: json_str_value(obj, "genus"),
+            genome_size_bp: json_int_value(obj, "genome_size_bp"),
+            gene_count: json_int_value(obj, "gene_count") as u32,
+            isolation_source: json_str_value(obj, "isolation_source"),
+        }
+    }
+}
+
 /// 16S `BioProject` record with biome classification (Exp126).
 #[derive(Debug, Clone)]
 pub struct BiomeProject {
@@ -55,14 +86,50 @@ pub struct BiomeProject {
     pub organism: String,
 }
 
+impl BiomeProject {
+    /// Parse a `BiomeProject` from a JSON object string.
+    #[must_use]
+    pub fn from_json_obj(obj: &str) -> Self {
+        Self {
+            accession: json_str_value(obj, "accession"),
+            title: json_str_value(obj, "title"),
+            biome: json_str_value(obj, "biome"),
+            organism: json_str_value(obj, "organism"),
+        }
+    }
+}
+
 fn data_dir() -> PathBuf {
-    if let Ok(root) = std::env::var("WETSPRING_DATA_ROOT") {
-        return PathBuf::from(root).join("ncbi_phase35");
+    validation::data_dir("WETSPRING_NCBI_DIR", "data/ncbi_phase35")
+}
+
+/// Common load-or-generate pattern: try to read JSON file, parse array, fall back to generator.
+fn load_json_array_or_fallback<T>(
+    path: &std::path::Path,
+    array_key: &str,
+    from_json: impl Fn(&str) -> T,
+    is_valid: impl Fn(&T) -> bool,
+    fallback: impl FnOnce() -> Vec<T>,
+) -> (Vec<T>, bool) {
+    if let Ok(content) = std::fs::read_to_string(path) {
+        let needle = format!("\"{array_key}\"");
+        if let Some(arr_start) = content.find(&needle) {
+            let rest = &content[arr_start..];
+            if let Some(bracket) = rest.find('[') {
+                let arr = &rest[bracket..];
+                let objects = split_json_objects(arr);
+                let items: Vec<T> = objects
+                    .iter()
+                    .map(|obj| from_json(obj))
+                    .filter(is_valid)
+                    .collect();
+                if !items.is_empty() {
+                    return (items, true);
+                }
+            }
+        }
     }
-    if let Ok(manifest) = std::env::var("CARGO_MANIFEST_DIR") {
-        return PathBuf::from(manifest).join("../data/ncbi_phase35");
-    }
-    PathBuf::from("data/ncbi_phase35")
+    (fallback(), false)
 }
 
 /// Extract a JSON string value from a line like `"key": "value"`.
@@ -126,33 +193,18 @@ fn split_json_objects(array_content: &str) -> Vec<String> {
 #[must_use]
 pub fn load_vibrio_assemblies() -> (Vec<VibrioAssembly>, bool) {
     let path = data_dir().join("vibrio_assemblies.json");
-    if let Ok(content) = std::fs::read_to_string(&path) {
-        if let Some(arr_start) = content.find("\"assemblies\"") {
-            let rest = &content[arr_start..];
-            if let Some(bracket) = rest.find('[') {
-                let arr = &rest[bracket..];
-                let objects = split_json_objects(arr);
-                let assemblies: Vec<VibrioAssembly> = objects
-                    .iter()
-                    .map(|obj| VibrioAssembly {
-                        accession: json_str_value(obj, "accession"),
-                        organism: json_str_value(obj, "organism"),
-                        genome_size_bp: json_int_value(obj, "genome_size_bp"),
-                        gene_count: json_int_value(obj, "gene_count") as u32,
-                        scaffold_count: json_int_value(obj, "scaffold_count") as u32,
-                        isolation_source: json_str_value(obj, "isolation_source"),
-                    })
-                    .filter(|a| !a.accession.is_empty())
-                    .collect();
+    load_json_array_or_fallback(
+        &path,
+        "assemblies",
+        VibrioAssembly::from_json_obj,
+        |a| !a.accession.is_empty(),
+        gen_synthetic_vibrio,
+    )
+}
 
-                if !assemblies.is_empty() {
-                    return (assemblies, true);
-                }
-            }
-        }
-    }
-
-    // Synthetic fallback: 150 assemblies mirroring real Vibrio diversity
+/// Synthetic fallback: 150 assemblies mirroring real Vibrio diversity.
+#[allow(clippy::cast_precision_loss)]
+fn gen_synthetic_vibrio() -> Vec<VibrioAssembly> {
     let mut rng = 42_u64;
     let species = [
         ("Vibrio cholerae", 4_000_000_u64, 3800_u32),
@@ -195,7 +247,7 @@ pub fn load_vibrio_assemblies() -> (Vec<VibrioAssembly>, bool) {
             isolation_source: sources[src_idx].to_string(),
         });
     }
-    (assemblies, false)
+    assemblies
 }
 
 /// Load Campylobacterota assemblies or generate synthetic fallback.
@@ -203,33 +255,18 @@ pub fn load_vibrio_assemblies() -> (Vec<VibrioAssembly>, bool) {
 #[must_use]
 pub fn load_campylobacterota() -> (Vec<CampyAssembly>, bool) {
     let path = data_dir().join("campylobacterota_assemblies.json");
-    if let Ok(content) = std::fs::read_to_string(&path) {
-        if let Some(arr_start) = content.find("\"assemblies\"") {
-            let rest = &content[arr_start..];
-            if let Some(bracket) = rest.find('[') {
-                let arr = &rest[bracket..];
-                let objects = split_json_objects(arr);
-                let assemblies: Vec<CampyAssembly> = objects
-                    .iter()
-                    .map(|obj| CampyAssembly {
-                        accession: json_str_value(obj, "accession"),
-                        organism: json_str_value(obj, "organism"),
-                        genus: json_str_value(obj, "genus"),
-                        genome_size_bp: json_int_value(obj, "genome_size_bp"),
-                        gene_count: json_int_value(obj, "gene_count") as u32,
-                        isolation_source: json_str_value(obj, "isolation_source"),
-                    })
-                    .filter(|a| !a.accession.is_empty())
-                    .collect();
+    load_json_array_or_fallback(
+        &path,
+        "assemblies",
+        CampyAssembly::from_json_obj,
+        |a| !a.accession.is_empty(),
+        gen_synthetic_campy,
+    )
+}
 
-                if !assemblies.is_empty() {
-                    return (assemblies, true);
-                }
-            }
-        }
-    }
-
-    // Synthetic fallback: 80 assemblies across genera and ecosystems
+/// Synthetic fallback: 80 assemblies across genera and ecosystems.
+#[allow(clippy::cast_precision_loss)]
+fn gen_synthetic_campy() -> Vec<CampyAssembly> {
     let genera = [
         (
             "Campylobacter",
@@ -305,38 +342,24 @@ pub fn load_campylobacterota() -> (Vec<CampyAssembly>, bool) {
             isolation_source: g.4.to_string(),
         });
     }
-    (assemblies, false)
+    assemblies
 }
 
 /// Load 16S `BioProject` records or generate synthetic fallback.
 #[must_use]
 pub fn load_biome_projects() -> (Vec<BiomeProject>, bool) {
     let path = data_dir().join("biome_16s_projects.json");
-    if let Ok(content) = std::fs::read_to_string(&path) {
-        if let Some(arr_start) = content.find("\"projects\"") {
-            let rest = &content[arr_start..];
-            if let Some(bracket) = rest.find('[') {
-                let arr = &rest[bracket..];
-                let objects = split_json_objects(arr);
-                let projects: Vec<BiomeProject> = objects
-                    .iter()
-                    .map(|obj| BiomeProject {
-                        accession: json_str_value(obj, "accession"),
-                        title: json_str_value(obj, "title"),
-                        biome: json_str_value(obj, "biome"),
-                        organism: json_str_value(obj, "organism"),
-                    })
-                    .filter(|p| !p.accession.is_empty())
-                    .collect();
+    load_json_array_or_fallback(
+        &path,
+        "projects",
+        BiomeProject::from_json_obj,
+        |p| !p.accession.is_empty(),
+        gen_synthetic_biome_projects,
+    )
+}
 
-                if !projects.is_empty() {
-                    return (projects, true);
-                }
-            }
-        }
-    }
-
-    // Synthetic fallback: 28 BioProjects across 14 biomes
+/// Synthetic fallback: 28 `BioProject` records across 14 biomes.
+fn gen_synthetic_biome_projects() -> Vec<BiomeProject> {
     let biomes = [
         ("gut", "Human gut microbiome 16S survey", 300, 0.55),
         ("gut", "Infant gut longitudinal 16S", 200, 0.40),
@@ -373,7 +396,7 @@ pub fn load_biome_projects() -> (Vec<BiomeProject>, bool) {
         ("algal_bloom", "Baltic Sea HAB 16S", 80, 0.18),
     ];
 
-    let projects: Vec<BiomeProject> = biomes
+    biomes
         .iter()
         .enumerate()
         .map(|(i, (biome, title, _n_species, _evenness))| BiomeProject {
@@ -382,9 +405,7 @@ pub fn load_biome_projects() -> (Vec<BiomeProject>, bool) {
             biome: (*biome).to_string(),
             organism: "metagenome".to_string(),
         })
-        .collect();
-
-    (projects, false)
+        .collect()
 }
 
 /// Biome diversity parameters for synthetic community generation (Exp126).
@@ -427,6 +448,7 @@ pub fn biome_diversity_params() -> Vec<(&'static str, usize, f64)> {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
+    use tempfile::TempDir;
 
     #[test]
     fn json_str_value_basic() {
@@ -452,6 +474,19 @@ mod tests {
     fn json_int_value_missing() {
         let json = r#"{"genome_size_bp": 4000000}"#;
         assert_eq!(json_int_value(json, "missing"), 0);
+    }
+
+    #[test]
+    fn json_str_value_empty_value() {
+        let json = r#"{"accession": "", "organism": "Vibrio"}"#;
+        assert_eq!(json_str_value(json, "accession"), "");
+        assert_eq!(json_str_value(json, "organism"), "Vibrio");
+    }
+
+    #[test]
+    fn json_int_value_handles_trailing_comma() {
+        let json = r#"{"count": 123, "other": 456}"#;
+        assert_eq!(json_int_value(json, "count"), 123);
     }
 
     #[test]
@@ -481,6 +516,117 @@ mod tests {
         let objects = split_json_objects(input);
         assert_eq!(objects.len(), 2);
         assert!(objects[0].contains("inner"));
+    }
+
+    #[test]
+    fn vibrio_assembly_from_json_obj() {
+        let obj = r#"{"accession": "GCF_000006745.1", "organism": "Vibrio cholerae", "genome_size_bp": 4033464, "gene_count": 3835, "scaffold_count": 2, "isolation_source": "clinical"}"#;
+        let a = VibrioAssembly::from_json_obj(obj);
+        assert_eq!(a.accession, "GCF_000006745.1");
+        assert_eq!(a.organism, "Vibrio cholerae");
+        assert_eq!(a.genome_size_bp, 4_033_464);
+        assert_eq!(a.gene_count, 3835);
+        assert_eq!(a.scaffold_count, 2);
+        assert_eq!(a.isolation_source, "clinical");
+    }
+
+    #[test]
+    fn campy_assembly_from_json_obj() {
+        let obj = r#"{"accession": "GCF_001234", "organism": "Campylobacter jejuni", "genus": "Campylobacter", "genome_size_bp": 1700000, "gene_count": 1700, "isolation_source": "gut"}"#;
+        let a = CampyAssembly::from_json_obj(obj);
+        assert_eq!(a.accession, "GCF_001234");
+        assert_eq!(a.organism, "Campylobacter jejuni");
+        assert_eq!(a.genus, "Campylobacter");
+        assert_eq!(a.genome_size_bp, 1_700_000);
+        assert_eq!(a.gene_count, 1700);
+        assert_eq!(a.isolation_source, "gut");
+    }
+
+    #[test]
+    fn biome_project_from_json_obj() {
+        let obj = r#"{"accession": "PRJNA123456", "title": "Gut microbiome 16S", "biome": "gut", "organism": "metagenome"}"#;
+        let p = BiomeProject::from_json_obj(obj);
+        assert_eq!(p.accession, "PRJNA123456");
+        assert_eq!(p.title, "Gut microbiome 16S");
+        assert_eq!(p.biome, "gut");
+        assert_eq!(p.organism, "metagenome");
+    }
+
+    /// Test-only: load from a specific directory (bypasses env-based `data_dir`).
+    fn load_vibrio_from_dir(dir: &std::path::Path) -> (Vec<VibrioAssembly>, bool) {
+        super::load_json_array_or_fallback(
+            &dir.join("vibrio_assemblies.json"),
+            "assemblies",
+            VibrioAssembly::from_json_obj,
+            |a| !a.accession.is_empty(),
+            super::gen_synthetic_vibrio,
+        )
+    }
+
+    /// Test-only: load from a specific directory (bypasses env-based `data_dir`).
+    fn load_campy_from_dir(dir: &std::path::Path) -> (Vec<CampyAssembly>, bool) {
+        super::load_json_array_or_fallback(
+            &dir.join("campylobacterota_assemblies.json"),
+            "assemblies",
+            CampyAssembly::from_json_obj,
+            |a| !a.accession.is_empty(),
+            super::gen_synthetic_campy,
+        )
+    }
+
+    /// Test-only: load from a specific directory (bypasses env-based `data_dir`).
+    fn load_biome_from_dir(dir: &std::path::Path) -> (Vec<BiomeProject>, bool) {
+        super::load_json_array_or_fallback(
+            &dir.join("biome_16s_projects.json"),
+            "projects",
+            BiomeProject::from_json_obj,
+            |p| !p.accession.is_empty(),
+            super::gen_synthetic_biome_projects,
+        )
+    }
+
+    #[test]
+    fn load_vibrio_assemblies_forced_synthetic() {
+        let temp = TempDir::new().unwrap();
+        let (assemblies, is_real) = load_vibrio_from_dir(temp.path());
+        assert!(!is_real, "should use synthetic when data dir is empty");
+        assert_eq!(assemblies.len(), 150);
+        assert!(assemblies[0].accession.starts_with("GCF_SYN_"));
+        assert!(assemblies[0].genome_size_bp > 0);
+        assert!(assemblies[0].gene_count > 0);
+    }
+
+    #[test]
+    fn load_campylobacterota_forced_synthetic() {
+        let temp = TempDir::new().unwrap();
+        let (assemblies, is_real) = load_campy_from_dir(temp.path());
+        assert!(!is_real, "should use synthetic when data dir is empty");
+        assert_eq!(assemblies.len(), 80);
+        assert!(assemblies[0].accession.starts_with("GCF_CAM_"));
+        assert!(!assemblies[0].genus.is_empty());
+    }
+
+    #[test]
+    fn load_biome_projects_forced_synthetic() {
+        let temp = TempDir::new().unwrap();
+        let (projects, is_real) = load_biome_from_dir(temp.path());
+        assert!(!is_real, "should use synthetic when data dir is empty");
+        assert_eq!(projects.len(), 28);
+        assert!(projects[0].accession.starts_with("PRJNA_SYN_"));
+        assert!(!projects[0].biome.is_empty());
+    }
+
+    #[test]
+    fn load_vibrio_assemblies_json_path() {
+        let temp = TempDir::new().unwrap();
+        let json_path = temp.path().join("vibrio_assemblies.json");
+        let json = r#"{"assemblies": [{"accession": "GCF_TEST_001", "organism": "Vibrio test", "genome_size_bp": 4000000, "gene_count": 3800, "scaffold_count": 2, "isolation_source": "marine"}]}"#;
+        std::fs::write(&json_path, json).unwrap();
+        let (assemblies, is_real) = load_vibrio_from_dir(temp.path());
+        assert!(is_real, "should use real JSON when file exists");
+        assert_eq!(assemblies.len(), 1);
+        assert_eq!(assemblies[0].accession, "GCF_TEST_001");
+        assert_eq!(assemblies[0].organism, "Vibrio test");
     }
 
     #[test]

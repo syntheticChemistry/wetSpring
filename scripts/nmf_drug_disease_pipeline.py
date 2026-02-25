@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """
 Drug Repurposing via Non-Negative Matrix Factorization — Python Control
 

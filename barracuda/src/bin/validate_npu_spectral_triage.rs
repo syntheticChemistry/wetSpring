@@ -8,6 +8,20 @@
     clippy::cast_sign_loss,
     clippy::cast_possible_wrap
 )]
+//! Exp124 — MassBank Full-Scale NPU Spectral Triage
+//!
+//! Int8-quantized spectral triage for NPU deployment. Validates recall,
+//! top-1 match rate, and throughput vs full f64 cosine search.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Validation type | Analytical (closed-form expected values) |
+//! | Expected values | Derived from spectral_match cosine similarity |
+//! | Reference | MassBank-style triage, int8 dot product ranking |
+//! | Date | 2026-02-25 |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use std::time::Instant;
 use wetspring_barracuda::bio::spectral_match;

@@ -462,4 +462,49 @@ mod tests {
         let msg = preview_error("oops", "short");
         assert_eq!(msg, "oops: short");
     }
+
+    #[test]
+    fn parse_esearch_count_multiline_xml() {
+        let xml = r#"<?xml version="1.0"?>
+<eSearchResult>
+  <Count>
+    999
+  </Count>
+  <RetMax>0</RetMax>
+</eSearchResult>"#;
+        assert_eq!(parse_esearch_count(xml).unwrap(), 999);
+    }
+
+    #[test]
+    fn preview_error_empty_body() {
+        let msg = preview_error("no count", "");
+        assert_eq!(msg, "no count: ");
+    }
+
+    #[test]
+    fn encode_entrez_term_unicode() {
+        let encoded = encode_entrez_term("café naïve 日本語");
+        assert_eq!(encoded, "café+naïve+日本語");
+    }
+
+    #[test]
+    fn cache_file_handles_path_separators() {
+        let path = cache_file("subdir/with/slashes.json");
+        let s = path.to_string_lossy();
+        assert!(s.contains("slashes.json"));
+        assert!(s.contains("subdir") || s.contains("with"));
+    }
+
+    #[test]
+    fn parse_api_key_toml_multiple_keys() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("multi.toml");
+        let mut f = std::fs::File::create(&path).unwrap();
+        writeln!(f, "ncbi_api_key = \"first_key\"").unwrap();
+        writeln!(f, "other = \"x\"").unwrap();
+        writeln!(f, "ncbi_api_key = \"second_key\"").unwrap();
+
+        let key = parse_api_key_toml(&path);
+        assert_eq!(key, Some("first_key".to_string()));
+    }
 }

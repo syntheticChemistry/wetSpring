@@ -15,6 +15,16 @@
 //!
 //! This experiment reinterprets their spatial statistics using the Anderson
 //! framework. Low-cost, high-impact reinterpretation paper.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Validation type | Analytical (closed-form expected values) |
+//! | Expected values | Derived from published equations |
+//! | Reference | Jemielita et al., SciRep 2019 |
+//! | Date | 2026-02-25 |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::validation::Validator;
 

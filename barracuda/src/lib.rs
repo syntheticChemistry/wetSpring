@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![deny(unsafe_code)]
 #![deny(clippy::expect_used, clippy::unwrap_used)]
-#![warn(missing_docs, clippy::pedantic, clippy::nursery)]
+#![deny(missing_docs)]
+#![warn(clippy::pedantic, clippy::nursery)]
 #![allow(
     clippy::module_name_repetitions,
     // GPU interop requires pervasive usize↔u32↔f64 conversion (wgpu APIs

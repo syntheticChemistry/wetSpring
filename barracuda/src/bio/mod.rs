@@ -83,7 +83,6 @@ pub mod neighbor_joining_gpu;
 pub mod ode;
 #[cfg(feature = "gpu")]
 pub mod ode_sweep_gpu;
-#[allow(clippy::cast_precision_loss)]
 pub mod pangenome;
 #[cfg(feature = "gpu")]
 pub mod pangenome_gpu;

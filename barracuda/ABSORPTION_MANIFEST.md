@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** February 25, 2026 (V40 ToadStool catch-up, post-S62+DF64 review)
+**Date:** February 25, 2026 (V41 deep audit, post-S62+DF64 review)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
 **ToadStool pin:** `02207c4a` (S62+DF64 expansion, Feb 24 2026)
-**Status:** 49 ToadStool primitives + 2 BGL helpers consumed (up from 44 in V39), 1 local WGSL extension (Write phase — diversity fusion), 5 GPU ODE modules use trait-generated WGSL via `BatchedOdeRK4<S>::generate_shader()`, 42 GPU modules + 1 Write-phase extension, 0 Tier B/C remaining, 0 Passthrough remaining (all 3 former Passthrough → Lean/Compose), 806 tests (759 barracuda + 47 forge), 95.75% library coverage, ToadStool S62+DF64 aligned, 168 experiments, 3,300+ checks
+**Status:** 49 ToadStool primitives + 2 BGL helpers consumed, 1 local WGSL extension (Write phase — diversity fusion), 5 GPU ODE modules use trait-generated WGSL via `BatchedOdeRK4<S>::generate_shader()`, 42 GPU modules + 1 Write-phase extension, 0 Tier B/C remaining, 0 Passthrough remaining, 918 tests (871 barracuda + 47 forge), 96.48% library coverage, ToadStool S62+DF64 aligned, 168 experiments, 3,300+ checks
 
 ---
 

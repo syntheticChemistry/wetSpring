@@ -392,4 +392,119 @@ mod tests {
         std::thread::sleep(std::time::Duration::from_millis(50));
         let _ = monitor.stop();
     }
+
+    #[test]
+    fn compute_gpu_energy_three_samples() {
+        let t0 = Instant::now();
+        let t1 = t0 + std::time::Duration::from_millis(500);
+        let t2 = t1 + std::time::Duration::from_millis(500);
+        let samples = vec![
+            GpuSample {
+                watts: 100.0,
+                temp_c: 50.0,
+                vram_mib: 1024.0,
+                timestamp: t0,
+            },
+            GpuSample {
+                watts: 150.0,
+                temp_c: 60.0,
+                vram_mib: 2048.0,
+                timestamp: t1,
+            },
+            GpuSample {
+                watts: 200.0,
+                temp_c: 70.0,
+                vram_mib: 4096.0,
+                timestamp: t2,
+            },
+        ];
+        let report = compute_gpu_energy(&samples, 1.0);
+        assert_eq!(report.gpu_samples, 3);
+        assert!((report.gpu_watts_avg - 150.0).abs() < f64::EPSILON);
+        assert!((report.gpu_watts_peak - 200.0).abs() < f64::EPSILON);
+        assert!((report.gpu_temp_peak_c - 70.0).abs() < f64::EPSILON);
+        assert!((report.gpu_vram_peak_mib - 4096.0).abs() < f64::EPSILON);
+        let expected_joules = 125.0_f64.mul_add(0.5, 175.0 * 0.5);
+        assert!((report.gpu_joules - expected_joules).abs() < 0.01);
+    }
+
+    #[test]
+    fn compute_gpu_energy_peak_tracking() {
+        let t0 = Instant::now();
+        let t1 = t0 + std::time::Duration::from_secs(1);
+        let t2 = t1 + std::time::Duration::from_secs(1);
+        let samples = vec![
+            GpuSample {
+                watts: 50.0,
+                temp_c: 40.0,
+                vram_mib: 512.0,
+                timestamp: t0,
+            },
+            GpuSample {
+                watts: 250.0,
+                temp_c: 85.0,
+                vram_mib: 8192.0,
+                timestamp: t1,
+            },
+            GpuSample {
+                watts: 100.0,
+                temp_c: 60.0,
+                vram_mib: 2048.0,
+                timestamp: t2,
+            },
+        ];
+        let report = compute_gpu_energy(&samples, 2.0);
+        assert!((report.gpu_watts_peak - 250.0).abs() < f64::EPSILON);
+        assert!((report.gpu_temp_peak_c - 85.0).abs() < f64::EPSILON);
+        assert!((report.gpu_vram_peak_mib - 8192.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn energy_report_default() {
+        let r = EnergyReport::default();
+        assert!(r.cpu_joules.abs() < f64::EPSILON);
+        assert!(r.gpu_joules.abs() < f64::EPSILON);
+        assert!(r.gpu_watts_avg.abs() < f64::EPSILON);
+        assert!(r.gpu_watts_peak.abs() < f64::EPSILON);
+        assert!(r.gpu_temp_peak_c.abs() < f64::EPSILON);
+        assert!(r.gpu_vram_peak_mib.abs() < f64::EPSILON);
+        assert_eq!(r.gpu_samples, 0);
+    }
+
+    #[test]
+    fn energy_report_to_json_contains_all_fields() {
+        let r = EnergyReport {
+            cpu_joules: 1.5,
+            gpu_joules: 3.25,
+            gpu_watts_avg: 150.0,
+            gpu_watts_peak: 200.0,
+            gpu_temp_peak_c: 72.0,
+            gpu_vram_peak_mib: 4096.0,
+            gpu_samples: 10,
+        };
+        let json = r.to_json();
+        assert!(json.contains("\"cpu_joules\": 1.5000"));
+        assert!(json.contains("\"gpu_joules\": 3.2500"));
+        assert!(json.contains("\"gpu_watts_avg\": 150.00"));
+        assert!(json.contains("\"gpu_watts_peak\": 200.00"));
+        assert!(json.contains("\"gpu_temp_peak_c\": 72.0"));
+        assert!(json.contains("\"gpu_vram_peak_mib\": 4096.0"));
+        assert!(json.contains("\"gpu_samples\": 10"));
+    }
+
+    #[test]
+    fn parse_nvidia_smi_sample_with_whitespace() {
+        let (w, t, v) = parse_nvidia_smi_sample("  45.23 ,  62 ,  1024  ").unwrap();
+        assert!((w - 45.23).abs() < f64::EPSILON);
+        assert!((t - 62.0).abs() < f64::EPSILON);
+        assert!((v - 1024.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn parse_nvidia_smi_sample_negative_values() {
+        let (w, t, v) = parse_nvidia_smi_sample("-5.0, -10, 512").unwrap();
+        assert!((w - (-5.0)).abs() < f64::EPSILON);
+        assert!((t - (-10.0)).abs() < f64::EPSILON);
+        assert!((v - 512.0).abs() < f64::EPSILON);
+    }
 }

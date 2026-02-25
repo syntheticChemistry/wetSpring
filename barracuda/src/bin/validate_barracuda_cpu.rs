@@ -44,7 +44,7 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
-#[allow(clippy::too_many_lines)]
+#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("BarraCuda CPU Parity — Pure Rust Math vs Python");
     let mut timings: Vec<(&str, f64)> = Vec::new();
@@ -85,7 +85,6 @@ fn main() {
         tolerances::EXACT,
     );
 
-    #[allow(clippy::cast_precision_loss)]
     {
         timings.push(("QS ODE (48h)", ode_us as f64));
         timings.push(("Capacitor ODE (48h)", cap_us as f64));
@@ -103,21 +102,11 @@ fn main() {
         let mut rng = gillespie::Lcg64::new(seed);
         let reactions = vec![
             gillespie::Reaction {
-                propensity: Box::new(|state: &[i64]| {
-                    #[allow(clippy::cast_precision_loss)]
-                    {
-                        0.5 * state[0] as f64
-                    }
-                }),
+                propensity: Box::new(|state: &[i64]| 0.5 * state[0] as f64),
                 stoichiometry: vec![1],
             },
             gillespie::Reaction {
-                propensity: Box::new(|state: &[i64]| {
-                    #[allow(clippy::cast_precision_loss)]
-                    {
-                        0.1 * state[0] as f64
-                    }
-                }),
+                propensity: Box::new(|state: &[i64]| 0.1 * state[0] as f64),
                 stoichiometry: vec![-1],
             },
         ];
@@ -125,7 +114,6 @@ fn main() {
         total_final += traj.final_state()[0];
     }
     let ssa_us = t0.elapsed().as_micros();
-    #[allow(clippy::cast_precision_loss)]
     let mean_final = total_final as f64 / n_reps as f64;
     v.check(
         "SSA: mean final > 50 (birth > death)",
@@ -133,7 +121,6 @@ fn main() {
         1.0,
         tolerances::EXACT,
     );
-    #[allow(clippy::cast_precision_loss)]
     {
         timings.push(("Gillespie SSA (100 reps)", ssa_us as f64));
     }
@@ -179,7 +166,6 @@ fn main() {
         1.0,
         tolerances::EXACT,
     );
-    #[allow(clippy::cast_precision_loss)]
     {
         v.check(
             "Viterbi path length",
@@ -202,7 +188,6 @@ fn main() {
             tolerances::PYTHON_PARITY,
         );
     }
-    #[allow(clippy::cast_precision_loss)]
     {
         timings.push(("HMM (5 obs)", hmm_us as f64));
     }
@@ -230,7 +215,6 @@ fn main() {
     let t0 = Instant::now();
     let scores = alignment::pairwise_scores(&seqs, &params);
     let pw_us = t0.elapsed().as_micros();
-    #[allow(clippy::cast_precision_loss)]
     {
         v.check(
             "Pairwise: 5 seqs → 10 pairs",
@@ -245,7 +229,6 @@ fn main() {
         5.0,
         tolerances::EXACT,
     );
-    #[allow(clippy::cast_precision_loss)]
     {
         timings.push(("SW single (40bp)", sw_us as f64));
         timings.push(("SW pairwise (5 seqs)", pw_us as f64));
@@ -286,7 +269,6 @@ fn main() {
         -40.881_169_027_599_25,
         tolerances::PHYLO_LIKELIHOOD,
     );
-    #[allow(clippy::cast_precision_loss)]
     {
         timings.push(("Felsenstein (20bp, 3 taxa)", fels_us as f64));
     }
@@ -313,7 +295,6 @@ fn main() {
         0.775,
         tolerances::ODE_METHOD_PARITY,
     );
-    #[allow(clippy::cast_precision_loss)]
     {
         timings.push(("Diversity (Shannon+Simpson)", div_us as f64));
     }
@@ -324,7 +305,6 @@ fn main() {
     v.section("═══ Domain 7: Signal Processing ═══");
 
     let mut test_signal = vec![0.0_f64; 100];
-    #[allow(clippy::cast_precision_loss)]
     for (i, val) in test_signal.iter_mut().enumerate() {
         let x = i as f64 / 100.0 * std::f64::consts::TAU * 3.0;
         *val = x.sin().abs();
@@ -342,7 +322,6 @@ fn main() {
         1.0,
         tolerances::EXACT,
     );
-    #[allow(clippy::cast_precision_loss)]
     {
         timings.push(("Peak detection (100 pts)", sig_us as f64));
     }
@@ -364,7 +343,6 @@ fn main() {
         1.0,
         tolerances::EXACT,
     );
-    #[allow(clippy::cast_precision_loss)]
     {
         timings.push(("Cooperation ODE (100h)", coop_us as f64));
     }
@@ -379,7 +357,6 @@ fn main() {
     let t0 = Instant::now();
     let rf = robinson_foulds::rf_distance(&tree_a, &tree_b);
     let rf_us = t0.elapsed().as_micros();
-    #[allow(clippy::cast_precision_loss)]
     {
         v.check("RF distance (4 taxa)", rf as f64, 2.0, tolerances::EXACT);
         timings.push(("Robinson-Foulds (4 taxa)", rf_us as f64));

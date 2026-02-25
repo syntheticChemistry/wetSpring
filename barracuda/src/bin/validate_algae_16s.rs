@@ -85,7 +85,7 @@ fn main() {
 
 // ── Synthetic pipeline: Nannochloropsis-like communities ────────────────────
 
-#[allow(clippy::too_many_lines)] // sequential 16S pipeline validation: quality → merge → derep → DADA2 → chimera → taxonomy → diversity
+#[allow(clippy::too_many_lines, clippy::cast_precision_loss)] // sequential 16S pipeline validation: quality → merge → derep → DADA2 → chimera → taxonomy → diversity
 fn validate_synthetic_pipeline(v: &mut Validator) {
     v.section("Synthetic Algae-Pond Pipeline");
 
@@ -138,7 +138,6 @@ fn validate_synthetic_pipeline(v: &mut Validator) {
     v.check_count("Chimera: 0 chimeras", chimera_stats.chimeras_found, 0);
 
     // Step 4: Diversity
-    #[allow(clippy::cast_precision_loss)]
     let counts: Vec<f64> = clean.iter().map(|a| a.abundance as f64).collect();
     let observed = diversity::observed_features(&counts);
     let shannon = diversity::shannon(&counts);
@@ -256,7 +255,6 @@ fn validate_synthetic_pipeline(v: &mut Validator) {
     let mut sample: HashMap<String, f64> = HashMap::new();
     for &(_, name, count) in species {
         let genus = name[..1].to_uppercase() + &name[1..];
-        #[allow(clippy::cast_precision_loss)]
         sample.insert(genus, count as f64);
     }
 
@@ -284,6 +282,7 @@ fn validate_synthetic_pipeline(v: &mut Validator) {
 
 // ── Cross-validate against Humphrey 2023 published results ─────────────────
 
+#[allow(clippy::cast_precision_loss)]
 fn validate_humphrey_reference(v: &mut Validator) {
     v.section("Humphrey 2023 Reference Points");
 
@@ -297,10 +296,8 @@ fn validate_humphrey_reference(v: &mut Validator) {
     let mut abundances = Vec::new();
     for i in 0..humphrey_otu_count {
         if i < 7 {
-            #[allow(clippy::cast_precision_loss)]
             abundances.push(50.0f64.mul_add((7 - i) as f64, 100.0)); // core: 150-450
         } else {
-            #[allow(clippy::cast_precision_loss)]
             abundances.push(3.0f64.mul_add((humphrey_otu_count - i) as f64, 5.0));
             // rare: 8-38
         }
@@ -468,7 +465,7 @@ fn decompress_partial_gz(path: &Path) -> Result<Vec<FastqRecord>, String> {
 
 // ── Real data validation (when FASTQ files are available) ──────────────────
 
-#[allow(clippy::too_many_lines)]
+#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn validate_real_data(v: &mut Validator, data_dir: &Path) {
     v.section("Real FASTQ Data (SRR7760408)");
 
@@ -520,7 +517,6 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
 
             let qparams = QualityParams::default();
             let (filtered, _filter_stats) = quality::filter_reads(&records, &qparams);
-            #[allow(clippy::cast_precision_loss)]
             let retention = filtered.len() as f64 / n as f64;
             println!(
                 "  Quality filter: {}/{} retained ({:.1}%)",
@@ -539,7 +535,6 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
             // Check sequence lengths are reasonable for V1-V2 amplicon (27F/338R)
             // Expected: ~300 bp
             if !filtered.is_empty() {
-                #[allow(clippy::cast_precision_loss)]
                 let mean_len: f64 = filtered
                     .iter()
                     .map(|r| r.sequence.len() as f64)
@@ -589,7 +584,6 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
                     );
 
                     // Diversity on real ASV counts
-                    #[allow(clippy::cast_precision_loss)]
                     let counts: Vec<f64> = asvs.iter().map(|a| a.abundance as f64).collect();
                     let shannon = diversity::shannon(&counts);
                     let observed = diversity::observed_features(&counts);

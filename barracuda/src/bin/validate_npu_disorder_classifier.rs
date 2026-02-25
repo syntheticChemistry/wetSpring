@@ -21,6 +21,16 @@
 //!   of whether quorum sensing signals will propagate or localize.
 //! - **HPC**: NPU classifies QS regime across all NCBI environmental
 //!   metagenomes, building a global map of QS propagation potential.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Validation type | Analytical (closed-form expected values) |
+//! | Expected values | Derived from Exp113 Anderson localization regimes |
+//! | Reference | Exp113 diversity → W mapping, ESN reservoir dynamics |
+//! | Date | 2026-02-25 |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::bio::esn::{Esn, EsnConfig};
 use wetspring_barracuda::validation::Validator;

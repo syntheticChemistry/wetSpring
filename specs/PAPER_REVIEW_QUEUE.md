@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: February 25, 2026 (Phase 45 V40 — ToadStool S62+DF64, 49 primitives + 2 BGL helpers + 1 WGSL extension, barracuda always-on, 7/9 P0-P3 delivered, 0 Passthrough, Track 3 GPU fully unblocked)
+**Last Updated**: February 25, 2026 (Phase 46 V41 — 918 tests, 96.48% llvm-cov, ToadStool S62+DF64, 49 primitives + 2 BGL helpers + 1 WGSL extension, barracuda always-on, 70 named tolerances, 0 Passthrough, all 30 papers three-tier)
 **Purpose**: Track papers for reproduction/review across three tracks
 
 ---

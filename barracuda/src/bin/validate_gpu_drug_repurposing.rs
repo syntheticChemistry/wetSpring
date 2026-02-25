@@ -32,15 +32,16 @@
 
 use barracuda::device::WgpuDevice;
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
+use barracuda::linalg::sparse::CsrMatrix;
 use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
 use barracuda::ops::peak_detect_f64::PeakDetectF64;
-use barracuda::linalg::sparse::CsrMatrix;
 use barracuda::ops::sparse_gemm_f64::SparseGemmF64;
 use barracuda::ops::transe_score_f64::TranseScoreF64;
 use std::sync::Arc;
 use std::time::Instant;
 use wetspring_barracuda::bio::gemm_cached::GemmCached;
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
@@ -155,9 +156,9 @@ fn validate_gpu_cosine_similarity(
     let b: Vec<f64> = (0..dim).map(|_| rng.next_f64()).collect();
 
     let t_cpu = Instant::now();
-    let cpu_dot: f64 = a.iter().zip(b.iter()).map(|(x, y)| x * y).sum();
-    let cpu_na: f64 = a.iter().map(|x| x * x).sum::<f64>().sqrt();
-    let cpu_nb: f64 = b.iter().map(|x| x * x).sum::<f64>().sqrt();
+    let cpu_dot = special::dot(&a, &b);
+    let cpu_na = special::l2_norm(&a);
+    let cpu_nb = special::l2_norm(&b);
     let cpu_cos = cpu_dot / (cpu_na * cpu_nb);
     let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
@@ -182,7 +183,7 @@ fn validate_gpu_cosine_similarity(
     let vlen = 1000;
     let big_a: Vec<f64> = (0..vlen).map(|_| rng.next_f64()).collect();
     let big_b: Vec<f64> = (0..vlen).map(|_| rng.next_f64()).collect();
-    let cpu_d: f64 = big_a.iter().zip(big_b.iter()).map(|(x, y)| x * y).sum();
+    let cpu_d = special::dot(&big_a, &big_b);
     let gpu_d = fmr.dot(&big_a, &big_b).expect("FMR dot 1000");
     v.check(
         "GPU dot product 1000-dim",
@@ -435,9 +436,8 @@ fn validate_sparse_gemm(
     };
 
     let t_gpu = Instant::now();
-    let gpu_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        sparse_op.execute(device)
-    }));
+    let gpu_result =
+        std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| sparse_op.execute(device)));
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     match gpu_result {
@@ -471,10 +471,7 @@ fn validate_sparse_gemm(
 
 // ── G06: NMF Top-K Drug Ranking (ToadStool S58+S60) ─────────────────────────
 
-fn validate_topk_ranking(
-    v: &mut Validator,
-    timings: &mut Vec<(&'static str, f64, f64)>,
-) {
+fn validate_topk_ranking(v: &mut Validator, timings: &mut Vec<(&'static str, f64, f64)>) {
     v.section("═══ G06: Top-K Drug Ranking (ToadStool S58 NMF + S60 TopK) ═══");
     println!("  NMF top_k_predictions: CPU ranking from upstream barracuda::linalg::nmf");
     println!("  GPU TopK (barracuda::ops::topk): available for scale via Tensor API");
@@ -510,12 +507,18 @@ fn validate_topk_ranking(
     println!("  NMF matrix: {n_drugs}×{n_diseases}, rank={rank}");
     println!("  Top-{k_val} predictions: {} returned", top_k.len());
     for (i, &(drug, disease, score)) in top_k.iter().enumerate().take(5) {
-        println!("    #{}: drug={drug}, disease={disease}, score={score:.4}", i + 1);
+        println!(
+            "    #{}: drug={drug}, disease={disease}, score={score:.4}",
+            i + 1
+        );
     }
     println!("  CPU ranking: {cpu_us:.0}µs");
 
     v.check_pass("top_k returns k results", top_k.len() == k_val);
-    v.check_pass("scores are positive", top_k.iter().all(|(_, _, s)| *s > 0.0));
+    v.check_pass(
+        "scores are positive",
+        top_k.iter().all(|(_, _, s)| *s > 0.0),
+    );
     v.check_pass(
         "scores are sorted descending",
         top_k.windows(2).all(|w| w[0].2 >= w[1].2),

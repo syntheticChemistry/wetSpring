@@ -21,6 +21,16 @@
 //!   high-interest placements are transmitted.
 //! - **HPC**: NPU scans millions of SRA reads against reference distance
 //!   features at ~10,000× less energy than full distance matrix computation.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Validation type | Analytical (closed-form expected values) |
+//! | Expected values | Derived from Exp109 JC69 distance matrix pattern |
+//! | Reference | Exp109 pairwise distances, ESN reservoir dynamics |
+//! | Date | 2026-02-25 |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::bio::esn::{Esn, EsnConfig};
 use wetspring_barracuda::validation::Validator;

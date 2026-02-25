@@ -18,6 +18,16 @@
 //!
 //! This experiment uses literature-curated data on 40+ organisms with known
 //! QS status and primary habitat geometry. Exp141 extends with live NCBI queries.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Validation type | Analytical (closed-form expected values) |
+//! | Expected values | Anderson model predictions by geometry class |
+//! | Reference | Literature-curated organism-QS-habitat dataset |
+//! | Date | 2026-02-25 |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::validation::Validator;
 

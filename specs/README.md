@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 25, 2026
-**Status**: Phase 45 — 3,300+/3,300+ checks, ALL PASS (806 tests, 168 experiments, ToadStool S62+DF64 aligned, 49 primitives + 2 BGL helpers + 1 WGSL extension, barracuda always-on, 70 named tolerance constants, 7/9 P0-P3 delivered, 0 Passthrough, V40 catch-up)
+**Status**: Phase 45 — 3,300+/3,300+ checks, ALL PASS (871 tests, 168 experiments, ToadStool S62+DF64 aligned, 49 primitives + 2 BGL helpers + 1 WGSL extension, barracuda always-on, 70 named tolerance constants, 7/9 P0-P3 delivered, 0 Passthrough, V40 catch-up, 96.48% llvm-cov)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -20,7 +20,7 @@
 | Cross-spring spectral | 25 checks — Anderson localization + QS-disorder analogy (Exp107) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
-| Rust modules | 46 CPU + 42 GPU + 1 Write-phase extension, 806 tests |
+| Rust modules | 46 CPU + 42 GPU + 1 Write-phase extension, 871 tests |
 | Write phase | 1 local WGSL extension (`diversity_fusion_f64.wgsl` — Exp167, 18/18) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
 | Paper queue | **ALL DONE** — 43/43 reproducible papers complete (Track 1c + Track 3 + Phase 37 extensions) |
@@ -117,7 +117,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 
 | Document | Location | Description |
 |----------|----------|-------------|
-| CONTROL_EXPERIMENT_STATUS.md | `../` | 168 experiments, 3,300+ validation checks, 806 tests |
+| CONTROL_EXPERIMENT_STATUS.md | `../` | 168 experiments, 3,300+ validation checks, 918 tests |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
 | Handoff (v36) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V36_WRITE_PHASE_HANDOFF_FEB25_2026.md` | Current ToadStool handoff |

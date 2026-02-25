@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** February 25, 2026 (V40 ToadStool catch-up, ToadStool `02207c4a` S62+DF64)
+**Date:** February 25, 2026 (V41 deep audit, ToadStool `02207c4a` S62+DF64)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 46 CPU + 42 GPU modules + 1 Write-phase WGSL extension, 49 ToadStool primitives + 2 BGL helpers (barracuda always-on, zero fallback code), 806 tests (759 barracuda + 47 forge), 95.75% library coverage, 168 experiments, 3,300+ checks, ToadStool S62+DF64 aligned, 70 named tolerance constants, 0 ad-hoc tolerances, 0 Passthrough, 0 debt. 7/9 P0-P3 evolution requests delivered.
+**Status:** 47 CPU + 42 GPU modules + 1 Write-phase WGSL extension, 49 ToadStool primitives + 2 BGL helpers (barracuda always-on, zero fallback code), 918 tests (871 barracuda + 47 forge), 96.48% library coverage, 168 experiments, 3,300+ checks, ToadStool S62+DF64 aligned, 70 named tolerance constants, 0 ad-hoc tolerances, 0 Passthrough, 0 debt. 7/9 P0-P3 evolution requests delivered.
 
 ### Full Lean + Write Phase
 

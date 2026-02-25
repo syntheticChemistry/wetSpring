@@ -18,6 +18,16 @@
 //! These anomalies are the "NP solutions" of the constrained evolution thesis:
 //! nature discovered solutions to a physics problem (Anderson localization)
 //! through evolutionary search.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Validation type | Analytical (closed-form expected values) |
+//! | Expected values | Derived from literature catalog of Anderson anomalies |
+//! | Reference | Constrained evolution thesis, Anderson anomaly catalog |
+//! | Date | 2026-02-25 |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::validation::Validator;
 

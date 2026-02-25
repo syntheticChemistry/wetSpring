@@ -8,6 +8,7 @@ control/galaxy/galaxy-data/
 data/
 experiments/results/*.qza
 experiments/results/**/*.qza
+experiments/results/**/*.qzv
 
 # Track 2: Mass spec data (large, not tracked)
 data/*.mzML

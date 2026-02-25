@@ -42,13 +42,13 @@ fn make_reference_tree() -> TreeNode {
     }
 }
 
+#[allow(clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp032: Alamin & Liu 2024 Phylogenetic Placement");
     let tree = make_reference_tree();
 
     v.section("── Close to sp1 ──");
     let scan = placement_scan(&tree, "ACGTACGTACGT", 0.05, 1.0);
-    #[allow(clippy::cast_precision_loss)]
     {
         v.check(
             "Edges scanned",
@@ -78,7 +78,6 @@ fn main() {
 
     v.section("── Close to sp3 ──");
     let scan = placement_scan(&tree, "ACTTACGTACGT", 0.05, 1.0);
-    #[allow(clippy::cast_precision_loss)]
     {
         v.check(
             "Best edge matches Python",
@@ -96,7 +95,6 @@ fn main() {
 
     v.section("── Divergent query ──");
     let scan = placement_scan(&tree, "GGGGGGGGGGGG", 0.05, 1.0);
-    #[allow(clippy::cast_precision_loss)]
     {
         v.check(
             "Best edge for divergent",
@@ -115,7 +113,6 @@ fn main() {
     v.section("── Batch placement ──");
     let queries = vec!["ACGTACGTACGT", "ACTTACGTACGT", "GGGGGGGGGGGG"];
     let results = batch_placement(&tree, &queries, 0.05, 1.0);
-    #[allow(clippy::cast_precision_loss)]
     {
         v.check(
             "Batch: 3 queries",
@@ -134,7 +131,6 @@ fn main() {
     v.section("── Determinism ──");
     let s1 = placement_scan(&tree, "ACGTACGTACGT", 0.05, 1.0);
     let s2 = placement_scan(&tree, "ACGTACGTACGT", 0.05, 1.0);
-    #[allow(clippy::cast_precision_loss)]
     {
         v.check(
             "Deterministic edge",

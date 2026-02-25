@@ -17,6 +17,16 @@
 //!
 //! Deep-sea sediment is 3D → Anderson predicts QS-active.
 //! This gives us 5,000× more data than our 56-query NCBI result.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Validation type | Analytical (closed-form expected values) |
+//! | Expected values | Derived from published equations |
+//! | Reference | Microbiome 2025 — Diverse QS systems in deep-sea cold seeps |
+//! | Date | 2026-02-25 |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::validation::Validator;
 

@@ -13,6 +13,16 @@
 //!
 //! Extension paper: "Diverse quorum sensing systems regulate microbial
 //! communication in deep-sea cold seeps" (Microbiome, 2025).
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Validation type | Analytical (closed-form expected values) |
+//! | Expected values | Derived from published equations |
+//! | Reference | Microbiome 2025 — Diverse QS systems in deep-sea cold seeps |
+//! | Date | 2026-02-25 |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::validation::Validator;
 

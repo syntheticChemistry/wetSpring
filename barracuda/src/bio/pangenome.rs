@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![allow(clippy::cast_precision_loss)]
 //! Pangenome analysis: gene presence-absence and core/accessory partitioning.
 //!
 //! Statistical functions (`normal_cdf`) are provided by [`crate::special`].
@@ -135,7 +136,6 @@ pub fn clusters_from_matrix(matrix: &[Vec<f64>], gene_names: &[String]) -> Vec<G
 /// `n(g)` is total gene count. Alpha < 1 indicates open pangenome.
 ///
 /// Uses simple linear regression on log-log data.
-#[allow(clippy::cast_precision_loss, clippy::similar_names)]
 fn fit_heaps_law(clusters: &[GeneCluster], n_genomes: usize) -> Option<f64> {
     if n_genomes < 3 || clusters.is_empty() {
         return None;
@@ -162,23 +162,23 @@ fn fit_heaps_law(clusters: &[GeneCluster], n_genomes: usize) -> Option<f64> {
     }
 
     // log-log regression: ln(n) = ln(κ) + α * ln(g)
-    let log_points: Vec<(f64, f64)> = points.iter().map(|(x, y)| (x.ln(), y.ln())).collect();
+    let log_points: Vec<(f64, f64)> = points.iter().map(|(g, n)| (g.ln(), n.ln())).collect();
 
-    let n = log_points.len() as f64;
-    let sum_x: f64 = log_points.iter().map(|(x, _)| x).sum();
-    let sum_y: f64 = log_points.iter().map(|(_, y)| y).sum();
-    let sum_xy: f64 = log_points.iter().map(|(x, y)| x * y).sum();
-    let sum_xx: f64 = log_points.iter().map(|(x, _)| x * x).sum();
+    let num_points = log_points.len() as f64;
+    let sum_ln_g: f64 = log_points.iter().map(|(g, _)| g).sum();
+    let sum_ln_n: f64 = log_points.iter().map(|(_, n)| n).sum();
+    let sum_ln_g_ln_n: f64 = log_points.iter().map(|(g, n)| g * n).sum();
+    let sum_ln_g_sq: f64 = log_points.iter().map(|(g, _)| g * g).sum();
 
-    // Linear regression denominator: n*Σ(x²) - (Σx)². Clippy
+    // Linear regression denominator: n*Σ(ln g)² - (Σ ln g)². Clippy
     // `suspicious_operation_groupings` is a false positive here.
     #[allow(clippy::suspicious_operation_groupings)]
-    let denom = n.mul_add(sum_xx, -(sum_x * sum_x));
+    let denom = num_points.mul_add(sum_ln_g_sq, -(sum_ln_g * sum_ln_g));
     if denom.abs() < crate::tolerances::MATRIX_EPS {
         return None;
     }
 
-    let alpha = n.mul_add(sum_xy, -(sum_x * sum_y)) / denom;
+    let alpha = num_points.mul_add(sum_ln_g_ln_n, -(sum_ln_g * sum_ln_n)) / denom;
     Some(alpha)
 }
 

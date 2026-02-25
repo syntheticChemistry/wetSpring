@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 25, 2026
-**Status:** Phase 45 — 168 experiments, 3,300+ validation checks, all PASS (759 barracuda + 47 forge = 806 Rust tests), ToadStool S62+DF64 aligned, 49 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on), 70 named tolerance constants, 0 ad-hoc tolerances, 7/9 P0-P3 delivered, 0 Passthrough, V40 catch-up complete
+**Status:** Phase 45 — 168 experiments, 3,300+ validation checks, all PASS (871 barracuda + 47 forge = 918 Rust tests), ToadStool S62+DF64 aligned, 49 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on), 70 named tolerance constants, 0 ad-hoc tolerances, 7/9 P0-P3 delivered, 0 Passthrough, V40 catch-up complete
 
 ---
 
@@ -210,7 +210,7 @@
 | Drug repurposing: CPU v9, GPU, metalForge (Exp163-165) | 44 |
 | Phase 44: modern systems S62+DF64, diversity fusion (Exp166-167) | 37 |
 | **Total validation checks** | **3,300+** |
-| Rust tests | 806 (759 barracuda + 47 forge) |
+| Rust tests | 918 (871 barracuda + 47 forge) |
 | BarraCuda CPU parity | 380/380 (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/092/101) |
 | metalForge cross-system | 37 domains CPU↔GPU proven (Exp103+104+165), **30/30 papers three-tier** |
@@ -339,7 +339,7 @@ cargo doc --features gpu       → clean (0 warnings, strict: -D missing_docs -D
 cargo test --lib               → 755 passed, 0 failed, 1 ignored (hardware-dependent)
 cargo test --tests             → 60 integration (23 bio + 16 determinism + 21 I/O)
 cargo test --doc               → 19 passed, 0 failed (5 API examples)
-cargo llvm-cov --lib           → 95.75% line coverage
+cargo llvm-cov --lib           → 96.48% line coverage
 #![deny(unsafe_code)]          → enforced crate-wide (edition 2024; env-var tests use Mutex-serialized helpers)
 #![deny(expect_used, unwrap_used)] → enforced crate-wide (test modules #[allow])
 partial_cmp().unwrap()         → 0 (all migrated to f64::total_cmp)

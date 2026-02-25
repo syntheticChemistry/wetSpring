@@ -12,6 +12,16 @@
 //!
 //! Loads Campylobacterota assembly metadata and generates ecosystem-specific
 //! pangenomes to test cross-ecosystem gene sharing patterns.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Validation type | Analytical (closed-form expected values) |
+//! | Expected values | Derived from NCBI assembly metadata |
+//! | Reference | NCBI Campylobacterota cross-ecosystem pangenome |
+//! | Date | 2026-02-25 |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use std::collections::HashMap;
 use std::time::Instant;

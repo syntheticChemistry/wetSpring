@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** February 25, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 45 — Paper queue ALL GREEN (43/43 papers, 30/30 three-tier); 759 lib tests + 47 forge = 806 total, 168 experiments, 3,300+ checks, 158 binaries, ToadStool S62+DF64 aligned, 49 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on), 70 named tolerance constants, zero ad-hoc tolerances, 7/9 P0-P3 delivered, 0 Passthrough, Track 3 GPU fully unblocked (V40 catch-up)
+**Status:** Phase 46 — Paper queue ALL GREEN (43/43 papers, 30/30 three-tier); 918 tests (871 barracuda + 47 forge), 96.48% llvm-cov, 168 experiments, 3,300+ checks, 158 binaries, ToadStool S62+DF64 aligned, 49 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on), 70 named tolerance constants, zero ad-hoc tolerances, 0 Passthrough, V41 deep audit
 
 ---
 
@@ -115,10 +115,10 @@ integration point.
 | Phase 44: modern systems S62+DF64, diversity fusion extension | 37 (Exp166: 19, Exp167: 18) |
 | Phase 45 V40: cross-spring S62+DF64 evolution | ~25 (Exp168: hotSpring precision → wetSpring bio → neuralSpring pop-gen → Track 3 GPU) |
 | **Total validation checks** | **3,300+** |
-| Rust library unit tests | 759 (barracuda CPU, default features) |
+| Rust library unit tests | 792 (barracuda CPU, default features) |
 | metalForge forge tests | 47 |
-| **Total Rust tests** | **806** (759 barracuda + 47 forge) |
-| Library code coverage | **95.75%** (llvm-cov) |
+| **Total Rust tests** | **918** (871 barracuda + 47 forge) |
+| Library code coverage | **96.48%** (llvm-cov) |
 | Experiments completed | 168 |
 | Validation/benchmark binaries | 147 validate + 11 benchmark = 158 total |
 | CPU bio modules | 47 |
@@ -130,9 +130,9 @@ integration point.
 | metalForge cross-system | 37 domains CPU↔GPU (Exp103+104), **25/25 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
-| ToadStool primitives consumed | **44** + 2 BGL helpers (barracuda always-on, zero fallback code — ToadStool S62+DF64) |
+| ToadStool primitives consumed | **49** + 2 BGL helpers (barracuda always-on, zero fallback code — ToadStool S62+DF64) |
 | Local WGSL shaders | **1** (diversity fusion — Write phase extension for ToadStool absorption) |
-All 3,300+ validation checks **PASS**. All 806 tests **PASS** (1 ignored: GPU-only).
+All 3,300+ validation checks **PASS**. All 918 tests **PASS** (1 ignored: GPU-only).
 
 ### GPU Performance
 
@@ -684,7 +684,27 @@ performance, provenance completeness, and modern Rust idioms:
 - **Upstream request**: `barracuda::math::{dot, l2_norm}` documented as extraction
   candidates in EVOLUTION_READINESS.md.
 
-**759 lib tests** | **95.75% coverage** | **62 named tolerances** | **0 clippy warnings**
+**792 lib tests** | **96.48% coverage** | **70 named tolerances** | **0 clippy warnings**
+
+### Phase 46: Deep Audit + Coverage + Idiomatic Evolution (V41)
+
+Comprehensive codebase audit and targeted test expansion:
+
+- **`missing_docs` escalated** from `warn` to `deny` — every public item now documented
+- **24 new library tests** targeting weak-coverage modules:
+  bench/power (59% → 71%), bench/hardware (77% → 81%), ncbi (78% → 80%),
+  io/fastq (84% → 87%)
+- **33 scattered `clippy::cast_precision_loss` annotations** consolidated to
+  function-level annotations in 4 validation binaries
+- **`ncbi_data.rs` refactored** — consolidated path discovery via `validation::data_dir`,
+  extracted JSON parsing helpers, 12 new tests (68% → 95% coverage)
+- **9 missing tolerance constants** added to `all_tolerances_are_non_negative` test
+- **Provenance headers** added to 20 validation binaries previously missing them
+- **Inline dot-product** replaced with `special::dot`/`special::l2_norm` in 2 binaries
+- **Dependency audit**: 3 direct deps (all pure Rust), 0 C dependencies, 0 HTTP/TLS crates
+- **All files under 1000 LOC** (max: 924 in a validation binary)
+
+**792 lib tests** | **96.48% coverage** | **70 named tolerances** | **0 clippy warnings**
 
 ### Phase 43: DF64 Evolution Lean (S62+DF64)
 - Adopted `storage_bgl_entry`/`uniform_bgl_entry` from upstream `ComputeDispatch` module
@@ -719,7 +739,7 @@ Rust 1.93 fixed across 20+ validation binaries.
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy --all-targets -D warnings` | Clean (0 warnings, pedantic + nursery) |
 | `cargo doc --no-deps` | Clean (0 warnings) |
-| Line coverage (`cargo-llvm-cov`) | **95.75% overall** (759 lib tests) |
+| Line coverage (`cargo-llvm-cov`) | **96.48% overall** (792 lib tests) |
 | `#![deny(unsafe_code)]` | **Enforced crate-wide** (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | **Enforced crate-wide** |
 | TODO/FIXME markers | **0** |
@@ -727,7 +747,7 @@ Rust 1.93 fixed across 20+ validation binaries.
 | SPDX-License-Identifier | All `.rs` files |
 | Max file size | All under 1000 LOC |
 | External C dependencies | **0** (`flate2` uses `rust_backend`) |
-| Named tolerance constants | 62 (scientifically justified, hierarchy-tested) |
+| Named tolerance constants | 70 (scientifically justified, hierarchy-tested) |
 | Provenance headers | All 158 validation/benchmark binaries |
 | ESN ridge regression | **Proper Cholesky solve** (not diagonal approximation) |
 | I/O streaming | Buffering APIs deprecated; `stats_from_file` + iterators preferred |
@@ -802,8 +822,7 @@ Rust 1.93 fixed across 20+ validation binaries.
 `kmd_gpu`, `merge_pairs_gpu`, `robinson_foulds_gpu`, `derep_gpu`,
 `neighbor_joining_gpu`, `reconciliation_gpu`, `molecular_clock_gpu`
 
-**Passthrough (3)** — accept GPU buffers, CPU kernel (pending ToadStool primitives):
-`gbm_gpu`, `feature_table_gpu`, `signal_gpu`
+**Passthrough (0)** — all promoted to Lean or Compose
 
 **Write → Lean (5)** — now using `BatchedOdeRK4<S>::generate_shader()` (WGSL deleted):
 `bistable_gpu`, `multi_signal_gpu`, `phage_defense_gpu`, `cooperation_gpu`, `capacitor_gpu`
@@ -821,7 +840,7 @@ Rust 1.93 fixed across 20+ validation binaries.
 wetSpring/
 ├── README.md                      ← this file
 ├── BENCHMARK_RESULTS.md           ← three-tier benchmark results
-├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (165 experiments)
+├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (168 experiments)
 ├── barracuda/                     ← Rust crate (src/, Cargo.toml, rustfmt.toml)
 │   ├── EVOLUTION_READINESS.md    ← absorption map (tiers, primitives, shaders)
 │   ├── ABSORPTION_MANIFEST.md    ← what's absorbed, local, planned (hotSpring pattern)
@@ -839,7 +858,7 @@ wetSpring/
 │   │   ├── bin/                 ← 158 validation/benchmark binaries
 │   │   └── shaders/             ← shared WGSL utilities (ODE shaders now generated at runtime)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024
-├── experiments/                   ← 162 experiment protocols + results
+├── experiments/                   ← 168 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
 │   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs, bridge.rs
@@ -866,7 +885,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (806: 752 lib + 7 GPU-only + 47 forge)
+# Run all tests (918: 871 barracuda + 47 forge)
 cargo test
 
 # Code quality checks
@@ -923,7 +942,7 @@ All validation data comes from public repositories:
 - **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
 - **ToadStool** — GPU compute engine (BarraCuda crate, 660+ WGSL shaders, S62+DF64)
 - **wateringHole** — Spring-local handoffs to ToadStool
-  - `handoffs/WETSPRING_TOADSTOOL_V38_DEEP_DEBT_HANDOFF_FEB25_2026.md` — **current** (deep debt resolution, tolerance centralization, I/O evolution, provenance, evolution requests)
+  - `handoffs/WETSPRING_TOADSTOOL_V41_DEEP_AUDIT_HANDOFF_FEB25_2026.md` — **current** (deep audit, coverage improvements, annotation consolidation, evolution handoff)
   - `handoffs/WETSPRING_TOADSTOOL_V37_REVALIDATION_HANDOFF_FEB25_2026.md` — sovereignty + safety revalidation
   - `handoffs/WETSPRING_TOADSTOOL_V36_WRITE_PHASE_HANDOFF_FEB25_2026.md` — write-phase extension
   - `handoffs/WETSPRING_TOADSTOOL_V35_DF64_LEAN_FEB25_2026.md` — DF64 evolution lean, BGL helpers, PeakDetect bug report

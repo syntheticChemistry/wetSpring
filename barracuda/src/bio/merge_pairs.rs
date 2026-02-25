@@ -385,9 +385,7 @@ fn posterior_quality_agree(fq: u8, rq: u8, offset: u8) -> u8 {
     // Cap at Q41 (Illumina max), floor at 0
     let q_capped = q_merged.clamp(0.0, 41.0);
 
-    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-    let result = q_capped.round() as u8 + offset;
-    result
+    q_capped.round() as u8 + offset
 }
 
 /// Posterior quality when two bases disagree.
@@ -406,9 +404,7 @@ fn posterior_quality_disagree(higher_q: u8, lower_q: u8, offset: u8) -> u8 {
 
     let q_capped = q_merged.clamp(0.0, 41.0);
 
-    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-    let result = q_capped.round() as u8 + offset;
-    result
+    q_capped.round() as u8 + offset
 }
 
 #[cfg(test)]

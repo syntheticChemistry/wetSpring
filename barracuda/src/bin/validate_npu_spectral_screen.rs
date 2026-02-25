@@ -21,6 +21,16 @@
 //!   no GPU needed in the field.
 //! - **HPC**: NPU pre-filters full `MassBank` (500k+ spectra) at ~10,000×
 //!   less energy than GPU cosine, with GPU confirmation only for top-k.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Validation type | Analytical (closed-form expected values) |
+//! | Expected values | Derived from Exp111 mass spectral library screening |
+//! | Reference | Exp111 cosine similarity, int8 quantization |
+//! | Date | 2026-02-25 |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::bio::esn::{Esn, EsnConfig};
 use wetspring_barracuda::special;

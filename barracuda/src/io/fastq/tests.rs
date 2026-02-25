@@ -405,3 +405,105 @@ fn fastq_nonexistent_file() {
     let result = FastqIter::open(std::path::Path::new("/nonexistent/reads.fastq"));
     assert!(result.is_err());
 }
+
+#[test]
+fn fastq_iter_malformed_header_after_valid_record() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = write_fastq(
+        &dir,
+        "malformed.fastq",
+        "@r1\nACGT\n+\nIIII\nNOT_AT\nGGCC\n+\n!!!!\n",
+    );
+    let mut iter = FastqIter::open(&path).unwrap();
+    let first = iter.next().unwrap();
+    assert!(first.is_ok());
+    assert_eq!(first.unwrap().id, "r1");
+    let second = iter.next().unwrap();
+    assert!(second.is_err());
+    assert!(iter.next().is_none());
+}
+
+#[test]
+fn fastq_iter_truncated_after_sequence() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = write_fastq(&dir, "trunc2.fastq", "@r1\nACGT\n");
+    let records: Vec<_> = FastqIter::open(&path)
+        .unwrap()
+        .collect::<Result<Vec<_>>>()
+        .unwrap();
+    assert_eq!(records.len(), 1);
+    assert_eq!(records[0].id, "r1");
+    assert_eq!(records[0].sequence, b"ACGT");
+    assert!(records[0].quality.is_empty());
+}
+
+#[test]
+fn fastq_iter_empty_line_terminates() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = write_fastq(&dir, "empty_line.fastq", "@r1\nACGT\n+\nIIII\n\n");
+    let records: Vec<_> = FastqIter::open(&path)
+        .unwrap()
+        .collect::<Result<Vec<_>>>()
+        .unwrap();
+    assert_eq!(records.len(), 1);
+}
+
+#[test]
+fn for_each_record_processes_each_record() {
+    let dir = tempfile::tempdir().unwrap();
+    let content = "@a\nACGT\n+\nIIII\n@b\nGGCC\n+\n!!!!\n@c\nTTTT\n+\n!!!!\n";
+    let path = write_fastq(&dir, "count.fastq", content);
+    let mut count = 0_usize;
+    for_each_record(&path, |r: FastqRefRecord<'_>| {
+        count += 1;
+        match count {
+            1 => assert_eq!(r.id, "a"),
+            2 => assert_eq!(r.id, "b"),
+            3 => assert_eq!(r.id, "c"),
+            _ => {}
+        }
+        Ok(())
+    })
+    .unwrap();
+    assert_eq!(count, 3);
+}
+
+#[test]
+fn for_each_record_truncated_file() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = write_fastq(&dir, "trunc_foreach.fastq", "@r1\nACGT\n+\n");
+    let mut count = 0_usize;
+    for_each_record(&path, |r: FastqRefRecord<'_>| {
+        count += 1;
+        assert_eq!(r.id, "r1");
+        assert_eq!(r.sequence, b"ACGT");
+        assert!(r.quality.is_empty());
+        Ok(())
+    })
+    .unwrap();
+    assert_eq!(count, 1);
+}
+
+#[test]
+fn stats_from_file_truncated_record() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = write_fastq(&dir, "trunc_stats.fastq", "@r1\nACGT\n+\n");
+    let stats = stats_from_file(&path).unwrap();
+    assert_eq!(stats.num_sequences, 1);
+    assert_eq!(stats.total_bases, 4);
+}
+
+#[test]
+fn parse_fastq_truncated_returns_partial() {
+    let dir = tempfile::tempdir().unwrap();
+    // First record complete, second truncated (no + or quality)
+    let path = write_fastq(&dir, "partial.fastq", "@r1\nACGT\n+\nIIII\n@r2\nGG\n");
+    let records = parse_fastq(&path).unwrap();
+    assert_eq!(records.len(), 2);
+    assert_eq!(records[0].id, "r1");
+    assert_eq!(records[0].sequence, b"ACGT");
+    assert_eq!(records[0].quality, b"IIII");
+    assert_eq!(records[1].id, "r2");
+    assert_eq!(records[1].sequence, b"GG");
+    assert!(records[1].quality.is_empty());
+}

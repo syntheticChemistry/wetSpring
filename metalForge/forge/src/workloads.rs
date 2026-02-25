@@ -265,11 +265,10 @@ pub fn capacitor_ode() -> BioWorkload {
 /// three separate `FusedMapReduceF64` dispatches.
 #[must_use]
 pub fn diversity_fusion() -> BioWorkload {
-    BioWorkload::new_static(ShaderOrigin::Local)
-        .named(
-            "diversity_fusion",
-            vec![Capability::F64Compute, Capability::ScalarReduce],
-        )
+    BioWorkload::new_static(ShaderOrigin::Local).named(
+        "diversity_fusion",
+        vec![Capability::F64Compute, Capability::ScalarReduce],
+    )
 }
 
 // ── Composed GPU domains (ToadStool primitives) ─────────────────────

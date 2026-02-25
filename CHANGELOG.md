@@ -5,6 +5,41 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V41 — Deep Audit + Coverage + Idiomatic Evolution (2026-02-25)
+
+### Quality Gates
+- `cargo fmt --check` — 0 diffs
+- `cargo clippy --all-targets` — 0 warnings (pedantic + nursery)
+- `cargo test` — 918 tests (871 barracuda + 47 forge), 0 failures
+- `cargo doc --no-deps` — 0 warnings
+- `cargo llvm-cov --lib` — 96.48% line coverage (up from 96.41%)
+
+### Coverage Improvements
+- bench/power.rs: 59.5% → 70.6% (6 new tests)
+- bench/hardware.rs: 76.9% → 81.4% (6 new tests)
+- ncbi.rs: 77.5% → 79.6% (5 new tests)
+- io/fastq/mod.rs: 83.7% → 87.2% (7 new tests)
+- ncbi_data.rs: 68% → 95% (12 new tests from V40)
+
+### Code Quality
+- `#![deny(missing_docs)]` escalated from `warn` — every public item documented
+- 33 scattered `clippy::cast_precision_loss` annotations consolidated to function-level
+- 9 missing tolerance constants added to `all_tolerances_are_non_negative` test
+- Provenance headers added to 20 validation binaries
+- Inline dot-product replaced with `special::dot`/`special::l2_norm` in 2 binaries
+- SPDX headers verified on all Python scripts
+
+### Dependency Analysis
+- 3 direct deps (all pure Rust): barracuda (path), bytemuck, flate2
+- 0 C dependencies, 0 HTTP/TLS crate deps
+- flate2 uses rust_backend (miniz_oxide)
+
+### Documentation
+- specs/README.md: 871 tests, 96.48% coverage
+- specs/BARRACUDA_REQUIREMENTS.md: evolution readiness table, blocking items
+- Root README.md: Phase 46, updated counts and coverage
+- wateringHole handoff V41: deep audit + ToadStool evolution handoff
+
 ### Changed (V40 — ToadStool S39-S62+DF64 Catch-Up + Rewiring)
 - **ToadStool evolution review**: Reviewed 55+ ToadStool commits (S39-S62+DF64).
   7/9 P0-P3 evolution requests delivered by ToadStool: GemmF64 public API (P0-1),

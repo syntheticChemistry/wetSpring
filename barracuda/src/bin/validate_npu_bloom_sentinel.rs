@@ -25,6 +25,16 @@
 //! - **HPC**: NPU scans decades of NCBI environmental time-series data
 //!   to identify retrospective bloom events across all monitored water
 //!   bodies globally.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Validation type | Analytical (closed-form expected values) |
+//! | Expected values | Derived from Exp112 diversity time-series pattern |
+//! | Reference | ESN Bloom Sentinel for NPU edge deployment |
+//! | Date | 2026-02-25 |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::bio::esn::{Esn, EsnConfig};
 use wetspring_barracuda::validation::Validator;

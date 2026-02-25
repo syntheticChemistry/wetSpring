@@ -16,6 +16,16 @@
 //!
 //! Extension paper: "Spatially propagating activation of QS in V. fischeri"
 //! (PRE 101:062421, 2020).
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Validation type | Analytical (closed-form expected values) |
+//! | Expected values | Meyer et al. PRE 2020 + Anderson localization |
+//! | Reference | Meyer et al. PRE 2020, Slevin & Ohtsuki 1999 |
+//! | Date | 2026-02-25 |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::validation::Validator;
 

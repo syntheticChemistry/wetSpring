@@ -22,6 +22,16 @@
 //! - Receiver:Producer ratio ≈ 1 in 3D dense (full circuits)
 //!
 //! Uses live NCBI Entrez queries. Falls back to cache.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Validation type | Analytical (closed-form expected values) |
+//! | Expected values | Anderson prediction (producer/receiver separation) |
+//! | Reference | NCBI Entrez protein queries, habitat isolation source |
+//! | Date | 2026-02-25 |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use std::io::Write as IoWrite;
 use std::time::Duration;

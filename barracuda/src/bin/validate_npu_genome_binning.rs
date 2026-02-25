@@ -18,6 +18,16 @@
 //!   from real-time nanopore data, flagging novel genome bins for upload.
 //! - **HPC**: NPU bins millions of NCBI SRA contigs at sub-watt power,
 //!   building global pangenome maps without GPU infrastructure.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Validation type | Analytical (closed-form expected values) |
+//! | Expected values | Derived from Exp110 pangenome gene content pattern |
+//! | Reference | Exp110 gene features, ESN reservoir dynamics |
+//! | Date | 2026-02-25 |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::bio::esn::{Esn, EsnConfig};
 use wetspring_barracuda::validation::Validator;

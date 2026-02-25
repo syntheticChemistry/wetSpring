@@ -13,6 +13,16 @@
 //! Validates CPU ↔ GPU parity for all ODE domains (phage defense, bistable,
 //! multi-signal) plus metalForge mixed-hardware dispatch scenarios including
 //! NPU-aware routing and `PCIe` direct transfer patterns.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Validation type | Analytical (closed-form expected values) |
+//! | Expected values | CPU ↔ GPU ODE integration parity |
+//! | Reference | Phage defense, bistable, multi-signal ODE domains |
+//! | Date | 2026-02-25 |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use std::time::Instant;
 use wetspring_barracuda::bio::bistable::{self, BistableParams};

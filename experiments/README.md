@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-25 (Phase 45: 168 experiments, ToadStool S62+DF64, 49 primitives + 2 BGL helpers + 1 WGSL extension, barracuda always-on, 806 tests, 95.75% coverage, 70 named tolerance constants, 7/9 P0-P3 delivered, 0 Passthrough, V40 catch-up complete)
+**Updated**: 2026-02-25 (Phase 45: 168 experiments, ToadStool S62+DF64, 49 primitives + 2 BGL helpers + 1 WGSL extension, barracuda always-on, 918 tests, 96.48% coverage, 70 named tolerance constants, 7/9 P0-P3 delivered, 0 Passthrough, V40 catch-up complete)
 
 ---
 
@@ -274,7 +274,7 @@ thresholds from `src/tolerances.rs`.
 | `validate_cross_spring_s62` | 168 | ~25 | `cargo run --features gpu --release --bin validate_cross_spring_s62` |
 
 **Total validation checks**: 3,300+
-**Rust tests**: 806 (759 barracuda + 47 forge)
+**Rust tests**: 918 (871 barracuda + 47 forge)
 **Binaries**: 147 validate + 11 benchmark = 158 total
 **ToadStool primitives**: 49 + 2 BGL helpers consumed (barracuda always-on, zero fallback code — S62+DF64)
 **Local WGSL shaders**: 1 (diversity_fusion_f64.wgsl — Write phase extension)
