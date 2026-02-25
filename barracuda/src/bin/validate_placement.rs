@@ -16,6 +16,7 @@
 
 use wetspring_barracuda::bio::felsenstein::{TreeNode, encode_dna};
 use wetspring_barracuda::bio::placement::{batch_placement, placement_scan};
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn make_reference_tree() -> TreeNode {
@@ -49,46 +50,66 @@ fn main() {
     let scan = placement_scan(&tree, "ACGTACGTACGT", 0.05, 1.0);
     #[allow(clippy::cast_precision_loss)]
     {
-        v.check("Edges scanned", scan.placements.len() as f64, 5.0, 0.0);
-        v.check("Best edge matches Python", scan.best_edge as f64, 2.0, 0.0);
+        v.check(
+            "Edges scanned",
+            scan.placements.len() as f64,
+            5.0,
+            tolerances::EXACT,
+        );
+        v.check(
+            "Best edge matches Python",
+            scan.best_edge as f64,
+            2.0,
+            tolerances::EXACT,
+        );
     }
     v.check(
         "Best LL matches Python",
         scan.best_ll,
         -29.977_219_041_460_447,
-        1e-4,
+        tolerances::PHYLO_LIKELIHOOD,
     );
     v.check(
         "Confidence > 0",
         f64::from(u8::from(scan.confidence > 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     v.section("── Close to sp3 ──");
     let scan = placement_scan(&tree, "ACTTACGTACGT", 0.05, 1.0);
     #[allow(clippy::cast_precision_loss)]
     {
-        v.check("Best edge matches Python", scan.best_edge as f64, 4.0, 0.0);
+        v.check(
+            "Best edge matches Python",
+            scan.best_edge as f64,
+            4.0,
+            tolerances::EXACT,
+        );
     }
     v.check(
         "Best LL matches Python",
         scan.best_ll,
         -29.976_782_512_790_9,
-        1e-4,
+        tolerances::PHYLO_LIKELIHOOD,
     );
 
     v.section("── Divergent query ──");
     let scan = placement_scan(&tree, "GGGGGGGGGGGG", 0.05, 1.0);
     #[allow(clippy::cast_precision_loss)]
     {
-        v.check("Best edge for divergent", scan.best_edge as f64, 0.0, 0.0);
+        v.check(
+            "Best edge for divergent",
+            scan.best_edge as f64,
+            0.0,
+            tolerances::EXACT,
+        );
     }
     v.check(
         "Divergent LL matches Python",
         scan.best_ll,
         -62.894_574_771_654_01,
-        1e-4,
+        tolerances::PHYLO_LIKELIHOOD,
     );
 
     v.section("── Batch placement ──");
@@ -96,13 +117,18 @@ fn main() {
     let results = batch_placement(&tree, &queries, 0.05, 1.0);
     #[allow(clippy::cast_precision_loss)]
     {
-        v.check("Batch: 3 queries", results.len() as f64, 3.0, 0.0);
+        v.check(
+            "Batch: 3 queries",
+            results.len() as f64,
+            3.0,
+            tolerances::EXACT,
+        );
     }
     v.check(
         "Batch[0] best LL consistent",
         results[0].best_ll,
         -29.977_219_041_460_447,
-        1e-4,
+        tolerances::PHYLO_LIKELIHOOD,
     );
 
     v.section("── Determinism ──");
@@ -114,14 +140,14 @@ fn main() {
             "Deterministic edge",
             f64::from(u8::from(s1.best_edge == s2.best_edge)),
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
     }
     v.check(
         "Deterministic LL",
         f64::from(u8::from(s1.best_ll.to_bits() == s2.best_ll.to_bits())),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     v.finish();

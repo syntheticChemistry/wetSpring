@@ -18,7 +18,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | BarraCuda CPU (sovereign Rust reference) |
 //! | Baseline date | 2026-02-21 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_dispatch_overhead_proof` |
@@ -56,7 +56,7 @@ async fn main() {
         validation::exit_skipped("No SHADER_F64 support on this GPU");
     }
 
-    let session = streaming_gpu::GpuPipelineSession::new(&gpu).unwrap();
+    let session = streaming_gpu::GpuPipelineSession::new(&gpu).expect("dispatch overhead");
     println!("  Session warmup: {:.1} ms", session.warmup_ms);
 
     let mut results: Vec<(usize, f64, f64, f64)> = Vec::new();
@@ -84,15 +84,15 @@ async fn main() {
         let mut _ind_simpson = 0.0;
         let mut _ind_observed = 0.0;
         for _ in 0..REPEATS {
-            let fmr = FusedMapReduceF64::new(gpu.to_wgpu_device()).unwrap();
-            ind_shannon = fmr.shannon_entropy(&abundances).unwrap();
-            let dom = fmr.simpson_index(&abundances).unwrap();
+            let fmr = FusedMapReduceF64::new(gpu.to_wgpu_device()).expect("dispatch overhead");
+            ind_shannon = fmr.shannon_entropy(&abundances).expect("dispatch overhead");
+            let dom = fmr.simpson_index(&abundances).expect("dispatch overhead");
             _ind_simpson = 1.0 - dom;
             let binary: Vec<f64> = abundances
                 .iter()
                 .map(|&c| if c > 0.0 { 1.0 } else { 0.0 })
                 .collect();
-            _ind_observed = fmr.sum(&binary).unwrap();
+            _ind_observed = fmr.sum(&binary).expect("dispatch overhead");
         }
         let ind_us = t_ind.elapsed().as_micros() as f64 / REPEATS as f64;
 
@@ -102,9 +102,11 @@ async fn main() {
         let mut stream_simpson = 0.0;
         let mut stream_observed = 0.0;
         for _ in 0..REPEATS {
-            stream_shannon = session.shannon(&abundances).unwrap();
-            stream_simpson = session.simpson(&abundances).unwrap();
-            stream_observed = session.observed_features(&abundances).unwrap();
+            stream_shannon = session.shannon(&abundances).expect("dispatch overhead");
+            stream_simpson = session.simpson(&abundances).expect("dispatch overhead");
+            stream_observed = session
+                .observed_features(&abundances)
+                .expect("dispatch overhead");
         }
         let stream_us = t_stream.elapsed().as_micros() as f64 / REPEATS as f64;
 

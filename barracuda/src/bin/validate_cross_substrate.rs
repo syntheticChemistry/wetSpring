@@ -27,6 +27,7 @@ use wetspring_barracuda::bio::{
     snp_gpu::SnpGpu,
 };
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
@@ -69,7 +70,7 @@ async fn main() {
 
     let t_gpu = Instant::now();
     let gpu_ani = AniGpu::new(&device).expect("ANI GPU shader");
-    let gpu_results = gpu_ani.batch_ani(&ani_pairs).unwrap();
+    let gpu_results = gpu_ani.batch_ani(&ani_pairs).expect("cross substrate");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     for (i, (cpu_r, gpu_val)) in cpu_results
@@ -81,7 +82,7 @@ async fn main() {
             &format!("ANI pair {i}: CPU == GPU"),
             *gpu_val,
             cpu_r.ani,
-            wetspring_barracuda::tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+            tolerances::GPU_VS_CPU_TRANSCENDENTAL,
         );
     }
     timings.push(("ANI (5 pairs)", cpu_us, gpu_us));
@@ -101,7 +102,7 @@ async fn main() {
 
     let t_gpu = Instant::now();
     let gpu_snp = SnpGpu::new(&device).expect("SNP GPU shader");
-    let gpu_snp_result = gpu_snp.call_snps(&snp_seqs).unwrap();
+    let gpu_snp_result = gpu_snp.call_snps(&snp_seqs).expect("cross substrate");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     let cpu_variant_count = cpu_snp.variants.len();
@@ -114,7 +115,7 @@ async fn main() {
         "SNP: variant count CPU == GPU",
         gpu_variant_count as f64,
         cpu_variant_count as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     for cv in &cpu_snp.variants {
@@ -124,7 +125,7 @@ async fn main() {
                 &format!("SNP pos {pos}: variant flag CPU == GPU"),
                 f64::from(gpu_snp_result.is_variant[pos]),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
         }
     }
@@ -166,7 +167,9 @@ async fn main() {
 
     let t_gpu = Instant::now();
     let gpu_pan = PangenomeGpu::new(&device).expect("Pangenome GPU shader");
-    let gpu_pan_result = gpu_pan.classify(&presence_flat, 5, 4).unwrap();
+    let gpu_pan_result = gpu_pan
+        .classify(&presence_flat, 5, 4)
+        .expect("cross substrate");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     v.check(
@@ -177,7 +180,7 @@ async fn main() {
             .filter(|&&c| c == 3)
             .count() as f64,
         cpu_pan.core_size as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Pan: accessory count CPU == GPU",
@@ -187,7 +190,7 @@ async fn main() {
             .filter(|&&c| c == 2)
             .count() as f64,
         cpu_pan.accessory_size as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Pan: unique count CPU == GPU",
@@ -197,7 +200,7 @@ async fn main() {
             .filter(|&&c| c == 1)
             .count() as f64,
         cpu_pan.unique_size as f64,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("Pangenome (5 genes × 4 genomes)", cpu_us, gpu_us));
 
@@ -222,7 +225,9 @@ async fn main() {
 
     let t_gpu = Instant::now();
     let gpu_dnds_mod = DnDsGpu::new(&device).expect("dN/dS GPU shader");
-    let gpu_dnds_result = gpu_dnds_mod.batch_dnds(&dnds_pairs).unwrap();
+    let gpu_dnds_result = gpu_dnds_mod
+        .batch_dnds(&dnds_pairs)
+        .expect("cross substrate");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     for (i, cpu_r) in cpu_dnds.iter().enumerate() {
@@ -231,13 +236,13 @@ async fn main() {
                 &format!("dN/dS pair {i}: dN CPU == GPU"),
                 gpu_dnds_result.dn[i],
                 cr.dn,
-                wetspring_barracuda::tolerances::GPU_VS_CPU_F64,
+                tolerances::GPU_VS_CPU_F64,
             );
             v.check(
                 &format!("dN/dS pair {i}: dS CPU == GPU"),
                 gpu_dnds_result.ds[i],
                 cr.ds,
-                wetspring_barracuda::tolerances::GPU_VS_CPU_F64,
+                tolerances::GPU_VS_CPU_F64,
             );
         }
     }

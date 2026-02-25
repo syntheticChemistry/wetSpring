@@ -16,14 +16,17 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
-//! | Baseline tool | Python baselines + published papers |
-//! | Baseline date | 2026-02-25 |
-//! | Exact command | `cargo run --release --bin validate_barracuda_cpu_v9` |
-//! | Data | Synthetic test vectors (self-contained) |
+//! | Baseline      | Fajgenbaum JCI 2019 (Paper 39, doi:10.1172/JCI126091), |
+//! |               | Yang et al. 2020 (Paper 41, doi:10.1093/bioinformatics/btaa164), |
+//! |               | `barracuda::linalg::nmf` + `barracuda::special` (always-on) |
+//! | Date          | 2026-02-25 |
+//! | Command       | `cargo run --release --bin validate_barracuda_cpu_v9` |
+//! | Data          | Synthetic test vectors (self-contained) |
+//! | Tolerances    | Structural (pass/fail) + `EXACT` for paper-derived constants |
 
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 use std::time::Instant;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 struct LcgRng(u64);
@@ -71,14 +74,19 @@ fn validate_pathway_scoring(v: &mut Validator) {
 
     let (top_name, top_score) = pathways
         .iter()
-        .max_by(|a, b| a.1.partial_cmp(&b.1).unwrap())
-        .unwrap();
+        .max_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal))
+        .expect("pathways non-empty");
 
     v.check_pass(
         "PI3K/AKT/mTOR is highest-activation pathway",
         *top_name == "PI3K/AKT/mTOR",
     );
-    v.check("PI3K/AKT/mTOR activation", *top_score, 0.92, 0.0);
+    v.check(
+        "PI3K/AKT/mTOR activation",
+        *top_score,
+        0.92,
+        tolerances::EXACT,
+    );
 
     let mut drug_scores: Vec<(&str, f64)> = drugs
         .iter()
@@ -90,15 +98,23 @@ fn validate_pathway_scoring(v: &mut Validator) {
             (*name, score)
         })
         .collect();
-    drug_scores.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+    drug_scores.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
 
     v.check_pass(
         "mTOR inhibitor ranks #1",
         drug_scores[0].0 == "sirolimus" || drug_scores[0].0 == "everolimus",
     );
 
-    let mtor = pathways.iter().find(|p| p.0 == "PI3K/AKT/mTOR").unwrap().1;
-    let il6 = pathways.iter().find(|p| p.0 == "IL-6/gp130").unwrap().1;
+    let mtor = pathways
+        .iter()
+        .find(|p| p.0 == "PI3K/AKT/mTOR")
+        .expect("known pathway PI3K/AKT/mTOR")
+        .1;
+    let il6 = pathways
+        .iter()
+        .find(|p| p.0 == "IL-6/gp130")
+        .expect("known pathway IL-6/gp130")
+        .1;
     v.check_pass("mTOR pathway > IL-6 pathway", mtor > il6);
 
     let mut score_matrix = vec![0.0_f64; drugs.len() * pathways.len()];
@@ -448,7 +464,7 @@ fn validate_kg_embedding(v: &mut Validator) {
         }
     }
 
-    triples.sort();
+    triples.sort_unstable();
     triples.dedup();
 
     v.check_pass("310 entities", KG_N_ENTITIES == 310);
@@ -521,12 +537,12 @@ fn validate_kg_embedding(v: &mut Validator) {
         let mut scores: Vec<(f64, usize)> = (0..KG_N_ENTITIES)
             .map(|e| (transe_score_fn(&entity_emb, &relation_emb, *h, *r, e), e))
             .collect();
-        scores.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap());
+        scores.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap_or(std::cmp::Ordering::Equal));
         if scores.iter().take(10).any(|&(_, e)| e == *tt) {
             hits_at_10 += 1;
         }
     }
-    let rate = hits_at_10 as f64 / sample.len() as f64;
+    let rate = f64::from(hits_at_10) / sample.len() as f64;
     v.check_pass("Hits@10 > 5%", rate > 0.05);
     println!("  Hits@10 = {hits_at_10}/{} = {rate:.4}", sample.len());
 

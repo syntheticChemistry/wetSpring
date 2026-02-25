@@ -124,31 +124,31 @@ fn validate_ani_gpu(gpu: &AniGpu, v: &mut Validator, timings: &mut Vec<(&str, f6
                 "ANI GPU: identical → 1.0",
                 gpu_result.ani_values[0],
                 cpu_results[0].ani,
-                1e-10,
+                tolerances::GPU_VS_CPU_TRANSCENDENTAL,
             );
             v.check(
                 "ANI GPU: different → 0.0",
                 gpu_result.ani_values[1],
                 cpu_results[1].ani,
-                1e-10,
+                tolerances::GPU_VS_CPU_TRANSCENDENTAL,
             );
             v.check(
                 "ANI GPU: half → 0.5",
                 gpu_result.ani_values[2],
                 cpu_results[2].ani,
-                1e-10,
+                tolerances::GPU_VS_CPU_TRANSCENDENTAL,
             );
             v.check(
                 "ANI GPU: gap excluded, ANI=1.0",
                 gpu_result.ani_values[3],
                 cpu_results[3].ani,
-                1e-10,
+                tolerances::GPU_VS_CPU_TRANSCENDENTAL,
             );
             v.check(
                 "ANI GPU: N excluded",
                 gpu_result.ani_values[4],
                 cpu_results[4].ani,
-                1e-10,
+                tolerances::GPU_VS_CPU_TRANSCENDENTAL,
             );
 
             // Verify aligned counts match CPU
@@ -156,24 +156,29 @@ fn validate_ani_gpu(gpu: &AniGpu, v: &mut Validator, timings: &mut Vec<(&str, f6
                 "ANI GPU: aligned count (identical)",
                 f64::from(gpu_result.aligned_counts[0]),
                 cpu_results[0].aligned_length as f64,
-                0.0,
+                tolerances::EXACT,
             );
             v.check(
                 "ANI GPU: aligned count (gaps)",
                 f64::from(gpu_result.aligned_counts[3]),
                 cpu_results[3].aligned_length as f64,
-                0.0,
+                tolerances::EXACT,
             );
 
             timings.push(("ANI batch (5 pairs)", gpu_us as f64));
         }
         Ok(Err(e)) => {
             println!("  [SKIP] ANI GPU error: {e}");
-            v.check("ANI GPU: available (skipped)", 1.0, 1.0, 0.0);
+            v.check("ANI GPU: available (skipped)", 1.0, 1.0, tolerances::EXACT);
         }
         Err(_) => {
             println!("  [SKIP] ANI GPU panicked (driver shader compilation)");
-            v.check("ANI GPU: available (driver skip)", 1.0, 1.0, 0.0);
+            v.check(
+                "ANI GPU: available (driver skip)",
+                1.0,
+                1.0,
+                tolerances::EXACT,
+            );
         }
     }
 }
@@ -202,7 +207,7 @@ fn validate_snp_gpu(gpu: &SnpGpu, v: &mut Validator, timings: &mut Vec<(&str, f6
                 "SNP GPU: variant count matches CPU",
                 f64::from(gpu_variant_count),
                 cpu_result.variants.len() as f64,
-                0.0,
+                tolerances::EXACT,
             );
 
             // Verify variant positions match
@@ -221,7 +226,7 @@ fn validate_snp_gpu(gpu: &SnpGpu, v: &mut Validator, timings: &mut Vec<(&str, f6
                 "SNP GPU: variant positions match CPU",
                 f64::from(u8::from(positions_match)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             // Verify depths at variant positions
@@ -233,7 +238,7 @@ fn validate_snp_gpu(gpu: &SnpGpu, v: &mut Validator, timings: &mut Vec<(&str, f6
                 "SNP GPU: depths match CPU at variant sites",
                 f64::from(u8::from(depths_ok)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             // Verify alt frequencies within tolerance
@@ -246,7 +251,7 @@ fn validate_snp_gpu(gpu: &SnpGpu, v: &mut Validator, timings: &mut Vec<(&str, f6
                 "SNP GPU: alt frequencies match CPU",
                 f64::from(u8::from(freq_ok)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             // Non-variant positions should have 0 alt freq
@@ -259,18 +264,23 @@ fn validate_snp_gpu(gpu: &SnpGpu, v: &mut Validator, timings: &mut Vec<(&str, f6
                 "SNP GPU: non-variant alt_freq = 0",
                 f64::from(u8::from(non_variants_clean)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             timings.push(("SNP calling (4 seqs × 12bp)", gpu_us as f64));
         }
         Ok(Err(e)) => {
             println!("  [SKIP] SNP GPU error: {e}");
-            v.check("SNP GPU: available (skipped)", 1.0, 1.0, 0.0);
+            v.check("SNP GPU: available (skipped)", 1.0, 1.0, tolerances::EXACT);
         }
         Err(_) => {
             println!("  [SKIP] SNP GPU panicked (driver shader compilation)");
-            v.check("SNP GPU: available (driver skip)", 1.0, 1.0, 0.0);
+            v.check(
+                "SNP GPU: available (driver skip)",
+                1.0,
+                1.0,
+                tolerances::EXACT,
+            );
         }
     }
 }
@@ -327,26 +337,26 @@ fn validate_pangenome_gpu(gpu: &PangenomeGpu, v: &mut Validator, timings: &mut V
                 "Pan GPU: core count matches CPU",
                 gpu_result.core_count() as f64,
                 cpu_result.core_size as f64,
-                0.0,
+                tolerances::EXACT,
             );
             v.check(
                 "Pan GPU: accessory count matches CPU",
                 gpu_result.accessory_count() as f64,
                 cpu_result.accessory_size as f64,
-                0.0,
+                tolerances::EXACT,
             );
             v.check(
                 "Pan GPU: unique count matches CPU",
                 gpu_result.unique_count() as f64,
                 cpu_result.unique_size as f64,
-                0.0,
+                tolerances::EXACT,
             );
             v.check(
                 "Pan GPU: total = core + acc + uniq",
                 (gpu_result.core_count() + gpu_result.accessory_count() + gpu_result.unique_count())
                     as f64,
                 cpu_result.total_size as f64,
-                0.0,
+                tolerances::EXACT,
             );
 
             // Verify genome counts per gene
@@ -359,7 +369,7 @@ fn validate_pangenome_gpu(gpu: &PangenomeGpu, v: &mut Validator, timings: &mut V
                 "Pan GPU: genome counts match CPU",
                 f64::from(u8::from(counts_match)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             // Core genes should have count == n_genomes
@@ -372,18 +382,23 @@ fn validate_pangenome_gpu(gpu: &PangenomeGpu, v: &mut Validator, timings: &mut V
                 "Pan GPU: core genes have count = n_genomes",
                 f64::from(u8::from(core_correct)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             timings.push(("Pangenome classify (7 genes × 5 genomes)", gpu_us as f64));
         }
         Ok(Err(e)) => {
             println!("  [SKIP] Pangenome GPU error: {e}");
-            v.check("Pan GPU: available (skipped)", 1.0, 1.0, 0.0);
+            v.check("Pan GPU: available (skipped)", 1.0, 1.0, tolerances::EXACT);
         }
         Err(_) => {
             println!("  [SKIP] Pangenome GPU panicked (driver shader compilation)");
-            v.check("Pan GPU: available (driver skip)", 1.0, 1.0, 0.0);
+            v.check(
+                "Pan GPU: available (driver skip)",
+                1.0,
+                1.0,
+                tolerances::EXACT,
+            );
         }
     }
 }
@@ -415,7 +430,7 @@ fn validate_dnds_gpu(gpu: &DnDsGpu, v: &mut Validator, timings: &mut Vec<(&str, 
     match result {
         Ok(Ok(gpu_result)) => {
             // Pair 0: identical → dN=0, dS=0
-            let cpu0 = cpu_results[0].as_ref().unwrap();
+            let cpu0 = cpu_results[0].as_ref().expect("dN/dS result");
             v.check(
                 "dN/dS GPU: identical dN=0",
                 gpu_result.dn[0],
@@ -430,7 +445,7 @@ fn validate_dnds_gpu(gpu: &DnDsGpu, v: &mut Validator, timings: &mut Vec<(&str, 
             );
 
             // Pair 1: synonymous only → dS>0, dN=0
-            let cpu1 = cpu_results[1].as_ref().unwrap();
+            let cpu1 = cpu_results[1].as_ref().expect("dN/dS result");
             v.check(
                 "dN/dS GPU: syn-only dN=0",
                 gpu_result.dn[1],
@@ -441,54 +456,64 @@ fn validate_dnds_gpu(gpu: &DnDsGpu, v: &mut Validator, timings: &mut Vec<(&str, 
                 "dN/dS GPU: syn-only dS>0",
                 f64::from(u8::from(gpu_result.ds[1] > 0.0)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
             v.check(
                 "dN/dS GPU: syn-only dS matches CPU",
                 gpu_result.ds[1],
                 cpu1.ds,
-                1e-4,
+                tolerances::GPU_VS_CPU_ENSEMBLE,
             );
 
             // Pair 2: nonsynonymous → dN>0
-            let cpu2 = cpu_results[2].as_ref().unwrap();
+            let cpu2 = cpu_results[2].as_ref().expect("dN/dS result");
             v.check(
                 "dN/dS GPU: nonsyn dN>0",
                 f64::from(u8::from(gpu_result.dn[2] > 0.0)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
             v.check(
                 "dN/dS GPU: nonsyn dN matches CPU",
                 gpu_result.dn[2],
                 cpu2.dn,
-                1e-4,
+                tolerances::GPU_VS_CPU_ENSEMBLE,
             );
 
             // Pair 3: mixed → both sites and diffs present
-            let cpu3 = cpu_results[3].as_ref().unwrap();
+            let cpu3 = cpu_results[3].as_ref().expect("dN/dS result");
             v.check(
                 "dN/dS GPU: mixed dS matches CPU",
                 gpu_result.ds[3],
                 cpu3.ds,
-                1e-4,
+                tolerances::GPU_VS_CPU_ENSEMBLE,
             );
             v.check(
                 "dN/dS GPU: mixed dN matches CPU",
                 gpu_result.dn[3],
                 cpu3.dn,
-                1e-4,
+                tolerances::GPU_VS_CPU_ENSEMBLE,
             );
 
             timings.push(("dN/dS batch (4 pairs, Nei-Gojobori)", gpu_us as f64));
         }
         Ok(Err(e)) => {
             println!("  [SKIP] dN/dS GPU error: {e}");
-            v.check("dN/dS GPU: available (skipped)", 1.0, 1.0, 0.0);
+            v.check(
+                "dN/dS GPU: available (skipped)",
+                1.0,
+                1.0,
+                tolerances::EXACT,
+            );
         }
         Err(_) => {
             println!("  [SKIP] dN/dS GPU panicked (driver shader compilation)");
-            v.check("dN/dS GPU: available (driver skip)", 1.0, 1.0, 0.0);
+            v.check(
+                "dN/dS GPU: available (driver skip)",
+                1.0,
+                1.0,
+                tolerances::EXACT,
+            );
         }
     }
 }

@@ -17,7 +17,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | `BarraCuda` CPU + `metalForge` substrate routing |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --release --bin validate_pcie_direct` |
@@ -28,6 +28,7 @@ use std::collections::HashMap;
 use std::fmt;
 use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, kmer, taxonomy, unifrac};
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -93,7 +94,7 @@ fn validate_gpu_to_npu_path(v: &mut Validator) {
         "GPU stage: 4 histograms produced",
         histograms.len() as f64,
         4.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check_pass(
         "GPU stage: histograms are GPU-ready (256-wide)",
@@ -127,7 +128,7 @@ fn validate_gpu_to_npu_path(v: &mut Validator) {
             &format!("sample {i}: GPU→NPU path matches CPU reference"),
             gpu_path_results[i] as f64,
             cpu_path_results[i] as f64,
-            0.0,
+            tolerances::EXACT,
         );
     }
 
@@ -185,13 +186,13 @@ fn validate_npu_to_gpu_path(v: &mut Validator) {
         "NPU→GPU vs CPU→GPU: Shannon parity",
         npu_shannon,
         cpu_shannon,
-        1e-12,
+        tolerances::ANALYTICAL_F64,
     );
     v.check(
         "NPU→GPU vs CPU→GPU: Simpson parity",
         npu_simpson,
         cpu_simpson,
-        1e-12,
+        tolerances::ANALYTICAL_F64,
     );
 
     print_timing("NPU→GPU path", t0);
@@ -227,7 +228,7 @@ fn validate_gpu_chain(v: &mut Validator) {
         "chain: Bray-Curtis condensed size",
         bc_condensed.len() as f64,
         6.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let tree = unifrac::PhyloTree::from_newick("((A:0.1,B:0.2):0.3,(C:0.4,D:0.5):0.6);");
@@ -241,12 +242,17 @@ fn validate_gpu_chain(v: &mut Validator) {
     }
 
     let (matrix, n_s, n_l) = unifrac::to_sample_matrix(&flat, &abundance);
-    v.check("chain: sample matrix rows", n_s as f64, 4.0, 0.0);
+    v.check(
+        "chain: sample matrix rows",
+        n_s as f64,
+        4.0,
+        tolerances::EXACT,
+    );
     v.check(
         "chain: sample matrix elements",
         matrix.len() as f64,
         (n_s * n_l) as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     let reconstructed = flat.to_phylo_tree();
@@ -358,7 +364,7 @@ fn validate_buffer_layout_contracts(v: &mut Validator) {
         "GPU buffer: kmer histogram = 4^k elements",
         hist.len() as f64,
         kmer_space as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     let refs = training_references();
@@ -368,13 +374,13 @@ fn validate_buffer_layout_contracts(v: &mut Validator) {
         "NPU buffer: weights = n_taxa × 4^k",
         weights.weights_i8.len() as f64,
         (weights.n_taxa * kmer_space) as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "NPU buffer: priors = n_taxa",
         weights.priors_i8.len() as f64,
         weights.n_taxa as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     let tree = unifrac::PhyloTree::from_newick("((A:0.1,B:0.2):0.3,(C:0.4,D:0.5):0.6);");
@@ -383,13 +389,13 @@ fn validate_buffer_layout_contracts(v: &mut Validator) {
         "GPU buffer: flat tree parent array = n_nodes",
         flat.parent.len() as f64,
         f64::from(flat.n_nodes),
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "GPU buffer: branch lengths = n_nodes",
         flat.branch_length.len() as f64,
         f64::from(flat.n_nodes),
-        0.0,
+        tolerances::EXACT,
     );
     v.check_pass(
         "GPU buffer: CSR children non-empty",
@@ -405,7 +411,7 @@ fn validate_buffer_layout_contracts(v: &mut Validator) {
         "GPU buffer: flat pairs = 2 × unique",
         flat_pairs_count as f64,
         (2 * pairs.len()) as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     print_timing("buffer contracts", t0);

@@ -15,7 +15,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | BarraCuda CPU (sovereign Rust reference) |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --release --bin validate_barracuda_cpu_v7` |
@@ -29,6 +29,7 @@ use wetspring_barracuda::bio::{
     taxonomy::{self, Lineage},
     unifrac,
 };
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn main() {
@@ -57,14 +58,19 @@ fn validate_kmer_histogram(v: &mut Validator) {
     let original = kmer::count_kmers(seq, k);
 
     let histogram = original.to_histogram();
-    v.check("histogram length = 4^k", histogram.len() as f64, 256.0, 0.0);
+    v.check(
+        "histogram length = 4^k",
+        histogram.len() as f64,
+        256.0,
+        tolerances::EXACT,
+    );
 
     let total_hist: u32 = histogram.iter().sum();
     v.check(
         "histogram total = original total_valid_kmers",
         f64::from(total_hist),
         original.total_valid_kmers as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     let restored = kmer::KmerCounts::from_histogram(&histogram, k);
@@ -72,7 +78,7 @@ fn validate_kmer_histogram(v: &mut Validator) {
         "restored total_valid_kmers matches",
         restored.total_valid_kmers as f64,
         original.total_valid_kmers as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     let orig_top = original.top_n(5);
@@ -82,13 +88,13 @@ fn validate_kmer_histogram(v: &mut Validator) {
             &format!("top {i} kmer matches"),
             *rk as f64,
             *ok as f64,
-            0.0,
+            tolerances::EXACT,
         );
         v.check(
             &format!("top {i} count matches"),
             f64::from(*rv),
             f64::from(*ov),
-            0.0,
+            tolerances::EXACT,
         );
     }
 
@@ -108,7 +114,7 @@ fn validate_kmer_sorted_pairs(v: &mut Validator) {
         "pairs count = unique kmers",
         pairs.len() as f64,
         original.unique_count() as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     let is_sorted = pairs.windows(2).all(|w| w[0].0 <= w[1].0);
@@ -119,13 +125,13 @@ fn validate_kmer_sorted_pairs(v: &mut Validator) {
         "restored total matches",
         restored.total_valid_kmers as f64,
         original.total_valid_kmers as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "restored unique_count matches",
         restored.unique_count() as f64,
         original.unique_count() as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     print_timing("kmer sorted pairs", t0);
@@ -151,13 +157,13 @@ fn validate_kmer_multi_sequence(v: &mut Validator) {
         "multi-seq total preserved",
         restored.total_valid_kmers as f64,
         combined.total_valid_kmers as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "multi-seq unique_count preserved",
         restored.unique_count() as f64,
         combined.unique_count() as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     let pairs = combined.to_sorted_pairs();
@@ -166,7 +172,7 @@ fn validate_kmer_multi_sequence(v: &mut Validator) {
         "sorted pairs total also matches",
         restored2.total_valid_kmers as f64,
         combined.total_valid_kmers as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     print_timing("kmer multi-sequence", t0);
@@ -188,7 +194,7 @@ fn validate_unifrac_flat_tree(v: &mut Validator) {
         "reconstructed node count matches",
         reconstructed.nodes.len() as f64,
         tree.nodes.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     let mut sample_a: HashMap<String, f64> = HashMap::new();
@@ -206,7 +212,7 @@ fn validate_unifrac_flat_tree(v: &mut Validator) {
         "unweighted UniFrac: original ↔ flat round-trip",
         uw_flat,
         uw_orig,
-        1e-12,
+        tolerances::ANALYTICAL_F64,
     );
 
     let w_orig = unifrac::weighted_unifrac(&tree, &sample_a, &sample_b);
@@ -215,7 +221,7 @@ fn validate_unifrac_flat_tree(v: &mut Validator) {
         "weighted UniFrac: original ↔ flat round-trip",
         w_flat,
         w_orig,
-        1e-12,
+        tolerances::ANALYTICAL_F64,
     );
 
     print_timing("unifrac flat tree", t0);
@@ -233,7 +239,12 @@ fn validate_unifrac_weighted(v: &mut Validator) {
     identical.insert("B".into(), 5.0);
 
     let self_dist = unifrac::weighted_unifrac(&tree, &identical, &identical);
-    v.check("weighted self-distance = 0", self_dist, 0.0, 1e-12);
+    v.check(
+        "weighted self-distance = 0",
+        self_dist,
+        0.0,
+        tolerances::ANALYTICAL_F64,
+    );
 
     let mut diff_a: HashMap<String, f64> = HashMap::new();
     let mut diff_b: HashMap<String, f64> = HashMap::new();
@@ -245,7 +256,12 @@ fn validate_unifrac_weighted(v: &mut Validator) {
     v.check_pass("weighted distance is finite", max_dist.is_finite());
 
     let uw_self = unifrac::unweighted_unifrac(&tree, &identical, &identical);
-    v.check("unweighted self-distance = 0", uw_self, 0.0, 1e-12);
+    v.check(
+        "unweighted self-distance = 0",
+        uw_self,
+        0.0,
+        tolerances::ANALYTICAL_F64,
+    );
 
     print_timing("unifrac weighted", t0);
 }
@@ -271,18 +287,18 @@ fn validate_unifrac_sample_matrix(v: &mut Validator) {
     );
 
     let (matrix, n_samples, n_leaves) = unifrac::to_sample_matrix(&flat, &samples);
-    v.check("n_samples = 2", n_samples as f64, 2.0, 0.0);
+    v.check("n_samples = 2", n_samples as f64, 2.0, tolerances::EXACT);
     v.check(
         "n_leaves matches flat tree",
         n_leaves as f64,
         flat.leaf_labels.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "matrix size = n_samples × n_leaves",
         matrix.len() as f64,
         (n_samples * n_leaves) as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     let row_sum_0: f64 = matrix[..n_leaves].iter().sum();
@@ -324,7 +340,7 @@ fn validate_taxonomy_int8(v: &mut Validator) {
             &format!("seq {i}: int8 argmax matches f64 taxon_idx"),
             int8_result_idx as f64,
             f64_result.taxon_idx as f64,
-            0.0,
+            tolerances::EXACT,
         );
     }
 
@@ -338,7 +354,7 @@ fn validate_taxonomy_int8(v: &mut Validator) {
         "weights size = n_taxa × 4^k",
         weights.weights_i8.len() as f64,
         expected_size as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     print_timing("taxonomy int8", t0);
@@ -394,7 +410,7 @@ fn validate_taxonomy_multi_taxon(v: &mut Validator) {
             &format!("taxon {i}: int8 matches f64"),
             q_idx as f64,
             result.taxon_idx as f64,
-            0.0,
+            tolerances::EXACT,
         );
     }
 
@@ -403,7 +419,7 @@ fn validate_taxonomy_multi_taxon(v: &mut Validator) {
         "priors count = n_taxa",
         weights.priors_i8.len() as f64,
         3.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     print_timing("taxonomy multi-taxon", t0);

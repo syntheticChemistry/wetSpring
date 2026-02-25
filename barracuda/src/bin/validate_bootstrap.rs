@@ -65,13 +65,13 @@ fn main() {
         "Original LL finite",
         f64::from(u8::from(orig_ll.is_finite())),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Original LL negative",
         f64::from(u8::from(orig_ll < 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     v.section("── Resampling preserves dimensions ──");
@@ -83,13 +83,13 @@ fn main() {
             "Replicate n_taxa",
             rep.n_taxa as f64,
             aln.n_taxa as f64,
-            0.0,
+            tolerances::EXACT,
         );
         v.check(
             "Replicate n_sites",
             rep.n_sites as f64,
             aln.n_sites as f64,
-            0.0,
+            tolerances::EXACT,
         );
     }
 
@@ -97,12 +97,22 @@ fn main() {
     let lls = bootstrap_likelihoods(&tree, &aln, 100, 1.0, 42);
     #[allow(clippy::cast_precision_loss)]
     {
-        v.check("100 replicates", lls.len() as f64, 100.0, 0.0);
+        v.check("100 replicates", lls.len() as f64, 100.0, tolerances::EXACT);
     }
     let all_finite = lls.iter().all(|ll| ll.is_finite());
     let all_neg = lls.iter().all(|ll| *ll < 0.0);
-    v.check("All LLs finite", f64::from(u8::from(all_finite)), 1.0, 0.0);
-    v.check("All LLs negative", f64::from(u8::from(all_neg)), 1.0, 0.0);
+    v.check(
+        "All LLs finite",
+        f64::from(u8::from(all_finite)),
+        1.0,
+        tolerances::EXACT,
+    );
+    v.check(
+        "All LLs negative",
+        f64::from(u8::from(all_neg)),
+        1.0,
+        tolerances::EXACT,
+    );
 
     let mean: f64 = lls.iter().sum::<f64>() / 100.0;
     v.check(
@@ -138,7 +148,7 @@ fn main() {
         "Support ∈ [0,1]",
         f64::from(u8::from((0.0..=1.0).contains(&support))),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     v.section("── Determinism ──");
@@ -152,7 +162,7 @@ fn main() {
         "Deterministic (bit-exact)",
         f64::from(u8::from(bits_match)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     v.finish();

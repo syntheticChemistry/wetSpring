@@ -144,12 +144,12 @@ fn validate_synthetic_pipeline(v: &mut Validator) {
     let shannon = diversity::shannon(&counts);
     let simpson = diversity::simpson(&counts);
 
-    v.check("Observed features = 5", observed, 5.0, 0.0);
+    v.check("Observed features = 5", observed, 5.0, tolerances::EXACT);
     v.check(
         "Shannon > 0 (diverse community)",
         if shannon > 0.0 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Simpson in (0,1)",
@@ -159,7 +159,7 @@ fn validate_synthetic_pipeline(v: &mut Validator) {
             0.0
         },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Shannon for [200,150,100,40,10]: analytically computable
@@ -231,7 +231,7 @@ fn validate_synthetic_pipeline(v: &mut Validator) {
         "Taxonomy: dominant ASV → Thalassospira",
         if genus_correct { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let result_bacillus = classifier.classify(bacillus, &params);
@@ -244,7 +244,7 @@ fn validate_synthetic_pipeline(v: &mut Validator) {
         "Taxonomy: pathogen ASV → Bacillus",
         if bacillus_correct { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Step 6: UniFrac
@@ -278,7 +278,7 @@ fn validate_synthetic_pipeline(v: &mut Validator) {
         "UniFrac: healthy vs pathogen-dominated > 0",
         if uw_vs_pathogen > 0.0 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 }
 
@@ -307,7 +307,12 @@ fn validate_humphrey_reference(v: &mut Validator) {
     }
 
     let observed = diversity::observed_features(&abundances);
-    v.check("Humphrey: observed = 18 OTUs", observed, 18.0, 0.0);
+    v.check(
+        "Humphrey: observed = 18 OTUs",
+        observed,
+        18.0,
+        tolerances::EXACT,
+    );
 
     let shannon = diversity::shannon(&abundances);
     // 18 OTUs with uneven distribution: Shannon typically 1.5-3.0
@@ -319,7 +324,7 @@ fn validate_humphrey_reference(v: &mut Validator) {
             0.0
         },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let simpson = diversity::simpson(&abundances);
@@ -327,7 +332,7 @@ fn validate_humphrey_reference(v: &mut Validator) {
         "Humphrey: Simpson > 0.5 (moderately diverse)",
         if simpson > 0.5 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Bacteroidetes/Proteobacteria dominance check:
@@ -340,7 +345,7 @@ fn validate_humphrey_reference(v: &mut Validator) {
         "Humphrey: core genera >50% of reads",
         if core_fraction > 0.5 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 }
 
@@ -400,19 +405,19 @@ fn validate_python_control(v: &mut Validator) {
         "Python baseline Shannon > 5.0 (high-diversity marine)",
         if py_shannon > 5.0 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Python baseline Simpson > 0.99 (very even community)",
         if py_simpson > 0.99 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Python baseline QC retention > 95%",
         if py_retention_pct > 95.0 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 }
 
@@ -463,6 +468,7 @@ fn decompress_partial_gz(path: &Path) -> Result<Vec<FastqRecord>, String> {
 
 // ── Real data validation (when FASTQ files are available) ──────────────────
 
+#[allow(clippy::too_many_lines)]
 fn validate_real_data(v: &mut Validator, data_dir: &Path) {
     v.section("Real FASTQ Data (SRR7760408)");
 
@@ -498,13 +504,18 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
             let n = records.len();
             println!("  Parsed {n} reads from R1");
 
-            v.check("R1 read count > 0", if n > 0 { 1.0 } else { 0.0 }, 1.0, 0.0);
+            v.check(
+                "R1 read count > 0",
+                if n > 0 { 1.0 } else { 0.0 },
+                1.0,
+                tolerances::EXACT,
+            );
 
             v.check(
                 "R1 read count > 10000 (MiSeq expected millions)",
                 if n > 10_000 { 1.0 } else { 0.0 },
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             let qparams = QualityParams::default();
@@ -522,7 +533,7 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
                 "Quality retention > 50%",
                 if retention > 0.5 { 1.0 } else { 0.0 },
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             // Check sequence lengths are reasonable for V1-V2 amplicon (27F/338R)
@@ -540,7 +551,7 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
                     "Mean read length > 100 bp",
                     if mean_len > 100.0 { 1.0 } else { 0.0 },
                     1.0,
-                    0.0,
+                    tolerances::EXACT,
                 );
             }
 
@@ -558,7 +569,7 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
                     "Derep: >1 unique sequence",
                     if uniques.len() > 1 { 1.0 } else { 0.0 },
                     1.0,
-                    0.0,
+                    tolerances::EXACT,
                 );
 
                 // DADA2 on subsample
@@ -574,7 +585,7 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
                         "DADA2: >1 ASV from real data",
                         if asvs.len() > 1 { 1.0 } else { 0.0 },
                         1.0,
-                        0.0,
+                        tolerances::EXACT,
                     );
 
                     // Diversity on real ASV counts
@@ -590,19 +601,19 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
                         "Real data Shannon > 0",
                         if shannon > 0.0 { 1.0 } else { 0.0 },
                         1.0,
-                        0.0,
+                        tolerances::EXACT,
                     );
                 }
             }
         }
         Err(e) => {
             println!("  [ERROR] Failed to parse R1: {e}");
-            v.check("R1 FASTQ parse", 0.0, 1.0, 0.0);
+            v.check("R1 FASTQ parse", 0.0, 1.0, tolerances::EXACT);
         }
     }
 
     if let Some(r2) = r2_path {
         println!("  R2 present: {}", r2.display());
-        v.check("R2 file exists", 1.0, 1.0, 0.0);
+        v.check("R2 file exists", 1.0, 1.0, tolerances::EXACT);
     }
 }

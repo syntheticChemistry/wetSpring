@@ -136,6 +136,7 @@ pub fn compute_stats(records: &[FastqRecord]) -> FastqStats {
 ///
 /// Returns [`crate::error::Error::Io`] if the file cannot be opened, or
 /// [`crate::error::Error::Fastq`] if a record is malformed.
+#[must_use = "computed stats are discarded if not used"]
 pub fn stats_from_file(path: &Path) -> Result<FastqStats> {
     let mut reader = open_reader(path)?;
     let mut header_buf = String::new();

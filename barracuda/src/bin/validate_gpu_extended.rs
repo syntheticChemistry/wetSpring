@@ -20,7 +20,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | `BarraCuda` CPU (sovereign Rust reference) |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --features gpu --release --bin validate_gpu_extended` |
@@ -76,13 +76,14 @@ fn validate_eic_total_intensity(v: &mut Validator, gpu: &GpuF64) {
     let ppm = 10.0;
 
     let cpu_eics = eic::extract_eics(&spectra, &target_mzs, ppm);
-    let gpu_eics = eic_gpu::extract_eics_gpu(gpu, &spectra, &target_mzs, ppm).unwrap();
+    let gpu_eics =
+        eic_gpu::extract_eics_gpu(gpu, &spectra, &target_mzs, ppm).expect("GPU extended");
 
     v.check(
         "EIC count matches",
         gpu_eics.len() as f64,
         cpu_eics.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     for (i, (ce, ge)) in cpu_eics.iter().zip(gpu_eics.iter()).enumerate() {
@@ -90,12 +91,12 @@ fn validate_eic_total_intensity(v: &mut Validator, gpu: &GpuF64) {
             &format!("EIC {i}: point count"),
             ge.rt.len() as f64,
             ce.rt.len() as f64,
-            0.0,
+            tolerances::EXACT,
         );
     }
 
     let cpu_totals = eic_total_intensity_cpu(&cpu_eics);
-    let gpu_totals = eic_gpu::batch_eic_total_intensity_gpu(gpu, &gpu_eics).unwrap();
+    let gpu_totals = eic_gpu::batch_eic_total_intensity_gpu(gpu, &gpu_eics).expect("GPU extended");
 
     for (i, (ct, gt)) in cpu_totals.iter().zip(gpu_totals.iter()).enumerate() {
         v.check(
@@ -134,20 +135,20 @@ fn validate_pcoa(v: &mut Validator, gpu: &GpuF64) {
 
     let condensed = diversity::bray_curtis_condensed(&samples);
 
-    let cpu_result = pcoa::pcoa(&condensed, n_samples, n_axes).unwrap();
-    let gpu_result = pcoa_gpu::pcoa_gpu(gpu, &condensed, n_samples, n_axes).unwrap();
+    let cpu_result = pcoa::pcoa(&condensed, n_samples, n_axes).expect("GPU extended");
+    let gpu_result = pcoa_gpu::pcoa_gpu(gpu, &condensed, n_samples, n_axes).expect("GPU extended");
 
     v.check(
         "PCoA: axes count",
         gpu_result.eigenvalues.len() as f64,
         cpu_result.eigenvalues.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "PCoA: coordinate rows",
         gpu_result.n_samples as f64,
         cpu_result.n_samples as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     for (i, (ce, ge)) in cpu_result
@@ -239,19 +240,20 @@ fn validate_kriging(v: &mut Validator, gpu: &GpuF64) {
     let targets = vec![(0.25, 0.25), (0.75, 0.75), (0.5, 0.0)];
     let config = kriging::VariogramConfig::spherical(0.0, 1.0, 2.0);
 
-    let ordinary = kriging::interpolate_diversity(gpu, &sites, &targets, &config).unwrap();
+    let ordinary =
+        kriging::interpolate_diversity(gpu, &sites, &targets, &config).expect("GPU extended");
 
     v.check(
         "kriging ordinary: value count",
         ordinary.values.len() as f64,
         targets.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "kriging ordinary: variance count",
         ordinary.variances.len() as f64,
         targets.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     for (i, val) in ordinary.values.iter().enumerate() {
@@ -265,14 +267,14 @@ fn validate_kriging(v: &mut Validator, gpu: &GpuF64) {
     }
 
     let known_mean = sites.iter().map(|s| s.value).sum::<f64>() / sites.len() as f64;
-    let simple =
-        kriging::interpolate_diversity_simple(gpu, &sites, &targets, &config, known_mean).unwrap();
+    let simple = kriging::interpolate_diversity_simple(gpu, &sites, &targets, &config, known_mean)
+        .expect("GPU extended");
 
     v.check(
         "kriging simple: value count",
         simple.values.len() as f64,
         targets.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     for (i, (ov, sv)) in ordinary.values.iter().zip(simple.values.iter()).enumerate() {
@@ -282,13 +284,13 @@ fn validate_kriging(v: &mut Validator, gpu: &GpuF64) {
         );
     }
 
-    let variogram = kriging::empirical_variogram(&sites, 5, 1.5).unwrap();
+    let variogram = kriging::empirical_variogram(&sites, 5, 1.5).expect("GPU extended");
     v.check_pass("variogram: has lags", !variogram.0.is_empty());
     v.check(
         "variogram: lag count = semivariance count",
         variogram.0.len() as f64,
         variogram.1.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     let ms = t0.elapsed().as_secs_f64() * 1000.0;
@@ -314,7 +316,8 @@ fn validate_rarefaction(v: &mut Validator, gpu: &GpuF64) {
         seed: 42,
     };
 
-    let result = rarefaction_gpu::rarefaction_bootstrap_gpu(gpu, &counts, &params).unwrap();
+    let result =
+        rarefaction_gpu::rarefaction_bootstrap_gpu(gpu, &counts, &params).expect("GPU extended");
 
     v.check_pass(
         "rarefaction: Shannon mean is finite",
@@ -349,7 +352,7 @@ fn validate_rarefaction(v: &mut Validator, gpu: &GpuF64) {
         "rarefaction: depth matches",
         result.depth as f64,
         500.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let cpu_shannon = diversity::shannon(&counts);
@@ -371,14 +374,14 @@ fn validate_rarefaction(v: &mut Validator, gpu: &GpuF64) {
     };
 
     let batch_samples = vec![counts, vec![50.0, 100.0, 200.0, 50.0, 100.0]];
-    let batch_results =
-        rarefaction_gpu::batch_rarefaction_gpu(gpu, &batch_samples, &params_batch).unwrap();
+    let batch_results = rarefaction_gpu::batch_rarefaction_gpu(gpu, &batch_samples, &params_batch)
+        .expect("GPU extended");
 
     v.check(
         "batch rarefaction: result count",
         batch_results.len() as f64,
         2.0,
-        0.0,
+        tolerances::EXACT,
     );
     for (i, br) in batch_results.iter().enumerate() {
         v.check_pass(

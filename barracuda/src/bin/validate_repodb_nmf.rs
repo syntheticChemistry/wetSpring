@@ -20,6 +20,7 @@
 //! | Date        | 2026-02-24 |
 //! | Phase       | 39 — Drug repurposing track |
 //! | Paper       | 42 (Gao et al. 2020, PMC7153111) |
+//! | Command     | `cargo test --bin validate_repodb_nmf -- --nocapture` |
 
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 use wetspring_barracuda::validation::Validator;
@@ -105,7 +106,7 @@ fn validate_factorisation_and_structure(
 
     v.check_pass("NMF converges (error decreases)", {
         let e = &result.errors;
-        e.len() >= 2 && e.last().unwrap() < &e[0]
+        e.len() >= 2 && e.last().expect("errors non-empty") < &e[0]
     });
     v.check_pass("relative error < 0.85", rel_err < 0.85);
 

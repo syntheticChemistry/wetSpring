@@ -40,6 +40,7 @@ use barracuda::{GillespieConfig, GillespieGpu};
 use barracuda::{SmithWatermanGpu, SwConfig};
 use std::sync::Arc;
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
@@ -93,30 +94,35 @@ fn validate_tree_inference(device: &Arc<WgpuDevice>, v: &mut Validator) {
         Ok(predictions) => {
             #[allow(clippy::cast_precision_loss)]
             {
-                v.check("TI: n_predictions = 4", predictions.len() as f64, 4.0, 0.0);
+                v.check(
+                    "TI: n_predictions = 4",
+                    predictions.len() as f64,
+                    4.0,
+                    tolerances::EXACT,
+                );
                 v.check(
                     "TI: sample 0 (3 < 5) = class 0",
                     f64::from(predictions[0]),
                     0.0,
-                    0.0,
+                    tolerances::EXACT,
                 );
                 v.check(
                     "TI: sample 1 (7 > 5) = class 1",
                     f64::from(predictions[1]),
                     1.0,
-                    0.0,
+                    tolerances::EXACT,
                 );
                 v.check(
                     "TI: sample 2 (4.9 < 5) = class 0",
                     f64::from(predictions[2]),
                     0.0,
-                    0.0,
+                    tolerances::EXACT,
                 );
                 v.check(
                     "TI: sample 3 (9 > 5) = class 1",
                     f64::from(predictions[3]),
                     1.0,
-                    0.0,
+                    tolerances::EXACT,
                 );
             }
 
@@ -150,12 +156,12 @@ fn validate_tree_inference(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 "TI: GPU == CPU parity (all 4 samples)",
                 f64::from(u8::from(parity)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
         }
         Err(e) => {
             println!("  [SKIP] TreeInferenceGpu::predict error: {e}");
-            v.check("TI: predict succeeded", 0.0, 1.0, 0.0);
+            v.check("TI: predict succeeded", 0.0, 1.0, tolerances::EXACT);
         }
     }
 }
@@ -200,7 +206,7 @@ fn validate_gillespie(device: &Arc<WgpuDevice>, v: &mut Validator) {
                     "SSA: n_trajectories",
                     result.n_trajectories as f64,
                     n_traj as f64,
-                    0.0,
+                    tolerances::EXACT,
                 );
             }
 
@@ -212,7 +218,7 @@ fn validate_gillespie(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 "SSA: mean final > 50 (birth > death)",
                 f64::from(u8::from(mean_final > 50.0)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             let all_finite = finals.iter().all(|x| x.is_finite() && *x >= 0.0);
@@ -220,18 +226,23 @@ fn validate_gillespie(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 "SSA: all finals finite and non-negative",
                 f64::from(u8::from(all_finite)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
         }
         Ok(Err(e)) => {
             println!("  [SKIP] GillespieGpu::simulate error: {e}");
             println!("  (f64 shader may need driver update or NVVM patch)");
-            v.check("SSA: GPU available (skipped)", 1.0, 1.0, 0.0);
+            v.check("SSA: GPU available (skipped)", 1.0, 1.0, tolerances::EXACT);
         }
         Err(_) => {
             println!("  [SKIP] GillespieGpu panicked (NVVM f64 shader compilation failure)");
             println!("  (known issue: some drivers cannot compile complex f64 WGSL)");
-            v.check("SSA: GPU available (driver skip)", 1.0, 1.0, 0.0);
+            v.check(
+                "SSA: GPU available (driver skip)",
+                1.0,
+                1.0,
+                tolerances::EXACT,
+            );
         }
     }
 }
@@ -260,13 +271,13 @@ fn validate_smith_waterman(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 "SW: score > 0",
                 f64::from(u8::from(result.score > 0.0)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
             v.check(
                 "SW: score finite",
                 f64::from(u8::from(result.score.is_finite())),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             let cpu_score = wetspring_barracuda::bio::alignment::smith_waterman_score(
@@ -283,16 +294,21 @@ fn validate_smith_waterman(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 "SW: GPU and CPU both score > 0",
                 f64::from(u8::from(result.score > 0.0 && cpu_score > 0)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
         }
         Ok(Err(e)) => {
             println!("  [SKIP] SmithWatermanGpu::align error: {e}");
-            v.check("SW: GPU available (skipped)", 1.0, 1.0, 0.0);
+            v.check("SW: GPU available (skipped)", 1.0, 1.0, tolerances::EXACT);
         }
         Err(_) => {
             println!("  [SKIP] SmithWatermanGpu panicked (NVVM f64 shader compilation)");
-            v.check("SW: GPU available (driver skip)", 1.0, 1.0, 0.0);
+            v.check(
+                "SW: GPU available (driver skip)",
+                1.0,
+                1.0,
+                tolerances::EXACT,
+            );
         }
     }
 }

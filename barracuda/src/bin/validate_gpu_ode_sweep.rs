@@ -36,6 +36,7 @@ use wetspring_barracuda::bio::ode_sweep_gpu::{N_PARAMS, N_VARS, OdeSweepConfig, 
 use wetspring_barracuda::bio::qs_biofilm::{self, QsBiofilmParams};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::special;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 fn params_to_flat(p: &QsBiofilmParams) -> [f64; N_PARAMS] {
@@ -133,7 +134,7 @@ fn validate_ode_sweep(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 "ODE sweep: output size",
                 gpu_finals.len() as f64,
                 (n_batches as usize * N_VARS) as f64,
-                0.0,
+                tolerances::EXACT,
             );
 
             let all_finite = gpu_finals.iter().all(|x| x.is_finite());
@@ -141,7 +142,7 @@ fn validate_ode_sweep(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 "ODE sweep: all finals finite",
                 f64::from(u8::from(all_finite)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             let all_nonneg = gpu_finals.iter().all(|&x| x >= -1e-10);
@@ -149,7 +150,7 @@ fn validate_ode_sweep(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 "ODE sweep: all finals ≥ 0",
                 f64::from(u8::from(all_nonneg)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             let mut max_diff = 0.0_f64;
@@ -175,7 +176,7 @@ fn validate_ode_sweep(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 "ODE sweep: CPU ↔ GPU abs parity < 0.15",
                 f64::from(u8::from(max_diff < 0.15)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             let batch0_n = gpu_finals[0];
@@ -183,7 +184,7 @@ fn validate_ode_sweep(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 "ODE sweep: cells grew (N > y0)",
                 f64::from(u8::from(batch0_n > y0_single[0])),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             let first_bio = gpu_finals[4];
@@ -192,7 +193,7 @@ fn validate_ode_sweep(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 "ODE sweep: parameter sweep changes outcome",
                 f64::from(u8::from((first_bio - last_bio).abs() > 1e-6)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             let first_n = gpu_finals[0];
@@ -201,16 +202,26 @@ fn validate_ode_sweep(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 "ODE sweep: higher µ → more cells",
                 f64::from(u8::from(last_n >= first_n)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
         }
         Ok(Err(e)) => {
             println!("  [SKIP] ODE sweep GPU error: {e}");
-            v.check("ODE sweep: GPU available (skipped)", 1.0, 1.0, 0.0);
+            v.check(
+                "ODE sweep: GPU available (skipped)",
+                1.0,
+                1.0,
+                tolerances::EXACT,
+            );
         }
         Err(_) => {
             println!("  [SKIP] ODE sweep panicked (driver compile failure)");
-            v.check("ODE sweep: GPU available (driver skip)", 1.0, 1.0, 0.0);
+            v.check(
+                "ODE sweep: GPU available (driver skip)",
+                1.0,
+                1.0,
+                tolerances::EXACT,
+            );
         }
     }
 }
@@ -281,13 +292,13 @@ fn validate_bifurcation(device: &Arc<WgpuDevice>, v: &mut Validator) {
         "Bifurcation: max eigenvalue > 0",
         f64::from(u8::from(max_eigen > 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Bifurcation: eigenvalue finite",
         f64::from(u8::from(max_eigen.is_finite())),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     println!("    J^T*J eigenvalues (CPU): {cpu_eigenvalues:.6?}");
 
@@ -305,7 +316,7 @@ fn validate_bifurcation(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 "Bifurcation: GPU eigenvalues finite",
                 f64::from(u8::from(all_finite)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             let gpu_max = gpu_eigs.iter().copied().fold(f64::NEG_INFINITY, f64::max);
@@ -318,7 +329,7 @@ fn validate_bifurcation(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 "Bifurcation: GPU ≈ CPU max eigenvalue (< 5%)",
                 f64::from(u8::from(rel < 0.05)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             let all_psd = gpu_eigs.iter().all(|&e| e >= -1e-8);
@@ -326,16 +337,26 @@ fn validate_bifurcation(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 "Bifurcation: J^T*J eigenvalues ≥ 0 (PSD)",
                 f64::from(u8::from(all_psd)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
         }
         Ok(Err(e)) => {
             println!("  [SKIP] BatchedEighGpu error: {e}");
-            v.check("Bifurcation: GPU eigensolve (skipped)", 1.0, 1.0, 0.0);
+            v.check(
+                "Bifurcation: GPU eigensolve (skipped)",
+                1.0,
+                1.0,
+                tolerances::EXACT,
+            );
         }
         Err(_) => {
             println!("  [SKIP] BatchedEighGpu panicked");
-            v.check("Bifurcation: GPU eigensolve (driver skip)", 1.0, 1.0, 0.0);
+            v.check(
+                "Bifurcation: GPU eigensolve (driver skip)",
+                1.0,
+                1.0,
+                tolerances::EXACT,
+            );
         }
     }
 }

@@ -19,7 +19,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | BarraCuda CPU (sovereign Rust reference) |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_metalforge_full_v2` |
@@ -58,8 +58,8 @@ fn validate_diversity(
     let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
     let t_gpu = Instant::now();
-    let gpu_sh = diversity_gpu::shannon_gpu(gpu, &counts).unwrap();
-    let gpu_si = diversity_gpu::simpson_gpu(gpu, &counts).unwrap();
+    let gpu_sh = diversity_gpu::shannon_gpu(gpu, &counts).expect("MetalForge v2");
+    let gpu_si = diversity_gpu::simpson_gpu(gpu, &counts).expect("MetalForge v2");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     v.check(
@@ -91,7 +91,7 @@ fn validate_bray_curtis(
     let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
     let t_gpu = Instant::now();
-    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(gpu, &[a, b]).unwrap()[0];
+    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(gpu, &[a, b]).expect("MetalForge v2")[0];
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     v.check(
@@ -121,7 +121,7 @@ fn validate_ani(
 
     let t_gpu = Instant::now();
     let gpu_ani_mod = AniGpu::new(device).expect("ANI GPU");
-    let gpu_ani = gpu_ani_mod.batch_ani(&pairs).unwrap();
+    let gpu_ani = gpu_ani_mod.batch_ani(&pairs).expect("MetalForge v2");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     for (i, (cpu_r, gpu_v)) in cpu_ani.iter().zip(gpu_ani.ani_values.iter()).enumerate() {
@@ -154,7 +154,7 @@ fn validate_snp(
 
     let t_gpu = Instant::now();
     let gpu_snp_mod = SnpGpu::new(device).expect("SNP GPU");
-    let gpu_snp = gpu_snp_mod.call_snps(&seqs).unwrap();
+    let gpu_snp = gpu_snp_mod.call_snps(&seqs).expect("MetalForge v2");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     let cpu_count = cpu_snp.variants.len();
@@ -189,7 +189,7 @@ fn validate_dnds(
 
     let t_gpu = Instant::now();
     let gpu_dnds_mod = DnDsGpu::new(device).expect("dN/dS GPU");
-    let gpu_dnds = gpu_dnds_mod.batch_dnds(&pairs).unwrap();
+    let gpu_dnds = gpu_dnds_mod.batch_dnds(&pairs).expect("MetalForge v2");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     for (i, cpu_r) in cpu_dnds.iter().enumerate() {
@@ -251,7 +251,9 @@ fn validate_pangenome(
 
     let t_gpu = Instant::now();
     let gpu_pan_mod = PangenomeGpu::new(device).expect("Pangenome GPU");
-    let gpu_pan = gpu_pan_mod.classify(&presence_flat, 5, 4).unwrap();
+    let gpu_pan = gpu_pan_mod
+        .classify(&presence_flat, 5, 4)
+        .expect("MetalForge v2");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     v.check(
@@ -289,7 +291,7 @@ fn validate_random_forest(
         &[None, Some(0), Some(1)],
         3,
     )
-    .unwrap();
+    .expect("MetalForge v2");
     let t2 = DecisionTree::from_arrays(
         &[1, -1, -1],
         &[3.0, 0.0, 0.0],
@@ -298,7 +300,7 @@ fn validate_random_forest(
         &[None, Some(0), Some(1)],
         3,
     )
-    .unwrap();
+    .expect("MetalForge v2");
     let t3 = DecisionTree::from_arrays(
         &[0, -1, -1],
         &[4.5, 0.0, 0.0],
@@ -307,9 +309,9 @@ fn validate_random_forest(
         &[None, Some(0), Some(1)],
         3,
     )
-    .unwrap();
+    .expect("MetalForge v2");
 
-    let rf = RandomForest::from_trees(vec![t1, t2, t3], 2).unwrap();
+    let rf = RandomForest::from_trees(vec![t1, t2, t3], 2).expect("MetalForge v2");
     let samples = vec![
         vec![3.0, 2.0, 0.0],
         vec![6.0, 4.0, 0.0],
@@ -323,7 +325,7 @@ fn validate_random_forest(
 
     let t_gpu = Instant::now();
     let rf_gpu = RandomForestGpu::new(device);
-    let gpu_preds = rf_gpu.predict_batch(&rf, &samples).unwrap();
+    let gpu_preds = rf_gpu.predict_batch(&rf, &samples).expect("MetalForge v2");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     for (i, (cpu_p, gpu_p)) in cpu_preds.iter().zip(gpu_preds.iter()).enumerate() {
@@ -377,7 +379,7 @@ fn validate_hmm(
     let hmm_gpu = HmmGpuForward::new(device).expect("HMM GPU");
     let gpu_r = hmm_gpu
         .forward_batch(&model, &flat_obs, 3, n_steps)
-        .unwrap();
+        .expect("MetalForge v2");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     v.check(
@@ -414,7 +416,7 @@ fn validate_spectral_cosine(
     ];
 
     let t_gpu = Instant::now();
-    let gpu_cos = spectral_match_gpu::pairwise_cosine_gpu(gpu, &spectra).unwrap();
+    let gpu_cos = spectral_match_gpu::pairwise_cosine_gpu(gpu, &spectra).expect("MetalForge v2");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     let t_cpu = Instant::now();
@@ -658,7 +660,7 @@ fn validate_decision_tree(
         &[None, Some(0), Some(1)],
         3,
     )
-    .unwrap();
+    .expect("MetalForge v2");
 
     let samples = [
         vec![3.0, 0.0, 0.0],

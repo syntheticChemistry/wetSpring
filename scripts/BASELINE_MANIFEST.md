@@ -96,6 +96,7 @@ cargo run --bin <binary>               # Rust must match within tolerance
 |--------|---------|---------------------|
 | `run_exp002.py` | SRA data download (Exp002) | `b99c0eb11d67bc7c` |
 | `search_ncbi_datasets.py` | NCBI dataset search | `703553dd76b87243` |
+| `fetch_ncbi_phase35.py` | Phase 35 NCBI bulk fetch | `d9dc06889e219dec` |
 
 ---
 

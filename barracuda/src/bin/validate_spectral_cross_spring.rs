@@ -18,17 +18,21 @@
 //!   5. Anderson 3D — mobility edge, metal-insulator transition
 //!   6. QS-disorder analogy — heterogeneity → localization transition
 //!
-//! | Date       | Author    | Hardware                                |
-//! |------------|-----------|----------------------------------------|
-//! | 2026-02-23 | wetSpring | i9-12900K, 64 GB DDR5, RTX 4070        |
+//! # Provenance
 //!
-//! Run: `cargo run --features gpu --bin validate_spectral_cross_spring`
+//! | Item    | Value |
+//! |---------|-------|
+//! | Date    | 2026-02-23 |
+//! | Author  | wetSpring |
+//! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070 |
+//! | Command | `cargo test --bin validate_spectral_cross_spring -- --nocapture` |
 
 use barracuda::spectral::{
     GOE_R, POISSON_R, almost_mathieu_hamiltonian, anderson_2d, anderson_3d, anderson_hamiltonian,
     find_all_eigenvalues, lanczos, lanczos_eigenvalues, level_spacing_ratio, lyapunov_exponent,
 };
 use std::time::Instant;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 const POISSON_TOL: f64 = 0.06;
@@ -77,11 +81,11 @@ fn validate_anderson_1d(v: &mut Validator) {
     let upper_bound = 2.0 + w / 2.0;
     v.check_pass(
         "Gershgorin lower: E_min >= -2-W/2",
-        e_min >= lower_bound - 1e-10,
+        e_min >= lower_bound - tolerances::ANALYTICAL_F64,
     );
     v.check_pass(
         "Gershgorin upper: E_max <= 2+W/2",
-        e_max <= upper_bound + 1e-10,
+        e_max <= upper_bound + tolerances::ANALYTICAL_F64,
     );
     v.check_pass("eigenvalue count = N", eigenvalues.len() == n);
 

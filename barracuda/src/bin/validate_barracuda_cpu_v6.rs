@@ -77,7 +77,7 @@ fn validate_qs_biofilm(v: &mut Validator) {
         "qs_biofilm flat round-trip",
         bitwise_diff(&flat, &flat2),
         0.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let r_direct = qs_biofilm::scenario_standard_growth(&p, DT);
@@ -89,7 +89,7 @@ fn validate_qs_biofilm(v: &mut Validator) {
         "qs_biofilm N_ss bitwise",
         (n_direct - n_flat).abs(),
         0.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let b_direct = steady_state_mean(&r_direct, 4, SS_FRAC);
@@ -98,7 +98,7 @@ fn validate_qs_biofilm(v: &mut Validator) {
         "qs_biofilm B_ss bitwise",
         (b_direct - b_flat).abs(),
         0.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     v.check(
@@ -135,7 +135,7 @@ fn validate_bistable(v: &mut Validator) {
         "bistable flat round-trip",
         bitwise_diff(&flat, &flat2),
         0.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let y0 = [0.01, 0.0, 0.0, 2.0, 0.1];
@@ -144,7 +144,12 @@ fn validate_bistable(v: &mut Validator) {
 
     let b_direct = steady_state_mean(&r_direct, 4, SS_FRAC);
     let b_flat = steady_state_mean(&r_flat, 4, SS_FRAC);
-    v.check("bistable B_ss bitwise", (b_direct - b_flat).abs(), 0.0, 0.0);
+    v.check(
+        "bistable B_ss bitwise",
+        (b_direct - b_flat).abs(),
+        0.0,
+        tolerances::EXACT,
+    );
 
     v.check(
         "bistable B_ss high (sessile attractor)",
@@ -200,7 +205,7 @@ fn validate_multi_signal(v: &mut Validator) {
         "multi_signal flat round-trip",
         bitwise_diff(&flat, &flat2),
         0.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let r_direct = multi_signal::scenario_wild_type(&p, DT);
@@ -257,7 +262,7 @@ fn validate_phage_defense(v: &mut Validator) {
         "phage_defense flat round-trip",
         bitwise_diff(&flat, &flat2),
         0.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let r_direct = phage_defense::scenario_phage_attack(&p, DT);
@@ -277,7 +282,12 @@ fn validate_phage_defense(v: &mut Validator) {
     let bd = steady_state_mean(&r_direct, 0, SS_FRAC);
     let bu = steady_state_mean(&r_direct, 1, SS_FRAC);
     v.check_pass("phage_defense defended > undefended", bd > bu);
-    v.check("phage_defense defended population positive", bd, bd, 0.0);
+    v.check(
+        "phage_defense defended population positive",
+        bd,
+        bd,
+        tolerances::EXACT,
+    );
 
     print_timing("phage_defense", t0);
 }
@@ -300,7 +310,7 @@ fn validate_cooperation(v: &mut Validator) {
         "cooperation flat round-trip",
         bitwise_diff(&flat, &flat2),
         0.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let r_direct = cooperation::scenario_equal_start(&p, DT);
@@ -348,7 +358,12 @@ fn validate_capacitor(v: &mut Validator) {
     let b_stress = steady_state_mean(&r_stress, 2, SS_FRAC);
 
     v.check_pass("capacitor stress > normal biofilm", b_stress > b_normal);
-    v.check("capacitor normal B_ss vs Python", b_normal, b_normal, 0.0);
+    v.check(
+        "capacitor normal B_ss vs Python",
+        b_normal,
+        b_normal,
+        tolerances::EXACT,
+    );
 
     let r_normal2 = capacitor::scenario_normal(&p, DT);
     for (a, b) in r_normal.y_final.iter().zip(&r_normal2.y_final) {

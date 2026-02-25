@@ -33,7 +33,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | BarraCuda CPU reference |
 //! | Baseline date | 2026-02-23 |
 //! | Exact command | `cargo run --features gpu --release --bin validate_streaming_ode_phylo` |
@@ -55,6 +55,7 @@ use wetspring_barracuda::bio::phage_defense_gpu::PhageDefenseGpu;
 use wetspring_barracuda::bio::qs_biofilm::{self, QsBiofilmParams};
 use wetspring_barracuda::bio::unifrac_gpu::UniFracGpu;
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
@@ -597,13 +598,18 @@ fn validate_felsenstein_streaming(
                 }
                 Err(e) => {
                     println!("  [SKIP] dispatch 2: {e}");
-                    v.check("Felsenstein dispatch 2 (skipped)", 1.0, 1.0, 0.0);
+                    v.check(
+                        "Felsenstein dispatch 2 (skipped)",
+                        1.0,
+                        1.0,
+                        tolerances::EXACT,
+                    );
                 }
             }
         }
         Err(e) => {
             println!("  [SKIP] FelsensteinGpu error: {e}");
-            v.check("Felsenstein (skipped)", 1.0, 1.0, 0.0);
+            v.check("Felsenstein (skipped)", 1.0, 1.0, tolerances::EXACT);
         }
     }
 
@@ -679,7 +685,7 @@ fn validate_unifrac_streaming(
                 &format!("leaf[{leaf}] sample[{s}]"),
                 result.node_sums[leaf * n_samples + s],
                 sample_matrix[leaf * n_samples + s],
-                1e-10,
+                tolerances::GPU_VS_CPU_F64,
             );
         }
     }

@@ -17,7 +17,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | `BarraCuda` CPU (sovereign Rust reference) |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --features gpu --release --bin validate_cpu_vs_gpu_all_domains` |
@@ -59,8 +59,8 @@ fn validate_shannon_simpson(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<T
     let cpu_si = diversity::simpson(&counts);
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
-    let gpu_sh = diversity_gpu::shannon_gpu(gpu, &counts).unwrap();
-    let gpu_si = diversity_gpu::simpson_gpu(gpu, &counts).unwrap();
+    let gpu_sh = diversity_gpu::shannon_gpu(gpu, &counts).expect("GPU/CPU validation");
+    let gpu_si = diversity_gpu::simpson_gpu(gpu, &counts).expect("GPU/CPU validation");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check(
         "Shannon CPU↔GPU",
@@ -90,7 +90,8 @@ fn validate_bray_curtis(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timin
     let cpu_bc = diversity::bray_curtis(&a, &b);
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
-    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(gpu, &[a, b]).unwrap()[0];
+    let gpu_bc =
+        diversity_gpu::bray_curtis_condensed_gpu(gpu, &[a, b]).expect("GPU/CPU validation")[0];
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check(
         "Bray-Curtis CPU↔GPU",
@@ -122,7 +123,7 @@ fn validate_ani(
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
     let ani_dev = AniGpu::new(device).expect("ANI GPU");
-    let gpu_ani = ani_dev.batch_ani(&pairs).unwrap();
+    let gpu_ani = ani_dev.batch_ani(&pairs).expect("GPU/CPU validation");
     let gpu_us = tg.elapsed().as_micros() as f64;
     for (i, (cr, gv)) in cpu_ani.iter().zip(gpu_ani.ani_values.iter()).enumerate() {
         v.check(
@@ -158,7 +159,7 @@ fn validate_snp(
     let tg = Instant::now();
     let gpu_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         let snp_dev = SnpGpu::new(device).expect("SNP GPU");
-        let gpu_snp = snp_dev.call_snps(&seqs).unwrap();
+        let gpu_snp = snp_dev.call_snps(&seqs).expect("GPU/CPU validation");
         gpu_snp.is_variant.iter().filter(|&&x| x != 0).count()
     }));
     let gpu_us = tg.elapsed().as_micros() as f64;
@@ -201,7 +202,7 @@ fn validate_dnds(
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
     let dnds_dev = DnDsGpu::new(device).expect("dN/dS GPU");
-    let gpu_dnds = dnds_dev.batch_dnds(&pairs).unwrap();
+    let gpu_dnds = dnds_dev.batch_dnds(&pairs).expect("GPU/CPU validation");
     let gpu_us = tg.elapsed().as_micros() as f64;
     for (i, cr) in cpu_dnds.iter().enumerate() {
         if let Ok(c) = cr {
@@ -264,7 +265,9 @@ fn validate_pangenome(
         .collect();
     let tg = Instant::now();
     let pan_dev = PangenomeGpu::new(device).expect("Pangenome GPU");
-    let gpu_pan = pan_dev.classify(&presence_flat, 5, 4).unwrap();
+    let gpu_pan = pan_dev
+        .classify(&presence_flat, 5, 4)
+        .expect("GPU/CPU validation");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check(
         "core",
@@ -306,7 +309,7 @@ fn validate_random_forest(
         &[None, Some(0), Some(1)],
         3,
     )
-    .unwrap();
+    .expect("GPU/CPU validation");
     let t2 = DecisionTree::from_arrays(
         &[1, -1, -1],
         &[3.0, 0.0, 0.0],
@@ -315,7 +318,7 @@ fn validate_random_forest(
         &[None, Some(0), Some(1)],
         3,
     )
-    .unwrap();
+    .expect("GPU/CPU validation");
     let t3 = DecisionTree::from_arrays(
         &[0, -1, -1],
         &[4.5, 0.0, 0.0],
@@ -324,8 +327,8 @@ fn validate_random_forest(
         &[None, Some(0), Some(1)],
         3,
     )
-    .unwrap();
-    let rf = RandomForest::from_trees(vec![t1, t2, t3], 2).unwrap();
+    .expect("GPU/CPU validation");
+    let rf = RandomForest::from_trees(vec![t1, t2, t3], 2).expect("GPU/CPU validation");
     let samples = vec![
         vec![3.0, 2.0, 0.0],
         vec![6.0, 4.0, 0.0],
@@ -337,10 +340,17 @@ fn validate_random_forest(
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
     let rf_gpu = RandomForestGpu::new(device);
-    let gpu_preds = rf_gpu.predict_batch(&rf, &samples).unwrap();
+    let gpu_preds = rf_gpu
+        .predict_batch(&rf, &samples)
+        .expect("GPU/CPU validation");
     let gpu_us = tg.elapsed().as_micros() as f64;
     for (i, (cp, gp)) in cpu_preds.iter().zip(gpu_preds.iter()).enumerate() {
-        v.check(&format!("RF pred {i}"), gp.class as f64, *cp as f64, 0.0);
+        v.check(
+            &format!("RF pred {i}"),
+            gp.class as f64,
+            *cp as f64,
+            tolerances::EXACT,
+        );
     }
     timings.push(Timing {
         name: "RF (4s × 3t)",
@@ -372,7 +382,9 @@ fn validate_hmm(
     let flat_obs: Vec<u32> = obs1.iter().chain(obs2.iter()).map(|&x| x as u32).collect();
     let tg = Instant::now();
     let hmm_dev = HmmGpuForward::new(device).expect("HMM GPU");
-    let gpu_r = hmm_dev.forward_batch(&model, &flat_obs, 2, 5).unwrap();
+    let gpu_r = hmm_dev
+        .forward_batch(&model, &flat_obs, 2, 5)
+        .expect("GPU/CPU validation");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check(
         "HMM seq 0",
@@ -522,7 +534,7 @@ fn validate_decision_tree(
         &[None, Some(0), Some(1)],
         3,
     )
-    .unwrap();
+    .expect("GPU/CPU validation");
     let samples = [
         vec![3.0, 0.0, 0.0],
         vec![7.0, 0.0, 0.0],
@@ -546,7 +558,12 @@ fn validate_decision_tree(
         Ok(gpu_preds) => {
             let gpu_us = tg.elapsed().as_micros() as f64;
             for (i, (cp, gp)) in cpu_preds.iter().zip(gpu_preds.iter()).enumerate() {
-                v.check(&format!("DT pred {i}"), f64::from(*gp), *cp as f64, 0.0);
+                v.check(
+                    &format!("DT pred {i}"),
+                    f64::from(*gp),
+                    *cp as f64,
+                    tolerances::EXACT,
+                );
             }
             timings.push(Timing {
                 name: "Decision Tree",
@@ -593,7 +610,8 @@ fn validate_spectral_cosine(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<T
     }
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
-    let gpu_cos = spectral_match_gpu::pairwise_cosine_gpu(gpu, &spectra).unwrap();
+    let gpu_cos =
+        spectral_match_gpu::pairwise_cosine_gpu(gpu, &spectra).expect("GPU/CPU validation");
     let gpu_us = tg.elapsed().as_micros() as f64;
     for (i, (c, g)) in cpu_cos.iter().zip(gpu_cos.iter()).enumerate() {
         v.check(
@@ -616,12 +634,14 @@ fn validate_eic(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timing>) {
     let spectra = synthetic_spectra();
     let target_mzs = vec![150.0, 200.0, 250.0, 300.0];
     let cpu_eics = eic::extract_eics(&spectra, &target_mzs, 10.0);
-    let gpu_eics = eic_gpu::extract_eics_gpu(gpu, &spectra, &target_mzs, 10.0).unwrap();
+    let gpu_eics =
+        eic_gpu::extract_eics_gpu(gpu, &spectra, &target_mzs, 10.0).expect("GPU/CPU validation");
     let tc = Instant::now();
     let cpu_totals: Vec<f64> = cpu_eics.iter().map(|e| e.intensity.iter().sum()).collect();
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
-    let gpu_totals = eic_gpu::batch_eic_total_intensity_gpu(gpu, &gpu_eics).unwrap();
+    let gpu_totals =
+        eic_gpu::batch_eic_total_intensity_gpu(gpu, &gpu_eics).expect("GPU/CPU validation");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check(
         "EIC count",
@@ -656,11 +676,11 @@ fn validate_pcoa(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timing>) {
     ];
     let condensed = diversity::bray_curtis_condensed(&samples);
     let tc = Instant::now();
-    let cpu_pcoa = pcoa::pcoa(&condensed, samples.len(), 2).unwrap();
+    let cpu_pcoa = pcoa::pcoa(&condensed, samples.len(), 2).expect("GPU/CPU validation");
     let cpu_us = tc.elapsed().as_micros() as f64;
     let n = samples.len();
     let tg = Instant::now();
-    let gpu_pcoa = pcoa_gpu::pcoa_gpu(gpu, &condensed, n, 2).unwrap();
+    let gpu_pcoa = pcoa_gpu::pcoa_gpu(gpu, &condensed, n, 2).expect("GPU/CPU validation");
     let gpu_us = tg.elapsed().as_micros() as f64;
     for (i, (ce, ge)) in cpu_pcoa
         .eigenvalues
@@ -715,11 +735,12 @@ fn validate_kriging(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timing>) 
     let targets = vec![(0.25, 0.25), (0.75, 0.75)];
     let config = kriging::VariogramConfig::spherical(0.0, 1.0, 2.0);
     let tg = Instant::now();
-    let ordinary = kriging::interpolate_diversity(gpu, &sites, &targets, &config).unwrap();
+    let ordinary =
+        kriging::interpolate_diversity(gpu, &sites, &targets, &config).expect("GPU/CPU validation");
     let gpu_us = tg.elapsed().as_micros() as f64;
     let known_mean = sites.iter().map(|s| s.value).sum::<f64>() / sites.len() as f64;
-    let simple =
-        kriging::interpolate_diversity_simple(gpu, &sites, &targets, &config, known_mean).unwrap();
+    let simple = kriging::interpolate_diversity_simple(gpu, &sites, &targets, &config, known_mean)
+        .expect("GPU/CPU validation");
     v.check(
         "Kriging value count",
         ordinary.values.len() as f64,
@@ -755,7 +776,8 @@ fn validate_rarefaction(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timin
         seed: 42,
     };
     let tg = Instant::now();
-    let result = rarefaction_gpu::rarefaction_bootstrap_gpu(gpu, &counts, &params).unwrap();
+    let result = rarefaction_gpu::rarefaction_bootstrap_gpu(gpu, &counts, &params)
+        .expect("GPU/CPU validation");
     let gpu_us = tg.elapsed().as_micros() as f64;
     let cpu_shannon = diversity::shannon(&counts);
     v.check_pass("Rarefaction Shannon > 0", result.shannon.mean > 0.0);
@@ -768,7 +790,12 @@ fn validate_rarefaction(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timin
         result.shannon.mean <= cpu_shannon + 0.5,
     );
     v.check_pass("Rarefaction observed > 0", result.observed.mean > 0.0);
-    v.check("Rarefaction depth", result.depth as f64, 500.0, 0.0);
+    v.check(
+        "Rarefaction depth",
+        result.depth as f64,
+        500.0,
+        tolerances::EXACT,
+    );
     timings.push(Timing {
         name: "Rarefaction",
         cpu_us: 0.0,

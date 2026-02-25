@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 25, 2026
-**Status:** Phase 44 — Validation study active — 3,279+ checks, 812 tests, 167 experiments, ToadStool S62+DF64 aligned, 44 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on)
+**Status:** Phase 45 — Validation study active — 3,279+ checks, 806 tests, 167 experiments, ToadStool S62+DF64 aligned, 44 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on, V38 deep debt resolved)
 **License:** AGPL-3.0-or-later
 
 ---
@@ -310,7 +310,7 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCuda/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34+ WGSL shaders, active Write phase)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (1 WGSL extension, 44 ToadStool primitives + 2 BGL helpers, barracuda always-on, 812 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (1 WGSL extension, 44 ToadStool primitives + 2 BGL helpers, barracuda always-on, 806 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **ecoPrimals/archive/wetspring-early-handoffs-feb2026/** — Fossil record of early ToadStool handoffs (v1–v9)
 
@@ -325,16 +325,16 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | Metric | Value |
 |--------|-------|
 | `cargo fmt --check` | Clean (0 diffs) |
-| `cargo clippy --pedantic --nursery` | 0 warnings |
+| `cargo clippy --pedantic --nursery -D warnings` | 0 diagnostics |
 | `cargo doc --no-deps` | 0 warnings |
-| Line coverage (`cargo-llvm-cov`) | **95.67% overall** |
+| Line coverage (`cargo-llvm-cov`) | **95.75% overall** |
 | `#![deny(unsafe_code)]` | Enforced crate-wide (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, clippy::unwrap_used)]` | Enforced crate-wide |
-| Named tolerance constants | 59 (all scientifically justified) |
+| Named tolerance constants | 62 (all scientifically justified, hierarchy-tested) |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` files |
-| Provenance headers | All 156 validation/benchmark binaries |
+| Provenance headers | All 157 validation/benchmark binaries |
 
 ## metalForge — Hardware Discovery
 

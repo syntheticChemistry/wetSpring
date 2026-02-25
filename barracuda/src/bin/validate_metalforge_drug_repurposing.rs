@@ -18,7 +18,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | CPU ↔ GPU parity |
 //! | Baseline date | 2026-02-25 |
 //! | Exact command | `cargo run --features gpu --release --bin validate_metalforge_drug_repurposing` |
@@ -266,7 +266,12 @@ fn validate_transe_parity(
     println!("  Max CPU↔GPU diff: {max_diff:.2e}");
     println!("  CPU: {cpu_us:.0}µs, GPU: {gpu_us:.0}µs");
 
-    v.check("TransE max diff", max_diff, 0.0, 1e-10);
+    v.check(
+        "TransE max diff",
+        max_diff,
+        0.0,
+        tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+    );
     v.check_pass("score count matches", gpu_scores.len() == cpu_scores.len());
 
     timings.push(("TransE 300-triple", cpu_us, gpu_us, max_diff));
@@ -318,11 +323,11 @@ fn validate_drug_ranking_parity(v: &mut Validator, gemm: &GemmCached) {
     let top_k = 20;
 
     let mut cpu_scores: Vec<(usize, f64)> = cpu_wh.iter().copied().enumerate().collect();
-    cpu_scores.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+    cpu_scores.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
     let cpu_top: Vec<usize> = cpu_scores.iter().take(top_k).map(|(i, _)| *i).collect();
 
     let mut gpu_scores: Vec<(usize, f64)> = gpu_wh.iter().copied().enumerate().collect();
-    gpu_scores.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+    gpu_scores.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
     let gpu_top: Vec<usize> = gpu_scores.iter().take(top_k).map(|(i, _)| *i).collect();
 
     let overlap = cpu_top.iter().filter(|i| gpu_top.contains(i)).count();

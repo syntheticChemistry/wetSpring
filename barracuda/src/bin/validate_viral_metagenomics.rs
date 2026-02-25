@@ -77,7 +77,7 @@ fn validate_dnds_analytical(v: &mut Validator) {
     v.section("── dN/dS analytical tests ──");
 
     // Identical sequences → dN = dS = 0
-    let result = dnds::pairwise_dnds(b"ATGATGATG", b"ATGATGATG").unwrap();
+    let result = dnds::pairwise_dnds(b"ATGATGATG", b"ATGATGATG").expect("dN/dS identical");
     v.check(
         "dN/dS identical: dN = 0",
         result.dn,
@@ -98,7 +98,7 @@ fn validate_dnds_analytical(v: &mut Validator) {
     );
 
     // Synonymous only: TTT→TTC (Phe→Phe)
-    let result = dnds::pairwise_dnds(b"TTTGCTAAA", b"TTCGCTAAA").unwrap();
+    let result = dnds::pairwise_dnds(b"TTTGCTAAA", b"TTCGCTAAA").expect("dN/dS synonymous");
     v.check(
         "dN/dS synonymous: dN = 0",
         result.dn,
@@ -119,7 +119,7 @@ fn validate_dnds_analytical(v: &mut Validator) {
     );
 
     // Nonsynonymous: AAA→GAA (Lys→Glu)
-    let result = dnds::pairwise_dnds(b"AAAGCTGCT", b"GAAGCTGCT").unwrap();
+    let result = dnds::pairwise_dnds(b"AAAGCTGCT", b"GAAGCTGCT").expect("dN/dS nonsynonymous");
     v.check(
         "dN/dS nonsynonymous: dN > 0",
         f64::from(u8::from(result.dn > 0.0)),
@@ -142,7 +142,7 @@ fn validate_dnds_analytical(v: &mut Validator) {
     );
 
     // Gap handling
-    let result = dnds::pairwise_dnds(b"ATG---GCT", b"ATG---GCT").unwrap();
+    let result = dnds::pairwise_dnds(b"ATG---GCT", b"ATG---GCT").expect("dN/dS gaps");
     v.check(
         "dN/dS: gaps skipped, dN = 0",
         result.dn,
@@ -155,7 +155,7 @@ fn validate_dnds_python_parity(v: &mut Validator) {
     v.section("── dN/dS Python parity ──");
 
     // Synonymous case
-    let r = dnds::pairwise_dnds(b"TTTGCTAAA", b"TTCGCTAAA").unwrap();
+    let r = dnds::pairwise_dnds(b"TTTGCTAAA", b"TTCGCTAAA").expect("dN/dS synonymous");
     v.check(
         "Python: syn dS",
         r.ds,
@@ -164,7 +164,7 @@ fn validate_dnds_python_parity(v: &mut Validator) {
     );
 
     // Nonsynonymous case
-    let r = dnds::pairwise_dnds(b"AAAGCTGCT", b"GAAGCTGCT").unwrap();
+    let r = dnds::pairwise_dnds(b"AAAGCTGCT", b"GAAGCTGCT").expect("dN/dS nonsynonymous");
     v.check(
         "Python: nonsyn dN",
         r.dn,
@@ -177,7 +177,7 @@ fn validate_dnds_python_parity(v: &mut Validator) {
         b"ATGGCTAAATTTGCTGCTGCTGCTGCTGCT",
         b"ATGGCCAAATTTGCTGCTGCTGCTGCCGCT",
     )
-    .unwrap();
+    .expect("dN/dS mixed");
     v.check(
         "Python: mixed dN = 0",
         r.dn,
@@ -196,7 +196,7 @@ fn validate_dnds_python_parity(v: &mut Validator) {
         b"ATGGCTGCTGCTGCTGCTGCTGCTGCTGCTGCTGCTGCTGCTGCTGCT",
         b"ATGGCCGCTGCTGCTGCTGCTGCTGCCGCTGCTGCTGCTGCTGCTGCT",
     )
-    .unwrap();
+    .expect("dN/dS purifying");
     v.check(
         "Python: purifying dS",
         r.ds,

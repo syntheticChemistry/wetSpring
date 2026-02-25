@@ -143,12 +143,12 @@ fn validate_synthetic_pipeline(v: &mut Validator) {
     let shannon = diversity::shannon(&counts);
     let simpson = diversity::simpson(&counts);
 
-    v.check("Observed features = 7", observed, 7.0, 0.0);
+    v.check("Observed features = 7", observed, 7.0, tolerances::EXACT);
     v.check(
         "Shannon > 0 (diverse community)",
         if shannon > 0.0 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Simpson in (0,1)",
@@ -158,7 +158,7 @@ fn validate_synthetic_pipeline(v: &mut Validator) {
             0.0
         },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Shannon for [180,120,80,60,50,30,20]: analytically computable
@@ -244,7 +244,7 @@ fn validate_synthetic_pipeline(v: &mut Validator) {
         "Taxonomy: dominant ASV → Saprospiraceae",
         if genus_correct { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let result_flavo = classifier.classify(flavobacterium, &params);
@@ -257,7 +257,7 @@ fn validate_synthetic_pipeline(v: &mut Validator) {
         "Taxonomy: rare ASV → Flavobacterium",
         if flavo_correct { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Step 6: UniFrac
@@ -302,7 +302,7 @@ fn validate_synthetic_pipeline(v: &mut Validator) {
         "UniFrac: healthy vs crash community > 0",
         if uw_vs_crash > 0.0 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 }
 
@@ -339,7 +339,7 @@ fn validate_cross_dataset_reference(v: &mut Validator) {
         "Cross-dataset genus overlap ≥ 1 (Marinobacter)",
         if has_overlap { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Both communities are Bacteroidetes + Proteobacteria dominated —
@@ -360,13 +360,13 @@ fn validate_cross_dataset_reference(v: &mut Validator) {
         "Exp017 has Bacteroidetes members",
         if bact_count >= 2 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Exp017 has Proteobacteria members",
         if proteo_count >= 2 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Verify that 7-taxon community yields higher Shannon than 5-taxon (richer)
@@ -380,7 +380,7 @@ fn validate_cross_dataset_reference(v: &mut Validator) {
         "Exp017 Shannon > Exp012 Shannon (richer community)",
         if shannon_017 > shannon_012 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     println!("  Exp012 Shannon: {shannon_012:.4}, Exp017 Shannon: {shannon_017:.4}");
 }
@@ -437,26 +437,26 @@ fn validate_python_control(v: &mut Validator) {
         "Python baseline Shannon > 5.0 (high-diversity marine)",
         if py_shannon > 5.0 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Python baseline Simpson > 0.99 (very even community)",
         if py_simpson > 0.99 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Python baseline QC retention > 95%",
         if py_retention_pct > 95.0 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Python baseline unique sequences > 1000 (diverse dataset)",
         #[allow(clippy::cast_precision_loss)]
         if py_unique_seqs > 1000 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 }
 
@@ -541,14 +541,19 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
             let n = records.len();
             println!("  Parsed {n} reads from R1");
 
-            v.check("R1 read count > 0", if n > 0 { 1.0 } else { 0.0 }, 1.0, 0.0);
+            v.check(
+                "R1 read count > 0",
+                if n > 0 { 1.0 } else { 0.0 },
+                1.0,
+                tolerances::EXACT,
+            );
 
             // V3-V4 amplicon: expect reasonable read count from 20MB subsample
             v.check(
                 "R1 read count > 1000 (subsample expected)",
                 if n > 1000 { 1.0 } else { 0.0 },
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             let qparams = QualityParams::default();
@@ -566,7 +571,7 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
                 "Quality retention > 50%",
                 if retention > 0.5 { 1.0 } else { 0.0 },
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             // V3-V4 amplicon: ~400-450 bp expected
@@ -583,7 +588,7 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
                     "Mean read length > 100 bp",
                     if mean_len > 100.0 { 1.0 } else { 0.0 },
                     1.0,
-                    0.0,
+                    tolerances::EXACT,
                 );
             }
 
@@ -601,7 +606,7 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
                     "Derep: >1 unique sequence",
                     if uniques.len() > 1 { 1.0 } else { 0.0 },
                     1.0,
-                    0.0,
+                    tolerances::EXACT,
                 );
 
                 if uniques.len() >= 2 {
@@ -616,7 +621,7 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
                         "DADA2: >1 ASV from real data",
                         if asvs.len() > 1 { 1.0 } else { 0.0 },
                         1.0,
-                        0.0,
+                        tolerances::EXACT,
                     );
 
                     // Acceptance criteria from Exp017 design:
@@ -633,7 +638,7 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
                         "Real data Shannon > 0",
                         if shannon > 0.0 { 1.0 } else { 0.0 },
                         1.0,
-                        0.0,
+                        tolerances::EXACT,
                     );
 
                     // Shannon plausibility for algae-pond community
@@ -645,19 +650,19 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
                             0.0
                         },
                         1.0,
-                        0.0,
+                        tolerances::EXACT,
                     );
                 }
             }
         }
         Err(e) => {
             println!("  [ERROR] Failed to parse R1: {e}");
-            v.check("R1 FASTQ parse", 0.0, 1.0, 0.0);
+            v.check("R1 FASTQ parse", 0.0, 1.0, tolerances::EXACT);
         }
     }
 
     if r2_path.is_some() {
-        v.check("R2 file exists", 1.0, 1.0, 0.0);
+        v.check("R2 file exists", 1.0, 1.0, tolerances::EXACT);
     } else {
         println!(
             "  [NOTE] R2 not present — only R1 subsample downloaded.\n  \

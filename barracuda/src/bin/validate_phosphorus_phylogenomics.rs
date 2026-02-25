@@ -50,7 +50,8 @@ fn validate_molecular_clock(v: &mut Validator) {
         vec![None, Some(0), Some(0), Some(1), Some(1), Some(2), Some(2)];
     let root_age = 2500.0; // 2.5 Gya
 
-    let result = molecular_clock::strict_clock(&branch_lengths, &parents, root_age, &[]).unwrap();
+    let result = molecular_clock::strict_clock(&branch_lengths, &parents, root_age, &[])
+        .expect("strict clock");
 
     v.check(
         "Clock rate positive",
@@ -88,8 +89,8 @@ fn validate_molecular_clock(v: &mut Validator) {
         min_age_ma: 2000.0,
         max_age_ma: 3000.0,
     }];
-    let result_cal =
-        molecular_clock::strict_clock(&branch_lengths, &parents, root_age, &cals).unwrap();
+    let result_cal = molecular_clock::strict_clock(&branch_lengths, &parents, root_age, &cals)
+        .expect("strict clock");
     v.check(
         "GOE calibration satisfied",
         f64::from(u8::from(result_cal.calibrations_satisfied)),
@@ -164,7 +165,8 @@ fn validate_python_parity(v: &mut Validator) {
         vec![None, Some(0), Some(0), Some(1), Some(1), Some(2), Some(2)];
 
     let py_rate = 1.480_000_000_000e-4;
-    let result = molecular_clock::strict_clock(&branch_lengths, &parents, 2500.0, &[]).unwrap();
+    let result = molecular_clock::strict_clock(&branch_lengths, &parents, 2500.0, &[])
+        .expect("strict clock");
 
     v.check(
         "Python: clock rate",
@@ -197,8 +199,8 @@ fn validate_cross_exp053(v: &mut Validator) {
     let p_054: Vec<Option<usize>> =
         vec![None, Some(0), Some(0), Some(1), Some(1), Some(2), Some(2)];
 
-    let r1 = molecular_clock::strict_clock(&bl_053, &p_053, 3000.0, &[]).unwrap();
-    let r2 = molecular_clock::strict_clock(&bl_054, &p_054, 2500.0, &[]).unwrap();
+    let r1 = molecular_clock::strict_clock(&bl_053, &p_053, 3000.0, &[]).expect("strict clock");
+    let r2 = molecular_clock::strict_clock(&bl_054, &p_054, 2500.0, &[]).expect("strict clock");
 
     v.check(
         "Both clock rates positive",

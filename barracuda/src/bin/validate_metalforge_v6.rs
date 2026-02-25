@@ -22,7 +22,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | `BarraCuda` CPU reference |
 //! | Baseline date | 2026-02-23 |
 //! | Exact command | `cargo run --features gpu --release --bin validate_metalforge_v6` |
@@ -195,12 +195,12 @@ fn validate_qs_ode_mf(
         }
         Ok(Err(e)) => {
             println!("  [SKIP] QS ODE GPU error: {e}");
-            v.check("QS ODE (skipped)", 1.0, 1.0, 0.0);
+            v.check("QS ODE (skipped)", 1.0, 1.0, tolerances::EXACT);
             timings.push(("QS ODE", cpu_us, 0.0, "SKIP"));
         }
         Err(_) => {
             println!("  [SKIP] QS ODE panicked (driver compile failure)");
-            v.check("QS ODE (driver skip)", 1.0, 1.0, 0.0);
+            v.check("QS ODE (driver skip)", 1.0, 1.0, tolerances::EXACT);
             timings.push(("QS ODE", cpu_us, 0.0, "SKIP"));
         }
     }
@@ -279,7 +279,7 @@ fn validate_unifrac_mf(
                 &format!("leaf[{leaf}] sample[{s}]"),
                 result.node_sums[leaf * n_samples + s],
                 sample_matrix[leaf * n_samples + s],
-                1e-10,
+                tolerances::GPU_VS_CPU_TRANSCENDENTAL,
             );
         }
     }
@@ -336,19 +336,19 @@ fn validate_dada2_mf(
                 "DADA2 ASV count",
                 gpu_asvs.len() as f64,
                 cpu_asvs.len() as f64,
-                0.0,
+                tolerances::EXACT,
             );
             v.check(
                 "DADA2 output reads",
                 gpu_stats.output_reads as f64,
                 cpu_stats.output_reads as f64,
-                0.0,
+                tolerances::EXACT,
             );
             v.check(
                 "DADA2 iterations",
                 gpu_stats.iterations as f64,
                 cpu_stats.iterations as f64,
-                0.0,
+                tolerances::EXACT,
             );
 
             for (i, (ca, ga)) in cpu_asvs.iter().zip(&gpu_asvs).enumerate() {
@@ -356,7 +356,7 @@ fn validate_dada2_mf(
                     &format!("DADA2 ASV[{i}] abundance"),
                     ga.abundance as f64,
                     ca.abundance as f64,
-                    0.0,
+                    tolerances::EXACT,
                 );
             }
 
@@ -364,7 +364,7 @@ fn validate_dada2_mf(
         }
         Err(e) => {
             println!("  [SKIP] DADA2 GPU error: {e}");
-            v.check("DADA2 GPU (skipped)", 1.0, 1.0, 0.0);
+            v.check("DADA2 GPU (skipped)", 1.0, 1.0, tolerances::EXACT);
             timings.push(("DADA2", cpu_us, 0.0, "SKIP"));
         }
     }
@@ -436,7 +436,12 @@ fn validate_kmer_mf(
     for (&g, &c) in gpu_result.histogram.iter().zip(cpu_hist.iter()) {
         max_diff = max_diff.max(g.abs_diff(c));
     }
-    v.check("K-mer max bin diff", f64::from(max_diff), 0.0, 0.0);
+    v.check(
+        "K-mer max bin diff",
+        f64::from(max_diff),
+        0.0,
+        tolerances::EXACT,
+    );
 
     timings.push(("K-mer Histogram", cpu_us, gpu_us, "CPU=GPU"));
 }
@@ -642,7 +647,7 @@ fn validate_felsenstein_mf(
         }
         Err(e) => {
             println!("  [SKIP] FelsensteinGpu error: {e}");
-            v.check("Felsenstein GPU (skipped)", 1.0, 1.0, 0.0);
+            v.check("Felsenstein GPU (skipped)", 1.0, 1.0, tolerances::EXACT);
             timings.push(("Felsenstein", cpu_us, 0.0, "SKIP"));
         }
     }

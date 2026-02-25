@@ -1,8 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** February 25, 2026
+**Date:** February 25, 2026 (V37 revalidation)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**Status:** 44 ToadStool primitives + 2 BGL helpers consumed, 1 local WGSL extension (Write phase — diversity fusion), 5 GPU ODE modules use trait-generated WGSL via `BatchedOdeRK4<S>::generate_shader()`, 42 GPU modules + 1 Write-phase extension, 0 Tier B/C remaining, 812 tests (765 barracuda + 47 forge), ToadStool S62+DF64 aligned, 167 experiments, 3,279+ checks
+**ToadStool pin:** `02207c4a` (S62+DF64 expansion, Feb 24 2026)
+**Status:** 44 ToadStool primitives + 2 BGL helpers consumed, 1 local WGSL extension (Write phase — diversity fusion), 5 GPU ODE modules use trait-generated WGSL via `BatchedOdeRK4<S>::generate_shader()`, 42 GPU modules + 1 Write-phase extension, 0 Tier B/C remaining, 806 tests (759 barracuda + 47 forge), 95.75% library coverage, ToadStool S62+DF64 aligned, 167 experiments, 3,279+ checks
 
 ---
 
@@ -48,7 +49,7 @@ WGSL          known physics   handoffs/                        delete local
 | Compose | GPU wrappers wiring ToadStool primitives | **7 modules** (kmd, merge_pairs, RF, derep, NJ, reconciliation, molecular_clock) |
 | Passthrough | Accept GPU buffers, CPU kernel | **3 modules** (gbm, feature_table, signal) |
 | Validate | CPU ↔ GPU parity for all shaders | All 5 ODE: exact parity (Exp099/100/101) |
-| Hand off | wateringHole/handoffs/ documents | **V35** active (DF64 lean + PeakDetect bug), V7-V34 archived |
+| Hand off | wateringHole/handoffs/ documents | **V37** active (revalidation + deep debt cleanup), V7-V36 archived |
 | Absorb | ToadStool integrates as `ops::bio::*` | **44 items** absorbed (ToadStool S62+DF64: all DONE, +46 cross-spring total) |
 | Lean | Rewire to upstream, delete local code | 44 primitives + 2 BGL helpers lean, 5 `OdeSystem` trait rewires, BGL boilerplate removed |
 
@@ -286,3 +287,12 @@ Patterns from hotSpring and neuralSpring that wetSpring leans on:
   - New local module: `bio::nmf` (Lee & Seung multiplicative updates, cosine sim, top-K)
   - ToadStool absorption targets: NMF update shader, sparse GEMM, weighted NMF mask
 - ODE lean benchmark: 5 systems × generate_shader(), upstream 20–33% faster
+
+**V37 revalidation (Feb 25, 2026):**
+- Revalidated against ToadStool `02207c4a` (S62+DF64 expansion)
+- 806 tests pass (759 barracuda + 47 forge), 0 failures
+- `cargo clippy --all-targets` clean (pedantic + nursery)
+- 95.75% library coverage (llvm-cov)
+- Deep debt cleanup: ncbi.rs sovereignty (capability-based HTTP), I/O parser lean
+  (deprecated buffering removed), 56 binaries modernized (NaN-safe sorts, descriptive expects),
+  tolerance provenance (5 constants with commit hashes), CI expanded (coverage gate + forge jobs)

@@ -239,14 +239,19 @@ pub fn spawn_nvidia_smi_poller(
                 return (None, None);
             };
             let handle = std::thread::spawn(move || {
-                let reader = BufReader::new(stdout);
-                for line in reader.lines() {
-                    let Ok(line) = line else { break };
-                    let line = line.trim().to_string();
+                let mut reader = BufReader::new(stdout);
+                let mut line_buf = String::new();
+                loop {
+                    line_buf.clear();
+                    match reader.read_line(&mut line_buf) {
+                        Ok(0) | Err(_) => break,
+                        Ok(_) => {}
+                    }
+                    let line = line_buf.trim();
                     if line.is_empty() {
                         continue;
                     }
-                    if let Some((watts, temp, vram)) = parse_nvidia_smi_sample(&line) {
+                    if let Some((watts, temp, vram)) = parse_nvidia_smi_sample(line) {
                         if let Ok(mut v) = samples.lock() {
                             v.push(GpuSample {
                                 watts,

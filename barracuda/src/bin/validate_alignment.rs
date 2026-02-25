@@ -14,6 +14,7 @@
 use wetspring_barracuda::bio::alignment::{
     AlignmentResult, ScoringParams, pairwise_scores, smith_waterman, smith_waterman_score,
 };
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn main() {
@@ -23,7 +24,12 @@ fn main() {
     // ── Identical sequences ─────────────────────────────────────────
     v.section("── Identical sequences ──");
     let r = smith_waterman(b"ACGTACGT", b"ACGTACGT", &params);
-    v.check("Identical: score", f64::from(r.score), 16.0, 0.0);
+    v.check(
+        "Identical: score",
+        f64::from(r.score),
+        16.0,
+        tolerances::EXACT,
+    );
     check_alignment_valid(&mut v, &r, "Identical");
 
     // ── Simple mismatch ─────────────────────────────────────────────
@@ -33,13 +39,18 @@ fn main() {
         "Mismatch: score matches Python",
         f64::from(r.score),
         5.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // ── Gap alignment ───────────────────────────────────────────────
     v.section("── Gap alignment ──");
     let r = smith_waterman(b"ACGTACGT", b"ACGACGT", &params);
-    v.check("Gap: score matches Python", f64::from(r.score), 10.0, 0.0);
+    v.check(
+        "Gap: score matches Python",
+        f64::from(r.score),
+        10.0,
+        tolerances::EXACT,
+    );
     check_alignment_valid(&mut v, &r, "Gap");
 
     // ── Local alignment ─────────────────────────────────────────────
@@ -49,7 +60,7 @@ fn main() {
         "Local: score (finds 8bp match)",
         f64::from(r.score),
         16.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // ── No match ────────────────────────────────────────────────────
@@ -61,14 +72,24 @@ fn main() {
         gap_extend: -2,
     };
     let r = smith_waterman(b"AAAA", b"CCCC", &harsh);
-    v.check("NoMatch: score = 0", f64::from(r.score), 0.0, 0.0);
+    v.check(
+        "NoMatch: score = 0",
+        f64::from(r.score),
+        0.0,
+        tolerances::EXACT,
+    );
 
     // ── 16S fragment alignment ──────────────────────────────────────
     v.section("── 16S fragment (40bp, 2 mismatches) ──");
     let q = b"GATCCTGGCTCAGGATGAACGCTGGCGGCGTGCCTAATAC";
     let t = b"GATCCTGGCTCAGAATGAACGCTGGCGGCATGCCTAATAC";
     let r = smith_waterman(q, t, &params);
-    v.check("16S: score matches Python", f64::from(r.score), 74.0, 0.0);
+    v.check(
+        "16S: score matches Python",
+        f64::from(r.score),
+        74.0,
+        tolerances::EXACT,
+    );
     check_alignment_valid(&mut v, &r, "16S");
 
     // ── Score-only consistency ──────────────────────────────────────
@@ -81,7 +102,7 @@ fn main() {
         "ScoreOnly == Full",
         f64::from(u8::from(full_score == fast_score)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // ── Batch pairwise ──────────────────────────────────────────────
@@ -95,15 +116,25 @@ fn main() {
             scores.len() as f64
         },
         3.0,
-        0.0,
+        tolerances::EXACT,
     );
-    v.check("Pairwise: ACGT-ACTT score", f64::from(scores[0]), 5.0, 0.0);
+    v.check(
+        "Pairwise: ACGT-ACTT score",
+        f64::from(scores[0]),
+        5.0,
+        tolerances::EXACT,
+    );
 
     // ── Case insensitive ────────────────────────────────────────────
     v.section("── Case insensitive ──");
     let s1 = smith_waterman(b"ACGT", b"acgt", &params).score;
     let s2 = smith_waterman(b"ACGT", b"ACGT", &params).score;
-    v.check("Case insensitive", f64::from(u8::from(s1 == s2)), 1.0, 0.0);
+    v.check(
+        "Case insensitive",
+        f64::from(u8::from(s1 == s2)),
+        1.0,
+        tolerances::EXACT,
+    );
 
     // ── Determinism ─────────────────────────────────────────────────
     v.section("── Determinism ──");
@@ -113,13 +144,13 @@ fn main() {
         "Deterministic score",
         f64::from(u8::from(r1.score == r2.score)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Deterministic alignment",
         f64::from(u8::from(r1.aligned_query == r2.aligned_query)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     v.finish();
@@ -131,6 +162,6 @@ fn check_alignment_valid(v: &mut Validator, r: &AlignmentResult, pre: &str) {
         &format!("{pre}: aligned lengths match"),
         f64::from(u8::from(same_len)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 }

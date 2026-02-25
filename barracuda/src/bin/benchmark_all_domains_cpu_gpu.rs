@@ -271,13 +271,13 @@ fn bench_random_forest(device: &Arc<WgpuDevice>) {
             &[None, Some(left_class), Some(right_class)],
             2,
         )
-        .unwrap()
+        .expect("benchmark")
     };
 
     let trees: Vec<DecisionTree> = (0..10)
         .map(|i| mk_stump((i % 2) as i32, f64::from(i).mul_add(0.3, 5.0), 0, 1))
         .collect();
-    let rf = RandomForest::from_trees(trees, 2).unwrap();
+    let rf = RandomForest::from_trees(trees, 2).expect("benchmark");
 
     for &n_samples in &[10, 50, 200, 1000] {
         let mut rng = 400_u64;

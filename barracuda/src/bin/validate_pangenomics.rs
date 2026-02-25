@@ -99,7 +99,7 @@ fn validate_heaps_law(v: &mut Validator) {
         "Heap's alpha computed",
         f64::from(u8::from(result.heaps_alpha.is_some())),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Large open pangenome: many unique genes per genome
@@ -123,7 +123,7 @@ fn validate_heaps_law(v: &mut Validator) {
         "Open pangenome: unique > core",
         f64::from(u8::from(open_result.unique_size > open_result.core_size)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 }
 
@@ -136,7 +136,7 @@ fn validate_enrichment(v: &mut Validator) {
         "Enriched: p < 0.05",
         f64::from(u8::from(p_enriched < 0.05)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Not enriched: 2 of 10 (expected ≈ 2)
@@ -145,12 +145,12 @@ fn validate_enrichment(v: &mut Validator) {
         "Not enriched: p ≈ 1.0",
         f64::from(u8::from((p_not - 1.0).abs() < 0.01)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Edge: zero population
     let p_zero = pangenome::hypergeometric_pvalue(0, 0, 0, 0);
-    v.check("Zero population: p = 1.0", p_zero, 1.0, 0.0);
+    v.check("Zero population: p = 1.0", p_zero, 1.0, tolerances::EXACT);
 }
 
 fn validate_bh_correction(v: &mut Validator) {
@@ -163,19 +163,19 @@ fn validate_bh_correction(v: &mut Validator) {
         "BH: all adjusted in [0,1]",
         f64::from(u8::from(adj.iter().all(|&p| (0.0..=1.0).contains(&p)))),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "BH: adjusted[0] <= adjusted[3]",
         f64::from(u8::from(adj[0] <= adj[3])),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "BH: smallest raw → smallest adjusted",
         f64::from(u8::from(adj[0] < adj[3])),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Empty

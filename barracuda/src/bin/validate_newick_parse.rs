@@ -23,6 +23,7 @@
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::bio::unifrac::PhyloTree;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 struct TestCase {
@@ -124,7 +125,7 @@ fn main() {
             &format!("{}: total branch length", tc.name),
             tree.total_branch_length(),
             tc.expected_branch_length,
-            1e-10,
+            tolerances::PYTHON_PARITY,
         );
 
         let mut rust_labels: Vec<&str> = tree

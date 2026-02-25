@@ -48,7 +48,8 @@ fn validate_molecular_clock(v: &mut Validator) {
     let parents: Vec<Option<usize>> = vec![None, Some(0), Some(0), Some(1), Some(1)];
     let root_age = 3000.0; // 3 Gya
 
-    let result = molecular_clock::strict_clock(&branch_lengths, &parents, root_age, &[]).unwrap();
+    let result = molecular_clock::strict_clock(&branch_lengths, &parents, root_age, &[])
+        .expect("strict clock");
 
     v.check(
         "Clock rate positive",
@@ -86,8 +87,8 @@ fn validate_molecular_clock(v: &mut Validator) {
         min_age_ma: 2500.0,
         max_age_ma: 3500.0,
     }];
-    let result_cal =
-        molecular_clock::strict_clock(&branch_lengths, &parents, root_age, &cals).unwrap();
+    let result_cal = molecular_clock::strict_clock(&branch_lengths, &parents, root_age, &cals)
+        .expect("strict clock");
     v.check(
         "Calibration constraint satisfied",
         f64::from(u8::from(result_cal.calibrations_satisfied)),
@@ -101,8 +102,8 @@ fn validate_molecular_clock(v: &mut Validator) {
         min_age_ma: 5000.0,
         max_age_ma: 6000.0,
     }];
-    let result_bad =
-        molecular_clock::strict_clock(&branch_lengths, &parents, root_age, &bad_cals).unwrap();
+    let result_bad = molecular_clock::strict_clock(&branch_lengths, &parents, root_age, &bad_cals)
+        .expect("strict clock");
     v.check(
         "Calibration violation detected",
         f64::from(u8::from(!result_bad.calibrations_satisfied)),
@@ -221,7 +222,8 @@ fn validate_python_parity(v: &mut Validator) {
     let parents: Vec<Option<usize>> = vec![None, Some(0), Some(0), Some(1), Some(1)];
 
     let py_rate = 6.666_666_666_667e-5;
-    let result = molecular_clock::strict_clock(&branch_lengths, &parents, 3000.0, &[]).unwrap();
+    let result = molecular_clock::strict_clock(&branch_lengths, &parents, 3000.0, &[])
+        .expect("strict clock");
 
     v.check(
         "Python: clock rate",

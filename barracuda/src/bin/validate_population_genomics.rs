@@ -175,7 +175,7 @@ fn validate_integrated_pipeline(v: &mut Validator) {
     );
 
     // dN/dS on the variant region
-    let r = dnds::pairwise_dnds(genomes[0], genomes[2]).unwrap();
+    let r = dnds::pairwise_dnds(genomes[0], genomes[2]).expect("dN/dS");
     v.check(
         "dN/dS computable on population pair",
         f64::from(u8::from(r.syn_sites > 0.0 || r.nonsyn_sites > 0.0)),

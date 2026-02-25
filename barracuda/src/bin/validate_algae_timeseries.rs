@@ -117,10 +117,10 @@ fn main() {
     v.section("── Determinism ──");
     let h1 = shannon(&dominant);
     let h2 = shannon(&dominant);
-    v.check("Shannon deterministic", h1, h2, 0.0);
+    v.check("Shannon deterministic", h1, h2, tolerances::EXACT);
     let bc1 = bray_curtis(&s1, &s3);
     let bc2 = bray_curtis(&s1, &s3);
-    v.check("BC deterministic", bc1, bc2, 0.0);
+    v.check("BC deterministic", bc1, bc2, tolerances::EXACT);
 
     v.finish();
 }

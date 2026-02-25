@@ -233,7 +233,7 @@ impl<R: BufRead> XmlReader<R> {
 ///
 /// Expects input like `key1="val1" key2="val2"`.
 fn parse_attributes(s: &str) -> Vec<(String, String)> {
-    let mut attrs = Vec::new();
+    let mut attrs = Vec::with_capacity(8);
     let mut rest = s.trim();
 
     while !rest.is_empty() {

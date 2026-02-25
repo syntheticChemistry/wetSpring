@@ -20,6 +20,7 @@
 //! | Data source | Synthetic (mirrors PRJNA649075 Lake Erie HAB, PRJNA524461 Baltic) |
 //! | GPU prims   | `FusedMapReduceF64`, `BrayCurtisF64` |
 //! | Date        | 2026-02-23 |
+//! | Command     | `cargo test --bin validate_real_bloom_gpu -- --nocapture` |
 
 use std::time::Instant;
 use wetspring_barracuda::bio::diversity;
@@ -162,8 +163,8 @@ fn main() {
 
     #[cfg(feature = "gpu")]
     {
-        let rt = tokio::runtime::Runtime::new().unwrap();
-        let gpu = rt.block_on(GpuF64::new()).unwrap();
+        let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
+        let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
 
         if !gpu.has_f64 {
             validation::exit_skipped("No SHADER_F64 support");
@@ -181,12 +182,12 @@ fn main() {
         {
             let gpu_shannon: Vec<f64> = eco
                 .iter()
-                .map(|c| diversity_gpu::shannon_gpu(&gpu, c).unwrap())
+                .map(|c| diversity_gpu::shannon_gpu(&gpu, c).expect("Shannon GPU"))
                 .collect();
 
             let _gpu_simpson: Vec<f64> = eco
                 .iter()
-                .map(|c| diversity_gpu::simpson_gpu(&gpu, c).unwrap())
+                .map(|c| diversity_gpu::simpson_gpu(&gpu, c).expect("Simpson GPU"))
                 .collect();
 
             // Parity: GPU Shannon ≈ CPU Shannon
@@ -212,7 +213,7 @@ fn main() {
                         &gpu,
                         &[w[0].clone(), w[1].clone()],
                     )
-                    .unwrap();
+                    .expect("Bray-Curtis GPU");
                     bc_mat[0]
                 })
                 .collect();

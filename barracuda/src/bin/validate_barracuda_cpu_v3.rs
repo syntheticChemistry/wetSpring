@@ -50,14 +50,14 @@ fn main() {
         "MS-QS: trajectory has steps",
         f64::from(u8::from(wt.steps > 100)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     let wt_final = &wt.y_final;
     v.check(
         "MS-QS: wild-type reaches steady state",
         f64::from(u8::from(!wt_final.is_empty())),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let no_qs = multi_signal::scenario_no_qs(&ms_params, 0.001);
@@ -65,7 +65,7 @@ fn main() {
         "MS-QS: no-QS mutant completes",
         f64::from(u8::from(no_qs.steps > 100)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     timings.push(("Multi-signal QS (48h)", ms_us as f64));
@@ -84,7 +84,7 @@ fn main() {
         "Phage: attack > 100 steps",
         f64::from(u8::from(attack.steps > 100)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let no_phage = phage_defense::scenario_no_phage(&pd_params, 0.001);
@@ -92,7 +92,7 @@ fn main() {
         "Phage: no-phage > 100 steps",
         f64::from(u8::from(no_phage.steps > 100)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let defended = phage_defense::scenario_pure_defended(&pd_params, 0.001);
@@ -100,7 +100,7 @@ fn main() {
         "Phage: defended > 100 steps",
         f64::from(u8::from(defended.steps > 100)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     timings.push(("Phage defense (48h)", pd_us as f64));
@@ -130,20 +130,25 @@ fn main() {
     let lls = bootstrap::bootstrap_likelihoods(&tree_bs, &alignment, 100, 1.0, 42);
     let bs_us = t0.elapsed().as_micros();
 
-    v.check("Bootstrap: 100 replicates", lls.len() as f64, 100.0, 0.0);
+    v.check(
+        "Bootstrap: 100 replicates",
+        lls.len() as f64,
+        100.0,
+        tolerances::EXACT,
+    );
     let all_finite = lls.iter().all(|x| x.is_finite());
     v.check(
         "Bootstrap: all LLs finite",
         f64::from(u8::from(all_finite)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     let mean_ll: f64 = lls.iter().sum::<f64>() / lls.len() as f64;
     v.check(
         "Bootstrap: mean LL < 0 (negative log-lik)",
         f64::from(u8::from(mean_ll < 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let lls2 = bootstrap::bootstrap_likelihoods(&tree_bs, &alignment, 100, 1.0, 42);
@@ -155,7 +160,7 @@ fn main() {
         "Bootstrap: deterministic (same seed)",
         f64::from(u8::from(deterministic)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     timings.push(("Bootstrap (100 reps, 8bp)", bs_us as f64));
@@ -194,29 +199,34 @@ fn main() {
         "Placement: found edges",
         f64::from(u8::from(!scan.placements.is_empty())),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Placement: best LL finite",
         f64::from(u8::from(scan.best_ll.is_finite())),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Placement: best LL < 0",
         f64::from(u8::from(scan.best_ll < 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Placement: confidence > 0",
         f64::from(u8::from(scan.confidence > 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let batch = placement::batch_placement(&ref_tree, &["ACGTACGTACGT", "ACTTACTTACTT"], 0.05, 1.0);
-    v.check("Batch placement: 2 queries", batch.len() as f64, 2.0, 0.0);
+    v.check(
+        "Batch placement: 2 queries",
+        batch.len() as f64,
+        2.0,
+        tolerances::EXACT,
+    );
 
     timings.push(("Placement (3 taxa, 12bp)", pl_us as f64));
 
@@ -246,14 +256,49 @@ fn main() {
     ]);
     let dt_us = t0.elapsed().as_micros();
 
-    v.check("DT: predict(3) = 0 (< 5)", pred_low as f64, 0.0, 0.0);
-    v.check("DT: predict(7) = 1 (≥ 5)", pred_high as f64, 1.0, 0.0);
-    v.check("DT: batch len = 4", batch_preds.len() as f64, 4.0, 0.0);
-    v.check("DT: batch[0] = 0", batch_preds[0] as f64, 0.0, 0.0);
-    v.check("DT: batch[1] = 1", batch_preds[1] as f64, 1.0, 0.0);
-    v.check("DT: n_nodes = 3", dt.n_nodes() as f64, 3.0, 0.0);
-    v.check("DT: n_leaves = 2", dt.n_leaves() as f64, 2.0, 0.0);
-    v.check("DT: depth = 1", dt.depth() as f64, 1.0, 0.0);
+    v.check(
+        "DT: predict(3) = 0 (< 5)",
+        pred_low as f64,
+        0.0,
+        tolerances::EXACT,
+    );
+    v.check(
+        "DT: predict(7) = 1 (≥ 5)",
+        pred_high as f64,
+        1.0,
+        tolerances::EXACT,
+    );
+    v.check(
+        "DT: batch len = 4",
+        batch_preds.len() as f64,
+        4.0,
+        tolerances::EXACT,
+    );
+    v.check(
+        "DT: batch[0] = 0",
+        batch_preds[0] as f64,
+        0.0,
+        tolerances::EXACT,
+    );
+    v.check(
+        "DT: batch[1] = 1",
+        batch_preds[1] as f64,
+        1.0,
+        tolerances::EXACT,
+    );
+    v.check(
+        "DT: n_nodes = 3",
+        dt.n_nodes() as f64,
+        3.0,
+        tolerances::EXACT,
+    );
+    v.check(
+        "DT: n_leaves = 2",
+        dt.n_leaves() as f64,
+        2.0,
+        tolerances::EXACT,
+    );
+    v.check("DT: depth = 1", dt.depth() as f64, 1.0, tolerances::EXACT);
 
     timings.push(("Decision tree (4 samples)", dt_us as f64));
 
@@ -285,24 +330,29 @@ fn main() {
         "Spectral: near-match > 0.95",
         f64::from(u8::from(near_match.score > 0.95)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Spectral: diff-match < near-match",
         f64::from(u8::from(diff_match.score < near_match.score)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Spectral: self matched_peaks = 5",
         self_match.matched_peaks as f64,
         5.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let spectra = vec![(mz_a, int_a), (mz_b, int_b), (mz_c, int_c)];
     let pw = spectral_match::pairwise_cosine(&spectra, 0.5);
-    v.check("Spectral: pairwise 3 → 3 pairs", pw.len() as f64, 3.0, 0.0);
+    v.check(
+        "Spectral: pairwise 3 → 3 pairs",
+        pw.len() as f64,
+        3.0,
+        tolerances::EXACT,
+    );
 
     timings.push(("Spectral match (5 peaks)", sm_us as f64));
 
@@ -337,7 +387,7 @@ fn main() {
         "Pielou: uneven < 0.5",
         f64::from(u8::from(pielou_uneven < 0.5)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Bray-Curtis: identical = 0",
@@ -349,32 +399,32 @@ fn main() {
         "Bray-Curtis: different > 0",
         f64::from(u8::from(bc_diff > 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Bray-Curtis: range [0,1]",
         f64::from(u8::from((0.0..=1.0).contains(&bc_diff))),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Chao1 ≥ observed",
         f64::from(u8::from(chao1_val >= 4.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
-    v.check("Observed features", obs, 3.0, 0.0);
+    v.check("Observed features", obs, 3.0, tolerances::EXACT);
     v.check(
         "AlphaDiversity: Shannon > 0",
         f64::from(u8::from(alpha.shannon > 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "AlphaDiversity: Evenness ∈ (0,1]",
         f64::from(u8::from(alpha.evenness > 0.0 && alpha.evenness <= 1.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let samples = vec![
@@ -387,7 +437,7 @@ fn main() {
         "BC condensed: 3 samples → 3 pairs",
         bc_matrix.len() as f64,
         3.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     timings.push(("Extended diversity suite", div_us as f64));
@@ -406,20 +456,20 @@ fn main() {
         "Kmer: unique > 0",
         f64::from(u8::from(kc.unique_count() > 0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Kmer: total = n-k+1",
         kc.total_count() as f64,
         (seq.len() - 4 + 1) as f64,
-        0.0,
+        tolerances::EXACT,
     );
     let decoded = kmer::decode_kmer(0b0001_1011, 4);
     v.check(
         "Kmer: decode 0b00011011 = ACGT",
         f64::from(u8::from(decoded == "ACGT")),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let multi = kmer::count_kmers_multi(&[b"ACGT" as &[u8], b"ACGT"], 3);
@@ -427,7 +477,7 @@ fn main() {
         "Kmer multi: 2 seqs combined",
         f64::from(u8::from(multi.total_count() > 0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     timings.push(("Kmer counting (16bp, k=4)", kmer_us as f64));
@@ -459,13 +509,13 @@ fn main() {
         "Pipeline: BC ∈ (0,1)",
         f64::from(u8::from(pipeline_bc > 0.0 && pipeline_bc < 1.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Pipeline: spectral > 0.99",
         f64::from(u8::from(pipeline_spectral.score > 0.99)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     timings.push(("Integrated pipeline", pipeline_us as f64));

@@ -1,17 +1,23 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// # Provenance
-// Experiment: 167
-// Date: February 25, 2026
-// Purpose: Validate diversity_fusion_f64.wgsl extension — CPU ↔ GPU parity
-// Python baseline: scipy/skbio Shannon/Simpson/Pielou (analytically verified)
-// Data: Synthetic abundance vectors (deterministic, no external data)
-// Command: cargo run --features gpu --bin validate_gpu_diversity_fusion
-//
-// This validates the Write-phase diversity fusion WGSL extension following
-// hotSpring's absorption pattern: local shader + CPU reference + parity check.
+//! # Exp167: Diversity Fusion GPU Extension (Write Phase)
+//!
+//! Validates diversity_fusion_f64.wgsl extension — CPU ↔ GPU parity.
+//! Python baseline: scipy/skbio Shannon/Simpson/Pielou (analytically verified).
+//! Data: Synthetic abundance vectors (deterministic, no external data).
+//! This validates the Write-phase diversity fusion WGSL extension following
+//! hotSpring's absorption pattern: local shader + CPU reference + parity check.
+//!
+//! # Provenance
+//!
+//! | Item        | Value |
+//! |-------------|-------|
+//! | Date        | 2026-02-25 |
+//! | Experiment  | 167 |
+//! | Command     | `cargo test --bin validate_gpu_diversity_fusion -- --nocapture` |
 
 use std::process;
 use std::sync::Arc;
+use wetspring_barracuda::tolerances;
 
 fn main() {
     println!("=== Exp167: Diversity Fusion GPU Extension (Write Phase) ===");
@@ -58,9 +64,9 @@ fn main() {
             .expect("GPU compute");
 
         // CPU uses hardware f64 ln(); GPU uses log_f64 polyfill (~1e-8 precision).
-        // Simpson uses only mul/sub → exact parity (1e-12).
-        let cpu_tol = 1e-12;
-        let gpu_log_tol = 1e-7;
+        // Simpson uses only mul/sub → exact parity (ANALYTICAL_F64).
+        let cpu_tol = tolerances::ANALYTICAL_F64;
+        let gpu_log_tol = tolerances::GPU_LOG_POLYFILL;
 
         // Sample 0: uniform → max diversity
         let expected_shannon = 4.0_f64.ln();
@@ -158,8 +164,8 @@ fn main() {
             .compute(&abundances, n_samples, n_species)
             .expect("GPU compute");
 
-        let gpu_log_tol = 1e-7;
-        let cpu_tol = 1e-12;
+        let gpu_log_tol = tolerances::GPU_LOG_POLYFILL;
+        let cpu_tol = tolerances::ANALYTICAL_F64;
 
         check(
             &mut checks,
@@ -212,8 +218,8 @@ fn main() {
             .compute(&abundances, n_samples, n_species)
             .expect("GPU compute");
 
-        let gpu_log_tol = 1e-7;
-        let cpu_tol = 1e-12;
+        let gpu_log_tol = tolerances::GPU_LOG_POLYFILL;
+        let cpu_tol = tolerances::ANALYTICAL_F64;
         let mut all_parity = true;
         for i in 0..n_samples {
             if (cpu[i].shannon - gpu_result[i].shannon).abs() > gpu_log_tol

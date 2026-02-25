@@ -229,7 +229,7 @@ fn validate_evenness_and_rarefaction(v: &mut Validator) {
         "Rarefaction monotonic",
         f64::from(u8::from(monotonic)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 }
 
@@ -266,7 +266,12 @@ fn validate_exp002_galaxy_baseline(v: &mut Validator) {
         alpha_low.observed, alpha_low.shannon, alpha_low.simpson
     );
 
-    v.check("Exp002 low: observed = 91", alpha_low.observed, 91.0, 0.0);
+    v.check(
+        "Exp002 low: observed = 91",
+        alpha_low.observed,
+        91.0,
+        tolerances::EXACT,
+    );
     v.check(
         "Exp002 low: Shannon in Galaxy range",
         alpha_low.shannon,
@@ -297,7 +302,7 @@ fn validate_exp002_galaxy_baseline(v: &mut Validator) {
         "Exp002 high: observed = 856",
         alpha_high.observed,
         856.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Exp002 high: Shannon in Galaxy range",
@@ -309,7 +314,7 @@ fn validate_exp002_galaxy_baseline(v: &mut Validator) {
         "Exp002 high: Simpson > 0.85",
         if alpha_high.simpson > 0.85 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Bray-Curtis between low and high → should be dissimilar
@@ -344,7 +349,7 @@ fn validate_exp002_galaxy_baseline(v: &mut Validator) {
             0.0
         },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Exp002: PCoA axis 0 dominant",

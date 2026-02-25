@@ -70,7 +70,7 @@ fn main() {
         "ANI: gaps excluded",
         with_gaps.aligned_length as f64,
         3.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "ANI: gap-excluded still 1.0",
@@ -81,7 +81,12 @@ fn main() {
 
     let seqs: Vec<&[u8]> = vec![b"ATGATG", b"ATGATG", b"CTGATG"];
     let matrix = ani::ani_matrix(&seqs);
-    v.check("ANI: matrix size n*(n-1)/2", matrix.len() as f64, 3.0, 0.0);
+    v.check(
+        "ANI: matrix size n*(n-1)/2",
+        matrix.len() as f64,
+        3.0,
+        tolerances::EXACT,
+    );
 
     let batch_pairs: Vec<(&[u8], &[u8])> = vec![
         (b"ATGATGATG", b"ATGATGATG"),
@@ -124,7 +129,7 @@ fn main() {
         "SNP: identical → 0 variants",
         no_snps.variants.len() as f64,
         0.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let one_snp_seqs: Vec<&[u8]> = vec![b"ATGATG", b"ATGATG", b"ATGTTG"];
@@ -133,13 +138,13 @@ fn main() {
         "SNP: single variant at pos 3",
         one_snp.variants.len() as f64,
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "SNP: variant position = 3",
         one_snp.variants[0].position as f64,
         3.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let freq_seqs: Vec<&[u8]> = vec![b"A", b"A", b"A", b"T"];
@@ -163,7 +168,7 @@ fn main() {
         "SNP: density > 0 for polymorphic",
         f64::from(u8::from(multi_density.snp_density() > 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let flat = snp::call_snps_flat(&one_snp_seqs);
@@ -171,13 +176,13 @@ fn main() {
         "SNP flat: same count as AoS",
         flat.positions.len() as f64,
         one_snp.variants.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "SNP flat: position matches",
         f64::from(flat.positions[0]),
         one_snp.variants[0].position as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     let snp_us = t0.elapsed().as_micros();
@@ -190,7 +195,7 @@ fn main() {
 
     let t0 = Instant::now();
 
-    let identical_dnds = dnds::pairwise_dnds(b"ATGATGATG", b"ATGATGATG").unwrap();
+    let identical_dnds = dnds::pairwise_dnds(b"ATGATGATG", b"ATGATGATG").expect("Barracuda CPU v4");
     v.check(
         "dN/dS: identical → dN=0",
         identical_dnds.dn,
@@ -205,12 +210,12 @@ fn main() {
     );
 
     // TTT→TTC: Phe→Phe (synonymous at pos 3)
-    let syn_result = dnds::pairwise_dnds(b"TTTGCTAAA", b"TTCGCTAAA").unwrap();
+    let syn_result = dnds::pairwise_dnds(b"TTTGCTAAA", b"TTCGCTAAA").expect("Barracuda CPU v4");
     v.check(
         "dN/dS: syn-only → dS > 0",
         f64::from(u8::from(syn_result.ds > 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "dN/dS: syn-only → dN = 0",
@@ -229,18 +234,18 @@ fn main() {
         b"ATGGCTAAATTTGCTGCTGCTGCTGCTGCT",
         b"ATGGCCGAATTTGCTGCTGCTGCTGCCGCT",
     )
-    .unwrap();
+    .expect("Barracuda CPU v4");
     v.check(
         "dN/dS: mixed → syn_sites > 0",
         f64::from(u8::from(mixed.syn_sites > 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "dN/dS: mixed → nonsyn_sites > 0",
         f64::from(u8::from(mixed.nonsyn_sites > 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let batch_pairs: Vec<(&[u8], &[u8])> =
@@ -248,15 +253,17 @@ fn main() {
     let batch = dnds::pairwise_dnds_batch(&batch_pairs);
     v.check(
         "dN/dS batch: first identical dN=0",
-        batch[0].as_ref().unwrap().dn,
+        batch[0].as_ref().expect("Barracuda CPU v4").dn,
         0.0,
         tolerances::ANALYTICAL_F64,
     );
     v.check(
         "dN/dS batch: second syn-only dS>0",
-        f64::from(u8::from(batch[1].as_ref().unwrap().ds > 0.0)),
+        f64::from(u8::from(
+            batch[1].as_ref().expect("Barracuda CPU v4").ds > 0.0,
+        )),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let dnds_us = t0.elapsed().as_micros();
@@ -272,12 +279,13 @@ fn main() {
     let branch_lengths = vec![0.0, 0.1, 0.2, 0.05, 0.05, 0.15, 0.15];
     let parents = vec![None, Some(0), Some(0), Some(1), Some(1), Some(2), Some(2)];
 
-    let clock = molecular_clock::strict_clock(&branch_lengths, &parents, 3500.0, &[]).unwrap();
+    let clock = molecular_clock::strict_clock(&branch_lengths, &parents, 3500.0, &[])
+        .expect("Barracuda CPU v4");
     v.check(
         "Clock: rate > 0",
         f64::from(u8::from(clock.rate > 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Clock: root age = 3500 Ma",
@@ -289,13 +297,13 @@ fn main() {
         "Clock: child age < root age",
         f64::from(u8::from(clock.node_ages[1] < clock.node_ages[0])),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Clock: calibrations satisfied (none set)",
         f64::from(u8::from(clock.calibrations_satisfied)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let relaxed = molecular_clock::relaxed_clock_rates(&branch_lengths, &clock.node_ages, &parents);
@@ -313,13 +321,13 @@ fn main() {
         min_age_ma: 3000.0,
         max_age_ma: 4000.0,
     };
-    let cal_clock =
-        molecular_clock::strict_clock(&branch_lengths, &parents, 3500.0, &[cal]).unwrap();
+    let cal_clock = molecular_clock::strict_clock(&branch_lengths, &parents, 3500.0, &[cal])
+        .expect("Barracuda CPU v4");
     v.check(
         "Clock: calibration satisfied",
         f64::from(u8::from(cal_clock.calibrations_satisfied)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let bad_cal = molecular_clock::CalibrationPoint {
@@ -327,13 +335,13 @@ fn main() {
         min_age_ma: 5000.0,
         max_age_ma: 6000.0,
     };
-    let bad_clock =
-        molecular_clock::strict_clock(&branch_lengths, &parents, 3500.0, &[bad_cal]).unwrap();
+    let bad_clock = molecular_clock::strict_clock(&branch_lengths, &parents, 3500.0, &[bad_cal])
+        .expect("Barracuda CPU v4");
     v.check(
         "Clock: violated calibration fails",
         f64::from(u8::from(!bad_clock.calibrations_satisfied)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let clock_us = t0.elapsed().as_micros();
@@ -378,15 +386,35 @@ fn main() {
     ];
 
     let pan = pangenome::analyze(&clusters, 5);
-    v.check("Pan: core = 3", pan.core_size as f64, 3.0, 0.0);
-    v.check("Pan: accessory = 2", pan.accessory_size as f64, 2.0, 0.0);
-    v.check("Pan: unique = 2", pan.unique_size as f64, 2.0, 0.0);
-    v.check("Pan: total = 7", pan.total_size as f64, 7.0, 0.0);
+    v.check(
+        "Pan: core = 3",
+        pan.core_size as f64,
+        3.0,
+        tolerances::EXACT,
+    );
+    v.check(
+        "Pan: accessory = 2",
+        pan.accessory_size as f64,
+        2.0,
+        tolerances::EXACT,
+    );
+    v.check(
+        "Pan: unique = 2",
+        pan.unique_size as f64,
+        2.0,
+        tolerances::EXACT,
+    );
+    v.check(
+        "Pan: total = 7",
+        pan.total_size as f64,
+        7.0,
+        tolerances::EXACT,
+    );
     v.check(
         "Pan: Heap's alpha computed",
         f64::from(u8::from(pan.heaps_alpha.is_some())),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let flat = pangenome::presence_matrix_flat(&clusters, 5);
@@ -394,13 +422,13 @@ fn main() {
         "Pan flat: length = genes * genomes",
         flat.len() as f64,
         f64::from(7 * 5),
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Pan flat: first core gene all-1",
         f64::from(flat[0] + flat[1] + flat[2] + flat[3] + flat[4]),
         5.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let enriched_p = pangenome::hypergeometric_pvalue(8, 10, 20, 100);
@@ -408,7 +436,7 @@ fn main() {
         "Pan: enriched p < 0.05",
         f64::from(u8::from(enriched_p < 0.05)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let not_enriched_p = pangenome::hypergeometric_pvalue(2, 10, 20, 100);
@@ -425,13 +453,13 @@ fn main() {
         "Pan BH: all in [0,1]",
         f64::from(u8::from(adj.iter().all(|&p| (0.0..=1.0).contains(&p)))),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Pan BH: smallest p adjusted up",
         f64::from(u8::from(adj[0] >= pvals[0])),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let pan_us = t0.elapsed().as_micros();

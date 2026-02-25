@@ -22,6 +22,7 @@ use wetspring_barracuda::bio::multi_signal_gpu::{MultiSignalGpu, MultiSignalOdeC
 use wetspring_barracuda::bio::phage_defense::{self, PhageDefenseParams};
 use wetspring_barracuda::bio::phage_defense_gpu::{PhageDefenseGpu, PhageDefenseOdeConfig};
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
@@ -50,10 +51,10 @@ async fn main() {
         let y0 = [100.0, 100.0, 10.0, 50.0];
         let n_batches = 8u32;
         let n_steps = 200u32;
-        let dt = wetspring_barracuda::tolerances::ODE_DEFAULT_DT;
+        let dt = tolerances::ODE_DEFAULT_DT;
 
         let cpu_result = phage_defense::run_defense(&y0, f64::from(n_steps) * dt, dt, &params);
-        let cpu_finals: Vec<f64> = cpu_result.states().last().unwrap().to_vec();
+        let cpu_finals: Vec<f64> = cpu_result.states().last().expect("MetalForge v4").to_vec();
 
         let gpu_engine = PhageDefenseGpu::new(device.clone()).expect("PhageDefense GPU compile");
         let flat = params.to_flat();
@@ -79,7 +80,12 @@ async fn main() {
         let batch0 = &gpu_result[..4];
         for (i, (&g, &c)) in batch0.iter().zip(cpu_finals.iter()).enumerate() {
             let denom = c.abs().max(g.abs()).max(1e-15);
-            v.check(&format!("phage var {i}"), (g - c).abs() / denom, 0.0, 0.01);
+            v.check(
+                &format!("phage var {i}"),
+                (g - c).abs() / denom,
+                0.0,
+                tolerances::ODE_GPU_PARITY,
+            );
         }
         v.check_pass("8 batches consistent", all_batches_match(&gpu_result, 4));
         println!("  Phage defense: {us} µs");
@@ -96,7 +102,7 @@ async fn main() {
         let dt = 0.01;
 
         let cpu_result = bistable::run_bistable(&y0, f64::from(n_steps) * dt, dt, &params);
-        let cpu_finals: Vec<f64> = cpu_result.states().last().unwrap().to_vec();
+        let cpu_finals: Vec<f64> = cpu_result.states().last().expect("MetalForge v4").to_vec();
 
         let gpu_engine = BistableGpu::new(device.clone()).expect("Bistable GPU compile");
         let flat = params.to_flat();
@@ -131,7 +137,7 @@ async fn main() {
                 &format!("bistable var {i}"),
                 (g - c).abs() / denom,
                 0.0,
-                0.01,
+                tolerances::ODE_GPU_PARITY,
             );
         }
         v.check_pass("8 batches consistent", all_batches_match(&gpu_result, 5));
@@ -149,7 +155,7 @@ async fn main() {
         let dt = 0.01;
 
         let cpu_result = multi_signal::run_multi_signal(&y0, f64::from(n_steps) * dt, dt, &params);
-        let cpu_finals: Vec<f64> = cpu_result.states().last().unwrap().to_vec();
+        let cpu_finals: Vec<f64> = cpu_result.states().last().expect("MetalForge v4").to_vec();
 
         let gpu_engine = MultiSignalGpu::new(device.clone()).expect("MultiSignal GPU compile");
         let flat = params.to_flat();
@@ -184,7 +190,7 @@ async fn main() {
                 &format!("multi_signal var {i}"),
                 (g - c).abs() / denom,
                 0.0,
-                0.01,
+                tolerances::ODE_GPU_PARITY,
             );
         }
         v.check_pass("8 batches consistent", all_batches_match(&gpu_result, 7));
@@ -221,8 +227,8 @@ async fn main() {
             .enumerate()
             .max_by(|a, b| a.1.total_cmp(b.1))
             .map(|(i, _)| i)
-            .unwrap();
-        v.check("NPU classify argmax", argmax as f64, 0.0, 0.0);
+            .expect("MetalForge v4");
+        v.check("NPU classify argmax", argmax as f64, 0.0, tolerances::EXACT);
 
         let us = t0.elapsed().as_micros();
         println!("  NPU routing: {us} µs");

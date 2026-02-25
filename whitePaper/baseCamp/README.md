@@ -2,7 +2,7 @@
 
 **Date:** February 25, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 44 — 167 experiments, 3,279+ validation checks, ALL PASS; 812 tests, ToadStool S62+DF64 aligned, 44 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on)
+**Status:** Phase 45 — 167 experiments, 3,279+ validation checks, ALL PASS; 806 tests, ToadStool S62+DF64 aligned, 44 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on)
 
 ---
 
@@ -96,7 +96,7 @@ Every paper goes through the full evolution. Status across all 25 actionable pap
 | Cross-spring evolution | 660+ WGSL shaders traced to origin springs, rewired imports | 9 checks |
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
-| Code quality audit | 95.67% coverage, streaming I/O, 0 production mocks, ToadStool S62+DF64, barracuda always-on | 812 tests |
+| Code quality audit | 95.75% coverage, streaming I/O, 0 production mocks, ToadStool S62+DF64, barracuda always-on | 806 tests |
 
 ## Performance Summary
 

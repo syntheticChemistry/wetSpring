@@ -29,7 +29,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | `BarraCuda` CPU + GPU streaming via `ToadStool` |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --features gpu --release --bin validate_pure_gpu_streaming` |
@@ -127,17 +127,17 @@ fn validate_roundtrip_mode(v: &mut Validator, gpu: &GpuF64) {
     let t_alpha = Instant::now();
     let rt_shannon: Vec<f64> = communities
         .iter()
-        .map(|c| diversity_gpu::shannon_gpu(gpu, c).unwrap())
+        .map(|c| diversity_gpu::shannon_gpu(gpu, c).expect("GPU streaming"))
         .collect();
     let mut rt_simpson_n = 0usize;
     for c in &communities {
-        diversity_gpu::simpson_gpu(gpu, c).unwrap();
+        diversity_gpu::simpson_gpu(gpu, c).expect("GPU streaming");
         rt_simpson_n += 1;
     }
     let alpha_us = t_alpha.elapsed().as_micros();
 
     let t_bray = Instant::now();
-    let rt_bc = diversity_gpu::bray_curtis_condensed_gpu(gpu, &communities).unwrap();
+    let rt_bc = diversity_gpu::bray_curtis_condensed_gpu(gpu, &communities).expect("GPU streaming");
     let bray_us = t_bray.elapsed().as_micros();
 
     v.check(
@@ -178,7 +178,7 @@ fn validate_streaming_mode(v: &mut Validator, gpu: &GpuF64) {
     v.section("═══ Mode 2: Streaming (GpuPipelineSession) ═══");
     let t0 = Instant::now();
 
-    let session = streaming_gpu::GpuPipelineSession::new(gpu).unwrap();
+    let session = streaming_gpu::GpuPipelineSession::new(gpu).expect("GPU streaming");
     println!("  Session: {}", session.ctx_stats());
 
     let communities = make_communities();
@@ -194,7 +194,7 @@ fn validate_streaming_mode(v: &mut Validator, gpu: &GpuF64) {
     let t_stream = Instant::now();
     let result = session
         .stream_sample(&classifier, &seq_refs, counts, &params)
-        .unwrap();
+        .expect("GPU streaming");
     let stream_us = t_stream.elapsed().as_micros();
 
     v.check_pass("stream: Shannon > 0", result.shannon > 0.0);
@@ -264,21 +264,21 @@ fn validate_modes_match(v: &mut Validator, gpu: &GpuF64) {
 
     let rt_shannon: Vec<f64> = communities
         .iter()
-        .map(|c| diversity_gpu::shannon_gpu(gpu, c).unwrap())
+        .map(|c| diversity_gpu::shannon_gpu(gpu, c).expect("GPU streaming"))
         .collect();
     let rt_simpson: Vec<f64> = communities
         .iter()
-        .map(|c| diversity_gpu::simpson_gpu(gpu, c).unwrap())
+        .map(|c| diversity_gpu::simpson_gpu(gpu, c).expect("GPU streaming"))
         .collect();
 
-    let session = streaming_gpu::GpuPipelineSession::new(gpu).unwrap();
+    let session = streaming_gpu::GpuPipelineSession::new(gpu).expect("GPU streaming");
     let st_shannon: Vec<f64> = communities
         .iter()
-        .map(|c| session.shannon(c).unwrap())
+        .map(|c| session.shannon(c).expect("GPU streaming"))
         .collect();
     let st_simpson: Vec<f64> = communities
         .iter()
-        .map(|c| session.simpson(c).unwrap())
+        .map(|c| session.simpson(c).expect("GPU streaming"))
         .collect();
 
     for i in 0..N_SAMPLES {
@@ -325,7 +325,7 @@ fn validate_batch_scaling(v: &mut Validator, gpu: &GpuF64) {
     v.section("═══ Mode 4: Batch Scaling (streaming overhead amortization) ═══");
     let t0 = Instant::now();
 
-    let session = streaming_gpu::GpuPipelineSession::new(gpu).unwrap();
+    let session = streaming_gpu::GpuPipelineSession::new(gpu).expect("GPU streaming");
 
     let batch_sizes = [4, 16, 64, 256];
     let mut timings: Vec<(usize, f64, f64)> = Vec::new();
@@ -341,15 +341,15 @@ fn validate_batch_scaling(v: &mut Validator, gpu: &GpuF64) {
 
         let roundtrip_start = Instant::now();
         for c in &communities {
-            let _ = diversity_gpu::shannon_gpu(gpu, c).unwrap();
-            let _ = diversity_gpu::simpson_gpu(gpu, c).unwrap();
+            let _ = diversity_gpu::shannon_gpu(gpu, c).expect("GPU streaming");
+            let _ = diversity_gpu::simpson_gpu(gpu, c).expect("GPU streaming");
         }
         let rt_us = roundtrip_start.elapsed().as_micros() as f64;
 
         let streaming_start = Instant::now();
         for c in &communities {
-            let _ = session.shannon(c).unwrap();
-            let _ = session.simpson(c).unwrap();
+            let _ = session.shannon(c).expect("GPU streaming");
+            let _ = session.simpson(c).expect("GPU streaming");
         }
         let st_us = streaming_start.elapsed().as_micros() as f64;
 
@@ -369,7 +369,8 @@ fn validate_batch_scaling(v: &mut Validator, gpu: &GpuF64) {
 
     if timings.len() >= 2 {
         let first_ratio = timings[0].1 / timings[0].2.max(1.0);
-        let last_ratio = timings.last().unwrap().1 / timings.last().unwrap().2.max(1.0);
+        let last_ratio = timings.last().expect("GPU streaming").1
+            / timings.last().expect("GPU streaming").2.max(1.0);
         v.check_pass(
             "scaling: streaming advantage grows with batch size",
             last_ratio >= first_ratio * 0.5,

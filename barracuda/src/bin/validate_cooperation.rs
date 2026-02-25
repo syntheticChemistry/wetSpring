@@ -24,6 +24,7 @@ use wetspring_barracuda::validation::Validator;
 const DT: f64 = 0.001;
 const SS_FRAC: f64 = 0.1;
 
+#[allow(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp025: Bruger & Waters 2018 Cooperative QS Game Theory");
     let params = CooperationParams::default();
@@ -140,13 +141,13 @@ fn main() {
         "B_pure_coop > B_mixed (cooperation yields more biofilm)",
         f64::from(u8::from(bio_coop > bio_mixed)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "B_mixed > B_pure_cheat (some cooperation better than none)",
         f64::from(u8::from(bio_mixed > bio_cheat)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // ── Determinism ─────────────────────────────────────────────────
@@ -159,7 +160,12 @@ fn main() {
         .zip(&r2.y_final)
         .map(|(a, b)| (a - b).abs())
         .fold(0.0_f64, f64::max);
-    v.check("Deterministic: rerun bitwise identical", max_diff, 0.0, 0.0);
+    v.check(
+        "Deterministic: rerun bitwise identical",
+        max_diff,
+        0.0,
+        tolerances::EXACT,
+    );
 
     v.finish();
 }
@@ -174,6 +180,6 @@ fn check_non_negative(
         &format!("{prefix}: all variables non-negative (min={min_val:.2e})"),
         min_val.max(0.0),
         min_val.max(0.0),
-        0.0,
+        tolerances::EXACT,
     );
 }

@@ -94,7 +94,7 @@ fn load_test_data() -> TestData {
         .map(|s| {
             let feats: Vec<f64> = s["features"]
                 .as_array()
-                .unwrap()
+                .expect("features array")
                 .iter()
                 .map(|v| v.as_f64().unwrap_or(0.0))
                 .collect();

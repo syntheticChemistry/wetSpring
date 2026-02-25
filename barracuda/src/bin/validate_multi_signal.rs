@@ -123,13 +123,13 @@ fn main() {
         "Hierarchy: H_wt > H_cai1",
         f64::from(u8::from(h_wt > h_cai1)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Hierarchy: H_cai1 > H_noqs",
         f64::from(u8::from(h_cai1 > h_noqs)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // ── Determinism ─────────────────────────────────────────────────
@@ -142,7 +142,12 @@ fn main() {
         .zip(&r2.y_final)
         .map(|(a, b)| (a - b).abs())
         .fold(0.0_f64, f64::max);
-    v.check("Deterministic: rerun bitwise identical", max_diff, 0.0, 0.0);
+    v.check(
+        "Deterministic: rerun bitwise identical",
+        max_diff,
+        0.0,
+        tolerances::EXACT,
+    );
 
     v.finish();
 }
@@ -157,6 +162,6 @@ fn check_non_negative(
         &format!("{prefix}: all variables non-negative (min={min_val:.2e})"),
         min_val.max(0.0),
         min_val.max(0.0),
-        0.0,
+        tolerances::EXACT,
     );
 }

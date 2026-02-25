@@ -139,13 +139,13 @@ fn validate_2state(gpu: &HmmGpuForward, v: &mut Validator) {
                 "2-state: GPU LL finite",
                 f64::from(u8::from(gpu_ll.is_finite())),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
             v.check(
                 "2-state: GPU LL negative",
                 f64::from(u8::from(gpu_ll < 0.0)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             let mut max_alpha_diff = 0.0_f64;
@@ -161,17 +161,27 @@ fn validate_2state(gpu: &HmmGpuForward, v: &mut Validator) {
                     max_alpha_diff < wetspring_barracuda::tolerances::GPU_VS_CPU_F64,
                 )),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
             println!("    (max alpha diff = {max_alpha_diff:.2e})");
         }
         Ok(Err(e)) => {
             println!("  [SKIP] HMM GPU error: {e}");
-            v.check("2-state: GPU available (skipped)", 1.0, 1.0, 0.0);
+            v.check(
+                "2-state: GPU available (skipped)",
+                1.0,
+                1.0,
+                tolerances::EXACT,
+            );
         }
         Err(_) => {
             println!("  [SKIP] HMM GPU panicked (NVVM f64 shader compilation)");
-            v.check("2-state: GPU available (driver skip)", 1.0, 1.0, 0.0);
+            v.check(
+                "2-state: GPU available (driver skip)",
+                1.0,
+                1.0,
+                tolerances::EXACT,
+            );
         }
     }
 }
@@ -201,7 +211,7 @@ fn validate_3state(gpu: &HmmGpuForward, v: &mut Validator) {
                 "3-state: GPU LL finite",
                 f64::from(u8::from(gpu_ll.is_finite())),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             // Viterbi path should be consistent (if alpha is correct,
@@ -211,22 +221,34 @@ fn validate_3state(gpu: &HmmGpuForward, v: &mut Validator) {
                 "3-state: Viterbi path len",
                 vit.path.len() as f64,
                 obs.len() as f64,
-                0.0,
+                tolerances::EXACT,
             );
             v.check(
                 "3-state: Viterbi LL ≤ forward LL",
-                f64::from(u8::from(vit.log_probability <= cpu.log_likelihood + 1e-10)),
+                f64::from(u8::from(
+                    vit.log_probability <= cpu.log_likelihood + tolerances::PYTHON_PARITY,
+                )),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
         }
         Ok(Err(e)) => {
             println!("  [SKIP] HMM GPU error: {e}");
-            v.check("3-state: GPU available (skipped)", 1.0, 1.0, 0.0);
+            v.check(
+                "3-state: GPU available (skipped)",
+                1.0,
+                1.0,
+                tolerances::EXACT,
+            );
         }
         Err(_) => {
             println!("  [SKIP] HMM GPU panicked (NVVM f64 shader compilation)");
-            v.check("3-state: GPU available (driver skip)", 1.0, 1.0, 0.0);
+            v.check(
+                "3-state: GPU available (driver skip)",
+                1.0,
+                1.0,
+                tolerances::EXACT,
+            );
         }
     }
 }
@@ -278,7 +300,7 @@ fn validate_batch(gpu: &HmmGpuForward, v: &mut Validator) {
                 "Batch: all GPU LLs finite",
                 f64::from(u8::from(all_finite)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             let mut max_diff = 0.0_f64;
@@ -289,7 +311,7 @@ fn validate_batch(gpu: &HmmGpuForward, v: &mut Validator) {
                 "Batch: max |CPU−GPU| < 1e-4",
                 f64::from(u8::from(max_diff < tolerances::GPU_VS_CPU_ENSEMBLE)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
             println!("    (max per-sequence diff = {max_diff:.2e})");
 
@@ -307,11 +329,21 @@ fn validate_batch(gpu: &HmmGpuForward, v: &mut Validator) {
         }
         Ok(Err(e)) => {
             println!("  [SKIP] HMM GPU batch error: {e}");
-            v.check("Batch: GPU available (skipped)", 1.0, 1.0, 0.0);
+            v.check(
+                "Batch: GPU available (skipped)",
+                1.0,
+                1.0,
+                tolerances::EXACT,
+            );
         }
         Err(_) => {
             println!("  [SKIP] HMM GPU batch panicked (NVVM f64 shader compilation)");
-            v.check("Batch: GPU available (driver skip)", 1.0, 1.0, 0.0);
+            v.check(
+                "Batch: GPU available (driver skip)",
+                1.0,
+                1.0,
+                tolerances::EXACT,
+            );
         }
     }
 }
@@ -352,17 +384,22 @@ fn validate_forward_backward(gpu: &HmmGpuForward, v: &mut Validator) {
                     max_fb_diff < wetspring_barracuda::tolerances::GPU_VS_CPU_F64,
                 )),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
             println!("    (max FB consistency diff = {max_fb_diff:.2e})");
         }
         Ok(Err(e)) => {
             println!("  [SKIP] HMM GPU FB error: {e}");
-            v.check("FB: GPU available (skipped)", 1.0, 1.0, 0.0);
+            v.check("FB: GPU available (skipped)", 1.0, 1.0, tolerances::EXACT);
         }
         Err(_) => {
             println!("  [SKIP] HMM GPU FB panicked");
-            v.check("FB: GPU available (driver skip)", 1.0, 1.0, 0.0);
+            v.check(
+                "FB: GPU available (driver skip)",
+                1.0,
+                1.0,
+                tolerances::EXACT,
+            );
         }
     }
 }

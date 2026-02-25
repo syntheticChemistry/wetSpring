@@ -147,7 +147,12 @@ fn main() {
         .zip(&r2.y_final)
         .map(|(a, b)| (a - b).abs())
         .fold(0.0_f64, f64::max);
-    v.check("Deterministic: rerun bitwise identical", max_diff, 0.0, 0.0);
+    v.check(
+        "Deterministic: rerun bitwise identical",
+        max_diff,
+        0.0,
+        tolerances::EXACT,
+    );
 
     v.finish();
 }
@@ -164,7 +169,7 @@ fn check_non_negative(
         &format!("{prefix}: all variables non-negative (min={min_val:.2e})"),
         min_val.max(0.0),
         min_val.max(0.0),
-        0.0,
+        tolerances::EXACT,
     );
     // If min_val was negative, the actual wouldn't equal expected, so this
     // would still technically pass. Use an explicit check instead:
@@ -173,7 +178,7 @@ fn check_non_negative(
             &format!("{prefix}: NEGATIVE VALUE DETECTED: {min_val:.6e}"),
             min_val,
             0.0,
-            0.0,
+            tolerances::EXACT,
         );
     }
 }

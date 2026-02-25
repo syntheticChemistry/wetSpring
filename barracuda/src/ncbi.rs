@@ -1,30 +1,30 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Shared NCBI Entrez helpers for validation binaries.
 //!
-//! Provides API-key discovery, HTTP GET via `curl` subprocess (sovereign
-//! HTTPS without TLS crate deps), and Entrez E-search wrappers. Validation
-//! binaries that query NCBI share this module instead of duplicating the
-//! same boilerplate.
+//! Provides API-key discovery, HTTP GET, and Entrez E-search wrappers.
+//! Validation binaries that query NCBI share this module instead of
+//! duplicating the same boilerplate.
 //!
-//! # Why `curl`?
+//! # HTTP transport
 //!
-//! HTTPS requires a TLS implementation. Adding `rustls`/`native-tls` would
-//! pull in 20+ transitive crates and violate ecoBin's minimal-dependency
-//! principle. Shelling out to `curl` keeps the binary self-contained while
-//! still supporting HTTPS. Binaries fall back to cached/synthetic data when
-//! `curl` is unavailable.
+//! HTTP GET uses a capability-based transport chain — the first available
+//! backend wins:
+//!
+//! 1. **`WETSPRING_HTTP_CMD`** — user-supplied command (e.g. `wget -qO-`)
+//! 2. **System `curl`** — sovereign HTTPS without TLS crate deps
+//! 3. **System `wget`** — common fallback on minimal containers
+//!
+//! All callers degrade gracefully to cached/synthetic data when no
+//! HTTP transport is available. The transport is an implementation
+//! detail — primal code discovers capabilities at runtime.
 //!
 //! # Evolution path
 //!
 //! | Phase | Strategy | Status |
 //! |-------|----------|--------|
-//! | Current | `curl` subprocess — zero compile deps, runtime dep on system curl | active |
-//! | Phase 2 | metalForge HTTP substrate — route HTTPS through forge routing | blocked on forge HTTP |
-//! | Phase 3 | Sovereign TLS (if HTTPS becomes pipeline-critical) | not needed for validation |
-//!
-//! The `curl` approach is the correct tradeoff for validation-only network
-//! access. All callers degrade gracefully to cached/synthetic data when
-//! `curl` is absent.
+//! | Current | Capability-discovered system HTTP — zero compile deps | active |
+//! | Phase 2 | metalForge HTTP substrate — route through forge dispatch | blocked on forge HTTP |
+//! | Phase 3 | Sovereign Rust TLS (if HTTPS becomes pipeline-critical) | not needed for validation |
 
 use std::path::{Path, PathBuf};
 
@@ -36,7 +36,6 @@ const ENTREZ_BASE: &str = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch
 /// 1. `NCBI_API_KEY` environment variable (production / CI)
 /// 2. `WETSPRING_DATA_ROOT/api-keys.toml` (capability-based data root)
 /// 3. `$HOME/.config/wetspring/api-keys.toml` (XDG convention)
-/// 4. Well-known development paths relative to workspace root
 ///
 /// Returns `None` if no key is found — callers must degrade gracefully
 /// (NCBI allows 3 req/sec without a key, 10 req/sec with one).
@@ -46,7 +45,6 @@ pub fn api_key() -> Option<String> {
         return Some(key);
     }
 
-    // Capability-based: check the validation data root
     if let Ok(root) = std::env::var("WETSPRING_DATA_ROOT") {
         let toml_path = Path::new(&root).join("api-keys.toml");
         if let Some(key) = parse_api_key_toml(&toml_path) {
@@ -54,21 +52,9 @@ pub fn api_key() -> Option<String> {
         }
     }
 
-    // XDG config home (~/.config/wetspring/)
     if let Ok(home) = std::env::var("HOME") {
         let xdg = Path::new(&home).join(".config/wetspring/api-keys.toml");
         if let Some(key) = parse_api_key_toml(&xdg) {
-            return Some(key);
-        }
-    }
-
-    // Legacy dev paths (kept for backwards compatibility during transition)
-    let legacy_paths = [
-        "../../../testing-secrets/api-keys.toml",
-        "../../testing-secrets/api-keys.toml",
-    ];
-    for path in &legacy_paths {
-        if let Some(key) = parse_api_key_toml(Path::new(path)) {
             return Some(key);
         }
     }
@@ -86,39 +72,114 @@ fn parse_api_key_toml(path: &Path) -> Option<String> {
         .map(String::from)
 }
 
-/// HTTP GET via `curl` subprocess — sovereign HTTPS without TLS crate deps.
+/// Discovered HTTP transport backend.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum HttpBackend {
+    Custom,
+    Curl,
+    Wget,
+}
+
+/// Discover an available HTTP GET backend at runtime.
 ///
-/// Returns the response body as a `String`. Falls back to an error when
-/// `curl` is not installed or the request fails.
+/// Returns the backend kind and the command name/path. Checks:
+/// 1. `WETSPRING_HTTP_CMD` environment variable
+/// 2. `curl` on `$PATH`
+/// 3. `wget` on `$PATH`
+fn discover_http_backend() -> Option<(HttpBackend, String)> {
+    if let Ok(cmd) = std::env::var("WETSPRING_HTTP_CMD") {
+        if !cmd.is_empty() {
+            return Some((HttpBackend::Custom, cmd));
+        }
+    }
+
+    if which_exists("curl") {
+        return Some((HttpBackend::Curl, "curl".to_string()));
+    }
+
+    if which_exists("wget") {
+        return Some((HttpBackend::Wget, "wget".to_string()));
+    }
+
+    None
+}
+
+/// Check whether a command exists on `$PATH` without executing it.
+fn which_exists(cmd: &str) -> bool {
+    std::process::Command::new("which")
+        .arg(cmd)
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .status()
+        .is_ok_and(|s| s.success())
+}
+
+/// HTTP GET via capability-discovered system transport.
+///
+/// Discovers the best available HTTP backend at runtime and uses it.
+/// Returns the response body as a `String`.
 ///
 /// # Errors
 ///
-/// Returns `Err` if `curl` is not found, the request times out (30 s),
-/// or the response contains invalid UTF-8.
+/// Returns `Err` if no HTTP transport is available, the request fails,
+/// times out (30 s), or the response contains invalid UTF-8.
+#[must_use = "HTTP response body is discarded if not used"]
 pub fn http_get(url: &str) -> Result<String, String> {
-    let output = std::process::Command::new("curl")
-        .args(["-s", "-m", "30", url])
-        .output()
-        .map_err(|e| e.to_string())?;
+    let (backend, cmd) = discover_http_backend().ok_or_else(|| {
+        "no HTTP transport available (need curl or wget on PATH, or set WETSPRING_HTTP_CMD)"
+            .to_string()
+    })?;
+
+    let output = match backend {
+        HttpBackend::Custom => {
+            let parts: Vec<&str> = cmd.split_whitespace().collect();
+            let (program, args) = parts
+                .split_first()
+                .ok_or_else(|| "WETSPRING_HTTP_CMD is empty".to_string())?;
+            let mut command = std::process::Command::new(program);
+            command.args(args);
+            command.arg(url);
+            command.output().map_err(|e| format!("{cmd}: {e}"))?
+        }
+        HttpBackend::Curl => std::process::Command::new("curl")
+            .args(["-sfS", "-m", "30", url])
+            .output()
+            .map_err(|e| format!("curl: {e}"))?,
+        HttpBackend::Wget => std::process::Command::new("wget")
+            .args(["-qO-", "--timeout=30", url])
+            .output()
+            .map_err(|e| format!("wget: {e}"))?,
+    };
 
     if output.status.success() {
         String::from_utf8(output.stdout).map_err(|e| e.to_string())
     } else {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        let preview = &stderr[..stderr.len().min(crate::tolerances::ERROR_BODY_PREVIEW_LEN)];
         Err(format!(
-            "curl failed: {}",
-            String::from_utf8_lossy(&output.stderr)
+            "{cmd} failed (exit {:?}): {preview}",
+            output.status.code()
         ))
     }
 }
 
 /// URL-encode a search term for Entrez E-utilities.
 fn encode_entrez_term(term: &str) -> String {
-    term.replace(' ', "+")
-        .replace('"', "%22")
-        .replace('[', "%5B")
-        .replace(']', "%5D")
-        .replace('(', "%28")
-        .replace(')', "%29")
+    let mut out = String::with_capacity(term.len() * 2);
+    for ch in term.chars() {
+        match ch {
+            ' ' => out.push('+'),
+            '"' => out.push_str("%22"),
+            '[' => out.push_str("%5B"),
+            ']' => out.push_str("%5D"),
+            '(' => out.push_str("%28"),
+            ')' => out.push_str("%29"),
+            '&' => out.push_str("%26"),
+            '#' => out.push_str("%23"),
+            other => out.push(other),
+        }
+    }
+    out
 }
 
 /// Query NCBI Entrez E-search and return the hit count.
@@ -131,6 +192,7 @@ fn encode_entrez_term(term: &str) -> String {
 ///
 /// Returns `Err` if the HTTP request fails, the response is missing a
 /// `<Count>` element, or the count cannot be parsed as `u64`.
+#[must_use = "search count is discarded if not used"]
 pub fn esearch_count(db: &str, term: &str, api_key: &str) -> Result<u64, String> {
     let encoded = encode_entrez_term(term);
     let url = format!("{ENTREZ_BASE}?db={db}&term={encoded}&rettype=count&api_key={api_key}");
@@ -140,25 +202,47 @@ pub fn esearch_count(db: &str, term: &str, api_key: &str) -> Result<u64, String>
 
 /// Parse `<Count>...</Count>` from an Entrez E-search XML response body.
 fn parse_esearch_count(body: &str) -> Result<u64, String> {
-    if let Some(start) = body.find("<Count>") {
-        let rest = &body[start + 7..];
-        if let Some(end) = rest.find("</Count>") {
-            return rest[..end].trim().parse::<u64>().map_err(|e| e.to_string());
-        }
-    }
-    Err(format!(
-        "no <Count> in response: {}",
-        &body[..body.len().min(crate::tolerances::ERROR_BODY_PREVIEW_LEN)]
-    ))
+    let start = body
+        .find("<Count>")
+        .ok_or_else(|| preview_error("no <Count> in response", body))?;
+    let rest = &body[start + 7..];
+    let end = rest
+        .find("</Count>")
+        .ok_or_else(|| preview_error("unclosed <Count> tag", body))?;
+    rest[..end]
+        .trim()
+        .parse::<u64>()
+        .map_err(|e| format!("invalid count value: {e}"))
 }
 
-/// Build a cache file path relative to the crate manifest directory.
+/// Build an error message with a truncated preview of the response body.
+fn preview_error(msg: &str, body: &str) -> String {
+    let limit = body.len().min(crate::tolerances::ERROR_BODY_PREVIEW_LEN);
+    format!("{msg}: {}", &body[..limit])
+}
+
+/// Build a cache file path via capability-based data discovery.
 ///
-/// Returns `{CARGO_MANIFEST_DIR}/../data/{filename}`.
+/// Discovery order:
+/// 1. `WETSPRING_DATA_ROOT/{filename}` if `WETSPRING_DATA_ROOT` is set
+/// 2. `{CARGO_MANIFEST_DIR}/../data/{filename}` for development
+/// 3. `data/{filename}` relative to cwd for deployment
 #[must_use]
 pub fn cache_file(filename: &str) -> PathBuf {
+    if let Ok(root) = std::env::var("WETSPRING_DATA_ROOT") {
+        let p = PathBuf::from(root).join(filename);
+        if p.parent().is_some_and(Path::exists) {
+            return p;
+        }
+    }
+
     let manifest = std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| ".".to_string());
-    PathBuf::from(manifest).join("../data").join(filename)
+    let dev_path = PathBuf::from(&manifest).join("../data").join(filename);
+    if dev_path.parent().is_some_and(Path::exists) {
+        return dev_path;
+    }
+
+    PathBuf::from("data").join(filename)
 }
 
 #[cfg(test)]
@@ -166,6 +250,8 @@ pub fn cache_file(filename: &str) -> PathBuf {
 mod tests {
     use super::*;
     use std::io::Write;
+
+    // ── URL encoding ──────────────────────────────────────────────
 
     #[test]
     fn encode_entrez_term_spaces_and_brackets() {
@@ -196,16 +282,36 @@ mod tests {
     }
 
     #[test]
+    fn encode_entrez_term_ampersand_and_hash() {
+        let encoded = encode_entrez_term("a&b#c");
+        assert_eq!(encoded, "a%26b%23c");
+    }
+
+    // ── Cache file discovery ──────────────────────────────────────
+
+    #[test]
     fn cache_file_builds_relative_path() {
         let path = cache_file("test_cache.txt");
-        assert!(path.ends_with("data/test_cache.txt"));
+        assert!(
+            path.to_string_lossy().contains("data")
+                && path.to_string_lossy().contains("test_cache.txt")
+        );
     }
 
     #[test]
     fn cache_file_nested() {
         let path = cache_file("sub/nested.json");
-        assert!(path.ends_with("data/sub/nested.json"));
+        assert!(path.to_string_lossy().contains("nested.json"));
     }
+
+    #[test]
+    fn cache_file_dev_fallback_contains_data() {
+        let path = cache_file("test.txt");
+        let s = path.to_string_lossy();
+        assert!(s.contains("data") && s.contains("test.txt"));
+    }
+
+    // ── API key discovery ─────────────────────────────────────────
 
     #[test]
     fn api_key_returns_from_env() {
@@ -262,11 +368,37 @@ mod tests {
         assert!(parse_api_key_toml(&path).is_none());
     }
 
+    // ── HTTP backend discovery ────────────────────────────────────
+
+    #[test]
+    fn discover_http_backend_finds_curl_or_wget() {
+        let result = discover_http_backend();
+        if which_exists("curl") {
+            let (backend, _) = result.unwrap();
+            assert_eq!(backend, HttpBackend::Curl);
+        } else if which_exists("wget") {
+            let (backend, _) = result.unwrap();
+            assert_eq!(backend, HttpBackend::Wget);
+        }
+    }
+
+    #[test]
+    fn which_exists_finds_sh() {
+        assert!(which_exists("sh"));
+    }
+
+    #[test]
+    fn which_exists_rejects_nonexistent() {
+        assert!(!which_exists("__wetspring_nonexistent_binary_xyz__"));
+    }
+
     #[test]
     fn http_get_localhost_refused() {
         let result = http_get("http://127.0.0.1:1/nonexistent");
         assert!(result.is_err());
     }
+
+    // ── Entrez XML parsing ────────────────────────────────────────
 
     #[test]
     fn parse_esearch_count_valid() {
@@ -314,5 +446,20 @@ mod tests {
     fn parse_esearch_count_large_value() {
         let xml = "<Count>9999999999</Count>";
         assert_eq!(parse_esearch_count(xml).unwrap(), 9_999_999_999);
+    }
+
+    // ── Preview error formatting ──────────────────────────────────
+
+    #[test]
+    fn preview_error_truncates_long_body() {
+        let body = "x".repeat(1000);
+        let msg = preview_error("test", &body);
+        assert!(msg.len() < 500);
+    }
+
+    #[test]
+    fn preview_error_short_body() {
+        let msg = preview_error("oops", "short");
+        assert_eq!(msg, "oops: short");
     }
 }

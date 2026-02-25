@@ -17,6 +17,7 @@
 //! |-------------|-------|
 //! | Date        | 2026-02-23 |
 //! | GPU prims   | anderson_hamiltonian, anderson_2d, anderson_3d, lanczos, level_spacing_ratio |
+//! | Command     | `cargo test --bin validate_cross_ecosystem_atlas -- --nocapture` |
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::bio::ncbi_data;
@@ -133,7 +134,12 @@ fn main() {
         fn nearest_r(sweep: &[(f64, f64)], w: f64) -> f64 {
             sweep
                 .iter()
-                .min_by(|(wa, _), (wb, _)| (wa - w).abs().partial_cmp(&(wb - w).abs()).unwrap())
+                .min_by(|(wa, _), (wb, _)| {
+                    (wa - w)
+                        .abs()
+                        .partial_cmp(&(wb - w).abs())
+                        .unwrap_or(std::cmp::Ordering::Equal)
+                })
                 .map_or(0.0, |(_, r)| *r)
         }
 

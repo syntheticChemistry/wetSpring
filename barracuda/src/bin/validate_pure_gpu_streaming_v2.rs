@@ -22,7 +22,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | `BarraCuda` CPU reference |
 //! | Baseline date | 2026-02-23 |
 //! | Exact command | `cargo run --features gpu --release --bin validate_pure_gpu_streaming_v2` |
@@ -122,7 +122,12 @@ fn validate_alpha_streaming(
         cpu_simpson,
         tolerances::ANALYTICAL_F64,
     );
-    v.check("Observed stream", gpu_observed, cpu_observed, 0.0);
+    v.check(
+        "Observed stream",
+        gpu_observed,
+        cpu_observed,
+        tolerances::EXACT,
+    );
     timings.push(("Alpha Diversity", cpu_us, gpu_us));
 }
 
@@ -154,7 +159,7 @@ fn validate_bray_curtis_streaming(
         "BC condensed length",
         gpu_bc.len() as f64,
         cpu_bc.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     for (i, (c, g)) in cpu_bc.iter().zip(&gpu_bc).enumerate() {
@@ -198,7 +203,7 @@ fn validate_spectral_streaming(
         "cosine condensed length",
         gpu_cos.len() as f64,
         cpu_cos.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     for (i, (c, g)) in cpu_cos.iter().zip(&gpu_cos).enumerate() {
@@ -289,7 +294,7 @@ fn validate_full_pipeline(
             &format!("alpha[{i}] observed"),
             gpu_a.observed,
             cpu_a.2,
-            0.0,
+            tolerances::EXACT,
         );
     }
 
@@ -298,7 +303,7 @@ fn validate_full_pipeline(
         "pipeline BC length",
         gpu_result.bray_curtis.len() as f64,
         cpu_bc.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
     for (i, (c, g)) in cpu_bc.iter().zip(&gpu_result.bray_curtis).enumerate() {
         v.check(

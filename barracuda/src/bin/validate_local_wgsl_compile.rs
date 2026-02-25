@@ -24,6 +24,7 @@ use wgpu::util::DeviceExt;
 use barracuda::{KmerHistogramGpu, TaxonomyFcGpu, UniFracPropagateGpu};
 use wetspring_barracuda::bio::ode_sweep_gpu::{OdeSweepConfig, OdeSweepGpu};
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
@@ -76,10 +77,30 @@ async fn main() {
 
         match result {
             Ok(hist) => {
-                v.check("kmer bin 0 count", f64::from(hist[0]), 4.0, 0.0);
-                v.check("kmer bin 1 count", f64::from(hist[1]), 2.0, 0.0);
-                v.check("kmer bin 2 count", f64::from(hist[2]), 1.0, 0.0);
-                v.check("kmer bin 3 count", f64::from(hist[3]), 1.0, 0.0);
+                v.check(
+                    "kmer bin 0 count",
+                    f64::from(hist[0]),
+                    4.0,
+                    tolerances::EXACT,
+                );
+                v.check(
+                    "kmer bin 1 count",
+                    f64::from(hist[1]),
+                    2.0,
+                    tolerances::EXACT,
+                );
+                v.check(
+                    "kmer bin 2 count",
+                    f64::from(hist[2]),
+                    1.0,
+                    tolerances::EXACT,
+                );
+                v.check(
+                    "kmer bin 3 count",
+                    f64::from(hist[3]),
+                    1.0,
+                    tolerances::EXACT,
+                );
                 println!("  Upstream dispatch in {us} µs");
             }
             Err(e) => {
@@ -137,8 +158,18 @@ async fn main() {
 
         match result {
             Ok(scores) => {
-                v.check("tax q0,t0 score", scores[0], -2.5, 1e-10);
-                v.check("tax q0,t1 score", scores[1], -4.0, 1e-10);
+                v.check(
+                    "tax q0,t0 score",
+                    scores[0],
+                    -2.5,
+                    tolerances::ML_PREDICTION,
+                );
+                v.check(
+                    "tax q0,t1 score",
+                    scores[1],
+                    -4.0,
+                    tolerances::ML_PREDICTION,
+                );
                 v.check_pass("TaxonomyFcGpu dispatched and readback OK", true);
                 println!("  Upstream dispatch in {us} µs");
             }

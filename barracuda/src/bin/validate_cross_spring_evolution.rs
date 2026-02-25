@@ -13,9 +13,11 @@
 //! # Provenance
 //!
 //! | Script  | `validate_cross_spring_evolution` |
-//! | Commit  | (current) |
+//! | Commit  | (inline CPU reference — GPU vs CPU comparison) |
 //! | Command | `cargo run --features gpu --bin validate_cross_spring_evolution` |
 //! | Hardware| RTX 4070 (Ada, f64 1:2), Titan V (Volta GV100, NVK) |
+//! | Tol     | `GPU_F32_PARITY` (1e-5) for f32 integer-derived metrics, |
+//! |         | `GPU_F32_SPATIAL` (1e-4) for f32 spatial grid payoff |
 //!
 //! # Purpose
 //!
@@ -46,6 +48,7 @@ use std::time::Instant;
 use wgpu::util::DeviceExt;
 
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
@@ -116,7 +119,7 @@ async fn main() {
                 &format!("Hamming pair {i}"),
                 f64::from(*gpu_d),
                 f64::from(*cpu_d),
-                1e-6,
+                tolerances::GPU_F32_PARITY,
             );
         }
         results.push((
@@ -171,7 +174,7 @@ async fn main() {
                 &format!("Jaccard pair {i}"),
                 f64::from(*gpu_d),
                 f64::from(*cpu_d),
-                1e-5,
+                tolerances::GPU_F32_PARITY,
             );
         }
         results.push((
@@ -217,7 +220,7 @@ async fn main() {
 
         let mut matching = 0usize;
         for (cf, gf) in cpu_fitness.iter().zip(gpu_fitness.iter()) {
-            if (f64::from(*gf) - f64::from(*cf)).abs() < 1e-4 {
+            if (f64::from(*gf) - f64::from(*cf)).abs() < tolerances::GPU_F32_SPATIAL {
                 matching += 1;
             }
         }
@@ -225,7 +228,7 @@ async fn main() {
             "SpatialPayoff cells matching",
             matching as f64,
             f64::from(grid_size * grid_size),
-            0.0,
+            tolerances::EXACT,
         );
         results.push((
             "SpatialPayoff",
@@ -285,7 +288,7 @@ async fn main() {
                 &format!("Fitness individual {i}"),
                 f64::from(*gf),
                 f64::from(*cf),
-                1e-5,
+                tolerances::GPU_F32_PARITY,
             );
         }
         results.push((
@@ -342,7 +345,7 @@ async fn main() {
                 &format!("LocusVar locus {i}"),
                 f64::from(*gv),
                 f64::from(*cv),
-                1e-5,
+                tolerances::GPU_F32_PARITY,
             );
         }
         results.push((
@@ -502,10 +505,10 @@ fn readback_f32(
     let slice = staging.slice(..);
     let (tx, rx) = std::sync::mpsc::channel();
     slice.map_async(wgpu::MapMode::Read, move |result| {
-        tx.send(result).unwrap();
+        tx.send(result).expect("channel send");
     });
     d.poll(wgpu::Maintain::Wait);
-    rx.recv().unwrap().unwrap();
+    rx.recv().expect("channel recv").expect("GPU buffer map");
 
     let data = slice.get_mapped_range();
     let result: Vec<f32> = bytemuck::cast_slice(&data).to_vec();

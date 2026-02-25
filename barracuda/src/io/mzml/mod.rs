@@ -206,11 +206,10 @@ impl Iterator for MzmlIter {
     }
 }
 
-/// Parse an mzML file and collect **all** spectra into memory.
+/// Collect all spectra from an mzML file into memory via [`MzmlIter`].
 ///
-/// Delegates to [`MzmlIter`] — XML streams from disk, but results are
-/// collected into a `Vec`. For large files, prefer iterating with
-/// [`MzmlIter`] directly.
+/// Convenience wrapper — streams from disk, then collects.
+/// For large files, prefer iterating with [`MzmlIter`] directly.
 ///
 /// # Examples
 ///
@@ -229,10 +228,7 @@ impl Iterator for MzmlIter {
 /// Returns [`Error::Io`] if the file cannot be opened, [`Error::Xml`]
 /// for XML structure errors, or [`Error::Base64`] / [`Error::Zlib`]
 /// for binary array decoding failures.
-#[deprecated(
-    since = "0.2.0",
-    note = "collects all spectra; use `MzmlIter` for streaming"
-)]
+#[must_use = "parsed spectra are discarded if not used"]
 pub fn parse_mzml(path: &Path) -> Result<Vec<MzmlSpectrum>> {
     MzmlIter::open(path)?.collect()
 }

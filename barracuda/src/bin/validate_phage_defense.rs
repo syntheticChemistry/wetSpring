@@ -37,7 +37,7 @@ fn main() {
         "No phage: Bu > Bd (no cost advantage)",
         f64::from(u8::from(bu > bd)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check("No phage: Bd matches Python", bd, 132_242.0, 1000.0);
     v.check("No phage: Bu matches Python", bu, 138_317.0, 1000.0);
@@ -50,7 +50,7 @@ fn main() {
         "Attack: Bd > Bu (defense wins)",
         f64::from(u8::from(bd > bu)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check("Attack: Bu ≈ 0 (crashed)", bu, 0.0, 1.0);
     v.check(
@@ -69,7 +69,7 @@ fn main() {
         "Defended survives better",
         f64::from(u8::from(defended_ss > undefended_ss)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Pure defended: Bd matches Python",
@@ -85,7 +85,7 @@ fn main() {
         "High cost: Bd still persists",
         f64::from(u8::from(bd_hc > 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     v.section("── Non-negativity ──");
@@ -94,7 +94,12 @@ fn main() {
         scenario_phage_attack(&params, DT),
     ] {
         let min: f64 = result.y.iter().copied().fold(f64::INFINITY, f64::min);
-        v.check("All vars ≥ 0", min.max(0.0), min.max(0.0), 0.0);
+        v.check(
+            "All vars ≥ 0",
+            min.max(0.0),
+            min.max(0.0),
+            tolerances::EXACT,
+        );
     }
 
     v.section("── Determinism ──");
@@ -106,7 +111,7 @@ fn main() {
         .zip(&r2.y_final)
         .map(|(a, b)| (a - b).abs())
         .fold(0.0_f64, f64::max);
-    v.check("Deterministic", max_diff, 0.0, 0.0);
+    v.check("Deterministic", max_diff, 0.0, tolerances::EXACT);
 
     v.finish();
 }

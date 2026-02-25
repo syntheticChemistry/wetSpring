@@ -143,8 +143,8 @@ fn main() {
 
     #[cfg(feature = "gpu")]
     {
-        let rt = tokio::runtime::Runtime::new().unwrap();
-        let gpu = rt.block_on(GpuF64::new()).unwrap();
+        let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
+        let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
 
         if !gpu.has_f64 {
             validation::exit_skipped("No SHADER_F64 support");
@@ -167,7 +167,9 @@ fn main() {
         let all_params: Vec<f64> = params.iter().flat_map(params_to_flat_17).collect();
 
         let gpu_start = Instant::now();
-        let gpu_output = sweeper.integrate(&config, &all_y0, &all_params).unwrap();
+        let gpu_output = sweeper
+            .integrate(&config, &all_y0, &all_params)
+            .expect("ODE integrate");
         let gpu_elapsed = gpu_start.elapsed();
 
         println!(

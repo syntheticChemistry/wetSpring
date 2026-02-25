@@ -200,7 +200,7 @@ async fn main() {
             &[None, Some(0), Some(1)],
             2,
         )
-        .unwrap();
+        .expect("dispatch overhead");
         let t2 = DecisionTree::from_arrays(
             &[1, -2, -2],
             &[3.0, 0.0, 0.0],
@@ -209,7 +209,7 @@ async fn main() {
             &[None, Some(0), Some(1)],
             2,
         )
-        .unwrap();
+        .expect("dispatch overhead");
         let t3 = DecisionTree::from_arrays(
             &[0, -2, -2],
             &[6.0, 0.0, 0.0],
@@ -218,8 +218,8 @@ async fn main() {
             &[None, Some(0), Some(1)],
             2,
         )
-        .unwrap();
-        let rf = RandomForest::from_trees(vec![t1, t2, t3], 2).unwrap();
+        .expect("dispatch overhead");
+        let rf = RandomForest::from_trees(vec![t1, t2, t3], 2).expect("dispatch overhead");
         let samples = vec![vec![3.0, 1.0], vec![7.0, 6.0]];
 
         let cpu = bench(|| {

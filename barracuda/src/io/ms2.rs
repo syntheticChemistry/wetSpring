@@ -60,129 +60,25 @@ pub struct Ms2Stats {
     pub mean_peaks_per_spectrum: f64,
 }
 
-/// Parse an MS2 file and collect **all** spectra into memory.
+/// Collect all spectra from an MS2 file into memory via [`Ms2Iter`].
 ///
-/// For large files, prefer [`Ms2Iter`] which streams spectra without
-/// buffering the entire dataset.
+/// Convenience wrapper — streams from disk, then collects.
+/// For large files, prefer iterating with [`Ms2Iter`] directly.
 ///
 /// # Errors
 ///
 /// Returns [`Error::Io`] if the file cannot be opened, or
 /// [`Error::Ms2`] if a record is malformed.
-#[deprecated(
-    since = "0.2.0",
-    note = "buffers entire file; use `Ms2Iter` for streaming"
-)]
+#[must_use = "parsed spectra are discarded if not used"]
 pub fn parse_ms2(path: &Path) -> Result<Vec<Ms2Spectrum>> {
-    let file = File::open(path).map_err(|e| Error::Io {
-        path: path.to_path_buf(),
-        source: e,
-    })?;
-    let reader = BufReader::new(file);
-
-    let mut spectra = Vec::new();
-    let mut current: Option<Ms2Spectrum> = None;
-
-    for line_result in reader.lines() {
-        let line = line_result.map_err(|e| Error::Io {
-            path: path.to_path_buf(),
-            source: e,
-        })?;
-
-        if line.is_empty() {
-            continue;
-        }
-
-        let first_byte = line.as_bytes()[0];
-        match first_byte {
-            b'H' => { /* header — skip */ }
-            b'S' => {
-                if let Some(spec) = current.take() {
-                    spectra.push(spec);
-                }
-                let mut parts = line.split_whitespace();
-                let scan: u32 = parts
-                    .nth(1)
-                    .and_then(|s| s.parse().ok())
-                    .ok_or_else(|| Error::Ms2(format!("S-line missing scan number: {line}")))?;
-                let pmz: f64 = parts
-                    .nth(1)
-                    .and_then(|s| s.parse().ok())
-                    .ok_or_else(|| Error::Ms2(format!("S-line missing precursor m/z: {line}")))?;
-                current = Some(Ms2Spectrum {
-                    scan,
-                    precursor_mz: pmz,
-                    rt_minutes: 0.0,
-                    tic: 0.0,
-                    bpi: 0.0,
-                    charge: 0,
-                    mz_array: Vec::new(),
-                    intensity_array: Vec::new(),
-                });
-            }
-            b'I' => {
-                if let Some(ref mut spec) = current {
-                    let mut parts = line.split_whitespace();
-                    if let (Some(_), Some(key), Some(val)) =
-                        (parts.next(), parts.next(), parts.next())
-                    {
-                        match key {
-                            "RTime" => {
-                                spec.rt_minutes = val.parse().map_err(|_| {
-                                    Error::Ms2(format!("I-line invalid RTime: {val}"))
-                                })?;
-                            }
-                            "TIC" => {
-                                spec.tic = val.parse().map_err(|_| {
-                                    Error::Ms2(format!("I-line invalid TIC: {val}"))
-                                })?;
-                            }
-                            "BPI" => {
-                                spec.bpi = val.parse().map_err(|_| {
-                                    Error::Ms2(format!("I-line invalid BPI: {val}"))
-                                })?;
-                            }
-                            _ => {}
-                        }
-                    }
-                }
-            }
-            b'Z' => {
-                if let Some(ref mut spec) = current {
-                    if let Some(charge_str) = line.split_whitespace().nth(1) {
-                        spec.charge = charge_str.parse().map_err(|_| {
-                            Error::Ms2(format!("Z-line invalid charge: {charge_str}"))
-                        })?;
-                    }
-                }
-            }
-            _ => {
-                // Peak line: mz intensity (tab or space separated)
-                if let Some(ref mut spec) = current {
-                    let mut parts = line.split_whitespace();
-                    if let (Some(mz_str), Some(int_str)) = (parts.next(), parts.next()) {
-                        if let (Ok(mz), Ok(intensity)) =
-                            (mz_str.parse::<f64>(), int_str.parse::<f64>())
-                        {
-                            spec.mz_array.push(mz);
-                            spec.intensity_array.push(intensity);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // Don't forget the last spectrum
-    if let Some(spec) = current {
-        spectra.push(spec);
-    }
-
-    Ok(spectra)
+    Ms2Iter::open(path)?.collect()
 }
 
 /// Streaming iterator that yields one [`Ms2Spectrum`] at a time without
 /// buffering the entire file.
+///
+/// Uses `read_line` into a reusable buffer to avoid per-line allocation
+/// (unlike `Lines` which allocates a fresh `String` per line).
 ///
 /// # Examples
 ///
@@ -197,7 +93,8 @@ pub fn parse_ms2(path: &Path) -> Result<Vec<Ms2Spectrum>> {
 /// }
 /// ```
 pub struct Ms2Iter {
-    reader: std::io::Lines<Box<dyn BufRead>>,
+    reader: Box<dyn BufRead>,
+    line_buf: String,
     path: std::path::PathBuf,
     pending: Option<Ms2Spectrum>,
     done: bool,
@@ -216,7 +113,8 @@ impl Ms2Iter {
         })?;
         let reader: Box<dyn BufRead> = Box::new(BufReader::new(file));
         Ok(Self {
-            reader: reader.lines(),
+            reader,
+            line_buf: String::new(),
             path: path.to_path_buf(),
             pending: None,
             done: false,
@@ -258,8 +156,14 @@ impl Iterator for Ms2Iter {
         }
 
         loop {
-            match self.reader.next() {
-                Some(Ok(line)) => {
+            self.line_buf.clear();
+            match self.reader.read_line(&mut self.line_buf) {
+                Ok(0) => {
+                    self.done = true;
+                    return self.pending.take().map(Ok);
+                }
+                Ok(_) => {
+                    let line = self.line_buf.trim_end_matches(['\n', '\r']);
                     if line.is_empty() {
                         continue;
                     }
@@ -301,7 +205,7 @@ impl Iterator for Ms2Iter {
                         }
                         b'I' => {
                             if let Some(ref mut spec) = self.pending {
-                                if let Err(e) = Self::parse_i_line(spec, &line) {
+                                if let Err(e) = Self::parse_i_line(spec, line) {
                                     return Some(Err(e));
                                 }
                             }
@@ -336,16 +240,12 @@ impl Iterator for Ms2Iter {
                         }
                     }
                 }
-                Some(Err(e)) => {
+                Err(e) => {
                     self.done = true;
                     return Some(Err(Error::Io {
                         path: self.path.clone(),
                         source: e,
                     }));
-                }
-                None => {
-                    self.done = true;
-                    return self.pending.take().map(Ok);
                 }
             }
         }
@@ -361,12 +261,14 @@ impl Iterator for Ms2Iter {
 /// # Errors
 ///
 /// Returns [`Error::Io`] if the file cannot be opened or read.
+#[must_use = "computed stats are discarded if not used"]
 pub fn stats_from_file(path: &Path) -> Result<Ms2Stats> {
     let file = File::open(path).map_err(|e| Error::Io {
         path: path.to_path_buf(),
         source: e,
     })?;
-    let reader = BufReader::new(file);
+    let mut reader = BufReader::new(file);
+    let mut line_buf = String::new();
 
     let mut num_spectra = 0_usize;
     let mut total_peaks = 0_usize;
@@ -376,11 +278,16 @@ pub fn stats_from_file(path: &Path) -> Result<Ms2Stats> {
     let mut max_rt: Option<f64> = None;
     let mut in_spectrum = false;
 
-    for line_result in reader.lines() {
-        let line = line_result.map_err(|e| Error::Io {
+    loop {
+        line_buf.clear();
+        let bytes_read = reader.read_line(&mut line_buf).map_err(|e| Error::Io {
             path: path.to_path_buf(),
             source: e,
         })?;
+        if bytes_read == 0 {
+            break;
+        }
+        let line = line_buf.trim_end_matches(['\n', '\r']);
 
         if line.is_empty() {
             continue;

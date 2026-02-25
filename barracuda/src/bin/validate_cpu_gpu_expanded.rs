@@ -30,6 +30,7 @@ use wetspring_barracuda::bio::phage_defense_gpu::{PhageDefenseGpu, PhageDefenseO
 use wetspring_barracuda::bio::qs_biofilm;
 use wetspring_barracuda::bio::unifrac_gpu::UniFracGpu;
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 fn validate_kmer(v: &mut Validator, device: &Arc<barracuda::device::WgpuDevice>) {
@@ -69,7 +70,12 @@ fn validate_kmer(v: &mut Validator, device: &Arc<barracuda::device::WgpuDevice>)
 
     let us = t0.elapsed().as_micros();
 
-    v.check("histogram length", gpu_hist.len() as f64, 256.0, 0.0);
+    v.check(
+        "histogram length",
+        gpu_hist.len() as f64,
+        256.0,
+        tolerances::EXACT,
+    );
 
     let gpu_total: u32 = gpu_hist.iter().sum();
     let cpu_total: u32 = cpu_hist.iter().sum();
@@ -77,14 +83,19 @@ fn validate_kmer(v: &mut Validator, device: &Arc<barracuda::device::WgpuDevice>)
         "total k-mers match",
         f64::from(gpu_total),
         f64::from(cpu_total),
-        0.0,
+        tolerances::EXACT,
     );
 
     let mut max_diff = 0u32;
     for (&g, &c) in gpu_hist.iter().zip(cpu_hist.iter()) {
         max_diff = max_diff.max(g.abs_diff(c));
     }
-    v.check("max bin difference", f64::from(max_diff), 0.0, 0.0);
+    v.check(
+        "max bin difference",
+        f64::from(max_diff),
+        0.0,
+        tolerances::EXACT,
+    );
     println!("  K-mer CPU ↔ GPU in {us} µs");
 }
 
@@ -116,13 +127,23 @@ fn validate_unifrac(v: &mut Validator, device: &Arc<barracuda::device::WgpuDevic
         "node_sums length",
         result.node_sums.len() as f64,
         (n_nodes * n_samples) as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     let leaf0_s0 = result.node_sums[0];
     let leaf1_s0 = result.node_sums[n_samples];
-    v.check("leaf 0 sample 0 initialized", leaf0_s0, 10.0, 1e-10);
-    v.check("leaf 1 sample 0 initialized", leaf1_s0, 3.0, 1e-10);
+    v.check(
+        "leaf 0 sample 0 initialized",
+        leaf0_s0,
+        10.0,
+        tolerances::PYTHON_PARITY,
+    );
+    v.check(
+        "leaf 1 sample 0 initialized",
+        leaf1_s0,
+        3.0,
+        tolerances::PYTHON_PARITY,
+    );
 
     let all_finite = result.node_sums.iter().all(|x| x.is_finite());
     v.check_pass("all node sums finite", all_finite);
@@ -152,7 +173,11 @@ fn validate_ode_sweep(v: &mut Validator, device: &Arc<barracuda::device::WgpuDev
     }
 
     let cpu_result = qs_biofilm::run_scenario(&y0, f64::from(n_steps) * dt, dt, &base_params);
-    let cpu_finals: Vec<f64> = cpu_result.states().last().unwrap().to_vec();
+    let cpu_finals: Vec<f64> = cpu_result
+        .states()
+        .last()
+        .expect("CPU/GPU expanded")
+        .to_vec();
 
     let config = OdeSweepConfig {
         n_batches,
@@ -173,7 +198,7 @@ fn validate_ode_sweep(v: &mut Validator, device: &Arc<barracuda::device::WgpuDev
         "GPU output count",
         gpu_result.len() as f64,
         f64::from(n_batches * 5),
-        0.0,
+        tolerances::EXACT,
     );
 
     let gpu_batch0 = &gpu_result[0..5];
@@ -183,7 +208,11 @@ fn validate_ode_sweep(v: &mut Validator, device: &Arc<barracuda::device::WgpuDev
     for (i, (&g, &c)) in gpu_batch0.iter().zip(cpu_finals.iter()).enumerate() {
         let denom = c.abs().max(g.abs()).max(1e-15);
         let rel = (g - c).abs() / denom;
-        let tol = if i < 3 { 0.01 } else { 1.5 };
+        let tol = if i < 3 {
+            tolerances::ODE_STEADY_STATE
+        } else {
+            tolerances::ODE_NEAR_ZERO_RELATIVE
+        };
         v.check(&format!("var {i} CPU ↔ GPU (tol={tol})"), rel, 0.0, tol);
     }
 
@@ -210,7 +239,11 @@ fn validate_phage_defense(v: &mut Validator, device: &Arc<barracuda::device::Wgp
     let y0 = [100.0, 100.0, 10.0, 50.0];
 
     let cpu_result = phage_defense::run_defense(&y0, f64::from(n_steps) * dt, dt, &params);
-    let cpu_finals: Vec<f64> = cpu_result.states().last().unwrap().to_vec();
+    let cpu_finals: Vec<f64> = cpu_result
+        .states()
+        .last()
+        .expect("CPU/GPU expanded")
+        .to_vec();
 
     let phage_gpu = PhageDefenseGpu::new(Arc::clone(device)).expect("PhageDefense GPU compile");
 
@@ -239,7 +272,7 @@ fn validate_phage_defense(v: &mut Validator, device: &Arc<barracuda::device::Wgp
         "GPU output count",
         gpu_result.len() as f64,
         f64::from(n_batches * 4),
-        0.0,
+        tolerances::EXACT,
     );
 
     let gpu_batch0 = &gpu_result[0..4];
@@ -252,7 +285,12 @@ fn validate_phage_defense(v: &mut Validator, device: &Arc<barracuda::device::Wgp
     for (i, (&g, &c)) in gpu_batch0.iter().zip(cpu_finals.iter()).enumerate() {
         let denom = c.abs().max(g.abs()).max(1e-15);
         let rel = (g - c).abs() / denom;
-        v.check(&format!("var {i} CPU ↔ GPU relative diff"), rel, 0.0, 0.05);
+        v.check(
+            &format!("var {i} CPU ↔ GPU relative diff"),
+            rel,
+            0.0,
+            tolerances::ODE_NEAR_ZERO,
+        );
     }
 
     let batches_ok = gpu_result.chunks(4).all(|chunk| {
@@ -281,7 +319,7 @@ fn validate_metalforge_pipeline(v: &mut Validator, device: &Arc<barracuda::devic
         "pipeline: kmer total > 0",
         f64::from(total),
         f64::from(total),
-        0.0,
+        tolerances::EXACT,
     );
     v.check_pass(
         &format!("pipeline: richness = {richness:.4} (nonzero bins)"),
@@ -294,7 +332,7 @@ fn validate_metalforge_pipeline(v: &mut Validator, device: &Arc<barracuda::devic
         "pipeline: GPU total == CPU total",
         f64::from(total),
         f64::from(cpu_total),
-        0.0,
+        tolerances::EXACT,
     );
 
     let us = t0.elapsed().as_micros();

@@ -39,9 +39,17 @@ pub const ANALYTICAL_F64: f64 = 1e-12;
 // ═══════════════════════════════════════════════════════════════════
 
 /// GC content: ±0.5% (`FastQC` baseline, Zenodo 800651 `MiSeq` SOP).
+///
+/// Validated: `Galaxy` 24.1 `FastQC` on Kozich et al. `MiSeq` SOP dataset
+/// (Zenodo 800651). Commit `504b0a8` (`FastQC` validated), data download
+/// commit `a3fd096`.
 pub const GC_CONTENT: f64 = 0.005;
 
 /// Mean quality score: ±0.5 (`FastQC` baseline, read-level variability).
+///
+/// Validated: `Galaxy` 24.1 `FastQC` on Kozich et al. `MiSeq` SOP dataset
+/// (Zenodo 800651). Read-level Phred variability at Q30 threshold. Commit
+/// `cf15167` (full `FastQC` run history).
 pub const MEAN_QUALITY: f64 = 0.5;
 
 /// m/z tolerance: ±0.01 Da (Orbitrap instrument precision).
@@ -183,6 +191,15 @@ pub const ODE_GPU_PARITY: f64 = 1e-6;
 /// Biologically "off" species may float slightly above zero due to
 /// integrator residual. 0.05 accommodates the numerical floor.
 pub const ODE_NEAR_ZERO: f64 = 0.05;
+
+/// Relative tolerance for near-zero ODE variables (GPU vs CPU).
+///
+/// When ODE variables are near zero (repressed pathways, depleted species),
+/// the *relative* error `|gpu - cpu| / max(|gpu|, |cpu|)` can be large
+/// even though the *absolute* difference is negligible. 1.5 (150%)
+/// accommodates GPU/CPU integrator divergence at the numerical floor
+/// where both values are biologically insignificant (< 0.01).
+pub const ODE_NEAR_ZERO_RELATIVE: f64 = 1.5;
 
 // ═══════════════════════════════════════════════════════════════════
 // Phylogenetic tolerances
@@ -357,6 +374,14 @@ pub const GPU_VS_CPU_F64: f64 = 1e-6;
 /// Allow 1e-10 for accumulated error in Shannon/Simpson computation.
 pub const GPU_VS_CPU_TRANSCENDENTAL: f64 = 1e-10;
 
+/// GPU f64 log polyfill precision (software `log_f64` shader).
+///
+/// When native WGSL `log(f64)` is unavailable, `ToadStool` uses a
+/// polynomial `log_f64` polyfill with ~1e-8 absolute precision.
+/// Allow 1e-7 for single evaluations; accumulated chains (Shannon
+/// over N species) may reach ~1e-6 covered by [`GPU_VS_CPU_F64`].
+pub const GPU_LOG_POLYFILL: f64 = 1e-7;
+
 /// GPU Bray-Curtis vs CPU: per-pair tolerance.
 ///
 /// Each pair involves N additions and a division. For N=2000 features,
@@ -429,14 +454,16 @@ pub const PHAGE_POPULATION_ABSOLUTE: f64 = 10.0;
 /// profiles. Shannon varies from ~2.93 (low-diversity, 91 ASVs) to ~3.85
 /// (high-diversity, 856 ASVs). ±1.50 covers the full profile variability
 /// from geometric/power-law rank abundance curves.
-/// Source: `experiments/results/002_phytoplankton/diversity_report.json`.
+/// Source: `experiments/results/002_phytoplankton/diversity_report.json`,
+/// commit `21d43a0` (Exp002 complete — 2273 ASVs from real phytoplankton).
 pub const GALAXY_SHANNON_RANGE: f64 = 1.50;
 
 /// Exp002 `Galaxy` Simpson range for rank-abundance curves.
 ///
 /// Low-diversity community: Simpson ~0.86 ± 0.25. The wide range reflects
 /// sensitivity of Simpson to dominance in highly-skewed communities.
-/// Source: `experiments/results/002_phytoplankton/diversity_report.json`.
+/// Source: `experiments/results/002_phytoplankton/diversity_report.json`,
+/// commit `21d43a0`.
 pub const GALAXY_SIMPSON_RANGE: f64 = 0.25;
 
 /// Exp002 `Galaxy` Bray-Curtis range between dissimilar communities.
@@ -444,7 +471,8 @@ pub const GALAXY_SIMPSON_RANGE: f64 = 0.25;
 /// BC(low, high) diversity communities: expected near 0.50 but highly
 /// dependent on rank-abundance shape. ±0.50 covers [0.0, 1.0] for any
 /// biologically plausible community pair.
-/// Source: `experiments/results/002_phytoplankton/diversity_report.json`.
+/// Source: `experiments/results/002_phytoplankton/diversity_report.json`,
+/// commit `21d43a0`.
 pub const GALAXY_BRAY_CURTIS_RANGE: f64 = 0.50;
 
 #[cfg(test)]
@@ -458,7 +486,8 @@ mod tests {
         assert!(EXACT_F64 < ANALYTICAL_F64);
         assert!(ANALYTICAL_F64 < PYTHON_PARITY);
         assert!(PYTHON_PARITY <= ML_PREDICTION);
-        assert!(GPU_VS_CPU_TRANSCENDENTAL <= GPU_VS_CPU_F64);
+        assert!(GPU_VS_CPU_TRANSCENDENTAL <= GPU_LOG_POLYFILL);
+        assert!(GPU_LOG_POLYFILL <= GPU_VS_CPU_F64);
         assert!(GPU_VS_CPU_F64 <= GPU_VS_CPU_ENSEMBLE);
     }
 
@@ -504,6 +533,7 @@ mod tests {
             JACOBI_TAU_OVERFLOW,
             GPU_VS_CPU_F64,
             GPU_VS_CPU_TRANSCENDENTAL,
+            GPU_LOG_POLYFILL,
             GPU_VS_CPU_BRAY_CURTIS,
             GPU_VS_CPU_ENSEMBLE,
             ODE_DEFAULT_DT,
@@ -515,6 +545,8 @@ mod tests {
             GALAXY_BRAY_CURTIS_RANGE,
             ESN_REGULARIZATION,
             CHAO1_COUNT_HALFWIDTH,
+            ODE_NEAR_ZERO_RELATIVE,
+            GPU_LOG_POLYFILL,
         ];
         for tol in all {
             assert!(tol >= 0.0, "tolerance {tol} must be non-negative");

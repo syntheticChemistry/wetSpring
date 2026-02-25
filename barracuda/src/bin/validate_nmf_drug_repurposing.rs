@@ -23,7 +23,12 @@
 //! |-------------|-------|
 //! | Date        | 2026-02-24 |
 //! | Phase       | 39 — Drug repurposing track |
-//! | Paper       | 41 (Yang et al. 2020) |
+//! | Paper       | 41 (Yang et al. 2020, doi:10.1093/bioinformatics/btaa164) |
+//! | Baseline    | Structural validation — sparsity, convergence, non-negativity |
+//! |             | against `barracuda::linalg::nmf` (no external Python baseline) |
+//! | NMF tol     | 1e-6 convergence (multiplicative update stopping criterion) |
+//! | Command     | `cargo run --bin validate_nmf_drug_repurposing` |
+//! | Tolerances  | Structural only — convergence, non-negativity, ranking |
 
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 use wetspring_barracuda::validation::Validator;
@@ -50,7 +55,8 @@ fn build_block_matrix(rng: &mut LcgRng) -> (Vec<f64>, usize) {
     let n_diseases = 100;
     let target_sparsity = 0.05;
     let n_known =
-        (f64::from(u32::try_from(n_drugs * n_diseases).unwrap()) * target_sparsity) as usize;
+        (f64::from(u32::try_from(n_drugs * n_diseases).expect("n_drugs*n_diseases fits u32"))
+            * target_sparsity) as usize;
 
     let mut matrix = vec![0.0; n_drugs * n_diseases];
     let n_clusters = 5;
@@ -62,10 +68,15 @@ fn build_block_matrix(rng: &mut LcgRng) -> (Vec<f64>, usize) {
         let disease_start = c * diseases_per_cluster;
         for _ in 0..(n_known / n_clusters) {
             let d = drug_start
-                + (rng.next_f64() * f64::from(u32::try_from(drugs_per_cluster).unwrap())) as usize;
+                + (rng.next_f64()
+                    * f64::from(
+                        u32::try_from(drugs_per_cluster).expect("drugs_per_cluster fits u32"),
+                    )) as usize;
             let dis = disease_start
-                + (rng.next_f64() * f64::from(u32::try_from(diseases_per_cluster).unwrap()))
-                    as usize;
+                + (rng.next_f64()
+                    * f64::from(
+                        u32::try_from(diseases_per_cluster).expect("diseases_per_cluster fits u32"),
+                    )) as usize;
             if d < n_drugs && dis < n_diseases {
                 matrix[d * n_diseases + dis] = 1.0;
             }

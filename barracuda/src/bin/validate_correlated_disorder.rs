@@ -34,6 +34,7 @@
 //! | Date        | 2026-02-24 |
 //! | Phase       | 39 — Correlated disorder |
 //! | GPU prims   | `SpectralCsrMatrix`, `lanczos`, `level_spacing_ratio` |
+//! | Command     | `cargo test --bin validate_correlated_disorder -- --nocapture` |
 
 use wetspring_barracuda::validation::Validator;
 

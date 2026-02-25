@@ -93,7 +93,7 @@ fn main() {
         "LowCdG: M_ss > B_ss (motility favored)",
         f64::from(u8::from(mot > bio)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "LowCdG: VpsR_ss (low)",
@@ -136,7 +136,7 @@ fn main() {
         .zip(&r2.y_final)
         .map(|(a, b)| (a - b).abs())
         .fold(0.0_f64, f64::max);
-    v.check("Deterministic", max_diff, 0.0, 0.0);
+    v.check("Deterministic", max_diff, 0.0, tolerances::EXACT);
 
     v.finish();
 }
@@ -147,6 +147,6 @@ fn check_non_neg(v: &mut Validator, r: &wetspring_barracuda::bio::ode::OdeResult
         &format!("{pre}: non-negative (min={min:.2e})"),
         min.max(0.0),
         min.max(0.0),
-        0.0,
+        tolerances::EXACT,
     );
 }

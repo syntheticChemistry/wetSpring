@@ -23,7 +23,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | `BarraCuda` CPU + GPU |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --features gpu --release --bin benchmark_streaming_vs_roundtrip` |
@@ -91,7 +91,7 @@ async fn main() {
         validation::exit_skipped("No SHADER_F64 support on this GPU");
     }
 
-    let session = streaming_gpu::GpuPipelineSession::new(&gpu).unwrap();
+    let session = streaming_gpu::GpuPipelineSession::new(&gpu).expect("streaming benchmark");
     println!("  Session warmup: {}", session.ctx_stats());
 
     let refs = training_refs();
@@ -131,8 +131,8 @@ async fn main() {
         let roundtrip_start = Instant::now();
         let mut rt_sh = Vec::with_capacity(n);
         for c in &communities {
-            rt_sh.push(diversity_gpu::shannon_gpu(&gpu, c).unwrap());
-            let _ = diversity_gpu::simpson_gpu(&gpu, c).unwrap();
+            rt_sh.push(diversity_gpu::shannon_gpu(&gpu, c).expect("streaming benchmark"));
+            let _ = diversity_gpu::simpson_gpu(&gpu, c).expect("streaming benchmark");
         }
         let rt_us = roundtrip_start.elapsed().as_micros() as f64;
 
@@ -140,12 +140,12 @@ async fn main() {
         let streaming_start = Instant::now();
         let mut st_sh = Vec::with_capacity(n);
         for c in &communities {
-            st_sh.push(session.shannon(c).unwrap());
-            let _ = session.simpson(c).unwrap();
+            st_sh.push(session.shannon(c).expect("streaming benchmark"));
+            let _ = session.simpson(c).expect("streaming benchmark");
         }
         let st_result = session
             .stream_sample(&classifier, &seq_refs, &communities[0], &params)
-            .unwrap();
+            .expect("streaming benchmark");
         let st_us = streaming_start.elapsed().as_micros() as f64;
 
         let gpu_vs_cpu = if cpu_us > 0.0 { rt_us / cpu_us } else { 0.0 };
@@ -177,7 +177,8 @@ async fn main() {
 
     // Final parity check at largest batch
     let communities = make_communities(128);
-    let rt_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).unwrap();
+    let rt_bc =
+        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).expect("streaming benchmark");
     let cpu_bc = diversity::bray_curtis_condensed(&communities);
 
     let bc_max_err = rt_bc

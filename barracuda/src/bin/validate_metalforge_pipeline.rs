@@ -19,7 +19,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | `BarraCuda` CPU + `metalForge` dispatch |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --release --bin validate_metalforge_pipeline` |
@@ -30,6 +30,7 @@ use std::collections::HashMap;
 use std::fmt;
 use std::time::Instant;
 use wetspring_barracuda::bio::{kmer, taxonomy, unifrac};
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 // ═══════════════════════════════════════════════════════════
@@ -262,7 +263,7 @@ fn validate_pipeline_parity(v: &mut Validator) {
             &format!("sample {i}: f64 ↔ int8 classification parity"),
             int8_classifications[i] as f64,
             cpu_classifications[i] as f64,
-            0.0,
+            tolerances::EXACT,
         );
     }
 
@@ -276,7 +277,7 @@ fn validate_pipeline_parity(v: &mut Validator) {
             &format!("sample {i}: kmer histogram round-trip"),
             restored.total_valid_kmers as f64,
             cpu_counts[i].total_valid_kmers as f64,
-            0.0,
+            tolerances::EXACT,
         );
     }
 
@@ -297,7 +298,7 @@ fn validate_pipeline_parity(v: &mut Validator) {
         "UniFrac parity: original ↔ CSR round-trip",
         uw_flat,
         uw_orig,
-        1e-12,
+        tolerances::ANALYTICAL_F64,
     );
 
     let ww_orig = unifrac::weighted_unifrac(&tree, &sa, &sb);
@@ -306,7 +307,7 @@ fn validate_pipeline_parity(v: &mut Validator) {
         "weighted UniFrac parity: original ↔ CSR round-trip",
         ww_flat,
         ww_orig,
-        1e-12,
+        tolerances::ANALYTICAL_F64,
     );
 
     print_timing("pipeline parity", t0);
@@ -326,7 +327,7 @@ fn validate_flat_layout_chain(v: &mut Validator) {
         "kmer: flattened buffer = 4 × 256",
         all_flat_count as f64,
         1024.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let tree = unifrac::PhyloTree::from_newick("((A:0.1,B:0.2):0.3,(C:0.4,D:0.5):0.6);");
@@ -349,12 +350,17 @@ fn validate_flat_layout_chain(v: &mut Validator) {
 
     let (sample_matrix, n_samples, n_leaves) =
         unifrac::to_sample_matrix(&flat_tree, &abundance_table);
-    v.check("unifrac: n_samples = 4", n_samples as f64, 4.0, 0.0);
+    v.check(
+        "unifrac: n_samples = 4",
+        n_samples as f64,
+        4.0,
+        tolerances::EXACT,
+    );
     v.check(
         "unifrac: matrix = n_samples × n_leaves",
         sample_matrix.len() as f64,
         (n_samples * n_leaves) as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     let refs = training_references();
@@ -364,14 +370,14 @@ fn validate_flat_layout_chain(v: &mut Validator) {
         "taxonomy: int8 weights = n_taxa × 4^k",
         weights.weights_i8.len() as f64,
         (weights.n_taxa * weights.kmer_space) as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check_pass("taxonomy: scale > 0", weights.scale > 0.0);
     v.check(
         "taxonomy: priors = n_taxa",
         weights.priors_i8.len() as f64,
         weights.n_taxa as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     let sorted_pairs: Vec<Vec<(u64, u32)>> = counts

@@ -316,9 +316,11 @@ fn validate_gpu_determinism(gpu: &GpuF64, v: &mut Validator) {
     let s3 = diversity_gpu::shannon_gpu(gpu, &counts).expect("GPU Shannon run 3");
     v.check(
         "GPU determinism: 3 runs identical",
-        f64::from(u8::from((s1 - s2).abs() < 1e-15 && (s2 - s3).abs() < 1e-15)),
+        f64::from(u8::from(
+            (s1 - s2).abs() < tolerances::EXACT_F64 && (s2 - s3).abs() < tolerances::EXACT_F64,
+        )),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 }
 

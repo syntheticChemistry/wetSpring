@@ -13,10 +13,10 @@
 //! QUALITY (Phred33 ASCII)
 //! ```
 //!
-//! [`parse_fastq`] collects all records for multi-pass analysis (k-mer
-//! counting, diversity). For single-pass statistics on large files,
-//! prefer [`stats_from_file`] which processes lines in-place and never
-//! allocates per-record storage.
+//! [`parse_fastq`] collects records via [`FastqIter`] for multi-pass
+//! analysis (k-mer counting, diversity). For single-pass statistics on
+//! large files, prefer [`stats_from_file`] which processes lines in-place
+//! and never allocates per-record storage.
 
 mod stats;
 #[cfg(test)]
@@ -125,66 +125,18 @@ pub(crate) fn trimmed_len(buf: &str) -> usize {
 
 // ── Public API ───────────────────────────────────────────────────
 
-/// Parse a FASTQ file and collect **all** records into memory.
+/// Collect all records from a FASTQ file into memory via [`FastqIter`].
 ///
-/// Handles plain `.fastq` and gzip-compressed `.fastq.gz` files.
-///
-/// For large files, prefer [`FastqIter`] or [`for_each_record`] which
-/// stream records without buffering the entire file.
+/// Convenience wrapper — streams records from disk, then collects.
+/// For single-pass processing prefer [`FastqIter`] or [`for_each_record`].
 ///
 /// # Errors
 ///
 /// Returns [`Error::Io`] if the file cannot be opened, or
 /// [`Error::Fastq`] if a record is malformed.
-#[deprecated(
-    since = "0.2.0",
-    note = "buffers entire file; use `FastqIter` or `for_each_record` for streaming"
-)]
+#[must_use = "parsed records are discarded if not used"]
 pub fn parse_fastq(path: &Path) -> Result<Vec<FastqRecord>> {
-    let mut reader = open_reader(path)?;
-    let mut records = Vec::new();
-    let mut buf = String::new();
-
-    loop {
-        // Line 1: @identifier
-        buf.clear();
-        if read_line(reader.as_mut(), &mut buf, path)? == 0 {
-            break;
-        }
-        if buf.trim_end().is_empty() {
-            break;
-        }
-        if !buf.starts_with('@') {
-            return Err(header_error(&buf));
-        }
-        let id = buf.trim_end()[1..]
-            .split_whitespace()
-            .next()
-            .unwrap_or("")
-            .to_string();
-
-        // Line 2: sequence
-        buf.clear();
-        read_line(reader.as_mut(), &mut buf, path)?;
-        let sequence = buf.trim_end().as_bytes().to_vec();
-
-        // Line 3: + separator (consumed, not validated beyond presence)
-        buf.clear();
-        read_line(reader.as_mut(), &mut buf, path)?;
-
-        // Line 4: quality scores
-        buf.clear();
-        read_line(reader.as_mut(), &mut buf, path)?;
-        let quality = buf.trim_end().as_bytes().to_vec();
-
-        records.push(FastqRecord {
-            id,
-            sequence,
-            quality,
-        });
-    }
-
-    Ok(records)
+    FastqIter::open(path)?.collect()
 }
 
 /// Process each record without per-record allocation.

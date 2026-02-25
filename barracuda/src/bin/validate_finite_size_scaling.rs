@@ -26,6 +26,7 @@
 //! |-------------|-------|
 //! | Date        | 2026-02-23 |
 //! | GPU prims   | anderson_3d, lanczos, level_spacing_ratio |
+//! | Command     | `cargo test --bin validate_finite_size_scaling -- --nocapture` |
 
 use wetspring_barracuda::validation::Validator;
 
@@ -146,7 +147,7 @@ fn main() {
                 "  W_c(L={}) = {:.2}, W_c(L={}) = {:.2}",
                 w_c_values[0].0,
                 first_w_c,
-                w_c_values.last().unwrap().0,
+                w_c_values.last().expect("w_c_values non-empty").0,
                 last_w_c
             );
             v.check_pass("W_c found for multiple sizes", w_c_values.len() >= 2);
@@ -179,7 +180,7 @@ fn main() {
                         (wa - w_test)
                             .abs()
                             .partial_cmp(&(wb - w_test).abs())
-                            .unwrap()
+                            .unwrap_or(std::cmp::Ordering::Equal)
                     })
                     .map_or(0.0, |(_, r)| *r);
                 print!("  L={l}:{r:.4}");

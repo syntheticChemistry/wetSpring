@@ -74,7 +74,7 @@ fn validate_matrix_scoring(
             ranked.push((i, j, matrix_scores[i * n_diseases + j]));
         }
     }
-    ranked.sort_by(|a, b| b.2.partial_cmp(&a.2).unwrap());
+    ranked.sort_by(|a, b| b.2.partial_cmp(&a.2).unwrap_or(std::cmp::Ordering::Equal));
 
     println!("\n  Top 10 drug-disease predictions:");
     println!("  {:>6} {:>8} {:>10}", "Drug", "Disease", "Score");
@@ -113,7 +113,7 @@ fn validate_nmf_analysis(v: &mut Validator, matrix_scores: &[f64], ranked: &[(us
 
     v.check_pass("NMF converges (error decreases)", {
         let e = &result.errors;
-        e.len() >= 2 && e.last().unwrap() < &e[0]
+        e.len() >= 2 && e.last().expect("errors non-empty") < &e[0]
     });
     v.check_pass("relative reconstruction error < 0.5", rel_err < 0.5);
 

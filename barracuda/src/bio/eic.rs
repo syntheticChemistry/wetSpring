@@ -126,7 +126,7 @@ pub fn detect_mass_tracks(spectra: &[MzmlSpectrum], ppm: f64, min_scans: usize) 
     }
 
     // Group into bins: consecutive m/z values within ppm tolerance
-    let mut bins: Vec<(f64, usize)> = Vec::new(); // (centroid, count_of_mz_values)
+    let mut bins: Vec<(f64, usize)> = Vec::with_capacity(all_mz.len()); // (centroid, count_of_mz_values)
     let mut bin_start = 0;
     for i in 1..all_mz.len() {
         let gap_ppm = (all_mz[i] - all_mz[i - 1]) / all_mz[i - 1] * 1e6;

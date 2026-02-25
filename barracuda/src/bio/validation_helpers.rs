@@ -59,14 +59,22 @@ pub fn load_silva_classifier(ref_dir: &Path) -> Option<NaiveBayesClassifier> {
 /// loading the entire file into memory.
 fn stream_taxonomy_tsv(path: &Path) -> Option<HashMap<String, String>> {
     let file = std::fs::File::open(path).ok()?;
-    let reader = BufReader::new(file);
+    let mut reader = BufReader::new(file);
     let mut map = HashMap::new();
+    let mut line_buf = String::new();
+    let mut first = true;
 
-    for (i, line_result) in reader.lines().enumerate() {
-        let line = line_result.ok()?;
-        if i == 0 {
-            continue; // header
+    loop {
+        line_buf.clear();
+        let n = reader.read_line(&mut line_buf).ok()?;
+        if n == 0 {
+            break;
         }
+        if first {
+            first = false;
+            continue;
+        }
+        let line = line_buf.trim_end_matches(['\n', '\r']);
         if let Some((id, tax)) = line.split_once('\t') {
             map.insert(id.to_string(), tax.trim().to_string());
         }
@@ -83,15 +91,22 @@ fn stream_fasta_subsampled(
     nth: usize,
 ) -> Option<Vec<ReferenceSeq>> {
     let file = std::fs::File::open(path).ok()?;
-    let reader = BufReader::new(file);
+    let mut reader = BufReader::new(file);
+    let mut line_buf = String::new();
 
-    let mut refs = Vec::new();
+    let estimated_refs = tax_map.len() / nth;
+    let mut refs = Vec::with_capacity(estimated_refs);
     let mut current_id = String::new();
     let mut current_seq: Vec<u8> = Vec::new();
     let mut n_parsed = 0_usize;
 
-    for line_result in reader.lines() {
-        let line = line_result.ok()?;
+    loop {
+        line_buf.clear();
+        let n = reader.read_line(&mut line_buf).ok()?;
+        if n == 0 {
+            break;
+        }
+        let line = line_buf.trim_end_matches(['\n', '\r']);
         if let Some(header) = line.strip_prefix('>') {
             if !current_id.is_empty() && !current_seq.is_empty() {
                 n_parsed += 1;
@@ -117,7 +132,6 @@ fn stream_fasta_subsampled(
         }
     }
 
-    // Handle last sequence
     if !current_id.is_empty() && !current_seq.is_empty() {
         n_parsed += 1;
         if n_parsed % nth == 0 {

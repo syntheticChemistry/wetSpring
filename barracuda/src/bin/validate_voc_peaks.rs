@@ -29,6 +29,7 @@
 use std::path::Path;
 use wetspring_barracuda::bio::signal::{PeakParams, find_peaks};
 use wetspring_barracuda::bio::tolerance_search;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 #[derive(Debug)]
@@ -129,12 +130,17 @@ fn validate_parsing(v: &mut Validator, compounds: &[VocCompound]) {
 
     let trans_beta_ionone = compounds.iter().find(|c| c.id == 6);
     if let Some(tbi) = trans_beta_ionone {
-        v.check("trans-beta-ionone m/z = 177", tbi.base_peak_mz, 177.0, 0.0);
+        v.check(
+            "trans-beta-ionone m/z = 177",
+            tbi.base_peak_mz,
+            177.0,
+            tolerances::EXACT,
+        );
         v.check(
             "trans-beta-ionone RI = 1495",
             tbi.experimental_ri,
             1495.0,
-            0.0,
+            tolerances::EXACT,
         );
         v.check_count(
             "trans-beta-ionone NIST match = 94%",
@@ -261,7 +267,7 @@ fn validate_biomarker_classification(v: &mut Validator, compounds: &[VocCompound
         "All A+R markers in >=2 experiments",
         if all_ar_in_3 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 }
 
@@ -303,7 +309,7 @@ fn validate_ri_tolerance_matching(v: &mut Validator, compounds: &[VocCompound]) 
         "All theoretical RIs found by tolerance search",
         if all_matched { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Verify that a wildly wrong RI does NOT match

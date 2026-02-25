@@ -90,7 +90,7 @@ fn validate_r1(data_dir: &Path, v: &mut Validator) {
         Err(e) => {
             println!("  FAILED: {e}");
             for _ in 0..5 {
-                v.check("(skipped — parse error)", 0.0, 1.0, 0.0);
+                v.check("(skipped — parse error)", 0.0, 1.0, tolerances::EXACT);
             }
         }
     }
@@ -122,7 +122,7 @@ fn validate_r2(data_dir: &Path, v: &mut Validator) {
         Err(e) => {
             println!("  FAILED: {e}");
             for _ in 0..2 {
-                v.check("(skipped — parse error)", 0.0, 1.0, 0.0);
+                v.check("(skipped — parse error)", 0.0, 1.0, tolerances::EXACT);
             }
         }
     }
@@ -212,19 +212,19 @@ fn validate_quality_filtering(v: &mut Validator) {
         "Filtered output >= 1",
         f64::from(u8::from(stats.output_reads >= 1)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Discarded >= 2",
         f64::from(u8::from(stats.discarded_reads >= 2)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "All outputs >= min_length",
         f64::from(u8::from(filtered.iter().all(|r| r.sequence.len() >= 36))),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Adapter trimming
@@ -239,7 +239,7 @@ fn validate_quality_filtering(v: &mut Validator) {
         "Adapter found",
         f64::from(u8::from(trimmed.is_some())),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Adapter trimmed correctly",
@@ -249,7 +249,7 @@ fn validate_quality_filtering(v: &mut Validator) {
                 .is_some_and(|t| t.sequence.len() < with_adapter.sequence.len()),
         )),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 }
 
@@ -293,7 +293,12 @@ fn validate_merge_pairs(v: &mut Validator) {
         result.mismatches,
     );
 
-    v.check("Merge successful", f64::from(u8::from(merged_ok)), 1.0, 0.0);
+    v.check(
+        "Merge successful",
+        f64::from(u8::from(merged_ok)),
+        1.0,
+        tolerances::EXACT,
+    );
     v.check_count("Merged length", merged_len, 253);
     v.check_count("Overlap", result.overlap, 247);
     v.check_count("Mismatches", result.mismatches, 0);
@@ -356,6 +361,6 @@ fn validate_dereplication(v: &mut Validator) {
         "FASTA has size annotations",
         f64::from(u8::from(fasta.contains(";size="))),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 }

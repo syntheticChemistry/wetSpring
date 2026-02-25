@@ -19,7 +19,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | BarraCuda CPU (sovereign Rust reference) |
 //! | Baseline date | 2026-02-21 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_substrate_router` |
@@ -113,7 +113,7 @@ fn route_shannon(router: &SubstrateRouter, gpu: Option<&GpuF64>, counts: &[f64])
     let target = router.route(WorkloadClass::BatchParallel, counts.len());
     let t = Instant::now();
     let value = match target {
-        Substrate::Gpu => diversity_gpu::shannon_gpu(gpu.unwrap(), counts)
+        Substrate::Gpu => diversity_gpu::shannon_gpu(gpu.expect("GPU when Gpu substrate"), counts)
             .unwrap_or_else(|_| diversity::shannon(counts)),
         Substrate::Cpu | Substrate::Npu => diversity::shannon(counts),
     };
@@ -128,7 +128,7 @@ fn route_simpson(router: &SubstrateRouter, gpu: Option<&GpuF64>, counts: &[f64])
     let target = router.route(WorkloadClass::BatchParallel, counts.len());
     let t = Instant::now();
     let value = match target {
-        Substrate::Gpu => diversity_gpu::simpson_gpu(gpu.unwrap(), counts)
+        Substrate::Gpu => diversity_gpu::simpson_gpu(gpu.expect("GPU when Gpu substrate"), counts)
             .unwrap_or_else(|_| diversity::simpson(counts)),
         Substrate::Cpu | Substrate::Npu => diversity::simpson(counts),
     };
@@ -148,8 +148,10 @@ fn route_bray_curtis(
     let target = router.route(WorkloadClass::BatchParallel, total_elements);
     let t = Instant::now();
     let value = match target {
-        Substrate::Gpu => diversity_gpu::bray_curtis_condensed_gpu(gpu.unwrap(), samples)
-            .unwrap_or_else(|_| diversity::bray_curtis_condensed(samples)),
+        Substrate::Gpu => {
+            diversity_gpu::bray_curtis_condensed_gpu(gpu.expect("GPU when Gpu substrate"), samples)
+                .unwrap_or_else(|_| diversity::bray_curtis_condensed(samples))
+        }
         Substrate::Cpu | Substrate::Npu => diversity::bray_curtis_condensed(samples),
     };
     (value, target, t.elapsed().as_micros() as f64)
@@ -190,7 +192,7 @@ async fn main() {
         "Small batch (32) → CPU",
         f64::from(u8::from(small_route == Substrate::Cpu)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let big_route = router.route(WorkloadClass::BatchParallel, 256);
@@ -203,7 +205,7 @@ async fn main() {
         "Large batch (256) → GPU (or CPU if no GPU)",
         f64::from(u8::from(big_route == expected_big)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let infer_route = router.route(WorkloadClass::Inference, 1);
@@ -216,7 +218,7 @@ async fn main() {
         "Inference → NPU (or CPU fallback)",
         f64::from(u8::from(infer_route == expected_infer)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let seq_route = router.route(WorkloadClass::Sequential, 1000);
@@ -224,7 +226,7 @@ async fn main() {
         "Sequential always → CPU",
         f64::from(u8::from(seq_route == Substrate::Cpu)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // ═══════════════════════════════════════════════════════════════════
@@ -243,7 +245,7 @@ async fn main() {
         "Small: routed to CPU",
         f64::from(u8::from(r_shannon.substrate == Substrate::Cpu)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Small: Shannon parity",
@@ -284,7 +286,7 @@ async fn main() {
         "Large: routed to GPU (or CPU fallback)",
         f64::from(u8::from(r_shannon_lg.substrate == expected_substrate)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Large: Shannon parity (GPU == CPU)",
@@ -324,9 +326,14 @@ async fn main() {
         "Bray-Curtis: correct routing",
         f64::from(u8::from(bray_substrate == expected_substrate)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
-    v.check("Bray-Curtis: len = 15", routed_bray.len() as f64, 15.0, 0.0);
+    v.check(
+        "Bray-Curtis: len = 15",
+        routed_bray.len() as f64,
+        15.0,
+        tolerances::EXACT,
+    );
     v.check(
         "Bray-Curtis[0] parity",
         routed_bray[0],
@@ -341,7 +348,7 @@ async fn main() {
                 .all(|d| d.is_finite() && *d >= 0.0 && *d <= 1.0 + 1e-10),
         )),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     println!(
@@ -365,7 +372,7 @@ async fn main() {
         "Mixed: diversity via GPU",
         f64::from(u8::from(diversity_result.substrate == expected_substrate)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Mixed: classification → NPU/CPU",
@@ -373,7 +380,7 @@ async fn main() {
             classify_route == Substrate::Npu || classify_route == Substrate::Cpu,
         )),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Mixed: diversity result valid",
@@ -381,7 +388,7 @@ async fn main() {
             diversity_result.value > 0.0 && diversity_result.value.is_finite(),
         )),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     println!(
@@ -400,7 +407,7 @@ async fn main() {
         "No-GPU: large batch falls back to CPU",
         f64::from(u8::from(fallback_route == Substrate::Cpu)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let fallback_shannon = route_shannon(&no_gpu_router, None, &large_counts);
@@ -437,7 +444,7 @@ async fn main() {
         "PCIe: at least one GPU detected",
         f64::from(u8::from(pci_gpus_found.iter().any(|&f| f) || gpu_available)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // ═══════════════════════════════════════════════════════════════════

@@ -486,15 +486,15 @@ fn main() {
     let dense_3d = results
         .iter()
         .find(|(g, _, _, _, _)| *g == "3D_dense")
-        .unwrap();
+        .expect("known geometry 3D_dense");
     let dilute_3d = results
         .iter()
         .find(|(g, _, _, _, _)| *g == "3D_dilute")
-        .unwrap();
+        .expect("known geometry 3D_dilute");
     let mat_2d = results
         .iter()
         .find(|(g, _, _, _, _)| *g == "2D_mat")
-        .unwrap();
+        .expect("known geometry 2D_mat");
 
     println!("  Anderson predictions vs observed QS gene prevalence:");
     println!();

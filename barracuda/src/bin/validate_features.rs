@@ -40,6 +40,7 @@ use wetspring_barracuda::bio::eic;
 use wetspring_barracuda::bio::feature_table::{self, FeatureParams};
 use wetspring_barracuda::bio::signal::PeakParams;
 use wetspring_barracuda::io::mzml;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 #[allow(clippy::too_many_lines)] // sequential feature validation: parse → tracks → EIC → features → asari cross-reference
@@ -112,7 +113,7 @@ fn main() {
         "Mass tracks >= 500 (lower bound, asari finds thousands)",
         f64::from(u8::from(mass_tracks.len() >= 500)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     v.section("Feature extraction (single file)");
@@ -142,13 +143,13 @@ fn main() {
         "Features >= 100 (asari finds ~6k from 8 files; single file yields fewer)",
         f64::from(u8::from(table.features.len() >= 100)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Mass tracks evaluated >= 100",
         f64::from(u8::from(table.mass_tracks_evaluated >= 100)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     if !table.features.is_empty() {
@@ -181,13 +182,13 @@ fn main() {
             "m/z min < 150 (asari low end is ~83)",
             f64::from(u8::from(mz_min < 150.0)),
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
         v.check(
             "m/z max > 800 (asari high end is ~999)",
             f64::from(u8::from(mz_max > 800.0)),
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
     }
 

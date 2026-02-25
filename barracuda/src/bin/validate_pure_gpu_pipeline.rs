@@ -22,7 +22,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | BarraCuda CPU (sovereign Rust reference) |
 //! | Baseline date | 2026-02-21 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_pure_gpu_pipeline` |
@@ -138,7 +138,7 @@ async fn main() {
     let t1 = Instant::now();
     let mut gpu_alpha: Vec<diversity::AlphaDiversity> = Vec::with_capacity(N_SAMPLES);
     for community in &communities {
-        let alpha = diversity_gpu::alpha_diversity_gpu(&gpu, community).unwrap();
+        let alpha = diversity_gpu::alpha_diversity_gpu(&gpu, community).expect("GPU pipeline");
         gpu_alpha.push(alpha);
     }
     let stage1_us = t1.elapsed().as_micros() as f64;
@@ -168,7 +168,7 @@ async fn main() {
             |(g, c)| (g.observed - c.observed).abs() < tolerances::GPU_VS_CPU_F64,
         ))),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     println!("  Stage 1: {stage1_us:.0} µs ({N_SAMPLES} samples × 5 metrics)");
@@ -179,7 +179,8 @@ async fn main() {
     v.section("Stage 2: Beta Diversity (GPU BrayCurtis)");
 
     let t2 = Instant::now();
-    let gpu_bray = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).unwrap();
+    let gpu_bray =
+        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).expect("GPU pipeline");
     let stage2_us = t2.elapsed().as_micros() as f64;
 
     let cpu_bray = diversity::bray_curtis_condensed(&communities);
@@ -189,7 +190,7 @@ async fn main() {
         "Bray-Curtis: correct pair count",
         gpu_bray.len() as f64,
         n_pairs as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     let bray_max_diff = gpu_bray
@@ -201,7 +202,7 @@ async fn main() {
         "Bray-Curtis: max diff within tolerance",
         f64::from(u8::from(bray_max_diff < tolerances::GPU_VS_CPU_BRAY_CURTIS)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Bray-Curtis: all in [0,1]",
@@ -209,7 +210,7 @@ async fn main() {
             gpu_bray.iter().all(|d| *d >= 0.0 && *d <= 1.0 + 1e-10),
         )),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     println!("  Stage 2: {stage2_us:.0} µs ({n_pairs} pairs)");
@@ -220,22 +221,22 @@ async fn main() {
     v.section("Stage 3: PCoA Ordination (GPU Eigh)");
 
     let t3 = Instant::now();
-    let gpu_pcoa = pcoa_gpu::pcoa_gpu(&gpu, &gpu_bray, N_SAMPLES, N_AXES).unwrap();
+    let gpu_pcoa = pcoa_gpu::pcoa_gpu(&gpu, &gpu_bray, N_SAMPLES, N_AXES).expect("GPU pipeline");
     let stage3_us = t3.elapsed().as_micros() as f64;
 
-    let cpu_pcoa = pcoa::pcoa(&cpu_bray, N_SAMPLES, N_AXES).unwrap();
+    let cpu_pcoa = pcoa::pcoa(&cpu_bray, N_SAMPLES, N_AXES).expect("GPU pipeline");
 
     v.check(
         "PCoA: correct n_axes",
         gpu_pcoa.eigenvalues.len() as f64,
         N_AXES as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "PCoA: correct n_samples",
         gpu_pcoa.n_samples as f64,
         N_SAMPLES as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     let eig_match = gpu_pcoa
@@ -247,7 +248,7 @@ async fn main() {
         "PCoA: eigenvalues match CPU",
         f64::from(u8::from(eig_match)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let prop_sum: f64 = gpu_pcoa.proportion_explained.iter().sum();
@@ -255,7 +256,7 @@ async fn main() {
         "PCoA: proportion explained ≤ 1.0",
         f64::from(u8::from(prop_sum <= 1.0 + 1e-6)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     println!("  Stage 3: {stage3_us:.0} µs (PCoA {N_SAMPLES}×{N_AXES}, prop_var={prop_sum:.3})");
@@ -273,9 +274,9 @@ async fn main() {
         .collect();
 
     let t4 = Instant::now();
-    let gpu_var_pc1 = stats_gpu::variance_gpu(&gpu, &pc1).unwrap();
-    let gpu_var_pc2 = stats_gpu::variance_gpu(&gpu, &pc2).unwrap();
-    let gpu_corr = stats_gpu::correlation_gpu(&gpu, &pc1, &pc2).unwrap();
+    let gpu_var_pc1 = stats_gpu::variance_gpu(&gpu, &pc1).expect("GPU pipeline");
+    let gpu_var_pc2 = stats_gpu::variance_gpu(&gpu, &pc2).expect("GPU pipeline");
+    let gpu_corr = stats_gpu::correlation_gpu(&gpu, &pc1, &pc2).expect("GPU pipeline");
     let stage4_us = t4.elapsed().as_micros() as f64;
 
     let cpu_var_pc1 = variance_cpu(&pc1);
@@ -309,7 +310,7 @@ async fn main() {
     v.section("Stage 5: Spectral Cosine (GPU GEMM)");
 
     let t5 = Instant::now();
-    let gpu_cosine = spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).unwrap();
+    let gpu_cosine = spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).expect("GPU pipeline");
     let stage5_us = t5.elapsed().as_micros() as f64;
 
     let cpu_cosine = pairwise_cosine_cpu(&spectra);
@@ -319,7 +320,7 @@ async fn main() {
         "Cosine: correct pair count",
         gpu_cosine.len() as f64,
         cos_pairs as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     let cos_max_diff = gpu_cosine
@@ -331,7 +332,7 @@ async fn main() {
         "Cosine: max diff within tolerance",
         f64::from(u8::from(cos_max_diff < tolerances::SPECTRAL_COSINE)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Cosine: all in [0,1]",
@@ -341,7 +342,7 @@ async fn main() {
                 .all(|s| s.is_finite() && *s >= 0.0 && *s <= 1.0 + 1e-10),
         )),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     println!("  Stage 5: {stage5_us:.0} µs ({cos_pairs} spectral pairs)");
@@ -353,7 +354,12 @@ async fn main() {
     let stage_sum = stage1_us + stage2_us + stage3_us + stage4_us + stage5_us;
 
     v.section("Pipeline Summary");
-    v.check("Pipeline completes without error", 1.0, 1.0, 0.0);
+    v.check(
+        "Pipeline completes without error",
+        1.0,
+        1.0,
+        tolerances::EXACT,
+    );
 
     println!();
     println!("┌───────────────────────────────────────────────────────┐");

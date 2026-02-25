@@ -36,6 +36,7 @@ use wetspring_barracuda::bio::multi_signal_gpu::{MultiSignalGpu, MultiSignalOdeC
 use wetspring_barracuda::bio::phage_defense::PhageDefenseParams;
 use wetspring_barracuda::bio::phage_defense_gpu::{PhageDefenseGpu, PhageDefenseOdeConfig};
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn bench<F: FnOnce() -> R, R>(label: &str, f: F) -> (R, f64) {
@@ -68,7 +69,7 @@ fn main() {
 
     // Bistable
     let (bistable_gpu_result, bistable_ms) = bench("Bistable GPU (128 batches)", || {
-        let gpu_ode = BistableGpu::new(Arc::clone(&device)).unwrap();
+        let gpu_ode = BistableGpu::new(Arc::clone(&device)).expect("BistableGpu init");
         let params: Vec<BistableParams> = (0..nb)
             .map(|i| BistableParams {
                 alpha_fb: 2.0 + (i as f64) * 0.01,
@@ -78,7 +79,7 @@ fn main() {
         let initial: Vec<[f64; BIST_VARS]> = vec![[0.01, 0.0, 0.0, 0.0, 0.5]; nb];
         gpu_ode
             .integrate_params(&params, &initial, 500, 0.01)
-            .unwrap()
+            .expect("Bistable integrate")
     });
     let bistable_finite = bistable_gpu_result
         .iter()
@@ -87,7 +88,7 @@ fn main() {
 
     // Cooperation
     let (coop_gpu_result, coop_ms) = bench("Cooperation GPU (128 batches)", || {
-        let gpu_ode = CooperationGpu::new(Arc::clone(&device)).unwrap();
+        let gpu_ode = CooperationGpu::new(Arc::clone(&device)).expect("CooperationGpu init");
         let flat_y0: Vec<f64> = (0..nb)
             .flat_map(|_| [0.01, 0.0, 0.0, 0.0].iter().copied())
             .collect();
@@ -106,14 +107,16 @@ fn main() {
             clamp_max: 1e6,
             clamp_min: 0.0,
         };
-        gpu_ode.integrate(&config, &flat_y0, &flat_p).unwrap()
+        gpu_ode
+            .integrate(&config, &flat_y0, &flat_p)
+            .expect("Cooperation integrate")
     });
     let coop_finite = coop_gpu_result.iter().all(|x| x.is_finite());
     v.check_pass("Cooperation: all 128 batches finite", coop_finite);
 
     // PhageDefense (4 state vars: B_u, B_d, P, R)
     let (phage_gpu_result, phage_ms) = bench("PhageDefense GPU (128 batches)", || {
-        let gpu_ode = PhageDefenseGpu::new(Arc::clone(&device)).unwrap();
+        let gpu_ode = PhageDefenseGpu::new(Arc::clone(&device)).expect("PhageDefenseGpu init");
         let flat_y0: Vec<f64> = (0..nb)
             .flat_map(|_| [1.0, 0.001, 0.01, 10.0].iter().copied())
             .collect();
@@ -135,7 +138,9 @@ fn main() {
             clamp_max: 1e8,
             clamp_min: 0.0,
         };
-        gpu_ode.integrate(&config, &flat_y0, &flat_p).unwrap()
+        gpu_ode
+            .integrate(&config, &flat_y0, &flat_p)
+            .expect("PhageDefense integrate")
     });
     let phage_finite = phage_gpu_result.iter().all(|x| x.is_finite());
     v.check_pass("PhageDefense: all 128 batches finite", phage_finite);
@@ -143,7 +148,7 @@ fn main() {
     // Capacitor (6 vars: N, cdG, VpsR, VpsR*, Bio, Eps)
     let (cap_gpu_result, cap_ms) = bench("Capacitor GPU (128 batches)", || {
         use wetspring_barracuda::bio::capacitor::{CapacitorParams, N_VARS as CAP_V};
-        let gpu_ode = CapacitorGpu::new(Arc::clone(&device)).unwrap();
+        let gpu_ode = CapacitorGpu::new(Arc::clone(&device)).expect("CapacitorGpu init");
         let flat_y0: Vec<f64> = (0..nb)
             .flat_map(|_| {
                 let mut y = [0.0f64; CAP_V];
@@ -166,7 +171,9 @@ fn main() {
             clamp_max: 1e6,
             clamp_min: 0.0,
         };
-        gpu_ode.integrate(&config, &flat_y0, &flat_p).unwrap()
+        gpu_ode
+            .integrate(&config, &flat_y0, &flat_p)
+            .expect("Capacitor integrate")
     });
     let cap_finite = cap_gpu_result.iter().all(|x| x.is_finite());
     v.check_pass("Capacitor: all 128 batches finite", cap_finite);
@@ -174,7 +181,7 @@ fn main() {
     // MultiSignal (7 vars)
     let (multi_gpu_result, multi_ms) = bench("MultiSignal GPU (128 batches)", || {
         use wetspring_barracuda::bio::multi_signal::{MultiSignalParams, N_VARS as MS_V};
-        let gpu_ode = MultiSignalGpu::new(Arc::clone(&device)).unwrap();
+        let gpu_ode = MultiSignalGpu::new(Arc::clone(&device)).expect("MultiSignalGpu init");
         let flat_y0: Vec<f64> = (0..nb)
             .flat_map(|_| {
                 let mut y = [0.0f64; MS_V];
@@ -197,7 +204,9 @@ fn main() {
             clamp_max: 1e6,
             clamp_min: 0.0,
         };
-        gpu_ode.integrate(&config, &flat_y0, &flat_p).unwrap()
+        gpu_ode
+            .integrate(&config, &flat_y0, &flat_p)
+            .expect("MultiSignal integrate")
     });
     let multi_finite = multi_gpu_result.iter().all(|x| x.is_finite());
     v.check_pass("MultiSignal: all 128 batches finite", multi_finite);
@@ -231,17 +240,22 @@ fn main() {
         .collect();
 
     let (result, first_dispatch_ms) = bench("First dispatch (64×32 × 32×64)", || {
-        gemm.execute(&a, &b, m, k, n, 1).unwrap()
+        gemm.execute(&a, &b, m, k, n, 1).expect("GEMM execute")
     });
     v.check_pass("GEMM result non-empty", !result.is_empty());
     v.check_pass("GEMM result finite", result.iter().all(|x| x.is_finite()));
 
     let expected_00: f64 = (0..k).map(|j| a[j] * b[j * n]).sum();
-    v.check("GEMM C[0,0] matches CPU", result[0], expected_00, 1e-6);
+    v.check(
+        "GEMM C[0,0] matches CPU",
+        result[0],
+        expected_00,
+        tolerances::GPU_VS_CPU_F64,
+    );
 
     let (_, repeat_ms) = bench("Repeat dispatch ×100 (pipeline cached)", || {
         for _ in 0..100 {
-            let _ = gemm.execute(&a, &b, m, k, n, 1).unwrap();
+            let _ = gemm.execute(&a, &b, m, k, n, 1).expect("GEMM execute");
         }
     });
     let per_dispatch = repeat_ms / 100.0;
@@ -267,19 +281,34 @@ fn main() {
     let (erf_result, erf_ms) = bench("erf(1.0) — barracuda::special", || {
         barracuda::special::erf(1.0)
     });
-    v.check("erf(1.0)", erf_result, 0.842_700_792_949_715, 2e-7);
+    v.check(
+        "erf(1.0)",
+        erf_result,
+        0.842_700_792_949_715,
+        tolerances::GPU_LOG_POLYFILL,
+    );
 
     let (lng_result, lng_ms) = bench("ln_gamma(5.0) — barracuda::special", || {
         barracuda::special::ln_gamma(5.0).expect("ln_gamma")
     });
-    v.check("ln_gamma(5.0)", lng_result, 3.178_053_830_347_95, 1e-10);
+    v.check(
+        "ln_gamma(5.0)",
+        lng_result,
+        3.178_053_830_347_95,
+        tolerances::PYTHON_PARITY,
+    );
 
     let (trapz_result, _) = bench("trapz(1000 points) — barracuda::numerical", || {
         let x: Vec<f64> = (0..1000).map(|i| f64::from(i) * 0.001).collect();
         let y: Vec<f64> = x.iter().map(|&xi| xi * xi).collect();
         barracuda::numerical::trapz(&y, &x).expect("trapz")
     });
-    v.check("∫x² dx [0,0.999]", trapz_result, 0.332_334, 0.001);
+    v.check(
+        "∫x² dx [0,0.999]",
+        trapz_result,
+        0.332_334,
+        tolerances::ODE_METHOD_PARITY,
+    );
 
     let (ridge_result, _) = bench("ridge regression (20×5→2) — barracuda::linalg", || {
         let x_data: Vec<f64> = (0..100).map(|i| (i as f64) * 0.01).collect();

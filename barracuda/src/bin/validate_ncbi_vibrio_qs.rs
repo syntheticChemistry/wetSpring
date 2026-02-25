@@ -20,6 +20,7 @@
 //! |--------|-------|
 //! | Date   | 2026-02-23 |
 //! | GPU prims | BatchedOdeRK4F64 via OdeSweepGpu |
+//! | Command | `cargo test --bin validate_ncbi_vibrio_qs -- --nocapture` |
 
 use wetspring_barracuda::bio::ncbi_data::{VibrioAssembly, load_vibrio_assemblies};
 #[cfg(feature = "gpu")]
@@ -178,8 +179,8 @@ fn main() {
 
     #[cfg(feature = "gpu")]
     {
-        let rt = tokio::runtime::Runtime::new().unwrap();
-        let gpu = rt.block_on(GpuF64::new()).unwrap();
+        let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
+        let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
         if !gpu.has_f64 {
             validation::exit_skipped("No SHADER_F64 support");
         }
@@ -195,7 +196,9 @@ fn main() {
         };
         let all_y0: Vec<f64> = (0..n).flat_map(|_| y0.iter().copied()).collect();
         let all_params: Vec<f64> = derived_params.iter().flat_map(params_to_flat_17).collect();
-        let gpu_output = sweeper.integrate(&config, &all_y0, &all_params).unwrap();
+        let gpu_output = sweeper
+            .integrate(&config, &all_y0, &all_params)
+            .expect("ODE integrate");
 
         v.check_count("GPU output size", gpu_output.len(), n * N_VARS);
         let gpu_all_finite = gpu_output.iter().all(|x| x.is_finite());

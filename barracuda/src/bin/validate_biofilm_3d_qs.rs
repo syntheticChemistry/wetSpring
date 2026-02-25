@@ -16,6 +16,7 @@
 //! |-------------|-------|
 //! | Date        | 2026-02-23 |
 //! | GPU prims   | anderson_2d, anderson_3d, lanczos, level_spacing_ratio |
+//! | Command     | `cargo test --bin validate_biofilm_3d_qs -- --nocapture` |
 
 use wetspring_barracuda::validation::Validator;
 
@@ -135,11 +136,21 @@ fn main() {
             let w = 0.5 + j_test * 14.5;
             let r_2d = sweep_2d
                 .iter()
-                .min_by(|(wa, _), (wb, _)| (wa - w).abs().partial_cmp(&(wb - w).abs()).unwrap())
+                .min_by(|(wa, _), (wb, _)| {
+                    (wa - w)
+                        .abs()
+                        .partial_cmp(&(wb - w).abs())
+                        .unwrap_or(std::cmp::Ordering::Equal)
+                })
                 .map_or(0.0, |(_, r)| *r);
             let r_3d = sweep_3d
                 .iter()
-                .min_by(|(wa, _), (wb, _)| (wa - w).abs().partial_cmp(&(wb - w).abs()).unwrap())
+                .min_by(|(wa, _), (wb, _)| {
+                    (wa - w)
+                        .abs()
+                        .partial_cmp(&(wb - w).abs())
+                        .unwrap_or(std::cmp::Ordering::Equal)
+                })
                 .map_or(0.0, |(_, r)| *r);
             let reg_2d = if r_2d > midpoint {
                 "ACTIVE"

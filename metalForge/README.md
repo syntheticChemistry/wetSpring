@@ -50,7 +50,7 @@ metalForge/
 ├── PRIMITIVE_MAP.md       ← Rust module ↔ ToadStool primitive mapping
 ├── ABSORPTION_STRATEGY.md ← Write → Absorb → Lean methodology
 ├── PCIE_TOPOLOGY.md       ← PCIe topology and device mapping
-├── forge/                 ← Rust crate: wetspring-forge v0.2.0 (discovery + dispatch)
+├── forge/                 ← Rust crate: wetspring-forge v0.3.0 (discovery + dispatch)
 │   ├── Cargo.toml
 │   ├── src/
 │   │   ├── lib.rs         ← crate root
@@ -110,7 +110,7 @@ ToadStool's unidirectional pipeline model.
 
 ```bash
 cd metalForge/forge
-cargo test          # 32 tests
+cargo test          # 47 tests
 cargo run --example inventory  # discover + dispatch demo
 ```
 
@@ -158,7 +158,7 @@ affinities. metalForge maps each validated algorithm to its optimal substrate.
 wetSpring follows hotSpring's pattern for ToadStool absorption:
 
 ```
-1. Validate in Rust CPU (barracuda/)          ← DONE: 46 CPU + 42 GPU + 1 WGSL ext, 812 tests, 167 experiments, 3,279+ checks
+1. Validate in Rust CPU (barracuda/)          ← DONE: 46 CPU + 42 GPU + 1 WGSL ext, 806 tests, 167 experiments, 3,279+ checks
 2. Characterize hardware (metalForge/)         ← THIS DIRECTORY
 3. Write Rust in GPU-friendly patterns         ← 27 absorbed (Lean); 1 local WGSL ext; 7 Compose; 3 Passthrough
 4. ToadStool absorbs as shared primitives      ← unidirectional handoff via wateringHole/handoffs/
@@ -197,7 +197,7 @@ from either inform the other's hardware utilization strategy.
 
 ---
 
-## Current Status (Feb 22, 2026)
+## Current Status (Feb 25, 2026)
 
 ### CPU: 31+ Domains Validated (Exp001–102)
 All 31+ algorithmic domains proven correct in pure Rust CPU:
@@ -211,7 +211,7 @@ GPU math portability proven across all 42 GPU modules:
 - **702+/702+ GPU checks** across 22 validation binaries
 - **Absorbed** (Lean): SW, Gillespie, DT, Felsenstein, GEMM, diversity, PCoA, spectral
 - **Absorbed** (Lean, Feb 22): HMM, DADA2, quality, ANI, SNP, dN/dS, pangenome, RF
-- **Local WGSL**: 3 (Lean phase complete — S39-41 absorbed ODE, kmer, unifrac, taxonomy)
+- **Local WGSL**: 1 (diversity_fusion_f64.wgsl — Write phase extension)
 - **Composed**: Bootstrap (15/15), placement (15/15), bifurcation eigenvalues (5/5)
 - **GPU Parity v1** (Exp064): 8 domains consolidated in single binary
 - **metalForge Full** (Exp065): CPU↔GPU substrate-independence for full portfolio
@@ -267,13 +267,13 @@ Delete local shader copy. Use the crate-level re-export
 (e.g., `barracuda::SmithWatermanGpu`). Local extensions that still need work
 remain in wetSpring until absorption.
 
-### Current Status (Feb 22)
+### Current Status (Feb 25)
 
 | Phase | Count | Items |
 |-------|:-----:|-------|
 | **Absorbed** (Lean) | 11 modules | SW, Gillespie, DT, Felsenstein, GEMM, diversity, PCoA, spectral, stats, EIC, rarefaction |
 | **Absorbed** (Lean, Feb 22) | 8 shaders | HMM, DADA2, QF, ANI, SNP, dN/dS, pangenome, RF |
-| **Local WGSL** (Write) | 3 | Lean phase complete (S39-41 absorbed all) |
+| **Local WGSL** (Write) | 1 | diversity_fusion_f64.wgsl (Write phase extension) |
 | **CPU math** (barracuda overlap) | 4 functions | erf, ln_gamma, regularized_gamma, integrate_peak |
 | **Blocked** | 3 modules | kmer (lock-free hash), UniFrac (tree traversal), taxonomy (NPU) |
 

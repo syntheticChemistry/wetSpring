@@ -14,7 +14,7 @@
 //! # Provenance
 //!
 //! | Script  | `validate_cross_spring_s57` |
-//! | Commit  | (current) |
+//! | Commit  | 1f9f80e |
 //! | Command | `cargo run --release --features gpu --bin validate_cross_spring_s57` |
 //! | Hardware| RTX 4070 (Ada, f64 1:2), Titan V (Volta GV100, NVK) |
 //!
@@ -62,6 +62,7 @@ use std::time::Instant;
 use wgpu::util::DeviceExt;
 
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 fn dense_to_csr(matrix: &[f64], n: usize) -> SpectralCsrMatrix {
@@ -135,7 +136,12 @@ async fn main() {
         // Verify: row sums should be zero (L = D - A property)
         for i in 0..n {
             let row_sum: f64 = (0..n).map(|j| laplacian[i * n + j]).sum();
-            v.check(&format!("graph_laplacian row {i} sum"), row_sum, 0.0, 1e-14);
+            v.check(
+                &format!("graph_laplacian row {i} sum"),
+                row_sum,
+                0.0,
+                tolerances::PYTHON_PARITY_TIGHT,
+            );
         }
 
         // Verify: diagonal = degree (row sum of adjacency)
@@ -145,7 +151,7 @@ async fn main() {
                 &format!("graph_laplacian diag[{i}] = degree"),
                 laplacian[i * n + i],
                 degree,
-                1e-14,
+                tolerances::PYTHON_PARITY_TIGHT,
             );
         }
 
@@ -161,7 +167,7 @@ async fn main() {
             "Fiedler value > 0 (connected graph)",
             if fiedler > 0.0 { 1.0 } else { 0.0 },
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
         println!("    Fiedler value: {fiedler:.4} (community connectivity)");
 
@@ -198,18 +204,28 @@ async fn main() {
                 0.0
             },
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
 
         // Uniform spectrum should give max rank
         let uniform: Vec<f64> = vec![1.0; 8];
         let rank_uniform = effective_rank(&uniform);
-        v.check("uniform spectrum: rank = n", rank_uniform, 8.0, 1e-10);
+        v.check(
+            "uniform spectrum: rank = n",
+            rank_uniform,
+            8.0,
+            tolerances::PYTHON_PARITY,
+        );
 
         // Single eigenvalue should give rank 1
         let single: Vec<f64> = vec![5.0, 0.0, 0.0, 0.0];
         let rank_single = effective_rank(&single);
-        v.check("single eigenvalue: rank = 1", rank_single, 1.0, 1e-10);
+        v.check(
+            "single eigenvalue: rank = 1",
+            rank_single,
+            1.0,
+            tolerances::PYTHON_PARITY,
+        );
 
         println!("    Diverse community effective rank: {rank_diverse:.2} / 8");
         println!("    Dominated community effective rank: {rank_dominated:.2} / 8");
@@ -237,10 +253,30 @@ async fn main() {
         let hess_us = t0.elapsed().as_micros() as f64;
 
         // Expected: [[2, 1], [1, 4]] (flat row-major)
-        v.check("Hessian[0,0] = 2", hessian[0], 2.0, 1e-5);
-        v.check("Hessian[0,1] = 1", hessian[1], 1.0, 1e-5);
-        v.check("Hessian[1,0] = 1", hessian[2], 1.0, 1e-5);
-        v.check("Hessian[1,1] = 4", hessian[3], 4.0, 1e-5);
+        v.check(
+            "Hessian[0,0] = 2",
+            hessian[0],
+            2.0,
+            tolerances::PYTHON_PVALUE,
+        );
+        v.check(
+            "Hessian[0,1] = 1",
+            hessian[1],
+            1.0,
+            tolerances::PYTHON_PVALUE,
+        );
+        v.check(
+            "Hessian[1,0] = 1",
+            hessian[2],
+            1.0,
+            tolerances::PYTHON_PVALUE,
+        );
+        v.check(
+            "Hessian[1,1] = 4",
+            hessian[3],
+            4.0,
+            tolerances::PYTHON_PVALUE,
+        );
 
         // Positive definite check (both eigenvalues > 0) → convex loss
         let trace = hessian[0] + hessian[3];
@@ -249,13 +285,13 @@ async fn main() {
             "Hessian PD: trace > 0",
             if trace > 0.0 { 1.0 } else { 0.0 },
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
         v.check(
             "Hessian PD: det > 0",
             if det > 0.0 { 1.0 } else { 0.0 },
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
 
         let sqrt_disc = (trace.mul_add(trace, -4.0 * det)).sqrt();
@@ -316,7 +352,7 @@ async fn main() {
                         &format!("disordered off-diag [{i},{j}] preserved"),
                         weak_disorder[i * n + j],
                         laplacian[i * n + j],
-                        1e-14,
+                        tolerances::PYTHON_PARITY_TIGHT,
                     );
                 }
             }
@@ -330,7 +366,7 @@ async fn main() {
             "disorder centered (mean shift = 0)",
             diag_additions,
             0.0,
-            1e-12,
+            tolerances::ANALYTICAL_F64,
         );
 
         // Compare spectra: strong disorder should shift level spacing toward Poisson
@@ -355,7 +391,7 @@ async fn main() {
                 0.0
             },
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
 
         // effective_rank should decrease with disorder (localization)
@@ -412,7 +448,12 @@ async fn main() {
         // Verify: all distributions sum to 1
         for (k, dist) in distributions.iter().enumerate() {
             let sum: f64 = dist.iter().sum();
-            v.check(&format!("BP layer {k} sums to 1"), sum, 1.0, 1e-14);
+            v.check(
+                &format!("BP layer {k} sums to 1"),
+                sum,
+                1.0,
+                tolerances::PYTHON_PARITY_TIGHT,
+            );
         }
 
         // Verify: 3 layers (input + 2 transitions)
@@ -420,7 +461,7 @@ async fn main() {
             "BP produces 3 distributions",
             distributions.len() as f64,
             3.0,
-            0.0,
+            tolerances::EXACT,
         );
 
         // Verify: coarsening preserves probability mass
@@ -428,7 +469,7 @@ async fn main() {
             "order-level has 2 categories",
             distributions[2].len() as f64,
             2.0,
-            0.0,
+            tolerances::EXACT,
         );
 
         println!(
@@ -495,7 +536,7 @@ async fn main() {
             "MCMC finds loss < initial",
             if best_loss < loss(&initial) { 1.0 } else { 0.0 },
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
         v.check(
             "MCMC acceptance rate reasonable (5-95%)",
@@ -505,13 +546,13 @@ async fn main() {
                 0.0
             },
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
         v.check(
             "MCMC loss trajectory exists",
             if result.losses.len() > 1 { 1.0 } else { 0.0 },
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
 
         println!(
@@ -581,7 +622,7 @@ async fn main() {
             "graph-based disorder shows sub-GOE statistics",
             if r_graph < 0.53 { 1.0 } else { 0.0 },
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
         v.check(
             "both r values are valid (0..1)",
@@ -591,7 +632,7 @@ async fn main() {
                 0.0
             },
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
 
         // neuralSpring S54: effective_rank shows localization
@@ -605,7 +646,7 @@ async fn main() {
                 0.0
             },
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
 
         println!("    Graph-based r={r_graph:.4}, rank={rank_graph:.2}");
@@ -647,7 +688,12 @@ async fn main() {
         });
         hamming.dispatch(&seq_buf, &dist_buf, 2, 4);
         let gpu_dists = readback_f32(&device, &dist_buf, 1);
-        v.check("Hamming GPU smoke", f64::from(gpu_dists[0]), 0.25, 1e-6);
+        v.check(
+            "Hamming GPU smoke",
+            f64::from(gpu_dists[0]),
+            0.25,
+            tolerances::GPU_F32_PARITY,
+        );
 
         // PairwiseJaccard
         let pa: Vec<f32> = vec![1.0, 0.0, 1.0, 1.0];
@@ -664,7 +710,12 @@ async fn main() {
         });
         jaccard.dispatch(&pa_buf, &jdist_buf, 2, 2);
         let j_dists = readback_f32(&device, &jdist_buf, 1);
-        v.check("Jaccard GPU smoke", f64::from(j_dists[0]), 0.5, 1e-5);
+        v.check(
+            "Jaccard GPU smoke",
+            f64::from(j_dists[0]),
+            0.5,
+            tolerances::GPU_F32_PARITY,
+        );
 
         // SpatialPayoff
         let grid: Vec<u32> = vec![1, 0, 0, 1];
@@ -689,7 +740,7 @@ async fn main() {
                 0.0
             },
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
 
         // BatchFitness (use realistic sizes — GPU workgroups need minimum dimensions)
@@ -860,10 +911,10 @@ fn readback_f32(
     let slice = staging.slice(..);
     let (tx, rx) = std::sync::mpsc::channel();
     slice.map_async(wgpu::MapMode::Read, move |result| {
-        tx.send(result).unwrap();
+        tx.send(result).expect("channel send");
     });
     d.poll(wgpu::Maintain::Wait);
-    rx.recv().unwrap().unwrap();
+    rx.recv().expect("channel recv").expect("GPU buffer map");
 
     let data = slice.get_mapped_range();
     let result: Vec<f32> = bytemuck::cast_slice(&data).to_vec();

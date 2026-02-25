@@ -17,7 +17,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | Analytical known-values from papers |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --release --bin validate_barracuda_cpu_v8` |
@@ -99,7 +99,7 @@ fn validate_cooperation(v: &mut Validator) {
         "cooperation flat round-trip",
         bitwise_diff(&flat, &flat2),
         0.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let r = cooperation::scenario_equal_start(&p, DT);
@@ -118,7 +118,7 @@ fn validate_cooperation(v: &mut Validator) {
         "cooperation flat vs direct bitwise",
         (n_coop - n_coop_flat).abs(),
         0.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let bio = steady_state_mean(&r, 3, SS_FRAC);
@@ -145,7 +145,7 @@ fn validate_capacitor(v: &mut Validator) {
         "capacitor flat round-trip",
         bitwise_diff(&flat, &flat2),
         0.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let r = capacitor::scenario_normal(&p, DT);
@@ -168,7 +168,7 @@ fn validate_capacitor(v: &mut Validator) {
         "capacitor flat vs direct bitwise",
         (n - n_flat).abs(),
         0.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     print_timing("capacitor", t0);
@@ -223,7 +223,7 @@ fn validate_gbm(v: &mut Validator) {
         &[2, -1, -1],
         &[0.0, 0.3, -0.1],
     )
-    .unwrap();
+    .expect("Barracuda CPU v8");
     let t2 = GbmTree::from_arrays(
         &[1, -1, -1],
         &[0.3, 0.0, 0.0],
@@ -231,8 +231,8 @@ fn validate_gbm(v: &mut Validator) {
         &[2, -1, -1],
         &[0.0, 0.2, -0.2],
     )
-    .unwrap();
-    let model = GbmClassifier::new(vec![t1, t2], 0.1, 0.0, 2).unwrap();
+    .expect("Barracuda CPU v8");
+    let model = GbmClassifier::new(vec![t1, t2], 0.1, 0.0, 2).expect("Barracuda CPU v8");
 
     let samples = vec![vec![0.8, 0.5], vec![0.2, 0.1], vec![0.6, 0.4]];
     let preds = model.predict_batch_proba(&samples);
@@ -485,7 +485,7 @@ fn validate_neighbor_joining(v: &mut Validator) {
             &format!("NJ dist[{i},{i}] = 0 (diagonal)"),
             dist[i * n + i],
             0.0,
-            0.0,
+            tolerances::EXACT,
         );
     }
 

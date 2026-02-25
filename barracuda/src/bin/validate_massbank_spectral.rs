@@ -122,7 +122,7 @@ fn main() {
     v.section("── Determinism ──");
     let cs1 = cosine_similarity(&pfos_mz, &pfos_int, &pfoa_mz, &pfoa_int, tol).score;
     let cs2 = cosine_similarity(&pfos_mz, &pfos_int, &pfoa_mz, &pfoa_int, tol).score;
-    v.check("cosine deterministic", cs1, cs2, 0.0);
+    v.check("cosine deterministic", cs1, cs2, tolerances::EXACT);
 
     v.finish();
 }

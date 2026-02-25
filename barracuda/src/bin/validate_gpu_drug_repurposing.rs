@@ -18,7 +18,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | CPU NMF + TransE as reference |
 //! | Baseline date | 2026-02-25 |
 //! | Exact command | `cargo run --features gpu --release --bin validate_gpu_drug_repurposing` |
@@ -273,7 +273,12 @@ fn validate_gpu_transe(
     println!("  Max CPU↔GPU diff: {max_diff:.2e}");
     println!("  CPU: {cpu_us:.0}µs, GPU: {gpu_us:.0}µs");
 
-    v.check("TransE GPU vs CPU", max_diff, 0.0, 1e-10);
+    v.check(
+        "TransE GPU vs CPU",
+        max_diff,
+        0.0,
+        tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+    );
     v.check_pass("all triples scored", gpu_scores.len() == triples.len());
 
     timings.push(("TransE scoring", cpu_us, gpu_us));

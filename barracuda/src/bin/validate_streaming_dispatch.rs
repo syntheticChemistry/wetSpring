@@ -16,7 +16,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | `BarraCuda` CPU reference |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --release --bin validate_streaming_dispatch` |
@@ -25,6 +25,7 @@
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, kmer, taxonomy, unifrac};
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn main() {
@@ -60,7 +61,7 @@ fn validate_roundtrip_pattern(v: &mut Validator) {
         "RT stage 1: 4 histograms",
         stage1_histograms.len() as f64,
         4.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let stage2_vecs: Vec<Vec<f64>> = stage1_histograms
@@ -78,7 +79,7 @@ fn validate_roundtrip_pattern(v: &mut Validator) {
         "RT stage 3: Bray-Curtis condensed size",
         stage3_bc.len() as f64,
         6.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     print_timing("round-trip pattern", t0);
@@ -105,12 +106,22 @@ fn validate_streaming_pattern(v: &mut Validator) {
     let shannon: Vec<f64> = float_vecs.iter().map(|s| diversity::shannon(s)).collect();
     let bc = diversity::bray_curtis_condensed(&float_vecs);
 
-    v.check("stream: histogram count", histograms.len() as f64, 4.0, 0.0);
+    v.check(
+        "stream: histogram count",
+        histograms.len() as f64,
+        4.0,
+        tolerances::EXACT,
+    );
     v.check_pass(
         "stream: all Shannon finite",
         shannon.iter().all(|s| s.is_finite()),
     );
-    v.check("stream: BC condensed size", bc.len() as f64, 6.0, 0.0);
+    v.check(
+        "stream: BC condensed size",
+        bc.len() as f64,
+        6.0,
+        tolerances::EXACT,
+    );
 
     print_timing("streaming pattern", t0);
 }
@@ -162,13 +173,13 @@ fn validate_three_stage_chain(v: &mut Validator) {
             &format!("3-stage sample {i}: Shannon RT ↔ stream"),
             st_shannon[i],
             rt_shannon[i],
-            0.0,
+            tolerances::EXACT,
         );
         v.check(
             &format!("3-stage sample {i}: taxonomy RT ↔ stream"),
             st_taxon[i] as f64,
             rt_taxon[i] as f64,
-            0.0,
+            tolerances::EXACT,
         );
     }
 
@@ -224,14 +235,14 @@ fn validate_five_stage_chain(v: &mut Validator) {
         "5-stage: BC condensed count",
         bc_condensed.len() as f64,
         6.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check_pass("5-stage: 4 taxonomy indices", taxon_indices.len() == 4);
     v.check(
         "5-stage: UniFrac flat ↔ original",
         uw_flat,
         uw_original,
-        1e-12,
+        tolerances::ANALYTICAL_F64,
     );
 
     let int8_indices: Vec<usize> = sequences
@@ -243,7 +254,7 @@ fn validate_five_stage_chain(v: &mut Validator) {
             &format!("5-stage sample {i}: f64 ↔ int8 parity"),
             int8_indices[i] as f64,
             taxon_indices[i] as f64,
-            0.0,
+            tolerances::EXACT,
         );
     }
 

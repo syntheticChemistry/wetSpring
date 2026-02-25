@@ -61,6 +61,23 @@ jobs:
       - run: cargo check --features json
         working-directory: barracuda
 
+  coverage:
+    name: Coverage (90% gate)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: barracuda
+      - uses: taiki-e/install-action@cargo-llvm-cov
+      - name: Run coverage and enforce 90% threshold
+        working-directory: barracuda
+        run: |
+          cargo llvm-cov --lib --fail-under-lines 90
+
   doc:
     name: Documentation
     runs-on: ubuntu-latest
@@ -72,3 +89,29 @@ jobs:
           workspaces: barracuda
       - run: cargo doc --no-deps
         working-directory: barracuda
+
+  forge-clippy:
+    name: metalForge Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: metalForge/forge
+      - run: cargo clippy --all-targets -- -D clippy::pedantic -D clippy::nursery
+        working-directory: metalForge/forge
+
+  forge-test:
+    name: metalForge Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: metalForge/forge
+      - run: cargo test --verbose
+        working-directory: metalForge/forge

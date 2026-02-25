@@ -10,7 +10,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | `scipy`, `numpy`, dendropy, `sklearn` (per-domain Python scripts) |
 //! | Baseline date | 2026-02-21 |
 //! | Exact command | `cargo run --release --bin validate_barracuda_cpu_full` |
@@ -62,7 +62,7 @@ fn main() {
         "Bistable: hysteresis detected",
         f64::from(u8::from(br.hysteresis_width > 1.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("D01: ODE Integration", ode_us));
 
@@ -91,7 +91,7 @@ fn main() {
         "SSA: mean final > 50 (birth > death)",
         f64::from(u8::from(mean_final > 50.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("D02: Gillespie SSA (100 reps)", ssa_us));
 
@@ -126,7 +126,7 @@ fn main() {
         "Viterbi LL ≤ forward LL",
         f64::from(u8::from(vit.log_probability <= fwd.log_likelihood)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("D03: HMM (5 obs)", hmm_us));
 
@@ -140,7 +140,12 @@ fn main() {
         &params,
     );
     let sw_us = t0.elapsed().as_micros() as f64;
-    v.check("SW 16S (40bp): score = 74", f64::from(r.score), 74.0, 0.0);
+    v.check(
+        "SW 16S (40bp): score = 74",
+        f64::from(r.score),
+        74.0,
+        tolerances::EXACT,
+    );
     timings.push(("D04: Smith-Waterman (40bp)", sw_us));
 
     // ═══ D05: Felsenstein Pruning ═════════════════════════════════
@@ -210,7 +215,7 @@ fn main() {
         "Peaks found > 0",
         f64::from(u8::from(!peaks.is_empty())),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("D07: Peak detection (100 pts)", sig_us));
 
@@ -226,7 +231,7 @@ fn main() {
         "Cooperation: freq ∈ (0,1)",
         f64::from(u8::from(final_freq > 0.0 && final_freq < 1.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("D08: Cooperation ODE (100h)", coop_us));
 
@@ -237,7 +242,7 @@ fn main() {
     let t0 = Instant::now();
     let rf = robinson_foulds::rf_distance(&tree_a, &tree_b);
     let rf_us = t0.elapsed().as_micros() as f64;
-    v.check("RF distance (4 taxa)", rf as f64, 2.0, 0.0);
+    v.check("RF distance (4 taxa)", rf as f64, 2.0, tolerances::EXACT);
     timings.push(("D09: Robinson-Foulds (4 taxa)", rf_us));
 
     // ═══ D10: Multi-Signal QS ═════════════════════════════════════
@@ -250,7 +255,7 @@ fn main() {
         "MS-QS: trajectory has steps",
         f64::from(u8::from(wt.steps > 100)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("D10: Multi-signal QS (48h)", ms_us));
 
@@ -264,7 +269,7 @@ fn main() {
         "Phage: attack > 100 steps",
         f64::from(u8::from(attack.steps > 100)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("D11: Phage defense (48h)", pd_us));
 
@@ -289,12 +294,17 @@ fn main() {
     let t0 = Instant::now();
     let lls = bootstrap::bootstrap_likelihoods(&tree_bs, &alignment_bs, 100, 1.0, 42);
     let bs_us = t0.elapsed().as_micros() as f64;
-    v.check("Bootstrap: 100 replicates", lls.len() as f64, 100.0, 0.0);
+    v.check(
+        "Bootstrap: 100 replicates",
+        lls.len() as f64,
+        100.0,
+        tolerances::EXACT,
+    );
     v.check(
         "Bootstrap: mean LL < 0",
         f64::from(u8::from(lls.iter().sum::<f64>() / 100.0 < 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("D12: Bootstrap (100 reps, 8bp)", bs_us));
 
@@ -327,13 +337,13 @@ fn main() {
         "Placement: found edges",
         f64::from(u8::from(!scan.placements.is_empty())),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Placement: best LL < 0",
         f64::from(u8::from(scan.best_ll < 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("D13: Placement (3 taxa, 12bp)", place_us));
 
@@ -352,8 +362,18 @@ fn main() {
     let pred_low = dt.predict(&[3.0, 0.0, 0.0]);
     let pred_high = dt.predict(&[7.0, 0.0, 0.0]);
     let dt_us = t0.elapsed().as_micros() as f64;
-    v.check("DT: predict(3) = 0 (< 5)", pred_low as f64, 0.0, 0.0);
-    v.check("DT: predict(7) = 1 (≥ 5)", pred_high as f64, 1.0, 0.0);
+    v.check(
+        "DT: predict(3) = 0 (< 5)",
+        pred_low as f64,
+        0.0,
+        tolerances::EXACT,
+    );
+    v.check(
+        "DT: predict(7) = 1 (≥ 5)",
+        pred_high as f64,
+        1.0,
+        tolerances::EXACT,
+    );
     timings.push(("D14: Decision tree", dt_us));
 
     // ═══ D15: Spectral Matching ═══════════════════════════════════
@@ -396,7 +416,7 @@ fn main() {
         "Chao1 ≥ observed",
         f64::from(u8::from(chao1 >= 4.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     let _ = (bc, ed_us);
     timings.push(("D16: Extended diversity", ed_us));
@@ -411,7 +431,7 @@ fn main() {
         "Kmer: total = n-k+1",
         kc.total_count() as f64,
         (seq.len() - 4 + 1) as f64,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("D17: Kmer counting (16bp, k=4)", kmer_us));
 
@@ -438,13 +458,13 @@ fn main() {
         "Pipeline: BC ∈ (0,1)",
         f64::from(u8::from(pipeline_bc > 0.0 && pipeline_bc < 1.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Pipeline: spectral > 0.99",
         f64::from(u8::from(pipeline_spec.score > 0.99)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("D18: Integrated pipeline", pipe_us));
 
@@ -485,13 +505,13 @@ fn main() {
         "SNP: identical → 0 variants",
         no_snps.variants.len() as f64,
         0.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "SNP: single variant at pos 3",
         one_snp.variants[0].position as f64,
         3.0,
-        0.0,
+        tolerances::EXACT,
     );
     let freq_result = snp::call_snps(&[b"A" as &[u8], b"A", b"A", b"T"]);
     v.check(
@@ -505,8 +525,8 @@ fn main() {
     // ═══ D21: dN/dS ═══════════════════════════════════════════════
     v.section("D21: dN/dS (Nei & Gojobori 1986)");
     let t0 = Instant::now();
-    let identical_dnds = dnds::pairwise_dnds(b"ATGATGATG", b"ATGATGATG").unwrap();
-    let syn_result = dnds::pairwise_dnds(b"TTTGCTAAA", b"TTCGCTAAA").unwrap();
+    let identical_dnds = dnds::pairwise_dnds(b"ATGATGATG", b"ATGATGATG").expect("dN/dS identical");
+    let syn_result = dnds::pairwise_dnds(b"TTTGCTAAA", b"TTCGCTAAA").expect("dN/dS synonymous");
     let dnds_us = t0.elapsed().as_micros() as f64;
     v.check(
         "dN/dS: identical → dN=0",
@@ -524,7 +544,7 @@ fn main() {
         "dN/dS: syn-only → dS > 0",
         f64::from(u8::from(syn_result.ds > 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "dN/dS: syn-only → dN = 0",
@@ -539,7 +559,8 @@ fn main() {
     let branch_lengths = vec![0.0, 0.1, 0.2, 0.05, 0.05, 0.15, 0.15];
     let parents = vec![None, Some(0), Some(0), Some(1), Some(1), Some(2), Some(2)];
     let t0 = Instant::now();
-    let clock = molecular_clock::strict_clock(&branch_lengths, &parents, 3500.0, &[]).unwrap();
+    let clock = molecular_clock::strict_clock(&branch_lengths, &parents, 3500.0, &[])
+        .expect("strict clock");
     let relaxed = molecular_clock::relaxed_clock_rates(&branch_lengths, &clock.node_ages, &parents);
     let positive_rates: Vec<f64> = relaxed.iter().copied().filter(|&r| r > 0.0).collect();
     let cv = molecular_clock::rate_variation_cv(&positive_rates);
@@ -548,7 +569,7 @@ fn main() {
         "Clock: rate > 0",
         f64::from(u8::from(clock.rate > 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Clock: root age = 3500 Ma",
@@ -599,10 +620,30 @@ fn main() {
     let t0 = Instant::now();
     let pan = pangenome::analyze(&clusters, 5);
     let pan_us = t0.elapsed().as_micros() as f64;
-    v.check("Pan: core = 3", pan.core_size as f64, 3.0, 0.0);
-    v.check("Pan: accessory = 2", pan.accessory_size as f64, 2.0, 0.0);
-    v.check("Pan: unique = 2", pan.unique_size as f64, 2.0, 0.0);
-    v.check("Pan: total = 7", pan.total_size as f64, 7.0, 0.0);
+    v.check(
+        "Pan: core = 3",
+        pan.core_size as f64,
+        3.0,
+        tolerances::EXACT,
+    );
+    v.check(
+        "Pan: accessory = 2",
+        pan.accessory_size as f64,
+        2.0,
+        tolerances::EXACT,
+    );
+    v.check(
+        "Pan: unique = 2",
+        pan.unique_size as f64,
+        2.0,
+        tolerances::EXACT,
+    );
+    v.check(
+        "Pan: total = 7",
+        pan.total_size as f64,
+        7.0,
+        tolerances::EXACT,
+    );
     timings.push(("D23: Pangenome (classify)", pan_us));
 
     // ═══ D24: Random Forest ═══════════════════════════════════════
@@ -638,9 +679,14 @@ fn main() {
         "RF: predict(3,2) = 1 (tie → higher class)",
         pred as f64,
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
-    v.check("RF: batch len = 3", batch_preds.len() as f64, 3.0, 0.0);
+    v.check(
+        "RF: batch len = 3",
+        batch_preds.len() as f64,
+        3.0,
+        tolerances::EXACT,
+    );
     timings.push(("D24: Random Forest", rf_us));
 
     // ═══ D25: GBM ═════════════════════════════════════════════════
@@ -660,7 +706,7 @@ fn main() {
     v.check(
         "GBM: raw score for x<5 = base + lr*(-0.3)",
         pred_gbm.raw_score,
-        0.1_f64.mul_add(-0.3, 0.0),
+        0.1_f64.mul_add(-0.3, tolerances::EXACT),
         tolerances::EXACT_F64,
     );
     v.check(
@@ -669,7 +715,7 @@ fn main() {
             pred_gbm.probability > 0.0 && pred_gbm.probability < 1.0,
         )),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("D25: GBM", gbm_us));
 

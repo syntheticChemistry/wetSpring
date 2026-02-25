@@ -124,7 +124,7 @@ fn main() {
         "Forward sweep stays in low-B attractor",
         f64::from(u8::from(fwd_stays_low)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let bwd_has_high = bif.b_backward.iter().any(|&b| b > 0.5);
@@ -132,7 +132,7 @@ fn main() {
         "Backward sweep visits high-B attractor",
         f64::from(u8::from(bwd_has_high)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // ── Determinism ─────────────────────────────────────────────────
@@ -146,7 +146,12 @@ fn main() {
         .zip(&r2.y_final)
         .map(|(a, b)| (a - b).abs())
         .fold(0.0_f64, f64::max);
-    v.check("Deterministic: rerun bitwise identical", max_diff, 0.0, 0.0);
+    v.check(
+        "Deterministic: rerun bitwise identical",
+        max_diff,
+        0.0,
+        tolerances::EXACT,
+    );
 
     v.finish();
 }
@@ -161,14 +166,14 @@ fn check_non_negative(
         &format!("{prefix}: all variables non-negative (min={min_val:.2e})"),
         min_val.max(0.0),
         min_val.max(0.0),
-        0.0,
+        tolerances::EXACT,
     );
     if min_val < 0.0 {
         v.check(
             &format!("{prefix}: NEGATIVE VALUE DETECTED: {min_val:.6e}"),
             min_val,
             0.0,
-            0.0,
+            tolerances::EXACT,
         );
     }
 }

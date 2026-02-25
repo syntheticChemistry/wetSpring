@@ -18,7 +18,11 @@
 //! | Item        | Value |
 //! |-------------|-------|
 //! | Date        | 2026-02-23 |
-//! | GPU prims   | anderson_2d, lanczos, level_spacing_ratio |
+//! | GPU prims   | `anderson_2d`, `lanczos`, `level_spacing_ratio` |
+//! | Baseline    | `barracuda::spectral` CPU eigensolvers (inline reference) |
+//! | Physics     | GOE `⟨r⟩ ≈ 0.5307`, Poisson `⟨r⟩ ≈ 0.3863` (Atas et al. PRL 2013) |
+//! | Thresholds  | 0.4/0.45 bracket the GOE↔Poisson crossover; see §S1/S2 |
+//! | Command     | `cargo run --features gpu --bin validate_anderson_2d_qs` |
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::validation::Validator;
@@ -172,13 +176,17 @@ fn main() {
             let r_1d = sweep_1d
                 .iter()
                 .min_by(|(wa, _), (wb, _)| {
-                    ((*wa - w).abs()).partial_cmp(&((*wb - w).abs())).unwrap()
+                    ((*wa - w).abs())
+                        .partial_cmp(&((*wb - w).abs()))
+                        .unwrap_or(std::cmp::Ordering::Equal)
                 })
                 .map_or(0.0, |(_, r)| *r);
             let r_2d = sweep_2d
                 .iter()
                 .min_by(|(wa, _), (wb, _)| {
-                    ((*wa - w).abs()).partial_cmp(&((*wb - w).abs())).unwrap()
+                    ((*wa - w).abs())
+                        .partial_cmp(&((*wb - w).abs()))
+                        .unwrap_or(std::cmp::Ordering::Equal)
                 })
                 .map_or(0.0, |(_, r)| *r);
             let regime_1d = if r_1d > midpoint {

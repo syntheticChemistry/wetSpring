@@ -21,7 +21,12 @@
 //! |-------------|-------|
 //! | Date        | 2026-02-24 |
 //! | Phase       | 39 — Drug repurposing track |
-//! | Paper       | 39 (Fajgenbaum et al. JCI 2019) |
+//! | Paper       | 39 (Fajgenbaum et al. JCI 2019, doi:10.1172/JCI126091) |
+//! | Baseline    | Pathway activation scores from JCI 2019 Fig 3 proteomic |
+//! |             | analysis (PI3K 0.92, JAK/STAT3 0.85, NF-κB 0.78, etc.) |
+//! | Drug targets| DrugBank (open), ChEMBL (open) |
+//! | Command     | `cargo run --bin validate_fajgenbaum_pathway` |
+//! | Tolerances  | Structural only — ranking and pass/fail, no numeric ε |
 
 use wetspring_barracuda::validation::Validator;
 
@@ -138,8 +143,12 @@ fn validate_pathway_identification(v: &mut Validator) {
 
     let top_pathway = PATHWAYS
         .iter()
-        .max_by(|a, b| a.activation_score.partial_cmp(&b.activation_score).unwrap())
-        .unwrap();
+        .max_by(|a, b| {
+            a.activation_score
+                .partial_cmp(&b.activation_score)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        })
+        .expect("PATHWAYS non-empty");
     v.check_pass(
         "PI3K/AKT/mTOR is highest-activation pathway",
         top_pathway.name == "PI3K/AKT/mTOR",
@@ -182,7 +191,7 @@ fn validate_score_matrix(v: &mut Validator) {
             (d, pathway_score)
         })
         .collect();
-    scores.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+    scores.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
 
     println!("\n  {:30} {:>12}", "Drug (ranked)", "Match Score");
     println!("  {:-<30} {:-<12}", "", "");
@@ -201,7 +210,7 @@ fn validate_score_matrix(v: &mut Validator) {
             > scores
                 .iter()
                 .find(|(d, _)| d.generic == "tocilizumab")
-                .unwrap()
+                .expect("known drug tocilizumab")
                 .1,
     );
 }
@@ -218,8 +227,14 @@ fn validate_discovery_logic(v: &mut Validator) {
 
     v.check_pass("PI3K/AKT/mTOR is downstream of IL-6/gp130", true);
     v.check_pass("mTOR pathway score > IL-6 pathway score", {
-        let mtor = PATHWAYS.iter().find(|p| p.name == "PI3K/AKT/mTOR").unwrap();
-        let il6 = PATHWAYS.iter().find(|p| p.name == "IL-6/gp130").unwrap();
+        let mtor = PATHWAYS
+            .iter()
+            .find(|p| p.name == "PI3K/AKT/mTOR")
+            .expect("known pathway PI3K/AKT/mTOR");
+        let il6 = PATHWAYS
+            .iter()
+            .find(|p| p.name == "IL-6/gp130")
+            .expect("known pathway IL-6/gp130");
         mtor.activation_score > il6.activation_score
     });
 

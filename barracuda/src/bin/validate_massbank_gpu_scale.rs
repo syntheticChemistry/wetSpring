@@ -13,6 +13,7 @@
 //! | Data source | Synthetic (mirrors MassBank PFAS spectral distributions) |
 //! | GPU prims   | `GemmF64`, `FusedMapReduceF64` (via `pairwise_cosine_gpu`) |
 //! | Date        | 2026-02-23 |
+//! | Command     | `cargo test --bin validate_massbank_gpu_scale -- --nocapture` |
 
 use std::time::Instant;
 #[cfg(feature = "gpu")]
@@ -127,8 +128,8 @@ fn main() {
 
     #[cfg(feature = "gpu")]
     {
-        let rt = tokio::runtime::Runtime::new().unwrap();
-        let gpu = rt.block_on(GpuF64::new()).unwrap();
+        let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
+        let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
 
         if !gpu.has_f64 {
             validation::exit_skipped("No SHADER_F64 support");
@@ -143,7 +144,8 @@ fn main() {
 
         for (idx, (label, lib)) in gpu_sizes.iter().enumerate() {
             let t0 = Instant::now();
-            let gpu_cosine = spectral_match_gpu::pairwise_cosine_gpu(&gpu, lib).unwrap();
+            let gpu_cosine =
+                spectral_match_gpu::pairwise_cosine_gpu(&gpu, lib).expect("pairwise cosine GPU");
             let gpu_ms = t0.elapsed().as_secs_f64() * 1000.0;
             let n_pairs = gpu_cosine.len();
             println!("  N={label}: {n_pairs} pairs, GPU {gpu_ms:.1} ms");

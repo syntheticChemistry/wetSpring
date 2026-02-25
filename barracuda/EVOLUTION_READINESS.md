@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** February 25, 2026 (ToadStool S62+DF64, barracuda always-on)
+**Date:** February 25, 2026 (V37 revalidation, ToadStool `02207c4a`)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 46 CPU + 42 GPU modules + 1 Write-phase WGSL extension, 44 ToadStool primitives + 2 BGL helpers (barracuda always-on, zero fallback code), 812 tests, 167 experiments, 3,279+ checks, ToadStool S62+DF64 aligned
+**Status:** 46 CPU + 42 GPU modules + 1 Write-phase WGSL extension, 44 ToadStool primitives + 2 BGL helpers (barracuda always-on, zero fallback code), 806 tests (759 barracuda + 47 forge), 95.75% library coverage, 167 experiments, 3,279+ checks, ToadStool S62+DF64 aligned
 
 ### Full Lean + Write Phase
 
@@ -32,10 +32,11 @@ through FP32 cores on consumer GPUs), `ComputeDispatch` builder, BGL helpers, an
 - `compile_shader_f64` directly on `GemmF64::WGSL` (replaces `ShaderTemplate::for_driver_auto`)
 - DF64 GEMM auto-selection blocked by private `wgsl_shader_for_device()` upstream
 
-**Upstream requests** (V35 handoff):
+**Upstream requests** (V37 update):
 1. Make `GemmF64::wgsl_shader_for_device()` public (DF64 auto-selection for cached pipelines)
 2. Fix `PeakDetectF64` WGSL shader (f32 literal → f64 array, line 49)
 3. Consider `ComputeDispatch` with cached-pipeline variant (returns pipeline + BGL for reuse)
+4. Consider `barracuda::math::{dot, l2_norm}` CPU primitives (currently in `wetspring::special`, thin wrappers over slice iterators — candidates for shared extraction)
 
 ### Next Write Phase: Absorption Candidates
 

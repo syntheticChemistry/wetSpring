@@ -26,7 +26,7 @@ Write the shader locally, validate, then hand off.
 
 **File placement:**
 ```
-barracuda/src/shaders/<domain>_<op>_f64.wgsl
+barracuda/src/bio/shaders/<domain>_<op>_f64.wgsl
 ```
 
 **Naming convention:**

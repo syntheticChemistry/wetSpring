@@ -25,7 +25,10 @@
 //! | Date        | 2026-02-24 |
 //! | Phase       | 39 — Drug repurposing track |
 //! | Paper       | 43 (ROBOKOP KG infrastructure) |
+//! | Command     | `cargo test --bin validate_knowledge_graph_embedding -- --nocapture` |
 
+#[cfg(feature = "gpu")]
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 struct LcgRng(u64);
@@ -269,7 +272,7 @@ fn validate_novel_predictions(
             }
         }
     }
-    novel_predictions.sort_by(|a, b| b.2.partial_cmp(&a.2).unwrap());
+    novel_predictions.sort_by(|a, b| b.2.partial_cmp(&a.2).unwrap_or(std::cmp::Ordering::Equal));
 
     println!("\n  Top 5 novel drug-disease predictions:");
     println!("  {:>6} {:>8} {:>10}", "Drug", "Disease", "Score");
@@ -328,7 +331,7 @@ fn validate_gpu_transe(v: &mut Validator, kg: &KgEmbedding, triples: &[(usize, u
         "GPU scores match CPU within f64 tolerance",
         max_diff,
         0.0,
-        1e-10,
+        tolerances::GPU_VS_CPU_TRANSCENDENTAL,
     );
 
     v.check_pass(
@@ -420,7 +423,7 @@ fn main() {
 
     v.check_pass(
         "training loss decreases",
-        losses.last().unwrap() < &losses[0],
+        losses.last().expect("losses non-empty") < &losses[0],
     );
 
     validate_link_prediction(&mut v, &kg, &triples);

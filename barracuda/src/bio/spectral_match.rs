@@ -63,8 +63,8 @@ pub fn cosine_similarity(
 
     // Greedy matching: for each query peak, find closest reference peak
     let mut ref_used = vec![false; ref_mz.len()];
-    let mut query_indices = Vec::new();
-    let mut reference_indices = Vec::new();
+    let mut query_indices = Vec::with_capacity(query_mz.len());
+    let mut reference_indices = Vec::with_capacity(query_mz.len());
 
     for (qi, &qmz) in query_mz.iter().enumerate() {
         let mut best_ri = None;

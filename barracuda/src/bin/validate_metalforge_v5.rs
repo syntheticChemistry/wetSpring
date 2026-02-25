@@ -16,7 +16,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | `BarraCuda` CPU reference |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --features gpu --release --bin validate_metalforge_v5` |
@@ -220,7 +220,7 @@ fn validate_gbm_mf(
         &[2, -1, -1],
         &[0.0, 0.3, -0.1],
     )
-    .unwrap();
+    .expect("MetalForge v5");
     let t2 = GbmTree::from_arrays(
         &[1, -1, -1],
         &[0.3, 0.0, 0.0],
@@ -228,8 +228,8 @@ fn validate_gbm_mf(
         &[2, -1, -1],
         &[0.0, 0.2, -0.2],
     )
-    .unwrap();
-    let model = GbmClassifier::new(vec![t1, t2], 0.1, 0.0, 2).unwrap();
+    .expect("MetalForge v5");
+    let model = GbmClassifier::new(vec![t1, t2], 0.1, 0.0, 2).expect("MetalForge v5");
 
     let samples = vec![vec![0.8, 0.5], vec![0.2, 0.1], vec![0.6, 0.4]];
     let tc = Instant::now();
@@ -330,7 +330,12 @@ fn validate_signal_mf(
     let gpu_peaks = signal_gpu::find_peaks_gpu(gpu, &data, &params).expect("signal GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
-    v.check("peak count", gpu_peaks.len() as f64, cpu.len() as f64, 0.0);
+    v.check(
+        "peak count",
+        gpu_peaks.len() as f64,
+        cpu.len() as f64,
+        tolerances::EXACT,
+    );
     for (i, (c, g)) in cpu.iter().zip(&gpu_peaks).enumerate() {
         v.check(
             &format!("peak[{i}] index"),

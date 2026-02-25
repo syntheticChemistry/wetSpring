@@ -384,18 +384,18 @@ fn validate_felsenstein_parity(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 "3-taxon: GPU LL finite",
                 f64::from(u8::from(gpu_ll.is_finite())),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
             v.check(
                 "3-taxon: GPU LL negative",
                 f64::from(u8::from(gpu_ll < 0.0)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
         }
         Err(e) => {
             println!("  [SKIP] FelsensteinGpu 3-taxon: {e}");
-            v.check("3-taxon GPU (skipped)", 1.0, 1.0, 0.0);
+            v.check("3-taxon GPU (skipped)", 1.0, 1.0, tolerances::EXACT);
         }
     }
 
@@ -422,12 +422,12 @@ fn validate_felsenstein_parity(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 "5-taxon: GPU LL negative",
                 f64::from(u8::from(gpu_ll5 < 0.0)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
         }
         Err(e) => {
             println!("  [SKIP] FelsensteinGpu 5-taxon: {e}");
-            v.check("5-taxon GPU (skipped)", 1.0, 1.0, 0.0);
+            v.check("5-taxon GPU (skipped)", 1.0, 1.0, tolerances::EXACT);
         }
     }
 }
@@ -477,7 +477,7 @@ fn validate_gpu_bootstrap(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 "Bootstrap: replicate count",
                 gpu_lls.len() as f64,
                 n_reps as f64,
-                0.0,
+                tolerances::EXACT,
             );
         }
 
@@ -486,7 +486,7 @@ fn validate_gpu_bootstrap(device: &Arc<WgpuDevice>, v: &mut Validator) {
             "Bootstrap: all GPU LLs finite & negative",
             f64::from(u8::from(all_finite)),
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
 
         // Per-replicate CPU ≈ GPU (within f64 tolerance)
@@ -498,7 +498,7 @@ fn validate_gpu_bootstrap(device: &Arc<WgpuDevice>, v: &mut Validator) {
             "Bootstrap: max |CPU−GPU| < 1e-4",
             f64::from(u8::from(max_diff < tolerances::GPU_VS_CPU_ENSEMBLE)),
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
         println!("    (max per-replicate diff = {max_diff:.2e})");
 
@@ -523,7 +523,12 @@ fn validate_gpu_bootstrap(device: &Arc<WgpuDevice>, v: &mut Validator) {
             tolerances::GPU_VS_CPU_ENSEMBLE,
         );
     } else {
-        v.check("Bootstrap: GPU available (skipped)", 1.0, 1.0, 0.0);
+        v.check(
+            "Bootstrap: GPU available (skipped)",
+            1.0,
+            1.0,
+            tolerances::EXACT,
+        );
     }
 }
 
@@ -573,7 +578,7 @@ fn validate_gpu_placement(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 "Placement: edge count",
                 gpu_lls.len() as f64,
                 n_edges as f64,
-                0.0,
+                tolerances::EXACT,
             );
         }
 
@@ -582,7 +587,7 @@ fn validate_gpu_placement(device: &Arc<WgpuDevice>, v: &mut Validator) {
             "Placement: all GPU LLs finite & negative",
             f64::from(u8::from(all_finite)),
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
 
         // Compare per-edge likelihoods
@@ -594,7 +599,7 @@ fn validate_gpu_placement(device: &Arc<WgpuDevice>, v: &mut Validator) {
             "Placement: max |CPU−GPU| < 1e-4",
             f64::from(u8::from(max_diff < tolerances::GPU_VS_CPU_ENSEMBLE)),
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
         println!("    (max per-edge diff = {max_diff:.2e})");
 
@@ -611,11 +616,16 @@ fn validate_gpu_placement(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 "Placement: best edge CPU == GPU",
                 gpu_best as f64,
                 cpu_scan.best_edge as f64,
-                0.0,
+                tolerances::EXACT,
             );
         }
     } else {
-        v.check("Placement: GPU available (skipped)", 1.0, 1.0, 0.0);
+        v.check(
+            "Placement: GPU available (skipped)",
+            1.0,
+            1.0,
+            tolerances::EXACT,
+        );
     }
 }
 

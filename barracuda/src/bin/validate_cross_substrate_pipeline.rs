@@ -21,7 +21,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | BarraCuda CPU (sovereign Rust reference) |
 //! | Baseline date | 2026-02-21 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_cross_substrate_pipeline` |
@@ -131,18 +131,20 @@ async fn main() {
 
     let t_gpu_compute = Instant::now();
     for community in &communities {
-        let shannon = diversity_gpu::shannon_gpu(&gpu, community).unwrap();
-        let simpson = diversity_gpu::simpson_gpu(&gpu, community).unwrap();
-        let observed = diversity_gpu::observed_features_gpu(&gpu, community).unwrap();
+        let shannon = diversity_gpu::shannon_gpu(&gpu, community).expect("Shannon GPU");
+        let simpson = diversity_gpu::simpson_gpu(&gpu, community).expect("Simpson GPU");
+        let observed =
+            diversity_gpu::observed_features_gpu(&gpu, community).expect("observed features GPU");
         gpu_results.push((shannon, simpson, observed));
     }
 
     let gpu_shannons: Vec<f64> = gpu_results.iter().map(|(s, _, _)| *s).collect();
-    let gpu_variance = stats_gpu::variance_gpu(&gpu, &gpu_shannons).unwrap();
+    let gpu_variance = stats_gpu::variance_gpu(&gpu, &gpu_shannons).expect("variance GPU");
     let gpu_compute_us = t_gpu_compute.elapsed().as_micros() as f64;
 
     let t_bray = Instant::now();
-    let gpu_bray = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).unwrap();
+    let gpu_bray =
+        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).expect("Bray-Curtis GPU");
     let bray_us = t_bray.elapsed().as_micros() as f64;
 
     let t_readback = Instant::now();

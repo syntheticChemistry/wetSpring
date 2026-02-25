@@ -49,7 +49,7 @@ fn main() {
         &[None, Some(0), None, Some(1), Some(2)],
         2,
     )
-    .unwrap();
+    .expect("Barracuda CPU v5");
 
     let tree2 = DecisionTree::from_arrays(
         &[1, -2, -2],
@@ -59,7 +59,7 @@ fn main() {
         &[None, Some(0), Some(2)],
         2,
     )
-    .unwrap();
+    .expect("Barracuda CPU v5");
 
     let tree3 = DecisionTree::from_arrays(
         &[0, -2, -2],
@@ -69,7 +69,7 @@ fn main() {
         &[None, Some(1), Some(2)],
         2,
     )
-    .unwrap();
+    .expect("Barracuda CPU v5");
 
     let tree4 = DecisionTree::from_arrays(
         &[0, 1, -2, -2, -2],
@@ -79,7 +79,7 @@ fn main() {
         &[None, None, Some(0), Some(1), Some(2)],
         2,
     )
-    .unwrap();
+    .expect("Barracuda CPU v5");
 
     let tree5 = DecisionTree::from_arrays(
         &[1, -2, 0, -2, -2],
@@ -89,29 +89,55 @@ fn main() {
         &[None, Some(0), None, Some(1), Some(2)],
         2,
     )
-    .unwrap();
+    .expect("Barracuda CPU v5");
 
-    let rf = RandomForest::from_trees(vec![tree1, tree2, tree3, tree4, tree5], 3).unwrap();
+    let rf = RandomForest::from_trees(vec![tree1, tree2, tree3, tree4, tree5], 3)
+        .expect("Barracuda CPU v5");
 
     // Structural checks
-    v.check("RF: n_trees = 5", rf.n_trees() as f64, 5.0, 0.0);
-    v.check("RF: n_features = 2", rf.n_features() as f64, 2.0, 0.0);
-    v.check("RF: n_classes = 3", rf.n_classes() as f64, 3.0, 0.0);
+    v.check(
+        "RF: n_trees = 5",
+        rf.n_trees() as f64,
+        5.0,
+        tolerances::EXACT,
+    );
+    v.check(
+        "RF: n_features = 2",
+        rf.n_features() as f64,
+        2.0,
+        tolerances::EXACT,
+    );
+    v.check(
+        "RF: n_classes = 3",
+        rf.n_classes() as f64,
+        3.0,
+        tolerances::EXACT,
+    );
 
     // Prediction checks — hand-computed majority votes
     // Sample [3.0, 1.0]: tree1→0, tree2→0, tree3→1, tree4→0(≤4,≤2), tree5→0(≤5) → class 0 (4-1-0)
     let pred1 = rf.predict_with_votes(&[3.0, 1.0]);
-    v.check("RF: [3,1] → class 0", pred1.class as f64, 0.0, 0.0);
+    v.check(
+        "RF: [3,1] → class 0",
+        pred1.class as f64,
+        0.0,
+        tolerances::EXACT,
+    );
     v.check(
         "RF: [3,1] confidence ≥ 0.6",
         f64::from(u8::from(pred1.confidence >= 0.6)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Sample [7.0, 6.0]: tree1→2, tree2→2, tree3→2, tree4→2, tree5→1 (f[0]=7≤7 → class 1)
     let pred2 = rf.predict_with_votes(&[7.0, 6.0]);
-    v.check("RF: [7,6] → class 2", pred2.class as f64, 2.0, 0.0);
+    v.check(
+        "RF: [7,6] → class 2",
+        pred2.class as f64,
+        2.0,
+        tolerances::EXACT,
+    );
     v.check(
         "RF: [7,6] conf = 0.8",
         pred2.confidence,
@@ -121,26 +147,46 @@ fn main() {
 
     // Batch predict
     let batch = rf.predict_batch(&[vec![3.0, 1.0], vec![7.0, 6.0], vec![5.5, 3.5]]);
-    v.check("RF: batch size = 3", batch.len() as f64, 3.0, 0.0);
-    v.check("RF: batch[0] = class 0", batch[0] as f64, 0.0, 0.0);
-    v.check("RF: batch[1] = class 2", batch[1] as f64, 2.0, 0.0);
+    v.check(
+        "RF: batch size = 3",
+        batch.len() as f64,
+        3.0,
+        tolerances::EXACT,
+    );
+    v.check(
+        "RF: batch[0] = class 0",
+        batch[0] as f64,
+        0.0,
+        tolerances::EXACT,
+    );
+    v.check(
+        "RF: batch[1] = class 2",
+        batch[1] as f64,
+        2.0,
+        tolerances::EXACT,
+    );
 
     // Tree predictions debug
     let tree_preds = rf.tree_predictions(&[3.0, 1.0]);
-    v.check("RF: tree_preds len = 5", tree_preds.len() as f64, 5.0, 0.0);
+    v.check(
+        "RF: tree_preds len = 5",
+        tree_preds.len() as f64,
+        5.0,
+        tolerances::EXACT,
+    );
 
     // Metadata
     v.check(
         "RF: total_nodes > 0",
         f64::from(u8::from(rf.total_nodes() > 0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "RF: avg_depth > 0",
         f64::from(u8::from(rf.avg_depth() > 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let rf_us = t0.elapsed().as_micros() as f64;
@@ -160,7 +206,7 @@ fn main() {
         &[2, -1, -1],
         &[0.0, -1.0, 1.0],
     )
-    .unwrap();
+    .expect("Barracuda CPU v5");
 
     let stump2 = GbmTree::from_arrays(
         &[1, -2, -2],
@@ -169,7 +215,7 @@ fn main() {
         &[2, -1, -1],
         &[0.0, -0.8, 0.8],
     )
-    .unwrap();
+    .expect("Barracuda CPU v5");
 
     let stump3 = GbmTree::from_arrays(
         &[0, -2, -2],
@@ -178,12 +224,18 @@ fn main() {
         &[2, -1, -1],
         &[0.0, -0.5, 1.5],
     )
-    .unwrap();
+    .expect("Barracuda CPU v5");
 
-    let gbm = GbmClassifier::new(vec![stump1, stump2, stump3], 0.1, 0.0, 2).unwrap();
+    let gbm =
+        GbmClassifier::new(vec![stump1, stump2, stump3], 0.1, 0.0, 2).expect("Barracuda CPU v5");
 
     // Structural checks
-    v.check("GBM: n_estimators = 3", gbm.n_estimators() as f64, 3.0, 0.0);
+    v.check(
+        "GBM: n_estimators = 3",
+        gbm.n_estimators() as f64,
+        3.0,
+        tolerances::EXACT,
+    );
     v.check(
         "GBM: lr = 0.1",
         gbm.learning_rate(),
@@ -193,7 +245,12 @@ fn main() {
 
     // [3.0, 2.0]: s1=-1.0, s2=-0.8, s3=-0.5 → score=0.1*(-2.3)=-0.23 → sigmoid<0.5 → class 0
     let pred_neg = gbm.predict_proba(&[3.0, 2.0]);
-    v.check("GBM: [3,2] → class 0", pred_neg.class as f64, 0.0, 0.0);
+    v.check(
+        "GBM: [3,2] → class 0",
+        pred_neg.class as f64,
+        0.0,
+        tolerances::EXACT,
+    );
     let expected_score_neg = 0.1 * (-1.0 + -0.8 + -0.5);
     v.check(
         "GBM: [3,2] raw score",
@@ -205,12 +262,17 @@ fn main() {
         "GBM: [3,2] prob < 0.5",
         f64::from(u8::from(pred_neg.probability < 0.5)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // [8.0, 5.0]: s1=1.0, s2=0.8, s3=1.5 → score=0.1*3.3=0.33 → sigmoid>0.5 → class 1
     let pred_pos = gbm.predict_proba(&[8.0, 5.0]);
-    v.check("GBM: [8,5] → class 1", pred_pos.class as f64, 1.0, 0.0);
+    v.check(
+        "GBM: [8,5] → class 1",
+        pred_pos.class as f64,
+        1.0,
+        tolerances::EXACT,
+    );
     let expected_score_pos = 0.1 * (1.0 + 0.8 + 1.5);
     v.check(
         "GBM: [8,5] raw score",
@@ -222,7 +284,7 @@ fn main() {
         "GBM: [8,5] prob > 0.5",
         f64::from(u8::from(pred_pos.probability > 0.5)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Sigmoid correctness check
@@ -236,23 +298,33 @@ fn main() {
 
     // Batch prediction
     let batch_preds = gbm.predict_batch(&[vec![3.0, 2.0], vec![8.0, 5.0]]);
-    v.check("GBM: batch[0] = 0", batch_preds[0] as f64, 0.0, 0.0);
-    v.check("GBM: batch[1] = 1", batch_preds[1] as f64, 1.0, 0.0);
+    v.check(
+        "GBM: batch[0] = 0",
+        batch_preds[0] as f64,
+        0.0,
+        tolerances::EXACT,
+    );
+    v.check(
+        "GBM: batch[1] = 1",
+        batch_preds[1] as f64,
+        1.0,
+        tolerances::EXACT,
+    );
 
     // Initial bias check
     let gbm_biased = GbmClassifier::new(
-        vec![GbmTree::from_arrays(&[-2], &[0.0], &[-1], &[-1], &[0.0]).unwrap()],
+        vec![GbmTree::from_arrays(&[-2], &[0.0], &[-1], &[-1], &[0.0]).expect("Barracuda CPU v5")],
         0.1,
         5.0,
         2,
     )
-    .unwrap();
+    .expect("Barracuda CPU v5");
     let biased_pred = gbm_biased.predict_proba(&[0.0]);
     v.check(
         "GBM: biased initial → prob > 0.99",
         f64::from(u8::from(biased_pred.probability > 0.99)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Multi-class GBM
@@ -265,7 +337,7 @@ fn main() {
         &[2, -1, -1],
         &[0.0, 2.0, -1.0],
     )
-    .unwrap();
+    .expect("Barracuda CPU v5");
     let mc_tree1 = GbmTree::from_arrays(
         &[0, -2, -2],
         &[0.5, 0.0, 0.0],
@@ -273,7 +345,7 @@ fn main() {
         &[2, -1, -1],
         &[0.0, -1.0, 2.0],
     )
-    .unwrap();
+    .expect("Barracuda CPU v5");
     let mc_tree2 = GbmTree::from_arrays(
         &[1, -2, -2],
         &[0.5, 0.0, 0.0],
@@ -281,7 +353,7 @@ fn main() {
         &[2, -1, -1],
         &[0.0, 2.0, -1.0],
     )
-    .unwrap();
+    .expect("Barracuda CPU v5");
 
     let mgbm = GbmMultiClassifier::new(
         vec![vec![mc_tree0], vec![mc_tree1], vec![mc_tree2]],
@@ -289,9 +361,14 @@ fn main() {
         vec![0.0, 0.0, 0.0],
         2,
     )
-    .unwrap();
+    .expect("Barracuda CPU v5");
 
-    v.check("GBM-MC: n_classes = 3", mgbm.n_classes() as f64, 3.0, 0.0);
+    v.check(
+        "GBM-MC: n_classes = 3",
+        mgbm.n_classes() as f64,
+        3.0,
+        tolerances::EXACT,
+    );
 
     // [0.3, 0.3]: class0 gets +2, class1 gets -1, class2 gets +2 → tie 0 vs 2, softmax picks 0 or 2
     let mc_pred = mgbm.predict_proba(&[0.3, 0.3]);
@@ -305,7 +382,7 @@ fn main() {
         "GBM-MC: 3 probabilities",
         mc_pred.probabilities.len() as f64,
         3.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // [0.7, 0.3]: class0→-1, class1→+2, class2→+2 → softmax: class 1 or 2 wins
@@ -314,7 +391,7 @@ fn main() {
         "GBM-MC: [0.7,0.3] not class 0",
         f64::from(u8::from(mc_pred2.class != 0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let gbm_us = t0.elapsed().as_micros() as f64;

@@ -18,6 +18,7 @@
 //! binary observation sequence derived from real gene tree RF distances.
 
 use wetspring_barracuda::bio::hmm::{HmmModel, forward, viterbi};
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn main() {
@@ -86,7 +87,7 @@ fn main() {
     let vit_ll = vit.log_probability;
     let fwd_ll = fwd.log_likelihood;
     // Viterbi log-prob ≤ forward log-lik (Viterbi is best single path, forward sums all)
-    let consistent = vit_ll <= fwd_ll + 1e-10;
+    let consistent = vit_ll <= fwd_ll + tolerances::PYTHON_PARITY;
     v.check_count("viterbi_ll <= forward_ll", usize::from(consistent), 1);
 
     // ── Section 4: Determinism ──────────────────────────────────

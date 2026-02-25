@@ -18,6 +18,7 @@ use std::path::Path;
 ///
 /// Returns [`crate::error::Error::Io`] if the file cannot be opened or [`crate::error::Error::Xml`]
 /// for XML structure errors.
+#[must_use = "computed stats are discarded if not used"]
 pub fn stats_from_file(path: &Path) -> Result<MzmlStats> {
     let file = File::open(path).map_err(|e| Error::Io {
         path: path.to_path_buf(),

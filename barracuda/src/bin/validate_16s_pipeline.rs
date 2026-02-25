@@ -111,7 +111,7 @@ fn validate_dada2(v: &mut Validator) {
         "DADA2 min_abundance filter",
         if all_above_min { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 }
 
@@ -222,7 +222,7 @@ fn validate_taxonomy(v: &mut Validator) {
         "Taxonomy: kingdom = Bacteria",
         if kingdom_correct { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let phylum_correct = result.lineage.ranks.get(1).map(String::as_str) == Some("p__Firmicutes");
@@ -230,7 +230,7 @@ fn validate_taxonomy(v: &mut Validator) {
         "Taxonomy: ref1 → Firmicutes",
         if phylum_correct { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Classify ref2 → should get Proteobacteria
@@ -244,7 +244,7 @@ fn validate_taxonomy(v: &mut Validator) {
             0.0
         },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Confidence should be high for exact match
@@ -253,7 +253,7 @@ fn validate_taxonomy(v: &mut Validator) {
         "Taxonomy: kingdom confidence > 0.8",
         if kingdom_confidence > 0.8 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Parse reference FASTA format
@@ -300,7 +300,7 @@ fn validate_unifrac(v: &mut Validator) {
         "UniFrac: disjoint communities > 0",
         if uw_disjoint > 0.0 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "UniFrac: unweighted in [0,1]",
@@ -310,7 +310,7 @@ fn validate_unifrac(v: &mut Validator) {
             0.0
         },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Weighted UniFrac: abundance matters
@@ -319,7 +319,7 @@ fn validate_unifrac(v: &mut Validator) {
         "UniFrac: weighted >= 0",
         if wuf >= 0.0 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Weighted UniFrac: identical = 0
@@ -405,12 +405,12 @@ fn validate_end_to_end(v: &mut Validator) {
     let simpson = diversity::simpson(&counts);
     let observed = diversity::observed_features(&counts);
 
-    v.check("Pipeline: observed = 3", observed, 3.0, 0.0);
+    v.check("Pipeline: observed = 3", observed, 3.0, tolerances::EXACT);
     v.check(
         "Pipeline: Shannon > 0",
         if shannon > 0.0 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Pipeline: Simpson in (0,1)",
@@ -420,7 +420,7 @@ fn validate_end_to_end(v: &mut Validator) {
             0.0
         },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Analytical Shannon for [50, 30, 20]: H = -Σ p_i ln(p_i)

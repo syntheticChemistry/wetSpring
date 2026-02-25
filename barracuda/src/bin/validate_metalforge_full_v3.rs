@@ -16,7 +16,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | `BarraCuda` CPU reference |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --features gpu --release --bin validate_metalforge_full_v3` |
@@ -56,8 +56,8 @@ fn validate_shannon_simpson(
     let cpu_si = diversity::simpson(&counts);
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
-    let gpu_sh = diversity_gpu::shannon_gpu(gpu, &counts).unwrap();
-    let gpu_si = diversity_gpu::simpson_gpu(gpu, &counts).unwrap();
+    let gpu_sh = diversity_gpu::shannon_gpu(gpu, &counts).expect("MetalForge v3");
+    let gpu_si = diversity_gpu::simpson_gpu(gpu, &counts).expect("MetalForge v3");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check(
         "Shannon",
@@ -86,7 +86,7 @@ fn validate_bray_curtis(
     let cpu_bc = diversity::bray_curtis(&a, &b);
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
-    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(gpu, &[a, b]).unwrap()[0];
+    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(gpu, &[a, b]).expect("MetalForge v3")[0];
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check("Bray-Curtis", gpu_bc, cpu_bc, tolerances::GPU_VS_CPU_F64);
     timings.push(("Bray-Curtis", cpu_us, gpu_us, "CPU=GPU"));
@@ -105,7 +105,7 @@ fn validate_ani(
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
     let ani_dev = AniGpu::new(device).expect("ANI GPU");
-    let gpu_ani = ani_dev.batch_ani(&pairs).unwrap();
+    let gpu_ani = ani_dev.batch_ani(&pairs).expect("MetalForge v3");
     let gpu_us = tg.elapsed().as_micros() as f64;
     for (i, (cr, gv)) in cpu_ani.iter().zip(gpu_ani.ani_values.iter()).enumerate() {
         v.check(
@@ -130,7 +130,7 @@ fn validate_snp(
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
     let snp_dev = SnpGpu::new(device).expect("SNP GPU");
-    let gpu_snp = snp_dev.call_snps(&seqs).unwrap();
+    let gpu_snp = snp_dev.call_snps(&seqs).expect("MetalForge v3");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check(
         "SNP count",
@@ -157,7 +157,7 @@ fn validate_dnds(
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
     let dnds_dev = DnDsGpu::new(device).expect("dN/dS GPU");
-    let gpu_dnds = dnds_dev.batch_dnds(&pairs).unwrap();
+    let gpu_dnds = dnds_dev.batch_dnds(&pairs).expect("MetalForge v3");
     let gpu_us = tg.elapsed().as_micros() as f64;
     for (i, cr) in cpu_dnds.iter().enumerate() {
         if let Ok(c) = cr {
@@ -201,7 +201,9 @@ fn validate_pangenome(
         .collect();
     let tg = Instant::now();
     let pan_dev = PangenomeGpu::new(device).expect("Pangenome GPU");
-    let gpu_pan = pan_dev.classify(&presence_flat, 3, 4).unwrap();
+    let gpu_pan = pan_dev
+        .classify(&presence_flat, 3, 4)
+        .expect("MetalForge v3");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check(
         "core",
@@ -226,7 +228,7 @@ fn validate_random_forest(
         &[None, Some(0), Some(1)],
         3,
     )
-    .unwrap();
+    .expect("MetalForge v3");
     let t2 = DecisionTree::from_arrays(
         &[1, -1, -1],
         &[3.0, 0.0, 0.0],
@@ -235,15 +237,15 @@ fn validate_random_forest(
         &[None, Some(0), Some(1)],
         3,
     )
-    .unwrap();
-    let rf = RandomForest::from_trees(vec![t1, t2], 2).unwrap();
+    .expect("MetalForge v3");
+    let rf = RandomForest::from_trees(vec![t1, t2], 2).expect("MetalForge v3");
     let samples = vec![vec![3.0, 2.0, 0.0], vec![6.0, 4.0, 0.0]];
     let tc = Instant::now();
     let cpu_preds: Vec<usize> = samples.iter().map(|s| rf.predict(s)).collect();
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
     let rf_gpu = RandomForestGpu::new(device);
-    let gpu_preds = rf_gpu.predict_batch(&rf, &samples).unwrap();
+    let gpu_preds = rf_gpu.predict_batch(&rf, &samples).expect("MetalForge v3");
     let gpu_us = tg.elapsed().as_micros() as f64;
     let all_match = cpu_preds
         .iter()
@@ -273,7 +275,9 @@ fn validate_hmm_forward(
     let flat_obs: Vec<u32> = obs.iter().map(|&x| x as u32).collect();
     let tg = Instant::now();
     let hmm_dev = HmmGpuForward::new(device).expect("HMM GPU");
-    let gpu_r = hmm_dev.forward_batch(&model, &flat_obs, 1, 5).unwrap();
+    let gpu_r = hmm_dev
+        .forward_batch(&model, &flat_obs, 1, 5)
+        .expect("MetalForge v3");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check(
         "HMM LL",
@@ -390,7 +394,7 @@ fn validate_decision_tree(
         &[None, Some(0), Some(1)],
         3,
     )
-    .unwrap();
+    .expect("MetalForge v3");
     let samples = [
         vec![3.0, 0.0, 0.0],
         vec![7.0, 0.0, 0.0],
@@ -414,7 +418,12 @@ fn validate_decision_tree(
         Ok(gpu_preds) => {
             let gpu_us = tg.elapsed().as_micros() as f64;
             for (i, (cp, gp)) in cpu_preds.iter().zip(gpu_preds.iter()).enumerate() {
-                v.check(&format!("DT pred {i}"), f64::from(*gp), *cp as f64, 0.0);
+                v.check(
+                    &format!("DT pred {i}"),
+                    f64::from(*gp),
+                    *cp as f64,
+                    tolerances::EXACT,
+                );
             }
             timings.push(("Decision Tree", cpu_us, gpu_us, "CPU=GPU"));
         }
@@ -444,7 +453,7 @@ fn validate_spectral_cosine(
     let cpu_cos = dot / (na * nb);
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
-    let gpu_cos = spectral_match_gpu::pairwise_cosine_gpu(gpu, &spectra).unwrap();
+    let gpu_cos = spectral_match_gpu::pairwise_cosine_gpu(gpu, &spectra).expect("MetalForge v3");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check(
         "Spectral cosine",
@@ -464,12 +473,13 @@ fn validate_eic(
     let spectra = synthetic_spectra();
     let target_mzs = vec![150.0, 200.0];
     let cpu_eics = eic::extract_eics(&spectra, &target_mzs, 10.0);
-    let gpu_eics = eic_gpu::extract_eics_gpu(gpu, &spectra, &target_mzs, 10.0).unwrap();
+    let gpu_eics =
+        eic_gpu::extract_eics_gpu(gpu, &spectra, &target_mzs, 10.0).expect("MetalForge v3");
     let tc = Instant::now();
     let cpu_totals: Vec<f64> = cpu_eics.iter().map(|e| e.intensity.iter().sum()).collect();
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
-    let gpu_totals = eic_gpu::batch_eic_total_intensity_gpu(gpu, &gpu_eics).unwrap();
+    let gpu_totals = eic_gpu::batch_eic_total_intensity_gpu(gpu, &gpu_eics).expect("MetalForge v3");
     let gpu_us = tg.elapsed().as_micros() as f64;
     for (i, (c, g)) in cpu_totals.iter().zip(gpu_totals.iter()).enumerate() {
         v.check(
@@ -496,11 +506,11 @@ fn validate_pcoa(
     ];
     let condensed = diversity::bray_curtis_condensed(&samples);
     let tc = Instant::now();
-    let cpu_pc = pcoa::pcoa(&condensed, samples.len(), 2).unwrap();
+    let cpu_pc = pcoa::pcoa(&condensed, samples.len(), 2).expect("MetalForge v3");
     let cpu_us = tc.elapsed().as_micros() as f64;
     let n = samples.len();
     let tg = Instant::now();
-    let gpu_pc = pcoa_gpu::pcoa_gpu(gpu, &condensed, n, 2).unwrap();
+    let gpu_pc = pcoa_gpu::pcoa_gpu(gpu, &condensed, n, 2).expect("MetalForge v3");
     let gpu_us = tg.elapsed().as_micros() as f64;
     for (i, (ce, ge)) in cpu_pc
         .eigenvalues
@@ -554,7 +564,8 @@ fn validate_kriging(
     let targets = vec![(0.25, 0.25), (0.75, 0.75)];
     let config = kriging::VariogramConfig::spherical(0.0, 1.0, 2.0);
     let tg = Instant::now();
-    let ordinary = kriging::interpolate_diversity(gpu, &sites, &targets, &config).unwrap();
+    let ordinary =
+        kriging::interpolate_diversity(gpu, &sites, &targets, &config).expect("MetalForge v3");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check(
         "Kriging count",
@@ -583,11 +594,17 @@ fn validate_rarefaction(
         seed: 42,
     };
     let tg = Instant::now();
-    let result = rarefaction_gpu::rarefaction_bootstrap_gpu(gpu, &counts, &params).unwrap();
+    let result =
+        rarefaction_gpu::rarefaction_bootstrap_gpu(gpu, &counts, &params).expect("MetalForge v3");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check_pass("Rarefaction Shannon > 0", result.shannon.mean > 0.0);
     v.check_pass("Rarefaction observed > 0", result.observed.mean > 0.0);
-    v.check("Rarefaction depth", result.depth as f64, 500.0, 0.0);
+    v.check(
+        "Rarefaction depth",
+        result.depth as f64,
+        500.0,
+        tolerances::EXACT,
+    );
     timings.push(("Rarefaction", 0.0, gpu_us, "GPU"));
 }
 

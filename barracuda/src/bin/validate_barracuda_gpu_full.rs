@@ -17,7 +17,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | BarraCuda CPU (sovereign Rust reference) |
 //! | Baseline date | 2026-02-21 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_barracuda_gpu_full` |
@@ -62,7 +62,7 @@ async fn main() {
         let cpu_val = diversity::shannon(&abundances);
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
         let t_gpu = Instant::now();
-        let gpu_val = diversity_gpu::shannon_gpu(&gpu, &abundances).unwrap();
+        let gpu_val = diversity_gpu::shannon_gpu(&gpu, &abundances).expect("GPU validation");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
         v.check(
             "Shannon: CPU == GPU",
@@ -81,7 +81,7 @@ async fn main() {
         let cpu_val = diversity::simpson(&abundances);
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
         let t_gpu = Instant::now();
-        let gpu_val = diversity_gpu::simpson_gpu(&gpu, &abundances).unwrap();
+        let gpu_val = diversity_gpu::simpson_gpu(&gpu, &abundances).expect("GPU validation");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
         v.check(
             "Simpson: CPU == GPU",
@@ -104,7 +104,8 @@ async fn main() {
         let cpu_bc = diversity::bray_curtis_condensed(&samples);
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
         let t_gpu = Instant::now();
-        let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).unwrap();
+        let gpu_bc =
+            diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).expect("GPU validation");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
         for (i, (c, g)) in cpu_bc.iter().zip(gpu_bc.iter()).enumerate() {
             v.check(
@@ -132,8 +133,10 @@ async fn main() {
         ];
         let self_spectra = vec![spectra_gpu[0].clone(), spectra_gpu[0].clone()];
         let t_gpu = Instant::now();
-        let gpu_self = spectral_match_gpu::pairwise_cosine_gpu(&gpu, &self_spectra).unwrap();
-        let gpu_pw = spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra_gpu).unwrap();
+        let gpu_self =
+            spectral_match_gpu::pairwise_cosine_gpu(&gpu, &self_spectra).expect("GPU validation");
+        let gpu_pw =
+            spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra_gpu).expect("GPU validation");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
         v.check(
             "Cosine: self-match ≈ 1.0",
@@ -160,7 +163,7 @@ async fn main() {
         let mean = data.iter().sum::<f64>() / data.len() as f64;
         let cpu_var = data.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / data.len() as f64;
         let t_gpu = Instant::now();
-        let gpu_var = stats_gpu::variance_gpu(&gpu, &data).unwrap();
+        let gpu_var = stats_gpu::variance_gpu(&gpu, &data).expect("GPU validation");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
         v.check(
             "Variance: CPU == GPU",
@@ -184,7 +187,7 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
         let t_gpu = Instant::now();
         let gpu_ani = AniGpu::new(&device).expect("ANI GPU shader");
-        let gpu_r = gpu_ani.batch_ani(&pairs).unwrap();
+        let gpu_r = gpu_ani.batch_ani(&pairs).expect("GPU validation");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
         for (i, (c, g)) in cpu_r.iter().zip(gpu_r.ani_values.iter()).enumerate() {
             v.check(
@@ -211,7 +214,7 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
         let t_gpu = Instant::now();
         let gpu_snp = SnpGpu::new(&device).expect("SNP GPU shader");
-        let gpu_r = gpu_snp.call_snps(&seqs).unwrap();
+        let gpu_r = gpu_snp.call_snps(&seqs).expect("GPU validation");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
         let gpu_count = gpu_r.is_variant.iter().filter(|&&x| x != 0).count();
         v.check(
@@ -239,7 +242,7 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
         let t_gpu = Instant::now();
         let gpu_mod = DnDsGpu::new(&device).expect("dN/dS GPU shader");
-        let gpu_r = gpu_mod.batch_dnds(&pairs).unwrap();
+        let gpu_r = gpu_mod.batch_dnds(&pairs).expect("GPU validation");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
         for (i, cpu_r) in cpu_dnds.iter().enumerate() {
             if let Ok(cr) = cpu_r {
@@ -294,7 +297,7 @@ async fn main() {
             .collect();
         let t_gpu = Instant::now();
         let gpu_pan = PangenomeGpu::new(&device).expect("Pangenome GPU shader");
-        let gpu_r = gpu_pan.classify(&flat, 5, 4).unwrap();
+        let gpu_r = gpu_pan.classify(&flat, 5, 4).expect("GPU validation");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
         let gpu_core = gpu_r.classifications.iter().filter(|&&c| c == 3).count();
         v.check(
@@ -317,7 +320,7 @@ async fn main() {
             &[None, Some(0), None, Some(1), Some(2)],
             2,
         )
-        .unwrap();
+        .expect("GPU validation");
         let t2 = DecisionTree::from_arrays(
             &[1, -2, -2],
             &[4.0, 0.0, 0.0],
@@ -326,7 +329,7 @@ async fn main() {
             &[None, Some(0), Some(2)],
             2,
         )
-        .unwrap();
+        .expect("GPU validation");
         let t3 = DecisionTree::from_arrays(
             &[0, -2, -2],
             &[6.0, 0.0, 0.0],
@@ -335,15 +338,15 @@ async fn main() {
             &[None, Some(1), Some(2)],
             2,
         )
-        .unwrap();
-        let rf = RandomForest::from_trees(vec![t1, t2, t3], 3).unwrap();
+        .expect("GPU validation");
+        let rf = RandomForest::from_trees(vec![t1, t2, t3], 3).expect("GPU validation");
         let samples = vec![vec![3.0, 1.0], vec![7.0, 6.0], vec![5.5, 3.5]];
         let t_cpu = Instant::now();
         let cpu_preds = rf.predict_batch(&samples);
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
         let t_gpu = Instant::now();
         let rf_gpu = RandomForestGpu::new(&device);
-        let gpu_preds = rf_gpu.predict_batch(&rf, &samples).unwrap();
+        let gpu_preds = rf_gpu.predict_batch(&rf, &samples).expect("GPU validation");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
         for (i, (c, g)) in cpu_preds.iter().zip(gpu_preds.iter()).enumerate() {
             v.check(
@@ -375,7 +378,9 @@ async fn main() {
         let flat_obs: Vec<u32> = obs1.iter().chain(obs2.iter()).map(|&x| x as u32).collect();
         let t_gpu = Instant::now();
         let hmm_gpu = HmmGpuForward::new(&device).expect("HMM GPU shader");
-        let gpu_r = hmm_gpu.forward_batch(&model, &flat_obs, 2, 4).unwrap();
+        let gpu_r = hmm_gpu
+            .forward_batch(&model, &flat_obs, 2, 4)
+            .expect("GPU validation");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
         v.check(
             "HMM[0]: CPU == GPU",

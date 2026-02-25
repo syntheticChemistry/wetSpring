@@ -24,7 +24,7 @@ pub struct SpectrumBuilder {
 }
 
 impl SpectrumBuilder {
-    pub const fn new(index: usize) -> Self {
+    pub fn new(index: usize) -> Self {
         Self {
             index,
             ms_level: 1,
@@ -34,8 +34,8 @@ impl SpectrumBuilder {
             base_peak_intensity: 0.0,
             lowest_mz: 0.0,
             highest_mz: 0.0,
-            mz_array: Vec::new(),
-            intensity_array: Vec::new(),
+            mz_array: Vec::with_capacity(256),
+            intensity_array: Vec::with_capacity(256),
         }
     }
 

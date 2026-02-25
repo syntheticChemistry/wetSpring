@@ -13,7 +13,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline commit | current HEAD |
+//! | Baseline commit | 1f9f80e |
 //! | Baseline tool | BarraCuda CPU (sovereign Rust reference) |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_pure_gpu_complete` |
@@ -163,7 +163,7 @@ fn validate_gbm_gpu(gpu: &GpuF64, v: &mut Validator) {
         &[2, -1, -1],
         &[0.0, 0.3, -0.1],
     )
-    .unwrap();
+    .expect("pure GPU complete");
     let t2 = GbmTree::from_arrays(
         &[1, -1, -1],
         &[0.3, 0.0, 0.0],
@@ -171,8 +171,8 @@ fn validate_gbm_gpu(gpu: &GpuF64, v: &mut Validator) {
         &[2, -1, -1],
         &[0.0, 0.2, -0.2],
     )
-    .unwrap();
-    let model = GbmClassifier::new(vec![t1, t2], 0.1, 0.0, 2).unwrap();
+    .expect("pure GPU complete");
+    let model = GbmClassifier::new(vec![t1, t2], 0.1, 0.0, 2).expect("pure GPU complete");
 
     let samples = vec![vec![0.8, 0.5], vec![0.2, 0.1], vec![0.6, 0.4]];
     let cpu: Vec<_> = model.predict_batch_proba(&samples);
@@ -290,7 +290,12 @@ fn validate_robinson_foulds_gpu(gpu: &GpuF64, v: &mut Validator) {
     let cpu_dist = robinson_foulds::rf_distance(&t1, &t2);
     let gpu_dist = robinson_foulds_gpu::rf_distance_gpu(gpu, &t1, &t2).expect("RF GPU");
 
-    v.check("RF distance CPU≈GPU", gpu_dist as f64, cpu_dist as f64, 0.0);
+    v.check(
+        "RF distance CPU≈GPU",
+        gpu_dist as f64,
+        cpu_dist as f64,
+        tolerances::EXACT,
+    );
 }
 
 fn validate_derep_gpu(gpu: &GpuF64, v: &mut Validator) {
@@ -464,10 +469,10 @@ fn validate_molecular_clock_gpu(gpu: &GpuF64, v: &mut Validator) {
             );
         }
         (None, None) => {
-            v.check("strict clock both None", 1.0, 1.0, 0.0);
+            v.check("strict clock both None", 1.0, 1.0, tolerances::EXACT);
         }
         _ => {
-            v.check("strict clock mismatch", 0.0, 1.0, 0.0);
+            v.check("strict clock mismatch", 0.0, 1.0, tolerances::EXACT);
         }
     }
 

@@ -33,6 +33,7 @@ use wetspring_barracuda::bio::{
     decision_tree::DecisionTree, random_forest::RandomForest, random_forest_gpu::RandomForestGpu,
 };
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
@@ -63,7 +64,7 @@ async fn main() {
         &[None, Some(0), None, Some(1), Some(2)],
         2,
     )
-    .unwrap();
+    .expect("GPU RF");
 
     let tree2 = DecisionTree::from_arrays(
         &[1, -2, -2],
@@ -73,7 +74,7 @@ async fn main() {
         &[None, Some(0), Some(2)],
         2,
     )
-    .unwrap();
+    .expect("GPU RF");
 
     let tree3 = DecisionTree::from_arrays(
         &[0, -2, -2],
@@ -83,7 +84,7 @@ async fn main() {
         &[None, Some(1), Some(2)],
         2,
     )
-    .unwrap();
+    .expect("GPU RF");
 
     let tree4 = DecisionTree::from_arrays(
         &[0, 1, -2, -2, -2],
@@ -93,7 +94,7 @@ async fn main() {
         &[None, None, Some(0), Some(1), Some(2)],
         2,
     )
-    .unwrap();
+    .expect("GPU RF");
 
     let tree5 = DecisionTree::from_arrays(
         &[1, -2, 0, -2, -2],
@@ -103,9 +104,9 @@ async fn main() {
         &[None, Some(0), None, Some(1), Some(2)],
         2,
     )
-    .unwrap();
+    .expect("GPU RF");
 
-    let rf = RandomForest::from_trees(vec![tree1, tree2, tree3, tree4, tree5], 3).unwrap();
+    let rf = RandomForest::from_trees(vec![tree1, tree2, tree3, tree4, tree5], 3).expect("GPU RF");
 
     let samples = vec![
         vec![3.0, 1.0],
@@ -133,7 +134,7 @@ async fn main() {
                 "RF GPU: result count matches",
                 gpu_preds.len() as f64,
                 samples.len() as f64,
-                0.0,
+                tolerances::EXACT,
             );
 
             for (i, (cpu, gpu)) in cpu_preds.iter().zip(gpu_preds.iter()).enumerate() {
@@ -141,13 +142,13 @@ async fn main() {
                     &format!("RF GPU: sample {i} class CPU == GPU"),
                     gpu.class as f64,
                     cpu.class as f64,
-                    0.0,
+                    tolerances::EXACT,
                 );
                 v.check(
                     &format!("RF GPU: sample {i} confidence matches"),
                     gpu.confidence,
                     cpu.confidence,
-                    1e-10,
+                    tolerances::ML_PREDICTION,
                 );
             }
 
@@ -160,11 +161,16 @@ async fn main() {
         }
         Ok(Err(e)) => {
             println!("  [SKIP] RF GPU error: {e}");
-            v.check("RF GPU: available (skipped)", 1.0, 1.0, 0.0);
+            v.check("RF GPU: available (skipped)", 1.0, 1.0, tolerances::EXACT);
         }
         Err(_) => {
             println!("  [SKIP] RF GPU panicked (driver shader compilation)");
-            v.check("RF GPU: available (driver skip)", 1.0, 1.0, 0.0);
+            v.check(
+                "RF GPU: available (driver skip)",
+                1.0,
+                1.0,
+                tolerances::EXACT,
+            );
         }
     }
 

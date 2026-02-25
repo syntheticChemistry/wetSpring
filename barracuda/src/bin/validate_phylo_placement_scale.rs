@@ -203,9 +203,9 @@ fn main() {
         let best = dists
             .iter()
             .enumerate()
-            .min_by(|a, b| a.1.partial_cmp(b.1).unwrap())
+            .min_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal))
             .map(|(i, _)| i)
-            .unwrap();
+            .expect("placement target found");
         best_targets.push(best);
     }
     let place_ms = place_start.elapsed().as_secs_f64() * 1000.0;
