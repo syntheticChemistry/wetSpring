@@ -282,8 +282,63 @@ fn validate_novel_predictions(
     validate_roadmap(v);
 }
 
+#[cfg(feature = "gpu")]
+fn validate_gpu_transe(v: &mut Validator, kg: &KgEmbedding, triples: &[(usize, usize, usize)]) {
+    v.section("§6 GPU TransE Parity (ToadStool S60)");
+
+    let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
+    let gpu = rt
+        .block_on(wetspring_barracuda::gpu::GpuF64::new())
+        .expect("GPU init");
+    let device = gpu.to_wgpu_device();
+
+    let heads: Vec<u32> = triples.iter().map(|t| t.0 as u32).collect();
+    let rels: Vec<u32> = triples.iter().map(|t| t.1 as u32).collect();
+    let tails: Vec<u32> = triples.iter().map(|t| t.2 as u32).collect();
+
+    let scorer = barracuda::ops::transe_score_f64::TranseScoreF64 {
+        entities: &kg.entity_embeddings,
+        relations: &kg.relation_embeddings,
+        n_entities: kg.n_entities,
+        n_relations: kg.n_relations,
+        dim: EMBED_DIM,
+        heads: &heads,
+        rels: &rels,
+        tails: &tails,
+    };
+
+    let gpu_scores = scorer.execute(&device).expect("GPU TransE");
+
+    let cpu_scores: Vec<f64> = triples.iter().map(|&(h, r, t)| kg.score(h, r, t)).collect();
+
+    let max_diff = gpu_scores
+        .iter()
+        .zip(cpu_scores.iter())
+        .map(|(g, c)| (g - c).abs())
+        .fold(0.0_f64, f64::max);
+
+    println!(
+        "  GPU scored {}/{} triples",
+        gpu_scores.len(),
+        triples.len()
+    );
+    println!("  Max CPU↔GPU diff: {max_diff:.2e}");
+
+    v.check(
+        "GPU scores match CPU within f64 tolerance",
+        max_diff,
+        0.0,
+        1e-10,
+    );
+
+    v.check_pass(
+        "ToadStool TranseScoreF64 produces correct scores",
+        max_diff < 1e-10,
+    );
+}
+
 fn validate_roadmap(v: &mut Validator) {
-    v.section("§6 ROBOKOP Integration Roadmap");
+    v.section("§7 ROBOKOP Integration Roadmap");
 
     println!("\n  Integration with real ROBOKOP data:");
     println!("  1. Entities: ~500K nodes (drugs, diseases, genes, pathways, GO terms)");
@@ -291,15 +346,15 @@ fn validate_roadmap(v: &mut Validator) {
     println!("  3. TransE training at this scale: ~30 min on single GPU");
     println!("  4. Link prediction: GPU-parallel scoring of all drug-disease pairs");
     println!();
-    println!("  GPU shader requirements for ToadStool:");
-    println!("  1. TransE update kernel — element-wise, fully parallelisable");
-    println!("  2. Negative sampling — GPU RNG (already in ToadStool)");
-    println!("  3. Pairwise distance — trivial L2 shader");
+    println!("  ToadStool primitives available (S60-S62):");
+    println!("  1. TranseScoreF64 — GPU batch scoring (DONE, validated above)");
+    println!("  2. SpMM f64 — sparse GEMM for drug-disease matrices (DONE)");
+    println!("  3. Negative sampling — GPU RNG (already in ToadStool)");
     println!("  4. Top-K selection — parallel sort (needed for NMF too)");
 
     v.check_pass("ROBOKOP integration roadmap documented", true);
 
-    v.section("§7 Cross-Paper Validation Chain");
+    v.section("§8 Cross-Paper Validation Chain");
 
     println!("\n  Papers 39-43 form a complete drug repurposing pipeline:");
     println!("  ┌─────────────┐   ┌──────────────┐   ┌────────────────┐");
@@ -369,6 +424,9 @@ fn main() {
     );
 
     validate_link_prediction(&mut v, &kg, &triples);
+
+    #[cfg(feature = "gpu")]
+    validate_gpu_transe(&mut v, &kg, &triples);
 
     v.finish();
 }

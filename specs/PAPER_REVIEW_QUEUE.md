@@ -144,7 +144,9 @@ Waters (c-di-GMP as a drug target), Murillo (surrogate learning for fast scoring
 | SVD (f64) | `svd_f64.wgsl` | ✅ Upstream | Jacobi SVD, one-sided |
 | NMF (f64) | `barracuda::linalg::nmf` | ✅ Upstream (S58) | Absorbed from wetSpring V30. Returns `Result<NmfResult>`. Multiplicative update, Lee & Seung (1999) |
 | Ridge regression | `barracuda::linalg::ridge` | ✅ Upstream (S59) | Cholesky-based. Used by ESN readout |
-| Sparse GEMM | — | **NEEDED** | Drug-disease matrices are sparse (~5% fill) |
+| Sparse GEMM (CSR×Dense) | `barracuda::ops::sparse_gemm_f64` | ✅ Upstream (S60) | Drug-disease matrices are sparse (~5% fill) |
+| TransE scoring | `barracuda::ops::transe_score_f64` | ✅ Upstream (S60) | GPU-parallel triple scoring for KG embeddings |
+| Peak detection | `barracuda::ops::peak_detect_f64` | ✅ Upstream (S62) | GPU parallel local-maxima, prominence, width |
 | Cosine similarity | `barracuda::linalg::nmf::cosine_similarity` | ✅ Upstream | Pairwise scoring on factor matrices |
 | Top-K selection | Inlined in `validate_matrix_pharmacophenomics` | ✅ Local | Rank drug-disease pairs by score. Candidate for upstream |
 
@@ -239,14 +241,14 @@ Core finding: **no prior work applies Anderson localization to QS signaling**.
 | Track 1c (Metagenomics) | 6 | 6/6 | 6/6 | 6/6 | Full three-tier |
 | Track 2 (PFAS/LC-MS) | 4 | 4/4 | 4/4 | 4/4 | Full three-tier |
 | **Subtotal (actionable)** | **25** | **25/25** | **25/25** | **25/25** | **ALL three-tier** |
-| Track 3 (Drug repurposing) | 5 | 5/5 | 3/5 | 0/5 | NMF upstream (S58); GPU NMF validated via Exp160; TransE pending |
+| Track 3 (Drug repurposing) | 5 | 5/5 | 5/5 | 0/5 | NMF (S58), TransE (S60), SpMM (S60) — full GPU suite |
 | Cross-spring (spectral) | 1 | 1/1 | 1/1 | — | CPU + GPU |
 | Extensions (Phase 37-39) | 9 | 9/9 | — | — | CPU only (by design — analytical/catalog) |
-| **Grand total** | **43** | **43/43** | **29/30** | **25/25** | |
+| **Grand total** | **43** | **43/43** | **31/31** | **25/25** | |
 
-**Next GPU targets:** NMF now upstream (S58), validated via Exp160 `validate_repodb_nmf --features gpu`.
-Track 3 remaining: `TransEScoreGpu` for knowledge graph embeddings (Exp161).
-Extension papers are analytical models — GPU acceleration is not the bottleneck.
+**All GPU primitives now upstream:** NMF (S58), TransE (S60), SpMM (S60), PeakDetect (S62).
+Track 3 has full GPU coverage. Extension papers are analytical models — GPU acceleration
+is not the bottleneck. All 31 actionable papers now have GPU paths.
 
 ---
 

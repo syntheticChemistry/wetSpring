@@ -9,15 +9,16 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V31** | `handoffs/WETSPRING_TOADSTOOL_V31_ABSORPTION_TARGETS_FEB24_2026.md` | Feb 24 | Phase 41: absorption targets for ToadStool, cross-spring evolution insights, architecture suggestions |
-| V30 | `handoffs/WETSPRING_TOADSTOOL_V30_S59_LEAN_FEB24_2026.md` | Feb 24 | Phase 41: S59 lean — NMF, ridge, ODE systems, correlated Anderson rewired upstream (~1,312 lines removed) |
+| **V32** | `handoffs/WETSPRING_TOADSTOOL_V32_S62_LEAN_FEB24_2026.md` | Feb 24 | Phase 41: S62 lean — PeakDetectF64, TranseScoreF64 wired, paper queue fully GPU-covered |
+| V31 | `handoffs/WETSPRING_TOADSTOOL_V31_ABSORPTION_TARGETS_FEB24_2026.md` | Feb 24 | Phase 41: absorption targets, cross-spring evolution insights |
+| V30 | `handoffs/WETSPRING_TOADSTOOL_V30_S59_LEAN_FEB24_2026.md` | Feb 24 | Phase 41: S59 lean — NMF, ridge, ODE systems, correlated Anderson (~1,312 lines removed) |
 | API | `handoffs/TOADSTOOL_PRIMITIVES_API_REPORT_FEB24_2026.md` | Feb 24 | ToadStool primitives API reference |
 
 ## Cross-Spring Documents
 
 | File | Purpose |
 |------|---------|
-| `CROSS_SPRING_SHADER_EVOLUTION.md` | 650+ WGSL shader provenance map (cross-spring, ToadStool S59) |
+| `CROSS_SPRING_SHADER_EVOLUTION.md` | 660+ WGSL shader provenance map (cross-spring, ToadStool S62) |
 
 ## Archive
 

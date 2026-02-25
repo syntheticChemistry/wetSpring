@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 24, 2026
-**Status:** Phase 41 — 162 experiments, 3,198+ validation checks, all PASS (759 barracuda + 47 forge = 806 Rust tests), ToadStool S59 aligned, 42 primitives consumed
+**Status:** Phase 41 — 162 experiments, 3,198+ validation checks, all PASS (759 barracuda + 47 forge = 806 Rust tests), ToadStool S62 aligned, 44 primitives consumed
 
 ---
 
@@ -399,7 +399,7 @@ substrate-independence: for every GPU-eligible algorithm, the metalForge
 router can dispatch to CPU or GPU and get the same answer. This is the
 foundation for CPU/GPU/NPU routing in production.
 
-## ToadStool Evolution (Feb 24, 2026 — S59 Aligned)
+## ToadStool Evolution (Feb 24, 2026 — S62 Aligned)
 
 ### Write → Absorb → Lean Status
 
@@ -407,7 +407,7 @@ Following hotSpring's pattern for ToadStool integration:
 
 | Phase | Count | Status |
 |-------|:-----:|--------|
-| **Lean** (consumed upstream) | 42 primitives across GPU + CPU | S59: NMF, ridge, ODE bio, Anderson correlated, trapz added to 37 prior |
+| **Lean** (consumed upstream) | 44 primitives across GPU + CPU | S62: PeakDetectF64, TranseScoreF64 added to 42 prior (S59: NMF, ridge, ODE bio, Anderson, trapz) |
 | **Write** (local WGSL, pending absorption) | **0** — all retired | ODE shaders use `generate_shader()`; local WGSL deleted |
 | **CPU math** (`crate::special`) | 3 functions delegating on GPU | `erf`, `ln_gamma`, `regularized_gamma_lower` → `barracuda::special::*` when `gpu` active; sovereign fallback for no-GPU |
 | **CPU-only** (no GPU path) | 1 module (phred) | Pure GPU promotion complete (Exp101) |
@@ -428,9 +428,9 @@ warnings. Two ToadStool bugs found and fixed during validation:
    ToadStool's RTX 4070 Ada Lovelace detection and f64 exp/log polyfill. Fixed to
    use `WgpuDevice::from_existing()` with real `AdapterInfo`.
 
-### Cross-Spring Evolution (S59)
+### Cross-Spring Evolution (S62)
 
-ToadStool `barracuda` is the convergence hub for all springs (650+ WGSL shaders):
+ToadStool `barracuda` is the convergence hub for all springs (660+ WGSL shaders):
 
 | Spring | Contribution | Key Primitives |
 |--------|-------------|-----------|

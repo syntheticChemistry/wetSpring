@@ -1,6 +1,6 @@
 # Cross-Spring Shader Evolution
 
-**Last updated**: Feb 24, 2026 — ToadStool S59 (650+ WGSL shaders)
+**Last updated**: Feb 24, 2026 — ToadStool S62 (660+ WGSL shaders, DF64 expansion)
 **Validated by**: wetSpring Exp120 `benchmark_cross_spring_evolution`, V30 lean validation
 
 ---

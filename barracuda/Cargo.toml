@@ -17,8 +17,8 @@ members = ["fuzz"]
 default = []
 # GPU acceleration via BarraCUDA/ToadStool (Phase 3).
 # Enable with `cargo build --features gpu`.
-# Pulls in wgpu v22 (device creation), barracuda (30 ToadStool primitives),
-# and tokio (async device init). 3 local WGSL shaders (ODE domains, Write phase).
+# Pulls in wgpu v22 (device creation), barracuda (44 ToadStool primitives),
+# and tokio (async device init). Zero local WGSL shaders (full lean).
 # GEMM uses GemmF64::WGSL (no cross-repo include_str!).
 gpu = ["dep:barracuda", "dep:wgpu", "dep:tokio"]
 # JSON model import (2 bins: validate_pfas_decision_tree, benchmark_three_tier).
@@ -29,8 +29,10 @@ json = ["dep:serde_json"]
 serde_json = { version = "1", optional = true }
 
 # BarraCUDA: shared scientific computing library (ToadStool GPU compute).
-# Provides FusedMapReduceF64, BrayCurtisF64, BatchedEighGpu, GemmF64,
-# KrigingF64, VarianceF64, CorrelationF64, CovarianceF64, WeightedDotF64.
+# ToadStool barracuda (S62): FusedMapReduceF64, BrayCurtisF64, GemmF64,
+# NMF, ridge, ODE bio, Anderson, trapz, PeakDetectF64, TranseScoreF64,
+# SpMM f64, BatchedEighGpu, KrigingF64, Variance/Correlation/Covariance,
+# Fp64Strategy, BatchedOdeRK4, ValidationHarness — 44 primitives consumed.
 barracuda = { path = "../../phase1/toadstool/crates/barracuda", optional = true }
 
 # wgpu: WebGPU compute — hardware-agnostic GPU via Vulkan/Metal/DX12.
