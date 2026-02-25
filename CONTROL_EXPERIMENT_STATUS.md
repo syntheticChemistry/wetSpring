@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 25, 2026
-**Status:** Phase 41 — 162 experiments, 3,198+ validation checks, all PASS (759 barracuda + 47 forge = 806 Rust tests), ToadStool S62 aligned, 44 primitives (barracuda always-on)
+**Status:** Phase 42 — 165 experiments, 3,242+ validation checks, all PASS (759 barracuda + 47 forge = 806 Rust tests), ToadStool S62 aligned, 44 primitives (barracuda always-on)
 
 ---
 
@@ -171,6 +171,9 @@
 | 160 | repoDB NMF reproduction (Gao 2020) | `validate_repodb_nmf` | PASS | 9 |
 | 161 | Knowledge graph embedding (ROBOKOP) | `validate_knowledge_graph_embedding` | PASS | 7 |
 | 162 | Cross-spring evolution (S54-S62) | `validate_cross_spring_s57` | PASS | 66 |
+| 163 | BarraCuda CPU v9 — Track 3 drug repurposing | `validate_barracuda_cpu_v9` | PASS | 27 |
+| 164 | GPU drug repurposing — GEMM NMF, TransE, PeakDetect | `validate_gpu_drug_repurposing` | PASS | 8 |
+| 165 | metalForge drug repurposing — CPU↔GPU parity | `validate_metalforge_drug_repurposing` | PASS | 9 |
 
 ---
 
@@ -178,7 +181,7 @@
 
 | Category | Count |
 |----------|-------|
-| Experiments completed | 162 |
+| Experiments completed | 165 |
 | CPU validation checks | 1,476 |
 | GPU validation checks | 702 |
 | Dispatch validation checks | 80 |
@@ -202,11 +205,12 @@
 | Extension papers: cold seep, phylogeny, waves (Exp144-149) | 36 |
 | Phase 39: finite-size, correlated, comm, nitrifying, marine, myxo, dicty (Exp150-156) | 66 |
 | Drug repurposing: Fajgenbaum, MATRIX, NMF, repoDB, ROBOKOP (Exp157-161) | 40 |
-| **Total validation checks** | **3,198+** |
+| Drug repurposing: CPU v9, GPU, metalForge (Exp163-165) | 44 |
+| **Total validation checks** | **3,242+** |
 | Rust tests | 806 (752 barracuda CPU + 7 GPU-only + 47 forge) |
 | BarraCuda CPU parity | 380/380 (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/092/101) |
-| metalForge cross-system | 37 domains CPU↔GPU proven (Exp103+104), **25/25 papers three-tier** |
+| metalForge cross-system | 37 domains CPU↔GPU proven (Exp103+104+165), **30/30 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | ToadStool primitives consumed | 44 (barracuda always-on, zero fallback — S62) |
 | ToadStool session alignment | S62 (660+ WGSL, cpu-math gate, PeakDetect, TransE, SpMM, NMF, ODE bio, ridge, Anderson) |

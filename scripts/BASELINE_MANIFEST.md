@@ -87,6 +87,8 @@ cargo run --bin <binary>               # Rust must match within tolerance
 | Script | Rust Binary | Exp | Tool | SHA-256 (first 16) |
 |--------|-------------|-----|------|---------------------|
 | `nmf_drug_disease_pipeline.py` | `validate_nmf_drug_repurposing` | 159 | NMF (Lee & Seung) | `292b8186d345b666` |
+| `fajgenbaum_pathway_scoring.py` | `validate_fajgenbaum_pathway` | 157 | Pathway scoring | `670d23b5e91da8b5` |
+| `transe_knowledge_graph.py` | `validate_knowledge_graph_embedding` | 161 | TransE (KG) | `5a8dfec3e8e5862b` |
 
 ## Utility (not baselines)
 

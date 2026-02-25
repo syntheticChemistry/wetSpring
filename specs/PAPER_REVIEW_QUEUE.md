@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: February 25, 2026 (Phase 41 — ToadStool S62, 44 primitives, barracuda always-on)
+**Last Updated**: February 25, 2026 (Phase 42 — ToadStool S62, 44 primitives, barracuda always-on)
 **Purpose**: Track papers for reproduction/review across three tracks
 
 ---
@@ -189,9 +189,9 @@ No proprietary data dependencies.
 
 | Tier | Description | Experiments | Checks |
 |------|-------------|:-----------:|:------:|
-| **BarraCuda CPU** | Rust math matches Python baselines | Exp035,043,057,070,079,085,102 | 380/380 |
-| **BarraCuda GPU** | GPU math matches CPU reference | Exp064,071,087,092,101 | 702+ |
-| **metalForge** | Substrate-independent output (CPU/GPU/NPU) | Exp060,065,080,084,086,088,093,103,104 | 234+ |
+| **BarraCuda CPU** | Rust math matches Python baselines | Exp035,043,057,070,079,085,102,163 | 407/407 |
+| **BarraCuda GPU** | GPU math matches CPU reference | Exp064,071,087,092,101,164 | 710+ |
+| **metalForge** | Substrate-independent output (CPU/GPU/NPU) | Exp060,065,080,084,086,088,093,103,104,165 | 243+ |
 | **Streaming** | Pure GPU pipeline, zero CPU round-trips | Exp072,073,075,089,090,091,105,106 | 252+ |
 | **Cross-spring** | neuralSpring + spectral theory primitives | Exp094,095,107 | 71 |
 | **NCBI-scale** | Real-scale data extensions | Exp108-113 | 78 |
@@ -199,7 +199,7 @@ No proprietary data dependencies.
 | **Cross-spring evolution** | 612 WGSL shaders traced, imports rewired | Exp120 | 9 |
 | **Phase 37-38 extensions** | Anderson-QS extension papers + cold seep + phylogeny | Exp144-149,152-156 | 102 |
 | **Phase 40 scaling** | Finite-size + correlated disorder + physical comm | Exp150-151 | 22 |
-| **Drug repurposing (Track 3)** | NMF, pathway scoring, KG embedding | Exp157-161 | 40 |
+| **Drug repurposing (Track 3)** | NMF, pathway scoring, KG embedding, metalForge | Exp157-165 | 84 |
 
 ### Phase 37 — Anderson-QS Extension Papers
 
@@ -241,14 +241,15 @@ Core finding: **no prior work applies Anderson localization to QS signaling**.
 | Track 1c (Metagenomics) | 6 | 6/6 | 6/6 | 6/6 | Full three-tier |
 | Track 2 (PFAS/LC-MS) | 4 | 4/4 | 4/4 | 4/4 | Full three-tier |
 | **Subtotal (actionable)** | **25** | **25/25** | **25/25** | **25/25** | **ALL three-tier** |
-| Track 3 (Drug repurposing) | 5 | 5/5 | 5/5 | 0/5 | NMF (S58), TransE (S60), SpMM (S60) — full GPU suite |
+| Track 3 (Drug repurposing) | 5 | 5/5 | 5/5 | 5/5 | Full three-tier (Exp163-165) |
 | Cross-spring (spectral) | 1 | 1/1 | 1/1 | — | CPU + GPU |
 | Extensions (Phase 37-39) | 9 | 9/9 | — | — | CPU only (by design — analytical/catalog) |
-| **Grand total** | **43** | **43/43** | **31/31** | **25/25** | |
+| **Grand total** | **43** | **43/43** | **31/31** | **30/30** | |
 
-**All GPU primitives now upstream:** NMF (S58), TransE (S60), SpMM (S60), PeakDetect (S62).
-Track 3 has full GPU coverage. Extension papers are analytical models — GPU acceleration
-is not the bottleneck. All 31 actionable papers now have GPU paths.
+**All GPU primitives upstream:** NMF (S58), TransE (S60), SpMM (S60), PeakDetect (S62).
+**All 30 actionable papers now have full three-tier validation** (CPU, GPU, metalForge).
+Track 3 completed via Exp163 (CPU v9), Exp164 (GPU drug repurposing), Exp165 (metalForge).
+Extension papers are analytical models — GPU acceleration is not the bottleneck.
 
 ---
 

@@ -410,6 +410,18 @@ name = "validate_cpu_vs_gpu_all_domains"
 path = "src/bin/validate_cpu_vs_gpu_all_domains.rs"
 required-features = ["gpu"]
 
+# ── GPU Drug Repurposing (Exp164) ────────────────────────────────
+[[bin]]
+name = "validate_gpu_drug_repurposing"
+path = "src/bin/validate_gpu_drug_repurposing.rs"
+required-features = ["gpu"]
+
+# ── metalForge Drug Repurposing (Exp165) ─────────────────────────
+[[bin]]
+name = "validate_metalforge_drug_repurposing"
+path = "src/bin/validate_metalforge_drug_repurposing.rs"
+required-features = ["gpu"]
+
 # ── metalForge Full v3 (Exp093) ──────────────────────────────────
 [[bin]]
 name = "validate_metalforge_full_v3"
@@ -542,6 +554,10 @@ required-features = ["gpu"]
 [[bin]]
 name = "validate_barracuda_cpu_v8"
 path = "src/bin/validate_barracuda_cpu_v8.rs"
+
+[[bin]]
+name = "validate_barracuda_cpu_v9"
+path = "src/bin/validate_barracuda_cpu_v9.rs"
 
 [[bin]]
 name = "validate_metalforge_v5"
