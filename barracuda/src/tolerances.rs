@@ -141,6 +141,14 @@ pub const EVOLUTIONARY_DISTANCE: f64 = 1e-3;
 /// can differ by ~1e-3 at alignment boundaries.
 pub const SPECTRAL_COSINE: f64 = 1e-3;
 
+/// HMM forward log-likelihood Python parity.
+///
+/// HMM forward algorithm accumulates log-sum-exp over T×N states.
+/// Python `hmmlearn` and Rust differ by ~1e-7 due to log/exp ordering.
+/// 1e-6 covers observed variance for small models (2 states, 5 obs).
+/// Validated: `scripts/liu2014_hmm_baseline.py`, commit `e4358c5`.
+pub const HMM_FORWARD_PARITY: f64 = 1e-6;
+
 // ═══════════════════════════════════════════════════════════════════
 // Algorithm guards and convergence thresholds
 // ═══════════════════════════════════════════════════════════════════
@@ -228,6 +236,21 @@ pub const GILLESPIE_MEAN_REL: f64 = 0.1;
 /// yields Fano within ±0.5 of theoretical at 10,000 replicates.
 pub const GILLESPIE_FANO: f64 = 0.5;
 
+/// Gillespie Python-range relative tolerance (15%).
+///
+/// Since Rust and Python use different PRNGs, we cannot match bitwise.
+/// With N=1000 replicates, the Rust ensemble mean should be within 15%
+/// of the analytical mean (same regime as the Python baseline).
+/// Validated: `scripts/gillespie_baseline.py`, commit `e4358c5`.
+pub const GILLESPIE_PYTHON_RANGE_REL: f64 = 0.15;
+
+/// Fano factor physical range for birth-death validation.
+///
+/// The Fano factor must lie in \[0, 2\] for a near-Poisson process.
+/// ±1.0 around the theoretical value of 1.0 covers the full physical
+/// range. Values outside indicate a bug in variance accumulation.
+pub const GILLESPIE_FANO_PHYSICAL: f64 = 1.0;
+
 // ═══════════════════════════════════════════════════════════════════
 // PFAS / analytical chemistry tolerances
 // ═══════════════════════════════════════════════════════════════════
@@ -249,6 +272,14 @@ pub const KMD_SPREAD: f64 = 0.02;
 /// Tighter than `MZ_TOLERANCE` for high-resolution fragment matching.
 pub const MZ_FRAGMENT: f64 = 0.001;
 
+/// KMD non-homologue separation threshold.
+///
+/// Compounds from *different* PFAS series (e.g. PFCAs vs sulfonates +
+/// non-PFAS) should differ by > 0.005 KMD units. Tighter than
+/// [`KMD_GROUPING`] to verify that non-homologues are correctly excluded.
+/// Validated: Exp006 (EPA Method 533), commit `eb99b12`.
+pub const KMD_NON_HOMOLOGUE: f64 = 0.005;
+
 /// Spectral matching m/z window for unit-resolution MS2.
 ///
 /// Used as the matching window parameter for `cosine_similarity`.
@@ -260,6 +291,23 @@ pub const SPECTRAL_MZ_WINDOW: f64 = 0.5;
 
 /// Relative peak height tolerance (1%) vs `scipy` baseline.
 pub const PEAK_HEIGHT_REL: f64 = 0.01;
+
+/// Rarefaction curve monotonicity guard.
+///
+/// Rarefaction is mathematically non-decreasing; small rounding in
+/// hypergeometric terms can cause ≤ 1e-10 decreases. Same order as
+/// [`PYTHON_PARITY`] but semantically a monotonicity check, not a
+/// baseline-comparison tolerance.
+pub const RAREFACTION_MONOTONIC: f64 = 1e-10;
+
+/// `PCoA` eigenvalue non-negativity floor.
+///
+/// Jacobi eigendecomposition of a centered distance matrix should produce
+/// non-negative eigenvalues. Numerical noise from double-centering and
+/// finite Jacobi sweeps can push tiny eigenvalues to −1e-10. Using this
+/// as `e >= -PCOA_EIGENVALUE_FLOOR` distinguishes genuine negative
+/// eigenvalues (non-Euclidean metric) from rounding artifacts.
+pub const PCOA_EIGENVALUE_FLOOR: f64 = 1e-10;
 
 // ═══════════════════════════════════════════════════════════════════
 // Jacobi eigendecomposition (PCoA)
@@ -475,6 +523,28 @@ pub const GALAXY_SIMPSON_RANGE: f64 = 0.25;
 /// commit `21d43a0`.
 pub const GALAXY_BRAY_CURTIS_RANGE: f64 = 0.50;
 
+// ═══════════════════════════════════════════════════════════════════
+// Feature extraction / asari cross-reference tolerances (Exp009)
+// ═══════════════════════════════════════════════════════════════════
+
+/// Asari cross-match percentage tolerance (Exp009).
+///
+/// At least 30% of asari features must be recovered by Rust. Expressed as
+/// the tolerance around the 100% ideal: `expected=30, tol=70` means the
+/// check passes when `match_pct >= 30%`. Wider than other tolerances
+/// because single-file extraction covers fewer features than the full
+/// 8-file asari run.
+/// Validated: Exp009 (MT02 HILIC-pos, 8 mzML, asari 1.13.1).
+pub const ASARI_CROSS_MATCH_PCT: f64 = 70.0;
+
+/// Asari m/z-range coverage percentage tolerance (Exp009).
+///
+/// At least 90% of Rust-detected features should fall within asari's
+/// observed m/z range (80–1000 Da). `expected=100, tol=10` means the
+/// check passes when `range_pct >= 90%`.
+/// Validated: Exp009 (MT02 HILIC-pos, asari range 83–999 Da).
+pub const ASARI_MZ_RANGE_PCT: f64 = 10.0;
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -547,6 +617,14 @@ mod tests {
             CHAO1_COUNT_HALFWIDTH,
             ODE_NEAR_ZERO_RELATIVE,
             GPU_LOG_POLYFILL,
+            RAREFACTION_MONOTONIC,
+            PCOA_EIGENVALUE_FLOOR,
+            KMD_NON_HOMOLOGUE,
+            HMM_FORWARD_PARITY,
+            GILLESPIE_PYTHON_RANGE_REL,
+            GILLESPIE_FANO_PHYSICAL,
+            ASARI_CROSS_MATCH_PCT,
+            ASARI_MZ_RANGE_PCT,
         ];
         for tol in all {
             assert!(tol >= 0.0, "tolerance {tol} must be non-negative");

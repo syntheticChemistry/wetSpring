@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** February 25, 2026 (V37 revalidation, ToadStool `02207c4a`)
+**Date:** February 25, 2026 (V40 ToadStool catch-up, ToadStool `02207c4a` S62+DF64)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 46 CPU + 42 GPU modules + 1 Write-phase WGSL extension, 44 ToadStool primitives + 2 BGL helpers (barracuda always-on, zero fallback code), 806 tests (759 barracuda + 47 forge), 95.75% library coverage, 167 experiments, 3,279+ checks, ToadStool S62+DF64 aligned
+**Status:** 46 CPU + 42 GPU modules + 1 Write-phase WGSL extension, 49 ToadStool primitives + 2 BGL helpers (barracuda always-on, zero fallback code), 806 tests (759 barracuda + 47 forge), 95.75% library coverage, 168 experiments, 3,300+ checks, ToadStool S62+DF64 aligned, 70 named tolerance constants, 0 ad-hoc tolerances, 0 Passthrough, 0 debt. 7/9 P0-P3 evolution requests delivered.
 
 ### Full Lean + Write Phase
 
@@ -21,51 +21,66 @@ and `trapz`. Zero duplicate math remains in the codebase.
 
 See `ABSORPTION_MANIFEST.md` for the full ledger.
 
-### S62+DF64 Evolution (Phase 43)
+### S62+DF64 Evolution (Phase 43 — V40 catch-up)
 
-ToadStool's post-S62 commits introduced DF64 core-streaming (routing f64 workloads
-through FP32 cores on consumer GPUs), `ComputeDispatch` builder, BGL helpers, and
-`unified_hardware` refactor. wetSpring adopted:
+ToadStool S39-S62+DF64 (55+ commits since V39) delivered massive infrastructure:
 
+**Absorbed and leaned:**
+- `PeakDetectF64` (S62) — `signal_gpu` rewired from Passthrough to Lean
 - `storage_bgl_entry`/`uniform_bgl_entry` from `barracuda::device::compute_pipeline`
   (6 files: 5 ODE GPU + `gemm_cached.rs`, ~258 lines BGL boilerplate removed)
 - `compile_shader_f64` directly on `GemmF64::WGSL` (replaces `ShaderTemplate::for_driver_auto`)
-- DF64 GEMM auto-selection blocked by private `wgsl_shader_for_device()` upstream
+- `GemmF64::wgsl_shader_for_device()` now public — DF64 GEMM auto-selection unblocked
 
-**Upstream requests** (V37 update):
-1. Make `GemmF64::wgsl_shader_for_device()` public (DF64 auto-selection for cached pipelines)
-2. Fix `PeakDetectF64` WGSL shader (f32 literal → f64 array, line 49)
-3. Consider `ComputeDispatch` with cached-pipeline variant (returns pipeline + BGL for reuse)
-4. Consider `barracuda::math::{dot, l2_norm}` CPU primitives (currently in `wetspring::special`, thin wrappers over slice iterators — candidates for shared extraction)
+**Available for future wiring:**
+- `ComputeDispatch` builder — eliminates 80-line bind-group/pipeline boilerplate
+- `Fp64Strategy` auto-detect — Native/Hybrid selection per GPU era
+- DF64 core-streaming — routes f64 through FP32 cores on consumer GPUs (RTX 4070: 5888 FP32 cores vs 92 FP64 units)
+- `BandwidthTier` — PCIe-aware routing for metalForge dispatch
+- `SparseGemmF64` — CSR × dense GEMM for drug repurposing sparse matrices
+- `TranseScoreF64` — GPU TransE KG embedding scoring
+- `TopK` — GPU bitonic sort for drug-disease ranking
+- `unified_hardware` refactored to 6 focused modules (types, traits, scheduler, discovery, cpu_executor, transfer)
+
+**Upstream requests** (V40 status — 7/9 delivered):
+1. ~~Make `GemmF64::wgsl_shader_for_device()` public~~ → **DELIVERED** (S62+DF64) — with `Fp64Strategy` auto-detect (Native/Hybrid), DF64 GEMM for FP32 cores
+2. ~~Fix `PeakDetectF64` WGSL shader~~ → **DELIVERED** (S62) — full f64 op + `peak_detect_f64.wgsl`; `signal_gpu` already leaned
+3. ~~`ComputeDispatch` with cached-pipeline variant~~ → **DELIVERED** (S62+DF64) — `ComputeDispatch` builder in `device::compute_pipeline`
+4. ~~`barracuda::math::{dot, l2_norm}`~~ → **DELIVERED** (S60) as GPU ops: `NormReduceF64::l2()`, `FusedMapReduceF64::dot()`, `WeightedDotF64::dot()`. CPU `special::{dot, l2_norm}` remain as thin local helpers for validation math.
+5. Absorb `diversity_fusion_f64.wgsl` → **OPEN** (P2)
+6. ~~`BatchedOdeRK4Generic<N, P>`~~ → **DELIVERED** (S58) via `OdeSystem` trait + `generate_shader()`; all 5 ODE systems leaned
+7. ~~GPU Top-K selection~~ → **DELIVERED** (S60) — `ops::topk::TopK` (1D indices, WGSL bitonic sort)
+8. ~~NPU int8 quantization helpers~~ → **DELIVERED** (S39) — `quantize_affine_i8`
+9. Tolerance module pattern for ToadStool validation → **OPEN** (P2 suggestion)
 
 ### Next Write Phase: Absorption Candidates
 
 Following hotSpring's pattern of writing validated extensions as proposals for
 ToadStool absorption, these wetSpring modules are candidates for new Write phase:
 
-| Module | Location | CPU Tests | What it does | Absorption benefit |
-|--------|----------|-----------|--------------|-------------------|
-| `bio::gbm_gpu` | `bio/gbm_gpu.rs` | 16/16 | GBM batch inference (CPU fallback) | GPU GBM inference for ML pipelines |
-| `bio::random_forest_gpu` | `bio/random_forest_gpu.rs` | 13/13 | RF batch inference (SoA layout) | GPU ensemble inference |
-| `bio::eic_gpu` | `bio/eic_gpu.rs` | GPU | EIC extraction + peak integration | LC-MS GPU pipeline |
-| `bio::kmd_gpu` | `bio/kmd_gpu.rs` | GPU | KMD group classification | PFAS screening pipeline |
-| `bio::merge_pairs_gpu` | `bio/merge_pairs_gpu.rs` | GPU | Paired-end read merging | 16S pipeline GPU stage |
-| `forge::bridge` | `metalForge/forge/src/bridge.rs` | 47 | Substrate ↔ barracuda bridge | Multi-substrate dispatch |
-| `forge::dispatch` | `metalForge/forge/src/dispatch.rs` | 47 | Capability-based routing | Universal workload routing |
+| Module | Location | Status | Absorption benefit |
+|--------|----------|--------|-------------------|
+| `diversity_fusion_f64.wgsl` | local WGSL | Write (P2-5 open) | Fused Shannon + Simpson + evenness |
+| `forge::bridge` | `metalForge/forge/src/bridge.rs` | 47 tests | Multi-substrate dispatch |
+| `forge::dispatch` | `metalForge/forge/src/dispatch.rs` | 47 tests | Universal workload routing |
+
+All GPU bio modules are now either Lean (upstream primitive) or Compose
+(wire upstream primitives). No GPU modules remain in Passthrough.
 
 ### Code Quality (Phase 15+)
 
 All modules pass `clippy::pedantic` + `clippy::nursery` (0 warnings, `-D` enforced
 in CI), `cargo fmt` (0 diffs), `cargo doc` (0 warnings with and without `--all-features`).
-All tolerances centralized in `tolerances.rs` (56 named constants — includes
+All tolerances centralized in `tolerances.rs` (70 named constants — includes
 Jacobi eigendecomposition (Golub & Van Loan), ESN regularisation (Jaeger 2001/
-Lukoševičius 2012), and Chao1 count detection (skbio parity)). NMF convergence
+Lukoševičius 2012), Chao1 count detection (skbio parity), and 8 V39 audit
+additions: rarefaction, PCoA, KMD, HMM, Gillespie, asari). NMF convergence
 constants removed after lean to `barracuda::linalg::nmf`.
 `bio::spectral_match` uses `special::{dot, l2_norm}` instead of inline computation.
 `#![deny(unsafe_code)]` enforced crate-wide — **zero unsafe blocks** in library or
 test code as of Feb 24, 2026. Test env-var manipulation refactored to pure-function
 `resolve_data_dir()` pattern, eliminating all `unsafe { set_var/remove_var }` calls.
-All 157 binaries carry `# Provenance` headers. Data paths use `validation::data_dir()`
+All 158 binaries carry `# Provenance` headers. Data paths use `validation::data_dir()`
 for capability-based discovery. NCBI API key resolution evolved to capability-based
 cascade (env var → `WETSPRING_DATA_ROOT` → XDG config → legacy paths).
 `flate2` uses `rust_backend` — zero C dependencies (ecoBin compliant). All 42
@@ -286,15 +301,18 @@ hotSpring's precision f64 polyfills improve wetSpring's numerical accuracy.
 | `erf`, `ln_gamma`, `regularized_gamma_p` | Special functions (always-on CPU math) | S59 |
 | `ValidationHarness` | Structured tolerance-aware validation | S59 |
 
-### 5 ToadStool S60-S62 Primitives (latest lean)
+### 8 ToadStool S60-S62+DF64 Primitives (V40 catch-up)
 
-| Primitive | wetSpring Use | ToadStool Session |
-|-----------|---------------|------------------|
-| `TranseScoreF64` | GPU knowledge graph scoring (TransE) | S60 |
-| `SparseGemmF64` | Available for sparse NMF (not yet wired) | S60 |
-| `PeakDetectF64` | GPU LC-MS peak detection | S62 |
-| `BandwidthTier` | PCIe-aware routing (available for metalForge) | S62 |
-| `cpu-math` feature gate | barracuda always-on without GPU | S62 |
+| Primitive | wetSpring Use | ToadStool Session | Status |
+|-----------|---------------|------------------|--------|
+| `TranseScoreF64` | GPU knowledge graph scoring (TransE) | S60 | Available — Track 3 |
+| `SparseGemmF64` | Sparse NMF for drug repurposing | S60 | Available — Track 3 |
+| `TopK` | Drug-disease pair ranking | S60 | Available — Track 3 |
+| `PeakDetectF64` | GPU LC-MS peak detection | S62 | ✅ Lean — `signal_gpu` rewired |
+| `BandwidthTier` | PCIe-aware routing for metalForge | S62 | Available |
+| `ComputeDispatch` | Eliminates BGL/pipeline boilerplate | S62+DF64 | Available |
+| `Fp64Strategy` | Native/Hybrid f64 auto-selection | DF64 | Available |
+| DF64 GEMM (`gemm_df64.wgsl`) | ~10× throughput on FP32 cores (RTX 4070) | DF64 | Available |
 
 ---
 

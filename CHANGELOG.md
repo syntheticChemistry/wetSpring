@@ -5,6 +5,39 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Changed (V40 — ToadStool S39-S62+DF64 Catch-Up + Rewiring)
+- **ToadStool evolution review**: Reviewed 55+ ToadStool commits (S39-S62+DF64).
+  7/9 P0-P3 evolution requests delivered by ToadStool: GemmF64 public API (P0-1),
+  PeakDetectF64 f64 fix (P1-2), ComputeDispatch builder (P1-3), GPU dot/l2_norm
+  (P1-4), ODE generate_shader (P2-6), TopK GPU (P3-7), quantize_affine_i8 (P3-8).
+- **Primitive count**: 44 → 49 ToadStool primitives consumed. New: PeakDetectF64,
+  ComputeDispatch, SparseGemmF64, TranseScoreF64, TopK.
+- **Passthrough elimination**: 3 → 0. `signal_gpu` leaned on `PeakDetectF64` (S62).
+- **Track 3 GPU unblocked**: NMF, SpMM, TransE, cosine, Top-K all upstream.
+- **SparseGemmF64 wired**: `validate_gpu_drug_repurposing` now validates GPU sparse
+  CSR × dense GEMM (100×80 @ 5% fill) against CPU reference.
+- **NMF Top-K wired**: Drug candidate ranking via `barracuda::linalg::nmf::top_k_predictions`.
+- **Exp168**: New `validate_cross_spring_s62` binary — comprehensive cross-spring
+  evolution validation covering hotSpring precision → wetSpring bio → neuralSpring
+  population genetics → Track 3 complete GPU path, with evolution timeline narrative.
+- **Pre-existing clippy fix**: `diversity_fusion_gpu.rs` float_cmp → epsilon check.
+- **Doc updates**: All handoffs, specs, root docs updated to V40 with 49 primitives,
+  0 Passthrough, 7/9 P0-P3 delivered. 158 binaries (was 157).
+
+### Changed (V39 — Comprehensive Audit + Tolerance Completion)
+- **tolerances.rs**: 8 additional named constants for full coverage. Total: 70 named
+  tolerance constants. New: `RAREFACTION_MONOTONIC`, `PCOA_EIGENVALUE_FLOOR`,
+  `KMD_NON_HOMOLOGUE`, `HMM_FORWARD_PARITY`, `GILLESPIE_PYTHON_RANGE_REL`,
+  `GILLESPIE_FANO_PHYSICAL`, `ASARI_CROSS_MATCH_PCT`, `ASARI_MZ_RANGE_PCT`.
+- **5 validation binaries updated**: `validate_diversity`, `validate_pfas`,
+  `validate_barracuda_cpu`, `validate_gillespie`, `validate_features` — all
+  remaining ad-hoc tolerance literals replaced with named constants. Zero
+  ad-hoc tolerances remain in any validation binary.
+- **Comprehensive audit**: Zero TODOs/FIXMEs/mocks, zero unsafe code, zero
+  production unwrap/expect, all 145 validation binaries follow hotSpring
+  pattern with provenance, all I/O parsers stream (no full-file buffering),
+  all external data from public repos with accession numbers.
+
 ### Changed (V38 — Deep Debt Resolution)
 - **tolerances.rs**: 3 new named constants (`GPU_LOG_POLYFILL`, `ODE_NEAR_ZERO_RELATIVE`,
   and strengthened `EXACT` usage). Total: 62 named tolerance constants.

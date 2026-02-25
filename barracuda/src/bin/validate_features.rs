@@ -208,7 +208,7 @@ fn main() {
             "Cross-match >= 30% of asari features",
             match_pct,
             30.0,
-            70.0, // tolerance: match_pct must be >= 30% (i.e. within 70 of 100)
+            tolerances::ASARI_CROSS_MATCH_PCT,
         );
 
         let rust_in_asari_range = table
@@ -222,7 +222,7 @@ fn main() {
             "Rust features in asari m/z range (80-1000) >= 90%",
             range_pct,
             100.0,
-            10.0,
+            tolerances::ASARI_MZ_RANGE_PCT,
         );
     } else {
         println!("  (skipping cross-reference — no features to compare)");

@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** February 25, 2026 (V37 revalidation)
+**Date:** February 25, 2026 (V40 ToadStool catch-up, post-S62+DF64 review)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
 **ToadStool pin:** `02207c4a` (S62+DF64 expansion, Feb 24 2026)
-**Status:** 44 ToadStool primitives + 2 BGL helpers consumed, 1 local WGSL extension (Write phase — diversity fusion), 5 GPU ODE modules use trait-generated WGSL via `BatchedOdeRK4<S>::generate_shader()`, 42 GPU modules + 1 Write-phase extension, 0 Tier B/C remaining, 806 tests (759 barracuda + 47 forge), 95.75% library coverage, ToadStool S62+DF64 aligned, 167 experiments, 3,279+ checks
+**Status:** 49 ToadStool primitives + 2 BGL helpers consumed (up from 44 in V39), 1 local WGSL extension (Write phase — diversity fusion), 5 GPU ODE modules use trait-generated WGSL via `BatchedOdeRK4<S>::generate_shader()`, 42 GPU modules + 1 Write-phase extension, 0 Tier B/C remaining, 0 Passthrough remaining (all 3 former Passthrough → Lean/Compose), 806 tests (759 barracuda + 47 forge), 95.75% library coverage, ToadStool S62+DF64 aligned, 168 experiments, 3,300+ checks
 
 ---
 
@@ -49,9 +49,9 @@ WGSL          known physics   handoffs/                        delete local
 | Compose | GPU wrappers wiring ToadStool primitives | **7 modules** (kmd, merge_pairs, RF, derep, NJ, reconciliation, molecular_clock) |
 | Passthrough | Accept GPU buffers, CPU kernel | **3 modules** (gbm, feature_table, signal) |
 | Validate | CPU ↔ GPU parity for all shaders | All 5 ODE: exact parity (Exp099/100/101) |
-| Hand off | wateringHole/handoffs/ documents | **V37** active (revalidation + deep debt cleanup), V7-V36 archived |
-| Absorb | ToadStool integrates as `ops::bio::*` | **44 items** absorbed (ToadStool S62+DF64: all DONE, +46 cross-spring total) |
-| Lean | Rewire to upstream, delete local code | 44 primitives + 2 BGL helpers lean, 5 `OdeSystem` trait rewires, BGL boilerplate removed |
+| Hand off | wateringHole/handoffs/ documents | **V40** active (ToadStool catch-up), V7-V39 archived |
+| Absorb | ToadStool integrates as `ops::bio::*` | **49 items** absorbed (ToadStool S62+DF64: all DONE, +46 cross-spring total) |
+| Lean | Rewire to upstream, delete local code | 49 primitives + 2 BGL helpers lean, 5 `OdeSystem` trait rewires, BGL boilerplate removed, 0 Passthrough |
 
 ---
 
@@ -130,16 +130,15 @@ workflows. No local WGSL needed — these compose upstream ops.
 
 ---
 
-## Passthrough Phase (3 GPU Wrappers)
+## Passthrough Phase — ALL PROMOTED (V40)
 
-Accept GPU buffers but run CPU kernels. Pending ToadStool primitives for
-full GPU dispatch.
+All 3 former Passthrough modules have been promoted. Zero Passthrough remains.
 
-| Module | CPU Kernel | Needed Primitive | Exp |
-|--------|-----------|-----------------|-----|
-| `gbm_gpu` | Sequential boosting | `GbmBatchInferenceGpu` | 101 |
-| `feature_table_gpu` | Feature extraction pipeline | `FeatureExtractionGpu` | 101 |
-| `signal_gpu` | Peak detection (1D) | `PeakDetectGpu` | 101 |
+| Module | Was | Now | How |
+|--------|-----|-----|-----|
+| `gbm_gpu` | Passthrough (sequential boosting) | ✅ Compose (`TreeInferenceGpu`) | Pure GPU batch inference (promoted Exp101) |
+| `feature_table_gpu` | Passthrough (feature extraction) | ✅ Compose (`FMR` + `WeightedDotF64`) | Chains eic_gpu + signal_gpu (promoted Exp101) |
+| `signal_gpu` | Passthrough (CPU peaks) | ✅ Lean (`PeakDetectF64` S62) | Rewired to upstream GPU peak detection |
 
 ---
 
@@ -179,8 +178,12 @@ Local Rust implementations that duplicate barracuda upstream. Pending
 | `cholesky_factor()` | `bio/esn.rs` | `barracuda::linalg::cholesky_solve` | SPD system solve (ridge regression, kriging, GP) |
 | `solve_ridge()` | `bio/esn.rs` | `barracuda::linalg::ridge_regression` | Cholesky-based ridge with flat buffer layout |
 
-**Blocker:** barracuda requires wgpu+akida+toadstool-core as mandatory deps.
-Proposed: `[features] math = []` gates CPU-only modules without GPU stack.
+**Status (V40):** barracuda's `default-features = false` already provides
+CPU-only access to `special`, `linalg`, `numerical`, and `tolerances`
+modules without pulling GPU dependencies. wetSpring already uses this
+pattern (`barracuda = { default-features = false }` in Cargo.toml).
+All 6 extraction candidates are already delegating to barracuda upstream.
+No further migration needed — this section is **COMPLETE**.
 
 ---
 
@@ -241,6 +244,24 @@ complete. All root docs synced. 222 lines commented-out code removed.
 | `belief_propagation_chain` | `barracuda::linalg` | S56 | Hierarchical taxonomy classification | 162 |
 | `boltzmann_sampling` | `barracuda::sample` | S56 | MCMC parameter optimization | 162 |
 
+### S60-S62+DF64 Primitives (V40 Catch-Up)
+
+ToadStool S60-S62+DF64 delivered major infrastructure and closed all
+wetSpring P0-P3 evolution requests except diversity_fusion absorption.
+
+| Primitive | Module | Session | wetSpring Status | Notes |
+|-----------|--------|---------|------------------|-------|
+| `PeakDetectF64` | `barracuda::ops::peak_detect_f64` | S62 | ✅ Lean — `signal_gpu` rewired | Closes P1-2 (f32→f64 fix) |
+| `ComputeDispatch` builder | `barracuda::device::compute_pipeline` | S62+DF64 | Available — adoption candidate | Closes P1-3 (cached-pipeline) |
+| `SparseGemmF64` | `barracuda::ops::sparse_gemm_f64` | S60 | Available — Track 3 drug repurposing | CSR × dense f64 GEMM |
+| `TranseScoreF64` | `barracuda::ops::transe_score_f64` | S60 | Available — Track 3 KG scoring | GPU TransE embedding |
+| `TopK` | `barracuda::ops::topk` | S60 | Available — Track 3 drug ranking | Closes P3-7 (GPU Top-K) |
+| `BandwidthTier` | `barracuda::unified_hardware::types` | S62 | Available — metalForge PCIe routing | PCIe-aware dispatch |
+| `Fp64Strategy` | `barracuda::device::driver_profile` | DF64 | Available — DF64 auto-selection | Native/Hybrid per GPU |
+| DF64 GEMM | `barracuda::shaders::linalg::gemm_df64` | DF64 | Available — RTX 4070 FP32-core GEMM | ~10× throughput for compute-dominant loops |
+
+All P0-P3 request resolution documented in V40 handoff.
+
 ---
 
 ## Cross-Spring Contributions
@@ -296,3 +317,19 @@ Patterns from hotSpring and neuralSpring that wetSpring leans on:
 - Deep debt cleanup: ncbi.rs sovereignty (capability-based HTTP), I/O parser lean
   (deprecated buffering removed), 56 binaries modernized (NaN-safe sorts, descriptive expects),
   tolerance provenance (5 constants with commit hashes), CI expanded (coverage gate + forge jobs)
+
+**V40 ToadStool catch-up (Feb 25, 2026):**
+- Reviewed ToadStool S39-S62+DF64 commit evolution (55+ commits since last handoff)
+- Confirmed: 7/9 P0-P3 evolution requests delivered by ToadStool
+  - P0-1: `GemmF64::wgsl_shader_for_device()` public + DF64 auto-select ✅
+  - P1-2: `PeakDetectF64` f64 end-to-end (S62) ✅ — `signal_gpu` already leaned
+  - P1-3: `ComputeDispatch` builder (S62+DF64) ✅
+  - P1-4: `dot`/`l2_norm` as GPU ops (`NormReduceF64`, `FusedMapReduceF64`) ✅
+  - P2-6: `BatchedOdeRK4` via `OdeSystem` trait + `generate_shader()` (S58) ✅
+  - P3-7: `TopK` GPU primitive (S60) ✅
+  - P3-8: `quantize_affine_i8` (S39) ✅
+- Remaining open: P2-5 (diversity_fusion absorption), P2-9 (tolerance pattern suggestion)
+- Track 3 GPU fully unblocked: NMF, SpMM, TransE, cosine, Top-K all upstream
+- 3 Passthrough modules promoted: signal_gpu → Lean, gbm_gpu → Compose, feature_table_gpu → Compose
+- 5 new upstream primitives available: SparseGemmF64, TranseScoreF64, BandwidthTier, Fp64Strategy, DF64 GEMM
+- All tests pass (806), clippy clean, docs clean against ToadStool HEAD (02207c4a)

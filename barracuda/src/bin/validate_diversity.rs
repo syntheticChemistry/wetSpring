@@ -224,7 +224,9 @@ fn validate_evenness_and_rarefaction(v: &mut Validator) {
     )]
     let depths: Vec<f64> = (1..=total as u64).map(|x| x as f64).collect();
     let curve = diversity::rarefaction_curve(&community, &depths);
-    let monotonic = curve.windows(2).all(|w| w[1] >= w[0] - 1e-10);
+    let monotonic = curve
+        .windows(2)
+        .all(|w| w[1] >= w[0] - tolerances::RAREFACTION_MONOTONIC);
     v.check(
         "Rarefaction monotonic",
         f64::from(u8::from(monotonic)),
@@ -343,7 +345,11 @@ fn validate_exp002_galaxy_baseline(v: &mut Validator) {
     );
     v.check(
         "Exp002: PCoA eigenvalues non-negative",
-        if pcoa.eigenvalues.iter().all(|&e| e >= -1e-10) {
+        if pcoa
+            .eigenvalues
+            .iter()
+            .all(|&e| e >= -tolerances::PCOA_EIGENVALUE_FLOOR)
+        {
             1.0
         } else {
             0.0

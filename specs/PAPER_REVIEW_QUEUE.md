@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: February 25, 2026 (Phase 45 — ToadStool S62+DF64, 44 primitives + 2 BGL helpers + 1 WGSL extension, barracuda always-on)
+**Last Updated**: February 25, 2026 (Phase 45 V40 — ToadStool S62+DF64, 49 primitives + 2 BGL helpers + 1 WGSL extension, barracuda always-on, 7/9 P0-P3 delivered, 0 Passthrough, Track 3 GPU fully unblocked)
 **Purpose**: Track papers for reproduction/review across three tracks
 
 ---

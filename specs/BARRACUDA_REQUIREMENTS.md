@@ -1,13 +1,13 @@
 # wetSpring — BarraCuda Requirements
 
-**Last Updated**: February 25, 2026 (V37 revalidation, ToadStool `02207c4a`)
+**Last Updated**: February 25, 2026 (V40 ToadStool catch-up, ToadStool `02207c4a` S62+DF64)
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---
 
 ## Current Kernel Usage (Validated)
 
-### Rust CPU Modules (47 modules, 806 tests, 95.75% library coverage)
+### Rust CPU Modules (47 modules, 806 tests, 95.75% library coverage, V40 catch-up)
 
 | Module Domain | Modules | Status |
 |--------------|---------|--------|
@@ -22,7 +22,7 @@
 | ML | decision_tree, random_forest, gbm | Sovereign |
 | Drug repurposing | nmf, transe | Sovereign (NEW — Track 3) |
 
-### GPU Primitives (44 ToadStool primitives + 2 BGL helpers + 1 local WGSL extension, 710+ checks)
+### GPU Primitives (49 ToadStool primitives + 2 BGL helpers + 1 local WGSL extension, 710+ checks)
 
 | ToadStool Primitive | wetSpring Use | Checks | Performance |
 |-------------------|---------------|--------|-------------|
@@ -55,23 +55,22 @@ Historical record of deleted shaders:
 
 Absorption target: ToadStool `BatchedOdeRK4Generic<N_VARS, N_PARAMS>`.
 
-### GPU Wrappers (12 — Compose/Passthrough)
+### GPU Wrappers (12 — All Compose/Lean, 0 Passthrough)
 
-Pure GPU promotion (Exp101) added 12 GPU wrappers via Compose strategy
-(wire existing ToadStool primitives) or Passthrough (GPU buffers + CPU core):
+Pure GPU promotion (Exp101) + S62 lean eliminated all Passthrough modules:
 
 | Module | ToadStool Primitive | Strategy |
 |--------|-------------------|----------|
 | `kmd_gpu` | `FusedMapReduceF64` | Compose |
 | `gbm_gpu` | `TreeInferenceGpu` | Compose |
 | `merge_pairs_gpu` | `FusedMapReduceF64` | Compose |
-| `signal_gpu` | `FusedMapReduceF64` | Compose |
+| `signal_gpu` | `PeakDetectF64` (S62) | **Lean** (rewired from Passthrough) |
 | `feature_table_gpu` | `FMR + WeightedDotF64` | Compose |
 | `robinson_foulds_gpu` | `PairwiseHammingGpu` | Compose |
 | `derep_gpu` | `KmerHistogramGpu` | Compose |
 | `chimera_gpu` | `GemmCachedF64` | Compose |
 | `neighbor_joining_gpu` | `FusedMapReduceF64` | Compose |
-| `reconciliation_gpu` | Batch workgroup | Passthrough |
+| `reconciliation_gpu` | `TreeInferenceGpu` | Compose |
 | `molecular_clock_gpu` | `FusedMapReduceF64` | Compose |
 
 ---
@@ -113,17 +112,26 @@ Pure GPU promotion (Exp101) added 12 GPU wrappers via Compose strategy
 | ~~Cooperation GPU~~ | ✅ Local WGSL ODE shader (Exp101) | Done | — |
 | ~~Capacitor GPU~~ | ✅ Local WGSL ODE shader (Exp101) | Done | — |
 | ~~13 Tier B/C modules~~ | ✅ Pure GPU promotion complete (Exp101) | Done | — |
-| Taxonomy NPU | Naive Bayes → FC model → int8 | **P3** | NPU candidate |
+| ~~Taxonomy NPU~~ | ✅ `quantize_affine_i8` (ToadStool S39) | Done | — |
 | ~~ODE generic absorption~~ | ✅ All 5 ODE shaders → `generate_shader()` (Lean COMPLETE) | Done | — |
+| ~~Signal GPU~~ | ✅ Lean on `PeakDetectF64` (ToadStool S62) | Done | — |
+| ~~Track 3 NMF/SpMM/TransE/TopK~~ | ✅ All upstream (ToadStool S58-S60) | Done | — |
+| `ComputeDispatch` adoption | Migrate GPU ops from manual BGL to `ComputeDispatch` builder | **P3** | Medium |
+| DF64 GEMM adoption | Use `Fp64Strategy::Hybrid` for RTX 4070 GEMM dispatch | **P3** | Low |
+| `BandwidthTier` in metalForge | Wire PCIe-aware routing into forge dispatch | **P3** | Low |
+| `diversity_fusion` absorption | Hand off to ToadStool (P2-5) | **P2** | Low |
 
-### Track 3 — Drug Repurposing GPU Primitives (NEW)
+### Track 3 — Drug Repurposing GPU Primitives (ALL DELIVERED)
 
-| Operation | Shader | Priority | Effort | Notes |
-|-----------|--------|----------|--------|-------|
-| NMF (f64) | `nmf_f64.wgsl` | **P1** | Medium | Multiplicative update rules (Lee & Seung 1999). ~4,000 × 18,000 drug-disease matrix |
-| Sparse GEMM | `sparse_gemm_f64.wgsl` | **P2** | High | CSR format. Drug-disease matrices ~5% fill |
-| Cosine similarity | `cosine_similarity_f64.wgsl` | **P2** | Low | Pairwise on NMF factor matrices. Compose from GEMM + FMR |
-| Top-K selection | `topk_f64.wgsl` | **P3** | Low | Rank drug-disease pairs by score. Parallel bitonic sort |
+All Track 3 GPU gaps have been closed by ToadStool S58-S62:
+
+| Operation | ToadStool Primitive | Session | Status |
+|-----------|-------------------|---------|--------|
+| ~~NMF (f64)~~ | `barracuda::linalg::nmf` (Euclidean + KL) | S58 | ✅ Absorbed — wetSpring uses upstream directly |
+| ~~Sparse GEMM~~ | `barracuda::ops::sparse_gemm_f64::SparseGemmF64` | S60 | ✅ Available — CSR × dense |
+| ~~Cosine similarity~~ | `barracuda::linalg::nmf::cosine_similarity` | S58 | ✅ Absorbed — pairwise on NMF factors |
+| ~~Top-K selection~~ | `barracuda::ops::topk::TopK` | S60 | ✅ Available — 1D bitonic sort |
+| TransE scoring | `barracuda::ops::transe_score_f64::TranseScoreF64` | S60 | ✅ Available — GPU KG embedding |
 
 ### BarraCuda Evolution Path
 
@@ -148,6 +156,6 @@ CPU 22.5× faster than Python  ────────→  GPU math PROVEN port
 - Spectral cosine achieves 926× GPU speedup — the first "GPU wins decisively" benchmark from any spring
 - 47 CPU + 42 GPU Rust modules with 2 runtime dependencies (flate2 + bytemuck) — highest sovereignty ratio in the ecosystem
 - **V29 handoff**: cross-spring synthesis, deprecated API removal, dead-code cleanup, evolution handoff
-- **12 shaders absorbed + 5 ODE leaned (generate_shader) + 12 composed wrappers** — zero local WGSL remains; see `barracuda/EVOLUTION_READINESS.md`
+- **12 shaders absorbed + 5 ODE leaned (generate_shader) + 12 composed/lean wrappers (0 Passthrough)** — zero local WGSL remains; 7/9 P0-P3 requests delivered; see `barracuda/EVOLUTION_READINESS.md`
 - **Rust edition 2024**, MSRV 1.85 — `f64::midpoint()`, `usize::midpoint()`, `const fn` promotions
 - **`#![deny(unsafe_code)]`** — edition 2024 makes `std::env::set_var` unsafe; `#[allow]` confined to test env-var calls

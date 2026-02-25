@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** February 25, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 45 — Paper queue ALL GREEN (43/43 papers, 30/30 three-tier); 759 lib tests + 47 forge = 806 total, 167 experiments, 3,279+ checks, 157 binaries, ToadStool S62+DF64 aligned, 44 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on), deep debt resolved (V38)
+**Status:** Phase 45 — Paper queue ALL GREEN (43/43 papers, 30/30 three-tier); 759 lib tests + 47 forge = 806 total, 168 experiments, 3,300+ checks, 158 binaries, ToadStool S62+DF64 aligned, 49 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on), 70 named tolerance constants, zero ad-hoc tolerances, 7/9 P0-P3 delivered, 0 Passthrough, Track 3 GPU fully unblocked (V40 catch-up)
 
 ---
 
@@ -51,7 +51,7 @@ WGSL          known physics   handoffs/                        delete local
 |-------|:-----:|-------------|
 | **Lean** | 27 | GPU modules consuming upstream ToadStool primitives |
 | **Compose** | 7 | GPU wrappers wiring ToadStool primitives (kmd, merge_pairs, robinson_foulds, derep, neighbor_joining, reconciliation, molecular_clock) |
-| **Passthrough** | 3 | Accept GPU buffers, CPU kernel (gbm, feature_table, signal) |
+| **Passthrough** | 0 | All promoted — `gbm` and `feature_table` compose upstream, `signal` leans on `PeakDetectF64` (S62) |
 | **Write → Lean** | 5 | ODE shaders fully lean — GPU modules use `generate_shader()` from `OdeSystem` traits (WGSL deleted) |
 | **NPU** | 1 | ESN reservoir computing → int8 quantization → NPU deployment (esn) |
 | **Tier B** | 0 | All promoted |
@@ -104,7 +104,7 @@ integration point.
 | Pure GPU streaming v2 | 72 (analytics + ODE + phylogenetics) |
 | Cross-spring spectral theory | 25 (Anderson 1D/2D/3D + Almost-Mathieu + QS bridge) |
 | NPU reservoir checks | 59 (ESN → int8 → NPU-simulated inference) |
-| Cross-spring evolution checks | 9 (Exp120 benchmark) |
+| Cross-spring evolution checks | 34 (Exp120 benchmark 9, Exp168 cross-spring S62+DF64 ~25) |
 | NCBI-scale hypothesis testing | 146 (GPU-confirmed: Vibrio QS, 2D Anderson, pangenome, atlas) |
 | 3D Anderson dimensional QS | 50 (GPU-confirmed: 1D→2D→3D sweep, vent chimney, phase diagram, biofilm 3D) |
 | Geometry verification + cross-ecosystem | 50 (finite-size scaling, geometry zoo, cave/spring/rhizosphere, 28×5 atlas) |
@@ -113,25 +113,26 @@ integration point.
 | Phase 39: finite-size, correlated, comm, nitrifying, marine, myxo, dicty, drug repurposing | 104 (Exp150-161: scaling v2, correlated disorder, physical comm, nitrifying, interkingdom, Myxococcus, Dictyostelium, Fajgenbaum, MATRIX, NMF, repoDB, ROBOKOP) |
 | Phase 42: Track 3 full-tier (CPU v9, GPU drug, metalForge drug) | 44 (Exp163-165: CPU v9 27, GPU drug 8, metalForge drug 9) |
 | Phase 44: modern systems S62+DF64, diversity fusion extension | 37 (Exp166: 19, Exp167: 18) |
-| **Total validation checks** | **3,279+** |
+| Phase 45 V40: cross-spring S62+DF64 evolution | ~25 (Exp168: hotSpring precision → wetSpring bio → neuralSpring pop-gen → Track 3 GPU) |
+| **Total validation checks** | **3,300+** |
 | Rust library unit tests | 759 (barracuda CPU, default features) |
 | metalForge forge tests | 47 |
 | **Total Rust tests** | **806** (759 barracuda + 47 forge) |
 | Library code coverage | **95.75%** (llvm-cov) |
-| Experiments completed | 162 |
-| Validation/benchmark binaries | 145 validate + 12 benchmark = 157 total |
+| Experiments completed | 168 |
+| Validation/benchmark binaries | 147 validate + 11 benchmark = 158 total |
 | CPU bio modules | 47 |
-| GPU bio modules | 42 (27 lean + 5 write→lean + 7 compose + 3 passthrough) |
+| GPU bio modules | 42 (30 lean + 5 write→lean + 7 compose + 0 passthrough) |
 | Tier B (needs refactor) | 0 (all promoted) |
 | Python baselines | 42 scripts |
 | BarraCuda CPU parity | 380/380 (v1-v8: 25 domains + 6 ODE flat + 13 promoted) |
-| BarraCuda GPU parity | 29 domains (16 absorbed + 5 local ODE + 7 compose + 1 passthrough) |
+| BarraCuda GPU parity | 29 domains (17 absorbed + 5 local ODE + 7 compose + 0 passthrough) |
 | metalForge cross-system | 37 domains CPU↔GPU (Exp103+104), **25/25 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | ToadStool primitives consumed | **44** + 2 BGL helpers (barracuda always-on, zero fallback code — ToadStool S62+DF64) |
 | Local WGSL shaders | **1** (diversity fusion — Write phase extension for ToadStool absorption) |
-All 3,279+ validation checks **PASS**. All 806 tests **PASS** (1 ignored: GPU-only).
+All 3,300+ validation checks **PASS**. All 806 tests **PASS** (1 ignored: GPU-only).
 
 ### GPU Performance
 
@@ -431,7 +432,7 @@ modules remain. Pure GPU capability across all 42 bio GPU modules:
   kmd, gbm, merge_pairs, signal, feature_table, robinson_foulds, derep,
   chimera, neighbor_joining, reconciliation, molecular_clock). 2 new WGSL
   shaders (cooperation 4v/13p, capacitor 6v/16p). 7 compose wrappers wiring
-  ToadStool primitives. 3 passthrough wrappers accepting GPU buffers.
+  ToadStool primitives. 0 passthrough wrappers (all promoted to lean/compose).
 - **Exp102: BarraCuda CPU v8** — 175/175 checks validating pure Rust math for
   all 13 newly promoted domains. Analytical known-values, monotonicity,
   round-trip fidelity. Combined v1-v8: **380/380 across 31+ domains**.
@@ -525,7 +526,7 @@ Complete rewiring to modern ToadStool S42 BarraCuda APIs:
 - **Exp120**: Benchmarks diversity (wetSpring), QS ODE (hotSpring precision), ESN reservoir
   (hotSpring/neuralSpring → wetSpring NPU), with full provenance table and evolution timeline
 
-**806 tests** | **3,279+ checks** | **157 binaries**
+**806 tests** | **3,300+ checks** | **158 binaries**
 
 ### Phase 35: NCBI-Scale Hypothesis Testing (Exp121-126)
 
@@ -641,7 +642,7 @@ Three parallel workstreams closing out the validation surface (104 checks, all P
 - Deprecated `parse_fastq` → streaming `FastqIter::open()` in all 3 validation binaries
 - 6 magic numbers promoted to `tolerances.rs` (62 named constants total)
 - 4 GPU test defects fixed (GBM tree data, KMD assertion, hardware-dependent ignores)
-- ToadStool S62 aligned — 44 primitives consumed (barracuda always-on, zero fallback code)
+- ToadStool S62+DF64 aligned — 49 primitives consumed (barracuda always-on, zero fallback code)
 - 759 GPU tests passing (9 ignored: hardware-dependent)
 
 ### Phase 44: Write Phase Extensions (hotSpring Pattern)
@@ -671,7 +672,7 @@ performance, provenance completeness, and modern Rust idioms:
   migrated from `reader.lines()` to reusable buffer pattern.
 - **Provenance hardened**: 25 binaries updated from placeholder commits to `1f9f80e`.
   13 binaries had `| Command |` rows added. 2 binaries reformatted to standard
-  provenance table. All 157 binaries now carry complete provenance.
+  provenance table. All 158 binaries now carry complete provenance.
 - **`#[must_use]` annotations**: Added to 7 public API functions across I/O and NCBI
   modules — `parse_ms2`, `stats_from_file` (×3), `parse_mzml`, `parse_fastq`,
   `http_get`, `esearch_count`.
@@ -691,7 +692,7 @@ performance, provenance completeness, and modern Rust idioms:
 - `gemm_cached.rs` simplified: `ShaderTemplate::for_driver_auto` → `compile_shader_f64`
 - Identified DF64 GEMM adoption blocker: `wgsl_shader_for_device()` is private upstream
 - Reported PeakDetectF64 WGSL bug (f32 literal → f64 array, line 49)
-- ToadStool S62+DF64 aligned — 44 primitives + 2 BGL helpers consumed
+- ToadStool S62+DF64 aligned — 49 primitives + 2 BGL helpers consumed
 
 ### Phase 40: Cross-Spring Evolution Rewire (Exp162)
 
@@ -727,7 +728,7 @@ Rust 1.93 fixed across 20+ validation binaries.
 | Max file size | All under 1000 LOC |
 | External C dependencies | **0** (`flate2` uses `rust_backend`) |
 | Named tolerance constants | 62 (scientifically justified, hierarchy-tested) |
-| Provenance headers | All 157 validation/benchmark binaries |
+| Provenance headers | All 158 validation/benchmark binaries |
 | ESN ridge regression | **Proper Cholesky solve** (not diagonal approximation) |
 | I/O streaming | Buffering APIs deprecated; `stats_from_file` + iterators preferred |
 | Clone optimization | Hot-path clones eliminated (merge_pairs, derep entry API) |
@@ -835,7 +836,7 @@ wetSpring/
 │   │   ├── bio/                 ← 47 CPU + 42 GPU bio modules
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML)
 │   │   ├── bench/               ← benchmark harness + power monitoring
-│   │   ├── bin/                 ← 157 validation/benchmark binaries
+│   │   ├── bin/                 ← 158 validation/benchmark binaries
 │   │   └── shaders/             ← shared WGSL utilities (ODE shaders now generated at runtime)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024
 ├── experiments/                   ← 162 experiment protocols + results

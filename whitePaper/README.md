@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 25, 2026
-**Status:** Phase 45 — Validation study active — 3,279+ checks, 806 tests, 167 experiments, ToadStool S62+DF64 aligned, 44 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on, V38 deep debt resolved)
+**Status:** Phase 45 — Validation study active — 3,300+ checks, 806 tests, 168 experiments, ToadStool S62+DF64 aligned, 49 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on), 70 named tolerance constants, 7/9 P0-P3 delivered, 0 Passthrough, V40 catch-up complete
 **License:** AGPL-3.0-or-later
 
 ---
@@ -67,7 +67,7 @@ capability-based dispatch, and shader origin tracking as an absorption seam for 
 
 | Claim | Evidence |
 |-------|----------|
-| Rust matches Python across 167 experiments | 3,279+ checks pass (CPU + GPU + metalForge + streaming + cross-spring) |
+| Rust matches Python across 168 experiments | 3,300+ checks pass (CPU + GPU + metalForge + streaming + cross-spring) |
 | GPU matches CPU across all 42 GPU modules + 1 extension | 710+ GPU checks pass (incl. 48 all-domain + 58 metalForge v5 + 18 diversity fusion) |
 | BarraCuda CPU parity across 31+ domains (v1-v9) | 407/407 cross-domain checks pass |
 | 926× spectral cosine GPU speedup | Exp016 benchmark |
@@ -334,7 +334,7 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` files |
-| Provenance headers | All 157 validation/benchmark binaries |
+| Provenance headers | All 158 validation/benchmark binaries |
 
 ## metalForge — Hardware Discovery
 

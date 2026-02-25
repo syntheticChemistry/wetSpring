@@ -9,11 +9,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V38** | `handoffs/WETSPRING_TOADSTOOL_V38_DEEP_DEBT_HANDOFF_FEB25_2026.md` | Feb 25 | Phase 45: Deep debt resolution, tolerance centralization, I/O evolution, provenance hardening, evolution requests |
-| V37 | `handoffs/WETSPRING_TOADSTOOL_V37_REVALIDATION_HANDOFF_FEB25_2026.md` | Feb 25 | Phase 44: Deep debt cleanup, ncbi sovereignty, I/O parser evolution, revalidation |
-| V36 | `handoffs/WETSPRING_TOADSTOOL_V36_WRITE_PHASE_HANDOFF_FEB25_2026.md` | Feb 25 | Phase 44: Write-phase extension, full absorption accounting, lessons learned, bug reports |
-| V35 | `handoffs/WETSPRING_TOADSTOOL_V35_DF64_LEAN_FEB25_2026.md` | Feb 25 | Phase 43: DF64 evolution lean, BGL helpers adopted, PeakDetect bug reported |
-| V34 | `handoffs/WETSPRING_TOADSTOOL_V34_ABSORPTION_EVOLUTION_HANDOFF_FEB25_2026.md` | Feb 25 | Phase 41: complete absorption accounting, evolution recommendations |
+| **V40** | `handoffs/WETSPRING_TOADSTOOL_V40_CATCH_UP_FEB25_2026.md` | Feb 25 | Phase 45: ToadStool S39-S62+DF64 catch-up, 7/9 P0-P3 delivered, Track 3 GPU fully unblocked, 0 Passthrough, 49 primitives consumed |
 
 ## Cross-Spring Documents
 
@@ -23,8 +19,8 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` (V7-V33, API report, rewire, cross-spring provenance).
-When V34-V36 are superseded by V38, they can be moved to archive.
+Superseded handoffs in `handoffs/archive/` (V7-V39, API report, rewire, cross-spring provenance).
+V34-V39 archived — superseded by V40.
 Cross-spring docs moved to archive: `CROSS_SPRING_EVOLUTION_WETSPRING_FEB22_2026.md`, `CROSS_SPRING_PROVENANCE_FEB22_2026.md`.
 
 ## Convention

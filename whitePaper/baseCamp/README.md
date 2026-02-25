@@ -2,7 +2,7 @@
 
 **Date:** February 25, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 45 — 167 experiments, 3,279+ validation checks, ALL PASS; 806 tests, ToadStool S62+DF64 aligned, 44 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on)
+**Status:** Phase 45 — 168 experiments, 3,300+ validation checks, ALL PASS; 806 tests, ToadStool S62+DF64 aligned, 49 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on), 70 named tolerance constants, 7/9 P0-P3 delivered, 0 Passthrough, V40 catch-up complete
 
 ---
 
@@ -37,7 +37,7 @@ All code is AGPL-3.0.
 | [Kachkovskiy](kachkovskiy.md) | MSU CMSE | cross | 1 | 107,113,119,**122,126,127-138,144-156** | 334 | Spectral theory, 2D/3D Anderson, geometry zoo, ecosystem atlas, finite-size scaling v1+v2, correlated disorder, mapping sensitivity, planktonic dilution, eukaryote scaling, extension papers, paper queue |
 | **Fajgenbaum** | UPenn | 3 | 7 | 157–165 | 84 | Drug repurposing, pharmacophenomics, Track 3 completed |
 | **Diversity Fusion** | — | GPU | 1 | 167 | 18 | CPU↔GPU parity extension |
-| **Total** | | | **43** | | **3,279+** | |
+| **Total** | | | **43** | | **3,300+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 

@@ -9,7 +9,7 @@ absorption pipeline and identifies what ToadStool needs to build next.
 > 1 local WGSL extension (`diversity_fusion_f64.wgsl` — Write phase, Exp167 18/18).
 > All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed).
 > S62+DF64 aligned. BGL boilerplate removed (~258 lines).
-> Forge crate v0.3.0. 167 experiments, 3,279+ checks, 806 tests.
+> Forge crate v0.3.0. 168 experiments, 3,300+ checks, 806 tests.
 
 ---
 

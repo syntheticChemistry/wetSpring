@@ -1,7 +1,7 @@
 # Cross-Spring Shader Evolution
 
 **Last updated**: Feb 25, 2026 — ToadStool S62+DF64 (608 WGSL shaders, DF64 core-streaming, BGL helpers)
-**Validated by**: wetSpring Exp166 `benchmark_modern_systems_df64` (19/19 PASS), V35 handoff
+**Validated by**: wetSpring Exp166 `benchmark_modern_systems_df64` (19/19 PASS), Exp168 `validate_cross_spring_s62` (cross-spring evolution, ~25 PASS), V40 handoff
 
 ---
 
@@ -62,6 +62,8 @@ available to all springs. This document tracks that evolution.
 | Feb 25 | ToadStool DF64 | ComputeDispatch builder, storage_bgl_entry/uniform_bgl_entry, gpu_ctx(), unified_hardware refactor | ToadStool architecture |
 | Feb 25 | wetSpring V35 | DF64 lean: BGL helpers adopted (6 files, ~258 lines removed), compile_shader_f64, PeakDetect bug reported | wetSpring leans on ToadStool |
 | Feb 25 | wetSpring Exp166 | Modern systems benchmark: 5 GPU ODE systems, GEMM cached, cross-spring provenance (19/19 PASS) | wetSpring validates |
+| Feb 25 | wetSpring V40 | ToadStool S39-S62+DF64 catch-up: 44→49 primitives, 7/9 P0-P3 delivered, 0 Passthrough, SparseGemmF64 + TopK wired | wetSpring leans on ToadStool |
+| Feb 25 | wetSpring Exp168 | Cross-spring evolution validation: hotSpring precision → wetSpring bio → neuralSpring pop-gen → Track 3 GPU (~25 PASS) | wetSpring validates |
 
 ---
 
@@ -288,6 +290,7 @@ S42 does not re-export them at the crate root.
 | Exp118 NPU Bloom Sentinel | PASS | 11/11 |
 | Exp119 NPU Disorder Classifier | PASS | 9/9 |
 | **Exp120 Cross-Spring Evolution** | **PASS** | **9/9** |
+| **Exp168 Cross-Spring S62+DF64** | **PASS** | **~25** |
 | Exp151 Anderson Correlated Disorder (S59 lean) | PASS | 9/9 |
 | Exp158 MATRIX Pharmacophenomics (S59 lean) | PASS | 9/9 |
 | Exp159 NMF Drug Repurposing (S59 lean) | PASS | 7/7 |

@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 25, 2026
-**Status**: Phase 45 — 3,279+/3,279+ checks, ALL PASS (806 tests, 167 experiments, ToadStool S62+DF64 aligned, 44 primitives + 2 BGL helpers + 1 WGSL extension, barracuda always-on)
+**Status**: Phase 45 — 3,300+/3,300+ checks, ALL PASS (806 tests, 168 experiments, ToadStool S62+DF64 aligned, 49 primitives + 2 BGL helpers + 1 WGSL extension, barracuda always-on, 70 named tolerance constants, 7/9 P0-P3 delivered, 0 Passthrough, V40 catch-up)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -10,7 +10,7 @@
 
 | Metric | Value |
 |--------|-------|
-| CPU validation | 1,476+/1,476+ PASS — 46 modules, 167 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
+| CPU validation | 1,476+/1,476+ PASS — 46 modules, 168 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
 | GPU validation | 710+/710+ PASS — 44 ToadStool primitives + 2 BGL helpers (S62+DF64, always-on), 1 local WGSL extension |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 407/407 — 22.5x Rust speedup over Python (v1–v9) |
@@ -117,7 +117,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 
 | Document | Location | Description |
 |----------|----------|-------------|
-| CONTROL_EXPERIMENT_STATUS.md | `../` | 167 experiments, 3,279+ validation checks, 806 tests |
+| CONTROL_EXPERIMENT_STATUS.md | `../` | 168 experiments, 3,300+ validation checks, 806 tests |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
 | Handoff (v36) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V36_WRITE_PHASE_HANDOFF_FEB25_2026.md` | Current ToadStool handoff |

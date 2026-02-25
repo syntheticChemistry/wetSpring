@@ -63,28 +63,28 @@ fn main() {
         "Final count non-negative",
         traj1.final_state()[0] as f64,
         traj1.final_state()[0].max(0) as f64,
-        0.0,
+        tolerances::EXACT,
     );
     let all_non_neg = traj1.states_iter().all(|s| s[0] >= 0);
     v.check(
         "All states non-negative",
         f64::from(u8::from(all_non_neg)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     let has_events = traj1.n_events() > 10;
     v.check(
         &format!("Has events: {} steps", traj1.n_events()),
         f64::from(u8::from(has_events)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     let time_mono = traj1.times.windows(2).all(|w| w[1] >= w[0]);
     v.check(
         "Time monotonically increasing",
         f64::from(u8::from(time_mono)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     v.section("── Ensemble Statistics (N=1000) ──");
@@ -107,21 +107,21 @@ fn main() {
         "Std dev > 0 (stochastic variability)",
         stats.std_dev,
         stats.std_dev,
-        0.0,
+        tolerances::EXACT,
     );
     let std_positive = stats.std_dev > 0.0;
     v.check(
         "Std dev strictly positive",
         f64::from(u8::from(std_positive)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     let ensemble_non_neg = stats.final_counts.iter().all(|&c| c >= 0);
     v.check(
         "All ensemble final counts non-negative",
         f64::from(u8::from(ensemble_non_neg)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     v.section("── Cross-Validation with Python Baseline ──");
@@ -133,14 +133,14 @@ fn main() {
         "Rust mean in Python range (100.0 ± 15%)",
         stats.mean,
         ANALYTICAL_MEAN,
-        ANALYTICAL_MEAN * 0.15,
+        ANALYTICAL_MEAN * tolerances::GILLESPIE_PYTHON_RANGE_REL,
     );
 
     v.check(
         "Rust Fano factor in physical range [0.5, 2.0]",
         stats.fano_factor,
         1.0,
-        1.0,
+        tolerances::GILLESPIE_FANO_PHYSICAL,
     );
 
     v.finish();

@@ -238,12 +238,12 @@ fn validate_kmd(v: &mut Validator) {
 
     // Non-homologues should be separated
     let mixed = vec![pfos, pfhxs, pfbs_mass, 600.0, 312.5];
-    let (_, mixed_groups) = kmd::pfas_kmd_screen(&mixed, 0.005);
+    let (_, mixed_groups) = kmd::pfas_kmd_screen(&mixed, tolerances::KMD_NON_HOMOLOGUE);
     let has_separation = mixed_groups.len() >= 2;
     v.check(
         "Non-homologues separated",
         f64::from(u8::from(has_separation)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 }

@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 25, 2026
-**Status:** Phase 45 — 167 experiments, 3,279+ validation checks, all PASS (759 barracuda + 47 forge = 806 Rust tests), ToadStool S62+DF64 aligned, 44 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on)
+**Status:** Phase 45 — 168 experiments, 3,300+ validation checks, all PASS (759 barracuda + 47 forge = 806 Rust tests), ToadStool S62+DF64 aligned, 49 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on), 70 named tolerance constants, 0 ad-hoc tolerances, 7/9 P0-P3 delivered, 0 Passthrough, V40 catch-up complete
 
 ---
 
@@ -209,7 +209,7 @@
 | Drug repurposing: Fajgenbaum, MATRIX, NMF, repoDB, ROBOKOP (Exp157-161) | 40 |
 | Drug repurposing: CPU v9, GPU, metalForge (Exp163-165) | 44 |
 | Phase 44: modern systems S62+DF64, diversity fusion (Exp166-167) | 37 |
-| **Total validation checks** | **3,279+** |
+| **Total validation checks** | **3,300+** |
 | Rust tests | 806 (759 barracuda + 47 forge) |
 | BarraCuda CPU parity | 380/380 (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/092/101) |
@@ -343,7 +343,7 @@ cargo llvm-cov --lib           → 95.75% line coverage
 #![deny(unsafe_code)]          → enforced crate-wide (edition 2024; env-var tests use Mutex-serialized helpers)
 #![deny(expect_used, unwrap_used)] → enforced crate-wide (test modules #[allow])
 partial_cmp().unwrap()         → 0 (all migrated to f64::total_cmp)
-inline tolerance literals      → 0 (62 named constants in tolerances.rs)
+inline tolerance literals      → 0 (70 named constants in tolerances.rs; V39 added 8)
 blanket similar_names          → removed; targeted #[allow] per-function where domain-appropriate
 GPU workgroup sizes            → named constants in all *_gpu.rs (match WGSL shaders)
 shared math (crate::special)   → delegates to barracuda::special when gpu active; sovereign otherwise
@@ -352,14 +352,14 @@ SPDX headers                   → all .rs files
 max file size                  → all under 1000 LOC (fastq.rs: 913 largest)
 external C dependencies        → 0 (flate2 rust_backend; wgpu default-features = false)
 XML parser allocations         → Cow<str> for xml_unescape; 1 allocation per text event (was 2)
-provenance headers             → all 157 binaries (commit, command, hardware)
+provenance headers             → all 158 binaries (commit, command, hardware)
 duplicate math                 → 0 (crate::special delegates to ToadStool barracuda::special when gpu enabled)
 Python baselines               → scripts/requirements.txt (pinned numpy, scipy, sklearn)
 barracuda_cpu                  → 380/380 checks PASS (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted)
 barracuda_gpu                  → 702 GPU checks PASS (770 with --features gpu, 9 ignored)
 fuzz harnesses                 → 4 (FASTQ, mzML, MS2, XML)
 zero-copy I/O                  → FastqRefRecord, DecodeBuffer reuse, streaming iterators
-ToadStool alignment            → S62 (44 primitives, barracuda always-on, zero fallback code)
+ToadStool alignment            → S62+DF64 (49 primitives, barracuda always-on, zero fallback code)
 deprecated APIs                → 0 (parse_fastq → FastqIter::open in all binaries)
 ```
 
@@ -414,7 +414,7 @@ Following hotSpring's pattern for ToadStool integration:
 
 | Phase | Count | Status |
 |-------|:-----:|--------|
-| **Lean** (consumed upstream) | 44 primitives (always-on, zero fallback code) | S62: PeakDetectF64, TranseScoreF64 added to 42 prior (S59: NMF, ridge, ODE bio, Anderson, trapz) |
+| **Lean** (consumed upstream) | 49 primitives (always-on, zero fallback code) | S62+DF64: PeakDetectF64, TranseScoreF64, ComputeDispatch, SparseGemmF64, TopK added to 44 prior |
 | **Write** (local WGSL, pending absorption) | **0** — all retired | ODE shaders use `generate_shader()`; local WGSL deleted |
 | **CPU math** (`crate::special`) | 3 functions delegating on GPU | `erf`, `ln_gamma`, `regularized_gamma_lower` → `barracuda::special::*` when `gpu` active; sovereign fallback for no-GPU |
 | **CPU-only** (no GPU path) | 1 module (phred) | Pure GPU promotion complete (Exp101) |

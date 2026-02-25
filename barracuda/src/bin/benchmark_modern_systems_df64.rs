@@ -438,6 +438,10 @@ fn main() {
     println!("  • airSpring kriging → wetSpring spatial diversity mapping");
     println!("  • hotSpring lattice QCD DF64 → consumer GPU throughput for all springs");
     println!("    (RTX 3090: 10,496 FP32 cores vs 164 FP64 units → ~10× throughput)");
+    println!("  • ToadStool S60: SparseGemmF64, TranseScoreF64, TopK → wetSpring Track 3");
+    println!("    (drug repurposing complete GPU path: NMF → cosine → TransE → TopK)");
+    println!("  • ToadStool S62: PeakDetectF64 → wetSpring signal_gpu lean");
+    println!("    (f64 end-to-end peak detection, consumer GPU viable)");
 
     v.check_pass("cross-spring provenance documented", true);
 
@@ -452,7 +456,7 @@ fn main() {
     println!("  │ Metric                             │ Value              │");
     println!("  ├──────────────────────────────────────────────────────────┤");
     println!("  │ ToadStool alignment                 │ S62+DF64          │");
-    println!("  │ BarraCuda primitives consumed        │ 44 + 2 BGL       │");
+    println!("  │ BarraCuda primitives consumed        │ 49 + 2 BGL       │");
     println!("  │ Local WGSL shaders                  │ 0                │");
     println!("  │ Upstream WGSL shaders (ToadStool)    │ 608              │");
     println!("  │ Cross-spring shader categories       │ 38               │");
@@ -460,7 +464,9 @@ fn main() {
     println!("  │ Science+lattice (hotSpring origin)   │ 46               │");
     println!("  │ GPU ODE systems (trait-generated)    │ 5                │");
     println!("  │ BGL boilerplate removed              │ ~258 lines       │");
-    println!("  │ Experiments                          │ 166              │");
+    println!("  │ P0-P3 requests delivered              │ 7/9              │");
+    println!("  │ Passthrough modules remaining         │ 0                │");
+    println!("  │ Experiments                          │ 168              │");
     println!("  │ Tests (CPU + GPU + forge)             │ 806             │");
     println!("  └──────────────────────────────────────────────────────────┘");
 

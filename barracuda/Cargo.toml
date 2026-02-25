@@ -17,7 +17,7 @@ members = ["fuzz"]
 default = []
 # GPU acceleration via ToadStool/BarraCuda (Phase 3).
 # Enable with `cargo build --features gpu`.
-# Adds wgpu v22 (device creation), barracuda GPU ops (44+ primitives),
+# Adds wgpu v22 (device creation), barracuda GPU ops (49+ primitives),
 # and tokio (async device init). Zero local WGSL shaders (full lean).
 gpu = ["barracuda/gpu", "dep:wgpu", "dep:tokio"]
 # JSON model import (2 bins: validate_pfas_decision_tree, benchmark_three_tier).
@@ -428,6 +428,12 @@ required-features = ["gpu"]
 [[bin]]
 name = "benchmark_modern_systems_df64"
 path = "src/bin/benchmark_modern_systems_df64.rs"
+required-features = ["gpu"]
+
+# ── Cross-Spring Evolution Validation S62+DF64 (Exp168) ──────────
+[[bin]]
+name = "validate_cross_spring_s62"
+path = "src/bin/validate_cross_spring_s62.rs"
 required-features = ["gpu"]
 
 # ── Diversity Fusion GPU Extension (Exp167) ──────────────────────

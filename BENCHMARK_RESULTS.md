@@ -1,7 +1,7 @@
 # wetSpring Benchmark Results
 
 **Date:** February 25, 2026
-**Status:** Phase 45 — Three-tier validation complete (Python → Rust CPU → GPU → metalForge) — 30/30 actionable papers full three-tier; 806 tests, 3,279+ checks, ToadStool S62+DF64, 44 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on)
+**Status:** Phase 45 — Three-tier validation complete (Python → Rust CPU → GPU → metalForge) — 30/30 actionable papers full three-tier; 806 tests, 3,300+ checks, ToadStool S62+DF64, 49 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on), 70 named tolerance constants, 7/9 P0-P3 delivered, 0 Passthrough, V40 catch-up complete
 
 ---
 
@@ -305,7 +305,7 @@ matrix. CPU↔GPU parity proven for all compose and write modules.
 | Local WGSL shaders | 0 (full lean — all GPU ops dispatch upstream) | PASS |
 | Compose GPU wrappers | 7 (kmd, merge_pairs, robinson_foulds, derep, NJ, reconciliation, molecular_clock) | PASS |
 | Passthrough GPU wrappers | 3 (gbm, feature_table, signal) | PASS |
-| **Grand total** | **3,279+ validation + 806 tests** | **ALL PASS** |
+| **Grand total** | **3,300+ validation + 806 tests** | **ALL PASS** |
 
 ---
 

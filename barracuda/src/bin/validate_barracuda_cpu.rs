@@ -82,7 +82,7 @@ fn main() {
         "Bistable: hysteresis detected",
         f64::from(u8::from(br.hysteresis_width > 1.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     #[allow(clippy::cast_precision_loss)]
@@ -131,7 +131,7 @@ fn main() {
         "SSA: mean final > 50 (birth > death)",
         f64::from(u8::from(mean_final > 50.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     #[allow(clippy::cast_precision_loss)]
     {
@@ -169,7 +169,7 @@ fn main() {
         "HMM forward LL",
         fwd.log_likelihood,
         -5.625_948_481_320_407,
-        1e-6,
+        tolerances::HMM_FORWARD_PARITY,
     );
 
     let vit = hmm::viterbi(&model, &obs);
@@ -177,11 +177,16 @@ fn main() {
         "Viterbi LL ≤ forward LL",
         f64::from(u8::from(vit.log_probability <= fwd.log_likelihood)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     #[allow(clippy::cast_precision_loss)]
     {
-        v.check("Viterbi path length", vit.path.len() as f64, 5.0, 0.0);
+        v.check(
+            "Viterbi path length",
+            vit.path.len() as f64,
+            5.0,
+            tolerances::EXACT,
+        );
     }
 
     let n_states = model.n_states;
@@ -214,7 +219,12 @@ fn main() {
     let t0 = Instant::now();
     let r = alignment::smith_waterman(q, t_seq, &params);
     let sw_us = t0.elapsed().as_micros();
-    v.check("SW 16S (40bp): score = 74", f64::from(r.score), 74.0, 0.0);
+    v.check(
+        "SW 16S (40bp): score = 74",
+        f64::from(r.score),
+        74.0,
+        tolerances::EXACT,
+    );
 
     let seqs: Vec<&[u8]> = vec![b"ACGT", b"ACTT", b"GGGG", b"ACGA", b"TTTG"];
     let t0 = Instant::now();
@@ -226,10 +236,15 @@ fn main() {
             "Pairwise: 5 seqs → 10 pairs",
             scores.len() as f64,
             10.0,
-            0.0,
+            tolerances::EXACT,
         );
     }
-    v.check("Pairwise: ACGT-ACTT score", f64::from(scores[0]), 5.0, 0.0);
+    v.check(
+        "Pairwise: ACGT-ACTT score",
+        f64::from(scores[0]),
+        5.0,
+        tolerances::EXACT,
+    );
     #[allow(clippy::cast_precision_loss)]
     {
         timings.push(("SW single (40bp)", sw_us as f64));
@@ -325,7 +340,7 @@ fn main() {
         "Peaks found > 0",
         f64::from(u8::from(!peaks.is_empty())),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     #[allow(clippy::cast_precision_loss)]
     {
@@ -347,7 +362,7 @@ fn main() {
         "Cooperation: freq ∈ (0,1)",
         f64::from(u8::from(final_freq > 0.0 && final_freq < 1.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     #[allow(clippy::cast_precision_loss)]
     {
@@ -366,7 +381,7 @@ fn main() {
     let rf_us = t0.elapsed().as_micros();
     #[allow(clippy::cast_precision_loss)]
     {
-        v.check("RF distance (4 taxa)", rf as f64, 2.0, 0.0);
+        v.check("RF distance (4 taxa)", rf as f64, 2.0, tolerances::EXACT);
         timings.push(("Robinson-Foulds (4 taxa)", rf_us as f64));
     }
 

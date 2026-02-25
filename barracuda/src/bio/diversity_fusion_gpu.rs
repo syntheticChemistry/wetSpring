@@ -306,9 +306,9 @@ mod tests {
         let results = diversity_fusion_cpu(&abundances, 4);
         let r = &results[0];
 
-        assert_eq!(r.shannon, 0.0);
-        assert_eq!(r.simpson, 0.0);
-        assert_eq!(r.evenness, 0.0);
+        assert!(r.shannon.abs() < f64::EPSILON, "empty → H'=0");
+        assert!(r.simpson.abs() < f64::EPSILON, "empty → D=0");
+        assert!(r.evenness.abs() < f64::EPSILON, "empty → J'=0");
     }
 
     #[test]
