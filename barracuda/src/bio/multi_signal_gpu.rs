@@ -5,7 +5,7 @@
 //! via the `OdeSystem` trait (see `bio::ode_systems::MultiSignalOde`).
 //! Local WGSL file deleted — shader now generated from trait impl at runtime.
 
-use barracuda::device::WgpuDevice;
+use barracuda::device::{WgpuDevice, storage_bgl_entry, uniform_bgl_entry};
 use barracuda::numerical::ode_generic::BatchedOdeRK4;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
@@ -92,48 +92,12 @@ impl MultiSignalGpu {
         })
     }
 
-    const fn bgl_entries() -> [wgpu::BindGroupLayoutEntry; 4] {
+    fn bgl_entries() -> [wgpu::BindGroupLayoutEntry; 4] {
         [
-            wgpu::BindGroupLayoutEntry {
-                binding: 0,
-                visibility: wgpu::ShaderStages::COMPUTE,
-                ty: wgpu::BindingType::Buffer {
-                    ty: wgpu::BufferBindingType::Uniform,
-                    has_dynamic_offset: false,
-                    min_binding_size: None,
-                },
-                count: None,
-            },
-            wgpu::BindGroupLayoutEntry {
-                binding: 1,
-                visibility: wgpu::ShaderStages::COMPUTE,
-                ty: wgpu::BindingType::Buffer {
-                    ty: wgpu::BufferBindingType::Storage { read_only: true },
-                    has_dynamic_offset: false,
-                    min_binding_size: None,
-                },
-                count: None,
-            },
-            wgpu::BindGroupLayoutEntry {
-                binding: 2,
-                visibility: wgpu::ShaderStages::COMPUTE,
-                ty: wgpu::BindingType::Buffer {
-                    ty: wgpu::BufferBindingType::Storage { read_only: true },
-                    has_dynamic_offset: false,
-                    min_binding_size: None,
-                },
-                count: None,
-            },
-            wgpu::BindGroupLayoutEntry {
-                binding: 3,
-                visibility: wgpu::ShaderStages::COMPUTE,
-                ty: wgpu::BindingType::Buffer {
-                    ty: wgpu::BufferBindingType::Storage { read_only: false },
-                    has_dynamic_offset: false,
-                    min_binding_size: None,
-                },
-                count: None,
-            },
+            uniform_bgl_entry(0),
+            storage_bgl_entry(1, true),
+            storage_bgl_entry(2, true),
+            storage_bgl_entry(3, false),
         ]
     }
 

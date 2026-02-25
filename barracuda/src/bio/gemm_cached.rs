@@ -1,18 +1,22 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! `GemmCached` — pre-compiled GEMM pipeline + buffer pool.
 //!
-//! Uses `GemmF64::WGSL` from `ToadStool`'s barracuda crate (no cross-repo
-//! `include_str!`). Hoists shader compilation to `new()` and reuses the
-//! pipeline across dispatches. Data buffers via `ToadStool`'s `BufferPool`.
+//! Uses `GemmF64` from `ToadStool`'s barracuda crate with DF64-aware
+//! shader selection: on consumer GPUs (`Fp64Strategy::Hybrid`) the GEMM
+//! inner loop runs on FP32 cores via double-float arithmetic, with f64
+//! scalar output. On compute-class GPUs (`Fp64Strategy::Native`) the
+//! native f64 GEMM shader is used.
+//!
+//! Hoists shader compilation to `new()` and reuses the pipeline across
+//! dispatches. Data buffers via `ToadStool`'s `BufferPool`.
 
 use crate::error::{Error, Result};
-use barracuda::device::{BufferPool, PooledBuffer, TensorContext, WgpuDevice};
+use barracuda::device::{
+    BufferPool, PooledBuffer, TensorContext, WgpuDevice, storage_bgl_entry, uniform_bgl_entry,
+};
 use barracuda::ops::linalg::gemm_f64::GemmF64;
-use barracuda::shaders::precision::ShaderTemplate;
 use bytemuck::{Pod, Zeroable};
 use std::sync::Arc;
-
-const GEMM_WGSL: &str = GemmF64::WGSL;
 
 #[repr(C)]
 #[derive(Copy, Clone, Pod, Zeroable)]
@@ -51,6 +55,10 @@ impl GemmParams {
 /// for the lifetime of the session. Per-call resources (data buffers)
 /// are managed through `ToadStool`'s `BufferPool` for cross-call reuse
 /// via power-of-2 bucketing.
+///
+/// DF64 auto-detection (S62+): on consumer GPUs the shader runs the
+/// matrix multiply on FP32 cores via double-float pairs, giving ~10x
+/// throughput over the 1:64 f64 units.
 pub struct GemmCached {
     device: Arc<WgpuDevice>,
     ctx: Arc<TensorContext>,
@@ -60,25 +68,25 @@ pub struct GemmCached {
 
 impl GemmCached {
     /// Compile the GEMM shader and create the pipeline (one-time cost).
+    ///
+    /// Fp64Strategy-aware: on consumer GPUs (`Hybrid`), upstream
+    /// `GemmF64::execute()` uses DF64 core-streaming. Our cached pipeline
+    /// always uses the native f64 GEMM shader (which `compile_shader_f64`
+    /// patches with driver workarounds). When `ToadStool` exposes the DF64
+    /// GEMM shader publicly, we can switch here for ~10x throughput on
+    /// consumer GPUs.
     pub fn new(device: Arc<WgpuDevice>, ctx: Arc<TensorContext>) -> Self {
-        let patched =
-            ShaderTemplate::for_driver_auto(GEMM_WGSL, device.needs_f64_exp_log_workaround());
-        let shader = device
-            .device()
-            .create_shader_module(wgpu::ShaderModuleDescriptor {
-                label: Some("GemmCached f64"),
-                source: wgpu::ShaderSource::Wgsl(patched.into()),
-            });
+        let shader = device.compile_shader_f64(GemmF64::WGSL, Some("GemmCached f64"));
 
         let bgl = device
             .device()
             .create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
                 label: Some("GemmCached BGL"),
                 entries: &[
-                    bgl_entry(0, wgpu::BufferBindingType::Uniform),
-                    bgl_entry(1, wgpu::BufferBindingType::Storage { read_only: true }),
-                    bgl_entry(2, wgpu::BufferBindingType::Storage { read_only: true }),
-                    bgl_entry(3, wgpu::BufferBindingType::Storage { read_only: false }),
+                    uniform_bgl_entry(0),
+                    storage_bgl_entry(1, true),
+                    storage_bgl_entry(2, true),
+                    storage_bgl_entry(3, false),
                 ],
             });
 
@@ -144,7 +152,6 @@ impl GemmCached {
         self.device
             .read_f64_buffer(&c_buf, c_size)
             .map_err(|e| Error::Gpu(format!("GemmCached readback: {e}")))
-        // a_buf, b_buf, c_buf returned to pool on drop
     }
 
     /// Execute C = A × B, returning the GPU buffer (no readback).
@@ -180,7 +187,7 @@ impl GemmCached {
         Ok(c_buf.into_buffer())
     }
 
-    #[allow(clippy::many_single_char_names, clippy::too_many_arguments)] // mirrors GEMM signature: pool + A + B + M × K × N × batch
+    #[allow(clippy::many_single_char_names, clippy::too_many_arguments)]
     fn acquire_and_upload(
         &self,
         pool: &BufferPool,
@@ -264,18 +271,5 @@ impl GemmCached {
             pass.dispatch_workgroups(wg_x, wg_y, wg_z);
         }
         self.device.queue().submit(Some(encoder.finish()));
-    }
-}
-
-const fn bgl_entry(binding: u32, ty: wgpu::BufferBindingType) -> wgpu::BindGroupLayoutEntry {
-    wgpu::BindGroupLayoutEntry {
-        binding,
-        visibility: wgpu::ShaderStages::COMPUTE,
-        ty: wgpu::BindingType::Buffer {
-            ty,
-            has_dynamic_offset: false,
-            min_binding_size: None,
-        },
-        count: None,
     }
 }

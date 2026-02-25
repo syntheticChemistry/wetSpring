@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** February 25, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 42 — Paper queue ALL GREEN (43/43 papers, 30/30 three-tier); 759 tests (barracuda) + 47 forge = 806 total, 165 experiments, 3,242+ checks, 155 binaries, ToadStool S62 aligned, 44 primitives (barracuda always-on)
+**Status:** Phase 43 — Paper queue ALL GREEN (43/43 papers, 30/30 three-tier); 759 tests (barracuda) + 47 forge = 806 total, 165 experiments, 3,242+ checks, 155 binaries, ToadStool S62+DF64 aligned, 44 primitives + 2 BGL helpers (barracuda always-on)
 
 ---
 
@@ -128,7 +128,7 @@ integration point.
 | metalForge cross-system | 37 domains CPU↔GPU (Exp103+104), **25/25 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
-| ToadStool primitives consumed | **44** (barracuda always-on, zero fallback code — ToadStool S62) |
+| ToadStool primitives consumed | **44** + 2 BGL helpers (barracuda always-on, zero fallback code — ToadStool S62+DF64) |
 | Local WGSL shaders | **0** (full lean — all GPU ops dispatch to upstream) |
 All 3,242+ validation checks **PASS**. All 806 tests **PASS** (1 ignored: GPU-only).
 
@@ -643,6 +643,14 @@ Three parallel workstreams closing out the validation surface (104 checks, all P
 - ToadStool S62 aligned — 44 primitives consumed (barracuda always-on, zero fallback code)
 - 759 GPU tests passing (9 ignored: hardware-dependent)
 
+### Phase 43: DF64 Evolution Lean (S62+DF64)
+- Adopted `storage_bgl_entry`/`uniform_bgl_entry` from upstream `ComputeDispatch` module
+  (6 files, ~258 lines of BGL boilerplate removed)
+- `gemm_cached.rs` simplified: `ShaderTemplate::for_driver_auto` → `compile_shader_f64`
+- Identified DF64 GEMM adoption blocker: `wgsl_shader_for_device()` is private upstream
+- Reported PeakDetectF64 WGSL bug (f32 literal → f64 array, line 49)
+- ToadStool S62+DF64 aligned — 44 primitives + 2 BGL helpers consumed
+
 ### Phase 40: Cross-Spring Evolution Rewire (Exp162)
 
 Wired cross-spring primitives (S54-S62) into wetSpring bio workflows (66 checks, all PASS):
@@ -870,9 +878,11 @@ All validation data comes from public repositories:
 - **hotSpring** — Nuclear/plasma physics validation (sibling Spring, precision shaders, f64 WGSL)
 - **neuralSpring** — ML/neural inference validation (sibling Spring, eigensolvers, batch IPR, TransE)
 - **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
-- **ToadStool** — GPU compute engine (BarraCuda crate, 660+ WGSL shaders, S62)
+- **ToadStool** — GPU compute engine (BarraCuda crate, 660+ WGSL shaders, S62+DF64)
 - **wateringHole** — Spring-local handoffs to ToadStool
-  - `handoffs/WETSPRING_TOADSTOOL_V33_CPUMATH_LEAN_FEB25_2026.md` — **current** (barracuda always-on, zero fallback)
+  - `handoffs/WETSPRING_TOADSTOOL_V35_DF64_LEAN_FEB25_2026.md` — **current** (DF64 evolution lean, BGL helpers, PeakDetect bug report)
+  - `handoffs/WETSPRING_TOADSTOOL_V34_ABSORPTION_EVOLUTION_HANDOFF_FEB25_2026.md` — absorption evolution handoff
+  - `handoffs/WETSPRING_TOADSTOOL_V33_CPUMATH_LEAN_FEB25_2026.md` — barracuda always-on, zero fallback
   - `handoffs/WETSPRING_TOADSTOOL_V32_S62_LEAN_FEB24_2026.md` — PeakDetectF64, TranseScoreF64, paper queue fully GPU-covered
   - `handoffs/WETSPRING_TOADSTOOL_V31_ABSORPTION_TARGETS_FEB24_2026.md` — absorption targets, cross-spring insights
   - `handoffs/WETSPRING_TOADSTOOL_V30_S59_LEAN_FEB24_2026.md` — S59 lean: NMF, ridge, ODE, Anderson (~1,312 lines removed)

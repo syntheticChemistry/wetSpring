@@ -30,8 +30,10 @@ serde_json = { version = "1", optional = true }
 # ToadStool barracuda — always-on for CPU math (special, linalg, numerical).
 # default-features = false: no wgpu/pollster/bytemuck pulled in for CPU builds.
 # When `gpu` feature is active, `barracuda/gpu` enables GPU ops.
-# S62: erf, ln_gamma, ridge, trapz, NMF, ODE bio, Anderson, PeakDetect,
-# TransE, SpMM, Fp64Strategy, BatchedOdeRK4, ValidationHarness.
+# S62+DF64: erf, ln_gamma, ridge, trapz, NMF, ODE bio, Anderson, PeakDetect,
+# TransE, SpMM, Fp64Strategy, BatchedOdeRK4, ValidationHarness,
+# ComputeDispatch, storage_bgl_entry, uniform_bgl_entry, gpu_ctx,
+# GemmF64 DF64 auto-detection (hybrid FP32-core GEMM on consumer GPUs).
 barracuda = { path = "../../phase1/toadstool/crates/barracuda", default-features = false }
 
 # wgpu: WebGPU compute — hardware-agnostic GPU via Vulkan/Metal/DX12.
