@@ -150,6 +150,45 @@ Waters (c-di-GMP as a drug target), Murillo (surrogate learning for fast scoring
 | Cosine similarity | `barracuda::linalg::nmf::cosine_similarity` | ✅ Upstream | Pairwise scoring on factor matrices |
 | Top-K selection | Inlined in `validate_matrix_pharmacophenomics` | ✅ Local | Rank drug-disease pairs by score. Candidate for upstream |
 
+### Track 4 — No-Till Soil QS & Anderson Geometry (baseCamp Sub-thesis 06)
+
+baseCamp Sub-thesis 06 applies the Anderson localization framework to explain
+no-till soil health outcomes. These reproduction targets validate the QS-geometry
+coupling in soil pore networks and provide the microbial community data for
+tilled vs no-till comparisons.
+
+#### Tier 1 — Direct Reproduction Targets
+
+| # | Paper | Journal | Year | Faculty | Why | Status |
+|---|-------|---------|------|---------|-----|--------|
+| 44 | Martínez-García et al. "Spatial structure, chemotaxis and quorum sensing shape bacterial biomass accumulation in complex porous media" | Nature Communications 14:8332 | 2023 | — | **Critical**: First paper to show QS + spatial 3D pore structure determines bacterial coordination in porous media. Direct validation of Anderson QS-geometry coupling in soil-like systems | Queued |
+| 45 | Feng et al. "Composition and metabolism of microbial communities in soil pores" | Nature Communications 15:3578 | 2024 | — | Microbial diversity differs between large (30-150 µm) and small (4-10 µm) soil pores. Pore-scale Anderson geometry data — different pore sizes = different effective lattice dimensions | Queued |
+| 46 | Mukherjee et al. "Manipulating the physical distance between cells during soil colonization reveals the importance of biotic interactions" | Environmental Microbiome 19:14 | 2024 | — | Physical proximity affects community assembly. 41% of dominant groups affected by cell distancing. Validates Anderson's distance/geometry dependence for QS | Queued |
+
+#### Tier 2 — No-Till Microbiome Data
+
+| # | Paper | Journal | Year | Faculty | Why | Status |
+|---|-------|---------|------|---------|-----|--------|
+| 47 | Islam et al. "No-till and conservation agriculture in the United States: An example from the David Brandt farm, Carroll, Ohio" | ISWCR 2:97-107 | 2014 | — | Brandt farm soil health data: microbial biomass, aggregate stability, active carbon. The no-till dataset for Anderson analysis | Queued |
+| 48 | Zuber & Villamil "Meta-analysis approach to assess effect of tillage on microbial biomass and enzyme activities" | Soil Biology and Biochemistry 97:176-187 | 2016 | — | Meta-analysis: no-till increases microbial biomass C by 16-20%. Systematic evidence for geometry → microbial function link | Queued |
+| 49 | Liang et al. "Long term tillage, cover crop, and fertilization effects on microbial community structure, activity" | Soil Biology and Biochemistry 89:37-44 | 2015 | — | 31+ year study: greater mycorrhizal fungi under no-till. Tillage × cover crop × N interaction. Data source for Anderson diversity mapping | Queued |
+
+#### Tier 3 — Soil Structure & QS Dynamics
+
+| # | Paper | Journal | Year | Faculty | Why | Status |
+|---|-------|---------|------|---------|-----|--------|
+| 50 | Tecon & Or "Biophysics of bacterial biofilms—insights from soil" | Biochimica et Biophysica Acta 1858:2774-2781 | 2017 | — | Review of soil aggregate geometry → biofilm formation → QS. Bridges Anderson physics to soil microbiology | Queued |
+| 51 | Rabot et al. "Soil structure as an indicator of soil functions: A review" | Geoderma 314:122-137 | 2018 | — | Soil structure → microbial functions. Framework for mapping aggregate stability to effective Anderson dimension | Queued |
+| 52 | Wang et al. "Effects of tillage practices in stover-return on endosphere and rhizosphere microbiomes" | npj Sustainable Agriculture 3:12 | 2025 | — | 2025 study: different tillage → different endosphere/rhizosphere microbiomes. Geometry-dependent community assembly | Queued |
+
+**Connection to existing wetSpring work**: Track 4 extends the Anderson-QS
+framework (Exp107-143, Phase 37-38) from natural biome predictions to
+agricultural soil systems. Papers 44-46 are the soil pore-scale equivalents
+of the 3D Anderson lattice. Papers 47-49 provide the tilled-vs-no-till
+microbial data. Papers 50-52 bridge soil structure science to the Anderson model.
+16S data from these studies would be processed through wetSpring's sovereign
+Rust pipeline.
+
 ### Cross-Spring — Spectral Theory (Kachkovskiy, via groundSpring/hotSpring)
 
 Kachkovskiy's spectral theory has an indirect but real connection to wetSpring
