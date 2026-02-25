@@ -1,8 +1,8 @@
 # Absorption Strategy: wetSpring → ToadStool
 
-**Date:** February 22, 2026
+**Date:** February 25, 2026
 **Pattern:** Write → Absorb → Lean (from hotSpring)
-**Status:** 30 ToadStool primitives (Lean), 5 local WGSL ODE shaders (Write), 42 GPU modules total, 0 Tier B/C
+**Status:** 44 ToadStool primitives + 2 BGL helpers (Lean), 1 local WGSL extension (Write), 42 GPU modules total, 0 Tier B/C, ToadStool S62+DF64 aligned
 
 ---
 
@@ -100,20 +100,26 @@ Every local shader must pass before handoff:
 | `PrngXoshiro` | `bio::rarefaction_gpu` | `ops::random::xoshiro` | Feb 22 |
 | `BatchTolSearchF64` | `bio::tolerance_search` | `ops::search::tol_search` | Feb 22 |
 
-### Local WGSL Shaders (5 — Write phase active)
+### ODE Systems — Absorbed via Trait Generation
 
-The `barracuda/src/shaders/` directory contains 5 ODE RK4 f64 WGSL shaders:
+The 5 ODE systems completed the full Write → Absorb → Lean cycle. Local WGSL
+shaders deleted; GPU modules now use `BatchedOdeRK4<S>::generate_shader()` from
+upstream ToadStool (S58+). The `OdeSystem` trait implementations remain local
+(bio-specific equations), but all GPU infrastructure is upstream.
 
-| Shader | Vars | Params | Exp |
-|--------|:----:|:------:|-----|
-| `phage_defense_ode_rk4_f64.wgsl` | 4 | 11 | 099 |
-| `bistable_ode_rk4_f64.wgsl` | 5 | 21 | 100 |
-| `multi_signal_ode_rk4_f64.wgsl` | 7 | 24 | 100 |
-| `cooperation_ode_rk4_f64.wgsl` | 4 | 13 | 101 |
-| `capacitor_ode_rk4_f64.wgsl` | 6 | 16 | 101 |
+| System | Trait Impl | Vars | Params | Exp |
+|--------|-----------|:----:|:------:|-----|
+| Phage defense | `PhageDefenseOde` | 4 | 11 | 099 |
+| Bistable QS | `BistableOde` | 5 | 21 | 100 |
+| Multi-signal | `MultiSignalOde` | 7 | 24 | 100 |
+| Cooperation | `CooperationOde` | 4 | 13 | 101 |
+| Capacitor | `CapacitorOde` | 6 | 16 | 100 |
 
-All use `compile_shader_f64()` with polyfills. Pending ToadStool absorption
-as `BatchedOdeRK4Generic<N_VARS, N_PARAMS>`.
+### Local WGSL Extensions (Write phase — following hotSpring pattern)
+
+| Shader | Module | Purpose | Status |
+|--------|--------|---------|--------|
+| `diversity_fusion_f64.wgsl` | `diversity_fusion_gpu` | Fused Shannon + Simpson + evenness | CPU tests pass, GPU validation pending |
 
 ### Compose GPU Wrappers (7 — Phase 28)
 

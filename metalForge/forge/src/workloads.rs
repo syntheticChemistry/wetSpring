@@ -194,63 +194,82 @@ pub fn taxonomy() -> BioWorkload {
     w.with_primitive("TaxonomyFcF64")
 }
 
-// ── Local WGSL domains (Write phase) ───────────────────────────────
+// ── Absorbed ODE domains (trait-generated WGSL via BatchedOdeRK4) ───
 
-/// Phage defense ODE (4 vars, 11 params — local WGSL).
+/// Phage defense ODE (4 vars, 11 params — absorbed via `BatchedOdeRK4` trait).
 #[must_use]
 pub fn phage_defense_ode() -> BioWorkload {
-    BioWorkload::new_static(ShaderOrigin::Local)
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
         .named(
             "phage_defense_ode",
             vec![Capability::F64Compute, Capability::ShaderDispatch],
         )
+        .with_primitive("BatchedOdeRK4<PhageDefenseOde>")
         .with_ode(4, 11)
 }
 
-/// Bistable QS ODE (5 vars, 21 params — local WGSL).
+/// Bistable QS ODE (5 vars, 21 params — absorbed via `BatchedOdeRK4` trait).
 #[must_use]
 pub fn bistable_ode() -> BioWorkload {
-    BioWorkload::new_static(ShaderOrigin::Local)
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
         .named(
             "bistable_ode",
             vec![Capability::F64Compute, Capability::ShaderDispatch],
         )
+        .with_primitive("BatchedOdeRK4<BistableOde>")
         .with_ode(5, 21)
 }
 
-/// Multi-signal QS ODE (7 vars, 24 params — local WGSL).
+/// Multi-signal QS ODE (7 vars, 24 params — absorbed via `BatchedOdeRK4` trait).
 #[must_use]
 pub fn multi_signal_ode() -> BioWorkload {
-    BioWorkload::new_static(ShaderOrigin::Local)
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
         .named(
             "multi_signal_ode",
             vec![Capability::F64Compute, Capability::ShaderDispatch],
         )
+        .with_primitive("BatchedOdeRK4<MultiSignalOde>")
         .with_ode(7, 24)
 }
 
-// ── Local WGSL domains (new Write phase — pure GPU promotion) ───────
-
-/// Cooperation game theory ODE (4 vars, 13 params — local WGSL).
+/// Cooperation game theory ODE (4 vars, 13 params — absorbed via `BatchedOdeRK4` trait).
 #[must_use]
 pub fn cooperation_ode() -> BioWorkload {
-    BioWorkload::new_static(ShaderOrigin::Local)
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
         .named(
             "cooperation_ode",
             vec![Capability::F64Compute, Capability::ShaderDispatch],
         )
+        .with_primitive("BatchedOdeRK4<CooperationOde>")
         .with_ode(4, 13)
 }
 
-/// Capacitor phenotype ODE (6 vars, 16 params — local WGSL).
+/// Capacitor phenotype ODE (6 vars, 16 params — absorbed via `BatchedOdeRK4` trait).
 #[must_use]
 pub fn capacitor_ode() -> BioWorkload {
-    BioWorkload::new_static(ShaderOrigin::Local)
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
         .named(
             "capacitor_ode",
             vec![Capability::F64Compute, Capability::ShaderDispatch],
         )
+        .with_primitive("BatchedOdeRK4<CapacitorOde>")
         .with_ode(6, 16)
+}
+
+// ── Write phase: new WGSL extensions for ToadStool absorption ───────
+
+/// Fused diversity metrics (Shannon + Simpson + evenness in single dispatch).
+///
+/// Local WGSL extension following hotSpring's absorption pattern.
+/// Computes all three diversity indices in one kernel pass, avoiding
+/// three separate `FusedMapReduceF64` dispatches.
+#[must_use]
+pub fn diversity_fusion() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Local)
+        .named(
+            "diversity_fusion",
+            vec![Capability::F64Compute, Capability::ScalarReduce],
+        )
 }
 
 // ── Composed GPU domains (ToadStool primitives) ─────────────────────
@@ -449,7 +468,7 @@ pub fn all_workloads() -> Vec<BioWorkload> {
         neighbor_joining(),
         reconciliation(),
         molecular_clock(),
-        // Local WGSL ODE domains (Write phase)
+        // Absorbed ODE domains (trait-generated WGSL)
         phage_defense_ode(),
         bistable_ode(),
         multi_signal_ode(),
@@ -459,6 +478,8 @@ pub fn all_workloads() -> Vec<BioWorkload> {
         dada2(),
         bootstrap(),
         placement(),
+        // Write phase: new WGSL extensions
+        diversity_fusion(),
         // CPU-only (I/O-bound)
         fastq_parsing(),
     ]
@@ -485,19 +506,19 @@ mod tests {
     #[test]
     fn all_workloads_has_entries() {
         let all = all_workloads();
-        assert!(all.len() >= 28, "expected at least 28 workloads");
+        assert!(all.len() >= 29, "expected at least 29 workloads");
     }
 
     #[test]
     fn origin_counts_match() {
         let (absorbed, local, cpu_only) = origin_summary();
-        assert_eq!(absorbed, 22, "22 absorbed domains");
-        assert_eq!(local, 5, "5 local WGSL domains");
+        assert_eq!(absorbed, 27, "27 absorbed domains (incl. 5 ODE via trait)");
+        assert_eq!(local, 1, "1 local WGSL extension (diversity_fusion)");
         assert_eq!(cpu_only, 1, "1 CPU-only domain");
     }
 
     #[test]
-    fn local_ode_workloads_have_dims() {
+    fn absorbed_ode_workloads_have_dims() {
         for w in [
             phage_defense_ode(),
             bistable_ode(),
@@ -505,7 +526,7 @@ mod tests {
             cooperation_ode(),
             capacitor_ode(),
         ] {
-            assert!(w.is_local());
+            assert!(w.is_absorbed());
             assert!(
                 w.ode_dims.is_some(),
                 "{} should have ODE dims",

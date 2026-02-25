@@ -1,15 +1,15 @@
 # Primitive Map: wetSpring Rust → ToadStool GPU
 
-**Date:** February 22, 2026
+**Date:** February 25, 2026
 **Purpose:** Map every wetSpring Rust module to its ToadStool/BarraCuda
 GPU primitive (or explain why it stays CPU-only). This guides the
 absorption pipeline and identifies what ToadStool needs to build next.
 
-> **Feb 22 update (latest):** 32 ToadStool primitives consumed. 5 local WGSL
-> (Lean phase complete; Write phase active — S39-41 absorbed ODE, kmer, unifrac, taxonomy).
-> Forge crate v0.3.0 adds streaming dispatch module. **Pure GPU promotion
-> complete: 0 Tier B/C remaining.** All 13 formerly CPU-only modules now have
-> GPU wrappers (12 new + 1 upgraded chimera_gpu).
+> **Feb 25 update (latest):** 44 ToadStool primitives + 2 BGL helpers consumed.
+> 0 local WGSL (all ODE shaders use `BatchedOdeRK4<S>::generate_shader()`).
+> S62+DF64 aligned. BGL boilerplate removed (~258 lines). **New Write phase:
+> diversity fusion WGSL extension** following hotSpring's absorption pattern.
+> Forge crate v0.3.0. 166 experiments, 3,261+ checks.
 
 ---
 
@@ -59,11 +59,12 @@ absorption pipeline and identifies what ToadStool needs to build next.
 |-------------|-------------|-------------------|-----|
 | `ode` (RK4) | Lean | `BatchedOdeRK4F64` (ToadStool S41) | 049 |
 | `qs_biofilm` | Lean | `BatchedOdeRK4F64` (ToadStool S41) | 049 |
-| `bistable` | Compose | Same ODE sweep shader | — |
-| `multi_signal` | Compose | Same ODE sweep shader | — |
-| `phage_defense` | Compose | Same ODE sweep shader | — |
+| `bistable` / `bistable_gpu` | Lean | `BatchedOdeRK4<BistableOde>::generate_shader()` | 099 |
+| `multi_signal` / `multi_signal_gpu` | Lean | `BatchedOdeRK4<MultiSignalOde>::generate_shader()` | 100 |
+| `phage_defense` / `phage_defense_gpu` | Lean | `BatchedOdeRK4<PhageDefenseOde>::generate_shader()` | 099 |
+| `cooperation` / `cooperation_gpu` | Lean | `BatchedOdeRK4<CooperationOde>::generate_shader()` | 101 |
+| `capacitor` / `capacitor_gpu` | Lean | `BatchedOdeRK4<CapacitorOde>::generate_shader()` | 100 |
 | `gillespie` | Lean | `GillespieGpu` | 044 |
-| `cooperation` / `cooperation_gpu` | Local | Local WGSL (4v, 13p) ODE sweep | Pure GPU |
 
 ### Sequence Analysis (mixed)
 
@@ -95,8 +96,13 @@ absorption pipeline and identifies what ToadStool needs to build next.
 | `eic` / `eic_gpu` | Lean | `FMR` | 016 |
 | `kmd` / `kmd_gpu` | Compose | `FusedMapReduceF64` element-wise | Pure GPU |
 | `signal` / `signal_gpu` | Compose | `FusedMapReduceF64` batch | Pure GPU |
-| `capacitor` / `capacitor_gpu` | Local | Local WGSL (6v, 16p) ODE sweep | Pure GPU |
 | `feature_table` / `feature_table_gpu` | Compose | Chains `eic_gpu` + `signal_gpu` | Pure GPU |
+
+### Write Phase: New Extensions for ToadStool Absorption
+
+| Rust Module | GPU Strategy | WGSL Shader | Status |
+|-------------|-------------|-------------|--------|
+| `diversity_fusion_gpu` | **Local** | `shaders/diversity_fusion_f64.wgsl` | Write phase — fused Shannon + Simpson + evenness in single dispatch |
 
 ### Track 1c: Deep-Sea Metagenomics (ToadStool-absorbed, Exp058)
 

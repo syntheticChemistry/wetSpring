@@ -46,21 +46,31 @@
 //! # Life Science Workloads
 //!
 //! wetSpring routes bioinformatics and analytical chemistry workloads:
-//! - **GPU (absorbed)**: Felsenstein, HMM, spectral cosine, diversity,
-//!   ANI/SNP/dN/dS, RF batch, QS ODE, k-mer, `UniFrac`
-//! - **GPU (local WGSL)**: Phage defense ODE, bistable QS ODE, multi-signal ODE
+//! - **GPU (absorbed, 27)**: Felsenstein, HMM, spectral cosine, diversity,
+//!   ANI/SNP/dN/dS, RF batch, QS ODE, k-mer, `UniFrac`, 5 ODE bio systems
+//!   (via `BatchedOdeRK4` trait), DADA2, GBM, `Robinson-Foulds`, chimera
+//! - **GPU (local WGSL, 1)**: Diversity fusion (Write phase — new extension)
 //! - **NPU-optimal**: Taxonomy classification, anomaly detection, PFAS screening
-//! - **CPU-optimal**: FASTQ/mzML parsing, chimera detection, tree traversal
+//! - **CPU-optimal**: FASTQ/mzML parsing, tree traversal
 //!
 //! # Write → Absorb → Lean Tracking
 //!
 //! The [`workloads`] module tracks shader origin for every domain:
-//! - **Absorbed** (8): lean on `ToadStool` primitives
-//! - **Local** (3): local WGSL shaders pending absorption
-//! - **CPU-only** (2): no GPU path planned
+//! - **Absorbed** (27): lean on `ToadStool` primitives (incl. 5 ODE via trait)
+//! - **Local** (1): new WGSL extension pending absorption
+//! - **CPU-only** (1): I/O-bound domain
 //!
 //! When `ToadStool` absorbs a local shader, update origin from `Local` to
 //! `Absorbed` and rewire. This is the Lean step.
+//!
+//! # Extension Pattern (following hotSpring)
+//!
+//! New bio-specific GPU shaders are written as local extensions with:
+//! 1. WGSL shader in `barracuda/src/bio/shaders/` (`include_str!`)
+//! 2. CPU reference implementation with analytical validation
+//! 3. Binding layout table in doc comments
+//! 4. Dispatch geometry documented (workgroup size, grid dims)
+//! 5. Handoff document in `wateringHole/handoffs/`
 
 pub mod bridge;
 pub mod dispatch;

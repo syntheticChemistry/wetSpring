@@ -30,6 +30,8 @@ pub mod derep;
 pub mod derep_gpu;
 pub mod diversity;
 #[cfg(feature = "gpu")]
+pub mod diversity_fusion_gpu;
+#[cfg(feature = "gpu")]
 pub mod diversity_gpu;
 pub mod dnds;
 #[cfg(feature = "gpu")]

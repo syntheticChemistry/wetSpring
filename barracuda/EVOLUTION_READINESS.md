@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** February 25, 2026 (ToadStool S62, barracuda always-on)
+**Date:** February 25, 2026 (ToadStool S62+DF64, barracuda always-on)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 46 CPU + 42 GPU modules, 0 local WGSL (Lean complete), 44 ToadStool primitives (barracuda always-on, zero fallback code), 806 tests, 162 experiments, 3,198+ checks, ToadStool S62 aligned
+**Status:** 46 CPU + 42 GPU modules, 0 local WGSL (Lean complete), 44 ToadStool primitives + 2 BGL helpers (barracuda always-on, zero fallback code), 806 tests, 166 experiments, 3,261+ checks, ToadStool S62+DF64 aligned
 
 ### Full Lean Achieved
 
@@ -18,6 +18,37 @@ and `trapz`. Zero duplicate math remains in the codebase.
 
 See `ABSORPTION_MANIFEST.md` for the full ledger.
 
+### S62+DF64 Evolution (Phase 43)
+
+ToadStool's post-S62 commits introduced DF64 core-streaming (routing f64 workloads
+through FP32 cores on consumer GPUs), `ComputeDispatch` builder, BGL helpers, and
+`unified_hardware` refactor. wetSpring adopted:
+
+- `storage_bgl_entry`/`uniform_bgl_entry` from `barracuda::device::compute_pipeline`
+  (6 files: 5 ODE GPU + `gemm_cached.rs`, ~258 lines BGL boilerplate removed)
+- `compile_shader_f64` directly on `GemmF64::WGSL` (replaces `ShaderTemplate::for_driver_auto`)
+- DF64 GEMM auto-selection blocked by private `wgsl_shader_for_device()` upstream
+
+**Upstream requests** (V35 handoff):
+1. Make `GemmF64::wgsl_shader_for_device()` public (DF64 auto-selection for cached pipelines)
+2. Fix `PeakDetectF64` WGSL shader (f32 literal → f64 array, line 49)
+3. Consider `ComputeDispatch` with cached-pipeline variant (returns pipeline + BGL for reuse)
+
+### Next Write Phase: Absorption Candidates
+
+Following hotSpring's pattern of writing validated extensions as proposals for
+ToadStool absorption, these wetSpring modules are candidates for new Write phase:
+
+| Module | Location | CPU Tests | What it does | Absorption benefit |
+|--------|----------|-----------|--------------|-------------------|
+| `bio::gbm_gpu` | `bio/gbm_gpu.rs` | 16/16 | GBM batch inference (CPU fallback) | GPU GBM inference for ML pipelines |
+| `bio::random_forest_gpu` | `bio/random_forest_gpu.rs` | 13/13 | RF batch inference (SoA layout) | GPU ensemble inference |
+| `bio::eic_gpu` | `bio/eic_gpu.rs` | GPU | EIC extraction + peak integration | LC-MS GPU pipeline |
+| `bio::kmd_gpu` | `bio/kmd_gpu.rs` | GPU | KMD group classification | PFAS screening pipeline |
+| `bio::merge_pairs_gpu` | `bio/merge_pairs_gpu.rs` | GPU | Paired-end read merging | 16S pipeline GPU stage |
+| `forge::bridge` | `metalForge/forge/src/bridge.rs` | 47 | Substrate ↔ barracuda bridge | Multi-substrate dispatch |
+| `forge::dispatch` | `metalForge/forge/src/dispatch.rs` | 47 | Capability-based routing | Universal workload routing |
+
 ### Code Quality (Phase 15+)
 
 All modules pass `clippy::pedantic` + `clippy::nursery` (0 warnings, `-D` enforced
@@ -30,7 +61,7 @@ constants removed after lean to `barracuda::linalg::nmf`.
 `#![deny(unsafe_code)]` enforced crate-wide — **zero unsafe blocks** in library or
 test code as of Feb 24, 2026. Test env-var manipulation refactored to pure-function
 `resolve_data_dir()` pattern, eliminating all `unsafe { set_var/remove_var }` calls.
-All 152 binaries carry `# Provenance` headers. Data paths use `validation::data_dir()`
+All 156 binaries carry `# Provenance` headers. Data paths use `validation::data_dir()`
 for capability-based discovery. NCBI API key resolution evolved to capability-based
 cascade (env var → `WETSPRING_DATA_ROOT` → XDG config → legacy paths).
 `flate2` uses `rust_backend` — zero C dependencies (ecoBin compliant). All 42

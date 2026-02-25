@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 25, 2026
-**Status:** Phase 41 — Validation study active — 3,198+/3,198+ checks, 806 tests, 162 experiments, ToadStool S62 aligned, 44 primitives (barracuda always-on)
+**Status:** Phase 43 — Validation study active — 3,261+ checks, 806 tests, 166 experiments, ToadStool S62+DF64 aligned, 44 primitives + 2 BGL helpers (barracuda always-on)
 **License:** AGPL-3.0-or-later
 
 ---
@@ -54,9 +54,11 @@ implementations into upstream ToadStool/BarraCuda primitives:
 **Current status:** 42 GPU modules total — 31 lean on upstream ToadStool primitives
 (31 Lean + 6 S54-S57), 0 local WGSL (all ODE shaders use `BatchedOdeRK4<S>::generate_shader()`),
 7 compose ToadStool primitives for GPU-accelerated workflows, 3 passthrough (accept
-GPU buffers, CPU kernel). Zero Tier B/C modules remain. The forge crate
-(`metalForge/forge/` v0.3.0) provides substrate discovery, capability-based dispatch,
-and shader origin tracking as an absorption seam for ToadStool.
+GPU buffers, CPU kernel). Zero Tier B/C modules remain. BGL helpers
+(`storage_bgl_entry`/`uniform_bgl_entry`) adopted from ToadStool S62+DF64
+`ComputeDispatch` module (6 files, ~258 lines boilerplate removed).
+The forge crate (`metalForge/forge/` v0.3.0) provides substrate discovery,
+capability-based dispatch, and shader origin tracking as an absorption seam for ToadStool.
 
 ---
 
@@ -125,6 +127,8 @@ and shader origin tracking as an absorption seam for ToadStool.
 | metalForge v6: 25/25 papers three-tier complete | Exp104: QS ODE + UniFrac + DADA2 + K-mer + Felsenstein through metalForge routing (24/24) |
 | Streaming v2: Bray-Curtis + spectral cosine + full pipeline | Exp105: pre-warmed `GpuPipelineSession` with BC + cosine + chained analytics (27/27) |
 | Streaming ODE + phylo: 6 pre-warmed primitives | Exp106: ODE sweep + phage + bistable + multi-signal + Felsenstein + UniFrac, zero recompilation (45/45) |
+| Track 3 drug repurposing: full three-tier | Exp157-165: Fajgenbaum, MATRIX, NMF, repoDB, KG — CPU, GPU, metalForge (all PASS) |
+| Modern systems benchmark (S62+DF64) | Exp166: 5 GPU ODE, GEMM cached, barracuda CPU math, cross-spring provenance (19/19) |
 
 ---
 
@@ -329,7 +333,7 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` files |
-| Provenance headers | All 152 validation/benchmark binaries |
+| Provenance headers | All 156 validation/benchmark binaries |
 
 ## metalForge — Hardware Discovery
 

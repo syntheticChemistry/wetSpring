@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** February 25, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 43 — Paper queue ALL GREEN (43/43 papers, 30/30 three-tier); 759 tests (barracuda) + 47 forge = 806 total, 166 experiments, 3,261+ checks, 156 binaries, ToadStool S62+DF64 aligned, 44 primitives + 2 BGL helpers (barracuda always-on)
+**Status:** Phase 44 — Paper queue ALL GREEN (43/43 papers, 30/30 three-tier); 765 tests (barracuda) + 47 forge = 812 total, 167 experiments, 3,279+ checks, 157 binaries, ToadStool S62+DF64 aligned, 44 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on)
 
 ---
 
@@ -642,6 +642,16 @@ Three parallel workstreams closing out the validation surface (104 checks, all P
 - 4 GPU test defects fixed (GBM tree data, KMD assertion, hardware-dependent ignores)
 - ToadStool S62 aligned — 44 primitives consumed (barracuda always-on, zero fallback code)
 - 759 GPU tests passing (9 ignored: hardware-dependent)
+
+### Phase 44: Write Phase Extensions (hotSpring Pattern)
+- First local WGSL extension: `diversity_fusion_f64.wgsl` — fused Shannon + Simpson + evenness
+- Follows hotSpring's absorption pattern: WGSL + CPU reference + binding layout docs + validation
+- `DiversityFusionGpu` module with documented binding layout and dispatch geometry
+- Forge workloads: 5 ODE systems reclassified from `Local` to `Absorbed` (trait-generated WGSL)
+- New forge `diversity_fusion` workload registered as `ShaderOrigin::Local` (Write phase)
+- Exp167: 18/18 GPU ↔ CPU parity checks PASS (Simpson exact, Shannon within log_f64 polyfill tol)
+- metalForge docs updated: PRIMITIVE_MAP.md, ABSORPTION_STRATEGY.md aligned to S62+DF64
+- Root docs, whitePaper, ABSORPTION_MANIFEST.md, EVOLUTION_READINESS.md cleaned and synchronized
 
 ### Phase 43: DF64 Evolution Lean (S62+DF64)
 - Adopted `storage_bgl_entry`/`uniform_bgl_entry` from upstream `ComputeDispatch` module

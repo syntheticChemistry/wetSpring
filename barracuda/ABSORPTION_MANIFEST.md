@@ -1,8 +1,8 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** February 24, 2026
+**Date:** February 25, 2026
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**Status:** 37 ToadStool primitives consumed (31 Lean + 6 S54-S57 CPU), 5 local WGSL ODE shaders **deleted** (replaced by `generate_shader()`), 5 GPU modules rewired to `BatchedOdeRK4<S>`, 42 GPU modules total, 0 Tier B/C remaining, 881 tests (834 barracuda + 47 forge), 95.67% coverage, ToadStool S57 aligned
+**Status:** 44 ToadStool primitives + 2 BGL helpers consumed, 0 local WGSL (all deleted), 5 GPU ODE modules use trait-generated WGSL via `BatchedOdeRK4<S>::generate_shader()`, 42 GPU modules total, 0 Tier B/C remaining, 806 tests (759 barracuda + 47 forge), ToadStool S62+DF64 aligned, 166 experiments, 3,261+ checks
 
 ---
 
@@ -48,9 +48,9 @@ WGSL          known physics   handoffs/                        delete local
 | Compose | GPU wrappers wiring ToadStool primitives | **7 modules** (kmd, merge_pairs, RF, derep, NJ, reconciliation, molecular_clock) |
 | Passthrough | Accept GPU buffers, CPU kernel | **3 modules** (gbm, feature_table, signal) |
 | Validate | CPU ↔ GPU parity for all shaders | All 5 ODE: exact parity (Exp099/100/101) |
-| Hand off | wateringHole/handoffs/ documents | **v27** active (evolution review), v13–v26 archived |
-| Absorb | ToadStool integrates as `ops::bio::*` | **26 items** absorbed (ToadStool S57: all DONE, +46 cross-spring total) |
-| Lean | Rewire to upstream, delete local code | 27 primitives lean + 5 `OdeSystem` trait rewires |
+| Hand off | wateringHole/handoffs/ documents | **V35** active (DF64 lean + PeakDetect bug), V7-V34 archived |
+| Absorb | ToadStool integrates as `ops::bio::*` | **44 items** absorbed (ToadStool S62+DF64: all DONE, +46 cross-spring total) |
+| Lean | Rewire to upstream, delete local code | 44 primitives + 2 BGL helpers lean, 5 `OdeSystem` trait rewires, BGL boilerplate removed |
 
 ---
 
