@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 25, 2026
-**Status:** Phase 42 — 165 experiments, 3,242+ validation checks, all PASS (759 barracuda + 47 forge = 806 Rust tests), ToadStool S62 aligned, 44 primitives (barracuda always-on)
+**Status:** Phase 43 — 166 experiments, 3,261+ validation checks, all PASS (759 barracuda + 47 forge = 806 Rust tests), ToadStool S62+DF64 aligned, 44 primitives + 2 BGL helpers (barracuda always-on)
 
 ---
 
@@ -174,6 +174,7 @@
 | 163 | BarraCuda CPU v9 — Track 3 drug repurposing | `validate_barracuda_cpu_v9` | PASS | 27 |
 | 164 | GPU drug repurposing — GEMM NMF, TransE, PeakDetect | `validate_gpu_drug_repurposing` | PASS | 8 |
 | 165 | metalForge drug repurposing — CPU↔GPU parity | `validate_metalforge_drug_repurposing` | PASS | 9 |
+| 166 | Modern systems benchmark (S62+DF64) | `benchmark_modern_systems_df64` | PASS | 19 |
 
 ---
 

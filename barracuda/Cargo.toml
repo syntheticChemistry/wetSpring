@@ -424,6 +424,12 @@ name = "validate_metalforge_drug_repurposing"
 path = "src/bin/validate_metalforge_drug_repurposing.rs"
 required-features = ["gpu"]
 
+# ── Modern Systems Benchmark S62+DF64 (Exp166) ──────────────────
+[[bin]]
+name = "benchmark_modern_systems_df64"
+path = "src/bin/benchmark_modern_systems_df64.rs"
+required-features = ["gpu"]
+
 # ── metalForge Full v3 (Exp093) ──────────────────────────────────
 [[bin]]
 name = "validate_metalforge_full_v3"

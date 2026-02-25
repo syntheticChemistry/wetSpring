@@ -1,14 +1,14 @@
 # Cross-Spring Shader Evolution
 
-**Last updated**: Feb 25, 2026 — ToadStool S62 (660+ WGSL shaders, cpu-math lean)
-**Validated by**: wetSpring Exp120 `benchmark_cross_spring_evolution`, V32 lean + cpu-math validation
+**Last updated**: Feb 25, 2026 — ToadStool S62+DF64 (608 WGSL shaders, DF64 core-streaming, BGL helpers)
+**Validated by**: wetSpring Exp166 `benchmark_modern_systems_df64` (19/19 PASS), V35 handoff
 
 ---
 
 ## Overview
 
 ToadStool BarraCuda is the shared GPU/NPU compute substrate for the ecoPrimals
-ecosystem. Its 650+ WGSL shaders evolved through cross-spring contributions:
+ecosystem. Its 608 WGSL shaders across 38 categories evolved through cross-spring contributions:
 each spring (hotSpring, wetSpring, neuralSpring, airSpring) contributed
 domain-specific shaders that were absorbed into ToadStool, refined, and made
 available to all springs. This document tracks that evolution.
@@ -19,12 +19,12 @@ available to all springs. This document tracks that evolution.
 
 | Origin | Shader Count | Op Count | Domains |
 |--------|-------------|----------|---------|
-| hotSpring | ~35 | ~25 | Nuclear HFB, lattice QCD, MD, ESN, precision, df64 emulation |
-| wetSpring | ~22 | ~18 | Metagenomics, DADA2, ANI, dN/dS, PFAS, SSA, NMF, ODE bio |
-| neuralSpring | ~14 | ~12 | ML, pairwise metrics, evolutionary, spectral IPR, graph linalg |
-| airSpring | ~5 (shared) | ~8 | IoT, precision agriculture, Richards, Kriging |
-| ToadStool-native | 100+ | 200+ | Math, linalg, NN, FHE, attention |
-| **Total** | **650+** | **300+** | |
+| hotSpring | ~46 | ~35 | Nuclear HFB, lattice QCD (SU(3), Wilson, HMC), MD, ESN, precision, DF64 core-streaming |
+| wetSpring | ~35 | ~25 | Metagenomics, DADA2, ANI, dN/dS, PFAS, SSA, NMF, ODE bio (5 → trait), TransE, taxonomy |
+| neuralSpring | ~14 | ~12 | ML, pairwise metrics, evolutionary, spectral IPR, graph linalg, GNN |
+| airSpring | ~5 | ~8 | IoT, precision agriculture, Richards PDE, Kriging, van Genuchten |
+| ToadStool-native | 508+ | 300+ | math(103), activation(37), linalg(33), loss(31), norm(27), reduce(24), tensor(43), etc. |
+| **Total** | **608** | **350+** | 38 shader categories |
 
 ---
 
@@ -57,6 +57,11 @@ available to all springs. This document tracks that evolution.
 | Feb 24 | ToadStool S60 | TranseScoreF64, SparseGemmF64, BandwidthTier | neuralSpring + hotSpring → ToadStool |
 | Feb 24 | ToadStool S62 | PeakDetectF64, cpu-math feature gate | wetSpring + neuralSpring → ToadStool |
 | Feb 25 | wetSpring V33 | CPU-math lean: barracuda always-on, ~177 lines dual-path removed. PeakDetect + TransE GPU. | wetSpring full lean on ToadStool |
+| Feb 25 | ToadStool DF64 | DF64 core-streaming: HMC gauge force, Wilson plaquette, action, kinetic energy — FP32 cores on consumer GPUs (~10× throughput) | hotSpring → ToadStool |
+| Feb 25 | ToadStool DF64 | gemm_df64.wgsl, lennard_jones_df64.wgsl — DF64 tiled GEMM + pairwise MD forces | hotSpring → ToadStool |
+| Feb 25 | ToadStool DF64 | ComputeDispatch builder, storage_bgl_entry/uniform_bgl_entry, gpu_ctx(), unified_hardware refactor | ToadStool architecture |
+| Feb 25 | wetSpring V35 | DF64 lean: BGL helpers adopted (6 files, ~258 lines removed), compile_shader_f64, PeakDetect bug reported | wetSpring leans on ToadStool |
+| Feb 25 | wetSpring Exp166 | Modern systems benchmark: 5 GPU ODE systems, GEMM cached, cross-spring provenance (19/19 PASS) | wetSpring validates |
 
 ---
 
@@ -141,6 +146,37 @@ New primitives wired in S60-S62:
 Upstream integrators are 21-51% faster because ToadStool optimizes the shared
 `integrate_cpu()` across all springs' usage patterns. Performance improved since
 S59 (was 10-43%) due to ToadStool's continuous optimization across all consumers.
+
+### S62+DF64: Core-streaming + architectural cleanup
+
+ToadStool's DF64 expansion (post-S62) introduced a major performance architecture:
+routing f64 workloads through FP32 cores on consumer GPUs via double-float (f32-pair)
+arithmetic. On RTX 3090, staple multiplications (40% of HMC) now run on 10,496 FP32
+cores instead of 164 FP64 units — ~10x throughput for the compute-dominant inner loop.
+
+| New shader/infrastructure | Origin | Benefit |
+|--------------------------|--------|---------|
+| `su3_df64.wgsl` | hotSpring lattice QCD | SU(3) matrix algebra on FP32 cores |
+| `su3_hmc_force_df64.wgsl` | hotSpring | Hybrid gauge force (DF64 compute, f64 projection) |
+| `wilson_plaquette_df64.wgsl` | hotSpring | Hybrid plaquette measurement |
+| `wilson_action_df64.wgsl` | hotSpring | Hybrid per-site action |
+| `kinetic_energy_df64.wgsl` | hotSpring | Hybrid kinetic energy |
+| `gemm_df64.wgsl` | shared | Tiled GEMM with DF64 accumulation (benefits all springs) |
+| `lennard_jones_df64.wgsl` | hotSpring MD | O(N²) pairwise forces with DF64 |
+| `ComputeDispatch` builder | ToadStool | Eliminates ~80-line boilerplate per GPU op |
+| `storage_bgl_entry/uniform_bgl_entry` | ToadStool | BGL helper functions (adopted by wetSpring: 6 files, ~258 lines saved) |
+| `BarracudaError::gpu_ctx()` | ToadStool | Compact error wrapping for GPU ops |
+| `unified_hardware` refactor | ToadStool | 1012-line monolith → 6 focused modules |
+
+**DF64 cross-spring impact**: the `gemm_df64.wgsl` tiled GEMM benefits any spring
+doing matrix math on consumer GPUs. wetSpring's drug repurposing NMF (200×150 matrices),
+neuralSpring's neural network weight updates, and airSpring's kriging systems all
+benefit from ~10x consumer GPU throughput. Once ToadStool exposes
+`GemmF64::wgsl_shader_for_device()` publicly, downstream springs can auto-select
+DF64 in their cached GEMM pipelines.
+
+**Known issue**: `PeakDetectF64` WGSL shader has an f32→f64 type mismatch bug
+(`prominence[idx] = 0.0;` should be `0.0lf`). Reported in wetSpring V35 handoff.
 
 ---
 
