@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-24 (Phase 41: 162 experiments, ToadStool S62 lean complete, 44 primitives (barracuda always-on), 806 tests)
+**Updated**: 2026-02-25 (Phase 41: 162 experiments, ToadStool S62, 44 primitives, barracuda always-on, 806 tests)
 
 ---
 
@@ -239,13 +239,12 @@ thresholds from `src/tolerances.rs`.
 | `validate_barracuda_cpu_v8` | 102 | 175 | `cargo run --release --bin validate_barracuda_cpu_v8` |
 | `validate_metalforge_v5` | 103 | 58 | `cargo run --features gpu --bin validate_metalforge_v5` |
 
-**Total validation checks**: 2,673+ (1,476 CPU + 702 GPU + 80 dispatch + 35 layout + 57 transfer/streaming + 39 cross-spring + 10 local WGSL + 7 expanded)
-**Rust tests**: 750 (676 lib + 60 integration + 14 doc)
-**Binaries**: 101 validate + 8 benchmark = 109 total
-**ToadStool primitives**: 30 consumed (Lean)
-**Local WGSL shaders**: 5 ODE (phage_defense, bistable, multi_signal, cooperation, capacitor)
-**GPU modules**: 42 total (27 Lean + 5 Write + 7 Compose + 3 Passthrough)
-**Tier B/C**: 0 remaining (all promoted Phase 28)
+**Total validation checks**: 3,198+ (1,476 CPU + 702 GPU + 82 ODE parity + 80 dispatch + 35 layout + 57 transfer/streaming + 66 cross-spring + 146 NCBI-scale + 50 3D Anderson + 50 geometry + 35 why analysis + 36 extension + 104 Phase 39 + 279 other)
+**Rust tests**: 806 (752 barracuda CPU + 7 GPU-only + 47 forge)
+**Binaries**: 141 validate + 11 benchmark = 152 total
+**ToadStool primitives**: 44 consumed (barracuda always-on, zero fallback code — S62)
+**Local WGSL shaders**: 0 (full lean — all GPU ops dispatch to upstream)
+**GPU modules**: 42 total (all lean on upstream primitives)
 **Benchmark infrastructure**: `bench.rs` harness with RAPL + nvidia-smi energy profiling, JSON output
 
 ---

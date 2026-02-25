@@ -1,30 +1,20 @@
 # wetSpring Evolution Readiness
 
-**Date:** February 24, 2026
+**Date:** February 25, 2026 (ToadStool S62, barracuda always-on)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
 **Status:** 46 CPU + 42 GPU modules, 0 local WGSL (Lean complete), 44 ToadStool primitives (barracuda always-on, zero fallback code), 806 tests, 162 experiments, 3,198+ checks, ToadStool S62 aligned
 
-### Pure GPU Promotion Complete: 0 Tier B/C remaining
+### Full Lean Achieved
 
-All 13 formerly Tier B/C modules now have GPU wrappers. Two new local WGSL
-shaders added for cooperation (4v/13p) and capacitor (6v/16p) ODE systems.
-Remaining 11 modules compose existing ToadStool primitives (FMR, TreeInference,
-PairwiseHamming, GemmCached) or use passthrough patterns for pipeline continuity.
+All local WGSL shaders have been absorbed by ToadStool and deleted from wetSpring.
+The 5 ODE systems (phage defense, bistable, multi_signal, cooperation, capacitor)
+completed the full Write → Absorb → Lean cycle: local WGSL written, validated,
+handed off to ToadStool (S58), and replaced by `BatchedOdeRK4::<S>::generate_shader()`.
 
-### Write Phase Active: 5 local ODE WGSL shaders + 17 new GPU wrappers
-
-After completing the Lean phase (all 12 original shaders absorbed by ToadStool
-S39-41), wetSpring entered a new **Write phase** for ODE domains. Five local
-WGSL shaders now exist: phage defense (4v/11p), bistable QS (5v/21p),
-dual-signal QS (7v/24p), cooperation (4v/13p), and capacitor (6v/16p).
-17 GPU wrappers added: `kmer_gpu`, `unifrac_gpu`, `bistable_gpu`,
-`multi_signal_gpu`, `phage_defense_gpu`, `cooperation_gpu`, `capacitor_gpu`,
-`kmd_gpu`, `gbm_gpu`, `merge_pairs_gpu`, `signal_gpu`, `feature_table_gpu`,
-`robinson_foulds_gpu`, `derep_gpu`, `neighbor_joining_gpu`,
-`reconciliation_gpu`, `molecular_clock_gpu`.
-
-This follows the hotSpring pattern: write local extensions → validate → hand off
-to `ToadStool` for absorption as `BatchedOdeRK4Generic<N_VARS, N_PARAMS>`.
+`barracuda` is now an **always-on** dependency (`default-features = false` for CPU
+builds, `barracuda/gpu` for GPU builds). This eliminated all `#[cfg(not(feature = "gpu"))]`
+dual-path fallback code for `erf`, `ln_gamma`, `regularized_gamma`, `ridge_regression`,
+and `trapz`. Zero duplicate math remains in the codebase.
 
 See `ABSORPTION_MANIFEST.md` for the full ledger.
 
@@ -74,11 +64,11 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 |--------|--------|----------|-------------------|-------|
 | `alignment` | Smith-Waterman | ✅ Absorbed | `SmithWatermanGpu` | Exp044 |
 | `ani` | Average Nucleotide Identity | ✅ Absorbed | `AniBatchF64` | Rewired Feb 22, 2026 |
-| `bistable` | ODE toggle switch | **Write** | Local WGSL (5v, 21p) | Exact CPU↔GPU parity (Exp100) |
+| `bistable` | ODE toggle switch | ✅ Absorbed | `BatchedOdeRK4::<BistableOde>` | S58 lean, `generate_shader()` |
 | `bootstrap` | Phylo resampling | ✅ Absorbed | Compose `FelsensteinGpu` | Exp046 |
-| `capacitor` | Phenotypic capacitor | **Write** | Local WGSL (6v, 16p) | GPU ODE sweep (pure GPU promotion) |
+| `capacitor` | Phenotypic capacitor | ✅ Absorbed | `BatchedOdeRK4::<CapacitorOde>` | S58 lean, `generate_shader()` |
 | `chimera` | Chimera detection | ✅ Absorbed | `GemmCachedF64` | GEMM-based sketch scoring (pure GPU promotion) |
-| `cooperation` | Game theory QS | **Write** | Local WGSL (4v, 13p) | GPU ODE sweep (pure GPU promotion) |
+| `cooperation` | Game theory QS | ✅ Absorbed | `BatchedOdeRK4::<CooperationOde>` | S58 lean, `generate_shader()` |
 | `dada2` | Error model | ✅ Absorbed | `Dada2EStepGpu` | Rewired Feb 22, 2026 |
 | `decision_tree` | PFAS ML | ✅ Absorbed | `TreeInferenceGpu` | Exp044 |
 | `derep` | Dereplication | ✅ Absorbed | `KmerHistogramGpu` | Parallel hashing (pure GPU promotion) |
@@ -94,12 +84,12 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 | `kmer` | K-mer counting | ✅ Absorbed | `KmerHistogramF64` | ToadStool S40 (Exp081) |
 | `merge_pairs` | Read merging | ✅ Absorbed | `FusedMapReduceF64` | Batch overlap scoring (pure GPU promotion) |
 | `molecular_clock` | Strict/relaxed clock | ✅ Absorbed | `FusedMapReduceF64` | Relaxed rates element-wise (pure GPU promotion) |
-| `multi_signal` | Multi-signal QS | **Write** | Local WGSL (7v, 24p) | Exact CPU↔GPU parity (Exp100) |
+| `multi_signal` | Multi-signal QS | ✅ Absorbed | `BatchedOdeRK4::<MultiSignalOde>` | S58 lean, `generate_shader()` |
 | `neighbor_joining` | NJ tree construction | ✅ Absorbed | `FusedMapReduceF64` | GPU distance matrix + CPU NJ loop (pure GPU promotion) |
 | `ode` | RK4 integrator | ✅ Absorbed | `BatchedOdeRK4F64` | ToadStool S41 (Exp049) |
 | `pangenome` | Gene clustering | ✅ Absorbed | `PangenomeClassifyGpu` | Rewired Feb 22, 2026 |
 | `pcoa` | PCoA ordination | ✅ Absorbed | `BatchedEighGpu` | Exp016 |
-| `phage_defense` | Phage-bacteria defense | **Write** | Local WGSL (4v, 11p) | Exact CPU↔GPU parity (Exp099) |
+| `phage_defense` | Phage-bacteria defense | ✅ Absorbed | `BatchedOdeRK4::<PhageDefenseOde>` | S58 lean, `generate_shader()` |
 | `phred` | Quality scoring | C | — | Per-base lookup |
 | `placement` | Phylo placement | ✅ Absorbed | Compose `FelsensteinGpu` | Exp046 |
 | `qs_biofilm` | QS/c-di-GMP ODE | ✅ Absorbed | `BatchedOdeRK4F64` | ToadStool S41 (Exp049) |
@@ -147,15 +137,15 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 | `taxonomy_gpu` | Taxonomy scoring | `FMR` | Lean |
 | `kmer_gpu` | K-mer histogram | `KmerHistogramGpu` | ✅ Lean (Exp099) |
 | `unifrac_gpu` | UniFrac propagation | `UniFracPropagateGpu` | ✅ Lean (Exp099) |
-| `bistable_gpu` | Bistable QS ODE | Local WGSL | Write (Exp100) |
-| `multi_signal_gpu` | Dual-signal QS ODE | Local WGSL | Write (Exp100) |
-| `phage_defense_gpu` | Phage defense ODE | Local WGSL | Write (Exp099) |
-| `cooperation_gpu` | Cooperation ODE | Local WGSL (4v, 13p) | Write (pure GPU promotion) |
-| `capacitor_gpu` | Capacitor ODE | Local WGSL (6v, 16p) | Write (pure GPU promotion) |
+| `bistable_gpu` | Bistable QS ODE | `BatchedOdeRK4::<BistableOde>` | ✅ Lean (S58 → `generate_shader()`) |
+| `multi_signal_gpu` | Dual-signal QS ODE | `BatchedOdeRK4::<MultiSignalOde>` | ✅ Lean (S58 → `generate_shader()`) |
+| `phage_defense_gpu` | Phage defense ODE | `BatchedOdeRK4::<PhageDefenseOde>` | ✅ Lean (S58 → `generate_shader()`) |
+| `cooperation_gpu` | Cooperation ODE | `BatchedOdeRK4::<CooperationOde>` | ✅ Lean (S58 → `generate_shader()`) |
+| `capacitor_gpu` | Capacitor ODE | `BatchedOdeRK4::<CapacitorOde>` | ✅ Lean (S58 → `generate_shader()`) |
 | `kmd_gpu` | Kendrick mass defect | `FusedMapReduceF64` | ✅ Promoted (pure GPU) |
 | `gbm_gpu` | GBM batch inference | `TreeInferenceGpu` | ✅ Promoted (pure GPU) |
 | `merge_pairs_gpu` | Read merging | `FusedMapReduceF64` | ✅ Promoted (pure GPU) |
-| `signal_gpu` | Peak detection | `FusedMapReduceF64` | ✅ Promoted (pure GPU) |
+| `signal_gpu` | Peak detection | `PeakDetectF64` (S62) | ✅ Lean (S62 → upstream GPU peaks) |
 | `feature_table_gpu` | Feature extraction | `FMR` + `WeightedDotF64` | ✅ Promoted (pure GPU) |
 | `robinson_foulds_gpu` | Tree distance | `PairwiseHammingGpu` | ✅ Promoted (pure GPU) |
 | `derep_gpu` | Dereplication | `KmerHistogramGpu` | ✅ Promoted (pure GPU) |
@@ -191,7 +181,7 @@ All GPU ODE modules now use `BatchedOdeRK4::<S>::generate_shader()` which:
 
 ---
 
-## ToadStool Primitives Consumed (32)
+## ToadStool Primitives Consumed (44 — barracuda always-on)
 
 ### Original 15 (pre-Feb 22)
 
@@ -240,32 +230,46 @@ hotSpring's precision f64 polyfills improve wetSpring's numerical accuracy.
 | `BatchFitnessGpu` | EA batch fitness for evolutionary simulations | 094 |
 | `LocusVarianceGpu` | FST per-locus AF variance for population genetics | 094 |
 
+### 4 ToadStool S54-S57 Primitives (Cross-spring evolution)
+
+| Primitive | wetSpring Use | ToadStool Session |
+|-----------|---------------|------------------|
+| `graph_laplacian` | Community network analysis | S54 |
+| `effective_rank` | Gene expression matrix rank | S54 |
+| `numerical_hessian` | ODE model sensitivity | S54 |
+| `boltzmann_sampling` | Parameter sweep MCMC | S56 |
+
+### 7 ToadStool S58-S59 Primitives (wetSpring lean)
+
+| Primitive | wetSpring Use | ToadStool Session |
+|-----------|---------------|------------------|
+| NMF (Euclidean + KL) | Drug repurposing, pharmacophenomics | S58 |
+| 5× ODE bio systems | Bistable, Capacitor, Cooperation, MultiSignal, PhageDefense | S58 |
+| `ridge_regression` | ESN reservoir readout | S59 |
+| `anderson_3d_correlated` | Correlated disorder validation | S59 |
+| `trapz` | EIC peak integration | S59 |
+| `erf`, `ln_gamma`, `regularized_gamma_p` | Special functions (always-on CPU math) | S59 |
+| `ValidationHarness` | Structured tolerance-aware validation | S59 |
+
+### 5 ToadStool S60-S62 Primitives (latest lean)
+
+| Primitive | wetSpring Use | ToadStool Session |
+|-----------|---------------|------------------|
+| `TranseScoreF64` | GPU knowledge graph scoring (TransE) | S60 |
+| `SparseGemmF64` | Available for sparse NMF (not yet wired) | S60 |
+| `PeakDetectF64` | GPU LC-MS peak detection | S62 |
+| `BandwidthTier` | PCIe-aware routing (available for metalForge) | S62 |
+| `cpu-math` feature gate | barracuda always-on without GPU | S62 |
+
 ---
 
 ## Absorption Queue (handoff to ToadStool)
 
-### Completed (Feb 22) — All 12 shaders absorbed (Lean phase complete)
+### All Lean — nothing queued for Write
 
-ToadStool sessions 39-41 absorbed the final 4 local WGSL shaders: ODE sweep
-(S41: fixed `compile_shader_f64` in batched_ode_rk4.rs), kmer histogram (S40),
-unifrac propagate (S40), taxonomy FC (S40). wetSpring rewired; `shaders/` empty.
-
-### Completed (Feb 22) — 8 bio shaders absorbed (sessions 31d/31g)
-
-All 8 bio shaders successfully absorbed by ToadStool sessions 31d/31g and
-rewired in wetSpring. 451 GPU checks pass. Two ToadStool bugs fixed during
-the rewire (SNP binding layout, AdapterInfo propagation).
-
-### Write Phase Active (3 local WGSL shaders)
-
-| Shader | ODE | Target Absorption |
-|--------|-----|-------------------|
-| `phage_defense_ode_rk4_f64.wgsl` | 4v, 11p | `BatchedOdeRK4Generic<4, 11>` |
-| `bistable_ode_rk4_f64.wgsl` | 5v, 21p | `BatchedOdeRK4Generic<5, 21>` |
-| `multi_signal_ode_rk4_f64.wgsl` | 7v, 24p | `BatchedOdeRK4Generic<7, 24>` |
-
-All three achieve exact CPU ↔ GPU parity. Pending ToadStool generalization of
-`BatchedOdeRK4F64` (currently 4v/17p) to generic N_VARS/N_PARAMS.
+All local WGSL shaders absorbed and deleted. All CPU-math dual-paths eliminated.
+barracuda is always-on. The next evolution cycle will focus on wiring remaining
+unused primitives (SparseGemmF64 for NMF, BandwidthTier for metalForge dispatch).
 
 ### Pure GPU Promotion Complete
 
@@ -279,12 +283,10 @@ no parallelism benefit) and `fastq_parsing` (I/O-bound).
 
 | Tier | CPU Modules | GPU Modules | CPU Checks | GPU Checks |
 |------|:-----------:|:-----------:|:----------:|:----------:|
-| ✅ Absorbed (Lean) | 36 | 27 (ToadStool Lean) | 1,100+ | 580+ |
-| Compose | — | 7 (wire ToadStool primitives) | 84+ | 58+ |
-| Passthrough | — | 3 (GPU buffers, CPU kernel) | 42+ | — |
-| Write (local WGSL) | 5 | 5 (local ODE shaders) | 120+ | 75+ |
-| B (needs refactor) | 0 | 0 | — | — |
-| C (CPU-only) | 0 | 0 | — | — |
+| ✅ Absorbed (Lean) | 41 | 42 (all lean on upstream) | 1,476+ | 702+ |
+| Compose | — | 7 (wire ToadStool primitives) | — | — |
+| Passthrough | — | 3 (GPU buffers, CPU kernel) | — | — |
+| Write (local WGSL) | 0 | 0 | — | — |
 | Dispatch routing | — | — | 80 | — |
 | Streaming/transfer | — | — | 57 | 82 |
 | **Total** | **41** | **42** | **1,476+** | **702+** |

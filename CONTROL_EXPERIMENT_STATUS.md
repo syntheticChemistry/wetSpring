@@ -1,6 +1,6 @@
 # wetSpring Control Experiment Status
 
-**Date:** February 24, 2026
+**Date:** February 25, 2026
 **Status:** Phase 41 — 162 experiments, 3,198+ validation checks, all PASS (759 barracuda + 47 forge = 806 Rust tests), ToadStool S62 aligned, 44 primitives (barracuda always-on)
 
 ---
@@ -170,7 +170,7 @@
 | 159 | NMF drug-disease factorization (Yang 2020) | `validate_nmf_drug_repurposing` | PASS | 7 |
 | 160 | repoDB NMF reproduction (Gao 2020) | `validate_repodb_nmf` | PASS | 9 |
 | 161 | Knowledge graph embedding (ROBOKOP) | `validate_knowledge_graph_embedding` | PASS | 7 |
-| 162 | Cross-spring S57 evolution | `validate_cross_spring_s57` | PASS | 66 |
+| 162 | Cross-spring evolution (S54-S62) | `validate_cross_spring_s57` | PASS | 66 |
 
 ---
 
@@ -203,14 +203,14 @@
 | Phase 39: finite-size, correlated, comm, nitrifying, marine, myxo, dicty (Exp150-156) | 66 |
 | Drug repurposing: Fajgenbaum, MATRIX, NMF, repoDB, ROBOKOP (Exp157-161) | 40 |
 | **Total validation checks** | **3,198+** |
-| Rust tests | 881 (755 lib + 60 integration + 19 doc + 47 forge) |
+| Rust tests | 806 (752 barracuda CPU + 7 GPU-only + 47 forge) |
 | BarraCuda CPU parity | 380/380 (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/092/101) |
 | metalForge cross-system | 37 domains CPU↔GPU proven (Exp103+104), **25/25 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
-| ToadStool primitives consumed | 37 (31 Lean + 6 S54-S57) |
-| ToadStool session alignment | S57 (650+ WGSL, 25 bio ops re-exported, 46 cross-spring items absorbed, 4,224 core tests) |
-| Cross-spring shader provenance | 35 hotSpring, 22 wetSpring, 14 neuralSpring, 5 airSpring, 100+ native |
+| ToadStool primitives consumed | 44 (barracuda always-on, zero fallback — S62) |
+| ToadStool session alignment | S62 (660+ WGSL, cpu-math gate, PeakDetect, TransE, SpMM, NMF, ODE bio, ridge, Anderson) |
+| Cross-spring shader provenance | 35+ hotSpring, 22+ wetSpring, 14+ neuralSpring, 5+ airSpring, 500+ native |
 
 ---
 
@@ -352,7 +352,7 @@ barracuda_cpu                  → 380/380 checks PASS (25 domains + 6 ODE flat 
 barracuda_gpu                  → 702 GPU checks PASS (770 with --features gpu, 9 ignored)
 fuzz harnesses                 → 4 (FASTQ, mzML, MS2, XML)
 zero-copy I/O                  → FastqRefRecord, DecodeBuffer reuse, streaming iterators
-ToadStool alignment            → S57 (all V16-V22 items absorbed, 46 cross-spring total)
+ToadStool alignment            → S62 (44 primitives, barracuda always-on, zero fallback code)
 deprecated APIs                → 0 (parse_fastq → FastqIter::open in all binaries)
 ```
 
@@ -435,7 +435,7 @@ ToadStool `barracuda` is the convergence hub for all springs (660+ WGSL shaders)
 | Spring | Contribution | Key Primitives |
 |--------|-------------|-----------|
 | **hotSpring** | Precision shaders (`df64_core.wgsl`, `Fp64Strategy`), lattice QCD, spectral theory | CG solver, Lanczos, Anderson, Hofstadter, Hermite/Laguerre, ESN reservoir |
-| **wetSpring** | Bio ODE systems, NMF, genomics shaders, math_f64 | NMF (S58), 5 ODE bio (S58), ridge regression (S59), Anderson correlated (S59), HMM, ANI, SNP, dN/dS |
+| **wetSpring** | Bio ODE systems, NMF, genomics shaders, math_f64, PeakDetect, TransE | NMF (S58), 5 ODE bio (S58), ridge (S59), Anderson (S59), PeakDetect (S62), TransE (S60), erf/ln_gamma/trapz (always-on) |
 | **neuralSpring** | Graph theory, ML inference, eigensolvers, TensorSession | graph_laplacian, effective_rank, numerical_hessian, belief_propagation, boltzmann_sampling, ValidationHarness |
 | **airSpring** | IoT, precision agriculture | Richards PDE, moving_window, Kriging, pow_f64/acos fixes |
 
@@ -496,7 +496,7 @@ Bugs found and fixed: SNP binding layout (ToadStool), AdapterInfo propagation (w
 
 | Benchmark | Checks | What it proves |
 |-----------|:------:|----------------|
-| `benchmark_ode_lean_crossspring` | 11 | 5 ODE systems → `generate_shader()` WGSL, CPU parity (4/5 exact, 1 clamping-divergent), upstream 20–33% faster, linear batch scaling (--release --features gpu) |
+| `benchmark_ode_lean_crossspring` | 11 | 5 ODE systems → upstream `generate_shader()` WGSL, CPU parity (4/5 exact, 1 clamping-divergent), upstream 21–51% faster (S62), linear batch scaling (--release --features gpu) |
 
 5 local WGSL files deleted (30,424 bytes). All GPU modules use `BatchedOdeRK4<S>::generate_shader()`.
 
@@ -518,19 +518,9 @@ Bugs found and fixed: SNP binding layout (ToadStool), AdapterInfo propagation (w
 
 | Document | Location | Purpose |
 |----------|----------|---------|
-| **V30 — S59 Lean: NMF, ridge, ODE, Anderson** | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V30_S59_LEAN_FEB24_2026.md` | Phase 41, S59 lean, ~1,312 lines removed, 42 primitives |
-| V29 — Evolution handoff | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V29_EVOLUTION_HANDOFF_FEB24_2026.md` | Phase 40, cross-spring synthesis |
-| V22 — Extension papers: cold seep, phylogeny, waves | `wateringHole/handoffs/WETSPRING_V022_EXTENSION_PAPERS_FEB23_2026.md` | Phase 38, 149 experiments, baseCamp sub-theses |
-| V21 — Why analysis: mapping, scaling, dilution, eukaryotes | `wateringHole/handoffs/WETSPRING_V021_WHY_ANALYSIS_FEB23_2026.md` | Phase 36c, GPU-confirmed, 138 experiments |
-| V20 — 3D Anderson dimensional QS | `wateringHole/handoffs/WETSPRING_V020_3D_ANDERSON_DIMENSIONAL_QS_FEB23_2026.md` | Phase 36, GPU-confirmed, 130 experiments |
-| V19 — NCBI hypothesis testing | `wateringHole/handoffs/WETSPRING_V019_NCBI_HYPOTHESIS_TESTING_FEB23_2026.md` | Phase 35, GPU-confirmed, 126 experiments |
-| V18 — Cross-spring rewire | `wateringHole/handoffs/WETSPRING_V018_CROSS_SPRING_REWIRE_HANDOFF_FEB23_2026.md` | Phase 34, full rewire, 120 experiments |
-| V17 — NPU reservoir | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V17_NPU_RESERVOIR_FEB23_2026.md` | Phases 31-33, NPU deployment, NCBI-scale |
-| V16 — Streaming | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V16_STREAMING_FEB23_2026.md` | Streaming v2, metalForge v6 |
-| V15 — ODE generic | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V15_ODE_GENERIC_FEB22_2026.md` | 5 ODE shaders → BatchedOdeRK4Generic |
-| V14 — Write phase | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V14_FEB22_2026.md` | ODE shaders, forge v0.3.0 |
-| V13 — Edition 2024 | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V13_FEB22_2026.md` | Structural evolution |
-| Cross-spring evolution | `wateringHole/handoffs/CROSS_SPRING_EVOLUTION_WETSPRING_FEB22_2026.md` | wetSpring perspective on biome model |
-| Cross-spring provenance | `wateringHole/handoffs/CROSS_SPRING_PROVENANCE_FEB22_2026.md` | Shader origin tracking |
-| Shader evolution | `wateringHole/CROSS_SPRING_SHADER_EVOLUTION.md` | 612 WGSL shader provenance |
-| Archive | `wateringHole/handoffs/archive/` | V7-V12, rewire (fossil record) |
+| **V33 — CPU-math lean (barracuda always-on)** | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V33_CPUMATH_LEAN_FEB25_2026.md` | Phase 41, zero fallback code, ~177 lines dual-path removed |
+| V32 — S62 lean: PeakDetect, TransE | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V32_S62_LEAN_FEB24_2026.md` | Phase 41, S62 lean, paper queue fully GPU-covered |
+| V31 — Absorption targets | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V31_ABSORPTION_TARGETS_FEB24_2026.md` | Phase 41, absorption targets, cross-spring insights |
+| V30 — S59 lean: NMF, ridge, ODE, Anderson | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V30_S59_LEAN_FEB24_2026.md` | Phase 41, S59 lean, ~1,312 lines removed, 42 primitives |
+| Shader evolution | `wateringHole/CROSS_SPRING_SHADER_EVOLUTION.md` | 660+ WGSL shader provenance (cross-spring, S62) |
+| Archive | `wateringHole/handoffs/archive/` | V7-V29 (fossil record) |

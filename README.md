@@ -4,7 +4,7 @@
 and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 **Write → Absorb → Lean** cycle adopted from hotSpring.
 
-**Date:** February 24, 2026
+**Date:** February 25, 2026
 **License:** AGPL-3.0-or-later
 **Status:** Phase 41 — Paper queue ALL GREEN (43/43 papers); 759 tests (barracuda) + 47 forge = 806 total, 162 experiments, 3,198+ checks, 152 binaries, ToadStool S62 aligned, 44 primitives (barracuda always-on)
 
@@ -96,7 +96,7 @@ integration point.
 |--------|-------|
 | Validation checks (CPU) | 1,476 |
 | Validation checks (GPU) | 702 |
-| ODE CPU ↔ GPU parity | 82 (5 ODE domains, lean on `generate_shader()`) |
+| ODE CPU ↔ GPU parity | 82 (5 ODE domains, lean on upstream `generate_shader()`) |
 | Dispatch validation checks | 80 |
 | Layout fidelity checks | 35 |
 | Transfer/streaming checks | 57 |
@@ -112,9 +112,9 @@ integration point.
 | Extension papers: cold seep, phylogeny, waves | 36 (cold seep 299K catalog, geometry overlay, luxR phylogeny, mechanical waves, wave-localization, burst statistics) |
 | Phase 39: finite-size, correlated, comm, nitrifying, marine, myxo, dicty, drug repurposing | 104 (Exp150-161: scaling v2, correlated disorder, physical comm, nitrifying, interkingdom, Myxococcus, Dictyostelium, Fajgenbaum, MATRIX, NMF, repoDB, ROBOKOP) |
 | **Total validation checks** | **3,198+** |
-| Rust library unit tests | 755 lib + 60 integration + 19 doc |
+| Rust library unit tests | 752 (barracuda CPU-only) / 759 (with GPU) |
 | metalForge forge tests | 47 |
-| **Total Rust tests** | **881** (834 barracuda + 47 forge) |
+| **Total Rust tests** | **806** (759 barracuda + 47 forge) |
 | Library code coverage | **95.67%** (llvm-cov) |
 | Experiments completed | 162 |
 | Validation/benchmark binaries | 141 validate + 11 benchmark = 152 total |
@@ -127,9 +127,9 @@ integration point.
 | metalForge cross-system | 37 domains CPU↔GPU (Exp103+104), **25/25 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
-| ToadStool primitives consumed | **37** (31 absorbed + 6 new S54-S57 — aligned to ToadStool S57) |
-| Local WGSL shaders | **0** (5 deleted — ODE modules lean on `generate_shader()`) |
-All 3,198+ validation checks **PASS**. All 881 tests **PASS** (1 ignored: GPU-only).
+| ToadStool primitives consumed | **44** (barracuda always-on, zero fallback code — ToadStool S62) |
+| Local WGSL shaders | **0** (full lean — all GPU ops dispatch to upstream) |
+All 3,198+ validation checks **PASS**. All 806 tests **PASS** (1 ignored: GPU-only).
 
 ### GPU Performance
 
@@ -321,7 +321,7 @@ Tier B → A promotion of 3 remaining non-ODE modules, ODE flat param validation
 and forge dispatch router proof:
 
 - **Exp078: ODE GPU Sweep Readiness** — flat param APIs (`to_flat`/`from_flat`)
-  for 5 ODE modules (qs_biofilm, bistable, multi_signal, phage_defense, cooperation)
+  for 5 ODE modules (all now lean on upstream `BatchedOdeRK4::generate_shader()`)
 - **Exp079: BarraCuda CPU v6** — 48/48 checks proving flat serialization preserves
   bitwise-identical ODE math. Zero ULP drift across all 6 biological models.
 - **Exp080: metalForge Dispatch Routing** — 35/35 checks validating forge router
@@ -523,7 +523,7 @@ Complete rewiring to modern ToadStool S42 BarraCuda APIs:
 - **Exp120**: Benchmarks diversity (wetSpring), QS ODE (hotSpring precision), ESN reservoir
   (hotSpring/neuralSpring → wetSpring NPU), with full provenance table and evolution timeline
 
-**881 tests** | **3,198+ checks** | **152 binaries**
+**806 tests** | **3,198+ checks** | **152 binaries**
 
 ### Phase 35: NCBI-Scale Hypothesis Testing (Exp121-126)
 
@@ -639,12 +639,12 @@ Three parallel workstreams closing out the validation surface (104 checks, all P
 - Deprecated `parse_fastq` → streaming `FastqIter::open()` in all 3 validation binaries
 - 6 magic numbers promoted to `tolerances.rs` (59 named constants total)
 - 4 GPU test defects fixed (GBM tree data, KMD assertion, hardware-dependent ignores)
-- ToadStool S57 sync confirmed — all 26 wetSpring items + 46 total cross-spring items absorbed
-- 770 GPU tests passing (9 ignored: hardware-dependent)
+- ToadStool S62 aligned — 44 primitives consumed (barracuda always-on, zero fallback code)
+- 759 GPU tests passing (9 ignored: hardware-dependent)
 
-### Phase 40: Cross-Spring S57 Evolution Rewire (Exp162)
+### Phase 40: Cross-Spring Evolution Rewire (Exp162)
 
-Wired 6 new ToadStool S54-S57 primitives into wetSpring bio workflows (66 checks, all PASS):
+Wired cross-spring primitives (S54-S62) into wetSpring bio workflows (66 checks, all PASS):
 
 - **graph_laplacian** (neuralSpring S54): community interaction network spectral analysis
 - **effective_rank** (neuralSpring S54): diversity matrix spectral diagnostics
@@ -814,7 +814,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (881: 755 lib + 60 integration + 19 doc + 47 forge)
+# Run all tests (806: 752 lib + 7 GPU-only + 47 forge)
 cargo test
 
 # Code quality checks
@@ -866,25 +866,15 @@ All validation data comes from public repositories:
 
 ## Related
 
-- **hotSpring** — Nuclear/plasma physics validation (sibling Spring, 35+ WGSL shaders absorbed)
-- **neuralSpring** — ML/neural inference validation (sibling Spring, eigensolvers, batch IPR)
+- **hotSpring** — Nuclear/plasma physics validation (sibling Spring, precision shaders, f64 WGSL)
+- **neuralSpring** — ML/neural inference validation (sibling Spring, eigensolvers, batch IPR, TransE)
 - **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
-- **ToadStool** — GPU compute engine (BarraCuda crate, 612 WGSL shaders, shared primitives)
+- **ToadStool** — GPU compute engine (BarraCuda crate, 660+ WGSL shaders, S62)
 - **wateringHole** — Spring-local handoffs to ToadStool
-  - `handoffs/WETSPRING_TOADSTOOL_V27_EVOLUTION_FEB24_2026.md` — **current** (barracuda evolution, three-tier controls, drug repurposing track)
-  - `handoffs/WETSPRING_TOADSTOOL_V26_SYNC_FEB24_2026.md` — code audit, revalidation, ToadStool S53 sync
-  - `handoffs/WETSPRING_TOADSTOOL_V29_EVOLUTION_HANDOFF_FEB24_2026.md` — cross-spring synthesis, deprecated API removal, evolution handoff
-  - `handoffs/WETSPRING_TOADSTOOL_V28_S57_SYNC_FEB24_2026.md` — S57 alignment, clippy cleanup, new primitives
-  - `handoffs/WETSPRING_TOADSTOOL_V25_FINITE_SIZE_FEB24_2026.md` — Phase 39, absorption roadmap
-  - `handoffs/WETSPRING_TOADSTOOL_V24_LEAN_FEB24_2026.md` — Phase 38 complete lean, cross-spring evolution
-  - `handoffs/WETSPRING_V022_EXTENSION_PAPERS_FEB23_2026.md` — Phase 38, extension papers
-  - `handoffs/WETSPRING_V021_WHY_ANALYSIS_FEB23_2026.md` — Phase 36c, why analysis
-  - `handoffs/WETSPRING_V020_3D_ANDERSON_DIMENSIONAL_QS_FEB23_2026.md` — Phase 36, 3D Anderson
-  - `handoffs/WETSPRING_V019_NCBI_HYPOTHESIS_TESTING_FEB23_2026.md` — Phase 35, NCBI-scale
-  - `handoffs/WETSPRING_V018_CROSS_SPRING_REWIRE_HANDOFF_FEB23_2026.md` — Phase 34, full rewire
-  - `handoffs/WETSPRING_TOADSTOOL_V17_NPU_RESERVOIR_FEB23_2026.md` — NPU reservoir, NCBI-scale, PCoA fix
-  - `handoffs/WETSPRING_TOADSTOOL_V16_STREAMING_FEB23_2026.md` — streaming v2, metalForge v6
-  - `handoffs/WETSPRING_TOADSTOOL_V15_ODE_GENERIC_FEB22_2026.md` — 5 ODE shaders → `BatchedOdeRK4Generic`
-  - `handoffs/archive/` — V7-V14, rewire (fossil record)
-  - `CROSS_SPRING_SHADER_EVOLUTION.md` — 612 shader provenance (35 hot, 22 wet, 14 neural, 5 air)
+  - `handoffs/WETSPRING_TOADSTOOL_V33_CPUMATH_LEAN_FEB25_2026.md` — **current** (barracuda always-on, zero fallback)
+  - `handoffs/WETSPRING_TOADSTOOL_V32_S62_LEAN_FEB24_2026.md` — PeakDetectF64, TranseScoreF64, paper queue fully GPU-covered
+  - `handoffs/WETSPRING_TOADSTOOL_V31_ABSORPTION_TARGETS_FEB24_2026.md` — absorption targets, cross-spring insights
+  - `handoffs/WETSPRING_TOADSTOOL_V30_S59_LEAN_FEB24_2026.md` — S59 lean: NMF, ridge, ODE, Anderson (~1,312 lines removed)
+  - `handoffs/archive/` — V7-V29 (fossil record)
+  - `CROSS_SPRING_SHADER_EVOLUTION.md` — 660+ shader provenance (cross-spring, S62)
 - **ecoPrimals** — Parent ecosystem

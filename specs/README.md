@@ -1,6 +1,6 @@
 # wetSpring Specifications
 
-**Last Updated**: February 24, 2026
+**Last Updated**: February 25, 2026
 **Status**: Phase 41 — 3,198+/3,198+ checks, ALL PASS (806 tests, 162 experiments, ToadStool S62 aligned, 44 primitives, barracuda always-on)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
@@ -28,7 +28,7 @@
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
 | Faculty (Track 1c) | R. Anderson (Carleton) — deep-sea metagenomics, population genomics |
 | Faculty (Track 2) | Jones (BMB/Chemistry, MSU) — PFAS mass spectrometry |
-| Handoffs | Thirty-one delivered (v1–v6, rewire, cross-spring, v7–v31) |
+| Handoffs | Thirty-three delivered (v1–v6, rewire, cross-spring, v7–v33) |
 
 ---
 
@@ -115,7 +115,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 | CONTROL_EXPERIMENT_STATUS.md | `../` | 162 experiments, 3,198+ validation checks, 806 tests |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
-| Handoff (v31) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V31_ABSORPTION_TARGETS_FEB24_2026.md` | Current ToadStool handoff |
+| Handoff (v33) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V33_CPUMATH_LEAN_FEB25_2026.md` | Current ToadStool handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |

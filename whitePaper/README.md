@@ -1,6 +1,6 @@
 # wetSpring White Paper
 
-**Date:** February 24, 2026
+**Date:** February 25, 2026
 **Status:** Phase 41 — Validation study active — 3,198+/3,198+ checks, 806 tests, 162 experiments, ToadStool S62 aligned, 44 primitives (barracuda always-on)
 **License:** AGPL-3.0-or-later
 
@@ -305,7 +305,7 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCuda/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34+ WGSL shaders, active Write phase)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL + 31 ToadStool primitives, 42 GPU modules, 881 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 44 ToadStool primitives, barracuda always-on, 806 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **archive/handoffs/** — Fossil record of ToadStool handoffs (v1–v14)
 
@@ -329,7 +329,7 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` files |
-| Provenance headers | All 151 validation/benchmark binaries |
+| Provenance headers | All 152 validation/benchmark binaries |
 
 ## metalForge — Hardware Discovery
 

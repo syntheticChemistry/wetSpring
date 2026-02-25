@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V33** | `handoffs/WETSPRING_TOADSTOOL_V33_CPUMATH_LEAN_FEB25_2026.md` | Feb 25 | Phase 41: barracuda always-on, ~177 lines dual-path removed, zero fallback code |
+| **V34** | `handoffs/WETSPRING_TOADSTOOL_V34_ABSORPTION_EVOLUTION_HANDOFF_FEB25_2026.md` | Feb 25 | Phase 41: complete absorption accounting, evolution recommendations for ToadStool |
+| V33 | `handoffs/WETSPRING_TOADSTOOL_V33_CPUMATH_LEAN_FEB25_2026.md` | Feb 25 | Phase 41: barracuda always-on, ~177 lines dual-path removed, zero fallback code |
 | V32 | `handoffs/WETSPRING_TOADSTOOL_V32_S62_LEAN_FEB24_2026.md` | Feb 24 | Phase 41: S62 lean — PeakDetectF64, TranseScoreF64 wired, paper queue fully GPU-covered |
 | V31 | `handoffs/WETSPRING_TOADSTOOL_V31_ABSORPTION_TARGETS_FEB24_2026.md` | Feb 24 | Phase 41: absorption targets, cross-spring evolution insights |
 | V30 | `handoffs/WETSPRING_TOADSTOOL_V30_S59_LEAN_FEB24_2026.md` | Feb 24 | Phase 41: S59 lean — NMF, ridge, ODE systems, correlated Anderson (~1,312 lines removed) |

@@ -1,6 +1,6 @@
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** February 24, 2026
+**Date:** February 25, 2026
 **Project:** wetSpring (ecoPrimals)
 **Status:** Phase 41 — 162 experiments, 3,198+ validation checks, ALL PASS; 806 tests, ToadStool S62 aligned, 44 primitives (barracuda always-on)
 
@@ -95,7 +95,7 @@ Every paper goes through the full evolution. Status across all 25 actionable pap
 | Cross-spring evolution | 612 WGSL shaders traced to origin springs, rewired imports | 9 checks |
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
-| Code quality audit | 95.67% coverage, streaming I/O, 0 production mocks, ToadStool S57 sync | 881 tests |
+| Code quality audit | 95.67% coverage, streaming I/O, 0 production mocks, ToadStool S62, barracuda always-on | 806 tests |
 
 ## Performance Summary
 
