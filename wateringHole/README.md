@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V57** | `handoffs/WETSPRING_TOADSTOOL_V57_S68_CATCHUP_HANDOFF_FEB26_2026.md` | Feb 26 | **current** — ToadStool S66→S68 catch-up (19 commits), CPU feature-gate fix, universal precision alignment |
+| **V58** | `handoffs/WETSPRING_TOADSTOOL_V58_EVOLUTION_LEARNINGS_HANDOFF_FEB26_2026.md` | Feb 26 | **current** — Evolution learnings, cross-spring patterns, absorption candidates, DF64 bio opportunity, feature-gate audit, benchmark data |
+| **V57** | `handoffs/WETSPRING_TOADSTOOL_V57_S68_CATCHUP_HANDOFF_FEB26_2026.md` | Feb 26 | ToadStool S66→S68 catch-up (19 commits), CPU feature-gate fix, universal precision alignment |
 | **V56** | `handoffs/WETSPRING_TOADSTOOL_V56_SCIENCE_PIPELINE_HANDOFF_FEB26_2026.md` | Feb 26 | Science extension pipeline, NCBI EFetch/SRA, NestGate JSON-RPC, GPU Anderson L=14-20, biomeOS science graph |
 | **V55** | `handoffs/WETSPRING_TOADSTOOL_V55_DEEP_DEBT_HANDOFF_FEB26_2026.md` | Feb 26 | Deep debt resolution, idiomatic Rust evolution, 79-primitive usage audit |
 | **V54** | `handoffs/WETSPRING_TOADSTOOL_V54_CODEBASE_AUDIT_HANDOFF_FEB26_2026.md` | Feb 26 | Codebase audit, supply-chain audit, tolerance provenance hardening |
@@ -19,7 +20,7 @@
 
 | File | Purpose |
 |------|---------|
-| `CROSS_SPRING_SHADER_EVOLUTION.md` | 694+ WGSL shader provenance map (cross-spring, ToadStool S66) |
+| `CROSS_SPRING_SHADER_EVOLUTION.md` | 700+ WGSL shader provenance map (cross-spring, ToadStool S68 universal precision) |
 
 ## Archive
 

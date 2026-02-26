@@ -5,6 +5,28 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V58 — Documentation Sync + Evolution Learnings Handoff (2026-02-26)
+
+### Changed
+- **Full documentation sync**: all status files, READMEs, and metric references
+  synchronized to 189 experiments, 961 tests, 175 binaries, ToadStool S68
+- **experiments/README.md**: added Exp184-189 to experiment index and binary table;
+  fixed stale bottom metrics (912→961 tests, 172→175 binaries)
+- **EVOLUTION_READINESS.md**: shader generation notes updated to `compile_shader_universal`
+- **wateringHole/README.md**: updated shader count to 700+ (S68 universal precision)
+- **10+ doc files**: 188→189 experiments, 912→961 tests, S66→S68 in current status lines
+
+### Added
+- **V58 handoff**: `WETSPRING_TOADSTOOL_V58_EVOLUTION_LEARNINGS_HANDOFF_FEB26_2026.md` —
+  forward-looking evolution learnings: cross-spring patterns, DF64 bio opportunity,
+  feature-gate audit methodology, benchmark reference data, absorption candidates
+
+### Metrics
+- Zero code changes (documentation-only release)
+- All stale metrics corrected across 15+ files
+- No TODO/FIXME markers (confirmed by full-codebase scan)
+- No temp files, debris, or empty directories (clean codebase)
+
 ## V57 — ToadStool S68 Catch-Up + Universal Precision Rewire (2026-02-26)
 
 ### Changed

@@ -2,7 +2,7 @@
 
 **Date:** February 26, 2026 (V57 ToadStool S68 catch-up + universal precision alignment)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules (all lean, 0 local WGSL, 0 local derivative/regression math), 79 ToadStool primitives consumed (barracuda always-on, zero fallback code), 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% library coverage, 188 experiments, 4,494+ checks (1,578 GPU on RTX 4070), ToadStool S68 aligned (`f0feb226`), 82 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V57:** ToadStool S66→S68 catch-up (19 commits), CPU feature-gate fix contributed upstream, universal precision architecture (700 shaders, 0 f32-only) now available, `gpu.rs` doc comment cleaned.
+**Status:** 47 CPU + 42 GPU modules (all lean, 0 local WGSL, 0 local derivative/regression math), 79 ToadStool primitives consumed (barracuda always-on, zero fallback code), 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% library coverage, 189 experiments, 4,494+ checks (1,578 GPU on RTX 4070), ToadStool S68 aligned (`f0feb226`), 82 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V57:** ToadStool S66→S68 catch-up (19 commits), CPU feature-gate fix contributed upstream, universal precision architecture (700 shaders, 0 f32-only) now available, `gpu.rs` doc comment cleaned.
 
 ### Full Lean Phase
 
@@ -237,7 +237,7 @@ handled by derivative-level guards (`fmax_d` in WGSL, `.max(0.0)` in CPU).
 
 All GPU ODE modules now use `BatchedOdeRK4::<S>::generate_shader()` which:
 1. Generates WGSL from `OdeSystem::wgsl_derivative()` at runtime
-2. Uses `WgpuDevice::compile_shader_f64()` for f64 preamble + polyfills
+2. Uses `WgpuDevice::compile_shader_universal(source, Precision::F64)` (V57 rewire)
 3. Workgroup dispatch at 64 threads
 - Function names avoid `_f64` suffix to prevent `ShaderTemplate` rewriting
 - No `// @unroll_hint` in comments (optimizer matches via `contains()`)
@@ -473,7 +473,7 @@ no parallelism benefit) and `fastq_parsing` (I/O-bound).
 | Handoffs | `../wateringHole/handoffs/` (36+ docs) | `ecoPrimals/archive/wetspring-early-handoffs-feb2026/` (v1-v9 fossil) |
 | Tests | 454 | 750 |
 | Validation | 418 checks | 2,673+ checks |
-| Experiments | 31 suites | 183 experiments |
+| Experiments | 31 suites | 189 experiments |
 | Line coverage | — | 97% bio+io (55% overall) |
 | Pipeline caching | Upstream (ToadStool native) | Local (Exp068, 38% overhead reduction) |
 | Three-tier proof | CPU→GPU→NPU | Python→CPU→GPU→NPU (Exp069) |

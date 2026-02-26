@@ -7,7 +7,7 @@
 
 ## Current Kernel Usage (Validated)
 
-### Rust CPU Modules (47 modules, 833 barracuda tests, 96.67% llvm-cov, V55 S66 rewire)
+### Rust CPU Modules (47 modules, 882 barracuda tests, 96.67% llvm-cov, V55 S66 rewire)
 
 | Module Domain | Modules | Status |
 |--------------|---------|--------|

@@ -2,7 +2,7 @@
 
 **Date:** February 26, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 57 — 188 experiments, 4,494+ validation checks (1,578 GPU on RTX 4070), ALL PASS; 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 82 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets), 0 Passthrough, V57 ToadStool S68 catch-up + universal precision alignment, 39/39 three-tier, 52/52 papers
+**Status:** Phase 58 — 189 experiments, 4,494+ validation checks (1,578 GPU on RTX 4070), ALL PASS; 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 82 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets), 0 Passthrough, V58 doc sync + evolution learnings, 39/39 three-tier, 52/52 papers
 
 ---
 
@@ -97,7 +97,7 @@ Every paper goes through the full evolution. Status across all 39 actionable pap
 | Cross-spring evolution | 660+ WGSL shaders traced to origin springs, rewired imports, Exp169 4-spring provenance | 21 checks |
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
-| Code quality audit | 96.67% coverage, streaming I/O, 0 production mocks, ToadStool S66, barracuda always-on, `deny(missing_docs)`, `cargo-deny` supply-chain audit, clippy pedantic CLEAN, zero unsafe code | 912 tests |
+| Code quality audit | 96.67% coverage, streaming I/O, 0 production mocks, ToadStool S68, barracuda always-on, `deny(missing_docs)`, `cargo-deny` supply-chain audit, clippy pedantic CLEAN, zero unsafe code | 961 tests |
 
 ## Performance Summary
 
@@ -130,7 +130,7 @@ Every paper goes through the full evolution. Status across all 39 actionable pap
 | Exp169 | Modern cross-spring benchmark | 12 | All CPU primitives validated, 4-spring provenance, bit-exact delegation |
 
 V44 rewired 6 validation binaries to modern upstream: `find_w_c` (4 files),
-`pearson_correlation` (1 file). 79 primitives consumed (S66). Hill CPU ODE helpers
+`pearson_correlation` (1 file). 79 primitives consumed (S68). Hill CPU ODE helpers
 intentionally kept local (derivative-level math, GPU equivalents generated
 by `BatchedOdeRK4::generate_shader()`).
 

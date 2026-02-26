@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** February 26, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 57 — ToadStool S68 universal precision rewire; 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, 189 experiments, 4,494+ checks (1,578 GPU on RTX 4070), 175 binaries, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math), 82 named tolerances with full provenance, 0 ad-hoc magic numbers, 0 Passthrough, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, NCBI EFetch/SRA pipeline + NestGate JSON-RPC integration + biomeOS science graph, 52/52 papers, 39/39 three-tier
+**Status:** Phase 58 — Documentation sync + evolution learnings handoff; 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, 189 experiments, 4,494+ checks (1,578 GPU on RTX 4070), 175 binaries, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math), 82 named tolerances with full provenance, 0 ad-hoc magic numbers, 0 Passthrough, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, NCBI EFetch/SRA pipeline + NestGate JSON-RPC integration + biomeOS science graph, 52/52 papers, 39/39 three-tier
 
 ---
 
@@ -121,8 +121,8 @@ integration point.
 | metalForge forge tests | 47 |
 | **Total Rust tests** | **961** (882 barracuda + 47 forge + 32 integration/doc) |
 | Library code coverage | **96.67%** (llvm-cov) |
-| Experiments completed | 188 |
-| Validation/benchmark binaries | 160 validate + 14 benchmark = 174 total |
+| Experiments completed | 189 |
+| Validation/benchmark binaries | 161 validate + 14 benchmark = 175 total |
 | CPU bio modules | 47 |
 | GPU bio modules | 42 (30 lean + 5 write→lean + 7 compose + 0 passthrough) |
 | Tier B (needs refactor) | 0 (all promoted) |
@@ -528,7 +528,7 @@ Complete rewiring to modern ToadStool S42 BarraCuda APIs:
 - **Exp120**: Benchmarks diversity (wetSpring), QS ODE (hotSpring precision), ESN reservoir
   (hotSpring/neuralSpring → wetSpring NPU), with full provenance table and evolution timeline
 
-**912 tests** | **4,494+ checks** | **173 binaries**
+**912 tests** | **4,494+ checks** | **175 binaries**
 
 ### Phase 35: NCBI-Scale Hypothesis Testing (Exp121-126)
 
@@ -839,7 +839,7 @@ Rust 1.93 fixed across 20+ validation binaries.
 | Max file size | All under 1000 LOC |
 | External C dependencies | **0** (`flate2` uses `rust_backend`) |
 | Named tolerance constants | 82 (scientifically justified, hierarchy-tested) |
-| Provenance headers | All 174 validation/benchmark binaries |
+| Provenance headers | All 175 validation/benchmark binaries |
 | ESN ridge regression | **Proper Cholesky solve** (not diagonal approximation) |
 | I/O streaming | Buffering APIs deprecated; `stats_from_file` + iterators preferred |
 | Clone optimization | Hot-path clones eliminated (merge_pairs, derep entry API) |
@@ -931,7 +931,7 @@ Rust 1.93 fixed across 20+ validation binaries.
 wetSpring/
 ├── README.md                      ← this file
 ├── BENCHMARK_RESULTS.md           ← three-tier benchmark results
-├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (183 experiments)
+├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (189 experiments)
 ├── barracuda/                     ← Rust crate (src/, Cargo.toml, rustfmt.toml)
 │   ├── EVOLUTION_READINESS.md    ← absorption map (tiers, primitives, shaders)
 │   ├── ABSORPTION_MANIFEST.md    ← what's absorbed, local, planned (hotSpring pattern)
@@ -946,10 +946,10 @@ wetSpring/
 │   │   ├── bio/                 ← 47 CPU + 42 GPU bio modules
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML)
 │   │   ├── bench/               ← benchmark harness + power monitoring
-│   │   ├── bin/                 ← 172 validation/benchmark binaries
+│   │   ├── bin/                 ← 175 validation/benchmark binaries
 │   │   └── shaders/             ← shared WGSL utilities (ODE shaders now generated at runtime)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024
-├── experiments/                   ← 188 experiment protocols + results
+├── experiments/                   ← 189 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
 │   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs, bridge.rs

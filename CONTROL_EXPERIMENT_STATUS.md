@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 26, 2026
-**Status:** Phase 57 — 188 experiments, 4,494+ validation checks (1,578 GPU on RTX 4070), all PASS (882 barracuda + 47 forge + 32 integration/doc = 961 Rust tests), ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 82 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets), V57 ToadStool S68 catch-up + universal precision alignment, 39/39 three-tier
+**Status:** Phase 58 — 189 experiments, 4,494+ validation checks (1,578 GPU on RTX 4070), all PASS (882 barracuda + 47 forge + 32 integration/doc = 961 Rust tests), ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 82 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets), V58 doc sync + evolution learnings handoff, 39/39 three-tier
 
 ---
 
@@ -199,7 +199,7 @@
 
 | Category | Count |
 |----------|-------|
-| Experiments completed | 183 |
+| Experiments completed | 189 |
 | CPU validation checks | 1,476 |
 | GPU validation checks | 1,578 |
 | Dispatch validation checks | 80 |
@@ -226,13 +226,13 @@
 | Drug repurposing: CPU v9, GPU, metalForge (Exp163-165) | 44 |
 | Phase 44: modern systems S62+DF64, diversity fusion (Exp166-167) | 37 |
 | **Total validation checks** | **4,494+** |
-| Rust tests | 912 (833 barracuda + 47 forge + 32 integration/doc) |
+| Rust tests | 961 (882 barracuda + 47 forge + 32 integration/doc) |
 | BarraCuda CPU parity | 380/380 (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/092/101) |
 | metalForge cross-system | 37 domains CPU↔GPU proven (Exp103+104+165+182), **39/39 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
-| ToadStool primitives consumed | 79 (barracuda always-on, zero fallback — S66) |
-| ToadStool session alignment | S66 (660+ WGSL, cpu-math gate, PeakDetect, TransE, SpMM, NMF, ODE bio, ridge, Anderson, diversity_fusion) |
+| ToadStool primitives consumed | 79 (barracuda always-on, zero fallback — S68) |
+| ToadStool session alignment | S68 (660+ WGSL, cpu-math gate, PeakDetect, TransE, SpMM, NMF, ODE bio, ridge, Anderson, diversity_fusion) |
 | Cross-spring shader provenance | 35+ hotSpring, 22+ wetSpring, 14+ neuralSpring, 5+ airSpring, 500+ native |
 
 ---
@@ -375,7 +375,7 @@ barracuda_cpu                  → 380/380 checks PASS (25 domains + 6 ODE flat 
 barracuda_gpu                  → 1,578 GPU checks PASS (70 validators, RTX 4070 + Titan V)
 fuzz harnesses                 → 4 (FASTQ, mzML, MS2, XML)
 zero-copy I/O                  → FastqRefRecord, DecodeBuffer reuse, streaming iterators
-ToadStool alignment            → S66 (79 primitives, barracuda always-on, zero fallback code)
+ToadStool alignment            → S68 (79 primitives, barracuda always-on, zero fallback code)
 deprecated APIs                → 0 (parse_fastq → FastqIter::open in all binaries)
 ```
 
@@ -430,7 +430,7 @@ Following hotSpring's pattern for ToadStool integration:
 
 | Phase | Count | Status |
 |-------|:-----:|--------|
-| **Lean** (consumed upstream) | 79 primitives (always-on, zero fallback code) | S66: hill, monod, fit_linear, mean, percentile, shannon_from_frequencies added to 66+2+5 prior; V52 S66 rewire, V51 GPU validation (1,578 checks) |
+| **Lean** (consumed upstream) | 79 primitives (always-on, zero fallback code) | S68: hill, monod, fit_linear, mean, percentile, shannon_from_frequencies added to 66+2+5 prior; V52 S66 rewire, V51 GPU validation (1,578 checks) |
 | **Write** (local WGSL, pending absorption) | **0** — all retired | ODE shaders use `generate_shader()`; local WGSL deleted |
 | **CPU math** (`crate::special`) | 3 functions delegating on GPU | `erf`, `ln_gamma`, `regularized_gamma_lower` → `barracuda::special::*` when `gpu` active; sovereign fallback for no-GPU |
 | **CPU-only** (no GPU path) | 1 module (phred) | Pure GPU promotion complete (Exp101) |
