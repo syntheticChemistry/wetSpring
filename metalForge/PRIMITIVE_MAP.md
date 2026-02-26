@@ -6,9 +6,9 @@ GPU primitive (or explain why it stays CPU-only). This guides the
 absorption pipeline and identifies what ToadStool needs to build next.
 
 > **Feb 25 update (latest):** 44 ToadStool primitives + 2 BGL helpers consumed.
-> 1 local WGSL extension (`diversity_fusion_f64.wgsl` — Write phase, Exp167 18/18).
+> 0 local WGSL (fully lean). diversity_fusion absorbed by ToadStool S63.
 > All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed).
-> S62+DF64 aligned. BGL boilerplate removed (~258 lines).
+> S65 aligned. BGL boilerplate removed (~258 lines).
 > Forge crate v0.3.0. 168 experiments, 3,300+ checks, 806 tests.
 
 ---
@@ -98,11 +98,11 @@ absorption pipeline and identifies what ToadStool needs to build next.
 | `signal` / `signal_gpu` | Compose | `FusedMapReduceF64` batch | Pure GPU |
 | `feature_table` / `feature_table_gpu` | Compose | Chains `eic_gpu` + `signal_gpu` | Pure GPU |
 
-### Write Phase: New Extensions for ToadStool Absorption
+### Lean (absorbed S63): Former diversity_fusion Extension
 
-| Rust Module | GPU Strategy | WGSL Shader | Status |
-|-------------|-------------|-------------|--------|
-| `diversity_fusion_gpu` | **Local** | `shaders/diversity_fusion_f64.wgsl` | Write phase — fused Shannon + Simpson + evenness in single dispatch |
+| Rust Module | GPU Strategy | ToadStool Primitive | Status |
+|-------------|-------------|---------------------|--------|
+| `diversity_fusion_gpu` | **Lean** | Absorbed by ToadStool S63 | Fused Shannon + Simpson + evenness in single dispatch |
 
 ### Track 1c: Deep-Sea Metagenomics (ToadStool-absorbed, Exp058)
 
@@ -182,9 +182,9 @@ The `bio::special` re-export shim has been removed (Phase 24).
 
 | Category | Count |
 |----------|-------|
-| **Lean** (upstream ToadStool) | 24 modules (16 original + 8 bio absorbed Feb 22) |
-| **Local** (WGSL shader) | 5 modules (Write phase active) |
+| **Lean** (upstream ToadStool) | 25 modules (16 original + 8 bio absorbed Feb 22 + diversity_fusion S63) |
+| **Local** (WGSL shader) | 0 modules (fully lean) |
 | **Compose** (existing primitives) | 16 modules (5 original + 11 pure GPU promotion) |
 | **CPU** (no GPU path) | 1 module (phred) |
 | **NPU** (candidate) | 1 module |
-| **Local WGSL** (Write phase) | 5 (3 original + 2 pure GPU promotion) |
+| **Local WGSL** | 0 (fully lean) |

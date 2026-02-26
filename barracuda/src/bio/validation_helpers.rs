@@ -10,6 +10,9 @@ use std::path::Path;
 
 use crate::bio::taxonomy::{Lineage, NaiveBayesClassifier, ReferenceSeq};
 
+const SILVA_FASTA: &str = "silva_138_99_seqs.fasta";
+const SILVA_TAX_TSV: &str = "silva_138_99_taxonomy.tsv";
+
 /// Load and subsample SILVA 138.1 NR99 reference, train `NaiveBayesClassifier`.
 ///
 /// Subsamples to ~5000 sequences (every 87th) for tractable training.
@@ -19,8 +22,8 @@ use crate::bio::taxonomy::{Lineage, NaiveBayesClassifier, ReferenceSeq};
 /// Returns `None` if reference files are missing or empty.
 #[must_use]
 pub fn load_silva_classifier(ref_dir: &Path) -> Option<NaiveBayesClassifier> {
-    let fasta_path = ref_dir.join("silva_138_99_seqs.fasta");
-    let tax_path = ref_dir.join("silva_138_99_taxonomy.tsv");
+    let fasta_path = ref_dir.join(SILVA_FASTA);
+    let tax_path = ref_dir.join(SILVA_TAX_TSV);
 
     if !fasta_path.exists() || !tax_path.exists() {
         println!(

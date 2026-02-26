@@ -45,15 +45,24 @@ pub fn api_key() -> Option<String> {
         return Some(key);
     }
 
-    if let Ok(root) = std::env::var("WETSPRING_DATA_ROOT") {
-        let toml_path = Path::new(&root).join("api-keys.toml");
+    let data_root = std::env::var("WETSPRING_DATA_ROOT").ok();
+    let home = std::env::var("HOME").ok();
+    api_key_from_paths(data_root.as_deref(), home.as_deref())
+}
+
+/// Pure-logic API key resolution from filesystem paths.
+///
+/// Checks `data_root/api-keys.toml` then `home/.config/wetspring/api-keys.toml`.
+fn api_key_from_paths(data_root: Option<&str>, home: Option<&str>) -> Option<String> {
+    if let Some(root) = data_root {
+        let toml_path = Path::new(root).join("api-keys.toml");
         if let Some(key) = parse_api_key_toml(&toml_path) {
             return Some(key);
         }
     }
 
-    if let Ok(home) = std::env::var("HOME") {
-        let xdg = Path::new(&home).join(".config/wetspring/api-keys.toml");
+    if let Some(h) = home {
+        let xdg = Path::new(h).join(".config/wetspring/api-keys.toml");
         if let Some(key) = parse_api_key_toml(&xdg) {
             return Some(key);
         }
@@ -87,17 +96,31 @@ enum HttpBackend {
 /// 2. `curl` on `$PATH`
 /// 3. `wget` on `$PATH`
 fn discover_http_backend() -> Option<(HttpBackend, String)> {
-    if let Ok(cmd) = std::env::var("WETSPRING_HTTP_CMD") {
+    let custom = std::env::var("WETSPRING_HTTP_CMD").ok();
+    select_backend(
+        custom.as_deref(),
+        which_exists("curl"),
+        which_exists("wget"),
+    )
+}
+
+/// Pure-logic backend selection — no env or filesystem access.
+fn select_backend(
+    custom_cmd: Option<&str>,
+    has_curl: bool,
+    has_wget: bool,
+) -> Option<(HttpBackend, String)> {
+    if let Some(cmd) = custom_cmd {
         if !cmd.is_empty() {
-            return Some((HttpBackend::Custom, cmd));
+            return Some((HttpBackend::Custom, cmd.to_string()));
         }
     }
 
-    if which_exists("curl") {
+    if has_curl {
         return Some((HttpBackend::Curl, "curl".to_string()));
     }
 
-    if which_exists("wget") {
+    if has_wget {
         return Some((HttpBackend::Wget, "wget".to_string()));
     }
 
@@ -151,8 +174,16 @@ pub fn http_get(url: &str) -> Result<String, String> {
             .map_err(|e| format!("wget: {e}"))?,
     };
 
+    interpret_output(&output, &cmd)
+}
+
+/// Interpret the output of an HTTP subprocess.
+///
+/// Extracted for testability: the subprocess dispatch is environment-dependent,
+/// but the response interpretation is pure logic.
+fn interpret_output(output: &std::process::Output, cmd: &str) -> Result<String, String> {
     if output.status.success() {
-        String::from_utf8(output.stdout).map_err(|e| e.to_string())
+        String::from_utf8(output.stdout.clone()).map_err(|e| e.to_string())
     } else {
         let stderr = String::from_utf8_lossy(&output.stderr);
         let preview = &stderr[..stderr.len().min(crate::tolerances::ERROR_BODY_PREVIEW_LEN)];
@@ -229,15 +260,21 @@ fn preview_error(msg: &str, body: &str) -> String {
 /// 3. `data/{filename}` relative to cwd for deployment
 #[must_use]
 pub fn cache_file(filename: &str) -> PathBuf {
-    if let Ok(root) = std::env::var("WETSPRING_DATA_ROOT") {
+    let data_root = std::env::var("WETSPRING_DATA_ROOT").ok();
+    let manifest = std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| ".".to_string());
+    resolve_cache_path(data_root.as_deref(), &manifest, filename)
+}
+
+/// Pure-logic cache path resolution — no env access.
+fn resolve_cache_path(data_root: Option<&str>, manifest_dir: &str, filename: &str) -> PathBuf {
+    if let Some(root) = data_root {
         let p = PathBuf::from(root).join(filename);
         if p.parent().is_some_and(Path::exists) {
             return p;
         }
     }
 
-    let manifest = std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| ".".to_string());
-    let dev_path = PathBuf::from(&manifest).join("../data").join(filename);
+    let dev_path = PathBuf::from(manifest_dir).join("../data").join(filename);
     if dev_path.parent().is_some_and(Path::exists) {
         return dev_path;
     }
@@ -506,5 +543,282 @@ mod tests {
 
         let key = parse_api_key_toml(&path);
         assert_eq!(key, Some("first_key".to_string()));
+    }
+
+    // ── interpret_output (extracted HTTP response logic) ─────────
+
+    #[test]
+    fn interpret_output_success_returns_body() {
+        let output = std::process::Output {
+            status: std::process::Command::new("true").status().unwrap(),
+            stdout: b"hello world".to_vec(),
+            stderr: vec![],
+        };
+        let result = interpret_output(&output, "test-cmd");
+        assert_eq!(result.unwrap(), "hello world");
+    }
+
+    #[test]
+    fn interpret_output_failure_returns_stderr_preview() {
+        let output = std::process::Output {
+            status: std::process::Command::new("false").status().unwrap(),
+            stdout: vec![],
+            stderr: b"connection refused".to_vec(),
+        };
+        let result = interpret_output(&output, "curl");
+        let err = result.unwrap_err();
+        assert!(err.contains("curl"));
+        assert!(err.contains("connection refused"));
+    }
+
+    #[test]
+    fn interpret_output_failure_truncates_long_stderr() {
+        let output = std::process::Output {
+            status: std::process::Command::new("false").status().unwrap(),
+            stdout: vec![],
+            stderr: "x".repeat(500).into_bytes(),
+        };
+        let result = interpret_output(&output, "wget");
+        let err = result.unwrap_err();
+        assert!(err.len() < 500);
+    }
+
+    #[test]
+    fn interpret_output_success_empty_body() {
+        let output = std::process::Output {
+            status: std::process::Command::new("true").status().unwrap(),
+            stdout: vec![],
+            stderr: vec![],
+        };
+        assert_eq!(interpret_output(&output, "cmd").unwrap(), "");
+    }
+
+    // ── cache_file with CARGO_MANIFEST_DIR (set during cargo test) ──
+
+    #[test]
+    fn cache_file_uses_manifest_dir_fallback() {
+        let path = cache_file("integration_test_file.json");
+        let s = path.to_string_lossy();
+        assert!(
+            s.contains("data") && s.contains("integration_test_file.json"),
+            "path should contain data dir: {s}"
+        );
+    }
+
+    // ── esearch_count URL construction ──────────────────────────
+
+    #[test]
+    fn esearch_count_constructs_valid_url() {
+        let encoded = encode_entrez_term("luxI[gene]");
+        let url = format!("{ENTREZ_BASE}?db=nuccore&term={encoded}&rettype=count&api_key=test_key");
+        assert!(url.contains("esearch.fcgi"));
+        assert!(url.contains("db=nuccore"));
+        assert!(url.contains("luxI%5Bgene%5D"));
+        assert!(url.contains("api_key=test_key"));
+    }
+
+    // ── discover_http_backend variants ──────────────────────────
+
+    #[test]
+    fn which_exists_finds_ls() {
+        assert!(which_exists("ls"));
+    }
+
+    #[test]
+    fn which_exists_finds_echo() {
+        assert!(which_exists("echo"));
+    }
+
+    // ── api_key without env keys returns None or existing key ───
+
+    #[test]
+    fn api_key_is_deterministic() {
+        let k1 = api_key();
+        let k2 = api_key();
+        assert_eq!(k1, k2);
+    }
+
+    // ── parse_api_key_toml with whitespace variations ───────────
+
+    #[test]
+    fn parse_api_key_toml_with_spaces_around_equals() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spaces.toml");
+        let mut f = std::fs::File::create(&path).unwrap();
+        writeln!(f, "ncbi_api_key   =   \"spaced_key\"").unwrap();
+
+        let key = parse_api_key_toml(&path);
+        assert_eq!(key, Some("spaced_key".to_string()));
+    }
+
+    #[test]
+    fn parse_api_key_toml_with_comment_before_key() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("commented.toml");
+        let mut f = std::fs::File::create(&path).unwrap();
+        writeln!(f, "# NCBI API key for production use").unwrap();
+        writeln!(f, "ncbi_api_key = \"comment_key\"").unwrap();
+
+        let key = parse_api_key_toml(&path);
+        assert_eq!(key, Some("comment_key".to_string()));
+    }
+
+    // ── api_key_from_paths (extracted pure logic) ────────────────
+
+    #[test]
+    fn api_key_from_paths_data_root_hit() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("api-keys.toml");
+        let mut f = std::fs::File::create(&path).unwrap();
+        writeln!(f, "ncbi_api_key = \"root_key\"").unwrap();
+
+        let key = api_key_from_paths(Some(dir.path().to_str().unwrap()), None);
+        assert_eq!(key, Some("root_key".to_string()));
+    }
+
+    #[test]
+    fn api_key_from_paths_home_xdg_hit() {
+        let dir = tempfile::tempdir().unwrap();
+        let xdg = dir.path().join(".config/wetspring");
+        std::fs::create_dir_all(&xdg).unwrap();
+        let path = xdg.join("api-keys.toml");
+        let mut f = std::fs::File::create(&path).unwrap();
+        writeln!(f, "ncbi_api_key = \"home_key\"").unwrap();
+
+        let key = api_key_from_paths(None, Some(dir.path().to_str().unwrap()));
+        assert_eq!(key, Some("home_key".to_string()));
+    }
+
+    #[test]
+    fn api_key_from_paths_data_root_priority_over_home() {
+        let root_dir = tempfile::tempdir().unwrap();
+        let root_toml = root_dir.path().join("api-keys.toml");
+        let mut f = std::fs::File::create(&root_toml).unwrap();
+        writeln!(f, "ncbi_api_key = \"root_wins\"").unwrap();
+
+        let home_dir = tempfile::tempdir().unwrap();
+        let xdg = home_dir.path().join(".config/wetspring");
+        std::fs::create_dir_all(&xdg).unwrap();
+        let home_toml = xdg.join("api-keys.toml");
+        let mut hf = std::fs::File::create(&home_toml).unwrap();
+        writeln!(hf, "ncbi_api_key = \"home_loses\"").unwrap();
+
+        let key = api_key_from_paths(
+            Some(root_dir.path().to_str().unwrap()),
+            Some(home_dir.path().to_str().unwrap()),
+        );
+        assert_eq!(key, Some("root_wins".to_string()));
+    }
+
+    #[test]
+    fn api_key_from_paths_both_none() {
+        assert!(api_key_from_paths(None, None).is_none());
+    }
+
+    #[test]
+    fn api_key_from_paths_data_root_missing_file_falls_to_home() {
+        let root_dir = tempfile::tempdir().unwrap();
+
+        let home_dir = tempfile::tempdir().unwrap();
+        let xdg = home_dir.path().join(".config/wetspring");
+        std::fs::create_dir_all(&xdg).unwrap();
+        let path = xdg.join("api-keys.toml");
+        let mut f = std::fs::File::create(&path).unwrap();
+        writeln!(f, "ncbi_api_key = \"fallback\"").unwrap();
+
+        let key = api_key_from_paths(
+            Some(root_dir.path().to_str().unwrap()),
+            Some(home_dir.path().to_str().unwrap()),
+        );
+        assert_eq!(key, Some("fallback".to_string()));
+    }
+
+    // ── select_backend (extracted pure logic) ────────────────────
+
+    #[test]
+    fn select_backend_custom_wins() {
+        let (backend, cmd) = select_backend(Some("myhttp --get"), true, true).unwrap();
+        assert_eq!(backend, HttpBackend::Custom);
+        assert_eq!(cmd, "myhttp --get");
+    }
+
+    #[test]
+    fn select_backend_empty_custom_ignored() {
+        let (backend, _) = select_backend(Some(""), true, false).unwrap();
+        assert_eq!(backend, HttpBackend::Curl);
+    }
+
+    #[test]
+    fn select_backend_curl_over_wget() {
+        let (backend, _) = select_backend(None, true, true).unwrap();
+        assert_eq!(backend, HttpBackend::Curl);
+    }
+
+    #[test]
+    fn select_backend_wget_fallback() {
+        let (backend, _) = select_backend(None, false, true).unwrap();
+        assert_eq!(backend, HttpBackend::Wget);
+    }
+
+    #[test]
+    fn select_backend_none_when_nothing() {
+        assert!(select_backend(None, false, false).is_none());
+    }
+
+    #[test]
+    fn select_backend_custom_only_no_system() {
+        let (backend, cmd) = select_backend(Some("wget2"), false, false).unwrap();
+        assert_eq!(backend, HttpBackend::Custom);
+        assert_eq!(cmd, "wget2");
+    }
+
+    // ── resolve_cache_path (extracted pure logic) ────────────────
+
+    #[test]
+    fn resolve_cache_path_data_root_existing_dir() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = resolve_cache_path(Some(dir.path().to_str().unwrap()), ".", "test.json");
+        assert_eq!(path, dir.path().join("test.json"));
+    }
+
+    #[test]
+    fn resolve_cache_path_data_root_nonexistent_falls_through() {
+        let path = resolve_cache_path(
+            Some("/nonexistent_wetspring_test_dir_xyz"),
+            ".",
+            "test.json",
+        );
+        assert!(
+            !path.starts_with("/nonexistent_wetspring_test_dir_xyz"),
+            "should not use nonexistent data root: {path:?}"
+        );
+    }
+
+    #[test]
+    fn resolve_cache_path_manifest_dir_fallback() {
+        let dir = tempfile::tempdir().unwrap();
+        let data = dir.path().join("data");
+        std::fs::create_dir_all(&data).unwrap();
+        let manifest = dir.path().join("sub");
+        std::fs::create_dir_all(&manifest).unwrap();
+        let path = resolve_cache_path(None, manifest.to_str().unwrap(), "cache.bin");
+        assert!(path.to_string_lossy().contains("data"));
+    }
+
+    #[test]
+    fn resolve_cache_path_final_fallback() {
+        let path = resolve_cache_path(None, "/nonexistent_manifest_xyz", "fallback.json");
+        assert_eq!(path, PathBuf::from("data").join("fallback.json"));
+    }
+
+    #[test]
+    fn resolve_cache_path_none_root_with_valid_manifest() {
+        let dir = tempfile::tempdir().unwrap();
+        let data = dir.path().join("data");
+        std::fs::create_dir_all(&data).unwrap();
+        let manifest = dir.path().join("crate");
+        std::fs::create_dir_all(&manifest).unwrap();
+        let path = resolve_cache_path(None, manifest.to_str().unwrap(), "x.json");
+        assert!(path.to_string_lossy().contains("data"), "path = {path:?}");
     }
 }

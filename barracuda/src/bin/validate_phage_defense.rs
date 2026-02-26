@@ -39,8 +39,18 @@ fn main() {
         1.0,
         tolerances::EXACT,
     );
-    v.check("No phage: Bd matches Python", bd, 132_242.0, 1000.0);
-    v.check("No phage: Bu matches Python", bu, 138_317.0, 1000.0);
+    v.check(
+        "No phage: Bd matches Python",
+        bd,
+        132_242.0,
+        tolerances::PHAGE_LARGE_POPULATION,
+    );
+    v.check(
+        "No phage: Bu matches Python",
+        bu,
+        138_317.0,
+        tolerances::PHAGE_LARGE_POPULATION,
+    );
 
     v.section("── Phage attack (defense advantage) ──");
     let r = scenario_phage_attack(&params, DT);
@@ -52,7 +62,12 @@ fn main() {
         1.0,
         tolerances::EXACT,
     );
-    v.check("Attack: Bu ≈ 0 (crashed)", bu, 0.0, 1.0);
+    v.check(
+        "Attack: Bu ≈ 0 (crashed)",
+        bu,
+        0.0,
+        tolerances::PHAGE_CRASH_FLOOR,
+    );
     v.check(
         "Attack: Bd matches Python",
         bd,
@@ -75,7 +90,7 @@ fn main() {
         "Pure defended: Bd matches Python",
         defended_ss,
         119_563.0,
-        1000.0,
+        tolerances::PHAGE_LARGE_POPULATION,
     );
 
     v.section("── High cost defense ──");

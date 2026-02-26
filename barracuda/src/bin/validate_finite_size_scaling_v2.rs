@@ -37,7 +37,8 @@ use wetspring_barracuda::validation::Validator;
 
 #[cfg(feature = "gpu")]
 use barracuda::spectral::{
-    GOE_R, POISSON_R, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
+    AndersonSweepPoint, GOE_R, POISSON_R, anderson_3d, find_w_c, lanczos, lanczos_eigenvalues,
+    level_spacing_ratio,
 };
 
 const LATTICE_SIZES: &[usize] = &[6, 8, 10, 12];
@@ -130,18 +131,15 @@ fn main() {
                 })
                 .collect();
 
-            let w_c = {
-                let mut last = None;
-                for i in 1..sweep.len() {
-                    let (w0, r0, _) = sweep[i - 1];
-                    let (w1, r1, _) = sweep[i];
-                    if r0 > midpoint && r1 <= midpoint {
-                        let t = (midpoint - r0) / (r1 - r0);
-                        last = Some(t.mul_add(w1 - w0, w0));
-                    }
-                }
-                last
-            };
+            let sweep_pts: Vec<_> = sweep
+                .iter()
+                .map(|&(w, r, s)| AndersonSweepPoint {
+                    w,
+                    r_mean: r,
+                    r_stderr: s,
+                })
+                .collect();
+            let w_c = find_w_c(&sweep_pts, midpoint);
 
             if let Some(wc) = w_c {
                 println!("    → W_c(L={l}) = {wc:.2}");

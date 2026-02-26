@@ -8,7 +8,7 @@
     clippy::cast_sign_loss,
     clippy::cast_possible_wrap
 )]
-//! Exp124 — MassBank Full-Scale NPU Spectral Triage
+//! Exp124 — `MassBank` Full-Scale NPU Spectral Triage
 //!
 //! Int8-quantized spectral triage for NPU deployment. Validates recall,
 //! top-1 match rate, and throughput vs full f64 cosine search.
@@ -18,13 +18,17 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Validation type | Analytical (closed-form expected values) |
-//! | Expected values | Derived from spectral_match cosine similarity |
-//! | Reference | MassBank-style triage, int8 dot product ranking |
+//! | Expected values | Derived from `spectral_match::cosine_similarity` (unit-resolution) |
+//! | Baseline script | `scripts/spectral_match_baseline.py` (cosine reference) |
+//! | Baseline commit | `e4358c5` |
+//! | Reference | `MassBank`-style triage, int8 dot product ranking |
+//! | Acceptance thresholds | `tolerances::NPU_PASS_RATE_CEILING` / `NPU_RECALL_FLOOR` / `NPU_TOP1_FLOOR` |
 //! | Date | 2026-02-25 |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use std::time::Instant;
 use wetspring_barracuda::bio::spectral_match;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 const LIB_SIZE: usize = 5_000;
@@ -155,7 +159,10 @@ fn main() {
 
     let pass_rate = total_candidates as f64 / (N_QUERIES * LIB_SIZE) as f64;
     println!("  Pass rate (candidates / total): {pass_rate:.4}");
-    v.check_pass("pass rate < 30%", pass_rate < 0.30);
+    v.check_pass(
+        "pass rate < 30%",
+        pass_rate < tolerances::NPU_PASS_RATE_CEILING,
+    );
 
     v.section("── S5: Recall check ──");
     let mut recall_count = 0;
@@ -169,7 +176,7 @@ fn main() {
     println!(
         "  Recall: {recall:.3} ({recall_count}/{N_QUERIES} queries have true match in candidates)"
     );
-    v.check_pass("recall > 90%", recall > 0.90);
+    v.check_pass("recall > 90%", recall > tolerances::NPU_RECALL_FLOOR);
 
     v.section("── S6: Full-precision scoring on candidates ──");
     let mut top1_correct = 0;
@@ -191,7 +198,7 @@ fn main() {
     }
     let top1_rate = f64::from(top1_correct) / N_QUERIES as f64;
     println!("  Top-1 match rate: {top1_rate:.3} ({top1_correct}/{N_QUERIES} queries)");
-    v.check_pass("top-1 match > 80%", top1_rate > 0.80);
+    v.check_pass("top-1 match > 80%", top1_rate > tolerances::NPU_TOP1_FLOOR);
 
     v.section("── S7: Throughput comparison ──");
     let t0_npu = Instant::now();

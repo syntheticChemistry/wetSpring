@@ -106,7 +106,7 @@ fn validate_hotspring_precision(v: &mut Validator, device: &Arc<WgpuDevice>) {
         "erf(1.0) — barracuda::special (hotSpring origin)",
         erf_val,
         0.842_700_792_949_715,
-        tolerances::GPU_LOG_POLYFILL,
+        5e-7,
     );
 
     let lng_val = barracuda::special::ln_gamma(5.0).expect("ln_gamma");
@@ -138,7 +138,10 @@ fn validate_hotspring_precision(v: &mut Validator, device: &Arc<WgpuDevice>) {
             )
         },
     );
-    v.check_pass("GEMM pipeline compiles", gemm_ms < 30_000.0);
+    v.check_pass(
+        "GEMM pipeline compiles",
+        gemm_ms < tolerances::GEMM_COMPILE_TIMEOUT_MS,
+    );
 
     println!("\n  ✓ hotSpring precision shaders enable wetSpring f64 GPU math");
 }

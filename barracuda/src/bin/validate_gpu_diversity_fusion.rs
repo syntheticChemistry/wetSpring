@@ -1,11 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! # Exp167: Diversity Fusion GPU Extension (Write Phase)
+//! # Exp167: Diversity Fusion GPU — Lean Phase (absorbed S63)
 //!
-//! Validates diversity_fusion_f64.wgsl extension — CPU ↔ GPU parity.
-//! Python baseline: scipy/skbio Shannon/Simpson/Pielou (analytically verified).
-//! Data: Synthetic abundance vectors (deterministic, no external data).
-//! This validates the Write-phase diversity fusion WGSL extension following
-//! hotSpring's absorption pattern: local shader + CPU reference + parity check.
+//! Validates `DiversityFusionGpu` via upstream `barracuda::ops::bio::diversity_fusion` —
+//! CPU ↔ GPU parity.  Python baseline: scipy/skbio Shannon/Simpson/Pielou
+//! (analytically verified).  Data: Synthetic abundance vectors (deterministic,
+//! no external data).
+//!
+//! Originally validated the Write-phase local WGSL shader.  After ToadStool S63
+//! absorption, the local shader was deleted and this binary now exercises the
+//! upstream `DiversityFusionGpu` + `diversity_fusion_cpu` re-exports.
 //!
 //! # Provenance
 //!
@@ -20,7 +23,7 @@ use std::sync::Arc;
 use wetspring_barracuda::tolerances;
 
 fn main() {
-    println!("=== Exp167: Diversity Fusion GPU Extension (Write Phase) ===");
+    println!("=== Exp167: Diversity Fusion GPU — Lean Phase (absorbed S63) ===");
     println!();
 
     let rt = tokio::runtime::Builder::new_current_thread()
@@ -248,12 +251,11 @@ fn main() {
     println!();
     println!("=== Exp167 Summary: {passed}/{checks} checks passed ===");
     println!();
-    println!("Extension pattern (hotSpring absorption model):");
-    println!("  WGSL:  barracuda/src/bio/shaders/diversity_fusion_f64.wgsl");
-    println!("  Rust:  barracuda/src/bio/diversity_fusion_gpu.rs");
-    println!("  CPU:   diversity_fusion_cpu() — analytical reference");
-    println!("  GPU:   DiversityFusionGpu — local pipeline (Write phase)");
-    println!("  Next:  handoff → ToadStool absorption → lean");
+    println!("Lean delegation (Write → Absorb → Lean complete):");
+    println!("  GPU:   barracuda::ops::bio::diversity_fusion::DiversityFusionGpu (S63)");
+    println!("  CPU:   barracuda::ops::bio::diversity_fusion::diversity_fusion_cpu (S63)");
+    println!("  Local: thin re-export in bio/diversity_fusion_gpu.rs (10 lines)");
+    println!("  WGSL:  deleted (was bio/shaders/diversity_fusion_f64.wgsl)");
 
     if passed == checks {
         println!();
@@ -261,7 +263,7 @@ fn main() {
         process::exit(0);
     } else {
         eprintln!();
-        eprintln!("FAIL: {}/{checks} passed", passed);
+        eprintln!("FAIL: {passed}/{checks} passed");
         process::exit(1);
     }
 }

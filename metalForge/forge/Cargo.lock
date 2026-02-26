@@ -73,6 +73,7 @@ dependencies = [
  "etcetera",
  "half",
  "log",
+ "naga",
  "num-traits",
  "pollster",
  "rand",

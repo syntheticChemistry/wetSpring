@@ -52,7 +52,7 @@ fn main() {
         "S1: B_ss (low biofilm)",
         b_ss,
         0.040,
-        tolerances::GC_CONTENT,
+        tolerances::ODE_BISTABLE_LOW_B,
     );
     v.check(
         "S1: C_ss (moderate c-di-GMP)",
@@ -79,7 +79,7 @@ fn main() {
         "S2: C_ss matches Python",
         c_ss,
         1.634,
-        tolerances::KMD_SPREAD,
+        tolerances::ODE_SIGNAL_SS,
     );
     check_non_negative(&mut v, &r, "S2");
 

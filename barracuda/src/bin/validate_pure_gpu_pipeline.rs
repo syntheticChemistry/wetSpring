@@ -29,6 +29,7 @@
 //! | Data | 8 synthetic communities × 512 features |
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, Pop!\_OS 22.04 |
 
+use barracuda::stats::{correlation::variance as stats_variance, pearson_correlation};
 use std::time::Instant;
 use wetspring_barracuda::bio::{
     diversity, diversity_gpu, pcoa, pcoa_gpu, spectral_match_gpu, stats_gpu,
@@ -89,25 +90,8 @@ fn pairwise_cosine_cpu(spectra: &[Vec<f64>]) -> Vec<f64> {
     condensed
 }
 
-fn variance_cpu(data: &[f64]) -> f64 {
-    let n = data.len() as f64;
-    let mean = data.iter().sum::<f64>() / n;
-    data.iter().map(|x| (x - mean) * (x - mean)).sum::<f64>() / n
-}
-
 fn correlation_cpu(x: &[f64], y: &[f64]) -> f64 {
-    let n = x.len() as f64;
-    let mx = x.iter().sum::<f64>() / n;
-    let my = y.iter().sum::<f64>() / n;
-    let cov: f64 = x
-        .iter()
-        .zip(y.iter())
-        .map(|(a, b)| (a - mx) * (b - my))
-        .sum::<f64>()
-        / n;
-    let sx = variance_cpu(x).sqrt();
-    let sy = variance_cpu(y).sqrt();
-    if sx * sy > 0.0 { cov / (sx * sy) } else { 0.0 }
+    pearson_correlation(x, y).unwrap_or(0.0)
 }
 
 #[tokio::main]
@@ -279,8 +263,12 @@ async fn main() {
     let gpu_corr = stats_gpu::correlation_gpu(&gpu, &pc1, &pc2).expect("GPU pipeline");
     let stage4_us = t4.elapsed().as_micros() as f64;
 
-    let cpu_var_pc1 = variance_cpu(&pc1);
-    let cpu_var_pc2 = variance_cpu(&pc2);
+    let cpu_var_pc1 = stats_variance(&pc1)
+        .map(|s| s * (pc1.len() - 1) as f64 / pc1.len() as f64)
+        .unwrap_or(0.0);
+    let cpu_var_pc2 = stats_variance(&pc2)
+        .map(|s| s * (pc2.len() - 1) as f64 / pc2.len() as f64)
+        .unwrap_or(0.0);
     let cpu_corr = correlation_cpu(&pc1, &pc2);
 
     v.check(

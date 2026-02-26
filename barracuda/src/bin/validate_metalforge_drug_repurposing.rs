@@ -375,7 +375,7 @@ fn main() {
     let mut timings: Vec<(&str, f64, f64, f64)> = Vec::new();
 
     let gemm = GemmCached::new(device.clone(), ctx);
-    let fmr = FusedMapReduceF64::new(device.clone()).expect("FMR init");
+    let fmr = FusedMapReduceF64::new(device).expect("FMR init");
 
     validate_nmf_reconstruction_parity(&mut v, &gemm, &mut timings);
     validate_cosine_scoring_parity(&mut v, &fmr, &mut timings);

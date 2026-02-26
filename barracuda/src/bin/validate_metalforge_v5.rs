@@ -398,7 +398,12 @@ fn validate_robinson_foulds_mf(
     let gpu_dist = robinson_foulds_gpu::rf_distance_gpu(gpu, &t1, &t2).expect("RF GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
-    v.check("RF distance", gpu_dist as f64, cpu_dist as f64, 0.0);
+    v.check(
+        "RF distance",
+        gpu_dist as f64,
+        cpu_dist as f64,
+        tolerances::EXACT,
+    );
     timings.push(("Robinson-Foulds", cpu_us, gpu_us, "CPU=GPU"));
 }
 
@@ -626,10 +631,10 @@ fn validate_molecular_clock_mf(
             );
         }
         (None, None) => {
-            v.check("strict clock both None", 1.0, 1.0, 0.0);
+            v.check("strict clock both None", 1.0, 1.0, tolerances::EXACT);
         }
         _ => {
-            v.check("strict clock mismatch", 0.0, 1.0, 0.0);
+            v.check("strict clock mismatch", 0.0, 1.0, tolerances::EXACT);
         }
     }
 

@@ -1,18 +1,17 @@
 # wetSpring Evolution Readiness
 
-**Date:** February 25, 2026 (V41 deep audit, ToadStool `02207c4a` S62+DF64)
+**Date:** February 25, 2026 (V48 ToadStool S65 rewire)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules + 1 Write-phase WGSL extension, 49 ToadStool primitives + 2 BGL helpers (barracuda always-on, zero fallback code), 918 tests (871 barracuda + 47 forge), 96.48% library coverage, 168 experiments, 3,300+ checks, ToadStool S62+DF64 aligned, 70 named tolerance constants, 0 ad-hoc tolerances, 0 Passthrough, 0 debt. 7/9 P0-P3 evolution requests delivered.
+**Status:** 47 CPU + 42 GPU modules (all lean, 0 local WGSL), 66 ToadStool primitives + 2 BGL helpers (barracuda always-on, zero fallback code), 898 tests (819 barracuda + 47 forge), 96.78% library coverage, 183 experiments, 3,618+ checks, ToadStool S65 aligned (`17932267`), 77 named tolerance constants, 0 ad-hoc tolerances, 0 Passthrough, 0 debt. 9/9 P0-P3 evolution requests delivered — `diversity_fusion_f64.wgsl` absorbed S63, `stats::diversity` absorbed S64, `stats::metrics::{dot, l2_norm}` absorbed S64.
 
-### Full Lean + Write Phase
+### Full Lean Phase
 
-All previously local WGSL shaders have been absorbed by ToadStool and deleted.
-The 5 ODE systems completed the full Write → Absorb → Lean cycle (S58).
-
-wetSpring has now entered the **Write phase** for new bio-specific extensions
-following hotSpring's absorption pattern. First extension: `diversity_fusion_f64.wgsl`
-(fused Shannon + Simpson + evenness, Exp167, 18/18 checks). Structured for
-absorption as `ops::bio::diversity_fusion`.
+All local WGSL shaders have been absorbed by ToadStool and deleted.
+The 5 ODE systems completed Write → Absorb → Lean (S58).
+`diversity_fusion_f64.wgsl` completed Write → Absorb → Lean (S63).
+`bio::diversity` delegated to `barracuda::stats::diversity` (S64).
+`special::{dot, l2_norm}` delegated to `barracuda::stats::{dot, l2_norm}` (S64).
+wetSpring is now **fully lean** — zero local math, zero local WGSL.
 
 `barracuda` is now an **always-on** dependency (`default-features = false` for CPU
 builds, `barracuda/gpu` for GPU builds). This eliminated all `#[cfg(not(feature = "gpu"))]`
@@ -21,7 +20,7 @@ and `trapz`. Zero duplicate math remains in the codebase.
 
 See `ABSORPTION_MANIFEST.md` for the full ledger.
 
-### S62+DF64 Evolution (Phase 43 — V40 catch-up)
+### S65 Evolution (Phase 43 — V40 catch-up)
 
 ToadStool S39-S62+DF64 (55+ commits since V39) delivered massive infrastructure:
 
@@ -43,24 +42,24 @@ ToadStool S39-S62+DF64 (55+ commits since V39) delivered massive infrastructure:
 - `unified_hardware` refactored to 6 focused modules (types, traits, scheduler, discovery, cpu_executor, transfer)
 
 **Upstream requests** (V40 status — 7/9 delivered):
-1. ~~Make `GemmF64::wgsl_shader_for_device()` public~~ → **DELIVERED** (S62+DF64) — with `Fp64Strategy` auto-detect (Native/Hybrid), DF64 GEMM for FP32 cores
+1. ~~Make `GemmF64::wgsl_shader_for_device()` public~~ → **DELIVERED** (S65) — with `Fp64Strategy` auto-detect (Native/Hybrid), DF64 GEMM for FP32 cores
 2. ~~Fix `PeakDetectF64` WGSL shader~~ → **DELIVERED** (S62) — full f64 op + `peak_detect_f64.wgsl`; `signal_gpu` already leaned
-3. ~~`ComputeDispatch` with cached-pipeline variant~~ → **DELIVERED** (S62+DF64) — `ComputeDispatch` builder in `device::compute_pipeline`
+3. ~~`ComputeDispatch` with cached-pipeline variant~~ → **DELIVERED** (S65) — `ComputeDispatch` builder in `device::compute_pipeline`
 4. ~~`barracuda::math::{dot, l2_norm}`~~ → **DELIVERED** (S60) as GPU ops: `NormReduceF64::l2()`, `FusedMapReduceF64::dot()`, `WeightedDotF64::dot()`. CPU `special::{dot, l2_norm}` remain as thin local helpers for validation math.
-5. Absorb `diversity_fusion_f64.wgsl` → **OPEN** (P2)
+5. Absorb `diversity_fusion_f64.wgsl` → **DONE** (absorbed S63)
 6. ~~`BatchedOdeRK4Generic<N, P>`~~ → **DELIVERED** (S58) via `OdeSystem` trait + `generate_shader()`; all 5 ODE systems leaned
 7. ~~GPU Top-K selection~~ → **DELIVERED** (S60) — `ops::topk::TopK` (1D indices, WGSL bitonic sort)
 8. ~~NPU int8 quantization helpers~~ → **DELIVERED** (S39) — `quantize_affine_i8`
-9. Tolerance module pattern for ToadStool validation → **OPEN** (P2 suggestion)
+9. Tolerance module pattern for ToadStool validation → **DELIVERED** (S52) — `barracuda::tolerances` module with `Tolerance` struct + `check()` + 12 named constants. wetSpring keeps its own flat `tolerances.rs` (77 domain-specific constants) which is complementary.
 
-### Next Write Phase: Absorption Candidates
+### Next Lean Phase: Absorption Candidates
 
 Following hotSpring's pattern of writing validated extensions as proposals for
-ToadStool absorption, these wetSpring modules are candidates for new Write phase:
+ToadStool absorption, these wetSpring modules are candidates for new Lean phase:
 
 | Module | Location | Status | Absorption benefit |
 |--------|----------|--------|-------------------|
-| `diversity_fusion_f64.wgsl` | local WGSL | Write (P2-5 open) | Fused Shannon + Simpson + evenness |
+| `diversity_fusion_f64.wgsl` | barracuda::ops::bio | DONE (absorbed S63) | Fused Shannon + Simpson + evenness |
 | `forge::bridge` | `metalForge/forge/src/bridge.rs` | 47 tests | Multi-substrate dispatch |
 | `forge::dispatch` | `metalForge/forge/src/dispatch.rs` | 47 tests | Universal workload routing |
 
@@ -71,7 +70,7 @@ All GPU bio modules are now either Lean (upstream primitive) or Compose
 
 All modules pass `clippy::pedantic` + `clippy::nursery` (0 warnings, `-D` enforced
 in CI), `cargo fmt` (0 diffs), `cargo doc` (0 warnings with and without `--all-features`).
-All tolerances centralized in `tolerances.rs` (70 named constants — includes
+All tolerances centralized in `tolerances.rs` (77 named constants — includes
 Jacobi eigendecomposition (Golub & Van Loan), ESN regularisation (Jaeger 2001/
 Lukoševičius 2012), Chao1 count detection (skbio parity), and 8 V39 audit
 additions: rarefaction, PCoA, KMD, HMM, Gillespie, asari). NMF convergence
@@ -231,7 +230,7 @@ All GPU ODE modules now use `BatchedOdeRK4::<S>::generate_shader()` which:
 
 ---
 
-## ToadStool Primitives Consumed (44 — barracuda always-on)
+## ToadStool Primitives Consumed (66 — barracuda always-on)
 
 ### Original 15 (pre-Feb 22)
 
@@ -299,9 +298,9 @@ hotSpring's precision f64 polyfills improve wetSpring's numerical accuracy.
 | `anderson_3d_correlated` | Correlated disorder validation | S59 |
 | `trapz` | EIC peak integration | S59 |
 | `erf`, `ln_gamma`, `regularized_gamma_p` | Special functions (always-on CPU math) | S59 |
-| `ValidationHarness` | Structured tolerance-aware validation | S59 |
+| `norm_cdf` | Normal CDF (delegates from `special::normal_cdf`) | S59 |
 
-### 8 ToadStool S60-S62+DF64 Primitives (V40 catch-up)
+### 8 ToadStool S60-S65 Primitives (V40 catch-up)
 
 | Primitive | wetSpring Use | ToadStool Session | Status |
 |-----------|---------------|------------------|--------|
@@ -310,7 +309,7 @@ hotSpring's precision f64 polyfills improve wetSpring's numerical accuracy.
 | `TopK` | Drug-disease pair ranking | S60 | Available — Track 3 |
 | `PeakDetectF64` | GPU LC-MS peak detection | S62 | ✅ Lean — `signal_gpu` rewired |
 | `BandwidthTier` | PCIe-aware routing for metalForge | S62 | Available |
-| `ComputeDispatch` | Eliminates BGL/pipeline boilerplate | S62+DF64 | Available |
+| `ComputeDispatch` | Eliminates BGL/pipeline boilerplate | S65 | Available |
 | `Fp64Strategy` | Native/Hybrid f64 auto-selection | DF64 | Available |
 | DF64 GEMM (`gemm_df64.wgsl`) | ~10× throughput on FP32 cores (RTX 4070) | DF64 | Available |
 
@@ -453,14 +452,14 @@ no parallelism benefit) and `fastq_parsing` (I/O-bound).
 |--------|-----------|-----------|
 | Domain | Computational physics | Life science & analytical chemistry |
 | CPU modules | 50+ (physics, lattice, MD, spectral) | 41 (bio, signal, ML) |
-| GPU modules | 34 WGSL shaders | 30 modules, 3 local WGSL (Write phase) |
+| GPU modules | 34 WGSL shaders | 42 modules (Lean phase) |
 | Absorbed | complex64, SU(3), plaquette, HMC, CellList | SW, Gillespie, DT, Felsenstein, GEMM, HMM, ANI, SNP, dN/dS, Pangenome, QF, DADA2, RF + 5 neuralSpring (PairwiseHamming, PairwiseJaccard, SpatialPayoff, BatchFitness, LocusVariance) |
 | WGSL pattern | `pub const WGSL: &str` inline | `include_str!("../shaders/...")` |
 | metalForge | GPU + NPU hardware characterization | GPU + NPU + cross-substrate validation |
 | Handoffs | `../wateringHole/handoffs/` (36+ docs) | `ecoPrimals/archive/wetspring-early-handoffs-feb2026/` (v1-v9 fossil) |
 | Tests | 454 | 750 |
 | Validation | 418 checks | 2,673+ checks |
-| Experiments | 31 suites | 120 experiments |
+| Experiments | 31 suites | 183 experiments |
 | Line coverage | — | 97% bio+io (55% overall) |
 | Pipeline caching | Upstream (ToadStool native) | Local (Exp068, 38% overhead reduction) |
 | Three-tier proof | CPU→GPU→NPU | Python→CPU→GPU→NPU (Exp069) |
@@ -473,10 +472,11 @@ no parallelism benefit) and `fastq_parsing` (I/O-bound).
 | Pure GPU streaming | — | Zero CPU round-trips, 441-837× over round-trip (Exp090) |
 | PCIe direct transfer | — | GPU→NPU without CPU staging (Exp088) |
 
-| WGSL pattern | `pub const WGSL` inline | `include_str!("../shaders/...")` for local; upstream for Lean |
-| Write cycle | Active (physics ODEs) | Active (bio ODEs: phage, bistable, multi-signal) |
+| WGSL pattern | `pub const WGSL` inline | upstream for Lean |
+| Write cycle | Active (physics ODEs) | Lean phase (all bio ODEs absorbed) |
 
 Both Springs follow the same pipeline: **Python → Rust CPU → GPU → ToadStool absorption**.
-hotSpring's `pub const WGSL` inline approach and wetSpring's `include_str!` file
-approach both work for absorption. Both are actively in Write phases for new
-domain-specific ODE shaders, with convergent handoff patterns via `wateringHole/`.
+hotSpring's `pub const WGSL` inline approach and wetSpring's upstream Lean
+approach both work for absorption. wetSpring is in Lean phase (all absorbed);
+hotSpring actively in Write phases for new domain-specific ODE shaders.
+Convergent handoff patterns via `wateringHole/`.

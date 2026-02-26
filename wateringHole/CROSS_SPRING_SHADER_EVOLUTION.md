@@ -1,7 +1,7 @@
 # Cross-Spring Shader Evolution
 
-**Last updated**: Feb 25, 2026 — ToadStool S62+DF64 (608 WGSL shaders, DF64 core-streaming, BGL helpers)
-**Validated by**: wetSpring Exp166 `benchmark_modern_systems_df64` (19/19 PASS), Exp168 `validate_cross_spring_s62` (cross-spring evolution, ~25 PASS), V40 handoff
+**Last updated**: Feb 25, 2026 — V48 ToadStool S65 rewire + Track 4 soil QS (608 WGSL shaders, DF64, 66 primitives consumed, 183 experiments, 3,618+ checks)
+**Validated by**: wetSpring Exp169 `benchmark_cross_spring_modern` (12/12 PASS), Exp166 (19/19), Exp168 (cross-spring S65), Exp170-182 (Track 4 soil QS 321 checks), V48 handoff
 
 ---
 
@@ -64,6 +64,9 @@ available to all springs. This document tracks that evolution.
 | Feb 25 | wetSpring Exp166 | Modern systems benchmark: 5 GPU ODE systems, GEMM cached, cross-spring provenance (19/19 PASS) | wetSpring validates |
 | Feb 25 | wetSpring V40 | ToadStool S39-S62+DF64 catch-up: 44→49 primitives, 7/9 P0-P3 delivered, 0 Passthrough, SparseGemmF64 + TopK wired | wetSpring leans on ToadStool |
 | Feb 25 | wetSpring Exp168 | Cross-spring evolution validation: hotSpring precision → wetSpring bio → neuralSpring pop-gen → Track 3 GPU (~25 PASS) | wetSpring validates |
+| Feb 25 | wetSpring V43 | ToadStool catch-up review: ABSORPTION_TRACKER 46/46 DONE, `normal_cdf` → upstream (50th primitive), 8/9 P0-P3, V40-V42 items documented for ToadStool tracker | wetSpring leans on ToadStool |
+| Feb 25 | wetSpring V44 | Complete rewire: `find_w_c` (4 files), `anderson_sweep_averaged` (1 file), `pearson_correlation` CPU delegation, 53 primitives total | wetSpring leans on ToadStool |
+| Feb 25 | wetSpring Exp169 | Modern cross-spring evolution benchmark: 4-spring provenance map, CPU math+stats+spectral validated (12/12 PASS) | wetSpring validates |
 
 ---
 
@@ -291,6 +294,9 @@ S42 does not re-export them at the crate root.
 | Exp119 NPU Disorder Classifier | PASS | 9/9 |
 | **Exp120 Cross-Spring Evolution** | **PASS** | **9/9** |
 | **Exp168 Cross-Spring S62+DF64** | **PASS** | **~25** |
+| **Exp169 Cross-Spring Modern Benchmark** | **PASS** | **12/12** |
+| **Exp170-178 Track 4 Soil QS (CPU)** | **PASS** | **183** |
+| **Exp179-182 Track 4 Three-Tier** | **PASS** | **138** |
 | Exp151 Anderson Correlated Disorder (S59 lean) | PASS | 9/9 |
 | Exp158 MATRIX Pharmacophenomics (S59 lean) | PASS | 9/9 |
 | Exp159 NMF Drug Repurposing (S59 lean) | PASS | 7/7 |

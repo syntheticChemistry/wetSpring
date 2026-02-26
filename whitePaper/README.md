@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 25, 2026
-**Status:** Phase 45 — Validation study active — 3,300+ checks, 806 tests, 168 experiments, ToadStool S62+DF64 aligned, 49 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on), 70 named tolerance constants, 7/9 P0-P3 delivered, 0 Passthrough, V40 catch-up complete
+**Status:** Phase 50 — Validation study active — 3,618+ checks, 898 tests, 183 experiments, ToadStool S65 aligned, 66 primitives + 2 BGL helpers + 0 local WGSL (fully lean) (barracuda always-on), 77 named tolerance constants, 0 Passthrough, V49 doc cleanup + evolution handoff, 39/39 three-tier, 52/52 papers
 **License:** AGPL-3.0-or-later
 
 ---
@@ -51,13 +51,11 @@ implementations into upstream ToadStool/BarraCuda primitives:
 4. **Absorb** — ToadStool integrates as `ops::bio::*` shaders
 5. **Lean** — wetSpring rewires to upstream imports, deletes local code
 
-**Current status:** 42 GPU modules + 1 Write-phase WGSL extension — all 42 lean on
-upstream ToadStool primitives (44 consumed + 2 BGL helpers, S62+DF64). 1 new local WGSL
-extension (`diversity_fusion_f64.wgsl` — fused Shannon + Simpson + evenness, Exp167 18/18).
-7 compose ToadStool primitives for GPU-accelerated workflows, 3 passthrough (accept
-GPU buffers, CPU kernel). Zero Tier B/C modules remain. BGL helpers
-(`storage_bgl_entry`/`uniform_bgl_entry`) adopted from ToadStool S62+DF64
-`ComputeDispatch` module (6 files, ~258 lines boilerplate removed).
+**Current status:** 42 GPU modules — Lean phase (fully absorbed). All 42 lean on
+upstream ToadStool primitives (66 consumed + 2 BGL helpers, S65. 0 local WGSL (fully lean)).
+7 compose ToadStool primitives for GPU-accelerated workflows. Zero Passthrough, zero
+Tier B/C modules remain. BGL helpers (`storage_bgl_entry`/`uniform_bgl_entry`) adopted
+from ToadStool S65 `ComputeDispatch` module (6 files, ~258 lines boilerplate removed).
 The forge crate (`metalForge/forge/` v0.3.0) provides substrate discovery,
 capability-based dispatch, and shader origin tracking as an absorption seam for ToadStool.
 
@@ -67,7 +65,7 @@ capability-based dispatch, and shader origin tracking as an absorption seam for 
 
 | Claim | Evidence |
 |-------|----------|
-| Rust matches Python across 168 experiments | 3,300+ checks pass (CPU + GPU + metalForge + streaming + cross-spring) |
+| Rust matches Python across 183 experiments | 3,618+ checks pass (CPU + GPU + metalForge + streaming + cross-spring + soil QS) |
 | GPU matches CPU across all 42 GPU modules + 1 extension | 710+ GPU checks pass (incl. 48 all-domain + 58 metalForge v5 + 18 diversity fusion) |
 | BarraCuda CPU parity across 31+ domains (v1-v9) | 407/407 cross-domain checks pass |
 | 926× spectral cosine GPU speedup | Exp016 benchmark |
@@ -129,7 +127,7 @@ capability-based dispatch, and shader origin tracking as an absorption seam for 
 | Streaming v2: Bray-Curtis + spectral cosine + full pipeline | Exp105: pre-warmed `GpuPipelineSession` with BC + cosine + chained analytics (27/27) |
 | Streaming ODE + phylo: 6 pre-warmed primitives | Exp106: ODE sweep + phage + bistable + multi-signal + Felsenstein + UniFrac, zero recompilation (45/45) |
 | Track 3 drug repurposing: full three-tier | Exp157-165: Fajgenbaum, MATRIX, NMF, repoDB, KG — CPU, GPU, metalForge (all PASS) |
-| Modern systems benchmark (S62+DF64) | Exp166: 5 GPU ODE, GEMM cached, barracuda CPU math, cross-spring provenance (19/19) |
+| Modern systems benchmark (S65) | Exp166: 5 GPU ODE, GEMM cached, barracuda CPU math, cross-spring provenance (19/19) |
 
 ---
 
@@ -310,7 +308,7 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCuda/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34+ WGSL shaders, active Write phase)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (1 WGSL extension, 44 ToadStool primitives + 2 BGL helpers, barracuda always-on, 806 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 66 ToadStool primitives + 2 BGL helpers, barracuda always-on, 898 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **ecoPrimals/archive/wetspring-early-handoffs-feb2026/** — Fossil record of early ToadStool handoffs (v1–v9)
 
@@ -327,10 +325,10 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy --pedantic --nursery -D warnings` | 0 diagnostics |
 | `cargo doc --no-deps` | 0 warnings |
-| Line coverage (`cargo-llvm-cov`) | **95.75% overall** |
+| Line coverage (`cargo-llvm-cov`) | **96.78% overall** |
 | `#![deny(unsafe_code)]` | Enforced crate-wide (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, clippy::unwrap_used)]` | Enforced crate-wide |
-| Named tolerance constants | 62 (all scientifically justified, hierarchy-tested) |
+| Named tolerance constants | 77 (all scientifically justified, hierarchy-tested) |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` files |

@@ -158,11 +158,11 @@ affinities. metalForge maps each validated algorithm to its optimal substrate.
 wetSpring follows hotSpring's pattern for ToadStool absorption:
 
 ```
-1. Validate in Rust CPU (barracuda/)          ← DONE: 46 CPU + 42 GPU + 1 WGSL ext, 806 tests, 168 experiments, 3,300+ checks
+1. Validate in Rust CPU (barracuda/)          ← DONE: 46 CPU + 42 GPU, 806 tests, 168 experiments, 3,300+ checks
 2. Characterize hardware (metalForge/)         ← THIS DIRECTORY
-3. Write Rust in GPU-friendly patterns         ← 27 absorbed (Lean); 1 local WGSL ext; 7 Compose; 3 Passthrough
+3. Write Rust in GPU-friendly patterns         ← 28 absorbed (Lean); 0 local WGSL (fully lean); 7 Compose; 3 Passthrough
 4. ToadStool absorbs as shared primitives      ← unidirectional handoff via wateringHole/handoffs/
-5. wetSpring consumes ToadStool primitives     ← 44 consumed + 2 BGL helpers, 42 GPU modules + 1 ext
+5. wetSpring consumes ToadStool primitives     ← 44 consumed + 2 BGL helpers, 42 GPU modules (S65)
 ```
 
 ### What "GPU-Friendly Patterns" Means for Life Science
@@ -211,7 +211,7 @@ GPU math portability proven across all 42 GPU modules:
 - **702+/702+ GPU checks** across 22 validation binaries
 - **Absorbed** (Lean): SW, Gillespie, DT, Felsenstein, GEMM, diversity, PCoA, spectral
 - **Absorbed** (Lean, Feb 22): HMM, DADA2, quality, ANI, SNP, dN/dS, pangenome, RF
-- **Local WGSL**: 1 (diversity_fusion_f64.wgsl — Write phase extension)
+- **Local WGSL**: 0 (diversity_fusion absorbed by ToadStool S63)
 - **Composed**: Bootstrap (15/15), placement (15/15), bifurcation eigenvalues (5/5)
 - **GPU Parity v1** (Exp064): 8 domains consolidated in single binary
 - **metalForge Full** (Exp065): CPU↔GPU substrate-independence for full portfolio
@@ -231,7 +231,7 @@ All 4 GPU-eligible Track 1c modules promoted (absorbed by ToadStool):
 ### Cross-System Vision
 ```
 CPU: 1,291 checks (25 domains, reference ground truth)
-GPU: 451 checks (30 ToadStool primitives, 3 local WGSL)
+GPU: 451 checks (31 ToadStool primitives, 0 local WGSL)
 NPU: Characterized (AKD1000, taxonomy/anomaly/RF inference at ~30mW)
 
 Proven: substrate-independence across 8 domains (Exp065 — metalForge Full)
@@ -273,7 +273,7 @@ remain in wetSpring until absorption.
 |-------|:-----:|-------|
 | **Absorbed** (Lean) | 11 modules | SW, Gillespie, DT, Felsenstein, GEMM, diversity, PCoA, spectral, stats, EIC, rarefaction |
 | **Absorbed** (Lean, Feb 22) | 8 shaders | HMM, DADA2, QF, ANI, SNP, dN/dS, pangenome, RF |
-| **Local WGSL** (Write) | 1 | diversity_fusion_f64.wgsl (Write phase extension) |
+| **Local WGSL** (Lean) | 0 | diversity_fusion absorbed by ToadStool S63 |
 | **CPU math** (barracuda overlap) | 4 functions | erf, ln_gamma, regularized_gamma, integrate_peak |
 | **Blocked** | 3 modules | kmer (lock-free hash), UniFrac (tree traversal), taxonomy (NPU) |
 

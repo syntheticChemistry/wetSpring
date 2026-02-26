@@ -40,7 +40,7 @@ fn main() {
 
     v.check("Equal: Nc_ss", nc, 0.370, tolerances::ODE_STEADY_STATE);
     v.check("Equal: Nd_ss", nd, 0.611, tolerances::ODE_STEADY_STATE);
-    v.check("Equal: AI_ss", ai, 1.854, tolerances::KMD_SPREAD);
+    v.check("Equal: AI_ss", ai, 1.854, tolerances::ODE_SIGNAL_SS);
     v.check(
         "Equal: coop_freq < 0.5 (cheater advantage)",
         f_coop,

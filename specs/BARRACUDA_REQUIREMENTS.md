@@ -1,13 +1,13 @@
 # wetSpring — BarraCuda Requirements
 
-**Last Updated**: February 25, 2026 (V40 ToadStool catch-up, ToadStool `02207c4a` S62+DF64)
+**Last Updated**: February 25, 2026 (V48 ToadStool S65 rewire, pin `17932267`)
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---
 
 ## Current Kernel Usage (Validated)
 
-### Rust CPU Modules (47 modules, 871 tests, 96.48% library coverage, V40 catch-up)
+### Rust CPU Modules (47 modules, 819 tests, 96.78% library coverage, V40 catch-up)
 
 | Module Domain | Modules | Status |
 |--------------|---------|--------|
@@ -22,7 +22,7 @@
 | ML | decision_tree, random_forest, gbm | Sovereign |
 | Drug repurposing | nmf, transe | Sovereign (NEW — Track 3) |
 
-### GPU Primitives (49 ToadStool primitives + 2 BGL helpers + 1 local WGSL extension, 710+ checks)
+### GPU Primitives (53 ToadStool primitives + 2 BGL helpers + 1 local WGSL extension, 710+ checks)
 
 | ToadStool Primitive | wetSpring Use | Checks | Performance |
 |-------------------|---------------|--------|-------------|
@@ -203,7 +203,7 @@ Tier classification for GPU shader promotion (Write → Absorb → Lean lifecycl
 
 | Rust Module | Local Shader | Absorption Target | Blocking |
 |-------------|-------------|-------------------|---------|
-| `diversity_fusion_gpu` | `diversity_fusion_f64.wgsl` | ToadStool P2-5 | Awaiting upstream absorption |
+| `diversity_fusion_gpu` | `diversity_fusion_f64.wgsl` | ToadStool P2-5 | Absorbed by ToadStool S63. Local WGSL deleted. wetSpring leans on barracuda::ops::bio::diversity_fusion. |
 
 ### Blocking Items for Full Lean
 
@@ -222,6 +222,6 @@ Tier classification for GPU shader promotion (Write → Absorb → Lean lifecycl
 - Spectral cosine achieves 926× GPU speedup — the first "GPU wins decisively" benchmark from any spring
 - 47 CPU + 42 GPU Rust modules with 2 runtime dependencies (flate2 + bytemuck) — highest sovereignty ratio in the ecosystem
 - **V29 handoff**: cross-spring synthesis, deprecated API removal, dead-code cleanup, evolution handoff
-- **12 shaders absorbed + 5 ODE leaned (generate_shader) + 12 composed/lean wrappers (0 Passthrough)** — zero local WGSL remains; 7/9 P0-P3 requests delivered; see `barracuda/EVOLUTION_READINESS.md`
+- **12 shaders absorbed + 5 ODE leaned (generate_shader) + 12 composed/lean wrappers (0 Passthrough)** — zero local WGSL remains; 8/9 P0-P3 requests delivered; see `barracuda/EVOLUTION_READINESS.md`
 - **Rust edition 2024**, MSRV 1.85 — `f64::midpoint()`, `usize::midpoint()`, `const fn` promotions
 - **`#![deny(unsafe_code)]`** — edition 2024 makes `std::env::set_var` unsafe; `#[allow]` confined to test env-var calls

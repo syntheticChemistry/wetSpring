@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-25 (Phase 45: 168 experiments, ToadStool S62+DF64, 49 primitives + 2 BGL helpers + 1 WGSL extension, barracuda always-on, 918 tests, 96.48% coverage, 70 named tolerance constants, 7/9 P0-P3 delivered, 0 Passthrough, V40 catch-up complete)
+**Updated**: 2026-02-25 (Phase 50: 183 experiments, ToadStool S65, 66 primitives + 2 BGL helpers + 0 local WGSL (fully lean), barracuda always-on, 898 tests, 96.78% coverage, 77 named tolerance constants, 0 Passthrough, V49 39/39 three-tier, 52/52 papers)
 
 ---
 
@@ -114,8 +114,11 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 163 | BarraCuda CPU v9 (Track 3) | cross | DONE | CPU + Track 3 | validate_barracuda_cpu_v9 | 66 |
 | 164 | GPU drug repurposing | GPU | DONE | GPU Track 3 | validate_gpu_drug_repurposing | 48 |
 | 165 | metalForge drug repurposing | metalForge | DONE | Substrate-independent | validate_metalforge_drug | 25 |
-| 166 | Modern systems S62+DF64 | cross/GPU | DONE | Exp166 benchmark | benchmark_modern_systems_df64 | 19 |
+| 166 | Modern systems S65 | cross/GPU | DONE | Exp166 benchmark | benchmark_modern_systems_df64 | 19 |
 | 167 | Diversity fusion GPU extension | GPU | DONE | CPU ↔ GPU parity | validate_gpu_diversity_fusion | 18 |
+| 168 | Cross-spring S62/S65 validation | cross/GPU | DONE | S62+DF64 rewire | validate_cross_spring_s62 | ~25 |
+| 169 | Modern cross-spring benchmark | cross/GPU | DONE | V44 rewire benchmark | benchmark_cross_spring_modern | 12 |
+| 183 | Cross-Spring Evolution Benchmark (S65) | cross/GPU | DONE | S65 rewire benchmark | benchmark_cross_spring_s65 | 36 |
 
 ---
 
@@ -272,13 +275,29 @@ thresholds from `src/tolerances.rs`.
 | `benchmark_modern_systems_df64` | 166 | 19 | `cargo run --features gpu --bin benchmark_modern_systems_df64` |
 | `validate_gpu_diversity_fusion` | 167 | 18 | `cargo run --features gpu --bin validate_gpu_diversity_fusion` |
 | `validate_cross_spring_s62` | 168 | ~25 | `cargo run --features gpu --release --bin validate_cross_spring_s62` |
+| `benchmark_cross_spring_modern` | 169 | 12 | `cargo run --release --features gpu --bin benchmark_cross_spring_modern` |
+| `benchmark_cross_spring_s65` | 183 | 36 | `cargo run --release --features gpu --bin benchmark_cross_spring_s65` |
+| `validate_soil_qs_pore_geometry` | 170 | 26 | `cargo run --release --bin validate_soil_qs_pore_geometry` |
+| `validate_soil_pore_diversity` | 171 | 27 | `cargo run --release --bin validate_soil_pore_diversity` |
+| `validate_soil_distance_colonization` | 172 | 23 | `cargo run --release --bin validate_soil_distance_colonization` |
+| `validate_notill_brandt_farm` | 173 | 14 | `cargo run --release --bin validate_notill_brandt_farm` |
+| `validate_notill_meta_analysis` | 174 | 20 | `cargo run --release --bin validate_notill_meta_analysis` |
+| `validate_notill_longterm_tillage` | 175 | 19 | `cargo run --release --bin validate_notill_longterm_tillage` |
+| `validate_soil_biofilm_aggregate` | 176 | 23 | `cargo run --release --bin validate_soil_biofilm_aggregate` |
+| `validate_soil_structure_function` | 177 | 16 | `cargo run --release --bin validate_soil_structure_function` |
+| `validate_tillage_microbiome_2025` | 178 | 15 | `cargo run --release --bin validate_tillage_microbiome_2025` |
+| `validate_soil_qs_cpu_parity` | 179 | 49 | `cargo run --release --bin validate_soil_qs_cpu_parity` |
+| `validate_soil_qs_gpu` | 180 | 23 | `cargo run --features gpu --release --bin validate_soil_qs_gpu` |
+| `validate_soil_qs_streaming` | 181 | 52 | `cargo run --features gpu --release --bin validate_soil_qs_streaming` |
+| `validate_soil_qs_metalforge` | 182 | 14 | `cargo run --features gpu --release --bin validate_soil_qs_metalforge` |
 
-**Total validation checks**: 3,300+
-**Rust tests**: 918 (871 barracuda + 47 forge)
-**Binaries**: 147 validate + 11 benchmark = 158 total
-**ToadStool primitives**: 49 + 2 BGL helpers consumed (barracuda always-on, zero fallback code — S62+DF64)
-**Local WGSL shaders**: 1 (diversity_fusion_f64.wgsl — Write phase extension)
-**GPU modules**: 42 total (all lean on upstream primitives) + 1 Write-phase extension
+**Total validation checks**: 3,618+
+**Rust tests**: 898 (819 barracuda + 47 forge + 32 integration/doc)
+**Binaries**: 160 validate + 12 benchmark = 172 total
+**ToadStool primitives**: 66 + 2 BGL helpers consumed (barracuda always-on, zero fallback code — S65)
+**Papers**: 52 (25 Tracks 1-2 + 5 Track 3 + 9 Track 4 + 1 cross-spring + 9 extensions + 3 reference)
+**Local WGSL shaders**: 0 (all absorbed by ToadStool S63)
+**GPU modules**: 42 total (all lean on upstream primitives)
 **Benchmark infrastructure**: `bench.rs` harness with RAPL + nvidia-smi energy profiling, JSON output
 
 ---

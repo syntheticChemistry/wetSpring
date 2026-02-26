@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Special mathematical functions for life-science computation.
 //!
-//! `erf`, `ln_gamma`, and `regularized_gamma_lower` delegate to
-//! `ToadStool`'s `barracuda::special` — one implementation, no duplicate
+//! `erf`, `ln_gamma`, `regularized_gamma_lower`, and `normal_cdf` delegate
+//! to `ToadStool`'s `barracuda` crate — one implementation, no duplicate
 //! math. `barracuda` is always available (default-features = false for
 //! CPU-only builds, full GPU when `gpu` feature is active).
 //!
-//! `normal_cdf`, `dot`, and `l2_norm` are local helpers used by 15+ binaries.
+//! `dot` and `l2_norm` are local CPU helpers used by 15+ binaries.
 //!
 //! # Consumers
 //!
@@ -28,9 +28,11 @@ pub fn erf(x: f64) -> f64 {
 }
 
 /// Normal CDF via the error function: Φ(x) = 0.5 × (1 + erf(x / √2)).
+///
+/// Delegates to `barracuda::stats::norm_cdf` (same formula, single implementation).
 #[must_use]
 pub fn normal_cdf(x: f64) -> f64 {
-    0.5 * (1.0 + erf(x / std::f64::consts::SQRT_2))
+    barracuda::stats::norm_cdf(x)
 }
 
 /// Lanczos approximation for ln(Γ(x)).
@@ -53,20 +55,18 @@ pub fn regularized_gamma_lower(a: f64, x: f64) -> f64 {
 
 /// L2 (Euclidean) norm of a slice: `sqrt(Σ x²)`.
 ///
-/// Used in spectral comparison, signal normalization, and validation
-/// binaries. Prefer this over inline `.map(|x| x * x).sum().sqrt()`.
+/// Delegates to `barracuda::stats::l2_norm` (S64).
 #[must_use]
 pub fn l2_norm(xs: &[f64]) -> f64 {
-    xs.iter().map(|x| x * x).sum::<f64>().sqrt()
+    barracuda::stats::l2_norm(xs)
 }
 
 /// Dot product of two equal-length slices.
 ///
-/// Panics in debug if lengths differ. Returns 0 for empty slices.
+/// Delegates to `barracuda::stats::dot` (S64).
 #[must_use]
 pub fn dot(a: &[f64], b: &[f64]) -> f64 {
-    debug_assert_eq!(a.len(), b.len(), "dot: length mismatch");
-    a.iter().zip(b).map(|(x, y)| x * y).sum()
+    barracuda::stats::dot(a, b)
 }
 
 #[cfg(test)]

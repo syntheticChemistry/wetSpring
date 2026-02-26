@@ -38,7 +38,8 @@ barracuda = { path = "../../phase1/toadstool/crates/barracuda", default-features
 
 # wgpu: WebGPU compute — hardware-agnostic GPU via Vulkan/Metal/DX12.
 # Same version as barracuda to prevent duplicate symbol linking errors.
-# default-features = false avoids pulling in renderdoc-sys (C dep).
+# default-features = false disables wgpu's default feature set.
+# Note: renderdoc-sys (C dep) is still pulled on native targets via wgpu-hal.
 wgpu = { version = "22", optional = true, default-features = false, features = ["wgsl", "vulkan-portability"] }
 
 # Async runtime for GPU device creation (barracuda already brings tokio in).

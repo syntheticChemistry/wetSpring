@@ -165,7 +165,12 @@ fn validate_snp(
     let gpu_us = tg.elapsed().as_micros() as f64;
     if let Ok(gpu_count) = gpu_result {
         let cpu_count = cpu_snp.variants.len();
-        v.check("SNP count", gpu_count as f64, cpu_count as f64, 0.0);
+        v.check(
+            "SNP count",
+            gpu_count as f64,
+            cpu_count as f64,
+            tolerances::EXACT,
+        );
         timings.push(Timing {
             name: "SNP",
             cpu_us,

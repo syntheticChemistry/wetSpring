@@ -442,6 +442,15 @@ pub const GPU_VS_CPU_BRAY_CURTIS: f64 = 1e-10;
 /// over ~1000 replicates, accumulated rounding yields ~1e-4 drift.
 pub const GPU_VS_CPU_ENSEMBLE: f64 = 1e-4;
 
+/// GPU vs CPU for HMM batch forward log-likelihoods.
+///
+/// 256 sequences × 100 steps × 3 states: log-space additions
+/// across the Forward lattice accumulate rounding differently on GPU
+/// (warp-level parallel reduction) vs CPU (sequential). 1e-3 covers
+/// the worst observed per-sequence drift across the batch.
+/// Validated: Exp048, `benchmark_phylo_hmm_gpu`, commit `e4358c5`.
+pub const GPU_VS_CPU_HMM_BATCH: f64 = 1e-3;
+
 /// GPU f32 vs CPU f64 for integer-derived results (Hamming, Jaccard).
 ///
 /// f32 has ~7 significant digits; operations on integer-derived values
@@ -496,6 +505,23 @@ pub const BOOTSTRAP_LL_ENSEMBLE: f64 = 5.0;
 /// Validated: Exp030 (Hsueh 2022), `scripts/hsueh2022_phage_defense.py`.
 pub const PHAGE_POPULATION_ABSOLUTE: f64 = 10.0;
 
+/// Phage defense large-population tolerance (no-phage / pure-defended).
+///
+/// Steady-state populations ~100k–140k cells. RK4 vs LSODA at dt=0.001
+/// accumulates ~1000 cells of drift over 100+ hours of simulated time.
+/// Proportionally ~0.7% — same relative order as [`PHAGE_POPULATION_ABSOLUTE`]
+/// for the attack scenario.
+/// Validated: Exp030 (Hsueh 2022), `scripts/hsueh2022_phage_defense.py`.
+pub const PHAGE_LARGE_POPULATION: f64 = 1000.0;
+
+/// Phage defense near-zero floor (crashed population).
+///
+/// After phage attack, undefended bacteria crash to ~0. RK4 integrator
+/// residual keeps the value slightly above zero. 1.0 cell is the
+/// biologically insignificant floor.
+/// Validated: Exp030 (Hsueh 2022), `scripts/hsueh2022_phage_defense.py`.
+pub const PHAGE_CRASH_FLOOR: f64 = 1.0;
+
 /// Exp002 `Galaxy` Shannon entropy range for rank-abundance curves.
 ///
 /// Simulated communities derived from Exp002 phytoplankton rank-abundance
@@ -522,6 +548,84 @@ pub const GALAXY_SIMPSON_RANGE: f64 = 0.25;
 /// Source: `experiments/results/002_phytoplankton/diversity_report.json`,
 /// commit `21d43a0`.
 pub const GALAXY_BRAY_CURTIS_RANGE: f64 = 0.50;
+
+// ═══════════════════════════════════════════════════════════════════
+// Feature extraction / asari cross-reference tolerances (Exp009)
+// ═══════════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════════
+// ODE domain-specific steady-state tolerances
+// ═══════════════════════════════════════════════════════════════════
+
+/// Bistable ODE low-biofilm steady-state tolerance.
+///
+/// For `B_ss` ≈ 0.040 in the zero-feedback scenario, RK4 vs LSODA
+/// differ by ~0.005. Tighter than [`ODE_STEADY_STATE`] (0.01) because
+/// the baseline value itself is small.
+/// Validated: Exp023 (Fernandez 2020), `scripts/fernandez2020_bistable.py`,
+/// commit `e4358c5`.
+pub const ODE_BISTABLE_LOW_B: f64 = 0.005;
+
+/// ODE c-di-GMP / autoinducer steady-state tolerance.
+///
+/// For c-di-GMP (`C_ss` ≈ 1.634 in bistable) and autoinducer (`AI_ss` ≈ 1.854
+/// in cooperation), RK4 vs LSODA accumulate ~0.02 difference due to
+/// stiff feedback loops in the signaling cascade.
+/// Validated: Exp023 (Fernandez 2020) and Exp025 (Bruger 2018),
+/// `scripts/fernandez2020_bistable.py`, `scripts/bruger2018_cooperation.py`,
+/// commit `e4358c5`.
+pub const ODE_SIGNAL_SS: f64 = 0.02;
+
+// ═══════════════════════════════════════════════════════════════════
+// HMM invariant tolerance
+// ═══════════════════════════════════════════════════════════════════
+
+/// HMM mathematical invariant slack: Viterbi log-prob ≤ Forward LL.
+///
+/// The most-likely path probability (Viterbi) must be ≤ the total
+/// probability (Forward) by definition. Numerical noise from
+/// log-sum-exp accumulation can cause sub-ULP violations; 1e-10
+/// accommodates this without masking real bugs.
+/// Validated: Exp026 (Liu 2014), `scripts/liu2014_hmm_baseline.py`,
+/// commit `e4358c5`.
+pub const HMM_INVARIANT_SLACK: f64 = 1e-10;
+
+// ═══════════════════════════════════════════════════════════════════
+// NPU triage acceptance thresholds
+// ═══════════════════════════════════════════════════════════════════
+
+/// NPU triage pass rate ceiling (candidates / total < threshold).
+///
+/// The NPU int8 triage should reduce the candidate set to < 30% of
+/// the full library. If pass rate exceeds this, the triage is not
+/// selective enough to provide a speedup.
+/// Derived: Exp124 (analytical), 5000 library × 100 queries, top-20%.
+pub const NPU_PASS_RATE_CEILING: f64 = 0.30;
+
+/// NPU triage recall floor (true match in candidate set).
+///
+/// At least 90% of queries must have their true match in the triage
+/// candidates. Below this, the speedup comes at unacceptable accuracy loss.
+/// Derived: Exp124 (analytical), 5000 library × 100 queries, top-20%.
+pub const NPU_RECALL_FLOOR: f64 = 0.90;
+
+/// NPU triage top-1 accuracy floor.
+///
+/// After full-precision re-scoring of triage candidates, at least 80%
+/// of queries must rank the true match as #1.
+/// Derived: Exp124 (analytical), cosine re-scoring on top-20% candidates.
+pub const NPU_TOP1_FLOOR: f64 = 0.80;
+
+// ═══════════════════════════════════════════════════════════════════
+// Performance guard thresholds
+// ═══════════════════════════════════════════════════════════════════
+
+/// GEMM pipeline compilation timeout (milliseconds).
+///
+/// The GPU GEMM shader (via hotSpring f64 polyfills) must compile in
+/// under 30 seconds on supported hardware. Exceeding this indicates
+/// a driver or shader complexity regression.
+pub const GEMM_COMPILE_TIMEOUT_MS: f64 = 30_000.0;
 
 // ═══════════════════════════════════════════════════════════════════
 // Feature extraction / asari cross-reference tolerances (Exp009)
@@ -620,12 +724,22 @@ mod tests {
             GPU_LOG_POLYFILL,
             GPU_VS_CPU_BRAY_CURTIS,
             GPU_VS_CPU_ENSEMBLE,
+            GPU_VS_CPU_HMM_BATCH,
             GPU_F32_PARITY,
             GPU_F32_SPATIAL,
             ODE_DEFAULT_DT,
             ODE_BIOFILM_SS,
             BOOTSTRAP_LL_ENSEMBLE,
             PHAGE_POPULATION_ABSOLUTE,
+            PHAGE_LARGE_POPULATION,
+            PHAGE_CRASH_FLOOR,
+            ODE_BISTABLE_LOW_B,
+            ODE_SIGNAL_SS,
+            HMM_INVARIANT_SLACK,
+            NPU_PASS_RATE_CEILING,
+            NPU_RECALL_FLOOR,
+            NPU_TOP1_FLOOR,
+            GEMM_COMPILE_TIMEOUT_MS,
             GALAXY_SHANNON_RANGE,
             GALAXY_SIMPSON_RANGE,
             GALAXY_BRAY_CURTIS_RANGE,

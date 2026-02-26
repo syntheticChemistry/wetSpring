@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: February 25, 2026 (Phase 46 V41 — 918 tests, 96.48% llvm-cov, ToadStool S62+DF64, 49 primitives + 2 BGL helpers + 1 WGSL extension, barracuda always-on, 70 named tolerances, 0 Passthrough, all 30 papers three-tier)
+**Last Updated**: February 25, 2026 (Phase 50 V48 — 898 tests, 96.78% llvm-cov, ToadStool S65 (`17932267`), 66 primitives + 2 BGL helpers + 0 local WGSL (fully lean), barracuda always-on, 77 named tolerances, 0 Passthrough, 52 papers, Track 4 soil QS complete)
 **Purpose**: Track papers for reproduction/review across three tracks
 
 ---
@@ -161,25 +161,25 @@ tilled vs no-till comparisons.
 
 | # | Paper | Journal | Year | Faculty | Why | Status |
 |---|-------|---------|------|---------|-----|--------|
-| 44 | Martínez-García et al. "Spatial structure, chemotaxis and quorum sensing shape bacterial biomass accumulation in complex porous media" | Nature Communications 14:8332 | 2023 | — | **Critical**: First paper to show QS + spatial 3D pore structure determines bacterial coordination in porous media. Direct validation of Anderson QS-geometry coupling in soil-like systems | Queued |
-| 45 | Feng et al. "Composition and metabolism of microbial communities in soil pores" | Nature Communications 15:3578 | 2024 | — | Microbial diversity differs between large (30-150 µm) and small (4-10 µm) soil pores. Pore-scale Anderson geometry data — different pore sizes = different effective lattice dimensions | Queued |
-| 46 | Mukherjee et al. "Manipulating the physical distance between cells during soil colonization reveals the importance of biotic interactions" | Environmental Microbiome 19:14 | 2024 | — | Physical proximity affects community assembly. 41% of dominant groups affected by cell distancing. Validates Anderson's distance/geometry dependence for QS | Queued |
+| 44 | Martínez-García et al. "Spatial structure, chemotaxis and quorum sensing shape bacterial biomass accumulation in complex porous media" | Nature Communications 14:8332 | 2023 | — | **Critical**: First paper to show QS + spatial 3D pore structure determines bacterial coordination in porous media. Direct validation of Anderson QS-geometry coupling in soil-like systems | **Exp170 DONE** (26/26) |
+| 45 | Feng et al. "Composition and metabolism of microbial communities in soil pores" | Nature Communications 15:3578 | 2024 | — | Microbial diversity differs between large (30-150 µm) and small (4-10 µm) soil pores. Pore-scale Anderson geometry data — different pore sizes = different effective lattice dimensions | **Exp171 DONE** (27/27) |
+| 46 | Mukherjee et al. "Manipulating the physical distance between cells during soil colonization reveals the importance of biotic interactions" | Environmental Microbiome 19:14 | 2024 | — | Physical proximity affects community assembly. 41% of dominant groups affected by cell distancing. Validates Anderson's distance/geometry dependence for QS | **Exp172 DONE** (23/23) |
 
 #### Tier 2 — No-Till Microbiome Data
 
 | # | Paper | Journal | Year | Faculty | Why | Status |
 |---|-------|---------|------|---------|-----|--------|
-| 47 | Islam et al. "No-till and conservation agriculture in the United States: An example from the David Brandt farm, Carroll, Ohio" | ISWCR 2:97-107 | 2014 | — | Brandt farm soil health data: microbial biomass, aggregate stability, active carbon. The no-till dataset for Anderson analysis | Queued |
-| 48 | Zuber & Villamil "Meta-analysis approach to assess effect of tillage on microbial biomass and enzyme activities" | Soil Biology and Biochemistry 97:176-187 | 2016 | — | Meta-analysis: no-till increases microbial biomass C by 16-20%. Systematic evidence for geometry → microbial function link | Queued |
-| 49 | Liang et al. "Long term tillage, cover crop, and fertilization effects on microbial community structure, activity" | Soil Biology and Biochemistry 89:37-44 | 2015 | — | 31+ year study: greater mycorrhizal fungi under no-till. Tillage × cover crop × N interaction. Data source for Anderson diversity mapping | Queued |
+| 47 | Islam et al. "No-till and conservation agriculture in the United States: An example from the David Brandt farm, Carroll, Ohio" | ISWCR 2:97-107 | 2014 | — | Brandt farm soil health data: microbial biomass, aggregate stability, active carbon. The no-till dataset for Anderson analysis | **Exp173 DONE** (14/14) |
+| 48 | Zuber & Villamil "Meta-analysis approach to assess effect of tillage on microbial biomass and enzyme activities" | Soil Biology and Biochemistry 97:176-187 | 2016 | — | Meta-analysis: no-till increases microbial biomass C by 16-20%. Systematic evidence for geometry → microbial function link | **Exp174 DONE** (20/20) |
+| 49 | Liang et al. "Long term tillage, cover crop, and fertilization effects on microbial community structure, activity" | Soil Biology and Biochemistry 89:37-44 | 2015 | — | 31+ year study: greater mycorrhizal fungi under no-till. Tillage × cover crop × N interaction. Data source for Anderson diversity mapping | **Exp175 DONE** (19/19) |
 
 #### Tier 3 — Soil Structure & QS Dynamics
 
 | # | Paper | Journal | Year | Faculty | Why | Status |
 |---|-------|---------|------|---------|-----|--------|
-| 50 | Tecon & Or "Biophysics of bacterial biofilms—insights from soil" | Biochimica et Biophysica Acta 1858:2774-2781 | 2017 | — | Review of soil aggregate geometry → biofilm formation → QS. Bridges Anderson physics to soil microbiology | Queued |
-| 51 | Rabot et al. "Soil structure as an indicator of soil functions: A review" | Geoderma 314:122-137 | 2018 | — | Soil structure → microbial functions. Framework for mapping aggregate stability to effective Anderson dimension | Queued |
-| 52 | Wang et al. "Effects of tillage practices in stover-return on endosphere and rhizosphere microbiomes" | npj Sustainable Agriculture 3:12 | 2025 | — | 2025 study: different tillage → different endosphere/rhizosphere microbiomes. Geometry-dependent community assembly | Queued |
+| 50 | Tecon & Or "Biophysics of bacterial biofilms—insights from soil" | Biochimica et Biophysica Acta 1858:2774-2781 | 2017 | — | Review of soil aggregate geometry → biofilm formation → QS. Bridges Anderson physics to soil microbiology | **Exp176 DONE** (23/23) |
+| 51 | Rabot et al. "Soil structure as an indicator of soil functions: A review" | Geoderma 314:122-137 | 2018 | — | Soil structure → microbial functions. Framework for mapping aggregate stability to effective Anderson dimension | **Exp177 DONE** (16/16) |
+| 52 | Wang et al. "Effects of tillage practices in stover-return on endosphere and rhizosphere microbiomes" | npj Sustainable Agriculture 3:12 | 2025 | — | 2025 study: different tillage → different endosphere/rhizosphere microbiomes. Geometry-dependent community assembly | **Exp178 DONE** (15/15) |
 
 **Connection to existing wetSpring work**: Track 4 extends the Anderson-QS
 framework (Exp107-143, Phase 37-38) from natural biome predictions to
@@ -204,7 +204,7 @@ in a noisy medium (Track 1).
 
 ## Open Data Provenance Audit
 
-All 43 reproductions use publicly accessible data or published model parameters.
+All 52 reproductions use publicly accessible data or published model parameters.
 No proprietary data dependencies.
 
 | Category | Papers | Data Source | Access |
@@ -225,6 +225,7 @@ No proprietary data dependencies.
 | **NPU reservoir** | Exp114-119 | ESN trained on GPU output, int8 quantized for Akida AKD1000 | Open (ESN weights from open training data) |
 | **Drug repurposing** | Exp157-165 | repoDB (1,571 × 1,209), published equations, ROBOKOP KG | Open (PMC, repoDB, algorithmic) |
 | **Diversity fusion** | Exp167 | Synthetic abundance data (CPU ↔ GPU parity) | Open (generated) |
+| **Track 4 soil QS** | Exp170-182 | Published soil metrics (Islam 2014, Zuber 2016, Liang 2015), model equations (Martínez-García 2023, Mukherjee 2024), pore geometry data (Feng 2024), review frameworks (Tecon & Or 2017, Rabot 2018), tillage microbiome (Wang 2025) | Open (journal tables, published equations) |
 
 ### Validation Tiers by Hardware
 
@@ -243,6 +244,8 @@ No proprietary data dependencies.
 | **Drug repurposing (Track 3)** | NMF, pathway scoring, KG embedding, metalForge | Exp157-165 | 84 |
 | **Modern systems (S62+DF64)** | BGL helpers, DF64, modern dispatch | Exp166 | 19 |
 | **Write-phase extensions** | Diversity fusion WGSL (CPU ↔ GPU parity) | Exp167 | 18 |
+| **Track 4 soil QS (CPU)** | Anderson-QS in soil pores, no-till data, structure→function | Exp170-178 | 183 |
+| **Track 4 soil QS (GPU/MF)** | CPU parity, GPU, streaming, metalForge | Exp179-182 | 138 |
 
 ### Phase 37 — Anderson-QS Extension Papers
 
@@ -285,16 +288,21 @@ Core finding: **no prior work applies Anderson localization to QS signaling**.
 | Track 2 (PFAS/LC-MS) | 4 | 4/4 | 4/4 | 4/4 | Full three-tier |
 | **Subtotal (actionable)** | **25** | **25/25** | **25/25** | **25/25** | **ALL three-tier** |
 | Track 3 (Drug repurposing) | 5 | 5/5 | 5/5 | 5/5 | Full three-tier (Exp163-165) |
+| Track 4 (Soil QS/Anderson) | 9 | 9/9 | 9/9 | 9/9 | Full three-tier (Exp170-182) |
 | Cross-spring (spectral) | 1 | 1/1 | 1/1 | — | CPU + GPU |
 | Extensions (Phase 37-39) | 9 | 9/9 | — | — | CPU only (by design — analytical/catalog) |
-| **Grand total** | **43** | **43/43** | **31/31** | **30/30** | |
+| **Grand total** | **52** | **52/52** | **31/31** | **30/30** | |
 
 **All GPU primitives upstream:** NMF (S58), TransE (S60), SpMM (S60), PeakDetect (S62), BGL helpers (S62+DF64).
 **All 30 actionable papers now have full three-tier validation** (CPU, GPU, metalForge).
 Track 3 completed via Exp163 (CPU v9), Exp164 (GPU drug repurposing), Exp165 (metalForge).
+Track 4 completed via Exp170-178 (CPU baselines — Anderson-QS soil pore geometry, no-till
+meta-analysis, long-term tillage factorial, biofilm aggregate, structure→function, tillage microbiomes).
 Modern systems validated via Exp166 (S62+DF64 benchmark, 19 checks).
 Diversity fusion WGSL extension validated via Exp167 (CPU ↔ GPU parity, 18 checks).
 Extension papers are analytical models — GPU acceleration is not the bottleneck.
+Track 4 now has full three-tier: CPU baseline (Exp170-178), CPU parity (Exp179),
+GPU validation (Exp180), pure GPU streaming (Exp181), metalForge cross-substrate (Exp182).
 
 ---
 

@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** February 25, 2026 (V41 deep audit, post-S62+DF64 review)
+**Date:** February 25, 2026 (V48 ToadStool S65 rewire)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**ToadStool pin:** `02207c4a` (S62+DF64 expansion, Feb 24 2026)
-**Status:** 49 ToadStool primitives + 2 BGL helpers consumed, 1 local WGSL extension (Write phase — diversity fusion), 5 GPU ODE modules use trait-generated WGSL via `BatchedOdeRK4<S>::generate_shader()`, 42 GPU modules + 1 Write-phase extension, 0 Tier B/C remaining, 0 Passthrough remaining, 918 tests (871 barracuda + 47 forge), 96.48% library coverage, ToadStool S62+DF64 aligned, 168 experiments, 3,300+ checks
+**ToadStool pin:** `17932267` (S65 smart refactoring, Feb 25 2026)
+**Status:** 66 ToadStool primitives + 2 BGL helpers consumed (incl. 11 `stats::diversity` + 2 `stats::metrics`), 0 local WGSL (fully lean), 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 898 tests (819 barracuda + 47 forge), 96.78% llvm-cov, ToadStool S65 aligned, 183 experiments, 3,618+ checks. 9/9 evolution requests DONE.
 
 ---
 
@@ -47,11 +47,11 @@ WGSL          known physics   handoffs/                        delete local
 |-------|-------------|--------|
 | Write | Local WGSL ODE shaders | **5 shaders deleted** — GPU modules use `generate_shader()` from `OdeSystem` trait impls (`bio/ode_systems.rs`) |
 | Compose | GPU wrappers wiring ToadStool primitives | **7 modules** (kmd, merge_pairs, RF, derep, NJ, reconciliation, molecular_clock) |
-| Passthrough | Accept GPU buffers, CPU kernel | **3 modules** (gbm, feature_table, signal) |
+| Passthrough | Accept GPU buffers, CPU kernel | **0 modules** — all 3 former Passthrough promoted (V40) |
 | Validate | CPU ↔ GPU parity for all shaders | All 5 ODE: exact parity (Exp099/100/101) |
-| Hand off | wateringHole/handoffs/ documents | **V40** active (ToadStool catch-up), V7-V39 archived |
-| Absorb | ToadStool integrates as `ops::bio::*` | **49 items** absorbed (ToadStool S62+DF64: all DONE, +46 cross-spring total) |
-| Lean | Rewire to upstream, delete local code | 49 primitives + 2 BGL helpers lean, 5 `OdeSystem` trait rewires, BGL boilerplate removed, 0 Passthrough |
+| Hand off | wateringHole/handoffs/ documents | **V48** active (S65 rewire handoff), V7-V45 archived |
+| Absorb | ToadStool integrates as `ops::bio::*` | **66 items** absorbed (ToadStool S65: all DONE, +46 cross-spring total) |
+| Lean | Rewire to upstream, delete local code | 66 primitives + 2 BGL helpers lean, 5 `OdeSystem` trait rewires, BGL boilerplate removed, 0 Passthrough |
 
 ---
 
@@ -174,15 +174,17 @@ Local Rust implementations that duplicate barracuda upstream. Pending
 | `erf()` | `bio/special.rs` | `barracuda::special::erf` | Shaped, FMA-optimized |
 | `ln_gamma()` | `bio/special.rs` | `barracuda::special::ln_gamma` | Lanczos, Horner form |
 | `regularized_gamma_lower()` | `bio/special.rs` | `barracuda::special::regularized_gamma_p` | Series expansion |
+| `normal_cdf()` | `bio/special.rs` | `barracuda::stats::norm_cdf` | Φ(x) = (1+erf(x/√2))/2 — **V43 rewire** |
 | `integrate_peak()` | `bio/eic.rs` | `barracuda::numerical::trapz` | Trapezoidal rule |
 | `cholesky_factor()` | `bio/esn.rs` | `barracuda::linalg::cholesky_solve` | SPD system solve (ridge regression, kriging, GP) |
 | `solve_ridge()` | `bio/esn.rs` | `barracuda::linalg::ridge_regression` | Cholesky-based ridge with flat buffer layout |
 
-**Status (V40):** barracuda's `default-features = false` already provides
-CPU-only access to `special`, `linalg`, `numerical`, and `tolerances`
+**Status (V43):** barracuda's `default-features = false` already provides
+CPU-only access to `special`, `linalg`, `numerical`, `stats`, and `tolerances`
 modules without pulling GPU dependencies. wetSpring already uses this
 pattern (`barracuda = { default-features = false }` in Cargo.toml).
-All 6 extraction candidates are already delegating to barracuda upstream.
+All 7 extraction candidates are delegating to barracuda upstream.
+V43 added `normal_cdf` → `barracuda::stats::norm_cdf` delegation.
 No further migration needed — this section is **COMPLETE**.
 
 ---
@@ -320,7 +322,7 @@ Patterns from hotSpring and neuralSpring that wetSpring leans on:
 
 **V40 ToadStool catch-up (Feb 25, 2026):**
 - Reviewed ToadStool S39-S62+DF64 commit evolution (55+ commits since last handoff)
-- Confirmed: 7/9 P0-P3 evolution requests delivered by ToadStool
+- Confirmed: 8/9 P0-P3 evolution requests delivered by ToadStool (V43: tolerance module confirmed)
   - P0-1: `GemmF64::wgsl_shader_for_device()` public + DF64 auto-select ✅
   - P1-2: `PeakDetectF64` f64 end-to-end (S62) ✅ — `signal_gpu` already leaned
   - P1-3: `ComputeDispatch` builder (S62+DF64) ✅
@@ -328,8 +330,21 @@ Patterns from hotSpring and neuralSpring that wetSpring leans on:
   - P2-6: `BatchedOdeRK4` via `OdeSystem` trait + `generate_shader()` (S58) ✅
   - P3-7: `TopK` GPU primitive (S60) ✅
   - P3-8: `quantize_affine_i8` (S39) ✅
-- Remaining open: P2-5 (diversity_fusion absorption), P2-9 (tolerance pattern suggestion)
+- P2-5 (diversity_fusion absorption) DONE (absorbed S63). P2-9 (tolerance pattern) confirmed DELIVERED (S52).
 - Track 3 GPU fully unblocked: NMF, SpMM, TransE, cosine, Top-K all upstream
-- 3 Passthrough modules promoted: signal_gpu → Lean, gbm_gpu → Compose, feature_table_gpu → Compose
+- 3 former Passthrough modules promoted (V40): signal_gpu → Lean, gbm_gpu → Compose, feature_table_gpu → Compose (0 Passthrough remaining)
 - 5 new upstream primitives available: SparseGemmF64, TranseScoreF64, BandwidthTier, Fp64Strategy, DF64 GEMM
 - All tests pass (806), clippy clean, docs clean against ToadStool HEAD (02207c4a)
+
+**V44 complete cross-spring rewire (Feb 25, 2026):**
+- Reviewed ToadStool ABSORPTION_TRACKER: all 46 wetSpring V16-V22 items DONE
+- ToadStool S42-S62+DF64: massive absorption cycle — 650+ shaders, 4,500+ tests
+- `normal_cdf` rewired: `special::normal_cdf` → `barracuda::stats::norm_cdf` (50th primitive)
+- `ValidationHarness` (S59) available but not consumed — wetSpring keeps local `Validator`
+  with simpler API (check/check_count/check_pass/section) suited to Python-baseline pattern.
+  ToadStool's `ValidationHarness` (check_abs/check_rel/check_upper/check_lower) is
+  richer but would require rewiring 158 binaries for marginal benefit.
+- `barracuda::tolerances` module (S52) confirmed delivered — closes P2-9.
+  wetSpring's flat `tolerances.rs` (77 domain constants) is complementary.
+- All items absorbed. 9/9 evolution requests DONE.
+- 819 lib tests pass, 0 clippy warnings (pedantic+nursery), fmt clean

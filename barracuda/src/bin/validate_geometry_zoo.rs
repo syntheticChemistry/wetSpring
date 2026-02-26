@@ -27,8 +27,8 @@ use wetspring_barracuda::validation::Validator;
 
 #[cfg(feature = "gpu")]
 use barracuda::spectral::{
-    GOE_R, POISSON_R, anderson_2d, anderson_3d, anderson_hamiltonian, find_all_eigenvalues,
-    lanczos, lanczos_eigenvalues, level_spacing_ratio,
+    AndersonSweepPoint, GOE_R, POISSON_R, anderson_2d, anderson_3d, anderson_hamiltonian,
+    find_all_eigenvalues, find_w_c, lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 
 const N_SWEEP: usize = 15;
@@ -43,20 +43,6 @@ fn sweep_w(i: usize) -> f64 {
 #[cfg(feature = "gpu")]
 fn plateau_count(sweep: &[(f64, f64)], midpoint: f64) -> usize {
     sweep.iter().filter(|(_, r)| *r > midpoint).count()
-}
-
-#[cfg(feature = "gpu")]
-fn find_last_downward_crossing(sweep: &[(f64, f64)], midpoint: f64) -> Option<f64> {
-    let mut last = None;
-    for i in 1..sweep.len() {
-        let (w0, r0) = sweep[i - 1];
-        let (w1, r1) = sweep[i];
-        if r0 > midpoint && r1 <= midpoint {
-            let t = (midpoint - r0) / (r1 - r0);
-            last = Some(t.mul_add(w1 - w0, w0));
-        }
-    }
-    last
 }
 
 fn main() {
@@ -144,7 +130,15 @@ fn main() {
                 lx * ly * lz
             };
             let p = plateau_count(&sweep, midpoint);
-            let w_c = find_last_downward_crossing(&sweep, midpoint);
+            let sweep_pts: Vec<_> = sweep
+                .iter()
+                .map(|&(w, r)| AndersonSweepPoint {
+                    w,
+                    r_mean: r,
+                    r_stderr: 0.0,
+                })
+                .collect();
+            let w_c = find_w_c(&sweep_pts, midpoint);
             let shape = format!(
                 "{}×{}×{}",
                 lx,

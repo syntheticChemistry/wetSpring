@@ -270,17 +270,17 @@ fn bench_felsenstein(device: &Arc<barracuda::device::WgpuDevice>, v: &mut Valida
                     "Fels: GPU completed",
                     f64::from(u8::from(gpu_ll.is_finite())),
                     1.0,
-                    0.0,
+                    tolerances::EXACT,
                 );
             }
         }
         Ok(Err(e)) => {
             println!("  [SKIP] GPU: {e}");
-            v.check("Fels: GPU (skipped)", 1.0, 1.0, 0.0);
+            v.check("Fels: GPU (skipped)", 1.0, 1.0, tolerances::EXACT);
         }
         Err(_) => {
             println!("  [SKIP] GPU panicked");
-            v.check("Fels: GPU (driver skip)", 1.0, 1.0, 0.0);
+            v.check("Fels: GPU (driver skip)", 1.0, 1.0, tolerances::EXACT);
         }
     }
 }
@@ -332,17 +332,17 @@ fn bench_bootstrap(device: &Arc<barracuda::device::WgpuDevice>, v: &mut Validato
                 "Bootstrap: parity",
                 f64::from(u8::from(max_diff < tolerances::GPU_VS_CPU_ENSEMBLE)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
             v.check(
                 "Bootstrap: GPU complete",
                 gpu_lls.len() as f64,
                 n_reps as f64,
-                0.0,
+                tolerances::EXACT,
             );
         }
     } else {
-        v.check("Bootstrap: GPU (skipped)", 1.0, 1.0, 0.0);
+        v.check("Bootstrap: GPU (skipped)", 1.0, 1.0, tolerances::EXACT);
     }
 }
 
@@ -420,25 +420,25 @@ fn bench_hmm_batch(device: &Arc<barracuda::device::WgpuDevice>, v: &mut Validato
                 println!("    max |CPU−GPU| = {max_diff:.2e}");
                 v.check(
                     "HMM batch: parity",
-                    f64::from(u8::from(max_diff < 1e-3)),
+                    f64::from(u8::from(max_diff < tolerances::GPU_VS_CPU_HMM_BATCH)),
                     1.0,
-                    0.0,
+                    tolerances::EXACT,
                 );
                 v.check(
                     "HMM batch: GPU complete",
                     gpu_result.log_likelihoods.len() as f64,
                     n_seqs as f64,
-                    0.0,
+                    tolerances::EXACT,
                 );
             }
         }
         Ok(Err(e)) => {
             println!("  [SKIP] GPU: {e}");
-            v.check("HMM batch: GPU (skipped)", 1.0, 1.0, 0.0);
+            v.check("HMM batch: GPU (skipped)", 1.0, 1.0, tolerances::EXACT);
         }
         Err(_) => {
             println!("  [SKIP] GPU panicked");
-            v.check("HMM batch: GPU (driver skip)", 1.0, 1.0, 0.0);
+            v.check("HMM batch: GPU (driver skip)", 1.0, 1.0, tolerances::EXACT);
         }
     }
 }

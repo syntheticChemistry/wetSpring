@@ -23,9 +23,14 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Validation type | Analytical (closed-form expected values) |
-//! | Expected values | Derived from literature catalog of Anderson anomalies |
-//! | Reference | Constrained evolution thesis, Anderson anomaly catalog |
+//! | Validation type | Analytical (literature-derived catalog) |
+//! | Expected values | Derived from published QS studies per organism |
+//! | Baseline commit | `e4358c5` |
+//! | Reference papers | Stabb 2005 (*A. fischeri*), Hammer & Bassler 2003 (*V. cholerae*), |
+//! | | Whiteley 1999 (*P. aeruginosa*), Velicer & Vos 2009 (*M. xanthus*), |
+//! | | Bonner 2009 (*Dictyostelium*), Boles 2005 (*S. epidermidis*) |
+//! | Reference | Constrained evolution thesis (gen3 Ch. 4), Anderson anomaly catalog |
+//! | Acceptance | Boolean pass/fail on catalog structure; no numeric tolerances needed |
 //! | Date | 2026-02-25 |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 

@@ -91,7 +91,7 @@ fn main() {
         "2s: Viterbi path matches Python",
         f64::from(u8::from(path_match)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let gamma = posterior(&model, &obs);
@@ -134,7 +134,7 @@ fn main() {
         "3s: Viterbi path matches Python",
         f64::from(u8::from(path_match_3)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let gamma3 = posterior(&model3, &obs3);
@@ -154,17 +154,19 @@ fn main() {
     v.section("── Mathematical invariants ──");
     v.check(
         "2s: Viterbi ≤ forward (most likely path ≤ total)",
-        f64::from(u8::from(vit.log_probability <= fwd.log_likelihood + 1e-10)),
+        f64::from(u8::from(
+            vit.log_probability <= fwd.log_likelihood + tolerances::HMM_INVARIANT_SLACK,
+        )),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "3s: Viterbi ≤ forward",
         f64::from(u8::from(
-            vit3.log_probability <= fwd3.log_likelihood + 1e-10,
+            vit3.log_probability <= fwd3.log_likelihood + tolerances::HMM_INVARIANT_SLACK,
         )),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // ── Determinism ─────────────────────────────────────────────────
@@ -175,7 +177,7 @@ fn main() {
         "Forward bitwise deterministic",
         (fwd_a.log_likelihood - fwd_b.log_likelihood).abs(),
         0.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     v.finish();

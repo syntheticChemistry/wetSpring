@@ -2,7 +2,7 @@
 
 **Date:** February 25, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 46 — 168 experiments, 3,300+ validation checks, ALL PASS; 918 tests (871 barracuda + 47 forge), 96.48% llvm-cov, ToadStool S62+DF64 aligned, 49 primitives + 2 BGL helpers + 1 WGSL extension (barracuda always-on), 70 named tolerance constants, 7/9 P0-P3 delivered, 0 Passthrough, V41 deep audit complete
+**Status:** Phase 50 — 183 experiments, 3,618+ validation checks, ALL PASS; 898 tests (819 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, ToadStool S65 aligned, 66 primitives + 2 BGL helpers + 0 local WGSL (fully lean) (barracuda always-on), 77 named tolerance constants, 0 Passthrough, V49 doc cleanup + evolution handoff, 39/39 three-tier, 52/52 papers
 
 ---
 
@@ -37,7 +37,8 @@ All code is AGPL-3.0.
 | [Kachkovskiy](kachkovskiy.md) | MSU CMSE | cross | 1 | 107,113,119,**122,126,127-138,144-156** | 334 | Spectral theory, 2D/3D Anderson, geometry zoo, ecosystem atlas, finite-size scaling v1+v2, correlated disorder, mapping sensitivity, planktonic dilution, eukaryote scaling, extension papers, paper queue |
 | **Fajgenbaum** | UPenn | 3 | 7 | 157–165 | 84 | Drug repurposing, pharmacophenomics, Track 3 completed |
 | **Diversity Fusion** | — | GPU | 1 | 167 | 18 | CPU↔GPU parity extension |
-| **Total** | | | **43** | | **3,300+** | |
+| **Track 4 Soil QS** | — | 4 | 9 | 170–182 | 321 | No-till soil QS, Anderson pore geometry, Brandt farm, meta-analysis, tillage factorial, CPU/GPU/streaming/metalForge |
+| **Total** | | | **52** | | **3,618+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -83,20 +84,20 @@ All code is AGPL-3.0.
 
 ## Validation Chain
 
-Every paper goes through the full evolution. Status across all 25 actionable papers:
+Every paper goes through the full evolution. Status across all 39 actionable papers:
 
 | Stage | What It Proves | Coverage |
 |-------|---------------|----------|
 | Python baseline | Algorithm correctness against published tools | 42 scripts |
 | BarraCuda CPU | Rust matches Python within machine precision | 1,476+ checks, 22.5x faster |
-| BarraCuda GPU | GPU matches CPU within 1e-6 | 702 checks, 29 domains |
-| Pure GPU streaming | Zero CPU round-trips, data stays on-device | 152 checks, 10+ domains |
-| metalForge | Same answer on CPU, GPU, NPU | 25/25 papers, 37 domains |
+| BarraCuda GPU | GPU matches CPU within 1e-6 | 702+ checks, 29+ domains |
+| Pure GPU streaming | Zero CPU round-trips, data stays on-device | 204+ checks, 10+ domains |
+| metalForge | Same answer on CPU, GPU, NPU | 39/39 papers, 37+ domains |
 | NPU reservoir | ESN → int8 → NPU preserves classification (Cholesky solve) | 59 checks, 6 domains |
-| Cross-spring evolution | 660+ WGSL shaders traced to origin springs, rewired imports | 9 checks |
+| Cross-spring evolution | 660+ WGSL shaders traced to origin springs, rewired imports, Exp169 4-spring provenance | 21 checks |
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
-| Code quality audit | 96.48% coverage, streaming I/O, 0 production mocks, ToadStool S62+DF64, barracuda always-on, `deny(missing_docs)` | 918 tests |
+| Code quality audit | 96.78% coverage, streaming I/O, 0 production mocks, ToadStool S65, barracuda always-on, `deny(missing_docs)` | 898 tests |
 
 ## Performance Summary
 
@@ -121,10 +122,47 @@ Every paper goes through the full evolution. Status across all 25 actionable pap
 | 04 | Sentinels + NPU deployment | [sub_thesis_04](sub_thesis_04_sentinels.md) | 114, 118, 123, 124, 147 |
 | 05 | Cross-species eavesdropping | [sub_thesis_05](sub_thesis_05_cross_species.md) | 142, 144–146, 151, 153–154 |
 
+### Cross-Spring Rewire + Modern Benchmark (Phase 48, V44)
+
+| Experiment | Focus | Checks | Key Finding |
+|:---:|-------|:------:|-------------|
+| Exp168 | Cross-spring S62 evolution | ~25 | hotSpring precision → wetSpring bio → neuralSpring validated |
+| Exp169 | Modern cross-spring benchmark | 12 | All CPU primitives validated, 4-spring provenance, bit-exact delegation |
+
+V44 rewired 6 validation binaries to modern upstream: `find_w_c` (4 files),
+`pearson_correlation` (1 file). 66 primitives consumed. Hill CPU ODE helpers
+intentionally kept local (derivative-level math, GPU equivalents generated
+by `BatchedOdeRK4::generate_shader()`).
+
+### Track 4: No-Till Soil QS & Anderson Geometry (Phase 50, V48)
+
+9 papers, 13 experiments, 321 validation checks. Extends the Anderson-QS framework
+into soil microbiology: pore-network geometry maps to Anderson disorder, aggregate
+stability predicts QS activation probability, and tillage history modulates
+effective dimension.
+
+| Experiment | Paper | Checks | Key Finding |
+|:---:|-------|:------:|-------------|
+| Exp170 | Martínez-García 2023 QS-pore geometry coupling | 26 | Non-linear connectivity → Anderson disorder W; P(QS) via norm_cdf |
+| Exp171 | Feng 2024 pore-size diversity | 27 | Pore class → effective dimension → diversity (Shannon, Bray-Curtis) |
+| Exp172 | Mukherjee 2024 distance colonization | 23 | Autoinducer diffusion + QS biofilm ODE + cooperation collapse |
+| Exp173 | Islam 2014 Brandt farm soil health | 14 | Published metrics validated; no-till → lower disorder → higher diversity |
+| Exp174 | Zuber & Villamil 2016 meta-analysis | 20 | Effect sizes, CI verification, Anderson predicts MBC increase |
+| Exp175 | Liang 2015 31-year tillage | 19 | 2×2×2 factorial, Shannon/Pielou, 31-year temporal recovery |
+| Exp176 | Tecon & Or 2017 biofilm-aggregate | 23 | Water film thickness → QS diffusion, aggregate surface → colonization |
+| Exp177 | Rabot 2018 structure-function | 16 | Structural properties → Anderson parameters → functional outcomes |
+| Exp178 | Wang 2025 tillage × compartment | 15 | Endosphere/rhizosphere compartment effects, stover return |
+| Exp179 | CPU parity benchmark | 49 | 8 domains timed, pure Rust math validated |
+| Exp180 | GPU validation | 23 | FMR + BrayCurtisF64 + Anderson 3D + ODE on GPU |
+| Exp181 | Pure GPU streaming | 52 | Zero-CPU-roundtrip soil QS pipeline |
+| Exp182 | metalForge cross-substrate | 14 | CPU = GPU for all Track 4 domains |
+
 ## Open Data
 
-All 43 reproductions use publicly accessible data or published model parameters.
+All 52 reproductions use publicly accessible data or published model parameters.
 No proprietary data dependencies. Sources: NCBI SRA, Zenodo, MassBank, EPA,
-Michigan EGLE, published ODE parameters, repoDB, algorithmic (no external data).
+Michigan EGLE, published ODE parameters, repoDB, algorithmic (no external data),
+published soil metrics (Islam 2014, Zuber 2016, Liang 2015), and published
+model equations (Martínez-García 2023, Tecon & Or 2017, Wang 2025).
 
 See `../specs/PAPER_REVIEW_QUEUE.md` for the full provenance audit.

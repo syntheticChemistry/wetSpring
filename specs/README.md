@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 25, 2026
-**Status**: Phase 45 — 3,300+/3,300+ checks, ALL PASS (871 tests, 168 experiments, ToadStool S62+DF64 aligned, 49 primitives + 2 BGL helpers + 1 WGSL extension, barracuda always-on, 70 named tolerance constants, 7/9 P0-P3 delivered, 0 Passthrough, V40 catch-up, 96.48% llvm-cov)
+**Status**: Phase 50 — 3,618+/3,618+ checks, ALL PASS (898 tests, 183 experiments, ToadStool S65 aligned, 66 primitives + 2 BGL helpers + 0 local WGSL (fully lean), barracuda always-on, 77 named tolerance constants, 9/9 P0-P3 delivered, 0 Passthrough, V49 doc cleanup + evolution handoff, 39/39 three-tier, 52/52 papers, 96.78% llvm-cov)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -10,8 +10,8 @@
 
 | Metric | Value |
 |--------|-------|
-| CPU validation | 1,476+/1,476+ PASS — 46 modules, 168 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
-| GPU validation | 710+/710+ PASS — 44 ToadStool primitives + 2 BGL helpers (S62+DF64, always-on), 1 local WGSL extension |
+| CPU validation | 1,476+/1,476+ PASS — 46 modules, 183 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
+| GPU validation | 710+/710+ PASS — 66 ToadStool primitives + 2 BGL helpers (S65, always-on), 0 local WGSL (fully lean) |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 407/407 — 22.5x Rust speedup over Python (v1–v9) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/101/164) — pure GPU math proven |
@@ -20,15 +20,15 @@
 | Cross-spring spectral | 25 checks — Anderson localization + QS-disorder analogy (Exp107) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
-| Rust modules | 46 CPU + 42 GPU + 1 Write-phase extension, 871 tests |
-| Write phase | 1 local WGSL extension (`diversity_fusion_f64.wgsl` — Exp167, 18/18) |
+| Rust modules | 46 CPU + 42 GPU, 898 tests |
+| Write phase | 0 local WGSL (fully lean) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
-| Paper queue | **ALL DONE** — 43/43 reproducible papers complete (Track 1c + Track 3 + Phase 37 extensions) |
+| Paper queue | **ALL DONE** — 52/52 reproducible papers complete (Tracks 1-4 + Phase 37 extensions + cross-spring) |
 | Faculty (Track 1) | Waters (MMG, MSU), Cahill (Sandia), Smallwood (Sandia) |
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
 | Faculty (Track 1c) | R. Anderson (Carleton) — deep-sea metagenomics, population genomics |
 | Faculty (Track 2) | Jones (BMB/Chemistry, MSU) — PFAS mass spectrometry |
-| Handoffs | Thirty-six delivered (v1–v6, rewire, cross-spring, v7–v36) |
+| Handoffs | Fifty delivered (v1–v50) |
 
 ---
 
@@ -86,8 +86,17 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 | 41 | Yang 2020 NMF drug repurposing | Y | Y | Y | Exp159 (CPU), Exp164 (GPU), Exp165 (metalForge) |
 | 42 | Gao 2020 repoDB NMF | Y | Y | Y | Exp160 (CPU), Exp164 (GPU), Exp165 (metalForge) |
 | 43 | ROBOKOP KG embedding | Y | Y | Y | Exp161 (CPU), Exp164 (GPU), Exp165 (metalForge) |
+| 44 | Martínez-García 2023 QS-pore geometry | Y | Y | Y | Exp170 (CPU), Exp180 (GPU), Exp182 (metalForge) |
+| 45 | Feng 2024 pore-size diversity | Y | Y | Y | Exp171 (CPU), Exp180 (GPU), Exp182 (metalForge) |
+| 46 | Mukherjee 2024 distance colonization | Y | Y | Y | Exp172 (CPU), Exp180 (GPU), Exp182 (metalForge) |
+| 47 | Islam 2014 Brandt farm soil health | Y | Y | Y | Exp173 (CPU), Exp180 (GPU), Exp182 (metalForge) |
+| 48 | Zuber & Villamil 2016 meta-analysis | Y | Y | Y | Exp174 (CPU), Exp180 (GPU), Exp182 (metalForge) |
+| 49 | Liang 2015 long-term tillage | Y | Y | Y | Exp175 (CPU), Exp180 (GPU), Exp182 (metalForge) |
+| 50 | Tecon & Or 2017 biofilm-aggregate | Y | Y | Y | Exp176 (CPU), Exp180 (GPU), Exp182 (metalForge) |
+| 51 | Rabot 2018 structure-function | Y | Y | Y | Exp177 (CPU), Exp180 (GPU), Exp182 (metalForge) |
+| 52 | Wang 2025 tillage microbiome | Y | Y | Y | Exp178 (CPU), Exp180 (GPU), Exp182 (metalForge) |
 
-**Full three-tier coverage (CPU + GPU + metalForge):** All **30 of 30 actionable papers** (25 Tracks 1-2 + 5 Track 3).
+**Full three-tier coverage (CPU + GPU + metalForge):** All **39 of 39 actionable papers** (25 Tracks 1-2 + 5 Track 3 + 9 Track 4).
 **CPU + GPU (no metalForge):** None — all actionable papers now have full three-tier coverage.
 **CPU only:** None — all actionable papers have at least CPU + GPU paths.
 
@@ -110,17 +119,17 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 
 | Spec | Status | Description |
 |------|--------|-------------|
-| [PAPER_REVIEW_QUEUE.md](PAPER_REVIEW_QUEUE.md) | Complete | 43/43 papers reproduced across 4 tracks + cross-spring |
+| [PAPER_REVIEW_QUEUE.md](PAPER_REVIEW_QUEUE.md) | Complete | 52/52 papers reproduced across 6 tracks + cross-spring |
 | [BARRACUDA_REQUIREMENTS.md](BARRACUDA_REQUIREMENTS.md) | Active | GPU kernel requirements and gap analysis |
 
 ### Existing Documentation (in parent directories)
 
 | Document | Location | Description |
 |----------|----------|-------------|
-| CONTROL_EXPERIMENT_STATUS.md | `../` | 168 experiments, 3,300+ validation checks, 918 tests |
+| CONTROL_EXPERIMENT_STATUS.md | `../` | 183 experiments, 3,618+ validation checks, 898 tests |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
-| Handoff (v36) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V36_WRITE_PHASE_HANDOFF_FEB25_2026.md` | Current ToadStool handoff |
+| Handoff (v48) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V48_S65_REWIRE_HANDOFF_FEB25_2026.md` | Current ToadStool handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |
@@ -137,7 +146,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 - **Deep-sea metagenomics** — ANI, SNP, dN/dS, molecular clock, pangenomics
 - **ML inference** — Decision tree, Random Forest, GBM (all sovereign, no Python)
 - **Drug repurposing** — NMF, knowledge graph embeddings, pharmacophenomics (Track 3)
-- **Sovereign Rust bioinformatics** — 46 CPU + 42 GPU modules + 1 Write-phase WGSL extension, 2 runtime dependencies (flate2 + bytemuck), 44 ToadStool primitives + 2 BGL helpers (S62+DF64, always-on, zero fallback)
+- **Sovereign Rust bioinformatics** — 46 CPU + 42 GPU modules + 0 local WGSL (fully lean), 2 runtime dependencies (flate2 + bytemuck), 66 ToadStool primitives + 2 BGL helpers (S65, always-on, zero fallback)
 
 ### wetSpring IS NOT:
 - Sensor noise analysis (groundSpring)
@@ -165,7 +174,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 `../whitePaper/STUDY.md` → `../CONTROL_EXPERIMENT_STATUS.md` → `../barracuda/EVOLUTION_READINESS.md` → BARRACUDA_REQUIREMENTS.md
 
 **Integration partner**:
-`../wateringHole/handoffs/WETSPRING_TOADSTOOL_V36_WRITE_PHASE_HANDOFF_FEB25_2026.md` → `../BENCHMARK_RESULTS.md`
+`../wateringHole/handoffs/WETSPRING_TOADSTOOL_V48_S65_REWIRE_HANDOFF_FEB25_2026.md` → `../BENCHMARK_RESULTS.md`
 
 ---
 

@@ -2,7 +2,7 @@
 
 **Date:** February 25, 2026
 **Pattern:** Write → Absorb → Lean (from hotSpring)
-**Status:** 44 ToadStool primitives + 2 BGL helpers (Lean), 1 local WGSL extension (Write), 42 GPU modules total, 0 Tier B/C, ToadStool S62+DF64 aligned
+**Status:** 44 ToadStool primitives + 2 BGL helpers (Lean), 0 local WGSL (fully lean), 42 GPU modules total, 0 Tier B/C, ToadStool S65 aligned
 
 ---
 
@@ -115,11 +115,11 @@ upstream ToadStool (S58+). The `OdeSystem` trait implementations remain local
 | Cooperation | `CooperationOde` | 4 | 13 | 101 |
 | Capacitor | `CapacitorOde` | 6 | 16 | 100 |
 
-### Local WGSL Extensions (Write phase — following hotSpring pattern)
+### Local WGSL Extensions (Lean phase — absorbed S63)
 
 | Shader | Module | Purpose | Status |
 |--------|--------|---------|--------|
-| `diversity_fusion_f64.wgsl` | `diversity_fusion_gpu` | Fused Shannon + Simpson + evenness | CPU tests pass, GPU validation pending |
+| diversity_fusion | `diversity_fusion_gpu` | Fused Shannon + Simpson + evenness | Absorbed by ToadStool S63 |
 
 ### Compose GPU Wrappers (7 — Phase 28)
 
