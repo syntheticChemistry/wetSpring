@@ -5,12 +5,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
-## V57 — ToadStool S68 Catch-Up + Universal Precision Alignment (2026-02-26)
+## V57 — ToadStool S68 Catch-Up + Universal Precision Rewire (2026-02-26)
 
 ### Changed
 - **ToadStool pin**: `045103a7` (S66 Wave 5) → `f0feb226` (S68 dual-layer universal precision)
   - 19 commits reviewed: S67 universal precision architecture + S68 f32→f64 evolution (291 shaders)
   - All 79 consumed primitives work unchanged — backward-compatible API
+- **Universal precision rewire**: 6 GPU modules rewired from `compile_shader_f64()` to
+  `compile_shader_universal(source, Precision::F64)` — prepares for DF64 precision experiments:
+  - `bistable_gpu.rs`, `phage_defense_gpu.rs`, `cooperation_gpu.rs`, `capacitor_gpu.rs`,
+    `multi_signal_gpu.rs` (ODE systems via `BatchedOdeRK4` trait-generated WGSL)
+  - `gemm_cached.rs` (`GemmF64::WGSL` — future `Precision::Df64` for ~10× on consumer GPUs)
 - **`gpu.rs` doc comment**: removed stale "3 local WGSL shaders" reference, replaced with accurate
   "zero local shaders, all generated via `BatchedOdeRK4`"
 
@@ -21,11 +26,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
   the `gpu` feature, breaking all `default-features = false` consumers.
 
 ### Added
-- **V57 handoff**: `WETSPRING_TOADSTOOL_V57_S68_CATCHUP_HANDOFF_FEB26_2026.md` —
-  ToadStool S68 catch-up, feature-gate fix, universal precision availability
+- **Exp189** `benchmark_cross_spring_s68.rs` — comprehensive cross-spring evolution benchmark
+  documenting every delegation chain with provenance: hotSpring precision (S39-S44), neuralSpring
+  pairwise ops (S45-S50), wetSpring bio (S51-S58), hotSpring DF64 (S58), ToadStool universal
+  precision (S67-S68). 11 validation sections, full timing table.
+- **V57 handoff**: `WETSPRING_TOADSTOOL_V57_S68_CATCHUP_HANDOFF_FEB26_2026.md`
 
 ### Metrics
-- All metrics unchanged from V56 (961 tests, 82 tolerances, 188 experiments, 174 binaries)
+- Experiments: 188 → 189 (Exp189 cross-spring S68 benchmark)
+- Binaries: 174 → 175 (`benchmark_cross_spring_s68`)
 - ToadStool alignment: S68 (`f0feb226`) — 700 shaders, 2,546+ barracuda tests, 0 f32-only
 - `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN
 

@@ -15,6 +15,7 @@ use barracuda::device::{
     BufferPool, PooledBuffer, TensorContext, WgpuDevice, storage_bgl_entry, uniform_bgl_entry,
 };
 use barracuda::ops::linalg::gemm_f64::GemmF64;
+use barracuda::shaders::Precision;
 use bytemuck::{Pod, Zeroable};
 use std::sync::Arc;
 
@@ -71,12 +72,12 @@ impl GemmCached {
     ///
     /// Fp64Strategy-aware: on consumer GPUs (`Hybrid`), upstream
     /// `GemmF64::execute()` uses DF64 core-streaming. Our cached pipeline
-    /// always uses the native f64 GEMM shader (which `compile_shader_f64`
-    /// patches with driver workarounds). When `ToadStool` exposes the DF64
-    /// GEMM shader publicly, we can switch here for ~10x throughput on
-    /// consumer GPUs.
+    /// always uses the native f64 GEMM shader via universal precision
+    /// compilation. To switch to DF64 for ~10x throughput on consumer GPUs,
+    /// change `Precision::F64` to `Precision::Df64` when the DF64 GEMM
+    /// shader is compatible with our bind group layout.
     pub fn new(device: Arc<WgpuDevice>, ctx: Arc<TensorContext>) -> Self {
-        let shader = device.compile_shader_f64(GemmF64::WGSL, Some("GemmCached f64"));
+        let shader = device.compile_shader_universal(GemmF64::WGSL, Precision::F64, Some("GemmCached f64"));
 
         let bgl = device
             .device()

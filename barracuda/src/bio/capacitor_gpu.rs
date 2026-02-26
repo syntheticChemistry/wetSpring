@@ -7,6 +7,7 @@
 
 use barracuda::device::{WgpuDevice, storage_bgl_entry, uniform_bgl_entry};
 use barracuda::numerical::ode_generic::BatchedOdeRK4;
+use barracuda::shaders::Precision;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
@@ -63,7 +64,7 @@ impl CapacitorGpu {
     pub fn new(device: Arc<WgpuDevice>) -> crate::error::Result<Self> {
         let d = device.device();
         let wgsl = BatchedOdeRK4::<CapacitorOde>::generate_shader();
-        let module = device.compile_shader_f64(&wgsl, Some("Capacitor ODE"));
+        let module = device.compile_shader_universal(&wgsl, Precision::F64, Some("Capacitor ODE"));
 
         let bgl = d.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             label: Some("Capacitor BGL"),

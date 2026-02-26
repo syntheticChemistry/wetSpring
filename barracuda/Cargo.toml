@@ -976,3 +976,8 @@ required-features = ["gpu"]
 name = "benchmark_cross_spring_s65"
 path = "src/bin/benchmark_cross_spring_s65.rs"
 required-features = ["gpu"]
+
+[[bin]]
+name = "benchmark_cross_spring_s68"
+path = "src/bin/benchmark_cross_spring_s68.rs"
+required-features = ["gpu"]

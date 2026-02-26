@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** February 26, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 57 — ToadStool S68 catch-up + universal precision alignment; 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, 188 experiments, 4,494+ checks (1,578 GPU on RTX 4070), 174 binaries, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed (barracuda always-on, zero local WGSL, zero local derivative/regression math), 82 named tolerances with full provenance, 0 ad-hoc magic numbers, 0 Passthrough, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, NCBI EFetch/SRA pipeline + NestGate JSON-RPC integration + biomeOS science graph, 52/52 papers, 39/39 three-tier
+**Status:** Phase 57 — ToadStool S68 universal precision rewire; 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, 189 experiments, 4,494+ checks (1,578 GPU on RTX 4070), 175 binaries, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math), 82 named tolerances with full provenance, 0 ad-hoc magic numbers, 0 Passthrough, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, NCBI EFetch/SRA pipeline + NestGate JSON-RPC integration + biomeOS science graph, 52/52 papers, 39/39 three-tier
 
 ---
 
@@ -734,14 +734,16 @@ refactoring, tolerance completeness, and barracuda team handoff:
 
 **833 lib tests** | **96.67% coverage** | **79 named tolerances** | **0 clippy warnings (pedantic)**
 
-### Phase 57: ToadStool S68 Catch-Up + Universal Precision Alignment (V57)
+### Phase 57: ToadStool S68 Universal Precision Rewire (V57)
 
 ToadStool advanced 19 commits (S66→S68) with universal precision architecture
 (all 291 f32-only shaders → f64 canonical, dual-layer DF64 pipeline). wetSpring
-revalidated cleanly after contributing a CPU feature-gate fix for `numerical/mod.rs`
-and `stats/mod.rs` (`wgsl_hessian_column`, `WGSL_HISTOGRAM`, `WGSL_BOOTSTRAP_MEAN_F64`
-now properly gated behind `#[cfg(feature = "gpu")]`). All 79 consumed primitives
-work unchanged. ToadStool pin: `f0feb226` (S68). 700 shaders, zero f32-only.
+revalidated cleanly after contributing a CPU feature-gate fix upstream and rewired
+all 6 GPU modules from `compile_shader_f64()` to `compile_shader_universal(source,
+Precision::F64)` — preparing for future DF64 precision experiments. Exp189
+cross-spring evolution benchmark documents the full provenance chain from all 5
+Springs (hotSpring precision, wetSpring bio, neuralSpring pairwise, airSpring stats,
+groundSpring bootstrap) through ToadStool S68's 700 shaders, zero f32-only.
 
 ### Phase 56: Science Extension Pipeline + Primal Integration (V56)
 
