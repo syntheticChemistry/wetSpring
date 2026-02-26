@@ -1,8 +1,8 @@
 # Sub-thesis 03: BioAg — Rhizosphere QS and Agricultural Applications
 
-**Date:** February 24, 2026
+**Date:** February 26, 2026
 **Faculty:** Waters (MSU MMG), Cahill (Sandia), Smallwood (Sandia)
-**Status:** Framework established — rhizosphere QS predictions validated
+**Status:** Framework established — rhizosphere QS predictions validated. Track 4 soil QS complete (9 papers, Exp170-182, 321 checks, full three-tier). Rhizosphere W ≈ 6.7 deep in extended regime. R:P = 2.3:1 eavesdropper enrichment confirmed
 
 ---
 

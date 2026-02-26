@@ -1,8 +1,8 @@
 # Sub-thesis 05: Cross-Species QS and Interspecies Eavesdropping
 
-**Date:** February 24, 2026
+**Date:** February 26, 2026
 **Faculty:** Waters (MSU MMG), R. Anderson (Carleton), Kachkovskiy (MSU CMSE)
-**Status:** Phylogenetic overlay complete — eavesdropper enrichment confirmed
+**Status:** Phylogenetic overlay complete — eavesdropper enrichment confirmed. Cold seep metagenomes (299K QS genes, 170 metagenomes, 34 QS types — Exp144-145). luxR × geometry overlay (12 lineages — Exp146). Interkingdom QS review (Exp154). Correlated disorder strengthens cross-species QS (Exp151)
 
 ---
 

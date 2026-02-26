@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** February 26, 2026 (V54 codebase audit + supply-chain audit)
+**Date:** February 26, 2026 (V56 science extension pipeline + primal integration)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
 **ToadStool pin:** `045103a7` (S66 Wave 5: multi-precision expansion, Feb 26 2026)
-**Status:** 79 ToadStool primitives consumed (incl. 11 `stats::diversity` + 2 `stats::metrics` + S66: `hill`, `monod`, `fit_linear`, `percentile`, `mean`, `shannon_from_frequencies`), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 906 tests (827 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, ToadStool S66 aligned, 183 experiments, 4,494+ checks (1,578 GPU on RTX 4070). 9/9 evolution requests DONE. **V52 S66 rewire:** `hill()` → `barracuda::stats::hill`, `fit_heaps_law` → `barracuda::stats::fit_linear`, `compute_ci` → `barracuda::stats::{mean, percentile}`. **V51 GPU validation:** 1,578 GPU checks on RTX 4070 + Titan V, tolerance refinement for chained transcendentals.
+**Status:** 79 ToadStool primitives consumed (incl. 11 `stats::diversity` + 2 `stats::metrics` + S66: `hill`, `monod`, `fit_linear`, `percentile`, `mean`, `shannon_from_frequencies`), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, ToadStool S66 aligned, 188 experiments, 4,494+ checks (1,578 GPU on RTX 4070), 82 named tolerances, 0 ad-hoc magic numbers, `clippy::pedantic` CLEAN. **V55:** encoding.rs typed errors, validate\_gpu\_diversity\_fusion → Validator framework, 2 new tolerance constants, ncbi/http bug fix, 6 new tests. **V56:** NCBI EFetch/SRA pipeline, NestGate JSON-RPC integration, SHA-256 cache integrity, GPU Anderson L=14-20, biomeOS science capability domain.
 
 ---
 

@@ -507,3 +507,34 @@ fn parse_fastq_truncated_returns_partial() {
     assert_eq!(records[1].sequence, b"GG");
     assert!(records[1].quality.is_empty());
 }
+
+#[test]
+fn for_each_record_stops_on_empty_line() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = write_fastq(
+        &dir,
+        "empty_sep.fastq",
+        "@r1\nACGT\n+\nIIII\n\n@r2\nGG\n+\nII\n",
+    );
+    let mut count = 0_usize;
+    for_each_record(&path, |_record| {
+        count += 1;
+        Ok(())
+    })
+    .unwrap();
+    assert_eq!(count, 1);
+}
+
+#[test]
+fn for_each_record_nonexistent_file() {
+    let result = for_each_record(std::path::Path::new("/tmp/__nonexistent__.fastq"), |_| {
+        Ok(())
+    });
+    assert!(result.is_err());
+}
+
+#[test]
+fn fastq_iter_nonexistent_file() {
+    let result = super::FastqIter::open(std::path::Path::new("/tmp/__nonexistent__.fastq"));
+    assert!(result.is_err());
+}

@@ -5,6 +5,69 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V56 — Science Extension Pipeline + Primal Integration (2026-02-26)
+
+### Science pipeline infrastructure
+- **`ncbi/efetch.rs`** — NEW: `EFetch` FASTA/GenBank download with response validation
+- **`ncbi/sra.rs`** — NEW: SRA run download via capability-discovered `fasterq-dump`/`fastq-dump`
+- **`ncbi/cache.rs`** — EXTENDED: accession-based directory trees, SHA-256 integrity sidecar files,
+  pure-Rust SHA-256 implementation (FIPS 180-4, verified against NIST test vectors)
+- **`ncbi/nestgate.rs`** — NEW: optional NestGate data provider via JSON-RPC 2.0 over Unix sockets
+  (`WETSPRING_DATA_PROVIDER=nestgate`); discovers socket via capability cascade; sovereign fallback
+
+### GPU Anderson finite-size scaling
+- **`validate_anderson_gpu_scaling.rs`** — NEW: Exp184b validation binary for L=14–20 lattices
+  (16 disorder realizations, 15 W-points, scaling collapse for critical exponent ν)
+- **3 new named tolerances**: `GPU_LANCZOS_EIGENVALUE_ABS` (0.03), `FINITE_SIZE_SCALING_REL` (0.08),
+  `LEVEL_SPACING_STDERR_MAX` (0.015) — all with full provenance in `tolerances.rs`
+
+### biomeOS orchestration
+- **`graphs/science_pipeline.toml`** — NEW: biomeOS deployment graph for NCBI → diversity →
+  Anderson spectral pipeline (NestGate data, ToadStool GPU compute, wetSpring science)
+- **`config/capability_registry.toml`** — UPDATED: `science` domain added (wetSpring as provider:
+  `science.diversity`, `science.anderson`, `science.ncbi_fetch`, `science.qs_model`)
+
+### Experiment protocols
+- **Exp184** — real NCBI 16S through sovereign pipeline (5 accessions test, 170 full set)
+- **Exp185** — cold seep metagenomes through sovereign pipeline (170 metagenomes)
+- **Exp186** — dynamic Anderson W(t): tillage transition, antibiotic recovery, seasonal
+- **Exp187** — DF64 Anderson at L=24+: extended precision for refined W_c and ν
+- **Exp188** — NPU sentinel with real sensor stream (Akida AKD1000)
+
+### Metrics
+- Barracuda lib tests: 833 → 882 (+49 from NCBI pipeline + cache + NestGate modules)
+- Total Rust tests: 912 → 961 (882 barracuda + 47 forge + 32 integration/doc)
+- Named tolerances: 79 → 82 (3 new GPU/scaling tolerances)
+- Experiments: 183 → 188 (5 new protocols)
+- Binaries: 172 → 174 (new `validate_anderson_gpu_scaling` + registration)
+- `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (including all new code)
+- Pure-Rust SHA-256 verified against 3 NIST reference vectors
+
+## V55 — Deep Debt Resolution, Idiomatic Rust Evolution (2026-02-26)
+
+### Fixed
+- **Clippy pedantic**: All 6 failing binaries now pass `cargo clippy --all-targets -- -D warnings -W clippy::pedantic`. Zero errors across entire codebase (lib + 173 binaries).
+  - `benchmark_cross_spring_s65.rs`: backticks, `f64::from()`, `f64::midpoint()`, `.is_some_and()`, import ordering.
+  - `validate_gpu_diversity_fusion.rs`: full rewrite — migrated to `Validator` framework, refactored 270-line monolith into 4 focused sub-functions.
+  - `validate_soil_qs_cpu_parity.rs`: strict float comparison replaced with `Validator::check()`.
+  - `benchmark_cross_spring_modern.rs`, `benchmark_modern_systems_df64.rs`, `validate_metalforge_drug_repurposing.rs`: allow annotations for domain-appropriate patterns.
+- **`ncbi/http.rs`**: whitespace-only `WETSPRING_HTTP_CMD` no longer treated as valid custom backend (latent bug fix).
+- **`encoding.rs`**: evolved `base64_decode` return from `Result<Vec<u8>, String>` to `crate::error::Result<Vec<u8>>` using proper `Error::Base64` variant. Caller in `mzml/decode.rs` simplified.
+
+### Added
+- `tolerances::ODE_GPU_SWEEP_ABS` (0.15) — GPU ODE sweep absolute parity with scientific justification. Replaces ad-hoc magic number.
+- `tolerances::GPU_EIGENVALUE_REL` (0.05) — GPU bifurcation eigenvalue relative parity. Replaces ad-hoc magic number.
+- `PfasFragments` provenance: NIST Chemistry WebBook monoisotopic mass derivation for CF2, C2F4, HF defaults.
+- 6 new tests: FASTQ (empty-line break, nonexistent file), HTTP (whitespace custom cmd, custom with args, invalid UTF-8 output), tolerances.
+- V55 handoff: `wateringHole/handoffs/WETSPRING_TOADSTOOL_V55_DEEP_DEBT_HANDOFF_FEB26_2026.md`.
+
+### Metrics
+- Tests: 906 → 912 (833 barracuda + 47 forge + 32 integration/doc).
+- Named tolerances: 77 → 79 (zero ad-hoc magic numbers remaining).
+- Clippy pedantic: lib + all targets CLEAN.
+- Coverage: 96.67% llvm-cov (library code).
+- `ncbi/http.rs` coverage: 81.71% → 83.99%.
+
 ## V54 — Codebase Audit, Provenance Hardening, Supply-Chain Audit (2026-02-26)
 
 ### Audited

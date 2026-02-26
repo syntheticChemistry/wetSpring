@@ -738,6 +738,12 @@ name = "validate_finite_size_scaling_v2"
 path = "src/bin/validate_finite_size_scaling_v2.rs"
 required-features = ["gpu"]
 
+# ── GPU Anderson Finite-Size Scaling L=14–20 (Exp184b) ─────────────
+[[bin]]
+name = "validate_anderson_gpu_scaling"
+path = "src/bin/validate_anderson_gpu_scaling.rs"
+required-features = ["gpu"]
+
 # ── NCBI Vibrio QS Parameter Landscape (Exp121) ───────────────────
 [[bin]]
 name = "validate_ncbi_vibrio_qs"

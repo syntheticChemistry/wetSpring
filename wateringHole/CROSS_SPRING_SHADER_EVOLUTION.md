@@ -1,7 +1,7 @@
 # Cross-Spring Shader Evolution
 
-**Last updated**: Feb 26, 2026 — V54 codebase audit (694 WGSL shaders, DF64, 79 primitives consumed, 0 local WGSL/derivative/regression, 183 experiments, 4,494+ checks, 1,578 GPU on RTX 4070, supply-chain audit, full tolerance provenance)
-**Validated by**: V54 audit (827 lib tests, 70 GPU validators PASS, 57 CPU validators PASS, `cargo-deny` clean), V54 handoff
+**Last updated**: Feb 26, 2026 — V56 science extension pipeline (694 WGSL shaders, DF64, 79 primitives consumed, 0 local WGSL/derivative/regression, 188 experiments, 4,494+ checks, 1,578 GPU on RTX 4070, 82 named tolerances, clippy pedantic CLEAN, NCBI EFetch/SRA pipeline, NestGate JSON-RPC, biomeOS science graph)
+**Validated by**: V56 audit (882 barracuda tests, 70 GPU validators PASS, 57 CPU validators PASS, `cargo-deny` clean), V56 handoff
 
 ---
 

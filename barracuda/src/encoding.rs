@@ -28,8 +28,8 @@ const DECODE_TABLE: [u8; 256] = build_decode_table();
 ///
 /// # Errors
 ///
-/// Returns an error message if the input contains invalid characters
-/// or has malformed padding.
+/// Returns [`crate::error::Error::Base64`] if the input contains invalid
+/// characters or has malformed padding.
 ///
 /// # Examples
 ///
@@ -39,7 +39,7 @@ const DECODE_TABLE: [u8; 256] = build_decode_table();
 /// let bytes = base64_decode("SGVsbG8=").unwrap();
 /// assert_eq!(bytes, b"Hello");
 /// ```
-pub fn base64_decode(input: &str) -> Result<Vec<u8>, String> {
+pub fn base64_decode(input: &str) -> crate::error::Result<Vec<u8>> {
     let mut buf = Vec::with_capacity(input.len() * 3 / 4);
     let mut accum: u32 = 0;
     let mut bits: u32 = 0;
@@ -50,7 +50,9 @@ pub fn base64_decode(input: &str) -> Result<Vec<u8>, String> {
         }
         let val = DECODE_TABLE[byte as usize];
         if val == 255 {
-            return Err(format!("invalid base64 byte: {byte:#04x}"));
+            return Err(crate::error::Error::Base64(format!(
+                "invalid base64 byte: {byte:#04x}"
+            )));
         }
         accum = (accum << 6) | u32::from(val);
         bits += 6;

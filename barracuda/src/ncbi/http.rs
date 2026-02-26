@@ -46,7 +46,7 @@ fn select_backend(
     has_wget: bool,
 ) -> Option<(Backend, String)> {
     if let Some(cmd) = custom_cmd {
-        if !cmd.is_empty() {
+        if !cmd.trim().is_empty() {
             return Some((Backend::Custom, cmd.to_string()));
         }
     }
@@ -248,5 +248,27 @@ mod tests {
             stderr: vec![],
         };
         assert_eq!(interpret_output(output, "cmd").unwrap(), "");
+    }
+
+    #[test]
+    fn interpret_output_invalid_utf8() {
+        let output = std::process::Output {
+            status: std::process::Command::new("true").status().unwrap(),
+            stdout: vec![0xFF, 0xFE],
+            stderr: vec![],
+        };
+        assert!(interpret_output(output, "cmd").is_err());
+    }
+
+    #[test]
+    fn select_backend_whitespace_only_custom_ignored() {
+        assert!(select_backend(Some("   "), false, false).is_none());
+    }
+
+    #[test]
+    fn select_backend_custom_with_args() {
+        let (backend, cmd) = select_backend(Some("myhttp --silent -L"), false, false).unwrap();
+        assert_eq!(backend, Backend::Custom);
+        assert_eq!(cmd, "myhttp --silent -L");
     }
 }

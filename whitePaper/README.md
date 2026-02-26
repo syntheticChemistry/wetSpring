@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 26, 2026
-**Status:** Phase 54 — Validation study active — 4,494+ checks (1,578 GPU on RTX 4070), 906 tests, 183 experiments, ToadStool S66 aligned (`045103a7`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 77 named tolerances with full provenance, 0 Passthrough, V54 S66 rewire + cross-spring evolution benchmarks, 39/39 three-tier, 52/52 papers
+**Status:** Phase 56 — Validation study active — 4,494+ checks (1,578 GPU on RTX 4070), 961 tests, 188 experiments, ToadStool S66 aligned (`045103a7`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 82 named tolerances with full provenance, 0 Passthrough, 0 ad-hoc magic numbers, clippy pedantic CLEAN, V56 science extension pipeline, 39/39 three-tier, 52/52 papers
 **License:** AGPL-3.0-or-later
 
 ---
@@ -308,7 +308,7 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCuda/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34+ WGSL shaders, active Write phase)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 79 ToadStool primitives, barracuda always-on, 906 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 79 ToadStool primitives, barracuda always-on, 912 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **ecoPrimals/archive/wetspring-early-handoffs-feb2026/** — Fossil record of early ToadStool handoffs (v1–v9)
 
@@ -325,7 +325,7 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy --pedantic --nursery -D warnings` | 0 diagnostics |
 | `cargo doc --no-deps` | 0 warnings |
-| Line coverage (`cargo-llvm-cov`) | **96.78% overall** |
+| Line coverage (`cargo-llvm-cov`) | **96.67% overall** |
 | `#![deny(unsafe_code)]` | Enforced crate-wide (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, clippy::unwrap_used)]` | Enforced crate-wide |
 | Named tolerance constants | 77 (all scientifically justified, hierarchy-tested) |

@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 26, 2026
-**Status**: Phase 54 — 4,494+/4,494+ checks (1,578 GPU on RTX 4070), ALL PASS (906 tests, 183 experiments, ToadStool S66 aligned (`045103a7`), 79 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 77 named tolerances with full provenance, 9/9 P0-P3 delivered, 0 Passthrough, V54 codebase audit + supply-chain audit, 39/39 three-tier, 52/52 papers, 96.78% llvm-cov)
+**Status**: Phase 56 — 4,494+/4,494+ checks (1,578 GPU on RTX 4070), ALL PASS (961 tests, 188 experiments, ToadStool S66 aligned (`045103a7`), 79 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 82 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, V56 science extension pipeline, 39/39 three-tier, 52/52 papers, 96.67% llvm-cov)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -20,7 +20,7 @@
 | Cross-spring spectral | 25 checks — Anderson localization + QS-disorder analogy (Exp107) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
-| Rust modules | 46 CPU + 42 GPU, 906 tests (827 barracuda + 47 forge + 32 integration/doc) |
+| Rust modules | 46 CPU + 42 GPU, 912 tests (833 barracuda + 47 forge + 32 integration/doc) |
 | Write phase | 0 local WGSL (fully lean) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
 | Paper queue | **ALL DONE** — 52/52 reproducible papers complete (Tracks 1-4 + Phase 37 extensions + cross-spring) |
@@ -42,7 +42,7 @@ Every paper in the queue goes through the full evolution path. Status:
 | **BarraCuda CPU** | Pure Rust math matches Python | 1,476 checks, 380/380 cross-domain parity (v1–v8) |
 | **BarraCuda GPU** | GPU produces same answer as CPU | 1,578 checks, 29 GPU domains |
 | **Pure GPU streaming** | Zero CPU round-trips, data stays on-device | 152 checks, 10+ domains, 441-837× over round-trip (Exp090/105/106) |
-| **metalForge mixed** | Same answer on CPU, GPU, NPU — substrate-independent | 37 domains, 25/25 papers three-tier (Exp103/104) |
+| **metalForge mixed** | Same answer on CPU, GPU, NPU — substrate-independent | 37 domains, 39/39 papers three-tier (Exp103/104/165/182) |
 
 **Pure GPU promotion complete** — all 13 formerly CPU-only modules now have GPU
 wrappers (Exp101). Papers 9, 10, 18, 26, 27 are no longer CPU-only. The only
@@ -126,7 +126,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 
 | Document | Location | Description |
 |----------|----------|-------------|
-| CONTROL_EXPERIMENT_STATUS.md | `../` | 183 experiments, 4,494+ validation checks, 906 tests |
+| CONTROL_EXPERIMENT_STATUS.md | `../` | 183 experiments, 4,494+ validation checks, 912 tests |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
 | Handoff (V54) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V54_CODEBASE_AUDIT_HANDOFF_FEB26_2026.md` | Current ToadStool handoff |

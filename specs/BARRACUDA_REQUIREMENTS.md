@@ -1,13 +1,13 @@
 # wetSpring — BarraCuda Requirements
 
-**Last Updated**: February 26, 2026 (V53 ToadStool S66, pin `045103a7`, 79 primitives)
+**Last Updated**: February 26, 2026 (V55 ToadStool S66, pin `045103a7`, 79 primitives)
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---
 
 ## Current Kernel Usage (Validated)
 
-### Rust CPU Modules (47 modules, 823 tests, 96.78% library coverage, V53 S66 rewire)
+### Rust CPU Modules (47 modules, 833 barracuda tests, 96.67% llvm-cov, V55 S66 rewire)
 
 | Module Domain | Modules | Status |
 |--------------|---------|--------|

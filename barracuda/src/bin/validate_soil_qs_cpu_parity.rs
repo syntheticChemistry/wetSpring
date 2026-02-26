@@ -10,6 +10,7 @@
     clippy::too_many_lines,
     clippy::items_after_statements,
     clippy::similar_names,
+    clippy::many_single_char_names,
     dead_code
 )]
 //! # Exp179: Track 4 CPU Parity Benchmark — Pure Rust Math vs Python-Equivalent
@@ -220,9 +221,11 @@ fn main() {
     let c1_300 = diversity::chao1(&comm_300);
     v.check_pass("Chao1(300) > Chao1(100)", c1_300 > c1_100);
 
-    v.check_pass(
+    v.check(
         "Observed features = richness",
-        diversity::observed_features(&comm_100) == 100.0,
+        diversity::observed_features(&comm_100),
+        100.0,
+        tolerances::EXACT,
     );
 
     let d03_us = t0.elapsed().as_micros() as f64;

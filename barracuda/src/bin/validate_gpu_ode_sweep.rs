@@ -172,11 +172,9 @@ fn validate_ode_sweep(device: &Arc<WgpuDevice>, v: &mut Validator) {
             // Polyfill pow_f64 introduces per-step drift that compounds over
             // 1000 RK4 steps. Absolute tolerance is the correct metric for
             // long-horizon ODE comparison with different FP paths.
-            v.check(
-                "ODE sweep: CPU ↔ GPU abs parity < 0.15",
-                f64::from(u8::from(max_diff < 0.15)),
-                1.0,
-                tolerances::EXACT,
+            v.check_pass(
+                "ODE sweep: CPU ↔ GPU abs parity",
+                max_diff < tolerances::ODE_GPU_SWEEP_ABS,
             );
 
             let batch0_n = gpu_finals[0];
@@ -325,11 +323,9 @@ fn validate_bifurcation(device: &Arc<WgpuDevice>, v: &mut Validator) {
             println!("    CPU max eigenvalue: {max_eigen:.6}");
             println!("    relative diff:      {rel:.4e}");
 
-            v.check(
-                "Bifurcation: GPU ≈ CPU max eigenvalue (< 5%)",
-                f64::from(u8::from(rel < 0.05)),
-                1.0,
-                tolerances::EXACT,
+            v.check_pass(
+                "Bifurcation: GPU ≈ CPU max eigenvalue",
+                rel < tolerances::GPU_EIGENVALUE_REL,
             );
 
             let all_psd = gpu_eigs.iter().all(|&e| e >= -1e-8);

@@ -1,8 +1,8 @@
 # Sub-thesis 04: Sentinels — Mechanical Wave Detection and NPU Deployment
 
-**Date:** February 24, 2026
+**Date:** February 26, 2026
 **Faculty:** Cahill (Sandia), Smallwood (Sandia), Kachkovskiy (MSU CMSE)
-**Status:** NPU deployment validated — coin-cell feasible
+**Status:** NPU deployment validated — coin-cell feasible. 4/6 communication modes subject to Anderson localization (Exp147, 152). PFAS screening pipeline complete (Exp041-042). Track 4 soil monitoring extends sentinel framework
 
 ---
 

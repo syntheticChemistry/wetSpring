@@ -93,7 +93,7 @@ impl DecodeBuffer {
     /// Returns [`Error::Base64`] for invalid base64, [`Error::Zlib`] for decompression
     /// failures, or [`Error::BinaryFormat`] for length mismatches.
     pub fn decode(&mut self, encoded: &str, is_zlib: bool, is_64bit: bool) -> Result<Vec<f64>> {
-        let bytes = base64_decode(encoded.trim()).map_err(Error::Base64)?;
+        let bytes = base64_decode(encoded.trim())?;
 
         let decompressed: &[u8] = if is_zlib {
             self.decompressed.clear();

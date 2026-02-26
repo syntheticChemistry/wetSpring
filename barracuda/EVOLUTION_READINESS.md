@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** February 26, 2026 (V54 codebase audit + supply-chain audit)
+**Date:** February 26, 2026 (V56 science extension pipeline + primal integration)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules (all lean, 0 local WGSL, 0 local derivative/regression math), 79 ToadStool primitives consumed (barracuda always-on, zero fallback code), 906 tests (827 barracuda + 47 forge + 32 integration/doc), 96.78% library coverage, 183 experiments, 4,494+ checks (1,578 GPU on RTX 4070), ToadStool S66 aligned (`045103a7`), 77 named tolerance constants, 0 ad-hoc tolerances, 0 Passthrough, 0 debt, 0 duplicate math. 9/9 P0-P3 evolution requests delivered. **V52 S66 rewire:** `hill()`, `fit_heaps_law`, `compute_ci` delegated to upstream `barracuda::stats`. **V51 GPU validation:** 1,578 GPU checks verified on physical hardware (RTX 4070).
+**Status:** 47 CPU + 42 GPU modules (all lean, 0 local WGSL, 0 local derivative/regression math), 79 ToadStool primitives consumed (barracuda always-on, zero fallback code), 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% library coverage, 188 experiments, 4,494+ checks (1,578 GPU on RTX 4070), ToadStool S66 aligned (`045103a7`), 82 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V55:** encoding.rs evolved to typed errors, validate\_gpu\_diversity\_fusion migrated to Validator framework, ncbi/http whitespace-only cmd bug fixed, PfasFragments provenance added, 2 new named tolerances (ODE\_GPU\_SWEEP\_ABS, GPU\_EIGENVALUE\_REL). **V56:** NCBI EFetch/SRA/NestGate modules, SHA-256 cache integrity, GPU Anderson L=14-20 binary, 3 new tolerances, biomeOS science graph.
 
 ### Full Lean Phase
 
@@ -79,7 +79,7 @@ All GPU bio modules are now either Lean (upstream primitive) or Compose
 
 All modules pass `clippy::pedantic` + `clippy::nursery` (0 warnings, `-D` enforced
 in CI), `cargo fmt` (0 diffs), `cargo doc` (0 warnings with and without `--all-features`).
-All tolerances centralized in `tolerances.rs` (77 named constants — includes
+All tolerances centralized in `tolerances.rs` (79 named constants — includes
 Jacobi eigendecomposition (Golub & Van Loan), ESN regularisation (Jaeger 2001/
 Lukoševičius 2012), Chao1 count detection (skbio parity), and 8 V39 audit
 additions: rarefaction, PCoA, KMD, HMM, Gillespie, asari). NMF convergence

@@ -8,21 +8,22 @@
     clippy::cast_sign_loss,
     clippy::cast_possible_wrap,
     clippy::too_many_lines,
-    clippy::similar_names
+    clippy::similar_names,
+    clippy::many_single_char_names
 )]
-//! Exp183 — Cross-Spring Evolution Benchmark (ToadStool S65)
+//! Exp183 — Cross-Spring Evolution Benchmark (`ToadStool` S65)
 //!
 //! Comprehensive benchmark of wetSpring's fully-lean stack after the V48
-//! rewire to ToadStool S65. Validates every delegation chain and benchmarks
+//! rewire to `ToadStool` S65. Validates every delegation chain and benchmarks
 //! each cross-spring primitive with provenance narrative.
 //!
 //! Covers:
-//! 1. GPU ODE (5 systems) — wetSpring bio → ToadStool BatchedOdeRK4
-//! 2. GPU DiversityFusion — wetSpring Write → ToadStool S63 absorption
-//! 3. CPU diversity delegation — wetSpring → barracuda::stats::diversity (S64)
-//! 4. CPU math delegation — wetSpring → barracuda::stats::{dot, l2_norm} (S64)
-//! 5. GEMM pipeline — wetSpring GemmCached → ToadStool GemmF64
-//! 6. Anderson spectral — hotSpring → ToadStool → wetSpring
+//! 1. GPU ODE (5 systems) — wetSpring bio → `ToadStool` `BatchedOdeRK4`
+//! 2. GPU `DiversityFusion` — wetSpring Write → `ToadStool` S63 absorption
+//! 3. CPU diversity delegation — wetSpring → `barracuda::stats::diversity` (S64)
+//! 4. CPU math delegation — wetSpring → `barracuda::stats::{dot, l2_norm}` (S64)
+//! 5. GEMM pipeline — wetSpring `GemmCached` → `ToadStool` `GemmF64`
+//! 6. Anderson spectral — `hotSpring` → `ToadStool` → wetSpring
 //! 7. Cross-spring primitive inventory + timing
 
 use std::sync::Arc;
@@ -33,6 +34,7 @@ use wetspring_barracuda::bio::bistable_gpu::{BistableGpu, N_VARS as BIST_VARS};
 use wetspring_barracuda::bio::capacitor_gpu::{CapacitorGpu, CapacitorOdeConfig};
 use wetspring_barracuda::bio::cooperation::CooperationParams;
 use wetspring_barracuda::bio::cooperation_gpu::{CooperationGpu, CooperationOdeConfig};
+use wetspring_barracuda::bio::gemm_cached::GemmCached;
 use wetspring_barracuda::bio::multi_signal_gpu::{MultiSignalGpu, MultiSignalOdeConfig};
 use wetspring_barracuda::bio::phage_defense::PhageDefenseParams;
 use wetspring_barracuda::bio::phage_defense_gpu::{PhageDefenseGpu, PhageDefenseOdeConfig};
@@ -392,7 +394,7 @@ fn main() {
         .all(|(a, b)| (a - b).abs() <= tolerances::EXACT);
     v.check_pass("bray_curtis_condensed delegation parity", bc_cond_parity);
 
-    let depths: Vec<f64> = (1..=50).map(|d| d as f64).collect();
+    let depths: Vec<f64> = (1..=50).map(f64::from).collect();
     let (rare_local, _) = bench("rarefaction_curve (→ barracuda::stats)", || {
         wetspring_barracuda::bio::diversity::rarefaction_curve(&community, &depths)
     });
@@ -421,8 +423,8 @@ fn main() {
 
     v.section("§4 CPU Math: special::{dot,l2_norm} → stats::metrics (S64)");
 
-    let vec_a: Vec<f64> = (0..1000).map(|i| (i as f64) * 0.001).collect();
-    let vec_b: Vec<f64> = (0..1000).map(|i| 1.0 - (i as f64) * 0.001).collect();
+    let vec_a: Vec<f64> = (0..1000).map(|i| f64::from(i) * 0.001).collect();
+    let vec_b: Vec<f64> = (0..1000).map(|i| 1.0 - f64::from(i) * 0.001).collect();
 
     let (dot_local, dot_ms) = bench("special::dot (→ barracuda::stats::dot)", || {
         wetspring_barracuda::special::dot(&vec_a, &vec_b)
@@ -533,8 +535,6 @@ fn main() {
 
     v.section("§6 GEMM Pipeline: wetSpring → ToadStool GemmF64 (S62 BGL)");
 
-    use wetspring_barracuda::bio::gemm_cached::GemmCached;
-
     let (_, gemm_setup_ms) = bench("GemmCached pipeline compile", || {
         GemmCached::new(Arc::clone(&device), Arc::clone(&ctx))
     });
@@ -615,12 +615,12 @@ fn main() {
             ms: anderson_ms,
         });
 
-        let midpoint = (barracuda::spectral::GOE_R + barracuda::spectral::POISSON_R) / 2.0;
+        let midpoint = f64::midpoint(barracuda::spectral::GOE_R, barracuda::spectral::POISSON_R);
         let (find_wc_res, find_wc_ms) = bench("anderson_sweep + find_w_c(L=6)", || {
             let sweep = barracuda::spectral::anderson_sweep_averaged(6, 1.0, 30.0, 5, 2, 42);
             barracuda::spectral::find_w_c(&sweep, midpoint)
         });
-        let wc_ok = find_wc_res.map_or(false, |w| w.is_finite() && w > 0.0);
+        let wc_ok = find_wc_res.is_some_and(|w| w.is_finite() && w > 0.0);
         v.check_pass(
             "find_w_c: W_c > 0 (or None if no crossing)",
             wc_ok || find_wc_res.is_none(),

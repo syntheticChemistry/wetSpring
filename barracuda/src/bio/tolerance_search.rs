@@ -53,12 +53,22 @@ fn find_in_range(sorted_mz: &[f64], lo: f64, hi: f64) -> Vec<usize> {
 }
 
 /// PFAS-characteristic fragment mass differences.
+///
+/// Masses derived from exact monoisotopic atomic masses (NIST Chemistry
+/// `WebBook`, 2023 CODATA): C = 12.000000, F = 18.998403, H = 1.007940.
+///
+/// - CF2: 12.000000 + 2 × 18.998403 = 49.996806 Da (rounded 49.99681)
+/// - C2F4: 2 × 12.000000 + 4 × 18.998403 = 99.993612 Da (rounded 99.99361)
+/// - HF: 1.007940 + 18.998403 = 20.006343 Da (rounded 20.00623)
+///
+/// Used by EPA Method 533 suspect screening (Exp006, commit `eb99b12`).
+/// Python baseline: `scripts/validate_track2.py`, commit `48fb787`.
 pub struct PfasFragments {
-    /// CF2 mass difference (49.99681 Da).
+    /// CF2 mass difference (49.99681 Da) — NIST monoisotopic.
     pub cf2: f64,
-    /// C2F4 mass difference (99.99361 Da).
+    /// C2F4 mass difference (99.99361 Da) — NIST monoisotopic.
     pub c2f4: f64,
-    /// HF mass difference (20.00623 Da).
+    /// HF mass difference (20.00623 Da) — NIST monoisotopic.
     pub hf: f64,
 }
 

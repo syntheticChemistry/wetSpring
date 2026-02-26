@@ -8,6 +8,7 @@
     clippy::cast_possible_wrap,
     clippy::too_many_lines,
     clippy::collection_is_never_read,
+    clippy::many_single_char_names,
     dead_code
 )]
 //! # Exp169: Modern Cross-Spring Evolution Benchmark

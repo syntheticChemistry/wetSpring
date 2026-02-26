@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 26, 2026
-**Status:** Phase 54 — 183 experiments, 4,494+ validation checks (1,578 GPU on RTX 4070), all PASS (827 barracuda + 47 forge + 32 integration/doc = 906 Rust tests), ToadStool S66 aligned (045103a7), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 77 named tolerances, 0 ad-hoc tolerances, 9/9 P0-P3 delivered, V54 codebase audit + supply-chain audit, 39/39 three-tier
+**Status:** Phase 56 — 188 experiments, 4,494+ validation checks (1,578 GPU on RTX 4070), all PASS (882 barracuda + 47 forge + 32 integration/doc = 961 Rust tests), ToadStool S66 aligned (045103a7), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 82 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets), V56 science extension pipeline + primal integration, 39/39 three-tier
 
 ---
 
@@ -226,10 +226,10 @@
 | Drug repurposing: CPU v9, GPU, metalForge (Exp163-165) | 44 |
 | Phase 44: modern systems S62+DF64, diversity fusion (Exp166-167) | 37 |
 | **Total validation checks** | **4,494+** |
-| Rust tests | 906 (827 barracuda + 47 forge + 32 integration/doc) |
+| Rust tests | 912 (833 barracuda + 47 forge + 32 integration/doc) |
 | BarraCuda CPU parity | 380/380 (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/092/101) |
-| metalForge cross-system | 37 domains CPU↔GPU proven (Exp103+104+165), **30/30 papers three-tier** |
+| metalForge cross-system | 37 domains CPU↔GPU proven (Exp103+104+165+182), **39/39 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | ToadStool primitives consumed | 79 (barracuda always-on, zero fallback — S66) |
 | ToadStool session alignment | S66 (660+ WGSL, cpu-math gate, PeakDetect, TransE, SpMM, NMF, ODE bio, ridge, Anderson, diversity_fusion) |
@@ -355,11 +355,11 @@ cargo doc --features gpu       → clean (0 warnings, strict: -D missing_docs -D
 cargo test --lib               → 755 passed, 0 failed, 1 ignored (hardware-dependent)
 cargo test --tests             → 60 integration (23 bio + 16 determinism + 21 I/O)
 cargo test --doc               → 19 passed, 0 failed (5 API examples)
-cargo llvm-cov --lib           → 96.78% line coverage
+cargo llvm-cov --lib           → 96.67% line coverage
 #![deny(unsafe_code)]          → enforced crate-wide (edition 2024; env-var tests use Mutex-serialized helpers)
 #![deny(expect_used, unwrap_used)] → enforced crate-wide (test modules #[allow])
 partial_cmp().unwrap()         → 0 (all migrated to f64::total_cmp)
-inline tolerance literals      → 0 (77 named constants in tolerances.rs; V39 added 8)
+inline tolerance literals      → 0 (79 named constants in tolerances.rs; V55 added 2)
 blanket similar_names          → removed; targeted #[allow] per-function where domain-appropriate
 GPU workgroup sizes            → named constants in all *_gpu.rs (match WGSL shaders)
 shared math (crate::special)   → delegates to barracuda::special when gpu active; sovereign otherwise

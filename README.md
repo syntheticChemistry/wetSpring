@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** February 26, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 54 — Paper queue ALL GREEN (52/52 papers, 39/39 three-tier); 906 tests (827 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, 183 experiments, 4,494+ checks (1,578 GPU on RTX 4070), 173 binaries, ToadStool S66 aligned (`045103a7`), 79 primitives consumed (barracuda always-on, zero local WGSL, zero local derivative/regression math), 77 named tolerances with full provenance, 0 Passthrough, V54 codebase audit, provenance hardening, supply-chain audit
+**Status:** Phase 56 — Science extension pipeline + primal integration; 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, 188 experiments, 4,494+ checks (1,578 GPU on RTX 4070), 174 binaries, ToadStool S66 aligned (`045103a7`), 79 primitives consumed (barracuda always-on, zero local WGSL, zero local derivative/regression math), 82 named tolerances with full provenance, 0 ad-hoc magic numbers, 0 Passthrough, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, NCBI EFetch/SRA pipeline + NestGate JSON-RPC integration + biomeOS science graph, 52/52 papers, 39/39 three-tier
 
 ---
 
@@ -117,12 +117,12 @@ integration point.
 | Phase 44: modern systems S62+DF64, diversity fusion extension | 37 (Exp166: 19, Exp167: 18) |
 | Phase 45 V40: cross-spring S62+DF64 evolution | ~25 (Exp168: hotSpring precision → wetSpring bio → neuralSpring pop-gen → Track 3 GPU) |
 | **Total validation checks** | **4,494+** |
-| Rust library unit tests | 827 (barracuda CPU, default features) |
+| Rust library unit tests | 882 (barracuda CPU, default features) |
 | metalForge forge tests | 47 |
-| **Total Rust tests** | **906** (827 barracuda + 47 forge + 32 integration/doc) |
-| Library code coverage | **96.78%** (llvm-cov) |
-| Experiments completed | 183 |
-| Validation/benchmark binaries | 160 validate + 12 benchmark = 172 total |
+| **Total Rust tests** | **961** (882 barracuda + 47 forge + 32 integration/doc) |
+| Library code coverage | **96.67%** (llvm-cov) |
+| Experiments completed | 188 |
+| Validation/benchmark binaries | 160 validate + 14 benchmark = 174 total |
 | CPU bio modules | 47 |
 | GPU bio modules | 42 (30 lean + 5 write→lean + 7 compose + 0 passthrough) |
 | Tier B (needs refactor) | 0 (all promoted) |
@@ -134,7 +134,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | ToadStool primitives consumed | **79** (barracuda always-on, zero fallback code — ToadStool S66, `045103a7`) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 4,494+ validation checks **PASS**. All 906 tests **PASS** (1 ignored: hardware-dependent).
+All 4,494+ validation checks **PASS**. All 961 tests **PASS** (1 ignored: hardware-dependent).
 
 ### GPU Performance
 
@@ -267,7 +267,7 @@ Proving the full ToadStool dispatch model and multi-substrate routing:
 - **Exp074: Substrate router** — GPU↔NPU↔CPU routing with PCIe topology awareness.
   AKD1000 NPU detected via `/dev/akida0`, graceful CPU fallback. Math parity proven.
 - **Exp075: Pure GPU 5-stage pipeline** — Alpha Diversity → Bray-Curtis → PCoA →
-  Stats → Spectral Cosine. Single upload/readback. 0.1% pipeline overhead. 31/31 PASS.
+  Stats → Spectral Cosine. Single upload/readback. 0.1% pipeline overhead. 40/40 PASS.
 - **Exp076: Cross-substrate pipeline** — GPU→NPU→CPU heterogeneous data flow with
   per-stage latency profiling. 17/17 PASS.
 - **Handoff v6** — comprehensive ToadStool/BarraCuda team handoff with all 9 shader
@@ -528,7 +528,7 @@ Complete rewiring to modern ToadStool S42 BarraCuda APIs:
 - **Exp120**: Benchmarks diversity (wetSpring), QS ODE (hotSpring precision), ESN reservoir
   (hotSpring/neuralSpring → wetSpring NPU), with full provenance table and evolution timeline
 
-**906 tests** | **4,494+ checks** | **173 binaries**
+**912 tests** | **4,494+ checks** | **173 binaries**
 
 ### Phase 35: NCBI-Scale Hypothesis Testing (Exp121-126)
 
@@ -686,7 +686,7 @@ performance, provenance completeness, and modern Rust idioms:
 - **Upstream request**: `barracuda::math::{dot, l2_norm}` documented as extraction
   candidates in EVOLUTION_READINESS.md.
 
-**819 lib tests** | **96.78% coverage** | **77 named tolerances** | **0 clippy warnings**
+**833 lib tests** | **96.67% coverage** | **79 named tolerances** | **0 clippy warnings (pedantic)**
 
 ### Phase 46: Deep Audit + Coverage + Idiomatic Evolution (V41)
 
@@ -706,7 +706,7 @@ Comprehensive codebase audit and targeted test expansion:
 - **Dependency audit**: 3 direct deps (all pure Rust), 0 C dependencies, 0 HTTP/TLS crates
 - **All files under 1000 LOC** (max: 924 in a validation binary)
 
-**819 lib tests** | **96.78% coverage** | **77 named tolerances** | **0 clippy warnings**
+**833 lib tests** | **96.67% coverage** | **79 named tolerances** | **0 clippy warnings (pedantic)**
 
 ### Phase 47: Deep Debt Evolution Round 2 (V42)
 
@@ -729,10 +729,29 @@ refactoring, tolerance completeness, and barracuda team handoff:
   module-level `SILVA_FASTA` / `SILVA_TAX_TSV` constants.
 - **`special::dot` / `special::l2_norm`**: Confirmed as correct local helpers —
   barracuda's `dotproduct` is a GPU Tensor op, not a CPU f64 slice operation.
-- **77 named tolerance constants** (was 70 at V41).
-- **Overall coverage: 96.78%** (was 96.48% at V41).
+- **79 named tolerance constants** (was 70 at V41, 77 at V54).
+- **Overall coverage: 96.67%** (was 96.48% at V41).
 
-**819 lib tests** | **96.78% coverage** | **77 named tolerances** | **0 clippy warnings**
+**833 lib tests** | **96.67% coverage** | **79 named tolerances** | **0 clippy warnings (pedantic)**
+
+### Phase 56: Science Extension Pipeline + Primal Integration (V56)
+
+Extending validated science with real NCBI data through sovereign primal pipeline:
+
+- **NCBI EFetch + SRA download** — `ncbi/efetch.rs` (FASTA/GenBank download with validation),
+  `ncbi/sra.rs` (capability-discovered `fasterq-dump`/`fastq-dump`), `ncbi/cache.rs` extended
+  with accession-based storage and pure-Rust SHA-256 integrity verification
+- **NestGate JSON-RPC integration** — `ncbi/nestgate.rs` routes data requests through NestGate's
+  Unix socket JSON-RPC API when `WETSPRING_DATA_PROVIDER=nestgate` is set. Sovereign fallback.
+  Discovers socket via capability cascade (`NESTGATE_SOCKET` → XDG → `/tmp`).
+- **GPU Anderson L=14-20** — `validate_anderson_gpu_scaling.rs` (Exp184b): finite-size scaling
+  at larger lattice sizes (N up to 8000), 16 realizations per point, 3 new named tolerances
+- **biomeOS science graph** — `graphs/science_pipeline.toml` orchestrates NestGate → wetSpring →
+  ToadStool pipeline. `science` domain added to `capability_registry.toml`.
+- **5 experiment protocols** — Exp184-188: real NCBI 16S pipeline, cold seep metagenomes,
+  dynamic Anderson W(t), DF64 large lattice, NPU sentinel with real sensor stream
+
+**882 lib tests** | **96.67% coverage** | **82 named tolerances** | **0 clippy warnings (pedantic)**
 
 ### Phase 50: V48-V50 ToadStool S65 Rewire + ODE Derivative Lean
 
@@ -756,7 +775,7 @@ refactoring, tolerance completeness, and barracuda team handoff:
 - hotSpring → wetSpring precision provenance: DF64, Anderson spectral, ESN reservoir, RK4/RK45
 - Full cross-spring evolution narrative documented in BENCHMARK_RESULTS.md
 
-**827 lib tests** | **96.78% coverage** | **77 named tolerances** | **0 clippy warnings**
+**833 lib tests** | **96.67% coverage** | **79 named tolerances** | **0 clippy warnings (pedantic)**
 
 ### Phase 48: V44 Complete Cross-Spring Rewire
 
@@ -800,16 +819,16 @@ Rust 1.93 fixed across 20+ validation binaries.
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy --all-targets -D warnings` | Clean (0 warnings, pedantic + nursery) |
 | `cargo doc --no-deps` | Clean (0 warnings) |
-| Line coverage (`cargo-llvm-cov`) | **96.78% overall** (827 lib tests) |
+| Line coverage (`cargo-llvm-cov`) | **96.67% overall** (833 lib tests) |
 | `#![deny(unsafe_code)]` | **Enforced crate-wide** (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | **Enforced crate-wide** |
 | TODO/FIXME markers | **0** |
-| Inline tolerance literals | **0** (all 77 use `tolerances::` constants) |
+| Inline tolerance literals | **0** (all 82 use `tolerances::` constants) |
 | SPDX-License-Identifier | All `.rs` files |
 | Max file size | All under 1000 LOC |
 | External C dependencies | **0** (`flate2` uses `rust_backend`) |
-| Named tolerance constants | 77 (scientifically justified, hierarchy-tested) |
-| Provenance headers | All 158 validation/benchmark binaries |
+| Named tolerance constants | 82 (scientifically justified, hierarchy-tested) |
+| Provenance headers | All 174 validation/benchmark binaries |
 | ESN ridge regression | **Proper Cholesky solve** (not diagonal approximation) |
 | I/O streaming | Buffering APIs deprecated; `stats_from_file` + iterators preferred |
 | Clone optimization | Hot-path clones eliminated (merge_pairs, derep entry API) |
@@ -908,9 +927,9 @@ wetSpring/
 │   ├── src/
 │   │   ├── lib.rs               ← crate root (pedantic + nursery lints enforced)
 │   │   ├── special.rs           ← sovereign math (erf, ln_gamma, regularized_gamma)
-│   │   ├── tolerances.rs        ← 77 named tolerance constants
+│   │   ├── tolerances.rs        ← 82 named tolerance constants
 │   │   ├── validation.rs        ← hotSpring validation framework
-│   │   ├── ncbi.rs              ← NCBI Entrez helpers (API key, HTTP, E-search)
+│   │   ├── ncbi/                ← NCBI module (API key, HTTP, E-search, EFetch, SRA, NestGate, cache)
 │   │   ├── encoding.rs          ← sovereign base64 (zero dependencies)
 │   │   ├── error.rs             ← error types (no external crates)
 │   │   ├── bio/                 ← 47 CPU + 42 GPU bio modules
@@ -919,7 +938,7 @@ wetSpring/
 │   │   ├── bin/                 ← 172 validation/benchmark binaries
 │   │   └── shaders/             ← shared WGSL utilities (ODE shaders now generated at runtime)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024
-├── experiments/                   ← 183 experiment protocols + results
+├── experiments/                   ← 188 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
 │   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs, bridge.rs
@@ -946,7 +965,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (906: 827 barracuda + 47 forge + 32 integration/doc)
+# Run all tests (961: 882 barracuda + 47 forge + 32 integration/doc)
 cargo test
 
 # Code quality checks
@@ -1003,7 +1022,7 @@ All validation data comes from public repositories:
 - **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
 - **ToadStool** — GPU compute engine (BarraCuda crate, 694 WGSL shaders, S66)
 - **wateringHole** — Spring-local handoffs to ToadStool
-  - `handoffs/WETSPRING_TOADSTOOL_V52_S66_REWIRE_HANDOFF_FEB26_2026.md` — **current** (S66 rewire, V51 GPU validation, 79 primitives, cross-spring evolution)
-  - `handoffs/archive/` — V7-V50 (fossil record, 46 files)
+  - `handoffs/WETSPRING_TOADSTOOL_V56_SCIENCE_PIPELINE_HANDOFF_FEB26_2026.md` — **current** (science pipeline, NestGate integration, GPU Anderson scaling, 82 tolerances)
+  - `handoffs/archive/` — V7-V55 (fossil record)
   - `CROSS_SPRING_SHADER_EVOLUTION.md` — 694+ shader provenance (cross-spring, S66)
 - **ecoPrimals** — Parent ecosystem

@@ -235,6 +235,51 @@ pub const ODE_GPU_PARITY: f64 = 1e-6;
 /// integrator residual. 0.05 accommodates the numerical floor.
 pub const ODE_NEAR_ZERO: f64 = 0.05;
 
+/// GPU ODE sweep absolute parity: max `|CPU - GPU|` over long-horizon
+/// integration (1000+ RK4 steps, 128 parameter batches).
+///
+/// After 1000 steps of RK4 at dt = 0.001, the GPU f64 and CPU f64
+/// integrators diverge by up to 0.12 absolute in species concentrations
+/// due to instruction reordering and FMA differences. 0.15 covers the
+/// worst observed case with 20% margin.
+/// Validated: Exp049 (GPU ODE sweep), commit `e4358c5`.
+pub const ODE_GPU_SWEEP_ABS: f64 = 0.15;
+
+/// GPU bifurcation eigenvalue relative parity (Jacobian eigenvalues).
+///
+/// Jacobi eigendecomposition on GPU vs CPU yields eigenvalues that
+/// differ by up to 3% in relative terms for near-zero eigenvalues
+/// of the ODE Jacobian. 5% covers the worst observed case.
+/// Validated: Exp050 (bifurcation eigenvalue), commit `e4358c5`.
+pub const GPU_EIGENVALUE_REL: f64 = 0.05;
+
+/// GPU Lanczos eigenvalue absolute parity (individual eigenvalues).
+///
+/// GPU Lanczos tridiagonalization followed by QR eigendecomposition
+/// on large Anderson lattices (L ≥ 14, N = L³ ≥ 2744) produces
+/// eigenvalues that differ from CPU reference by up to 0.02 absolute
+/// due to `SpMV` summation order differences on GPU. 0.03 covers the
+/// worst observed case with 50% margin.
+/// Validated: Exp184b (GPU Anderson finite-size scaling), planned.
+pub const GPU_LANCZOS_EIGENVALUE_ABS: f64 = 0.03;
+
+/// Finite-size scaling `W_c` relative tolerance across lattice sizes.
+///
+/// The critical disorder `W_c` estimated from level spacing ratio
+/// crossing points varies by up to 5% across lattice sizes L = 6–20
+/// due to finite-size corrections. 8% covers the largest expected
+/// deviation at L = 6 with margin.
+/// Validated: Exp150 (L=6–12), Exp184b (L=14–20).
+pub const FINITE_SIZE_SCALING_REL: f64 = 0.08;
+
+/// Level spacing ratio ⟨r⟩ standard error tolerance for disorder averaging.
+///
+/// With 8 disorder realizations per (L, W) point, the standard error of
+/// ⟨r⟩ should be below 0.015 (well-sampled regime). Values above this
+/// indicate insufficient averaging or a phase boundary artifact.
+/// Validated: Exp150 (8 realizations), Exp184b (16 realizations).
+pub const LEVEL_SPACING_STDERR_MAX: f64 = 0.015;
+
 /// Relative tolerance for near-zero ODE variables (GPU vs CPU).
 ///
 /// When ODE variables are near zero (repressed pathways, depleted species),
@@ -745,6 +790,11 @@ mod tests {
             ODE_METHOD_PARITY,
             ODE_GPU_PARITY,
             ODE_NEAR_ZERO,
+            ODE_GPU_SWEEP_ABS,
+            GPU_EIGENVALUE_REL,
+            GPU_LANCZOS_EIGENVALUE_ABS,
+            FINITE_SIZE_SCALING_REL,
+            LEVEL_SPACING_STDERR_MAX,
             ODE_NEAR_ZERO_RELATIVE,
             PHYLO_LIKELIHOOD,
             JC69_PROBABILITY,

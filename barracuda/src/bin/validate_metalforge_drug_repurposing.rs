@@ -6,7 +6,8 @@
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
     clippy::cast_sign_loss,
-    clippy::similar_names
+    clippy::similar_names,
+    clippy::items_after_statements
 )]
 //! Exp165: metalForge Drug Repurposing — CPU vs GPU Cross-Substrate Parity
 //!

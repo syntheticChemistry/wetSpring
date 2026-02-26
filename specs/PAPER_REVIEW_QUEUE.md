@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: February 26, 2026 (Phase 54 V54 — 906 tests, 96.78% llvm-cov, ToadStool S66 (`045103a7`), 79 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 77 named tolerances, 0 Passthrough, 52 papers, V54 codebase audit + supply-chain audit)
+**Last Updated**: February 26, 2026 (Phase 56 V56 — 961 tests, 96.67% llvm-cov, ToadStool S66 (`045103a7`), 79 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 82 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, 52 papers, V56 science extension pipeline)
 **Purpose**: Track papers for reproduction/review across three tracks
 
 ---
@@ -286,15 +286,15 @@ Core finding: **no prior work applies Anderson localization to QS signaling**.
 | Track 1b (Phylogenetics) | 5 | 5/5 | 5/5 | 5/5 | Full three-tier |
 | Track 1c (Metagenomics) | 6 | 6/6 | 6/6 | 6/6 | Full three-tier |
 | Track 2 (PFAS/LC-MS) | 4 | 4/4 | 4/4 | 4/4 | Full three-tier |
-| **Subtotal (actionable)** | **25** | **25/25** | **25/25** | **25/25** | **ALL three-tier** |
 | Track 3 (Drug repurposing) | 5 | 5/5 | 5/5 | 5/5 | Full three-tier (Exp163-165) |
 | Track 4 (Soil QS/Anderson) | 9 | 9/9 | 9/9 | 9/9 | Full three-tier (Exp170-182) |
+| **Subtotal (three-tier)** | **39** | **39/39** | **39/39** | **39/39** | **ALL three-tier** |
 | Cross-spring (spectral) | 1 | 1/1 | 1/1 | — | CPU + GPU |
 | Extensions (Phase 37-39) | 9 | 9/9 | — | — | CPU only (by design — analytical/catalog) |
-| **Grand total** | **52** | **52/52** | **31/31** | **30/30** | |
+| **Grand total** | **52** | **52/52** | **40/40** | **39/39** | |
 
 **All GPU primitives upstream:** NMF (S58), TransE (S60), SpMM (S60), PeakDetect (S62), BGL helpers (S62+DF64).
-**All 30 actionable papers now have full three-tier validation** (CPU, GPU, metalForge).
+**All 39 three-tier-eligible papers now have full three-tier validation** (CPU, GPU, metalForge).
 Track 3 completed via Exp163 (CPU v9), Exp164 (GPU drug repurposing), Exp165 (metalForge).
 Track 4 completed via Exp170-178 (CPU baselines — Anderson-QS soil pore geometry, no-till
 meta-analysis, long-term tillage factorial, biofilm aggregate, structure→function, tillage microbiomes).
