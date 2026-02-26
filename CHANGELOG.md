@@ -5,6 +5,24 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V53 — Cross-Spring Evolution Benchmarks + Doc Cleanup (2026-02-26)
+
+### Benchmarked
+- 7 cross-spring evolution benchmarks on RTX 4070: PairwiseJaccard 122×, SpatialPayoff 22×, PairwiseHamming 10× GPU speedup.
+- ODE lean benchmark: upstream `integrate_cpu` 18-31% faster than local after ToadStool absorption optimization.
+- Three-tier Python → Rust CPU → GPU benchmark on RTX 4070 (Exp069).
+- Modern systems DF64 benchmark (Exp166) — 5 ODE × 128 batches, GEMM pipeline, CPU special functions.
+- Spectral cross-spring validation (Exp107) — Anderson localization, Almost-Mathieu, QS-disorder analogy, 25/25 PASS.
+
+### Cleaned
+- Root docs, specs/, metalForge/, whitePaper/baseCamp/, experiments/README — all updated to Phase 53, S66, 79 primitives.
+- Archived V48-V50 handoffs to `wateringHole/handoffs/archive/` (46 total archived files).
+- barracuda/ABSORPTION_MANIFEST.md and EVOLUTION_READINESS.md updated to V53/S66.
+
+### Added
+- `wateringHole/handoffs/WETSPRING_TOADSTOOL_V53_CROSS_SPRING_EVOLUTION_HANDOFF_FEB26_2026.md` — GPU performance data, tolerance learnings, absorption candidates, full cross-spring provenance timeline.
+- BENCHMARK_RESULTS.md: cross-spring evolution narrative (hotSpring→wetSpring→neuralSpring provenance tables, ODE lean benchmark, GPU scaling results).
+
 ## V52 — ToadStool S66 Rewire (2026-02-26)
 
 ### Rewired

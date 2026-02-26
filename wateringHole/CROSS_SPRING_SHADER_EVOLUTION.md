@@ -8,7 +8,7 @@
 ## Overview
 
 ToadStool BarraCuda is the shared GPU/NPU compute substrate for the ecoPrimals
-ecosystem. Its 608 WGSL shaders across 38 categories evolved through cross-spring contributions:
+ecosystem. Its 694 WGSL shaders across 38 categories evolved through cross-spring contributions:
 each spring (hotSpring, wetSpring, neuralSpring, airSpring) contributed
 domain-specific shaders that were absorbed into ToadStool, refined, and made
 available to all springs. This document tracks that evolution.

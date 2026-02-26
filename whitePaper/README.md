@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 26, 2026
-**Status:** Phase 50 — Validation study active — 4,494+ checks, 902 tests, 183 experiments, ToadStool S65 aligned, 66 primitives + 2 BGL + 5 ODE `cpu_derivative` + 0 local WGSL (fully lean, zero local derivative math) (barracuda always-on), 77 named tolerance constants, 0 Passthrough, V50 ODE derivative rewire, 39/39 three-tier, 52/52 papers
+**Status:** Phase 53 — Validation study active — 4,494+ checks (1,578 GPU on RTX 4070), 902 tests, 183 experiments, ToadStool S66 aligned (`045103a7`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 77 named tolerances, 0 Passthrough, V53 S66 rewire + cross-spring evolution benchmarks, 39/39 three-tier, 52/52 papers
 **License:** AGPL-3.0-or-later
 
 ---

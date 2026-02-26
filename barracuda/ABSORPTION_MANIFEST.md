@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** February 26, 2026 (V50 ToadStool S65 ODE derivative rewire)
+**Date:** February 26, 2026 (V53 ToadStool S66 cross-spring evolution)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**ToadStool pin:** `17932267` (S65 smart refactoring, Feb 25 2026)
-**Status:** 66 ToadStool primitives + 2 BGL helpers + 5 ODE `cpu_derivative` consumed (incl. 11 `stats::diversity` + 2 `stats::metrics`), 0 local WGSL (fully lean), 0 local ODE derivative math (fully delegated), 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 870 tests (823 barracuda + 47 forge), 96.78% llvm-cov, ToadStool S65 aligned, 183 experiments, 4,494+ checks. 9/9 evolution requests DONE. **V50 ODE rewire:** 5 local RHS functions replaced with `barracuda::numerical::*Ode::cpu_derivative`, eliminating ~200 lines of duplicate derivative math.
+**ToadStool pin:** `045103a7` (S66 Wave 5: multi-precision expansion, Feb 26 2026)
+**Status:** 79 ToadStool primitives consumed (incl. 11 `stats::diversity` + 2 `stats::metrics` + S66: `hill`, `monod`, `fit_linear`, `percentile`, `mean`, `shannon_from_frequencies`), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 902 tests (823 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, ToadStool S66 aligned, 183 experiments, 4,494+ checks (1,578 GPU on RTX 4070). 9/9 evolution requests DONE. **V52 S66 rewire:** `hill()` → `barracuda::stats::hill`, `fit_heaps_law` → `barracuda::stats::fit_linear`, `compute_ci` → `barracuda::stats::{mean, percentile}`. **V51 GPU validation:** 1,578 GPU checks on RTX 4070 + Titan V, tolerance refinement for chained transcendentals.
 
 ---
 
@@ -51,7 +51,7 @@ WGSL          known physics   handoffs/                        delete local
 | Validate | CPU ↔ GPU parity for all shaders | All 5 ODE: exact parity (Exp099/100/101) |
 | Hand off | wateringHole/handoffs/ documents | **V48** active (S65 rewire handoff), V7-V45 archived |
 | Absorb | ToadStool integrates as `ops::bio::*` | **66 items** absorbed (ToadStool S65: all DONE, +46 cross-spring total) |
-| Lean | Rewire to upstream, delete local code | 66 primitives + 2 BGL helpers lean, 5 `OdeSystem` trait rewires, BGL boilerplate removed, 0 Passthrough |
+| Lean | Rewire to upstream, delete local code | 79 primitives consumed (S66), 5 `OdeSystem` trait rewires, BGL boilerplate removed, 0 Passthrough |
 
 ---
 

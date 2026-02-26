@@ -2,7 +2,7 @@
 
 **Date:** February 26, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 50 — 183 experiments, 4,494+ validation checks, ALL PASS; 902 tests (823 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, ToadStool S65 aligned, 66 primitives + 2 BGL + 5 ODE `cpu_derivative` + 0 local WGSL (fully lean, zero local derivative math) (barracuda always-on), 77 named tolerance constants, 0 Passthrough, V50 ODE derivative rewire, 39/39 three-tier, 52/52 papers
+**Status:** Phase 53 — 183 experiments, 4,494+ validation checks (1,578 GPU on RTX 4070), ALL PASS; 902 tests (823 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, ToadStool S66 aligned (`045103a7`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 77 named tolerances, 0 Passthrough, V53 S66 rewire + cross-spring benchmarks, 39/39 three-tier, 52/52 papers
 
 ---
 
@@ -130,11 +130,11 @@ Every paper goes through the full evolution. Status across all 39 actionable pap
 | Exp169 | Modern cross-spring benchmark | 12 | All CPU primitives validated, 4-spring provenance, bit-exact delegation |
 
 V44 rewired 6 validation binaries to modern upstream: `find_w_c` (4 files),
-`pearson_correlation` (1 file). 66 primitives consumed. Hill CPU ODE helpers
+`pearson_correlation` (1 file). 79 primitives consumed (S66). Hill CPU ODE helpers
 intentionally kept local (derivative-level math, GPU equivalents generated
 by `BatchedOdeRK4::generate_shader()`).
 
-### Track 4: No-Till Soil QS & Anderson Geometry (Phase 50, V48)
+### Track 4: No-Till Soil QS & Anderson Geometry (Phase 53, V52)
 
 9 papers, 13 experiments, 321 validation checks. Extends the Anderson-QS framework
 into soil microbiology: pore-network geometry maps to Anderson disorder, aggregate

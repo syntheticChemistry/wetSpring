@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** February 26, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 50 — Paper queue ALL GREEN (52/52 papers, 39/39 three-tier); 902 tests (823 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, 183 experiments, 4,494+ checks, 173 binaries, ToadStool S65 aligned (`17932267`), 66 primitives + 2 BGL helpers + 5 ODE `cpu_derivative` (barracuda always-on, zero local WGSL, zero local derivative math), 77 named tolerance constants, zero ad-hoc tolerances, 0 Passthrough, V50 ODE derivative rewire + cross-spring validation
+**Status:** Phase 53 — Paper queue ALL GREEN (52/52 papers, 39/39 three-tier); 902 tests (823 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, 183 experiments, 4,494+ checks (1,578 GPU on RTX 4070), 173 binaries, ToadStool S66 aligned (`045103a7`), 79 primitives consumed (barracuda always-on, zero local WGSL, zero local derivative/regression math), 77 named tolerances, 0 Passthrough, V53 cross-spring evolution benchmarks + S66 rewire
 
 ---
 
@@ -644,7 +644,7 @@ Three parallel workstreams closing out the validation surface (104 checks, all P
 - Deprecated `parse_fastq` → streaming `FastqIter::open()` in all 3 validation binaries
 - 6 magic numbers promoted to `tolerances.rs` (62 named constants total)
 - 4 GPU test defects fixed (GBM tree data, KMD assertion, hardware-dependent ignores)
-- ToadStool S65 aligned — 66 primitives consumed (barracuda always-on, zero fallback code)
+- ToadStool S66 aligned — 79 primitives consumed (barracuda always-on, zero fallback code)
 - 759 GPU tests passing (9 ignored: hardware-dependent)
 
 ### Phase 44: Write Phase Extensions (hotSpring Pattern)
@@ -734,24 +734,27 @@ refactoring, tolerance completeness, and barracuda team handoff:
 
 **819 lib tests** | **96.78% coverage** | **77 named tolerances** | **0 clippy warnings**
 
-### Phase 50: V48 ToadStool S65 Rewire (Fully Lean)
+### Phase 50: V48-V50 ToadStool S65 Rewire + ODE Derivative Lean
 
-- Exp183: Cross-Spring Evolution Benchmark — 36/36 checks PASS (benchmark_cross_spring_s65). Covers GPU ODE (5 systems), DiversityFusion GPU, CPU diversity/math delegation, GEMM, Anderson spectral, NMF, ridge. Cross-spring provenance S39→S65.
-- ToadStool S60-S65 audit: 4 commits, sessions 60-65 (DF64 FMA, sovereign compiler, cross-spring absorption, smart refactoring)
+- Exp183: Cross-Spring Evolution Benchmark — 36/36 checks PASS. GPU ODE, DiversityFusion, CPU delegation, GEMM, Anderson spectral, NMF, ridge. Provenance S39→S65.
 - `diversity_fusion_f64.wgsl` absorbed S63 → deleted local WGSL, lean on `barracuda::ops::bio::diversity_fusion`
 - `bio::diversity` (11 functions) → delegated to `barracuda::stats::diversity` (S64)
-- `special::{dot, l2_norm}` → delegated to `barracuda::stats::{dot, l2_norm}` (S64)
-- metalForge `diversity_fusion` workload: `ShaderOrigin::Local` → `Absorbed` (28/28, 0 local)
-- Evolution request score: 9/9 DONE — all open items closed
+- 5 ODE RHS functions replaced with `barracuda::numerical::ode_bio::*Ode::cpu_derivative` (~200 lines eliminated)
 - ToadStool S65 aligned (`17932267`) — 66 primitives + 2 BGL helpers, zero local WGSL
-- 823 lib tests + 47 forge tests + 18 GPU diversity fusion checks all PASS post-rewire
 
-### Phase 50: V50 ODE Derivative Rewire
+### Phase 51-52: V51 GPU Validation + V52 ToadStool S66 Rewire
 
-- 5 ODE RHS functions replaced with `barracuda::numerical::ode_bio::*Ode::cpu_derivative`: capacitor, cooperation, multi_signal (+ c-di-GMP guard), bistable (+ c-di-GMP guard), phage_defense. ~200 lines eliminated.
-- `qs_biofilm::hill()` and `qs_biofilm::qs_rhs()` exposed as pub API; `validate_gpu_ode_sweep` rewired to library.
-- `ncbi/http.rs`: `interpret_output` takes ownership (zero-copy), `which_exists` pure Rust PATH scan.
-- 4 new `try_load_json_array` error-path tests. All 6 ODE validators PASS. Cross-spring validation PASS.
+- V51: 1,578 GPU validation checks on RTX 4070. Tolerance refinement for chained transcendentals (`GPU_LOG_POLYFILL` 1e-7). f32→f64 type fix for neuralSpring BatchFitness/LocusVariance.
+- V52: ToadStool S66 rewire — `hill()` → `barracuda::stats::hill`, `fit_heaps_law` → `barracuda::stats::fit_linear`, `compute_ci` → `barracuda::stats::{mean, percentile}`. Re-export `shannon_from_frequencies`.
+- ToadStool S66 aligned (`045103a7`) — 79 primitives consumed, zero local WGSL/derivative/regression math
+
+### Phase 53: Cross-Spring Evolution Benchmarks
+
+- 7 cross-spring benchmark/validator binaries all PASS on RTX 4070
+- PairwiseJaccard 122× GPU speedup, SpatialPayoff 22×, PairwiseHamming 10× (neuralSpring → wetSpring)
+- ODE lean 18-24% faster via upstream `integrate_cpu` after ToadStool absorption optimization
+- hotSpring → wetSpring precision provenance: DF64, Anderson spectral, ESN reservoir, RK4/RK45
+- Full cross-spring evolution narrative documented in BENCHMARK_RESULTS.md
 
 **823 lib tests** | **96.78% coverage** | **77 named tolerances** | **0 clippy warnings**
 
@@ -998,12 +1001,9 @@ All validation data comes from public repositories:
 - **hotSpring** — Nuclear/plasma physics validation (sibling Spring, precision shaders, f64 WGSL)
 - **neuralSpring** — ML/neural inference validation (sibling Spring, eigensolvers, batch IPR, TransE)
 - **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
-- **ToadStool** — GPU compute engine (BarraCuda crate, 694 WGSL shaders, S65)
+- **ToadStool** — GPU compute engine (BarraCuda crate, 694 WGSL shaders, S66)
 - **wateringHole** — Spring-local handoffs to ToadStool
-  - `handoffs/WETSPRING_TOADSTOOL_V50_ODE_DERIVATIVE_REWIRE_FEB26_2026.md` — **current** (5 ODE `cpu_derivative` rewire, zero local derivative math, cross-spring validation)
-  - `handoffs/WETSPRING_V49_EVOLUTION_LEARNINGS_HANDOFF_FEB25_2026.md` — barracuda primitive review (66+2), cross-spring timeline, lessons for Write→Absorb→Lean
-  - `handoffs/WETSPRING_TOADSTOOL_V48_S65_REWIRE_HANDOFF_FEB25_2026.md` — S65 rewire, fully lean, 66 primitives, diversity_fusion absorbed
-  - `handoffs/WETSPRING_TOADSTOOL_V47_TRACK4_EVOLUTION_HANDOFF_FEB25_2026.md` — Track 4 soil QS + Anderson geometry, 13 experiments, 321 checks
-  - `handoffs/archive/` — V7-V45 (fossil record)
-  - `CROSS_SPRING_SHADER_EVOLUTION.md` — 660+ shader provenance (cross-spring, S65)
+  - `handoffs/WETSPRING_TOADSTOOL_V52_S66_REWIRE_HANDOFF_FEB26_2026.md` — **current** (S66 rewire, V51 GPU validation, 79 primitives, cross-spring evolution)
+  - `handoffs/archive/` — V7-V50 (fossil record, 46 files)
+  - `CROSS_SPRING_SHADER_EVOLUTION.md` — 694+ shader provenance (cross-spring, S66)
 - **ecoPrimals** — Parent ecosystem

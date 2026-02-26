@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 26, 2026
-**Status:** Phase 52 — 183 experiments, 4,494+ validation checks (1,578 GPU on RTX 4070), all PASS (823 barracuda + 47 forge + 32 integration/doc = 902 Rust tests), ToadStool S66 aligned (045103a7), 79 primitives consumed (+6 S66: hill, monod, fit_linear, percentile, mean, shannon_from_frequencies), 0 local WGSL, 0 local derivative math, 0 local regression (barracuda always-on), 77 named tolerance constants, 0 ad-hoc tolerances, 9/9 P0-P3 delivered, V52 S66 rewire, 39/39 three-tier
+**Status:** Phase 53 — 183 experiments, 4,494+ validation checks (1,578 GPU on RTX 4070), all PASS (823 barracuda + 47 forge + 32 integration/doc = 902 Rust tests), ToadStool S66 aligned (045103a7), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 77 named tolerances, 0 ad-hoc tolerances, 9/9 P0-P3 delivered, V53 cross-spring evolution + doc cleanup, 39/39 three-tier
 
 ---
 
@@ -375,7 +375,7 @@ barracuda_cpu                  → 380/380 checks PASS (25 domains + 6 ODE flat 
 barracuda_gpu                  → 1,578 GPU checks PASS (70 validators, RTX 4070 + Titan V)
 fuzz harnesses                 → 4 (FASTQ, mzML, MS2, XML)
 zero-copy I/O                  → FastqRefRecord, DecodeBuffer reuse, streaming iterators
-ToadStool alignment            → S65 (66 primitives, barracuda always-on, zero fallback code)
+ToadStool alignment            → S66 (79 primitives, barracuda always-on, zero fallback code)
 deprecated APIs                → 0 (parse_fastq → FastqIter::open in all binaries)
 ```
 
@@ -430,7 +430,7 @@ Following hotSpring's pattern for ToadStool integration:
 
 | Phase | Count | Status |
 |-------|:-----:|--------|
-| **Lean** (consumed upstream) | 66 primitives (always-on, zero fallback code) | S65: PeakDetectF64, TranseScoreF64, ComputeDispatch, SparseGemmF64, TopK added to 44 prior; V44: find_w_c, anderson_sweep_averaged, pearson_correlation; S63: diversity_fusion absorbed |
+| **Lean** (consumed upstream) | 79 primitives (always-on, zero fallback code) | S66: hill, monod, fit_linear, mean, percentile, shannon_from_frequencies added to 66+2+5 prior; V52 S66 rewire, V51 GPU validation (1,578 checks) |
 | **Write** (local WGSL, pending absorption) | **0** — all retired | ODE shaders use `generate_shader()`; local WGSL deleted |
 | **CPU math** (`crate::special`) | 3 functions delegating on GPU | `erf`, `ln_gamma`, `regularized_gamma_lower` → `barracuda::special::*` when `gpu` active; sovereign fallback for no-GPU |
 | **CPU-only** (no GPU path) | 1 module (phred) | Pure GPU promotion complete (Exp101) |
