@@ -187,69 +187,17 @@ impl MultiSignalParams {
     }
 }
 
-#[inline]
-fn hill(x: f64, k: f64, n: f64) -> f64 {
-    if x <= 0.0 {
-        return 0.0;
-    }
-    let xn = x.powf(n);
-    xn / (k.powf(n) + xn)
-}
+use barracuda::numerical::{MultiSignalOde, OdeSystem as _};
 
-/// Hill repression: k^n / (k^n + x^n).
-#[inline]
-fn hill_repress(x: f64, k: f64, n: f64) -> f64 {
-    if x <= 0.0 {
-        return 1.0;
-    }
-    let kn = k.powf(n);
-    kn / (kn + x.powf(n))
-}
-
-/// Right-hand side for the dual-signal QS ODE system.
-#[allow(clippy::many_single_char_names)]
-fn multi_rhs(state: &[f64], _t: f64, p: &MultiSignalParams) -> Vec<f64> {
-    let cell = state[0].max(0.0);
-    let cai1 = state[1].max(0.0);
-    let ai2 = state[2].max(0.0);
-    let luxo_p = state[3].max(0.0);
-    let hapr = state[4].max(0.0);
+/// Wraps barracuda's `MultiSignalOde::cpu_derivative` with the c-di-GMP
+/// convergence guard that prevents oscillation near zero in fixed-step RK4.
+fn multi_rhs_guarded(state: &[f64], t: f64, flat: &[f64]) -> Vec<f64> {
+    let mut dy = MultiSignalOde::cpu_derivative(t, state, flat);
     let cdg = state[5].max(0.0);
-    let bio = state[6].max(0.0);
-
-    // Growth
-    let d_cell = (p.mu_max * cell).mul_add(1.0 - cell / p.k_cap, -(p.death_rate * cell));
-
-    // Dual autoinducer production
-    let d_cai1 = p.k_cai1_prod.mul_add(cell, -p.d_cai1 * cai1);
-    let d_ai2 = p.k_ai2_prod.mul_add(cell, -p.d_ai2 * ai2);
-
-    // LuxO phosphorylation: dephosphorylated by BOTH signals
-    // Each signal independently contributes to dephosphorylation
-    let dephos_cai1 = hill(cai1, p.k_cqs, 2.0);
-    let dephos_ai2 = hill(ai2, p.k_luxpq, 2.0);
-    let total_dephos = dephos_cai1 + dephos_ai2;
-    let d_luxo_p = (p.d_luxo_p + total_dephos).mul_add(-luxo_p, p.k_luxo_phos);
-
-    // HapR: repressed by LuxO~P
-    let d_hapr = p.k_hapr_max.mul_add(
-        hill_repress(luxo_p, p.k_repress, p.n_repress),
-        -p.d_hapr * hapr,
-    );
-
-    // c-di-GMP (same as Waters 2008)
-    let dgc_rate = p.k_dgc_basal * p.k_dgc_rep.mul_add(-hapr, 1.0).max(0.0);
-    let pde_rate = p.k_pde_act.mul_add(hapr, p.k_pde_basal);
-    let mut d_cdg = p.d_cdg.mul_add(-cdg, dgc_rate - pde_rate * cdg);
-    if cdg < crate::tolerances::ODE_CDG_CONVERGENCE && d_cdg < 0.0 {
-        d_cdg = 0.0;
+    if cdg < crate::tolerances::ODE_CDG_CONVERGENCE && dy[5] < 0.0 {
+        dy[5] = 0.0;
     }
-
-    // Biofilm
-    let bio_promote = p.k_bio_max * hill(cdg, p.k_bio_cdg, p.n_bio);
-    let d_bio = bio_promote.mul_add(1.0 - bio, -(p.d_bio * bio));
-
-    vec![d_cell, d_cai1, d_ai2, d_luxo_p, d_hapr, d_cdg, d_bio]
+    dy
 }
 
 const CLAMP: [(f64, f64); 7] = [
@@ -270,8 +218,9 @@ pub fn run_multi_signal(
     dt: f64,
     params: &MultiSignalParams,
 ) -> OdeResult {
+    let flat = params.to_flat();
     rk4_integrate(
-        |y, t| multi_rhs(y, t, params),
+        |y, t| multi_rhs_guarded(y, t, &flat),
         y0,
         0.0,
         t_end,

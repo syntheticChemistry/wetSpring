@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
-**Last Updated**: February 25, 2026
-**Status**: Phase 50 — 3,618+/3,618+ checks, ALL PASS (898 tests, 183 experiments, ToadStool S65 aligned, 66 primitives + 2 BGL helpers + 0 local WGSL (fully lean), barracuda always-on, 77 named tolerance constants, 9/9 P0-P3 delivered, 0 Passthrough, V49 doc cleanup + evolution handoff, 39/39 three-tier, 52/52 papers, 96.78% llvm-cov)
+**Last Updated**: February 26, 2026
+**Status**: Phase 50 — 3,618+/3,618+ checks, ALL PASS (902 tests, 183 experiments, ToadStool S65 aligned, 66 primitives + 2 BGL + 5 ODE `cpu_derivative` + 0 local WGSL (fully lean, zero local derivative math), barracuda always-on, 77 named tolerance constants, 9/9 P0-P3 delivered, 0 Passthrough, V50 ODE derivative rewire, 39/39 three-tier, 52/52 papers, 96.78% llvm-cov)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -20,7 +20,7 @@
 | Cross-spring spectral | 25 checks — Anderson localization + QS-disorder analogy (Exp107) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
-| Rust modules | 46 CPU + 42 GPU, 898 tests |
+| Rust modules | 46 CPU + 42 GPU, 902 tests (823 barracuda + 47 forge + 32 integration/doc) |
 | Write phase | 0 local WGSL (fully lean) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
 | Paper queue | **ALL DONE** — 52/52 reproducible papers complete (Tracks 1-4 + Phase 37 extensions + cross-spring) |

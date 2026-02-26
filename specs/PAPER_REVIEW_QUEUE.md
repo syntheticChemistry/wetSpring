@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: February 25, 2026 (Phase 50 V48 — 898 tests, 96.78% llvm-cov, ToadStool S65 (`17932267`), 66 primitives + 2 BGL helpers + 0 local WGSL (fully lean), barracuda always-on, 77 named tolerances, 0 Passthrough, 52 papers, Track 4 soil QS complete)
+**Last Updated**: February 26, 2026 (Phase 50 V50 — 902 tests, 96.78% llvm-cov, ToadStool S65 (`17932267`), 66 primitives + 2 BGL + 5 ODE `cpu_derivative` + 0 local WGSL (fully lean, zero local derivative math), barracuda always-on, 77 named tolerances, 0 Passthrough, 52 papers, V50 ODE derivative rewire)
 **Purpose**: Track papers for reproduction/review across three tracks
 
 ---

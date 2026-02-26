@@ -263,7 +263,7 @@ pub fn capacitor_ode() -> BioWorkload {
 /// Local WGSL extension following hotSpring's absorption pattern.
 /// Computes all three diversity indices in one kernel pass, avoiding
 /// three separate `FusedMapReduceF64` dispatches.
-/// Absorbed by ToadStool S63 as `ops::bio::diversity_fusion`.
+/// Absorbed by `ToadStool` S63 as `ops::bio::diversity_fusion`.
 #[must_use]
 pub fn diversity_fusion() -> BioWorkload {
     BioWorkload::new_static(ShaderOrigin::Absorbed)
@@ -514,7 +514,10 @@ mod tests {
     #[test]
     fn origin_counts_match() {
         let (absorbed, local, cpu_only) = origin_summary();
-        assert_eq!(absorbed, 28, "28 absorbed domains (incl. 5 ODE + diversity_fusion via S63)");
+        assert_eq!(
+            absorbed, 28,
+            "28 absorbed domains (incl. 5 ODE + diversity_fusion via S63)"
+        );
         assert_eq!(local, 0, "0 local WGSL extensions (all absorbed)");
         assert_eq!(cpu_only, 1, "1 CPU-only domain");
     }

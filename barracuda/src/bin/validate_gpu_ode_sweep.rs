@@ -362,35 +362,5 @@ fn validate_bifurcation(device: &Arc<WgpuDevice>, v: &mut Validator) {
 }
 
 fn qs_rhs_wrap(state: &[f64], p: &QsBiofilmParams) -> Vec<f64> {
-    let cell = state[0].max(0.0);
-    let ai = state[1].max(0.0);
-    let hapr = state[2].max(0.0);
-    let cdg = state[3].max(0.0);
-    let bio = state[4].max(0.0);
-
-    let d_cell = (p.mu_max * cell).mul_add(1.0 - cell / p.k_cap, -(p.death_rate * cell));
-    let d_ai = p.k_ai_prod.mul_add(cell, -p.d_ai * ai);
-    let d_hapr = p
-        .k_hapr_max
-        .mul_add(hill(ai, p.k_hapr_ai, p.n_hapr), -p.d_hapr * hapr);
-
-    let dgc_rate = p.k_dgc_basal * p.k_dgc_rep.mul_add(-hapr, 1.0).max(0.0);
-    let pde_rate = p.k_pde_act.mul_add(hapr, p.k_pde_basal);
-    let mut d_cdg = p.d_cdg.mul_add(-cdg, dgc_rate - pde_rate * cdg);
-    if cdg < 1e-12 && d_cdg < 0.0 {
-        d_cdg = 0.0;
-    }
-
-    let bio_promote = p.k_bio_max * hill(cdg, p.k_bio_cdg, p.n_bio);
-    let d_bio = bio_promote.mul_add(1.0 - bio, -(p.d_bio * bio));
-
-    vec![d_cell, d_ai, d_hapr, d_cdg, d_bio]
-}
-
-fn hill(x: f64, k: f64, n: f64) -> f64 {
-    if x <= 0.0 {
-        return 0.0;
-    }
-    let xn = x.powf(n);
-    xn / (k.powf(n) + xn)
+    wetspring_barracuda::bio::qs_biofilm::qs_rhs(state, 0.0, p)
 }

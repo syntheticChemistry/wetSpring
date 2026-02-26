@@ -1,7 +1,7 @@
 # Cross-Spring Shader Evolution
 
-**Last updated**: Feb 25, 2026 — V48 ToadStool S65 rewire + Track 4 soil QS (608 WGSL shaders, DF64, 66 primitives consumed, 183 experiments, 3,618+ checks)
-**Validated by**: wetSpring Exp169 `benchmark_cross_spring_modern` (12/12 PASS), Exp166 (19/19), Exp168 (cross-spring S65), Exp170-182 (Track 4 soil QS 321 checks), V48 handoff
+**Last updated**: Feb 26, 2026 — V50 ODE derivative rewire (608 WGSL shaders, DF64, 66+5 primitives consumed, 0 local derivative math, 183 experiments, 3,618+ checks)
+**Validated by**: V50 revalidation (all 6 ODE validators PASS, Exp120 cross-spring 9/9, Exp169 modern 12/12, Exp070 CPU-full 50/50, 823 lib tests), V48 handoff
 
 ---
 
@@ -67,6 +67,8 @@ available to all springs. This document tracks that evolution.
 | Feb 25 | wetSpring V43 | ToadStool catch-up review: ABSORPTION_TRACKER 46/46 DONE, `normal_cdf` → upstream (50th primitive), 8/9 P0-P3, V40-V42 items documented for ToadStool tracker | wetSpring leans on ToadStool |
 | Feb 25 | wetSpring V44 | Complete rewire: `find_w_c` (4 files), `anderson_sweep_averaged` (1 file), `pearson_correlation` CPU delegation, 53 primitives total | wetSpring leans on ToadStool |
 | Feb 25 | wetSpring Exp169 | Modern cross-spring evolution benchmark: 4-spring provenance map, CPU math+stats+spectral validated (12/12 PASS) | wetSpring validates |
+| Feb 26 | wetSpring V50 | **ODE derivative rewire**: 5 local RHS functions replaced with `barracuda::numerical::ode_bio::*Ode::cpu_derivative`. ~200 lines duplicate derivative math eliminated. c-di-GMP guard preserved as thin wrapper. `hill()` + `qs_rhs()` exposed as public API. Zero local derivative math remains. | wetSpring leans on ToadStool |
+| Feb 26 | wetSpring V50 | Revalidation: QS ODE 16/16, Bistable 14/14, Cooperation 20/20, Capacitor 18/18, Multi-Signal 19/19, Phage 12/12, CPU-full 50/50, cross-spring 9/9+12/12. 823 lib tests. | wetSpring validates |
 
 ---
 
@@ -113,6 +115,29 @@ neuralSpring's graph theory primitives (S54: `graph_laplacian`, `effective_rank`
 
 neuralSpring's `ValidationHarness` (S59) provides structured tolerance-aware
 validation with `check_abs`/`check_rel`/`require!` macros.
+
+### V50: ODE Derivative Lean — Completing the Full Circle
+
+The V50 rewire completes the ODE absorption cycle at the CPU derivative level.
+wetSpring originally wrote 5 biological ODE systems with local RHS functions
+(~200 lines of hill functions, Monod kinetics, multi-variable derivatives).
+ToadStool absorbed these as `barracuda::numerical::ode_bio::*Ode` (S58), adding
+both GPU WGSL generation and CPU `cpu_derivative` methods.
+
+V50 closes the loop: wetSpring now delegates derivative *computation* back to
+barracuda, keeping only the integration framework (trajectory storage, clamping,
+steady-state analysis) and a thin c-di-GMP convergence guard. The result:
+
+- **Zero local derivative math** — all ODE equations live in barracuda
+- **Single source of truth** — change a derivative in barracuda, all springs get it
+- **GPU/CPU parity** — same `cpu_derivative` logic mirrors the WGSL `deriv()` function
+- **Cross-spring benefit** — neuralSpring's evolutionary ODE, hotSpring's nuclear ODE,
+  and any future spring ODE all use the same `OdeSystem` trait infrastructure
+
+This demonstrates the full Write → Absorb → Lean → **Rewire** cycle:
+```
+wetSpring writes (v24-v25) → ToadStool absorbs (S58) → wetSpring leans (V30) → rewires CPU (V50)
+```
 
 ### S60-S62: Full CPU-math lean + new GPU primitives
 
@@ -282,7 +307,7 @@ S42 does not re-export them at the crate root.
 
 | Suite | Result | Count |
 |-------|--------|-------|
-| Library tests | PASS | 759/759 |
+| Library tests | PASS | 823/823 |
 | Integration tests | PASS | 21/21 |
 | Doc tests | PASS | 19/19 |
 | GPU feature compile | PASS | All bins + lib |

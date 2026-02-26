@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** February 25, 2026 (V48 ToadStool S65 rewire)
+**Date:** February 26, 2026 (V50 ToadStool S65 ODE derivative rewire)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
 **ToadStool pin:** `17932267` (S65 smart refactoring, Feb 25 2026)
-**Status:** 66 ToadStool primitives + 2 BGL helpers consumed (incl. 11 `stats::diversity` + 2 `stats::metrics`), 0 local WGSL (fully lean), 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 898 tests (819 barracuda + 47 forge), 96.78% llvm-cov, ToadStool S65 aligned, 183 experiments, 3,618+ checks. 9/9 evolution requests DONE.
+**Status:** 66 ToadStool primitives + 2 BGL helpers + 5 ODE `cpu_derivative` consumed (incl. 11 `stats::diversity` + 2 `stats::metrics`), 0 local WGSL (fully lean), 0 local ODE derivative math (fully delegated), 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 870 tests (823 barracuda + 47 forge), 96.78% llvm-cov, ToadStool S65 aligned, 183 experiments, 3,618+ checks. 9/9 evolution requests DONE. **V50 ODE rewire:** 5 local RHS functions replaced with `barracuda::numerical::*Ode::cpu_derivative`, eliminating ~200 lines of duplicate derivative math.
 
 ---
 
@@ -164,28 +164,41 @@ All 13 former Tier B/C modules have been promoted to GPU-capable:
 
 ---
 
-## CPU Math Extraction Candidates
+## CPU Math Extraction — COMPLETE
 
-Local Rust implementations that duplicate barracuda upstream. Pending
-`barracuda [features] math = []` for lean migration.
+All local math has been delegated to barracuda upstream:
 
 | Local Function | File | Upstream Target | Status |
 |----------------|------|-----------------|--------|
-| `erf()` | `bio/special.rs` | `barracuda::special::erf` | Shaped, FMA-optimized |
-| `ln_gamma()` | `bio/special.rs` | `barracuda::special::ln_gamma` | Lanczos, Horner form |
-| `regularized_gamma_lower()` | `bio/special.rs` | `barracuda::special::regularized_gamma_p` | Series expansion |
-| `normal_cdf()` | `bio/special.rs` | `barracuda::stats::norm_cdf` | Φ(x) = (1+erf(x/√2))/2 — **V43 rewire** |
-| `integrate_peak()` | `bio/eic.rs` | `barracuda::numerical::trapz` | Trapezoidal rule |
-| `cholesky_factor()` | `bio/esn.rs` | `barracuda::linalg::cholesky_solve` | SPD system solve (ridge regression, kriging, GP) |
-| `solve_ridge()` | `bio/esn.rs` | `barracuda::linalg::ridge_regression` | Cholesky-based ridge with flat buffer layout |
+| `erf()` | `special.rs` | `barracuda::special::erf` | ✅ Delegated |
+| `ln_gamma()` | `special.rs` | `barracuda::special::ln_gamma` | ✅ Delegated |
+| `regularized_gamma_lower()` | `special.rs` | `barracuda::special::regularized_gamma_p` | ✅ Delegated |
+| `normal_cdf()` | `special.rs` | `barracuda::stats::norm_cdf` | ✅ Delegated (V43) |
+| `dot()`, `l2_norm()` | `special.rs` | `barracuda::stats::{dot, l2_norm}` | ✅ Delegated (S64) |
+| `integrate_peak()` | `bio/eic.rs` | `barracuda::numerical::trapz` | ✅ Delegated |
+| `solve_ridge()` | `bio/esn.rs` | `barracuda::linalg::ridge_regression` | ✅ Delegated |
 
-**Status (V43):** barracuda's `default-features = false` already provides
-CPU-only access to `special`, `linalg`, `numerical`, `stats`, and `tolerances`
-modules without pulling GPU dependencies. wetSpring already uses this
-pattern (`barracuda = { default-features = false }` in Cargo.toml).
-All 7 extraction candidates are delegating to barracuda upstream.
-V43 added `normal_cdf` → `barracuda::stats::norm_cdf` delegation.
-No further migration needed — this section is **COMPLETE**.
+### ODE Derivative Delegation (V50)
+
+5 ODE system RHS functions replaced with `barracuda::numerical::ode_bio::*Ode::cpu_derivative`:
+
+| System | wetSpring File | barracuda Primitive | Guard |
+|--------|---------------|-------------------|-------|
+| Capacitor | `bio/capacitor.rs` | `CapacitorOde::cpu_derivative` | None |
+| Cooperation | `bio/cooperation.rs` | `CooperationOde::cpu_derivative` | None |
+| Multi-Signal | `bio/multi_signal.rs` | `MultiSignalOde::cpu_derivative` | c-di-GMP convergence |
+| Bistable | `bio/bistable.rs` | `BistableOde::cpu_derivative` | c-di-GMP convergence |
+| Phage Defense | `bio/phage_defense.rs` | `PhageDefenseOde::cpu_derivative` | None |
+
+Local helpers (`hill()`, `hill_repress()`, `monod()`) and full RHS functions
+removed (~200 lines). wetSpring retains:
+- `rk4_integrate` (trajectory storage + clamping — not in barracuda's batched API)
+- `OdeResult` / `steady_state_mean` (trajectory analysis)
+- c-di-GMP convergence guard (thin wrapper for fixed-step RK4 stability)
+- `QsBiofilm` base model (not absorbed — monostable variant stays local)
+- All param structs (ergonomic named fields, `Default` impls, domain docs)
+
+**Zero duplicate derivative math remains in the codebase.**
 
 ---
 
@@ -347,4 +360,13 @@ Patterns from hotSpring and neuralSpring that wetSpring leans on:
 - `barracuda::tolerances` module (S52) confirmed delivered — closes P2-9.
   wetSpring's flat `tolerances.rs` (77 domain constants) is complementary.
 - All items absorbed. 9/9 evolution requests DONE.
-- 819 lib tests pass, 0 clippy warnings (pedantic+nursery), fmt clean
+- 823 lib tests pass, 0 clippy warnings (pedantic+nursery), fmt clean
+
+**V50 ODE derivative rewire (Feb 26, 2026):**
+- 5 ODE RHS functions rewired to `barracuda::numerical::ode_bio::*Ode::cpu_derivative`
+- ~200 lines local derivative math eliminated (hill, hill_repress, monod helpers + RHS bodies)
+- c-di-GMP convergence guard preserved as thin wrapper for bistable + multi_signal
+- `which_exists()` rewritten as pure Rust PATH scan (no subprocess)
+- `interpret_output()` takes ownership (eliminates stdout clone)
+- 4 new `try_load_json_array` error-path tests added
+- 823 lib tests pass, 0 clippy warnings (pedantic+nursery), fmt clean, docs clean

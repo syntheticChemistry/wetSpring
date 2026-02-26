@@ -1,8 +1,8 @@
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** February 25, 2026
+**Date:** February 26, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 50 — 183 experiments, 3,618+ validation checks, ALL PASS; 898 tests (819 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, ToadStool S65 aligned, 66 primitives + 2 BGL helpers + 0 local WGSL (fully lean) (barracuda always-on), 77 named tolerance constants, 0 Passthrough, V49 doc cleanup + evolution handoff, 39/39 three-tier, 52/52 papers
+**Status:** Phase 50 — 183 experiments, 3,618+ validation checks, ALL PASS; 902 tests (823 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, ToadStool S65 aligned, 66 primitives + 2 BGL + 5 ODE `cpu_derivative` + 0 local WGSL (fully lean, zero local derivative math) (barracuda always-on), 77 named tolerance constants, 0 Passthrough, V50 ODE derivative rewire, 39/39 three-tier, 52/52 papers
 
 ---
 

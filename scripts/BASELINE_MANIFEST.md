@@ -1,7 +1,7 @@
 # Python Baseline Manifest
 
-**Generated:** February 23, 2026
-**Last scripts commit:** `48fb787` (Phase 28)
+**Generated:** February 23, 2026 (last significant script update)
+**Last scripts commit:** `48fb787` (Phase 28; scripts stable since — baselines frozen for reproducibility)
 
 This manifest maps each Python baseline script to its Rust validation binary,
 experiment number, and content hash for reproducibility verification.

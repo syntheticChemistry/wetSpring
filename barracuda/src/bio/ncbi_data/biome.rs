@@ -27,23 +27,32 @@ impl BiomeProject {
     }
 }
 
-/// Load 16S `BioProject` records or generate synthetic fallback.
-#[must_use]
-pub fn load_biome_projects() -> (Vec<BiomeProject>, bool) {
+/// Load 16S `BioProject` records from NCBI JSON data.
+///
+/// # Errors
+///
+/// Returns `Err` if the JSON file is missing or contains no valid records.
+pub fn try_load_biome_projects() -> crate::error::Result<Vec<BiomeProject>> {
     let path = super::data_dir().join("biome_16s_projects.json");
-    super::load_json_array_or_fallback(
-        &path,
-        "projects",
-        BiomeProject::from_json_obj,
-        |p| !p.accession.is_empty(),
-        gen_synthetic_biome_projects,
-    )
+    super::try_load_json_array(&path, "projects", BiomeProject::from_json_obj, |p| {
+        !p.accession.is_empty()
+    })
 }
 
-/// Synthetic fallback: 28 `BioProject` records across 14 biomes.
+/// Load 16S `BioProject` records, falling back to synthetic data when offline.
 ///
-/// Used when `biome_16s_projects.json` is absent (offline / CI).
-fn gen_synthetic_biome_projects() -> Vec<BiomeProject> {
+/// Returns `(records, is_real_data)`. See [`try_load_biome_projects`] for
+/// explicit error handling.
+#[must_use]
+pub fn load_biome_projects() -> (Vec<BiomeProject>, bool) {
+    try_load_biome_projects()
+        .map_or_else(|_| (gen_synthetic_biome_projects(), false), |p| (p, true))
+}
+
+/// Synthetic data: 28 `BioProject` records across 14 biomes.
+///
+/// Deterministic accessions (`PRJNA_SYN_*`). Used only as offline/CI fallback.
+pub fn gen_synthetic_biome_projects() -> Vec<BiomeProject> {
     let biomes = [
         ("gut", "Human gut microbiome 16S survey"),
         ("gut", "Infant gut longitudinal 16S"),
@@ -131,13 +140,13 @@ mod tests {
     use tempfile::TempDir;
 
     fn load_from_dir(dir: &std::path::Path) -> (Vec<BiomeProject>, bool) {
-        super::super::load_json_array_or_fallback(
+        super::super::try_load_json_array(
             &dir.join("biome_16s_projects.json"),
             "projects",
             BiomeProject::from_json_obj,
             |p| !p.accession.is_empty(),
-            gen_synthetic_biome_projects,
         )
+        .map_or_else(|_| (gen_synthetic_biome_projects(), false), |p| (p, true))
     }
 
     #[test]

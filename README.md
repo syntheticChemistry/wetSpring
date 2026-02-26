@@ -4,9 +4,9 @@
 and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 **Write → Absorb → Lean** cycle adopted from hotSpring.
 
-**Date:** February 25, 2026
+**Date:** February 26, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 50 — Paper queue ALL GREEN (52/52 papers, 39/39 three-tier); 898 tests (819 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, 183 experiments, 3,618+ checks, 173 binaries, ToadStool S65 aligned (`17932267`), 66 primitives + 2 BGL helpers (barracuda always-on, zero local WGSL), 77 named tolerance constants, zero ad-hoc tolerances, 0 Passthrough, V49 doc cleanup + evolution handoff
+**Status:** Phase 50 — Paper queue ALL GREEN (52/52 papers, 39/39 three-tier); 902 tests (823 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, 183 experiments, 3,618+ checks, 173 binaries, ToadStool S65 aligned (`17932267`), 66 primitives + 2 BGL helpers + 5 ODE `cpu_derivative` (barracuda always-on, zero local WGSL, zero local derivative math), 77 named tolerance constants, zero ad-hoc tolerances, 0 Passthrough, V50 ODE derivative rewire + cross-spring validation
 
 ---
 
@@ -117,9 +117,9 @@ integration point.
 | Phase 44: modern systems S62+DF64, diversity fusion extension | 37 (Exp166: 19, Exp167: 18) |
 | Phase 45 V40: cross-spring S62+DF64 evolution | ~25 (Exp168: hotSpring precision → wetSpring bio → neuralSpring pop-gen → Track 3 GPU) |
 | **Total validation checks** | **3,618+** |
-| Rust library unit tests | 819 (barracuda CPU, default features) |
+| Rust library unit tests | 823 (barracuda CPU, default features) |
 | metalForge forge tests | 47 |
-| **Total Rust tests** | **898** (819 barracuda + 47 forge + 32 integration/doc) |
+| **Total Rust tests** | **902** (823 barracuda + 47 forge + 32 integration/doc) |
 | Library code coverage | **96.78%** (llvm-cov) |
 | Experiments completed | 183 |
 | Validation/benchmark binaries | 160 validate + 12 benchmark = 172 total |
@@ -744,7 +744,16 @@ refactoring, tolerance completeness, and barracuda team handoff:
 - metalForge `diversity_fusion` workload: `ShaderOrigin::Local` → `Absorbed` (28/28, 0 local)
 - Evolution request score: 9/9 DONE — all open items closed
 - ToadStool S65 aligned (`17932267`) — 66 primitives + 2 BGL helpers, zero local WGSL
-- 819 lib tests + 47 forge tests + 18 GPU diversity fusion checks all PASS post-rewire
+- 823 lib tests + 47 forge tests + 18 GPU diversity fusion checks all PASS post-rewire
+
+### Phase 50: V50 ODE Derivative Rewire
+
+- 5 ODE RHS functions replaced with `barracuda::numerical::ode_bio::*Ode::cpu_derivative`: capacitor, cooperation, multi_signal (+ c-di-GMP guard), bistable (+ c-di-GMP guard), phage_defense. ~200 lines eliminated.
+- `qs_biofilm::hill()` and `qs_biofilm::qs_rhs()` exposed as pub API; `validate_gpu_ode_sweep` rewired to library.
+- `ncbi/http.rs`: `interpret_output` takes ownership (zero-copy), `which_exists` pure Rust PATH scan.
+- 4 new `try_load_json_array` error-path tests. All 6 ODE validators PASS. Cross-spring validation PASS.
+
+**823 lib tests** | **96.78% coverage** | **77 named tolerances** | **0 clippy warnings**
 
 ### Phase 48: V44 Complete Cross-Spring Rewire
 
@@ -788,7 +797,7 @@ Rust 1.93 fixed across 20+ validation binaries.
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy --all-targets -D warnings` | Clean (0 warnings, pedantic + nursery) |
 | `cargo doc --no-deps` | Clean (0 warnings) |
-| Line coverage (`cargo-llvm-cov`) | **96.78% overall** (819 lib tests) |
+| Line coverage (`cargo-llvm-cov`) | **96.78% overall** (823 lib tests) |
 | `#![deny(unsafe_code)]` | **Enforced crate-wide** (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | **Enforced crate-wide** |
 | TODO/FIXME markers | **0** |
@@ -934,7 +943,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (898: 819 barracuda + 47 forge + 32 integration/doc)
+# Run all tests (902: 823 barracuda + 47 forge + 32 integration/doc)
 cargo test
 
 # Code quality checks
@@ -991,12 +1000,10 @@ All validation data comes from public repositories:
 - **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
 - **ToadStool** — GPU compute engine (BarraCuda crate, 694 WGSL shaders, S65)
 - **wateringHole** — Spring-local handoffs to ToadStool
-  - `handoffs/WETSPRING_TOADSTOOL_V48_S65_REWIRE_HANDOFF_FEB25_2026.md` — **current** (S65 rewire, fully lean, 66 primitives, diversity_fusion absorbed, 9/9 evolution DONE)
-  - `handoffs/WETSPRING_TOADSTOOL_V47_TRACK4_EVOLUTION_HANDOFF_FEB25_2026.md` — Track 4 soil QS + Anderson geometry, 13 new experiments, 321 checks, evolution lessons, full three-tier 39/39
-  - `handoffs/WETSPRING_TOADSTOOL_V45_COMPREHENSIVE_EVOLUTION_HANDOFF_FEB25_2026.md` — comprehensive evolution, 53 primitives, cross-spring provenance, P0-P8 requests
-  - `handoffs/WETSPRING_TOADSTOOL_V44_COMPLETE_REWIRE_HANDOFF_FEB25_2026.md` — complete cross-spring rewire, Exp169 benchmark, 4-spring provenance map
-  - `handoffs/WETSPRING_TOADSTOOL_V42_DEEP_DEBT_EVOLUTION_HANDOFF_FEB25_2026.md` — deep debt round 2, testability refactoring
-  - `handoffs/WETSPRING_TOADSTOOL_V41_DEEP_AUDIT_HANDOFF_FEB25_2026.md` — deep audit, coverage improvements
-  - `handoffs/archive/` — V7-V40 (fossil record)
+  - `handoffs/WETSPRING_TOADSTOOL_V50_ODE_DERIVATIVE_REWIRE_FEB26_2026.md` — **current** (5 ODE `cpu_derivative` rewire, zero local derivative math, cross-spring validation)
+  - `handoffs/WETSPRING_V49_EVOLUTION_LEARNINGS_HANDOFF_FEB25_2026.md` — barracuda primitive review (66+2), cross-spring timeline, lessons for Write→Absorb→Lean
+  - `handoffs/WETSPRING_TOADSTOOL_V48_S65_REWIRE_HANDOFF_FEB25_2026.md` — S65 rewire, fully lean, 66 primitives, diversity_fusion absorbed
+  - `handoffs/WETSPRING_TOADSTOOL_V47_TRACK4_EVOLUTION_HANDOFF_FEB25_2026.md` — Track 4 soil QS + Anderson geometry, 13 experiments, 321 checks
+  - `handoffs/archive/` — V7-V45 (fossil record)
   - `CROSS_SPRING_SHADER_EVOLUTION.md` — 660+ shader provenance (cross-spring, S65)
 - **ecoPrimals** — Parent ecosystem

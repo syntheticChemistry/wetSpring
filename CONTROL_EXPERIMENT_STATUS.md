@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
-**Date:** February 25, 2026
-**Status:** Phase 50 — 183 experiments, 3,618+ validation checks, all PASS (819 barracuda + 47 forge + 32 integration/doc = 898 Rust tests), ToadStool S65 aligned, 66 primitives + 2 BGL helpers + 0 local WGSL (fully lean) (barracuda always-on), 77 named tolerance constants, 0 ad-hoc tolerances, 8/9 P0-P3 delivered, 0 Passthrough, V49 doc cleanup + evolution handoff, 39/39 three-tier
+**Date:** February 26, 2026
+**Status:** Phase 50 — 183 experiments, 3,618+ validation checks, all PASS (823 barracuda + 47 forge + 32 integration/doc = 902 Rust tests), ToadStool S65 aligned, 66 primitives + 2 BGL helpers + 5 ODE `cpu_derivative` + 0 local WGSL (fully lean, zero local derivative math) (barracuda always-on), 77 named tolerance constants, 0 ad-hoc tolerances, 9/9 P0-P3 delivered, 0 Passthrough, V50 ODE derivative rewire, 39/39 three-tier
 
 ---
 
@@ -225,8 +225,8 @@
 | Drug repurposing: Fajgenbaum, MATRIX, NMF, repoDB, ROBOKOP (Exp157-161) | 40 |
 | Drug repurposing: CPU v9, GPU, metalForge (Exp163-165) | 44 |
 | Phase 44: modern systems S62+DF64, diversity fusion (Exp166-167) | 37 |
-| **Total validation checks** | **3,300+** |
-| Rust tests | 898 (819 barracuda + 47 forge + 32 integration/doc) |
+| **Total validation checks** | **3,618+** |
+| Rust tests | 902 (823 barracuda + 47 forge + 32 integration/doc) |
 | BarraCuda CPU parity | 380/380 (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/092/101) |
 | metalForge cross-system | 37 domains CPU↔GPU proven (Exp103+104+165), **30/30 papers three-tier** |

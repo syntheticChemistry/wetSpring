@@ -159,8 +159,12 @@ impl QsBiofilmParams {
 }
 
 /// Hill activation: x^n / (k^n + x^n).
+///
+/// Standard cooperative-binding function used by all QS ODE systems.
+/// Returns 0 for non-positive `x` (physical: zero signal → zero response).
 #[inline]
-fn hill(x: f64, k: f64, n: f64) -> f64 {
+#[must_use]
+pub fn hill(x: f64, k: f64, n: f64) -> f64 {
     if x <= 0.0 {
         return 0.0;
     }
@@ -169,8 +173,12 @@ fn hill(x: f64, k: f64, n: f64) -> f64 {
 }
 
 /// Right-hand side of the wild-type QS/biofilm ODE system.
-#[allow(clippy::many_single_char_names)] // standard ODE state vector notation
-fn qs_rhs(state: &[f64], _t: f64, p: &QsBiofilmParams) -> Vec<f64> {
+///
+/// This is the monostable Waters 2008 model. For the bistable extension
+/// (Fernandez 2020), see [`super::bistable`].
+#[allow(clippy::many_single_char_names)]
+#[must_use]
+pub fn qs_rhs(state: &[f64], _t: f64, p: &QsBiofilmParams) -> Vec<f64> {
     let cell = state[0].max(0.0);
     let ai = state[1].max(0.0);
     let hapr = state[2].max(0.0);

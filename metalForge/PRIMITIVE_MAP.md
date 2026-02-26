@@ -1,15 +1,15 @@
 # Primitive Map: wetSpring Rust → ToadStool GPU
 
-**Date:** February 25, 2026
+**Date:** February 26, 2026
 **Purpose:** Map every wetSpring Rust module to its ToadStool/BarraCuda
 GPU primitive (or explain why it stays CPU-only). This guides the
 absorption pipeline and identifies what ToadStool needs to build next.
 
-> **Feb 25 update (latest):** 44 ToadStool primitives + 2 BGL helpers consumed.
-> 0 local WGSL (fully lean). diversity_fusion absorbed by ToadStool S63.
+> **Feb 26 update (latest):** 44 ToadStool primitives + 2 BGL helpers + 5 ODE `cpu_derivative` consumed.
+> 0 local WGSL, 0 local derivative math (fully lean). diversity_fusion absorbed S63.
 > All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed).
 > S65 aligned. BGL boilerplate removed (~258 lines).
-> Forge crate v0.3.0. 168 experiments, 3,300+ checks, 806 tests.
+> Forge crate v0.3.0. 183 experiments, 3,618+ checks, 902 tests.
 
 ---
 

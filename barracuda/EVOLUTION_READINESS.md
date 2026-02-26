@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** February 25, 2026 (V48 ToadStool S65 rewire)
+**Date:** February 26, 2026 (V50 ToadStool S65 ODE derivative rewire)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules (all lean, 0 local WGSL), 66 ToadStool primitives + 2 BGL helpers (barracuda always-on, zero fallback code), 898 tests (819 barracuda + 47 forge), 96.78% library coverage, 183 experiments, 3,618+ checks, ToadStool S65 aligned (`17932267`), 77 named tolerance constants, 0 ad-hoc tolerances, 0 Passthrough, 0 debt. 9/9 P0-P3 evolution requests delivered — `diversity_fusion_f64.wgsl` absorbed S63, `stats::diversity` absorbed S64, `stats::metrics::{dot, l2_norm}` absorbed S64.
+**Status:** 47 CPU + 42 GPU modules (all lean, 0 local WGSL, 0 local derivative math), 66 ToadStool primitives + 2 BGL helpers + 5 ODE `cpu_derivative` (barracuda always-on, zero fallback code), 870 tests (823 barracuda + 47 forge), 96.78% library coverage, 183 experiments, 3,618+ checks, ToadStool S65 aligned (`17932267`), 77 named tolerance constants, 0 ad-hoc tolerances, 0 Passthrough, 0 debt, 0 duplicate math. 9/9 P0-P3 evolution requests delivered. **V50**: 5 ODE RHS functions rewired to `barracuda::numerical::ode_bio::*Ode::cpu_derivative`.
 
 ### Full Lean Phase
 
@@ -11,7 +11,16 @@ The 5 ODE systems completed Write → Absorb → Lean (S58).
 `diversity_fusion_f64.wgsl` completed Write → Absorb → Lean (S63).
 `bio::diversity` delegated to `barracuda::stats::diversity` (S64).
 `special::{dot, l2_norm}` delegated to `barracuda::stats::{dot, l2_norm}` (S64).
-wetSpring is now **fully lean** — zero local math, zero local WGSL.
+
+**V50 ODE derivative lean:** 5 local RHS functions (`capacitor_rhs`, `coop_rhs`,
+`multi_rhs`, `bistable_rhs`, `defense_rhs`) replaced with
+`barracuda::numerical::ode_bio::*Ode::cpu_derivative`. Local helper functions
+(`hill()`, `hill_repress()`, `monod()`) removed. ~200 lines of duplicate
+derivative math eliminated. c-di-GMP convergence guard preserved as thin
+wrapper for bistable and multi-signal (fixed-step RK4 stability refinement).
+
+wetSpring is now **fully lean** — zero local math, zero local WGSL, zero local
+ODE derivative code.
 
 `barracuda` is now an **always-on** dependency (`default-features = false` for CPU
 builds, `barracuda/gpu` for GPU builds). This eliminated all `#[cfg(not(feature = "gpu"))]`

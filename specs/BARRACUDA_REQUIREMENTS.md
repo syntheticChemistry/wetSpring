@@ -7,7 +7,7 @@
 
 ## Current Kernel Usage (Validated)
 
-### Rust CPU Modules (47 modules, 819 tests, 96.78% library coverage, V40 catch-up)
+### Rust CPU Modules (47 modules, 823 tests, 96.78% library coverage, V50 ODE derivative rewire)
 
 | Module Domain | Modules | Status |
 |--------------|---------|--------|

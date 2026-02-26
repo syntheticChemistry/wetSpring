@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
-**Date:** February 25, 2026
-**Status:** Phase 50 — Validation study active — 3,618+ checks, 898 tests, 183 experiments, ToadStool S65 aligned, 66 primitives + 2 BGL helpers + 0 local WGSL (fully lean) (barracuda always-on), 77 named tolerance constants, 0 Passthrough, V49 doc cleanup + evolution handoff, 39/39 three-tier, 52/52 papers
+**Date:** February 26, 2026
+**Status:** Phase 50 — Validation study active — 3,618+ checks, 902 tests, 183 experiments, ToadStool S65 aligned, 66 primitives + 2 BGL + 5 ODE `cpu_derivative` + 0 local WGSL (fully lean, zero local derivative math) (barracuda always-on), 77 named tolerance constants, 0 Passthrough, V50 ODE derivative rewire, 39/39 three-tier, 52/52 papers
 **License:** AGPL-3.0-or-later
 
 ---
@@ -308,7 +308,7 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCuda/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34+ WGSL shaders, active Write phase)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 66 ToadStool primitives + 2 BGL helpers, barracuda always-on, 898 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 66 ToadStool primitives + 2 BGL + 5 ODE `cpu_derivative`, barracuda always-on, 902 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **ecoPrimals/archive/wetspring-early-handoffs-feb2026/** — Fossil record of early ToadStool handoffs (v1–v9)
 

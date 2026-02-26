@@ -11,17 +11,19 @@
 //! # Module structure
 //!
 //! Each experiment's record type lives in its own submodule:
-//! - [`vibrio`] — Vibrio genome assemblies (Exp121)
-//! - [`campy`] — Campylobacterota assemblies (Exp125)
-//! - [`biome`] — 16S `BioProject` records (Exp126)
+//! - `vibrio` — Vibrio genome assemblies (Exp121)
+//! - `campy` — Campylobacterota assemblies (Exp125)
+//! - `biome` — 16S `BioProject` records (Exp126)
 
 mod biome;
 mod campy;
 mod vibrio;
 
-pub use biome::{BiomeProject, biome_diversity_params, load_biome_projects};
-pub use campy::{CampyAssembly, load_campylobacterota};
-pub use vibrio::{VibrioAssembly, load_vibrio_assemblies};
+pub use biome::{
+    BiomeProject, biome_diversity_params, load_biome_projects, try_load_biome_projects,
+};
+pub use campy::{CampyAssembly, load_campylobacterota, try_load_campylobacterota};
+pub use vibrio::{VibrioAssembly, load_vibrio_assemblies, try_load_vibrio_assemblies};
 
 use crate::validation;
 use std::path::PathBuf;
@@ -30,36 +32,40 @@ fn data_dir() -> PathBuf {
     validation::data_dir("WETSPRING_NCBI_DIR", "data/ncbi_phase35")
 }
 
-/// Load-or-generate pattern: try to read JSON file, parse array, fall back to
-/// generator when data is unavailable.
+/// Load JSON array — returns an error when data is unavailable.
 ///
-/// Returns `(items, is_real_data)`.
-fn load_json_array_or_fallback<T>(
+/// Production-grade API: callers handle the error explicitly.
+fn try_load_json_array<T>(
     path: &std::path::Path,
     array_key: &str,
     from_json: impl Fn(&str) -> T,
     is_valid: impl Fn(&T) -> bool,
-    fallback: impl FnOnce() -> Vec<T>,
-) -> (Vec<T>, bool) {
-    if let Ok(content) = std::fs::read_to_string(path) {
-        let needle = format!("\"{array_key}\"");
-        if let Some(arr_start) = content.find(&needle) {
-            let rest = &content[arr_start..];
-            if let Some(bracket) = rest.find('[') {
-                let arr = &rest[bracket..];
-                let objects = split_json_objects(arr);
-                let items: Vec<T> = objects
-                    .iter()
-                    .map(|obj| from_json(obj))
-                    .filter(is_valid)
-                    .collect();
-                if !items.is_empty() {
-                    return (items, true);
-                }
-            }
-        }
+) -> crate::error::Result<Vec<T>> {
+    let content = std::fs::read_to_string(path).map_err(|e| crate::error::Error::Io {
+        path: path.to_path_buf(),
+        source: e,
+    })?;
+    let needle = format!("\"{array_key}\"");
+    let arr_start = content
+        .find(&needle)
+        .ok_or_else(|| crate::error::Error::InvalidInput(format!("no \"{array_key}\" key")))?;
+    let rest = &content[arr_start..];
+    let bracket = rest
+        .find('[')
+        .ok_or_else(|| crate::error::Error::InvalidInput("no array bracket".into()))?;
+    let arr = &rest[bracket..];
+    let objects = split_json_objects(arr);
+    let items: Vec<T> = objects
+        .iter()
+        .map(|obj| from_json(obj))
+        .filter(is_valid)
+        .collect();
+    if items.is_empty() {
+        return Err(crate::error::Error::InvalidInput(
+            "no valid records in JSON array".into(),
+        ));
     }
-    (fallback(), false)
+    Ok(items)
 }
 
 /// Extract a JSON string value from a line like `"key": "value"`.

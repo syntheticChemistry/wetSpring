@@ -87,8 +87,19 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: barracuda
-      - run: cargo doc --no-deps
+      - run: cargo doc --no-deps --lib
         working-directory: barracuda
+
+  forge-fmt:
+    name: metalForge Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - run: cargo fmt --check
+        working-directory: metalForge/forge
 
   forge-clippy:
     name: metalForge Clippy

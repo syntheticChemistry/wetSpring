@@ -33,25 +33,33 @@ impl CampyAssembly {
     }
 }
 
-/// Load Campylobacterota assemblies or generate synthetic fallback.
+/// Load Campylobacterota assemblies from NCBI JSON data.
+///
+/// # Errors
+///
+/// Returns `Err` if the JSON file is missing or contains no valid records.
+pub fn try_load_campylobacterota() -> crate::error::Result<Vec<CampyAssembly>> {
+    let path = super::data_dir().join("campylobacterota_assemblies.json");
+    super::try_load_json_array(&path, "assemblies", CampyAssembly::from_json_obj, |a| {
+        !a.accession.is_empty()
+    })
+}
+
+/// Load Campylobacterota assemblies, falling back to synthetic data when offline.
+///
+/// Returns `(records, is_real_data)`. See [`try_load_campylobacterota`] for
+/// explicit error handling.
 #[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
 #[must_use]
 pub fn load_campylobacterota() -> (Vec<CampyAssembly>, bool) {
-    let path = super::data_dir().join("campylobacterota_assemblies.json");
-    super::load_json_array_or_fallback(
-        &path,
-        "assemblies",
-        CampyAssembly::from_json_obj,
-        |a| !a.accession.is_empty(),
-        gen_synthetic_campy,
-    )
+    try_load_campylobacterota().map_or_else(|_| (gen_synthetic_campy(), false), |a| (a, true))
 }
 
-/// Synthetic fallback: 80 assemblies across genera and ecosystems.
+/// Synthetic data: 80 assemblies across genera and ecosystems.
 ///
-/// Used when `campylobacterota_assemblies.json` is absent (offline / CI).
+/// Deterministic accessions (`GCF_CAM_*`). Used only as offline/CI fallback.
 #[allow(clippy::cast_precision_loss)]
-fn gen_synthetic_campy() -> Vec<CampyAssembly> {
+pub fn gen_synthetic_campy() -> Vec<CampyAssembly> {
     let genera = [
         (
             "Campylobacter",
@@ -137,13 +145,13 @@ mod tests {
     use tempfile::TempDir;
 
     fn load_from_dir(dir: &std::path::Path) -> (Vec<CampyAssembly>, bool) {
-        super::super::load_json_array_or_fallback(
+        super::super::try_load_json_array(
             &dir.join("campylobacterota_assemblies.json"),
             "assemblies",
             CampyAssembly::from_json_obj,
             |a| !a.accession.is_empty(),
-            gen_synthetic_campy,
         )
+        .map_or_else(|_| (gen_synthetic_campy(), false), |a| (a, true))
     }
 
     #[test]

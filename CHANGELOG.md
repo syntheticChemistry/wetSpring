@@ -5,6 +5,28 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V50 — ODE Derivative Rewire + Cross-Spring Validation (2026-02-26)
+
+### Rewired
+- 5 ODE RHS functions replaced with `barracuda::numerical::ode_bio::*Ode::cpu_derivative`: capacitor, cooperation, multi_signal (+ cdg guard), bistable (+ cdg guard), phage_defense. ~200 lines local derivative math eliminated.
+- `qs_biofilm::hill()` and `qs_biofilm::qs_rhs()` exposed as `pub` API. `validate_gpu_ode_sweep` local `qs_rhs_wrap` + `hill` replaced with library function.
+- `ncbi/http.rs`: `interpret_output` takes ownership (eliminates stdout clone). `which_exists` rewritten as pure Rust PATH scan (no subprocess).
+
+### Validated
+- All 6 ODE validators PASS: QS 16/16, Bistable 14/14, Cooperation 20/20, Capacitor 18/18, Multi-Signal 19/19, Phage 12/12.
+- Cross-spring: Exp120 9/9, Exp169 12/12, Exp070 CPU-full 50/50, Exp163 v9 27/27.
+- 823 barracuda lib tests, 47 forge tests. Clippy pedantic+nursery clean.
+
+### Tests
+- 4 new `try_load_json_array` error-path tests (missing file, invalid JSON, empty array, valid JSON).
+- 823 barracuda + 47 forge + 32 integration/doc = 902 total.
+
+### Docs
+- ABSORPTION_MANIFEST.md, EVOLUTION_READINESS.md updated for V50 ODE derivative lean.
+- CROSS_SPRING_SHADER_EVOLUTION.md: V50 timeline entry + full Write→Absorb→Lean→Rewire narrative.
+- V50 handoff: `WETSPRING_TOADSTOOL_V50_ODE_DERIVATIVE_REWIRE_FEB26_2026.md`.
+- Root docs, specs, CONTROL_EXPERIMENT_STATUS: test counts 819→823, 898→902, 8/9→9/9 P0-P3.
+
 ## V49 — Documentation Cleanup + Evolution Handoff (2026-02-25)
 
 ### Cleaned

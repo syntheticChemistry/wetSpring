@@ -111,50 +111,17 @@ impl BistableParams {
     }
 }
 
-/// Hill activation: x^n / (k^n + x^n).
-#[inline]
-fn hill(x: f64, k: f64, n: f64) -> f64 {
-    if x <= 0.0 {
-        return 0.0;
-    }
-    let xn = x.powf(n);
-    xn / (k.powf(n) + xn)
-}
+use barracuda::numerical::{BistableOde, OdeSystem as _};
 
-/// Right-hand side of the bistable QS / c-di-GMP / biofilm ODE system.
-///
-/// Compared to `qs_biofilm::qs_rhs`, adds:
-///   `DGC_rate += alpha_fb * Hill(B, k_fb, n_fb)`
-#[allow(clippy::many_single_char_names)]
-fn bistable_rhs(state: &[f64], _t: f64, p: &BistableParams) -> Vec<f64> {
-    let cell = state[0].max(0.0);
-    let ai = state[1].max(0.0);
-    let hapr = state[2].max(0.0);
+/// Wraps barracuda's `BistableOde::cpu_derivative` with the c-di-GMP
+/// convergence guard that prevents oscillation near zero in fixed-step RK4.
+fn bistable_rhs_guarded(state: &[f64], t: f64, flat: &[f64]) -> Vec<f64> {
+    let mut dy = BistableOde::cpu_derivative(t, state, flat);
     let cdg = state[3].max(0.0);
-    let bio = state[4].max(0.0);
-
-    let b = &p.base;
-
-    let d_cell = (b.mu_max * cell).mul_add(1.0 - cell / b.k_cap, -(b.death_rate * cell));
-    let d_ai = b.k_ai_prod.mul_add(cell, -b.d_ai * ai);
-    let d_hapr = b
-        .k_hapr_max
-        .mul_add(hill(ai, b.k_hapr_ai, b.n_hapr), -b.d_hapr * hapr);
-
-    let basal_dgc = b.k_dgc_basal * b.k_dgc_rep.mul_add(-hapr, 1.0).max(0.0);
-    let feedback_dgc = p.alpha_fb * hill(bio, p.k_fb, p.n_fb);
-    let dgc_rate = basal_dgc + feedback_dgc;
-
-    let pde_rate = b.k_pde_act.mul_add(hapr, b.k_pde_basal);
-    let mut d_cdg = b.d_cdg.mul_add(-cdg, dgc_rate - pde_rate * cdg);
-    if cdg < crate::tolerances::ODE_CDG_CONVERGENCE && d_cdg < 0.0 {
-        d_cdg = 0.0;
+    if cdg < crate::tolerances::ODE_CDG_CONVERGENCE && dy[3] < 0.0 {
+        dy[3] = 0.0;
     }
-
-    let bio_promote = b.k_bio_max * hill(cdg, b.k_bio_cdg, b.n_bio);
-    let d_bio = bio_promote.mul_add(1.0 - bio, -(b.d_bio * bio));
-
-    vec![d_cell, d_ai, d_hapr, d_cdg, d_bio]
+    dy
 }
 
 /// Biological bounds for the 5-variable system.
@@ -169,8 +136,9 @@ const CLAMP: [(f64, f64); 5] = [
 /// Run the bistable model from given initial conditions.
 #[must_use]
 pub fn run_bistable(y0: &[f64; 5], t_end: f64, dt: f64, params: &BistableParams) -> OdeResult {
+    let flat = params.to_flat();
     rk4_integrate(
-        |y, t| bistable_rhs(y, t, params),
+        |y, t| bistable_rhs_guarded(y, t, &flat),
         y0,
         0.0,
         t_end,

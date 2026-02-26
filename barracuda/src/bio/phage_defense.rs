@@ -116,48 +116,7 @@ impl PhageDefenseParams {
     }
 }
 
-#[inline]
-fn monod(r: f64, k: f64) -> f64 {
-    r / (k + r)
-}
-
-/// Right-hand side of the phage-bacteria defense ODE.
-#[allow(clippy::many_single_char_names)]
-fn defense_rhs(state: &[f64], _t: f64, p: &PhageDefenseParams) -> Vec<f64> {
-    let bd = state[0].max(0.0);
-    let bu = state[1].max(0.0);
-    let phage = state[2].max(0.0);
-    let r = state[3].max(0.0);
-
-    let growth_limit = monod(r, p.k_resource);
-
-    // Defended bacteria: reduced growth, reduced phage kill
-    let mu_d = p.mu_max * (1.0 - p.defense_cost) * growth_limit;
-    let infection_d = p.adsorption_rate * bd * phage;
-    let kill_d = infection_d * (1.0 - p.defense_efficiency);
-    let growth_defended = p.death_rate.mul_add(-bd, mu_d * bd - kill_d);
-
-    // Undefended bacteria: full growth, full phage kill
-    let mu_u = p.mu_max * growth_limit;
-    let infection_u = p.adsorption_rate * bu * phage;
-    let growth_undefended = p.death_rate.mul_add(-bu, mu_u * bu - infection_u);
-
-    // Phage: bursts from killed bacteria, decay
-    let burst_from_u = p.burst_size * infection_u;
-    let burst_from_d = p.burst_size * (1.0 - p.defense_efficiency) * infection_d;
-    let d_phage = (p.adsorption_rate * (bd + bu)).mul_add(
-        -phage,
-        p.phage_decay.mul_add(-phage, burst_from_u + burst_from_d),
-    );
-
-    // Resources: inflow - consumption - dilution
-    let consumption = p.yield_coeff * (mu_d * bd + mu_u * bu);
-    let d_r = p
-        .resource_dilution
-        .mul_add(-r, p.resource_inflow - consumption);
-
-    vec![growth_defended, growth_undefended, d_phage, d_r]
-}
+use barracuda::numerical::{OdeSystem as _, PhageDefenseOde};
 
 const CLAMP: [(f64, f64); 4] = [
     (0.0, f64::INFINITY),
@@ -169,8 +128,9 @@ const CLAMP: [(f64, f64); 4] = [
 /// Run the phage defense model.
 #[must_use]
 pub fn run_defense(y0: &[f64; 4], t_end: f64, dt: f64, params: &PhageDefenseParams) -> OdeResult {
+    let flat = params.to_flat();
     rk4_integrate(
-        |y, t| defense_rhs(y, t, params),
+        |y, t| PhageDefenseOde::cpu_derivative(t, y, &flat),
         y0,
         0.0,
         t_end,

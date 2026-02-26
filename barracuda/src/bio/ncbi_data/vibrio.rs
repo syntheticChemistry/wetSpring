@@ -33,27 +33,39 @@ impl VibrioAssembly {
     }
 }
 
-/// Load Vibrio assemblies from NCBI data or generate synthetic fallback.
+/// Load Vibrio assemblies from NCBI JSON data.
+///
+/// Returns an error when the data file is absent or unparseable.
+/// Callers that need offline/CI fallback should use
+/// [`load_vibrio_assemblies`] instead.
+///
+/// # Errors
+///
+/// Returns `Err` if the JSON file is missing or contains no valid records.
+pub fn try_load_vibrio_assemblies() -> crate::error::Result<Vec<VibrioAssembly>> {
+    let path = super::data_dir().join("vibrio_assemblies.json");
+    super::try_load_json_array(&path, "assemblies", VibrioAssembly::from_json_obj, |a| {
+        !a.accession.is_empty()
+    })
+}
+
+/// Load Vibrio assemblies, falling back to synthetic data when offline.
+///
+/// Returns `(records, is_real_data)`. Validation binaries use this for
+/// CI/offline resilience. Library consumers should prefer
+/// [`try_load_vibrio_assemblies`] for explicit error handling.
 #[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
 #[must_use]
 pub fn load_vibrio_assemblies() -> (Vec<VibrioAssembly>, bool) {
-    let path = super::data_dir().join("vibrio_assemblies.json");
-    super::load_json_array_or_fallback(
-        &path,
-        "assemblies",
-        VibrioAssembly::from_json_obj,
-        |a| !a.accession.is_empty(),
-        gen_synthetic_vibrio,
-    )
+    try_load_vibrio_assemblies().map_or_else(|_| (gen_synthetic_vibrio(), false), |a| (a, true))
 }
 
-/// Synthetic fallback: 150 assemblies mirroring real Vibrio diversity.
+/// Synthetic data: 150 assemblies mirroring real Vibrio diversity.
 ///
-/// Used when `vibrio_assemblies.json` is absent (offline / CI). The returned
-/// records have deterministic accessions (`GCF_SYN_*`) so downstream tests
-/// can distinguish synthetic from real data.
+/// Deterministic accessions (`GCF_SYN_*`) so callers can distinguish
+/// synthetic from real data. Used only as offline/CI fallback.
 #[allow(clippy::cast_precision_loss)]
-fn gen_synthetic_vibrio() -> Vec<VibrioAssembly> {
+pub fn gen_synthetic_vibrio() -> Vec<VibrioAssembly> {
     let mut rng = 42_u64;
     let species = [
         ("Vibrio cholerae", 4_000_000_u64, 3800_u32),
@@ -106,13 +118,13 @@ mod tests {
     use tempfile::TempDir;
 
     fn load_from_dir(dir: &std::path::Path) -> (Vec<VibrioAssembly>, bool) {
-        super::super::load_json_array_or_fallback(
+        super::super::try_load_json_array(
             &dir.join("vibrio_assemblies.json"),
             "assemblies",
             VibrioAssembly::from_json_obj,
             |a| !a.accession.is_empty(),
-            gen_synthetic_vibrio,
         )
+        .map_or_else(|_| (gen_synthetic_vibrio(), false), |a| (a, true))
     }
 
     #[test]
@@ -148,6 +160,63 @@ mod tests {
         assert!(is_real, "should use real JSON when file exists");
         assert_eq!(assemblies.len(), 1);
         assert_eq!(assemblies[0].accession, "GCF_TEST_001");
+    }
+
+    #[test]
+    fn try_load_missing_file_returns_error() {
+        let temp = TempDir::new().unwrap();
+        let result = super::super::try_load_json_array::<VibrioAssembly>(
+            &temp.path().join("nonexistent.json"),
+            "assemblies",
+            VibrioAssembly::from_json_obj,
+            |a| !a.accession.is_empty(),
+        );
+        assert!(result.is_err(), "missing file should return Err");
+    }
+
+    #[test]
+    fn try_load_invalid_json_returns_error() {
+        let temp = TempDir::new().unwrap();
+        let path = temp.path().join("vibrio_assemblies.json");
+        std::fs::write(&path, "not valid json at all").unwrap();
+        let result = super::super::try_load_json_array::<VibrioAssembly>(
+            &path,
+            "assemblies",
+            VibrioAssembly::from_json_obj,
+            |a| !a.accession.is_empty(),
+        );
+        assert!(result.is_err(), "invalid JSON should return Err");
+    }
+
+    #[test]
+    fn try_load_empty_array_returns_error() {
+        let temp = TempDir::new().unwrap();
+        let path = temp.path().join("vibrio_assemblies.json");
+        std::fs::write(&path, r#"{"assemblies": []}"#).unwrap();
+        let result = super::super::try_load_json_array::<VibrioAssembly>(
+            &path,
+            "assemblies",
+            VibrioAssembly::from_json_obj,
+            |a| !a.accession.is_empty(),
+        );
+        assert!(result.is_err(), "empty array should return Err");
+    }
+
+    #[test]
+    fn try_load_valid_json_returns_ok() {
+        let temp = TempDir::new().unwrap();
+        let path = temp.path().join("vibrio_assemblies.json");
+        let json = r#"{"assemblies": [{"accession": "GCF_TEST", "organism": "Vibrio", "genome_size_bp": 4000000, "gene_count": 3800, "scaffold_count": 2, "isolation_source": "marine"}]}"#;
+        std::fs::write(&path, json).unwrap();
+        let result = super::super::try_load_json_array(
+            &path,
+            "assemblies",
+            VibrioAssembly::from_json_obj,
+            |a| !a.accession.is_empty(),
+        );
+        let assemblies = result.unwrap();
+        assert_eq!(assemblies.len(), 1);
+        assert_eq!(assemblies[0].accession, "GCF_TEST");
     }
 
     #[test]

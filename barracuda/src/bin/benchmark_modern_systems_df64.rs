@@ -459,10 +459,11 @@ fn main() {
     println!("  │ Science+lattice (hotSpring origin)   │ 46               │");
     println!("  │ GPU ODE systems (trait-generated)    │ 5                │");
     println!("  │ BGL boilerplate removed              │ ~258 lines       │");
-    println!("  │ P0-P3 requests delivered              │ 7/9              │");
+    println!("  │ P0-P3 requests delivered              │ 9/9              │");
     println!("  │ Passthrough modules remaining         │ 0                │");
-    println!("  │ Experiments                          │ 168              │");
-    println!("  │ Tests (CPU + GPU + forge)             │ 806             │");
+    println!("  │ ODE cpu_derivative consumed           │ 5                │");
+    println!("  │ Experiments                          │ 183              │");
+    println!("  │ Tests (CPU + GPU + forge)             │ 902             │");
     println!("  └──────────────────────────────────────────────────────────┘");
 
     println!();

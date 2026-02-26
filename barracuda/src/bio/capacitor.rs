@@ -143,40 +143,7 @@ impl Default for CapacitorParams {
     }
 }
 
-#[inline]
-fn hill(x: f64, k: f64, n: f64) -> f64 {
-    if x <= 0.0 {
-        return 0.0;
-    }
-    let xn = x.powf(n);
-    xn / (k.powf(n) + xn)
-}
-
-/// Right-hand side of the capacitor ODE system.
-#[allow(clippy::many_single_char_names)]
-fn capacitor_rhs(state: &[f64], _t: f64, p: &CapacitorParams) -> Vec<f64> {
-    let cell = state[0].max(0.0);
-    let cdg = state[1].max(0.0);
-    let vpsr = state[2].max(0.0);
-    let bio = state[3].max(0.0);
-    let mot = state[4].max(0.0);
-    let rug = state[5].max(0.0);
-
-    let d_cell = (p.mu_max * cell).mul_add(1.0 - cell / p.k_cap, -(p.death_rate * cell));
-    let d_cdg = (p.stress_factor * p.k_cdg_prod).mul_add(cell, -(p.d_cdg * cdg));
-
-    // VpsR charges with c-di-GMP, discharges constitutively
-    let charge = p.k_vpsr_charge * hill(cdg, p.k_vpsr_cdg, p.n_vpsr) * (1.0 - vpsr);
-    let discharge = p.k_vpsr_discharge * vpsr;
-    let d_vpsr = charge - discharge;
-
-    // Three phenotypic outputs from the capacitor
-    let d_bio = (p.w_biofilm * vpsr).mul_add(1.0 - bio, -(p.d_bio * bio));
-    let d_mot = (p.w_motility * (1.0 - vpsr)).mul_add(1.0 - mot, -(p.d_mot * mot));
-    let d_rug = (p.w_rugose * vpsr * vpsr).mul_add(1.0 - rug, -(p.d_rug * rug));
-
-    vec![d_cell, d_cdg, d_vpsr, d_bio, d_mot, d_rug]
-}
+use barracuda::numerical::{CapacitorOde, OdeSystem as _};
 
 const CLAMP: [(f64, f64); 6] = [
     (0.0, f64::INFINITY),
@@ -190,8 +157,9 @@ const CLAMP: [(f64, f64); 6] = [
 /// Run the capacitor model.
 #[must_use]
 pub fn run_capacitor(y0: &[f64; 6], t_end: f64, dt: f64, params: &CapacitorParams) -> OdeResult {
+    let flat = params.to_flat();
     rk4_integrate(
-        |y, t| capacitor_rhs(y, t, params),
+        |y, t| CapacitorOde::cpu_derivative(t, y, &flat),
         y0,
         0.0,
         t_end,

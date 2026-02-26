@@ -1,7 +1,7 @@
 # wetSpring Benchmark Results
 
-**Date:** February 25, 2026
-**Status:** Phase 50 — Three-tier validation complete (Python → Rust CPU → GPU → metalForge) — 39/39 actionable papers full three-tier (52/52 total); 898 tests (819 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, 3,618+ checks, 183 experiments, ToadStool S65, 66 primitives + 2 BGL helpers + 0 local WGSL (fully lean), 77 named tolerances, 0 Passthrough, V49 doc cleanup + evolution handoff
+**Date:** February 26, 2026
+**Status:** Phase 50 — Three-tier validation complete (Python → Rust CPU → GPU → metalForge) — 39/39 actionable papers full three-tier (52/52 total); 902 tests (823 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, 3,618+ checks, 183 experiments, ToadStool S65, 66 primitives + 2 BGL + 5 ODE `cpu_derivative` + 0 local WGSL (fully lean, zero local derivative math), 77 named tolerances, 0 Passthrough, V50 ODE derivative rewire
 
 ---
 
@@ -321,7 +321,7 @@ matrix. CPU↔GPU parity proven for all compose and write modules.
 | Rust CPU validation | 1,476 | PASS |
 | GPU validation | 702+ | PASS |
 | Dispatch + layout + transfer | 172 | PASS |
-| Rust tests | 898 (819 barracuda + 47 forge + 32 integration/doc) | PASS |
+| Rust tests | 902 (823 barracuda + 47 forge + 32 integration/doc) | PASS |
 | Python baselines | 42 scripts | PASS |
 | BarraCuda CPU parity | 380/380 (v1-v8: 31+ domains) | PASS |
 | ToadStool primitives consumed | 66 (barracuda always-on, zero fallback — S65) | PASS |
@@ -338,7 +338,7 @@ matrix. CPU↔GPU parity proven for all compose and write modules.
 cd barracuda
 
 # Tier 2: Rust CPU (1,476+ checks)
-cargo test                         # 898 tests (819 barracuda + 47 forge + 32 integration/doc)
+cargo test                         # 902 tests (823 barracuda + 47 forge + 32 integration/doc)
 cargo run --release --bin validate_qs_ode  # ... repeat for all CPU binaries
 
 # Tier 2b: BarraCuda CPU parity (380/380)

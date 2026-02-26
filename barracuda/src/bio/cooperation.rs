@@ -124,39 +124,7 @@ impl CooperationParams {
     }
 }
 
-#[inline]
-fn hill(x: f64, k: f64) -> f64 {
-    if x <= 0.0 {
-        return 0.0;
-    }
-    let x2 = x * x;
-    x2 / k.mul_add(k, x2)
-}
-
-/// Right-hand side of the cooperation game ODE.
-#[allow(clippy::many_single_char_names)]
-fn coop_rhs(state: &[f64], _t: f64, p: &CooperationParams) -> Vec<f64> {
-    let nc = state[0].max(0.0);
-    let nd = state[1].max(0.0);
-    let ai = state[2].max(0.0);
-    let bio = state[3].max(0.0);
-
-    let n_total = nc + nd;
-    let crowding = (1.0 - n_total / p.k_cap).max(0.0);
-
-    let signal_benefit = p.benefit * hill(ai, p.k_benefit);
-    let dispersal = p.dispersal_bonus * (1.0 - bio);
-
-    let fitness_coop = (p.mu_coop - p.cost + signal_benefit + dispersal) * crowding;
-    let fitness_cheat = (p.mu_cheat + signal_benefit + dispersal) * crowding;
-
-    let growth_coop = fitness_coop.mul_add(nc, -(p.death_rate * nc));
-    let growth_cheat = fitness_cheat.mul_add(nd, -(p.death_rate * nd));
-    let d_ai = p.k_ai_prod.mul_add(nc, -p.d_ai * ai);
-    let d_bio = (p.k_bio * hill(ai, p.k_bio_ai)).mul_add(1.0 - bio, -(p.d_bio * bio));
-
-    vec![growth_coop, growth_cheat, d_ai, d_bio]
-}
+use barracuda::numerical::{CooperationOde, OdeSystem as _};
 
 const CLAMP: [(f64, f64); 4] = [
     (0.0, f64::INFINITY),
@@ -173,8 +141,9 @@ pub fn run_cooperation(
     dt: f64,
     params: &CooperationParams,
 ) -> OdeResult {
+    let flat = params.to_flat();
     rk4_integrate(
-        |y, t| coop_rhs(y, t, params),
+        |y, t| CooperationOde::cpu_derivative(t, y, &flat),
         y0,
         0.0,
         t_end,
