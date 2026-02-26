@@ -7,6 +7,9 @@ Trains a single decision tree on the full PFAS dataset, exports the tree
 structure to JSON, and saves test predictions for Rust validation.
 
 Requires: pip install numpy scikit-learn pandas
+
+Reproduction:
+    python3 scripts/pfas_tree_export.py
 """
 import json
 import sys

@@ -12,6 +12,9 @@ Datasets:
   - PRJNA382322 / SRR5452557:  AlgaeParc 2013 bacterial community
 
 Requires: pip install numpy scipy
+
+Reproduction:
+    python3 scripts/validate_public_16s_python.py
 """
 import gzip
 import json

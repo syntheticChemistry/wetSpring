@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** February 26, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 53 — Paper queue ALL GREEN (52/52 papers, 39/39 three-tier); 902 tests (823 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, 183 experiments, 4,494+ checks (1,578 GPU on RTX 4070), 173 binaries, ToadStool S66 aligned (`045103a7`), 79 primitives consumed (barracuda always-on, zero local WGSL, zero local derivative/regression math), 77 named tolerances, 0 Passthrough, V53 cross-spring evolution benchmarks + S66 rewire
+**Status:** Phase 54 — Paper queue ALL GREEN (52/52 papers, 39/39 three-tier); 906 tests (827 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, 183 experiments, 4,494+ checks (1,578 GPU on RTX 4070), 173 binaries, ToadStool S66 aligned (`045103a7`), 79 primitives consumed (barracuda always-on, zero local WGSL, zero local derivative/regression math), 77 named tolerances with full provenance, 0 Passthrough, V54 codebase audit, provenance hardening, supply-chain audit
 
 ---
 
@@ -117,24 +117,24 @@ integration point.
 | Phase 44: modern systems S62+DF64, diversity fusion extension | 37 (Exp166: 19, Exp167: 18) |
 | Phase 45 V40: cross-spring S62+DF64 evolution | ~25 (Exp168: hotSpring precision → wetSpring bio → neuralSpring pop-gen → Track 3 GPU) |
 | **Total validation checks** | **4,494+** |
-| Rust library unit tests | 823 (barracuda CPU, default features) |
+| Rust library unit tests | 827 (barracuda CPU, default features) |
 | metalForge forge tests | 47 |
-| **Total Rust tests** | **902** (823 barracuda + 47 forge + 32 integration/doc) |
+| **Total Rust tests** | **906** (827 barracuda + 47 forge + 32 integration/doc) |
 | Library code coverage | **96.78%** (llvm-cov) |
 | Experiments completed | 183 |
 | Validation/benchmark binaries | 160 validate + 12 benchmark = 172 total |
 | CPU bio modules | 47 |
 | GPU bio modules | 42 (30 lean + 5 write→lean + 7 compose + 0 passthrough) |
 | Tier B (needs refactor) | 0 (all promoted) |
-| Python baselines | 42 scripts |
+| Python baselines | 44 scripts (all with reproduction headers + SHA-256 integrity verification) |
 | BarraCuda CPU parity | 380/380 (v1-v8: 25 domains + 6 ODE flat + 13 promoted) |
 | BarraCuda GPU parity | 29 domains (17 absorbed + 5 local ODE + 7 compose + 0 passthrough) |
 | metalForge cross-system | 37 domains CPU↔GPU (Exp103+104+165+182), **39/39 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
-| ToadStool primitives consumed | **66** + 2 BGL helpers (barracuda always-on, zero fallback code — ToadStool S65) |
+| ToadStool primitives consumed | **79** (barracuda always-on, zero fallback code — ToadStool S66, `045103a7`) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 4,494+ validation checks **PASS**. All 898 tests **PASS** (1 ignored: GPU-only).
+All 4,494+ validation checks **PASS**. All 906 tests **PASS** (1 ignored: hardware-dependent).
 
 ### GPU Performance
 
@@ -528,7 +528,7 @@ Complete rewiring to modern ToadStool S42 BarraCuda APIs:
 - **Exp120**: Benchmarks diversity (wetSpring), QS ODE (hotSpring precision), ESN reservoir
   (hotSpring/neuralSpring → wetSpring NPU), with full provenance table and evolution timeline
 
-**898 tests** | **4,494+ checks** | **173 binaries**
+**906 tests** | **4,494+ checks** | **173 binaries**
 
 ### Phase 35: NCBI-Scale Hypothesis Testing (Exp121-126)
 
@@ -756,7 +756,7 @@ refactoring, tolerance completeness, and barracuda team handoff:
 - hotSpring → wetSpring precision provenance: DF64, Anderson spectral, ESN reservoir, RK4/RK45
 - Full cross-spring evolution narrative documented in BENCHMARK_RESULTS.md
 
-**823 lib tests** | **96.78% coverage** | **77 named tolerances** | **0 clippy warnings**
+**827 lib tests** | **96.78% coverage** | **77 named tolerances** | **0 clippy warnings**
 
 ### Phase 48: V44 Complete Cross-Spring Rewire
 
@@ -800,7 +800,7 @@ Rust 1.93 fixed across 20+ validation binaries.
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy --all-targets -D warnings` | Clean (0 warnings, pedantic + nursery) |
 | `cargo doc --no-deps` | Clean (0 warnings) |
-| Line coverage (`cargo-llvm-cov`) | **96.78% overall** (823 lib tests) |
+| Line coverage (`cargo-llvm-cov`) | **96.78% overall** (827 lib tests) |
 | `#![deny(unsafe_code)]` | **Enforced crate-wide** (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | **Enforced crate-wide** |
 | TODO/FIXME markers | **0** |
@@ -946,7 +946,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (902: 823 barracuda + 47 forge + 32 integration/doc)
+# Run all tests (906: 827 barracuda + 47 forge + 32 integration/doc)
 cargo test
 
 # Code quality checks

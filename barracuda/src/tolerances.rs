@@ -53,6 +53,11 @@ pub const GC_CONTENT: f64 = 0.005;
 pub const MEAN_QUALITY: f64 = 0.5;
 
 /// m/z tolerance: ±0.01 Da (Orbitrap instrument precision).
+///
+/// Standard mass accuracy for high-resolution Orbitrap LC-MS instruments
+/// (Thermo Scientific, sub-5 ppm at 200–1000 Da). Calibrated against EPA
+/// Method 533 reference standards (Exp005/006/007).
+/// Validated: `scripts/validate_track2.py`, commit `48fb787`.
 pub const MZ_TOLERANCE: f64 = 0.01;
 
 // ═══════════════════════════════════════════════════════════════════
@@ -62,7 +67,8 @@ pub const MZ_TOLERANCE: f64 = 0.01;
 /// Shannon entropy range for simulated marine community.
 ///
 /// Simulated 330-species community with Exp002 relative abundances.
-/// Expected ~4.9 ± 0.3 (validated against skbio 0.6.0).
+/// Expected ~4.9 ± 0.3 (validated against skbio 0.6.0, commit `e4358c5`).
+/// Calibrated: `scripts/validate_exp001.py` (Exp001/002), commit `48fb787`.
 pub const SHANNON_SIMULATED: f64 = 0.3;
 
 /// Simpson range for simulated marine community.
@@ -96,6 +102,8 @@ pub const EXACT_F64: f64 = 1e-15;
 ///
 /// Different loop ordering and FMA availability cause 1-3 ULP drift
 /// in accumulated sums. 1e-10 covers ~5 digits of accumulated error.
+/// Calibrated across Exp020–030, Exp051–056 (ODE, phylo, dN/dS);
+/// worst observed drift: ~3e-11 (dN/dS Exp052). Commit `e4358c5`.
 pub const PYTHON_PARITY: f64 = 1e-10;
 
 /// Python-to-Rust parity for high-precision analytical formulas
@@ -103,42 +111,62 @@ pub const PYTHON_PARITY: f64 = 1e-10;
 ///
 /// These are direct formula evaluations with minimal accumulation.
 /// 1e-14 is ~1 ULP for typical magnitude-1 results.
+/// Calibrated: Exp029 (Felsenstein), Exp053/054 (molecular clock).
+/// Scripts: `felsenstein_pruning_baseline.py`, `mateos2023_sulfur_phylogenomics.py`.
+/// Commit `48fb787`.
 pub const PYTHON_PARITY_TIGHT: f64 = 1e-14;
 
 /// Python-to-Rust parity for statistical p-values and BH correction.
 ///
 /// P-value computation involves log-gamma and combinatorial sums;
 /// implementations may differ by a few ULP in tail behavior.
+/// Calibrated: Exp056 (pangenome enrichment), Exp041 (EPA PFAS ML).
+/// Scripts: `moulana2020_pangenomics.py`, `epa_pfas_ml_baseline.py`.
+/// Commit `48fb787`.
 pub const PYTHON_PVALUE: f64 = 1e-5;
 
 /// ML model parity (decision tree, random forest, GBM confidence).
 ///
 /// Floating-point vote ratios and softmax normalization. 1e-10
 /// matches Python `sklearn` / `xgboost` to full f64 precision.
+/// Calibrated: Exp008 (PFAS decision tree), Exp041 (EPA RF/GBM).
+/// Scripts: `pfas_tree_export.py`, `exp008_pfas_ml_baseline.py`.
+/// Commit `48fb787`.
 pub const ML_PREDICTION: f64 = 1e-10;
 
 /// Cross-species ANI comparison against Python baseline.
 ///
 /// k-mer sampling and gap handling can differ at boundary codons.
 /// 1e-4 covers implementation-level variation in ANI estimation.
+/// Calibrated: Exp055 (population genomics ANI).
+/// Script: `anderson2017_population_genomics.py`. Commit `48fb787`.
 pub const ANI_CROSS_SPECIES: f64 = 1e-4;
 
 /// ML classification metrics (F1, accuracy) against Python baseline.
 ///
 /// F1 score involves integer counts (TP, FP, FN) and division;
 /// ties and rounding can differ by ~1e-4 between implementations.
+/// Calibrated: Exp008/041 (PFAS classification, EPA ML).
+/// Scripts: `exp008_pfas_ml_baseline.py`, `epa_pfas_ml_baseline.py`.
+/// Commit `48fb787`.
 pub const ML_F1_SCORE: f64 = 1e-4;
 
 /// Evolutionary distance estimation (Jukes-Cantor, alignment-derived).
 ///
 /// Distance matrix computation accumulates log/exp corrections over
 /// pairwise alignment columns; ~1e-3 covers implementation variation.
+/// Calibrated: Exp033 (neighbor joining), Exp034 (DTL reconciliation).
+/// Scripts: `liu2009_neighbor_joining.py`, `zheng2023_dtl_reconciliation.py`.
+/// Commit `48fb787`.
 pub const EVOLUTIONARY_DISTANCE: f64 = 1e-3;
 
 /// Spectral cosine similarity rounding (m/z-shifted comparisons).
 ///
 /// Greedy peak matching with floating-point intensity weighting
 /// can differ by ~1e-3 at alignment boundaries.
+/// Calibrated: Exp005/006 (mzML spectral matching), Exp042 (`MassBank`).
+/// Scripts: `validate_track2.py`, `massbank_spectral_baseline.py`.
+/// Commit `48fb787`.
 pub const SPECTRAL_COSINE: f64 = 1e-3;
 
 /// HMM forward log-likelihood Python parity.
@@ -180,12 +208,19 @@ pub const ODE_CDG_CONVERGENCE: f64 = 1e-12;
 /// Used by Waters 2008 QS, Mhatre 2020 capacitor, Bruger 2018 cooperation,
 /// and Fernandez 2020 bistable ODE models. RK4 vs `scipy.integrate` at
 /// identical dt accumulates ~1e-3 difference for multi-species systems.
+/// Calibrated: Exp020/023/025/027 (all ODE models).
+/// Scripts: `waters2008_qs_ode.py`, `fernandez2020_bistable.py`,
+/// `bruger2018_cooperation.py`, `mhatre2020_capacitor.py`.
+/// Commit `48fb787`.
 pub const ODE_STEADY_STATE: f64 = 0.01;
 
 /// ODE method parity: RK4 vs LSODA integrator differences.
 ///
 /// Fixed-step RK4 diverges from adaptive LSODA by up to ~1e-3 in
-/// concentration for stiff systems. Validated against Python baselines.
+/// concentration for stiff systems.
+/// Calibrated: Exp020/023/024/025/027/030 (all 6 ODE models).
+/// Scripts: `waters2008_qs_ode.py`, `srivastava2011_multi_signal.py`,
+/// `hsueh2022_phage_defense.py`. Commit `48fb787`.
 pub const ODE_METHOD_PARITY: f64 = 1e-3;
 
 /// ODE GPU vs CPU parity: same RK4, different instruction ordering.
@@ -269,7 +304,12 @@ pub const KMD_SPREAD: f64 = 0.02;
 
 /// Fragment m/z tolerance (Da) for suspect screening.
 ///
-/// Tighter than `MZ_TOLERANCE` for high-resolution fragment matching.
+/// Tighter than [`MZ_TOLERANCE`] for high-resolution MS2 fragment
+/// matching. Derived from Orbitrap MS2 mass accuracy (sub-2 ppm at
+/// typical fragment m/z 50–500 Da).
+/// Calibrated: Exp006 (PFAS suspect screening), Exp042 (`MassBank`).
+/// Scripts: `validate_track2.py`, `massbank_spectral_baseline.py`.
+/// Commit `48fb787`.
 pub const MZ_FRAGMENT: f64 = 0.001;
 
 /// KMD non-homologue separation threshold.
@@ -283,6 +323,10 @@ pub const KMD_NON_HOMOLOGUE: f64 = 0.005;
 /// Spectral matching m/z window for unit-resolution MS2.
 ///
 /// Used as the matching window parameter for `cosine_similarity`.
+/// Standard unit-resolution window for ion-trap / triple-quad MS2.
+/// Calibrated: Exp005 (mzML cosine), Exp042 (`MassBank` spectral).
+/// Scripts: `validate_track2.py`, `massbank_spectral_baseline.py`.
+/// Commit `48fb787`.
 pub const SPECTRAL_MZ_WINDOW: f64 = 0.5;
 
 // ═══════════════════════════════════════════════════════════════════
@@ -290,6 +334,12 @@ pub const SPECTRAL_MZ_WINDOW: f64 = 0.5;
 // ═══════════════════════════════════════════════════════════════════
 
 /// Relative peak height tolerance (1%) vs `scipy` baseline.
+///
+/// Peak detection prominence and height differ by ≤1% between
+/// `scipy.signal.find_peaks` and the Rust implementation due to
+/// interpolation at boundary samples.
+/// Calibrated: Exp010 (peak detection).
+/// Script: `generate_peak_baselines.py`. Commit `48fb787`.
 pub const PEAK_HEIGHT_REL: f64 = 0.01;
 
 /// Rarefaction curve monotonicity guard.

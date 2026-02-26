@@ -69,14 +69,28 @@ fn try_load_json_array<T>(
 }
 
 /// Extract a JSON string value from a line like `"key": "value"`.
+///
+/// Handles escaped quotes (`\"`) inside string values. For full-fidelity
+/// JSON parsing (nested objects, unicode escapes), enable the `json`
+/// feature which provides `serde_json`.
 fn json_str_value(json: &str, key: &str) -> String {
     let needle = format!("\"{key}\":");
     if let Some(pos) = json.find(&needle) {
         let rest = &json[pos + needle.len()..];
         let rest = rest.trim_start();
         if let Some(inner) = rest.strip_prefix('"') {
-            if let Some(end) = inner.find('"') {
-                return inner[..end].to_string();
+            let mut result = String::new();
+            let mut chars = inner.chars();
+            while let Some(ch) = chars.next() {
+                match ch {
+                    '\\' => {
+                        if let Some(escaped) = chars.next() {
+                            result.push(escaped);
+                        }
+                    }
+                    '"' => return result,
+                    _ => result.push(ch),
+                }
             }
         }
     }
@@ -96,20 +110,35 @@ fn json_int_value(json: &str, key: &str) -> u64 {
 }
 
 /// Split JSON array into individual object strings (minimal parser).
+///
+/// Tracks quoted regions so that braces inside string values (e.g.
+/// `"desc": "gene {x}"`) do not break the split.
 fn split_json_objects(array_content: &str) -> Vec<String> {
     let mut objects = Vec::new();
-    let mut depth = 0;
+    let mut depth = 0i32;
     let mut start = None;
+    let mut in_string = false;
+    let mut prev_backslash = false;
 
     for (i, ch) in array_content.char_indices() {
+        if prev_backslash {
+            prev_backslash = false;
+            continue;
+        }
         match ch {
-            '{' => {
+            '\\' if in_string => {
+                prev_backslash = true;
+            }
+            '"' => {
+                in_string = !in_string;
+            }
+            '{' if !in_string => {
                 if depth == 0 {
                     start = Some(i);
                 }
                 depth += 1;
             }
-            '}' => {
+            '}' if !in_string => {
                 depth -= 1;
                 if depth == 0 {
                     if let Some(s) = start {
@@ -199,5 +228,33 @@ mod tests {
     fn data_dir_returns_path() {
         let dir = data_dir();
         assert!(dir.to_string_lossy().contains("ncbi_phase35"));
+    }
+
+    #[test]
+    fn json_str_value_escaped_quotes() {
+        let json = r#"{"desc": "gene \"rpoB\" cluster", "id": "42"}"#;
+        assert_eq!(json_str_value(json, "desc"), r#"gene "rpoB" cluster"#);
+        assert_eq!(json_str_value(json, "id"), "42");
+    }
+
+    #[test]
+    fn json_str_value_escaped_backslash() {
+        let json = r#"{"path": "C:\\data\\file"}"#;
+        assert_eq!(json_str_value(json, "path"), r"C:\data\file");
+    }
+
+    #[test]
+    fn split_json_objects_braces_in_strings() {
+        let input = r#"[{"name": "gene {x}", "n": 1}, {"name": "b", "n": 2}]"#;
+        let objects = split_json_objects(input);
+        assert_eq!(objects.len(), 2);
+        assert!(objects[0].contains("gene {x}"));
+    }
+
+    #[test]
+    fn split_json_objects_escaped_quote_in_string() {
+        let input = r#"[{"name": "a\"b", "n": 1}]"#;
+        let objects = split_json_objects(input);
+        assert_eq!(objects.len(), 1);
     }
 }

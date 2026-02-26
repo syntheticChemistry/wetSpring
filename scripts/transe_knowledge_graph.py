@@ -12,6 +12,9 @@ This is the Python baseline. Rust binary: validate_knowledge_graph_embedding.
 
 Date: 2026-02-25
 Paper: 43 (ROBOKOP KG infrastructure)
+
+Reproduction:
+    python3 scripts/transe_knowledge_graph.py
 """
 
 import numpy as np

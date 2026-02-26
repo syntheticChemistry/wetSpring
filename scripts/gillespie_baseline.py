@@ -7,6 +7,9 @@ Implements a simple birth-death process for c-di-GMP signal modeling
 (Massie et al. 2012 simplified). Produces ensemble statistics for Rust validation.
 
 Requires: pip install numpy
+
+Reproduction:
+    python3 scripts/gillespie_baseline.py
 """
 import json
 import sys

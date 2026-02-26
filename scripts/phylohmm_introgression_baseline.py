@@ -15,6 +15,9 @@ The approach models a PhyloNet-HMM style analysis:
 This mirrors Liu 2014's PhyloNet-HMM for introgression detection.
 
 Requires: Python 3.8+ (stdlib only)
+
+Reproduction:
+    python3 scripts/phylohmm_introgression_baseline.py
 """
 import json
 import math

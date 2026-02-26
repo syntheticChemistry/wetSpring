@@ -11,6 +11,9 @@ The .dat files use a simple text format readable without a JSON parser:
   Line 4: space-separated prominences
 
 Requires: pip install scipy numpy
+
+Reproduction:
+    python3 scripts/generate_peak_baselines.py
 """
 import json
 import os

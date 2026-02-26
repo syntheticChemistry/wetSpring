@@ -18,6 +18,9 @@ The pipeline tests the same algorithmic chain as SATe:
   Distance matrix → NJ tree → Alignment refinement → Likelihood scoring
 
 Requires: Python 3.8+ (stdlib only)
+
+Reproduction:
+    python3 scripts/sate_alignment_baseline.py
 """
 import json
 import math

@@ -11,6 +11,9 @@ analytes, GPS coordinates, and watershed metadata).
 National-scale expansion via EPA UCMR 5 data when downloaded.
 
 Requires: Python 3.8+ (stdlib only)
+
+Reproduction:
+    python3 scripts/epa_pfas_ml_baseline.py
 """
 import json
 import math

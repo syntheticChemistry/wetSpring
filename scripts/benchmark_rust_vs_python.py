@@ -8,6 +8,9 @@ Runs equivalent operations to validate_barracuda_cpu v1–v4 in pure
 Python (numpy/scipy) and reports wall-clock timings for direct comparison.
 
 Coverage: all 23 algorithmic domains that BarraCUDA validates on CPU.
+
+Reproduction:
+    python3 scripts/benchmark_rust_vs_python.py
 """
 
 import json

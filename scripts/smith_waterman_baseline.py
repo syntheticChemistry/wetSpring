@@ -6,6 +6,9 @@ Smith-Waterman local alignment — Python baseline.
 
 Pure-Python SW with affine gaps for validation against Rust.
 No external dependencies (sovereign).
+
+Reproduction:
+    python3 scripts/smith_waterman_baseline.py
 """
 
 import json, os

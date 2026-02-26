@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 26, 2026
-**Status:** Phase 53 — Validation study active — 4,494+ checks (1,578 GPU on RTX 4070), 902 tests, 183 experiments, ToadStool S66 aligned (`045103a7`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 77 named tolerances, 0 Passthrough, V53 S66 rewire + cross-spring evolution benchmarks, 39/39 three-tier, 52/52 papers
+**Status:** Phase 54 — Validation study active — 4,494+ checks (1,578 GPU on RTX 4070), 906 tests, 183 experiments, ToadStool S66 aligned (`045103a7`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 77 named tolerances with full provenance, 0 Passthrough, V54 S66 rewire + cross-spring evolution benchmarks, 39/39 three-tier, 52/52 papers
 **License:** AGPL-3.0-or-later
 
 ---
@@ -52,10 +52,10 @@ implementations into upstream ToadStool/BarraCuda primitives:
 5. **Lean** — wetSpring rewires to upstream imports, deletes local code
 
 **Current status:** 42 GPU modules — Lean phase (fully absorbed). All 42 lean on
-upstream ToadStool primitives (66 consumed + 2 BGL helpers, S65. 0 local WGSL (fully lean)).
+upstream ToadStool primitives (79 consumed, S66. 0 local WGSL (fully lean)).
 7 compose ToadStool primitives for GPU-accelerated workflows. Zero Passthrough, zero
 Tier B/C modules remain. BGL helpers (`storage_bgl_entry`/`uniform_bgl_entry`) adopted
-from ToadStool S65 `ComputeDispatch` module (6 files, ~258 lines boilerplate removed).
+from ToadStool S66 `ComputeDispatch` module (6 files, ~258 lines boilerplate removed).
 The forge crate (`metalForge/forge/` v0.3.0) provides substrate discovery,
 capability-based dispatch, and shader origin tracking as an absorption seam for ToadStool.
 
@@ -127,7 +127,7 @@ capability-based dispatch, and shader origin tracking as an absorption seam for 
 | Streaming v2: Bray-Curtis + spectral cosine + full pipeline | Exp105: pre-warmed `GpuPipelineSession` with BC + cosine + chained analytics (27/27) |
 | Streaming ODE + phylo: 6 pre-warmed primitives | Exp106: ODE sweep + phage + bistable + multi-signal + Felsenstein + UniFrac, zero recompilation (45/45) |
 | Track 3 drug repurposing: full three-tier | Exp157-165: Fajgenbaum, MATRIX, NMF, repoDB, KG — CPU, GPU, metalForge (all PASS) |
-| Modern systems benchmark (S65) | Exp166: 5 GPU ODE, GEMM cached, barracuda CPU math, cross-spring provenance (19/19) |
+| Modern systems benchmark (S66) | Exp166: 5 GPU ODE, GEMM cached, barracuda CPU math, cross-spring provenance (19/19) |
 
 ---
 
@@ -308,7 +308,7 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCuda/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34+ WGSL shaders, active Write phase)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 66 ToadStool primitives + 2 BGL + 5 ODE `cpu_derivative`, barracuda always-on, 902 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 79 ToadStool primitives, barracuda always-on, 906 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **ecoPrimals/archive/wetspring-early-handoffs-feb2026/** — Fossil record of early ToadStool handoffs (v1–v9)
 

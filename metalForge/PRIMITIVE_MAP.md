@@ -9,7 +9,7 @@ absorption pipeline and identifies what ToadStool needs to build next.
 > 0 local WGSL, 0 local derivative math (fully lean). diversity_fusion absorbed S63.
 > All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed).
 > S66 aligned (`045103a7`). 79 primitives consumed. BGL boilerplate removed (~258 lines).
-> Forge crate v0.3.0. 183 experiments, 4,494+ checks, 902 tests.
+> Forge crate v0.3.0. 183 experiments, 4,494+ checks, 906 tests.
 
 ---
 

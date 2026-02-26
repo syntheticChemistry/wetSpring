@@ -28,6 +28,9 @@ State variables:
   B  = biofilm state (VPS expression, normalized, 0-1)
 
 Requires: pip install numpy scipy
+
+Reproduction:
+    python3 scripts/waters2008_qs_ode.py
 """
 import json
 import sys

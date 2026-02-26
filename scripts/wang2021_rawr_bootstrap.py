@@ -6,6 +6,9 @@ Wang 2021 RAWR bootstrap — Python baseline.
 
 References:
     Wang et al. 2021, Bioinformatics (ISMB) 37:i111-i119
+
+Reproduction:
+    python3 scripts/wang2021_rawr_bootstrap.py
 """
 
 import json, os, math, random

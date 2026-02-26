@@ -9,6 +9,9 @@ by the Rust harness so that results can be merged into a unified
 three-tier comparison (Python → Rust CPU → Rust GPU).
 
 Requires: pip install numpy scipy
+
+Reproduction:
+    python3 scripts/benchmark_python_baseline.py
 """
 import json
 import os

@@ -13,6 +13,9 @@ to establish baselines for:
 This serves as proxy for Smallwood (#14) raceway metagenomic surveillance.
 
 Requires: Python 3.8+ (stdlib only)
+
+Reproduction:
+    python3 scripts/bloom_surveillance_baseline.py
 """
 import json
 import math

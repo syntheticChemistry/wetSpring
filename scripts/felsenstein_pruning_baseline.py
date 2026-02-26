@@ -7,6 +7,9 @@ Felsenstein pruning — Python baseline for phylogenetic likelihood.
 Pure-Python (sovereign) Jukes-Cantor model, post-order tree traversal.
 References:
     Felsenstein 1981, J Mol Evol 17:368-376
+
+Reproduction:
+    python3 scripts/felsenstein_pruning_baseline.py
 """
 
 import json, os, math

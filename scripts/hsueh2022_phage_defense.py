@@ -6,6 +6,9 @@ Hsueh/Severin 2022 phage defense deaminase — Python baseline.
 
 References:
     Hsueh, Severin et al. 2022, Nature Microbiology 7:1210-1220
+
+Reproduction:
+    python3 scripts/hsueh2022_phage_defense.py
 """
 
 import json, os

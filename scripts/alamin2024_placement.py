@@ -6,6 +6,9 @@ Alamin & Liu 2024 phylogenetic placement — Python baseline.
 
 References:
     Alamin & Liu 2024, IEEE/ACM TCBB
+
+Reproduction:
+    python3 scripts/alamin2024_placement.py
 """
 
 import json, os, math

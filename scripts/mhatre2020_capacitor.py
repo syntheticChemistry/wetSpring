@@ -6,6 +6,9 @@ Mhatre 2020 phenotypic capacitor — Python baseline.
 
 References:
     Mhatre et al. 2020, PNAS 117:21647-21657
+
+Reproduction:
+    python3 scripts/mhatre2020_capacitor.py
 """
 
 import json, os

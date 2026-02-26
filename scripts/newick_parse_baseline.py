@@ -7,6 +7,9 @@ Parses a set of Newick trees and extracts leaf counts, branch length sums,
 and topology features. Produces ground truth for Rust validation.
 
 Requires: pip install dendropy
+
+Reproduction:
+    python3 scripts/newick_parse_baseline.py
 """
 import json
 import sys

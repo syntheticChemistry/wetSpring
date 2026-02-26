@@ -2,7 +2,7 @@
 
 **Date:** February 26, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 53 — 183 experiments, 4,494+ validation checks (1,578 GPU on RTX 4070), ALL PASS; 902 tests (823 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, ToadStool S66 aligned (`045103a7`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 77 named tolerances, 0 Passthrough, V53 S66 rewire + cross-spring benchmarks, 39/39 three-tier, 52/52 papers
+**Status:** Phase 54 — 183 experiments, 4,494+ validation checks (1,578 GPU on RTX 4070), ALL PASS; 906 tests (827 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, ToadStool S66 aligned (`045103a7`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 77 named tolerances with full provenance, 0 Passthrough, V54 codebase audit + provenance hardening + supply-chain audit, 39/39 three-tier, 52/52 papers
 
 ---
 
@@ -88,7 +88,7 @@ Every paper goes through the full evolution. Status across all 39 actionable pap
 
 | Stage | What It Proves | Coverage |
 |-------|---------------|----------|
-| Python baseline | Algorithm correctness against published tools | 42 scripts |
+| Python baseline | Algorithm correctness against published tools | 44 scripts (all with reproduction headers + SHA-256 integrity verification) |
 | BarraCuda CPU | Rust matches Python within machine precision | 1,476+ checks, 22.5x faster |
 | BarraCuda GPU | GPU matches CPU within 1e-6 | 1,578+ checks, 29+ domains |
 | Pure GPU streaming | Zero CPU round-trips, data stays on-device | 204+ checks, 10+ domains |
@@ -97,7 +97,7 @@ Every paper goes through the full evolution. Status across all 39 actionable pap
 | Cross-spring evolution | 660+ WGSL shaders traced to origin springs, rewired imports, Exp169 4-spring provenance | 21 checks |
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
-| Code quality audit | 96.78% coverage, streaming I/O, 0 production mocks, ToadStool S65, barracuda always-on, `deny(missing_docs)` | 898 tests |
+| Code quality audit | 96.78% coverage, streaming I/O, 0 production mocks, ToadStool S66, barracuda always-on, `deny(missing_docs)`, `cargo-deny` supply-chain audit, zero unsafe code | 906 tests |
 
 ## Performance Summary
 

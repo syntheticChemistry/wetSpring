@@ -7,6 +7,9 @@ Generates ground-truth RF distances for synthetic Newick tree pairs.
 Used by validate_rf_distance (Exp021) for Rust validation.
 
 Requires: pip install dendropy
+
+Reproduction:
+    python3 scripts/rf_distance_baseline.py
 """
 import json
 import sys

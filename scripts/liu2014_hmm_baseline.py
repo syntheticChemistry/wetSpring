@@ -9,6 +9,9 @@ Validates forward, Viterbi, and posterior against a known HMM model.
 References:
     Liu et al. 2014, PLoS Comp Bio 10:e1003649
     Rabiner 1989, "A Tutorial on Hidden Markov Models"
+
+Reproduction:
+    python3 scripts/liu2014_hmm_baseline.py
 """
 
 import json

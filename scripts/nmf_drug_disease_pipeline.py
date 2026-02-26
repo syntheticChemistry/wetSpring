@@ -18,6 +18,9 @@ Pipeline:
 
 This is the Python control — BarraCUDA CPU validation uses bio::nmf (Rust).
 GPU tier will use ToadStool-absorbed NMF shader (generate_shader pattern).
+
+Reproduction:
+    python3 scripts/nmf_drug_disease_pipeline.py
 """
 
 import time

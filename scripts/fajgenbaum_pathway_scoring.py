@@ -12,6 +12,9 @@ This is the Python baseline. Rust binary: validate_fajgenbaum_pathway.
 
 Date: 2026-02-25
 Paper: 39 (Fajgenbaum et al. JCI 2019)
+
+Reproduction:
+    python3 scripts/fajgenbaum_pathway_scoring.py
 """
 
 import numpy as np

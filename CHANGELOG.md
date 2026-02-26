@@ -5,6 +5,30 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V54 — Codebase Audit, Provenance Hardening, Supply-Chain Audit (2026-02-26)
+
+### Audited
+- Full codebase audit: zero `unsafe`, zero `unwrap`/`expect` in library code, zero `todo!`/`unimplemented!`, zero mocks in production, all files under 1000 LOC.
+- 1 ignored test confirmed intentional: `bench::power::tests::power_monitor_start_stop` (requires nvidia-smi and RAPL hardware).
+- All I/O parsers confirmed streaming (FASTQ, MS2, mzML, XML) — no full-file buffering.
+- AGPL-3.0-or-later SPDX headers confirmed on all source files.
+
+### Hardened
+- `ncbi_data/mod.rs` JSON parser: handles escaped quotes and braces inside strings. 4 new edge-case tests (barracuda tests 823 → 827, total 902 → 906).
+- 14 tolerance constants (`MZ_TOLERANCE`, `PYTHON_PARITY`, `SPECTRAL_COSINE`, etc.) now have full experiment/script/commit provenance chains.
+- 28 Python baseline scripts: added `Reproduction:` headers with exact commands.
+- `BASELINE_MANIFEST.md`: added reproduction environment (Python, OS, NumPy/SciPy versions), automated drift verification instructions, updated all SHA-256 hashes.
+
+### Added
+- `barracuda/deny.toml` — cargo-deny supply-chain audit (license allowlist, advisory DB, source restrictions).
+- `scripts/verify_baseline_integrity.sh` — automated SHA-256 drift detection for all 44 baseline scripts. Exit 0/1 for CI integration.
+- V54 handoff: `wateringHole/handoffs/WETSPRING_TOADSTOOL_V54_CODEBASE_AUDIT_HANDOFF_FEB26_2026.md`.
+
+### Updated
+- Root README, CHANGELOG, CONTROL_EXPERIMENT_STATUS, experiments/README, BENCHMARK_RESULTS: all counts synced (827 barracuda tests, 906 total, 79 primitives, S66).
+- whitePaper/baseCamp/ updated with audit findings and evolution state.
+- Archived V52 handoff to `wateringHole/handoffs/archive/`.
+
 ## V53 — Cross-Spring Evolution Benchmarks + Doc Cleanup (2026-02-26)
 
 ### Benchmarked

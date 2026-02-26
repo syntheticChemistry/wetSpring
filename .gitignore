@@ -1,8 +1,8 @@
 # Rust
 target/
 
-# Galaxy data (large, not tracked)
-control/galaxy/galaxy-data/
+# Galaxy (root-owned setup remnant, not tracked)
+control/
 
 # Datasets (downloaded separately)
 data/

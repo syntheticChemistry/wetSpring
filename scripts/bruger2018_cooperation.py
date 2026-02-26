@@ -9,6 +9,9 @@ Two-population (cooperator/cheater) ODE model with frequency-dependent fitness.
 
 References:
     Bruger & Waters 2018, AEM 84:e00402-18
+
+Reproduction:
+    python3 scripts/bruger2018_cooperation.py
 """
 
 import json

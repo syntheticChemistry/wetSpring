@@ -14,6 +14,9 @@ Tests:
   - Pairwise cosine matrix properties
 
 Requires: Python 3.8+ (stdlib only)
+
+Reproduction:
+    python3 scripts/massbank_spectral_baseline.py
 """
 import json
 import math

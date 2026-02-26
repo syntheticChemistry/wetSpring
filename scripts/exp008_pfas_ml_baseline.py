@@ -11,6 +11,9 @@ Data: Michigan DEQ/EGLE PFAS surface water sampling (3,719 records)
 Source: ArcGIS REST API (gisagoegle.state.mi.us)
 
 Requires: pip install numpy scipy scikit-learn pandas
+
+Reproduction:
+    python3 scripts/exp008_pfas_ml_baseline.py
 """
 import json
 import os

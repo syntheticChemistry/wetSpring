@@ -13,6 +13,9 @@ diversity data matching published ranges to establish baselines for:
 This serves as proxy for Cahill (#13) phage biocontrol monitoring.
 
 Requires: Python 3.8+ (stdlib only)
+
+Reproduction:
+    python3 scripts/algae_timeseries_baseline.py
 """
 import json
 import math

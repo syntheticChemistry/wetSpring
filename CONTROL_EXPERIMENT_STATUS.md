@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 26, 2026
-**Status:** Phase 53 — 183 experiments, 4,494+ validation checks (1,578 GPU on RTX 4070), all PASS (823 barracuda + 47 forge + 32 integration/doc = 902 Rust tests), ToadStool S66 aligned (045103a7), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 77 named tolerances, 0 ad-hoc tolerances, 9/9 P0-P3 delivered, V53 cross-spring evolution + doc cleanup, 39/39 three-tier
+**Status:** Phase 54 — 183 experiments, 4,494+ validation checks (1,578 GPU on RTX 4070), all PASS (827 barracuda + 47 forge + 32 integration/doc = 906 Rust tests), ToadStool S66 aligned (045103a7), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 77 named tolerances, 0 ad-hoc tolerances, 9/9 P0-P3 delivered, V54 codebase audit + supply-chain audit, 39/39 three-tier
 
 ---
 
@@ -174,7 +174,7 @@
 | 163 | BarraCuda CPU v9 — Track 3 drug repurposing | `validate_barracuda_cpu_v9` | PASS | 27 |
 | 164 | GPU drug repurposing — GEMM NMF, TransE, PeakDetect | `validate_gpu_drug_repurposing` | PASS | 8 |
 | 165 | metalForge drug repurposing — CPU↔GPU parity | `validate_metalforge_drug_repurposing` | PASS | 9 |
-| 166 | Modern systems benchmark (S65) | `benchmark_modern_systems_df64` | PASS | 19 |
+| 166 | Modern systems benchmark (S66) | `benchmark_modern_systems_df64` | PASS | 19 |
 | 167 | Diversity fusion GPU (Lean, absorbed S63) | `validate_gpu_diversity_fusion` | PASS | 18 |
 | 168 | Cross-spring S62 validation | `validate_cross_spring_s62` | PASS | ~25 |
 | 169 | Modern cross-spring benchmark (V44 rewire) | `benchmark_cross_spring_modern` | PASS | 12 |
@@ -191,7 +191,7 @@
 | 180 | Track 4 GPU validation | `validate_soil_qs_gpu` | PASS | 23 |
 | 181 | Track 4 pure GPU streaming | `validate_soil_qs_streaming` | PASS | 52 |
 | 182 | Track 4 metalForge cross-substrate | `validate_soil_qs_metalforge` | PASS | 14 |
-| 183 | Cross-Spring Evolution Benchmark (S65) | `benchmark_cross_spring_s65` | PASS | 36 |
+| 183 | Cross-Spring Evolution Benchmark (S66) | `benchmark_cross_spring_s65` | PASS | 36 |
 
 ---
 
@@ -226,13 +226,13 @@
 | Drug repurposing: CPU v9, GPU, metalForge (Exp163-165) | 44 |
 | Phase 44: modern systems S62+DF64, diversity fusion (Exp166-167) | 37 |
 | **Total validation checks** | **4,494+** |
-| Rust tests | 902 (823 barracuda + 47 forge + 32 integration/doc) |
+| Rust tests | 906 (827 barracuda + 47 forge + 32 integration/doc) |
 | BarraCuda CPU parity | 380/380 (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/092/101) |
 | metalForge cross-system | 37 domains CPU↔GPU proven (Exp103+104+165), **30/30 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
-| ToadStool primitives consumed | 66 (barracuda always-on, zero fallback — S65) |
-| ToadStool session alignment | S65 (660+ WGSL, cpu-math gate, PeakDetect, TransE, SpMM, NMF, ODE bio, ridge, Anderson, diversity_fusion) |
+| ToadStool primitives consumed | 79 (barracuda always-on, zero fallback — S66) |
+| ToadStool session alignment | S66 (660+ WGSL, cpu-math gate, PeakDetect, TransE, SpMM, NMF, ODE bio, ridge, Anderson, diversity_fusion) |
 | Cross-spring shader provenance | 35+ hotSpring, 22+ wetSpring, 14+ neuralSpring, 5+ airSpring, 500+ native |
 
 ---

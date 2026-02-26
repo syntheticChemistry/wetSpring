@@ -13,6 +13,9 @@ replicate, producing a baseline for Rust validation of the RF module on
 real phylogenetic data at scale.
 
 Requires: Python 3.8+ (stdlib only)
+
+Reproduction:
+    python3 scripts/phynetpy_rf_baseline.py
 """
 import json
 import os
