@@ -1,7 +1,7 @@
 # wetSpring Benchmark Results
 
 **Date:** February 26, 2026
-**Status:** Phase 50 — Three-tier validation complete (Python → Rust CPU → GPU → metalForge) — 39/39 actionable papers full three-tier (52/52 total); 902 tests (823 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, 4,494+ checks, 183 experiments, ToadStool S65, 66 primitives + 2 BGL + 5 ODE `cpu_derivative` + 0 local WGSL (fully lean, zero local derivative math), 77 named tolerances, 0 Passthrough, V50 ODE derivative rewire
+**Status:** Phase 52 — Three-tier validation complete (Python → Rust CPU → GPU → metalForge) — 39/39 actionable papers full three-tier (52/52 total); 902 tests (823 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, 4,494+ checks (1,578 GPU on RTX 4070), 183 experiments, ToadStool S66 (045103a7), 79 primitives consumed, 0 local WGSL/derivative/regression (fully lean), 77 named tolerances, 0 Passthrough, V52 S66 rewire
 
 ---
 
@@ -236,47 +236,97 @@ Run with `cargo run --release --bin benchmark_23_domain_timing` and
 
 ---
 
-## Exp095: Cross-Spring Scaling Benchmark
+## Exp095: Cross-Spring Scaling Benchmark (RTX 4070)
 
-Benchmark cross-spring evolved primitives at realistic bioinformatics problem
-sizes. Run with `cargo run --release --features gpu --bin benchmark_cross_spring_scaling`.
+Cross-spring evolved primitives at realistic bioinformatics problem sizes.
+Run with `cargo run --release --features gpu --bin benchmark_cross_spring_scaling`.
 
 | Primitive | Evolved By | Problem Size | CPU (µs) | GPU (µs) | Speedup |
 |-----------|-----------|-------------|----------|----------|---------|
-| PairwiseHamming | neuralSpring | 500×1000 (125K pairs) | 15,999 | 978 | **16.4×** |
-| PairwiseJaccard | neuralSpring | 200×2000 (20K pairs) | 41,780 | 151 | **276.7×** |
-| SpatialPayoff | neuralSpring | 256×256 (65K cells) | 1,019 | 52 | **19.6×** |
-| BatchFitness | neuralSpring | 4096×256 (1M elems) | 537 | 82 | **6.5×** |
-| LocusVariance | neuralSpring | 100×10K (1M elems) | 1,097 | 57 | **19.2×** |
-| FusedMapReduce | hotSpring | 100K f64 | <1 | 2,699 | N/A |
-| GemmF64 | wetSpring | 256×256 f64 | 3,684 | 3,463 | **1.1×** |
+| PairwiseJaccard | neuralSpring | 200×2000 (20K pairs) | 41,777 | 342 | **122×** |
+| SpatialPayoff | neuralSpring | 256×256 (65K cells) | 1,026 | 47 | **22×** |
+| PairwiseHamming | neuralSpring | 500×1000 (125K pairs) | 10,383 | 1,039 | **10×** |
+| LocusVariance | neuralSpring | 100×10K (1M elems) | 1,079 | 154 | **7×** |
+| BatchFitness | neuralSpring | 4096×256 (1M elems) | 470 | 79 | **6×** |
+| GemmF64 | wetSpring | 256×256 f64 | 3,479 | 3,643 | 1.0× |
 
-Key findings: PairwiseJaccard achieves 277× GPU speedup; SpatialPayoff and
-LocusVariance ~20×; PairwiseHamming 16×; BatchFitness 6.5×. FusedMapReduce and
-GemmF64 at small sizes are transfer-dominated (see Exp066 for larger sizes).
+GPU wins at scale: Jaccard 122×, SpatialPayoff 22×, Hamming 10×.
+GemmF64 at 256×256 is transfer-dominated; see Exp066 for larger sizes.
 
 ---
 
-## Exp183: Cross-Spring Evolution Benchmark (ToadStool S65)
+## Exp183: Cross-Spring Evolution Benchmark (ToadStool S66)
 
-Comprehensive validation of the V48 S65 rewire — 36/36 checks PASS. Run with
+Comprehensive validation of the S66 rewire — 36/36 checks PASS. Run with
 `cargo run --release --features gpu --bin benchmark_cross_spring_s65`.
 
 | Domain | Checks | Status |
 |--------|--------|--------|
-| GPU ODE (5 systems) | 5 | PASS |
+| GPU ODE (5 systems × 128 batches) | 5 | PASS |
 | DiversityFusion GPU (Write→Absorb→Lean) | 3 | PASS |
 | CPU diversity delegation (11 functions → barracuda::stats) | 11 | PASS |
 | CPU math delegation (dot/l2_norm → barracuda::stats) | 2 | PASS |
-| GEMM pipeline | 2 | PASS |
-| Anderson spectral | 2 | PASS |
-| NMF | 2 | PASS |
-| Ridge | 2 | PASS |
-| Cross-spring provenance (S39→S65) | 7 | PASS |
+| hotSpring precision (erf, ln_gamma, norm_cdf, trapz) | 6 | PASS |
+| GEMM pipeline (compile + cached dispatch) | 4 | PASS |
+| Anderson spectral (hotSpring → wetSpring Track 4) | 3 | PASS |
+| NMF + Ridge | 2 | PASS |
 | **Total** | **36** | **PASS** |
 
-Documents contributions from all 4 springs (hotSpring, wetSpring, neuralSpring,
-airSpring) across the cross-spring provenance timeline from S39 to S65.
+---
+
+## Cross-Spring Evolution: Where Things Evolved to Be Helpful
+
+The biome model in action — each spring contributes domain expertise, ToadStool
+absorbs it, and all springs benefit. Verified on RTX 4070 + Titan V.
+
+### hotSpring → wetSpring (physics → biology)
+
+| Primitive | Origin | wetSpring Use | Impact |
+|-----------|--------|--------------|--------|
+| f64 precision polyfills | Lattice QCD workarounds | GPU ODE accuracy on consumer GPUs | Enables f64 bio ODE on Ada |
+| DF64 core-streaming (14 shaders) | SU(3) gauge theory | Consumer GPU viability | 10× throughput vs native f64 |
+| Anderson 2D/3D + Lanczos | Condensed matter | QS-disorder localization (Exp107) | Novel biology insight |
+| `find_w_c` phase transition | Metal-insulator transition | QS signal localization threshold | W_c = 11.79 |
+| PeakDetectF64 | LC-MS signal processing | mzML peak detection | f64 end-to-end |
+| BatchedEighGpu | Nuclear Hartree-Fock | PCoA eigendecomposition | GPU-accelerated |
+| ESN reservoir | Stanton-Murillo transport | NPU deployment (Exp114-119) | int8 inference |
+| RK4/RK45 adaptive | Precision ODE integration | All 5 bio ODE systems | Trait-generated WGSL |
+
+### wetSpring → ToadStool → all springs (biology → shared)
+
+| Primitive | Absorbed Session | Consumers |
+|-----------|-----------------|-----------|
+| 5 bio ODE systems → `OdeSystem` trait | S51-S58 | neuralSpring population genetics |
+| DiversityFusion WGSL | S63 | airSpring crop biodiversity |
+| 11 diversity metrics | S64 | All springs with ecology/graph data |
+| GemmCachedF64 (60× taxonomy) | S62 | hotSpring HFB, neuralSpring GNN |
+| Tolerance constant pattern | S52 | All springs adopted |
+| `hill()`, `monod()` CPU | S66 | All springs with kinetic models |
+| `fit_linear` regression | S66 | airSpring, groundSpring |
+
+### neuralSpring → wetSpring (ML/population → biology)
+
+| Primitive | Problem Size | GPU Speedup | wetSpring Use |
+|-----------|-------------|-------------|--------------|
+| PairwiseHamming | 500 seqs × 1000 bp | **10×** | SNP distance matrices |
+| PairwiseJaccard | 200 genomes × 2000 genes | **122×** | Pangenome similarity |
+| SpatialPayoff | 256×256 grid | **22×** | QS cooperation game theory |
+| BatchFitness | 4096 × 256 genome | **6×** | Evolutionary fitness eval |
+| LocusVariance | 100 pops × 10K loci | **7×** | FST estimation |
+| graph_laplacian | Community networks | CPU | Spectral community analysis |
+
+### ODE Lean Benchmark: Write → Absorb → Lean complete
+
+| System | Origin | State Dim | Local CPU (µs) | Upstream CPU (µs) | Max Diff |
+|--------|--------|-----------|---------------|-------------------|----------|
+| Capacitor | wetSpring Exp002 | 6 | 2,020 | 1,581 | 0.00 |
+| Cooperation | wetSpring Exp003 | 4 | 825 | 696 | 4.44e-16 |
+| MultiSignal | wetSpring Exp006 | 7 | 1,592 | 1,214 | 4.44e-16 |
+| Bistable | wetSpring Exp007 | 5 | 1,738 | 1,424 | 0.00 |
+| PhageDefense | wetSpring Exp009 | 4 | 82 | 63 | extreme params |
+
+Upstream integrate_cpu is **18-24% faster** than local — ToadStool optimized
+the hot loop after absorbing the trait implementations.
 
 ---
 
