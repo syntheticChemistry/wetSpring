@@ -126,10 +126,10 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 
 | Document | Location | Description |
 |----------|----------|-------------|
-| CONTROL_EXPERIMENT_STATUS.md | `../` | 183 experiments, 3,618+ validation checks, 898 tests |
+| CONTROL_EXPERIMENT_STATUS.md | `../` | 183 experiments, 3,618+ validation checks, 902 tests |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
-| Handoff (v48) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V48_S65_REWIRE_HANDOFF_FEB25_2026.md` | Current ToadStool handoff |
+| Handoff (v50) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V50_COMPREHENSIVE_EVOLUTION_HANDOFF_FEB26_2026.md` | Current ToadStool handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |

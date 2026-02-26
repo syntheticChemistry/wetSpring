@@ -902,3 +902,71 @@ path = "src/bin/validate_burst_statistics_anderson.rs"
 name = "validate_cross_spring_s57"
 path = "src/bin/validate_cross_spring_s57.rs"
 required-features = ["gpu"]
+
+# ── Track 4: Soil QS & Anderson Geometry (Exp170-182) ────
+[[bin]]
+name = "validate_soil_qs_pore_geometry"
+path = "src/bin/validate_soil_qs_pore_geometry.rs"
+
+[[bin]]
+name = "validate_soil_pore_diversity"
+path = "src/bin/validate_soil_pore_diversity.rs"
+
+[[bin]]
+name = "validate_soil_distance_colonization"
+path = "src/bin/validate_soil_distance_colonization.rs"
+
+[[bin]]
+name = "validate_notill_brandt_farm"
+path = "src/bin/validate_notill_brandt_farm.rs"
+
+[[bin]]
+name = "validate_notill_meta_analysis"
+path = "src/bin/validate_notill_meta_analysis.rs"
+
+[[bin]]
+name = "validate_notill_longterm_tillage"
+path = "src/bin/validate_notill_longterm_tillage.rs"
+
+[[bin]]
+name = "validate_soil_biofilm_aggregate"
+path = "src/bin/validate_soil_biofilm_aggregate.rs"
+
+[[bin]]
+name = "validate_soil_structure_function"
+path = "src/bin/validate_soil_structure_function.rs"
+
+[[bin]]
+name = "validate_tillage_microbiome_2025"
+path = "src/bin/validate_tillage_microbiome_2025.rs"
+
+[[bin]]
+name = "validate_soil_qs_cpu_parity"
+path = "src/bin/validate_soil_qs_cpu_parity.rs"
+
+[[bin]]
+name = "validate_soil_qs_gpu"
+path = "src/bin/validate_soil_qs_gpu.rs"
+required-features = ["gpu"]
+
+[[bin]]
+name = "validate_soil_qs_streaming"
+path = "src/bin/validate_soil_qs_streaming.rs"
+required-features = ["gpu"]
+
+[[bin]]
+name = "validate_soil_qs_metalforge"
+path = "src/bin/validate_soil_qs_metalforge.rs"
+required-features = ["gpu"]
+
+# ── Modern Cross-Spring Benchmark (Exp169) ───────────────
+[[bin]]
+name = "benchmark_cross_spring_modern"
+path = "src/bin/benchmark_cross_spring_modern.rs"
+required-features = ["gpu"]
+
+# ── Cross-Spring S65 Benchmark (Exp183) ──────────────────
+[[bin]]
+name = "benchmark_cross_spring_s65"
+path = "src/bin/benchmark_cross_spring_s65.rs"
+required-features = ["gpu"]

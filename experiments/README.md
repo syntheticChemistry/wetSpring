@@ -103,17 +103,17 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 102 | BarraCuda CPU v8 (25 domains) | cross | DONE | — | validate_barracuda_cpu_v8 | 175 |
 | 103 | metalForge v5 (25/25 papers) | metalForge | DONE | — | validate_metalforge_v5 | 58 |
 | 104 | metalForge v6 (25/25 papers) | metalForge | DONE | — | validate_metalforge_v6 | 24 |
-| 105 | Pure GPU streaming v2 | streaming | DONE | — | validate_streaming_v2 | 27 |
+| 105 | Pure GPU streaming v2 | streaming | DONE | — | validate_pure_gpu_streaming_v2 | 27 |
 | 106 | Streaming ODE + phylo | streaming | DONE | — | validate_streaming_ode_phylo | 45 |
 | 157 | Fajgenbaum pathway scoring | 3 | DONE | Published equations | validate_fajgenbaum_pathway | 8 |
 | 158 | MATRIX pharmacophenomics | 3 | DONE | Lancet Haematology 2025 | validate_matrix_pharmacophenomics | 9 |
 | 159 | Yang 2020 NMF drug repurposing | 3 | DONE | PMC | validate_nmf_drug_repurposing | 7 |
 | 160 | Gao 2020 repoDB NMF | 3 | DONE | PMC | validate_repodb_nmf | 9 |
-| 161 | ROBOKOP KG embedding | 3 | DONE | KG infrastructure | validate_kg_embedding | 7 |
+| 161 | ROBOKOP KG embedding | 3 | DONE | KG infrastructure | validate_knowledge_graph_embedding | 7 |
 | 162 | Cross-spring S57 evolution | cross | DONE | S57 rewire | benchmark_cross_spring_evolution | 66 |
 | 163 | BarraCuda CPU v9 (Track 3) | cross | DONE | CPU + Track 3 | validate_barracuda_cpu_v9 | 66 |
 | 164 | GPU drug repurposing | GPU | DONE | GPU Track 3 | validate_gpu_drug_repurposing | 48 |
-| 165 | metalForge drug repurposing | metalForge | DONE | Substrate-independent | validate_metalforge_drug | 25 |
+| 165 | metalForge drug repurposing | metalForge | DONE | Substrate-independent | validate_metalforge_drug_repurposing | 25 |
 | 166 | Modern systems S65 | cross/GPU | DONE | Exp166 benchmark | benchmark_modern_systems_df64 | 19 |
 | 167 | Diversity fusion GPU extension | GPU | DONE | CPU ↔ GPU parity | validate_gpu_diversity_fusion | 18 |
 | 168 | Cross-spring S62/S65 validation | cross/GPU | DONE | S62+DF64 rewire | validate_cross_spring_s62 | ~25 |
@@ -261,17 +261,17 @@ thresholds from `src/tolerances.rs`.
 | `validate_barracuda_cpu_v8` | 102 | 175 | `cargo run --release --bin validate_barracuda_cpu_v8` |
 | `validate_metalforge_v5` | 103 | 58 | `cargo run --features gpu --bin validate_metalforge_v5` |
 | `validate_metalforge_v6` | 104 | 24 | `cargo run --features gpu --bin validate_metalforge_v6` |
-| `validate_streaming_v2` | 105 | 27 | `cargo run --features gpu --bin validate_streaming_v2` |
+| `validate_pure_gpu_streaming_v2` | 105 | 27 | `cargo run --features gpu --bin validate_pure_gpu_streaming_v2` |
 | `validate_streaming_ode_phylo` | 106 | 45 | `cargo run --features gpu --bin validate_streaming_ode_phylo` |
 | `validate_fajgenbaum_pathway` | 157 | 8 | `cargo run --bin validate_fajgenbaum_pathway` |
 | `validate_matrix_pharmacophenomics` | 158 | 9 | `cargo run --bin validate_matrix_pharmacophenomics` |
 | `validate_nmf_drug_repurposing` | 159 | 7 | `cargo run --bin validate_nmf_drug_repurposing` |
 | `validate_repodb_nmf` | 160 | 9 | `cargo run --bin validate_repodb_nmf` |
-| `validate_kg_embedding` | 161 | 7 | `cargo run --bin validate_kg_embedding` |
+| `validate_knowledge_graph_embedding` | 161 | 7 | `cargo run --bin validate_knowledge_graph_embedding` |
 | `benchmark_cross_spring_evolution` | 162 | 66 | `cargo run --features gpu --bin benchmark_cross_spring_evolution` |
 | `validate_barracuda_cpu_v9` | 163 | 66 | `cargo run --release --bin validate_barracuda_cpu_v9` |
 | `validate_gpu_drug_repurposing` | 164 | 48 | `cargo run --features gpu --bin validate_gpu_drug_repurposing` |
-| `validate_metalforge_drug` | 165 | 25 | `cargo run --features gpu --bin validate_metalforge_drug` |
+| `validate_metalforge_drug_repurposing` | 165 | 25 | `cargo run --features gpu --bin validate_metalforge_drug_repurposing` |
 | `benchmark_modern_systems_df64` | 166 | 19 | `cargo run --features gpu --bin benchmark_modern_systems_df64` |
 | `validate_gpu_diversity_fusion` | 167 | 18 | `cargo run --features gpu --bin validate_gpu_diversity_fusion` |
 | `validate_cross_spring_s62` | 168 | ~25 | `cargo run --features gpu --release --bin validate_cross_spring_s62` |
