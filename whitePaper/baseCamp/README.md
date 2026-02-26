@@ -2,7 +2,7 @@
 
 **Date:** February 26, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 56 — 188 experiments, 4,494+ validation checks (1,578 GPU on RTX 4070), ALL PASS; 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, ToadStool S66 aligned (`045103a7`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 82 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets), 0 Passthrough, V56 science extension pipeline + primal integration, 39/39 three-tier, 52/52 papers
+**Status:** Phase 57 — 188 experiments, 4,494+ validation checks (1,578 GPU on RTX 4070), ALL PASS; 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 82 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets), 0 Passthrough, V57 ToadStool S68 catch-up + universal precision alignment, 39/39 three-tier, 52/52 papers
 
 ---
 

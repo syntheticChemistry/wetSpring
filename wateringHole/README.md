@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V56** | `handoffs/WETSPRING_TOADSTOOL_V56_SCIENCE_PIPELINE_HANDOFF_FEB26_2026.md` | Feb 26 | **current** — science extension pipeline, NCBI EFetch/SRA, NestGate JSON-RPC, GPU Anderson L=14-20, biomeOS science graph, 82 tolerances |
+| **V57** | `handoffs/WETSPRING_TOADSTOOL_V57_S68_CATCHUP_HANDOFF_FEB26_2026.md` | Feb 26 | **current** — ToadStool S66→S68 catch-up (19 commits), CPU feature-gate fix, universal precision alignment |
+| **V56** | `handoffs/WETSPRING_TOADSTOOL_V56_SCIENCE_PIPELINE_HANDOFF_FEB26_2026.md` | Feb 26 | Science extension pipeline, NCBI EFetch/SRA, NestGate JSON-RPC, GPU Anderson L=14-20, biomeOS science graph |
 | **V55** | `handoffs/WETSPRING_TOADSTOOL_V55_DEEP_DEBT_HANDOFF_FEB26_2026.md` | Feb 26 | Deep debt resolution, idiomatic Rust evolution, 79-primitive usage audit |
 | **V54** | `handoffs/WETSPRING_TOADSTOOL_V54_CODEBASE_AUDIT_HANDOFF_FEB26_2026.md` | Feb 26 | Codebase audit, supply-chain audit, tolerance provenance hardening |
 | **V53** | `handoffs/WETSPRING_TOADSTOOL_V53_CROSS_SPRING_EVOLUTION_HANDOFF_FEB26_2026.md` | Feb 26 | Cross-spring evolution benchmarks, GPU performance data, tolerance learnings |

@@ -22,14 +22,10 @@
 //! - `SmithWatermanGpu` — banded SW alignment (anti-diagonal wavefront)
 //! - `TreeInferenceGpu` — decision tree / RF inference (sample x tree)
 //!
-//! # Local WGSL shaders (3, Write phase)
+//! # WGSL Generation (Lean — zero local shaders)
 //!
-//! - `phage_defense_ode_rk4_f64.wgsl` — 4 vars, 11 params
-//! - `bistable_ode_rk4_f64.wgsl` — 5 vars, 21 params (QS + feedback)
-//! - `multi_signal_ode_rk4_f64.wgsl` — 7 vars, 24 params (dual-signal QS)
-//!
-//! All local shaders use `compile_shader_f64()` with `fmax`/`fclamp`/`fpow`
-//! polyfills and the `(zero + literal)` pattern for explicit f64 typing.
+//! All ODE shaders are generated at runtime via `BatchedOdeRK4::generate_shader()`
+//! from ToadStool. wetSpring holds zero local `.wgsl` files.
 
 use barracuda::device::{GpuDriverProfile, TensorContext, WgpuDevice};
 use std::sync::Arc;

@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** February 26, 2026 (V56 science extension pipeline + primal integration)
+**Date:** February 26, 2026 (V57 ToadStool S68 catch-up + universal precision alignment)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**ToadStool pin:** `045103a7` (S66 Wave 5: multi-precision expansion, Feb 26 2026)
-**Status:** 79 ToadStool primitives consumed (incl. 11 `stats::diversity` + 2 `stats::metrics` + S66: `hill`, `monod`, `fit_linear`, `percentile`, `mean`, `shannon_from_frequencies`), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, ToadStool S66 aligned, 188 experiments, 4,494+ checks (1,578 GPU on RTX 4070), 82 named tolerances, 0 ad-hoc magic numbers, `clippy::pedantic` CLEAN. **V55:** encoding.rs typed errors, validate\_gpu\_diversity\_fusion → Validator framework, 2 new tolerance constants, ncbi/http bug fix, 6 new tests. **V56:** NCBI EFetch/SRA pipeline, NestGate JSON-RPC integration, SHA-256 cache integrity, GPU Anderson L=14-20, biomeOS science capability domain.
+**ToadStool pin:** `f0feb226` (S68: dual-layer universal precision, 700 shaders, 0 f32-only, Feb 26 2026)
+**Status:** 79 ToadStool primitives consumed (incl. 11 `stats::diversity` + 2 `stats::metrics` + S66: `hill`, `monod`, `fit_linear`, `percentile`, `mean`, `shannon_from_frequencies`), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, ToadStool S68 aligned, 188 experiments, 4,494+ checks (1,578 GPU on RTX 4070), 82 named tolerances, 0 ad-hoc magic numbers, `clippy::pedantic` CLEAN. **V57:** ToadStool S66→S68 catch-up (19 commits), CPU feature-gate fix contributed upstream (`numerical/mod.rs` + `stats/mod.rs`), universal precision architecture available, `gpu.rs` doc comment cleaned.
 
 ---
 
@@ -49,7 +49,7 @@ WGSL          known physics   handoffs/                        delete local
 | Compose | GPU wrappers wiring ToadStool primitives | **7 modules** (kmd, merge_pairs, RF, derep, NJ, reconciliation, molecular_clock) |
 | Passthrough | Accept GPU buffers, CPU kernel | **0 modules** — all 3 former Passthrough promoted (V40) |
 | Validate | CPU ↔ GPU parity for all shaders | All 5 ODE: exact parity (Exp099/100/101) |
-| Hand off | wateringHole/handoffs/ documents | **V54** active (codebase audit handoff), V7-V52 archived |
+| Hand off | wateringHole/handoffs/ documents | **V57** active (S68 catch-up handoff), V7-V56 archived |
 | Absorb | ToadStool integrates as `ops::bio::*` | **79 primitives** consumed (ToadStool S66: all DONE, +46 cross-spring total) |
 | Lean | Rewire to upstream, delete local code | 79 primitives consumed (S66), 5 `OdeSystem` trait rewires, BGL boilerplate removed, 0 Passthrough |
 

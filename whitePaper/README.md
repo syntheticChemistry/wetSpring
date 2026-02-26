@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 26, 2026
-**Status:** Phase 56 — Validation study active — 4,494+ checks (1,578 GPU on RTX 4070), 961 tests, 188 experiments, ToadStool S66 aligned (`045103a7`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 82 named tolerances with full provenance, 0 Passthrough, 0 ad-hoc magic numbers, clippy pedantic CLEAN, V56 science extension pipeline, 39/39 three-tier, 52/52 papers
+**Status:** Phase 57 — Validation study active — 4,494+ checks (1,578 GPU on RTX 4070), 961 tests, 188 experiments, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 82 named tolerances with full provenance, 0 Passthrough, 0 ad-hoc magic numbers, clippy pedantic CLEAN, V57 ToadStool S68 catch-up, 39/39 three-tier, 52/52 papers
 **License:** AGPL-3.0-or-later
 
 ---

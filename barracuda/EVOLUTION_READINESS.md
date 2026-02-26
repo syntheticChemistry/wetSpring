@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** February 26, 2026 (V56 science extension pipeline + primal integration)
+**Date:** February 26, 2026 (V57 ToadStool S68 catch-up + universal precision alignment)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules (all lean, 0 local WGSL, 0 local derivative/regression math), 79 ToadStool primitives consumed (barracuda always-on, zero fallback code), 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% library coverage, 188 experiments, 4,494+ checks (1,578 GPU on RTX 4070), ToadStool S66 aligned (`045103a7`), 82 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V55:** encoding.rs evolved to typed errors, validate\_gpu\_diversity\_fusion migrated to Validator framework, ncbi/http whitespace-only cmd bug fixed, PfasFragments provenance added, 2 new named tolerances (ODE\_GPU\_SWEEP\_ABS, GPU\_EIGENVALUE\_REL). **V56:** NCBI EFetch/SRA/NestGate modules, SHA-256 cache integrity, GPU Anderson L=14-20 binary, 3 new tolerances, biomeOS science graph.
+**Status:** 47 CPU + 42 GPU modules (all lean, 0 local WGSL, 0 local derivative/regression math), 79 ToadStool primitives consumed (barracuda always-on, zero fallback code), 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% library coverage, 188 experiments, 4,494+ checks (1,578 GPU on RTX 4070), ToadStool S68 aligned (`f0feb226`), 82 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V57:** ToadStool S66→S68 catch-up (19 commits), CPU feature-gate fix contributed upstream, universal precision architecture (700 shaders, 0 f32-only) now available, `gpu.rs` doc comment cleaned.
 
 ### Full Lean Phase
 
@@ -41,6 +41,11 @@ ToadStool S39-S62+DF64 (55+ commits since V39) delivered massive infrastructure:
 - `GemmF64::wgsl_shader_for_device()` now public — DF64 GEMM auto-selection unblocked
 
 **Available for future wiring:**
+- `compile_shader_universal()` — single call for any precision (F16/F32/F64/DF64) (S67)
+- `Precision::Df64` — DF64 variant for enhanced precision on FP32 cores (S67)
+- `compile_template()` — template-based `{{SCALAR}}` shader compilation (S67)
+- `Precision::op_preamble()` — abstract precision ops layer (S68)
+- `downcast_f64_to_f16()` — F16 downcast with sentinel protection (S68)
 - `ComputeDispatch` builder — eliminates 80-line bind-group/pipeline boilerplate
 - `Fp64Strategy` auto-detect — Native/Hybrid selection per GPU era
 - DF64 core-streaming — routes f64 through FP32 cores on consumer GPUs (RTX 4070: 5888 FP32 cores vs 92 FP64 units)

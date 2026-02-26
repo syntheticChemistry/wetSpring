@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** February 26, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 56 — Science extension pipeline + primal integration; 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, 188 experiments, 4,494+ checks (1,578 GPU on RTX 4070), 174 binaries, ToadStool S66 aligned (`045103a7`), 79 primitives consumed (barracuda always-on, zero local WGSL, zero local derivative/regression math), 82 named tolerances with full provenance, 0 ad-hoc magic numbers, 0 Passthrough, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, NCBI EFetch/SRA pipeline + NestGate JSON-RPC integration + biomeOS science graph, 52/52 papers, 39/39 three-tier
+**Status:** Phase 57 — ToadStool S68 catch-up + universal precision alignment; 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, 188 experiments, 4,494+ checks (1,578 GPU on RTX 4070), 174 binaries, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed (barracuda always-on, zero local WGSL, zero local derivative/regression math), 82 named tolerances with full provenance, 0 ad-hoc magic numbers, 0 Passthrough, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, NCBI EFetch/SRA pipeline + NestGate JSON-RPC integration + biomeOS science graph, 52/52 papers, 39/39 three-tier
 
 ---
 
@@ -132,7 +132,7 @@ integration point.
 | metalForge cross-system | 37 domains CPU↔GPU (Exp103+104+165+182), **39/39 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
-| ToadStool primitives consumed | **79** (barracuda always-on, zero fallback code — ToadStool S66, `045103a7`) |
+| ToadStool primitives consumed | **79** (barracuda always-on, zero fallback code — ToadStool S68, `f0feb226`) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
 All 4,494+ validation checks **PASS**. All 961 tests **PASS** (1 ignored: hardware-dependent).
 
@@ -734,6 +734,15 @@ refactoring, tolerance completeness, and barracuda team handoff:
 
 **833 lib tests** | **96.67% coverage** | **79 named tolerances** | **0 clippy warnings (pedantic)**
 
+### Phase 57: ToadStool S68 Catch-Up + Universal Precision Alignment (V57)
+
+ToadStool advanced 19 commits (S66→S68) with universal precision architecture
+(all 291 f32-only shaders → f64 canonical, dual-layer DF64 pipeline). wetSpring
+revalidated cleanly after contributing a CPU feature-gate fix for `numerical/mod.rs`
+and `stats/mod.rs` (`wgsl_hessian_column`, `WGSL_HISTOGRAM`, `WGSL_BOOTSTRAP_MEAN_F64`
+now properly gated behind `#[cfg(feature = "gpu")]`). All 79 consumed primitives
+work unchanged. ToadStool pin: `f0feb226` (S68). 700 shaders, zero f32-only.
+
 ### Phase 56: Science Extension Pipeline + Primal Integration (V56)
 
 Extending validated science with real NCBI data through sovereign primal pipeline:
@@ -1022,7 +1031,7 @@ All validation data comes from public repositories:
 - **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
 - **ToadStool** — GPU compute engine (BarraCuda crate, 694 WGSL shaders, S66)
 - **wateringHole** — Spring-local handoffs to ToadStool
-  - `handoffs/WETSPRING_TOADSTOOL_V56_SCIENCE_PIPELINE_HANDOFF_FEB26_2026.md` — **current** (science pipeline, NestGate integration, GPU Anderson scaling, 82 tolerances)
-  - `handoffs/archive/` — V7-V55 (fossil record)
+  - `handoffs/WETSPRING_TOADSTOOL_V57_S68_CATCHUP_HANDOFF_FEB26_2026.md` — **current** (ToadStool S68 catch-up, universal precision alignment, CPU feature-gate fix)
+  - `handoffs/archive/` — V7-V56 (fossil record)
   - `CROSS_SPRING_SHADER_EVOLUTION.md` — 694+ shader provenance (cross-spring, S66)
 - **ecoPrimals** — Parent ecosystem

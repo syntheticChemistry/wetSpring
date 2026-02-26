@@ -1,7 +1,7 @@
 # wetSpring Benchmark Results
 
 **Date:** February 26, 2026
-**Status:** Phase 56 — Three-tier validation complete (Python → Rust CPU → GPU → metalForge) — 39/39 actionable papers full three-tier (52/52 total); 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, 4,494+ checks (1,578 GPU on RTX 4070), 188 experiments, ToadStool S66 (`045103a7`), 79 primitives consumed, 0 local WGSL/derivative/regression (fully lean), 82 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, V56 science extension pipeline
+**Status:** Phase 57 — Three-tier validation complete (Python → Rust CPU → GPU → metalForge) — 39/39 actionable papers full three-tier (52/52 total); 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, 4,494+ checks (1,578 GPU on RTX 4070), 188 experiments, ToadStool S68 (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (fully lean), 82 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, V57 ToadStool S68 catch-up
 
 ---
 

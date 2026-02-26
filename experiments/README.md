@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-26 (Phase 56: 188 experiments, ToadStool S66 (`045103a7`), 79 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 961 tests, 96.67% coverage, 82 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, V56 science extension pipeline, 39/39 three-tier, 52/52 papers)
+**Updated**: 2026-02-26 (Phase 57: 188 experiments, ToadStool S68 (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 961 tests, 96.67% coverage, 82 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, V57 ToadStool S68 catch-up, 39/39 three-tier, 52/52 papers)
 
 ---
 
@@ -294,7 +294,7 @@ thresholds from `src/tolerances.rs`.
 **Total validation checks**: 4,494+
 **Rust tests**: 912 (833 barracuda + 47 forge + 32 integration/doc)
 **Binaries**: 160 validate + 12 benchmark = 172 total
-**ToadStool primitives**: 79 consumed (barracuda always-on, zero fallback code — S66 `045103a7`)
+**ToadStool primitives**: 79 consumed (barracuda always-on, zero fallback code — S68 `f0feb226`)
 **Papers**: 52 (25 Tracks 1-2 + 5 Track 3 + 9 Track 4 + 1 cross-spring + 9 extensions + 3 reference)
 **Local WGSL shaders**: 0 (all absorbed by ToadStool S63)
 **GPU modules**: 42 total (all lean on upstream primitives)

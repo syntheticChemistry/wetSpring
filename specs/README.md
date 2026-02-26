@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 26, 2026
-**Status**: Phase 56 — 4,494+/4,494+ checks (1,578 GPU on RTX 4070), ALL PASS (961 tests, 188 experiments, ToadStool S66 aligned (`045103a7`), 79 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 82 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, V56 science extension pipeline, 39/39 three-tier, 52/52 papers, 96.67% llvm-cov)
+**Status**: Phase 57 — 4,494+/4,494+ checks (1,578 GPU on RTX 4070), ALL PASS (961 tests, 188 experiments, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 82 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, V57 ToadStool S68 catch-up, 39/39 three-tier, 52/52 papers, 96.67% llvm-cov)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -11,7 +11,7 @@
 | Metric | Value |
 |--------|-------|
 | CPU validation | 1,476+/1,476+ PASS — 46 modules, 183 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
-| GPU validation | 710+/710+ PASS — 79 ToadStool primitives (S66 `045103a7`, always-on), 0 local WGSL (fully lean) |
+| GPU validation | 710+/710+ PASS — 79 ToadStool primitives (S68 `f0feb226`, always-on), 0 local WGSL (fully lean) |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 407/407 — 22.5x Rust speedup over Python (v1–v9) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/101/164) — pure GPU math proven |

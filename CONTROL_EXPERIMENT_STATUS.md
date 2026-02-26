@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 26, 2026
-**Status:** Phase 56 — 188 experiments, 4,494+ validation checks (1,578 GPU on RTX 4070), all PASS (882 barracuda + 47 forge + 32 integration/doc = 961 Rust tests), ToadStool S66 aligned (045103a7), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 82 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets), V56 science extension pipeline + primal integration, 39/39 three-tier
+**Status:** Phase 57 — 188 experiments, 4,494+ validation checks (1,578 GPU on RTX 4070), all PASS (882 barracuda + 47 forge + 32 integration/doc = 961 Rust tests), ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 82 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets), V57 ToadStool S68 catch-up + universal precision alignment, 39/39 three-tier
 
 ---
 
