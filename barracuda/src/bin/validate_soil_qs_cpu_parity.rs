@@ -39,9 +39,12 @@
 //!
 //! | Item | Value |
 //! |------|-------|
-//! | Date | 2026-02-25 |
+//! | Baseline commit | `1f9f80e` |
+//! | Baseline date | 2026-02-25 |
 //! | Track | Track 4 — No-Till Soil QS & Anderson Geometry |
 //! | Command | `cargo run --release --bin validate_soil_qs_cpu_parity` |
+//! | Data | Synthetic ODE, community, and statistical reference values |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use std::time::Instant;
 use wetspring_barracuda::bio::cooperation::{self, CooperationParams};
@@ -192,25 +195,25 @@ fn main() {
         "Shannon(uniform 4) = ln(4)",
         diversity::shannon(&uniform_4),
         4.0_f64.ln(),
-        1e-10,
+        tolerances::PYTHON_PARITY,
     );
     v.check(
         "Simpson(uniform 4) = 0.75",
         diversity::simpson(&uniform_4),
         0.75,
-        1e-10,
+        tolerances::PYTHON_PARITY,
     );
     v.check(
         "Pielou(uniform 4) = 1.0",
         diversity::pielou_evenness(&uniform_4),
         1.0,
-        1e-10,
+        tolerances::PYTHON_PARITY,
     );
     v.check(
         "Chao1(uniform 4) = 4.0",
         diversity::chao1(&uniform_4),
         4.0,
-        1e-6,
+        tolerances::HMM_FORWARD_PARITY,
     );
 
     let h_100 = diversity::shannon(&comm_100);
@@ -283,11 +286,21 @@ fn main() {
     let t0 = Instant::now();
 
     v.check("Φ(0) = 0.5", norm_cdf(0.0), 0.5, tolerances::EXACT);
-    v.check("Φ(1.96) ≈ 0.975", norm_cdf(1.96), 0.975, 1e-3);
-    v.check("Φ(-∞) ≈ 0", norm_cdf(-10.0), 0.0, 1e-10);
-    v.check("Φ(+∞) ≈ 1", norm_cdf(10.0), 1.0, 1e-10);
+    v.check(
+        "Φ(1.96) ≈ 0.975",
+        norm_cdf(1.96),
+        0.975,
+        tolerances::NORM_CDF_PARITY,
+    );
+    v.check("Φ(-∞) ≈ 0", norm_cdf(-10.0), 0.0, tolerances::PYTHON_PARITY);
+    v.check("Φ(+∞) ≈ 1", norm_cdf(10.0), 1.0, tolerances::PYTHON_PARITY);
     v.check("erf(0) = 0", erf(0.0), 0.0, tolerances::EXACT);
-    v.check("erf(1.0)", erf(1.0), 0.842_700_792_949_715, 5e-7);
+    v.check(
+        "erf(1.0)",
+        erf(1.0),
+        0.842_700_792_949_715,
+        tolerances::ERF_PARITY,
+    );
 
     let w_c_3d = 16.5_f64;
     let test_w = [3.0, 8.0, 12.0, 16.5, 20.0, 25.0];

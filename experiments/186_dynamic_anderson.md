@@ -1,10 +1,10 @@
 # Exp186: Dynamic Anderson W(t) — Community Evolution Under Perturbation
 
 **Date:** February 26, 2026
-**Phase:** V55 — Science extensions
-**Binary:** `validate_dynamic_anderson` (planned)
+**Phase:** V59 — Science extensions
+**Binary:** `validate_dynamic_anderson`
 **Command:** `cargo run --release --features gpu --bin validate_dynamic_anderson`
-**Status:** Protocol defined, implementation pending
+**Status:** DONE (CPU, 7 checks PASS — GPU sections require --features gpu)
 **Depends on:** Exp150 (finite-size scaling), Exp170-182 (Track 4 soil QS)
 
 ## Purpose

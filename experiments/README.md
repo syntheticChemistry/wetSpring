@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-26 (Phase 58: 189 experiments, ToadStool S68 (`f0feb226`), 79 primitives consumed via `compile_shader_universal`, 0 local WGSL/derivative/regression, barracuda always-on, 961 tests, 96.67% coverage, 82 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, V58 doc sync + evolution learnings handoff, 39/39 three-tier, 52/52 papers)
+**Updated**: 2026-02-26 (Phase 59: 197 experiments, ToadStool S68 (`f0feb226`), 79 primitives consumed via `compile_shader_universal`, 0 local WGSL/derivative/regression, barracuda always-on, 1,008 tests, 96.67% coverage, 86 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, V59 doc sync + evolution learnings handoff, 39/39 three-tier, 52/52 papers)
 
 ---
 
@@ -119,12 +119,15 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 168 | Cross-spring S62/S66 validation | cross/GPU | DONE | S62+DF64 rewire | validate_cross_spring_s62 | ~25 |
 | 169 | Modern cross-spring benchmark | cross/GPU | DONE | V44 rewire benchmark | benchmark_cross_spring_modern | 12 |
 | 183 | Cross-Spring Evolution Benchmark (S66) | cross/GPU | DONE | S66 rewire benchmark | benchmark_cross_spring_s65 | 36 |
-| 184 | [Real NCBI Sovereign Pipeline](184_real_ncbi_sovereign_pipeline.md) | 1 | PROTOCOL | Real NCBI 16S sovereign | validate_real_ncbi_pipeline (planned) | — |
-| 185 | [Cold Seep Sovereign Pipeline](185_cold_seep_sovereign_pipeline.md) | 1c | PROTOCOL | Cold seep metagenomes | validate_cold_seep_pipeline (planned) | — |
-| 186 | [Dynamic Anderson W(t)](186_dynamic_anderson.md) | cross/GPU | PROTOCOL | Community evolution | validate_dynamic_anderson (planned) | — |
-| 187 | [DF64 Anderson Large Lattice](187_df64_anderson_large_lattice.md) | cross/GPU | PROTOCOL | DF64 L=24+ lattice | validate_df64_anderson (planned) | — |
-| 188 | [NPU Sentinel Real Stream](188_npu_sentinel_real_stream.md) | NPU | PROTOCOL | Real sensor stream | validate_npu_sentinel_stream (planned) | — |
+| 184 | [Real NCBI Sovereign Pipeline](184_real_ncbi_sovereign_pipeline.md) | 1 | DONE | Real NCBI 16S sovereign | validate_real_ncbi_pipeline | 25 |
+| 185 | [Cold Seep Sovereign Pipeline](185_cold_seep_sovereign_pipeline.md) | 1c | DONE | Cold seep metagenomes | validate_cold_seep_pipeline | 8 |
+| 186 | [Dynamic Anderson W(t)](186_dynamic_anderson.md) | cross/GPU | DONE | Community evolution | validate_dynamic_anderson | 7 |
+| 187 | [DF64 Anderson Large Lattice](187_df64_anderson_large_lattice.md) | cross/GPU | DONE | DF64 L=24+ lattice | validate_df64_anderson | 4 |
+| 188 | [NPU Sentinel Real Stream](188_npu_sentinel_real_stream.md) | NPU | DONE | Real sensor stream | validate_npu_sentinel_stream | 10 |
 | 189 | [Cross-Spring Evolution S68](189_cross_spring_evolution_s68.md) | cross/GPU | DONE | S68 universal precision | benchmark_cross_spring_s68 | varies |
+| 190 | [BarraCuda CPU v10 — V59 Science](190_barracuda_cpu_v10.md) | CPU/cross | DONE | V59 science domains | validate_barracuda_cpu_v10 | 75 |
+| 191 | [GPU V59 Science Parity](191_gpu_v59_science.md) | GPU | DONE | Diversity + Anderson | validate_gpu_v59_science | 29 |
+| 192 | [metalForge V59 Cross-Substrate](192_metalforge_v59_science.md) | metalForge | DONE | CPU↔GPU parity | validate_metalforge_v59_science | 36 |
 
 ---
 
@@ -284,6 +287,9 @@ thresholds from `src/tolerances.rs`.
 | `benchmark_cross_spring_modern` | 169 | 12 | `cargo run --release --features gpu --bin benchmark_cross_spring_modern` |
 | `benchmark_cross_spring_s65` | 183 | 36 | `cargo run --release --features gpu --bin benchmark_cross_spring_s65` |
 | `benchmark_cross_spring_s68` | 189 | varies | `cargo run --release --features gpu --bin benchmark_cross_spring_s68` |
+| `validate_barracuda_cpu_v10` | 190 | 75 | `cargo run --release --bin validate_barracuda_cpu_v10` |
+| `validate_gpu_v59_science` | 191 | 29 | `cargo run --features gpu --release --bin validate_gpu_v59_science` |
+| `validate_metalforge_v59_science` | 192 | 36 | `cargo run --features gpu --release --bin validate_metalforge_v59_science` |
 | `validate_soil_qs_pore_geometry` | 170 | 26 | `cargo run --release --bin validate_soil_qs_pore_geometry` |
 | `validate_soil_pore_diversity` | 171 | 27 | `cargo run --release --bin validate_soil_pore_diversity` |
 | `validate_soil_distance_colonization` | 172 | 23 | `cargo run --release --bin validate_soil_distance_colonization` |
@@ -298,9 +304,9 @@ thresholds from `src/tolerances.rs`.
 | `validate_soil_qs_streaming` | 181 | 52 | `cargo run --features gpu --release --bin validate_soil_qs_streaming` |
 | `validate_soil_qs_metalforge` | 182 | 14 | `cargo run --features gpu --release --bin validate_soil_qs_metalforge` |
 
-**Total validation checks**: 4,494+
-**Rust tests**: 961 (882 barracuda + 47 forge + 32 integration/doc)
-**Binaries**: 161 validate + 14 benchmark = 175 total
+**Total validation checks**: 4,688+
+**Rust tests**: 1,008 (882 barracuda lib + 60 integration + 19 doc + 47 forge)
+**Binaries**: 169 validate + 15 benchmark = 184 total
 **ToadStool primitives**: 79 consumed (barracuda always-on, zero fallback code — S68 `f0feb226`)
 **Papers**: 52 (25 Tracks 1-2 + 5 Track 3 + 9 Track 4 + 1 cross-spring + 9 extensions + 3 reference)
 **Local WGSL shaders**: 0 (all absorbed by ToadStool S63)

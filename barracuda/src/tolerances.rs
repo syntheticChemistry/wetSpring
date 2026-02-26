@@ -332,6 +332,38 @@ pub const GILLESPIE_PYTHON_RANGE_REL: f64 = 0.15;
 pub const GILLESPIE_FANO_PHYSICAL: f64 = 1.0;
 
 // ═══════════════════════════════════════════════════════════════════
+// Special-function evaluation tolerances
+// ═══════════════════════════════════════════════════════════════════
+
+/// Parts-per-million conversion factor (1 ppm = 1e-6).
+///
+/// Used by EIC extraction and tolerance-based m/z matching to convert
+/// ppm parameters to fractional Da tolerances: `tol = mz * ppm * PPM_FACTOR`.
+pub const PPM_FACTOR: f64 = 1e-6;
+
+/// Error function (erf) evaluation tolerance vs reference values.
+///
+/// `erf(x)` computed via Horner polynomial agrees with Abramowitz & Stegun
+/// table values to ~5e-7 absolute. Covers both CPU and GPU `erf` polyfills.
+/// Validated: Exp179 (Track 4 QS pore geometry), Exp183 (no-till meta-analysis).
+pub const ERF_PARITY: f64 = 5e-7;
+
+/// Normal CDF Φ(x) evaluation tolerance for non-extreme arguments.
+///
+/// `norm_cdf(x)` for |x| < 4 agrees with Python `scipy.stats.norm.cdf`
+/// to ~1e-3 absolute due to erf polynomial approximation differences.
+/// For extreme arguments (|x| > 6), use [`PYTHON_PARITY`] (1e-10).
+/// Validated: Exp179/183 (Anderson disorder mapping, soil QS).
+pub const NORM_CDF_PARITY: f64 = 1e-3;
+
+/// Normal CDF Φ(x) evaluation tolerance for CDF tail values.
+///
+/// `norm_cdf(x)` for |x| ~ 3 (tail region, CDF ~ 0.9987) retains ~4
+/// significant digits. 1e-4 covers polynomial approximation drift.
+/// Validated: Exp185 (soil biofilm aggregate).
+pub const NORM_CDF_TAIL: f64 = 1e-4;
+
+// ═══════════════════════════════════════════════════════════════════
 // PFAS / analytical chemistry tolerances
 // ═══════════════════════════════════════════════════════════════════
 
@@ -646,10 +678,6 @@ pub const GALAXY_SIMPSON_RANGE: f64 = 0.25;
 pub const GALAXY_BRAY_CURTIS_RANGE: f64 = 0.50;
 
 // ═══════════════════════════════════════════════════════════════════
-// Feature extraction / asari cross-reference tolerances (Exp009)
-// ═══════════════════════════════════════════════════════════════════
-
-// ═══════════════════════════════════════════════════════════════════
 // ODE domain-specific steady-state tolerances
 // ═══════════════════════════════════════════════════════════════════
 
@@ -802,6 +830,10 @@ mod tests {
             GILLESPIE_FANO,
             GILLESPIE_PYTHON_RANGE_REL,
             GILLESPIE_FANO_PHYSICAL,
+            PPM_FACTOR,
+            ERF_PARITY,
+            NORM_CDF_PARITY,
+            NORM_CDF_TAIL,
             KMD_GROUPING,
             KMD_SPREAD,
             MZ_FRAGMENT,

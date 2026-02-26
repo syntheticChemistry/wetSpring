@@ -1,10 +1,10 @@
 # Exp185: Cold Seep Metagenomes Through Sovereign Pipeline
 
 **Date:** February 26, 2026
-**Phase:** V55 — Science extensions
-**Binary:** `validate_cold_seep_pipeline` (planned)
+**Phase:** V59 — Science extensions
+**Binary:** `validate_cold_seep_pipeline`
 **Command:** `cargo run --release --features gpu --bin validate_cold_seep_pipeline`
-**Status:** Protocol defined, implementation pending
+**Status:** DONE (CPU, 8 checks PASS)
 **Depends on:** Exp184 (pipeline validation with small test set)
 
 ## Purpose

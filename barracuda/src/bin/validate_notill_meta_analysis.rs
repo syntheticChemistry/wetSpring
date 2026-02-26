@@ -255,11 +255,21 @@ fn main() {
     );
 
     let erf_check = erf(1.0);
-    v.check("erf(1.0) correct", erf_check, 0.842_700_792_949_715, 5e-7);
+    v.check(
+        "erf(1.0) correct",
+        erf_check,
+        0.842_700_792_949_715,
+        tolerances::ERF_PARITY,
+    );
 
     v.check("Φ(0) = 0.5", norm_cdf(0.0), 0.5, tolerances::EXACT);
 
-    v.check("Φ(1.96) ≈ 0.975", norm_cdf(1.96), 0.975, 1e-3);
+    v.check(
+        "Φ(1.96) ≈ 0.975",
+        norm_cdf(1.96),
+        0.975,
+        tolerances::NORM_CDF_PARITY,
+    );
 
     let (passed, total) = v.counts();
     println!("\n  ── Exp174 Summary: {passed}/{total} checks ──");

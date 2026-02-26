@@ -286,7 +286,12 @@ fn main() {
     v.check("Φ(0) = 0.5", norm_cdf(0.0), 0.5, tolerances::EXACT);
 
     let h_uniform = diversity::shannon(&[0.25, 0.25, 0.25, 0.25]);
-    v.check("Shannon(uniform 4) = ln(4)", h_uniform, 4.0_f64.ln(), 1e-10);
+    v.check(
+        "Shannon(uniform 4) = ln(4)",
+        h_uniform,
+        4.0_f64.ln(),
+        tolerances::PYTHON_PARITY,
+    );
 
     v.check(
         "pearson_correlation(perfect linear) = 1.0",

@@ -4,8 +4,14 @@
 //!
 //! # Provenance
 //!
-//! | Script  | `validate_local_wgsl_compile` |
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline commit | `1f9f80e` |
+//! | Baseline date | 2026-02-22 |
+//! | Script | `validate_local_wgsl_compile` |
 //! | Command | `cargo run --features gpu --bin validate_local_wgsl_compile` |
+//! | Data | Synthetic k-mer, taxonomy, ODE test vectors |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
 //! # Purpose
 //!

@@ -76,6 +76,7 @@ validate-cpu-selfcontained:
           validate_barracuda_cpu_v3 validate_barracuda_cpu_v4 \
           validate_barracuda_cpu_v5 validate_barracuda_cpu_v6 \
           validate_barracuda_cpu_v7 validate_barracuda_cpu_v8 \
+          validate_barracuda_cpu_v9 validate_barracuda_cpu_v10 \
           validate_barracuda_cpu_full)
     pass=0; fail=0; skip=0
     for bin in "${bins[@]}"; do

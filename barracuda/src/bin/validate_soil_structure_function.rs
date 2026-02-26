@@ -276,7 +276,12 @@ fn main() {
     v.check("Φ(0) = 0.5", norm_cdf(0.0), 0.5, tolerances::EXACT);
 
     let h_max = diversity::shannon(&[0.2, 0.2, 0.2, 0.2, 0.2]);
-    v.check("Shannon(uniform 5) = ln(5)", h_max, 5.0_f64.ln(), 1e-10);
+    v.check(
+        "Shannon(uniform 5) = ln(5)",
+        h_max,
+        5.0_f64.ln(),
+        tolerances::PYTHON_PARITY,
+    );
 
     let (passed, total) = v.counts();
     println!("\n  ── Exp177 Summary: {passed}/{total} checks ──");

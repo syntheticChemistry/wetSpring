@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 26, 2026
-**Status:** Phase 58 — Validation study active — 4,494+ checks (1,578 GPU on RTX 4070), 961 tests, 189 experiments, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 82 named tolerances with full provenance, 0 Passthrough, 0 ad-hoc magic numbers, clippy pedantic CLEAN, V58 doc sync + evolution learnings, 39/39 three-tier, 52/52 papers
+**Status:** Phase 59 — Validation study active — 4,688+ checks (1,578 GPU on RTX 4070), 1,008 tests, 197 experiments, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 86 named tolerances with full provenance, 0 Passthrough, 0 ad-hoc magic numbers, clippy pedantic CLEAN, V59 doc sync + evolution learnings, 39/39 three-tier, 52/52 papers
 **License:** AGPL-3.0-or-later
 
 ---
@@ -65,7 +65,7 @@ capability-based dispatch, and shader origin tracking as an absorption seam for 
 
 | Claim | Evidence |
 |-------|----------|
-| Rust matches Python across 189 experiments | 4,494+ checks pass (CPU + GPU + metalForge + streaming + cross-spring + soil QS) |
+| Rust matches Python across 197 experiments | 4,688+ checks pass (CPU + GPU + metalForge + streaming + cross-spring + soil QS) |
 | GPU matches CPU across all 42 GPU modules + 1 extension | 710+ GPU checks pass (incl. 48 all-domain + 58 metalForge v5 + 18 diversity fusion) |
 | BarraCuda CPU parity across 31+ domains (v1-v9) | 407/407 cross-domain checks pass |
 | 926× spectral cosine GPU speedup | Exp016 benchmark |
@@ -308,7 +308,7 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCuda/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34+ WGSL shaders, active Write phase)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 79 ToadStool primitives, barracuda always-on, 961 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 79 ToadStool primitives, barracuda always-on, 1,008 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **ecoPrimals/archive/wetspring-early-handoffs-feb2026/** — Fossil record of early ToadStool handoffs (v1–v9)
 
@@ -328,11 +328,11 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | Line coverage (`cargo-llvm-cov`) | **96.67% overall** |
 | `#![deny(unsafe_code)]` | Enforced crate-wide (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, clippy::unwrap_used)]` | Enforced crate-wide |
-| Named tolerance constants | 82 (all scientifically justified, hierarchy-tested) |
+| Named tolerance constants | 86 (all scientifically justified, hierarchy-tested) |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` files |
-| Provenance headers | All 158 validation/benchmark binaries |
+| Provenance headers | All 184 validation/benchmark binaries |
 
 ## metalForge — Hardware Discovery
 

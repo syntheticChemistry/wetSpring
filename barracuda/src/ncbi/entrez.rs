@@ -22,6 +22,8 @@ fn encode_term(term: &str) -> String {
     out
 }
 
+use crate::error::Error;
+
 /// Query NCBI Entrez E-search and return the hit count.
 ///
 /// Sends a `rettype=count` request to
@@ -33,7 +35,7 @@ fn encode_term(term: &str) -> String {
 /// Returns `Err` if the HTTP request fails, the response is missing a
 /// `<Count>` element, or the count cannot be parsed as `u64`.
 #[must_use = "search count is discarded if not used"]
-pub fn esearch_count(db: &str, term: &str, api_key: &str) -> Result<u64, String> {
+pub fn esearch_count(db: &str, term: &str, api_key: &str) -> crate::error::Result<u64> {
     let encoded = encode_term(term);
     let url = format!("{ENTREZ_BASE}?db={db}&term={encoded}&rettype=count&api_key={api_key}");
     let body = super::http::get(&url)?;
@@ -41,22 +43,22 @@ pub fn esearch_count(db: &str, term: &str, api_key: &str) -> Result<u64, String>
 }
 
 /// Parse `<Count>...</Count>` from an Entrez E-search XML response body.
-fn parse_count(body: &str) -> Result<u64, String> {
+fn parse_count(body: &str) -> crate::error::Result<u64> {
     let start = body
         .find("<Count>")
-        .ok_or_else(|| preview_error("no <Count> in response", body))?;
+        .ok_or_else(|| Error::Ncbi(preview_msg("no <Count> in response", body)))?;
     let rest = &body[start + 7..];
     let end = rest
         .find("</Count>")
-        .ok_or_else(|| preview_error("unclosed <Count> tag", body))?;
+        .ok_or_else(|| Error::Ncbi(preview_msg("unclosed <Count> tag", body)))?;
     rest[..end]
         .trim()
         .parse::<u64>()
-        .map_err(|e| format!("invalid count value: {e}"))
+        .map_err(|e| Error::Ncbi(format!("invalid count value: {e}")))
 }
 
 /// Build an error message with a truncated preview of the response body.
-fn preview_error(msg: &str, body: &str) -> String {
+fn preview_msg(msg: &str, body: &str) -> String {
     let limit = body.len().min(crate::tolerances::ERROR_BODY_PREVIEW_LEN);
     format!("{msg}: {}", &body[..limit])
 }
@@ -167,21 +169,21 @@ mod tests {
     }
 
     #[test]
-    fn preview_error_truncates_long_body() {
+    fn preview_msg_truncates_long_body() {
         let body = "x".repeat(1000);
-        let msg = preview_error("test", &body);
+        let msg = preview_msg("test", &body);
         assert!(msg.len() < 500);
     }
 
     #[test]
-    fn preview_error_short_body() {
-        let msg = preview_error("oops", "short");
+    fn preview_msg_short_body() {
+        let msg = preview_msg("oops", "short");
         assert_eq!(msg, "oops: short");
     }
 
     #[test]
-    fn preview_error_empty_body() {
-        let msg = preview_error("no count", "");
+    fn preview_msg_empty_body() {
+        let msg = preview_msg("no count", "");
         assert_eq!(msg, "no count: ");
     }
 

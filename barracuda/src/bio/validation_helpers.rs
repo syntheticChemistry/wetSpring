@@ -13,6 +13,19 @@ use crate::bio::taxonomy::{Lineage, NaiveBayesClassifier, ReferenceSeq};
 const SILVA_FASTA: &str = "silva_138_99_seqs.fasta";
 const SILVA_TAX_TSV: &str = "silva_138_99_taxonomy.tsv";
 
+/// Subsample stride for SILVA reference (every Nth sequence).
+///
+/// Yields ~5 000 sequences from the 432 287-entry NR99 set,
+/// providing sufficient taxonomic breadth for 16S classification
+/// while keeping training time under 10 s on a single core.
+const SILVA_SUBSAMPLE_STRIDE: usize = 87;
+
+/// k-mer size for the Naive Bayes classifier.
+///
+/// k = 8 matches the QIIME 2 `classify-sklearn` default for
+/// 16S V4 amplicons (Werner et al. 2012, Bokulich et al. 2018).
+const SILVA_KMER_SIZE: usize = 8;
+
 /// Load and subsample SILVA 138.1 NR99 reference, train `NaiveBayesClassifier`.
 ///
 /// Subsamples to ~5000 sequences (every 87th) for tractable training.
@@ -38,8 +51,8 @@ pub fn load_silva_classifier(ref_dir: &Path) -> Option<NaiveBayesClassifier> {
     let tax_map = stream_taxonomy_tsv(&tax_path)?;
     println!("  Loaded {} taxonomy entries", tax_map.len());
 
-    let refs = stream_fasta_subsampled(&fasta_path, &tax_map, 87)?;
-    let n_total = refs.len().saturating_mul(87);
+    let refs = stream_fasta_subsampled(&fasta_path, &tax_map, SILVA_SUBSAMPLE_STRIDE)?;
+    let n_total = refs.len().saturating_mul(SILVA_SUBSAMPLE_STRIDE);
 
     println!(
         "  Subsampled {} reference sequences from ~{} total",
@@ -52,8 +65,8 @@ pub fn load_silva_classifier(ref_dir: &Path) -> Option<NaiveBayesClassifier> {
         return None;
     }
 
-    println!("  Training NaiveBayes classifier (k=8)...");
-    let classifier = NaiveBayesClassifier::train(&refs, 8);
+    println!("  Training NaiveBayes classifier (k={SILVA_KMER_SIZE})...");
+    let classifier = NaiveBayesClassifier::train(&refs, SILVA_KMER_SIZE);
     println!("  Classifier ready: {} taxa", classifier.n_taxa());
     Some(classifier)
 }

@@ -226,14 +226,19 @@ fn main() {
     v.section("── S6: CPU Math — BarraCuda Pure Rust ──");
 
     v.check("Φ(0) = 0.5", norm_cdf(0.0), 0.5, tolerances::EXACT);
-    v.check("Φ(3) ≈ 0.9987", norm_cdf(3.0), 0.998_650_1, 1e-4);
+    v.check(
+        "Φ(3) ≈ 0.9987",
+        norm_cdf(3.0),
+        0.998_650_1,
+        tolerances::NORM_CDF_TAIL,
+    );
 
     let sphere_vol = (4.0 / 3.0) * std::f64::consts::PI;
     v.check(
         "4/3 π (unit sphere vol)",
         sphere_vol,
         4.188_790_204_786_391,
-        1e-10,
+        tolerances::PYTHON_PARITY,
     );
 
     let (passed, total) = v.counts();

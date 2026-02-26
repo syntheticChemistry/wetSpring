@@ -280,10 +280,20 @@ fn main() {
 
     let h_check = diversity::shannon(&[0.25, 0.25, 0.25, 0.25]);
     let expected_h = 4.0_f64.ln();
-    v.check("Shannon(uniform 4) = ln(4)", h_check, expected_h, 1e-10);
+    v.check(
+        "Shannon(uniform 4) = ln(4)",
+        h_check,
+        expected_h,
+        tolerances::PYTHON_PARITY,
+    );
 
     let si_check = diversity::simpson(&[0.25, 0.25, 0.25, 0.25]);
-    v.check("Simpson(uniform 4) = 0.75", si_check, 0.75, 1e-10);
+    v.check(
+        "Simpson(uniform 4) = 0.75",
+        si_check,
+        0.75,
+        tolerances::PYTHON_PARITY,
+    );
 
     let (passed, total) = v.counts();
     println!("\n  ── Exp171 Summary: {passed}/{total} checks ──");

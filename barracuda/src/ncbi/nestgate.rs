@@ -21,6 +21,7 @@
 //! | Current | Optional `NestGate` provider, sovereign fallback | active |
 //! | Phase 2 | `biomeOS` Neural API routing (`capability.call`) | planned |
 
+use crate::error::Error;
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixStream;
 use std::path::PathBuf;
@@ -79,7 +80,7 @@ fn resolve_socket(explicit: Option<&str>, xdg_runtime: Option<&str>) -> Option<P
 /// # Errors
 ///
 /// Returns `Err` if the socket is unavailable or the RPC fails.
-pub fn store(socket: &PathBuf, key: &str, value: &str) -> Result<(), String> {
+pub fn store(socket: &PathBuf, key: &str, value: &str) -> crate::error::Result<()> {
     let request = format!(
         r#"{{"jsonrpc":"2.0","method":"storage.store","params":{{"key":"{}","value":"{}","family_id":"{}"}},"id":1}}"#,
         escape_json(key),
@@ -88,7 +89,7 @@ pub fn store(socket: &PathBuf, key: &str, value: &str) -> Result<(), String> {
     );
     let response = rpc_call(socket, &request)?;
     if response.contains("\"error\"") {
-        Err(extract_error(&response))
+        Err(Error::Ncbi(extract_error(&response)))
     } else {
         Ok(())
     }
@@ -100,7 +101,7 @@ pub fn store(socket: &PathBuf, key: &str, value: &str) -> Result<(), String> {
 ///
 /// Returns `Err` if the socket is unavailable, the key does not exist,
 /// or the RPC fails.
-pub fn retrieve(socket: &PathBuf, key: &str) -> Result<String, String> {
+pub fn retrieve(socket: &PathBuf, key: &str) -> crate::error::Result<String> {
     let request = format!(
         r#"{{"jsonrpc":"2.0","method":"storage.retrieve","params":{{"key":"{}","family_id":"{}"}},"id":2}}"#,
         escape_json(key),
@@ -108,7 +109,7 @@ pub fn retrieve(socket: &PathBuf, key: &str) -> Result<String, String> {
     );
     let response = rpc_call(socket, &request)?;
     if response.contains("\"error\"") {
-        Err(extract_error(&response))
+        Err(Error::Ncbi(extract_error(&response)))
     } else {
         extract_result_value(&response)
     }
@@ -119,7 +120,7 @@ pub fn retrieve(socket: &PathBuf, key: &str) -> Result<String, String> {
 /// # Errors
 ///
 /// Returns `Err` if the socket is unavailable or the RPC fails.
-pub fn exists(socket: &PathBuf, key: &str) -> Result<bool, String> {
+pub fn exists(socket: &PathBuf, key: &str) -> crate::error::Result<bool> {
     let request = format!(
         r#"{{"jsonrpc":"2.0","method":"storage.exists","params":{{"key":"{}","family_id":"{}"}},"id":3}}"#,
         escape_json(key),
@@ -134,11 +135,11 @@ pub fn exists(socket: &PathBuf, key: &str) -> Result<bool, String> {
 /// # Errors
 ///
 /// Returns `Err` if the socket is unavailable or the health check fails.
-pub fn health(socket: &PathBuf) -> Result<(), String> {
+pub fn health(socket: &PathBuf) -> crate::error::Result<()> {
     let request = r#"{"jsonrpc":"2.0","method":"health","params":{},"id":0}"#;
     let response = rpc_call(socket, request)?;
     if response.contains("\"error\"") {
-        Err(extract_error(&response))
+        Err(Error::Ncbi(extract_error(&response)))
     } else {
         Ok(())
     }
@@ -157,7 +158,7 @@ pub fn fetch_or_fallback(
     db: &str,
     id: &str,
     api_key: &str,
-) -> Result<String, String> {
+) -> crate::error::Result<String> {
     let cache_key = format!("ncbi:{db}:{id}");
 
     if exists(socket, &cache_key).unwrap_or(false) {
@@ -174,37 +175,39 @@ pub fn fetch_or_fallback(
 }
 
 /// Send a JSON-RPC request over a Unix socket and read the response.
-fn rpc_call(socket: &PathBuf, request: &str) -> Result<String, String> {
+fn rpc_call(socket: &PathBuf, request: &str) -> crate::error::Result<String> {
     let stream = UnixStream::connect_addr(
         &std::os::unix::net::SocketAddr::from_pathname(socket)
-            .map_err(|e| format!("invalid socket path: {e}"))?,
+            .map_err(|e| Error::Ncbi(format!("invalid socket path: {e}")))?,
     )
-    .map_err(|e| format!("NestGate connect {}: {e}", socket.display()))?;
+    .map_err(|e| Error::Ncbi(format!("NestGate connect {}: {e}", socket.display())))?;
 
     stream
         .set_read_timeout(Some(READ_TIMEOUT))
-        .map_err(|e| format!("set read timeout: {e}"))?;
+        .map_err(|e| Error::Ncbi(format!("set read timeout: {e}")))?;
     stream
         .set_write_timeout(Some(CONNECT_TIMEOUT))
-        .map_err(|e| format!("set write timeout: {e}"))?;
+        .map_err(|e| Error::Ncbi(format!("set write timeout: {e}")))?;
 
     let mut writer = std::io::BufWriter::new(&stream);
     writer
         .write_all(request.as_bytes())
-        .map_err(|e| format!("write to NestGate: {e}"))?;
+        .map_err(|e| Error::Ncbi(format!("write to NestGate: {e}")))?;
     writer
         .write_all(b"\n")
-        .map_err(|e| format!("write newline: {e}"))?;
-    writer.flush().map_err(|e| format!("flush: {e}"))?;
+        .map_err(|e| Error::Ncbi(format!("write newline: {e}")))?;
+    writer
+        .flush()
+        .map_err(|e| Error::Ncbi(format!("flush: {e}")))?;
 
     let mut reader = BufReader::new(&stream);
     let mut line = String::new();
     reader
         .read_line(&mut line)
-        .map_err(|e| format!("read from NestGate: {e}"))?;
+        .map_err(|e| Error::Ncbi(format!("read from NestGate: {e}")))?;
 
     if line.is_empty() {
-        return Err("NestGate returned empty response".to_string());
+        return Err(Error::Ncbi("NestGate returned empty response".to_string()));
     }
 
     Ok(line)
@@ -232,11 +235,14 @@ fn extract_error(response: &str) -> String {
             }
         }
     }
-    format!("NestGate RPC error: {}", &response[..response.len().min(200)])
+    format!(
+        "NestGate RPC error: {}",
+        &response[..response.len().min(200)]
+    )
 }
 
 /// Extract the `result.value` or `result` string from a JSON-RPC response.
-fn extract_result_value(response: &str) -> Result<String, String> {
+fn extract_result_value(response: &str) -> crate::error::Result<String> {
     if let Some(start) = response.find("\"result\"") {
         if let Some(colon) = response[start..].find(':') {
             let after_colon = &response[start + colon + 1..];
@@ -252,7 +258,9 @@ fn extract_result_value(response: &str) -> Result<String, String> {
             }
         }
     }
-    Err("could not extract result from NestGate response".to_string())
+    Err(Error::Ncbi(
+        "could not extract result from NestGate response".to_string(),
+    ))
 }
 
 #[cfg(test)]
@@ -262,9 +270,11 @@ mod tests {
 
     #[test]
     fn is_enabled_default_false() {
-        assert!(!std::env::var("WETSPRING_DATA_PROVIDER")
-            .is_ok_and(|v| v.trim().eq_ignore_ascii_case("nestgate"))
-            || is_enabled());
+        assert!(
+            !std::env::var("WETSPRING_DATA_PROVIDER")
+                .is_ok_and(|v| v.trim().eq_ignore_ascii_case("nestgate"))
+                || is_enabled()
+        );
     }
 
     #[test]
@@ -356,6 +366,7 @@ mod tests {
     fn health_nonexistent_socket_errors() {
         let path = PathBuf::from("/tmp/wetspring_test_nonexistent_nestgate.sock");
         let err = health(&path).unwrap_err();
-        assert!(err.contains("NestGate connect") || err.contains("invalid socket"));
+        let msg = err.to_string();
+        assert!(msg.contains("NestGate connect") || msg.contains("invalid socket"));
     }
 }

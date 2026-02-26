@@ -194,7 +194,12 @@ fn main() {
         1.544_479_521_096_86,
         tolerances::PYTHON_PARITY,
     );
-    v.check("Simpson (5 OTUs, 1-D)", si, 0.775, 0.001);
+    v.check(
+        "Simpson (5 OTUs, 1-D)",
+        si,
+        0.775,
+        tolerances::ODE_METHOD_PARITY,
+    );
     timings.push(("D06: Diversity (Shannon+Simpson)", div_us));
 
     // ═══ D07: Signal Processing ═══════════════════════════════════

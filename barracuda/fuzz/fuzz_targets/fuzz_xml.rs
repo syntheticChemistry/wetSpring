@@ -13,9 +13,8 @@ fuzz_target!(|data: &[u8]| {
 
     loop {
         match xml_reader.next_event() {
-            Ok(XmlEvent::Eof) => break,
+            Ok(XmlEvent::Eof) | Err(_) => break,
             Ok(_) => {}
-            Err(_) => break,
         }
     }
 });

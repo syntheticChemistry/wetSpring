@@ -1,10 +1,10 @@
 # Exp184: Real NCBI 16S Through Sovereign Pipeline
 
 **Date:** February 26, 2026
-**Phase:** V55 — Science extensions
-**Binary:** `validate_real_ncbi_pipeline` (planned)
+**Phase:** V59 — Science extensions
+**Binary:** `validate_real_ncbi_pipeline`
 **Command:** `cargo run --release --bin validate_real_ncbi_pipeline`
-**Status:** Protocol defined, implementation pending
+**Status:** DONE (CPU, 25 checks PASS)
 
 ## Purpose
 

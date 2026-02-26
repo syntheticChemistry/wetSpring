@@ -33,6 +33,8 @@ pub enum Error {
     Gpu(String),
     /// Invalid input parameters (dimensions, ranges, constraints).
     InvalidInput(String),
+    /// NCBI Entrez / SRA / `NestGate` error (network, parsing, protocol).
+    Ncbi(String),
 }
 
 /// Result type alias for wetSpring operations.
@@ -50,6 +52,7 @@ impl fmt::Display for Error {
             Self::Ms2(msg) => write!(f, "MS2 parse error: {msg}"),
             Self::Gpu(msg) => write!(f, "GPU compute error: {msg}"),
             Self::InvalidInput(msg) => write!(f, "invalid input: {msg}"),
+            Self::Ncbi(msg) => write!(f, "NCBI error: {msg}"),
         }
     }
 }
@@ -65,7 +68,8 @@ impl std::error::Error for Error {
             | Self::BinaryFormat(_)
             | Self::Ms2(_)
             | Self::Gpu(_)
-            | Self::InvalidInput(_) => None,
+            | Self::InvalidInput(_)
+            | Self::Ncbi(_) => None,
         }
     }
 }
@@ -110,6 +114,7 @@ mod tests {
                 Error::InvalidInput("bad dimensions".into()),
                 "invalid input",
             ),
+            (Error::Ncbi("connection refused".into()), "NCBI error"),
         ];
         for (err, expected_prefix) in cases {
             let msg = err.to_string();
@@ -142,6 +147,7 @@ mod tests {
             Error::Ms2("x".into()),
             Error::Gpu("x".into()),
             Error::InvalidInput("x".into()),
+            Error::Ncbi("x".into()),
         ];
         for err in &variants {
             assert!(std::error::Error::source(err).is_none());

@@ -74,10 +74,11 @@ pub fn rf_distance_matrix_gpu(gpu: &GpuF64, trees: &[PhyloTree]) -> Result<Vec<f
         return Ok(condensed);
     }
 
-    // For larger sets, compute pairwise on CPU (GPU Hamming operates on
-    // u32 bit-vectors; split encoding is string-based in the current CPU
-    // module). When ToadStool provides a BipartitionGpu primitive, this
-    // will rewire to full GPU dispatch.
+    // CPU delegation: GPU Hamming operates on u32 bit-vectors but splits
+    // are string-encoded. Rewires to PairwiseHammingGpu when:
+    //   1. Split representation evolves to bit-vector encoding
+    //   2. ToadStool provides BipartitionEncodeGpu (string → bitvec)
+    // Tracked: BARRACUDA_REQUIREMENTS.md, Tier B compose
     let mut condensed = Vec::with_capacity(n * (n - 1) / 2);
     for i in 0..n {
         for j in (i + 1)..n {

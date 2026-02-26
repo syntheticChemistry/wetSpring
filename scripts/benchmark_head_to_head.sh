@@ -12,7 +12,7 @@ mkdir -p "$RESULTS"
 
 echo "═══════════════════════════════════════════════════════════════"
 echo "  wetSpring — Rust vs Python Head-to-Head Benchmark"
-echo "  31+ domains | 380/380 CPU parity checks | v1–v8"
+echo "  36+ domains | 455+ CPU parity checks | v1–v10"
 echo "═══════════════════════════════════════════════════════════════"
 echo ""
 
@@ -26,7 +26,9 @@ cargo build --release \
     --bin validate_barracuda_cpu_v5 \
     --bin validate_barracuda_cpu_v6 \
     --bin validate_barracuda_cpu_v7 \
-    --bin validate_barracuda_cpu_v8 2>&1 | tail -1
+    --bin validate_barracuda_cpu_v8 \
+    --bin validate_barracuda_cpu_v9 \
+    --bin validate_barracuda_cpu_v10 2>&1 | tail -1
 
 BINS=(
     "validate_barracuda_cpu:v1 (9 domains)"
@@ -37,6 +39,8 @@ BINS=(
     "validate_barracuda_cpu_v6:v6 (6 ODE flat)"
     "validate_barracuda_cpu_v7:v7 (Tier A layouts)"
     "validate_barracuda_cpu_v8:v8 (13 promoted GPU domains)"
+    "validate_barracuda_cpu_v9:v9 (Track 3 drug repurposing)"
+    "validate_barracuda_cpu_v10:v10 (V59 science extensions)"
 )
 
 RUST_TOTAL=0

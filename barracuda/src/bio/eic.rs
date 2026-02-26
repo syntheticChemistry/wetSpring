@@ -64,7 +64,7 @@ pub fn extract_eics(spectra: &[MzmlSpectrum], target_mzs: &[f64], ppm: f64) -> V
             for spectrum in &ms1 {
                 rt.push(spectrum.rt_minutes);
 
-                let tol = target * ppm * 1e-6;
+                let tol = target * ppm * crate::tolerances::PPM_FACTOR;
                 let lo = target - tol;
                 let hi = target + tol;
 

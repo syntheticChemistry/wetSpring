@@ -1,10 +1,10 @@
 # Exp188: NPU Sentinel with Real Sensor Stream
 
 **Date:** February 26, 2026
-**Phase:** V55 — Science extensions
-**Binary:** `validate_npu_sentinel_stream` (planned)
+**Phase:** V59 — Science extensions
+**Binary:** `validate_npu_sentinel_stream`
 **Command:** `cargo run --release --bin validate_npu_sentinel_stream`
-**Status:** Protocol defined, implementation pending
+**Status:** DONE (CPU, 10 checks PASS — AKD1000 hardware pending, int8 simulation validated)
 **Depends on:** Exp160 (NPU sentinel validation), Exp184 (real data pipeline)
 
 ## Purpose

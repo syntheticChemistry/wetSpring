@@ -153,7 +153,10 @@ fn main() {
 
             for &(w, _, stderr) in &sweep {
                 v.check_pass(
-                    &format!("L={l} W={w:.1}: stderr < {}", tolerances::LEVEL_SPACING_STDERR_MAX),
+                    &format!(
+                        "L={l} W={w:.1}: stderr < {}",
+                        tolerances::LEVEL_SPACING_STDERR_MAX
+                    ),
                     stderr < tolerances::LEVEL_SPACING_STDERR_MAX,
                 );
             }
@@ -205,9 +208,7 @@ fn main() {
             let mut crossings = Vec::new();
             for i in 0..all_results.len() {
                 for j in (i + 1)..all_results.len() {
-                    if let Some(wc) =
-                        find_crossing(&all_results[i].sweep, &all_results[j].sweep)
-                    {
+                    if let Some(wc) = find_crossing(&all_results[i].sweep, &all_results[j].sweep) {
                         println!(
                             "    L={} × L={}: W_c = {wc:.2}",
                             all_results[i].l, all_results[j].l

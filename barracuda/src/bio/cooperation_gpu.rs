@@ -64,7 +64,8 @@ impl CooperationGpu {
     pub fn new(device: Arc<WgpuDevice>) -> crate::error::Result<Self> {
         let d = device.device();
         let wgsl = BatchedOdeRK4::<CooperationOde>::generate_shader();
-        let module = device.compile_shader_universal(&wgsl, Precision::F64, Some("Cooperation ODE"));
+        let module =
+            device.compile_shader_universal(&wgsl, Precision::F64, Some("Cooperation ODE"));
 
         let bgl = d.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             label: Some("Cooperation BGL"),

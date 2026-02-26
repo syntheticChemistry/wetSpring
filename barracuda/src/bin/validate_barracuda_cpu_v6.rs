@@ -218,12 +218,17 @@ fn validate_multi_signal(v: &mut Validator) {
             &format!("multi_signal var{var} bitwise"),
             (d - f).abs(),
             0.0,
-            0.0,
+            tolerances::EXACT,
         );
     }
 
     let h_ss = steady_state_mean(&r_direct, 4, SS_FRAC);
-    v.check("multi_signal HapR_ss vs Python (>0.3)", h_ss, 0.5, 0.2);
+    v.check(
+        "multi_signal HapR_ss vs Python (>0.3)",
+        h_ss,
+        0.5,
+        tolerances::ODE_GPU_SWEEP_ABS,
+    );
 
     let b_ss = steady_state_mean(&r_direct, 6, SS_FRAC);
     v.check(
@@ -275,7 +280,7 @@ fn validate_phage_defense(v: &mut Validator) {
             &format!("phage_defense var{var} bitwise"),
             (d - f).abs(),
             0.0,
-            0.0,
+            tolerances::EXACT,
         );
     }
 
@@ -323,7 +328,7 @@ fn validate_cooperation(v: &mut Validator) {
             &format!("cooperation var{var} bitwise"),
             (d - f).abs(),
             0.0,
-            0.0,
+            tolerances::EXACT,
         );
     }
 

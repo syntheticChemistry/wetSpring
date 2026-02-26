@@ -14,7 +14,7 @@
 /// NaN values in `sorted_mz` are safely skipped (they never match any range).
 #[must_use]
 pub fn find_within_ppm(sorted_mz: &[f64], query: f64, ppm: f64) -> Vec<usize> {
-    let tol = query * ppm * 1e-6;
+    let tol = query * ppm * crate::tolerances::PPM_FACTOR;
     let lo = query - tol;
     let hi = query + tol;
     find_in_range(sorted_mz, lo, hi)

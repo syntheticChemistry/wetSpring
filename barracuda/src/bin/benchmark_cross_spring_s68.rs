@@ -278,14 +278,13 @@ fn main() {
         DiversityFusionGpu, diversity_fusion_cpu,
     };
 
-    let abundances: Vec<f64> = (0..200)
-        .map(|i| f64::from(i % 50 + 1) / 50.0)
-        .collect();
+    let abundances: Vec<f64> = (0..200).map(|i| f64::from(i % 50 + 1) / 50.0).collect();
     let n_species = 50;
 
     let (fusion_gpu_res, fusion_gpu_ms) = bench("DiversityFusion GPU (200 samples)", || {
         let dfg = DiversityFusionGpu::new(Arc::clone(&device), Arc::clone(&ctx));
-        dfg.compute(&abundances, n_species).expect("DiversityFusion GPU")
+        dfg.compute(&abundances, n_species)
+            .expect("DiversityFusion GPU")
     });
     let fusion_cpu_res = diversity_fusion_cpu(&abundances, n_species).expect("DiversityFusion CPU");
 
@@ -321,15 +320,33 @@ fn main() {
         wetspring_barracuda::bio::diversity::shannon(&community)
     });
     let sh_upstream = barracuda::stats::shannon(&community);
-    v.check("Shannon: local ≡ upstream", sh_local, sh_upstream, tolerances::EXACT_F64);
-    timings.push(Timing { label: "Shannon (CPU)", origin: "wetSpring→S64", ms: sh_ms });
+    v.check(
+        "Shannon: local ≡ upstream",
+        sh_local,
+        sh_upstream,
+        tolerances::EXACT_F64,
+    );
+    timings.push(Timing {
+        label: "Shannon (CPU)",
+        origin: "wetSpring→S64",
+        ms: sh_ms,
+    });
 
     let (si_local, si_ms) = bench("diversity::simpson (→ barracuda::stats)", || {
         wetspring_barracuda::bio::diversity::simpson(&community)
     });
     let si_upstream = barracuda::stats::simpson(&community);
-    v.check("Simpson: local ≡ upstream", si_local, si_upstream, tolerances::EXACT_F64);
-    timings.push(Timing { label: "Simpson (CPU)", origin: "wetSpring→S64", ms: si_ms });
+    v.check(
+        "Simpson: local ≡ upstream",
+        si_local,
+        si_upstream,
+        tolerances::EXACT_F64,
+    );
+    timings.push(Timing {
+        label: "Simpson (CPU)",
+        origin: "wetSpring→S64",
+        ms: si_ms,
+    });
 
     let samples_a = vec![10.0, 20.0, 30.0, 5.0];
     let samples_b = vec![15.0, 25.0, 10.0, 8.0];
@@ -337,8 +354,17 @@ fn main() {
         wetspring_barracuda::bio::diversity::bray_curtis(&samples_a, &samples_b)
     });
     let bc_upstream = barracuda::stats::bray_curtis(&samples_a, &samples_b);
-    v.check("Bray-Curtis: local ≡ upstream", bc_local, bc_upstream, tolerances::EXACT_F64);
-    timings.push(Timing { label: "Bray-Curtis (CPU)", origin: "wetSpring→S64", ms: bc_ms });
+    v.check(
+        "Bray-Curtis: local ≡ upstream",
+        bc_local,
+        bc_upstream,
+        tolerances::EXACT_F64,
+    );
+    timings.push(Timing {
+        label: "Bray-Curtis (CPU)",
+        origin: "wetSpring→S64",
+        ms: bc_ms,
+    });
 
     // ═══════════════════════════════════════════════════════════════════
     // §4  CPU Special Functions — barracuda::special (cross-spring S59)
@@ -351,20 +377,42 @@ fn main() {
     let (erf_val, erf_ms) = bench("erf(1.0) — barracuda::special", || {
         barracuda::special::erf(1.0)
     });
-    v.check("erf(1.0)", erf_val, 0.842_700_792_949_715, tolerances::ANALYTICAL_F64);
-    timings.push(Timing { label: "erf(1.0)", origin: "hotSpring→S59", ms: erf_ms });
+    v.check(
+        "erf(1.0)",
+        erf_val,
+        0.842_700_792_949_715,
+        tolerances::ANALYTICAL_F64,
+    );
+    timings.push(Timing {
+        label: "erf(1.0)",
+        origin: "hotSpring→S59",
+        ms: erf_ms,
+    });
 
     let (lng_val, lng_ms) = bench("ln_gamma(5.0) — barracuda::special", || {
         barracuda::special::ln_gamma(5.0).expect("ln_gamma")
     });
-    v.check("ln_gamma(5.0) = ln(24)", lng_val, f64::ln(24.0), tolerances::ANALYTICAL_F64);
-    timings.push(Timing { label: "ln_gamma(5.0)", origin: "hotSpring→S59", ms: lng_ms });
+    v.check(
+        "ln_gamma(5.0) = ln(24)",
+        lng_val,
+        f64::ln(24.0),
+        tolerances::ANALYTICAL_F64,
+    );
+    timings.push(Timing {
+        label: "ln_gamma(5.0)",
+        origin: "hotSpring→S59",
+        ms: lng_ms,
+    });
 
     let (ncdf_val, ncdf_ms) = bench("norm_cdf(1.96) — barracuda::stats", || {
         barracuda::stats::norm_cdf(1.96)
     });
     v.check("norm_cdf(1.96) ≈ 0.975", ncdf_val, 0.975, 0.001);
-    timings.push(Timing { label: "norm_cdf(1.96)", origin: "cross-spring→S59", ms: ncdf_ms });
+    timings.push(Timing {
+        label: "norm_cdf(1.96)",
+        origin: "cross-spring→S59",
+        ms: ncdf_ms,
+    });
 
     // ═══════════════════════════════════════════════════════════════════
     // §5  Anderson Spectral — hotSpring → ToadStool → wetSpring
@@ -387,7 +435,10 @@ fn main() {
         let (n_eigs, r_val) = anderson_res;
         v.check_pass("Anderson: eigenvalues computed", n_eigs > 0);
         v.check_pass("Anderson: r finite", r_val.is_finite());
-        v.check_pass("Anderson: r in valid range (0, 1)", r_val > 0.0 && r_val < 1.0);
+        v.check_pass(
+            "Anderson: r in valid range (0, 1)",
+            r_val > 0.0 && r_val < 1.0,
+        );
         timings.push(Timing {
             label: "Anderson 3D + Lanczos",
             origin: "hotSpring→ToadStool",
@@ -437,7 +488,11 @@ fn main() {
         .map(|r| r.w.iter().all(|&x| x >= 0.0) && r.h.iter().all(|&x| x >= 0.0))
         .unwrap_or(false);
     v.check_pass("NMF W, H non-negative", nmf_ok);
-    timings.push(Timing { label: "NMF 10×8 k=3", origin: "wetSpring→S58", ms: nmf_ms });
+    timings.push(Timing {
+        label: "NMF 10×8 k=3",
+        origin: "wetSpring→S58",
+        ms: nmf_ms,
+    });
 
     let (ridge_res, ridge_ms) = bench("ridge regression (20×5→2) — barracuda::linalg", || {
         let x_data: Vec<f64> = (0..100).map(|i| f64::from(i) * 0.01).collect();
@@ -450,7 +505,11 @@ fn main() {
             .map(|r| r.weights.iter().all(|w| w.is_finite()))
             .unwrap_or(false),
     );
-    timings.push(Timing { label: "Ridge 20×5→2", origin: "wetSpring→S59", ms: ridge_ms });
+    timings.push(Timing {
+        label: "Ridge 20×5→2",
+        origin: "wetSpring→S59",
+        ms: ridge_ms,
+    });
 
     let (trapz_val, trapz_ms) = bench("trapz(1000 pts) — barracuda::numerical", || {
         let n = 1000;
@@ -459,7 +518,11 @@ fn main() {
         barracuda::numerical::trapz(&y, &x).expect("trapz")
     });
     v.check("trapz(x²) ≈ 1/3", trapz_val, 1.0 / 3.0, 0.001);
-    timings.push(Timing { label: "trapz 1000pts", origin: "cross-spring→S59", ms: trapz_ms });
+    timings.push(Timing {
+        label: "trapz 1000pts",
+        origin: "cross-spring→S59",
+        ms: trapz_ms,
+    });
 
     // ═══════════════════════════════════════════════════════════════════
     // §7  GPU GEMM — wetSpring GemmCached via universal precision (S68)
@@ -546,7 +609,12 @@ fn main() {
         wetspring_barracuda::special::dot(&vec_a, &vec_b)
     });
     let dot_upstream = barracuda::stats::dot(&vec_a, &vec_b);
-    v.check("dot: local ≡ upstream", dot_local, dot_upstream, tolerances::EXACT_F64);
+    v.check(
+        "dot: local ≡ upstream",
+        dot_local,
+        dot_upstream,
+        tolerances::EXACT_F64,
+    );
     timings.push(Timing {
         label: "dot product (100)",
         origin: "airSpring→S64",
@@ -557,7 +625,12 @@ fn main() {
         wetspring_barracuda::special::l2_norm(&vec_a)
     });
     let l2_upstream = barracuda::stats::l2_norm(&vec_a);
-    v.check("l2_norm: local ≡ upstream", l2_local, l2_upstream, tolerances::EXACT_F64);
+    v.check(
+        "l2_norm: local ≡ upstream",
+        l2_local,
+        l2_upstream,
+        tolerances::EXACT_F64,
+    );
     timings.push(Timing {
         label: "l2_norm (100)",
         origin: "airSpring→S64",
@@ -620,7 +693,9 @@ fn main() {
     println!("  ──────────────────────────────────────");
     println!("  • hotSpring f64 precision → all springs benefit from driver workarounds");
     println!("    (Fp64Strategy auto-detection, NVK polyfills, ILP optimization)");
-    println!("  • hotSpring DF64 (14 shaders) → universal precision makes DF64 a Precision variant");
+    println!(
+        "  • hotSpring DF64 (14 shaders) → universal precision makes DF64 a Precision variant"
+    );
     println!("    compile_shader_universal(source, Precision::Df64) — any shader, any spring");
     println!("  • wetSpring bio ODE × 5 → ToadStool BatchedOdeRK4 trait (S58)");
     println!("    → neuralSpring uses same trait for population genetics ODE");

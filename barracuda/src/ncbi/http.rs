@@ -68,6 +68,8 @@ fn which_exists(cmd: &str) -> bool {
         .is_some_and(|paths| std::env::split_paths(&paths).any(|dir| dir.join(cmd).is_file()))
 }
 
+use crate::error::Error;
+
 /// HTTP GET via capability-discovered system transport.
 ///
 /// Discovers the best available HTTP backend at runtime and uses it.
@@ -78,10 +80,12 @@ fn which_exists(cmd: &str) -> bool {
 /// Returns `Err` if no HTTP transport is available, the request fails,
 /// times out (30 s), or the response contains invalid UTF-8.
 #[must_use = "HTTP response body is discarded if not used"]
-pub fn get(url: &str) -> Result<String, String> {
+pub fn get(url: &str) -> crate::error::Result<String> {
     let (backend, cmd) = discover_backend().ok_or_else(|| {
-        "no HTTP transport available (need curl or wget on PATH, or set WETSPRING_HTTP_CMD)"
-            .to_string()
+        Error::Ncbi(
+            "no HTTP transport available (need curl or wget on PATH, or set WETSPRING_HTTP_CMD)"
+                .to_string(),
+        )
     })?;
 
     let output = match backend {
@@ -89,20 +93,22 @@ pub fn get(url: &str) -> Result<String, String> {
             let parts: Vec<&str> = cmd.split_whitespace().collect();
             let (program, args) = parts
                 .split_first()
-                .ok_or_else(|| "WETSPRING_HTTP_CMD is empty".to_string())?;
+                .ok_or_else(|| Error::Ncbi("WETSPRING_HTTP_CMD is empty".to_string()))?;
             let mut command = std::process::Command::new(program);
             command.args(args);
             command.arg(url);
-            command.output().map_err(|e| format!("{cmd}: {e}"))?
+            command
+                .output()
+                .map_err(|e| Error::Ncbi(format!("{cmd}: {e}")))?
         }
         Backend::Curl => std::process::Command::new("curl")
             .args(["-sfS", "-m", "30", url])
             .output()
-            .map_err(|e| format!("curl: {e}"))?,
+            .map_err(|e| Error::Ncbi(format!("curl: {e}")))?,
         Backend::Wget => std::process::Command::new("wget")
             .args(["-qO-", "--timeout=30", url])
             .output()
-            .map_err(|e| format!("wget: {e}"))?,
+            .map_err(|e| Error::Ncbi(format!("wget: {e}")))?,
     };
 
     interpret_output(output, &cmd)
@@ -111,16 +117,16 @@ pub fn get(url: &str) -> Result<String, String> {
 /// Interpret the output of an HTTP subprocess.
 ///
 /// Takes ownership to avoid cloning `stdout` on the success path.
-fn interpret_output(output: std::process::Output, cmd: &str) -> Result<String, String> {
+fn interpret_output(output: std::process::Output, cmd: &str) -> crate::error::Result<String> {
     if output.status.success() {
-        String::from_utf8(output.stdout).map_err(|e| e.to_string())
+        String::from_utf8(output.stdout).map_err(|e| Error::Ncbi(e.to_string()))
     } else {
         let stderr = String::from_utf8_lossy(&output.stderr);
         let preview = &stderr[..stderr.len().min(crate::tolerances::ERROR_BODY_PREVIEW_LEN)];
-        Err(format!(
+        Err(Error::Ncbi(format!(
             "{cmd} failed (exit {:?}): {preview}",
             output.status.code()
-        ))
+        )))
     }
 }
 
@@ -224,8 +230,9 @@ mod tests {
         };
         let result = interpret_output(output, "curl");
         let err = result.unwrap_err();
-        assert!(err.contains("curl"));
-        assert!(err.contains("connection refused"));
+        let msg = err.to_string();
+        assert!(msg.contains("curl"));
+        assert!(msg.contains("connection refused"));
     }
 
     #[test]
@@ -237,7 +244,7 @@ mod tests {
         };
         let result = interpret_output(output, "wget");
         let err = result.unwrap_err();
-        assert!(err.len() < 500);
+        assert!(err.to_string().len() < 500);
     }
 
     #[test]

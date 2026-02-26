@@ -64,7 +64,8 @@ impl PhageDefenseGpu {
     pub fn new(device: Arc<WgpuDevice>) -> crate::error::Result<Self> {
         let d = device.device();
         let wgsl = BatchedOdeRK4::<PhageDefenseOde>::generate_shader();
-        let module = device.compile_shader_universal(&wgsl, Precision::F64, Some("PhageDefense ODE"));
+        let module =
+            device.compile_shader_universal(&wgsl, Precision::F64, Some("PhageDefense ODE"));
 
         let bgl = d.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             label: Some("PhageDefense BGL"),

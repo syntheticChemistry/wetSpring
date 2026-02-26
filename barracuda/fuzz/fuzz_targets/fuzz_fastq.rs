@@ -12,7 +12,7 @@ fuzz_target!(|data: &[u8]| {
 
     // Should not panic regardless of input
     let _ = wetspring_barracuda::io::fastq::FastqIter::open(&path)
-        .and_then(|iter| iter.collect::<std::result::Result<Vec<_>, _>>());
+        .and_then(Iterator::collect::<std::result::Result<Vec<_>, _>>);
 
     // Also test stats_from_file
     let _ = wetspring_barracuda::io::fastq::stats_from_file(&path);

@@ -981,3 +981,45 @@ required-features = ["gpu"]
 name = "benchmark_cross_spring_s68"
 path = "src/bin/benchmark_cross_spring_s68.rs"
 required-features = ["gpu"]
+
+# ── Exp184: Real NCBI Sovereign Pipeline ──────────────────
+[[bin]]
+name = "validate_real_ncbi_pipeline"
+path = "src/bin/validate_real_ncbi_pipeline.rs"
+
+# ── Exp185: Cold Seep Sovereign Pipeline ──────────────────
+[[bin]]
+name = "validate_cold_seep_pipeline"
+path = "src/bin/validate_cold_seep_pipeline.rs"
+
+# ── Exp186: Dynamic Anderson W(t) ─────────────────────────
+[[bin]]
+name = "validate_dynamic_anderson"
+path = "src/bin/validate_dynamic_anderson.rs"
+
+# ── Exp187: DF64 Anderson Large Lattice ───────────────────
+[[bin]]
+name = "validate_df64_anderson"
+path = "src/bin/validate_df64_anderson.rs"
+
+# ── Exp188: NPU Sentinel Real Stream ──────────────────────
+[[bin]]
+name = "validate_npu_sentinel_stream"
+path = "src/bin/validate_npu_sentinel_stream.rs"
+
+# ── Exp190: BarraCuda CPU v10 — V59 Science Extensions ───
+[[bin]]
+name = "validate_barracuda_cpu_v10"
+path = "src/bin/validate_barracuda_cpu_v10.rs"
+
+# ── Exp191: GPU V59 Science Parity ───────────────────────
+[[bin]]
+name = "validate_gpu_v59_science"
+path = "src/bin/validate_gpu_v59_science.rs"
+required-features = ["gpu"]
+
+# ── Exp192: metalForge V59 Cross-Substrate ───────────────
+[[bin]]
+name = "validate_metalforge_v59_science"
+path = "src/bin/validate_metalforge_v59_science.rs"
+required-features = ["gpu"]

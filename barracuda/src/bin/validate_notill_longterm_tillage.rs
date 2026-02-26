@@ -336,10 +336,20 @@ fn main() {
     v.check("Φ(0) = 0.5", norm_cdf(0.0), 0.5, tolerances::EXACT);
 
     let h_check = diversity::shannon(&[0.5, 0.5]);
-    v.check("Shannon(50/50) = ln(2)", h_check, 2.0_f64.ln(), 1e-10);
+    v.check(
+        "Shannon(50/50) = ln(2)",
+        h_check,
+        2.0_f64.ln(),
+        tolerances::PYTHON_PARITY,
+    );
 
     let e_check = diversity::pielou_evenness(&[0.25, 0.25, 0.25, 0.25]);
-    v.check("Pielou(uniform 4) = 1.0", e_check, 1.0, 1e-10);
+    v.check(
+        "Pielou(uniform 4) = 1.0",
+        e_check,
+        1.0,
+        tolerances::PYTHON_PARITY,
+    );
 
     let (passed, total) = v.counts();
     println!("\n  ── Exp175 Summary: {passed}/{total} checks ──");

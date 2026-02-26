@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 26, 2026
-**Status:** Phase 58 — 189 experiments, 4,494+ validation checks (1,578 GPU on RTX 4070), all PASS (882 barracuda + 47 forge + 32 integration/doc = 961 Rust tests), ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 82 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets), V58 doc sync + evolution learnings handoff, 39/39 three-tier
+**Status:** Phase 59 — 197 experiments, 4,688+ validation checks (1,578 GPU on RTX 4070), all PASS (882 barracuda lib + 60 integration + 19 doc + 47 forge = 1,008 Rust tests), ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 86 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets + fuzz), typed NCBI errors (`Error::Ncbi`), V59 deep debt resolution + idiomatic Rust evolution, 39/39 three-tier
 
 ---
 
@@ -192,6 +192,14 @@
 | 181 | Track 4 pure GPU streaming | `validate_soil_qs_streaming` | PASS | 52 |
 | 182 | Track 4 metalForge cross-substrate | `validate_soil_qs_metalforge` | PASS | 14 |
 | 183 | Cross-Spring Evolution Benchmark (S66) | `benchmark_cross_spring_s65` | PASS | 36 |
+| 184 | Real NCBI Sovereign Pipeline | `validate_real_ncbi_pipeline` | PASS | 25 |
+| 185 | Cold Seep Sovereign Pipeline | `validate_cold_seep_pipeline` | PASS | 8 |
+| 186 | Dynamic Anderson W(t) | `validate_dynamic_anderson` | PASS | 7 |
+| 187 | DF64 Anderson Large Lattice (f64 Phase 1) | `validate_df64_anderson` | PASS | 4 |
+| 188 | NPU Sentinel Real Stream | `validate_npu_sentinel_stream` | PASS | 10 |
+| 190 | BarraCuda CPU v10 — V59 Science | CPU/cross | PASS | 75 |
+| 191 | GPU V59 Science Parity | GPU | PASS | 29 |
+| 192 | metalForge V59 Cross-Substrate | metalForge | PASS | 36 |
 
 ---
 
@@ -199,7 +207,7 @@
 
 | Category | Count |
 |----------|-------|
-| Experiments completed | 189 |
+| Experiments completed | 197 |
 | CPU validation checks | 1,476 |
 | GPU validation checks | 1,578 |
 | Dispatch validation checks | 80 |
@@ -225,8 +233,10 @@
 | Drug repurposing: Fajgenbaum, MATRIX, NMF, repoDB, ROBOKOP (Exp157-161) | 40 |
 | Drug repurposing: CPU v9, GPU, metalForge (Exp163-165) | 44 |
 | Phase 44: modern systems S62+DF64, diversity fusion (Exp166-167) | 37 |
-| **Total validation checks** | **4,494+** |
-| Rust tests | 961 (882 barracuda + 47 forge + 32 integration/doc) |
+| Exp184-188 science extensions | 54 |
+| Exp190-192 V59 three-tier controls | 140 |
+| **Total validation checks** | **4,688+** |
+| Rust tests | 1,008 (882 barracuda lib + 60 integration + 19 doc + 47 forge) |
 | BarraCuda CPU parity | 380/380 (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/092/101) |
 | metalForge cross-system | 37 domains CPU↔GPU proven (Exp103+104+165+182), **39/39 papers three-tier** |
@@ -284,6 +294,10 @@
 ### Deferred (not blocking)
 - Exp002 raw data: 70 FASTQ pairs from SRA (Galaxy bootstrap, not needed for validation)
 - Trimmomatic/pyteomics baselines: superseded by sovereign Rust implementations
+- Exp184 Tier 2/3: full 170 cold seep + LTEE downloads (requires broadband + compute time)
+- Exp186/187 GPU sections: require `--features gpu` (validated CPU W(t) functions + constants)
+- Exp187 DF64 Phase 2: requires upstream ToadStool DF64 Lanczos kernel from hotSpring
+- Exp188 real AKD1000: requires NPU hardware path (CPU int8 simulation validated)
 
 ### Completed
 - Exp019 Phases 2-4 (Phylogenetic): All COMPLETE
@@ -345,21 +359,21 @@ matching. Exp008 adds sovereign ML for environmental monitoring.
 
 ---
 
-## Code Quality (Feb 24, 2026)
+## Code Quality (Feb 26, 2026)
 
 ```
 cargo fmt --check              → clean (0 diffs, both crates)
 cargo clippy --pedantic        → 0 warnings (pedantic + nursery, default features)
 cargo clippy --features gpu    → 0 warnings (pedantic + nursery, GPU features)
 cargo doc --features gpu       → clean (0 warnings, strict: -D missing_docs -D broken_intra_doc_links)
-cargo test --lib               → 755 passed, 0 failed, 1 ignored (hardware-dependent)
+cargo test --lib               → 882 passed, 0 failed, 1 ignored (hardware-dependent)
 cargo test --tests             → 60 integration (23 bio + 16 determinism + 21 I/O)
 cargo test --doc               → 19 passed, 0 failed (5 API examples)
 cargo llvm-cov --lib           → 96.67% line coverage
 #![deny(unsafe_code)]          → enforced crate-wide (edition 2024; env-var tests use Mutex-serialized helpers)
 #![deny(expect_used, unwrap_used)] → enforced crate-wide (test modules #[allow])
 partial_cmp().unwrap()         → 0 (all migrated to f64::total_cmp)
-inline tolerance literals      → 0 (79 named constants in tolerances.rs; V55 added 2)
+inline tolerance literals      → 0 (86 named constants in tolerances.rs; V59 added 4: PPM_FACTOR, ERF/NORM_CDF parity)
 blanket similar_names          → removed; targeted #[allow] per-function where domain-appropriate
 GPU workgroup sizes            → named constants in all *_gpu.rs (match WGSL shaders)
 shared math (crate::special)   → delegates to barracuda::special when gpu active; sovereign otherwise
@@ -368,7 +382,7 @@ SPDX headers                   → all .rs files
 max file size                  → all under 1000 LOC (fastq.rs: 913 largest)
 external C dependencies        → 0 (flate2 rust_backend; wgpu default-features = false)
 XML parser allocations         → Cow<str> for xml_unescape; 1 allocation per text event (was 2)
-provenance headers             → all 158 binaries (commit, command, hardware)
+provenance headers             → all 163 binaries (commit, command, hardware)
 duplicate math                 → 0 (crate::special delegates to ToadStool barracuda::special when gpu enabled)
 Python baselines               → scripts/requirements.txt (pinned numpy, scipy, sklearn)
 barracuda_cpu                  → 380/380 checks PASS (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted)

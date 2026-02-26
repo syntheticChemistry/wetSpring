@@ -1,10 +1,10 @@
 # Exp187: DF64 Anderson at L=24+ — Extended Precision Large Lattice
 
 **Date:** February 26, 2026
-**Phase:** V55 — Science extensions
-**Binary:** `validate_df64_anderson` (planned)
+**Phase:** V59 — Science extensions
+**Binary:** `validate_df64_anderson`
 **Command:** `cargo run --release --features gpu --bin validate_df64_anderson`
-**Status:** Protocol defined, implementation pending
+**Status:** DONE (CPU, 4 checks PASS — GPU sections require --features gpu; DF64 Phase 2 pending)
 **Depends on:** Exp184b (GPU L=14-20), hotSpring DF64 validation
 
 ## Purpose

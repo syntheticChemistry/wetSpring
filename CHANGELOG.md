@@ -5,6 +5,35 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V59 — Phase 59: Science Extensions + Deep Debt Resolution (2026-02-26)
+
+### Science Extensions (Exp184-188)
+- Exp184: Real NCBI 16S sovereign pipeline (25 checks — NCBI query → FASTA → diversity → Anderson)
+- Exp185: Cold seep metagenomes (8 checks — 50 communities, Bray-Curtis, Anderson classification)
+- Exp186: Dynamic Anderson W(t) (7 checks — tillage, antibiotic, seasonal perturbation scenarios)
+- Exp187: DF64 Anderson large lattice (4 checks — L=6-14 f64 Phase 1, DF64 Phase 2 readiness)
+- Exp188: NPU sentinel real stream (10 checks — steady-state, stress, bloom detection, int8 inference)
+
+### Deep Debt Resolution
+- NCBI modules: migrated from `Result<T, String>` to typed `Error::Ncbi(String)` across 6 modules
+- Tolerance hygiene: replaced all inline literals with named constants; added PPM_FACTOR, ERF_PARITY, NORM_CDF_PARITY, NORM_CDF_TAIL (82 → 86 constants)
+- Clippy: pedantic + nursery CLEAN across entire workspace including fuzz targets
+- Formatting: cargo fmt --check CLEAN
+- validate_neighbor_joining: migrated to Validator harness (was custom check! macro)
+- GPU feature_table_gpu: rewired to compose signal_gpu::find_peaks_gpu using PeakDetectF64
+- Provenance gaps filled for validate_local_wgsl_compile and validate_soil_qs_cpu_parity
+
+### Three-Tier Controls (Exp190-192)
+- Exp190: BarraCuda CPU v10 — V59 science domains (75 checks — diversity, Bray-Curtis, W(t), int8, FASTA→diversity)
+- Exp191: GPU V59 Science Parity (29 checks — Anderson 3D, diversity→Anderson pipeline, W_c, cold seep)
+- Exp192: metalForge V59 Cross-Substrate (36 checks — diversity/BC/Anderson CPU↔GPU parity)
+
+### Metrics
+- 197 experiments (was 189), 4,688+ validation checks (was 4,494+)
+- 1,008 Rust tests (882 lib + 60 integration + 19 doc + 47 forge)
+- 86 named tolerances (was 82), 184 binaries (was 175)
+- 52/52 papers reproduced, 39/39 three-tier validated
+
 ## V58 — Documentation Sync + Evolution Learnings Handoff (2026-02-26)
 
 ### Changed

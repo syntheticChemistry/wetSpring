@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: February 26, 2026 (Phase 58 V58 — 961 tests, 96.67% llvm-cov, ToadStool S68 (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 82 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, 52 papers, V58 doc sync + evolution learnings)
+**Last Updated**: February 26, 2026 (Phase 59 V59 — 1,008 tests, ToadStool S68 (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 86 named tolerances, 0 ad-hoc magic numbers, clippy pedantic+nursery CLEAN, typed NCBI errors, 0 Passthrough, 52 papers, 197 experiments, V59 deep debt + science extensions)
 **Purpose**: Track papers for reproduction/review across three tracks
 
 ---

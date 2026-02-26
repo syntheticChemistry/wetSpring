@@ -323,13 +323,23 @@ fn main() {
     v.section("── S7: CPU Math Verification (BarraCuda Pure Rust) ──");
 
     let erf_val = erf(1.0);
-    v.check("erf(1.0) correct", erf_val, 0.842_700_792_949_715, 5e-7);
+    v.check(
+        "erf(1.0) correct",
+        erf_val,
+        0.842_700_792_949_715,
+        tolerances::ERF_PARITY,
+    );
 
     let ncdf = norm_cdf(0.0);
     v.check("Φ(0) = 0.5", ncdf, 0.5, tolerances::EXACT);
 
     let ncdf196 = norm_cdf(1.96);
-    v.check("Φ(1.96) ≈ 0.975", ncdf196, 0.975, 1e-3);
+    v.check(
+        "Φ(1.96) ≈ 0.975",
+        ncdf196,
+        0.975,
+        tolerances::NORM_CDF_PARITY,
+    );
 
     v.check_pass(
         "All ODE integration uses pure Rust (no Python, no scipy)",

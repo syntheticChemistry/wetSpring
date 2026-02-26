@@ -2,7 +2,7 @@
 
 **Date:** February 26, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 58 — 189 experiments, 4,494+ validation checks (1,578 GPU on RTX 4070), ALL PASS; 961 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 82 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets), 0 Passthrough, V58 doc sync + evolution learnings, 39/39 three-tier, 52/52 papers
+**Status:** Phase 59 — 197 experiments, 4,688+ validation checks (1,578 GPU on RTX 4070), ALL PASS; 1,008 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 86 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets), 0 Passthrough, V59 doc sync + evolution learnings, 39/39 three-tier, 52/52 papers
 
 ---
 
@@ -38,7 +38,7 @@ All code is AGPL-3.0.
 | **Fajgenbaum** | UPenn | 3 | 7 | 157–165 | 84 | Drug repurposing, pharmacophenomics, Track 3 completed |
 | **Diversity Fusion** | — | GPU | 1 | 167 | 18 | CPU↔GPU parity extension |
 | **Track 4 Soil QS** | — | 4 | 9 | 170–182 | 321 | No-till soil QS, Anderson pore geometry, Brandt farm, meta-analysis, tillage factorial, CPU/GPU/streaming/metalForge |
-| **Total** | | | **52** | | **4,494+** | |
+| **Total** | | | **52** | | **4,688+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -97,7 +97,7 @@ Every paper goes through the full evolution. Status across all 39 actionable pap
 | Cross-spring evolution | 660+ WGSL shaders traced to origin springs, rewired imports, Exp169 4-spring provenance | 21 checks |
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
-| Code quality audit | 96.67% coverage, streaming I/O, 0 production mocks, ToadStool S68, barracuda always-on, `deny(missing_docs)`, `cargo-deny` supply-chain audit, clippy pedantic CLEAN, zero unsafe code | 961 tests |
+| Code quality audit | 96.67% coverage, streaming I/O, 0 production mocks, ToadStool S68, barracuda always-on, `deny(missing_docs)`, `cargo-deny` supply-chain audit, clippy pedantic CLEAN, zero unsafe code | 1,008 tests |
 
 ## Performance Summary
 
@@ -156,6 +156,16 @@ effective dimension.
 | Exp180 | GPU validation | 23 | FMR + BrayCurtisF64 + Anderson 3D + ODE on GPU |
 | Exp181 | Pure GPU streaming | 52 | Zero-CPU-roundtrip soil QS pipeline |
 | Exp182 | metalForge cross-substrate | 14 | CPU = GPU for all Track 4 domains |
+
+### Phase 59 Additions (Exp184–188)
+
+| Experiment | Focus | Checks | Key Finding |
+|:---:|-------|:------:|-------------|
+| Exp184 | Real NCBI Sovereign Pipeline | 25 | Real NCBI 16S sovereign pipeline validation |
+| Exp185 | Cold Seep Sovereign Pipeline | 8 | Cold seep metagenomes sovereign pipeline |
+| Exp186 | Dynamic Anderson W(t) | 7 | Community evolution, time-dependent disorder |
+| Exp187 | DF64 Anderson Large Lattice | 4 | DF64 L=24+ lattice validation |
+| Exp188 | NPU Sentinel Real Stream | 10 | Real sensor stream NPU deployment |
 
 ## Open Data
 

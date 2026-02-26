@@ -77,7 +77,8 @@ impl GemmCached {
     /// change `Precision::F64` to `Precision::Df64` when the DF64 GEMM
     /// shader is compatible with our bind group layout.
     pub fn new(device: Arc<WgpuDevice>, ctx: Arc<TensorContext>) -> Self {
-        let shader = device.compile_shader_universal(GemmF64::WGSL, Precision::F64, Some("GemmCached f64"));
+        let shader =
+            device.compile_shader_universal(GemmF64::WGSL, Precision::F64, Some("GemmCached f64"));
 
         let bgl = device
             .device()
