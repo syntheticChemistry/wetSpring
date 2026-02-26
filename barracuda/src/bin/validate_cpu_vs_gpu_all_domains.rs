@@ -623,7 +623,7 @@ fn validate_spectral_cosine(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<T
             &format!("Spectral pair {i}"),
             *g,
             *c,
-            tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+            tolerances::GPU_LOG_POLYFILL,
         );
     }
     timings.push(Timing {

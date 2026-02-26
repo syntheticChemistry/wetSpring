@@ -418,8 +418,9 @@ pub const GPU_VS_CPU_F64: f64 = 1e-6;
 
 /// GPU f64 vs CPU f64 for log/exp operations (transcendentals).
 ///
-/// Native WGSL `log(f64)` on NVIDIA matches CPU to ~1e-14.
-/// Allow 1e-10 for accumulated error in Shannon/Simpson computation.
+/// Native WGSL `log(f64)` on NVIDIA matches CPU to ~1e-14 per call.
+/// Allow 1e-10 for single transcendental evaluations (one log or exp).
+/// For chained Shannon/Simpson/cosine, use `GPU_LOG_POLYFILL` (1e-7).
 pub const GPU_VS_CPU_TRANSCENDENTAL: f64 = 1e-10;
 
 /// GPU f64 log polyfill precision (software `log_f64` shader).

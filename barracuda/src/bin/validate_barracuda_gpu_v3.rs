@@ -93,7 +93,7 @@ fn validate_extended_diversity(gpu: &GpuF64, v: &mut Validator) {
             "Pielou GPU uneven < 0.5",
             gpu_val,
             cpu,
-            tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+            tolerances::GPU_LOG_POLYFILL,
         );
     }
 

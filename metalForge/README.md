@@ -158,7 +158,7 @@ affinities. metalForge maps each validated algorithm to its optimal substrate.
 wetSpring follows hotSpring's pattern for ToadStool absorption:
 
 ```
-1. Validate in Rust CPU (barracuda/)          ← DONE: 46 CPU + 42 GPU, 902 tests, 183 experiments, 3,618+ checks
+1. Validate in Rust CPU (barracuda/)          ← DONE: 46 CPU + 42 GPU, 902 tests, 183 experiments, 4,494+ checks
 2. Characterize hardware (metalForge/)         ← THIS DIRECTORY
 3. Write Rust in GPU-friendly patterns         ← 28 absorbed (Lean); 0 local WGSL (fully lean); 7 Compose; 3 Passthrough
 4. ToadStool absorbs as shared primitives      ← unidirectional handoff via wateringHole/handoffs/
@@ -206,9 +206,9 @@ All 31+ algorithmic domains proven correct in pure Rust CPU:
 - **13 newly promoted GPU domains** (Exp102): cooperation, capacitor, kmd, gbm, merge_pairs, signal, feature_table, robinson_foulds, derep, chimera, NJ, reconciliation, molecular_clock
 - **22.5× overall speedup** over Python (Exp059, peak 625× for SW)
 
-### GPU: 702+ Checks Passing (Exp044–103)
+### GPU: 1,578+ Checks Passing (Exp044–103)
 GPU math portability proven across all 42 GPU modules:
-- **702+/702+ GPU checks** across 22 validation binaries
+- **1,578+/1,578+ GPU checks** across 22 validation binaries
 - **Absorbed** (Lean): SW, Gillespie, DT, Felsenstein, GEMM, diversity, PCoA, spectral
 - **Absorbed** (Lean, Feb 22): HMM, DADA2, quality, ANI, SNP, dN/dS, pangenome, RF
 - **Local WGSL**: 0 (diversity_fusion absorbed by ToadStool S63)

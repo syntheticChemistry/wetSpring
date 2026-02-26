@@ -1,7 +1,7 @@
 # Cross-Spring Shader Evolution
 
-**Last updated**: Feb 26, 2026 — V50 ODE derivative rewire (608 WGSL shaders, DF64, 66+5 primitives consumed, 0 local derivative math, 183 experiments, 3,618+ checks)
-**Validated by**: V50 revalidation (all 6 ODE validators PASS, Exp120 cross-spring 9/9, Exp169 modern 12/12, Exp070 CPU-full 50/50, 823 lib tests), V48 handoff
+**Last updated**: Feb 26, 2026 — V52 S66 rewire (694 WGSL shaders, DF64, 79 primitives consumed, 0 local WGSL/derivative/regression, 183 experiments, 4,494+ checks, 1,578 GPU on RTX 4070)
+**Validated by**: V52 revalidation (823 lib tests, 70 GPU validators PASS, 57 CPU validators PASS), V52 S66 handoff
 
 ---
 

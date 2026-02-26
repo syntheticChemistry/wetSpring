@@ -291,7 +291,7 @@ thresholds from `src/tolerances.rs`.
 | `validate_soil_qs_streaming` | 181 | 52 | `cargo run --features gpu --release --bin validate_soil_qs_streaming` |
 | `validate_soil_qs_metalforge` | 182 | 14 | `cargo run --features gpu --release --bin validate_soil_qs_metalforge` |
 
-**Total validation checks**: 3,618+
+**Total validation checks**: 4,494+
 **Rust tests**: 902 (823 barracuda + 47 forge + 32 integration/doc)
 **Binaries**: 160 validate + 12 benchmark = 172 total
 **ToadStool primitives**: 66 + 2 BGL helpers consumed (barracuda always-on, zero fallback code — S65)

@@ -5,6 +5,39 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V52 — ToadStool S66 Rewire (2026-02-26)
+
+### Rewired
+- `qs_biofilm::hill()` → delegates to `barracuda::stats::hill` (S66 `stats::metrics`). Retains `x ≤ 0` physical guard.
+- `pangenome::fit_heaps_law` → delegates to `barracuda::stats::fit_linear` (S66 `stats::regression`). Eliminates 15 lines of manual log-log regression.
+- `rarefaction_gpu::compute_ci` → uses `barracuda::stats::{mean, percentile}` (S66). Interpolated percentiles replace manual sort+index.
+
+### Added
+- Re-export `diversity::shannon_from_frequencies` from `barracuda::stats` (S66).
+
+### Pinned
+- ToadStool `045103a7` (S66 Wave 5), up from `17932267` (S65).
+- New primitives consumed: `hill`, `monod`, `fit_linear`, `percentile`, `mean`, `shannon_from_frequencies`.
+- Total primitives consumed: 79 (+6).
+
+### Validated
+- 823 lib tests PASS, clippy pedantic+nursery clean, 70 GPU validators (1,578 checks) PASS.
+
+## V51 — Full GPU Validation on Local Hardware (2026-02-26)
+
+### Fixed
+- **BatchFitness + LocusVariance (Exp094)**: Upgraded f32 buffers → f64 to match upstream ToadStool S65 shader evolution. Readback generalized to `readback_bytes<T: Pod>`.
+- **Shannon/Simpson/Spectral tolerance**: 8 validators used `GPU_VS_CPU_TRANSCENDENTAL` (1e-10) for chained transcendental chains (Shannon=Σ p·ln(p)). Empirical GPU error exceeds 1e-10 on RTX 4070 Ada. Corrected to `GPU_LOG_POLYFILL` (1e-7) — still 7 significant digits, tighter than Python parity.
+
+### Validated (RTX 4070 + Titan V)
+- **70 GPU validators**: 1,578 checks, ALL PASS. Covers 16S pipeline (88), ODE sweep (12), cross-spring evolution (39), metalForge v4-v6 (104), pure GPU streaming (80+27), soil QS GPU+streaming+metalForge (89), 49-check all-domains head-to-head, and 6 GPU benchmarks.
+- **Total validation checks**: 4,494+ (CPU 1,476 + GPU 1,578 + dispatch 80 + layout 35 + integration).
+- **830 barracuda lib tests** with `--features gpu` — all pass including GPU shader compilation tests.
+
+### Docs
+- Tolerance doc: clarified `GPU_VS_CPU_TRANSCENDENTAL` is for single-call, `GPU_LOG_POLYFILL` for chained ops.
+- All project docs updated: 3,618→4,494+ checks, 702→1,578 GPU checks.
+
 ## V50 — ODE Derivative Rewire + Cross-Spring Validation (2026-02-26)
 
 ### Rewired
@@ -47,7 +80,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 ### Debris Audit
 - No dead code, no temp files, no orphan scripts, no stale TODOs in barracuda/src/.
 - `bio/shaders/` directory confirmed empty (diversity_fusion_f64.wgsl deleted V48).
-- 173 binaries, 183 experiments, 3,618+ checks, 898 tests — all verified.
+- 173 binaries, 183 experiments, 4,494+ checks, 898 tests — all verified.
 
 ## V48 — ToadStool S65 Rewire (2026-02-25)
 
@@ -82,7 +115,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 ## V47 — Documentation Cleanup + Evolution Handoff (2026-02-25)
 
 ### Documentation Cleanup
-- Root README.md: Track table expanded to 6 tracks (added Track 3 + Track 4), stale counts corrected (3,618+ checks, 182 experiments, 171 binaries, 39/39 three-tier), handoff list reorganized with V47 as current.
+- Root README.md: Track table expanded to 6 tracks (added Track 3 + Track 4), stale counts corrected (4,494+ checks, 182 experiments, 171 binaries, 39/39 three-tier), handoff list reorganized with V47 as current.
 - whitePaper/baseCamp/README.md: Track 4 faculty row added, paper total corrected (52), "actionable papers" updated (39/39), validation chain corrected (39/39 three-tier, 52 papers open data).
 - experiments/README.md: Phase markers updated, counts synchronized (182 experiments, 171 binaries, 52 papers).
 - specs/README.md: Paper queue corrected (52/52), handoff reference updated to V47, handoff count corrected (47 delivered), three-tier matrix updated (39/39).

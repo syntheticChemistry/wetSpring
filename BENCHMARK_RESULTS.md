@@ -1,7 +1,7 @@
 # wetSpring Benchmark Results
 
 **Date:** February 26, 2026
-**Status:** Phase 50 — Three-tier validation complete (Python → Rust CPU → GPU → metalForge) — 39/39 actionable papers full three-tier (52/52 total); 902 tests (823 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, 3,618+ checks, 183 experiments, ToadStool S65, 66 primitives + 2 BGL + 5 ODE `cpu_derivative` + 0 local WGSL (fully lean, zero local derivative math), 77 named tolerances, 0 Passthrough, V50 ODE derivative rewire
+**Status:** Phase 50 — Three-tier validation complete (Python → Rust CPU → GPU → metalForge) — 39/39 actionable papers full three-tier (52/52 total); 902 tests (823 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, 4,494+ checks, 183 experiments, ToadStool S65, 66 primitives + 2 BGL + 5 ODE `cpu_derivative` + 0 local WGSL (fully lean, zero local derivative math), 77 named tolerances, 0 Passthrough, V50 ODE derivative rewire
 
 ---
 
@@ -99,7 +99,7 @@ Tier 3: GPU (ToadStool/BarraCuda, math parity with CPU)
 
 ---
 
-## Tier 3: GPU Validation (22 GPU validation binaries, 702+ checks)
+## Tier 3: GPU Validation (22 GPU validation binaries, 1,578+ checks)
 
 | Binary | Checks | Status |
 |--------|--------|--------|
@@ -125,7 +125,7 @@ Tier 3: GPU (ToadStool/BarraCuda, math parity with CPU)
 | `validate_pure_gpu_complete` | 52 | PASS |
 | `validate_metalforge_v5` | 58 | PASS |
 | `validate_barracuda_cpu_v8` | 175 | PASS |
-| **GPU total** | **702+** | **PASS** |
+| **GPU total** | **1,578+** | **PASS** |
 
 ### GPU Performance
 
@@ -319,7 +319,7 @@ matrix. CPU↔GPU parity proven for all compose and write modules.
 | Category | Checks | Status |
 |----------|--------|--------|
 | Rust CPU validation | 1,476 | PASS |
-| GPU validation | 702+ | PASS |
+| GPU validation | 1,578+ | PASS |
 | Dispatch + layout + transfer | 172 | PASS |
 | Rust tests | 902 (823 barracuda + 47 forge + 32 integration/doc) | PASS |
 | Python baselines | 42 scripts | PASS |
@@ -344,7 +344,7 @@ cargo run --release --bin validate_qs_ode  # ... repeat for all CPU binaries
 # Tier 2b: BarraCuda CPU parity (380/380)
 cargo run --release --bin validate_barracuda_cpu_v8   # 175 checks (13 promoted domains)
 
-# Tier 3: GPU (702+ checks)
+# Tier 3: GPU (1,578+ checks)
 cargo run --features gpu --bin validate_diversity_gpu          # 38
 cargo run --features gpu --bin validate_16s_pipeline_gpu       # 88
 cargo run --features gpu --bin validate_pure_gpu_complete      # 52 (13 promoted domains)

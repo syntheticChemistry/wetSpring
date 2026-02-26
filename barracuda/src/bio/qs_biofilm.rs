@@ -160,16 +160,15 @@ impl QsBiofilmParams {
 
 /// Hill activation: x^n / (k^n + x^n).
 ///
-/// Standard cooperative-binding function used by all QS ODE systems.
-/// Returns 0 for non-positive `x` (physical: zero signal → zero response).
+/// Delegates to [`barracuda::stats::hill`] with a physical guard:
+/// returns 0 for non-positive `x` (zero signal → zero response).
 #[inline]
 #[must_use]
 pub fn hill(x: f64, k: f64, n: f64) -> f64 {
     if x <= 0.0 {
         return 0.0;
     }
-    let xn = x.powf(n);
-    xn / (k.powf(n) + xn)
+    barracuda::stats::hill(x, k, n)
 }
 
 /// Right-hand side of the wild-type QS/biofilm ODE system.

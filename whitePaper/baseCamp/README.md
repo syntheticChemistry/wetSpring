@@ -2,7 +2,7 @@
 
 **Date:** February 26, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 50 — 183 experiments, 3,618+ validation checks, ALL PASS; 902 tests (823 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, ToadStool S65 aligned, 66 primitives + 2 BGL + 5 ODE `cpu_derivative` + 0 local WGSL (fully lean, zero local derivative math) (barracuda always-on), 77 named tolerance constants, 0 Passthrough, V50 ODE derivative rewire, 39/39 three-tier, 52/52 papers
+**Status:** Phase 50 — 183 experiments, 4,494+ validation checks, ALL PASS; 902 tests (823 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, ToadStool S65 aligned, 66 primitives + 2 BGL + 5 ODE `cpu_derivative` + 0 local WGSL (fully lean, zero local derivative math) (barracuda always-on), 77 named tolerance constants, 0 Passthrough, V50 ODE derivative rewire, 39/39 three-tier, 52/52 papers
 
 ---
 
@@ -38,7 +38,7 @@ All code is AGPL-3.0.
 | **Fajgenbaum** | UPenn | 3 | 7 | 157–165 | 84 | Drug repurposing, pharmacophenomics, Track 3 completed |
 | **Diversity Fusion** | — | GPU | 1 | 167 | 18 | CPU↔GPU parity extension |
 | **Track 4 Soil QS** | — | 4 | 9 | 170–182 | 321 | No-till soil QS, Anderson pore geometry, Brandt farm, meta-analysis, tillage factorial, CPU/GPU/streaming/metalForge |
-| **Total** | | | **52** | | **3,618+** | |
+| **Total** | | | **52** | | **4,494+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -90,7 +90,7 @@ Every paper goes through the full evolution. Status across all 39 actionable pap
 |-------|---------------|----------|
 | Python baseline | Algorithm correctness against published tools | 42 scripts |
 | BarraCuda CPU | Rust matches Python within machine precision | 1,476+ checks, 22.5x faster |
-| BarraCuda GPU | GPU matches CPU within 1e-6 | 702+ checks, 29+ domains |
+| BarraCuda GPU | GPU matches CPU within 1e-6 | 1,578+ checks, 29+ domains |
 | Pure GPU streaming | Zero CPU round-trips, data stays on-device | 204+ checks, 10+ domains |
 | metalForge | Same answer on CPU, GPU, NPU | 39/39 papers, 37+ domains |
 | NPU reservoir | ESN → int8 → NPU preserves classification (Cholesky solve) | 59 checks, 6 domains |

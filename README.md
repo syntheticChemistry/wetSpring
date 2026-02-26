@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** February 26, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 50 — Paper queue ALL GREEN (52/52 papers, 39/39 three-tier); 902 tests (823 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, 183 experiments, 3,618+ checks, 173 binaries, ToadStool S65 aligned (`17932267`), 66 primitives + 2 BGL helpers + 5 ODE `cpu_derivative` (barracuda always-on, zero local WGSL, zero local derivative math), 77 named tolerance constants, zero ad-hoc tolerances, 0 Passthrough, V50 ODE derivative rewire + cross-spring validation
+**Status:** Phase 50 — Paper queue ALL GREEN (52/52 papers, 39/39 three-tier); 902 tests (823 barracuda + 47 forge + 32 integration/doc), 96.78% llvm-cov, 183 experiments, 4,494+ checks, 173 binaries, ToadStool S65 aligned (`17932267`), 66 primitives + 2 BGL helpers + 5 ODE `cpu_derivative` (barracuda always-on, zero local WGSL, zero local derivative math), 77 named tolerance constants, zero ad-hoc tolerances, 0 Passthrough, V50 ODE derivative rewire + cross-spring validation
 
 ---
 
@@ -97,7 +97,7 @@ integration point.
 | Metric | Count |
 |--------|-------|
 | Validation checks (CPU) | 1,476 |
-| Validation checks (GPU) | 702 |
+| Validation checks (GPU) | 1,578 |
 | ODE CPU ↔ GPU parity | 82 (5 ODE domains, lean on upstream `generate_shader()`) |
 | Dispatch validation checks | 80 |
 | Layout fidelity checks | 35 |
@@ -116,7 +116,7 @@ integration point.
 | Phase 42: Track 3 full-tier (CPU v9, GPU drug, metalForge drug) | 44 (Exp163-165: CPU v9 27, GPU drug 8, metalForge drug 9) |
 | Phase 44: modern systems S62+DF64, diversity fusion extension | 37 (Exp166: 19, Exp167: 18) |
 | Phase 45 V40: cross-spring S62+DF64 evolution | ~25 (Exp168: hotSpring precision → wetSpring bio → neuralSpring pop-gen → Track 3 GPU) |
-| **Total validation checks** | **3,618+** |
+| **Total validation checks** | **4,494+** |
 | Rust library unit tests | 823 (barracuda CPU, default features) |
 | metalForge forge tests | 47 |
 | **Total Rust tests** | **902** (823 barracuda + 47 forge + 32 integration/doc) |
@@ -134,7 +134,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | ToadStool primitives consumed | **66** + 2 BGL helpers (barracuda always-on, zero fallback code — ToadStool S65) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 3,618+ validation checks **PASS**. All 898 tests **PASS** (1 ignored: GPU-only).
+All 4,494+ validation checks **PASS**. All 898 tests **PASS** (1 ignored: GPU-only).
 
 ### GPU Performance
 
@@ -528,7 +528,7 @@ Complete rewiring to modern ToadStool S42 BarraCuda APIs:
 - **Exp120**: Benchmarks diversity (wetSpring), QS ODE (hotSpring precision), ESN reservoir
   (hotSpring/neuralSpring → wetSpring NPU), with full provenance table and evolution timeline
 
-**898 tests** | **3,618+ checks** | **173 binaries**
+**898 tests** | **4,494+ checks** | **173 binaries**
 
 ### Phase 35: NCBI-Scale Hypothesis Testing (Exp121-126)
 

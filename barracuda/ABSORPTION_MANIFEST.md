@@ -3,7 +3,7 @@
 **Date:** February 26, 2026 (V50 ToadStool S65 ODE derivative rewire)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
 **ToadStool pin:** `17932267` (S65 smart refactoring, Feb 25 2026)
-**Status:** 66 ToadStool primitives + 2 BGL helpers + 5 ODE `cpu_derivative` consumed (incl. 11 `stats::diversity` + 2 `stats::metrics`), 0 local WGSL (fully lean), 0 local ODE derivative math (fully delegated), 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 870 tests (823 barracuda + 47 forge), 96.78% llvm-cov, ToadStool S65 aligned, 183 experiments, 3,618+ checks. 9/9 evolution requests DONE. **V50 ODE rewire:** 5 local RHS functions replaced with `barracuda::numerical::*Ode::cpu_derivative`, eliminating ~200 lines of duplicate derivative math.
+**Status:** 66 ToadStool primitives + 2 BGL helpers + 5 ODE `cpu_derivative` consumed (incl. 11 `stats::diversity` + 2 `stats::metrics`), 0 local WGSL (fully lean), 0 local ODE derivative math (fully delegated), 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 870 tests (823 barracuda + 47 forge), 96.78% llvm-cov, ToadStool S65 aligned, 183 experiments, 4,494+ checks. 9/9 evolution requests DONE. **V50 ODE rewire:** 5 local RHS functions replaced with `barracuda::numerical::*Ode::cpu_derivative`, eliminating ~200 lines of duplicate derivative math.
 
 ---
 
@@ -299,7 +299,7 @@ Patterns from hotSpring and neuralSpring that wetSpring leans on:
 | Category | Checks | Status |
 |----------|:------:|--------|
 | CPU parity (Python → Rust) | 1,476 | ALL PASS |
-| GPU parity (CPU → GPU) | 702+ | ALL PASS |
+| GPU parity (CPU → GPU) | 1,578+ | ALL PASS |
 | BarraCuda CPU parity (v1-v8) | 380/380 | ALL PASS |
 | Streaming dispatch | 80 | ALL PASS |
 | Layout fidelity | 35 | ALL PASS |

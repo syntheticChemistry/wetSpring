@@ -18,7 +18,7 @@ and mathematical biology (Track 1b), deep-sea metagenomics and microbial
 evolution (Track 1c), and PFAS detection via LC-MS (Track 2),
 validating 88 Rust modules (46 CPU + 42 GPU) against baselines from Galaxy,
 QIIME2, asari, FindPFAS, scipy, sklearn, dendropy, real NCBI SRA data, and
-published paper models with 3,618+ quantitative checks across 183 experiments
+published paper models with 4,494+ quantitative checks across 183 experiments
 — all passing. The pipeline proves substrate independence: math produces
 identical results on CPU and GPU, validated via metalForge cross-substrate
 checks (Exp060). Random Forest ensemble and Gradient Boosting Machine
@@ -199,7 +199,7 @@ the Phase 1-3 checks. The following are the self-contained validators:
 
 ### 3.3 GPU Validation (Phase 3)
 
-702+ GPU checks across 22 GPU validation binaries — all pass:
+1,578+ GPU checks across 22 GPU validation binaries — all pass:
 
 **Individual operations (38 checks, tolerance ≤ 1e-10):**
 
@@ -598,7 +598,7 @@ cargo run --release --bin validate_algae_16s
 cargo run --release --bin validate_voc_peaks
 cargo run --release --bin validate_public_benchmarks
 
-# GPU validation + benchmark (702+ checks)
+# GPU validation + benchmark (1,578+ checks)
 cargo run --release --features gpu --bin validate_diversity_gpu
 cargo run --release --features gpu --bin validate_16s_pipeline_gpu
 cargo run --release --features gpu --bin benchmark_cpu_gpu

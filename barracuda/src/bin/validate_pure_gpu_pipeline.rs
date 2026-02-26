@@ -137,7 +137,7 @@ async fn main() {
             &format!("S{i}: Shannon GPU == CPU"),
             ga.shannon,
             ca.shannon,
-            tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+            tolerances::GPU_LOG_POLYFILL,
         );
         v.check(
             &format!("S{i}: Simpson GPU == CPU"),

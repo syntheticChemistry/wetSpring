@@ -239,20 +239,20 @@ async fn main() {
         ));
     }
 
-    // BatchFitness (neuralSpring → ToadStool session 31f)
+    // BatchFitness (neuralSpring → ToadStool session 31f) — f64 pipeline
     v.section("BatchFitness (neuralSpring → ToadStool)");
     {
         let pop_size: u32 = 16;
         let genome_len: u32 = 8;
-        let weights: Vec<f32> = (0..genome_len)
-            .map(|i| (i as f32 + 1.0) / genome_len as f32)
+        let weights: Vec<f64> = (0..genome_len)
+            .map(|i| (f64::from(i) + 1.0) / f64::from(genome_len))
             .collect();
-        let population: Vec<f32> = (0..pop_size)
+        let population: Vec<f64> = (0..pop_size)
             .flat_map(|i| (0..genome_len).map(move |g| if (i + g) % 2 == 0 { 1.0 } else { 0.0 }))
             .collect();
 
         let tc = Instant::now();
-        let cpu_fit = cpu_batch_fitness(
+        let cpu_fit = cpu_batch_fitness_f64(
             &population,
             &weights,
             pop_size as usize,
@@ -272,7 +272,7 @@ async fn main() {
         });
         let fit_buf = d.create_buffer(&wgpu::BufferDescriptor {
             label: Some("Fitness Output"),
-            size: u64::from(pop_size * 4),
+            size: u64::from(pop_size) * 8,
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
             mapped_at_creation: false,
         });
@@ -280,15 +280,15 @@ async fn main() {
         let bf = BatchFitnessGpu::new(device.clone());
         let tg = Instant::now();
         bf.dispatch(&pop_buf, &w_buf, &fit_buf, pop_size, genome_len);
-        let gpu_fit = readback_f32(&device, &fit_buf, pop_size as usize);
+        let gpu_fit = readback_f64(&device, &fit_buf, pop_size as usize);
         let gpu_us = tg.elapsed().as_micros() as f64;
 
         for (i, (cf, gf)) in cpu_fit.iter().zip(gpu_fit.iter()).enumerate() {
             v.check(
                 &format!("Fitness individual {i}"),
-                f64::from(*gf),
-                f64::from(*cf),
-                tolerances::GPU_F32_PARITY,
+                *gf,
+                *cf,
+                tolerances::GPU_VS_CPU_F64,
             );
         }
         results.push((
@@ -300,14 +300,14 @@ async fn main() {
         ));
     }
 
-    // LocusVariance (neuralSpring → ToadStool session 31f)
+    // LocusVariance (neuralSpring → ToadStool session 31f) — f64 pipeline
     // Layout: allele_freqs[pop * n_loci + locus] — row-major [pop × loci]
     v.section("LocusVariance (neuralSpring → ToadStool)");
     {
         let n_pops: u32 = 4;
         let n_loci: u32 = 6;
         #[rustfmt::skip]
-        let freqs: Vec<f32> = vec![
+        let freqs: Vec<f64> = vec![
             // pop0: loci 0..5
             0.1, 0.2, 0.9, 0.0, 1.0, 0.4,
             // pop1
@@ -319,7 +319,7 @@ async fn main() {
         ];
 
         let tc = Instant::now();
-        let cpu_var = cpu_locus_variance_rowmajor(&freqs, n_pops as usize, n_loci as usize);
+        let cpu_var = cpu_locus_variance_rowmajor_f64(&freqs, n_pops as usize, n_loci as usize);
         let cpu_us = tc.elapsed().as_micros() as f64;
 
         let freq_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
@@ -329,7 +329,7 @@ async fn main() {
         });
         let var_buf = d.create_buffer(&wgpu::BufferDescriptor {
             label: Some("LocusVar Output"),
-            size: u64::from(n_loci * 4),
+            size: u64::from(n_loci) * 8,
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
             mapped_at_creation: false,
         });
@@ -337,15 +337,15 @@ async fn main() {
         let lv = LocusVarianceGpu::new(device.clone());
         let tg = Instant::now();
         lv.dispatch(&freq_buf, &var_buf, n_pops, n_loci);
-        let gpu_var = readback_f32(&device, &var_buf, n_loci as usize);
+        let gpu_var = readback_f64(&device, &var_buf, n_loci as usize);
         let gpu_us = tg.elapsed().as_micros() as f64;
 
         for (i, (cv, gv)) in cpu_var.iter().zip(gpu_var.iter()).enumerate() {
             v.check(
                 &format!("LocusVar locus {i}"),
-                f64::from(*gv),
-                f64::from(*cv),
-                tolerances::GPU_F32_PARITY,
+                *gv,
+                *cv,
+                tolerances::GPU_VS_CPU_F64,
             );
         }
         results.push((
@@ -460,7 +460,12 @@ fn cpu_spatial_payoff(grid: &[u32], size: usize, benefit: f32, cost: f32) -> Vec
     fitness
 }
 
-fn cpu_batch_fitness(pop: &[f32], weights: &[f32], pop_size: usize, genome_len: usize) -> Vec<f32> {
+fn cpu_batch_fitness_f64(
+    pop: &[f64],
+    weights: &[f64],
+    pop_size: usize,
+    genome_len: usize,
+) -> Vec<f64> {
     (0..pop_size)
         .map(|i| {
             (0..genome_len)
@@ -470,17 +475,17 @@ fn cpu_batch_fitness(pop: &[f32], weights: &[f32], pop_size: usize, genome_len: 
         .collect()
 }
 
-fn cpu_locus_variance_rowmajor(freqs: &[f32], n_pops: usize, n_loci: usize) -> Vec<f32> {
+fn cpu_locus_variance_rowmajor_f64(freqs: &[f64], n_pops: usize, n_loci: usize) -> Vec<f64> {
     (0..n_loci)
         .map(|l| {
-            let mean: f32 = (0..n_pops).map(|p| freqs[p * n_loci + l]).sum::<f32>() / n_pops as f32;
+            let mean: f64 = (0..n_pops).map(|p| freqs[p * n_loci + l]).sum::<f64>() / n_pops as f64;
             (0..n_pops)
                 .map(|p| {
                     let diff = freqs[p * n_loci + l] - mean;
                     diff * diff
                 })
-                .sum::<f32>()
-                / n_pops as f32
+                .sum::<f64>()
+                / n_pops as f64
         })
         .collect()
 }
@@ -490,16 +495,33 @@ fn readback_f32(
     buf: &wgpu::Buffer,
     n: usize,
 ) -> Vec<f32> {
+    readback_bytes::<f32>(device, buf, n)
+}
+
+fn readback_f64(
+    device: &Arc<barracuda::device::WgpuDevice>,
+    buf: &wgpu::Buffer,
+    n: usize,
+) -> Vec<f64> {
+    readback_bytes::<f64>(device, buf, n)
+}
+
+fn readback_bytes<T: bytemuck::Pod>(
+    device: &Arc<barracuda::device::WgpuDevice>,
+    buf: &wgpu::Buffer,
+    n: usize,
+) -> Vec<T> {
     let d = device.device();
     let q = device.queue();
+    let byte_len = (n * std::mem::size_of::<T>()) as u64;
     let staging = d.create_buffer(&wgpu::BufferDescriptor {
         label: Some("readback staging"),
-        size: (n * 4) as u64,
+        size: byte_len,
         usage: wgpu::BufferUsages::MAP_READ | wgpu::BufferUsages::COPY_DST,
         mapped_at_creation: false,
     });
     let mut encoder = d.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
-    encoder.copy_buffer_to_buffer(buf, 0, &staging, 0, (n * 4) as u64);
+    encoder.copy_buffer_to_buffer(buf, 0, &staging, 0, byte_len);
     q.submit(std::iter::once(encoder.finish()));
 
     let slice = staging.slice(..);
@@ -511,7 +533,7 @@ fn readback_f32(
     rx.recv().expect("channel recv").expect("GPU buffer map");
 
     let data = slice.get_mapped_range();
-    let result: Vec<f32> = bytemuck::cast_slice(&data).to_vec();
+    let result: Vec<T> = bytemuck::cast_slice(&data).to_vec();
     drop(data);
     staging.unmap();
     result

@@ -2,7 +2,7 @@
 
 **Date:** February 26, 2026 (V50 ToadStool S65 ODE derivative rewire)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules (all lean, 0 local WGSL, 0 local derivative math), 66 ToadStool primitives + 2 BGL helpers + 5 ODE `cpu_derivative` (barracuda always-on, zero fallback code), 870 tests (823 barracuda + 47 forge), 96.78% library coverage, 183 experiments, 3,618+ checks, ToadStool S65 aligned (`17932267`), 77 named tolerance constants, 0 ad-hoc tolerances, 0 Passthrough, 0 debt, 0 duplicate math. 9/9 P0-P3 evolution requests delivered. **V50**: 5 ODE RHS functions rewired to `barracuda::numerical::ode_bio::*Ode::cpu_derivative`.
+**Status:** 47 CPU + 42 GPU modules (all lean, 0 local WGSL, 0 local derivative math), 66 ToadStool primitives + 2 BGL helpers + 5 ODE `cpu_derivative` (barracuda always-on, zero fallback code), 870 tests (823 barracuda + 47 forge), 96.78% library coverage, 183 experiments, 4,494+ checks, ToadStool S65 aligned (`17932267`), 77 named tolerance constants, 0 ad-hoc tolerances, 0 Passthrough, 0 debt, 0 duplicate math. 9/9 P0-P3 evolution requests delivered. **V50**: 5 ODE RHS functions rewired to `barracuda::numerical::ode_bio::*Ode::cpu_derivative`.
 
 ### Full Lean Phase
 
@@ -344,13 +344,13 @@ no parallelism benefit) and `fastq_parsing` (I/O-bound).
 
 | Tier | CPU Modules | GPU Modules | CPU Checks | GPU Checks |
 |------|:-----------:|:-----------:|:----------:|:----------:|
-| ✅ Absorbed (Lean) | 41 | 42 (all lean on upstream) | 1,476+ | 702+ |
+| ✅ Absorbed (Lean) | 41 | 42 (all lean on upstream) | 1,476+ | 1,578+ |
 | Compose | — | 7 (wire ToadStool primitives) | — | — |
 | Passthrough | — | 3 (GPU buffers, CPU kernel) | — | — |
 | Write (local WGSL) | 0 | 0 | — | — |
 | Dispatch routing | — | — | 80 | — |
 | Streaming/transfer | — | — | 57 | 82 |
-| **Total** | **41** | **42** | **1,476+** | **702+** |
+| **Total** | **41** | **42** | **1,476+** | **1,578+** |
 
 ---
 

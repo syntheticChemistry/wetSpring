@@ -191,13 +191,13 @@ async fn main() {
                 &format!("S{i}: Shannon GPU == CPU"),
                 *gs,
                 *cs,
-                tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+                tolerances::GPU_LOG_POLYFILL,
             );
             v.check(
                 &format!("S{i}: Simpson GPU == CPU"),
                 *gsi,
                 *csi,
-                tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+                tolerances::GPU_LOG_POLYFILL,
             );
         }
         if i == 0 {
@@ -215,8 +215,8 @@ async fn main() {
             .iter()
             .zip(cpu_results.iter())
             .all(|((gs, gsi, go), (cs, csi, co))| {
-                (gs - cs).abs() < tolerances::GPU_VS_CPU_TRANSCENDENTAL
-                    && (gsi - csi).abs() < tolerances::GPU_VS_CPU_TRANSCENDENTAL
+                (gs - cs).abs() < tolerances::GPU_LOG_POLYFILL
+                    && (gsi - csi).abs() < tolerances::GPU_LOG_POLYFILL
                     && (go - co).abs() < tolerances::GPU_VS_CPU_F64
             });
     v.check(

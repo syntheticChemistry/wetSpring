@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: February 26, 2026
-**Status**: Phase 50 — 3,618+/3,618+ checks, ALL PASS (902 tests, 183 experiments, ToadStool S65 aligned, 66 primitives + 2 BGL + 5 ODE `cpu_derivative` + 0 local WGSL (fully lean, zero local derivative math), barracuda always-on, 77 named tolerance constants, 9/9 P0-P3 delivered, 0 Passthrough, V50 ODE derivative rewire, 39/39 three-tier, 52/52 papers, 96.78% llvm-cov)
+**Status**: Phase 50 — 4,494+/4,494+ checks, ALL PASS (902 tests, 183 experiments, ToadStool S65 aligned, 66 primitives + 2 BGL + 5 ODE `cpu_derivative` + 0 local WGSL (fully lean, zero local derivative math), barracuda always-on, 77 named tolerance constants, 9/9 P0-P3 delivered, 0 Passthrough, V50 ODE derivative rewire, 39/39 three-tier, 52/52 papers, 96.78% llvm-cov)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -40,7 +40,7 @@ Every paper in the queue goes through the full evolution path. Status:
 |-------|---------------|--------|
 | **Python baseline** | Algorithm correctness against published tools | 42 scripts, all reproducible |
 | **BarraCuda CPU** | Pure Rust math matches Python | 1,476 checks, 380/380 cross-domain parity (v1–v8) |
-| **BarraCuda GPU** | GPU produces same answer as CPU | 702 checks, 29 GPU domains |
+| **BarraCuda GPU** | GPU produces same answer as CPU | 1,578 checks, 29 GPU domains |
 | **Pure GPU streaming** | Zero CPU round-trips, data stays on-device | 152 checks, 10+ domains, 441-837× over round-trip (Exp090/105/106) |
 | **metalForge mixed** | Same answer on CPU, GPU, NPU — substrate-independent | 37 domains, 25/25 papers three-tier (Exp103/104) |
 
@@ -126,7 +126,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 
 | Document | Location | Description |
 |----------|----------|-------------|
-| CONTROL_EXPERIMENT_STATUS.md | `../` | 183 experiments, 3,618+ validation checks, 902 tests |
+| CONTROL_EXPERIMENT_STATUS.md | `../` | 183 experiments, 4,494+ validation checks, 902 tests |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
 | BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
 | Handoff (v50) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V50_COMPREHENSIVE_EVOLUTION_HANDOFF_FEB26_2026.md` | Current ToadStool handoff |

@@ -161,25 +161,11 @@ fn fit_heaps_law(clusters: &[GeneCluster], n_genomes: usize) -> Option<f64> {
         return None;
     }
 
-    // log-log regression: ln(n) = ln(κ) + α * ln(g)
-    let log_points: Vec<(f64, f64)> = points.iter().map(|(g, n)| (g.ln(), n.ln())).collect();
+    // log-log regression: ln(n) = α * ln(g) + ln(κ)
+    let ln_g: Vec<f64> = points.iter().map(|(g, _)| g.ln()).collect();
+    let ln_n: Vec<f64> = points.iter().map(|(_, n)| n.ln()).collect();
 
-    let num_points = log_points.len() as f64;
-    let sum_ln_g: f64 = log_points.iter().map(|(g, _)| g).sum();
-    let sum_ln_n: f64 = log_points.iter().map(|(_, n)| n).sum();
-    let sum_ln_g_ln_n: f64 = log_points.iter().map(|(g, n)| g * n).sum();
-    let sum_ln_g_sq: f64 = log_points.iter().map(|(g, _)| g * g).sum();
-
-    // Linear regression denominator: n*Σ(ln g)² - (Σ ln g)². Clippy
-    // `suspicious_operation_groupings` is a false positive here.
-    #[allow(clippy::suspicious_operation_groupings)]
-    let denom = num_points.mul_add(sum_ln_g_sq, -(sum_ln_g * sum_ln_g));
-    if denom.abs() < crate::tolerances::MATRIX_EPS {
-        return None;
-    }
-
-    let alpha = num_points.mul_add(sum_ln_g_ln_n, -(sum_ln_g * sum_ln_n)) / denom;
-    Some(alpha)
+    barracuda::stats::fit_linear(&ln_g, &ln_n).map(|r| r.params[0])
 }
 
 /// Hypergeometric test for enrichment (Fisher exact approximation).

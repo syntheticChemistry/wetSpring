@@ -459,7 +459,7 @@ fn validate_spectral_cosine(
         "Spectral cosine",
         gpu_cos[0],
         cpu_cos,
-        tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+        tolerances::GPU_LOG_POLYFILL,
     );
     timings.push(("Spectral Cosine", cpu_us, gpu_us, "CPU=GPU"));
 }

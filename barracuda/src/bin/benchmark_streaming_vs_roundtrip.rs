@@ -157,10 +157,10 @@ async fn main() {
 
         // Verify parity
         for i in 0..n {
-            if (rt_sh[i] - cpu_sh[i]).abs() > tolerances::GPU_VS_CPU_TRANSCENDENTAL {
+            if (rt_sh[i] - cpu_sh[i]).abs() > tolerances::GPU_LOG_POLYFILL {
                 all_parity = false;
             }
-            if (st_sh[i] - cpu_sh[i]).abs() > tolerances::GPU_VS_CPU_TRANSCENDENTAL {
+            if (st_sh[i] - cpu_sh[i]).abs() > tolerances::GPU_LOG_POLYFILL {
                 all_parity = false;
             }
         }

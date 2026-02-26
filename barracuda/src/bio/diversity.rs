@@ -53,6 +53,16 @@ pub fn simpson(counts: &[f64]) -> f64 {
     barracuda::stats::simpson(counts)
 }
 
+/// Shannon entropy from pre-normalized frequency proportions.
+///
+/// Unlike [`shannon`], does not normalize — caller guarantees Σ fᵢ = 1.
+/// Delegates to `barracuda::stats::diversity::shannon_from_frequencies` (S66).
+#[inline]
+#[must_use]
+pub fn shannon_from_frequencies(frequencies: &[f64]) -> f64 {
+    barracuda::stats::shannon_from_frequencies(frequencies)
+}
+
 /// Chao1 richness estimator.
 ///
 /// Delegates to `barracuda::stats::diversity::chao1` (S64).

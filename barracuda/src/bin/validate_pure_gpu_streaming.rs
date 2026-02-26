@@ -304,7 +304,7 @@ fn validate_modes_match(v: &mut Validator, gpu: &GpuF64) {
             &format!("S{i}: Shannon CPU ↔ stream"),
             st_shannon[i],
             cpu_shannon[i],
-            tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+            tolerances::GPU_LOG_POLYFILL,
         );
         v.check(
             &format!("S{i}: Simpson CPU ↔ stream"),

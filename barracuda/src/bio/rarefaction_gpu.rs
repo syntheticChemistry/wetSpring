@@ -223,11 +223,9 @@ fn subsample_community(counts: &[f64], depth: usize, rng: &mut u64) -> Vec<f64> 
 }
 
 /// Compute 95% confidence interval from bootstrap samples.
-#[allow(
-    clippy::cast_possible_truncation,
-    clippy::cast_precision_loss,
-    clippy::cast_sign_loss
-)]
+///
+/// Uses [`barracuda::stats::percentile`] for interpolated bounds.
+#[allow(clippy::cast_precision_loss)]
 fn compute_ci(samples: &[f64]) -> BootstrapCi {
     if samples.is_empty() {
         return BootstrapCi {
@@ -238,23 +236,16 @@ fn compute_ci(samples: &[f64]) -> BootstrapCi {
         };
     }
 
-    let n = samples.len() as f64;
-    let mean = samples.iter().sum::<f64>() / n;
-
-    let variance = samples.iter().map(|&x| (x - mean).powi(2)).sum::<f64>() / (n - 1.0).max(1.0);
-    let se = variance.sqrt();
-
-    let mut sorted = samples.to_vec();
-    sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
-
-    let lower_idx = ((samples.len() as f64 * 0.025).floor() as usize).min(samples.len() - 1);
-    let upper_idx = ((samples.len() as f64 * 0.975).floor() as usize).min(samples.len() - 1);
+    let mean = barracuda::stats::mean(samples);
+    let n = samples.len();
+    let nf = n as f64; // bootstrap sample counts always << 2^52
+    let variance = samples.iter().map(|&x| (x - mean).powi(2)).sum::<f64>() / (nf - 1.0).max(1.0);
 
     BootstrapCi {
         mean,
-        lower: sorted[lower_idx],
-        upper: sorted[upper_idx],
-        se,
+        lower: barracuda::stats::percentile(samples, 2.5),
+        upper: barracuda::stats::percentile(samples, 97.5),
+        se: variance.sqrt(),
     }
 }
 

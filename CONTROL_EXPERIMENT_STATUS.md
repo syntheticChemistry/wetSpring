@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 26, 2026
-**Status:** Phase 50 — 183 experiments, 3,618+ validation checks, all PASS (823 barracuda + 47 forge + 32 integration/doc = 902 Rust tests), ToadStool S65 aligned, 66 primitives + 2 BGL helpers + 5 ODE `cpu_derivative` + 0 local WGSL (fully lean, zero local derivative math) (barracuda always-on), 77 named tolerance constants, 0 ad-hoc tolerances, 9/9 P0-P3 delivered, 0 Passthrough, V50 ODE derivative rewire, 39/39 three-tier
+**Status:** Phase 52 — 183 experiments, 4,494+ validation checks (1,578 GPU on RTX 4070), all PASS (823 barracuda + 47 forge + 32 integration/doc = 902 Rust tests), ToadStool S66 aligned (045103a7), 79 primitives consumed (+6 S66: hill, monod, fit_linear, percentile, mean, shannon_from_frequencies), 0 local WGSL, 0 local derivative math, 0 local regression (barracuda always-on), 77 named tolerance constants, 0 ad-hoc tolerances, 9/9 P0-P3 delivered, V52 S66 rewire, 39/39 three-tier
 
 ---
 
@@ -201,7 +201,7 @@
 |----------|-------|
 | Experiments completed | 183 |
 | CPU validation checks | 1,476 |
-| GPU validation checks | 702 |
+| GPU validation checks | 1,578 |
 | Dispatch validation checks | 80 |
 | Layout fidelity checks | 35 |
 | Transfer/streaming checks | 57 |
@@ -225,7 +225,7 @@
 | Drug repurposing: Fajgenbaum, MATRIX, NMF, repoDB, ROBOKOP (Exp157-161) | 40 |
 | Drug repurposing: CPU v9, GPU, metalForge (Exp163-165) | 44 |
 | Phase 44: modern systems S62+DF64, diversity fusion (Exp166-167) | 37 |
-| **Total validation checks** | **3,618+** |
+| **Total validation checks** | **4,494+** |
 | Rust tests | 902 (823 barracuda + 47 forge + 32 integration/doc) |
 | BarraCuda CPU parity | 380/380 (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/092/101) |
@@ -372,7 +372,7 @@ provenance headers             → all 158 binaries (commit, command, hardware)
 duplicate math                 → 0 (crate::special delegates to ToadStool barracuda::special when gpu enabled)
 Python baselines               → scripts/requirements.txt (pinned numpy, scipy, sklearn)
 barracuda_cpu                  → 380/380 checks PASS (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted)
-barracuda_gpu                  → 702 GPU checks PASS (770 with --features gpu, 9 ignored)
+barracuda_gpu                  → 1,578 GPU checks PASS (70 validators, RTX 4070 + Titan V)
 fuzz harnesses                 → 4 (FASTQ, mzML, MS2, XML)
 zero-copy I/O                  → FastqRefRecord, DecodeBuffer reuse, streaming iterators
 ToadStool alignment            → S65 (66 primitives, barracuda always-on, zero fallback code)

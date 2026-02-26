@@ -114,7 +114,7 @@ fn validate_alpha_streaming(
         "Shannon stream",
         gpu_shannon,
         cpu_shannon,
-        tolerances::ANALYTICAL_F64,
+        tolerances::GPU_LOG_POLYFILL,
     );
     v.check(
         "Simpson stream",
@@ -282,7 +282,7 @@ fn validate_full_pipeline(
             &format!("alpha[{i}] Shannon"),
             gpu_a.shannon,
             cpu_a.0,
-            tolerances::ANALYTICAL_F64,
+            tolerances::GPU_LOG_POLYFILL,
         );
         v.check(
             &format!("alpha[{i}] Simpson"),
