@@ -192,7 +192,8 @@ mod tests {
 
     #[test]
     fn validate_genbank_valid() {
-        let body = "LOCUS       NC_000913             4641652 bp    DNA     circular\nDEFINITION  ...";
+        let body =
+            "LOCUS       NC_000913             4641652 bp    DNA     circular\nDEFINITION  ...";
         assert!(validate_genbank(body).is_ok());
     }
 

@@ -16,7 +16,7 @@
 //! - `WETSPRING_SOCKET` — Override the default socket path
 //! - `SONGBIRD_SOCKET` — Override Songbird discovery socket
 
-use wetspring_barracuda::ipc::{songbird, Server};
+use wetspring_barracuda::ipc::{Server, songbird};
 
 fn main() {
     eprintln!("wetspring-server v{}", env!("CARGO_PKG_VERSION"));
@@ -44,7 +44,9 @@ fn main() {
         None
     };
 
-    eprintln!("  Capabilities: health.check, science.{{diversity,anderson,qs_model,ncbi_fetch,full_pipeline}}");
+    eprintln!(
+        "  Capabilities: health.check, science.{{diversity,anderson,qs_model,ncbi_fetch,full_pipeline}}"
+    );
     eprintln!("  Ready.");
 
     server.run();

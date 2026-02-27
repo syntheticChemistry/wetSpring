@@ -13,11 +13,19 @@
 //!
 //! Proves: when NestGate/ToadStool/Tower are running, biomeOS can orchestrate
 //! the science pipeline graph through wetSpring's JSON-RPC interface.
+//!
+//! ## Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Source | Analytical (closed-form formula) |
+//! | Reference | Shannon=ln(4), Simpson=0.75, observed=4, Pielou=1.0 for uniform 4-species community (Magurran 2004, Ecological Diversity) |
 
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixStream;
 use std::time::Duration;
 use wetspring_barracuda::ipc::Server;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation;
 
 fn main() {
@@ -67,19 +75,24 @@ fn main() {
     let shannon_expected = 4.0_f64.ln();
     v.check_pass(
         "diversity: uniform Shannon = ln(4)",
-        check_f64_in_json(&div_resp, "shannon", shannon_expected, 1e-10),
+        check_f64_in_json(
+            &div_resp,
+            "shannon",
+            shannon_expected,
+            tolerances::PYTHON_PARITY,
+        ),
     );
     v.check_pass(
         "diversity: uniform Simpson = 0.75",
-        check_f64_in_json(&div_resp, "simpson", 0.75, 1e-10),
+        check_f64_in_json(&div_resp, "simpson", 0.75, tolerances::PYTHON_PARITY),
     );
     v.check_pass(
         "diversity: observed = 4",
-        check_f64_in_json(&div_resp, "observed", 4.0, 1e-10),
+        check_f64_in_json(&div_resp, "observed", 4.0, tolerances::PYTHON_PARITY),
     );
     v.check_pass(
         "diversity: Pielou evenness = 1.0",
-        check_f64_in_json(&div_resp, "pielou", 1.0, 1e-10),
+        check_f64_in_json(&div_resp, "pielou", 1.0, tolerances::PYTHON_PARITY),
     );
 
     // Specific metric selection
@@ -142,15 +155,18 @@ fn main() {
     );
 
     // Error case: unknown scenario
-    let qs_bad = rpc(&server_path, "science.qs_model", r#"{"scenario":"imaginary"}"#);
+    let qs_bad = rpc(
+        &server_path,
+        "science.qs_model",
+        r#"{"scenario":"imaginary"}"#,
+    );
     v.check_pass(
         "qs_model: unknown scenario returns error",
         qs_bad.contains("error"),
     );
 
     // ── Stage 4: Full Pipeline ───────────────────────────────────────
-    let pipeline_with_counts =
-        r#"{"counts":[5.0,10.0,15.0,20.0],"scenario":"standard_growth"}"#;
+    let pipeline_with_counts = r#"{"counts":[5.0,10.0,15.0,20.0],"scenario":"standard_growth"}"#;
     let pipe_resp = rpc(&server_path, "science.full_pipeline", pipeline_with_counts);
     v.check_pass(
         "full_pipeline: diversity stage present",
@@ -173,10 +189,7 @@ fn main() {
 
     // ── Stage 5: Protocol Edge Cases ─────────────────────────────────
     let unknown = rpc(&server_path, "nonexistent.method", "{}");
-    v.check_pass(
-        "unknown method returns -32601",
-        unknown.contains("-32601"),
-    );
+    v.check_pass("unknown method returns -32601", unknown.contains("-32601"));
 
     let bad_version = rpc_raw(
         &server_path,
@@ -196,9 +209,7 @@ fn main() {
     let mut reader = BufReader::new(&stream);
     let mut multi_ok = true;
     for i in 1..=5 {
-        let req = format!(
-            r#"{{"jsonrpc":"2.0","method":"health.check","params":{{}},"id":{i}}}"#
-        );
+        let req = format!(r#"{{"jsonrpc":"2.0","method":"health.check","params":{{}},"id":{i}}}"#);
         if writer.write_all(req.as_bytes()).is_err()
             || writer.write_all(b"\n").is_err()
             || writer.flush().is_err()
@@ -260,9 +271,7 @@ fn main() {
 
 /// Send a JSON-RPC request and return the response.
 fn rpc(sock: &std::path::Path, method: &str, params: &str) -> String {
-    let req = format!(
-        r#"{{"jsonrpc":"2.0","method":"{method}","params":{params},"id":1}}"#
-    );
+    let req = format!(r#"{{"jsonrpc":"2.0","method":"{method}","params":{params},"id":1}}"#);
     rpc_raw(sock, &req)
 }
 
@@ -291,7 +300,9 @@ fn check_f64_in_json(json: &str, field: &str, expected: f64, tol: f64) -> bool {
         let after = &json[pos + needle.len()..];
         let trimmed = after.trim_start();
         let end = trimmed
-            .find(|c: char| !c.is_ascii_digit() && c != '.' && c != '-' && c != 'e' && c != 'E' && c != '+')
+            .find(|c: char| {
+                !c.is_ascii_digit() && c != '.' && c != '-' && c != 'e' && c != 'E' && c != '+'
+            })
             .unwrap_or(trimmed.len());
         if let Ok(val) = trimmed[..end].parse::<f64>() {
             return (val - expected).abs() < tol;
@@ -307,7 +318,9 @@ fn check_f64_positive(json: &str, field: &str) -> bool {
         let after = &json[pos + needle.len()..];
         let trimmed = after.trim_start();
         let end = trimmed
-            .find(|c: char| !c.is_ascii_digit() && c != '.' && c != '-' && c != 'e' && c != 'E' && c != '+')
+            .find(|c: char| {
+                !c.is_ascii_digit() && c != '.' && c != '-' && c != 'e' && c != 'E' && c != '+'
+            })
             .unwrap_or(trimmed.len());
         if let Ok(val) = trimmed[..end].parse::<f64>() {
             return val > 0.0;

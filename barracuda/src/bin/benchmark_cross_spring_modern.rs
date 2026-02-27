@@ -70,7 +70,12 @@ fn main() {
     let t0 = Instant::now();
     let erf_val = erf(1.0);
     let erf_ns = t0.elapsed().as_nanos();
-    v.check("erf(1.0)", erf_val, 0.842_700_792_949_715, 5e-7);
+    v.check(
+        "erf(1.0)",
+        erf_val,
+        0.842_700_792_949_715,
+        tolerances::ERF_PARITY,
+    );
 
     let t0 = Instant::now();
     let lng_val = ln_gamma(5.0).unwrap_or(f64::NAN);

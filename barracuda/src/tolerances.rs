@@ -812,6 +812,38 @@ pub const ASARI_MZ_RANGE_PCT: f64 = 10.0;
 /// Validated: Exp186 (Dynamic Anderson W(t)), Exp190 (CPU v10).
 pub const SEASONAL_OSCILLATION: f64 = 0.5;
 
+/// Poisson level spacing ratio tolerance for spectral cross-spring validation.
+///
+/// At strong disorder (W >> `W_c`), ⟨r⟩ should approach Poisson (0.3863).
+/// Tolerance of 0.06 covers finite-size fluctuations and disorder averaging
+/// with 8 realizations on lattices L = 6–14.
+/// Validated: Exp107 (cross-spring spectral theory), commit `756df26`.
+pub const SPECTRAL_POISSON_PARITY: f64 = 0.06;
+
+/// Lyapunov exponent tolerance for localization diagnostics.
+///
+/// Normalized Lyapunov exponent γL should be > 0 in the localized phase.
+/// Tolerance of 0.03 covers transfer-matrix convergence for chain lengths
+/// ≥ 10,000 sites at moderate disorder.
+/// Validated: Exp107 (cross-spring spectral theory), commit `756df26`.
+pub const SPECTRAL_LYAPUNOV_PARITY: f64 = 0.03;
+
+/// Herman–Avila–Bochi cocycle tolerance for spectral diagnostics.
+///
+/// The Herman bound on Lyapunov exponents provides a lower bound on the
+/// localization rate. Tolerance of 0.02 covers polynomial expansion drift
+/// in the cocycle integral for moderate disorder.
+/// Validated: Exp107 (cross-spring spectral theory), commit `756df26`.
+pub const SPECTRAL_HERMAN_PARITY: f64 = 0.02;
+
+/// Trapezoidal integration tolerance for coarse grids (N = 100).
+///
+/// `barracuda::numerical::trapz` on N = 100 points for smooth functions
+/// (e.g., x² on \[0,1\]) introduces discretization error ∝ h² ≈ 1e-4.
+/// 1e-6 covers typical analytical targets with margin.
+/// Validated: Exp169/183 (cross-spring modern/S65), commit `756df26`.
+pub const TRAPZ_COARSE: f64 = 1e-6;
+
 /// Lanczos vs Sturm eigenvalue comparison tolerance.
 ///
 /// Lanczos tridiagonalization with k=60 vectors and Sturm bisection

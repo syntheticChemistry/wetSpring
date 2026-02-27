@@ -68,6 +68,7 @@ flate2 = { version = "1.0", default-features = false, features = ["rust_backend"
 
 [dev-dependencies]
 tempfile = "3"
+temp-env = "0.3"
 
 # ── Track 1 validation binaries ──────────────────────────────────
 [[bin]]
@@ -1097,6 +1098,28 @@ required-features = ["gpu", "ipc"]
 name = "validate_metalforge_v7_mixed"
 path = "src/bin/validate_metalforge_v7_mixed.rs"
 required-features = ["ipc"]
+
+# ── Exp209: Streaming I/O Parity Validation (V66 post-audit) ──
+[[bin]]
+name = "validate_streaming_io_parity"
+path = "src/bin/validate_streaming_io_parity.rs"
+
+# ── Exp212: BarraCuda CPU v12 — Post-Audit Math Fidelity ──
+[[bin]]
+name = "validate_barracuda_cpu_v12"
+path = "src/bin/validate_barracuda_cpu_v12.rs"
+
+# ── Exp214: NUCLEUS Mixed Hardware V8 — V66 I/O Evolution (IPC) ──
+[[bin]]
+name = "validate_nucleus_v8_mixed"
+path = "src/bin/validate_nucleus_v8_mixed.rs"
+required-features = ["ipc"]
+
+# ── Exp215: CPU vs GPU v5 — V66 I/O Evolution Domains ──
+[[bin]]
+name = "validate_cpu_vs_gpu_v5_io_evolution"
+path = "src/bin/validate_cpu_vs_gpu_v5_io_evolution.rs"
+required-features = ["gpu"]
 
 # ── Exp210: Modern Cross-Spring Evolution Benchmark (S68+) ──
 [[bin]]

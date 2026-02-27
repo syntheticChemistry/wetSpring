@@ -19,15 +19,16 @@
 //!
 //! # Provenance
 //!
-//! | Item           | Value |
-//! |----------------|-------|
-//! | Date           | 2026-02-26 |
-//! | Source paper   | Ruff et al., Nature Microbiology (2019) |
-//! | BioProject     | PRJNA315684 |
-//! | Baseline commit| wetSpring Phase 59 |
-//! | Data           | 170 cold seep 16S V4 amplicons (NCBI SRA) |
-//! | Hardware       | biomeGate RTX 4070 (GPU), Eastgate CPU |
-//! | Command        | `cargo run --release --features gpu --bin validate_cold_seep_pipeline` |
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline | wetSpring Phase 59 sovereign pipeline |
+//! | Commit | 756df26 |
+//! | Date | 2026-02-26 |
+//! | Source paper | Ruff et al., Nature Microbiology (2019) |
+//! | BioProject | PRJNA315684 |
+//! | Data | 170 cold seep 16S V4 amplicons (NCBI SRA) |
+//! | Hardware | biomeGate RTX 4070 (GPU), Eastgate CPU |
+//! | Command | `cargo run --release --features gpu --bin validate_cold_seep_pipeline` |
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;

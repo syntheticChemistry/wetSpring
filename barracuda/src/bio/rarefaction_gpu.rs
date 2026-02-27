@@ -210,9 +210,7 @@ fn subsample_community(counts: &[f64], depth: usize, rng: &mut u64) -> Vec<f64> 
         let u = (*rng >> 11) as f64 / (1_u64 << 53) as f64;
 
         // Binary search for the species
-        let idx = match cumulative
-            .binary_search_by(|p| p.total_cmp(&u))
-        {
+        let idx = match cumulative.binary_search_by(|p| p.total_cmp(&u)) {
             Ok(i) => i,
             Err(i) => i.min(counts.len() - 1),
         };

@@ -61,9 +61,7 @@ fn bench<T>(label: &str, f: impl FnOnce() -> T) -> (T, f64) {
 }
 
 fn main() {
-    let mut v = Validator::new(
-        "Exp210: Modern Cross-Spring Evolution Benchmark (ToadStool S68+)",
-    );
+    let mut v = Validator::new("Exp210: Modern Cross-Spring Evolution Benchmark (ToadStool S68+)");
     let mut timings: Vec<Timing> = Vec::new();
 
     // ═══════════════════════════════════════════════════════════════════
@@ -119,7 +117,9 @@ fn main() {
     println!("  Evolution: wetSpring authored → ToadStool absorbed → all Springs benefit");
 
     let n_taxa = 500;
-    let counts: Vec<f64> = (0..n_taxa).map(|i| ((i * 7 + 3) % 100 + 1) as f64).collect();
+    let counts: Vec<f64> = (0..n_taxa)
+        .map(|i| ((i * 7 + 3) % 100 + 1) as f64)
+        .collect();
 
     let (cpu_shannon, cpu_div_ms) = bench("CPU Shannon (barracuda::stats S64)", || {
         diversity::shannon(&counts)
@@ -135,7 +135,11 @@ fn main() {
     v.check_pass("Simpson ∈ (0,1)", cpu_simpson > 0.0 && cpu_simpson < 1.0);
     v.check_pass("Pielou ∈ (0,1]", cpu_pielou > 0.0 && cpu_pielou <= 1.0);
 
-    timings.push(Timing { label: "CPU diversity (500 taxa)", origin: "wetSpring→S64", ms: cpu_div_ms });
+    timings.push(Timing {
+        label: "CPU diversity (500 taxa)",
+        origin: "wetSpring→S64",
+        ms: cpu_div_ms,
+    });
 
     // ═══════════════════════════════════════════════════════════════════
     // §2  wetSpring Bio: GPU DiversityFusion (Write → S63 → Lean)
@@ -157,17 +161,37 @@ fn main() {
 
     let fusion_gpu = DiversityFusionGpu::new(Arc::clone(&device)).expect("DiversityFusionGpu");
     let (gpu_fusion, gpu_fusion_ms) = bench("GPU DiversityFusion (5×10k)", || {
-        fusion_gpu.compute(&large_counts, n_samples, n_species).expect("fusion GPU")
+        fusion_gpu
+            .compute(&large_counts, n_samples, n_species)
+            .expect("fusion GPU")
     });
 
-    v.check("GPU Shannon ≈ CPU", gpu_fusion[0].shannon, cpu_fusion[0].shannon, tolerances::GPU_VS_CPU_F64);
-    v.check("GPU Simpson ≈ CPU", gpu_fusion[0].simpson, cpu_fusion[0].simpson, tolerances::GPU_VS_CPU_F64);
+    v.check(
+        "GPU Shannon ≈ CPU",
+        gpu_fusion[0].shannon,
+        cpu_fusion[0].shannon,
+        tolerances::GPU_VS_CPU_F64,
+    );
+    v.check(
+        "GPU Simpson ≈ CPU",
+        gpu_fusion[0].simpson,
+        cpu_fusion[0].simpson,
+        tolerances::GPU_VS_CPU_F64,
+    );
 
     let speedup = cpu_fusion_ms / gpu_fusion_ms;
     println!("  GPU speedup: {speedup:.1}× over CPU (FusedMapReduceF64)");
 
-    timings.push(Timing { label: "CPU DiversityFusion 5×10k", origin: "wetSpring→S63", ms: cpu_fusion_ms });
-    timings.push(Timing { label: "GPU DiversityFusion 5×10k", origin: "wetSpring→S63→GPU", ms: gpu_fusion_ms });
+    timings.push(Timing {
+        label: "CPU DiversityFusion 5×10k",
+        origin: "wetSpring→S63",
+        ms: cpu_fusion_ms,
+    });
+    timings.push(Timing {
+        label: "GPU DiversityFusion 5×10k",
+        origin: "wetSpring→S63→GPU",
+        ms: gpu_fusion_ms,
+    });
 
     // ═══════════════════════════════════════════════════════════════════
     // §3  hotSpring: Special Functions + Anderson Spectral
@@ -179,13 +203,28 @@ fn main() {
     println!("  hotSpring drives: Fp64Strategy, DF64 core, compile_shader_f64 polyfills");
 
     let erf_val = barracuda::special::erf(1.0);
-    v.check("erf(1.0) [A&S polynomial]", erf_val, 0.842_700_792_949_715, tolerances::ERF_PARITY);
+    v.check(
+        "erf(1.0) [A&S polynomial]",
+        erf_val,
+        0.842_700_792_949_715,
+        tolerances::ERF_PARITY,
+    );
 
     let lng = barracuda::special::ln_gamma(5.0).expect("ln_gamma");
-    v.check("ln_gamma(5.0) = ln(24)", lng, 24.0_f64.ln(), tolerances::ANALYTICAL_F64);
+    v.check(
+        "ln_gamma(5.0) = ln(24)",
+        lng,
+        24.0_f64.ln(),
+        tolerances::ANALYTICAL_F64,
+    );
 
     let ncdf = barracuda::stats::norm_cdf(1.96);
-    v.check("norm_cdf(1.96) ≈ 0.975", ncdf, 0.975, tolerances::CROSS_SPRING_NUMERICAL);
+    v.check(
+        "norm_cdf(1.96) ≈ 0.975",
+        ncdf,
+        0.975,
+        tolerances::CROSS_SPRING_NUMERICAL,
+    );
 
     let (anderson_result, anderson_ms) = bench("Anderson 3D spectral (L=8)", || {
         let csr = barracuda::spectral::anderson_3d(8, 8, 8, 2.0, 42);
@@ -193,9 +232,16 @@ fn main() {
         let eigs = barracuda::spectral::lanczos_eigenvalues(&tri);
         barracuda::spectral::level_spacing_ratio(&eigs)
     });
-    v.check_pass("Anderson r ∈ (0,1)", anderson_result > 0.0 && anderson_result < 1.0);
+    v.check_pass(
+        "Anderson r ∈ (0,1)",
+        anderson_result > 0.0 && anderson_result < 1.0,
+    );
 
-    timings.push(Timing { label: "Anderson 3D (L=8)", origin: "hotSpring→S59→spectral", ms: anderson_ms });
+    timings.push(Timing {
+        label: "Anderson 3D (L=8)",
+        origin: "hotSpring→S59→spectral",
+        ms: anderson_ms,
+    });
 
     // ═══════════════════════════════════════════════════════════════════
     // §4  airSpring/groundSpring: Stats Evolution (S64/S66)
@@ -207,10 +253,18 @@ fn main() {
     println!("  Provenance: both → stats::metrics MAE, RMSE, R² (S64)");
 
     let vec_a: Vec<f64> = (0..100).map(|i| i as f64 * 0.1).collect();
-    let vec_b: Vec<f64> = vec_a.iter().map(|&x| 2.0 * x + 1.0 + 0.01 * x.sin()).collect();
+    let vec_b: Vec<f64> = vec_a
+        .iter()
+        .map(|&x| 2.0 * x + 1.0 + 0.01 * x.sin())
+        .collect();
 
     let pearson = barracuda::stats::pearson_correlation(&vec_a, &vec_b).expect("pearson");
-    v.check("Pearson(linear) ≈ 1.0 [cross-spring→S64]", pearson, 1.0, 0.001);
+    v.check(
+        "Pearson(linear) ≈ 1.0 [cross-spring→S64]",
+        pearson,
+        1.0,
+        0.001,
+    );
 
     let mae_val = barracuda::stats::mae(&vec_a, &vec_b);
     v.check_pass("MAE finite [airSpring→S64 metrics]", mae_val.is_finite());
@@ -225,14 +279,25 @@ fn main() {
     v.check_pass("R² > 0.99 [airSpring→S64 metrics]", r2_val > 0.99);
 
     let trap_n = 1000;
-    let trap_x: Vec<f64> = (0..trap_n).map(|i| f64::from(i) / f64::from(trap_n - 1)).collect();
+    let trap_x: Vec<f64> = (0..trap_n)
+        .map(|i| f64::from(i) / f64::from(trap_n - 1))
+        .collect();
     let trap_y: Vec<f64> = trap_x.iter().map(|&xi| xi * xi).collect();
     let (trapz_val, trapz_ms) = bench("trapz(x², 1000 pts) [cross-spring numerical]", || {
         barracuda::numerical::trapz(&trap_y, &trap_x).expect("trapz")
     });
-    v.check("trapz(x²) ≈ 1/3", trapz_val, 1.0 / 3.0, 1e-6);
+    v.check(
+        "trapz(x²) ≈ 1/3",
+        trapz_val,
+        1.0 / 3.0,
+        tolerances::TRAPZ_COARSE,
+    );
 
-    timings.push(Timing { label: "trapz(x², 1000 pts)", origin: "cross-spring→numerical", ms: trapz_ms });
+    timings.push(Timing {
+        label: "trapz(x², 1000 pts)",
+        origin: "cross-spring→numerical",
+        ms: trapz_ms,
+    });
 
     // ═══════════════════════════════════════════════════════════════════
     // §5  GPU GEMM: Precision-Aware Pipeline (wetSpring → S62 → S68)
@@ -247,8 +312,12 @@ fn main() {
     let m = 256;
     let k = 128;
     let n = 256;
-    let a_mat: Vec<f64> = (0..m * k).map(|i| ((i * 7 + 3) % 100) as f64 / 100.0).collect();
-    let b_mat: Vec<f64> = (0..k * n).map(|i| ((i * 11 + 5) % 100) as f64 / 100.0).collect();
+    let a_mat: Vec<f64> = (0..m * k)
+        .map(|i| ((i * 7 + 3) % 100) as f64 / 100.0)
+        .collect();
+    let b_mat: Vec<f64> = (0..k * n)
+        .map(|i| ((i * 11 + 5) % 100) as f64 / 100.0)
+        .collect();
 
     let gemm = GemmCached::new(Arc::clone(&device), Arc::clone(&ctx));
     let (gemm_res, gemm_ms) = bench("GEMM 256×128 × 128×256 (Precision::F64)", || {
@@ -257,18 +326,35 @@ fn main() {
     v.check_pass("GEMM result finite", gemm_res.iter().all(|x| x.is_finite()));
 
     let expected_00: f64 = (0..k).map(|j| a_mat[j] * b_mat[j * n]).sum();
-    v.check("GEMM C[0,0] ≈ CPU", gemm_res[0], expected_00, tolerances::GPU_VS_CPU_F64);
+    v.check(
+        "GEMM C[0,0] ≈ CPU",
+        gemm_res[0],
+        expected_00,
+        tolerances::GPU_VS_CPU_F64,
+    );
 
     // Cached dispatch (amortized submit_and_poll, S68+)
-    for _ in 0..5 { let _ = gemm.execute(&a_mat, &b_mat, m, k, n, 1); }
+    for _ in 0..5 {
+        let _ = gemm.execute(&a_mat, &b_mat, m, k, n, 1);
+    }
     let ((), cached_ms) = bench("GEMM ×50 cached (submit_and_poll S68+)", || {
-        for _ in 0..50 { let _ = gemm.execute(&a_mat, &b_mat, m, k, n, 1); }
+        for _ in 0..50 {
+            let _ = gemm.execute(&a_mat, &b_mat, m, k, n, 1);
+        }
     });
     let per_dispatch = cached_ms / 50.0;
     v.check_pass("cached dispatch faster than cold", per_dispatch < gemm_ms);
 
-    timings.push(Timing { label: "GEMM cold 256×256", origin: "wetSpring→S62→S68", ms: gemm_ms });
-    timings.push(Timing { label: "GEMM cached avg", origin: "wetSpring→S62→S68+", ms: per_dispatch });
+    timings.push(Timing {
+        label: "GEMM cold 256×256",
+        origin: "wetSpring→S62→S68",
+        ms: gemm_ms,
+    });
+    timings.push(Timing {
+        label: "GEMM cached avg",
+        origin: "wetSpring→S62→S68+",
+        ms: per_dispatch,
+    });
 
     // ═══════════════════════════════════════════════════════════════════
     // §6  NMF + Ridge: Cross-Spring Linalg (wetSpring → S58)
@@ -279,7 +365,9 @@ fn main() {
     println!("  NMF: Non-negative matrix factorization (Lee & Seung 1999)");
     println!("  Ridge: Tikhonov regularization (readout training, ESN, kriging)");
 
-    let v_mat: Vec<f64> = (0..20 * 10).map(|i| ((i * 3 + 1) % 50) as f64 / 50.0).collect();
+    let v_mat: Vec<f64> = (0..20 * 10)
+        .map(|i| ((i * 3 + 1) % 50) as f64 / 50.0)
+        .collect();
     let nmf_cfg = barracuda::linalg::nmf::NmfConfig {
         rank: 3,
         max_iter: 100,
@@ -290,7 +378,10 @@ fn main() {
     let (nmf_res, nmf_ms) = bench("NMF 20×10 (KL, k=3)", || {
         barracuda::linalg::nmf::nmf(&v_mat, 20, 10, &nmf_cfg).expect("NMF")
     });
-    v.check_pass("NMF W, H non-negative", nmf_res.w.iter().chain(&nmf_res.h).all(|&x| x >= 0.0));
+    v.check_pass(
+        "NMF W, H non-negative",
+        nmf_res.w.iter().chain(&nmf_res.h).all(|&x| x >= 0.0),
+    );
 
     let ridge_x: Vec<f64> = (0..100).map(|i| f64::from(i) * 0.01).collect();
     let ridge_y: Vec<f64> = (0..40).map(|i| f64::from(i).mul_add(0.25, 1.0)).collect();
@@ -304,8 +395,16 @@ fn main() {
             .unwrap_or(false),
     );
 
-    timings.push(Timing { label: "NMF 20×10 KL k=3", origin: "wetSpring→S58→linalg", ms: nmf_ms });
-    timings.push(Timing { label: "Ridge 20×5→2", origin: "wetSpring→S59→linalg", ms: ridge_ms });
+    timings.push(Timing {
+        label: "NMF 20×10 KL k=3",
+        origin: "wetSpring→S58→linalg",
+        ms: nmf_ms,
+    });
+    timings.push(Timing {
+        label: "Ridge 20×5→2",
+        origin: "wetSpring→S59→linalg",
+        ms: ridge_ms,
+    });
 
     // ═══════════════════════════════════════════════════════════════════
     // §7  Cross-Spring Evolution Provenance Summary
@@ -354,16 +453,25 @@ fn main() {
     println!("  │ ToadStool alignment           │ S68+ (e96576ee)                              │");
     println!("  │ WGSL shaders                  │ 700 (0 f32-only, all f64 canonical)          │");
     println!("  │ Precision architecture        │ Universal (F16/F32/F64/DF64 via single API)  │");
-    println!("  │ Fp64Strategy                  │ {:?}{} │", strategy,
-        " ".repeat(43 - format!("{strategy:?}").len()));
-    println!("  │ Optimal precision             │ {:?}{} │", precision,
-        " ".repeat(43 - format!("{precision:?}").len()));
+    println!(
+        "  │ Fp64Strategy                  │ {:?}{} │",
+        strategy,
+        " ".repeat(43 - format!("{strategy:?}").len())
+    );
+    println!(
+        "  │ Optimal precision             │ {:?}{} │",
+        precision,
+        " ".repeat(43 - format!("{precision:?}").len())
+    );
     println!("  │ Device-lost resilience        │ S68+ (submit_and_poll + is_lost())           │");
     println!("  │ Dispatch semaphore            │ S68+ (dGPU=8, iGPU=4, CPU=2 permits)        │");
     println!("  │ Primitives consumed           │ 79 (barracuda always-on, zero fallback)      │");
     println!("  │ Local WGSL                    │ 0 (fully lean)                               │");
-    println!("  │ Dispatch threshold            │ {} elements{} │", threshold,
-        " ".repeat(37 - format!("{threshold}").len()));
+    println!(
+        "  │ Dispatch threshold            │ {} elements{} │",
+        threshold,
+        " ".repeat(37 - format!("{threshold}").len())
+    );
     println!("  └───────────────────────────────┴───────────────────────────────────────────────┘");
 
     v.check_pass("cross-spring evolution documented", true);
@@ -377,10 +485,7 @@ fn main() {
     println!("  │ Benchmark                       │ Provenance             │ Time     │");
     println!("  ├─────────────────────────────────┼────────────────────────┼──────────┤");
     for t in &timings {
-        println!(
-            "  │ {:<31} │ {:<22} │ {:>7.3}ms│",
-            t.label, t.origin, t.ms
-        );
+        println!("  │ {:<31} │ {:<22} │ {:>7.3}ms│", t.label, t.origin, t.ms);
     }
     println!("  └─────────────────────────────────┴────────────────────────┴──────────┘");
 

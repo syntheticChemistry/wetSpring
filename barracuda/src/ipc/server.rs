@@ -69,9 +69,8 @@ impl Server {
             })?;
         }
 
-        let listener = UnixListener::bind(path).map_err(|e| {
-            crate::error::Error::Ipc(format!("bind {}: {e}", path.display()))
-        })?;
+        let listener = UnixListener::bind(path)
+            .map_err(|e| crate::error::Error::Ipc(format!("bind {}: {e}", path.display())))?;
 
         Ok(Self {
             listener,
@@ -298,9 +297,8 @@ mod tests {
         let mut reader = BufReader::new(&stream);
 
         for i in 1..=3 {
-            let request = format!(
-                r#"{{"jsonrpc":"2.0","method":"health.check","params":{{}},"id":{i}}}"#
-            );
+            let request =
+                format!(r#"{{"jsonrpc":"2.0","method":"health.check","params":{{}},"id":{i}}}"#);
             writer.write_all(request.as_bytes()).unwrap();
             writer.write_all(b"\n").unwrap();
             writer.flush().unwrap();
@@ -371,8 +369,7 @@ mod tests {
         reader.read_line(&mut resp).unwrap();
 
         // Now request metrics snapshot
-        let metrics_req =
-            r#"{"jsonrpc":"2.0","method":"metrics.snapshot","params":{},"id":2}"#;
+        let metrics_req = r#"{"jsonrpc":"2.0","method":"metrics.snapshot","params":{},"id":2}"#;
         writer.write_all(metrics_req.as_bytes()).unwrap();
         writer.write_all(b"\n").unwrap();
         writer.flush().unwrap();

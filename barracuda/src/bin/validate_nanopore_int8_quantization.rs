@@ -21,13 +21,13 @@
 //!
 //! # Provenance
 //!
-//! | Item           | Value |
-//! |----------------|-------|
-//! | Date           | 2026-02-26 |
-//! | Baseline       | Synthetic nanopore communities |
-//! | Commit         | wetSpring Phase 61 |
-//! | Hardware       | CPU only (int8 simulation) |
-//! | Command        | `cargo run --release --bin validate_nanopore_int8_quantization` |
+//! | Field | Value |
+//! |-------|-------|
+//! | Source | Synthetic (SyntheticSignalGenerator seed=42, int8 from synthetic reads) |
+//! | Date | 2026-02-26 |
+//! | Commit | wetSpring Phase 61 |
+//! | Hardware | CPU only (int8 simulation) |
+//! | Command | `cargo run --release --bin validate_nanopore_int8_quantization` |
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::io::nanopore::{NanoporeRead, SyntheticSignalGenerator};

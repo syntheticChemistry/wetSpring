@@ -523,4 +523,41 @@ core id\t\t: 5
         assert_eq!(driver, "550.0");
         assert_eq!(cc, "8.9");
     }
+
+    #[test]
+    fn write_to_produces_valid_output() {
+        let hw = HardwareInventory::from_content(
+            "test-gate",
+            SAMPLE_CPUINFO,
+            "MemTotal:       8192000 kB\n",
+            "Test GPU, 4096, 500.0, 7.5",
+            "6.1.0",
+        );
+        let mut buf = Vec::new();
+        hw.write_to(&mut buf).unwrap();
+        let output = String::from_utf8(buf).unwrap();
+        assert!(output.contains("test-gate"));
+        assert!(output.contains("i9-12900K"));
+        assert!(output.contains("Test GPU"));
+        assert!(output.contains("Hardware"));
+    }
+
+    #[test]
+    fn detect_does_not_panic() {
+        let _ = HardwareInventory::detect("unit-test");
+    }
+
+    #[test]
+    fn query_nvidia_smi_csv_does_not_panic() {
+        let _ = query_nvidia_smi_csv();
+    }
+
+    #[test]
+    fn from_content_empty_strings() {
+        let hw = HardwareInventory::from_content("", "", "", "", "");
+        assert_eq!(hw.gate_name, "");
+        assert_eq!(hw.cpu_model, "unknown");
+        assert_eq!(hw.gpu_name, "N/A");
+        assert_eq!(hw.ram_total_mb, 0);
+    }
 }

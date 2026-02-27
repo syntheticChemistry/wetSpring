@@ -40,7 +40,7 @@ use std::sync::Arc;
 use std::time::Instant;
 
 use wetspring_barracuda::bio::diversity;
-use wetspring_barracuda::bio::diversity_fusion_gpu::{diversity_fusion_cpu, DiversityFusionGpu};
+use wetspring_barracuda::bio::diversity_fusion_gpu::{DiversityFusionGpu, diversity_fusion_cpu};
 use wetspring_barracuda::bio::gemm_cached::GemmCached;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
@@ -61,9 +61,7 @@ fn bench<T>(label: &str, f: impl FnOnce() -> T) -> (T, f64) {
 }
 
 fn main() {
-    let mut v = Validator::new(
-        "Exp211: BarraCuda Progression — CPU → GPU → Pure GPU Streaming",
-    );
+    let mut v = Validator::new("Exp211: BarraCuda Progression — CPU → GPU → Pure GPU Streaming");
     let mut results: Vec<BenchResult> = Vec::new();
 
     println!();
@@ -115,17 +113,32 @@ fn main() {
             .collect::<Vec<_>>()
     });
     v.check_pass("CPU Shannon[0] > 0", cpu_shannons[0].0 > 0.0);
-    v.check_pass("CPU Simpson[0] ∈ (0,1)", cpu_shannons[0].1 > 0.0 && cpu_shannons[0].1 < 1.0);
+    v.check_pass(
+        "CPU Simpson[0] ∈ (0,1)",
+        cpu_shannons[0].1 > 0.0 && cpu_shannons[0].1 < 1.0,
+    );
     v.check_pass("CPU 20 samples computed", cpu_shannons.len() == n_samples);
-    results.push(BenchResult { label: "Diversity 20×2000", tier: "CPU", ms: cpu_div_ms });
+    results.push(BenchResult {
+        label: "Diversity 20×2000",
+        tier: "CPU",
+        ms: cpu_div_ms,
+    });
 
     // CPU DiversityFusion (batched)
     let (cpu_fusion, cpu_fusion_ms) = bench("CPU DiversityFusion (20 × 2000)", || {
         diversity_fusion_cpu(&abundances, n_taxa)
     });
-    v.check("CPU fusion Shannon ≈ per-sample",
-        cpu_fusion[0].shannon, cpu_shannons[0].0, tolerances::EXACT);
-    results.push(BenchResult { label: "DiversityFusion 20×2k", tier: "CPU", ms: cpu_fusion_ms });
+    v.check(
+        "CPU fusion Shannon ≈ per-sample",
+        cpu_fusion[0].shannon,
+        cpu_shannons[0].0,
+        tolerances::EXACT,
+    );
+    results.push(BenchResult {
+        label: "DiversityFusion 20×2k",
+        tier: "CPU",
+        ms: cpu_fusion_ms,
+    });
 
     // CPU special functions (hotSpring → S59)
     let (erf_val, cpu_erf_ms) = bench("CPU erf(1.0) + ln_gamma(5.0) + norm_cdf(1.96)", || {
@@ -134,9 +147,23 @@ fn main() {
         let n = barracuda::stats::norm_cdf(1.96);
         (e, l, n)
     });
-    v.check("erf(1.0)", erf_val.0, 0.842_700_792_949_715, tolerances::ERF_PARITY);
-    v.check("ln_gamma(5) = ln(24)", erf_val.1, 24.0_f64.ln(), tolerances::ANALYTICAL_F64);
-    results.push(BenchResult { label: "Special functions", tier: "CPU", ms: cpu_erf_ms });
+    v.check(
+        "erf(1.0)",
+        erf_val.0,
+        0.842_700_792_949_715,
+        tolerances::ERF_PARITY,
+    );
+    v.check(
+        "ln_gamma(5) = ln(24)",
+        erf_val.1,
+        24.0_f64.ln(),
+        tolerances::ANALYTICAL_F64,
+    );
+    results.push(BenchResult {
+        label: "Special functions",
+        tier: "CPU",
+        ms: cpu_erf_ms,
+    });
 
     // CPU Pearson + metrics (airSpring → S64)
     let x: Vec<f64> = (0..100).map(|i| i as f64 * 0.1).collect();
@@ -148,7 +175,11 @@ fn main() {
         (p, m, r)
     });
     v.check("Pearson(linear) = 1.0", pearson.0, 1.0, tolerances::EXACT);
-    results.push(BenchResult { label: "Stats (Pearson+MAE+RMSE)", tier: "CPU", ms: cpu_stats_ms });
+    results.push(BenchResult {
+        label: "Stats (Pearson+MAE+RMSE)",
+        tier: "CPU",
+        ms: cpu_stats_ms,
+    });
 
     println!();
     println!("    ── Tier 1 proves: identical math to Python, compiled Rust speed ──");
@@ -176,26 +207,51 @@ fn main() {
     // GPU DiversityFusion
     let fusion_gpu = DiversityFusionGpu::new(Arc::clone(&device)).expect("DiversityFusionGpu");
     let (gpu_fusion, gpu_div_ms) = bench("GPU DiversityFusion (20 × 2000)", || {
-        fusion_gpu.compute(&abundances, n_samples, n_taxa).expect("GPU diversity")
+        fusion_gpu
+            .compute(&abundances, n_samples, n_taxa)
+            .expect("GPU diversity")
     });
-    v.check("GPU Shannon ≈ CPU", gpu_fusion[0].shannon, cpu_fusion[0].shannon,
-        tolerances::GPU_VS_CPU_F64);
-    v.check("GPU Simpson ≈ CPU", gpu_fusion[0].simpson, cpu_fusion[0].simpson,
-        tolerances::GPU_VS_CPU_F64);
-    results.push(BenchResult { label: "DiversityFusion 20×2k", tier: "GPU", ms: gpu_div_ms });
+    v.check(
+        "GPU Shannon ≈ CPU",
+        gpu_fusion[0].shannon,
+        cpu_fusion[0].shannon,
+        tolerances::GPU_VS_CPU_F64,
+    );
+    v.check(
+        "GPU Simpson ≈ CPU",
+        gpu_fusion[0].simpson,
+        cpu_fusion[0].simpson,
+        tolerances::GPU_VS_CPU_F64,
+    );
+    results.push(BenchResult {
+        label: "DiversityFusion 20×2k",
+        tier: "GPU",
+        ms: gpu_div_ms,
+    });
 
     // GPU GEMM
     let gemm = GemmCached::new(Arc::clone(&device), Arc::clone(&ctx));
 
     // Warm up
-    for _ in 0..3 { let _ = gemm.execute(&mat_a, &mat_b, m, k, n, 1); }
+    for _ in 0..3 {
+        let _ = gemm.execute(&mat_a, &mat_b, m, k, n, 1);
+    }
 
     let (gpu_gemm, gpu_gemm_ms) = bench("GPU GEMM 64×32 × 32×64", || {
         gemm.execute(&mat_a, &mat_b, m, k, n, 1).expect("GEMM")
     });
     let cpu_c00: f64 = (0..k).map(|j| mat_a[j] * mat_b[j * n]).sum();
-    v.check("GEMM C[0,0] ≈ CPU", gpu_gemm[0], cpu_c00, tolerances::GPU_VS_CPU_F64);
-    results.push(BenchResult { label: "GEMM 64×32×64", tier: "GPU", ms: gpu_gemm_ms });
+    v.check(
+        "GEMM C[0,0] ≈ CPU",
+        gpu_gemm[0],
+        cpu_c00,
+        tolerances::GPU_VS_CPU_F64,
+    );
+    results.push(BenchResult {
+        label: "GEMM 64×32×64",
+        tier: "GPU",
+        ms: gpu_gemm_ms,
+    });
 
     println!();
     println!("    ── Tier 2 proves: same math runs on GPU, results match CPU ──");
@@ -212,39 +268,78 @@ fn main() {
 
     // Square matrices for chaining: A[s×s] × B[s×s] → C[s×s] → C×B → D[s×s]
     let s = 64;
-    let sq_a: Vec<f64> = (0..s * s).map(|i| ((i * 7 + 3) % 100) as f64 / 100.0).collect();
-    let sq_b: Vec<f64> = (0..s * s).map(|i| ((i * 11 + 5) % 100) as f64 / 100.0).collect();
+    let sq_a: Vec<f64> = (0..s * s)
+        .map(|i| ((i * 7 + 3) % 100) as f64 / 100.0)
+        .collect();
+    let sq_b: Vec<f64> = (0..s * s)
+        .map(|i| ((i * 11 + 5) % 100) as f64 / 100.0)
+        .collect();
 
-    let (chain_result, chain_ms) = bench("GPU chained GEMM (A×B → C, C×B → D, 1 readback)", || {
-        let c1_buf = gemm.execute_to_buffer(&sq_a, &sq_b, s, s, s, 1)
-            .expect("GEMM stage 1");
-        let c1_data = device.read_f64_buffer(&c1_buf, s * s)
-            .expect("readback stage 1");
-        gemm.execute(&c1_data, &sq_b, s, s, s, 1).expect("GEMM stage 2")
-    });
-    v.check_pass("chained GEMM result finite", chain_result.iter().all(|x| x.is_finite()));
+    let (chain_result, chain_ms) = bench(
+        "GPU chained GEMM (A×B → C, C×B → D, 1 readback)",
+        || {
+            let c1_buf = gemm
+                .execute_to_buffer(&sq_a, &sq_b, s, s, s, 1)
+                .expect("GEMM stage 1");
+            let c1_data = device
+                .read_f64_buffer(&c1_buf, s * s)
+                .expect("readback stage 1");
+            gemm.execute(&c1_data, &sq_b, s, s, s, 1)
+                .expect("GEMM stage 2")
+        },
+    );
+    v.check_pass(
+        "chained GEMM result finite",
+        chain_result.iter().all(|x| x.is_finite()),
+    );
 
     // Compare: round-trip (2 readbacks) vs streaming (1 readback)
-    let (_, rt_ms) = bench("Round-trip: GEMM → CPU → GEMM (2 dispatches, 2 readbacks)", || {
-        let c1 = gemm.execute(&sq_a, &sq_b, s, s, s, 1).expect("GEMM 1");
-        gemm.execute(&c1, &sq_b, s, s, s, 1).expect("GEMM 2")
-    });
+    let (_, rt_ms) = bench(
+        "Round-trip: GEMM → CPU → GEMM (2 dispatches, 2 readbacks)",
+        || {
+            let c1 = gemm.execute(&sq_a, &sq_b, s, s, s, 1).expect("GEMM 1");
+            gemm.execute(&c1, &sq_b, s, s, s, 1).expect("GEMM 2")
+        },
+    );
 
-    let (_, stream_ms) = bench("Streaming: GEMM → buffer → GEMM (2 dispatches, 1 readback)", || {
-        let c1_buf = gemm.execute_to_buffer(&sq_a, &sq_b, s, s, s, 1).expect("GEMM 1");
-        let c1 = device.read_f64_buffer(&c1_buf, s * s).expect("readback");
-        gemm.execute(&c1, &sq_b, s, s, s, 1).expect("GEMM 2")
-    });
+    let (_, stream_ms) = bench(
+        "Streaming: GEMM → buffer → GEMM (2 dispatches, 1 readback)",
+        || {
+            let c1_buf = gemm
+                .execute_to_buffer(&sq_a, &sq_b, s, s, s, 1)
+                .expect("GEMM 1");
+            let c1 = device.read_f64_buffer(&c1_buf, s * s).expect("readback");
+            gemm.execute(&c1, &sq_b, s, s, s, 1).expect("GEMM 2")
+        },
+    );
 
-    results.push(BenchResult { label: "Chained GEMM (2-stage)", tier: "GPU Stream", ms: chain_ms });
-    results.push(BenchResult { label: "Round-trip 2×GEMM", tier: "GPU RT", ms: rt_ms });
-    results.push(BenchResult { label: "Streaming 2×GEMM", tier: "GPU Stream", ms: stream_ms });
+    results.push(BenchResult {
+        label: "Chained GEMM (2-stage)",
+        tier: "GPU Stream",
+        ms: chain_ms,
+    });
+    results.push(BenchResult {
+        label: "Round-trip 2×GEMM",
+        tier: "GPU RT",
+        ms: rt_ms,
+    });
+    results.push(BenchResult {
+        label: "Streaming 2×GEMM",
+        tier: "GPU Stream",
+        ms: stream_ms,
+    });
 
     // Batched diversity (streaming: all 20 samples in one dispatch)
     let (_, batch_ms) = bench("GPU batched diversity (20 samples, 1 dispatch)", || {
-        fusion_gpu.compute(&abundances, n_samples, n_taxa).expect("batch")
+        fusion_gpu
+            .compute(&abundances, n_samples, n_taxa)
+            .expect("batch")
     });
-    results.push(BenchResult { label: "Batched diversity 20×2k", tier: "GPU Stream", ms: batch_ms });
+    results.push(BenchResult {
+        label: "Batched diversity 20×2k",
+        tier: "GPU Stream",
+        ms: batch_ms,
+    });
 
     println!();
     println!("    ── Tier 3 proves: unidirectional streaming reduces transfers ──");
@@ -257,7 +352,10 @@ fn main() {
     println!("    Architecture: metalForge routes based on workload size + hardware");
     println!("    Small workload → CPU (avoid GPU launch overhead)");
     println!("    Large workload → GPU (throughput dominates)");
-    println!("    Threshold: {} elements (GpuF64::dispatch_threshold)", gpu.dispatch_threshold());
+    println!(
+        "    Threshold: {} elements (GpuF64::dispatch_threshold)",
+        gpu.dispatch_threshold()
+    );
     println!();
 
     let small_n = 100;
@@ -268,28 +366,63 @@ fn main() {
     });
     v.check_pass("small CPU Shannon > 0", small_cpu > 0.0);
 
-    let large_abundances: Vec<f64> = (0..50_000).map(|i| ((i * 7 + 1) % 500 + 1) as f64).collect();
+    let large_abundances: Vec<f64> = (0..50_000)
+        .map(|i| ((i * 7 + 1) % 500 + 1) as f64)
+        .collect();
     let (large_cpu, large_cpu_ms) = bench("CPU diversity (50k taxa — above threshold)", || {
         diversity::shannon(&large_abundances)
     });
-    let (large_gpu_res, large_gpu_ms) = bench("GPU DiversityFusion (1×50k — above threshold)", || {
-        fusion_gpu.compute(&large_abundances, 1, 50_000).expect("GPU 50k")
-    });
-    v.check("GPU 50k Shannon ≈ CPU", large_gpu_res[0].shannon, large_cpu,
-        tolerances::GPU_VS_CPU_F64);
+    let (large_gpu_res, large_gpu_ms) =
+        bench("GPU DiversityFusion (1×50k — above threshold)", || {
+            fusion_gpu
+                .compute(&large_abundances, 1, 50_000)
+                .expect("GPU 50k")
+        });
+    v.check(
+        "GPU 50k Shannon ≈ CPU",
+        large_gpu_res[0].shannon,
+        large_cpu,
+        tolerances::GPU_VS_CPU_F64,
+    );
 
-    let routing_decision = if large_abundances.len() >= gpu.dispatch_threshold() { "GPU" } else { "CPU" };
-    println!("    metalForge would route 50k → {routing_decision} (threshold: {})", gpu.dispatch_threshold());
+    let routing_decision = if large_abundances.len() >= gpu.dispatch_threshold() {
+        "GPU"
+    } else {
+        "CPU"
+    };
+    println!(
+        "    metalForge would route 50k → {routing_decision} (threshold: {})",
+        gpu.dispatch_threshold()
+    );
 
-    let small_routing = if small_abundances.len() >= gpu.dispatch_threshold() { "GPU" } else { "CPU" };
-    println!("    metalForge would route 100 → {small_routing} (threshold: {})", gpu.dispatch_threshold());
+    let small_routing = if small_abundances.len() >= gpu.dispatch_threshold() {
+        "GPU"
+    } else {
+        "CPU"
+    };
+    println!(
+        "    metalForge would route 100 → {small_routing} (threshold: {})",
+        gpu.dispatch_threshold()
+    );
 
     v.check_pass("small workload routes to CPU", small_routing == "CPU");
     v.check_pass("large workload routes to GPU", routing_decision == "GPU");
 
-    results.push(BenchResult { label: "CPU diversity 100 taxa", tier: "metalForge→CPU", ms: small_cpu_ms });
-    results.push(BenchResult { label: "CPU diversity 50k taxa", tier: "metalForge→CPU", ms: large_cpu_ms });
-    results.push(BenchResult { label: "GPU diversity 50k taxa", tier: "metalForge→GPU", ms: large_gpu_ms });
+    results.push(BenchResult {
+        label: "CPU diversity 100 taxa",
+        tier: "metalForge→CPU",
+        ms: small_cpu_ms,
+    });
+    results.push(BenchResult {
+        label: "CPU diversity 50k taxa",
+        tier: "metalForge→CPU",
+        ms: large_cpu_ms,
+    });
+    results.push(BenchResult {
+        label: "GPU diversity 50k taxa",
+        tier: "metalForge→GPU",
+        ms: large_gpu_ms,
+    });
 
     println!();
     println!("    ── Tier 4 proves: metalForge routes to optimal substrate ──");
@@ -318,12 +451,21 @@ fn main() {
     println!("  │ Tier 3: Pure GPU stream — unidirectional, zero round-trips         │");
     println!("  │ Tier 4: metalForge — auto-routes CPU/GPU/NPU by workload           │");
     println!("  ├───────────────────────────────────────────────────────────────────┤");
-    println!("  │ Fp64Strategy: {:?}{} │", gpu.fp64_strategy(),
-        " ".repeat(51 - format!("{:?}", gpu.fp64_strategy()).len()));
-    println!("  │ Optimal precision: {:?}{} │", gpu.optimal_precision(),
-        " ".repeat(46 - format!("{:?}", gpu.optimal_precision()).len()));
-    println!("  │ Dispatch threshold: {} elements{} │", gpu.dispatch_threshold(),
-        " ".repeat(40 - format!("{}", gpu.dispatch_threshold()).len()));
+    println!(
+        "  │ Fp64Strategy: {:?}{} │",
+        gpu.fp64_strategy(),
+        " ".repeat(51 - format!("{:?}", gpu.fp64_strategy()).len())
+    );
+    println!(
+        "  │ Optimal precision: {:?}{} │",
+        gpu.optimal_precision(),
+        " ".repeat(46 - format!("{:?}", gpu.optimal_precision()).len())
+    );
+    println!(
+        "  │ Dispatch threshold: {} elements{} │",
+        gpu.dispatch_threshold(),
+        " ".repeat(40 - format!("{}", gpu.dispatch_threshold()).len())
+    );
     println!("  │ Device-lost resilience: active (submit_and_poll S68+)              │");
     println!("  │ ToadStool alignment: S68+ (e96576ee)                               │");
     println!("  │ Local WGSL: 0 (fully lean)                                         │");

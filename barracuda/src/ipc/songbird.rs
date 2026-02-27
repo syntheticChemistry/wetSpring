@@ -20,8 +20,8 @@
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixStream;
 use std::path::{Path, PathBuf};
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(30);
@@ -86,8 +86,7 @@ pub fn register(songbird_socket: &Path, wetspring_socket: &Path) -> crate::error
 ///
 /// Returns `Err` if Songbird is unreachable or the heartbeat is rejected.
 pub fn heartbeat(songbird_socket: &Path) -> crate::error::Result<()> {
-    let request =
-        r#"{"jsonrpc":"2.0","method":"discovery.heartbeat","params":{"primal":"wetspring"},"id":2}"#;
+    let request = r#"{"jsonrpc":"2.0","method":"discovery.heartbeat","params":{"primal":"wetspring"},"id":2}"#;
     let response = rpc_call(songbird_socket, request)?;
     if response.contains("\"error\"") {
         Err(crate::error::Error::Ipc(format!(
@@ -181,7 +180,7 @@ fn rpc_call(socket: &Path, request: &str) -> crate::error::Result<String> {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, unsafe_code)]
+#[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
 
@@ -196,12 +195,10 @@ mod tests {
         let sock = dir.path().join("songbird.sock");
         std::fs::write(&sock, "").unwrap();
 
-        // SAFETY: single-threaded test; no other thread reads SONGBIRD_SOCKET.
-        unsafe { std::env::set_var("SONGBIRD_SOCKET", sock.to_str().unwrap()) };
-        let found = discover_socket();
-        unsafe { std::env::remove_var("SONGBIRD_SOCKET") };
-
-        assert_eq!(found, Some(sock));
+        temp_env::with_var("SONGBIRD_SOCKET", Some(sock.to_str().unwrap()), || {
+            let found = discover_socket();
+            assert_eq!(found, Some(sock.clone()));
+        });
     }
 
     #[test]
@@ -220,6 +217,9 @@ mod tests {
     fn heartbeat_nonexistent_socket_errors() {
         let bad_path = PathBuf::from("/tmp/wetspring_test_no_songbird_hb.sock");
         let err = heartbeat(&bad_path).unwrap_err();
-        assert!(err.to_string().contains("Songbird connect") || err.to_string().contains("invalid socket"));
+        assert!(
+            err.to_string().contains("Songbird connect")
+                || err.to_string().contains("invalid socket")
+        );
     }
 }

@@ -470,7 +470,12 @@ fn main() {
     let (erf_val, erf_ms) = bench("erf(1.0) — barracuda::special", || {
         barracuda::special::erf(1.0)
     });
-    v.check("erf(1.0)", erf_val, 0.842_700_792_949_715, 5e-7);
+    v.check(
+        "erf(1.0)",
+        erf_val,
+        0.842_700_792_949_715,
+        tolerances::ERF_PARITY,
+    );
     timings.push(Timing {
         label: "erf(1.0)",
         origin: "hotSpring→ToadStool",

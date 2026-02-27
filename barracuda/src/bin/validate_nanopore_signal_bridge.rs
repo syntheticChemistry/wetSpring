@@ -22,13 +22,13 @@
 //!
 //! # Provenance
 //!
-//! | Item           | Value |
-//! |----------------|-------|
-//! | Date           | 2026-02-26 |
-//! | Baseline       | Synthetic (no external data) |
-//! | Commit         | wetSpring Phase 61 |
-//! | Hardware       | CPU only (pre-hardware) |
-//! | Command        | `cargo run --release --bin validate_nanopore_signal_bridge` |
+//! | Field | Value |
+//! |-------|-------|
+//! | Source | Synthetic (SyntheticSignalGenerator seed=42) |
+//! | Date | 2026-02-26 |
+//! | Commit | wetSpring Phase 61 |
+//! | Hardware | CPU only (pre-hardware) |
+//! | Command | `cargo run --release --bin validate_nanopore_signal_bridge` |
 
 use wetspring_barracuda::io::nanopore::{
     self, NanoporeIter, NanoporeRead, SyntheticSignalGenerator,

@@ -311,10 +311,12 @@ fn read_one_nrs_record(reader: &mut impl BufRead, path: &Path) -> Result<Nanopor
     let n = signal_length as usize;
     let mut signal = vec![0i16; n];
 
+    let byte_buf: &mut [u8] = bytemuck::cast_slice_mut(&mut signal);
+    read_exact(reader, byte_buf, path)?;
+
+    #[cfg(target_endian = "big")]
     for sample in &mut signal {
-        let mut buf = [0u8; 2];
-        read_exact(reader, &mut buf, path)?;
-        *sample = i16::from_le_bytes(buf);
+        *sample = i16::from_le_bytes(sample.to_ne_bytes());
     }
 
     Ok(NanoporeRead {
@@ -346,8 +348,16 @@ fn write_one_nrs_record(
     w(writer, &read.calibration_scale.to_le_bytes())?;
     w(writer, &(read.signal.len() as u64).to_le_bytes())?;
 
-    for &sample in &read.signal {
-        w(writer, &sample.to_le_bytes())?;
+    #[cfg(target_endian = "little")]
+    {
+        let byte_slice: &[u8] = bytemuck::cast_slice(&read.signal);
+        w(writer, byte_slice)?;
+    }
+    #[cfg(target_endian = "big")]
+    {
+        for &sample in &read.signal {
+            w(writer, &sample.to_le_bytes())?;
+        }
     }
 
     Ok(())

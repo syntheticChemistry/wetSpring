@@ -8,7 +8,7 @@
 //! through `ToadStool`'s GPU primitives (`FusedMapReduceF64`, Lanczos, etc.)
 //! with automatic CPU fallback below the dispatch threshold or on GPU error.
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use crate::bio::diversity;
 use crate::bio::qs_biofilm::{self, N_PARAMS, QsBiofilmParams};
@@ -66,7 +66,10 @@ fn handle_health() -> Result<Value, (i64, String)> {
     #[cfg(feature = "gpu")]
     let substrate = if try_gpu().is_some() {
         "gpu"
-    } else if GPU_CTX.get().is_some_and(|g| g.as_ref().is_some_and(GpuF64::is_lost)) {
+    } else if GPU_CTX
+        .get()
+        .is_some_and(|g| g.as_ref().is_some_and(GpuF64::is_lost))
+    {
         "gpu_lost"
     } else {
         "cpu"
@@ -266,10 +269,7 @@ fn handle_anderson(params: &Value) -> Result<Value, (i64, String)> {
             .get("disorder")
             .and_then(Value::as_f64)
             .unwrap_or(16.5);
-        let seed = params
-            .get("seed")
-            .and_then(Value::as_u64)
-            .unwrap_or(42);
+        let seed = params.get("seed").and_then(Value::as_u64).unwrap_or(42);
 
         let n = l * l * l;
         let mat = anderson_3d(l, l, l, w, seed);
@@ -277,7 +277,11 @@ fn handle_anderson(params: &Value) -> Result<Value, (i64, String)> {
         let eigs = lanczos_eigenvalues(&tri);
         let r = level_spacing_ratio(&eigs);
         let midpoint = f64::midpoint(GOE_R, POISSON_R);
-        let regime = if r > midpoint { "extended" } else { "localized" };
+        let regime = if r > midpoint {
+            "extended"
+        } else {
+            "localized"
+        };
 
         Ok(json!({
             "status": "computed",

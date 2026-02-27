@@ -21,13 +21,13 @@
 //!
 //! # Provenance
 //!
-//! | Item           | Value |
-//! |----------------|-------|
-//! | Date           | 2026-02-26 |
-//! | Baseline       | Synthetic 16S communities (no external data) |
-//! | Commit         | wetSpring Phase 61 |
-//! | Hardware       | CPU only (pre-hardware) |
-//! | Command        | `cargo run --release --bin validate_nanopore_simulated_16s` |
+//! | Field | Value |
+//! |-------|-------|
+//! | Source | Synthetic (simulated 16S communities, seed=42) |
+//! | Date | 2026-02-26 |
+//! | Commit | wetSpring Phase 61 |
+//! | Hardware | CPU only (pre-hardware) |
+//! | Command | `cargo run --release --bin validate_nanopore_simulated_16s` |
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;

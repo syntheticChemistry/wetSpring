@@ -32,12 +32,14 @@
 //!
 //! # Provenance
 //!
-//! | Item | Value |
-//! |------|-------|
+//! | Field | Value |
+//! |-------|-------|
 //! | Date | 2026-02-25 |
 //! | Paper | Mukherjee et al. 2024, Environmental Microbiome 19:14 |
 //! | Data | Model equations + published 41% threshold |
-//! | Track | Track 4 — No-Till Soil QS & Anderson Geometry |
+//! | Track | Track 4 Exp174 — No-Till Soil QS & Anderson Geometry |
+//! | erf(1.0) | Analytical: Abramowitz & Stegun, Handbook of Mathematical Functions |
+//! | Soil model | Autoinducer diffusion L_D, threshold from Mukherjee et al. |
 //! | Command | `cargo test --bin validate_soil_distance_colonization -- --nocapture` |
 
 use std::time::Instant;
@@ -285,7 +287,12 @@ fn main() {
         tolerances::EXACT,
     );
 
-    v.check("erf(1.0)", erf(1.0), 0.842_700_792_949_715, 5e-7);
+    v.check(
+        "erf(1.0)",
+        erf(1.0),
+        0.842_700_792_949_715,
+        tolerances::ERF_PARITY,
+    );
     v.check("Φ(0) = 0.5", norm_cdf(0.0), 0.5, tolerances::EXACT);
 
     let (passed, total) = v.counts();

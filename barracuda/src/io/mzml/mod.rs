@@ -206,6 +206,28 @@ impl Iterator for MzmlIter {
     }
 }
 
+/// Process each spectrum without collecting to a `Vec`.
+///
+/// The callback receives each [`MzmlSpectrum`] as it is parsed. For
+/// single-pass aggregation (statistics, filtering), this avoids
+/// buffering all spectra in memory. The internal `DecodeBuffer` is
+/// reused across spectra to minimize allocation.
+///
+/// # Errors
+///
+/// Returns [`Error::Io`] if the file cannot be opened,
+/// [`Error::Xml`] / [`Error::Base64`] / [`Error::Zlib`] for decode
+/// failures, or propagates the callback's [`Result`].
+pub fn for_each_spectrum<F>(path: &Path, mut f: F) -> Result<()>
+where
+    F: FnMut(MzmlSpectrum) -> Result<()>,
+{
+    for result in MzmlIter::open(path)? {
+        f(result?)?;
+    }
+    Ok(())
+}
+
 /// Collect all spectra from an mzML file into memory via [`MzmlIter`].
 ///
 /// Convenience wrapper — streams from disk, then collects.

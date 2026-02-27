@@ -213,12 +213,13 @@ pub fn viterbi(model: &HmmModel, observations: &[usize]) -> ViterbiResult {
 
     // Termination: find best final state
     let final_row = &delta[(t_len - 1) * n..t_len * n];
-    let (best_final, best_prob) = final_row
-        .iter()
-        .enumerate()
-        .fold((0, f64::NEG_INFINITY), |(bi, bv), (i, &v)| {
-            if v > bv { (i, v) } else { (bi, bv) }
-        });
+    let (best_final, best_prob) =
+        final_row
+            .iter()
+            .enumerate()
+            .fold((0, f64::NEG_INFINITY), |(bi, bv), (i, &v)| {
+                if v > bv { (i, v) } else { (bi, bv) }
+            });
 
     // Backtrack
     let mut path = vec![0_usize; t_len];

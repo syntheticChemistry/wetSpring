@@ -315,4 +315,35 @@ mod tests {
         let filename = format!("{accession}.fastq");
         assert_eq!(filename, "SRR1234567.fastq");
     }
+
+    #[test]
+    fn which_exists_finds_sh() {
+        assert!(which_exists("sh"));
+    }
+
+    #[test]
+    fn which_exists_misses_nonexistent() {
+        assert!(!which_exists("wetspring_nonexistent_tool_abc123"));
+    }
+
+    #[test]
+    fn download_sra_run_creates_output_dir() {
+        let dir = tempfile::tempdir().unwrap();
+        let sub = dir.path().join("subdir");
+        assert!(!sub.exists());
+        let _ = download_sra_run("SRR000001", &sub);
+        assert!(sub.exists());
+    }
+
+    #[test]
+    fn validate_accession_mixed_case() {
+        assert!(validate_accession("sRr1234567").is_ok());
+        assert!(validate_accession("Err999888").is_ok());
+    }
+
+    #[test]
+    fn validate_accession_whitespace_only() {
+        let err = validate_accession("   ").unwrap_err();
+        assert!(err.to_string().contains("empty"));
+    }
 }

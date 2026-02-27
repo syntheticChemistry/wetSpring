@@ -77,9 +77,9 @@ pub mod error;
 #[cfg(feature = "gpu")]
 pub mod gpu;
 pub mod io;
-pub mod ncbi;
 #[cfg(feature = "ipc")]
 pub mod ipc;
+pub mod ncbi;
 #[cfg(feature = "npu")]
 pub mod npu;
 pub mod special;

@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! FASTQ statistics computation — from records or streaming.
 
-use super::{FastqRecord, FastqStats, open_reader};
+use super::{FastqRecord, FastqStats, header_error_bytes, open_reader, read_byte_line, trim_end};
 use crate::error::Result;
 use std::collections::HashMap;
 use std::path::Path;
-
-use super::{header_error, read_line, trimmed_len};
 
 /// Incremental accumulator for FASTQ statistics.
 ///
@@ -126,11 +124,11 @@ pub fn compute_stats(records: &[FastqRecord]) -> FastqStats {
     acc.finish()
 }
 
-/// Compute FASTQ statistics in a single streaming pass (zero-copy path).
+/// Compute FASTQ statistics in a single streaming pass (byte-native path).
 ///
 /// No per-record allocation — lines are processed in-place from a
-/// reusable `String` buffer.  Use this for large files where only
-/// aggregate statistics are needed.
+/// reusable byte buffer. No UTF-8 requirement for sequence or quality
+/// data. Use this for large files where only aggregate statistics are needed.
 ///
 /// # Errors
 ///
@@ -139,39 +137,36 @@ pub fn compute_stats(records: &[FastqRecord]) -> FastqStats {
 #[must_use = "computed stats are discarded if not used"]
 pub fn stats_from_file(path: &Path) -> Result<FastqStats> {
     let mut reader = open_reader(path)?;
-    let mut header_buf = String::new();
-    let mut seq_buf = String::new();
-    let mut separator_buf = String::new();
-    let mut qual_buf = String::new();
+    let mut buf = Vec::new();
     let mut acc = StatsAccumulator::new();
 
     loop {
-        header_buf.clear();
-        if read_line(reader.as_mut(), &mut header_buf, path)? == 0 {
+        buf.clear();
+        if read_byte_line(reader.as_mut(), &mut buf, path)? == 0 {
             break;
         }
-        if header_buf.trim_end().is_empty() {
+        if trim_end(&buf).is_empty() {
             break;
         }
-        if !header_buf.starts_with('@') {
-            return Err(header_error(&header_buf));
+        if buf.first() != Some(&b'@') {
+            return Err(header_error_bytes(&buf));
         }
 
-        seq_buf.clear();
-        read_line(reader.as_mut(), &mut seq_buf, path)?;
-        let seq_len = trimmed_len(&seq_buf);
+        // Sequence line
+        buf.clear();
+        read_byte_line(reader.as_mut(), &mut buf, path)?;
+        let seq = trim_end(&buf).to_vec();
 
-        separator_buf.clear();
-        read_line(reader.as_mut(), &mut separator_buf, path)?;
+        // Separator line
+        buf.clear();
+        read_byte_line(reader.as_mut(), &mut buf, path)?;
 
-        qual_buf.clear();
-        read_line(reader.as_mut(), &mut qual_buf, path)?;
-        let qual_len = trimmed_len(&qual_buf);
+        // Quality line
+        buf.clear();
+        read_byte_line(reader.as_mut(), &mut buf, path)?;
+        let qual = trim_end(&buf);
 
-        acc.add_record(
-            &seq_buf.as_bytes()[..seq_len],
-            &qual_buf.as_bytes()[..qual_len],
-        );
+        acc.add_record(&seq, qual);
     }
 
     Ok(acc.finish())

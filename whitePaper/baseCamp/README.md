@@ -2,7 +2,7 @@
 
 **Date:** February 27, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 65 — 211 experiments, 5,061+ validation checks (1,783 GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,103 tests (977 barracuda + 47 forge + 79 integration/doc), 95.46% line / 93.54% fn / 94.99% branch, ToadStool S68+ aligned (`e96576ee`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 92 named tolerances, clippy pedantic CLEAN, progression benchmark (Python 27× → CPU → GPU → streaming → metalForge), cross-spring modern rewiring (Fp64Strategy + submit_and_poll), 39/39 three-tier, 52/52 papers
+**Status:** Phase 66 — 216 experiments, 5,251+ validation checks (1,783 GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,073+ tests (946 barracuda lib + 80 integration/doc + 47 forge), 95.77% line / 93.86% fn / 95.33% branch, ToadStool S68+ aligned (`e96576ee`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 92 named tolerances, 0 unsafe code, clippy pedantic CLEAN, V66 deep audit: byte-native FASTQ I/O, bytemuck nanopore bulk read, streaming APIs (mzML/MS2/FASTQ), safe env handling (`temp_env`), tolerance centralization, `partial_cmp` → `total_cmp` migration, dispatch evolution (49/49), NUCLEUS V8 mixed hardware (49/49), CPU vs GPU v5 ready, progression benchmark (Python 27× → CPU → GPU → streaming → metalForge), 39/39 three-tier, 52/52 papers
 
 ---
 
@@ -39,7 +39,8 @@ All code is AGPL-3.0.
 | **Diversity Fusion** | — | GPU | 1 | 167 | 18 | CPU↔GPU parity extension |
 | **Track 4 Soil QS** | — | 4 | 9 | 170–182 | 321 | No-till soil QS, Anderson pore geometry, Brandt farm, meta-analysis, tillage factorial, CPU/GPU/streaming/metalForge |
 | **biomeOS IPC** | — | cross | — | 203-208 | 321 | IPC dispatch, GPU-aware routing, NUCLEUS atomics, Songbird, Neural API |
-| **Total** | | | **52** | | **5,061+** | |
+| **V66 Audit + Dispatch** | — | cross | — | 209,212-215 | 239+ | Streaming I/O parity, CPU v12, dispatch evolution, NUCLEUS V8, CPU vs GPU v5 |
+| **Total** | | | **52** | | **5,251+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -90,7 +91,7 @@ Every paper goes through the full evolution. Status across all 39 actionable pap
 | Stage | What It Proves | Coverage |
 |-------|---------------|----------|
 | Python baseline | Algorithm correctness against published tools | 44 scripts (all with reproduction headers + SHA-256 integrity verification) |
-| BarraCuda CPU | Rust matches Python within machine precision | 1,642+ checks, 33.4x faster |
+| BarraCuda CPU | Rust matches Python within machine precision | 1,697+ checks (v1-v12), 33.4x faster |
 | BarraCuda GPU | GPU matches CPU within 1e-6 | 1,783+ checks, 36+ domains |
 | Pure GPU streaming | Zero CPU round-trips, data stays on-device | 204+ checks, 10+ domains |
 | metalForge | Same answer on CPU, GPU, NPU | 39/39 papers, 37+ domains |
@@ -99,7 +100,9 @@ Every paper goes through the full evolution. Status across all 39 actionable pap
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
 | biomeOS IPC integration | JSON-RPC science primal, GPU-aware dispatch, Songbird registration | 321 checks (Exp203-208) |
-| Code quality audit | 95.46% line / 93.54% fn / 94.99% branch, streaming I/O, 0 production mocks, ToadStool S68, barracuda always-on, `deny(missing_docs)`, zero unsafe code, clippy pedantic CLEAN, baseline manifest 41/41 | 1,103 tests |
+| Code quality audit | 95.77% line / 93.86% fn / 95.33% branch, streaming I/O, 0 production mocks, ToadStool S68, barracuda always-on, `deny(missing_docs)`, zero unsafe code, clippy pedantic CLEAN, baseline manifest 41/41 | 1,073+ tests |
+| V66 dispatch evolution | Forge dispatch routing (29 workloads), streaming topology (PCIe bypass), NUCLEUS Tower/Node/Nest model, absorption audit (0 local WGSL) | 49 checks (Exp213) |
+| V66 NUCLEUS V8 | IPC dispatch with V66 I/O evolution (byte-native FASTQ, bytemuck nanopore, streaming MS2), Nest metrics, CPU fallback parity, full pipeline chain | 49 checks (Exp214) |
 
 ## Performance Summary
 
@@ -242,6 +245,25 @@ Python baseline → BarraCuda CPU (27× faster, pure Rust) → BarraCuda GPU
 | Exp206 | BarraCuda CPU v11 (IPC dispatch math fidelity) | 64 | Zero numeric drift through IPC layer (EXACT_F64) |
 | Exp207 | BarraCuda GPU v4 (IPC science on GPU) | 54 | GPU-aware dispatch, lazy OnceLock, threshold routing |
 | Exp208 | metalForge v7 (NUCLEUS mixed hardware) | 75 | PCIe bypass topology, Tower/Node/Nest atomics, cross-substrate |
+
+### Phase 66: Deep Audit + Dispatch Evolution (Exp209, 212–215)
+
+| Experiment | Focus | Checks | Key Finding |
+|:---:|-------|:------:|-------------|
+| Exp209 | Streaming I/O parity (byte-native FASTQ, bytemuck nanopore, MS2 streaming) | 37 | All evolved I/O paths bit-exact with batch originals |
+| Exp212 | BarraCuda CPU v12 — post-audit math fidelity (I/O → diversity → QS → derep → merge) | 55 | End-to-end pipeline through evolved I/O layer preserves math |
+| Exp213 | Compute dispatch + streaming evolution (forge dispatch, PCIe bypass, NUCLEUS model) | 49 | 29 workloads route correctly, 0 local WGSL (full lean), PCIe bypass streamable |
+| Exp214 | NUCLEUS mixed hardware V8 — V66 I/O evolution via IPC dispatch | 49 | Tower/Node/Nest lifecycle validated through evolved I/O, Nest metrics, CPU fallback parity |
+| Exp215 | CPU vs GPU v5 — V66 I/O evolution domains | ~40 | Built and ready, awaiting GPU hardware validation |
+
+V66 deep audit: byte-native FASTQ I/O (eliminated UTF-8 assumptions), bytemuck
+nanopore bulk read (zero per-sample I/O), streaming APIs for mzML/MS2/FASTQ
+(`for_each_spectrum`, `for_each_record`), safe env handling (`temp_env` replacing
+unsafe `set_var`), tolerance centralization (92 named constants with provenance),
+`partial_cmp` → `total_cmp` migration (10 lib sites), 0 unsafe code, 0 production
+mocks. Dispatch evolution (Exp213) proves the metalForge infrastructure correctly
+handles all V66 workloads. NUCLEUS V8 (Exp214) proves the IPC layer preserves
+math fidelity through the evolved I/O stack.
 
 ## Open Data
 

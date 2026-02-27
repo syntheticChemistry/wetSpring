@@ -1,6 +1,6 @@
 # Sub-thesis 01: Anderson Localization as QS Null Hypothesis
 
-**Date:** February 26, 2026
+**Date:** February 27, 2026
 **Faculty:** Kachkovskiy (MSU CMSE), Waters (MSU MMG)
 **Status:** Active — 183 experiments (Exp107-156, 170-182), 3,400+ checks, W_c = 16.26 ± 0.95 (finite-size scaling L=6-12), Track 4 soil QS complete (9 papers, full three-tier), 9 extension papers validated, correlated disorder + dilution effects quantified, clippy pedantic CLEAN, 79 named tolerances
 

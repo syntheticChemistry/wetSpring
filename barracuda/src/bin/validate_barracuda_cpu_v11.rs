@@ -45,7 +45,9 @@ fn validate_diversity_dispatch_parity(v: &mut Validator) {
         &[55.0, 55.0, 55.0, 55.0, 55.0, 55.0, 55.0, 55.0, 55.0, 55.0],
         &[500.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
         &[1.0],
-        &[200.0, 180.0, 160.0, 140.0, 120.0, 100.0, 80.0, 60.0, 40.0, 20.0, 10.0, 5.0],
+        &[
+            200.0, 180.0, 160.0, 140.0, 120.0, 100.0, 80.0, 60.0, 40.0, 20.0, 10.0, 5.0,
+        ],
     ];
 
     for (i, counts) in test_communities.iter().enumerate() {
@@ -110,14 +112,8 @@ fn validate_bray_curtis_dispatch_parity(v: &mut Validator) {
             &[10.0, 20.0, 30.0, 40.0, 50.0],
             &[15.0, 25.0, 35.0, 45.0, 55.0],
         ),
-        (
-            &[100.0, 0.0, 0.0, 0.0],
-            &[0.0, 0.0, 0.0, 100.0],
-        ),
-        (
-            &[50.0, 50.0, 50.0],
-            &[50.0, 50.0, 50.0],
-        ),
+        (&[100.0, 0.0, 0.0, 0.0], &[0.0, 0.0, 0.0, 100.0]),
+        (&[50.0, 50.0, 50.0], &[50.0, 50.0, 50.0]),
     ];
 
     for (i, (a, b)) in pairs.iter().enumerate() {
@@ -138,9 +134,17 @@ fn validate_bray_curtis_dispatch_parity(v: &mut Validator) {
     let identical_a = &[50.0, 50.0, 50.0][..];
     let identical_b = &[50.0, 50.0, 50.0][..];
     let bc_identical = diversity::bray_curtis(identical_a, identical_b);
-    v.check("identical communities BC=0", bc_identical, 0.0, tolerances::EXACT_F64);
+    v.check(
+        "identical communities BC=0",
+        bc_identical,
+        0.0,
+        tolerances::EXACT_F64,
+    );
 
-    println!("  Bray-Curtis dispatch parity: {}µs", t.elapsed().as_micros());
+    println!(
+        "  Bray-Curtis dispatch parity: {}µs",
+        t.elapsed().as_micros()
+    );
 }
 
 // ── D03: Dispatch↔Direct QS Model Parity ────────────────────────────────────
@@ -149,7 +153,12 @@ fn validate_qs_dispatch_parity(v: &mut Validator) {
     v.section("═══ D03: Dispatch↔Direct QS Model Parity ═══");
     let t = Instant::now();
 
-    let scenarios = &["standard_growth", "high_density", "hapr_mutant", "dgc_overexpression"];
+    let scenarios = &[
+        "standard_growth",
+        "high_density",
+        "hapr_mutant",
+        "dgc_overexpression",
+    ];
 
     for scenario in scenarios {
         let dt = 0.01;
@@ -223,10 +232,7 @@ fn validate_full_pipeline_dispatch(v: &mut Validator) {
         "pipeline contains qs_model stage",
         result.get("qs_model").is_some(),
     );
-    v.check_pass(
-        "pipeline marked complete",
-        result["pipeline"] == "complete",
-    );
+    v.check_pass("pipeline marked complete", result["pipeline"] == "complete");
 
     let div = &result["diversity"];
     let direct_h = diversity::shannon(counts);
@@ -242,7 +248,10 @@ fn validate_full_pipeline_dispatch(v: &mut Validator) {
     let pipeline_t_end = qs["t_end"].as_f64().expect("pipeline t_end");
     v.check_pass("pipeline QS t_end > 0", pipeline_t_end > 0.0);
 
-    println!("  Full pipeline dispatch chaining: {}µs", t.elapsed().as_micros());
+    println!(
+        "  Full pipeline dispatch chaining: {}µs",
+        t.elapsed().as_micros()
+    );
 }
 
 // ── D05: Three-Tier NestGate Routing (Structural) ────────────────────────────
@@ -261,15 +270,9 @@ fn validate_nestgate_three_tier(v: &mut Validator) {
     println!("  NestGate enabled: {nestgate_enabled}");
     println!("  NestGate socket: {nestgate_socket:?}");
 
-    v.check_pass(
-        "discover_biomeos_socket returns Option (no panic)",
-        true,
-    );
+    v.check_pass("discover_biomeos_socket returns Option (no panic)", true);
     v.check_pass("is_enabled returns bool (no panic)", true);
-    v.check_pass(
-        "discover_socket returns Option (no panic)",
-        true,
-    );
+    v.check_pass("discover_socket returns Option (no panic)", true);
 
     let err = dispatch::dispatch("science.ncbi_fetch", &json!({}));
     v.check_pass(
@@ -277,7 +280,10 @@ fn validate_nestgate_three_tier(v: &mut Validator) {
         matches!(err, Err((-32602, _))),
     );
 
-    println!("  Three-tier routing structural: {}µs", t.elapsed().as_micros());
+    println!(
+        "  Three-tier routing structural: {}µs",
+        t.elapsed().as_micros()
+    );
 }
 
 // ── D06: NUCLEUS Atomic Coordination Model ───────────────────────────────────
@@ -290,8 +296,14 @@ fn validate_nucleus_atomics(v: &mut Validator) {
     let caps = health["capabilities"].as_array().expect("capabilities");
     let cap_names: Vec<&str> = caps.iter().filter_map(|c| c.as_str()).collect();
 
-    v.check_pass("Tower: health.check reports healthy", health["status"] == "healthy");
-    v.check_pass("Tower: primal identity = wetspring", health["primal"] == "wetspring");
+    v.check_pass(
+        "Tower: health.check reports healthy",
+        health["status"] == "healthy",
+    );
+    v.check_pass(
+        "Tower: primal identity = wetspring",
+        health["primal"] == "wetspring",
+    );
 
     v.check_pass(
         "Node: science.diversity registered",

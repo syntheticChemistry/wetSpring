@@ -190,7 +190,8 @@ impl BistableGpu {
             pass.set_bind_group(0, &bg, &[]);
             pass.dispatch_workgroups(config.n_batches.div_ceil(64), 1, 1);
         }
-        self.device.submit_and_poll(std::iter::once(encoder.finish()));
+        self.device
+            .submit_and_poll(std::iter::once(encoder.finish()));
 
         self.device
             .read_buffer_f64(&out_buf, b * N_VARS)

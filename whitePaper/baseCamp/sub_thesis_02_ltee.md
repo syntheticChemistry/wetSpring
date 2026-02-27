@@ -1,6 +1,6 @@
 # Sub-thesis 02: LTEE Constrained Evolution and Anderson Anomalies
 
-**Date:** February 26, 2026
+**Date:** February 27, 2026
 **Faculty:** Kachkovskiy (MSU CMSE), Waters (MSU MMG)
 **Status:** Framework established — anomaly catalog complete (9 anomalies, 3 NP solutions). W_c = 16.26 ± 0.95 quantified. Track 4 no-till data (Exp170-178) provides agricultural time-series test bed
 

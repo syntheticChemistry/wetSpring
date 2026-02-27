@@ -507,4 +507,31 @@ mod tests {
         assert!((t - (-10.0)).abs() < f64::EPSILON);
         assert!((v - 512.0).abs() < f64::EPSILON);
     }
+
+    #[test]
+    fn rapl_read_does_not_panic() {
+        let _ = read_rapl_energy_uj();
+        let _ = read_rapl_max_energy_uj();
+    }
+
+    #[test]
+    fn parse_nvidia_smi_sample_extra_fields() {
+        let (w, t, v) = parse_nvidia_smi_sample("100.0, 70, 2048, extra").unwrap();
+        assert!((w - 100.0).abs() < f64::EPSILON);
+        assert!((t - 70.0).abs() < f64::EPSILON);
+        assert!((v - 2048.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn rapl_delta_large_values() {
+        let j = rapl_delta_joules(999_999_000_000, 1_000_001_000_000, u64::MAX);
+        assert!((j - 2.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn energy_report_default_zeroes() {
+        let r = EnergyReport::default();
+        assert!(r.gpu_watts_avg.abs() < f64::EPSILON);
+        assert_eq!(r.gpu_samples, 0);
+    }
 }

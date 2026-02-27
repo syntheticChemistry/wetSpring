@@ -252,6 +252,27 @@ impl Iterator for Ms2Iter {
     }
 }
 
+/// Process each spectrum without collecting to a `Vec`.
+///
+/// The callback receives each [`Ms2Spectrum`] as it is parsed. For
+/// single-pass aggregation (statistics, filtering), this avoids
+/// buffering all spectra in memory.
+///
+/// # Errors
+///
+/// Returns [`Error::Io`] if the file cannot be opened,
+/// [`Error::Ms2`] if a record is malformed, or propagates the
+/// callback's [`Result`].
+pub fn for_each_spectrum<F>(path: &Path, mut f: F) -> Result<()>
+where
+    F: FnMut(Ms2Spectrum) -> Result<()>,
+{
+    for result in Ms2Iter::open(path)? {
+        f(result?)?;
+    }
+    Ok(())
+}
+
 /// Compute summary statistics in a single streaming pass.
 ///
 /// Allocation-free per spectrum — lines are streamed via `BufReader` without

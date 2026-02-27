@@ -37,10 +37,6 @@ use std::time::Instant;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
-const POISSON_TOL: f64 = 0.06;
-const LYAPUNOV_TOL: f64 = 0.03;
-const HERMAN_TOL: f64 = 0.02;
-
 fn main() {
     println!("═══════════════════════════════════════════════════════════");
     println!("  Exp107: Cross-Spring Spectral Theory (Anderson / QS)");
@@ -102,7 +98,7 @@ fn validate_anderson_1d(v: &mut Validator) {
         &format!(
             "Lyapunov γ(0) ≈ W²/96 = {gamma_expected:.4} (got {gamma_0:.4}, rel {rel_err:.4})"
         ),
-        rel_err < LYAPUNOV_TOL * 10.0,
+        rel_err < tolerances::SPECTRAL_LYAPUNOV_PARITY * 10.0,
     );
 
     // Lyapunov at band edge: γ(1.8) > 0
@@ -111,7 +107,12 @@ fn validate_anderson_1d(v: &mut Validator) {
 
     // Level statistics: strong disorder → Poisson
     let r = level_spacing_ratio(&eigenvalues);
-    v.check("⟨r⟩ Poisson (W=4, 1D localized)", r, POISSON_R, POISSON_TOL);
+    v.check(
+        "⟨r⟩ Poisson (W=4, 1D localized)",
+        r,
+        POISSON_R,
+        tolerances::SPECTRAL_POISSON_PARITY,
+    );
     println!("  [INFO] ⟨r⟩ = {r:.4} (Poisson = {POISSON_R:.4})");
 }
 
@@ -132,7 +133,7 @@ fn validate_almost_mathieu(v: &mut Validator) {
             &format!("Herman γ(0) at λ={lambda:.1}"),
             gamma,
             expected,
-            HERMAN_TOL * lambda,
+            tolerances::SPECTRAL_HERMAN_PARITY * lambda,
         );
         println!("  [INFO] λ={lambda:.1}: γ={gamma:.4}, ln(λ)={expected:.4}, err={err:.4}");
     }
@@ -236,7 +237,7 @@ fn validate_anderson_2d(v: &mut Validator) {
         "2D strong disorder ⟨r⟩ ≈ Poisson",
         r_strong,
         POISSON_R,
-        POISSON_TOL,
+        tolerances::SPECTRAL_POISSON_PARITY,
     );
 
     // Gershgorin for 2D: σ(H) ⊂ [-4 - W/2, 4 + W/2]
@@ -276,7 +277,7 @@ fn validate_anderson_3d_transition(v: &mut Validator) {
         "3D insulating ⟨r⟩ ≈ Poisson",
         r_strong,
         POISSON_R,
-        POISSON_TOL,
+        tolerances::SPECTRAL_POISSON_PARITY,
     );
 
     // Gershgorin for 3D: σ(H) ⊂ [-6 - W/2, 6 + W/2]
@@ -326,7 +327,7 @@ fn validate_qs_disorder_analogy(v: &mut Validator) {
         "High heterogeneity ⟨r⟩ ≈ Poisson (signals localized)",
         r_high,
         POISSON_R,
-        POISSON_TOL,
+        tolerances::SPECTRAL_POISSON_PARITY,
     );
 
     // Lyapunov confirms localization increases with W

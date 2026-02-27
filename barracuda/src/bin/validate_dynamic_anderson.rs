@@ -19,16 +19,17 @@
 //!
 //! # Provenance
 //!
-//! | Item           | Value |
-//! |----------------|-------|
-//! | Date           | 2026-02-26 |
-//! | Theory         | Anderson (1958), time-dependent generalization |
-//! | Soil data      | Islam et al. (2014), Brandt farm 15-year study |
-//! | Antibiotic     | Dethlefsen & Relman, PNAS 108 (2011) |
-//! | Seasonal       | Lauber et al., Applied Env. Microbiol. 75 (2009) |
-//! | Baseline commit| wetSpring Phase 59 |
-//! | Hardware       | biomeGate RTX 4070 (GPU), Eastgate CPU |
-//! | Command        | `cargo run --release --features gpu --bin validate_dynamic_anderson` |
+//! | Field | Value |
+//! |-------|-------|
+//! | Source | Analytical (closed-form W(t) models) |
+//! | Date | 2026-02-26 |
+//! | Theory | Anderson (1958), time-dependent generalization; seasonal oscillation W(t) = W₀ + A·sin(2πt/365) |
+//! | Soil data | Islam et al. (2014), Brandt farm 15-year study |
+//! | Antibiotic | Dethlefsen & Relman, PNAS 108 (2011) |
+//! | Seasonal | Lauber et al., Applied Env. Microbiol. 75 (2009) |
+//! | Baseline commit | wetSpring Phase 59 |
+//! | Hardware | biomeGate RTX 4070 (GPU), Eastgate CPU |
+//! | Command | `cargo run --release --features gpu --bin validate_dynamic_anderson` |
 
 use wetspring_barracuda::validation::Validator;
 

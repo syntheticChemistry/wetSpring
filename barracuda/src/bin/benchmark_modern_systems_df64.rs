@@ -282,7 +282,12 @@ fn main() {
     let (erf_result, erf_ms) = bench("erf(1.0) — barracuda::special", || {
         barracuda::special::erf(1.0)
     });
-    v.check("erf(1.0)", erf_result, 0.842_700_792_949_715, 5e-7);
+    v.check(
+        "erf(1.0)",
+        erf_result,
+        0.842_700_792_949_715,
+        tolerances::ERF_PARITY,
+    );
 
     let (lng_result, lng_ms) = bench("ln_gamma(5.0) — barracuda::special", || {
         barracuda::special::ln_gamma(5.0).expect("ln_gamma")

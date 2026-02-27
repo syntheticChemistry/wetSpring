@@ -222,11 +222,7 @@ pub fn fetch_via_biomeos(
 /// # Errors
 ///
 /// Returns `Err` if all three tiers fail.
-pub fn fetch_tiered(
-    db: &str,
-    id: &str,
-    api_key: &str,
-) -> crate::error::Result<String> {
+pub fn fetch_tiered(db: &str, id: &str, api_key: &str) -> crate::error::Result<String> {
     // Tier 1: biomeOS Neural API routing
     if let Some(biomeos_socket) = discover_biomeos_socket() {
         match fetch_via_biomeos(&biomeos_socket, db, id, api_key) {
@@ -507,7 +503,10 @@ mod tests {
 
     #[test]
     fn extract_error_truncates_long_response() {
-        let response = format!(r#"{{"jsonrpc":"2.0","error":{{"code":-1,"message":"x"}},"id":1}}{}"#, "y".repeat(500));
+        let response = format!(
+            r#"{{"jsonrpc":"2.0","error":{{"code":-1,"message":"x"}},"id":1}}{}"#,
+            "y".repeat(500)
+        );
         let err = extract_error(&response);
         assert!(err.contains('x'));
     }

@@ -30,12 +30,13 @@
 //!
 //! # Provenance
 //!
-//! | Item | Value |
-//! |------|-------|
+//! | Field | Value |
+//! |-------|-------|
 //! | Date | 2026-02-25 |
 //! | Paper | Martínez-García et al. 2023, Nature Comms 14:8332 |
 //! | Data | Model equations from paper (open access) |
-//! | Track | Track 4 — No-Till Soil QS & Anderson Geometry |
+//! | Track | Track 4 Exp170 — No-Till Soil QS & Anderson Geometry |
+//! | ODE | Waters 2008 QS model; ODE steady-state expectations with soil pore geometry parameters |
 //! | Command | `cargo test --bin validate_soil_qs_pore_geometry -- --nocapture` |
 
 use std::time::Instant;

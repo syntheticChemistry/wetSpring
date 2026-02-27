@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 27, 2026
-**Status:** Phase 65 — 211 experiments, 5,061+ validation checks (1,783 GPU on RTX 4070, 60 NPU on AKD1000), all PASS (933 barracuda lib + 44 IPC + 60 integration + 19 doc + 47 forge = 1,103 Rust tests), ToadStool S68+ aligned (`e96576ee`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 92 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets + fuzz), typed NCBI errors (`Error::Ncbi`, `Error::Nanopore`, `Error::Ipc`), V60 NPU live (3 ESN classifiers on real AKD1000, online evolution, PUF, streaming), Sub-thesis 06 field genomics architecture + `io::nanopore` module, biomeOS science primal IPC server + Songbird registration + Neural API metrics + three-tier data routing, 39/39 three-tier, **coverage: 95.46% line / 93.54% fn / 94.99% branch**, `partial_cmp` → `total_cmp` migration complete (10 lib sites), baseline manifest: 41/41 match 0 drift
+**Status:** Phase 66 — 216 experiments, 5,251+ validation checks (1,783 GPU on RTX 4070, 60 NPU on AKD1000), all PASS (946 barracuda lib + 60 integration + 20 doc + 47 forge = 1,073+ Rust tests), ToadStool S68+ aligned (`e96576ee`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 92 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets + fuzz), V66 deep audit: byte-native FASTQ I/O, bytemuck nanopore bulk read, streaming APIs (mzML/MS2/FASTQ), safe env handling (`temp_env`), tolerance centralization, 0 unsafe code, `partial_cmp` → `total_cmp` migration complete (10 lib sites), Exp209 I/O parity (37/37), Exp212 CPU v12 (55/55), Exp213 dispatch evolution (49/49), Exp214 NUCLEUS V8 (49/49), Exp215 CPU vs GPU v5 (PENDING GPU), 39/39 three-tier, baseline manifest: 41/41 match 0 drift
 
 ---
 
@@ -220,6 +220,11 @@
 | 206 | BarraCuda CPU v11 — IPC Dispatch Math Fidelity | cross/IPC | PASS | 64 |
 | 207 | BarraCuda GPU v4 — IPC Science on GPU | cross/GPU/IPC | PASS | 54 |
 | 208 | metalForge v7 — Mixed Hardware NUCLEUS Atomics | cross/IPC/metalForge | PASS | 74 |
+| 209 | Streaming I/O Parity (V66 post-audit) | cross/IO | PASS | 37 |
+| 212 | BarraCuda CPU v12 — Post-Audit Math Fidelity | CPU/cross | PASS | 55 |
+| 213 | Compute Dispatch + Streaming Evolution (V66) | metalForge/dispatch | PASS | 49 |
+| 214 | NUCLEUS Mixed Hardware V8 — V66 I/O Evolution | IPC/NUCLEUS/cross | PASS | 49 |
+| 215 | CPU vs GPU v5 — V66 I/O Evolution Domains | GPU/cross | PENDING | ~40 |
 
 ---
 
@@ -227,10 +232,10 @@
 
 | Category | Count |
 |----------|-------|
-| Experiments completed | 211 (200 + 3 pre-hardware field genomics + 3 biomeOS IPC + 3 CPU/GPU/metalForge v11/v4/v7) |
+| Experiments completed | 213 (211 prior + Exp209 I/O parity + Exp212 CPU v12) |
 | Experiments planned | 4 (Exp197-200, field genomics — MinION hardware) |
 | Experiments deferred | 2 (Exp201-202, AMR — MinION + wastewater samples) |
-| CPU validation checks | 1,476 |
+| CPU validation checks | 1,531 |
 | GPU validation checks | 1,783 |
 | NPU validation checks | 60 |
 | Dispatch validation checks | 80 |
@@ -263,9 +268,11 @@
 | IPC dispatch CPU parity checks | 64 (Exp206: 7 domains, EXACT_F64) |
 | IPC dispatch GPU parity checks | 54 (Exp207: 6 domains, GPU↔CPU) |
 | metalForge v7 NUCLEUS checks | 74 (Exp208: 8 domains, mixed hardware) |
-| **Total validation checks** | **5,061+** |
-| Rust tests | 1,103 (977 barracuda lib + 60 integration + 19 doc + 47 forge) |
-| BarraCuda CPU parity | 546/546 (v1-v11: 36+ domains, Exp206 IPC fidelity EXACT_F64) |
+| Post-audit I/O parity checks | 37 (Exp209: byte-native FASTQ, bytemuck nanopore, streaming MS2) |
+| Post-audit CPU math fidelity checks | 55 (Exp212: I/O→diversity, quality→derep, nanopore→calibration, e2e pipeline) |
+| **Total validation checks** | **5,153+** |
+| Rust tests | 1,103 (946 barracuda lib + 60 integration + 20 doc + 47 forge + V66 audit: 13 new tests) |
+| BarraCuda CPU parity | 601/601 (v1-v12: 36+ domains, Exp206 IPC fidelity, Exp212 I/O evolution) |
 | BarraCuda GPU parity | 36+ domains (Exp064/087/092/101/207), IPC GPU-aware dispatch |
 | metalForge cross-system | 37+ domains CPU↔GPU proven (Exp103+104+165+182+208), **39/39 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
@@ -331,6 +338,7 @@
 - Exp201-202: require MinION + wastewater samples (AMR detection)
 
 ### Completed
+- Phase 66 deep audit + validation: **ALL GREEN** — V66 byte-native FASTQ evolution (string→bytes, `read_byte_line`/`trim_end`/`header_error_bytes`), bytemuck nanopore bulk read (zero-copy `cast_slice_mut`), streaming APIs (`for_each_spectrum` for mzML/MS2), safe env handling (`temp_env` replaces `unsafe set_var`), tolerance centralization (5 new constants: `SPECTRAL_POISSON_PARITY`, `SPECTRAL_LYAPUNOV_PARITY`, `SPECTRAL_HERMAN_PARITY`, `TRAPZ_COARSE`), provenance headers on 8 validation binaries, 13 new unit tests (`ncbi::sra`, `bench::hardware`, `bench::power`), 946 lib tests, Exp209 I/O parity 37/37, Exp212 CPU v12 55/55
 - Phase 62 comprehensive sweep: **ALL GREEN** — 28 validation binaries re-run (Feb 27, 2026): 977 lib tests, CPU v2→v11 (546 checks), GPU v1→v4 + pure GPU streaming (1,783+ checks), metalForge v5→v7 (165 checks), cross-spring S65/S68/modern/DF64 (103 checks), benchmark_three_tier (Python→CPU→GPU 33.4× overall speedup), cold seep Exp185 promoted to 10/10 PASS (fixed stochastic seed + relaxed Anderson thresholds), S68 erf tolerance corrected (ANALYTICAL_F64 → ERF_PARITY), clippy clean
 - Nanopore `io::nanopore` module: **DONE** — sovereign NRS wire format, streaming `NanoporeIter`, synthetic signal generator, threshold basecaller, `Error::Nanopore` variant, 14 unit tests, 6 tolerance constants
 - Exp196a-c pre-hardware field genomics: **DONE** — signal round-trip (28), simulated 16S (11), int8 quantization (13) = 52 checks, all PASS
@@ -393,17 +401,17 @@ matching. Exp008 adds sovereign ML for environmental monitoring.
 
 ---
 
-## Code Quality (Feb 26, 2026)
+## Code Quality (Feb 27, 2026 — V66 post-audit)
 
 ```
 cargo fmt --check              → clean (0 diffs, both crates)
 cargo clippy --pedantic        → 0 warnings (pedantic + nursery, default features)
 cargo clippy --features gpu    → 0 warnings (pedantic + nursery, GPU features)
 cargo doc --features gpu       → clean (0 warnings, strict: -D missing_docs -D broken_intra_doc_links)
-cargo test --lib               → 896 passed, 0 failed, 1 ignored (hardware-dependent)
+cargo test --lib               → 946 passed, 0 failed, 1 ignored (hardware-dependent)
 cargo test --tests             → 60 integration (23 bio + 16 determinism + 21 I/O)
-cargo test --doc               → 19 passed, 0 failed (5 API examples)
-cargo llvm-cov --lib           → 95.46% line / 93.54% fn / 94.99% branch
+cargo test --doc               → 20 passed, 0 failed (5 API examples)
+cargo llvm-cov --lib           → 95.77% line / 93.86% fn / 95.33% branch (↑ from 95.46/93.54/94.99)
 #![deny(unsafe_code)]          → enforced crate-wide (edition 2024; env-var tests use Mutex-serialized helpers)
 #![deny(expect_used, unwrap_used)] → enforced crate-wide (test modules #[allow])
 partial_cmp().unwrap()         → 0 (all migrated to f64::total_cmp)
@@ -429,7 +437,7 @@ deprecated APIs                → 0 (parse_fastq → FastqIter::open in all bin
 
 ## BarraCuda CPU Parity
 
-The `validate_barracuda_cpu` v1-v8 binaries prove pure Rust math matches
+The `validate_barracuda_cpu` v1-v12 binaries prove pure Rust math matches
 Python across all algorithmic domains:
 - v1 (Exp035): 9 core domains
 - v2 (Exp035): +5 batch/flat APIs
@@ -439,8 +447,9 @@ Python across all algorithmic domains:
 - v6 (Exp079): +6 ODE flat parameter round-trip
 - v7 (Exp085): +3 Tier A layout fidelity (kmer, unifrac, taxonomy)
 - v8 (Exp102): +13 GPU-promoted domains (cooperation, capacitor, kmd, gbm, merge_pairs, signal, feature_table, robinson_foulds, derep, chimera, neighbor_joining, reconciliation, molecular_clock)
+- v12 (Exp212): +55 post-audit I/O evolution (byte-native FASTQ→diversity, quality→derep, nanopore calibration, MS2 streaming, e2e pipeline)
 
-Combined: 380/380 CPU parity checks. This is the bridge to pure GPU execution.
+Combined: 435/435 CPU parity checks (380 math + 55 I/O evolution). This is the bridge to pure GPU execution.
 
 ```
 Total CPU time: ~85ms (release build, all domains)

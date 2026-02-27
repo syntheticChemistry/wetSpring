@@ -69,9 +69,7 @@ pub fn error_response(id: &Value, code: i64, message: &str) -> String {
         "id": id,
     });
     serde_json::to_string(&resp).unwrap_or_else(|_| {
-        format!(
-            r#"{{"jsonrpc":"2.0","error":{{"code":{code},"message":"{message}"}},"id":null}}"#
-        )
+        format!(r#"{{"jsonrpc":"2.0","error":{{"code":{code},"message":"{message}"}},"id":null}}"#)
     })
 }
 

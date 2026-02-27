@@ -149,9 +149,17 @@ fn validate_gpu_bray_curtis(v: &mut Validator) {
 
     let identical = synthetic_community(15_000, 0.5, 999);
     let bc_self = diversity::bray_curtis(&identical, &identical);
-    v.check("identical communities BC=0", bc_self, 0.0, tolerances::EXACT_F64);
+    v.check(
+        "identical communities BC=0",
+        bc_self,
+        0.0,
+        tolerances::EXACT_F64,
+    );
 
-    println!("  GPU Bray-Curtis: {cpu_bc:.6}, {}µs", t.elapsed().as_micros());
+    println!(
+        "  GPU Bray-Curtis: {cpu_bc:.6}, {}µs",
+        t.elapsed().as_micros()
+    );
 }
 
 // ── G03: GPU QS ODE Model via Dispatch ───────────────────────────────────────
@@ -160,7 +168,12 @@ fn validate_gpu_qs_model(v: &mut Validator) {
     v.section("═══ G03: GPU QS ODE Model via Dispatch ═══");
     let t = Instant::now();
 
-    let scenarios = &["standard_growth", "high_density", "hapr_mutant", "dgc_overexpression"];
+    let scenarios = &[
+        "standard_growth",
+        "high_density",
+        "hapr_mutant",
+        "dgc_overexpression",
+    ];
 
     for scenario in scenarios {
         let dt = 0.01;
@@ -312,10 +325,7 @@ fn validate_toadstool_dispatch(v: &mut Validator) {
         );
     }
 
-    println!(
-        "  ToadStool dispatch model: {}µs",
-        t.elapsed().as_micros()
-    );
+    println!("  ToadStool dispatch model: {}µs", t.elapsed().as_micros());
 }
 
 fn main() {

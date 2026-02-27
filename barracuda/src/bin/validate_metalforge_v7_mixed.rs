@@ -119,7 +119,10 @@ fn validate_cross_substrate_bray_curtis(v: &mut Validator) {
     let t = Instant::now();
 
     let pairs: &[(&[f64], &[f64])] = &[
-        (&[10.0, 20.0, 30.0, 40.0, 50.0], &[15.0, 25.0, 35.0, 45.0, 55.0]),
+        (
+            &[10.0, 20.0, 30.0, 40.0, 50.0],
+            &[15.0, 25.0, 35.0, 45.0, 55.0],
+        ),
         (&[100.0, 0.0, 0.0, 0.0], &[0.0, 0.0, 0.0, 100.0]),
         (&[50.0, 50.0, 50.0], &[50.0, 50.0, 50.0]),
     ];
@@ -145,10 +148,18 @@ fn validate_cross_substrate_bray_curtis(v: &mut Validator) {
     let result = dispatch::dispatch("science.diversity", &params).expect("large bc");
     let mf_bc = result["bray_curtis"].as_f64().expect("bray_curtis");
 
-    v.check("large BC cross-substrate", mf_bc, cpu_bc, tolerances::EXACT_F64);
+    v.check(
+        "large BC cross-substrate",
+        mf_bc,
+        cpu_bc,
+        tolerances::EXACT_F64,
+    );
     v.check_pass("BC in [0,1]", (0.0..=1.0).contains(&cpu_bc));
 
-    println!("  Cross-substrate Bray-Curtis: {}µs", t.elapsed().as_micros());
+    println!(
+        "  Cross-substrate Bray-Curtis: {}µs",
+        t.elapsed().as_micros()
+    );
 }
 
 // ── MF03: Cross-Substrate QS ODE (all 4 scenarios) ──────────────────────────
@@ -157,7 +168,12 @@ fn validate_cross_substrate_qs(v: &mut Validator) {
     v.section("═══ MF03: Cross-Substrate QS ODE (4 Scenarios) ═══");
     let t = Instant::now();
 
-    let scenarios = &["standard_growth", "high_density", "hapr_mutant", "dgc_overexpression"];
+    let scenarios = &[
+        "standard_growth",
+        "high_density",
+        "hapr_mutant",
+        "dgc_overexpression",
+    ];
 
     for scenario in scenarios {
         let dt = 0.01;
@@ -221,11 +237,36 @@ fn validate_pcie_bypass_topology(v: &mut Validator) {
     }
 
     let science_pipeline = [
-        PipelineStage { name: "nestgate_fetch", substrate: "CPU", accepts_gpu_buffer: false, produces_gpu_buffer: false },
-        PipelineStage { name: "diversity_fusion", substrate: "GPU", accepts_gpu_buffer: true, produces_gpu_buffer: true },
-        PipelineStage { name: "qs_ode_sweep", substrate: "GPU", accepts_gpu_buffer: true, produces_gpu_buffer: true },
-        PipelineStage { name: "anderson_spectral", substrate: "GPU", accepts_gpu_buffer: true, produces_gpu_buffer: true },
-        PipelineStage { name: "taxonomy_int8", substrate: "NPU", accepts_gpu_buffer: false, produces_gpu_buffer: false },
+        PipelineStage {
+            name: "nestgate_fetch",
+            substrate: "CPU",
+            accepts_gpu_buffer: false,
+            produces_gpu_buffer: false,
+        },
+        PipelineStage {
+            name: "diversity_fusion",
+            substrate: "GPU",
+            accepts_gpu_buffer: true,
+            produces_gpu_buffer: true,
+        },
+        PipelineStage {
+            name: "qs_ode_sweep",
+            substrate: "GPU",
+            accepts_gpu_buffer: true,
+            produces_gpu_buffer: true,
+        },
+        PipelineStage {
+            name: "anderson_spectral",
+            substrate: "GPU",
+            accepts_gpu_buffer: true,
+            produces_gpu_buffer: true,
+        },
+        PipelineStage {
+            name: "taxonomy_int8",
+            substrate: "NPU",
+            accepts_gpu_buffer: false,
+            produces_gpu_buffer: false,
+        },
     ];
 
     let mut gpu_chained = 0;
@@ -250,9 +291,24 @@ fn validate_pcie_bypass_topology(v: &mut Validator) {
     );
 
     let npu_to_gpu = [
-        PipelineStage { name: "npu_taxonomy", substrate: "NPU", accepts_gpu_buffer: false, produces_gpu_buffer: true },
-        PipelineStage { name: "gpu_diversity", substrate: "GPU", accepts_gpu_buffer: true, produces_gpu_buffer: true },
-        PipelineStage { name: "gpu_anderson", substrate: "GPU", accepts_gpu_buffer: true, produces_gpu_buffer: true },
+        PipelineStage {
+            name: "npu_taxonomy",
+            substrate: "NPU",
+            accepts_gpu_buffer: false,
+            produces_gpu_buffer: true,
+        },
+        PipelineStage {
+            name: "gpu_diversity",
+            substrate: "GPU",
+            accepts_gpu_buffer: true,
+            produces_gpu_buffer: true,
+        },
+        PipelineStage {
+            name: "gpu_anderson",
+            substrate: "GPU",
+            accepts_gpu_buffer: true,
+            produces_gpu_buffer: true,
+        },
     ];
 
     let mut npu_gpu_chained = 0;
@@ -261,14 +317,15 @@ fn validate_pcie_bypass_topology(v: &mut Validator) {
             npu_gpu_chained += 1;
         }
     }
-    v.check_pass("NPU→GPU: direct buffer transfer (2 chained)", npu_gpu_chained == 2);
+    v.check_pass(
+        "NPU→GPU: direct buffer transfer (2 chained)",
+        npu_gpu_chained == 2,
+    );
 
     println!(
         "  Science pipeline: 5 stages, {gpu_chained} GPU-chained, {cpu_roundtrips} roundtrips"
     );
-    println!(
-        "  NPU→GPU bypass: {npu_gpu_chained} chained (zero CPU roundtrip between GPU stages)"
-    );
+    println!("  NPU→GPU bypass: {npu_gpu_chained} chained (zero CPU roundtrip between GPU stages)");
     println!("  PCIe bypass topology: {}µs", t.elapsed().as_micros());
 }
 
@@ -287,10 +344,7 @@ fn validate_gpu_cpu_fallback(v: &mut Validator) {
             anderson_result.is_ok(),
         );
         if let Ok(ref result) = anderson_result {
-            v.check_pass(
-                "anderson substrate=gpu",
-                result["substrate"] == "gpu",
-            );
+            v.check_pass("anderson substrate=gpu", result["substrate"] == "gpu");
         }
     }
     #[cfg(not(feature = "gpu"))]
@@ -302,11 +356,8 @@ fn validate_gpu_cpu_fallback(v: &mut Validator) {
     }
 
     let counts: &[f64] = &[100.0, 80.0, 60.0, 40.0, 20.0, 10.0, 5.0, 3.0, 2.0, 1.0];
-    let fallback_result = dispatch::dispatch(
-        "science.diversity",
-        &json!({"counts": counts}),
-    )
-    .expect("diversity always works (CPU fallback)");
+    let fallback_result = dispatch::dispatch("science.diversity", &json!({"counts": counts}))
+        .expect("diversity always works (CPU fallback)");
 
     let cpu_h = diversity::shannon(counts);
     let fb_h = fallback_result["shannon"].as_f64().expect("h");
@@ -322,7 +373,10 @@ fn validate_gpu_cpu_fallback(v: &mut Validator) {
         &json!({"counts": counts, "scenario": "standard_growth"}),
     )
     .expect("pipeline works with fallback");
-    v.check_pass("pipeline completes with fallback", pipeline["pipeline"] == "complete");
+    v.check_pass(
+        "pipeline completes with fallback",
+        pipeline["pipeline"] == "complete",
+    );
 
     let anderson_in_pipeline = &pipeline["anderson"];
     #[cfg(not(feature = "gpu"))]
@@ -361,18 +415,12 @@ fn validate_nucleus_coordination(v: &mut Validator) {
         "metrics.snapshot",
     ];
     for cap in &expected_caps {
-        v.check_pass(
-            &format!("Tower announces '{cap}'"),
-            cap_strs.contains(cap),
-        );
+        v.check_pass(&format!("Tower announces '{cap}'"), cap_strs.contains(cap));
     }
 
     let node_counts: &[f64] = &[50.0, 40.0, 30.0, 20.0, 10.0];
-    let node_result = dispatch::dispatch(
-        "science.diversity",
-        &json!({"counts": node_counts}),
-    )
-    .expect("node diversity");
+    let node_result = dispatch::dispatch("science.diversity", &json!({"counts": node_counts}))
+        .expect("node diversity");
     let direct_h = diversity::shannon(node_counts);
     let node_h = node_result["shannon"].as_f64().expect("h");
     v.check(
@@ -382,14 +430,21 @@ fn validate_nucleus_coordination(v: &mut Validator) {
         tolerances::EXACT_F64,
     );
 
-    let nest_result = dispatch::dispatch(
-        "science.qs_model",
-        &json!({"scenario": "standard_growth"}),
-    )
-    .expect("nest qs");
-    v.check_pass("Nest: QS result has steps", nest_result.get("steps").is_some());
-    v.check_pass("Nest: QS result has peak", nest_result.get("peak_biofilm").is_some());
-    v.check_pass("Nest: QS result has final_state", nest_result.get("final_state").is_some());
+    let nest_result =
+        dispatch::dispatch("science.qs_model", &json!({"scenario": "standard_growth"}))
+            .expect("nest qs");
+    v.check_pass(
+        "Nest: QS result has steps",
+        nest_result.get("steps").is_some(),
+    );
+    v.check_pass(
+        "Nest: QS result has peak",
+        nest_result.get("peak_biofilm").is_some(),
+    );
+    v.check_pass(
+        "Nest: QS result has final_state",
+        nest_result.get("final_state").is_some(),
+    );
 
     println!(
         "  NUCLEUS: {} capabilities, diversity={direct_h:.6}",
@@ -446,11 +501,14 @@ fn validate_biomeos_graph_e2e(v: &mut Validator) {
         .states()
         .filter_map(|s| s.get(4).copied())
         .fold(0.0_f64, f64::max);
-    v.check("E2E: QS peak parity", qs_peak, cpu_peak, tolerances::EXACT_F64);
-
-    println!(
-        "  E2E: H={h:.4}, D={d:.4}, BC={bc:.4}, QS_peak={qs_peak:.4}"
+    v.check(
+        "E2E: QS peak parity",
+        qs_peak,
+        cpu_peak,
+        tolerances::EXACT_F64,
     );
+
+    println!("  E2E: H={h:.4}, D={d:.4}, BC={bc:.4}, QS_peak={qs_peak:.4}");
     println!("  biomeOS graph E2E: {}µs", t.elapsed().as_micros());
 }
 
@@ -469,26 +527,88 @@ fn validate_workload_routing_model(v: &mut Validator) {
     }
 
     let routes = [
-        WorkloadRoute { name: "Diversity fused map-reduce", optimal_substrate: "GPU", capability: "f64+reduce", ipc_method: Some("science.diversity") },
-        WorkloadRoute { name: "Anderson spectral", optimal_substrate: "GPU", capability: "f64+shader", ipc_method: Some("science.anderson") },
-        WorkloadRoute { name: "QS ODE parameter sweep", optimal_substrate: "GPU", capability: "f64", ipc_method: Some("science.qs_model") },
-        WorkloadRoute { name: "HMM forward", optimal_substrate: "GPU", capability: "f64+shader", ipc_method: None },
-        WorkloadRoute { name: "Felsenstein pruning", optimal_substrate: "GPU", capability: "f64+shader", ipc_method: None },
-        WorkloadRoute { name: "Taxonomy int8", optimal_substrate: "NPU", capability: "quant(8)", ipc_method: None },
-        WorkloadRoute { name: "PFAS screening", optimal_substrate: "NPU", capability: "quant(8)", ipc_method: None },
-        WorkloadRoute { name: "Anomaly ESN", optimal_substrate: "NPU", capability: "quant(4)+weight-mut", ipc_method: None },
-        WorkloadRoute { name: "FASTQ parsing", optimal_substrate: "CPU", capability: "cpu", ipc_method: None },
-        WorkloadRoute { name: "Tree traversal", optimal_substrate: "CPU", capability: "cpu", ipc_method: None },
+        WorkloadRoute {
+            name: "Diversity fused map-reduce",
+            optimal_substrate: "GPU",
+            capability: "f64+reduce",
+            ipc_method: Some("science.diversity"),
+        },
+        WorkloadRoute {
+            name: "Anderson spectral",
+            optimal_substrate: "GPU",
+            capability: "f64+shader",
+            ipc_method: Some("science.anderson"),
+        },
+        WorkloadRoute {
+            name: "QS ODE parameter sweep",
+            optimal_substrate: "GPU",
+            capability: "f64",
+            ipc_method: Some("science.qs_model"),
+        },
+        WorkloadRoute {
+            name: "HMM forward",
+            optimal_substrate: "GPU",
+            capability: "f64+shader",
+            ipc_method: None,
+        },
+        WorkloadRoute {
+            name: "Felsenstein pruning",
+            optimal_substrate: "GPU",
+            capability: "f64+shader",
+            ipc_method: None,
+        },
+        WorkloadRoute {
+            name: "Taxonomy int8",
+            optimal_substrate: "NPU",
+            capability: "quant(8)",
+            ipc_method: None,
+        },
+        WorkloadRoute {
+            name: "PFAS screening",
+            optimal_substrate: "NPU",
+            capability: "quant(8)",
+            ipc_method: None,
+        },
+        WorkloadRoute {
+            name: "Anomaly ESN",
+            optimal_substrate: "NPU",
+            capability: "quant(4)+weight-mut",
+            ipc_method: None,
+        },
+        WorkloadRoute {
+            name: "FASTQ parsing",
+            optimal_substrate: "CPU",
+            capability: "cpu",
+            ipc_method: None,
+        },
+        WorkloadRoute {
+            name: "Tree traversal",
+            optimal_substrate: "CPU",
+            capability: "cpu",
+            ipc_method: None,
+        },
     ];
 
-    let gpu_routed = routes.iter().filter(|r| r.optimal_substrate == "GPU").count();
-    let npu_routed = routes.iter().filter(|r| r.optimal_substrate == "NPU").count();
-    let cpu_routed = routes.iter().filter(|r| r.optimal_substrate == "CPU").count();
+    let gpu_routed = routes
+        .iter()
+        .filter(|r| r.optimal_substrate == "GPU")
+        .count();
+    let npu_routed = routes
+        .iter()
+        .filter(|r| r.optimal_substrate == "NPU")
+        .count();
+    let cpu_routed = routes
+        .iter()
+        .filter(|r| r.optimal_substrate == "CPU")
+        .count();
 
     v.check_pass("GPU gets compute-heavy (5 workloads)", gpu_routed == 5);
     v.check_pass("NPU gets inference (3 workloads)", npu_routed == 3);
     v.check_pass("CPU gets I/O-bound (2 workloads)", cpu_routed == 2);
-    v.check_pass("all 10 workloads routed", gpu_routed + npu_routed + cpu_routed == 10);
+    v.check_pass(
+        "all 10 workloads routed",
+        gpu_routed + npu_routed + cpu_routed == 10,
+    );
 
     for route in &routes {
         if let Some(method) = route.ipc_method {
@@ -501,10 +621,9 @@ fn validate_workload_routing_model(v: &mut Validator) {
                     let p = json!({"scenario": "standard_growth"});
                     dispatch::dispatch(method, &p).map(|_| ())
                 }
-                "science.anderson" => {
-                    dispatch::dispatch(method, &json!({})).map(|_| ())
-                    .or_else(|e| if e.0 == -32001 { Ok(()) } else { Err(e) })
-                }
+                "science.anderson" => dispatch::dispatch(method, &json!({}))
+                    .map(|_| ())
+                    .or_else(|e| if e.0 == -32001 { Ok(()) } else { Err(e) }),
                 _ => Ok(()),
             };
             v.check_pass(
@@ -514,9 +633,7 @@ fn validate_workload_routing_model(v: &mut Validator) {
         }
     }
 
-    println!(
-        "  Routing: GPU={gpu_routed}, NPU={npu_routed}, CPU={cpu_routed} (10 total)"
-    );
+    println!("  Routing: GPU={gpu_routed}, NPU={npu_routed}, CPU={cpu_routed} (10 total)");
     println!("  Workload routing: {}µs", t.elapsed().as_micros());
 }
 

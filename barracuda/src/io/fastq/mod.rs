@@ -13,6 +13,9 @@
 //! QUALITY (Phred33 ASCII)
 //! ```
 //!
+//! All I/O is byte-native — no UTF-8 assumption for sequence or quality
+//! data. Header identifiers are extracted as lossy UTF-8.
+//!
 //! [`parse_fastq`] collects records via [`FastqIter`] for multi-pass
 //! analysis (k-mer counting, diversity). For single-pass statistics on
 //! large files, prefer [`stats_from_file`] which processes lines in-place
@@ -101,26 +104,52 @@ pub(crate) fn open_reader(path: &Path) -> Result<Box<dyn BufRead>> {
     }
 }
 
-/// Read one line into `buf`, returning bytes read.  Wraps I/O errors
-/// with path context.
-pub(crate) fn read_line(reader: &mut dyn BufRead, buf: &mut String, path: &Path) -> Result<usize> {
-    reader.read_line(buf).map_err(|e| Error::Io {
+/// Read one byte-line into `buf`, returning bytes read. Wraps I/O errors
+/// with path context. Uses `read_until(b'\n')` — no UTF-8 requirement.
+pub(crate) fn read_byte_line(
+    reader: &mut dyn BufRead,
+    buf: &mut Vec<u8>,
+    path: &Path,
+) -> Result<usize> {
+    reader.read_until(b'\n', buf).map_err(|e| Error::Io {
         path: path.to_path_buf(),
         source: e,
     })
 }
 
-/// Return an error for a malformed header line.
-pub(crate) fn header_error(buf: &str) -> Error {
-    let snippet = buf.trim_end();
-    let end = snippet.len().min(40);
-    let s = &snippet[..end];
+/// Trim trailing `\n` and `\r` from a byte slice.
+pub(crate) fn trim_end(buf: &[u8]) -> &[u8] {
+    let mut end = buf.len();
+    while end > 0 && matches!(buf[end - 1], b'\n' | b'\r') {
+        end -= 1;
+    }
+    &buf[..end]
+}
+
+/// Return an error for a malformed header line (bytes input, lossy display).
+pub(crate) fn header_error_bytes(buf: &[u8]) -> Error {
+    let trimmed = trim_end(buf);
+    let end = trimmed.len().min(40);
+    let s = String::from_utf8_lossy(&trimmed[..end]);
     Error::Fastq(format!("expected '@' header, got: {s}"))
 }
 
-/// Count the trimmed length of `buf` (excluding trailing `\n` / `\r`).
-pub(crate) fn trimmed_len(buf: &str) -> usize {
-    buf.trim_end().len()
+/// Extract the record identifier from a header line (bytes after `@`,
+/// up to the first ASCII whitespace). Returns lossy UTF-8.
+fn extract_id(header: &[u8]) -> &str {
+    let trimmed = trim_end(header);
+    let after_at = if trimmed.first() == Some(&b'@') {
+        &trimmed[1..]
+    } else {
+        trimmed
+    };
+    let id_end = after_at
+        .iter()
+        .position(|&b| b == b' ' || b == b'\t')
+        .unwrap_or(after_at.len());
+    // FASTQ identifiers are ASCII by spec; this is infallible for well-formed input
+    std::str::from_utf8(&after_at[..id_end])
+        .unwrap_or_else(|e| std::str::from_utf8(&after_at[..e.valid_up_to()]).unwrap_or(""))
 }
 
 // ── Public API ───────────────────────────────────────────────────
@@ -144,6 +173,9 @@ pub fn parse_fastq(path: &Path) -> Result<Vec<FastqRecord>> {
 /// The callback receives borrowed slices into the parser's internal buffers.
 /// For single-pass processing (statistics, filtering), this avoids the
 /// per-record `Vec` allocation of [`FastqIter`].
+///
+/// All I/O is byte-native — no UTF-8 requirement for sequence or quality
+/// lines. Header identifiers are extracted as lossy UTF-8.
 ///
 /// # Errors
 ///
@@ -171,40 +203,37 @@ where
     F: FnMut(FastqRefRecord<'_>) -> Result<()>,
 {
     let mut reader = open_reader(path)?;
-    let mut buf_header = String::new();
-    let mut buf_sequence = String::new();
-    let mut buf_sep = String::new();
-    let mut buf_quality = String::new();
+    let mut buf_header = Vec::new();
+    let mut buf_sequence = Vec::new();
+    let mut buf_sep = Vec::new();
+    let mut buf_quality = Vec::new();
 
     loop {
         buf_header.clear();
-        if read_line(reader.as_mut(), &mut buf_header, path)? == 0 {
+        if read_byte_line(reader.as_mut(), &mut buf_header, path)? == 0 {
             break;
         }
-        if buf_header.trim_end().is_empty() {
+        if trim_end(&buf_header).is_empty() {
             break;
         }
-        if !buf_header.starts_with('@') {
-            return Err(header_error(&buf_header));
+        if buf_header.first() != Some(&b'@') {
+            return Err(header_error_bytes(&buf_header));
         }
-        let id = buf_header.trim_end()[1..]
-            .split_whitespace()
-            .next()
-            .unwrap_or("");
+        let id = extract_id(&buf_header);
 
         buf_sequence.clear();
-        read_line(reader.as_mut(), &mut buf_sequence, path)?;
+        read_byte_line(reader.as_mut(), &mut buf_sequence, path)?;
 
         buf_sep.clear();
-        read_line(reader.as_mut(), &mut buf_sep, path)?;
+        read_byte_line(reader.as_mut(), &mut buf_sep, path)?;
 
         buf_quality.clear();
-        read_line(reader.as_mut(), &mut buf_quality, path)?;
+        read_byte_line(reader.as_mut(), &mut buf_quality, path)?;
 
         let record = FastqRefRecord {
             id,
-            sequence: buf_sequence.trim_end().as_bytes(),
-            quality: buf_quality.trim_end().as_bytes(),
+            sequence: trim_end(&buf_sequence),
+            quality: trim_end(&buf_quality),
         };
         f(record)?;
     }
@@ -213,8 +242,8 @@ where
 
 /// Streaming FASTQ iterator — yields one record at a time without buffering.
 ///
-/// For large files where you don't need all records in memory simultaneously.
-/// Handles both plain `.fastq` and gzip-compressed `.fastq.gz` files.
+/// All I/O is byte-native — no UTF-8 requirement for sequence or quality
+/// lines. Handles both plain `.fastq` and gzip-compressed `.fastq.gz` files.
 ///
 /// # Errors
 ///
@@ -236,7 +265,7 @@ where
 pub struct FastqIter {
     reader: Box<dyn BufRead>,
     path: std::path::PathBuf,
-    buf: String,
+    buf: Vec<u8>,
     done: bool,
 }
 
@@ -251,7 +280,7 @@ impl FastqIter {
         Ok(Self {
             reader,
             path: path.to_path_buf(),
-            buf: String::new(),
+            buf: Vec::new(),
             done: false,
         })
     }
@@ -267,7 +296,7 @@ impl Iterator for FastqIter {
 
         // Line 1: @identifier
         self.buf.clear();
-        match read_line(self.reader.as_mut(), &mut self.buf, &self.path) {
+        match read_byte_line(self.reader.as_mut(), &mut self.buf, &self.path) {
             Ok(0) => {
                 self.done = true;
                 return None;
@@ -278,42 +307,38 @@ impl Iterator for FastqIter {
                 return Some(Err(e));
             }
         }
-        if self.buf.trim_end().is_empty() {
+        if trim_end(&self.buf).is_empty() {
             self.done = true;
             return None;
         }
-        if !self.buf.starts_with('@') {
+        if self.buf.first() != Some(&b'@') {
             self.done = true;
-            return Some(Err(header_error(&self.buf)));
+            return Some(Err(header_error_bytes(&self.buf)));
         }
-        let id = self.buf.trim_end()[1..]
-            .split_whitespace()
-            .next()
-            .unwrap_or("")
-            .to_string();
+        let id = extract_id(&self.buf).to_string();
 
         // Line 2: sequence
         self.buf.clear();
-        if let Err(e) = read_line(self.reader.as_mut(), &mut self.buf, &self.path) {
+        if let Err(e) = read_byte_line(self.reader.as_mut(), &mut self.buf, &self.path) {
             self.done = true;
             return Some(Err(e));
         }
-        let sequence = self.buf.trim_end().as_bytes().to_vec();
+        let sequence = trim_end(&self.buf).to_vec();
 
         // Line 3: + separator
         self.buf.clear();
-        if let Err(e) = read_line(self.reader.as_mut(), &mut self.buf, &self.path) {
+        if let Err(e) = read_byte_line(self.reader.as_mut(), &mut self.buf, &self.path) {
             self.done = true;
             return Some(Err(e));
         }
 
         // Line 4: quality scores
         self.buf.clear();
-        if let Err(e) = read_line(self.reader.as_mut(), &mut self.buf, &self.path) {
+        if let Err(e) = read_byte_line(self.reader.as_mut(), &mut self.buf, &self.path) {
             self.done = true;
             return Some(Err(e));
         }
-        let quality = self.buf.trim_end().as_bytes().to_vec();
+        let quality = trim_end(&self.buf).to_vec();
 
         Some(Ok(FastqRecord {
             id,

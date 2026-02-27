@@ -1,6 +1,6 @@
 # Sub-thesis 04: Sentinels — Mechanical Wave Detection and NPU Deployment
 
-**Date:** February 26, 2026
+**Date:** February 27, 2026
 **Faculty:** Cahill (Sandia), Smallwood (Sandia), Kachkovskiy (MSU CMSE)
 **Status:** **NPU deployment validated on real AKD1000 hardware** — coin-cell feasible (11 years at 1 Hz). 4/6 communication modes subject to Anderson localization (Exp147, 152). PFAS screening pipeline complete (Exp041-042). Track 4 soil monitoring extends sentinel framework. **V60 Live Hardware**: Exp193-195 validate ESN classifiers (QS/Bloom/Disorder) on real AKD1000 via pure Rust `akida-driver` — 18.8K Hz throughput, 1.4 µJ/infer, online readout switching in 86 µs, (1+1)-ES evolution at 136 gen/sec, 12.9K Hz temporal streaming, PUF fingerprint (6.34 bits entropy)
 

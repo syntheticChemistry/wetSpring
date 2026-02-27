@@ -24,6 +24,11 @@ tokio = { version = "1", features = ["rt"] }
 name = "validate_dispatch_routing"
 path = "src/bin/validate_dispatch_routing.rs"
 
+# ── Exp213: Dispatch + Streaming Evolution (V66) ──
+[[bin]]
+name = "validate_dispatch_evolution_v66"
+path = "src/bin/validate_dispatch_evolution_v66.rs"
+
 [dev-dependencies]
 
 [lints.clippy]

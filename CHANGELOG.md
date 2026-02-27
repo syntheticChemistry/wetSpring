@@ -5,6 +5,38 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V66 — Deep Audit + Dispatch Evolution + NUCLEUS Local Deployment (2026-02-27)
+
+### V66 Deep Audit
+- Byte-native FASTQ I/O: `io::fastq` operates on `&[u8]`, eliminating UTF-8 assumptions
+- Bytemuck nanopore bulk read: zero-copy signal extraction via `bytemuck::cast_slice`
+- Streaming APIs: `for_each_spectrum` (mzML), `for_each_record` (MS2, FASTQ)
+- Safe env handling: `temp_env::with_var` replaces unsafe `std::env::set_var` in tests
+- Tolerance centralization: 92 named constants in `tolerances.rs` with provenance
+- `partial_cmp` → `total_cmp` migration: 10 lib sites (panic-free NaN handling)
+- Zero unsafe code, zero TODO/FIXME/HACK
+
+### Experiment Buildouts (Exp209, 212–215)
+- Exp209: Streaming I/O parity — 37/37 checks PASS
+- Exp212: BarraCuda CPU v12 post-audit math fidelity — 55/55 checks PASS
+- Exp213: Compute dispatch + streaming evolution (forge) — 49/49 checks PASS
+- Exp214: NUCLEUS mixed hardware V8 via IPC dispatch — 49/49 checks PASS
+- Exp215: CPU vs GPU v5 — built, awaiting GPU hardware
+
+### NUCLEUS Local Deployment (Eastgate Tower)
+- Built and deployed 5 primals from source: BearDog, Songbird, ToadStool, NestGate, biomeOS
+- 4 primals + Neural API live on `/run/user/1000/biomeos/`
+- 121 capability translations loaded, COORDINATED mode
+- End-to-end validated: Songbird HTTP → BearDog TLS 1.3 → NCBI → NestGate storage
+- Real *Vibrio harveyi* 16S data (PX756524.1) fetched and stored
+- 6 deployment issues documented for team feedback (F1–F6)
+
+### Totals
+- 216 experiments, 5,251+ checks, 1,073+ tests
+- 95.77% line / 93.86% fn / 95.33% branch coverage
+- 200 validation binaries, 344 .rs files
+- 52/52 papers, 39/39 three-tier
+
 ## V65 — Progression Benchmark: Python → CPU → GPU → Pure GPU → metalForge (2026-02-27)
 
 ### Exp211: BarraCuda Progression Benchmark
