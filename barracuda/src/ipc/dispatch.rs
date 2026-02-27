@@ -35,6 +35,7 @@ fn try_gpu() -> Option<&'static GpuF64> {
             rt.block_on(GpuF64::new()).ok()
         })
         .as_ref()
+        .filter(|g| !g.is_lost())
 }
 
 /// Dispatch a JSON-RPC method call to the appropriate barracuda handler.
@@ -63,7 +64,13 @@ fn handle_health() -> Result<Value, (i64, String)> {
     #![allow(clippy::unnecessary_wraps)]
 
     #[cfg(feature = "gpu")]
-    let substrate = if try_gpu().is_some() { "gpu" } else { "cpu" };
+    let substrate = if try_gpu().is_some() {
+        "gpu"
+    } else if GPU_CTX.get().is_some_and(|g| g.as_ref().is_some_and(GpuF64::is_lost)) {
+        "gpu_lost"
+    } else {
+        "cpu"
+    };
     #[cfg(not(feature = "gpu"))]
     let substrate = "cpu";
 

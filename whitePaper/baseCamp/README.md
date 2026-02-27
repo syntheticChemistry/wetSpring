@@ -2,7 +2,7 @@
 
 **Date:** February 27, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 62 — 209 experiments, 5,021+ validation checks (1,759 GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,103 tests (977 barracuda + 47 forge + 79 integration/doc), 95.46% line / 93.54% fn / 94.99% branch, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 92 named tolerances, clippy pedantic CLEAN, biomeOS IPC GPU-aware dispatch (Exp203-208), comprehensive green sweep (Python 33.4× → CPU → GPU → streaming 441-837× → metalForge), 39/39 three-tier, 52/52 papers
+**Status:** Phase 62 — 209 experiments, 5,021+ validation checks (1,759 GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,103 tests (977 barracuda + 47 forge + 79 integration/doc), 95.46% line / 93.54% fn / 94.99% branch, ToadStool S68+ aligned (`e96576ee`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 92 named tolerances, clippy pedantic CLEAN, biomeOS IPC GPU-aware dispatch (Exp203-208), comprehensive green sweep (Python 33.4× → CPU → GPU → streaming 441-837× → metalForge), 39/39 three-tier, 52/52 papers
 
 ---
 

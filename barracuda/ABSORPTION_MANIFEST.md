@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** February 27, 2026 (V61 Field Genomics `io::nanopore` + Barracuda Evolution Audit)
+**Date:** February 27, 2026 (V63 ToadStool S68+ Realignment)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**ToadStool pin:** `f0feb226` (S68: dual-layer universal precision, 700 shaders, 0 f32-only, Feb 26 2026)
-**Status:** 79 ToadStool primitives consumed via `compile_shader_universal` (incl. 11 `stats::diversity` + 2 `stats::metrics` + S66: `hill`, `monod`, `fit_linear`, `percentile`, `mean`, `shannon_from_frequencies`), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,022 tests (896 barracuda lib + 60 integration + 19 doc + 47 forge), 95.46% line / 93.54% fn / 94.99% branch, ToadStool S68 aligned, 203 experiments, 4,800+ checks (1,578 GPU on RTX 4070, 60 NPU on AKD1000), 92 named tolerances, 0 ad-hoc magic numbers, `clippy::pedantic` CLEAN. **V61:** `io::nanopore` operational, Exp196a-c pre-hardware validation (52 checks), 3 absorption candidates ready (ESN, NPU bridge, validator). Full barracuda evolution audit in V61 handoff.
+**ToadStool pin:** `e96576ee` (S68+: device-lost resilience, dispatch semaphore, 700 shaders, 0 f32-only, Feb 27 2026)
+**Status:** 79 ToadStool primitives consumed via `compile_shader_universal` (incl. 11 `stats::diversity` + 2 `stats::metrics` + S66: `hill`, `monod`, `fit_linear`, `percentile`, `mean`, `shannon_from_frequencies`), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,103 tests (977 barracuda lib + 60 integration + 19 doc + 47 forge), 95.46% line / 93.54% fn / 94.99% branch, ToadStool S68+ aligned, 209 experiments, 5,021+ checks (1,759 GPU on RTX 4070, 60 NPU on AKD1000), 92 named tolerances, 0 ad-hoc magic numbers, `clippy::pedantic` CLEAN. **V63:** ToadStool S68+ realignment — `GpuF64::is_lost()` wired, IPC device-lost fallback, all revalidated green. 3 absorption candidates ready (ESN, NPU bridge, validator).
 
 ---
 
@@ -49,7 +49,7 @@ WGSL          known physics   handoffs/                        delete local
 | Compose | GPU wrappers wiring ToadStool primitives | **7 modules** (kmd, merge_pairs, RF, derep, NJ, reconciliation, molecular_clock) |
 | Passthrough | Accept GPU buffers, CPU kernel | **0 modules** — all 3 former Passthrough promoted (V40) |
 | Validate | CPU ↔ GPU parity for all shaders | All 5 ODE: exact parity (Exp099/100/101) |
-| Hand off | wateringHole/handoffs/ documents | **V57** active (S68 catch-up handoff), V7-V56 archived |
+| Hand off | wateringHole/handoffs/ documents | **V63** active (S68+ realignment), V7-V62 archived |
 | Absorb | ToadStool integrates as `ops::bio::*` | **79 primitives** consumed (ToadStool S66: all DONE, +46 cross-spring total) |
 | Lean | Rewire to upstream, delete local code | 79 primitives consumed (S66), 5 `OdeSystem` trait rewires, BGL boilerplate removed, 0 Passthrough |
 

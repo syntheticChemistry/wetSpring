@@ -177,6 +177,16 @@ impl GpuF64 {
         &self.driver_profile
     }
 
+    /// Whether the underlying GPU device has been lost.
+    ///
+    /// Delegates to `WgpuDevice::is_lost()` (`ToadStool` S68+). When `true`,
+    /// callers should fall back to the CPU path — the GPU will not accept
+    /// new work until the device is recreated.
+    #[must_use]
+    pub fn is_lost(&self) -> bool {
+        self.wgpu_device.is_lost()
+    }
+
     /// Whether this GPU's driver needs f64 `exp`/`log` polyfills.
     #[must_use]
     pub fn needs_f64_workaround(&self) -> bool {

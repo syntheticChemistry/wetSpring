@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** February 27, 2026 (V62 biomeOS IPC Integration + Comprehensive Green Sweep)
+**Date:** February 27, 2026 (V63 ToadStool S68+ Realignment)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules + 1 IPC module (all lean, 0 local WGSL, 0 local derivative/regression math), 79 ToadStool primitives consumed (barracuda always-on, zero fallback code), 1,103 tests (977 barracuda lib + 60 integration + 19 doc + 47 forge), 95.46% line / 93.54% fn / 94.99% branch coverage, 209 experiments, 5,021+ checks (1,759 GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S68 aligned (`f0feb226`), 92 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V62:** biomeOS IPC science primal (GPU-aware dispatch via `OnceLock<GpuF64>` + dispatch threshold routing), Exp203-208 (321 checks PASS), comprehensive sweep all green (33.4× Python→Rust, 441-837× streaming vs RT). 3 absorption candidates ready (ESN, NPU bridge, validator).
+**Status:** 47 CPU + 42 GPU modules + 1 IPC module (all lean, 0 local WGSL, 0 local derivative/regression math), 79 ToadStool primitives consumed (barracuda always-on, zero fallback code), 1,103 tests (977 barracuda lib + 60 integration + 19 doc + 47 forge), 95.46% line / 93.54% fn / 94.99% branch coverage, 209 experiments, 5,021+ checks (1,759 GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S68+ aligned (`e96576ee`), 92 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V63:** ToadStool S68+ realignment — `GpuF64::is_lost()` surfaced, IPC dispatch device-lost fallback, GEMM benchmark fix (256×256 + warm-up), all 6 key binaries revalidated green. 3 absorption candidates ready (ESN, NPU bridge, validator).
 
 ### Full Lean Phase
 
@@ -46,6 +46,10 @@ ToadStool S39-S62+DF64 (55+ commits since V39) delivered massive infrastructure:
 - `compile_template()` — template-based `{{SCALAR}}` shader compilation (S67)
 - `Precision::op_preamble()` — abstract precision ops layer (S68)
 - `downcast_f64_to_f16()` — F16 downcast with sentinel protection (S68)
+- `WgpuDevice::is_lost()` — device-lost detection (S68+) — **WIRED** in `GpuF64::is_lost()`
+- `WgpuDevice::acquire_dispatch()` — concurrency permit (S68+)
+- `WgpuDevice::max_concurrent_dispatches()` — concurrency budget query (S68+)
+- `submit_and_poll()` — resilient submit with catch_unwind (S68+) — transparent via ToadStool ops
 - `ComputeDispatch` builder — eliminates 80-line bind-group/pipeline boilerplate
 - `Fp64Strategy` auto-detect — Native/Hybrid selection per GPU era
 - DF64 core-streaming — routes f64 through FP32 cores on consumer GPUs (RTX 4070: 5888 FP32 cores vs 92 FP64 units)
@@ -54,6 +58,7 @@ ToadStool S39-S62+DF64 (55+ commits since V39) delivered massive infrastructure:
 - `TranseScoreF64` — GPU TransE KG embedding scoring
 - `TopK` — GPU bitonic sort for drug-disease ranking
 - `unified_hardware` refactored to 6 focused modules (types, traits, scheduler, discovery, cpu_executor, transfer)
+- `from_existing_simple()` deprecated (S68+) — wetSpring already uses `from_existing()` with real `AdapterInfo`
 
 **Upstream requests** (V40 status — 7/9 delivered):
 1. ~~Make `GemmF64::wgsl_shader_for_device()` public~~ → **DELIVERED** (S65) — with `Fp64Strategy` auto-detect (Native/Hybrid), DF64 GEMM for FP32 cores

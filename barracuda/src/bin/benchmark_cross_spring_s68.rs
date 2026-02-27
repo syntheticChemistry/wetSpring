@@ -551,9 +551,9 @@ fn main() {
     });
 
     let gemm = GemmCached::new(Arc::clone(&device), Arc::clone(&ctx));
-    let m = 64;
-    let k = 32;
-    let n = 64;
+    let m = 256;
+    let k = 128;
+    let n = 256;
     let a_mat: Vec<f64> = (0..m * k)
         .map(|i| ((i * 7 + 3) % 100) as f64 / 100.0)
         .collect();
@@ -561,7 +561,7 @@ fn main() {
         .map(|i| ((i * 11 + 5) % 100) as f64 / 100.0)
         .collect();
 
-    let (gemm_res, first_ms) = bench("GEMM first dispatch (64×32 × 32×64)", || {
+    let (gemm_res, first_ms) = bench("GEMM first dispatch (256×128 × 128×256)", || {
         gemm.execute(&a_mat, &b_mat, m, k, n, 1).expect("GEMM")
     });
     v.check_pass("GEMM result finite", gemm_res.iter().all(|x| x.is_finite()));
@@ -573,10 +573,15 @@ fn main() {
         tolerances::GPU_VS_CPU_F64,
     );
     timings.push(Timing {
-        label: "GEMM first dispatch 64×64",
+        label: "GEMM first dispatch 256×256",
         origin: "wetSpring→S62→S68",
         ms: first_ms,
     });
+
+    // Warm-up: amortize GPU clock ramp and ToadStool dispatch_semaphore init
+    for _ in 0..5 {
+        let _ = gemm.execute(&a_mat, &b_mat, m, k, n, 1).expect("GEMM");
+    }
 
     let ((), repeat_ms) = bench("GEMM ×100 (cached pipeline)", || {
         for _ in 0..100 {
@@ -737,7 +742,7 @@ fn main() {
     println!("  ┌──────────────────────────────────────────────────────────────┐");
     println!("  │ Metric                              │ Value                  │");
     println!("  ├──────────────────────────────────────────────────────────────┤");
-    println!("  │ ToadStool alignment                  │ S68 (f0feb226)        │");
+    println!("  │ ToadStool alignment                  │ S68+ (e96576ee)       │");
     println!("  │ BarraCuda primitives consumed         │ 79                   │");
     println!("  │ Local WGSL shaders                   │ 0 (fully lean)       │");
     println!("  │ Upstream WGSL shaders (ToadStool)     │ 700                  │");

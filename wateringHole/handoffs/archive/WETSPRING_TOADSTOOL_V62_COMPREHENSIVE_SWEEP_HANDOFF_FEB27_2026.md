@@ -257,7 +257,7 @@ Python (1,713 ms) → Rust CPU (51 ms, 33.4×) → GPU (portable) → Streaming 
 | Named tolerances | 92 (all scientifically justified) |
 | Local WGSL | 0 (fully lean) |
 | Passthrough | 0 (all promoted) |
-| ToadStool alignment | S68 (`f0feb226`) |
+| ToadStool alignment | S68+ (`e96576ee`) |
 
 ---
 

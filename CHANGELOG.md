@@ -5,6 +5,27 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V63 — ToadStool S68+ Realignment (2026-02-27)
+
+### ToadStool Pin Update
+- Advanced from `f0feb226` (S68) to `e96576ee` (S68+: device-lost resilience, dispatch semaphore, CPU feature-gate fix)
+- 3 ToadStool commits: CPU feature-gate regression fix, root doc cleanup, GPU device-lost resilience
+- 589 files in barracuda crate migrated from `queue.submit + device.poll` to `submit_and_poll`
+
+### Rewiring
+- New: `GpuF64::is_lost()` — surfaces `WgpuDevice::is_lost()` for device-lost detection
+- Updated: `ipc::dispatch::try_gpu()` filters lost GPU contexts, falls back to CPU
+- Updated: `health.check` reports `"gpu_lost"` substrate when device is lost but was previously initialized
+
+### Benchmark Fix
+- `benchmark_cross_spring_s68`: GEMM matrix size 64×64 → 256×256 to dominate `submit_and_poll` overhead
+- Added 5-iteration warm-up before timing loop
+
+### Revalidation
+- All 6 key binaries green: Exp206 (64/64), Exp207 (54/54), Exp208 (75/75), Exp185 (10/10), Exp189 (28/28), Exp075 (31/31)
+- `cargo test --release`: 20/20 PASS
+- `cargo clippy --features gpu,ipc`: 0 warnings
+
 ## V62 — Phase 62: biomeOS IPC Integration + Comprehensive Green Sweep (2026-02-27)
 
 ### biomeOS Science Primal

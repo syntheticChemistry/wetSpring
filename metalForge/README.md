@@ -162,7 +162,7 @@ wetSpring follows hotSpring's pattern for ToadStool absorption:
 2. Characterize hardware (metalForge/)         ← THIS DIRECTORY — 47 forge tests
 3. Write Rust in GPU-friendly patterns         ← 25 Lean + 16 Compose; 0 local WGSL (fully lean); 0 Passthrough
 4. ToadStool absorbs as shared primitives      ← unidirectional handoff via wateringHole/handoffs/
-5. wetSpring consumes ToadStool primitives     ← 79 consumed, 42 GPU modules (S68, f0feb226)
+5. wetSpring consumes ToadStool primitives     ← 79 consumed, 42 GPU modules (S68, e96576ee)
 ```
 
 ### What "GPU-Friendly Patterns" Means for Life Science

@@ -1,7 +1,7 @@
 # wetSpring Benchmark Results
 
 **Date:** February 27, 2026
-**Status:** Phase 62 — Comprehensive sweep GREEN (Python → Rust CPU → GPU → Pure GPU Streaming → metalForge → NPU) — 39/39 actionable papers full three-tier (52/52 total); 1,103 tests (977 barracuda lib + 60 integration + 19 doc + 47 forge), 95.46% line / 93.54% fn / 94.99% branch, 5,021+ checks (1,578 GPU on RTX 4070, 60 NPU on AKD1000), 209 experiments, ToadStool S68 (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (fully lean), 92 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, IPC dispatch GPU-aware (lazy `OnceLock<GpuF64>` + dispatch threshold routing), biomeOS IPC science primal (Exp203-205), three-tier IPC validation (Exp206-208), V61 nanopore signal bridge + pre-hardware (io::nanopore, Exp196a-c)
+**Status:** Phase 62 — Comprehensive sweep GREEN (Python → Rust CPU → GPU → Pure GPU Streaming → metalForge → NPU) — 39/39 actionable papers full three-tier (52/52 total); 1,103 tests (977 barracuda lib + 60 integration + 19 doc + 47 forge), 95.46% line / 93.54% fn / 94.99% branch, 5,021+ checks (1,578 GPU on RTX 4070, 60 NPU on AKD1000), 209 experiments, ToadStool S68+ (`e96576ee`), 79 primitives consumed, 0 local WGSL/derivative/regression (fully lean), 92 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, IPC dispatch GPU-aware (lazy `OnceLock<GpuF64>` + dispatch threshold routing), biomeOS IPC science primal (Exp203-205), three-tier IPC validation (Exp206-208), V61 nanopore signal bridge + pre-hardware (io::nanopore, Exp196a-c)
 
 ---
 

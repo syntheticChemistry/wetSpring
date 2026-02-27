@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** February 27, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 62 — Comprehensive green sweep + IPC GPU-aware dispatch + biomeOS integration; 977 lib tests (1,103 total: 977 barracuda lib + 60 integration + 19 doc + 47 forge), **95.46% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov), 209 experiments, 5,021+ checks (1,759 GPU on RTX 4070, 60 NPU on AKD1000), 194 binaries, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math), 92 named tolerances with full provenance, 0 ad-hoc magic numbers, 0 Passthrough, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, IPC dispatch with lazy `OnceLock<GpuF64>` + dispatch threshold routing, biomeOS science primal server (Songbird-registered, Neural API metrics, three-tier data routing), NCBI EFetch/SRA pipeline + NestGate JSON-RPC integration, 52/52 papers, 39/39 three-tier, V62 comprehensive sweep: Python→CPU (33.4×)→GPU→Pure GPU Streaming (441-837×)→metalForge cross-substrate
+**Status:** Phase 62 — Comprehensive green sweep + IPC GPU-aware dispatch + biomeOS integration; 977 lib tests (1,103 total: 977 barracuda lib + 60 integration + 19 doc + 47 forge), **95.46% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov), 209 experiments, 5,021+ checks (1,759 GPU on RTX 4070, 60 NPU on AKD1000), 194 binaries, ToadStool S68 aligned (`e96576ee`), 79 primitives consumed via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math), 92 named tolerances with full provenance, 0 ad-hoc magic numbers, 0 Passthrough, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, IPC dispatch with lazy `OnceLock<GpuF64>` + dispatch threshold routing, biomeOS science primal server (Songbird-registered, Neural API metrics, three-tier data routing), NCBI EFetch/SRA pipeline + NestGate JSON-RPC integration, 52/52 papers, 39/39 three-tier, V62 comprehensive sweep: Python→CPU (33.4×)→GPU→Pure GPU Streaming (441-837×)→metalForge cross-substrate
 
 ---
 
@@ -137,7 +137,7 @@ integration point.
 | metalForge cross-system | 37+ domains CPU↔GPU (Exp103+104+165+182+208), **39/39 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
-| ToadStool primitives consumed | **79** (barracuda always-on, zero fallback code — ToadStool S68, `f0feb226`) |
+| ToadStool primitives consumed | **79** (barracuda always-on, zero fallback code — ToadStool S68+, `e96576ee`) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
 All 4,800+ validation checks **PASS**. All 1,022 tests **PASS** (1 ignored: hardware-dependent).
 
