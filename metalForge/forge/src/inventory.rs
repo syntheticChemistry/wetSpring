@@ -6,6 +6,8 @@
 //! NPU probing (local device nodes). Returns every substrate discovered
 //! on this machine. If it's not in the inventory, it doesn't exist to us.
 
+use std::io::{self, Write};
+
 use crate::probe;
 use crate::substrate::{Substrate, SubstrateKind};
 
@@ -22,34 +24,38 @@ pub fn discover() -> Vec<Substrate> {
     substrates
 }
 
-/// Print a human-readable inventory to stdout.
-pub fn print_inventory(substrates: &[Substrate]) {
-    println!("┌──────────────────────────────────────────────┐");
-    println!("│  wetSpring Forge — Hardware Inventory         │");
-    println!("├──────────────────────────────────────────────┤");
+/// Write a human-readable inventory to the given writer.
+///
+/// # Errors
+///
+/// Returns an I/O error if writing fails.
+pub fn write_inventory(substrates: &[Substrate], w: &mut impl Write) -> io::Result<()> {
+    writeln!(w, "┌──────────────────────────────────────────────┐")?;
+    writeln!(w, "│  wetSpring Forge — Hardware Inventory         │")?;
+    writeln!(w, "├──────────────────────────────────────────────┤")?;
 
     for (i, s) in substrates.iter().enumerate() {
-        println!("│ {i}: {s}");
+        writeln!(w, "│ {i}: {s}")?;
 
         if let Some(ref backend) = s.identity.backend {
-            println!("│    backend: {backend}");
+            writeln!(w, "│    backend: {backend}")?;
         }
         if let Some(idx) = s.identity.adapter_index {
-            println!("│    adapter: {idx}");
+            writeln!(w, "│    adapter: {idx}")?;
         }
         if let Some(ref node) = s.identity.device_node {
-            println!("│    device:  {node}");
+            writeln!(w, "│    device:  {node}")?;
         }
         if let Some(cores) = s.properties.core_count {
             let threads = s.properties.thread_count.unwrap_or(cores);
-            println!("│    cores:   {cores} ({threads} threads)");
+            writeln!(w, "│    cores:   {cores} ({threads} threads)")?;
         }
         if s.properties.has_f64 {
-            println!("│    SHADER_F64: YES");
+            writeln!(w, "│    SHADER_F64: YES")?;
         }
 
-        println!("│    caps:    {}", s.capability_summary());
-        println!("│");
+        writeln!(w, "│    caps:    {}", s.capability_summary())?;
+        writeln!(w, "│")?;
     }
 
     let gpu_count = substrates
@@ -60,8 +66,17 @@ pub fn print_inventory(substrates: &[Substrate]) {
         .iter()
         .filter(|s| s.kind == SubstrateKind::Npu)
         .count();
-    println!("│  Total: 1 CPU, {gpu_count} GPU(s), {npu_count} NPU(s)");
-    println!("└──────────────────────────────────────────────┘");
+    writeln!(w, "│  Total: 1 CPU, {gpu_count} GPU(s), {npu_count} NPU(s)")?;
+    writeln!(w, "└──────────────────────────────────────────────┘")?;
+    Ok(())
+}
+
+/// Print a human-readable inventory to stdout.
+///
+/// Convenience wrapper around [`write_inventory`] for CLI usage.
+pub fn print_inventory(substrates: &[Substrate]) {
+    let mut stdout = io::stdout().lock();
+    let _ = write_inventory(substrates, &mut stdout);
 }
 
 #[cfg(test)]

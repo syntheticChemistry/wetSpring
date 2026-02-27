@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** February 26, 2026 (V60 NPU Live + Field Genomics Architecture)
+**Date:** February 27, 2026 (V62 biomeOS IPC Integration + Comprehensive Green Sweep)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules (all lean, 0 local WGSL, 0 local derivative/regression math), 79 ToadStool primitives consumed (barracuda always-on, zero fallback code), 1,008 tests (882 barracuda lib + 60 integration + 19 doc + 47 forge), 96.67% library coverage, 200 experiments, 4,748+ checks (1,578 GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S68 aligned (`f0feb226`), 86 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V60:** NPU live (Exp193-195: real AKD1000 hardware, 3 ESN classifiers, online evolution, PUF, streaming), Sub-thesis 06 field genomics architecture defined (Exp196-202 planned), data type profiling for NestGate evolution.
+**Status:** 47 CPU + 42 GPU modules + 1 IPC module (all lean, 0 local WGSL, 0 local derivative/regression math), 79 ToadStool primitives consumed (barracuda always-on, zero fallback code), 1,103 tests (977 barracuda lib + 60 integration + 19 doc + 47 forge), 95.46% line / 93.54% fn / 94.99% branch coverage, 209 experiments, 5,021+ checks (1,759 GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S68 aligned (`f0feb226`), 92 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V62:** biomeOS IPC science primal (GPU-aware dispatch via `OnceLock<GpuF64>` + dispatch threshold routing), Exp203-208 (321 checks PASS), comprehensive sweep all green (33.4× Python→Rust, 441-837× streaming vs RT). 3 absorption candidates ready (ESN, NPU bridge, validator).
 
 ### Full Lean Phase
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Date: 2026-02-20
+# Commit: 756df26
 """
 Fernandez 2020 bistable phenotypic switching — Python baseline.
 
@@ -10,8 +11,8 @@ QS/c-di-GMP/biofilm model from Fernandez et al. 2020 (PNAS 117:29046-29054).
 Extends the Waters 2008 model with positive feedback from biofilm state (B)
 onto DGC production, creating bistability and hysteresis.
 
-Usage:
-    python fernandez2020_bistable.py
+Reproduction:
+    python3 scripts/fernandez2020_bistable.py
 
 Outputs:
     experiments/results/023_bistable/fernandez2020_python_baseline.json

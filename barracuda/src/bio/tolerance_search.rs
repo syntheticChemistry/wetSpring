@@ -37,7 +37,7 @@ pub fn find_within_da(sorted_mz: &[f64], query: f64, tol_da: f64) -> Vec<usize> 
 /// used by most sort implementations).
 fn find_in_range(sorted_mz: &[f64], lo: f64, hi: f64) -> Vec<usize> {
     let start = sorted_mz
-        .binary_search_by(|v| v.partial_cmp(&lo).unwrap_or(std::cmp::Ordering::Greater))
+        .binary_search_by(|v| v.total_cmp(&lo))
         .unwrap_or_else(|i| i);
 
     let mut matches = Vec::new();

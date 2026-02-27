@@ -20,12 +20,14 @@
 //!
 //! # Provenance
 //!
-//! | Item    | Value |
-//! |---------|-------|
-//! | Date    | 2026-02-23 |
-//! | Author  | wetSpring |
-//! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070 |
-//! | Command | `cargo test --bin validate_spectral_cross_spring -- --nocapture` |
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline commit | `756df26` |
+//! | Baseline tool | barracuda::spectral primitives (Anderson, Lanczos, level statistics) — Bourgain & Kachkovskiy 2018 theory |
+//! | Baseline date | 2026-02-27 |
+//! | Exact command | `cargo run --release --bin validate_spectral_cross_spring` |
+//! | Data | Synthetic (Anderson 1D/2D/3D Hamiltonians, Almost-Mathieu, no external data) |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use barracuda::spectral::{
     GOE_R, POISSON_R, almost_mathieu_hamiltonian, anderson_2d, anderson_3d, anderson_hamiltonian,

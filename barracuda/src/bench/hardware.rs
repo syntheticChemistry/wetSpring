@@ -81,10 +81,14 @@ impl HardwareInventory {
         Self::from_content(gate_name, &cpuinfo, &meminfo, &nvidia_csv, &os_kernel)
     }
 
-    /// Pretty-print the inventory block.
-    pub fn print(&self) {
-        let w = 52;
-        println!("  ┌── Hardware ─{}┐", "─".repeat(w - 14));
+    /// Write the hardware inventory block to the given writer.
+    ///
+    /// # Errors
+    ///
+    /// Returns an I/O error if writing fails.
+    pub fn write_to(&self, w: &mut impl std::io::Write) -> std::io::Result<()> {
+        let col = 52;
+        writeln!(w, "  ┌── Hardware ─{}┐", "─".repeat(col - 14))?;
         let Self {
             gate_name,
             cpu_model,
@@ -99,20 +103,29 @@ impl HardwareInventory {
             os_kernel,
             ..
         } = self;
-        println!("  │ {:<w$}│", format!("Gate:   {gate_name}"));
-        println!("  │ {:<w$}│", format!("CPU:    {cpu_model}"));
-        println!(
-            "  │ {:<w$}│",
+        writeln!(w, "  │ {:<col$}│", format!("Gate:   {gate_name}"))?;
+        writeln!(w, "  │ {:<col$}│", format!("CPU:    {cpu_model}"))?;
+        writeln!(
+            w,
+            "  │ {:<col$}│",
             format!("Cores:  {cpu_cores} ({cpu_threads} threads), L3 {cpu_cache_kb} KB"),
-        );
-        println!("  │ {:<w$}│", format!("RAM:    {ram_total_mb} MB"));
-        println!("  │ {:<w$}│", format!("GPU:    {gpu_name}"));
-        println!(
-            "  │ {:<w$}│",
+        )?;
+        writeln!(w, "  │ {:<col$}│", format!("RAM:    {ram_total_mb} MB"))?;
+        writeln!(w, "  │ {:<col$}│", format!("GPU:    {gpu_name}"))?;
+        writeln!(
+            w,
+            "  │ {:<col$}│",
             format!("VRAM:   {gpu_vram_mb} MB, Driver {gpu_driver}, CC {gpu_compute_cap}"),
-        );
-        println!("  │ {:<w$}│", format!("Kernel: {os_kernel}"));
-        println!("  └─{}┘", "─".repeat(w + 1));
+        )?;
+        writeln!(w, "  │ {:<col$}│", format!("Kernel: {os_kernel}"))?;
+        writeln!(w, "  └─{}┘", "─".repeat(col + 1))?;
+        Ok(())
+    }
+
+    /// Pretty-print the inventory block to stdout.
+    pub fn print(&self) {
+        let mut stdout = std::io::stdout().lock();
+        let _ = self.write_to(&mut stdout);
     }
 
     pub(crate) fn to_json(&self) -> String {

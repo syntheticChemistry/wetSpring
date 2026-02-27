@@ -1,8 +1,8 @@
 # Sub-thesis 06: Field Genomics — Sovereign Sequencing + Neuromorphic Edge Classification
 
-**Date:** February 26, 2026
+**Date:** February 27, 2026
 **Faculty:** Cahill (Sandia), Smallwood (Sandia), R. Anderson (Carleton), Jones (MSU BMB), Waters (MSU MMG)
-**Status:** Architecture defined — all computational components validated independently. NPU live on AKD1000 (Exp193-195). 16S sovereign pipeline operational (Exp184-185). ESN classifiers validated on hardware. Awaiting sequencer hardware (MinION Mk1D or Mk1C) for end-to-end integration.
+**Status:** `io::nanopore` module operational — POD5/NRS parser, streaming iterator, synthetic read generation. Pre-hardware validation complete (Exp196a-c, 52/52 PASS). NPU live on AKD1000 (Exp193-195). 16S sovereign pipeline operational (Exp184-185). ESN classifiers validated on hardware. Deep audit complete: 95.46% line coverage, `partial_cmp` → `total_cmp`, dead code removed, baseline manifest refreshed. Remaining: `bio::basecall` (signal → base) and real MinION integration (Exp197-202).
 
 ---
 
@@ -15,7 +15,7 @@ classifies, and acts without cloud connectivity. This closes the loop from
 environmental DNA to actionable intelligence at the edge.
 
 No other stack combines: (1) a pure Rust sequencing pipeline validated across
-200 experiments, (2) a pure Rust NPU driver running live on neuromorphic
+203 experiments, (2) a pure Rust NPU driver running live on neuromorphic
 hardware at <10 mW, and (3) a metalForge substrate router that dispatches
 workloads across CPU, GPU, NPU, and — now — sequencer.
 
@@ -235,7 +235,7 @@ Every program above uses math that is already validated in BarraCUDA:
 | Domain | Module | Validated | GPU | NPU |
 |--------|--------|:---------:|:---:|:---:|
 | Basecalling (new) | `bio::basecall` (to build) | — | planned | — |
-| FAST5/POD5 I/O (new) | `io::nanopore` (to build) | — | — | — |
+| FAST5/POD5 I/O | `io::nanopore` | Exp196a (28 checks) | — | — |
 | 16S ASV denoising | `bio::dada2` | 4,688+ checks | yes | — |
 | Chimera detection | `bio::chimera` | validated | yes | — |
 | Taxonomy classification | `bio::taxonomy` | validated | yes | int8 |
@@ -254,8 +254,8 @@ Every program above uses math that is already validated in BarraCUDA:
 | Random Forest | `ml::random_forest` | validated | yes | — |
 | GBM inference | `ml::gbm` | validated | yes | — |
 
-**New modules needed:** `io::nanopore` (FAST5/POD5 reader) and `bio::basecall`
-(signal → base conversion). Everything downstream is operational.
+**Remaining module:** `bio::basecall` (signal → base conversion). `io::nanopore`
+is operational (V61). Everything downstream is operational.
 
 ## Primal Integration
 
@@ -279,7 +279,7 @@ Every program above uses math that is already validated in BarraCUDA:
 | Pipeline | QIIME2/Galaxy, needs internet | Sovereign Rust, zero external dependencies |
 | Power | Laptop (45-65W) or Mk1C ARM (60W) | MinION (60W) + NPU standby (10 mW) |
 | Connectivity | Required for analysis | Optional (nightly sync) |
-| Validation | Published tools (black box) | 200 experiments, 4,748+ checks, all open |
+| Validation | Published tools (black box) | 203 experiments, 4,800+ checks, all open |
 | Hardware lock-in | ONT software stack | Pure Rust driver, AGPL-3.0, no vendor SDK |
 
 ## Testable Predictions
@@ -296,8 +296,8 @@ Every program above uses math that is already validated in BarraCUDA:
 
 | Phase | Target | Deliverable |
 |-------|--------|-------------|
-| **Now** | Architecture + module design | This document, experiment outlines |
-| **Next** | `io::nanopore` FAST5/POD5 reader | Simulated reads through existing pipeline |
+| ~~Now~~ **Done** | Architecture + module design | This document, experiment outlines |
+| ~~Next~~ **Done (V61)** | `io::nanopore` POD5/NRS reader | Exp196a-c: 52/52 pre-hardware checks PASS |
 | **Hardware arrival** | End-to-end validation | Exp196-202: real reads through sovereign pipeline |
 | **Field season 2026** | Saginaw Bay deployment | Continuous bloom sentinel with real sequencing |
 | **Year 2** | Multi-site network | Soil + water + wastewater monitoring stations |

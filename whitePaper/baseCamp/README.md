@@ -1,8 +1,8 @@
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** February 26, 2026
+**Date:** February 27, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 60 — 200 experiments, 4,748+ validation checks (1,578 GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,008 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 86 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets), 0 Passthrough, V60 NPU live (Exp193-195: real AKD1000), Sub-thesis 06 field genomics architecture (nanopore + NPU), 39/39 three-tier, 52/52 papers
+**Status:** Phase 62 — 209 experiments, 5,021+ validation checks (1,759 GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,103 tests (977 barracuda + 47 forge + 79 integration/doc), 95.46% line / 93.54% fn / 94.99% branch, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 92 named tolerances, clippy pedantic CLEAN, biomeOS IPC GPU-aware dispatch (Exp203-208), comprehensive green sweep (Python 33.4× → CPU → GPU → streaming 441-837× → metalForge), 39/39 three-tier, 52/52 papers
 
 ---
 
@@ -38,7 +38,8 @@ All code is AGPL-3.0.
 | **Fajgenbaum** | UPenn | 3 | 7 | 157–165 | 84 | Drug repurposing, pharmacophenomics, Track 3 completed |
 | **Diversity Fusion** | — | GPU | 1 | 167 | 18 | CPU↔GPU parity extension |
 | **Track 4 Soil QS** | — | 4 | 9 | 170–182 | 321 | No-till soil QS, Anderson pore geometry, Brandt farm, meta-analysis, tillage factorial, CPU/GPU/streaming/metalForge |
-| **Total** | | | **52** | | **4,748+** | |
+| **biomeOS IPC** | — | cross | — | 203-208 | 321 | IPC dispatch, GPU-aware routing, NUCLEUS atomics, Songbird, Neural API |
+| **Total** | | | **52** | | **5,021+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -89,21 +90,22 @@ Every paper goes through the full evolution. Status across all 39 actionable pap
 | Stage | What It Proves | Coverage |
 |-------|---------------|----------|
 | Python baseline | Algorithm correctness against published tools | 44 scripts (all with reproduction headers + SHA-256 integrity verification) |
-| BarraCuda CPU | Rust matches Python within machine precision | 1,476+ checks, 22.5x faster |
-| BarraCuda GPU | GPU matches CPU within 1e-6 | 1,578+ checks, 29+ domains |
+| BarraCuda CPU | Rust matches Python within machine precision | 1,642+ checks, 33.4x faster |
+| BarraCuda GPU | GPU matches CPU within 1e-6 | 1,759+ checks, 36+ domains |
 | Pure GPU streaming | Zero CPU round-trips, data stays on-device | 204+ checks, 10+ domains |
 | metalForge | Same answer on CPU, GPU, NPU | 39/39 papers, 37+ domains |
 | NPU reservoir | ESN → int8 → NPU preserves classification (Cholesky solve) | 59 checks, 6 domains |
 | Cross-spring evolution | 660+ WGSL shaders traced to origin springs, rewired imports, Exp169 4-spring provenance | 21 checks |
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
-| Code quality audit | 96.67% coverage, streaming I/O, 0 production mocks, ToadStool S68, barracuda always-on, `deny(missing_docs)`, `cargo-deny` supply-chain audit, clippy pedantic CLEAN, zero unsafe code | 1,008 tests |
+| biomeOS IPC integration | JSON-RPC science primal, GPU-aware dispatch, Songbird registration | 321 checks (Exp203-208) |
+| Code quality audit | 95.46% line / 93.54% fn / 94.99% branch, streaming I/O, 0 production mocks, ToadStool S68, barracuda always-on, `deny(missing_docs)`, zero unsafe code, clippy pedantic CLEAN, baseline manifest 41/41 | 1,103 tests |
 
 ## Performance Summary
 
 | Metric | Value | Source |
 |--------|-------|--------|
-| Rust vs Python (25 domains) | **22.5x** overall, 625x peak (Smith-Waterman) | Exp059 |
+| Rust vs Python (25 domains) | **33.4x** overall, 625x peak (Smith-Waterman) | Exp059 |
 | GPU vs CPU (spectral cosine) | **926x** | Exp087 |
 | GPU vs CPU (taxonomy, 500 queries) | **63x** | Exp016 |
 | GPU vs CPU (pipeline, 10 samples) | **2.45x** | Exp016 |
@@ -121,7 +123,7 @@ Every paper goes through the full evolution. Status across all 39 actionable pap
 | 03 | BioAg rhizosphere QS | [sub_thesis_03](sub_thesis_03_bioag.md) | 129, 142, 146, 151, 153 |
 | 04 | Sentinels + NPU deployment | [sub_thesis_04](sub_thesis_04_sentinels.md) | 114, 118, 123, 124, 147, 193–195 |
 | 05 | Cross-species eavesdropping | [sub_thesis_05](sub_thesis_05_cross_species.md) | 142, 144–146, 151, 153–154 |
-| 06 | Field genomics (nanopore + NPU) | [sub_thesis_06](sub_thesis_06_field_genomics.md) | planned: 196–202 |
+| 06 | Field genomics (nanopore + NPU) | [sub_thesis_06](sub_thesis_06_field_genomics.md) | 196a-c (pre-hardware done, 52 checks); planned: 197–202 |
 
 ### Cross-Spring Rewire + Modern Benchmark (Phase 48, V44)
 
@@ -163,7 +165,7 @@ effective dimension.
 | Experiment | Focus | Checks | Key Finding |
 |:---:|-------|:------:|-------------|
 | Exp184 | Real NCBI Sovereign Pipeline | 25 | Real NCBI 16S sovereign pipeline validation |
-| Exp185 | Cold Seep Sovereign Pipeline | 8 | Cold seep metagenomes sovereign pipeline |
+| Exp185 | Cold Seep Sovereign Pipeline | 10 | Cold seep metagenomes sovereign pipeline (CPU + GPU Anderson) |
 | Exp186 | Dynamic Anderson W(t) | 7 | Community evolution, time-dependent disorder |
 | Exp187 | DF64 Anderson Large Lattice | 4 | DF64 L=24+ lattice validation |
 | Exp188 | NPU Sentinel Real Stream | 10 | Real sensor stream NPU deployment |
@@ -193,11 +195,30 @@ and NPU-driven adaptive sampling.
 | NPU Adaptive Sampling | cross-cutting technique | Exp197 |
 | Deep-Sea Autonomous Lander | ST01, R. Anderson, cold seep | long-term |
 
-New BarraCUDA modules needed: `io::nanopore` (FAST5/POD5 reader),
-`bio::basecall` (signal → base). All downstream math is operational.
+**V61 status:** `io::nanopore` module operational (POD5/NRS parser, streaming
+iterator, synthetic read generation). Exp196a-c validate the full pre-hardware
+software path (52/52 checks PASS). Remaining: `bio::basecall` (signal → base,
+awaiting MinION hardware) and Exp197-202 (real sequencer integration).
+
+### Phase 61 Additions (Exp196a-c)
+
+| Experiment | Focus | Checks | Key Finding |
+|:---:|-------|:------:|-------------|
+| Exp196a | Nanopore Signal Bridge (POD5/NRS) | 28 | Header parsing, signal extraction, read→FASTQ, batch iteration |
+| Exp196b | Simulated Long-Read 16S Pipeline | 11 | ASV recovery from noisy long reads, community reconstruction |
+| Exp196c | NPU Int8 Quantization Pipeline | 13 | f64→int8 community fidelity, ESN regime classification |
 
 See [Sub-thesis 06: Field Genomics](sub_thesis_06_field_genomics.md) for
 full architecture, literature review, and experiment plan.
+
+### Phase 62 Additions (Exp203–208)
+
+| Experiment | Focus | Checks | Key Finding |
+|:---:|-------|:------:|-------------|
+| Exp203 | biomeOS Science Pipeline (IPC server, Songbird, Neural API) | 29 | Full IPC lifecycle validated, metrics reporting |
+| Exp206 | BarraCuda CPU v11 (IPC dispatch math fidelity) | 64 | Zero numeric drift through IPC layer (EXACT_F64) |
+| Exp207 | BarraCuda GPU v4 (IPC science on GPU) | 54 | GPU-aware dispatch, lazy OnceLock, threshold routing |
+| Exp208 | metalForge v7 (NUCLEUS mixed hardware) | 75 | PCIe bypass topology, Tower/Node/Nest atomics, cross-substrate |
 
 ## Open Data
 

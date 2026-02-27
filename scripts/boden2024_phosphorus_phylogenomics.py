@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Date: 2026-02-20
+# Commit: 756df26
 """
 Boden & Anderson 2024 — Phosphorus-cycling enzyme phylogenomics.
 
@@ -12,8 +13,8 @@ Paper: Boden et al. (2024) Nature Communications 15:3703
 DOI: 10.1038/s41467-024-47914-0
 Data: OSF vt5rw
 
-Usage:
-    python scripts/boden2024_phosphorus_phylogenomics.py
+Reproduction:
+    python3 scripts/boden2024_phosphorus_phylogenomics.py
 
 Python: 3.10+
 Date: 2026-02-20

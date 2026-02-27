@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: February 26, 2026 (Phase 60 V60 — 1,008 tests, ToadStool S68 (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 86 named tolerances, 0 ad-hoc magic numbers, clippy pedantic+nursery CLEAN, typed NCBI errors, 0 Passthrough, 52 papers, 200 experiments, V60 NPU live + field genomics architecture)
+**Last Updated**: February 27, 2026 (Phase 61 V61 + deep audit — 1,022 tests, 95.46% line / 93.54% fn / 94.99% branch, ToadStool S68 (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 92 named tolerances, `partial_cmp` → `total_cmp` migration (10 lib sites), baseline manifest 41/41 match 0 drift, clippy pedantic+nursery CLEAN, typed NCBI errors, 0 Passthrough, 52 papers, 203 experiments, V61 `io::nanopore` + Exp196a-c pre-hardware)
 **Purpose**: Track papers for reproduction/review across three tracks
 
 ---

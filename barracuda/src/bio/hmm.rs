@@ -148,9 +148,7 @@ pub fn backward(model: &HmmModel, observations: &[usize]) -> BackwardResult {
     let mut log_beta = vec![f64::NEG_INFINITY; t_len * n];
 
     // Initialization: beta[T-1][i] = 1 → log(1) = 0
-    for i in 0..n {
-        log_beta[(t_len - 1) * n + i] = 0.0;
-    }
+    log_beta[(t_len - 1) * n..t_len * n].fill(0.0);
 
     // Induction (backwards)
     for t in (0..t_len - 1).rev() {
@@ -214,14 +212,13 @@ pub fn viterbi(model: &HmmModel, observations: &[usize]) -> ViterbiResult {
     }
 
     // Termination: find best final state
-    let mut best_final = 0;
-    let mut best_prob = f64::NEG_INFINITY;
-    for i in 0..n {
-        if delta[(t_len - 1) * n + i] > best_prob {
-            best_prob = delta[(t_len - 1) * n + i];
-            best_final = i;
-        }
-    }
+    let final_row = &delta[(t_len - 1) * n..t_len * n];
+    let (best_final, best_prob) = final_row
+        .iter()
+        .enumerate()
+        .fold((0, f64::NEG_INFINITY), |(bi, bv), (i, &v)| {
+            if v > bv { (i, v) } else { (bi, bv) }
+        });
 
     // Backtrack
     let mut path = vec![0_usize; t_len];

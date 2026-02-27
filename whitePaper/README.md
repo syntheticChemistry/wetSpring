@@ -329,7 +329,7 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy --pedantic --nursery -D warnings` | 0 diagnostics |
 | `cargo doc --no-deps` | 0 warnings |
-| Line coverage (`cargo-llvm-cov`) | **96.67% overall** |
+| Line coverage (`cargo-llvm-cov`) | **95.46% line / 93.54% fn / 94.99% branch** |
 | `#![deny(unsafe_code)]` | Enforced crate-wide (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, clippy::unwrap_used)]` | Enforced crate-wide |
 | Named tolerance constants | 86 (all scientifically justified, hierarchy-tested) |

@@ -1,0 +1,117 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+use super::*;
+
+#[test]
+#[allow(clippy::assertions_on_constants)]
+fn tolerance_hierarchy_is_monotonic() {
+    assert!(EXACT < EXACT_F64);
+    assert!(EXACT_F64 < ANALYTICAL_F64);
+    assert!(ANALYTICAL_F64 < PYTHON_PARITY);
+    assert!(PYTHON_PARITY <= ML_PREDICTION);
+    assert!(GPU_VS_CPU_TRANSCENDENTAL <= GPU_LOG_POLYFILL);
+    assert!(GPU_LOG_POLYFILL <= GPU_VS_CPU_F64);
+    assert!(GPU_VS_CPU_F64 <= GPU_VS_CPU_ENSEMBLE);
+}
+
+#[test]
+fn all_tolerances_are_non_negative() {
+    let all = [
+        EXACT,
+        EXACT_F64,
+        ANALYTICAL_F64,
+        GC_CONTENT,
+        MEAN_QUALITY,
+        MZ_TOLERANCE,
+        SHANNON_SIMULATED,
+        SIMPSON_SIMULATED,
+        CHAO1_RANGE,
+        BRAY_CURTIS_SYMMETRY,
+        PYTHON_PARITY,
+        PYTHON_PARITY_TIGHT,
+        PYTHON_PVALUE,
+        ML_PREDICTION,
+        ANI_CROSS_SPECIES,
+        ML_F1_SCORE,
+        EVOLUTIONARY_DISTANCE,
+        SPECTRAL_COSINE,
+        HMM_FORWARD_PARITY,
+        DNDS_OMEGA_GUARD,
+        DADA2_ERR_CONVERGENCE,
+        ODE_CDG_CONVERGENCE,
+        ODE_STEADY_STATE,
+        ODE_METHOD_PARITY,
+        ODE_GPU_PARITY,
+        ODE_NEAR_ZERO,
+        ODE_GPU_SWEEP_ABS,
+        GPU_EIGENVALUE_REL,
+        GPU_LANCZOS_EIGENVALUE_ABS,
+        FINITE_SIZE_SCALING_REL,
+        LEVEL_SPACING_STDERR_MAX,
+        ANDERSON_1D_WEAK_DISORDER_FLOOR,
+        ANDERSON_STRONG_DISORDER_CEILING,
+        ANDERSON_2D_WEAK_DISORDER_FLOOR,
+        ODE_NEAR_ZERO_RELATIVE,
+        PHYLO_LIKELIHOOD,
+        JC69_PROBABILITY,
+        GILLESPIE_MEAN_REL,
+        GILLESPIE_FANO,
+        GILLESPIE_PYTHON_RANGE_REL,
+        GILLESPIE_FANO_PHYSICAL,
+        PPM_FACTOR,
+        ERF_PARITY,
+        NORM_CDF_PARITY,
+        NORM_CDF_TAIL,
+        KMD_GROUPING,
+        KMD_SPREAD,
+        MZ_FRAGMENT,
+        KMD_NON_HOMOLOGUE,
+        SPECTRAL_MZ_WINDOW,
+        PEAK_HEIGHT_REL,
+        RAREFACTION_MONOTONIC,
+        PCOA_EIGENVALUE_FLOOR,
+        JACOBI_CONVERGENCE,
+        JACOBI_ELEMENT_SKIP,
+        JACOBI_TAU_OVERFLOW,
+        MATRIX_EPS,
+        ESN_REGULARIZATION,
+        CHAO1_COUNT_HALFWIDTH,
+        BOX_MULLER_U1_FLOOR,
+        GAMMA_RIGHT_TAIL_OFFSET,
+        ODE_DIVISION_GUARD,
+        GAMMA_SERIES_CONVERGENCE,
+        GPU_VS_CPU_F64,
+        GPU_VS_CPU_TRANSCENDENTAL,
+        GPU_LOG_POLYFILL,
+        GPU_VS_CPU_BRAY_CURTIS,
+        GPU_VS_CPU_ENSEMBLE,
+        GPU_VS_CPU_HMM_BATCH,
+        GPU_F32_PARITY,
+        GPU_F32_SPATIAL,
+        ODE_DEFAULT_DT,
+        ODE_BIOFILM_SS,
+        BOOTSTRAP_LL_ENSEMBLE,
+        PHAGE_POPULATION_ABSOLUTE,
+        PHAGE_LARGE_POPULATION,
+        PHAGE_CRASH_FLOOR,
+        ODE_BISTABLE_LOW_B,
+        ODE_SIGNAL_SS,
+        HMM_INVARIANT_SLACK,
+        NPU_PASS_RATE_CEILING,
+        NPU_RECALL_FLOOR,
+        NPU_TOP1_FLOOR,
+        GEMM_COMPILE_TIMEOUT_MS,
+        GALAXY_SHANNON_RANGE,
+        GALAXY_SIMPSON_RANGE,
+        GALAXY_BRAY_CURTIS_RANGE,
+        ASARI_CROSS_MATCH_PCT,
+        ASARI_MZ_RANGE_PCT,
+        SEASONAL_OSCILLATION,
+        LANCZOS_VS_STURM,
+        CROSS_SPRING_NUMERICAL,
+        SOIL_MODEL_APPROX,
+        ODE_BISTABLE_HIGH_B,
+    ];
+    for tol in all {
+        assert!(tol >= 0.0, "tolerance {tol} must be non-negative");
+    }
+}

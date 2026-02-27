@@ -19,11 +19,14 @@
 //!
 //! # Provenance
 //!
-//! | Item        | Value |
-//! |-------------|-------|
-//! | Date        | 2026-02-26 |
-//! | Experiment  | 167 |
-//! | Command     | `cargo test --bin validate_gpu_diversity_fusion -- --nocapture` |
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline commit | `756df26` |
+//! | Baseline tool | scipy/skbio Shannon/Simpson/Pielou (analytically verified) |
+//! | Baseline date | 2026-02-27 |
+//! | Exact command | `cargo run --release --features gpu --bin validate_gpu_diversity_fusion` |
+//! | Data | Synthetic abundance vectors (deterministic, no external data) |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use std::sync::Arc;
 use wetspring_barracuda::bio::diversity_fusion_gpu::{

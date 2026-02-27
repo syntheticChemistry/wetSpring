@@ -332,9 +332,7 @@ pub fn filter_reads_flat(
     let mut ends = Vec::with_capacity(n);
     let mut pass = Vec::with_capacity(n);
 
-    for i in 0..n {
-        let off = offsets[i];
-        let len = lengths[i];
+    for (&off, &len) in offsets.iter().zip(lengths.iter()) {
         if off + len > qualities.len() || len == 0 {
             starts.push(0);
             ends.push(0);

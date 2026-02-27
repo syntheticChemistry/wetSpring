@@ -29,6 +29,18 @@ pub fn efetch_fasta(db: &str, id: &str, api_key: &str) -> crate::error::Result<S
     Ok(body)
 }
 
+/// Validate that a response body looks like `GenBank` (contains `LOCUS`).
+fn validate_genbank(body: &str) -> crate::error::Result<()> {
+    if body.contains("LOCUS") {
+        Ok(())
+    } else {
+        Err(Error::Ncbi(preview_msg(
+            "response does not look like GenBank",
+            body,
+        )))
+    }
+}
+
 /// Fetch a `GenBank` flat-file record from NCBI by accession or UID.
 ///
 /// # Errors
@@ -39,12 +51,7 @@ pub fn efetch_fasta(db: &str, id: &str, api_key: &str) -> crate::error::Result<S
 pub fn efetch_genbank(db: &str, id: &str, api_key: &str) -> crate::error::Result<String> {
     let url = build_url(db, id, "gb", "text", api_key);
     let body = super::http::get(&url)?;
-    if !body.contains("LOCUS") {
-        return Err(Error::Ncbi(preview_msg(
-            "response does not look like GenBank",
-            &body,
-        )));
-    }
+    validate_genbank(&body)?;
     Ok(body)
 }
 
@@ -168,5 +175,49 @@ mod tests {
     fn preview_msg_short() {
         let msg = preview_msg("oops", "short");
         assert_eq!(msg, "oops: short");
+    }
+
+    #[test]
+    fn build_url_empty_api_key() {
+        let url = build_url("nucleotide", "K03455", "fasta", "text", "");
+        assert!(url.contains("api_key="));
+    }
+
+    #[test]
+    fn build_url_genbank_rettype() {
+        let url = build_url("nucleotide", "NC_000913", "gb", "text", "k");
+        assert!(url.contains("rettype=gb"));
+        assert!(url.contains("retmode=text"));
+    }
+
+    #[test]
+    fn validate_genbank_valid() {
+        let body = "LOCUS       NC_000913             4641652 bp    DNA     circular\nDEFINITION  ...";
+        assert!(validate_genbank(body).is_ok());
+    }
+
+    #[test]
+    fn validate_genbank_html_error() {
+        let body = "<!DOCTYPE html><html><body>Error</body></html>";
+        let err = validate_genbank(body).unwrap_err();
+        assert!(err.to_string().contains("does not look like GenBank"));
+    }
+
+    #[test]
+    fn validate_genbank_empty() {
+        let err = validate_genbank("").unwrap_err();
+        assert!(err.to_string().contains("does not look like GenBank"));
+    }
+
+    #[test]
+    fn validate_genbank_partial_locus() {
+        let body = "Header line\nLOCUS       NC_000913";
+        assert!(validate_genbank(body).is_ok());
+    }
+
+    #[test]
+    fn preview_msg_empty_body() {
+        let msg = preview_msg("error", "");
+        assert_eq!(msg, "error: ");
     }
 }

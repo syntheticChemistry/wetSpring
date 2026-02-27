@@ -4,7 +4,7 @@
 **Phase:** V59 — Science extensions
 **Binary:** `validate_cold_seep_pipeline`
 **Command:** `cargo run --release --features gpu --bin validate_cold_seep_pipeline`
-**Status:** DONE (CPU, 8 checks PASS)
+**Status:** DONE (CPU + GPU, 10/10 checks PASS)
 **Depends on:** Exp184 (pipeline validation with small test set)
 
 ## Purpose

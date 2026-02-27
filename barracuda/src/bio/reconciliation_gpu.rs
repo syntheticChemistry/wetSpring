@@ -9,6 +9,15 @@
 //! In a pure-GPU streaming pipeline, gene trees arrive from the
 //! neighbor-joining stage and reconciliation results feed downstream
 //! evolutionary analysis without CPU round-trips between families.
+//!
+//! # Evolution status: PASSTHROUGH
+//!
+//! Both functions validate GPU device capability for pipeline continuity
+//! but dispatch to the CPU `reconcile_dtl()` kernel. True GPU promotion
+//! requires a `BatchReconcileGpu` `ToadStool` primitive (one workgroup per
+//! gene family, DP on the host×parasite product space). Until then, the
+//! CPU kernel is correct and the GPU validation ensures pipeline wiring
+//! is exercised end-to-end.
 
 use super::reconciliation::{self, DtlCosts, DtlResult, FlatRecTree};
 use crate::error::{Error, Result};

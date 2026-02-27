@@ -25,21 +25,12 @@ use wetspring_barracuda::bio::hmm::{HmmModel, forward, forward_batch, viterbi, v
 use wetspring_barracuda::bio::neighbor_joining::{distance_matrix, neighbor_joining};
 use wetspring_barracuda::bio::reconciliation::{DtlCosts, FlatRecTree, reconcile_dtl};
 use wetspring_barracuda::tolerances;
+use wetspring_barracuda::validation::Validator;
 
 const NO_CHILD: u32 = u32::MAX;
 
-fn check(name: &str, cond: bool, pass: &mut u32, fail: &mut u32) {
-    if cond {
-        println!("[PASS] {name}");
-        *pass += 1;
-    } else {
-        println!("[FAIL] {name}");
-        *fail += 1;
-    }
-}
-
-fn validate_flat_felsenstein(pass: &mut u32, fail: &mut u32) {
-    println!("─── FlatTree Felsenstein Parity ───");
+fn validate_flat_felsenstein(v: &mut Validator) {
+    v.section("── FlatTree Felsenstein Parity ──");
     let tree = TreeNode::Internal {
         left: Box::new(TreeNode::Internal {
             left: Box::new(TreeNode::Leaf {
@@ -63,25 +54,23 @@ fn validate_flat_felsenstein(pass: &mut u32, fail: &mut u32) {
     let ll_recursive = log_likelihood(&tree, 1.0);
     let flat = FlatTree::from_tree(&tree, 1.0);
     let ll_flat = flat.log_likelihood();
-    check(
+    v.check(
         "FlatTree: LL matches recursive",
-        (ll_recursive - ll_flat).abs() < tolerances::ANALYTICAL_F64,
-        pass,
-        fail,
+        ll_flat,
+        ll_recursive,
+        tolerances::ANALYTICAL_F64,
     );
-    check(
+    v.check_pass(
         "FlatTree: LL finite & negative",
         ll_flat.is_finite() && ll_flat < 0.0,
-        pass,
-        fail,
     );
-    check("FlatTree: n_sites=16", flat.n_sites == 16, pass, fail);
-    check("FlatTree: n_leaves=3", flat.n_leaves == 3, pass, fail);
-    check("FlatTree: n_internal=2", flat.n_internal == 2, pass, fail);
+    v.check_count("FlatTree: n_sites=16", flat.n_sites, 16);
+    v.check_count("FlatTree: n_leaves=3", flat.n_leaves, 3);
+    v.check_count("FlatTree: n_internal=2", flat.n_internal, 2);
 }
 
-fn validate_batch_hmm(pass: &mut u32, fail: &mut u32) {
-    println!("\n─── Batch HMM Parity ───");
+fn validate_batch_hmm(v: &mut Validator) {
+    v.section("── Batch HMM Parity ──");
     let model = HmmModel {
         n_states: 2,
         log_pi: vec![0.6_f64.ln(), 0.4_f64.ln()],
@@ -98,40 +87,32 @@ fn validate_batch_hmm(pass: &mut u32, fail: &mut u32) {
     };
     let obs1: Vec<usize> = vec![0, 1, 2, 0, 1];
     let obs2: Vec<usize> = vec![2, 2, 1, 0, 0, 1, 2];
+
     let fw1 = forward(&model, &obs1);
     let fw2 = forward(&model, &obs2);
     let batch_fw = forward_batch(&model, &[&obs1, &obs2]);
-    check(
+    v.check(
         "Batch HMM: forward LL[0]",
-        (fw1.log_likelihood - batch_fw[0].log_likelihood).abs() < tolerances::ANALYTICAL_F64,
-        pass,
-        fail,
+        batch_fw[0].log_likelihood,
+        fw1.log_likelihood,
+        tolerances::ANALYTICAL_F64,
     );
-    check(
+    v.check(
         "Batch HMM: forward LL[1]",
-        (fw2.log_likelihood - batch_fw[1].log_likelihood).abs() < tolerances::ANALYTICAL_F64,
-        pass,
-        fail,
+        batch_fw[1].log_likelihood,
+        fw2.log_likelihood,
+        tolerances::ANALYTICAL_F64,
     );
+
     let vit1 = viterbi(&model, &obs1);
     let vit2 = viterbi(&model, &obs2);
     let batch_vit = viterbi_batch(&model, &[&obs1, &obs2]);
-    check(
-        "Batch HMM: Viterbi[0]",
-        vit1.path == batch_vit[0].path,
-        pass,
-        fail,
-    );
-    check(
-        "Batch HMM: Viterbi[1]",
-        vit2.path == batch_vit[1].path,
-        pass,
-        fail,
-    );
+    v.check_pass("Batch HMM: Viterbi[0]", vit1.path == batch_vit[0].path);
+    v.check_pass("Batch HMM: Viterbi[1]", vit2.path == batch_vit[1].path);
 }
 
-fn validate_batch_sw(pass: &mut u32, fail: &mut u32) {
-    println!("\n─── Batch Smith-Waterman Parity ───");
+fn validate_batch_sw(v: &mut Validator) {
+    v.section("── Batch Smith-Waterman Parity ──");
     let params = ScoringParams::default();
     let s1 = smith_waterman_score(b"ACGTACGT", b"ACGTACTT", &params);
     let s2 = smith_waterman_score(b"TTTTAAAA", b"AAAATTTT", &params);
@@ -139,19 +120,19 @@ fn validate_batch_sw(pass: &mut u32, fail: &mut u32) {
         &[(b"ACGTACGT", b"ACGTACTT"), (b"TTTTAAAA", b"AAAATTTT")],
         &params,
     );
-    check("Batch SW: score[0]", s1 == batch[0], pass, fail);
-    check("Batch SW: score[1]", s2 == batch[1], pass, fail);
+    v.check_pass("Batch SW: score[0]", s1 == batch[0]);
+    v.check_pass("Batch SW: score[1]", s2 == batch[1]);
 }
 
-fn validate_nj_and_dtl(pass: &mut u32, fail: &mut u32) {
-    println!("\n─── Neighbor-Joining + DTL ───");
+fn validate_nj_and_dtl(v: &mut Validator) {
+    v.section("── Neighbor-Joining + DTL ──");
     let seqs: Vec<&[u8]> = vec![b"ACGTACGTACGT", b"ACGTACGTACTT", b"TGCATGCATGCA"];
     let dm = distance_matrix(&seqs);
     let labels: Vec<String> = vec!["S1".into(), "S2".into(), "S3".into()];
     let nj = neighbor_joining(&dm, &labels);
-    check("NJ: 1 join for 3 taxa", nj.n_joins == 1, pass, fail);
-    check("NJ: valid Newick", nj.newick.ends_with(';'), pass, fail);
-    check("NJ: distance matrix 3×3", dm.len() == 9, pass, fail);
+    v.check_count("NJ: 1 join for 3 taxa", nj.n_joins, 1);
+    v.check_pass("NJ: valid Newick", nj.newick.ends_with(';'));
+    v.check_count("NJ: distance matrix 3×3", dm.len(), 9);
 
     let host = FlatRecTree {
         names: vec!["H_A".into(), "H_B".into(), "H_AB".into()],
@@ -165,17 +146,12 @@ fn validate_nj_and_dtl(pass: &mut u32, fail: &mut u32) {
     };
     let tip_map = vec![("P_A".into(), "H_A".into()), ("P_B".into(), "H_B".into())];
     let dtl = reconcile_dtl(&host, &para, &tip_map, &DtlCosts::default());
-    check("DTL: congruent cost=0", dtl.optimal_cost == 0, pass, fail);
-    check(
-        "DTL: mapped to H_AB",
-        dtl.optimal_host == "H_AB",
-        pass,
-        fail,
-    );
+    v.check_count("DTL: congruent cost=0", dtl.optimal_cost as usize, 0);
+    v.check_pass("DTL: mapped to H_AB", dtl.optimal_host == "H_AB");
 }
 
-fn validate_cross_module(pass: &mut u32, fail: &mut u32) {
-    println!("\n─── Cross-module: NJ → Felsenstein ───");
+fn validate_cross_module(v: &mut Validator) {
+    v.section("── Cross-module: NJ → Felsenstein ──");
     let tree = TreeNode::Internal {
         left: Box::new(TreeNode::Leaf {
             name: "S1".into(),
@@ -191,30 +167,21 @@ fn validate_cross_module(pass: &mut u32, fail: &mut u32) {
     let ll = log_likelihood(&tree, 1.0);
     let flat = FlatTree::from_tree(&tree, 1.0);
     let ll_flat = flat.log_likelihood();
-    check(
+    v.check(
         "NJ→Felsenstein: flat matches recursive",
-        (ll - ll_flat).abs() < tolerances::ANALYTICAL_F64,
-        pass,
-        fail,
+        ll_flat,
+        ll,
+        tolerances::ANALYTICAL_F64,
     );
-    check("NJ→Felsenstein: LL negative", ll < 0.0, pass, fail);
+    v.check_pass("NJ→Felsenstein: LL negative", ll < 0.0);
 }
 
 fn main() {
-    let mut pass = 0_u32;
-    let mut fail = 0_u32;
-
-    println!("=== Exp035: BarraCuda CPU Parity v2 ===\n");
-
-    validate_flat_felsenstein(&mut pass, &mut fail);
-    validate_batch_hmm(&mut pass, &mut fail);
-    validate_batch_sw(&mut pass, &mut fail);
-    validate_nj_and_dtl(&mut pass, &mut fail);
-    validate_cross_module(&mut pass, &mut fail);
-
-    println!("\n========================================");
-    println!("Exp035 BarraCuda CPU v2: {pass} PASS, {fail} FAIL");
-    if fail > 0 {
-        std::process::exit(1);
-    }
+    let mut v = Validator::new("Exp035: BarraCuda CPU Parity v2");
+    validate_flat_felsenstein(&mut v);
+    validate_batch_hmm(&mut v);
+    validate_batch_sw(&mut v);
+    validate_nj_and_dtl(&mut v);
+    validate_cross_module(&mut v);
+    v.finish();
 }

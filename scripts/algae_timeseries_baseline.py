@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Date: 2026-02-20
+# Commit: 756df26
 """Exp039 baseline — Algal pond time-series diversity analysis.
 
 Simulates the longitudinal analysis pattern for PRJNA382322 (128-sample

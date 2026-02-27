@@ -46,18 +46,18 @@
 //! # Life Science Workloads
 //!
 //! wetSpring routes bioinformatics and analytical chemistry workloads:
-//! - **GPU (absorbed, 27)**: Felsenstein, HMM, spectral cosine, diversity,
+//! - **GPU (absorbed, 28)**: Felsenstein, HMM, spectral cosine, diversity,
 //!   ANI/SNP/dN/dS, RF batch, QS ODE, k-mer, `UniFrac`, 5 ODE bio systems
-//!   (via `BatchedOdeRK4` trait), DADA2, GBM, `Robinson-Foulds`, chimera
-//! - **GPU (local WGSL, 1)**: Diversity fusion (Write phase — new extension)
+//!   (via `BatchedOdeRK4` trait), DADA2, GBM, `Robinson-Foulds`, chimera,
+//!   diversity fusion (absorbed by `ToadStool` S63)
 //! - **NPU-optimal**: Taxonomy classification, anomaly detection, PFAS screening
 //! - **CPU-optimal**: FASTQ/mzML parsing, tree traversal
 //!
 //! # Write → Absorb → Lean Tracking
 //!
 //! The [`workloads`] module tracks shader origin for every domain:
-//! - **Absorbed** (27): lean on `ToadStool` primitives (incl. 5 ODE via trait)
-//! - **Local** (1): new WGSL extension pending absorption
+//! - **Absorbed** (28): lean on `ToadStool` primitives (incl. 5 ODE via trait)
+//! - **Local** (0): zero local WGSL — Full Lean achieved (S63)
 //! - **CPU-only** (1): I/O-bound domain
 //!
 //! When `ToadStool` absorbs a local shader, update origin from `Local` to

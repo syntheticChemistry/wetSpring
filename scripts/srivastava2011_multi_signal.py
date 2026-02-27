@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Date: 2026-02-20
+# Commit: 756df26
 """
 Srivastava 2011 multi-input QS network — Python baseline.
 
 Dual-signal (CAI-1 + AI-2) QS model with LuxO phosphorelay.
 5 scenarios: wild type, CAI-1 only, AI-2 only, no QS, exogenous CAI-1.
 
-Usage:
-    python srivastava2011_multi_signal.py
+Reproduction:
+    python3 scripts/srivastava2011_multi_signal.py
 
 References:
     Srivastava et al. 2011, J Bacteriology 193:6331-41

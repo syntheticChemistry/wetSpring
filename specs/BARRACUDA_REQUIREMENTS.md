@@ -7,7 +7,7 @@
 
 ## Current Kernel Usage (Validated)
 
-### Rust CPU Modules (47 modules, 882 barracuda tests, 96.67% llvm-cov, V55 S66 rewire)
+### Rust CPU Modules (47 modules, 882 barracuda tests, 95.46% line / 93.54% fn / 94.99% branch, V55 S66 rewire)
 
 | Module Domain | Modules | Status |
 |--------------|---------|--------|
@@ -22,7 +22,7 @@
 | ML | decision_tree, random_forest, gbm | Sovereign |
 | Drug repurposing | nmf, transe | Sovereign (NEW — Track 3) |
 
-### GPU Primitives (53 ToadStool primitives + 2 BGL helpers + 1 local WGSL extension, 710+ checks)
+### GPU Primitives (53 ToadStool primitives + 2 BGL helpers, 0 local WGSL, 710+ checks)
 
 | ToadStool Primitive | wetSpring Use | Checks | Performance |
 |-------------------|---------------|--------|-------------|
@@ -55,9 +55,9 @@ Historical record of deleted shaders:
 
 Absorption target: ToadStool `BatchedOdeRK4Generic<N_VARS, N_PARAMS>`.
 
-### GPU Wrappers (12 — All Compose/Lean, 0 Passthrough)
+### GPU Wrappers (12 — 10 Compose/Lean, 1 Passthrough)
 
-Pure GPU promotion (Exp101) + S62 lean eliminated all Passthrough modules:
+Pure GPU promotion (Exp101) + S62 lean eliminated most Passthrough modules:
 
 | Module | ToadStool Primitive | Strategy |
 |--------|-------------------|----------|
@@ -70,7 +70,7 @@ Pure GPU promotion (Exp101) + S62 lean eliminated all Passthrough modules:
 | `derep_gpu` | `KmerHistogramGpu` | Compose |
 | `chimera_gpu` | `GemmCachedF64` | Compose |
 | `neighbor_joining_gpu` | `FusedMapReduceF64` | Compose |
-| `reconciliation_gpu` | `TreeInferenceGpu` | Compose |
+| `reconciliation_gpu` | CPU `reconcile_dtl()` per family | **Passthrough** — GPU validated but CPU kernel used; needs `BatchReconcileGpu` |
 | `molecular_clock_gpu` | `FusedMapReduceF64` | Compose |
 
 ---
@@ -195,22 +195,25 @@ Tier classification for GPU shader promotion (Write → Absorb → Lean lifecycl
 | `robinson_foulds_gpu` | `PairwiseHammingGpu` | Tree distance metric |
 | `chimera_gpu` | `GemmCachedF64` | Chimera detection |
 | `neighbor_joining_gpu` | `FusedMapReduceF64` | Tree construction |
-| `reconciliation_gpu` | `TreeInferenceGpu` | Gene/species reconciliation |
+| `reconciliation_gpu` | CPU `reconcile_dtl()` passthrough | Gene/species reconciliation (GPU device validated, CPU kernel) |
 | `molecular_clock_gpu` | `FusedMapReduceF64` | Divergence dating |
 | `kmd_gpu` | `FusedMapReduceF64` | PFAS homologue detection |
 
 ### Tier C — Write (local WGSL extension, pending absorption)
 
-| Rust Module | Local Shader | Absorption Target | Blocking |
-|-------------|-------------|-------------------|---------|
-| `diversity_fusion_gpu` | `diversity_fusion_f64.wgsl` | ToadStool P2-5 | Absorbed by ToadStool S63. Local WGSL deleted. wetSpring leans on barracuda::ops::bio::diversity_fusion. |
+| Rust Module | Local Shader | Absorption Target | Status |
+|-------------|-------------|-------------------|--------|
+| ~~`diversity_fusion_gpu`~~ | ~~`diversity_fusion_f64.wgsl`~~ | ToadStool P2-5 | ✅ Absorbed by ToadStool S63. Local WGSL deleted. wetSpring leans on `barracuda::ops::bio::diversity_fusion`. |
 
-### Blocking Items for Full Lean
+**Tier C is empty — Full Lean ACHIEVED.** Zero local WGSL shaders remain.
 
-1. **`diversity_fusion_f64.wgsl` absorption** — the sole remaining local WGSL shader
-2. **`ComputeDispatch` migration** — P3, medium effort, replaces manual BGL setup
-3. **DF64 GEMM adoption** — P3, low effort, `Fp64Strategy::Hybrid` for consumer GPUs
-4. **`BandwidthTier` wiring** — P3, low effort, PCIe-aware dispatch in metalForge
+### Blocking Items for Sovereign Pipeline
+
+1. ~~**`diversity_fusion_f64.wgsl` absorption**~~ — ✅ Absorbed by ToadStool S63
+2. **`reconciliation_gpu` passthrough** — CPU kernel per family; needs `BatchReconcileGpu` for true GPU promotion
+3. **`ComputeDispatch` migration** — P3, medium effort, replaces manual BGL setup
+4. **DF64 GEMM adoption** — P3, low effort, `Fp64Strategy::Hybrid` for consumer GPUs
+5. **`BandwidthTier` wiring** — P3, low effort, PCIe-aware dispatch in metalForge
 
 ---
 

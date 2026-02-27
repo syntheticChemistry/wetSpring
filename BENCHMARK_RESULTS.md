@@ -1,7 +1,7 @@
 # wetSpring Benchmark Results
 
-**Date:** February 26, 2026
-**Status:** Phase 60 — Three-tier validation complete (Python → Rust CPU → GPU → metalForge → NPU) — 39/39 actionable papers full three-tier (52/52 total); 1,008 tests (882 barracuda lib + 60 integration + 19 doc + 47 forge), 96.67% llvm-cov, 4,748+ checks (1,578 GPU on RTX 4070, 60 NPU on AKD1000), 200 experiments, ToadStool S68 (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (fully lean), 86 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, V60 NPU live + field genomics architecture
+**Date:** February 27, 2026
+**Status:** Phase 62 — Comprehensive sweep GREEN (Python → Rust CPU → GPU → Pure GPU Streaming → metalForge → NPU) — 39/39 actionable papers full three-tier (52/52 total); 1,103 tests (977 barracuda lib + 60 integration + 19 doc + 47 forge), 95.46% line / 93.54% fn / 94.99% branch, 5,021+ checks (1,578 GPU on RTX 4070, 60 NPU on AKD1000), 209 experiments, ToadStool S68 (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (fully lean), 92 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, IPC dispatch GPU-aware (lazy `OnceLock<GpuF64>` + dispatch threshold routing), biomeOS IPC science primal (Exp203-205), three-tier IPC validation (Exp206-208), V61 nanopore signal bridge + pre-hardware (io::nanopore, Exp196a-c)
 
 ---
 
@@ -74,11 +74,10 @@ Tier 3: GPU (ToadStool/BarraCuda, math parity with CPU)
 
 | Suite | Count | Status |
 |-------|-------|--------|
-| Library + integration tests (CPU) | 752 | PASS (+ 1 ignored — hardware-dependent) |
-| Library + integration tests (GPU) | 759 | PASS (+ 9 ignored — hardware-dependent) |
+| Library + integration + IPC tests (CPU) | 977 | PASS (+ 1 ignored — hardware-dependent) |
 | metalForge forge tests | 47 | PASS |
-| **Total** | **1,008** | **PASS** |
-| Line coverage | 97% bio+io (56% overall) | Exceeds 90% target |
+| **Total** | **1,103** (977 + 60 integration + 19 doc + 47 forge) | **PASS** |
+| Line coverage | 95.46% line / 93.54% fn / 94.99% branch | Exceeds 90% target |
 
 ---
 
@@ -95,7 +94,11 @@ Tier 3: GPU (ToadStool/BarraCuda, math parity with CPU)
 | `validate_barracuda_cpu_v7` | 43 | Tier A layouts (v7) | PASS |
 | `validate_barracuda_cpu_v8` | 175 | 13 promoted GPU domains (v8) | PASS |
 | `validate_barracuda_cpu_full` | 50 | 25 consolidated (Exp070) | PASS |
-| **CPU parity total** | **380** (deduplicated across 31+ domains) | | **PASS** |
+| `validate_barracuda_cpu_v9` | 27 | Track 3 drug repurposing (v9, Exp163) | PASS |
+| `validate_barracuda_cpu_v10` | 75 | V59 science extensions (v10, Exp190) | PASS |
+| `validate_barracuda_cpu_v11` | 64 | IPC dispatch math fidelity (v11, Exp206) | PASS |
+| `validate_soil_qs_cpu_parity` | 49 | Track 4 soil QS pure Rust (Exp179) | PASS |
+| **CPU parity total** | **546** (deduplicated across 36+ domains) | | **PASS** |
 
 ---
 
@@ -125,7 +128,11 @@ Tier 3: GPU (ToadStool/BarraCuda, math parity with CPU)
 | `validate_pure_gpu_complete` | 52 | PASS |
 | `validate_metalforge_v5` | 58 | PASS |
 | `validate_barracuda_cpu_v8` | 175 | PASS |
-| **GPU total** | **1,578+** | **PASS** |
+| `validate_barracuda_gpu_v4` | 54 | PASS (Exp207: IPC GPU dispatch) |
+| `validate_soil_qs_gpu` | 23 | PASS (Exp180: Track 4 soil QS) |
+| `validate_gpu_v59_science` | 29 | PASS (Exp191: V59 science parity) |
+| `validate_metalforge_v7_mixed` | 75 | PASS (Exp208: NUCLEUS mixed hardware) |
+| **GPU total** | **1,759+** | **PASS** |
 
 ### GPU Performance
 
@@ -222,11 +229,11 @@ Head-to-head benchmark across all 25 BarraCuda CPU parity domains:
 
 | Metric | Value |
 |--------|-------|
-| Rust (release) total | ~79,984 µs |
-| Python total | ~1,798,608 µs |
-| **Overall Speedup** | **22.5×** |
+| Rust (release) total | ~51,358 µs |
+| Python total | ~1,713,242 µs |
+| **Overall Speedup** | **33.4×** |
 | Peak speedup | 625× (Smith-Waterman) |
-| ODE domains | 15–28× |
+| ODE domains | 15–29× |
 | Track 1c domains | 6–56× |
 
 Run with `cargo run --release --bin benchmark_23_domain_timing` and
@@ -364,21 +371,88 @@ matrix. CPU↔GPU parity proven for all compose and write modules.
 
 ---
 
+## Phase 62: Comprehensive Validation Sweep (Feb 27, 2026)
+
+Full pipeline chain validated green — Python baselines through metalForge cross-substrate:
+
+### Tier 1 → Tier 2: Python → BarraCuda CPU (Pure Rust Math)
+
+| Benchmark | Python (µs) | Rust CPU (µs) | Speedup |
+|-----------|-------------|---------------|---------|
+| 23-domain total | 1,713,242 | 51,358 | **33.4×** |
+| ODE integration (D01) | 461,002 | 8,283 | **56×** |
+| Gillespie SSA (D02) | 717,988 | 18,700 | **38×** |
+| Smith-Waterman (D04) | 7,500 | 12 | **625×** |
+| Phage defense (D11) | 172,884 | 8,357 | **21×** |
+
+Pure Rust, zero unsafe, zero dependencies. `cargo run --release --bin benchmark_23_domain_timing`.
+
+### Tier 2 → Tier 3: BarraCuda CPU → GPU (Math Portability)
+
+| Binary | Checks | Status | Wall-clock |
+|--------|--------|--------|------------|
+| `validate_barracuda_gpu_full` (Exp071) | 24/24 | PASS | 4.7s |
+| `validate_barracuda_gpu_v1` (Exp064) | 26/26 | PASS | 4.0s |
+| `validate_barracuda_gpu_v4` (Exp207) | 54/54 | PASS | 13.8s |
+| `validate_soil_qs_gpu` (Exp180) | 23/23 | PASS | 3.4s |
+| `validate_gpu_v59_science` (Exp191) | 29/29 | PASS | — |
+
+GPU dispatch threshold (via `GpuF64::dispatch_threshold()`) routes small workloads to CPU,
+large workloads to GPU. IPC layer adds zero numeric drift (Exp206: 64/64 EXACT_F64).
+
+### Tier 3 → Pure GPU: ToadStool Unidirectional Streaming
+
+| Binary | Checks | Status | Key Result |
+|--------|--------|--------|------------|
+| `validate_pure_gpu_streaming` (Exp090) | 80/80 | PASS | 441–837× vs round-trip |
+| `validate_pure_gpu_streaming_v2` (Exp105) | 27/27 | PASS | Multi-domain analytics |
+| `validate_streaming_ode_phylo` (Exp106) | 45/45 | PASS | ODE + phylo chained |
+| `validate_pure_gpu_complete` (Exp101) | 52/52 | PASS | 13 modules promoted |
+
+Streaming architecture: CPU → GPU → GPU → GPU → CPU (2 transfers vs 6 round-trip).
+`GpuPipelineSession` pre-warms pipelines, `execute_to_buffer()` keeps data on GPU.
+
+### Tier 4: metalForge Cross-Substrate (GPU → NPU → CPU)
+
+| Binary | Checks | Status | Substrates |
+|--------|--------|--------|------------|
+| `validate_metalforge_v5` (Exp103) | 52/52 | PASS | CPU↔GPU 29 domains |
+| `validate_metalforge_v6` (Exp104) | 24/24 | PASS | Three-tier complete |
+| `validate_metalforge_v7_mixed` (Exp208) | 75/75 | PASS | NUCLEUS atomics, PCIe bypass |
+| `validate_soil_qs_metalforge` (Exp182) | 14/14 | PASS | Track 4 cross-substrate |
+
+metalForge routes workloads via `Capability` matching: `F64Compute` → GPU, `QuantizedInference` → NPU,
+`ShaderDispatch` → GPU streaming. PCIe bypass topology modeled (NPU → GPU direct buffer transfer).
+
+### Cross-Spring Evolution Benchmarks
+
+| Binary | Checks | Status |
+|--------|--------|--------|
+| `benchmark_cross_spring_s68` (Exp189) | 28/28 | PASS |
+| `benchmark_cross_spring_s65` (Exp183) | 36/36 | PASS |
+| `benchmark_cross_spring_modern` (Exp169) | 20/20 | PASS |
+| `benchmark_modern_systems_df64` (Exp166) | 19/19 | PASS |
+| `benchmark_streaming_vs_roundtrip` (Exp091) | 2/2 | PASS |
+
+---
+
 ## Grand Total
 
 | Category | Checks | Status |
 |----------|--------|--------|
-| Rust CPU validation | 1,476 | PASS |
-| GPU validation | 1,578+ | PASS |
+| Rust CPU validation | 1,642 | PASS |
+| GPU validation | 1,759+ | PASS |
 | Dispatch + layout + transfer | 172 | PASS |
-| Rust tests | 1,008 (882 barracuda lib + 60 integration + 19 doc + 47 forge) | PASS |
+| IPC dispatch parity (CPU+GPU+metalForge) | 193 (Exp206-208) | PASS |
+| Pure GPU streaming | 152 (Exp090+101+105+106) | PASS |
+| Rust tests | 1,103 (977 barracuda lib + 60 integration + 19 doc + 47 forge) | PASS |
 | Python baselines | 44 scripts | PASS |
-| BarraCuda CPU parity | 380/380 (v1-v8: 31+ domains) | PASS |
+| BarraCuda CPU parity | 546/546 (v1-v11: 36+ domains) | PASS |
 | ToadStool primitives consumed | 79 primitives (barracuda always-on, zero fallback — S68) | PASS |
 | Local WGSL shaders | 0 (full lean — all GPU ops dispatch upstream) | PASS |
 | Compose GPU wrappers | 7 (kmd, merge_pairs, robinson_foulds, derep, NJ, reconciliation, molecular_clock) | PASS |
-| Passthrough GPU wrappers | 3 (gbm, feature_table, signal) | PASS |
-| **Grand total** | **3,300+ validation + 1,008 tests** | **ALL PASS** |
+| Passthrough GPU wrappers | 0 (all promoted — S66 lean cycle) | PASS |
+| **Grand total** | **5,021+ validation + 1,103 tests** | **ALL PASS** |
 
 ---
 
@@ -387,19 +461,36 @@ matrix. CPU↔GPU parity proven for all compose and write modules.
 ```bash
 cd barracuda
 
-# Tier 2: Rust CPU (1,476+ checks)
-cargo test                         # 1,008 tests (882 barracuda lib + 60 integration + 19 doc + 47 forge)
-cargo run --release --bin validate_qs_ode  # ... repeat for all CPU binaries
+# Unit tests (977 lib + 60 integration + 19 doc + 47 forge = 1,103)
+cargo test --features ipc
 
-# Tier 2b: BarraCuda CPU parity (380/380)
-cargo run --release --bin validate_barracuda_cpu_v8   # 175 checks (13 promoted domains)
+# Tier 2: BarraCuda CPU parity (546/546 across 36+ domains)
+cargo run --release --bin validate_barracuda_cpu_full          # 50 (Exp070)
+cargo run --release --bin validate_barracuda_cpu_v9            # 27 (Exp163)
+cargo run --release --bin validate_barracuda_cpu_v10           # 75 (Exp190)
+cargo run --features ipc --release --bin validate_barracuda_cpu_v11  # 64 (Exp206)
+cargo run --release --bin validate_soil_qs_cpu_parity          # 49 (Exp179)
 
-# Tier 3: GPU (1,578+ checks)
-cargo run --features gpu --bin validate_diversity_gpu          # 38
-cargo run --features gpu --bin validate_16s_pipeline_gpu       # 88
-cargo run --features gpu --bin validate_pure_gpu_complete      # 52 (13 promoted domains)
-cargo run --features gpu --bin validate_metalforge_v5          # 58 (29 cross-substrate domains)
+# Tier 3: GPU parity (1,759+ checks)
+cargo run --features gpu --release --bin validate_barracuda_gpu_full  # 24 (Exp071)
+cargo run --features gpu --release --bin validate_barracuda_gpu_v1   # 26 (Exp064)
+cargo run --features gpu,ipc --release --bin validate_barracuda_gpu_v4  # 54 (Exp207)
+cargo run --features gpu --release --bin validate_pure_gpu_complete   # 52 (Exp101)
 
-# Tier 1: Python
-cd ../scripts && python3 gillespie_baseline.py
+# Tier 3b: Pure GPU streaming
+cargo run --features gpu --release --bin validate_pure_gpu_streaming     # 80 (Exp090)
+cargo run --features gpu --release --bin validate_pure_gpu_streaming_v2  # 27 (Exp105)
+cargo run --features gpu --release --bin validate_streaming_ode_phylo    # 45 (Exp106)
+
+# Tier 4: metalForge cross-substrate
+cargo run --features gpu --release --bin validate_metalforge_v5         # 52 (Exp103)
+cargo run --features gpu,ipc --release --bin validate_metalforge_v7_mixed  # 75 (Exp208)
+
+# Benchmarks
+cargo run --release --bin benchmark_23_domain_timing           # Python→Rust CPU (33.4×)
+cargo run --features gpu,json --release --bin benchmark_three_tier  # Python→CPU→GPU
+cargo run --features gpu --release --bin benchmark_streaming_vs_roundtrip  # Streaming vs RT
+
+# Tier 1: Python baselines
+cd ../scripts && python3 benchmark_rust_vs_python.py && python3 benchmark_python_baseline.py
 ```

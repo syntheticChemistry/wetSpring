@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Date: 2026-02-20
+# Commit: 756df26
 """
 Anderson 2014 — Viral metagenomics at hydrothermal vents.
 
@@ -11,8 +12,8 @@ the new Rust `bio::dnds` module.
 Paper: Anderson et al. (2014) PLoS ONE 9:e109696
 DOI: 10.1371/journal.pone.0109696
 
-Usage:
-    python scripts/anderson2014_viral_metagenomics.py
+Reproduction:
+    python3 scripts/anderson2014_viral_metagenomics.py
 
 Requires: no external dependencies (pure Python + math)
 Python: 3.10+

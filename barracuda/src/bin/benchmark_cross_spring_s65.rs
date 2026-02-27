@@ -424,7 +424,9 @@ fn main() {
     v.section("§4 CPU Math: special::{dot,l2_norm} → stats::metrics (S64)");
 
     let vec_a: Vec<f64> = (0..1000).map(|i| f64::from(i) * 0.001).collect();
-    let vec_b: Vec<f64> = (0..1000).map(|i| 1.0 - f64::from(i) * 0.001).collect();
+    let vec_b: Vec<f64> = (0..1000)
+        .map(|i| f64::from(i).mul_add(-0.001, 1.0))
+        .collect();
 
     let (dot_local, dot_ms) = bench("special::dot (→ barracuda::stats::dot)", || {
         wetspring_barracuda::special::dot(&vec_a, &vec_b)

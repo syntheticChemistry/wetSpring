@@ -75,7 +75,7 @@ pub fn parse_reference_fasta(contents: &str) -> Vec<super::types::ReferenceSeq> 
             }
             let parts: Vec<&str> = header.splitn(2, |c: char| c.is_whitespace()).collect();
             current_id = parts[0].to_string();
-            current_tax = parts.get(1).unwrap_or(&"").to_string();
+            current_tax = parts.get(1).copied().unwrap_or_default().to_string();
             current_seq.clear();
         } else {
             current_seq.extend(

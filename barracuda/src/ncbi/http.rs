@@ -278,4 +278,46 @@ mod tests {
         assert_eq!(backend, Backend::Custom);
         assert_eq!(cmd, "myhttp --silent -L");
     }
+
+    #[test]
+    #[cfg(unix)]
+    fn interpret_output_failure_exit_code_none() {
+        use std::os::unix::process::ExitStatusExt;
+        let output = std::process::Output {
+            status: std::process::ExitStatus::from_raw(0x80),
+            stdout: vec![],
+            stderr: b"killed by signal".to_vec(),
+        };
+        let result = interpret_output(output, "curl");
+        let err = result.unwrap_err();
+        let msg = err.to_string();
+        assert!(msg.contains("curl"));
+        assert!(msg.contains("killed") || msg.contains("exit"));
+    }
+
+    #[test]
+    fn interpret_output_success_unicode_body() {
+        let output = std::process::Output {
+            status: std::process::Command::new("true").status().unwrap(),
+            stdout: "café résumé".as_bytes().to_vec(),
+            stderr: vec![],
+        };
+        let result = interpret_output(output, "cmd");
+        assert_eq!(result.unwrap(), "café résumé");
+    }
+
+    #[test]
+    fn select_backend_trimmed_custom() {
+        let (backend, cmd) = select_backend(Some("  curl  "), false, false).unwrap();
+        assert_eq!(backend, Backend::Custom);
+        assert!(!cmd.is_empty());
+    }
+
+    #[test]
+    fn select_backend_empty_after_trim_ignored() {
+        let result = select_backend(Some("   "), true, false);
+        assert!(result.is_some());
+        let (backend, _) = result.unwrap();
+        assert_eq!(backend, Backend::Curl);
+    }
 }

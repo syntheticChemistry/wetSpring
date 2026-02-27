@@ -280,6 +280,33 @@ pub const FINITE_SIZE_SCALING_REL: f64 = 0.08;
 /// Validated: Exp150 (8 realizations), Exp184b (16 realizations).
 pub const LEVEL_SPACING_STDERR_MAX: f64 = 0.015;
 
+/// 1D Anderson localization: weak-disorder ⟨r⟩ floor.
+///
+/// At W = 0.5 (weak disorder) on a 400-site 1D lattice, ⟨r⟩ should
+/// exceed this threshold, staying in the GOE-like regime. Below it,
+/// the system is already localized which contradicts 1D random-matrix
+/// expectations at weak disorder.
+/// Validated: Exp122 (`validate_anderson_2d_qs`, commit `756df26`, 2026-02-26).
+/// Physics: Atas et al. PRL 2013, GOE ⟨r⟩ ≈ 0.5307.
+pub const ANDERSON_1D_WEAK_DISORDER_FLOOR: f64 = 0.4;
+
+/// 2D Anderson localization: strong-disorder ⟨r⟩ ceiling.
+///
+/// At W = 15.0 (strong disorder) on a 20×20 2D lattice, ⟨r⟩ should
+/// stay below this threshold, confirming localization. Values above it
+/// at strong disorder would indicate a numerical or lattice artifact.
+/// Validated: Exp122 (`validate_anderson_2d_qs`, commit `756df26`, 2026-02-26).
+/// Physics: Atas et al. PRL 2013, Poisson ⟨r⟩ ≈ 0.3863.
+pub const ANDERSON_STRONG_DISORDER_CEILING: f64 = 0.45;
+
+/// 2D Anderson localization: weak-disorder ⟨r⟩ floor (stricter than 1D).
+///
+/// At W = 0.5 on a 20×20 2D lattice, extended states should yield
+/// ⟨r⟩ > 0.45 (closer to GOE). The 2D extended regime persists to
+/// higher disorder than 1D.
+/// Validated: Exp122 (`validate_anderson_2d_qs`, commit `756df26`, 2026-02-26).
+pub const ANDERSON_2D_WEAK_DISORDER_FLOOR: f64 = 0.45;
+
 /// Relative tolerance for near-zero ODE variables (GPU vs CPU).
 ///
 /// When ODE variables are near zero (repressed pathways, depleted species),
@@ -821,119 +848,59 @@ pub const SOIL_MODEL_APPROX: f64 = 0.1;
 /// Validated: Exp079 (`BarraCuda` CPU v6), `scripts/fernandez2020_bistable.py`.
 pub const ODE_BISTABLE_HIGH_B: f64 = 0.15;
 
+// ═══════════════════════════════════════════════════════════════════
+// Nanopore signal tolerances (field genomics, Exp196+)
+// ═══════════════════════════════════════════════════════════════════
+
+/// Nanopore signal round-trip tolerance (NRS wire format).
+///
+/// Signal written to NRS and read back must be bit-exact (i16 ↔ i16).
+/// Calibration values (f64 ↔ f64) must survive IEEE 754 round-trip.
+/// Tolerance of 0.0 enforces exact match.
+/// Validated: Exp196a (POD5 parser validation).
+pub const NANOPORE_SIGNAL_ROUNDTRIP: f64 = 0.0;
+
+/// Nanopore calibrated signal tolerance (pA conversion).
+///
+/// Affine calibration `pA = raw * scale + offset` introduces no error
+/// beyond f64 arithmetic (`mul_add` is fused). Machine precision suffices.
+/// Validated: Exp196a (calibration round-trip).
+pub const NANOPORE_CALIBRATION: f64 = 1e-12;
+
+/// Nanopore synthetic basecall accuracy threshold.
+///
+/// Threshold-based basecalling on synthetic signal with 200 samples per
+/// base and Gaussian noise (σ=10 ADC) achieves >87.5% per-base accuracy.
+/// This is a validation floor for the synthetic generator, not a claim
+/// about real nanopore basecalling accuracy.
+/// Validated: Exp196a (synthetic basecall round-trip).
+pub const NANOPORE_BASECALL_ACCURACY: f64 = 0.75;
+
+/// Nanopore signal statistics tolerance.
+///
+/// Mean and standard deviation of ADC signal (i16 → f64 summation)
+/// should be within machine precision of the reference calculation.
+/// Validated: Exp196a (signal statistics).
+pub const NANOPORE_SIGNAL_STATS: f64 = 1e-10;
+
+/// Nanopore int8 quantization fidelity threshold.
+///
+/// When quantizing nanopore-quality features to int8 for NPU inference,
+/// the classification agreement between f64 and int8 paths must exceed
+/// this threshold. 90% is conservative — real ESN classifiers on clean
+/// signal typically achieve >95%.
+/// Validated: Exp196c (int8 quantization from noisy reads).
+pub const NANOPORE_INT8_FIDELITY: f64 = 0.90;
+
+/// Nanopore simulated 16S pipeline diversity tolerance.
+///
+/// Shannon diversity computed from long-read (nanopore-length) 16S reads
+/// vs short-read (Illumina-length) reference. Nanopore's higher error
+/// rate (~5-10% per-read) inflates observed OTU counts slightly, but
+/// diversity metrics are robust. 0.3 covers the expected inflation.
+/// Validated: Exp196b (simulated long-read 16S).
+pub const NANOPORE_DIVERSITY_TOLERANCE: f64 = 0.3;
+
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    #[allow(clippy::assertions_on_constants)]
-    fn tolerance_hierarchy_is_monotonic() {
-        assert!(EXACT < EXACT_F64);
-        assert!(EXACT_F64 < ANALYTICAL_F64);
-        assert!(ANALYTICAL_F64 < PYTHON_PARITY);
-        assert!(PYTHON_PARITY <= ML_PREDICTION);
-        assert!(GPU_VS_CPU_TRANSCENDENTAL <= GPU_LOG_POLYFILL);
-        assert!(GPU_LOG_POLYFILL <= GPU_VS_CPU_F64);
-        assert!(GPU_VS_CPU_F64 <= GPU_VS_CPU_ENSEMBLE);
-    }
-
-    #[test]
-    fn all_tolerances_are_non_negative() {
-        let all = [
-            EXACT,
-            EXACT_F64,
-            ANALYTICAL_F64,
-            GC_CONTENT,
-            MEAN_QUALITY,
-            MZ_TOLERANCE,
-            SHANNON_SIMULATED,
-            SIMPSON_SIMULATED,
-            CHAO1_RANGE,
-            BRAY_CURTIS_SYMMETRY,
-            PYTHON_PARITY,
-            PYTHON_PARITY_TIGHT,
-            PYTHON_PVALUE,
-            ML_PREDICTION,
-            ANI_CROSS_SPECIES,
-            ML_F1_SCORE,
-            EVOLUTIONARY_DISTANCE,
-            SPECTRAL_COSINE,
-            HMM_FORWARD_PARITY,
-            DNDS_OMEGA_GUARD,
-            DADA2_ERR_CONVERGENCE,
-            ODE_CDG_CONVERGENCE,
-            ODE_STEADY_STATE,
-            ODE_METHOD_PARITY,
-            ODE_GPU_PARITY,
-            ODE_NEAR_ZERO,
-            ODE_GPU_SWEEP_ABS,
-            GPU_EIGENVALUE_REL,
-            GPU_LANCZOS_EIGENVALUE_ABS,
-            FINITE_SIZE_SCALING_REL,
-            LEVEL_SPACING_STDERR_MAX,
-            ODE_NEAR_ZERO_RELATIVE,
-            PHYLO_LIKELIHOOD,
-            JC69_PROBABILITY,
-            GILLESPIE_MEAN_REL,
-            GILLESPIE_FANO,
-            GILLESPIE_PYTHON_RANGE_REL,
-            GILLESPIE_FANO_PHYSICAL,
-            PPM_FACTOR,
-            ERF_PARITY,
-            NORM_CDF_PARITY,
-            NORM_CDF_TAIL,
-            KMD_GROUPING,
-            KMD_SPREAD,
-            MZ_FRAGMENT,
-            KMD_NON_HOMOLOGUE,
-            SPECTRAL_MZ_WINDOW,
-            PEAK_HEIGHT_REL,
-            RAREFACTION_MONOTONIC,
-            PCOA_EIGENVALUE_FLOOR,
-            JACOBI_CONVERGENCE,
-            JACOBI_ELEMENT_SKIP,
-            JACOBI_TAU_OVERFLOW,
-            MATRIX_EPS,
-            ESN_REGULARIZATION,
-            CHAO1_COUNT_HALFWIDTH,
-            BOX_MULLER_U1_FLOOR,
-            GAMMA_RIGHT_TAIL_OFFSET,
-            ODE_DIVISION_GUARD,
-            GAMMA_SERIES_CONVERGENCE,
-            GPU_VS_CPU_F64,
-            GPU_VS_CPU_TRANSCENDENTAL,
-            GPU_LOG_POLYFILL,
-            GPU_VS_CPU_BRAY_CURTIS,
-            GPU_VS_CPU_ENSEMBLE,
-            GPU_VS_CPU_HMM_BATCH,
-            GPU_F32_PARITY,
-            GPU_F32_SPATIAL,
-            ODE_DEFAULT_DT,
-            ODE_BIOFILM_SS,
-            BOOTSTRAP_LL_ENSEMBLE,
-            PHAGE_POPULATION_ABSOLUTE,
-            PHAGE_LARGE_POPULATION,
-            PHAGE_CRASH_FLOOR,
-            ODE_BISTABLE_LOW_B,
-            ODE_SIGNAL_SS,
-            HMM_INVARIANT_SLACK,
-            NPU_PASS_RATE_CEILING,
-            NPU_RECALL_FLOOR,
-            NPU_TOP1_FLOOR,
-            GEMM_COMPILE_TIMEOUT_MS,
-            GALAXY_SHANNON_RANGE,
-            GALAXY_SIMPSON_RANGE,
-            GALAXY_BRAY_CURTIS_RANGE,
-            ASARI_CROSS_MATCH_PCT,
-            ASARI_MZ_RANGE_PCT,
-            SEASONAL_OSCILLATION,
-            LANCZOS_VS_STURM,
-            CROSS_SPRING_NUMERICAL,
-            SOIL_MODEL_APPROX,
-            ODE_BISTABLE_HIGH_B,
-        ];
-        for tol in all {
-            assert!(tol >= 0.0, "tolerance {tol} must be non-negative");
-        }
-    }
-}
+#[path = "tolerances_tests.rs"]
+mod tests;

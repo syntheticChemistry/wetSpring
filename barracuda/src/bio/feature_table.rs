@@ -193,7 +193,7 @@ pub fn extract_features(spectra: &[MzmlSpectrum], params: &FeatureParams) -> Fea
     }
 
     // Sort features by m/z
-    features.sort_by(|a, b| a.mz.partial_cmp(&b.mz).unwrap_or(std::cmp::Ordering::Equal));
+    features.sort_by(|a, b| a.mz.total_cmp(&b.mz));
 
     FeatureTable {
         features,
@@ -216,7 +216,7 @@ fn estimate_noise(intensity: &[f64], peak_start: usize, peak_end: usize) -> f64 
         return 0.0;
     }
 
-    non_peak.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+    non_peak.sort_by(f64::total_cmp);
     non_peak[non_peak.len() / 2]
 }
 

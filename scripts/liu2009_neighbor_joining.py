@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Date: 2026-02-20
+# Commit: 756df26
 """
 Python baseline: Neighbor-Joining tree construction (Saitou & Nei 1987).
 
@@ -8,7 +9,7 @@ Core SATé primitive (Liu 2009) — builds a guide tree from a pairwise
 distance matrix. This is a pure Python implementation for BarraCUDA
 CPU validation (no dendropy/Biopython dependency).
 
-Usage:
+Reproduction:
     python3 scripts/liu2009_neighbor_joining.py
 
 Outputs JSON with tree topology and branch lengths for Rust comparison.

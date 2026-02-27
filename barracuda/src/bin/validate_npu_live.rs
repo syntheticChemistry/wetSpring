@@ -93,7 +93,7 @@ fn generate_qs_data(offset: usize, count: usize) -> (Vec<Vec<f64>>, Vec<usize>) 
         };
         let input: Vec<f64> = base
             .iter()
-            .map(|&b| b + (rng.next_f64() - 0.5) * 0.3)
+            .map(|&b| (rng.next_f64() - 0.5).mul_add(0.3, b))
             .collect();
         inputs.push(input);
         labels.push(class);
@@ -128,7 +128,7 @@ fn generate_bloom_data(offset: usize, count: usize) -> (Vec<Vec<f64>>, Vec<usize
             2 => (1.0, 0.3, 30.0, 0.20, 0.70, 28.0),
             _ => (2.0, 0.6, 80.0, 0.50, 0.30, 23.0),
         };
-        let mut n = |c: f64| c + (rng.next_f64() - 0.5) * c * 0.15;
+        let mut n = |c: f64| ((rng.next_f64() - 0.5) * c).mul_add(0.15, c);
         inputs.push(vec![
             n(shannon),
             n(simpson),
@@ -168,7 +168,7 @@ fn generate_disorder_data(offset: usize, count: usize) -> (Vec<Vec<f64>>, Vec<us
             1 => (2.5, 0.6, 100.0, 0.55, 8.0),
             _ => (1.2, 0.3, 30.0, 0.20, 20.0),
         };
-        let mut n = |c: f64| c + (rng.next_f64() - 0.5) * c * 0.2;
+        let mut n = |c: f64| ((rng.next_f64() - 0.5) * c).mul_add(0.2, c);
         inputs.push(vec![n(shannon), n(simpson), n(richness), n(evenness), n(w)]);
         labels.push(regime);
     }

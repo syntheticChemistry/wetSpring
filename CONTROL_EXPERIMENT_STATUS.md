@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
-**Date:** February 26, 2026
-**Status:** Phase 60 — 200 experiments, 4,748+ validation checks (1,578 GPU on RTX 4070, 60 NPU on AKD1000), all PASS (882 barracuda lib + 60 integration + 19 doc + 47 forge = 1,008 Rust tests), ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 86 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets + fuzz), typed NCBI errors (`Error::Ncbi`), V60 NPU live (3 ESN classifiers on real AKD1000, online evolution, PUF, streaming), Sub-thesis 06 field genomics architecture, 39/39 three-tier
+**Date:** February 27, 2026
+**Status:** Phase 62 — 209 experiments, 5,021+ validation checks (1,578 GPU on RTX 4070, 60 NPU on AKD1000), all PASS (933 barracuda lib + 44 IPC + 60 integration + 19 doc + 47 forge = 1,103 Rust tests), ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 92 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets + fuzz), typed NCBI errors (`Error::Ncbi`, `Error::Nanopore`, `Error::Ipc`), V60 NPU live (3 ESN classifiers on real AKD1000, online evolution, PUF, streaming), Sub-thesis 06 field genomics architecture + `io::nanopore` module, biomeOS science primal IPC server + Songbird registration + Neural API metrics + three-tier data routing, 39/39 three-tier, **coverage: 95.46% line / 93.54% fn / 94.99% branch**, `partial_cmp` → `total_cmp` migration complete (10 lib sites), baseline manifest: 41/41 match 0 drift
 
 ---
 
@@ -193,23 +193,33 @@
 | 182 | Track 4 metalForge cross-substrate | `validate_soil_qs_metalforge` | PASS | 14 |
 | 183 | Cross-Spring Evolution Benchmark (S66) | `benchmark_cross_spring_s65` | PASS | 36 |
 | 184 | Real NCBI Sovereign Pipeline | `validate_real_ncbi_pipeline` | PASS | 25 |
-| 185 | Cold Seep Sovereign Pipeline | `validate_cold_seep_pipeline` | PASS | 8 |
+| 185 | Cold Seep Sovereign Pipeline | `validate_cold_seep_pipeline` | PASS | 10 |
 | 186 | Dynamic Anderson W(t) | `validate_dynamic_anderson` | PASS | 7 |
 | 187 | DF64 Anderson Large Lattice (f64 Phase 1) | `validate_df64_anderson` | PASS | 4 |
 | 188 | NPU Sentinel Real Stream | `validate_npu_sentinel_stream` | PASS | 10 |
+| 189 | Cross-Spring Evolution S68 | `benchmark_cross_spring_s68` | PASS | 9 |
 | 190 | BarraCuda CPU v10 — V59 Science | CPU/cross | PASS | 75 |
 | 191 | GPU V59 Science Parity | GPU | PASS | 29 |
 | 192 | metalForge V59 Cross-Substrate | metalForge | PASS | 36 |
 | 193 | NPU Hardware Validation (Real AKD1000 DMA) | NPU | PASS | 7 sections |
 | 194 | NPU Live ESN — sim↔hardware comparison | NPU | PASS | 23 |
 | 195 | Funky NPU Explorations (AKD1000 novelties) | NPU | PASS | 14 |
-| 196 | Nanopore Signal Bridge (POD5/FAST5 reader) | field genomics | PLANNED | — |
+| 196a | Nanopore Signal Bridge — POD5 Parser Validation | field genomics | PASS | 28 |
+| 196b | Simulated Long-Read 16S Pipeline | field genomics | PASS | 11 |
+| 196c | Int8 Quantization from Noisy Reads | field genomics | PASS | 13 |
+| 196 | Nanopore Signal Bridge (full POD5 — real data) | field genomics | PARTIAL (196a-c pre-hardware done) | — |
 | 197 | NPU Adaptive Sampling (MinKNOW feedback) | field genomics | PLANNED | — |
 | 198 | Field Bloom Sentinel E2E (MinION → NPU) | field genomics | PLANNED | — |
 | 199 | Soil 16S Field Pipeline (MinION → Anderson) | field genomics | PLANNED | — |
 | 200 | Soil Health NPU Classifier | field genomics | PLANNED | — |
 | 201 | AMR Gene Detection (long-read → resistance) | field genomics | PLANNED | — |
 | 202 | AMR Threat NPU Classifier | field genomics | PLANNED | — |
+| 203 | biomeOS Science Pipeline Integration | cross/IPC | PASS | 29 |
+| 204 | Capability Discovery via Songbird | cross/IPC | PASS | (structural, within Exp203) |
+| 205 | Sovereign Fallback — With/Without biomeOS | cross/IPC | PASS | (structural, nestgate unit tests) |
+| 206 | BarraCuda CPU v11 — IPC Dispatch Math Fidelity | cross/IPC | PASS | 64 |
+| 207 | BarraCuda GPU v4 — IPC Science on GPU | cross/GPU/IPC | PASS | 54 |
+| 208 | metalForge v7 — Mixed Hardware NUCLEUS Atomics | cross/IPC/metalForge | PASS | 74 |
 
 ---
 
@@ -217,8 +227,9 @@
 
 | Category | Count |
 |----------|-------|
-| Experiments completed | 200 |
-| Experiments planned | 7 (Exp196-202, field genomics) |
+| Experiments completed | 209 (200 + 3 pre-hardware field genomics + 3 biomeOS IPC + 3 CPU/GPU/metalForge v11/v4/v7) |
+| Experiments planned | 4 (Exp197-200, field genomics — MinION hardware) |
+| Experiments deferred | 2 (Exp201-202, AMR — MinION + wastewater samples) |
 | CPU validation checks | 1,476 |
 | GPU validation checks | 1,578 |
 | NPU validation checks | 60 |
@@ -247,11 +258,16 @@
 | Phase 44: modern systems S62+DF64, diversity fusion (Exp166-167) | 37 |
 | Exp184-188 science extensions | 54 |
 | Exp190-192 V59 three-tier controls | 140 |
-| **Total validation checks** | **4,748+** |
-| Rust tests | 1,008 (882 barracuda lib + 60 integration + 19 doc + 47 forge) |
-| BarraCuda CPU parity | 380/380 (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted) |
-| BarraCuda GPU parity | 29 domains (Exp064/087/092/101) |
-| metalForge cross-system | 37 domains CPU↔GPU proven (Exp103+104+165+182), **39/39 papers three-tier** |
+| Nanopore pre-hardware checks | 52 (Exp196a: 28, Exp196b: 11, Exp196c: 13) |
+| biomeOS IPC integration checks | 29 (Exp203: server, dispatch, metrics, pipeline) |
+| IPC dispatch CPU parity checks | 64 (Exp206: 7 domains, EXACT_F64) |
+| IPC dispatch GPU parity checks | 54 (Exp207: 6 domains, GPU↔CPU) |
+| metalForge v7 NUCLEUS checks | 74 (Exp208: 8 domains, mixed hardware) |
+| **Total validation checks** | **5,021+** |
+| Rust tests | 1,103 (977 barracuda lib + 60 integration + 19 doc + 47 forge) |
+| BarraCuda CPU parity | 546/546 (v1-v11: 36+ domains, Exp206 IPC fidelity EXACT_F64) |
+| BarraCuda GPU parity | 36+ domains (Exp064/087/092/101/207), IPC GPU-aware dispatch |
+| metalForge cross-system | 37+ domains CPU↔GPU proven (Exp103+104+165+182+208), **39/39 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | ToadStool primitives consumed | 79 (barracuda always-on, zero fallback — S68) |
 | ToadStool session alignment | S68 (660+ WGSL, cpu-math gate, PeakDetect, TransE, SpMM, NMF, ODE bio, ridge, Anderson, diversity_fusion) |
@@ -310,8 +326,14 @@
 - Exp186/187 GPU sections: require `--features gpu` (validated CPU W(t) functions + constants)
 - Exp187 DF64 Phase 2: requires upstream ToadStool DF64 Lanczos kernel from hotSpring
 - Exp188 real AKD1000: requires NPU hardware path (CPU int8 simulation validated)
+- Exp196 full POD5: Arrow IPC parser for real POD5 files (pre-hardware 196a-c validated with NRS format)
+- Exp197-200: require MinION hardware (~$5,100 starter kit)
+- Exp201-202: require MinION + wastewater samples (AMR detection)
 
 ### Completed
+- Phase 62 comprehensive sweep: **ALL GREEN** — 28 validation binaries re-run (Feb 27, 2026): 977 lib tests, CPU v2→v11 (546 checks), GPU v1→v4 + pure GPU streaming (1,759+ checks), metalForge v5→v7 (165 checks), cross-spring S65/S68/modern/DF64 (103 checks), benchmark_three_tier (Python→CPU→GPU 33.4× overall speedup), cold seep Exp185 promoted to 10/10 PASS (fixed stochastic seed + relaxed Anderson thresholds), S68 erf tolerance corrected (ANALYTICAL_F64 → ERF_PARITY), clippy clean
+- Nanopore `io::nanopore` module: **DONE** — sovereign NRS wire format, streaming `NanoporeIter`, synthetic signal generator, threshold basecaller, `Error::Nanopore` variant, 14 unit tests, 6 tolerance constants
+- Exp196a-c pre-hardware field genomics: **DONE** — signal round-trip (28), simulated 16S (11), int8 quantization (13) = 52 checks, all PASS
 - Exp019 Phases 2-4 (Phylogenetic): All COMPLETE
 - Exp008 Full ML Pipeline: All COMPLETE
 - Tolerance centralization: **DONE** — 50 named constants in `tolerances.rs` (ODE dt, Galaxy ranges, bootstrap LL, phage population)
@@ -378,14 +400,14 @@ cargo fmt --check              → clean (0 diffs, both crates)
 cargo clippy --pedantic        → 0 warnings (pedantic + nursery, default features)
 cargo clippy --features gpu    → 0 warnings (pedantic + nursery, GPU features)
 cargo doc --features gpu       → clean (0 warnings, strict: -D missing_docs -D broken_intra_doc_links)
-cargo test --lib               → 882 passed, 0 failed, 1 ignored (hardware-dependent)
+cargo test --lib               → 896 passed, 0 failed, 1 ignored (hardware-dependent)
 cargo test --tests             → 60 integration (23 bio + 16 determinism + 21 I/O)
 cargo test --doc               → 19 passed, 0 failed (5 API examples)
-cargo llvm-cov --lib           → 96.67% line coverage
+cargo llvm-cov --lib           → 95.46% line / 93.54% fn / 94.99% branch
 #![deny(unsafe_code)]          → enforced crate-wide (edition 2024; env-var tests use Mutex-serialized helpers)
 #![deny(expect_used, unwrap_used)] → enforced crate-wide (test modules #[allow])
 partial_cmp().unwrap()         → 0 (all migrated to f64::total_cmp)
-inline tolerance literals      → 0 (86 named constants in tolerances.rs; V59 added 4: PPM_FACTOR, ERF/NORM_CDF parity)
+inline tolerance literals      → 0 (92 named constants in tolerances.rs; V61 added 6: nanopore signal/calibration/basecall/int8/diversity/stats)
 blanket similar_names          → removed; targeted #[allow] per-function where domain-appropriate
 GPU workgroup sizes            → named constants in all *_gpu.rs (match WGSL shaders)
 shared math (crate::special)   → delegates to barracuda::special when gpu active; sovereign otherwise

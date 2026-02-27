@@ -204,7 +204,7 @@ pub fn benjamini_hochberg(pvalues: &[f64]) -> Vec<f64> {
     }
 
     let mut indexed: Vec<(usize, f64)> = pvalues.iter().copied().enumerate().collect();
-    indexed.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal));
+    indexed.sort_by(|a, b| a.1.total_cmp(&b.1));
 
     let mut adjusted = vec![0.0; n];
     let mut cummin = f64::INFINITY;

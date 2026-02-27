@@ -154,7 +154,7 @@ pub fn interpolate_diversity(
         .interpolate(&known, targets, config.model)
         .map_err(|e| Error::Gpu(format!("kriging interpolation: {e}")))?;
 
-    Ok(from_kriging_result(&result))
+    Ok(from_kriging_result(result))
 }
 
 /// Interpolate with a known population mean (simple kriging).
@@ -195,7 +195,7 @@ pub fn interpolate_diversity_simple(
         .interpolate_simple(&known, targets, config.model, known_mean)
         .map_err(|e| Error::Gpu(format!("simple kriging: {e}")))?;
 
-    Ok(from_kriging_result(&result))
+    Ok(from_kriging_result(result))
 }
 
 /// Compute empirical variogram from observed spatial data.
@@ -229,10 +229,10 @@ pub fn empirical_variogram(
         .map_err(|e| Error::Gpu(format!("variogram fitting: {e}")))
 }
 
-/// Convert `ToadStool`'s `KrigingResult` to our domain type.
-fn from_kriging_result(result: &KrigingResult) -> SpatialResult {
+/// Convert `ToadStool`'s `KrigingResult` to our domain type (zero-copy).
+fn from_kriging_result(result: KrigingResult) -> SpatialResult {
     SpatialResult {
-        values: result.values.clone(),
-        variances: result.variances.clone(),
+        values: result.values,
+        variances: result.variances,
     }
 }

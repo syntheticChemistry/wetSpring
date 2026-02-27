@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-26 (Phase 60: 200 experiments, 4,748+ checks (1,578 GPU, 60 NPU on AKD1000), ToadStool S68 (`f0feb226`), 79 primitives consumed, barracuda always-on, 1,008 tests, 96.67% coverage, 86 named tolerances, clippy pedantic CLEAN, 0 Passthrough, V60 NPU live (Exp193-195), Sub-thesis 06 field genomics (Exp196-202 planned), 39/39 three-tier, 52/52 papers)
+**Updated**: 2026-02-27 (Phase 62: 209 experiments, 5,021+ checks (1,578 GPU, 60 NPU on AKD1000), ToadStool S68 (`f0feb226`), 79 primitives consumed, barracuda always-on, 1,103 tests, 95.46% line / 93.54% fn / 94.99% branch, 92 named tolerances, clippy pedantic CLEAN, 0 Passthrough, V61 `io::nanopore` module + Exp196a-c pre-hardware validation + V62 biomeOS IPC integration, 39/39 three-tier, 52/52 papers)
 
 ---
 
@@ -131,13 +131,22 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 193 | [NPU Hardware Validation](193_npu_hardware_validation.md) | NPU | DONE | Real AKD1000 DMA | validate_npu_hardware | 7 sections |
 | 194 | [NPU Live ESN](194_npu_live_esn.md) | NPU | DONE | Sim↔hardware ESN | validate_npu_live | 23 |
 | 195 | [Funky NPU Explorations](195_npu_funky_explorations.md) | NPU | DONE | AKD1000 novelties | validate_npu_funky | 14 |
-| 196 | Nanopore Signal Bridge | field genomics | PLANNED | POD5/FAST5 reader | — | — |
+| 196a | [Nanopore Signal Bridge](196a_nanopore_signal_bridge.md) | field genomics | DONE | POD5/NRS reader | io::nanopore, validate_nanopore_signal_bridge | 28 |
+| 196b | [Simulated 16S Pipeline](196b_simulated_16s_pipeline.md) | field genomics | DONE | Nanopore→16S | bio::dada2, bio::taxonomy, validate_nanopore_simulated_16s | 11 |
+| 196c | [NPU Int8 Quantization](196c_npu_int8_quantization.md) | field genomics | DONE | Community→NPU | bio::esn, validate_nanopore_int8_quantization | 13 |
+| 196 | Nanopore Signal Bridge (full POD5) | field genomics | PARTIAL (196a-c done) | Real POD5 data | — | — |
 | 197 | NPU Adaptive Sampling | field genomics | PLANNED | MinKNOW feedback | — | — |
 | 198 | Field Bloom Sentinel E2E | field genomics | PLANNED | MinION → NPU | — | — |
 | 199 | Soil 16S Field Pipeline | field genomics | PLANNED | MinION → Anderson | — | — |
 | 200 | Soil Health NPU Classifier | field genomics | PLANNED | NPU soil class | — | — |
 | 201 | AMR Gene Detection | field genomics | PLANNED | Long-read AMR | — | — |
 | 202 | AMR Threat NPU Classifier | field genomics | PLANNED | NPU AMR class | — | — |
+| 203 | [biomeOS Science Pipeline](203_biomeos_science_pipeline.md) | cross/IPC | DONE | wetspring-server | ipc::server, ipc::dispatch, ipc::protocol, ipc::metrics | 29 |
+| 204 | [Capability Discovery](204_capability_discovery.md) | cross/IPC | DONE | Songbird | ipc::songbird | (within 203) |
+| 205 | [Sovereign Fallback](205_sovereign_fallback.md) | cross/IPC | DONE | Three-tier routing | ncbi::nestgate | (within 203) |
+| 206 | [BarraCuda CPU v11](206_barracuda_cpu_v11_ipc_dispatch.md) | cross/IPC | DONE | Direct function calls | ipc::dispatch, bio::diversity, bio::qs_biofilm | 64 |
+| 207 | [BarraCuda GPU v4](207_barracuda_gpu_v4_ipc_science.md) | cross/GPU/IPC | DONE | CPU diversity/QS/Anderson | ipc::dispatch, ToadStool GPU primitives | 54 |
+| 208 | [metalForge v7](208_metalforge_v7_mixed_nucleus.md) | cross/IPC/metalForge | DONE | CPU direct calls | ipc::dispatch, forge routing model, NUCLEUS atomics | 74 |
 
 ---
 
@@ -313,10 +322,18 @@ thresholds from `src/tolerances.rs`.
 | `validate_soil_qs_gpu` | 180 | 23 | `cargo run --features gpu --release --bin validate_soil_qs_gpu` |
 | `validate_soil_qs_streaming` | 181 | 52 | `cargo run --features gpu --release --bin validate_soil_qs_streaming` |
 | `validate_soil_qs_metalforge` | 182 | 14 | `cargo run --features gpu --release --bin validate_soil_qs_metalforge` |
+| `validate_nanopore_signal_bridge` | 196a | 28 | `cargo run --release --bin validate_nanopore_signal_bridge` |
+| `validate_nanopore_simulated_16s` | 196b | 11 | `cargo run --release --bin validate_nanopore_simulated_16s` |
+| `validate_nanopore_int8_quantization` | 196c | 13 | `cargo run --release --bin validate_nanopore_int8_quantization` |
+| `validate_science_pipeline` | 203 | 29 | `cargo run --features ipc --bin validate_science_pipeline` |
+| `wetspring_server` | 203 | — | `cargo run --features ipc --bin wetspring_server` (biomeOS primal) |
+| `validate_barracuda_cpu_v11` | 206 | 64 | `cargo run --features ipc --release --bin validate_barracuda_cpu_v11` |
+| `validate_barracuda_gpu_v4` | 207 | 54 | `cargo run --features gpu,ipc --release --bin validate_barracuda_gpu_v4` |
+| `validate_metalforge_v7_mixed` | 208 | 74 | `cargo run --features ipc --release --bin validate_metalforge_v7_mixed` |
 
-**Total validation checks**: 4,748+
-**Rust tests**: 1,008 (882 barracuda lib + 60 integration + 19 doc + 47 forge)
-**Binaries**: 169 validate + 15 benchmark = 184 total
+**Total validation checks**: 5,021+
+**Rust tests**: 1,103 (933 barracuda lib + 44 IPC + 60 integration + 19 doc + 47 forge)
+**Binaries**: 178 validate + 15 benchmark + 1 server = 194 total
 **ToadStool primitives**: 79 consumed (barracuda always-on, zero fallback code — S68 `f0feb226`)
 **Papers**: 52 (25 Tracks 1-2 + 5 Track 3 + 9 Track 4 + 1 cross-spring + 9 extensions + 3 reference)
 **Local WGSL shaders**: 0 (all absorbed by ToadStool S63)

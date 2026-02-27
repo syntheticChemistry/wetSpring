@@ -26,6 +26,9 @@ gpu = ["barracuda/gpu", "dep:wgpu", "dep:tokio"]
 npu = ["dep:akida-driver"]
 # JSON model import (2 bins: validate_pfas_decision_tree, benchmark_three_tier).
 json = ["dep:serde_json"]
+# IPC server for biomeOS science primal (wetspring-server binary).
+# Adds JSON-RPC 2.0 over Unix socket, Songbird registration, Neural API metrics.
+ipc = ["json"]
 
 [dependencies]
 # serde_json: JSON parsing for validation data and model import (2 binaries).
@@ -1049,3 +1052,48 @@ required-features = ["npu"]
 name = "validate_npu_funky"
 path = "src/bin/validate_npu_funky.rs"
 required-features = ["npu"]
+
+# ── Exp196a: Nanopore Signal Bridge (POD5 parser) ──────
+[[bin]]
+name = "validate_nanopore_signal_bridge"
+path = "src/bin/validate_nanopore_signal_bridge.rs"
+
+# ── Exp196b: Simulated Long-Read 16S Pipeline ──────────
+[[bin]]
+name = "validate_nanopore_simulated_16s"
+path = "src/bin/validate_nanopore_simulated_16s.rs"
+
+# ── Exp196c: Int8 Quantization from Noisy Reads ────────
+[[bin]]
+name = "validate_nanopore_int8_quantization"
+path = "src/bin/validate_nanopore_int8_quantization.rs"
+
+# ── wetSpring IPC Server (biomeOS science primal) ──────
+[[bin]]
+name = "wetspring_server"
+path = "src/bin/wetspring_server.rs"
+required-features = ["ipc"]
+
+# ── Exp203: biomeOS Science Pipeline Validation ───────
+[[bin]]
+name = "validate_science_pipeline"
+path = "src/bin/validate_science_pipeline.rs"
+required-features = ["ipc"]
+
+# ── Exp206: BarraCuda CPU v11 — IPC Dispatch Math Fidelity ──
+[[bin]]
+name = "validate_barracuda_cpu_v11"
+path = "src/bin/validate_barracuda_cpu_v11.rs"
+required-features = ["ipc"]
+
+# ── Exp207: BarraCuda GPU v4 — IPC Science on GPU ──
+[[bin]]
+name = "validate_barracuda_gpu_v4"
+path = "src/bin/validate_barracuda_gpu_v4.rs"
+required-features = ["gpu", "ipc"]
+
+# ── Exp208: metalForge v7 — Mixed Hardware NUCLEUS Atomics ──
+[[bin]]
+name = "validate_metalforge_v7_mixed"
+path = "src/bin/validate_metalforge_v7_mixed.rs"
+required-features = ["ipc"]

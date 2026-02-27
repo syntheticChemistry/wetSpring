@@ -196,7 +196,7 @@ pub fn to_fasta_with_abundance(uniques: &[UniqueSequence]) -> String {
 #[allow(clippy::cast_precision_loss)] // abundance to f64 for diversity calculations
 pub fn abundance_vector(uniques: &[UniqueSequence]) -> Vec<f64> {
     let mut counts: Vec<f64> = uniques.iter().map(|u| u.abundance as f64).collect();
-    counts.sort_by(|a, b| b.partial_cmp(a).unwrap_or(std::cmp::Ordering::Equal));
+    counts.sort_by(|a, b| b.total_cmp(a));
     counts
 }
 

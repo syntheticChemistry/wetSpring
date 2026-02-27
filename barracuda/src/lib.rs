@@ -31,6 +31,9 @@
 //! # Track 2: PFAS Analytical Chemistry (LC-MS, PFAS screening)
 //! - [`io::mzml`] — mzML mass spectrometry data parser (streaming)
 //! - [`io::ms2`] — MS2 text format parser (streaming)
+//!
+//! # Field Genomics (Sub-thesis 06)
+//! - [`io::nanopore`] — Nanopore raw signal parser (POD5/NRS streaming)
 //! - [`bio::tolerance_search`] — ppm-tolerance m/z matching for suspect screening
 //! - [`bio::spectral_match`] — MS2 cosine similarity for library matching
 //! - [`bio::kmd`] — Kendrick mass defect analysis for PFAS homologue detection
@@ -75,6 +78,8 @@ pub mod error;
 pub mod gpu;
 pub mod io;
 pub mod ncbi;
+#[cfg(feature = "ipc")]
+pub mod ipc;
 #[cfg(feature = "npu")]
 pub mod npu;
 pub mod special;

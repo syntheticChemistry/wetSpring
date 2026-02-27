@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Date: 2026-02-20
+# Commit: 756df26
 """
 Moulana & Anderson 2020 — Sulfurovum pangenomics.
 
@@ -11,8 +12,8 @@ Paper: Moulana et al. (2020) mSystems 5:e00673-19
 DOI: 10.1128/mSystems.00673-19
 Data: PRJNA283159 + PRJEB5293
 
-Usage:
-    python scripts/moulana2020_pangenomics.py
+Reproduction:
+    python3 scripts/moulana2020_pangenomics.py
 
 Python: 3.10+
 Date: 2026-02-20

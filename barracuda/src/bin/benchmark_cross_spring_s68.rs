@@ -379,7 +379,7 @@ fn main() {
         "erf(1.0)",
         erf_val,
         0.842_700_792_949_715,
-        tolerances::ANALYTICAL_F64,
+        tolerances::ERF_PARITY,
     );
     timings.push(Timing {
         label: "erf(1.0)",

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Date: 2026-02-23
+# Commit: 756df26
 """Fetch NCBI data for Phase 35 experiments (Exp121-126).
 
 Queries NCBI Entrez for:

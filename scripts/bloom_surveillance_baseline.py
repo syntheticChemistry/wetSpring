@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Date: 2026-02-20
+# Commit: 756df26
 """Exp040 baseline — Bloom event detection and surveillance pipeline.
 
 Simulates cyanobacterial bloom surveillance pattern for PRJNA1224988

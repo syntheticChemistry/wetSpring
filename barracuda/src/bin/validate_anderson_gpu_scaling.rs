@@ -26,13 +26,14 @@
 //!
 //! # Provenance
 //!
-//! | Item        | Value |
-//! |-------------|-------|
-//! | Date        | 2026-02-26 |
-//! | Phase       | V55 — Science extensions |
-//! | GPU prims   | `anderson_3d`, `lanczos`, `level_spacing_ratio` |
-//! | Predecessor | Exp150 (L=6–12, 8 realizations) |
-//! | Literature  | Slevin & Ohtsuki, PRL 82 (1999); Rodriguez et al., PRB 84 (2011) |
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline commit | `756df26` |
+//! | Baseline tool | Exp150 (L=6–12), barracuda::spectral (`anderson_3d`, `lanczos`, `level_spacing_ratio`) |
+//! | Baseline date | 2026-02-27 |
+//! | Exact command | `cargo run --release --features gpu --bin validate_anderson_gpu_scaling` |
+//! | Data | Synthetic Anderson 3D lattices L=14–20 (N up to 8000) |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
@@ -205,7 +206,6 @@ fn main() {
             );
 
             println!("\n  Pairwise crossings:");
-            let mut crossings = Vec::new();
             for i in 0..all_results.len() {
                 for j in (i + 1)..all_results.len() {
                     if let Some(wc) = find_crossing(&all_results[i].sweep, &all_results[j].sweep) {
@@ -213,7 +213,6 @@ fn main() {
                             "    L={} × L={}: W_c = {wc:.2}",
                             all_results[i].l, all_results[j].l
                         );
-                        crossings.push(wc);
                     }
                 }
             }

@@ -1,8 +1,12 @@
 # Field Genomics Requirements — Sub-thesis 06 Systems
 
-**Last Updated:** February 26, 2026
+**Last Updated:** February 27, 2026
 **Purpose:** Define the systems, modules, and infrastructure needed to execute
 the field genomics research programs (Sub-thesis 06 / Gen3 Paper 09).
+
+> **V61 status:** `io::nanopore` is operational (POD5/NRS parser, streaming
+> iterator, synthetic read generation). Exp196a-c validate the complete
+> pre-hardware software path (52/52 PASS). See §1.1 for module details.
 
 ---
 
@@ -10,7 +14,7 @@ the field genomics research programs (Sub-thesis 06 / Gen3 Paper 09).
 
 ### 1.1 `io::nanopore` — Raw Signal Reader
 
-**Priority:** P0 (blocks all field genomics experiments)
+**Priority:** P0 — **DONE (V61)** — POD5/NRS parser operational, Exp196a (28/28 PASS)
 
 **What:** Read Oxford Nanopore raw signal files (FAST5 and POD5 formats) and
 expose them as streaming iterators for downstream processing.

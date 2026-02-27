@@ -176,7 +176,7 @@ fn main() {
             let mean_wc =
                 w_c_values.iter().map(|(_, wc)| wc).sum::<f64>() / w_c_values.len() as f64;
 
-            let nu_grid: Vec<f64> = (0..21).map(|i| 1.0 + f64::from(i) * 0.05).collect();
+            let nu_grid: Vec<f64> = (0..21).map(|i| f64::from(i).mul_add(0.05, 1.0)).collect();
             let mut best_nu = LITERATURE_NU;
             let mut best_cost = f64::MAX;
 

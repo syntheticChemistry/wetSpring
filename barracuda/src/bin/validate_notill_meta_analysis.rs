@@ -26,13 +26,14 @@
 //!
 //! # Provenance
 //!
-//! | Item | Value |
-//! |------|-------|
-//! | Date | 2026-02-25 |
-//! | Paper | Zuber & Villamil 2016, Soil Biol Biochem 97:176-187 |
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline commit | `756df26` |
+//! | Baseline tool | Zuber & Villamil 2016, Soil Biol Biochem 97:176-187 (meta-analysis) |
+//! | Baseline date | 2026-02-27 |
+//! | Exact command | `cargo run --release --bin validate_notill_meta_analysis` |
 //! | Data | Meta-analysis effect sizes from 62 studies (Table 1-3) |
-//! | Track | Track 4 — No-Till Soil QS & Anderson Geometry |
-//! | Command | `cargo test --bin validate_notill_meta_analysis -- --nocapture` |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;

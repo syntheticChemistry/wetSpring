@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Date: 2026-02-20
+# Commit: 756df26
 """
 Anderson 2017 — Population genomics at hydrothermal vents.
 
@@ -11,8 +12,8 @@ Paper: Anderson et al. (2017) Nature Communications 8:1114
 DOI: 10.1038/s41467-017-01228-6
 Data: PRJNA283159
 
-Usage:
-    python scripts/anderson2017_population_genomics.py
+Reproduction:
+    python3 scripts/anderson2017_population_genomics.py
 
 Python: 3.10+
 Date: 2026-02-20

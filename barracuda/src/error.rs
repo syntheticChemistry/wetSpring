@@ -37,6 +37,10 @@ pub enum Error {
     Ncbi(String),
     /// NPU compute error (discovery, model load, inference, DMA).
     Npu(String),
+    /// Nanopore raw signal parsing error (POD5/FAST5).
+    Nanopore(String),
+    /// IPC server/client protocol error (socket, JSON-RPC, dispatch).
+    Ipc(String),
 }
 
 /// Result type alias for wetSpring operations.
@@ -56,6 +60,8 @@ impl fmt::Display for Error {
             Self::InvalidInput(msg) => write!(f, "invalid input: {msg}"),
             Self::Ncbi(msg) => write!(f, "NCBI error: {msg}"),
             Self::Npu(msg) => write!(f, "NPU error: {msg}"),
+            Self::Nanopore(msg) => write!(f, "nanopore parse error: {msg}"),
+            Self::Ipc(msg) => write!(f, "IPC error: {msg}"),
         }
     }
 }
@@ -73,7 +79,9 @@ impl std::error::Error for Error {
             | Self::Gpu(_)
             | Self::InvalidInput(_)
             | Self::Ncbi(_)
-            | Self::Npu(_) => None,
+            | Self::Npu(_)
+            | Self::Nanopore(_)
+            | Self::Ipc(_) => None,
         }
     }
 }
@@ -120,6 +128,11 @@ mod tests {
             ),
             (Error::Ncbi("connection refused".into()), "NCBI error"),
             (Error::Npu("no device".into()), "NPU error"),
+            (
+                Error::Nanopore("truncated signal".into()),
+                "nanopore parse error",
+            ),
+            (Error::Ipc("socket refused".into()), "IPC error"),
         ];
         for (err, expected_prefix) in cases {
             let msg = err.to_string();
@@ -154,6 +167,8 @@ mod tests {
             Error::InvalidInput("x".into()),
             Error::Ncbi("x".into()),
             Error::Npu("x".into()),
+            Error::Nanopore("x".into()),
+            Error::Ipc("x".into()),
         ];
         for err in &variants {
             assert!(std::error::Error::source(err).is_none());

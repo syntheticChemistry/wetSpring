@@ -149,7 +149,7 @@ pub fn extract_features_gpu(
         }
     }
 
-    features.sort_by(|a, b| a.mz.partial_cmp(&b.mz).unwrap_or(std::cmp::Ordering::Equal));
+    features.sort_by(|a, b| a.mz.total_cmp(&b.mz));
 
     Ok(FeatureTable {
         features,
@@ -168,7 +168,7 @@ fn estimate_noise(intensity: &[f64]) -> f64 {
     if sorted.is_empty() {
         return 0.0;
     }
-    sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+    sorted.sort_by(f64::total_cmp);
     let quarter = sorted.len() / 4;
     let noise_slice = &sorted[..quarter.max(1)];
     noise_slice.iter().sum::<f64>() / noise_slice.len() as f64

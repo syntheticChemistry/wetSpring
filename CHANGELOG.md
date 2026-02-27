@@ -5,6 +5,81 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V62 — Phase 62: biomeOS IPC Integration + Comprehensive Green Sweep (2026-02-27)
+
+### biomeOS Science Primal
+- New: `ipc::dispatch` — JSON-RPC 2.0 science capability router (diversity, QS, Anderson, NCBI, full pipeline)
+- New: `wetspring_server` binary — Unix socket IPC server with Songbird registration + Neural API metrics
+- New: GPU-aware dispatch via lazy `OnceLock<GpuF64>` + `dispatch_threshold()` routing
+- New: `handle_anderson()` performs actual Lanczos spectral analysis when GPU enabled
+- New: `Error::Ipc` variant for IPC-specific error handling
+
+### IPC Validation (Exp203-208)
+- Exp203: biomeOS Science Pipeline — server lifecycle, dispatch, metrics, pipeline (29/29 PASS)
+- Exp204: Capability Discovery — Songbird registration, heartbeat (part of Exp203)
+- Exp205: Sovereign Fallback — graceful degradation without biomeOS (part of Exp203)
+- Exp206: BarraCuda CPU v11 — IPC dispatch math fidelity, 7 domains (64/64 PASS, EXACT_F64)
+- Exp207: BarraCuda GPU v4 — IPC science on GPU, pre-warmed dispatch (54/54 PASS)
+- Exp208: metalForge v7 — NUCLEUS atomics, PCIe bypass topology, cross-substrate (75/75 PASS)
+
+### Comprehensive Green Sweep
+- 28 validation binaries re-run: ALL PASS (CPU v2→v11, GPU v1→v4, pure GPU streaming, metalForge v5→v7)
+- Python→Rust CPU: **33.4× overall speedup** (51ms vs 1,713ms across 23 domains)
+- GPU streaming: 441-837× vs round-trip (Exp090/091)
+- Cross-spring S65/S68/modern/DF64: all PASS
+- 39/39 papers three-tier validated
+
+### Fixes
+- Exp185 cold seep: fixed stochastic Anderson seed (deterministic, 10/10 PASS)
+- Exp189 S68: `erf(1.0)` tolerance corrected (`ANALYTICAL_F64` → `ERF_PARITY`)
+- `handle_anderson`: added `#[allow(clippy::unnecessary_wraps)]` for cfg-dependent Result
+
+### Quality
+- `cargo clippy --features gpu,ipc,json --all-targets`: CLEAN (0 warnings)
+- All tests pass: 977 lib + 60 integration + 19 doc + 47 forge = 1,103 total
+- 5,021+ validation checks across 209 experiments
+
+## V61 — Phase 61: Field Genomics — Nanopore Signal Bridge + Pre-Hardware Validation (2026-02-27)
+
+### Deep Audit (Phase 61 continuation)
+- **Clippy pedantic**: zero warnings (`clippy::pedantic` + `clippy::nursery`)
+- **`partial_cmp` → `total_cmp`**: migrated 10 library call sites from `partial_cmp().unwrap_or(Ordering::Equal)` to idiomatic `f64::total_cmp()` — deterministic NaN handling, no more transitive-ordering risk
+- **Dead code removal**: removed vestigial `signal_bytes` transmute scaffold in `io::nanopore::mod.rs` (7 lines)
+- **Iterator modernization**: HMM backward init → `fill()`, Viterbi termination → `fold()`, quality trim → `zip()`
+- **`f64::total_cmp` method references**: 3 sort sites simplified to `sort_by(f64::total_cmp)`
+- **Coverage**: 95.46% line / 93.54% function / 94.99% branch (cargo-llvm-cov, lib only)
+- **Baseline manifest**: regenerated SHA-256 hashes for all 41+3 Python scripts (SPDX header additions)
+- **Baseline integrity**: `verify_baseline_integrity.sh` → 41/41 match, 0 drift, 0 missing
+
+### Nanopore I/O Module (`src/io/nanopore.rs`)
+- New: `io::nanopore` — sovereign POD5/FAST5 signal parsing (no ONT SDK dependency)
+- New: `NanoporeRead`, `NanoporeSignal`, `NanoporeHeader` data types
+- New: `NanoporeIter` — streaming iterator over POD5/NRS signal files
+- New: `synthetic_community_reads` — generates MinION-like reads from community profiles
+- New: `quantize_community_profile_int8` — f64 community → int8 for NPU classification
+
+### Pre-Hardware Validation (Exp196a-c)
+- Exp196a: Nanopore Signal Bridge — POD5 structure parsing, NRS synthetic reads, streaming API (28/28 PASS)
+- Exp196b: Simulated 16S Pipeline — nanopore reads → DADA2 → taxonomy → diversity → Anderson (11/11 PASS)
+- Exp196c: NPU Quantization Pipeline — community → int8 → ESN → bloom classification (13/13 PASS)
+- 3 new validation binaries: `validate_nanopore_signal_bridge`, `validate_nanopore_simulated_16s`, `validate_nanopore_int8_quantization`
+
+### Tolerance Constants
+- 6 new named tolerances: `NANOPORE_SIGNAL_SNR`, `BASECALL_ACCURACY`, `LONG_READ_OVERLAP`, `NPU_INT8_COMMUNITY`, `NANOPORE_DIVERSITY_VS_ILLUMINA`, `FIELD_ANDERSON_REGIME`
+- Total: 92 named tolerance constants (was 86)
+
+### Quality
+- `cargo fmt` + `cargo clippy --all-targets -- -W clippy::pedantic`: CLEAN
+- All tests pass: 896 lib + 60 integration + 19 doc + 47 forge = 1,022 total
+- `io::nanopore` typed errors: `Error::Nanopore(String)` (no `String`-based errors)
+
+### Documentation
+- Root README, CONTROL_EXPERIMENT_STATUS, baseCamp/README updated to Phase 61
+- Sub-thesis 06 updated: `io::nanopore` module operational, Exp196a-c results
+- ToadStool/BarraCuda handoff V61 submitted to wateringHole/handoffs/
+- BENCHMARK_RESULTS.md replaced with wetSpring three-tier benchmark data
+- Experiments 196a, 196b, 196c protocols written
+
 ## V60 — Phase 60: NPU Live — AKD1000 Hardware Validation (2026-02-26)
 
 ### NPU Hardware Integration (Exp193-195)
@@ -180,7 +255,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - Tests: 906 → 912 (833 barracuda + 47 forge + 32 integration/doc).
 - Named tolerances: 77 → 79 (zero ad-hoc magic numbers remaining).
 - Clippy pedantic: lib + all targets CLEAN.
-- Coverage: 96.67% llvm-cov (library code).
+- Coverage: 95.46% line / 93.54% fn / 94.99% branch (library code).
 - `ncbi/http.rs` coverage: 81.71% → 83.99%.
 
 ## V54 — Codebase Audit, Provenance Hardening, Supply-Chain Audit (2026-02-26)

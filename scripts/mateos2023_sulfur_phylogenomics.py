@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Date: 2026-02-20
+# Commit: 756df26
 """
 Mateos & Anderson 2023 — Sulfur-cycling enzyme phylogenomics.
 
@@ -11,8 +12,8 @@ Paper: Mateos et al. (2023) Science Advances 9:eade4847
 DOI: 10.1126/sciadv.ade4847
 Data: Figshare project 144267
 
-Usage:
-    python scripts/mateos2023_sulfur_phylogenomics.py
+Reproduction:
+    python3 scripts/mateos2023_sulfur_phylogenomics.py
 
 Requires: no external dependencies (pure Python)
 Python: 3.10+

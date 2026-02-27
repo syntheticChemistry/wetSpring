@@ -9,7 +9,11 @@
     clippy::cast_possible_wrap,
     clippy::cast_lossless,
     clippy::too_many_lines,
-    clippy::similar_names
+    clippy::similar_names,
+    clippy::suboptimal_flops,
+    clippy::doc_markdown,
+    clippy::redundant_clone,
+    clippy::missing_const_for_fn
 )]
 //! Exp195: Funky NPU Explorations — `AKD1000` Neuromorphic Novelties
 //!
@@ -668,12 +672,13 @@ fn eval_npu_fitness(
     for (input, &label) in test_inputs.iter().zip(test_labels.iter()) {
         esn.update(input);
         let state_i8 = quantize_state(esn.state());
-        let r = npu::npu_infer_i8(handle, &state_i8, n_out).unwrap_or(npu::NpuInferResult {
-            raw_i8: vec![0; n_out],
-            class: 0,
-            write_ns: 0,
-            read_ns: 0,
-        });
+        let r =
+            npu::npu_infer_i8(handle, &state_i8, n_out).unwrap_or_else(|_| npu::NpuInferResult {
+                raw_i8: vec![0; n_out],
+                class: 0,
+                write_ns: 0,
+                read_ns: 0,
+            });
         if r.class == label {
             correct += 1;
         }

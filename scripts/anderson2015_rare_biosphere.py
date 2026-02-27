@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Date: 2026-02-20
+# Commit: 756df26
 """
 Anderson 2015 — Rare biosphere at deep-sea hydrothermal vents.
 
@@ -13,8 +14,8 @@ Three synthetic communities:
   - Von Damm: moderate diversity (Campylobacteria-dominated)
   - Background seawater: high diversity, many rare lineages
 
-Usage:
-    python scripts/anderson2015_rare_biosphere.py
+Reproduction:
+    python3 scripts/anderson2015_rare_biosphere.py
 
 Requires: numpy (no external bioinformatics tools)
 Python: 3.10+

@@ -293,4 +293,26 @@ mod tests {
         let err = download_sra_run("ZZZZZZZZZ", dir.path()).unwrap_err();
         assert!(err.to_string().contains("unrecognized"));
     }
+
+    #[test]
+    fn download_sra_run_too_short() {
+        let dir = tempfile::tempdir().unwrap();
+        let err = download_sra_run("SRR12", dir.path()).unwrap_err();
+        assert!(err.to_string().contains("too short"));
+    }
+
+    #[test]
+    fn validate_accession_erx_drx_erp_drp() {
+        assert!(validate_accession("ERX123456").is_ok());
+        assert!(validate_accession("DRX654321").is_ok());
+        assert!(validate_accession("ERP111222").is_ok());
+        assert!(validate_accession("DRP999888").is_ok());
+    }
+
+    #[test]
+    fn output_filename_format() {
+        let accession = "SRR1234567";
+        let filename = format!("{accession}.fastq");
+        assert_eq!(filename, "SRR1234567.fastq");
+    }
 }

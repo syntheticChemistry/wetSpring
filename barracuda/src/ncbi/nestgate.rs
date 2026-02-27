@@ -9,22 +9,23 @@
 //! # Protocol
 //!
 //! JSON-RPC 2.0, newline-delimited, over Unix domain socket.
-//! Socket discovery:
-//! 1. `NESTGATE_SOCKET` env var
+//! Socket discovery (capability-based, no hardcoded paths):
+//! 1. `NESTGATE_SOCKET` env var (explicit override)
 //! 2. `$XDG_RUNTIME_DIR/biomeos/nestgate-default.sock`
-//! 3. `/tmp/nestgate-default.sock`
+//! 3. `<temp_dir>/nestgate-default.sock` (platform-agnostic fallback)
 //!
-//! # Evolution path
+//! # Data routing tiers
 //!
-//! | Phase | Strategy | Status |
-//! |-------|----------|--------|
-//! | Current | Optional `NestGate` provider, sovereign fallback | active |
-//! | Phase 2 | `biomeOS` Neural API routing (`capability.call`) | planned |
+//! | Tier | Strategy | When |
+//! |------|----------|------|
+//! | 1 | biomeOS Neural API `capability.call` | biomeOS orchestrator running |
+//! | 2 | Direct `NestGate` socket | Standalone + NestGate available |
+//! | 3 | Sovereign HTTP | No ecosystem services |
 
 use crate::error::Error;
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixStream;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(5);
@@ -40,10 +41,10 @@ pub fn is_enabled() -> bool {
 
 /// Discover the `NestGate` Unix socket path.
 ///
-/// Discovery order:
-/// 1. `NESTGATE_SOCKET` env var (explicit path)
+/// Capability-based discovery (no hardcoded absolute paths):
+/// 1. `NESTGATE_SOCKET` env var (explicit override)
 /// 2. `$XDG_RUNTIME_DIR/biomeos/nestgate-default.sock`
-/// 3. `/tmp/nestgate-default.sock`
+/// 3. `<temp_dir>/nestgate-default.sock` (platform-agnostic fallback)
 #[must_use]
 pub fn discover_socket() -> Option<PathBuf> {
     let explicit = std::env::var("NESTGATE_SOCKET").ok();
@@ -67,7 +68,7 @@ fn resolve_socket(explicit: Option<&str>, xdg_runtime: Option<&str>) -> Option<P
         }
     }
 
-    let fallback = PathBuf::from("/tmp/nestgate-default.sock");
+    let fallback = std::env::temp_dir().join("nestgate-default.sock");
     if fallback.exists() {
         return Some(fallback);
     }
@@ -80,7 +81,7 @@ fn resolve_socket(explicit: Option<&str>, xdg_runtime: Option<&str>) -> Option<P
 /// # Errors
 ///
 /// Returns `Err` if the socket is unavailable or the RPC fails.
-pub fn store(socket: &PathBuf, key: &str, value: &str) -> crate::error::Result<()> {
+pub fn store(socket: &Path, key: &str, value: &str) -> crate::error::Result<()> {
     let request = format!(
         r#"{{"jsonrpc":"2.0","method":"storage.store","params":{{"key":"{}","value":"{}","family_id":"{}"}},"id":1}}"#,
         escape_json(key),
@@ -101,7 +102,7 @@ pub fn store(socket: &PathBuf, key: &str, value: &str) -> crate::error::Result<(
 ///
 /// Returns `Err` if the socket is unavailable, the key does not exist,
 /// or the RPC fails.
-pub fn retrieve(socket: &PathBuf, key: &str) -> crate::error::Result<String> {
+pub fn retrieve(socket: &Path, key: &str) -> crate::error::Result<String> {
     let request = format!(
         r#"{{"jsonrpc":"2.0","method":"storage.retrieve","params":{{"key":"{}","family_id":"{}"}},"id":2}}"#,
         escape_json(key),
@@ -120,7 +121,7 @@ pub fn retrieve(socket: &PathBuf, key: &str) -> crate::error::Result<String> {
 /// # Errors
 ///
 /// Returns `Err` if the socket is unavailable or the RPC fails.
-pub fn exists(socket: &PathBuf, key: &str) -> crate::error::Result<bool> {
+pub fn exists(socket: &Path, key: &str) -> crate::error::Result<bool> {
     let request = format!(
         r#"{{"jsonrpc":"2.0","method":"storage.exists","params":{{"key":"{}","family_id":"{}"}},"id":3}}"#,
         escape_json(key),
@@ -135,7 +136,7 @@ pub fn exists(socket: &PathBuf, key: &str) -> crate::error::Result<bool> {
 /// # Errors
 ///
 /// Returns `Err` if the socket is unavailable or the health check fails.
-pub fn health(socket: &PathBuf) -> crate::error::Result<()> {
+pub fn health(socket: &Path) -> crate::error::Result<()> {
     let request = r#"{"jsonrpc":"2.0","method":"health","params":{},"id":0}"#;
     let response = rpc_call(socket, request)?;
     if response.contains("\"error\"") {
@@ -143,6 +144,113 @@ pub fn health(socket: &PathBuf) -> crate::error::Result<()> {
     } else {
         Ok(())
     }
+}
+
+/// Discover the biomeOS Neural API socket for capability-based routing.
+///
+/// 1. `BIOMEOS_SOCKET` env var (explicit override)
+/// 2. `$XDG_RUNTIME_DIR/biomeos/biomeos-default.sock`
+/// 3. `<temp_dir>/biomeos-default.sock`
+#[must_use]
+pub fn discover_biomeos_socket() -> Option<PathBuf> {
+    let explicit = std::env::var("BIOMEOS_SOCKET").ok();
+    let xdg = std::env::var("XDG_RUNTIME_DIR").ok();
+    resolve_biomeos_socket(explicit.as_deref(), xdg.as_deref())
+}
+
+/// Pure-logic biomeOS socket path resolution.
+fn resolve_biomeos_socket(explicit: Option<&str>, xdg_runtime: Option<&str>) -> Option<PathBuf> {
+    if let Some(path) = explicit {
+        let p = PathBuf::from(path);
+        if p.exists() {
+            return Some(p);
+        }
+    }
+
+    if let Some(xdg) = xdg_runtime {
+        let p = PathBuf::from(xdg).join("biomeos/biomeos-default.sock");
+        if p.exists() {
+            return Some(p);
+        }
+    }
+
+    let fallback = std::env::temp_dir().join("biomeos-default.sock");
+    if fallback.exists() {
+        return Some(fallback);
+    }
+
+    None
+}
+
+/// Route an NCBI fetch through biomeOS Neural API `capability.call`.
+///
+/// Sends `capability.call("science.ncbi_fetch", ...)` to the biomeOS
+/// orchestrator, which routes it to `NestGate` or the registered provider.
+///
+/// # Errors
+///
+/// Returns `Err` if biomeOS is unreachable or the capability call fails.
+pub fn fetch_via_biomeos(
+    biomeos_socket: &Path,
+    db: &str,
+    id: &str,
+    api_key: &str,
+) -> crate::error::Result<String> {
+    let request = format!(
+        r#"{{"jsonrpc":"2.0","method":"capability.call","params":{{"capability":"science.ncbi_fetch","params":{{"db":"{}","id":"{}","api_key":"{}"}}}},"id":1}}"#,
+        escape_json(db),
+        escape_json(id),
+        escape_json(api_key),
+    );
+    let response = rpc_call(biomeos_socket, &request)?;
+    if response.contains("\"error\"") {
+        Err(Error::Ncbi(format!(
+            "biomeOS capability.call failed: {}",
+            extract_error(&response)
+        )))
+    } else {
+        extract_fasta_from_response(&response)
+    }
+}
+
+/// Fetch FASTA using the three-tier routing strategy.
+///
+/// 1. **biomeOS**: If biomeOS Neural API is available, use `capability.call`
+/// 2. **`NestGate`**: If direct `NestGate` socket is available, use cache + fetch
+/// 3. **Sovereign**: Fall back to direct NCBI HTTP
+///
+/// # Errors
+///
+/// Returns `Err` if all three tiers fail.
+pub fn fetch_tiered(
+    db: &str,
+    id: &str,
+    api_key: &str,
+) -> crate::error::Result<String> {
+    // Tier 1: biomeOS Neural API routing
+    if let Some(biomeos_socket) = discover_biomeos_socket() {
+        match fetch_via_biomeos(&biomeos_socket, db, id, api_key) {
+            Ok(fasta) => return Ok(fasta),
+            Err(e) => {
+                eprintln!("[nestgate] biomeOS routing failed, falling back: {e}");
+            }
+        }
+    }
+
+    // Tier 2: Direct NestGate socket
+    if is_enabled() {
+        if let Some(nestgate_socket) = discover_socket() {
+            match fetch_or_fallback(&nestgate_socket, db, id, api_key) {
+                Ok(fasta) => return Ok(fasta),
+                Err(e) => {
+                    eprintln!("[nestgate] NestGate failed, falling back to sovereign: {e}");
+                }
+            }
+        }
+    }
+
+    // Tier 3: Sovereign HTTP
+    super::efetch::efetch_fasta(db, id, api_key)
 }
 
 /// Fetch FASTA from NCBI via `NestGate`, caching in `NestGate`'s storage.
@@ -154,7 +262,7 @@ pub fn health(socket: &PathBuf) -> crate::error::Result<()> {
 ///
 /// Returns `Err` if both `NestGate` retrieval and sovereign fallback fail.
 pub fn fetch_or_fallback(
-    socket: &PathBuf,
+    socket: &Path,
     db: &str,
     id: &str,
     api_key: &str,
@@ -175,7 +283,7 @@ pub fn fetch_or_fallback(
 }
 
 /// Send a JSON-RPC request over a Unix socket and read the response.
-fn rpc_call(socket: &PathBuf, request: &str) -> crate::error::Result<String> {
+fn rpc_call(socket: &Path, request: &str) -> crate::error::Result<String> {
     let stream = UnixStream::connect_addr(
         &std::os::unix::net::SocketAddr::from_pathname(socket)
             .map_err(|e| Error::Ncbi(format!("invalid socket path: {e}")))?,
@@ -239,6 +347,25 @@ fn extract_error(response: &str) -> String {
         "NestGate RPC error: {}",
         &response[..response.len().min(200)]
     )
+}
+
+/// Extract a FASTA string from a biomeOS capability.call response.
+///
+/// Handles both `{"result":{"fasta":">seq..."}}` and bare `{"result":">seq..."}`.
+fn extract_fasta_from_response(response: &str) -> crate::error::Result<String> {
+    if let Some(start) = response.find("\"fasta\"") {
+        if let Some(colon) = response[start..].find(':') {
+            let after = &response[start + colon + 1..];
+            let trimmed = after.trim_start();
+            if let Some(inner) = trimmed.strip_prefix('"') {
+                if let Some(end) = inner.find('"') {
+                    let raw = &inner[..end];
+                    return Ok(raw.replace("\\n", "\n").replace("\\\"", "\""));
+                }
+            }
+        }
+    }
+    extract_result_value(response)
 }
 
 /// Extract the `result.value` or `result` string from a JSON-RPC response.
@@ -313,6 +440,40 @@ mod tests {
     }
 
     #[test]
+    fn resolve_socket_xdg_nonexistent() {
+        let dir = tempfile::tempdir().unwrap();
+        let xdg = dir.path().join("nonexistent_xdg");
+        let result = resolve_socket(None, Some(xdg.to_str().unwrap()));
+        assert!(result.is_none() || result.is_some_and(|p| p.exists()));
+    }
+
+    #[test]
+    fn resolve_socket_explicit_overrides_xdg() {
+        let dir = tempfile::tempdir().unwrap();
+        let explicit_sock = dir.path().join("explicit.sock");
+        std::fs::write(&explicit_sock, "").unwrap();
+        let xdg_dir = tempfile::tempdir().unwrap();
+        let biomeos = xdg_dir.path().join("biomeos");
+        std::fs::create_dir_all(&biomeos).unwrap();
+        let xdg_sock = biomeos.join("nestgate-default.sock");
+        std::fs::write(&xdg_sock, "").unwrap();
+        let result = resolve_socket(
+            Some(explicit_sock.to_str().unwrap()),
+            Some(xdg_dir.path().to_str().unwrap()),
+        );
+        assert_eq!(result, Some(explicit_sock));
+    }
+
+    #[test]
+    fn resolve_socket_temp_fallback() {
+        let dir = tempfile::tempdir().unwrap();
+        let sock = dir.path().join("nestgate-default.sock");
+        std::fs::write(&sock, "").unwrap();
+        let result = resolve_socket(None, Some("/nonexistent_xdg_path_12345"));
+        assert!(result.is_none() || result.is_some_and(|p| p.exists()));
+    }
+
+    #[test]
     fn escape_json_special_chars() {
         assert_eq!(escape_json("hello\nworld"), "hello\\nworld");
         assert_eq!(escape_json("say \"hi\""), "say \\\"hi\\\"");
@@ -345,6 +506,19 @@ mod tests {
     }
 
     #[test]
+    fn extract_error_truncates_long_response() {
+        let response = format!(r#"{{"jsonrpc":"2.0","error":{{"code":-1,"message":"x"}},"id":1}}{}"#, "y".repeat(500));
+        let err = extract_error(&response);
+        assert!(err.contains('x'));
+    }
+
+    #[test]
+    fn extract_error_empty_response() {
+        let err = extract_error("");
+        assert!(err.contains("RPC error"));
+    }
+
+    #[test]
     fn extract_result_value_string() {
         let response = r#"{"jsonrpc":"2.0","result":">seq1\nATCG","id":1}"#;
         let val = extract_result_value(response).unwrap();
@@ -358,14 +532,163 @@ mod tests {
     }
 
     #[test]
+    fn extract_result_value_escaped_newline() {
+        let response = r#"{"jsonrpc":"2.0","result":">seq1\nATCG\n","id":1}"#;
+        let val = extract_result_value(response).unwrap();
+        assert_eq!(val, ">seq1\nATCG\n");
+    }
+
+    #[test]
+    fn extract_result_value_escaped_quote() {
+        let response = r#"{"jsonrpc":"2.0","result":"say \"hi\"","id":1}"#;
+        let val = extract_result_value(response).unwrap();
+        assert!(val.contains("say"));
+    }
+
+    #[test]
+    fn extract_result_value_nested_object() {
+        let response = r#"{"jsonrpc":"2.0","result":{"value":"cached"},"id":1}"#;
+        let val = extract_result_value(response).unwrap();
+        assert!(val.contains("value") && val.contains("cached"));
+    }
+
+    #[test]
+    fn store_request_format() {
+        let key = "ncbi:nucleotide:K03455";
+        let value = ">seq\nATCG";
+        let request = format!(
+            r#"{{"jsonrpc":"2.0","method":"storage.store","params":{{"key":"{}","value":"{}","family_id":"{}"}},"id":1}}"#,
+            escape_json(key),
+            escape_json(value),
+            FAMILY_ID,
+        );
+        assert!(request.contains("storage.store"));
+        assert!(request.contains("ncbi:nucleotide:K03455"));
+        assert!(request.contains(">seq\\nATCG"));
+    }
+
+    #[test]
+    fn retrieve_request_format() {
+        let key = "test_key";
+        let request = format!(
+            r#"{{"jsonrpc":"2.0","method":"storage.retrieve","params":{{"key":"{}","family_id":"{}"}},"id":2}}"#,
+            escape_json(key),
+            FAMILY_ID,
+        );
+        assert!(request.contains("storage.retrieve"));
+        assert!(request.contains("test_key"));
+    }
+
+    #[test]
+    fn exists_request_format() {
+        let request = format!(
+            r#"{{"jsonrpc":"2.0","method":"storage.exists","params":{{"key":"{}","family_id":"{}"}},"id":3}}"#,
+            escape_json("key"),
+            FAMILY_ID,
+        );
+        assert!(request.contains("storage.exists"));
+    }
+
+    #[test]
+    fn health_request_format() {
+        let request = r#"{"jsonrpc":"2.0","method":"health","params":{},"id":0}"#;
+        assert!(request.contains("health"));
+    }
+
+    #[test]
     fn discover_socket_does_not_panic() {
         let _ = discover_socket();
+    }
+
+    #[test]
+    fn discover_biomeos_socket_does_not_panic() {
+        let _ = discover_biomeos_socket();
+    }
+
+    #[test]
+    fn resolve_biomeos_socket_explicit() {
+        let dir = tempfile::tempdir().unwrap();
+        let sock = dir.path().join("biomeos.sock");
+        std::fs::write(&sock, "").unwrap();
+        let result = resolve_biomeos_socket(Some(sock.to_str().unwrap()), None);
+        assert_eq!(result, Some(sock));
+    }
+
+    #[test]
+    fn resolve_biomeos_socket_xdg() {
+        let dir = tempfile::tempdir().unwrap();
+        let biomeos_dir = dir.path().join("biomeos");
+        std::fs::create_dir_all(&biomeos_dir).unwrap();
+        let sock = biomeos_dir.join("biomeos-default.sock");
+        std::fs::write(&sock, "").unwrap();
+        let result = resolve_biomeos_socket(None, Some(dir.path().to_str().unwrap()));
+        assert_eq!(result, Some(sock));
+    }
+
+    #[test]
+    fn resolve_biomeos_socket_none() {
+        let result = resolve_biomeos_socket(None, None);
+        assert!(result.is_none() || result.is_some_and(|p| p.exists()));
+    }
+
+    #[test]
+    fn fetch_via_biomeos_nonexistent_socket() {
+        let path = PathBuf::from("/tmp/wetspring_test_no_biomeos.sock");
+        let err = fetch_via_biomeos(&path, "nucleotide", "K03455", "").unwrap_err();
+        let msg = err.to_string();
+        assert!(msg.contains("NestGate connect") || msg.contains("invalid socket"));
+    }
+
+    #[test]
+    fn extract_fasta_from_response_with_fasta_key() {
+        let resp = r#"{"jsonrpc":"2.0","result":{"fasta":">seq1\nATCG"},"id":1}"#;
+        let fasta = extract_fasta_from_response(resp).unwrap();
+        assert!(fasta.contains(">seq1"));
+    }
+
+    #[test]
+    fn extract_fasta_from_response_bare_result() {
+        let resp = r#"{"jsonrpc":"2.0","result":">seq2\nGCTA","id":1}"#;
+        let fasta = extract_fasta_from_response(resp).unwrap();
+        assert!(fasta.contains(">seq2"));
     }
 
     #[test]
     fn health_nonexistent_socket_errors() {
         let path = PathBuf::from("/tmp/wetspring_test_nonexistent_nestgate.sock");
         let err = health(&path).unwrap_err();
+        let msg = err.to_string();
+        assert!(msg.contains("NestGate connect") || msg.contains("invalid socket"));
+    }
+
+    #[test]
+    fn invalid_socket_path_too_long() {
+        let path = PathBuf::from("/tmp/".to_string() + &"a".repeat(200));
+        let err = health(&path).unwrap_err();
+        let msg = err.to_string();
+        assert!(msg.contains("invalid socket") || msg.contains("NestGate connect"));
+    }
+
+    #[test]
+    fn store_nonexistent_socket_errors() {
+        let path = PathBuf::from("/tmp/wetspring_test_nonexistent_store.sock");
+        let err = store(&path, "key", "value").unwrap_err();
+        let msg = err.to_string();
+        assert!(msg.contains("NestGate connect") || msg.contains("invalid socket"));
+    }
+
+    #[test]
+    fn retrieve_nonexistent_socket_errors() {
+        let path = PathBuf::from("/tmp/wetspring_test_nonexistent_retrieve.sock");
+        let err = retrieve(&path, "key").unwrap_err();
+        let msg = err.to_string();
+        assert!(msg.contains("NestGate connect") || msg.contains("invalid socket"));
+    }
+
+    #[test]
+    fn exists_nonexistent_socket_errors() {
+        let path = PathBuf::from("/tmp/wetspring_test_nonexistent_exists.sock");
+        let err = exists(&path, "key").unwrap_err();
         let msg = err.to_string();
         assert!(msg.contains("NestGate connect") || msg.contains("invalid socket"));
     }

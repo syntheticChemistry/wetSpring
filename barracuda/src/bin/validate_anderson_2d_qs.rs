@@ -15,16 +15,18 @@
 //!
 //! # Provenance
 //!
-//! | Item        | Value |
-//! |-------------|-------|
-//! | Date        | 2026-02-23 |
-//! | GPU prims   | `anderson_2d`, `lanczos`, `level_spacing_ratio` |
-//! | Baseline    | `barracuda::spectral` CPU eigensolvers (inline reference) |
-//! | Physics     | GOE `⟨r⟩ ≈ 0.5307`, Poisson `⟨r⟩ ≈ 0.3863` (Atas et al. PRL 2013) |
-//! | Thresholds  | 0.4/0.45 bracket the GOE↔Poisson crossover; see §S1/S2 |
-//! | Command     | `cargo run --features gpu --bin validate_anderson_2d_qs` |
+//! | Item           | Value |
+//! |----------------|-------|
+//! | Date           | 2026-02-26 |
+//! | Commit         | `756df26` |
+//! | GPU prims      | `anderson_2d`, `lanczos`, `level_spacing_ratio` |
+//! | Baseline       | `barracuda::spectral` CPU eigensolvers (inline reference) |
+//! | Physics        | GOE `⟨r⟩ ≈ 0.5307`, Poisson `⟨r⟩ ≈ 0.3863` (Atas et al. PRL 2013) |
+//! | Thresholds     | `tolerances::ANDERSON_*` — bracket the GOE↔Poisson crossover |
+//! | Command        | `cargo run --features gpu --bin validate_anderson_2d_qs` |
 
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 #[cfg(feature = "gpu")]
@@ -72,8 +74,14 @@ fn main() {
         let first_1d = sweep_1d.first().map_or(0.0, |(_, r)| *r);
         let last_1d = sweep_1d.last().map_or(0.0, |(_, r)| *r);
         v.check_count("1D sweep points", sweep_1d.len(), N_DISORDER_POINTS);
-        v.check_pass("1D first point ⟨r⟩ > 0.4 (weak disorder)", first_1d > 0.4);
-        v.check_pass("1D last point ⟨r⟩ < 0.45 (strong disorder)", last_1d < 0.45);
+        v.check_pass(
+            "1D first point ⟨r⟩ > ANDERSON_1D_WEAK_DISORDER_FLOOR",
+            first_1d > tolerances::ANDERSON_1D_WEAK_DISORDER_FLOOR,
+        );
+        v.check_pass(
+            "1D last point ⟨r⟩ < ANDERSON_STRONG_DISORDER_CEILING",
+            last_1d < tolerances::ANDERSON_STRONG_DISORDER_CEILING,
+        );
         v.check_pass("1D ⟨r⟩ decreases with W", first_1d > last_1d);
         println!("  1D sweep: W=[0.5..15], first ⟨r⟩={first_1d:.4}, last ⟨r⟩={last_1d:.4}");
 
@@ -90,8 +98,14 @@ fn main() {
         let first_2d = sweep_2d.first().map_or(0.0, |(_, r)| *r);
         let last_2d = sweep_2d.last().map_or(0.0, |(_, r)| *r);
         v.check_count("2D sweep points", sweep_2d.len(), N_DISORDER_POINTS);
-        v.check_pass("2D first point ⟨r⟩ > 0.45 (weak disorder)", first_2d > 0.45);
-        v.check_pass("2D last point ⟨r⟩ < 0.45 (strong disorder)", last_2d < 0.45);
+        v.check_pass(
+            "2D first point ⟨r⟩ > ANDERSON_2D_WEAK_DISORDER_FLOOR",
+            first_2d > tolerances::ANDERSON_2D_WEAK_DISORDER_FLOOR,
+        );
+        v.check_pass(
+            "2D last point ⟨r⟩ < ANDERSON_STRONG_DISORDER_CEILING",
+            last_2d < tolerances::ANDERSON_STRONG_DISORDER_CEILING,
+        );
         v.check_pass("2D ⟨r⟩ decreases with W", first_2d > last_2d);
         println!("  2D sweep: W=[0.5..15], first ⟨r⟩={first_2d:.4}, last ⟨r⟩={last_2d:.4}");
 

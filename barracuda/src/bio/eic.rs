@@ -119,7 +119,7 @@ pub fn detect_mass_tracks(spectra: &[MzmlSpectrum], ppm: f64, min_scans: usize) 
         .iter()
         .flat_map(|s| s.mz_array.iter().copied())
         .collect();
-    all_mz.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+    all_mz.sort_by(f64::total_cmp);
 
     if all_mz.is_empty() {
         return vec![];

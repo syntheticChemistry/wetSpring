@@ -57,8 +57,8 @@ fn validate_ms2_parsing(ms2_path: &Path, v: &mut Validator) {
     let stats = match ms2::stats_from_file(ms2_path) {
         Ok(s) => s,
         Err(e) => {
-            println!("  FAILED stats: {e}");
-            std::process::exit(1);
+            v.check_pass(&format!("MS2 stats parsed: {e}"), false);
+            return;
         }
     };
     println!(
@@ -83,8 +83,8 @@ fn validate_ms2_parsing(ms2_path: &Path, v: &mut Validator) {
     let iter = match ms2::Ms2Iter::open(ms2_path) {
         Ok(it) => it,
         Err(e) => {
-            println!("  FAILED iter: {e}");
-            std::process::exit(1);
+            v.check_pass(&format!("MS2 iterator: {e}"), false);
+            return;
         }
     };
     for result in iter {

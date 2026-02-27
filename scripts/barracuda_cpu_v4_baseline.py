@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Date: 2026-02-21
+# Commit: 756df26
 """
 wetSpring — BarraCUDA CPU v4: Track 1c Python Timing Baseline
 
@@ -8,7 +9,7 @@ Pure-Python implementations of the 5 Track 1c domains for timing
 comparison against Rust. Covers: ANI, SNP, dN/dS, molecular clock,
 and pangenome analysis.
 
-Usage:
+Reproduction:
     python3 scripts/barracuda_cpu_v4_baseline.py
 """
 
