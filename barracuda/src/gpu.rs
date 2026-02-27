@@ -194,12 +194,38 @@ impl GpuF64 {
             || self.driver_profile.needs_log_f64_workaround()
     }
 
+    /// Runtime precision strategy for this GPU (hotSpring S58 → `ToadStool` S67).
+    ///
+    /// `Native` = compute-class GPU with full-rate f64 (Titan V, V100, MI250X).
+    /// `Hybrid` = consumer GPU with throttled f64 — bulk math routes through
+    /// DF64 (f32-pair, ~14 digits) on FP32 cores, native f64 for reductions.
+    #[must_use]
+    pub fn fp64_strategy(&self) -> barracuda::device::Fp64Strategy {
+        self.driver_profile.fp64_strategy()
+    }
+
+    /// Optimal `Precision` for `compile_shader_universal` on this GPU.
+    ///
+    /// Returns `Precision::F64` for compute-class GPUs (Native strategy),
+    /// `Precision::Df64` for consumer GPUs (Hybrid strategy — routes through
+    /// FP32 cores via DF64 core-streaming for ~10x effective throughput).
+    #[must_use]
+    pub fn optimal_precision(&self) -> barracuda::shaders::Precision {
+        use barracuda::device::Fp64Strategy;
+        match self.fp64_strategy() {
+            Fp64Strategy::Native => barracuda::shaders::Precision::F64,
+            Fp64Strategy::Hybrid => barracuda::shaders::Precision::Df64,
+        }
+    }
+
     /// Print GPU capabilities to stdout.
     pub fn print_info(&self) {
         println!("  GPU: {}", self.adapter_name);
         println!("  SHADER_F64: {}", if self.has_f64 { "YES" } else { "NO" });
         println!("  Arch: {:?}", self.driver_profile.arch);
         println!("  Driver: {:?}", self.driver_profile.driver);
+        println!("  Fp64Strategy: {:?}", self.fp64_strategy());
+        println!("  Optimal precision: {:?}", self.optimal_precision());
         println!(
             "  f64 workarounds: exp={}, log={}",
             self.driver_profile.needs_exp_f64_workaround(),

@@ -1097,3 +1097,9 @@ required-features = ["gpu", "ipc"]
 name = "validate_metalforge_v7_mixed"
 path = "src/bin/validate_metalforge_v7_mixed.rs"
 required-features = ["ipc"]
+
+# ── Exp210: Modern Cross-Spring Evolution Benchmark (S68+) ──
+[[bin]]
+name = "benchmark_cross_spring_modern_s68plus"
+path = "src/bin/benchmark_cross_spring_modern_s68plus.rs"
+required-features = ["gpu"]

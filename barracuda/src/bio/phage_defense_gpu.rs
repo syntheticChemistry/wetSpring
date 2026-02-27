@@ -123,7 +123,6 @@ impl PhageDefenseGpu {
         assert_eq!(batch_params.len(), b * N_PARAMS);
 
         let d = self.device.device();
-        let q = self.device.queue();
 
         let gpu_cfg = GpuConfig {
             n_batches: config.n_batches,
@@ -192,8 +191,7 @@ impl PhageDefenseGpu {
             pass.set_bind_group(0, &bg, &[]);
             pass.dispatch_workgroups(config.n_batches.div_ceil(64), 1, 1);
         }
-        q.submit(std::iter::once(encoder.finish()));
-        d.poll(wgpu::Maintain::Wait);
+        self.device.submit_and_poll(std::iter::once(encoder.finish()));
 
         self.device
             .read_buffer_f64(&out_buf, b * N_VARS)

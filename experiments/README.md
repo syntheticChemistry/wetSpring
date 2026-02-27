@@ -330,10 +330,11 @@ thresholds from `src/tolerances.rs`.
 | `validate_barracuda_cpu_v11` | 206 | 64 | `cargo run --features ipc --release --bin validate_barracuda_cpu_v11` |
 | `validate_barracuda_gpu_v4` | 207 | 54 | `cargo run --features gpu,ipc --release --bin validate_barracuda_gpu_v4` |
 | `validate_metalforge_v7_mixed` | 208 | 74 | `cargo run --features ipc --release --bin validate_metalforge_v7_mixed` |
+| `benchmark_cross_spring_modern_s68plus` | 210 | 24 | `cargo run --features gpu --release --bin benchmark_cross_spring_modern_s68plus` |
 
-**Total validation checks**: 5,021+
+**Total validation checks**: 5,045+
 **Rust tests**: 1,103 (933 barracuda lib + 44 IPC + 60 integration + 19 doc + 47 forge)
-**Binaries**: 178 validate + 15 benchmark + 1 server = 194 total
+**Binaries**: 178 validate + 16 benchmark + 1 server = 195 total
 **ToadStool primitives**: 79 consumed (barracuda always-on, zero fallback code — S68+ `e96576ee`)
 **Papers**: 52 (25 Tracks 1-2 + 5 Track 3 + 9 Track 4 + 1 cross-spring + 9 extensions + 3 reference)
 **Local WGSL shaders**: 0 (all absorbed by ToadStool S63)

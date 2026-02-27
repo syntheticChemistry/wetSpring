@@ -272,6 +272,6 @@ impl GemmCached {
             pass.set_bind_group(0, bg, &[]);
             pass.dispatch_workgroups(wg_x, wg_y, wg_z);
         }
-        self.device.queue().submit(Some(encoder.finish()));
+        self.device.submit_and_poll(Some(encoder.finish()));
     }
 }

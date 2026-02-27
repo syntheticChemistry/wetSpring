@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** February 27, 2026 (V63 ToadStool S68+ Realignment)
+**Date:** February 27, 2026 (V64 Modern Cross-Spring Rewiring)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules + 1 IPC module (all lean, 0 local WGSL, 0 local derivative/regression math), 79 ToadStool primitives consumed (barracuda always-on, zero fallback code), 1,103 tests (977 barracuda lib + 60 integration + 19 doc + 47 forge), 95.46% line / 93.54% fn / 94.99% branch coverage, 209 experiments, 5,021+ checks (1,759 GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S68+ aligned (`e96576ee`), 92 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V63:** ToadStool S68+ realignment — `GpuF64::is_lost()` surfaced, IPC dispatch device-lost fallback, GEMM benchmark fix (256×256 + warm-up), all 6 key binaries revalidated green. 3 absorption candidates ready (ESN, NPU bridge, validator).
+**Status:** 47 CPU + 42 GPU modules + 1 IPC module (all lean, 0 local WGSL, 0 local derivative/regression math), 79 ToadStool primitives consumed (barracuda always-on, zero fallback code), 1,103 tests (977 barracuda lib + 60 integration + 19 doc + 47 forge), 95.46% line / 93.54% fn / 94.99% branch coverage, 210 experiments, 5,045+ checks (1,783 GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S68+ aligned (`e96576ee`), 92 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V64:** Modern cross-spring rewiring — `GpuF64::fp64_strategy()` + `optimal_precision()` wired, 6 GPU modules migrated to `submit_and_poll` (resilient dispatch), Exp210 cross-spring evolution benchmark (24/24), full validation sweep green. 3 absorption candidates ready (ESN, NPU bridge, validator).
 
 ### Full Lean Phase
 
@@ -41,17 +41,17 @@ ToadStool S39-S62+DF64 (55+ commits since V39) delivered massive infrastructure:
 - `GemmF64::wgsl_shader_for_device()` now public — DF64 GEMM auto-selection unblocked
 
 **Available for future wiring:**
-- `compile_shader_universal()` — single call for any precision (F16/F32/F64/DF64) (S67)
-- `Precision::Df64` — DF64 variant for enhanced precision on FP32 cores (S67)
+- `compile_shader_universal()` — single call for any precision (F16/F32/F64/DF64) (S67) — **IN USE** by 6 GPU modules
+- `Precision::Df64` — DF64 variant for enhanced precision on FP32 cores (S67) — available via `GpuF64::optimal_precision()`
 - `compile_template()` — template-based `{{SCALAR}}` shader compilation (S67)
 - `Precision::op_preamble()` — abstract precision ops layer (S68)
 - `downcast_f64_to_f16()` — F16 downcast with sentinel protection (S68)
-- `WgpuDevice::is_lost()` — device-lost detection (S68+) — **WIRED** in `GpuF64::is_lost()`
-- `WgpuDevice::acquire_dispatch()` — concurrency permit (S68+)
+- `WgpuDevice::is_lost()` — device-lost detection (S68+) — **WIRED** in `GpuF64::is_lost()` (V63)
+- `WgpuDevice::acquire_dispatch()` — concurrency permit (S68+) — transparent via `submit_and_poll`
 - `WgpuDevice::max_concurrent_dispatches()` — concurrency budget query (S68+)
-- `submit_and_poll()` — resilient submit with catch_unwind (S68+) — transparent via ToadStool ops
+- `submit_and_poll()` — resilient submit with catch_unwind (S68+) — **WIRED** in 5 ODE GPU + 1 GEMM module (V64)
 - `ComputeDispatch` builder — eliminates 80-line bind-group/pipeline boilerplate
-- `Fp64Strategy` auto-detect — Native/Hybrid selection per GPU era
+- `Fp64Strategy` auto-detect — Native/Hybrid selection per GPU era — **WIRED** in `GpuF64::fp64_strategy()` (V64)
 - DF64 core-streaming — routes f64 through FP32 cores on consumer GPUs (RTX 4070: 5888 FP32 cores vs 92 FP64 units)
 - `BandwidthTier` — PCIe-aware routing for metalForge dispatch
 - `SparseGemmF64` — CSR × dense GEMM for drug repurposing sparse matrices

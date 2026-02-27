@@ -5,6 +5,24 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V64 — Modern Cross-Spring Rewiring + submit_and_poll Migration (2026-02-27)
+
+### New Capabilities Wired
+- `GpuF64::fp64_strategy()` — runtime precision selection (hotSpring S58 → ToadStool S67)
+- `GpuF64::optimal_precision()` — returns `F64` (compute-class) or `Df64` (consumer GPU, ~10× via FP32 cores)
+- `submit_and_poll` migration: 5 ODE GPU modules (bistable, capacitor, cooperation, multi_signal, phage_defense) + GemmCached now use ToadStool's resilient dispatch with DispatchSemaphore + catch_unwind
+
+### Cross-Spring Evolution Benchmark (Exp210)
+- New: `benchmark_cross_spring_modern_s68plus` — 24/24 checks, provenance tracking across all 5 springs
+- Documents which ToadStool primitives came from which spring (hotSpring→precision, wetSpring→bio, neuralSpring→pairwise, airSpring→regression, groundSpring→bootstrap)
+- Validates Fp64Strategy detection, device-lost resilience, modern precision pipeline
+
+### Revalidation (V64 sweep)
+- Exp210 (24/24), Exp189 (28/28), cross-spring evolution, GPU diversity fusion, drug repurposing, KG embedding: all PASS
+- 5 ODE GPU modules (bistable, capacitor, cooperation, multi_signal, phage_defense): all PASS with submit_and_poll
+- Exp206 (64/64 CPU IPC), Exp207 (54/54 GPU IPC), Exp208 (75/75 metalForge): all PASS
+- cargo test: 20/20, clippy: 0 warnings
+
 ## V63 — ToadStool S68+ Realignment (2026-02-27)
 
 ### ToadStool Pin Update
