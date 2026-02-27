@@ -5,6 +5,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V65 — Progression Benchmark: Python → CPU → GPU → Pure GPU → metalForge (2026-02-27)
+
+### Exp211: BarraCuda Progression Benchmark
+- Capstone benchmark proving math is pure, portable, and fast at every tier
+- Tier 1 (CPU): 27× faster than Python across 23 domains (Smith-Waterman: 408×)
+- Tier 2 (GPU): identical results to CPU via ToadStool compile_shader_universal
+- Tier 3 (GPU Streaming): chained dispatches via execute_to_buffer, zero intermediate round-trips
+- Tier 4 (metalForge): workload-aware routing — small→CPU, large→GPU (threshold: 10k elements)
+- 16/16 checks PASS
+
+### Python vs Rust Head-to-Head (Exp059 revalidation)
+- 23-domain timing: Python 1,838,772 µs vs Rust 67,602 µs = 27.2× overall
+- ODE domains: 12.8×–35.7× (pure Rust RK4 vs Python loops)
+- String algorithms: 408× (Smith-Waterman), 86× (Felsenstein), 31× (HMM)
+
 ## V64 — Modern Cross-Spring Rewiring + submit_and_poll Migration (2026-02-27)
 
 ### New Capabilities Wired

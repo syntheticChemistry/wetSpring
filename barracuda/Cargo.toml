@@ -1103,3 +1103,9 @@ required-features = ["ipc"]
 name = "benchmark_cross_spring_modern_s68plus"
 path = "src/bin/benchmark_cross_spring_modern_s68plus.rs"
 required-features = ["gpu"]
+
+# ── Exp211: Progression Benchmark — CPU → GPU → Pure GPU Streaming ──
+[[bin]]
+name = "benchmark_progression_cpu_gpu_stream"
+path = "src/bin/benchmark_progression_cpu_gpu_stream.rs"
+required-features = ["gpu"]
