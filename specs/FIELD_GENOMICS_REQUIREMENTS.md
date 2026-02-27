@@ -161,7 +161,7 @@ before hardware arrives:
 | AKD1000 NPU (PCIe) | Edge classification — live, validated |
 | RTX 4070 GPU | Basecalling acceleration, batch Anderson |
 | i9-12900K CPU | General compute, fallback |
-| BarraCUDA + ToadStool | 200 experiments of validated math |
+| BarraCUDA + ToadStool | 211 experiments of validated math |
 | NestGate v4.1.0 | Content-addressed storage |
 | Songbird | Network telemetry |
 

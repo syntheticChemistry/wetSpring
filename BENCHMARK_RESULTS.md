@@ -1,7 +1,7 @@
 # wetSpring Benchmark Results
 
 **Date:** February 27, 2026
-**Status:** Phase 62 — Comprehensive sweep GREEN (Python → Rust CPU → GPU → Pure GPU Streaming → metalForge → NPU) — 39/39 actionable papers full three-tier (52/52 total); 1,103 tests (977 barracuda lib + 60 integration + 19 doc + 47 forge), 95.46% line / 93.54% fn / 94.99% branch, 5,021+ checks (1,578 GPU on RTX 4070, 60 NPU on AKD1000), 209 experiments, ToadStool S68+ (`e96576ee`), 79 primitives consumed, 0 local WGSL/derivative/regression (fully lean), 92 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, IPC dispatch GPU-aware (lazy `OnceLock<GpuF64>` + dispatch threshold routing), biomeOS IPC science primal (Exp203-205), three-tier IPC validation (Exp206-208), V61 nanopore signal bridge + pre-hardware (io::nanopore, Exp196a-c)
+**Status:** Phase 65 — Comprehensive sweep GREEN (Python → Rust CPU → GPU → Pure GPU Streaming → metalForge → NPU) — 39/39 actionable papers full three-tier (52/52 total); 1,103 tests (977 barracuda lib + 60 integration + 19 doc + 47 forge), 95.46% line / 93.54% fn / 94.99% branch, 5,061+ checks (1,783 GPU on RTX 4070, 60 NPU on AKD1000), 211 experiments, ToadStool S68+ (`e96576ee`), 79 primitives consumed, 0 local WGSL/derivative/regression (fully lean), 92 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, IPC dispatch GPU-aware (lazy `OnceLock<GpuF64>` + dispatch threshold routing), biomeOS IPC science primal (Exp203-205), three-tier IPC validation (Exp206-208), V61 nanopore signal bridge + pre-hardware (io::nanopore, Exp196a-c)
 
 ---
 
@@ -102,7 +102,7 @@ Tier 3: GPU (ToadStool/BarraCuda, math parity with CPU)
 
 ---
 
-## Tier 3: GPU Validation (22 GPU validation binaries, 1,578+ checks)
+## Tier 3: GPU Validation (22 GPU validation binaries, 1,783+ checks)
 
 | Binary | Checks | Status |
 |--------|--------|--------|
@@ -132,7 +132,7 @@ Tier 3: GPU (ToadStool/BarraCuda, math parity with CPU)
 | `validate_soil_qs_gpu` | 23 | PASS (Exp180: Track 4 soil QS) |
 | `validate_gpu_v59_science` | 29 | PASS (Exp191: V59 science parity) |
 | `validate_metalforge_v7_mixed` | 75 | PASS (Exp208: NUCLEUS mixed hardware) |
-| **GPU total** | **1,759+** | **PASS** |
+| **GPU total** | **1,783+** | **PASS** |
 
 ### GPU Performance
 
@@ -441,7 +441,7 @@ metalForge routes workloads via `Capability` matching: `F64Compute` → GPU, `Qu
 | Category | Checks | Status |
 |----------|--------|--------|
 | Rust CPU validation | 1,642 | PASS |
-| GPU validation | 1,759+ | PASS |
+| GPU validation | 1,783+ | PASS |
 | Dispatch + layout + transfer | 172 | PASS |
 | IPC dispatch parity (CPU+GPU+metalForge) | 193 (Exp206-208) | PASS |
 | Pure GPU streaming | 152 (Exp090+101+105+106) | PASS |
@@ -452,7 +452,7 @@ metalForge routes workloads via `Capability` matching: `F64Compute` → GPU, `Qu
 | Local WGSL shaders | 0 (full lean — all GPU ops dispatch upstream) | PASS |
 | Compose GPU wrappers | 7 (kmd, merge_pairs, robinson_foulds, derep, NJ, reconciliation, molecular_clock) | PASS |
 | Passthrough GPU wrappers | 0 (all promoted — S66 lean cycle) | PASS |
-| **Grand total** | **5,021+ validation + 1,103 tests** | **ALL PASS** |
+| **Grand total** | **5,061+ validation + 1,103 tests** | **ALL PASS** |
 
 ---
 
@@ -471,7 +471,7 @@ cargo run --release --bin validate_barracuda_cpu_v10           # 75 (Exp190)
 cargo run --features ipc --release --bin validate_barracuda_cpu_v11  # 64 (Exp206)
 cargo run --release --bin validate_soil_qs_cpu_parity          # 49 (Exp179)
 
-# Tier 3: GPU parity (1,759+ checks)
+# Tier 3: GPU parity (1,783+ checks)
 cargo run --features gpu --release --bin validate_barracuda_gpu_full  # 24 (Exp071)
 cargo run --features gpu --release --bin validate_barracuda_gpu_v1   # 26 (Exp064)
 cargo run --features gpu,ipc --release --bin validate_barracuda_gpu_v4  # 54 (Exp207)

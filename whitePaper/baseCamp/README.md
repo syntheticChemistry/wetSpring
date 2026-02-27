@@ -2,7 +2,7 @@
 
 **Date:** February 27, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 62 — 209 experiments, 5,021+ validation checks (1,759 GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,103 tests (977 barracuda + 47 forge + 79 integration/doc), 95.46% line / 93.54% fn / 94.99% branch, ToadStool S68+ aligned (`e96576ee`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 92 named tolerances, clippy pedantic CLEAN, biomeOS IPC GPU-aware dispatch (Exp203-208), comprehensive green sweep (Python 33.4× → CPU → GPU → streaming 441-837× → metalForge), 39/39 three-tier, 52/52 papers
+**Status:** Phase 65 — 211 experiments, 5,061+ validation checks (1,783 GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,103 tests (977 barracuda + 47 forge + 79 integration/doc), 95.46% line / 93.54% fn / 94.99% branch, ToadStool S68+ aligned (`e96576ee`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 92 named tolerances, clippy pedantic CLEAN, progression benchmark (Python 27× → CPU → GPU → streaming → metalForge), cross-spring modern rewiring (Fp64Strategy + submit_and_poll), 39/39 three-tier, 52/52 papers
 
 ---
 
@@ -39,7 +39,7 @@ All code is AGPL-3.0.
 | **Diversity Fusion** | — | GPU | 1 | 167 | 18 | CPU↔GPU parity extension |
 | **Track 4 Soil QS** | — | 4 | 9 | 170–182 | 321 | No-till soil QS, Anderson pore geometry, Brandt farm, meta-analysis, tillage factorial, CPU/GPU/streaming/metalForge |
 | **biomeOS IPC** | — | cross | — | 203-208 | 321 | IPC dispatch, GPU-aware routing, NUCLEUS atomics, Songbird, Neural API |
-| **Total** | | | **52** | | **5,021+** | |
+| **Total** | | | **52** | | **5,061+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -91,7 +91,7 @@ Every paper goes through the full evolution. Status across all 39 actionable pap
 |-------|---------------|----------|
 | Python baseline | Algorithm correctness against published tools | 44 scripts (all with reproduction headers + SHA-256 integrity verification) |
 | BarraCuda CPU | Rust matches Python within machine precision | 1,642+ checks, 33.4x faster |
-| BarraCuda GPU | GPU matches CPU within 1e-6 | 1,759+ checks, 36+ domains |
+| BarraCuda GPU | GPU matches CPU within 1e-6 | 1,783+ checks, 36+ domains |
 | Pure GPU streaming | Zero CPU round-trips, data stays on-device | 204+ checks, 10+ domains |
 | metalForge | Same answer on CPU, GPU, NPU | 39/39 papers, 37+ domains |
 | NPU reservoir | ESN → int8 → NPU preserves classification (Cholesky solve) | 59 checks, 6 domains |
@@ -210,6 +210,29 @@ awaiting MinION hardware) and Exp197-202 (real sequencer integration).
 
 See [Sub-thesis 06: Field Genomics](sub_thesis_06_field_genomics.md) for
 full architecture, literature review, and experiment plan.
+
+### Phase 64: Cross-Spring Modern Rewiring (Exp210)
+
+| Experiment | Focus | Checks | Key Finding |
+|:---:|-------|:------:|-------------|
+| Exp210 | Cross-spring modern benchmark (S68+ Fp64Strategy, submit_and_poll, provenance) | 24 | All 5-spring provenance validated, optimal_precision wired, ToadStool resilient dispatch |
+
+V64 wired `Fp64Strategy` and `optimal_precision()` in `GpuF64`, migrated 6 GPU
+modules (5 ODE + GEMM) to `submit_and_poll()` for device-lost resilience, and
+created a comprehensive cross-spring evolution benchmark tracing provenance
+across hotSpring, wetSpring, neuralSpring, airSpring, and groundSpring.
+
+### Phase 65: Progression Benchmark (Exp211)
+
+| Experiment | Focus | Checks | Key Finding |
+|:---:|-------|:------:|-------------|
+| Exp211 | Full progression: Python → CPU → GPU → streaming → metalForge | 16 | 27× Rust/CPU vs Python, chained GPU GEMM, workload-aware metalForge routing |
+
+V65 proves the complete validation progression on a single unified workload:
+Python baseline → BarraCuda CPU (27× faster, pure Rust) → BarraCuda GPU
+(identical results via ToadStool) → Pure GPU streaming (chained
+`execute_to_buffer`, zero round-trips) → metalForge cross-substrate routing
+(CPU/GPU/NPU workload-aware dispatch, 10K element threshold).
 
 ### Phase 62 Additions (Exp203–208)
 

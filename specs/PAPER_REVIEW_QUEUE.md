@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: February 27, 2026 (Phase 61 V61 + deep audit — 1,022 tests, 95.46% line / 93.54% fn / 94.99% branch, ToadStool S68+ (`e96576ee`), 79 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 92 named tolerances, `partial_cmp` → `total_cmp` migration (10 lib sites), baseline manifest 41/41 match 0 drift, clippy pedantic+nursery CLEAN, typed NCBI errors, 0 Passthrough, 52 papers, 203 experiments, V61 `io::nanopore` + Exp196a-c pre-hardware)
+**Last Updated**: February 27, 2026 (Phase 65 V65 + deep audit — 1,103 tests, 95.46% line / 93.54% fn / 94.99% branch, ToadStool S68+ (`e96576ee`), 79 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 92 named tolerances, `partial_cmp` → `total_cmp` migration (10 lib sites), baseline manifest 41/41 match 0 drift, clippy pedantic+nursery CLEAN, typed NCBI errors, 0 Passthrough, 52 papers, 211 experiments, V65 `io::nanopore` + Exp196a-c pre-hardware)
 **Purpose**: Track papers for reproduction/review across three tracks
 
 ---
@@ -232,7 +232,7 @@ No proprietary data dependencies.
 | Tier | Description | Experiments | Checks |
 |------|-------------|:-----------:|:------:|
 | **BarraCuda CPU** | Rust math matches Python baselines | Exp035,043,057,070,079,085,102,163 | 407/407 |
-| **BarraCuda GPU** | GPU math matches CPU reference | Exp064,071,087,092,101,164 | 710+ |
+| **BarraCuda GPU** | GPU math matches CPU reference | Exp064,071,087,092,101,164 | 1,783 |
 | **metalForge** | Substrate-independent output (CPU/GPU/NPU) | Exp060,065,080,084,086,088,093,103,104,165 | 243+ |
 | **Streaming** | Pure GPU pipeline, zero CPU round-trips | Exp072,073,075,089,090,091,105,106 | 252+ |
 | **Cross-spring** | neuralSpring + spectral theory primitives | Exp094,095,107 | 71 |

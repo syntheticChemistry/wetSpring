@@ -15,7 +15,7 @@ classifies, and acts without cloud connectivity. This closes the loop from
 environmental DNA to actionable intelligence at the edge.
 
 No other stack combines: (1) a pure Rust sequencing pipeline validated across
-203 experiments, (2) a pure Rust NPU driver running live on neuromorphic
+211 experiments, (2) a pure Rust NPU driver running live on neuromorphic
 hardware at <10 mW, and (3) a metalForge substrate router that dispatches
 workloads across CPU, GPU, NPU, and — now — sequencer.
 
@@ -279,7 +279,7 @@ is operational (V61). Everything downstream is operational.
 | Pipeline | QIIME2/Galaxy, needs internet | Sovereign Rust, zero external dependencies |
 | Power | Laptop (45-65W) or Mk1C ARM (60W) | MinION (60W) + NPU standby (10 mW) |
 | Connectivity | Required for analysis | Optional (nightly sync) |
-| Validation | Published tools (black box) | 203 experiments, 4,800+ checks, all open |
+| Validation | Published tools (black box) | 211 experiments, 5,061+ checks, all open |
 | Hardware lock-in | ONT software stack | Pure Rust driver, AGPL-3.0, no vendor SDK |
 
 ## Testable Predictions

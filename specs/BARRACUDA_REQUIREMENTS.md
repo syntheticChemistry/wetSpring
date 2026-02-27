@@ -1,13 +1,13 @@
 # wetSpring — BarraCuda Requirements
 
-**Last Updated**: February 26, 2026 (V57 ToadStool S68, pin `e96576ee`, S68+ device-lost resilience, 79 primitives)
+**Last Updated**: February 27, 2026 (V65 ToadStool S68, pin `e96576ee`, S68+ device-lost resilience, 79 primitives)
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---
 
 ## Current Kernel Usage (Validated)
 
-### Rust CPU Modules (47 modules, 882 barracuda tests, 95.46% line / 93.54% fn / 94.99% branch, V55 S66 rewire)
+### Rust CPU Modules (47 modules, 882 barracuda tests, 95.46% line / 93.54% fn / 94.99% branch, V65 S68+ rewire)
 
 | Module Domain | Modules | Status |
 |--------------|---------|--------|
@@ -22,7 +22,7 @@
 | ML | decision_tree, random_forest, gbm | Sovereign |
 | Drug repurposing | nmf, transe | Sovereign (NEW — Track 3) |
 
-### GPU Primitives (53 ToadStool primitives + 2 BGL helpers, 0 local WGSL, 710+ checks)
+### GPU Primitives (79 ToadStool primitives + 2 BGL helpers, 0 local WGSL, 1,783 GPU checks)
 
 | ToadStool Primitive | wetSpring Use | Checks | Performance |
 |-------------------|---------------|--------|-------------|

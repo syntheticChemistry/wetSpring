@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** February 27, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 62 — Comprehensive green sweep + IPC GPU-aware dispatch + biomeOS integration; 977 lib tests (1,103 total: 977 barracuda lib + 60 integration + 19 doc + 47 forge), **95.46% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov), 209 experiments, 5,021+ checks (1,759 GPU on RTX 4070, 60 NPU on AKD1000), 194 binaries, ToadStool S68 aligned (`e96576ee`), 79 primitives consumed via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math), 92 named tolerances with full provenance, 0 ad-hoc magic numbers, 0 Passthrough, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, IPC dispatch with lazy `OnceLock<GpuF64>` + dispatch threshold routing, biomeOS science primal server (Songbird-registered, Neural API metrics, three-tier data routing), NCBI EFetch/SRA pipeline + NestGate JSON-RPC integration, 52/52 papers, 39/39 three-tier, V62 comprehensive sweep: Python→CPU (33.4×)→GPU→Pure GPU Streaming (441-837×)→metalForge cross-substrate
+**Status:** Phase 65 — Comprehensive green sweep + IPC GPU-aware dispatch + biomeOS integration; 977 lib tests (1,103 total: 977 barracuda lib + 60 integration + 19 doc + 47 forge), **95.46% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov), 211 experiments, 5,061+ checks (1,783 GPU on RTX 4070, 60 NPU on AKD1000), 196 binaries, ToadStool S68 aligned (`e96576ee`), 79 primitives consumed via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math), 92 named tolerances with full provenance, 0 ad-hoc magic numbers, 0 Passthrough, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, IPC dispatch with lazy `OnceLock<GpuF64>` + dispatch threshold routing, biomeOS science primal server (Songbird-registered, Neural API metrics, three-tier data routing), NCBI EFetch/SRA pipeline + NestGate JSON-RPC integration, 52/52 papers, 39/39 three-tier, V62 comprehensive sweep: Python→CPU (33.4×)→GPU→Pure GPU Streaming (441-837×)→metalForge cross-substrate
 
 ---
 
@@ -97,7 +97,7 @@ integration point.
 | Metric | Count |
 |--------|-------|
 | Validation checks (CPU) | 1,476 |
-| Validation checks (GPU) | 1,578 |
+| Validation checks (GPU) | 1,783 |
 | ODE CPU ↔ GPU parity | 82 (5 ODE domains, lean on upstream `generate_shader()`) |
 | Dispatch validation checks | 80 |
 | Layout fidelity checks | 35 |
@@ -121,13 +121,13 @@ integration point.
 | IPC dispatch CPU parity (Exp206) | 64 (7 domains, EXACT_F64 — zero numeric drift through IPC layer) |
 | IPC dispatch GPU parity (Exp207) | 54 (6 domains, GPU↔CPU — lazy OnceLock + dispatch threshold) |
 | metalForge v7 NUCLEUS (Exp208) | 75 (8 domains, mixed hardware — PCIe bypass, Tower/Node/Nest atomics) |
-| **Total validation checks** | **5,021+** |
+| **Total validation checks** | **5,061+** |
 | Rust library unit tests | 977 (barracuda CPU + IPC, default features) |
 | metalForge forge tests | 47 |
 | **Total Rust tests** | **1,103** (977 barracuda lib + 60 integration + 19 doc + 47 forge) |
 | Library code coverage | **95.46% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov) |
-| Experiments completed | 209 |
-| Validation/benchmark binaries | 179 validate + 15 benchmark = 194 total |
+| Experiments completed | 211 |
+| Validation/benchmark binaries | 178 validate + 17 benchmark = 196 total |
 | CPU bio modules | 47 |
 | GPU bio modules | 42 (30 lean + 5 write→lean + 7 compose + 0 passthrough) |
 | Tier B (needs refactor) | 0 (all promoted) |
@@ -139,7 +139,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | ToadStool primitives consumed | **79** (barracuda always-on, zero fallback code — ToadStool S68+, `e96576ee`) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 4,800+ validation checks **PASS**. All 1,022 tests **PASS** (1 ignored: hardware-dependent).
+All 5,061+ validation checks **PASS**. All 1,103 tests **PASS** (1 ignored: hardware-dependent).
 
 ### GPU Performance
 
@@ -533,7 +533,7 @@ Complete rewiring to modern ToadStool S42 BarraCuda APIs:
 - **Exp120**: Benchmarks diversity (wetSpring), QS ODE (hotSpring precision), ESN reservoir
   (hotSpring/neuralSpring → wetSpring NPU), with full provenance table and evolution timeline
 
-**1,008 tests** | **4,748+ checks** | **186 binaries**
+**1,103 tests** | **5,061+ checks** | **196 binaries**
 
 ### Phase 35: NCBI-Scale Hypothesis Testing (Exp121-126)
 
@@ -785,7 +785,7 @@ complete Python → CPU → GPU → Pure GPU Streaming → metalForge pipeline:
   GPU streaming 441-837× vs round-trip. 39/39 papers three-tier. clippy CLEAN.
 - **Fixes:** Exp185 cold seep (stochastic seed determinism), Exp189 S68 erf tolerance
 
-**977 lib tests** | **1,103 total** | **5,021+ checks** | **209 experiments** | **0 clippy warnings**
+**977 lib tests** | **1,103 total** | **5,061+ checks** | **211 experiments** | **0 clippy warnings**
 
 ### Phase 57: ToadStool S68 Universal Precision Rewire (V57)
 
@@ -892,7 +892,7 @@ Rust 1.93 fixed across 20+ validation binaries.
 | Max file size | All under 1000 LOC |
 | External C dependencies | **0** (`flate2` uses `rust_backend`) |
 | Named tolerance constants | 92 (scientifically justified, hierarchy-tested) |
-| Provenance headers | All 194 validation/benchmark binaries |
+| Provenance headers | All 196 validation/benchmark binaries |
 | ESN ridge regression | **Proper Cholesky solve** (not diagonal approximation) |
 | I/O streaming | Buffering APIs deprecated; `stats_from_file` + iterators preferred |
 | Clone optimization | Hot-path clones eliminated (merge_pairs, derep entry API) |
@@ -984,7 +984,7 @@ Rust 1.93 fixed across 20+ validation binaries.
 wetSpring/
 ├── README.md                      ← this file
 ├── BENCHMARK_RESULTS.md           ← three-tier benchmark results
-├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (209 experiments)
+├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (211 experiments)
 ├── barracuda/                     ← Rust crate (src/, Cargo.toml, rustfmt.toml)
 │   ├── EVOLUTION_READINESS.md    ← absorption map (tiers, primitives, shaders)
 │   ├── ABSORPTION_MANIFEST.md    ← what's absorbed, local, planned (hotSpring pattern)
@@ -999,11 +999,11 @@ wetSpring/
 │   │   ├── bio/                 ← 47 CPU + 42 GPU bio modules
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML, nanopore)
 │   │   ├── bench/               ← benchmark harness + power monitoring
-│   │   ├── bin/                 ← 194 validation/benchmark binaries
+│   │   ├── bin/                 ← 196 validation/benchmark binaries
 │   │   ├── ipc/                 ← JSON-RPC dispatch (biomeOS integration)
 │   │   └── shaders/             ← shared WGSL utilities (ODE shaders now generated at runtime)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024
-├── experiments/                   ← 209 experiment protocols + results
+├── experiments/                   ← 211 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
 │   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs, bridge.rs
@@ -1087,7 +1087,7 @@ All validation data comes from public repositories:
 - **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
 - **ToadStool** — GPU compute engine (BarraCuda crate, 700+ WGSL shaders, S68)
 - **wateringHole** — Spring-local handoffs to ToadStool
-  - `handoffs/WETSPRING_TOADSTOOL_V62_COMPREHENSIVE_SWEEP_HANDOFF_FEB27_2026.md` — **current** (V62 IPC GPU dispatch + biomeOS + comprehensive sweep)
-  - `handoffs/archive/` — V7-V61 (fossil record)
+  - `handoffs/WETSPRING_TOADSTOOL_V65_PROGRESSION_BENCHMARK_HANDOFF_FEB27_2026.md` — **current** (V65 progression benchmark + cross-spring evolution + submit_and_poll)
+  - `handoffs/archive/` — V7-V64 (fossil record)
   - `CROSS_SPRING_SHADER_EVOLUTION.md` — 700+ shader provenance (cross-spring, S68)
 - **ecoPrimals** — Parent ecosystem

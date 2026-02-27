@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** February 27, 2026 (V64 Modern Cross-Spring Rewiring)
+**Date:** February 27, 2026 (V65 Progression Benchmark)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules + 1 IPC module (all lean, 0 local WGSL, 0 local derivative/regression math), 79 ToadStool primitives consumed (barracuda always-on, zero fallback code), 1,103 tests (977 barracuda lib + 60 integration + 19 doc + 47 forge), 95.46% line / 93.54% fn / 94.99% branch coverage, 210 experiments, 5,045+ checks (1,783 GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S68+ aligned (`e96576ee`), 92 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V64:** Modern cross-spring rewiring — `GpuF64::fp64_strategy()` + `optimal_precision()` wired, 6 GPU modules migrated to `submit_and_poll` (resilient dispatch), Exp210 cross-spring evolution benchmark (24/24), full validation sweep green. 3 absorption candidates ready (ESN, NPU bridge, validator).
+**Status:** 47 CPU + 42 GPU modules + 1 IPC module (all lean, 0 local WGSL, 0 local derivative/regression math), 79 ToadStool primitives consumed (barracuda always-on, zero fallback code), 1,103 tests (977 barracuda lib + 60 integration + 19 doc + 47 forge), 95.46% line / 93.54% fn / 94.99% branch coverage, 211 experiments, 5,061+ checks (1,783 GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S68+ aligned (`e96576ee`), 92 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V64:** Modern cross-spring rewiring — `GpuF64::fp64_strategy()` + `optimal_precision()` wired, 6 GPU modules migrated to `submit_and_poll` (resilient dispatch), Exp210 cross-spring evolution benchmark (24/24), full validation sweep green. 3 absorption candidates ready (ESN, NPU bridge, validator).
 
 ### Full Lean Phase
 
@@ -478,7 +478,7 @@ no parallelism benefit) and `fastq_parsing` (I/O-bound).
 | Handoffs | `../wateringHole/handoffs/` (36+ docs) | `ecoPrimals/archive/wetspring-early-handoffs-feb2026/` (v1-v9 fossil) |
 | Tests | 454 | 1,008 |
 | Validation | 418 checks | 2,673+ checks |
-| Experiments | 31 suites | 200 experiments |
+| Experiments | 31 suites | 211 experiments |
 | Line coverage | — | 97% bio+io (55% overall) |
 | Pipeline caching | Upstream (ToadStool native) | Local (Exp068, 38% overhead reduction) |
 | Three-tier proof | CPU→GPU→NPU | Python→CPU→GPU→NPU (Exp069) |
