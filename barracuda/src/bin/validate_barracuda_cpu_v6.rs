@@ -155,7 +155,7 @@ fn validate_bistable(v: &mut Validator) {
         "bistable B_ss high (sessile attractor)",
         b_direct,
         0.7,
-        0.15,
+        tolerances::ODE_BISTABLE_HIGH_B,
     );
 
     let p_no_fb = BistableParams {

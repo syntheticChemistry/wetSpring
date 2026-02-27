@@ -2,7 +2,7 @@
 
 **Date:** February 26, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 59 — 197 experiments, 4,688+ validation checks (1,578 GPU on RTX 4070), ALL PASS; 1,008 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 86 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets), 0 Passthrough, V59 doc sync + evolution learnings, 39/39 three-tier, 52/52 papers
+**Status:** Phase 60 — 200 experiments, 4,748+ validation checks (1,578 GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,008 tests (882 barracuda + 47 forge + 32 integration/doc), 96.67% llvm-cov, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 86 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets), 0 Passthrough, V60 NPU live (Exp193-195: real AKD1000), Sub-thesis 06 field genomics architecture (nanopore + NPU), 39/39 three-tier, 52/52 papers
 
 ---
 
@@ -38,7 +38,7 @@ All code is AGPL-3.0.
 | **Fajgenbaum** | UPenn | 3 | 7 | 157–165 | 84 | Drug repurposing, pharmacophenomics, Track 3 completed |
 | **Diversity Fusion** | — | GPU | 1 | 167 | 18 | CPU↔GPU parity extension |
 | **Track 4 Soil QS** | — | 4 | 9 | 170–182 | 321 | No-till soil QS, Anderson pore geometry, Brandt farm, meta-analysis, tillage factorial, CPU/GPU/streaming/metalForge |
-| **Total** | | | **52** | | **4,688+** | |
+| **Total** | | | **52** | | **4,748+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -119,8 +119,9 @@ Every paper goes through the full evolution. Status across all 39 actionable pap
 | 01 | Anderson-QS null hypothesis | [sub_thesis_01](sub_thesis_01_anderson_qs.md) | 107, 126–138, 144–156 |
 | 02 | LTEE constrained evolution | [sub_thesis_02](sub_thesis_02_ltee.md) | 143, 146 |
 | 03 | BioAg rhizosphere QS | [sub_thesis_03](sub_thesis_03_bioag.md) | 129, 142, 146, 151, 153 |
-| 04 | Sentinels + NPU deployment | [sub_thesis_04](sub_thesis_04_sentinels.md) | 114, 118, 123, 124, 147 |
+| 04 | Sentinels + NPU deployment | [sub_thesis_04](sub_thesis_04_sentinels.md) | 114, 118, 123, 124, 147, 193–195 |
 | 05 | Cross-species eavesdropping | [sub_thesis_05](sub_thesis_05_cross_species.md) | 142, 144–146, 151, 153–154 |
+| 06 | Field genomics (nanopore + NPU) | [sub_thesis_06](sub_thesis_06_field_genomics.md) | planned: 196–202 |
 
 ### Cross-Spring Rewire + Modern Benchmark (Phase 48, V44)
 
@@ -166,6 +167,37 @@ effective dimension.
 | Exp186 | Dynamic Anderson W(t) | 7 | Community evolution, time-dependent disorder |
 | Exp187 | DF64 Anderson Large Lattice | 4 | DF64 L=24+ lattice validation |
 | Exp188 | NPU Sentinel Real Stream | 10 | Real sensor stream NPU deployment |
+
+### Phase 60 Additions (Exp193–195)
+
+| Experiment | Focus | Checks | Key Finding |
+|:---:|-------|:------:|-------------|
+| Exp193 | NPU Hardware Validation (Real AKD1000 DMA) | 7 sections | DMA 37 MB/s, device discovery, SRAM mapping |
+| Exp194 | NPU Live ESN — sim↔hardware comparison | 23 | 3 classifiers, 20.7K infer/sec, 1.4 µJ/infer, weight mutation |
+| Exp195 | Funky NPU Explorations (AKD1000 novelties) | 14 | PUF 6.34 bits, online evolution 136 gen/sec, streaming 12.9K Hz |
+
+### Field Genomics: Nanopore + NPU Integration (Sub-thesis 06)
+
+Extends the sentinel framework (Sub-thesis 04) and metalForge substrate routing
+with in-field DNA sequencing via Oxford Nanopore MinION. The architectural
+thesis: a sovereign Rust pipeline that sequences, classifies, and acts at the
+edge without cloud connectivity, using the AKD1000 for real-time classification
+and NPU-driven adaptive sampling.
+
+| Program | Connects | Experiments |
+|---------|----------|:-----------:|
+| Bloom Sentinel Live (Great Lakes HAB) | ST01, ST04, Cahill/Smallwood | Exp196–198 |
+| Soil Health Sentinel (no-till) | ST01, ST03, ST06-local, Track 4 | Exp199–200 |
+| AMR Wastewater Sentinel | ST04 (pathogen emergence) | Exp201–202 |
+| PFAS Dual-Mode Monitor | ST04 (PFAS), Jones Lab | planned |
+| NPU Adaptive Sampling | cross-cutting technique | Exp197 |
+| Deep-Sea Autonomous Lander | ST01, R. Anderson, cold seep | long-term |
+
+New BarraCUDA modules needed: `io::nanopore` (FAST5/POD5 reader),
+`bio::basecall` (signal → base). All downstream math is operational.
+
+See [Sub-thesis 06: Field Genomics](sub_thesis_06_field_genomics.md) for
+full architecture, literature review, and experiment plan.
 
 ## Open Data
 

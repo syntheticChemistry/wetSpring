@@ -100,7 +100,7 @@ fn main() {
         // ─── S1: Tillage → No-Till Transition ────────────────────────
         v.section("── S1: Tillage → No-Till Transition ──");
 
-        let t_points: Vec<f64> = (0..20).map(|i| i as f64 * 0.5).collect();
+        let t_points: Vec<f64> = (0..20).map(|i| f64::from(i) * 0.5).collect();
         let mut trajectory: Vec<(f64, f64, f64, f64)> = Vec::new();
 
         for &t in &t_points {
@@ -143,7 +143,7 @@ fn main() {
         // ─── S2: Antibiotic Perturbation ─────────────────────────────
         v.section("── S2: Antibiotic Perturbation ──");
 
-        let ab_t: Vec<f64> = (0..30).map(|i| i as f64 * 2.0).collect();
+        let ab_t: Vec<f64> = (0..30).map(|i| f64::from(i) * 2.0).collect();
         let mut ab_traj: Vec<(f64, f64, f64, f64)> = Vec::new();
 
         for &t in &ab_t {
@@ -186,7 +186,7 @@ fn main() {
         // ─── S3: Seasonal Cycle ──────────────────────────────────────
         v.section("── S3: Seasonal Cycle ──");
 
-        let seasonal_t: Vec<f64> = (0..24).map(|i| i as f64 * 30.0).collect();
+        let seasonal_t: Vec<f64> = (0..24).map(|i| f64::from(i) * 30.0).collect();
         let mut seasonal_traj: Vec<(f64, f64, f64, f64)> = Vec::new();
 
         for &t in &seasonal_t {

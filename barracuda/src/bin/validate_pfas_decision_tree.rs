@@ -179,7 +179,7 @@ fn main() {
         "Python↔Rust prediction parity (100%)",
         parity_rate,
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check_count("All predictions match", match_count, n_samples);
 
@@ -202,14 +202,14 @@ fn main() {
         "Accuracy above 0.80 threshold",
         f64::from(u8::from(acc_ok)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     let f1_ok = rust_f1 >= 0.80;
     v.check(
         "F1 above 0.80 threshold",
         f64::from(u8::from(f1_ok)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     v.finish();

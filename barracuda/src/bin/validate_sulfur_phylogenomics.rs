@@ -55,7 +55,7 @@ fn validate_molecular_clock(v: &mut Validator) {
         "Clock rate positive",
         f64::from(u8::from(result.rate > 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Root age = 3000 Ma",
@@ -67,7 +67,7 @@ fn validate_molecular_clock(v: &mut Validator) {
         "All node ages non-negative",
         f64::from(u8::from(result.node_ages.iter().all(|&a| a >= 0.0))),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let monotonic = (1..5).all(|i| match parents[i] {
@@ -78,7 +78,7 @@ fn validate_molecular_clock(v: &mut Validator) {
         "Parent ages > child ages",
         f64::from(u8::from(monotonic)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Calibration satisfied
@@ -93,7 +93,7 @@ fn validate_molecular_clock(v: &mut Validator) {
         "Calibration constraint satisfied",
         f64::from(u8::from(result_cal.calibrations_satisfied)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Calibration violated
@@ -108,7 +108,7 @@ fn validate_molecular_clock(v: &mut Validator) {
         "Calibration violation detected",
         f64::from(u8::from(!result_bad.calibrations_satisfied)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Relaxed clock rates on strict tree → CV ≈ 0
@@ -119,7 +119,7 @@ fn validate_molecular_clock(v: &mut Validator) {
         "Strict tree rate CV ≈ 0",
         f64::from(u8::from(cv < 1e-10)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 }
 
@@ -150,7 +150,7 @@ fn validate_dtl_reconciliation(v: &mut Validator) {
         "Congruent: optimal cost = 0",
         f64::from(result.optimal_cost),
         0.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Incongruent trees → cost > 0
@@ -176,7 +176,7 @@ fn validate_dtl_reconciliation(v: &mut Validator) {
         "Incongruent: optimal cost > 0",
         f64::from(u8::from(result_inc.optimal_cost > 0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // Deterministic
@@ -185,7 +185,7 @@ fn validate_dtl_reconciliation(v: &mut Validator) {
         "DTL reconciliation deterministic",
         f64::from(u8::from(result.optimal_cost == result2.optimal_cost)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 }
 
@@ -203,7 +203,7 @@ fn validate_rf_distance(v: &mut Validator) {
         "RF(different topology) > 0",
         f64::from(u8::from(rf2 > 0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let rf_norm = robinson_foulds::rf_distance_normalized(&tree_a, &tree_c);
@@ -211,7 +211,7 @@ fn validate_rf_distance(v: &mut Validator) {
         "RF normalized in [0,1]",
         f64::from(u8::from((0.0..=1.0).contains(&rf_norm))),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 }
 

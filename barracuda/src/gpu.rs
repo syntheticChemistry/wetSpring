@@ -25,7 +25,7 @@
 //! # WGSL Generation (Lean — zero local shaders)
 //!
 //! All ODE shaders are generated at runtime via `BatchedOdeRK4::generate_shader()`
-//! from ToadStool. wetSpring holds zero local `.wgsl` files.
+//! from `ToadStool`. wetSpring holds zero local `.wgsl` files.
 
 use barracuda::device::{GpuDriverProfile, TensorContext, WgpuDevice};
 use std::sync::Arc;

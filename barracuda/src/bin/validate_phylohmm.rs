@@ -97,7 +97,7 @@ fn main() {
         "forward_deterministic",
         fwd2.log_likelihood,
         fwd.log_likelihood,
-        0.0,
+        tolerances::EXACT,
     );
     let vit2 = viterbi(&model, &obs_20);
     v.check_count("viterbi_deterministic", vit2.path.len(), vit.path.len());

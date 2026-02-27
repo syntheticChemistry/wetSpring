@@ -5,6 +5,37 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V60 — Phase 60: NPU Live — AKD1000 Hardware Validation (2026-02-26)
+
+### NPU Hardware Integration (Exp193-195)
+- Exp193: NPU Hardware Validation — real AKD1000 DMA + discovery (7 sections, all PASS)
+- Exp194: NPU Live ESN — 3 classifiers (QS/Bloom/Disorder) sim vs hardware comparison (23/23 PASS)
+  - Reservoir weight loading: 164 KB in 4.5 ms (37 MB/s) to 10 MB SRAM
+  - Online readout switching: 3 hot swaps in 86 µs total (weight mutation validated)
+  - Batch inference: 20.7K infer/sec (8-wide)
+  - Power: 1.4 µJ/infer, coin-cell CR2032 → 11 years at 1 Hz
+- Exp195: Funky NPU Explorations — 5 novel experiments only possible on real neuromorphic hardware (14/14 PASS)
+  - S1: Physical Reservoir Fingerprint (PUF) — 6.34 bits entropy, dual-state alternating signature
+  - S2: Online Readout Evolution — (1+1)-ES at 136 gen/sec on hardware, 24% → 32% fitness
+  - S3: Temporal Streaming — 12.9K Hz, p99=76 µs, 500-step bloom trajectory
+  - S4: Chaos/Anderson Disorder Sweep — 8 disorder levels (W=0 to W=30) on NPU SRAM
+  - S5: Cross-Reservoir Crosstalk — 12.8K switch/sec, no state bleed between classifiers
+
+### NPU Module (`src/npu.rs`)
+- New: `npu_infer_i8` — single int8 inference via DMA round-trip
+- New: `load_reservoir_weights` — f64 ESN weights → f32 → NPU SRAM (with SRAM capacity check)
+- New: `load_readout_weights` — online readout switching via DMA (weight mutation)
+- New: `npu_batch_infer` — batch int8 inference with aggregate metrics
+- New: `NpuInferResult`, `ReservoirLoadResult`, `NpuBatchResult` result types
+
+### ESN Accessors (`src/bio/esn.rs`)
+- New: `w_in()`, `w_res()`, `w_out()`, `w_out_mut()`, `config()` — raw weight access for NPU bridge
+
+### Quality
+- `cargo fmt` + `cargo clippy --all-targets --features npu -- -W clippy::pedantic`: CLEAN
+- All tests pass: CPU build (19/19), NPU build (19/19), GPU build unchanged
+- 3 new validation binaries: `validate_npu_hardware`, `validate_npu_live`, `validate_npu_funky`
+
 ## V59 — Phase 59: Science Extensions + Deep Debt Resolution (2026-02-26)
 
 ### Science Extensions (Exp184-188)

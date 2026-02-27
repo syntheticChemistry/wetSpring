@@ -383,7 +383,12 @@ fn main() {
     let w0 = w_init;
     let w_inf = (w_init - w_final).mul_add(-(1.0 - (-1000.0 / tau).exp()), w_init);
     v.check("W(0) = W_init", w0, w_init, tolerances::EXACT);
-    v.check("W(∞) → W_final", w_inf, w_final, 0.01);
+    v.check(
+        "W(∞) → W_final",
+        w_inf,
+        w_final,
+        tolerances::ODE_STEADY_STATE,
+    );
 
     let d07_us = t0.elapsed().as_micros() as f64;
     timings.push(Timing {

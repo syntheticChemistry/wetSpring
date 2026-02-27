@@ -1439,6 +1439,7 @@ dependencies = [
 name = "wetspring-barracuda"
 version = "0.1.0"
 dependencies = [
+ "akida-driver",
  "barracuda",
  "bytemuck",
  "flate2",

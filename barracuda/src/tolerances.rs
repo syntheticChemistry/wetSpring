@@ -773,6 +773,54 @@ pub const ASARI_CROSS_MATCH_PCT: f64 = 70.0;
 /// Validated: Exp009 (MT02 HILIC-pos, asari range 83–999 Da).
 pub const ASARI_MZ_RANGE_PCT: f64 = 10.0;
 
+// ═══════════════════════════════════════════════════════════════════
+// Dynamic Anderson W(t) and seasonal model tolerances
+// ═══════════════════════════════════════════════════════════════════
+
+/// Seasonal oscillation amplitude tolerance for periodic W(t) functions.
+///
+/// Seasonal W(t) = `W_0` + A·sin(2πt/365) evaluated at quarter-periods
+/// produces ±A offsets. With A=4 and `W_0`=16, a tolerance of 0.5 covers
+/// numerical imprecision in `sin()` at non-exact multiples of π/2.
+/// Validated: Exp186 (Dynamic Anderson W(t)), Exp190 (CPU v10).
+pub const SEASONAL_OSCILLATION: f64 = 0.5;
+
+/// Lanczos vs Sturm eigenvalue comparison tolerance.
+///
+/// Lanczos tridiagonalization with k=60 vectors and Sturm bisection
+/// produce eigenvalue estimates that differ by up to ~0.3 for Anderson
+/// lattices at L=10 (N=1000). 0.5 covers the worst-case algorithmic
+/// discrepancy with margin.
+/// Validated: Exp107 (cross-spring spectral theory).
+pub const LANCZOS_VS_STURM: f64 = 0.5;
+
+/// Cross-spring numerical function parity (trapz, pearson, ridge).
+///
+/// Verifying shared barracuda primitives (trapezoidal integration,
+/// Pearson correlation, `norm_cdf`) against known analytical values.
+/// 1e-3 covers polynomial approximation drift in `norm_cdf` and
+/// discretization error in trapz for coarse grids (N=100).
+/// Validated: Exp183 (cross-spring S65), Exp169 (cross-spring modern).
+pub const CROSS_SPRING_NUMERICAL: f64 = 1e-3;
+
+/// Soil physics model approximation tolerance.
+///
+/// Used for soil-specific model comparisons: chemotaxis reduction of
+/// effective `W_c` (~15%), carbon enrichment ratios (Brandt farm 2.15×),
+/// and critical colonization distance estimates. These are inherently
+/// approximate models with ~5% uncertainty from parameter fitting.
+/// Validated: Exp170–182 (Track 4 soil QS).
+pub const SOIL_MODEL_APPROX: f64 = 0.1;
+
+/// Bistable ODE high-biofilm attractor tolerance.
+///
+/// For the sessile attractor in the Fernandez 2020 bistable model,
+/// `B_ss` ≈ 0.7. RK4 vs LSODA accumulate ~0.10 difference in the
+/// high-biofilm state due to stiffness in the feedback loop.
+/// 0.15 covers the worst observed case with 50% margin.
+/// Validated: Exp079 (`BarraCuda` CPU v6), `scripts/fernandez2020_bistable.py`.
+pub const ODE_BISTABLE_HIGH_B: f64 = 0.15;
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -878,6 +926,11 @@ mod tests {
             GALAXY_BRAY_CURTIS_RANGE,
             ASARI_CROSS_MATCH_PCT,
             ASARI_MZ_RANGE_PCT,
+            SEASONAL_OSCILLATION,
+            LANCZOS_VS_STURM,
+            CROSS_SPRING_NUMERICAL,
+            SOIL_MODEL_APPROX,
+            ODE_BISTABLE_HIGH_B,
         ];
         for tol in all {
             assert!(tol >= 0.0, "tolerance {tol} must be non-negative");

@@ -94,7 +94,7 @@ fn main() {
         "Critical distance = L_D × ln(1/threshold)",
         critical_distance,
         diffusion_length * (1.0 / threshold_conc).ln(),
-        0.1,
+        tolerances::SOIL_MODEL_APPROX,
     );
 
     // ═══════════════════════════════════════════════════════════════

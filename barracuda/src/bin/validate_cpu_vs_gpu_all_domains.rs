@@ -278,19 +278,19 @@ fn validate_pangenome(
         "core",
         gpu_pan.classifications.iter().filter(|&&c| c == 3).count() as f64,
         cpu_pan.core_size as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "accessory",
         gpu_pan.classifications.iter().filter(|&&c| c == 2).count() as f64,
         cpu_pan.accessory_size as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "unique",
         gpu_pan.classifications.iter().filter(|&&c| c == 1).count() as f64,
         cpu_pan.unique_size as f64,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(Timing {
         name: "Pangenome (5g×4)",
@@ -652,7 +652,7 @@ fn validate_eic(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timing>) {
         "EIC count",
         gpu_totals.len() as f64,
         cpu_totals.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
     for (i, (c, g)) in cpu_totals.iter().zip(gpu_totals.iter()).enumerate() {
         v.check(
@@ -750,7 +750,7 @@ fn validate_kriging(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timing>) 
         "Kriging value count",
         ordinary.values.len() as f64,
         targets.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
     for (i, val) in ordinary.values.iter().enumerate() {
         v.check_pass(&format!("Kriging ordinary {i} finite"), val.is_finite());

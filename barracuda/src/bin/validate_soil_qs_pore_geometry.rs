@@ -180,7 +180,7 @@ fn main() {
         "Chemotaxis reduces effective W_c by ~15%",
         w_effective_with_chemotaxis,
         w_c_3d * 0.85,
-        0.1,
+        tolerances::SOIL_MODEL_APPROX,
     );
 
     let disorder_values = [10.0, 14.0, 16.5, 20.0, 25.0];

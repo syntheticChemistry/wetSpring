@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** February 26, 2026
-**Status:** Phase 59 — Validation study active — 4,688+ checks (1,578 GPU on RTX 4070), 1,008 tests, 197 experiments, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 86 named tolerances with full provenance, 0 Passthrough, 0 ad-hoc magic numbers, clippy pedantic CLEAN, V59 doc sync + evolution learnings, 39/39 three-tier, 52/52 papers
+**Status:** Phase 60 — Validation study active — 4,748+ checks (1,578 GPU on RTX 4070, **60 NPU on AKD1000**), 1,008 tests, 200 experiments, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 86 named tolerances with full provenance, 0 Passthrough, 0 ad-hoc magic numbers, clippy pedantic CLEAN, V60 NPU Live (Exp193-195: real AKD1000 DMA, ESN sim↔hardware, online evolution, PUF fingerprint), 39/39 three-tier, 52/52 papers
 **License:** AGPL-3.0-or-later
 
 ---
@@ -38,6 +38,10 @@
 7. Can local WGSL shaders be structured for clean absorption into ToadStool,
    following the Write → Absorb → Lean cycle proven by hotSpring?
 
+8. Can the sovereign pipeline extend to field-deployed nanopore sequencing,
+   with NPU-driven adaptive sampling closing the loop from environmental DNA
+   to real-time classification without cloud connectivity? (Sub-thesis 06)
+
 ---
 
 ## Evolution Methodology: Write → Absorb → Lean
@@ -65,7 +69,7 @@ capability-based dispatch, and shader origin tracking as an absorption seam for 
 
 | Claim | Evidence |
 |-------|----------|
-| Rust matches Python across 197 experiments | 4,688+ checks pass (CPU + GPU + metalForge + streaming + cross-spring + soil QS) |
+| Rust matches Python across 200 experiments | 4,748+ checks pass (CPU + GPU + metalForge + streaming + cross-spring + soil QS + NPU) |
 | GPU matches CPU across all 42 GPU modules + 1 extension | 710+ GPU checks pass (incl. 48 all-domain + 58 metalForge v5 + 18 diversity fusion) |
 | BarraCuda CPU parity across 31+ domains (v1-v9) | 407/407 cross-domain checks pass |
 | 926× spectral cosine GPU speedup | Exp016 benchmark |

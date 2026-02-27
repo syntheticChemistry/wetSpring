@@ -163,7 +163,7 @@ fn validate_snp(
         "SNP: variant count CPU ↔ GPU",
         gpu_count as f64,
         cpu_count as f64,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("SNP (4 seqs × 12bp)", cpu_us, gpu_us, "CPU=GPU"));
 }
@@ -260,19 +260,19 @@ fn validate_pangenome(
         "Pan: core CPU ↔ GPU",
         gpu_pan.classifications.iter().filter(|&&c| c == 3).count() as f64,
         cpu_pan.core_size as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Pan: accessory CPU ↔ GPU",
         gpu_pan.classifications.iter().filter(|&&c| c == 2).count() as f64,
         cpu_pan.accessory_size as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Pan: unique CPU ↔ GPU",
         gpu_pan.classifications.iter().filter(|&&c| c == 1).count() as f64,
         cpu_pan.unique_size as f64,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("Pangenome (5 genes × 4 genomes)", cpu_us, gpu_us, "CPU=GPU"));
 }
@@ -333,7 +333,7 @@ fn validate_random_forest(
             &format!("RF sample {i}: CPU ↔ GPU"),
             gpu_p.class as f64,
             *cpu_p as f64,
-            0.0,
+            tolerances::EXACT,
         );
     }
     timings.push((
@@ -693,7 +693,7 @@ fn validate_decision_tree(
                     &format!("DT sample {i}: CPU ↔ GPU"),
                     f64::from(*gpu_p),
                     *cpu_p as f64,
-                    0.0,
+                    tolerances::EXACT,
                 );
             }
             timings.push(("Decision Tree (4 samples)", cpu_us, gpu_us, "CPU=GPU"));

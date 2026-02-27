@@ -87,7 +87,7 @@ The `forge/` directory is a standalone Rust crate (`wetspring-forge` v0.3.0)
 that discovers compute substrates at runtime and routes workloads by capability.
 It follows hotSpring's `metalForge/forge/` pattern — same substrate types,
 same capability-based dispatch, same wgpu GPU probing — adapted for life
-science workloads. **38 unit tests**, clippy clean, `forbid(unsafe_code)`.
+science workloads. **47 unit tests**, clippy clean, `forbid(unsafe_code)`.
 
 **v0.3.0 additions:**
 - `workloads` module — preset bio domain workloads with `ShaderOrigin` tracking
@@ -158,11 +158,11 @@ affinities. metalForge maps each validated algorithm to its optimal substrate.
 wetSpring follows hotSpring's pattern for ToadStool absorption:
 
 ```
-1. Validate in Rust CPU (barracuda/)          ← DONE: 46 CPU + 42 GPU, 1,008 tests, 197 experiments, 4,688+ checks
-2. Characterize hardware (metalForge/)         ← THIS DIRECTORY
-3. Write Rust in GPU-friendly patterns         ← 28 absorbed (Lean); 0 local WGSL (fully lean); 7 Compose; 3 Passthrough
+1. Validate in Rust CPU (barracuda/)          ← DONE: 47 CPU + 42 GPU, 1,008 tests, 200 experiments, 4,748+ checks
+2. Characterize hardware (metalForge/)         ← THIS DIRECTORY — 47 forge tests
+3. Write Rust in GPU-friendly patterns         ← 25 Lean + 16 Compose; 0 local WGSL (fully lean); 0 Passthrough
 4. ToadStool absorbs as shared primitives      ← unidirectional handoff via wateringHole/handoffs/
-5. wetSpring consumes ToadStool primitives     ← 79 consumed, 42 GPU modules (S68)
+5. wetSpring consumes ToadStool primitives     ← 79 consumed, 42 GPU modules (S68, f0feb226)
 ```
 
 ### What "GPU-Friendly Patterns" Means for Life Science
@@ -267,17 +267,17 @@ Delete local shader copy. Use the crate-level re-export
 (e.g., `barracuda::SmithWatermanGpu`). Local extensions that still need work
 remain in wetSpring until absorption.
 
-### Current Status (Feb 26)
+### Current Status (V59, Feb 26)
 
 | Phase | Count | Items |
 |-------|:-----:|-------|
-| **Absorbed** (Lean) | 11 modules | SW, Gillespie, DT, Felsenstein, GEMM, diversity, PCoA, spectral, stats, EIC, rarefaction |
-| **Absorbed** (Lean, Feb 22) | 8 shaders | HMM, DADA2, QF, ANI, SNP, dN/dS, pangenome, RF |
-| **Local WGSL** (Lean) | 0 | diversity_fusion absorbed by ToadStool S63 |
-| **CPU math** (barracuda overlap) | 4 functions | erf, ln_gamma, regularized_gamma, integrate_peak |
-| **Blocked** | 3 modules | kmer (lock-free hash), UniFrac (tree traversal), taxonomy (NPU) |
+| **Lean** (ToadStool absorbed) | 25 modules | SW, Gillespie, DT, Felsenstein, GEMM, diversity, PCoA, spectral, stats, EIC, rarefaction, HMM, DADA2, QF, ANI, SNP, dN/dS, pangenome, RF, kmer, UniFrac, taxonomy, cooperation, capacitor, diversity_fusion |
+| **Compose** (ToadStool wrappers) | 16 modules | kmd, merge_pairs, robinson_foulds, derep, NJ, reconciliation, molecular_clock, bootstrap, placement, ODE sweep ×5, bifurcation, streaming |
+| **Local WGSL** | 0 | Fully lean — all shaders absorbed by ToadStool S62–S68 |
+| **CPU math** (delegated to barracuda) | 8 functions | erf, ln_gamma, regularized_gamma_p, norm_cdf, dot, l2_norm, trapz, ridge_regression |
+| **Blocked** | 0 | All former blockers resolved: kmer (S62), UniFrac (S62), taxonomy (S64), NVVM polyfill (S39) |
 
-Active handoff: `../../wateringHole/handoffs/WETSPRING_V018_CROSS_SPRING_REWIRE_HANDOFF_FEB23_2026.md`
+Active handoff: `../../wateringHole/handoffs/WETSPRING_TOADSTOOL_V59_SCIENCE_EXTENSIONS_HANDOFF_FEB26_2026.md`
 
 ---
 
@@ -330,25 +330,19 @@ it and rely on `compile_shader_f64` or `ShaderTemplate` preprocessing.
 
 ---
 
-## Completed GPU Wiring (Feb 20)
+## GPU Module Status (V59)
 
-| Domain | Method | Status |
-|--------|--------|--------|
-| Felsenstein pruning | `FelsensteinGpu` (ToadStool) | Exp046: 15/15 |
-| Bootstrap resampling | Compose FelsensteinGpu per replicate | Exp046: 15/15 |
-| Phylogenetic placement | Compose FelsensteinGpu per edge | Exp046: 15/15 |
-| HMM batch forward | Local WGSL shader (forced polyfill) | Exp047: 13/13 |
-| ODE parameter sweep | Local WGSL shader (pow_f64 polyfill) | Exp049: 7/7 |
-| Bifurcation eigenvalues | `BatchedEighGpu` (ToadStool) | Exp050: 5/5 |
+All 42 GPU modules are operational. 0 local WGSL shaders — fully lean.
 
-## ToadStool Absorption Candidates
+| Tier | Count | Examples | Status |
+|------|:-----:|---------|--------|
+| **Lean** (absorbed) | 25 | diversity, PCoA, kmer, unifrac, ODE×5, SW, Felsenstein, HMM, DADA2 | ToadStool primitives |
+| **Compose** (wrappers) | 16 | kmd, merge_pairs, RF, derep, NJ, reconciliation, molecular_clock | Composing ToadStool ops |
+| **CPU-only** | 1 | phred (lookup table, no GPU benefit) | N/A |
 
-1. **`hmm_forward_f64.wgsl`** — batch HMM forward in log-space. 13/13 checks.
-2. **`batched_qs_ode_rk4_f64.wgsl`** — local fix: upstream `batched_ode_rk4.rs:209`
-   uses `compile_shader` not `compile_shader_f64`; wetSpring uses
-   `compile_shader_f64()` (ToadStool removed `enable f64;` session 39).
-3. **NVVM driver profile fix** — `needs_f64_exp_log_workaround()` should
-   return `true` for Ada Lovelace (RTX 4070/4080/4090).
+All former absorption candidates (HMM, ODE, diversity_fusion) have been
+absorbed by ToadStool S62–S68. NVVM driver profile workaround is
+upstream (forced polyfill on Ada Lovelace).
 
 ---
 
@@ -368,34 +362,32 @@ ToadStool/BarraCuda team absorption. Following hotSpring's pattern:
 | 32 tolerance constants | Hierarchy-tested | `barracuda::tolerances` cross-Spring standard |
 | SoA/batch patterns | GPU-friendly, `#[repr(C)]` | Direct shader translation |
 
-### Blocked
+### Resolved Blockers (V59)
 
-| Blocker | Impact | Resolution |
-|---------|--------|------------|
-| `barracuda::math` feature gate | 4 CPU math functions can't lean upstream | Propose `[features] math = []` |
-| NVVM driver profile bug | f64 transcendentals crash on Ada Lovelace | Fix `needs_f64_exp_log_workaround()` |
-| Lock-free hash GPU primitive | kmer module can't promote | ToadStool new primitive |
-| Tree traversal GPU primitive | UniFrac can't promote | ToadStool new primitive |
+| Former Blocker | Resolution | Session |
+|----------------|------------|---------|
+| `barracuda::math` feature gate | barracuda always-on; `crate::special` delegates to `barracuda::special` | S62 |
+| NVVM driver profile bug | Forced polyfill via `ShaderTemplate::for_driver_auto(source, true)` | S39 |
+| Lock-free hash GPU primitive | `KmerHistogramF64` absorbed by ToadStool | S62 |
+| Tree traversal GPU primitive | `UniFracPropagateF64` absorbed by ToadStool | S62 |
+| NPU taxonomy inference | `TaxonomyFcF64` absorbed with int8 quantization path | S64 |
 
-### Next Steps
+### Next Steps (V60+)
 
-1. **ToadStool absorption**: 9 Tier A shaders submitted via handoff doc.
-   Priority: HMM forward (compose `logsumexp_wgsl`), ODE sweep (fix
-   upstream `BatchedOdeRK4F64`), RF inference (extend `TreeInferenceGpu`
-   to ensemble/SoA).
+1. **`ComputeDispatch` migration**: Replace manual BGL setup in GPU ops
+   with ToadStool `ComputeDispatch` builder for cleaner dispatch code.
 
-2. **barracuda `math` feature**: Propose CPU-only feature gate for
-   `numerical`, `special`, `stats` modules. Unblocks switching 4 local
-   math functions to upstream primitives.
+2. **DF64 GEMM adoption**: Use `Fp64Strategy::Hybrid` for RTX 4070
+   GEMM dispatch — FP32-core emulated f64 on consumer GPUs.
 
-3. **GPU**: Scale ODE sweep to B=10,000 with ToadStool unidirectional
-   streaming. Current: 64 batches in 2s. Target: 10,000 in <1s.
+3. **`BandwidthTier` wiring**: Wire PCIe-aware routing into forge
+   dispatch for GPU↔NPU↔CPU transfer cost awareness.
 
-4. **NPU**: Train taxonomy FC model from Naive Bayes weights, quantize int8,
-   validate classification accuracy NPU vs CPU.
+4. **DF64 Lanczos**: Blocked on ToadStool DF64 Lanczos kernel for
+   Anderson localization at L≥24 (Exp187 Phase 2).
 
-5. **CPU**: Profile P-core vs E-core for ODE-heavy workloads. Consider
-   P-core pinning for latency-sensitive stages (DADA2, parsing).
+5. **NPU hardware path**: Run Exp188 on real AKD1000 when available;
+   CPU int8 simulation validated (10 checks PASS).
 
-6. **GPU**: Remaining P3 items (K-mer counting, UniFrac) require new
-   ToadStool primitives — wait for upstream absorption cycle.
+6. **Data-scale validation**: Full cold seep (170 communities) and
+   LTEE data for sovereign NCBI pipeline (Exp184 Tier 2/3).

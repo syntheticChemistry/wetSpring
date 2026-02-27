@@ -139,7 +139,7 @@ async fn main() {
             &format!("N={n}: Streaming overhead < Individual"),
             f64::from(u8::from(stream_us <= ind_us)),
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
 
         if stream_us < ind_us {
@@ -159,7 +159,7 @@ async fn main() {
         "Streaming faster than individual in ≥3/4 batch sizes",
         f64::from(u8::from(streaming_faster_count >= 3)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     println!();

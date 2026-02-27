@@ -104,7 +104,7 @@ fn main() {
         "Active carbon enrichment ~2.15× (published: 963/447)",
         carbon_ratio,
         2.15,
-        0.1,
+        tolerances::SOIL_MODEL_APPROX,
     );
 
     // ═══════════════════════════════════════════════════════════════

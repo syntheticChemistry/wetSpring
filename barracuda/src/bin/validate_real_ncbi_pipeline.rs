@@ -84,6 +84,7 @@ fn fasta_to_species_counts(fasta: &str) -> Vec<f64> {
     counts
 }
 
+#[allow(clippy::many_single_char_names)]
 fn main() {
     let mut v = Validator::new("Exp184: Real NCBI 16S Through Sovereign Pipeline");
 

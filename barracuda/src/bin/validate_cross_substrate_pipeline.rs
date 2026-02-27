@@ -223,7 +223,7 @@ async fn main() {
         "All 12 samples: diversity parity",
         f64::from(u8::from(all_diversity_match)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let n_pairs = N_SAMPLES * (N_SAMPLES - 1) / 2;
@@ -236,7 +236,7 @@ async fn main() {
         &format!("Bray-Curtis: all {n_pairs} pairs match CPU"),
         f64::from(u8::from(bray_match)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     println!("  GPU compute: {gpu_compute_us:.0} µs diversity, {bray_us:.0} µs Bray-Curtis");
@@ -276,7 +276,7 @@ async fn main() {
         "Classification: all samples labeled",
         f64::from(u8::from(has_valid_classes)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     let correct_routing = if npu_available {
@@ -292,7 +292,7 @@ async fn main() {
         "Classification: correct substrate routing",
         f64::from(u8::from(correct_routing)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     println!(
@@ -333,25 +333,25 @@ async fn main() {
         "Aggregation: mean Shannon > 0",
         f64::from(u8::from(mean_shannon > 0.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Aggregation: mean Simpson in (0,1)",
         f64::from(u8::from(mean_simpson > 0.0 && mean_simpson < 1.0)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Aggregation: all samples classified",
         (n_high + n_mod + n_low) as f64,
         N_SAMPLES as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "Variance: GPU Shannon variance valid",
         f64::from(u8::from(gpu_variance >= 0.0 && gpu_variance.is_finite())),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     println!("  Mean Shannon: {mean_shannon:.4}, Mean Simpson: {mean_simpson:.4}");
@@ -382,7 +382,7 @@ async fn main() {
         "E2E: GPU and CPU produce same classifications",
         f64::from(u8::from(class_match)),
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // ═══════════════════════════════════════════════════════════════════

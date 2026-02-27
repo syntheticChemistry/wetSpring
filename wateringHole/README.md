@@ -9,10 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V59** | `handoffs/WETSPRING_TOADSTOOL_V59_SCIENCE_EXTENSIONS_HANDOFF_FEB26_2026.md` | Feb 26 | **current** — Science extensions (Exp184-188), three-tier controls (Exp190-192), typed NCBI errors, 86 tolerances |
-| **V58** | `handoffs/WETSPRING_TOADSTOOL_V58_EVOLUTION_LEARNINGS_HANDOFF_FEB26_2026.md` | Feb 26 | Evolution learnings, cross-spring patterns, absorption candidates, DF64 bio opportunity, feature-gate audit, benchmark data |
-| **V57** | `handoffs/WETSPRING_TOADSTOOL_V57_S68_CATCHUP_HANDOFF_FEB26_2026.md` | Feb 26 | ToadStool S66→S68 catch-up (19 commits), CPU feature-gate fix, universal precision alignment |
-| **V56** | `handoffs/WETSPRING_TOADSTOOL_V56_SCIENCE_PIPELINE_HANDOFF_FEB26_2026.md` | Feb 26 | Science extension pipeline, NCBI EFetch/SRA, NestGate JSON-RPC, GPU Anderson L=14-20, biomeOS science graph |
+| **V60** | `handoffs/WETSPRING_TOADSTOOL_V60_NPU_FIELD_GENOMICS_HANDOFF_FEB26_2026.md` | Feb 26 | **current** — NPU live (Exp193-195, real AKD1000), field genomics architecture (Sub-thesis 06), ESN+NPU+Validator absorption candidates, data type profiling |
+| **V59** | `handoffs/WETSPRING_TOADSTOOL_V59_SCIENCE_EXTENSIONS_HANDOFF_FEB26_2026.md` | Feb 26 | Science extensions (Exp184-188), three-tier controls (Exp190-192), typed NCBI errors, 86 tolerances |
 
 ## Cross-Spring Documents
 
@@ -22,8 +20,8 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` (V7-V52, API report, rewire, cross-spring provenance — 49 files).
-V34-V39 archived (superseded by V40). V40-V43 archived (superseded by V47). V44-V45 archived (superseded by V48). V47-V50 archived (superseded by V52). V52 archived (superseded by V53+V54). V53-V55 archived (superseded by V56-V59).
+Superseded handoffs in `handoffs/archive/` (V7-V58, API report, rewire, cross-spring provenance — 52 files).
+V34-V39 archived (superseded by V40). V40-V43 archived (superseded by V47). V44-V45 archived (superseded by V48). V47-V50 archived (superseded by V52). V52 archived (superseded by V53+V54). V53-V55 archived (superseded by V56-V59). V56-V58 archived (superseded by V59+V60).
 Cross-spring docs moved to archive: `CROSS_SPRING_EVOLUTION_WETSPRING_FEB22_2026.md`, `CROSS_SPRING_PROVENANCE_FEB22_2026.md`.
 
 ## Convention

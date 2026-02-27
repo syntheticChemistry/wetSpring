@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** February 26, 2026 (V57 ToadStool S68 catch-up + universal precision alignment)
+**Date:** February 26, 2026 (V60 NPU Live + Field Genomics Architecture)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules (all lean, 0 local WGSL, 0 local derivative/regression math), 79 ToadStool primitives consumed (barracuda always-on, zero fallback code), 1,008 tests (882 barracuda lib + 60 integration + 19 doc + 47 forge), 96.67% library coverage, 197 experiments, 4,688+ checks (1,578 GPU on RTX 4070), ToadStool S68 aligned (`f0feb226`), 86 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V57:** ToadStool S66→S68 catch-up (19 commits), CPU feature-gate fix contributed upstream, universal precision architecture (700 shaders, 0 f32-only) now available, `gpu.rs` doc comment cleaned.
+**Status:** 47 CPU + 42 GPU modules (all lean, 0 local WGSL, 0 local derivative/regression math), 79 ToadStool primitives consumed (barracuda always-on, zero fallback code), 1,008 tests (882 barracuda lib + 60 integration + 19 doc + 47 forge), 96.67% library coverage, 200 experiments, 4,748+ checks (1,578 GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S68 aligned (`f0feb226`), 86 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V60:** NPU live (Exp193-195: real AKD1000 hardware, 3 ESN classifiers, online evolution, PUF, streaming), Sub-thesis 06 field genomics architecture defined (Exp196-202 planned), data type profiling for NestGate evolution.
 
 ### Full Lean Phase
 
@@ -473,7 +473,7 @@ no parallelism benefit) and `fastq_parsing` (I/O-bound).
 | Handoffs | `../wateringHole/handoffs/` (36+ docs) | `ecoPrimals/archive/wetspring-early-handoffs-feb2026/` (v1-v9 fossil) |
 | Tests | 454 | 1,008 |
 | Validation | 418 checks | 2,673+ checks |
-| Experiments | 31 suites | 197 experiments |
+| Experiments | 31 suites | 200 experiments |
 | Line coverage | — | 97% bio+io (55% overall) |
 | Pipeline caching | Upstream (ToadStool native) | Local (Exp068, 38% overhead reduction) |
 | Three-tier proof | CPU→GPU→NPU | Python→CPU→GPU→NPU (Exp069) |

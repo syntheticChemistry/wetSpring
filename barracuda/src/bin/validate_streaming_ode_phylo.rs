@@ -172,7 +172,7 @@ fn validate_ode_streaming(
         "ODE output len",
         gpu_out.len() as f64,
         (n_batch * N_VARS) as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     timings.push(("QS ODE (4-batch)", cpu_us, gpu_us));
@@ -672,7 +672,7 @@ fn validate_unifrac_streaming(
         "UniFrac output size",
         result.node_sums.len() as f64,
         (n_nodes * n_samples) as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check_pass(
         "UniFrac all finite",

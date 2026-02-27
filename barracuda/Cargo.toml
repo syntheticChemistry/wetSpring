@@ -20,6 +20,10 @@ default = []
 # Adds wgpu v22 (device creation), barracuda GPU ops (49+ primitives),
 # and tokio (async device init). Zero local WGSL shaders (full lean).
 gpu = ["barracuda/gpu", "dep:wgpu", "dep:tokio"]
+# NPU acceleration via ToadStool akida-driver (BrainChip AKD1000/AKD1500).
+# Enable with `cargo build --features npu`.
+# Provides runtime discovery, capability-based dispatch, int8 inference.
+npu = ["dep:akida-driver"]
 # JSON model import (2 bins: validate_pfas_decision_tree, benchmark_three_tier).
 json = ["dep:serde_json"]
 
@@ -35,6 +39,10 @@ serde_json = { version = "1", optional = true }
 # ComputeDispatch, storage_bgl_entry, uniform_bgl_entry, gpu_ctx,
 # GemmF64 DF64 auto-detection (hybrid FP32-core GEMM on consumer GPUs).
 barracuda = { path = "../../phase1/toadstool/crates/barracuda", default-features = false }
+
+# ToadStool akida-driver — pure Rust NPU access (BrainChip AKD1000/AKD1500).
+# Runtime discovery, capability-based dispatch, zero mocks.
+akida-driver = { path = "../../phase1/toadstool/crates/neuromorphic/akida-driver", optional = true }
 
 # wgpu: WebGPU compute — hardware-agnostic GPU via Vulkan/Metal/DX12.
 # Same version as barracuda to prevent duplicate symbol linking errors.
@@ -1023,3 +1031,21 @@ required-features = ["gpu"]
 name = "validate_metalforge_v59_science"
 path = "src/bin/validate_metalforge_v59_science.rs"
 required-features = ["gpu"]
+
+# ── Exp193: NPU Hardware Validation (real AKD1000) ──────
+[[bin]]
+name = "validate_npu_hardware"
+path = "src/bin/validate_npu_hardware.rs"
+required-features = ["npu"]
+
+# ── Exp194: NPU Live — ESN Reservoir on AKD1000 ────────
+[[bin]]
+name = "validate_npu_live"
+path = "src/bin/validate_npu_live.rs"
+required-features = ["npu"]
+
+# ── Exp195: Funky NPU Explorations (AKD1000) ───────────
+[[bin]]
+name = "validate_npu_funky"
+path = "src/bin/validate_npu_funky.rs"
+required-features = ["npu"]

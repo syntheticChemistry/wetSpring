@@ -167,7 +167,7 @@ fn validate_qs_ode_mf(
                 "QS ODE output size",
                 gpu_finals.len() as f64,
                 (n_batches as usize * N_VARS) as f64,
-                0.0,
+                tolerances::EXACT,
             );
 
             let all_finite = gpu_finals.iter().all(|x| x.is_finite());
@@ -185,7 +185,7 @@ fn validate_qs_ode_mf(
                 "QS ODE CPU↔GPU parity < 0.15",
                 f64::from(u8::from(max_diff < 0.15)),
                 1.0,
-                0.0,
+                tolerances::EXACT,
             );
 
             let cells_grew = gpu_finals[0] > y0_single[0];
@@ -266,7 +266,7 @@ fn validate_unifrac_mf(
         "UniFrac output size",
         result.node_sums.len() as f64,
         (n_nodes * n_samples) as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     let all_finite = result.node_sums.iter().all(|x| x.is_finite());
@@ -420,7 +420,7 @@ fn validate_kmer_mf(
         "K-mer histogram length",
         gpu_result.histogram.len() as f64,
         kmer_space as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     let cpu_total: u32 = cpu_hist.iter().sum();
@@ -429,7 +429,7 @@ fn validate_kmer_mf(
         "K-mer total count",
         f64::from(gpu_total),
         f64::from(cpu_total),
-        0.0,
+        tolerances::EXACT,
     );
 
     let mut max_diff = 0_u32;

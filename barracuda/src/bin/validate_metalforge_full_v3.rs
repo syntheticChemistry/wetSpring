@@ -136,7 +136,7 @@ fn validate_snp(
         "SNP count",
         gpu_snp.is_variant.iter().filter(|&&x| x != 0).count() as f64,
         cpu_snp.variants.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("SNP", cpu_us, gpu_us, "CPU=GPU"));
 }
@@ -209,7 +209,7 @@ fn validate_pangenome(
         "core",
         gpu_pan.classifications.iter().filter(|&&c| c == 3).count() as f64,
         cpu_pan.core_size as f64,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("Pangenome", cpu_us, gpu_us, "CPU=GPU"));
 }
@@ -571,7 +571,7 @@ fn validate_kriging(
         "Kriging count",
         ordinary.values.len() as f64,
         targets.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
     for (i, val) in ordinary.values.iter().enumerate() {
         v.check_pass(&format!("Kriging {i} finite"), val.is_finite());

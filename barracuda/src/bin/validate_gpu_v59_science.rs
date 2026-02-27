@@ -67,7 +67,11 @@ fn validate_gpu_anderson(v: &mut Validator) {
             let eigs = lanczos_eigenvalues(&tri);
             let r = level_spacing_ratio(&eigs);
 
-            let regime = if r > midpoint { "extended" } else { "localized" };
+            let regime = if r > midpoint {
+                "extended"
+            } else {
+                "localized"
+            };
             println!("    W={w:5.1} → r={r:.4} ({regime})");
 
             v.check_pass(
@@ -133,10 +137,7 @@ fn validate_diversity_anderson_pipeline(v: &mut Validator) {
         results.push((name, h, j, w, r));
     }
 
-    v.check_pass(
-        "high diversity → extended regime",
-        results[0].4 > midpoint,
-    );
+    v.check_pass("high diversity → extended regime", results[0].4 > midpoint);
 
     v.check_pass(
         "high-diversity W < low-diversity W (physics correct)",
@@ -186,7 +187,10 @@ fn validate_wc_determination(v: &mut Validator) {
 
     if let Some(pair) = crossing {
         let w_c_approx = f64::midpoint(pair[0].0, pair[1].0);
-        println!("  W_c ≈ {w_c_approx:.1} (crossing between W={:.1} and W={:.1})", pair[0].0, pair[1].0);
+        println!(
+            "  W_c ≈ {w_c_approx:.1} (crossing between W={:.1} and W={:.1})",
+            pair[0].0, pair[1].0
+        );
         v.check_pass(
             "W_c in plausible range [10, 25]",
             (10.0..=25.0).contains(&w_c_approx),
@@ -267,16 +271,11 @@ fn validate_cold_seep_spectral(v: &mut Validator) {
             .all(|&r| (POISSON_R - 0.1..=GOE_R + 0.1).contains(&r)),
     );
 
-    println!(
-        "  Cold seep spectral: {:.0}µs",
-        t.elapsed().as_micros()
-    );
+    println!("  Cold seep spectral: {:.0}µs", t.elapsed().as_micros());
 }
 
 fn main() {
-    let mut v = Validator::new(
-        "Exp191: GPU V59 Science Parity — Diversity + Anderson (4 Domains)",
-    );
+    let mut v = Validator::new("Exp191: GPU V59 Science Parity — Diversity + Anderson (4 Domains)");
     let t_total = Instant::now();
 
     validate_gpu_anderson(&mut v);

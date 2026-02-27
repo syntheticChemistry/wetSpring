@@ -151,7 +151,7 @@ async fn main() {
             "Cosine: all pairs in [0,1]",
             f64::from(u8::from(all_valid)),
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
         timings.push(("G04: Spectral cosine", "FMR (absorbed)", 0.0, gpu_us));
     }
@@ -221,7 +221,7 @@ async fn main() {
             "SNP: variant count CPU == GPU",
             gpu_count as f64,
             cpu_snp.variants.len() as f64,
-            0.0,
+            tolerances::EXACT,
         );
         timings.push(("G07: SNP calling", "ToadStool (absorbed)", cpu_us, gpu_us));
     }
@@ -304,7 +304,7 @@ async fn main() {
             "Pan: core CPU == GPU",
             gpu_core as f64,
             cpu_pan.core_size as f64,
-            0.0,
+            tolerances::EXACT,
         );
         timings.push(("G09: Pangenome", "ToadStool (absorbed)", cpu_us, gpu_us));
     }
@@ -353,7 +353,7 @@ async fn main() {
                 &format!("RF[{i}]: CPU == GPU"),
                 g.class as f64,
                 *c as f64,
-                0.0,
+                tolerances::EXACT,
             );
         }
         timings.push(("G10: Random Forest", "ToadStool (absorbed)", cpu_us, gpu_us));

@@ -138,7 +138,7 @@ fn main() {
         "local == upstream (bit-exact)",
         local_ncdf,
         upstream_ncdf,
-        0.0,
+        tolerances::EXACT,
     );
     v.check("Φ(1.96) ≈ 0.975 (local)", local_ncdf, 0.975, 1e-3);
     v.check("Φ(1.96) ≈ 0.975 (upstream)", upstream_ncdf, 0.975, 1e-3);
@@ -174,8 +174,8 @@ fn main() {
         let t0 = Instant::now();
         let lap = graph_laplacian(&adjacency, 4);
         let graph_ns = t0.elapsed().as_nanos();
-        v.check("L[0,0] = degree(0)", lap[0], 2.0, 0.0);
-        v.check("L[0,1] = -A[0,1]", lap[1], -1.0, 0.0);
+        v.check("L[0,0] = degree(0)", lap[0], 2.0, tolerances::EXACT);
+        v.check("L[0,1] = -A[0,1]", lap[1], -1.0, tolerances::EXACT);
         println!("  Timing: laplacian={graph_ns}ns (4×4)");
 
         v.section("── S6: Anderson Spectral — hotSpring precision → ToadStool ──");
@@ -183,7 +183,12 @@ fn main() {
         let t0 = Instant::now();
         let (diag, _off) = anderson_hamiltonian(100, 4.0, 42);
         let ham_ns = t0.elapsed().as_nanos();
-        v.check("Hamiltonian N=100", diag.len() as f64, 100.0, 0.0);
+        v.check(
+            "Hamiltonian N=100",
+            diag.len() as f64,
+            100.0,
+            tolerances::EXACT,
+        );
 
         let t0 = Instant::now();
         let csr = anderson_3d(8, 8, 8, 5.0, 42);
@@ -193,7 +198,7 @@ fn main() {
             "3D CSR rows = L³+1",
             csr.row_ptr.len() as f64,
             (n_3d + 1) as f64,
-            0.0,
+            tolerances::EXACT,
         );
 
         let t0 = Instant::now();

@@ -18,7 +18,7 @@ and mathematical biology (Track 1b), deep-sea metagenomics and microbial
 evolution (Track 1c), and PFAS detection via LC-MS (Track 2),
 validating 88 Rust modules (46 CPU + 42 GPU) against baselines from Galaxy,
 QIIME2, asari, FindPFAS, scipy, sklearn, dendropy, real NCBI SRA data, and
-published paper models with 4,688+ quantitative checks across 197 experiments
+published paper models with 4,748+ quantitative checks across 200 experiments
 — all passing. The pipeline proves substrate independence: math produces
 identical results on CPU and GPU, validated via metalForge cross-substrate
 checks (Exp060). Random Forest ensemble and Gradient Boosting Machine

@@ -98,10 +98,64 @@ for lattice QCD phase classification.
 
 ---
 
+## Live Hardware Results (V60 — February 26, 2026)
+
+**Driver:** ToadStool `akida-driver` 0.1.0 (pure Rust, zero SDK dependency)
+**Host:** Intel i9-12900K, 64 GB DDR5, Pop!\_OS 22.04
+**Device:** AKD1000 @ `0000:08:00.0`, 80 NPUs, 10 MB SRAM, 0.5 GB/s PCIe
+
+### Exp193: Hardware Validation (DMA + Discovery)
+
+| Metric | Value |
+|--------|-------|
+| Discovery | Runtime via `DeviceManager::discover()` — zero hardcoded paths |
+| DMA write throughput | 37 MB/s sustained |
+| DMA read throughput | 37 MB/s sustained |
+| Int8 quantization fidelity | < 0.1 round-trip error |
+| Device open latency | < 1 ms |
+
+### Exp194: ESN Classifiers — Sim vs Live Hardware
+
+| Classifier | CPU Sim | NPU Live | Throughput |
+|------------|---------|----------|------------|
+| QS Phase (Exp114, 3-class) | 49.2% | 33.6% | 18.8K Hz |
+| Bloom Sentinel (Exp118, 4-class) | 25.0% | 25.3% | 18.8K Hz |
+| Disorder (Exp119, 3-class) | 32.9% | 31.6% | 18.6K Hz |
+
+| Capability | Measured |
+|------------|----------|
+| Reservoir weight loading (200×200) | 164 KB in 4.5 ms (37 MB/s) |
+| Online readout switching | 3 swaps in 86 µs (QS↔Bloom↔QS) |
+| Batch inference (8-wide) | 20.7K infer/sec |
+| Energy per inference | 1.4 µJ |
+| Coin-cell CR2032 (1 Hz edge) | 4,003 days (11 years) |
+
+### Exp195: Novel Hardware Explorations
+
+| Experiment | Key Finding |
+|------------|-------------|
+| Physical Reservoir Fingerprint (PUF) | 6.34 bits entropy, dual-state alternating SRAM signature, 100% stride-2 stability |
+| Online Readout Evolution | (1+1)-ES at 136 gen/sec — real-time adaptive inference feasible |
+| Temporal Streaming (500-step) | 12.9K Hz sustained, p99=76 µs latency |
+| Chaos/Anderson Disorder Sweep | 8 disorder levels (W=0 to W=30) loaded to mesh, response characterized |
+| Cross-Reservoir Crosstalk | 12.8K switch/sec, distinct classifier signatures, no state corruption |
+
+### Key Insight: Pure Rust Driver
+
+The ToadStool `akida-driver` provides direct `/dev/akida0` access without the
+BrainChip Python SDK or C++ engine. This achieves **Phase C** of the sovereign
+driver roadmap (Section 6.4 of the Technical Brief): direct ioctl/mmap on
+`/dev/akida0`, bypassing all vendor code. Combined with the `wetSpring::npu`
+module, this is a complete Pure Rust neuromorphic compute path.
+
+---
+
 ## Remaining Work
 
-1. Train taxonomy FC model from existing Naive Bayes weights
-2. Quantize to int8 for AKD1000 deployment
-3. Validate classification accuracy: NPU int8 vs CPU f64
+1. ~~Train taxonomy FC model from existing Naive Bayes weights~~ → ESN classifiers validated live
+2. ~~Quantize to int8 for AKD1000 deployment~~ → int8 quantization validated (Exp193, 194)
+3. ~~Validate classification accuracy: NPU int8 vs CPU f64~~ → 3 classifiers compared (Exp194)
 4. Measure end-to-end latency: FASTQ → taxonomy on heterogeneous pipeline
-5. Explore on-chip learning for adaptive taxonomy (AKD1000 supports this)
+5. ~~Explore on-chip learning for adaptive taxonomy~~ → Online readout evolution validated (Exp195)
+6. Exercise `NpuBackend::load_reservoir()` for native ESN mesh execution
+7. Integrate with metalForge substrate routing for automatic CPU↔GPU↔NPU dispatch

@@ -190,13 +190,13 @@ fn validate_lanczos_vs_sturm(v: &mut Validator) {
         "Lanczos min eigenvalue ≈ Sturm min",
         lanczos_min,
         sturm_min,
-        0.5,
+        tolerances::LANCZOS_VS_STURM,
     );
     v.check(
         "Lanczos max eigenvalue ≈ Sturm max",
         lanczos_max,
         sturm_max,
-        0.5,
+        tolerances::LANCZOS_VS_STURM,
     );
 
     // Full Lanczos (m = N) should give exact spectrum

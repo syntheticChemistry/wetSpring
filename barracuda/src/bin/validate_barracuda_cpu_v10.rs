@@ -176,11 +176,23 @@ fn validate_dynamic_anderson(v: &mut Validator) {
     v.section("═══ D03: Dynamic Anderson W(t) Functions (Exp186) ═══");
     let t = Instant::now();
 
-    v.check("tillage W(0) = 20", w_tillage(0.0), 20.0, tolerances::EXACT_F64);
-    v.check("tillage W(∞) → 12", w_tillage(100.0), 12.0, 0.01);
+    v.check(
+        "tillage W(0) = 20",
+        w_tillage(0.0),
+        20.0,
+        tolerances::EXACT_F64,
+    );
+    v.check(
+        "tillage W(∞) → 12",
+        w_tillage(100.0),
+        12.0,
+        tolerances::ODE_STEADY_STATE,
+    );
     v.check_pass("tillage monotonically decreasing", {
         let t_vals: Vec<f64> = (0..20).map(f64::from).collect();
-        t_vals.windows(2).all(|w| w_tillage(w[0]) >= w_tillage(w[1]))
+        t_vals
+            .windows(2)
+            .all(|w| w_tillage(w[0]) >= w_tillage(w[1]))
     });
 
     v.check(
@@ -193,12 +205,37 @@ fn validate_dynamic_anderson(v: &mut Validator) {
         let w_mid = w_antibiotic(3.5);
         w_mid > 14.0 && w_mid < 25.0
     });
-    v.check("antibiotic W(7) = 25 (peak)", w_antibiotic(7.0), 25.0, tolerances::EXACT_F64);
-    v.check("antibiotic W(∞) → 14", w_antibiotic(200.0), 14.0, 0.01);
+    v.check(
+        "antibiotic W(7) = 25 (peak)",
+        w_antibiotic(7.0),
+        25.0,
+        tolerances::EXACT_F64,
+    );
+    v.check(
+        "antibiotic W(∞) → 14",
+        w_antibiotic(200.0),
+        14.0,
+        tolerances::ODE_STEADY_STATE,
+    );
 
-    v.check("seasonal W(0) = 16", w_seasonal(0.0), 16.0, tolerances::EXACT_F64);
-    v.check("seasonal W(91.25) ≈ 20", w_seasonal(91.25), 20.0, 0.5);
-    v.check("seasonal W(273.75) ≈ 12", w_seasonal(273.75), 12.0, 0.5);
+    v.check(
+        "seasonal W(0) = 16",
+        w_seasonal(0.0),
+        16.0,
+        tolerances::EXACT_F64,
+    );
+    v.check(
+        "seasonal W(91.25) ≈ 20",
+        w_seasonal(91.25),
+        20.0,
+        tolerances::SEASONAL_OSCILLATION,
+    );
+    v.check(
+        "seasonal W(273.75) ≈ 12",
+        w_seasonal(273.75),
+        12.0,
+        tolerances::SEASONAL_OSCILLATION,
+    );
     v.check_pass("seasonal is periodic (365 days)", {
         let diff = (w_seasonal(0.0) - w_seasonal(365.0)).abs();
         diff < 1e-10
@@ -211,10 +248,7 @@ fn validate_dynamic_anderson(v: &mut Validator) {
         min >= 11.99 && max <= 20.01
     });
 
-    println!(
-        "  Dynamic Anderson W(t): {:.0}µs",
-        t.elapsed().as_micros()
-    );
+    println!("  Dynamic Anderson W(t): {:.0}µs", t.elapsed().as_micros());
 }
 
 // ── D04: NPU Int8 Quantization Mathematics ───────────────────────────────────
@@ -304,9 +338,9 @@ fn validate_fasta_to_diversity(v: &mut Validator) {
     v.section("═══ D05: FASTA → Diversity End-to-End (Exp184) ═══");
     let t = Instant::now();
 
-    let fasta = ">seq1\nATCGATCG\n>seq2\nATCGATCG\n>seq3\nGGGGAAAA\n>seq4\nGGGGAAAA\n>seq5\nCCCCTTTT\n";
-    let mut counts: std::collections::HashMap<String, f64> =
-        std::collections::HashMap::new();
+    let fasta =
+        ">seq1\nATCGATCG\n>seq2\nATCGATCG\n>seq3\nGGGGAAAA\n>seq4\nGGGGAAAA\n>seq5\nCCCCTTTT\n";
+    let mut counts: std::collections::HashMap<String, f64> = std::collections::HashMap::new();
     let mut current_seq = String::new();
     for line in fasta.lines() {
         if line.starts_with('>') {
@@ -345,10 +379,7 @@ fn validate_fasta_to_diversity(v: &mut Validator) {
     v.check_pass("Pielou J < 1 (not perfectly even)", j < 1.0);
     v.check_pass("Pielou J > 0.8 (fairly even)", j > 0.8);
 
-    println!(
-        "  FASTA → diversity: {:.0}µs",
-        t.elapsed().as_micros()
-    );
+    println!("  FASTA → diversity: {:.0}µs", t.elapsed().as_micros());
 }
 
 fn main() {

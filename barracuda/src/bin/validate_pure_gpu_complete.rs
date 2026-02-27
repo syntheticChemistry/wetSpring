@@ -213,13 +213,13 @@ fn validate_merge_pairs_gpu(gpu: &GpuF64, v: &mut Validator) {
         "merge count CPU≈GPU",
         gpu_merged.len() as f64,
         cpu_merged.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "merge stats input_pairs CPU≈GPU",
         gpu_stats.input_pairs as f64,
         cpu_stats.input_pairs as f64,
-        0.0,
+        tolerances::EXACT,
     );
 }
 
@@ -249,14 +249,14 @@ fn validate_signal_gpu(gpu: &GpuF64, v: &mut Validator) {
         "peak count CPU≈GPU",
         gpu_peaks.len() as f64,
         cpu.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
     for (i, (c, g)) in cpu.iter().zip(&gpu_peaks).enumerate() {
         v.check(
             &format!("peak[{i}] index CPU≈GPU"),
             g.index as f64,
             c.index as f64,
-            0.0,
+            tolerances::EXACT,
         );
     }
 }
@@ -274,7 +274,7 @@ fn validate_feature_table_gpu(gpu: &GpuF64, v: &mut Validator) {
         "feature count CPU≈GPU (empty)",
         gpu_ft.features.len() as f64,
         cpu.features.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
 }
 
@@ -330,13 +330,13 @@ fn validate_derep_gpu(gpu: &GpuF64, v: &mut Validator) {
         "derep unique count CPU≈GPU",
         gpu_uniq.len() as f64,
         cpu_uniq.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "derep input_sequences CPU≈GPU",
         gpu_stats.input_sequences as f64,
         cpu_stats.input_sequences as f64,
-        0.0,
+        tolerances::EXACT,
     );
 }
 
@@ -373,13 +373,13 @@ fn validate_chimera_gpu(gpu: &GpuF64, v: &mut Validator) {
         "chimera count CPU≈GPU",
         gpu_results.len() as f64,
         cpu_results.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "chimera found CPU≈GPU",
         gpu_stats.chimeras_found as f64,
         cpu_stats.chimeras_found as f64,
-        0.0,
+        tolerances::EXACT,
     );
 }
 

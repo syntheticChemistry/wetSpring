@@ -75,6 +75,8 @@ pub mod error;
 pub mod gpu;
 pub mod io;
 pub mod ncbi;
+#[cfg(feature = "npu")]
+pub mod npu;
 pub mod special;
 pub mod tolerances;
 pub mod validation;

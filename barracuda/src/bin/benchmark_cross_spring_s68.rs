@@ -54,6 +54,7 @@ use wetspring_barracuda::bio::bistable_gpu::{BistableGpu, N_VARS as BIST_VARS};
 use wetspring_barracuda::bio::capacitor_gpu::{CapacitorGpu, CapacitorOdeConfig};
 use wetspring_barracuda::bio::cooperation::CooperationParams;
 use wetspring_barracuda::bio::cooperation_gpu::{CooperationGpu, CooperationOdeConfig};
+use wetspring_barracuda::bio::diversity_fusion_gpu::{DiversityFusionGpu, diversity_fusion_cpu};
 use wetspring_barracuda::bio::gemm_cached::GemmCached;
 use wetspring_barracuda::bio::multi_signal_gpu::{MultiSignalGpu, MultiSignalOdeConfig};
 use wetspring_barracuda::bio::phage_defense::PhageDefenseParams;
@@ -197,7 +198,7 @@ fn main() {
     });
 
     let (cap_res, cap_ms) = bench("Capacitor GPU (128 batches)", || {
-        use wetspring_barracuda::bio::capacitor::{CapacitorParams, N_VARS as CAP_V};
+        use wetspring_barracuda::bio::capacitor::CapacitorParams;
         let gpu_ode = CapacitorGpu::new(Arc::clone(&device)).expect("CapacitorGpu");
         let flat_y0: Vec<f64> = (0..nb)
             .flat_map(|_| [0.01, 0.0, 0.0, 0.0, 0.0, 0.0].iter().copied())
@@ -232,7 +233,7 @@ fn main() {
     });
 
     let (multi_res, multi_ms) = bench("MultiSignal GPU (128 batches)", || {
-        use wetspring_barracuda::bio::multi_signal::{MultiSignalParams, N_VARS as MS_V};
+        use wetspring_barracuda::bio::multi_signal::MultiSignalParams;
         let gpu_ode = MultiSignalGpu::new(Arc::clone(&device)).expect("MultiSignalGpu");
         let flat_y0: Vec<f64> = (0..nb)
             .flat_map(|_| [0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0].iter().copied())
@@ -274,30 +275,27 @@ fn main() {
     println!("  Provenance: wetSpring diversity_fusion_f64.wgsl → ToadStool S63 absorption");
     println!("  First full Write→Absorb→Lean cycle in ecoPrimals history");
 
-    use wetspring_barracuda::bio::diversity_fusion_gpu::{
-        DiversityFusionGpu, diversity_fusion_cpu,
-    };
-
     let abundances: Vec<f64> = (0..200).map(|i| f64::from(i % 50 + 1) / 50.0).collect();
     let n_species = 50;
+    let n_samples = abundances.len() / n_species;
 
-    let (fusion_gpu_res, fusion_gpu_ms) = bench("DiversityFusion GPU (200 samples)", || {
-        let dfg = DiversityFusionGpu::new(Arc::clone(&device), Arc::clone(&ctx));
-        dfg.compute(&abundances, n_species)
+    let (fusion_gpu_res, fusion_gpu_ms) = bench("DiversityFusion GPU (4 samples)", || {
+        let dfg = DiversityFusionGpu::new(Arc::clone(&device)).expect("DiversityFusion init");
+        dfg.compute(&abundances, n_samples, n_species)
             .expect("DiversityFusion GPU")
     });
-    let fusion_cpu_res = diversity_fusion_cpu(&abundances, n_species).expect("DiversityFusion CPU");
+    let fusion_cpu_res = diversity_fusion_cpu(&abundances, n_species);
 
     v.check(
         "Fusion GPU Shannon ≈ CPU",
-        fusion_gpu_res.shannon,
-        fusion_cpu_res.shannon,
+        fusion_gpu_res[0].shannon,
+        fusion_cpu_res[0].shannon,
         tolerances::GPU_VS_CPU_F64,
     );
     v.check(
         "Fusion GPU Simpson ≈ CPU",
-        fusion_gpu_res.simpson,
-        fusion_cpu_res.simpson,
+        fusion_gpu_res[0].simpson,
+        fusion_cpu_res[0].simpson,
         tolerances::GPU_VS_CPU_F64,
     );
     timings.push(Timing {
@@ -407,7 +405,12 @@ fn main() {
     let (ncdf_val, ncdf_ms) = bench("norm_cdf(1.96) — barracuda::stats", || {
         barracuda::stats::norm_cdf(1.96)
     });
-    v.check("norm_cdf(1.96) ≈ 0.975", ncdf_val, 0.975, 0.001);
+    v.check(
+        "norm_cdf(1.96) ≈ 0.975",
+        ncdf_val,
+        0.975,
+        tolerances::CROSS_SPRING_NUMERICAL,
+    );
     timings.push(Timing {
         label: "norm_cdf(1.96)",
         origin: "cross-spring→S59",
@@ -517,7 +520,12 @@ fn main() {
         let y: Vec<f64> = x.iter().map(|&xi| xi * xi).collect();
         barracuda::numerical::trapz(&y, &x).expect("trapz")
     });
-    v.check("trapz(x²) ≈ 1/3", trapz_val, 1.0 / 3.0, 0.001);
+    v.check(
+        "trapz(x²) ≈ 1/3",
+        trapz_val,
+        1.0 / 3.0,
+        tolerances::CROSS_SPRING_NUMERICAL,
+    );
     timings.push(Timing {
         label: "trapz 1000pts",
         origin: "cross-spring→S59",
@@ -598,7 +606,12 @@ fn main() {
     let (pear_val, pear_ms) = bench("pearson_correlation — barracuda::stats", || {
         barracuda::stats::pearson_correlation(&vec_a, &vec_b).expect("pearson")
     });
-    v.check("pearson(linear, anti-linear) ≈ -1", pear_val, -1.0, 0.001);
+    v.check(
+        "pearson(linear, anti-linear) ≈ -1",
+        pear_val,
+        -1.0,
+        tolerances::CROSS_SPRING_NUMERICAL,
+    );
     timings.push(Timing {
         label: "Pearson correlation",
         origin: "airSpring→S64",

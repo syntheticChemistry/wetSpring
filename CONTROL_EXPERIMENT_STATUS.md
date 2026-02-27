@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 26, 2026
-**Status:** Phase 59 — 197 experiments, 4,688+ validation checks (1,578 GPU on RTX 4070), all PASS (882 barracuda lib + 60 integration + 19 doc + 47 forge = 1,008 Rust tests), ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 86 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets + fuzz), typed NCBI errors (`Error::Ncbi`), V59 deep debt resolution + idiomatic Rust evolution, 39/39 three-tier
+**Status:** Phase 60 — 200 experiments, 4,748+ validation checks (1,578 GPU on RTX 4070, 60 NPU on AKD1000), all PASS (882 barracuda lib + 60 integration + 19 doc + 47 forge = 1,008 Rust tests), ToadStool S68 aligned (`f0feb226`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 86 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets + fuzz), typed NCBI errors (`Error::Ncbi`), V60 NPU live (3 ESN classifiers on real AKD1000, online evolution, PUF, streaming), Sub-thesis 06 field genomics architecture, 39/39 three-tier
 
 ---
 
@@ -200,6 +200,16 @@
 | 190 | BarraCuda CPU v10 — V59 Science | CPU/cross | PASS | 75 |
 | 191 | GPU V59 Science Parity | GPU | PASS | 29 |
 | 192 | metalForge V59 Cross-Substrate | metalForge | PASS | 36 |
+| 193 | NPU Hardware Validation (Real AKD1000 DMA) | NPU | PASS | 7 sections |
+| 194 | NPU Live ESN — sim↔hardware comparison | NPU | PASS | 23 |
+| 195 | Funky NPU Explorations (AKD1000 novelties) | NPU | PASS | 14 |
+| 196 | Nanopore Signal Bridge (POD5/FAST5 reader) | field genomics | PLANNED | — |
+| 197 | NPU Adaptive Sampling (MinKNOW feedback) | field genomics | PLANNED | — |
+| 198 | Field Bloom Sentinel E2E (MinION → NPU) | field genomics | PLANNED | — |
+| 199 | Soil 16S Field Pipeline (MinION → Anderson) | field genomics | PLANNED | — |
+| 200 | Soil Health NPU Classifier | field genomics | PLANNED | — |
+| 201 | AMR Gene Detection (long-read → resistance) | field genomics | PLANNED | — |
+| 202 | AMR Threat NPU Classifier | field genomics | PLANNED | — |
 
 ---
 
@@ -207,9 +217,11 @@
 
 | Category | Count |
 |----------|-------|
-| Experiments completed | 197 |
+| Experiments completed | 200 |
+| Experiments planned | 7 (Exp196-202, field genomics) |
 | CPU validation checks | 1,476 |
 | GPU validation checks | 1,578 |
+| NPU validation checks | 60 |
 | Dispatch validation checks | 80 |
 | Layout fidelity checks | 35 |
 | Transfer/streaming checks | 57 |
@@ -235,7 +247,7 @@
 | Phase 44: modern systems S62+DF64, diversity fusion (Exp166-167) | 37 |
 | Exp184-188 science extensions | 54 |
 | Exp190-192 V59 three-tier controls | 140 |
-| **Total validation checks** | **4,688+** |
+| **Total validation checks** | **4,748+** |
 | Rust tests | 1,008 (882 barracuda lib + 60 integration + 19 doc + 47 forge) |
 | BarraCuda CPU parity | 380/380 (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/092/101) |

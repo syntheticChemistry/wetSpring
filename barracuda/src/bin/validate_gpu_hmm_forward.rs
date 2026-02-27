@@ -291,7 +291,7 @@ fn validate_batch(gpu: &HmmGpuForward, v: &mut Validator) {
                     "Batch: n_seqs",
                     gpu_result.log_likelihoods.len() as f64,
                     n_seqs as f64,
-                    0.0,
+                    tolerances::EXACT,
                 );
             }
 

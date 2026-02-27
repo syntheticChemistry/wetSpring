@@ -286,13 +286,13 @@ fn validate_merge_pairs_mf(
         "merge count",
         gpu_merged.len() as f64,
         cpu_merged.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "merge input_pairs",
         gpu_stats.input_pairs as f64,
         cpu_stats.input_pairs as f64,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("Merge Pairs", cpu_us, gpu_us, "CPU=GPU"));
 }
@@ -341,7 +341,7 @@ fn validate_signal_mf(
             &format!("peak[{i}] index"),
             g.index as f64,
             c.index as f64,
-            0.0,
+            tolerances::EXACT,
         );
     }
     timings.push(("Signal", cpu_us, gpu_us, "CPU=GPU"));
@@ -371,7 +371,7 @@ fn validate_feature_table_mf(
         "feature count",
         gpu_ft.features.len() as f64,
         cpu.features.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("Feature Table", cpu_us, gpu_us, "CPU=GPU"));
 }
@@ -449,13 +449,13 @@ fn validate_derep_mf(
         "derep unique count",
         gpu_uniq.len() as f64,
         cpu_uniq.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "derep input_sequences",
         gpu_stats.input_sequences as f64,
         cpu_stats.input_sequences as f64,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("Dereplication", cpu_us, gpu_us, "CPU=GPU"));
 }
@@ -503,13 +503,13 @@ fn validate_chimera_mf(
         "chimera count",
         gpu_results.len() as f64,
         cpu_results.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "chimera found",
         gpu_stats.chimeras_found as f64,
         cpu_stats.chimeras_found as f64,
-        0.0,
+        tolerances::EXACT,
     );
     timings.push(("Chimera", cpu_us, gpu_us, "CPU=GPU"));
 }

@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-26 (Phase 59: 197 experiments, ToadStool S68 (`f0feb226`), 79 primitives consumed via `compile_shader_universal`, 0 local WGSL/derivative/regression, barracuda always-on, 1,008 tests, 96.67% coverage, 86 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, V59 doc sync + evolution learnings handoff, 39/39 three-tier, 52/52 papers)
+**Updated**: 2026-02-26 (Phase 60: 200 experiments, 4,748+ checks (1,578 GPU, 60 NPU on AKD1000), ToadStool S68 (`f0feb226`), 79 primitives consumed, barracuda always-on, 1,008 tests, 96.67% coverage, 86 named tolerances, clippy pedantic CLEAN, 0 Passthrough, V60 NPU live (Exp193-195), Sub-thesis 06 field genomics (Exp196-202 planned), 39/39 three-tier, 52/52 papers)
 
 ---
 
@@ -128,6 +128,16 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 190 | [BarraCuda CPU v10 — V59 Science](190_barracuda_cpu_v10.md) | CPU/cross | DONE | V59 science domains | validate_barracuda_cpu_v10 | 75 |
 | 191 | [GPU V59 Science Parity](191_gpu_v59_science.md) | GPU | DONE | Diversity + Anderson | validate_gpu_v59_science | 29 |
 | 192 | [metalForge V59 Cross-Substrate](192_metalforge_v59_science.md) | metalForge | DONE | CPU↔GPU parity | validate_metalforge_v59_science | 36 |
+| 193 | [NPU Hardware Validation](193_npu_hardware_validation.md) | NPU | DONE | Real AKD1000 DMA | validate_npu_hardware | 7 sections |
+| 194 | [NPU Live ESN](194_npu_live_esn.md) | NPU | DONE | Sim↔hardware ESN | validate_npu_live | 23 |
+| 195 | [Funky NPU Explorations](195_npu_funky_explorations.md) | NPU | DONE | AKD1000 novelties | validate_npu_funky | 14 |
+| 196 | Nanopore Signal Bridge | field genomics | PLANNED | POD5/FAST5 reader | — | — |
+| 197 | NPU Adaptive Sampling | field genomics | PLANNED | MinKNOW feedback | — | — |
+| 198 | Field Bloom Sentinel E2E | field genomics | PLANNED | MinION → NPU | — | — |
+| 199 | Soil 16S Field Pipeline | field genomics | PLANNED | MinION → Anderson | — | — |
+| 200 | Soil Health NPU Classifier | field genomics | PLANNED | NPU soil class | — | — |
+| 201 | AMR Gene Detection | field genomics | PLANNED | Long-read AMR | — | — |
+| 202 | AMR Threat NPU Classifier | field genomics | PLANNED | NPU AMR class | — | — |
 
 ---
 
@@ -304,7 +314,7 @@ thresholds from `src/tolerances.rs`.
 | `validate_soil_qs_streaming` | 181 | 52 | `cargo run --features gpu --release --bin validate_soil_qs_streaming` |
 | `validate_soil_qs_metalforge` | 182 | 14 | `cargo run --features gpu --release --bin validate_soil_qs_metalforge` |
 
-**Total validation checks**: 4,688+
+**Total validation checks**: 4,748+
 **Rust tests**: 1,008 (882 barracuda lib + 60 integration + 19 doc + 47 forge)
 **Binaries**: 169 validate + 15 benchmark = 184 total
 **ToadStool primitives**: 79 consumed (barracuda always-on, zero fallback code — S68 `f0feb226`)

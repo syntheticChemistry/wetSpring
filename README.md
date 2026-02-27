@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** February 26, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 59 — Science extensions + deep debt resolution; 1,008 tests (882 barracuda lib + 60 integration + 19 doc + 47 forge), 96.67% llvm-cov, 197 experiments, 4,688+ checks (1,578 GPU on RTX 4070), 184 binaries (169 validate + 15 benchmark), ToadStool S68 aligned (`f0feb226`), 79 primitives consumed via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math), 86 named tolerances with full provenance, 0 ad-hoc magic numbers, 0 Passthrough, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, NCBI EFetch/SRA pipeline + NestGate JSON-RPC integration + biomeOS science graph, 52/52 papers, 39/39 three-tier
+**Status:** Phase 60 — NPU Live + Field Genomics architecture; 1,008 tests (882 barracuda lib + 60 integration + 19 doc + 47 forge), 96.67% llvm-cov, 200 experiments, 4,748+ checks (1,578 GPU on RTX 4070, 60 NPU on AKD1000), 186 binaries, ToadStool S68 aligned (`f0feb226`), 79 primitives consumed via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math), 86 named tolerances with full provenance, 0 ad-hoc magic numbers, 0 Passthrough, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, NCBI EFetch/SRA pipeline + NestGate JSON-RPC integration + biomeOS science graph, 52/52 papers, 39/39 three-tier, V60 NPU live (Exp193-195: real AKD1000 DMA, ESN sim↔hardware, online evolution, PUF), Sub-thesis 06 field genomics (nanopore + NPU) architecture defined
 
 ---
 
@@ -116,7 +116,7 @@ integration point.
 | Phase 42: Track 3 full-tier (CPU v9, GPU drug, metalForge drug) | 44 (Exp163-165: CPU v9 27, GPU drug 8, metalForge drug 9) |
 | Phase 44: modern systems S62+DF64, diversity fusion extension | 37 (Exp166: 19, Exp167: 18) |
 | Phase 45 V40: cross-spring S62+DF64 evolution | ~25 (Exp168: hotSpring precision → wetSpring bio → neuralSpring pop-gen → Track 3 GPU) |
-| **Total validation checks** | **4,688+** |
+| **Total validation checks** | **4,748+** |
 | Rust library unit tests | 882 (barracuda CPU, default features) |
 | metalForge forge tests | 47 |
 | **Total Rust tests** | **1,008** (882 barracuda lib + 60 integration + 19 doc + 47 forge) |
@@ -134,7 +134,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | ToadStool primitives consumed | **79** (barracuda always-on, zero fallback code — ToadStool S68, `f0feb226`) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 4,688+ validation checks **PASS**. All 1,008 tests **PASS** (1 ignored: hardware-dependent).
+All 4,748+ validation checks **PASS**. All 1,008 tests **PASS** (1 ignored: hardware-dependent).
 
 ### GPU Performance
 
@@ -528,7 +528,7 @@ Complete rewiring to modern ToadStool S42 BarraCuda APIs:
 - **Exp120**: Benchmarks diversity (wetSpring), QS ODE (hotSpring precision), ESN reservoir
   (hotSpring/neuralSpring → wetSpring NPU), with full provenance table and evolution timeline
 
-**1,008 tests** | **4,688+ checks** | **184 binaries**
+**1,008 tests** | **4,748+ checks** | **186 binaries**
 
 ### Phase 35: NCBI-Scale Hypothesis Testing (Exp121-126)
 
@@ -931,7 +931,7 @@ Rust 1.93 fixed across 20+ validation binaries.
 wetSpring/
 ├── README.md                      ← this file
 ├── BENCHMARK_RESULTS.md           ← three-tier benchmark results
-├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (197 experiments)
+├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (200 experiments)
 ├── barracuda/                     ← Rust crate (src/, Cargo.toml, rustfmt.toml)
 │   ├── EVOLUTION_READINESS.md    ← absorption map (tiers, primitives, shaders)
 │   ├── ABSORPTION_MANIFEST.md    ← what's absorbed, local, planned (hotSpring pattern)

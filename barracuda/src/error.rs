@@ -35,6 +35,8 @@ pub enum Error {
     InvalidInput(String),
     /// NCBI Entrez / SRA / `NestGate` error (network, parsing, protocol).
     Ncbi(String),
+    /// NPU compute error (discovery, model load, inference, DMA).
+    Npu(String),
 }
 
 /// Result type alias for wetSpring operations.
@@ -53,6 +55,7 @@ impl fmt::Display for Error {
             Self::Gpu(msg) => write!(f, "GPU compute error: {msg}"),
             Self::InvalidInput(msg) => write!(f, "invalid input: {msg}"),
             Self::Ncbi(msg) => write!(f, "NCBI error: {msg}"),
+            Self::Npu(msg) => write!(f, "NPU error: {msg}"),
         }
     }
 }
@@ -69,7 +72,8 @@ impl std::error::Error for Error {
             | Self::Ms2(_)
             | Self::Gpu(_)
             | Self::InvalidInput(_)
-            | Self::Ncbi(_) => None,
+            | Self::Ncbi(_)
+            | Self::Npu(_) => None,
         }
     }
 }
@@ -115,6 +119,7 @@ mod tests {
                 "invalid input",
             ),
             (Error::Ncbi("connection refused".into()), "NCBI error"),
+            (Error::Npu("no device".into()), "NPU error"),
         ];
         for (err, expected_prefix) in cases {
             let msg = err.to_string();
@@ -148,6 +153,7 @@ mod tests {
             Error::Gpu("x".into()),
             Error::InvalidInput("x".into()),
             Error::Ncbi("x".into()),
+            Error::Npu("x".into()),
         ];
         for err in &variants {
             assert!(std::error::Error::source(err).is_none());

@@ -144,7 +144,7 @@ fn validate_roundtrip_mode(v: &mut Validator, gpu: &GpuF64) {
         "RT: Shannon count",
         rt_shannon.len() as f64,
         N_SAMPLES as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check_pass(
         "RT: all Shannon finite",
@@ -154,13 +154,13 @@ fn validate_roundtrip_mode(v: &mut Validator, gpu: &GpuF64) {
         "RT: Simpson count",
         rt_simpson_n as f64,
         N_SAMPLES as f64,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "RT: Bray-Curtis pairs",
         rt_bc.len() as f64,
         (N_SAMPLES * (N_SAMPLES - 1) / 2) as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     println!(
@@ -207,7 +207,7 @@ fn validate_streaming_mode(v: &mut Validator, gpu: &GpuF64) {
         "stream: classification count",
         result.classifications.len() as f64,
         seq_refs.len() as f64,
-        0.0,
+        tolerances::EXACT,
     );
 
     let cpu_result =
@@ -241,7 +241,7 @@ fn validate_streaming_mode(v: &mut Validator, gpu: &GpuF64) {
             &format!("stream taxon {i}: GPU == CPU"),
             gc.taxon_idx as f64,
             cc.taxon_idx as f64,
-            0.0,
+            tolerances::EXACT,
         );
     }
 

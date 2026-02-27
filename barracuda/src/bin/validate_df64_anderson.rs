@@ -76,6 +76,12 @@ fn main() {
     {
         use barracuda::spectral::{AndersonSweepPoint, GOE_R, POISSON_R, find_w_c};
 
+        struct SizeResult {
+            l: usize,
+            sweep: Vec<(f64, f64, f64)>,
+            w_c: Option<f64>,
+        }
+
         let midpoint = f64::midpoint(GOE_R, POISSON_R);
         println!("  GOE_R={GOE_R:.4}, POISSON_R={POISSON_R:.4}, midpoint={midpoint:.4}");
         println!("  Lattice sizes: {LATTICE_SIZES:?}");
@@ -85,12 +91,6 @@ fn main() {
         println!("  Literature: W_c ≈ 16.54, ν ≈ 1.571");
 
         v.section("── S1: Disorder-averaged sweep per L ──");
-
-        struct SizeResult {
-            l: usize,
-            sweep: Vec<(f64, f64, f64)>,
-            w_c: Option<f64>,
-        }
 
         let mut all_results: Vec<SizeResult> = Vec::new();
 
@@ -176,7 +176,7 @@ fn main() {
             let mean_wc =
                 w_c_values.iter().map(|(_, wc)| wc).sum::<f64>() / w_c_values.len() as f64;
 
-            let nu_grid: Vec<f64> = (0..21).map(|i| 1.0 + i as f64 * 0.05).collect();
+            let nu_grid: Vec<f64> = (0..21).map(|i| 1.0 + f64::from(i) * 0.05).collect();
             let mut best_nu = LITERATURE_NU;
             let mut best_cost = f64::MAX;
 

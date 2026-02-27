@@ -209,6 +209,35 @@ impl Esn {
         &self.state
     }
 
+    /// Input weight matrix `W_in` (flat, `input_size × reservoir_size`).
+    #[must_use]
+    pub fn w_in(&self) -> &[f64] {
+        &self.w_in
+    }
+
+    /// Reservoir weight matrix `W_res` (flat, `reservoir_size × reservoir_size`).
+    #[must_use]
+    pub fn w_res(&self) -> &[f64] {
+        &self.w_res
+    }
+
+    /// Readout weight matrix `W_out` (flat, `output_size × reservoir_size`).
+    #[must_use]
+    pub fn w_out(&self) -> &[f64] {
+        &self.w_out
+    }
+
+    /// Mutable access to readout weights for online learning / evolution.
+    pub fn w_out_mut(&mut self) -> &mut [f64] {
+        &mut self.w_out
+    }
+
+    /// Configuration used to build this ESN.
+    #[must_use]
+    pub const fn config(&self) -> &EsnConfig {
+        &self.config
+    }
+
     /// Compute readout from current state.
     #[must_use]
     pub fn readout(&self) -> Vec<f64> {
