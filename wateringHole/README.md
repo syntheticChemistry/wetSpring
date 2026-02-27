@@ -12,6 +12,12 @@
 | **V60** | `handoffs/WETSPRING_TOADSTOOL_V60_NPU_FIELD_GENOMICS_HANDOFF_FEB26_2026.md` | Feb 26 | **current** — NPU live (Exp193-195, real AKD1000), field genomics architecture (Sub-thesis 06), ESN+NPU+Validator absorption candidates, data type profiling |
 | **V59** | `handoffs/WETSPRING_TOADSTOOL_V59_SCIENCE_EXTENSIONS_HANDOFF_FEB26_2026.md` | Feb 26 | Science extensions (Exp184-188), three-tier controls (Exp190-192), typed NCBI errors, 86 tolerances |
 
+## NestGate Handoffs
+
+| File | Date | Scope |
+|------|------|-------|
+| `handoffs/WETSPRING_NESTGATE_DATA_TYPES_EVOLUTION_HANDOFF_FEB26_2026.md` | Feb 26 | Data type profiling, P0-P3 gap analysis, evolution roadmap for biology-aware storage |
+
 ## Cross-Spring Documents
 
 | File | Purpose |
