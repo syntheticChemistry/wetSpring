@@ -423,9 +423,18 @@ fn main() {
         &[1.0, 1.0],
         1e-5,
     );
-    // Provenance: Rosenbrock at (1,1), numerical_hessian eps=1e-5
-    v.check("Hessian H[0,0] ≈ 802", hess[0], 802.0, 2.0);
-    v.check("Hessian H[1,1] ≈ 200", hess[3], 200.0, 1.0);
+    v.check(
+        "Hessian H[0,0] ≈ 802",
+        hess[0],
+        802.0,
+        tolerances::HESSIAN_H00_TOL,
+    );
+    v.check(
+        "Hessian H[1,1] ≈ 200",
+        hess[3],
+        200.0,
+        tolerances::HESSIAN_H11_TOL,
+    );
 
     v.section("D33: NMF (wetSpring → ToadStool)");
     total_domains += 1;

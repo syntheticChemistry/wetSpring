@@ -14,6 +14,7 @@ fn tolerance_hierarchy_is_monotonic() {
 }
 
 #[test]
+#[allow(clippy::too_many_lines)]
 fn all_tolerances_are_non_negative() {
     let all = [
         EXACT,
@@ -127,6 +128,19 @@ fn all_tolerances_are_non_negative() {
         DYNAMIC_WT_PERIODICITY,
         SOIL_DISTANCE_MIN_DIFF,
         SOIL_COOP_FREQ_AFFECTED,
+        OBSERVED_FEATURES_TOL,
+        CHIMERA_PARENT_TOL,
+        MERGE_OVERLAP_TOL,
+        HESSIAN_H00_TOL,
+        HESSIAN_H11_TOL,
+        NANOPORE_MEAN_READ_LENGTH_TOL,
+        COLD_SEEP_SHANNON_MIN,
+        COLD_SEEP_SHANNON_MAX,
+        COLD_SEEP_SIMPSON_MIN,
+        COLD_SEEP_OBS_FEATURES_MIN,
+        PFAS_MIN_INTENSITY_PCT,
+        PFAS_ML_ACCEPTANCE_FLOOR,
+        SOIL_DISORDER_ANALYTICAL,
     ];
     for tol in all {
         assert!(tol >= 0.0, "tolerance {tol} must be non-negative");

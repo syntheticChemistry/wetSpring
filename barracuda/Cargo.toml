@@ -10,8 +10,7 @@ repository = "https://github.com/syntheticChemistry/wetSpring"
 keywords = ["bioinformatics", "mass-spectrometry", "pfas", "gpu", "wgsl"]
 categories = ["science", "command-line-utilities"]
 
-[workspace]
-members = ["fuzz"]
+# Workspace root is wetSpring/Cargo.toml; fuzz is a workspace member there.
 
 [features]
 default = []

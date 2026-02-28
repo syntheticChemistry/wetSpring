@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# wetSpring workspace — stops Cargo from walking up to the parent
+# ecoPrimals workspace. Each sub-crate retains its own [workspace]
+# root so that `cargo test` works both from sub-crate directories
+# and from this root via `--manifest-path`.
+
+[workspace]
+resolver = "2"
+members = [
+    "barracuda",
+    "barracuda/fuzz",
+    "metalForge/forge",
+]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.85"
+license = "AGPL-3.0-or-later"

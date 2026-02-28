@@ -310,7 +310,12 @@ fn validate_merge_pairs(v: &mut Validator) {
         merge_pairs::merge_pairs(&fwd_batch, &rev_batch, &merge_pairs::MergeParams::default());
 
     v.check_count("Batch merged count", stats.merged_count, 10);
-    v.check("Batch mean overlap", stats.mean_overlap, 247.0, 1.0);
+    v.check(
+        "Batch mean overlap",
+        stats.mean_overlap,
+        247.0,
+        tolerances::MERGE_OVERLAP_TOL,
+    );
 }
 
 fn validate_dereplication(v: &mut Validator) {

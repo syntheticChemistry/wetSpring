@@ -116,7 +116,12 @@ fn validate_simulated_community(v: &mut Validator) {
         alpha.observed, alpha.shannon, alpha.simpson, alpha.chao1
     );
 
-    v.check("Observed features", alpha.observed, 330.0, 1.0);
+    v.check(
+        "Observed features",
+        alpha.observed,
+        330.0,
+        tolerances::OBSERVED_FEATURES_TOL,
+    );
     v.check(
         "Shannon in marine range",
         alpha.shannon,

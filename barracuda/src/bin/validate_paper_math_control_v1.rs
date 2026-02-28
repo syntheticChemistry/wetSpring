@@ -435,8 +435,18 @@ fn main() {
     let notill_qs = norm_cdf((w_c - notill_w) / sigma_qs);
     let tilled_qs = norm_cdf((w_c - tilled_w) / sigma_qs);
 
-    v.check("Islam: no-till W", notill_w, 5.175, 0.01);
-    v.check("Islam: tilled W", tilled_w, 15.375, 0.01);
+    v.check(
+        "Islam: no-till W",
+        notill_w,
+        5.175,
+        tolerances::SOIL_DISORDER_ANALYTICAL,
+    );
+    v.check(
+        "Islam: tilled W",
+        tilled_w,
+        15.375,
+        tolerances::SOIL_DISORDER_ANALYTICAL,
+    );
     v.check_pass("Islam: no-till QS > 0.99", notill_qs > 0.99);
     v.check_pass("Islam: tilled QS < no-till QS", tilled_qs < notill_qs);
 

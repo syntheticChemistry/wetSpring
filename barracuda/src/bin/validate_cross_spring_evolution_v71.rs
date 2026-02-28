@@ -322,8 +322,18 @@ fn main() {
         barracuda::numerical::numerical_hessian(&rosenbrock, &[1.0, 1.0], 1e-5)
     });
     v.check_pass("Hessian 2×2", hessian.len() == 4);
-    v.check("Hessian H[0,0] ≈ 802 at optimum", hessian[0], 802.0, 2.0);
-    v.check("Hessian H[1,1] ≈ 200 at optimum", hessian[3], 200.0, 1.0);
+    v.check(
+        "Hessian H[0,0] ≈ 802 at optimum",
+        hessian[0],
+        802.0,
+        tolerances::HESSIAN_H00_TOL,
+    );
+    v.check(
+        "Hessian H[1,1] ≈ 200 at optimum",
+        hessian[3],
+        200.0,
+        tolerances::HESSIAN_H11_TOL,
+    );
 
     let eigenvalues = [10.0, 5.0, 2.0, 1.0, 0.5, 0.1, 0.01, 0.001];
     let (eff_rank, _) = bench("effective_rank (8 eigenvalues)", || {

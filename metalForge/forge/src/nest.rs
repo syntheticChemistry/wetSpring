@@ -667,4 +667,163 @@ mod tests {
         assert_eq!(m, 2);
         assert_eq!(d, 28);
     }
+
+    #[test]
+    fn days_to_ymd_leap_year() {
+        // 2000-03-01 = day 11017 from epoch (2000 is a leap year)
+        let (y, m, d) = days_to_ymd(11_017);
+        assert_eq!(y, 2000);
+        assert_eq!(m, 3);
+        assert_eq!(d, 1);
+    }
+
+    #[test]
+    fn is_leap_year_basic() {
+        assert!(is_leap(2000));
+        assert!(is_leap(2024));
+        assert!(!is_leap(1900));
+        assert!(!is_leap(2023));
+    }
+
+    #[test]
+    fn extract_result_value_array() {
+        let json = r#"{"jsonrpc":"2.0","result":["a","b","c"],"id":1}"#;
+        let val = extract_result_value(json).unwrap();
+        assert!(val.starts_with('['));
+        assert!(val.contains("\"a\""));
+    }
+
+    #[test]
+    fn extract_result_value_number() {
+        let json = r#"{"jsonrpc":"2.0","result":42,"id":1}"#;
+        assert_eq!(extract_result_value(json), Some("42".to_string()));
+    }
+
+    #[test]
+    fn extract_result_value_null() {
+        let json = r#"{"jsonrpc":"2.0","result":null,"id":1}"#;
+        assert_eq!(extract_result_value(json), Some("null".to_string()));
+    }
+
+    #[test]
+    fn extract_result_value_missing() {
+        let json = r#"{"jsonrpc":"2.0","error":"bad","id":1}"#;
+        assert!(extract_result_value(json).is_none());
+    }
+
+    #[test]
+    fn extract_result_string_basic() {
+        let json = r#"{"result":{"blob":"SGVsbG8="},"id":1}"#;
+        assert_eq!(
+            extract_result_string(json, "blob"),
+            Some("SGVsbG8=".to_string())
+        );
+    }
+
+    #[test]
+    fn extract_result_string_missing_key() {
+        let json = r#"{"result":{"blob":"SGVsbG8="},"id":1}"#;
+        assert!(extract_result_string(json, "data").is_none());
+    }
+
+    #[test]
+    fn extract_string_array_basic() {
+        let json = r#"{"result":{"keys":["a","b","c"]},"id":1}"#;
+        let keys = extract_string_array(json, "keys").unwrap();
+        assert_eq!(keys, vec!["a", "b", "c"]);
+    }
+
+    #[test]
+    fn extract_string_array_empty() {
+        let json = r#"{"result":{"keys":[]},"id":1}"#;
+        let keys = extract_string_array(json, "keys").unwrap();
+        assert!(keys.is_empty());
+    }
+
+    #[test]
+    fn extract_result_array_basic() {
+        let json = r#"{"jsonrpc":"2.0","result":["k1","k2"],"id":1}"#;
+        let arr = extract_result_array(json).unwrap();
+        assert_eq!(arr, vec!["k1", "k2"]);
+    }
+
+    #[test]
+    fn find_value_end_string() {
+        assert_eq!(find_value_end(r#""hello""#), Some(7));
+    }
+
+    #[test]
+    fn find_value_end_object() {
+        assert_eq!(find_value_end(r#"{"a":1}"#), Some(7));
+    }
+
+    #[test]
+    fn find_value_end_nested() {
+        assert_eq!(find_value_end(r#"{"a":{"b":2}}"#), Some(13));
+    }
+
+    #[test]
+    fn find_value_end_array() {
+        assert_eq!(find_value_end("[1,2,3]"), Some(7));
+    }
+
+    #[test]
+    fn find_value_end_number() {
+        assert_eq!(find_value_end("42,"), Some(2));
+    }
+
+    #[test]
+    fn parse_string_list_basic() {
+        let list = parse_string_list(r#""a","b","c""#);
+        assert_eq!(list, vec!["a", "b", "c"]);
+    }
+
+    #[test]
+    fn parse_string_list_empty() {
+        let list = parse_string_list("");
+        assert!(list.is_empty());
+    }
+
+    #[test]
+    fn nest_client_new_and_socket_path() {
+        let p = PathBuf::from("/tmp/test.sock");
+        let client = NestClient::new(p.clone());
+        assert_eq!(client.socket_path(), p);
+    }
+
+    #[test]
+    fn nest_client_discover_returns_none_without_socket() {
+        temp_env::with_var("NESTGATE_SOCKET", None::<&str>, || {
+            // Discovery may or may not find a socket depending on the system;
+            // what matters is that it doesn't panic.
+            let _ = NestClient::discover();
+        });
+    }
+
+    #[test]
+    fn base64_large_binary() {
+        #[allow(clippy::cast_possible_truncation)]
+        let data: Vec<u8> = (0_u32..1024).map(|i| (i & 0xFF) as u8).collect();
+        let encoded = base64_encode(&data);
+        let decoded = base64_decode(&encoded);
+        assert_eq!(decoded, data);
+    }
+
+    #[test]
+    fn b64_val_all_chars() {
+        assert_eq!(b64_val(b'A'), 0);
+        assert_eq!(b64_val(b'Z'), 25);
+        assert_eq!(b64_val(b'a'), 26);
+        assert_eq!(b64_val(b'z'), 51);
+        assert_eq!(b64_val(b'0'), 52);
+        assert_eq!(b64_val(b'9'), 61);
+        assert_eq!(b64_val(b'+'), 62);
+        assert_eq!(b64_val(b'/'), 63);
+        assert_eq!(b64_val(b'='), 0);
+    }
+
+    #[test]
+    fn escape_json_str_empty() {
+        assert_eq!(escape_json_str(""), "");
+    }
 }

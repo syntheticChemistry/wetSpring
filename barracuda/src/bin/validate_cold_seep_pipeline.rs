@@ -36,10 +36,12 @@ use wetspring_barracuda::validation::Validator;
 
 const N_SYNTHETIC_SAMPLES: usize = 50;
 
-const EXPECTED_MEAN_SHANNON_MIN: f64 = 2.0;
-const EXPECTED_MEAN_SHANNON_MAX: f64 = 6.0;
-const EXPECTED_SIMPSON_MIN: f64 = 0.7;
-const EXPECTED_OBS_FEATURES_MIN: f64 = 50.0;
+// Expected diversity ranges sourced from Ruff et al. (2019) cold seep
+// communities — see tolerances module for provenance documentation.
+const EXPECTED_MEAN_SHANNON_MIN: f64 = tolerances::COLD_SEEP_SHANNON_MIN;
+const EXPECTED_MEAN_SHANNON_MAX: f64 = tolerances::COLD_SEEP_SHANNON_MAX;
+const EXPECTED_SIMPSON_MIN: f64 = tolerances::COLD_SEEP_SIMPSON_MIN;
+const EXPECTED_OBS_FEATURES_MIN: f64 = tolerances::COLD_SEEP_OBS_FEATURES_MIN;
 
 fn synthetic_cold_seep_community(sample_idx: usize) -> Vec<f64> {
     let n_species = 150 + (sample_idx % 100);

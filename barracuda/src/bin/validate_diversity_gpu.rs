@@ -361,7 +361,7 @@ fn validate_pairwise_l2(gpu: &GpuF64, v: &mut Validator) {
         for (&g, &c) in gpu_condensed.iter().zip(cpu_condensed.iter()) {
             let diff = (g - c).abs();
             max_diff = max_diff.max(diff);
-            if diff > 1e-5 {
+            if diff > tolerances::GPU_F32_PARITY {
                 all_ok = false;
             }
         }

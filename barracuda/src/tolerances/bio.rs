@@ -26,6 +26,14 @@ pub const SIMPSON_SIMULATED: f64 = 0.05;
 pub const CHAO1_RANGE: f64 = 100.0;
 
 /// Bray-Curtis: f64 symmetry tolerance.
+///
+/// `BC(a,b)` and `BC(b,a)` involve identical f64 arithmetic but with
+/// operands in different order. The sum `|a_i - b_i|` vs `|b_i - a_i|`
+/// is exact (absolute value), and the denominator `Σ(a_i + b_i)` is
+/// commutative. 1e-15 (≈4.5 × `f64::EPSILON`) covers any compiler
+/// reordering of the summation accumulator.
+/// Validated: Exp002 (phytoplankton diversity), `validate_diversity`,
+/// commit `e4358c5`, 2026-02-19.
 pub const BRAY_CURTIS_SYMMETRY: f64 = 1e-15;
 
 // ═══════════════════════════════════════════════════════════════════
@@ -538,6 +546,113 @@ pub const NANOPORE_INT8_FIDELITY: f64 = 0.90;
 /// diversity metrics are robust. 0.3 covers the expected inflation.
 /// Validated: Exp196b (simulated long-read 16S).
 pub const NANOPORE_DIVERSITY_TOLERANCE: f64 = 0.3;
+
+// ═══════════════════════════════════════════════════════════════════
+// Validation binary convenience tolerances
+// ═══════════════════════════════════════════════════════════════════
+
+/// Observed feature count tolerance (integer-valued diversity metric).
+///
+/// `observed_features()` returns an integer-valued count cast to f64.
+/// Exact match is expected, but ±1.0 accommodates rounding in
+/// rarefied / subsampled communities where floating-point abundances
+/// are rounded to presence/absence.
+/// Validated: Exp002 (diversity), commit `e4358c5`, 2026-02-19.
+pub const OBSERVED_FEATURES_TOL: f64 = 1.0;
+
+/// Chimera detection parent-count tolerance.
+///
+/// After chimera removal the number of surviving parents is an
+/// integer; ±1 covers borderline score ties.
+/// Validated: Exp001 (16S pipeline), commit `e4358c5`, 2026-02-19.
+pub const CHIMERA_PARENT_TOL: f64 = 1.0;
+
+/// Batch merge-pairs mean-overlap tolerance (bp).
+///
+/// Mean overlap across N pairs may drift ±1 bp due to integer/float
+/// rounding of overlap positions.
+/// Validated: Exp001 (FASTQ merge), commit `e4358c5`, 2026-02-19.
+pub const MERGE_OVERLAP_TOL: f64 = 1.0;
+
+/// Numerical Hessian diagonal element tolerance.
+///
+/// `numerical_hessian` at ε = 1e-5 uses O(ε²) central differences.
+/// For the Rosenbrock function at (1,1), H[0,0] ≈ 802 and H[1,1] ≈ 200.
+/// The finite-difference truncation error is O(ε²) ≈ 1e-10, but the
+/// conditioning of the second-order quotient amplifies rounding to ~2.0
+/// for H[0,0] and ~1.0 for H[1,1].
+/// Validated: Exp224 (`BarraCuda` CPU v14), commit `e4358c5`, 2026-02-19.
+/// Source: neuralSpring Rosenbrock baseline.
+pub const HESSIAN_H00_TOL: f64 = 2.0;
+
+/// Numerical Hessian off-diagonal / second diagonal tolerance.
+///
+/// See [`HESSIAN_H00_TOL`] for derivation.
+pub const HESSIAN_H11_TOL: f64 = 1.0;
+
+/// Simulated nanopore mean read length tolerance (bp).
+///
+/// Synthetic 16S reads are generated at a target length of 1450 bp.
+/// The tolerance covers the ±10 bp variation from the LCG-based
+/// read generator. All reads are the exact target length in the
+/// current deterministic generator; 10.0 provides margin for future
+/// stochastic length models.
+/// Validated: Exp196b (simulated long-read 16S), Phase 61, 2026-02-26.
+pub const NANOPORE_MEAN_READ_LENGTH_TOL: f64 = 10.0;
+
+/// Cold seep pipeline Shannon entropy expectation range.
+///
+/// Ruff et al. (2019) cold seep communities: Shannon H' = 2.0–6.0.
+/// Synthetic communities calibrated to published diversity ranges.
+/// Source: Ruff et al., Nat. Microbiol. 2019, PRJNA315684.
+/// Validated: Exp185 (cold seep metagenomes), commit `756df26`, 2026-02-26.
+pub const COLD_SEEP_SHANNON_MIN: f64 = 2.0;
+
+/// Upper bound for cold seep Shannon expectation range.
+///
+/// See [`COLD_SEEP_SHANNON_MIN`] for derivation.
+pub const COLD_SEEP_SHANNON_MAX: f64 = 6.0;
+
+/// Cold seep Simpson D minimum floor.
+///
+/// Published cold seep community Simpson D ≥ 0.7 across all samples
+/// (high-diversity, multi-species sediment). Source: Ruff et al. 2019.
+/// Validated: Exp185, commit `756df26`, 2026-02-26.
+pub const COLD_SEEP_SIMPSON_MIN: f64 = 0.7;
+
+/// Cold seep observed features minimum.
+///
+/// At least 50 OTUs expected per sample in cold seep 16S amplicons.
+/// Source: Ruff et al. 2019 (170 samples, median `S_obs` > 100).
+/// Validated: Exp185, commit `756df26`, 2026-02-26.
+pub const COLD_SEEP_OBS_FEATURES_MIN: f64 = 50.0;
+
+/// PFAS fragment screening minimum intensity threshold (%).
+///
+/// Fragments below 5% relative intensity are noise; above 5% they
+/// contribute to the CF2/C2F4/HF difference screening.
+/// Source: JonZwe/FindPFAS default parameterisation.
+/// Validated: Exp006 (PFAS screening), commit `eb99b12`, 2026-02-16.
+pub const PFAS_MIN_INTENSITY_PCT: f64 = 5.0;
+
+/// PFAS ML classification acceptance floor (accuracy and F1).
+///
+/// Decision tree and random forest models trained on Exp008 PFAS data
+/// must exceed 80% accuracy and F1 to be considered viable.
+/// Calibrated: Exp008 (PFAS decision tree), sklearn baseline achieves
+/// ~0.95 accuracy; 0.80 is a conservative floor.
+/// Script: `pfas_tree_export.py`, commit `e4358c5`, 2026-02-19.
+pub const PFAS_ML_ACCEPTANCE_FLOOR: f64 = 0.80;
+
+/// Islam 2014 soil disorder W analytical tolerance.
+///
+/// W = 25 × (1 − connectivity). For connectivity = 0.793 (no-till)
+/// and 0.385 (tilled), W = 5.175 and 15.375 respectively.
+/// These are exact analytical values; tolerance covers only f64
+/// rounding in the multiplication chain.
+/// Source: Islam (2014), Brandt Farm no-till study.
+/// Validated: Exp183 (soil QS), commit `48fb787`.
+pub const SOIL_DISORDER_ANALYTICAL: f64 = 0.01;
 
 /// Asari cross-match percentage tolerance (Exp009).
 ///

@@ -197,16 +197,16 @@ fn main() {
         data.expected_f1,
         tolerances::ML_F1_SCORE,
     );
-    let acc_ok = rust_accuracy >= 0.80;
+    let acc_ok = rust_accuracy >= tolerances::PFAS_ML_ACCEPTANCE_FLOOR;
     v.check(
-        "Accuracy above 0.80 threshold",
+        "Accuracy above acceptance floor",
         f64::from(u8::from(acc_ok)),
         1.0,
         tolerances::EXACT,
     );
-    let f1_ok = rust_f1 >= 0.80;
+    let f1_ok = rust_f1 >= tolerances::PFAS_ML_ACCEPTANCE_FLOOR;
     v.check(
-        "F1 above 0.80 threshold",
+        "F1 above acceptance floor",
         f64::from(u8::from(f1_ok)),
         1.0,
         tolerances::EXACT,

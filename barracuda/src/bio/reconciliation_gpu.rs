@@ -8,12 +8,21 @@
 //!
 //! # GPU Strategy
 //!
-//! - **Batch cost aggregation**: After CPU `reconcile_dtl` per family,
-//!   `FusedMapReduceF64` sums optimal costs across families (GPU probe
-//!   for pipeline continuity).
-//! - **DP kernel**: Stays CPU-side — the DP has row dependencies;
-//!   full GPU promotion would require a `BatchReconcileGpu` primitive
-//!   (one workgroup per gene family).
+//! - **Batch cost aggregation** (Tier A — live): After CPU `reconcile_dtl`
+//!   per family, `FusedMapReduceF64` sums optimal costs across families.
+//!   This validates the GPU pipeline and provides batch-level statistics.
+//! - **DP kernel** (Tier C — blocked on `ToadStool` primitive): The per-tree
+//!   DP has row dependencies that prevent naive GPU parallelism. Full GPU
+//!   promotion requires a `BatchReconcileGpu` primitive with one workgroup
+//!   per gene family, computing the DP in wavefront order. This is blocked
+//!   on `ToadStool` adding a wavefront DP WGSL shader.
+//!
+//! # Evolution Path
+//!
+//! ```text
+//! Current:  CPU DP per family → GPU `FusedMapReduceF64` cost aggregation
+//! Tier C:   GPU wavefront DP (1 workgroup/family) → GPU reduce (ToadStool)
+//! ```
 //!
 //! # CPU Fallback
 //!

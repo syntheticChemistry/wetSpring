@@ -239,4 +239,70 @@ mod tests {
     fn nestgate_socket_discovery_does_not_panic() {
         let _ = discover_nestgate_socket();
     }
+
+    #[test]
+    fn resolve_dataset_nonexistent_env_dir() {
+        let dir = tempfile::tempdir().unwrap();
+        temp_env::with_var(
+            "WETSPRING_DATA_DIR",
+            Some(dir.path().to_str().unwrap()),
+            || {
+                let res = resolve_dataset("missing_dataset");
+                assert_eq!(res.source, DataSource::Synthetic);
+                assert!(!res.is_real);
+            },
+        );
+    }
+
+    #[test]
+    fn resolve_file_nonexistent_file_in_valid_dir() {
+        let dir = tempfile::tempdir().unwrap();
+        let dataset_dir = dir.path().join("ds");
+        std::fs::create_dir_all(&dataset_dir).unwrap();
+
+        temp_env::with_var(
+            "WETSPRING_DATA_DIR",
+            Some(dir.path().to_str().unwrap()),
+            || {
+                let res = resolve_file("ds", "missing.fa");
+                assert_eq!(res.source, DataSource::Synthetic);
+                assert!(!res.is_real);
+            },
+        );
+    }
+
+    #[test]
+    fn data_source_equality() {
+        assert_eq!(DataSource::Synthetic, DataSource::Synthetic);
+        assert_eq!(DataSource::NestGate, DataSource::NestGate);
+        assert_ne!(DataSource::Synthetic, DataSource::NestGate);
+        let path = std::path::PathBuf::from("/tmp/data");
+        assert_eq!(
+            DataSource::LocalDir(path.clone()),
+            DataSource::LocalDir(path)
+        );
+    }
+
+    #[test]
+    fn data_resolution_debug() {
+        let res = DataResolution {
+            source: DataSource::Synthetic,
+            path: None,
+            is_real: false,
+        };
+        let debug = format!("{res:?}");
+        assert!(debug.contains("Synthetic"));
+    }
+
+    #[test]
+    fn env_data_dir_invalid_path() {
+        temp_env::with_var(
+            "WETSPRING_DATA_DIR",
+            Some("/definitely/nonexistent/path/12345"),
+            || {
+                let dir = env_data_dir();
+                assert!(dir.is_none() || !dir.unwrap().to_str().unwrap().contains("12345"));
+            },
+        );
+    }
 }

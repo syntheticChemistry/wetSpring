@@ -523,4 +523,155 @@ mod tests {
         let result = list_assembly_files(Path::new("/nonexistent/path"));
         assert!(result.is_err());
     }
+
+    #[test]
+    fn list_assembly_files_empty_dir() {
+        let dir = tempfile::tempdir().unwrap();
+        let result = list_assembly_files(dir.path()).unwrap();
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn list_assembly_files_filters_fna_gz() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(dir.path().join("GCF_001.fna.gz"), "data").unwrap();
+        std::fs::write(dir.path().join("GCF_002.fna.gz"), "data").unwrap();
+        std::fs::write(dir.path().join("README.md"), "docs").unwrap();
+        std::fs::write(dir.path().join("data.csv"), "csv").unwrap();
+
+        let result = list_assembly_files(dir.path()).unwrap();
+        assert_eq!(result.len(), 2);
+        assert!(
+            result[0]
+                .file_name()
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .ends_with(".fna.gz")
+        );
+    }
+
+    #[test]
+    fn parse_fasta_multiline() {
+        let fasta = b">seq1\nATGC\nGCTA\nAAAA\n>seq2\nTTTT\n";
+        let reader = std::io::BufReader::new(&fasta[..]);
+        let seqs = parse_fasta_sequences(reader).unwrap();
+        assert_eq!(seqs.len(), 2);
+        assert_eq!(seqs[0], b"ATGCGCTAAAAA");
+        assert_eq!(seqs[1], b"TTTT");
+    }
+
+    #[test]
+    fn parse_fasta_no_header() {
+        let fasta = b"ATGCATGC\n";
+        let reader = std::io::BufReader::new(&fasta[..]);
+        let seqs = parse_fasta_sequences(reader).unwrap();
+        assert!(seqs.is_empty());
+    }
+
+    #[test]
+    fn parse_fasta_trailing_whitespace() {
+        let fasta = b">seq\nATGC  \nGCTA\n";
+        let reader = std::io::BufReader::new(&fasta[..]);
+        let seqs = parse_fasta_sequences(reader).unwrap();
+        assert_eq!(seqs[0], b"ATGCGCTA");
+    }
+
+    #[test]
+    fn gc_empty_sequences() {
+        let (gc, total) = count_gc(&[]);
+        assert_eq!(gc, 0);
+        assert_eq!(total, 0);
+    }
+
+    #[test]
+    fn gc_only_n_bases() {
+        let seqs = vec![b"NNNNN".to_vec()];
+        let (gc, total) = count_gc(&seqs);
+        assert_eq!(gc, 0);
+        assert_eq!(total, 5);
+    }
+
+    #[test]
+    fn n50_equal_contigs() {
+        let contigs = vec![100, 100, 100];
+        assert_eq!(compute_n50(&contigs, 300), 100);
+    }
+
+    #[test]
+    fn n50_dominated_by_largest() {
+        let contigs = vec![900, 50, 50];
+        assert_eq!(compute_n50(&contigs, 1000), 900);
+    }
+
+    #[test]
+    fn shannon_entropy_two_bins() {
+        let values = vec![0.0, 0.0, 0.0, 1.0, 1.0, 1.0];
+        let h = shannon_entropy_binned(&values, 2);
+        let expected = 2.0_f64.ln();
+        assert!(
+            (h - expected).abs() < tolerances::ODE_STEADY_STATE,
+            "expected ~{expected}, got {h}"
+        );
+    }
+
+    #[test]
+    fn shannon_entropy_zero_bins() {
+        assert!((shannon_entropy_binned(&[0.5, 0.6], 0)).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn aggregate_collection_single() {
+        let assemblies = vec![AssemblyStats {
+            accession: "X".to_string(),
+            num_contigs: 5,
+            total_length: 1_000_000,
+            n50: 200_000,
+            gc_content: 0.40,
+            largest_contig: 400_000,
+        }];
+        let coll = aggregate_collection("single", assemblies);
+        assert_eq!(coll.assembly_count, 1);
+        assert!((coll.mean_gc - 0.40).abs() < f64::EPSILON);
+        assert!((coll.mean_genome_size - 1_000_000.0).abs() < 1.0);
+        assert!((coll.gc_std).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn compute_collection_from_dir_no_fna_gz() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(dir.path().join("data.txt"), "not fasta").unwrap();
+        let result = compute_collection_from_dir("test", dir.path());
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("no .fna.gz"));
+    }
+
+    #[test]
+    fn compute_assembly_stats_pipeline() {
+        let dir = tempfile::tempdir().unwrap();
+
+        let fasta = b">contig1\nATGCGCGCATGCATGCATATGCGCATGC\n>contig2\nAAAATTTTCCCCGGGG\n";
+        let compressed = {
+            use std::io::Write;
+            let mut encoder =
+                flate2::write::GzEncoder::new(Vec::new(), flate2::Compression::fast());
+            encoder.write_all(fasta).unwrap();
+            encoder.finish().unwrap()
+        };
+        std::fs::write(dir.path().join("GCF_test.fna.gz"), &compressed).unwrap();
+
+        let stats =
+            compute_assembly_stats_from_file("GCF_test", &dir.path().join("GCF_test.fna.gz"))
+                .unwrap();
+        assert_eq!(stats.num_contigs, 2);
+        assert_eq!(stats.accession, "GCF_test");
+        assert!(stats.total_length > 0);
+        assert!(stats.gc_content > 0.0 && stats.gc_content < 1.0);
+        assert!(stats.n50 > 0);
+        assert!(stats.largest_contig >= stats.n50);
+
+        let coll = compute_collection_from_dir("test", dir.path()).unwrap();
+        assert_eq!(coll.assembly_count, 1);
+        assert!(coll.mean_gc > 0.0);
+    }
 }

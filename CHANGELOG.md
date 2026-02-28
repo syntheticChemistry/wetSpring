@@ -5,6 +5,48 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V76 — Deep Codebase Audit + Evolution (2026-02-28)
+
+### Comprehensive Audit Execution
+- Full codebase audit: linting, formatting, clippy pedantic, doc checks, coverage, unsafe code, sovereignty, dependency health, file sizes, mocks, hardcoding, I/O streaming, tolerance provenance
+- Workspace configuration: created `wetSpring/Cargo.toml` virtual workspace, unified barracuda + barracuda/fuzz + metalForge/forge under single root
+- Sub-crate `[workspace]` declarations removed in favor of root workspace
+
+### Tolerance Provenance
+- `BRAY_CURTIS_SYMMETRY` given full provenance documentation (Exp002, validation tool, commit, date)
+- 14 new named tolerance constants replacing inline magic numbers across 10 validation binaries
+- All 97 tolerance constants now have scientific justification and provenance
+
+### metalForge/forge Coverage Boost
+- 62 new tests across `nest.rs`, `ncbi.rs`, `data.rs`, `inventory.rs`, `node.rs`
+- Coverage: 73.31% → 83.82% for metalForge/forge crate
+- `flate2` added as dev-dependency for gzip test fixtures
+
+### reconciliation_gpu Documentation
+- GPU strategy documented: Tier A (batch cost aggregation via FusedMapReduceF64) live, Tier C (full DP kernel) requires ToadStool wavefront primitive
+- Evolution path diagram added
+
+### Audit Results (Clean)
+- 0 unsafe blocks in all code
+- 0 todo!/unimplemented!() anywhere
+- 0 .unwrap()/.expect() in library code
+- 0 mocks in production code
+- 0 external C dependencies (wgpu only for GPU, required)
+- All files under 1000 LOC (max 924)
+- All external deps pure Rust
+- Hardcoded primal names in cross-spring binaries: provenance documentation, not sovereignty violation
+
+### Fixes
+- Clippy backtick warnings in tolerances/bio.rs and reconciliation_gpu.rs
+- `E0063` missing fields in inventory.rs tests
+- Unnecessary raw string hashes in nest.rs
+- Cast truncation warnings in nest.rs
+
+### Totals
+- 229 experiments, 5,743+ checks, 1,148+ tests (955 lib + 60 integration + 20 doc + 113 forge)
+- 95.86% line coverage, clippy pedantic CLEAN, all tests PASS
+- 97 named tolerances with full provenance, 0 ad-hoc magic numbers
+
 ## V75 — ToadStool Rewire: ComputeDispatch + New Op Adoption (2026-02-28)
 
 ### ComputeDispatch Adoption

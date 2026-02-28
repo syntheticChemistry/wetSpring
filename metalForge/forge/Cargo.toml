@@ -8,7 +8,7 @@ rust-version = "1.85"
 description = "Hardware discovery and cross-substrate dispatch for wetSpring"
 license = "AGPL-3.0-or-later"
 
-[workspace]
+# Workspace root is wetSpring/Cargo.toml.
 
 [dependencies]
 barracuda = { path = "../../../phase1/toadstool/crates/barracuda" }
@@ -48,6 +48,7 @@ path = "src/bin/validate_nucleus_pipeline_v69.rs"
 
 [dev-dependencies]
 temp-env = "0.3"
+flate2 = "1"
 
 [lints.clippy]
 pedantic = { level = "warn", priority = -1 }

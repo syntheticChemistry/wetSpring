@@ -227,7 +227,12 @@ fn main() {
     let mean_length = read_lengths.iter().sum::<usize>() as f64 / read_lengths.len() as f64;
 
     println!("  Mean read length: {mean_length:.0} bp");
-    v.check("mean read length ≈ 1450 bp", mean_length, 1450.0, 10.0);
+    v.check(
+        "mean read length ≈ 1450 bp",
+        mean_length,
+        1450.0,
+        tolerances::NANOPORE_MEAN_READ_LENGTH_TOL,
+    );
 
     v.check_pass(
         "all reads > 1000 bp (full-length 16S)",

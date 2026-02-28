@@ -152,7 +152,12 @@ fn validate_chimera(v: &mut Validator) {
     v.check_count("Chimera: input sequences", stats.input_sequences, 3);
     #[allow(clippy::cast_precision_loss)]
     let clean_len_f64 = clean.len() as f64;
-    v.check("Chimera: parents preserved", clean_len_f64, 2.0, 1.0);
+    v.check(
+        "Chimera: parents preserved",
+        clean_len_f64,
+        2.0,
+        tolerances::CHIMERA_PARENT_TOL,
+    );
 
     // Non-chimeric sequences should pass through unchanged
     let non_chimeric = vec![

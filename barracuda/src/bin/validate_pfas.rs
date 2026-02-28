@@ -77,7 +77,7 @@ fn validate_ms2_parsing(ms2_path: &Path, v: &mut Validator) {
     // ── PFAS fragment screening (streaming — never buffers all spectra)
     v.section("── PFAS fragment difference screening ──");
     let tol_da = tolerances::MZ_FRAGMENT;
-    let min_intensity_pct = 5.0;
+    let min_intensity_pct = tolerances::PFAS_MIN_INTENSITY_PCT;
 
     let mut pfas_hits = Vec::new();
     let iter = match ms2::Ms2Iter::open(ms2_path) {

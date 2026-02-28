@@ -2,7 +2,7 @@
 
 **Date:** February 28, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 75 — 229 experiments, 5,743+ validation checks (1,833+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,148+ tests (955 barracuda lib + 60 integration + 20 doc + 113 forge), ToadStool S68+ aligned (`e96576ee`), 82 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 92 named tolerances, 0 unsafe code, clippy pedantic CLEAN, V75 ComputeDispatch evolution, V72 five-tier chain: Exp224 paper math (58/58, 18 papers), Exp225 CPU v14 (58/58, 50 domains), Exp226 GPU v6 (28/28), Exp227 streaming v4 (24/24), Exp228 metalForge v8 (33/33), 52/52 papers, 50/50 three-tier
+**Status:** Phase 76 — 229 experiments, 5,743+ validation checks (1,833+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,148+ tests (955 barracuda lib + 60 integration + 20 doc + 113 forge), ToadStool S68+ aligned (`e96576ee`), 82 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances (full provenance), 0 unsafe code, 0 todo!/unimplemented!(), clippy pedantic CLEAN, V76 deep codebase audit + evolution, V75 ComputeDispatch, V72 five-tier chain, 52/52 papers, 50/50 three-tier, 95.86% line coverage
 
 ---
 

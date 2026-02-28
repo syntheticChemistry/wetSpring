@@ -469,4 +469,66 @@ mod tests {
         assert_eq!(hex_char(10), 'A');
         assert_eq!(hex_char(15), 'F');
     }
+
+    #[test]
+    fn url_encode_special_chars() {
+        assert_eq!(url_encode("a&b=c"), "a%26b%3Dc");
+        assert_eq!(url_encode("100%"), "100%25");
+    }
+
+    #[test]
+    fn url_encode_empty() {
+        assert_eq!(url_encode(""), "");
+    }
+
+    #[test]
+    fn parse_esearch_missing_count() {
+        let xml = "<eSearchResult><IdList><Id>1</Id></IdList></eSearchResult>";
+        let result = parse_esearch_result("nucleotide", xml);
+        assert_eq!(result.count, 0);
+        assert_eq!(result.ids.len(), 1);
+    }
+
+    #[test]
+    fn extract_xml_tag_nested() {
+        let xml = "<root><outer><Count>10</Count></outer></root>";
+        assert_eq!(extract_xml_tag(xml, "Count"), Some("10".to_string()));
+    }
+
+    #[test]
+    fn extract_xml_tags_empty_list() {
+        let xml = "<IdList></IdList>";
+        let ids = extract_xml_tags(xml, "Id");
+        assert!(ids.is_empty());
+    }
+
+    #[test]
+    fn extract_xml_tags_no_match() {
+        let xml = "<root><a>1</a></root>";
+        let tags = extract_xml_tags(xml, "b");
+        assert!(tags.is_empty());
+    }
+
+    #[test]
+    fn ncbi_client_with_nest() {
+        let sock = PathBuf::from("/tmp/fake_nestgate.sock");
+        let nest = crate::nest::NestClient::new(sock);
+        let client = NcbiClient::with_nest(nest);
+        assert!(client.has_nest());
+    }
+
+    #[test]
+    fn esummary_empty_ids() {
+        let client = NcbiClient::direct();
+        let result = client.esummary("assembly", &[]);
+        assert!(result.is_ok());
+        assert!(result.unwrap().raw_xml.is_empty());
+    }
+
+    #[test]
+    fn assembly_source_display() {
+        let local = AssemblySource::LocalFile(PathBuf::from("/data/assembly.fna.gz"));
+        assert_ne!(local, AssemblySource::NestCache);
+        assert_ne!(local, AssemblySource::Fetched);
+    }
 }

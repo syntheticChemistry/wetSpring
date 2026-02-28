@@ -1084,7 +1084,7 @@ All validation data comes from public repositories:
 - **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
 - **ToadStool** — GPU compute engine (BarraCuda crate, 700+ WGSL shaders, S68)
 - **wateringHole** — Spring-local handoffs to ToadStool
-  - `handoffs/WETSPRING_TOADSTOOL_V75_COMPUTEDISPATCH_REWIRE_HANDOFF_FEB28_2026.md` — **current** (V75 ComputeDispatch rewire)
-  - `handoffs/archive/` — V7-V70 (fossil record)
+  - `handoffs/WETSPRING_TOADSTOOL_V76_DEEP_AUDIT_EVOLUTION_HANDOFF_FEB28_2026.md` — **current** (V76 deep audit + evolution)
+  - `handoffs/archive/` — V7-V73 (fossil record)
   - `CROSS_SPRING_SHADER_EVOLUTION.md` — 700+ shader provenance (cross-spring, S68)
 - **ecoPrimals** — Parent ecosystem
