@@ -1,0 +1,106 @@
+{
+  "treatments": [
+    {
+      "name": "NT+CC+N",
+      "tillage": 1.0,
+      "cover": 1.2,
+      "nitrogen": 1.1,
+      "richness": 240,
+      "evenness": 0.875,
+      "mean_shannon": 5.480435090409873,
+      "mean_pielou": 0.9999628085456879
+    },
+    {
+      "name": "NT+CC-N",
+      "tillage": 1.0,
+      "cover": 1.2,
+      "nitrogen": 0.9,
+      "richness": 240,
+      "evenness": 0.865,
+      "mean_shannon": 5.4804168261887405,
+      "mean_pielou": 0.9999594760471622
+    },
+    {
+      "name": "NT-CC+N",
+      "tillage": 1.0,
+      "cover": 0.8,
+      "nitrogen": 1.1,
+      "richness": 160,
+      "evenness": 0.835,
+      "mean_shannon": 5.074837791878735,
+      "mean_pielou": 0.9999337907690801
+    },
+    {
+      "name": "NT-CC-N",
+      "tillage": 1.0,
+      "cover": 0.8,
+      "nitrogen": 0.9,
+      "richness": 160,
+      "evenness": 0.825,
+      "mean_shannon": 5.074755366092295,
+      "mean_pielou": 0.9999175497910485
+    },
+    {
+      "name": "CT+CC+N",
+      "tillage": 0.6,
+      "cover": 1.2,
+      "nitrogen": 1.1,
+      "richness": 144,
+      "evenness": 0.715,
+      "mean_shannon": 4.968486485643791,
+      "mean_pielou": 0.9997330253970862
+    },
+    {
+      "name": "CT+CC-N",
+      "tillage": 0.6,
+      "cover": 1.2,
+      "nitrogen": 0.9,
+      "richness": 144,
+      "evenness": 0.705,
+      "mean_shannon": 4.96834229030943,
+      "mean_pielou": 0.9997040111614058
+    },
+    {
+      "name": "CT-CC+N",
+      "tillage": 0.6,
+      "cover": 0.8,
+      "nitrogen": 1.1,
+      "richness": 96,
+      "evenness": 0.675,
+      "mean_shannon": 4.562436359267685,
+      "mean_pielou": 0.9995811379588163
+    },
+    {
+      "name": "CT-CC-N",
+      "tillage": 0.6,
+      "cover": 0.8,
+      "nitrogen": 0.9,
+      "richness": 96,
+      "evenness": 0.665,
+      "mean_shannon": 4.562186764474151,
+      "mean_pielou": 0.9995264544020271
+    }
+  ],
+  "main_effects": {
+    "nt_mean_shannon": 5.277611268642411,
+    "ct_mean_shannon": 4.7653629749237645,
+    "tillage_enrichment_pct": 10.749407682356903,
+    "cc_mean_shannon": 5.2244201731379585,
+    "nocc_mean_shannon": 4.818554070428217,
+    "best_treatment": "NT+CC+N",
+    "worst_treatment": "CT-CC-N"
+  },
+  "recovery_31yr": {
+    "recovery_tau": 8.0,
+    "w_tilled": 18.0,
+    "w_recovered": 4.0,
+    "w_at_31": 4.290560730231796,
+    "qs_at_31": 0.9999764745648787,
+    "fraction_recovered": 0.9792456621263003
+  },
+  "math_verification": {
+    "shannon_50_50": 0.6931471805599453,
+    "pielou_uniform_4": 1.0,
+    "midpoint_0_1": 0.5
+  }
+}

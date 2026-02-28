@@ -72,6 +72,7 @@ pub struct PfasFragments {
     pub hf: f64,
 }
 
+/// Manual impl intentional: NIST monoisotopic masses (CF2, C2F4, HF).
 impl Default for PfasFragments {
     fn default() -> Self {
         Self {

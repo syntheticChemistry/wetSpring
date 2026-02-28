@@ -17,6 +17,11 @@ use super::protocol;
 
 const CONNECTION_READ_TIMEOUT: Duration = Duration::from_secs(120);
 
+/// Default socket path under `XDG_RUNTIME_DIR` (`biomeos/wetspring-default.sock`).
+const DEFAULT_SOCKET_PATH_XDG: &str = "biomeos/wetspring-default.sock";
+/// Fallback socket filename when `XDG_RUNTIME_DIR` is unset (`wetspring-default.sock`).
+const DEFAULT_SOCKET_PATH_FALLBACK: &str = "wetspring-default.sock";
+
 /// wetSpring IPC server.
 ///
 /// Listens on a Unix domain socket and handles JSON-RPC 2.0 requests,
@@ -156,15 +161,15 @@ fn handle_connection(stream: &std::os::unix::net::UnixStream, metrics: &Metrics)
                         metrics.record_success(&method, start.elapsed());
                         protocol::success_response(&req.id, &result)
                     }
-                    Err((code, msg)) => {
+                    Err(rpc_err) => {
                         metrics.record_error(&method, start.elapsed());
-                        protocol::error_response(&req.id, code, &msg)
+                        protocol::error_response(&req.id, rpc_err.code, &rpc_err.message)
                     }
                 }
             }
-            Err((id, code, msg)) => {
+            Err(parse_err) => {
                 metrics.record_error("_parse", start.elapsed());
-                protocol::error_response(&id, code, &msg)
+                protocol::error_response(&parse_err.id, parse_err.error.code, &parse_err.error.message)
             }
         };
 
@@ -184,10 +189,10 @@ fn resolve_bind_path() -> PathBuf {
     }
 
     if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
-        return PathBuf::from(xdg).join("biomeos/wetspring-default.sock");
+        return PathBuf::from(xdg).join(DEFAULT_SOCKET_PATH_XDG);
     }
 
-    std::env::temp_dir().join("wetspring-default.sock")
+    std::env::temp_dir().join(DEFAULT_SOCKET_PATH_FALLBACK)
 }
 
 #[cfg(test)]

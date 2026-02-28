@@ -69,6 +69,7 @@ pub struct ChimeraParams {
     pub min_diffs: usize,
 }
 
+/// Manual impl intentional: all fields use non-zero defaults (UCHIME-style).
 impl Default for ChimeraParams {
     fn default() -> Self {
         Self {

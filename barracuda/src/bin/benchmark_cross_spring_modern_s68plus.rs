@@ -263,7 +263,7 @@ fn main() {
         "Pearson(linear) ≈ 1.0 [cross-spring→S64]",
         pearson,
         1.0,
-        0.001,
+        tolerances::CROSS_SPRING_NUMERICAL,
     );
 
     let mae_val = barracuda::stats::mae(&vec_a, &vec_b);

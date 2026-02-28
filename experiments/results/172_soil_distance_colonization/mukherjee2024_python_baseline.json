@@ -1,0 +1,120 @@
+{
+  "diffusion": {
+    "source_conc": 1.0,
+    "diffusion_length": 100.0,
+    "threshold": 0.1,
+    "critical_distance": 230.25850929940455,
+    "distances": [
+      {
+        "distance_um": 10.0,
+        "concentration": 0.9048374180359595,
+        "above_threshold": true
+      },
+      {
+        "distance_um": 25.0,
+        "concentration": 0.7788007830714049,
+        "above_threshold": true
+      },
+      {
+        "distance_um": 50.0,
+        "concentration": 0.6065306597126334,
+        "above_threshold": true
+      },
+      {
+        "distance_um": 100.0,
+        "concentration": 0.36787944117144233,
+        "above_threshold": true
+      },
+      {
+        "distance_um": 200.0,
+        "concentration": 0.1353352832366127,
+        "above_threshold": true
+      },
+      {
+        "distance_um": 500.0,
+        "concentration": 0.006737946999085467,
+        "above_threshold": false
+      },
+      {
+        "distance_um": 1000.0,
+        "concentration": 4.5399929762484854e-05,
+        "above_threshold": false
+      }
+    ]
+  },
+  "distance_factors": [
+    0.5,
+    1.0,
+    2.0,
+    5.0,
+    10.0
+  ],
+  "affected_fraction_target": 0.41,
+  "anderson_localization": [
+    {
+      "w": 5.0,
+      "xi": 1000.0,
+      "max_qs_range": 2000.0,
+      "regime": "extended"
+    },
+    {
+      "w": 10.0,
+      "xi": 1000.0,
+      "max_qs_range": 2000.0,
+      "regime": "extended"
+    },
+    {
+      "w": 15.0,
+      "xi": 1000.0,
+      "max_qs_range": 2000.0,
+      "regime": "extended"
+    },
+    {
+      "w": 20.0,
+      "xi": 22.22222222222222,
+      "max_qs_range": 44.44444444444444,
+      "regime": "localized"
+    },
+    {
+      "w": 25.0,
+      "xi": 10.526315789473685,
+      "max_qs_range": 21.05263157894737,
+      "regime": "localized"
+    }
+  ],
+  "integrated": [
+    {
+      "name": "Dense colony, large pore",
+      "ai_conc": 0.951229424500714,
+      "qs_prob": 0.9967577739016723,
+      "combined": 0.9481453236351006,
+      "outcome": "QS active"
+    },
+    {
+      "name": "Dense colony, small pore",
+      "ai_conc": 0.951229424500714,
+      "qs_prob": 0.01136991048818437,
+      "combined": 0.01081539341030025,
+      "outcome": "QS suppressed"
+    },
+    {
+      "name": "Sparse, large pore",
+      "ai_conc": 0.1353352832366127,
+      "qs_prob": 0.9967577739016723,
+      "combined": 0.1348964956492784,
+      "outcome": "QS suppressed"
+    },
+    {
+      "name": "Sparse, small pore",
+      "ai_conc": 0.1353352832366127,
+      "qs_prob": 0.01136991048818437,
+      "combined": 0.0015387500562933651,
+      "outcome": "QS suppressed"
+    }
+  ],
+  "math_verification": {
+    "exp_neg1": 0.36787944117144233,
+    "erf_1": 0.8427007929497148,
+    "norm_cdf_0": 0.5
+  }
+}

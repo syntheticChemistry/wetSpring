@@ -5,6 +5,77 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V73 — Deep Debt Reduction + Idiomatic Rust Evolution (2026-02-28)
+
+### Error Type Evolution
+- `Result<Value, (i64, String)>` → `RpcError { code, message }` with named constructors (dispatch, protocol, server, 7 bins)
+- `Result<Self, String>` → `error::Result<Self>` with `Error::InvalidInput` (gbm, decision_tree, random_forest)
+- `GemmCached` dimension casts: `as u32` → `dim_u32()` returning `Result` (zero `expect`/`unwrap`)
+
+### Function Decomposition
+- `dada2::denoise` → `init_partition` + `em_step` + `build_asvs`
+- `dispatch::handle_diversity` → 6 metric helpers
+- `gbm::predict_batch_proba` → `predict_single_proba`
+
+### Hardcoded Values → Named Constants
+- Socket paths (server, songbird, nestgate) → `DEFAULT_*_PATH_XDG`/`DEFAULT_*_PATH_FALLBACK`
+- GPU dispatch thresholds → `DISPATCH_THRESHOLD_NATIVE`, etc.
+- Feature table defaults → `DEFAULT_EIC_PPM`, `DEFAULT_MIN_SCANS`, etc.
+- GPU feature table threshold → `MIN_MS1_SCANS_FOR_GPU`
+
+### Safe Casts
+- `duration.as_micros() as u64` → `.try_into().unwrap_or(u64::MAX)` (saturating)
+- `u64 as usize` → `usize::try_from().unwrap_or(fallback)`
+
+### Defaults and Annotations
+- `ipc::metrics::Metrics` → `#[derive(Default)]`
+- 15 param struct manual `Default` impls annotated with provenance comments
+
+### Totals
+- 229 experiments, 5,743+ checks, 1,199+ tests (1,006 lib)
+- Clippy pedantic CLEAN, zero `expect`/`unwrap` in production
+- 52/52 papers, 50/50 three-tier
+
+## V72 — Five-Tier Validation Chain: Exp224–228 (2026-02-28)
+
+### Exp224: Paper Math Control (58/58)
+- 18 published papers validated against exact equations in pure Rust
+- Waters 2008, Massie 2012, Fernandez 2020, Srivastava 2011, Bruger 2018, Seed 2011, MG2023, Felsenstein 1981, Jones PFAS, EPA ML, NMF, TransE, Anderson spectral
+
+### Exp225: BarraCuda CPU v14 (58/58)
+- 50 domains + df64_host + cross-spring primitives (graph_laplacian, effective_rank, numerical_hessian)
+
+### Exp226: BarraCuda GPU v6 (28/28)
+- CPU==GPU parity, GemmCached::with_precision(F64), DF64 roundtrip, BandwidthTier detection
+
+### Exp227: Pure GPU Streaming v4 (24/24)
+- 7-stage unidirectional: quality→diversity→fusion→GEMM→PCoA→spectral→DF64
+
+### Exp228: metalForge v8 Cross-System (33/33)
+- GPU→NPU→CPU IPC dispatch, DF64 in dispatch context, PCIe bypass
+
+### Totals
+- 201 new checks (5,743+ cumulative)
+- V72 handoff: five-tier chain GREEN
+
+## V67 — Experiment Buildout + Evolution (2026-02-27)
+
+### New Python Baselines (10)
+- Track 4 soil papers: mukherjee2024, wang2025, zheng2024, ramirez2021, fierer2012, crowther2019, delgado2020
+- NPU spectral triage: pfas_spectral_triage_baseline, pfas_gbm_inference, pfas_random_forest_inference
+
+### Experiment Buildouts (Exp216–220)
+- Exp216: BarraCuda CPU v13 — 47-domain pure Rust math proof (47/47)
+- Exp217: Python vs Rust v2 — 47-domain timing benchmark
+- Exp218: GPU v5 portability — 42-module CPU==GPU proof (42/42)
+- Exp219: Pure GPU streaming v3 — 6-stage unidirectional pipeline (18/18)
+- Exp220: Cross-substrate dispatch V67 + BandwidthTier (25/25)
+- 11 extension papers promoted to three-tier (50/50)
+
+### Totals
+- 221 experiments, 5,421+ checks, 1,081+ tests
+- 52/52 papers, 50/50 three-tier
+
 ## V66 — Deep Audit + Dispatch Evolution + NUCLEUS Local Deployment (2026-02-27)
 
 ### V66 Deep Audit

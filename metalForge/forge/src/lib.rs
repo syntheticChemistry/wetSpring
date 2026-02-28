@@ -73,8 +73,12 @@
 //! 5. Handoff document in `wateringHole/handoffs/`
 
 pub mod bridge;
+pub mod data;
 pub mod dispatch;
 pub mod inventory;
+pub mod ncbi;
+pub mod nest;
+pub mod node;
 pub mod probe;
 pub mod streaming;
 pub mod substrate;

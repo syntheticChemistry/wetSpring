@@ -14,6 +14,10 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
 
 /// Thread-safe metrics collector for the wetSpring IPC server.
+///
+/// Uses #[derive(Default)]: `AtomicU64` and `Mutex<HashMap<..>>` both implement
+/// Default (0 and empty map respectively).
+#[derive(Default)]
 pub struct Metrics {
     /// Total calls received (success + error).
     pub total_calls: AtomicU64,
@@ -38,6 +42,7 @@ struct MethodMetrics {
     max_us: u64,
 }
 
+/// Manual impl intentional: `min_us: u64::MAX` is sentinel for "no min yet".
 impl Default for MethodMetrics {
     fn default() -> Self {
         Self {
@@ -66,7 +71,7 @@ impl Metrics {
 
     /// Record a successful method call with its wall-clock duration.
     pub fn record_success(&self, method: &str, duration: Duration) {
-        let us = duration.as_micros() as u64;
+        let us = duration.as_micros().try_into().unwrap_or(u64::MAX);
         self.total_calls.fetch_add(1, Ordering::Relaxed);
         self.success_count.fetch_add(1, Ordering::Relaxed);
         self.total_duration_us.fetch_add(us, Ordering::Relaxed);
@@ -87,7 +92,7 @@ impl Metrics {
 
     /// Record a failed method call with its wall-clock duration.
     pub fn record_error(&self, method: &str, duration: Duration) {
-        let us = duration.as_micros() as u64;
+        let us = duration.as_micros().try_into().unwrap_or(u64::MAX);
         self.total_calls.fetch_add(1, Ordering::Relaxed);
         self.error_count.fetch_add(1, Ordering::Relaxed);
         self.total_duration_us.fetch_add(us, Ordering::Relaxed);
@@ -137,12 +142,6 @@ impl Metrics {
             "total_duration_us": self.total_duration_us.load(Ordering::Relaxed),
             "methods": methods,
         })
-    }
-}
-
-impl Default for Metrics {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

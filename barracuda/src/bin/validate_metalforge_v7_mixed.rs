@@ -351,7 +351,7 @@ fn validate_gpu_cpu_fallback(v: &mut Validator) {
     {
         v.check_pass(
             "anderson unavailable without GPU (graceful -32001)",
-            matches!(anderson_result, Err((-32001, _))),
+            anderson_result.is_err_and(|e| e.code == -32001),
         );
     }
 
@@ -623,7 +623,7 @@ fn validate_workload_routing_model(v: &mut Validator) {
                 }
                 "science.anderson" => dispatch::dispatch(method, &json!({}))
                     .map(|_| ())
-                    .or_else(|e| if e.0 == -32001 { Ok(()) } else { Err(e) }),
+                    .or_else(|e| if e.code == -32001 { Ok(()) } else { Err(e) }),
                 _ => Ok(()),
             };
             v.check_pass(

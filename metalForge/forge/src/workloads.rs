@@ -61,6 +61,7 @@ impl BioWorkload {
                 name: String::new(),
                 required: Vec::new(),
                 preferred_substrate: None,
+                data_bytes: None,
             },
             origin,
             primitive: None,
@@ -432,6 +433,97 @@ pub fn placement() -> BioWorkload {
         .with_primitive("FelsensteinGpu")
 }
 
+// ── NUCLEUS data-driven domains (Tower → Nest → Node) ───────────────
+
+/// Assembly statistics (N50, GC, genome size) — CPU f64 compute.
+///
+/// Processes NCBI genome assemblies resolved via the Nest data chain.
+/// GPU promotion via `FusedMapReduceF64` for large collections.
+#[must_use]
+pub fn assembly_statistics() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "assembly_statistics",
+            vec![Capability::F64Compute, Capability::ScalarReduce],
+        )
+        .with_primitive("FusedMapReduceF64")
+}
+
+/// GC content analysis across assembly collections.
+///
+/// Computes per-assembly GC fractions and collection-level diversity
+/// (Shannon entropy of GC distribution).
+#[must_use]
+pub fn gc_analysis() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "gc_analysis",
+            vec![Capability::F64Compute, Capability::ScalarReduce],
+        )
+        .with_primitive("FusedMapReduceF64")
+}
+
+/// Genome diversity metrics across assembly collections.
+///
+/// Shannon/Simpson entropy on genome size distributions and GC profiles.
+#[must_use]
+pub fn genome_diversity() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "genome_diversity",
+            vec![Capability::F64Compute, Capability::ScalarReduce],
+        )
+        .with_primitive("DiversityFusionGpu")
+}
+
+/// PFAS spectral matching against reference libraries.
+///
+/// Cosine similarity scoring between measured and reference spectra.
+#[must_use]
+pub fn pfas_spectral_match() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "pfas_spectral_match",
+            vec![Capability::F64Compute, Capability::ShaderDispatch],
+        )
+        .with_primitive("WeightedDotF64")
+}
+
+/// Vibrio landscape analysis — cross-assembly comparative genomics.
+///
+/// K-mer profiling + diversity across Vibrio assembly collections.
+#[must_use]
+pub fn vibrio_landscape() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "vibrio_landscape",
+            vec![Capability::F64Compute, Capability::ScalarReduce],
+        )
+        .with_primitive("FusedMapReduceF64 + KmerHistogramGpu")
+}
+
+/// Campylobacterota comparative genomics — pan-genome statistics.
+#[must_use]
+pub fn campylobacterota_comparative() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "campylobacterota_comparative",
+            vec![Capability::F64Compute, Capability::ScalarReduce],
+        )
+        .with_primitive("FusedMapReduceF64")
+}
+
+/// NCBI assembly ingestion pipeline — I/O + compute coordination.
+///
+/// CPU-only I/O phase (FASTA parse, gzip decompress) followed by
+/// GPU-eligible statistics computation. Dispatched as CPU because
+/// the I/O phase dominates.
+#[must_use]
+pub fn ncbi_assembly_ingest() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::CpuOnly)
+        .named("ncbi_assembly_ingest", vec![Capability::CpuCompute])
+}
+
 // ── CPU-only domains (I/O-bound, no GPU benefit) ────────────────────
 
 /// FASTQ parsing (CPU-only, I/O-bound).
@@ -439,6 +531,133 @@ pub fn placement() -> BioWorkload {
 pub fn fastq_parsing() -> BioWorkload {
     BioWorkload::new_static(ShaderOrigin::CpuOnly)
         .named("fastq_parsing", vec![Capability::CpuCompute])
+}
+
+// ── Extension Papers (Exp144-156) — Anderson-QS Three-Tier ──────────
+
+/// Cold seep QS catalog (Exp144): diversity + Anderson + ODE.
+#[must_use]
+pub fn cold_seep_catalog() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "cold_seep_catalog",
+            vec![Capability::F64Compute, Capability::ScalarReduce],
+        )
+        .with_primitive("FusedMapReduceF64 + BatchedOdeRK4<QsBiofilm>")
+}
+
+/// Cold seep QS geometry (Exp145): diversity + Anderson localization.
+#[must_use]
+pub fn cold_seep_geometry() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "cold_seep_geometry",
+            vec![Capability::F64Compute, Capability::ScalarReduce],
+        )
+        .with_primitive("FusedMapReduceF64 + BrayCurtisF64")
+}
+
+/// `LuxR` phylogeny geometry (Exp146): diversity + phylogenetics + Anderson.
+#[must_use]
+pub fn luxr_phylogeny() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "luxr_phylogeny",
+            vec![Capability::F64Compute, Capability::ShaderDispatch],
+        )
+        .with_primitive("FusedMapReduceF64 + RobinsonFouldsF64")
+}
+
+/// Mechanical wave Anderson (Exp147): Anderson localization + wave model.
+#[must_use]
+pub fn mechanical_wave() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "mechanical_wave_anderson",
+            vec![Capability::F64Compute, Capability::ShaderDispatch],
+        )
+        .with_primitive("BatchedOdeRK4 + FusedMapReduceF64")
+}
+
+/// QS wave localization (Exp148): Anderson + QS ODE.
+#[must_use]
+pub fn qs_wave_localization() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "qs_wave_localization",
+            vec![Capability::F64Compute, Capability::ShaderDispatch],
+        )
+        .with_primitive("BatchedOdeRK4<QsBiofilm> + FusedMapReduceF64")
+        .with_ode(4, 17)
+}
+
+/// Burst statistics Anderson (Exp149): stochastic + Anderson.
+#[must_use]
+pub fn burst_statistics() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "burst_statistics_anderson",
+            vec![Capability::F64Compute, Capability::ScalarReduce],
+        )
+        .with_primitive("FusedMapReduceF64")
+}
+
+/// Physical communication Anderson (Exp152): comm + Anderson disorder.
+#[must_use]
+pub fn physical_comm() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "physical_comm_anderson",
+            vec![Capability::F64Compute, Capability::ScalarReduce],
+        )
+        .with_primitive("FusedMapReduceF64 + BatchedOdeRK4")
+}
+
+/// Nitrifying QS (Exp153): QS biofilm + diversity + Anderson.
+#[must_use]
+pub fn nitrifying_qs() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "nitrifying_qs",
+            vec![Capability::F64Compute, Capability::ScalarReduce],
+        )
+        .with_primitive("FusedMapReduceF64 + BatchedOdeRK4<QsBiofilm>")
+        .with_ode(4, 17)
+}
+
+/// Marine interkingdom QS (Exp154): cross-domain QS + diversity.
+#[must_use]
+pub fn marine_interkingdom() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "marine_interkingdom_qs",
+            vec![Capability::F64Compute, Capability::ScalarReduce],
+        )
+        .with_primitive("FusedMapReduceF64 + BrayCurtisF64")
+}
+
+/// Myxococcus critical density (Exp155): cooperation ODE + Anderson.
+#[must_use]
+pub fn myxococcus_critical_density() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "myxococcus_critical_density",
+            vec![Capability::F64Compute, Capability::ShaderDispatch],
+        )
+        .with_primitive("BatchedOdeRK4<CooperationOde>")
+        .with_ode(4, 13)
+}
+
+/// Dictyostelium relay (Exp156): signal relay ODE + Anderson.
+#[must_use]
+pub fn dictyostelium_relay() -> BioWorkload {
+    BioWorkload::new_static(ShaderOrigin::Absorbed)
+        .named(
+            "dictyostelium_relay",
+            vec![Capability::F64Compute, Capability::ShaderDispatch],
+        )
+        .with_primitive("BatchedOdeRK4<MultiSignalOde>")
+        .with_ode(7, 24)
 }
 
 // ── Inventory ───────────────────────────────────────────────────────
@@ -482,7 +701,27 @@ pub fn all_workloads() -> Vec<BioWorkload> {
         placement(),
         // Absorbed S63: diversity fusion
         diversity_fusion(),
+        // Extension papers (Exp144-156): Anderson-QS three-tier
+        cold_seep_catalog(),
+        cold_seep_geometry(),
+        luxr_phylogeny(),
+        mechanical_wave(),
+        qs_wave_localization(),
+        burst_statistics(),
+        physical_comm(),
+        nitrifying_qs(),
+        marine_interkingdom(),
+        myxococcus_critical_density(),
+        dictyostelium_relay(),
+        // NUCLEUS data-driven domains (Tower → Nest → Node)
+        assembly_statistics(),
+        gc_analysis(),
+        genome_diversity(),
+        pfas_spectral_match(),
+        vibrio_landscape(),
+        campylobacterota_comparative(),
         // CPU-only (I/O-bound)
+        ncbi_assembly_ingest(),
         fastq_parsing(),
     ]
 }
@@ -508,18 +747,18 @@ mod tests {
     #[test]
     fn all_workloads_has_entries() {
         let all = all_workloads();
-        assert!(all.len() >= 29, "expected at least 29 workloads");
+        assert!(all.len() >= 47, "expected at least 47 workloads");
     }
 
     #[test]
     fn origin_counts_match() {
         let (absorbed, local, cpu_only) = origin_summary();
         assert_eq!(
-            absorbed, 28,
-            "28 absorbed domains (incl. 5 ODE + diversity_fusion via S63)"
+            absorbed, 45,
+            "45 absorbed domains (28 base + 11 extension + 6 NUCLEUS data-driven)"
         );
         assert_eq!(local, 0, "0 local WGSL extensions (all absorbed)");
-        assert_eq!(cpu_only, 1, "1 CPU-only domain");
+        assert_eq!(cpu_only, 2, "2 CPU-only domains (fastq_parsing + ncbi_assembly_ingest)");
     }
 
     #[test]

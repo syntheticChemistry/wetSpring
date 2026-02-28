@@ -103,6 +103,7 @@ pub struct Dada2Params {
     pub min_abundance: usize,
 }
 
+/// Manual impl intentional: all fields use non-zero defaults (DADA2 R package).
 impl Default for Dada2Params {
     fn default() -> Self {
         Self {
@@ -183,50 +184,22 @@ pub fn denoise(seqs: &[UniqueSequence], params: &Dada2Params) -> (Vec<Asv>, Dada
     }
 
     let mut err = init_error_model();
-
-    // Partition assignments: partition[i] = index of center sequence
-    let mut partition: Vec<usize> = vec![0; seqs.len()];
-    let mut centers: Vec<usize> = vec![0];
+    let (mut partition, mut centers) = init_partition(seqs.len());
 
     let mut last_n_centers = 0;
     let mut iters = 0;
 
     for _ in 0..params.max_iterations {
         iters += 1;
-
-        // E-step: assign each sequence to the nearest center
-        assign_to_centers(&seqs, &centers, &err, &mut partition);
-
-        // M-step: update error model from assignments
-        for _ in 0..params.max_err_iterations {
-            let new_err = estimate_error_model(&seqs, &partition, &centers);
-            let converged = err_model_converged(&err, &new_err);
-            err = new_err;
-            if converged {
-                break;
-            }
-        }
-
-        // Split step: find sequences whose abundance is too high to be errors
-        let new_centers = find_new_centers(&seqs, &partition, &centers, &err, params.omega_a);
-
-        for &c in &new_centers {
-            if !centers.contains(&c) {
-                centers.push(c);
-            }
-        }
-        centers.sort_unstable();
-
-        if centers.len() == last_n_centers {
+        let centers_changed =
+            em_step(&seqs, &mut partition, &mut centers, &mut err, params, last_n_centers);
+        last_n_centers = centers.len();
+        if !centers_changed {
             break;
         }
-        last_n_centers = centers.len();
     }
 
-    // Final assignment
     assign_to_centers(&seqs, &centers, &err, &mut partition);
-
-    // Build ASVs
     let mut asvs = build_asvs(&seqs, &partition, &centers);
     asvs.sort_by(|a, b| b.abundance.cmp(&a.abundance));
 
@@ -243,6 +216,45 @@ pub fn denoise(seqs: &[UniqueSequence], params: &Dada2Params) -> (Vec<Asv>, Dada
             iterations: iters,
         },
     )
+}
+
+/// Initial sequence partitioning: all sequences assigned to center 0.
+fn init_partition(n: usize) -> (Vec<usize>, Vec<usize>) {
+    let partition = vec![0; n];
+    let centers = vec![0];
+    (partition, centers)
+}
+
+/// Single EM iteration: E-step (assign), M-step (refine error model), split (find new centers).
+/// Returns `true` if centers changed (iteration should continue).
+fn em_step(
+    seqs: &[&UniqueSequence],
+    partition: &mut [usize],
+    centers: &mut Vec<usize>,
+    err: &mut ErrorModel,
+    params: &Dada2Params,
+    last_n_centers: usize,
+) -> bool {
+    assign_to_centers(seqs, centers, err, partition);
+
+    for _ in 0..params.max_err_iterations {
+        let new_err = estimate_error_model(seqs, partition, centers);
+        let converged = err_model_converged(err, &new_err);
+        *err = new_err;
+        if converged {
+            break;
+        }
+    }
+
+    let new_centers = find_new_centers(seqs, partition, centers, err, params.omega_a);
+    for &c in &new_centers {
+        if !centers.contains(&c) {
+            centers.push(c);
+        }
+    }
+    centers.sort_unstable();
+
+    centers.len() != last_n_centers
 }
 
 /// Initialize error model from Phred quality scores (no prior data).

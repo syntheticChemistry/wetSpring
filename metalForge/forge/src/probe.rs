@@ -11,7 +11,7 @@
 //!
 //! CPU discovery reads `/proc/cpuinfo` and `/proc/meminfo`.
 
-use crate::substrate::{Capability, Identity, Properties, Substrate, SubstrateKind};
+use crate::substrate::{Capability, Identity, Properties, Substrate, SubstrateKind, SubstrateOrigin};
 use std::fs;
 
 /// Probe all GPU adapters via wgpu.
@@ -65,6 +65,7 @@ pub fn probe_gpus() -> Vec<Substrate> {
                 ..Properties::default()
             },
             capabilities,
+            origin: SubstrateOrigin::Local,
         });
     }
 
@@ -97,6 +98,7 @@ pub fn probe_cpu() -> Substrate {
             ..Properties::default()
         },
         capabilities,
+        origin: SubstrateOrigin::Local,
     }
 }
 
@@ -134,6 +136,7 @@ pub fn probe_npus() -> Vec<Substrate> {
                 Capability::BatchInference { max_batch: 8 },
                 Capability::WeightMutation,
             ],
+            origin: SubstrateOrigin::Local,
         });
     }
 

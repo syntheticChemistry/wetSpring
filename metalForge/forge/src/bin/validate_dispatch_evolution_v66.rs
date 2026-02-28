@@ -30,7 +30,7 @@
 
 use wetspring_forge::dispatch::{self, Reason, Workload};
 use wetspring_forge::streaming::{PipelineStage, StreamingSession};
-use wetspring_forge::substrate::{Capability, Identity, Properties, Substrate, SubstrateKind};
+use wetspring_forge::substrate::{Capability, Identity, Properties, Substrate, SubstrateKind, SubstrateOrigin};
 use wetspring_forge::workloads;
 
 fn check(pass: &mut u32, fail: &mut u32, total: &mut u32, name: &str, ok: bool) {
@@ -61,6 +61,7 @@ fn make_gpu() -> Substrate {
             Capability::ShaderDispatch,
             Capability::TimestampQuery,
         ],
+        origin: SubstrateOrigin::Local,
     }
 }
 
@@ -78,6 +79,7 @@ fn make_npu() -> Substrate {
             Capability::BatchInference { max_batch: 8 },
             Capability::WeightMutation,
         ],
+        origin: SubstrateOrigin::Local,
     }
 }
 
@@ -97,6 +99,7 @@ fn make_cpu() -> Substrate {
             Capability::CpuCompute,
             Capability::SimdVector,
         ],
+        origin: SubstrateOrigin::Local,
     }
 }
 
@@ -126,7 +129,13 @@ fn section_workload_routing(pass: &mut u32, fail: &mut u32, total: &mut u32) {
         }
     }
 
-    check(pass, fail, total, "all workloads routed", routed == all.len());
+    check(
+        pass,
+        fail,
+        total,
+        "all workloads routed",
+        routed == all.len(),
+    );
     check(
         pass,
         fail,
@@ -141,7 +150,13 @@ fn section_workload_routing(pass: &mut u32, fail: &mut u32, total: &mut u32) {
         &format!("NPU routes {npu_n} workloads (0: taxonomy needs f64)"),
         npu_n == 0,
     );
-    check(pass, fail, total, "CPU handles I/O-bound workloads", cpu_n >= 1);
+    check(
+        pass,
+        fail,
+        total,
+        "CPU handles I/O-bound workloads",
+        cpu_n >= 1,
+    );
 
     let tax = workloads::taxonomy();
     let tax_d = dispatch::route(&tax.workload, &inventory);
@@ -171,7 +186,7 @@ fn section_absorption_status(pass: &mut u32, fail: &mut u32, total: &mut u32) {
 
     let (absorbed, local, cpu_only) = workloads::origin_summary();
 
-    check(pass, fail, total, "28 absorbed workloads", absorbed == 28);
+    check(pass, fail, total, "39 absorbed workloads", absorbed == 39);
     check(pass, fail, total, "0 local WGSL (full lean)", local == 0);
     check(pass, fail, total, "1 CPU-only (FASTQ)", cpu_only == 1);
 
@@ -180,7 +195,13 @@ fn section_absorption_status(pass: &mut u32, fail: &mut u32, total: &mut u32) {
         .iter()
         .filter(|w| w.is_absorbed())
         .all(|w| w.primitive.is_some());
-    check(pass, fail, total, "all absorbed have ToadStool primitive", all_have_prim);
+    check(
+        pass,
+        fail,
+        total,
+        "all absorbed have ToadStool primitive",
+        all_have_prim,
+    );
 
     let ode_count = all.iter().filter(|w| w.ode_dims.is_some()).count();
     check(
@@ -195,7 +216,13 @@ fn section_absorption_status(pass: &mut u32, fail: &mut u32, total: &mut u32) {
         .iter()
         .filter(|w| w.ode_dims.is_some())
         .all(workloads::BioWorkload::is_absorbed);
-    check(pass, fail, total, "all ODE workloads absorbed", ode_all_absorbed);
+    check(
+        pass,
+        fail,
+        total,
+        "all ODE workloads absorbed",
+        ode_all_absorbed,
+    );
 }
 
 // ── S3 ──────────────────────────────────────────────────────────────────────
@@ -213,10 +240,28 @@ fn section_streaming_topology(pass: &mut u32, fail: &mut u32, total: &mut u32) {
         });
     }
     let a = pure_gpu.analyze();
-    check(pass, fail, total, "pure GPU: fully streamable", a.fully_streamable);
+    check(
+        pass,
+        fail,
+        total,
+        "pure GPU: fully streamable",
+        a.fully_streamable,
+    );
     check(pass, fail, total, "pure GPU: 4 stages", a.n_stages == 4);
-    check(pass, fail, total, "pure GPU: 3 chained transitions", a.gpu_chained == 3);
-    check(pass, fail, total, "pure GPU: 0 CPU roundtrips", a.cpu_roundtrips == 0);
+    check(
+        pass,
+        fail,
+        total,
+        "pure GPU: 3 chained transitions",
+        a.gpu_chained == 3,
+    );
+    check(
+        pass,
+        fail,
+        total,
+        "pure GPU: 0 CPU roundtrips",
+        a.cpu_roundtrips == 0,
+    );
 
     let mut mixed = StreamingSession::new(SubstrateKind::Gpu);
     mixed.add_stage(PipelineStage {
@@ -232,8 +277,20 @@ fn section_streaming_topology(pass: &mut u32, fail: &mut u32, total: &mut u32) {
         produces_gpu_buffer: false,
     });
     let m = mixed.analyze();
-    check(pass, fail, total, "GPU→NPU (no PCIe): not streamable", !m.fully_streamable);
-    check(pass, fail, total, "GPU→NPU: 1 CPU roundtrip", m.cpu_roundtrips == 1);
+    check(
+        pass,
+        fail,
+        total,
+        "GPU→NPU (no PCIe): not streamable",
+        !m.fully_streamable,
+    );
+    check(
+        pass,
+        fail,
+        total,
+        "GPU→NPU: 1 CPU roundtrip",
+        m.cpu_roundtrips == 1,
+    );
 
     let mut bypass = StreamingSession::new(SubstrateKind::Gpu);
     bypass.add_stage(PipelineStage {
@@ -249,8 +306,20 @@ fn section_streaming_topology(pass: &mut u32, fail: &mut u32, total: &mut u32) {
         produces_gpu_buffer: false,
     });
     let b = bypass.analyze();
-    check(pass, fail, total, "PCIe bypass: GPU→NPU chains (1 chained)", b.gpu_chained >= 1);
-    check(pass, fail, total, "PCIe bypass: 0 CPU roundtrips", b.cpu_roundtrips == 0);
+    check(
+        pass,
+        fail,
+        total,
+        "PCIe bypass: GPU→NPU chains (1 chained)",
+        b.gpu_chained >= 1,
+    );
+    check(
+        pass,
+        fail,
+        total,
+        "PCIe bypass: 0 CPU roundtrips",
+        b.cpu_roundtrips == 0,
+    );
 }
 
 // ── S4 ──────────────────────────────────────────────────────────────────────
@@ -262,19 +331,49 @@ fn section_mixed_dispatch(pass: &mut u32, fail: &mut u32, total: &mut u32) {
     let cpu_only = [make_cpu()];
     let gpu_only = [make_gpu()];
 
-    let div = Workload::new("diversity", vec![Capability::F64Compute, Capability::ScalarReduce]);
-    let tax = Workload::new("taxonomy_int8", vec![Capability::QuantizedInference { bits: 8 }]);
+    let div = Workload::new(
+        "diversity",
+        vec![Capability::F64Compute, Capability::ScalarReduce],
+    );
+    let tax = Workload::new(
+        "taxonomy_int8",
+        vec![Capability::QuantizedInference { bits: 8 }],
+    );
     let fq = Workload::new("fastq_parse", vec![Capability::CpuCompute]);
 
     let d1 = dispatch::route(&div, &full).unwrap();
-    check(pass, fail, total, "diversity → GPU on full system", d1.substrate.kind == SubstrateKind::Gpu);
-    check(pass, fail, total, "diversity reason: BestAvailable", d1.reason == Reason::BestAvailable);
+    check(
+        pass,
+        fail,
+        total,
+        "diversity → GPU on full system",
+        d1.substrate.kind == SubstrateKind::Gpu,
+    );
+    check(
+        pass,
+        fail,
+        total,
+        "diversity reason: BestAvailable",
+        d1.reason == Reason::BestAvailable,
+    );
 
     let d2 = dispatch::route(&tax, &full).unwrap();
-    check(pass, fail, total, "taxonomy → NPU on full system", d2.substrate.kind == SubstrateKind::Npu);
+    check(
+        pass,
+        fail,
+        total,
+        "taxonomy → NPU on full system",
+        d2.substrate.kind == SubstrateKind::Npu,
+    );
 
     let d3 = dispatch::route(&fq, &full).unwrap();
-    check(pass, fail, total, "FASTQ → CPU on full system", d3.substrate.kind == SubstrateKind::Cpu);
+    check(
+        pass,
+        fail,
+        total,
+        "FASTQ → CPU on full system",
+        d3.substrate.kind == SubstrateKind::Cpu,
+    );
 
     let d4 = dispatch::route(&div, &cpu_only);
     check(
@@ -296,11 +395,23 @@ fn section_mixed_dispatch(pass: &mut u32, fail: &mut u32, total: &mut u32) {
     );
 
     let d5 = dispatch::route(&tax, &gpu_only);
-    check(pass, fail, total, "taxonomy: no route on GPU-only (needs int8)", d5.is_none());
+    check(
+        pass,
+        fail,
+        total,
+        "taxonomy: no route on GPU-only (needs int8)",
+        d5.is_none(),
+    );
 
     let pref = Workload::new("test", vec![Capability::F64Compute]).prefer(SubstrateKind::Gpu);
     let d6 = dispatch::route(&pref, &full).unwrap();
-    check(pass, fail, total, "GPU preference honored", d6.reason == Reason::Preferred);
+    check(
+        pass,
+        fail,
+        total,
+        "GPU preference honored",
+        d6.reason == Reason::Preferred,
+    );
 
     let bad_pref = Workload::new("test", vec![Capability::F64Compute]).prefer(SubstrateKind::Npu);
     let d7 = dispatch::route(&bad_pref, &full).unwrap();
@@ -327,11 +438,35 @@ fn section_nucleus_model(pass: &mut u32, fail: &mut u32, total: &mut u32) {
         "metrics.snapshot",
     ];
 
-    check(pass, fail, total, "Tower exposes 6 capabilities", tower_caps.len() == 6);
-    let science = tower_caps.iter().filter(|c| c.starts_with("science.")).count();
-    check(pass, fail, total, "Tower: 5 science capabilities", science == 5);
-    let metrics = tower_caps.iter().filter(|c| c.starts_with("metrics.")).count();
-    check(pass, fail, total, "Tower: 1 metrics (Nest) capability", metrics == 1);
+    check(
+        pass,
+        fail,
+        total,
+        "Tower exposes 6 capabilities",
+        tower_caps.len() == 6,
+    );
+    let science = tower_caps
+        .iter()
+        .filter(|c| c.starts_with("science."))
+        .count();
+    check(
+        pass,
+        fail,
+        total,
+        "Tower: 5 science capabilities",
+        science == 5,
+    );
+    let metrics = tower_caps
+        .iter()
+        .filter(|c| c.starts_with("metrics."))
+        .count();
+    check(
+        pass,
+        fail,
+        total,
+        "Tower: 1 metrics (Nest) capability",
+        metrics == 1,
+    );
 
     let inventory = [make_gpu(), make_npu(), make_cpu()];
 
@@ -346,11 +481,7 @@ fn section_nucleus_model(pass: &mut u32, fail: &mut u32, total: &mut u32) {
             vec![Capability::QuantizedInference { bits: 8 }],
             SubstrateKind::Npu,
         ),
-        (
-            "fastq_io",
-            vec![Capability::CpuCompute],
-            SubstrateKind::Cpu,
-        ),
+        ("fastq_io", vec![Capability::CpuCompute], SubstrateKind::Cpu),
     ];
 
     for (name, caps, expected_kind) in &node_workloads {
@@ -469,8 +600,20 @@ fn section_dispatch_threshold(pass: &mut u32, fail: &mut u32, total: &mut u32) {
     let use_gpu_small = below_threshold >= gpu_threshold;
     let use_gpu_large = above_threshold >= gpu_threshold;
 
-    check(pass, fail, total, "100 elements: CPU (below threshold)", !use_gpu_small);
-    check(pass, fail, total, "50000 elements: GPU (above threshold)", use_gpu_large);
+    check(
+        pass,
+        fail,
+        total,
+        "100 elements: CPU (below threshold)",
+        !use_gpu_small,
+    );
+    check(
+        pass,
+        fail,
+        total,
+        "50000 elements: GPU (above threshold)",
+        use_gpu_large,
+    );
 
     let exact_threshold: usize = gpu_threshold;
     check(

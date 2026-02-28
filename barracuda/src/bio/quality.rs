@@ -45,6 +45,7 @@ pub struct QualityParams {
     pub phred_offset: u8,
 }
 
+/// Manual impl intentional: all fields use non-zero defaults (Trimmomatic-style).
 impl Default for QualityParams {
     fn default() -> Self {
         Self {

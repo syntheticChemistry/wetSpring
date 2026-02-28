@@ -289,6 +289,7 @@ pub fn posterior_batch(model: &HmmModel, sequences: &[&[usize]]) -> Vec<Vec<f64>
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
     fn simple_weather_model() -> HmmModel {
         // Classic: 2 states (Rainy=0, Sunny=1), 3 symbols (Walk=0, Shop=1, Clean=2)
@@ -319,7 +320,7 @@ mod tests {
         let b = 3.0_f64.ln();
         let result = log_sum_exp2(a, b);
         assert!(
-            (result - 5.0_f64.ln()).abs() < 1e-12,
+            (result - 5.0_f64.ln()).abs() < tolerances::ANALYTICAL_F64,
             "ln(2) + ln(3) = ln(5)"
         );
     }
@@ -335,7 +336,7 @@ mod tests {
     fn log_sum_exp_slice() {
         let vals = vec![1.0_f64.ln(), 2.0_f64.ln(), 3.0_f64.ln()];
         let result = log_sum_exp(&vals);
-        assert!((result - 6.0_f64.ln()).abs() < 1e-12);
+        assert!((result - 6.0_f64.ln()).abs() < tolerances::ANALYTICAL_F64);
     }
 
     #[test]
@@ -369,7 +370,7 @@ mod tests {
                 .collect();
             let ll_t = log_sum_exp(&log_vals);
             assert!(
-                (ll_t - fwd.log_likelihood).abs() < 1e-10,
+                (ll_t - fwd.log_likelihood).abs() < tolerances::PYTHON_PARITY,
                 "forward-backward consistency failed at t={t}: {ll_t} vs {}",
                 fwd.log_likelihood
             );
@@ -395,7 +396,7 @@ mod tests {
         let fwd = forward(&model, &obs);
         let vit = viterbi(&model, &obs);
         assert!(
-            vit.log_probability <= fwd.log_likelihood + 1e-10,
+            vit.log_probability <= fwd.log_likelihood + tolerances::HMM_INVARIANT_SLACK,
             "Viterbi path can't be more likely than total: {} > {}",
             vit.log_probability,
             fwd.log_likelihood
@@ -412,7 +413,7 @@ mod tests {
                 .map(|i| gamma[t * model.n_states + i])
                 .sum();
             assert!(
-                (row_sum - 1.0).abs() < 1e-10,
+                (row_sum - 1.0).abs() < tolerances::PYTHON_PARITY,
                 "posterior at t={t} should sum to 1, got {row_sum}"
             );
         }
@@ -425,7 +426,7 @@ mod tests {
         let gamma = posterior(&model, &obs);
         for &g in &gamma {
             assert!(
-                (-1e-10..=1.0 + 1e-10).contains(&g),
+                (-tolerances::PYTHON_PARITY..=1.0 + tolerances::PYTHON_PARITY).contains(&g),
                 "gamma out of [0,1]: {g}"
             );
         }
@@ -487,7 +488,7 @@ mod tests {
 
         for t in 0..obs.len() {
             let row_sum: f64 = (0..3).map(|i| gamma[t * 3 + i]).sum();
-            assert!((row_sum - 1.0).abs() < 1e-10);
+            assert!((row_sum - 1.0).abs() < tolerances::PYTHON_PARITY);
         }
     }
 }

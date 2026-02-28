@@ -39,6 +39,7 @@ pub struct ScoringParams {
     pub gap_extend: i32,
 }
 
+/// Manual impl intentional: all fields use non-zero scores (BLOSUM-style).
 impl Default for ScoringParams {
     fn default() -> Self {
         Self {

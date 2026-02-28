@@ -19,6 +19,7 @@
 
 use crate::substrate::{Capability, Identity, Properties, Substrate, SubstrateKind};
 use barracuda::device::WgpuDevice;
+use barracuda::unified_hardware::BandwidthTier;
 
 /// Create a barracuda [`WgpuDevice`] from a forge GPU substrate.
 ///
@@ -86,13 +87,42 @@ pub fn substrate_from_device(device: &WgpuDevice) -> Substrate {
             ..Properties::default()
         },
         capabilities,
+        origin: crate::substrate::SubstrateOrigin::Local,
     }
+}
+
+/// Detect the `BandwidthTier` for a GPU substrate from its adapter name.
+///
+/// Uses barracuda's `BandwidthTier::detect_from_adapter_name` to map GPU
+/// model strings to `PCIe` generation + lane width. Falls back to
+/// `BandwidthTier::Unknown` for unrecognised adapters.
+///
+/// Returns `None` for non-GPU substrates.
+#[must_use]
+pub fn detect_bandwidth_tier(substrate: &Substrate) -> Option<BandwidthTier> {
+    if substrate.kind != SubstrateKind::Gpu {
+        return None;
+    }
+    Some(BandwidthTier::detect_from_adapter_name(&substrate.identity.name))
+}
+
+/// Estimate the data transfer cost in microseconds for moving `data_bytes`
+/// to a GPU substrate.
+///
+/// Combines the `BandwidthTier`'s latency and throughput model. Returns
+/// `None` for non-GPU substrates.
+#[must_use]
+pub fn estimated_transfer_us(substrate: &Substrate, data_bytes: usize) -> Option<f64> {
+    let tier = detect_bandwidth_tier(substrate)?;
+    let cost = tier.transfer_cost();
+    Some(cost.estimated_us(data_bytes))
 }
 
 #[cfg(test)]
 #[allow(clippy::expect_used)]
 mod tests {
     use super::*;
+    use crate::substrate::SubstrateOrigin;
     use crate::inventory;
 
     #[test]
@@ -118,6 +148,7 @@ mod tests {
             identity: Identity::named("f32-only GPU"),
             properties: Properties::default(),
             capabilities: vec![Capability::F32Compute, Capability::ShaderDispatch],
+            origin: SubstrateOrigin::Local,
         };
         let gpu_f64 = Substrate {
             kind: SubstrateKind::Gpu,
@@ -131,6 +162,7 @@ mod tests {
                 Capability::F32Compute,
                 Capability::ShaderDispatch,
             ],
+            origin: SubstrateOrigin::Local,
         };
         let cpu = crate::probe::probe_cpu();
 
@@ -152,7 +184,46 @@ mod tests {
             identity: Identity::named("no-index GPU"),
             properties: Properties::default(),
             capabilities: vec![Capability::ShaderDispatch],
+            origin: SubstrateOrigin::Local,
         };
         assert!(create_device(&gpu).is_none());
+    }
+
+    #[test]
+    fn detect_bandwidth_tier_for_rtx4070() {
+        let gpu = Substrate {
+            kind: SubstrateKind::Gpu,
+            identity: Identity::named("NVIDIA GeForce RTX 4070"),
+            properties: Properties::default(),
+            capabilities: vec![Capability::F64Compute],
+            origin: SubstrateOrigin::Local,
+        };
+        let tier = detect_bandwidth_tier(&gpu).expect("GPU should have tier");
+        assert_eq!(tier, BandwidthTier::PciE4x16);
+    }
+
+    #[test]
+    fn detect_bandwidth_tier_none_for_cpu() {
+        let cpu = crate::probe::probe_cpu();
+        assert!(detect_bandwidth_tier(&cpu).is_none());
+    }
+
+    #[test]
+    fn estimated_transfer_us_positive() {
+        let gpu = Substrate {
+            kind: SubstrateKind::Gpu,
+            identity: Identity::named("NVIDIA GeForce RTX 4070"),
+            properties: Properties::default(),
+            capabilities: vec![Capability::F64Compute],
+            origin: SubstrateOrigin::Local,
+        };
+        let us = estimated_transfer_us(&gpu, 1_048_576).expect("should have cost");
+        assert!(us > 0.0, "transfer cost should be positive: {us}");
+    }
+
+    #[test]
+    fn estimated_transfer_us_none_for_cpu() {
+        let cpu = crate::probe::probe_cpu();
+        assert!(estimated_transfer_us(&cpu, 1024).is_none());
     }
 }

@@ -16,6 +16,7 @@
 //! - **Chimera detection**: CPU (branching, hash-heavy)
 
 use crate::substrate::{Capability, Substrate, SubstrateKind};
+use barracuda::unified_hardware::BandwidthTier;
 
 /// A workload that needs to be dispatched to a substrate.
 #[derive(Debug)]
@@ -26,6 +27,8 @@ pub struct Workload {
     pub required: Vec<Capability>,
     /// Preferred substrate kind (if any).
     pub preferred_substrate: Option<SubstrateKind>,
+    /// Data transfer size in bytes (for bandwidth-aware routing).
+    pub data_bytes: Option<usize>,
 }
 
 /// Dispatch decision — which substrate was chosen and why.
@@ -44,6 +47,8 @@ pub enum Reason {
     Preferred,
     /// Best capable substrate by priority (GPU > NPU > CPU).
     BestAvailable,
+    /// GPU was capable but transfer cost exceeded compute benefit.
+    BandwidthFallback,
 }
 
 impl Workload {
@@ -54,6 +59,7 @@ impl Workload {
             name: name.into(),
             required,
             preferred_substrate: None,
+            data_bytes: None,
         }
     }
 
@@ -61,6 +67,13 @@ impl Workload {
     #[must_use]
     pub const fn prefer(mut self, kind: SubstrateKind) -> Self {
         self.preferred_substrate = Some(kind);
+        self
+    }
+
+    /// Set the data transfer size for bandwidth-aware routing.
+    #[must_use]
+    pub const fn with_data_bytes(mut self, bytes: usize) -> Self {
+        self.data_bytes = Some(bytes);
         self
     }
 }
@@ -104,11 +117,62 @@ pub fn route<'a>(workload: &Workload, substrates: &'a [Substrate]) -> Option<Dec
     })
 }
 
+/// Route a workload with bandwidth-aware GPU/CPU decisions.
+///
+/// Like [`route`], but when a GPU substrate is chosen and the workload
+/// specifies `data_bytes`, the estimated `PCIe` transfer cost is compared
+/// against the GPU dispatch overhead. If the transfer cost dominates
+/// (small workloads over slow `PCIe` links), falls back to CPU with
+/// `Reason::BandwidthFallback`.
+///
+/// The threshold heuristic: if estimated transfer microseconds exceed
+/// the barracuda GPU dispatch overhead constant, prefer CPU for
+/// non-preferred workloads.
+#[must_use]
+pub fn route_bandwidth_aware<'a>(
+    workload: &Workload,
+    substrates: &'a [Substrate],
+) -> Option<Decision<'a>> {
+    let decision = route(workload, substrates)?;
+
+    if decision.substrate.kind != SubstrateKind::Gpu {
+        return Some(decision);
+    }
+    if workload.preferred_substrate == Some(SubstrateKind::Gpu) {
+        return Some(decision);
+    }
+
+    let data_bytes = match workload.data_bytes {
+        Some(b) if b > 0 => b,
+        _ => return Some(decision),
+    };
+
+    let tier = BandwidthTier::detect_from_adapter_name(&decision.substrate.identity.name);
+    let cost = tier.transfer_cost();
+    let transfer_us = cost.estimated_us(data_bytes);
+
+    if transfer_us > barracuda::unified_hardware::GPU_DISPATCH_OVERHEAD_US {
+        let cpu_fallback = substrates
+            .iter()
+            .filter(|s| s.kind == SubstrateKind::Cpu)
+            .find(|s| workload.required.iter().all(|req| s.has(req)));
+
+        if let Some(cpu) = cpu_fallback {
+            return Some(Decision {
+                substrate: cpu,
+                reason: Reason::BandwidthFallback,
+            });
+        }
+    }
+
+    Some(decision)
+}
+
 #[cfg(test)]
 #[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
-    use crate::substrate::{Identity, Properties};
+    use crate::substrate::{Identity, Properties, SubstrateOrigin};
 
     fn make_gpu(name: &str, caps: Vec<Capability>) -> Substrate {
         Substrate {
@@ -116,6 +180,7 @@ mod tests {
             identity: Identity::named(name),
             properties: Properties::default(),
             capabilities: caps,
+            origin: SubstrateOrigin::Local,
         }
     }
 
@@ -125,6 +190,7 @@ mod tests {
             identity: Identity::named("CPU"),
             properties: Properties::default(),
             capabilities: vec![Capability::F64Compute, Capability::F32Compute],
+            origin: SubstrateOrigin::Local,
         }
     }
 
@@ -138,6 +204,7 @@ mod tests {
                 Capability::QuantizedInference { bits: 8 },
                 Capability::BatchInference { max_batch: 8 },
             ],
+            origin: SubstrateOrigin::Local,
         }
     }
 
@@ -259,5 +326,48 @@ mod tests {
     fn workload_prefer_chain() {
         let w = Workload::new("inference", vec![Capability::F32Compute]).prefer(SubstrateKind::Npu);
         assert_eq!(w.preferred_substrate, Some(SubstrateKind::Npu));
+    }
+
+    #[test]
+    fn workload_with_data_bytes() {
+        let w = Workload::new("matmul", vec![Capability::F64Compute]).with_data_bytes(1_048_576);
+        assert_eq!(w.data_bytes, Some(1_048_576));
+    }
+
+    #[test]
+    fn bandwidth_aware_respects_preference() {
+        let gpu = make_gpu("NVIDIA GeForce RTX 4070", vec![Capability::F64Compute]);
+        let cpu = make_cpu();
+        let subs = [gpu, cpu];
+        let w = Workload::new("forced_gpu", vec![Capability::F64Compute])
+            .prefer(SubstrateKind::Gpu)
+            .with_data_bytes(1_000_000_000);
+
+        let d = route_bandwidth_aware(&w, &subs).expect("should route");
+        assert_eq!(d.substrate.kind, SubstrateKind::Gpu);
+    }
+
+    #[test]
+    fn bandwidth_aware_no_data_bytes_uses_standard() {
+        let gpu = make_gpu(
+            "NVIDIA GeForce RTX 4070",
+            vec![Capability::F64Compute, Capability::ShaderDispatch],
+        );
+        let cpu = make_cpu();
+        let subs = [gpu, cpu];
+        let w = Workload::new(
+            "diversity",
+            vec![Capability::F64Compute, Capability::ShaderDispatch],
+        );
+
+        let d = route_bandwidth_aware(&w, &subs).expect("should route");
+        assert_eq!(d.substrate.kind, SubstrateKind::Gpu);
+        assert_eq!(d.reason, Reason::BestAvailable);
+    }
+
+    #[test]
+    fn bandwidth_fallback_reason() {
+        assert_ne!(Reason::BandwidthFallback, Reason::BestAvailable);
+        assert_ne!(Reason::BandwidthFallback, Reason::Preferred);
     }
 }

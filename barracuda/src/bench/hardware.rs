@@ -251,6 +251,7 @@ fn read_stdout(cmd: &str, args: &[&str]) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
 

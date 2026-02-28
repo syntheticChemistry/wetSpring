@@ -500,7 +500,12 @@ fn main() {
     let (ncdf_val, ncdf_ms) = bench("norm_cdf(1.96) — barracuda::stats", || {
         barracuda::stats::norm_cdf(1.96)
     });
-    v.check("norm_cdf(1.96) ≈ 0.975", ncdf_val, 0.975, 1e-3);
+    v.check(
+        "norm_cdf(1.96) ≈ 0.975",
+        ncdf_val,
+        0.975,
+        tolerances::NORM_CDF_PARITY,
+    );
     timings.push(Timing {
         label: "norm_cdf(1.96)",
         origin: "hotSpring→ToadStool",

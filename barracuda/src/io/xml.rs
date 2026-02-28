@@ -315,27 +315,23 @@ mod tests {
     fn self_closing_with_attr() {
         let events = events_from(r#"<item key="value"/>"#);
         assert_eq!(events.len(), 2);
-        match &events[0] {
-            XmlEvent::StartElement { name, attrs } => {
-                assert_eq!(name, "item");
-                assert_eq!(attrs, &[("key".to_owned(), "value".to_owned())]);
-            }
-            other => panic!("expected StartElement, got {other:?}"),
-        }
+        let XmlEvent::StartElement { name, attrs } = &events[0] else {
+            panic!("events[0] should be StartElement");
+        };
+        assert_eq!(name, "item");
+        assert_eq!(attrs, &[("key".to_owned(), "value".to_owned())]);
         assert!(matches!(&events[1], XmlEvent::EndElement { name } if name == "item"));
     }
 
     #[test]
     fn multiple_attributes() {
         let events = events_from(r#"<cv accession="MS:1000511" value="1"/>"#);
-        match &events[0] {
-            XmlEvent::StartElement { attrs, .. } => {
-                assert_eq!(attrs.len(), 2);
-                assert_eq!(attrs[0], ("accession".to_owned(), "MS:1000511".to_owned()));
-                assert_eq!(attrs[1], ("value".to_owned(), "1".to_owned()));
-            }
-            other => panic!("expected StartElement, got {other:?}"),
-        }
+        let XmlEvent::StartElement { attrs, .. } = &events[0] else {
+            panic!("events[0] should be StartElement");
+        };
+        assert_eq!(attrs.len(), 2);
+        assert_eq!(attrs[0], ("accession".to_owned(), "MS:1000511".to_owned()));
+        assert_eq!(attrs[1], ("value".to_owned(), "1".to_owned()));
     }
 
     #[test]
@@ -382,12 +378,10 @@ mod tests {
     #[test]
     fn entity_unescape_attr() {
         let events = events_from(r#"<a val="a&amp;b"/>"#);
-        match &events[0] {
-            XmlEvent::StartElement { attrs, .. } => {
-                assert_eq!(attrs[0].1, "a&b");
-            }
-            other => panic!("expected StartElement, got {other:?}"),
-        }
+        let XmlEvent::StartElement { attrs, .. } = &events[0] else {
+            panic!("events[0] should be StartElement");
+        };
+        assert_eq!(attrs[0].1, "a&b");
     }
 
     #[test]
@@ -426,14 +420,12 @@ mod tests {
     #[test]
     fn single_quoted_attributes() {
         let events = events_from("<a name='value'/>");
-        match &events[0] {
-            XmlEvent::StartElement { attrs, .. } => {
-                assert_eq!(attrs.len(), 1);
-                assert_eq!(attrs[0].0, "name");
-                assert_eq!(attrs[0].1, "value");
-            }
-            other => panic!("expected StartElement, got {other:?}"),
-        }
+        let XmlEvent::StartElement { attrs, .. } = &events[0] else {
+            panic!("events[0] should be StartElement");
+        };
+        assert_eq!(attrs.len(), 1);
+        assert_eq!(attrs[0].0, "name");
+        assert_eq!(attrs[0].1, "value");
     }
 
     #[test]
@@ -505,62 +497,50 @@ mod tests {
         let e1 = reader.next_event().unwrap();
         assert!(matches!(e1, XmlEvent::StartElement { name, .. } if name == "a"));
         let e2 = reader.next_event().unwrap();
-        match e2 {
-            XmlEvent::Text(t) => assert_eq!(t, "  &hello  "),
-            other => panic!("expected Text, got {other:?}"),
-        }
+        let XmlEvent::Text(t) = e2 else {
+            panic!("e2 should be Text");
+        };
+        assert_eq!(t, "  &hello  ");
     }
 
     #[test]
     fn malformed_attribute_no_equals() {
-        // Attribute without '=' — triggers the break in parse_attributes
         let events = events_from("<a broken/>");
-        match &events[0] {
-            XmlEvent::StartElement { name, attrs, .. } => {
-                assert_eq!(name, "a");
-                assert!(attrs.is_empty());
-            }
-            other => panic!("expected StartElement, got {other:?}"),
-        }
+        let XmlEvent::StartElement { name, attrs } = &events[0] else {
+            panic!("events[0] should be StartElement");
+        };
+        assert_eq!(name, "a");
+        assert!(attrs.is_empty());
     }
 
     #[test]
     fn malformed_attribute_no_value() {
-        // Attribute with '=' but no value — triggers rest.is_empty() break
         let events = events_from("<a key=/>");
-        match &events[0] {
-            XmlEvent::StartElement { name, attrs, .. } => {
-                assert_eq!(name, "a");
-                assert!(attrs.is_empty());
-            }
-            other => panic!("expected StartElement, got {other:?}"),
-        }
+        let XmlEvent::StartElement { name, attrs } = &events[0] else {
+            panic!("events[0] should be StartElement");
+        };
+        assert_eq!(name, "a");
+        assert!(attrs.is_empty());
     }
 
     #[test]
     fn malformed_attribute_no_quote() {
-        // Attribute with '=' but unquoted value — triggers quote check break
         let events = events_from("<a key=noquote/>");
-        match &events[0] {
-            XmlEvent::StartElement { name, attrs, .. } => {
-                assert_eq!(name, "a");
-                assert!(attrs.is_empty());
-            }
-            other => panic!("expected StartElement, got {other:?}"),
-        }
+        let XmlEvent::StartElement { name, attrs } = &events[0] else {
+            panic!("events[0] should be StartElement");
+        };
+        assert_eq!(name, "a");
+        assert!(attrs.is_empty());
     }
 
     #[test]
     fn malformed_attribute_unclosed_quote() {
-        // Attribute with opening quote but no closing quote
         let events = events_from(r#"<a key="unclosed/>"#);
-        match &events[0] {
-            XmlEvent::StartElement { name, attrs, .. } => {
-                assert_eq!(name, "a");
-                assert!(attrs.is_empty());
-            }
-            other => panic!("expected StartElement, got {other:?}"),
-        }
+        let XmlEvent::StartElement { name, attrs } = &events[0] else {
+            panic!("events[0] should be StartElement");
+        };
+        assert_eq!(name, "a");
+        assert!(attrs.is_empty());
     }
 
     #[test]

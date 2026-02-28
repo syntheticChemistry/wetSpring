@@ -12,6 +12,7 @@ use serde_json::{Value, json};
 
 use crate::bio::diversity;
 use crate::bio::qs_biofilm::{self, N_PARAMS, QsBiofilmParams};
+use crate::ipc::protocol::RpcError;
 
 #[cfg(feature = "gpu")]
 use std::sync::OnceLock;
@@ -48,7 +49,7 @@ fn try_gpu() -> Option<&'static GpuF64> {
 /// - `-32601`: Method not found
 /// - `-32602`: Invalid params
 /// - `-32000` to `-32099`: Server errors (NCBI, GPU, etc.)
-pub fn dispatch(method: &str, params: &Value) -> Result<Value, (i64, String)> {
+pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
     match method {
         "health.check" => handle_health(),
         "science.diversity" => handle_diversity(params),
@@ -56,11 +57,11 @@ pub fn dispatch(method: &str, params: &Value) -> Result<Value, (i64, String)> {
         "science.ncbi_fetch" => handle_ncbi_fetch(params),
         "science.anderson" => handle_anderson(params),
         "science.full_pipeline" => handle_full_pipeline(params),
-        _ => Err((-32601, format!("method not found: {method}"))),
+        _ => Err(RpcError::method_not_found(method)),
     }
 }
 
-fn handle_health() -> Result<Value, (i64, String)> {
+fn handle_health() -> Result<Value, RpcError> {
     #![allow(clippy::unnecessary_wraps)]
 
     #[cfg(feature = "gpu")]
@@ -93,10 +94,10 @@ fn handle_health() -> Result<Value, (i64, String)> {
     }))
 }
 
-fn handle_diversity(params: &Value) -> Result<Value, (i64, String)> {
+fn handle_diversity(params: &Value) -> Result<Value, RpcError> {
     let counts = extract_f64_array(params, "counts")?;
     if counts.is_empty() {
-        return Err((-32602, "counts array is empty".into()));
+        return Err(RpcError::invalid_params("counts array is empty"));
     }
 
     let metrics = extract_string_array(params, "metrics");
@@ -107,55 +108,22 @@ fn handle_diversity(params: &Value) -> Result<Value, (i64, String)> {
     #[cfg(feature = "gpu")]
     let use_gpu = try_gpu().filter(|g| counts.len() >= g.dispatch_threshold());
 
-    if compute_all || metrics.iter().any(|m| m == "shannon") {
-        #[cfg(feature = "gpu")]
-        let val = use_gpu
-            .and_then(|g| diversity_gpu::shannon_gpu(g, &counts).ok())
-            .unwrap_or_else(|| diversity::shannon(&counts));
-        #[cfg(not(feature = "gpu"))]
-        let val = diversity::shannon(&counts);
-        result.insert("shannon".into(), json!(val));
+    #[cfg(feature = "gpu")]
+    {
+        insert_shannon_if_requested(&mut result, compute_all, &metrics, &counts, use_gpu);
+        insert_simpson_if_requested(&mut result, compute_all, &metrics, &counts, use_gpu);
+        insert_observed_if_requested(&mut result, compute_all, &metrics, &counts, use_gpu);
+        insert_pielou_if_requested(&mut result, compute_all, &metrics, &counts, use_gpu);
     }
-    if compute_all || metrics.iter().any(|m| m == "simpson") {
-        #[cfg(feature = "gpu")]
-        let val = use_gpu
-            .and_then(|g| diversity_gpu::simpson_gpu(g, &counts).ok())
-            .unwrap_or_else(|| diversity::simpson(&counts));
-        #[cfg(not(feature = "gpu"))]
-        let val = diversity::simpson(&counts);
-        result.insert("simpson".into(), json!(val));
+    #[cfg(not(feature = "gpu"))]
+    {
+        insert_shannon_if_requested(&mut result, compute_all, &metrics, &counts);
+        insert_simpson_if_requested(&mut result, compute_all, &metrics, &counts);
+        insert_observed_if_requested(&mut result, compute_all, &metrics, &counts);
+        insert_pielou_if_requested(&mut result, compute_all, &metrics, &counts);
     }
-    if compute_all || metrics.iter().any(|m| m == "chao1") {
-        result.insert("chao1".into(), json!(diversity::chao1(&counts)));
-    }
-    if compute_all || metrics.iter().any(|m| m == "observed") {
-        #[cfg(feature = "gpu")]
-        let val = use_gpu
-            .and_then(|g| diversity_gpu::observed_features_gpu(g, &counts).ok())
-            .unwrap_or_else(|| diversity::observed_features(&counts));
-        #[cfg(not(feature = "gpu"))]
-        let val = diversity::observed_features(&counts);
-        result.insert("observed".into(), json!(val));
-    }
-    if compute_all || metrics.iter().any(|m| m == "pielou") {
-        #[cfg(feature = "gpu")]
-        let val = use_gpu
-            .and_then(|g| diversity_gpu::pielou_evenness_gpu(g, &counts).ok())
-            .unwrap_or_else(|| diversity::pielou_evenness(&counts));
-        #[cfg(not(feature = "gpu"))]
-        let val = diversity::pielou_evenness(&counts);
-        result.insert("pielou".into(), json!(val));
-    }
-
-    if let Some(b_counts) = params.get("counts_b").and_then(Value::as_array) {
-        let b: Vec<f64> = b_counts.iter().filter_map(Value::as_f64).collect();
-        if b.len() == counts.len() {
-            result.insert(
-                "bray_curtis".into(),
-                json!(diversity::bray_curtis(&counts, &b)),
-            );
-        }
-    }
+    insert_chao1_if_requested(&mut result, compute_all, &metrics, &counts);
+    insert_bray_curtis_if_present(&mut result, params, &counts);
 
     #[cfg(feature = "gpu")]
     {
@@ -166,7 +134,156 @@ fn handle_diversity(params: &Value) -> Result<Value, (i64, String)> {
     Ok(Value::Object(result))
 }
 
-fn handle_qs_model(params: &Value) -> Result<Value, (i64, String)> {
+#[cfg(feature = "gpu")]
+fn insert_shannon_if_requested(
+    result: &mut serde_json::Map<String, Value>,
+    compute_all: bool,
+    metrics: &[String],
+    counts: &[f64],
+    use_gpu: Option<&'static GpuF64>,
+) {
+    if !compute_all && !metrics.iter().any(|m| m == "shannon") {
+        return;
+    }
+    let val = use_gpu
+        .and_then(|g| diversity_gpu::shannon_gpu(g, counts).ok())
+        .unwrap_or_else(|| diversity::shannon(counts));
+    result.insert("shannon".into(), json!(val));
+}
+
+#[cfg(not(feature = "gpu"))]
+fn insert_shannon_if_requested(
+    result: &mut serde_json::Map<String, Value>,
+    compute_all: bool,
+    metrics: &[String],
+    counts: &[f64],
+) {
+    if !compute_all && !metrics.iter().any(|m| m == "shannon") {
+        return;
+    }
+    result.insert("shannon".into(), json!(diversity::shannon(counts)));
+}
+
+#[cfg(feature = "gpu")]
+fn insert_simpson_if_requested(
+    result: &mut serde_json::Map<String, Value>,
+    compute_all: bool,
+    metrics: &[String],
+    counts: &[f64],
+    use_gpu: Option<&'static GpuF64>,
+) {
+    if !compute_all && !metrics.iter().any(|m| m == "simpson") {
+        return;
+    }
+    let val = use_gpu
+        .and_then(|g| diversity_gpu::simpson_gpu(g, counts).ok())
+        .unwrap_or_else(|| diversity::simpson(counts));
+    result.insert("simpson".into(), json!(val));
+}
+
+#[cfg(not(feature = "gpu"))]
+fn insert_simpson_if_requested(
+    result: &mut serde_json::Map<String, Value>,
+    compute_all: bool,
+    metrics: &[String],
+    counts: &[f64],
+) {
+    if !compute_all && !metrics.iter().any(|m| m == "simpson") {
+        return;
+    }
+    result.insert("simpson".into(), json!(diversity::simpson(counts)));
+}
+
+fn insert_chao1_if_requested(
+    result: &mut serde_json::Map<String, Value>,
+    compute_all: bool,
+    metrics: &[String],
+    counts: &[f64],
+) {
+    if !compute_all && !metrics.iter().any(|m| m == "chao1") {
+        return;
+    }
+    result.insert("chao1".into(), json!(diversity::chao1(counts)));
+}
+
+#[cfg(feature = "gpu")]
+fn insert_observed_if_requested(
+    result: &mut serde_json::Map<String, Value>,
+    compute_all: bool,
+    metrics: &[String],
+    counts: &[f64],
+    use_gpu: Option<&'static GpuF64>,
+) {
+    if !compute_all && !metrics.iter().any(|m| m == "observed") {
+        return;
+    }
+    let val = use_gpu
+        .and_then(|g| diversity_gpu::observed_features_gpu(g, counts).ok())
+        .unwrap_or_else(|| diversity::observed_features(counts));
+    result.insert("observed".into(), json!(val));
+}
+
+#[cfg(not(feature = "gpu"))]
+fn insert_observed_if_requested(
+    result: &mut serde_json::Map<String, Value>,
+    compute_all: bool,
+    metrics: &[String],
+    counts: &[f64],
+) {
+    if !compute_all && !metrics.iter().any(|m| m == "observed") {
+        return;
+    }
+    result.insert("observed".into(), json!(diversity::observed_features(counts)));
+}
+
+#[cfg(feature = "gpu")]
+fn insert_pielou_if_requested(
+    result: &mut serde_json::Map<String, Value>,
+    compute_all: bool,
+    metrics: &[String],
+    counts: &[f64],
+    use_gpu: Option<&'static GpuF64>,
+) {
+    if !compute_all && !metrics.iter().any(|m| m == "pielou") {
+        return;
+    }
+    let val = use_gpu
+        .and_then(|g| diversity_gpu::pielou_evenness_gpu(g, counts).ok())
+        .unwrap_or_else(|| diversity::pielou_evenness(counts));
+    result.insert("pielou".into(), json!(val));
+}
+
+#[cfg(not(feature = "gpu"))]
+fn insert_pielou_if_requested(
+    result: &mut serde_json::Map<String, Value>,
+    compute_all: bool,
+    metrics: &[String],
+    counts: &[f64],
+) {
+    if !compute_all && !metrics.iter().any(|m| m == "pielou") {
+        return;
+    }
+    result.insert("pielou".into(), json!(diversity::pielou_evenness(counts)));
+}
+
+fn insert_bray_curtis_if_present(
+    result: &mut serde_json::Map<String, Value>,
+    params: &Value,
+    counts: &[f64],
+) {
+    if let Some(b_counts) = params.get("counts_b").and_then(Value::as_array) {
+        let b: Vec<f64> = b_counts.iter().filter_map(Value::as_f64).collect();
+        if b.len() == counts.len() {
+            result.insert(
+                "bray_curtis".into(),
+                json!(diversity::bray_curtis(counts, &b)),
+            );
+        }
+    }
+}
+
+
+fn handle_qs_model(params: &Value) -> Result<Value, RpcError> {
     let scenario = params
         .get("scenario")
         .and_then(Value::as_str)
@@ -176,13 +293,10 @@ fn handle_qs_model(params: &Value) -> Result<Value, (i64, String)> {
     let qs_params = if let Some(flat) = params.get("params").and_then(Value::as_array) {
         let flat_vec: Vec<f64> = flat.iter().filter_map(Value::as_f64).collect();
         if flat_vec.len() < N_PARAMS {
-            return Err((
-                -32602,
-                format!(
-                    "params array needs {N_PARAMS} values, got {}",
-                    flat_vec.len()
-                ),
-            ));
+            return Err(RpcError::invalid_params(format!(
+                "params array needs {N_PARAMS} values, got {}",
+                flat_vec.len()
+            )));
         }
         QsBiofilmParams::from_flat(&flat_vec)
     } else {
@@ -194,7 +308,7 @@ fn handle_qs_model(params: &Value) -> Result<Value, (i64, String)> {
         "high_density" => qs_biofilm::scenario_high_density(&qs_params, dt),
         "hapr_mutant" => qs_biofilm::scenario_hapr_mutant(&qs_params, dt),
         "dgc_overexpression" => qs_biofilm::scenario_dgc_overexpression(&qs_params, dt),
-        _ => return Err((-32602, format!("unknown scenario: {scenario}"))),
+        _ => return Err(RpcError::invalid_params(format!("unknown scenario: {scenario}"))),
     };
 
     let peak_biofilm = result
@@ -210,7 +324,7 @@ fn handle_qs_model(params: &Value) -> Result<Value, (i64, String)> {
     }))
 }
 
-fn handle_ncbi_fetch(params: &Value) -> Result<Value, (i64, String)> {
+fn handle_ncbi_fetch(params: &Value) -> Result<Value, RpcError> {
     let db = params
         .get("db")
         .and_then(Value::as_str)
@@ -218,7 +332,7 @@ fn handle_ncbi_fetch(params: &Value) -> Result<Value, (i64, String)> {
     let id = params
         .get("id")
         .and_then(Value::as_str)
-        .ok_or_else(|| (-32602, "missing required param: id".to_string()))?;
+        .ok_or_else(|| RpcError::invalid_params("missing required param: id"))?;
 
     let api_key = params
         .get("api_key")
@@ -241,18 +355,15 @@ fn handle_ncbi_fetch(params: &Value) -> Result<Value, (i64, String)> {
             };
             json!({"fasta": fasta, "source": source})
         })
-        .map_err(|e| (-32000, format!("NCBI fetch failed: {e}")))
+        .map_err(|e| RpcError::server_error(-32000, format!("NCBI fetch failed: {e}")))
 }
 
 #[allow(clippy::unnecessary_wraps)]
-fn handle_anderson(params: &Value) -> Result<Value, (i64, String)> {
+fn handle_anderson(params: &Value) -> Result<Value, RpcError> {
     #[cfg(not(feature = "gpu"))]
     {
         let _ = params;
-        Err((
-            -32001,
-            "science.anderson requires GPU feature (--features gpu)".into(),
-        ))
+        Err(RpcError::server_error(-32001, "science.anderson requires GPU feature (--features gpu)"))
     }
 
     #[cfg(feature = "gpu")]
@@ -261,10 +372,8 @@ fn handle_anderson(params: &Value) -> Result<Value, (i64, String)> {
             GOE_R, POISSON_R, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
         };
 
-        let l = params
-            .get("lattice_size")
-            .and_then(Value::as_u64)
-            .unwrap_or(8) as usize;
+        let l_raw = params.get("lattice_size").and_then(Value::as_u64).unwrap_or(8);
+        let l = usize::try_from(l_raw).unwrap_or(8);
         let w = params
             .get("disorder")
             .and_then(Value::as_f64)
@@ -297,7 +406,7 @@ fn handle_anderson(params: &Value) -> Result<Value, (i64, String)> {
     }
 }
 
-fn handle_full_pipeline(params: &Value) -> Result<Value, (i64, String)> {
+fn handle_full_pipeline(params: &Value) -> Result<Value, RpcError> {
     let mut pipeline_result = serde_json::Map::new();
 
     // Stage 1: Diversity (if counts provided)
@@ -333,11 +442,11 @@ fn handle_full_pipeline(params: &Value) -> Result<Value, (i64, String)> {
 }
 
 /// Extract an `f64` array from a JSON params object by key.
-fn extract_f64_array(params: &Value, key: &str) -> Result<Vec<f64>, (i64, String)> {
+fn extract_f64_array(params: &Value, key: &str) -> Result<Vec<f64>, RpcError> {
     let arr = params
         .get(key)
         .and_then(Value::as_array)
-        .ok_or_else(|| (-32602, format!("missing or invalid param: {key}")))?;
+        .ok_or_else(|| RpcError::invalid_params(format!("missing or invalid param: {key}")))?;
 
     Ok(arr.iter().filter_map(Value::as_f64).collect())
 }
@@ -372,7 +481,7 @@ mod tests {
     #[test]
     fn dispatch_unknown_method() {
         let err = dispatch("nonexistent.method", &json!({})).unwrap_err();
-        assert_eq!(err.0, -32601);
+        assert_eq!(err.code, -32601);
     }
 
     #[test]
@@ -398,13 +507,13 @@ mod tests {
     fn diversity_empty_counts() {
         let params = json!({"counts": []});
         let err = dispatch("science.diversity", &params).unwrap_err();
-        assert_eq!(err.0, -32602);
+        assert_eq!(err.code, -32602);
     }
 
     #[test]
     fn diversity_missing_counts() {
         let err = dispatch("science.diversity", &json!({})).unwrap_err();
-        assert_eq!(err.0, -32602);
+        assert_eq!(err.code, -32602);
     }
 
     #[test]
@@ -438,7 +547,7 @@ mod tests {
     fn qs_model_unknown_scenario() {
         let params = json!({"scenario": "imaginary"});
         let err = dispatch("science.qs_model", &params).unwrap_err();
-        assert_eq!(err.0, -32602);
+        assert_eq!(err.code, -32602);
     }
 
     #[test]
@@ -474,7 +583,7 @@ mod tests {
     #[test]
     fn extract_f64_array_missing() {
         let err = extract_f64_array(&json!({}), "data").unwrap_err();
-        assert_eq!(err.0, -32602);
+        assert_eq!(err.code, -32602);
     }
 
     #[test]

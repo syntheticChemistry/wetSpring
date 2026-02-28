@@ -270,14 +270,14 @@ fn validate_ms2_spectral_math(v: &mut Validator) {
         let mut f = std::fs::File::create(&path).unwrap();
         writeln!(f, "H\tCreatedBy\twetSpring Exp212").unwrap();
         for scan in 1..=5_u32 {
-            let precursor = 400.0 + f64::from(scan) * 50.0;
+            let precursor = f64::from(scan).mul_add(50.0, 400.0);
             writeln!(f, "S\t{scan}\t{scan}\t{precursor:.3}").unwrap();
             writeln!(f, "I\tRTime\t{:.1}", f64::from(scan) * 0.5).unwrap();
             writeln!(f, "I\tBPI\t10000.0").unwrap();
             writeln!(f, "I\tTIC\t50000.0").unwrap();
             writeln!(f, "Z\t2\t{:.3}", precursor * 2.0 - 1.008).unwrap();
             for frag in 0..scan {
-                let mz = 100.0 + f64::from(frag) * 100.0;
+                let mz = f64::from(frag).mul_add(100.0, 100.0);
                 let intensity = 1000.0 * f64::from(scan - frag);
                 writeln!(f, "{mz:.1}\t{intensity:.1}").unwrap();
             }

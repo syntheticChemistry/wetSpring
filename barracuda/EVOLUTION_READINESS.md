@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** February 27, 2026 (V65 Progression Benchmark)
+**Date:** February 27, 2026 (V67 Experiment Buildout + Evolution)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules + 1 IPC module (all lean, 0 local WGSL, 0 local derivative/regression math), 79 ToadStool primitives consumed (barracuda always-on, zero fallback code), 1,103 tests (977 barracuda lib + 60 integration + 19 doc + 47 forge), 95.46% line / 93.54% fn / 94.99% branch coverage, 211 experiments, 5,061+ checks (1,783 GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S68+ aligned (`e96576ee`), 92 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V64:** Modern cross-spring rewiring — `GpuF64::fp64_strategy()` + `optimal_precision()` wired, 6 GPU modules migrated to `submit_and_poll` (resilient dispatch), Exp210 cross-spring evolution benchmark (24/24), full validation sweep green. 3 absorption candidates ready (ESN, NPU bridge, validator).
+**Status:** 47 CPU + 42 GPU modules + 1 IPC module (all lean, 0 local WGSL, 0 local derivative/regression math), 79 ToadStool primitives consumed (barracuda always-on, zero fallback code), 1,081+ tests (946 barracuda lib + 60 integration + 20 doc + 55 forge), 221 experiments, 5,421+ checks (1,833+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S68+ aligned (`e96576ee`), 92 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V67:** Exp216 47-domain CPU proof, Exp217 benchmark, Exp218 GPU v5 portability, Exp219 streaming v3, Exp220 cross-substrate v67, 11 extension papers (Exp144-156) promoted to three-tier, BandwidthTier + ComputeDispatch wired in metalForge, 50/50 three-tier. 10 new Python baselines (Exp170-178 soil papers + spectral match).
 
 ### Full Lean Phase
 

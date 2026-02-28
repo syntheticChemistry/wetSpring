@@ -54,6 +54,7 @@ pub struct PeakParams {
     pub distance: usize,
 }
 
+/// Manual impl intentional: `distance: 1` is non-zero (scipy.signal default).
 impl Default for PeakParams {
     fn default() -> Self {
         Self {

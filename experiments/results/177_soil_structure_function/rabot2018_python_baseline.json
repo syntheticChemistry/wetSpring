@@ -1,0 +1,99 @@
+{
+  "structure_properties": {
+    "aggregate_stability": {
+      "good": 3.0,
+      "poor": 20.0
+    },
+    "porosity": {
+      "good": 5.0,
+      "poor": 15.0
+    },
+    "pore_connectivity": {
+      "good": 4.0,
+      "poor": 18.0
+    },
+    "pore_size_distribution": {
+      "good": 5.0,
+      "poor": 16.0
+    }
+  },
+  "soil_types": [
+    {
+      "name": "Well-structured clay loam",
+      "effective_w": 4.0,
+      "base_richness": 250,
+      "effective_richness": 216,
+      "evenness": 0.7200000000000001,
+      "mean_shannon": 5.3739484307340595,
+      "qs_probability": 0.9999845457031177
+    },
+    {
+      "name": "Moderate sandy loam",
+      "effective_w": 10.0,
+      "base_richness": 200,
+      "effective_richness": 133,
+      "evenness": 0.6000000000000001,
+      "mean_shannon": 4.886862239309423,
+      "qs_probability": 0.9848698599897642
+    },
+    {
+      "name": "Degraded silt",
+      "effective_w": 18.0,
+      "base_richness": 100,
+      "effective_richness": 40,
+      "evenness": 0.44000000000000006,
+      "mean_shannon": 3.6795844936270883,
+      "qs_probability": 0.3085375387259869
+    },
+    {
+      "name": "Compacted clay",
+      "effective_w": 22.0,
+      "base_richness": 60,
+      "effective_richness": 16,
+      "evenness": 0.36000000000000004,
+      "mean_shannon": 2.760116784749478,
+      "qs_probability": 0.03337650758481726
+    }
+  ],
+  "management": [
+    {
+      "practice": "Native forest",
+      "agg_stability_pct": 92,
+      "porosity_pct": 65,
+      "effective_w": 1.9999999999999991,
+      "qs_probability": 0.9999993286715442
+    },
+    {
+      "practice": "No-till + cover crop",
+      "agg_stability_pct": 78,
+      "porosity_pct": 55,
+      "effective_w": 5.499999999999999,
+      "qs_probability": 0.9998771336100348
+    },
+    {
+      "practice": "Reduced tillage",
+      "agg_stability_pct": 55,
+      "porosity_pct": 48,
+      "effective_w": 11.249999999999998,
+      "qs_probability": 0.959940843136183
+    },
+    {
+      "practice": "Conventional tillage",
+      "agg_stability_pct": 35,
+      "porosity_pct": 42,
+      "effective_w": 16.25,
+      "qs_probability": 0.5332067518526223
+    },
+    {
+      "practice": "Intensive + bare fallow",
+      "agg_stability_pct": 18,
+      "porosity_pct": 35,
+      "effective_w": 20.5,
+      "qs_probability": 0.09121121972586788
+    }
+  ],
+  "math_verification": {
+    "norm_cdf_0": 0.5,
+    "shannon_uniform_5": 1.6094379124341003
+  }
+}

@@ -226,18 +226,20 @@ mod tests {
 
     #[test]
     fn select_substrate_finds_capable() {
-        use crate::substrate::{Identity, Properties};
+        use crate::substrate::{Identity, Properties, SubstrateOrigin};
         let gpu = Substrate {
             kind: SubstrateKind::Gpu,
             identity: Identity::named("GPU"),
             properties: Properties::default(),
             capabilities: vec![Capability::F64Compute, Capability::ShaderDispatch],
+            origin: SubstrateOrigin::Local,
         };
         let cpu = Substrate {
             kind: SubstrateKind::Cpu,
             identity: Identity::named("CPU"),
             properties: Properties::default(),
             capabilities: vec![Capability::CpuCompute],
+            origin: SubstrateOrigin::Local,
         };
         let stage = PipelineStage {
             name: "GEMM".into(),
@@ -253,12 +255,13 @@ mod tests {
 
     #[test]
     fn select_substrate_returns_none_when_incapable() {
-        use crate::substrate::{Identity, Properties};
+        use crate::substrate::{Identity, Properties, SubstrateOrigin};
         let cpu = Substrate {
             kind: SubstrateKind::Cpu,
             identity: Identity::named("CPU"),
             properties: Properties::default(),
             capabilities: vec![Capability::CpuCompute],
+            origin: SubstrateOrigin::Local,
         };
         let stage = PipelineStage {
             name: "NMF".into(),

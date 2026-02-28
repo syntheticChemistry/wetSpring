@@ -32,6 +32,15 @@ const CONNECT_TIMEOUT: Duration = Duration::from_secs(5);
 const READ_TIMEOUT: Duration = Duration::from_secs(30);
 const FAMILY_ID: &str = "default";
 
+/// Default `NestGate` socket path under `XDG_RUNTIME_DIR` (`biomeos/nestgate-default.sock`).
+const DEFAULT_NESTGATE_PATH_XDG: &str = "biomeos/nestgate-default.sock";
+/// Fallback `NestGate` socket filename when `XDG_RUNTIME_DIR` is unset (`nestgate-default.sock`).
+const DEFAULT_NESTGATE_PATH_FALLBACK: &str = "nestgate-default.sock";
+/// Default `biomeOS` socket path under `XDG_RUNTIME_DIR` (`biomeos/biomeos-default.sock`).
+const DEFAULT_BIOMEOS_PATH_XDG: &str = "biomeos/biomeos-default.sock";
+/// Fallback `biomeOS` socket filename when `XDG_RUNTIME_DIR` is unset (`biomeos-default.sock`).
+const DEFAULT_BIOMEOS_PATH_FALLBACK: &str = "biomeos-default.sock";
+
 /// Whether `NestGate` routing is enabled via environment.
 #[must_use]
 pub fn is_enabled() -> bool {
@@ -62,13 +71,13 @@ fn resolve_socket(explicit: Option<&str>, xdg_runtime: Option<&str>) -> Option<P
     }
 
     if let Some(xdg) = xdg_runtime {
-        let p = PathBuf::from(xdg).join("biomeos/nestgate-default.sock");
+        let p = PathBuf::from(xdg).join(DEFAULT_NESTGATE_PATH_XDG);
         if p.exists() {
             return Some(p);
         }
     }
 
-    let fallback = std::env::temp_dir().join("nestgate-default.sock");
+    let fallback = std::env::temp_dir().join(DEFAULT_NESTGATE_PATH_FALLBACK);
     if fallback.exists() {
         return Some(fallback);
     }
@@ -168,13 +177,13 @@ fn resolve_biomeos_socket(explicit: Option<&str>, xdg_runtime: Option<&str>) -> 
     }
 
     if let Some(xdg) = xdg_runtime {
-        let p = PathBuf::from(xdg).join("biomeos/biomeos-default.sock");
+        let p = PathBuf::from(xdg).join(DEFAULT_BIOMEOS_PATH_XDG);
         if p.exists() {
             return Some(p);
         }
     }
 
-    let fallback = std::env::temp_dir().join("biomeos-default.sock");
+    let fallback = std::env::temp_dir().join(DEFAULT_BIOMEOS_PATH_FALLBACK);
     if fallback.exists() {
         return Some(fallback);
     }

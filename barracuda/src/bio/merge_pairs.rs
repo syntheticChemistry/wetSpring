@@ -47,6 +47,7 @@ pub struct MergeParams {
     pub min_merged_quality: u8,
 }
 
+/// Manual impl intentional: non-zero defaults (VSEARCH/Edgar-Flyvbjerg style).
 impl Default for MergeParams {
     fn default() -> Self {
         Self {

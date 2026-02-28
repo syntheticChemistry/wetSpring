@@ -4,6 +4,10 @@
 //! **Lean phase complete**: Uses `ToadStool`'s `BatchedOdeRK4<MultiSignalOde>::generate_shader()`
 //! via the `OdeSystem` trait (see `bio::ode_systems::MultiSignalOde`).
 //! Local WGSL file deleted — shader now generated from trait impl at runtime.
+//!
+//! **Precision (S68+)**: Compiled via `compile_shader_universal` at `Precision::F64`
+//! (f64 canonical). `Precision::Df64` available for ~10× throughput on consumer
+//! FP32 cores (requires host buffer protocol adaptation: `vec2<f32>` storage).
 
 use barracuda::device::{WgpuDevice, storage_bgl_entry, uniform_bgl_entry};
 use barracuda::numerical::ode_generic::BatchedOdeRK4;

@@ -110,6 +110,19 @@ fn all_tolerances_are_non_negative() {
         CROSS_SPRING_NUMERICAL,
         SOIL_MODEL_APPROX,
         ODE_BISTABLE_HIGH_B,
+        SPECTRAL_POISSON_PARITY,
+        SPECTRAL_LYAPUNOV_PARITY,
+        SPECTRAL_R_MARGIN,
+        SPECTRAL_GERSHGORIN_MARGIN,
+        SPECTRAL_ALMOST_MATHIEU_MARGIN,
+        SPECTRAL_EXTENDED_LYAPUNOV,
+        SPECTRAL_HERMAN_PARITY,
+        TRAPZ_COARSE,
+        DYNAMIC_WT_EXACT,
+        DYNAMIC_WT_ASYMPTOTIC,
+        DYNAMIC_WT_PERIODICITY,
+        SOIL_DISTANCE_MIN_DIFF,
+        SOIL_COOP_FREQ_AFFECTED,
     ];
     for tol in all {
         assert!(tol >= 0.0, "tolerance {tol} must be non-negative");

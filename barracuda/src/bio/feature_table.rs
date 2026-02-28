@@ -22,6 +22,17 @@ use crate::io::mzml::MzmlSpectrum;
 use super::eic;
 use super::signal::{self, PeakParams};
 
+/// Default EIC extraction tolerance (ppm). Matches asari-style LC-MS metabolomics.
+const DEFAULT_EIC_PPM: f64 = 5.0;
+/// Default minimum scans for mass track detection. Tracks must span ≥ this many scans.
+const DEFAULT_MIN_SCANS: usize = 3;
+/// Default minimum peak prominence for feature acceptance (intensity units).
+const DEFAULT_MIN_PROMINENCE: f64 = 100.0;
+/// Default minimum peak height for feature acceptance (intensity units).
+const DEFAULT_MIN_HEIGHT: f64 = 1000.0;
+/// Default minimum signal-to-noise ratio for feature acceptance.
+const DEFAULT_MIN_SNR: f64 = 3.0;
+
 /// A single detected feature (m/z × RT × intensity).
 #[derive(Debug, Clone)]
 pub struct Feature {
@@ -58,17 +69,18 @@ pub struct FeatureParams {
     pub min_snr: f64,
 }
 
+/// Manual impl intentional: all fields use non-zero defaults (asari-style).
 impl Default for FeatureParams {
     fn default() -> Self {
         Self {
-            eic_ppm: 5.0,
-            min_scans: 3,
+            eic_ppm: DEFAULT_EIC_PPM,
+            min_scans: DEFAULT_MIN_SCANS,
             peak_params: PeakParams {
-                min_prominence: Some(100.0),
+                min_prominence: Some(DEFAULT_MIN_PROMINENCE),
                 ..PeakParams::default()
             },
-            min_height: 1000.0,
-            min_snr: 3.0,
+            min_height: DEFAULT_MIN_HEIGHT,
+            min_snr: DEFAULT_MIN_SNR,
         }
     }
 }

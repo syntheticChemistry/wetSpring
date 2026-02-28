@@ -29,7 +29,24 @@ path = "src/bin/validate_dispatch_routing.rs"
 name = "validate_dispatch_evolution_v66"
 path = "src/bin/validate_dispatch_evolution_v66.rs"
 
+# ── Exp220: Cross-Substrate Dispatch Evolution (V67) ──
+[[bin]]
+name = "validate_dispatch_evolution_v67"
+path = "src/bin/validate_dispatch_evolution_v67.rs"
+
+# ── Exp221: Tower Atomic Wiring + Real Data (V68) ──
+[[bin]]
+name = "validate_tower_wiring_v68"
+path = "src/bin/validate_tower_wiring_v68.rs"
+
+# ── Exp222: Full NUCLEUS Pipeline (V69) ──
+[[bin]]
+name = "validate_nucleus_pipeline_v69"
+path = "src/bin/validate_nucleus_pipeline_v69.rs"
+
 [dev-dependencies]
+temp-env = "0.3"
+tempfile = "3"
 
 [lints.clippy]
 pedantic = { level = "warn", priority = -1 }

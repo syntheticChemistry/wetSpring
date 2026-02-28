@@ -1,0 +1,130 @@
+{
+  "anderson_aggregate": {
+    "notill_w": 5.0,
+    "tilled_w": 15.0,
+    "notill_qs": 0.9999367907681316,
+    "tilled_qs": 0.6914624612740131,
+    "predicted_enrichment_pct": 44.61186930173437
+  },
+  "effect_sizes": [
+    {
+      "indicator": "MBC",
+      "effect_pct": 16.2,
+      "ci_lower": 10.9,
+      "ci_upper": 21.8,
+      "n_studies": 56,
+      "se": 2.7806122448979593,
+      "z_score": 5.826055045871559,
+      "p_value": 5.6752904598056375e-09,
+      "significant": true
+    },
+    {
+      "indicator": "MBN",
+      "effect_pct": 12.4,
+      "ci_lower": 5.2,
+      "ci_upper": 20.1,
+      "n_studies": 34,
+      "se": 3.801020408163266,
+      "z_score": 3.26228187919463,
+      "p_value": 0.0011051918806870287,
+      "significant": true
+    },
+    {
+      "indicator": "beta_glucosidase",
+      "effect_pct": 15.0,
+      "ci_lower": 8.0,
+      "ci_upper": 22.5,
+      "n_studies": 28,
+      "se": 3.6989795918367347,
+      "z_score": 4.055172413793104,
+      "p_value": 5.009733676297756e-05,
+      "significant": true
+    },
+    {
+      "indicator": "phosphatase",
+      "effect_pct": 18.0,
+      "ci_lower": 10.0,
+      "ci_upper": 27.0,
+      "n_studies": 24,
+      "se": 4.336734693877551,
+      "z_score": 4.1505882352941175,
+      "p_value": 3.316218939830584e-05,
+      "significant": true
+    }
+  ],
+  "depth_layers": [
+    {
+      "label": "0-5 cm",
+      "depth_cm": 2.5,
+      "notill_w": 4.0,
+      "tilled_w": 18.0,
+      "notill_qs": 0.9999845457031177,
+      "tilled_qs": 0.3085375387259869,
+      "enrichment_pct": 224.10466156962735
+    },
+    {
+      "label": "5-15 cm",
+      "depth_cm": 10.0,
+      "notill_w": 6.0,
+      "tilled_w": 14.0,
+      "notill_qs": 0.9997673709209645,
+      "tilled_qs": 0.7976716190363569,
+      "enrichment_pct": 25.335707960721155
+    },
+    {
+      "label": "15-30 cm",
+      "depth_cm": 22.5,
+      "notill_w": 10.0,
+      "tilled_w": 12.0,
+      "notill_qs": 0.9848698599897642,
+      "tilled_qs": 0.9331927987311419,
+      "enrichment_pct": 5.537661813173789
+    },
+    {
+      "label": ">30 cm",
+      "depth_cm": 40.0,
+      "notill_w": 11.0,
+      "tilled_w": 11.5,
+      "notill_qs": 0.9666234924151828,
+      "tilled_qs": 0.9522096477271853,
+      "enrichment_pct": 1.5137259659573576
+    }
+  ],
+  "temporal_recovery": [
+    {
+      "years": 1,
+      "fraction_recovered": 0.09516258196404048,
+      "w": 16.667723852503432,
+      "qs_prob": 0.4777075684443977
+    },
+    {
+      "years": 5,
+      "fraction_recovered": 0.3934693402873666,
+      "w": 12.491429235976868,
+      "qs_prob": 0.9092564522196818
+    },
+    {
+      "years": 10,
+      "fraction_recovered": 0.6321205588285577,
+      "w": 9.150312176400192,
+      "qs_prob": 0.9928551247502811
+    },
+    {
+      "years": 20,
+      "fraction_recovered": 0.8646647167633873,
+      "w": 5.8946939653125785,
+      "qs_prob": 0.9997961911181744
+    },
+    {
+      "years": 40,
+      "fraction_recovered": 0.9816843611112658,
+      "w": 4.256418944442279,
+      "qs_prob": 0.9999775975009946
+    }
+  ],
+  "math_verification": {
+    "erf_1": 0.8427007929497148,
+    "norm_cdf_0": 0.5,
+    "norm_cdf_1_96": 0.9750021048517795
+  }
+}

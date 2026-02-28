@@ -23,6 +23,7 @@
 //! multi-tree dispatch.
 
 use super::decision_tree::DecisionTree;
+use crate::error;
 
 /// A Random Forest classifier/regressor.
 #[derive(Debug, Clone)]
@@ -49,13 +50,15 @@ impl RandomForest {
     /// # Errors
     ///
     /// Returns `Err` if trees have inconsistent feature counts.
-    pub fn from_trees(trees: Vec<DecisionTree>, n_classes: usize) -> Result<Self, String> {
+    pub fn from_trees(trees: Vec<DecisionTree>, n_classes: usize) -> error::Result<Self> {
         if trees.is_empty() {
-            return Err("empty forest".into());
+            return Err(error::Error::InvalidInput("empty forest".into()));
         }
         let n_features = trees[0].n_features();
         if trees.iter().any(|t| t.n_features() != n_features) {
-            return Err("inconsistent n_features across trees".into());
+            return Err(error::Error::InvalidInput(
+                "inconsistent n_features across trees".into(),
+            ));
         }
         Ok(Self {
             trees,

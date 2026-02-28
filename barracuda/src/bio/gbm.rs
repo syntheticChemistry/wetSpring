@@ -23,6 +23,8 @@
 //! be dispatched in parallel. For multi-class, the K class chains can
 //! also run in parallel. `ToadStool` absorption as `GbmBatchInferenceGpu`.
 
+use crate::error;
+
 /// A regression tree for GBM (predicts f64 residuals, not class labels).
 #[derive(Debug, Clone)]
 pub struct GbmTree {
@@ -56,14 +58,14 @@ impl GbmTree {
         left_children: &[i32],
         right_children: &[i32],
         values: &[f64],
-    ) -> Result<Self, String> {
+    ) -> error::Result<Self> {
         let n = features.len();
         if thresholds.len() != n
             || left_children.len() != n
             || right_children.len() != n
             || values.len() != n
         {
-            return Err("inconsistent array lengths".into());
+            return Err(error::Error::InvalidInput("inconsistent array lengths".into()));
         }
         let nodes = (0..n)
             .map(|i| GbmNode {
@@ -136,9 +138,9 @@ impl GbmClassifier {
         learning_rate: f64,
         initial_prediction: f64,
         n_features: usize,
-    ) -> Result<Self, String> {
+    ) -> error::Result<Self> {
         if trees.is_empty() {
-            return Err("empty GBM".into());
+            return Err(error::Error::InvalidInput("empty GBM".into()));
         }
         Ok(Self {
             trees,
@@ -151,16 +153,7 @@ impl GbmClassifier {
     /// Predict with probability and raw score.
     #[must_use]
     pub fn predict_proba(&self, features: &[f64]) -> GbmPrediction {
-        let mut score = self.initial_prediction;
-        for tree in &self.trees {
-            score += self.learning_rate * tree.predict(features);
-        }
-        let prob = sigmoid(score);
-        GbmPrediction {
-            class: usize::from(prob >= 0.5),
-            probability: prob,
-            raw_score: score,
-        }
+        self.predict_single_proba(features)
     }
 
     /// Predict class only.
@@ -172,7 +165,22 @@ impl GbmClassifier {
     /// Batch prediction with probabilities.
     #[must_use]
     pub fn predict_batch_proba(&self, samples: &[Vec<f64>]) -> Vec<GbmPrediction> {
-        samples.iter().map(|s| self.predict_proba(s)).collect()
+        samples.iter().map(|s| self.predict_single_proba(s)).collect()
+    }
+
+    /// Single-sample prediction with probability.
+    #[must_use]
+    fn predict_single_proba(&self, features: &[f64]) -> GbmPrediction {
+        let mut score = self.initial_prediction;
+        for tree in &self.trees {
+            score += self.learning_rate * tree.predict(features);
+        }
+        let prob = sigmoid(score);
+        GbmPrediction {
+            class: usize::from(prob >= 0.5),
+            probability: prob,
+            raw_score: score,
+        }
     }
 
     /// Batch prediction (class only).
@@ -234,13 +242,15 @@ impl GbmMultiClassifier {
         learning_rate: f64,
         initial_predictions: Vec<f64>,
         n_features: usize,
-    ) -> Result<Self, String> {
+    ) -> error::Result<Self> {
         let n_classes = class_trees.len();
         if n_classes < 2 {
-            return Err("need at least 2 classes".into());
+            return Err(error::Error::InvalidInput("need at least 2 classes".into()));
         }
         if initial_predictions.len() != n_classes {
-            return Err("initial_predictions length must equal n_classes".into());
+            return Err(error::Error::InvalidInput(
+                "initial_predictions length must equal n_classes".into(),
+            ));
         }
         Ok(Self {
             class_trees,

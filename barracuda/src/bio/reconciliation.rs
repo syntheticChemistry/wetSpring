@@ -48,6 +48,7 @@ pub struct DtlCosts {
     pub loss: u32,
 }
 
+/// Manual impl intentional: all fields use non-zero costs (DTL event model).
 impl Default for DtlCosts {
     fn default() -> Self {
         Self {

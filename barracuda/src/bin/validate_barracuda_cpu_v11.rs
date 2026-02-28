@@ -277,7 +277,7 @@ fn validate_nestgate_three_tier(v: &mut Validator) {
     let err = dispatch::dispatch("science.ncbi_fetch", &json!({}));
     v.check_pass(
         "ncbi_fetch without id returns -32602",
-        matches!(err, Err((-32602, _))),
+        err.is_err_and(|e| e.code == -32602),
     );
 
     println!(
@@ -333,13 +333,13 @@ fn validate_nucleus_atomics(v: &mut Validator) {
     let anderson_err = dispatch::dispatch("science.anderson", &json!({}));
     v.check_pass(
         "Node: anderson reports gpu-required (CPU-only build)",
-        matches!(anderson_err, Err((-32001, _))),
+        anderson_err.is_err_and(|e| e.code == -32001),
     );
 
     let unknown = dispatch::dispatch("nonexistent.method", &json!({}));
     v.check_pass(
         "Tower: unknown method returns -32601",
-        matches!(unknown, Err((-32601, _))),
+        unknown.is_err_and(|e| e.code == -32601),
     );
 
     println!("  NUCLEUS atomics: {}µs", t.elapsed().as_micros());
@@ -354,25 +354,25 @@ fn validate_dispatch_errors(v: &mut Validator) {
     let empty_counts = dispatch::dispatch("science.diversity", &json!({"counts": []}));
     v.check_pass(
         "empty counts → -32602",
-        matches!(empty_counts, Err((-32602, _))),
+        empty_counts.is_err_and(|e| e.code == -32602),
     );
 
     let missing_counts = dispatch::dispatch("science.diversity", &json!({}));
     v.check_pass(
         "missing counts → -32602",
-        matches!(missing_counts, Err((-32602, _))),
+        missing_counts.is_err_and(|e| e.code == -32602),
     );
 
     let bad_scenario = dispatch::dispatch("science.qs_model", &json!({"scenario": "bogus"}));
     v.check_pass(
         "unknown QS scenario → -32602",
-        matches!(bad_scenario, Err((-32602, _))),
+        bad_scenario.is_err_and(|e| e.code == -32602),
     );
 
     let missing_id = dispatch::dispatch("science.ncbi_fetch", &json!({}));
     v.check_pass(
         "ncbi_fetch missing id → -32602",
-        matches!(missing_id, Err((-32602, _))),
+        missing_id.is_err_and(|e| e.code == -32602),
     );
 
     println!("  Error handling: {}µs", t.elapsed().as_micros());

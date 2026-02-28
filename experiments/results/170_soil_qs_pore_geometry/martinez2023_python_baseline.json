@@ -1,0 +1,119 @@
+{
+  "pore_mapping": [
+    {
+      "pore_um": 4.0,
+      "connectivity": 0.002844444444444445,
+      "effective_w": 24.92888888888889,
+      "qs_probability": 0.002479927041175018
+    },
+    {
+      "pore_um": 10.0,
+      "connectivity": 0.017777777777777778,
+      "effective_w": 24.555555555555557,
+      "qs_probability": 0.003624481471723678
+    },
+    {
+      "pore_um": 30.0,
+      "connectivity": 0.16000000000000003,
+      "effective_w": 21.0,
+      "qs_probability": 0.06680720126885807
+    },
+    {
+      "pore_um": 50.0,
+      "connectivity": 0.4444444444444444,
+      "effective_w": 13.88888888888889,
+      "qs_probability": 0.8079509832320966
+    },
+    {
+      "pore_um": 100.0,
+      "connectivity": 1.0,
+      "effective_w": 0.0,
+      "qs_probability": 0.9999999810104375
+    },
+    {
+      "pore_um": 150.0,
+      "connectivity": 1.0,
+      "effective_w": 0.0,
+      "qs_probability": 0.9999999810104375
+    }
+  ],
+  "chemotaxis": {
+    "w_effective_with_chemotaxis": 14.025,
+    "reduction_pct": 15.0,
+    "disorder_sweep": [
+      {
+        "w": 10.0,
+        "p_no_chemotaxis": 0.9848698599897642,
+        "p_with_chemotaxis": 0.9961696194324102,
+        "benefit": 0.011299759442646051
+      },
+      {
+        "w": 14.0,
+        "p_no_chemotaxis": 0.7976716190363569,
+        "p_with_chemotaxis": 0.9374031272090931,
+        "benefit": 0.13973150817273627
+      },
+      {
+        "w": 16.5,
+        "p_no_chemotaxis": 0.5,
+        "p_with_chemotaxis": 0.7953142046527473,
+        "benefit": 0.29531420465274727
+      },
+      {
+        "w": 20.0,
+        "p_no_chemotaxis": 0.12167250457438122,
+        "p_with_chemotaxis": 0.43381616738909634,
+        "benefit": 0.3121436628147151
+      },
+      {
+        "w": 25.0,
+        "p_no_chemotaxis": 0.0023032661316958825,
+        "p_with_chemotaxis": 0.05667275460976292,
+        "benefit": 0.05436948847806704
+      }
+    ]
+  },
+  "integrated": [
+    {
+      "name": "Sandy loam (large pores, 100\u00b5m)",
+      "pore_um": 100.0,
+      "connectivity": 1.0,
+      "effective_w": 0.0,
+      "qs_probability": 0.9999999810104375,
+      "qs_active": true,
+      "coop_survival": 0.8999999999999999
+    },
+    {
+      "name": "Clay (small pores, 5\u00b5m)",
+      "pore_um": 5.0,
+      "connectivity": 0.0044444444444444444,
+      "effective_w": 24.88888888888889,
+      "qs_probability": 0.0025845992884771236,
+      "qs_active": false,
+      "coop_survival": 0.0008888888888888889
+    },
+    {
+      "name": "No-till aggregate (mixed, 80\u00b5m)",
+      "pore_um": 80.0,
+      "connectivity": 1.0,
+      "effective_w": 0.0,
+      "qs_probability": 0.9999999810104375,
+      "qs_active": true,
+      "coop_survival": 0.8999999999999999
+    },
+    {
+      "name": "Tilled (destroyed aggregates, 15\u00b5m)",
+      "pore_um": 15.0,
+      "connectivity": 0.04000000000000001,
+      "effective_w": 24.0,
+      "qs_probability": 0.006209665325776132,
+      "qs_active": false,
+      "coop_survival": 0.008000000000000002
+    }
+  ],
+  "math_verification": {
+    "erf_1": 0.8427007929497148,
+    "norm_cdf_0": 0.5,
+    "norm_cdf_1_96": 0.9750021048517795
+  }
+}

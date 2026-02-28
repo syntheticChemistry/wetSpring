@@ -1,6 +1,6 @@
 # wetSpring wateringHole
 
-**Date:** February 27, 2026
+**Date:** February 28, 2026
 **Purpose:** Spring-local handoff documents to ToadStool/BarraCuda and cross-spring provenance records.
 
 ---
@@ -9,7 +9,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V65** | `handoffs/WETSPRING_TOADSTOOL_V65_PROGRESSION_BENCHMARK_HANDOFF_FEB27_2026.md` | Feb 27 | **current** — V65 progression benchmark (Python → CPU → GPU → streaming → metalForge), Exp210 cross-spring evolution (24/24), Exp211 progression benchmark (16/16), submit_and_poll migration, Fp64Strategy/optimal_precision wiring, 211 experiments 5,061+ checks ALL PASS |
+| **V73** | `handoffs/WETSPRING_TOADSTOOL_V73_DEBT_REDUCTION_FIVE_TIER_HANDOFF_FEB28_2026.md` | Feb 28 | **current** — V73 deep debt reduction (RpcError, function decomposition, safe casts, named constants) + V72 five-tier chain (Exp224-228: paper math 58/58, CPU v14 58/58, GPU v6 28/28, streaming v4 24/24, metalForge v8 33/33), 229 experiments 5,743+ checks ALL PASS |
 
 ## NestGate Handoffs
 
@@ -26,7 +26,7 @@
 ## Archive
 
 Superseded handoffs in `handoffs/archive/` (V7-V64, API report, rewire, cross-spring provenance — 54 files).
-V34-V39 archived (superseded by V40). V40-V43 archived (superseded by V47). V44-V45 archived (superseded by V48). V47-V50 archived (superseded by V52). V52 archived (superseded by V53+V54). V53-V55 archived (superseded by V56-V59). V56-V58 archived (superseded by V59+V60). V59-V64 archived (superseded by V65).
+V34-V39 archived (superseded by V40). V40-V43 archived (superseded by V47). V44-V45 archived (superseded by V48). V47-V50 archived (superseded by V52). V52 archived (superseded by V53+V54). V53-V55 archived (superseded by V56-V59). V56-V58 archived (superseded by V59+V60). V59-V66 archived (superseded by V73).
 Cross-spring docs moved to archive: `CROSS_SPRING_EVOLUTION_WETSPRING_FEB22_2026.md`, `CROSS_SPRING_PROVENANCE_FEB22_2026.md`.
 
 ## Convention

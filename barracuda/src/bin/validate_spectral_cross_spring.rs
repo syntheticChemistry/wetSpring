@@ -147,7 +147,7 @@ fn validate_almost_mathieu(v: &mut Validator) {
 
     v.check_pass(
         &format!("Aubry–André: λ=0.5 extended γ ≈ 0 (got {gamma_ext:.4})"),
-        gamma_ext.abs() < 0.05,
+        gamma_ext.abs() < tolerances::SPECTRAL_EXTENDED_LYAPUNOV,
     );
     v.check_pass(
         &format!("Aubry–André: λ=2.0 localized γ > 0 (got {gamma_loc:.4})"),
@@ -160,7 +160,8 @@ fn validate_almost_mathieu(v: &mut Validator) {
     let eig_loc = find_all_eigenvalues(&diag_loc, &off_loc);
     v.check_pass(
         &format!("Almost-Mathieu spectrum bound: E_max <= {bound}"),
-        eig_loc.last().copied().unwrap_or(0.0) <= bound + 0.01,
+        eig_loc.last().copied().unwrap_or(0.0)
+            <= bound + tolerances::SPECTRAL_ALMOST_MATHIEU_MARGIN,
     );
 }
 
@@ -224,7 +225,7 @@ fn validate_anderson_2d(v: &mut Validator) {
     println!("  [INFO] 2D (L={l}, W=1): ⟨r⟩ = {r_weak:.4}");
     v.check_pass(
         &format!("2D weak disorder ⟨r⟩ > Poisson (got {r_weak:.4})"),
-        r_weak > POISSON_R - 0.02,
+        r_weak > POISSON_R - tolerances::SPECTRAL_R_MARGIN,
     );
 
     // Strong disorder: should approach Poisson
@@ -246,7 +247,7 @@ fn validate_anderson_2d(v: &mut Validator) {
     sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
     v.check_pass(
         &format!("2D spectrum bound: E_max <= {bound}"),
-        sorted.last().copied().unwrap_or(0.0) <= bound + 0.5,
+        sorted.last().copied().unwrap_or(0.0) <= bound + tolerances::SPECTRAL_GERSHGORIN_MARGIN,
     );
 }
 
@@ -264,7 +265,7 @@ fn validate_anderson_3d_transition(v: &mut Validator) {
     println!("  [INFO] 3D (L={l}, W=2): ⟨r⟩ = {r_weak:.4} (GOE = {GOE_R:.4})");
     v.check_pass(
         &format!("3D metallic ⟨r⟩ > Poisson (got {r_weak:.4})"),
-        r_weak > POISSON_R + 0.02,
+        r_weak > POISSON_R + tolerances::SPECTRAL_R_MARGIN,
     );
 
     // Strong disorder (W=25): insulating regime, Poisson-like
@@ -286,7 +287,7 @@ fn validate_anderson_3d_transition(v: &mut Validator) {
     sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
     v.check_pass(
         &format!("3D spectrum bound: E_max <= {bound}"),
-        sorted.last().copied().unwrap_or(0.0) <= bound + 0.5,
+        sorted.last().copied().unwrap_or(0.0) <= bound + tolerances::SPECTRAL_GERSHGORIN_MARGIN,
     );
 }
 

@@ -18,6 +18,8 @@
 //! let prediction = tree.predict(&features);
 //! ```
 
+use crate::error;
+
 /// A node in the decision tree.
 #[derive(Debug, Clone)]
 pub struct TreeNode {
@@ -61,14 +63,14 @@ impl DecisionTree {
         right_children: &[i32],
         predictions: &[Option<usize>],
         n_features: usize,
-    ) -> Result<Self, String> {
+    ) -> error::Result<Self> {
         let n = features.len();
         if thresholds.len() != n
             || left_children.len() != n
             || right_children.len() != n
             || predictions.len() != n
         {
-            return Err("inconsistent array lengths".into());
+            return Err(error::Error::InvalidInput("inconsistent array lengths".into()));
         }
 
         let nodes: Vec<TreeNode> = (0..n)

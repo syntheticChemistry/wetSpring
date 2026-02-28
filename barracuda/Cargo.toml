@@ -1109,6 +1109,28 @@ path = "src/bin/validate_streaming_io_parity.rs"
 name = "validate_barracuda_cpu_v12"
 path = "src/bin/validate_barracuda_cpu_v12.rs"
 
+# ── Exp216: BarraCuda CPU v13 — 47-Domain Pure Rust Math Proof ──
+[[bin]]
+name = "validate_barracuda_cpu_v13"
+path = "src/bin/validate_barracuda_cpu_v13.rs"
+
+# ── Exp217: Python vs Rust v2 — 47-Domain Timing ──
+[[bin]]
+name = "benchmark_python_vs_rust_v2"
+path = "src/bin/benchmark_python_vs_rust_v2.rs"
+
+# ── Exp218: BarraCuda GPU v5 — 42-Module Portability Proof ──
+[[bin]]
+name = "validate_barracuda_gpu_v5"
+path = "src/bin/validate_barracuda_gpu_v5.rs"
+required-features = ["gpu"]
+
+# ── Exp219: Pure GPU Streaming v3 — Unidirectional Pipeline ──
+[[bin]]
+name = "validate_pure_gpu_streaming_v3"
+path = "src/bin/validate_pure_gpu_streaming_v3.rs"
+required-features = ["gpu"]
+
 # ── Exp214: NUCLEUS Mixed Hardware V8 — V66 I/O Evolution (IPC) ──
 [[bin]]
 name = "validate_nucleus_v8_mixed"
@@ -1132,3 +1154,40 @@ required-features = ["gpu"]
 name = "benchmark_progression_cpu_gpu_stream"
 path = "src/bin/benchmark_progression_cpu_gpu_stream.rs"
 required-features = ["gpu"]
+
+# ── Exp223: Cross-Spring Evolution V71 Complete Rewire ──
+[[bin]]
+name = "validate_cross_spring_evolution_v71"
+path = "src/bin/validate_cross_spring_evolution_v71.rs"
+required-features = ["gpu"]
+
+# ── Exp224: Paper Math Control — Published Equations via BarraCuda CPU ──
+[[bin]]
+name = "validate_paper_math_control_v1"
+path = "src/bin/validate_paper_math_control_v1.rs"
+
+# ── Exp225: BarraCuda CPU v14 — V71 Pure Rust Math (50 Domains) ──
+# Note: requires `gpu` feature for ToadStool spectral/linalg module resolution,
+# but all math runs on CPU (zero GPU dispatch in this binary).
+[[bin]]
+name = "validate_barracuda_cpu_v14"
+path = "src/bin/validate_barracuda_cpu_v14.rs"
+required-features = ["gpu"]
+
+# ── Exp226: BarraCuda GPU v6 — V71 Precision-Flexible Portability Proof ──
+[[bin]]
+name = "validate_barracuda_gpu_v6"
+path = "src/bin/validate_barracuda_gpu_v6.rs"
+required-features = ["gpu"]
+
+# ── Exp227: Pure GPU Streaming v4 — Unidirectional Full Science Pipeline ──
+[[bin]]
+name = "validate_pure_gpu_streaming_v4"
+path = "src/bin/validate_pure_gpu_streaming_v4.rs"
+required-features = ["gpu"]
+
+# ── Exp228: metalForge v8 — Cross-System (GPU → NPU → CPU) Dispatch ──
+[[bin]]
+name = "validate_metalforge_v8_cross_system"
+path = "src/bin/validate_metalforge_v8_cross_system.rs"
+required-features = ["ipc"]

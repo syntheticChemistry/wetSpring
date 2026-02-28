@@ -1,0 +1,110 @@
+{
+  "treatments": [
+    {
+      "tillage": "NT",
+      "compartment": "Endosphere",
+      "effective_w": 5.0,
+      "richness_filter": 0.4,
+      "effective_richness": 102,
+      "evenness": 0.6200000000000001,
+      "mean_shannon": 4.621805847963349,
+      "rep_shannons": [
+        4.621767410446145,
+        4.6219194252944,
+        4.621730708149502
+      ]
+    },
+    {
+      "tillage": "NT",
+      "compartment": "Rhizosphere",
+      "effective_w": 5.0,
+      "richness_filter": 1.0,
+      "effective_richness": 257,
+      "evenness": 0.6200000000000001,
+      "mean_shannon": 5.5462800217090304,
+      "rep_shannons": [
+        5.5462655427203345,
+        5.546490784980661,
+        5.5460837374260965
+      ]
+    },
+    {
+      "tillage": "RT",
+      "compartment": "Endosphere",
+      "effective_w": 12.0,
+      "richness_filter": 0.4,
+      "effective_richness": 78,
+      "evenness": 0.508,
+      "mean_shannon": 4.350973218079569,
+      "rep_shannons": [
+        4.350192337320918,
+        4.351188620190253,
+        4.351538696727535
+      ]
+    },
+    {
+      "tillage": "RT",
+      "compartment": "Rhizosphere",
+      "effective_w": 12.0,
+      "richness_filter": 1.0,
+      "effective_richness": 197,
+      "evenness": 0.508,
+      "mean_shannon": 5.276819231554427,
+      "rep_shannons": [
+        5.276504083891298,
+        5.2768099592155195,
+        5.277143651556464
+      ]
+    },
+    {
+      "tillage": "DP",
+      "compartment": "Endosphere",
+      "effective_w": 18.0,
+      "richness_filter": 0.4,
+      "effective_richness": 58,
+      "evenness": 0.41200000000000003,
+      "mean_shannon": 4.049237755956142,
+      "rep_shannons": [
+        4.051906106900249,
+        4.046561703007382,
+        4.049245457960795
+      ]
+    },
+    {
+      "tillage": "DP",
+      "compartment": "Rhizosphere",
+      "effective_w": 18.0,
+      "richness_filter": 1.0,
+      "effective_richness": 145,
+      "evenness": 0.41200000000000003,
+      "mean_shannon": 4.965444302084998,
+      "rep_shannons": [
+        4.967570201458092,
+        4.964751244550145,
+        4.964011460246754
+      ]
+    }
+  ],
+  "main_effects": {
+    "nt_mean": 5.084042934836189,
+    "rt_mean": 4.8138962248169985,
+    "dp_mean": 4.507341029020569,
+    "tillage_ordering": true,
+    "endo_mean": 4.340672273999687,
+    "rhizo_mean": 5.262847851782818,
+    "compartment_effect": true
+  },
+  "interaction": {
+    "delta_endo": 0.5725680920072067,
+    "delta_rhizo": 0.5808357196240328,
+    "endo_more_sensitive": true
+  },
+  "stover_benefit": {
+    "rt_qs": 0.9331927987311419,
+    "dp_qs": 0.3085375387259869,
+    "benefit": 0.624655260005155
+  },
+  "math_verification": {
+    "norm_cdf_0": 0.5
+  }
+}

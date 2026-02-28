@@ -27,6 +27,11 @@ use std::time::Duration;
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(30);
 const RPC_TIMEOUT: Duration = Duration::from_secs(5);
 
+/// Default socket path under `XDG_RUNTIME_DIR` (`biomeos/songbird-default.sock`).
+const DEFAULT_SOCKET_PATH_XDG: &str = "biomeos/songbird-default.sock";
+/// Fallback socket filename when `XDG_RUNTIME_DIR` is unset (`songbird-default.sock`).
+const DEFAULT_SOCKET_PATH_FALLBACK: &str = "songbird-default.sock";
+
 /// Discover the Songbird Unix socket path.
 ///
 /// Returns `None` if no Songbird socket is found (standalone mode).
@@ -40,13 +45,13 @@ pub fn discover_socket() -> Option<PathBuf> {
     }
 
     if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
-        let p = PathBuf::from(xdg).join("biomeos/songbird-default.sock");
+        let p = PathBuf::from(xdg).join(DEFAULT_SOCKET_PATH_XDG);
         if p.exists() {
             return Some(p);
         }
     }
 
-    let fallback = std::env::temp_dir().join("songbird-default.sock");
+    let fallback = std::env::temp_dir().join(DEFAULT_SOCKET_PATH_FALLBACK);
     if fallback.exists() {
         return Some(fallback);
     }

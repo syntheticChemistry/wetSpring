@@ -31,6 +31,7 @@
 //! | Hardware | biomeGate RTX 4070 (GPU), Eastgate CPU |
 //! | Command | `cargo run --release --features gpu --bin validate_dynamic_anderson` |
 
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 const N_REALIZATIONS: usize = 4;
@@ -213,7 +214,10 @@ fn main() {
 
         println!("  r range: [{r_min:.4}, {r_max:.4}]");
 
-        v.check_pass("r oscillates (range > 0.01)", r_max - r_min > 0.01);
+        v.check_pass(
+            "r oscillates (range > DYNAMIC_WT_EXACT)",
+            r_max - r_min > tolerances::DYNAMIC_WT_EXACT,
+        );
         v.check_pass(
             "r range brackets midpoint (W_0 ≈ W_c)",
             r_min < midpoint && r_max > midpoint,
@@ -231,7 +235,7 @@ fn main() {
             .map(|(_, _, r, _)| *r)
             .sum::<f64>()
             / 12.0;
-        let periodicity = (first_half - second_half).abs() < 0.05;
+        let periodicity = (first_half - second_half).abs() < tolerances::DYNAMIC_WT_PERIODICITY;
         v.check_pass(
             "approximate yearly periodicity (half means within 0.05)",
             periodicity,
@@ -243,21 +247,30 @@ fn main() {
         v.section("── Dynamic Anderson requires --features gpu ──");
         println!("  Validating W(t) functions only...");
 
-        v.check_pass("tillage W(0) = 20", (w_tillage(0.0) - 20.0).abs() < 0.01);
-        v.check_pass("tillage W(∞) ≈ 12", (w_tillage(100.0) - 12.0).abs() < 0.1);
+        v.check_pass(
+            "tillage W(0) = 20",
+            (w_tillage(0.0) - 20.0).abs() < tolerances::DYNAMIC_WT_EXACT,
+        );
+        v.check_pass(
+            "tillage W(∞) ≈ 12",
+            (w_tillage(100.0) - 12.0).abs() < tolerances::DYNAMIC_WT_ASYMPTOTIC,
+        );
         v.check_pass(
             "antibiotic W(-1) = 14",
-            (w_antibiotic(-1.0) - 14.0).abs() < 0.01,
+            (w_antibiotic(-1.0) - 14.0).abs() < tolerances::DYNAMIC_WT_EXACT,
         );
         v.check_pass("antibiotic W(3.5) > 14", w_antibiotic(3.5) > 14.0);
         v.check_pass(
             "antibiotic W(100) ≈ 14",
-            (w_antibiotic(100.0) - 14.0).abs() < 0.1,
+            (w_antibiotic(100.0) - 14.0).abs() < tolerances::DYNAMIC_WT_ASYMPTOTIC,
         );
-        v.check_pass("seasonal W(0) = 16", (w_seasonal(0.0) - 16.0).abs() < 0.01);
+        v.check_pass(
+            "seasonal W(0) = 16",
+            (w_seasonal(0.0) - 16.0).abs() < tolerances::DYNAMIC_WT_EXACT,
+        );
         v.check_pass(
             "seasonal W(91.25) ≈ 20",
-            (w_seasonal(91.25) - 20.0).abs() < 0.5,
+            (w_seasonal(91.25) - 20.0).abs() < tolerances::SEASONAL_OSCILLATION,
         );
     }
 

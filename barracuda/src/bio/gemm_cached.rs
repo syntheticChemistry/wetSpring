@@ -19,6 +19,11 @@ use barracuda::shaders::Precision;
 use bytemuck::{Pod, Zeroable};
 use std::sync::Arc;
 
+fn dim_u32(v: usize, name: &str) -> Result<u32> {
+    u32::try_from(v)
+        .map_err(|_| Error::InvalidInput(format!("{name} dimension {v} exceeds u32::MAX")))
+}
+
 #[repr(C)]
 #[derive(Copy, Clone, Pod, Zeroable)]
 struct GemmParams {
@@ -68,17 +73,35 @@ pub struct GemmCached {
 }
 
 impl GemmCached {
-    /// Compile the GEMM shader and create the pipeline (one-time cost).
+    /// Compile the GEMM shader at `Precision::F64` (default, correct for all GPUs).
     ///
-    /// Fp64Strategy-aware: on consumer GPUs (`Hybrid`), upstream
-    /// `GemmF64::execute()` uses DF64 core-streaming. Our cached pipeline
-    /// always uses the native f64 GEMM shader via universal precision
-    /// compilation. To switch to DF64 for ~10x throughput on consumer GPUs,
-    /// change `Precision::F64` to `Precision::Df64` when the DF64 GEMM
-    /// shader is compatible with our bind group layout.
+    /// See [`with_precision`](Self::with_precision) to compile at a different
+    /// precision level.
     pub fn new(device: Arc<WgpuDevice>, ctx: Arc<TensorContext>) -> Self {
-        let shader =
-            device.compile_shader_universal(GemmF64::WGSL, Precision::F64, Some("GemmCached f64"));
+        Self::with_precision(device, ctx, Precision::F64)
+    }
+
+    /// Compile the GEMM shader at the specified precision.
+    ///
+    /// `Precision::F64` — native f64 on compute-class GPUs (Titan V, MI250X).
+    /// `Precision::Df64` — DF64 double-float on FP32 cores (~10× throughput
+    /// on consumer GPUs). DF64 changes the wire format to `vec2<f32>`;
+    /// current buffer protocol uses f64 — caller must use [`crate::df64_host`]
+    /// pack/unpack for DF64 data if the shader's storage layout changed.
+    ///
+    /// For most workloads, use [`new`](Self::new) (F64) until the host
+    /// buffer protocol is adapted for DF64.
+    pub fn with_precision(
+        device: Arc<WgpuDevice>,
+        ctx: Arc<TensorContext>,
+        precision: Precision,
+    ) -> Self {
+        let label = match precision {
+            Precision::F64 => "GemmCached f64",
+            Precision::Df64 => "GemmCached df64",
+            _ => "GemmCached",
+        };
+        let shader = device.compile_shader_universal(GemmF64::WGSL, precision, Some(label));
 
         let bgl = device
             .device()
@@ -128,7 +151,7 @@ impl GemmCached {
     /// # Errors
     ///
     /// Returns an error if GPU dispatch or readback fails.
-    #[allow(clippy::cast_possible_truncation, clippy::many_single_char_names)]
+    #[allow(clippy::many_single_char_names)]
     pub fn execute(
         &self,
         a: &[f64],
@@ -143,13 +166,20 @@ impl GemmCached {
 
         let (a_buf, b_buf, c_buf) = self.acquire_and_upload(pool, a, b, m, k, n, batch_size);
 
-        let params = GemmParams::new(m as u32, k as u32, n as u32, batch_size as u32, 1.0, 0.0);
+        let params = GemmParams::new(
+            dim_u32(m, "m")?,
+            dim_u32(k, "k")?,
+            dim_u32(n, "n")?,
+            dim_u32(batch_size, "batch_size")?,
+            1.0,
+            0.0,
+        );
         let params_buf = self
             .device
             .create_uniform_buffer("GemmCached Params", &params);
 
         let bg = self.create_bind_group(&params_buf, &a_buf, &b_buf, &c_buf);
-        self.dispatch(&bg, m, n, batch_size);
+        self.dispatch_wg(&bg, m, n, batch_size)?;
 
         self.device
             .read_f64_buffer(&c_buf, c_size)
@@ -164,7 +194,7 @@ impl GemmCached {
     /// # Errors
     ///
     /// Returns an error if GPU dispatch fails.
-    #[allow(clippy::cast_possible_truncation, clippy::many_single_char_names)]
+    #[allow(clippy::many_single_char_names)]
     pub fn execute_to_buffer(
         &self,
         a: &[f64],
@@ -178,13 +208,20 @@ impl GemmCached {
 
         let (a_buf, b_buf, c_buf) = self.acquire_and_upload(pool, a, b, m, k, n, batch_size);
 
-        let params = GemmParams::new(m as u32, k as u32, n as u32, batch_size as u32, 1.0, 0.0);
+        let params = GemmParams::new(
+            dim_u32(m, "m")?,
+            dim_u32(k, "k")?,
+            dim_u32(n, "n")?,
+            dim_u32(batch_size, "batch_size")?,
+            1.0,
+            0.0,
+        );
         let params_buf = self
             .device
             .create_uniform_buffer("GemmCached Params", &params);
 
         let bg = self.create_bind_group(&params_buf, &a_buf, &b_buf, &c_buf);
-        self.dispatch(&bg, m, n, batch_size);
+        self.dispatch_wg(&bg, m, n, batch_size)?;
 
         Ok(c_buf.into_buffer())
     }
@@ -251,11 +288,10 @@ impl GemmCached {
             })
     }
 
-    #[allow(clippy::cast_possible_truncation)]
-    fn dispatch(&self, bg: &wgpu::BindGroup, m: usize, n: usize, batch_size: usize) {
-        let wg_x = (n as u32).div_ceil(16);
-        let wg_y = (m as u32).div_ceil(16);
-        let wg_z = batch_size as u32;
+    fn dispatch_wg(&self, bg: &wgpu::BindGroup, m: usize, n: usize, batch_size: usize) -> Result<()> {
+        let wg_x = dim_u32(n, "n")?.div_ceil(16);
+        let wg_y = dim_u32(m, "m")?.div_ceil(16);
+        let wg_z = dim_u32(batch_size, "batch_size")?;
 
         let mut encoder =
             self.device
@@ -273,5 +309,6 @@ impl GemmCached {
             pass.dispatch_workgroups(wg_x, wg_y, wg_z);
         }
         self.device.submit_and_poll(Some(encoder.finish()));
+        Ok(())
     }
 }

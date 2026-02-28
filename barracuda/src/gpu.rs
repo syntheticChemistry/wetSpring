@@ -3,15 +3,30 @@
 //!
 //! Creates a wgpu device with `SHADER_F64` and bridges to `ToadStool`'s
 //! `WgpuDevice` + `TensorContext`. Core dispatch goes through `ToadStool`
-//! primitives; ODE domains use local WGSL shaders (Write phase, pending
-//! `ToadStool` absorption as `BatchedOdeRK4Generic`).
+//! primitives (79 consumed, zero fallback code). ODE domains use
+//! runtime-generated WGSL via `BatchedOdeRK4::generate_shader()`.
 //!
-//! # Absorbed `ToadStool` primitives (30)
+//! # Precision (`ToadStool` S68+)
+//!
+//! All 700 `ToadStool` WGSL shaders are f64-canonical (zero f32-only remain).
+//! `compile_shader_universal(source, precision)` routes through:
+//!
+//! - `Precision::F64` — native f64 (compute-class GPUs: Titan V, V100, MI250X)
+//! - `Precision::Df64` — double-float f32-pair (~48-bit mantissa, ~10× throughput
+//!   on consumer FP32 cores: RTX 4070, RDNA2+)
+//! - `Precision::F32` — downcast from f64 canonical (inference, bandwidth-bound)
+//! - `Precision::F16` — half-precision (inference only)
+//!
+//! Selection: [`GpuF64::optimal_precision`] returns F64 or Df64 based on
+//! [`GpuF64::fp64_strategy`] (Native vs Hybrid). ODE modules currently use
+//! F64 directly; DF64 promotion requires host buffer protocol adaptation.
+//!
+//! # Consumed `ToadStool` GPU primitives
 //!
 //! - `FusedMapReduceF64` — Shannon, Simpson, alpha diversity
 //! - `BrayCurtisF64` — condensed distance matrices
 //! - `BatchedEighGpu` — `PCoA` eigendecomposition
-//! - `BatchedOdeRK4F64` — QS/c-di-GMP ODE integration
+//! - `BatchedOdeRK4F64` — QS/c-di-GMP ODE integration (5 ODE systems)
 //! - `GemmF64` / `GemmCachedF64` — batch spectral cosine, taxonomy
 //! - `KrigingF64` — spatial interpolation
 //! - `KmerHistogramGpu` — k-mer counting (atomic histogram)
@@ -21,6 +36,8 @@
 //! - `GillespieGpu` — parallel SSA (N independent trajectories)
 //! - `SmithWatermanGpu` — banded SW alignment (anti-diagonal wavefront)
 //! - `TreeInferenceGpu` — decision tree / RF inference (sample x tree)
+//! - `DiversityFusionGpu` — Shannon + Simpson + evenness fused
+//! - Plus 20+ bio ops: ANI, SNP, dN/dS, pangenome, HMM, DADA2, etc.
 //!
 //! # WGSL Generation (Lean — zero local shaders)
 //!
@@ -244,6 +261,13 @@ impl GpuF64 {
 /// adapts to the detected GPU's latency profile.
 pub const GPU_DISPATCH_THRESHOLD: usize = 10_000;
 
+/// Element count thresholds for GPU vs CPU dispatch crossover.
+/// Derived from benchmarking `FusedMapReduceF64` (hotSpring Exp001 §4.4, wetSpring Exp064/087).
+const DISPATCH_THRESHOLD_FAST: usize = 5_000;     // Fast f64 (AMD RDNA2+): ~4 cycles/DFMA
+const DISPATCH_THRESHOLD_NATIVE: usize = 10_000;  // Native f64 (NVIDIA Volta+): ~8 cycles/DFMA
+const DISPATCH_THRESHOLD_SOFTWARE: usize = 25_000; // Software f64 (Apple M, Intel): emulated
+const DISPATCH_THRESHOLD_UNKNOWN: usize = 50_000; // Unknown / very slow: conservative
+
 impl GpuF64 {
     /// Capability-aware dispatch threshold for this GPU.
     ///
@@ -260,15 +284,12 @@ impl GpuF64 {
         let model = self.driver_profile.latency_model();
         let dfma_cycles = model.raw_latency(WgslOpClass::F64Fma);
 
-        // Thresholds derived from benchmarking `FusedMapReduceF64` across
-        // GPU families (hotSpring Exp001 §4.4, wetSpring Exp064/087).
-        // The crossover is where GPU throughput exceeds CPU throughput
-        // including kernel launch + PCIe transfer overhead (~50 μs).
+        // DFMA cycle ranges: 0..=4 fast, 5..=8 native, 9..=16 software, _ unknown
         match dfma_cycles {
-            0..=4 => 5_000,   // Fast f64 (AMD RDNA2+): ~4 cycles/DFMA
-            5..=8 => 10_000,  // Native f64 (NVIDIA Volta+): ~8 cycles/DFMA
-            9..=16 => 25_000, // Software f64 (Apple M, Intel): emulated
-            _ => 50_000,      // Unknown / very slow: conservative
+            0..=4 => DISPATCH_THRESHOLD_FAST,
+            5..=8 => DISPATCH_THRESHOLD_NATIVE,
+            9..=16 => DISPATCH_THRESHOLD_SOFTWARE,
+            _ => DISPATCH_THRESHOLD_UNKNOWN,
         }
     }
 }

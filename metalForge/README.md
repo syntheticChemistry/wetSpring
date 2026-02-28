@@ -197,7 +197,7 @@ from either inform the other's hardware utilization strategy.
 
 ---
 
-## Current Status (Feb 26, 2026)
+## Current Status (Feb 28, 2026)
 
 ### CPU: 31+ Domains Validated (Exp001–102)
 All 31+ algorithmic domains proven correct in pure Rust CPU:
@@ -267,7 +267,7 @@ Delete local shader copy. Use the crate-level re-export
 (e.g., `barracuda::SmithWatermanGpu`). Local extensions that still need work
 remain in wetSpring until absorption.
 
-### Current Status (V65, Feb 27)
+### Current Status (V73, Feb 28)
 
 | Phase | Count | Items |
 |-------|:-----:|-------|
@@ -277,7 +277,7 @@ remain in wetSpring until absorption.
 | **CPU math** (delegated to barracuda) | 8 functions | erf, ln_gamma, regularized_gamma_p, norm_cdf, dot, l2_norm, trapz, ridge_regression |
 | **Blocked** | 0 | All former blockers resolved: kmer (S62), UniFrac (S62), taxonomy (S64), NVVM polyfill (S39) |
 
-Active handoff: `../../wateringHole/handoffs/WETSPRING_TOADSTOOL_V65_PROGRESSION_BENCHMARK_HANDOFF_FEB27_2026.md`
+Active handoff: `../../wateringHole/handoffs/WETSPRING_TOADSTOOL_V73_DEBT_REDUCTION_FIVE_TIER_HANDOFF_FEB28_2026.md`
 
 ---
 
@@ -330,7 +330,7 @@ it and rely on `compile_shader_f64` or `ShaderTemplate` preprocessing.
 
 ---
 
-## GPU Module Status (V65)
+## GPU Module Status (V73)
 
 All 42 GPU modules are operational. 0 local WGSL shaders — fully lean.
 
@@ -362,7 +362,7 @@ ToadStool/BarraCuda team absorption. Following hotSpring's pattern:
 | 32 tolerance constants | Hierarchy-tested | `barracuda::tolerances` cross-Spring standard |
 | SoA/batch patterns | GPU-friendly, `#[repr(C)]` | Direct shader translation |
 
-### Resolved Blockers (V65)
+### Resolved Blockers (V73)
 
 | Former Blocker | Resolution | Session |
 |----------------|------------|---------|

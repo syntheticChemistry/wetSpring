@@ -119,6 +119,26 @@ Compares current SHA-256 hashes against this manifest. Exit 0 = no drift.
 | `fajgenbaum_pathway_scoring.py` | `validate_fajgenbaum_pathway` | 157 | Pathway scoring | `6e906b0159e0c26a` |
 | `transe_knowledge_graph.py` | `validate_knowledge_graph_embedding` | 161 | TransE (KG) | `a8d567aaf686a847` |
 
+### Track 4 — No-Till Soil QS & Anderson Geometry
+
+| Script | Rust Binary | Exp | Tool | SHA-256 (first 16) |
+|--------|-------------|-----|------|---------------------|
+| `martinez2023_pore_geometry.py` | `validate_soil_qs_pore_geometry` | 170 | Anderson + QS ODE | `b75181ca308568de` |
+| `feng2024_pore_diversity.py` | `validate_soil_pore_diversity` | 171 | Shannon/BC/Anderson | `5dd58505694e385b` |
+| `mukherjee2024_colonization.py` | `validate_soil_distance_colonization` | 172 | AI diffusion/Anderson | `2056f32a550fc155` |
+| `islam2014_brandt_farm.py` | `validate_notill_brandt_farm` | 173 | Aggregate/SOM | `72a4703cfbb70293` |
+| `zuber2016_meta_analysis.py` | `validate_notill_meta_analysis` | 174 | Meta-analysis CI | `b3112e70f47ae972` |
+| `liang2015_longterm_tillage.py` | `validate_notill_longterm_tillage` | 175 | 2×2×2 factorial | `dd447d48edb8593f` |
+| `tecon2017_biofilm_aggregate.py` | `validate_soil_biofilm_aggregate` | 176 | Biofilm/aggregate | `c07ccf97f27777d7` |
+| `rabot2018_structure_function.py` | `validate_soil_structure_function` | 177 | Structure→function | `dcf5a170ccd6fbc5` |
+| `wang2025_tillage_microbiome.py` | `validate_tillage_microbiome_2025` | 178 | Tillage × compartment | `b947317f2aaa8378` |
+
+### NPU Spectral Triage
+
+| Script | Rust Binary | Exp | Tool | SHA-256 (first 16) |
+|--------|-------------|-----|------|---------------------|
+| `spectral_match_baseline.py` | `validate_npu_spectral_triage` | 124 | Int8 triage/cosine | `e3f6f4ff4071c4fe` |
+
 ## Utility (not baselines)
 
 | Script | Purpose | SHA-256 (first 16) |

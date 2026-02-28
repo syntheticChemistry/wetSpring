@@ -128,7 +128,8 @@ fn main() {
 
     v.check_pass(
         "Distance modulates biofilm formation (B varies with AI production)",
-        (biofilm_vs_distance[0].1 - biofilm_vs_distance[4].1).abs() > 0.001,
+        (biofilm_vs_distance[0].1 - biofilm_vs_distance[4].1).abs()
+            > tolerances::SOIL_DISTANCE_MIN_DIFF,
     );
 
     v.check_pass(
@@ -166,7 +167,7 @@ fn main() {
 
         let result = cooperation::scenario_equal_start(&params, dt);
         let freq = *cooperation::cooperator_frequency(&result).last().unwrap();
-        let affected = (freq - baseline_freq).abs() > 0.005;
+        let affected = (freq - baseline_freq).abs() > tolerances::SOIL_COOP_FREQ_AFFECTED;
         if affected {
             affected_count += 1;
         }

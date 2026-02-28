@@ -1,0 +1,16 @@
+{
+  "library_size": 5000,
+  "n_queries": 100,
+  "triage": {
+    "k": 1000,
+    "pass_rate": 0.2,
+    "recall": 1.0,
+    "recall_count": 100,
+    "top1_rate": 0.97,
+    "top1_correct": 97
+  },
+  "verification": {
+    "self_similarity": 1.0000000000000002,
+    "cross_similarity": 0.7630474678189079
+  }
+}

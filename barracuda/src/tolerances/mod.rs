@@ -549,8 +549,11 @@ pub const ODE_DIVISION_GUARD: f64 = 1e-30;
 pub const ERROR_BODY_PREVIEW_LEN: usize = 200;
 
 // ═══════════════════════════════════════════════════════════════════
-// GPU vs CPU tolerances
+// GPU vs CPU tolerances (see `gpu` submodule)
 // ═══════════════════════════════════════════════════════════════════
+
+mod gpu;
+pub use gpu::*;
 
 /// Regularized incomplete gamma series convergence epsilon.
 ///
@@ -560,65 +563,6 @@ pub const GAMMA_SERIES_CONVERGENCE: f64 = 1e-15;
 
 /// Maximum iterations for regularized gamma series expansion.
 pub const GAMMA_SERIES_MAX_ITER: usize = 1000;
-
-/// GPU f64 vs CPU f64 for exact arithmetic (add, mul, comparison).
-///
-/// GPU `SHADER_F64` uses IEEE 754 f64, but different instruction ordering
-/// and FMA behavior can introduce small differences. Typical max observed
-/// diff ~8e-8 for `exp()` on current hardware (hotSpring Exp001 §4.4).
-///
-/// For simple add/mul chains (diversity metrics), expect < 1e-10.
-pub const GPU_VS_CPU_F64: f64 = 1e-6;
-
-/// GPU f64 vs CPU f64 for log/exp operations (transcendentals).
-///
-/// Native WGSL `log(f64)` on NVIDIA matches CPU to ~1e-14 per call.
-/// Allow 1e-10 for single transcendental evaluations (one log or exp).
-/// For chained Shannon/Simpson/cosine, use `GPU_LOG_POLYFILL` (1e-7).
-pub const GPU_VS_CPU_TRANSCENDENTAL: f64 = 1e-10;
-
-/// GPU f64 log polyfill precision (software `log_f64` shader).
-///
-/// When native WGSL `log(f64)` is unavailable, `ToadStool` uses a
-/// polynomial `log_f64` polyfill with ~1e-8 absolute precision.
-/// Allow 1e-7 for single evaluations; accumulated chains (Shannon
-/// over N species) may reach ~1e-6 covered by [`GPU_VS_CPU_F64`].
-pub const GPU_LOG_POLYFILL: f64 = 1e-7;
-
-/// GPU Bray-Curtis vs CPU: per-pair tolerance.
-///
-/// Each pair involves N additions and a division. For N=2000 features,
-/// rounding differs by at most a few ULP per addition.
-pub const GPU_VS_CPU_BRAY_CURTIS: f64 = 1e-10;
-
-/// GPU vs CPU for stochastic ensemble statistics (bootstrap mean/var).
-///
-/// Parallel reduction order differs on GPU; for ensemble averages
-/// over ~1000 replicates, accumulated rounding yields ~1e-4 drift.
-pub const GPU_VS_CPU_ENSEMBLE: f64 = 1e-4;
-
-/// GPU vs CPU for HMM batch forward log-likelihoods.
-///
-/// 256 sequences × 100 steps × 3 states: log-space additions
-/// across the Forward lattice accumulate rounding differently on GPU
-/// (warp-level parallel reduction) vs CPU (sequential). 1e-3 covers
-/// the worst observed per-sequence drift across the batch.
-/// Validated: Exp048, `benchmark_phylo_hmm_gpu`, commit `e4358c5`.
-pub const GPU_VS_CPU_HMM_BATCH: f64 = 1e-3;
-
-/// GPU f32 vs CPU f64 for integer-derived results (Hamming, Jaccard).
-///
-/// f32 has ~7 significant digits; operations on integer-derived values
-/// (count / total) yield results exact to ~1e-6. Allow 1e-5 to cover
-/// accumulated rounding in pairwise summation.
-pub const GPU_F32_PARITY: f64 = 1e-5;
-
-/// GPU f32 spatial computation tolerance (payoff, fitness, variance).
-///
-/// f32 grid operations (neighbor sums, dot products) accumulate
-/// rounding proportional to neighborhood size. For 8-neighbor grids,
-/// 1e-4 covers the worst-case f32 summation error.
-pub const GPU_F32_SPATIAL: f64 = 1e-4;
 
 // ═══════════════════════════════════════════════════════════════════
 // ODE integration parameters
@@ -801,75 +745,11 @@ pub const ASARI_CROSS_MATCH_PCT: f64 = 70.0;
 pub const ASARI_MZ_RANGE_PCT: f64 = 10.0;
 
 // ═══════════════════════════════════════════════════════════════════
-// Dynamic Anderson W(t) and seasonal model tolerances
+// Spectral theory, Anderson, dynamic disorder, soil (see `spectral`)
 // ═══════════════════════════════════════════════════════════════════
 
-/// Seasonal oscillation amplitude tolerance for periodic W(t) functions.
-///
-/// Seasonal W(t) = `W_0` + A·sin(2πt/365) evaluated at quarter-periods
-/// produces ±A offsets. With A=4 and `W_0`=16, a tolerance of 0.5 covers
-/// numerical imprecision in `sin()` at non-exact multiples of π/2.
-/// Validated: Exp186 (Dynamic Anderson W(t)), Exp190 (CPU v10).
-pub const SEASONAL_OSCILLATION: f64 = 0.5;
-
-/// Poisson level spacing ratio tolerance for spectral cross-spring validation.
-///
-/// At strong disorder (W >> `W_c`), ⟨r⟩ should approach Poisson (0.3863).
-/// Tolerance of 0.06 covers finite-size fluctuations and disorder averaging
-/// with 8 realizations on lattices L = 6–14.
-/// Validated: Exp107 (cross-spring spectral theory), commit `756df26`.
-pub const SPECTRAL_POISSON_PARITY: f64 = 0.06;
-
-/// Lyapunov exponent tolerance for localization diagnostics.
-///
-/// Normalized Lyapunov exponent γL should be > 0 in the localized phase.
-/// Tolerance of 0.03 covers transfer-matrix convergence for chain lengths
-/// ≥ 10,000 sites at moderate disorder.
-/// Validated: Exp107 (cross-spring spectral theory), commit `756df26`.
-pub const SPECTRAL_LYAPUNOV_PARITY: f64 = 0.03;
-
-/// Herman–Avila–Bochi cocycle tolerance for spectral diagnostics.
-///
-/// The Herman bound on Lyapunov exponents provides a lower bound on the
-/// localization rate. Tolerance of 0.02 covers polynomial expansion drift
-/// in the cocycle integral for moderate disorder.
-/// Validated: Exp107 (cross-spring spectral theory), commit `756df26`.
-pub const SPECTRAL_HERMAN_PARITY: f64 = 0.02;
-
-/// Trapezoidal integration tolerance for coarse grids (N = 100).
-///
-/// `barracuda::numerical::trapz` on N = 100 points for smooth functions
-/// (e.g., x² on \[0,1\]) introduces discretization error ∝ h² ≈ 1e-4.
-/// 1e-6 covers typical analytical targets with margin.
-/// Validated: Exp169/183 (cross-spring modern/S65), commit `756df26`.
-pub const TRAPZ_COARSE: f64 = 1e-6;
-
-/// Lanczos vs Sturm eigenvalue comparison tolerance.
-///
-/// Lanczos tridiagonalization with k=60 vectors and Sturm bisection
-/// produce eigenvalue estimates that differ by up to ~0.3 for Anderson
-/// lattices at L=10 (N=1000). 0.5 covers the worst-case algorithmic
-/// discrepancy with margin.
-/// Validated: Exp107 (cross-spring spectral theory).
-pub const LANCZOS_VS_STURM: f64 = 0.5;
-
-/// Cross-spring numerical function parity (trapz, pearson, ridge).
-///
-/// Verifying shared barracuda primitives (trapezoidal integration,
-/// Pearson correlation, `norm_cdf`) against known analytical values.
-/// 1e-3 covers polynomial approximation drift in `norm_cdf` and
-/// discretization error in trapz for coarse grids (N=100).
-/// Validated: Exp183 (cross-spring S65), Exp169 (cross-spring modern).
-pub const CROSS_SPRING_NUMERICAL: f64 = 1e-3;
-
-/// Soil physics model approximation tolerance.
-///
-/// Used for soil-specific model comparisons: chemotaxis reduction of
-/// effective `W_c` (~15%), carbon enrichment ratios (Brandt farm 2.15×),
-/// and critical colonization distance estimates. These are inherently
-/// approximate models with ~5% uncertainty from parameter fitting.
-/// Validated: Exp170–182 (Track 4 soil QS).
-pub const SOIL_MODEL_APPROX: f64 = 0.1;
+mod spectral;
+pub use spectral::*;
 
 /// Bistable ODE high-biofilm attractor tolerance.
 ///
@@ -934,5 +814,4 @@ pub const NANOPORE_INT8_FIDELITY: f64 = 0.90;
 pub const NANOPORE_DIVERSITY_TOLERANCE: f64 = 0.3;
 
 #[cfg(test)]
-#[path = "tolerances_tests.rs"]
 mod tests;

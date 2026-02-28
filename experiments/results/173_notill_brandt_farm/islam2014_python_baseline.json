@@ -1,0 +1,49 @@
+{
+  "published": {
+    "notill_agg_stability": 79.3,
+    "tilled_agg_stability": 38.5,
+    "notill_active_c": 963,
+    "tilled_active_c": 447,
+    "carbon_enrichment_ratio": 2.1543624161073827,
+    "notill_som": 5.1,
+    "tilled_som": 2.8
+  },
+  "anderson": {
+    "notill_w": 5.175000000000002,
+    "tilled_w": 15.375,
+    "notill_qs": 0.9999199961682489,
+    "tilled_qs": 0.6461697666727237
+  },
+  "diversity": {
+    "notill_mean_shannon": 5.529399176920505,
+    "tilled_mean_shannon": 4.607847004353327,
+    "notill_gt_tilled": true
+  },
+  "beta_diversity": {
+    "mean_within_notill": 0.3203170904732636,
+    "mean_within_tilled": 0.32086318062492636,
+    "mean_between": 0.6432205738139811
+  },
+  "som_biomass": {
+    "som_values": [
+      2.8,
+      3.5,
+      4.0,
+      4.5,
+      5.1
+    ],
+    "biomass_values": [
+      460.0,
+      600.0,
+      700.0,
+      800.0,
+      919.9999999999999
+    ],
+    "pearson_r": 1.0
+  },
+  "math_verification": {
+    "norm_cdf_0": 0.5,
+    "shannon_uniform_4": 1.3862943611198906,
+    "pearson_perfect_linear": 1.0
+  }
+}

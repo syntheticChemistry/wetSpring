@@ -25,6 +25,9 @@ use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
 use crate::io::mzml::MzmlSpectrum;
 
+/// Minimum MS1 scan count for GPU dispatch. Below this, CPU path is faster.
+const MIN_MS1_SCANS_FOR_GPU: usize = 256;
+
 fn require_f64(gpu: &GpuF64) -> Result<()> {
     if !gpu.has_f64 {
         return Err(Error::Gpu(
@@ -59,7 +62,7 @@ pub fn extract_features_gpu(
     require_f64(gpu)?;
 
     let ms1_count = spectra.iter().filter(|s| s.ms_level == 1).count();
-    if ms1_count < 256 {
+    if ms1_count < MIN_MS1_SCANS_FOR_GPU {
         return Ok(super::feature_table::extract_features(spectra, params));
     }
 

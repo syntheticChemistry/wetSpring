@@ -92,10 +92,10 @@ fn validate_fastq_gpu_diversity(v: &mut Validator, gpu: &GpuF64) {
     let cpu_j = diversity::pielou_evenness(&counts);
     let cpu_s = diversity::observed_features(&counts);
 
-    let gpu_result = diversity_gpu::diversity_gpu(gpu, &counts);
+    let gpu_result = diversity_gpu::alpha_diversity_gpu(gpu, &counts).unwrap();
     let gpu_h = gpu_result.shannon;
     let gpu_d = gpu_result.simpson;
-    let gpu_j = gpu_result.pielou;
+    let gpu_j = gpu_result.evenness;
     let gpu_s = gpu_result.observed;
 
     v.check(
@@ -119,16 +119,20 @@ fn validate_fastq_gpu_diversity(v: &mut Validator, gpu: &GpuF64) {
     v.check("Observed: CPU == GPU", cpu_s, gpu_s, tolerances::EXACT_F64);
 
     let n = counts.len();
-    let mut cpu_bc_matrix = vec![0.0_f64; n * n];
-    for i in 0..n {
-        for j in (i + 1)..n {
-            let bc = diversity::bray_curtis_pair(&[counts[i]], &[counts[j]]);
-            cpu_bc_matrix[i * n + j] = bc;
-            cpu_bc_matrix[j * n + i] = bc;
-        }
-    }
+    let samples: Vec<Vec<f64>> = counts.iter().map(|&c| vec![c]).collect();
+    let cpu_bc = diversity::bray_curtis_condensed(&samples);
+    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).unwrap();
 
-    v.check_pass("Bray-Curtis matrix computed for GPU comparison", n >= 5);
+    v.check_pass("Bray-Curtis condensed: CPU computed", !cpu_bc.is_empty());
+    v.check_count("Bray-Curtis condensed: length match", gpu_bc.len(), cpu_bc.len());
+    for (k, (&c, &g)) in cpu_bc.iter().zip(gpu_bc.iter()).enumerate() {
+        v.check(
+            &format!("BC[{k}]: CPU == GPU"),
+            c,
+            g,
+            tolerances::GPU_VS_CPU_F64,
+        );
+    }
 
     println!(
         "    G01 completed: {:.0}µs ({n} taxa)",
@@ -139,7 +143,7 @@ fn validate_fastq_gpu_diversity(v: &mut Validator, gpu: &GpuF64) {
 
 // ── G02: Quality filter → GPU dereplication ─────────────────────────────────
 
-fn validate_quality_gpu_derep(v: &mut Validator, _gpu: &GpuF64) {
+fn validate_quality_gpu_derep(v: &mut Validator, gpu: &GpuF64) {
     v.section("═══ G02: Quality filter → dereplication parity ═══");
     let t = Instant::now();
 
@@ -185,7 +189,7 @@ fn validate_quality_gpu_derep(v: &mut Validator, _gpu: &GpuF64) {
 
     let counts: Vec<f64> = uniques.iter().map(|u| u.abundance as f64).collect();
     let cpu_h = diversity::shannon(&counts);
-    let gpu_result = diversity_gpu::diversity_gpu(_gpu, &counts);
+    let gpu_result = diversity_gpu::alpha_diversity_gpu(gpu, &counts).unwrap();
 
     v.check(
         "derep → Shannon: CPU == GPU",
@@ -209,7 +213,7 @@ fn validate_ms2_gpu_spectral(v: &mut Validator, _gpu: &GpuF64) {
         let mut f = std::fs::File::create(&path).unwrap();
         writeln!(f, "H\tCreatedBy\tExp215").unwrap();
         for scan in 1..=4_u32 {
-            let precursor = 300.0 + f64::from(scan) * 100.0;
+            let precursor = f64::from(scan).mul_add(100.0, 300.0);
             writeln!(f, "S\t{scan}\t{scan}\t{precursor:.3}").unwrap();
             writeln!(f, "I\tRTime\t{:.1}", f64::from(scan) * 0.5).unwrap();
             writeln!(f, "I\tBPI\t10000.0").unwrap();
@@ -219,7 +223,7 @@ fn validate_ms2_gpu_spectral(v: &mut Validator, _gpu: &GpuF64) {
                 writeln!(
                     f,
                     "{:.1}\t{:.1}",
-                    100.0 + f64::from(frag) * 50.0,
+                    f64::from(frag).mul_add(50.0, 100.0),
                     1000.0 * f64::from(scan - frag)
                 )
                 .unwrap();
@@ -363,7 +367,7 @@ fn validate_full_gpu_chain(v: &mut Validator, gpu: &GpuF64) {
     let cpu_h = diversity::shannon(&counts);
     let cpu_d = diversity::simpson(&counts);
 
-    let gpu_result = diversity_gpu::diversity_gpu(gpu, &counts);
+    let gpu_result = diversity_gpu::alpha_diversity_gpu(gpu, &counts).unwrap();
 
     v.check(
         "pipeline Shannon: CPU == GPU",
@@ -393,16 +397,15 @@ fn validate_gpu_threshold(v: &mut Validator, gpu: &GpuF64) {
         (1_000..=100_000).contains(&threshold),
     );
 
-    let small: Vec<f64> = (1..=10).map(|i| i as f64).collect();
+    let small: Vec<f64> = (1..=10).map(f64::from).collect();
     let use_gpu_small = small.len() >= threshold;
     v.check_pass("10 elements: below threshold (CPU)", !use_gpu_small);
 
-    let large: Vec<f64> = (1..=200_000).map(|i| (i % 1000 + 1) as f64).collect();
-    let use_gpu_large = large.len() >= threshold;
+    let use_gpu_large = (1..=200_000_i32).count() >= threshold;
     v.check_pass("200k elements: above threshold (GPU)", use_gpu_large);
 
     let cpu_h = diversity::shannon(&small);
-    let gpu_h = diversity_gpu::diversity_gpu(gpu, &small).shannon;
+    let gpu_h = diversity_gpu::alpha_diversity_gpu(gpu, &small).unwrap().shannon;
     v.check(
         "small set: CPU == GPU math identical",
         cpu_h,

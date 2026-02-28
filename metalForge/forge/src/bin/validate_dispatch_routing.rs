@@ -28,7 +28,9 @@
 
 use wetspring_forge::dispatch::{self, Reason, Workload};
 use wetspring_forge::inventory;
-use wetspring_forge::substrate::{Capability, Identity, Properties, Substrate, SubstrateKind};
+use wetspring_forge::substrate::{
+    Capability, Identity, Properties, Substrate, SubstrateKind, SubstrateOrigin,
+};
 
 fn main() {
     let mut pass = 0u32;
@@ -78,6 +80,7 @@ fn gpu_f64(name: &str) -> Substrate {
             Capability::ShaderDispatch,
             Capability::ScalarReduce,
         ],
+        origin: SubstrateOrigin::Local,
     }
 }
 
@@ -87,6 +90,7 @@ fn gpu_f32(name: &str) -> Substrate {
         identity: Identity::named(name),
         properties: Properties::default(),
         capabilities: vec![Capability::F32Compute, Capability::ShaderDispatch],
+        origin: SubstrateOrigin::Local,
     }
 }
 
@@ -100,6 +104,7 @@ fn npu(name: &str) -> Substrate {
             Capability::QuantizedInference { bits: 8 },
             Capability::BatchInference { max_batch: 8 },
         ],
+        origin: SubstrateOrigin::Local,
     }
 }
 
@@ -113,6 +118,7 @@ fn cpu() -> Substrate {
             Capability::F32Compute,
             Capability::SimdVector,
         ],
+        origin: SubstrateOrigin::Local,
     }
 }
 

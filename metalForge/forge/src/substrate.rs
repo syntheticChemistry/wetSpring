@@ -22,6 +22,21 @@ pub struct Substrate {
     pub properties: Properties,
     /// What this device can do.
     pub capabilities: Vec<Capability>,
+    /// Where this substrate was discovered (local probe vs. Songbird mesh).
+    pub origin: SubstrateOrigin,
+}
+
+/// How a substrate was discovered.
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub enum SubstrateOrigin {
+    /// Discovered via local hardware probing (wgpu, procfs, device nodes).
+    #[default]
+    Local,
+    /// Discovered via Songbird mesh discovery from a remote NUCLEUS gate.
+    Mesh {
+        /// Name of the gate that reported this substrate.
+        gate_name: String,
+    },
 }
 
 /// How we found this device and what to call it.
@@ -191,6 +206,7 @@ mod tests {
                 ..Properties::default()
             },
             capabilities: vec![Capability::F64Compute, Capability::ShaderDispatch],
+            origin: SubstrateOrigin::Local,
         }
     }
 
@@ -242,6 +258,7 @@ mod tests {
                 ..Properties::default()
             },
             capabilities: vec![],
+            origin: SubstrateOrigin::Local,
         };
         let display = format!("{s}");
         assert!(display.contains("12288MB"));

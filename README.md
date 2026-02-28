@@ -4,9 +4,9 @@
 and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 **Write → Absorb → Lean** cycle adopted from hotSpring.
 
-**Date:** February 27, 2026
+**Date:** February 28, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 66 — V66 deep audit + dispatch evolution + NUCLEUS local deployment; 1,073+ tests (946 barracuda lib + 60 integration + 20 doc + 47 forge), **95.77% line / 93.86% fn / 95.33% branch** (cargo-llvm-cov), 216 experiments, 5,251+ checks (1,783 GPU on RTX 4070, 60 NPU on AKD1000), 200 binaries, ToadStool S68+ aligned (`e96576ee`), 79 primitives consumed via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 92 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, V66: byte-native FASTQ I/O, bytemuck nanopore bulk read, streaming APIs (mzML/MS2/FASTQ), safe env handling (`temp_env`), `partial_cmp` → `total_cmp` migration, dispatch evolution (Exp213 49/49), NUCLEUS V8 mixed hardware (Exp214 49/49), NUCLEUS local deployment validated (4 primals + Neural API + real NCBI data flow), 52/52 papers, 39/39 three-tier
+**Status:** Phase 73 — V73 deep debt reduction + V72 five-tier validation chain; 1,199+ tests (1,006 barracuda lib + 60 integration + 20 doc + 113 forge), **95.77% line / 93.86% fn / 95.33% branch** (cargo-llvm-cov), 229 experiments, 5,743+ checks (1,833+ GPU on RTX 4070, 60 NPU on AKD1000), 210 binaries, ToadStool S68+ aligned (`e96576ee`), 79 primitives consumed via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 92 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, V73 deep debt: `RpcError` struct replaces `(i64, String)` tuples, `Result<_,String>` → `error::Error::InvalidInput`, `GemmCached` `TryFrom` propagation (zero `expect`/`unwrap`), function decomposition (dada2, dispatch, gbm), hardcoded paths → named constants, `as` casts → safe conversions; V72: Exp224-228 five-tier chain (paper math 58/58, CPU v14 58/58, GPU v6 28/28, streaming v4 24/24, metalForge v8 33/33), 52/52 papers, 50/50 three-tier
 
 ---
 
@@ -51,7 +51,7 @@ WGSL          known physics   handoffs/                        delete local
 
 | Phase | Count | Description |
 |-------|:-----:|-------------|
-| **Lean** | 27 | GPU modules consuming upstream ToadStool primitives |
+| **Lean** | 34 | GPU modules consuming upstream ToadStool primitives |
 | **Compose** | 7 | GPU wrappers wiring ToadStool primitives (kmd, merge_pairs, robinson_foulds, derep, neighbor_joining, reconciliation, molecular_clock) |
 | **Passthrough** | 0 | All promoted — `gbm` and `feature_table` compose upstream, `signal` leans on `PeakDetectF64` (S62) |
 | **Write → Lean** | 5 | ODE shaders fully lean — GPU modules use `generate_shader()` from `OdeSystem` traits (WGSL deleted) |

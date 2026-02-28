@@ -1,7 +1,55 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! JSON-RPC 2.0 protocol types and serialization for the Primal IPC Protocol.
 
+use std::fmt;
+
 use serde_json::Value;
+
+/// JSON-RPC 2.0 error with numeric code and human-readable message.
+#[derive(Debug, Clone)]
+pub struct RpcError {
+    /// Standard JSON-RPC error code (e.g. `-32601` method not found).
+    pub code: i64,
+    /// Human-readable description.
+    pub message: String,
+}
+
+impl RpcError {
+    /// Method not found (`-32601`).
+    #[must_use]
+    pub fn method_not_found(method: &str) -> Self {
+        Self { code: -32601, message: format!("method not found: {method}") }
+    }
+
+    /// Invalid method parameters (`-32602`).
+    #[must_use]
+    pub fn invalid_params(msg: impl Into<String>) -> Self {
+        Self { code: -32602, message: msg.into() }
+    }
+
+    /// Application-level server error (`-32000` to `-32099`).
+    #[must_use]
+    pub fn server_error(code: i64, msg: impl Into<String>) -> Self {
+        Self { code, message: msg.into() }
+    }
+}
+
+impl fmt::Display for RpcError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "[{}] {}", self.code, self.message)
+    }
+}
+
+impl std::error::Error for RpcError {}
+
+/// Parse failure including the request `id` for correlating the error response.
+#[derive(Debug)]
+pub struct ParseError {
+    /// Request ID (or `Value::Null` if unparseable).
+    pub id: Value,
+    /// The underlying RPC error.
+    pub error: RpcError,
+}
 
 /// A parsed JSON-RPC 2.0 request.
 #[derive(Debug)]
@@ -18,24 +66,33 @@ pub struct Request {
 ///
 /// # Errors
 ///
-/// Returns `(id, code, message)` on parse failure, following JSON-RPC error codes:
+/// Returns a [`ParseError`] on failure, following JSON-RPC error codes:
 /// - `-32700`: Parse error (malformed JSON)
 /// - `-32600`: Invalid request (missing required fields)
-pub fn parse_request(line: &str) -> Result<Request, (Value, i64, String)> {
+pub fn parse_request(line: &str) -> Result<Request, ParseError> {
     let val: Value = serde_json::from_str(line.trim())
-        .map_err(|e| (Value::Null, -32700, format!("parse error: {e}")))?;
+        .map_err(|e| ParseError {
+            id: Value::Null,
+            error: RpcError { code: -32700, message: format!("parse error: {e}") },
+        })?;
 
     let id = val.get("id").cloned().unwrap_or(Value::Null);
 
     let jsonrpc = val.get("jsonrpc").and_then(Value::as_str);
     if jsonrpc != Some("2.0") {
-        return Err((id, -32600, "invalid or missing jsonrpc version".into()));
+        return Err(ParseError {
+            id,
+            error: RpcError { code: -32600, message: "invalid or missing jsonrpc version".into() },
+        });
     }
 
     let method = val
         .get("method")
         .and_then(Value::as_str)
-        .ok_or_else(|| (id.clone(), -32600, "missing method field".into()))?
+        .ok_or_else(|| ParseError {
+            id: id.clone(),
+            error: RpcError { code: -32600, message: "missing method field".into() },
+        })?
         .to_string();
 
     let params = val
@@ -90,20 +147,20 @@ mod tests {
     fn parse_request_missing_method() {
         let line = r#"{"jsonrpc":"2.0","params":{},"id":1}"#;
         let err = parse_request(line).unwrap_err();
-        assert_eq!(err.1, -32600);
+        assert_eq!(err.error.code, -32600);
     }
 
     #[test]
     fn parse_request_bad_json() {
         let err = parse_request("not json").unwrap_err();
-        assert_eq!(err.1, -32700);
+        assert_eq!(err.error.code, -32700);
     }
 
     #[test]
     fn parse_request_wrong_version() {
         let line = r#"{"jsonrpc":"1.0","method":"test","id":1}"#;
         let err = parse_request(line).unwrap_err();
-        assert_eq!(err.1, -32600);
+        assert_eq!(err.error.code, -32600);
     }
 
     #[test]

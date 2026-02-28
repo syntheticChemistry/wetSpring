@@ -72,6 +72,7 @@
 
 pub mod bench;
 pub mod bio;
+pub mod df64_host;
 pub mod encoding;
 pub mod error;
 #[cfg(feature = "gpu")]

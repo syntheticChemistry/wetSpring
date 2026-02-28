@@ -1,0 +1,116 @@
+{
+  "film_diffusion": [
+    {
+      "thickness_um": 1,
+      "diffusion_length_um": 10
+    },
+    {
+      "thickness_um": 3,
+      "diffusion_length_um": 50
+    },
+    {
+      "thickness_um": 5,
+      "diffusion_length_um": 100
+    },
+    {
+      "thickness_um": 10,
+      "diffusion_length_um": 200
+    }
+  ],
+  "aggregate_geometry": [
+    {
+      "diameter_mm": 0.25,
+      "radius_mm": 0.125,
+      "surface_mm2": 0.19634954084936207,
+      "volume_mm3": 0.008181230868723419,
+      "sv_ratio": 24.0
+    },
+    {
+      "diameter_mm": 0.5,
+      "radius_mm": 0.25,
+      "surface_mm2": 0.7853981633974483,
+      "volume_mm3": 0.06544984694978735,
+      "sv_ratio": 12.0
+    },
+    {
+      "diameter_mm": 1.0,
+      "radius_mm": 0.5,
+      "surface_mm2": 3.141592653589793,
+      "volume_mm3": 0.5235987755982988,
+      "sv_ratio": 6.0
+    },
+    {
+      "diameter_mm": 2.0,
+      "radius_mm": 1.0,
+      "surface_mm2": 12.566370614359172,
+      "volume_mm3": 4.1887902047863905,
+      "sv_ratio": 3.0
+    },
+    {
+      "diameter_mm": 5.0,
+      "radius_mm": 2.5,
+      "surface_mm2": 78.53981633974483,
+      "volume_mm3": 65.44984694978736,
+      "sv_ratio": 1.2
+    }
+  ],
+  "biofilm_response": [
+    {
+      "film_factor": 0.3,
+      "k_ai_prod": 1.5,
+      "d_ai": 1.8257418583505538
+    },
+    {
+      "film_factor": 0.5,
+      "k_ai_prod": 2.5,
+      "d_ai": 1.4142135623730951
+    },
+    {
+      "film_factor": 1.0,
+      "k_ai_prod": 5.0,
+      "d_ai": 1.0
+    },
+    {
+      "film_factor": 2.0,
+      "k_ai_prod": 10.0,
+      "d_ai": 0.7071067811865476
+    }
+  ],
+  "aggregate_networks": [
+    {
+      "label": "Pristine forest",
+      "connectivity_pct": 90,
+      "effective_w": 2.4999999999999996,
+      "qs_probability": 0.9999984693732634
+    },
+    {
+      "label": "No-till (40 yr)",
+      "connectivity_pct": 80,
+      "effective_w": 4.999999999999999,
+      "qs_probability": 0.9999367907681316
+    },
+    {
+      "label": "No-till (5 yr)",
+      "connectivity_pct": 60,
+      "effective_w": 10.0,
+      "qs_probability": 0.9848698599897642
+    },
+    {
+      "label": "Conv. tillage",
+      "connectivity_pct": 35,
+      "effective_w": 16.25,
+      "qs_probability": 0.5332067518526223
+    },
+    {
+      "label": "Compacted subsoil",
+      "connectivity_pct": 15,
+      "effective_w": 21.25,
+      "qs_probability": 0.05667275460976292
+    }
+  ],
+  "math_verification": {
+    "norm_cdf_0": 0.5,
+    "norm_cdf_3": 0.9986501019683699,
+    "unit_sphere_volume": 4.1887902047863905
+  }
+}

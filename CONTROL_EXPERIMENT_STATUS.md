@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
-**Date:** February 27, 2026
-**Status:** Phase 66 — 216 experiments, 5,251+ validation checks (1,783 GPU on RTX 4070, 60 NPU on AKD1000), all PASS (946 barracuda lib + 60 integration + 20 doc + 47 forge = 1,073+ Rust tests), ToadStool S68+ aligned (`e96576ee`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 92 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets + fuzz), V66 deep audit: byte-native FASTQ I/O, bytemuck nanopore bulk read, streaming APIs (mzML/MS2/FASTQ), safe env handling (`temp_env`), tolerance centralization, 0 unsafe code, `partial_cmp` → `total_cmp` migration complete (10 lib sites), Exp209 I/O parity (37/37), Exp212 CPU v12 (55/55), Exp213 dispatch evolution (49/49), Exp214 NUCLEUS V8 (49/49), Exp215 CPU vs GPU v5 (PENDING GPU), 39/39 three-tier, baseline manifest: 41/41 match 0 drift
+**Date:** February 28, 2026
+**Status:** Phase 73 — 229 experiments, 5,743+ validation checks (1,833+ GPU on RTX 4070, 60 NPU on AKD1000), all PASS (1,006 barracuda lib + 60 integration + 20 doc + 113 forge = 1,199+ Rust tests), ToadStool S68+ aligned (`e96576ee`, universal precision, 700 WGSL, ZERO f32-only), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 92 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets + fuzz), V73 deep debt reduction: `Result<_, (i64, String)>` → `RpcError` struct (protocol, dispatch, server, 7 bins), `Result<_, String>` → `error::Error::InvalidInput` (gbm, decision_tree, random_forest), `GemmCached` dimension casts → `TryFrom` with `Result` propagation (zero `expect`/`unwrap` in production), `Metrics` → `#[derive(Default)]`, 15 param struct Default impls annotated, hardcoded socket paths → named constants (server, songbird, nestgate), magic dispatch thresholds → named constants (gpu, feature_table_gpu), `dada2::denoise` decomposed → `init_partition` + `em_step`, `dispatch::handle_diversity` decomposed → 6 metric helpers, `gbm::predict_batch_proba` decomposed → `predict_single_proba`, `ipc/metrics` duration cast → saturating `try_into`, dispatch lattice_size → `usize::try_from`
 
 ---
 
@@ -224,7 +224,22 @@
 | 212 | BarraCuda CPU v12 — Post-Audit Math Fidelity | CPU/cross | PASS | 55 |
 | 213 | Compute Dispatch + Streaming Evolution (V66) | metalForge/dispatch | PASS | 49 |
 | 214 | NUCLEUS Mixed Hardware V8 — V66 I/O Evolution | IPC/NUCLEUS/cross | PASS | 49 |
-| 215 | CPU vs GPU v5 — V66 I/O Evolution Domains | GPU/cross | PENDING | ~40 |
+| 215 | CPU vs GPU v5 — V66 I/O Evolution Domains | GPU/cross | PASS | 40+ |
+| 216 | BarraCuda CPU v13 — 47-Domain Pure Rust Math Proof | CPU | PASS | 27+ |
+| 217 | Python vs Rust v2 — 47-Domain Timing Benchmark | benchmark | PASS | 25 |
+| 218 | BarraCuda GPU v5 — 42-Module Portability Proof | GPU | PASS | 20+ |
+| 219 | Pure GPU Streaming v3 — Unidirectional Pipeline | GPU/streaming | PASS | 30+ |
+| 220 | Cross-Substrate Dispatch Evolution (V67) | metalForge/dispatch | PASS | 28 |
+| 221 | Tower Atomic Wiring + Real Data Validation (V68) | metalForge/tower+data | PASS | 27 |
+| 222 | NUCLEUS Pipeline Integration (V69) | ipc/pipeline | PASS | 46 |
+| 223 | Cross-Spring Evolution V71 Complete Rewire | cross-spring/gpu | PASS | 46 |
+| 224 | Paper Math Control — 18 Papers Published Equations | cpu/papers | PASS | 58 |
+| 225 | BarraCuda CPU v14 — V71 Pure Rust Math (50 Domains) | cpu | PASS | 58 |
+| 226 | BarraCuda GPU v6 — V71 Precision-Flexible Portability | gpu | PASS | 28 |
+| 227 | Pure GPU Streaming v4 — Unidirectional Full Science | gpu/streaming | PASS | 24 |
+| 228 | metalForge v8 — Cross-System (GPU → NPU → CPU) | metalForge/ipc | PASS | 33 |
+| 222 | Full NUCLEUS Pipeline: Tower→Nest→Node (V69) | metalForge/nucleus | PASS | 46 |
+| 223 | Cross-Spring Evolution V71 Complete Rewire | GPU/cross-spring/precision | PASS | 46 |
 
 ---
 
@@ -232,7 +247,7 @@
 
 | Category | Count |
 |----------|-------|
-| Experiments completed | 213 (211 prior + Exp209 I/O parity + Exp212 CPU v12) |
+| Experiments completed | 225 (213 prior + Exp216-221 V66-V68 + Exp222 NUCLEUS + Exp223 cross-spring + Exp224-228 V72 three-tier) |
 | Experiments planned | 4 (Exp197-200, field genomics — MinION hardware) |
 | Experiments deferred | 2 (Exp201-202, AMR — MinION + wastewater samples) |
 | CPU validation checks | 1,531 |
@@ -270,15 +285,24 @@
 | metalForge v7 NUCLEUS checks | 74 (Exp208: 8 domains, mixed hardware) |
 | Post-audit I/O parity checks | 37 (Exp209: byte-native FASTQ, bytemuck nanopore, streaming MS2) |
 | Post-audit CPU math fidelity checks | 55 (Exp212: I/O→diversity, quality→derep, nanopore→calibration, e2e pipeline) |
-| **Total validation checks** | **5,153+** |
-| Rust tests | 1,103 (946 barracuda lib + 60 integration + 20 doc + 47 forge + V66 audit: 13 new tests) |
+| Tower wiring + real data checks | 27 (Exp221: Songbird parse, NestGate resolve, NCBI assembly, PFAS library, Tower inventory, data dispatch) |
+| NUCLEUS pipeline checks | 46 (Exp222: Nest protocol, NCBI acquisition, Vibrio/Campylobacterota compute, diversity, pipeline integration, workload catalog) |
+| Cross-spring evolution checks | 46 (Exp223: 5 springs + ToadStool hub provenance, neuralSpring primitives, BandwidthTier, DF64) |
+| Paper math control checks | 58 (Exp224: 18 papers × published equations, Python baseline parity) |
+| CPU v14 (V71) checks | 58 (Exp225: 50 domains + df64_host + cross-spring primitives) |
+| GPU v6 (V71) checks | 28 (Exp226: precision-flexible GEMM, DF64 roundtrip, BandwidthTier) |
+| Streaming v4 checks | 24 (Exp227: 7-stage unidirectional pipeline, GEMM→fusion→PCoA→DF64) |
+| metalForge v8 checks | 33 (Exp228: GPU→NPU→CPU routing, IPC dispatch, DF64 protocol) |
+| **Total validation checks** | **5,743+** |
+| Rust tests | 1,155+ (962 barracuda lib + 60 integration + 20 doc + 113 forge) |
 | BarraCuda CPU parity | 601/601 (v1-v12: 36+ domains, Exp206 IPC fidelity, Exp212 I/O evolution) |
 | BarraCuda GPU parity | 36+ domains (Exp064/087/092/101/207), IPC GPU-aware dispatch |
-| metalForge cross-system | 37+ domains CPU↔GPU proven (Exp103+104+165+182+208), **39/39 papers three-tier** |
+| metalForge cross-system | 37+ domains CPU↔GPU proven (Exp103+104+165+182+208+220+221+222), **50/50 papers three-tier** (39 base + 11 extension Exp144-156) |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
-| ToadStool primitives consumed | 79 (barracuda always-on, zero fallback — S68) |
-| ToadStool session alignment | S68 (660+ WGSL, cpu-math gate, PeakDetect, TransE, SpMM, NMF, ODE bio, ridge, Anderson, diversity_fusion) |
-| Cross-spring shader provenance | 35+ hotSpring, 22+ wetSpring, 14+ neuralSpring, 5+ airSpring, 500+ native |
+| ToadStool primitives consumed | 79 (barracuda always-on, zero fallback — S68+) |
+| ToadStool session alignment | S68+ (`e96576ee`) — 700 WGSL (ZERO f32-only), universal precision (F16/F32/F64/Df64), `compile_shader_universal` canonical, device-lost resilience, CPU feature-gate clean |
+| ToadStool precision | f64 canonical → downcast via `Precision` enum; `optimal_precision()` routes F64 (compute) or Df64 (consumer); `compile_op_shader` for abstract `op_add`/`op_mul` |
+| Cross-spring shader provenance | 35+ hotSpring, 22+ wetSpring, 14+ neuralSpring, 5+ airSpring, 600+ native |
 
 ---
 
@@ -431,7 +455,7 @@ barracuda_cpu                  → 380/380 checks PASS (25 domains + 6 ODE flat 
 barracuda_gpu                  → 1,783 GPU checks PASS (70 validators, RTX 4070 + Titan V)
 fuzz harnesses                 → 4 (FASTQ, mzML, MS2, XML)
 zero-copy I/O                  → FastqRefRecord, DecodeBuffer reuse, streaming iterators
-ToadStool alignment            → S68 (79 primitives, barracuda always-on, zero fallback code)
+ToadStool alignment            → S68+ (79 primitives, barracuda always-on, zero fallback code, 700 WGSL f64-canonical, universal precision)
 deprecated APIs                → 0 (parse_fastq → FastqIter::open in all binaries)
 ```
 
@@ -479,7 +503,7 @@ substrate-independence: for every GPU-eligible algorithm, the metalForge
 router can dispatch to CPU or GPU and get the same answer. This is the
 foundation for CPU/GPU/NPU routing in production.
 
-## ToadStool Evolution (Feb 24, 2026 — S62 Aligned)
+## ToadStool Evolution (Feb 28, 2026 — S68+ Aligned)
 
 ### Write → Absorb → Lean Status
 
@@ -487,12 +511,33 @@ Following hotSpring's pattern for ToadStool integration:
 
 | Phase | Count | Status |
 |-------|:-----:|--------|
-| **Lean** (consumed upstream) | 79 primitives (always-on, zero fallback code) | S68: hill, monod, fit_linear, mean, percentile, shannon_from_frequencies added to 66+2+5 prior; V52 S66 rewire, V51 GPU validation (1,783 checks) |
+| **Lean** (consumed upstream) | 79 primitives (always-on, zero fallback code) | S68+: 700 WGSL (ZERO f32-only), universal precision (F16/F32/F64/Df64), `compile_shader_universal` canonical, device-lost resilience, CPU feature-gate clean |
 | **Write** (local WGSL, pending absorption) | **0** — all retired | ODE shaders use `generate_shader()`; local WGSL deleted |
 | **CPU math** (`crate::special`) | 3 functions delegating on GPU | `erf`, `ln_gamma`, `regularized_gamma_lower` → `barracuda::special::*` when `gpu` active; sovereign fallback for no-GPU |
 | **CPU-only** (no GPU path) | 1 module (phred) | Pure GPU promotion complete (Exp101) |
 | **Removed** (leaning upstream) | NMF (482 lines), ODE systems (715 lines), Anderson builder (~115 lines), ridge (~100 lines) | ~1,312 lines deleted in V30 lean |
+| **Passthrough** | 1 module (`reconciliation_gpu`) | CPU dispatch, pending `BatchReconcileGpu` upstream |
 | **metalForge** (absorption eng.) | 56 tolerances, SoA patterns, `#[repr(C)]` | Shaping all modules for ToadStool absorption |
+
+### S66-S68+ Precision Evolution (Feb 25-28, 2026)
+
+ToadStool S66-S68+ delivered universal precision — a single f64-canonical shader
+compiles to any target precision via `compile_shader_universal(source, precision)`:
+
+| Milestone | Commit | Impact |
+|-----------|--------|--------|
+| S66: `compile_shader_df64` + universal DF64 math | `045103a7` | DF64 pathway opens for consumer GPUs |
+| S67: Universal precision architecture | `6b4082f7` | `Precision` enum (F16/F32/F64/Df64), "math is universal, precision is silicon" |
+| S68 Waves 1-11: ALL f32→f64 canonical | `b4f06a9d`..`423650ce` | 497 f32 shaders evolved; ZERO f32-only remain |
+| S68: Dual-layer precision (op_preamble + naga IR) | `686b3c22` | Abstract `op_add`/`op_mul` + compile-time rewrite |
+| S68: DF64 universal pipeline | `a72f87db` | `downcast_f64_to_df64()` completes F16/F32/F64/Df64 matrix |
+| S68+: CPU feature-gate fix | `89356efa` | No regression when `gpu` feature inactive |
+| S68+: GPU device-lost resilience | `e96576ee` | `is_lost()` for standalone testing; consumed via `GpuF64::is_lost()` |
+
+wetSpring impact: all 6 GPU bio ODE modules + `GemmCached` use `compile_shader_universal`
+at `Precision::F64`. DF64 promotion available but requires host buffer protocol
+adaptation (`vec2<f32>` storage instead of raw f64). `GpuF64::optimal_precision()`
+already routes per hardware (F64 for compute-class, Df64 for consumer).
 
 ### Feb 22 Rewire: 8 Bio Primitives Absorbed
 
@@ -508,21 +553,23 @@ warnings. Two ToadStool bugs found and fixed during validation:
    ToadStool's RTX 4070 Ada Lovelace detection and f64 exp/log polyfill. Fixed to
    use `WgpuDevice::from_existing()` with real `AdapterInfo`.
 
-### Cross-Spring Evolution (S62)
+### Cross-Spring Evolution (S68+)
 
-ToadStool `barracuda` is the convergence hub for all springs (660+ WGSL shaders):
+ToadStool `barracuda` is the convergence hub for all springs (700 WGSL shaders, all f64-canonical):
 
 | Spring | Contribution | Key Primitives |
 |--------|-------------|-----------|
-| **hotSpring** | Precision shaders (`df64_core.wgsl`, `Fp64Strategy`), lattice QCD, spectral theory | CG solver, Lanczos, Anderson, Hofstadter, Hermite/Laguerre, ESN reservoir |
+| **hotSpring** | Precision shaders (`df64_core.wgsl`, `Fp64Strategy`), lattice QCD, spectral theory | CG solver, Lanczos, Anderson, Hofstadter, Hermite/Laguerre, ESN reservoir, Sovereign compiler |
 | **wetSpring** | Bio ODE systems, NMF, genomics shaders, math_f64, PeakDetect, TransE | NMF (S58), 5 ODE bio (S58), ridge (S59), Anderson (S59), PeakDetect (S62), TransE (S60), erf/ln_gamma/trapz (always-on) |
 | **neuralSpring** | Graph theory, ML inference, eigensolvers, TensorSession | graph_laplacian, effective_rank, numerical_hessian, belief_propagation, boltzmann_sampling, ValidationHarness |
 | **airSpring** | IoT, precision agriculture | Richards PDE, moving_window, Kriging, pow_f64/acos fixes |
+| **groundSpring** | Population genetics, bootstrap | bootstrap (rawr_mean), batched multinomial |
 
 Cross-spring benefits measured: upstream ODE integrators are **10-43% faster** than
 local (ToadStool optimizes across all springs' usage). hotSpring's `Fp64Strategy`
 gives wetSpring f64 on all GPUs. neuralSpring's graph primitives enable wetSpring
-community network analysis. 12 provenance tags track origins across springs.
+community network analysis. S68+ universal precision means all springs benefit
+from f64-canonical authoring with automatic downcast to target hardware.
 
 ### Streaming & Dispatch Validation (Feb 22, 2026)
 
@@ -598,9 +645,11 @@ Bugs found and fixed: SNP binding layout (ToadStool), AdapterInfo propagation (w
 
 | Document | Location | Purpose |
 |----------|----------|---------|
-| **V33 — CPU-math lean (barracuda always-on)** | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V33_CPUMATH_LEAN_FEB25_2026.md` | Phase 41, zero fallback code, ~177 lines dual-path removed |
+| **V72 — Three-Tier Buildout (Paper→CPU→GPU→Stream→metalForge)** | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V70_S68_PRECISION_EVOLUTION_FEB28_2026.md` | Phase 72, Exp224-228 (201 new checks), 18-paper math control, CPU v14 50-domain, GPU v6 precision-flexible, streaming v4 7-stage, metalForge v8 cross-system |
+| V61 — Barracuda Evolution | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V61_BARRACUDA_EVOLUTION_FEB27_2026.md` | Phase 69, 79 primitives, absorption candidates |
+| V33 — CPU-math lean (barracuda always-on) | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V33_CPUMATH_LEAN_FEB25_2026.md` | Phase 41, zero fallback code, ~177 lines dual-path removed |
 | V32 — S62 lean: PeakDetect, TransE | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V32_S62_LEAN_FEB24_2026.md` | Phase 41, S62 lean, paper queue fully GPU-covered |
 | V31 — Absorption targets | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V31_ABSORPTION_TARGETS_FEB24_2026.md` | Phase 41, absorption targets, cross-spring insights |
 | V30 — S59 lean: NMF, ridge, ODE, Anderson | `wateringHole/handoffs/WETSPRING_TOADSTOOL_V30_S59_LEAN_FEB24_2026.md` | Phase 41, S59 lean, ~1,312 lines removed, 42 primitives |
-| Shader evolution | `wateringHole/CROSS_SPRING_SHADER_EVOLUTION.md` | 660+ WGSL shader provenance (cross-spring, S62) |
+| Shader evolution | `wateringHole/CROSS_SPRING_SHADER_EVOLUTION.md` | 700 WGSL shader provenance (cross-spring, S68+) |
 | Archive | `wateringHole/handoffs/archive/` | V7-V29 (fossil record) |
