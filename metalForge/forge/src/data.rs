@@ -4,10 +4,10 @@
 //!
 //! Provides a three-tier data path resolution strategy:
 //! 1. **Environment**: `WETSPRING_DATA_DIR` (explicit local path)
-//! 2. **NestGate IPC**: Query NestGate for cached/stored datasets
+//! 2. **`NestGate` IPC**: Query `NestGate` for cached/stored datasets
 //! 3. **Synthetic fallback**: Use generated test data when real data unavailable
 //!
-//! This wires the Nest atomic (Tower + NestGate) into metalForge so validation
+//! This wires the Nest atomic (Tower + `NestGate`) into metalForge so validation
 //! binaries can discover real data at runtime without hardcoded paths.
 
 use std::io::{BufRead, BufReader, Write};
@@ -24,7 +24,7 @@ const NESTGATE_TIMEOUT: Duration = Duration::from_secs(5);
 pub enum DataSource {
     /// Resolved from a local directory via environment variable.
     LocalDir(PathBuf),
-    /// Resolved from NestGate IPC cache.
+    /// Resolved from `NestGate` IPC cache.
     NestGate,
     /// No real data available — using synthetic fallback.
     Synthetic,
@@ -45,7 +45,7 @@ pub struct DataResolution {
 ///
 /// Resolution order:
 /// 1. `WETSPRING_DATA_DIR/<dataset>` (env var path)
-/// 2. NestGate IPC `storage.exists` / `storage.retrieve`
+/// 2. `NestGate` IPC `storage.exists` / `storage.retrieve`
 /// 3. Synthetic fallback
 #[must_use]
 pub fn resolve_dataset(dataset: &str) -> DataResolution {
@@ -127,12 +127,12 @@ fn env_data_dir() -> Option<PathBuf> {
     workspace.filter(|p| p.is_dir())
 }
 
-/// Discover the NestGate Unix socket (delegates to [`nest::discover_nestgate_socket`]).
+/// Discover the `NestGate` Unix socket (delegates to [`nest::discover_nestgate_socket`]).
 fn discover_nestgate_socket() -> Option<PathBuf> {
     nest::discover_nestgate_socket()
 }
 
-/// Check if NestGate has a dataset cached.
+/// Check if `NestGate` has a dataset cached.
 fn nestgate_has_dataset(socket: &Path, key: &str) -> bool {
     let escaped_key = key.replace('\\', "\\\\").replace('"', "\\\"");
     let request = format!(
@@ -143,12 +143,11 @@ fn nestgate_has_dataset(socket: &Path, key: &str) -> bool {
         .unwrap_or(false)
 }
 
-/// Send a JSON-RPC request to NestGate.
+/// Send a JSON-RPC request to `NestGate`.
 fn nestgate_rpc(socket: &Path, request: &str) -> Result<String, String> {
     let addr = std::os::unix::net::SocketAddr::from_pathname(socket)
         .map_err(|e| format!("invalid NestGate socket: {e}"))?;
-    let stream =
-        UnixStream::connect_addr(&addr).map_err(|e| format!("NestGate connect: {e}"))?;
+    let stream = UnixStream::connect_addr(&addr).map_err(|e| format!("NestGate connect: {e}"))?;
     stream
         .set_read_timeout(Some(NESTGATE_TIMEOUT))
         .map_err(|e| format!("timeout: {e}"))?;
@@ -160,9 +159,7 @@ fn nestgate_rpc(socket: &Path, request: &str) -> Result<String, String> {
     writer
         .write_all(request.as_bytes())
         .map_err(|e| format!("write: {e}"))?;
-    writer
-        .write_all(b"\n")
-        .map_err(|e| format!("write: {e}"))?;
+    writer.write_all(b"\n").map_err(|e| format!("write: {e}"))?;
     writer.flush().map_err(|e| format!("flush: {e}"))?;
 
     let mut reader = BufReader::new(&stream);

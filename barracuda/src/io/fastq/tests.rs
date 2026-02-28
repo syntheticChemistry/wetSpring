@@ -527,14 +527,16 @@ fn for_each_record_stops_on_empty_line() {
 
 #[test]
 fn for_each_record_nonexistent_file() {
-    let result = for_each_record(std::path::Path::new("/tmp/__nonexistent__.fastq"), |_| {
-        Ok(())
-    });
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("__nonexistent__.fastq");
+    let result = for_each_record(&path, |_| Ok(()));
     assert!(result.is_err());
 }
 
 #[test]
 fn fastq_iter_nonexistent_file() {
-    let result = super::FastqIter::open(std::path::Path::new("/tmp/__nonexistent__.fastq"));
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("__nonexistent__.fastq");
+    let result = super::FastqIter::open(&path);
     assert!(result.is_err());
 }

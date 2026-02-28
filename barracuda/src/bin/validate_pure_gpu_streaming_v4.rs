@@ -12,7 +12,7 @@
 //! # Exp227: Pure GPU Streaming v4 — Unidirectional Full Science Pipeline
 //!
 //! Extends v3 with V71 additions: precision-flexible GEMM, DF64 host-side
-//! pack/unpack, DiversityFusion, and end-to-end timing comparison of
+//! pack/unpack, `DiversityFusion`, and end-to-end timing comparison of
 //! streaming vs individual dispatch. Demonstrates `ToadStool`'s
 //! unidirectional streaming architecture: multiple GPU stages chained
 //! with zero CPU compute round-trips.
@@ -52,7 +52,8 @@ use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
 async fn main() {
-    let mut v = Validator::new("Exp227: Pure GPU Streaming v4 — Unidirectional Full Science Pipeline");
+    let mut v =
+        Validator::new("Exp227: Pure GPU Streaming v4 — Unidirectional Full Science Pipeline");
 
     let gpu = match GpuF64::new().await {
         Ok(g) => g,
@@ -115,7 +116,10 @@ async fn main() {
     let cpu_div_us = t0.elapsed().as_micros() as f64;
 
     let t1 = Instant::now();
-    let gpu_shannons: Vec<f64> = samples.iter().map(|c| session.shannon(c).unwrap()).collect();
+    let gpu_shannons: Vec<f64> = samples
+        .iter()
+        .map(|c| session.shannon(c).unwrap())
+        .collect();
     let gpu_bc = session.bray_curtis_matrix(&sample_refs).unwrap();
     let gpu_div_us = t1.elapsed().as_micros() as f64;
 
@@ -141,11 +145,18 @@ async fn main() {
 
     let fusion_gpu = DiversityFusionGpu::new(Arc::clone(&device)).expect("DiversityFusionGpu");
     let t1 = Instant::now();
-    let gpu_fuse = fusion_gpu.compute(&flat, n_fuse_samples, n_species).expect("fusion");
+    let gpu_fuse = fusion_gpu
+        .compute(&flat, n_fuse_samples, n_species)
+        .expect("fusion");
     let gpu_fuse_us = t1.elapsed().as_micros() as f64;
 
     for (i, (c, g)) in cpu_fuse.iter().zip(&gpu_fuse).enumerate() {
-        v.check(&format!("Fusion Shannon[{i}]"), g.shannon, c.shannon, tolerances::GPU_VS_CPU_F64);
+        v.check(
+            &format!("Fusion Shannon[{i}]"),
+            g.shannon,
+            c.shannon,
+            tolerances::GPU_VS_CPU_F64,
+        );
     }
     timings.push(("DiversityFusion", cpu_fuse_us, gpu_fuse_us));
 
@@ -154,15 +165,21 @@ async fn main() {
     let m = 256;
     let k = 128;
     let n = 256;
-    let a_mat: Vec<f64> = (0..m * k).map(|i| ((i * 7 + 3) % 100) as f64 / 100.0).collect();
-    let b_mat: Vec<f64> = (0..k * n).map(|i| ((i * 11 + 5) % 100) as f64 / 100.0).collect();
+    let a_mat: Vec<f64> = (0..m * k)
+        .map(|i| ((i * 7 + 3) % 100) as f64 / 100.0)
+        .collect();
+    let b_mat: Vec<f64> = (0..k * n)
+        .map(|i| ((i * 11 + 5) % 100) as f64 / 100.0)
+        .collect();
 
     let t0 = Instant::now();
     let mut cpu_c = vec![0.0_f64; m * n];
     for r in 0..m {
         for c in 0..n {
             let mut sum = 0.0;
-            for j in 0..k { sum += a_mat[r * k + j] * b_mat[j * n + c]; }
+            for j in 0..k {
+                sum += a_mat[r * k + j] * b_mat[j * n + c];
+            }
             cpu_c[r * n + c] = sum;
         }
     }
@@ -173,10 +190,27 @@ async fn main() {
     let gpu_c = gemm.execute(&a_mat, &b_mat, m, k, n, 1).expect("GEMM");
     let gpu_gemm_us = t1.elapsed().as_micros() as f64;
 
-    v.check("GEMM C[0,0]", gpu_c[0], cpu_c[0], tolerances::GPU_VS_CPU_F64);
-    v.check("GEMM C[m-1,n-1]", gpu_c[m * n - 1], cpu_c[m * n - 1], tolerances::GPU_VS_CPU_F64);
-    let max_err = cpu_c.iter().zip(&gpu_c).map(|(a, b)| (a - b).abs()).fold(0.0_f64, f64::max);
-    v.check_pass("GEMM max error < 1e-5", max_err < 1e-5);
+    v.check(
+        "GEMM C[0,0]",
+        gpu_c[0],
+        cpu_c[0],
+        tolerances::GPU_VS_CPU_F64,
+    );
+    v.check(
+        "GEMM C[m-1,n-1]",
+        gpu_c[m * n - 1],
+        cpu_c[m * n - 1],
+        tolerances::GPU_VS_CPU_F64,
+    );
+    let max_err = cpu_c
+        .iter()
+        .zip(&gpu_c)
+        .map(|(a, b)| (a - b).abs())
+        .fold(0.0_f64, f64::max);
+    v.check_pass(
+        "GEMM max error < 1e-5",
+        max_err < tolerances::GEMM_GPU_MAX_ERR,
+    );
     timings.push(("GEMM 256×128×256", cpu_gemm_us, gpu_gemm_us));
 
     // ═══ Stage 5: PCoA from Streaming BC ═══════════════════════════════
@@ -191,7 +225,10 @@ async fn main() {
     let gpu_pcoa_us = t1.elapsed().as_micros() as f64;
 
     v.check_count("PCoA samples", gpu_pcoa.n_samples, cpu_pcoa.n_samples);
-    v.check_pass("PCoA coords finite", gpu_pcoa.coordinates.iter().all(|c| c.is_finite()));
+    v.check_pass(
+        "PCoA coords finite",
+        gpu_pcoa.coordinates.iter().all(|c| c.is_finite()),
+    );
     timings.push(("PCoA", cpu_pcoa_us, gpu_pcoa_us));
 
     // ═══ Stage 6: Spectral Cosine ══════════════════════════════════════
@@ -202,7 +239,10 @@ async fn main() {
         vec![10.0, 20.0, 500.0, 30.0, 15.0],
     ];
     let gpu_cos = spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).unwrap();
-    v.check_pass("Self-cosine ≈ 1", (gpu_cos[0] - 1.0).abs() < tolerances::GPU_VS_CPU_F64);
+    v.check_pass(
+        "Self-cosine ≈ 1",
+        (gpu_cos[0] - 1.0).abs() < tolerances::GPU_VS_CPU_F64,
+    );
     timings.push(("Spectral Cosine", 0.0, 0.0));
 
     // ═══ Stage 7: DF64 Pack/Unpack on Streaming Data ══════════════════
@@ -210,39 +250,61 @@ async fn main() {
     let gemm_slice = &gpu_c[..10];
     let packed = df64_host::pack_slice(gemm_slice);
     let unpacked = df64_host::unpack_slice(&packed);
-    let df64_max_err = gemm_slice.iter().zip(&unpacked)
+    let df64_max_err = gemm_slice
+        .iter()
+        .zip(&unpacked)
         .map(|(a, b)| (a - b).abs())
         .fold(0.0_f64, f64::max);
-    v.check_pass("DF64 roundtrip < 1e-13", df64_max_err < 1e-13);
+    v.check_pass(
+        "DF64 roundtrip < 1e-13",
+        df64_max_err < tolerances::DF64_ROUNDTRIP,
+    );
 
-    let f32_err: f64 = gemm_slice.iter()
+    let f32_err: f64 = gemm_slice
+        .iter()
         .map(|&x| (x - f64::from(x as f32)).abs())
         .fold(0.0_f64, f64::max);
-    v.check_pass("DF64 beats f32 precision", df64_max_err < f32_err || f32_err == 0.0);
+    v.check_pass(
+        "DF64 beats f32 precision",
+        df64_max_err < f32_err || f32_err == 0.0,
+    );
     println!("  DF64 max err: {df64_max_err:.2e}, f32 max err: {f32_err:.2e}");
 
     // ═══ Streaming vs Dispatch Benchmark ═══════════════════════════════
     v.section("Streaming vs Individual Dispatch");
 
     let warmup_reads = synthetic_reads(200, 150);
-    let warmup_samples: Vec<Vec<f64>> = (0..3).map(|k| (1..=50).map(|i| f64::from((i * (k + 1)) % 20 + 1)).collect()).collect();
+    let warmup_samples: Vec<Vec<f64>> = (0..3)
+        .map(|k| {
+            (1..=50)
+                .map(|i| f64::from((i * (k + 1)) % 20 + 1))
+                .collect()
+        })
+        .collect();
     let warmup_refs: Vec<&[f64]> = warmup_samples.iter().map(Vec::as_slice).collect();
 
     let t_stream = Instant::now();
     let _f = session.filter_reads(&warmup_reads, &qparams);
-    for s in &warmup_samples { let _ = session.shannon(s); }
+    for s in &warmup_samples {
+        let _ = session.shannon(s);
+    }
     let _ = session.bray_curtis_matrix(&warmup_refs);
     let stream_ms = t_stream.elapsed().as_secs_f64() * 1000.0;
 
     let t_individual = Instant::now();
     let _ = quality::filter_reads(&warmup_reads, &qparams);
-    for s in &warmup_samples { let _ = diversity::shannon(s); }
+    for s in &warmup_samples {
+        let _ = diversity::shannon(s);
+    }
     let _ = diversity::bray_curtis_condensed(&warmup_samples);
     let individual_ms = t_individual.elapsed().as_secs_f64() * 1000.0;
 
     println!("  Streaming:  {stream_ms:.3} ms (GPU session, pre-warmed)");
     println!("  Individual: {individual_ms:.3} ms (CPU)");
-    v.check_pass("both pipelines completed", stream_ms > 0.0 && individual_ms > 0.0);
+    v.check_pass(
+        "both pipelines completed",
+        stream_ms > 0.0 && individual_ms > 0.0,
+    );
 
     // ═══ Summary ═══════════════════════════════════════════════════════
     v.section("Streaming v4 Summary");
@@ -269,7 +331,7 @@ fn synthetic_reads(count: usize, read_len: usize) -> Vec<FastqRecord> {
     let bases = b"ATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGC";
     let seq = &bases[..read_len.min(bases.len())];
     (0..count)
-        .map(|i|         FastqRecord {
+        .map(|i| FastqRecord {
             id: format!("@read_{i}"),
             sequence: seq.to_vec(),
             quality: vec![35_u8; seq.len()],

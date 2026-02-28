@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 28, 2026
-**Status:** Phase 73 — 229 experiments, 5,743+ validation checks (1,833+ GPU on RTX 4070, 60 NPU on AKD1000), all PASS (1,006 barracuda lib + 60 integration + 20 doc + 113 forge = 1,199+ Rust tests), ToadStool S68+ aligned (`e96576ee`, universal precision, 700 WGSL, ZERO f32-only), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 92 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (lib + all targets + fuzz), V73 deep debt reduction: `Result<_, (i64, String)>` → `RpcError` struct (protocol, dispatch, server, 7 bins), `Result<_, String>` → `error::Error::InvalidInput` (gbm, decision_tree, random_forest), `GemmCached` dimension casts → `TryFrom` with `Result` propagation (zero `expect`/`unwrap` in production), `Metrics` → `#[derive(Default)]`, 15 param struct Default impls annotated, hardcoded socket paths → named constants (server, songbird, nestgate), magic dispatch thresholds → named constants (gpu, feature_table_gpu), `dada2::denoise` decomposed → `init_partition` + `em_step`, `dispatch::handle_diversity` decomposed → 6 metric helpers, `gbm::predict_batch_proba` decomposed → `predict_single_proba`, `ipc/metrics` duration cast → saturating `try_into`, dispatch lattice_size → `usize::try_from`
+**Status:** Phase 75 — 229 experiments, 5,743+ validation checks (1,833+ GPU on RTX 4070, 60 NPU on AKD1000), all PASS (955 barracuda lib + 60 integration + 20 doc + 113 forge = 1,148 Rust tests), ToadStool S68+ aligned (`e96576ee`, universal precision, 700 WGSL, ZERO f32-only), 82 primitives consumed (was 79: +`ComputeDispatch`, +`BatchedMultinomialGpu`, +`PairwiseL2Gpu`), 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances (split: `bio.rs` + `instrument.rs` + `gpu.rs` + `spectral.rs`), 0 ad-hoc magic numbers, clippy pedantic CLEAN (both crates, all targets), 95.86% line coverage, V75 ToadStool rewire: 6 GPU modules refactored from manual BGL to `ComputeDispatch` builder (gemm\_cached, bistable, capacitor, cooperation, multi\_signal, phage\_defense), rarefaction\_gpu evolved to `BatchedMultinomialGpu`+`DiversityFusionGpu`, new `pairwise_l2_gpu` and `fst_variance` modules adopted from ToadStool, all tests green
 
 ---
 
@@ -294,7 +294,7 @@
 | Streaming v4 checks | 24 (Exp227: 7-stage unidirectional pipeline, GEMM→fusion→PCoA→DF64) |
 | metalForge v8 checks | 33 (Exp228: GPU→NPU→CPU routing, IPC dispatch, DF64 protocol) |
 | **Total validation checks** | **5,743+** |
-| Rust tests | 1,155+ (962 barracuda lib + 60 integration + 20 doc + 113 forge) |
+| Rust tests | 1,148+ (955 barracuda lib + 60 integration + 20 doc + 113 forge) |
 | BarraCuda CPU parity | 601/601 (v1-v12: 36+ domains, Exp206 IPC fidelity, Exp212 I/O evolution) |
 | BarraCuda GPU parity | 36+ domains (Exp064/087/092/101/207), IPC GPU-aware dispatch |
 | metalForge cross-system | 37+ domains CPU↔GPU proven (Exp103+104+165+182+208+220+221+222), **50/50 papers three-tier** (39 base + 11 extension Exp144-156) |
@@ -425,39 +425,57 @@ matching. Exp008 adds sovereign ML for environmental monitoring.
 
 ---
 
-## Code Quality (Feb 27, 2026 — V66 post-audit)
+## Code Quality (Feb 28, 2026 — V74 deep debt + evolution audit)
 
 ```
 cargo fmt --check              → clean (0 diffs, both crates)
-cargo clippy --pedantic        → 0 warnings (pedantic + nursery, default features)
-cargo clippy --features gpu    → 0 warnings (pedantic + nursery, GPU features)
-cargo doc --features gpu       → clean (0 warnings, strict: -D missing_docs -D broken_intra_doc_links)
-cargo test --lib               → 946 passed, 0 failed, 1 ignored (hardware-dependent)
+cargo clippy --pedantic        → 0 warnings (pedantic, default features, both crates)
+cargo clippy --features gpu    → 0 warnings (pedantic, GPU features)
+cargo doc --all-features       → clean (0 warnings, both crates)
+cargo test --lib               → 955 passed, 0 failed, 1 ignored (hardware-dependent)
 cargo test --tests             → 60 integration (23 bio + 16 determinism + 21 I/O)
 cargo test --doc               → 20 passed, 0 failed (5 API examples)
-cargo llvm-cov --lib           → 95.77% line / 93.86% fn / 95.33% branch (↑ from 95.46/93.54/94.99)
+metalForge cargo test          → 113 passed, 0 failed
+cargo llvm-cov --lib           → 95.86% line / 94.02% region / 95.40% fn (↑ from 95.77/93.86/95.33)
 #![deny(unsafe_code)]          → enforced crate-wide (edition 2024; env-var tests use Mutex-serialized helpers)
 #![deny(expect_used, unwrap_used)] → enforced crate-wide (test modules #[allow])
+#![forbid(unsafe_code)]        → enforced in metalForge forge crate
 partial_cmp().unwrap()         → 0 (all migrated to f64::total_cmp)
-inline tolerance literals      → 0 (92 named constants in tolerances.rs; V61 added 6: nanopore signal/calibration/basecall/int8/diversity/stats)
+inline tolerance literals      → 0 (97 named constants in tolerances/{mod,bio,instrument,gpu,spectral}.rs)
 blanket similar_names          → removed; targeted #[allow] per-function where domain-appropriate
 GPU workgroup sizes            → named constants in all *_gpu.rs (match WGSL shaders)
 shared math (crate::special)   → delegates to barracuda::special when gpu active; sovereign otherwise
+duplicate math                 → 0 (manual mean/variance → barracuda::stats in node.rs, nanopore, derep)
 hardware detection             → injectable (from_content / parse_*), no direct /proc in library
-SPDX headers                   → all .rs files
-max file size                  → all under 1000 LOC (fastq.rs: 913 largest)
+SPDX headers                   → all .rs files (AGPL-3.0-or-later)
+max file size                  → all under 1000 LOC (largest: validate_cross_spring_s57.rs at 924)
 external C dependencies        → 0 (flate2 rust_backend; wgpu default-features = false)
 XML parser allocations         → Cow<str> for xml_unescape; 1 allocation per text event (was 2)
-provenance headers             → all 163 binaries (commit, command, hardware)
-duplicate math                 → 0 (crate::special delegates to ToadStool barracuda::special when gpu enabled)
-Python baselines               → scripts/requirements.txt (pinned numpy, scipy, sklearn)
-barracuda_cpu                  → 380/380 checks PASS (25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted)
-barracuda_gpu                  → 1,783 GPU checks PASS (70 validators, RTX 4070 + Titan V)
+provenance headers             → all validation binaries (commit, command, hardware, Python script)
+Python baselines               → scripts/requirements.txt (pinned numpy, scipy, sklearn, pandas, dendropy)
+barracuda_cpu                  → 380/380+ checks PASS (50+ domains, Exp206 IPC, Exp212 I/O, Exp225 V71)
+barracuda_gpu                  → 1,783+ GPU checks PASS (70+ validators, RTX 4070 + Titan V)
 fuzz harnesses                 → 4 (FASTQ, mzML, MS2, XML)
 zero-copy I/O                  → FastqRefRecord, DecodeBuffer reuse, streaming iterators
+hardcoded paths                → 0 in tests (all tempfile::tempdir), env vars for config
+GPU passthroughs               → 0 (chimera_gpu, derep_gpu, reconciliation_gpu evolved to real GPU ops)
 ToadStool alignment            → S68+ (79 primitives, barracuda always-on, zero fallback code, 700 WGSL f64-canonical, universal precision)
 deprecated APIs                → 0 (parse_fastq → FastqIter::open in all binaries)
+module refactoring             → tolerances split (mod→bio+instrument), workloads→provenance, dispatch→handlers, esn→npu, quality→trim
 ```
+
+### V74 Deep Audit Changes
+
+- `cargo fmt` + `cargo clippy --pedantic` clean across both crates (was failing)
+- 25 ad-hoc tolerance literals → named constants (5 new: `SOIL_RECOVERY_W_TOL`, `DF64_ROUNDTRIP`, `GC_GENUS_DIVERSITY_MIN`, `TRAPZ_101`, `GEMM_GPU_MAX_ERR`)
+- 15 manual mean/variance → `barracuda::stats::mean`/`variance`/`std_dev`
+- 20+ `/tmp/` hardcoded test paths → `tempfile::tempdir()`
+- 5 validation binaries got full provenance (paper_math_control, diversity, nanopore, cpu_v14, science_pipeline)
+- 5 large files refactored (tolerances, workloads, dispatch, ESN, quality)
+- 3 GPU passthroughs evolved to real implementations (chimera, derep, reconciliation)
+- `requirements.txt` completed (pandas, dendropy, external tool documentation)
+- 58 clippy errors fixed in metalForge (doc markdown, `# Errors` sections)
+- All doc `[x,y]` bracket escaping fixed (rustdoc intra-doc links)
 
 ## BarraCuda CPU Parity
 

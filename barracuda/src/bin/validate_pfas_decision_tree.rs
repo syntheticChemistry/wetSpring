@@ -189,7 +189,7 @@ fn main() {
         "Rust accuracy matches Python",
         rust_accuracy,
         data.expected_accuracy,
-        tolerances::ML_PREDICTION,
+        tolerances::ML_F1_SCORE,
     );
     v.check(
         "Rust F1 matches Python",

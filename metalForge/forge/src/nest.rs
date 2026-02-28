@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Nest atomic storage client — JSON-RPC over Unix socket to NestGate.
+//! Nest atomic storage client — JSON-RPC over Unix socket to `NestGate`.
 //!
-//! Provides a typed client for NestGate's storage API using the biomeOS
+//! Provides a typed client for `NestGate`'s storage API using the biomeOS
 //! JSON-RPC 2.0 protocol. Supports both structured JSON storage and
 //! binary blob storage (base64-encoded).
 //!
 //! # Socket Discovery
 //!
-//! NestGate socket is discovered in order:
+//! `NestGate` socket is discovered in order:
 //! 1. `NESTGATE_SOCKET` environment variable
 //! 2. `$XDG_RUNTIME_DIR/biomeos/nestgate-default.sock`
 //! 3. `/tmp/nestgate-default.sock`
 //!
 //! # NUCLEUS Role
 //!
-//! Nest = Tower + NestGate + Squirrel. This module implements the NestGate
+//! Nest = Tower + `NestGate` + Squirrel. This module implements the `NestGate`
 //! storage interface that validation binaries and pipelines use to persist
 //! and retrieve datasets without hardcoded paths.
 
@@ -27,10 +27,10 @@ use std::time::Duration;
 const NESTGATE_TIMEOUT: Duration = Duration::from_secs(5);
 const DEFAULT_FAMILY: &str = "default";
 
-/// NestGate storage client.
+/// `NestGate` storage client.
 ///
 /// Wraps a Unix socket path and provides typed methods for all
-/// NestGate storage operations.
+/// `NestGate` storage operations.
 #[derive(Debug, Clone)]
 pub struct NestClient {
     socket: PathBuf,
@@ -65,9 +65,9 @@ pub struct RetrieveResult {
 }
 
 impl NestClient {
-    /// Create a client for a discovered NestGate socket.
+    /// Create a client for a discovered `NestGate` socket.
     ///
-    /// Returns `None` if no NestGate socket is found.
+    /// Returns `None` if no `NestGate` socket is found.
     #[must_use]
     pub fn discover() -> Option<Self> {
         discover_nestgate_socket().map(|socket| Self {
@@ -98,7 +98,12 @@ impl NestClient {
         &self.socket
     }
 
-    /// Check if a key exists in NestGate storage.
+    /// Check if a key exists in `NestGate` storage.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the socket is invalid, connection fails, or the RPC
+    /// response cannot be read.
     pub fn exists(&self, key: &str) -> Result<bool, String> {
         let escaped = escape_json_str(key);
         let family = escape_json_str(&self.family_id);
@@ -110,6 +115,11 @@ impl NestClient {
     }
 
     /// Store a JSON value by key.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the socket is invalid, connection fails, or the RPC
+    /// response cannot be read.
     pub fn store(&self, key: &str, value: &str) -> Result<StoreResult, String> {
         let escaped_key = escape_json_str(key);
         let family = escape_json_str(&self.family_id);
@@ -124,6 +134,11 @@ impl NestClient {
     }
 
     /// Store a binary blob (base64-encoded) by key.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the socket is invalid, connection fails, or the RPC
+    /// response cannot be read.
     pub fn store_blob(&self, key: &str, data: &[u8]) -> Result<StoreResult, String> {
         let escaped_key = escape_json_str(key);
         let family = escape_json_str(&self.family_id);
@@ -139,6 +154,11 @@ impl NestClient {
     }
 
     /// Retrieve a JSON value by key.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the socket is invalid, connection fails, or the RPC
+    /// response cannot be read.
     pub fn retrieve(&self, key: &str) -> Result<RetrieveResult, String> {
         let escaped_key = escape_json_str(key);
         let family = escape_json_str(&self.family_id);
@@ -151,6 +171,11 @@ impl NestClient {
     }
 
     /// Retrieve a binary blob by key.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the socket is invalid, connection fails, or the RPC
+    /// response cannot be read.
     pub fn retrieve_blob(&self, key: &str) -> Result<Option<Vec<u8>>, String> {
         let escaped_key = escape_json_str(key);
         let family = escape_json_str(&self.family_id);
@@ -161,12 +186,17 @@ impl NestClient {
         if raw.contains("\"error\"") {
             return Ok(None);
         }
-        let b64 = extract_result_string(&raw, "blob")
-            .or_else(|| extract_result_string(&raw, "data"));
+        let b64 =
+            extract_result_string(&raw, "blob").or_else(|| extract_result_string(&raw, "data"));
         Ok(b64.map(|encoded| base64_decode(&encoded)))
     }
 
     /// Delete a key from storage.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the socket is invalid, connection fails, or the RPC
+    /// response cannot be read.
     pub fn delete(&self, key: &str) -> Result<StoreResult, String> {
         let escaped_key = escape_json_str(key);
         let family = escape_json_str(&self.family_id);
@@ -181,6 +211,11 @@ impl NestClient {
     }
 
     /// List keys with an optional prefix filter.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the socket is invalid, connection fails, or the RPC
+    /// response cannot be read.
     pub fn list(&self, prefix: Option<&str>) -> Result<ListResult, String> {
         let family = escape_json_str(&self.family_id);
         let params = prefix.map_or_else(
@@ -190,9 +225,8 @@ impl NestClient {
                 format!(r#"{{"family_id":"{family}","prefix":"{escaped}"}}"#)
             },
         );
-        let req = format!(
-            r#"{{"jsonrpc":"2.0","method":"storage.list","params":{params},"id":1}}"#,
-        );
+        let req =
+            format!(r#"{{"jsonrpc":"2.0","method":"storage.list","params":{params},"id":1}}"#,);
         let raw = rpc(&self.socket, &req)?;
         let keys = extract_string_array(&raw, "keys")
             .or_else(|| extract_result_array(&raw))
@@ -201,6 +235,11 @@ impl NestClient {
     }
 
     /// Get storage statistics.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the socket is invalid, connection fails, or the RPC
+    /// response cannot be read.
     pub fn stats(&self) -> Result<String, String> {
         let family = escape_json_str(&self.family_id);
         let req = format!(
@@ -209,13 +248,16 @@ impl NestClient {
         rpc(&self.socket, &req)
     }
 
-    /// Ingest a local file into NestGate blob storage.
+    /// Ingest a local file into `NestGate` blob storage.
     ///
     /// Reads the file and stores it as a base64-encoded blob under the
     /// given key. For large files, this loads the entire file into memory.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the file cannot be read or storage operations fail.
     pub fn ingest_file(&self, key: &str, path: &Path) -> Result<StoreResult, String> {
-        let data = std::fs::read(path)
-            .map_err(|e| format!("read {}: {e}", path.display()))?;
+        let data = std::fs::read(path).map_err(|e| format!("read {}: {e}", path.display()))?;
         self.store_blob(key, &data)
     }
 
@@ -223,6 +265,11 @@ impl NestClient {
     ///
     /// Stores provenance (source, accession, file count, total bytes)
     /// under the key `meta:<dataset>`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the socket is invalid, connection fails, or the RPC
+    /// response cannot be read.
     pub fn store_dataset_metadata(
         &self,
         dataset: &str,
@@ -241,7 +288,7 @@ impl NestClient {
 
 // ── Socket discovery ────────────────────────────────────────────────
 
-/// Discover the NestGate Unix socket.
+/// Discover the `NestGate` Unix socket.
 ///
 /// Public so `data.rs` can share the same discovery logic.
 #[must_use]
@@ -270,8 +317,7 @@ pub fn discover_nestgate_socket() -> Option<PathBuf> {
 fn rpc(socket: &Path, request: &str) -> Result<String, String> {
     let addr = std::os::unix::net::SocketAddr::from_pathname(socket)
         .map_err(|e| format!("invalid NestGate socket: {e}"))?;
-    let stream =
-        UnixStream::connect_addr(&addr).map_err(|e| format!("NestGate connect: {e}"))?;
+    let stream = UnixStream::connect_addr(&addr).map_err(|e| format!("NestGate connect: {e}"))?;
     stream
         .set_read_timeout(Some(NESTGATE_TIMEOUT))
         .map_err(|e| format!("timeout: {e}"))?;
@@ -283,9 +329,7 @@ fn rpc(socket: &Path, request: &str) -> Result<String, String> {
     writer
         .write_all(request.as_bytes())
         .map_err(|e| format!("write: {e}"))?;
-    writer
-        .write_all(b"\n")
-        .map_err(|e| format!("write: {e}"))?;
+    writer.write_all(b"\n").map_err(|e| format!("write: {e}"))?;
     writer.flush().map_err(|e| format!("flush: {e}"))?;
 
     let mut reader = BufReader::new(&stream);
@@ -372,7 +416,11 @@ fn find_value_end(s: &str) -> Option<usize> {
             Some(end)
         }
         b'{' | b'[' => {
-            let (open, close) = if *first == b'{' { (b'{', b'}') } else { (b'[', b']') };
+            let (open, close) = if *first == b'{' {
+                (b'{', b'}')
+            } else {
+                (b'[', b']')
+            };
             let mut depth = 0;
             for (i, &ch) in s.as_bytes().iter().enumerate() {
                 if ch == open {
@@ -392,8 +440,7 @@ fn find_value_end(s: &str) -> Option<usize> {
 
 // ── Base64 encode/decode (no external dependency) ───────────────────
 
-const B64_CHARS: &[u8; 64] =
-    b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const B64_CHARS: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 fn base64_encode(data: &[u8]) -> String {
     let mut result = String::with_capacity(data.len().div_ceil(3) * 4);
@@ -420,16 +467,16 @@ fn base64_encode(data: &[u8]) -> String {
 
 #[allow(clippy::cast_possible_truncation)]
 fn base64_decode(encoded: &str) -> Vec<u8> {
-    let clean: Vec<u8> = encoded.bytes().filter(|b| !b.is_ascii_whitespace()).collect();
+    let clean: Vec<u8> = encoded
+        .bytes()
+        .filter(|b| !b.is_ascii_whitespace())
+        .collect();
     let mut result = Vec::with_capacity(clean.len() * 3 / 4);
     for chunk in clean.chunks(4) {
         if chunk.len() < 4 {
             break;
         }
-        let vals: Vec<u8> = chunk
-            .iter()
-            .map(|&b| b64_val(b))
-            .collect();
+        let vals: Vec<u8> = chunk.iter().map(|&b| b64_val(b)).collect();
         let n = (u32::from(vals[0]) << 18)
             | (u32::from(vals[1]) << 12)
             | (u32::from(vals[2]) << 6)
@@ -486,7 +533,16 @@ fn days_to_ymd(mut days: u64) -> (u64, u64, u64) {
     let mdays: [u64; 12] = [
         31,
         if leap { 29 } else { 28 },
-        31, 30, 31, 30, 31, 31, 30, 31, 30, 31,
+        31,
+        30,
+        31,
+        30,
+        31,
+        31,
+        30,
+        31,
+        30,
+        31,
     ];
     let mut month = 0;
     for (i, &md) in mdays.iter().enumerate() {
@@ -586,8 +642,9 @@ mod tests {
 
     #[test]
     fn nest_client_with_family() {
-        let client = NestClient::new(PathBuf::from("/tmp/test.sock"))
-            .with_family("wetspring");
+        let dir = tempfile::tempdir().unwrap();
+        let sock = dir.path().join("test.sock");
+        let client = NestClient::new(sock).with_family("wetspring");
         assert_eq!(client.family_id, "wetspring");
     }
 

@@ -107,15 +107,12 @@ impl NanoporeRead {
             };
         }
 
-        let n = self.signal.len() as f64;
-        let sum: f64 = self.signal.iter().map(|&s| f64::from(s)).sum();
-        let mean = sum / n;
-        let var: f64 = self
-            .signal
-            .iter()
-            .map(|&s| (f64::from(s) - mean).powi(2))
-            .sum::<f64>()
-            / n;
+        let signal_f64: Vec<f64> = self.signal.iter().map(|&s| f64::from(s)).collect();
+        let mean = barracuda::stats::mean(&signal_f64);
+        let n = signal_f64.len() as f64;
+        let std_dev = barracuda::stats::correlation::variance(&signal_f64)
+            .map(|var_sample| (var_sample * (n - 1.0) / n).sqrt())
+            .unwrap_or(0.0);
         let (lo, hi) = self
             .signal
             .iter()
@@ -123,7 +120,7 @@ impl NanoporeRead {
 
         SignalStats {
             mean,
-            std_dev: var.sqrt(),
+            std_dev,
             min: lo,
             max: hi,
             n_samples: self.signal.len(),

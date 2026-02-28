@@ -9,14 +9,13 @@
 //! (f64 canonical). `Precision::Df64` available for ~10× throughput on consumer
 //! FP32 cores (requires host buffer protocol adaptation: `vec2<f32>` storage).
 
-use barracuda::device::{WgpuDevice, storage_bgl_entry, uniform_bgl_entry};
+use barracuda::device::{ComputeDispatch, WgpuDevice};
+use barracuda::numerical::MultiSignalOde;
 use barracuda::numerical::ode_generic::BatchedOdeRK4;
-use barracuda::shaders::Precision;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
 use super::multi_signal::{self, MultiSignalParams};
-use barracuda::numerical::MultiSignalOde;
 
 /// Number of state variables.
 pub const N_VARS: usize = multi_signal::N_VARS;
@@ -54,8 +53,6 @@ struct GpuConfig {
 
 /// GPU-backed batched dual-signal QS ODE integrator.
 pub struct MultiSignalGpu {
-    pipeline: wgpu::ComputePipeline,
-    bgl: wgpu::BindGroupLayout,
     device: Arc<WgpuDevice>,
 }
 
@@ -65,46 +62,8 @@ impl MultiSignalGpu {
     /// # Errors
     ///
     /// Returns `Err` if shader compilation fails.
-    pub fn new(device: Arc<WgpuDevice>) -> crate::error::Result<Self> {
-        let d = device.device();
-        let wgsl = BatchedOdeRK4::<MultiSignalOde>::generate_shader();
-        let module =
-            device.compile_shader_universal(&wgsl, Precision::F64, Some("MultiSignal ODE"));
-
-        let bgl = d.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-            label: Some("MultiSignal BGL"),
-            entries: &Self::bgl_entries(),
-        });
-
-        let layout = d.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-            label: Some("MultiSignal Layout"),
-            bind_group_layouts: &[&bgl],
-            push_constant_ranges: &[],
-        });
-
-        let pipeline = d.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
-            label: Some("MultiSignal Pipeline"),
-            layout: Some(&layout),
-            module: &module,
-            entry_point: "main",
-            compilation_options: wgpu::PipelineCompilationOptions::default(),
-            cache: None,
-        });
-
-        Ok(Self {
-            pipeline,
-            bgl,
-            device,
-        })
-    }
-
-    fn bgl_entries() -> [wgpu::BindGroupLayoutEntry; 4] {
-        [
-            uniform_bgl_entry(0),
-            storage_bgl_entry(1, true),
-            storage_bgl_entry(2, true),
-            storage_bgl_entry(3, false),
-        ]
+    pub const fn new(device: Arc<WgpuDevice>) -> crate::error::Result<Self> {
+        Ok(Self { device })
     }
 
     /// Integrate all batches and return final states `[n_batches x N_VARS]`.
@@ -160,43 +119,16 @@ impl MultiSignalGpu {
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
         });
 
-        let bg = d.create_bind_group(&wgpu::BindGroupDescriptor {
-            label: Some("MultiSignal BG"),
-            layout: &self.bgl,
-            entries: &[
-                wgpu::BindGroupEntry {
-                    binding: 0,
-                    resource: config_buf.as_entire_binding(),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 1,
-                    resource: states_buf.as_entire_binding(),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 2,
-                    resource: params_buf.as_entire_binding(),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 3,
-                    resource: out_buf.as_entire_binding(),
-                },
-            ],
-        });
-
-        let mut encoder = d.create_command_encoder(&wgpu::CommandEncoderDescriptor {
-            label: Some("MultiSignal Encoder"),
-        });
-        {
-            let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
-                label: Some("MultiSignal Pass"),
-                timestamp_writes: None,
-            });
-            pass.set_pipeline(&self.pipeline);
-            pass.set_bind_group(0, &bg, &[]);
-            pass.dispatch_workgroups(config.n_batches.div_ceil(64), 1, 1);
-        }
-        self.device
-            .submit_and_poll(std::iter::once(encoder.finish()));
+        let wgsl = BatchedOdeRK4::<MultiSignalOde>::generate_shader();
+        ComputeDispatch::new(self.device.as_ref(), "MultiSignal ODE")
+            .shader(&wgsl, "main")
+            .f64()
+            .uniform(0, &config_buf)
+            .storage_read(1, &states_buf)
+            .storage_read(2, &params_buf)
+            .storage_rw(3, &out_buf)
+            .dispatch(config.n_batches.div_ceil(64), 1, 1)
+            .submit();
 
         self.device
             .read_buffer_f64(&out_buf, b * N_VARS)

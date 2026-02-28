@@ -125,7 +125,11 @@ fn validate_quality_filter(
     let (gpu_filtered, gpu_stats) = session.filter_reads(&reads, &params).unwrap();
     let gpu_us = tg.elapsed().as_micros() as f64;
 
-    v.check_count("filtered read count", gpu_filtered.len(), cpu_filtered.0.len());
+    v.check_count(
+        "filtered read count",
+        gpu_filtered.len(),
+        cpu_filtered.0.len(),
+    );
     v.check_pass(
         "GPU stats consistent",
         gpu_stats.input_reads == reads.len()
@@ -179,21 +183,11 @@ fn validate_diversity_streaming(
         );
     }
     for (i, (c, g)) in cpu_simpsons.iter().zip(&gpu_simpsons).enumerate() {
-        v.check(
-            &format!("Simpson[{i}]"),
-            *g,
-            *c,
-            tolerances::ANALYTICAL_F64,
-        );
+        v.check(&format!("Simpson[{i}]"), *g, *c, tolerances::ANALYTICAL_F64);
     }
     v.check_count("BC condensed length", gpu_bc.len(), cpu_bc.len());
     for (i, (c, g)) in cpu_bc.iter().zip(&gpu_bc).enumerate() {
-        v.check(
-            &format!("BC[{i}]"),
-            *g,
-            *c,
-            tolerances::GPU_VS_CPU_F64,
-        );
+        v.check(&format!("BC[{i}]"), *g, *c, tolerances::GPU_VS_CPU_F64);
     }
 
     timings.push(("Diversity (α + β)", cpu_us, gpu_us));
@@ -267,12 +261,7 @@ fn validate_spectral_streaming(
 
     v.check_count("cosine condensed length", gpu_cos.len(), cpu_cos.len());
     for (i, (c, g)) in cpu_cos.iter().zip(&gpu_cos).enumerate() {
-        v.check(
-            &format!("cos[{i}]"),
-            *g,
-            *c,
-            tolerances::GPU_VS_CPU_F64,
-        );
+        v.check(&format!("cos[{i}]"), *g, *c, tolerances::GPU_VS_CPU_F64);
     }
 
     v.check(
@@ -311,7 +300,13 @@ fn validate_full_pipeline(
     let tc = Instant::now();
     let cpu_alpha: Vec<(f64, f64, f64)> = samples
         .iter()
-        .map(|c| (diversity::shannon(c), diversity::simpson(c), diversity::observed_features(c)))
+        .map(|c| {
+            (
+                diversity::shannon(c),
+                diversity::simpson(c),
+                diversity::observed_features(c),
+            )
+        })
         .collect();
     let cpu_bc = diversity::bray_curtis_condensed(&samples);
     let cpu_us = tc.elapsed().as_micros() as f64;

@@ -257,10 +257,10 @@ fn validate_full_pipeline_dispatch(v: &mut Validator) {
 // ── D05: Three-Tier NestGate Routing (Structural) ────────────────────────────
 
 fn validate_nestgate_three_tier(v: &mut Validator) {
+    use wetspring_barracuda::ncbi::nestgate;
+
     v.section("═══ D05: Three-Tier NestGate Routing (Structural) ═══");
     let t = Instant::now();
-
-    use wetspring_barracuda::ncbi::nestgate;
 
     let biomeos_socket = nestgate::discover_biomeos_socket();
     let nestgate_enabled = nestgate::is_enabled();

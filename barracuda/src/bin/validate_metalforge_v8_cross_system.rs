@@ -88,9 +88,24 @@ fn main() {
         let ipc_d = result["simpson"].as_f64().unwrap();
         let ipc_j = result["pielou"].as_f64().unwrap();
 
-        v.check(&format!("Shannon[{i}]: IPC == direct"), ipc_h, cpu_h, tolerances::EXACT_F64);
-        v.check(&format!("Simpson[{i}]: IPC == direct"), ipc_d, cpu_d, tolerances::EXACT_F64);
-        v.check(&format!("Pielou[{i}]: IPC == direct"), ipc_j, cpu_j, tolerances::EXACT_F64);
+        v.check(
+            &format!("Shannon[{i}]: IPC == direct"),
+            ipc_h,
+            cpu_h,
+            tolerances::EXACT_F64,
+        );
+        v.check(
+            &format!("Simpson[{i}]: IPC == direct"),
+            ipc_d,
+            cpu_d,
+            tolerances::EXACT_F64,
+        );
+        v.check(
+            &format!("Pielou[{i}]: IPC == direct"),
+            ipc_j,
+            cpu_j,
+            tolerances::EXACT_F64,
+        );
     }
 
     // ═══ MF02: IPC QS ODE (GPU compute-dense path) ═══════════════════
@@ -103,23 +118,44 @@ fn main() {
     let ipc_params = json!({"scenario": "standard_growth"});
     let ipc_result = dispatch::dispatch("science.qs_model", &ipc_params).expect("dispatch QS");
     let ipc_n_ss = ipc_result["final_state"][0].as_f64().unwrap();
-    v.check("QS N_ss: IPC == direct", ipc_n_ss, cpu_n_ss, tolerances::ODE_METHOD_PARITY);
+    v.check(
+        "QS N_ss: IPC == direct",
+        ipc_n_ss,
+        cpu_n_ss,
+        tolerances::ODE_METHOD_PARITY,
+    );
 
-    let ipc_high = dispatch::dispatch("science.qs_model", &json!({"scenario": "high_density"})).expect("high density");
-    v.check_pass("QS high-density: final_state exists", ipc_high.get("final_state").is_some());
+    let ipc_high = dispatch::dispatch("science.qs_model", &json!({"scenario": "high_density"}))
+        .expect("high density");
+    v.check_pass(
+        "QS high-density: final_state exists",
+        ipc_high.get("final_state").is_some(),
+    );
 
     // ═══ MF03: IPC Full Pipeline (chained dispatch) ═══════════════════
     v.section("MF03: Full Pipeline (diversity + QS in single dispatch)");
     let pipeline_community = synthetic_community(200, 0.7, 999);
-    let pipe_result = dispatch::dispatch("science.full_pipeline", &json!({
-        "counts": &pipeline_community,
-        "scenario": "standard_growth"
-    })).expect("full_pipeline");
+    let pipe_result = dispatch::dispatch(
+        "science.full_pipeline",
+        &json!({
+            "counts": &pipeline_community,
+            "scenario": "standard_growth"
+        }),
+    )
+    .expect("full_pipeline");
 
     let pipe_h = pipe_result["diversity"]["shannon"].as_f64().unwrap();
     let expected_h = diversity::shannon(&pipeline_community);
-    v.check("Pipeline Shannon == direct", pipe_h, expected_h, tolerances::EXACT_F64);
-    v.check_pass("Pipeline QS result present", pipe_result.get("qs_model").is_some());
+    v.check(
+        "Pipeline Shannon == direct",
+        pipe_h,
+        expected_h,
+        tolerances::EXACT_F64,
+    );
+    v.check_pass(
+        "Pipeline QS result present",
+        pipe_result.get("qs_model").is_some(),
+    );
 
     // ═══ MF04: Workload Routing Model ═════════════════════════════════
     v.section("MF04: GPU→NPU→CPU Routing Model");
@@ -129,21 +165,60 @@ fn main() {
         optimal_substrate: &'static str,
     }
     let routes = [
-        WorkloadRoute { name: "Diversity (fused)", optimal_substrate: "GPU" },
-        WorkloadRoute { name: "GEMM (matmul)", optimal_substrate: "GPU" },
-        WorkloadRoute { name: "ODE sweep", optimal_substrate: "GPU" },
-        WorkloadRoute { name: "Anderson eigens", optimal_substrate: "GPU" },
-        WorkloadRoute { name: "NMF factorize", optimal_substrate: "GPU" },
-        WorkloadRoute { name: "ESN classify", optimal_substrate: "NPU" },
-        WorkloadRoute { name: "Spectral triage", optimal_substrate: "NPU" },
-        WorkloadRoute { name: "Int8 basecall", optimal_substrate: "NPU" },
-        WorkloadRoute { name: "FASTQ parsing", optimal_substrate: "CPU" },
-        WorkloadRoute { name: "Tree traversal", optimal_substrate: "CPU" },
+        WorkloadRoute {
+            name: "Diversity (fused)",
+            optimal_substrate: "GPU",
+        },
+        WorkloadRoute {
+            name: "GEMM (matmul)",
+            optimal_substrate: "GPU",
+        },
+        WorkloadRoute {
+            name: "ODE sweep",
+            optimal_substrate: "GPU",
+        },
+        WorkloadRoute {
+            name: "Anderson eigens",
+            optimal_substrate: "GPU",
+        },
+        WorkloadRoute {
+            name: "NMF factorize",
+            optimal_substrate: "GPU",
+        },
+        WorkloadRoute {
+            name: "ESN classify",
+            optimal_substrate: "NPU",
+        },
+        WorkloadRoute {
+            name: "Spectral triage",
+            optimal_substrate: "NPU",
+        },
+        WorkloadRoute {
+            name: "Int8 basecall",
+            optimal_substrate: "NPU",
+        },
+        WorkloadRoute {
+            name: "FASTQ parsing",
+            optimal_substrate: "CPU",
+        },
+        WorkloadRoute {
+            name: "Tree traversal",
+            optimal_substrate: "CPU",
+        },
     ];
 
-    let gpu_n = routes.iter().filter(|r| r.optimal_substrate == "GPU").count();
-    let npu_n = routes.iter().filter(|r| r.optimal_substrate == "NPU").count();
-    let cpu_n = routes.iter().filter(|r| r.optimal_substrate == "CPU").count();
+    let gpu_n = routes
+        .iter()
+        .filter(|r| r.optimal_substrate == "GPU")
+        .count();
+    let npu_n = routes
+        .iter()
+        .filter(|r| r.optimal_substrate == "NPU")
+        .count();
+    let cpu_n = routes
+        .iter()
+        .filter(|r| r.optimal_substrate == "CPU")
+        .count();
 
     v.check_pass("GPU routes 5 compute-dense workloads", gpu_n == 5);
     v.check_pass("NPU routes 3 inference workloads", npu_n == 3);
@@ -167,15 +242,25 @@ fn main() {
     // ═══ MF06: V71 DF64 Host Protocol in Dispatch ═════════════════════
     v.section("MF06: V71 DF64 Host Protocol in Dispatch");
 
-    let test_vals: Vec<f64> = (0..100).map(|i| std::f64::consts::PI * f64::from(i)).collect();
+    let test_vals: Vec<f64> = (0..100)
+        .map(|i| std::f64::consts::PI * f64::from(i))
+        .collect();
     let packed = df64_host::pack_slice(&test_vals);
     let unpacked = df64_host::unpack_slice(&packed);
-    let max_err = test_vals.iter().zip(&unpacked)
-        .map(|(a, b)| (a - b).abs()).fold(0.0_f64, f64::max);
-    v.check_pass("DF64 dispatch pack/unpack < 1e-12", max_err < 1e-12);
+    let max_err = test_vals
+        .iter()
+        .zip(&unpacked)
+        .map(|(a, b)| (a - b).abs())
+        .fold(0.0_f64, f64::max);
+    v.check_pass(
+        "DF64 dispatch pack/unpack < 1e-12",
+        max_err < tolerances::ANALYTICAL_F64,
+    );
 
-    let f32_err: f64 = test_vals.iter()
-        .map(|&x| (x - f64::from(x as f32)).abs()).fold(0.0_f64, f64::max);
+    let f32_err: f64 = test_vals
+        .iter()
+        .map(|&x| (x - f64::from(x as f32)).abs())
+        .fold(0.0_f64, f64::max);
     v.check_pass("DF64 precision > f32 for dispatch", max_err < f32_err);
     println!("  DF64 max roundtrip: {max_err:.2e}, f32 max: {f32_err:.2e}");
 
@@ -187,7 +272,12 @@ fn main() {
     let fallback_params = json!({"counts": &counts, "substrate": "cpu"});
     let fallback = dispatch::dispatch("science.diversity", &fallback_params).expect("fallback");
     let fb_h = fallback["shannon"].as_f64().unwrap();
-    v.check("Fallback Shannon == CPU", fb_h, cpu_h, tolerances::EXACT_F64);
+    v.check(
+        "Fallback Shannon == CPU",
+        fb_h,
+        cpu_h,
+        tolerances::EXACT_F64,
+    );
 
     // ═══ MF08: Health Check ════════════════════════════════════════════
     v.section("MF08: IPC Health Check");
@@ -197,7 +287,10 @@ fn main() {
     // ═══ MF09: Error Handling ══════════════════════════════════════════
     v.section("MF09: Error Handling");
     let err = dispatch::dispatch("science.nonexistent", &json!({}));
-    v.check_pass("unknown method → -32601", err.is_err() && err.unwrap_err().code == -32601);
+    v.check_pass(
+        "unknown method → -32601",
+        err.is_err() && err.unwrap_err().code == -32601,
+    );
 
     let empty_div = dispatch::dispatch("science.diversity", &json!({}));
     v.check_pass("missing params → error", empty_div.is_err());

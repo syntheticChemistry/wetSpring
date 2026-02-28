@@ -111,7 +111,12 @@ fn main() {
     v.check("Φ(0) = 0.5", phi, 0.5, tolerances::EXACT);
 
     let phi_196 = norm_cdf(1.96);
-    v.check("Φ(1.96) ≈ 0.975", phi_196, 0.975, 1e-3);
+    v.check(
+        "Φ(1.96) ≈ 0.975",
+        phi_196,
+        0.975,
+        tolerances::NORM_CDF_PARITY,
+    );
 
     let t0 = Instant::now();
     let x = vec![1.0, 2.0, 3.0, 4.0, 5.0];
@@ -145,8 +150,18 @@ fn main() {
         upstream_ncdf,
         tolerances::EXACT,
     );
-    v.check("Φ(1.96) ≈ 0.975 (local)", local_ncdf, 0.975, 1e-3);
-    v.check("Φ(1.96) ≈ 0.975 (upstream)", upstream_ncdf, 0.975, 1e-3);
+    v.check(
+        "Φ(1.96) ≈ 0.975 (local)",
+        local_ncdf,
+        0.975,
+        tolerances::NORM_CDF_PARITY,
+    );
+    v.check(
+        "Φ(1.96) ≈ 0.975 (upstream)",
+        upstream_ncdf,
+        0.975,
+        tolerances::NORM_CDF_PARITY,
+    );
 
     println!("  Delegation: local={local_ns}ns, upstream={upstream_ns}ns");
 
@@ -161,7 +176,7 @@ fn main() {
     let t0 = Instant::now();
     let area = trapz(&ys, &xs).unwrap_or(f64::NAN);
     let trapz_ns = t0.elapsed().as_nanos();
-    v.check("∫₀¹ x² dx = 1/3", area, 1.0 / 3.0, 1e-4);
+    v.check("∫₀¹ x² dx = 1/3", area, 1.0 / 3.0, tolerances::TRAPZ_101);
 
     println!("  Timing: trapz={trapz_ns}ns (101 points)");
 

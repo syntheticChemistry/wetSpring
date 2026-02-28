@@ -103,7 +103,9 @@ pub fn detect_bandwidth_tier(substrate: &Substrate) -> Option<BandwidthTier> {
     if substrate.kind != SubstrateKind::Gpu {
         return None;
     }
-    Some(BandwidthTier::detect_from_adapter_name(&substrate.identity.name))
+    Some(BandwidthTier::detect_from_adapter_name(
+        &substrate.identity.name,
+    ))
 }
 
 /// Estimate the data transfer cost in microseconds for moving `data_bytes`
@@ -122,8 +124,8 @@ pub fn estimated_transfer_us(substrate: &Substrate, data_bytes: usize) -> Option
 #[allow(clippy::expect_used)]
 mod tests {
     use super::*;
-    use crate::substrate::SubstrateOrigin;
     use crate::inventory;
+    use crate::substrate::SubstrateOrigin;
 
     #[test]
     fn best_f64_gpu_returns_gpu_if_available() {

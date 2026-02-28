@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-28 (Phase 73: 229 experiments, 5,743+ checks (1,833+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S68+ (`e96576ee`), 79 primitives consumed, barracuda always-on, 1,199+ tests, 92 named tolerances, clippy pedantic CLEAN, 0 Passthrough, V73 deep debt reduction + V72 five-tier validation chain, 50/50 three-tier, 52/52 papers)
+**Updated**: 2026-02-28 (Phase 75: 229 experiments, 210 binaries, 5,743+ checks (1,833+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S68+ (`e96576ee`), 82 primitives consumed, barracuda always-on, 1,148+ tests, 92 named tolerances, clippy pedantic CLEAN, 0 Passthrough, V74/V75 ComputeDispatch evolution, 50/50 three-tier, 52/52 papers)
 
 ---
 
@@ -333,10 +333,10 @@ thresholds from `src/tolerances.rs`.
 | `benchmark_cross_spring_modern_s68plus` | 210 | 24 | `cargo run --features gpu --release --bin benchmark_cross_spring_modern_s68plus` |
 | `benchmark_progression_cpu_gpu_stream` | 211 | 16 | `cargo run --features gpu --release --bin benchmark_progression_cpu_gpu_stream` |
 
-**Total validation checks**: 5,061+
-**Rust tests**: 1,103 (933 barracuda lib + 44 IPC + 60 integration + 19 doc + 47 forge)
-**Binaries**: 178 validate + 17 benchmark + 1 server = 196 total
-**ToadStool primitives**: 79 consumed (barracuda always-on, zero fallback code — S68+ `e96576ee`)
+**Total validation checks**: 5,743+
+**Rust tests**: 1,148+ (955 barracuda lib + 60 integration + 20 doc + 113 forge)
+**Binaries**: 210 total (validate + benchmark + server)
+**ToadStool primitives**: 82 consumed (barracuda always-on, zero fallback code — S68+ `e96576ee`)
 **Papers**: 52 (25 Tracks 1-2 + 5 Track 3 + 9 Track 4 + 1 cross-spring + 9 extensions + 3 reference)
 **Local WGSL shaders**: 0 (all absorbed by ToadStool S63)
 **GPU modules**: 42 total (all lean on upstream primitives)

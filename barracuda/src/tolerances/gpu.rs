@@ -63,3 +63,10 @@ pub const GPU_F32_PARITY: f64 = 1e-5;
 /// rounding proportional to neighborhood size. For 8-neighbor grids,
 /// 1e-4 covers the worst-case f32 summation error.
 pub const GPU_F32_SPATIAL: f64 = 1e-4;
+
+/// GEMM streaming max absolute error (CPU vs GPU over full matrix).
+///
+/// Large GEMM (256×128×256) accumulates rounding across many dot products;
+/// 1e-5 covers worst-case element-wise drift in streaming pipeline.
+/// Validated: Exp227 (Pure GPU Streaming v4).
+pub const GEMM_GPU_MAX_ERR: f64 = 1e-5;

@@ -63,9 +63,10 @@ fn extract_features(calibrated: &[f64], sample_rate: f64) -> ReadFeatures {
         };
     }
 
-    let mean = calibrated.iter().sum::<f64>() / n;
-    let var = calibrated.iter().map(|&x| (x - mean).powi(2)).sum::<f64>() / n;
-    let std_dev = var.sqrt();
+    let mean = barracuda::stats::mean(calibrated);
+    let std_dev = barracuda::stats::correlation::variance(calibrated)
+        .map(|var_sample| (var_sample * (n - 1.0) / n).sqrt())
+        .unwrap_or(0.0);
     let (min, max) = calibrated
         .iter()
         .fold((f64::MAX, f64::MIN), |(lo, hi), &x| (lo.min(x), hi.max(x)));

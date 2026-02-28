@@ -29,7 +29,7 @@
 use std::collections::HashMap;
 use wetspring_barracuda::bio::{
     bistable, cooperation, derep, diversity, dnds, felsenstein, gillespie, hmm, kmd, kmer,
-    merge_pairs, neighbor_joining, pangenome, pcoa, phage_defense, quality, qs_biofilm,
+    merge_pairs, neighbor_joining, pangenome, pcoa, phage_defense, qs_biofilm, quality,
     reconciliation, robinson_foulds, signal, snp, spectral_match, unifrac,
 };
 use wetspring_barracuda::tolerances;
@@ -153,7 +153,10 @@ fn main() {
         ("g2".to_string(), "h2".to_string()),
     ];
     let rec = reconciliation::reconcile_dtl(&host, &guest, &tip_map, &costs);
-    v.check_pass("DTL reconciliation cost computed", rec.optimal_cost < u32::MAX);
+    v.check_pass(
+        "DTL reconciliation cost computed",
+        rec.optimal_cost < u32::MAX,
+    );
 
     // ═══ G7: Felsenstein JC69 ════════════════════════════════════════════
     v.section("═══ G7: Felsenstein JC69 ═══");
@@ -162,7 +165,10 @@ fn main() {
     let p_same = felsenstein::jc69_prob(0, 0, 0.1, 1.0);
     let p_diff = felsenstein::jc69_prob(0, 1, 0.1, 1.0);
     v.check_pass("JC69 P(same) > P(diff)", p_same > p_diff);
-    v.check_pass("JC69 sums to 1", (3.0_f64.mul_add(p_diff, p_same) - 1.0).abs() < 1e-10);
+    v.check_pass(
+        "JC69 sums to 1",
+        (3.0_f64.mul_add(p_diff, p_same) - 1.0).abs() < tolerances::PYTHON_PARITY,
+    );
 
     // ═══ G8: HMM Forward ═════════════════════════════════════════════════
     v.section("═══ G8: HMM Forward ═══");
@@ -180,7 +186,10 @@ fn main() {
     };
     let obs = [0_usize, 1, 0];
     let fwd = hmm::forward(&model, &obs);
-    v.check_pass("HMM log-likelihood is finite", fwd.log_likelihood.is_finite());
+    v.check_pass(
+        "HMM log-likelihood is finite",
+        fwd.log_likelihood.is_finite(),
+    );
     v.check_pass("HMM log-likelihood is negative", fwd.log_likelihood < 0.0);
 
     // ═══ G9: dN/dS ═══════════════════════════════════════════════════════
@@ -247,7 +256,10 @@ fn main() {
     let coop_params = cooperation::CooperationParams::default();
     let coop_result = cooperation::scenario_equal_start(&coop_params, 0.01);
     let freq = cooperation::cooperator_frequency(&coop_result);
-    v.check_pass("cooperators persist (freq > 0.1)", *freq.last().unwrap() > 0.1);
+    v.check_pass(
+        "cooperators persist (freq > 0.1)",
+        *freq.last().unwrap() > 0.1,
+    );
 
     // ═══ G15: Bistable ODE ═══════════════════════════════════════════════
     v.section("═══ G15: Bistable ODE ═══");
@@ -316,7 +328,10 @@ fn main() {
 
     let frac_40 = 1.0 - (-40.0_f64 / 10.0).exp();
     let w_at_40 = 14.0_f64.mul_add(-frac_40, 18.0);
-    v.check_pass("40yr W near final", (w_at_40 - 4.0).abs() < 1.0);
+    v.check_pass(
+        "40yr W near final",
+        (w_at_40 - 4.0).abs() < tolerances::SOIL_RECOVERY_W_TOL,
+    );
 
     // ═══ G22: Spectral Match ═════════════════════════════════════════════
     v.section("═══ G22: Spectral Match ═══");
@@ -325,7 +340,12 @@ fn main() {
     let mz = [100.0, 200.0, 300.0];
     let int = [1000.0, 500.0, 200.0];
     let self_sim = spectral_match::cosine_similarity(&mz, &int, &mz, &int, 0.5);
-    v.check("cosine self == 1", self_sim.score, 1.0, tolerances::ANALYTICAL_F64);
+    v.check(
+        "cosine self == 1",
+        self_sim.score,
+        1.0,
+        tolerances::ANALYTICAL_F64,
+    );
 
     // ═══ G23: KMD ════════════════════════════════════════════════════════
     v.section("═══ G23: KMD ═══");
@@ -364,19 +384,34 @@ fn main() {
     v.section("═══ G26: PCoA ═══");
     total_domains += 1;
 
-    let dm = [0.0, 0.5, 0.8, 0.5, 0.0, 0.6, 0.8, 0.6, 0.0];
-    let pcoa_result = pcoa::pcoa(&dm, 3, 2).unwrap();
+    // PCoA expects condensed distance matrix (upper triangle, n*(n-1)/2 values).
+    // For 3 samples: pairs (1,0), (2,0), (2,1) → [d10, d20, d21]
+    let condensed = [0.5, 0.8, 0.6];
+    let pcoa_result = pcoa::pcoa(&condensed, 3, 2).unwrap();
     v.check_pass("PCoA produces coordinates", pcoa_result.n_samples == 3);
 
     // ═══ G27: Math Primitives ════════════════════════════════════════════
     v.section("═══ G27: Math Primitives ═══");
     total_domains += 1;
 
-    v.check("erf(1)", erf(1.0), 0.842_700_792_949_715, tolerances::ERF_PARITY);
+    v.check(
+        "erf(1)",
+        erf(1.0),
+        0.842_700_792_949_715,
+        tolerances::ERF_PARITY,
+    );
     v.check("Φ(0) = 0.5", norm_cdf(0.0), 0.5, tolerances::EXACT);
-    v.check("Φ(1.96) ≈ 0.975", norm_cdf(1.96), 0.975, tolerances::NORM_CDF_PARITY);
+    v.check(
+        "Φ(1.96) ≈ 0.975",
+        norm_cdf(1.96),
+        0.975,
+        tolerances::NORM_CDF_PARITY,
+    );
     v.check("erf(0) = 0", erf(0.0), 0.0, tolerances::ANALYTICAL_F64);
-    v.check_pass("erf(-x) = -erf(x)", (erf(-1.0) + erf(1.0)).abs() < 1e-12);
+    v.check_pass(
+        "erf(-x) = -erf(x)",
+        (erf(-1.0) + erf(1.0)).abs() < tolerances::ANALYTICAL_F64,
+    );
 
     println!("\n  ── Summary ──");
     println!("  Domain groups validated: {total_domains}");

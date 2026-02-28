@@ -183,7 +183,7 @@ fn validate_qs_ode_mf(
             println!("    max |CPU−GPU| = {max_diff:.4e}");
             v.check(
                 "QS ODE CPU↔GPU parity < 0.15",
-                f64::from(u8::from(max_diff < 0.15)),
+                f64::from(u8::from(max_diff < tolerances::ODE_GPU_SWEEP_ABS)),
                 1.0,
                 tolerances::EXACT,
             );

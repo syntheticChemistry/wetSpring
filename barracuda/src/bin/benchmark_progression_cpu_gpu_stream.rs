@@ -11,16 +11,16 @@
     clippy::similar_names,
     clippy::many_single_char_names
 )]
-//! Exp211 — BarraCuda Progression Benchmark: CPU → GPU → Pure GPU Streaming
+//! Exp211 — `BarraCuda` Progression Benchmark: CPU → GPU → Pure GPU Streaming
 //!
 //! Demonstrates the full validation progression on identical workloads:
 //!
 //! ```text
 //! Tier 0: Python baseline (reference — run separately via benchmark_rust_vs_python.py)
 //! Tier 1: BarraCuda CPU — pure Rust math, validated against Python, faster than interpreted
-//! Tier 2: BarraCuda GPU — same math, portable to GPU via ToadStool compile_shader_universal
+//! Tier 2: BarraCuda GPU — same math, portable to GPU via `ToadStool` `compile_shader_universal`
 //! Tier 3: Pure GPU Streaming — unidirectional dispatch, zero intermediate CPU round-trips
-//! Tier 4: metalForge routing — cross-substrate dispatch (GPU + CPU) based on workload size
+//! Tier 4: `metalForge` routing — cross-substrate dispatch (GPU + CPU) based on workload size
 //! ```
 //!
 //! Each tier produces identical mathematical results. The progression shows:
@@ -31,10 +31,10 @@
 //!
 //! # Cross-Spring Provenance
 //!
-//! Diversity: wetSpring → ToadStool S64 (CPU) / S63 (GPU DiversityFusion)
-//! GEMM: wetSpring → ToadStool S62 (GemmCached, DF64-aware via hotSpring S58)
-//! Stats: airSpring/groundSpring → ToadStool S64/S66 (metrics, bootstrap)
-//! Precision: hotSpring → ToadStool S67 (Fp64Strategy, compile_shader_universal)
+//! Diversity: wetSpring → `ToadStool` S64 (CPU) / S63 (GPU `DiversityFusion`)
+//! GEMM: wetSpring → `ToadStool` S62 (`GemmCached`, `DF64`-aware via hotSpring S58)
+//! Stats: airSpring/groundSpring → `ToadStool` S64/S66 (metrics, bootstrap)
+//! Precision: hotSpring → `ToadStool` S67 (`Fp64Strategy`, `compile_shader_universal`)
 
 use std::sync::Arc;
 use std::time::Instant;
@@ -166,7 +166,7 @@ fn main() {
     });
 
     // CPU Pearson + metrics (airSpring → S64)
-    let x: Vec<f64> = (0..100).map(|i| i as f64 * 0.1).collect();
+    let x: Vec<f64> = (0..100).map(|i| f64::from(i as u32) * 0.1).collect();
     let y: Vec<f64> = x.iter().map(|&xi| 2.0 * xi + 1.0).collect();
     let (pearson, cpu_stats_ms) = bench("CPU Pearson + MAE + RMSE", || {
         let p = barracuda::stats::pearson_correlation(&x, &y).expect("pearson");
@@ -359,7 +359,7 @@ fn main() {
     println!();
 
     let small_n = 100;
-    let small_abundances: Vec<f64> = (0..small_n).map(|i| (i + 1) as f64).collect();
+    let small_abundances: Vec<f64> = (0..small_n).map(|i| f64::from((i + 1) as u32)).collect();
 
     let (small_cpu, small_cpu_ms) = bench("CPU diversity (100 taxa — below threshold)", || {
         diversity::shannon(&small_abundances)
@@ -367,7 +367,7 @@ fn main() {
     v.check_pass("small CPU Shannon > 0", small_cpu > 0.0);
 
     let large_abundances: Vec<f64> = (0..50_000)
-        .map(|i| ((i * 7 + 1) % 500 + 1) as f64)
+        .map(|i| f64::from(((i * 7 + 1) % 500 + 1) as u32))
         .collect();
     let (large_cpu, large_cpu_ms) = bench("CPU diversity (50k taxa — above threshold)", || {
         diversity::shannon(&large_abundances)

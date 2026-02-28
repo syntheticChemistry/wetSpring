@@ -70,7 +70,9 @@ impl DecisionTree {
             || right_children.len() != n
             || predictions.len() != n
         {
-            return Err(error::Error::InvalidInput("inconsistent array lengths".into()));
+            return Err(error::Error::InvalidInput(
+                "inconsistent array lengths".into(),
+            ));
         }
 
         let nodes: Vec<TreeNode> = (0..n)

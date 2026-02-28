@@ -30,7 +30,9 @@
 
 use wetspring_forge::dispatch::{self, Reason, Workload};
 use wetspring_forge::streaming::{PipelineStage, StreamingSession};
-use wetspring_forge::substrate::{Capability, Identity, Properties, Substrate, SubstrateKind, SubstrateOrigin};
+use wetspring_forge::substrate::{
+    Capability, Identity, Properties, Substrate, SubstrateKind, SubstrateOrigin,
+};
 use wetspring_forge::workloads;
 
 fn check(pass: &mut u32, fail: &mut u32, total: &mut u32, name: &str, ok: bool) {
@@ -186,9 +188,15 @@ fn section_absorption_status(pass: &mut u32, fail: &mut u32, total: &mut u32) {
 
     let (absorbed, local, cpu_only) = workloads::origin_summary();
 
-    check(pass, fail, total, "39 absorbed workloads", absorbed == 39);
+    check(pass, fail, total, "45 absorbed workloads", absorbed == 45);
     check(pass, fail, total, "0 local WGSL (full lean)", local == 0);
-    check(pass, fail, total, "1 CPU-only (FASTQ)", cpu_only == 1);
+    check(
+        pass,
+        fail,
+        total,
+        "2 CPU-only (FASTQ + ncbi_assembly_ingest)",
+        cpu_only == 2,
+    );
 
     let all = workloads::all_workloads();
     let all_have_prim = all

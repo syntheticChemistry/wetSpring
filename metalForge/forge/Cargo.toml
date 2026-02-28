@@ -12,6 +12,8 @@ license = "AGPL-3.0-or-later"
 
 [dependencies]
 barracuda = { path = "../../../phase1/toadstool/crates/barracuda" }
+tempfile = "3"
+wetspring-barracuda = { path = "../../barracuda", default-features = false }
 
 wgpu = { version = "22", default-features = false, features = [
     "wgsl",
@@ -46,7 +48,6 @@ path = "src/bin/validate_nucleus_pipeline_v69.rs"
 
 [dev-dependencies]
 temp-env = "0.3"
-tempfile = "3"
 
 [lints.clippy]
 pedantic = { level = "warn", priority = -1 }

@@ -411,7 +411,9 @@ mod tests {
 
     #[test]
     fn resolve_socket_explicit_nonexistent() {
-        let result = resolve_socket(Some("/tmp/nonexistent_wetspring_test.sock"), None);
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("nonexistent_wetspring_test.sock");
+        let result = resolve_socket(Some(path.to_str().unwrap()), None);
         assert!(result.is_none());
     }
 
@@ -641,7 +643,8 @@ mod tests {
 
     #[test]
     fn fetch_via_biomeos_nonexistent_socket() {
-        let path = PathBuf::from("/tmp/wetspring_test_no_biomeos.sock");
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("wetspring_test_no_biomeos.sock");
         let err = fetch_via_biomeos(&path, "nucleotide", "K03455", "").unwrap_err();
         let msg = err.to_string();
         assert!(msg.contains("NestGate connect") || msg.contains("invalid socket"));
@@ -663,7 +666,8 @@ mod tests {
 
     #[test]
     fn health_nonexistent_socket_errors() {
-        let path = PathBuf::from("/tmp/wetspring_test_nonexistent_nestgate.sock");
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("wetspring_test_nonexistent_nestgate.sock");
         let err = health(&path).unwrap_err();
         let msg = err.to_string();
         assert!(msg.contains("NestGate connect") || msg.contains("invalid socket"));
@@ -671,7 +675,8 @@ mod tests {
 
     #[test]
     fn invalid_socket_path_too_long() {
-        let path = PathBuf::from("/tmp/".to_string() + &"a".repeat(200));
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("a".repeat(200));
         let err = health(&path).unwrap_err();
         let msg = err.to_string();
         assert!(msg.contains("invalid socket") || msg.contains("NestGate connect"));
@@ -679,7 +684,8 @@ mod tests {
 
     #[test]
     fn store_nonexistent_socket_errors() {
-        let path = PathBuf::from("/tmp/wetspring_test_nonexistent_store.sock");
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("wetspring_test_nonexistent_store.sock");
         let err = store(&path, "key", "value").unwrap_err();
         let msg = err.to_string();
         assert!(msg.contains("NestGate connect") || msg.contains("invalid socket"));
@@ -687,7 +693,8 @@ mod tests {
 
     #[test]
     fn retrieve_nonexistent_socket_errors() {
-        let path = PathBuf::from("/tmp/wetspring_test_nonexistent_retrieve.sock");
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("wetspring_test_nonexistent_retrieve.sock");
         let err = retrieve(&path, "key").unwrap_err();
         let msg = err.to_string();
         assert!(msg.contains("NestGate connect") || msg.contains("invalid socket"));
@@ -695,7 +702,8 @@ mod tests {
 
     #[test]
     fn exists_nonexistent_socket_errors() {
-        let path = PathBuf::from("/tmp/wetspring_test_nonexistent_exists.sock");
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("wetspring_test_nonexistent_exists.sock");
         let err = exists(&path, "key").unwrap_err();
         let msg = err.to_string();
         assert!(msg.contains("NestGate connect") || msg.contains("invalid socket"));

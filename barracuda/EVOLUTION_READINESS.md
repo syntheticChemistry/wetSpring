@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** February 27, 2026 (V67 Experiment Buildout + Evolution)
+**Date:** February 28, 2026 (V75 ToadStool Rewire)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules + 1 IPC module (all lean, 0 local WGSL, 0 local derivative/regression math), 79 ToadStool primitives consumed (barracuda always-on, zero fallback code), 1,081+ tests (946 barracuda lib + 60 integration + 20 doc + 55 forge), 221 experiments, 5,421+ checks (1,833+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S68+ aligned (`e96576ee`), 92 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V67:** Exp216 47-domain CPU proof, Exp217 benchmark, Exp218 GPU v5 portability, Exp219 streaming v3, Exp220 cross-substrate v67, 11 extension papers (Exp144-156) promoted to three-tier, BandwidthTier + ComputeDispatch wired in metalForge, 50/50 three-tier. 10 new Python baselines (Exp170-178 soil papers + spectral match).
+**Status:** 47 CPU + 42 GPU modules + 1 IPC module (all lean, 0 local WGSL, 0 local derivative/regression math), 82 ToadStool primitives consumed (barracuda always-on, zero fallback code), 1,148+ tests (955 barracuda lib + 60 integration + 20 doc + 113 forge), 229 experiments, 5,743+ checks (1,833+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S68+ aligned (`e96576ee`), 97 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V75:** ComputeDispatch adoption (6 GPU modules), BatchedMultinomialGpu + PairwiseL2Gpu + FstVariance, 82 primitives.
 
 ### Full Lean Phase
 
@@ -89,7 +89,7 @@ All GPU bio modules are now either Lean (upstream primitive) or Compose
 
 All modules pass `clippy::pedantic` + `clippy::nursery` (0 warnings, `-D` enforced
 in CI), `cargo fmt` (0 diffs), `cargo doc` (0 warnings with and without `--all-features`).
-All tolerances centralized in `tolerances.rs` (79 named constants — includes
+All tolerances centralized in `tolerances.rs` (97 named constants — includes
 Jacobi eigendecomposition (Golub & Van Loan), ESN regularisation (Jaeger 2001/
 Lukoševičius 2012), Chao1 count detection (skbio parity), and 8 V39 audit
 additions: rarefaction, PCoA, KMD, HMM, Gillespie, asari). NMF convergence
@@ -249,7 +249,7 @@ All GPU ODE modules now use `BatchedOdeRK4::<S>::generate_shader()` which:
 
 ---
 
-## ToadStool Primitives Consumed (66 — barracuda always-on)
+## ToadStool Primitives Consumed (82 — barracuda always-on)
 
 ### Original 15 (pre-Feb 22)
 
@@ -476,9 +476,9 @@ no parallelism benefit) and `fastq_parsing` (I/O-bound).
 | WGSL pattern | `pub const WGSL: &str` inline | `include_str!("../shaders/...")` |
 | metalForge | GPU + NPU hardware characterization | GPU + NPU + cross-substrate validation |
 | Handoffs | `../wateringHole/handoffs/` (36+ docs) | `ecoPrimals/archive/wetspring-early-handoffs-feb2026/` (v1-v9 fossil) |
-| Tests | 454 | 1,008 |
-| Validation | 418 checks | 2,673+ checks |
-| Experiments | 31 suites | 211 experiments |
+| Tests | 454 | 1,148 |
+| Validation | 418 checks | 5,743+ checks |
+| Experiments | 31 suites | 229 experiments |
 | Line coverage | — | 97% bio+io (55% overall) |
 | Pipeline caching | Upstream (ToadStool native) | Local (Exp068, 38% overhead reduction) |
 | Three-tier proof | CPU→GPU→NPU | Python→CPU→GPU→NPU (Exp069) |

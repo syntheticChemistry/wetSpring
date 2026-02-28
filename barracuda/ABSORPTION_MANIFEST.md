@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** February 28, 2026 (V73 Deep Debt Reduction)
+**Date:** February 28, 2026 (V75 ToadStool Rewire)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
 **ToadStool pin:** `e96576ee` (S68+: device-lost resilience, dispatch semaphore, 700 shaders, 0 f32-only, Feb 27 2026)
-**Status:** 79 ToadStool primitives consumed via `compile_shader_universal` (incl. 11 `stats::diversity` + 2 `stats::metrics` + S66: `hill`, `monod`, `fit_linear`, `percentile`, `mean`, `shannon_from_frequencies`), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,199+ tests (977 barracuda lib + 60 integration + 19 doc + 47 forge), 95.46% line / 93.54% fn / 94.99% branch, ToadStool S68+ aligned, 229 experiments, 5,743+ checks (1,783 GPU on RTX 4070, 60 NPU on AKD1000), 92 named tolerances, 0 ad-hoc magic numbers, `clippy::pedantic` CLEAN. Hand off: V73 active (supersedes V66), V7-V66 archived.
+**Status:** 82 ToadStool primitives consumed via `compile_shader_universal` (incl. 11 `stats::diversity` + 2 `stats::metrics` + S66: `hill`, `monod`, `fit_linear`, `percentile`, `mean`, `shannon_from_frequencies`), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,148+ tests (955 barracuda lib + 60 integration + 20 doc + 113 forge), 95.86% line / 94.02% fn / 95.40% branch, ToadStool S68+ aligned, 229 experiments, 5,743+ checks (1,783 GPU on RTX 4070, 60 NPU on AKD1000), 97 named tolerances, 0 ad-hoc magic numbers, `clippy::pedantic` CLEAN. Hand off: V75 active (supersedes V73), V7-V70 archived.
 
 ---
 
@@ -49,9 +49,9 @@ WGSL          known physics   handoffs/                        delete local
 | Compose | GPU wrappers wiring ToadStool primitives | **7 modules** (kmd, merge_pairs, RF, derep, NJ, reconciliation, molecular_clock) |
 | Passthrough | Accept GPU buffers, CPU kernel | **0 modules** — all 3 former Passthrough promoted (V40) |
 | Validate | CPU ↔ GPU parity for all shaders | All 5 ODE: exact parity (Exp099/100/101) |
-| Hand off | wateringHole/handoffs/ documents | **V63** active (S68+ realignment), V7-V62 archived |
-| Absorb | ToadStool integrates as `ops::bio::*` | **79 primitives** consumed (ToadStool S66: all DONE, +46 cross-spring total) |
-| Lean | Rewire to upstream, delete local code | 79 primitives consumed (S66), 5 `OdeSystem` trait rewires, BGL boilerplate removed, 0 Passthrough |
+| Hand off | wateringHole/handoffs/ documents | **V75** active (ToadStool Rewire), V7-V70 archived |
+| Absorb | ToadStool integrates as `ops::bio::*` | **82 primitives** consumed (ToadStool S66: all DONE, +46 cross-spring total) |
+| Lean | Rewire to upstream, delete local code | 82 primitives consumed (S66), 5 `OdeSystem` trait rewires, BGL boilerplate removed, 0 Passthrough |
 
 ---
 
@@ -204,7 +204,7 @@ removed (~200 lines). wetSpring retains:
 
 ## metalForge Forge Crate
 
-The `metalForge/forge/` crate (`wetspring-forge` v0.3.0, 47 tests) provides:
+The `metalForge/forge/` crate (`wetspring-forge` v0.3.0, 113 tests) provides:
 
 | Module | Purpose | Absorption Path |
 |--------|---------|-----------------|

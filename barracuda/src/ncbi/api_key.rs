@@ -92,8 +92,9 @@ mod tests {
 
     #[test]
     fn parse_toml_nonexistent_file() {
-        let path = Path::new("/tmp/wetspring_nonexistent_toml_abc123.toml");
-        assert!(parse_toml(path).is_none());
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("wetspring_nonexistent_toml_abc123.toml");
+        assert!(parse_toml(&path).is_none());
     }
 
     #[test]

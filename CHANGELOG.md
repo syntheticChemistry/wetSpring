@@ -5,6 +5,55 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V75 — ToadStool Rewire: ComputeDispatch + New Op Adoption (2026-02-28)
+
+### ComputeDispatch Adoption
+- 6 GPU modules refactored from manual bind-group layout to `ComputeDispatch` builder: `gemm_cached`, `bistable_gpu`, `capacitor_gpu`, `cooperation_gpu`, `multi_signal_gpu`, `phage_defense_gpu`
+- ~400 lines of BGL/pipeline/bind-group boilerplate removed
+- Struct fields simplified: `pipeline` and `bgl` fields eliminated from all 6 modules
+- Constructors became `const fn` (no shader compilation at init)
+
+### New ToadStool Primitives Adopted
+- `BatchedMultinomialGpu` — `rarefaction_gpu` evolved from `FusedMapReduceF64` + CPU subsample to dedicated GPU multinomial
+- `DiversityFusionGpu` — fused Shannon + Simpson + evenness per bootstrap replicate
+- `PairwiseL2Gpu` — new `pairwise_l2_gpu` module for condensed Euclidean distances
+- `fst_variance_decomposition` — new `fst_variance` module (Weir-Cockerham FST)
+
+### Primitive Count
+- 79 → 82 consumed primitives (+`ComputeDispatch`, +`BatchedMultinomialGpu`, +`PairwiseL2Gpu`)
+
+### Documentation
+- Updated `CONTROL_EXPERIMENT_STATUS.md` to Phase 75
+- New handoff: `WETSPRING_TOADSTOOL_V75_COMPUTE_DISPATCH_REWIRE_FEB28_2026.md`
+
+### Totals
+- 229 experiments, 5,743+ checks, 1,148+ tests (955 lib + 60 integration + 20 doc + 113 forge)
+- Clippy pedantic CLEAN, all tests PASS
+
+## V74 — Deep Evolution Audit (2026-02-28)
+
+### Code Quality
+- `cargo fmt`/`clippy --pedantic` green (was failing prior)
+- 25 ad-hoc tolerance literals → named constants (97 total)
+- 15 manual mean/variance → `barracuda::stats`
+- 20+ `/tmp/` paths → `tempfile::tempdir()`
+
+### Refactoring
+- 5 large files smart-refactored: tolerances (→ `bio.rs` + `instrument.rs`), workloads (→ `provenance.rs`), dispatch (→ `handlers.rs`), ESN (→ `npu.rs`), quality (→ `trim.rs`)
+- 3 GPU passthroughs → real implementations (chimera, derep, reconciliation use `KmerHistogramGpu`/`GemmF64`/`FusedMapReduceF64`)
+
+### Fixes
+- 58 forge clippy errors fixed (doc markdown + `# Errors` sections)
+- `requirements.txt` completed (pandas, dendropy)
+- PCoA condensed matrix bug fixed
+- metalForge workload counts corrected (45 absorbed, 2 CPU-only)
+- PFAS tolerance corrected (`ML_F1_SCORE` for accuracy comparison)
+- Broken intra-doc links fixed (`[0,1]` → escaped brackets)
+
+### Totals
+- 229 experiments, 5,743+ checks, 1,148+ tests
+- 95.86% line coverage, clippy pedantic CLEAN (both crates)
+
 ## V73 — Deep Debt Reduction + Idiomatic Rust Evolution (2026-02-28)
 
 ### Error Type Evolution

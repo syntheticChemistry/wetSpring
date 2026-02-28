@@ -64,9 +64,7 @@ pub fn pack_slice(data: &[f64]) -> Vec<f32> {
 #[must_use]
 pub fn unpack_slice(data: &[f32]) -> Vec<f64> {
     assert!(data.len() % 2 == 0, "DF64 data must have even length");
-    data.chunks_exact(2)
-        .map(|c| unpack(c[0], c[1]))
-        .collect()
+    data.chunks_exact(2).map(|c| unpack(c[0], c[1])).collect()
 }
 
 /// Precision of a DF64 round-trip: pack then unpack.
@@ -147,7 +145,7 @@ mod tests {
     #[test]
     #[should_panic(expected = "even length")]
     fn unpack_odd_panics() {
-        unpack_slice(&[1.0, 2.0, 3.0]);
+        let _ = unpack_slice(&[1.0, 2.0, 3.0]);
     }
 
     #[test]

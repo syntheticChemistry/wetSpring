@@ -174,7 +174,7 @@ fn main() {
         let mut n_extended = 0_usize;
         let mut r_values = Vec::with_capacity(N_SYNTHETIC_SAMPLES);
 
-        for j in all_pielou.iter() {
+        for j in &all_pielou {
             let w = evenness_to_disorder(*j);
             let mat = anderson_3d(l, l, l, w, fixed_seed);
             let tri = lanczos(&mat, n_lattice, 42);

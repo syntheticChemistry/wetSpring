@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V73** | `handoffs/WETSPRING_TOADSTOOL_V73_DEBT_REDUCTION_FIVE_TIER_HANDOFF_FEB28_2026.md` | Feb 28 | **current** — V73 deep debt reduction (RpcError, function decomposition, safe casts, named constants) + V72 five-tier chain (Exp224-228: paper math 58/58, CPU v14 58/58, GPU v6 28/28, streaming v4 24/24, metalForge v8 33/33), 229 experiments 5,743+ checks ALL PASS |
+| **V75** | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V75_COMPUTE_DISPATCH_REWIRE_FEB28_2026.md` | Feb 28 | **current** — 82 primitives consumed (+`ComputeDispatch`, +`BatchedMultinomialGpu`, +`PairwiseL2Gpu`), 6 GPU modules refactored from manual BGL to ComputeDispatch builder, `rarefaction_gpu` evolved to dedicated multinomial GPU, `pairwise_l2_gpu` + `fst_variance` adopted |
+| V73 | `handoffs/WETSPRING_TOADSTOOL_V73_DEBT_REDUCTION_FIVE_TIER_HANDOFF_FEB28_2026.md` | Feb 28 | V73 deep debt + V72 five-tier chain (Exp224-228), 229 experiments 5,743+ checks ALL PASS |
 
 ## NestGate Handoffs
 
@@ -25,8 +26,8 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` (V7-V64, API report, rewire, cross-spring provenance — 54 files).
-V34-V39 archived (superseded by V40). V40-V43 archived (superseded by V47). V44-V45 archived (superseded by V48). V47-V50 archived (superseded by V52). V52 archived (superseded by V53+V54). V53-V55 archived (superseded by V56-V59). V56-V58 archived (superseded by V59+V60). V59-V66 archived (superseded by V73).
+Superseded handoffs in `handoffs/archive/` (V7-V72, API report, rewire, cross-spring provenance — 56 files).
+V34-V39 archived (superseded by V40). V40-V43 archived (superseded by V47). V44-V45 archived (superseded by V48). V47-V50 archived (superseded by V52). V52 archived (superseded by V53+V54). V53-V55 archived (superseded by V56-V59). V56-V58 archived (superseded by V59+V60). V59-V66 archived (superseded by V73). V61+V70 archived at ecosystem wateringHole (superseded by V75).
 Cross-spring docs moved to archive: `CROSS_SPRING_EVOLUTION_WETSPRING_FEB22_2026.md`, `CROSS_SPRING_PROVENANCE_FEB22_2026.md`.
 
 ## Convention

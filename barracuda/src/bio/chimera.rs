@@ -226,7 +226,7 @@ pub fn remove_chimeras(seqs: &[Asv], params: &ChimeraParams) -> (Vec<Asv>, Chime
 /// then evaluates all crossover points in O(1) each. Early termination
 /// when score exceeds threshold.
 #[allow(clippy::cast_precision_loss)]
-fn test_chimera_fast(
+pub(crate) fn test_chimera_fast(
     query: &Asv,
     seqs: &[Asv],
     candidates: &[usize],

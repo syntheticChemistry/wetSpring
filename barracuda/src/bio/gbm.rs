@@ -65,7 +65,9 @@ impl GbmTree {
             || right_children.len() != n
             || values.len() != n
         {
-            return Err(error::Error::InvalidInput("inconsistent array lengths".into()));
+            return Err(error::Error::InvalidInput(
+                "inconsistent array lengths".into(),
+            ));
         }
         let nodes = (0..n)
             .map(|i| GbmNode {
@@ -165,7 +167,10 @@ impl GbmClassifier {
     /// Batch prediction with probabilities.
     #[must_use]
     pub fn predict_batch_proba(&self, samples: &[Vec<f64>]) -> Vec<GbmPrediction> {
-        samples.iter().map(|s| self.predict_single_proba(s)).collect()
+        samples
+            .iter()
+            .map(|s| self.predict_single_proba(s))
+            .collect()
     }
 
     /// Single-sample prediction with probability.

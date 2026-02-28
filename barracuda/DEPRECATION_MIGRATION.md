@@ -2,6 +2,7 @@
 
 **Date:** February 25, 2026
 **Pattern:** Following hotSpring's `DEPRECATION_MIGRATION.md`
+**Status:** All migrations complete. No pending deprecation candidates. Document retained for provenance.
 
 When ToadStool absorbs a wetSpring shader or pattern, the local copy becomes
 **deprecated**. We keep it for reference but use the upstream version in all

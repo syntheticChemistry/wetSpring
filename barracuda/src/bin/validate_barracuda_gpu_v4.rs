@@ -15,12 +15,12 @@
 //! Exp207: `BarraCuda` GPU Parity v4 — IPC Science Capabilities on GPU
 //!
 //! Validates that every science capability dispatched through the IPC layer
-//! produces GPU↔CPU parity when ToadStool compute dispatch is available.
+//! produces GPU↔CPU parity when `ToadStool` compute dispatch is available.
 //! Exercises diversity (fused map-reduce), QS ODE (parameter sweep),
 //! Anderson spectral analysis, and full pipeline chaining on GPU.
 //!
 //! This proves the math is truly portable: CPU call == GPU call == IPC dispatch
-//! for the same input data. ToadStool's unidirectional streaming eliminates
+//! for the same input data. `ToadStool`'s unidirectional streaming eliminates
 //! round-trips; the math is identical.
 //!
 //! # Provenance

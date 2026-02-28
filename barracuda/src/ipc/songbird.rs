@@ -208,8 +208,9 @@ mod tests {
 
     #[test]
     fn register_nonexistent_socket_errors() {
-        let bad_path = PathBuf::from("/tmp/wetspring_test_no_songbird.sock");
-        let ws_path = PathBuf::from("/tmp/wetspring.sock");
+        let dir = tempfile::tempdir().unwrap();
+        let bad_path = dir.path().join("wetspring_test_no_songbird.sock");
+        let ws_path = dir.path().join("wetspring.sock");
         let err = register(&bad_path, &ws_path).unwrap_err();
         let msg = err.to_string();
         assert!(
@@ -220,7 +221,8 @@ mod tests {
 
     #[test]
     fn heartbeat_nonexistent_socket_errors() {
-        let bad_path = PathBuf::from("/tmp/wetspring_test_no_songbird_hb.sock");
+        let dir = tempfile::tempdir().unwrap();
+        let bad_path = dir.path().join("wetspring_test_no_songbird_hb.sock");
         let err = heartbeat(&bad_path).unwrap_err();
         assert!(
             err.to_string().contains("Songbird connect")

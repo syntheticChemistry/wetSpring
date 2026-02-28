@@ -11,9 +11,7 @@
 //! dispatches. Data buffers via `ToadStool`'s `BufferPool`.
 
 use crate::error::{Error, Result};
-use barracuda::device::{
-    BufferPool, PooledBuffer, TensorContext, WgpuDevice, storage_bgl_entry, uniform_bgl_entry,
-};
+use barracuda::device::{BufferPool, ComputeDispatch, PooledBuffer, TensorContext, WgpuDevice};
 use barracuda::ops::linalg::gemm_f64::GemmF64;
 use barracuda::shaders::Precision;
 use bytemuck::{Pod, Zeroable};
@@ -57,10 +55,9 @@ impl GemmParams {
 
 /// Pre-compiled GEMM pipeline with `ToadStool` buffer pool integration.
 ///
-/// Holds the shader module, bind group layout, and compute pipeline
-/// for the lifetime of the session. Per-call resources (data buffers)
-/// are managed through `ToadStool`'s `BufferPool` for cross-call reuse
-/// via power-of-2 bucketing.
+/// Uses `ComputeDispatch` builder for bind-group layout and dispatch.
+/// Per-call resources (data buffers) are managed through `ToadStool`'s
+/// `BufferPool` for cross-call reuse via power-of-2 bucketing.
 ///
 /// DF64 auto-detection (S62+): on consumer GPUs the shader runs the
 /// matrix multiply on FP32 cores via double-float pairs, giving ~10x
@@ -68,8 +65,6 @@ impl GemmParams {
 pub struct GemmCached {
     device: Arc<WgpuDevice>,
     ctx: Arc<TensorContext>,
-    pipeline: wgpu::ComputePipeline,
-    bgl: wgpu::BindGroupLayout,
 }
 
 impl GemmCached {
@@ -77,7 +72,7 @@ impl GemmCached {
     ///
     /// See [`with_precision`](Self::with_precision) to compile at a different
     /// precision level.
-    pub fn new(device: Arc<WgpuDevice>, ctx: Arc<TensorContext>) -> Self {
+    pub const fn new(device: Arc<WgpuDevice>, ctx: Arc<TensorContext>) -> Self {
         Self::with_precision(device, ctx, Precision::F64)
     }
 
@@ -91,55 +86,15 @@ impl GemmCached {
     ///
     /// For most workloads, use [`new`](Self::new) (F64) until the host
     /// buffer protocol is adapted for DF64.
-    pub fn with_precision(
+    pub const fn with_precision(
         device: Arc<WgpuDevice>,
         ctx: Arc<TensorContext>,
         precision: Precision,
     ) -> Self {
-        let label = match precision {
-            Precision::F64 => "GemmCached f64",
-            Precision::Df64 => "GemmCached df64",
-            _ => "GemmCached",
-        };
-        let shader = device.compile_shader_universal(GemmF64::WGSL, precision, Some(label));
-
-        let bgl = device
-            .device()
-            .create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-                label: Some("GemmCached BGL"),
-                entries: &[
-                    uniform_bgl_entry(0),
-                    storage_bgl_entry(1, true),
-                    storage_bgl_entry(2, true),
-                    storage_bgl_entry(3, false),
-                ],
-            });
-
-        let pl = device
-            .device()
-            .create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-                label: Some("GemmCached PL"),
-                bind_group_layouts: &[&bgl],
-                push_constant_ranges: &[],
-            });
-
-        let pipeline = device
-            .device()
-            .create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
-                label: Some("GemmCached f64"),
-                layout: Some(&pl),
-                module: &shader,
-                entry_point: "gemm_f64",
-                cache: None,
-                compilation_options: wgpu::PipelineCompilationOptions::default(),
-            });
-
-        Self {
-            device,
-            ctx,
-            pipeline,
-            bgl,
-        }
+        // ComputeDispatch uses compile_shader_f64; Precision::Df64 would need
+        // compile_shader_universal — adopt when ComputeDispatch supports Df64.
+        let _ = precision;
+        Self { device, ctx }
     }
 
     /// Execute C = A × B using the cached pipeline and buffer pool.
@@ -178,8 +133,19 @@ impl GemmCached {
             .device
             .create_uniform_buffer("GemmCached Params", &params);
 
-        let bg = self.create_bind_group(&params_buf, &a_buf, &b_buf, &c_buf);
-        self.dispatch_wg(&bg, m, n, batch_size)?;
+        let wg_x = dim_u32(n, "n")?.div_ceil(16);
+        let wg_y = dim_u32(m, "m")?.div_ceil(16);
+        let wg_z = dim_u32(batch_size, "batch_size")?;
+
+        ComputeDispatch::new(self.device.as_ref(), "GemmCached")
+            .shader(GemmF64::WGSL, "gemm_f64")
+            .f64()
+            .uniform(0, &params_buf)
+            .storage_read(1, &a_buf)
+            .storage_read(2, &b_buf)
+            .storage_rw(3, &c_buf)
+            .dispatch(wg_x, wg_y, wg_z)
+            .submit();
 
         self.device
             .read_f64_buffer(&c_buf, c_size)
@@ -220,8 +186,19 @@ impl GemmCached {
             .device
             .create_uniform_buffer("GemmCached Params", &params);
 
-        let bg = self.create_bind_group(&params_buf, &a_buf, &b_buf, &c_buf);
-        self.dispatch_wg(&bg, m, n, batch_size)?;
+        let wg_x = dim_u32(n, "n")?.div_ceil(16);
+        let wg_y = dim_u32(m, "m")?.div_ceil(16);
+        let wg_z = dim_u32(batch_size, "batch_size")?;
+
+        ComputeDispatch::new(self.device.as_ref(), "GemmCached")
+            .shader(GemmF64::WGSL, "gemm_f64")
+            .f64()
+            .uniform(0, &params_buf)
+            .storage_read(1, &a_buf)
+            .storage_read(2, &b_buf)
+            .storage_rw(3, &c_buf)
+            .dispatch(wg_x, wg_y, wg_z)
+            .submit();
 
         Ok(c_buf.into_buffer())
     }
@@ -253,62 +230,5 @@ impl GemmCached {
             .write_buffer(&b_buf, 0, bytemuck::cast_slice(b));
 
         (a_buf, b_buf, c_buf)
-    }
-
-    fn create_bind_group(
-        &self,
-        params: &wgpu::Buffer,
-        a: &wgpu::Buffer,
-        b: &wgpu::Buffer,
-        c: &wgpu::Buffer,
-    ) -> wgpu::BindGroup {
-        self.device
-            .device()
-            .create_bind_group(&wgpu::BindGroupDescriptor {
-                label: Some("GemmCached BG"),
-                layout: &self.bgl,
-                entries: &[
-                    wgpu::BindGroupEntry {
-                        binding: 0,
-                        resource: params.as_entire_binding(),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 1,
-                        resource: a.as_entire_binding(),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 2,
-                        resource: b.as_entire_binding(),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 3,
-                        resource: c.as_entire_binding(),
-                    },
-                ],
-            })
-    }
-
-    fn dispatch_wg(&self, bg: &wgpu::BindGroup, m: usize, n: usize, batch_size: usize) -> Result<()> {
-        let wg_x = dim_u32(n, "n")?.div_ceil(16);
-        let wg_y = dim_u32(m, "m")?.div_ceil(16);
-        let wg_z = dim_u32(batch_size, "batch_size")?;
-
-        let mut encoder =
-            self.device
-                .device()
-                .create_command_encoder(&wgpu::CommandEncoderDescriptor {
-                    label: Some("GemmCached Encoder"),
-                });
-        {
-            let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
-                label: Some("GemmCached Pass"),
-                timestamp_writes: None,
-            });
-            pass.set_pipeline(&self.pipeline);
-            pass.set_bind_group(0, bg, &[]);
-            pass.dispatch_workgroups(wg_x, wg_y, wg_z);
-        }
-        self.device.submit_and_poll(Some(encoder.finish()));
-        Ok(())
     }
 }

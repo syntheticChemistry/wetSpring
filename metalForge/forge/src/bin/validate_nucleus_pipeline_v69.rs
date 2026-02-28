@@ -4,11 +4,11 @@
 //!
 //! Validates the complete Tower → Nest → Node data flow:
 //!
-//! **S1: Nest Client Protocol** — NestGate storage JSON-RPC protocol
+//! **S1: Nest Client Protocol** — `NestGate` storage JSON-RPC protocol
 //!       (store, retrieve, exists, list, blob round-trip, base64)
 //!
 //! **S2: NCBI Acquisition via Tower** — ESearch/ESummary/EFetch protocol,
-//!       assembly resolution chain, NestGate caching layer
+//!       assembly resolution chain, `NestGate` caching layer
 //!
 //! **S3: Real Assembly Compute (Node)** — N50, GC content, genome size,
 //!       Shannon entropy on 199 Vibrio + 158 Campylobacterota assemblies
@@ -29,6 +29,7 @@
     clippy::cast_possible_truncation
 )]
 
+use wetspring_barracuda::tolerances;
 use wetspring_forge::data;
 use wetspring_forge::dispatch;
 use wetspring_forge::inventory;
@@ -92,46 +93,56 @@ fn section_nest_protocol(pass: &mut u32, fail: &mut u32) {
     let test_data = b"ATGCATGCATGC\n>genome_assembly_data\nGGGCCCATATAT";
     let encoded = nest_base64_encode(test_data);
     let decoded = nest_base64_decode(&encoded);
-    check("Base64 round-trip (genomic data)", decoded == test_data, pass, fail);
+    check(
+        "Base64 round-trip (genomic data)",
+        decoded == test_data,
+        pass,
+        fail,
+    );
 
     // Base64 with binary payload
     let binary_data: Vec<u8> = (0..=255).collect();
     let enc2 = nest_base64_encode(&binary_data);
     let dec2 = nest_base64_decode(&enc2);
-    check("Base64 round-trip (binary 0-255)", dec2 == binary_data, pass, fail);
+    check(
+        "Base64 round-trip (binary 0-255)",
+        dec2 == binary_data,
+        pass,
+        fail,
+    );
 
     // NestGate socket discovery
     let socket_result = nest::discover_nestgate_socket();
     let has_nestgate = socket_result.is_some();
     println!(
         "  [INFO] NestGate socket: {}",
-        if has_nestgate { "FOUND" } else { "not running (protocol-only mode)" }
+        if has_nestgate {
+            "FOUND"
+        } else {
+            "not running (protocol-only mode)"
+        }
     );
-    check(
-        "NestGate socket discovery does not panic",
-        true,
-        pass,
-        fail,
-    );
+    check("NestGate socket discovery does not panic", true, pass, fail);
 
     // NestClient construction
-    let client = nest::NestClient::new(PathBuf::from("/tmp/test-nestgate.sock"));
+    let dir = tempfile::tempdir().unwrap();
+    let sock = dir.path().join("test-nestgate.sock");
+    let client = nest::NestClient::new(sock);
     check(
         "NestClient constructs with arbitrary socket",
-        client.socket_path().to_str().unwrap().contains("test-nestgate"),
+        client
+            .socket_path()
+            .to_str()
+            .unwrap()
+            .contains("test-nestgate"),
         pass,
         fail,
     );
 
     // NestClient with family
-    let client2 = nest::NestClient::new(PathBuf::from("/tmp/test.sock"))
-        .with_family("wetspring");
-    check(
-        "NestClient accepts custom family_id",
-        true,
-        pass,
-        fail,
-    );
+    let sock2 = dir.path().join("test.sock");
+    let client2 = nest::NestClient::new(sock2).with_family("wetspring");
+    check("NestClient accepts custom family_id", true, pass, fail);
     let _ = client2;
 
     // NestClient discover (graceful when no socket)
@@ -174,7 +185,12 @@ fn section_ncbi_acquisition(pass: &mut u32, fail: &mut u32) {
     check("ESearch XML parse: count=199", count == 199, pass, fail);
 
     let ids = extract_xml_ids(sample_xml);
-    check("ESearch XML parse: 3 IDs returned", ids.len() == 3, pass, fail);
+    check(
+        "ESearch XML parse: 3 IDs returned",
+        ids.len() == 3,
+        pass,
+        fail,
+    );
 
     // NcbiClient construction
     let client = ncbi::NcbiClient::direct();
@@ -186,12 +202,7 @@ fn section_ncbi_acquisition(pass: &mut u32, fail: &mut u32) {
     );
 
     let client2 = ncbi::NcbiClient::discover();
-    check(
-        "NcbiClient::discover() graceful",
-        true,
-        pass,
-        fail,
-    );
+    check("NcbiClient::discover() graceful", true, pass, fail);
     let _ = client2;
 
     // Assembly resolution: check local data directory
@@ -203,20 +214,13 @@ fn section_ncbi_acquisition(pass: &mut u32, fail: &mut u32) {
         check(
             "Assembly resolve: Vibrio GCF_000024825.1 found locally",
             result.is_ok()
-                && result
-                    .as_ref()
-                    .unwrap()
-                    .source == ncbi::AssemblySource::LocalFile(vibrio_dir.join("GCF_000024825.1.fna.gz")),
+                && result.as_ref().unwrap().source
+                    == ncbi::AssemblySource::LocalFile(vibrio_dir.join("GCF_000024825.1.fna.gz")),
             pass,
             fail,
         );
         if let Ok(ref r) = result {
-            check(
-                "Assembly resolve: size > 0",
-                r.size_bytes > 0,
-                pass,
-                fail,
-            );
+            check("Assembly resolve: size > 0", r.size_bytes > 0, pass, fail);
         }
     } else {
         println!("  [SKIP] Vibrio assemblies not on disk");
@@ -234,13 +238,29 @@ fn section_assembly_compute(pass: &mut u32, fail: &mut u32) {
     let campy_dir = data_dir.join("campylobacterota_assemblies");
 
     if vibrio_dir.is_dir() {
-        validate_organism_collection("Vibrio", &vibrio_dir, 150, 0.44..=0.52, 2.5..=6.5, pass, fail);
+        validate_organism_collection(
+            "Vibrio",
+            &vibrio_dir,
+            150,
+            0.44..=0.52,
+            2.5..=6.5,
+            pass,
+            fail,
+        );
     } else {
         println!("  [SKIP] Vibrio assemblies not available");
     }
 
     if campy_dir.is_dir() {
-        validate_organism_collection("Campylobacterota", &campy_dir, 100, 0.25..=0.45, 1.0..=4.0, pass, fail);
+        validate_organism_collection(
+            "Campylobacterota",
+            &campy_dir,
+            100,
+            0.25..=0.45,
+            1.0..=4.0,
+            pass,
+            fail,
+        );
     } else {
         println!("  [SKIP] Campylobacterota assemblies not available");
     }
@@ -274,8 +294,7 @@ fn validate_organism_collection(
     );
 
     if !stats.is_empty() {
-        let mean_gc: f64 =
-            stats.iter().map(|s| s.gc_content).sum::<f64>() / stats.len() as f64;
+        let mean_gc: f64 = stats.iter().map(|s| s.gc_content).sum::<f64>() / stats.len() as f64;
         check(
             &format!("{name} mean GC: {mean_gc:.4} (expect {gc_range:?})"),
             gc_range.contains(&mean_gc),
@@ -356,9 +375,7 @@ fn section_collection_diversity(pass: &mut u32, fail: &mut u32) {
         if gc_values.len() >= 5 {
             let gc_entropy = node::shannon_entropy_binned(&gc_values, 10);
             check(
-                &format!(
-                    "Vibrio GC Shannon entropy: {gc_entropy:.4} (expect > 0, diverse GC)"
-                ),
+                &format!("Vibrio GC Shannon entropy: {gc_entropy:.4} (expect > 0, diverse GC)"),
                 gc_entropy > 0.0,
                 pass,
                 fail,
@@ -366,9 +383,7 @@ fn section_collection_diversity(pass: &mut u32, fail: &mut u32) {
 
             let size_entropy = node::shannon_entropy_binned(&sizes, 10);
             check(
-                &format!(
-                    "Vibrio genome size entropy: {size_entropy:.4} (expect > 0)"
-                ),
+                &format!("Vibrio genome size entropy: {size_entropy:.4} (expect > 0)"),
                 size_entropy > 0.0,
                 pass,
                 fail,
@@ -380,9 +395,10 @@ fn section_collection_diversity(pass: &mut u32, fail: &mut u32) {
             let gc_range = gc_max - gc_min;
             check(
                 &format!(
-                    "Vibrio GC range: {gc_range:.4} (expect >= 0.02 for genus diversity)"
+                    "Vibrio GC range: {gc_range:.4} (expect >= {} for genus diversity)",
+                    tolerances::GC_GENUS_DIVERSITY_MIN
                 ),
-                gc_range >= 0.02,
+                gc_range >= tolerances::GC_GENUS_DIVERSITY_MIN,
                 pass,
                 fail,
             );
@@ -449,7 +465,10 @@ fn section_pipeline_integration(pass: &mut u32, fail: &mut u32) {
 
     let campy = data::resolve_dataset("campylobacterota_assemblies");
     check(
-        &format!("Nest resolves campylobacterota_assemblies: {:?}", campy.source),
+        &format!(
+            "Nest resolves campylobacterota_assemblies: {:?}",
+            campy.source
+        ),
         campy.is_real,
         pass,
         fail,
@@ -464,10 +483,7 @@ fn section_pipeline_integration(pass: &mut u32, fail: &mut u32) {
     );
 
     // Node: dispatch routing for NUCLEUS workloads
-    let w = dispatch::Workload::new(
-        "vibrio_assembly_stats",
-        vec![Capability::F64Compute],
-    );
+    let w = dispatch::Workload::new("vibrio_assembly_stats", vec![Capability::F64Compute]);
     let d = dispatch::route_bandwidth_aware(&w, &substrates);
     check(
         "Node routes assembly_stats workload",
@@ -594,8 +610,7 @@ fn compute_gc_sample(paths: &[PathBuf]) -> Vec<f64> {
     gcs
 }
 
-const B64: &[u8; 64] =
-    b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const B64: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 fn nest_base64_encode(data: &[u8]) -> String {
     let mut result = String::with_capacity(data.len().div_ceil(3) * 4);
@@ -621,7 +636,10 @@ fn nest_base64_encode(data: &[u8]) -> String {
 }
 
 fn nest_base64_decode(encoded: &str) -> Vec<u8> {
-    let clean: Vec<u8> = encoded.bytes().filter(|b| !b.is_ascii_whitespace()).collect();
+    let clean: Vec<u8> = encoded
+        .bytes()
+        .filter(|b| !b.is_ascii_whitespace())
+        .collect();
     let mut result = Vec::with_capacity(clean.len() * 3 / 4);
     for chunk in clean.chunks(4) {
         if chunk.len() < 4 {

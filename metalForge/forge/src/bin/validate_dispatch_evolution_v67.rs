@@ -32,7 +32,9 @@
 use wetspring_forge::bridge;
 use wetspring_forge::dispatch::{self, Workload};
 use wetspring_forge::streaming::{PipelineStage, StreamingSession};
-use wetspring_forge::substrate::{Capability, Identity, Properties, Substrate, SubstrateKind, SubstrateOrigin};
+use wetspring_forge::substrate::{
+    Capability, Identity, Properties, Substrate, SubstrateKind, SubstrateOrigin,
+};
 use wetspring_forge::workloads;
 
 fn check(pass: &mut u32, fail: &mut u32, total: &mut u32, name: &str, ok: bool) {
@@ -113,7 +115,9 @@ fn section_bandwidth_detection(pass: &mut u32, fail: &mut u32, total: &mut u32) 
     let rtx4070 = make_gpu("NVIDIA GeForce RTX 4070");
     let tier = bridge::detect_bandwidth_tier(&rtx4070);
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "RTX 4070 has BandwidthTier",
         tier.is_some(),
     );
@@ -121,7 +125,9 @@ fn section_bandwidth_detection(pass: &mut u32, fail: &mut u32, total: &mut u32) 
     let cpu = make_cpu();
     let cpu_tier = bridge::detect_bandwidth_tier(&cpu);
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "CPU has no BandwidthTier",
         cpu_tier.is_none(),
     );
@@ -129,7 +135,9 @@ fn section_bandwidth_detection(pass: &mut u32, fail: &mut u32, total: &mut u32) 
     let npu = make_npu();
     let npu_tier = bridge::detect_bandwidth_tier(&npu);
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "NPU has no BandwidthTier",
         npu_tier.is_none(),
     );
@@ -137,7 +145,9 @@ fn section_bandwidth_detection(pass: &mut u32, fail: &mut u32, total: &mut u32) 
     let rtx2080 = make_gpu("NVIDIA GeForce RTX 2080 Ti");
     let tier_2080 = bridge::detect_bandwidth_tier(&rtx2080);
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "RTX 2080 Ti has BandwidthTier",
         tier_2080.is_some(),
     );
@@ -145,7 +155,9 @@ fn section_bandwidth_detection(pass: &mut u32, fail: &mut u32, total: &mut u32) 
     let a100 = make_gpu("NVIDIA A100");
     let tier_a100 = bridge::detect_bandwidth_tier(&a100);
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "A100 has BandwidthTier",
         tier_a100.is_some(),
     );
@@ -160,20 +172,24 @@ fn section_bandwidth_routing(pass: &mut u32, fail: &mut u32, total: &mut u32) {
     let cpu = make_cpu();
     let inventory = [gpu, cpu];
 
-    let small_work = Workload::new("small_diversity", vec![Capability::F64Compute])
-        .with_data_bytes(64);
+    let small_work =
+        Workload::new("small_diversity", vec![Capability::F64Compute]).with_data_bytes(64);
     let d_small = dispatch::route_bandwidth_aware(&small_work, &inventory);
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "small workload routes somewhere",
         d_small.is_some(),
     );
 
-    let large_work = Workload::new("large_diversity", vec![Capability::F64Compute])
-        .with_data_bytes(100_000_000);
+    let large_work =
+        Workload::new("large_diversity", vec![Capability::F64Compute]).with_data_bytes(100_000_000);
     let d_large = dispatch::route_bandwidth_aware(&large_work, &inventory);
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "large workload routes somewhere",
         d_large.is_some(),
     );
@@ -181,7 +197,9 @@ fn section_bandwidth_routing(pass: &mut u32, fail: &mut u32, total: &mut u32) {
     let no_data = Workload::new("no_data", vec![Capability::F64Compute]);
     let d_nodata = dispatch::route_bandwidth_aware(&no_data, &inventory).unwrap();
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "no data_bytes: standard routing (GPU)",
         d_nodata.substrate.kind == SubstrateKind::Gpu,
     );
@@ -191,7 +209,9 @@ fn section_bandwidth_routing(pass: &mut u32, fail: &mut u32, total: &mut u32) {
         .with_data_bytes(1);
     let d_pref = dispatch::route_bandwidth_aware(&preferred, &inventory).unwrap();
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "GPU preference overrides bandwidth gating",
         d_pref.substrate.kind == SubstrateKind::Gpu,
     );
@@ -222,24 +242,36 @@ fn section_cross_substrate_flow(pass: &mut u32, fail: &mut u32, total: &mut u32)
     let d_cpu = dispatch::route(&cpu_work, &inventory).unwrap();
 
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "diversity → GPU",
         d_gpu.substrate.kind == SubstrateKind::Gpu,
     );
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "taxonomy triage → NPU",
         d_npu.substrate.kind == SubstrateKind::Npu,
     );
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "FASTQ I/O → CPU",
         d_cpu.substrate.kind == SubstrateKind::Cpu,
     );
 
-    let flow = [d_gpu.substrate.kind, d_npu.substrate.kind, d_cpu.substrate.kind];
+    let flow = [
+        d_gpu.substrate.kind,
+        d_npu.substrate.kind,
+        d_cpu.substrate.kind,
+    ];
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "cross-substrate flow: GPU → NPU → CPU",
         flow == [SubstrateKind::Gpu, SubstrateKind::Npu, SubstrateKind::Cpu],
     );
@@ -247,7 +279,9 @@ fn section_cross_substrate_flow(pass: &mut u32, fail: &mut u32, total: &mut u32)
     let unique_substrates: std::collections::HashSet<SubstrateKind> =
         flow.iter().copied().collect();
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "3 distinct substrates used",
         unique_substrates.len() == 3,
     );
@@ -262,13 +296,17 @@ fn section_transfer_cost(pass: &mut u32, fail: &mut u32, total: &mut u32) {
 
     let cost_1mb = bridge::estimated_transfer_us(&rtx4070, 1_048_576);
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "1 MB transfer cost exists",
         cost_1mb.is_some(),
     );
     if let Some(us) = cost_1mb {
         check(
-            pass, fail, total,
+            pass,
+            fail,
+            total,
             &format!("1 MB transfer: {us:.1} µs > 0"),
             us > 0.0,
         );
@@ -277,21 +315,27 @@ fn section_transfer_cost(pass: &mut u32, fail: &mut u32, total: &mut u32) {
     let cost_1gb = bridge::estimated_transfer_us(&rtx4070, 1_073_741_824);
     let cost_1kb = bridge::estimated_transfer_us(&rtx4070, 1024);
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "1 GB transfer > 1 KB transfer",
         cost_1gb.unwrap() > cost_1kb.unwrap(),
     );
 
     let cost_zero = bridge::estimated_transfer_us(&rtx4070, 0);
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "0 bytes transfer has latency only",
         cost_zero.is_some_and(|c| c >= 0.0),
     );
 
     let cpu_cost = bridge::estimated_transfer_us(&make_cpu(), 1_048_576);
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "CPU has no transfer cost",
         cpu_cost.is_none(),
     );
@@ -313,17 +357,23 @@ fn section_streaming_bandwidth(pass: &mut u32, fail: &mut u32, total: &mut u32) 
     }
     let a = gpu_pure.analyze();
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "pure GPU pipeline: fully streamable",
         a.fully_streamable,
     );
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "pure GPU pipeline: 3 chained",
         a.gpu_chained == 3,
     );
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "pure GPU pipeline: 0 PCIe roundtrips",
         a.cpu_roundtrips == 0,
     );
@@ -349,12 +399,16 @@ fn section_streaming_bandwidth(pass: &mut u32, fail: &mut u32, total: &mut u32) 
     });
     let b = cross.analyze();
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "GPU→NPU→CPU: not fully streamable",
         !b.fully_streamable,
     );
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "GPU→NPU→CPU: 2 CPU roundtrips",
         b.cpu_roundtrips == 2,
     );
@@ -371,11 +425,7 @@ fn section_full_inventory(pass: &mut u32, fail: &mut u32, total: &mut u32) {
     let inventory = [gpu, npu, cpu];
 
     let all = workloads::all_workloads();
-    check(
-        pass, fail, total,
-        "workload catalog >= 29",
-        all.len() >= 29,
-    );
+    check(pass, fail, total, "workload catalog >= 29", all.len() >= 29);
 
     let mut routed = 0_usize;
     for bw in &all {
@@ -384,25 +434,31 @@ fn section_full_inventory(pass: &mut u32, fail: &mut u32, total: &mut u32) {
         }
     }
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "all workloads routed",
         routed == all.len(),
     );
 
-    let bw_work = Workload::new("bw_diversity", vec![Capability::F64Compute])
-        .with_data_bytes(100_000_000);
+    let bw_work =
+        Workload::new("bw_diversity", vec![Capability::F64Compute]).with_data_bytes(100_000_000);
     let d = dispatch::route_bandwidth_aware(&bw_work, &inventory);
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         "bandwidth-aware routes for large workload",
         d.is_some(),
     );
 
     let (absorbed, local, cpu_only) = workloads::origin_summary();
     check(
-        pass, fail, total,
+        pass,
+        fail,
+        total,
         &format!("{absorbed} absorbed, {local} local, {cpu_only} CPU-only"),
-        absorbed >= 39 && local == 0 && cpu_only == 1,
+        absorbed == 45 && local == 0 && cpu_only == 2,
     );
 }
 

@@ -4,7 +4,7 @@
 //!
 //! Coordinates the full NUCLEUS data flow:
 //! 1. **Tower** discovers compute substrates (local + mesh via Songbird)
-//! 2. **Nest** provides data (local dir / NestGate cache / NCBI fetch)
+//! 2. **Nest** provides data (local dir / `NestGate` cache / NCBI fetch)
 //! 3. **Node** dispatches computation to the best available substrate
 //!
 //! # Assembly Statistics
@@ -25,6 +25,8 @@ use crate::data::{self, DataSource};
 use crate::dispatch::{self, Reason, Workload};
 use crate::inventory;
 use crate::substrate::{Capability, SubstrateKind};
+#[cfg(test)]
+use wetspring_barracuda::tolerances;
 
 /// Assembly statistics computed from a genome FASTA.
 #[derive(Debug, Clone)]
@@ -81,10 +83,15 @@ pub struct PipelineResult {
 
 /// Compute assembly statistics for a dataset using the full NUCLEUS pipeline.
 ///
-/// 1. Resolves the dataset via the three-tier chain (env / NestGate / synthetic)
+/// 1. Resolves the dataset via the three-tier chain (env / `NestGate` / synthetic)
 /// 2. Discovers compute substrates via Tower (local + Songbird mesh)
 /// 3. Routes the computation workload to the best substrate
 /// 4. Computes statistics on the resolved assemblies
+///
+/// # Errors
+///
+/// Returns an error if no capable substrate is found, the dataset has no local
+/// path, or assembly file parsing fails.
 pub fn compute_assembly_stats(dataset: &str) -> Result<PipelineResult, String> {
     let resolution = data::resolve_dataset(dataset);
 
@@ -117,10 +124,12 @@ pub fn compute_assembly_stats(dataset: &str) -> Result<PipelineResult, String> {
 }
 
 /// Compute collection statistics from a directory of `.fna.gz` files.
-pub fn compute_collection_from_dir(
-    dataset: &str,
-    dir: &Path,
-) -> Result<CollectionStats, String> {
+///
+/// # Errors
+///
+/// Returns an error if the directory cannot be read, contains no `.fna.gz`
+/// files, or all assemblies fail to parse.
+pub fn compute_collection_from_dir(dataset: &str, dir: &Path) -> Result<CollectionStats, String> {
     let entries = list_assembly_files(dir)?;
     if entries.is_empty() {
         return Err(format!("no .fna.gz files in {}", dir.display()));
@@ -150,6 +159,11 @@ pub fn compute_collection_from_dir(
 }
 
 /// Compute statistics for a single assembly file (.fna.gz).
+///
+/// # Errors
+///
+/// Returns an error if the file cannot be read, decompressed, or parsed as
+/// FASTA, or if it contains no sequences.
 pub fn compute_assembly_stats_from_file(
     accession: &str,
     path: &Path,
@@ -290,29 +304,23 @@ fn count_gc(sequences: &[Vec<u8>]) -> (u64, u64) {
     (gc, total)
 }
 
-#[allow(clippy::cast_precision_loss)]
 fn mean(values: &[f64]) -> f64 {
-    if values.is_empty() {
-        return 0.0;
-    }
-    values.iter().sum::<f64>() / values.len() as f64
+    barracuda::stats::mean(values)
 }
 
-#[allow(clippy::cast_precision_loss)]
-fn std_dev(values: &[f64], mean_val: f64) -> f64 {
-    if values.len() < 2 {
-        return 0.0;
-    }
-    let variance = values.iter().map(|v| (v - mean_val).powi(2)).sum::<f64>()
-        / (values.len() - 1) as f64;
-    variance.sqrt()
+fn std_dev(values: &[f64], _mean_val: f64) -> f64 {
+    barracuda::stats::correlation::std_dev(values).unwrap_or(0.0)
 }
 
 /// Shannon entropy of a distribution binned into `n_bins` equal-width bins.
 ///
 /// Used to quantify GC content diversity across an assembly collection.
 /// Higher entropy = more diverse GC distribution.
-#[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+#[allow(
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss
+)]
 pub fn shannon_entropy_binned(values: &[f64], n_bins: usize) -> f64 {
     if values.is_empty() || n_bins == 0 {
         return 0.0;
@@ -347,9 +355,12 @@ pub fn shannon_entropy_binned(values: &[f64], n_bins: usize) -> f64 {
 }
 
 /// List `.fna.gz` assembly files in a directory.
+///
+/// # Errors
+///
+/// Returns an error if the directory cannot be read.
 pub fn list_assembly_files(dir: &Path) -> Result<Vec<PathBuf>, String> {
-    let entries = std::fs::read_dir(dir)
-        .map_err(|e| format!("read dir {}: {e}", dir.display()))?;
+    let entries = std::fs::read_dir(dir).map_err(|e| format!("read dir {}: {e}", dir.display()))?;
 
     let mut paths: Vec<PathBuf> = entries
         .filter_map(Result::ok)
@@ -427,7 +438,10 @@ mod tests {
         let m = mean(&values);
         let sd = std_dev(&values, m);
         // Sample std dev (N-1 denominator): sqrt(32/7) ≈ 2.138
-        assert!((sd - 2.138).abs() < 0.01, "sample std dev: {sd}");
+        assert!(
+            (sd - 2.138).abs() < tolerances::ODE_STEADY_STATE,
+            "sample std dev: {sd}"
+        );
     }
 
     #[test]
@@ -439,14 +453,20 @@ mod tests {
     fn shannon_entropy_uniform() {
         let values: Vec<f64> = (0..100).map(|i| f64::from(i) / 100.0).collect();
         let h = shannon_entropy_binned(&values, 10);
-        assert!(h > 2.0, "uniform distribution should have high entropy, got {h}");
+        assert!(
+            h > 2.0,
+            "uniform distribution should have high entropy, got {h}"
+        );
     }
 
     #[test]
     fn shannon_entropy_constant() {
         let values = vec![0.5; 100];
         let h = shannon_entropy_binned(&values, 10);
-        assert!(h.abs() < f64::EPSILON, "constant values should have zero entropy");
+        assert!(
+            h.abs() < f64::EPSILON,
+            "constant values should have zero entropy"
+        );
     }
 
     #[test]
@@ -494,7 +514,7 @@ mod tests {
 
         let coll = aggregate_collection("test", assemblies);
         assert_eq!(coll.assembly_count, 2);
-        assert!((coll.mean_gc - 0.475).abs() < 0.01);
+        assert!((coll.mean_gc - 0.475).abs() < tolerances::ODE_STEADY_STATE);
         assert!((coll.mean_genome_size - 4_500_000.0).abs() < 1.0);
     }
 

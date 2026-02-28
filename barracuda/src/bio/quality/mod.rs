@@ -20,7 +20,11 @@
 //! - Bolger, A.M. et al. (2014). Trimmomatic. Bioinformatics 30(15): 2114-2120.
 //! - Martin, M. (2011). Cutadapt removes adapter sequences. EMBnet.journal 17(1): 10-12.
 
+mod trim;
+
 use crate::io::fastq::FastqRecord;
+
+pub use super::adapter::{find_adapter_3prime, trim_adapter_3prime};
 
 /// Configuration for quality filtering operations.
 #[derive(Debug, Clone)]
@@ -112,85 +116,6 @@ pub struct FilterStats {
     pub adapter_bases_trimmed: u64,
 }
 
-/// Trim low-quality leading bases from a read.
-///
-/// Removes bases from the 5' end where quality < `min_quality`.
-/// Returns the index of the first base that passes.
-#[must_use]
-fn trim_leading(quality: &[u8], min_quality: u8, phred_offset: u8) -> usize {
-    quality
-        .iter()
-        .position(|&q| q.saturating_sub(phred_offset) >= min_quality)
-        .unwrap_or(quality.len())
-}
-
-/// Trim low-quality trailing bases from a read.
-///
-/// Removes bases from the 3' end where quality < `min_quality`.
-/// Returns the index one past the last base that passes.
-#[must_use]
-fn trim_trailing(quality: &[u8], min_quality: u8, phred_offset: u8) -> usize {
-    quality
-        .iter()
-        .rposition(|&q| q.saturating_sub(phred_offset) >= min_quality)
-        .map_or(0, |i| i + 1)
-}
-
-/// Sliding window quality trim from 5' to 3'.
-///
-/// Scans the read with a window of `window_size` bases. When the average
-/// quality within the window drops below `min_quality`, the read is
-/// truncated at that position.
-///
-/// Returns the trim position (index one past the last retained base).
-#[must_use]
-#[allow(clippy::cast_precision_loss)] // window sizes are small
-fn trim_sliding_window(
-    quality: &[u8],
-    window_size: usize,
-    min_quality: u8,
-    phred_offset: u8,
-) -> usize {
-    if quality.len() < window_size {
-        // Can't form a full window — check the whole read as one window
-        let avg: f64 = quality
-            .iter()
-            .map(|&q| f64::from(q.saturating_sub(phred_offset)))
-            .sum::<f64>()
-            / quality.len() as f64;
-        return if avg >= f64::from(min_quality) {
-            quality.len()
-        } else {
-            0
-        };
-    }
-
-    // Initial window sum
-    let mut window_sum: u32 = quality[..window_size]
-        .iter()
-        .map(|&q| u32::from(q.saturating_sub(phred_offset)))
-        .sum();
-
-    #[allow(clippy::cast_possible_truncation)] // read lengths are always small
-    let threshold = u32::from(min_quality) * window_size as u32;
-
-    if window_sum < threshold {
-        return 0;
-    }
-
-    for i in 1..=(quality.len() - window_size) {
-        // Slide: remove left, add right
-        window_sum -= u32::from(quality[i - 1].saturating_sub(phred_offset));
-        window_sum += u32::from(quality[i + window_size - 1].saturating_sub(phred_offset));
-
-        if window_sum < threshold {
-            return i;
-        }
-    }
-
-    quality.len()
-}
-
 /// Apply all quality trimming operations to a single read.
 ///
 /// Order: leading trim → trailing trim → sliding window → min length check.
@@ -205,7 +130,7 @@ pub fn trim_read(record: &FastqRecord, params: &QualityParams) -> Option<(usize,
     }
 
     // 1. Leading trim
-    let start = trim_leading(
+    let start = trim::trim_leading(
         &record.quality,
         params.leading_min_quality,
         params.phred_offset,
@@ -215,7 +140,7 @@ pub fn trim_read(record: &FastqRecord, params: &QualityParams) -> Option<(usize,
     }
 
     // 2. Trailing trim
-    let end = trim_trailing(
+    let end = trim::trim_trailing(
         &record.quality[..len],
         params.trailing_min_quality,
         params.phred_offset,
@@ -226,7 +151,7 @@ pub fn trim_read(record: &FastqRecord, params: &QualityParams) -> Option<(usize,
 
     // 3. Sliding window on the remaining region
     let sub_quality = &record.quality[start..end];
-    let window_end = trim_sliding_window(
+    let window_end = trim::trim_sliding_window(
         sub_quality,
         params.window_size,
         params.window_min_quality,
@@ -343,10 +268,7 @@ pub fn filter_reads_flat(
         let qual = &qualities[off..off + len];
 
         // Leading trim
-        let start = qual
-            .iter()
-            .position(|&q| q.saturating_sub(params.phred_offset) >= params.leading_min_quality)
-            .unwrap_or(len);
+        let start = trim::trim_leading(qual, params.leading_min_quality, params.phred_offset);
         if start >= len {
             starts.push(0);
             ends.push(0);
@@ -355,10 +277,7 @@ pub fn filter_reads_flat(
         }
 
         // Trailing trim
-        let end = qual
-            .iter()
-            .rposition(|&q| q.saturating_sub(params.phred_offset) >= params.trailing_min_quality)
-            .map_or(0, |i| i + 1);
+        let end = trim::trim_trailing(qual, params.trailing_min_quality, params.phred_offset);
         if end <= start {
             starts.push(0);
             ends.push(0);
@@ -368,7 +287,7 @@ pub fn filter_reads_flat(
 
         // Sliding window on remaining region
         let sub_qual = &qual[start..end];
-        let window_end = trim_sliding_window(
+        let window_end = trim::trim_sliding_window(
             sub_qual,
             params.window_size,
             params.window_min_quality,
@@ -387,12 +306,10 @@ pub fn filter_reads_flat(
 }
 
 #[cfg(test)]
-use super::adapter::bases_match;
-pub use super::adapter::{find_adapter_3prime, trim_adapter_3prime};
-
-#[cfg(test)]
 #[allow(clippy::expect_used, clippy::unwrap_used, clippy::naive_bytecount)]
 mod tests {
+    use super::super::adapter::bases_match;
+    use super::trim;
     use super::*;
 
     fn make_record(seq: &[u8], qual: &[u8]) -> FastqRecord {
@@ -410,65 +327,60 @@ mod tests {
     #[test]
     fn trim_leading_removes_low_quality() {
         let qual = qual_from_phred(&[2, 2, 2, 30, 30, 30]);
-        assert_eq!(trim_leading(&qual, 3, 33), 3);
+        assert_eq!(trim::trim_leading(&qual, 3, 33), 3);
     }
 
     #[test]
     fn trim_leading_all_low() {
         let qual = qual_from_phred(&[2, 2, 2]);
-        assert_eq!(trim_leading(&qual, 3, 33), 3);
+        assert_eq!(trim::trim_leading(&qual, 3, 33), 3);
     }
 
     #[test]
     fn trim_leading_all_high() {
         let qual = qual_from_phred(&[30, 30, 30]);
-        assert_eq!(trim_leading(&qual, 3, 33), 0);
+        assert_eq!(trim::trim_leading(&qual, 3, 33), 0);
     }
 
     #[test]
     fn trim_trailing_removes_low_quality() {
         let qual = qual_from_phred(&[30, 30, 30, 2, 2, 2]);
-        assert_eq!(trim_trailing(&qual, 3, 33), 3);
+        assert_eq!(trim::trim_trailing(&qual, 3, 33), 3);
     }
 
     #[test]
     fn trim_trailing_all_low() {
         let qual = qual_from_phred(&[2, 2, 2]);
-        assert_eq!(trim_trailing(&qual, 3, 33), 0);
+        assert_eq!(trim::trim_trailing(&qual, 3, 33), 0);
     }
 
     #[test]
     fn trim_trailing_all_high() {
         let qual = qual_from_phred(&[30, 30, 30]);
-        assert_eq!(trim_trailing(&qual, 3, 33), 3);
+        assert_eq!(trim::trim_trailing(&qual, 3, 33), 3);
     }
 
     #[test]
     fn sliding_window_high_quality() {
         let qual = qual_from_phred(&[30, 30, 30, 30, 30, 30]);
-        assert_eq!(trim_sliding_window(&qual, 4, 20, 33), 6);
+        assert_eq!(trim::trim_sliding_window(&qual, 4, 20, 33), 6);
     }
 
     #[test]
     fn sliding_window_drops_at_end() {
         let qual = qual_from_phred(&[30, 30, 30, 30, 5, 5, 5, 5]);
-        // Window of 4 starting at position 3: [30, 5, 5, 5] avg = 11.25 < 20
-        // Window of 4 starting at position 2: [30, 30, 5, 5] avg = 17.5 < 20
-        // Window of 4 starting at position 1: [30, 30, 30, 5] avg = 23.75 >= 20
-        // So trim at position where window first fails
-        let pos = trim_sliding_window(&qual, 4, 20, 33);
+        let pos = trim::trim_sliding_window(&qual, 4, 20, 33);
         assert!((2..=5).contains(&pos), "pos={pos}");
     }
 
     #[test]
     fn sliding_window_all_low() {
         let qual = qual_from_phred(&[5, 5, 5, 5, 5]);
-        assert_eq!(trim_sliding_window(&qual, 4, 20, 33), 0);
+        assert_eq!(trim::trim_sliding_window(&qual, 4, 20, 33), 0);
     }
 
     #[test]
     fn trim_read_full_pipeline() {
-        // Simulate: 2 low-quality leading, 3 low-quality trailing, good middle
         let qual = qual_from_phred(&[2, 2, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 2, 2, 2]);
         let seq: Vec<u8> = vec![b'A'; 15];
         let record = make_record(&seq, &qual);
@@ -481,8 +393,8 @@ mod tests {
         let result = trim_read(&record, &params);
         assert!(result.is_some());
         let (start, end) = result.unwrap();
-        assert_eq!(start, 2); // skip 2 leading
-        assert_eq!(end, 12); // skip 3 trailing
+        assert_eq!(start, 2);
+        assert_eq!(end, 12);
     }
 
     #[test]
@@ -492,7 +404,7 @@ mod tests {
         let record = make_record(&seq, &qual);
 
         let params = QualityParams {
-            min_length: 36, // longer than read
+            min_length: 36,
             ..QualityParams::default()
         };
 
@@ -502,11 +414,8 @@ mod tests {
     #[test]
     fn filter_reads_batch() {
         let records = vec![
-            // Good read
             make_record(&[b'A'; 50], &qual_from_phred(&[30; 50])),
-            // Bad read (all low quality)
             make_record(&[b'A'; 50], &qual_from_phred(&[2; 50])),
-            // Short but good
             make_record(&[b'A'; 10], &qual_from_phred(&[30; 10])),
         ];
 
@@ -517,7 +426,7 @@ mod tests {
 
         let (filtered, stats) = filter_reads(&records, &params);
         assert_eq!(stats.input_reads, 3);
-        assert_eq!(stats.output_reads, 1); // only the good 50bp read
+        assert_eq!(stats.output_reads, 1);
         assert_eq!(stats.discarded_reads, 2);
         assert_eq!(filtered.len(), 1);
         assert_eq!(filtered[0].sequence.len(), 50);
@@ -525,7 +434,7 @@ mod tests {
 
     #[test]
     fn adapter_exact_match() {
-        let seq = b"ACGTACGTAACTAGTCGA"; // adapter at end
+        let seq = b"ACGTACGTAACTAGTCGA";
         let adapter = b"AACTAGTCGA";
         let pos = find_adapter_3prime(seq, adapter, 0, 5);
         assert_eq!(pos, Some(8));
@@ -533,7 +442,7 @@ mod tests {
 
     #[test]
     fn adapter_with_mismatches() {
-        let seq = b"ACGTACGTAACTXGTCGA"; // 1 mismatch in adapter region
+        let seq = b"ACGTACGTAACTXGTCGA";
         let adapter = b"AACTAGTCGA";
         let pos = find_adapter_3prime(seq, adapter, 1, 5);
         assert_eq!(pos, Some(8));
@@ -549,8 +458,7 @@ mod tests {
 
     #[test]
     fn adapter_partial_overlap() {
-        // Adapter partially overlaps read end (first 5 bases of adapter match end)
-        let seq = b"ACGTACGTAACTA"; // last 5 match start of adapter
+        let seq = b"ACGTACGTAACTA";
         let adapter = b"AACTAGTCGA";
         let pos = find_adapter_3prime(seq, adapter, 0, 5);
         assert_eq!(pos, Some(8));
@@ -606,7 +514,6 @@ mod tests {
             ..QualityParams::default()
         };
 
-        // Build flat arrays
         let mut qualities = Vec::new();
         let mut offsets = Vec::new();
         let mut lengths = Vec::new();
@@ -619,7 +526,6 @@ mod tests {
         let flat = filter_reads_flat(&qualities, &offsets, &lengths, &params);
         let (structured, stats) = filter_reads(&records, &params);
 
-        // Flat pass count should match structured output count
         let flat_pass_count = flat.pass.iter().filter(|&&p| p == 1).count();
         assert_eq!(flat_pass_count, stats.output_reads);
         assert_eq!(flat_pass_count, structured.len());

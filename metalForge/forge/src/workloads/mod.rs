@@ -18,91 +18,10 @@
 //! [`ShaderOrigin::Local`] to [`ShaderOrigin::Absorbed`] and rewire the
 //! dispatch to use the upstream primitive. This is the Lean step.
 
-use crate::dispatch::Workload;
+mod provenance;
+pub use provenance::*;
+
 use crate::substrate::{Capability, SubstrateKind};
-
-/// Where the GPU shader for a workload lives.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ShaderOrigin {
-    /// Absorbed by `ToadStool` — uses `barracuda::ops::*` primitives.
-    Absorbed,
-    /// Local WGSL shader in `barracuda/src/shaders/` — pending absorption.
-    Local,
-    /// CPU-only domain — no GPU shader exists or is planned.
-    CpuOnly,
-}
-
-/// A bio workload with shader provenance tracking.
-#[derive(Debug)]
-pub struct BioWorkload {
-    /// The dispatch workload (name + capabilities).
-    pub workload: Workload,
-    /// Where the GPU implementation lives.
-    pub origin: ShaderOrigin,
-    /// `ToadStool` primitive name (if absorbed).
-    pub primitive: Option<&'static str>,
-    /// ODE system dimensions (if applicable).
-    pub ode_dims: Option<OdeDims>,
-}
-
-/// ODE system dimensions for dispatch sizing.
-#[derive(Debug, Clone, Copy)]
-pub struct OdeDims {
-    /// Number of state variables.
-    pub n_vars: u32,
-    /// Number of parameters per batch element.
-    pub n_params: u32,
-}
-
-impl BioWorkload {
-    const fn new_static(origin: ShaderOrigin) -> Self {
-        Self {
-            workload: Workload {
-                name: String::new(),
-                required: Vec::new(),
-                preferred_substrate: None,
-                data_bytes: None,
-            },
-            origin,
-            primitive: None,
-            ode_dims: None,
-        }
-    }
-
-    fn named(mut self, name: &str, required: Vec<Capability>) -> Self {
-        self.workload.name = name.to_string();
-        self.workload.required = required;
-        self
-    }
-
-    const fn with_primitive(mut self, primitive: &'static str) -> Self {
-        self.primitive = Some(primitive);
-        self
-    }
-
-    const fn with_ode(mut self, n_vars: u32, n_params: u32) -> Self {
-        self.ode_dims = Some(OdeDims { n_vars, n_params });
-        self
-    }
-
-    /// Whether this workload uses a local (non-absorbed) WGSL shader.
-    #[must_use]
-    pub const fn is_local(&self) -> bool {
-        matches!(self.origin, ShaderOrigin::Local)
-    }
-
-    /// Whether this workload has been absorbed by `ToadStool`.
-    #[must_use]
-    pub const fn is_absorbed(&self) -> bool {
-        matches!(self.origin, ShaderOrigin::Absorbed)
-    }
-
-    /// Whether this workload is CPU-only (no GPU path).
-    #[must_use]
-    pub const fn is_cpu_only(&self) -> bool {
-        matches!(self.origin, ShaderOrigin::CpuOnly)
-    }
-}
 
 // ── Absorbed ToadStool domains ──────────────────────────────────────
 
@@ -758,7 +677,10 @@ mod tests {
             "45 absorbed domains (28 base + 11 extension + 6 NUCLEUS data-driven)"
         );
         assert_eq!(local, 0, "0 local WGSL extensions (all absorbed)");
-        assert_eq!(cpu_only, 2, "2 CPU-only domains (fastq_parsing + ncbi_assembly_ingest)");
+        assert_eq!(
+            cpu_only, 2,
+            "2 CPU-only domains (fastq_parsing + ncbi_assembly_ingest)"
+        );
     }
 
     #[test]

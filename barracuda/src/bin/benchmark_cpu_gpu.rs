@@ -239,6 +239,7 @@ fn bench_variance(gpu: &GpuF64, report: &mut BenchReport) {
     for &n in &[1_000, 10_000, 100_000, 1_000_000] {
         let data = generate_f64(n, 7);
         let (cpu, cpu_e) = bench_with_energy(|| {
+            // Intentional: manual variance for CPU benchmark baseline vs GPU.
             let mean = data.iter().sum::<f64>() / data.len() as f64;
             let _var: f64 =
                 data.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / data.len() as f64;

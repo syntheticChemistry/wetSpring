@@ -6,20 +6,29 @@
 //! 1. Server binds and accepts connections
 //! 2. health.check returns all 5 capabilities
 //! 3. science.diversity computes correct metrics
-//! 4. science.qs_model runs ODE integration
-//! 5. science.full_pipeline chains stages correctly
+//! 4. `science.qs_model` runs ODE integration
+//! 5. `science.full_pipeline` chains stages correctly
 //! 6. Songbird registration falls back gracefully
 //! 7. Metrics are tracked per-method
 //!
 //! Proves: when NestGate/ToadStool/Tower are running, biomeOS can orchestrate
 //! the science pipeline graph through wetSpring's JSON-RPC interface.
 //!
-//! ## Provenance
+//! # Provenance
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Source | Analytical (closed-form formula) |
-//! | Reference | Shannon=ln(4), Simpson=0.75, observed=4, Pielou=1.0 for uniform 4-species community (Magurran 2004, Ecological Diversity) |
+//! | Baseline | Analytical (closed-form formulas) |
+//! | Reference | Magurran 2004, *Measuring Biological Diversity* |
+//! | Date | 2026-02-28 |
+//! | Command | `cargo run --release --bin validate_science_pipeline` |
+//!
+//! ## `check_f64_in_json` expected values
+//!
+//! - **Shannon = ln(4)**: Uniform 4-species community; H′ = ln(S).
+//! - **Simpson = 0.75**: Uniform 4-species; D = 1 − 1/S = 0.75.
+//! - **observed = 4**: Count of non-zero abundances.
+//! - **Pielou = 1.0**: Perfect evenness for uniform distribution.
 
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixStream;
@@ -28,6 +37,7 @@ use wetspring_barracuda::ipc::Server;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation;
 
+#[allow(clippy::too_many_lines)]
 fn main() {
     let mut v = validation::Validator::new("Exp203: biomeOS Science Pipeline");
 

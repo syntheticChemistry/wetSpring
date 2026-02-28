@@ -138,13 +138,14 @@ fn validate_signal_stats(v: &mut Validator) {
     v.check_count("n_samples = 5", stats.n_samples, 5);
 
     let samples = [100.0_f64, 200.0, 300.0, 400.0, 500.0];
-    let mean = 300.0_f64;
-    let expected_var =
-        samples.iter().map(|&x| (x - mean).powi(2)).sum::<f64>() / samples.len() as f64;
+    let n = samples.len() as f64;
+    let expected_std = barracuda::stats::correlation::variance(&samples[..])
+        .map(|var_sample| (var_sample * (n - 1.0) / n).sqrt())
+        .unwrap_or(0.0);
     v.check(
         "std_dev = sqrt(var(100..500))",
         stats.std_dev,
-        expected_var.sqrt(),
+        expected_std,
         tolerances::NANOPORE_SIGNAL_STATS,
     );
 

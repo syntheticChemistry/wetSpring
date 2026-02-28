@@ -102,6 +102,12 @@ pub const SPECTRAL_HERMAN_PARITY: f64 = 0.02;
 /// Validated: Exp169/183 (cross-spring modern/S65), commit `756df26`.
 pub const TRAPZ_COARSE: f64 = 1e-6;
 
+/// Trapezoidal integration tolerance for N = 101 points (x² on \[0,1\]).
+///
+/// Discretization error ∝ h² ≈ 1e-4 for ∫₀¹ x² dx with 101 points.
+/// Validated: Exp169 (`benchmark_cross_spring_modern`).
+pub const TRAPZ_101: f64 = 1e-4;
+
 /// Lanczos vs Sturm eigenvalue comparison tolerance.
 ///
 /// Lanczos tridiagonalization with k=60 vectors and Sturm bisection

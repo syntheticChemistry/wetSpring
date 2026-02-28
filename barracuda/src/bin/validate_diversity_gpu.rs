@@ -39,7 +39,7 @@
 //! Run: `cargo run --features gpu --bin validate_diversity_gpu`
 
 use wetspring_barracuda::bio::{
-    diversity, diversity_gpu, pcoa, pcoa_gpu, spectral_match_gpu, stats_gpu,
+    diversity, diversity_gpu, pairwise_l2_gpu, pcoa, pcoa_gpu, spectral_match_gpu, stats_gpu,
 };
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::special;
@@ -70,6 +70,7 @@ async fn main() {
     validate_simpson(&gpu, &mut v);
     validate_bray_curtis(&gpu, &mut v);
     validate_pcoa(&gpu, &mut v);
+    validate_pairwise_l2(&gpu, &mut v);
     validate_alpha_diversity(&gpu, &mut v);
     validate_spectral_match(&gpu, &mut v);
     validate_stats_gpu(&mut v, &gpu);
@@ -327,6 +328,53 @@ fn validate_pcoa(gpu: &GpuF64, v: &mut Validator) {
     }
 }
 
+fn validate_pairwise_l2(gpu: &GpuF64, v: &mut Validator) {
+    v.section("── PairwiseL2Gpu (Euclidean distance matrix) ──");
+
+    // 4 samples × 2 dims — PCoA-like coords
+    {
+        let coords = vec![
+            1.0, 0.0, // sample 0
+            -0.5, 0.8, // sample 1
+            -0.3, -0.6, // sample 2
+            0.2, 0.1, // sample 3
+        ];
+        let n = 4;
+        let dim = 2;
+
+        let mut cpu_condensed = Vec::with_capacity(n * (n - 1) / 2);
+        for i in 1..n {
+            for j in 0..i {
+                let a = &coords[i * dim..(i + 1) * dim];
+                let b = &coords[j * dim..(j + 1) * dim];
+                cpu_condensed.push(euclidean_dist(a, b));
+            }
+        }
+
+        let gpu_condensed = pairwise_l2_gpu::pairwise_l2_condensed_gpu(gpu, &coords, n, dim)
+            .expect("PairwiseL2Gpu");
+
+        assert_eq!(gpu_condensed.len(), cpu_condensed.len());
+
+        let mut max_diff = 0.0_f64;
+        let mut all_ok = true;
+        for (&g, &c) in gpu_condensed.iter().zip(cpu_condensed.iter()) {
+            let diff = (g - c).abs();
+            max_diff = max_diff.max(diff);
+            if diff > 1e-5 {
+                all_ok = false;
+            }
+        }
+
+        v.check(
+            &format!("PairwiseL2 4×2 (max diff {max_diff:.2e}, f32 tolerance 1e-5)"),
+            f64::from(u8::from(all_ok)),
+            1.0,
+            0.0,
+        );
+    }
+}
+
 fn validate_alpha_diversity(gpu: &GpuF64, v: &mut Validator) {
     v.section("── Alpha Diversity GPU vs CPU ──");
 
@@ -462,6 +510,7 @@ fn validate_stats_gpu(v: &mut Validator, gpu: &GpuF64) {
 
     let data = vec![2.0, 4.0, 4.0, 4.0, 5.0, 5.0, 7.0, 9.0];
     let n = data.len() as f64;
+    // Intentional: manual population/sample variance as CPU reference to compare against GPU output.
     let mean = data.iter().sum::<f64>() / n;
     let cpu_var: f64 = data.iter().map(|&x| (x - mean).powi(2)).sum::<f64>() / n;
     let cpu_sample_var = cpu_var * n / (n - 1.0);

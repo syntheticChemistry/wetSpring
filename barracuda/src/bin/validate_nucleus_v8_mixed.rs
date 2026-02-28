@@ -179,6 +179,7 @@ fn validate_nanopore_signal(v: &mut Validator) {
 
     let stats = loaded[0].signal_stats();
     let raw_f64: Vec<f64> = loaded[0].signal.iter().map(|&s| f64::from(s)).collect();
+    // Intentional: manual mean/variance as reference to validate signal_stats implementation.
     let manual_mean: f64 = raw_f64.iter().sum::<f64>() / raw_f64.len() as f64;
 
     v.check(

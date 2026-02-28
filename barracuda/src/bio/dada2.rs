@@ -191,8 +191,14 @@ pub fn denoise(seqs: &[UniqueSequence], params: &Dada2Params) -> (Vec<Asv>, Dada
 
     for _ in 0..params.max_iterations {
         iters += 1;
-        let centers_changed =
-            em_step(&seqs, &mut partition, &mut centers, &mut err, params, last_n_centers);
+        let centers_changed = em_step(
+            &seqs,
+            &mut partition,
+            &mut centers,
+            &mut err,
+            params,
+            last_n_centers,
+        );
         last_n_centers = centers.len();
         if !centers_changed {
             break;

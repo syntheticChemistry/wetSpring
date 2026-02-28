@@ -124,7 +124,11 @@ fn validate_fastq_gpu_diversity(v: &mut Validator, gpu: &GpuF64) {
     let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).unwrap();
 
     v.check_pass("Bray-Curtis condensed: CPU computed", !cpu_bc.is_empty());
-    v.check_count("Bray-Curtis condensed: length match", gpu_bc.len(), cpu_bc.len());
+    v.check_count(
+        "Bray-Curtis condensed: length match",
+        gpu_bc.len(),
+        cpu_bc.len(),
+    );
     for (k, (&c, &g)) in cpu_bc.iter().zip(gpu_bc.iter()).enumerate() {
         v.check(
             &format!("BC[{k}]: CPU == GPU"),
@@ -295,12 +299,13 @@ fn validate_nanopore_gpu_stats(v: &mut Validator, _gpu: &GpuF64) {
     }
 
     let signal_f64: Vec<f64> = loaded[0].signal.iter().map(|&s| f64::from(s)).collect();
+    // Intentional: manual population variance to validate signal_stats implementation.
     let cpu_mean: f64 = signal_f64.iter().sum::<f64>() / signal_f64.len() as f64;
     let cpu_var: f64 = signal_f64
         .iter()
         .map(|x| (x - cpu_mean).powi(2))
         .sum::<f64>()
-        / (signal_f64.len() as f64 - 1.0);
+        / signal_f64.len() as f64;
 
     let stats = loaded[0].signal_stats();
     v.check(
@@ -405,7 +410,9 @@ fn validate_gpu_threshold(v: &mut Validator, gpu: &GpuF64) {
     v.check_pass("200k elements: above threshold (GPU)", use_gpu_large);
 
     let cpu_h = diversity::shannon(&small);
-    let gpu_h = diversity_gpu::alpha_diversity_gpu(gpu, &small).unwrap().shannon;
+    let gpu_h = diversity_gpu::alpha_diversity_gpu(gpu, &small)
+        .unwrap()
+        .shannon;
     v.check(
         "small set: CPU == GPU math identical",
         cpu_h,

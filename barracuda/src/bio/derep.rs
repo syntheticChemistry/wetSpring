@@ -152,14 +152,15 @@ pub fn dereplicate(
 
 /// Compute mean Phred quality (offset 33) from quality bytes.
 #[allow(clippy::cast_precision_loss)]
-fn mean_quality(qual: &[u8]) -> f64 {
+pub(crate) fn mean_quality(qual: &[u8]) -> f64 {
     if qual.is_empty() {
         return 0.0;
     }
-    qual.iter()
+    let phred_values: Vec<f64> = qual
+        .iter()
         .map(|&q| f64::from(q.saturating_sub(33)))
-        .sum::<f64>()
-        / qual.len() as f64
+        .collect();
+    barracuda::stats::mean(&phred_values)
 }
 
 /// Write dereplicated sequences to FASTA format with abundance annotations.

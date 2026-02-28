@@ -5,14 +5,20 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline | Analytical formulas (Shannon, Simpson, Chao1) + Exp002 Galaxy |
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | Analytical formulas (Shannon, Simpson, Chao1) |
-//! | Baseline version | skbio 0.6.0 (simulated community) |
-//! | Baseline command | No external Python tool for core metrics |
+//! | Baseline tool | Analytical (closed-form) for core metrics; skbio 0.6.0 for simulated |
+//! | Exp002 data | `experiments/results/002_phytoplankton/diversity_report.json` |
 //! | Baseline date | 2026-02-19 |
-//! | Exact command | `cargo run --bin validate_diversity` |
-//! | Data | PRJNA1195978 (phytoplankton), synthetic for analytical tests |
+//! | Command | `cargo run --bin validate_diversity` |
+//! | Data | PRJNA1195978 (phytoplankton), deterministic synthetic for 330-feature test |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! ## Expected values
+//!
+//! - **330 observed**: Deterministic synthetic community (100+100+100+20+10 tiers).
+//! - **Shannon 4.9, Simpson 0.95**: From same community; analytical formulas.
+//! - **Exp002 low/high (91, 856)**: Geometric/power-law rank-abundance matching Galaxy report ranges.
 //!
 //! # Methodology
 //!

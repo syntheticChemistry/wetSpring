@@ -1,7 +1,7 @@
 # wetSpring Benchmark Results
 
 **Date:** February 27, 2026
-**Status:** Phase 73 — Comprehensive sweep GREEN (Python → Rust CPU → GPU → Pure GPU Streaming → metalForge → NPU) — 50/50 actionable papers full three-tier (63/63 total); 1,199+ tests (1,006 barracuda lib + 60 integration + 20 doc + 113 forge), 5,743+ checks (1,833+ GPU on RTX 4070, 60 NPU on AKD1000), 229 experiments, ToadStool S68+ (`e96576ee`), 79 primitives consumed, 0 local WGSL/derivative/regression (fully lean), 92 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough. V73: deep debt reduction (RpcError, function decomposition, safe casts, named constants). V72: Exp224-228 five-tier chain (paper math + CPU v14 + GPU v6 + streaming v4 + metalForge v8)
+**Status:** Phase 73 — Comprehensive sweep GREEN (Python → Rust CPU → GPU → Pure GPU Streaming → metalForge → NPU) — 50/50 actionable papers full three-tier (63/63 total); 1,148+ tests (955 barracuda lib + 60 integration + 20 doc + 113 forge), 5,743+ checks (1,833+ GPU on RTX 4070, 60 NPU on AKD1000), 229 experiments, ToadStool S68+ (`e96576ee`), 82 primitives consumed, 0 local WGSL/derivative/regression (fully lean), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough. V75: ComputeDispatch adoption (6 GPU modules), BatchedMultinomialGpu + PairwiseL2Gpu + FstVariance. V73: deep debt reduction (RpcError, function decomposition, safe casts, named constants). V72: Exp224-228 five-tier chain (paper math + CPU v14 + GPU v6 + streaming v4 + metalForge v8)
 
 ---
 
@@ -74,9 +74,9 @@ Tier 3: GPU (ToadStool/BarraCuda, math parity with CPU)
 
 | Suite | Count | Status |
 |-------|-------|--------|
-| Library + integration + IPC tests (CPU) | 977 | PASS (+ 1 ignored — hardware-dependent) |
-| metalForge forge tests | 47 | PASS |
-| **Total** | **1,103** (977 + 60 integration + 19 doc + 47 forge) | **PASS** |
+| Library + integration + IPC tests (CPU) | 955 | PASS (+ 1 ignored — hardware-dependent) |
+| metalForge forge tests | 113 | PASS |
+| **Total** | **1,148** (955 + 60 integration + 20 doc + 113 forge) | **PASS** |
 | Line coverage | 95.46% line / 93.54% fn / 94.99% branch | Exceeds 90% target |
 
 ---

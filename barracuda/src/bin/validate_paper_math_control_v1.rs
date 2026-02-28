@@ -28,13 +28,23 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
+//! | Baseline | Analytical solutions from published papers (see below) |
+//! | Python baseline | `scripts/islam2014_brandt_farm.py` (Islam/Zuber W values) |
+//! | Commit | wetSpring Phase 71 |
 //! | Date | 2026-02-28 |
-//! | Phase | 71 |
 //! | Command | `cargo run --release --bin validate_paper_math_control_v1` |
+//!
+//! ## Islam/Zuber values (P13–P14)
+//!
+//! - **Islam 2014** (Brandt Farm): W = 25×(1−conn), conn from published data (no-till 79.3%,
+//!   tilled 38.5%) → `notill_w=5.175`, `tilled_w=15.375` (analytical; tolerance 0.01).
+//! - **Zuber 2016** (meta-analysis): MBC ratio 1.14±0.06 from Table 2 (analytical).
+//! - Python baseline `scripts/islam2014_brandt_farm.py` reproduces Anderson W values;
+//!   run `python3 scripts/islam2014_brandt_farm.py` to verify.
 
 use wetspring_barracuda::bio::{
-    bistable, capacitor, cooperation, diversity, felsenstein, gillespie, hmm,
-    multi_signal, phage_defense, qs_biofilm, spectral_match,
+    bistable, capacitor, cooperation, diversity, felsenstein, gillespie, hmm, multi_signal,
+    phage_defense, qs_biofilm, spectral_match,
 };
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
@@ -43,9 +53,8 @@ use barracuda::special::erf;
 use barracuda::stats::norm_cdf;
 
 fn main() {
-    let mut v = Validator::new(
-        "Exp224: Paper Math Control — Published Equations via BarraCuda CPU",
-    );
+    let mut v =
+        Validator::new("Exp224: Paper Math Control — Published Equations via BarraCuda CPU");
 
     // ═══════════════════════════════════════════════════════════════════
     // Track 1: Microbial Ecology & QS Signaling
@@ -64,15 +73,40 @@ fn main() {
     let c_ss = ode_tail_mean(&r, 3, 0.1);
     let b_ss = ode_tail_mean(&r, 4, 0.1);
 
-    v.check("Waters: N_ss ≈ carrying capacity", n_ss, 0.975, tolerances::ODE_METHOD_PARITY);
-    v.check("Waters: H_ss (HapR active)", h_ss, 1.979, tolerances::ODE_STEADY_STATE);
-    v.check("Waters: C_ss ≈ 0 (c-di-GMP repressed)", c_ss, 0.0, tolerances::ODE_NEAR_ZERO);
-    v.check("Waters: B_ss (biofilm dispersed)", b_ss, 0.020, tolerances::ODE_BIOFILM_SS);
+    v.check(
+        "Waters: N_ss ≈ carrying capacity",
+        n_ss,
+        0.975,
+        tolerances::ODE_METHOD_PARITY,
+    );
+    v.check(
+        "Waters: H_ss (HapR active)",
+        h_ss,
+        1.979,
+        tolerances::ODE_STEADY_STATE,
+    );
+    v.check(
+        "Waters: C_ss ≈ 0 (c-di-GMP repressed)",
+        c_ss,
+        0.0,
+        tolerances::ODE_NEAR_ZERO,
+    );
+    v.check(
+        "Waters: B_ss (biofilm dispersed)",
+        b_ss,
+        0.020,
+        tolerances::ODE_BIOFILM_SS,
+    );
 
     let r2 = qs_biofilm::scenario_high_density(&params, 0.001);
     let n2 = ode_tail_mean(&r2, 0, 0.1);
     let b2 = ode_tail_mean(&r2, 4, 0.1);
-    v.check("Waters: high-density N_ss", n2, 0.975, tolerances::ODE_METHOD_PARITY);
+    v.check(
+        "Waters: high-density N_ss",
+        n2,
+        0.975,
+        tolerances::ODE_METHOD_PARITY,
+    );
     v.check_pass("Waters: high-density B → low (dispersal)", b2 < 0.5);
 
     // ── P2: Massie 2012 — Gillespie SSA ──
@@ -92,7 +126,10 @@ fn main() {
         })
         .collect();
     let emp_mean = final_counts.iter().sum::<f64>() / n_runs as f64;
-    let emp_std = (final_counts.iter().map(|x| (x - emp_mean).powi(2)).sum::<f64>()
+    let emp_std = (final_counts
+        .iter()
+        .map(|x| (x - emp_mean).powi(2))
+        .sum::<f64>()
         / n_runs as f64)
         .sqrt();
 
@@ -106,7 +143,10 @@ fn main() {
 
     let t1 = gillespie::birth_death_ssa(k_dgc, k_pde, 100.0, 42);
     let t2 = gillespie::birth_death_ssa(k_dgc, k_pde, 100.0, 42);
-    v.check_pass("Massie: SSA deterministic given seed", t1.final_state()[0] == t2.final_state()[0]);
+    v.check_pass(
+        "Massie: SSA deterministic given seed",
+        t1.final_state()[0] == t2.final_state()[0],
+    );
 
     // ── P3: Fernandez 2020 — Bistable Phenotypic Switching ──
     v.section("P3: Fernandez 2020 — Bistable Phenotypic Switching");
@@ -122,8 +162,14 @@ fn main() {
     let r_high = bistable::run_bistable(&y0_high, 0.01, 200.0, &bi_params);
     let final_high: Vec<f64> = r_high.states().last().unwrap().to_vec();
 
-    v.check_pass("Fernandez: all states non-negative (low)", final_low.iter().all(|&x| x >= 0.0));
-    v.check_pass("Fernandez: all states non-negative (high)", final_high.iter().all(|&x| x >= 0.0));
+    v.check_pass(
+        "Fernandez: all states non-negative (low)",
+        final_low.iter().all(|&x| x >= 0.0),
+    );
+    v.check_pass(
+        "Fernandez: all states non-negative (high)",
+        final_high.iter().all(|&x| x >= 0.0),
+    );
     v.check_pass("Fernandez: ODE produces time series", r_low.t.len() > 1);
 
     // ── P4: Srivastava 2011 — Multi-Signal QS ──
@@ -138,10 +184,22 @@ fn main() {
     let wt_final: Vec<f64> = ms_wt.states().last().unwrap().to_vec();
     let noqs_final: Vec<f64> = ms_noqs.states().last().unwrap().to_vec();
 
-    v.check_pass("Srivastava: wild-type produces trajectory", ms_wt.t.len() > 10);
-    v.check_pass("Srivastava: no-QS produces trajectory", ms_noqs.t.len() > 10);
-    v.check_pass("Srivastava: wild-type states finite", wt_final.iter().all(|x| x.is_finite()));
-    v.check_pass("Srivastava: no-QS states finite", noqs_final.iter().all(|x| x.is_finite()));
+    v.check_pass(
+        "Srivastava: wild-type produces trajectory",
+        ms_wt.t.len() > 10,
+    );
+    v.check_pass(
+        "Srivastava: no-QS produces trajectory",
+        ms_noqs.t.len() > 10,
+    );
+    v.check_pass(
+        "Srivastava: wild-type states finite",
+        wt_final.iter().all(|x| x.is_finite()),
+    );
+    v.check_pass(
+        "Srivastava: no-QS states finite",
+        noqs_final.iter().all(|x| x.is_finite()),
+    );
 
     // ── P5: Bruger & Waters 2018 — Cooperative QS Game Theory ──
     v.section("P5: Bruger & Waters 2018 — Cooperation");
@@ -165,15 +223,36 @@ fn main() {
     let bd_nophage = ode_tail_mean(&r_nophage, 0, 0.1);
     let bu_nophage = ode_tail_mean(&r_nophage, 1, 0.1);
 
-    v.check("Hsueh: no-phage Bd", bd_nophage, 132_242.0, tolerances::PHAGE_LARGE_POPULATION);
-    v.check("Hsueh: no-phage Bu", bu_nophage, 138_317.0, tolerances::PHAGE_LARGE_POPULATION);
-    v.check_pass("Hsueh: Bu > Bd (no cost advantage)", bu_nophage > bd_nophage);
+    v.check(
+        "Hsueh: no-phage Bd",
+        bd_nophage,
+        132_242.0,
+        tolerances::PHAGE_LARGE_POPULATION,
+    );
+    v.check(
+        "Hsueh: no-phage Bu",
+        bu_nophage,
+        138_317.0,
+        tolerances::PHAGE_LARGE_POPULATION,
+    );
+    v.check_pass(
+        "Hsueh: Bu > Bd (no cost advantage)",
+        bu_nophage > bd_nophage,
+    );
 
     let r_attack = phage_defense::scenario_phage_attack(&phage_params, 0.001);
     let bd_attack = ode_tail_mean(&r_attack, 0, 0.1);
     let bu_attack = ode_tail_mean(&r_attack, 1, 0.1);
-    v.check_pass("Hsueh: attack Bd > Bu (defense wins)", bd_attack > bu_attack);
-    v.check("Hsueh: attack Bu ≈ 0 (crashed)", bu_attack, 0.0, tolerances::PHAGE_CRASH_FLOOR);
+    v.check_pass(
+        "Hsueh: attack Bd > Bu (defense wins)",
+        bd_attack > bu_attack,
+    );
+    v.check(
+        "Hsueh: attack Bu ≈ 0 (crashed)",
+        bu_attack,
+        0.0,
+        tolerances::PHAGE_CRASH_FLOOR,
+    );
 
     // ── P7: Mhatre 2020 — Phenotypic Capacitor ──
     v.section("P7: Mhatre 2020 — Phenotypic Capacitor");
@@ -187,8 +266,14 @@ fn main() {
     let normal_final: Vec<f64> = cap_normal.states().last().unwrap().to_vec();
     let stress_final: Vec<f64> = cap_stress.states().last().unwrap().to_vec();
 
-    v.check_pass("Mhatre: normal states finite", normal_final.iter().all(|x| x.is_finite()));
-    v.check_pass("Mhatre: stress states finite", stress_final.iter().all(|x| x.is_finite()));
+    v.check_pass(
+        "Mhatre: normal states finite",
+        normal_final.iter().all(|x| x.is_finite()),
+    );
+    v.check_pass(
+        "Mhatre: stress states finite",
+        stress_final.iter().all(|x| x.is_finite()),
+    );
     v.check_pass("Mhatre: trajectories produced", cap_normal.t.len() > 100);
 
     // ═══════════════════════════════════════════════════════════════════
@@ -221,16 +306,31 @@ fn main() {
     println!("  Analytical: P(same|t) = 1/4 + 3/4·exp(-4μt)");
 
     let p_same_0 = felsenstein::jc69_prob(0, 0, 0.0, 1.0);
-    v.check("Felsenstein: P(A→A|t=0) = 1", p_same_0, 1.0, tolerances::ANALYTICAL_F64);
+    v.check(
+        "Felsenstein: P(A→A|t=0) = 1",
+        p_same_0,
+        1.0,
+        tolerances::ANALYTICAL_F64,
+    );
 
     let p_same = felsenstein::jc69_prob(0, 0, 0.1, 1.0);
     let p_diff = felsenstein::jc69_prob(0, 1, 0.1, 1.0);
     let row_sum = p_same + 3.0 * p_diff;
-    v.check("Felsenstein: row sum = 1", row_sum, 1.0, tolerances::ANALYTICAL_F64);
+    v.check(
+        "Felsenstein: row sum = 1",
+        row_sum,
+        1.0,
+        tolerances::ANALYTICAL_F64,
+    );
     v.check_pass("Felsenstein: P(same) > P(diff)", p_same > p_diff);
 
     let p_exact = 0.25 + 0.75 * (-4.0_f64 * 0.1 / 3.0).exp();
-    v.check("Felsenstein: P(A→A) analytical", p_same, p_exact, tolerances::ANALYTICAL_F64);
+    v.check(
+        "Felsenstein: P(A→A) analytical",
+        p_same,
+        p_exact,
+        tolerances::ANALYTICAL_F64,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // Track 2: Analytical Chemistry (PFAS)
@@ -243,12 +343,22 @@ fn main() {
     let mz = [100.0, 200.0, 300.0];
     let int = [1000.0, 500.0, 200.0];
     let self_sim = spectral_match::cosine_similarity(&mz, &int, &mz, &int, 0.5);
-    v.check("Jones: cosine self = 1.0", self_sim.score, 1.0, tolerances::ANALYTICAL_F64);
+    v.check(
+        "Jones: cosine self = 1.0",
+        self_sim.score,
+        1.0,
+        tolerances::ANALYTICAL_F64,
+    );
 
     let mz2 = [400.0, 500.0, 600.0];
     let int2 = [1000.0, 500.0, 200.0];
     let ortho = spectral_match::cosine_similarity(&mz, &int, &mz2, &int2, 0.5);
-    v.check("Jones: orthogonal ≈ 0", ortho.score, 0.0, tolerances::ANALYTICAL_F64);
+    v.check(
+        "Jones: orthogonal ≈ 0",
+        ortho.score,
+        0.0,
+        tolerances::ANALYTICAL_F64,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // Track 3: Drug Repurposing
@@ -260,7 +370,7 @@ fn main() {
     println!("  Model: NMF V ≈ W·H, KL divergence, W≥0, H≥0");
 
     let v_mat: Vec<f64> = (0..30 * 15)
-        .map(|i| ((i * 3 + 1) % 50) as f64 / 50.0)
+        .map(|i| f64::from(((i * 3 + 1) % 50) as u32) / 50.0)
         .collect();
     let nmf_cfg = barracuda::linalg::nmf::NmfConfig {
         rank: 5,
@@ -270,8 +380,14 @@ fn main() {
         seed: 42,
     };
     let nmf_res = barracuda::linalg::nmf::nmf(&v_mat, 30, 15, &nmf_cfg).expect("NMF");
-    v.check_pass("Fajgenbaum: W non-negative", nmf_res.w.iter().all(|&x| x >= 0.0));
-    v.check_pass("Fajgenbaum: H non-negative", nmf_res.h.iter().all(|&x| x >= 0.0));
+    v.check_pass(
+        "Fajgenbaum: W non-negative",
+        nmf_res.w.iter().all(|&x| x >= 0.0),
+    );
+    v.check_pass(
+        "Fajgenbaum: H non-negative",
+        nmf_res.h.iter().all(|&x| x >= 0.0),
+    );
     v.check_pass(
         "Fajgenbaum: error decreased during iterations",
         nmf_res.errors.len() >= 2 && nmf_res.errors.last() < nmf_res.errors.first(),
@@ -279,9 +395,12 @@ fn main() {
 
     let ridge_x: Vec<f64> = (0..50).map(|i| f64::from(i) * 0.02).collect();
     let ridge_y: Vec<f64> = (0..20).map(|i| f64::from(i).mul_add(0.5, 1.0)).collect();
-    let ridge = barracuda::linalg::ridge_regression(&ridge_x, &ridge_y, 10, 5, 2, 1e-6)
-        .expect("ridge");
-    v.check_pass("Fajgenbaum: ridge weights finite", ridge.weights.iter().all(|w| w.is_finite()));
+    let ridge =
+        barracuda::linalg::ridge_regression(&ridge_x, &ridge_y, 10, 5, 2, 1e-6).expect("ridge");
+    v.check_pass(
+        "Fajgenbaum: ridge weights finite",
+        ridge.weights.iter().all(|w| w.is_finite()),
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // Track 4: Soil QS (Anderson Geometry Framework)
@@ -302,7 +421,10 @@ fn main() {
 
     v.check_pass("MG2023: large pore QS > small pore QS", large_qs > small_qs);
     v.check_pass("MG2023: large pore QS near 1", large_qs > 0.9);
-    v.check_pass("MG2023: small pore QS < 0.2 (poor connectivity)", small_qs < 0.2);
+    v.check_pass(
+        "MG2023: small pore QS < 0.2 (poor connectivity)",
+        small_qs < 0.2,
+    );
 
     // ── P13: Islam 2014 — Brandt Farm ──
     v.section("P13: Islam 2014 — Brandt Farm No-Till");
@@ -326,7 +448,10 @@ fn main() {
     let mbc_ratio = 1.14_f64;
     let mbc_se = 0.06_f64;
     v.check_pass("Zuber: MBC ratio > 1", mbc_ratio > 1.0);
-    v.check_pass("Zuber: 95% CI excludes 1.0", mbc_ratio - 1.96 * mbc_se > 1.0);
+    v.check_pass(
+        "Zuber: 95% CI excludes 1.0",
+        mbc_ratio - 1.96 * mbc_se > 1.0,
+    );
 
     // ── P15: Feng 2024 — Pore-Size Diversity ──
     v.section("P15: Feng 2024 — Pore-Size Diversity");
@@ -358,8 +483,14 @@ fn main() {
 
     let frac_small = (10.0_f64 - 2.0).powi(3) / 10.0_f64.powi(3);
     let frac_large = (100.0_f64 - 2.0).powi(3) / 100.0_f64.powi(3);
-    v.check_pass("Tecon: large aggregate → more interior", frac_large > frac_small);
-    v.check_pass("Tecon: interior fraction ∈ (0,1)", frac_large > 0.0 && frac_large < 1.0);
+    v.check_pass(
+        "Tecon: large aggregate → more interior",
+        frac_large > frac_small,
+    );
+    v.check_pass(
+        "Tecon: interior fraction ∈ (0,1)",
+        frac_large > 0.0 && frac_large < 1.0,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // Cross-Spring: Anderson Localization
@@ -370,9 +501,24 @@ fn main() {
     println!("  Paper: Bourgain J, Kachkovskiy I. GAFA. 2018;28:1539–87.");
     println!("  Eq: σ(H) ⊂ [-2-W/2, 2+W/2], γ(0) ≈ W²/96 (Kappus-Wegner)");
 
-    v.check("BK2018: erf(1.0)", erf(1.0), 0.842_700_792_949_715, tolerances::ERF_PARITY);
-    v.check("BK2018: erf(0) = 0", erf(0.0), 0.0, tolerances::ANALYTICAL_F64);
-    v.check("BK2018: Φ(0) = 0.5", norm_cdf(0.0), 0.5, tolerances::EXACT_F64);
+    v.check(
+        "BK2018: erf(1.0)",
+        erf(1.0),
+        0.842_700_792_949_715,
+        tolerances::ERF_PARITY,
+    );
+    v.check(
+        "BK2018: erf(0) = 0",
+        erf(0.0),
+        0.0,
+        tolerances::ANALYTICAL_F64,
+    );
+    v.check(
+        "BK2018: Φ(0) = 0.5",
+        norm_cdf(0.0),
+        0.5,
+        tolerances::EXACT_F64,
+    );
 
     let gamma_kw = 0.5_f64 * 0.5 / 96.0;
     v.check(

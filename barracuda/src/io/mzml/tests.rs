@@ -482,7 +482,9 @@ fn mzml_iter_xml_error() {
 
 #[test]
 fn mzml_nonexistent_file() {
-    let result = parse_mzml(std::path::Path::new("/nonexistent/data.mzML"));
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("nonexistent.mzML");
+    let result = parse_mzml(&path);
     assert!(result.is_err());
 }
 

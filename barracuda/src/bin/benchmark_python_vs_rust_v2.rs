@@ -30,7 +30,7 @@ use std::collections::HashMap;
 use std::time::Instant;
 use wetspring_barracuda::bio::{
     bistable, cooperation, derep, diversity, dnds, felsenstein, gillespie, hmm, kmd, kmer,
-    merge_pairs, neighbor_joining, pangenome, pcoa, phage_defense, quality, qs_biofilm,
+    merge_pairs, neighbor_joining, pangenome, pcoa, phage_defense, qs_biofilm, quality,
     robinson_foulds, signal, snp, spectral_match, unifrac,
 };
 use wetspring_barracuda::validation::Validator;
@@ -273,7 +273,9 @@ fn main() {
 
     // D18: Spectral Match
     let t0 = Instant::now();
-    let mz: Vec<f64> = (0..100).map(|i| f64::from(i).mul_add(10.0, 100.0)).collect();
+    let mz: Vec<f64> = (0..100)
+        .map(|i| f64::from(i).mul_add(10.0, 100.0))
+        .collect();
     let int: Vec<f64> = (0..100).map(|i| f64::from(100 - i)).collect();
     for _ in 0..1_000 {
         let _ = spectral_match::cosine_similarity(&mz, &int, &mz, &int, 0.5);
@@ -286,7 +288,9 @@ fn main() {
 
     // D19: KMD
     let t0 = Instant::now();
-    let masses: Vec<f64> = (0..500).map(|i| f64::from(i).mul_add(14.0, 200.0)).collect();
+    let masses: Vec<f64> = (0..500)
+        .map(|i| f64::from(i).mul_add(14.0, 200.0))
+        .collect();
     for _ in 0..100 {
         let _ = kmd::kendrick_mass_defect(&masses, kmd::units::CH2_EXACT, kmd::units::CH2_NOMINAL);
     }
@@ -298,7 +302,9 @@ fn main() {
 
     // D20: Peak Finding
     let t0 = Instant::now();
-    let sig: Vec<f64> = (0..10_000_i32).map(|i| (f64::from(i) * 0.01).sin().abs() * 100.0).collect();
+    let sig: Vec<f64> = (0..10_000_i32)
+        .map(|i| (f64::from(i) * 0.01).sin().abs() * 100.0)
+        .collect();
     for _ in 0..100 {
         let _ = signal::find_peaks(&sig, &signal::PeakParams::default());
     }
@@ -333,7 +339,11 @@ fn main() {
         .map(|k| {
             let i = k / n;
             let j = k % n;
-            if i == j { 0.0 } else { ((i + j) as f64).mul_add(0.01, 0.1) }
+            if i == j {
+                0.0
+            } else {
+                ((i + j) as f64).mul_add(0.01, 0.1)
+            }
         })
         .collect();
     let _ = pcoa::pcoa(&pcoa_dm, n, 3);
@@ -392,7 +402,10 @@ fn main() {
     }
     println!("  {:-<20} {:-<10}", "", "");
     println!("  {:<20} {:>10}", "TOTAL", total_us);
-    println!("\n  All {} domains benchmarked in pure Rust.", benches.len());
+    println!(
+        "\n  All {} domains benchmarked in pure Rust.",
+        benches.len()
+    );
 
     v.finish();
 }

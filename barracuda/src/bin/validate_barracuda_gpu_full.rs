@@ -160,6 +160,7 @@ async fn main() {
     v.section("G05: Variance (FMR)");
     {
         let data = vec![10.0, 20.0, 30.0, 15.0, 25.0, 5.0, 12.0, 8.0];
+        // Intentional: manual population variance as CPU reference to compare against GPU output.
         let mean = data.iter().sum::<f64>() / data.len() as f64;
         let cpu_var = data.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / data.len() as f64;
         let t_gpu = Instant::now();

@@ -1,7 +1,7 @@
 # Cross-Spring Shader Evolution
 
-**Last updated**: Feb 27, 2026 — V65 Modern cross-spring rewiring (700 WGSL shaders, 0 f32-only, universal precision, DF64, 79 primitives consumed, 0 local WGSL/derivative/regression, 211 experiments, 5,061+ checks, 1,783 GPU on RTX 4070, 92 named tolerances, clippy pedantic CLEAN). V65: `GpuF64::fp64_strategy()` + `optimal_precision()` wired, 6 GPU modules migrated to `submit_and_poll`, Exp210 cross-spring evolution benchmark (24/24).
-**Validated by**: V65 full sweep (all ODE GPU, GEMM, IPC, metalForge green), ToadStool S68+ `e96576ee`
+**Last updated**: Feb 28, 2026 — V75 ToadStool Rewire (700 WGSL shaders, 0 f32-only, universal precision, DF64, 82 primitives consumed, 0 local WGSL/derivative/regression, 229 experiments, 5,743+ checks, 1,833+ GPU on RTX 4070, 97 named tolerances, clippy pedantic CLEAN). V75: ComputeDispatch adoption (6 GPU modules), BatchedMultinomialGpu + PairwiseL2Gpu + FstVariance.
+**Validated by**: V75 full sweep (all ODE GPU, GEMM, IPC, metalForge green), ToadStool S68+ `e96576ee`
 
 ---
 

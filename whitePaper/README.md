@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
-**Date:** February 26, 2026
-**Status:** Phase 65 — Validation study active — 5,061+ checks (1,783 GPU on RTX 4070, **60 NPU on AKD1000**), 1,103 tests, 211 experiments, ToadStool S68+ aligned (`e96576ee`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 92 named tolerances with full provenance, 0 Passthrough, 0 ad-hoc magic numbers, clippy pedantic CLEAN, V65 NPU Live (Exp193-195: real AKD1000 DMA, ESN sim↔hardware, online evolution, PUF fingerprint), 39/39 three-tier, 52/52 papers
+**Date:** February 28, 2026
+**Status:** Phase 75 — Validation study active — 5,743+ checks (1,833+ GPU on RTX 4070, **60 NPU on AKD1000**), 1,148 tests (955 lib, 1,148 total), 229 experiments, ToadStool S68+ aligned (`e96576ee`), 82 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 92 named tolerances with full provenance, 0 Passthrough, 0 ad-hoc magic numbers, clippy pedantic CLEAN, V75 ComputeDispatch evolution, 39/39 three-tier, 52/52 papers
 **License:** AGPL-3.0-or-later
 
 ---
@@ -56,7 +56,7 @@ implementations into upstream ToadStool/BarraCuda primitives:
 5. **Lean** — wetSpring rewires to upstream imports, deletes local code
 
 **Current status:** 42 GPU modules — Lean phase (fully absorbed). All 42 lean on
-upstream ToadStool primitives (79 consumed, S68. 0 local WGSL (fully lean)).
+upstream ToadStool primitives (82 consumed, S68+. 0 local WGSL (fully lean)).
 7 compose ToadStool primitives for GPU-accelerated workflows. Zero Passthrough, zero
 Tier B/C modules remain. BGL helpers (`storage_bgl_entry`/`uniform_bgl_entry`) adopted
 from ToadStool S66 `ComputeDispatch` module (6 files, ~258 lines boilerplate removed).
@@ -69,8 +69,8 @@ capability-based dispatch, and shader origin tracking as an absorption seam for 
 
 | Claim | Evidence |
 |-------|----------|
-| Rust matches Python across 211 experiments | 5,061+ checks pass (CPU + GPU + metalForge + streaming + cross-spring + soil QS + NPU) |
-| GPU matches CPU across all 42 GPU modules + 1 extension | 1,783 GPU checks pass (incl. 48 all-domain + 58 metalForge v5 + 18 diversity fusion) |
+| Rust matches Python across 229 experiments | 5,743+ checks pass (CPU + GPU + metalForge + streaming + cross-spring + soil QS + NPU) |
+| GPU matches CPU across all 42 GPU modules + 1 extension | 1,833+ GPU checks pass (incl. 48 all-domain + 58 metalForge v5 + 18 diversity fusion) |
 | BarraCuda CPU parity across 31+ domains (v1-v9) | 407/407 cross-domain checks pass |
 | 926× spectral cosine GPU speedup | Exp016 benchmark |
 | 2.45× full 16S pipeline GPU speedup | Exp015/016 benchmark |
@@ -312,7 +312,7 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCuda/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34+ WGSL shaders, active Write phase)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 79 ToadStool primitives, barracuda always-on, 1,103 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 82 ToadStool primitives, barracuda always-on, 1,148 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **ecoPrimals/archive/wetspring-early-handoffs-feb2026/** — Fossil record of early ToadStool handoffs (v1–v9)
 
@@ -329,7 +329,7 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy --pedantic --nursery -D warnings` | 0 diagnostics |
 | `cargo doc --no-deps` | 0 warnings |
-| Line coverage (`cargo-llvm-cov`) | **95.46% line / 93.54% fn / 94.99% branch** |
+| Line coverage (`cargo-llvm-cov`) | **95.86% line / 94.02% region / 95.40% fn** |
 | `#![deny(unsafe_code)]` | Enforced crate-wide (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, clippy::unwrap_used)]` | Enforced crate-wide |
 | Named tolerance constants | 86 (all scientifically justified, hierarchy-tested) |

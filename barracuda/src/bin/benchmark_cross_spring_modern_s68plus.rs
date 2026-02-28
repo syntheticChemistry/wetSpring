@@ -11,7 +11,7 @@
     clippy::similar_names,
     clippy::many_single_char_names
 )]
-//! Exp210 — Modern Cross-Spring Evolution Benchmark (ToadStool S68+)
+//! Exp210 — Modern Cross-Spring Evolution Benchmark (`ToadStool` S68+)
 //!
 //! Validates and benchmarks the full cross-spring evolution at S68+ scale.
 //! Each section traces provenance through the ecoPrimals ecosystem, showing
@@ -118,7 +118,7 @@ fn main() {
 
     let n_taxa = 500;
     let counts: Vec<f64> = (0..n_taxa)
-        .map(|i| ((i * 7 + 3) % 100 + 1) as f64)
+        .map(|i| f64::from(((i * 7 + 3) % 100 + 1) as u32))
         .collect();
 
     let (cpu_shannon, cpu_div_ms) = bench("CPU Shannon (barracuda::stats S64)", || {
@@ -152,7 +152,7 @@ fn main() {
     let n_species = 10_000;
     let n_samples = 5;
     let large_counts: Vec<f64> = (0..n_samples * n_species)
-        .map(|i| ((i * 13 + 7) % 200 + 1) as f64)
+        .map(|i| f64::from(((i * 13 + 7) % 200 + 1) as u32))
         .collect();
 
     let (cpu_fusion, cpu_fusion_ms) = bench("CPU DiversityFusion (5×10k)", || {
@@ -252,7 +252,7 @@ fn main() {
     println!("  Provenance: groundSpring → bootstrap rawr_mean (S66)");
     println!("  Provenance: both → stats::metrics MAE, RMSE, R² (S64)");
 
-    let vec_a: Vec<f64> = (0..100).map(|i| i as f64 * 0.1).collect();
+    let vec_a: Vec<f64> = (0..100).map(|i| f64::from(i as u32) * 0.1).collect();
     let vec_b: Vec<f64> = vec_a
         .iter()
         .map(|&x| 2.0 * x + 1.0 + 0.01 * x.sin())
@@ -273,7 +273,7 @@ fn main() {
     v.check_pass("RMSE finite [airSpring→S64 metrics]", rmse_val.is_finite());
 
     // R² = Nash-Sutcliffe: observed vs simulated (same scale, small noise)
-    let observed: Vec<f64> = (0..100).map(|i| i as f64 * 0.1).collect();
+    let observed: Vec<f64> = (0..100).map(|i| f64::from(i as u32) * 0.1).collect();
     let simulated: Vec<f64> = observed.iter().map(|&x| x + 0.001 * x.sin()).collect();
     let r2_val = barracuda::stats::r_squared(&observed, &simulated);
     v.check_pass("R² > 0.99 [airSpring→S64 metrics]", r2_val > 0.99);
@@ -313,10 +313,10 @@ fn main() {
     let k = 128;
     let n = 256;
     let a_mat: Vec<f64> = (0..m * k)
-        .map(|i| ((i * 7 + 3) % 100) as f64 / 100.0)
+        .map(|i| f64::from(((i * 7 + 3) % 100) as u32) / 100.0)
         .collect();
     let b_mat: Vec<f64> = (0..k * n)
-        .map(|i| ((i * 11 + 5) % 100) as f64 / 100.0)
+        .map(|i| f64::from(((i * 11 + 5) % 100) as u32) / 100.0)
         .collect();
 
     let gemm = GemmCached::new(Arc::clone(&device), Arc::clone(&ctx));
@@ -366,7 +366,7 @@ fn main() {
     println!("  Ridge: Tikhonov regularization (readout training, ESN, kriging)");
 
     let v_mat: Vec<f64> = (0..20 * 10)
-        .map(|i| ((i * 3 + 1) % 50) as f64 / 50.0)
+        .map(|i| f64::from(((i * 3 + 1) % 50) as u32) / 50.0)
         .collect();
     let nmf_cfg = barracuda::linalg::nmf::NmfConfig {
         rank: 3,

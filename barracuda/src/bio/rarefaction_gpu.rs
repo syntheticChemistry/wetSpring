@@ -1,29 +1,28 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! GPU-accelerated rarefaction with bootstrap confidence intervals.
 //!
-//! Uses `ToadStool`'s `FusedMapReduceF64` for parallel diversity computation
-//! across bootstrap replicates. The random subsampling uses a simple
-//! multiplicative LCG seeded per-replicate, with diversity metrics computed
-//! on GPU.
+//! Uses `ToadStool`'s `BatchedMultinomialGpu` for batched multinomial
+//! subsampling across all bootstrap replicates in one GPU dispatch, then
+//! `DiversityFusionGpu` for fused Shannon + Simpson + evenness per replicate.
 //!
 //! # Architecture
 //!
-//! - **Bootstrap loop**: For each replicate, generate a rarefied abundance
-//!   vector by random sampling, then compute Shannon/Simpson on GPU.
-//! - **GPU dispatch**: `FusedMapReduceF64::shannon_entropy` and
-//!   `::simpson_index` for each replicate.
-//! - **CPU fallback**: For small communities (< 50 species) or few bootstrap
-//!   iterations, CPU is faster due to dispatch overhead.
+//! - **Batched multinomial**: All replicates sampled in one GPU kernel via
+//!   `BatchedMultinomialGpu` (xoshiro128** PRNG).
+//! - **Fused diversity**: `DiversityFusionGpu::compute` yields Shannon, Simpson,
+//!   evenness for all replicates in one pass.
+//! - **CPU fallback**: For small communities (< 50 species), CPU is faster
+//!   due to dispatch overhead.
 //!
 //! # References
 //!
 //! - Gotelli & Colwell (2001). "Quantifying biodiversity."
-//! - `ToadStool` `prng_xoshiro` for future full-GPU random sampling.
+//! - `ToadStool` `batched_multinomial`, `diversity_fusion`.
 
 use crate::bio::diversity;
 use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
-use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
+use barracuda::ops::bio::{BatchedMultinomialGpu, DiversityFusionGpu};
 
 /// Minimum species count to justify GPU rarefaction dispatch.
 ///
@@ -136,41 +135,95 @@ pub fn rarefaction_bootstrap_gpu(
 
     let use_gpu = counts.len() >= GPU_MIN_SPECIES;
 
-    let fmr = if use_gpu {
-        Some(
-            FusedMapReduceF64::new(gpu.to_wgpu_device())
-                .map_err(|e| Error::Gpu(format!("FusedMapReduceF64: {e}")))?,
-        )
-    } else {
-        None
-    };
+    let (shannon_samples, simpson_samples, observed_samples) = if use_gpu {
+        let device = gpu.to_wgpu_device();
+        let multinomial = BatchedMultinomialGpu::new(device.clone())
+            .map_err(|e| Error::Gpu(format!("BatchedMultinomialGpu: {e}")))?;
+        let diversity_fusion = DiversityFusionGpu::new(device)
+            .map_err(|e| Error::Gpu(format!("DiversityFusionGpu: {e}")))?;
 
-    let mut shannon_samples = Vec::with_capacity(params.n_bootstrap);
-    let mut simpson_samples = Vec::with_capacity(params.n_bootstrap);
-    let mut observed_samples = Vec::with_capacity(params.n_bootstrap);
-
-    let mut rng_state = params.seed;
-
-    for _ in 0..params.n_bootstrap {
-        let rarefied = subsample_community(counts, depth, &mut rng_state);
-
-        if let Some(ref fmr) = fmr {
-            let h = fmr
-                .shannon_entropy(&rarefied)
-                .map_err(|e| Error::Gpu(format!("Shannon GPU: {e}")))?;
-            shannon_samples.push(h);
-
-            let d = fmr
-                .simpson_index(&rarefied)
-                .map_err(|e| Error::Gpu(format!("Simpson GPU: {e}")))?;
-            simpson_samples.push(1.0 - d);
-        } else {
-            shannon_samples.push(diversity::shannon(&rarefied));
-            simpson_samples.push(diversity::simpson(&rarefied));
+        let n_taxa = counts.len();
+        let n_reps = params.n_bootstrap;
+        if total <= 0.0 {
+            return Ok(RarefactionResult {
+                shannon: BootstrapCi {
+                    mean: 0.0,
+                    lower: 0.0,
+                    upper: 0.0,
+                    se: 0.0,
+                },
+                simpson: BootstrapCi {
+                    mean: 0.0,
+                    lower: 0.0,
+                    upper: 0.0,
+                    se: 0.0,
+                },
+                observed: BootstrapCi {
+                    mean: 0.0,
+                    lower: 0.0,
+                    upper: 0.0,
+                    se: 0.0,
+                },
+                depth,
+            });
         }
 
-        observed_samples.push(diversity::observed_features(&rarefied));
-    }
+        let mut cumulative = Vec::with_capacity(n_taxa);
+        let mut cum = 0.0;
+        for &c in counts {
+            cum += c / total;
+            cumulative.push(cum);
+        }
+
+        let depth_u32 = u32::try_from(depth)
+            .map_err(|_| Error::InvalidInput("rarefaction depth exceeds u32::MAX".into()))?;
+        let n_reps_u32 = u32::try_from(n_reps)
+            .map_err(|_| Error::InvalidInput("n_bootstrap exceeds u32::MAX".into()))?;
+
+        let mut seeds: Vec<u32> = (0..n_reps * 4)
+            .map(|i| {
+                let s = params
+                    .seed
+                    .wrapping_add((i / 4) as u64 * 0x9e37_79b9_7f4a_7c15);
+                ((s >> ((i % 4) * 16)) as u32).wrapping_add(0x9e37_79b9)
+            })
+            .collect();
+
+        let counts_u32 = multinomial
+            .sample(&cumulative, &mut seeds, depth_u32, n_reps_u32)
+            .map_err(|e| Error::Gpu(format!("BatchedMultinomialGpu::sample: {e}")))?;
+
+        let abundances: Vec<f64> = counts_u32.iter().map(|&c| f64::from(c)).collect();
+
+        let results = diversity_fusion
+            .compute(&abundances, n_reps, n_taxa)
+            .map_err(|e| Error::Gpu(format!("DiversityFusionGpu::compute: {e}")))?;
+
+        let shannon_samples: Vec<f64> = results.iter().map(|r| r.shannon).collect();
+        let simpson_samples: Vec<f64> = results.iter().map(|r| r.simpson).collect();
+        let observed_samples: Vec<f64> = (0..n_reps)
+            .map(|r| {
+                let row = &counts_u32[r * n_taxa..(r + 1) * n_taxa];
+                row.iter().filter(|&&c| c > 0).count() as f64
+            })
+            .collect();
+
+        (shannon_samples, simpson_samples, observed_samples)
+    } else {
+        let mut shannon_samples = Vec::with_capacity(params.n_bootstrap);
+        let mut simpson_samples = Vec::with_capacity(params.n_bootstrap);
+        let mut observed_samples = Vec::with_capacity(params.n_bootstrap);
+        let mut rng_state = params.seed;
+
+        for _ in 0..params.n_bootstrap {
+            let rarefied = subsample_community(counts, depth, &mut rng_state);
+            shannon_samples.push(diversity::shannon(&rarefied));
+            simpson_samples.push(diversity::simpson(&rarefied));
+            observed_samples.push(diversity::observed_features(&rarefied));
+        }
+
+        (shannon_samples, simpson_samples, observed_samples)
+    };
 
     Ok(RarefactionResult {
         shannon: compute_ci(&shannon_samples),

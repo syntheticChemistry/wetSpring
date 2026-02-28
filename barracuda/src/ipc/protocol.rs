@@ -18,19 +18,28 @@ impl RpcError {
     /// Method not found (`-32601`).
     #[must_use]
     pub fn method_not_found(method: &str) -> Self {
-        Self { code: -32601, message: format!("method not found: {method}") }
+        Self {
+            code: -32601,
+            message: format!("method not found: {method}"),
+        }
     }
 
     /// Invalid method parameters (`-32602`).
     #[must_use]
     pub fn invalid_params(msg: impl Into<String>) -> Self {
-        Self { code: -32602, message: msg.into() }
+        Self {
+            code: -32602,
+            message: msg.into(),
+        }
     }
 
     /// Application-level server error (`-32000` to `-32099`).
     #[must_use]
     pub fn server_error(code: i64, msg: impl Into<String>) -> Self {
-        Self { code, message: msg.into() }
+        Self {
+            code,
+            message: msg.into(),
+        }
     }
 }
 
@@ -70,11 +79,13 @@ pub struct Request {
 /// - `-32700`: Parse error (malformed JSON)
 /// - `-32600`: Invalid request (missing required fields)
 pub fn parse_request(line: &str) -> Result<Request, ParseError> {
-    let val: Value = serde_json::from_str(line.trim())
-        .map_err(|e| ParseError {
-            id: Value::Null,
-            error: RpcError { code: -32700, message: format!("parse error: {e}") },
-        })?;
+    let val: Value = serde_json::from_str(line.trim()).map_err(|e| ParseError {
+        id: Value::Null,
+        error: RpcError {
+            code: -32700,
+            message: format!("parse error: {e}"),
+        },
+    })?;
 
     let id = val.get("id").cloned().unwrap_or(Value::Null);
 
@@ -82,7 +93,10 @@ pub fn parse_request(line: &str) -> Result<Request, ParseError> {
     if jsonrpc != Some("2.0") {
         return Err(ParseError {
             id,
-            error: RpcError { code: -32600, message: "invalid or missing jsonrpc version".into() },
+            error: RpcError {
+                code: -32600,
+                message: "invalid or missing jsonrpc version".into(),
+            },
         });
     }
 
@@ -91,7 +105,10 @@ pub fn parse_request(line: &str) -> Result<Request, ParseError> {
         .and_then(Value::as_str)
         .ok_or_else(|| ParseError {
             id: id.clone(),
-            error: RpcError { code: -32600, message: "missing method field".into() },
+            error: RpcError {
+                code: -32600,
+                message: "missing method field".into(),
+            },
         })?
         .to_string();
 

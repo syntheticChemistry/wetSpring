@@ -14,6 +14,8 @@ use std::time::Duration;
 use super::dispatch;
 use super::metrics::Metrics;
 use super::protocol;
+#[cfg(test)]
+use crate::tolerances;
 
 const CONNECTION_READ_TIMEOUT: Duration = Duration::from_secs(120);
 
@@ -169,7 +171,11 @@ fn handle_connection(stream: &std::os::unix::net::UnixStream, metrics: &Metrics)
             }
             Err(parse_err) => {
                 metrics.record_error("_parse", start.elapsed());
-                protocol::error_response(&parse_err.id, parse_err.error.code, &parse_err.error.message)
+                protocol::error_response(
+                    &parse_err.id,
+                    parse_err.error.code,
+                    &parse_err.error.message,
+                )
             }
         };
 
@@ -258,7 +264,7 @@ mod tests {
 
         let val: serde_json::Value = serde_json::from_str(&response).unwrap();
         let shannon = val["result"]["shannon"].as_f64().unwrap();
-        assert!((shannon - 4.0_f64.ln()).abs() < 1e-10);
+        assert!((shannon - 4.0_f64.ln()).abs() < tolerances::PYTHON_PARITY);
     }
 
     #[test]

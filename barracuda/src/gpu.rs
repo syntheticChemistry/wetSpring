@@ -263,8 +263,8 @@ pub const GPU_DISPATCH_THRESHOLD: usize = 10_000;
 
 /// Element count thresholds for GPU vs CPU dispatch crossover.
 /// Derived from benchmarking `FusedMapReduceF64` (hotSpring Exp001 §4.4, wetSpring Exp064/087).
-const DISPATCH_THRESHOLD_FAST: usize = 5_000;     // Fast f64 (AMD RDNA2+): ~4 cycles/DFMA
-const DISPATCH_THRESHOLD_NATIVE: usize = 10_000;  // Native f64 (NVIDIA Volta+): ~8 cycles/DFMA
+const DISPATCH_THRESHOLD_FAST: usize = 5_000; // Fast f64 (AMD RDNA2+): ~4 cycles/DFMA
+const DISPATCH_THRESHOLD_NATIVE: usize = 10_000; // Native f64 (NVIDIA Volta+): ~8 cycles/DFMA
 const DISPATCH_THRESHOLD_SOFTWARE: usize = 25_000; // Software f64 (Apple M, Intel): emulated
 const DISPATCH_THRESHOLD_UNKNOWN: usize = 50_000; // Unknown / very slow: conservative
 

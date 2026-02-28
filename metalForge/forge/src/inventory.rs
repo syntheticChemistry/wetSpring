@@ -101,8 +101,7 @@ fn query_songbird_substrates(socket: &Path) -> Result<Vec<Substrate>, String> {
 fn songbird_rpc(socket: &Path, request: &str) -> Result<String, String> {
     let addr = std::os::unix::net::SocketAddr::from_pathname(socket)
         .map_err(|e| format!("invalid Songbird socket: {e}"))?;
-    let stream =
-        UnixStream::connect_addr(&addr).map_err(|e| format!("Songbird connect: {e}"))?;
+    let stream = UnixStream::connect_addr(&addr).map_err(|e| format!("Songbird connect: {e}"))?;
     stream
         .set_read_timeout(Some(SONGBIRD_TIMEOUT))
         .map_err(|e| format!("set timeout: {e}"))?;
@@ -453,10 +452,7 @@ mod tests {
             extract_json_string(json, "name"),
             Some("eastgate".to_string())
         );
-        assert_eq!(
-            extract_json_string(json, "type"),
-            Some("tower".to_string())
-        );
+        assert_eq!(extract_json_string(json, "type"), Some("tower".to_string()));
         assert!(extract_json_string(json, "missing").is_none());
     }
 

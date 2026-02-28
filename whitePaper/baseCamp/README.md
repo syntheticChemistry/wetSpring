@@ -2,7 +2,7 @@
 
 **Date:** February 28, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 73 — 229 experiments, 5,743+ validation checks (1,833+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,199+ tests (1,006 barracuda lib + 60 integration + 20 doc + 113 forge), ToadStool S68+ aligned (`e96576ee`), 79 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 92 named tolerances, 0 unsafe code, clippy pedantic CLEAN, V73 deep debt reduction (RpcError, function decomposition, safe casts, named constants), V72 five-tier chain: Exp224 paper math (58/58, 18 papers), Exp225 CPU v14 (58/58, 50 domains), Exp226 GPU v6 (28/28), Exp227 streaming v4 (24/24), Exp228 metalForge v8 (33/33), 52/52 papers, 50/50 three-tier
+**Status:** Phase 75 — 229 experiments, 5,743+ validation checks (1,833+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,148+ tests (955 barracuda lib + 60 integration + 20 doc + 113 forge), ToadStool S68+ aligned (`e96576ee`), 82 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 92 named tolerances, 0 unsafe code, clippy pedantic CLEAN, V75 ComputeDispatch evolution, V72 five-tier chain: Exp224 paper math (58/58, 18 papers), Exp225 CPU v14 (58/58, 50 domains), Exp226 GPU v6 (28/28), Exp227 streaming v4 (24/24), Exp228 metalForge v8 (33/33), 52/52 papers, 50/50 three-tier
 
 ---
 
@@ -41,7 +41,7 @@ All code is AGPL-3.0.
 | **biomeOS IPC** | — | cross | — | 203-208 | 321 | IPC dispatch, GPU-aware routing, NUCLEUS atomics, Songbird, Neural API |
 | **V66 Audit + Dispatch** | — | cross | — | 209,212-215 | 239+ | Streaming I/O parity, CPU v12, dispatch evolution, NUCLEUS V8, CPU vs GPU v5 |
 | **V67 Experiment Buildout** | — | cross | — | 216-220 | 170+ | 47-domain CPU proof, Python-vs-Rust benchmark, 42-module GPU portability, unidirectional streaming, cross-substrate dispatch V67 + BandwidthTier, 11 extension papers → 50/50 three-tier |
-| **Total** | | | **52** | | **5,421+** | |
+| **Total** | | | **52** | | **5,743+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -101,7 +101,7 @@ Every paper goes through the full evolution. Status across all 39 actionable pap
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
 | biomeOS IPC integration | JSON-RPC science primal, GPU-aware dispatch, Songbird registration | 321 checks (Exp203-208) |
-| Code quality audit | 95.77% line / 93.86% fn / 95.33% branch, streaming I/O, 0 production mocks, ToadStool S68, barracuda always-on, `deny(missing_docs)`, zero unsafe code, clippy pedantic CLEAN, baseline manifest 51/51 | 1,081+ tests |
+| Code quality audit | 95.86% line / 94.02% region / 95.40% fn, streaming I/O, 0 production mocks, ToadStool S68+, barracuda always-on, `deny(missing_docs)`, zero unsafe code, clippy pedantic CLEAN, baseline manifest 51/51 | 1,148+ tests |
 | V66 dispatch evolution | Forge dispatch routing (29 workloads), streaming topology (PCIe bypass), NUCLEUS Tower/Node/Nest model, absorption audit (0 local WGSL) | 49 checks (Exp213) |
 | V66 NUCLEUS V8 | IPC dispatch with V66 I/O evolution (byte-native FASTQ, bytemuck nanopore, streaming MS2), Nest metrics, CPU fallback parity, full pipeline chain | 49 checks (Exp214) |
 
@@ -137,7 +137,7 @@ Every paper goes through the full evolution. Status across all 39 actionable pap
 | Exp169 | Modern cross-spring benchmark | 12 | All CPU primitives validated, 4-spring provenance, bit-exact delegation |
 
 V44 rewired 6 validation binaries to modern upstream: `find_w_c` (4 files),
-`pearson_correlation` (1 file). 79 primitives consumed (S68). Hill CPU ODE helpers
+`pearson_correlation` (1 file). 82 primitives consumed (S68+). Hill CPU ODE helpers
 intentionally kept local (derivative-level math, GPU equivalents generated
 by `BatchedOdeRK4::generate_shader()`).
 
@@ -281,7 +281,7 @@ NPU spectral triage Exp124) with SHA-256 provenance in BASELINE_MANIFEST.md.
 11 extension papers (Exp144-149, 152-156) promoted to three-tier by adding
 metalForge workload definitions (`ShaderOrigin::Absorbed`). BandwidthTier
 and ComputeDispatch from Barracuda wired into metalForge bridge/dispatch.
-50/50 three-tier papers. 221 experiments, 5,421+ checks, 1,081+ tests.
+50/50 three-tier papers. 229 experiments, 5,743+ checks, 1,148+ tests.
 
 ## Open Data
 

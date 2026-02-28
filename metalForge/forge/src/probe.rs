@@ -11,7 +11,9 @@
 //!
 //! CPU discovery reads `/proc/cpuinfo` and `/proc/meminfo`.
 
-use crate::substrate::{Capability, Identity, Properties, Substrate, SubstrateKind, SubstrateOrigin};
+use crate::substrate::{
+    Capability, Identity, Properties, Substrate, SubstrateKind, SubstrateOrigin,
+};
 use std::fs;
 
 /// Probe all GPU adapters via wgpu.

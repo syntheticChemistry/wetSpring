@@ -23,8 +23,8 @@
 //! Tests that the IPC dispatch layer correctly models mixed hardware
 //! routing: diversity→GPU (fused map-reduce), QS ODE→GPU (parameter
 //! sweep), taxonomy→NPU (int8 quantized), FASTQ→CPU (I/O-bound).
-//! Validates PCIe bypass topology (streaming without CPU roundtrip),
-//! graceful GPU→CPU fallback, and biomeOS graph pipeline chaining.
+//! Validates `PCIe` bypass topology (streaming without CPU roundtrip),
+//! graceful GPU→CPU fallback, and `biomeOS` graph pipeline chaining.
 //!
 //! # Provenance
 //!

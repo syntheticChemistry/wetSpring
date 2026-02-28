@@ -44,6 +44,8 @@ pub mod feature_table;
 #[cfg(feature = "gpu")]
 pub mod feature_table_gpu;
 pub mod felsenstein;
+#[cfg(feature = "gpu")]
+pub mod fst_variance;
 pub mod gbm;
 #[cfg(feature = "gpu")]
 pub mod gbm_gpu;
@@ -83,6 +85,8 @@ pub mod neighbor_joining_gpu;
 pub mod ode;
 #[cfg(feature = "gpu")]
 pub mod ode_sweep_gpu;
+#[cfg(feature = "gpu")]
+pub mod pairwise_l2_gpu;
 pub mod pangenome;
 #[cfg(feature = "gpu")]
 pub mod pangenome_gpu;

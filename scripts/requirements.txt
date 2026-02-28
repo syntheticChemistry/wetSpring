@@ -8,8 +8,15 @@
 #   python3 -m venv .venv && source .venv/bin/activate
 #   pip install -r requirements.txt
 #
-# Last verified: 2026-02-21
+# Last verified: 2026-02-28
+#
+# External tools (own environments — not pip installable here):
+#   - qiime2: validate_exp001.py, run_exp002.py (conda env qiime2-2026)
+#   - asari, FindPFAS: PFAS/metabolomics pipelines (separate install)
+#   - PhyNetPy: phynetpy_rf_baseline.py (stdlib-only; uses DEFJ/ data)
 
 numpy==2.1.3
 scipy==1.15.3
 scikit-learn==1.7.2
+pandas==3.0.1
+dendropy==5.0.8

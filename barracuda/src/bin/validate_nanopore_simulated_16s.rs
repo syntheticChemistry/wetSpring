@@ -23,11 +23,18 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Source | Synthetic (simulated 16S communities, seed=42) |
-//! | Date | 2026-02-26 |
+//! | Baseline | In-repo simulation (this binary) |
+//! | Source | Synthetic 16S amplicons, deterministic RNG |
 //! | Commit | wetSpring Phase 61 |
-//! | Hardware | CPU only (pre-hardware) |
+//! | Date | 2026-02-26 |
 //! | Command | `cargo run --release --bin validate_nanopore_simulated_16s` |
+//!
+//! ## Simulation parameters
+//!
+//! - **Read length**: 1450 bp (target; mean ≈ 1450, tolerance 10 bp)
+//! - **Substitution rate**: ~5% (1 in 20 bases)
+//! - **Seed**: 42 (even community), 100 (uneven community)
+//! - **Structure**: Conserved 5'/3' (20 bp each), variable middle, species-specific patterns
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;

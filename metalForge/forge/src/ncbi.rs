@@ -3,14 +3,14 @@
 //! NCBI E-utilities acquisition via the Tower atomic pattern.
 //!
 //! Acquires genomic data from NCBI using the Tower → Nest flow:
-//! 1. **Tower** discovers NestGate via Songbird
+//! 1. **Tower** discovers `NestGate` via Songbird
 //! 2. **Nest** checks if data is already stored (`storage.exists`)
 //! 3. If not cached, fetches directly from NCBI E-utilities via `curl`
-//! 4. Stores the result in NestGate for future use
+//! 4. Stores the result in `NestGate` for future use
 //!
 //! This avoids adding an HTTP client dependency to the forge crate. NCBI
 //! HTTP calls are delegated to `curl` (available on all target systems).
-//! When NestGate evolves to expose `ncbi.fetch` via RPC, the direct
+//! When `NestGate` evolves to expose `ncbi.fetch` via RPC, the direct
 //! curl path becomes a fallback.
 //!
 //! # Rate Limiting
@@ -29,7 +29,7 @@ const EUTILS_BASE: &str = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils";
 /// NCBI acquisition client using the Tower → Nest pattern.
 #[derive(Debug)]
 pub struct NcbiClient {
-    /// NestGate client for caching (if available).
+    /// `NestGate` client for caching (if available).
     nest: Option<NestClient>,
     /// Optional API key for higher rate limits.
     api_key: Option<String>,
@@ -37,7 +37,7 @@ pub struct NcbiClient {
     email: Option<String>,
 }
 
-/// Result of an NCBI search (ESearch).
+/// Result of an NCBI search (`ESearch`).
 #[derive(Debug)]
 pub struct SearchResult {
     /// Database searched.
@@ -50,17 +50,17 @@ pub struct SearchResult {
     pub raw_xml: String,
 }
 
-/// Result of an NCBI summary (ESummary).
+/// Result of an NCBI summary (`ESummary`).
 #[derive(Debug)]
 pub struct SummaryResult {
     /// Document summaries (raw XML).
     pub raw_xml: String,
 }
 
-/// Result of an NCBI fetch (EFetch).
+/// Result of an NCBI fetch (`EFetch`).
 #[derive(Debug)]
 pub struct FetchResult {
-    /// Fetched content (FASTA, GenBank, etc.).
+    /// Fetched content (`FASTA`, `GenBank`, etc.).
     pub content: String,
     /// Return type used.
     pub rettype: String,
@@ -69,7 +69,7 @@ pub struct FetchResult {
 /// Where an assembly was resolved from.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AssemblySource {
-    /// Found in NestGate cache.
+    /// Found in `NestGate` cache.
     NestCache,
     /// Found on local filesystem.
     LocalFile(PathBuf),
@@ -93,8 +93,8 @@ pub struct AssemblyResult {
 impl NcbiClient {
     /// Create a new NCBI client with Tower discovery.
     ///
-    /// Attempts to discover NestGate for caching. Falls back to
-    /// direct NCBI access if NestGate is unavailable.
+    /// Attempts to discover `NestGate` for caching. Falls back to
+    /// direct NCBI access if `NestGate` is unavailable.
     #[must_use]
     pub fn discover() -> Self {
         Self {
@@ -107,7 +107,7 @@ impl NcbiClient {
         }
     }
 
-    /// Create a client with explicit NestGate socket.
+    /// Create a client with explicit `NestGate` socket.
     #[must_use]
     pub fn with_nest(nest: NestClient) -> Self {
         Self {
@@ -117,7 +117,7 @@ impl NcbiClient {
         }
     }
 
-    /// Create a client without NestGate (direct NCBI only).
+    /// Create a client without `NestGate` (direct NCBI only).
     #[must_use]
     pub fn direct() -> Self {
         Self {
@@ -127,21 +127,21 @@ impl NcbiClient {
         }
     }
 
-    /// Whether this client has NestGate caching available.
+    /// Whether this client has `NestGate` caching available.
     #[must_use]
     pub const fn has_nest(&self) -> bool {
         self.nest.is_some()
     }
 
-    /// Search NCBI via ESearch.
+    /// Search NCBI via `ESearch`.
     ///
     /// Returns matching IDs for the given database and query term.
-    pub fn esearch(
-        &self,
-        db: &str,
-        term: &str,
-        retmax: u32,
-    ) -> Result<SearchResult, String> {
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the HTTP request fails, the response is invalid UTF-8,
+    /// or `NestGate` storage operations fail when caching.
+    pub fn esearch(&self, db: &str, term: &str, retmax: u32) -> Result<SearchResult, String> {
         let cache_key = format!("ncbi:esearch:{db}:{term}:{retmax}");
 
         if let Some(ref nest) = self.nest {
@@ -170,7 +170,11 @@ impl NcbiClient {
         Ok(parse_esearch_result(db, &xml))
     }
 
-    /// Fetch summaries via ESummary.
+    /// Fetch summaries via `ESummary`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the HTTP request fails or the response is invalid UTF-8.
     pub fn esummary(&self, db: &str, ids: &[String]) -> Result<SummaryResult, String> {
         if ids.is_empty() {
             return Ok(SummaryResult {
@@ -178,29 +182,26 @@ impl NcbiClient {
             });
         }
         let id_list = ids.join(",");
-        let mut url = format!(
-            "{EUTILS_BASE}/esummary.fcgi?db={db}&id={id_list}&retmode=xml"
-        );
+        let mut url = format!("{EUTILS_BASE}/esummary.fcgi?db={db}&id={id_list}&retmode=xml");
         self.append_auth(&mut url);
 
         let raw_xml = curl_get(&url)?;
         Ok(SummaryResult { raw_xml })
     }
 
-    /// Fetch sequence data via EFetch.
-    pub fn efetch(
-        &self,
-        db: &str,
-        id: &str,
-        rettype: &str,
-    ) -> Result<FetchResult, String> {
+    /// Fetch sequence data via `EFetch`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the HTTP request fails, the response is invalid UTF-8,
+    /// or `NestGate` storage operations fail when caching.
+    pub fn efetch(&self, db: &str, id: &str, rettype: &str) -> Result<FetchResult, String> {
         let cache_key = format!("ncbi:efetch:{db}:{id}:{rettype}");
 
         if let Some(ref nest) = self.nest {
             if nest.exists(&cache_key) == Ok(true) {
                 if let Ok(Some(data)) = nest.retrieve_blob(&cache_key) {
-                    let content = String::from_utf8(data)
-                        .map_err(|e| format!("utf8: {e}"))?;
+                    let content = String::from_utf8(data).map_err(|e| format!("utf8: {e}"))?;
                     return Ok(FetchResult {
                         content,
                         rettype: rettype.to_string(),
@@ -209,9 +210,8 @@ impl NcbiClient {
             }
         }
 
-        let mut url = format!(
-            "{EUTILS_BASE}/efetch.fcgi?db={db}&id={id}&rettype={rettype}&retmode=text"
-        );
+        let mut url =
+            format!("{EUTILS_BASE}/efetch.fcgi?db={db}&id={id}&rettype={rettype}&retmode=text");
         self.append_auth(&mut url);
 
         let content = curl_get(&url)?;
@@ -229,13 +229,18 @@ impl NcbiClient {
     /// Acquire a genome assembly by accession.
     ///
     /// Resolution chain:
-    /// 1. Check NestGate cache
+    /// 1. Check `NestGate` cache
     /// 2. Check local data directory
     /// 3. Fetch assembly summary from NCBI for metadata
     ///
-    /// For actual assembly FASTA downloads (multi-GB), use the dedicated
+    /// For actual assembly `FASTA` downloads (multi-GB), use the dedicated
     /// download scripts in `scripts/`. This method fetches metadata and
     /// verifies availability.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the assembly is not found in NCBI, or if `ESearch`
+    /// or local filesystem operations fail.
     pub fn acquire_assembly(
         &self,
         accession: &str,
@@ -258,9 +263,7 @@ impl NcbiClient {
             let filename = format!("{accession}.fna.gz");
             let path = dir.join(&filename);
             if path.exists() {
-                let size = std::fs::metadata(&path)
-                    .map(|m| m.len())
-                    .unwrap_or(0);
+                let size = std::fs::metadata(&path).map(|m| m.len()).unwrap_or(0);
                 return Ok(AssemblyResult {
                     accession: accession.to_string(),
                     source: AssemblySource::LocalFile(path.clone()),
