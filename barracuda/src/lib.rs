@@ -86,3 +86,4 @@ pub mod npu;
 pub mod special;
 pub mod tolerances;
 pub mod validation;
+pub mod vault;

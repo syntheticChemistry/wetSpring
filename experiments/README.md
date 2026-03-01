@@ -155,6 +155,7 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 256 | EMP-Scale Anderson Atlas | NUCLEUS/data | DONE | 30K samples × 14 EMPO biomes | validate_emp_anderson_atlas | 35 |
 | 257 | NUCLEUS Data Pipeline | NUCLEUS/IPC | DONE | Three-tier primal routing | validate_nucleus_data_pipeline | 9 |
 | 258 | NUCLEUS Tower-Node | NUCLEUS/deploy | DONE | All primals READY, IPC 3.2× overhead | validate_nucleus_tower_node | 13 |
+| 259 | Genomic Vault | vault/consent | DONE | Consent + encrypted storage + provenance | validate_genomic_vault | 30 |
 
 ---
 
@@ -348,9 +349,10 @@ thresholds from `src/tolerances.rs`.
 | `validate_emp_anderson_atlas` | 256 | 35 | `cargo run --release --bin validate_emp_anderson_atlas` |
 | `validate_nucleus_data_pipeline` | 257 | 9 | `cargo run --release --bin validate_nucleus_data_pipeline` |
 | `validate_nucleus_tower_node` | 258 | 13 | `cargo run --release --features ipc --bin validate_nucleus_tower_node` |
+| `validate_genomic_vault` | 259 | 30 | `cargo run --release --bin validate_genomic_vault` |
 
-**Total validation checks**: 6,626+
-**Rust tests**: 1,210 (962 barracuda lib + 60 integration + 22 doc + 166 forge)
+**Total validation checks**: 6,656+
+**Rust tests**: 1,230 (975 barracuda lib + 60 integration + 22 doc + 166 forge + 7 vault integration)
 **Binaries**: 215 total (validate + benchmark + server)
 **ToadStool primitives**: 93 consumed (barracuda always-on, zero fallback code — S70+++ `1dd7e338`)
 **Papers**: 52 (25 Tracks 1-2 + 5 Track 3 + 9 Track 4 + 1 cross-spring + 9 extensions + 3 reference)

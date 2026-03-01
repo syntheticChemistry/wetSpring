@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** March 1, 2026
-**Status:** Phase 85 — 259 experiments, 6,626+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), all PASS (962 barracuda lib + 60 integration + 22 doc + 166 forge = 1,210 Rust tests), ToadStool S70+++ aligned (`1dd7e338`, universal precision, 700+ WGSL, ZERO f32-only, Builder refactor, Fp64Strategy::Concurrent, chrono eliminated), 93 primitives consumed (same ToadStool S70+++), 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (both crates, all targets, ZERO warnings), V85: Exp256 EMP Anderson Atlas (30K samples, 14 biomes), Exp257 NUCLEUS Data Pipeline (three-tier routing), Exp258 NUCLEUS Tower-Node (all primals READY, IPC 3.2× overhead)
+**Status:** Phase 85 — 260 experiments, 6,656+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), all PASS (962 barracuda lib + 60 integration + 22 doc + 166 forge = 1,210 Rust tests), ToadStool S70+++ aligned (`1dd7e338`, universal precision, 700+ WGSL, ZERO f32-only, Builder refactor, Fp64Strategy::Concurrent, chrono eliminated), 93 primitives consumed (same ToadStool S70+++), 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (both crates, all targets, ZERO warnings), V85: Exp256 EMP Anderson Atlas (30K samples, 14 biomes), Exp257 NUCLEUS Data Pipeline (three-tier routing), Exp258 NUCLEUS Tower-Node (all primals READY, IPC 3.2× overhead)
 
 ---
 
@@ -267,6 +267,7 @@
 | 256 | EMP-Scale Anderson Atlas — 30K biome QS | V85 | ✅ 35/35 | 35 |
 | 257 | NUCLEUS Data Acquisition Pipeline | V85 | ✅ 9/9 | 9 |
 | 258 | NUCLEUS Tower-Node Deployment | V85 | ✅ 13/13 | 13 |
+| 259 | Genomic Vault — Consent + Encrypted Storage | V85 | ✅ 30/30 | 30 |
 
 ---
 

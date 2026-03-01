@@ -1347,3 +1347,8 @@ path = "src/bin/validate_nucleus_data_pipeline.rs"
 name = "validate_nucleus_tower_node"
 path = "src/bin/validate_nucleus_tower_node.rs"
 required-features = ["ipc"]
+
+# ── Exp259: Genomic Vault — Consent + Encrypted Storage + Provenance ──
+[[bin]]
+name = "validate_genomic_vault"
+path = "src/bin/validate_genomic_vault.rs"

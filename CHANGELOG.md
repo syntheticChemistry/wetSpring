@@ -5,12 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
-## V85 — EMP Atlas + NUCLEUS Primal Interaction (2026-03-01)
+## V85 — EMP Atlas + NUCLEUS Primal Interaction + Genomic Vault (2026-03-01)
 
 ### New experiments (all pass)
 - **Exp256**: EMP-Scale Anderson Atlas — 30,002 samples × 14 EMPO biomes, 35/35 checks
 - **Exp257**: NUCLEUS Data Acquisition Pipeline — three-tier primal routing, 9/9 checks
 - **Exp258**: NUCLEUS Tower-Node Deployment — all primals READY, IPC 3.2× overhead, 13/13 checks
+- **Exp259**: Genomic Vault — consent + encrypted storage + provenance, 30/30 checks
 
 ### NUCLEUS findings
 - All 6 primal binaries installed on Eastgate (biomeOS v0.1.0, BearDog, Songbird, ToadStool, NestGate, Squirrel)
@@ -19,11 +20,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - JSON-RPC overhead: 3.2× (0.86µs → 2.74µs) — negligible vs Anderson 500ms
 - Full pipeline dispatch: 0.87ms (diversity + QS model + Anderson)
 
+### Genomic Vault — Organ Model
+- New `vault` module: consent tickets, encrypted storage, provenance chain (20 lib tests)
+- Consent: time-bounded, revocable, scope-limited, owner-bound
+- Encryption: sovereign cipher (BearDog ChaCha20-Poly1305 absorb target)
+- Provenance: Merkle-linked append-only audit chain (BearDog Ed25519 absorb target)
+- Cross-spring handoff: ecoPrimals/wateringHole for BearDog + NestGate + Songbird absorption
+
 ### Totals
-- Total new checks: 57 (35 + 9 + 13)
-- Experiments: 256 → 259
-- Checks: 6,569 → 6,626
-- Binaries: 219 → 222
+- Total new checks: 87 (35 + 9 + 13 + 30)
+- Experiments: 256 → 260
+- Checks: 6,569 → 6,656
+- Binaries: 219 → 223
+- New lib tests: 20 (vault module)
 
 ## V84 — Paper Math + CPU v19 + Python Parity + GPU v11 + Pure GPU Streaming v8 (2026-03-01)
 
