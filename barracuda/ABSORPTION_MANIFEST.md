@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** March 1, 2026 (V84)
+**Date:** March 1, 2026 (V85)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
 **ToadStool pin:** `1dd7e338` (S70+++: Builder refactor, Fp64Strategy::Concurrent, staging PipelineBuilder, 6 new shaders, 3 new stats modules, chrono eliminated, dead code cleanup, Mar 1 2026)
-**Status:** 93 ToadStool primitives consumed via `compile_shader_universal` (same ToadStool S70+++), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,210 tests (962 barracuda lib + 60 integration + 22 doc + 166 forge), ToadStool S70+++ aligned, 256 experiments, 6,569+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 97 named tolerances, clippy pedantic CLEAN. **V84:** Exp251-255 pipeline buildout (32 papers, 26 CPU domains, 21 GPU domains, Python parity proven, 6-stage streaming). Hand off: V84 active (supersedes V82), V7-V82 archived.
+**Status:** 93 ToadStool primitives consumed via `compile_shader_universal` (same ToadStool S70+++), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,223 tests (975 barracuda lib + 60 integration + 22 doc + 166 forge), ToadStool S70+++ aligned, 260 experiments, 6,656+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 97 named tolerances, clippy pedantic CLEAN. **V85:** Exp256-259 — EMP Atlas 30K, NUCLEUS data pipeline, Tower-Node (all 6 primals READY), Genomic Vault organ model (consent/provenance/encrypted storage, 20 lib tests, 30 experiment checks). Hand off: V85 active (supersedes V84), V7-V84 archived.
 
 ---
 
@@ -386,7 +386,7 @@ Patterns from hotSpring and neuralSpring that wetSpring leans on:
 **V82 ToadStool S70+++ rewire (Mar 1, 2026):**
 - ToadStool pin advanced: S68+ (`e96576ee`) → S70+++ (`1dd7e338`)
 - 13 commits, 324 files changed, 9,440 insertions in upstream barracuda crate
-- No breaking changes — clean compile, 1,210 tests pass, 0 clippy warnings
+- No breaking changes — clean compile, 1,223 tests pass, 0 clippy warnings
 - 3 new primitives consumed: `stats::evolution` (kimura_fixation_prob, error_threshold,
   detection_power, detection_threshold), `stats::jackknife` (jackknife_mean_variance,
   generalized jackknife), `stats::diversity::chao1_classic` (integer-count Chao 1984)

@@ -1,7 +1,7 @@
 # wetSpring Benchmark Results
 
 **Date:** March 1, 2026
-**Status:** Phase 85 — Comprehensive sweep GREEN (Paper → CPU → GPU → Streaming → metalForge → NPU → NUCLEUS) — 52/52 papers, 50/50 three-tier; 1,210 tests (962 barracuda lib + 60 integration + 22 doc + 166 forge), 6,626+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 259 experiments, ToadStool S70+++ (`1dd7e338`), 93 primitives consumed, 26 CPU domains, 21 GPU domains, Python parity proven (15 domains bit-identical to SciPy), 0 local WGSL (fully lean), 97 named tolerances, clippy pedantic CLEAN. **V85:** Exp256-258 (EMP Atlas 30K samples, NUCLEUS Data Pipeline, Tower-Node — all 6 primals READY, IPC 3.2× overhead, bit-identical dispatch)
+**Status:** Phase 85 — Comprehensive sweep GREEN (Paper → CPU → GPU → Streaming → metalForge → NPU → NUCLEUS → Vault) — 52/52 papers, 50/50 three-tier; 1,223 tests (975 barracuda lib + 60 integration + 22 doc + 166 forge), 6,656+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 260 experiments, ToadStool S70+++ (`1dd7e338`), 93 primitives consumed, 26 CPU domains, 21 GPU domains, Python parity proven (15 domains bit-identical to SciPy), 0 local WGSL (fully lean), 97 named tolerances, clippy pedantic CLEAN. **V85:** Exp256-259 (EMP Atlas 30K samples, NUCLEUS Data Pipeline, Tower-Node, Genomic Vault — all 6 primals READY, IPC 3.2× overhead, bit-identical dispatch, vault organ model with consent/provenance/encrypted storage)
 
 ---
 
@@ -464,7 +464,7 @@ metalForge routes workloads via `Capability` matching: `F64Compute` → GPU, `Qu
 | Local WGSL shaders | 0 (full lean — all GPU ops dispatch upstream) | PASS |
 | Compose GPU wrappers | 7 (kmd, merge_pairs, robinson_foulds, derep, NJ, reconciliation, molecular_clock) | PASS |
 | Passthrough GPU wrappers | 0 (all promoted — S66 lean cycle) | PASS |
-| **Grand total** | **6,569+ validation + 1,210 tests** | **ALL PASS** |
+| **Grand total** | **6,656+ validation + 1,223 tests** | **ALL PASS** |
 
 ---
 
@@ -507,6 +507,7 @@ cargo run --features gpu --release --bin validate_pure_gpu_streaming_v8  # 43 (E
 cargo run --release --bin validate_emp_anderson_atlas                    # 35 (Exp256, 30K EMP samples)
 cargo run --release --bin validate_nucleus_data_pipeline                 # 9  (Exp257, three-tier routing)
 cargo run --release --features ipc --bin validate_nucleus_tower_node     # 13 (Exp258, all primals READY)
+cargo run --release --bin validate_genomic_vault                          # 30 (Exp259, vault organ model)
 
 # Benchmarks
 cargo run --release --bin benchmark_23_domain_timing           # Python→Rust CPU (33.4×)

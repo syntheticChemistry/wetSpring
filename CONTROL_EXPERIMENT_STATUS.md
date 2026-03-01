@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** March 1, 2026
-**Status:** Phase 85 — 260 experiments, 6,656+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), all PASS (962 barracuda lib + 60 integration + 22 doc + 166 forge = 1,210 Rust tests), ToadStool S70+++ aligned (`1dd7e338`, universal precision, 700+ WGSL, ZERO f32-only, Builder refactor, Fp64Strategy::Concurrent, chrono eliminated), 93 primitives consumed (same ToadStool S70+++), 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (both crates, all targets, ZERO warnings), V85: Exp256 EMP Anderson Atlas (30K samples, 14 biomes), Exp257 NUCLEUS Data Pipeline (three-tier routing), Exp258 NUCLEUS Tower-Node (all primals READY, IPC 3.2× overhead)
+**Status:** Phase 85 — 260 experiments, 6,656+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), all PASS (975 barracuda lib + 60 integration + 22 doc + 166 forge = 1,223 Rust tests), ToadStool S70+++ aligned (`1dd7e338`, universal precision, 700+ WGSL, ZERO f32-only, Builder refactor, Fp64Strategy::Concurrent, chrono eliminated), 93 primitives consumed (same ToadStool S70+++), 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (both crates, all targets, ZERO warnings), V85: Exp256 EMP Anderson Atlas (30K samples, 14 biomes), Exp257 NUCLEUS Data Pipeline (three-tier routing), Exp258 NUCLEUS Tower-Node (all primals READY, IPC 3.2× overhead), Exp259 Genomic Vault organ model (consent/provenance/encrypted storage, 20 lib tests, 30 experiment checks)
 
 ---
 
@@ -321,8 +321,8 @@
 | GPU v6 (V71) checks | 28 (Exp226: precision-flexible GEMM, DF64 roundtrip, BandwidthTier) |
 | Streaming v4 checks | 24 (Exp227: 7-stage unidirectional pipeline, GEMM→fusion→PCoA→DF64) |
 | metalForge v8 checks | 33 (Exp228: GPU→NPU→CPU routing, IPC dispatch, DF64 protocol) |
-| **Total validation checks** | **6,569+** |
-| Rust tests | 1,210 (962 barracuda lib + 60 integration + 22 doc + 166 forge) |
+| **Total validation checks** | **6,656+** |
+| Rust tests | 1,223 (975 barracuda lib + 60 integration + 22 doc + 166 forge) |
 | BarraCuda CPU parity | 601/601 (v1-v12: 36+ domains, Exp206 IPC fidelity, Exp212 I/O evolution) |
 | BarraCuda GPU parity | 36+ domains (Exp064/087/092/101/207), IPC GPU-aware dispatch |
 | metalForge cross-system | 37+ domains CPU↔GPU proven (Exp103+104+165+182+208+220+221+222), **50/50 papers three-tier** (39 base + 11 extension Exp144-156) |

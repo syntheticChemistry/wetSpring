@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: March 1, 2026 (Phase 84 V84 — 1,210 tests, 95.86% line / 94.02% region / 95.40% fn, ToadStool S70+++ (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 97 named tolerances (split: bio+instrument+gpu+spectral), clippy pedantic CLEAN (both crates), 0 ad-hoc tolerance literals, 0 GPU passthroughs (chimera/derep/reconciliation evolved), 0 duplicate math (barracuda::stats), 0 hardcoded /tmp/ paths, 52 papers, 256 experiments, all validation binaries green)
+**Last Updated**: March 1, 2026 (Phase 85 V85 — 1,223 tests, 95.86% line / 94.02% region / 95.40% fn, ToadStool S70+++ (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 97 named tolerances (split: bio+instrument+gpu+spectral), clippy pedantic CLEAN (both crates), 0 ad-hoc tolerance literals, 0 GPU passthroughs (chimera/derep/reconciliation evolved), 0 duplicate math (barracuda::stats), 0 hardcoded /tmp/ paths, 52 papers, 260 experiments, all validation binaries green, vault module with consent/provenance/encrypted storage)
 **Purpose**: Track papers for reproduction/review across three tracks
 
 ---

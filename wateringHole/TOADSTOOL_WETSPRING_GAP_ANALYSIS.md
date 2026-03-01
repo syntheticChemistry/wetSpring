@@ -6,6 +6,8 @@
 
 **V84 additions:** 7 new CPU domains validated (adapter, placement, PCoA, bootstrap phylo, EIC, KMD, feature table); Python parity proof (Exp253).
 
+**V85 additions:** EMP Anderson Atlas 30K (Exp256), NUCLEUS data pipeline (Exp257), Tower-Node deployment (Exp258), Genomic Vault organ model (Exp259). New `vault` module (consent/provenance/encrypted storage) — 20 lib tests, 30 experiment checks. Sovereign hash/cipher/signing placeholders ready for BearDog absorption (ChaCha20-Poly1305, Ed25519, BLAKE3). New Neural API capabilities needed: `vault.store`, `vault.retrieve`, `vault.consent`, batch `science.diversity`, provenance CAS.
+
 ---
 
 ## Step 1: ToadStool Public Exports

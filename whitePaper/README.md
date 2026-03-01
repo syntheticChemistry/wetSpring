@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** March 1, 2026
-**Status:** Phase 85 — Validation study active — 6,626+ checks (1,945+ GPU on RTX 4070, **60 NPU on AKD1000**), 1,210 tests (962 lib + 60 integration + 22 doc + 166 forge), 259 experiments, ToadStool S70+++ aligned (`1dd7e338`), 93 primitives consumed, 26 CPU domains + 21 GPU domains, Python parity proven (15 domains bit-identical to SciPy), 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances with full provenance, 0 Passthrough, clippy pedantic CLEAN, V85 EMP Atlas + NUCLEUS primal interaction (all primals READY), 50/50 three-tier, 52/52 papers
+**Status:** Phase 85 — Validation study active — 6,656+ checks (1,945+ GPU on RTX 4070, **60 NPU on AKD1000**), 1,223 tests (975 lib + 60 integration + 22 doc + 166 forge), 260 experiments, ToadStool S70+++ aligned (`1dd7e338`), 93 primitives consumed, 26 CPU domains + 21 GPU domains, Python parity proven (15 domains bit-identical to SciPy), 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances with full provenance, 0 Passthrough, clippy pedantic CLEAN, V85 EMP Atlas + NUCLEUS primal interaction (all primals READY) + Genomic Vault organ model, 50/50 three-tier, 52/52 papers
 **License:** AGPL-3.0-or-later
 
 ---
@@ -312,7 +312,7 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCuda/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34+ WGSL shaders, active Write phase)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 93 ToadStool primitives, barracuda always-on, 1,210 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 93 ToadStool primitives, barracuda always-on, 1,223 tests, vault module)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **ecoPrimals/archive/wetspring-early-handoffs-feb2026/** — Fossil record of early ToadStool handoffs (v1–v9)
 

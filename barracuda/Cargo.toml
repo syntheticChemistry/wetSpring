@@ -36,7 +36,7 @@ serde_json = { version = "1", optional = true }
 # ToadStool barracuda — always-on for CPU math (special, linalg, numerical).
 # default-features = false: no wgpu/pollster/bytemuck pulled in for CPU builds.
 # When `gpu` feature is active, `barracuda/gpu` enables GPU ops.
-# S70+++: 93 primitives consumed (V83). CPU stats: bootstrap_ci, rawr_mean,
+# S70+++: 93 primitives consumed (V85). CPU stats: bootstrap_ci, rawr_mean,
 # fit_exponential/quadratic/logarithmic/all, jackknife, evolution, chao1_classic.
 # GPU bio: StencilCooperationGpu, HillGateGpu (dispatched). WrightFisherGpu (needs DF64).
 # GPU linalg: SymmetrizeGpu, LaplacianGpu (S71 uniform alignment fix pending).

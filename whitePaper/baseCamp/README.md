@@ -2,7 +2,7 @@
 
 **Date:** March 1, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 85 — 259 experiments, 6,626+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,210 tests (962 barracuda lib + 60 integration + 22 doc + 166 forge), ToadStool S70+++ aligned (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances (full provenance), 0 unsafe code, 0 todo!/unimplemented!(), clippy pedantic CLEAN (both crates, ZERO warnings), V85 EMP Atlas 30K + NUCLEUS primal interaction (all 6 primals READY, IPC 3.2× overhead), 52/52 papers, 50/50 three-tier, 95.86% line coverage
+**Status:** Phase 85 — 260 experiments, 6,656+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,223 tests (975 barracuda lib + 60 integration + 22 doc + 166 forge), ToadStool S70+++ aligned (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances (full provenance), 0 unsafe code, 0 todo!/unimplemented!(), clippy pedantic CLEAN (both crates, ZERO warnings), V85 EMP Atlas 30K + NUCLEUS primal interaction (all 6 primals READY, IPC 3.2× overhead) + Genomic Vault organ model (consent/provenance/encrypted storage), 52/52 papers, 50/50 three-tier, 95.86% line coverage
 
 ---
 
@@ -41,7 +41,7 @@ All code is AGPL-3.0.
 | **biomeOS IPC** | — | cross | — | 203-208 | 321 | IPC dispatch, GPU-aware routing, NUCLEUS atomics, Songbird, Neural API |
 | **V66 Audit + Dispatch** | — | cross | — | 209,212-215 | 239+ | Streaming I/O parity, CPU v12, dispatch evolution, NUCLEUS V8, CPU vs GPU v5 |
 | **V67 Experiment Buildout** | — | cross | — | 216-220 | 170+ | 47-domain CPU proof, Python-vs-Rust benchmark, 42-module GPU portability, unidirectional streaming, cross-substrate dispatch V67 + BandwidthTier, 11 extension papers → 50/50 three-tier |
-| **Total** | | | **52** | | **6,569+** | |
+| **Total** | | | **52** | | **6,656+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -102,10 +102,11 @@ Every paper goes through the full evolution. Status across all 52 papers:
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
 | biomeOS IPC integration | JSON-RPC science primal, GPU-aware dispatch, Songbird registration | 321 checks (Exp203-208) |
-| Code quality audit | 95.86% line / 94.02% region / 95.40% fn, streaming I/O, 0 production mocks, ToadStool S70+++, barracuda always-on, `deny(missing_docs)`, zero unsafe code, clippy pedantic CLEAN, baseline manifest 51/51 | 1,210 tests |
+| Code quality audit | 95.86% line / 94.02% region / 95.40% fn, streaming I/O, 0 production mocks, ToadStool S70+++, barracuda always-on, `deny(missing_docs)`, zero unsafe code, clippy pedantic CLEAN, baseline manifest 51/51 | 1,223 tests |
 | V66 dispatch evolution | Forge dispatch routing (29 workloads), streaming topology (PCIe bypass), NUCLEUS Tower/Node/Nest model, absorption audit (0 local WGSL) | 49 checks (Exp213) |
 | V66 NUCLEUS V8 | IPC dispatch with V66 I/O evolution (byte-native FASTQ, bytemuck nanopore, streaming MS2), Nest metrics, CPU fallback parity, full pipeline chain | 49 checks (Exp214) |
 | **V84 pipeline buildout** | Paper→CPU→GPU→Streaming proven end-to-end: 32 papers, 26 CPU domains, 21 GPU domains, Python parity, 0.10ms streaming overhead | 172 checks (Exp251-255) |
+| **V85 NUCLEUS + Vault** | EMP 30K atlas, NUCLEUS data pipeline, Tower-Node deployment, Genomic Vault organ model (consent-gated encrypted storage, Merkle provenance) | 87 checks (Exp256-259) |
 
 ## Extension Roadmap
 
@@ -120,7 +121,7 @@ validated science to real-world data:
 
 Primal integration: NestGate for NCBI data acquisition, biomeOS NUCLEUS for
 local/LAN orchestration (Tower→Node→Nest atomics), ToadStool for GPU dispatch.
-All IPC validated in Exp203-208 (321 checks).
+All IPC validated in Exp203-208 (321 checks), NUCLEUS pipeline in Exp256-259 (87 checks, vault organ model).
 
 ## Performance Summary
 

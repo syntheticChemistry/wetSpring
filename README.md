@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** March 1, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 85 — 1,210 tests (962 barracuda lib + 60 integration + 22 doc + 166 forge), 259 experiments, 6,626+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 222+ binaries, ToadStool S70+++ aligned (`1dd7e338`), 93 primitives consumed (same ToadStool S70+++) via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 97 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (both crates, all targets, ZERO warnings), V85: Exp256-258 (EMP Anderson Atlas 30K, NUCLEUS Data Pipeline, Tower-Node Deployment), all primals READY (biomeOS + BearDog + Songbird + ToadStool + NestGate + Squirrel), IPC bit-identical 3.2× overhead
+**Status:** Phase 85 — 1,223 tests (975 barracuda lib + 60 integration + 22 doc + 166 forge), 260 experiments, 6,656+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 223+ binaries, ToadStool S70+++ aligned (`1dd7e338`), 93 primitives consumed (same ToadStool S70+++) via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 97 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (both crates, all targets, ZERO warnings), V85: Exp256-259 (EMP Anderson Atlas 30K, NUCLEUS Data Pipeline, Tower-Node Deployment, Genomic Vault — organ model), all primals READY (biomeOS + BearDog + Songbird + ToadStool + NestGate + Squirrel), IPC bit-identical 3.2× overhead, vault module (consent + encrypted storage + provenance)
 
 ---
 
@@ -121,10 +121,10 @@ integration point.
 | IPC dispatch CPU parity (Exp206) | 64 (7 domains, EXACT_F64 — zero numeric drift through IPC layer) |
 | IPC dispatch GPU parity (Exp207) | 54 (6 domains, GPU↔CPU — lazy OnceLock + dispatch threshold) |
 | metalForge v7 NUCLEUS (Exp208) | 75 (8 domains, mixed hardware — PCIe bypass, Tower/Node/Nest atomics) |
-| **Total validation checks** | **6,569+** |
+| **Total validation checks** | **6,656+** |
 | Rust library unit tests | 962 (barracuda CPU + IPC, default features) |
 | metalForge forge tests | 175 |
-| **Total Rust tests** | **1,210** (962 barracuda lib + 60 integration + 22 doc + 166 forge) |
+| **Total Rust tests** | **1,223** (975 barracuda lib + 60 integration + 22 doc + 166 forge) |
 | Library code coverage | **95.86% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov) |
 | Experiments completed | 256 |
 | Validation/benchmark binaries | 205+ validate + 14 benchmark = 219+ total |
@@ -139,7 +139,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | ToadStool primitives consumed | **93** (barracuda always-on, zero fallback code — ToadStool S70+++, `1dd7e338`) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 6,569+ validation checks **PASS**. All 1,210 tests **PASS** (1 ignored: hardware-dependent).
+All 6,656+ validation checks **PASS**. All 1,223 tests **PASS** (1 ignored: hardware-dependent).
 
 ### GPU Performance
 
@@ -984,7 +984,7 @@ Rust 1.93 fixed across 20+ validation binaries.
 wetSpring/
 ├── README.md                      ← this file
 ├── BENCHMARK_RESULTS.md           ← three-tier benchmark results
-├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (256 experiments)
+├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (260 experiments)
 ├── barracuda/                     ← Rust crate (src/, Cargo.toml, rustfmt.toml)
 │   ├── EVOLUTION_READINESS.md    ← absorption map (tiers, primitives, shaders)
 │   ├── ABSORPTION_MANIFEST.md    ← what's absorbed, local, planned (hotSpring pattern)
@@ -1027,7 +1027,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (1,210: 962 barracuda lib + 60 integration + 22 doc + 166 forge)
+# Run all tests (1,223: 975 barracuda lib + 60 integration + 22 doc + 166 forge)
 cargo test --features ipc
 
 # Code quality checks

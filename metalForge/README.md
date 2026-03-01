@@ -158,7 +158,7 @@ affinities. metalForge maps each validated algorithm to its optimal substrate.
 wetSpring follows hotSpring's pattern for ToadStool absorption:
 
 ```
-1. Validate in Rust CPU (barracuda/)          ← DONE: 47 CPU + 42 GPU, 1,210 tests, 256 experiments, 6,569+ checks
+1. Validate in Rust CPU (barracuda/)          ← DONE: 47 CPU + 42 GPU + 1 vault, 1,223 tests, 260 experiments, 6,656+ checks
 2. Characterize hardware (metalForge/)         ← THIS DIRECTORY — 166 forge tests
 3. Write Rust in GPU-friendly patterns         ← 34 Lean + 7 Compose; 0 local WGSL (fully lean); 0 Passthrough
 4. ToadStool absorbs as shared primitives      ← unidirectional handoff via wateringHole/handoffs/
@@ -267,7 +267,7 @@ Delete local shader copy. Use the crate-level re-export
 (e.g., `barracuda::SmithWatermanGpu`). Local extensions that still need work
 remain in wetSpring until absorption.
 
-### Current Status (V84, Mar 1)
+### Current Status (V85, Mar 1)
 
 | Phase | Count | Items |
 |-------|:-----:|-------|
@@ -277,7 +277,7 @@ remain in wetSpring until absorption.
 | **CPU math** (delegated to barracuda) | 8 functions | erf, ln_gamma, regularized_gamma_p, norm_cdf, dot, l2_norm, trapz, ridge_regression |
 | **Blocked** | 0 | All former blockers resolved: kmer (S62), UniFrac (S62), taxonomy (S64), NVVM polyfill (S39) |
 
-Active handoff: `../../wateringHole/handoffs/WETSPRING_TOADSTOOL_V84_PIPELINE_BUILDOUT_HANDOFF_MAR01_2026.md`
+Active handoff: `../../wateringHole/handoffs/WETSPRING_TOADSTOOL_V85_VAULT_NUCLEUS_EVOLUTION_HANDOFF_MAR01_2026.md`
 
 ---
 

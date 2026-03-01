@@ -1,6 +1,6 @@
 # Absorption Strategy: wetSpring → ToadStool
 
-**Date:** February 25, 2026
+**Date:** March 1, 2026
 **Pattern:** Write → Absorb → Lean (from hotSpring)
 **Status:** 93 ToadStool primitives consumed (Lean), 0 local WGSL (fully lean), 42 GPU modules total, 0 Tier B/C, ToadStool S70+++ aligned (`1dd7e338`)
 

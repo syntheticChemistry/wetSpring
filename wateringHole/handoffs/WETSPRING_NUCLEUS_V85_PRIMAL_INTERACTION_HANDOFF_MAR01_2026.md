@@ -1,7 +1,7 @@
 # wetSpring → NUCLEUS V85 Primal Interaction Handoff
 
 **Date:** March 1, 2026
-**From:** wetSpring V85 (Exp256-258, 6,626+ checks, 1,210+ Rust tests)
+**From:** wetSpring V85 (Exp256-259, 6,656+ checks, 1,223 Rust tests)
 **To:** biomeOS, NestGate, Songbird, ToadStool
 
 ---
@@ -18,7 +18,7 @@ experiments that exercise NUCLEUS primal interaction:
 | 257 | NUCLEUS Data Pipeline | 9 | PASS — three-tier routing validated |
 | 258 | NUCLEUS Tower-Node | 13 | PASS — all primals READY, 3.2× IPC overhead |
 
-**Total V85:** 259 experiments, 6,626+ validation checks.
+**Total V85:** 260 experiments, 6,656+ validation checks.
 
 ---
 
