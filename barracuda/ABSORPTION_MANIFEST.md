@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** February 28, 2026 (V81 CPU↔GPU Parity + ToadStool Dispatch + PCIe Bypass + NUCLEUS v2)
+**Date:** March 1, 2026 (V82 ToadStool S70+++ Rewire)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**ToadStool pin:** `e96576ee` (S68+: device-lost resilience, dispatch semaphore, 700 shaders, 0 f32-only, Feb 27 2026)
-**Status:** 82 ToadStool primitives consumed via `compile_shader_universal` (incl. 11 `stats::diversity` + 2 `stats::metrics` + S66: `hill`, `monod`, `fit_linear`, `percentile`, `mean`, `shannon_from_frequencies`), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,219 tests (955 barracuda lib + 60 integration + 20 doc + 113 forge), 95.86% line / 94.02% fn / 95.40% branch, ToadStool S68+ aligned, 247 experiments, 6,273+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 97 named tolerances, 0 ad-hoc magic numbers, `clippy::pedantic` CLEAN. Hand off: V81 active (supersedes V75), V7-V70 archived.
+**ToadStool pin:** `1dd7e338` (S70+++: Builder refactor, Fp64Strategy::Concurrent, staging PipelineBuilder, 6 new shaders, 3 new stats modules, chrono eliminated, dead code cleanup, Mar 1 2026)
+**Status:** 85 ToadStool primitives consumed via `compile_shader_universal` (82 prior + 3 S70: `stats::evolution`, `stats::jackknife`, `stats::diversity::chao1_classic`), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), ToadStool S70+++ aligned, 248 experiments, 6,315+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 97 named tolerances, 0 ad-hoc magic numbers, `clippy::pedantic` CLEAN. Hand off: V82 active (supersedes V81), V7-V75 archived.
 
 ---
 
@@ -370,3 +370,16 @@ Patterns from hotSpring and neuralSpring that wetSpring leans on:
 - `interpret_output()` takes ownership (eliminates stdout clone)
 - 4 new `try_load_json_array` error-path tests added
 - 823 lib tests pass, 0 clippy warnings (pedantic+nursery), fmt clean, docs clean
+
+**V82 ToadStool S70+++ rewire (Mar 1, 2026):**
+- ToadStool pin advanced: S68+ (`e96576ee`) → S70+++ (`1dd7e338`)
+- 13 commits, 324 files changed, 9,440 insertions in upstream barracuda crate
+- No breaking changes — clean compile, 1,210 tests pass, 0 clippy warnings
+- 3 new primitives consumed: `stats::evolution` (kimura_fixation_prob, error_threshold,
+  detection_power, detection_threshold), `stats::jackknife` (jackknife_mean_variance,
+  generalized jackknife), `stats::diversity::chao1_classic` (integer-count Chao 1984)
+- Exp247: ToadStool S70+++ Rewire Validation — 42/42 checks PASS
+- Available but not consumed: staging::pipeline::PipelineBuilder, Fp64Strategy::Concurrent,
+  SymmetrizeGpu, LaplacianGpu, 6 new WGSL shaders (batched_elementwise, seasonal_pipeline,
+  anderson_coupling, lanczos_iteration, linear_regression, matrix_correlation)
+- Total: 85 ToadStool primitives consumed (82 prior + 3 S70)

@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
-**Date:** February 28, 2026
-**Status:** Phase 81 — 247 experiments, 6,273+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), all PASS (962 barracuda lib + 60 integration + 22 doc + 175 forge = 1,219 Rust tests), ToadStool S68+ aligned (`e96576ee`, universal precision, 700 WGSL, ZERO f32-only), 82 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (both crates, all targets, ZERO warnings), V81 CPU↔GPU parity + ToadStool dispatch + PCIe bypass + NUCLEUS v2: CPU vs GPU v6 (22 domains head-to-head, math truly portable), ToadStool Dispatch v2 (streaming overhead proof, GpuPipelineSession pre-warmed), PCIe Bypass (NPU→GPU direct, bandwidth-aware routing, mixed pipeline topology), NUCLEUS v2 (49 workloads, Tower+Nest+Node extended, biomeOS sovereign fallback), all experiments (Exp233-246) validated green
+**Date:** March 1, 2026
+**Status:** Phase 82 — 248 experiments, 6,315+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), all PASS (955 barracuda lib + 60 integration + 20 doc + 175 forge = 1,210 Rust tests), ToadStool S70+++ aligned (`1dd7e338`, universal precision, 700+ WGSL, ZERO f32-only, Builder refactor, Fp64Strategy::Concurrent, chrono eliminated), 85 primitives consumed (82 prior + 3 S70: evolution, jackknife, chao1_classic), 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (both crates, all targets, ZERO warnings), V82 ToadStool S70+++ rewire: new stats (evolution, jackknife, chao1_classic), 13 upstream commits absorbed, all experiments (Exp233-247) validated green
 
 ---
 
@@ -255,6 +255,7 @@
 | 243 | CPU vs GPU Extended Parity — 22 Domains Head-to-Head (6 new + 16 inherited) | gpu/parity | PASS | 24 |
 | 244 | ToadStool Compute Dispatch v2 — Streaming Overhead Proof (6 sections) | gpu/streaming | PASS | 22 |
 | 245 | PCIe Bypass Mixed Hardware — NPU→GPU→CPU Dispatch Topology (6 sections) | metalForge/pcie | PASS | 36 |
+| 247 | ToadStool S70+++ Rewire — New Stats Primitives (evolution, jackknife, chao1_classic) | rewire | PASS | 42 |
 | 246 | NUCLEUS Tower→Node→Nest v2 — Extended Pipeline (49 workloads, biomeOS coord) | metalForge/nucleus | PASS | 62 |
 | 222 | Full NUCLEUS Pipeline: Tower→Nest→Node (V69) | metalForge/nucleus | PASS | 46 |
 | 223 | Cross-Spring Evolution V71 Complete Rewire | GPU/cross-spring/precision | PASS | 46 |

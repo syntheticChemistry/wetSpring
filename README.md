@@ -4,9 +4,9 @@
 and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 **Write → Absorb → Lean** cycle adopted from hotSpring.
 
-**Date:** February 28, 2026
+**Date:** March 1, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 81 — 1,219 tests (962 barracuda lib + 60 integration + 22 doc + 175 forge), 247 experiments, 6,273+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 214+ binaries, ToadStool S68+ aligned (`e96576ee`), 82 primitives consumed via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 97 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (both crates, all targets, ZERO warnings), V81 CPU↔GPU parity (22 domains head-to-head) + ToadStool Dispatch v2 (streaming overhead proof) + PCIe Bypass (NPU→GPU direct, bandwidth-aware routing) + NUCLEUS v2 (49 workloads, Tower+Nest+Node extended, biomeOS sovereign fallback)
+**Status:** Phase 82 — 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), 248 experiments, 6,315+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 215+ binaries, ToadStool S70+++ aligned (`1dd7e338`), 85 primitives consumed (82 prior + 3 S70: evolution, jackknife, chao1_classic) via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 97 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (both crates, all targets, ZERO warnings), V82 ToadStool S70+++ rewire: new stats primitives (evolution, jackknife, chao1_classic) + 13 upstream commits absorbed (Builder refactor, Fp64Strategy::Concurrent, staging::pipeline PipelineBuilder, 6 new shaders, 3 new stats modules)
 
 ---
 

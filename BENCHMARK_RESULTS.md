@@ -1,7 +1,7 @@
 # wetSpring Benchmark Results
 
 **Date:** February 27, 2026
-**Status:** Phase 73 — Comprehensive sweep GREEN (Python → Rust CPU → GPU → Pure GPU Streaming → metalForge → NPU) — 50/50 actionable papers full three-tier (63/63 total); 1,148+ tests (955 barracuda lib + 60 integration + 20 doc + 113 forge), 5,743+ checks (1,833+ GPU on RTX 4070, 60 NPU on AKD1000), 229 experiments, ToadStool S68+ (`e96576ee`), 82 primitives consumed, 0 local WGSL/derivative/regression (fully lean), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough. V75: ComputeDispatch adoption (6 GPU modules), BatchedMultinomialGpu + PairwiseL2Gpu + FstVariance. V73: deep debt reduction (RpcError, function decomposition, safe casts, named constants). V72: Exp224-228 five-tier chain (paper math + CPU v14 + GPU v6 + streaming v4 + metalForge v8)
+**Status:** Phase 82 — Comprehensive sweep GREEN (Python → Rust CPU → GPU → Pure GPU Streaming → metalForge → NPU) — 50/50 actionable papers full three-tier (63/63 total); 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), 6,315+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 248 experiments, ToadStool S70+++ (`1dd7e338`), 85 primitives consumed, 0 local WGSL/derivative/regression (fully lean), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough. V82: ToadStool S70+++ rewire (evolution, jackknife, chao1_classic). V81: CPU↔GPU parity + ToadStool dispatch + PCIe bypass + NUCLEUS v2. V75: ComputeDispatch adoption (6 GPU modules)
 
 ---
 

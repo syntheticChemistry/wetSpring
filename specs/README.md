@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
-**Last Updated**: February 28, 2026
-**Status**: Phase 81 — 6,273+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS (1,219 tests, 247 experiments, ToadStool S68+ aligned (`e96576ee`), 82 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 97 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, V81 CPU↔GPU Parity + ToadStool Dispatch + PCIe Bypass + NUCLEUS v2, 39/39 three-tier, 52/52 papers, 95.86% line / 94.02% region / 95.40% fn)
+**Last Updated**: March 1, 2026
+**Status**: Phase 82 — 6,315+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS (1,210 tests, 248 experiments, ToadStool S70+++ aligned (`1dd7e338`), 85 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 97 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, V82 CPU↔GPU Parity + ToadStool Dispatch + PCIe Bypass + NUCLEUS v2, 39/39 three-tier, 52/52 papers, 95.86% line / 94.02% region / 95.40% fn)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -10,8 +10,8 @@
 
 | Metric | Value |
 |--------|-------|
-| CPU validation | 1,476+/1,476+ PASS — 47 modules, 247 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
-| GPU validation | 1,945+/1,945+ PASS — 82 ToadStool primitives (S68+ `e96576ee`, always-on), 0 local WGSL (fully lean) |
+| CPU validation | 1,476+/1,476+ PASS — 47 modules, 248 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
+| GPU validation | 1,945+/1,945+ PASS — 85 ToadStool primitives (S70+++ `1dd7e338`, always-on), 0 local WGSL (fully lean) |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 407/407 — 22.5x Rust speedup over Python (v1–v9) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/101/164) — pure GPU math proven |
@@ -20,7 +20,7 @@
 | Cross-spring spectral | 25 checks — Anderson localization + QS-disorder analogy (Exp107) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
-| Rust modules | 47 CPU + 42 GPU, 1,148+ tests (955 barracuda lib + 60 integration + 20 doc + 113 forge) |
+| Rust modules | 47 CPU + 42 GPU, 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 113 forge) |
 | Write phase | 0 local WGSL (fully lean) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
 | Paper queue | **ALL DONE** — 52/52 reproducible papers complete (Tracks 1-4 + Phase 37 extensions + cross-spring) |
@@ -156,7 +156,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 - **NPU edge inference** — ESN reservoir on AKD1000, online evolution, adaptive sampling (V60)
 - **Field genomics** (planned) — Nanopore sequencing + NPU classification + metalForge routing. See [FIELD_GENOMICS_REQUIREMENTS.md](FIELD_GENOMICS_REQUIREMENTS.md)
 - **Data type profiling** — Biological data format catalog driving NestGate data primal evolution. See [DATA_TYPES.md](DATA_TYPES.md)
-- **Sovereign Rust bioinformatics** — 47 CPU + 42 GPU modules + 0 local WGSL (fully lean), 2 runtime dependencies (flate2 + bytemuck), 82 ToadStool primitives (S68+, always-on, zero fallback)
+- **Sovereign Rust bioinformatics** — 47 CPU + 42 GPU modules + 0 local WGSL (fully lean), 2 runtime dependencies (flate2 + bytemuck), 85 ToadStool primitives (S70+++, always-on, zero fallback)
 
 ### wetSpring IS NOT:
 - Sensor noise analysis (groundSpring)

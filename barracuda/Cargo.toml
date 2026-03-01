@@ -36,10 +36,10 @@ serde_json = { version = "1", optional = true }
 # ToadStool barracuda — always-on for CPU math (special, linalg, numerical).
 # default-features = false: no wgpu/pollster/bytemuck pulled in for CPU builds.
 # When `gpu` feature is active, `barracuda/gpu` enables GPU ops.
-# S62+DF64: erf, ln_gamma, ridge, trapz, NMF, ODE bio, Anderson, PeakDetect,
-# TransE, SpMM, Fp64Strategy, BatchedOdeRK4, ValidationHarness,
-# ComputeDispatch, storage_bgl_entry, uniform_bgl_entry, gpu_ctx,
-# GemmF64 DF64 auto-detection (hybrid FP32-core GEMM on consumer GPUs).
+# S70+++: All S62+DF64 capabilities + evolution (kimura, error_threshold,
+# detection_power/threshold), jackknife (leave-one-out, generalized),
+# chao1_classic (u64), staging::pipeline::PipelineBuilder, Fp64Strategy::Concurrent,
+# SymmetrizeGpu, LaplacianGpu, f64-canonical shaders (0 f32-only), Builder refactor.
 barracuda = { path = "../../phase1/toadstool/crates/barracuda", default-features = false }
 
 # ToadStool akida-driver — pure Rust NPU access (BrainChip AKD1000/AKD1500).
@@ -1282,3 +1282,8 @@ required-features = ["gpu"]
 name = "validate_toadstool_dispatch_v2"
 path = "src/bin/validate_toadstool_dispatch_v2.rs"
 required-features = ["gpu"]
+
+# ── Exp247: ToadStool S70+++ Rewire Validation ──
+[[bin]]
+name = "validate_toadstool_s70_rewire"
+path = "src/bin/validate_toadstool_s70_rewire.rs"

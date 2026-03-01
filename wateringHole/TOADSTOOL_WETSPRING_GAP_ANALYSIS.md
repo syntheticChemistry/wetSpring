@@ -1,7 +1,8 @@
 # ToadStool barracuda vs wetSpring: Deep Gap Analysis
 
-**Date:** February 28, 2026  
+**Date:** March 1, 2026  
 **Scope:** Compare ToadStool barracuda public exports with wetSpring actual usage. Identify unused primitives, adoption opportunities, and maintenance reduction.
+**ToadStool Pin:** S70+++ (`1dd7e338`)
 
 ---
 
@@ -18,7 +19,7 @@
 | `tolerances` | always | Centralized validation tolerances (LINALG_*, REDUCTION_*, BIO_*, SPECIAL_*) |
 | `validation` | always | ValidationHarness, exit_no_gpu, require! macro |
 | `math` | always | Re-exports special + erf_batch, erfc_batch |
-| `stats` | always | bootstrap, chi2, correlation, diversity, hydrology, metrics, moving_window_f64, normal, regression, spectral_density |
+| `stats` | always | bootstrap, chi2, correlation, diversity, **evolution** (S70), hydrology, **jackknife** (S70), metrics, moving_window_f64, normal, regression, spectral_density |
 | `auto_tensor` | gpu | Auto tensor |
 | `benchmarks` | gpu | Benchmark suite |
 | `compute_graph` | gpu | Compute graph |
@@ -37,8 +38,10 @@
 - **bootstrap:** bootstrap_ci, bootstrap_mean, bootstrap_median, bootstrap_std, rawr_mean, BootstrapCI
 - **chi2:** chi2_decomposed, chi2_decomposed_weighted, Chi2Decomposed
 - **correlation:** correlation_matrix, covariance, covariance_matrix, pearson_correlation, spearman_correlation
-- **diversity:** alpha_diversity, bray_curtis, bray_curtis_condensed, bray_curtis_matrix, chao1, condensed_index, observed_features, pielou_evenness, rarefaction_curve, shannon, shannon_from_frequencies, simpson, AlphaDiversity
-- **hydrology:** crop_coefficient, hargreaves_et0, hargreaves_et0_batch, soil_water_balance
+- **diversity:** alpha_diversity, bray_curtis, bray_curtis_condensed, bray_curtis_matrix, chao1, **chao1_classic** (S70), condensed_index, observed_features, pielou_evenness, rarefaction_curve, shannon, shannon_from_frequencies, simpson, AlphaDiversity
+- **evolution** (S70): **kimura_fixation_prob**, **error_threshold**, **detection_power**, **detection_threshold**
+- **hydrology:** crop_coefficient, **fao56_et0** (S70), hargreaves_et0, hargreaves_et0_batch, soil_water_balance
+- **jackknife** (S70): **jackknife**, **jackknife_mean_variance**, JackknifeResult
 - **metrics:** dot, hill, hit_rate, index_of_agreement, l2_norm, mae, mbe, mean, monod, nash_sutcliffe, percentile, r_squared, rmse
 - **moving_window_f64:** moving_window_stats_f64, MovingWindowResultF64
 - **normal:** norm_cdf, norm_cdf_batch, norm_pdf, norm_pdf_batch, norm_ppf

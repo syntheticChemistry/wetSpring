@@ -5,6 +5,31 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V82 — ToadStool S70+++ Rewire (2026-03-01)
+
+### ToadStool Pin Advance: S68+ (`e96576ee`) → S70+++ (`1dd7e338`)
+- Absorbed 13 commits, 324 files changed, 9,440 insertions in barracuda crate
+- **No breaking changes** — clean compile, all 1,210 tests pass, 0 clippy warnings
+- Key upstream evolution: Builder refactor, Fp64Strategy::Concurrent, EcosystemCaller removed,
+  chrono eliminated (std::time), dead code cleanup (~400 lines), monitoring evolution
+
+### Exp247: ToadStool S70+++ Rewire — New Stats Primitives (42/42 checks PASS)
+- **stats::evolution** (S70, from groundSpring) — `kimura_fixation_prob`, `error_threshold`,
+  `detection_power`, `detection_threshold`: validated neutral/beneficial/deleterious fixation,
+  Eigen quasispecies error threshold (analytic match), rare biosphere detection power/depth
+- **stats::jackknife** (S70, from groundSpring) — `jackknife_mean_variance`, generalized
+  `jackknife`: leave-one-out resampling, jackknife Shannon diversity with SE estimation
+- **stats::diversity::chao1_classic** (S70, from groundSpring) — integer-count Chao 1984
+  estimator: validated vs analytic formula, edge cases (no singletons, no doubletons)
+- Cross-validation: detection_power ↔ detection_threshold round-trip for 5 rare abundances
+
+### New Upstream Capabilities Available (not yet consumed)
+- `staging::pipeline::PipelineBuilder` — GPU streaming topology builder (hotSpring Forge v0.3–v0.5)
+- `Fp64Strategy::Concurrent` — DF64 + native f64 side-by-side validation
+- `SymmetrizeGpu`, `LaplacianGpu` — new GPU linalg ops
+- 6 new WGSL shaders: batched_elementwise_f64, seasonal_pipeline, anderson_coupling_f64,
+  lanczos_iteration_f64, linear_regression_f64, matrix_correlation_f64
+
 ## V81 — CPU↔GPU Parity + ToadStool Dispatch + PCIe Bypass + NUCLEUS v2 (2026-02-28)
 
 ### Exp243: CPU vs GPU Extended Parity — 22 Domains Head-to-Head

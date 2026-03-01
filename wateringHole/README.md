@@ -1,6 +1,6 @@
 # wetSpring wateringHole
 
-**Date:** February 28, 2026
+**Date:** March 1, 2026
 **Purpose:** Spring-local handoff documents to ToadStool/BarraCuda and cross-spring provenance records.
 
 ---
@@ -9,7 +9,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V81** | `handoffs/WETSPRING_TOADSTOOL_V81_EVOLUTION_CHAIN_HANDOFF_FEB28_2026.md` | Feb 28 | **current** — CPU↔GPU 22-domain parity, ToadStool dispatch v2 (streaming overhead proof), PCIe bypass mixed hardware (NPU→GPU direct, bandwidth-aware), NUCLEUS v2 (49 workloads, Tower+Nest+Node, biomeOS), 247 experiments 6,273+ checks ALL PASS |
+| **V82** | `handoffs/WETSPRING_TOADSTOOL_V82_S70_REWIRE_HANDOFF_MAR01_2026.md` | Mar 1 | **current** — ToadStool S70+++ rewire (13 commits absorbed), 3 new primitives (evolution, jackknife, chao1_classic), 85 total primitives, 248 experiments, 6,315+ checks ALL PASS |
 
 ## NestGate Handoffs
 
@@ -25,7 +25,7 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` (V7-V76, API report, rewire, cross-spring provenance — 58 files).
+Superseded handoffs in `handoffs/archive/` (V7-V81, API report, rewire, cross-spring provenance — 59 files).
 
 ## Convention
 

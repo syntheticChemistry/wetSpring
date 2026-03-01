@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** February 28, 2026 (V81 CPU↔GPU Parity + ToadStool Dispatch + PCIe Bypass + NUCLEUS v2)
+**Date:** March 1, 2026 (V82 ToadStool S70+++ Rewire)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules + 1 IPC module (all lean, 0 local WGSL, 0 local derivative/regression math), 82 ToadStool primitives consumed (barracuda always-on, zero fallback code), 1,219 tests (955 barracuda lib + 60 integration + 20 doc + 113 forge), 247 experiments, 6,273+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S68+ aligned (`e96576ee`), 97 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V81:** CPU↔GPU Parity + ToadStool Dispatch + PCIe Bypass + NUCLEUS v2, 82 primitives.
+**Status:** 47 CPU + 42 GPU modules + 1 IPC module (all lean, 0 local WGSL, 0 local derivative/regression math), 85 ToadStool primitives consumed (82 prior + 3 S70: evolution, jackknife, chao1_classic, barracuda always-on, zero fallback code), 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), 248 experiments, 6,315+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S70+++ aligned (`1dd7e338`), 97 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V82:** ToadStool S70+++ rewire + new stats primitives (evolution, jackknife, chao1_classic), 85 primitives.
 
 ### Full Lean Phase
 

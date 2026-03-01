@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
-**Date:** February 28, 2026
-**Status:** Phase 81 — Validation study active — 6,273+ checks (1,945+ GPU on RTX 4070, **60 NPU on AKD1000**), 1,219 tests (955 lib, 1,219 total), 247 experiments, ToadStool S68+ aligned (`e96576ee`), 82 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances with full provenance, 0 Passthrough, 0 ad-hoc magic numbers, clippy pedantic CLEAN, V81 CPU↔GPU Parity + ToadStool Dispatch + PCIe Bypass + NUCLEUS v2, 39/39 three-tier, 52/52 papers
+**Date:** March 1, 2026
+**Status:** Phase 82 — Validation study active — 6,315+ checks (1,945+ GPU on RTX 4070, **60 NPU on AKD1000**), 1,210 tests (955 lib, 1,210 total), 248 experiments, ToadStool S70+++ aligned (`1dd7e338`), 85 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances with full provenance, 0 Passthrough, 0 ad-hoc magic numbers, clippy pedantic CLEAN, V82 CPU↔GPU Parity + ToadStool Dispatch + PCIe Bypass + NUCLEUS v2, 39/39 three-tier, 52/52 papers
 **License:** AGPL-3.0-or-later
 
 ---
@@ -56,7 +56,7 @@ implementations into upstream ToadStool/BarraCuda primitives:
 5. **Lean** — wetSpring rewires to upstream imports, deletes local code
 
 **Current status:** 42 GPU modules — Lean phase (fully absorbed). All 42 lean on
-upstream ToadStool primitives (82 consumed, S68+. 0 local WGSL (fully lean)).
+upstream ToadStool primitives (85 consumed, S70+++. 0 local WGSL (fully lean)).
 7 compose ToadStool primitives for GPU-accelerated workflows. Zero Passthrough, zero
 Tier B/C modules remain. BGL helpers (`storage_bgl_entry`/`uniform_bgl_entry`) adopted
 from ToadStool S66 `ComputeDispatch` module (6 files, ~258 lines boilerplate removed).
@@ -312,7 +312,7 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCuda/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34+ WGSL shaders, active Write phase)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 82 ToadStool primitives, barracuda always-on, 1,148 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 85 ToadStool primitives, barracuda always-on, 1,210 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **ecoPrimals/archive/wetspring-early-handoffs-feb2026/** — Fossil record of early ToadStool handoffs (v1–v9)
 

@@ -1,8 +1,8 @@
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** February 28, 2026
+**Date:** March 1, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 81 — 247 experiments, 6,273+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,219 tests (962 barracuda lib + 60 integration + 22 doc + 175 forge), ToadStool S68+ aligned (`e96576ee`), 82 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances (full provenance), 0 unsafe code, 0 todo!/unimplemented!(), clippy pedantic CLEAN (both crates, ZERO warnings), V81 CPU↔GPU 22-domain parity + ToadStool dispatch v2 + PCIe bypass + NUCLEUS v2, V80 extended evolution (19 domains × 4 tiers), 52/52 papers, 50/50 three-tier, 95.86% line coverage
+**Status:** Phase 82 — 248 experiments, 6,315+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,210 tests (962 barracuda lib + 60 integration + 22 doc + 166 forge), ToadStool S70+++ aligned (`1dd7e338`), 85 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances (full provenance), 0 unsafe code, 0 todo!/unimplemented!(), clippy pedantic CLEAN (both crates, ZERO warnings), V82 CPU↔GPU 22-domain parity + ToadStool dispatch v2 + PCIe bypass + NUCLEUS v2, V80 extended evolution (19 domains × 4 tiers), 52/52 papers, 50/50 three-tier, 95.86% line coverage
 
 ---
 
@@ -41,7 +41,7 @@ All code is AGPL-3.0.
 | **biomeOS IPC** | — | cross | — | 203-208 | 321 | IPC dispatch, GPU-aware routing, NUCLEUS atomics, Songbird, Neural API |
 | **V66 Audit + Dispatch** | — | cross | — | 209,212-215 | 239+ | Streaming I/O parity, CPU v12, dispatch evolution, NUCLEUS V8, CPU vs GPU v5 |
 | **V67 Experiment Buildout** | — | cross | — | 216-220 | 170+ | 47-domain CPU proof, Python-vs-Rust benchmark, 42-module GPU portability, unidirectional streaming, cross-substrate dispatch V67 + BandwidthTier, 11 extension papers → 50/50 three-tier |
-| **Total** | | | **52** | | **6,273+** | |
+| **Total** | | | **52** | | **6,315+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -101,7 +101,7 @@ Every paper goes through the full evolution. Status across all 39 actionable pap
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
 | biomeOS IPC integration | JSON-RPC science primal, GPU-aware dispatch, Songbird registration | 321 checks (Exp203-208) |
-| Code quality audit | 95.86% line / 94.02% region / 95.40% fn, streaming I/O, 0 production mocks, ToadStool S68+, barracuda always-on, `deny(missing_docs)`, zero unsafe code, clippy pedantic CLEAN, baseline manifest 51/51 | 1,148+ tests |
+| Code quality audit | 95.86% line / 94.02% region / 95.40% fn, streaming I/O, 0 production mocks, ToadStool S70+++, barracuda always-on, `deny(missing_docs)`, zero unsafe code, clippy pedantic CLEAN, baseline manifest 51/51 | 1,210 tests |
 | V66 dispatch evolution | Forge dispatch routing (29 workloads), streaming topology (PCIe bypass), NUCLEUS Tower/Node/Nest model, absorption audit (0 local WGSL) | 49 checks (Exp213) |
 | V66 NUCLEUS V8 | IPC dispatch with V66 I/O evolution (byte-native FASTQ, bytemuck nanopore, streaming MS2), Nest metrics, CPU fallback parity, full pipeline chain | 49 checks (Exp214) |
 
@@ -137,7 +137,7 @@ Every paper goes through the full evolution. Status across all 39 actionable pap
 | Exp169 | Modern cross-spring benchmark | 12 | All CPU primitives validated, 4-spring provenance, bit-exact delegation |
 
 V44 rewired 6 validation binaries to modern upstream: `find_w_c` (4 files),
-`pearson_correlation` (1 file). 82 primitives consumed (S68+). Hill CPU ODE helpers
+`pearson_correlation` (1 file). 85 primitives consumed (S70+++). Hill CPU ODE helpers
 intentionally kept local (derivative-level math, GPU equivalents generated
 by `BatchedOdeRK4::generate_shader()`).
 
@@ -219,7 +219,7 @@ full architecture, literature review, and experiment plan.
 
 | Experiment | Focus | Checks | Key Finding |
 |:---:|-------|:------:|-------------|
-| Exp210 | Cross-spring modern benchmark (S68+ Fp64Strategy, submit_and_poll, provenance) | 24 | All 5-spring provenance validated, optimal_precision wired, ToadStool resilient dispatch |
+| Exp210 | Cross-spring modern benchmark (S70+++ Fp64Strategy, submit_and_poll, provenance) | 24 | All 5-spring provenance validated, optimal_precision wired, ToadStool resilient dispatch |
 
 V64 wired `Fp64Strategy` and `optimal_precision()` in `GpuF64`, migrated 6 GPU
 modules (5 ODE + GEMM) to `submit_and_poll()` for device-lost resilience, and
