@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** March 1, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 85 — 1,223 tests (975 barracuda lib + 60 integration + 22 doc + 166 forge), 260 experiments, 6,656+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 223+ binaries, ToadStool S70+++ aligned (`1dd7e338`), 93 primitives consumed (same ToadStool S70+++) via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 97 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (both crates, all targets, ZERO warnings), V85: Exp256-259 (EMP Anderson Atlas 30K, NUCLEUS Data Pipeline, Tower-Node Deployment, Genomic Vault — organ model), all primals READY (biomeOS + BearDog + Songbird + ToadStool + NestGate + Squirrel), IPC bit-identical 3.2× overhead, vault module (consent + encrypted storage + provenance)
+**Status:** Phase 86 — 1,247 tests (975 barracuda lib + 60 integration + 22 doc + 166 forge), 262 experiments, 6,656+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 221+ binaries, ToadStool S70+++ aligned (`1dd7e338`), 93 primitives consumed (same ToadStool S70+++) via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 97 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (both crates, all targets, ZERO warnings), V86: Exp260-262 (Cross-Spring Evolution validation 23/23, Cross-Spring Modern benchmark 12 primitives, Deep Debt Elimination Round 3 — module refactors, 11 new tests, ESN bridge to ToadStool esn_v2), all primals READY (biomeOS + BearDog + Songbird + ToadStool + NestGate + Squirrel), IPC bit-identical 3.2× overhead, vault module (consent + encrypted storage + provenance)
 
 ---
 
@@ -55,7 +55,7 @@ WGSL          known physics   handoffs/                        delete local
 | **Compose** | 7 | GPU wrappers wiring ToadStool primitives (kmd, merge_pairs, robinson_foulds, derep, neighbor_joining, reconciliation, molecular_clock) |
 | **Passthrough** | 0 | All promoted — `gbm` and `feature_table` compose upstream, `signal` leans on `PeakDetectF64` (S62) |
 | **Write → Lean** | 5 | ODE shaders fully lean — GPU modules use `generate_shader()` from `OdeSystem` traits (WGSL deleted) |
-| **NPU** | 1 | ESN reservoir computing → int8 quantization → NPU deployment (esn) |
+| **NPU** | 1 | ESN reservoir computing → int8 quantization → NPU deployment (esn) — bridge to ToadStool `esn_v2` |
 | **Tier B** | 0 | All promoted |
 | **Tier C** | 0 | All promoted |
 
@@ -106,7 +106,7 @@ integration point.
 | Pure GPU streaming v2 | 72 (analytics + ODE + phylogenetics) |
 | Cross-spring spectral theory | 25 (Anderson 1D/2D/3D + Almost-Mathieu + QS bridge) |
 | NPU reservoir checks | 59 (ESN → int8 → NPU-simulated inference) |
-| Cross-spring evolution checks | 34 (Exp120 benchmark 9, Exp168 cross-spring S62+DF64 ~25) |
+| Cross-spring evolution checks | 57 (Exp120 benchmark 9, Exp168 ~25, Exp260 validate_cross_spring_evolution_modern 23/23) |
 | NCBI-scale hypothesis testing | 146 (GPU-confirmed: Vibrio QS, 2D Anderson, pangenome, atlas) |
 | 3D Anderson dimensional QS | 50 (GPU-confirmed: 1D→2D→3D sweep, vent chimney, phase diagram, biofilm 3D) |
 | Geometry verification + cross-ecosystem | 50 (finite-size scaling, geometry zoo, cave/spring/rhizosphere, 28×5 atlas) |
@@ -124,10 +124,10 @@ integration point.
 | **Total validation checks** | **6,656+** |
 | Rust library unit tests | 962 (barracuda CPU + IPC, default features) |
 | metalForge forge tests | 175 |
-| **Total Rust tests** | **1,223** (975 barracuda lib + 60 integration + 22 doc + 166 forge) |
+| **Total Rust tests** | **1,247** (975 barracuda lib + 60 integration + 22 doc + 166 forge) |
 | Library code coverage | **95.86% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov) |
-| Experiments completed | 256 |
-| Validation/benchmark binaries | 205+ validate + 14 benchmark = 219+ total |
+| Experiments completed | 262 |
+| Validation/benchmark binaries | 206+ validate + 15 benchmark = 221+ total |
 | CPU bio modules | 47 |
 | GPU bio modules | 42 (30 lean + 5 write→lean + 7 compose + 0 passthrough) |
 | Tier B (needs refactor) | 0 (all promoted) |
@@ -139,7 +139,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | ToadStool primitives consumed | **93** (barracuda always-on, zero fallback code — ToadStool S70+++, `1dd7e338`) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 6,656+ validation checks **PASS**. All 1,223 tests **PASS** (1 ignored: hardware-dependent).
+All 6,656+ validation checks **PASS**. All 1,247 tests **PASS** (1 ignored: hardware-dependent).
 
 ### GPU Performance
 
@@ -787,6 +787,17 @@ complete Python → CPU → GPU → Pure GPU Streaming → metalForge pipeline:
 
 **977 lib tests** | **1,103 total** | **5,061+ checks** | **211 experiments** | **0 clippy warnings**
 
+### Phase 86: Cross-Spring Evolution + Deep Debt Elimination (V86)
+
+Three rounds of deep evolution work:
+
+- **Exp260: Cross-Spring Evolution Validation** — `validate_cross_spring_evolution_modern` (23/23 checks). Validates all five Springs' primitives consumed by wetSpring via ToadStool S70+++.
+- **Exp261: Cross-Spring Modern Benchmark** — `benchmark_cross_spring_modern` (12 primitives benchmarked). Provenance tracking across hotSpring, wetSpring, neuralSpring, airSpring, groundSpring.
+- **Exp262: Deep Debt Elimination Round 3** — 4 module refactors (dada2, io/ms2, ncbi/nestgate, tolerances/bio), 11 new tests, clone audit. ESN bridge to ToadStool `esn_v2` for NPU reservoir inference.
+- **New spec**: `specs/CROSS_SPRING_EVOLUTION.md` — cross-spring shader and primitive evolution documentation.
+
+**1,247 tests** | **262 experiments** | **221+ binaries**
+
 ### Phase 57: ToadStool S68 Universal Precision Rewire (V57)
 
 ToadStool advanced 19 commits (S66→S68) with universal precision architecture
@@ -999,7 +1010,7 @@ wetSpring/
 │   │   ├── bio/                 ← 47 CPU + 42 GPU bio modules
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML, nanopore)
 │   │   ├── bench/               ← benchmark harness + power monitoring
-│   │   ├── bin/                 ← 219+ validation/benchmark binaries
+│   │   ├── bin/                 ← 221+ validation/benchmark binaries (validate_cross_spring_evolution_modern, benchmark_cross_spring_modern)
 │   │   ├── ipc/                 ← JSON-RPC dispatch (biomeOS integration)
 │   │   └── shaders/             ← shared WGSL utilities (ODE shaders now generated at runtime)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024
@@ -1015,7 +1026,7 @@ wetSpring/
 ├── wateringHole/                   ← spring-local handoffs (following hotSpring pattern)
 │   └── handoffs/                  ← ToadStool rewire + cross-spring evolution docs
 ├── scripts/                       ← Python baselines (57 scripts)
-├── specs/                         ← specifications and paper queue
+├── specs/                         ← specifications and paper queue (CROSS_SPRING_EVOLUTION.md)
 ├── whitePaper/                    ← validation study draft
 └── data/                          ← local datasets (not committed)
 ```
@@ -1027,7 +1038,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (1,223: 975 barracuda lib + 60 integration + 22 doc + 166 forge)
+# Run all tests (1,247: 975 barracuda lib + 60 integration + 22 doc + 166 forge)
 cargo test --features ipc
 
 # Code quality checks
@@ -1037,6 +1048,10 @@ cargo doc --no-deps
 
 # Line coverage (requires cargo-llvm-cov)
 cargo llvm-cov --lib --summary-only
+
+# Workspace coverage with HTML report (from root):
+cargo llvm-cov --workspace --html
+# Or: ./scripts/coverage.sh
 
 # Run all CPU validation binaries (1,476+ checks)
 for bin in $(ls src/bin/validate_*.rs | grep -v gpu | sed 's|src/bin/||;s|\.rs||'); do
@@ -1084,7 +1099,7 @@ All validation data comes from public repositories:
 - **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
 - **ToadStool** — GPU compute engine (BarraCuda crate, 700+ WGSL shaders, S68)
 - **wateringHole** — Spring-local handoffs to ToadStool
-  - `handoffs/WETSPRING_TOADSTOOL_V84_PIPELINE_BUILDOUT_HANDOFF_MAR01_2026.md` — **current** (V84 pipeline buildout: Paper→CPU→GPU→Streaming, 32 papers, Python parity, 0.10ms streaming overhead)
+  - `handoffs/WETSPRING_TOADSTOOL_V85_VAULT_NUCLEUS_EVOLUTION_HANDOFF_MAR01_2026.md` — **current** (V85 vault + NUCLEUS evolution; V86: cross-spring evolution validation, benchmark, ESN bridge, deep debt elimination)
   - `handoffs/archive/` — V7-V76 (fossil record)
   - `CROSS_SPRING_SHADER_EVOLUTION.md` — 700+ shader provenance (cross-spring, S68)
 - **ecoPrimals** — Parent ecosystem

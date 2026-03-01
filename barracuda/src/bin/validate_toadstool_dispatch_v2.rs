@@ -12,19 +12,19 @@
     clippy::float_cmp,
     unused_assignments
 )]
-//! # Exp244: ToadStool Compute Dispatch v2 — Extended Overhead Proof
+//! # Exp244: `ToadStool` Compute Dispatch v2 — Extended Overhead Proof
 //!
 //! Extends Exp073 dispatch overhead proof with new streaming domains.
-//! Proves ToadStool unidirectional streaming eliminates CPU round-trips
+//! Proves `ToadStool` unidirectional streaming eliminates CPU round-trips
 //! for: DADA2, chimera, diversity, Bray-Curtis, taxonomy, full analytics.
 //!
 //! Validates:
-//! 1. GpuPipelineSession warmup and pre-compilation
+//! 1. `GpuPipelineSession` warmup and pre-compilation
 //! 2. Streaming vs individual dispatch overhead reduction
 //! 3. Full analytics pipeline (taxonomy + diversity + BC in one session)
 //! 4. CPU reference parity for all streaming outputs
 //!
-//! Chain: Paper → CPU → GPU → Parity → **ToadStool (this)** → metalForge
+//! Chain: Paper → CPU → GPU → Parity → **`ToadStool` (this)** → `metalForge`
 //!
 //! | Field | Value |
 //! |-------|-------|
@@ -63,7 +63,7 @@ fn main() {
     // ═══ S2: Streaming Diversity vs Individual Dispatch ═══════════════════
     v.section("S2: Streaming vs Individual Dispatch (Diversity)");
     let abundances: Vec<f64> = (0..1024)
-        .map(|i| ((i + 1) as f64).mul_add(1.5, 0.5))
+        .map(|i| f64::from(i + 1).mul_add(1.5, 0.5))
         .collect();
 
     let tc = Instant::now();

@@ -195,7 +195,7 @@ impl<R: BufRead> XmlReader<R> {
             let attrs = parse_attributes(attr_part);
 
             self.queue.push_back(XmlEvent::StartElement {
-                name: name.clone(),
+                name: name.clone(), // ownership transfer: name also used for EndElement below
                 attrs,
             });
             if is_empty {

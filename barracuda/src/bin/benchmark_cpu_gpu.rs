@@ -52,6 +52,7 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::special;
+use wetspring_barracuda::validation;
 
 fn main() {
     let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
@@ -84,9 +85,8 @@ fn main() {
 
     report.print_summary();
 
-    let out_dir = std::env::var("WETSPRING_BENCHMARK_DIR")
-        .unwrap_or_else(|_| format!("{}/../benchmarks/results", env!("CARGO_MANIFEST_DIR")));
-    match report.save_json(&out_dir) {
+    let out_dir = validation::discover_bench_dir();
+    match report.save_json(out_dir.to_string_lossy().as_ref()) {
         Ok(path) => println!("JSON results saved to {path}"),
         Err(e) => eprintln!("Warning: could not save JSON: {e}"),
     }
@@ -239,8 +239,7 @@ fn bench_variance(gpu: &GpuF64, report: &mut BenchReport) {
     for &n in &[1_000, 10_000, 100_000, 1_000_000] {
         let data = generate_f64(n, 7);
         let (cpu, cpu_e) = bench_with_energy(|| {
-            // Intentional: manual variance for CPU benchmark baseline vs GPU.
-            let mean = data.iter().sum::<f64>() / data.len() as f64;
+            let mean = barracuda::stats::mean(&data);
             let _var: f64 =
                 data.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / data.len() as f64;
         });

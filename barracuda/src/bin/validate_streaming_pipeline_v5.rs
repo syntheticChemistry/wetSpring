@@ -6,12 +6,12 @@
     clippy::items_after_statements,
     clippy::print_stdout
 )]
-//! # Exp231: Streaming Pipeline v5 — Diversity → L2 → PCoA → Rarefaction Chain
+//! # Exp231: Streaming Pipeline v5 — Diversity → L2 → `PCoA` → Rarefaction Chain
 //!
 //! Proves that multi-stage scientific pipelines produce identical results
 //! whether executed as independent steps (round-trip) or as a streaming chain
 //! (no CPU intermediate buffers). Extends v4 with:
-//! - **PairwiseL2** in pipeline (Euclidean distance matrix)
+//! - **`PairwiseL2`** in pipeline (Euclidean distance matrix)
 //! - **FST variance** as pipeline output
 //! - **Rarefaction** bootstrap at end of chain
 //! - **6-stage chain** determinism

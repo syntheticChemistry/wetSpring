@@ -46,7 +46,7 @@ pub struct BioWorkload {
 }
 
 impl BioWorkload {
-    pub(super) const fn new_static(origin: ShaderOrigin) -> Self {
+    pub(crate) const fn new_static(origin: ShaderOrigin) -> Self {
         Self {
             workload: Workload {
                 name: String::new(),
@@ -60,18 +60,18 @@ impl BioWorkload {
         }
     }
 
-    pub(super) fn named(mut self, name: &str, required: Vec<Capability>) -> Self {
+    pub(crate) fn named(mut self, name: &str, required: Vec<Capability>) -> Self {
         self.workload.name = name.to_string();
         self.workload.required = required;
         self
     }
 
-    pub(super) const fn with_primitive(mut self, primitive: &'static str) -> Self {
+    pub(crate) const fn with_primitive(mut self, primitive: &'static str) -> Self {
         self.primitive = Some(primitive);
         self
     }
 
-    pub(super) const fn with_ode(mut self, n_vars: u32, n_params: u32) -> Self {
+    pub(crate) const fn with_ode(mut self, n_vars: u32, n_params: u32) -> Self {
         self.ode_dims = Some(OdeDims { n_vars, n_params });
         self
     }

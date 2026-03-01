@@ -15,7 +15,7 @@
 //! # Exp232: metalForge v9 — NUCLEUS Mixed Hardware Dispatch
 //!
 //! Validates the complete NUCLEUS dispatch model with V75-V76 additions:
-//! - **GPU→NPU PCIe bypass** — streaming topology without CPU round-trip
+//! - **GPU→NPU `PCIe` bypass** — streaming topology without CPU round-trip
 //! - **`FstVariance` + `PairwiseL2` in dispatch** — new V75 workloads routed
 //! - **Tower/Node/Nest** coordination with new workloads
 //! - **DF64 dispatch** — precision protocol in cross-substrate context

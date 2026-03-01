@@ -12,7 +12,7 @@
     clippy::items_after_statements,
     clippy::float_cmp
 )]
-//! # Exp240: BarraCuda GPU v9 — Extended GPU Portability Proof
+//! # Exp240: `BarraCuda` GPU v9 — Extended GPU Portability Proof
 //!
 //! Extends GPU v8 with 8 new GPU workloads covering domains from CPU v17:
 //! - G09: Chimera Detection GPU
@@ -259,7 +259,7 @@ fn main() {
     let parent_indices_cpu = vec![Some(4), Some(4), Some(3), Some(4), None];
     let parent_indices_gpu: Vec<i64> = parent_indices_cpu
         .iter()
-        .map(|p| p.map_or(-1, |x| x as i64))
+        .map(|p| p.map_or(-1, |x| i64::try_from(x).expect("index fits i64")))
         .collect();
     let calibrations = vec![molecular_clock::CalibrationPoint {
         node_id: 4,
@@ -422,7 +422,7 @@ fn main() {
         println!("  │ {:<34} │ {:>8.2} │", gt.name, gt.ms);
     }
     println!("  ├──────────────────────────────────┼──────────┤");
-    println!("  │ TOTAL                            │ {:>8.2} │", total_ms);
+    println!("  │ TOTAL                            │ {total_ms:>8.2} │");
     println!("  └──────────────────────────────────┴──────────┘");
     println!("  8 new + 8 inherited GPU workloads, CPU == GPU within tolerances");
     println!();

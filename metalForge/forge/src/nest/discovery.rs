@@ -1,0 +1,45 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+//! Socket discovery for `NestGate` Unix socket.
+//!
+//! Discovery order:
+//! 1. `NESTGATE_SOCKET` environment variable (if path exists)
+//! 2. `$XDG_RUNTIME_DIR/biomeos/nestgate-default.sock` (if exists)
+//! 3. Default path from `default_socket_path()` (`/run/nestgate/default.sock` if env unset)
+
+use std::path::PathBuf;
+
+/// Default socket path when `NESTGATE_SOCKET` is not set.
+///
+/// Uses environment-based discovery: checks `NESTGATE_SOCKET` first,
+/// falls back to `/run/nestgate/default.sock`.
+#[must_use]
+pub fn default_socket_path() -> PathBuf {
+    std::env::var("NESTGATE_SOCKET")
+        .unwrap_or_else(|_| String::from("/run/nestgate/default.sock"))
+        .into()
+}
+
+/// Discover the `NestGate` Unix socket.
+///
+/// Public so `data.rs` can share the same discovery logic.
+#[must_use]
+pub fn discover_nestgate_socket() -> Option<PathBuf> {
+    if let Ok(path) = std::env::var("NESTGATE_SOCKET") {
+        let p = PathBuf::from(path);
+        if p.exists() {
+            return Some(p);
+        }
+    }
+    if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
+        let p = PathBuf::from(xdg).join("biomeos/nestgate-default.sock");
+        if p.exists() {
+            return Some(p);
+        }
+    }
+    let fallback = default_socket_path();
+    if fallback.exists() {
+        return Some(fallback);
+    }
+    None
+}

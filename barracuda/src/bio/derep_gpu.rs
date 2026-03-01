@@ -55,7 +55,7 @@ fn require_f64(gpu: &GpuF64) -> Result<()> {
 /// # Errors
 ///
 /// Returns an error if the device lacks `SHADER_F64` support.
-#[allow(clippy::cast_precision_loss)]
+#[allow(clippy::cast_precision_loss, clippy::too_many_lines)]
 pub fn dereplicate_gpu(
     gpu: &GpuF64,
     records: &[FastqRecord],
@@ -153,6 +153,10 @@ pub fn dereplicate_gpu(
 
     let mean_qualities: Vec<f64> = records.iter().map(|r| mean_quality(&r.quality)).collect();
 
+    // Use HashMap to take ownership of sequences (avoids clone in hot path).
+    let mut sequences_by_idx: std::collections::HashMap<usize, Vec<u8>> =
+        sequences.into_iter().enumerate().collect();
+
     let mut uniques: Vec<UniqueSequence> = Vec::new();
     for (_root, members) in root_to_members {
         let best_idx = members
@@ -165,13 +169,16 @@ pub fn dereplicate_gpu(
             })
             .unwrap_or(members[0]);
 
+        let seq = sequences_by_idx
+            .remove(&members[0])
+            .ok_or_else(|| Error::Gpu("derep: member index out of range (internal)".into()))?;
         let rec = &records[best_idx];
         uniques.push(UniqueSequence {
-            sequence: sequences[members[0]].clone(),
+            sequence: seq,
             abundance: members.len(),
             best_quality: mean_qualities[best_idx],
-            representative_id: rec.id.clone(),
-            representative_quality: rec.quality.clone(),
+            representative_id: rec.id.clone(), // ownership transfer: borrowed input requires clone
+            representative_quality: rec.quality.clone(), // ownership transfer: borrowed input requires clone
         });
     }
 

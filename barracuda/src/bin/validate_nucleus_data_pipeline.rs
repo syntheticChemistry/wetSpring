@@ -1,16 +1,23 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![allow(
-    clippy::expect_used, clippy::unwrap_used, clippy::print_stdout,
-    clippy::too_many_lines, clippy::cast_precision_loss, clippy::cast_possible_truncation,
-    clippy::cast_sign_loss, clippy::similar_names, clippy::many_single_char_names,
-    clippy::items_after_statements, clippy::float_cmp
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::print_stdout,
+    clippy::too_many_lines,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::similar_names,
+    clippy::many_single_char_names,
+    clippy::items_after_statements,
+    clippy::float_cmp
 )]
 //! # Exp257: NUCLEUS Data Acquisition Pipeline — Three-Tier Primal Routing
 //!
 //! Validates the full NUCLEUS data acquisition chain for science workloads:
 //!
 //! 1. **Songbird Discovery** — wetSpring registers capabilities, discovers peers
-//! 2. **NestGate Three-Tier Routing** — biomeOS → NestGate → sovereign HTTP
+//! 2. **`NestGate` Three-Tier Routing** — biomeOS → `NestGate` → sovereign HTTP
 //! 3. **Neural API capability.call** — semantic routing through biomeOS orchestrator
 //! 4. **Science Pipeline via IPC** — diversity + Anderson through JSON-RPC dispatch
 //! 5. **Sovereign Fallback** — standalone mode when no ecosystem is running
@@ -42,9 +49,8 @@ use wetspring_barracuda::validation::Validator;
 const RPC_TIMEOUT: Duration = Duration::from_secs(5);
 
 fn main() {
-    let mut v = Validator::new(
-        "Exp257: NUCLEUS Data Acquisition Pipeline — Three-Tier Primal Routing",
-    );
+    let mut v =
+        Validator::new("Exp257: NUCLEUS Data Acquisition Pipeline — Three-Tier Primal Routing");
 
     v.section("Phase 1: Ecosystem Probe — Socket Discovery");
 
@@ -55,10 +61,10 @@ fn main() {
 
     println!("  Socket scan results:");
     println!("  ─────────────────────────────────────────");
-    report_socket("biomeOS orchestrator", &biomeos_socket);
-    report_socket("Songbird discovery", &songbird_socket);
-    report_socket("NestGate data provider", &nestgate_socket);
-    report_socket("wetSpring IPC server", &wetspring_socket);
+    report_socket("biomeOS orchestrator", biomeos_socket.as_ref());
+    report_socket("Songbird discovery", songbird_socket.as_ref());
+    report_socket("NestGate data provider", nestgate_socket.as_ref());
+    report_socket("wetSpring IPC server", wetspring_socket.as_ref());
     println!();
 
     let has_biomeos = biomeos_socket.is_some();
@@ -66,10 +72,7 @@ fn main() {
     let has_nestgate = nestgate_socket.is_some();
     let has_wetspring = wetspring_socket.is_some();
 
-    v.check_pass(
-        "Discovery: socket scan completes without panic",
-        true,
-    );
+    v.check_pass("Discovery: socket scan completes without panic", true);
 
     v.section("Phase 2: Tier Assessment");
 
@@ -84,7 +87,10 @@ fn main() {
         3
     };
 
-    v.check_pass("Tier assessment: tier identified (1-3)", (1..=3).contains(&tier));
+    v.check_pass(
+        "Tier assessment: tier identified (1-3)",
+        (1..=3).contains(&tier),
+    );
     println!("  Active tier: {tier}");
     println!();
 
@@ -92,10 +98,16 @@ fn main() {
 
     if let Some(ref sock) = songbird_socket {
         let t = Instant::now();
-        match rpc_call(sock, r#"{"jsonrpc":"2.0","method":"discovery.list","params":{},"id":1}"#) {
+        match rpc_call(
+            sock,
+            r#"{"jsonrpc":"2.0","method":"discovery.list","params":{},"id":1}"#,
+        ) {
             Ok(response) => {
                 let ms = t.elapsed().as_secs_f64() * 1000.0;
-                println!("  Songbird list response ({ms:.1}ms): {}", &response[..response.len().min(200)]);
+                println!(
+                    "  Songbird list response ({ms:.1}ms): {}",
+                    &response[..response.len().min(200)]
+                );
                 v.check_pass("Songbird: discovery.list responded", true);
             }
             Err(e) => {
@@ -116,16 +128,23 @@ fn main() {
         match rpc_call(sock, ncbi_probe) {
             Ok(response) => {
                 let ms = t.elapsed().as_secs_f64() * 1000.0;
-                println!("  NestGate NCBI capabilities ({ms:.1}ms): {}", &response[..response.len().min(200)]);
+                println!(
+                    "  NestGate NCBI capabilities ({ms:.1}ms): {}",
+                    &response[..response.len().min(200)]
+                );
                 v.check_pass("NestGate: NCBI capabilities responded", true);
             }
             Err(e) => {
                 println!("  NestGate: NCBI probe failed — {e}");
-                let health_probe = r#"{"jsonrpc":"2.0","method":"health.check","params":{},"id":3}"#;
+                let health_probe =
+                    r#"{"jsonrpc":"2.0","method":"health.check","params":{},"id":3}"#;
                 match rpc_call(sock, health_probe) {
                     Ok(response) => {
                         let ms = t.elapsed().as_secs_f64() * 1000.0;
-                        println!("  NestGate: health check succeeded ({ms:.1}ms): {}", &response[..response.len().min(200)]);
+                        println!(
+                            "  NestGate: health check succeeded ({ms:.1}ms): {}",
+                            &response[..response.len().min(200)]
+                        );
                         v.check_pass("NestGate: health check responded", true);
                     }
                     Err(e2) => {
@@ -148,7 +167,10 @@ fn main() {
         match rpc_call(sock, cap_list) {
             Ok(response) => {
                 let ms = t.elapsed().as_secs_f64() * 1000.0;
-                println!("  biomeOS capability.list ({ms:.1}ms): {}", &response[..response.len().min(300)]);
+                println!(
+                    "  biomeOS capability.list ({ms:.1}ms): {}",
+                    &response[..response.len().min(300)]
+                );
                 v.check_pass("biomeOS: capability.list responded", true);
 
                 let cap_call = r#"{"jsonrpc":"2.0","method":"capability.call","params":{"capability":"science.diversity","args":{"counts":[10,20,30,40],"metrics":["shannon"]}},"id":5}"#;
@@ -156,7 +178,10 @@ fn main() {
                 match rpc_call(sock, cap_call) {
                     Ok(response2) => {
                         let ms2 = t2.elapsed().as_secs_f64() * 1000.0;
-                        println!("  capability.call science.diversity ({ms2:.1}ms): {}", &response2[..response2.len().min(200)]);
+                        println!(
+                            "  capability.call science.diversity ({ms2:.1}ms): {}",
+                            &response2[..response2.len().min(200)]
+                        );
                         v.check_pass("biomeOS: capability.call science.diversity succeeded", true);
                     }
                     Err(e) => {
@@ -183,7 +208,10 @@ fn main() {
         match rpc_call(sock, health) {
             Ok(response) => {
                 let ms = t.elapsed().as_secs_f64() * 1000.0;
-                println!("  wetSpring IPC health ({ms:.1}ms): {}", &response[..response.len().min(200)]);
+                println!(
+                    "  wetSpring IPC health ({ms:.1}ms): {}",
+                    &response[..response.len().min(200)]
+                );
                 v.check_pass("wetSpring IPC: health check responded", true);
 
                 let diversity_req = r#"{"jsonrpc":"2.0","method":"science.diversity","params":{"counts":[100,200,300,150,50],"metrics":["all"]},"id":11}"#;
@@ -191,9 +219,13 @@ fn main() {
                 match rpc_call(sock, diversity_req) {
                     Ok(div_response) => {
                         let ms2 = t2.elapsed().as_secs_f64() * 1000.0;
-                        println!("  wetSpring IPC diversity ({ms2:.1}ms): {}", &div_response[..div_response.len().min(300)]);
+                        println!(
+                            "  wetSpring IPC diversity ({ms2:.1}ms): {}",
+                            &div_response[..div_response.len().min(300)]
+                        );
 
-                        let direct_shannon = diversity::shannon(&[100.0, 200.0, 300.0, 150.0, 50.0]);
+                        let direct_shannon =
+                            diversity::shannon(&[100.0, 200.0, 300.0, 150.0, 50.0]);
                         let ipc_match = div_response.contains("shannon");
                         v.check_pass("wetSpring IPC: diversity includes shannon", ipc_match);
                         println!("  Direct shannon: {direct_shannon:.6}");
@@ -241,34 +273,73 @@ fn main() {
     println!("╔══════════════════════════════════════════════════════════════╗");
     println!("║  NUCLEUS Primal Interaction Status                          ║");
     println!("╠══════════════════════════════════════════════════════════════╣");
-    println!("║ {:20} │ {:8} │ {:25} ║", "Primal", "Status", "Evolution Need");
+    println!(
+        "║ {:20} │ {:8} │ {:25} ║",
+        "Primal", "Status", "Evolution Need"
+    );
     println!("╠══════════════════════════════════════════════════════════════╣");
 
     let biomeos_status = if has_biomeos { "LIVE" } else { "offline" };
-    let biomeos_need = if has_biomeos { "batch dispatch (N=30K)" } else { "start NUCLEUS node" };
-    println!("║ {:20} │ {:8} │ {:25} ║", "biomeOS", biomeos_status, biomeos_need);
+    let biomeos_need = if has_biomeos {
+        "batch dispatch (N=30K)"
+    } else {
+        "start NUCLEUS node"
+    };
+    println!(
+        "║ {:20} │ {:8} │ {:25} ║",
+        "biomeOS", biomeos_status, biomeos_need
+    );
 
     let songbird_status = if has_songbird { "LIVE" } else { "offline" };
-    let songbird_need = if has_songbird { "multi-gate federation" } else { "start with NUCLEUS" };
-    println!("║ {:20} │ {:8} │ {:25} ║", "Songbird", songbird_status, songbird_need);
+    let songbird_need = if has_songbird {
+        "multi-gate federation"
+    } else {
+        "start with NUCLEUS"
+    };
+    println!(
+        "║ {:20} │ {:8} │ {:25} ║",
+        "Songbird", songbird_status, songbird_need
+    );
 
     let nestgate_status = if has_nestgate { "LIVE" } else { "offline" };
-    let nestgate_need = if has_nestgate { "BIOM parser + SRA bulk" } else { "start with NUCLEUS" };
-    println!("║ {:20} │ {:8} │ {:25} ║", "NestGate", nestgate_status, nestgate_need);
+    let nestgate_need = if has_nestgate {
+        "BIOM parser + SRA bulk"
+    } else {
+        "start with NUCLEUS"
+    };
+    println!(
+        "║ {:20} │ {:8} │ {:25} ║",
+        "NestGate", nestgate_status, nestgate_need
+    );
 
     let wetspring_status = if has_wetspring { "LIVE" } else { "offline" };
-    let wetspring_need = if has_wetspring { "batch pipeline dispatch" } else { "run wetspring_server" };
-    println!("║ {:20} │ {:8} │ {:25} ║", "wetSpring", wetspring_status, wetspring_need);
+    let wetspring_need = if has_wetspring {
+        "batch pipeline dispatch"
+    } else {
+        "run wetspring_server"
+    };
+    println!(
+        "║ {:20} │ {:8} │ {:25} ║",
+        "wetSpring", wetspring_status, wetspring_need
+    );
 
-    println!("║ {:20} │ {:8} │ {:25} ║", "BearDog", "proven", "lineage verification");
-    println!("║ {:20} │ {:8} │ {:25} ║", "ToadStool", "absorbing", "S70+++ shader evolution");
+    println!(
+        "║ {:20} │ {:8} │ {:25} ║",
+        "BearDog", "proven", "lineage verification"
+    );
+    println!(
+        "║ {:20} │ {:8} │ {:25} ║",
+        "ToadStool", "absorbing", "S70+++ shader evolution"
+    );
     println!("╠══════════════════════════════════════════════════════════════╣");
-    println!("║ Active tier: {tier}  │  Data path: {:36} ║",
+    println!(
+        "║ Active tier: {tier}  │  Data path: {:36} ║",
         match tier {
             1 => "biomeOS → capability.call → wetSpring",
             2 => "NestGate → direct IPC → wetSpring",
             _ => "sovereign standalone (no IPC)",
-        });
+        }
+    );
     println!("╚══════════════════════════════════════════════════════════════╝");
     println!();
     println!("  Next steps to activate NUCLEUS:");
@@ -279,7 +350,9 @@ fn main() {
     if !has_wetspring {
         println!("  2. cargo run --release --bin wetspring_server");
     }
-    println!("  3. WETSPRING_DATA_PROVIDER=nestgate cargo run --release --bin validate_nucleus_data_pipeline");
+    println!(
+        "  3. WETSPRING_DATA_PROVIDER=nestgate cargo run --release --bin validate_nucleus_data_pipeline"
+    );
     println!("  4. Wire EMP OTU table download via NestGate HTTP fetch");
 
     v.finish();
@@ -309,7 +382,7 @@ fn discover_socket(primal: &str) -> Option<PathBuf> {
     None
 }
 
-fn report_socket(label: &str, path: &Option<PathBuf>) {
+fn report_socket(label: &str, path: Option<&PathBuf>) {
     match path {
         Some(p) => println!("    ✓ {label}: {}", p.display()),
         None => println!("    · {label}: not found"),
@@ -317,19 +390,25 @@ fn report_socket(label: &str, path: &Option<PathBuf>) {
 }
 
 fn rpc_call(socket: &PathBuf, request: &str) -> Result<String, String> {
-    let stream = UnixStream::connect(socket)
-        .map_err(|e| format!("connect {}: {e}", socket.display()))?;
+    let stream =
+        UnixStream::connect(socket).map_err(|e| format!("connect {}: {e}", socket.display()))?;
     stream.set_read_timeout(Some(RPC_TIMEOUT)).ok();
     stream.set_write_timeout(Some(RPC_TIMEOUT)).ok();
 
     let mut writer = std::io::BufWriter::new(&stream);
-    writer.write_all(request.as_bytes()).map_err(|e| format!("write: {e}"))?;
-    writer.write_all(b"\n").map_err(|e| format!("newline: {e}"))?;
+    writer
+        .write_all(request.as_bytes())
+        .map_err(|e| format!("write: {e}"))?;
+    writer
+        .write_all(b"\n")
+        .map_err(|e| format!("newline: {e}"))?;
     writer.flush().map_err(|e| format!("flush: {e}"))?;
 
     let mut reader = BufReader::new(&stream);
     let mut line = String::new();
-    reader.read_line(&mut line).map_err(|e| format!("read: {e}"))?;
+    reader
+        .read_line(&mut line)
+        .map_err(|e| format!("read: {e}"))?;
 
     if line.is_empty() {
         return Err("empty response".to_string());

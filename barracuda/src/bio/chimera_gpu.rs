@@ -182,7 +182,7 @@ pub fn remove_chimeras_gpu(
     let filtered: Vec<Asv> = results
         .iter()
         .filter(|r| !r.is_chimera)
-        .map(|r| seqs[r.query_idx].clone())
+        .map(|r| seqs[r.query_idx].clone()) // ownership transfer: borrowed input requires clone
         .collect();
     Ok((filtered, stats))
 }

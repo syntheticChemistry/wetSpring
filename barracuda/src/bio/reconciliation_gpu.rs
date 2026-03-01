@@ -51,13 +51,13 @@ fn require_f64(gpu: &GpuF64) -> Result<()> {
 /// # Errors
 ///
 /// Returns an error if the device lacks `SHADER_F64` support.
-pub fn reconcile_dtl_gpu(
+pub fn reconcile_dtl_gpu<'a>(
     gpu: &GpuF64,
-    host: &FlatRecTree,
+    host: &'a FlatRecTree,
     parasite: &FlatRecTree,
     tip_mapping: &[(String, String)],
     costs: &DtlCosts,
-) -> Result<DtlResult> {
+) -> Result<DtlResult<'a>> {
     require_f64(gpu)?;
 
     let result = reconciliation::reconcile_dtl(host, parasite, tip_mapping, costs);
@@ -83,13 +83,13 @@ pub fn reconcile_dtl_gpu(
 /// # Errors
 ///
 /// Returns an error if the device lacks `SHADER_F64` support.
-pub fn reconcile_batch_gpu(
+pub fn reconcile_batch_gpu<'a>(
     gpu: &GpuF64,
-    host: &FlatRecTree,
+    host: &'a FlatRecTree,
     parasites: &[FlatRecTree],
     tip_mappings: &[Vec<(String, String)>],
     costs: &DtlCosts,
-) -> Result<Vec<DtlResult>> {
+) -> Result<Vec<DtlResult<'a>>> {
     require_f64(gpu)?;
 
     let results: Vec<DtlResult> = parasites

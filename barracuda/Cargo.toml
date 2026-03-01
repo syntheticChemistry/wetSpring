@@ -66,6 +66,12 @@ bytemuck = { version = "1", features = ["derive"] }
 # XML parsing is sovereign (src/io/xml.rs); base64 is sovereign (src/encoding.rs).
 flate2 = { version = "1.0", default-features = false, features = ["rust_backend"] }
 
+# Vault: sovereign crypto (pure Rust, ecoBin compliant).
+# ChaCha20-Poly1305 AEAD (RustCrypto), Ed25519 (dalek), BLAKE3 hashing.
+chacha20poly1305 = "0.10"
+ed25519-dalek = "2.2"
+blake3 = "1.8"
+
 [dev-dependencies]
 tempfile = "3"
 temp-env = "0.3"
@@ -466,6 +472,11 @@ required-features = ["gpu"]
 name = "validate_cross_spring_evolution"
 path = "src/bin/validate_cross_spring_evolution.rs"
 required-features = ["gpu"]
+
+# ── Cross-Spring Evolution Modern — ToadStool Primitives (CPU) ───
+[[bin]]
+name = "validate_cross_spring_evolution_modern"
+path = "src/bin/validate_cross_spring_evolution_modern.rs"
 
 # ── Local WGSL Compile Test (Exp096) ─────────────────────────────
 [[bin]]
@@ -981,7 +992,6 @@ required-features = ["gpu"]
 [[bin]]
 name = "benchmark_cross_spring_modern"
 path = "src/bin/benchmark_cross_spring_modern.rs"
-required-features = ["gpu"]
 
 # ── Cross-Spring S65 Benchmark (Exp183) ──────────────────
 [[bin]]

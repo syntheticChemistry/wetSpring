@@ -7,17 +7,17 @@
     clippy::too_many_lines,
     clippy::print_stdout
 )]
-//! # Exp245: PCIe Bypass Mixed Hardware — NPU→GPU→CPU Dispatch Topology
+//! # Exp245: `PCIe` Bypass Mixed Hardware — NPU→GPU→CPU Dispatch Topology
 //!
 //! Validates metalForge's mixed hardware dispatch:
-//! - S1: PCIe bandwidth tier detection (Gen3/Gen4/Gen5)
+//! - S1: `PCIe` bandwidth tier detection (Gen3/Gen4/Gen5)
 //! - S2: GPU→GPU streaming (fully chainable, 0 CPU round-trips)
-//! - S3: GPU→NPU bypass (accepts_gpu_buffer: true, 0 CPU round-trips)
+//! - S3: GPU→NPU bypass (`accepts_gpu_buffer`: true, 0 CPU round-trips)
 //! - S4: GPU→CPU fallback (bandwidth-aware, 1 CPU round-trip)
-//! - S5: Mixed pipeline topology analysis (PCIe bypass scoring)
+//! - S5: Mixed pipeline topology analysis (`PCIe` bypass scoring)
 //! - S6: Bandwidth-aware dispatch routing for new workloads
 //!
-//! Chain: Paper → CPU → GPU → Parity → ToadStool → **metalForge (this)**
+//! Chain: Paper → CPU → GPU → Parity → `ToadStool` → **metalForge (this)**
 //!
 //! | Field | Value |
 //! |-------|-------|

@@ -81,6 +81,17 @@ pub const KMD_SPREAD: f64 = 0.02;
 pub const KMD_NON_HOMOLOGUE: f64 = 0.005;
 
 // ═══════════════════════════════════════════════════════════════════
+// EIC / Extracted Ion Chromatogram
+// ═══════════════════════════════════════════════════════════════════
+
+/// EIC trapezoid area integration tolerance.
+///
+/// Trapezoid rule integration of extracted ion chromatogram peaks
+/// matches analytical expectation within 1% (same order as [`KMD_GROUPING`]).
+/// Validated: Exp252 (`BarraCuda` CPU v19), D24 EIC domain.
+pub const EIC_TRAPEZOID: f64 = 0.01;
+
+// ═══════════════════════════════════════════════════════════════════
 // Peak detection / signal processing
 // ═══════════════════════════════════════════════════════════════════
 

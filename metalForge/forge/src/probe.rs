@@ -145,15 +145,16 @@ fn probe_cpu_platform() -> CpuProbeResult {
 
 /// Default device node for NPU hardware.
 ///
-/// Override with `WETSPRING_NPU_DEVICE` for alternate installations or
-/// different NPU vendors.
+/// `BrainChip` AKD1000 default device path: `/dev/akida0`. This is the primary
+/// NPU substrate in wetSpring's capability discovery. Overridable via
+/// `WETSPRING_NPU_DEVICE` for alternate installations or different NPU vendors.
 const DEFAULT_NPU_DEVICE: &str = "/dev/akida0";
 
 /// Probe for NPU devices via capability-based discovery.
 ///
 /// Discovery order:
 /// 1. `WETSPRING_NPU_DEVICE` env var (explicit override — any NPU vendor)
-/// 2. Scan `/dev/akida*` device nodes (BrainChip AKD series)
+/// 2. Scan `/dev/akida*` device nodes (`BrainChip` AKD series)
 ///
 /// Returns all discovered NPU substrates with their capabilities.
 #[must_use]

@@ -139,6 +139,7 @@ pub fn clusters_from_matrix(
 /// `n(g)` is total gene count. Alpha < 1 indicates open pangenome.
 ///
 /// Uses simple linear regression on log-log data.
+#[allow(clippy::cast_precision_loss)] // usize → f64 for log-log regression
 fn fit_heaps_law(clusters: &[GeneCluster], n_genomes: usize) -> Option<f64> {
     if n_genomes < 3 || clusters.is_empty() {
         return None;
@@ -176,6 +177,7 @@ fn fit_heaps_law(clusters: &[GeneCluster], n_genomes: usize) -> Option<f64> {
 /// Tests whether `k` successes in `n` draws from a population of `big_n`
 /// with `big_k` total successes is significant.
 #[must_use]
+#[allow(clippy::cast_precision_loss)] // usize → f64 for normal approximation
 pub fn hypergeometric_pvalue(k: usize, n: usize, big_k: usize, big_n: usize) -> f64 {
     if big_n == 0 || n == 0 || big_k == 0 {
         return 1.0;
@@ -200,6 +202,7 @@ pub fn hypergeometric_pvalue(k: usize, n: usize, big_k: usize, big_n: usize) -> 
 
 /// Benjamini-Hochberg FDR correction.
 #[must_use]
+#[allow(clippy::cast_precision_loss)] // usize → f64 for rank adjustment
 pub fn benjamini_hochberg(pvalues: &[f64]) -> Vec<f64> {
     let n = pvalues.len();
     if n == 0 {

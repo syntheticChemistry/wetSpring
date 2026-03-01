@@ -151,7 +151,6 @@ fn handle_connection(stream: &std::os::unix::net::UnixStream, metrics: &Metrics)
 
         let response = match protocol::parse_request(&line) {
             Ok(req) => {
-                let method = req.method.clone();
                 // Server-level intercept for metrics (needs Metrics reference)
                 let result = if req.method == "metrics.snapshot" {
                     Ok(metrics.snapshot())
@@ -160,11 +159,11 @@ fn handle_connection(stream: &std::os::unix::net::UnixStream, metrics: &Metrics)
                 };
                 match result {
                     Ok(result) => {
-                        metrics.record_success(&method, start.elapsed());
+                        metrics.record_success(&req.method, start.elapsed());
                         protocol::success_response(&req.id, &result)
                     }
                     Err(rpc_err) => {
-                        metrics.record_error(&method, start.elapsed());
+                        metrics.record_error(&req.method, start.elapsed());
                         protocol::error_response(&req.id, rpc_err.code, &rpc_err.message)
                     }
                 }

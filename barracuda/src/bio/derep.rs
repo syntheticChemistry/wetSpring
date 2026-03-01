@@ -97,13 +97,13 @@ pub fn dereplicate(
                 }
             }
             std::collections::hash_map::Entry::Vacant(e) => {
-                let sequence = e.key().clone();
+                let sequence = e.key().clone(); // ownership transfer: key stays in map
                 e.insert(UniqueSequence {
                     sequence,
                     abundance: 1,
                     best_quality: mean_q,
-                    representative_id: record.id.clone(),
-                    representative_quality: record.quality.clone(),
+                    representative_id: record.id.clone(), // ownership transfer: borrowed input requires clone
+                    representative_quality: record.quality.clone(), // ownership transfer: borrowed input requires clone
                 });
             }
         }

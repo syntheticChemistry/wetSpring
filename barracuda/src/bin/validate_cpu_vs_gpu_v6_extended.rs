@@ -19,7 +19,7 @@
 //! CPU is the reference; GPU must match within tolerance.
 //! Wall-clock timing captures both paths.
 //!
-//! Chain: Paper → CPU → GPU → **Parity (this)** → ToadStool Dispatch → metalForge
+//! Chain: Paper → CPU → GPU → **Parity (this)** → `ToadStool` Dispatch → `metalForge`
 //!
 //! | Field | Value |
 //! |-------|-------|
@@ -237,7 +237,7 @@ fn main() {
     let parents_cpu = vec![Some(4), Some(4), Some(3), Some(4), None];
     let parents_gpu: Vec<i64> = parents_cpu
         .iter()
-        .map(|p| p.map_or(-1, |x| x as i64))
+        .map(|p| p.map_or(-1, |x| i64::try_from(x).expect("index fits i64")))
         .collect();
     let cal = vec![molecular_clock::CalibrationPoint {
         node_id: 4,

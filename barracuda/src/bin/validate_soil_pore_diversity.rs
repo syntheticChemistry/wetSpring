@@ -63,21 +63,6 @@ fn generate_community(richness: usize, evenness: f64, seed: u64) -> Vec<f64> {
     abundances
 }
 
-fn bray_curtis_cpu(a: &[f64], b: &[f64]) -> f64 {
-    let max_len = a.len().max(b.len());
-    let mut sum_min = 0.0;
-    let mut sum_a = 0.0;
-    let mut sum_b = 0.0;
-    for i in 0..max_len {
-        let ai = if i < a.len() { a[i] } else { 0.0 };
-        let bi = if i < b.len() { b[i] } else { 0.0 };
-        sum_min += ai.min(bi);
-        sum_a += ai;
-        sum_b += bi;
-    }
-    1.0 - 2.0 * sum_min / (sum_a + sum_b)
-}
-
 fn main() {
     let mut v = Validator::new("Exp171: Soil Pore Diversity (Feng et al. 2024)");
 
@@ -203,7 +188,7 @@ fn main() {
     for ci in 0..pore_classes.len() {
         for i in 0..n_replicates {
             for j in (i + 1)..n_replicates {
-                let bc = bray_curtis_cpu(&all_communities[ci][i], &all_communities[ci][j]);
+                let bc = diversity::bray_curtis(&all_communities[ci][i], &all_communities[ci][j]);
                 within_class_bc.push(bc);
             }
         }
@@ -213,7 +198,8 @@ fn main() {
         for cj in (ci + 1)..pore_classes.len() {
             for ri in 0..n_replicates {
                 for rj in 0..n_replicates {
-                    let bc = bray_curtis_cpu(&all_communities[ci][ri], &all_communities[cj][rj]);
+                    let bc =
+                        diversity::bray_curtis(&all_communities[ci][ri], &all_communities[cj][rj]);
                     between_class_bc.push(bc);
                 }
             }

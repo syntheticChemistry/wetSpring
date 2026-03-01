@@ -250,7 +250,7 @@ fn validate_bray_curtis(gpu: &GpuF64, v: &mut Validator) {
             &format!("Bray-Curtis 10×50 (max diff {max_diff:.2e}, {n_pairs} pairs)"),
             f64::from(u8::from(bc_passed)),
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
     }
 }
@@ -308,7 +308,7 @@ fn validate_pcoa(gpu: &GpuF64, v: &mut Validator) {
             &format!("PCoA reconstructed distances (max diff {max_dist_diff:.2e})"),
             f64::from(u8::from(dist_passed)),
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
 
         // Proportion explained should match CPU
@@ -370,7 +370,7 @@ fn validate_pairwise_l2(gpu: &GpuF64, v: &mut Validator) {
             &format!("PairwiseL2 4×2 (max diff {max_diff:.2e}, f32 tolerance 1e-5)"),
             f64::from(u8::from(all_ok)),
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
     }
 }
@@ -500,7 +500,7 @@ fn validate_spectral_match(gpu: &GpuF64, v: &mut Validator) {
             "Library match: reversed < 1",
             f64::from(u8::from(gpu_scores[1] < 1.0)),
             1.0,
-            0.0,
+            tolerances::EXACT,
         );
     }
 }

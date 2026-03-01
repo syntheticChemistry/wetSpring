@@ -11,7 +11,7 @@ use std::io::Write;
 use std::path::Path;
 use tempfile::TempDir;
 use wetspring_barracuda::encoding::base64_encode;
-use wetspring_barracuda::io::{fastq, ms2, mzml};
+use wetspring_barracuda::io::{fastq, ms2, mzml, nanopore};
 
 use flate2::Compression;
 use flate2::write::GzEncoder;
@@ -288,6 +288,100 @@ fn mzml_streaming_stats_match_collected() {
 #[test]
 fn mzml_nonexistent_file() {
     assert!(mzml::MzmlIter::open(Path::new("/nonexistent/file.mzML")).is_err());
+}
+
+// ── Error-path tests: malformed inputs ─────────────────────────
+
+#[test]
+fn mzml_invalid_xml_rejected() {
+    let dir = TempDir::new().unwrap();
+    let path = dir.path().join("invalid_xml.mzML");
+    let mut f = File::create(&path).unwrap();
+    f.write_all(b"<?xml version=\"1.0\"?><root><unclosed")
+        .unwrap();
+
+    let results: Vec<_> = mzml::MzmlIter::open(&path).unwrap().collect();
+    assert!(!results.is_empty());
+    assert!(
+        results[0].is_err(),
+        "Invalid XML should yield parse error, got {:?}",
+        results[0]
+    );
+}
+
+#[test]
+fn mzml_missing_required_elements() {
+    let dir = TempDir::new().unwrap();
+    let path = dir.path().join("minimal_bad.mzML");
+    let mut f = File::create(&path).unwrap();
+    // Valid XML but no spectrumList/spectrum — parser yields empty
+    f.write_all(b"<?xml version=\"1.0\"?><indexedmzML><mzML><run></run></mzML></indexedmzML>")
+        .unwrap();
+
+    let spectra = collect_mzml(&path);
+    assert!(spectra.is_empty());
+}
+
+#[test]
+fn ms2_malformed_headers_rejected() {
+    let dir = TempDir::new().unwrap();
+    let path = dir.path().join("malformed_hdr.ms2");
+    let mut f = File::create(&path).unwrap();
+    writeln!(f, "H\tCreatedBy\ttest").unwrap();
+    writeln!(f, "S").unwrap(); // S-line missing scan and precursor m/z
+    writeln!(f, "100.0\t200.0").unwrap();
+
+    let result = ms2::Ms2Iter::open(&path).and_then(|i| i.collect::<Result<Vec<_>, _>>());
+    assert!(result.is_err());
+    let err_msg = result.unwrap_err().to_string();
+    assert!(
+        err_msg.contains("S-line") || err_msg.contains("scan") || err_msg.contains("Ms2"),
+        "Error should mention S-line/scan: {err_msg}"
+    );
+}
+
+#[test]
+fn ms2_invalid_peak_data_ignored() {
+    let dir = TempDir::new().unwrap();
+    let path = dir.path().join("invalid_peaks.ms2");
+    let mut f = File::create(&path).unwrap();
+    writeln!(f, "S\t1\t1\t450.0").unwrap();
+    writeln!(f, "I\tRTime\t3.0").unwrap();
+    writeln!(f, "Z\t2\t899.0").unwrap();
+    writeln!(f, "100.0\t500.0").unwrap();
+    writeln!(f, "not_a_number\t300.0").unwrap();
+    writeln!(f, "200.0\tbad").unwrap();
+    writeln!(f, "single_field").unwrap();
+    writeln!(f, "300.0\t100.0").unwrap();
+
+    let spectra = collect_ms2(&path);
+    assert_eq!(spectra.len(), 1);
+    assert_eq!(spectra[0].mz_array.len(), 2); // only 100.0 and 300.0 parse
+}
+
+#[test]
+fn nanopore_nrs_truncated_data_rejected() {
+    let dir = TempDir::new().unwrap();
+    let path = dir.path().join("truncated.nrs");
+    let mut f = File::create(&path).unwrap();
+    f.write_all(b"NRS1").unwrap();
+    f.write_all(&1u64.to_le_bytes()).unwrap();
+    // Truncated record: read_id (16 bytes) + channel (4) + sample_rate (8) + ...
+    // Write partial header then stop
+    f.write_all(&[0u8; 16]).unwrap();
+    f.write_all(&1u32.to_le_bytes()).unwrap();
+    f.write_all(&4000.0f64.to_le_bytes()).unwrap();
+    // Omit rest of record (calibration_offset, calibration_scale, signal_length, signal)
+    drop(f);
+
+    let iter = nanopore::NanoporeIter::open(&path).expect("open");
+    let results: Vec<_> = iter.collect();
+    assert_eq!(results.len(), 1);
+    assert!(
+        results[0].is_err(),
+        "Truncated NRS should yield error, got {:?}",
+        results[0]
+    );
 }
 
 // ── FASTQ synthetic file round-trip ─────────────────────────────

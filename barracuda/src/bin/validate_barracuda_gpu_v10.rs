@@ -12,18 +12,18 @@
     clippy::items_after_statements,
     clippy::float_cmp
 )]
-//! # Exp250: BarraCuda GPU v10 — Cross-Spring Bio+Linalg GPU Ops
+//! # Exp250: `BarraCuda` GPU v10 — Cross-Spring Bio+Linalg GPU Ops
 //!
-//! Wires 5 new GPU ops from ToadStool S70+++ into wetSpring and validates
+//! Wires 5 new GPU ops from `ToadStool` S70+++ into wetSpring and validates
 //! their construction + dispatch. Documents upstream findings for S71.
 //!
 //! | Op | Domain | Provenance |
 //! |----|--------|------------|
-//! | `WrightFisherGpu` | popgen | neuralSpring → ToadStool S68 |
-//! | `StencilCooperationGpu` | spatial games | neuralSpring → ToadStool S68 |
-//! | `HillGateGpu` | regulatory nets | neuralSpring → ToadStool S68 |
-//! | `SymmetrizeGpu` | linalg | neuralSpring → ToadStool S65 |
-//! | `LaplacianGpu` | linalg | neuralSpring → ToadStool S65 |
+//! | `WrightFisherGpu` | popgen | `neuralSpring` → `ToadStool` S68 |
+//! | `StencilCooperationGpu` | spatial games | `neuralSpring` → `ToadStool` S68 |
+//! | `HillGateGpu` | regulatory nets | `neuralSpring` → `ToadStool` S68 |
+//! | `SymmetrizeGpu` | linalg | `neuralSpring` → `ToadStool` S65 |
+//! | `LaplacianGpu` | linalg | `neuralSpring` → `ToadStool` S65 |
 //!
 //! ## Upstream Findings (S71 ticket)
 //!
@@ -93,13 +93,26 @@ fn main() {
 
     let cpu_shannon = diversity::shannon(&ab);
     let cpu_simpson = diversity::simpson(&ab);
-    v.check("Shannon: GPU ≈ CPU", gpu_shannon, cpu_shannon, tolerances::GPU_VS_CPU_F64);
-    v.check("Simpson: GPU ≈ CPU", gpu_simpson, cpu_simpson, tolerances::GPU_VS_CPU_F64);
+    v.check(
+        "Shannon: GPU ≈ CPU",
+        gpu_shannon,
+        cpu_shannon,
+        tolerances::GPU_VS_CPU_F64,
+    );
+    v.check(
+        "Simpson: GPU ≈ CPU",
+        gpu_simpson,
+        cpu_simpson,
+        tolerances::GPU_VS_CPU_F64,
+    );
     println!("  diversity_gpu sanity: {g01_us:.0} µs");
 
     timings.push(GpuTiming {
-        op: "diversity_gpu (sanity)", origin: "wetSpring", absorbed: "S44",
-        gpu_us: g01_us, status: "PASS",
+        op: "diversity_gpu (sanity)",
+        origin: "wetSpring",
+        absorbed: "S44",
+        gpu_us: g01_us,
+        status: "PASS",
     });
 
     // ═══ G02: WrightFisherGpu — Construction + Dispatch ════════════════════
@@ -116,30 +129,46 @@ fn main() {
         let two_n: u32 = 200;
         let total = (n_pops * n_loci) as usize;
 
-        let freq_in: Vec<f64> = (0..total).map(|i| (0.1 + 0.005 * i as f64).min(0.99)).collect();
+        let freq_in: Vec<f64> = (0..total)
+            .map(|i| (0.1 + 0.005 * i as f64).min(0.99))
+            .collect();
         let selection: Vec<f64> = (0..n_loci as usize).map(|i| 0.001 * i as f64).collect();
-        let prng_state: Vec<u32> = (0..(total * 4)).map(|i| (i as u32).wrapping_mul(2654435761) ^ 0xDEAD_BEEF).collect();
+        let prng_state: Vec<u32> = (0..(total * 4))
+            .map(|i| (i as u32).wrapping_mul(2_654_435_761) ^ 0xDEAD_BEEF)
+            .collect();
 
         let freq_in_buf = wgpu_dev.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("WF freq_in"), contents: bytemuck::cast_slice(&freq_in),
+            label: Some("WF freq_in"),
+            contents: bytemuck::cast_slice(&freq_in),
             usage: wgpu::BufferUsages::STORAGE,
         });
         let sel_buf = wgpu_dev.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("WF sel"), contents: bytemuck::cast_slice(&selection),
+            label: Some("WF sel"),
+            contents: bytemuck::cast_slice(&selection),
             usage: wgpu::BufferUsages::STORAGE,
         });
         let out_buf = wgpu_dev.create_buffer(&wgpu::BufferDescriptor {
-            label: Some("WF out"), size: (total * 8) as u64,
+            label: Some("WF out"),
+            size: (total * 8) as u64,
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
             mapped_at_creation: false,
         });
         let prng_buf = wgpu_dev.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("WF PRNG"), contents: bytemuck::cast_slice(&prng_state),
+            label: Some("WF PRNG"),
+            contents: bytemuck::cast_slice(&prng_state),
             usage: wgpu::BufferUsages::STORAGE,
         });
 
         let t = Instant::now();
-        wf.dispatch(&freq_in_buf, &sel_buf, &out_buf, &prng_buf, n_pops, n_loci, two_n);
+        wf.dispatch(
+            &freq_in_buf,
+            &sel_buf,
+            &out_buf,
+            &prng_buf,
+            n_pops,
+            n_loci,
+            two_n,
+        );
         wgpu_dev.poll(wgpu::Maintain::Wait);
         let us = t.elapsed().as_micros() as f64;
 
@@ -147,26 +176,42 @@ fn main() {
         (freq_out, freq_in, us)
     }));
 
-    match wf_result {
-        Ok((freq_out, freq_in, us)) => {
-            v.check_pass("WF: constructed + dispatched", true);
-            v.check_pass("WF: all ∈ [0, 1]", freq_out.iter().all(|&f| (0.0..=1.0).contains(&f)));
-            let changed = freq_in.iter().zip(freq_out.iter()).filter(|&(a, b)| (a - b).abs() > 1e-15).count();
-            v.check_pass("WF: drift occurred", changed > 0);
-            println!("  WrightFisher: {us:.0} µs, {changed}/{} loci changed", freq_out.len());
-            timings.push(GpuTiming {
-                op: "WrightFisherGpu 8×16", origin: "neuralSpring", absorbed: "S68",
-                gpu_us: us, status: "PASS",
-            });
-        }
-        Err(_) => {
-            v.check_pass("WF: f64 shader needs compile_shader_f64 preprocessing (Hybrid GPU)", true);
-            println!("  WrightFisher: enable f64 not supported on Hybrid — needs S71 DF64 translation");
-            timings.push(GpuTiming {
-                op: "WrightFisherGpu 8×16", origin: "neuralSpring", absorbed: "S68",
-                gpu_us: 0.0, status: "NEEDS_DF64",
-            });
-        }
+    if let Ok((freq_out, freq_in, us)) = wf_result {
+        v.check_pass("WF: constructed + dispatched", true);
+        v.check_pass(
+            "WF: all ∈ [0, 1]",
+            freq_out.iter().all(|&f| (0.0..=1.0).contains(&f)),
+        );
+        let changed = freq_in
+            .iter()
+            .zip(freq_out.iter())
+            .filter(|&(a, b)| (a - b).abs() > 1e-15)
+            .count();
+        v.check_pass("WF: drift occurred", changed > 0);
+        println!(
+            "  WrightFisher: {us:.0} µs, {changed}/{} loci changed",
+            freq_out.len()
+        );
+        timings.push(GpuTiming {
+            op: "WrightFisherGpu 8×16",
+            origin: "neuralSpring",
+            absorbed: "S68",
+            gpu_us: us,
+            status: "PASS",
+        });
+    } else {
+        v.check_pass(
+            "WF: f64 shader needs compile_shader_f64 preprocessing (Hybrid GPU)",
+            true,
+        );
+        println!("  WrightFisher: enable f64 not supported on Hybrid — needs S71 DF64 translation");
+        timings.push(GpuTiming {
+            op: "WrightFisherGpu 8×16",
+            origin: "neuralSpring",
+            absorbed: "S68",
+            gpu_us: 0.0,
+            status: "NEEDS_DF64",
+        });
     }
 
     // ═══ G03: StencilCooperationGpu — Spatial Game Theory ══════════════════
@@ -183,15 +228,18 @@ fn main() {
         let fitness: Vec<f64> = (0..n_cells).map(|i| 1.0 + 0.1 * (i as f64).sin()).collect();
 
         let strat_buf = wgpu_dev.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("S strat"), contents: bytemuck::cast_slice(&strategies),
+            label: Some("S strat"),
+            contents: bytemuck::cast_slice(&strategies),
             usage: wgpu::BufferUsages::STORAGE,
         });
         let fit_buf = wgpu_dev.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("S fit"), contents: bytemuck::cast_slice(&fitness),
+            label: Some("S fit"),
+            contents: bytemuck::cast_slice(&fitness),
             usage: wgpu::BufferUsages::STORAGE,
         });
         let new_buf = wgpu_dev.create_buffer(&wgpu::BufferDescriptor {
-            label: Some("S new"), size: (n_cells * 4) as u64,
+            label: Some("S new"),
+            size: (n_cells * 4) as u64,
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
             mapped_at_creation: false,
         });
@@ -205,25 +253,31 @@ fn main() {
         (new_strats, n_cells, us)
     }));
 
-    match stencil_result {
-        Ok((strats, n_cells, us)) => {
-            v.check_pass("Stencil: constructed + dispatched", true);
-            v.check_pass("Stencil: all 0 or 1", strats.iter().all(|&s| s <= 1));
-            let coop = strats.iter().filter(|&&s| s == 1).count();
-            println!("  Stencil: {us:.0} µs, cooperators={coop}/{n_cells}");
-            timings.push(GpuTiming {
-                op: "StencilCoopGpu 16×16", origin: "neuralSpring", absorbed: "S68",
-                gpu_us: us, status: "PASS",
-            });
-        }
-        Err(_) => {
-            v.check_pass("Stencil: f64 shader needs DF64 translation (Hybrid GPU)", true);
-            println!("  Stencil: enable f64 not supported on Hybrid — needs S71 DF64 translation");
-            timings.push(GpuTiming {
-                op: "StencilCoopGpu 16×16", origin: "neuralSpring", absorbed: "S68",
-                gpu_us: 0.0, status: "NEEDS_DF64",
-            });
-        }
+    if let Ok((strats, n_cells, us)) = stencil_result {
+        v.check_pass("Stencil: constructed + dispatched", true);
+        v.check_pass("Stencil: all 0 or 1", strats.iter().all(|&s| s <= 1));
+        let coop = strats.iter().filter(|&&s| s == 1).count();
+        println!("  Stencil: {us:.0} µs, cooperators={coop}/{n_cells}");
+        timings.push(GpuTiming {
+            op: "StencilCoopGpu 16×16",
+            origin: "neuralSpring",
+            absorbed: "S68",
+            gpu_us: us,
+            status: "PASS",
+        });
+    } else {
+        v.check_pass(
+            "Stencil: f64 shader needs DF64 translation (Hybrid GPU)",
+            true,
+        );
+        println!("  Stencil: enable f64 not supported on Hybrid — needs S71 DF64 translation");
+        timings.push(GpuTiming {
+            op: "StencilCoopGpu 16×16",
+            origin: "neuralSpring",
+            absorbed: "S68",
+            gpu_us: 0.0,
+            status: "NEEDS_DF64",
+        });
     }
 
     // ═══ G04: HillGateGpu — Two-Input Regulatory Logic ═════════════════════
@@ -239,22 +293,32 @@ fn main() {
         let input_b: Vec<f64> = (0..n_hill as usize).map(|i| 0.1 + i as f64 * 0.3).collect();
 
         let a_buf = wgpu_dev.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("Hill A"), contents: bytemuck::cast_slice(&input_a),
+            label: Some("Hill A"),
+            contents: bytemuck::cast_slice(&input_a),
             usage: wgpu::BufferUsages::STORAGE,
         });
         let b_buf = wgpu_dev.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("Hill B"), contents: bytemuck::cast_slice(&input_b),
+            label: Some("Hill B"),
+            contents: bytemuck::cast_slice(&input_b),
             usage: wgpu::BufferUsages::STORAGE,
         });
         let out_buf = wgpu_dev.create_buffer(&wgpu::BufferDescriptor {
-            label: Some("Hill out"), size: (n_hill as usize * 8) as u64,
+            label: Some("Hill out"),
+            size: (n_hill as usize * 8) as u64,
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
             mapped_at_creation: false,
         });
         let params = HillGateParams {
-            n_a: n_hill, n_b: n_hill, mode: 0, _pad: 0,
-            k_a: 5.0, k_b: 5.0, n_a_exp: 2.0, n_b_exp: 2.0,
-            vmax: 1.0, _pad2: 0.0,
+            n_a: n_hill,
+            n_b: n_hill,
+            mode: 0,
+            _pad: 0,
+            k_a: 5.0,
+            k_b: 5.0,
+            n_a_exp: 2.0,
+            n_b_exp: 2.0,
+            vmax: 1.0,
+            _pad2: 0.0,
         };
 
         let t = Instant::now();
@@ -266,32 +330,38 @@ fn main() {
         (hill_out, input_a, input_b, us)
     }));
 
-    match hill_result {
-        Ok((hill_out, input_a, input_b, us)) => {
-            v.check_pass("Hill: constructed + dispatched", true);
-            v.check_pass("Hill: all ∈ [0, 1]", hill_out.iter().all(|&h| (0.0..=1.0).contains(&h)));
-            let mut max_err = 0.0_f64;
-            for i in 0..hill_out.len() {
-                let (a, b) = (input_a[i], input_b[i]);
-                let ha = a.powf(2.0) / (25.0 + a.powf(2.0));
-                let hb = b.powf(2.0) / (25.0 + b.powf(2.0));
-                max_err = max_err.max((hill_out[i] - ha * hb).abs());
-            }
-            v.check("Hill GPU ≈ CPU", max_err, 0.0, tolerances::GPU_VS_CPU_F64);
-            println!("  HillGate: {us:.0} µs, max_err={max_err:.2e}");
-            timings.push(GpuTiming {
-                op: "HillGateGpu 32 paired", origin: "neuralSpring", absorbed: "S68",
-                gpu_us: us, status: "PASS",
-            });
+    if let Ok((hill_out, input_a, input_b, us)) = hill_result {
+        v.check_pass("Hill: constructed + dispatched", true);
+        v.check_pass(
+            "Hill: all ∈ [0, 1]",
+            hill_out.iter().all(|&h| (0.0..=1.0).contains(&h)),
+        );
+        let mut max_err = 0.0_f64;
+        for i in 0..hill_out.len() {
+            let (a, b) = (input_a[i], input_b[i]);
+            let ha = a.powf(2.0) / (25.0 + a.powf(2.0));
+            let hb = b.powf(2.0) / (25.0 + b.powf(2.0));
+            max_err = max_err.max((hill_out[i] - ha * hb).abs());
         }
-        Err(_) => {
-            v.check_pass("Hill: f64 shader needs DF64 translation (Hybrid GPU)", true);
-            println!("  HillGate: enable f64 not supported on Hybrid — needs S71 DF64 translation");
-            timings.push(GpuTiming {
-                op: "HillGateGpu 32 paired", origin: "neuralSpring", absorbed: "S68",
-                gpu_us: 0.0, status: "NEEDS_DF64",
-            });
-        }
+        v.check("Hill GPU ≈ CPU", max_err, 0.0, tolerances::GPU_VS_CPU_F64);
+        println!("  HillGate: {us:.0} µs, max_err={max_err:.2e}");
+        timings.push(GpuTiming {
+            op: "HillGateGpu 32 paired",
+            origin: "neuralSpring",
+            absorbed: "S68",
+            gpu_us: us,
+            status: "PASS",
+        });
+    } else {
+        v.check_pass("Hill: f64 shader needs DF64 translation (Hybrid GPU)", true);
+        println!("  HillGate: enable f64 not supported on Hybrid — needs S71 DF64 translation");
+        timings.push(GpuTiming {
+            op: "HillGateGpu 32 paired",
+            origin: "neuralSpring",
+            absorbed: "S68",
+            gpu_us: 0.0,
+            status: "NEEDS_DF64",
+        });
     }
 
     // ═══ G05: SymmetrizeGpu + LaplacianGpu ═════════════════════════════════
@@ -302,23 +372,26 @@ fn main() {
         let sym = SymmetrizeGpu::new(Arc::clone(&device)).unwrap();
         sym.execute(&[1.0, 2.0, 3.0, 4.0], 2)
     }));
-    match sym_result {
-        Ok(Ok(r)) => {
-            v.check_pass("SymmetrizeGpu: dispatched", true);
-            println!("  SymmetrizeGpu 2×2: {r:?}");
-            timings.push(GpuTiming {
-                op: "SymmetrizeGpu", origin: "neuralSpring", absorbed: "S65",
-                gpu_us: 0.0, status: "PASS",
-            });
-        }
-        _ => {
-            v.check_pass("SymmetrizeGpu: uniform alignment issue filed for S71", true);
-            println!("  SymmetrizeGpu: 4B params buffer < 16B WGSL minimum on Vulkan");
-            timings.push(GpuTiming {
-                op: "SymmetrizeGpu", origin: "neuralSpring", absorbed: "S65",
-                gpu_us: 0.0, status: "S71_FIX",
-            });
-        }
+    if let Ok(Ok(r)) = sym_result {
+        v.check_pass("SymmetrizeGpu: dispatched", true);
+        println!("  SymmetrizeGpu 2×2: {r:?}");
+        timings.push(GpuTiming {
+            op: "SymmetrizeGpu",
+            origin: "neuralSpring",
+            absorbed: "S65",
+            gpu_us: 0.0,
+            status: "PASS",
+        });
+    } else {
+        v.check_pass("SymmetrizeGpu: uniform alignment issue filed for S71", true);
+        println!("  SymmetrizeGpu: 4B params buffer < 16B WGSL minimum on Vulkan");
+        timings.push(GpuTiming {
+            op: "SymmetrizeGpu",
+            origin: "neuralSpring",
+            absorbed: "S65",
+            gpu_us: 0.0,
+            status: "S71_FIX",
+        });
     }
 
     let lap_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
@@ -326,24 +399,30 @@ fn main() {
         let lap = LaplacianGpu::new(Arc::clone(&device)).unwrap();
         lap.execute(&[0.0, 1.0, 1.0, 0.0], 2)
     }));
-    match lap_result {
-        Ok(Ok(r)) => {
-            v.check_pass("LaplacianGpu: dispatched", true);
-            v.check("LaplacianGpu row-sum", r.iter().sum::<f64>(), 0.0, 1e-10);
-            println!("  LaplacianGpu 2×2: {r:?}");
-            timings.push(GpuTiming {
-                op: "LaplacianGpu", origin: "neuralSpring", absorbed: "S65",
-                gpu_us: 0.0, status: "PASS",
-            });
-        }
-        _ => {
-            v.check_pass("LaplacianGpu: same uniform alignment issue filed for S71", true);
-            println!("  LaplacianGpu: same 4B→16B uniform buffer fix needed");
-            timings.push(GpuTiming {
-                op: "LaplacianGpu", origin: "neuralSpring", absorbed: "S65",
-                gpu_us: 0.0, status: "S71_FIX",
-            });
-        }
+    if let Ok(Ok(r)) = lap_result {
+        v.check_pass("LaplacianGpu: dispatched", true);
+        v.check("LaplacianGpu row-sum", r.iter().sum::<f64>(), 0.0, 1e-10);
+        println!("  LaplacianGpu 2×2: {r:?}");
+        timings.push(GpuTiming {
+            op: "LaplacianGpu",
+            origin: "neuralSpring",
+            absorbed: "S65",
+            gpu_us: 0.0,
+            status: "PASS",
+        });
+    } else {
+        v.check_pass(
+            "LaplacianGpu: same uniform alignment issue filed for S71",
+            true,
+        );
+        println!("  LaplacianGpu: same 4B→16B uniform buffer fix needed");
+        timings.push(GpuTiming {
+            op: "LaplacianGpu",
+            origin: "neuralSpring",
+            absorbed: "S65",
+            gpu_us: 0.0,
+            status: "S71_FIX",
+        });
     }
 
     // ═══ G06: CPU Graph Laplacian Benchmark (validated fallback) ════════════
@@ -365,15 +444,23 @@ fn main() {
     let cpu_lap_us = t6.elapsed().as_micros() as f64;
 
     v.check_pass("CPU Laplacian: non-empty", !lap_cpu.is_empty());
-    let row_sum: f64 = (0..n_bench).map(|i| {
-        (0..n_bench).map(|j| lap_cpu[i * n_bench + j]).sum::<f64>().abs()
-    }).sum();
+    let row_sum: f64 = (0..n_bench)
+        .map(|i| {
+            (0..n_bench)
+                .map(|j| lap_cpu[i * n_bench + j])
+                .sum::<f64>()
+                .abs()
+        })
+        .sum();
     v.check("CPU Laplacian row-sum ≈ 0", row_sum, 0.0, 1e-10);
     println!("  CPU graph_laplacian 128×128: {cpu_lap_us:.0} µs (validated fallback)");
 
     timings.push(GpuTiming {
-        op: "CPU Laplacian 128×128", origin: "neuralSpring", absorbed: "S51",
-        gpu_us: cpu_lap_us, status: "CPU_OK",
+        op: "CPU Laplacian 128×128",
+        origin: "neuralSpring",
+        absorbed: "S51",
+        gpu_us: cpu_lap_us,
+        status: "CPU_OK",
     });
 
     // ═══ Report ════════════════════════════════════════════════════════════
@@ -381,13 +468,21 @@ fn main() {
     println!("╔═══════════════════════════════════════════════════════════════════════════╗");
     println!("║         GPU v10 — Cross-Spring Provenance + Status Report                ║");
     println!("╠═══════════════════════════════════════════════════════════════════════════╣");
-    println!("║ {:24} │ {:14} │ {:5} │ {:>8} │ {:10} ║",
-        "Operation", "Origin", "At", "µs", "Status");
+    println!(
+        "║ {:24} │ {:14} │ {:5} │ {:>8} │ {:10} ║",
+        "Operation", "Origin", "At", "µs", "Status"
+    );
     println!("╠═══════════════════════════════════════════════════════════════════════════╣");
     for t in &timings {
-        let us_str = if t.gpu_us > 0.0 { format!("{:.0}", t.gpu_us) } else { "—".into() };
-        println!("║ {:24} │ {:14} │ {:5} │ {:>8} │ {:10} ║",
-            t.op, t.origin, t.absorbed, us_str, t.status);
+        let us_str = if t.gpu_us > 0.0 {
+            format!("{:.0}", t.gpu_us)
+        } else {
+            "—".into()
+        };
+        println!(
+            "║ {:24} │ {:14} │ {:5} │ {:>8} │ {:10} ║",
+            t.op, t.origin, t.absorbed, us_str, t.status
+        );
     }
     println!("╚═══════════════════════════════════════════════════════════════════════════╝");
 

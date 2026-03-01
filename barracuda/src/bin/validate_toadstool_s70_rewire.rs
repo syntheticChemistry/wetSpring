@@ -10,14 +10,14 @@
     clippy::similar_names,
     clippy::float_cmp
 )]
-//! # Exp247: ToadStool S70+++ Rewire Validation
+//! # Exp247: `ToadStool` S70+++ Rewire Validation
 //!
-//! Validates wetSpring consumption of ToadStool S70+ new stats primitives:
+//! Validates wetSpring consumption of `ToadStool` S70+ new stats primitives:
 //! - `stats::evolution` — Kimura fixation, Eigen error threshold, detection power/threshold
 //! - `stats::jackknife` — leave-one-out resampling, generalized jackknife
 //! - `stats::diversity::chao1_classic` — integer-count Chao1 (Chao 1984)
 //!
-//! These primitives were absorbed from groundSpring into ToadStool at S70.
+//! These primitives were absorbed from groundSpring into `ToadStool` at S70.
 //! wetSpring now consumes them directly for rare biosphere and population genetics.
 //!
 //! | Field | Value |
@@ -92,7 +92,12 @@ fn main() {
     v.check_pass("More reads → higher power", power_10k > power_1k);
     println!("  P(detect | p=0.001, D=10000) = {power_10k:.6}");
 
-    v.check("p=0 → power=0", barracuda::stats::detection_power(0.0, 10_000), 0.0, 1e-15);
+    v.check(
+        "p=0 → power=0",
+        barracuda::stats::detection_power(0.0, 10_000),
+        0.0,
+        1e-15,
+    );
     v.check(
         "p=1 → power=1",
         barracuda::stats::detection_power(1.0, 1),
@@ -128,7 +133,12 @@ fn main() {
     v.check("Mean = 3.0", jk.estimate, 3.0, 1e-12);
     v.check_pass("Variance ≥ 0", jk.variance >= 0.0);
     v.check_pass("Std error ≥ 0", jk.std_error >= 0.0);
-    v.check("Std error = sqrt(variance)", jk.std_error, jk.variance.sqrt(), 1e-15);
+    v.check(
+        "Std error = sqrt(variance)",
+        jk.std_error,
+        jk.variance.sqrt(),
+        1e-15,
+    );
     println!(
         "  Jackknife mean = {:.4}, var = {:.6}, se = {:.6}",
         jk.estimate, jk.variance, jk.std_error
@@ -152,10 +162,8 @@ fn main() {
     v.section("S6: Generalized Jackknife");
 
     let data_gen = [2.0, 4.0, 6.0, 8.0];
-    let jk_gen = barracuda::stats::jackknife(&data_gen, |d| {
-        d.iter().sum::<f64>() / d.len() as f64
-    })
-    .unwrap();
+    let jk_gen =
+        barracuda::stats::jackknife(&data_gen, |d| d.iter().sum::<f64>() / d.len() as f64).unwrap();
     v.check("Generalized mean ≈ 5.0", jk_gen.estimate, 5.0, 1e-10);
     v.check_pass("Generalized variance ≥ 0", jk_gen.variance >= 0.0);
     println!(
@@ -210,12 +218,19 @@ fn main() {
         "Both estimators > S_obs (unseen species detected)",
         chao1_float > s_obs && chao1_int > s_obs,
     );
-    println!("  chao1(f64, bias-corrected) = {chao1_float:.2}, chao1_classic(u64, Chao 1984) = {chao1_int:.2}");
+    println!(
+        "  chao1(f64, bias-corrected) = {chao1_float:.2}, chao1_classic(u64, Chao 1984) = {chao1_int:.2}"
+    );
 
     let no_singles: Vec<u64> = vec![10, 5, 3, 2, 20, 7];
     let chao1_no_f1 = barracuda::stats::chao1_classic(&no_singles);
     let s_obs_no = no_singles.iter().filter(|&&c| c > 0).count() as f64;
-    v.check("No singletons: chao1 == S_obs", chao1_no_f1, s_obs_no, 1e-12);
+    v.check(
+        "No singletons: chao1 == S_obs",
+        chao1_no_f1,
+        s_obs_no,
+        1e-12,
+    );
 
     let no_doubles: Vec<u64> = vec![10, 5, 3, 1, 1, 1, 20];
     let chao1_no_f2 = barracuda::stats::chao1_classic(&no_doubles);

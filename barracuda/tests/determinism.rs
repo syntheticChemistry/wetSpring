@@ -377,6 +377,93 @@ fn determinism_kmd() {
     }
 }
 
+// ── GPU determinism (feature = "gpu") ────────────────────────────────
+// Run twice, verify bitwise identical. Skip if GPU init fails (e.g. CI).
+
+#[cfg(feature = "gpu")]
+#[tokio::test]
+async fn gpu_diversity_shannon_deterministic() {
+    use wetspring_barracuda::bio::diversity_gpu;
+    use wetspring_barracuda::gpu::GpuF64;
+
+    let Ok(gpu) = GpuF64::new().await else { return };
+    if !gpu.has_f64 {
+        return;
+    }
+
+    let counts: Vec<f64> = (1..=200).map(|i| f64::from(i * 7 % 50 + 1)).collect();
+    let Ok(run1) = diversity_gpu::shannon_gpu(&gpu, &counts) else {
+        return;
+    };
+    let Ok(run2) = diversity_gpu::shannon_gpu(&gpu, &counts) else {
+        return;
+    };
+    assert_eq!(
+        run1.to_bits(),
+        run2.to_bits(),
+        "GPU Shannon must be bitwise identical"
+    );
+}
+
+#[cfg(feature = "gpu")]
+#[tokio::test]
+async fn gpu_diversity_simpson_deterministic() {
+    use wetspring_barracuda::bio::diversity_gpu;
+    use wetspring_barracuda::gpu::GpuF64;
+
+    let Ok(gpu) = GpuF64::new().await else { return };
+    if !gpu.has_f64 {
+        return;
+    }
+
+    let counts: Vec<f64> = (1..=100).map(|i| f64::from(i * 3 % 30 + 1)).collect();
+    let Ok(run1) = diversity_gpu::simpson_gpu(&gpu, &counts) else {
+        return;
+    };
+    let Ok(run2) = diversity_gpu::simpson_gpu(&gpu, &counts) else {
+        return;
+    };
+    assert_eq!(
+        run1.to_bits(),
+        run2.to_bits(),
+        "GPU Simpson must be bitwise identical"
+    );
+}
+
+#[cfg(feature = "gpu")]
+#[tokio::test]
+async fn gpu_diversity_bray_curtis_deterministic() {
+    use wetspring_barracuda::bio::diversity_gpu;
+    use wetspring_barracuda::gpu::GpuF64;
+
+    let Ok(gpu) = GpuF64::new().await else { return };
+    if !gpu.has_f64 {
+        return;
+    }
+
+    let samples: Vec<Vec<f64>> = (0..5)
+        .map(|i| {
+            (0..80)
+                .map(|j| f64::from((i * 37 + j * 13) % 50 + 1))
+                .collect()
+        })
+        .collect();
+    let Ok(run1) = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples) else {
+        return;
+    };
+    let Ok(run2) = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples) else {
+        return;
+    };
+    assert_eq!(run1.len(), run2.len());
+    for (a, b) in run1.iter().zip(run2.iter()) {
+        assert_eq!(
+            a.to_bits(),
+            b.to_bits(),
+            "GPU Bray-Curtis must be bitwise identical"
+        );
+    }
+}
+
 fn generate_16s_reads(n: usize, len: usize, seed: u64) -> String {
     let mut rng = seed;
     let bases = [b'A', b'C', b'G', b'T'];

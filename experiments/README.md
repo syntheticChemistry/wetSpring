@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-01 (Phase 85: 260 experiments, 223+ binaries, 6,656+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S70+++ (`1dd7e338`), 93 primitives consumed, barracuda always-on, 1,223 tests, 97 named tolerances, clippy pedantic CLEAN, 0 Passthrough, V85 EMP Atlas + NUCLEUS Primal Interaction + Genomic Vault, all 6 primals READY, IPC bit-identical 3.2× overhead)
+**Updated**: 2026-03-01 (Phase 86: 262 experiments, 221+ binaries, 6,656+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S70+++ (`1dd7e338`), 93 primitives consumed, barracuda always-on, 1,247 tests, 97 named tolerances, clippy pedantic CLEAN, 0 Passthrough, V86 cross-spring evolution + Deep Debt Elimination Round 3, all 6 primals READY, IPC bit-identical 3.2× overhead)
 
 ---
 
@@ -156,6 +156,9 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 257 | NUCLEUS Data Pipeline | NUCLEUS/IPC | DONE | Three-tier primal routing | validate_nucleus_data_pipeline | 9 |
 | 258 | NUCLEUS Tower-Node | NUCLEUS/deploy | DONE | All primals READY, IPC 3.2× overhead | validate_nucleus_tower_node | 13 |
 | 259 | Genomic Vault | vault/consent | DONE | Consent + encrypted storage + provenance | validate_genomic_vault | 30 |
+| 260 | Cross-Spring Evolution Validation | cross/GPU | DONE | 23/23 checks, all five Springs | validate_cross_spring_evolution_modern | 23 |
+| 261 | Cross-Spring Modern Benchmark | cross/GPU | DONE | 12 primitives benchmarked | benchmark_cross_spring_modern | 12 |
+| 262 | Deep Debt Elimination Round 3 | cross | DONE | Module refactors, test coverage, clone audit | (unit tests, refactors) | — |
 
 ---
 
@@ -350,10 +353,12 @@ thresholds from `src/tolerances.rs`.
 | `validate_nucleus_data_pipeline` | 257 | 9 | `cargo run --release --bin validate_nucleus_data_pipeline` |
 | `validate_nucleus_tower_node` | 258 | 13 | `cargo run --release --features ipc --bin validate_nucleus_tower_node` |
 | `validate_genomic_vault` | 259 | 30 | `cargo run --release --bin validate_genomic_vault` |
+| `validate_cross_spring_evolution_modern` | 260 | 23 | `cargo run --features gpu --bin validate_cross_spring_evolution_modern` |
+| `benchmark_cross_spring_modern` | 261 | 12 | `cargo run --release --features gpu --bin benchmark_cross_spring_modern` |
 
 **Total validation checks**: 6,656+
-**Rust tests**: 1,230 (975 barracuda lib + 60 integration + 22 doc + 166 forge + 7 vault integration)
-**Binaries**: 215 total (validate + benchmark + server)
+**Rust tests**: 1,247 (975 barracuda lib + 60 integration + 22 doc + 166 forge)
+**Binaries**: 221+ total (validate + benchmark + server)
 **ToadStool primitives**: 93 consumed (barracuda always-on, zero fallback code — S70+++ `1dd7e338`)
 **Papers**: 52 (25 Tracks 1-2 + 5 Track 3 + 9 Track 4 + 1 cross-spring + 9 extensions + 3 reference)
 **Local WGSL shaders**: 0 (all absorbed by ToadStool S63)

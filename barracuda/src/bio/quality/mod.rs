@@ -176,7 +176,7 @@ pub fn trim_read(record: &FastqRecord, params: &QualityParams) -> Option<(usize,
 #[must_use]
 pub fn apply_trim(record: &FastqRecord, start: usize, end: usize) -> FastqRecord {
     FastqRecord {
-        id: record.id.clone(),
+        id: record.id.clone(), // ownership transfer: borrowed input requires clone
         sequence: record.sequence[start..end].to_vec(),
         quality: record.quality[start..end].to_vec(),
     }

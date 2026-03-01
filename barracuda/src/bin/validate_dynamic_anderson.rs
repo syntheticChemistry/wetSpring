@@ -66,6 +66,7 @@ fn w_seasonal(t: f64) -> f64 {
 #[cfg(feature = "gpu")]
 fn compute_r_at_w(l: usize, w: f64, n_real: usize) -> (f64, f64) {
     use barracuda::spectral::{anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio};
+    use barracuda::stats::{correlation, mean};
 
     let n = l * l * l;
     let mut r_values = Vec::with_capacity(n_real);
@@ -76,12 +77,8 @@ fn compute_r_at_w(l: usize, w: f64, n_real: usize) -> (f64, f64) {
         let eigs = lanczos_eigenvalues(&tri);
         r_values.push(level_spacing_ratio(&eigs));
     }
-    let mean = r_values.iter().sum::<f64>() / n_real as f64;
-    let variance = r_values
-        .iter()
-        .map(|r| (r - mean) * (r - mean))
-        .sum::<f64>()
-        / (n_real.max(2) - 1) as f64;
+    let mean = mean(&r_values);
+    let variance = correlation::variance(&r_values).unwrap_or(0.0);
     let stderr = (variance / n_real as f64).sqrt();
     (mean, stderr)
 }

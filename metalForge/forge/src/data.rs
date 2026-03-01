@@ -109,6 +109,18 @@ pub fn resolve_file(dataset: &str, filename: &str) -> DataResolution {
     }
 }
 
+/// Discover the data directory path (env var or default).
+///
+/// Uses `WETSPRING_DATA_DIR` if set. Intentional default fallback:
+/// `/tmp/wetspring-data` when `WETSPRING_DATA_DIR` is not set. Does not check
+/// existence.
+#[must_use]
+pub fn discover_data_dir() -> PathBuf {
+    std::env::var("WETSPRING_DATA_DIR")
+        .unwrap_or_else(|_| String::from("/tmp/wetspring-data"))
+        .into()
+}
+
 /// Get the data directory from environment, falling back to `data/` relative
 /// to the workspace root.
 fn env_data_dir() -> Option<PathBuf> {
@@ -276,7 +288,7 @@ mod tests {
         assert_eq!(DataSource::Synthetic, DataSource::Synthetic);
         assert_eq!(DataSource::NestGate, DataSource::NestGate);
         assert_ne!(DataSource::Synthetic, DataSource::NestGate);
-        let path = std::path::PathBuf::from("/tmp/data");
+        let path = discover_data_dir();
         assert_eq!(
             DataSource::LocalDir(path.clone()),
             DataSource::LocalDir(path)

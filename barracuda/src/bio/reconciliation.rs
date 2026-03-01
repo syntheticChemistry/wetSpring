@@ -94,11 +94,11 @@ impl FlatRecTree {
 
 /// Result of DTL reconciliation.
 #[derive(Debug, Clone)]
-pub struct DtlResult {
+pub struct DtlResult<'a> {
     /// Optimal total cost.
     pub optimal_cost: u32,
     /// Host node where parasite root maps optimally.
-    pub optimal_host: String,
+    pub optimal_host: &'a str,
     /// DP table: `cost[p_idx * n_host + h_idx]` (flat, GPU-ready layout).
     pub cost_table: Vec<u32>,
     /// Event table: `event[p_idx * n_host + h_idx]`.
@@ -114,12 +114,12 @@ pub struct DtlResult {
 ///
 /// Panics if trees are empty.
 #[must_use]
-pub fn reconcile_dtl(
-    host: &FlatRecTree,
+pub fn reconcile_dtl<'a>(
+    host: &'a FlatRecTree,
     parasite: &FlatRecTree,
     tip_mapping: &[(String, String)],
     costs: &DtlCosts,
-) -> DtlResult {
+) -> DtlResult<'a> {
     let nh = host.len();
     let np = parasite.len();
     assert!(!host.is_empty() && !parasite.is_empty());
@@ -244,7 +244,7 @@ pub fn reconcile_dtl(
 
     DtlResult {
         optimal_cost: opt_cost,
-        optimal_host: host.names[opt_host_idx].clone(),
+        optimal_host: &host.names[opt_host_idx],
         cost_table: cost,
         event_table: event,
     }
@@ -286,11 +286,11 @@ fn propagate_losses(
 /// the same host tree. Each reconciliation is independent — maps to
 /// one GPU workgroup per gene family.
 #[must_use]
-pub fn reconcile_batch(
-    host: &FlatRecTree,
+pub fn reconcile_batch<'a>(
+    host: &'a FlatRecTree,
     parasites: &[(&FlatRecTree, &[(String, String)])],
     costs: &DtlCosts,
-) -> Vec<DtlResult> {
+) -> Vec<DtlResult<'a>> {
     parasites
         .iter()
         .map(|(para, tip_map)| reconcile_dtl(host, para, tip_map, costs))

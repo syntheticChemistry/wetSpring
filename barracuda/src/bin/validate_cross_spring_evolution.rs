@@ -476,16 +476,17 @@ fn cpu_batch_fitness_f64(
 }
 
 fn cpu_locus_variance_rowmajor_f64(freqs: &[f64], n_pops: usize, n_loci: usize) -> Vec<f64> {
+    use barracuda::stats::correlation;
     (0..n_loci)
         .map(|l| {
-            let mean: f64 = (0..n_pops).map(|p| freqs[p * n_loci + l]).sum::<f64>() / n_pops as f64;
-            (0..n_pops)
-                .map(|p| {
-                    let diff = freqs[p * n_loci + l] - mean;
-                    diff * diff
-                })
-                .sum::<f64>()
-                / n_pops as f64
+            let col: Vec<f64> = (0..n_pops).map(|p| freqs[p * n_loci + l]).collect();
+            let sample_var = correlation::variance(&col).unwrap_or(0.0);
+            // Original used population variance (n divisor); correlation::variance uses n-1
+            if n_pops > 0 {
+                sample_var * (n_pops - 1) as f64 / n_pops as f64
+            } else {
+                0.0
+            }
         })
         .collect()
 }

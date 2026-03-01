@@ -9,7 +9,7 @@
     clippy::items_after_statements,
     clippy::print_stdout
 )]
-//! # Exp230: `BarraCuda` GPU v7 — V76 ComputeDispatch + PairwiseL2 + Rarefaction
+//! # Exp230: `BarraCuda` GPU v7 — V76 `ComputeDispatch` + `PairwiseL2` + Rarefaction
 //!
 //! GPU portability: identical workloads on CPU and GPU, parity within
 //! documented tolerances. Extends v6 with:

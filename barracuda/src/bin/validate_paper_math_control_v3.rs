@@ -23,7 +23,7 @@
 //! - P31: Mateos 2023 sulfur phylogenomics (Exp053) — HMM + tree building
 //! - P32: Anderson 2014 viral metagenomics (Exp052) — diversity + kmer
 //!
-//! All papers cross-validated with V83 bootstrap_ci and jackknife for
+//! All papers cross-validated with V83 `bootstrap_ci` and jackknife for
 //! confidence intervals on key statistics.
 //!
 //! # Chain
@@ -64,7 +64,10 @@ fn main() {
     let phage_r = phage_defense::scenario_phage_attack(&phage_params, 0.01);
     v.check_pass("Phage: ODE converges", phage_r.states().count() > 100);
     let final_state: Vec<f64> = phage_r.states().last().unwrap().to_vec();
-    v.check_pass("Phage: bacteria survive (coexistence)", final_state[0] > 0.0);
+    v.check_pass(
+        "Phage: bacteria survive (coexistence)",
+        final_state[0] > 0.0,
+    );
 
     let phage_ssa = gillespie::birth_death_ssa(2.0, 0.5, 100.0, 42);
     v.check_pass("Phage SSA: events produced", phage_ssa.times.len() > 10);
@@ -98,14 +101,23 @@ fn main() {
         raceway_abundances.clone(),
         vec![100.0, 90.0, 40.0, 20.0, 10.0, 5.0, 2.0, 180.0, 60.0, 25.0],
     ]);
-    v.check_pass("Raceway: BC ∈ [0,1]", bc_matrix[1] >= 0.0 && bc_matrix[1] <= 1.0);
+    v.check_pass(
+        "Raceway: BC ∈ [0,1]",
+        bc_matrix[1] >= 0.0 && bc_matrix[1] <= 1.0,
+    );
 
     let raceway_ci = barracuda::stats::bootstrap_ci(
         &raceway_abundances,
         |d| diversity::shannon(&d.iter().map(|&x| x.max(0.01)).collect::<Vec<_>>()),
-        5_000, 0.95, 42,
-    ).unwrap();
-    v.check_pass("Raceway: bootstrap CI lower < upper", raceway_ci.lower < raceway_ci.upper);
+        5_000,
+        0.95,
+        42,
+    )
+    .unwrap();
+    v.check_pass(
+        "Raceway: bootstrap CI lower < upper",
+        raceway_ci.lower < raceway_ci.upper,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // P28: Rabot 2018 — Structure-Function Soil (Exp177)
@@ -119,11 +131,12 @@ fn main() {
     let pear = barracuda::stats::pearson_correlation(&soil_pores, &soil_diversity).unwrap();
     v.check_pass("Rabot: porosity↔diversity correlated (r > 0.5)", pear > 0.5);
 
-    let fit = barracuda::stats::fit_linear(
-        &soil_pores, &soil_diversity,
-    ).unwrap();
+    let fit = barracuda::stats::fit_linear(&soil_pores, &soil_diversity).unwrap();
     v.check_pass("Rabot: linear fit R² > 0.5", fit.r_squared > 0.5);
-    println!("  Rabot: r={pear:.4}, slope={:.4}, R²={:.4}", fit.params[0], fit.r_squared);
+    println!(
+        "  Rabot: r={pear:.4}, slope={:.4}, R²={:.4}",
+        fit.params[0], fit.r_squared
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // P29: Wang 2025 — Tillage Microbiome (Exp178)
@@ -143,7 +156,10 @@ fn main() {
 
     let jk_notill = barracuda::stats::jackknife_mean_variance(&notill).unwrap();
     let jk_tilled = barracuda::stats::jackknife_mean_variance(&tilled).unwrap();
-    v.check_pass("Wang: both JK SE > 0", jk_notill.std_error > 0.0 && jk_tilled.std_error > 0.0);
+    v.check_pass(
+        "Wang: both JK SE > 0",
+        jk_notill.std_error > 0.0 && jk_tilled.std_error > 0.0,
+    );
     println!("  H(no-till)={h_notill:.4}, H(tilled)={h_tilled:.4}, BC={bc_till:.4}");
 
     // ═══════════════════════════════════════════════════════════════════
@@ -161,7 +177,10 @@ fn main() {
     let seqs = ["ACGT", "ACGA", "ACGC"];
     let tree = neighbor_joining::neighbor_joining(
         &[0.0, 0.1, 0.2, 0.1, 0.0, 0.15, 0.2, 0.15, 0.0],
-        &seqs.iter().map(|s| s.to_string()).collect::<Vec<_>>(),
+        &seqs
+            .iter()
+            .map(std::string::ToString::to_string)
+            .collect::<Vec<_>>(),
     );
     v.check_pass("Boden: NJ produces Newick", !tree.newick.is_empty());
 
@@ -177,13 +196,22 @@ fn main() {
         log_trans: vec![0.7_f64.ln(), 0.3_f64.ln(), 0.2_f64.ln(), 0.8_f64.ln()],
         n_symbols: 4,
         log_emit: vec![
-            0.3_f64.ln(), 0.3_f64.ln(), 0.2_f64.ln(), 0.2_f64.ln(),
-            0.1_f64.ln(), 0.1_f64.ln(), 0.4_f64.ln(), 0.4_f64.ln(),
+            0.3_f64.ln(),
+            0.3_f64.ln(),
+            0.2_f64.ln(),
+            0.2_f64.ln(),
+            0.1_f64.ln(),
+            0.1_f64.ln(),
+            0.4_f64.ln(),
+            0.4_f64.ln(),
         ],
     };
     let obs_sulfur: Vec<usize> = vec![0, 1, 2, 3, 0, 1, 2];
     let hmm_fwd = hmm::forward(&hmm_model, &obs_sulfur);
-    v.check_pass("Mateos: HMM forward LL finite", hmm_fwd.log_likelihood.is_finite());
+    v.check_pass(
+        "Mateos: HMM forward LL finite",
+        hmm_fwd.log_likelihood.is_finite(),
+    );
 
     let sulfur_tree = felsenstein::TreeNode::Leaf {
         name: "S1".into(),
@@ -198,21 +226,35 @@ fn main() {
     v.section("P32: Anderson 2014 — Viral Metagenomics (Exp052)");
     n_papers += 1;
 
-    let viral_abundances = vec![500.0, 200.0, 80.0, 30.0, 10.0, 5.0, 2.0, 1.0, 1.0, 1.0, 300.0];
+    let viral_abundances = vec![
+        500.0, 200.0, 80.0, 30.0, 10.0, 5.0, 2.0, 1.0, 1.0, 1.0, 300.0,
+    ];
     let h_viral = diversity::shannon(&viral_abundances);
     let s_viral = diversity::simpson(&viral_abundances);
     v.check_pass("Anderson14: Shannon > 0", h_viral > 0.0);
-    v.check_pass("Anderson14: Simpson ∈ (0,1)", s_viral > 0.0 && s_viral < 1.0);
+    v.check_pass(
+        "Anderson14: Simpson ∈ (0,1)",
+        s_viral > 0.0 && s_viral < 1.0,
+    );
 
     let viral_kmers = kmer::count_kmers(b"ATGCGATCGATCGTAGCTAGCTAGCGATCG", 4);
-    v.check_pass("Anderson14: k-mer counts > 0", viral_kmers.total_valid_kmers > 0);
+    v.check_pass(
+        "Anderson14: k-mer counts > 0",
+        viral_kmers.total_valid_kmers > 0,
+    );
 
     let viral_ci = barracuda::stats::bootstrap_ci(
         &viral_abundances,
         |d| diversity::shannon(&d.iter().map(|&x| x.max(0.01)).collect::<Vec<_>>()),
-        5_000, 0.95, 77,
-    ).unwrap();
-    v.check_pass("Anderson14: Shannon CI finite", viral_ci.estimate.is_finite());
+        5_000,
+        0.95,
+        77,
+    )
+    .unwrap();
+    v.check_pass(
+        "Anderson14: Shannon CI finite",
+        viral_ci.estimate.is_finite(),
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // V83 Cross-Paper Composition: Bootstrap + Jackknife + Regression
@@ -221,20 +263,31 @@ fn main() {
 
     let all_diversities = vec![h_raceway, h_notill, h_tilled, h_viral, jk_phage.estimate];
     let jk_cross = barracuda::stats::jackknife_mean_variance(&all_diversities).unwrap();
-    v.check_pass("V83: Cross-paper diversity JK mean > 0", jk_cross.estimate > 0.0);
-    v.check_pass("V83: Cross-paper diversity JK SE > 0", jk_cross.std_error > 0.0);
+    v.check_pass(
+        "V83: Cross-paper diversity JK mean > 0",
+        jk_cross.estimate > 0.0,
+    );
+    v.check_pass(
+        "V83: Cross-paper diversity JK SE > 0",
+        jk_cross.std_error > 0.0,
+    );
 
     let sample_sizes: Vec<f64> = vec![10.0, 10.0, 10.0, 11.0, 50.0];
     let diversities: Vec<f64> = all_diversities.clone();
     let fit_div = barracuda::stats::fit_logarithmic(&sample_sizes, &diversities);
-    v.check_pass("V83: Species-area fit attempted", fit_div.is_some() || fit_div.is_none());
+    v.check_pass(
+        "V83: Species-area fit attempted",
+        fit_div.is_some() || fit_div.is_none(),
+    );
 
     let power_95 = barracuda::stats::detection_threshold(0.001, 0.95);
     v.check_pass("V83: Rare biosphere depth > 2000", power_95 > 2000);
 
     let depth_power = barracuda::stats::detection_power(0.001, power_95);
     v.check_pass("V83: Achieved power ≥ 0.95", depth_power >= 0.95);
-    println!("  V83 depth design: D*={power_95} for p=0.001 at 95% power (achieved {depth_power:.4})");
+    println!(
+        "  V83 depth design: D*={power_95} for p=0.001 at 95% power (achieved {depth_power:.4})"
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // Summary

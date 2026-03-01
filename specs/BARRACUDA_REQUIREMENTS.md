@@ -228,3 +228,24 @@ Tier classification for GPU shader promotion (Write → Absorb → Lean lifecycl
 - **12 shaders absorbed + 5 ODE leaned (generate_shader) + 12 composed/lean wrappers (0 Passthrough)** — zero local WGSL remains; 8/9 P0-P3 requests delivered; see `barracuda/EVOLUTION_READINESS.md`
 - **Rust edition 2024**, MSRV 1.85 — `f64::midpoint()`, `usize::midpoint()`, `const fn` promotions
 - **`#![deny(unsafe_code)]`** — edition 2024 makes `std::env::set_var` unsafe; `#[allow]` confined to test env-var calls
+
+---
+
+## Dependency Audit (ecoBin Compliance)
+
+### wgpu C Dependency
+
+The `wgpu` crate (via ToadStool / metalForge) pulls in `renderdoc-sys` (C dependency) on native targets via `wgpu-hal`. This is **acceptable** because:
+
+1. **wgpu is the only practical GPU abstraction for Rust** — cross-platform Vulkan/Metal/DX12/WebGPU without vendor lock-in.
+2. **The C dependency is optional** — `renderdoc-sys` is only for RenderDoc debugging integration, not runtime GPU compute.
+3. **Actual GPU backends are OS-provided** — Vulkan, Metal, DX12 are system libraries; no C runtime in the hot path.
+4. **Pure Rust GPU compute is not yet feasible** — WGSL compilation and GPU dispatch require wgpu; there is no pure-Rust alternative for cross-platform GPU compute.
+
+### Pure Rust Dependencies
+
+All other barracuda dependencies are pure Rust (ecoBin compliant): `flate2`, `bytemuck`, and upstream ToadStool/metalForge crates.
+
+### Mitigation
+
+When wgpu achieves pure-Rust backends (e.g. Lavapipe software renderer without C), we will upgrade. Until then, the single optional C dependency is documented and accepted for GPU pipeline continuity.

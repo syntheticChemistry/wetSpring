@@ -381,7 +381,7 @@ fn build_asvs(seqs: &[&UniqueSequence], partition: &[usize], centers: &[usize]) 
     let mut asvs: Vec<Asv> = centers
         .iter()
         .map(|&c| Asv {
-            sequence: seqs[c].sequence.clone(),
+            sequence: seqs[c].sequence.clone(), // ownership transfer: borrowed input requires clone
             abundance: 0,
             n_members: 0,
         })

@@ -1,9 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![allow(
-    clippy::expect_used, clippy::unwrap_used, clippy::print_stdout,
-    clippy::too_many_lines, clippy::cast_precision_loss, clippy::cast_possible_truncation,
-    clippy::cast_sign_loss, clippy::similar_names, clippy::many_single_char_names,
-    clippy::items_after_statements, clippy::float_cmp
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::print_stdout,
+    clippy::too_many_lines,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::similar_names,
+    clippy::many_single_char_names,
+    clippy::items_after_statements,
+    clippy::float_cmp
 )]
 //! # Exp259: Genomic Vault — Consent + Encrypted Storage + Provenance
 //!
@@ -38,9 +45,7 @@ use wetspring_barracuda::vault::provenance::ProvenanceChain;
 use wetspring_barracuda::vault::storage::VaultStore;
 
 fn main() {
-    let mut v = Validator::new(
-        "Exp259: Genomic Vault — Consent + Encrypted Storage + Provenance",
-    );
+    let mut v = Validator::new("Exp259: Genomic Vault — Consent + Encrypted Storage + Provenance");
 
     v.section("Phase 1: Consent Ticket Protocol");
 
@@ -51,11 +56,21 @@ fn main() {
         Duration::from_secs(3600),
     );
     v.check_pass("Consent: ticket created and valid", ticket.is_valid());
-    v.check_pass("Consent: remaining > 0", ticket.remaining() > Duration::ZERO);
+    v.check_pass(
+        "Consent: remaining > 0",
+        ticket.remaining() > Duration::ZERO,
+    );
     v.check_pass("Consent: not revoked", !ticket.revoked);
-    println!("  Ticket ID: {:02x}{:02x}{:02x}{:02x}...", ticket.id[0], ticket.id[1], ticket.id[2], ticket.id[3]);
+    println!(
+        "  Ticket ID: {:02x}{:02x}{:02x}{:02x}...",
+        ticket.id[0], ticket.id[1], ticket.id[2], ticket.id[3]
+    );
     println!("  Owner: {}", ticket.owner_id);
-    println!("  Scope: {} (sensitivity {})", ticket.scope.label(), ticket.scope.sensitivity());
+    println!(
+        "  Scope: {} (sensitivity {})",
+        ticket.scope.label(),
+        ticket.scope.sensitivity()
+    );
     println!("  Grantee: {}", ticket.grantee);
     println!("  Duration: {}s", ticket.duration.as_secs());
 
@@ -84,10 +99,16 @@ fn main() {
         "external-lab",
         Duration::from_secs(86400),
     );
-    v.check_pass("Consent: raw sequences ticket valid before revoke", revocable.is_valid());
+    v.check_pass(
+        "Consent: raw sequences ticket valid before revoke",
+        revocable.is_valid(),
+    );
     revocable.revoke();
     v.check_pass("Consent: revoked ticket is invalid", !revocable.is_valid());
-    v.check_pass("Consent: revoked ticket remaining = 0", revocable.remaining() == Duration::ZERO);
+    v.check_pass(
+        "Consent: revoked ticket remaining = 0",
+        revocable.remaining() == Duration::ZERO,
+    );
 
     let mut expired = ConsentTicket::new(
         "eastgate-family",
@@ -112,14 +133,29 @@ fn main() {
 
     let sample_16s = b">sample_001 16S rRNA gene partial sequence\nATCGATCGATCGATCGATCGATCGATCGATCG\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n";
     let hash = vault
-        .store(sample_16s, "sample_001.fasta", "patient-001", &key, &store_ticket)
+        .store(
+            sample_16s,
+            "sample_001.fasta",
+            "patient-001",
+            &key,
+            &store_ticket,
+        )
         .unwrap();
     v.check_pass("Vault: 16S sequence stored", vault.blob_count() == 1);
-    println!("  Stored: sample_001.fasta ({} bytes) → hash {:02x}{:02x}{:02x}{:02x}...",
-        sample_16s.len(), hash[0], hash[1], hash[2], hash[3]);
+    println!(
+        "  Stored: sample_001.fasta ({} bytes) → hash {:02x}{:02x}{:02x}{:02x}...",
+        sample_16s.len(),
+        hash[0],
+        hash[1],
+        hash[2],
+        hash[3]
+    );
 
     let result = vault.retrieve(&hash, &key, &store_ticket).unwrap();
-    v.check_pass("Vault: retrieved plaintext matches original", result.plaintext == sample_16s);
+    v.check_pass(
+        "Vault: retrieved plaintext matches original",
+        result.plaintext == sample_16s,
+    );
     v.check_pass("Vault: content hash matches", result.content_hash == hash);
     v.check_pass("Vault: label preserved", result.label == "sample_001.fasta");
 
@@ -142,14 +178,19 @@ fn main() {
     v.section("Phase 3: Multi-Sample Vault");
 
     let samples = [
-        ("sample_002.fasta", b"ATCGATCG metagenome fragment 002" as &[u8]),
+        (
+            "sample_002.fasta",
+            b"ATCGATCG metagenome fragment 002" as &[u8],
+        ),
         ("sample_003.fasta", b"GCTAGCTA metagenome fragment 003"),
         ("sample_004.fasta", b"TTAACCGG metagenome fragment 004"),
         ("sample_005.fasta", b"CCGGTTAA metagenome fragment 005"),
     ];
 
     for (label, data) in &samples {
-        vault.store(data, label, "patient-001", &key, &store_ticket).unwrap();
+        vault
+            .store(data, label, "patient-001", &key, &store_ticket)
+            .unwrap();
     }
     v.check_pass("Vault: 5 samples stored", vault.blob_count() == 5);
 
@@ -157,20 +198,42 @@ fn main() {
     v.check_pass("Vault: list returns 5 entries", listing.len() == 5);
 
     let empty_list = vault.list("patient-999");
-    v.check_pass("Vault: list for unknown owner is empty", empty_list.is_empty());
+    v.check_pass(
+        "Vault: list for unknown owner is empty",
+        empty_list.is_empty(),
+    );
 
     v.section("Phase 4: Provenance Chain Integrity");
 
-    v.check_pass("Provenance: chain integrity verified", vault.verify_provenance());
+    v.check_pass(
+        "Provenance: chain integrity verified",
+        vault.verify_provenance(),
+    );
     let chain = vault.provenance();
-    v.check_pass("Provenance: chain has entries", chain.len() > 0);
+    v.check_pass("Provenance: chain has entries", !chain.is_empty());
     println!("  Chain length: {} entries", chain.len());
 
-    let store_ops: Vec<_> = chain.iter().filter(|e| e.operation == "vault.store").collect();
-    let retrieve_ops: Vec<_> = chain.iter().filter(|e| e.operation == "vault.retrieve").collect();
-    v.check_pass("Provenance: 5 store operations recorded", store_ops.len() == 5);
-    v.check_pass("Provenance: 1 retrieve operation recorded", retrieve_ops.len() == 1);
-    println!("  Operations: {} store + {} retrieve", store_ops.len(), retrieve_ops.len());
+    let store_ops: Vec<_> = chain
+        .iter()
+        .filter(|e| e.operation == "vault.store")
+        .collect();
+    let retrieve_ops: Vec<_> = chain
+        .iter()
+        .filter(|e| e.operation == "vault.retrieve")
+        .collect();
+    v.check_pass(
+        "Provenance: 5 store operations recorded",
+        store_ops.len() == 5,
+    );
+    v.check_pass(
+        "Provenance: 1 retrieve operation recorded",
+        retrieve_ops.len() == 1,
+    );
+    println!(
+        "  Operations: {} store + {} retrieve",
+        store_ops.len(),
+        retrieve_ops.len()
+    );
 
     for (i, entry) in chain.iter().enumerate() {
         if i > 0 {
@@ -181,23 +244,38 @@ fn main() {
     v.check_pass("Provenance: all chain links verified", true);
 
     let ws_entries: Vec<_> = chain.by_actor("wetspring").collect();
-    v.check_pass("Provenance: filter by actor works", ws_entries.len() == chain.len());
+    v.check_pass(
+        "Provenance: filter by actor works",
+        ws_entries.len() == chain.len(),
+    );
 
     v.section("Phase 5: Standalone Provenance Chain");
 
     let mut standalone = ProvenanceChain::new();
-    v.check_pass("Provenance: empty chain valid", standalone.verify_integrity());
+    v.check_pass(
+        "Provenance: empty chain valid",
+        standalone.verify_integrity(),
+    );
 
     standalone.append("ingest", "nestgate", [1u8; 32], [2u8; 32], "eastgate");
     standalone.append("diversity", "wetspring", [1u8; 32], [3u8; 32], "eastgate");
     standalone.append("anderson", "toadstool", [1u8; 32], [4u8; 32], "eastgate");
     standalone.append("export", "wetspring", [1u8; 32], [5u8; 32], "eastgate");
 
-    v.check_pass("Provenance: 4-entry chain valid", standalone.verify_integrity());
-    v.check_pass("Provenance: head is export", standalone.head().unwrap().operation == "export");
+    v.check_pass(
+        "Provenance: 4-entry chain valid",
+        standalone.verify_integrity(),
+    );
+    v.check_pass(
+        "Provenance: head is export",
+        standalone.head().unwrap().operation == "export",
+    );
 
     let toadstool_ops: Vec<_> = standalone.by_actor("toadstool").collect();
-    v.check_pass("Provenance: toadstool did 1 operation", toadstool_ops.len() == 1);
+    v.check_pass(
+        "Provenance: toadstool did 1 operation",
+        toadstool_ops.len() == 1,
+    );
 
     v.section("Phase 6: Organ Model Summary");
 

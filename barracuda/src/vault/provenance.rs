@@ -85,10 +85,7 @@ impl ProvenanceChain {
         data_hash: [u8; 32],
         node_id: &str,
     ) -> &ProvenanceEntry {
-        let parent = self
-            .entries
-            .last()
-            .map_or([0u8; 32], |e| e.hash);
+        let parent = self.entries.last().map_or([0u8; 32], |e| e.hash);
 
         let timestamp = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -157,7 +154,9 @@ impl ProvenanceChain {
 
     /// Filter entries by consent ticket ID.
     pub fn by_consent(&self, ticket_id: [u8; 32]) -> impl Iterator<Item = &ProvenanceEntry> + '_ {
-        self.entries.iter().filter(move |e| e.consent_ticket_id == ticket_id)
+        self.entries
+            .iter()
+            .filter(move |e| e.consent_ticket_id == ticket_id)
     }
 }
 
@@ -167,27 +166,9 @@ impl Default for ProvenanceChain {
     }
 }
 
-/// Sovereign hash function (same as consent module — `BearDog` absorb target).
+/// Entry hash using BLAKE3.
 fn sovereign_hash(input: &[u8]) -> [u8; 32] {
-    let mut h: [u64; 4] = [
-        0x6A09_E667_F3BC_C908,
-        0xBB67_AE85_84CA_A73B,
-        0x3C6E_F372_FE94_F82B,
-        0xA54F_F53A_5F1D_36F1,
-    ];
-
-    for chunk in input.chunks(32) {
-        for (i, byte) in chunk.iter().enumerate() {
-            h[i % 4] ^= u64::from(*byte) << ((i % 8) * 8);
-            h[i % 4] = h[i % 4].wrapping_mul(0x517C_C1B7_2722_0A95).rotate_left(17);
-        }
-    }
-
-    let mut out = [0u8; 32];
-    for (i, word) in h.iter().enumerate() {
-        out[i * 8..(i + 1) * 8].copy_from_slice(&word.to_le_bytes());
-    }
-    out
+    *blake3::hash(input).as_bytes()
 }
 
 #[cfg(test)]
@@ -207,7 +188,13 @@ mod tests {
         let mut chain = ProvenanceChain::new();
         let ticket_id = [1u8; 32];
         let data_hash = [2u8; 32];
-        chain.append("diversity_analysis", "wetspring", ticket_id, data_hash, "eastgate");
+        chain.append(
+            "diversity_analysis",
+            "wetspring",
+            ticket_id,
+            data_hash,
+            "eastgate",
+        );
         assert_eq!(chain.len(), 1);
         assert!(chain.verify_integrity());
         assert_eq!(chain.head().unwrap().parent, [0u8; 32]);
@@ -222,10 +209,22 @@ mod tests {
         chain.append("ingest", "nestgate", ticket_id, data_hash, "eastgate");
         let first_hash = chain.head().unwrap().hash;
 
-        chain.append("diversity_analysis", "wetspring", ticket_id, data_hash, "eastgate");
+        chain.append(
+            "diversity_analysis",
+            "wetspring",
+            ticket_id,
+            data_hash,
+            "eastgate",
+        );
         assert_eq!(chain.head().unwrap().parent, first_hash);
 
-        chain.append("anderson_classification", "toadstool", ticket_id, data_hash, "eastgate");
+        chain.append(
+            "anderson_classification",
+            "toadstool",
+            ticket_id,
+            data_hash,
+            "eastgate",
+        );
         assert_eq!(chain.len(), 3);
         assert!(chain.verify_integrity());
     }
@@ -253,7 +252,6 @@ mod tests {
         chain.append("op2", "nestgate", t, d, "eastgate");
         chain.append("op3", "wetspring", t, d, "eastgate");
 
-        let ws_entries: Vec<_> = chain.by_actor("wetspring").collect();
-        assert_eq!(ws_entries.len(), 2);
+        assert_eq!(chain.by_actor("wetspring").count(), 2);
     }
 }

@@ -64,6 +64,8 @@ struct SizeResult {
 
 #[cfg(feature = "gpu")]
 fn compute_r_stats(l: usize, w: f64, n_real: usize) -> (f64, f64) {
+    use barracuda::stats::{correlation, mean};
+
     let n = l * l * l;
     let mut r_values = Vec::with_capacity(n_real);
     for seed_offset in 0..n_real {
@@ -73,14 +75,9 @@ fn compute_r_stats(l: usize, w: f64, n_real: usize) -> (f64, f64) {
         let eigs = lanczos_eigenvalues(&tri);
         r_values.push(level_spacing_ratio(&eigs));
     }
-    let n_f64 = f64::from(n_real as u32);
-    let mean = r_values.iter().sum::<f64>() / n_f64;
-    let variance = r_values
-        .iter()
-        .map(|r| (r - mean) * (r - mean))
-        .sum::<f64>()
-        / f64::from((n_real - 1) as u32);
-    let stderr = (variance / n_f64).sqrt();
+    let mean = mean(&r_values);
+    let variance = correlation::variance(&r_values).unwrap_or(0.0);
+    let stderr = (variance / f64::from(n_real as u32)).sqrt();
     (mean, stderr)
 }
 

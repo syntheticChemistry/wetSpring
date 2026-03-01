@@ -19,6 +19,44 @@ pub struct NpuReadoutWeights {
 }
 
 impl NpuReadoutWeights {
+    /// Quantize raw readout weights to NPU format (shared by `LegacyEsn` and `BioEsn`).
+    #[must_use]
+    #[allow(clippy::cast_possible_truncation, clippy::cast_precision_loss)]
+    pub fn from_readout_weights(w_out: &[f64], output_size: usize, reservoir_size: usize) -> Self {
+        if w_out.is_empty() {
+            return Self {
+                weights_i8: Vec::new(),
+                scale: 1.0,
+                zero_point: 0.0,
+                output_size: 0,
+                reservoir_size: 0,
+            };
+        }
+
+        let min_val = w_out.iter().copied().fold(f64::INFINITY, f64::min);
+        let max_val = w_out.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+
+        let range = max_val - min_val;
+        let scale = if range > 0.0 { range / 255.0 } else { 1.0 };
+        let zero_point = min_val;
+
+        let weights_i8: Vec<i8> = w_out
+            .iter()
+            .map(|&v| {
+                let q = ((v - zero_point) / scale).round() as i64 - 128;
+                q.clamp(-128, 127) as i8
+            })
+            .collect();
+
+        Self {
+            weights_i8,
+            scale,
+            zero_point,
+            output_size,
+            reservoir_size,
+        }
+    }
+
     /// Run int8 inference on a reservoir state vector.
     /// Returns f64 outputs (dequantized from int8 accumulation).
     #[must_use]

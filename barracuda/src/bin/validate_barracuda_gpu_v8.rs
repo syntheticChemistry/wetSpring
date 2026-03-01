@@ -3,6 +3,7 @@
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::similar_names,
+    clippy::many_single_char_names,
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
     clippy::too_many_lines,

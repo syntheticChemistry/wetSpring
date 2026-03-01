@@ -12,7 +12,7 @@
     clippy::items_after_statements,
     clippy::float_cmp
 )]
-//! # Exp239: BarraCuda CPU v17 — Extended Domain Benchmark (8 New Domains)
+//! # Exp239: `BarraCuda` CPU v17 — Extended Domain Benchmark (8 New Domains)
 //!
 //! Extends CPU v16 (11 domains, 33 checks) with 8 NEW CPU-only domains:
 //! - D12: Chimera Detection
@@ -166,7 +166,7 @@ fn main() {
     };
     let mut esn_net = esn::Esn::new(esn_config);
     let inputs: Vec<Vec<f64>> = (0..20)
-        .map(|i| vec![(i as f64 * 0.3).sin(), (i as f64 * 0.3).cos()])
+        .map(|i| vec![(f64::from(i) * 0.3).sin(), (f64::from(i) * 0.3).cos()])
         .collect();
     let targets: Vec<Vec<f64>> = inputs.iter().map(|inp| vec![inp[0] + inp[1]]).collect();
     esn_net.train(&inputs, &targets);

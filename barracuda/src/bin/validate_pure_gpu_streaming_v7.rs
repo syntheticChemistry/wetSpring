@@ -12,7 +12,7 @@
     clippy::items_after_statements,
     clippy::float_cmp
 )]
-//! # Exp241: Pure GPU Streaming v7 — Extended ToadStool Unidirectional Pipeline
+//! # Exp241: Pure GPU Streaming v7 — Extended `ToadStool` Unidirectional Pipeline
 //!
 //! Extends streaming v6 with new domains:
 //! - Stage 1: DADA2 GPU denoising

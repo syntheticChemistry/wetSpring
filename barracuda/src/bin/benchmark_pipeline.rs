@@ -319,9 +319,8 @@ fn main() {
     println!("╚══════════════════════════════════════════════════════════════════════╝");
 
     // ── Save JSON ───────────────────────────────────────────────────────
-    let out_dir = std::env::var("WETSPRING_BENCHMARK_DIR")
-        .unwrap_or_else(|_| format!("{}/../benchmarks/results", env!("CARGO_MANIFEST_DIR")));
-    match report.save_json(&out_dir) {
+    let out_dir = validation::discover_bench_dir();
+    match report.save_json(out_dir.to_string_lossy().as_ref()) {
         Ok(path) => println!("\nJSON results saved to {path}"),
         Err(e) => eprintln!("Warning: could not save JSON: {e}"),
     }

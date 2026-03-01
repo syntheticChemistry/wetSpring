@@ -1,17 +1,24 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![allow(
-    clippy::expect_used, clippy::unwrap_used, clippy::print_stdout,
-    clippy::too_many_lines, clippy::cast_precision_loss, clippy::cast_possible_truncation,
-    clippy::cast_sign_loss, clippy::similar_names, clippy::many_single_char_names,
-    clippy::items_after_statements, clippy::float_cmp
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::print_stdout,
+    clippy::too_many_lines,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::similar_names,
+    clippy::many_single_char_names,
+    clippy::items_after_statements,
+    clippy::float_cmp
 )]
 //! # Exp258: NUCLEUS Tower-Node Deployment — Live Primal Orchestration
 //!
 //! Validates the full NUCLEUS Tower→Node deployment model by:
 //!
 //! 1. Probing whether biomeOS binary exists and is executable
-//! 2. Testing Tower Atomic (BearDog + Songbird) readiness
-//! 3. Testing Node Atomic (Tower + ToadStool) readiness
+//! 2. Testing Tower Atomic (`BearDog` + Songbird) readiness
+//! 3. Testing Node Atomic (Tower + `ToadStool`) readiness
 //! 4. Validating the science pipeline through each deployment mode
 //! 5. Measuring the overhead of IPC vs direct function calls
 //!
@@ -41,43 +48,44 @@ use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::validation::Validator;
 
 fn main() {
-    let mut v = Validator::new(
-        "Exp258: NUCLEUS Tower-Node Deployment — Live Primal Orchestration",
-    );
+    let mut v = Validator::new("Exp258: NUCLEUS Tower-Node Deployment — Live Primal Orchestration");
 
     v.section("Phase 1: biomeOS Binary Discovery");
 
-    let biomeos_bin = find_biomeos_binary();
-    match &biomeos_bin {
-        Some(path) => {
-            println!("  biomeOS binary: {}", path.display());
-            v.check_pass("biomeOS binary found", true);
+    let biomeos_bin = discover_biomeos_bin();
+    if let Some(path) = &biomeos_bin {
+        println!("  biomeOS binary: {}", path.display());
+        v.check_pass("biomeOS binary found", true);
 
-            let t = Instant::now();
-            let version_out = Command::new(path).arg("--version").output();
-            let ms = t.elapsed().as_secs_f64() * 1000.0;
-            match version_out {
-                Ok(out) => {
-                    let version = String::from_utf8_lossy(&out.stdout);
-                    let version = version.trim();
-                    if version.is_empty() {
-                        let stderr = String::from_utf8_lossy(&out.stderr);
-                        println!("  biomeOS version ({ms:.1}ms): (stdout empty, stderr: {})", stderr.trim());
-                    } else {
-                        println!("  biomeOS version ({ms:.1}ms): {version}");
-                    }
-                    v.check_pass("biomeOS --version executable", out.status.success() || !version.is_empty());
+        let t = Instant::now();
+        let version_out = Command::new(path).arg("--version").output();
+        let ms = t.elapsed().as_secs_f64() * 1000.0;
+        match version_out {
+            Ok(out) => {
+                let version = String::from_utf8_lossy(&out.stdout);
+                let version = version.trim();
+                if version.is_empty() {
+                    let stderr = String::from_utf8_lossy(&out.stderr);
+                    println!(
+                        "  biomeOS version ({ms:.1}ms): (stdout empty, stderr: {})",
+                        stderr.trim()
+                    );
+                } else {
+                    println!("  biomeOS version ({ms:.1}ms): {version}");
                 }
-                Err(e) => {
-                    println!("  biomeOS --version failed: {e}");
-                    v.check_pass("biomeOS --version executable", false);
-                }
+                v.check_pass(
+                    "biomeOS --version executable",
+                    out.status.success() || !version.is_empty(),
+                );
+            }
+            Err(e) => {
+                println!("  biomeOS --version failed: {e}");
+                v.check_pass("biomeOS --version executable", false);
             }
         }
-        None => {
-            println!("  biomeOS binary: not found in PATH or known locations");
-            v.check_pass("biomeOS binary found (optional — build first)", true);
-        }
+    } else {
+        println!("  biomeOS binary: not found in PATH or known locations");
+        v.check_pass("biomeOS binary found (optional — build first)", true);
     }
 
     v.section("Phase 2: Primal Binary Scan");
@@ -91,41 +99,54 @@ fn main() {
     ];
 
     for (name, description) in &primals {
-        let found = find_primal_binary(name);
-        match found {
-            Some(path) => {
-                println!("  ✓ {description}: {}", path.display());
-                v.check_pass(&format!("{name} binary found"), true);
-            }
-            None => {
-                println!("  · {description}: not in PATH");
-                v.check_pass(&format!("{name} binary (optional)"), true);
-            }
+        let found = discover_primal_bin(name);
+        if let Some(path) = found {
+            println!("  ✓ {description}: {}", path.display());
+            v.check_pass(&format!("{name} binary found"), true);
+        } else {
+            println!("  · {description}: not in PATH");
+            v.check_pass(&format!("{name} binary (optional)"), true);
         }
     }
 
     v.section("Phase 3: NUCLEUS Mode Readiness Assessment");
 
-    let has_beardog = find_primal_binary("beardog").is_some();
-    let has_songbird = find_primal_binary("songbird").is_some();
-    let has_toadstool = find_primal_binary("toadstool").is_some();
-    let has_nestgate = find_primal_binary("nestgate").is_some();
+    let has_beardog = discover_primal_bin("beardog").is_some();
+    let has_songbird = discover_primal_bin("songbird").is_some();
+    let has_toadstool = discover_primal_bin("toadstool").is_some();
+    let has_nestgate = discover_primal_bin("nestgate").is_some();
 
     let tower_ready = has_beardog && has_songbird;
     let node_ready = tower_ready && has_toadstool;
     let nest_ready = tower_ready && has_nestgate;
     let full_ready = node_ready && has_nestgate;
 
-    println!("  Tower Atomic (BearDog + Songbird):        {}", if tower_ready { "READY" } else { "need binaries" });
-    println!("  Node Atomic  (Tower + ToadStool):         {}", if node_ready { "READY" } else { "need binaries" });
-    println!("  Nest Atomic  (Tower + NestGate + Squirrel): {}", if nest_ready { "READY" } else { "need binaries" });
-    println!("  Full Atomic  (all primals):               {}", if full_ready { "READY" } else { "need binaries" });
+    println!(
+        "  Tower Atomic (BearDog + Songbird):        {}",
+        if tower_ready {
+            "READY"
+        } else {
+            "need binaries"
+        }
+    );
+    println!(
+        "  Node Atomic  (Tower + ToadStool):         {}",
+        if node_ready { "READY" } else { "need binaries" }
+    );
+    println!(
+        "  Nest Atomic  (Tower + NestGate + Squirrel): {}",
+        if nest_ready { "READY" } else { "need binaries" }
+    );
+    println!(
+        "  Full Atomic  (all primals):               {}",
+        if full_ready { "READY" } else { "need binaries" }
+    );
 
     v.check_pass("NUCLEUS mode assessment complete", true);
 
     v.section("Phase 4: IPC vs Direct Dispatch Overhead");
 
-    let counts: Vec<f64> = (1..=200).map(|i| (i as f64).sqrt() * 10.0).collect();
+    let counts: Vec<f64> = (1..=200).map(|i| f64::from(i).sqrt() * 10.0).collect();
 
     let t_direct = Instant::now();
     let n_iterations = 1000;
@@ -133,7 +154,7 @@ fn main() {
     for _ in 0..n_iterations {
         direct_h = diversity::shannon(&counts);
     }
-    let direct_us = t_direct.elapsed().as_nanos() as f64 / n_iterations as f64 / 1000.0;
+    let direct_us = t_direct.elapsed().as_nanos() as f64 / f64::from(n_iterations) / 1000.0;
 
     v.check_pass("Direct dispatch: Shannon computed", direct_h > 0.0);
     println!("  Direct dispatch: {n_iterations}× Shannon on 200 taxa = {direct_us:.2}µs/call");
@@ -143,16 +164,26 @@ fn main() {
     let mut json_h = 0.0;
     for _ in 0..n_iterations {
         let params = serde_json::json!({"counts": counts, "metrics": ["shannon"]});
-        let result = wetspring_barracuda::ipc::dispatch::dispatch("science.diversity", &params).unwrap();
+        let result =
+            wetspring_barracuda::ipc::dispatch::dispatch("science.diversity", &params).unwrap();
         json_h = result["shannon"].as_f64().unwrap();
     }
-    let json_us = t_json.elapsed().as_nanos() as f64 / n_iterations as f64 / 1000.0;
+    let json_us = t_json.elapsed().as_nanos() as f64 / f64::from(n_iterations) / 1000.0;
 
     v.check_pass("IPC dispatch: Shannon computed", json_h > 0.0);
-    v.check_pass("IPC dispatch: bit-identical to direct", (direct_h - json_h).abs() < 1e-15);
+    v.check_pass(
+        "IPC dispatch: bit-identical to direct",
+        (direct_h - json_h).abs() < 1e-15,
+    );
     println!("  IPC dispatch:    {n_iterations}× Shannon on 200 taxa = {json_us:.2}µs/call");
-    println!("  Overhead: {:.1}× (JSON-RPC serialization + dispatch routing)", json_us / direct_us);
-    println!("  Math fidelity: |direct - ipc| = {:.2e}", (direct_h - json_h).abs());
+    println!(
+        "  Overhead: {:.1}× (JSON-RPC serialization + dispatch routing)",
+        json_us / direct_us
+    );
+    println!(
+        "  Math fidelity: |direct - ipc| = {:.2e}",
+        (direct_h - json_h).abs()
+    );
 
     v.section("Phase 5: Full Pipeline Dispatch Timing");
 
@@ -162,10 +193,9 @@ fn main() {
         "metrics": ["all"],
         "scenario": "standard_growth",
     });
-    let pipeline_result = wetspring_barracuda::ipc::dispatch::dispatch(
-        "science.full_pipeline",
-        &pipeline_params,
-    ).unwrap();
+    let pipeline_result =
+        wetspring_barracuda::ipc::dispatch::dispatch("science.full_pipeline", &pipeline_params)
+            .unwrap();
     let pipeline_ms = t_pipeline.elapsed().as_secs_f64() * 1000.0;
 
     let has_diversity = pipeline_result.get("diversity").is_some();
@@ -173,8 +203,10 @@ fn main() {
     v.check_pass("Full pipeline: diversity stage completed", has_diversity);
     v.check_pass("Full pipeline: QS model stage completed", has_qs);
     println!("  Full pipeline dispatch: {pipeline_ms:.2}ms");
-    println!("  Stages: diversity={has_diversity}, qs_model={has_qs}, anderson={}",
-        pipeline_result.get("anderson").is_some());
+    println!(
+        "  Stages: diversity={has_diversity}, qs_model={has_qs}, anderson={}",
+        pipeline_result.get("anderson").is_some()
+    );
 
     v.section("Phase 6: Deployment Roadmap");
 
@@ -210,35 +242,53 @@ fn main() {
     v.finish();
 }
 
-fn find_biomeos_binary() -> Option<PathBuf> {
-    if let Ok(path) = which("biomeos") {
-        return Some(path);
-    }
-
-    let candidates = [
-        "../phase2/biomeOS/target/release/biomeos",
-        "../../phase2/biomeOS/target/release/biomeos",
-        "../../../phase2/biomeOS/target/release/biomeos",
-    ];
-    for candidate in &candidates {
-        let p = PathBuf::from(candidate);
+/// Discover biomeOS binary via environment or PATH.
+///
+/// Uses `BIOMEOS_BIN` if set and path exists, then `which("biomeos")`,
+/// then delegates to [`discover_primal_bin`] for relative-path discovery.
+fn discover_biomeos_bin() -> Option<PathBuf> {
+    if let Ok(path) = std::env::var("BIOMEOS_BIN") {
+        let p = PathBuf::from(path);
         if p.exists() {
             return Some(p);
         }
     }
-    None
+    if let Ok(path) = which("biomeos") {
+        return Some(path);
+    }
+
+    discover_primal_bin("biomeos")
 }
 
-fn find_primal_binary(name: &str) -> Option<PathBuf> {
+/// Discover a primal binary via environment or PATH.
+///
+/// Uses `{NAME}_BIN` (e.g. `BEARDOG_BIN`, `TOADSTOOL_BIN`) if set and path exists,
+/// then `which(name)`, then relative candidates as last resort.
+///
+/// For `biomeos`, uses directory `biomeOS` (known casing for the phase2 crate).
+fn discover_primal_bin(name: &str) -> Option<PathBuf> {
+    let env_var = format!("{}_BIN", name.to_uppercase().replace('-', "_"));
+    if let Ok(path) = std::env::var(&env_var) {
+        let p = PathBuf::from(path);
+        if p.exists() {
+            return Some(p);
+        }
+    }
     if let Ok(path) = which(name) {
         return Some(path);
     }
 
+    let dir_name = match name {
+        "biomeos" => "biomeOS",
+        _ => name,
+    };
+
     let phase_dirs = ["phase1", "phase2"];
     for phase in &phase_dirs {
         let candidates = [
-            format!("../{phase}/{name}/target/release/{name}"),
-            format!("../../{phase}/{name}/target/release/{name}"),
+            format!("../{phase}/{dir_name}/target/release/{name}"),
+            format!("../../{phase}/{dir_name}/target/release/{name}"),
+            format!("../../../{phase}/{dir_name}/target/release/{name}"),
         ];
         for candidate in &candidates {
             let p = PathBuf::from(candidate);

@@ -12,11 +12,11 @@
     clippy::items_after_statements,
     clippy::float_cmp
 )]
-//! # Exp229: `BarraCuda` CPU v15 — V76 Pure Rust Math (FST + PairwiseL2 + Rarefaction)
+//! # Exp229: `BarraCuda` CPU v15 — V76 Pure Rust Math (FST + `PairwiseL2` + Rarefaction)
 //!
 //! Extends CPU v14 (50 domains) with:
 //! - **V75 `fst_variance`** — Weir-Cockerham FST variance decomposition
-//! - **V75 PairwiseL2 CPU reference** — Euclidean distance baseline for GPU parity
+//! - **V75 `PairwiseL2` CPU reference** — Euclidean distance baseline for GPU parity
 //! - **V75 Rarefaction CPU reference** — bootstrap CI baseline for GPU parity
 //! - **V76 tolerance provenance audit** — verify named constants exist and are sensible
 //! - **V76 reconciliation CPU** — improved DTL reconciliation with multi-family

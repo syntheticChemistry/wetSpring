@@ -91,6 +91,17 @@ pub fn exit_skipped(reason: &str) -> ! {
     std::process::exit(2)
 }
 
+/// Discover the benchmark results directory via capability-based discovery.
+///
+/// Discovery order:
+/// 1. `WETSPRING_BENCH_DIR` env var (explicit override)
+/// 2. `{CARGO_MANIFEST_DIR}/../benchmarks/results` for development
+/// 3. `benchmarks/results` relative to cwd for deployment
+#[must_use]
+pub fn discover_bench_dir() -> std::path::PathBuf {
+    data_dir("WETSPRING_BENCH_DIR", "benchmarks/results")
+}
+
 /// Resolve a data directory using a cascading discovery strategy.
 ///
 /// Implements capability-based discovery: primal code has no hardcoded paths and

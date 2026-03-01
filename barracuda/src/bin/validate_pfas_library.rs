@@ -348,9 +348,13 @@ fn validate_kmd_homologue_series(v: &mut Validator) {
     println!("  PFCA KMD range: {kmd_range:.6} (min={kmd_min:.4}, max={kmd_max:.4})");
     v.check(
         "PFCA series KMD spread < 0.02",
-        if kmd_range < 0.02 { 1.0 } else { 0.0 },
+        if kmd_range < tolerances::KMD_SPREAD {
+            1.0
+        } else {
+            0.0
+        },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // PFSA series: 6 compounds
@@ -370,9 +374,13 @@ fn validate_kmd_homologue_series(v: &mut Validator) {
     println!("  PFSA KMD range: {pfsa_range:.6}");
     v.check(
         "PFSA series KMD spread < 0.02",
-        if pfsa_range < 0.02 { 1.0 } else { 0.0 },
+        if pfsa_range < tolerances::KMD_SPREAD {
+            1.0
+        } else {
+            0.0
+        },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // PFCA and PFSA should be in DIFFERENT KMD groups
@@ -384,13 +392,17 @@ fn validate_kmd_homologue_series(v: &mut Validator) {
 
     v.check(
         "PFCA vs PFSA KMD separation > 0.01",
-        if inter_series_gap > 0.01 { 1.0 } else { 0.0 },
+        if inter_series_gap > tolerances::KMD_GROUPING {
+            1.0
+        } else {
+            0.0
+        },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // pfas_kmd_screen grouping: all PFCA should cluster together
-    let (_, pfca_groups) = kmd::pfas_kmd_screen(&pfca_masses, 0.01);
+    let (_, pfca_groups) = kmd::pfas_kmd_screen(&pfca_masses, tolerances::KMD_GROUPING);
     let max_pfca_group = pfca_groups.iter().map(Vec::len).max().unwrap_or(0);
     println!(
         "  PFCA grouping: {} groups, largest = {}",
@@ -409,7 +421,7 @@ fn validate_kmd_homologue_series(v: &mut Validator) {
     mixed_masses.extend(pfsa_masses.iter());
     mixed_masses.extend(FTSA_SERIES.iter().map(|p| p.mh_neg));
 
-    let (_, mixed_groups) = kmd::pfas_kmd_screen(&mixed_masses, 0.005);
+    let (_, mixed_groups) = kmd::pfas_kmd_screen(&mixed_masses, tolerances::KMD_NON_HOMOLOGUE);
     println!(
         "  Mixed series: {} groups from {} compounds",
         mixed_groups.len(),
@@ -693,11 +705,11 @@ fn validate_jones_library_expansion(v: &mut Validator) {
         "Jones m/z range spans > 500 Da",
         if (mz_max - mz_min) > 500.0 { 1.0 } else { 0.0 },
         1.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // KMD analysis on Jones library: should detect multiple homologue groups
-    let (_, groups) = kmd::pfas_kmd_screen(&sorted_jones, 0.01);
+    let (_, groups) = kmd::pfas_kmd_screen(&sorted_jones, tolerances::KMD_GROUPING);
     println!(
         "  Jones KMD screening: {} groups from {} ions",
         groups.len(),

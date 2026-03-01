@@ -9,9 +9,10 @@
 resolver = "2"
 members = [
     "barracuda",
-    "barracuda/fuzz",
     "metalForge/forge",
 ]
+# barracuda/fuzz excluded: fuzz targets run indefinitely and block `cargo test --workspace`.
+# Run fuzz independently: `cd barracuda/fuzz && cargo +nightly fuzz run <target>`
 
 [workspace.package]
 edition = "2024"

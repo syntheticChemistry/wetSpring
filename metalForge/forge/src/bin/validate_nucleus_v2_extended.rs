@@ -15,7 +15,7 @@
 //! molecular clock, random forest, rarefaction, kriging.
 //!
 //! - S1: Tower (Discovery) — Local substrates + capability matching
-//! - S2: Nest (Storage) — NestGate protocol for new workload artifacts
+//! - S2: Nest (Storage) — `NestGate` protocol for new workload artifacts
 //! - S3: Node (Compute) — Dispatch routing for 8 new workloads
 //! - S4: Extended Workload Catalog — 49+ workloads registered
 //! - S5: Cross-System Pipeline — GPU→NPU→CPU hand-off for mixed workloads
@@ -142,9 +142,31 @@ fn section_nest_protocol(pass: &mut u32, fail: &mut u32) {
     } else {
         println!("    NestGate: not running (sovereign fallback OK)");
         check("Nest: sovereign fallback (no NestGate)", true, pass, fail);
-        check("Nest: fallback placeholder", true, pass, fail);
-        check("Nest: fallback placeholder", true, pass, fail);
-        check("Nest: fallback placeholder", true, pass, fail);
+
+        // Real Nest API validation when NestGate is unavailable: client construction and discovery work
+        let discovered = nest::NestClient::discover();
+        check(
+            "Nest: fallback — discover() returns None when no socket",
+            discovered.is_none(),
+            pass,
+            fail,
+        );
+
+        let default_path = nest::default_socket_path();
+        let client = nest::NestClient::new(default_path.clone());
+        check(
+            "Nest: fallback — client constructs with default path",
+            client.socket_path() == default_path.as_path(),
+            pass,
+            fail,
+        );
+
+        check(
+            "Nest: fallback — default_socket_path yields usable path",
+            !default_path.as_os_str().is_empty(),
+            pass,
+            fail,
+        );
     }
 }
 

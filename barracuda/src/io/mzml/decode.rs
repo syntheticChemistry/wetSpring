@@ -532,7 +532,7 @@ mod tests {
         let encoded = crate::encoding::base64_encode(&bytes);
 
         let mut state = BinaryArrayState::new();
-        state.text = encoded.clone();
+        state.text = encoded.clone(); // ownership transfer: encoded reused for second decode below
         state.is_mz = true;
         state.is_zlib = false;
         state.is_64bit = true;

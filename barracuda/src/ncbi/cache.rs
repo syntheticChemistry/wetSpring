@@ -8,14 +8,14 @@ use std::path::{Path, PathBuf};
 /// Build a cache file path via capability-based data discovery.
 ///
 /// Discovery order:
-/// 1. `WETSPRING_DATA_ROOT/{filename}` if `WETSPRING_DATA_ROOT` is set
+/// 1. `WETSPRING_DATA_DIR/{filename}` if `WETSPRING_DATA_DIR` is set
 /// 2. `{CARGO_MANIFEST_DIR}/../data/{filename}` for development
 /// 3. `data/{filename}` relative to cwd for deployment
 #[must_use]
 pub fn cache_file(filename: &str) -> PathBuf {
-    let data_root = std::env::var("WETSPRING_DATA_ROOT").ok();
+    let data_dir = std::env::var("WETSPRING_DATA_DIR").ok();
     let manifest = std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| ".".to_string());
-    resolve(data_root.as_deref(), &manifest, filename)
+    resolve(data_dir.as_deref(), &manifest, filename)
 }
 
 /// Build an accession-based cache directory.
@@ -257,9 +257,14 @@ fn sha256(data: &[u8]) -> [u8; 32] {
 }
 
 /// Pure-logic cache path resolution — no env access.
-fn resolve(data_root: Option<&str>, manifest_dir: &str, filename: &str) -> PathBuf {
-    if let Some(root) = data_root {
-        let p = PathBuf::from(root).join(filename);
+///
+/// Fallback cascade (when `data_dir` is `None` or path doesn't exist):
+/// 1. `WETSPRING_DATA_DIR` (passed as `data_dir`) — explicit override
+/// 2. `{manifest_dir}/../data` — development layout (crate in workspace)
+/// 3. `data/` — deployment fallback relative to cwd
+fn resolve(data_dir: Option<&str>, manifest_dir: &str, filename: &str) -> PathBuf {
+    if let Some(dir) = data_dir {
+        let p = PathBuf::from(dir).join(filename);
         if p.parent().is_some_and(Path::exists) {
             return p;
         }

@@ -7,15 +7,20 @@
 //!
 //! # Encryption
 //!
-//! Local: sovereign XOR-rotate cipher (placeholder).
-//! Absorb target: `BearDog` `encryption.encrypt` (`ChaCha20-Poly1305`).
+//! ChaCha20-Poly1305 AEAD (`RustCrypto` `chacha20poly1305` crate).
+//! Key derivation: `BLAKE3(lineage_seed)` → 32-byte encryption key.
+//! Nonce: first 12 bytes of content hash (deterministic for dedup).
 //!
 //! # Storage
 //!
-//! Local: in-memory `HashMap` (placeholder).
+//! Local: in-memory `HashMap` (correct local pattern).
 //! Absorb target: `NestGate` `storage.store_blob` (content-addressed ZFS).
 
 use std::collections::HashMap;
+
+use blake3::Hasher;
+use chacha20poly1305::ChaCha20Poly1305;
+use chacha20poly1305::aead::{Aead, KeyInit};
 
 use super::consent::ConsentTicket;
 use super::provenance::ProvenanceChain;
@@ -95,7 +100,7 @@ impl VaultStore {
 
         let content_hash = sovereign_hash(plaintext);
         let nonce = derive_nonce(&content_hash);
-        let ciphertext = sovereign_encrypt(plaintext, key, &nonce);
+        let ciphertext = sovereign_encrypt(plaintext, key, &nonce)?;
         let cipher_hash = sovereign_hash(&ciphertext);
 
         let blob = VaultBlob {
@@ -145,7 +150,7 @@ impl VaultStore {
             return Err("consent ticket owner does not match blob owner".to_string());
         }
 
-        let plaintext = sovereign_decrypt(&blob.ciphertext, key, &blob.nonce);
+        let plaintext = sovereign_decrypt(&blob.ciphertext, key, &blob.nonce)?;
 
         let verify_hash = sovereign_hash(&plaintext);
         if verify_hash != *content_hash {
@@ -200,10 +205,7 @@ impl VaultStore {
     /// # Errors
     ///
     /// Always returns `Err` — unauthorized access is never permitted.
-    pub fn retrieve_unauthorized(
-        &self,
-        content_hash: &[u8; 32],
-    ) -> Result<(), String> {
+    pub fn retrieve_unauthorized(&self, content_hash: &[u8; 32]) -> Result<(), String> {
         if self.blobs.contains_key(content_hash) {
             Err("blob exists but no valid consent ticket presented".to_string())
         } else {
@@ -212,31 +214,45 @@ impl VaultStore {
     }
 }
 
-/// Sovereign encryption (XOR-rotate, placeholder for `ChaCha20-Poly1305`).
+/// Encrypt plaintext with ChaCha20-Poly1305.
 ///
-/// `BearDog` absorb target: replace with `encryption.encrypt`.
-fn sovereign_encrypt(plaintext: &[u8], key: &[u8; 32], nonce: &[u8; 12]) -> Vec<u8> {
-    let mut keystream = Vec::with_capacity(plaintext.len());
-    let mut state: u64 = u64::from_le_bytes(nonce[..8].try_into().unwrap_or([0; 8]));
-
-    for (i, &k) in key.iter().cycle().take(plaintext.len()).enumerate() {
-        state = state
-            .wrapping_mul(0x517C_C1B7_2722_0A95)
-            .wrapping_add(u64::from(k))
-            .wrapping_add(i as u64);
-        keystream.push((state >> 32) as u8);
-    }
-
-    plaintext
-        .iter()
-        .zip(keystream.iter())
-        .map(|(&p, &k)| p ^ k)
-        .collect()
+/// Key derivation: `BLAKE3(lineage_seed)` → 32-byte key.
+/// Nonce: 12 bytes (from content hash for deterministic dedup).
+fn sovereign_encrypt(
+    plaintext: &[u8],
+    lineage_seed: &[u8; 32],
+    nonce: &[u8; 12],
+) -> Result<Vec<u8>, String> {
+    let key = derive_key(lineage_seed);
+    let cipher =
+        ChaCha20Poly1305::new_from_slice(&key).map_err(|_| "invalid key length".to_string())?;
+    let nonce_arr = chacha20poly1305::Nonce::from_slice(nonce);
+    cipher
+        .encrypt(nonce_arr, plaintext)
+        .map_err(|e| format!("encryption failed: {e}"))
 }
 
-/// Sovereign decryption (symmetric with encryption).
-fn sovereign_decrypt(ciphertext: &[u8], key: &[u8; 32], nonce: &[u8; 12]) -> Vec<u8> {
-    sovereign_encrypt(ciphertext, key, nonce)
+/// Decrypt ciphertext with ChaCha20-Poly1305.
+fn sovereign_decrypt(
+    ciphertext: &[u8],
+    lineage_seed: &[u8; 32],
+    nonce: &[u8; 12],
+) -> Result<Vec<u8>, String> {
+    let key = derive_key(lineage_seed);
+    let cipher =
+        ChaCha20Poly1305::new_from_slice(&key).map_err(|_| "invalid key length".to_string())?;
+    let nonce_arr = chacha20poly1305::Nonce::from_slice(nonce);
+    cipher
+        .decrypt(nonce_arr, ciphertext)
+        .map_err(|_| "decryption failed (wrong key or tampered ciphertext)".to_string())
+}
+
+/// Derive 32-byte encryption key from lineage seed using BLAKE3.
+fn derive_key(lineage_seed: &[u8; 32]) -> [u8; 32] {
+    let mut hasher = Hasher::new();
+    hasher.update(b"wetspring-vault-encryption-v1");
+    hasher.update(lineage_seed);
+    *hasher.finalize().as_bytes()
 }
 
 /// Derive a nonce from a content hash (deterministic for dedup).
@@ -246,27 +262,9 @@ fn derive_nonce(content_hash: &[u8; 32]) -> [u8; 12] {
     nonce
 }
 
-/// Sovereign hash (same as consent/provenance modules).
+/// Content hash using BLAKE3.
 fn sovereign_hash(input: &[u8]) -> [u8; 32] {
-    let mut h: [u64; 4] = [
-        0x6A09_E667_F3BC_C908,
-        0xBB67_AE85_84CA_A73B,
-        0x3C6E_F372_FE94_F82B,
-        0xA54F_F53A_5F1D_36F1,
-    ];
-
-    for chunk in input.chunks(32) {
-        for (i, byte) in chunk.iter().enumerate() {
-            h[i % 4] ^= u64::from(*byte) << ((i % 8) * 8);
-            h[i % 4] = h[i % 4].wrapping_mul(0x517C_C1B7_2722_0A95).rotate_left(17);
-        }
-    }
-
-    let mut out = [0u8; 32];
-    for (i, word) in h.iter().enumerate() {
-        out[i * 8..(i + 1) * 8].copy_from_slice(&word.to_le_bytes());
-    }
-    out
+    *blake3::hash(input).as_bytes()
 }
 
 #[cfg(test)]
@@ -285,9 +283,9 @@ mod tests {
         let key = [42u8; 32];
         let nonce = [1u8; 12];
         let plaintext = b"ATCGATCGATCGATCG";
-        let ciphertext = sovereign_encrypt(plaintext, &key, &nonce);
+        let ciphertext = sovereign_encrypt(plaintext, &key, &nonce).unwrap();
         assert_ne!(&ciphertext[..], &plaintext[..]);
-        let decrypted = sovereign_decrypt(&ciphertext, &key, &nonce);
+        let decrypted = sovereign_decrypt(&ciphertext, &key, &nonce).unwrap();
         assert_eq!(&decrypted[..], &plaintext[..]);
     }
 
@@ -298,7 +296,9 @@ mod tests {
         let ticket = test_ticket("owner-1", ConsentScope::ReadRawSequences);
         let data = b"ATCGATCGATCG sequence data";
 
-        let hash = vault.store(data, "sample_001.fastq", "owner-1", &key, &ticket).unwrap();
+        let hash = vault
+            .store(data, "sample_001.fastq", "owner-1", &key, &ticket)
+            .unwrap();
         let result = vault.retrieve(&hash, &key, &ticket).unwrap();
 
         assert_eq!(&result.plaintext[..], &data[..]);
@@ -311,7 +311,9 @@ mod tests {
         let key = [42u8; 32];
         let ticket = test_ticket("owner-1", ConsentScope::ReadRawSequences);
 
-        let err = vault.store(b"data", "label", "owner-2", &key, &ticket).unwrap_err();
+        let err = vault
+            .store(b"data", "label", "owner-2", &key, &ticket)
+            .unwrap_err();
         assert!(err.contains("owner mismatch"));
     }
 
@@ -320,7 +322,9 @@ mod tests {
         let mut vault = VaultStore::new("eastgate");
         let key = [42u8; 32];
         let ticket = test_ticket("owner-1", ConsentScope::ReadRawSequences);
-        let hash = vault.store(b"data", "label", "owner-1", &key, &ticket).unwrap();
+        let hash = vault
+            .store(b"data", "label", "owner-1", &key, &ticket)
+            .unwrap();
 
         let mut expired_ticket = test_ticket("owner-1", ConsentScope::ReadRawSequences);
         expired_ticket.issued_at = 0;
@@ -335,7 +339,9 @@ mod tests {
         let mut vault = VaultStore::new("eastgate");
         let key = [42u8; 32];
         let mut ticket = test_ticket("owner-1", ConsentScope::ReadRawSequences);
-        let hash = vault.store(b"data", "label", "owner-1", &key, &ticket).unwrap();
+        let hash = vault
+            .store(b"data", "label", "owner-1", &key, &ticket)
+            .unwrap();
 
         ticket.revoke();
         let err = vault.retrieve(&hash, &key, &ticket).unwrap_err();
@@ -348,7 +354,9 @@ mod tests {
         let key = [42u8; 32];
         let ticket = test_ticket("owner-1", ConsentScope::ReadRawSequences);
 
-        let hash = vault.store(b"data", "label", "owner-1", &key, &ticket).unwrap();
+        let hash = vault
+            .store(b"data", "label", "owner-1", &key, &ticket)
+            .unwrap();
         let _ = vault.retrieve(&hash, &key, &ticket).unwrap();
 
         assert_eq!(vault.provenance().len(), 2);
@@ -362,9 +370,15 @@ mod tests {
         let wrong_key = [99u8; 32];
         let ticket = test_ticket("owner-1", ConsentScope::ReadRawSequences);
 
-        let hash = vault.store(b"data", "label", "owner-1", &key, &ticket).unwrap();
+        let hash = vault
+            .store(b"data", "label", "owner-1", &key, &ticket)
+            .unwrap();
         let err = vault.retrieve(&hash, &wrong_key, &ticket).unwrap_err();
-        assert!(err.contains("integrity check failed"));
+        // ChaCha20-Poly1305: wrong key fails at decrypt (AEAD tag) or content hash
+        assert!(
+            err.contains("decryption failed") || err.contains("integrity check failed"),
+            "expected decrypt or integrity error, got: {err}"
+        );
     }
 
     #[test]
@@ -372,7 +386,9 @@ mod tests {
         let mut vault = VaultStore::new("eastgate");
         let key = [42u8; 32];
         let ticket = test_ticket("owner-1", ConsentScope::ReadRawSequences);
-        let hash = vault.store(b"data", "label", "owner-1", &key, &ticket).unwrap();
+        let hash = vault
+            .store(b"data", "label", "owner-1", &key, &ticket)
+            .unwrap();
 
         let err = vault.retrieve_unauthorized(&hash).unwrap_err();
         assert!(err.contains("no valid consent ticket"));

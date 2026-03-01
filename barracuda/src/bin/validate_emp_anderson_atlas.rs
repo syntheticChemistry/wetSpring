@@ -1,9 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![allow(
-    clippy::expect_used, clippy::unwrap_used, clippy::print_stdout,
-    clippy::too_many_lines, clippy::cast_precision_loss, clippy::cast_possible_truncation,
-    clippy::cast_sign_loss, clippy::similar_names, clippy::many_single_char_names,
-    clippy::items_after_statements, clippy::float_cmp
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::print_stdout,
+    clippy::too_many_lines,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::similar_names,
+    clippy::many_single_char_names,
+    clippy::items_after_statements,
+    clippy::float_cmp
 )]
 //! # Exp256: EMP-Scale Anderson Atlas — 30K Biome QS Classification
 //!
@@ -85,7 +92,9 @@ fn anderson_w_from_j(j: f64) -> f64 {
 fn generate_community(n_taxa: usize, target_j: f64, seed: u64) -> Vec<f64> {
     let mut rng_state = seed;
     let lcg = |state: &mut u64| -> f64 {
-        *state = state.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
+        *state = state
+            .wrapping_mul(6_364_136_223_846_793_005)
+            .wrapping_add(1);
         (*state >> 33) as f64 / (1u64 << 31) as f64
     };
 
@@ -135,9 +144,7 @@ fn level_spacing_ratio_simple(w: f64, seed: u64) -> f64 {
 }
 
 fn main() {
-    let mut v = Validator::new(
-        "Exp256: EMP-Scale Anderson Atlas — 30K Biome QS Classification",
-    );
+    let mut v = Validator::new("Exp256: EMP-Scale Anderson Atlas — 30K Biome QS Classification");
     let t_total = Instant::now();
 
     let n_taxa = 150;
@@ -179,10 +186,10 @@ fn main() {
         let mut biome_qs_active = 0_usize;
 
         for sample_idx in 0..samples_per_biome {
-            let seed = (biome_idx as u64 * 100_000 + sample_idx as u64) * 2654435761;
+            let seed = (biome_idx as u64 * 100_000 + sample_idx as u64) * 2_654_435_761;
 
-            let target_j = (base_j + (sample_idx as f64 / samples_per_biome as f64 - 0.5)
-                * j_spread * 2.0)
+            let target_j = (base_j
+                + (sample_idx as f64 / samples_per_biome as f64 - 0.5) * j_spread * 2.0)
                 .clamp(0.01, 0.99);
             let community = generate_community(n_taxa, target_j, seed);
 
@@ -209,10 +216,7 @@ fn main() {
         let pct_active = biome_qs_active as f64 / samples_per_biome as f64 * 100.0;
         let biome_ms = t_biome.elapsed().as_secs_f64() * 1000.0;
 
-        v.check_pass(
-            &format!("{biome_name}: QS-active > 50%"),
-            pct_active > 50.0,
-        );
+        v.check_pass(&format!("{biome_name}: QS-active > 50%"), pct_active > 50.0);
         v.check_pass(
             &format!("{biome_name}: mean r > midpoint ({midpoint:.3})"),
             mean_r > midpoint,
@@ -223,8 +227,8 @@ fn main() {
             n_samples: samples_per_biome,
             mean_shannon: mean_h,
             mean_pielou_j: mean_j,
-            mean_w: mean_w,
-            mean_r: mean_r,
+            mean_w,
+            mean_r,
             pct_qs_active: pct_active,
             _compute_ms: biome_ms,
         });
@@ -238,7 +242,10 @@ fn main() {
     let jk = stats::jackknife_mean_variance(&all_rs).unwrap();
     v.check_pass("Atlas: jackknife SE on mean r > 0", jk.std_error > 0.0);
     v.check_pass("Atlas: jackknife mean r > midpoint", jk.estimate > midpoint);
-    println!("  Atlas mean r: {:.4} ± {:.6} (jackknife)", jk.estimate, jk.std_error);
+    println!(
+        "  Atlas mean r: {:.4} ± {:.6} (jackknife)",
+        jk.estimate, jk.std_error
+    );
 
     let ci = stats::bootstrap_ci(
         &all_rs,
@@ -249,7 +256,10 @@ fn main() {
     )
     .unwrap();
     v.check_pass("Atlas: 95% CI lower > midpoint", ci.lower > midpoint);
-    v.check_pass("Atlas: CI contains estimate", ci.lower <= ci.estimate && ci.estimate <= ci.upper);
+    v.check_pass(
+        "Atlas: CI contains estimate",
+        ci.lower <= ci.estimate && ci.estimate <= ci.upper,
+    );
     println!("  Atlas 95% CI: [{:.4}, {:.4}]", ci.lower, ci.upper);
 
     let r_w_corr = stats::pearson_correlation(&all_ws, &all_rs).unwrap();
@@ -257,14 +267,15 @@ fn main() {
     println!("  W↔r Pearson correlation: {r_w_corr:.4}");
 
     let pct_global_active = global_qs_active as f64 / total_samples as f64 * 100.0;
-    v.check_pass(
-        "Atlas: global QS-active > 90%",
-        pct_global_active > 90.0,
-    );
+    v.check_pass("Atlas: global QS-active > 90%", pct_global_active > 90.0);
 
     v.section("Phase 4: Primal Interaction Report");
 
-    let substrate = if ipc_available { "NUCLEUS (IPC)" } else { "standalone (direct)" };
+    let substrate = if ipc_available {
+        "NUCLEUS (IPC)"
+    } else {
+        "standalone (direct)"
+    };
     println!("  Compute substrate: {substrate}");
     println!("  Data path: synthetic EMP-calibrated (real EMP pending NestGate BIOM fetch)");
     println!();
@@ -298,20 +309,32 @@ fn main() {
 
     println!();
     println!("╔══════════════════════════════════════════════════════════════════════════════╗");
-    println!("║  EMP-Scale Anderson Atlas — {total_samples} Samples × {n_biomes} Biomes                    ║",
-        n_biomes = EMP_BIOMES.len());
+    println!(
+        "║  EMP-Scale Anderson Atlas — {total_samples} Samples × {n_biomes} Biomes                    ║",
+        n_biomes = EMP_BIOMES.len()
+    );
     println!("╠══════════════════════════════════════════════════════════════════════════════╣");
-    println!("║ {:22} │ {:>5} │ {:>6} │ {:>5} │ {:>5} │ {:>7} │ {:>8} ║",
-        "Biome", "N", "H'", "J", "W", "r", "QS%");
+    println!(
+        "║ {:22} │ {:>5} │ {:>6} │ {:>5} │ {:>5} │ {:>7} │ {:>8} ║",
+        "Biome", "N", "H'", "J", "W", "r", "QS%"
+    );
     println!("╠══════════════════════════════════════════════════════════════════════════════╣");
     for e in &atlas {
-        println!("║ {:22} │ {:>5} │ {:>6.3} │ {:>5.3} │ {:>5.1} │ {:>7.4} │ {:>7.1}% ║",
-            e.biome, e.n_samples, e.mean_shannon, e.mean_pielou_j,
-            e.mean_w, e.mean_r, e.pct_qs_active);
+        println!(
+            "║ {:22} │ {:>5} │ {:>6.3} │ {:>5.3} │ {:>5.1} │ {:>7.4} │ {:>7.1}% ║",
+            e.biome,
+            e.n_samples,
+            e.mean_shannon,
+            e.mean_pielou_j,
+            e.mean_w,
+            e.mean_r,
+            e.pct_qs_active
+        );
     }
     println!("╠══════════════════════════════════════════════════════════════════════════════╣");
-    println!("║ Global QS-active: {global_qs_active}/{total_samples} ({pct_global_active:.1}%)  │  Compute: {total_ms:.1}ms  │  Substrate: {:10} ║",
-        substrate);
+    println!(
+        "║ Global QS-active: {global_qs_active}/{total_samples} ({pct_global_active:.1}%)  │  Compute: {total_ms:.1}ms  │  Substrate: {substrate:10} ║"
+    );
     println!("╚══════════════════════════════════════════════════════════════════════════════╝");
 
     v.finish();
@@ -321,7 +344,8 @@ fn check_nucleus_available() -> bool {
     let xdg = std::env::var("XDG_RUNTIME_DIR").ok();
     if let Some(xdg_dir) = xdg {
         let biomeos_sock = std::path::PathBuf::from(&xdg_dir).join("biomeos/biomeos-default.sock");
-        let wetspring_sock = std::path::PathBuf::from(&xdg_dir).join("biomeos/wetspring-default.sock");
+        let wetspring_sock =
+            std::path::PathBuf::from(&xdg_dir).join("biomeos/wetspring-default.sock");
         if biomeos_sock.exists() || wetspring_sock.exists() {
             return true;
         }
