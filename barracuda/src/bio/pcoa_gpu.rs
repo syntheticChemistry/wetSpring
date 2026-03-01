@@ -44,6 +44,11 @@ pub fn pcoa_gpu(
     n_samples: usize,
     n_axes: usize,
 ) -> Result<PcoaResult> {
+    if n_samples < 2 {
+        return Err(Error::InvalidInput(
+            "PCoA requires at least 2 samples".into(),
+        ));
+    }
     let expected_pairs = n_samples * (n_samples - 1) / 2;
     if condensed.len() != expected_pairs {
         return Err(Error::InvalidInput(format!(
@@ -52,11 +57,6 @@ pub fn pcoa_gpu(
             expected_pairs,
             n_samples
         )));
-    }
-    if n_samples < 2 {
-        return Err(Error::InvalidInput(
-            "PCoA requires at least 2 samples".into(),
-        ));
     }
     if !gpu.has_f64 {
         return Err(Error::Gpu("SHADER_F64 not supported on this GPU".into()));

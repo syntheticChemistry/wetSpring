@@ -315,7 +315,7 @@ fn main() {
 
     let p_same = felsenstein::jc69_prob(0, 0, 0.1, 1.0);
     let p_diff = felsenstein::jc69_prob(0, 1, 0.1, 1.0);
-    let row_sum = p_same + 3.0 * p_diff;
+    let row_sum = 3.0_f64.mul_add(p_diff, p_same);
     v.check(
         "Felsenstein: row sum = 1",
         row_sum,
@@ -324,7 +324,7 @@ fn main() {
     );
     v.check_pass("Felsenstein: P(same) > P(diff)", p_same > p_diff);
 
-    let p_exact = 0.25 + 0.75 * (-4.0_f64 * 0.1 / 3.0).exp();
+    let p_exact = 0.75_f64.mul_add((-4.0_f64 * 0.1 / 3.0).exp(), 0.25);
     v.check(
         "Felsenstein: P(A→A) analytical",
         p_same,
@@ -460,7 +460,7 @@ fn main() {
     v.check_pass("Zuber: MBC ratio > 1", mbc_ratio > 1.0);
     v.check_pass(
         "Zuber: 95% CI excludes 1.0",
-        mbc_ratio - 1.96 * mbc_se > 1.0,
+        1.96_f64.mul_add(-mbc_se, mbc_ratio) > 1.0,
     );
 
     // ── P15: Feng 2024 — Pore-Size Diversity ──

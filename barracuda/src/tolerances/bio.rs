@@ -577,10 +577,10 @@ pub const MERGE_OVERLAP_TOL: f64 = 1.0;
 /// Numerical Hessian diagonal element tolerance.
 ///
 /// `numerical_hessian` at ε = 1e-5 uses O(ε²) central differences.
-/// For the Rosenbrock function at (1,1), H[0,0] ≈ 802 and H[1,1] ≈ 200.
+/// For the Rosenbrock function at (1,1), H\[0,0\] ≈ 802 and H\[1,1\] ≈ 200.
 /// The finite-difference truncation error is O(ε²) ≈ 1e-10, but the
 /// conditioning of the second-order quotient amplifies rounding to ~2.0
-/// for H[0,0] and ~1.0 for H[1,1].
+/// for H\[0,0\] and ~1.0 for H\[1,1\].
 /// Validated: Exp224 (`BarraCuda` CPU v14), commit `e4358c5`, 2026-02-19.
 /// Source: neuralSpring Rosenbrock baseline.
 pub const HESSIAN_H00_TOL: f64 = 2.0;

@@ -5,6 +5,136 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V81 — CPU↔GPU Parity + ToadStool Dispatch + PCIe Bypass + NUCLEUS v2 (2026-02-28)
+
+### Exp243: CPU vs GPU Extended Parity — 22 Domains Head-to-Head
+- **6 new CPU↔GPU domains**: Chimera, DADA2, GBM, DTL Reconciliation, Molecular Clock, Random Forest
+- Wall-clock timing for both paths; same equations, different hardware
+- Inherits 16 domains from Exp092; 22 total domains, math truly portable
+- 24/24 checks PASS
+
+### Exp244: ToadStool Compute Dispatch v2 — Extended Overhead Proof
+- `GpuPipelineSession` pre-warmup + streaming vs individual dispatch overhead
+- Bray-Curtis matrix streaming, `stream_sample` (taxonomy + diversity), `stream_full_analytics`
+- CPU reference parity for all streaming outputs; determinism proven (3 runs bit-identical)
+- 22/22 checks PASS
+
+### Exp245: PCIe Bypass Mixed Hardware — NPU→GPU→CPU Dispatch Topology
+- PCIe bandwidth tier detection (Gen3/Gen4/Gen5) per GPU substrate
+- GPU→GPU streaming (4 stages, 3 chained, 0 CPU round-trips, fully streamable)
+- GPU→NPU PCIe bypass (`accepts_gpu_buffer: true`, 0 CPU round-trips) vs without (1 round-trip)
+- Bandwidth-aware dispatch routing for chimera, DADA2, GBM, reconciliation, clock
+- 6-stage pipeline topology: 5 transitions saved, 0 CPU round-trips needed
+- 36/36 checks PASS
+
+### Exp246: NUCLEUS Tower→Node→Nest v2 — Extended Pipeline
+- Tower discovery: local substrates + `discover_with_tower()` capability matching
+- Nest protocol: NestGate store/retrieve/exists for workload artifacts (sovereign fallback)
+- Node dispatch: 8 new workloads routed (chimera, dada2, gbm, reconciliation, clock, bootstrap, placement, assembly)
+- Extended catalog: 34+ workloads registered, all ToadStool-absorbed
+- Cross-system pipeline: GPU→GPU→GPU→NPU→CPU (3 chained + 1 bypass + 1 CPU fallback)
+- biomeOS coordination: Songbird + NestGate socket discovery, sovereign mode fallback
+- 62/62 checks PASS
+
+## V80 — Extended Evolution Chain: 19 Domains × 4 Tiers (2026-02-28)
+
+### Exp239: BarraCuda CPU v17 — 8 New Domains (Pure Rust)
+- **Chimera Detection** (`chimera::detect_chimeras`, `chimera::remove_chimeras`)
+- **DADA2 Denoising** (`dada2::denoise`, `dada2::asvs_to_fasta`)
+- **Smith-Waterman Alignment** (`alignment::smith_waterman`, `alignment::pairwise_scores`)
+- **Echo State Network** (`esn::Esn` train/predict, `NpuReadoutWeights::classify`)
+- **GBM Classifier** (`gbm::GbmClassifier` single/batch prediction)
+- **DTL Reconciliation** (`reconciliation::reconcile_dtl`)
+- **Molecular Clock** (`molecular_clock::strict_clock`, `relaxed_clock_rates`, `rate_variation_cv`)
+- **Random Forest + Decision Tree** (`random_forest::RandomForest`, `decision_tree::DecisionTree`)
+- 29/29 checks PASS — zero Python, zero GPU, zero unsafe
+
+### Exp240: BarraCuda GPU v9 — 8 New GPU Workloads
+- GPU parity for: Chimera, DADA2, GBM, Reconciliation, Molecular Clock, Random Forest, Rarefaction, Kriging
+- CPU == GPU within tolerances for all domains
+- 24/24 checks PASS
+
+### Exp241: Pure GPU Streaming v7 — 6-Stage ToadStool Pipeline
+- DADA2 → Chimera → Diversity → Rarefaction → Kriging → Reconciliation
+- ToadStool unidirectional: zero CPU round-trips between stages
+- Bray-Curtis CPU == GPU parity, bitwise determinism (3 runs)
+- 18/18 checks PASS
+
+### Exp242: metalForge v11 — 23-Workload Cross-System Dispatch
+- Extended from 15 to 23 workloads (16 GPU + 3 NPU + 4 CPU)
+- 8 new: Chimera, DADA2, GBM, Reconciliation, Clock, RF, Rarefaction, Kriging
+- IPC dispatch parity validated (Shannon, Simpson, QS model, full pipeline)
+- 43/43 checks PASS
+
+### Validation
+- 962 barracuda lib tests + 175 metalForge forge tests: **all pass**
+- Clippy pedantic: **ZERO warnings**
+- Prior chain (Exp233-237) re-validated green: 156/156 checks
+- New chain (Exp239-242) validated: 114/114 checks
+- Total: **270 checks across 9 experiments**, all green
+
+## V79 — Deep Debt Evolution: Idiomatic Rust + Platform-Agnostic + Safety (2026-02-28)
+
+### Exp238: Deep Debt Evolution
+
+#### Modern Idiomatic Rust
+- `&[String]` → `&[impl AsRef<str>]` in `neighbor_joining`, `neighbor_joining_gpu`, `pangenome::clusters_from_matrix` — callers can now pass `&[&str]` without allocation
+- `map().unwrap_or_else()` → `map_or_else()` in pangenome (clippy-clean)
+
+#### Platform-Agnostic Hardware Discovery
+- metalForge `probe_cpu()` evolved to `#[cfg(target_os = "linux")]` with platform-specific `CpuProbeResult` struct (replaces complex 6-element tuple)
+- `#[cfg(not(target_os = "linux"))]` fallback returns baseline capabilities
+- NPU discovery evolved from single hardcoded `/dev/akida0` check to capability-based filesystem scan (`/dev/akida*`) with `WETSPRING_NPU_DEVICE` env override
+
+#### Subtraction Overflow Fix (Safe Rust)
+- `pcoa.rs` and `pcoa_gpu.rs`: moved `n_samples < 2` guard **before** `n_samples * (n_samples - 1) / 2` — prevents `usize` underflow panic when `n_samples == 0`
+- Audited all `len() - 1` patterns across both crates; remaining instances verified safe (guarded by prior length checks)
+
+#### Validation
+- 1,006 barracuda lib tests: **all pass**
+- 175 metalForge forge tests: **all pass**
+- Clippy pedantic + nursery: **ZERO warnings** (both crates, all targets)
+- All five-tier evolution experiments re-validated green (Exp233-237: 156/156 checks)
+
+## V78 — Five-Tier Evolution Chain: Paper → CPU → GPU → Streaming → metalForge (2026-02-28)
+
+### Experiment Buildout (Exp233-237)
+- **Exp233: Paper Math Control v2** — 40/40 checks, extends v1 from 18 to 25 papers: +Yang 2020 NMF rank selection (Track 3), +Anderson 2017 population genomics ANI/dN/dS (Track 1c), +Moulana 2020 pangenome core/accessory (Track 1c), +Anderson 2015 rare biosphere Chao1 (Track 1c), +Cold seep QS gene catalog (Phase 37), +luxR phylogeny RF/NJ (Phase 37), +Burst statistics SSA (Phase 37)
+- **Exp234: BarraCuda CPU v16** — 33/33 checks, full-domain benchmark: 11 domains (diversity, ODE ×6, Gillespie ×1000, phylogenetics, genomics, kmer+taxonomy, spectral+signal, FST, NMF+erf+Pearson, PCoA+UniFrac, quality+merge), 48ms total pure Rust CPU, zero Python/GPU/unsafe
+- **Exp235: BarraCuda GPU v8** — 20/20 checks, pure GPU analytics: 11 GPU workloads (diversity, DiversityFusion, HMM, dN/dS, SNP, pangenome, PairwiseL2, variance, spectral cosine, GEMM 64×32×64, DF64), all CPU == GPU within named tolerances
+- **Exp236: Pure GPU Streaming v6** — 22/22 checks, ToadStool unidirectional pipeline: round-trip vs GPU streaming parity (Shannon, BC, DiversityFusion), PairwiseL2 GPU, spectral cosine GPU, bitwise determinism (3 runs identical)
+- **Exp237: metalForge v10** — 41/41 checks, cross-system evolution: 15-workload NUCLEUS dispatch (8 GPU + 3 NPU + 4 CPU), PCIe bypass transitions, IPC dispatch parity (diversity, QS ODE, full pipeline), DF64 pack/unpack, graceful fallback, health + error handling
+
+### Five-Tier Chain
+```text
+Paper (Exp233, 25 papers) → CPU (Exp234, 11 domains) → GPU (Exp235, 11 workloads) → Streaming (Exp236, unidirectional) → metalForge (Exp237, GPU→NPU→CPU)
+```
+
+### Totals
+- 238 experiments, 6,015+ validation checks, 1,155 Rust tests
+- All existing experiments still PASS (v1 58/58, v14 58/58, v6 28/28)
+- clippy pedantic + nursery CLEAN, fmt CLEAN
+- Evolution path proven: published equations → pure Rust math → GPU portability → streaming pipeline → mixed hardware NUCLEUS dispatch
+
+## V77 — Four-Tier Experiment Buildout + Control Validation (2026-02-28)
+
+### Experiment Buildout (Exp229-232)
+- **Exp229: BarraCuda CPU v15** — 42/42 checks, V76 pure Rust math: FST variance (Weir-Cockerham), PairwiseL2 CPU reference, rarefaction CPU reference, tolerance provenance audit (11 named constants verified), reconciliation DTL, ToadStool math primitives
+- **Exp230: BarraCuda GPU v7** — 26/26 checks, GPU parity: PairwiseL2Gpu (condensed Euclidean, f32 kernel, sorted comparison), BatchedMultinomialGpu rarefaction bootstrap, DiversityFusionGpu, FST (CPU, no regression), inherited diversity/BC/GEMM/DF64/BandwidthTier
+- **Exp231: Streaming Pipeline v5** — 20/20 checks, 6-stage chain (kmer → diversity → BC → L2 → PCoA → taxonomy), round-trip vs streaming parity, PCoA in pipeline, bitwise determinism (3 runs identical)
+- **Exp232: metalForge v9** — 28/28 checks, NUCLEUS mixed hardware dispatch: 13-workload routing (GPU 7 + NPU 3 + CPU 3), V75 workloads in dispatch (PairwiseL2, rarefaction, FST), PCIe bypass topology (7 transitions), IPC parity (diversity, QS ODE, full pipeline), DF64 dispatch, graceful fallback, error handling
+
+### Three-Tier Chain Position
+```text
+Paper (Exp224) → CPU (Exp229) → GPU (Exp230) → Streaming (Exp231) → metalForge (Exp232)
+```
+
+### Totals
+- 233 experiments, 5,859+ validation checks, 1,155 Rust tests
+- All existing experiments still PASS (v14 58/58, v6 28/28, paper 58/58)
+- clippy pedantic + nursery CLEAN, fmt CLEAN, doc CLEAN
+- Evolution path validated: pure Rust math → GPU parity → streaming chain → mixed hardware NUCLEUS dispatch
+
 ## V76 — Deep Codebase Audit + Evolution (2026-02-28)
 
 ### Comprehensive Audit Execution

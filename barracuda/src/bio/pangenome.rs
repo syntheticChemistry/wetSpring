@@ -117,16 +117,19 @@ pub fn analyze_batch(datasets: &[(Vec<GeneCluster>, usize)]) -> Vec<PangenomeRes
 /// Construct gene clusters from a raw presence-absence matrix.
 ///
 /// `matrix` is `[n_genes x n_genomes]`, row-major. Values > 0 indicate presence.
+/// Accepts any name type that can be borrowed as `&str`.
 #[must_use]
-pub fn clusters_from_matrix(matrix: &[Vec<f64>], gene_names: &[String]) -> Vec<GeneCluster> {
+pub fn clusters_from_matrix(
+    matrix: &[Vec<f64>],
+    gene_names: &[impl AsRef<str>],
+) -> Vec<GeneCluster> {
     matrix
         .iter()
         .enumerate()
         .map(|(i, row)| GeneCluster {
             id: gene_names
                 .get(i)
-                .cloned()
-                .unwrap_or_else(|| format!("gene_{i}")),
+                .map_or_else(|| format!("gene_{i}"), |n| n.as_ref().to_owned()),
             presence: row.iter().map(|&v| v > 0.0).collect(),
         })
         .collect()
@@ -284,7 +287,7 @@ mod tests {
     #[test]
     fn matrix_construction() {
         let matrix = vec![vec![1.0, 0.0, 1.0], vec![0.0, 1.0, 1.0]];
-        let names = vec!["geneA".into(), "geneB".into()];
+        let names: Vec<&str> = vec!["geneA", "geneB"];
         let clusters = clusters_from_matrix(&matrix, &names);
         assert_eq!(clusters.len(), 2);
         assert_eq!(clusters[0].id, "geneA");

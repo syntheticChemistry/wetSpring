@@ -1190,3 +1190,95 @@ required-features = ["gpu"]
 name = "validate_metalforge_v8_cross_system"
 path = "src/bin/validate_metalforge_v8_cross_system.rs"
 required-features = ["ipc"]
+
+# ── Exp229: BarraCuda CPU v15 — V76 Pure Rust Math (FST + PairwiseL2 + Rarefaction) ──
+# Note: requires `gpu` feature for ToadStool ops::bio module resolution,
+# but all math runs on CPU (zero GPU dispatch in this binary).
+[[bin]]
+name = "validate_barracuda_cpu_v15"
+path = "src/bin/validate_barracuda_cpu_v15.rs"
+required-features = ["gpu"]
+
+# ── Exp230: BarraCuda GPU v7 — V76 ComputeDispatch + PairwiseL2 + Rarefaction ──
+[[bin]]
+name = "validate_barracuda_gpu_v7"
+path = "src/bin/validate_barracuda_gpu_v7.rs"
+required-features = ["gpu"]
+
+# ── Exp231: Streaming Pipeline v5 — Diversity → L2 → PCoA → Rarefaction Chain ──
+[[bin]]
+name = "validate_streaming_pipeline_v5"
+path = "src/bin/validate_streaming_pipeline_v5.rs"
+
+# ── Exp232: metalForge v9 — NUCLEUS Mixed Hardware Dispatch ──
+[[bin]]
+name = "validate_metalforge_v9_nucleus"
+path = "src/bin/validate_metalforge_v9_nucleus.rs"
+required-features = ["gpu", "ipc"]
+
+# ── Exp233: Paper Math Control v2 — 25 Papers via BarraCuda CPU ──
+[[bin]]
+name = "validate_paper_math_control_v2"
+path = "src/bin/validate_paper_math_control_v2.rs"
+
+# ── Exp234: BarraCuda CPU v16 — Full Domain Benchmark (Pure Rust Math) ──
+# Note: requires `gpu` feature for ToadStool ops::bio module resolution,
+# but all math runs on CPU (zero GPU dispatch in this binary).
+[[bin]]
+name = "validate_barracuda_cpu_v16"
+path = "src/bin/validate_barracuda_cpu_v16.rs"
+required-features = ["gpu"]
+
+# ── Exp235: BarraCuda GPU v8 — Pure GPU Analytics (Truly Portable Math) ──
+[[bin]]
+name = "validate_barracuda_gpu_v8"
+path = "src/bin/validate_barracuda_gpu_v8.rs"
+required-features = ["gpu"]
+
+# ── Exp236: Pure GPU Streaming v6 — ToadStool Unidirectional Pipeline ──
+[[bin]]
+name = "validate_pure_gpu_streaming_v6"
+path = "src/bin/validate_pure_gpu_streaming_v6.rs"
+required-features = ["gpu"]
+
+# ── Exp237: metalForge v10 — Cross-System Evolution (GPU→NPU→CPU) ──
+[[bin]]
+name = "validate_metalforge_v10_evolution"
+path = "src/bin/validate_metalforge_v10_evolution.rs"
+required-features = ["gpu", "ipc"]
+
+# ── Exp239: BarraCuda CPU v17 — Extended Domain Benchmark ──
+[[bin]]
+name = "validate_barracuda_cpu_v17"
+path = "src/bin/validate_barracuda_cpu_v17.rs"
+required-features = ["gpu"]
+
+# ── Exp240: BarraCuda GPU v9 — Extended GPU Portability Proof ──
+[[bin]]
+name = "validate_barracuda_gpu_v9"
+path = "src/bin/validate_barracuda_gpu_v9.rs"
+required-features = ["gpu"]
+
+# ── Exp241: Pure GPU Streaming v7 — Extended ToadStool Pipeline ──
+[[bin]]
+name = "validate_pure_gpu_streaming_v7"
+path = "src/bin/validate_pure_gpu_streaming_v7.rs"
+required-features = ["gpu"]
+
+# ── Exp242: metalForge v11 — Extended Cross-System Dispatch ──
+[[bin]]
+name = "validate_metalforge_v11_extended"
+path = "src/bin/validate_metalforge_v11_extended.rs"
+required-features = ["gpu", "ipc"]
+
+# ── Exp243: CPU vs GPU Extended Parity — 22 Domains ──
+[[bin]]
+name = "validate_cpu_vs_gpu_v6_extended"
+path = "src/bin/validate_cpu_vs_gpu_v6_extended.rs"
+required-features = ["gpu"]
+
+# ── Exp244: ToadStool Compute Dispatch v2 ──
+[[bin]]
+name = "validate_toadstool_dispatch_v2"
+path = "src/bin/validate_toadstool_dispatch_v2.rs"
+required-features = ["gpu"]

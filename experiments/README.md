@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-02-28 (Phase 75: 229 experiments, 210 binaries, 5,743+ checks (1,833+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S68+ (`e96576ee`), 82 primitives consumed, barracuda always-on, 1,148+ tests, 92 named tolerances, clippy pedantic CLEAN, 0 Passthrough, V74/V75 ComputeDispatch evolution, 50/50 three-tier, 52/52 papers)
+**Updated**: 2026-02-28 (Phase 81: 247 experiments, 214+ binaries, 6,273+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S68+ (`e96576ee`), 82 primitives consumed, barracuda always-on, 1,219 tests, 97 named tolerances, clippy pedantic CLEAN, 0 Passthrough, V81 CPU↔GPU Parity + ToadStool Dispatch + PCIe Bypass + NUCLEUS v2, 50/50 three-tier, 52/52 papers)
 
 ---
 

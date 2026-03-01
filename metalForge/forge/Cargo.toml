@@ -46,6 +46,16 @@ path = "src/bin/validate_tower_wiring_v68.rs"
 name = "validate_nucleus_pipeline_v69"
 path = "src/bin/validate_nucleus_pipeline_v69.rs"
 
+# ── Exp245: PCIe Bypass Mixed Hardware ──
+[[bin]]
+name = "validate_pcie_bypass_mixed_hw"
+path = "src/bin/validate_pcie_bypass_mixed_hw.rs"
+
+# ── Exp246: NUCLEUS Tower→Node→Nest v2 ──
+[[bin]]
+name = "validate_nucleus_v2_extended"
+path = "src/bin/validate_nucleus_v2_extended.rs"
+
 [dev-dependencies]
 temp-env = "0.3"
 flate2 = "1"

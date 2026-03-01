@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** February 28, 2026
-**Status:** Phase 75 — 229 experiments, 5,743+ validation checks (1,833+ GPU on RTX 4070, 60 NPU on AKD1000), all PASS (955 barracuda lib + 60 integration + 20 doc + 113 forge = 1,148 Rust tests), ToadStool S68+ aligned (`e96576ee`, universal precision, 700 WGSL, ZERO f32-only), 82 primitives consumed (was 79: +`ComputeDispatch`, +`BatchedMultinomialGpu`, +`PairwiseL2Gpu`), 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances (split: `bio.rs` + `instrument.rs` + `gpu.rs` + `spectral.rs`), 0 ad-hoc magic numbers, clippy pedantic CLEAN (both crates, all targets), 95.86% line coverage, V75 ToadStool rewire: 6 GPU modules refactored from manual BGL to `ComputeDispatch` builder (gemm\_cached, bistable, capacitor, cooperation, multi\_signal, phage\_defense), rarefaction\_gpu evolved to `BatchedMultinomialGpu`+`DiversityFusionGpu`, new `pairwise_l2_gpu` and `fst_variance` modules adopted from ToadStool, all tests green
+**Status:** Phase 81 — 247 experiments, 6,273+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), all PASS (962 barracuda lib + 60 integration + 22 doc + 175 forge = 1,219 Rust tests), ToadStool S68+ aligned (`e96576ee`, universal precision, 700 WGSL, ZERO f32-only), 82 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (both crates, all targets, ZERO warnings), V81 CPU↔GPU parity + ToadStool dispatch + PCIe bypass + NUCLEUS v2: CPU vs GPU v6 (22 domains head-to-head, math truly portable), ToadStool Dispatch v2 (streaming overhead proof, GpuPipelineSession pre-warmed), PCIe Bypass (NPU→GPU direct, bandwidth-aware routing, mixed pipeline topology), NUCLEUS v2 (49 workloads, Tower+Nest+Node extended, biomeOS sovereign fallback), all experiments (Exp233-246) validated green
 
 ---
 
@@ -238,6 +238,24 @@
 | 226 | BarraCuda GPU v6 — V71 Precision-Flexible Portability | gpu | PASS | 28 |
 | 227 | Pure GPU Streaming v4 — Unidirectional Full Science | gpu/streaming | PASS | 24 |
 | 228 | metalForge v8 — Cross-System (GPU → NPU → CPU) | metalForge/ipc | PASS | 33 |
+| 229 | BarraCuda CPU v15 — V76 Pure Rust Math (FST + PairwiseL2 + Rarefaction) | cpu | PASS | 42 |
+| 230 | BarraCuda GPU v7 — V76 ComputeDispatch + PairwiseL2 + Rarefaction | gpu | PASS | 26 |
+| 231 | Streaming Pipeline v5 — Diversity → L2 → PCoA → Rarefaction Chain | streaming | PASS | 20 |
+| 232 | metalForge v9 — NUCLEUS Mixed Hardware Dispatch (V76) | metalForge/ipc | PASS | 28 |
+| 233 | Paper Math Control v2 — 25 Papers (Track 1c + Track 3 + Phase 37) | cpu | PASS | 40 |
+| 234 | BarraCuda CPU v16 — Full Domain Benchmark (Pure Rust, 48ms) | cpu | PASS | 33 |
+| 235 | BarraCuda GPU v8 — Pure GPU Analytics (Truly Portable Math) | gpu | PASS | 20 |
+| 236 | Pure GPU Streaming v6 — ToadStool Unidirectional Pipeline | gpu | PASS | 22 |
+| 237 | metalForge v10 — Cross-System Evolution (GPU→NPU→CPU) | metalForge/ipc | PASS | 41 |
+| 238 | Deep Debt Evolution — Idiomatic Rust + Platform-Agnostic + Overflow Fix | debt/quality | PASS | 1,181 (re-validated) |
+| 239 | BarraCuda CPU v17 — 8 New Domains (Chimera, DADA2, SW, ESN, GBM, DTL, Clock, RF) | cpu | PASS | 29 |
+| 240 | BarraCuda GPU v9 — 8 New GPU Workloads (Chimera, DADA2, GBM, DTL, Clock, RF, Rarefaction, Kriging) | gpu | PASS | 24 |
+| 241 | Pure GPU Streaming v7 — 6-Stage ToadStool Pipeline (DADA2→Chimera→Diversity→Rarefaction→Kriging→DTL) | gpu/streaming | PASS | 18 |
+| 242 | metalForge v11 — 23-Workload Cross-System Dispatch (16 GPU + 3 NPU + 4 CPU) | metalForge/ipc | PASS | 43 |
+| 243 | CPU vs GPU Extended Parity — 22 Domains Head-to-Head (6 new + 16 inherited) | gpu/parity | PASS | 24 |
+| 244 | ToadStool Compute Dispatch v2 — Streaming Overhead Proof (6 sections) | gpu/streaming | PASS | 22 |
+| 245 | PCIe Bypass Mixed Hardware — NPU→GPU→CPU Dispatch Topology (6 sections) | metalForge/pcie | PASS | 36 |
+| 246 | NUCLEUS Tower→Node→Nest v2 — Extended Pipeline (49 workloads, biomeOS coord) | metalForge/nucleus | PASS | 62 |
 | 222 | Full NUCLEUS Pipeline: Tower→Nest→Node (V69) | metalForge/nucleus | PASS | 46 |
 | 223 | Cross-Spring Evolution V71 Complete Rewire | GPU/cross-spring/precision | PASS | 46 |
 
@@ -247,7 +265,7 @@
 
 | Category | Count |
 |----------|-------|
-| Experiments completed | 225 (213 prior + Exp216-221 V66-V68 + Exp222 NUCLEUS + Exp223 cross-spring + Exp224-228 V72 three-tier) |
+| Experiments completed | 229 (225 prior + Exp229-232 V76 four-tier buildout) |
 | Experiments planned | 4 (Exp197-200, field genomics — MinION hardware) |
 | Experiments deferred | 2 (Exp201-202, AMR — MinION + wastewater samples) |
 | CPU validation checks | 1,531 |

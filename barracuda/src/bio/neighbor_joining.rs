@@ -66,13 +66,14 @@ pub fn distance_matrix(sequences: &[&[u8]]) -> Vec<f64> {
 /// Neighbor-Joining algorithm from a flat distance matrix.
 ///
 /// `dist` is row-major `[n * n]`, `labels` has `n` elements.
+/// Accepts any label type that can be borrowed as `&str` (e.g. `String`, `&str`).
 ///
 /// # Panics
 ///
 /// Panics if `labels.len() < 2` or `dist.len() != n * n`.
 #[must_use]
 #[allow(clippy::cast_precision_loss)]
-pub fn neighbor_joining(dist: &[f64], labels: &[String]) -> NjResult {
+pub fn neighbor_joining(dist: &[f64], labels: &[impl AsRef<str>]) -> NjResult {
     let n = labels.len();
     assert!(n >= 2, "need at least 2 taxa");
     assert_eq!(dist.len(), n * n, "distance matrix size mismatch");
@@ -87,7 +88,7 @@ pub fn neighbor_joining(dist: &[f64], labels: &[String]) -> NjResult {
     }
 
     let mut active: Vec<usize> = (0..n).collect();
-    let mut node_labels: Vec<String> = labels.to_vec();
+    let mut node_labels: Vec<String> = labels.iter().map(|l| l.as_ref().to_owned()).collect();
     let mut next_node = n;
     let mut n_joins = 0_usize;
 

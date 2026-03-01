@@ -57,7 +57,11 @@ pub fn distance_matrix_gpu(gpu: &GpuF64, sequences: &[&[u8]]) -> Result<Vec<f64>
 /// # Errors
 ///
 /// Returns an error if the device lacks `SHADER_F64` support.
-pub fn neighbor_joining_gpu(gpu: &GpuF64, dist: &[f64], labels: &[String]) -> Result<NjResult> {
+pub fn neighbor_joining_gpu(
+    gpu: &GpuF64,
+    dist: &[f64],
+    labels: &[impl AsRef<str>],
+) -> Result<NjResult> {
     require_f64(gpu)?;
     Ok(neighbor_joining::neighbor_joining(dist, labels))
 }

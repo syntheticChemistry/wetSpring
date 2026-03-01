@@ -74,6 +74,11 @@ impl PcoaResult {
 ///
 /// Returns [`Error::InvalidInput`] if dimensions are inconsistent.
 pub fn pcoa(condensed: &[f64], n_samples: usize, n_axes: usize) -> Result<PcoaResult> {
+    if n_samples < 2 {
+        return Err(Error::InvalidInput(
+            "PCoA requires at least 2 samples".into(),
+        ));
+    }
     let expected_pairs = n_samples * (n_samples - 1) / 2;
     if condensed.len() != expected_pairs {
         return Err(Error::InvalidInput(format!(
@@ -82,11 +87,6 @@ pub fn pcoa(condensed: &[f64], n_samples: usize, n_axes: usize) -> Result<PcoaRe
             expected_pairs,
             n_samples
         )));
-    }
-    if n_samples < 2 {
-        return Err(Error::InvalidInput(
-            "PCoA requires at least 2 samples".into(),
-        ));
     }
 
     let n = n_samples;

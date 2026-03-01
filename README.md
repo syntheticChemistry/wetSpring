@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** February 28, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 75 — 1,148+ tests (955 barracuda lib + 60 integration + 20 doc + 113 forge), **95.86% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov), 229 experiments, 5,743+ checks (1,833+ GPU on RTX 4070, 60 NPU on AKD1000), 210 binaries, ToadStool S68+ aligned (`e96576ee`), 82 primitives consumed via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 97 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, all validation binaries confirmed green, V75 ToadStool rewire: `ComputeDispatch` builder adopted (6 GPU modules), `BatchedMultinomialGpu` + `DiversityFusionGpu` for rarefaction, `PairwiseL2Gpu` + `fst_variance` new modules
+**Status:** Phase 81 — 1,219 tests (962 barracuda lib + 60 integration + 22 doc + 175 forge), 247 experiments, 6,273+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 214+ binaries, ToadStool S68+ aligned (`e96576ee`), 82 primitives consumed via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 97 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (both crates, all targets, ZERO warnings), V81 CPU↔GPU parity (22 domains head-to-head) + ToadStool Dispatch v2 (streaming overhead proof) + PCIe Bypass (NPU→GPU direct, bandwidth-aware routing) + NUCLEUS v2 (49 workloads, Tower+Nest+Node extended, biomeOS sovereign fallback)
 
 ---
 
@@ -121,13 +121,13 @@ integration point.
 | IPC dispatch CPU parity (Exp206) | 64 (7 domains, EXACT_F64 — zero numeric drift through IPC layer) |
 | IPC dispatch GPU parity (Exp207) | 54 (6 domains, GPU↔CPU — lazy OnceLock + dispatch threshold) |
 | metalForge v7 NUCLEUS (Exp208) | 75 (8 domains, mixed hardware — PCIe bypass, Tower/Node/Nest atomics) |
-| **Total validation checks** | **5,061+** |
-| Rust library unit tests | 955 (barracuda CPU + IPC, default features) |
-| metalForge forge tests | 113 |
-| **Total Rust tests** | **1,148** (955 barracuda lib + 60 integration + 20 doc + 113 forge) |
+| **Total validation checks** | **6,273+** |
+| Rust library unit tests | 962 (barracuda CPU + IPC, default features) |
+| metalForge forge tests | 175 |
+| **Total Rust tests** | **1,219** (962 barracuda lib + 60 integration + 22 doc + 175 forge) |
 | Library code coverage | **95.86% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov) |
-| Experiments completed | 229 |
-| Validation/benchmark binaries | 196 validate + 14 benchmark = 210 total |
+| Experiments completed | 247 |
+| Validation/benchmark binaries | 200+ validate + 14 benchmark = 214+ total |
 | CPU bio modules | 47 |
 | GPU bio modules | 42 (30 lean + 5 write→lean + 7 compose + 0 passthrough) |
 | Tier B (needs refactor) | 0 (all promoted) |
@@ -139,7 +139,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | ToadStool primitives consumed | **82** (barracuda always-on, zero fallback code — ToadStool S68+, `e96576ee`) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 5,061+ validation checks **PASS**. All 1,148 tests **PASS** (1 ignored: hardware-dependent).
+All 6,273+ validation checks **PASS**. All 1,219 tests **PASS** (1 ignored: hardware-dependent).
 
 ### GPU Performance
 
@@ -984,7 +984,7 @@ Rust 1.93 fixed across 20+ validation binaries.
 wetSpring/
 ├── README.md                      ← this file
 ├── BENCHMARK_RESULTS.md           ← three-tier benchmark results
-├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (229 experiments)
+├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (247 experiments)
 ├── barracuda/                     ← Rust crate (src/, Cargo.toml, rustfmt.toml)
 │   ├── EVOLUTION_READINESS.md    ← absorption map (tiers, primitives, shaders)
 │   ├── ABSORPTION_MANIFEST.md    ← what's absorbed, local, planned (hotSpring pattern)
@@ -999,11 +999,11 @@ wetSpring/
 │   │   ├── bio/                 ← 47 CPU + 42 GPU bio modules
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML, nanopore)
 │   │   ├── bench/               ← benchmark harness + power monitoring
-│   │   ├── bin/                 ← 210 validation/benchmark binaries
+│   │   ├── bin/                 ← 214+ validation/benchmark binaries
 │   │   ├── ipc/                 ← JSON-RPC dispatch (biomeOS integration)
 │   │   └── shaders/             ← shared WGSL utilities (ODE shaders now generated at runtime)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024
-├── experiments/                   ← 229 experiment protocols + results
+├── experiments/                   ← 247 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
 │   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs, bridge.rs
@@ -1027,7 +1027,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (1,148: 955 barracuda lib + 60 integration + 20 doc + 113 forge)
+# Run all tests (1,219: 962 barracuda lib + 60 integration + 22 doc + 175 forge)
 cargo test --features ipc
 
 # Code quality checks
@@ -1084,7 +1084,7 @@ All validation data comes from public repositories:
 - **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
 - **ToadStool** — GPU compute engine (BarraCuda crate, 700+ WGSL shaders, S68)
 - **wateringHole** — Spring-local handoffs to ToadStool
-  - `handoffs/WETSPRING_TOADSTOOL_V76_DEEP_AUDIT_EVOLUTION_HANDOFF_FEB28_2026.md` — **current** (V76 deep audit + evolution)
-  - `handoffs/archive/` — V7-V73 (fossil record)
+  - `handoffs/WETSPRING_TOADSTOOL_V81_EVOLUTION_CHAIN_HANDOFF_FEB28_2026.md` — **current** (V81 evolution chain: CPU↔GPU parity, ToadStool dispatch, PCIe bypass, NUCLEUS v2)
+  - `handoffs/archive/` — V7-V76 (fossil record)
   - `CROSS_SPRING_SHADER_EVOLUTION.md` — 700+ shader provenance (cross-spring, S68)
 - **ecoPrimals** — Parent ecosystem

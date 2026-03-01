@@ -74,18 +74,17 @@ pub fn probe_gpus() -> Vec<Substrate> {
     gpus
 }
 
-/// Probe CPU via `/proc/cpuinfo` and `/proc/meminfo`.
+/// Probe CPU capabilities via platform-native sources.
+///
+/// On Linux, reads `/proc/cpuinfo` and `/proc/meminfo`. On other platforms,
+/// returns a baseline CPU substrate with default capabilities.
 #[must_use]
 pub fn probe_cpu() -> Substrate {
-    let cpuinfo = fs::read_to_string("/proc/cpuinfo").unwrap_or_default();
-    let (model, cores, threads, cache_kb, has_avx2) = parse_cpuinfo(&cpuinfo);
-    let meminfo = fs::read_to_string("/proc/meminfo").unwrap_or_default();
-    let mem_bytes = parse_meminfo(&meminfo);
-
-    let name = model.unwrap_or_else(|| String::from("Unknown CPU"));
+    let probe = probe_cpu_platform();
+    let name = probe.model.unwrap_or_else(|| String::from("Unknown CPU"));
 
     let mut capabilities = vec![Capability::F64Compute, Capability::F32Compute];
-    if has_avx2 {
+    if probe.has_avx2 {
         capabilities.push(Capability::SimdVector);
     }
 
@@ -93,10 +92,10 @@ pub fn probe_cpu() -> Substrate {
         kind: SubstrateKind::Cpu,
         identity: Identity::named(name),
         properties: Properties {
-            memory_bytes: mem_bytes,
-            core_count: cores,
-            thread_count: threads,
-            cache_kb,
+            memory_bytes: probe.memory_bytes,
+            core_count: probe.cores,
+            thread_count: probe.threads,
+            cache_kb: probe.cache_kb,
             ..Properties::default()
         },
         capabilities,
@@ -104,45 +103,120 @@ pub fn probe_cpu() -> Substrate {
     }
 }
 
-/// Default device node for `BrainChip` AKD1000 NPU.
+/// Raw CPU probe results prior to substrate construction.
+struct CpuProbeResult {
+    model: Option<String>,
+    cores: Option<u32>,
+    threads: Option<u32>,
+    cache_kb: Option<u32>,
+    has_avx2: bool,
+    memory_bytes: Option<u64>,
+}
+
+/// Platform-specific CPU probing (Linux: reads `/proc/cpuinfo` and `/proc/meminfo`).
+#[cfg(target_os = "linux")]
+fn probe_cpu_platform() -> CpuProbeResult {
+    let cpuinfo = fs::read_to_string("/proc/cpuinfo").unwrap_or_default();
+    let (model, cores, threads, cache_kb, has_avx2) = parse_cpuinfo(&cpuinfo);
+    let meminfo = fs::read_to_string("/proc/meminfo").unwrap_or_default();
+    let memory_bytes = parse_meminfo(&meminfo);
+    CpuProbeResult {
+        model,
+        cores,
+        threads,
+        cache_kb,
+        has_avx2,
+        memory_bytes,
+    }
+}
+
+/// Fallback CPU probing for non-Linux platforms.
+#[cfg(not(target_os = "linux"))]
+fn probe_cpu_platform() -> CpuProbeResult {
+    CpuProbeResult {
+        model: None,
+        cores: None,
+        threads: None,
+        cache_kb: None,
+        has_avx2: false,
+        memory_bytes: None,
+    }
+}
+
+/// Default device node for NPU hardware.
 ///
-/// Override with `WETSPRING_NPU_DEVICE` for alternate installations.
+/// Override with `WETSPRING_NPU_DEVICE` for alternate installations or
+/// different NPU vendors.
 const DEFAULT_NPU_DEVICE: &str = "/dev/akida0";
 
-/// Probe for NPU devices.
+/// Probe for NPU devices via capability-based discovery.
 ///
-/// Discovers `BrainChip` AKD1000 via device node (default: `/dev/akida0`,
-/// override with `WETSPRING_NPU_DEVICE`). This is local evolution —
-/// `ToadStool` doesn't have NPU substrate support yet, so we probe
-/// directly. Once `ToadStool` absorbs NPU dispatch, we lean on that.
+/// Discovery order:
+/// 1. `WETSPRING_NPU_DEVICE` env var (explicit override — any NPU vendor)
+/// 2. Scan `/dev/akida*` device nodes (BrainChip AKD series)
+///
+/// Returns all discovered NPU substrates with their capabilities.
 #[must_use]
 pub fn probe_npus() -> Vec<Substrate> {
     let mut npus = Vec::new();
 
-    let npu_device =
-        std::env::var("WETSPRING_NPU_DEVICE").unwrap_or_else(|_| DEFAULT_NPU_DEVICE.to_string());
-    let akida_path = std::path::Path::new(&npu_device);
-    if akida_path.exists() {
-        npus.push(Substrate {
-            kind: SubstrateKind::Npu,
-            identity: Identity {
-                name: String::from("BrainChip AKD1000"),
-                device_node: Some(npu_device.clone()),
-                ..Identity::named("BrainChip AKD1000")
-            },
-            properties: Properties::default(),
-            capabilities: vec![
-                Capability::F32Compute,
-                Capability::QuantizedInference { bits: 8 },
-                Capability::QuantizedInference { bits: 4 },
-                Capability::BatchInference { max_batch: 8 },
-                Capability::WeightMutation,
-            ],
-            origin: SubstrateOrigin::Local,
-        });
+    let candidates = discover_npu_device_nodes();
+    for device_path in candidates {
+        let akida_path = std::path::Path::new(&device_path);
+        if akida_path.exists() {
+            npus.push(Substrate {
+                kind: SubstrateKind::Npu,
+                identity: Identity {
+                    name: npu_name_from_device(&device_path),
+                    device_node: Some(device_path),
+                    ..Identity::named("NPU")
+                },
+                properties: Properties::default(),
+                capabilities: vec![
+                    Capability::F32Compute,
+                    Capability::QuantizedInference { bits: 8 },
+                    Capability::QuantizedInference { bits: 4 },
+                    Capability::BatchInference { max_batch: 8 },
+                    Capability::WeightMutation,
+                ],
+                origin: SubstrateOrigin::Local,
+            });
+        }
     }
 
     npus
+}
+
+/// Discover NPU device nodes via env var or filesystem scan.
+fn discover_npu_device_nodes() -> Vec<String> {
+    if let Ok(explicit) = std::env::var("WETSPRING_NPU_DEVICE") {
+        return vec![explicit];
+    }
+
+    let mut nodes = Vec::new();
+    if let Ok(entries) = fs::read_dir("/dev") {
+        for entry in entries.flatten() {
+            if let Some(name) = entry.file_name().to_str() {
+                if name.starts_with("akida") {
+                    nodes.push(entry.path().to_string_lossy().into_owned());
+                }
+            }
+        }
+    }
+
+    if nodes.is_empty() {
+        nodes.push(DEFAULT_NPU_DEVICE.to_string());
+    }
+    nodes
+}
+
+/// Derive NPU name from device node path.
+fn npu_name_from_device(path: &str) -> String {
+    if path.contains("akida") {
+        String::from("BrainChip AKD1000")
+    } else {
+        format!("NPU ({path})")
+    }
 }
 
 /// Parse `/proc/cpuinfo` content into (model, cores, threads, `cache_kb`, `has_avx2`).
