@@ -3,7 +3,7 @@
 **Date:** March 1, 2026 (V84)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
 **ToadStool pin:** `1dd7e338` (S70+++: Builder refactor, Fp64Strategy::Concurrent, staging PipelineBuilder, 6 new shaders, 3 new stats modules, chrono eliminated, dead code cleanup, Mar 1 2026)
-**Status:** 93 ToadStool primitives consumed via `compile_shader_universal` (same ToadStool S70+++), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), ToadStool S70+++ aligned, 256 experiments, 6,569+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 97 named tolerances, 0 ad-hoc magic numbers, `clippy::pedantic` CLEAN. **V84:** Exp252 BarraCuda CPU v19 validated 7 new uncovered domains: adapter, placement, PCoA, bootstrap phylo, EIC, KMD, feature table. Hand off: V84 active (supersedes V83), V7-V75 archived.
+**Status:** 93 ToadStool primitives consumed via `compile_shader_universal` (same ToadStool S70+++), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,210 tests (962 barracuda lib + 60 integration + 22 doc + 166 forge), ToadStool S70+++ aligned, 256 experiments, 6,569+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 97 named tolerances, clippy pedantic CLEAN. **V84:** Exp251-255 pipeline buildout (32 papers, 26 CPU domains, 21 GPU domains, Python parity proven, 6-stage streaming). Hand off: V84 active (supersedes V82), V7-V82 archived.
 
 ---
 
@@ -49,9 +49,9 @@ WGSL          known physics   handoffs/                        delete local
 | Compose | GPU wrappers wiring ToadStool primitives | **7 modules** (kmd, merge_pairs, RF, derep, NJ, reconciliation, molecular_clock) |
 | Passthrough | Accept GPU buffers, CPU kernel | **0 modules** — all 3 former Passthrough promoted (V40) |
 | Validate | CPU ↔ GPU parity for all shaders | All 5 ODE: exact parity (Exp099/100/101) |
-| Hand off | wateringHole/handoffs/ documents | **V75** active (ToadStool Rewire), V7-V70 archived |
-| Absorb | ToadStool integrates as `ops::bio::*` | **82 primitives** consumed (ToadStool S66: all DONE, +46 cross-spring total) |
-| Lean | Rewire to upstream, delete local code | 82 primitives consumed (S66), 5 `OdeSystem` trait rewires, BGL boilerplate removed, 0 Passthrough |
+| Hand off | wateringHole/handoffs/ documents | **V84** active (supersedes V83), V7-V82 archived |
+| Absorb | ToadStool integrates as `ops::bio::*` | **93 primitives** consumed (ToadStool S66: all DONE, +46 cross-spring total) |
+| Lean | Rewire to upstream, delete local code | 93 primitives consumed (S66), 5 `OdeSystem` trait rewires, BGL boilerplate removed, 0 Passthrough |
 
 ---
 

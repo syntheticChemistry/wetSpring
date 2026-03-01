@@ -259,14 +259,11 @@
 | 248 | BarraCuda CPU v18 — bootstrap_ci, rawr_mean, fit_*, cross-spring stats | cpu | PASS | 36 |
 | 249 | Cross-Spring Evolution Benchmark S70+++ with provenance map | cross-spring/benchmark | PASS | 34 |
 | 250 | GPU v10 — StencilCooperationGpu, HillGateGpu; WrightFisher/Symmetrize/Laplacian S71 findings | gpu | PASS | 12 |
-| 251 | Paper Math Control v3 — 32 papers, 27/27 checks | cpu/papers | PASS | 27 |
-| 252 | BarraCuda CPU v19 — 7 uncovered domains (adapter, placement, PCoA, bootstrap phylo, EIC, KMD, feature table) | cpu | PASS | 42 |
-| 253 | Python vs Rust Benchmark v3 — 15 domains paper parity proof | benchmark | PASS | 35 |
-| 254 | BarraCuda GPU v11 — GPU portability (PCoA GPU, K-mer GPU, Bootstrap+GPU, KMD+GPU, Kriging GPU) | gpu | PASS | 25 |
-| 255 | Pure GPU Streaming v8 — 6-stage unidirectional pipeline proof, 0.10ms overhead | gpu/streaming | PASS | 43 |
-| 246 | NUCLEUS Tower→Node→Nest v2 — Extended Pipeline (49 workloads, biomeOS coord) | metalForge/nucleus | PASS | 62 |
-| 222 | Full NUCLEUS Pipeline: Tower→Nest→Node (V69) | metalForge/nucleus | PASS | 46 |
-| 223 | Cross-Spring Evolution V71 Complete Rewire | GPU/cross-spring/precision | PASS | 46 |
+| 251 | Paper Math Control v3 — 32 papers | V84 | ✅ 27/27 | 27 |
+| 252 | BarraCuda CPU v19 — 7 domains | V84 | ✅ 42/42 | 42 |
+| 253 | Python vs Rust Benchmark v3 — 15 domains | V84 | ✅ 35/35 | 35 |
+| 254 | BarraCuda GPU v11 — GPU portability | V84 | ✅ 25/25 | 25 |
+| 255 | Pure GPU Streaming v8 — unidirectional | V84 | ✅ 43/43 | 43 |
 
 ---
 
@@ -321,7 +318,7 @@
 | Streaming v4 checks | 24 (Exp227: 7-stage unidirectional pipeline, GEMM→fusion→PCoA→DF64) |
 | metalForge v8 checks | 33 (Exp228: GPU→NPU→CPU routing, IPC dispatch, DF64 protocol) |
 | **Total validation checks** | **6,569+** |
-| Rust tests | 1,148+ (955 barracuda lib + 60 integration + 20 doc + 113 forge) |
+| Rust tests | 1,210 (962 barracuda lib + 60 integration + 22 doc + 166 forge) |
 | BarraCuda CPU parity | 601/601 (v1-v12: 36+ domains, Exp206 IPC fidelity, Exp212 I/O evolution) |
 | BarraCuda GPU parity | 36+ domains (Exp064/087/092/101/207), IPC GPU-aware dispatch |
 | metalForge cross-system | 37+ domains CPU↔GPU proven (Exp103+104+165+182+208+220+221+222), **50/50 papers three-tier** (39 base + 11 extension Exp144-156) |

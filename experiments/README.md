@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-01 (Phase 83: 251 experiments, 214+ binaries, 6,397+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S70+++ (`1dd7e338`), 93 primitives consumed, barracuda always-on, 1,210 tests, 97 named tolerances, clippy pedantic CLEAN, 0 Passthrough, V83 CPU↔GPU Parity + ToadStool Dispatch + PCIe Bypass + NUCLEUS v2, 50/50 three-tier, 52/52 papers)
+**Updated**: 2026-03-01 (Phase 84: 256 experiments, 219+ binaries, 6,569+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S70+++ (`1dd7e338`), 93 primitives consumed, barracuda always-on, 1,210 tests, 97 named tolerances, clippy pedantic CLEAN, 0 Passthrough, V84 CPU↔GPU Parity + ToadStool Dispatch + PCIe Bypass + NUCLEUS v2, 50/50 three-tier, 52/52 papers)
 
 ---
 
@@ -147,6 +147,11 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 206 | [BarraCuda CPU v11](206_barracuda_cpu_v11_ipc_dispatch.md) | cross/IPC | DONE | Direct function calls | ipc::dispatch, bio::diversity, bio::qs_biofilm | 64 |
 | 207 | [BarraCuda GPU v4](207_barracuda_gpu_v4_ipc_science.md) | cross/GPU/IPC | DONE | CPU diversity/QS/Anderson | ipc::dispatch, ToadStool GPU primitives | 54 |
 | 208 | [metalForge v7](208_metalforge_v7_mixed_nucleus.md) | cross/IPC/metalForge | DONE | CPU direct calls | ipc::dispatch, forge routing model, NUCLEUS atomics | 74 |
+| 251 | Paper Math Control v3 | cpu/papers | DONE | 32 papers validated | validate_paper_math_control_v3 | 27 |
+| 252 | BarraCuda CPU v19 | cross | DONE | 7 uncovered domains (adapter, placement, PCoA, bootstrap phylo, EIC, KMD, feature table) | validate_barracuda_cpu_v19 | 42 |
+| 253 | Python vs Rust Benchmark v3 | cross | DONE | 15-domain paper parity proof | benchmark_python_vs_rust_v3 | 35 |
+| 254 | BarraCuda GPU v11 | GPU | DONE | GPU portability (PCoA GPU, K-mer GPU, Bootstrap+GPU, KMD+GPU, Kriging GPU) | validate_barracuda_gpu_v11 | 25 |
+| 255 | Pure GPU Streaming v8 | GPU/streaming | DONE | 6-stage unidirectional pipeline proof | validate_pure_gpu_streaming_v8 | 43 |
 
 ---
 
@@ -332,10 +337,15 @@ thresholds from `src/tolerances.rs`.
 | `validate_metalforge_v7_mixed` | 208 | 74 | `cargo run --features ipc --release --bin validate_metalforge_v7_mixed` |
 | `benchmark_cross_spring_modern_s68plus` | 210 | 24 | `cargo run --features gpu --release --bin benchmark_cross_spring_modern_s68plus` |
 | `benchmark_progression_cpu_gpu_stream` | 211 | 16 | `cargo run --features gpu --release --bin benchmark_progression_cpu_gpu_stream` |
+| `validate_paper_math_control_v3` | 251 | 27 | `cargo run --release --bin validate_paper_math_control_v3` |
+| `validate_barracuda_cpu_v19` | 252 | 42 | `cargo run --release --bin validate_barracuda_cpu_v19` |
+| `benchmark_python_vs_rust_v3` | 253 | 35 | `cargo run --release --bin benchmark_python_vs_rust_v3` |
+| `validate_barracuda_gpu_v11` | 254 | 25 | `cargo run --features gpu --release --bin validate_barracuda_gpu_v11` |
+| `validate_pure_gpu_streaming_v8` | 255 | 43 | `cargo run --features gpu --release --bin validate_pure_gpu_streaming_v8` |
 
-**Total validation checks**: 6,397+
-**Rust tests**: 1,210 (955 barracuda lib + 60 integration + 20 doc + 113 forge)
-**Binaries**: 210 total (validate + benchmark + server)
+**Total validation checks**: 6,569+
+**Rust tests**: 1,210 (962 barracuda lib + 60 integration + 22 doc + 166 forge)
+**Binaries**: 215 total (validate + benchmark + server)
 **ToadStool primitives**: 93 consumed (barracuda always-on, zero fallback code — S70+++ `1dd7e338`)
 **Papers**: 52 (25 Tracks 1-2 + 5 Track 3 + 9 Track 4 + 1 cross-spring + 9 extensions + 3 reference)
 **Local WGSL shaders**: 0 (all absorbed by ToadStool S63)

@@ -2,7 +2,7 @@
 
 **Date:** March 1, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 83 — 251 experiments, 6,397+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,210 tests (962 barracuda lib + 60 integration + 22 doc + 166 forge), ToadStool S70+++ aligned (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances (full provenance), 0 unsafe code, 0 todo!/unimplemented!(), clippy pedantic CLEAN (both crates, ZERO warnings), V83 CPU↔GPU 22-domain parity + ToadStool dispatch v2 + PCIe bypass + NUCLEUS v2, V80 extended evolution (19 domains × 4 tiers), 52/52 papers, 50/50 three-tier, 95.86% line coverage
+**Status:** Phase 84 — 256 experiments, 6,569+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,210 tests (962 barracuda lib + 60 integration + 22 doc + 166 forge), ToadStool S70+++ aligned (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances (full provenance), 0 unsafe code, 0 todo!/unimplemented!(), clippy pedantic CLEAN (both crates, ZERO warnings), V84 CPU↔GPU 22-domain parity + ToadStool dispatch v2 + PCIe bypass + NUCLEUS v2, V80 extended evolution (19 domains × 4 tiers), 52/52 papers, 50/50 three-tier, 95.86% line coverage
 
 ---
 
@@ -41,7 +41,7 @@ All code is AGPL-3.0.
 | **biomeOS IPC** | — | cross | — | 203-208 | 321 | IPC dispatch, GPU-aware routing, NUCLEUS atomics, Songbird, Neural API |
 | **V66 Audit + Dispatch** | — | cross | — | 209,212-215 | 239+ | Streaming I/O parity, CPU v12, dispatch evolution, NUCLEUS V8, CPU vs GPU v5 |
 | **V67 Experiment Buildout** | — | cross | — | 216-220 | 170+ | 47-domain CPU proof, Python-vs-Rust benchmark, 42-module GPU portability, unidirectional streaming, cross-substrate dispatch V67 + BandwidthTier, 11 extension papers → 50/50 three-tier |
-| **Total** | | | **52** | | **6,397+** | |
+| **Total** | | | **52** | | **6,569+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -87,17 +87,18 @@ All code is AGPL-3.0.
 
 ## Validation Chain
 
-Every paper goes through the full evolution. Status across all 39 actionable papers:
+Every paper goes through the full evolution. Status across all 52 papers:
 
 | Stage | What It Proves | Coverage |
 |-------|---------------|----------|
-| Python baseline | Algorithm correctness against published tools | 44 scripts (all with reproduction headers + SHA-256 integrity verification) |
-| BarraCuda CPU | Rust matches Python within machine precision | 1,697+ checks (v1-v12), 33.4x faster |
-| BarraCuda GPU | GPU matches CPU within 1e-6 | 1,783+ checks, 36+ domains |
-| Pure GPU streaming | Zero CPU round-trips, data stays on-device | 204+ checks, 10+ domains |
+| Paper math control | Published equations reproduced exactly | 32 papers (Exp251), 27 checks |
+| Python baseline | Algorithm correctness against published tools | 57 scripts (all with reproduction headers + SHA-256 integrity verification) |
+| BarraCuda CPU | Rust matches Python within machine precision | 26 domains (v1-v19), bit-identical to SciPy/NumPy (Exp253) |
+| BarraCuda GPU | GPU matches CPU within 1e-6 | 21 GPU domains, 1,783+ checks |
+| Pure GPU streaming | Zero CPU round-trips, data stays on-device | 8 streaming experiments, unidirectional proof (0.10ms overhead, Exp255) |
 | metalForge | Same answer on CPU, GPU, NPU | 50/50 papers, 37+ domains |
 | NPU reservoir | ESN → int8 → NPU preserves classification (Cholesky solve) | 59 checks, 6 domains |
-| Cross-spring evolution | 660+ WGSL shaders traced to origin springs, rewired imports, Exp169 4-spring provenance | 21 checks |
+| Cross-spring evolution | 700+ WGSL shaders traced to origin springs, 93 ToadStool primitives consumed | 21 checks |
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
 | biomeOS IPC integration | JSON-RPC science primal, GPU-aware dispatch, Songbird registration | 321 checks (Exp203-208) |

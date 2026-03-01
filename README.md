@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** March 1, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 84 — 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), 256 experiments, 6,569+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 215+ binaries, ToadStool S70+++ aligned (`1dd7e338`), 93 primitives consumed (same ToadStool S70+++) via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 97 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (both crates, all targets, ZERO warnings), V84: Exp251-255 (Paper Math v3, CPU v19, Python parity v3, GPU v11, Pure GPU Streaming v8)
+**Status:** Phase 84 — 1,210 tests (962 barracuda lib + 60 integration + 22 doc + 166 forge), 256 experiments, 6,569+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 219+ binaries, ToadStool S70+++ aligned (`1dd7e338`), 93 primitives consumed (same ToadStool S70+++) via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 97 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (both crates, all targets, ZERO warnings), V84: Exp251-255 (Paper Math v3, CPU v19, Python parity v3, GPU v11, Pure GPU Streaming v8)
 
 ---
 
@@ -124,10 +124,10 @@ integration point.
 | **Total validation checks** | **6,569+** |
 | Rust library unit tests | 962 (barracuda CPU + IPC, default features) |
 | metalForge forge tests | 175 |
-| **Total Rust tests** | **1,219** (962 barracuda lib + 60 integration + 22 doc + 175 forge) |
+| **Total Rust tests** | **1,210** (962 barracuda lib + 60 integration + 22 doc + 166 forge) |
 | Library code coverage | **95.86% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov) |
 | Experiments completed | 256 |
-| Validation/benchmark binaries | 200+ validate + 14 benchmark = 214+ total |
+| Validation/benchmark binaries | 205+ validate + 14 benchmark = 219+ total |
 | CPU bio modules | 47 |
 | GPU bio modules | 42 (30 lean + 5 write→lean + 7 compose + 0 passthrough) |
 | Tier B (needs refactor) | 0 (all promoted) |
@@ -139,7 +139,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | ToadStool primitives consumed | **93** (barracuda always-on, zero fallback code — ToadStool S70+++, `1dd7e338`) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 6,569+ validation checks **PASS**. All 1,219 tests **PASS** (1 ignored: hardware-dependent).
+All 6,569+ validation checks **PASS**. All 1,210 tests **PASS** (1 ignored: hardware-dependent).
 
 ### GPU Performance
 
@@ -999,11 +999,11 @@ wetSpring/
 │   │   ├── bio/                 ← 47 CPU + 42 GPU bio modules
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML, nanopore)
 │   │   ├── bench/               ← benchmark harness + power monitoring
-│   │   ├── bin/                 ← 214+ validation/benchmark binaries
+│   │   ├── bin/                 ← 219+ validation/benchmark binaries
 │   │   ├── ipc/                 ← JSON-RPC dispatch (biomeOS integration)
 │   │   └── shaders/             ← shared WGSL utilities (ODE shaders now generated at runtime)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024
-├── experiments/                   ← 247 experiment protocols + results
+├── experiments/                   ← 256 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
 │   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs, bridge.rs
@@ -1027,7 +1027,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (1,219: 962 barracuda lib + 60 integration + 22 doc + 175 forge)
+# Run all tests (1,210: 962 barracuda lib + 60 integration + 22 doc + 166 forge)
 cargo test --features ipc
 
 # Code quality checks
@@ -1084,7 +1084,7 @@ All validation data comes from public repositories:
 - **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
 - **ToadStool** — GPU compute engine (BarraCuda crate, 700+ WGSL shaders, S68)
 - **wateringHole** — Spring-local handoffs to ToadStool
-  - `handoffs/WETSPRING_TOADSTOOL_V81_EVOLUTION_CHAIN_HANDOFF_FEB28_2026.md` — **current** (V81 evolution chain: CPU↔GPU parity, ToadStool dispatch, PCIe bypass, NUCLEUS v2)
+  - `handoffs/WETSPRING_TOADSTOOL_V84_PIPELINE_BUILDOUT_HANDOFF_MAR01_2026.md` — **current** (V84 pipeline buildout: Paper→CPU→GPU→Streaming, 32 papers, Python parity, 0.10ms streaming overhead)
   - `handoffs/archive/` — V7-V76 (fossil record)
   - `CROSS_SPRING_SHADER_EVOLUTION.md` — 700+ shader provenance (cross-spring, S68)
 - **ecoPrimals** — Parent ecosystem

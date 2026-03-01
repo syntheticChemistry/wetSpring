@@ -9,7 +9,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V83** | `handoffs/WETSPRING_TOADSTOOL_V83_S70_REWIRE_HANDOFF_MAR01_2026.md` | Mar 1 | **current** — ToadStool S70+++ rewire, 8 new consumed primitives (bootstrap_ci, rawr_mean, fit_*×4, StencilCooperationGpu, HillGateGpu), 93 total primitives, 251 experiments, 6,397+ checks ALL PASS |
+| **V84** | `handoffs/WETSPRING_TOADSTOOL_V84_PIPELINE_BUILDOUT_HANDOFF_MAR01_2026.md` | Mar 1 | **current** — Paper→CPU→GPU→Streaming pipeline proof, 32 papers, 26 CPU / 21 GPU domains, Python parity proven, 0.10ms streaming overhead, 256 experiments, 6,569+ checks ALL PASS |
 
 ## NestGate Handoffs
 
@@ -25,7 +25,7 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` (V7-V81, API report, rewire, cross-spring provenance — 59 files).
+Superseded handoffs in `handoffs/archive/` (V7-V82, API report, rewire, cross-spring provenance — 60 files).
 
 ## Convention
 

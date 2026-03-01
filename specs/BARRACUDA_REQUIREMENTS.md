@@ -1,6 +1,6 @@
 # wetSpring — BarraCuda Requirements
 
-**Last Updated**: March 1, 2026 (V83 ToadStool S70+++, pin `1dd7e338`, 93 primitives consumed)
+**Last Updated**: March 1, 2026 (V84 ToadStool S70+++, pin `1dd7e338`, 93 primitives consumed)
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---

@@ -1,7 +1,7 @@
 # wetSpring Benchmark Results
 
 **Date:** March 1, 2026
-**Status:** Phase 84 — Comprehensive sweep GREEN (Python → Rust CPU → GPU → Pure GPU Streaming → metalForge → NPU) — 50/50 actionable papers full three-tier (63/63 total); 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), 6,569+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 256 experiments, ToadStool S70+++ (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression (fully lean), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough. **V84:** Exp253 Python vs Rust Benchmark v3 — 15 domains paper parity proof, 35/35 checks. V83: Extended cross-spring rewire. V82: ToadStool S70+++ rewire. V81: CPU↔GPU parity + ToadStool dispatch + PCIe bypass + NUCLEUS v2. V75: ComputeDispatch adoption (6 GPU modules)
+**Status:** Phase 84 — Comprehensive sweep GREEN (Paper → CPU → GPU → Streaming → metalForge → NPU) — 52/52 papers, 50/50 three-tier; 1,210 tests (962 barracuda lib + 60 integration + 22 doc + 166 forge), 6,569+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 256 experiments, ToadStool S70+++ (`1dd7e338`), 93 primitives consumed, 26 CPU domains, 21 GPU domains, Python parity proven (15 domains bit-identical to SciPy), 0 local WGSL (fully lean), 97 named tolerances, clippy pedantic CLEAN. **V84:** Exp251-255 (Paper Math v3 32 papers, CPU v19 7 domains, Python parity v3 15 domains, GPU v11 5 workloads, Streaming v8 6-stage pipeline 0.10ms overhead)
 
 ---
 
@@ -76,7 +76,7 @@ Tier 3: GPU (ToadStool/BarraCuda, math parity with CPU)
 |-------|-------|--------|
 | Library + integration + IPC tests (CPU) | 955 | PASS (+ 1 ignored — hardware-dependent) |
 | metalForge forge tests | 113 | PASS |
-| **Total** | **1,148** (955 + 60 integration + 20 doc + 113 forge) | **PASS** |
+| **Total** | **1,210** (962 + 60 integration + 22 doc + 166 forge) | **PASS** |
 | Line coverage | 95.46% line / 93.54% fn / 94.99% branch | Exceeds 90% target |
 
 ---
@@ -497,6 +497,13 @@ cargo run --features gpu --release --bin validate_streaming_ode_phylo    # 45 (E
 # Tier 4: metalForge cross-substrate
 cargo run --features gpu --release --bin validate_metalforge_v5         # 52 (Exp103)
 cargo run --features gpu,ipc --release --bin validate_metalforge_v7_mixed  # 75 (Exp208)
+
+# V84: Paper→CPU→GPU→Streaming pipeline
+cargo run --release --bin validate_paper_math_control_v3       # 27 (Exp251, 32 papers)
+cargo run --release --bin validate_barracuda_cpu_v19           # 42 (Exp252, 7 new domains)
+cargo run --release --bin benchmark_python_vs_rust_v3          # 35 (Exp253, 15-domain parity)
+cargo run --features gpu --release --bin validate_barracuda_gpu_v11  # 25 (Exp254, GPU portability)
+cargo run --features gpu --release --bin validate_pure_gpu_streaming_v8  # 43 (Exp255, 6-stage pipeline)
 
 # Benchmarks
 cargo run --release --bin benchmark_23_domain_timing           # Python→Rust CPU (33.4×)

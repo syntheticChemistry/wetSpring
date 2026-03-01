@@ -4,6 +4,8 @@
 **Scope:** Compare ToadStool barracuda public exports with wetSpring actual usage. Identify unused primitives, adoption opportunities, and maintenance reduction.
 **ToadStool Pin:** S70+++ (`1dd7e338`)
 
+**V84 additions:** 7 new CPU domains validated (adapter, placement, PCoA, bootstrap phylo, EIC, KMD, feature table); Python parity proof (Exp253).
+
 ---
 
 ## Step 1: ToadStool Public Exports
@@ -58,7 +60,7 @@
 | DnDsBatchF64 | ✅ dnds_gpu.rs |
 | FelsensteinGpu, PhyloTree | ✅ validate_metalforge_v6, validate_streaming_ode_phylo, etc. |
 | GillespieGpu, GillespieConfig | ✅ validate_metalforge_full_v2, validate_toadstool_bio |
-| HillGateGpu | ✅ cooperation_gpu.rs (V83) |
+| HillGateGpu | ✅ cooperation_gpu.rs (V84) |
 | HmmBatchForwardF64 | ✅ hmm_gpu.rs |
 | KmerHistogramGpu | ✅ validate_local_wgsl_compile |
 | LocusVarianceGpu | ✅ locus_variance_gpu.rs |
@@ -72,7 +74,7 @@
 | SmithWatermanGpu, SwConfig | ✅ validate_metalforge_full_v2 |
 | SnpCallingF64 | ✅ snp_gpu.rs |
 | SpatialPayoffGpu | ✅ spatial_payoff_gpu.rs |
-| StencilCooperationGpu | ✅ cooperation_gpu.rs (V83) |
+| StencilCooperationGpu | ✅ cooperation_gpu.rs (V84) |
 | SwarmNnGpu | ❌ **UNUSED** |
 | TaxonomyFcGpu | ✅ validate_local_wgsl_compile |
 | TreeInferenceGpu, FlatForest | ✅ decision_tree, gbm, reconciliation |
@@ -157,11 +159,11 @@
 
 | Function | Domain Relevance | Could Replace Local? | Recommendation |
 |----------|------------------|----------------------|----------------|
-| `bootstrap_ci`, `bootstrap_mean`, `rawr_mean` | Phylogenetic bootstrap (Exp031) | Yes — bootstrap workload | **Adopted V83** — bootstrap_ci, rawr_mean consumed. |
+| `bootstrap_ci`, `bootstrap_mean`, `rawr_mean` | Phylogenetic bootstrap (Exp031) | Yes — bootstrap workload | **Adopted V84** — bootstrap_ci, rawr_mean consumed. |
 | `chi2_decomposed`, `chi2_decomposed_weighted` | Goodness-of-fit (PFAS, spectral) | Maybe | **Evaluate** — if any validation does χ² by hand, delegate. |
 | `correlation_matrix`, `covariance_matrix` | PCoA, spectral | Maybe | **Evaluate** — PCoA uses BatchedEighGpu; correlation_matrix may simplify some paths. |
 | `hargreaves_et0`, `crop_coefficient`, `soil_water_balance` | airSpring hydrology | No — wetSpring is bio/PFAS | **Skip** — not in wetSpring domain. |
-| `fit_exponential`, `fit_logarithmic`, `fit_quadratic`, `fit_all` | Heaps law, growth curves | Yes — pangenome uses fit_linear | **Adopted V83** — fit_exponential, fit_quadratic, fit_logarithmic, fit_all consumed. |
+| `fit_exponential`, `fit_logarithmic`, `fit_quadratic`, `fit_all` | Heaps law, growth curves | Yes — pangenome uses fit_linear | **Adopted V84** — fit_exponential, fit_quadratic, fit_logarithmic, fit_all consumed. |
 | `moving_window_stats_f64` | airSpring IoT | No | **Skip** — not in wetSpring domain. |
 | `index_of_agreement`, `nash_sutcliffe`, `hit_rate` | Model validation | Maybe | **Evaluate** — if any validation compares model vs observed, adopt. |
 | `empirical_spectral_density`, `marchenko_pastur_bounds` | Random matrix theory | Maybe | **Evaluate** — spectral module uses anderson_3d, lanczos; these could complement. |
@@ -240,10 +242,10 @@
 | ~~P1~~ | ~~BatchedMultinomialGpu~~ | **DONE V75** — rarefaction_gpu adopted |
 | ~~P1~~ | ~~PairwiseL2Gpu~~ | **DONE V75** — pairwise_l2_gpu.rs |
 | ~~P2~~ | ~~FstVariance~~ | **DONE V75** — fst_variance.rs |
-| ~~P2~~ | ~~bootstrap_ci, rawr_mean~~ | **DONE V83** — consumed |
+| ~~P2~~ | ~~bootstrap_ci, rawr_mean~~ | **DONE V84** — consumed |
 | **P2** | Precision::Df64 | Evaluate — throughput optimization for ODE/GEMM |
 | **P3** | dispatch_for, substrates | Evaluate — CPU fallback for small batches |
-| ~~P3~~ | ~~fit_exponential, fit_quadratic~~ | **DONE V83** — consumed |
+| ~~P3~~ | ~~fit_exponential, fit_quadratic~~ | **DONE V84** — consumed |
 | **Skip** | ValidationHarness | Keep local Validator |
 | **Skip** | hydrology, moving_window | Not in wetSpring domain |
 | **Skip** | ShaderTemplate direct use | No change — use compile_shader_universal |

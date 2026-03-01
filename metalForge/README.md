@@ -110,7 +110,7 @@ ToadStool's unidirectional pipeline model.
 
 ```bash
 cd metalForge/forge
-cargo test          # 47 tests
+cargo test          # 166 tests
 cargo run --example inventory  # discover + dispatch demo
 ```
 
@@ -158,9 +158,9 @@ affinities. metalForge maps each validated algorithm to its optimal substrate.
 wetSpring follows hotSpring's pattern for ToadStool absorption:
 
 ```
-1. Validate in Rust CPU (barracuda/)          ← DONE: 47 CPU + 42 GPU, 1,103 tests, 211 experiments, 5,061+ checks
-2. Characterize hardware (metalForge/)         ← THIS DIRECTORY — 47 forge tests
-3. Write Rust in GPU-friendly patterns         ← 25 Lean + 16 Compose; 0 local WGSL (fully lean); 0 Passthrough
+1. Validate in Rust CPU (barracuda/)          ← DONE: 47 CPU + 42 GPU, 1,210 tests, 256 experiments, 6,569+ checks
+2. Characterize hardware (metalForge/)         ← THIS DIRECTORY — 166 forge tests
+3. Write Rust in GPU-friendly patterns         ← 34 Lean + 7 Compose; 0 local WGSL (fully lean); 0 Passthrough
 4. ToadStool absorbs as shared primitives      ← unidirectional handoff via wateringHole/handoffs/
 5. wetSpring consumes ToadStool primitives     ← 93 consumed, 42 GPU modules (S70+++, 1dd7e338)
 ```
@@ -197,7 +197,7 @@ from either inform the other's hardware utilization strategy.
 
 ---
 
-## Current Status (Feb 28, 2026)
+## Current Status (Mar 1, 2026)
 
 ### CPU: 31+ Domains Validated (Exp001–102)
 All 31+ algorithmic domains proven correct in pure Rust CPU:
@@ -267,7 +267,7 @@ Delete local shader copy. Use the crate-level re-export
 (e.g., `barracuda::SmithWatermanGpu`). Local extensions that still need work
 remain in wetSpring until absorption.
 
-### Current Status (V73, Feb 28)
+### Current Status (V84, Mar 1)
 
 | Phase | Count | Items |
 |-------|:-----:|-------|
@@ -277,7 +277,7 @@ remain in wetSpring until absorption.
 | **CPU math** (delegated to barracuda) | 8 functions | erf, ln_gamma, regularized_gamma_p, norm_cdf, dot, l2_norm, trapz, ridge_regression |
 | **Blocked** | 0 | All former blockers resolved: kmer (S62), UniFrac (S62), taxonomy (S64), NVVM polyfill (S39) |
 
-Active handoff: `../../wateringHole/handoffs/WETSPRING_TOADSTOOL_V73_DEBT_REDUCTION_FIVE_TIER_HANDOFF_FEB28_2026.md`
+Active handoff: `../../wateringHole/handoffs/WETSPRING_TOADSTOOL_V84_PIPELINE_BUILDOUT_HANDOFF_MAR01_2026.md`
 
 ---
 

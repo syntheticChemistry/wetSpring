@@ -2,7 +2,7 @@
 
 **Date:** March 1, 2026 (V84)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules + 1 IPC module (all lean, 0 local WGSL, 0 local derivative/regression math), 93 ToadStool primitives consumed (same ToadStool S70+++, barracuda always-on, zero fallback code), 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), 256 experiments, 6,569+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S70+++ aligned (`1dd7e338`), 97 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V84:** Exp254 BarraCuda GPU v11 — new GPU domains (PCoA GPU, K-mer GPU, Bootstrap+GPU, KMD+GPU, Kriging GPU). Exp255 Pure GPU Streaming v8 — 6-stage unidirectional pipeline proof, 0.10ms overhead.
+**Status:** 47 CPU + 42 GPU modules + 1 IPC module (all lean, 0 local WGSL, 0 local derivative/regression math), 93 ToadStool primitives consumed (same ToadStool S70+++, barracuda always-on, zero fallback code), 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), 256 experiments, 6,569+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S70+++ aligned (`1dd7e338`), 97 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V84:** Exp252 BarraCuda CPU v19 — 7 new CPU domains (adapter, placement, PCoA, bootstrap phylo, EIC, KMD, feature table). Exp253 Python parity proof — 15 domains. Exp254 BarraCuda GPU v11 — new GPU domains (PCoA GPU, K-mer GPU, Bootstrap+GPU, KMD+GPU, Kriging GPU). Exp255 Pure GPU Streaming v8 — 6-stage unidirectional pipeline proof, 0.10ms overhead.
 
 ### Full Lean Phase
 
@@ -249,7 +249,7 @@ All GPU ODE modules now use `BatchedOdeRK4::<S>::generate_shader()` which:
 
 ---
 
-## ToadStool Primitives Consumed (82 — barracuda always-on)
+## ToadStool Primitives Consumed (93 — barracuda always-on)
 
 ### Original 15 (pre-Feb 22)
 
@@ -476,9 +476,9 @@ no parallelism benefit) and `fastq_parsing` (I/O-bound).
 | WGSL pattern | `pub const WGSL: &str` inline | `include_str!("../shaders/...")` |
 | metalForge | GPU + NPU hardware characterization | GPU + NPU + cross-substrate validation |
 | Handoffs | `../wateringHole/handoffs/` (36+ docs) | `ecoPrimals/archive/wetspring-early-handoffs-feb2026/` (v1-v9 fossil) |
-| Tests | 454 | 1,148 |
-| Validation | 418 checks | 5,743+ checks |
-| Experiments | 31 suites | 229 experiments |
+| Tests | 454 | 1,210 |
+| Validation | 418 checks | 6,569+ checks |
+| Experiments | 31 suites | 256 experiments |
 | Line coverage | — | 97% bio+io (55% overall) |
 | Pipeline caching | Upstream (ToadStool native) | Local (Exp068, 38% overhead reduction) |
 | Three-tier proof | CPU→GPU→NPU | Python→CPU→GPU→NPU (Exp069) |
