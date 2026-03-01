@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** March 1, 2026 (V85)
+**Date:** March 1, 2026 (V87)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**ToadStool pin:** `1dd7e338` (S70+++: Builder refactor, Fp64Strategy::Concurrent, staging PipelineBuilder, 6 new shaders, 3 new stats modules, chrono eliminated, dead code cleanup, Mar 1 2026)
-**Status:** 93 ToadStool primitives consumed via `compile_shader_universal` (same ToadStool S70+++), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,223 tests (975 barracuda lib + 60 integration + 22 doc + 166 forge), ToadStool S70+++ aligned, 260 experiments, 6,656+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 97 named tolerances, clippy pedantic CLEAN. **V85:** Exp256-259 — EMP Atlas 30K, NUCLEUS data pipeline, Tower-Node (all 6 primals READY), Genomic Vault organ model (consent/provenance/encrypted storage, 20 lib tests, 30 experiment checks). Hand off: V85 active (supersedes V84), V7-V84 archived.
+**ToadStool pin:** `1dd7e338` (S71+++: Builder refactor, Fp64Strategy::Concurrent, staging PipelineBuilder, universal precision)
+**Status:** 93 ToadStool primitives consumed via `compile_shader_universal` (same ToadStool S71+++), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,247 tests (975 barracuda lib + 60 integration + 22 doc + 166 forge), ToadStool S71+++ aligned, 262 experiments, 6,656+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 97 named tolerances, clippy pedantic CLEAN. **V87:** blueFish whitePaper (7 docs, chemistry research programme), hotSpring brain architecture review (4-layer brain, 36-head ESN, NautilusBrain), isomorphism proof (29 comp-chem ops → BarraCUDA, 6 genuinely new kernels). Hand off: V87 active (supersedes V86), V7-V86 archived.
 
 ---
 

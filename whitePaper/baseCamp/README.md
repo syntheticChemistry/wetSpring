@@ -2,7 +2,7 @@
 
 **Date:** March 1, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 85 — 260 experiments, 6,656+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,223 tests (975 barracuda lib + 60 integration + 22 doc + 166 forge), ToadStool S70+++ aligned (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances (full provenance), 0 unsafe code, 0 todo!/unimplemented!(), clippy pedantic CLEAN (both crates, ZERO warnings), V85 EMP Atlas 30K + NUCLEUS primal interaction (all 6 primals READY, IPC 3.2× overhead) + Genomic Vault organ model (consent/provenance/encrypted storage), 52/52 papers, 50/50 three-tier, 95.86% line coverage
+**Status:** Phase 87 — 262 experiments, 6,656+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,247 tests (975 barracuda lib + 60 integration + 22 doc + 166 forge), ToadStool S71+++ aligned (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances (full provenance), 0 unsafe code, 0 todo!/unimplemented!(), clippy pedantic CLEAN (both crates, ZERO warnings), V86 cross-spring evolution (23/23 across 5 Springs) + deep debt elimination round 3 + ESN bridge to ToadStool esn_v2 + blueFish whitePaper launched (`whitePaper/blueFish/` — 7 documents, chemistry as irreducible research programme, RootPulse provenance integration), 52/52 papers, 50/50 three-tier, 95.86% line coverage
 
 ---
 
@@ -107,6 +107,7 @@ Every paper goes through the full evolution. Status across all 52 papers:
 | V66 NUCLEUS V8 | IPC dispatch with V66 I/O evolution (byte-native FASTQ, bytemuck nanopore, streaming MS2), Nest metrics, CPU fallback parity, full pipeline chain | 49 checks (Exp214) |
 | **V84 pipeline buildout** | Paper→CPU→GPU→Streaming proven end-to-end: 32 papers, 26 CPU domains, 21 GPU domains, Python parity, 0.10ms streaming overhead | 172 checks (Exp251-255) |
 | **V85 NUCLEUS + Vault** | EMP 30K atlas, NUCLEUS data pipeline, Tower-Node deployment, Genomic Vault organ model (consent-gated encrypted storage, Merkle provenance) | 87 checks (Exp256-259) |
+| **V87 blueFish whitePaper** | Chemistry as irreducible research programme (Fodor, Lakatos, Anderson). Isomorphism: 29 comp-chem ops → BarraCUDA (14 direct, 9 compose, 6 new). RootPulse provenance for DFT campaigns. hotSpring brain arch mapped to bio workloads. | 7 documents |
 
 ## Extension Roadmap
 

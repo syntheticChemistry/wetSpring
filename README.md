@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** March 1, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 86 — 1,247 tests (975 barracuda lib + 60 integration + 22 doc + 166 forge), 262 experiments, 6,656+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 221+ binaries, ToadStool S71+++ aligned (`1dd7e338`), 93 primitives consumed (same ToadStool S71+++) via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 97 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (both crates, all targets, ZERO warnings), V86: Exp260-262 (Cross-Spring Evolution validation 23/23, Cross-Spring Modern benchmark 12 primitives, Deep Debt Elimination Round 3 — module refactors, 11 new tests, ESN bridge to ToadStool esn_v2), all primals READY (biomeOS + BearDog + Songbird + ToadStool + NestGate + Squirrel), IPC bit-identical 3.2× overhead, vault module (consent + encrypted storage + provenance)
+**Status:** Phase 87 — 1,247 tests (975 barracuda lib + 60 integration + 22 doc + 166 forge), 262 experiments, 6,656+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 238 binaries (218 validate + 20 benchmark), ToadStool S71+++ aligned (`1dd7e338`), 93 primitives consumed (same ToadStool S71+++) via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 97 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (both crates, all targets, ZERO warnings), V87: blueFish whitePaper launched (7 documents, chemistry as irreducible research programme, RootPulse provenance integration, isomorphism proof extending BarraCUDA to 29 comp-chem operations), hotSpring brain architecture reviewed (4-layer concurrent brain, 36-head ESN, NautilusBrain mapped to bio workloads), V87 handoff to ToadStool/BarraCUDA team with Phase 2 primal requirements (LoamSpine, SweetGrass, rhizoCrypt)
 
 ---
 
@@ -127,7 +127,7 @@ integration point.
 | **Total Rust tests** | **1,247** (975 barracuda lib + 60 integration + 22 doc + 166 forge) |
 | Library code coverage | **95.86% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov) |
 | Experiments completed | 262 |
-| Validation/benchmark binaries | 206+ validate + 15 benchmark = 221+ total |
+| Validation/benchmark binaries | 218 validate + 20 benchmark = 238 total |
 | CPU bio modules | 47 |
 | GPU bio modules | 42 (30 lean + 5 write→lean + 7 compose + 0 passthrough) |
 | Tier B (needs refactor) | 0 (all promoted) |
@@ -787,6 +787,18 @@ complete Python → CPU → GPU → Pure GPU Streaming → metalForge pipeline:
 
 **977 lib tests** | **1,103 total** | **5,061+ checks** | **211 experiments** | **0 clippy warnings**
 
+### Phase 87: blueFish WhitePaper + hotSpring Brain Architecture Review (V87)
+
+Documentation and architectural evolution:
+
+- **blueFish whitePaper launched** — 7 documents at `whitePaper/blueFish/` establishing chemistry as an irreducible research programme within ecoPrimals. Non-reducibility argument (Fodor, Lakatos, Anderson). Two-arm architecture (analytical + computational). Isomorphism proof: 29 comp-chem operations decomposed into BarraCUDA primitives (14 direct, 9 compose, 6 genuinely new). RootPulse provenance integration with 5 use cases. Community engagement document mapping Reddit pain points to ecoPrimals solutions.
+- **hotSpring brain architecture reviewed** — 4-layer concurrent brain (NPU+GPU+CPU+GPU), Gen 2 36-head ESN with `HeadGroupDisagreement`, NautilusBrain evolutionary reservoir computing. Mapped to wetSpring bio workloads: `DiversityUpdate`, bio head groups, chemistry active learning.
+- **Phase 2 primal requirements specified** — Concrete demands on LoamSpine (100+ entries/sec, Merkle proofs), SweetGrass (chemistry Entity/Braid types), rhizoCrypt (multi-agent DAG), BearDog (signing), NestGate (content-addressed chemistry data).
+- **V87 handoff** — ToadStool/BarraCUDA team handoff with absorption targets: brain architecture generalization, ERI shader class planning, `esn_v2` shape bug.
+- **Root doc cleanup** — removed references to phantom `BENCHMARK_RESULTS.md` and `CONTROL_EXPERIMENT_STATUS.md`, corrected binary counts (218 validate + 20 benchmark = 238), updated all handoff references to V87.
+
+**1,247 tests** | **262 experiments** | **238 binaries**
+
 ### Phase 86: Cross-Spring Evolution + Deep Debt Elimination (V86)
 
 Three rounds of deep evolution work:
@@ -796,7 +808,7 @@ Three rounds of deep evolution work:
 - **Exp262: Deep Debt Elimination Round 3** — 4 module refactors (dada2, io/ms2, ncbi/nestgate, tolerances/bio), 11 new tests, clone audit. ESN bridge to ToadStool `esn_v2` for NPU reservoir inference.
 - **New spec**: `specs/CROSS_SPRING_EVOLUTION.md` — cross-spring shader and primitive evolution documentation.
 
-**1,247 tests** | **262 experiments** | **221+ binaries**
+**1,247 tests** | **262 experiments** | **238 binaries**
 
 ### Phase 57: ToadStool S68 Universal Precision Rewire (V57)
 
@@ -848,7 +860,7 @@ Extending validated science with real NCBI data through sovereign primal pipelin
 - PairwiseJaccard 122× GPU speedup, SpatialPayoff 22×, PairwiseHamming 10× (neuralSpring → wetSpring)
 - ODE lean 18-24% faster via upstream `integrate_cpu` after ToadStool absorption optimization
 - hotSpring → wetSpring precision provenance: DF64, Anderson spectral, ESN reservoir, RK4/RK45
-- Full cross-spring evolution narrative documented in BENCHMARK_RESULTS.md
+- Full cross-spring evolution narrative documented in `specs/CROSS_SPRING_EVOLUTION.md`
 
 **833 lib tests** | **96.67% coverage** | **79 named tolerances** | **0 clippy warnings (pedantic)**
 
@@ -994,8 +1006,6 @@ Rust 1.93 fixed across 20+ validation binaries.
 ```
 wetSpring/
 ├── README.md                      ← this file
-├── BENCHMARK_RESULTS.md           ← three-tier benchmark results
-├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (260 experiments)
 ├── barracuda/                     ← Rust crate (src/, Cargo.toml, rustfmt.toml)
 │   ├── EVOLUTION_READINESS.md    ← absorption map (tiers, primitives, shaders)
 │   ├── ABSORPTION_MANIFEST.md    ← what's absorbed, local, planned (hotSpring pattern)
@@ -1010,7 +1020,7 @@ wetSpring/
 │   │   ├── bio/                 ← 47 CPU + 42 GPU bio modules
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML, nanopore)
 │   │   ├── bench/               ← benchmark harness + power monitoring
-│   │   ├── bin/                 ← 221+ validation/benchmark binaries (validate_cross_spring_evolution_modern, benchmark_cross_spring_modern)
+│   │   ├── bin/                 ← 238 validation/benchmark binaries (218 validate + 20 benchmark)
 │   │   ├── ipc/                 ← JSON-RPC dispatch (biomeOS integration)
 │   │   └── shaders/             ← shared WGSL utilities (ODE shaders now generated at runtime)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024
@@ -1094,12 +1104,13 @@ All validation data comes from public repositories:
 
 ## Related
 
-- **hotSpring** — Nuclear/plasma physics validation (sibling Spring, precision shaders, f64 WGSL)
+- **hotSpring** — Nuclear/plasma physics validation (sibling Spring, precision shaders, f64 WGSL, 4-layer brain architecture, 36-head ESN, NautilusBrain)
 - **neuralSpring** — ML/neural inference validation (sibling Spring, eigensolvers, batch IPR, TransE)
 - **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
-- **ToadStool** — GPU compute engine (BarraCuda crate, 700+ WGSL shaders, S68)
+- **ToadStool** — GPU compute engine (BarraCuda crate, 700+ WGSL shaders, S71+++)
 - **wateringHole** — Spring-local handoffs to ToadStool
-  - `handoffs/WETSPRING_TOADSTOOL_V85_VAULT_NUCLEUS_EVOLUTION_HANDOFF_MAR01_2026.md` — **current** (V85 vault + NUCLEUS evolution; V86: cross-spring evolution validation, benchmark, ESN bridge, deep debt elimination)
-  - `handoffs/archive/` — V7-V76 (fossil record)
-  - `CROSS_SPRING_SHADER_EVOLUTION.md` — 700+ shader provenance (cross-spring, S68)
+  - `handoffs/WETSPRING_TOADSTOOL_V87_BLUEFISH_BRAIN_ARCH_HANDOFF_MAR01_2026.md` — **current** (V87 blueFish whitePaper, hotSpring brain arch review, Phase 2 primal requirements)
+  - `handoffs/archive/` — V7-V86 (fossil record)
+  - `CROSS_SPRING_SHADER_EVOLUTION.md` — 700+ shader provenance (cross-spring, S71+++)
+- **blueFish** — Chemistry as irreducible research programme (`whitePaper/blueFish/`, analytical + computational, RootPulse provenance)
 - **ecoPrimals** — Parent ecosystem

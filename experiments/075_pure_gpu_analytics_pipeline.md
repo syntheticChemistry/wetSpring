@@ -1,7 +1,7 @@
 # Experiment 075: Pure GPU Multi-Stage Analytics Pipeline
 
 **Date:** February 21, 2026
-**Status:** Active
+**Status:** DONE
 **Binary:** `validate_pure_gpu_pipeline`
 
 ---

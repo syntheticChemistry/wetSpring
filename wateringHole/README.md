@@ -9,9 +9,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V86** | `handoffs/WETSPRING_TOADSTOOL_V86_CROSS_SPRING_EVOLUTION_HANDOFF_MAR01_2026.md` | Mar 1 | **current** — Cross-spring evolution, 23/23 checks, BioEsn esn_v2 bridge, 75 files -4,753 lines, 1,247 tests |
-| V85 | `handoffs/WETSPRING_TOADSTOOL_V85_VAULT_NUCLEUS_EVOLUTION_HANDOFF_MAR01_2026.md` | Mar 1 | Genomic Vault organ model, NUCLEUS deployment, EMP Atlas 30K, 260 experiments, 6,656+ checks ALL PASS |
-| V85 | `handoffs/WETSPRING_NUCLEUS_V85_PRIMAL_INTERACTION_HANDOFF_MAR01_2026.md` | Mar 1 | EMP Atlas 30K, NUCLEUS three-tier routing, Tower-Node deployment, all 6 primals READY, IPC bit-identical 3.2× overhead |
+| **V87** | `handoffs/WETSPRING_TOADSTOOL_V87_BLUEFISH_BRAIN_ARCH_HANDOFF_MAR01_2026.md` | Mar 1 | **current** — blueFish whitePaper (7 docs, chemistry research programme), hotSpring brain arch review, Phase 2 primal requirements, isomorphism proof (29 comp-chem ops → BarraCUDA), `esn_v2` shape bug |
 
 ## NestGate Handoffs
 
@@ -27,7 +25,7 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` (V7-V84, API report, rewire, cross-spring provenance, NestGate data types — 67 files).
+Superseded handoffs in `handoffs/archive/` (V7-V85, API report, rewire, cross-spring provenance, NestGate data types — 68 files).
 
 ## Convention
 

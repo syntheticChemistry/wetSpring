@@ -84,11 +84,12 @@ engine without reimplementation.
 
 ## ToadStool Primitive Count
 
-As of V85 (March 2026):
+As of V87 (March 2026):
 - **93 ToadStool primitives** consumed by wetSpring
 - **0 local WGSL shaders** (all absorbed)
 - **744 total WGSL shaders** in ToadStool across all Springs
-- **5,421+ validation checks** in wetSpring
+- **6,656+ validation checks** in wetSpring
+- **29 computational chemistry ops** mapped to BarraCUDA primitives (blueFish isomorphism proof)
 
 ## Cross-Spring Validation
 
@@ -109,6 +110,28 @@ The Echo State Network illustrates cross-spring evolution:
 4. **neuralSpring** uses the same `esn_v2` for ML surrogate prediction
 
 Each Spring contributed domain-specific improvements:
-- hotSpring: precision (Xoshiro256pp PRNG, f64 training)
-- wetSpring: bio feature extraction and multi-head bio classifiers
+- hotSpring: precision (Xoshiro256pp PRNG, f64 training), 4-layer brain architecture, 36-head ESN with `HeadGroupDisagreement`
+- wetSpring: bio feature extraction, multi-head bio classifiers, blueFish chemistry layer (29 comp-chem ops mapped)
 - neuralSpring: tensor session integration and hardware routing
+
+## blueFish Chemistry Layer (V87)
+
+The blueFish whitePaper (`whitePaper/blueFish/`) extends cross-spring evolution into computational chemistry. The isomorphism proof (`02_ISOMORPHISM.md`) maps 29 comp-chem operations to BarraCUDA primitives:
+
+- **Tier 1** (14 direct): Matrix diagonalization, GEMM, FFT, gradient descent — all exist
+- **Tier 2** (9 compose): SCF iteration (CG + GEMM + reduce), MD integration (velocity Verlet + force eval) — compose existing
+- **Tier 3** (6 genuinely new): ERI (Obara-Saika), Boys function, Schwarz screening, Becke partitioning, Gaussian basis eval, RI decomposition
+
+The 6 new kernels represent a 15% expansion of BarraCUDA's primitive library for an entirely new scientific domain. ERI has structural analogy to hotSpring's 4-point correlation functions.
+
+## hotSpring Brain Architecture Ingest (V87)
+
+Reviewed hotSpring v0.6.15 brain architecture for wetSpring bio mapping:
+
+| hotSpring Pattern | wetSpring Bio Analog |
+|---|---|
+| `CgResidualUpdate` (GPU → NPU) | `DiversityUpdate { n_species, shannon_h, evenness }` |
+| `BrainInterrupt::KillCg` (NPU → GPU) | `BrainInterrupt::FlagNovelState` |
+| `AttentionState` (Green/Yellow/Red) | Monitors diversity trajectory |
+| `HeadGroupDisagreement` | Bio head groups: Anderson-informed, diversity-empirical, phylogeny-informed |
+| `NautilusBrain` + `BetaObservation` | `NautilusBrain` + `ChemObservation` or `QsObservation` |

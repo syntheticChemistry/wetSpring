@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: March 1, 2026
-**Status**: Phase 86 — 6,656+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS (1,247 tests, 262 experiments, ToadStool S71+++ aligned (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 97 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, V86 cross-spring evolution + Genomic Vault + EMP Atlas 30K + Pipeline Buildout, 50/50 three-tier, 52/52 papers, 95.86% line / 94.02% region / 95.40% fn)
+**Status**: Phase 87 — 6,656+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS (1,247 tests, 262 experiments, 238 binaries, ToadStool S71+++ aligned (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 97 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, V87 blueFish whitePaper + hotSpring brain arch review + RootPulse provenance, 50/50 three-tier, 52/52 papers, 95.86% line / 94.02% region / 95.40% fn)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -28,7 +28,7 @@
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
 | Faculty (Track 1c) | R. Anderson (Carleton) — deep-sea metagenomics, population genomics |
 | Faculty (Track 2) | Jones (BMB/Chemistry, MSU) — PFAS mass spectrometry |
-| Handoffs | Seventy-three delivered (v1–v73) |
+| Handoffs | Eighty-seven delivered (v1–v87) |
 
 ---
 
@@ -134,10 +134,8 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 
 | Document | Location | Description |
 |----------|----------|-------------|
-| CONTROL_EXPERIMENT_STATUS.md | `../` | 262 experiments, 6,656+ validation checks, 1,247 tests |
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
-| BENCHMARK_RESULTS.md | `../` | CPU vs GPU performance benchmarks |
-| Handoff (V85/V86) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V85_VAULT_NUCLEUS_EVOLUTION_HANDOFF_MAR01_2026.md` | Current ToadStool handoff |
+| Handoff (V87) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V87_BLUEFISH_BRAIN_ARCH_HANDOFF_MAR01_2026.md` | Current ToadStool handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |
@@ -182,13 +180,13 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 3. PAPER_REVIEW_QUEUE.md — what's next (5 min)
 
 **Deep dive** (2 hours):
-`../whitePaper/STUDY.md` → `../CONTROL_EXPERIMENT_STATUS.md` → `../barracuda/EVOLUTION_READINESS.md` → BARRACUDA_REQUIREMENTS.md
+`../whitePaper/STUDY.md` → `../barracuda/EVOLUTION_READINESS.md` → BARRACUDA_REQUIREMENTS.md
 
 **Data primal / NestGate evolution**:
 DATA_TYPES.md → FIELD_GENOMICS_REQUIREMENTS.md → `../whitePaper/baseCamp/sub_thesis_06_field_genomics.md`
 
 **Integration partner**:
-`../wateringHole/handoffs/WETSPRING_TOADSTOOL_V85_VAULT_NUCLEUS_EVOLUTION_HANDOFF_MAR01_2026.md` → `../BENCHMARK_RESULTS.md`
+`../wateringHole/handoffs/WETSPRING_TOADSTOOL_V87_BLUEFISH_BRAIN_ARCH_HANDOFF_MAR01_2026.md` → `../specs/CROSS_SPRING_EVOLUTION.md`
 
 ---
 

@@ -1,7 +1,7 @@
 # Experiment 076: metalForge Cross-Substrate Pipeline
 
 **Date:** February 21, 2026
-**Status:** Active
+**Status:** DONE
 **Binary:** `validate_cross_substrate_pipeline`
 
 ---

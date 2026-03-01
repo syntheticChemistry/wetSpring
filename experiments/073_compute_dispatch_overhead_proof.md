@@ -1,7 +1,7 @@
 # Experiment 073: Compute Dispatch Overhead — Streaming vs Individual vs CPU
 
 **Date:** February 21, 2026
-**Status:** Active
+**Status:** DONE
 **Binary:** `validate_dispatch_overhead_proof`
 
 ---

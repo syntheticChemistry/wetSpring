@@ -1,7 +1,7 @@
 # Experiment 074: metalForge Substrate Router — GPU↔NPU↔CPU Dispatch
 
 **Date:** February 21, 2026
-**Status:** Active
+**Status:** DONE
 **Binary:** `validate_substrate_router`
 
 ---

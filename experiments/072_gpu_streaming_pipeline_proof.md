@@ -1,7 +1,7 @@
 # Experiment 072: ToadStool Unidirectional Streaming — Zero CPU Round-Trips
 
 **Date:** February 21, 2026
-**Status:** Active
+**Status:** DONE
 **Binary:** `validate_gpu_streaming_pipeline`
 
 ---
