@@ -36,10 +36,11 @@ serde_json = { version = "1", optional = true }
 # ToadStool barracuda — always-on for CPU math (special, linalg, numerical).
 # default-features = false: no wgpu/pollster/bytemuck pulled in for CPU builds.
 # When `gpu` feature is active, `barracuda/gpu` enables GPU ops.
-# S70+++: All S62+DF64 capabilities + evolution (kimura, error_threshold,
-# detection_power/threshold), jackknife (leave-one-out, generalized),
-# chao1_classic (u64), staging::pipeline::PipelineBuilder, Fp64Strategy::Concurrent,
-# SymmetrizeGpu, LaplacianGpu, f64-canonical shaders (0 f32-only), Builder refactor.
+# S70+++: 93 primitives consumed (V83). CPU stats: bootstrap_ci, rawr_mean,
+# fit_exponential/quadratic/logarithmic/all, jackknife, evolution, chao1_classic.
+# GPU bio: StencilCooperationGpu, HillGateGpu (dispatched). WrightFisherGpu (needs DF64).
+# GPU linalg: SymmetrizeGpu, LaplacianGpu (S71 uniform alignment fix pending).
+# Infra: Fp64Strategy::Concurrent, PipelineBuilder, f64-canonical shaders.
 barracuda = { path = "../../phase1/toadstool/crates/barracuda", default-features = false }
 
 # ToadStool akida-driver — pure Rust NPU access (BrainChip AKD1000/AKD1500).
@@ -1287,3 +1288,19 @@ required-features = ["gpu"]
 [[bin]]
 name = "validate_toadstool_s70_rewire"
 path = "src/bin/validate_toadstool_s70_rewire.rs"
+
+# ── Exp248: BarraCuda CPU v18 — Extended Stats Rewire ──
+[[bin]]
+name = "validate_barracuda_cpu_v18"
+path = "src/bin/validate_barracuda_cpu_v18.rs"
+
+# ── Exp249: Cross-Spring Evolution Benchmark S70+++ ──
+[[bin]]
+name = "benchmark_cross_spring_evolution_s70"
+path = "src/bin/benchmark_cross_spring_evolution_s70.rs"
+
+# ── Exp250: BarraCuda GPU v10 — Cross-Spring Bio+Linalg ──
+[[bin]]
+name = "validate_barracuda_gpu_v10"
+path = "src/bin/validate_barracuda_gpu_v10.rs"
+required-features = ["gpu"]

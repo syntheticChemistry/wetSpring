@@ -1,6 +1,6 @@
 # wetSpring — BarraCuda Requirements
 
-**Last Updated**: March 1, 2026 (V82 ToadStool S70+++, pin `1dd7e338`, 85 primitives consumed)
+**Last Updated**: March 1, 2026 (V83 ToadStool S70+++, pin `1dd7e338`, 93 primitives consumed)
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---
@@ -22,7 +22,7 @@
 | ML | decision_tree, random_forest, gbm | Sovereign |
 | Drug repurposing | nmf, transe | Sovereign (NEW — Track 3) |
 
-### GPU Primitives (79 ToadStool primitives + 2 BGL helpers, 0 local WGSL, 1,783 GPU checks)
+### GPU Primitives (93 ToadStool primitives + 2 BGL helpers, 0 local WGSL, 1,783 GPU checks)
 
 | ToadStool Primitive | wetSpring Use | Checks | Performance |
 |-------------------|---------------|--------|-------------|

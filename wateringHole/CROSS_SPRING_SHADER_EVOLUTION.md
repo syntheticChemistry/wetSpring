@@ -1,7 +1,7 @@
 # Cross-Spring Shader Evolution
 
-**Last updated**: Mar 1, 2026 — V82 ToadStool S70+++ Rewire (700+ WGSL shaders, 0 f32-only, universal precision, DF64, 85 primitives consumed, 0 local WGSL/derivative/regression, 248 experiments, 6,315+ checks, 1,945+ GPU on RTX 4070, 97 named tolerances, clippy pedantic CLEAN). V82: S70+++ pin advance (13 commits, 324 files), 3 new stats primitives (evolution, jackknife, chao1_classic), 6 new WGSL shaders upstream (batched_elementwise_f64, seasonal_pipeline, anderson_coupling_f64, lanczos_iteration_f64, linear_regression_f64, matrix_correlation_f64).
-**Validated by**: V82 full sweep (1,210 tests, Exp247 42/42 checks), ToadStool S70+++ `1dd7e338`
+**Last updated**: Mar 1, 2026 — V83 ToadStool S70+++ Rewire (700+ WGSL shaders, 0 f32-only, universal precision, DF64, 93 primitives consumed, 0 local WGSL/derivative/regression, 251 experiments, 6,397+ checks, 1,945+ GPU on RTX 4070, 97 named tolerances, clippy pedantic CLEAN). V83: 8 new consumed primitives (bootstrap_ci, rawr_mean, fit_exponential, fit_quadratic, fit_logarithmic, fit_all, StencilCooperationGpu, HillGateGpu).
+**Validated by**: V83 full sweep (1,210 tests, Exp247 42/42 checks), ToadStool S70+++ `1dd7e338`
 
 ---
 

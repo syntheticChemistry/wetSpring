@@ -5,6 +5,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V83 — Extended Cross-Spring Rewire (2026-03-01)
+
+### Extended cross-spring rewire
+- **Exp248**: BarraCuda CPU v18 — bootstrap_ci, rawr_mean, fit_*, cross-spring stats (36/36 checks)
+- **Exp249**: Cross-Spring Evolution Benchmark S70+++ with provenance map (34/34 checks)
+- **Exp250**: GPU v10 — StencilCooperationGpu, HillGateGpu dispatched; WrightFisher/Symmetrize/Laplacian findings for S71 (12/12 checks)
+- Fp64Strategy::Concurrent wired in gpu.rs
+- 8 new primitives consumed (93 total)
+- 2 upstream findings filed for ToadStool S71
+
 ## V82 — ToadStool S70+++ Rewire (2026-03-01)
 
 ### ToadStool Pin Advance: S68+ (`e96576ee`) → S70+++ (`1dd7e338`)

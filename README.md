@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** March 1, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 82 — 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), 248 experiments, 6,315+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 215+ binaries, ToadStool S70+++ aligned (`1dd7e338`), 85 primitives consumed (82 prior + 3 S70: evolution, jackknife, chao1_classic) via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 97 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (both crates, all targets, ZERO warnings), V82 ToadStool S70+++ rewire: new stats primitives (evolution, jackknife, chao1_classic) + 13 upstream commits absorbed (Builder refactor, Fp64Strategy::Concurrent, staging::pipeline PipelineBuilder, 6 new shaders, 3 new stats modules)
+**Status:** Phase 83 — 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), 251 experiments, 6,397+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 215+ binaries, ToadStool S70+++ aligned (`1dd7e338`), 93 primitives consumed (85 prior + 8 V83: bootstrap_ci, rawr_mean, fit_exponential, fit_quadratic, fit_logarithmic, fit_all, StencilCooperationGpu, HillGateGpu) via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 97 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (both crates, all targets, ZERO warnings), V83 extended cross-spring rewire: Exp248 CPU v18, Exp249 cross-spring S70+++, Exp250 GPU v10, Fp64Strategy::Concurrent wired
 
 ---
 
@@ -121,12 +121,12 @@ integration point.
 | IPC dispatch CPU parity (Exp206) | 64 (7 domains, EXACT_F64 — zero numeric drift through IPC layer) |
 | IPC dispatch GPU parity (Exp207) | 54 (6 domains, GPU↔CPU — lazy OnceLock + dispatch threshold) |
 | metalForge v7 NUCLEUS (Exp208) | 75 (8 domains, mixed hardware — PCIe bypass, Tower/Node/Nest atomics) |
-| **Total validation checks** | **6,273+** |
+| **Total validation checks** | **6,397+** |
 | Rust library unit tests | 962 (barracuda CPU + IPC, default features) |
 | metalForge forge tests | 175 |
 | **Total Rust tests** | **1,219** (962 barracuda lib + 60 integration + 22 doc + 175 forge) |
 | Library code coverage | **95.86% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov) |
-| Experiments completed | 247 |
+| Experiments completed | 251 |
 | Validation/benchmark binaries | 200+ validate + 14 benchmark = 214+ total |
 | CPU bio modules | 47 |
 | GPU bio modules | 42 (30 lean + 5 write→lean + 7 compose + 0 passthrough) |
@@ -137,7 +137,7 @@ integration point.
 | metalForge cross-system | 37+ domains CPU↔GPU (Exp103+104+165+182+208), **39/39 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
-| ToadStool primitives consumed | **82** (barracuda always-on, zero fallback code — ToadStool S68+, `e96576ee`) |
+| ToadStool primitives consumed | **93** (barracuda always-on, zero fallback code — ToadStool S70+++, `1dd7e338`) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
 All 6,273+ validation checks **PASS**. All 1,219 tests **PASS** (1 ignored: hardware-dependent).
 
@@ -984,7 +984,7 @@ Rust 1.93 fixed across 20+ validation binaries.
 wetSpring/
 ├── README.md                      ← this file
 ├── BENCHMARK_RESULTS.md           ← three-tier benchmark results
-├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (247 experiments)
+├── CONTROL_EXPERIMENT_STATUS.md   ← experiment status tracker (251 experiments)
 ├── barracuda/                     ← Rust crate (src/, Cargo.toml, rustfmt.toml)
 │   ├── EVOLUTION_READINESS.md    ← absorption map (tiers, primitives, shaders)
 │   ├── ABSORPTION_MANIFEST.md    ← what's absorbed, local, planned (hotSpring pattern)

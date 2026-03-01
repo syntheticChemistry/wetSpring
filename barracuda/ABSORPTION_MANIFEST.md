@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** March 1, 2026 (V82 ToadStool S70+++ Rewire)
+**Date:** March 1, 2026 (V83 Extended Cross-Spring Rewire)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
 **ToadStool pin:** `1dd7e338` (S70+++: Builder refactor, Fp64Strategy::Concurrent, staging PipelineBuilder, 6 new shaders, 3 new stats modules, chrono eliminated, dead code cleanup, Mar 1 2026)
-**Status:** 85 ToadStool primitives consumed via `compile_shader_universal` (82 prior + 3 S70: `stats::evolution`, `stats::jackknife`, `stats::diversity::chao1_classic`), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), ToadStool S70+++ aligned, 248 experiments, 6,315+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 97 named tolerances, 0 ad-hoc magic numbers, `clippy::pedantic` CLEAN. Hand off: V82 active (supersedes V81), V7-V75 archived.
+**Status:** 93 ToadStool primitives consumed via `compile_shader_universal` (85 prior + 8 V83: `stats::bootstrap_ci`, `stats::rawr_mean`, `stats::fit_exponential`, `stats::fit_quadratic`, `stats::fit_logarithmic`, `stats::fit_all`, `ops::bio::StencilCooperationGpu`, `ops::bio::HillGateGpu`), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), ToadStool S70+++ aligned, 251 experiments, 6,397+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 97 named tolerances, 0 ad-hoc magic numbers, `clippy::pedantic` CLEAN. Hand off: V83 active (supersedes V82), V7-V75 archived.
 
 ---
 
@@ -370,6 +370,18 @@ Patterns from hotSpring and neuralSpring that wetSpring leans on:
 - `interpret_output()` takes ownership (eliminates stdout clone)
 - 4 new `try_load_json_array` error-path tests added
 - 823 lib tests pass, 0 clippy warnings (pedantic+nursery), fmt clean, docs clean
+
+**V83 Extended cross-spring rewire (Mar 1, 2026):**
+- Exp248: BarraCuda CPU v18 — bootstrap_ci, rawr_mean, fit_exponential, fit_quadratic,
+  fit_logarithmic, fit_all, cross-spring stats (36/36 checks)
+- Exp249: Cross-Spring Evolution Benchmark S70+++ with provenance map (34/34 checks)
+- Exp250: GPU v10 — StencilCooperationGpu, HillGateGpu dispatched; WrightFisher/Symmetrize/Laplacian
+  findings for ToadStool S71 (12/12 checks)
+- Fp64Strategy::Concurrent wired in gpu.rs
+- 8 new primitives consumed: stats (bootstrap_ci, rawr_mean, fit_exponential, fit_quadratic,
+  fit_logarithmic, fit_all), GPU bio (StencilCooperationGpu, HillGateGpu)
+- 2 upstream findings filed for ToadStool S71
+- Total: 93 ToadStool primitives consumed (85 prior + 8 V83)
 
 **V82 ToadStool S70+++ rewire (Mar 1, 2026):**
 - ToadStool pin advanced: S68+ (`e96576ee`) → S70+++ (`1dd7e338`)

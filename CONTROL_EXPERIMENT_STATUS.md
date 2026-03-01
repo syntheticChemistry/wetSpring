@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** March 1, 2026
-**Status:** Phase 82 — 248 experiments, 6,315+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), all PASS (955 barracuda lib + 60 integration + 20 doc + 175 forge = 1,210 Rust tests), ToadStool S70+++ aligned (`1dd7e338`, universal precision, 700+ WGSL, ZERO f32-only, Builder refactor, Fp64Strategy::Concurrent, chrono eliminated), 85 primitives consumed (82 prior + 3 S70: evolution, jackknife, chao1_classic), 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (both crates, all targets, ZERO warnings), V82 ToadStool S70+++ rewire: new stats (evolution, jackknife, chao1_classic), 13 upstream commits absorbed, all experiments (Exp233-247) validated green
+**Status:** Phase 83 — 251 experiments, 6,397+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), all PASS (955 barracuda lib + 60 integration + 20 doc + 175 forge = 1,210 Rust tests), ToadStool S70+++ aligned (`1dd7e338`, universal precision, 700+ WGSL, ZERO f32-only, Builder refactor, Fp64Strategy::Concurrent, chrono eliminated), 93 primitives consumed (85 prior + 8 V83: bootstrap_ci, rawr_mean, fit_*, StencilCooperationGpu, HillGateGpu), 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (both crates, all targets, ZERO warnings), V83 extended cross-spring rewire: Exp248 CPU v18, Exp249 cross-spring S70+++, Exp250 GPU v10, Fp64Strategy::Concurrent wired, 2 upstream S71 findings
 
 ---
 
@@ -256,6 +256,9 @@
 | 244 | ToadStool Compute Dispatch v2 — Streaming Overhead Proof (6 sections) | gpu/streaming | PASS | 22 |
 | 245 | PCIe Bypass Mixed Hardware — NPU→GPU→CPU Dispatch Topology (6 sections) | metalForge/pcie | PASS | 36 |
 | 247 | ToadStool S70+++ Rewire — New Stats Primitives (evolution, jackknife, chao1_classic) | rewire | PASS | 42 |
+| 248 | BarraCuda CPU v18 — bootstrap_ci, rawr_mean, fit_*, cross-spring stats | cpu | PASS | 36 |
+| 249 | Cross-Spring Evolution Benchmark S70+++ with provenance map | cross-spring/benchmark | PASS | 34 |
+| 250 | GPU v10 — StencilCooperationGpu, HillGateGpu; WrightFisher/Symmetrize/Laplacian S71 findings | gpu | PASS | 12 |
 | 246 | NUCLEUS Tower→Node→Nest v2 — Extended Pipeline (49 workloads, biomeOS coord) | metalForge/nucleus | PASS | 62 |
 | 222 | Full NUCLEUS Pipeline: Tower→Nest→Node (V69) | metalForge/nucleus | PASS | 46 |
 | 223 | Cross-Spring Evolution V71 Complete Rewire | GPU/cross-spring/precision | PASS | 46 |
@@ -266,7 +269,7 @@
 
 | Category | Count |
 |----------|-------|
-| Experiments completed | 229 (225 prior + Exp229-232 V76 four-tier buildout) |
+| Experiments completed | 251 (248 prior + Exp248-250 V83 extended cross-spring rewire) |
 | Experiments planned | 4 (Exp197-200, field genomics — MinION hardware) |
 | Experiments deferred | 2 (Exp201-202, AMR — MinION + wastewater samples) |
 | CPU validation checks | 1,531 |
@@ -312,13 +315,13 @@
 | GPU v6 (V71) checks | 28 (Exp226: precision-flexible GEMM, DF64 roundtrip, BandwidthTier) |
 | Streaming v4 checks | 24 (Exp227: 7-stage unidirectional pipeline, GEMM→fusion→PCoA→DF64) |
 | metalForge v8 checks | 33 (Exp228: GPU→NPU→CPU routing, IPC dispatch, DF64 protocol) |
-| **Total validation checks** | **5,743+** |
+| **Total validation checks** | **6,397+** |
 | Rust tests | 1,148+ (955 barracuda lib + 60 integration + 20 doc + 113 forge) |
 | BarraCuda CPU parity | 601/601 (v1-v12: 36+ domains, Exp206 IPC fidelity, Exp212 I/O evolution) |
 | BarraCuda GPU parity | 36+ domains (Exp064/087/092/101/207), IPC GPU-aware dispatch |
 | metalForge cross-system | 37+ domains CPU↔GPU proven (Exp103+104+165+182+208+220+221+222), **50/50 papers three-tier** (39 base + 11 extension Exp144-156) |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
-| ToadStool primitives consumed | 79 (barracuda always-on, zero fallback — S68+) |
+| ToadStool primitives consumed | 93 (barracuda always-on, zero fallback — S70+++) |
 | ToadStool session alignment | S68+ (`e96576ee`) — 700 WGSL (ZERO f32-only), universal precision (F16/F32/F64/Df64), `compile_shader_universal` canonical, device-lost resilience, CPU feature-gate clean |
 | ToadStool precision | f64 canonical → downcast via `Precision` enum; `optimal_precision()` routes F64 (compute) or Df64 (consumer); `compile_op_shader` for abstract `op_add`/`op_mul` |
 | Cross-spring shader provenance | 35+ hotSpring, 22+ wetSpring, 14+ neuralSpring, 5+ airSpring, 600+ native |

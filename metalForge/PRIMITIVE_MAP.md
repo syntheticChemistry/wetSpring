@@ -5,9 +5,9 @@
 GPU primitive (or explain why it stays CPU-only). This guides the
 absorption pipeline and identifies what ToadStool needs to build next.
 
-> **Mar 1 update (latest):** 85 ToadStool primitives consumed. 0 local WGSL, 0 local derivative math (fully lean).
+> **Mar 1 update (latest):** 93 ToadStool primitives consumed. 0 local WGSL, 0 local derivative math (fully lean).
 > All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed). S70+++ aligned (`1dd7e338`).
-> Forge crate v0.3.0. 248 experiments, 6,315+ checks (60 NPU). Phase 82, 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN.
+> Forge crate v0.3.0. 251 experiments, 6,397+ checks (60 NPU). Phase 83, 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN.
 
 ---
 

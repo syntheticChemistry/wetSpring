@@ -9,7 +9,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V82** | `handoffs/WETSPRING_TOADSTOOL_V82_S70_REWIRE_HANDOFF_MAR01_2026.md` | Mar 1 | **current** — ToadStool S70+++ rewire (13 commits absorbed), 3 new primitives (evolution, jackknife, chao1_classic), 85 total primitives, 248 experiments, 6,315+ checks ALL PASS |
+| **V83** | `handoffs/WETSPRING_TOADSTOOL_V83_S70_REWIRE_HANDOFF_MAR01_2026.md` | Mar 1 | **current** — ToadStool S70+++ rewire, 8 new consumed primitives (bootstrap_ci, rawr_mean, fit_*×4, StencilCooperationGpu, HillGateGpu), 93 total primitives, 251 experiments, 6,397+ checks ALL PASS |
 
 ## NestGate Handoffs
 
@@ -21,7 +21,7 @@
 
 | File | Purpose |
 |------|---------|
-| `CROSS_SPRING_SHADER_EVOLUTION.md` | 700+ WGSL shader provenance map (cross-spring, ToadStool S68 universal precision) |
+| `CROSS_SPRING_SHADER_EVOLUTION.md` | 700+ WGSL shader provenance map (cross-spring, ToadStool S70+++ universal precision) |
 
 ## Archive
 

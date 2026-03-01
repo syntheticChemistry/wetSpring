@@ -226,11 +226,13 @@ impl GpuF64 {
     /// Returns `Precision::F64` for compute-class GPUs (Native strategy),
     /// `Precision::Df64` for consumer GPUs (Hybrid strategy — routes through
     /// FP32 cores via DF64 core-streaming for ~10x effective throughput).
+    /// `Concurrent` mode runs both DF64 and native f64 side-by-side for
+    /// validation; defaults to F64 for the primary path.
     #[must_use]
     pub fn optimal_precision(&self) -> barracuda::shaders::Precision {
         use barracuda::device::Fp64Strategy;
         match self.fp64_strategy() {
-            Fp64Strategy::Native => barracuda::shaders::Precision::F64,
+            Fp64Strategy::Native | Fp64Strategy::Concurrent => barracuda::shaders::Precision::F64,
             Fp64Strategy::Hybrid => barracuda::shaders::Precision::Df64,
         }
     }

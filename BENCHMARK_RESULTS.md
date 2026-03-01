@@ -1,7 +1,7 @@
 # wetSpring Benchmark Results
 
-**Date:** February 27, 2026
-**Status:** Phase 82 — Comprehensive sweep GREEN (Python → Rust CPU → GPU → Pure GPU Streaming → metalForge → NPU) — 50/50 actionable papers full three-tier (63/63 total); 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), 6,315+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 248 experiments, ToadStool S70+++ (`1dd7e338`), 85 primitives consumed, 0 local WGSL/derivative/regression (fully lean), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough. V82: ToadStool S70+++ rewire (evolution, jackknife, chao1_classic). V81: CPU↔GPU parity + ToadStool dispatch + PCIe bypass + NUCLEUS v2. V75: ComputeDispatch adoption (6 GPU modules)
+**Date:** March 1, 2026
+**Status:** Phase 83 — Comprehensive sweep GREEN (Python → Rust CPU → GPU → Pure GPU Streaming → metalForge → NPU) — 50/50 actionable papers full three-tier (63/63 total); 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), 6,397+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 251 experiments, ToadStool S70+++ (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression (fully lean), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough. V83: Extended cross-spring rewire (Exp248 CPU v18, Exp249 S70+++, Exp250 GPU v10), Fp64Strategy::Concurrent wired. V82: ToadStool S70+++ rewire (evolution, jackknife, chao1_classic). V81: CPU↔GPU parity + ToadStool dispatch + PCIe bypass + NUCLEUS v2. V75: ComputeDispatch adoption (6 GPU modules)
 
 ---
 
@@ -448,11 +448,11 @@ metalForge routes workloads via `Capability` matching: `F64Compute` → GPU, `Qu
 | Rust tests | 1,103 (977 barracuda lib + 60 integration + 19 doc + 47 forge) | PASS |
 | Python baselines | 44 scripts | PASS |
 | BarraCuda CPU parity | 546/546 (v1-v11: 36+ domains) | PASS |
-| ToadStool primitives consumed | 79 primitives (barracuda always-on, zero fallback — S68) | PASS |
+| ToadStool primitives consumed | 93 primitives (barracuda always-on, zero fallback — S70+++) | PASS |
 | Local WGSL shaders | 0 (full lean — all GPU ops dispatch upstream) | PASS |
 | Compose GPU wrappers | 7 (kmd, merge_pairs, robinson_foulds, derep, NJ, reconciliation, molecular_clock) | PASS |
 | Passthrough GPU wrappers | 0 (all promoted — S66 lean cycle) | PASS |
-| **Grand total** | **5,061+ validation + 1,103 tests** | **ALL PASS** |
+| **Grand total** | **6,397+ validation + 1,210 tests** | **ALL PASS** |
 
 ---
 
