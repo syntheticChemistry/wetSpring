@@ -105,6 +105,22 @@ Every paper goes through the full evolution. Status across all 52 papers:
 | Code quality audit | 95.86% line / 94.02% region / 95.40% fn, streaming I/O, 0 production mocks, ToadStool S70+++, barracuda always-on, `deny(missing_docs)`, zero unsafe code, clippy pedantic CLEAN, baseline manifest 51/51 | 1,210 tests |
 | V66 dispatch evolution | Forge dispatch routing (29 workloads), streaming topology (PCIe bypass), NUCLEUS Tower/Node/Nest model, absorption audit (0 local WGSL) | 49 checks (Exp213) |
 | V66 NUCLEUS V8 | IPC dispatch with V66 I/O evolution (byte-native FASTQ, bytemuck nanopore, streaming MS2), Nest metrics, CPU fallback parity, full pipeline chain | 49 checks (Exp214) |
+| **V84 pipeline buildout** | Paper→CPU→GPU→Streaming proven end-to-end: 32 papers, 26 CPU domains, 21 GPU domains, Python parity, 0.10ms streaming overhead | 172 checks (Exp251-255) |
+
+## Extension Roadmap
+
+See [`EXTENSION_PLAN.md`](EXTENSION_PLAN.md) for the phased plan to take
+validated science to real-world data:
+
+| Phase | What | Compute | Priority |
+|-------|------|---------|----------|
+| **P0** | EMP 30K samples + KBS LTER time series | Eastgate alone, hours | Now |
+| **P1** | SRA longitudinal atlas + AMR surveillance | LAN mesh (10G cables) | After cabling |
+| **P2** | MinION field genomics + coupled nutrient models | Eastgate + ~$1K MinION | Medium-term |
+
+Primal integration: NestGate for NCBI data acquisition, biomeOS NUCLEUS for
+local/LAN orchestration (Tower→Node→Nest atomics), ToadStool for GPU dispatch.
+All IPC validated in Exp203-208 (321 checks).
 
 ## Performance Summary
 
