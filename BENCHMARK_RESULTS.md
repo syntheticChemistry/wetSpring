@@ -1,7 +1,7 @@
 # wetSpring Benchmark Results
 
 **Date:** March 1, 2026
-**Status:** Phase 83 — Comprehensive sweep GREEN (Python → Rust CPU → GPU → Pure GPU Streaming → metalForge → NPU) — 50/50 actionable papers full three-tier (63/63 total); 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), 6,397+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 251 experiments, ToadStool S70+++ (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression (fully lean), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough. V83: Extended cross-spring rewire (Exp248 CPU v18, Exp249 S70+++, Exp250 GPU v10), Fp64Strategy::Concurrent wired. V82: ToadStool S70+++ rewire (evolution, jackknife, chao1_classic). V81: CPU↔GPU parity + ToadStool dispatch + PCIe bypass + NUCLEUS v2. V75: ComputeDispatch adoption (6 GPU modules)
+**Status:** Phase 84 — Comprehensive sweep GREEN (Python → Rust CPU → GPU → Pure GPU Streaming → metalForge → NPU) — 50/50 actionable papers full three-tier (63/63 total); 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), 6,569+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 256 experiments, ToadStool S70+++ (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression (fully lean), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough. **V84:** Exp253 Python vs Rust Benchmark v3 — 15 domains paper parity proof, 35/35 checks. V83: Extended cross-spring rewire. V82: ToadStool S70+++ rewire. V81: CPU↔GPU parity + ToadStool dispatch + PCIe bypass + NUCLEUS v2. V75: ComputeDispatch adoption (6 GPU modules)
 
 ---
 
@@ -243,6 +243,18 @@ Run with `cargo run --release --bin benchmark_23_domain_timing` and
 
 ---
 
+## Exp253: Python vs Rust Benchmark v3 (V84)
+
+| Metric | Value |
+|--------|-------|
+| Domains | 15 domains paper parity proof |
+| Checks | 35/35 PASS |
+| Binary | `benchmark_python_vs_rust_v3` |
+
+Validates Rust CPU matches Python across 15 domains with published-equation parity.
+
+---
+
 ## Exp095: Cross-Spring Scaling Benchmark (RTX 4070)
 
 Cross-spring evolved primitives at realistic bioinformatics problem sizes.
@@ -452,7 +464,7 @@ metalForge routes workloads via `Capability` matching: `F64Compute` → GPU, `Qu
 | Local WGSL shaders | 0 (full lean — all GPU ops dispatch upstream) | PASS |
 | Compose GPU wrappers | 7 (kmd, merge_pairs, robinson_foulds, derep, NJ, reconciliation, molecular_clock) | PASS |
 | Passthrough GPU wrappers | 0 (all promoted — S66 lean cycle) | PASS |
-| **Grand total** | **6,397+ validation + 1,210 tests** | **ALL PASS** |
+| **Grand total** | **6,569+ validation + 1,210 tests** | **ALL PASS** |
 
 ---
 

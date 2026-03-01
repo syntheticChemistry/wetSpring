@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** March 1, 2026
-**Status:** Phase 83 — 251 experiments, 6,397+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), all PASS (955 barracuda lib + 60 integration + 20 doc + 175 forge = 1,210 Rust tests), ToadStool S70+++ aligned (`1dd7e338`, universal precision, 700+ WGSL, ZERO f32-only, Builder refactor, Fp64Strategy::Concurrent, chrono eliminated), 93 primitives consumed (85 prior + 8 V83: bootstrap_ci, rawr_mean, fit_*, StencilCooperationGpu, HillGateGpu), 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (both crates, all targets, ZERO warnings), V83 extended cross-spring rewire: Exp248 CPU v18, Exp249 cross-spring S70+++, Exp250 GPU v10, Fp64Strategy::Concurrent wired, 2 upstream S71 findings
+**Status:** Phase 84 — 256 experiments, 6,569+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), all PASS (955 barracuda lib + 60 integration + 20 doc + 175 forge = 1,210 Rust tests), ToadStool S70+++ aligned (`1dd7e338`, universal precision, 700+ WGSL, ZERO f32-only, Builder refactor, Fp64Strategy::Concurrent, chrono eliminated), 93 primitives consumed (same ToadStool S70+++), 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (both crates, all targets, ZERO warnings), V84: Exp251 Paper Math Control v3 (32 papers), Exp252 BarraCuda CPU v19 (7 uncovered domains), Exp253 Python vs Rust Benchmark v3 (15 domains), Exp254 BarraCuda GPU v11 (GPU portability), Exp255 Pure GPU Streaming v8 (6-stage pipeline, 0.10ms overhead)
 
 ---
 
@@ -259,6 +259,11 @@
 | 248 | BarraCuda CPU v18 — bootstrap_ci, rawr_mean, fit_*, cross-spring stats | cpu | PASS | 36 |
 | 249 | Cross-Spring Evolution Benchmark S70+++ with provenance map | cross-spring/benchmark | PASS | 34 |
 | 250 | GPU v10 — StencilCooperationGpu, HillGateGpu; WrightFisher/Symmetrize/Laplacian S71 findings | gpu | PASS | 12 |
+| 251 | Paper Math Control v3 — 32 papers, 27/27 checks | cpu/papers | PASS | 27 |
+| 252 | BarraCuda CPU v19 — 7 uncovered domains (adapter, placement, PCoA, bootstrap phylo, EIC, KMD, feature table) | cpu | PASS | 42 |
+| 253 | Python vs Rust Benchmark v3 — 15 domains paper parity proof | benchmark | PASS | 35 |
+| 254 | BarraCuda GPU v11 — GPU portability (PCoA GPU, K-mer GPU, Bootstrap+GPU, KMD+GPU, Kriging GPU) | gpu | PASS | 25 |
+| 255 | Pure GPU Streaming v8 — 6-stage unidirectional pipeline proof, 0.10ms overhead | gpu/streaming | PASS | 43 |
 | 246 | NUCLEUS Tower→Node→Nest v2 — Extended Pipeline (49 workloads, biomeOS coord) | metalForge/nucleus | PASS | 62 |
 | 222 | Full NUCLEUS Pipeline: Tower→Nest→Node (V69) | metalForge/nucleus | PASS | 46 |
 | 223 | Cross-Spring Evolution V71 Complete Rewire | GPU/cross-spring/precision | PASS | 46 |
@@ -269,7 +274,7 @@
 
 | Category | Count |
 |----------|-------|
-| Experiments completed | 251 (248 prior + Exp248-250 V83 extended cross-spring rewire) |
+| Experiments completed | 256 (251 prior + Exp251-255 V84) |
 | Experiments planned | 4 (Exp197-200, field genomics — MinION hardware) |
 | Experiments deferred | 2 (Exp201-202, AMR — MinION + wastewater samples) |
 | CPU validation checks | 1,531 |
@@ -315,7 +320,7 @@
 | GPU v6 (V71) checks | 28 (Exp226: precision-flexible GEMM, DF64 roundtrip, BandwidthTier) |
 | Streaming v4 checks | 24 (Exp227: 7-stage unidirectional pipeline, GEMM→fusion→PCoA→DF64) |
 | metalForge v8 checks | 33 (Exp228: GPU→NPU→CPU routing, IPC dispatch, DF64 protocol) |
-| **Total validation checks** | **6,397+** |
+| **Total validation checks** | **6,569+** |
 | Rust tests | 1,148+ (955 barracuda lib + 60 integration + 20 doc + 113 forge) |
 | BarraCuda CPU parity | 601/601 (v1-v12: 36+ domains, Exp206 IPC fidelity, Exp212 I/O evolution) |
 | BarraCuda GPU parity | 36+ domains (Exp064/087/092/101/207), IPC GPU-aware dispatch |

@@ -5,6 +5,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V84 — Paper Math + CPU v19 + Python Parity + GPU v11 + Pure GPU Streaming v8 (2026-03-01)
+
+### New experiments (all pass)
+- **Exp251**: Paper Math Control v3 — 32 papers, 27/27 checks
+- **Exp252**: BarraCuda CPU v19 — 7 uncovered domains (adapter, placement, PCoA, bootstrap phylo, EIC, KMD, feature table), 42/42 checks
+- **Exp253**: Python vs Rust Benchmark v3 — 15 domains paper parity proof, 35/35 checks
+- **Exp254**: BarraCuda GPU v11 — GPU portability (PCoA GPU, K-mer GPU, Bootstrap+GPU, KMD+GPU, Kriging GPU), 25/25 checks
+- **Exp255**: Pure GPU Streaming v8 — 6-stage unidirectional pipeline proof, 43/43 checks, 0.10ms overhead
+
+### Totals
+- Total new checks: 172 (27 + 42 + 35 + 25 + 43)
+- Experiments: 251 → 256
+- Checks: 6,397 → 6,569
+- CPU domains: 19 → 26
+- GPU domains: 16 → 21
+- Papers validated: 25 → 32
+
 ## V83 — Extended Cross-Spring Rewire (2026-03-01)
 
 ### Extended cross-spring rewire

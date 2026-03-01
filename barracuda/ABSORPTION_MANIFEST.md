@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** March 1, 2026 (V83 Extended Cross-Spring Rewire)
+**Date:** March 1, 2026 (V84)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
 **ToadStool pin:** `1dd7e338` (S70+++: Builder refactor, Fp64Strategy::Concurrent, staging PipelineBuilder, 6 new shaders, 3 new stats modules, chrono eliminated, dead code cleanup, Mar 1 2026)
-**Status:** 93 ToadStool primitives consumed via `compile_shader_universal` (85 prior + 8 V83: `stats::bootstrap_ci`, `stats::rawr_mean`, `stats::fit_exponential`, `stats::fit_quadratic`, `stats::fit_logarithmic`, `stats::fit_all`, `ops::bio::StencilCooperationGpu`, `ops::bio::HillGateGpu`), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), ToadStool S70+++ aligned, 251 experiments, 6,397+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 97 named tolerances, 0 ad-hoc magic numbers, `clippy::pedantic` CLEAN. Hand off: V83 active (supersedes V82), V7-V75 archived.
+**Status:** 93 ToadStool primitives consumed via `compile_shader_universal` (same ToadStool S70+++), 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), ToadStool S70+++ aligned, 256 experiments, 6,569+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 97 named tolerances, 0 ad-hoc magic numbers, `clippy::pedantic` CLEAN. **V84:** Exp252 BarraCuda CPU v19 validated 7 new uncovered domains: adapter, placement, PCoA, bootstrap phylo, EIC, KMD, feature table. Hand off: V84 active (supersedes V83), V7-V75 archived.
 
 ---
 

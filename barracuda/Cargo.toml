@@ -1304,3 +1304,30 @@ path = "src/bin/benchmark_cross_spring_evolution_s70.rs"
 name = "validate_barracuda_gpu_v10"
 path = "src/bin/validate_barracuda_gpu_v10.rs"
 required-features = ["gpu"]
+
+# ── Exp251: Paper Math Control v3 — 32 Papers ──
+[[bin]]
+name = "validate_paper_math_control_v3"
+path = "src/bin/validate_paper_math_control_v3.rs"
+
+# ── Exp252: BarraCuda CPU v19 — Uncovered Domain Sweep ──
+[[bin]]
+name = "validate_barracuda_cpu_v19"
+path = "src/bin/validate_barracuda_cpu_v19.rs"
+
+# ── Exp253: Python vs Rust Benchmark v3 — Paper Parity Proof ──
+[[bin]]
+name = "benchmark_python_vs_rust_v3"
+path = "src/bin/benchmark_python_vs_rust_v3.rs"
+
+# ── Exp254: BarraCuda GPU v11 — V84 Domain GPU Portability ──
+[[bin]]
+name = "validate_barracuda_gpu_v11"
+path = "src/bin/validate_barracuda_gpu_v11.rs"
+required-features = ["gpu"]
+
+# ── Exp255: Pure GPU Streaming v8 — Unidirectional Pipeline Proof ──
+[[bin]]
+name = "validate_pure_gpu_streaming_v8"
+path = "src/bin/validate_pure_gpu_streaming_v8.rs"
+required-features = ["gpu"]

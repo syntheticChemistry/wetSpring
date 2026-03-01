@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 1, 2026 (V83 Extended Cross-Spring Rewire)
+**Date:** March 1, 2026 (V84)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules + 1 IPC module (all lean, 0 local WGSL, 0 local derivative/regression math), 93 ToadStool primitives consumed (85 prior + 8 V83: bootstrap_ci, rawr_mean, fit_*, StencilCooperationGpu, HillGateGpu, barracuda always-on, zero fallback code), 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), 251 experiments, 6,397+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S70+++ aligned (`1dd7e338`), 97 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V83:** Extended cross-spring rewire (Exp248 CPU v18, Exp249 cross-spring S70+++, Exp250 GPU v10), Fp64Strategy::Concurrent wired, 93 primitives.
+**Status:** 47 CPU + 42 GPU modules + 1 IPC module (all lean, 0 local WGSL, 0 local derivative/regression math), 93 ToadStool primitives consumed (same ToadStool S70+++, barracuda always-on, zero fallback code), 1,210 tests (955 barracuda lib + 60 integration + 20 doc + 175 forge), 256 experiments, 6,569+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S70+++ aligned (`1dd7e338`), 97 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V84:** Exp254 BarraCuda GPU v11 — new GPU domains (PCoA GPU, K-mer GPU, Bootstrap+GPU, KMD+GPU, Kriging GPU). Exp255 Pure GPU Streaming v8 — 6-stage unidirectional pipeline proof, 0.10ms overhead.
 
 ### Full Lean Phase
 
