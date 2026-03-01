@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** March 1, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 84 — 1,210 tests (962 barracuda lib + 60 integration + 22 doc + 166 forge), 256 experiments, 6,569+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 219+ binaries, ToadStool S70+++ aligned (`1dd7e338`), 93 primitives consumed (same ToadStool S70+++) via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 97 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (both crates, all targets, ZERO warnings), V84: Exp251-255 (Paper Math v3, CPU v19, Python parity v3, GPU v11, Pure GPU Streaming v8)
+**Status:** Phase 85 — 1,210 tests (962 barracuda lib + 60 integration + 22 doc + 166 forge), 259 experiments, 6,626+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 222+ binaries, ToadStool S70+++ aligned (`1dd7e338`), 93 primitives consumed (same ToadStool S70+++) via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 97 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (both crates, all targets, ZERO warnings), V85: Exp256-258 (EMP Anderson Atlas 30K, NUCLEUS Data Pipeline, Tower-Node Deployment), all primals READY (biomeOS + BearDog + Songbird + ToadStool + NestGate + Squirrel), IPC bit-identical 3.2× overhead
 
 ---
 

@@ -1,7 +1,7 @@
 # wetSpring Control Experiment Status
 
 **Date:** March 1, 2026
-**Status:** Phase 84 — 256 experiments, 6,569+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), all PASS (955 barracuda lib + 60 integration + 20 doc + 175 forge = 1,210 Rust tests), ToadStool S70+++ aligned (`1dd7e338`, universal precision, 700+ WGSL, ZERO f32-only, Builder refactor, Fp64Strategy::Concurrent, chrono eliminated), 93 primitives consumed (same ToadStool S70+++), 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (both crates, all targets, ZERO warnings), V84: Exp251 Paper Math Control v3 (32 papers), Exp252 BarraCuda CPU v19 (7 uncovered domains), Exp253 Python vs Rust Benchmark v3 (15 domains), Exp254 BarraCuda GPU v11 (GPU portability), Exp255 Pure GPU Streaming v8 (6-stage pipeline, 0.10ms overhead)
+**Status:** Phase 85 — 259 experiments, 6,626+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), all PASS (962 barracuda lib + 60 integration + 22 doc + 166 forge = 1,210 Rust tests), ToadStool S70+++ aligned (`1dd7e338`, universal precision, 700+ WGSL, ZERO f32-only, Builder refactor, Fp64Strategy::Concurrent, chrono eliminated), 93 primitives consumed (same ToadStool S70+++), 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN (both crates, all targets, ZERO warnings), V85: Exp256 EMP Anderson Atlas (30K samples, 14 biomes), Exp257 NUCLEUS Data Pipeline (three-tier routing), Exp258 NUCLEUS Tower-Node (all primals READY, IPC 3.2× overhead)
 
 ---
 
@@ -264,6 +264,9 @@
 | 253 | Python vs Rust Benchmark v3 — 15 domains | V84 | ✅ 35/35 | 35 |
 | 254 | BarraCuda GPU v11 — GPU portability | V84 | ✅ 25/25 | 25 |
 | 255 | Pure GPU Streaming v8 — unidirectional | V84 | ✅ 43/43 | 43 |
+| 256 | EMP-Scale Anderson Atlas — 30K biome QS | V85 | ✅ 35/35 | 35 |
+| 257 | NUCLEUS Data Acquisition Pipeline | V85 | ✅ 9/9 | 9 |
+| 258 | NUCLEUS Tower-Node Deployment | V85 | ✅ 13/13 | 13 |
 
 ---
 

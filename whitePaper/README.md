@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** March 1, 2026
-**Status:** Phase 84 — Validation study active — 6,569+ checks (1,945+ GPU on RTX 4070, **60 NPU on AKD1000**), 1,210 tests (962 lib + 60 integration + 22 doc + 166 forge), 256 experiments, ToadStool S70+++ aligned (`1dd7e338`), 93 primitives consumed, 26 CPU domains + 21 GPU domains, Python parity proven (15 domains bit-identical to SciPy), 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances with full provenance, 0 Passthrough, clippy pedantic CLEAN, V84 Paper→CPU→GPU→Streaming pipeline, 50/50 three-tier, 52/52 papers
+**Status:** Phase 85 — Validation study active — 6,626+ checks (1,945+ GPU on RTX 4070, **60 NPU on AKD1000**), 1,210 tests (962 lib + 60 integration + 22 doc + 166 forge), 259 experiments, ToadStool S70+++ aligned (`1dd7e338`), 93 primitives consumed, 26 CPU domains + 21 GPU domains, Python parity proven (15 domains bit-identical to SciPy), 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances with full provenance, 0 Passthrough, clippy pedantic CLEAN, V85 EMP Atlas + NUCLEUS primal interaction (all primals READY), 50/50 three-tier, 52/52 papers
 **License:** AGPL-3.0-or-later
 
 ---

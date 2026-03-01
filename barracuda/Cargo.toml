@@ -1331,3 +1331,19 @@ required-features = ["gpu"]
 name = "validate_pure_gpu_streaming_v8"
 path = "src/bin/validate_pure_gpu_streaming_v8.rs"
 required-features = ["gpu"]
+
+# ── Exp256: EMP-Scale Anderson Atlas — 30K Biome QS Classification ──
+[[bin]]
+name = "validate_emp_anderson_atlas"
+path = "src/bin/validate_emp_anderson_atlas.rs"
+
+# ── Exp257: NUCLEUS Primal Interaction — Data Acquisition Pipeline ──
+[[bin]]
+name = "validate_nucleus_data_pipeline"
+path = "src/bin/validate_nucleus_data_pipeline.rs"
+
+# ── Exp258: NUCLEUS Tower-Node Deployment — Live Primal Orchestration ──
+[[bin]]
+name = "validate_nucleus_tower_node"
+path = "src/bin/validate_nucleus_tower_node.rs"
+required-features = ["ipc"]

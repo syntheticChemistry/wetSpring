@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-01 (Phase 84: 256 experiments, 219+ binaries, 6,569+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S70+++ (`1dd7e338`), 93 primitives consumed, barracuda always-on, 1,210 tests, 97 named tolerances, clippy pedantic CLEAN, 0 Passthrough, V84 CPU↔GPU Parity + ToadStool Dispatch + PCIe Bypass + NUCLEUS v2, 50/50 three-tier, 52/52 papers)
+**Updated**: 2026-03-01 (Phase 85: 259 experiments, 222+ binaries, 6,626+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S70+++ (`1dd7e338`), 93 primitives consumed, barracuda always-on, 1,210 tests, 97 named tolerances, clippy pedantic CLEAN, 0 Passthrough, V85 EMP Atlas + NUCLEUS Primal Interaction, all 6 primals READY, IPC bit-identical 3.2× overhead)
 
 ---
 
@@ -152,6 +152,9 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 253 | Python vs Rust Benchmark v3 | cross | DONE | 15-domain paper parity proof | benchmark_python_vs_rust_v3 | 35 |
 | 254 | BarraCuda GPU v11 | GPU | DONE | GPU portability (PCoA GPU, K-mer GPU, Bootstrap+GPU, KMD+GPU, Kriging GPU) | validate_barracuda_gpu_v11 | 25 |
 | 255 | Pure GPU Streaming v8 | GPU/streaming | DONE | 6-stage unidirectional pipeline proof | validate_pure_gpu_streaming_v8 | 43 |
+| 256 | EMP-Scale Anderson Atlas | NUCLEUS/data | DONE | 30K samples × 14 EMPO biomes | validate_emp_anderson_atlas | 35 |
+| 257 | NUCLEUS Data Pipeline | NUCLEUS/IPC | DONE | Three-tier primal routing | validate_nucleus_data_pipeline | 9 |
+| 258 | NUCLEUS Tower-Node | NUCLEUS/deploy | DONE | All primals READY, IPC 3.2× overhead | validate_nucleus_tower_node | 13 |
 
 ---
 
@@ -342,8 +345,11 @@ thresholds from `src/tolerances.rs`.
 | `benchmark_python_vs_rust_v3` | 253 | 35 | `cargo run --release --bin benchmark_python_vs_rust_v3` |
 | `validate_barracuda_gpu_v11` | 254 | 25 | `cargo run --features gpu --release --bin validate_barracuda_gpu_v11` |
 | `validate_pure_gpu_streaming_v8` | 255 | 43 | `cargo run --features gpu --release --bin validate_pure_gpu_streaming_v8` |
+| `validate_emp_anderson_atlas` | 256 | 35 | `cargo run --release --bin validate_emp_anderson_atlas` |
+| `validate_nucleus_data_pipeline` | 257 | 9 | `cargo run --release --bin validate_nucleus_data_pipeline` |
+| `validate_nucleus_tower_node` | 258 | 13 | `cargo run --release --features ipc --bin validate_nucleus_tower_node` |
 
-**Total validation checks**: 6,569+
+**Total validation checks**: 6,626+
 **Rust tests**: 1,210 (962 barracuda lib + 60 integration + 22 doc + 166 forge)
 **Binaries**: 215 total (validate + benchmark + server)
 **ToadStool primitives**: 93 consumed (barracuda always-on, zero fallback code — S70+++ `1dd7e338`)

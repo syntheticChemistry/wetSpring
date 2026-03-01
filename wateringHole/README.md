@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V84** | `handoffs/WETSPRING_TOADSTOOL_V84_PIPELINE_BUILDOUT_HANDOFF_MAR01_2026.md` | Mar 1 | **current** — Paper→CPU→GPU→Streaming pipeline proof, 32 papers, 26 CPU / 21 GPU domains, Python parity proven, 0.10ms streaming overhead, 256 experiments, 6,569+ checks ALL PASS |
+| **V85** | `handoffs/WETSPRING_NUCLEUS_V85_PRIMAL_INTERACTION_HANDOFF_MAR01_2026.md` | Mar 1 | **current** — EMP Atlas 30K, NUCLEUS three-tier routing, Tower-Node deployment, all 6 primals READY, IPC bit-identical 3.2× overhead, 259 experiments, 6,626+ checks ALL PASS |
+| V84 | `handoffs/WETSPRING_TOADSTOOL_V84_PIPELINE_BUILDOUT_HANDOFF_MAR01_2026.md` | Mar 1 | Paper→CPU→GPU→Streaming pipeline proof, 32 papers, 26 CPU / 21 GPU domains, Python parity proven |
 
 ## NestGate Handoffs
 

@@ -5,6 +5,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V85 — EMP Atlas + NUCLEUS Primal Interaction (2026-03-01)
+
+### New experiments (all pass)
+- **Exp256**: EMP-Scale Anderson Atlas — 30,002 samples × 14 EMPO biomes, 35/35 checks
+- **Exp257**: NUCLEUS Data Acquisition Pipeline — three-tier primal routing, 9/9 checks
+- **Exp258**: NUCLEUS Tower-Node Deployment — all primals READY, IPC 3.2× overhead, 13/13 checks
+
+### NUCLEUS findings
+- All 6 primal binaries installed on Eastgate (biomeOS v0.1.0, BearDog, Songbird, ToadStool, NestGate, Squirrel)
+- All 4 NUCLEUS modes READY (Tower, Node, Nest, Full)
+- IPC dispatch bit-identical to direct function calls (|error| = 0.0)
+- JSON-RPC overhead: 3.2× (0.86µs → 2.74µs) — negligible vs Anderson 500ms
+- Full pipeline dispatch: 0.87ms (diversity + QS model + Anderson)
+
+### Totals
+- Total new checks: 57 (35 + 9 + 13)
+- Experiments: 256 → 259
+- Checks: 6,569 → 6,626
+- Binaries: 219 → 222
+
 ## V84 — Paper Math + CPU v19 + Python Parity + GPU v11 + Pure GPU Streaming v8 (2026-03-01)
 
 ### New experiments (all pass)

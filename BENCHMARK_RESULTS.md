@@ -1,7 +1,7 @@
 # wetSpring Benchmark Results
 
 **Date:** March 1, 2026
-**Status:** Phase 84 — Comprehensive sweep GREEN (Paper → CPU → GPU → Streaming → metalForge → NPU) — 52/52 papers, 50/50 three-tier; 1,210 tests (962 barracuda lib + 60 integration + 22 doc + 166 forge), 6,569+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 256 experiments, ToadStool S70+++ (`1dd7e338`), 93 primitives consumed, 26 CPU domains, 21 GPU domains, Python parity proven (15 domains bit-identical to SciPy), 0 local WGSL (fully lean), 97 named tolerances, clippy pedantic CLEAN. **V84:** Exp251-255 (Paper Math v3 32 papers, CPU v19 7 domains, Python parity v3 15 domains, GPU v11 5 workloads, Streaming v8 6-stage pipeline 0.10ms overhead)
+**Status:** Phase 85 — Comprehensive sweep GREEN (Paper → CPU → GPU → Streaming → metalForge → NPU → NUCLEUS) — 52/52 papers, 50/50 three-tier; 1,210 tests (962 barracuda lib + 60 integration + 22 doc + 166 forge), 6,626+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 259 experiments, ToadStool S70+++ (`1dd7e338`), 93 primitives consumed, 26 CPU domains, 21 GPU domains, Python parity proven (15 domains bit-identical to SciPy), 0 local WGSL (fully lean), 97 named tolerances, clippy pedantic CLEAN. **V85:** Exp256-258 (EMP Atlas 30K samples, NUCLEUS Data Pipeline, Tower-Node — all 6 primals READY, IPC 3.2× overhead, bit-identical dispatch)
 
 ---
 
@@ -504,6 +504,9 @@ cargo run --release --bin validate_barracuda_cpu_v19           # 42 (Exp252, 7 n
 cargo run --release --bin benchmark_python_vs_rust_v3          # 35 (Exp253, 15-domain parity)
 cargo run --features gpu --release --bin validate_barracuda_gpu_v11  # 25 (Exp254, GPU portability)
 cargo run --features gpu --release --bin validate_pure_gpu_streaming_v8  # 43 (Exp255, 6-stage pipeline)
+cargo run --release --bin validate_emp_anderson_atlas                    # 35 (Exp256, 30K EMP samples)
+cargo run --release --bin validate_nucleus_data_pipeline                 # 9  (Exp257, three-tier routing)
+cargo run --release --features ipc --bin validate_nucleus_tower_node     # 13 (Exp258, all primals READY)
 
 # Benchmarks
 cargo run --release --bin benchmark_23_domain_timing           # Python→Rust CPU (33.4×)
