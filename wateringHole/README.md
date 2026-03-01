@@ -23,7 +23,7 @@
 
 | File | Purpose |
 |------|---------|
-| `CROSS_SPRING_SHADER_EVOLUTION.md` | 700+ WGSL shader provenance map (cross-spring, ToadStool S70+++ universal precision) |
+| `CROSS_SPRING_SHADER_EVOLUTION.md` | 700+ WGSL shader provenance map (cross-spring, ToadStool S71+++ universal precision) |
 
 ## Archive
 

@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** March 1, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 86 — 1,247 tests (975 barracuda lib + 60 integration + 22 doc + 166 forge), 262 experiments, 6,656+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 221+ binaries, ToadStool S70+++ aligned (`1dd7e338`), 93 primitives consumed (same ToadStool S70+++) via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 97 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (both crates, all targets, ZERO warnings), V86: Exp260-262 (Cross-Spring Evolution validation 23/23, Cross-Spring Modern benchmark 12 primitives, Deep Debt Elimination Round 3 — module refactors, 11 new tests, ESN bridge to ToadStool esn_v2), all primals READY (biomeOS + BearDog + Songbird + ToadStool + NestGate + Squirrel), IPC bit-identical 3.2× overhead, vault module (consent + encrypted storage + provenance)
+**Status:** Phase 86 — 1,247 tests (975 barracuda lib + 60 integration + 22 doc + 166 forge), 262 experiments, 6,656+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 221+ binaries, ToadStool S71+++ aligned (`1dd7e338`), 93 primitives consumed (same ToadStool S71+++) via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 97 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (both crates, all targets, ZERO warnings), V86: Exp260-262 (Cross-Spring Evolution validation 23/23, Cross-Spring Modern benchmark 12 primitives, Deep Debt Elimination Round 3 — module refactors, 11 new tests, ESN bridge to ToadStool esn_v2), all primals READY (biomeOS + BearDog + Songbird + ToadStool + NestGate + Squirrel), IPC bit-identical 3.2× overhead, vault module (consent + encrypted storage + provenance)
 
 ---
 
@@ -137,7 +137,7 @@ integration point.
 | metalForge cross-system | 37+ domains CPU↔GPU (Exp103+104+165+182+208), **39/39 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
-| ToadStool primitives consumed | **93** (barracuda always-on, zero fallback code — ToadStool S70+++, `1dd7e338`) |
+| ToadStool primitives consumed | **93** (barracuda always-on, zero fallback code — ToadStool S71+++, `1dd7e338`) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
 All 6,656+ validation checks **PASS**. All 1,247 tests **PASS** (1 ignored: hardware-dependent).
 
@@ -791,7 +791,7 @@ complete Python → CPU → GPU → Pure GPU Streaming → metalForge pipeline:
 
 Three rounds of deep evolution work:
 
-- **Exp260: Cross-Spring Evolution Validation** — `validate_cross_spring_evolution_modern` (23/23 checks). Validates all five Springs' primitives consumed by wetSpring via ToadStool S70+++.
+- **Exp260: Cross-Spring Evolution Validation** — `validate_cross_spring_evolution_modern` (23/23 checks). Validates all five Springs' primitives consumed by wetSpring via ToadStool S71+++.
 - **Exp261: Cross-Spring Modern Benchmark** — `benchmark_cross_spring_modern` (12 primitives benchmarked). Provenance tracking across hotSpring, wetSpring, neuralSpring, airSpring, groundSpring.
 - **Exp262: Deep Debt Elimination Round 3** — 4 module refactors (dada2, io/ms2, ncbi/nestgate, tolerances/bio), 11 new tests, clone audit. ESN bridge to ToadStool `esn_v2` for NPU reservoir inference.
 - **New spec**: `specs/CROSS_SPRING_EVOLUTION.md` — cross-spring shader and primitive evolution documentation.

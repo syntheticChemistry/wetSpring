@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: March 1, 2026
-**Status**: Phase 86 — 6,656+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS (1,247 tests, 262 experiments, ToadStool S70+++ aligned (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 97 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, V86 cross-spring evolution + Genomic Vault + EMP Atlas 30K + Pipeline Buildout, 50/50 three-tier, 52/52 papers, 95.86% line / 94.02% region / 95.40% fn)
+**Status**: Phase 86 — 6,656+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS (1,247 tests, 262 experiments, ToadStool S71+++ aligned (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 97 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, V86 cross-spring evolution + Genomic Vault + EMP Atlas 30K + Pipeline Buildout, 50/50 three-tier, 52/52 papers, 95.86% line / 94.02% region / 95.40% fn)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -11,7 +11,7 @@
 | Metric | Value |
 |--------|-------|
 | CPU validation | 1,476+/1,476+ PASS — 47 modules, 262 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
-| GPU validation | 1,945+/1,945+ PASS — 93 ToadStool primitives (S70+++ `1dd7e338`, always-on), 0 local WGSL (fully lean) |
+| GPU validation | 1,945+/1,945+ PASS — 93 ToadStool primitives (S71+++ `1dd7e338`, always-on), 0 local WGSL (fully lean) |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 407/407 — 22.5x Rust speedup over Python (v1–v9) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/101/164) — pure GPU math proven |
@@ -157,7 +157,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 - **NPU edge inference** — ESN reservoir on AKD1000, online evolution, adaptive sampling (V60)
 - **Field genomics** (planned) — Nanopore sequencing + NPU classification + metalForge routing. See [FIELD_GENOMICS_REQUIREMENTS.md](FIELD_GENOMICS_REQUIREMENTS.md)
 - **Data type profiling** — Biological data format catalog driving NestGate data primal evolution. See [DATA_TYPES.md](DATA_TYPES.md)
-- **Sovereign Rust bioinformatics** — 47 CPU + 42 GPU modules + 0 local WGSL (fully lean), 2 runtime dependencies (flate2 + bytemuck), 93 ToadStool primitives (S70+++, always-on, zero fallback)
+- **Sovereign Rust bioinformatics** — 47 CPU + 42 GPU modules + 0 local WGSL (fully lean), 2 runtime dependencies (flate2 + bytemuck), 93 ToadStool primitives (S71+++, always-on, zero fallback)
 
 ### wetSpring IS NOT:
 - Sensor noise analysis (groundSpring)

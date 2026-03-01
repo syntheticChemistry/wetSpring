@@ -4,18 +4,29 @@
 **From:** wetSpring V86
 **To:** ToadStool / BarraCuda team
 **Supersedes:** V85 Vault NUCLEUS Evolution Handoff
-**ToadStool Pin:** S70+++
+**ToadStool Pin:** S71+++
 **License:** AGPL-3.0-or-later
 
 ---
 
 ## Executive Summary
 
+- **Validated clean against ToadStool S71+++** (universal precision, DF64 transcendentals, ComputeDispatch migration)
 - **Deep debt elimination:** 75 files changed, -4,753 net lines
 - **Cross-spring evolution validation:** 23/23 checks across 5 Springs
 - **ESN bridge to ToadStool esn_v2:** BioEsn with multi-head bio classifiers
 - **4 large module refactors:** node, inventory, tolerances/bio, dada2
 - **1,247 tests, 0 failures,** clippy pedantic clean
+
+---
+
+## S71 Evolution Acknowledgment
+
+1. **Universal precision** (op_preamble + naga IR rewrite) — math is universal, precision is silicon
+2. **Zero f32-only shaders** — all canonical f64 with downcast
+3. **DF64 transcendentals complete** (gamma, erf)
+4. **ComputeDispatch builder** for 66+ ops
+5. **All wetSpring imports and primitives verified compatible**
 
 ---
 
