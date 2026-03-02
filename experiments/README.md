@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-02 (Phase 92D+: 277 experiments, 260 binaries, 7,384+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S86 (`2fee1969`), 144 primitives consumed, barracuda always-on, 1,309 tests, 103 named tolerances, clippy pedantic CLEAN, full paper-math chain Exp291-295)
+**Updated**: 2026-03-02 (Phase 92F: 273 experiments, 262 binaries, 7,266+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S86 (`2fee1969`), 144 primitives consumed (264 ComputeDispatch ops), barracuda always-on, 1,089 tests, 103 named tolerances, clippy pedantic CLEAN. V92F: cross-spring modern S86 validation (Exp297, 46/46), GPU↔CPU parity verified, full paper-math chain Exp291-295)
 
 ---
 
@@ -179,6 +179,8 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 293 | [CPU vs GPU v9](293_cpu_vs_gpu_v9.md) | gpu | DONE | CPU reference | 5-track GPU portability — diversity, NMF, Anderson, pharmacology | 35 |
 | 294 | [Pure GPU Streaming v9](294_pure_gpu_streaming_v9.md) | streaming | DONE | CPU+GPU reference | Full pipeline: diversity→BC→NMF→Anderson→stats, W↔P(QS) r=-0.924 | 16 |
 | 295 | [metalForge v14](295_metalforge_v14_paper_chain.md) | metalforge | DONE | Pipeline integration | Paper-math cross-system: 6 tracks, PCIe streaming, sovereign 45/47 | 28 |
+| 296 | ToadStool S86 CPU Rewire | cpu | DONE | ToadStool S86 (`2fee1969`) | S79→S86 feature-gate fixes, ungated spectral/graph/sample CPU modules | 64 |
+| 297 | Cross-Spring Modern S86 GPU | gpu | DONE | ToadStool S86 + RTX 4070 | Cross-spring GPU↔CPU parity: diversity, GEMM, BrayCurtis, spectral, hydrology, stats, sampling + benchmark | 46 |
 
 ---
 
@@ -384,11 +386,12 @@ thresholds from `src/tolerances.rs`.
 | `validate_mixed_hw_dispatch` | 269 | 91 | `cargo run -p wetspring-forge --bin validate_mixed_hw_dispatch` |
 | `validate_biomeos_graph` | 270 | 29 | `cargo run -p wetspring-forge --bin validate_biomeos_graph` |
 | `validate_cross_spring_s86` | 296 | 64 | `cargo run --release --bin validate_cross_spring_s86` |
+| `validate_cross_spring_modern_s86` | 297 | 46 | `cargo run --release --features gpu --bin validate_cross_spring_modern_s86` |
 
-**Total validation checks**: 7,448+
-**Rust tests**: 1,309
-**Binaries**: 261 total (234 validate + 20 benchmark)
-**ToadStool primitives**: 144 consumed (barracuda always-on, zero fallback code — S86 `2fee1969`)
+**Total validation checks**: 7,266+
+**Rust tests**: 1,089
+**Binaries**: 262 total (235 validate + 20 benchmark)
+**ToadStool primitives**: 144 consumed (264 ComputeDispatch ops, barracuda always-on, zero fallback code — S86 `2fee1969`)
 **Papers**: 52 (25 Tracks 1-2 + 5 Track 3 + 9 Track 4 + 1 cross-spring + 9 extensions + 3 reference)
 **Local WGSL shaders**: 0 (all absorbed by ToadStool S63)
 **GPU modules**: 42 total (all lean on upstream primitives)

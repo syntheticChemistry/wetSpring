@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: March 2, 2026
-**Status**: Phase 92D — 7,220+ checks, ALL PASS (1,309 tests, 272 experiments, 255 binaries, ToadStool S86 `2fee1969`, 144 primitives, 0 local WGSL, 103 named tolerances, clippy pedantic CLEAN `--all-features`, 52 papers + 6 reproduced, full three-tier on all 39 eligible papers)
+**Status**: Phase 92F — 7,266+ checks, ALL PASS (1,089 tests, 273 experiments, 262 binaries, ToadStool S86 `2fee1969`, 144 primitives (264 ComputeDispatch ops), 0 local WGSL, 103 named tolerances, clippy pedantic CLEAN `--all-features`, 52 papers + 6 reproduced, full three-tier on all 39 eligible papers). V92F: cross-spring modern S86 validation (Exp297, 46/46), GPU↔CPU parity on RTX 4070
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -11,16 +11,18 @@
 | Metric | Value |
 |--------|-------|
 | CPU validation | 1,476+/1,476+ PASS — 47 modules, 262 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
-| GPU validation | 1,945+/1,945+ PASS — 144 ToadStool primitives (S71+++ `1dd7e338`, always-on), 0 local WGSL (fully lean) |
+| GPU validation | 1,945+/1,945+ PASS — 144 ToadStool primitives (S86 `2fee1969`, always-on, 264 ComputeDispatch ops), 0 local WGSL (fully lean) |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 407/407 — 22.5x Rust speedup over Python (v1–v9) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/101/164) — pure GPU math proven |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip (Exp090/091) |
 | metalForge cross-system | 37 domains CPU↔GPU (Exp103+104+165) + dispatch (Exp080) + pipeline (Exp086) + PCIe (Exp088) |
 | Cross-spring spectral | 25 checks — Anderson localization + QS-disorder analogy (Exp107) |
+| Cross-spring modern S86 | 46/46 PASS — GPU↔CPU parity, 264 ComputeDispatch ops, 5 springs + wateringHole (Exp297) |
+| S86 CPU rewire | 64/64 PASS — ungated spectral/graph/sample modules, S80-S86 evolution (Exp296) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
-| Rust modules | 47 CPU + 42 GPU + 1 vault, 1,247 tests (975 barracuda lib + 60 integration + 22 doc + 166 forge) |
+| Rust modules | 47 CPU + 42 GPU + 1 IPC + 1 vault, 1,089 tests, 262 binaries |
 | Write phase | 0 local WGSL (fully lean) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
 | Paper queue | **ALL DONE** — 52/52 reproducible papers complete (Tracks 1-4 + Phase 37 extensions + cross-spring) |
@@ -135,7 +137,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 | Document | Location | Description |
 |----------|----------|-------------|
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
-| Handoff (V92C) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V92C_BLUEFISH_BRAIN_ARCH_HANDOFF_MAR02_2026.md` | Current ToadStool handoff |
+| Handoff (V92F) | `../wateringHole/handoffs/WETSPRING_CROSS_SPRING_V92F_MODERN_S86_HANDOFF_MAR02_2026.md` | Current cross-spring evolution handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |
@@ -155,7 +157,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 - **NPU edge inference** — ESN reservoir on AKD1000, online evolution, adaptive sampling (V60)
 - **Field genomics** (planned) — Nanopore sequencing + NPU classification + metalForge routing. See [FIELD_GENOMICS_REQUIREMENTS.md](FIELD_GENOMICS_REQUIREMENTS.md)
 - **Data type profiling** — Biological data format catalog driving NestGate data primal evolution. See [DATA_TYPES.md](DATA_TYPES.md)
-- **Sovereign Rust bioinformatics** — 47 CPU + 42 GPU modules + 0 local WGSL (fully lean), 2 runtime dependencies (flate2 + bytemuck), 144 ToadStool primitives (S71+++, always-on, zero fallback)
+- **Sovereign Rust bioinformatics** — 47 CPU + 42 GPU modules + 0 local WGSL (fully lean), 2 runtime dependencies (flate2 + bytemuck), 144 ToadStool primitives (S86, always-on, zero fallback, 264 ComputeDispatch ops)
 
 ### wetSpring IS NOT:
 - Sensor noise analysis (groundSpring)
