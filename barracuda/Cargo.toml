@@ -1505,3 +1505,9 @@ path = "src/bin/validate_cross_spring_s86.rs"
 name = "validate_cross_spring_modern_s86"
 path = "src/bin/validate_cross_spring_modern_s86.rs"
 required-features = ["gpu"]
+
+# ── Exp300: S86 Streaming Pipeline — Spectral + Graph + Sampling ──
+[[bin]]
+name = "validate_s86_streaming_pipeline"
+path = "src/bin/validate_s86_streaming_pipeline.rs"
+required-features = ["gpu"]

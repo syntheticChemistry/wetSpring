@@ -26,6 +26,7 @@ mod inventory;
 mod ode;
 mod phylogeny;
 mod provenance;
+mod s86_science;
 mod spectral;
 mod taxonomy;
 
@@ -52,6 +53,10 @@ pub use phylogeny::{
     reconciliation, robinson_foulds, unifrac_propagate,
 };
 pub use provenance::*;
+pub use s86_science::{
+    anderson_spectral, belief_propagation, boltzmann_sampling, graph_laplacian,
+    hofstadter_butterfly, hydrology_et0, space_filling_sampling,
+};
 pub use spectral::{
     feature_table, gbm_inference, kmd, merge_pairs, pfas_spectral_match, signal_processing,
 };

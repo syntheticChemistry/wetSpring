@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-02 (Phase 92F: 273 experiments, 262 binaries, 7,266+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S86 (`2fee1969`), 144 primitives consumed (264 ComputeDispatch ops), barracuda always-on, 1,089 tests, 103 named tolerances, clippy pedantic CLEAN. V92F: cross-spring modern S86 validation (Exp297, 46/46), GPU↔CPU parity verified, full paper-math chain Exp291-295)
+**Updated**: 2026-03-02 (Phase 92G: 276 experiments, 264 binaries, 7,872+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S86 (`2fee1969`), 144 primitives consumed (264 ComputeDispatch ops), barracuda always-on, 1,089 tests, 103 named tolerances, clippy pedantic CLEAN. V92G: full 5-tier chain (Exp298, 499 checks), S86 metalForge dispatch (Exp299, 59/59), S86 streaming pipeline (Exp300, 48/48))
 
 ---
 
@@ -181,6 +181,9 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 295 | [metalForge v14](295_metalforge_v14_paper_chain.md) | metalforge | DONE | Pipeline integration | Paper-math cross-system: 6 tracks, PCIe streaming, sovereign 45/47 | 28 |
 | 296 | ToadStool S86 CPU Rewire | cpu | DONE | ToadStool S86 (`2fee1969`) | S79→S86 feature-gate fixes, ungated spectral/graph/sample CPU modules | 64 |
 | 297 | Cross-Spring Modern S86 GPU | gpu | DONE | ToadStool S86 + RTX 4070 | Cross-spring GPU↔CPU parity: diversity, GEMM, BrayCurtis, spectral, hydrology, stats, sampling + benchmark | 46 |
+| 298 | [Full 5-Tier Chain V92G](298_full_chain_v92f_validation.md) | chain | DONE | All tiers | Paper math→CPU→GPU→streaming→metalForge: 499 total checks, all 52 papers, open data confirmed | 499 |
+| 299 | S86 metalForge Dispatch | forge | DONE | metalForge S86 | 7 new workloads (spectral/graph/sampling), catalog routing, streaming pipeline analysis, cross-spring provenance, math validation | 59 |
+| 300 | S86 Streaming Pipeline | gpu | DONE | ToadStool S86 + RTX 4070 | Cross-spring stages: GPU diversity → Anderson → graph → Boltzmann → LHS/Sobol → ET₀ → stats | 48 |
 
 ---
 

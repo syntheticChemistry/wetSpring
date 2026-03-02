@@ -5,6 +5,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V92G — Full 5-Tier Chain Validation + S86 Gap Closure (2026-03-02)
+
+### Added
+- Exp298: Full 5-tier chain validation protocol (Paper math → CPU → GPU →
+  Streaming → metalForge). 499 total checks across all tiers, all 52 papers,
+  open data confirmed.
+- Exp299: `validate_s86_metalforge_dispatch` — S86 ungated primitives routed
+  through metalForge Node dispatch. 7 new workloads added to catalog:
+  anderson_spectral, hofstadter_butterfly, graph_laplacian, belief_propagation,
+  boltzmann_sampling, space_filling_sampling, hydrology_et0. 59/59 checks.
+- Exp300: `validate_s86_streaming_pipeline` — S86 CPU primitives as pipeline
+  stages between GPU stages (diversity → spectral → graph → sampling → stats).
+  48/48 checks. Cross-spring provenance tracked at every stage.
+- 7 new metalForge workloads (`s86_science.rs`) closing Tier 4/5 coverage gaps
+  for all 16 S86 ungated primitives
+
+### Changed
+- metalForge workload catalog: 46 → 53 workloads
+- Experiment count: 273 → 276
+
 ## V92F — Cross-Spring Modern S86 Validation + Benchmark (2026-03-02)
 
 ### Added

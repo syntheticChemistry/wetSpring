@@ -71,6 +71,10 @@ path = "src/bin/validate_mixed_hw_dispatch.rs"
 name = "validate_biomeos_graph"
 path = "src/bin/validate_biomeos_graph.rs"
 
+[[bin]]
+name = "validate_s86_metalforge_dispatch"
+path = "src/bin/validate_s86_metalforge_dispatch.rs"
+
 [dev-dependencies]
 temp-env = "0.3"
 flate2 = "1"

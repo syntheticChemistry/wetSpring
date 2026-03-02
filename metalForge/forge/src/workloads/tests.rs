@@ -8,15 +8,15 @@ use crate::workloads::*;
 #[test]
 fn all_workloads_has_entries() {
     let all = all_workloads();
-    assert!(all.len() >= 47, "expected at least 47 workloads");
+    assert!(all.len() >= 54, "expected at least 54 workloads");
 }
 
 #[test]
 fn origin_counts_match() {
     let (absorbed, local, cpu_only) = origin_summary();
     assert_eq!(
-        absorbed, 45,
-        "45 absorbed domains (28 base + 11 extension + 6 NUCLEUS data-driven)"
+        absorbed, 52,
+        "52 absorbed domains (28 base + 11 extension + 6 NUCLEUS data-driven + 7 S86 science)"
     );
     assert_eq!(local, 0, "0 local WGSL extensions (all absorbed)");
     assert_eq!(

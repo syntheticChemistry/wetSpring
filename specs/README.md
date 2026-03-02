@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: March 2, 2026
-**Status**: Phase 92F — 7,266+ checks, ALL PASS (1,089 tests, 273 experiments, 262 binaries, ToadStool S86 `2fee1969`, 144 primitives (264 ComputeDispatch ops), 0 local WGSL, 103 named tolerances, clippy pedantic CLEAN `--all-features`, 52 papers + 6 reproduced, full three-tier on all 39 eligible papers). V92F: cross-spring modern S86 validation (Exp297, 46/46), GPU↔CPU parity on RTX 4070
+**Status**: Phase 92G — 7,872+ checks, ALL PASS (1,089 tests, 276 experiments, 264 binaries, ToadStool S86 `2fee1969`, 144 primitives (264 ComputeDispatch ops), 0 local WGSL, 103 named tolerances, clippy pedantic CLEAN `--all-features`, 52 papers + 6 reproduced, full three-tier on all 39 eligible papers, 53 metalForge workloads). V92G: full 5-tier chain (Exp298, 499 checks), S86 metalForge dispatch (Exp299, 59/59), S86 streaming pipeline (Exp300, 48/48)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -16,10 +16,13 @@
 | BarraCuda CPU parity | 407/407 — 22.5x Rust speedup over Python (v1–v9) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/101/164) — pure GPU math proven |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip (Exp090/091) |
-| metalForge cross-system | 37 domains CPU↔GPU (Exp103+104+165) + dispatch (Exp080) + pipeline (Exp086) + PCIe (Exp088) |
+| metalForge cross-system | 37 domains CPU↔GPU (Exp103+104+165) + dispatch (Exp080) + pipeline (Exp086) + PCIe (Exp088) + S86 science (Exp299, 7 new workloads) |
 | Cross-spring spectral | 25 checks — Anderson localization + QS-disorder analogy (Exp107) |
 | Cross-spring modern S86 | 46/46 PASS — GPU↔CPU parity, 264 ComputeDispatch ops, 5 springs + wateringHole (Exp297) |
 | S86 CPU rewire | 64/64 PASS — ungated spectral/graph/sample modules, S80-S86 evolution (Exp296) |
+| S86 metalForge dispatch | 59/59 PASS — 7 new workloads, routing, streaming analysis, math validation (Exp299) |
+| S86 streaming pipeline | 48/48 PASS — cross-spring stages: GPU↔CPU interleaved pipeline (Exp300) |
+| Full 5-tier chain | 499/499 PASS — Paper math → CPU → GPU → Streaming → metalForge (Exp298) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
 | Rust modules | 47 CPU + 42 GPU + 1 IPC + 1 vault, 1,089 tests, 262 binaries |

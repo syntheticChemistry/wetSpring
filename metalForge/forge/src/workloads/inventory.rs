@@ -9,6 +9,7 @@ use super::genomics;
 use super::ode;
 use super::phylogeny;
 use super::provenance::BioWorkload;
+use super::s86_science;
 use super::spectral;
 use super::taxonomy;
 
@@ -65,5 +66,12 @@ pub fn all_workloads() -> Vec<BioWorkload> {
         genomics::campylobacterota_comparative(),
         cpu_only::ncbi_assembly_ingest(),
         cpu_only::fastq_parsing(),
+        s86_science::anderson_spectral(),
+        s86_science::hofstadter_butterfly(),
+        s86_science::graph_laplacian(),
+        s86_science::belief_propagation(),
+        s86_science::boltzmann_sampling(),
+        s86_science::space_filling_sampling(),
+        s86_science::hydrology_et0(),
     ]
 }
