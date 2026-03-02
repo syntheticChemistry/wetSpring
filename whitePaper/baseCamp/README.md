@@ -2,7 +2,7 @@
 
 **Date:** March 2, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 92D+ — 277 experiments, 7,384+ validation checks, ALL PASS; 1,309 tests, 260 binaries (provenance headers on all), ToadStool S79 (`f97fc2ae`), 93 primitives consumed, 0 local WGSL, 103 named tolerances, 0 unsafe code, 0 panics in library, clippy pedantic CLEAN (`--all-features -W clippy::pedantic`), V92D+: full paper-math chain Exp291-295 (Paper v4 45/45 → CPU v22 40/40 → GPU v9 35/35 → Streaming v9 16/16 → metalForge v14 28/28), all 58 papers now have experiments, 52 + 6 reproduced with full three-tier + paper-math chain
+**Status:** Phase 92D+ — 277 experiments, 7,384+ validation checks, ALL PASS; 1,309 tests, 260 binaries (provenance headers on all), ToadStool S86 (`2fee1969`), 144 primitives consumed, 0 local WGSL, 103 named tolerances, 0 unsafe code, 0 panics in library, clippy pedantic CLEAN (`--all-features -W clippy::pedantic`), V92D+: full paper-math chain Exp291-295 (Paper v4 45/45 → CPU v22 40/40 → GPU v9 35/35 → Streaming v9 16/16 → metalForge v14 28/28), all 58 papers now have experiments, 52 + 6 reproduced with full three-tier + paper-math chain
 
 ---
 
@@ -101,7 +101,7 @@ Every paper goes through the full evolution. Status across all 52 papers:
 | Pure GPU streaming | Zero CPU round-trips, data stays on-device | 8 streaming experiments, unidirectional proof (0.10ms overhead, Exp255) |
 | metalForge | Same answer on CPU, GPU, NPU | 50/50 papers, 37+ domains |
 | NPU reservoir | ESN → int8 → NPU preserves classification (Cholesky solve) | 59 checks, 6 domains |
-| Cross-spring evolution | 700+ WGSL shaders traced to origin springs, 93 ToadStool primitives consumed | 21 checks |
+| Cross-spring evolution | 700+ WGSL shaders traced to origin springs, 144 ToadStool primitives consumed | 21 checks |
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
 | biomeOS IPC integration | JSON-RPC science primal, GPU-aware dispatch, Songbird registration | 321 checks (Exp203-208) |

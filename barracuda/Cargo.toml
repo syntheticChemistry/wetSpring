@@ -39,12 +39,15 @@ serde_json = { version = "1", optional = true }
 # ToadStool barracuda — always-on for CPU math (special, linalg, numerical).
 # default-features = false: no wgpu/pollster/bytemuck pulled in for CPU builds.
 # When `gpu` feature is active, `barracuda/gpu` enables GPU ops.
-# S79 (f97fc2ae): 93+ primitives consumed (V89). CPU stats: bootstrap_ci, rawr_mean,
+# S86 (2fee1969): 144+ primitives consumed (V92E). CPU stats: bootstrap_ci, rawr_mean,
 # fit_exponential/quadratic/logarithmic/all, jackknife, evolution, chao1_classic.
 # GPU bio: StencilCooperationGpu, HillGateGpu (dispatched). WrightFisherGpu (needs DF64).
 # GPU linalg: SymmetrizeGpu, LaplacianGpu. ESN: MultiHeadEsn, ExportedWeights (head_labels).
-# Infra: Fp64Strategy::Concurrent, PipelineBuilder, 844 f64-canonical WGSL shaders.
-# New since S71: libc→rustix, AFIT, asin_df64 iterative, FFT buffer fix, spectral stats.
+# Infra: Fp64Strategy::Concurrent, PipelineBuilder, 844+ f64-canonical WGSL shaders.
+# S80-S86: Nautilus absorption, BatchedEncoder, fused_mlp, StatefulPipeline, Batch Nelder-Mead,
+# NVK driver workarounds, InterconnectTopology, OS memory detection, anderson_4d, BrentGpu,
+# L-BFGS, RichardsGpu, OmelyanIntegrator, BatchedStatefulF64, 144 ComputeDispatch ops.
+# Fixed: spectral/graph/sample CPU modules incorrectly GPU-gated (wetSpring S86 rewire).
 barracuda = { path = "../../phase1/toadstool/crates/barracuda", default-features = false }
 
 # ToadStool akida-driver — pure Rust NPU access (BrainChip AKD1000/AKD1500).
@@ -1491,3 +1494,8 @@ required-features = ["gpu"]
 name = "validate_gonzales_metalforge"
 path = "src/bin/validate_gonzales_metalforge.rs"
 required-features = ["gpu"]
+
+# ── Exp296: Cross-Spring S86 Rewire Validation ──
+[[bin]]
+name = "validate_cross_spring_s86"
+path = "src/bin/validate_cross_spring_s86.rs"

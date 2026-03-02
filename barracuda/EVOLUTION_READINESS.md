@@ -2,7 +2,7 @@
 
 **Date:** March 2, 2026 (V92D)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules + 1 IPC + 1 vault module (all lean, 0 local WGSL, 0 local derivative/regression math), 93 ToadStool primitives consumed (S79, barracuda always-on, zero fallback code), 1,309 tests, 272 experiments, 7,220+ checks, ToadStool S79 aligned (`f97fc2ae`), 103 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V92D:** panic-free library code (ESN bridge `block_on` now returns `Result`), `MetricCtx` refactor in IPC handlers, modern idiomatic Rust throughout (`mul_add`, `f64::from`, `f64::midpoint`, inlined format args).
+**Status:** 47 CPU + 42 GPU modules + 1 IPC + 1 vault module (all lean, 0 local WGSL, 0 local derivative/regression math), 144 ToadStool primitives consumed (S86, barracuda always-on, zero fallback code), 1,309 tests, 272 experiments, 7,220+ checks, ToadStool S86 aligned (`2fee1969`), 103 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V92D:** panic-free library code (ESN bridge `block_on` now returns `Result`), `MetricCtx` refactor in IPC handlers, modern idiomatic Rust throughout (`mul_add`, `f64::from`, `f64::midpoint`, inlined format args).
 
 ### Full Lean Phase
 
@@ -249,7 +249,7 @@ All GPU ODE modules now use `BatchedOdeRK4::<S>::generate_shader()` which:
 
 ---
 
-## ToadStool Primitives Consumed (93 — barracuda always-on)
+## ToadStool Primitives Consumed (144 — barracuda always-on)
 
 ### Original 15 (pre-Feb 22)
 

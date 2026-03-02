@@ -5,6 +5,38 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V92E — ToadStool S86 Rewire (2026-03-02)
+
+### Changed
+- ToadStool pin: S79 (`f97fc2ae`) → S86 (`2fee1969`), 7 commits absorbed
+- Primitives consumed: 93 → 144 (+51 ComputeDispatch ops)
+- Fixed 3 ToadStool feature-gate bugs: `spectral`, `linalg::graph`, and `sample`
+  modules incorrectly gated behind `#[cfg(feature = "gpu")]` despite containing
+  pure CPU code (anderson, lanczos, graph_laplacian, boltzmann_sampling, etc.)
+- `sample::batch_ipr` correctly isolated behind GPU gate (uses wgpu)
+- `sample` module: WGSL statics and `direct`/`sparsity` submodules GPU-gated,
+  CPU samplers (LHS, Sobol, Metropolis, maximin) always available
+
+### ToadStool S80-S86 evolution absorbed
+- S80: Nautilus reservoir computing, BatchedEncoder (46-78× fused pipeline),
+  fused_mlp, StatefulPipeline, Batch Nelder-Mead GPU, NVK driver workarounds,
+  NeighborMode::PrecomputedBuffer
+- S81: InterconnectTopology, SubstratePipeline, 4 ET₀ methods,
+  anderson_eigenvalues, complex_polyakov_average, FitResult named accessors,
+  BarracudaError::Io+Json
+- S82: 16 ComputeDispatch ops (FHE, lattice QCD, audio/signal, bio),
+  OS memory detection (real /proc/meminfo), creation.rs DRY refactor
+- S83: BrentGpu, anderson_4d, OmelyanIntegrator, RichardsGpu, L-BFGS,
+  BatchedStatefulF64, SpectralBridge, HeadKind generalization
+- S84-S86: +33 ComputeDispatch ops (matmul_tiled, gemm_f64, losses, ML ops),
+  hydrology directory split, experimental real probes, 2,866 barracuda tests
+
+### Quality
+- `cargo check`: CLEAN (CPU and GPU paths)
+- `cargo clippy --all-features -- -W clippy::pedantic`: 0 warnings
+- `cargo fmt --all`: CLEAN
+- `cargo test`: 1,044 PASS, 0 FAIL
+
 ## V92D+ — Paper-Math Chain + Cross-System Validation (2026-03-02)
 
 ### Added

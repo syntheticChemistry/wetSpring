@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** March 2, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 92D — 1,309 tests, 277 experiments, 7,384+ validation checks, 260 binaries, ToadStool S79 (`f97fc2ae`), 93 primitives consumed, zero local WGSL, zero unsafe code, 103 named tolerances, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN, all `fmt`/`doc`/`test` gates green. Full paper-math chain validated: Paper v4 (45/45) → CPU v22 (40/40) → GPU v9 (35/35) → Streaming v9 (16/16) → metalForge v14 (28/28)
+**Status:** Phase 92E — 1,309 tests, 277 experiments, 7,384+ validation checks, 260 binaries, ToadStool S86 (`2fee1969`), 144 primitives consumed, zero local WGSL, zero unsafe code, 103 named tolerances, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN, all `fmt`/`doc`/`test` gates green. Full paper-math chain validated: Paper v4 (45/45) → CPU v22 (40/40) → GPU v9 (35/35) → Streaming v9 (16/16) → metalForge v14 (28/28). ToadStool S79→S86 rewire: fixed CPU module feature-gate bugs (spectral, graph, sample), 144 ComputeDispatch ops, Nautilus, BatchedEncoder, L-BFGS, BrentGpu, RichardsGpu.
 
 ---
 
@@ -141,7 +141,7 @@ integration point.
 | metalForge cross-system | 37+ domains CPU↔GPU (Exp103+104+165+182+208), **39/39 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
-| ToadStool primitives consumed | **93** (barracuda always-on, zero fallback code — ToadStool S79, `f97fc2ae`) |
+| ToadStool primitives consumed | **144** (barracuda always-on, zero fallback code — ToadStool S86, `2fee1969`) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
 All 7,220+ validation checks **PASS**. All 1,309 tests **PASS** (1 ignored: hardware-dependent).
 

@@ -2,8 +2,8 @@
 
 **Date:** March 2, 2026 (V92D)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**ToadStool pin:** `f97fc2ae` (S79)
-**Status:** 93 ToadStool primitives consumed via `compile_shader_universal`, 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,309 tests, ToadStool S79 aligned, 272 experiments, 7,220+ checks, 103 named tolerances, clippy pedantic CLEAN (`--all-features`). **V92D:** ESN bridge panic → Result, IPC MetricCtx refactor, modern idiomatic Rust. Hand off: V92D active (supersedes V92C), V7-V92C archived.
+**ToadStool pin:** `2fee1969` (S86)
+**Status:** 144 ToadStool primitives consumed via `compile_shader_universal`, 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,309 tests, ToadStool S86 aligned, 272 experiments, 7,220+ checks, 103 named tolerances, clippy pedantic CLEAN (`--all-features`). **V92D:** ESN bridge panic → Result, IPC MetricCtx refactor, modern idiomatic Rust. Hand off: V92D active (supersedes V92C), V7-V92C archived.
 
 ---
 
@@ -50,8 +50,8 @@ WGSL          known physics   handoffs/                        delete local
 | Passthrough | Accept GPU buffers, CPU kernel | **0 modules** — all 3 former Passthrough promoted (V40) |
 | Validate | CPU ↔ GPU parity for all shaders | All 5 ODE: exact parity (Exp099/100/101) |
 | Hand off | wateringHole/handoffs/ documents | **V84** active (supersedes V83), V7-V82 archived |
-| Absorb | ToadStool integrates as `ops::bio::*` | **93 primitives** consumed (ToadStool S66: all DONE, +46 cross-spring total) |
-| Lean | Rewire to upstream, delete local code | 93 primitives consumed (S66), 5 `OdeSystem` trait rewires, BGL boilerplate removed, 0 Passthrough |
+| Absorb | ToadStool integrates as `ops::bio::*` | **144 primitives** consumed (ToadStool S66: all DONE, +46 cross-spring total) |
+| Lean | Rewire to upstream, delete local code | 144 primitives consumed (S66), 5 `OdeSystem` trait rewires, BGL boilerplate removed, 0 Passthrough |
 
 ---
 
@@ -381,7 +381,7 @@ Patterns from hotSpring and neuralSpring that wetSpring leans on:
 - 8 new primitives consumed: stats (bootstrap_ci, rawr_mean, fit_exponential, fit_quadratic,
   fit_logarithmic, fit_all), GPU bio (StencilCooperationGpu, HillGateGpu)
 - 2 upstream findings filed for ToadStool S71
-- Total: 93 ToadStool primitives consumed (85 prior + 8 V83)
+- Total: 144 ToadStool primitives consumed (85 prior + 8 V83)
 
 **V82 ToadStool S70+++ rewire (Mar 1, 2026):**
 - ToadStool pin advanced: S68+ (`e96576ee`) → S70+++ (`1dd7e338`)

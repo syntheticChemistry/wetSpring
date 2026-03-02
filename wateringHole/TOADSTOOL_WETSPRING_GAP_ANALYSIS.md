@@ -2,7 +2,7 @@
 
 **Date:** March 2, 2026 (V92C)
 **Scope:** Compare ToadStool barracuda public exports with wetSpring actual usage. Identify unused primitives, adoption opportunities, and maintenance reduction.
-**ToadStool Pin:** S79 (`f97fc2ae`)
+**ToadStool Pin:** S86 (`2fee1969`)
 
 **V84 additions:** 7 new CPU domains validated (adapter, placement, PCoA, bootstrap phylo, EIC, KMD, feature table); Python parity proof (Exp253).
 
