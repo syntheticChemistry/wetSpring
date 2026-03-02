@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** March 2, 2026
-**Status:** Phase 92H — Validation study active — 8,180+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 1,219 tests, 279 experiments, 267 binaries, ToadStool S86 aligned (`2fee1969`), 144 primitives consumed (264 ComputeDispatch ops), 0 local WGSL (barracuda always-on), 103 named tolerances with full provenance, clippy pedantic CLEAN (`--all-features`), 52 papers + 6 reproduced, all 39 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. V92H: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed hardware orchestration (Exp303, 147/147)
+**Status:** Phase 92I — Validation study active — 8,180+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 1,219 tests, 279 experiments, 267 binaries, ToadStool S87 aligned (`2dc26792`), 144 primitives consumed (264 ComputeDispatch ops), 0 local WGSL (barracuda always-on), 103 named tolerances with full provenance, clippy pedantic CLEAN (`--all-features`), 52 papers + 6 reproduced, all 39 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. V92I: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed hardware orchestration (Exp303, 147/147)
 **License:** AGPL-3.0-or-later
 
 ---

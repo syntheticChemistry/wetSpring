@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** March 2, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 92H — 1,219 tests, 279 experiments, 8,180+ validation checks, 267 binaries, ToadStool S86 (`2fee1969`), 144 primitives consumed (264 ComputeDispatch ops), zero local WGSL, zero unsafe code, 103 named tolerances, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN. Full 5-tier chain validated (Exp298: 499 checks). V92H: Exp301 (48/48, CPU↔GPU full domain parity — 15 sections, 17+ ComputeDispatch ops), Exp302 (113/113, NUCLEUS + PCIe bypass + biomeOS — Tower/Node/Nest, 54 workloads, 5 DAG topologies), Exp303 (147/147, mixed hardware NUCLEUS orchestration — multi-GPU dispatch, 6 interleaved GPU/NPU/CPU pipelines, all 54 workloads routed). 54 metalForge workloads.
+**Status:** Phase 92I — 1,219 tests, 279 experiments, 8,180+ validation checks, 267 binaries, ToadStool S87 (`2dc26792`), 144 primitives consumed (264 ComputeDispatch ops), zero local WGSL, zero unsafe code, 103 named tolerances, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN. Full 5-tier chain GREEN on S87 (13 binaries, all pass). V92I: ToadStool S87 absorption — FHE shader fixes, gpu_helpers refactor, device-lost recovery, unsafe audit, 2,866+ upstream tests pass. 54 metalForge workloads.
 
 ---
 
@@ -141,7 +141,7 @@ integration point.
 | metalForge cross-system | 37+ domains CPU↔GPU (Exp103+104+165+182+208), **39/39 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
-| ToadStool primitives consumed | **144** (barracuda always-on, zero fallback code — ToadStool S86, `2fee1969`) |
+| ToadStool primitives consumed | **144** (barracuda always-on, zero fallback code — ToadStool S87, `2dc26792`) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
 All 7,220+ validation checks **PASS**. All 1,309 tests **PASS** (1 ignored: hardware-dependent).
 

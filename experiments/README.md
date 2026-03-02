@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-02 (Phase 92H: 279 experiments, 267 binaries, 8,180+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S86 (`2fee1969`), 144 primitives consumed (264 ComputeDispatch ops), barracuda always-on, 1,219 tests, 103 named tolerances, clippy pedantic CLEAN. V92H: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147))
+**Updated**: 2026-03-02 (Phase 92I: 279 experiments, 267 binaries, 8,180+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S87 (`2dc26792`), 144 primitives consumed (264 ComputeDispatch ops), barracuda always-on, 1,219 tests, 103 named tolerances, clippy pedantic CLEAN. V92I: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147))
 
 ---
 
@@ -394,10 +394,10 @@ thresholds from `src/tolerances.rs`.
 | `validate_cross_spring_s86` | 296 | 64 | `cargo run --release --bin validate_cross_spring_s86` |
 | `validate_cross_spring_modern_s86` | 297 | 46 | `cargo run --release --features gpu --bin validate_cross_spring_modern_s86` |
 
-**Total validation checks**: 7,266+
-**Rust tests**: 1,089
-**Binaries**: 262 total (235 validate + 20 benchmark)
-**ToadStool primitives**: 144 consumed (264 ComputeDispatch ops, barracuda always-on, zero fallback code — S86 `2fee1969`)
+**Total validation checks**: 8,180+
+**Rust tests**: 1,219
+**Binaries**: 267 total
+**ToadStool primitives**: 144 consumed (264 ComputeDispatch ops, barracuda always-on, zero fallback code — S87 `2dc26792`)
 **Papers**: 52 (25 Tracks 1-2 + 5 Track 3 + 9 Track 4 + 1 cross-spring + 9 extensions + 3 reference)
 **Local WGSL shaders**: 0 (all absorbed by ToadStool S63)
 **GPU modules**: 42 total (all lean on upstream primitives)

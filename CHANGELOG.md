@@ -3,7 +3,18 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## [Unreleased]
+## V92I — ToadStool S87 Absorption + Full Revalidation (2026-03-02)
+
+### Changed
+- ToadStool pin: S86 (`2fee1969`) → S87 (`2dc26792`)
+- S87 upstream highlights: FHE shader arithmetic fixes, gpu_helpers refactored
+  (663→3 submodules), 75 async-trait reclassifications, device-lost recovery
+  (`with_device_retry`), unsafe audit across all GPU sites, 9 pre-existing
+  test failures fixed, 2,866+ barracuda tests pass upstream
+- Full 5-tier revalidation GREEN on S87: all 13 binaries, 1,219 tests, 175
+  forge tests — zero regressions, zero API breakage
+- No new ops absorbed (ComputeDispatch stays at 144/264); S87 is internal
+  debt evolution and test resilience, not new operations
 
 ## V92H — CPU↔GPU ComputeDispatch + NUCLEUS Mixed Hardware (2026-03-02)
 

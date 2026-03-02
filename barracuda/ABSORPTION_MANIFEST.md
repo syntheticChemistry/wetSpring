@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** March 2, 2026 (V92F)
+**Date:** March 2, 2026 (V92I)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**ToadStool pin:** `2fee1969` (S86)
-**Status:** 144 ToadStool primitives consumed (264 ComputeDispatch ops) via `compile_shader_universal`, 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,089 tests, ToadStool S86 aligned, 273 experiments, 7,266+ checks, 103 named tolerances, clippy pedantic CLEAN (`--all-features`). **V92F:** cross-spring modern S86 validation (Exp297, 46/46), `BatchedMultinomialGpu::sample` API rewire, GPU↔CPU parity on RTX 4070 (DF64 Hybrid). Hand off: V92F active (supersedes V92E), V7-V92D archived.
+**ToadStool pin:** `2dc26792` (S87)
+**Status:** 144 ToadStool primitives consumed (264 ComputeDispatch ops) via `compile_shader_universal`, 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,219 tests, ToadStool S87 aligned, 279 experiments, 8,180+ checks, 103 named tolerances, clippy pedantic CLEAN (`--all-features`). **V92I:** ToadStool S87 absorption (FHE shader fixes, gpu_helpers refactor, device-lost recovery, unsafe audit), full 5-tier revalidation GREEN. V92H handoff active (supersedes V92E/V92F), V7-V92D archived.
 
 ---
 

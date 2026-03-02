@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: March 2, 2026
-**Status**: Phase 92H — 8,180+ checks, ALL PASS (1,219 tests, 279 experiments, 267 binaries, ToadStool S86 `2fee1969`, 144 primitives (264 ComputeDispatch ops), 0 local WGSL, 103 named tolerances, clippy pedantic CLEAN `--all-features`, 52 papers + 6 reproduced, full three-tier on all 39 eligible papers, 54 metalForge workloads). V92H: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147)
+**Status**: Phase 92I — 8,180+ checks, ALL PASS (1,219 tests, 279 experiments, 267 binaries, ToadStool S87 `2dc26792`, 144 primitives (264 ComputeDispatch ops), 0 local WGSL, 103 named tolerances, clippy pedantic CLEAN `--all-features`, 52 papers + 6 reproduced, full three-tier on all 39 eligible papers, 54 metalForge workloads). V92I: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -11,7 +11,7 @@
 | Metric | Value |
 |--------|-------|
 | CPU validation | 1,476+/1,476+ PASS — 47 modules, 262 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
-| GPU validation | 1,945+/1,945+ PASS — 144 ToadStool primitives (S86 `2fee1969`, always-on, 264 ComputeDispatch ops), 0 local WGSL (fully lean) |
+| GPU validation | 1,945+/1,945+ PASS — 144 ToadStool primitives (S87 `2dc26792`, always-on, 264 ComputeDispatch ops), 0 local WGSL (fully lean) |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 407/407 — 22.5x Rust speedup over Python (v1–v9) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/101/164) — pure GPU math proven |
