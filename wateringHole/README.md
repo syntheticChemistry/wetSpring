@@ -9,6 +9,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
+| **V92H** | `handoffs/WETSPRING_TOADSTOOL_V92H_COMPUTE_DISPATCH_NUCLEUS_HANDOFF_MAR02_2026.md` | Mar 2 | CPU↔GPU ComputeDispatch parity (17+ ops, Exp301), NUCLEUS+PCIe+biomeOS (Exp302), mixed hardware orchestration (Exp303). 308 new checks. |
 | **V92F** | `handoffs/WETSPRING_TOADSTOOL_V92F_BARRACUDA_EVOLUTION_HANDOFF_MAR02_2026.md` | Mar 2 | Comprehensive ToadStool/BarraCuda evolution handoff: 144 primitives, feature-gate fixes, benchmarks, cross-spring map, paper chain |
 | **V92F** | `handoffs/WETSPRING_CROSS_SPRING_V92F_MODERN_S86_HANDOFF_MAR02_2026.md` | Mar 2 | Cross-spring modern S86 validation + benchmark: Exp297 46/46, GPU↔CPU parity, 264 ComputeDispatch ops |
 | **V92E** | `handoffs/WETSPRING_TOADSTOOL_V92E_S86_REWIRE_HANDOFF_MAR02_2026.md` | Mar 2 | ToadStool S79→S86 rewire: 3 feature-gate fixes, 144 primitives, Exp296 64/64 PASS |
