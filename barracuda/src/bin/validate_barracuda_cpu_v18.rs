@@ -29,8 +29,12 @@
 //! |-------|-------|
 //! | Date | 2026-03-01 |
 //! | Command | `cargo run --bin validate_barracuda_cpu_v18` |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::time::Instant;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 struct Timing {
@@ -63,12 +67,20 @@ fn main() {
 
     v.check_pass("CI lower < estimate", ci.lower < ci.estimate);
     v.check_pass("CI upper > estimate", ci.upper > ci.estimate);
-    v.check_pass("Confidence = 0.95", (ci.confidence - 0.95).abs() < 1e-12);
+    v.check_pass(
+        "Confidence = 0.95",
+        (ci.confidence - 0.95).abs() < tolerances::ANALYTICAL_F64,
+    );
     v.check_pass("n_bootstrap = 10000", ci.n_bootstrap == 10_000);
     v.check_pass("SE > 0", ci.std_error > 0.0);
 
     let true_mean: f64 = barracuda::stats::mean(&diversity_data);
-    v.check("Estimate ≈ sample mean", ci.estimate, true_mean, 0.05);
+    v.check(
+        "Estimate ≈ sample mean",
+        ci.estimate,
+        true_mean,
+        tolerances::PEAK_MIN_PROMINENCE,
+    );
     v.check_pass(
         "CI contains true mean",
         ci.lower <= true_mean && true_mean <= ci.upper,
@@ -276,7 +288,12 @@ fn main() {
     );
     v.check_pass("Heaps linear fit: Some", heaps_linear.is_some());
     if let Some(ref hl) = heaps_linear {
-        v.check("Heaps exponent ≈ 0.6", hl.params[0], 0.6, 0.05);
+        v.check(
+            "Heaps exponent ≈ 0.6",
+            hl.params[0],
+            0.6,
+            tolerances::PEAK_MIN_PROMINENCE,
+        );
         println!(
             "  Heaps linear (log-log): exponent={:.4}, R²={:.4}",
             hl.params[0], hl.r_squared

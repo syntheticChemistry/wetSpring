@@ -13,15 +13,14 @@ env:
 
 jobs:
   fmt:
-    name: Format
+    name: Format (workspace)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt
-      - run: cargo fmt --check
-        working-directory: barracuda
+      - run: cargo fmt --all -- --check
 
   clippy:
     name: Clippy (pedantic)
@@ -32,22 +31,16 @@ jobs:
         with:
           components: clippy
       - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: barracuda
-      - run: cargo clippy --all-targets -- -D clippy::pedantic -D clippy::nursery
-        working-directory: barracuda
+      - run: cargo clippy --workspace --all-targets --all-features -- -D clippy::pedantic -D clippy::nursery
 
   test:
-    name: Test
+    name: Test (workspace)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: barracuda
-      - run: cargo test --verbose
-        working-directory: barracuda
+      - run: cargo test --workspace --verbose
 
   test-features:
     name: Test (json feature)
@@ -56,13 +49,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: barracuda
       - run: cargo check --features json
         working-directory: barracuda
 
-  coverage:
-    name: Coverage (90% gate)
+  coverage-barracuda:
+    name: Coverage — barracuda (90% gate)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -78,6 +69,23 @@ jobs:
         run: |
           cargo llvm-cov --lib --fail-under-lines 90
 
+  coverage-forge:
+    name: Coverage — metalForge (80% gate)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: metalForge/forge
+      - uses: taiki-e/install-action@cargo-llvm-cov
+      - name: Run coverage and enforce 80% threshold
+        working-directory: metalForge/forge
+        run: |
+          cargo llvm-cov --lib --fail-under-lines 80
+
   doc:
     name: Documentation
     runs-on: ubuntu-latest
@@ -85,44 +93,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: barracuda
-      - run: cargo doc --no-deps --lib
-        working-directory: barracuda
+      - run: cargo doc --workspace --no-deps
 
-  forge-fmt:
-    name: metalForge Format
+  cross-musl:
+    name: Cross-compile (musl)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
-          components: rustfmt
-      - run: cargo fmt --check
-        working-directory: metalForge/forge
-
-  forge-clippy:
-    name: metalForge Clippy
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: clippy
+          targets: x86_64-unknown-linux-musl
       - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: metalForge/forge
-      - run: cargo clippy --all-targets -- -D clippy::pedantic -D clippy::nursery
-        working-directory: metalForge/forge
-
-  forge-test:
-    name: metalForge Test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: metalForge/forge
-      - run: cargo test --verbose
-        working-directory: metalForge/forge
+      - name: Install musl tools
+        run: sudo apt-get install -y musl-tools
+      - run: cargo check --workspace --target x86_64-unknown-linux-musl

@@ -32,6 +32,9 @@
 //! | Date | 2026-02-28 |
 //! | Phase | 77 |
 //! | Command | `cargo run --release --features gpu --bin validate_barracuda_cpu_v16` |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{
@@ -273,7 +276,7 @@ fn main() {
         &barracuda::linalg::nmf::NmfConfig {
             rank: 3,
             max_iter: 100,
-            tol: 1e-4,
+            tol: tolerances::NMF_CONVERGENCE_KL,
             objective: barracuda::linalg::nmf::NmfObjective::KlDivergence,
             seed: 42,
         },

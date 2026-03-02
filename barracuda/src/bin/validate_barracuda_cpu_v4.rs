@@ -23,6 +23,9 @@
 //! | Exact command | `python3 scripts/barracuda_cpu_v4_baseline.py` |
 //! | Data | Synthetic test vectors (ANI, SNP, dN/dS, clock, pangenome) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{ani, dnds, molecular_clock, pangenome, snp};

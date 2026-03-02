@@ -665,3 +665,72 @@ fn mzml_stats_with_constructed_spectra() {
     assert!((stats.min_mz.unwrap() - 80.0).abs() < f64::EPSILON);
     assert!((stats.max_mz.unwrap() - 1000.0).abs() < f64::EPSILON);
 }
+
+// ── Fault injection tests ─────────────────────────────────────────
+
+#[test]
+fn fault_fastq_truncated_record() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("truncated.fastq");
+    std::fs::write(&path, "@seq1\nATCG\n+\n").unwrap();
+    let result = fastq::stats_from_file(&path);
+    assert!(
+        result.is_ok(),
+        "truncated FASTQ should not crash — graceful degradation"
+    );
+}
+
+#[test]
+fn fault_fastq_empty_file() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("empty.fastq");
+    std::fs::write(&path, "").unwrap();
+    let result = fastq::stats_from_file(&path);
+    assert!(result.is_ok_and(|s| s.num_sequences == 0));
+}
+
+#[test]
+fn fault_fastq_nonexistent_file() {
+    use std::path::Path;
+    let result = fastq::stats_from_file(Path::new("/tmp/wetspring_nonexistent_12345.fastq"));
+    assert!(result.is_err());
+}
+
+#[test]
+fn fault_fastq_binary_garbage() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("garbage.fastq");
+    std::fs::write(&path, vec![0xFF, 0xFE, 0x00, 0x01, 0x80]).unwrap();
+    let result = fastq::stats_from_file(&path);
+    assert!(
+        result.is_err() || result.is_ok_and(|s| s.num_sequences == 0),
+        "binary garbage should either error or report 0 sequences"
+    );
+}
+
+#[test]
+fn fault_mzml_empty_file() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("empty.mzML");
+    std::fs::write(&path, "").unwrap();
+    let iter = mzml::MzmlIter::open(&path);
+    assert!(iter.is_err() || iter.is_ok_and(|mut i| i.next().is_none()));
+}
+
+#[test]
+fn fault_mzml_malformed_xml() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("bad.mzML");
+    std::fs::write(&path, "<mzML><not-closed>").unwrap();
+    let iter = mzml::MzmlIter::open(&path);
+    assert!(iter.is_err() || iter.is_ok_and(|mut i| i.next().is_none()));
+}
+
+#[test]
+fn fault_ms2_empty_file() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("empty.ms2");
+    std::fs::write(&path, "").unwrap();
+    let iter = ms2::Ms2Iter::open(&path);
+    assert!(iter.is_err() || iter.is_ok_and(|mut i| i.next().is_none()));
+}

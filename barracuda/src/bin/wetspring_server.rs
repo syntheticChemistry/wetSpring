@@ -1,25 +1,60 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! wetSpring IPC server — biomeOS science primal.
 //!
-//! Listens on a Unix socket and handles JSON-RPC 2.0 requests for
-//! science capabilities (diversity, QS model, NCBI fetch, Anderson).
-//! Registers with Songbird for capability-based discovery when available.
+//! Listens on a Unix socket (or TCP via `WETSPRING_TCP_ADDR`) and handles
+//! JSON-RPC 2.0 requests for science capabilities (diversity, QS model,
+//! NCBI fetch, Anderson). Registers with Songbird for capability-based
+//! discovery when available.
 //!
 //! # Usage
 //!
 //! ```text
-//! cargo run --features ipc --bin wetspring_server
+//! wetspring-server [--help | --version | serve]
 //! ```
 //!
 //! # Environment
 //!
 //! - `WETSPRING_SOCKET` — Override the default socket path
+//! - `WETSPRING_TCP_ADDR` — Bind TCP instead of Unix socket (e.g. `127.0.0.1:9800`)
 //! - `SONGBIRD_SOCKET` — Override Songbird discovery socket
 
 use wetspring_barracuda::ipc::{Server, songbird};
 
-fn main() {
-    eprintln!("wetspring-server v{}", env!("CARGO_PKG_VERSION"));
+const PRIMAL: &str = wetspring_barracuda::PRIMAL_NAME;
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+
+fn print_version() {
+    println!("{PRIMAL} {VERSION}");
+}
+
+fn print_help() {
+    println!("{PRIMAL} {VERSION} — biomeOS science primal (BarraCuda-powered)");
+    println!();
+    println!("USAGE:");
+    println!("  wetspring-server [COMMAND]");
+    println!();
+    println!("COMMANDS:");
+    println!("  serve       Start the IPC server (default)");
+    println!("  version     Print version and exit");
+    println!("  help        Print this help and exit");
+    println!();
+    println!("OPTIONS:");
+    println!("  --help, -h       Print help");
+    println!("  --version, -V    Print version");
+    println!();
+    println!("ENVIRONMENT:");
+    println!("  WETSPRING_SOCKET     Override Unix socket path");
+    println!("  WETSPRING_TCP_ADDR   Bind TCP (e.g. 127.0.0.1:9800)");
+    println!("  SONGBIRD_SOCKET      Override Songbird socket");
+    println!();
+    println!("CAPABILITIES:");
+    println!("  health.check, science.diversity, science.anderson,");
+    println!("  science.qs_model, science.ncbi_fetch, science.full_pipeline,");
+    println!("  metrics.snapshot");
+}
+
+fn run_server() {
+    eprintln!("{PRIMAL} v{VERSION}");
     eprintln!("  Science primal for biomeOS — BarraCuda-powered");
 
     let server = match Server::bind_default() {
@@ -32,7 +67,6 @@ fn main() {
 
     eprintln!("  Socket: {}", server.socket_path().display());
 
-    // Songbird registration (non-fatal — standalone mode if unavailable)
     let _heartbeat = songbird::discover_socket().map_or_else(
         || {
             eprintln!("  Songbird: not found (standalone mode)");
@@ -53,4 +87,19 @@ fn main() {
     eprintln!("  Ready.");
 
     server.run();
+}
+
+fn main() {
+    let args: Vec<String> = std::env::args().skip(1).collect();
+
+    match args.first().map(String::as_str) {
+        Some("--help" | "-h" | "help") => print_help(),
+        Some("--version" | "-V" | "version") => print_version(),
+        Some("serve") | None => run_server(),
+        Some(unknown) => {
+            eprintln!("error: unknown command '{unknown}'");
+            eprintln!("Run '{PRIMAL} --help' for usage.");
+            std::process::exit(2);
+        }
+    }
 }

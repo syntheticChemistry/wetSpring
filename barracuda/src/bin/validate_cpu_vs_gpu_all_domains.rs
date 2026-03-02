@@ -23,6 +23,9 @@
 //! | Exact command | `cargo run --features gpu --release --bin validate_cpu_vs_gpu_all_domains` |
 //! | Data | Synthetic test vectors (self-contained) |
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, Pop!\_OS 22.04 |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use barracuda::{
     FlatForest, GillespieConfig, GillespieGpu, SmithWatermanGpu, SwConfig, TreeInferenceGpu,

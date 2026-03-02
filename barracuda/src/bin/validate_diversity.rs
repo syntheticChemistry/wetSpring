@@ -27,6 +27,9 @@
 //!
 //! Phase 3 adds Exp002 QIIME2 baseline validation using real Galaxy diversity
 //! report values from `experiments/results/002_phytoplankton/diversity_report.json`.
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::{diversity, kmer, pcoa};
 use wetspring_barracuda::tolerances;

@@ -22,9 +22,12 @@
 //! |-------|-------|
 //! | Validation type | Analytical (closed-form expected values) |
 //! | Expected values | Derived from published equations |
-//! | Reference | Jemielita et al., SciRep 2019 |
+//! | Reference | Jemielita et al., `SciRep` 2019 |
 //! | Date | 2026-02-25 |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use wetspring_barracuda::validation::Validator;
 

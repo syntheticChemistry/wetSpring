@@ -157,3 +157,37 @@ impl AniGpu {
         })
     }
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::type_complexity,
+    clippy::manual_let_else
+)]
+mod tests {
+    use super::*;
+    use crate::gpu::GpuF64;
+
+    #[test]
+    fn api_surface_compiles() {
+        fn _assert_ani_gpu_result(_: &AniGpuResult) {}
+        let _: fn(&AniGpu, &[(&[u8], &[u8])]) -> crate::error::Result<AniGpuResult> =
+            AniGpu::batch_ani;
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let device = gpu.to_wgpu_device();
+        let ani = AniGpu::new(&device).expect("AniGpu::new");
+        let pairs = [(&b"ACGT"[..], &b"ACGT"[..])];
+        let result = ani.batch_ani(&pairs);
+        assert!(result.is_ok(), "batch_ani should succeed with valid input");
+    }
+}

@@ -20,7 +20,10 @@ pub struct VibrioAssembly {
 
 impl VibrioAssembly {
     /// Parse a `VibrioAssembly` from a JSON object string.
+    ///
+    /// NCBI `gene_count` and `scaffold_count` fit in u32 for all known assemblies.
     #[must_use]
+    #[allow(clippy::cast_possible_truncation)]
     pub fn from_json_obj(obj: &str) -> Self {
         Self {
             accession: super::json_str_value(obj, "accession"),
@@ -64,7 +67,9 @@ pub fn load_vibrio_assemblies() -> (Vec<VibrioAssembly>, bool) {
 ///
 /// Deterministic accessions (`GCF_SYN_*`) so callers can distinguish
 /// synthetic from real data. Used only as offline/CI fallback.
-#[allow(clippy::cast_precision_loss)]
+///
+/// `rng>>33` yields ≤2^31; `genome_size`/`gene_count`/`scaffold_count` fit target types.
+#[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
 pub fn gen_synthetic_vibrio() -> Vec<VibrioAssembly> {
     let mut rng = 42_u64;
     let species = [

@@ -1,7 +1,7 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: March 1, 2026 (Phase 85 V85 — 1,223 tests, 95.86% line / 94.02% region / 95.40% fn, ToadStool S70+++ (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 97 named tolerances (split: bio+instrument+gpu+spectral), clippy pedantic CLEAN (both crates), 0 ad-hoc tolerance literals, 0 GPU passthroughs (chimera/derep/reconciliation evolved), 0 duplicate math (barracuda::stats), 0 hardcoded /tmp/ paths, 52 papers, 260 experiments, all validation binaries green, vault module with consent/provenance/encrypted storage)
-**Purpose**: Track papers for reproduction/review across three tracks
+**Last Updated**: March 2, 2026 (Phase 92 V92 — 1,088 tests (ipc+nautilus), ToadStool S79 (`f97fc2ae`), 93+ primitives, 844 WGSL shaders, clippy pedantic CLEAN, 275 experiments, 52 papers complete + 6 proposed (Track 5 Gonzales immunological Anderson), Exp273-275 Paper 12 validation 48/48 checks)
+**Purpose**: Track papers for reproduction/review across five tracks
 
 ---
 
@@ -189,6 +189,61 @@ microbial data. Papers 50-52 bridge soil structure science to the Anderson model
 16S data from these studies would be processed through wetSpring's sovereign
 Rust pipeline.
 
+### Track 5 — Immunological Anderson & Drug Repurposing (Gonzales / Fajgenbaum Bridge)
+
+Andrea J. Gonzales (Zoetis → MSU Pharmacology & Toxicology, 2025–present)
+provides the empirical immunological foundation for extending Anderson
+localization from microbial QS (Track 1, Paper 01) to cytokine signal
+propagation in skin tissue. The core observation: Th2 cytokines (IL-4,
+IL-13, IL-31) are diffusible signals propagating through a disordered
+biological medium — the same physics that governs autoinducer propagation
+through microbial communities.
+
+**Connection to Fajgenbaum (Track 3)**: The MATRIX drug repurposing framework
+scores drug-disease pairs by pathway overlap. Paper 12 adds a spatial
+geometry dimension: a drug must both target the right pathway AND physically
+reach its target through tissue geometry. Anderson localization quantifies
+the "reach" condition.
+
+#### Tier 1 — Gonzales Core Papers
+
+| # | Paper | Journal | Year | Faculty | Why | Status |
+|---|-------|---------|------|---------|-----|--------|
+| 53 | Gonzales AJ et al. "Interleukin-31: its role in canine pruritus and naturally occurring canine atopic dermatitis" | Vet Dermatol 24:48-53 | 2013 | Gonzales | IL-31 elevated in AD dog serum; IV IL-31 induces pruritus in beagles; IL-31 activates peripheral nerves. IL-31 as diffusible signal, W mapping from tissue heterogeneity | **Exp282 DONE** (15/15) |
+| 54 | Gonzales AJ et al. "Oclacitinib (APOQUEL) is a novel JAK inhibitor with activity against cytokines involved in allergy" | J Vet Pharmacol Ther 37:317-324 | 2014 | Gonzales | JAK1 IC50 = 10 nM; blocks IL-2, IL-4, IL-6, IL-13, IL-31 (IC50 36-249 nM). Dose-response modeling, IC50 as Anderson barrier height | **Exp280 DONE** (35/35) |
+| 55 | Gonzales AJ et al. "IL-31-induced pruritus in dogs: a novel experimental model" | Vet Dermatol 27:34-e10 | 2016 | Gonzales | Standardized IL-31 pruritus model; oclacitinib superior at 1, 6, 11, 16 hr. Time-series pruritus data for LSTM, controlled Anderson perturbation | **Exp281 DONE** (19/19, D04) |
+| 56 | Fleck TJ,...,Gonzales AJ "Onset and duration of action of lokivetmab in IL-31 induced pruritus" | Vet Dermatol 32:681-e182 | 2021 | Gonzales | Cytopoint: 3 hr onset, dose-dependent duration (14/28/42 days). PK decay as signal extinction in Anderson model | **Exp281 DONE** (19/19, D01-D03) |
+| 57 | Gonzales AJ et al. "Oclacitinib is a selective JAK1 inhibitor with efficacy in canine flea allergic dermatitis" | J Vet Pharmacol Ther 47:447-453 | 2024 | Gonzales | JAK1 selectivity confirmed in different allergic model. Cross-disease validation of same Anderson pathway | **Exp280 DONE** (35/35, D03) |
+| 58 | McCandless EE, Rugg CA, Fici GJ et al. "Allergen-induced production of IL-31 by canine Th2 cells and identification of immune, skin, and neuronal target cells" | Vet Immunol Immunopathol 157:42-48 | 2014 | Gonzales | IL-31 produced by Th2 cells; target cells = immune, skin, neuronal. Three-compartment Anderson lattice | **Exp281 DONE** (19/19, D05) |
+
+#### Tier 2 — Companion Literature (Fajgenbaum Bridge + Human AD)
+
+| # | Paper | Journal | Year | Faculty | Why | Status |
+|---|-------|---------|------|---------|-----|--------|
+| F1 | Fajgenbaum DC et al. "Identifying and targeting pathogenic PI3K/AKT/mTOR signaling in IL-6-blockade-refractory iMCD" | J Clin Invest | 2019 | Fajgenbaum | Proves pathway-based drug repurposing; mTOR cross-talks with JAK/STAT. Already Exp157 | Reference |
+| D1 | Simpson et al. "Dupilumab Phase 3 trials" | N Engl J Med | 2020 | — | Human anti-IL-4Rα for AD — blocks IL-4 + IL-13. Cross-species validation of Gonzales's canine work | Reference |
+| D2 | Silverberg et al. "JAK inhibitors in AD" | J Am Acad Dermatol | 2023 | — | Upadacitinib, abrocitinib for human AD — human equivalents of Apoquel | Reference |
+| N1 | Oetjen et al. "Sensory neurons co-opt immune cells for AD pathogenesis" | Cell | 2023 | — | IL-4/IL-13 directly sensitize sensory neurons — neuro-immune axis | Reference |
+
+#### wetSpring Experiments
+
+| Exp | Description | Validates | Status |
+|-----|-------------|-----------|--------|
+| Exp273 | Anderson lattice with skin-layer geometry: 2D epidermis + 3D dermis + barrier interface | Core Anderson prediction for immunological signaling | **22/22 PASS** |
+| Exp274 | Barrier disruption model: dimensional promotion, P06↔P12 duality, Fajgenbaum scoring | AD scratch cycle as inverse of Paper 06 tillage collapse | **15/15 PASS** |
+| Exp275 | Cell-type heterogeneity sweep: W sweep, cross-species, disease profiles | Prediction: inflammation increases W but stays below W_c | **11/11 PASS** |
+| Exp276 | CPU parity: immuno-Anderson (alpha diversity, spectral, Pielou→W, Fajgenbaum) | Pure Rust math correctness for Paper 12 framework | **32/32 PASS** |
+| Exp277 | GPU validation: immuno-Anderson diversity (Shannon, Simpson, Bray-Curtis on GPU) | GPU portability of Paper 12 math | **21/21 PASS** |
+| Exp278 | ToadStool streaming: batched GPU pipeline for immuno-Anderson | Streaming dispatch reduces round-trips | **31/31 PASS** |
+| Exp279 | metalForge cross-substrate: CPU↔GPU parity + NUCLEUS atomics | Cross-hardware portability | **25/25 PASS** |
+| Exp280 | Gonzales 2014 IC50 dose-response: Hill equation, JAK selectivity, Anderson barrier map | Paper 54+57 reproduction (published data) | **35/35 PASS** |
+| Exp281 | Fleck/Gonzales 2021 PK: dose-duration, exponential decay, pruritus model, three-compartment | Paper 53+55+56+58 reproduction (published data) | **19/19 PASS** |
+| Exp282 | Gonzales 2013 IL-31 serum: dose-response, receptor→lattice, Anderson spectral, cross-species | Paper 53 reproduction (published data, Anderson mapping) | **15/15 PASS** |
+| Exp283 | CPU parity: Gonzales reproductions (Hill, regression, diversity, Anderson, IC50→barrier) | Pure Rust math correctness for Papers 53-56 | **43/43 PASS** |
+| Exp284 | GPU validation: Gonzales diversity (Shannon, Simpson, Pielou, Bray-Curtis on GPU) | GPU portability of pharmacological math | **17/17 PASS** |
+| Exp285 | ToadStool streaming: Gonzales batched GPU pipeline (Shannon, Simpson, BC matrix) | Streaming dispatch for pharmacological workloads | **37/37 PASS** |
+| Exp286 | metalForge cross-substrate: Gonzales CPU↔GPU + Hill + Anderson + NUCLEUS | Cross-hardware portability for drug reproductions | **36/36 PASS** |
+
 ### Cross-Spring — Spectral Theory (Kachkovskiy, via groundSpring/hotSpring)
 
 Kachkovskiy's spectral theory has an indirect but real connection to wetSpring
@@ -246,6 +301,10 @@ No proprietary data dependencies.
 | **Write-phase extensions** | Diversity fusion WGSL (CPU ↔ GPU parity) | Exp167 | 18 |
 | **Track 4 soil QS (CPU)** | Anderson-QS in soil pores, no-till data, structure→function | Exp170-178 | 183 |
 | **Track 4 soil QS (GPU/MF)** | CPU parity, GPU, streaming, metalForge | Exp179-182 | 138 |
+| **Track 5 immuno-Anderson (science)** | Skin lattice, barrier disruption, heterogeneity sweep | Exp273-275 | 48 |
+| **Track 5 immuno-Anderson (3-tier)** | CPU parity, GPU, streaming, metalForge | Exp276-279 | 109 |
+| **Track 5 Gonzales (science)** | IC50 dose-response, PK decay, IL-31 serum, Anderson mapping | Exp280-282 | 69 |
+| **Track 5 Gonzales (3-tier)** | CPU parity, GPU, streaming, metalForge | Exp283-286 | 133 |
 
 ### Phase 37 — Anderson-QS Extension Papers
 
@@ -291,7 +350,9 @@ Core finding: **no prior work applies Anderson localization to QS signaling**.
 | **Subtotal (three-tier)** | **39** | **39/39** | **39/39** | **39/39** | **ALL three-tier** |
 | Cross-spring (spectral) | 1 | 1/1 | 1/1 | — | CPU + GPU |
 | Extensions (Phase 37-39) | 9 | 9/9 | — | — | CPU only (by design — analytical/catalog) |
-| **Grand total** | **52** | **52/52** | **40/40** | **39/39** | |
+| Track 5 immuno-Anderson (science) | 6 | 1/1 | 4/4 | 1/1 | Full three-tier (Exp273-279: 157/157) |
+| Track 5 Gonzales reproductions | 6 | 1/1 | 1/1 | 1/1 | Full three-tier (Exp280-286: 202/202) |
+| **Grand total** | **52 + 6 reproduced** | **54/54** | **48/48** | **41/41** | |
 
 **All GPU primitives upstream:** NMF (S58), TransE (S60), SpMM (S60), PeakDetect (S62), BGL helpers (S62+DF64).
 **All 39 three-tier-eligible papers now have full three-tier validation** (CPU, GPU, metalForge).
@@ -303,6 +364,9 @@ Diversity fusion WGSL extension validated via Exp167 (CPU ↔ GPU parity, 18 che
 Extension papers are analytical models — GPU acceleration is not the bottleneck.
 Track 4 now has full three-tier: CPU baseline (Exp170-178), CPU parity (Exp179),
 GPU validation (Exp180), pure GPU streaming (Exp181), metalForge cross-substrate (Exp182).
+Track 5 Gonzales reproductions completed V92: science (Exp280-282: 69/69) +
+three-tier (Exp283-286: 133/133) = 202/202 checks. Papers 53-58 now reproduced from
+published data (IC50 dose-response, PK decay, pruritus time-series, cell populations).
 
 ---
 

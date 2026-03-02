@@ -35,6 +35,9 @@
 //! - Saprospiraceae positively correlated with algal productivity
 //! - Community composition shifts with reactor configuration and nitrogen source
 //! - `AlgaeParc` outdoor pilots show seasonal bacterial turnover
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use std::collections::HashMap;
 use std::path::Path;

@@ -36,6 +36,9 @@
 //! - PFSA series (C4–C10): PFBS → PFDS (6 compounds, CF₂ spacing)
 //! - FTSA series (4:2 → 8:2): 3 compounds
 //! - `GenX` (HFPO-DA): single compound
+//!
+//! Validation class: Synthetic
+//! Provenance: Generated data with known statistical properties
 
 use wetspring_barracuda::bio::{kmd, spectral_match, tolerance_search};
 use wetspring_barracuda::tolerances;
@@ -265,7 +268,7 @@ fn validate_tolerance_search_systematic(v: &mut Validator) {
             let matches = tolerance_search::find_within_ppm(&sorted_mz, compound.mh_neg, ppm);
             if matches
                 .iter()
-                .any(|&idx| (sorted_mz[idx] - compound.mh_neg).abs() < 1e-6)
+                .any(|&idx| (sorted_mz[idx] - compound.mh_neg).abs() < tolerances::MZ_SEARCH_EXACT)
             {
                 hits += 1;
             }
@@ -297,7 +300,7 @@ fn validate_tolerance_search_systematic(v: &mut Validator) {
     let result_in = tolerance_search::find_within_ppm(&sorted_mz, query_in, 5.0);
     let found_in = result_in
         .iter()
-        .any(|&idx| (sorted_mz[idx] - pfoa_mz).abs() < 1e-4);
+        .any(|&idx| (sorted_mz[idx] - pfoa_mz).abs() < tolerances::MZ_SEARCH_RELAXED);
     v.check(
         "4.9 ppm shift found at 5 ppm window",
         if found_in { 1.0 } else { 0.0 },
@@ -310,7 +313,7 @@ fn validate_tolerance_search_systematic(v: &mut Validator) {
     let result_out = tolerance_search::find_within_ppm(&sorted_mz, query_out, 5.0);
     let found_out = result_out
         .iter()
-        .any(|&idx| (sorted_mz[idx] - pfoa_mz).abs() < 1e-4);
+        .any(|&idx| (sorted_mz[idx] - pfoa_mz).abs() < tolerances::MZ_SEARCH_RELAXED);
     v.check(
         "6 ppm shift NOT found at 5 ppm window",
         if found_out { 0.0 } else { 1.0 },
@@ -319,10 +322,10 @@ fn validate_tolerance_search_systematic(v: &mut Validator) {
     );
 
     // Da tolerance: PFOA at ±0.01 Da
-    let result_da = tolerance_search::find_within_da(&sorted_mz, pfoa_mz, 0.01);
+    let result_da = tolerance_search::find_within_da(&sorted_mz, pfoa_mz, tolerances::MZ_TOLERANCE);
     let found_da = result_da
         .iter()
-        .any(|&idx| (sorted_mz[idx] - pfoa_mz).abs() < 1e-6);
+        .any(|&idx| (sorted_mz[idx] - pfoa_mz).abs() < tolerances::MZ_SEARCH_EXACT);
     v.check(
         "PFOA found at ±0.01 Da",
         if found_da { 1.0 } else { 0.0 },
@@ -600,7 +603,7 @@ fn validate_cross_series_discrimination(v: &mut Validator) {
         "PFCA CF₂ spacing ≈ 49.997 Da",
         cf2_mean,
         kmd::units::CF2_EXACT,
-        0.01,
+        tolerances::CF2_SPACING_TOL,
     );
 
     // Same for PFSA
@@ -621,7 +624,7 @@ fn validate_cross_series_discrimination(v: &mut Validator) {
             "PFSA CF₂ spacing ≈ 49.997 Da",
             pfsa_cf2_mean,
             kmd::units::CF2_EXACT,
-            0.01,
+            tolerances::CF2_SPACING_TOL,
         );
     }
 

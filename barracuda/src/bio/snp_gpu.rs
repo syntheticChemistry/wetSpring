@@ -156,3 +156,39 @@ impl SnpGpu {
         })
     }
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::manual_let_else,
+    clippy::used_underscore_items
+)]
+mod tests {
+    use super::*;
+    use crate::gpu::GpuF64;
+
+    #[test]
+    fn api_surface_compiles() {
+        fn _assert_snp_result(_: &SnpGpuResult) {}
+        let _ = SnpGpu::new;
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn snp_gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let device = gpu.to_wgpu_device();
+        let snp = match SnpGpu::new(&device) {
+            Ok(s) => s,
+            Err(_) => return,
+        };
+        let seqs = vec![b"ACGT" as &[u8], b"ACGG" as &[u8]];
+        let result = snp.call_snps(&seqs);
+        assert!(result.is_ok(), "call_snps should succeed");
+    }
+}

@@ -20,7 +20,7 @@
 //! | Spring | Contribution |
 //! |--------|-------------|
 //! | hotSpring | Precision math, `ReduceScalarPipeline`, ESN, DF64 |
-//! | wetSpring | Bio diversity, HMM, Felsenstein, DADA2, log_f64 fix |
+//! | wetSpring | Bio diversity, HMM, Felsenstein, DADA2, `log_f64` fix |
 //! | neuralSpring | ML ops, pairwise, eigensolver, tensor session |
 //! | groundSpring | Evolution (Kimura), jackknife, bootstrap, grid |
 //! | airSpring | Hydrology, Brent optimizer, seasonal pipeline |
@@ -28,6 +28,9 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Command | `cargo run --bin validate_cross_spring_evolution_modern` |
+//!
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;

@@ -13,6 +13,9 @@
 //!   Always available. Use for non-GPU builds and backward compatibility.
 //! - **`ToadStool` bridge** (`BioEsn`): Wraps `barracuda::esn_v2::ESN` for bio use cases.
 //!   Hardware-agnostic (Tensor), WGSL fused reservoir update. Requires `gpu` feature.
+//! - **Multi-head** (`MultiHeadBioEsn`): Wraps `ToadStool` `MultiHeadEsn` (S79).
+//!   Shared reservoir, per-head bio readout, head disagreement uncertainty.
+//!   Cross-spring provenance: hotSpring (36-head) + wetSpring (bio heads).
 //!
 //! # NPU Deployment Path
 //!
@@ -25,6 +28,7 @@
 //! ```
 
 mod config;
+pub mod heads;
 mod npu;
 mod reservoir;
 mod training;
@@ -33,11 +37,12 @@ mod training;
 mod toadstool_bridge;
 
 pub use config::EsnConfig;
+pub use heads::{AttentionState, BioHeadGroupDisagreement};
 pub use npu::NpuReadoutWeights;
 pub use reservoir::Lcg;
 
 #[cfg(feature = "gpu")]
-pub use toadstool_bridge::{BioEsn, BioEsnConfig, BioHeadKind};
+pub use toadstool_bridge::{BioEsn, BioEsnConfig, BioHeadKind, MultiHeadBioEsn};
 
 use reservoir::{build_w_in, build_w_res, update_state};
 use training::solve_ridge;

@@ -25,7 +25,10 @@ mod sra;
 
 pub use api_key::api_key;
 pub use cache::{accession_dir, cache_file, verify_integrity, write_with_integrity};
-pub use efetch::{efetch_fasta, efetch_fasta_batch, efetch_genbank};
+pub use efetch::{
+    HttpGetFn, efetch_fasta, efetch_fasta_batch, efetch_fasta_batch_with, efetch_fasta_with,
+    efetch_genbank, efetch_genbank_with,
+};
 pub use entrez::esearch_count;
 pub use http::get as http_get;
 pub use sra::{download_sra_run, sra_tools_available};

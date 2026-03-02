@@ -37,6 +37,9 @@
 //! | Date | 2026-02-25 |
 //! | Track | Track 4 — No-Till Soil QS & Anderson Geometry |
 //! | Command | `cargo run --features gpu --release --bin validate_soil_qs_streaming` |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, diversity_gpu};

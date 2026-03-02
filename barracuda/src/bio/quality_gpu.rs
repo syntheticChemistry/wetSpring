@@ -203,3 +203,44 @@ fn pack_quality_data(reads: &[FastqRecord]) -> (Vec<u32>, Vec<u32>, Vec<u32>) {
 
     (packed, offsets, lengths)
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::type_complexity,
+    clippy::manual_let_else
+)]
+mod tests {
+    use super::*;
+    use crate::gpu::GpuF64;
+    use crate::io::fastq::FastqRecord;
+
+    #[test]
+    fn api_surface_compiles() {
+        fn _assert_quality_filter_cached(_: &QualityFilterCached) {}
+        let _: fn(
+            &GpuF64,
+            &[FastqRecord],
+            &QualityParams,
+            Option<&QualityFilterCached>,
+        ) -> Result<(Vec<FastqRecord>, FilterStats)> = filter_reads_gpu;
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let reads: Vec<FastqRecord> = vec![];
+        let params = QualityParams::default();
+        let result = filter_reads_gpu(&gpu, &reads, &params, None);
+        assert!(
+            result.is_ok(),
+            "filter_reads_gpu should succeed with empty input"
+        );
+    }
+}

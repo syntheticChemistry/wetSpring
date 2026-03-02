@@ -36,6 +36,9 @@
 //! |-------|-------|
 //! | Date | 2026-03-01 |
 //! | Command | `cargo run --release --bin validate_genomic_vault` |
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use std::time::Duration;
 

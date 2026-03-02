@@ -17,6 +17,9 @@
 //! | Date        | 2026-02-23 |
 //! | GPU prims   | anderson_2d, anderson_3d, lanczos, level_spacing_ratio |
 //! | Command     | `cargo test --bin validate_biofilm_3d_qs -- --nocapture` |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use wetspring_barracuda::validation::Validator;
 

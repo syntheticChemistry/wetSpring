@@ -9,13 +9,16 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | zheng2023_dtl_reconciliation.py |
+//! | Baseline tool | `zheng2023_dtl_reconciliation.py` |
 //! | Baseline version | scripts/ |
-//! | Baseline command | python3 scripts/zheng2023_dtl_reconciliation.py |
+//! | Baseline command | python3 `scripts/zheng2023_dtl_reconciliation.py` |
 //! | Baseline date | 2026-02-19 |
 //! | Exact command | `python3 scripts/zheng2023_dtl_reconciliation.py` |
 //! | Data | synthetic host/parasite trees |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::reconciliation::{
     DtlCosts, DtlEvent, FlatRecTree, reconcile_batch, reconcile_dtl,

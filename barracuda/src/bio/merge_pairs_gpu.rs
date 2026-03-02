@@ -70,3 +70,50 @@ pub fn merge_pair_gpu(
     require_f64(gpu)?;
     Ok(merge_pairs::merge_pair(fwd, rev, params))
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::type_complexity,
+    clippy::manual_let_else
+)]
+mod tests {
+    use super::*;
+    use crate::gpu::GpuF64;
+    use crate::io::fastq::FastqRecord;
+
+    #[test]
+    fn api_surface_compiles() {
+        let _: fn(
+            &GpuF64,
+            &[FastqRecord],
+            &[FastqRecord],
+            &MergeParams,
+        ) -> Result<(Vec<FastqRecord>, MergeStats)> = merge_pairs_gpu;
+        let _: fn(
+            &GpuF64,
+            &FastqRecord,
+            &FastqRecord,
+            &MergeParams,
+        ) -> Result<merge_pairs::MergeResult> = merge_pair_gpu;
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let fwd = vec![];
+        let rev = vec![];
+        let params = MergeParams::default();
+        let result = merge_pairs_gpu(&gpu, &fwd, &rev, &params);
+        assert!(
+            result.is_ok(),
+            "merge_pairs_gpu should succeed with empty input"
+        );
+    }
+}

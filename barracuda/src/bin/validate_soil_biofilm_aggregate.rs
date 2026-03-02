@@ -29,6 +29,9 @@
 //! | Data | Conceptual model with published parameter ranges |
 //! | Track | Track 4 — No-Till Soil QS & Anderson Geometry |
 //! | Command | `cargo test --bin validate_soil_biofilm_aggregate -- --nocapture` |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas and algorithmic invariants
 
 use wetspring_barracuda::bio::qs_biofilm::{self, QsBiofilmParams};
 use wetspring_barracuda::tolerances;

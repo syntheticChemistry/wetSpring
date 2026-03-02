@@ -30,6 +30,9 @@
 //! |-------|-------|
 //! | Date | 2026-02-28 |
 //! | Command | `cargo run --features gpu --bin validate_toadstool_dispatch_v2` |
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use std::time::Instant;
 

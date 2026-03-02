@@ -30,6 +30,9 @@
 //! |-------|-------|
 //! | Date | 2026-03-01 |
 //! | Command | `cargo run --features gpu --bin validate_cpu_vs_gpu_pure_math` |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use std::time::Instant;
 
@@ -272,7 +275,7 @@ fn main() {
         std::f64::consts::E,
         1e-15,
         1e20,
-        -3.141_592_653_589_793,
+        -std::f64::consts::PI,
         0.0,
     ];
 

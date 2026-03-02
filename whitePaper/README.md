@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** March 1, 2026
-**Status:** Phase 87 — Validation study active — 6,656+ checks (1,945+ GPU on RTX 4070, **60 NPU on AKD1000**), 1,247 tests (975 lib + 60 integration + 22 doc + 166 forge), 262 experiments, 238 binaries, ToadStool S71+++ aligned (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances with full provenance, clippy pedantic CLEAN, V87 blueFish whitePaper launched (7 docs, chemistry as irreducible research programme, RootPulse provenance integration), hotSpring brain architecture reviewed, 50/50 three-tier, 52/52 papers
+**Status:** Phase 92C — Validation study active — 6,656+ checks (1,945+ GPU on RTX 4070, **60 NPU on AKD1000**), 1,247 tests (975 lib + 60 integration + 22 doc + 166 forge), 262 experiments, 238 binaries, ToadStool S79 aligned (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances with full provenance, clippy pedantic CLEAN, V92C blueFish whitePaper launched (7 docs, chemistry as irreducible research programme, RootPulse provenance integration), hotSpring brain architecture reviewed, 50/50 three-tier, 52/52 papers
 **License:** AGPL-3.0-or-later
 
 ---

@@ -21,6 +21,9 @@
 //! | GPU prims   | `FusedMapReduceF64`, `BrayCurtisF64` |
 //! | Date        | 2026-02-23 |
 //! | Command     | `cargo test --bin validate_real_bloom_gpu -- --nocapture` |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use std::time::Instant;
 use wetspring_barracuda::bio::diversity;

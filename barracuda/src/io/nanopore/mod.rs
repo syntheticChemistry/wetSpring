@@ -267,6 +267,95 @@ mod tests {
     }
 
     #[test]
+    fn nrs_truncated_header_rejected() {
+        let tmp = tempfile::NamedTempFile::new().unwrap();
+        std::fs::write(tmp.path(), b"NRS1").unwrap();
+        let result = NanoporeIter::open(tmp.path());
+        assert!(
+            result.is_err(),
+            "truncated n_reads (magic only, no u64) should fail"
+        );
+    }
+
+    #[test]
+    fn nrs_signal_length_exceeds_limit_rejected() {
+        use std::io::Write;
+        let tmp = tempfile::NamedTempFile::new().unwrap();
+        let mut f = std::fs::File::create(tmp.path()).unwrap();
+        f.write_all(b"NRS1").unwrap();
+        f.write_all(&1u64.to_le_bytes()).unwrap();
+        f.write_all(&[0u8; 16]).unwrap();
+        f.write_all(&1u32.to_le_bytes()).unwrap();
+        f.write_all(&4000.0f64.to_le_bytes()).unwrap();
+        f.write_all(&0.0f64.to_le_bytes()).unwrap();
+        f.write_all(&1.0f64.to_le_bytes()).unwrap();
+        f.write_all(&(100_000_001u64).to_le_bytes()).unwrap();
+        drop(f);
+
+        let mut iter = NanoporeIter::open(tmp.path()).unwrap();
+        let result = iter.next().unwrap();
+        assert!(result.is_err());
+        let msg = result.unwrap_err().to_string();
+        assert!(msg.contains("100M") || msg.contains("corrupt"));
+    }
+
+    #[test]
+    fn nrs_truncated_read_rejected() {
+        use std::io::Write;
+        let tmp = tempfile::NamedTempFile::new().unwrap();
+        let mut f = std::fs::File::create(tmp.path()).unwrap();
+        f.write_all(b"NRS1").unwrap();
+        f.write_all(&1u64.to_le_bytes()).unwrap();
+        f.write_all(&[0u8; 16]).unwrap();
+        f.write_all(&1u32.to_le_bytes()).unwrap();
+        f.write_all(&4000.0f64.to_le_bytes()).unwrap();
+        f.write_all(&0.0f64.to_le_bytes()).unwrap();
+        f.write_all(&1.0f64.to_le_bytes()).unwrap();
+        f.write_all(&100u64.to_le_bytes()).unwrap();
+        f.write_all(&[0u8; 50]).unwrap();
+        drop(f);
+
+        let mut iter = NanoporeIter::open(tmp.path()).unwrap();
+        let result = iter.next().unwrap();
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn nrs_empty_file_zero_bytes() {
+        let tmp = tempfile::NamedTempFile::new().unwrap();
+        std::fs::write(tmp.path(), []).unwrap();
+        let result = NanoporeIter::open(tmp.path());
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn nrs_read_extraction_wire_format() {
+        let read = NanoporeRead {
+            read_id: [0xAB; 16],
+            signal: vec![100, -50, 0],
+            channel: 99,
+            sample_rate: 5000.0,
+            calibration_offset: -10.5,
+            calibration_scale: 0.02,
+        };
+        let reads = vec![read.clone()];
+        let tmp = tempfile::NamedTempFile::new().unwrap();
+        write_nrs(tmp.path(), &reads).unwrap();
+
+        let loaded: NanoporeRead = NanoporeIter::open(tmp.path())
+            .unwrap()
+            .next()
+            .unwrap()
+            .unwrap();
+        assert_eq!(loaded.read_id, read.read_id);
+        assert_eq!(loaded.channel, read.channel);
+        assert!((loaded.sample_rate - read.sample_rate).abs() < f64::EPSILON);
+        assert!((loaded.calibration_offset - read.calibration_offset).abs() < f64::EPSILON);
+        assert!((loaded.calibration_scale - read.calibration_scale).abs() < f64::EPSILON);
+        assert_eq!(loaded.signal, read.signal);
+    }
+
+    #[test]
     fn threshold_basecall_boundaries() {
         assert_eq!(threshold_basecall(260.0), b'A');
         assert_eq!(threshold_basecall(275.0), b'C');

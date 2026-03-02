@@ -26,6 +26,9 @@
 //! | Command       | `cargo run --features gpu --release --bin validate_gpu_v59_science` |
 //! | Data          | Synthetic test vectors (self-contained) |
 //! | Tolerances    | `tolerances::GPU_CPU_F64` for GPU↔CPU, structural |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use barracuda::spectral::{
     GOE_R, POISSON_R, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,

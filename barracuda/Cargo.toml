@@ -28,6 +28,9 @@ json = ["dep:serde_json"]
 # IPC server for biomeOS science primal (wetspring-server binary).
 # Adds JSON-RPC 2.0 over Unix socket, Songbird registration, Neural API metrics.
 ipc = ["json"]
+# Nautilus Shell: evolutionary reservoir computing for bio sentinel monitoring.
+# Adds concept edge detection, drift monitoring, evolutionary adaptation.
+nautilus = ["dep:bingocube-nautilus"]
 
 [dependencies]
 # serde_json: JSON parsing for validation data and model import (2 binaries).
@@ -36,11 +39,12 @@ serde_json = { version = "1", optional = true }
 # ToadStool barracuda — always-on for CPU math (special, linalg, numerical).
 # default-features = false: no wgpu/pollster/bytemuck pulled in for CPU builds.
 # When `gpu` feature is active, `barracuda/gpu` enables GPU ops.
-# S70+++: 93 primitives consumed (V85). CPU stats: bootstrap_ci, rawr_mean,
+# S79 (f97fc2ae): 93+ primitives consumed (V89). CPU stats: bootstrap_ci, rawr_mean,
 # fit_exponential/quadratic/logarithmic/all, jackknife, evolution, chao1_classic.
 # GPU bio: StencilCooperationGpu, HillGateGpu (dispatched). WrightFisherGpu (needs DF64).
-# GPU linalg: SymmetrizeGpu, LaplacianGpu (S71 uniform alignment fix pending).
-# Infra: Fp64Strategy::Concurrent, PipelineBuilder, f64-canonical shaders.
+# GPU linalg: SymmetrizeGpu, LaplacianGpu. ESN: MultiHeadEsn, ExportedWeights (head_labels).
+# Infra: Fp64Strategy::Concurrent, PipelineBuilder, 844 f64-canonical WGSL shaders.
+# New since S71: libc→rustix, AFIT, asin_df64 iterative, FFT buffer fix, spectral stats.
 barracuda = { path = "../../phase1/toadstool/crates/barracuda", default-features = false }
 
 # ToadStool akida-driver — pure Rust NPU access (BrainChip AKD1000/AKD1500).
@@ -56,6 +60,11 @@ wgpu = { version = "22", optional = true, default-features = false, features = [
 # Async runtime for GPU device creation (barracuda already brings tokio in).
 tokio = { version = "1", features = ["rt", "macros"], optional = true }
 
+# bingocube-nautilus: evolutionary reservoir computing via BingoCube board populations.
+# Pure Rust + serde, no GPU deps. Used for Nautilus Shell bio bridge (concept edge
+# detection, drift monitoring, evolutionary adaptation for bio sentinel).
+# Cross-spring provenance: primalTools/bingoCube (shared ecosystem tool).
+bingocube-nautilus = { path = "../../primalTools/bingoCube/nautilus", optional = true }
 
 # bytemuck: zero-copy casting for GPU uniform buffers (GemmCached params).
 # Already a transitive dep via barracuda; pinned here for local extensions.
@@ -75,6 +84,7 @@ blake3 = "1.8"
 [dev-dependencies]
 tempfile = "3"
 temp-env = "0.3"
+proptest = "1"
 
 # ── Track 1 validation binaries ──────────────────────────────────
 [[bin]]
@@ -1389,4 +1399,95 @@ path = "src/bin/validate_toadstool_dispatch_v3.rs"
 [[bin]]
 name = "validate_cpu_vs_gpu_pure_math"
 path = "src/bin/validate_cpu_vs_gpu_pure_math.rs"
+required-features = ["gpu"]
+
+# ── Exp271: Cross-Spring S79 Evolution Validation + Benchmark ──
+[[bin]]
+name = "validate_cross_spring_s79"
+path = "src/bin/validate_cross_spring_s79.rs"
+
+# ── Exp272: Bio Brain Cross-Spring Validation — Brain + Nautilus + 36-Head ──
+[[bin]]
+name = "validate_bio_brain_s79"
+path = "src/bin/validate_bio_brain_s79.rs"
+required-features = ["nautilus"]
+
+# ── Exp273: Immunological Anderson — Skin-Layer Geometry (Paper 12) ──
+[[bin]]
+name = "validate_skin_anderson_s79"
+path = "src/bin/validate_skin_anderson_s79.rs"
+required-features = ["gpu"]
+
+# ── Exp274: Barrier Disruption — Dimensional Promotion Threshold (Paper 12) ──
+[[bin]]
+name = "validate_barrier_disruption_s79"
+path = "src/bin/validate_barrier_disruption_s79.rs"
+required-features = ["gpu"]
+
+# ── Exp275: Cell-Type Heterogeneity Sweep — W vs r (Paper 12) ──
+[[bin]]
+name = "validate_heterogeneity_sweep_s79"
+path = "src/bin/validate_heterogeneity_sweep_s79.rs"
+required-features = ["gpu"]
+
+# ── Exp276: Track 5 CPU Parity — Immunological Anderson (Paper 12) ──
+[[bin]]
+name = "validate_immuno_anderson_cpu_parity"
+path = "src/bin/validate_immuno_anderson_cpu_parity.rs"
+required-features = ["gpu"]
+
+# ── Exp277: Track 5 GPU Validation — Immunological Anderson (Paper 12) ──
+[[bin]]
+name = "validate_immuno_anderson_gpu"
+path = "src/bin/validate_immuno_anderson_gpu.rs"
+required-features = ["gpu"]
+
+# ── Exp278: Track 5 ToadStool Streaming — Immunological Anderson (Paper 12) ──
+[[bin]]
+name = "validate_immuno_anderson_streaming"
+path = "src/bin/validate_immuno_anderson_streaming.rs"
+required-features = ["gpu"]
+
+# ── Exp279: Track 5 metalForge Cross-Substrate — Immunological Anderson (Paper 12) ──
+[[bin]]
+name = "validate_immuno_anderson_metalforge"
+path = "src/bin/validate_immuno_anderson_metalforge.rs"
+required-features = ["gpu"]
+
+# ── Exp280: Track 5 Gonzales 2014 — Oclacitinib IC50 Dose-Response (Paper 54) ──
+[[bin]]
+name = "validate_gonzales_ic50_s79"
+path = "src/bin/validate_gonzales_ic50_s79.rs"
+
+# ── Exp281: Track 5 Fleck/Gonzales 2021 — Lokivetmab PK (Paper 56) ──
+[[bin]]
+name = "validate_gonzales_pk_s79"
+path = "src/bin/validate_gonzales_pk_s79.rs"
+
+# ── Exp282: Track 5 Gonzales 2013 — IL-31 Serum & Anderson Disorder (Paper 53) ──
+[[bin]]
+name = "validate_gonzales_il31_s79"
+path = "src/bin/validate_gonzales_il31_s79.rs"
+
+# ── Exp283: Track 5 CPU Parity — Gonzales Reproductions (Papers 53-56) ──
+[[bin]]
+name = "validate_gonzales_cpu_parity"
+path = "src/bin/validate_gonzales_cpu_parity.rs"
+
+# ── Exp284: Track 5 GPU Validation — Gonzales Reproductions (Papers 53-56) ──
+[[bin]]
+name = "validate_gonzales_gpu"
+path = "src/bin/validate_gonzales_gpu.rs"
+required-features = ["gpu"]
+
+# ── Exp285: Track 5 ToadStool Streaming — Gonzales Reproductions (Papers 53-56) ──
+[[bin]]
+name = "validate_gonzales_streaming"
+path = "src/bin/validate_gonzales_streaming.rs"
+required-features = ["gpu"]
+
+# ── Exp286: Track 5 metalForge Cross-Substrate — Gonzales Reproductions (Papers 53-56) ──
+[[bin]]
+name = "validate_gonzales_metalforge"
+path = "src/bin/validate_gonzales_metalforge.rs"
 required-features = ["gpu"]

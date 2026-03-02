@@ -35,6 +35,9 @@
 //! | Date | 2026-02-28 |
 //! | Phase | 76 |
 //! | Command | `cargo run --features ipc --release --bin validate_metalforge_v9_nucleus` |
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use serde_json::json;
 use std::time::Instant;

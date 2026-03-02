@@ -138,3 +138,30 @@ impl KmerGpu {
         self.count_histogram(&indices, k)
     }
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
+mod tests {
+    use super::*;
+    use crate::gpu::GpuF64;
+
+    #[test]
+    fn api_surface_compiles() {
+        fn _assert_kmer_result(_: &KmerGpuResult) {}
+        let _ = KmerGpu::new;
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn kmer_gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let device = gpu.to_wgpu_device();
+        let kmer = KmerGpu::new(&device);
+        let result = kmer.count_from_sequence(b"ACGT", 2);
+        assert!(result.is_ok(), "count_from_sequence should succeed");
+    }
+}

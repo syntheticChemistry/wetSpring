@@ -22,6 +22,9 @@
 //! | Date        | 2026-02-24 |
 //! | Phase       | 39 — Paper queue extension |
 //! | Paper       | 36 (Commun Biol 2025) |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas and algorithmic invariants
 
 use wetspring_barracuda::validation::Validator;
 

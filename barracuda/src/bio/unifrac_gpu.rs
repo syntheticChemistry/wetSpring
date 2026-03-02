@@ -124,3 +124,45 @@ impl UniFracGpu {
         })
     }
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::type_complexity,
+    clippy::manual_let_else
+)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn api_surface_compiles() {
+        fn _assert_result(_: &UniFracGpuResult) {}
+        let _: fn(
+            &UniFracGpu,
+            &[u32],
+            &[f64],
+            &[f64],
+            usize,
+            usize,
+            usize,
+        ) -> crate::error::Result<UniFracGpuResult> = UniFracGpu::propagate;
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn gpu_signature_check() {
+        let gpu = match crate::gpu::GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let device = gpu.to_wgpu_device();
+        let unifrac = UniFracGpu::new(&device);
+        let parent_array = [0u32, 0, 1];
+        let branch_lengths = [0.0, 1.0, 1.0];
+        let sample_matrix = [1.0, 0.0, 0.0, 1.0];
+        let result = unifrac.propagate(&parent_array, &branch_lengths, &sample_matrix, 3, 2, 2);
+        assert!(result.is_ok(), "propagate should succeed with valid input");
+    }
+}

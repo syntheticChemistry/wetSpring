@@ -23,8 +23,11 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Date | 2026-03-01 |
-//! | ToadStool Pin | S70+++ (`1dd7e338`) |
+//! | `ToadStool` Pin | S70+++ (`1dd7e338`) |
 //! | Command | `cargo run --bin validate_toadstool_s70_rewire` |
+//!
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use wetspring_barracuda::validation::Validator;
 

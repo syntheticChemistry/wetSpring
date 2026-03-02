@@ -21,6 +21,9 @@
 //!
 //! **S6: NUCLEUS Workload Catalog** — All 47 workloads registered,
 //!       NUCLEUS data-driven domains dispatched correctly
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 #![allow(
     clippy::expect_used,

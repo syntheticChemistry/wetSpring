@@ -30,6 +30,9 @@
 //! | Date | 2026-02-28 |
 //! | Phase | 76 |
 //! | Command | `cargo run --release --bin validate_streaming_pipeline_v5` |
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, kmer, pcoa, taxonomy};

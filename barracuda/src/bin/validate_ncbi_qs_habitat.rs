@@ -29,7 +29,10 @@
 //! | Item        | Value |
 //! |-------------|-------|
 //! | Date        | 2026-02-23 |
-//! | Database    | NCBI Protein (nr), BioSample |
+//! | Database    | NCBI Protein (nr), `BioSample` |
+//!
+//! Validation class: Synthetic
+//! Provenance: Generated data with known statistical properties
 
 use std::io::Write as IoWrite;
 use std::time::Duration;

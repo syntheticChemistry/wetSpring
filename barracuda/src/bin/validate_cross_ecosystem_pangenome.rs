@@ -21,6 +21,9 @@
 //! | Data source | Synthetic (mirrors NCBI Campylobacterota, ~5,000 genomes) |
 //! | GPU prims   | `PangenomeClassifyGpu`, `AniBatchF64`, `DnDsBatchF64` |
 //! | Date        | 2026-02-23 |
+//!
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::ani;

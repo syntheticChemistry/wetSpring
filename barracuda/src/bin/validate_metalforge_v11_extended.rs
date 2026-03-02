@@ -26,6 +26,9 @@
 //! |-------|-------|
 //! | Date | 2026-02-28 |
 //! | Command | `cargo run --features gpu,ipc --bin validate_metalforge_v11_extended` |
+//!
+//! Validation class: Pipeline
+//! Provenance: metalForge dispatch/routing validation
 
 use std::time::Instant;
 

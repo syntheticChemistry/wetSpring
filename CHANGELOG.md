@@ -5,6 +5,79 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V92C — Deep Audit & GPU Test Evolution (2026-03-02)
+
+### Added
+- 32 GPU bio modules: `#[cfg(test)]` stubs (API surface + signature checks)
+- 249 validation binaries: `//! Validation class:` + `//! Provenance:` headers
+- 3 diversity tolerance constants: `DIVERSITY_EVENNESS_TOL`, `DIVERSITY_TS_MONOTONIC`, `SHANNON_RECOVERY_TOL`
+- 14 new library tests (power.rs, nrs.rs, brain/observation.rs)
+
+### Changed
+- 20+ binaries: inline tolerance literals → `tolerances::` constants
+- 30+ files: doc_markdown clippy fixes (backticked identifiers in provenance headers)
+- `io/nanopore/mod.rs`: `use` imports moved before statements (items-after-statements fix)
+
+### Totals
+- Tests: 1,044 lib (default features), 1,101 (with ipc), 1,276 workspace
+- Named tolerances: 103
+- Clippy: zero warnings (pedantic + nursery)
+
+## V92B — Immunological Anderson + Gonzales Reproducibility (2026-03-02)
+
+### Added
+- Immunological Anderson extension
+- Gonzales reproducibility validation
+
+### Totals
+- Experiments: 272
+- Checks: 7,220+
+- Binaries: 255
+
+## V92 — Immunological Anderson (2026-03-02)
+
+### Added
+- Immunological Anderson extension (Track 4 soil QS)
+
+## V91 — Deep Debt Resolution + Idiomatic Modernization (2026-03-02)
+
+### Changed
+- Capability-based discovery unified into `ipc::discover`
+- Handler refactoring: monolithic 605-line file → 3 domain-focused modules
+- `#[must_use]` on gillespie, pcoa
+- `as` casts replaced with `From`/`TryFrom`
+
+### Added
+- 5 new brain handler dispatch tests
+
+## V90 — Bio Brain Cross-Spring Ingest (2026-03-02)
+
+### Added
+- hotSpring 4-layer brain + 36-head Gen2 ESN adapted to bio sentinel
+- `BioNautilusBrain` from bingocube-nautilus
+- `BioBrain` adapter: attention state machine, observation history
+- 3 new IPC methods: brain.observe, brain.attention, brain.urgency
+- Exp272: Bio Brain Validation (64/64 checks, 7 domains)
+
+### Totals
+- Experiments: 271 → 272
+- Checks: 7,156 → 7,220
+
+## V89 — ToadStool S79 Deep Rewire (2026-03-02)
+
+### Changed
+- ToadStool pin: S71+++ (`1dd7e338`) → S79 (`f97fc2ae`), 9 commits
+- `MultiHeadBioEsn` wrapper for ToadStool `MultiHeadEsn`
+- IPC `SpectralAnalysis` rewire
+
+### Added
+- Exp271: Cross-Spring S79 Validation (73/73 checks, 13 domains)
+
+### Totals
+- Experiments: 270 → 271
+- Checks: 7,083 → 7,156
+- Binaries: 253 → 255 (+ validate_cross_spring_s79, validate_bio_brain_s79)
+
 ## V88 — Full Experiment Buildout + Control Validation (2026-03-02)
 
 ### New experiments (all pass)

@@ -71,3 +71,36 @@ pub fn pairwise_l2_condensed_gpu(
 
     Ok(raw.iter().map(|&x| f64::from(x)).collect())
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::type_complexity,
+    clippy::manual_let_else
+)]
+mod tests {
+    use super::*;
+    use crate::gpu::GpuF64;
+
+    #[test]
+    fn api_surface_compiles() {
+        let _: fn(&GpuF64, &[f64], usize, usize) -> Result<Vec<f64>> = pairwise_l2_condensed_gpu;
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let coords = vec![0.0, 0.0, 1.0, 1.0];
+        let result = pairwise_l2_condensed_gpu(&gpu, &coords, 2, 2);
+        assert!(
+            result.is_ok(),
+            "pairwise_l2_condensed_gpu should succeed with valid input"
+        );
+    }
+}

@@ -26,10 +26,14 @@
 //! | Baselines      | Exp114, 118, 119, 123 CPU int8 simulation |
 //! | Hardware       | Eastgate i9-12900K, 64 GB DDR5, Pop!\_OS 22.04 |
 //! | Command        | `cargo run --release --features npu --bin validate_npu_live` |
+//!
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::esn::{Esn, EsnConfig};
 use wetspring_barracuda::npu;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 // ═══════════════════════════════════════════════════════════════════
@@ -338,7 +342,7 @@ fn main() {
             spectral_radius: 0.9,
             connectivity: 0.12,
             leak_rate: 0.3,
-            regularization: 1e-5,
+            regularization: tolerances::ESN_REGULARIZATION_TIGHT,
             seed: 2025,
         },
         &train_in,
@@ -367,7 +371,7 @@ fn main() {
             spectral_radius: 0.85,
             connectivity: 0.12,
             leak_rate: 0.25,
-            regularization: 1e-5,
+            regularization: tolerances::ESN_REGULARIZATION_TIGHT,
             seed: 314,
         },
         &train_in,
@@ -390,7 +394,7 @@ fn main() {
         spectral_radius: 0.9,
         connectivity: 0.12,
         leak_rate: 0.3,
-        regularization: 1e-5,
+        regularization: tolerances::ESN_REGULARIZATION_TIGHT,
         seed: 2025,
     });
 

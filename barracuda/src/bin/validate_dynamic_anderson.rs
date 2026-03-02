@@ -30,6 +30,9 @@
 //! | Baseline commit | wetSpring Phase 59 |
 //! | Hardware | biomeGate RTX 4070 (GPU), Eastgate CPU |
 //! | Command | `cargo run --release --features gpu --bin validate_dynamic_anderson` |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;

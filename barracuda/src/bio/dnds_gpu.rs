@@ -176,3 +176,39 @@ impl DnDsGpu {
         Ok(DnDsGpuResult { dn, ds, omega })
     }
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::manual_let_else,
+    clippy::used_underscore_items
+)]
+mod tests {
+    use super::*;
+    use crate::gpu::GpuF64;
+
+    #[test]
+    fn api_surface_compiles() {
+        fn _assert_dnds_result(_: &DnDsGpuResult) {}
+        let _ = DnDsGpu::new;
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn dnds_gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let device = gpu.to_wgpu_device();
+        let dnds = match DnDsGpu::new(&device) {
+            Ok(d) => d,
+            Err(_) => return,
+        };
+        let pairs = vec![(b"ATGATGATG" as &[u8], b"ATGATGATG" as &[u8])];
+        let result = dnds.batch_dnds(&pairs);
+        assert!(result.is_ok(), "batch_dnds should succeed");
+    }
+}

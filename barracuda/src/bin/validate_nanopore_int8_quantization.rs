@@ -23,11 +23,14 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Source | Synthetic (SyntheticSignalGenerator seed=42, int8 from synthetic reads) |
+//! | Source | Synthetic (`SyntheticSignalGenerator` seed=42, int8 from synthetic reads) |
 //! | Date | 2026-02-26 |
 //! | Commit | wetSpring Phase 61 |
 //! | Hardware | CPU only (int8 simulation) |
 //! | Command | `cargo run --release --bin validate_nanopore_int8_quantization` |
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::io::nanopore::{NanoporeRead, SyntheticSignalGenerator};

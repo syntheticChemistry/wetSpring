@@ -45,6 +45,9 @@
 //! | Command | `cargo run --release --bin validate_soil_qs_cpu_parity` |
 //! | Data | Synthetic ODE, community, and statistical reference values |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::time::Instant;
 use wetspring_barracuda::bio::cooperation::{self, CooperationParams};
@@ -124,7 +127,7 @@ fn main() {
         let mut all_distinct = true;
         for i in 0..bs.len() {
             for j in (i + 1)..bs.len() {
-                if (bs[i] - bs[j]).abs() < 1e-10 {
+                if (bs[i] - bs[j]).abs() < tolerances::PYTHON_PARITY {
                     all_distinct = false;
                 }
             }
@@ -309,7 +312,7 @@ fn main() {
         let p = norm_cdf((w_c_3d - w) / 3.0);
         v.check_pass(
             &format!("P(QS|W={w:.0})={p:.4} monotone decreasing"),
-            p <= prev_p + 1e-10,
+            p <= prev_p + tolerances::PYTHON_PARITY,
         );
         prev_p = p;
     }
@@ -376,7 +379,7 @@ fn main() {
         let w = (w_init - w_final).mul_add(-frac, w_init);
         v.check_pass(
             &format!("Year {y:.0}: W={w:.1} ≤ previous"),
-            w <= prev_w + 0.01,
+            w <= prev_w + tolerances::ODE_STEADY_STATE,
         );
         prev_w = w;
     }

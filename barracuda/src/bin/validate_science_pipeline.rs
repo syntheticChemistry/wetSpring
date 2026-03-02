@@ -29,6 +29,9 @@
 //! - **Simpson = 0.75**: Uniform 4-species; D = 1 − 1/S = 0.75.
 //! - **observed = 4**: Count of non-zero abundances.
 //! - **Pielou = 1.0**: Perfect evenness for uniform distribution.
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixStream;

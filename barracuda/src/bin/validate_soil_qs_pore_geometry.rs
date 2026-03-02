@@ -38,6 +38,9 @@
 //! | Track | Track 4 Exp170 — No-Till Soil QS & Anderson Geometry |
 //! | ODE | Waters 2008 QS model; ODE steady-state expectations with soil pore geometry parameters |
 //! | Command | `cargo test --bin validate_soil_qs_pore_geometry -- --nocapture` |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::cooperation::{self, CooperationParams};

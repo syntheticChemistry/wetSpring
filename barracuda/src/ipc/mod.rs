@@ -31,11 +31,13 @@
 //! - **Existing math unchanged**: the server is a thin JSON-RPC wrapper over
 //!   validated barracuda library functions.
 
+pub mod discover;
 pub mod dispatch;
 pub(crate) mod handlers;
 pub mod metrics;
 pub mod protocol;
 pub mod server;
 pub mod songbird;
+pub mod transport;
 
 pub use server::Server;

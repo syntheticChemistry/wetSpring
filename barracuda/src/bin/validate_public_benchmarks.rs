@@ -14,6 +14,9 @@
 //! | Exact command | `cargo run --bin validate_public_benchmarks` |
 //! | Data | PRJNA1114688, PRJNA629095, PRJNA1178324, PRJNA516219 |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas and algorithmic invariants
 
 use std::collections::HashMap;
 use std::path::Path;

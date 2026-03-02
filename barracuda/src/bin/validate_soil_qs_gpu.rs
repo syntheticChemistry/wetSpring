@@ -33,6 +33,9 @@
 //! | Date | 2026-02-25 |
 //! | Track | Track 4 — No-Till Soil QS & Anderson Geometry |
 //! | Command | `cargo run --features gpu --release --bin validate_soil_qs_gpu` |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{

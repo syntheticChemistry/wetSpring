@@ -35,6 +35,9 @@
 //! | Data | Published soil health metrics (Table 1-3 from paper) |
 //! | Track | Track 4 — No-Till Soil QS & Anderson Geometry |
 //! | Command | `cargo test --bin validate_notill_brandt_farm -- --nocapture` |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas and algorithmic invariants
 
 use std::time::Instant;
 use wetspring_barracuda::bio::diversity;

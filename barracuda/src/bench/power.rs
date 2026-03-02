@@ -393,6 +393,35 @@ mod tests {
         let _ = monitor.stop();
     }
 
+    /// Runs on any system — nvidia-smi and RAPL may be absent; exercises fallback paths.
+    #[test]
+    fn power_monitor_start_stop_no_hardware_required() {
+        let monitor = PowerMonitor::start();
+        let report = monitor.stop();
+        // When nvidia-smi is unavailable, gpu_samples is 0; when RAPL is absent, cpu_joules is 0.
+        assert!(report.gpu_watts_avg >= 0.0);
+        assert!(report.gpu_watts_peak >= 0.0);
+        assert!(report.gpu_temp_peak_c >= 0.0);
+        assert!(report.gpu_vram_peak_mib >= 0.0);
+    }
+
+    #[test]
+    fn power_monitor_stop_with_zero_gpu_samples() {
+        let monitor = PowerMonitor::start();
+        let report = monitor.stop();
+        // On CI / systems without nvidia-smi, gpu_samples will be 0; report should be valid.
+        assert!(report.cpu_joules >= 0.0);
+        assert!(report.gpu_joules >= 0.0);
+    }
+
+    #[test]
+    fn spawn_nvidia_smi_handles_missing_binary() {
+        let samples: Arc<Mutex<Vec<GpuSample>>> = Arc::new(Mutex::new(Vec::new()));
+        let (smi_child, reader_handle) = spawn_nvidia_smi_poller(samples);
+        // When nvidia-smi is unavailable: (None, None). When available: (Some, Some). No panic.
+        let _ = (smi_child, reader_handle);
+    }
+
     #[test]
     fn compute_gpu_energy_three_samples() {
         let t0 = Instant::now();

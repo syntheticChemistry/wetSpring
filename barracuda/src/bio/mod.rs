@@ -12,6 +12,7 @@ pub mod bistable;
 #[cfg(feature = "gpu")]
 pub mod bistable_gpu;
 pub mod bootstrap;
+pub mod brain;
 pub mod capacitor;
 #[cfg(feature = "gpu")]
 pub mod capacitor_gpu;

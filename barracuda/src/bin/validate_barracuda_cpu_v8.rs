@@ -23,6 +23,9 @@
 //! | Exact command | `cargo run --release --bin validate_barracuda_cpu_v8` |
 //! | Data | Synthetic test vectors (self-contained) |
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, Pop!\_OS 22.04 |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{
@@ -46,7 +49,6 @@ use wetspring_barracuda::io::fastq::FastqRecord;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
-const DT: f64 = 0.001;
 const SS_FRAC: f64 = 0.1;
 
 fn main() {
@@ -102,7 +104,7 @@ fn validate_cooperation(v: &mut Validator) {
         tolerances::EXACT,
     );
 
-    let r = cooperation::scenario_equal_start(&p, DT);
+    let r = cooperation::scenario_equal_start(&p, tolerances::ODE_DEFAULT_DT);
     let n_coop = steady_state_mean(&r, 0, SS_FRAC);
     let n_cheat = steady_state_mean(&r, 1, SS_FRAC);
 
@@ -110,9 +112,12 @@ fn validate_cooperation(v: &mut Validator) {
         "cooperation coexistence: both > 0",
         n_coop > 0.0 && n_cheat > 0.0,
     );
-    v.check_pass("cooperation cooperators persist", n_coop > 0.001);
+    v.check_pass(
+        "cooperation cooperators persist",
+        n_coop > tolerances::ODE_COOPERATOR_PERSIST_THRESHOLD,
+    );
 
-    let r_flat = cooperation::scenario_equal_start(&p2, DT);
+    let r_flat = cooperation::scenario_equal_start(&p2, tolerances::ODE_DEFAULT_DT);
     let n_coop_flat = steady_state_mean(&r_flat, 0, SS_FRAC);
     v.check(
         "cooperation flat vs direct bitwise",
@@ -148,9 +153,12 @@ fn validate_capacitor(v: &mut Validator) {
         tolerances::EXACT,
     );
 
-    let r = capacitor::scenario_normal(&p, DT);
+    let r = capacitor::scenario_normal(&p, tolerances::ODE_DEFAULT_DT);
     let n = steady_state_mean(&r, 0, SS_FRAC);
-    v.check_pass("capacitor cells grow", n > 0.01);
+    v.check_pass(
+        "capacitor cells grow",
+        n > tolerances::ODE_CELL_GROWTH_THRESHOLD,
+    );
 
     let vpsr = steady_state_mean(&r, 2, SS_FRAC);
     v.check_pass("capacitor VpsR accumulates", vpsr > 0.0);
@@ -162,7 +170,7 @@ fn validate_capacitor(v: &mut Validator) {
         biofilm > 0.0 || motility > 0.0,
     );
 
-    let r_flat = capacitor::scenario_normal(&p2, DT);
+    let r_flat = capacitor::scenario_normal(&p2, tolerances::ODE_DEFAULT_DT);
     let n_flat = steady_state_mean(&r_flat, 0, SS_FRAC);
     v.check(
         "capacitor flat vs direct bitwise",
@@ -253,7 +261,7 @@ fn validate_gbm(v: &mut Validator) {
 
     v.check_pass(
         "GBM different features → different raw_scores",
-        (p_a[0].raw_score - p_b[0].raw_score).abs() > 1e-15,
+        (p_a[0].raw_score - p_b[0].raw_score).abs() > tolerances::EXACT_F64,
     );
 
     print_timing("gbm", t0);
@@ -316,7 +324,7 @@ fn validate_signal(v: &mut Validator) {
 
     let params = PeakParams {
         min_height: Some(0.1),
-        min_prominence: Some(0.05),
+        min_prominence: Some(tolerances::PEAK_MIN_PROMINENCE),
         distance: 3,
         ..PeakParams::default()
     };

@@ -28,6 +28,9 @@
 //! | Date | 2026-02-27 |
 //! | Commit | wetSpring Phase 67 |
 //! | Command | `cargo run --release --bin validate_dispatch_evolution_v67` |
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use wetspring_forge::bridge;
 use wetspring_forge::dispatch::{self, Workload};

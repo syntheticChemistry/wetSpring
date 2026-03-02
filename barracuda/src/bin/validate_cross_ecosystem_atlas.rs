@@ -18,6 +18,9 @@
 //! | Date        | 2026-02-23 |
 //! | GPU prims   | anderson_hamiltonian, anderson_2d, anderson_3d, lanczos, level_spacing_ratio |
 //! | Command     | `cargo test --bin validate_cross_ecosystem_atlas -- --nocapture` |
+//!
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::bio::ncbi_data;

@@ -103,3 +103,37 @@ pub const EIC_TRAPEZOID: f64 = 0.01;
 /// Calibrated: Exp010 (peak detection).
 /// Script: `generate_peak_baselines.py`. Commit `48fb787`.
 pub const PEAK_HEIGHT_REL: f64 = 0.01;
+
+/// Minimum prominence for peak detection (Gaussian/Lorentzian).
+///
+/// Peaks with prominence below this are filtered. 0.05 (5% of typical
+/// signal range) distinguishes true peaks from noise in synthetic
+/// validation signals.
+/// Validated: Exp102 (`BarraCuda` CPU v8 signal module).
+pub const PEAK_MIN_PROMINENCE: f64 = 0.05;
+
+// ═══════════════════════════════════════════════════════════════════
+// PFAS / m/z search
+// ═══════════════════════════════════════════════════════════════════
+
+/// m/z exact match tolerance after tolerance search.
+///
+/// When `find_within_ppm` or `find_within_da` returns indices, the
+/// matched mass should equal the query within this tolerance (exact
+/// mass comparison). 1e-6 Da covers f64 rounding at typical PFAS m/z.
+/// Validated: Exp018 (PFAS library validation).
+pub const MZ_SEARCH_EXACT: f64 = 1e-6;
+
+/// m/z relaxed match for edge-case validation.
+///
+/// For ppm-window boundary tests (e.g. 4.9 ppm shift at 5 ppm window),
+/// slightly relaxed tolerance accounts for binning at search boundaries.
+/// Validated: Exp018 (tolerance edge cases).
+pub const MZ_SEARCH_RELAXED: f64 = 1e-4;
+
+/// CF₂ homologue spacing validation tolerance (Da).
+///
+/// PFCA/PFSA adjacent members differ by ~49.997 Da (CF₂). Mean spacing
+/// from library should match within 0.01 Da for correct series detection.
+/// Validated: Exp018 (cross-series discrimination).
+pub const CF2_SPACING_TOL: f64 = 0.01;

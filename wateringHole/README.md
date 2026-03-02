@@ -9,7 +9,12 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V88** | `handoffs/WETSPRING_TOADSTOOL_V88_EXPERIMENT_BUILDOUT_HANDOFF_MAR02_2026.md` | Mar 2 | **current** — full experiment buildout (Exp263-270, 427 checks), barracuda API deep dive (FitResult, spectral chain, graph_laplacian, dispatch routing), 6 absorption targets, mixed-hardware NUCLEUS dispatch proven |
+| **V92C** | `handoffs/WETSPRING_TOADSTOOL_V92C_DEEP_AUDIT_HANDOFF_MAR02_2026.md` | Mar 2 | Deep audit & GPU test evolution |
+| **V92B** | `handoffs/WETSPRING_GONZALES_REPRO_V92B_HANDOFF_MAR02_2026.md` | Mar 2 | Gonzales repro handoff |
+| **V92** | `handoffs/WETSPRING_IMMUNO_ANDERSON_V92_HANDOFF_MAR02_2026.md` | Mar 2 | Immuno Anderson handoff |
+| **V91** | `handoffs/WETSPRING_DEEP_DEBT_V91_HANDOFF_MAR02_2026.md` | Mar 2 | Deep debt handoff |
+| **V90** | `handoffs/WETSPRING_BIO_BRAIN_V90_CROSS_SPRING_HANDOFF_MAR02_2026.md` | Mar 2 | Bio Brain cross-spring handoff |
+| **V89** | `handoffs/WETSPRING_TOADSTOOL_V89_S79_REALIGNMENT_HANDOFF_MAR02_2026.md` | Mar 2 | ToadStool S79 realignment handoff |
 
 ## NestGate Handoffs
 
@@ -25,7 +30,7 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` (V7-V87, API report, rewire, cross-spring provenance, NestGate data types — 71 files).
+Superseded handoffs in `handoffs/archive/` (V7-V87, API report, rewire, cross-spring provenance, NestGate data types — 72 files).
 
 ## Convention
 

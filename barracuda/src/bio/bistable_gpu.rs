@@ -179,3 +179,50 @@ impl BistableGpu {
             .collect())
     }
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::type_complexity,
+    clippy::manual_let_else
+)]
+mod tests {
+    use super::*;
+    use crate::gpu::GpuF64;
+
+    #[test]
+    fn api_surface_compiles() {
+        fn _assert_config(_: &BistableOdeConfig) {}
+        let _: fn(
+            &BistableGpu,
+            &BistableOdeConfig,
+            &[f64],
+            &[f64],
+        ) -> crate::error::Result<Vec<f64>> = BistableGpu::integrate;
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let device = gpu.to_wgpu_device();
+        let bistable = BistableGpu::new(device).expect("BistableGpu::new");
+        let config = BistableOdeConfig {
+            n_batches: 1,
+            n_steps: 10,
+            h: 0.01,
+            t0: 0.0,
+            clamp_max: 1e6,
+            clamp_min: 0.0,
+        };
+        let initial_states = [0.5, 0.5, 0.0, 0.0, 0.0];
+        let batch_params = super::super::bistable::BistableParams::default().to_flat();
+        let result = bistable.integrate(&config, &initial_states, &batch_params);
+        assert!(result.is_ok(), "integrate should succeed with valid input");
+    }
+}

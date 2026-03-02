@@ -16,6 +16,9 @@
 //! | Date | 2026-02-19 |
 //! | Exact command | `python3 scripts/rf_distance_baseline.py` |
 //! | Hardware | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04 |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::robinson_foulds::{rf_distance, rf_distance_normalized};
 use wetspring_barracuda::bio::unifrac::PhyloTree;

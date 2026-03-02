@@ -22,6 +22,9 @@
 //! Line 4: space-separated prominences (f64) — may be empty
 //!
 //! Run: `cargo run --bin validate_peaks`
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use std::path::Path;
 use wetspring_barracuda::bio::signal::{PeakParams, find_peaks};

@@ -171,3 +171,36 @@ impl RandomForestGpu {
         Ok(results)
     }
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
+mod tests {
+    use super::*;
+    use crate::bio::decision_tree::DecisionTree;
+    use crate::bio::random_forest::RandomForest;
+    use crate::gpu::GpuF64;
+
+    #[test]
+    fn api_surface_compiles() {
+        fn _assert_rf_gpu(_: &RandomForestGpu) {}
+        let _ = RandomForestGpu::new;
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn random_forest_gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let device = gpu.to_wgpu_device();
+        let rf_gpu = RandomForestGpu::new(&device);
+        let tree =
+            DecisionTree::from_arrays(&[-2], &[0.0], &[-1], &[-1], &[Some(0)], 2).expect("stump");
+        let forest = RandomForest::from_trees(vec![tree], 2).expect("forest");
+        let samples = vec![vec![1.0, 2.0]];
+        let result = rf_gpu.predict_batch(&forest, &samples);
+        assert!(result.is_ok(), "predict_batch should succeed");
+    }
+}

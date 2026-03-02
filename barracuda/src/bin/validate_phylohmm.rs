@@ -16,6 +16,9 @@
 //!
 //! Validates Rust HMM forward + Viterbi against Python baseline on a
 //! binary observation sequence derived from real gene tree RF distances.
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::hmm::{HmmModel, forward, viterbi};
 use wetspring_barracuda::tolerances;

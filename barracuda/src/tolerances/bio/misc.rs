@@ -171,3 +171,97 @@ pub const ASARI_CROSS_MATCH_PCT: f64 = 70.0;
 /// check passes when `range_pct >= 90%`.
 /// Validated: Exp009 (MT02 HILIC-pos, asari range 83–999 Da).
 pub const ASARI_MZ_RANGE_PCT: f64 = 10.0;
+
+// ═══════════════════════════════════════════════════════════════════
+// NMF / drug repurposing
+// ═══════════════════════════════════════════════════════════════════
+
+/// NMF convergence tolerance for KL-divergence objective.
+///
+/// Iteration stops when relative change in objective falls below this.
+/// KL-divergence NMF typically converges more slowly than Euclidean;
+/// 1e-4 balances accuracy with iteration count for drug-disease matrices.
+/// Validated: Exp267 (`ToadStool` Dispatch v3), Exp224 (Paper Math Control).
+pub const NMF_CONVERGENCE_KL: f64 = 1e-4;
+
+/// NMF convergence tolerance for Euclidean objective.
+///
+/// Tighter than [`NMF_CONVERGENCE_KL`] for Euclidean NMF (W·H ≈ V).
+/// Drug repurposing GEMM reconstruction and top-k ranking use this.
+/// Validated: Exp164 (GPU Drug Repurposing).
+pub const NMF_CONVERGENCE_EUCLIDEAN: f64 = 1e-6;
+
+/// Ridge regression default regularization (Tikhonov λ).
+///
+/// Common default for small-to-medium regression problems. Prevents
+/// overfitting when `n_features` ≈ `n_samples`. Used in `ToadStool` Dispatch
+/// and Paper Math Control ridge validation.
+pub const RIDGE_REGULARIZATION_DEFAULT: f64 = 0.01;
+
+/// Ridge regression small regularization for well-conditioned problems.
+///
+/// When design matrix is well-conditioned, smaller λ preserves
+/// coefficient accuracy. Used in Fajgenbaum NMF pathway scoring.
+pub const RIDGE_REGULARIZATION_SMALL: f64 = 1e-6;
+
+/// Ridge regression output tolerance vs analytical expectation.
+///
+/// Ridge weights and predictions vs known linear targets. Covers
+/// Cholesky solve rounding and matrix conditioning effects.
+/// Validated: Exp267, Exp224.
+pub const RIDGE_TEST_TOL: f64 = 1e-4;
+
+// ═══════════════════════════════════════════════════════════════════
+// Numerical differentiation / integration
+// ═══════════════════════════════════════════════════════════════════
+
+/// Numerical Hessian finite-difference step (central differences).
+///
+/// ε for O(ε²) central-difference quotient. Too small amplifies
+/// rounding; too large increases truncation error. 1e-5 is standard
+/// for magnitude-1 functions (e.g. x²+y² at (1,1)).
+/// Validated: Exp267 (Rosenbrock-style Hessian).
+pub const NUMERICAL_HESSIAN_EPSILON: f64 = 1e-5;
+
+/// Numerical Hessian output tolerance vs analytical second derivatives.
+///
+/// For f(x,y)=x²+y², H\[0,0\]=H\[1,1\]=2, H\[0,1\]=0. Finite-difference
+/// truncation and conditioning yield ~1e-4 absolute error.
+/// Validated: Exp267.
+pub const HESSIAN_TEST_TOL: f64 = 1e-4;
+
+// ═══════════════════════════════════════════════════════════════════
+// Knowledge graph / embedding
+// ═══════════════════════════════════════════════════════════════════
+
+/// Embedding norm floor for L2 normalization.
+///
+/// When ‖v‖ < this, skip normalization to avoid division by near-zero.
+/// `TransE` and KG embedding init use this to handle zero/negligible vectors.
+/// 1e-12 allows ~1e-6 relative error in subsequent dot products.
+pub const EMBEDDING_NORM_FLOOR: f64 = 1e-12;
+
+/// Knowledge graph Hits@10 minimum threshold.
+///
+/// Link prediction: Hits@10 must exceed 5% to beat random baseline.
+/// `TransE` on synthetic drug-disease KG typically achieves 20–40%.
+/// Validated: Exp161 (ROBOKOP KG embedding).
+pub const KNOWLEDGE_GRAPH_HITS10_FLOOR: f64 = 0.05;
+
+// ═══════════════════════════════════════════════════════════════════
+// ODE biological thresholds
+// ═══════════════════════════════════════════════════════════════════
+
+/// Cooperators persist threshold (Bruger & Waters 2018).
+///
+/// Steady-state cooperator count must exceed this to confirm coexistence.
+/// Below 0.001, cheaters have effectively dominated.
+/// Validated: Exp102 (`BarraCuda` CPU v8).
+pub const ODE_COOPERATOR_PERSIST_THRESHOLD: f64 = 0.001;
+
+/// Capacitor cell growth minimum (Mhatre 2020).
+///
+/// Steady-state cell count must exceed 0.01 to confirm phenotypic
+/// capacitor effect. Near-zero indicates failed growth.
+/// Validated: Exp102 (`BarraCuda` CPU v8).
+pub const ODE_CELL_GROWTH_THRESHOLD: f64 = 0.01;

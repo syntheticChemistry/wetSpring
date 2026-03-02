@@ -2,7 +2,7 @@
 
 **Date:** March 2, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 88 — 270 experiments, 7,083+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,249 tests, ToadStool S71+++ aligned (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances (full provenance), 0 unsafe code, 0 todo!/unimplemented!(), clippy pedantic CLEAN (both crates, ZERO warnings), V88 full experiment buildout (Exp263-270: CPU v20 + CPU↔GPU v7 + metalForge v12 + NUCLEUS v3 + ToadStool pure-math + mixed-HW dispatch + biomeOS graph), 52/52 papers, 50/50 three-tier, 95.86% line coverage
+**Status:** Phase 92C — 272 experiments, 7,220+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000, 73 cross-spring S79, 64 bio brain cross-spring, 157 immunological Anderson + 202 Gonzales reproductions — full three-tier), ALL PASS; 1,276 tests (with ipc+nautilus), 255 binaries (provenance headers on all), ToadStool S79 aligned (`f97fc2ae`), 93+ primitives consumed, 844 f64-canonical WGSL shaders (zero local), 103 named tolerances (full provenance), 0 unsafe code, 0 todo!/unimplemented!(), clippy pedantic CLEAN (both crates, ZERO warnings), V92C Paper 12: full three-tier immunological Anderson (Exp273-279: 157/157) + Gonzales paper reproductions (Exp280-286: 202/202), Track 5 Papers 53-58 reproduced from published data, all 58 papers now have experiments
 
 ---
 
@@ -42,7 +42,9 @@ All code is AGPL-3.0.
 | **V66 Audit + Dispatch** | — | cross | — | 209,212-215 | 239+ | Streaming I/O parity, CPU v12, dispatch evolution, NUCLEUS V8, CPU vs GPU v5 |
 | **V67 Experiment Buildout** | — | cross | — | 216-220 | 170+ | 47-domain CPU proof, Python-vs-Rust benchmark, 42-module GPU portability, unidirectional streaming, cross-substrate dispatch V67 + BandwidthTier, 11 extension papers → 50/50 three-tier |
 | **V88 Buildout** | — | cross | — | 263-270 | 427 | CPU v20, CPU↔GPU pure-math, metalForge v12, NUCLEUS v3, ToadStool dispatch v3, mixed-HW, biomeOS graph |
-| **Total** | | | **52** | | **7,083+** | |
+| **V89 S79 Rewire** | — | cross | — | 271 | 73 | Cross-spring S79 provenance: 13 domains, 6 springs, `MultiHeadBioEsn`, `SpectralAnalysis` IPC, ToadStool S79 deep rewire |
+| **V90 Bio Brain** | — | cross | — | 272 | 64 | hotSpring 4-layer brain → `BioBrain`, 36-head Gen2 → `BioHeadGroupDisagreement` + `AttentionState`, bingoCube/nautilus → `BioNautilusBrain`, 3 IPC methods, 7 domains, 7 springs |
+| **Total** | | | **52** | | **7,220+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -103,7 +105,7 @@ Every paper goes through the full evolution. Status across all 52 papers:
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
 | biomeOS IPC integration | JSON-RPC science primal, GPU-aware dispatch, Songbird registration | 321 checks (Exp203-208) |
-| Code quality audit | 95.86% line / 94.02% region / 95.40% fn, streaming I/O, 0 production mocks, ToadStool S70+++, barracuda always-on, `deny(missing_docs)`, zero unsafe code, clippy pedantic CLEAN, baseline manifest 51/51 | 1,223 tests |
+| Code quality audit | 95.86% line / 94.02% region / 95.40% fn, streaming I/O, 0 production mocks, ToadStool S70+++, barracuda always-on, `deny(missing_docs)`, zero unsafe code, clippy pedantic CLEAN, baseline manifest 51/51 | 1,276 tests |
 | V66 dispatch evolution | Forge dispatch routing (29 workloads), streaming topology (PCIe bypass), NUCLEUS Tower/Node/Nest model, absorption audit (0 local WGSL) | 49 checks (Exp213) |
 | V66 NUCLEUS V8 | IPC dispatch with V66 I/O evolution (byte-native FASTQ, bytemuck nanopore, streaming MS2), Nest metrics, CPU fallback parity, full pipeline chain | 49 checks (Exp214) |
 | **V84 pipeline buildout** | Paper→CPU→GPU→Streaming proven end-to-end: 32 papers, 26 CPU domains, 21 GPU domains, Python parity, 0.10ms streaming overhead | 172 checks (Exp251-255) |
@@ -281,7 +283,7 @@ Python baseline → BarraCuda CPU (27× faster, pure Rust) → BarraCuda GPU
 V66 deep audit: byte-native FASTQ I/O (eliminated UTF-8 assumptions), bytemuck
 nanopore bulk read (zero per-sample I/O), streaming APIs for mzML/MS2/FASTQ
 (`for_each_spectrum`, `for_each_record`), safe env handling (`temp_env` replacing
-unsafe `set_var`), tolerance centralization (92 named constants with provenance),
+unsafe `set_var`), tolerance centralization (103 named constants with provenance),
 `partial_cmp` → `total_cmp` migration (10 lib sites), 0 unsafe code, 0 production
 mocks. Dispatch evolution (Exp213) proves the metalForge infrastructure correctly
 handles all V66 workloads. NUCLEUS V8 (Exp214) proves the IPC layer preserves
@@ -302,7 +304,7 @@ NPU spectral triage Exp124) with SHA-256 provenance in BASELINE_MANIFEST.md.
 11 extension papers (Exp144-149, 152-156) promoted to three-tier by adding
 metalForge workload definitions (`ShaderOrigin::Absorbed`). BandwidthTier
 and ComputeDispatch from Barracuda wired into metalForge bridge/dispatch.
-50/50 three-tier papers. 229 experiments, 5,743+ checks, 1,148+ tests.
+50/50 three-tier papers. 272 experiments, 7,220+ checks, 1,276 tests.
 
 ## Open Data
 

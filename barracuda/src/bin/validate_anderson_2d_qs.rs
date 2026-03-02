@@ -24,6 +24,9 @@
 //! | Physics        | GOE `⟨r⟩ ≈ 0.5307`, Poisson `⟨r⟩ ≈ 0.3863` (Atas et al. PRL 2013) |
 //! | Thresholds     | `tolerances::ANDERSON_*` — bracket the GOE↔Poisson crossover |
 //! | Command        | `cargo run --features gpu --bin validate_anderson_2d_qs` |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;

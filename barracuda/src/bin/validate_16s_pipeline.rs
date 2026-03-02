@@ -24,6 +24,9 @@
 //! 3. **Taxonomy**: Known taxa are classified correctly with high confidence
 //! 4. **`UniFrac`**: Phylogeny-weighted distances match analytical expectations
 //! 5. **Pipeline integration**: Stages compose correctly end-to-end
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use std::collections::HashMap;
 use wetspring_barracuda::bio::chimera::{self, ChimeraParams};

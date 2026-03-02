@@ -26,6 +26,9 @@
 //! | Command       | `cargo run --features gpu --release --bin validate_metalforge_v59_science` |
 //! | Data          | Synthetic test vectors (self-contained) |
 //! | Tolerances    | `tolerances::GPU_CPU_F64` for cross-substrate parity |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use barracuda::spectral::{
     GOE_R, POISSON_R, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,

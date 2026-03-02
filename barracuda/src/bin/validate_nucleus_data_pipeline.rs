@@ -37,6 +37,9 @@
 //! |-------|-------|
 //! | Date | 2026-03-01 |
 //! | Command | `cargo run --release --bin validate_nucleus_data_pipeline` |
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixStream;

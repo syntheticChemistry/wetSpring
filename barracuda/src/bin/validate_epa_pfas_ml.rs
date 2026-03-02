@@ -16,6 +16,9 @@
 //!
 //! Validates decision tree classification of PFAS contamination levels
 //! using the Rust `DecisionTree` module.
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::decision_tree::DecisionTree;
 use wetspring_barracuda::validation::Validator;

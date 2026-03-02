@@ -22,6 +22,9 @@
 //! | Date        | 2026-02-24 |
 //! | Phase       | 39 — Paper queue extension |
 //! | Paper       | 35 (npj Biofilms 2021) |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas and algorithmic invariants
 
 use wetspring_barracuda::validation::Validator;
 

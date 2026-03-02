@@ -29,6 +29,9 @@
 //! | NMF tol     | 1e-6 convergence (multiplicative update stopping criterion) |
 //! | Command     | `cargo run --bin validate_nmf_drug_repurposing` |
 //! | Tolerances  | Structural only — convergence, non-negativity, ranking |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 use wetspring_barracuda::validation::Validator;

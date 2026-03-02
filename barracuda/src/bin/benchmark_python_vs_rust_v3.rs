@@ -38,6 +38,7 @@
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, dnds, hmm, kmer, pcoa};
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 struct ParityBench {
@@ -82,14 +83,14 @@ fn main() {
         "Shannon: barracuda ≡ analytical",
         actual_h,
         expected_h,
-        1e-12,
+        tolerances::ANALYTICAL_F64,
     );
     benches.push(ParityBench {
         domain: "Shannon H'",
         python_equiv: "skbio.diversity.alpha.shannon",
         expected: expected_h,
         actual: actual_h,
-        tolerance: 1e-12,
+        tolerance: tolerances::ANALYTICAL_F64,
         rust_us: us,
         workload: "100 taxa × 10k iters",
     });
@@ -115,14 +116,14 @@ fn main() {
         "Simpson: barracuda ≡ analytical",
         actual_si,
         expected_si,
-        1e-14,
+        tolerances::PYTHON_PARITY_TIGHT,
     );
     benches.push(ParityBench {
         domain: "Simpson D",
         python_equiv: "skbio.diversity.alpha.simpson",
         expected: expected_si,
         actual: actual_si,
-        tolerance: 1e-14,
+        tolerance: tolerances::PYTHON_PARITY_TIGHT,
         rust_us: us,
         workload: "100 taxa × 10k iters",
     });
@@ -158,14 +159,14 @@ fn main() {
         "Bray-Curtis: barracuda ≡ analytical",
         actual_bc,
         expected_bc,
-        1e-14,
+        tolerances::PYTHON_PARITY_TIGHT,
     );
     benches.push(ParityBench {
         domain: "Bray-Curtis",
         python_equiv: "scipy.spatial.distance.braycurtis",
         expected: expected_bc,
         actual: actual_bc,
-        tolerance: 1e-14,
+        tolerance: tolerances::PYTHON_PARITY_TIGHT,
         rust_us: us,
         workload: "200 features × 10k iters",
     });
@@ -194,7 +195,7 @@ fn main() {
         python_equiv: "scipy.stats.pearsonr",
         expected: 1.0,
         actual: actual_r,
-        tolerance: 0.001,
+        tolerance: tolerances::ODE_METHOD_PARITY,
         rust_us: us,
         workload: "500 pairs × 10k iters",
     });
@@ -213,13 +214,18 @@ fn main() {
     }
     let us = t.elapsed().as_micros();
 
-    v.check("erf(1): barracuda ≡ scipy", actual_erf, expected_erf, 1e-6);
+    v.check(
+        "erf(1): barracuda ≡ scipy",
+        actual_erf,
+        expected_erf,
+        tolerances::ERF_PARITY,
+    );
     benches.push(ParityBench {
         domain: "erf(1)",
         python_equiv: "scipy.special.erf",
         expected: expected_erf,
         actual: actual_erf,
-        tolerance: 1e-6,
+        tolerance: tolerances::ERF_PARITY,
         rust_us: us,
         workload: "erf(1.0) × 1M iters",
     });
@@ -236,13 +242,13 @@ fn main() {
     }
     let us = t.elapsed().as_micros();
 
-    v.check("Φ(0) ≡ 0.5", actual_cdf, 0.5, 1e-15);
+    v.check("Φ(0) ≡ 0.5", actual_cdf, 0.5, tolerances::EXACT_F64);
     benches.push(ParityBench {
         domain: "norm_cdf(0)",
         python_equiv: "scipy.stats.norm.cdf",
         expected: 0.5,
         actual: actual_cdf,
-        tolerance: 1e-15,
+        tolerance: tolerances::EXACT_F64,
         rust_us: us,
         workload: "Φ(0) × 1M iters",
     });
@@ -270,7 +276,7 @@ fn main() {
         "Bootstrap: estimate ≈ sample mean",
         ci.estimate,
         true_mean,
-        0.01,
+        tolerances::EIC_TRAPEZOID,
     );
     v.check_pass(
         "Bootstrap: CI contains true mean",
@@ -282,7 +288,7 @@ fn main() {
         python_equiv: "scipy.stats.bootstrap",
         expected: true_mean,
         actual: ci.estimate,
-        tolerance: 0.01,
+        tolerance: tolerances::EIC_TRAPEZOID,
         rust_us: us,
         workload: "100 points × 10k resamples",
     });
@@ -303,7 +309,7 @@ fn main() {
         "Jackknife: estimate ≈ sample mean",
         jk.estimate,
         true_mean,
-        1e-12,
+        tolerances::ANALYTICAL_F64,
     );
     v.check_pass("Jackknife: SE > 0", jk.std_error > 0.0);
     benches.push(ParityBench {
@@ -311,7 +317,7 @@ fn main() {
         python_equiv: "astropy.stats.jackknife_stats",
         expected: true_mean,
         actual: jk.estimate,
-        tolerance: 1e-12,
+        tolerance: tolerances::ANALYTICAL_F64,
         rust_us: us,
         workload: "100 points × 1k iters",
     });
@@ -364,7 +370,7 @@ fn main() {
         python_equiv: "scipy.optimize.curve_fit",
         expected: 1.0,
         actual: fe.r_squared,
-        tolerance: 0.01,
+        tolerance: tolerances::EIC_TRAPEZOID,
         rust_us: us,
         workload: "50 points × 1k iters",
     });
@@ -381,13 +387,18 @@ fn main() {
     }
     let us = t.elapsed().as_micros();
 
-    v.check("Kimura neutral: P_fix = p₀ = 0.01", p_fix, 0.01, 1e-10);
+    v.check(
+        "Kimura neutral: P_fix = p₀ = 0.01",
+        p_fix,
+        0.01,
+        tolerances::PYTHON_PARITY,
+    );
     benches.push(ParityBench {
         domain: "Kimura Fixation",
         python_equiv: "analytical (no scipy equiv)",
         expected: 0.01,
         actual: p_fix,
-        tolerance: 1e-10,
+        tolerance: tolerances::PYTHON_PARITY,
         rust_us: us,
         workload: "N=1000, s=0 × 100k iters",
     });
@@ -460,7 +471,7 @@ fn main() {
         python_equiv: "skbio.stats.ordination.pcoa",
         expected: 1.0,
         actual: pc.proportion_explained.iter().sum::<f64>(),
-        tolerance: 0.01,
+        tolerance: tolerances::EIC_TRAPEZOID,
         rust_us: us,
         workload: "20 samples × 3 axes × 100 iters",
     });

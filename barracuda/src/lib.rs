@@ -70,6 +70,12 @@
 //! Python baseline → Rust validation (here) → GPU acceleration → sovereign pipeline
 //! ```
 
+/// This primal's canonical identifier — used for IPC, provenance, and metrics.
+pub const PRIMAL_NAME: &str = "wetspring";
+
+/// Key derivation context prefix — versioned for forward compatibility.
+pub const VAULT_KEY_CONTEXT: &str = "wetspring-vault-encryption-v1";
+
 pub mod bench;
 pub mod bio;
 pub mod df64_host;

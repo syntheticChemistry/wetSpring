@@ -25,6 +25,9 @@
 //!    retention indices; verify `bio::signal::find_peaks` detects all 7 A+R biomarkers
 //! 4. **Biomarker classification**: Separate A+R-only from A+R,A compounds
 //! 5. **Tolerance matching**: Use `bio::tolerance_search` for RI matching
+//!
+//! Validation class: Synthetic
+//! Provenance: Generated data with known statistical properties
 
 use std::path::Path;
 use wetspring_barracuda::bio::signal::{PeakParams, find_peaks};

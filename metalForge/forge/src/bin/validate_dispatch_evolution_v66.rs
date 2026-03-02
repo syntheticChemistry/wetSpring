@@ -27,6 +27,9 @@
 //! | Date | 2026-02-27 |
 //! | Commit | wetSpring Phase 66 |
 //! | Command | `cargo run --release --bin validate_dispatch_evolution_v66` |
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use wetspring_forge::dispatch::{self, Reason, Workload};
 use wetspring_forge::streaming::{PipelineStage, StreamingSession};

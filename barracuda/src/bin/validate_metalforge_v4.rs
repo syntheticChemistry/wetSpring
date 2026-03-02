@@ -23,6 +23,9 @@
 //! | Reference | Phage defense, bistable, multi-signal ODE domains |
 //! | Date | 2026-02-25 |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::bistable::{self, BistableParams};
@@ -89,7 +92,7 @@ async fn main() {
 
         let batch0 = &gpu_result[..4];
         for (i, (&g, &c)) in batch0.iter().zip(cpu_finals.iter()).enumerate() {
-            let denom = c.abs().max(g.abs()).max(1e-15);
+            let denom = c.abs().max(g.abs()).max(tolerances::MATRIX_EPS);
             v.check(
                 &format!("phage var {i}"),
                 (g - c).abs() / denom,
@@ -142,7 +145,7 @@ async fn main() {
         v.check_pass("outputs non-negative", all_positive);
 
         for (i, (&g, &c)) in batch0.iter().zip(cpu_finals.iter()).enumerate() {
-            let denom = c.abs().max(g.abs()).max(1e-15);
+            let denom = c.abs().max(g.abs()).max(tolerances::MATRIX_EPS);
             v.check(
                 &format!("bistable var {i}"),
                 (g - c).abs() / denom,
@@ -195,7 +198,7 @@ async fn main() {
         v.check_pass("outputs non-negative", all_positive);
 
         for (i, (&g, &c)) in batch0.iter().zip(cpu_finals.iter()).enumerate() {
-            let denom = c.abs().max(g.abs()).max(1e-15);
+            let denom = c.abs().max(g.abs()).max(tolerances::MATRIX_EPS);
             v.check(
                 &format!("multi_signal var {i}"),
                 (g - c).abs() / denom,
@@ -316,7 +319,10 @@ async fn main() {
 
 fn all_batches_match(results: &[f64], n_vars: usize) -> bool {
     let batch0 = &results[..n_vars];
-    results
-        .chunks(n_vars)
-        .all(|chunk| chunk.iter().zip(batch0).all(|(a, b)| (a - b).abs() < 1e-10))
+    results.chunks(n_vars).all(|chunk| {
+        chunk
+            .iter()
+            .zip(batch0)
+            .all(|(a, b)| (a - b).abs() < tolerances::PYTHON_PARITY)
+    })
 }

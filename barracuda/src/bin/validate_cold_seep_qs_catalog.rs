@@ -27,6 +27,9 @@
 //! | Reference | Microbiome 2025 — Diverse QS systems in deep-sea cold seeps |
 //! | Date | 2026-02-25 |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use wetspring_barracuda::validation::Validator;
 

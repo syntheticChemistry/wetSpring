@@ -77,3 +77,39 @@ pub fn distance_matrix_batch_gpu(gpu: &GpuF64, alignments: &[Vec<&[u8]>]) -> Res
     require_f64(gpu)?;
     Ok(neighbor_joining::distance_matrix_batch(alignments))
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::type_complexity,
+    clippy::manual_let_else
+)]
+mod tests {
+    use super::*;
+    use crate::gpu::GpuF64;
+
+    #[test]
+    fn api_surface_compiles() {
+        let _: fn(&GpuF64, &[&[u8]]) -> Result<Vec<f64>> = distance_matrix_gpu;
+        let _: fn(&GpuF64, &[Vec<&[u8]>]) -> Result<Vec<Vec<f64>>> = distance_matrix_batch_gpu;
+        // neighbor_joining_gpu has impl AsRef<str> — verified in gpu_signature_check
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let dist = vec![0.0, 0.5, 0.0];
+        let labels = ["a", "b", "c"];
+        let result = neighbor_joining_gpu(&gpu, &dist, &labels);
+        assert!(
+            result.is_ok(),
+            "neighbor_joining_gpu should succeed with valid input"
+        );
+    }
+}

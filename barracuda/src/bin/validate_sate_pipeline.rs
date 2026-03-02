@@ -15,6 +15,9 @@
 //!
 //! Validates that the Rust NJ → SW → distance pipeline matches Python
 //! baseline on synthetic 16S-like sequences at 5, 8, and 12 taxa.
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use wetspring_barracuda::bio::alignment::{ScoringParams, smith_waterman_score};
 use wetspring_barracuda::bio::neighbor_joining::{
@@ -120,7 +123,7 @@ fn main() {
     let dmat_match = dmat
         .iter()
         .zip(dmat2.iter())
-        .all(|(a, b)| (a - b).abs() < 1e-15);
+        .all(|(a, b)| (a - b).abs() < tolerances::EXACT_F64);
     v.check_count("distance_matrix deterministic", usize::from(dmat_match), 1);
     let sw1 = smith_waterman_score(SEQ_T0, SEQ_T3, &params);
     let sw2 = smith_waterman_score(SEQ_T0, SEQ_T3, &params);

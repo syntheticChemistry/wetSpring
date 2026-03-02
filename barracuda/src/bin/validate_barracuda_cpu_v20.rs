@@ -18,7 +18,7 @@
 //! - D27: Vault Provenance Chain (BLAKE3 Merkle chain, tamper detection)
 //! - D28: Vault Consent Protocol (scope hierarchy, revocation, expiry)
 //! - D29: Vault Encrypted Storage (ChaCha20-Poly1305, key rejection)
-//! - D30: DF64 Pack/Unpack (host-side double-float, try_unpack_slice)
+//! - D30: DF64 Pack/Unpack (host-side double-float, `try_unpack_slice`)
 //! - D31: Encoding Sovereignty (base64 encode/decode, RFC 4648)
 //! - D32: Tolerance Registry (97 named constants, hierarchy validation)
 //!
@@ -33,6 +33,9 @@
 //! | Provenance type | Analytical (cryptographic + mathematical invariants) |
 //! | Date | 2026-03-01 |
 //! | Command | `cargo run --release --bin validate_barracuda_cpu_v20` |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use std::time::{Duration, Instant};
 

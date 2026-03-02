@@ -42,6 +42,9 @@
 //! | Date | 2026-03-01 |
 //! | ToadStool | S70+++ (`1dd7e338`) |
 //! | Command | `cargo run --features gpu --bin validate_barracuda_gpu_v10` |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use std::sync::Arc;
 use std::time::Instant;
@@ -185,7 +188,7 @@ fn main() {
         let changed = freq_in
             .iter()
             .zip(freq_out.iter())
-            .filter(|&(a, b)| (a - b).abs() > 1e-15)
+            .filter(|&(a, b)| (a - b).abs() > tolerances::EXACT_F64)
             .count();
         v.check_pass("WF: drift occurred", changed > 0);
         println!(

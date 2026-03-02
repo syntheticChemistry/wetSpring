@@ -21,6 +21,9 @@
 //! | Phase       | 39 — Drug repurposing track |
 //! | Paper       | 42 (Gao et al. 2020, PMC7153111) |
 //! | Command     | `cargo test --bin validate_repodb_nmf -- --nocapture` |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas and algorithmic invariants
 
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 use wetspring_barracuda::validation::Validator;

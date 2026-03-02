@@ -25,6 +25,9 @@
 //! | Exact command | `cargo run --release --features gpu --bin validate_substrate_router` |
 //! | Data | Synthetic test vectors (self-contained) |
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, AKD1000 NPU, Pop!\_OS 22.04 |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use std::fmt;
 use std::time::Instant;

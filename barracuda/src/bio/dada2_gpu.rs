@@ -397,3 +397,49 @@ fn build_asvs(seqs: &[&UniqueSequence], partition: &[usize], centers: &[usize]) 
     asvs.sort_by(|a, b| b.abundance.cmp(&a.abundance));
     asvs
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::manual_let_else,
+    clippy::used_underscore_items
+)]
+mod tests {
+    use super::*;
+    use crate::bio::derep::UniqueSequence;
+    use crate::gpu::GpuF64;
+    use std::sync::Arc;
+
+    #[test]
+    fn api_surface_compiles() {
+        fn _assert_dada2_gpu(_: &Dada2Gpu) {}
+        let _ = Dada2Gpu::new;
+        let _ = denoise_gpu;
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn dada2_gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let device: Arc<barracuda::device::WgpuDevice> = gpu.to_wgpu_device();
+        let engine = match Dada2Gpu::new(device) {
+            Ok(e) => e,
+            Err(_) => return,
+        };
+        let seqs = vec![UniqueSequence {
+            sequence: b"ACGT".to_vec(),
+            abundance: 1,
+            best_quality: 30.0,
+            representative_id: "test".to_string(),
+            representative_quality: vec![30, 30, 30, 30],
+        }];
+        let params = Dada2Params::default();
+        let result = denoise_gpu(&engine, &seqs, &params);
+        assert!(result.is_ok(), "denoise_gpu should succeed");
+    }
+}

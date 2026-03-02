@@ -1,8 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! JSON-RPC method handlers for science capabilities.
-//!
-//! Each handler maps a method + params to barracuda library calls.
-//! The dispatch layer in `dispatch.rs` routes method names here.
+//! Science IPC handlers — diversity, QS model, Anderson, NCBI, full pipeline.
 
 use serde_json::{Value, json};
 
@@ -11,63 +8,12 @@ use crate::bio::qs_biofilm::{self, N_PARAMS, QsBiofilmParams};
 use crate::ipc::protocol::RpcError;
 
 #[cfg(feature = "gpu")]
-use std::sync::OnceLock;
-
-#[cfg(feature = "gpu")]
 use crate::bio::diversity_gpu;
-#[cfg(feature = "gpu")]
-use crate::gpu::GpuF64;
+
+use super::{extract_f64_array, extract_string_array};
 
 #[cfg(feature = "gpu")]
-static GPU_CTX: OnceLock<Option<GpuF64>> = OnceLock::new();
-
-#[cfg(feature = "gpu")]
-fn try_gpu() -> Option<&'static GpuF64> {
-    GPU_CTX
-        .get_or_init(|| {
-            let rt = tokio::runtime::Builder::new_current_thread()
-                .enable_all()
-                .build()
-                .ok()?;
-            rt.block_on(GpuF64::new()).ok()
-        })
-        .as_ref()
-        .filter(|g| !g.is_lost())
-}
-
-/// Health/readiness probe.
-pub fn handle_health() -> Result<Value, RpcError> {
-    #![allow(clippy::unnecessary_wraps)]
-
-    #[cfg(feature = "gpu")]
-    let substrate = if try_gpu().is_some() {
-        "gpu"
-    } else if GPU_CTX
-        .get()
-        .is_some_and(|g| g.as_ref().is_some_and(GpuF64::is_lost))
-    {
-        "gpu_lost"
-    } else {
-        "cpu"
-    };
-    #[cfg(not(feature = "gpu"))]
-    let substrate = "cpu";
-
-    Ok(json!({
-        "status": "healthy",
-        "primal": "wetspring",
-        "version": env!("CARGO_PKG_VERSION"),
-        "substrate": substrate,
-        "capabilities": [
-            "science.diversity",
-            "science.anderson",
-            "science.qs_model",
-            "science.ncbi_fetch",
-            "science.full_pipeline",
-            "metrics.snapshot",
-        ],
-    }))
-}
+use super::try_gpu;
 
 /// Alpha diversity metrics (Shannon, Simpson, Chao1, etc.).
 pub fn handle_diversity(params: &Value) -> Result<Value, RpcError> {
@@ -84,20 +30,54 @@ pub fn handle_diversity(params: &Value) -> Result<Value, RpcError> {
     #[cfg(feature = "gpu")]
     let use_gpu = try_gpu().filter(|g| counts.len() >= g.dispatch_threshold());
 
-    #[cfg(feature = "gpu")]
-    {
-        insert_shannon_if_requested(&mut result, compute_all, &metrics, &counts, use_gpu);
-        insert_simpson_if_requested(&mut result, compute_all, &metrics, &counts, use_gpu);
-        insert_observed_if_requested(&mut result, compute_all, &metrics, &counts, use_gpu);
-        insert_pielou_if_requested(&mut result, compute_all, &metrics, &counts, use_gpu);
-    }
-    #[cfg(not(feature = "gpu"))]
-    {
-        insert_shannon_if_requested(&mut result, compute_all, &metrics, &counts);
-        insert_simpson_if_requested(&mut result, compute_all, &metrics, &counts);
-        insert_observed_if_requested(&mut result, compute_all, &metrics, &counts);
-        insert_pielou_if_requested(&mut result, compute_all, &metrics, &counts);
-    }
+    insert_metric_if_requested(
+        &mut result,
+        compute_all,
+        &metrics,
+        "shannon",
+        &counts,
+        diversity::shannon,
+        #[cfg(feature = "gpu")]
+        |g, c| diversity_gpu::shannon_gpu(g, c).ok(),
+        #[cfg(feature = "gpu")]
+        use_gpu,
+    );
+    insert_metric_if_requested(
+        &mut result,
+        compute_all,
+        &metrics,
+        "simpson",
+        &counts,
+        diversity::simpson,
+        #[cfg(feature = "gpu")]
+        |g, c| diversity_gpu::simpson_gpu(g, c).ok(),
+        #[cfg(feature = "gpu")]
+        use_gpu,
+    );
+    insert_metric_if_requested(
+        &mut result,
+        compute_all,
+        &metrics,
+        "observed",
+        &counts,
+        diversity::observed_features,
+        #[cfg(feature = "gpu")]
+        |g, c| diversity_gpu::observed_features_gpu(g, c).ok(),
+        #[cfg(feature = "gpu")]
+        use_gpu,
+    );
+    insert_metric_if_requested(
+        &mut result,
+        compute_all,
+        &metrics,
+        "pielou",
+        &counts,
+        diversity::pielou_evenness,
+        #[cfg(feature = "gpu")]
+        |g, c| diversity_gpu::pielou_evenness_gpu(g, c).ok(),
+        #[cfg(feature = "gpu")]
+        use_gpu,
+    );
     insert_chao1_if_requested(&mut result, compute_all, &metrics, &counts);
     insert_bray_curtis_if_present(&mut result, params, &counts);
 
@@ -110,64 +90,40 @@ pub fn handle_diversity(params: &Value) -> Result<Value, RpcError> {
     Ok(Value::Object(result))
 }
 
+/// Unified metric insertion — eliminates GPU/CPU cfg duplication.
 #[cfg(feature = "gpu")]
-fn insert_shannon_if_requested(
+fn insert_metric_if_requested(
     result: &mut serde_json::Map<String, Value>,
     compute_all: bool,
     metrics: &[String],
+    name: &str,
     counts: &[f64],
-    use_gpu: Option<&'static GpuF64>,
+    cpu_fn: fn(&[f64]) -> f64,
+    gpu_fn: impl FnOnce(&crate::gpu::GpuF64, &[f64]) -> Option<f64>,
+    use_gpu: Option<&'static crate::gpu::GpuF64>,
 ) {
-    if !compute_all && !metrics.iter().any(|m| m == "shannon") {
+    if !compute_all && !metrics.iter().any(|m| m == name) {
         return;
     }
     let val = use_gpu
-        .and_then(|g| diversity_gpu::shannon_gpu(g, counts).ok())
-        .unwrap_or_else(|| diversity::shannon(counts));
-    result.insert("shannon".into(), json!(val));
+        .and_then(|g| gpu_fn(g, counts))
+        .unwrap_or_else(|| cpu_fn(counts));
+    result.insert(name.into(), json!(val));
 }
 
 #[cfg(not(feature = "gpu"))]
-fn insert_shannon_if_requested(
+fn insert_metric_if_requested(
     result: &mut serde_json::Map<String, Value>,
     compute_all: bool,
     metrics: &[String],
+    name: &str,
     counts: &[f64],
+    cpu_fn: fn(&[f64]) -> f64,
 ) {
-    if !compute_all && !metrics.iter().any(|m| m == "shannon") {
+    if !compute_all && !metrics.iter().any(|m| m == name) {
         return;
     }
-    result.insert("shannon".into(), json!(diversity::shannon(counts)));
-}
-
-#[cfg(feature = "gpu")]
-fn insert_simpson_if_requested(
-    result: &mut serde_json::Map<String, Value>,
-    compute_all: bool,
-    metrics: &[String],
-    counts: &[f64],
-    use_gpu: Option<&'static GpuF64>,
-) {
-    if !compute_all && !metrics.iter().any(|m| m == "simpson") {
-        return;
-    }
-    let val = use_gpu
-        .and_then(|g| diversity_gpu::simpson_gpu(g, counts).ok())
-        .unwrap_or_else(|| diversity::simpson(counts));
-    result.insert("simpson".into(), json!(val));
-}
-
-#[cfg(not(feature = "gpu"))]
-fn insert_simpson_if_requested(
-    result: &mut serde_json::Map<String, Value>,
-    compute_all: bool,
-    metrics: &[String],
-    counts: &[f64],
-) {
-    if !compute_all && !metrics.iter().any(|m| m == "simpson") {
-        return;
-    }
-    result.insert("simpson".into(), json!(diversity::simpson(counts)));
+    result.insert(name.into(), json!(cpu_fn(counts)));
 }
 
 fn insert_chao1_if_requested(
@@ -180,69 +136,6 @@ fn insert_chao1_if_requested(
         return;
     }
     result.insert("chao1".into(), json!(diversity::chao1(counts)));
-}
-
-#[cfg(feature = "gpu")]
-fn insert_observed_if_requested(
-    result: &mut serde_json::Map<String, Value>,
-    compute_all: bool,
-    metrics: &[String],
-    counts: &[f64],
-    use_gpu: Option<&'static GpuF64>,
-) {
-    if !compute_all && !metrics.iter().any(|m| m == "observed") {
-        return;
-    }
-    let val = use_gpu
-        .and_then(|g| diversity_gpu::observed_features_gpu(g, counts).ok())
-        .unwrap_or_else(|| diversity::observed_features(counts));
-    result.insert("observed".into(), json!(val));
-}
-
-#[cfg(not(feature = "gpu"))]
-fn insert_observed_if_requested(
-    result: &mut serde_json::Map<String, Value>,
-    compute_all: bool,
-    metrics: &[String],
-    counts: &[f64],
-) {
-    if !compute_all && !metrics.iter().any(|m| m == "observed") {
-        return;
-    }
-    result.insert(
-        "observed".into(),
-        json!(diversity::observed_features(counts)),
-    );
-}
-
-#[cfg(feature = "gpu")]
-fn insert_pielou_if_requested(
-    result: &mut serde_json::Map<String, Value>,
-    compute_all: bool,
-    metrics: &[String],
-    counts: &[f64],
-    use_gpu: Option<&'static GpuF64>,
-) {
-    if !compute_all && !metrics.iter().any(|m| m == "pielou") {
-        return;
-    }
-    let val = use_gpu
-        .and_then(|g| diversity_gpu::pielou_evenness_gpu(g, counts).ok())
-        .unwrap_or_else(|| diversity::pielou_evenness(counts));
-    result.insert("pielou".into(), json!(val));
-}
-
-#[cfg(not(feature = "gpu"))]
-fn insert_pielou_if_requested(
-    result: &mut serde_json::Map<String, Value>,
-    compute_all: bool,
-    metrics: &[String],
-    counts: &[f64],
-) {
-    if !compute_all && !metrics.iter().any(|m| m == "pielou") {
-        return;
-    }
-    result.insert("pielou".into(), json!(diversity::pielou_evenness(counts)));
 }
 
 fn insert_bray_curtis_if_present(
@@ -325,7 +218,6 @@ pub fn handle_ncbi_fetch(params: &Value) -> Result<Value, RpcError> {
         .or_else(crate::ncbi::api_key)
         .unwrap_or_default();
 
-    // Three-tier routing: biomeOS → NestGate → sovereign HTTP
     crate::ncbi::nestgate::fetch_tiered(db, id, &api_key)
         .map(|fasta| {
             let source = if crate::ncbi::nestgate::discover_biomeos_socket().is_some() {
@@ -357,7 +249,8 @@ pub fn handle_anderson(params: &Value) -> Result<Value, RpcError> {
     #[cfg(feature = "gpu")]
     {
         use barracuda::spectral::{
-            GOE_R, POISSON_R, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
+            GOE_R, POISSON_R, SpectralAnalysis, anderson_3d, lanczos, lanczos_eigenvalues,
+            level_spacing_ratio,
         };
 
         let l_raw = params
@@ -383,6 +276,9 @@ pub fn handle_anderson(params: &Value) -> Result<Value, RpcError> {
             "localized"
         };
 
+        let gamma = 1.0_f64;
+        let analysis = SpectralAnalysis::from_eigenvalues(eigs, gamma);
+
         Ok(json!({
             "status": "computed",
             "substrate": "gpu",
@@ -393,6 +289,10 @@ pub fn handle_anderson(params: &Value) -> Result<Value, RpcError> {
             "regime": regime,
             "goe_r": GOE_R,
             "poisson_r": POISSON_R,
+            "spectral_bandwidth": analysis.bandwidth,
+            "spectral_condition_number": analysis.condition_number,
+            "spectral_phase": format!("{:?}", analysis.phase),
+            "marchenko_upper": analysis.marchenko_upper,
         }))
     }
 }
@@ -401,13 +301,11 @@ pub fn handle_anderson(params: &Value) -> Result<Value, RpcError> {
 pub fn handle_full_pipeline(params: &Value) -> Result<Value, RpcError> {
     let mut pipeline_result = serde_json::Map::new();
 
-    // Stage 1: Diversity (if counts provided)
     if params.get("counts").is_some_and(Value::is_array) {
         let diversity = handle_diversity(params)?;
         pipeline_result.insert("diversity".into(), diversity);
     }
 
-    // Stage 2: QS model
     let qs_params = if params.get("scenario").is_some() || params.get("dt").is_some() {
         params.clone()
     } else {
@@ -416,7 +314,6 @@ pub fn handle_full_pipeline(params: &Value) -> Result<Value, RpcError> {
     let qs_result = handle_qs_model(&qs_params)?;
     pipeline_result.insert("qs_model".into(), qs_result);
 
-    // Stage 3: Anderson (non-fatal if GPU unavailable)
     match handle_anderson(params) {
         Ok(anderson) => {
             pipeline_result.insert("anderson".into(), anderson);
@@ -431,33 +328,4 @@ pub fn handle_full_pipeline(params: &Value) -> Result<Value, RpcError> {
 
     pipeline_result.insert("pipeline".into(), json!("complete"));
     Ok(Value::Object(pipeline_result))
-}
-
-/// Extract an `f64` array from a JSON params object by key.
-///
-/// # Errors
-///
-/// Returns `RpcError::invalid_params` if the key is missing or the value is not an array.
-pub fn extract_f64_array(params: &Value, key: &str) -> Result<Vec<f64>, RpcError> {
-    let arr = params
-        .get(key)
-        .and_then(Value::as_array)
-        .ok_or_else(|| RpcError::invalid_params(format!("missing or invalid param: {key}")))?;
-
-    Ok(arr.iter().filter_map(Value::as_f64).collect())
-}
-
-/// Extract a string array from a JSON params object by key.
-/// Returns empty vec if key is missing.
-pub fn extract_string_array(params: &Value, key: &str) -> Vec<String> {
-    params
-        .get(key)
-        .and_then(Value::as_array)
-        .map(|arr| {
-            arr.iter()
-                .filter_map(Value::as_str)
-                .map(String::from)
-                .collect()
-        })
-        .unwrap_or_default()
 }

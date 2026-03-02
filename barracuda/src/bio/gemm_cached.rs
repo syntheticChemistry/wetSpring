@@ -232,3 +232,40 @@ impl GemmCached {
         (a_buf, b_buf, c_buf)
     }
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::type_complexity,
+    clippy::manual_let_else
+)]
+mod tests {
+    use super::*;
+    use crate::gpu::GpuF64;
+    use std::sync::Arc;
+
+    #[test]
+    fn api_surface_compiles() {
+        fn _assert_gemm_cached(_: &GemmCached) {}
+        let _: fn(&GemmCached, &[f64], &[f64], usize, usize, usize, usize) -> Result<Vec<f64>> =
+            GemmCached::execute;
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let device = gpu.to_wgpu_device();
+        let ctx = gpu.tensor_context().clone();
+        let gemm = GemmCached::new(Arc::clone(&device), ctx);
+        let a = vec![1.0; 4];
+        let b = vec![1.0; 4];
+        let result = gemm.execute(&a, &b, 2, 2, 2, 1);
+        assert!(result.is_ok(), "execute should succeed with valid input");
+    }
+}

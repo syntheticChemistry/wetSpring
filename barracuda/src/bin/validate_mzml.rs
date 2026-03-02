@@ -19,6 +19,9 @@
 //! - ~6,256 MS1 spectra total (all centroid)
 //! - m/z range ~80–1000, 64-bit float + zlib compressed
 //! - ~6M total decoded peaks
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use std::path::PathBuf;
 use wetspring_barracuda::io::mzml;

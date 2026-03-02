@@ -11,6 +11,9 @@
 //! | Date | 2026-02-20 |
 //! | Exact command | `python3 scripts/mhatre2020_capacitor.py` |
 //! | Hardware | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04 |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::capacitor::{
     CapacitorParams, scenario_low_cdg, scenario_normal, scenario_stress, scenario_vpsr_knockout,

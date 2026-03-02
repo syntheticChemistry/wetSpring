@@ -34,6 +34,9 @@
 //! - `bio::feature_table::extract_features` — end-to-end feature extraction
 //!
 //! Run: `cargo run --bin validate_features`
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use std::path::Path;
 use wetspring_barracuda::bio::eic;

@@ -36,6 +36,9 @@
 //! |-------|-------|
 //! | Date | 2026-03-01 |
 //! | Command | `cargo run --release --bin validate_paper_math_control_v3` |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use wetspring_barracuda::bio::{
     diversity, dnds, felsenstein, gillespie, hmm, kmer, neighbor_joining, phage_defense,

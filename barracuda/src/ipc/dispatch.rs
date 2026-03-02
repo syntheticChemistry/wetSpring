@@ -34,6 +34,9 @@ pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
         "science.ncbi_fetch" => handlers::handle_ncbi_fetch(params),
         "science.anderson" => handlers::handle_anderson(params),
         "science.full_pipeline" => handlers::handle_full_pipeline(params),
+        "brain.observe" => handlers::handle_brain_observe(params),
+        "brain.attention" => handlers::handle_brain_attention(params),
+        "brain.urgency" => handlers::handle_brain_urgency(params),
         _ => Err(RpcError::method_not_found(method)),
     }
 }
@@ -170,5 +173,67 @@ mod tests {
     fn extract_string_array_missing() {
         let arr = extract_string_array(&json!({}), "m");
         assert!(arr.is_empty());
+    }
+
+    #[test]
+    fn brain_observe_valid() {
+        let outputs: Vec<f64> = (0..36).map(|i| f64::from(i) * 0.01).collect();
+        let params = json!({
+            "sample_id": "test-s1",
+            "shannon": 3.2,
+            "simpson": 0.85,
+            "evenness": 0.7,
+            "chao1": 150.0,
+            "bray_curtis_mean": 0.4,
+            "anderson_w": 5.0,
+            "anderson_phase": 0.3,
+            "amr_load": 0.1,
+            "head_outputs": outputs,
+        });
+        let result = dispatch("brain.observe", &params).unwrap();
+        assert_eq!(result["status"], "observed");
+        assert_eq!(result["sample_id"], "test-s1");
+        assert!(result.get("attention").is_some());
+        assert!(result.get("urgency").is_some());
+        assert!(result["observation_count"].as_u64().unwrap() >= 1);
+    }
+
+    #[test]
+    fn brain_observe_insufficient_heads() {
+        let params = json!({
+            "shannon": 2.0,
+            "head_outputs": [0.1, 0.2],
+        });
+        let err = dispatch("brain.observe", &params).unwrap_err();
+        assert_eq!(err.code, -32602);
+    }
+
+    #[test]
+    fn brain_attention_no_prior() {
+        let result = dispatch("brain.attention", &json!({})).unwrap();
+        assert!(result.get("attention").is_some());
+        assert!(result.get("urgency").is_some());
+    }
+
+    #[test]
+    fn brain_urgency_no_prior() {
+        let result = dispatch("brain.urgency", &json!({})).unwrap();
+        let urgency = result["urgency"].as_f64().unwrap();
+        assert!(urgency >= 0.0);
+        assert!(result.get("attention").is_some());
+    }
+
+    #[test]
+    fn brain_observe_then_attention() {
+        let outputs: Vec<f64> = vec![0.5; 36];
+        let params = json!({
+            "sample_id": "seq-check",
+            "shannon": 4.0,
+            "head_outputs": outputs,
+        });
+        dispatch("brain.observe", &params).unwrap();
+
+        let att = dispatch("brain.attention", &json!({})).unwrap();
+        assert!(att["observation_count"].as_u64().unwrap() >= 1);
     }
 }

@@ -37,6 +37,9 @@
 //! | Data | Published diversity metrics and community analysis |
 //! | Track | Track 4 — No-Till Soil QS & Anderson Geometry |
 //! | Command | `cargo test --bin validate_tillage_microbiome_2025 -- --nocapture` |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas and algorithmic invariants
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;

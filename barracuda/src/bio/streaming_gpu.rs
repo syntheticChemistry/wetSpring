@@ -650,3 +650,37 @@ fn argmax_with_priors(scores: &[f64], log_priors: &[f64]) -> usize {
     }
     best_idx
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::type_complexity,
+    clippy::manual_let_else
+)]
+mod tests {
+    use super::*;
+    use crate::gpu::GpuF64;
+
+    #[test]
+    fn api_surface_compiles() {
+        fn _assert_session(_: &GpuPipelineSession) {}
+        fn _assert_alpha(_: &AlphaDiversity) {}
+        fn _assert_streaming_result(_: &StreamingGpuResult) {}
+        fn _assert_full_result(_: &FullStreamingResult) {}
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let session = GpuPipelineSession::new(&gpu).expect("GpuPipelineSession::new");
+        let counts = vec![1.0, 2.0, 3.0];
+        let result = session.shannon(&counts);
+        assert!(result.is_ok(), "shannon should succeed with valid input");
+    }
+}

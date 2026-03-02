@@ -10,6 +10,9 @@
 //! | Baseline commit | `e4358c5` |
 //! | Date | 2026-02-21 |
 //! | Exact command | `python3 scripts/felsenstein_pruning_baseline.py` |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::felsenstein::{
     TreeNode, encode_dna, jc69_prob, log_likelihood, site_log_likelihoods, transition_matrix,

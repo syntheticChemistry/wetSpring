@@ -139,3 +139,41 @@ impl HmmGpuForward {
         })
     }
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(clippy::expect_used, clippy::unwrap_used, clippy::manual_let_else)]
+mod tests {
+    use super::*;
+    use crate::gpu::GpuF64;
+
+    #[test]
+    fn api_surface_compiles() {
+        fn _assert_hmm_result(_: &HmmGpuResult) {}
+        let _ = HmmGpuForward::new;
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn hmm_gpu_forward_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let device = gpu.to_wgpu_device();
+        let hmm = match HmmGpuForward::new(&device) {
+            Ok(h) => h,
+            Err(_) => return,
+        };
+        let model = HmmModel {
+            n_states: 2,
+            log_pi: vec![0.5_f64.ln(), 0.5_f64.ln()],
+            log_trans: vec![0.9_f64.ln(), 0.1_f64.ln(), 0.1_f64.ln(), 0.9_f64.ln()],
+            n_symbols: 2,
+            log_emit: vec![0.9_f64.ln(), 0.1_f64.ln(), 0.1_f64.ln(), 0.9_f64.ln()],
+        };
+        let obs = vec![0u32, 1u32];
+        let result = hmm.forward_batch(&model, &obs, 1, 2);
+        assert!(result.is_ok(), "forward_batch should succeed");
+    }
+}

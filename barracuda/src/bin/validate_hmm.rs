@@ -11,6 +11,9 @@
 //! | Baseline output | `experiments/results/026_hmm/liu2014_hmm_python_baseline.json` |
 //! | Date | 2026-02-21 |
 //! | Exact command | `python3 scripts/liu2014_hmm_baseline.py` |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::hmm::{HmmModel, forward, posterior, viterbi};
 use wetspring_barracuda::tolerances;

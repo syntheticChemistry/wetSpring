@@ -87,3 +87,38 @@ pub fn find_peaks_batch_gpu(
         .map(|s| find_peaks_gpu(gpu, s, params))
         .collect()
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::type_complexity,
+    clippy::manual_let_else
+)]
+mod tests {
+    use super::*;
+    use crate::gpu::GpuF64;
+
+    #[test]
+    fn api_surface_compiles() {
+        let _: fn(&GpuF64, &[f64], &PeakParams) -> Result<Vec<Peak>> = find_peaks_gpu;
+        let _: fn(&GpuF64, &[&[f64]], &PeakParams) -> Result<Vec<Vec<Peak>>> = find_peaks_batch_gpu;
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let data: Vec<f64> = (0..64).map(f64::from).collect();
+        let params = PeakParams::default();
+        let result = find_peaks_gpu(&gpu, &data, &params);
+        assert!(
+            result.is_ok(),
+            "find_peaks_gpu should succeed with valid input"
+        );
+    }
+}

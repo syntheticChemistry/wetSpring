@@ -27,36 +27,12 @@ use std::time::Duration;
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(30);
 const RPC_TIMEOUT: Duration = Duration::from_secs(5);
 
-/// Default socket path under `XDG_RUNTIME_DIR` (`biomeos/songbird-default.sock`).
-const DEFAULT_SOCKET_PATH_XDG: &str = "biomeos/songbird-default.sock";
-/// Fallback socket filename when `XDG_RUNTIME_DIR` is unset (`songbird-default.sock`).
-const DEFAULT_SOCKET_PATH_FALLBACK: &str = "songbird-default.sock";
-
 /// Discover the Songbird Unix socket path.
 ///
 /// Returns `None` if no Songbird socket is found (standalone mode).
 #[must_use]
 pub fn discover_socket() -> Option<PathBuf> {
-    if let Ok(path) = std::env::var("SONGBIRD_SOCKET") {
-        let p = PathBuf::from(path);
-        if p.exists() {
-            return Some(p);
-        }
-    }
-
-    if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
-        let p = PathBuf::from(xdg).join(DEFAULT_SOCKET_PATH_XDG);
-        if p.exists() {
-            return Some(p);
-        }
-    }
-
-    let fallback = std::env::temp_dir().join(DEFAULT_SOCKET_PATH_FALLBACK);
-    if fallback.exists() {
-        return Some(fallback);
-    }
-
-    None
+    super::discover::discover_socket("SONGBIRD_SOCKET", "songbird")
 }
 
 /// Register wetSpring capabilities with Songbird.
@@ -70,8 +46,12 @@ pub fn discover_socket() -> Option<PathBuf> {
 pub fn register(songbird_socket: &Path, wetspring_socket: &Path) -> crate::error::Result<()> {
     let ws_path = wetspring_socket.display();
     let version = env!("CARGO_PKG_VERSION");
+    let primal = crate::PRIMAL_NAME;
+    let caps = super::handlers::CAPABILITIES;
+    let caps_json: Vec<String> = caps.iter().map(|c| format!("\"{c}\"")).collect();
+    let caps_str = caps_json.join(",");
     let request = format!(
-        r#"{{"jsonrpc":"2.0","method":"discovery.register","params":{{"primal":"wetspring","socket":"{ws_path}","capabilities":["science","biodiversity","spectral","metagenomics","qs_model"],"version":"{version}"}},"id":1}}"#,
+        r#"{{"jsonrpc":"2.0","method":"discovery.register","params":{{"primal":"{primal}","socket":"{ws_path}","capabilities":[{caps_str}],"version":"{version}"}},"id":1}}"#,
     );
 
     let response = rpc_call(songbird_socket, &request)?;
@@ -91,8 +71,11 @@ pub fn register(songbird_socket: &Path, wetspring_socket: &Path) -> crate::error
 ///
 /// Returns `Err` if Songbird is unreachable or the heartbeat is rejected.
 pub fn heartbeat(songbird_socket: &Path) -> crate::error::Result<()> {
-    let request = r#"{"jsonrpc":"2.0","method":"discovery.heartbeat","params":{"primal":"wetspring"},"id":2}"#;
-    let response = rpc_call(songbird_socket, request)?;
+    let primal = crate::PRIMAL_NAME;
+    let request = format!(
+        r#"{{"jsonrpc":"2.0","method":"discovery.heartbeat","params":{{"primal":"{primal}"}},"id":2}}"#
+    );
+    let response = rpc_call(songbird_socket, &request)?;
     if response.contains("\"error\"") {
         Err(crate::error::Error::Ipc(format!(
             "Songbird heartbeat failed: {}",

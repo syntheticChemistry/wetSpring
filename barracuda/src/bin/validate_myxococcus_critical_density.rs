@@ -23,6 +23,9 @@
 //! | Date        | 2026-02-24 |
 //! | Phase       | 39 — Paper queue extension |
 //! | Paper       | 37 (Rajagopalan et al. PNAS 2021) |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas and algorithmic invariants
 
 use wetspring_barracuda::validation::Validator;
 

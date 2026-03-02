@@ -39,12 +39,16 @@
 //! |-------|-------|
 //! | Date | 2026-03-01 |
 //! | Command | `cargo run --release --bin validate_nucleus_tower_node` |
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use std::path::PathBuf;
 use std::process::Command;
 use std::time::Instant;
 
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn main() {
@@ -173,7 +177,7 @@ fn main() {
     v.check_pass("IPC dispatch: Shannon computed", json_h > 0.0);
     v.check_pass(
         "IPC dispatch: bit-identical to direct",
-        (direct_h - json_h).abs() < 1e-15,
+        (direct_h - json_h).abs() < tolerances::EXACT_F64,
     );
     println!("  IPC dispatch:    {n_iterations}× Shannon on 200 taxa = {json_us:.2}µs/call");
     println!(

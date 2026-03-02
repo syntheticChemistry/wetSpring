@@ -37,6 +37,9 @@
 //! | Data | Model: synthetic communities at pore-size-dependent richness |
 //! | Track | Track 4 — No-Till Soil QS & Anderson Geometry |
 //! | Command | `cargo test --bin validate_soil_pore_diversity -- --nocapture` |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::diversity;

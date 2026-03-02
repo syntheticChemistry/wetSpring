@@ -35,6 +35,9 @@
 //! - **Substitution rate**: ~5% (1 in 20 bases)
 //! - **Seed**: 42 (even community), 100 (uneven community)
 //! - **Structure**: Conserved 5'/3' (20 bp each), variable middle, species-specific patterns
+//!
+//! Validation class: Synthetic
+//! Provenance: Generated data with known statistical properties
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;

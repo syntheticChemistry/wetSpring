@@ -28,6 +28,9 @@
 //! | Exact command | `cargo run --release --bin validate_spectral_cross_spring` |
 //! | Data | Synthetic (Anderson 1D/2D/3D Hamiltonians, Almost-Mathieu, no external data) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use barracuda::spectral::{
     GOE_R, POISSON_R, almost_mathieu_hamiltonian, anderson_2d, anderson_3d, anderson_hamiltonian,

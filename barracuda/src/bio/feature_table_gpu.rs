@@ -176,3 +176,40 @@ fn estimate_noise(intensity: &[f64]) -> f64 {
     let noise_slice = &sorted[..quarter.max(1)];
     noise_slice.iter().sum::<f64>() / noise_slice.len() as f64
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::type_complexity,
+    clippy::manual_let_else
+)]
+mod tests {
+    use super::*;
+    use crate::bio::feature_table::FeatureParams;
+    use crate::gpu::GpuF64;
+    use crate::io::mzml::MzmlSpectrum;
+
+    #[test]
+    fn api_surface_compiles() {
+        let _: fn(&GpuF64, &[MzmlSpectrum], &FeatureParams) -> Result<FeatureTable> =
+            extract_features_gpu;
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let spectra: Vec<MzmlSpectrum> = vec![];
+        let params = FeatureParams::default();
+        let result = extract_features_gpu(&gpu, &spectra, &params);
+        assert!(
+            result.is_ok(),
+            "extract_features_gpu should succeed with empty input"
+        );
+    }
+}

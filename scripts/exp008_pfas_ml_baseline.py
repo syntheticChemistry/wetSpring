@@ -203,7 +203,7 @@ def main():
 
     if not DATA_PATH.exists():
         print(f"\n  ERROR: Data not found at {DATA_PATH}")
-        print("  Run the download first (scripts/download_michigan_pfas.sh)")
+        print("  Download Michigan DEQ PFAS data manually per experiments/008_pfas_ml_water_monitoring.md")
         return 1
 
     # Load and explore

@@ -19,8 +19,11 @@
 //! | Item   | Value |
 //! |--------|-------|
 //! | Date   | 2026-02-23 |
-//! | GPU prims | BatchedOdeRK4F64 via OdeSweepGpu |
+//! | GPU prims | `BatchedOdeRK4F64` via `OdeSweepGpu` |
 //! | Command | `cargo test --bin validate_ncbi_vibrio_qs -- --nocapture` |
+//!
+//! Validation class: Synthetic
+//! Provenance: Generated data with known statistical properties
 
 use wetspring_barracuda::bio::ncbi_data::{VibrioAssembly, load_vibrio_assemblies};
 #[cfg(feature = "gpu")]

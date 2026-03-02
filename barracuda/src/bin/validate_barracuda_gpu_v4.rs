@@ -32,6 +32,9 @@
 //! | Command       | `cargo run --features gpu,ipc --release --bin validate_barracuda_gpu_v4` |
 //! | Data          | Synthetic test vectors (self-contained) |
 //! | Tolerances    | `tolerances::GPU_VS_CPU_F64` for GPU↔CPU, `EXACT_F64` for structural |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use barracuda::spectral::{GOE_R, POISSON_R};
 use serde_json::json;

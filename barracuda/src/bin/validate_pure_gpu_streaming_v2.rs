@@ -27,6 +27,9 @@
 //! | Baseline date | 2026-02-23 |
 //! | Exact command | `cargo run --features gpu --release --bin validate_pure_gpu_streaming_v2` |
 //! | Data | Synthetic test vectors (self-contained) |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use std::time::Instant;
 

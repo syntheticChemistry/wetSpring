@@ -35,6 +35,9 @@
 //! | Date | 2026-02-28 |
 //! | Phase | 77 |
 //! | Command | `cargo run --release --bin validate_paper_math_control_v2` |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use std::collections::HashMap;
 use wetspring_barracuda::bio::{

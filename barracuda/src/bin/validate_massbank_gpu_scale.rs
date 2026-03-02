@@ -14,6 +14,9 @@
 //! | GPU prims   | `GemmF64`, `FusedMapReduceF64` (via `pairwise_cosine_gpu`) |
 //! | Date        | 2026-02-23 |
 //! | Command     | `cargo test --bin validate_massbank_gpu_scale -- --nocapture` |
+//!
+//! Validation class: Synthetic
+//! Provenance: Generated data with known statistical properties
 
 use std::time::Instant;
 #[cfg(feature = "gpu")]

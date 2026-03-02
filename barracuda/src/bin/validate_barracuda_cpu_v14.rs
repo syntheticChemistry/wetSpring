@@ -33,6 +33,9 @@
 //!
 //! - **802, 200**: Rosenbrock f(x,y)=(1−x)²+100(y−x²)² at optimum (1,1),
 //!   `numerical_hessian` eps=1e-5. Analytical H\[0,0\]≈802, H\[1,1\]≈200; tolerance 2.0.
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use std::collections::HashMap;
 use wetspring_barracuda::bio::{
@@ -422,7 +425,7 @@ fn main() {
     let hess = barracuda::numerical::numerical_hessian(
         &|x: &[f64]| 100.0f64.mul_add((x[0].mul_add(-x[0], x[1])).powi(2), (1.0 - x[0]).powi(2)),
         &[1.0, 1.0],
-        1e-5,
+        tolerances::NUMERICAL_HESSIAN_EPSILON,
     );
     v.check(
         "Hessian H[0,0] ≈ 802",
@@ -445,7 +448,7 @@ fn main() {
     let nmf_cfg = barracuda::linalg::nmf::NmfConfig {
         rank: 3,
         max_iter: 100,
-        tol: 1e-4,
+        tol: tolerances::NMF_CONVERGENCE_KL,
         objective: barracuda::linalg::nmf::NmfObjective::KlDivergence,
         seed: 42,
     };
@@ -456,7 +459,15 @@ fn main() {
     total_domains += 1;
     let rx: Vec<f64> = (0..50).map(|i| f64::from(i) * 0.02).collect();
     let ry: Vec<f64> = (0..20).map(|i| f64::from(i).mul_add(0.5, 1.0)).collect();
-    let ridge = barracuda::linalg::ridge_regression(&rx, &ry, 10, 5, 2, 1e-6).expect("ridge");
+    let ridge = barracuda::linalg::ridge_regression(
+        &rx,
+        &ry,
+        10,
+        5,
+        2,
+        tolerances::RIDGE_REGULARIZATION_SMALL,
+    )
+    .expect("ridge");
     v.check_pass(
         "ridge weights finite",
         ridge.weights.iter().all(|w| w.is_finite()),

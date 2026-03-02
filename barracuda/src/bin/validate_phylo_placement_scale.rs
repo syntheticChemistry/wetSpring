@@ -21,6 +21,9 @@
 //! | Data source | Synthetic (mirrors Tara Oceans rplB gene trees) |
 //! | CPU prims   | `neighbor_joining`, `felsenstein`, `placement` |
 //! | Date        | 2026-02-23 |
+//!
+//! Validation class: Synthetic
+//! Provenance: Generated data with known statistical properties
 
 use std::time::Instant;
 use wetspring_barracuda::bio::felsenstein::{self, TreeNode};

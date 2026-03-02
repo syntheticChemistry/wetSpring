@@ -19,6 +19,9 @@
 //! 2. `UniFrac` propagation: CPU tree ↔ GPU `UniFracGpu`
 //! 3. ODE sweep: CPU `run_bistable` ↔ GPU `OdeSweepGpu`
 //! 4. metalForge mixed-hardware dispatch: GPU→CPU→GPU pipeline
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use std::sync::Arc;
 use std::time::Instant;
@@ -206,7 +209,7 @@ fn validate_ode_sweep(v: &mut Validator, device: &Arc<barracuda::device::WgpuDev
     v.check_pass("GPU ODE outputs finite", all_finite);
 
     for (i, (&g, &c)) in gpu_batch0.iter().zip(cpu_finals.iter()).enumerate() {
-        let denom = c.abs().max(g.abs()).max(1e-15);
+        let denom = c.abs().max(g.abs()).max(tolerances::MATRIX_EPS);
         let rel = (g - c).abs() / denom;
         let tol = if i < 3 {
             tolerances::ODE_STEADY_STATE
@@ -223,7 +226,7 @@ fn validate_ode_sweep(v: &mut Validator, device: &Arc<barracuda::device::WgpuDev
         chunk
             .iter()
             .zip(gpu_batch0.iter())
-            .all(|(a, b)| (a - b).abs() < 1e-10)
+            .all(|(a, b)| (a - b).abs() < tolerances::PYTHON_PARITY)
     });
     v.check_pass("all batches produce identical results", batches_consistent);
     println!("  ODE CPU ↔ GPU in {us} µs");
@@ -283,7 +286,7 @@ fn validate_phage_defense(v: &mut Validator, device: &Arc<barracuda::device::Wgp
     v.check_pass("GPU outputs non-negative", gpu_positive);
 
     for (i, (&g, &c)) in gpu_batch0.iter().zip(cpu_finals.iter()).enumerate() {
-        let denom = c.abs().max(g.abs()).max(1e-15);
+        let denom = c.abs().max(g.abs()).max(tolerances::MATRIX_EPS);
         let rel = (g - c).abs() / denom;
         v.check(
             &format!("var {i} CPU ↔ GPU relative diff"),
@@ -297,7 +300,7 @@ fn validate_phage_defense(v: &mut Validator, device: &Arc<barracuda::device::Wgp
         chunk
             .iter()
             .zip(gpu_batch0.iter())
-            .all(|(a, b)| (a - b).abs() < 1e-10)
+            .all(|(a, b)| (a - b).abs() < tolerances::PYTHON_PARITY)
     });
     v.check_pass("all batches produce identical results", batches_ok);
     println!("  Phage Defense CPU ↔ GPU in {us} µs");

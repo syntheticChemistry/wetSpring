@@ -188,3 +188,35 @@ mod tests {
         assert_eq!(base64_encode(b"foobar"), "Zm9vYmFy");
     }
 }
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod proptests {
+    use super::*;
+    use proptest::prelude::*;
+
+    proptest! {
+        #[test]
+        fn base64_roundtrip(data in prop::collection::vec(any::<u8>(), 0..256)) {
+            let encoded = base64_encode(&data);
+            let decoded = base64_decode(&encoded).unwrap();
+            prop_assert_eq!(decoded, data);
+        }
+
+        #[test]
+        fn base64_encode_length(data in prop::collection::vec(any::<u8>(), 0..256)) {
+            let encoded = base64_encode(&data);
+            let expected_len = data.len().div_ceil(3) * 4;
+            prop_assert_eq!(encoded.len(), expected_len);
+        }
+
+        #[test]
+        fn base64_only_valid_chars(data in prop::collection::vec(any::<u8>(), 0..256)) {
+            let encoded = base64_encode(&data);
+            prop_assert!(
+                encoded.chars().all(|c| c.is_ascii_alphanumeric() || c == '+' || c == '/' || c == '='),
+                "invalid char in base64 output: {encoded}"
+            );
+        }
+    }
+}

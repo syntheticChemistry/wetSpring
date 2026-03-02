@@ -10,6 +10,9 @@
 //! | Baseline commit | `e4358c5` |
 //! | Date | 2026-02-21 |
 //! | Exact command | `python3 scripts/smith_waterman_baseline.py` |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::alignment::{
     AlignmentResult, ScoringParams, pairwise_scores, smith_waterman, smith_waterman_score,

@@ -115,7 +115,7 @@ impl VaultStore {
 
         self.chain.append(
             "vault.store",
-            "wetspring",
+            crate::PRIMAL_NAME,
             ticket.id,
             content_hash,
             &self.node_id,
@@ -159,7 +159,7 @@ impl VaultStore {
 
         self.chain.append(
             "vault.retrieve",
-            "wetspring",
+            crate::PRIMAL_NAME,
             ticket.id,
             *content_hash,
             &self.node_id,
@@ -250,7 +250,7 @@ fn sovereign_decrypt(
 /// Derive 32-byte encryption key from lineage seed using BLAKE3.
 fn derive_key(lineage_seed: &[u8; 32]) -> [u8; 32] {
     let mut hasher = Hasher::new();
-    hasher.update(b"wetspring-vault-encryption-v1");
+    hasher.update(crate::VAULT_KEY_CONTEXT.as_bytes());
     hasher.update(lineage_seed);
     *hasher.finalize().as_bytes()
 }

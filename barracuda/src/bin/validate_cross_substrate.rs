@@ -20,6 +20,9 @@
 //! | Exact command | `cargo run --release --features gpu --bin validate_cross_substrate` |
 //! | Data | Synthetic test vectors (ANI, SNP, pangenome, dN/dS pairs) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{

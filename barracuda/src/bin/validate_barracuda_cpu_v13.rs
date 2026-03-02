@@ -25,6 +25,9 @@
 //! | Date | 2026-02-27 |
 //! | Commit | wetSpring Phase 66+ |
 //! | Command | `cargo run --release --bin validate_barracuda_cpu_v13` |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use std::collections::HashMap;
 use wetspring_barracuda::bio::{

@@ -41,6 +41,9 @@
 //! |-------|-------|
 //! | Date | 2026-03-01 |
 //! | Command | `cargo run --release --features gpu --bin validate_emp_anderson_atlas` |
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use std::time::Instant;
 

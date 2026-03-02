@@ -6,9 +6,9 @@
 //! primitives (79 consumed, zero fallback code). ODE domains use
 //! runtime-generated WGSL via `BatchedOdeRK4::generate_shader()`.
 //!
-//! # Precision (`ToadStool` S68+)
+//! # Precision (`ToadStool` S68+ → S79)
 //!
-//! All 700 `ToadStool` WGSL shaders are f64-canonical (zero f32-only remain).
+//! All 844 `ToadStool` WGSL shaders are f64-canonical (zero f32-only remain).
 //! `compile_shader_universal(source, precision)` routes through:
 //!
 //! - `Precision::F64` — native f64 (compute-class GPUs: Titan V, V100, MI250X)
@@ -21,7 +21,7 @@
 //! [`GpuF64::fp64_strategy`] (Native vs Hybrid). ODE modules currently use
 //! F64 directly; DF64 promotion requires host buffer protocol adaptation.
 //!
-//! # Consumed `ToadStool` GPU primitives
+//! # Consumed `ToadStool` GPU primitives (S79)
 //!
 //! - `FusedMapReduceF64` — Shannon, Simpson, alpha diversity
 //! - `BrayCurtisF64` — condensed distance matrices
@@ -37,6 +37,7 @@
 //! - `SmithWatermanGpu` — banded SW alignment (anti-diagonal wavefront)
 //! - `TreeInferenceGpu` — decision tree / RF inference (sample x tree)
 //! - `DiversityFusionGpu` — Shannon + Simpson + evenness fused
+//! - `MultiHeadEsn` — shared reservoir, per-head readout (S79 `head_disagreement`)
 //! - Plus 20+ bio ops: ANI, SNP, dN/dS, pangenome, HMM, DADA2, etc.
 //!
 //! # WGSL Generation (Lean — zero local shaders)
@@ -77,8 +78,8 @@ const MAX_STORAGE_BUFFERS_PER_STAGE: u32 = 16;
 /// for batched dispatch and buffer pooling.
 ///
 /// Most domains dispatch through absorbed `ToadStool` primitives via
-/// [`to_wgpu_device`](Self::to_wgpu_device). ODE domains compile local
-/// WGSL shaders via `compile_shader_f64()` (Write phase, pending absorption).
+/// [`to_wgpu_device`](Self::to_wgpu_device). ODE domains use runtime-generated
+/// WGSL via `BatchedOdeRK4::generate_shader()` (`ToadStool`, zero local shaders).
 ///
 /// Driver-specific capabilities (NVK workarounds, eigensolve strategy,
 /// latency model) are available via [`driver_profile`](Self::driver_profile).

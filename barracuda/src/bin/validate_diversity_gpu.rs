@@ -37,6 +37,9 @@
 //! - Weighted/plain dot product (via `ToadStool`'s `WeightedDotF64`)
 //!
 //! Run: `cargo run --features gpu --bin validate_diversity_gpu`
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use wetspring_barracuda::bio::{
     diversity, diversity_gpu, pairwise_l2_gpu, pcoa, pcoa_gpu, spectral_match_gpu, stats_gpu,

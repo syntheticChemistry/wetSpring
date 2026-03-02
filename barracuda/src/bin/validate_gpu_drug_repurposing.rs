@@ -29,6 +29,9 @@
 //! | Baseline date | 2026-02-25 |
 //! | Exact command | `cargo run --features gpu --release --bin validate_gpu_drug_repurposing` |
 //! | Data | Synthetic test vectors (self-contained) |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use barracuda::device::WgpuDevice;
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
@@ -95,7 +98,7 @@ fn validate_gemm_nmf_reconstruction(
     let config = NmfConfig {
         rank,
         max_iter: 200,
-        tol: 1e-6,
+        tol: tolerances::NMF_CONVERGENCE_EUCLIDEAN,
         objective: NmfObjective::Euclidean,
         seed: 42,
     };
@@ -216,7 +219,7 @@ fn validate_gpu_transe(
             *val = rng.next_f64().mul_add(0.2, -0.1);
         }
         let norm: f64 = row.iter().map(|x| x * x).sum::<f64>().sqrt();
-        if norm > 1e-12 {
+        if norm > tolerances::EMBEDDING_NORM_FLOOR {
             for val in row.iter_mut() {
                 *val /= norm;
             }

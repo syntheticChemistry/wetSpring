@@ -25,6 +25,9 @@
 //! | Acceptance thresholds | `tolerances::NPU_PASS_RATE_CEILING` / `NPU_RECALL_FLOOR` / `NPU_TOP1_FLOOR` |
 //! | Date | 2026-02-25 |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::spectral_match;

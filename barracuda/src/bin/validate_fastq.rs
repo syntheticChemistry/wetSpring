@@ -20,6 +20,9 @@
 //!
 //! - `F3D0_R1`: 7,793 sequences, 249–251 bp, GC ~54.7%, mean Q ~35.8
 //! - All 40 files: 304,720 total sequences (20 paired samples)
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use std::path::Path;
 use wetspring_barracuda::bio::{derep, merge_pairs, quality};

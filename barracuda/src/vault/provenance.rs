@@ -115,9 +115,7 @@ impl ProvenanceChain {
             signature: [0u8; 64],
         });
 
-        // SAFETY: we just pushed an element, so `last()` is always `Some`.
-        #[allow(clippy::expect_used)]
-        self.entries.last().expect("just pushed")
+        &self.entries[self.entries.len() - 1]
     }
 
     /// Verify chain integrity (each entry's parent matches the previous hash).

@@ -27,6 +27,9 @@
 //! | Exact command | `cargo run --release --features gpu --bin validate_cross_substrate_pipeline` |
 //! | Data | 12 synthetic communities × 256 features |
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, AKD1000 NPU, Pop!\_OS 22.04 |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use std::fmt;
 use std::time::Instant;

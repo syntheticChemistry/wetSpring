@@ -20,6 +20,9 @@
 //! - Pielou evenness drop
 //! - Bray-Curtis shift magnitude
 //! - Berger-Parker dominance index
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::diversity::{bray_curtis, pielou_evenness, shannon, simpson};
 use wetspring_barracuda::tolerances;
@@ -95,7 +98,7 @@ fn main() {
         32.0, 48.0, 31.0, 49.0, 30.0,
     ];
     let h_recovery = shannon(&recovery);
-    let recovery_near_baseline = (h_recovery - h_even).abs() < 0.1;
+    let recovery_near_baseline = (h_recovery - h_even).abs() < tolerances::SHANNON_RECOVERY_TOL;
     v.check_count(
         "Shannon recovers to near baseline",
         usize::from(recovery_near_baseline),

@@ -23,6 +23,9 @@
 //! | Baseline tool | metalForge Tower atomic integration |
 //! | Data | Real NCBI assemblies + Zenodo PFAS (priority-1) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070) |
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use wetspring_forge::data::{self, DataSource};
 use wetspring_forge::dispatch::{self, Workload};

@@ -25,6 +25,9 @@
 //! | Exact command | `cargo run --features gpu --release --bin validate_metalforge_full` |
 //! | Data | Synthetic test vectors (self-contained) |
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, Pop!\_OS 22.04 |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{

@@ -25,6 +25,9 @@
 //! airSpring  → Pearson, MAE, RMSE, R², NSE, trapz, kriging, moving window
 //! groundSpring → bootstrap rawr_mean, batched multinomial
 //! ```
+//!
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::sync::Arc;
 use std::time::Instant;

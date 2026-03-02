@@ -195,3 +195,43 @@ fn argmax_with_priors(scores: &[f64], log_priors: &[f64]) -> usize {
     }
     best_idx
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::type_complexity,
+    clippy::manual_let_else
+)]
+mod tests {
+    use super::*;
+    use crate::gpu::GpuF64;
+
+    #[test]
+    fn api_surface_compiles() {
+        let _: fn(
+            &GpuF64,
+            &NaiveBayesClassifier,
+            &[&[u8]],
+            &ClassifyParams,
+        ) -> Result<Vec<Classification>> = classify_batch_gpu;
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let classifier = NaiveBayesClassifier::train(&[], 8);
+        let sequences: Vec<&[u8]> = vec![];
+        let params = ClassifyParams::default();
+        let result = classify_batch_gpu(&gpu, &classifier, &sequences, &params);
+        assert!(
+            result.is_ok(),
+            "classify_batch_gpu should succeed with empty input"
+        );
+    }
+}

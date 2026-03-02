@@ -39,6 +39,9 @@
 //! | `SpatialPayoffGpu` | neuralSpring | Session 31f | wetSpring (new) |
 //! | `BatchFitnessGpu` | neuralSpring | Session 31f | wetSpring (new) |
 //! | `LocusVarianceGpu` | neuralSpring | Session 31f | wetSpring (new) |
+//!
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use barracuda::{
     BatchFitnessGpu, LocusVarianceGpu, PairwiseHammingGpu, PairwiseJaccardGpu, SpatialPayoffGpu,

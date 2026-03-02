@@ -16,6 +16,9 @@
 //!
 //! Validates time-series diversity tracking: Shannon over time, Bray-Curtis
 //! between consecutive timepoints, and Z-score anomaly detection.
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::diversity::{bray_curtis, shannon};
 use wetspring_barracuda::tolerances;
@@ -100,7 +103,9 @@ fn main() {
     let shannon_ts: Vec<f64> = communities.iter().map(|c| shannon(c)).collect();
     let all_positive = shannon_ts.iter().all(|&h| h > 0.0);
     v.check_count("all Shannon > 0", usize::from(all_positive), 1);
-    let monotonic_test = shannon_ts.windows(2).any(|w| (w[0] - w[1]).abs() > 0.001);
+    let monotonic_test = shannon_ts
+        .windows(2)
+        .any(|w| (w[0] - w[1]).abs() > tolerances::DIVERSITY_TS_MONOTONIC);
     v.check_count("Shannon varies over time", usize::from(monotonic_test), 1);
 
     // ── Section 5: Crash detection scenario ────────────────────

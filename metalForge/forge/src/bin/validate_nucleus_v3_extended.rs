@@ -12,18 +12,21 @@
 //!
 //! Extends NUCLEUS v2 (62 checks) with V87 validation:
 //! - S1: Tower Discovery (substrates + capability matching)
-//! - S2: Nest Storage Protocol (NestGate or sovereign fallback)
-//! - S3: Node Dispatch (13 workloads including 5 new: PCoA, K-mer, Bootstrap, KMD, Kriging)
+//! - S2: Nest Storage Protocol (`NestGate` or sovereign fallback)
+//! - S3: Node Dispatch (13 workloads including 5 new: `PCoA`, K-mer, Bootstrap, KMD, Kriging)
 //! - S4: Extended Workload Catalog (49+ workloads, absorption tracking)
 //! - S5: Cross-System Pipeline (GPU→NPU→CPU hand-off)
-//! - S6: biomeOS Coordination (Songbird, NestGate, Tower)
-//! - S7: Mixed Hardware Routing (PCIe bypass, bandwidth-aware)
+//! - S6: biomeOS Coordination (Songbird, `NestGate`, Tower)
+//! - S7: Mixed Hardware Routing (`PCIe` bypass, bandwidth-aware)
 //! - S8: Vault Integration (provenance chain verification for dispatch)
 //!
 //! | Field | Value |
 //! |-------|-------|
 //! | Date | 2026-03-01 |
 //! | Command | `cargo run --bin validate_nucleus_v3_extended` |
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use wetspring_forge::bridge;
 use wetspring_forge::dispatch;

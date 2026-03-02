@@ -19,11 +19,6 @@ use crate::tolerances;
 
 const CONNECTION_READ_TIMEOUT: Duration = Duration::from_secs(120);
 
-/// Default socket path under `XDG_RUNTIME_DIR` (`biomeos/wetspring-default.sock`).
-const DEFAULT_SOCKET_PATH_XDG: &str = "biomeos/wetspring-default.sock";
-/// Fallback socket filename when `XDG_RUNTIME_DIR` is unset (`wetspring-default.sock`).
-const DEFAULT_SOCKET_PATH_FALLBACK: &str = "wetspring-default.sock";
-
 /// wetSpring IPC server.
 ///
 /// Listens on a Unix domain socket and handles JSON-RPC 2.0 requests,
@@ -189,15 +184,7 @@ fn handle_connection(stream: &std::os::unix::net::UnixStream, metrics: &Metrics)
 
 /// Resolve the socket path for binding.
 fn resolve_bind_path() -> PathBuf {
-    if let Ok(path) = std::env::var("WETSPRING_SOCKET") {
-        return PathBuf::from(path);
-    }
-
-    if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
-        return PathBuf::from(xdg).join(DEFAULT_SOCKET_PATH_XDG);
-    }
-
-    std::env::temp_dir().join(DEFAULT_SOCKET_PATH_FALLBACK)
+    super::discover::resolve_bind_path("WETSPRING_SOCKET", crate::PRIMAL_NAME)
 }
 
 #[cfg(test)]

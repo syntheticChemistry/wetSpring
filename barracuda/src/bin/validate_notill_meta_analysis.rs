@@ -34,6 +34,9 @@
 //! | Exact command | `cargo run --release --bin validate_notill_meta_analysis` |
 //! | Data | Meta-analysis effect sizes from 62 studies (Table 1-3) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas and algorithmic invariants
 
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;

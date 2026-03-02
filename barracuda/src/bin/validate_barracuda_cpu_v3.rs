@@ -22,6 +22,9 @@
 //! ```text
 //! Python baseline → v1 (9) → v2 (+5 batch) → [THIS] v3 (+9) → GPU
 //! ```
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{

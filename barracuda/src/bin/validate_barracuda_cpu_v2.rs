@@ -11,13 +11,16 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | BarraCuda CPU v1 (recursive/sequential) + Python refs: `felsenstein_pruning_baseline.py`, `liu2014_hmm_baseline.py`, `smith_waterman_baseline.py`, `liu2009_neighbor_joining.py`, `zheng2023_dtl_reconciliation.py` |
+//! | Baseline tool | `BarraCuda` CPU v1 (recursive/sequential) + Python refs: `felsenstein_pruning_baseline.py`, `liu2014_hmm_baseline.py`, `smith_waterman_baseline.py`, `liu2009_neighbor_joining.py`, `zheng2023_dtl_reconciliation.py` |
 //! | Baseline version | Feb 2026 |
 //! | Baseline command | Batch/flat impl validated against sequential; `python3 scripts/liu2009_neighbor_joining.py` (NJ), `python3 scripts/zheng2023_dtl_reconciliation.py` (DTL) |
 //! | Baseline date | 2026-02-19 |
 //! | Exact command | `cargo run --bin validate_barracuda_cpu_v2` |
 //! | Data | Synthetic test vectors (hardcoded) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::alignment::{ScoringParams, score_batch, smith_waterman_score};
 use wetspring_barracuda::bio::felsenstein::{FlatTree, TreeNode, encode_dna, log_likelihood};

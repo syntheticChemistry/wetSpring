@@ -24,11 +24,14 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Source | Synthetic (SyntheticSignalGenerator seed=42) |
+//! | Source | Synthetic (`SyntheticSignalGenerator` seed=42) |
 //! | Date | 2026-02-26 |
 //! | Commit | wetSpring Phase 61 |
 //! | Hardware | CPU only (pre-hardware) |
 //! | Command | `cargo run --release --bin validate_nanopore_signal_bridge` |
+//!
+//! Validation class: Synthetic
+//! Provenance: Generated data with known statistical properties
 
 use wetspring_barracuda::io::nanopore::{
     self, NanoporeIter, NanoporeRead, SyntheticSignalGenerator,

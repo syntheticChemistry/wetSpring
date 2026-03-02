@@ -24,11 +24,14 @@
 //! |----------------|-------|
 //! | Date           | 2026-02-26 |
 //! | DF64 method    | Dekker (1971), double-float arithmetic |
-//! | Target W_c     | 16.54 ± 0.10, Slevin & Ohtsuki, PRL 82 (1999) |
+//! | Target `W_c`     | 16.54 ± 0.10, Slevin & Ohtsuki, PRL 82 (1999) |
 //! | Target ν       | 1.571 ± 0.004, Rodriguez et al., PRB 84 (2011) |
 //! | Baseline commit| wetSpring Phase 59, Exp150 (finite-size scaling) |
 //! | Hardware       | biomeGate RTX 4070 (GPU), Eastgate CPU |
 //! | Command        | `cargo run --release --features gpu --bin validate_df64_anderson` |
+//!
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use wetspring_barracuda::validation::Validator;
 

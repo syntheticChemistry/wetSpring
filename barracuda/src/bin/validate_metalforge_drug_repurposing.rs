@@ -24,6 +24,9 @@
 //! | Baseline date | 2026-02-25 |
 //! | Exact command | `cargo run --features gpu --release --bin validate_metalforge_drug_repurposing` |
 //! | Data | Synthetic test vectors (self-contained) |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;

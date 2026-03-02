@@ -25,6 +25,9 @@
 //! | Baseline date | 2026-02-22 |
 //! | Data | Synthetic substrate inventories (self-contained) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use wetspring_forge::dispatch::{self, Reason, Workload};
 use wetspring_forge::inventory;

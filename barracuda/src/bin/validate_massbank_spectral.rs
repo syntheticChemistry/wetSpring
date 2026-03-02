@@ -17,6 +17,9 @@
 //!
 //! Validates cosine similarity spectral matching on synthetic PFAS-like
 //! mass spectra, matching Python baseline exactly.
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::spectral_match::cosine_similarity;
 use wetspring_barracuda::tolerances;

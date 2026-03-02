@@ -481,4 +481,148 @@ mod tests {
         }
         assert_eq!(v.counts(), (0, 5));
     }
+
+    // ── Determinism (rerun-identical) tests ────────────────────────
+
+    #[test]
+    #[allow(clippy::float_cmp)]
+    fn determinism_diversity() {
+        use crate::bio::diversity::{bray_curtis, chao1, shannon, simpson};
+
+        let counts = [10.0, 20.0, 30.0, 40.0];
+        let a = [1.0, 2.0, 3.0];
+        let b = [2.0, 3.0, 4.0];
+
+        let sh1 = shannon(&counts);
+        let sh2 = shannon(&counts);
+        assert_eq!(sh1, sh2, "shannon must be bitwise identical");
+
+        let si1 = simpson(&counts);
+        let si2 = simpson(&counts);
+        assert_eq!(si1, si2, "simpson must be bitwise identical");
+
+        let c1 = chao1(&counts);
+        let c2 = chao1(&counts);
+        assert_eq!(c1, c2, "chao1 must be bitwise identical");
+
+        let bc1 = bray_curtis(&a, &b);
+        let bc2 = bray_curtis(&a, &b);
+        assert_eq!(bc1, bc2, "bray_curtis must be bitwise identical");
+    }
+
+    #[test]
+    #[allow(clippy::float_cmp)]
+    fn determinism_ode() {
+        use crate::bio::qs_biofilm::{QsBiofilmParams, run_scenario};
+
+        let y0 = [0.01, 0.0, 0.0, 2.0, 0.5];
+        let t_end = 10.0;
+        let dt = 0.1;
+        let params = QsBiofilmParams::default();
+
+        let r1 = run_scenario(&y0, t_end, dt, &params);
+        let r2 = run_scenario(&y0, t_end, dt, &params);
+
+        assert_eq!(r1.t.len(), r2.t.len(), "ODE trajectory length");
+        for (i, (&t1, &t2)) in r1.t.iter().zip(r2.t.iter()).enumerate() {
+            assert_eq!(t1, t2, "t[{i}] must be bitwise identical");
+        }
+        for (i, (&y1, &y2)) in r1.y.iter().zip(r2.y.iter()).enumerate() {
+            assert_eq!(y1, y2, "y[{i}] must be bitwise identical");
+        }
+    }
+
+    #[test]
+    #[allow(clippy::float_cmp)]
+    fn determinism_special_functions() {
+        let x = 1.5;
+        let erf1 = barracuda::special::erf(x);
+        let erf2 = barracuda::special::erf(x);
+        assert_eq!(erf1, erf2, "erf must be bitwise identical");
+
+        let ncdf1 = barracuda::stats::norm_cdf(x);
+        let ncdf2 = barracuda::stats::norm_cdf(x);
+        assert_eq!(ncdf1, ncdf2, "norm_cdf must be bitwise identical");
+
+        let lg1 = barracuda::special::ln_gamma(x).unwrap_or(f64::INFINITY);
+        let lg2 = barracuda::special::ln_gamma(x).unwrap_or(f64::INFINITY);
+        assert_eq!(lg1, lg2, "ln_gamma must be bitwise identical");
+    }
+
+    #[cfg(feature = "gpu")]
+    #[test]
+    #[allow(clippy::float_cmp)]
+    fn determinism_anderson_spectral() {
+        use barracuda::spectral::{anderson_2d, lanczos, lanczos_eigenvalues, level_spacing_ratio};
+
+        const SEED: u64 = 42;
+        let l = 8_usize;
+        let w = 2.0_f64;
+        let n_iter = 30_usize;
+
+        let mat1 = anderson_2d(l, l, w, SEED);
+        let mat2 = anderson_2d(l, l, w, SEED);
+        let tri1 = lanczos(&mat1, n_iter, SEED);
+        let tri2 = lanczos(&mat2, n_iter, SEED);
+        let eigs1 = lanczos_eigenvalues(&tri1);
+        let eigs2 = lanczos_eigenvalues(&tri2);
+        let r1 = level_spacing_ratio(&eigs1);
+        let r2 = level_spacing_ratio(&eigs2);
+
+        assert_eq!(eigs1.len(), eigs2.len(), "eigenvalue count");
+        for (i, (&e1, &e2)) in eigs1.iter().zip(eigs2.iter()).enumerate() {
+            assert_eq!(e1, e2, "eigenvalue[{i}] must be bitwise identical");
+        }
+        assert_eq!(r1, r2, "level_spacing_ratio must be bitwise identical");
+    }
+
+    #[test]
+    fn determinism_encoding_roundtrip() {
+        use crate::encoding::{base64_decode, base64_encode};
+
+        let data = b"Hello, deterministic world!";
+        let enc1 = base64_encode(data);
+        let enc2 = base64_encode(data);
+        assert_eq!(enc1, enc2, "base64 encode must be identical");
+
+        let dec1 = base64_decode(&enc1).expect("decode");
+        let dec2 = base64_decode(&enc2).expect("decode");
+        assert_eq!(dec1, dec2, "base64 decode must be identical");
+    }
+
+    #[test]
+    #[allow(clippy::float_cmp)]
+    fn determinism_fastq_parsing() {
+        use crate::io::fastq::{compute_stats, parse_fastq};
+        use std::fs::File;
+        use std::io::Write;
+
+        let synthetic = "@r1\nACGTACGT\n+\nIIIIIIII\n@r2\nGGCCAATT\n+\n!!!!!!!!\n";
+        let dir = tempfile::tempdir().expect("tempdir");
+        let path = dir.path().join("determinism.fastq");
+        let mut f = File::create(&path).expect("create");
+        f.write_all(synthetic.as_bytes()).expect("write");
+        drop(f);
+
+        let records1 = parse_fastq(&path).expect("parse 1");
+        let records2 = parse_fastq(&path).expect("parse 2");
+        let stats1 = compute_stats(&records1);
+        let stats2 = compute_stats(&records2);
+
+        assert_eq!(stats1.num_sequences, stats2.num_sequences);
+        assert_eq!(stats1.total_bases, stats2.total_bases);
+        assert_eq!(stats1.min_length, stats2.min_length);
+        assert_eq!(stats1.max_length, stats2.max_length);
+        assert_eq!(
+            stats1.mean_length, stats2.mean_length,
+            "mean_length bitwise"
+        );
+        assert_eq!(
+            stats1.mean_quality, stats2.mean_quality,
+            "mean_quality bitwise"
+        );
+        assert_eq!(stats1.gc_content, stats2.gc_content, "gc_content bitwise");
+        assert_eq!(stats1.q30_count, stats2.q30_count);
+        assert_eq!(stats1.length_distribution, stats2.length_distribution);
+    }
 }

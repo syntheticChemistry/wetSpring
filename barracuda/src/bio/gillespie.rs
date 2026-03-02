@@ -45,6 +45,7 @@ impl Lcg64 {
     }
 
     /// Advance state and return raw `u64`.
+    #[must_use]
     pub const fn next_u64(&mut self) -> u64 {
         self.state = self.state.wrapping_mul(Self::MULT).wrapping_add(Self::INC);
         self.state
@@ -52,6 +53,7 @@ impl Lcg64 {
 
     /// Uniform `f64` in `[0, 1)`.
     #[allow(clippy::cast_precision_loss)]
+    #[must_use]
     pub fn next_f64(&mut self) -> f64 {
         (self.next_u64() >> 11) as f64 / ((1_u64 << 53) as f64)
     }
@@ -59,6 +61,7 @@ impl Lcg64 {
     /// Exponential variate with rate `lambda` (mean = `1/lambda`).
     ///
     /// Uses inverse CDF: `-ln(U) / lambda`.
+    #[must_use]
     pub fn exp_variate(&mut self, lambda: f64) -> f64 {
         let u = self.next_f64();
         let u_clamped = if u == 0.0 { f64::MIN_POSITIVE } else { u };

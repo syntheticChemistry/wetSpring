@@ -34,6 +34,8 @@ pub struct FlatTree {
 
 impl PhyloTree {
     /// Convert to a GPU-compatible flat tree (CSR layout).
+    ///
+    /// Tree node counts fit in u32 for any realistic phylogeny.
     #[must_use]
     #[allow(clippy::cast_possible_truncation)]
     pub fn to_flat_tree(&self) -> FlatTree {
@@ -79,7 +81,10 @@ impl PhyloTree {
 
 impl FlatTree {
     /// Reconstruct a [`PhyloTree`] from flat arrays.
+    ///
+    /// u32→usize is infallible widening on 64-bit; tree indices fit on 32-bit.
     #[must_use]
+    #[allow(clippy::cast_possible_truncation)] // loop index i < n_nodes, fits in u32
     pub fn to_phylo_tree(&self) -> PhyloTree {
         let n = self.n_nodes as usize;
         let mut nodes = Vec::with_capacity(n);

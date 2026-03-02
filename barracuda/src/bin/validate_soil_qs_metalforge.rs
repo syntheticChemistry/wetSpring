@@ -34,6 +34,9 @@
 //! | Date | 2026-02-25 |
 //! | Track | Track 4 — No-Till Soil QS & Anderson Geometry |
 //! | Command | `cargo run --features gpu --release --bin validate_soil_qs_metalforge` |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{
@@ -180,7 +183,7 @@ async fn main() {
     v.check_pass("QS standard: N converges", std_n > params.k_cap * 0.5);
     v.check_pass(
         "QS scenarios produce distinct B",
-        (high_b - mut_b).abs() > 1e-6,
+        (high_b - mut_b).abs() > tolerances::ODE_GPU_PARITY,
     );
 
     timings.push(SubstrateTiming {

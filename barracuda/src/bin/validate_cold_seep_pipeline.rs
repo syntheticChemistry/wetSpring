@@ -25,10 +25,13 @@
 //! | Commit | 756df26 |
 //! | Date | 2026-02-26 |
 //! | Source paper | Ruff et al., Nature Microbiology (2019) |
-//! | BioProject | PRJNA315684 |
+//! | `BioProject` | PRJNA315684 |
 //! | Data | 170 cold seep 16S V4 amplicons (NCBI SRA) |
 //! | Hardware | biomeGate RTX 4070 (GPU), Eastgate CPU |
 //! | Command | `cargo run --release --features gpu --bin validate_cold_seep_pipeline` |
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;

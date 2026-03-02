@@ -24,9 +24,12 @@
 //! | Paper       | 39 (Fajgenbaum et al. JCI 2019, doi:10.1172/JCI126091) |
 //! | Baseline    | Pathway activation scores from JCI 2019 Fig 3 proteomic |
 //! |             | analysis (PI3K 0.92, JAK/STAT3 0.85, NF-κB 0.78, etc.) |
-//! | Drug targets| DrugBank (open), ChEMBL (open) |
+//! | Drug targets| `DrugBank` (open), `ChEMBL` (open) |
 //! | Command     | `cargo run --bin validate_fajgenbaum_pathway` |
 //! | Tolerances  | Structural only — ranking and pass/fail, no numeric ε |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas and algorithmic invariants
 
 use wetspring_barracuda::validation::Validator;
 

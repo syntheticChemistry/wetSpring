@@ -24,6 +24,9 @@
 //! | Exact command | `cargo run --release --features gpu --bin validate_dispatch_overhead_proof` |
 //! | Data | Synthetic abundance vectors at [64, 256, 1024, 4096] |
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, Pop!\_OS 22.04 |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, streaming_gpu};

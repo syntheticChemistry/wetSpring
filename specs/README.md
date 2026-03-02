@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: March 1, 2026
-**Status**: Phase 87 — 6,656+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS (1,247 tests, 262 experiments, 238 binaries, ToadStool S71+++ aligned (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 97 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, V87 blueFish whitePaper + hotSpring brain arch review + RootPulse provenance, 50/50 three-tier, 52/52 papers, 95.86% line / 94.02% region / 95.40% fn)
+**Status**: Phase 92C — 6,656+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS (1,247 tests, 262 experiments, 238 binaries, ToadStool S79 aligned (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 97 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, V92C blueFish whitePaper + hotSpring brain arch review + RootPulse provenance, 50/50 three-tier, 52/52 papers, 95.86% line / 94.02% region / 95.40% fn)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -135,7 +135,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 | Document | Location | Description |
 |----------|----------|-------------|
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
-| Handoff (V87) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V87_BLUEFISH_BRAIN_ARCH_HANDOFF_MAR01_2026.md` | Current ToadStool handoff |
+| Handoff (V92C) | `../wateringHole/handoffs/WETSPRING_TOADSTOOL_V92C_BLUEFISH_BRAIN_ARCH_HANDOFF_MAR02_2026.md` | Current ToadStool handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |
@@ -186,7 +186,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 DATA_TYPES.md → FIELD_GENOMICS_REQUIREMENTS.md → `../whitePaper/baseCamp/sub_thesis_06_field_genomics.md`
 
 **Integration partner**:
-`../wateringHole/handoffs/WETSPRING_TOADSTOOL_V87_BLUEFISH_BRAIN_ARCH_HANDOFF_MAR01_2026.md` → `../specs/CROSS_SPRING_EVOLUTION.md`
+`../wateringHole/handoffs/WETSPRING_TOADSTOOL_V92C_BLUEFISH_BRAIN_ARCH_HANDOFF_MAR02_2026.md` → `../specs/CROSS_SPRING_EVOLUTION.md`
 
 ---
 

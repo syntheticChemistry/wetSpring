@@ -34,6 +34,9 @@
 //! | Date | 2026-02-27 |
 //! | Commit | wetSpring Phase 66 |
 //! | Command | `cargo run --features ipc --release --bin validate_nucleus_v8_mixed` |
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use serde_json::{Value, json};
 use std::io::Write;

@@ -26,8 +26,10 @@
 //! | Phase       | 39 — Drug repurposing track |
 //! | Paper       | 43 (ROBOKOP KG infrastructure) |
 //! | Command     | `cargo test --bin validate_knowledge_graph_embedding -- --nocapture` |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas and algorithmic invariants
 
-#[cfg(feature = "gpu")]
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
@@ -242,7 +244,7 @@ fn validate_link_prediction(
 
     v.check_pass(
         "Hits@10 > 5% (better than random baseline)",
-        hits10_pct > 0.05,
+        hits10_pct > tolerances::KNOWLEDGE_GRAPH_HITS10_FLOOR,
     );
 
     validate_novel_predictions(v, kg, &treats_triples);
@@ -336,7 +338,7 @@ fn validate_gpu_transe(v: &mut Validator, kg: &KgEmbedding, triples: &[(usize, u
 
     v.check_pass(
         "ToadStool TranseScoreF64 produces correct scores",
-        max_diff < 1e-10,
+        max_diff < tolerances::PYTHON_PARITY,
     );
 }
 
@@ -409,7 +411,7 @@ fn main() {
     let mut kg = KgEmbedding::new(N_ENTITIES, N_RELATIONS, 42);
 
     let n_epochs = 50;
-    let lr = 0.01;
+    let lr = tolerances::RIDGE_REGULARIZATION_DEFAULT;
     let margin = 1.0;
 
     let mut losses = Vec::new();

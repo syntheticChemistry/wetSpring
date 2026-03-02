@@ -44,6 +44,9 @@
 //! | wetSpring | 12 bio shaders, GEMM 60×, `math_f64.wgsl`, ODE generic | hotSpring HFB, neuralSpring |
 //! | neuralSpring | 5 distance/fitness ops, 6 graph/MCMC primitives | wetSpring (this experiment) |
 //! | airSpring | `pow_f64` fix, `acos_f64`, FMR buffer fix | All Springs |
+//!
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use barracuda::linalg::{
     belief_propagation_chain, disordered_laplacian, effective_rank, graph_laplacian,
@@ -72,7 +75,7 @@ fn dense_to_csr(matrix: &[f64], n: usize) -> SpectralCsrMatrix {
     for i in 0..n {
         for j in 0..n {
             let val = matrix[i * n + j];
-            if val.abs() > 1e-15 {
+            if val.abs() > tolerances::JACOBI_ELEMENT_SKIP {
                 col_idx.push(j);
                 values.push(val);
             }
@@ -734,7 +737,10 @@ async fn main() {
         let sp_fit = readback_f32(&device, &fit_buf, 4);
         v.check(
             "Spatial GPU smoke: some nonzero",
-            if sp_fit.iter().any(|x| x.abs() > 1e-6) {
+            if sp_fit
+                .iter()
+                .any(|x| f64::from(x.abs()) > tolerances::GPU_VS_CPU_F64)
+            {
                 1.0
             } else {
                 0.0
@@ -781,7 +787,9 @@ async fn main() {
         let bf_matching = cpu_bf
             .iter()
             .zip(bf_out.iter())
-            .filter(|(c, g)| (f64::from(**g) - f64::from(**c)).abs() < 1e-3)
+            .filter(|(c, g)| {
+                (f64::from(**g) - f64::from(**c)).abs() < tolerances::GPU_VS_CPU_HMM_BATCH
+            })
             .count();
         println!(
             "    BatchFitness: {bf_matching}/{bf_pop} GPU↔CPU match (Exp094 validates at scale)"
@@ -829,7 +837,7 @@ async fn main() {
         let lv_matching = cpu_lv
             .iter()
             .zip(lv_out.iter())
-            .filter(|(c, g)| (f64::from(**g) - f64::from(**c)).abs() < 0.01)
+            .filter(|(c, g)| (f64::from(**g) - f64::from(**c)).abs() < tolerances::ODE_STEADY_STATE)
             .count();
         println!("    LocusVar: {lv_matching}/{lv_loci} GPU↔CPU match (Exp094 validates at scale)");
 

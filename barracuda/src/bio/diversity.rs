@@ -377,3 +377,69 @@ mod tests {
         assert!((c - 8.0).abs() < 1e-10);
     }
 }
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod proptests {
+    use super::*;
+    use proptest::prelude::*;
+
+    fn non_negative_vec() -> impl Strategy<Value = Vec<f64>> {
+        prop::collection::vec(0.0..1000.0_f64, 1..50)
+    }
+
+    proptest! {
+        #[test]
+        fn shannon_is_non_negative(counts in non_negative_vec()) {
+            prop_assert!(shannon(&counts) >= 0.0);
+        }
+
+        #[test]
+        fn simpson_bounded_zero_one(counts in non_negative_vec()) {
+            let s = simpson(&counts);
+            prop_assert!((0.0..=1.0).contains(&s), "simpson={s}");
+        }
+
+        #[test]
+        #[allow(clippy::cast_precision_loss)]
+        fn observed_features_leq_length(counts in non_negative_vec()) {
+            let obs = observed_features(&counts);
+            prop_assert!(obs <= counts.len() as f64);
+        }
+
+        #[test]
+        fn pielou_bounded_zero_one(counts in non_negative_vec()) {
+            let p = pielou_evenness(&counts);
+            prop_assert!(
+                p.is_nan() || (0.0..=1.0 + f64::EPSILON).contains(&p),
+                "pielou={p}"
+            );
+        }
+
+        #[test]
+        fn chao1_geq_observed(counts in non_negative_vec()) {
+            let obs = observed_features(&counts);
+            let c = chao1(&counts);
+            prop_assert!(c >= obs - f64::EPSILON, "chao1={c} < observed={obs}");
+        }
+
+        #[test]
+        fn bray_curtis_symmetric(
+            a in prop::collection::vec(0.0..100.0_f64, 1..20),
+        ) {
+            let b: Vec<f64> = a.iter().map(|x| x + 1.0).collect();
+            let ab = bray_curtis(&a, &b);
+            let ba = bray_curtis(&b, &a);
+            prop_assert!((ab - ba).abs() < 1e-12, "BC not symmetric: {ab} != {ba}");
+        }
+
+        #[test]
+        fn bray_curtis_bounded(
+            a in prop::collection::vec(0.0..100.0_f64, 1..20),
+        ) {
+            let b: Vec<f64> = a.iter().map(|x| x * 0.5 + 1.0).collect();
+            let bc = bray_curtis(&a, &b);
+            prop_assert!((0.0..=1.0).contains(&bc), "BC out of [0,1]: {bc}");
+        }
+    }
+}

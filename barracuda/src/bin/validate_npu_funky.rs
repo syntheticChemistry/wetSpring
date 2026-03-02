@@ -37,6 +37,9 @@
 //! | NPU hardware | `BrainChip` `AKD1000` 80 NPU, 10 MB SRAM |
 //! | Driver       | `ToadStool` akida-driver 0.1.0 (pure Rust) |
 //! | Command      | `cargo run --release --features npu --bin validate_npu_funky` |
+//!
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::esn::{Esn, EsnConfig};

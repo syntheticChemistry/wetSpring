@@ -20,6 +20,9 @@
 //! | Exact command | `python3 scripts/pfas_tree_export.py` |
 //! | Data | 744 test samples, decision_tree_exported.json |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use std::fs;
 use wetspring_barracuda::bio::decision_tree::DecisionTree;

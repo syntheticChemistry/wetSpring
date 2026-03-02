@@ -10,13 +10,16 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | liu2009_neighbor_joining.py |
+//! | Baseline tool | `liu2009_neighbor_joining.py` |
 //! | Baseline version | scripts/ |
-//! | Baseline command | python3 scripts/liu2009_neighbor_joining.py |
+//! | Baseline command | python3 `scripts/liu2009_neighbor_joining.py` |
 //! | Baseline date | 2026-02-19 |
 //! | Exact command | `python3 scripts/liu2009_neighbor_joining.py` |
 //! | Data | synthetic distance matrices, 3–5 taxa |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::neighbor_joining::{
     distance_matrix, jukes_cantor_distance, neighbor_joining,

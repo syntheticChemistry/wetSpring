@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 1, 2026 (V85)
+**Date:** March 2, 2026 (V92C)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules + 1 IPC + 1 vault module (all lean, 0 local WGSL, 0 local derivative/regression math), 93 ToadStool primitives consumed (same ToadStool S70+++, barracuda always-on, zero fallback code), 1,223 tests (975 barracuda lib + 60 integration + 22 doc + 166 forge), 260 experiments, 6,656+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S70+++ aligned (`1dd7e338`), 97 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V85:** Exp256 EMP Anderson Atlas 30K — 14-biome synthetic atlas proves Anderson-QS at scale. Exp257 NUCLEUS Data Pipeline — three-tier routing (NestGate → Songbird → sovereign). Exp258 Tower-Node — all 6 primals READY, IPC 3.2× overhead, bit-identical dispatch. Exp259 Genomic Vault — organ model (consent-gated, encrypted storage, Merkle provenance), 20 lib tests, 30 experiment checks. Sovereign placeholders ready for BearDog/NestGate/Songbird absorption.
+**Status:** 47 CPU + 42 GPU modules + 1 IPC + 1 vault module (all lean, 0 local WGSL, 0 local derivative/regression math), 93 ToadStool primitives consumed (same ToadStool S79, barracuda always-on, zero fallback code), 1,276 tests, 272 experiments, 7,220+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S79 aligned (`f97fc2ae`), 103 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math.
 
 ### Full Lean Phase
 

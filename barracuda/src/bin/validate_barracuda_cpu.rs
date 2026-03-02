@@ -35,6 +35,9 @@
 //! ```text
 //! Python baseline → [THIS] BarraCuda CPU → BarraCuda GPU → sovereign pipeline
 //! ```
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{

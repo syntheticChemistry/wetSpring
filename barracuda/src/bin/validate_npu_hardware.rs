@@ -26,6 +26,9 @@
 //! | Baseline       | ToadStool examples/basic\_io.rs round-trip |
 //! | Hardware       | Eastgate i9-12900K, 64 GB DDR5, Pop!\_OS 22.04 |
 //! | Command        | `cargo run --release --features npu --bin validate_npu_hardware` |
+//!
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::time::Instant;
 use wetspring_barracuda::npu;

@@ -36,6 +36,9 @@
 //!
 //! Validates alpha diversity (Shannon, Simpson, Chao1), beta diversity
 //! (`Bray-Curtis`), rarefaction, and rare lineage detection.
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::{diversity, pcoa};
 use wetspring_barracuda::tolerances;

@@ -32,6 +32,9 @@
 //! | Date | 2026-02-28 |
 //! | Phase | 76 |
 //! | Command | `cargo run --release --features gpu --bin validate_barracuda_gpu_v7` |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use std::sync::Arc;
 use std::time::Instant;

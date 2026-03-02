@@ -135,7 +135,7 @@ impl Metrics {
             });
 
         serde_json::json!({
-            "primal": "wetspring",
+            "primal": crate::PRIMAL_NAME,
             "total_calls": self.total_calls.load(Ordering::Relaxed),
             "success_count": self.success_count.load(Ordering::Relaxed),
             "error_count": self.error_count.load(Ordering::Relaxed),

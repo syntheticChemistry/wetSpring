@@ -162,3 +162,33 @@ fn double_center(condensed: &[f64], n: usize) -> Vec<f64> {
     }
     centered
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::used_underscore_items
+)]
+mod tests {
+    use super::*;
+    use crate::gpu::GpuF64;
+
+    #[test]
+    fn api_surface_compiles() {
+        fn _assert_pcoa_gpu(_: fn(&GpuF64, &[f64], usize, usize) -> Result<PcoaResult>) {}
+        _assert_pcoa_gpu(pcoa_gpu);
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn pcoa_gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let condensed = vec![1.0, 1.0, 1.0]; // 3 samples: n*(n-1)/2 = 3
+        let result = pcoa_gpu(&gpu, &condensed, 3, 2);
+        assert!(result.is_ok(), "pcoa_gpu should succeed with valid input");
+    }
+}

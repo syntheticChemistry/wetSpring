@@ -25,6 +25,9 @@
 //! |-------|-------|
 //! | Date | 2026-02-28 |
 //! | Command | `cargo run --bin validate_nucleus_v2_extended` |
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use wetspring_forge::dispatch;
 use wetspring_forge::inventory;

@@ -34,6 +34,9 @@
 //! | Command | `cargo run --release --bin validate_barracuda_cpu_v12` |
 //! | Data | Synthetic test vectors (self-contained) |
 //! | Tolerances | `tolerances::ANALYTICAL_F64`, `tolerances::EXACT_F64` |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use std::io::Write;
 use std::path::PathBuf;

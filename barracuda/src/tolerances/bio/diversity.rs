@@ -14,6 +14,24 @@ pub const SHANNON_SIMULATED: f64 = 0.3;
 /// Expected ~0.9 ± 0.05 (validated against skbio 0.6.0, commit `e4358c5`).
 pub const SIMPSON_SIMULATED: f64 = 0.05;
 
+/// Pielou evenness J ≈ 1.0 tolerance for perfectly even communities.
+///
+/// J = H / ln(S) equals 1.0 for uniform abundance; 1% accommodates
+/// f64 rounding in Shannon and Simpson chains.
+pub const DIVERSITY_EVENNESS_TOL: f64 = 0.01;
+
+/// Shannon timeseries monotonicity threshold.
+///
+/// When checking "Shannon varies over time," a decrease > 0.001 between
+/// consecutive time points indicates meaningful temporal variation.
+pub const DIVERSITY_TS_MONOTONIC: f64 = 0.001;
+
+/// Shannon recovery near baseline after bloom.
+///
+/// Post-bloom community rebounds to within this tolerance of pre-bloom
+/// Shannon entropy. 0.1 accommodates residual dominance from bloom species.
+pub const SHANNON_RECOVERY_TOL: f64 = 0.1;
+
 /// Chao1 range above observed features (singleton/doubleton dependent).
 ///
 /// Chao1 ≥ observed by definition; for Exp002 `Galaxy` community

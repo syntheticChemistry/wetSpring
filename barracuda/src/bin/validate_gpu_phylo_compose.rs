@@ -37,6 +37,9 @@
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
 //! `ToadStool` primitive: `FelsensteinGpu` (site-parallel pruning). GPU bootstrap + placement.
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use barracuda::device::WgpuDevice;
 use barracuda::{FelsensteinGpu, FelsensteinResult, PhyloTree};

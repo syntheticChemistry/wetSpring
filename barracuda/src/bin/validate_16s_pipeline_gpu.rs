@@ -35,6 +35,9 @@
 //! All GPU vs CPU checks use `tolerances::GPU_VS_CPU_F64` (1e-6).
 //!
 //! Run: `cargo run --features gpu --release --bin validate_16s_pipeline_gpu`
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 #![allow(
     clippy::expect_used,

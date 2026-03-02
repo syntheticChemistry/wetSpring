@@ -39,8 +39,11 @@
 //! | Data | Model equations + published 41% threshold |
 //! | Track | Track 4 Exp174 — No-Till Soil QS & Anderson Geometry |
 //! | erf(1.0) | Analytical: Abramowitz & Stegun, Handbook of Mathematical Functions |
-//! | Soil model | Autoinducer diffusion L_D, threshold from Mukherjee et al. |
+//! | Soil model | Autoinducer diffusion `L_D`, threshold from Mukherjee et al. |
 //! | Command | `cargo test --bin validate_soil_distance_colonization -- --nocapture` |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::cooperation::{self, CooperationParams};

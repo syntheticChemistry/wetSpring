@@ -48,6 +48,9 @@
 //! | Baseline date | 2026-02-25 |
 //! | ToadStool pin | `02207c4a` (S62+DF64) |
 //! | Exact command | `cargo run --features gpu --release --bin validate_cross_spring_s62` |
+//!
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::sync::Arc;
 use std::time::Instant;

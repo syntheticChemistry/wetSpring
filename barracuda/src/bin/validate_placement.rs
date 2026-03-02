@@ -6,13 +6,16 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | alamin2024_placement.py |
+//! | Baseline tool | `alamin2024_placement.py` |
 //! | Baseline version | scripts/ |
-//! | Baseline command | python3 scripts/alamin2024_placement.py |
+//! | Baseline command | python3 `scripts/alamin2024_placement.py` |
 //! | Baseline date | 2026-02-19 |
 //! | Exact command | `python3 scripts/alamin2024_placement.py` |
 //! | Data | reference tree, 12bp query sequences |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::felsenstein::{TreeNode, encode_dna};
 use wetspring_barracuda::bio::placement::{batch_placement, placement_scan};

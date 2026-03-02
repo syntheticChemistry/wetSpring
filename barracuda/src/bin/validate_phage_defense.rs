@@ -6,13 +6,16 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | hsueh2022_phage_defense.py |
+//! | Baseline tool | `hsueh2022_phage_defense.py` |
 //! | Baseline version | scripts/ |
-//! | Baseline command | python3 scripts/hsueh2022_phage_defense.py |
+//! | Baseline command | python3 `scripts/hsueh2022_phage_defense.py` |
 //! | Baseline date | 2026-02-19 |
 //! | Exact command | `python3 scripts/hsueh2022_phage_defense.py` |
 //! | Data | phage-bacteria ODE scenarios |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::ode::steady_state_mean;
 use wetspring_barracuda::bio::phage_defense::{

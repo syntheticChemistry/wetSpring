@@ -26,6 +26,9 @@
 //! | Data           | NCBI SRA: PRJNA315684 (cold seep), PRJNA283159 (vent) |
 //! | Hardware       | Eastgate CPU (validation), biomeGate RTX 4070 (GPU) |
 //! | Command        | `cargo run --release --bin validate_real_ncbi_pipeline` |
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use std::collections::HashMap;
 use wetspring_barracuda::bio::diversity;

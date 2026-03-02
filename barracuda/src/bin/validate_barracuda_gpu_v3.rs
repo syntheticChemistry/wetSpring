@@ -27,6 +27,9 @@
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
 //! GPU modules: `diversity_gpu` (Pielou, Shannon, Simpson, Bray-Curtis), `spectral_match_gpu`, `stats_gpu`.
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 #![allow(
     clippy::expect_used,

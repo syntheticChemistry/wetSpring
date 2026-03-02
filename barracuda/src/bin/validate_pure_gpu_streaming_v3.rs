@@ -26,6 +26,9 @@
 //! | Date | 2026-02-27 |
 //! | Commit | wetSpring Phase 66+ |
 //! | Command | `cargo run --release --features gpu --bin validate_pure_gpu_streaming_v3` |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use std::time::Instant;
 

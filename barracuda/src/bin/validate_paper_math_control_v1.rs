@@ -41,6 +41,9 @@
 //! - **Zuber 2016** (meta-analysis): MBC ratio 1.14±0.06 from Table 2 (analytical).
 //! - Python baseline `scripts/islam2014_brandt_farm.py` reproduces Anderson W values;
 //!   run `python3 scripts/islam2014_brandt_farm.py` to verify.
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::{
     bistable, capacitor, cooperation, diversity, felsenstein, gillespie, hmm, multi_signal,
@@ -67,7 +70,7 @@ fn main() {
     println!("  Python baseline: N_ss=0.975, H_ss=1.979, C_ss≈0, B_ss=0.020");
 
     let params = qs_biofilm::QsBiofilmParams::default();
-    let r = qs_biofilm::scenario_standard_growth(&params, 0.001);
+    let r = qs_biofilm::scenario_standard_growth(&params, tolerances::ODE_DEFAULT_DT);
     let n_ss = ode_tail_mean(&r, 0, 0.1);
     let h_ss = ode_tail_mean(&r, 2, 0.1);
     let c_ss = ode_tail_mean(&r, 3, 0.1);
@@ -98,7 +101,7 @@ fn main() {
         tolerances::ODE_BIOFILM_SS,
     );
 
-    let r2 = qs_biofilm::scenario_high_density(&params, 0.001);
+    let r2 = qs_biofilm::scenario_high_density(&params, tolerances::ODE_DEFAULT_DT);
     let n2 = ode_tail_mean(&r2, 0, 0.1);
     let b2 = ode_tail_mean(&r2, 4, 0.1);
     v.check(
@@ -155,11 +158,11 @@ fn main() {
 
     let bi_params = bistable::BistableParams::default();
     let y0_low = [0.01, 0.0, 0.0, 2.0, 0.5];
-    let r_low = bistable::run_bistable(&y0_low, 0.01, 200.0, &bi_params);
+    let r_low = bistable::run_bistable(&y0_low, tolerances::ODE_DEFAULT_DT, 200.0, &bi_params);
     let final_low: Vec<f64> = r_low.states().last().unwrap().to_vec();
 
     let y0_high = [0.5, 1.0, 1.0, 0.1, 0.1];
-    let r_high = bistable::run_bistable(&y0_high, 0.01, 200.0, &bi_params);
+    let r_high = bistable::run_bistable(&y0_high, tolerances::ODE_DEFAULT_DT, 200.0, &bi_params);
     let final_high: Vec<f64> = r_high.states().last().unwrap().to_vec();
 
     v.check_pass(
@@ -178,8 +181,8 @@ fn main() {
     println!("  Property: all signals → LuxO-P low (high-cell-density phenotype)");
 
     let ms_params = multi_signal::MultiSignalParams::default();
-    let ms_wt = multi_signal::scenario_wild_type(&ms_params, 0.01);
-    let ms_noqs = multi_signal::scenario_no_qs(&ms_params, 0.01);
+    let ms_wt = multi_signal::scenario_wild_type(&ms_params, tolerances::ODE_DEFAULT_DT);
+    let ms_noqs = multi_signal::scenario_no_qs(&ms_params, tolerances::ODE_DEFAULT_DT);
 
     let wt_final: Vec<f64> = ms_wt.states().last().unwrap().to_vec();
     let noqs_final: Vec<f64> = ms_noqs.states().last().unwrap().to_vec();
@@ -207,7 +210,7 @@ fn main() {
     println!("  Property: cooperators persist when benefit > cost (ESS)");
 
     let coop_params = cooperation::CooperationParams::default();
-    let coop_result = cooperation::scenario_equal_start(&coop_params, 0.01);
+    let coop_result = cooperation::scenario_equal_start(&coop_params, tolerances::ODE_DEFAULT_DT);
     let freq = cooperation::cooperator_frequency(&coop_result);
     let final_freq = *freq.last().unwrap();
     v.check_pass("Bruger: cooperators persist (f > 0.1)", final_freq > 0.1);
@@ -219,7 +222,7 @@ fn main() {
     println!("  Python baseline: no-phage Bd=132,242, Bu=138,317; attack Bu→0");
 
     let phage_params = phage_defense::PhageDefenseParams::default();
-    let r_nophage = phage_defense::scenario_no_phage(&phage_params, 0.001);
+    let r_nophage = phage_defense::scenario_no_phage(&phage_params, tolerances::ODE_DEFAULT_DT);
     let bd_nophage = ode_tail_mean(&r_nophage, 0, 0.1);
     let bu_nophage = ode_tail_mean(&r_nophage, 1, 0.1);
 
@@ -240,7 +243,7 @@ fn main() {
         bu_nophage > bd_nophage,
     );
 
-    let r_attack = phage_defense::scenario_phage_attack(&phage_params, 0.001);
+    let r_attack = phage_defense::scenario_phage_attack(&phage_params, tolerances::ODE_DEFAULT_DT);
     let bd_attack = ode_tail_mean(&r_attack, 0, 0.1);
     let bu_attack = ode_tail_mean(&r_attack, 1, 0.1);
     v.check_pass(
@@ -260,8 +263,8 @@ fn main() {
     println!("  Property: QS memory persists; stress amplifies phenotype");
 
     let cap_params = capacitor::CapacitorParams::default();
-    let cap_normal = capacitor::scenario_normal(&cap_params, 0.01);
-    let cap_stress = capacitor::scenario_stress(&cap_params, 0.01);
+    let cap_normal = capacitor::scenario_normal(&cap_params, tolerances::ODE_DEFAULT_DT);
+    let cap_stress = capacitor::scenario_stress(&cap_params, tolerances::ODE_DEFAULT_DT);
 
     let normal_final: Vec<f64> = cap_normal.states().last().unwrap().to_vec();
     let stress_final: Vec<f64> = cap_stress.states().last().unwrap().to_vec();
@@ -375,7 +378,7 @@ fn main() {
     let nmf_cfg = barracuda::linalg::nmf::NmfConfig {
         rank: 5,
         max_iter: 200,
-        tol: 1e-4,
+        tol: tolerances::NMF_CONVERGENCE_KL,
         objective: barracuda::linalg::nmf::NmfObjective::KlDivergence,
         seed: 42,
     };
@@ -395,8 +398,15 @@ fn main() {
 
     let ridge_x: Vec<f64> = (0..50).map(|i| f64::from(i) * 0.02).collect();
     let ridge_y: Vec<f64> = (0..20).map(|i| f64::from(i).mul_add(0.5, 1.0)).collect();
-    let ridge =
-        barracuda::linalg::ridge_regression(&ridge_x, &ridge_y, 10, 5, 2, 1e-6).expect("ridge");
+    let ridge = barracuda::linalg::ridge_regression(
+        &ridge_x,
+        &ridge_y,
+        10,
+        5,
+        2,
+        tolerances::RIDGE_REGULARIZATION_SMALL,
+    )
+    .expect("ridge");
     v.check_pass(
         "Fajgenbaum: ridge weights finite",
         ridge.weights.iter().all(|w| w.is_finite()),

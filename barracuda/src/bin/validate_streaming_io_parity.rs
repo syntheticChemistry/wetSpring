@@ -31,6 +31,9 @@
 //! | Commit | wetSpring Phase 66 (V66 post-audit) |
 //! | Hardware | CPU only (I/O validation) |
 //! | Command | `cargo run --release --bin validate_streaming_io_parity` |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::io::Write;
 use std::path::PathBuf;

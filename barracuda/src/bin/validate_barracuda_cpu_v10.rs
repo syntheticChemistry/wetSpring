@@ -23,6 +23,9 @@
 //! | Command       | `cargo run --release --bin validate_barracuda_cpu_v10` |
 //! | Data          | Synthetic test vectors (self-contained) |
 //! | Tolerances    | `tolerances::EXACT_F64`, structural (pass/fail) |
+//!
+//! Validation class: Synthetic
+//! Provenance: Generated data with known statistical properties
 
 use std::time::Instant;
 use wetspring_barracuda::bio::diversity;
@@ -82,7 +85,7 @@ fn validate_diversity_pipeline(v: &mut Validator) {
     let j_even = diversity::pielou_evenness(&communities[1]);
     v.check_pass(
         "perfectly even community has Pielou J ≈ 1.0",
-        (j_even - 1.0).abs() < 0.01,
+        (j_even - 1.0).abs() < tolerances::DIVERSITY_EVENNESS_TOL,
     );
 
     println!("  Diversity pipeline: {:.0}µs", t.elapsed().as_micros());
@@ -238,14 +241,15 @@ fn validate_dynamic_anderson(v: &mut Validator) {
     );
     v.check_pass("seasonal is periodic (365 days)", {
         let diff = (w_seasonal(0.0) - w_seasonal(365.0)).abs();
-        diff < 1e-10
+        diff < tolerances::PYTHON_PARITY
     });
 
     v.check_pass("seasonal range is [12, 20]", {
         let vals: Vec<f64> = (0..366).map(f64::from).map(w_seasonal).collect();
         let min = vals.iter().copied().fold(f64::MAX, f64::min);
         let max = vals.iter().copied().fold(f64::MIN, f64::max);
-        min >= 11.99 && max <= 20.01
+        let margin = tolerances::ODE_STEADY_STATE;
+        min >= 12.0 - margin && max <= 20.0 + margin
     });
 
     println!("  Dynamic Anderson W(t): {:.0}µs", t.elapsed().as_micros());
@@ -316,7 +320,7 @@ fn validate_npu_quantization(v: &mut Validator) {
         let quantization_error = (orig - recon).abs() / range;
         v.check_pass(
             &format!("feature {i} quantization error < 1%"),
-            quantization_error < 0.01,
+            quantization_error < tolerances::PEAK_HEIGHT_REL,
         );
     }
 

@@ -18,6 +18,9 @@
 //! | Data source | Synthetic (mirrors ~12,000 Vibrio genomes on NCBI) |
 //! | GPU prims   | `BatchedOdeRK4F64` (via `OdeSweepGpu`) |
 //! | Date        | 2026-02-23 |
+//!
+//! Validation class: Synthetic
+//! Provenance: Generated data with known statistical properties
 
 use std::time::Instant;
 #[cfg(feature = "gpu")]

@@ -176,3 +176,36 @@ pub fn cosine_vs_library_gpu(
 
     Ok(scores)
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::type_complexity,
+    clippy::used_underscore_items
+)]
+mod tests {
+    use super::*;
+    use crate::gpu::GpuF64;
+
+    #[test]
+    fn api_surface_compiles() {
+        fn _assert_pairwise(_: fn(&GpuF64, &[Vec<f64>]) -> Result<Vec<f64>>) {}
+        fn _assert_cosine_vs_lib(_: fn(&GpuF64, &[f64], &[Vec<f64>]) -> Result<Vec<f64>>) {}
+        _assert_pairwise(pairwise_cosine_gpu);
+        _assert_cosine_vs_lib(cosine_vs_library_gpu);
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn pairwise_cosine_gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let spectra = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+        let result = pairwise_cosine_gpu(&gpu, &spectra);
+        assert!(result.is_ok(), "pairwise_cosine_gpu should succeed");
+    }
+}

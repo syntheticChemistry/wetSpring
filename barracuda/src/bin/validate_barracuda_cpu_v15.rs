@@ -35,6 +35,9 @@
 //! | Date | 2026-02-28 |
 //! | Phase | 76 |
 //! | Command | `cargo run --release --bin validate_barracuda_cpu_v15` |
+//!
+//! Validation class: GPU-parity
+//! Provenance: CPU reference implementation in barracuda::bio
 
 use std::collections::HashMap;
 use wetspring_barracuda::bio::{
@@ -69,7 +72,10 @@ fn main() {
     let large_sizes = [1000, 1000, 1000];
     let fst_identical =
         fst_variance::fst_variance_decomposition(&identical_freqs, &large_sizes).unwrap();
-    v.check_pass("FST(identical) ≈ 0", fst_identical.fst.abs() < 0.01);
+    v.check_pass(
+        "FST(identical) ≈ 0",
+        fst_identical.fst.abs() < tolerances::ODE_STEADY_STATE,
+    );
 
     // ═══ D01: PairwiseL2 CPU Reference ═══════════════════════════════
     v.section("D01: V75 PairwiseL2 CPU Reference");

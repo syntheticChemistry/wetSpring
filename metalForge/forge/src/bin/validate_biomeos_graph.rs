@@ -28,6 +28,9 @@
 //! |-------|-------|
 //! | Date | 2026-03-01 |
 //! | Command | `cargo run -p wetspring-forge --bin validate_biomeos_graph` |
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use wetspring_forge::dispatch;
 use wetspring_forge::inventory;

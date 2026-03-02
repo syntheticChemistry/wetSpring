@@ -87,3 +87,39 @@ pub fn rf_distance_matrix_gpu(gpu: &GpuF64, trees: &[PhyloTree]) -> Result<Vec<f
     }
     Ok(condensed)
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::type_complexity,
+    clippy::manual_let_else
+)]
+mod tests {
+    use super::*;
+    use crate::bio::unifrac::tree::PhyloTree;
+    use crate::gpu::GpuF64;
+
+    #[test]
+    fn api_surface_compiles() {
+        let _: fn(&GpuF64, &PhyloTree, &PhyloTree) -> Result<usize> = rf_distance_gpu;
+        let _: fn(&GpuF64, &PhyloTree, &PhyloTree) -> Result<f64> = rf_distance_normalized_gpu;
+        let _: fn(&GpuF64, &[PhyloTree]) -> Result<Vec<f64>> = rf_distance_matrix_gpu;
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let tree = PhyloTree::from_newick("(A,B);");
+        let result = rf_distance_gpu(&gpu, &tree, &tree);
+        assert!(
+            result.is_ok(),
+            "rf_distance_gpu should succeed with valid input"
+        );
+    }
+}

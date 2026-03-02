@@ -6,7 +6,7 @@
 //! math. `barracuda` is always available (default-features = false for
 //! CPU-only builds, full GPU when `gpu` feature is active).
 //!
-//! `dot` and `l2_norm` are local CPU helpers used by 15+ binaries.
+//! `dot` and `l2_norm` delegate to `barracuda::stats` (S64 absorption).
 //!
 //! # Consumers
 //!

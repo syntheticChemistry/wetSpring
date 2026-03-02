@@ -36,6 +36,9 @@
 //! | Data | 31-year experimental data (Table 1-4 from paper) |
 //! | Track | Track 4 — No-Till Soil QS & Anderson Geometry |
 //! | Command | `cargo test --bin validate_notill_longterm_tillage -- --nocapture` |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas and algorithmic invariants
 
 use std::time::Instant;
 use wetspring_barracuda::bio::diversity;

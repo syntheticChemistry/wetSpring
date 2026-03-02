@@ -27,6 +27,9 @@
 //! | Baseline date | 2026-02-23 |
 //! | Exact command | `cargo run --features gpu --release --bin validate_metalforge_v6` |
 //! | Data | Synthetic test vectors (self-contained) |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use barracuda::device::WgpuDevice;
 use barracuda::{FelsensteinGpu, PhyloTree};

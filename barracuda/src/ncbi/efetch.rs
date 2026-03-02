@@ -9,6 +9,9 @@ use crate::error::Error;
 
 const EFETCH_BASE: &str = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
 
+/// Injectable HTTP GET function — enables mock injection for testing.
+pub type HttpGetFn = fn(&str) -> crate::error::Result<String>;
+
 /// Fetch a single FASTA record from NCBI by accession or UID.
 ///
 /// # Arguments
@@ -23,8 +26,22 @@ const EFETCH_BASE: &str = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.
 /// or no HTTP transport is available.
 #[must_use = "fetched sequence is discarded if not used"]
 pub fn efetch_fasta(db: &str, id: &str, api_key: &str) -> crate::error::Result<String> {
+    efetch_fasta_with(db, id, api_key, super::http::get)
+}
+
+/// Like [`efetch_fasta`] but with an injectable HTTP transport.
+///
+/// # Errors
+///
+/// Returns `Err` if the HTTP transport fails or the response is not FASTA.
+pub fn efetch_fasta_with(
+    db: &str,
+    id: &str,
+    api_key: &str,
+    http_get: HttpGetFn,
+) -> crate::error::Result<String> {
     let url = build_url(db, id, "fasta", "text", api_key);
-    let body = super::http::get(&url)?;
+    let body = http_get(&url)?;
     validate_fasta(&body)?;
     Ok(body)
 }
@@ -49,8 +66,22 @@ fn validate_genbank(body: &str) -> crate::error::Result<()> {
 /// contain a LOCUS line.
 #[must_use = "fetched record is discarded if not used"]
 pub fn efetch_genbank(db: &str, id: &str, api_key: &str) -> crate::error::Result<String> {
+    efetch_genbank_with(db, id, api_key, super::http::get)
+}
+
+/// Like [`efetch_genbank`] but with an injectable HTTP transport.
+///
+/// # Errors
+///
+/// Returns `Err` if the HTTP transport fails or the response is not `GenBank`.
+pub fn efetch_genbank_with(
+    db: &str,
+    id: &str,
+    api_key: &str,
+    http_get: HttpGetFn,
+) -> crate::error::Result<String> {
     let url = build_url(db, id, "gb", "text", api_key);
-    let body = super::http::get(&url)?;
+    let body = http_get(&url)?;
     validate_genbank(&body)?;
     Ok(body)
 }
@@ -63,12 +94,27 @@ pub fn efetch_genbank(db: &str, id: &str, api_key: &str) -> crate::error::Result
 /// FASTA headers.
 #[must_use = "fetched sequences are discarded if not used"]
 pub fn efetch_fasta_batch(db: &str, ids: &[&str], api_key: &str) -> crate::error::Result<String> {
+    efetch_fasta_batch_with(db, ids, api_key, super::http::get)
+}
+
+/// Like [`efetch_fasta_batch`] but with an injectable HTTP transport.
+///
+/// # Errors
+///
+/// Returns `Err` if the IDs are empty, the HTTP transport fails, or
+/// the response is not FASTA.
+pub fn efetch_fasta_batch_with(
+    db: &str,
+    ids: &[&str],
+    api_key: &str,
+    http_get: HttpGetFn,
+) -> crate::error::Result<String> {
     if ids.is_empty() {
         return Err(Error::Ncbi("empty ID list".to_string()));
     }
     let joined = ids.join(",");
     let url = build_url(db, &joined, "fasta", "text", api_key);
-    let body = super::http::get(&url)?;
+    let body = http_get(&url)?;
     validate_fasta(&body)?;
     Ok(body)
 }
@@ -220,5 +266,79 @@ mod tests {
     fn preview_msg_empty_body() {
         let msg = preview_msg("error", "");
         assert_eq!(msg, "error: ");
+    }
+
+    #[allow(clippy::unnecessary_wraps)]
+    fn mock_fasta_get(_url: &str) -> crate::error::Result<String> {
+        Ok(">K03455.1 Human immunodeficiency virus\nATCGATCGATCG\n".to_string())
+    }
+
+    #[allow(clippy::unnecessary_wraps)]
+    fn mock_genbank_get(_url: &str) -> crate::error::Result<String> {
+        Ok("LOCUS       K03455  9719 bp    RNA\nDEFINITION  HIV-1\n".to_string())
+    }
+
+    fn mock_error_get(_url: &str) -> crate::error::Result<String> {
+        Err(crate::error::Error::Ncbi("connection refused".to_string()))
+    }
+
+    #[allow(clippy::unnecessary_wraps)]
+    fn mock_html_error_get(_url: &str) -> crate::error::Result<String> {
+        Ok("<!DOCTYPE html><html><body>Error</body></html>".to_string())
+    }
+
+    #[test]
+    fn efetch_fasta_with_mock_success() {
+        let result = efetch_fasta_with("nucleotide", "K03455", "key", mock_fasta_get);
+        let fasta = result.unwrap();
+        assert!(fasta.starts_with('>'));
+        assert!(fasta.contains("ATCG"));
+    }
+
+    #[test]
+    fn efetch_fasta_with_mock_network_error() {
+        let err = efetch_fasta_with("nucleotide", "K03455", "key", mock_error_get).unwrap_err();
+        assert!(err.to_string().contains("connection refused"));
+    }
+
+    #[test]
+    fn efetch_fasta_with_mock_html_error() {
+        let err =
+            efetch_fasta_with("nucleotide", "K03455", "key", mock_html_error_get).unwrap_err();
+        assert!(err.to_string().contains("does not look like FASTA"));
+    }
+
+    #[test]
+    fn efetch_genbank_with_mock_success() {
+        let result = efetch_genbank_with("nucleotide", "K03455", "key", mock_genbank_get);
+        let gb = result.unwrap();
+        assert!(gb.contains("LOCUS"));
+    }
+
+    #[test]
+    fn efetch_genbank_with_mock_html_error() {
+        let err =
+            efetch_genbank_with("nucleotide", "K03455", "key", mock_html_error_get).unwrap_err();
+        assert!(err.to_string().contains("does not look like GenBank"));
+    }
+
+    #[test]
+    fn efetch_fasta_batch_with_mock_success() {
+        let result =
+            efetch_fasta_batch_with("nucleotide", &["K03455", "M54321"], "key", mock_fasta_get);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn efetch_fasta_batch_with_mock_empty_ids() {
+        let err = efetch_fasta_batch_with("nucleotide", &[], "key", mock_fasta_get).unwrap_err();
+        assert!(err.to_string().contains("empty ID list"));
+    }
+
+    #[test]
+    fn efetch_fasta_batch_with_mock_error() {
+        let err =
+            efetch_fasta_batch_with("nucleotide", &["K03455"], "key", mock_error_get).unwrap_err();
+        assert!(err.to_string().contains("connection refused"));
     }
 }

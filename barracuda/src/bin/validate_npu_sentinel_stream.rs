@@ -20,11 +20,14 @@
 //! | Item           | Value |
 //! |----------------|-------|
 //! | Date           | 2026-02-26 |
-//! | NPU hardware   | BrainChip Akida AKD1000, Eastgate (simulated) |
+//! | NPU hardware   | `BrainChip` Akida AKD1000, Eastgate (simulated) |
 //! | Baseline model | Exp160 SNN sentinel (95% top-1, 87% recall) |
 //! | Baseline commit| wetSpring Phase 59 |
 //! | Hardware       | Eastgate CPU (int8 sim), biomeGate RTX 4070 (Anderson) |
 //! | Command        | `cargo run --release --bin validate_npu_sentinel_stream` |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas and algorithmic invariants
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::validation::Validator;

@@ -114,3 +114,34 @@ fn require_f64(gpu: &GpuF64) -> Result<()> {
         Err(Error::Gpu("SHADER_F64 not supported on this GPU".into()))
     }
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    clippy::used_underscore_items
+)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn api_surface_compiles() {
+        fn _assert_variance(_: fn(&GpuF64, &[f64]) -> Result<f64>) {}
+        fn _assert_correlation(_: fn(&GpuF64, &[f64], &[f64]) -> Result<f64>) {}
+        _assert_variance(variance_gpu);
+        _assert_correlation(correlation_gpu);
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn variance_gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let data = vec![1.0, 2.0, 3.0, 4.0];
+        let result = variance_gpu(&gpu, &data);
+        assert!(result.is_ok(), "variance_gpu should succeed");
+    }
+}

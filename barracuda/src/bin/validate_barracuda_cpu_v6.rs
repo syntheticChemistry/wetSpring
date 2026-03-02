@@ -24,6 +24,9 @@
 //! | Exact command | `cargo run --release --bin validate_barracuda_cpu_v6` |
 //! | Data | Analytical ODE steady-states from documented Python runs |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{
@@ -174,7 +177,7 @@ fn validate_bistable(v: &mut Validator) {
         .b_forward
         .iter()
         .zip(&bif.b_backward)
-        .any(|(f, b)| (f - b).abs() > 0.05);
+        .any(|(f, b)| (f - b).abs() > tolerances::PEAK_MIN_PROMINENCE);
     v.check_pass(
         "bistable hysteresis detected in bifurcation scan",
         has_hysteresis,

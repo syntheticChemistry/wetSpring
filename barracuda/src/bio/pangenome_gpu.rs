@@ -132,3 +132,34 @@ impl PangenomeGpu {
         })
     }
 }
+
+#[cfg(test)]
+#[cfg(feature = "gpu")]
+#[allow(clippy::expect_used, clippy::unwrap_used, clippy::manual_let_else)]
+mod tests {
+    use super::*;
+    use crate::gpu::GpuF64;
+
+    #[test]
+    fn api_surface_compiles() {
+        fn _assert_pangenome_result(_: &PangenomeGpuResult) {}
+        let _ = PangenomeGpu::new;
+    }
+
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn pangenome_gpu_signature_check() {
+        let gpu = match GpuF64::new().await {
+            Ok(g) if g.has_f64 => g,
+            _ => return,
+        };
+        let device = gpu.to_wgpu_device();
+        let pan = match PangenomeGpu::new(&device) {
+            Ok(p) => p,
+            Err(_) => return,
+        };
+        let presence = vec![1u8, 0, 1, 1, 0, 1]; // 2 genes x 3 genomes
+        let result = pan.classify(&presence, 2, 3);
+        assert!(result.is_ok(), "classify should succeed");
+    }
+}

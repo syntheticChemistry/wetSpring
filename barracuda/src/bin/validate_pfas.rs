@@ -18,6 +18,9 @@
 //! - 738 MS2 spectra (exact — deterministic parser)
 //! - 62 PFAS candidate spectra (CF2/C2F4/HF fragment screening)
 //! - 25 unique PFAS precursor m/z values
+//!
+//! Validation class: Python-parity
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use std::collections::HashSet;
 use std::path::Path;

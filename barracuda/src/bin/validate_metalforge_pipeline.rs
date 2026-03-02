@@ -25,6 +25,9 @@
 //! | Exact command | `cargo run --release --bin validate_metalforge_pipeline` |
 //! | Data | Synthetic test vectors (self-contained) |
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, Pop!\_OS 22.04 |
+//!
+//! Validation class: Pipeline
+//! Provenance: End-to-end pipeline integration test
 
 use std::collections::HashMap;
 use std::fmt;

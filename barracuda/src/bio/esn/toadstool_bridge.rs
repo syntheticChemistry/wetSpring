@@ -2,11 +2,20 @@
 #![allow(clippy::missing_errors_doc, clippy::missing_const_for_fn)]
 //! Bridge to `ToadStool`'s `barracuda::esn_v2` for bio use cases.
 //!
-//! Wraps the hardware-agnostic ESN (Tensor, WGSL shaders) with bio-specific
-//! feature extraction and multi-head classifier support.
+//! Two tiers:
+//! - [`BioEsn`]: single-head ESN for backward compatibility and simple classifiers.
+//! - [`MultiHeadBioEsn`]: wraps `ToadStool` `MultiHeadEsn` (S79) — shared reservoir
+//!   with per-head bio readouts, head disagreement uncertainty, and labeled exports.
+//!
+//! # Cross-spring provenance
+//!
+//! - ESN core: hotSpring V0615 (36-head concept, `MultiHeadEsn`)
+//! - Reservoir WGSL shaders: neuralSpring V24 (`LstmReservoir`, `EsnClassifier`)
+//! - Ridge regression readout: `ToadStool` `barracuda::linalg::solve_f64_cpu`
+//! - Bio feature mapping: wetSpring (diversity, taxonomy, AMR, bloom, disorder heads)
 
 use super::{EsnConfig, NpuReadoutWeights};
-use barracuda::esn_v2::{ESN, ESNConfig, ExportedWeights};
+use barracuda::esn_v2::{ESN, ESNConfig, ExportedWeights, HeadConfig, MultiHeadEsn};
 use barracuda::tensor::Tensor;
 use std::sync::OnceLock;
 
@@ -229,17 +238,27 @@ impl BioEsn {
     }
 
     /// Export all weights for cross-device deployment.
+    ///
+    /// Includes `head_labels` for bio heads (`ToadStool` S79+).
     pub fn export_weights(&self) -> Result<ExportedWeights, barracuda::error::BarracudaError> {
-        self.inner.export_weights()
+        let mut weights = self.inner.export_weights()?;
+        if weights.head_labels.is_empty() && self.inner.config().output_size > 1 {
+            weights.head_labels = bio_head_labels(self.inner.config().output_size);
+        }
+        Ok(weights)
     }
 
-    /// Migrate single-head weights to multi-head.
+    /// Migrate single-head weights to multi-head with bio labels.
     pub fn migrate_to_multi_head(
         weights: &ExportedWeights,
         reservoir_size: usize,
         new_output_size: usize,
     ) -> Result<ExportedWeights, barracuda::error::BarracudaError> {
-        weights.migrate_to_multi_head(reservoir_size, new_output_size)
+        let mut migrated = weights.migrate_to_multi_head(reservoir_size, new_output_size)?;
+        if migrated.head_labels.is_empty() {
+            migrated.head_labels = bio_head_labels(new_output_size);
+        }
+        Ok(migrated)
     }
 
     /// Configuration used to build this ESN.
@@ -253,6 +272,125 @@ impl BioEsn {
     pub fn is_trained(&self) -> bool {
         self.inner.is_trained()
     }
+}
+
+/// Multi-head bio ESN wrapping `ToadStool`'s `MultiHeadEsn` (S79).
+///
+/// Shared reservoir with per-head readouts for bio classification domains.
+/// Each head is independently trainable and exportable. Head disagreement
+/// measures uncertainty across bio domains.
+///
+/// # Cross-spring provenance
+///
+/// - Shared reservoir: hotSpring V0615 (36-head concept → `ToadStool` `MultiHeadEsn`)
+/// - Per-head ridge regression: `ToadStool` `barracuda::linalg::solve_f64_cpu`
+/// - Bio head mapping: wetSpring (diversity/taxonomy/AMR/bloom/disorder)
+/// - Head disagreement: hotSpring uncertainty metric (mean pairwise L2)
+pub struct MultiHeadBioEsn {
+    inner: MultiHeadEsn,
+    head_labels: Vec<String>,
+}
+
+impl MultiHeadBioEsn {
+    /// Create a multi-head bio ESN with the standard 5 bio heads.
+    ///
+    /// Heads: diversity (0), taxonomy (1), AMR (2), bloom (3), disorder (4).
+    pub fn new_bio5(config: &BioEsnConfig) -> Result<Self, barracuda::error::BarracudaError> {
+        let heads = vec![
+            HeadConfig {
+                group: barracuda::esn_v2::HeadGroup::Meta,
+                label: "diversity".to_string(),
+                output_size: 1,
+            },
+            HeadConfig {
+                group: barracuda::esn_v2::HeadGroup::Meta,
+                label: "taxonomy".to_string(),
+                output_size: 1,
+            },
+            HeadConfig {
+                group: barracuda::esn_v2::HeadGroup::Meta,
+                label: "amr".to_string(),
+                output_size: 1,
+            },
+            HeadConfig {
+                group: barracuda::esn_v2::HeadGroup::Meta,
+                label: "bloom".to_string(),
+                output_size: 1,
+            },
+            HeadConfig {
+                group: barracuda::esn_v2::HeadGroup::Meta,
+                label: "disorder".to_string(),
+                output_size: 1,
+            },
+        ];
+        Self::new(config, heads)
+    }
+
+    /// Create a multi-head bio ESN with custom head configuration.
+    pub fn new(
+        config: &BioEsnConfig,
+        heads: Vec<HeadConfig>,
+    ) -> Result<Self, barracuda::error::BarracudaError> {
+        let head_labels: Vec<String> = heads.iter().map(|h| h.label.clone()).collect();
+        let esn_config = config.to_esn_config();
+        let inner = block_on(MultiHeadEsn::new(esn_config, heads))?;
+        Ok(Self { inner, head_labels })
+    }
+
+    /// Train a single bio head from pre-collected reservoir states.
+    ///
+    /// `states`: flat `[reservoir_size × n_samples]` (column-major).
+    /// `targets`: flat `[head_output_size × n_samples]`.
+    pub fn train_head(
+        &mut self,
+        head: BioHeadKind,
+        states: &[f64],
+        targets: &[f64],
+        lambda: f64,
+    ) -> Result<(), barracuda::error::BarracudaError> {
+        let idx = head.index(self.head_labels.len());
+        self.inner.train_head(idx, states, targets, lambda)
+    }
+
+    /// Mean pairwise L2 distance between head predictions (uncertainty signal).
+    ///
+    /// Higher disagreement → lower confidence in the consensus prediction.
+    /// Requires a reservoir state `Tensor` (from `ToadStool` ESN forward pass).
+    pub fn head_disagreement(
+        &self,
+        state: &Tensor,
+    ) -> Result<f64, barracuda::error::BarracudaError> {
+        self.inner.head_disagreement(state)
+    }
+
+    /// Export weights with bio head labels populated.
+    pub fn export_weights(&self) -> Result<ExportedWeights, barracuda::error::BarracudaError> {
+        self.inner.export_weights()
+    }
+
+    /// Head labels for this ESN.
+    #[must_use]
+    pub fn head_labels(&self) -> &[String] {
+        &self.head_labels
+    }
+
+    /// Number of bio heads.
+    #[must_use]
+    pub fn num_heads(&self) -> usize {
+        self.head_labels.len()
+    }
+}
+
+/// Default bio head labels for multi-head ESN (matches [`BioHeadKind`] order).
+fn bio_head_labels(output_size: usize) -> Vec<String> {
+    const NAMES: &[&str] = &["diversity", "taxonomy", "amr", "bloom", "disorder"];
+    (0..output_size)
+        .map(|i| {
+            NAMES
+                .get(i)
+                .map_or_else(|| format!("custom_{i}"), |s| (*s).to_string())
+        })
+        .collect()
 }
 
 /// Block on async using a shared runtime.

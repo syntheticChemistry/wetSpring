@@ -267,7 +267,7 @@ Delete local shader copy. Use the crate-level re-export
 (e.g., `barracuda::SmithWatermanGpu`). Local extensions that still need work
 remain in wetSpring until absorption.
 
-### Current Status (V87, Mar 1)
+### Current Status (V92C, Mar 2)
 
 | Phase | Count | Items |
 |-------|:-----:|-------|
@@ -277,7 +277,7 @@ remain in wetSpring until absorption.
 | **CPU math** (delegated to barracuda) | 8 functions | erf, ln_gamma, regularized_gamma_p, norm_cdf, dot, l2_norm, trapz, ridge_regression |
 | **Blocked** | 0 | All former blockers resolved: kmer (S62), UniFrac (S62), taxonomy (S64), NVVM polyfill (S39) |
 
-Active handoff: `../../wateringHole/handoffs/WETSPRING_TOADSTOOL_V87_BLUEFISH_BRAIN_ARCH_HANDOFF_MAR01_2026.md`
+Active handoff: `../../wateringHole/handoffs/WETSPRING_TOADSTOOL_V92C_BLUEFISH_BRAIN_ARCH_HANDOFF_MAR02_2026.md`
 
 ---
 

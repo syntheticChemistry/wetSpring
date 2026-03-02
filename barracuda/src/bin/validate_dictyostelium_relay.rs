@@ -21,6 +21,9 @@
 //! | Date        | 2026-02-24 |
 //! | Phase       | 39 — Paper queue extension |
 //! | Paper       | 38 (Frontiers Cell Dev Biol 2023) |
+//!
+//! Validation class: Analytical
+//! Provenance: Known-value formulas and algorithmic invariants
 
 use wetspring_barracuda::validation::Validator;
 
