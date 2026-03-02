@@ -137,7 +137,7 @@ fn main() {
 
     // 9. pearson_correlation — perfect linear y = 2x + 1 → r = 1
     let x_lin: Vec<f64> = (0..20).map(f64::from).collect();
-    let y_lin: Vec<f64> = x_lin.iter().map(|&x| 2.0 * x + 1.0).collect();
+    let y_lin: Vec<f64> = x_lin.iter().map(|&x| 2.0f64.mul_add(x, 1.0)).collect();
     let pearson = barracuda::stats::pearson_correlation(&x_lin, &y_lin).unwrap();
     v.check(
         "pearson(perfect linear) = 1",
@@ -159,7 +159,7 @@ fn main() {
 
     // 11. fit_linear — known line y = 3x + 2
     let x_fit: Vec<f64> = (0..15).map(f64::from).collect();
-    let y_fit: Vec<f64> = x_fit.iter().map(|&x| 3.0 * x + 2.0).collect();
+    let y_fit: Vec<f64> = x_fit.iter().map(|&x| 3.0f64.mul_add(x, 2.0)).collect();
     let fit = barracuda::stats::fit_linear(&x_fit, &y_fit).unwrap();
     v.check("fit_linear: slope ≈ 3", fit.params[0], 3.0, 0.01);
     v.check("fit_linear: intercept ≈ 2", fit.params[1], 2.0, 0.01);
@@ -210,13 +210,13 @@ fn main() {
     let x_exp: Vec<f64> = (0..20).map(f64::from).collect();
     let y_exp: Vec<f64> = x_exp
         .iter()
-        .map(|&x| 2.0 * (0.15 * x).exp() + 0.5)
+        .map(|&x| 2.0f64.mul_add((0.15 * x).exp(), 0.5))
         .collect();
     let fit_exp = barracuda::stats::fit_exponential(&x_exp, &y_exp).unwrap();
     v.check_pass("fit_exponential: Some", true);
     v.check_pass("fit_exponential R² > 0.95", fit_exp.r_squared > 0.95);
     let pred = fit_exp.predict_one(10.0).unwrap();
-    let expected_pred = 2.0 * (0.15_f64 * 10.0).exp() + 0.5;
+    let expected_pred = 2.0f64.mul_add((0.15_f64 * 10.0).exp(), 0.5);
     v.check(
         "fit_exponential predict(10) ≈ truth",
         pred,

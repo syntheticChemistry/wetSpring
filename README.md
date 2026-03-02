@@ -4,9 +4,9 @@
 and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 **Write → Absorb → Lean** cycle adopted from hotSpring.
 
-**Date:** March 1, 2026
+**Date:** March 2, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 87 — 1,247 tests (975 barracuda lib + 60 integration + 22 doc + 166 forge), 262 experiments, 6,656+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 238 binaries (218 validate + 20 benchmark), ToadStool S71+++ aligned (`1dd7e338`), 93 primitives consumed (same ToadStool S71+++) via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 97 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (both crates, all targets, ZERO warnings), V87: blueFish whitePaper launched (7 documents, chemistry as irreducible research programme, RootPulse provenance integration, isomorphism proof extending BarraCUDA to 29 comp-chem operations), hotSpring brain architecture reviewed (4-layer concurrent brain, 36-head ESN, NautilusBrain mapped to bio workloads), V87 handoff to ToadStool/BarraCUDA team with Phase 2 primal requirements (LoamSpine, SweetGrass, rhizoCrypt)
+**Status:** Phase 88 — 1,249 tests, 270 experiments, 7,083+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 253 binaries (233 validate + 20 benchmark), ToadStool S71+++ aligned (`1dd7e338`), 93 primitives consumed via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 97 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (both crates, all targets, ZERO warnings), V88: full experiment buildout (Exp263-270) — CPU v20 (37 checks), CPU↔GPU parity v7 (22), metalForge v12 (63), NUCLEUS v3 (106), ToadStool pure-math dispatch v3 (41), CPU↔GPU pure-math parity (38), mixed-hardware NUCLEUS dispatch (91), biomeOS graph coordination (29), V88 handoff to ToadStool/BarraCUDA team with barracuda evolution learnings and absorption targets
 
 ---
 
@@ -121,13 +121,14 @@ integration point.
 | IPC dispatch CPU parity (Exp206) | 64 (7 domains, EXACT_F64 — zero numeric drift through IPC layer) |
 | IPC dispatch GPU parity (Exp207) | 54 (6 domains, GPU↔CPU — lazy OnceLock + dispatch threshold) |
 | metalForge v7 NUCLEUS (Exp208) | 75 (8 domains, mixed hardware — PCIe bypass, Tower/Node/Nest atomics) |
-| **Total validation checks** | **6,656+** |
-| Rust library unit tests | 962 (barracuda CPU + IPC, default features) |
+| V88 experiment buildout (Exp263-270) | 427 (CPU v20, CPU↔GPU v7, metalForge v12, NUCLEUS v3, ToadStool pure-math v3, CPU↔GPU pure-math, mixed-HW dispatch, biomeOS graph) |
+| **Total validation checks** | **7,083+** |
+| Rust library unit tests | 964 (barracuda CPU + IPC, default features) |
 | metalForge forge tests | 175 |
-| **Total Rust tests** | **1,247** (975 barracuda lib + 60 integration + 22 doc + 166 forge) |
+| **Total Rust tests** | **1,249** |
 | Library code coverage | **95.86% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov) |
-| Experiments completed | 262 |
-| Validation/benchmark binaries | 218 validate + 20 benchmark = 238 total |
+| Experiments completed | 270 |
+| Validation/benchmark binaries | 233 validate + 20 benchmark = 253 total |
 | CPU bio modules | 47 |
 | GPU bio modules | 42 (30 lean + 5 write→lean + 7 compose + 0 passthrough) |
 | Tier B (needs refactor) | 0 (all promoted) |
@@ -139,7 +140,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | ToadStool primitives consumed | **93** (barracuda always-on, zero fallback code — ToadStool S71+++, `1dd7e338`) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 6,656+ validation checks **PASS**. All 1,247 tests **PASS** (1 ignored: hardware-dependent).
+All 7,083+ validation checks **PASS**. All 1,249 tests **PASS** (1 ignored: hardware-dependent).
 
 ### GPU Performance
 
@@ -787,6 +788,24 @@ complete Python → CPU → GPU → Pure GPU Streaming → metalForge pipeline:
 
 **977 lib tests** | **1,103 total** | **5,061+ checks** | **211 experiments** | **0 clippy warnings**
 
+### Phase 88: Full Experiment Buildout + Control Validation (V88)
+
+Eight new experiments validating every layer of the compute stack — from pure
+barracuda math through GPU parity to mixed-hardware NUCLEUS dispatch:
+
+- **Exp263: BarraCuda CPU v20** — 37/37 checks. Vault DF64, cross-domain pure Rust math, 20th CPU parity round.
+- **Exp264: CPU vs GPU v7** — 22/22 checks. 27-domain GPU parity proof (G17-G21 expansion).
+- **Exp265: metalForge v12** — 63/63 checks. Extended cross-system dispatch with bandwidth-aware routing.
+- **Exp266: NUCLEUS v3** — 106/106 checks. Tower→Node→Nest + Vault + biomeOS full lifecycle.
+- **Exp267: ToadStool Dispatch v3** — 41/41 checks. Pure Rust math across 6 `barracuda` domains (stats, linalg, special, numerical, spectral). Proves every ToadStool abstraction preserves math from analytical formulae through CPU compute.
+- **Exp268: CPU vs GPU Pure Math** — 38/38 checks. Deepest GPU parity layer: `FusedMapReduceF64`, `BrayCurtisF64`, `BatchedEighGpu`, graph Laplacian, DF64 pack/unpack, `GpuPipelineSession` streaming determinism.
+- **Exp269: Mixed Hardware Dispatch** — 91/91 checks. NUCLEUS atomics + PCIe bypass: Tower discovery (3 GPUs), NPU→GPU bypass (0 CPU round-trips), GPU→CPU fallback, bandwidth-aware multi-GPU routing, 8-stage mixed pipeline, full 47-workload catalog dispatch (45 GPU + 2 CPU-only).
+- **Exp270: biomeOS Graph Coordination** — 29/29 checks. Full biomeOS layer: socket discovery, primal orchestration, Nest sovereign fallback, 3 pipeline topologies (GPU-only, mixed, CPU-only), sovereign mode (zero external dependencies).
+- **API deep dive**: `barracuda::stats::FitResult` params array (not named fields), `Result<f64>` return types, `spectral` chain (`anderson_3d` → `lanczos` → `lanczos_eigenvalues`), `graph_laplacian` flat-array API — all documented in handoff for upstream team.
+- **CPU-only workload routing**: `dispatch::route` correctly handles `ShaderOrigin::CpuOnly` workloads (excluded from GPU routing, not failures).
+
+**1,249 tests** | **270 experiments** | **253 binaries** | **427 new checks**
+
 ### Phase 87: blueFish WhitePaper + hotSpring Brain Architecture Review (V87)
 
 Documentation and architectural evolution:
@@ -795,7 +814,7 @@ Documentation and architectural evolution:
 - **hotSpring brain architecture reviewed** — 4-layer concurrent brain (NPU+GPU+CPU+GPU), Gen 2 36-head ESN with `HeadGroupDisagreement`, NautilusBrain evolutionary reservoir computing. Mapped to wetSpring bio workloads: `DiversityUpdate`, bio head groups, chemistry active learning.
 - **Phase 2 primal requirements specified** — Concrete demands on LoamSpine (100+ entries/sec, Merkle proofs), SweetGrass (chemistry Entity/Braid types), rhizoCrypt (multi-agent DAG), BearDog (signing), NestGate (content-addressed chemistry data).
 - **V87 handoff** — ToadStool/BarraCUDA team handoff with absorption targets: brain architecture generalization, ERI shader class planning, `esn_v2` shape bug.
-- **Root doc cleanup** — removed references to phantom `BENCHMARK_RESULTS.md` and `CONTROL_EXPERIMENT_STATUS.md`, corrected binary counts (218 validate + 20 benchmark = 238), updated all handoff references to V87.
+- **Root doc cleanup** — removed references to phantom `BENCHMARK_RESULTS.md` and `CONTROL_EXPERIMENT_STATUS.md`, corrected binary counts.
 
 **1,247 tests** | **262 experiments** | **238 binaries**
 
@@ -1020,11 +1039,11 @@ wetSpring/
 │   │   ├── bio/                 ← 47 CPU + 42 GPU bio modules
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML, nanopore)
 │   │   ├── bench/               ← benchmark harness + power monitoring
-│   │   ├── bin/                 ← 238 validation/benchmark binaries (218 validate + 20 benchmark)
+│   │   ├── bin/                 ← 253 validation/benchmark binaries (233 validate + 20 benchmark)
 │   │   ├── ipc/                 ← JSON-RPC dispatch (biomeOS integration)
 │   │   └── shaders/             ← shared WGSL utilities (ODE shaders now generated at runtime)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024
-├── experiments/                   ← 256 experiment protocols + results
+├── experiments/                   ← 270 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
 │   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs, bridge.rs
@@ -1048,7 +1067,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (1,247: 975 barracuda lib + 60 integration + 22 doc + 166 forge)
+# Run all tests (1,249 across barracuda + forge workspace)
 cargo test --features ipc
 
 # Code quality checks
@@ -1109,8 +1128,8 @@ All validation data comes from public repositories:
 - **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
 - **ToadStool** — GPU compute engine (BarraCuda crate, 700+ WGSL shaders, S71+++)
 - **wateringHole** — Spring-local handoffs to ToadStool
-  - `handoffs/WETSPRING_TOADSTOOL_V87_BLUEFISH_BRAIN_ARCH_HANDOFF_MAR01_2026.md` — **current** (V87 blueFish whitePaper, hotSpring brain arch review, Phase 2 primal requirements)
-  - `handoffs/archive/` — V7-V86 (fossil record)
+  - `handoffs/WETSPRING_TOADSTOOL_V88_EXPERIMENT_BUILDOUT_HANDOFF_MAR02_2026.md` — **current** (V88 experiment buildout, barracuda API learnings, absorption targets)
+  - `handoffs/archive/` — V7-V87 (fossil record)
   - `CROSS_SPRING_SHADER_EVOLUTION.md` — 700+ shader provenance (cross-spring, S71+++)
 - **blueFish** — Chemistry as irreducible research programme (`whitePaper/blueFish/`, analytical + computational, RootPulse provenance)
 - **ecoPrimals** — Parent ecosystem

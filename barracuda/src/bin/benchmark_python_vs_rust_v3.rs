@@ -133,10 +133,10 @@ fn main() {
     v.section("§3 Bray-Curtis — Python: scipy.spatial.distance.braycurtis");
 
     let a: Vec<f64> = (0..200)
-        .map(|i| (f64::from(i) * 0.3).sin().abs() * 50.0 + 1.0)
+        .map(|i| (f64::from(i) * 0.3).sin().abs().mul_add(50.0, 1.0))
         .collect();
     let b: Vec<f64> = (0..200)
-        .map(|i| (f64::from(i) * 0.31).sin().abs() * 50.0 + 1.0)
+        .map(|i| (f64::from(i) * 0.31).sin().abs().mul_add(50.0, 1.0))
         .collect();
 
     let sum_abs_diff: f64 = a
@@ -178,7 +178,7 @@ fn main() {
     let x: Vec<f64> = (0..500).map(|i| f64::from(i) * 0.1).collect();
     let y: Vec<f64> = x
         .iter()
-        .map(|&xi| 2.0 * xi + 3.0 + 0.01 * xi.sin())
+        .map(|&xi| 0.01f64.mul_add(xi.sin(), 2.0f64.mul_add(xi, 3.0)))
         .collect();
 
     let t = Instant::now();
@@ -322,7 +322,7 @@ fn main() {
     v.section("§9 Linear Regression — Python: scipy.stats.linregress");
 
     let xr: Vec<f64> = (0..100).map(f64::from).collect();
-    let yr: Vec<f64> = xr.iter().map(|&xi| 3.0 * xi + 7.0).collect();
+    let yr: Vec<f64> = xr.iter().map(|&xi| 3.0f64.mul_add(xi, 7.0)).collect();
 
     let t = Instant::now();
     let mut fit = barracuda::stats::fit_linear(&xr, &yr).unwrap();

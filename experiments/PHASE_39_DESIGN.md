@@ -1,4 +1,5 @@
 # Phase 39 Design: Finite-Size Scaling + Correlated Disorder + Paper Queue
+> *Fossil record — design completed; all experiments implemented and passing.*
 
 **Date:** February 24, 2026
 **Status:** Exp150-161 ALL PASS (104 checks); paper queue ALL GREEN (43/43 papers)

@@ -50,10 +50,10 @@ fn main() {
     let abundance_1k: Vec<f64> = (1..=1000).map(|i| f64::from(i % 50 + 1)).collect();
     let abundance_500: Vec<f64> = (1..=500).map(|i| f64::from(i % 30 + 1)).collect();
     let vec_a: Vec<f64> = (0..1000)
-        .map(|i| (f64::from(i) * 0.3).sin().abs() * 50.0 + 1.0)
+        .map(|i| (f64::from(i) * 0.3).sin().abs().mul_add(50.0, 1.0))
         .collect();
     let vec_b: Vec<f64> = (0..1000)
-        .map(|i| (f64::from(i) * 0.31).sin().abs() * 50.0 + 1.0)
+        .map(|i| (f64::from(i) * 0.31).sin().abs().mul_add(50.0, 1.0))
         .collect();
 
     let (_, us) = bench_n(1000, || barracuda::stats::shannon(&abundance_1k));
@@ -98,7 +98,11 @@ fn main() {
     let n_rows = 50_usize;
     let n_cols = 10_usize;
     let x_ridge: Vec<f64> = (0..n_rows * n_cols)
-        .map(|i| ((i / n_cols) as f64 * 0.1 + (i % n_cols) as f64 * 0.05).sin())
+        .map(|i| {
+            ((i / n_cols) as f64)
+                .mul_add(0.1, (i % n_cols) as f64 * 0.05)
+                .sin()
+        })
         .collect();
     let y_ridge: Vec<f64> = (0..n_rows).map(|i| (i as f64 * 0.2).cos()).collect();
 
@@ -129,7 +133,7 @@ fn main() {
     let x_1k: Vec<f64> = (0..1000).map(|i| f64::from(i) * 0.1).collect();
     let y_1k: Vec<f64> = x_1k
         .iter()
-        .map(|&xi| 2.0 * xi + 3.0 + 0.01 * xi.sin())
+        .map(|&xi| 0.01f64.mul_add(xi.sin(), 2.0f64.mul_add(xi, 3.0)))
         .collect();
 
     let (_, us) = bench_n(1000, || barracuda::stats::pearson_correlation(&x_1k, &y_1k));
@@ -142,7 +146,7 @@ fn main() {
     });
 
     let x_500: Vec<f64> = (0..500).map(f64::from).collect();
-    let y_500: Vec<f64> = x_500.iter().map(|&xi| 3.0 * xi + 7.0).collect();
+    let y_500: Vec<f64> = x_500.iter().map(|&xi| 3.0f64.mul_add(xi, 7.0)).collect();
     let (_, us) = bench_n(1000, || barracuda::stats::fit_linear(&x_500, &y_500));
     rows.push(BenchRow {
         primitive: "Linear fit",

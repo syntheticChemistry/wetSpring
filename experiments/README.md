@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-01 (Phase 86: 262 experiments, 221+ binaries, 6,656+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S71+++ (`1dd7e338`), 93 primitives consumed, barracuda always-on, 1,247 tests, 97 named tolerances, clippy pedantic CLEAN, 0 Passthrough, V86 cross-spring evolution + Deep Debt Elimination Round 3, all 6 primals READY, IPC bit-identical 3.2× overhead)
+**Updated**: 2026-03-02 (Phase 88: 270 experiments, 253 binaries, 7,083+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S71+++ (`1dd7e338`), 93 primitives consumed, barracuda always-on, 1,249 tests, 97 named tolerances, clippy pedantic CLEAN, V88 full experiment buildout Exp263-270: CPU v20 + CPU↔GPU v7 + metalForge v12 + NUCLEUS v3 + ToadStool pure-math v3 + CPU↔GPU pure-math + mixed-HW dispatch + biomeOS graph)
 
 ---
 
@@ -159,6 +159,14 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 260 | Cross-Spring Evolution Validation | cross/GPU | DONE | 23/23 checks, all five Springs | validate_cross_spring_evolution_modern | 23 |
 | 261 | Cross-Spring Modern Benchmark | cross/GPU | DONE | 12 primitives benchmarked | benchmark_cross_spring_modern | 12 |
 | 262 | Deep Debt Elimination Round 3 | cross | DONE | Module refactors, test coverage, clone audit | (unit tests, refactors) | — |
+| 263 | [BarraCuda CPU v20](263_barracuda_cpu_v20.md) | cross | DONE | Vault DF64 + cross-domain | validate_barracuda_cpu_v20 | 37 |
+| 264 | [CPU vs GPU v7](264_cpu_vs_gpu_v7.md) | GPU/parity | DONE | 27-domain G17–G21 | validate_cpu_vs_gpu_v7 | 22 |
+| 265 | [metalForge v12](265_metalforge_v12.md) | metalForge | DONE | Extended cross-system dispatch | validate_metalforge_v12_extended | 63 |
+| 266 | [NUCLEUS v3](266_nucleus_v3.md) | metalForge | DONE | Tower→Node→Nest + Vault + biomeOS | validate_nucleus_v3_extended | 106 |
+| 267 | [ToadStool Dispatch v3](267_toadstool_dispatch_v3.md) | cross | DONE | Pure Rust math across 6 barracuda domains | validate_toadstool_dispatch_v3 | 41 |
+| 268 | [CPU vs GPU Pure Math](268_cpu_vs_gpu_pure_math.md) | GPU/parity | DONE | Deepest GPU parity layer | validate_cpu_vs_gpu_pure_math | 38 |
+| 269 | [Mixed HW Dispatch](269_mixed_hw_dispatch.md) | metalForge | DONE | NUCLEUS atomics + PCIe bypass | validate_mixed_hw_dispatch | 91 |
+| 270 | [biomeOS Graph](270_biomeos_graph.md) | metalForge | DONE | Full biomeOS coordination layer | validate_biomeos_graph | 29 |
 
 ---
 
@@ -355,10 +363,18 @@ thresholds from `src/tolerances.rs`.
 | `validate_genomic_vault` | 259 | 30 | `cargo run --release --bin validate_genomic_vault` |
 | `validate_cross_spring_evolution_modern` | 260 | 23 | `cargo run --features gpu --bin validate_cross_spring_evolution_modern` |
 | `benchmark_cross_spring_modern` | 261 | 12 | `cargo run --release --features gpu --bin benchmark_cross_spring_modern` |
+| `validate_barracuda_cpu_v20` | 263 | 37 | `cargo run --release --bin validate_barracuda_cpu_v20` |
+| `validate_cpu_vs_gpu_v7` | 264 | 22 | `cargo run --release --features gpu --bin validate_cpu_vs_gpu_v7` |
+| `validate_metalforge_v12_extended` | 265 | 63 | `cargo run --release --features gpu,ipc --bin validate_metalforge_v12_extended` |
+| `validate_nucleus_v3_extended` | 266 | 106 | `cargo run --release -p wetspring-forge --bin validate_nucleus_v3_extended` |
+| `validate_toadstool_dispatch_v3` | 267 | 41 | `cargo run --release --bin validate_toadstool_dispatch_v3` |
+| `validate_cpu_vs_gpu_pure_math` | 268 | 38 | `cargo run --features gpu --bin validate_cpu_vs_gpu_pure_math` |
+| `validate_mixed_hw_dispatch` | 269 | 91 | `cargo run -p wetspring-forge --bin validate_mixed_hw_dispatch` |
+| `validate_biomeos_graph` | 270 | 29 | `cargo run -p wetspring-forge --bin validate_biomeos_graph` |
 
-**Total validation checks**: 6,656+
-**Rust tests**: 1,247 (975 barracuda lib + 60 integration + 22 doc + 166 forge)
-**Binaries**: 221+ total (validate + benchmark + server)
+**Total validation checks**: 7,083+
+**Rust tests**: 1,249
+**Binaries**: 253 total (233 validate + 20 benchmark)
 **ToadStool primitives**: 93 consumed (barracuda always-on, zero fallback code — S71+++ `1dd7e338`)
 **Papers**: 52 (25 Tracks 1-2 + 5 Track 3 + 9 Track 4 + 1 cross-spring + 9 extensions + 3 reference)
 **Local WGSL shaders**: 0 (all absorbed by ToadStool S63)

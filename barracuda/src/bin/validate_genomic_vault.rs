@@ -243,10 +243,9 @@ fn main() {
     }
     v.check_pass("Provenance: all chain links verified", true);
 
-    let ws_entries: Vec<_> = chain.by_actor("wetspring").collect();
     v.check_pass(
         "Provenance: filter by actor works",
-        ws_entries.len() == chain.len(),
+        chain.by_actor("wetspring").count() == chain.len(),
     );
 
     v.section("Phase 5: Standalone Provenance Chain");
@@ -271,10 +270,9 @@ fn main() {
         standalone.head().unwrap().operation == "export",
     );
 
-    let toadstool_ops: Vec<_> = standalone.by_actor("toadstool").collect();
     v.check_pass(
         "Provenance: toadstool did 1 operation",
-        toadstool_ops.len() == 1,
+        standalone.by_actor("toadstool").count() == 1,
     );
 
     v.section("Phase 6: Organ Model Summary");

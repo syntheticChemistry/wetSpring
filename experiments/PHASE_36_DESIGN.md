@@ -1,4 +1,5 @@
 # Phase 36: 3D Anderson Lattice QS — Dimensional Phase Diagram
+> *Fossil record — design completed; all experiments implemented and passing.*
 
 **Date:** February 23, 2026
 **Phase:** 36

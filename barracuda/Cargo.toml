@@ -1362,3 +1362,31 @@ required-features = ["ipc"]
 [[bin]]
 name = "validate_genomic_vault"
 path = "src/bin/validate_genomic_vault.rs"
+
+# ── Exp263: BarraCuda CPU v20 — V87 Vault + DF64 + Cross-Domain ──
+[[bin]]
+name = "validate_barracuda_cpu_v20"
+path = "src/bin/validate_barracuda_cpu_v20.rs"
+
+# ── Exp264: CPU vs GPU v7 — G17–G21 Parity ──
+[[bin]]
+name = "validate_cpu_vs_gpu_v7"
+path = "src/bin/validate_cpu_vs_gpu_v7.rs"
+required-features = ["gpu"]
+
+# ── Exp265: metalForge v12 — V87 Extended Cross-System Dispatch ──
+[[bin]]
+name = "validate_metalforge_v12_extended"
+path = "src/bin/validate_metalforge_v12_extended.rs"
+required-features = ["gpu", "ipc"]
+
+# ── Exp267: ToadStool Dispatch v3 — Pure Rust Math Validation ──
+[[bin]]
+name = "validate_toadstool_dispatch_v3"
+path = "src/bin/validate_toadstool_dispatch_v3.rs"
+
+# ── Exp268: CPU vs GPU Pure Math — ToadStool Primitives ──
+[[bin]]
+name = "validate_cpu_vs_gpu_pure_math"
+path = "src/bin/validate_cpu_vs_gpu_pure_math.rs"
+required-features = ["gpu"]

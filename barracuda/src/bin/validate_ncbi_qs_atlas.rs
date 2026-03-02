@@ -48,7 +48,7 @@ fn evenness_to_disorder(pielou_j: f64) -> f64 {
     pielou_j.mul_add(14.5, 0.5)
 }
 
-#[cfg_attr(not(feature = "gpu"), allow(dead_code))]
+#[cfg(feature = "gpu")]
 fn is_known_high_qs(biome: &str) -> bool {
     let s = biome.to_lowercase();
     s.contains("gut")
@@ -59,7 +59,7 @@ fn is_known_high_qs(biome: &str) -> bool {
         || s.contains("coral")
 }
 
-#[cfg_attr(not(feature = "gpu"), allow(dead_code))]
+#[cfg(feature = "gpu")]
 fn is_known_low_qs(biome: &str) -> bool {
     let s = biome.to_lowercase();
     s.contains("deep_sea")

@@ -86,7 +86,7 @@ fn pielou_evenness(counts: &[f64]) -> f64 {
 }
 
 fn anderson_w_from_j(j: f64) -> f64 {
-    0.5 + 14.5 * j
+    14.5f64.mul_add(j, 0.5)
 }
 
 fn generate_community(n_taxa: usize, target_j: f64, seed: u64) -> Vec<f64> {
@@ -98,7 +98,7 @@ fn generate_community(n_taxa: usize, target_j: f64, seed: u64) -> Vec<f64> {
         (*state >> 33) as f64 / (1u64 << 31) as f64
     };
 
-    let n_active = ((n_taxa as f64) * (0.3 + 0.7 * target_j)).ceil() as usize;
+    let n_active = ((n_taxa as f64) * 0.7f64.mul_add(target_j, 0.3)).ceil() as usize;
     let n_active = n_active.max(3).min(n_taxa);
 
     let skew = 1.0 - target_j;
@@ -137,9 +137,9 @@ fn level_spacing_ratio_simple(w: f64, seed: u64) -> f64 {
 
     if w < w_c {
         let frac = w / w_c;
-        goe_r - frac * (goe_r - poisson_r) * 0.3 + noise
+        (frac * (goe_r - poisson_r)).mul_add(-0.3, goe_r) + noise
     } else {
-        poisson_r + (w - w_c) * 0.001 + noise
+        (w - w_c).mul_add(0.001, poisson_r) + noise
     }
 }
 
@@ -188,8 +188,8 @@ fn main() {
         for sample_idx in 0..samples_per_biome {
             let seed = (biome_idx as u64 * 100_000 + sample_idx as u64) * 2_654_435_761;
 
-            let target_j = (base_j
-                + (sample_idx as f64 / samples_per_biome as f64 - 0.5) * j_spread * 2.0)
+            let target_j = ((sample_idx as f64 / samples_per_biome as f64 - 0.5) * j_spread)
+                .mul_add(2.0, base_j)
                 .clamp(0.01, 0.99);
             let community = generate_community(n_taxa, target_j, seed);
 

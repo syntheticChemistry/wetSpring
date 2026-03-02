@@ -26,8 +26,22 @@
 //!
 //! Chain: Paper (Exp233) → **CPU (this + v16)** → GPU → Streaming → metalForge
 //!
+//! # Provenance
+//!
+//! Expected values are **analytical / algorithmic** — derived from algorithm
+//! definitions and known-input properties, not from Python baseline scripts.
+//! Each domain uses synthetic inputs with deterministic, verifiable outputs:
+//! - Chimera: constructed chimeric + non-chimeric ASVs with known parentage
+//! - DADA2: synthetic error profiles with known denoised sequences
+//! - Smith-Waterman: hand-scored alignments with known optimal scores
+//! - ESN: fixed reservoir weights with deterministic matrix operations
+//! - GBM/RF/Decision Tree: fitted on known-label synthetic data
+//! - DTL Reconciliation: hand-constructed gene/species tree pair
+//! - Molecular Clock: known-distance tree with analytical expected dates
+//!
 //! | Field | Value |
 //! |-------|-------|
+//! | Provenance type | Analytical (algorithmic known-values) |
 //! | Date | 2026-02-28 |
 //! | Command | `cargo run --features gpu --bin validate_barracuda_cpu_v17` |
 

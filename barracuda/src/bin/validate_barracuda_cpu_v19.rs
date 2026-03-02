@@ -214,7 +214,7 @@ fn main() {
 
     let encoded_a = felsenstein::encode_dna("ACGTACGTACGTACGT");
     let encoded_b = felsenstein::encode_dna("ACGAACGTACGTACGT");
-    let alignment = bootstrap::Alignment::from_rows(&[encoded_a.clone(), encoded_b.clone()]);
+    let alignment = bootstrap::Alignment::from_rows(&[encoded_a, encoded_b]);
 
     v.check_pass("Bootstrap: alignment n_taxa=2", alignment.n_taxa == 2);
     d23_checks += 1;

@@ -1,4 +1,5 @@
 # Phase 35: NCBI-Scale Hypothesis Testing & Extended Systems
+> *Fossil record — design completed; all experiments implemented and passing.*
 
 **Date:** February 23, 2026
 **Phase:** 35 — "Real Data, Real Hypotheses"

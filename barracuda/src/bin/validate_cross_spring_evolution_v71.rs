@@ -316,7 +316,7 @@ fn main() {
     let (hessian, hessian_ms) = bench("numerical_hessian (Rosenbrock, 2D)", || {
         let rosenbrock = |x: &[f64]| -> f64 {
             let a = 1.0 - x[0];
-            let b = x[1] - x[0] * x[0];
+            let b = x[0].mul_add(-x[0], x[1]);
             a * a + 100.0 * b * b
         };
         barracuda::numerical::numerical_hessian(&rosenbrock, &[1.0, 1.0], 1e-5)
@@ -364,7 +364,7 @@ fn main() {
     let obs: Vec<f64> = (0..200).map(|i| f64::from(i) * 0.05).collect();
     let sim: Vec<f64> = obs
         .iter()
-        .map(|&x| 2.0 * x + 1.0 + 0.01 * x.sin())
+        .map(|&x| 0.01f64.mul_add(x.sin(), 2.0f64.mul_add(x, 1.0)))
         .collect();
 
     let pearson = barracuda::stats::pearson_correlation(&obs, &sim).expect("pearson");
@@ -381,7 +381,7 @@ fn main() {
     v.check_pass("RMSE finite", rmse.is_finite() && rmse >= 0.0);
     v.check_pass("RMSE ≥ MAE (Cauchy-Schwarz)", rmse >= mae);
 
-    let sim_close: Vec<f64> = obs.iter().map(|&x| x + 0.001 * x.sin()).collect();
+    let sim_close: Vec<f64> = obs.iter().map(|&x| 0.001f64.mul_add(x.sin(), x)).collect();
     let r2 = barracuda::stats::r_squared(&obs, &sim_close);
     v.check_pass("R² > 0.999", r2 > 0.999);
 

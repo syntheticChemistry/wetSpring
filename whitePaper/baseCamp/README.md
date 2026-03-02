@@ -1,8 +1,8 @@
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** March 1, 2026
+**Date:** March 2, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 87 — 262 experiments, 6,656+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,247 tests (975 barracuda lib + 60 integration + 22 doc + 166 forge), ToadStool S71+++ aligned (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances (full provenance), 0 unsafe code, 0 todo!/unimplemented!(), clippy pedantic CLEAN (both crates, ZERO warnings), V86 cross-spring evolution (23/23 across 5 Springs) + deep debt elimination round 3 + ESN bridge to ToadStool esn_v2 + blueFish whitePaper launched (`whitePaper/blueFish/` — 7 documents, chemistry as irreducible research programme, RootPulse provenance integration), 52/52 papers, 50/50 three-tier, 95.86% line coverage
+**Status:** Phase 88 — 270 experiments, 7,083+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS; 1,249 tests, ToadStool S71+++ aligned (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression (barracuda always-on), 97 named tolerances (full provenance), 0 unsafe code, 0 todo!/unimplemented!(), clippy pedantic CLEAN (both crates, ZERO warnings), V88 full experiment buildout (Exp263-270: CPU v20 + CPU↔GPU v7 + metalForge v12 + NUCLEUS v3 + ToadStool pure-math + mixed-HW dispatch + biomeOS graph), 52/52 papers, 50/50 three-tier, 95.86% line coverage
 
 ---
 
@@ -41,7 +41,8 @@ All code is AGPL-3.0.
 | **biomeOS IPC** | — | cross | — | 203-208 | 321 | IPC dispatch, GPU-aware routing, NUCLEUS atomics, Songbird, Neural API |
 | **V66 Audit + Dispatch** | — | cross | — | 209,212-215 | 239+ | Streaming I/O parity, CPU v12, dispatch evolution, NUCLEUS V8, CPU vs GPU v5 |
 | **V67 Experiment Buildout** | — | cross | — | 216-220 | 170+ | 47-domain CPU proof, Python-vs-Rust benchmark, 42-module GPU portability, unidirectional streaming, cross-substrate dispatch V67 + BandwidthTier, 11 extension papers → 50/50 three-tier |
-| **Total** | | | **52** | | **6,656+** | |
+| **V88 Buildout** | — | cross | — | 263-270 | 427 | CPU v20, CPU↔GPU pure-math, metalForge v12, NUCLEUS v3, ToadStool dispatch v3, mixed-HW, biomeOS graph |
+| **Total** | | | **52** | | **7,083+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -108,6 +109,7 @@ Every paper goes through the full evolution. Status across all 52 papers:
 | **V84 pipeline buildout** | Paper→CPU→GPU→Streaming proven end-to-end: 32 papers, 26 CPU domains, 21 GPU domains, Python parity, 0.10ms streaming overhead | 172 checks (Exp251-255) |
 | **V85 NUCLEUS + Vault** | EMP 30K atlas, NUCLEUS data pipeline, Tower-Node deployment, Genomic Vault organ model (consent-gated encrypted storage, Merkle provenance) | 87 checks (Exp256-259) |
 | **V87 blueFish whitePaper** | Chemistry as irreducible research programme (Fodor, Lakatos, Anderson). Isomorphism: 29 comp-chem ops → BarraCUDA (14 direct, 9 compose, 6 new). RootPulse provenance for DFT campaigns. hotSpring brain arch mapped to bio workloads. | 7 documents |
+| **V88 experiment buildout** | Full control validation: CPU v20 (37), CPU↔GPU v7 (22), metalForge v12 (63), NUCLEUS v3 (106), ToadStool pure-math v3 (41), CPU↔GPU pure-math (38), mixed-HW dispatch (91), biomeOS graph (29). Barracuda API deep dive documented for absorption. | 427 checks (Exp263-270) |
 
 ## Extension Roadmap
 

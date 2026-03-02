@@ -1,4 +1,5 @@
 # Phase 38 Design: Extension Papers — Literature Synthesis
+> *Fossil record — design completed; all experiments implemented and passing.*
 
 **Date:** February 24, 2026
 **Status:** COMPLETE — 6 experiments (Exp144-149), 36 checks, all PASS; deep code audit delivered (v23 handoff)

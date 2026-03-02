@@ -255,7 +255,7 @@ fn main() {
     let vec_a: Vec<f64> = (0..100).map(|i| f64::from(i as u32) * 0.1).collect();
     let vec_b: Vec<f64> = vec_a
         .iter()
-        .map(|&x| 2.0 * x + 1.0 + 0.01 * x.sin())
+        .map(|&x| 0.01f64.mul_add(x.sin(), 2.0f64.mul_add(x, 1.0)))
         .collect();
 
     let pearson = barracuda::stats::pearson_correlation(&vec_a, &vec_b).expect("pearson");
@@ -274,7 +274,10 @@ fn main() {
 
     // R² = Nash-Sutcliffe: observed vs simulated (same scale, small noise)
     let observed: Vec<f64> = (0..100).map(|i| f64::from(i as u32) * 0.1).collect();
-    let simulated: Vec<f64> = observed.iter().map(|&x| x + 0.001 * x.sin()).collect();
+    let simulated: Vec<f64> = observed
+        .iter()
+        .map(|&x| 0.001f64.mul_add(x.sin(), x))
+        .collect();
     let r2_val = barracuda::stats::r_squared(&observed, &simulated);
     v.check_pass("R² > 0.99 [airSpring→S64 metrics]", r2_val > 0.99);
 

@@ -129,7 +129,7 @@ fn main() {
     let x_exp: Vec<f64> = (0..20).map(f64::from).collect();
     let y_exp: Vec<f64> = x_exp
         .iter()
-        .map(|&x| 2.0 * (0.15 * x).exp() + 0.5)
+        .map(|&x| 2.0f64.mul_add((0.15 * x).exp(), 0.5))
         .collect();
 
     let t2 = Instant::now();
@@ -152,7 +152,7 @@ fn main() {
         let pred = fe.predict_one(10.0);
         v.check_pass("predict_one(10) is Some", pred.is_some());
         if let Some(p) = pred {
-            let expected = 2.0 * (0.15_f64 * 10.0).exp() + 0.5;
+            let expected = 2.0f64.mul_add((0.15_f64 * 10.0).exp(), 0.5);
             v.check("predict_one(10) ≈ truth", p, expected, expected * 0.15);
         }
     }
@@ -163,7 +163,7 @@ fn main() {
     let x_quad: Vec<f64> = (-10..=10).map(f64::from).collect();
     let y_quad: Vec<f64> = x_quad
         .iter()
-        .map(|&x| 0.5 * x * x - 2.0 * x + 3.0)
+        .map(|&x| (0.5 * x).mul_add(x, -(2.0 * x)) + 3.0)
         .collect();
 
     let t3 = Instant::now();
@@ -188,7 +188,7 @@ fn main() {
     v.section("S6: fit_logarithmic — Log Growth (neuralSpring S66 → ToadStool)");
 
     let x_log: Vec<f64> = (1..=30).map(f64::from).collect();
-    let y_log: Vec<f64> = x_log.iter().map(|&x| 5.0 * x.ln() + 2.0).collect();
+    let y_log: Vec<f64> = x_log.iter().map(|&x| 5.0f64.mul_add(x.ln(), 2.0)).collect();
 
     let t4 = Instant::now();
     let fit_log = barracuda::stats::fit_logarithmic(&x_log, &y_log);

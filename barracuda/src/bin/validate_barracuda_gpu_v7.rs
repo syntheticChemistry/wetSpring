@@ -112,8 +112,8 @@ async fn main() {
 
     v.check_pass("L2 pair count match", gpu_l2.len() == cpu_l2.len());
 
-    let mut cpu_sorted = cpu_l2.clone();
-    let mut gpu_sorted = gpu_l2.clone();
+    let mut cpu_sorted = cpu_l2;
+    let mut gpu_sorted = gpu_l2;
     cpu_sorted.sort_by(|a, b| a.partial_cmp(b).unwrap());
     gpu_sorted.sort_by(|a, b| a.partial_cmp(b).unwrap());
 

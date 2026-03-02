@@ -189,7 +189,7 @@ impl BinaryArrayState {
     /// # Errors
     ///
     /// Returns [`Error::Base64`], [`Error::Zlib`], or [`Error::BinaryFormat`] on decode failure.
-    #[allow(dead_code)] // convenience wrapper used in tests; struct is pub(crate)
+    #[cfg(test)]
     pub fn decode_into(&self, builder: &mut SpectrumBuilder) -> Result<()> {
         self.decode_into_with_buffer(builder, None)
     }

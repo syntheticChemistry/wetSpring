@@ -1,4 +1,5 @@
 # Phase 37 Design: Anderson as Null Hypothesis — Finding Nature's NP Solutions
+> *Fossil record — design completed; all experiments implemented and passing.*
 
 **Date:** February 23, 2026
 **Status:** COMPLETE

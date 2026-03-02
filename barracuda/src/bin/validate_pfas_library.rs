@@ -41,11 +41,7 @@ use wetspring_barracuda::bio::{kmd, spectral_match, tolerance_search};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
-/// PFAS compound with known exact mass.
-///
-/// Fields `name`, `formula`, and `series` are retained for provenance
-/// and human-readable diagnostics even when not referenced in code.
-#[allow(dead_code)]
+/// PFAS compound with known exact mass and provenance metadata.
 struct PfasRef {
     name: &'static str,
     formula: &'static str,
@@ -214,6 +210,29 @@ fn all_pfas() -> Vec<&'static PfasRef> {
 
 fn main() {
     let mut v = Validator::new("wetSpring PFAS Library Validation (Exp018)");
+
+    let all = all_pfas();
+    println!("  Library: {} compounds across {} series", all.len(), {
+        let mut series: Vec<&str> = all.iter().map(|p| p.series).collect();
+        series.sort_unstable();
+        series.dedup();
+        series.len()
+    },);
+    for series_name in &["PFCA", "PFSA", "FTSA", "HFPO", "ether"] {
+        let members: Vec<_> = all.iter().filter(|p| p.series == *series_name).collect();
+        if !members.is_empty() {
+            let names: Vec<&str> = members.iter().map(|p| p.name).collect();
+            let formulas: Vec<&str> = members.iter().map(|p| p.formula).collect();
+            println!(
+                "  {series_name}: {} compounds ({} .. {}), formulas {} .. {}",
+                members.len(),
+                names.first().unwrap_or(&"?"),
+                names.last().unwrap_or(&"?"),
+                formulas.first().unwrap_or(&"?"),
+                formulas.last().unwrap_or(&"?"),
+            );
+        }
+    }
 
     validate_tolerance_search_systematic(&mut v);
     validate_kmd_homologue_series(&mut v);

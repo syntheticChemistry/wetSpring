@@ -33,16 +33,19 @@ fn main() {
     eprintln!("  Socket: {}", server.socket_path().display());
 
     // Songbird registration (non-fatal — standalone mode if unavailable)
-    let _heartbeat = if let Some(songbird_socket) = songbird::discover_socket() {
-        eprintln!("  Songbird: {}", songbird_socket.display());
-        Some(songbird::start_heartbeat_loop(
-            songbird_socket,
-            server.socket_path().to_path_buf(),
-        ))
-    } else {
-        eprintln!("  Songbird: not found (standalone mode)");
-        None
-    };
+    let _heartbeat = songbird::discover_socket().map_or_else(
+        || {
+            eprintln!("  Songbird: not found (standalone mode)");
+            None
+        },
+        |songbird_socket| {
+            eprintln!("  Songbird: {}", songbird_socket.display());
+            Some(songbird::start_heartbeat_loop(
+                songbird_socket,
+                server.socket_path().to_path_buf(),
+            ))
+        },
+    );
 
     eprintln!(
         "  Capabilities: health.check, science.{{diversity,anderson,qs_model,ncbi_fetch,full_pipeline}}"

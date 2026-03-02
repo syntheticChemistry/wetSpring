@@ -140,7 +140,7 @@ fn main() {
                     &format!("PCoA GPU: eigenvalue[{i}] magnitude"),
                     gpc.eigenvalues[i].abs(),
                     cpu_pcoa.eigenvalues[i].abs(),
-                    cpu_pcoa.eigenvalues[i].abs() * 0.1 + 1e-10,
+                    cpu_pcoa.eigenvalues[i].abs().mul_add(0.1, 1e-10),
                 );
                 g17_checks += 1;
                 let _ = sign;

@@ -130,7 +130,7 @@ fn main() {
         let total = (n_pops * n_loci) as usize;
 
         let freq_in: Vec<f64> = (0..total)
-            .map(|i| (0.1 + 0.005 * i as f64).min(0.99))
+            .map(|i| 0.005f64.mul_add(i as f64, 0.1).min(0.99))
             .collect();
         let selection: Vec<f64> = (0..n_loci as usize).map(|i| 0.001 * i as f64).collect();
         let prng_state: Vec<u32> = (0..(total * 4))
@@ -225,7 +225,9 @@ fn main() {
         let grid_size: u32 = 16;
         let n_cells = (grid_size * grid_size) as usize;
         let strategies: Vec<u32> = (0..n_cells as u32).map(|i| i % 2).collect();
-        let fitness: Vec<f64> = (0..n_cells).map(|i| 1.0 + 0.1 * (i as f64).sin()).collect();
+        let fitness: Vec<f64> = (0..n_cells)
+            .map(|i| 0.1f64.mul_add((i as f64).sin(), 1.0))
+            .collect();
 
         let strat_buf = wgpu_dev.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("S strat"),
@@ -290,7 +292,9 @@ fn main() {
         let hill = HillGateGpu::new(Arc::clone(&device));
         let n_hill: u32 = 32;
         let input_a: Vec<f64> = (0..n_hill as usize).map(|i| i as f64 * 0.5).collect();
-        let input_b: Vec<f64> = (0..n_hill as usize).map(|i| 0.1 + i as f64 * 0.3).collect();
+        let input_b: Vec<f64> = (0..n_hill as usize)
+            .map(|i| (i as f64).mul_add(0.3, 0.1))
+            .collect();
 
         let a_buf = wgpu_dev.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Hill A"),
@@ -339,8 +343,8 @@ fn main() {
         let mut max_err = 0.0_f64;
         for i in 0..hill_out.len() {
             let (a, b) = (input_a[i], input_b[i]);
-            let ha = a.powf(2.0) / (25.0 + a.powf(2.0));
-            let hb = b.powf(2.0) / (25.0 + b.powf(2.0));
+            let ha = a.powi(2) / a.mul_add(a, 25.0);
+            let hb = b.powi(2) / b.mul_add(b, 25.0);
             max_err = max_err.max((hill_out[i] - ha * hb).abs());
         }
         v.check("Hill GPU ≈ CPU", max_err, 0.0, tolerances::GPU_VS_CPU_F64);

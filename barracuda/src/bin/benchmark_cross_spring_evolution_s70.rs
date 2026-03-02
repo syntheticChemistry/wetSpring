@@ -248,8 +248,11 @@ fn main() {
 
     let x: Vec<f64> = (1..=100).map(f64::from).collect();
     let y_exp: Vec<f64> = x.iter().map(|&xi| 1.5 * (0.03 * xi).exp()).collect();
-    let y_quad: Vec<f64> = x.iter().map(|&xi| 0.02 * xi * xi - xi + 10.0).collect();
-    let y_log: Vec<f64> = x.iter().map(|&xi| 8.0 * xi.ln() + 3.0).collect();
+    let y_quad: Vec<f64> = x
+        .iter()
+        .map(|&xi| (0.02 * xi).mul_add(xi, -xi) + 10.0)
+        .collect();
+    let y_log: Vec<f64> = x.iter().map(|&xi| 8.0f64.mul_add(xi.ln(), 3.0)).collect();
 
     let (fe, us_exp) = bench_us(|| barracuda::stats::fit_exponential(&x, &y_exp));
     let (fq, us_quad) = bench_us(|| barracuda::stats::fit_quadratic(&x, &y_quad));
@@ -480,7 +483,7 @@ fn main() {
 
     let a: Vec<f64> = (0..1000).map(|i| (f64::from(i) * 0.01).sin()).collect();
     let b: Vec<f64> = (0..1000)
-        .map(|i| (f64::from(i) * 0.01).sin() + 0.01 * (f64::from(i) * 0.1).cos())
+        .map(|i| 0.01f64.mul_add((f64::from(i) * 0.1).cos(), (f64::from(i) * 0.01).sin()))
         .collect();
 
     let (pear, us_pear) = bench_us(|| {

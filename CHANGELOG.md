@@ -5,6 +5,32 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V88 — Full Experiment Buildout + Control Validation (2026-03-02)
+
+### New experiments (all pass)
+- **Exp263**: BarraCuda CPU v20 — Vault DF64 + cross-domain pure Rust math, 37/37 checks
+- **Exp264**: CPU vs GPU v7 — 27-domain GPU parity proof (G17–G21), 22/22 checks
+- **Exp265**: metalForge v12 — Extended cross-system dispatch, bandwidth-aware routing, 63/63 checks
+- **Exp266**: NUCLEUS v3 — Tower→Node→Nest + Vault + biomeOS lifecycle, 106/106 checks
+- **Exp267**: ToadStool Dispatch v3 — Pure Rust math across 6 barracuda domains (stats, linalg, special, numerical, spectral), 41/41 checks
+- **Exp268**: CPU vs GPU Pure Math — Deepest GPU parity layer (FusedMapReduce, BrayCurtis, BatchedEigh, Laplacian, DF64, streaming), 38/38 checks
+- **Exp269**: Mixed Hardware Dispatch — NUCLEUS atomics + PCIe bypass, 47-workload catalog routing (45 GPU + 2 CPU-only), 91/91 checks
+- **Exp270**: biomeOS Graph Coordination — Full biomeOS layer, 3 pipeline topologies, sovereign mode, 29/29 checks
+
+### Barracuda API learnings
+- `FitResult` exposes parameters via `params: Vec<f64>` (not named fields like `slope`)
+- `stats::pearson_correlation`, `spearman_correlation`, `special::ln_gamma`, `numerical::trapz` return `Result<f64>`
+- `graph_laplacian` takes flat `&[f64]` + `n: usize` (not `Vec<Vec<f64>>`)
+- Spectral chain: `anderson_3d` → `lanczos` → `lanczos_eigenvalues` (three separate calls)
+- `dispatch::route` returns `None` for `ShaderOrigin::CpuOnly` workloads (by design, not error)
+
+### Totals
+- Total new checks: 427 (37 + 22 + 63 + 106 + 41 + 38 + 91 + 29)
+- Experiments: 262 → 270
+- Checks: 6,656 → 7,083
+- Binaries: 238 → 253
+- Tests: 1,247 → 1,249
+
 ## V85 — EMP Atlas + NUCLEUS Primal Interaction + Genomic Vault (2026-03-01)
 
 ### New experiments (all pass)

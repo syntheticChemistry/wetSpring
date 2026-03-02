@@ -238,7 +238,7 @@ fn validate_ms2_spectral(v: &mut Validator) {
         let mut f = std::fs::File::create(&path).unwrap();
         writeln!(f, "H\tCreatedBy\tExp214").unwrap();
         for scan in 1..=3_u32 {
-            let precursor = 400.0 + f64::from(scan) * 100.0;
+            let precursor = f64::from(scan).mul_add(100.0, 400.0);
             writeln!(f, "S\t{scan}\t{scan}\t{precursor:.3}").unwrap();
             writeln!(f, "I\tRTime\t{:.1}", f64::from(scan) * 0.5).unwrap();
             writeln!(f, "I\tBPI\t10000.0").unwrap();
@@ -248,7 +248,7 @@ fn validate_ms2_spectral(v: &mut Validator) {
                 writeln!(
                     f,
                     "{:.1}\t{:.1}",
-                    100.0 + f64::from(frag) * 100.0,
+                    f64::from(frag).mul_add(100.0, 100.0),
                     1000.0 * f64::from(scan + 1 - frag)
                 )
                 .unwrap();

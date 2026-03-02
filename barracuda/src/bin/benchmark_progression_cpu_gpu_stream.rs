@@ -167,7 +167,7 @@ fn main() {
 
     // CPU Pearson + metrics (airSpring → S64)
     let x: Vec<f64> = (0..100).map(|i| f64::from(i as u32) * 0.1).collect();
-    let y: Vec<f64> = x.iter().map(|&xi| 2.0 * xi + 1.0).collect();
+    let y: Vec<f64> = x.iter().map(|&xi| 2.0f64.mul_add(xi, 1.0)).collect();
     let (pearson, cpu_stats_ms) = bench("CPU Pearson + MAE + RMSE", || {
         let p = barracuda::stats::pearson_correlation(&x, &y).expect("pearson");
         let m = barracuda::stats::mae(&x, &y);

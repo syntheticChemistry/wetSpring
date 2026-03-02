@@ -56,6 +56,21 @@ path = "src/bin/validate_pcie_bypass_mixed_hw.rs"
 name = "validate_nucleus_v2_extended"
 path = "src/bin/validate_nucleus_v2_extended.rs"
 
+# ── Exp266: NUCLEUS v3 — Tower→Node→Nest + Vault + biomeOS ──
+[[bin]]
+name = "validate_nucleus_v3_extended"
+path = "src/bin/validate_nucleus_v3_extended.rs"
+
+# ── Exp269: Mixed Hardware Dispatch — NUCLEUS Atomics + PCIe Bypass ──
+[[bin]]
+name = "validate_mixed_hw_dispatch"
+path = "src/bin/validate_mixed_hw_dispatch.rs"
+
+# ── Exp270: biomeOS Graph Coordination ──
+[[bin]]
+name = "validate_biomeos_graph"
+path = "src/bin/validate_biomeos_graph.rs"
+
 [dev-dependencies]
 temp-env = "0.3"
 flate2 = "1"

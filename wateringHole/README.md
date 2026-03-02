@@ -1,6 +1,6 @@
 # wetSpring wateringHole
 
-**Date:** March 1, 2026
+**Date:** March 2, 2026
 **Purpose:** Spring-local handoff documents to ToadStool/BarraCuda and cross-spring provenance records.
 
 ---
@@ -9,7 +9,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V87** | `handoffs/WETSPRING_TOADSTOOL_V87_BLUEFISH_BRAIN_ARCH_HANDOFF_MAR01_2026.md` | Mar 1 | **current** — blueFish whitePaper (7 docs, chemistry research programme), hotSpring brain arch review, Phase 2 primal requirements, isomorphism proof (29 comp-chem ops → BarraCUDA), `esn_v2` shape bug |
+| **V88** | `handoffs/WETSPRING_TOADSTOOL_V88_EXPERIMENT_BUILDOUT_HANDOFF_MAR02_2026.md` | Mar 2 | **current** — full experiment buildout (Exp263-270, 427 checks), barracuda API deep dive (FitResult, spectral chain, graph_laplacian, dispatch routing), 6 absorption targets, mixed-hardware NUCLEUS dispatch proven |
 
 ## NestGate Handoffs
 
@@ -25,7 +25,7 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` (V7-V85, API report, rewire, cross-spring provenance, NestGate data types — 68 files).
+Superseded handoffs in `handoffs/archive/` (V7-V87, API report, rewire, cross-spring provenance, NestGate data types — 71 files).
 
 ## Convention
 

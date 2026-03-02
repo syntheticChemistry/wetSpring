@@ -112,7 +112,7 @@ fn main() {
     v.check_pass("0.1% at 95% power: D* > 2000", depth_95 > 2000);
     println!("  D*(p=0.001, P=0.95) = {depth_95}");
 
-    let expected_depth = ((1.0 - 0.95_f64).ln() / (1.0 - 0.001_f64).ln()).ceil() as u64;
+    let expected_depth = (1.0 - 0.95_f64).log(1.0 - 0.001_f64).ceil() as u64;
     v.check_count_u64("D* matches analytic", depth_95, expected_depth);
     println!("  Expected D* = {expected_depth}, got {depth_95}");
 

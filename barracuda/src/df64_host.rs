@@ -58,6 +58,25 @@ pub fn pack_slice(data: &[f64]) -> Vec<f32> {
 /// Input length must be even. Each pair of f32s `[hi, lo]` is reconstructed
 /// to f64. Output length = input length / 2.
 ///
+/// # Errors
+///
+/// Returns [`InvalidInput`](crate::error::Error::InvalidInput) if `data.len()` is odd.
+pub fn try_unpack_slice(data: &[f32]) -> crate::error::Result<Vec<f64>> {
+    if data.len() % 2 != 0 {
+        return Err(crate::error::Error::InvalidInput(format!(
+            "DF64 data must have even length, got {}",
+            data.len()
+        )));
+    }
+    Ok(data.chunks_exact(2).map(|c| unpack(c[0], c[1])).collect())
+}
+
+/// Unpack DF64 wire format (interleaved f32 pairs) back to f64 values.
+///
+/// Equivalent to [`try_unpack_slice`] but panics on odd-length input.
+/// Prefer [`try_unpack_slice`] in library code; this is provided for
+/// validation binaries where input is always from [`pack_slice`].
+///
 /// # Panics
 ///
 /// Panics if `data.len()` is odd.
@@ -79,7 +98,7 @@ pub fn roundtrip_error(v: f64) -> f64 {
 }
 
 #[cfg(test)]
-#[allow(clippy::float_cmp)]
+#[allow(clippy::float_cmp, clippy::unwrap_used, clippy::expect_used)]
 mod tests {
     use super::*;
 
@@ -146,6 +165,25 @@ mod tests {
     #[should_panic(expected = "even length")]
     fn unpack_odd_panics() {
         let _ = unpack_slice(&[1.0, 2.0, 3.0]);
+    }
+
+    #[test]
+    fn try_unpack_odd_returns_error() {
+        let result = try_unpack_slice(&[1.0, 2.0, 3.0]);
+        assert!(result.is_err());
+        let msg = result.unwrap_err().to_string();
+        assert!(
+            msg.contains("even length"),
+            "error should mention even length: {msg}"
+        );
+    }
+
+    #[test]
+    fn try_unpack_roundtrip() {
+        let data = [1.0, 2.0, std::f64::consts::PI];
+        let packed = pack_slice(&data);
+        let unpacked = try_unpack_slice(&packed).expect("valid packed data");
+        assert_eq!(unpacked.len(), data.len());
     }
 
     #[test]

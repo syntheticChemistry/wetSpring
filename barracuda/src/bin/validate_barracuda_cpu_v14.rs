@@ -187,7 +187,7 @@ fn main() {
     v.check_pass("P(same) > P(diff)", p_same > p_diff);
     v.check(
         "row sum = 1",
-        p_same + 3.0 * p_diff,
+        3.0f64.mul_add(p_diff, p_same),
         1.0,
         tolerances::ANALYTICAL_F64,
     );
@@ -303,7 +303,8 @@ fn main() {
     );
     v.check_pass(
         "Pore gradient: big > small QS",
-        norm_cdf((w_c - 25.0 * (1.0 - 0.85)) / 3.0) > norm_cdf((w_c - 25.0 * (1.0 - 0.2)) / 3.0),
+        norm_cdf((25.0f64.mul_add(-(1.0 - 0.85), w_c)) / 3.0)
+            > norm_cdf((25.0f64.mul_add(-(1.0 - 0.2), w_c)) / 3.0),
     );
     v.check_pass(
         "Aggregate interior: large > small",
@@ -419,7 +420,7 @@ fn main() {
     v.section("D32: Numerical Hessian (neuralSpring)");
     total_domains += 1;
     let hess = barracuda::numerical::numerical_hessian(
-        &|x: &[f64]| (1.0 - x[0]).powi(2) + 100.0 * (x[1] - x[0] * x[0]).powi(2),
+        &|x: &[f64]| 100.0f64.mul_add((x[0].mul_add(-x[0], x[1])).powi(2), (1.0 - x[0]).powi(2)),
         &[1.0, 1.0],
         1e-5,
     );
@@ -474,7 +475,7 @@ fn main() {
     v.section("D36: Pearson + Stats (airSpring → ToadStool)");
     total_domains += 1;
     let a: Vec<f64> = (0..100).map(|i| f64::from(i) * 0.1).collect();
-    let b: Vec<f64> = a.iter().map(|&x| 2.0 * x + 1.0).collect();
+    let b: Vec<f64> = a.iter().map(|&x| 2.0f64.mul_add(x, 1.0)).collect();
     let pearson = barracuda::stats::pearson_correlation(&a, &b).expect("pearson");
     v.check(
         "Pearson(linear) = 1.0",

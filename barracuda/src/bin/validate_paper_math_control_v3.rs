@@ -273,7 +273,7 @@ fn main() {
     );
 
     let sample_sizes: Vec<f64> = vec![10.0, 10.0, 10.0, 11.0, 50.0];
-    let diversities: Vec<f64> = all_diversities.clone();
+    let diversities = all_diversities;
     let fit_div = barracuda::stats::fit_logarithmic(&sample_sizes, &diversities);
     v.check_pass(
         "V83: Species-area fit attempted",
