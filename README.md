@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** March 2, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 92G — 1,089 tests, 276 experiments, 7,872+ validation checks, 264 binaries, ToadStool S86 (`2fee1969`), 144 primitives consumed (264 ComputeDispatch ops), zero local WGSL, zero unsafe code, 103 named tolerances, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN. Full 5-tier chain validated (Exp298: 499 checks, Paper math → CPU → GPU → Streaming → metalForge). S86 gap closure: Exp299 (59/59, metalForge dispatch for spectral/graph/sampling), Exp300 (48/48, streaming pipeline with cross-spring stages). All 52 papers, 39 three-tier eligible papers validated at CPU + GPU + metalForge. 53 metalForge workloads.
+**Status:** Phase 92H — 1,219 tests, 279 experiments, 8,180+ validation checks, 267 binaries, ToadStool S86 (`2fee1969`), 144 primitives consumed (264 ComputeDispatch ops), zero local WGSL, zero unsafe code, 103 named tolerances, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN. Full 5-tier chain validated (Exp298: 499 checks). V92H: Exp301 (48/48, CPU↔GPU full domain parity — 15 sections, 17+ ComputeDispatch ops), Exp302 (113/113, NUCLEUS + PCIe bypass + biomeOS — Tower/Node/Nest, 54 workloads, 5 DAG topologies), Exp303 (147/147, mixed hardware NUCLEUS orchestration — multi-GPU dispatch, 6 interleaved GPU/NPU/CPU pipelines, all 54 workloads routed). 54 metalForge workloads.
 
 ---
 

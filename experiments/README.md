@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-02 (Phase 92G: 276 experiments, 264 binaries, 7,872+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S86 (`2fee1969`), 144 primitives consumed (264 ComputeDispatch ops), barracuda always-on, 1,089 tests, 103 named tolerances, clippy pedantic CLEAN. V92G: full 5-tier chain (Exp298, 499 checks), S86 metalForge dispatch (Exp299, 59/59), S86 streaming pipeline (Exp300, 48/48))
+**Updated**: 2026-03-02 (Phase 92H: 279 experiments, 267 binaries, 8,180+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S86 (`2fee1969`), 144 primitives consumed (264 ComputeDispatch ops), barracuda always-on, 1,219 tests, 103 named tolerances, clippy pedantic CLEAN. V92H: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147))
 
 ---
 
@@ -184,6 +184,9 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 298 | [Full 5-Tier Chain V92G](298_full_chain_v92f_validation.md) | chain | DONE | All tiers | Paper math→CPU→GPU→streaming→metalForge: 499 total checks, all 52 papers, open data confirmed | 499 |
 | 299 | S86 metalForge Dispatch | forge | DONE | metalForge S86 | 7 new workloads (spectral/graph/sampling), catalog routing, streaming pipeline analysis, cross-spring provenance, math validation | 59 |
 | 300 | S86 Streaming Pipeline | gpu | DONE | ToadStool S86 + RTX 4070 | Cross-spring stages: GPU diversity → Anderson → graph → Boltzmann → LHS/Sobol → ET₀ → stats | 48 |
+| 301 | [CPU↔GPU Full Domain V92G](301_cpu_gpu_full_domain_v92g.md) | gpu | DONE | RTX 4070 | 15-section parity: FusedMapReduce, DiversityFusion, BrayCurtis, BatchedEigh, GEMM, NMF, Anderson, Bootstrap, Boltzmann, Hydrology, DF64 | 48 |
+| 302 | [NUCLEUS+PCIe+biomeOS V92G](302_nucleus_biomeos_v92g.md) | forge | DONE | metalForge | Tower/Node/Nest, PCIe bypass, biomeOS DAG, 54 workloads dispatched, streaming patterns, absorption evolution | 113 |
+| 303 | [Mixed NUCLEUS V92G](303_mixed_nucleus_v92g.md) | forge | DONE | metalForge | Multi-GPU dispatch, 6 GPU/NPU/CPU pipeline patterns, topology matrix, all 54 workloads routed, bandwidth decisions | 147 |
 
 ---
 

@@ -5,6 +5,29 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V92H — CPU↔GPU ComputeDispatch + NUCLEUS Mixed Hardware (2026-03-02)
+
+### Added
+- Exp301: `validate_cpu_gpu_full_domain_v92g` — 15-section CPU↔GPU parity
+  covering FusedMapReduceF64, DiversityFusionGpu, BrayCurtisF64, BatchedEighGpu,
+  GemmF64, GemmCachedF64, NMF, GraphLaplacian, Anderson/Lanczos, Bootstrap,
+  Boltzmann, LHS/Sobol, Hydrology ET₀, DF64, fit_all. 48/48 checks.
+- Exp302: `validate_nucleus_biomeos_v92g` — NUCLEUS + PCIe bypass + biomeOS.
+  Tower discovery (3 GPUs + 1 CPU), PCIe bandwidth tiers (Gen3/Gen4),
+  NUCLEUS pipeline (Tower→Node→Nest), biomeOS DAG (5 pipeline topologies),
+  full catalog dispatch (54 workloads), streaming pattern analysis. 113/113 checks.
+- Exp303: `validate_mixed_nucleus_v92g` — mixed hardware NUCLEUS orchestration.
+  Multi-GPU dispatch with load balancing, 6 interleaved GPU/NPU/CPU pipeline
+  patterns, topology decision matrix, all 54 workloads routed (standard + BW-aware),
+  bandwidth decision matrix (1KB–100MB). 147/147 checks.
+
+### Changed
+- Experiments: 276 → 279
+- Binaries: 264 → 267
+- Validation checks: 7,872+ → 8,180+
+- metalForge workloads: 53 → 54
+- Tests: 1,089 → 1,219
+
 ## V92G — Full 5-Tier Chain Validation + S86 Gap Closure (2026-03-02)
 
 ### Added

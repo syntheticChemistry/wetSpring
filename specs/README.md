@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: March 2, 2026
-**Status**: Phase 92G — 7,872+ checks, ALL PASS (1,089 tests, 276 experiments, 264 binaries, ToadStool S86 `2fee1969`, 144 primitives (264 ComputeDispatch ops), 0 local WGSL, 103 named tolerances, clippy pedantic CLEAN `--all-features`, 52 papers + 6 reproduced, full three-tier on all 39 eligible papers, 53 metalForge workloads). V92G: full 5-tier chain (Exp298, 499 checks), S86 metalForge dispatch (Exp299, 59/59), S86 streaming pipeline (Exp300, 48/48)
+**Status**: Phase 92H — 8,180+ checks, ALL PASS (1,219 tests, 279 experiments, 267 binaries, ToadStool S86 `2fee1969`, 144 primitives (264 ComputeDispatch ops), 0 local WGSL, 103 named tolerances, clippy pedantic CLEAN `--all-features`, 52 papers + 6 reproduced, full three-tier on all 39 eligible papers, 54 metalForge workloads). V92H: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

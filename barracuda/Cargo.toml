@@ -1511,3 +1511,9 @@ required-features = ["gpu"]
 name = "validate_s86_streaming_pipeline"
 path = "src/bin/validate_s86_streaming_pipeline.rs"
 required-features = ["gpu"]
+
+# ── Exp301: CPU vs GPU Full Domain Parity — V92G ComputeDispatch ──
+[[bin]]
+name = "validate_cpu_gpu_full_domain_v92g"
+path = "src/bin/validate_cpu_gpu_full_domain_v92g.rs"
+required-features = ["gpu"]
