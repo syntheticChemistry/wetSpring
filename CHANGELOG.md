@@ -5,6 +5,33 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V92F — Cross-Spring Modern S86 Validation + Benchmark (2026-03-02)
+
+### Added
+- Exp297: `validate_cross_spring_modern_s86` — GPU validation + benchmark binary
+  exercising 264 ComputeDispatch ops with full cross-spring provenance tracking.
+  Tests: GPU init, DF64 precision, diversity CPU↔GPU parity, GemmF64 128×128,
+  Bray-Curtis distance matrix, GemmCached pipeline, Anderson spectral scaling,
+  6 hydrology ET₀ methods, bootstrap/jackknife/fit_all, Boltzmann/Sobol/LHS
+  sampling, NMF, graph Laplacian, DF64 pack/roundtrip. 46/46 checks pass.
+- Cross-spring evolution map documenting which spring contributed each primitive
+  and how shaders evolved through the ecosystem (hotSpring→precision,
+  wetSpring→bio, neuralSpring→linalg, airSpring→hydrology, groundSpring→stats,
+  wateringHole→sampling)
+
+### Fixed
+- `rarefaction_gpu.rs`: Updated `BatchedMultinomialGpu::sample` call to match
+  ToadStool S86 API (seeds now `Option<&mut Vec<u32>>`, new
+  `BatchedMultinomialConfig` parameter)
+
+### Benchmark results (RTX 4070, release, Exp297)
+- GEMM 128×128 GPU: 18 ms, CPU: 3.7 ms (DF64 double-float on FP32 cores)
+- GemmCached 64×32×16: 13 ms (B-matrix cached on device)
+- BrayCurtis 20×200: 2.7 ms (condensed distance matrix)
+- DiversityFusion GPU: 75 ms (500 taxa, first dispatch includes pipeline compile)
+- Anderson 1D n=2000: 1341 ms (dense eigensolve, CPU; GPU batch via BatchIprGpu)
+- Boltzmann 5k×2D: 0.26 ms, Sobol 10k×5D: 0.30 ms, LHS 10k×5D: 0.33 ms
+
 ## V92E — ToadStool S86 Rewire (2026-03-02)
 
 ### Changed

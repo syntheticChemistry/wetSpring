@@ -122,8 +122,15 @@ fn main() {
         );
 
         println!("  Lanczos: 8×8 (64 sites), r={r:.4}, phase={phase:?}");
-        println!("  bandwidth={bandwidth:.3}, cond={cond:.3}, {} bands", bands.len());
-        println!("  GOE_R={:.4}, POISSON_R={:.4}", barracuda::spectral::GOE_R, barracuda::spectral::POISSON_R);
+        println!(
+            "  bandwidth={bandwidth:.3}, cond={cond:.3}, {} bands",
+            bands.len()
+        );
+        println!(
+            "  GOE_R={:.4}, POISSON_R={:.4}",
+            barracuda::spectral::GOE_R,
+            barracuda::spectral::POISSON_R
+        );
         println!("  {:.2} ms", t.elapsed().as_secs_f64() * 1000.0);
     }
 
@@ -133,10 +140,7 @@ fn main() {
         v.section("S4: Graph — Laplacian + Effective Rank [CPU ungated]");
 
         let adj = vec![
-            0.0, 1.0, 1.0, 0.0,
-            1.0, 0.0, 1.0, 1.0,
-            1.0, 1.0, 0.0, 0.0,
-            0.0, 1.0, 0.0, 0.0,
+            0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
         ];
         let lap = barracuda::linalg::graph_laplacian(&adj, 4);
         v.check_pass("graph_laplacian returns n² values", lap.len() == 16);
@@ -149,10 +153,7 @@ fn main() {
         );
 
         let off_diag_sum: f64 = lap.iter().sum::<f64>();
-        v.check_pass(
-            "Laplacian rows sum to 0",
-            off_diag_sum.abs() < 1e-10,
-        );
+        v.check_pass("Laplacian rows sum to 0", off_diag_sum.abs() < 1e-10);
 
         let hetero = vec![0.1, -0.2, 0.05, -0.1];
         let disordered = barracuda::linalg::disordered_laplacian(&lap, 4, &hetero, 1.0);
@@ -166,11 +167,8 @@ fn main() {
         let input_dist = vec![0.5, 0.3, 0.2];
         let trans = vec![0.7, 0.2, 0.1, 0.3, 0.5, 0.2, 0.1, 0.3, 0.6];
         let dims = vec![3_usize];
-        let dists = barracuda::linalg::belief_propagation_chain(
-            &input_dist,
-            &[trans.as_slice()],
-            &dims,
-        );
+        let dists =
+            barracuda::linalg::belief_propagation_chain(&input_dist, &[trans.as_slice()], &dims);
         v.check_pass("belief_propagation returns layers", dists.len() == 2);
         let final_sum: f64 = dists.last().unwrap().iter().sum();
         v.check_pass("final distribution ≈ 1", (final_sum - 1.0).abs() < 1e-10);
@@ -188,8 +186,7 @@ fn main() {
         let loss_fn = |params: &[f64]| -> f64 { params.iter().map(|x| x * x).sum() };
         let initial = vec![5.0, -3.0, 2.0];
         let initial_loss = loss_fn(&initial);
-        let result =
-            barracuda::sample::boltzmann_sampling(&loss_fn, &initial, 1.0, 0.5, 500, 42);
+        let result = barracuda::sample::boltzmann_sampling(&loss_fn, &initial, 1.0, 0.5, 500, 42);
         v.check_pass("Boltzmann: losses non-empty", !result.losses.is_empty());
         v.check_pass(
             "Boltzmann: accept rate in [0,1]",
@@ -241,7 +238,9 @@ fn main() {
         let t = Instant::now();
         v.section("S7: Hydrology — 4 new ET₀ methods [S81]");
 
-        let monthly = [3.0, 4.0, 8.0, 12.0, 17.0, 21.0, 24.0, 23.0, 19.0, 13.0, 8.0, 4.0];
+        let monthly = [
+            3.0, 4.0, 8.0, 12.0, 17.0, 21.0, 24.0, 23.0, 19.0, 13.0, 8.0, 4.0,
+        ];
         let hi = barracuda::stats::thornthwaite_heat_index(&monthly);
         v.check_pass("Thornthwaite heat index > 0", hi > 0.0);
 
@@ -323,7 +322,10 @@ fn main() {
 
         println!("  Golden ratio: {:.10}", barracuda::spectral::GOLDEN_RATIO);
         println!("  Almost-Mathieu: 20×20, λ=2.0");
-        println!("  Hofstadter: {} (alpha, eigenvalues) pairs", butterfly.len());
+        println!(
+            "  Hofstadter: {} (alpha, eigenvalues) pairs",
+            butterfly.len()
+        );
         println!("  {:.2} ms", t.elapsed().as_secs_f64() * 1000.0);
     }
 
@@ -367,10 +369,9 @@ fn main() {
         let hargreaves = barracuda::stats::hargreaves_et0(35.0, 32.0, 18.0).unwrap();
         v.check_pass("Hargreaves ET₀ > 0", hargreaves > 0.0);
 
-        let fao56 = barracuda::stats::fao56_et0(
-            21.5, 12.3, 84.0, 63.0, 2.78, 22.07, 100.0, 50.8, 187,
-        )
-        .unwrap();
+        let fao56 =
+            barracuda::stats::fao56_et0(21.5, 12.3, 84.0, 63.0, 2.78, 22.07, 100.0, 50.8, 187)
+                .unwrap();
         v.check_pass("FAO-56 ET₀ ≈ 3.88", (fao56 - 3.88).abs() < 0.15);
 
         let ncdf = barracuda::stats::norm_cdf(0.0);

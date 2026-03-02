@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** March 2, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 92E — 1,309 tests, 277 experiments, 7,384+ validation checks, 260 binaries, ToadStool S86 (`2fee1969`), 144 primitives consumed, zero local WGSL, zero unsafe code, 103 named tolerances, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN, all `fmt`/`doc`/`test` gates green. Full paper-math chain validated: Paper v4 (45/45) → CPU v22 (40/40) → GPU v9 (35/35) → Streaming v9 (16/16) → metalForge v14 (28/28). ToadStool S79→S86 rewire: fixed CPU module feature-gate bugs (spectral, graph, sample), 144 ComputeDispatch ops, Nautilus, BatchedEncoder, L-BFGS, BrentGpu, RichardsGpu.
+**Status:** Phase 92F — 1,089 tests, 273 experiments, 7,266+ validation checks, 261 binaries, ToadStool S86 (`2fee1969`), 144 primitives consumed (264 ComputeDispatch ops), zero local WGSL, zero unsafe code, 103 named tolerances, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN. Cross-spring modern S86 validation + benchmark complete (Exp297, 46/46): GPU↔CPU parity verified for all 5 springs + wateringHole on RTX 4070 (DF64 Hybrid). Shader evolution provenance mapped: hotSpring→precision, wetSpring→bio, neuralSpring→linalg, airSpring→hydrology, groundSpring→stats, wateringHole→sampling.
 
 ---
 

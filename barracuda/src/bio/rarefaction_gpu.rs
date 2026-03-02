@@ -189,8 +189,12 @@ pub fn rarefaction_bootstrap_gpu(
             })
             .collect();
 
+        let config = barracuda::ops::bio::BatchedMultinomialConfig {
+            cumulative_probs: true,
+            seed: None,
+        };
         let counts_u32 = multinomial
-            .sample(&cumulative, &mut seeds, depth_u32, n_reps_u32)
+            .sample(&cumulative, Some(&mut seeds), depth_u32, n_reps_u32, config)
             .map_err(|e| Error::Gpu(format!("BatchedMultinomialGpu::sample: {e}")))?;
 
         let abundances: Vec<f64> = counts_u32.iter().map(|&c| f64::from(c)).collect();

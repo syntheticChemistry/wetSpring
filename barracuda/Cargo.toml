@@ -1499,3 +1499,9 @@ required-features = ["gpu"]
 [[bin]]
 name = "validate_cross_spring_s86"
 path = "src/bin/validate_cross_spring_s86.rs"
+
+# ── Exp297: Cross-Spring Modern S86 Validation + Benchmark ──
+[[bin]]
+name = "validate_cross_spring_modern_s86"
+path = "src/bin/validate_cross_spring_modern_s86.rs"
+required-features = ["gpu"]

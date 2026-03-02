@@ -1,7 +1,7 @@
 # Cross-Spring Shader Evolution
 
-**Last updated**: Mar 1, 2026 — V92C ToadStool S86 (700+ WGSL shaders, 0 f32-only, universal precision, DF64, 144 primitives consumed, 0 local WGSL/derivative/regression, 260 experiments, 6,656+ checks, 1,945+ GPU on RTX 4070, 97 named tolerances, clippy pedantic CLEAN). V92C: vault module (consent/provenance/encrypted storage), NUCLEUS deployed (all 6 primals READY), EMP Atlas 30K.
-**Validated by**: V92C full sweep (1,223 tests, Exp247 42/42 checks), ToadStool S86 `2fee1969`
+**Last updated**: Mar 2, 2026 — V92F ToadStool S86 (264 ComputeDispatch ops, 144 primitives consumed, 0 local WGSL/derivative/regression, 273 experiments, 7,266+ checks, GPU on RTX 4070, 103 named tolerances, clippy pedantic CLEAN). V92F: Cross-spring modern S86 validation + benchmark (Exp297, 46/46), GPU↔CPU parity verified for all 5 springs + wateringHole.
+**Validated by**: V92F Exp297 (46/46), ToadStool S86 `2fee1969`, 1,089 unit tests, 264 ComputeDispatch ops exercised
 
 ---
 
