@@ -12,19 +12,19 @@
     clippy::items_after_statements,
     clippy::float_cmp
 )]
-//! # Exp268: BarraCuda CPU vs GPU Pure Math — ToadStool Primitives
+//! # Exp268: `BarraCuda` CPU vs GPU Pure Math — `ToadStool` Primitives
 //!
-//! Validates that every ToadStool GPU primitive produces identical results
+//! Validates that every `ToadStool` GPU primitive produces identical results
 //! to its CPU counterpart. This is the deepest layer of parity validation:
 //! not wetSpring bio domains, but the underlying barracuda math itself.
 //!
 //! Sections:
-//! - S1: FusedMapReduceF64 — Shannon, Simpson via GPU reduce
-//! - S2: BrayCurtisF64 — Pairwise distance matrix
-//! - S3: BatchedEighGpu — Eigendecomposition (PCoA path)
+//! - S1: `FusedMapReduceF64` — Shannon, Simpson via GPU reduce
+//! - S2: `BrayCurtisF64` — Pairwise distance matrix
+//! - S3: `BatchedEighGpu` — Eigendecomposition (`PCoA` path)
 //! - S4: GPU Laplacian + Spectral — graph theory parity
 //! - S5: DF64 Precision — Pack/unpack at GPU boundary
-//! - S6: GpuPipelineSession — Streaming vs individual dispatch parity
+//! - S6: `GpuPipelineSession` — Streaming vs individual dispatch parity
 //!
 //! | Field | Value |
 //! |-------|-------|
@@ -32,7 +32,7 @@
 //! | Command | `cargo run --features gpu --bin validate_cpu_vs_gpu_pure_math` |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::time::Instant;
 
@@ -78,34 +78,31 @@ fn main() {
         let gpu_si = diversity_gpu::simpson_gpu(&gpu, &counts);
         let gpu_obs = diversity_gpu::observed_features_gpu(&gpu, &counts);
 
-        match (gpu_sh, gpu_si, gpu_obs) {
-            (Ok(gsh), Ok(gsi), Ok(gobs)) => {
-                v.check(
-                    &format!("Shannon n={n}: CPU↔GPU"),
-                    gsh,
-                    cpu_sh,
-                    tolerances::GPU_VS_CPU_TRANSCENDENTAL,
-                );
-                s1 += 1;
-                v.check(
-                    &format!("Simpson n={n}: CPU↔GPU"),
-                    gsi,
-                    cpu_si,
-                    tolerances::GPU_VS_CPU_TRANSCENDENTAL,
-                );
-                s1 += 1;
-                v.check(
-                    &format!("Observed n={n}: CPU↔GPU"),
-                    gobs,
-                    cpu_obs,
-                    tolerances::GPU_VS_CPU_F64,
-                );
-                s1 += 1;
-            }
-            _ => {
-                v.check_pass(&format!("GPU unavailable for n={n} — CPU valid"), true);
-                s1 += 1;
-            }
+        if let (Ok(gsh), Ok(gsi), Ok(gobs)) = (gpu_sh, gpu_si, gpu_obs) {
+            v.check(
+                &format!("Shannon n={n}: CPU↔GPU"),
+                gsh,
+                cpu_sh,
+                tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+            );
+            s1 += 1;
+            v.check(
+                &format!("Simpson n={n}: CPU↔GPU"),
+                gsi,
+                cpu_si,
+                tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+            );
+            s1 += 1;
+            v.check(
+                &format!("Observed n={n}: CPU↔GPU"),
+                gobs,
+                cpu_obs,
+                tolerances::GPU_VS_CPU_F64,
+            );
+            s1 += 1;
+        } else {
+            v.check_pass(&format!("GPU unavailable for n={n} — CPU valid"), true);
+            s1 += 1;
         }
 
         if n == sizes[0] {

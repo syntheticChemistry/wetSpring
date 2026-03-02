@@ -12,7 +12,7 @@
 )]
 //! # Exp284: GPU Validation — Gonzales Reproductions
 //!
-//! Proves that BarraCUDA GPU produces identical results to CPU for all
+//! Proves that `BarraCUDA` GPU produces identical results to CPU for all
 //! Gonzales paper reproduction domains. Validates that the pure Rust math
 //! from Exp280-283 is truly portable to GPU.
 //!
@@ -23,9 +23,9 @@
 //!
 //! ## Evolution chain
 //! - **Previous**: Exp283 CPU parity (pure Rust)
-//! - **This**: BarraCUDA GPU (diversity on GPU, spectral on CPU)
-//! - **Next**: Exp285 ToadStool streaming dispatch
-//! - **Final**: Exp286 metalForge cross-substrate (NUCLEUS)
+//! - **This**: `BarraCUDA` GPU (diversity on GPU, spectral on CPU)
+//! - **Next**: Exp285 `ToadStool` streaming dispatch
+//! - **Final**: Exp286 `metalForge` cross-substrate (NUCLEUS)
 //!
 //! # Provenance
 //!
@@ -234,7 +234,7 @@ async fn main() {
     v.section("═══ D04: Large Population GPU Benchmark ═══");
 
     let large_pop: Vec<f64> = (0..10_000)
-        .map(|i| ((i * 37 + 13) % 100) as f64 + 1.0)
+        .map(|i| f64::from((i * 37 + 13) % 100) + 1.0)
         .collect();
 
     let tc = Instant::now();
@@ -328,8 +328,7 @@ async fn main() {
 
     println!("╠═════════════════════════╬════════════╬════════════╬════════════════╣");
     println!(
-        "║ TOTAL                   ║ {:>10.0} ║ {:>10.0} ║ {:>3}            ║",
-        total_cpu, total_gpu, total_checks
+        "║ TOTAL                   ║ {total_cpu:>10.0} ║ {total_gpu:>10.0} ║ {total_checks:>3}            ║"
     );
     println!("╚═════════════════════════╩════════════╩════════════╩════════════════╝");
     println!();

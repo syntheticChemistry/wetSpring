@@ -10,7 +10,7 @@
 //!
 //! | Item        | Value |
 //! |-------------|-------|
-//! | Data source | Synthetic (mirrors MassBank PFAS spectral distributions) |
+//! | Data source | Synthetic (mirrors `MassBank` PFAS spectral distributions) |
 //! | GPU prims   | `GemmF64`, `FusedMapReduceF64` (via `pairwise_cosine_gpu`) |
 //! | Date        | 2026-02-23 |
 //! | Command     | `cargo test --bin validate_massbank_gpu_scale -- --nocapture` |

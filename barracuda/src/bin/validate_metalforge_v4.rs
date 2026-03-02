@@ -5,13 +5,13 @@
     clippy::too_many_lines,
     clippy::cast_precision_loss
 )]
-//! Exp100: metalForge Cross-Substrate v4 — 20 Domains + NPU Dispatch
+//! Exp100: `metalForge` Cross-Substrate v4 — 20 Domains + NPU Dispatch
 //!
 //! | Script  | `validate_metalforge_v4` |
 //! | Command | `cargo run --features gpu --bin validate_metalforge_v4` |
 //!
 //! Validates CPU ↔ GPU parity for all ODE domains (phage defense, bistable,
-//! multi-signal) plus metalForge mixed-hardware dispatch scenarios including
+//! multi-signal) plus `metalForge` mixed-hardware dispatch scenarios including
 //! NPU-aware routing and `PCIe` direct transfer patterns.
 //!
 //! # Provenance

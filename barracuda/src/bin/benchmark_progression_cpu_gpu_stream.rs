@@ -17,8 +17,8 @@
 //!
 //! ```text
 //! Tier 0: Python baseline (reference — run separately via benchmark_rust_vs_python.py)
-//! Tier 1: BarraCuda CPU — pure Rust math, validated against Python, faster than interpreted
-//! Tier 2: BarraCuda GPU — same math, portable to GPU via `ToadStool` `compile_shader_universal`
+//! Tier 1: `BarraCuda` CPU — pure Rust math, validated against Python, faster than interpreted
+//! Tier 2: `BarraCuda` GPU — same math, portable to GPU via `ToadStool` `compile_shader_universal`
 //! Tier 3: Pure GPU Streaming — unidirectional dispatch, zero intermediate CPU round-trips
 //! Tier 4: `metalForge` routing — cross-substrate dispatch (GPU + CPU) based on workload size
 //! ```

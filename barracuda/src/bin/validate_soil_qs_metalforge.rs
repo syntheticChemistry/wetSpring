@@ -13,10 +13,10 @@
     clippy::needless_range_loop,
     dead_code
 )]
-//! # Exp182: Track 4 metalForge Cross-Substrate — Soil QS
+//! # Exp182: Track 4 `metalForge` Cross-Substrate — Soil QS
 //!
 //! Proves that soil QS analysis produces identical results regardless of
-//! substrate: CPU, GPU, or NPU. metalForge's capability-based router
+//! substrate: CPU, GPU, or NPU. `metalForge`'s capability-based router
 //! dispatches each workload to the best available substrate, and results
 //! must match across all substrates.
 //!

@@ -9,10 +9,10 @@
     clippy::similar_names,
     clippy::items_after_statements
 )]
-//! Exp165: metalForge Drug Repurposing — CPU vs GPU Cross-Substrate Parity
+//! Exp165: `metalForge` Drug Repurposing — CPU vs GPU Cross-Substrate Parity
 //!
 //! Proves that Track 3 drug repurposing computations produce identical
-//! results on CPU and GPU substrates. This is the metalForge three-tier
+//! results on CPU and GPU substrates. This is the `metalForge` three-tier
 //! proof: same math, different hardware, same answers.
 //!
 //! # Provenance
@@ -26,7 +26,7 @@
 //! | Data | Synthetic test vectors (self-contained) |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;

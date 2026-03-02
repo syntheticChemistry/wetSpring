@@ -20,7 +20,7 @@
 //! # Evolution chain
 //!
 //! ```text
-//! Paper (Exp233) → CPU (Exp234) → GPU (Exp235) → Streaming (this) → metalForge (Exp237)
+//! Paper (Exp233) → CPU (Exp234) → GPU (Exp235) → Streaming (this) → `metalForge` (Exp237)
 //! ```
 //!
 //! # Provenance
@@ -32,7 +32,7 @@
 //! | Command | `cargo run --release --features gpu --bin validate_pure_gpu_streaming_v6` |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::sync::Arc;
 use std::time::Instant;

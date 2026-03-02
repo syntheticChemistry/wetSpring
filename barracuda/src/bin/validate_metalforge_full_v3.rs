@@ -6,9 +6,9 @@
     clippy::cast_possible_truncation,
     clippy::similar_names
 )]
-//! Exp093: metalForge Full Cross-Substrate v3 — 16 Domains
+//! Exp093: `metalForge` Full Cross-Substrate v3 — 16 Domains
 //!
-//! Extends metalForge cross-substrate proof from 12 domains (Exp084)
+//! Extends `metalForge` cross-substrate proof from 12 domains (Exp084)
 //! to all 16 GPU-eligible domains by adding EIC, `PCoA`, Kriging, and
 //! Rarefaction. Proves substrate-independence for the entire portfolio.
 //!
@@ -24,7 +24,7 @@
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, Pop!\_OS 22.04 |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use barracuda::device::WgpuDevice;
 use barracuda::{

@@ -7,7 +7,7 @@
     clippy::cast_possible_truncation,
     clippy::too_many_lines
 )]
-//! Exp076: metalForge Cross-Substrate Pipeline
+//! Exp076: `metalForge` Cross-Substrate Pipeline
 //!
 //! Demonstrates a heterogeneous compute pipeline across GPU, NPU, and CPU:
 //! - Stage 1 (GPU): batch-parallel diversity + spectral analytics
@@ -22,14 +22,14 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | 1f9f80e |
-//! | Baseline tool | BarraCuda CPU (sovereign Rust reference) |
+//! | Baseline tool | `BarraCuda` CPU (sovereign Rust reference) |
 //! | Baseline date | 2026-02-21 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_cross_substrate_pipeline` |
 //! | Data | 12 synthetic communities × 256 features |
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, AKD1000 NPU, Pop!\_OS 22.04 |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::fmt;
 use std::time::Instant;

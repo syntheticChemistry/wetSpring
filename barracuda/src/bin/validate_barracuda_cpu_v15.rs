@@ -24,7 +24,7 @@
 //! # Three-tier chain position
 //!
 //! ```text
-//! Paper (Exp224) → CPU (this) → GPU (Exp230) → Streaming (Exp231) → metalForge (Exp232)
+//! Paper (Exp224) → CPU (this) → GPU (Exp230) → Streaming (Exp231) → `metalForge` (Exp232)
 //! ```
 //!
 //! # Provenance
@@ -37,7 +37,7 @@
 //! | Command | `cargo run --release --bin validate_barracuda_cpu_v15` |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::collections::HashMap;
 use wetspring_barracuda::bio::{

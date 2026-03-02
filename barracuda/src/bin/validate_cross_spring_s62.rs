@@ -24,18 +24,18 @@
 //! hotSpring (physics) ─┐
 //!   f64 precision       │
 //!   ShaderTemplate      │
-//!   Fp64Strategy        ├──→ ToadStool (608 WGSL) ──→ all springs benefit
+//!   Fp64Strategy        ├──→ `ToadStool` (608 WGSL) ──→ all springs benefit
 //!   DF64 core-streaming │
 //!   SU(3), HMC, MD     │
 //! ──────────────────────┤
 //! wetSpring (bio)       │
 //!   Bio ODE (5 systems) │
-//!   Diversity, NMF      ├──→ ToadStool absorbs     ──→ neuralSpring uses bio shaders
+//!   Diversity, NMF      ├──→ `ToadStool` absorbs     ──→ neuralSpring uses bio shaders
 //!   GemmCached, TransE  │                               hotSpring uses GemmCachedF64
 //!   PeakDetect, ANI     │
 //! ──────────────────────┤
 //! neuralSpring (ML)     │
-//!   PairwiseHamming     ├──→ ToadStool absorbs     ──→ wetSpring uses for SNP distance
+//!   PairwiseHamming     ├──→ `ToadStool` absorbs     ──→ wetSpring uses for SNP distance
 //!   SpatialPayoff       │                               hotSpring uses for MD analysis
 //!   BatchFitness        │
 //! ```
@@ -46,7 +46,7 @@
 //! |-------|-------|
 //! | Baseline commit | 1f9f80e |
 //! | Baseline date | 2026-02-25 |
-//! | ToadStool pin | `02207c4a` (S62+DF64) |
+//! | `ToadStool` pin | `02207c4a` (S62+DF64) |
 //! | Exact command | `cargo run --features gpu --release --bin validate_cross_spring_s62` |
 //!
 //! Validation class: Cross-spring

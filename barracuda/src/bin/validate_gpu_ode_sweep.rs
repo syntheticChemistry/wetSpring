@@ -30,7 +30,7 @@
 //! Local WGSL: batched RK4 ODE sweep. `ToadStool`: `BatchedEighGpu` for bifurcation eigenvalues.
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use barracuda::device::WgpuDevice;
 use barracuda::ops::linalg::BatchedEighGpu;

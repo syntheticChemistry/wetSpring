@@ -20,7 +20,7 @@
 //!
 //! ## NUCLEUS Integration
 //!
-//! When biomeOS NUCLEUS is running, this experiment:
+//! When `biomeOS` NUCLEUS is running, this experiment:
 //! 1. Discovers wetSpring IPC socket via Songbird
 //! 2. Routes diversity + Anderson through `science.full_pipeline`
 //! 3. Reports which substrate handled each batch (CPU/GPU)

@@ -15,7 +15,7 @@
 //! | Item        | Value |
 //! |-------------|-------|
 //! | Date        | 2026-02-23 |
-//! | GPU prims   | anderson_2d, anderson_3d, lanczos, level_spacing_ratio |
+//! | GPU prims   | `anderson_2d`, `anderson_3d`, `lanczos`, `level_spacing_ratio` |
 //! | Command     | `cargo test --bin validate_biofilm_3d_qs -- --nocapture` |
 //!
 //! Validation class: Analytical

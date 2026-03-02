@@ -15,11 +15,11 @@
 //! # Exp264: CPU vs GPU v7 — 5 New Domains Head-to-Head (G17–G21 Parity)
 //!
 //! Closes the CPU↔GPU parity gap identified in the V87 audit. Validates
-//! that GPU domains G17–G21 (PCoA, K-mer, Bootstrap, KMD, Kriging) produce
+//! that GPU domains G17–G21 (`PCoA`, K-mer, Bootstrap, KMD, Kriging) produce
 //! identical results to their CPU counterparts.
 //!
 //! Extends v6 (D01–D22, 24 checks) with 5 new parity domains:
-//! - D23: PCoA CPU vs GPU (eigenvalues, coordinates, variance)
+//! - D23: `PCoA` CPU vs GPU (eigenvalues, coordinates, variance)
 //! - D24: K-mer Histogram CPU vs GPU (counts)
 //! - D25: Bootstrap + GPU Diversity CPU vs GPU (Shannon, Simpson, CI)
 //! - D26: KMD CPU vs GPU (PFAS mass defects)
@@ -37,7 +37,7 @@
 //! | Command | `cargo run --features gpu --bin validate_cpu_vs_gpu_v7` |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::time::Instant;
 
@@ -226,7 +226,7 @@ fn main() {
     }
 
     let communities: Vec<Vec<f64>> = (0..50)
-        .map(|i| counts.iter().map(|&c| c + (i as f64) * 0.1).collect())
+        .map(|i| counts.iter().map(|&c| c + f64::from(i) * 0.1).collect())
         .collect();
     let bootstrap_shannon: Vec<f64> = communities.iter().map(|c| diversity::shannon(c)).collect();
     let mean = bootstrap_shannon.iter().sum::<f64>() / bootstrap_shannon.len() as f64;

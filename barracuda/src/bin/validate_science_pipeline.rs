@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Exp203: biomeOS Science Pipeline Integration Validation
+//! Exp203: `biomeOS` Science Pipeline Integration Validation
 //!
-//! Validates the wetSpring IPC server end-to-end as a biomeOS science primal.
+//! Validates the wetSpring IPC server end-to-end as a `biomeOS` science primal.
 //! Tests the full `science_pipeline.toml` graph locally:
 //! 1. Server binds and accepts connections
 //! 2. health.check returns all 5 capabilities
@@ -11,7 +11,7 @@
 //! 6. Songbird registration falls back gracefully
 //! 7. Metrics are tracked per-method
 //!
-//! Proves: when NestGate/ToadStool/Tower are running, biomeOS can orchestrate
+//! Proves: when `NestGate`/`ToadStool`/`Tower` are running, `biomeOS` can orchestrate
 //! the science pipeline graph through wetSpring's JSON-RPC interface.
 //!
 //! # Provenance

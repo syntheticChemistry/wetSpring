@@ -17,8 +17,8 @@
 //! Validates the full NUCLEUS data acquisition chain for science workloads:
 //!
 //! 1. **Songbird Discovery** — wetSpring registers capabilities, discovers peers
-//! 2. **`NestGate` Three-Tier Routing** — biomeOS → `NestGate` → sovereign HTTP
-//! 3. **Neural API capability.call** — semantic routing through biomeOS orchestrator
+//! 2. **`NestGate` Three-Tier Routing** — `biomeOS` → `NestGate` → sovereign HTTP
+//! 3. **Neural API capability.call** — semantic routing through `biomeOS` orchestrator
 //! 4. **Science Pipeline via IPC** — diversity + Anderson through JSON-RPC dispatch
 //! 5. **Sovereign Fallback** — standalone mode when no ecosystem is running
 //!

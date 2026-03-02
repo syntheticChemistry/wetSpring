@@ -20,7 +20,7 @@
 //! # Evolution chain
 //!
 //! ```text
-//! Paper (Exp233) → CPU (Exp234) → GPU (Exp235) → Streaming (Exp236) → metalForge (this)
+//! Paper (Exp233) → CPU (Exp234) → GPU (Exp235) → Streaming (Exp236) → `metalForge` (this)
 //! ```
 //!
 //! # Provenance

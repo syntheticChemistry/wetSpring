@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: March 2, 2026 (Phase 92 V92 — 1,088 tests (ipc+nautilus), ToadStool S79 (`f97fc2ae`), 93+ primitives, 844 WGSL shaders, clippy pedantic CLEAN, 275 experiments, 52 papers complete + 6 proposed (Track 5 Gonzales immunological Anderson), Exp273-275 Paper 12 validation 48/48 checks)
+**Last Updated**: March 2, 2026 (Phase 92D — 1,309 tests, ToadStool S79 (`f97fc2ae`), 93 primitives, clippy pedantic CLEAN, 277 experiments, 52 papers complete + 6 reproduced, all 39 three-tier eligible papers validated at CPU + GPU + metalForge, full paper-math chain Exp291-295: Paper v4 45/45 + CPU v22 40/40 + GPU v9 35/35 + Streaming v9 16/16 + metalForge v14 28/28)
 **Purpose**: Track papers for reproduction/review across five tracks
 
 ---
@@ -305,6 +305,11 @@ No proprietary data dependencies.
 | **Track 5 immuno-Anderson (3-tier)** | CPU parity, GPU, streaming, metalForge | Exp276-279 | 109 |
 | **Track 5 Gonzales (science)** | IC50 dose-response, PK decay, IL-31 serum, Anderson mapping | Exp280-282 | 69 |
 | **Track 5 Gonzales (3-tier)** | CPU parity, GPU, streaming, metalForge | Exp283-286 | 133 |
+| **Paper Math Control v4** | All 52 papers' core equations | Exp291 | 45 |
+| **CPU v22 Comprehensive** | Full-domain CPU paper parity (8 domains) | Exp292 | 40 |
+| **GPU v9 Portability** | 5-track GPU dispatch + Anderson W-map | Exp293 | 35 |
+| **Pure GPU Streaming v9** | End-to-end pipeline: diversity→BC→NMF→Anderson→stats | Exp294 | 16 |
+| **metalForge v14 Paper Chain** | Cross-system paper math (GPU→CPU transitions) | Exp295 | 28 |
 
 ### Phase 37 — Anderson-QS Extension Papers
 
@@ -370,6 +375,25 @@ published data (IC50 dose-response, PK decay, pruritus time-series, cell populat
 
 ---
 
+## Hardware Control Chain
+
+Every paper reproduction is validated through a progressive hardware control chain.
+Each tier's output is verified against the previous tier to prove substrate independence.
+
+```
+Open Data (NCBI SRA, Zenodo, EPA, journal tables, published equations)
+  → barracuda CPU:  Pure Rust math matches Python/SciPy baselines (f64 exact or justified tolerance)
+    → barracuda GPU: GPU dispatch matches CPU reference (WGSL f64 via ToadStool S79)
+      → metalForge:  Mixed-hardware routing produces identical results (CPU ↔ GPU ↔ NPU)
+```
+
+**Verification**: 58 papers, 7,384+ checks (incl. Exp291-295: 164 new), 1,309 tests. Zero proprietary data dependencies.
+All Python baselines have reproduction headers (script, commit, date, hardware, SHA-256).
+All Rust validators have provenance classification headers.
+All 103 tolerance constants are scientifically justified and hierarchy-tested.
+
+---
+
 ## Notes
 
 - wetSpring has the largest paper queue because it spans four scientific domains + cross-spring
@@ -379,3 +403,5 @@ published data (IC50 dose-response, PK decay, pruritus time-series, cell populat
 - Track 3 papers (Fajgenbaum) use publicly available repoDB + published algorithms
 - Cahill/Smallwood papers may require Sandia data access agreements
 - Paper 23 (Kachkovskiy) is now validated via cross-spring spectral primitives (Exp107: 25/25 checks)
+- Extension papers (Phase 37-39) are CPU-only by design — they validate analytical models where GPU is not the bottleneck
+- V92D: all library code is panic-free, all clippy pedantic warnings resolved under `--all-features`

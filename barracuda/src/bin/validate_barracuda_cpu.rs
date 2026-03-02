@@ -33,7 +33,7 @@
 //! # Evolution path
 //!
 //! ```text
-//! Python baseline → [THIS] BarraCuda CPU → BarraCuda GPU → sovereign pipeline
+//! Python baseline → [THIS] `BarraCuda` CPU → `BarraCuda` GPU → sovereign pipeline
 //! ```
 //!
 //! Validation class: Python-parity

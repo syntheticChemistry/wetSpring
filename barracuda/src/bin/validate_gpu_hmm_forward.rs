@@ -34,7 +34,7 @@
 //! `ToadStool` `barracuda::ops::bio::hmm::HmmBatchForwardF64` (rewired 2026-02-22).
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use wetspring_barracuda::bio::hmm::{self, HmmModel};
 use wetspring_barracuda::bio::hmm_gpu::HmmGpuForward;

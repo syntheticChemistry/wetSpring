@@ -10,7 +10,7 @@
     clippy::similar_names,
     dead_code
 )]
-//! # Exp278: Track 5 ToadStool Streaming Dispatch — Immunological Anderson
+//! # Exp278: Track 5 `ToadStool` Streaming Dispatch — Immunological Anderson
 //!
 //! Pure GPU streaming pipeline for Paper 12. Uses `GpuPipelineSession` for
 //! batched GPU operations (Shannon, Simpson, Bray-Curtis) with zero CPU
@@ -25,8 +25,8 @@
 //!
 //! ## Evolution path
 //! - **Previous**: Exp277 GPU validation (individual dispatch)
-//! - **This experiment**: ToadStool streaming (batched GPU)
-//! - **Next**: Exp279 metalForge cross-substrate (NUCLEUS atomics)
+//! - **This experiment**: `ToadStool` streaming (batched GPU)
+//! - **Next**: Exp279 `metalForge` cross-substrate (NUCLEUS atomics)
 //!
 //! # Provenance
 //!
@@ -43,7 +43,7 @@
 use std::time::Instant;
 
 use barracuda::spectral::{
-    GOE_R, POISSON_R, anderson_2d, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
+    GOE_R, POISSON_R, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 use wetspring_barracuda::bio::{diversity, diversity_gpu, streaming_gpu};
 use wetspring_barracuda::gpu::GpuF64;
@@ -220,7 +220,7 @@ async fn main() {
 
     let t0 = Instant::now();
 
-    let midpoint = f64::midpoint(GOE_R, POISSON_R);
+    let _midpoint = f64::midpoint(GOE_R, POISSON_R);
     let mat = anderson_3d(6, 6, 6, 10.0, 42);
     let tri = lanczos(&mat, 216, 42);
     let eigs = lanczos_eigenvalues(&tri);

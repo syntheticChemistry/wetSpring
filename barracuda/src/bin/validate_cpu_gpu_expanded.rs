@@ -18,10 +18,10 @@
 //! 1. K-mer histogram: CPU `count_kmers` ↔ GPU `KmerGpu`
 //! 2. `UniFrac` propagation: CPU tree ↔ GPU `UniFracGpu`
 //! 3. ODE sweep: CPU `run_bistable` ↔ GPU `OdeSweepGpu`
-//! 4. metalForge mixed-hardware dispatch: GPU→CPU→GPU pipeline
+//! 4. `metalForge` mixed-hardware dispatch: GPU→CPU→GPU pipeline
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::sync::Arc;
 use std::time::Instant;

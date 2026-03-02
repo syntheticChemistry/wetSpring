@@ -8,6 +8,7 @@
     clippy::too_many_lines,
     clippy::items_after_statements,
     clippy::similar_names,
+    clippy::many_single_char_names,
     dead_code
 )]
 //! # Exp276: Track 5 CPU Parity — Immunological Anderson Pure Rust Math
@@ -28,8 +29,8 @@
 //! ## Evolution path
 //! - **This experiment**: `BarraCuda` CPU (pure Rust, single-threaded)
 //! - **Next**: Exp277 GPU validation (same math on GPU)
-//! - **Then**: Exp278 ToadStool dispatch (streaming pipeline)
-//! - **Final**: Exp279 metalForge cross-substrate (NUCLEUS atomics)
+//! - **Then**: Exp278 `ToadStool` dispatch (streaming pipeline)
+//! - **Final**: Exp279 `metalForge` cross-substrate (NUCLEUS atomics)
 //!
 //! # Provenance
 //!
@@ -42,7 +43,7 @@
 //! | Command | `cargo run --release --bin validate_immuno_anderson_cpu_parity` |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::time::Instant;
 
@@ -51,7 +52,6 @@ use barracuda::spectral::{
 };
 use barracuda::stats::norm_cdf;
 use wetspring_barracuda::bio::diversity;
-use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 struct Timing {
@@ -96,7 +96,7 @@ fn main() {
     let si_severe = diversity::simpson(&severe);
     v.check_pass(
         "Simpson(healthy) in [0,1]",
-        si_healthy >= 0.0 && si_healthy <= 1.0,
+        (0.0..=1.0).contains(&si_healthy),
     );
     v.check_pass(
         "Simpson(severe) > Simpson(healthy) (more even)",
@@ -275,7 +275,7 @@ fn main() {
         let cdf = norm_cdf((w - 15.0) / 5.0);
         v.check_pass(
             &format!("norm_cdf(W={w:.1}) in [0,1]"),
-            cdf >= 0.0 && cdf <= 1.0,
+            (0.0..=1.0).contains(&cdf),
         );
 
         println!("  {name:<12} Pielou={j:.4}  W={w:.1}  CDF(W|μ=15,σ=5)={cdf:.4}");
@@ -363,8 +363,7 @@ fn main() {
 
     println!("╠═════════════════════════╬════════════╬═══════════════════════╣");
     println!(
-        "║ TOTAL                   ║ {:>10.0} ║ {:>3}                   ║",
-        total_us, total_checks
+        "║ TOTAL                   ║ {total_us:>10.0} ║ {total_checks:>3}                   ║"
     );
     println!("╚═════════════════════════╩════════════╩═══════════════════════╝");
     println!();

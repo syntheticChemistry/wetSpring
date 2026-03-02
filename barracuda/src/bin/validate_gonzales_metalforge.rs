@@ -10,14 +10,14 @@
     clippy::similar_names,
     dead_code
 )]
-//! # Exp286: metalForge Cross-Substrate — Gonzales Reproductions
+//! # Exp286: `metalForge` Cross-Substrate — Gonzales Reproductions
 //!
 //! Validates CPU ↔ GPU parity for all Gonzales paper reproduction workloads
-//! in a metalForge-compatible configuration. Demonstrates that pharmacological
+//! in a `metalForge`-compatible configuration. Demonstrates that pharmacological
 //! data (Hill equation, PK decay, cell diversity) produces identical results
 //! across CPU and GPU substrates.
 //!
-//! ## metalForge coordination
+//! ## `metalForge` coordination
 //! - **NUCLEUS Tower**: substrate discovery (GPU, CPU, NPU candidates)
 //! - **NUCLEUS Node**: workload dispatch (diversity → GPU, spectral → CPU)
 //! - **NUCLEUS Nest**: metrics snapshot (latency, throughput, parity)
@@ -26,11 +26,11 @@
 //! - CPU → CPU: pure Rust baseline (always available)
 //! - CPU → GPU: WGPU compute shader dispatch
 //! - GPU → CPU: fallback path (degraded perf, same math)
-//! - NPU → GPU: PCIe bypass (described, not yet physical)
+//! - NPU → GPU: `PCIe` bypass (described, not yet physical)
 //!
 //! ## Evolution chain
-//! - **Previous**: Exp285 ToadStool streaming
-//! - **This**: metalForge cross-substrate (final tier)
+//! - **Previous**: Exp285 `ToadStool` streaming
+//! - **This**: `metalForge` cross-substrate (final tier)
 //!
 //! # Provenance
 //!
@@ -41,7 +41,7 @@
 //! | Command | `cargo run --release --features gpu --bin validate_gonzales_metalforge` |
 //!
 //! Validation class: Analytical
-//! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
+//! Provenance: Known-value formulas (`Shannon` H(uniform)=ln(S), `Hill`(EC50)=0.5, GOE/Poisson level spacing)
 
 use std::time::Instant;
 
@@ -63,7 +63,7 @@ struct Timing {
 
 #[tokio::main]
 async fn main() {
-    let mut v = Validator::new("Exp286: metalForge Cross-Substrate — Gonzales Reproductions");
+    let mut v = Validator::new("Exp286: `metalForge` Cross-Substrate — Gonzales Reproductions");
     let mut timings: Vec<Timing> = Vec::new();
 
     let gpu = match GpuF64::new().await {
@@ -74,7 +74,6 @@ async fn main() {
         Err(e) => {
             println!("  GPU unavailable ({e}), running CPU-only checks");
             v.finish();
-            return;
         }
     };
 
@@ -179,7 +178,7 @@ async fn main() {
     v.section("═══ D03: Anderson Spectral — Substrate Determinism ═══");
     let t0 = Instant::now();
 
-    let midpoint = (POISSON_R + GOE_R) / 2.0;
+    let midpoint = f64::midpoint(POISSON_R, GOE_R);
     let configs: &[(&str, usize, usize, usize, f64, u64)] = &[
         ("2D epidermis", 8, 8, 1, 16.0, 42),
         ("3D dermis", 6, 6, 6, 4.0, 42),
@@ -329,8 +328,7 @@ async fn main() {
 
     println!("╠═════════════════════════╬════════════╬════════════╬════════════════╣");
     println!(
-        "║ TOTAL                   ║ {:>10.0} ║ {:>10.0} ║ {:>3}            ║",
-        total_cpu, total_gpu, total_checks
+        "║ TOTAL                   ║ {total_cpu:>10.0} ║ {total_gpu:>10.0} ║ {total_checks:>3}            ║"
     );
     println!("╚═════════════════════════╩════════════╩════════════╩════════════════╝");
     println!();

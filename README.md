@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** March 2, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 92B — 1,276 tests (1,101 barracuda lib+ipc + 175 forge), 272 experiments, 7,220+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 255 binaries (249 validate + 20 benchmark), ToadStool S79 aligned (`f97fc2ae`), 93 primitives consumed via `compile_shader_universal` (barracuda always-on, zero local WGSL, zero local derivative/regression math, zero unsafe code), 103 named tolerances with full provenance, 0 ad-hoc magic numbers, `cargo clippy --all-targets -- -W clippy::pedantic` CLEAN (both crates, all targets, ZERO warnings), 249 validators with provenance classification headers, 32 GPU modules with test stubs, V89–V92B: S79 deep rewire, bio brain cross-spring ingest, deep debt resolution, immunological Anderson, Gonzales reproducibility
+**Status:** Phase 92D — 1,309 tests, 277 experiments, 7,384+ validation checks, 260 binaries, ToadStool S79 (`f97fc2ae`), 93 primitives consumed, zero local WGSL, zero unsafe code, 103 named tolerances, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN, all `fmt`/`doc`/`test` gates green. Full paper-math chain validated: Paper v4 (45/45) → CPU v22 (40/40) → GPU v9 (35/35) → Streaming v9 (16/16) → metalForge v14 (28/28)
 
 ---
 
@@ -127,7 +127,8 @@ integration point.
 | **Total validation checks** | **7,220+** |
 | Rust library unit tests | 1,044 (barracuda CPU + IPC, default features) |
 | metalForge forge tests | 175 |
-| **Total Rust tests** | **1,276** |
+| Integration + determinism + doc tests | 90 |
+| **Total Rust tests** | **1,309** |
 | Library code coverage | **95.86% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov) |
 | Experiments completed | 272 |
 | Validation/benchmark binaries | 249 validate + 20 benchmark = 255 total |
@@ -142,7 +143,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | ToadStool primitives consumed | **93** (barracuda always-on, zero fallback code — ToadStool S79, `f97fc2ae`) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 7,220+ validation checks **PASS**. All 1,276 tests **PASS** (1 ignored: hardware-dependent).
+All 7,220+ validation checks **PASS**. All 1,309 tests **PASS** (1 ignored: hardware-dependent).
 
 ### GPU Performance
 
@@ -375,16 +376,24 @@ barracuda math through GPU parity to mixed-hardware NUCLEUS dispatch:
 - Immunological Anderson extension
 - Gonzales reproducibility validation
 
-### Phase 92C: Deep Audit & Evolution (current)
+### Phase 92C: Deep Audit & Evolution
 - 32 GPU modules received API test stubs
 - 249 validators classified with provenance headers (70 Analytical, 59 GPU-parity, 53 Python-parity, 35 Pipeline, 20 Cross-spring, 12 Synthetic)
 - 20+ binaries: inline tolerance literals → `tolerances::` constants
 - 3 new diversity tolerance constants
 - 14 new tests (power.rs, nrs.rs, brain/observation.rs)
 - All doc_markdown clippy warnings fixed across 30+ files
-- All gates green: fmt ✓, clippy pedantic+nursery ✓, 1,044 lib tests ✓, doc ✓
 
-**1,276 tests** | **272 experiments** | **255 binaries** | **7,220+ checks**
+### Phase 92D: Deep Debt Resolution + Pedantic Evolution (current)
+- `panic!` in ESN bridge → `Result`-based error handling (zero panics in library code)
+- IPC science handler: 8-arg function → `MetricCtx` struct pattern
+- 50+ binaries: clippy pedantic fully clean (`--all-features -W clippy::pedantic`)
+- Modern idioms: `mul_add`, `f64::from`, `f64::midpoint`, inlined format args, `if let`
+- Shared `validation::bench()` helper extracted
+- Provenance documentation: `experiments/results/README.md`, BASELINE_MANIFEST clarification
+- Dependency health: CPU-only build is pure Rust; only C dep is `renderdoc-sys` via wgpu (GPU path)
+
+**1,309 tests** | **272 experiments** | **255 binaries** | **7,220+ checks**
 
 ### Phase 87: blueFish WhitePaper + hotSpring Brain Architecture Review (V87)
 
@@ -505,7 +514,7 @@ Rust 1.93 fixed across 20+ validation binaries.
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy --all-targets -D warnings` | Clean (0 warnings, pedantic + nursery) |
 | `cargo doc --no-deps` | Clean (0 warnings) |
-| Line coverage (`cargo-llvm-cov`) | **95.86% line / 93.54% fn / 94.99% branch** (1,044 lib tests) |
+| Line coverage (`cargo-llvm-cov`) | **95.86% line / 93.54% fn / 94.99% branch** (1,044+ lib tests) |
 | `#![deny(unsafe_code)]` | **Enforced crate-wide** (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | **Enforced crate-wide** |
 | TODO/FIXME markers | **0** |
@@ -611,7 +620,7 @@ wetSpring/
 │   ├── src/
 │   │   ├── lib.rs               ← crate root (pedantic + nursery lints enforced)
 │   │   ├── special.rs           ← sovereign math (erf, ln_gamma, regularized_gamma)
-│   │   ├── tolerances.rs        ← 97 named tolerance constants
+│   │   ├── tolerances.rs        ← 103 named tolerance constants
 │   │   ├── validation.rs        ← hotSpring validation framework
 │   │   ├── ncbi/                ← NCBI module (API key, HTTP, E-search, EFetch, SRA, NestGate, cache)
 │   │   ├── encoding.rs          ← sovereign base64 (zero dependencies)
@@ -647,7 +656,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (1,276 across barracuda + forge workspace)
+# Run all tests (1,309 across barracuda + forge workspace)
 cargo test --features ipc
 
 # Code quality checks
@@ -708,8 +717,8 @@ All validation data comes from public repositories:
 - **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
 - **ToadStool** — GPU compute engine (BarraCuda crate, 700+ WGSL shaders, S71+++)
 - **wateringHole** — Spring-local handoffs to ToadStool
-  - `handoffs/WETSPRING_TOADSTOOL_V88_EXPERIMENT_BUILDOUT_HANDOFF_MAR02_2026.md` — V88 (experiment buildout); V89–V92B handoffs in archive
-  - `handoffs/archive/` — V7-V87 (fossil record)
+  - `handoffs/WETSPRING_TOADSTOOL_V92D_DEEP_DEBT_EVOLUTION_HANDOFF_MAR02_2026.md` — V92D (current: deep debt evolution, panic elimination, pedantic hardening)
+  - `handoffs/archive/` — V7-V92C (fossil record)
   - `CROSS_SPRING_SHADER_EVOLUTION.md` — 700+ shader provenance (cross-spring, S71+++)
 - **blueFish** — Chemistry as irreducible research programme (`whitePaper/blueFish/`, analytical + computational, RootPulse provenance)
 - **ecoPrimals** — Parent ecosystem

@@ -3,6 +3,18 @@
 **Generated:** February 27, 2026 (Phase 61 audit — SPDX headers + provenance metadata added)
 **Last scripts commit:** Phase 61 audit (hashes updated after adding SPDX-License-Identifier headers)
 
+## Commit History Clarification
+
+Script `# Commit:` headers reference the commit at which each script's
+**mathematical output** was last validated, not the manifest freeze commit:
+
+- `756df26` — original baseline generation (pre-SPDX, Tracks 1-3)
+- `wetSpring Phase 66` — Track 4 (soil QS) baselines added in Phase 66
+- `48fb787` — manifest freeze: SPDX headers added, SHA-256 hashes updated
+
+The SHA-256 values in this manifest reflect post-SPDX content (commit `48fb787`).
+Numerical output is unchanged from the original generation commits.
+
 This manifest maps each Python baseline script to its Rust validation binary,
 experiment number, and content hash for reproducibility verification.
 

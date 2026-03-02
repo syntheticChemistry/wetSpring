@@ -33,7 +33,7 @@
 //! - **This experiment**: `BarraCuda` CPU (pure Rust, single-threaded)
 //! - **Next**: Exp180 GPU validation (same math on GPU)
 //! - **Then**: Exp181 pure GPU streaming (unidirectional)
-//! - **Final**: Exp182 metalForge cross-substrate
+//! - **Final**: Exp182 `metalForge` cross-substrate
 //!
 //! # Provenance
 //!

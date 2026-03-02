@@ -28,7 +28,7 @@
 //! - **`BarraCuda` CPU**: Autoinducer diffusion + QS ODE (pure Rust)
 //! - **`BarraCuda` GPU**: `BatchedOdeRK4` parameter sweep over distances
 //! - **Pure GPU streaming**: Distance sweep → QS decision on-device
-//! - **metalForge**: CPU = GPU = NPU colonization classification
+//! - **`metalForge`**: CPU = GPU = NPU colonization classification
 //!
 //! # Provenance
 //!

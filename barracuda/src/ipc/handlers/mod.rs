@@ -24,7 +24,7 @@ use serde_json::{Value, json};
 use crate::ipc::protocol::RpcError;
 
 /// Capabilities advertised by this primal, derived from the dispatch table.
-pub(crate) const CAPABILITIES: &[&str] = &[
+pub const CAPABILITIES: &[&str] = &[
     "science.diversity",
     "science.anderson",
     "science.qs_model",

@@ -21,9 +21,9 @@
 //! | Field          | Value |
 //! |----------------|-------|
 //! | Date           | 2026-02-26 |
-//! | NPU hardware   | BrainChip Akida AKD1000 (PCIe, Eastgate) |
+//! | NPU hardware   | `BrainChip` Akida AKD1000 (`PCIe`, Eastgate) |
 //! | Driver         | `ToadStool` akida-driver 0.1.0 (pure Rust) |
-//! | Baseline       | ToadStool examples/basic\_io.rs round-trip |
+//! | Baseline       | `ToadStool` examples/basic\_io.rs round-trip |
 //! | Hardware       | Eastgate i9-12900K, 64 GB DDR5, Pop!\_OS 22.04 |
 //! | Command        | `cargo run --release --features npu --bin validate_npu_hardware` |
 //!

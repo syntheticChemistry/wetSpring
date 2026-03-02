@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
-**Last Updated**: March 1, 2026
-**Status**: Phase 92C — 6,656+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ALL PASS (1,247 tests, 262 experiments, 238 binaries, ToadStool S79 aligned (`1dd7e338`), 93 primitives consumed, 0 local WGSL/derivative/regression, barracuda always-on, 97 named tolerances with full provenance, 0 ad-hoc magic numbers, clippy pedantic CLEAN, 0 Passthrough, V92C blueFish whitePaper + hotSpring brain arch review + RootPulse provenance, 50/50 three-tier, 52/52 papers, 95.86% line / 94.02% region / 95.40% fn)
+**Last Updated**: March 2, 2026
+**Status**: Phase 92D — 7,220+ checks, ALL PASS (1,309 tests, 272 experiments, 255 binaries, ToadStool S79 `f97fc2ae`, 93 primitives, 0 local WGSL, 103 named tolerances, clippy pedantic CLEAN `--all-features`, 52 papers + 6 reproduced, full three-tier on all 39 eligible papers)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

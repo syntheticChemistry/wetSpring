@@ -12,7 +12,7 @@
     clippy::many_single_char_names,
     dead_code
 )]
-//! # Exp232: metalForge v9 — NUCLEUS Mixed Hardware Dispatch
+//! # Exp232: `metalForge` v9 — NUCLEUS Mixed Hardware Dispatch
 //!
 //! Validates the complete NUCLEUS dispatch model with V75-V76 additions:
 //! - **GPU→NPU `PCIe` bypass** — streaming topology without CPU round-trip
@@ -25,7 +25,7 @@
 //! # Three-tier chain
 //!
 //! ```text
-//! Paper (Exp224) → CPU (Exp229) → GPU (Exp230) → Streaming (Exp231) → metalForge (this)
+//! Paper (Exp224) → CPU (Exp229) → GPU (Exp230) → Streaming (Exp231) → `metalForge` (this)
 //! ```
 //!
 //! # Provenance

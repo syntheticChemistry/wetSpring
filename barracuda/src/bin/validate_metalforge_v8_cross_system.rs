@@ -12,7 +12,7 @@
     clippy::many_single_char_names,
     dead_code
 )]
-//! # Exp228: metalForge v8 — Cross-System (GPU → NPU → CPU) Dispatch
+//! # Exp228: `metalForge` v8 — Cross-System (GPU → NPU → CPU) Dispatch
 //!
 //! Validates the complete cross-substrate dispatch chain through the IPC
 //! layer. Each science workload dispatches to the optimal hardware:
@@ -29,7 +29,7 @@
 //! # Three-tier chain
 //!
 //! ```text
-//! Paper (224) → CPU (225) → GPU (226) → Streaming (227) → metalForge (this)
+//! Paper (224) → CPU (225) → GPU (226) → Streaming (227) → `metalForge` (this)
 //! ```
 //!
 //! # Provenance
@@ -41,7 +41,7 @@
 //! | Command | `cargo run --features ipc --release --bin validate_metalforge_v8_cross_system` |
 //!
 //! Validation class: Pipeline
-//! Provenance: metalForge dispatch/routing validation
+//! Provenance: `metalForge` dispatch/routing validation
 
 use serde_json::json;
 use std::time::Instant;

@@ -6,11 +6,11 @@
     clippy::cast_possible_truncation,
     clippy::similar_names
 )]
-//! Exp103: metalForge Cross-Substrate v5 — 13 Pure GPU Promotion Domains
+//! Exp103: `metalForge` Cross-Substrate v5 — 13 Pure GPU Promotion Domains
 //!
-//! Extends metalForge cross-substrate validation (Exp093: 16 domains) to
+//! Extends `metalForge` cross-substrate validation (Exp093: 16 domains) to
 //! cover the 13 newly GPU-promoted modules. Proves: for every new GPU module,
-//! metalForge router can dispatch to CPU or GPU and get the same answer.
+//! `metalForge` router can dispatch to CPU or GPU and get the same answer.
 //!
 //! # Provenance
 //!
@@ -24,7 +24,7 @@
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, Pop!\_OS 22.04 |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::sync::Arc;
 use std::time::Instant;

@@ -26,7 +26,7 @@
 //! - **`BarraCuda` CPU**: Sovereign diversity pipeline (Shannon, Simpson, Bray-Curtis)
 //! - **`BarraCuda` GPU**: `FusedMapReduceF64` + `BrayCurtisF64`
 //! - **Pure GPU streaming**: Abundance → diversity → ordination on-device
-//! - **metalForge**: CPU = GPU = NPU diversity output
+//! - **`metalForge`**: CPU = GPU = NPU diversity output
 //!
 //! # Provenance
 //!

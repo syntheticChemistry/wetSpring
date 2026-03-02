@@ -12,7 +12,7 @@
     clippy::many_single_char_names,
     dead_code
 )]
-//! Exp208: metalForge v7 — Mixed Hardware NUCLEUS Atomics via IPC
+//! Exp208: `metalForge` v7 — Mixed Hardware NUCLEUS Atomics via IPC
 //!
 //! Validates cross-substrate dispatch with NUCLEUS atomic coordination
 //! through the IPC dispatch layer:
@@ -30,7 +30,7 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Baseline      | metalForge v6 (Exp104), CPU v11 (Exp206), GPU V59 (Exp191) |
+//! | Baseline      | `metalForge` v6 (Exp104), CPU v11 (Exp206), GPU V59 (Exp191) |
 //! | Date          | 2026-02-27 |
 //! | Command       | `cargo run --features ipc --release --bin validate_metalforge_v7_mixed` |
 //! | Data          | Synthetic test vectors (self-contained) |

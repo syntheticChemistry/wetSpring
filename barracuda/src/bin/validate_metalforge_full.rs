@@ -7,18 +7,18 @@
     clippy::cast_possible_truncation,
     clippy::too_many_lines
 )]
-//! Exp065: metalForge Full Cross-System Validation
+//! Exp065: `metalForge` Full Cross-System Validation
 //!
 //! Extends Exp060 (Track 1c only) to ALL GPU-eligible domains. For each
 //! domain, compute CPU reference truth, then GPU, and prove parity. This
-//! is the full metalForge substrate-independence proof.
+//! is the full `metalForge` substrate-independence proof.
 //!
 //! # Provenance
 //!
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | BarraCuda CPU (sovereign Rust reference) |
+//! | Baseline tool | `BarraCuda` CPU (sovereign Rust reference) |
 //! | Baseline version | Feb 2026 |
 //! | Baseline command | CPU run first as ground truth; GPU validated against CPU |
 //! | Baseline date | 2026-02-21 |
@@ -27,7 +27,7 @@
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, Pop!\_OS 22.04 |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{

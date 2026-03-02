@@ -25,7 +25,7 @@
 //! | Item        | Value |
 //! |-------------|-------|
 //! | Date        | 2026-02-23 |
-//! | GPU prims   | anderson_3d, lanczos, level_spacing_ratio |
+//! | GPU prims   | `anderson_3d`, `lanczos`, `level_spacing_ratio` |
 //! | Command     | `cargo test --bin validate_finite_size_scaling -- --nocapture` |
 //!
 //! Validation class: Analytical

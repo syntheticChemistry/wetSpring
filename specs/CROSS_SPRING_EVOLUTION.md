@@ -84,12 +84,13 @@ engine without reimplementation.
 
 ## ToadStool Primitive Count
 
-As of V87 (March 2026):
+As of V92D (March 2, 2026):
 - **93 ToadStool primitives** consumed by wetSpring
 - **0 local WGSL shaders** (all absorbed)
-- **744 total WGSL shaders** in ToadStool across all Springs
-- **6,656+ validation checks** in wetSpring
+- **844+ total WGSL shaders** in ToadStool across all Springs
+- **7,220+ validation checks** in wetSpring (1,309 tests)
 - **29 computational chemistry ops** mapped to BarraCUDA primitives (blueFish isomorphism proof)
+- **Zero panics** in library code, **zero unsafe**, **zero clippy warnings** (`--all-features -W pedantic`)
 
 ## Cross-Spring Validation
 

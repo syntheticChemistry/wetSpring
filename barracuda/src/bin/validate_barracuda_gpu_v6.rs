@@ -21,7 +21,7 @@
 //! # Three-tier chain position
 //!
 //! ```text
-//! Paper (Exp224) → CPU (Exp225) → GPU (this) → Streaming (Exp227) → metalForge (Exp228)
+//! Paper (Exp224) → CPU (Exp225) → GPU (this) → Streaming (Exp227) → `metalForge` (Exp228)
 //! ```
 //!
 //! # Provenance
@@ -33,7 +33,7 @@
 //! | Command | `cargo run --release --features gpu --bin validate_barracuda_gpu_v6` |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::sync::Arc;
 use std::time::Instant;

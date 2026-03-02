@@ -24,7 +24,7 @@
 //! | Command | `cargo run --release --features gpu --bin validate_barracuda_gpu_v5` |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use wetspring_barracuda::bio::{
     diversity, diversity_gpu, dnds, dnds_gpu::DnDsGpu, hmm, hmm_gpu::HmmGpuForward, pangenome,

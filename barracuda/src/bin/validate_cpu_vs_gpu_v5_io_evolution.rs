@@ -34,7 +34,7 @@
 //! | Command | `cargo run --features gpu --release --bin validate_cpu_vs_gpu_v5_io_evolution` |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::io::Write;
 use std::path::PathBuf;

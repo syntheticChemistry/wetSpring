@@ -29,7 +29,7 @@
 //! `ToadStool` `barracuda::ops::bio::rf_inference::RfBatchInferenceGpu`.
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{

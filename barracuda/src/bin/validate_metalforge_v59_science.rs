@@ -11,7 +11,7 @@
     clippy::many_single_char_names,
     dead_code
 )]
-//! Exp192: metalForge V59 Cross-Substrate — CPU↔GPU Parity for Science Domains
+//! Exp192: `metalForge` V59 Cross-Substrate — CPU↔GPU Parity for Science Domains
 //!
 //! Proves that V59 science computations produce identical results on CPU
 //! and GPU substrates. Exercises diversity, Bray-Curtis, and Anderson

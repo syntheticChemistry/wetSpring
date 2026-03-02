@@ -6,7 +6,7 @@
     clippy::cast_possible_truncation,
     clippy::similar_names
 )]
-//! Exp104: metalForge Cross-Substrate v6 — Complete Three-Tier Coverage
+//! Exp104: `metalForge` Cross-Substrate v6 — Complete Three-Tier Coverage
 //!
 //! Closes all remaining Three-Tier Matrix gaps by validating domains that
 //! had CPU + GPU parity but were never exercised through a metalForge

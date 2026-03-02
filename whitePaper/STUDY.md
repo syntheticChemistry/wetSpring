@@ -1,6 +1,6 @@
 # wetSpring: Replicable Life Science and Analytical Chemistry on Consumer GPU Hardware
 
-**Working Draft** — February 26, 2026
+**Working Draft** — March 2, 2026
 
 ---
 

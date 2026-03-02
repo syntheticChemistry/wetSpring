@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![allow(clippy::similar_names)]
-//! Exp060: Cross-Substrate Validation (metalForge)
+//! Exp060: Cross-Substrate Validation (`metalForge`)
 //!
 //! Proves that the same algorithm produces identical results on CPU and GPU
 //! substrates. For each GPU-promoted algorithm, run CPU first as reference
 //! truth, then GPU, and compare.
 //!
-//! This is the metalForge proof: the math is substrate-independent.
+//! This is the `metalForge` proof: the math is substrate-independent.
 //!
 //! # Provenance
 //!
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | BarraCuda CPU (reference implementation) |
+//! | Baseline tool | `BarraCuda` CPU (reference implementation) |
 //! | Baseline version | Feb 2026 |
 //! | Baseline command | CPU run first as ground truth; GPU validated against CPU |
 //! | Baseline date | 2026-02-19 |

@@ -20,7 +20,7 @@
 //! # Three-tier chain
 //!
 //! ```text
-//! Paper (224) → CPU (225) → GPU (226) → Streaming (this) → metalForge (228)
+//! Paper (224) → CPU (225) → GPU (226) → Streaming (this) → `metalForge` (228)
 //! ```
 //!
 //! # Provenance
@@ -32,7 +32,7 @@
 //! | Command | `cargo run --release --features gpu --bin validate_pure_gpu_streaming_v4` |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::sync::Arc;
 use std::time::Instant;

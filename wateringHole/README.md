@@ -9,6 +9,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
+| **V92D+** | `handoffs/WETSPRING_PAPER_CHAIN_V92D_PLUS_HANDOFF_MAR02_2026.md` | Mar 2 | Paper-math chain: Exp291-295, 52 papers, CPU→GPU→streaming→metalForge |
 | **V92C** | `handoffs/WETSPRING_TOADSTOOL_V92C_DEEP_AUDIT_HANDOFF_MAR02_2026.md` | Mar 2 | Deep audit & GPU test evolution |
 | **V92B** | `handoffs/WETSPRING_GONZALES_REPRO_V92B_HANDOFF_MAR02_2026.md` | Mar 2 | Gonzales repro handoff |
 | **V92** | `handoffs/WETSPRING_IMMUNO_ANDERSON_V92_HANDOFF_MAR02_2026.md` | Mar 2 | Immuno Anderson handoff |

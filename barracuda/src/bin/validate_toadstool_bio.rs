@@ -35,7 +35,7 @@
 //! `ToadStool` primitives: `TreeInferenceGpu`, `GillespieGpu`, `SmithWatermanGpu`.
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use barracuda::device::WgpuDevice;
 use barracuda::{FlatForest, TreeInferenceGpu};

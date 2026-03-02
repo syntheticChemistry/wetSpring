@@ -6,9 +6,9 @@
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation
 )]
-//! Exp084: metalForge Full Cross-Substrate v2
+//! Exp084: `metalForge` Full Cross-Substrate v2
 //!
-//! Extends Exp065 (8 domains) with 4 additional ToadStool-absorbed domains:
+//! Extends Exp065 (8 domains) with 4 additional `ToadStool`-absorbed domains:
 //! Smith-Waterman, Gillespie SSA, Decision Tree, and Spectral Cosine.
 //! For each domain, CPU computes reference truth, GPU must match.
 //!
@@ -20,14 +20,14 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | 1f9f80e |
-//! | Baseline tool | BarraCuda CPU (sovereign Rust reference) |
+//! | Baseline tool | `BarraCuda` CPU (sovereign Rust reference) |
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_metalforge_full_v2` |
 //! | Data | Synthetic test vectors (self-contained) |
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, Pop!\_OS 22.04 |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use barracuda::TreeInferenceGpu;
 use barracuda::device::WgpuDevice;

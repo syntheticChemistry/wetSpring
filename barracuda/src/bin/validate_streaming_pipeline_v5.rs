@@ -19,7 +19,7 @@
 //! # Three-tier chain position
 //!
 //! ```text
-//! Paper (Exp224) → CPU (Exp229) → GPU (Exp230) → Streaming (this) → metalForge (Exp232)
+//! Paper (Exp224) → CPU (Exp229) → GPU (Exp230) → Streaming (this) → `metalForge` (Exp232)
 //! ```
 //!
 //! # Provenance

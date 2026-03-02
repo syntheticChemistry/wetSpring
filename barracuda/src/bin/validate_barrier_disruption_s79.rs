@@ -23,7 +23,7 @@
 //!
 //! 1. Vary breach depth (Lz = 1..8) with fixed lateral size (Lx=Ly=8)
 //! 2. At each depth, compute level spacing ratio r
-//! 3. Identify the depth at which r crosses the midpoint → d_eff transition
+//! 3. Identify the depth at which r crosses the midpoint → `d_eff` transition
 //! 4. Repeat at multiple disorder strengths W to map the (W, Lz) phase diagram
 //! 5. Ensemble average over seeds for statistical robustness
 //!
@@ -33,7 +33,7 @@
 //! |-----------|--------|--------|
 //! | `anderson_2d` / `anderson_3d` | hotSpring | `barracuda::spectral` |
 //! | `lanczos` / `lanczos_eigenvalues` | hotSpring | `barracuda::spectral` |
-//! | `level_spacing_ratio` | multiple | `barracuda::spectral::stats` |
+//! | `level_spacing_ratio` | multiple | ``barracuda::spectral`::stats` |
 //! | Diversity (Pielou) | wetSpring | `wetspring_barracuda::bio::diversity` |
 //!
 //! # Provenance
@@ -128,10 +128,7 @@ fn main() {
                 _ => "through to reticular dermis",
             };
 
-            println!(
-                "  │  {:>3}  │ {:.4} │ {:+.4}   │ {:<11} │ {}",
-                lz, r, delta, regime, interp
-            );
+            println!("  │  {lz:>3}  │ {r:.4} │ {delta:+.4}   │ {regime:<11} │ {interp}");
             rs.push((lz, r));
         }
 
@@ -183,7 +180,7 @@ fn main() {
         println!("  │  ");
         print!("  │  W \\ Lz │");
         for &lz in &depths {
-            print!("   {:>2}   │", lz);
+            print!("   {lz:>2}   │");
         }
         println!();
         print!("  │  ───────┼");
@@ -196,7 +193,7 @@ fn main() {
         let mut any_localized = false;
 
         for &w in &disorders {
-            print!("  │  {:>5.1}  │", w);
+            print!("  │  {w:>5.1}  │");
             for &lz in &depths {
                 let r = ensemble_r_3d(lxy, lxy, lz, w, &seeds);
                 let symbol = if r > midpoint {
@@ -206,7 +203,7 @@ fn main() {
                     any_localized = true;
                     "LOC"
                 };
-                print!(" {:.3} {} │", r, symbol);
+                print!(" {r:.3} {symbol} │");
             }
             println!();
         }
@@ -552,15 +549,13 @@ fn main() {
     let mut total_checks = 0_u32;
     let mut total_ms = 0.0_f64;
     for d in &domains {
-        println!("║ {:<22} │ {:>6.1}ms │ {:>3} ║", d.name, d.ms, d.checks);
+        let (name, ms, checks) = (&d.name, d.ms, d.checks);
+        println!("║ {name:<22} │ {ms:>6.1}ms │ {checks:>3} ║");
         total_checks += d.checks;
         total_ms += d.ms;
     }
     println!("╠════════════════════════════════════════════════════════════════════╣");
-    println!(
-        "║ TOTAL                  │ {:>6.1}ms │ {:>3} ║",
-        total_ms, total_checks
-    );
+    println!("║ TOTAL                  │ {total_ms:>6.1}ms │ {total_checks:>3} ║");
     println!("╚════════════════════════════════════════════════════════════════════╝");
 
     println!("\n  Paper 06 ↔ Paper 12 Duality:");

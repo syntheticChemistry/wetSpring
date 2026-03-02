@@ -34,13 +34,13 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | 1f9f80e |
-//! | Baseline tool | BarraCuda CPU reference |
+//! | Baseline tool | `BarraCuda` CPU reference |
 //! | Baseline date | 2026-02-23 |
 //! | Exact command | `cargo run --features gpu --release --bin validate_streaming_ode_phylo` |
 //! | Data | Synthetic test vectors (self-contained) |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use barracuda::device::WgpuDevice;
 use barracuda::{FelsensteinGpu, PhyloTree};

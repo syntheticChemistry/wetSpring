@@ -2,7 +2,7 @@
 
 **Date:** March 2, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 92C — 272 experiments, 7,220+ validation checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000, 73 cross-spring S79, 64 bio brain cross-spring, 157 immunological Anderson + 202 Gonzales reproductions — full three-tier), ALL PASS; 1,276 tests (with ipc+nautilus), 255 binaries (provenance headers on all), ToadStool S79 aligned (`f97fc2ae`), 93+ primitives consumed, 844 f64-canonical WGSL shaders (zero local), 103 named tolerances (full provenance), 0 unsafe code, 0 todo!/unimplemented!(), clippy pedantic CLEAN (both crates, ZERO warnings), V92C Paper 12: full three-tier immunological Anderson (Exp273-279: 157/157) + Gonzales paper reproductions (Exp280-286: 202/202), Track 5 Papers 53-58 reproduced from published data, all 58 papers now have experiments
+**Status:** Phase 92D+ — 277 experiments, 7,384+ validation checks, ALL PASS; 1,309 tests, 260 binaries (provenance headers on all), ToadStool S79 (`f97fc2ae`), 93 primitives consumed, 0 local WGSL, 103 named tolerances, 0 unsafe code, 0 panics in library, clippy pedantic CLEAN (`--all-features -W clippy::pedantic`), V92D+: full paper-math chain Exp291-295 (Paper v4 45/45 → CPU v22 40/40 → GPU v9 35/35 → Streaming v9 16/16 → metalForge v14 28/28), all 58 papers now have experiments, 52 + 6 reproduced with full three-tier + paper-math chain
 
 ---
 

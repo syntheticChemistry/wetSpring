@@ -22,7 +22,7 @@
 //! |-------|---------------|-----------|------------|
 //! | Epidermis | 2D lattice (L=6) | d=2 | Signals localize |
 //! | Dermis | 3D lattice (L=8) | d=3 | Signals propagate |
-//! | Barrier breach | 2D → 3D transition | d_eff increase | Dimensional promotion |
+//! | Barrier breach | 2D → 3D transition | `d_eff` increase | Dimensional promotion |
 //!
 //! # Cross-Spring Provenance
 //!
@@ -257,8 +257,10 @@ fn main() {
 
             if !found_transition && r < midpoint && prev_r > midpoint {
                 found_transition = true;
-                w_c_estimate =
-                    (w + disorders[disorders.iter().position(|&d| d == w).unwrap() - 1]) / 2.0;
+                w_c_estimate = f64::midpoint(
+                    w,
+                    disorders[disorders.iter().position(|&d| d == w).unwrap() - 1],
+                );
             }
             prev_r = r;
         }
@@ -487,17 +489,14 @@ fn main() {
     let mut total_checks = 0_u32;
     let mut total_ms = 0.0_f64;
     for d in &domains {
-        println!(
-            "║ {:<22} │ {:<18} │ {:>6.2}ms │ {:>3} ║",
-            d.name, d.spring, d.ms, d.checks
-        );
+        let (name, spring, ms, checks) = (&d.name, &d.spring, d.ms, d.checks);
+        println!("║ {name:<22} │ {spring:<18} │ {ms:>6.2}ms │ {checks:>3} ║");
         total_checks += d.checks;
         total_ms += d.ms;
     }
     println!("╠════════════════════════════════════════════════════════════════════╣");
     println!(
-        "║ TOTAL                  │ Paper 12           │ {:>6.2}ms │ {:>3} ║",
-        total_ms, total_checks
+        "║ TOTAL                  │ Paper 12           │ {total_ms:>6.2}ms │ {total_checks:>3} ║"
     );
     println!("╚════════════════════════════════════════════════════════════════════╝");
 

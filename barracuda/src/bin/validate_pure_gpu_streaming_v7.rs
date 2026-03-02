@@ -33,7 +33,7 @@
 //! | Command | `cargo run --features gpu --bin validate_pure_gpu_streaming_v7` |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::time::Instant;
 

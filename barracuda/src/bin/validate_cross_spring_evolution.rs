@@ -29,19 +29,19 @@
 //!
 //! | Primitive | Evolved By | Absorbed | Consumed By |
 //! |-----------|-----------|----------|-------------|
-//! | `FusedMapReduceF64` | hotSpring | Session 18 | wetSpring, neuralSpring |
-//! | `GemmCachedF64` (60×) | wetSpring | Session 18 | hotSpring HFB |
-//! | `BatchedEighGpu` (NAK) | hotSpring | Session 25 | wetSpring PCoA |
-//! | `ShaderTemplate` | hotSpring NVK | Session 18 | All Springs |
-//! | `math_f64.wgsl` | wetSpring | Session 27 | All Springs |
-//! | `PairwiseHammingGpu` | neuralSpring | Session 31f | wetSpring (new) |
-//! | `PairwiseJaccardGpu` | neuralSpring | Session 31f | wetSpring (new) |
-//! | `SpatialPayoffGpu` | neuralSpring | Session 31f | wetSpring (new) |
-//! | `BatchFitnessGpu` | neuralSpring | Session 31f | wetSpring (new) |
-//! | `LocusVarianceGpu` | neuralSpring | Session 31f | wetSpring (new) |
+//! | `FusedMapReduceF64` | `hotSpring` | Session 18 | `wetSpring`, `neuralSpring` |
+//! | `GemmCachedF64` (60×) | `wetSpring` | Session 18 | `hotSpring` HFB |
+//! | `BatchedEighGpu` (NAK) | `hotSpring` | Session 25 | `wetSpring` `PCoA` |
+//! | `ShaderTemplate` | `hotSpring` NVK | Session 18 | All Springs |
+//! | `math_f64.wgsl` | `wetSpring` | Session 27 | All Springs |
+//! | `PairwiseHammingGpu` | `neuralSpring` | Session 31f | `wetSpring` (new) |
+//! | `PairwiseJaccardGpu` | `neuralSpring` | Session 31f | `wetSpring` (new) |
+//! | `SpatialPayoffGpu` | `neuralSpring` | Session 31f | `wetSpring` (new) |
+//! | `BatchFitnessGpu` | `neuralSpring` | Session 31f | `wetSpring` (new) |
+//! | `LocusVarianceGpu` | `neuralSpring` | Session 31f | `wetSpring` (new) |
 //!
 //! Validation class: Cross-spring
-//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
+//! Provenance: Validates across multiple primals/springs (`hotSpring`, `wetSpring`, `neuralSpring`, etc.)
 
 use barracuda::{
     BatchFitnessGpu, LocusVarianceGpu, PairwiseHammingGpu, PairwiseJaccardGpu, SpatialPayoffGpu,

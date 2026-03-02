@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** March 2, 2026 (V92C)
+**Date:** March 2, 2026 (V92D)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
 **ToadStool pin:** `f97fc2ae` (S79)
-**Status:** 93 ToadStool primitives consumed via `compile_shader_universal`, 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,276 tests (1,101 barracuda lib+ipc + 175 forge), ToadStool S79 aligned, 272 experiments, 7,220+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 103 named tolerances, clippy pedantic CLEAN. **V92C:** 32 GPU test stubs, 249 provenance-classified validators, 14 new library tests. Hand off: V92C active (supersedes V87), V7-V87 archived.
+**Status:** 93 ToadStool primitives consumed via `compile_shader_universal`, 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,309 tests, ToadStool S79 aligned, 272 experiments, 7,220+ checks, 103 named tolerances, clippy pedantic CLEAN (`--all-features`). **V92D:** ESN bridge panic → Result, IPC MetricCtx refactor, modern idiomatic Rust. Hand off: V92D active (supersedes V92C), V7-V92C archived.
 
 ---
 

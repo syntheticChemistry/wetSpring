@@ -40,11 +40,11 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Date | 2026-03-01 |
-//! | ToadStool | S70+++ (`1dd7e338`) |
+//! | `ToadStool` | S70+++ (`1dd7e338`) |
 //! | Command | `cargo run --features gpu --bin validate_barracuda_gpu_v10` |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::sync::Arc;
 use std::time::Instant;

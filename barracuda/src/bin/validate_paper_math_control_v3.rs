@@ -29,7 +29,7 @@
 //! # Chain
 //!
 //! ```text
-//! Paper (this) → CPU (v16-v19) → GPU (v8-v11) → Streaming (v6-v8) → metalForge (v10-v11)
+//! Paper (this) → CPU (v16-v19) → GPU (v8-v11) → Streaming (v6-v8) → `metalForge` (v10-v11)
 //! ```
 //!
 //! | Field | Value |

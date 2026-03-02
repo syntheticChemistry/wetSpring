@@ -19,7 +19,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `e4358c5` |
-//! | Baseline tool | wgpu/ToadStool dispatch timing |
+//! | Baseline tool | wgpu/`ToadStool` dispatch timing |
 //! | Baseline date | 2026-02-21 |
 //! | Exact command | `cargo run --features gpu --release --bin benchmark_dispatch_overhead` |
 //! | Data | Minimal test vectors |

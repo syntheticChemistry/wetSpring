@@ -30,7 +30,7 @@
 //!
 //! ## Chain
 //!
-//! Exp256-258 (NUCLEUS) → **Exp259 (Genomic Vault)** → BearDog/NestGate absorb
+//! Exp256-258 (NUCLEUS) → **Exp259 (Genomic Vault)** → `BearDog`/`NestGate` absorb
 //!
 //! | Field | Value |
 //! |-------|-------|

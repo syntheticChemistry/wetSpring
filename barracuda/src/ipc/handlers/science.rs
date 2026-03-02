@@ -30,56 +30,72 @@ pub fn handle_diversity(params: &Value) -> Result<Value, RpcError> {
     #[cfg(feature = "gpu")]
     let use_gpu = try_gpu().filter(|g| counts.len() >= g.dispatch_threshold());
 
-    insert_metric_if_requested(
-        &mut result,
+    let mut ctx = MetricCtx {
+        result: &mut result,
         compute_all,
-        &metrics,
-        "shannon",
-        &counts,
-        diversity::shannon,
-        #[cfg(feature = "gpu")]
-        |g, c| diversity_gpu::shannon_gpu(g, c).ok(),
-        #[cfg(feature = "gpu")]
-        use_gpu,
-    );
-    insert_metric_if_requested(
-        &mut result,
-        compute_all,
-        &metrics,
-        "simpson",
-        &counts,
-        diversity::simpson,
-        #[cfg(feature = "gpu")]
-        |g, c| diversity_gpu::simpson_gpu(g, c).ok(),
-        #[cfg(feature = "gpu")]
-        use_gpu,
-    );
-    insert_metric_if_requested(
-        &mut result,
-        compute_all,
-        &metrics,
-        "observed",
-        &counts,
-        diversity::observed_features,
-        #[cfg(feature = "gpu")]
-        |g, c| diversity_gpu::observed_features_gpu(g, c).ok(),
-        #[cfg(feature = "gpu")]
-        use_gpu,
-    );
-    insert_metric_if_requested(
-        &mut result,
-        compute_all,
-        &metrics,
-        "pielou",
-        &counts,
-        diversity::pielou_evenness,
-        #[cfg(feature = "gpu")]
-        |g, c| diversity_gpu::pielou_evenness_gpu(g, c).ok(),
-        #[cfg(feature = "gpu")]
-        use_gpu,
-    );
-    insert_chao1_if_requested(&mut result, compute_all, &metrics, &counts);
-    insert_bray_curtis_if_present(&mut result, params, &counts);
+        metrics: &metrics,
+    };
+
+    ctx.insert("shannon", || {
+        dispatch_metric(&counts, diversity::shannon, {
+            #[cfg(feature = "gpu")]
+            {
+                use_gpu.and_then(|g| diversity_gpu::shannon_gpu(g, &counts).ok())
+            }
+            #[cfg(not(feature = "gpu"))]
+            {
+                None
+            }
+        })
+    });
+    ctx.insert("simpson", || {
+        dispatch_metric(&counts, diversity::simpson, {
+            #[cfg(feature = "gpu")]
+            {
+                use_gpu.and_then(|g| diversity_gpu::simpson_gpu(g, &counts).ok())
+            }
+            #[cfg(not(feature = "gpu"))]
+            {
+                None
+            }
+        })
+    });
+    ctx.insert("observed", || {
+        dispatch_metric(&counts, diversity::observed_features, {
+            #[cfg(feature = "gpu")]
+            {
+                use_gpu.and_then(|g| diversity_gpu::observed_features_gpu(g, &counts).ok())
+            }
+            #[cfg(not(feature = "gpu"))]
+            {
+                None
+            }
+        })
+    });
+    ctx.insert("pielou", || {
+        dispatch_metric(&counts, diversity::pielou_evenness, {
+            #[cfg(feature = "gpu")]
+            {
+                use_gpu.and_then(|g| diversity_gpu::pielou_evenness_gpu(g, &counts).ok())
+            }
+            #[cfg(not(feature = "gpu"))]
+            {
+                None
+            }
+        })
+    });
+
+    ctx.insert("chao1", || diversity::chao1(&counts));
+
+    if let Some(b_counts) = params.get("counts_b").and_then(Value::as_array) {
+        let b: Vec<f64> = b_counts.iter().filter_map(Value::as_f64).collect();
+        if b.len() == counts.len() {
+            result.insert(
+                "bray_curtis".into(),
+                json!(diversity::bray_curtis(&counts, &b)),
+            );
+        }
+    }
 
     #[cfg(feature = "gpu")]
     {
@@ -90,68 +106,25 @@ pub fn handle_diversity(params: &Value) -> Result<Value, RpcError> {
     Ok(Value::Object(result))
 }
 
-/// Unified metric insertion — eliminates GPU/CPU cfg duplication.
-#[cfg(feature = "gpu")]
-fn insert_metric_if_requested(
-    result: &mut serde_json::Map<String, Value>,
+/// Accumulates diversity metrics into a JSON map, filtering by request.
+struct MetricCtx<'a> {
+    result: &'a mut serde_json::Map<String, Value>,
     compute_all: bool,
-    metrics: &[String],
-    name: &str,
-    counts: &[f64],
-    cpu_fn: fn(&[f64]) -> f64,
-    gpu_fn: impl FnOnce(&crate::gpu::GpuF64, &[f64]) -> Option<f64>,
-    use_gpu: Option<&'static crate::gpu::GpuF64>,
-) {
-    if !compute_all && !metrics.iter().any(|m| m == name) {
-        return;
-    }
-    let val = use_gpu
-        .and_then(|g| gpu_fn(g, counts))
-        .unwrap_or_else(|| cpu_fn(counts));
-    result.insert(name.into(), json!(val));
+    metrics: &'a [String],
 }
 
-#[cfg(not(feature = "gpu"))]
-fn insert_metric_if_requested(
-    result: &mut serde_json::Map<String, Value>,
-    compute_all: bool,
-    metrics: &[String],
-    name: &str,
-    counts: &[f64],
-    cpu_fn: fn(&[f64]) -> f64,
-) {
-    if !compute_all && !metrics.iter().any(|m| m == name) {
-        return;
-    }
-    result.insert(name.into(), json!(cpu_fn(counts)));
-}
-
-fn insert_chao1_if_requested(
-    result: &mut serde_json::Map<String, Value>,
-    compute_all: bool,
-    metrics: &[String],
-    counts: &[f64],
-) {
-    if !compute_all && !metrics.iter().any(|m| m == "chao1") {
-        return;
-    }
-    result.insert("chao1".into(), json!(diversity::chao1(counts)));
-}
-
-fn insert_bray_curtis_if_present(
-    result: &mut serde_json::Map<String, Value>,
-    params: &Value,
-    counts: &[f64],
-) {
-    if let Some(b_counts) = params.get("counts_b").and_then(Value::as_array) {
-        let b: Vec<f64> = b_counts.iter().filter_map(Value::as_f64).collect();
-        if b.len() == counts.len() {
-            result.insert(
-                "bray_curtis".into(),
-                json!(diversity::bray_curtis(counts, &b)),
-            );
+impl MetricCtx<'_> {
+    fn insert(&mut self, name: &str, compute: impl FnOnce() -> f64) {
+        if !self.compute_all && !self.metrics.iter().any(|m| m == name) {
+            return;
         }
+        self.result.insert(name.into(), json!(compute()));
     }
+}
+
+/// GPU-or-CPU dispatch: use the GPU result if available, otherwise fall back to CPU.
+fn dispatch_metric(counts: &[f64], cpu_fn: fn(&[f64]) -> f64, gpu_result: Option<f64>) -> f64 {
+    gpu_result.unwrap_or_else(|| cpu_fn(counts))
 }
 
 /// QS/c-di-GMP biofilm ODE integration.

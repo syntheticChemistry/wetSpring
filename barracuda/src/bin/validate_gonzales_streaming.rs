@@ -10,7 +10,7 @@
     clippy::similar_names,
     dead_code
 )]
-//! # Exp285: ToadStool Streaming — Gonzales Reproductions
+//! # Exp285: `ToadStool` Streaming — Gonzales Reproductions
 //!
 //! Pure GPU streaming pipeline for Gonzales paper reproductions. Uses
 //! `GpuPipelineSession` for batched GPU operations with zero CPU round-trips
@@ -20,12 +20,12 @@
 //! ## Streaming vs Individual GPU
 //! - Individual (`diversity_gpu::*`): one GPU dispatch per call
 //! - Streaming (`GpuPipelineSession`): pipeline cached, buffers reused,
-//!   unidirectional GPU flow — what ToadStool absorbs for production
+//!   unidirectional GPU flow — what `ToadStool` absorbs for production
 //!
 //! ## Evolution chain
 //! - **Previous**: Exp284 GPU validation
-//! - **This**: ToadStool streaming (batched GPU)
-//! - **Next**: Exp286 metalForge cross-substrate (NUCLEUS atomics)
+//! - **This**: `ToadStool` streaming (batched GPU)
+//! - **Next**: Exp286 `metalForge` cross-substrate (NUCLEUS atomics)
 //!
 //! # Provenance
 //!
@@ -180,7 +180,7 @@ async fn main() {
     let mild_ad = vec![15.0, 20.0, 12.0, 18.0, 22.0, 16.0];
 
     let samples_vec = vec![healthy.clone(), mild_ad.clone(), ad_state.clone()];
-    let sample_refs: Vec<&[f64]> = samples_vec.iter().map(|s| s.as_slice()).collect();
+    let sample_refs: Vec<&[f64]> = samples_vec.iter().map(Vec::as_slice).collect();
 
     let ti = Instant::now();
     let ind_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples_vec)
@@ -251,7 +251,7 @@ async fn main() {
 
     // Large batch
     let large: Vec<f64> = (0..50_000)
-        .map(|i| ((i * 17 + 7) % 500) as f64 + 1.0)
+        .map(|i| f64::from((i * 17 + 7) % 500) + 1.0)
         .collect();
     let str_large_sh = session.shannon(&large).expect("large batch shannon");
     let cpu_large_sh = diversity::shannon(&large);
@@ -294,8 +294,7 @@ async fn main() {
 
     println!("╠═════════════════════════╬════════════╬════════════╬════════════════╣");
     println!(
-        "║ TOTAL                   ║            ║            ║ {:>3}            ║",
-        total_checks
+        "║ TOTAL                   ║            ║            ║ {total_checks:>3}            ║"
     );
     println!("╚═════════════════════════╩════════════╩════════════╩════════════════╝");
     println!();

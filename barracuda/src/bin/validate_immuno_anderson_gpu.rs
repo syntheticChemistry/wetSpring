@@ -24,8 +24,8 @@
 //! ## Evolution path
 //! - **Previous**: Exp276 CPU parity (pure Rust)
 //! - **This experiment**: `BarraCuda` GPU (diversity on GPU, spectral on CPU)
-//! - **Next**: Exp278 ToadStool streaming dispatch
-//! - **Final**: Exp279 metalForge cross-substrate (NUCLEUS)
+//! - **Next**: Exp278 `ToadStool` streaming dispatch
+//! - **Final**: Exp279 `metalForge` cross-substrate (NUCLEUS)
 //!
 //! # Provenance
 //!

@@ -16,7 +16,7 @@
 //!
 //! Validates the full NUCLEUS Tower→Node deployment model by:
 //!
-//! 1. Probing whether biomeOS binary exists and is executable
+//! 1. Probing whether `biomeOS` binary exists and is executable
 //! 2. Testing Tower Atomic (`BearDog` + Songbird) readiness
 //! 3. Testing Node Atomic (Tower + `ToadStool`) readiness
 //! 4. Validating the science pipeline through each deployment mode
@@ -26,8 +26,8 @@
 //!
 //! ```text
 //! Tower (BearDog + Songbird)
-//!   └─ Node (Tower + ToadStool)
-//!       └─ Full (Node + NestGate + Squirrel)
+//!   └─ Node (Tower + `ToadStool`)
+//!       └─ Full (Node + `NestGate` + Squirrel)
 //! ```
 //!
 //! ## Chain

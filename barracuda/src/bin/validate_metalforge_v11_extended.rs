@@ -11,16 +11,16 @@
     clippy::items_after_statements,
     clippy::float_cmp
 )]
-//! # Exp242: metalForge v11 — Extended Cross-System Dispatch
+//! # Exp242: `metalForge` v11 — Extended Cross-System Dispatch
 //!
-//! Extends metalForge v10 with 8 new workloads covering the domains
+//! Extends `metalForge` v10 with 8 new workloads covering the domains
 //! added in CPU v17 / GPU v9:
 //! - Chimera (GPU), DADA2 (GPU), GBM (GPU), Reconciliation (GPU)
 //! - Molecular Clock (GPU), Random Forest (GPU), Rarefaction (GPU), Kriging (GPU)
 //!
 //! 23-workload catalog: 16 GPU + 3 NPU + 4 CPU
 //!
-//! Chain position: Paper → CPU (Exp239) → GPU (Exp240) → Streaming (Exp241) → **metalForge (this)**
+//! Chain position: Paper → CPU (Exp239) → GPU (Exp240) → Streaming (Exp241) → **`metalForge` (this)**
 //!
 //! | Field | Value |
 //! |-------|-------|
@@ -28,7 +28,7 @@
 //! | Command | `cargo run --features gpu,ipc --bin validate_metalforge_v11_extended` |
 //!
 //! Validation class: Pipeline
-//! Provenance: metalForge dispatch/routing validation
+//! Provenance: `metalForge` dispatch/routing validation
 
 use std::time::Instant;
 

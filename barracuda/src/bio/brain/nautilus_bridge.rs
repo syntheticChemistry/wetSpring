@@ -188,6 +188,7 @@ fn bio_to_beta(obs: &BioObservation) -> BetaObservation {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used, clippy::suboptimal_flops)]
 mod tests {
     use super::*;
 
@@ -241,9 +242,9 @@ mod tests {
         let mut brain = BioNautilusBrain::new("wetspring-test");
         for i in 0..10 {
             let mut obs = sample_obs();
-            obs.shannon = 1.0 + f64::from(i) * 0.5;
-            obs.evenness = 0.5 + f64::from(i) * 0.03;
-            obs.chao1 = 50.0 + f64::from(i) * 20.0;
+            obs.shannon = f64::from(i).mul_add(0.5, 1.0);
+            obs.evenness = f64::from(i).mul_add(0.03, 0.5);
+            obs.chao1 = f64::from(i).mul_add(20.0, 50.0);
             brain.observe(&obs);
         }
         let mse = brain.train();
@@ -255,9 +256,9 @@ mod tests {
         let mut brain = BioNautilusBrain::new("wetspring-test");
         for i in 0..10 {
             let mut obs = sample_obs();
-            obs.shannon = 1.0 + f64::from(i) * 0.5;
-            obs.evenness = 0.5 + f64::from(i) * 0.03;
-            obs.chao1 = 50.0 + f64::from(i) * 20.0;
+            obs.shannon = f64::from(i).mul_add(0.5, 1.0);
+            obs.evenness = f64::from(i).mul_add(0.03, 0.5);
+            obs.chao1 = f64::from(i).mul_add(20.0, 50.0);
             brain.observe(&obs);
         }
         brain.train();

@@ -23,7 +23,7 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `756df26` |
-//! | Baseline tool | barracuda::spectral primitives (Anderson, Lanczos, level statistics) — Bourgain & Kachkovskiy 2018 theory |
+//! | Baseline tool | `barracuda::spectral` primitives (Anderson, Lanczos, level statistics) — Bourgain & Kachkovskiy 2018 theory |
 //! | Baseline date | 2026-02-27 |
 //! | Exact command | `cargo run --release --bin validate_spectral_cross_spring` |
 //! | Data | Synthetic (Anderson 1D/2D/3D Hamiltonians, Almost-Mathieu, no external data) |

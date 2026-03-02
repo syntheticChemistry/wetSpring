@@ -156,13 +156,13 @@ impl BioEsn {
     /// Returns `barracuda::error::BarracudaError` if config is invalid or device init fails.
     pub fn new(config: &BioEsnConfig) -> Result<Self, barracuda::error::BarracudaError> {
         let esn_config = config.to_esn_config();
-        let inner = block_on(ESN::new(esn_config))?;
+        let inner = block_on(ESN::new(esn_config))??;
         Ok(Self { inner })
     }
 
     /// Reset reservoir state to zero.
     pub fn reset_state(&mut self) -> Result<(), barracuda::error::BarracudaError> {
-        block_on(self.inner.reset_state())
+        block_on(self.inner.reset_state())?
     }
 
     /// Run one reservoir update step.
@@ -171,7 +171,7 @@ impl BioEsn {
         let device = self.inner.state().device().clone();
         let input_tensor =
             Tensor::from_data(&input_f32, vec![self.inner.config().input_size, 1], device)?;
-        block_on(self.inner.update(&input_tensor))?;
+        block_on(self.inner.update(&input_tensor))??;
         Ok(())
     }
 
@@ -195,7 +195,7 @@ impl BioEsn {
             .iter()
             .map(|v| v.iter().map(|&x| x as f32).collect())
             .collect();
-        block_on(self.inner.train(&inputs_f32, &targets_f32))
+        block_on(self.inner.train(&inputs_f32, &targets_f32))?
     }
 
     /// Predict on a sequence of inputs.
@@ -207,7 +207,7 @@ impl BioEsn {
         let mut outputs = Vec::with_capacity(inputs.len());
         for input in inputs {
             let input_f32: Vec<f32> = input.iter().map(|&x| x as f32).collect();
-            let out = block_on(self.inner.predict(&input_f32))?;
+            let out = block_on(self.inner.predict(&input_f32))??;
             outputs.push(out.iter().map(|&x| f64::from(x)).collect());
         }
         Ok(outputs)
@@ -333,7 +333,7 @@ impl MultiHeadBioEsn {
     ) -> Result<Self, barracuda::error::BarracudaError> {
         let head_labels: Vec<String> = heads.iter().map(|h| h.label.clone()).collect();
         let esn_config = config.to_esn_config();
-        let inner = block_on(MultiHeadEsn::new(esn_config, heads))?;
+        let inner = block_on(MultiHeadEsn::new(esn_config, heads))??;
         Ok(Self { inner, head_labels })
     }
 
@@ -394,16 +394,26 @@ fn bio_head_labels(output_size: usize) -> Vec<String> {
 }
 
 /// Block on async using a shared runtime.
-fn block_on<F, O>(f: F) -> O
+///
+/// # Errors
+///
+/// Returns `BarracudaError::InvalidOperation` if the tokio runtime cannot be created.
+fn block_on<F, O>(f: F) -> Result<O, barracuda::error::BarracudaError>
 where
     F: std::future::Future<Output = O>,
 {
-    static RUNTIME: OnceLock<tokio::runtime::Runtime> = OnceLock::new();
-    let rt = RUNTIME.get_or_init(|| {
+    static RUNTIME: OnceLock<Result<tokio::runtime::Runtime, String>> = OnceLock::new();
+    let rt_result = RUNTIME.get_or_init(|| {
         tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()
-            .unwrap_or_else(|e| panic!("tokio runtime for ESN bridge: {e}"))
+            .map_err(|e| e.to_string())
     });
-    rt.block_on(f)
+    match rt_result {
+        Ok(rt) => Ok(rt.block_on(f)),
+        Err(msg) => Err(barracuda::error::BarracudaError::InvalidOperation {
+            op: "ESN bridge runtime init".to_string(),
+            reason: msg.clone(),
+        }),
+    }
 }

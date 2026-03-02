@@ -5,6 +5,72 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## V92D+ — Paper-Math Chain + Cross-System Validation (2026-03-02)
+
+### Added
+- Exp291: Paper Math Control v4 — all 52 papers' core equations (45/45 PASS)
+  P33-P47: Meyer QS propagation, nitrifying QS, marine interkingdom,
+  Myxococcus critical density, Dictyostelium cAMP, Fajgenbaum MATRIX,
+  Gao repoDB NMF, ROBOKOP KG, Mukherjee cell distancing, Gonzales IC50/PK/
+  IL-31/pruritus/three-compartment/selectivity
+- Exp292: BarraCuda CPU v22 — comprehensive 8-domain paper parity (40/40 PASS)
+  D33-D40: ODE, stochastic, diversity, phylogenetics, linear algebra,
+  Anderson spectral, pharmacology, statistics. Total: 0.8 ms pure Rust
+- Exp293: CPU vs GPU v9 — 5-track GPU portability (35/35 PASS)
+  D33-D38: multi-track diversity, NMF drug repurposing, Anderson W-mapping,
+  Hill/PK pharmacology, cross-track determinism, performance benchmarks
+- Exp294: Pure GPU Streaming v9 — end-to-end pipeline (16/16 PASS)
+  Diversity→BrayCurtis→NMF→Anderson W→P(QS)→statistics. W↔P(QS) r=-0.924
+- Exp295: metalForge v14 — paper-math cross-system (28/28 PASS)
+  6 tracks routed, PCIe streaming 3 GPU-chained/0 round-trips,
+  GPU→CPU→GPU pipeline with 4 substrate transitions, sovereign 45/47
+- 5 experiment protocol documents (experiments/291-295_*.md)
+
+### Changed
+- specs/PAPER_REVIEW_QUEUE.md: updated to 277 experiments, 7,384+ checks
+- Root README: updated experiment/check counts, added chain summary
+
+### Quality
+- `cargo fmt --all`: CLEAN
+- `cargo clippy --all-features -W pedantic`: 0 warnings
+- `cargo test --workspace`: 1,309 tests, 0 failures
+- All 5 new validation binaries: PASS
+
+## V92D — Deep Debt Resolution + Pedantic Evolution (2026-03-02)
+
+### Changed
+- `ipc/handlers/science.rs`: refactored 8-arg `insert_metric_if_requested` to
+  `MetricCtx` struct + `dispatch_metric` helper (clippy `too_many_arguments` fix)
+- `ipc/handlers/mod.rs`: `pub(crate)` → `pub` on `CAPABILITIES` (redundant in private module)
+- `bio/brain/nautilus_bridge.rs` tests: arithmetic → `mul_add` for fused precision
+- `bio/esn/toadstool_bridge.rs`: `panic!` in tokio runtime init → `Result`-based
+  error handling; `block_on()` now returns `Result<O, BarracudaError>` with `??` chaining
+- 50+ validation binaries: doc backticks on bare identifiers (`barracuda::bio`,
+  `ToadStool`, `BarraCuda`, `metalForge`, `NestGate`, `biomeOS`, `PCoA`, etc.)
+- 6 binaries: inlined format args (`println!("{}", x)` → `println!("{x}")`)
+- 4 binaries: `i as f64` → `f64::from(i)` for lossless casts
+- 2 binaries: manual `(a + b) / 2.0` → `f64::midpoint(a, b)`
+- 1 binary: `match` → `if let` (single-pattern destructure)
+- 2 binaries: manual range → `RangeInclusive::contains`
+- 1 binary: removed unreachable `return` after `v.finish()`
+- Removed unused imports and variables in 2 binaries
+
+### Added
+- `validation::bench<T>()` shared timing helper for validation binaries
+- `experiments/results/README.md` documenting results directory layout and provenance
+- `scripts/BASELINE_MANIFEST.md` commit history clarification section
+
+### Fixed
+- All `cargo clippy --workspace --all-targets --all-features -- -D warnings -W clippy::pedantic` CLEAN
+- All `cargo fmt --all -- --check` CLEAN
+- All `cargo test --workspace` PASS (1,309 tests, 0 failures)
+
+### Totals
+- Tests: 1,309 workspace (1,044 lib + 175 forge + 23 integration + 33 determinism + 16 io-roundtrip + 18 doc)
+- Named tolerances: 103
+- Clippy: zero warnings (pedantic, including `--all-features`)
+- Zero unsafe code, zero TODOs, zero mocks in production
+
 ## V92C — Deep Audit & GPU Test Evolution (2026-03-02)
 
 ### Added

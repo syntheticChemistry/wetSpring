@@ -166,6 +166,19 @@ pub fn resolve_data_dir(
     std::path::PathBuf::from(default_subpath)
 }
 
+// ── Benchmark helper ──────────────────────────────────────────
+
+/// Run a closure and return `(result, elapsed_ms)`.
+///
+/// Shared helper for validation binaries that record per-domain timing.
+#[must_use]
+pub fn bench<T>(f: impl FnOnce() -> T) -> (T, f64) {
+    let start = std::time::Instant::now();
+    let result = f();
+    let ms = start.elapsed().as_secs_f64() * 1e3;
+    (result, ms)
+}
+
 // ── Validator: structured check accumulator ───────────────────
 
 /// Accumulated validation state, removing manual pass/fail bookkeeping.

@@ -11,22 +11,22 @@
 )]
 //! # Exp275: Cell-Type Heterogeneity Sweep — W vs r in 3D Dermis
 //!
-//! Validates the immunological Anderson prediction: immune cell infiltration
+//! Validates the immunological `Anderson` prediction: immune cell infiltration
 //! during AD flare increases disorder W (cell-type heterogeneity) but stays
-//! below the critical W_c in 3D, so cytokine signals remain extended
+//! below the critical `W_c` in 3D, so cytokine signals remain extended
 //! (propagating). This is why chronic AD is self-sustaining.
 //!
-//! Maps cell population compositions to Pielou evenness, then to Anderson
+//! Maps cell population compositions to `Pielou` evenness, then to `Anderson`
 //! disorder W, then computes the spectral diagnostic r.
 //!
 //! # Disease States Modeled
 //!
-//! | State | Cell Profile | Pielou | Disorder W | Predicted r |
+//! | State | Cell Profile | `Pielou` | Disorder W | Predicted r |
 //! |-------|-------------|--------|------------|-------------|
 //! | Healthy | Keratinocyte-dominant | Low | ~6 | r > midpoint (benign extended) |
 //! | Mild AD | Moderate infiltration | Medium | ~10 | r > midpoint (pathological) |
 //! | Moderate AD | Heavy infiltration | High | ~14 | r > midpoint (chronic) |
-//! | Severe AD | Massive infiltration | Very high | ~18 | r ≈ midpoint (near W_c) |
+//! | Severe AD | Massive infiltration | Very high | ~18 | r ≈ midpoint (near `W_c`) |
 //! | Treatment | Reduced infiltration | Lowered | ~8 | r > midpoint (resolving) |
 //!
 //! # Provenance
@@ -34,12 +34,12 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | `ToadStool` pin | S79 (`f97fc2ae`) |
-//! | baseCamp paper | Paper 12: Immunological Anderson |
+//! | baseCamp paper | Paper 12: Immunological `Anderson` |
 //! | Date | 2026-03-02 |
 //! | Command | `cargo run --release --features gpu --bin validate_heterogeneity_sweep_s79` |
 //!
 //! Validation class: Analytical
-//! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
+//! Provenance: Known-value formulas (`Shannon` H(uniform)=ln(S), `Hill`(EC50)=0.5, GOE/Poisson level spacing)
 
 use std::time::Instant;
 
@@ -209,10 +209,7 @@ fn main() {
                 _ => "",
             };
 
-            println!(
-                "  │  {:<19}│ {:>5.1} │ {:.4} │ {:<11} │ {}",
-                name, w, r, regime, clinical
-            );
+            println!("  │  {name:<19}│ {w:>5.1} │ {r:.4} │ {regime:<11} │ {clinical}");
             rs.push((name.to_string(), w, r));
         }
 
@@ -244,7 +241,7 @@ fn main() {
         let t0 = Instant::now();
 
         let l = 6_usize;
-        let w_values: Vec<f64> = (1..=25).map(|i| i as f64).collect();
+        let w_values: Vec<f64> = (1..=25).map(f64::from).collect();
 
         println!("  ┌─ D3: Continuous W Sweep in 3D Dermis (L={l}, 5 seeds)");
         println!("  │  ");
@@ -262,7 +259,7 @@ fn main() {
             let (w_prev, r_prev) = pair[0];
             let (w_curr, r_curr) = pair[1];
             if r_prev >= midpoint && r_curr < midpoint {
-                w_c_found = Some(((w_prev + w_curr) / 2.0, r_curr));
+                w_c_found = Some((f64::midpoint(w_prev, w_curr), r_curr));
             }
         }
 
@@ -381,10 +378,7 @@ fn main() {
         total_ms += d.ms;
     }
     println!("╠════════════════════════════════════════════════════════════════════╣");
-    println!(
-        "║ TOTAL                  │ {:>6.1}ms │ {:>3} ║",
-        total_ms, total_checks
-    );
+    println!("║ TOTAL                  │ {total_ms:>6.1}ms │ {total_checks:>3} ║");
     println!("╚════════════════════════════════════════════════════════════════════╝");
     println!();
 

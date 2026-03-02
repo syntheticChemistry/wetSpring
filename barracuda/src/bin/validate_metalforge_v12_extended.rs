@@ -11,21 +11,21 @@
     clippy::items_after_statements,
     clippy::float_cmp
 )]
-//! # Exp265: metalForge v12 — Extended V87 Cross-System Dispatch
+//! # Exp265: `metalForge` v12 — Extended V87 Cross-System Dispatch
 //!
-//! Extends metalForge v11 (23-workload, 43 checks) with the 5 new GPU
+//! Extends `metalForge` v11 (23-workload, 43 checks) with the 5 new GPU
 //! domains from CPU v19/GPU v11 that were missing from the dispatch catalog:
-//! - PCoA GPU (pcoa_gpu)
-//! - K-mer GPU (kmer_gpu)
-//! - Bootstrap GPU (stats + diversity_gpu)
-//! - KMD GPU (kmd_gpu)
+//! - `PCoA` GPU (`pcoa_gpu`)
+//! - K-mer GPU (`kmer_gpu`)
+//! - Bootstrap GPU (stats + `diversity_gpu`)
+//! - KMD GPU (`kmd_gpu`)
 //! - Kriging GPU (kriging)
 //!
 //! Also adds vault-aware dispatch and provenance chain routing.
 //!
 //! 28-workload catalog: 21 GPU + 3 NPU + 4 CPU
 //!
-//! Chain position: Paper → CPU v20 → GPU v11 → Parity v7 → **metalForge v12 (this)**
+//! Chain position: Paper → CPU v20 → GPU v11 → Parity v7 → **`metalForge` v12 (this)**
 //!
 //! | Field | Value |
 //! |-------|-------|
@@ -33,7 +33,7 @@
 //! | Command | `cargo run --features gpu,ipc --bin validate_metalforge_v12_extended` |
 //!
 //! Validation class: Pipeline
-//! Provenance: metalForge dispatch/routing validation
+//! Provenance: `metalForge` dispatch/routing validation
 
 use std::time::Instant;
 
@@ -405,7 +405,7 @@ fn main() {
             diversity::shannon(
                 &counts
                     .iter()
-                    .map(|&c| c + (i as f64) * 0.1)
+                    .map(|&c| c + f64::from(i) * 0.1)
                     .collect::<Vec<_>>(),
             )
         })

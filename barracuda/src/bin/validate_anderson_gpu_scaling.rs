@@ -29,14 +29,14 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Baseline commit | `756df26` |
-//! | Baseline tool | Exp150 (L=6–12), barracuda::spectral (`anderson_3d`, `lanczos`, `level_spacing_ratio`) |
+//! | Baseline tool | Exp150 (L=6–12), `barracuda::spectral` (`anderson_3d`, `lanczos`, `level_spacing_ratio`) |
 //! | Baseline date | 2026-02-27 |
 //! | Exact command | `cargo run --release --features gpu --bin validate_anderson_gpu_scaling` |
 //! | Data | Synthetic Anderson 3D lattices L=14–20 (N up to 8000) |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;

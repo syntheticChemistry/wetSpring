@@ -26,7 +26,7 @@
 //! - **`BarraCuda` CPU**: Anderson spectral + QS ODE (pure Rust, single-threaded)
 //! - **`BarraCuda` GPU**: `anderson_3d` + `BatchedOdeRK4` (parallel realization sweep)
 //! - **Pure GPU streaming**: Unidirectional; lattice → eigenvalues → QS decision on-device
-//! - **metalForge**: CPU = GPU = NPU output for pore-scale QS classification
+//! - **`metalForge`**: CPU = GPU = NPU output for pore-scale QS classification
 //!
 //! # Provenance
 //!

@@ -10,7 +10,7 @@
 //! promotion via `ToadStool`.
 //!
 //! ```text
-//! Python → CPU v1/v2/v3 → [THIS] GPU v3 → ToadStool sovereign
+//! Python → CPU v1/v2/v3 → [THIS] GPU v3 → `ToadStool` sovereign
 //! ```
 //!
 //! # Provenance
@@ -29,7 +29,7 @@
 //! GPU modules: `diversity_gpu` (Pielou, Shannon, Simpson, Bray-Curtis), `spectral_match_gpu`, `stats_gpu`.
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 #![allow(
     clippy::expect_used,

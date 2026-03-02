@@ -16,7 +16,7 @@
 //! | Item        | Value |
 //! |-------------|-------|
 //! | Date        | 2026-02-23 |
-//! | GPU prims   | anderson_hamiltonian, anderson_2d, anderson_3d, lanczos, level_spacing_ratio |
+//! | GPU prims   | `anderson_hamiltonian`, `anderson_2d`, `anderson_3d`, `lanczos`, `level_spacing_ratio` |
 //! | Command     | `cargo test --bin validate_dimensional_phase_diagram -- --nocapture` |
 //!
 //! Validation class: Analytical

@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-02 (Phase 92C: 272 experiments, 255 binaries, 7,220+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S79 (`f97fc2ae`), 93 primitives consumed, barracuda always-on, 1,276 tests, 103 named tolerances, clippy pedantic CLEAN, V92C deep audit + GPU test stubs)
+**Updated**: 2026-03-02 (Phase 92D+: 277 experiments, 260 binaries, 7,384+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S79 (`f97fc2ae`), 93 primitives consumed, barracuda always-on, 1,309 tests, 103 named tolerances, clippy pedantic CLEAN, full paper-math chain Exp291-295)
 
 ---
 
@@ -169,6 +169,16 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 270 | [biomeOS Graph](270_biomeos_graph.md) | metalForge | DONE | Full biomeOS coordination layer | validate_biomeos_graph | 29 |
 | 271 | Cross-Spring S79 Validation | cross | DONE | All 5 Springs → ToadStool S79 | 13 cross-spring domains, spectral, bio, stats | 73 |
 | 272 | Bio Brain Cross-Spring | cross | DONE | hotSpring + bingoCube/nautilus | bio/brain, bio/esn, 36-head ESN, NautilusBrain | 64 |
+| 273-286 | Track 5 Immuno-Anderson + Gonzales | 5 | DONE | Published paper data | immuno_anderson, Hill, PK decay, diversity, GPU, streaming, metalForge | 359 |
+| 287 | [BarraCuda CPU v21](287_barracuda_cpu_v21.md) | infra | DONE | Analytical | V92D deep debt evolution — error handling, bench, tolerances, special functions | 44 |
+| 288 | [CPU vs GPU v8](288_cpu_vs_gpu_v8.md) | infra | DONE | CPU reference | ToadStool compute dispatch — FusedMapReduce, spectral, BC matrix, streaming | 16+ |
+| 289 | [metalForge v13](289_metalforge_v13_mixed.md) | infra | DONE | Pipeline integration | Mixed hardware NUCLEUS atomics — Tower/Node/Nest, PCIe bypass, sovereign | 30 |
+| 290 | [biomeOS Graph v2](290_biomeos_graph_v2.md) | infra | DONE | Pipeline integration | biomeOS coordination — Tower/Node/Nest graphs, absorption, sovereign | 27 |
+| 291 | [Paper Math Control v4](291_paper_math_control_v4.md) | paper | DONE | Published equations | All 52 papers' core equations — P33-P47 (extensions, Track 3, Track 5) | 45 |
+| 292 | [BarraCuda CPU v22](292_barracuda_cpu_v22.md) | cpu | DONE | Analytical | Comprehensive 8-domain paper parity (0.8 ms pure Rust) | 40 |
+| 293 | [CPU vs GPU v9](293_cpu_vs_gpu_v9.md) | gpu | DONE | CPU reference | 5-track GPU portability — diversity, NMF, Anderson, pharmacology | 35 |
+| 294 | [Pure GPU Streaming v9](294_pure_gpu_streaming_v9.md) | streaming | DONE | CPU+GPU reference | Full pipeline: diversity→BC→NMF→Anderson→stats, W↔P(QS) r=-0.924 | 16 |
+| 295 | [metalForge v14](295_metalforge_v14_paper_chain.md) | metalforge | DONE | Pipeline integration | Paper-math cross-system: 6 tracks, PCIe streaming, sovereign 45/47 | 28 |
 
 ---
 

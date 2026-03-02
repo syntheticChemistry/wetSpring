@@ -26,7 +26,7 @@
 //! | Command        | `cargo run --features gpu --bin validate_anderson_2d_qs` |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;

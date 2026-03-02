@@ -10,7 +10,7 @@
     clippy::similar_names,
     dead_code
 )]
-//! # Exp279: Track 5 metalForge Cross-Substrate — Immunological Anderson
+//! # Exp279: Track 5 `metalForge` Cross-Substrate — Immunological Anderson
 //!
 //! Proves that immunological Anderson analysis produces identical results
 //! regardless of substrate: CPU, GPU, or NPU. Cross-substrate parity for
@@ -24,13 +24,13 @@
 //! - Fajgenbaum geometry-augmented scoring
 //!
 //! ## NUCLEUS Atomics Coordination
-//! - **Tower**: substrate discovery, bandwidth tiers (PCIe Gen4, USB3)
+//! - **Tower**: substrate discovery, bandwidth tiers (`PCIe` Gen4, USB3)
 //! - **Node**: workload dispatch (diversity → GPU, spectral → CPU, scoring → CPU)
 //! - **Nest**: metrics snapshot (cross-substrate timing, parity status)
 //! - **biomeOS graph**: orchestrates Tower→Node→Nest pipeline
 //!
 //! ## Mixed Hardware Path
-//! - NPU → GPU via PCIe (bypass CPU round-trip): diversity int8 → f64 promotion
+//! - NPU → GPU via `PCIe` (bypass CPU round-trip): diversity int8 → f64 promotion
 //! - GPU → CPU fallback: spectral eigenvalues (Lanczos CPU-only)
 //! - CPU standalone: Fajgenbaum scoring, ODE integration
 //!

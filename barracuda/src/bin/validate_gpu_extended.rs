@@ -28,7 +28,7 @@
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, Pop!\_OS 22.04 |
 //!
 //! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in barracuda::bio
+//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, eic, eic_gpu, kriging, pcoa, pcoa_gpu, rarefaction_gpu};
