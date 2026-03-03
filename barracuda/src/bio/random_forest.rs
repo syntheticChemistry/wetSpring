@@ -124,7 +124,7 @@ impl RandomForest {
 
     /// Number of trees in the forest.
     #[must_use]
-    pub fn n_trees(&self) -> usize {
+    pub const fn n_trees(&self) -> usize {
         self.trees.len()
     }
 
@@ -168,6 +168,7 @@ impl RandomForest {
 #[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
     fn tree_a() -> DecisionTree {
         // f[0] <= 0.5 → 0, else → 1
@@ -206,7 +207,7 @@ mod tests {
         let pred = rf.predict_with_votes(&[0.7, 0.7]);
         assert_eq!(pred.class, 1);
         assert_eq!(pred.votes, vec![0, 3]);
-        assert!((pred.confidence - 1.0).abs() < 1e-10);
+        assert!((pred.confidence - 1.0).abs() < tolerances::ANALYTICAL_LOOSE);
     }
 
     #[test]
@@ -287,6 +288,6 @@ mod tests {
             .map(|t| t.depth() as f64)
             .sum::<f64>()
             / 3.0;
-        assert!((avg - manual).abs() < 1e-15);
+        assert!((avg - manual).abs() < tolerances::MATRIX_EPS);
     }
 }

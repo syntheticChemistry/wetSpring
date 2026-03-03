@@ -1,7 +1,7 @@
 # wetSpring wateringHole
 
-**Date:** March 2, 2026
-**Purpose:** Spring-local handoff documents to ToadStool/BarraCuda and cross-spring provenance records.
+**Date:** March 3, 2026
+**Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records.
 
 ---
 
@@ -9,40 +9,31 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V92J** | `handoffs/WETSPRING_TOADSTOOL_V92J_CROSS_SPRING_EVOLUTION_HANDOFF_MAR02_2026.md` | Mar 2 | Cross-spring evolution handoff: Exp304 (61/61), shader provenance across 6 springs, GPU benchmarks (GEMM 7.1× speedup), 3 absorption opportunities, full barracuda usage inventory, learnings for ToadStool evolution. |
-| **V92I** | `handoffs/WETSPRING_TOADSTOOL_V92I_S87_ABSORPTION_HANDOFF_MAR02_2026.md` | Mar 2 | ToadStool S87 absorption: FHE shader fixes, gpu_helpers refactor, device-lost recovery, unsafe audit. Full 5-tier GREEN (13 binaries). Zero regressions. |
-| **V92H** | `handoffs/WETSPRING_TOADSTOOL_V92H_COMPUTE_DISPATCH_NUCLEUS_HANDOFF_MAR02_2026.md` | Mar 2 | CPU↔GPU ComputeDispatch parity (17+ ops, Exp301), NUCLEUS+PCIe+biomeOS (Exp302), mixed hardware orchestration (Exp303). 308 new checks. |
-| **V92F** | `handoffs/WETSPRING_TOADSTOOL_V92F_BARRACUDA_EVOLUTION_HANDOFF_MAR02_2026.md` | Mar 2 | Comprehensive ToadStool/BarraCuda evolution handoff: 144 primitives, feature-gate fixes, benchmarks, cross-spring map, paper chain |
-| **V92F** | `handoffs/WETSPRING_CROSS_SPRING_V92F_MODERN_S86_HANDOFF_MAR02_2026.md` | Mar 2 | Cross-spring modern S86 validation + benchmark: Exp297 46/46, GPU↔CPU parity, 264 ComputeDispatch ops |
-| **V92E** | `handoffs/WETSPRING_TOADSTOOL_V92E_S86_REWIRE_HANDOFF_MAR02_2026.md` | Mar 2 | ToadStool S79→S86 rewire: 3 feature-gate fixes, 144 primitives, Exp296 64/64 PASS |
-| **V92D+** | `handoffs/WETSPRING_PAPER_CHAIN_V92D_PLUS_HANDOFF_MAR02_2026.md` | Mar 2 | Paper-math chain: Exp291-295, 52 papers, CPU→GPU→streaming→metalForge |
-| **V92C** | `handoffs/WETSPRING_TOADSTOOL_V92C_DEEP_AUDIT_HANDOFF_MAR02_2026.md` | Mar 2 | Deep audit & GPU test evolution |
-| **V92B** | `handoffs/WETSPRING_GONZALES_REPRO_V92B_HANDOFF_MAR02_2026.md` | Mar 2 | Gonzales repro handoff |
-| **V92** | `handoffs/WETSPRING_IMMUNO_ANDERSON_V92_HANDOFF_MAR02_2026.md` | Mar 2 | Immuno Anderson handoff |
-| **V91** | `handoffs/WETSPRING_DEEP_DEBT_V91_HANDOFF_MAR02_2026.md` | Mar 2 | Deep debt handoff |
+| **V93** | `handoffs/WETSPRING_BARRACUDA_031_REWIRE_HANDOFF_MAR03_2026.md` | Mar 3 | Standalone barraCuda v0.3.1 rewire: path swap, MSRV bump, NPU strategy, 1,044 tests pass, zero API breakage |
+| **V93** | `handoffs/WETSPRING_V93_BARRACUDA_EVOLUTION_FEEDBACK_MAR03_2026.md` | Mar 3 | Evolution feedback to barraCuda/toadStool: 144 primitives consumed, precision observations, deep debt patterns, architecture after rewire |
+| **V92F** | `handoffs/WETSPRING_CROSS_SPRING_V92F_MODERN_S86_HANDOFF_MAR02_2026.md` | Mar 2 | Cross-spring modern S86 validation + benchmark |
+| **V92D+** | `handoffs/WETSPRING_PAPER_CHAIN_V92D_PLUS_HANDOFF_MAR02_2026.md` | Mar 2 | Paper-math chain: 52 papers, CPU→GPU→streaming→metalForge |
+| **V92B** | `handoffs/WETSPRING_GONZALES_REPRO_V92B_HANDOFF_MAR02_2026.md` | Mar 2 | Gonzales reproducibility handoff |
+| **V92** | `handoffs/WETSPRING_IMMUNO_ANDERSON_V92_HANDOFF_MAR02_2026.md` | Mar 2 | Immunological Anderson handoff |
+| **V91** | `handoffs/WETSPRING_DEEP_DEBT_V91_HANDOFF_MAR02_2026.md` | Mar 2 | Deep debt resolution handoff |
 | **V90** | `handoffs/WETSPRING_BIO_BRAIN_V90_CROSS_SPRING_HANDOFF_MAR02_2026.md` | Mar 2 | Bio Brain cross-spring handoff |
-| **V89** | `handoffs/WETSPRING_TOADSTOOL_V89_S79_REALIGNMENT_HANDOFF_MAR02_2026.md` | Mar 2 | ToadStool S79 realignment handoff |
-
-## NestGate Handoffs
-
-| File | Date | Scope |
-|------|------|-------|
-| `handoffs/archive/WETSPRING_NESTGATE_DATA_TYPES_EVOLUTION_HANDOFF_FEB26_2026.md` | Feb 26 | Data type profiling, P0-P3 gap analysis, evolution roadmap for biology-aware storage |
 
 ## Cross-Spring Documents
 
 | File | Purpose |
 |------|---------|
-| `CROSS_SPRING_SHADER_EVOLUTION.md` | Cross-spring shader provenance map (264 ComputeDispatch ops, ToadStool S87 universal precision) |
+| `CROSS_SPRING_SHADER_EVOLUTION.md` | Cross-spring shader provenance map (767+ barraCuda WGSL shaders) |
+| `TOADSTOOL_WETSPRING_GAP_ANALYSIS.md` | Gap analysis: barraCuda exports vs wetSpring usage |
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` (V7-V87, API report, rewire, cross-spring provenance, NestGate data types — 72 files).
+Superseded handoffs in `handoffs/archive/` — V7-V92J ToadStool-era handoffs (80+ files).
+Preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda.
 
 ## Convention
 
 Following hotSpring's naming pattern:
-`WETSPRING_V{NNN}_{TOPIC}_HANDOFF_{DATE}.md`
+`WETSPRING_{VERSION}_{TOPIC}_HANDOFF_{DATE}.md`
 
-Handoffs are unidirectional: wetSpring → ToadStool.
-ToadStool absorbs what it finds useful; wetSpring leans on upstream.
+Handoffs flow: wetSpring → barraCuda (math) and wetSpring → toadStool (hardware).
+No reverse dependencies.

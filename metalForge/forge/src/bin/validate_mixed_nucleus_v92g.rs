@@ -141,10 +141,12 @@ fn section_multi_gpu_dispatch(pass: &mut u32, fail: &mut u32) {
 }
 
 // ═══ S2: GPU→NPU→CPU Interleaved Pipelines ═════════════════════════
+type PipelinePattern<'a> = (&'a str, Vec<(Capability, bool, bool)>);
+
 fn section_gpu_npu_pipelines(pass: &mut u32, fail: &mut u32) {
     println!("\n  S2: GPU→NPU→CPU Interleaved Pipelines");
 
-    let patterns: Vec<(&str, Vec<(Capability, bool, bool)>)> = vec![
+    let patterns: Vec<PipelinePattern<'_>> = vec![
         (
             "GPU-only (4 stages)",
             vec![
@@ -242,7 +244,6 @@ fn section_gpu_npu_pipelines(pass: &mut u32, fail: &mut u32) {
 fn section_mixed_topology_matrix(pass: &mut u32, fail: &mut u32) {
     println!("\n  S3: Topology Decision Matrix — All Substrate Pairs");
 
-    let _kinds = [SubstrateKind::Gpu, SubstrateKind::Cpu];
     let caps = vec![
         ("ShaderDispatch", Capability::ShaderDispatch),
         ("F64Compute", Capability::F64Compute),
@@ -313,14 +314,10 @@ fn section_workload_routing_completeness(pass: &mut u32, fail: &mut u32) {
 
         let standard = dispatch::route(&bw.workload, &substrates);
         let bandwidth = dispatch::route_bandwidth_aware(&bw.workload, &substrates);
-        if standard.is_some() {
+        if let Some(ref route) = standard {
             gpu_routed += 1;
             check(
-                &format!(
-                    "Route '{}': → {:?}",
-                    bw.workload.name,
-                    standard.as_ref().unwrap().substrate.kind
-                ),
+                &format!("Route '{}': → {:?}", bw.workload.name, route.substrate.kind),
                 true,
                 pass,
                 fail,
@@ -342,10 +339,7 @@ fn section_workload_routing_completeness(pass: &mut u32, fail: &mut u32) {
         }
     }
 
-    println!(
-        "    Total: {} GPU-routed, {} CPU-only, {} unroutable",
-        gpu_routed, cpu_only, unroutable
-    );
+    println!("    Total: {gpu_routed} GPU-routed, {cpu_only} CPU-only, {unroutable} unroutable");
     check("All routeable", unroutable == 0, pass, fail);
 }
 

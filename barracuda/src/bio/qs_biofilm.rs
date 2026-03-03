@@ -351,7 +351,7 @@ mod tests {
     #[test]
     fn matches_python_steady_state() {
         let p = QsBiofilmParams::default();
-        let tol = 1e-3;
+        let tol = crate::tolerances::NORM_CDF_PARITY;
 
         // Standard growth
         let r = scenario_standard_growth(&p, DT);

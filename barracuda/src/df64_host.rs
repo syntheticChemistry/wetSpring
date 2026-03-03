@@ -62,7 +62,7 @@ pub fn pack_slice(data: &[f64]) -> Vec<f32> {
 ///
 /// Returns [`InvalidInput`](crate::error::Error::InvalidInput) if `data.len()` is odd.
 pub fn try_unpack_slice(data: &[f32]) -> crate::error::Result<Vec<f64>> {
-    if data.len() % 2 != 0 {
+    if !data.len().is_multiple_of(2) {
         return Err(crate::error::Error::InvalidInput(format!(
             "DF64 data must have even length, got {}",
             data.len()
@@ -82,7 +82,10 @@ pub fn try_unpack_slice(data: &[f32]) -> crate::error::Result<Vec<f64>> {
 /// Panics if `data.len()` is odd.
 #[must_use]
 pub fn unpack_slice(data: &[f32]) -> Vec<f64> {
-    assert!(data.len() % 2 == 0, "DF64 data must have even length");
+    assert!(
+        data.len().is_multiple_of(2),
+        "DF64 data must have even length"
+    );
     data.chunks_exact(2).map(|c| unpack(c[0], c[1])).collect()
 }
 
@@ -101,6 +104,7 @@ pub fn roundtrip_error(v: f64) -> f64 {
 #[allow(clippy::float_cmp, clippy::unwrap_used, clippy::expect_used)]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
     #[test]
     fn pack_unpack_roundtrip_exact_for_f32_representable() {
@@ -130,7 +134,10 @@ mod tests {
         let v = 1e20_f64;
         let err = roundtrip_error(v);
         let rel = err / v;
-        assert!(rel < 1e-15, "relative roundtrip error {rel}");
+        assert!(
+            rel < tolerances::MATRIX_EPS,
+            "relative roundtrip error {rel}"
+        );
     }
 
     #[test]

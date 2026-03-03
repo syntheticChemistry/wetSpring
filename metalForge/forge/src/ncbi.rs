@@ -24,7 +24,11 @@ use std::process::Command;
 
 use crate::nest::NestClient;
 
-const EUTILS_BASE: &str = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils";
+const EUTILS_BASE_DEFAULT: &str = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils";
+
+fn eutils_base() -> String {
+    std::env::var("WETSPRING_NCBI_EUTILS_URL").unwrap_or_else(|_| EUTILS_BASE_DEFAULT.to_owned())
+}
 
 /// NCBI acquisition client using the Tower → Nest pattern.
 #[derive(Debug)]
@@ -155,9 +159,9 @@ impl NcbiClient {
         }
 
         let encoded_term = url_encode(term);
-        let mut url = format!(
-            "{EUTILS_BASE}/esearch.fcgi?db={db}&term={encoded_term}&retmax={retmax}&retmode=xml"
-        );
+        let base = eutils_base();
+        let mut url =
+            format!("{base}/esearch.fcgi?db={db}&term={encoded_term}&retmax={retmax}&retmode=xml");
         self.append_auth(&mut url);
 
         let xml = curl_get(&url)?;
@@ -182,7 +186,8 @@ impl NcbiClient {
             });
         }
         let id_list = ids.join(",");
-        let mut url = format!("{EUTILS_BASE}/esummary.fcgi?db={db}&id={id_list}&retmode=xml");
+        let base = eutils_base();
+        let mut url = format!("{base}/esummary.fcgi?db={db}&id={id_list}&retmode=xml");
         self.append_auth(&mut url);
 
         let raw_xml = curl_get(&url)?;
@@ -210,8 +215,8 @@ impl NcbiClient {
             }
         }
 
-        let mut url =
-            format!("{EUTILS_BASE}/efetch.fcgi?db={db}&id={id}&rettype={rettype}&retmode=text");
+        let base = eutils_base();
+        let mut url = format!("{base}/efetch.fcgi?db={db}&id={id}&rettype={rettype}&retmode=text");
         self.append_auth(&mut url);
 
         let content = curl_get(&url)?;

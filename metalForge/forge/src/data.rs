@@ -109,16 +109,29 @@ pub fn resolve_file(dataset: &str, filename: &str) -> DataResolution {
     }
 }
 
-/// Discover the data directory path (env var or default).
+/// Discover the data directory path (env var or XDG-compliant default).
 ///
-/// Uses `WETSPRING_DATA_DIR` if set. Intentional default fallback:
-/// `/tmp/wetspring-data` when `WETSPRING_DATA_DIR` is not set. Does not check
-/// existence.
+/// Resolution order:
+/// 1. `WETSPRING_DATA_DIR` (explicit override)
+/// 2. `XDG_DATA_HOME/wetspring` (typically `~/.local/share/wetspring`)
+/// 3. `~/.local/share/wetspring` (XDG default when `XDG_DATA_HOME` is unset)
+///
+/// Does not check existence — callers should create the directory if needed.
 #[must_use]
 pub fn discover_data_dir() -> PathBuf {
-    std::env::var("WETSPRING_DATA_DIR")
-        .unwrap_or_else(|_| String::from("/tmp/wetspring-data"))
-        .into()
+    if let Ok(dir) = std::env::var("WETSPRING_DATA_DIR") {
+        return PathBuf::from(dir);
+    }
+
+    if let Ok(xdg) = std::env::var("XDG_DATA_HOME") {
+        return PathBuf::from(xdg).join("wetspring");
+    }
+
+    if let Ok(home) = std::env::var("HOME") {
+        return PathBuf::from(home).join(".local/share/wetspring");
+    }
+
+    PathBuf::from("/tmp/wetspring-data")
 }
 
 /// Get the data directory from environment, falling back to `data/` relative

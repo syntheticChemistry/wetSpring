@@ -490,7 +490,7 @@ fn generate_16s_reads(n: usize, len: usize, seed: u64) -> String {
         let sp = &species[i % species.len()];
         let mut seq = sp.clone();
         rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-        if (rng >> 33) % 20 == 0 {
+        if (rng >> 33).is_multiple_of(20) {
             let pos = (rng >> 17) as usize % len;
             seq[pos] = bases[(rng >> 10) as usize % 4];
         }

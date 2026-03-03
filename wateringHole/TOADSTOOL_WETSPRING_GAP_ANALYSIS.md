@@ -1,8 +1,8 @@
 # ToadStool barracuda vs wetSpring: Deep Gap Analysis
 
-**Date:** March 2, 2026 (V92I)
+**Date:** March 3, 2026 (Phase 93)
 **Scope:** Compare ToadStool barracuda public exports with wetSpring actual usage. Identify unused primitives, adoption opportunities, and maintenance reduction.
-**ToadStool Pin:** S87 (`2dc26792`)
+**barraCuda:** standalone v0.3.1
 
 **V84 additions:** 7 new CPU domains validated (adapter, placement, PCoA, bootstrap phylo, EIC, KMD, feature table); Python parity proof (Exp253).
 

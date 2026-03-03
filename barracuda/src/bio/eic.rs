@@ -245,7 +245,7 @@ mod tests {
         let intensity = vec![0.0, 10.0, 10.0, 0.0];
         let area = integrate_peak(&rt, &intensity, 0, 3);
         // Trapezoid: (0+10)/2*1 + (10+10)/2*1 + (10+0)/2*1 = 5 + 10 + 5 = 20
-        assert!((area - 20.0).abs() < 1e-10);
+        assert!((area - 20.0).abs() < crate::tolerances::ANALYTICAL_LOOSE);
     }
 
     #[test]

@@ -361,18 +361,18 @@ mod tests {
     fn noise_estimation() {
         let data = vec![10.0, 10.0, 10.0, 1000.0, 10.0, 10.0, 10.0];
         let noise = estimate_noise(&data, 3, 3);
-        assert!((noise - 10.0).abs() < 1e-10);
+        assert!((noise - 10.0).abs() < crate::tolerances::ANALYTICAL_LOOSE);
     }
 
     #[test]
     fn interpolate_rt_exact_index() {
         let rt = vec![1.0, 2.0, 3.0, 4.0];
-        assert!((interpolate_rt(&rt, 2.0) - 3.0).abs() < 1e-10);
+        assert!((interpolate_rt(&rt, 2.0) - 3.0).abs() < crate::tolerances::ANALYTICAL_LOOSE);
     }
 
     #[test]
     fn interpolate_rt_fractional() {
         let rt = vec![1.0, 2.0, 3.0, 4.0];
-        assert!((interpolate_rt(&rt, 1.5) - 2.5).abs() < 1e-10);
+        assert!((interpolate_rt(&rt, 1.5) - 2.5).abs() < crate::tolerances::ANALYTICAL_LOOSE);
     }
 }

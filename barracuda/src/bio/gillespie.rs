@@ -99,7 +99,7 @@ impl Trajectory {
     /// Number of recorded time points.
     #[inline]
     #[must_use]
-    pub fn n_points(&self) -> usize {
+    pub const fn n_points(&self) -> usize {
         self.times.len()
     }
 
@@ -129,7 +129,7 @@ impl Trajectory {
 
     /// Number of events (transitions).
     #[must_use]
-    pub fn n_events(&self) -> usize {
+    pub const fn n_events(&self) -> usize {
         self.times.len().saturating_sub(1)
     }
 

@@ -46,7 +46,7 @@ fn main() {
         v.check_pass("anderson_eigenvalues returns values", !eigs.is_empty());
         v.check_pass("eigenvalue count matches n", eigs.len() == n);
 
-        let mut sorted = eigs.clone();
+        let mut sorted = eigs;
         sorted.sort_by(|a, b| a.partial_cmp(b).unwrap());
         let bandwidth = sorted[n - 1] - sorted[0];
         v.check_pass("1D bandwidth > 0", bandwidth > 0.0);
@@ -335,7 +335,7 @@ fn main() {
         v.section("S10: Spectral — Tridiagonal Eigensolve [CPU ungated]");
 
         let n: usize = 100;
-        let alpha: Vec<f64> = (0..n).map(|i| 2.0 + 0.1 * i as f64).collect();
+        let alpha: Vec<f64> = (0..n).map(|i| 0.1f64.mul_add(i as f64, 2.0)).collect();
         let beta: Vec<f64> = (0..n - 1).map(|_| -1.0_f64).collect();
         let eigs = barracuda::spectral::find_all_eigenvalues(&alpha, &beta);
         v.check_pass("tridiagonal: n eigenvalues", eigs.len() == n);

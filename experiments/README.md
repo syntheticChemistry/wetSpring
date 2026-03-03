@@ -1,11 +1,11 @@
 # wetSpring Experiments
 
-Experiment protocols and results for BarraCuda/ToadStool validation against
+Experiment protocols and results for `barraCuda` validation against
 published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-02 (Phase 92J: 280 experiments, 284 binaries, 8,241+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S87 (`2dc26792`), 144 primitives consumed (264 ComputeDispatch ops), barracuda always-on, 1,219 tests, 103 named tolerances, clippy pedantic CLEAN. V92J: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147), cross-spring evolution S87 (Exp304, 61/61))
+**Updated**: 2026-03-03 (Phase 93: 280 experiments, 284 binaries, 8,241+ checks, standalone `barraCuda` v0.3.1 (767+ WGSL shaders), 144 primitives consumed, 1,044 lib tests, 106 named tolerances, clippy pedantic + nursery ZERO WARNINGS)
 
 ---
 
@@ -397,11 +397,11 @@ thresholds from `src/tolerances.rs`.
 | `validate_cross_spring_evolution_s87` | 304 | 61 | `cargo run --release --features gpu --bin validate_cross_spring_evolution_s87` |
 
 **Total validation checks**: 8,241+
-**Rust tests**: 1,219
-**Binaries**: 284 total
-**ToadStool primitives**: 144 consumed (264 ComputeDispatch ops, barracuda always-on, zero fallback code — S87 `2dc26792`)
+**Rust tests**: 1,044 (library)
+**Binaries**: 268 total
+**barraCuda primitives**: 144 consumed (standalone v0.3.1, zero fallback code)
 **Papers**: 52 (25 Tracks 1-2 + 5 Track 3 + 9 Track 4 + 1 cross-spring + 9 extensions + 3 reference)
-**Local WGSL shaders**: 0 (all absorbed by ToadStool S63)
+**Local WGSL shaders**: 0 (all absorbed)
 **GPU modules**: 42 total (all lean on upstream primitives)
 **Benchmark infrastructure**: `bench.rs` harness with RAPL + nvidia-smi energy profiling, JSON output
 

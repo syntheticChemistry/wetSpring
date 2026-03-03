@@ -301,7 +301,7 @@ fn main() {
             .map(|i| ((i * 13 + 3) % 100) as f64 / 100.0)
             .collect();
 
-        let gemm = GemmCached::new(Arc::clone(&device), ctx.clone());
+        let gemm = GemmCached::new(Arc::clone(&device), ctx);
         let (result, ms_gpu) = bench("GemmCached GPU 64×32×16", || {
             gemm.execute(&a, &b, m, k, n, 1)
         });
@@ -438,7 +438,7 @@ fn main() {
         v.section("§7 groundSpring — Stats + FitResult Named Accessors (S81)");
 
         let data: Vec<f64> = (0..200)
-            .map(|i| (f64::from(i) * 0.1).sin() * 3.0 + 5.0)
+            .map(|i| (f64::from(i) * 0.1).sin().mul_add(3.0, 5.0))
             .collect();
 
         let (ci, ms_boot) = bench("Bootstrap 200×50k", || {
@@ -470,7 +470,7 @@ fn main() {
         );
 
         let x: [f64; 8] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0];
-        let y: Vec<f64> = x.iter().map(|&xi| 3.0 * xi.ln() + 1.0).collect();
+        let y: Vec<f64> = x.iter().map(|&xi| 3.0f64.mul_add(xi.ln(), 1.0)).collect();
         let fits = barracuda::stats::fit_all(&x, &y);
         v.check_pass("fit_all: models converge", !fits.is_empty());
         if let Some(b) = fits
@@ -498,8 +498,9 @@ fn main() {
     {
         v.section("§8 wateringHole → cross-spring — Sampling + Optimization");
 
-        let rosenbrock =
-            |x: &[f64]| -> f64 { (1.0 - x[0]).powi(2) + 100.0 * (x[1] - x[0].powi(2)).powi(2) };
+        let rosenbrock = |x: &[f64]| -> f64 {
+            (1.0 - x[0]).mul_add(1.0 - x[0], 100.0 * x[0].mul_add(-x[0], x[1]).powi(2))
+        };
         let initial = vec![5.0, -3.0];
 
         let (boltz, ms_boltz) = bench("Boltzmann 5k steps", || {

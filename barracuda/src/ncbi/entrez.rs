@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! NCBI Entrez E-utilities (E-search) wrappers.
 
-const ENTREZ_BASE: &str = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
+const ENTREZ_BASE_DEFAULT: &str = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
+
+fn entrez_base() -> String {
+    std::env::var("WETSPRING_NCBI_ESEARCH_URL").unwrap_or_else(|_| ENTREZ_BASE_DEFAULT.to_owned())
+}
 
 /// URL-encode a search term for Entrez E-utilities.
 fn encode_term(term: &str) -> String {
@@ -37,7 +41,8 @@ use crate::error::Error;
 #[must_use = "search count is discarded if not used"]
 pub fn esearch_count(db: &str, term: &str, api_key: &str) -> crate::error::Result<u64> {
     let encoded = encode_term(term);
-    let url = format!("{ENTREZ_BASE}?db={db}&term={encoded}&rettype=count&api_key={api_key}");
+    let base = entrez_base();
+    let url = format!("{base}?db={db}&term={encoded}&rettype=count&api_key={api_key}");
     let body = super::http::get(&url)?;
     parse_count(&body)
 }
@@ -190,7 +195,8 @@ mod tests {
     #[test]
     fn esearch_url_construction() {
         let encoded = encode_term("luxI[gene]");
-        let url = format!("{ENTREZ_BASE}?db=nuccore&term={encoded}&rettype=count&api_key=test_key");
+        let base = entrez_base();
+        let url = format!("{base}?db=nuccore&term={encoded}&rettype=count&api_key=test_key");
         assert!(url.contains("esearch.fcgi"));
         assert!(url.contains("db=nuccore"));
         assert!(url.contains("luxI%5Bgene%5D"));

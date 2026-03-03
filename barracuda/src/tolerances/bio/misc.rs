@@ -265,3 +265,32 @@ pub const ODE_COOPERATOR_PERSIST_THRESHOLD: f64 = 0.001;
 /// capacitor effect. Near-zero indicates failed growth.
 /// Validated: Exp102 (`BarraCuda` CPU v8).
 pub const ODE_CELL_GROWTH_THRESHOLD: f64 = 0.01;
+
+// ═══════════════════════════════════════════════════════════════════
+// Nautilus / ESN / taxonomy
+// ═══════════════════════════════════════════════════════════════════
+
+/// Default ridge regularization for Nautilus bio-ESN shell readout.
+///
+/// Prevents overfitting in the shell's linear readout layer.
+/// Larger than [`RIDGE_REGULARIZATION_SMALL`] (1e-6) because the
+/// ESN reservoir state matrix is typically ill-conditioned.
+pub const RIDGE_NAUTILUS_DEFAULT: f64 = 1e-4;
+
+/// Log-probability floor for Bayesian classifiers.
+///
+/// Prevents `ln(0)` in naive Bayes / taxonomy classification when
+/// a k-mer has zero observed frequency. 1e-300 is safely above
+/// `f64::MIN_POSITIVE` (2.2e-308) while being negligible in probability space.
+pub const LOG_PROB_FLOOR: f64 = 1e-300;
+
+// ═══════════════════════════════════════════════════════════════════
+// Synthetic signal generation
+// ═══════════════════════════════════════════════════════════════════
+
+/// Box-Muller u1 floor for synthetic nanopore signal generation.
+///
+/// More conservative than [`BOX_MULLER_U1_FLOOR`](crate::tolerances::BOX_MULLER_U1_FLOOR)
+/// (1e-15) because synthetic signals use a low-quality LCG whose
+/// output can cluster near zero. 1e-30 bounds the noise to ~11.7σ.
+pub const BOX_MULLER_U1_FLOOR_SYNTHETIC: f64 = 1e-30;

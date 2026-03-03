@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
-**Date:** March 2, 2026
-**Status:** Phase 92J — Validation study active — 8,241+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 1,219 tests, 280 experiments, 284 binaries, ToadStool S87 aligned (`2dc26792`), 144 primitives consumed (264 ComputeDispatch ops), 0 local WGSL (barracuda always-on), 103 named tolerances with full provenance, clippy pedantic CLEAN (`--all-features`), 52 papers + 6 reproduced, all 39 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. V92J: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed hardware orchestration (Exp303, 147/147)
+**Date:** March 3, 2026
+**Status:** Phase 93 — Validation study active — 8,241+ checks, 1,044 lib tests, 280 experiments, 284 binaries, standalone `barraCuda` v0.3.1 (767+ f64-canonical WGSL shaders), 144 primitives consumed, 0 local WGSL, 106 named tolerances, clippy pedantic + nursery ZERO WARNINGS, 52 papers + 6 reproduced, all 39 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers
 **License:** AGPL-3.0-or-later
 
 ---
@@ -20,7 +20,7 @@
 1. Can published life science algorithms (DADA2, UCHIME, RDP, UniFrac, scipy,
    sklearn) be faithfully reimplemented in pure Rust with documented tolerances?
 
-2. Can those Rust CPU implementations be promoted to GPU via ToadStool/BarraCuda
+2. Can those Rust CPU implementations be promoted to GPU via `barraCuda`
    with math parity, and at what speedup?
 
 3. Can stochastic and dynamical systems models (ODE, Gillespie SSA) be ported
@@ -32,10 +32,10 @@
 5. Is the math truly substrate-independent — does the same algorithm produce
    identical results on CPU, GPU, and (eventually) NPU?
 
-6. Does ToadStool's unidirectional streaming eliminate the GPU round-trip
-   overhead that makes naive GPU dispatch slower than CPU for small workloads?
+6. Does `barraCuda`/`toadStool`'s unidirectional streaming eliminate the GPU
+   round-trip overhead that makes naive GPU dispatch slower than CPU for small workloads?
 
-7. Can local WGSL shaders be structured for clean absorption into ToadStool,
+7. Can local WGSL shaders be structured for clean absorption into `barraCuda`,
    following the Write → Absorb → Lean cycle proven by hotSpring?
 
 8. Can the sovereign pipeline extend to field-deployed nanopore sequencing,
@@ -47,21 +47,19 @@
 ## Evolution Methodology: Write → Absorb → Lean
 
 wetSpring adopts hotSpring's proven absorption cycle for evolving local
-implementations into upstream ToadStool/BarraCuda primitives:
+implementations into upstream `barraCuda` primitives:
 
 1. **Write** — Implement on CPU with WGSL shader templates in `.wgsl` files
 2. **Validate** — Test CPU ↔ GPU parity against Python baselines
 3. **Hand off** — Document in `wateringHole/handoffs/` with binding layouts
-4. **Absorb** — ToadStool integrates as `ops::bio::*` shaders
+4. **Absorb** — `barraCuda` integrates as shared math primitives
 5. **Lean** — wetSpring rewires to upstream imports, deletes local code
 
 **Current status:** 42 GPU modules — Lean phase (fully absorbed). All 42 lean on
-upstream ToadStool primitives (144 consumed, S70+++. 0 local WGSL (fully lean)).
-7 compose ToadStool primitives for GPU-accelerated workflows. Zero Passthrough, zero
-Tier B/C modules remain. BGL helpers (`storage_bgl_entry`/`uniform_bgl_entry`) adopted
-from ToadStool S66 `ComputeDispatch` module (6 files, ~258 lines boilerplate removed).
-The forge crate (`metalForge/forge/` v0.3.0) provides substrate discovery,
-capability-based dispatch, and shader origin tracking as an absorption seam for ToadStool.
+upstream `barraCuda` primitives (144 consumed, v0.3.1 standalone, 767+ WGSL shaders).
+7 compose `barraCuda` primitives for GPU-accelerated workflows. Zero Passthrough, zero
+Tier B/C modules remain. The forge crate (`metalForge/forge/` v0.3.0) provides substrate
+discovery, capability-based dispatch, and shader origin tracking.
 
 ---
 
@@ -309,18 +307,18 @@ cross-substrate validated (Exp060: 20/20 CPU↔GPU parity).
 ## Relationship to ecoPrimals
 
 wetSpring is one of several **Springs** — validation targets that prove
-algorithms can be ported from interpreted languages to BarraCuda/ToadStool:
+algorithms can be ported from interpreted languages to `barraCuda` (math)
+and `toadStool` (hardware dispatch):
 
-- **hotSpring** — Nuclear physics, plasma, lattice QCD (34+ WGSL shaders, active Write phase)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 144 ToadStool primitives, barracuda always-on, 1,219 tests, vault module)
+- **hotSpring** — Nuclear physics, plasma, lattice QCD (62 WGSL shaders, 660 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 144 barraCuda primitives, 1,044 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
-- **ecoPrimals/archive/wetspring-early-handoffs-feb2026/** — Fossil record of early ToadStool handoffs (v1–v9)
+- **airSpring** — Precision agriculture, IoT, Richards PDE, Kriging
 
 Springs follow the **Write → Absorb → Lean** pattern (pioneered by hotSpring):
-write and validate locally, hand off to ToadStool for absorption, then lean on
-upstream primitives. This reduces dispatch overhead and round-trips via streaming
-pipeline composition. wetSpring's `metalForge/` directory characterizes available
-hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
+write and validate locally, hand off to `barraCuda` for absorption, then lean on
+upstream primitives. Springs depend directly on `barraCuda` for math; `toadStool`
+orchestrates hardware routing separately.
 
 ## Code Quality
 
@@ -332,7 +330,7 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | Line coverage (`cargo-llvm-cov`) | **95.86% line / 94.02% region / 95.40% fn** |
 | `#![deny(unsafe_code)]` | Enforced crate-wide (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, clippy::unwrap_used)]` | Enforced crate-wide |
-| Named tolerance constants | 103 (all scientifically justified, hierarchy-tested) |
+| Named tolerance constants | 106 (all scientifically justified, hierarchy-tested) |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` files |

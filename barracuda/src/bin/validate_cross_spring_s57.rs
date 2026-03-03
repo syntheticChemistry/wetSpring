@@ -68,6 +68,15 @@ use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
+struct BenchEntry {
+    primitive: &'static str,
+    evolved_by: &'static str,
+    session: &'static str,
+    cpu_us: f64,
+    problem: &'static str,
+    checks: u32,
+}
+
 fn dense_to_csr(matrix: &[f64], n: usize) -> SpectralCsrMatrix {
     let mut row_ptr = vec![0usize];
     let mut col_idx = Vec::new();
@@ -88,6 +97,43 @@ fn dense_to_csr(matrix: &[f64], n: usize) -> SpectralCsrMatrix {
         col_idx,
         values,
     }
+}
+
+fn eigenvalues_from_dense(matrix: &[f64], n: usize) -> Vec<f64> {
+    let csr = dense_to_csr(matrix, n);
+    lanczos_eigenvalues(&lanczos(&csr, n, 42))
+}
+
+fn readback_f32(
+    device: &Arc<barracuda::device::WgpuDevice>,
+    buf: &wgpu::Buffer,
+    n: usize,
+) -> Vec<f32> {
+    let d = device.device();
+    let q = device.queue();
+    let staging = d.create_buffer(&wgpu::BufferDescriptor {
+        label: Some("readback staging"),
+        size: (n * 4) as u64,
+        usage: wgpu::BufferUsages::MAP_READ | wgpu::BufferUsages::COPY_DST,
+        mapped_at_creation: false,
+    });
+    let mut encoder = d.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
+    encoder.copy_buffer_to_buffer(buf, 0, &staging, 0, (n * 4) as u64);
+    q.submit(std::iter::once(encoder.finish()));
+
+    let slice = staging.slice(..);
+    let (tx, rx) = std::sync::mpsc::channel();
+    slice.map_async(wgpu::MapMode::Read, move |result| {
+        tx.send(result).expect("channel send");
+    });
+    d.poll(wgpu::Maintain::Wait);
+    rx.recv().expect("channel recv").expect("GPU buffer map");
+
+    let data = slice.get_mapped_range();
+    let result: Vec<f32> = bytemuck::cast_slice(&data).to_vec();
+    drop(data);
+    staging.unmap();
+    result
 }
 
 #[tokio::main]
@@ -160,10 +206,7 @@ async fn main() {
 
         // Biological meaning: Fiedler value (2nd smallest eigenvalue) measures
         // community connectivity — higher = more connected = easier QS signaling
-        let csr = dense_to_csr(&laplacian, n);
-        let tri = lanczos(&csr, n, 42);
-        let eigenvalues = lanczos_eigenvalues(&tri);
-        let mut sorted_eigs = eigenvalues;
+        let mut sorted_eigs = eigenvalues_from_dense(&laplacian, n);
         sorted_eigs.sort_by(f64::total_cmp);
         let fiedler = sorted_eigs[1]; // 2nd smallest
         v.check(
@@ -373,12 +416,9 @@ async fn main() {
         );
 
         // Compare spectra: strong disorder should shift level spacing toward Poisson
-        let csr_clean = dense_to_csr(&laplacian, n);
-        let csr_weak = dense_to_csr(&weak_disorder, n);
-        let csr_strong = dense_to_csr(&strong_disorder, n);
-        let eigs_clean = lanczos_eigenvalues(&lanczos(&csr_clean, n, 42));
-        let eigs_weak = lanczos_eigenvalues(&lanczos(&csr_weak, n, 42));
-        let eigs_strong = lanczos_eigenvalues(&lanczos(&csr_strong, n, 42));
+        let eigs_clean = eigenvalues_from_dense(&laplacian, n);
+        let eigs_weak = eigenvalues_from_dense(&weak_disorder, n);
+        let eigs_strong = eigenvalues_from_dense(&strong_disorder, n);
 
         let r_clean = level_spacing_ratio(&eigs_clean);
         let r_weak = level_spacing_ratio(&eigs_weak);
@@ -603,8 +643,7 @@ async fn main() {
         let disordered = disordered_laplacian(&lap, n, &env_heterogeneity, 5.0);
 
         // hotSpring spectral: eigenanalysis of disordered system
-        let csr_disordered = dense_to_csr(&disordered, n);
-        let eigs_graph = lanczos_eigenvalues(&lanczos(&csr_disordered, n, 42));
+        let eigs_graph = eigenvalues_from_dense(&disordered, n);
         let r_graph = level_spacing_ratio(&eigs_graph);
 
         // Compare with hotSpring's native anderson_hamiltonian on same chain
@@ -888,45 +927,4 @@ async fn main() {
     println!("  Every Spring benefits from every other Spring's evolution.\n");
 
     v.finish();
-}
-
-struct BenchEntry {
-    primitive: &'static str,
-    evolved_by: &'static str,
-    session: &'static str,
-    cpu_us: f64,
-    problem: &'static str,
-    checks: u32,
-}
-
-fn readback_f32(
-    device: &Arc<barracuda::device::WgpuDevice>,
-    buf: &wgpu::Buffer,
-    n: usize,
-) -> Vec<f32> {
-    let d = device.device();
-    let q = device.queue();
-    let staging = d.create_buffer(&wgpu::BufferDescriptor {
-        label: Some("readback staging"),
-        size: (n * 4) as u64,
-        usage: wgpu::BufferUsages::MAP_READ | wgpu::BufferUsages::COPY_DST,
-        mapped_at_creation: false,
-    });
-    let mut encoder = d.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
-    encoder.copy_buffer_to_buffer(buf, 0, &staging, 0, (n * 4) as u64);
-    q.submit(std::iter::once(encoder.finish()));
-
-    let slice = staging.slice(..);
-    let (tx, rx) = std::sync::mpsc::channel();
-    slice.map_async(wgpu::MapMode::Read, move |result| {
-        tx.send(result).expect("channel send");
-    });
-    d.poll(wgpu::Maintain::Wait);
-    rx.recv().expect("channel recv").expect("GPU buffer map");
-
-    let data = slice.get_mapped_range();
-    let result: Vec<f32> = bytemuck::cast_slice(&data).to_vec();
-    drop(data);
-    staging.unmap();
-    result
 }

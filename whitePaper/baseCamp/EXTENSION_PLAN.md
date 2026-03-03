@@ -1,8 +1,8 @@
 # baseCamp Extension Plan: From Validated Math to Real-World Science
 
-**Date:** March 2, 2026 (updated)
-**Author:** wetSpring V92C (ecoPrimals)
-**Foundation:** 280 experiments, 8,241+ checks, 52 papers (6 proposed), 144 ToadStool primitives (S87, 844 f64-canonical shaders), Python parity proven, cross-spring provenance validated (Exp271: 73/73, 6 springs + Exp272: 64/64, 7 springs), V91 deep debt: unified discovery, handler refactoring, 1,219 tests, V92C Paper 12: full three-tier immunological Anderson (Exp273-279: 157/157 checks — science, CPU parity, GPU, streaming, metalForge)
+**Date:** March 3, 2026 (updated)
+**Author:** wetSpring Phase 93 (ecoPrimals)
+**Foundation:** 280 experiments, 8,241+ checks, 52 papers (6 proposed), 144 primitives (standalone barraCuda v0.3.1), Python parity proven, cross-spring provenance validated (Exp271: 73/73, 6 springs + Exp272: 64/64, 7 springs), unified discovery, handler refactoring, 1,044 lib tests, Paper 12: full three-tier immunological Anderson (Exp273-279: 157/157 checks — science, CPU parity, GPU, streaming, metalForge)
 
 ---
 

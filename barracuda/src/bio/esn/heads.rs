@@ -271,6 +271,8 @@ mod tests {
     use super::*;
     use std::collections::HashSet;
 
+    use crate::tolerances;
+
     #[test]
     fn head_constants_non_overlapping() {
         let all: Vec<usize> = (0..NUM_HEADS).collect();
@@ -307,7 +309,7 @@ mod tests {
         outputs[C0_UNIFRAC_REGIME] = 0.5;
         let d = BioHeadGroupDisagreement::from_outputs(&outputs);
         assert!(
-            (d.delta_regime - 0.8).abs() < 1e-10,
+            (d.delta_regime - 0.8).abs() < tolerances::ANALYTICAL_LOOSE,
             "regime spread = 0.9 - 0.1 = 0.8"
         );
         assert!(d.urgency() > 0.1);

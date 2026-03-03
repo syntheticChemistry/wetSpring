@@ -107,7 +107,7 @@ impl DecodeBuffer {
         };
 
         if is_64bit {
-            if decompressed.len() % 8 != 0 {
+            if !decompressed.len().is_multiple_of(8) {
                 return Err(Error::BinaryFormat(format!(
                     "f64 array length {} not divisible by 8",
                     decompressed.len()
@@ -122,7 +122,7 @@ impl DecodeBuffer {
                 })
                 .collect())
         } else {
-            if decompressed.len() % 4 != 0 {
+            if !decompressed.len().is_multiple_of(4) {
                 return Err(Error::BinaryFormat(format!(
                     "f32 array length {} not divisible by 4",
                     decompressed.len()

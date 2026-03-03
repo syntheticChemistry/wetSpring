@@ -156,6 +156,7 @@ fn root_tree_height(branch_lengths: &[f64], parent_indices: &[Option<usize>]) ->
 #[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
     fn simple_tree() -> (Vec<f64>, Vec<Option<usize>>) {
         // Tree: root(0) -> A(1, bl=0.1), root(0) -> B(2, bl=0.2)
@@ -170,7 +171,7 @@ mod tests {
         let (bl, parents) = simple_tree();
         let result = strict_clock(&bl, &parents, 100.0, &[]).unwrap();
         assert!(result.rate > 0.0);
-        assert!((result.node_ages[0] - 100.0).abs() < 1e-10);
+        assert!((result.node_ages[0] - 100.0).abs() < tolerances::ANALYTICAL_LOOSE);
         assert!(result.node_ages[1] < 100.0);
         assert!(result.node_ages[3] < result.node_ages[1]);
         assert!(result.calibrations_satisfied);
@@ -218,7 +219,7 @@ mod tests {
     fn cv_strict_is_zero() {
         let rates = vec![0.5, 0.5, 0.5, 0.5];
         let cv = rate_variation_cv(&rates);
-        assert!(cv.abs() < 1e-12);
+        assert!(cv.abs() < tolerances::ANALYTICAL_F64);
     }
 
     #[test]
@@ -235,6 +236,9 @@ mod tests {
         let rates = relaxed_clock_rates(&bl, &result.node_ages, &parents);
         let positive_rates: Vec<f64> = rates.iter().copied().filter(|&r| r > 0.0).collect();
         let cv = rate_variation_cv(&positive_rates);
-        assert!(cv < 1e-10, "Strict tree should have CV ≈ 0, got {cv}");
+        assert!(
+            cv < tolerances::ANALYTICAL_LOOSE,
+            "Strict tree should have CV ≈ 0, got {cv}"
+        );
     }
 }

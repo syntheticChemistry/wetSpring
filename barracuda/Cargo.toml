@@ -2,10 +2,10 @@
 name = "wetspring-barracuda"
 version = "0.1.0"
 edition = "2024"
-rust-version = "1.85"
+rust-version = "1.87"
 authors = ["Squirrel Team"]
 license = "AGPL-3.0-or-later"
-description = "Life science + PFAS analytical chemistry pipelines — Rust + GPU via BarraCUDA/ToadStool"
+description = "Life science + PFAS analytical chemistry pipelines — Rust + GPU via barraCuda"
 repository = "https://github.com/syntheticChemistry/wetSpring"
 keywords = ["bioinformatics", "mass-spectrometry", "pfas", "gpu", "wgsl"]
 categories = ["science", "command-line-utilities"]
@@ -14,9 +14,9 @@ categories = ["science", "command-line-utilities"]
 
 [features]
 default = []
-# GPU acceleration via ToadStool/BarraCuda (Phase 3).
+# GPU acceleration via barraCuda (standalone math primal).
 # Enable with `cargo build --features gpu`.
-# Adds wgpu v22 (device creation), barracuda GPU ops (49+ primitives),
+# Adds wgpu v22 (device creation), barraCuda GPU ops (144+ primitives),
 # and tokio (async device init). Zero local WGSL shaders (full lean).
 gpu = ["barracuda/gpu", "dep:wgpu", "dep:tokio"]
 # NPU acceleration via ToadStool akida-driver (BrainChip AKD1000/AKD1500).
@@ -36,26 +36,22 @@ nautilus = ["dep:bingocube-nautilus"]
 # serde_json: JSON parsing for validation data and model import (2 binaries).
 serde_json = { version = "1", optional = true }
 
-# ToadStool barracuda — always-on for CPU math (special, linalg, numerical).
-# default-features = false: no wgpu/pollster/bytemuck pulled in for CPU builds.
+# barraCuda — standalone math primal (v0.3.1). Pure math + GPU compute.
+# default-features = false: no wgpu/bytemuck pulled in for CPU builds.
 # When `gpu` feature is active, `barracuda/gpu` enables GPU ops.
-# S86 (2fee1969): 144+ primitives consumed (V92E). CPU stats: bootstrap_ci, rawr_mean,
-# fit_exponential/quadratic/logarithmic/all, jackknife, evolution, chao1_classic.
-# GPU bio: StencilCooperationGpu, HillGateGpu (dispatched). WrightFisherGpu (needs DF64).
-# GPU linalg: SymmetrizeGpu, LaplacianGpu. ESN: MultiHeadEsn, ExportedWeights (head_labels).
-# Infra: Fp64Strategy::Concurrent, PipelineBuilder, 844+ f64-canonical WGSL shaders.
-# S80-S86: Nautilus absorption, BatchedEncoder, fused_mlp, StatefulPipeline, Batch Nelder-Mead,
-# NVK driver workarounds, InterconnectTopology, OS memory detection, anderson_4d, BrentGpu,
-# L-BFGS, RichardsGpu, OmelyanIntegrator, BatchedStatefulF64, 144 ComputeDispatch ops.
-# Fixed: spectral/graph/sample CPU modules incorrectly GPU-gated (wetSpring S86 rewire).
-barracuda = { path = "../../phase1/toadstool/crates/barracuda", default-features = false }
+# 144+ primitives consumed. 767+ f64-canonical WGSL shaders.
+# CPU: linalg, special, numerical, spectral, stats, sample.
+# GPU: FusedMapReduceF64, BrayCurtisF64, GemmF64, BatchedOdeRK4, etc.
+# Universal precision: f64-canonical with f16/f32/f64/df64 dispatch per hardware.
+barracuda = { path = "../../barraCuda/crates/barracuda", default-features = false }
 
-# ToadStool akida-driver — pure Rust NPU access (BrainChip AKD1000/AKD1500).
+# akida-driver — pure Rust NPU access (BrainChip AKD1000/AKD1500).
+# Independent of barraCuda; sourced from toadStool neuromorphic crates.
 # Runtime discovery, capability-based dispatch, zero mocks.
 akida-driver = { path = "../../phase1/toadstool/crates/neuromorphic/akida-driver", optional = true }
 
 # wgpu: WebGPU compute — hardware-agnostic GPU via Vulkan/Metal/DX12.
-# Same version as barracuda to prevent duplicate symbol linking errors.
+# Same version as barraCuda to prevent duplicate symbol linking errors.
 # default-features = false disables wgpu's default feature set.
 # Note: renderdoc-sys (C dep) is still pulled on native targets via wgpu-hal.
 wgpu = { version = "22", optional = true, default-features = false, features = ["wgsl", "vulkan-portability"] }
@@ -370,6 +366,12 @@ required-features = ["gpu"]
 [[bin]]
 name = "validate_diversity_gpu"
 path = "src/bin/validate_diversity_gpu.rs"
+required-features = ["gpu"]
+
+# ── Kriging (spatial diversity interpolation, Exp280) ─────────────
+[[bin]]
+name = "validate_kriging"
+path = "src/bin/validate_kriging.rs"
 required-features = ["gpu"]
 
 # ── GPU 16S pipeline parity (Exp016: CPU vs GPU math parity) ─────

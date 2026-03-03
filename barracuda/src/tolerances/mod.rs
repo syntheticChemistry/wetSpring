@@ -46,6 +46,15 @@ pub const EXACT: f64 = 0.0;
 /// accumulated rounding in simple arithmetic chains.
 pub const ANALYTICAL_F64: f64 = 1e-12;
 
+/// Loose analytical tolerance for test assertions.
+///
+/// Used when comparing computed values to known analytical results
+/// where intermediate arithmetic (division, sqrt, ln) accumulates
+/// more rounding than pure add/multiply chains. Covers ~5 digits
+/// of accumulated error. Tighter than instrument tolerances, looser
+/// than [`ANALYTICAL_F64`].
+pub const ANALYTICAL_LOOSE: f64 = 1e-10;
+
 // ═══════════════════════════════════════════════════════════════════
 // Special-function evaluation tolerances
 // ═══════════════════════════════════════════════════════════════════

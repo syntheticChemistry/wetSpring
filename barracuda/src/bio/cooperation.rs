@@ -191,7 +191,11 @@ pub fn cooperator_frequency(result: &OdeResult) -> Vec<f64> {
             let nc = row[0].max(0.0);
             let nd = row[1].max(0.0);
             let total = nc + nd;
-            if total < 1e-15 { 0.5 } else { nc / total }
+            if total < crate::tolerances::MATRIX_EPS {
+                0.5
+            } else {
+                nc / total
+            }
         })
         .collect()
 }

@@ -51,7 +51,10 @@ impl SyntheticSignalGenerator {
             let u1 = ((rng >> 33) as f64) / f64::from(u32::MAX);
             rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
             let u2 = ((rng >> 33) as f64) / f64::from(u32::MAX);
-            let noise = ((-2.0 * u1.max(1e-30).ln()).sqrt()
+            let noise = ((-2.0
+                * u1.max(crate::tolerances::BOX_MULLER_U1_FLOOR_SYNTHETIC)
+                    .ln())
+            .sqrt()
                 * (2.0 * std::f64::consts::PI * u2).cos()
                 * 15.0) as i16;
             signal.push(baseline.saturating_add(noise));
@@ -128,7 +131,10 @@ impl SyntheticSignalGenerator {
                 let u1 = ((rng >> 33) as f64) / f64::from(u32::MAX);
                 rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
                 let u2 = ((rng >> 33) as f64) / f64::from(u32::MAX);
-                let noise = ((-2.0 * u1.max(1e-30).ln()).sqrt()
+                let noise = ((-2.0
+                    * u1.max(crate::tolerances::BOX_MULLER_U1_FLOOR_SYNTHETIC)
+                        .ln())
+                .sqrt()
                     * (2.0 * std::f64::consts::PI * u2).cos()
                     * 10.0) as i16;
                 signal.push(level.saturating_add(noise));

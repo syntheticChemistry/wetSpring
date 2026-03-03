@@ -1,12 +1,13 @@
 # wetSpring — Life Science & Analytical Chemistry Validation
 
-**An ecoPrimals Spring** — life science biome evolving Rust implementations
-and GPU shaders for ToadStool/BarraCuda absorption. Follows the
-**Write → Absorb → Lean** cycle adopted from hotSpring.
+**An ecoPrimals Spring** — life science biome validating Python baselines
+against Rust implementations and GPU shaders via `barraCuda` (standalone math
+primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 
-**Date:** March 2, 2026
+**Date:** March 3, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 92J — 1,219 tests, 280 experiments, 8,241+ validation checks, 268 binaries, ToadStool S87 (`2dc26792`), 144 primitives consumed (264 ComputeDispatch ops), zero local WGSL, zero unsafe code, 103 named tolerances, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN. Full 5-tier chain GREEN on S87 (14 binaries, all pass). V92J: cross-spring evolution benchmark (Exp304: 61/61, GEMM 7.1× GPU speedup, shader provenance across 6 springs). 54 metalForge workloads.
+**MSRV:** 1.87
+**Status:** Phase 93 — 1,044 lib tests, 280 experiments, 8,241+ validation checks, 268 binaries, standalone `barraCuda` v0.3.1 (767+ f64-canonical WGSL shaders), 144 primitives consumed, zero local WGSL, zero unsafe code, 106 named tolerances, `cargo clippy -W clippy::pedantic -W clippy::nursery` **ZERO WARNINGS**. XDG-compliant data paths. Configurable NCBI endpoints. All hardcoded tolerances centralized.
 
 ---
 
@@ -14,7 +15,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 wetSpring validates the entire evolution path from interpreted-language
 scientific computing (Python/numpy/scipy/sklearn) to sovereign Rust CPU
-implementations, and then to GPU acceleration via ToadStool/BarraCuda:
+implementations, and then to GPU acceleration via `barraCuda`:
 
 ```
 Python baseline → Rust CPU validation → GPU acceleration → metalForge cross-substrate
@@ -36,8 +37,9 @@ Six tracks cover the life science, environmental monitoring, and drug repurposin
 ## Evolution Architecture: Write → Absorb → Lean
 
 wetSpring follows hotSpring's proven absorption cycle. Springs are biomes;
-ToadStool/BarraCuda is the fungus present in every biome. Springs don't
-import each other — they lean on ToadStool independently.
+`barraCuda` is the universal math primal and `toadStool` is the hardware
+dispatch primal. Springs depend directly on `barraCuda` for math, and
+`toadStool` orchestrates hardware routing. Springs don't import each other.
 
 ```
 Write → Validate → Hand off → Absorb → Lean
@@ -125,10 +127,10 @@ integration point.
 | Exp271: Cross-Spring S79 (13 domains) | 73 |
 | Exp272: Bio Brain (7 domains) | 64 |
 | **Total validation checks** | **8,241+** |
-| Rust library unit tests | 1,044 (barracuda CPU + IPC, default features) |
+| Rust library unit tests | 1,044 (`barraCuda` CPU + IPC, default features) |
 | metalForge forge tests | 175 |
 | Integration + determinism + doc tests | 90 |
-| **Total Rust tests** | **1,219** |
+| **Total Rust tests** | **1,044+** (library) |
 | Library code coverage | **95.86% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov) |
 | Experiments completed | 280 |
 | Validation/benchmark binaries | 284 |
@@ -141,9 +143,9 @@ integration point.
 | metalForge cross-system | 37+ domains CPU↔GPU (Exp103+104+165+182+208), **39/39 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
-| ToadStool primitives consumed | **144** (barracuda always-on, zero fallback code — ToadStool S87, `2dc26792`) |
+| `barraCuda` primitives consumed | **144** (always-on, zero fallback code — standalone `barraCuda` v0.3.1) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 8,241+ validation checks **PASS**. All 1,219 tests **PASS** (1 ignored: hardware-dependent).
+All 8,241+ validation checks **PASS**. All 1,044 library tests **PASS** (1 ignored: hardware-dependent).
 
 ### GPU Performance
 
@@ -384,7 +386,31 @@ barracuda math through GPU parity to mixed-hardware NUCLEUS dispatch:
 - 14 new tests (power.rs, nrs.rs, brain/observation.rs)
 - All doc_markdown clippy warnings fixed across 30+ files
 
-### Phase 92J: Deep Debt Resolution + Pedantic Evolution (current)
+### Phase 93: Standalone barraCuda Rewire + Deep Debt Evolution (current)
+
+Rewired from ToadStool-embedded `barracuda` v0.2.0 to standalone `barraCuda`
+v0.3.1. Comprehensive deep debt resolution across the full codebase:
+
+- **barraCuda rewire**: Dependency path swap from `phase1/toadstool/crates/barracuda`
+  to standalone `barraCuda/crates/barracuda` (v0.3.1). Zero API breakage — 1,044 tests
+  pass without code changes. akida-driver (NPU) kept at toadStool path (independent).
+- **MSRV bump**: 1.85 → 1.87 (matching standalone barraCuda requirement)
+- **Tolerance centralization**: 4 production inline constants → named constants
+  (`RIDGE_NAUTILUS_DEFAULT`, `BOX_MULLER_U1_FLOOR_SYNTHETIC`, `LOG_PROB_FLOOR`,
+  `ANALYTICAL_LOOSE`). 60+ test tolerances across 18 files → `tolerances::` references.
+- **Hardcoding evolution**: NCBI URLs → env-var configurable (`WETSPRING_NCBI_*`).
+  Data dir → XDG-compliant (`XDG_DATA_HOME/wetspring` → `~/.local/share/wetspring`).
+- **Modern Rust idioms**: 16 `is_multiple_of()` conversions (Rust 1.87+), 12 `const fn`
+  promotions, 27 `mul_add` fused operations, 4 redundant clones removed.
+- **Smart file refactoring**: `validation.rs` (668→297), `io/xml.rs` (612→285),
+  `bio/dnds.rs` (583→313) — tests extracted to separate files.
+- **Clippy nursery clean**: Zero warnings at both `pedantic` and `nursery` levels.
+- **Doc updates**: ToadStool references → barraCuda (standalone math primal) in
+  architectural docs (`gpu.rs`, `lib.rs`, `npu.rs`, `Cargo.toml`).
+
+**1,044 tests** | **106 named tolerances** | **0 clippy warnings (pedantic + nursery)**
+
+### Phase 92J: Deep Debt Resolution + Pedantic Evolution
 - `panic!` in ESN bridge → `Result`-based error handling (zero panics in library code)
 - IPC science handler: 8-arg function → `MetricCtx` struct pattern
 - 50+ binaries: clippy pedantic fully clean (`--all-features -W clippy::pedantic`)
@@ -393,7 +419,7 @@ barracuda math through GPU parity to mixed-hardware NUCLEUS dispatch:
 - Provenance documentation: `experiments/results/README.md`, BASELINE_MANIFEST clarification
 - Dependency health: CPU-only build is pure Rust; only C dep is `renderdoc-sys` via wgpu (GPU path)
 
-**1,219 tests** | **280 experiments** | **268 binaries** | **8,241+ checks**
+**1,044 tests** | **280 experiments** | **268 binaries** | **8,241+ checks**
 
 ### Phase 87: blueFish WhitePaper + hotSpring Brain Architecture Review (V87)
 
@@ -512,17 +538,17 @@ Rust 1.93 fixed across 20+ validation binaries.
 | Check | Status |
 |-------|--------|
 | `cargo fmt --check` | Clean (0 diffs) |
-| `cargo clippy --all-targets -D warnings` | Clean (0 warnings, pedantic + nursery) |
-| `cargo doc --no-deps` | Clean (0 warnings) |
-| Line coverage (`cargo-llvm-cov`) | **95.86% line / 93.54% fn / 94.99% branch** (1,044+ lib tests) |
+| `cargo clippy -W pedantic -W nursery` | **Zero warnings** (pedantic + nursery clean) |
+| `cargo doc --no-deps` | Clean (1 pre-existing `bench` ambiguity) |
+| Line coverage (`cargo-llvm-cov`) | **95.86% line / 93.54% fn / 94.99% branch** (1,044 lib tests) |
 | `#![deny(unsafe_code)]` | **Enforced crate-wide** (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | **Enforced crate-wide** |
 | TODO/FIXME markers | **0** |
-| Inline tolerance literals | **0** (all 103 use `tolerances::` constants) |
+| Inline tolerance literals | **0** (all 106 use `tolerances::` constants) |
 | SPDX-License-Identifier | All `.rs` files |
 | Max file size | All under 1000 LOC |
 | External C dependencies | **0** (`flate2` uses `rust_backend`) |
-| Named tolerance constants | 103 (scientifically justified, hierarchy-tested) |
+| Named tolerance constants | 106 (scientifically justified, hierarchy-tested) |
 | Provenance headers | All 268 binaries |
 | ESN ridge regression | **Proper Cholesky solve** (not diagonal approximation) |
 | I/O streaming | Buffering APIs deprecated; `stats_from_file` + iterators preferred |
@@ -620,8 +646,8 @@ wetSpring/
 │   ├── src/
 │   │   ├── lib.rs               ← crate root (pedantic + nursery lints enforced)
 │   │   ├── special.rs           ← sovereign math (erf, ln_gamma, regularized_gamma)
-│   │   ├── tolerances.rs        ← 103 named tolerance constants
-│   │   ├── validation.rs        ← hotSpring validation framework
+│   │   ├── tolerances/           ← 106 named tolerance constants (bio, gpu, spectral, instrument)
+│   │   ├── validation/           ← hotSpring validation framework
 │   │   ├── ncbi/                ← NCBI module (API key, HTTP, E-search, EFetch, SRA, NestGate, cache)
 │   │   ├── encoding.rs          ← sovereign base64 (zero dependencies)
 │   │   ├── error.rs             ← error types (no external crates)
@@ -656,12 +682,12 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (1,219 across barracuda + forge workspace)
-cargo test --features ipc
+# Run all tests (1,044 library tests)
+cargo test --workspace
 
 # Code quality checks
-cargo fmt -- --check
-cargo clippy --all-targets -- -D clippy::pedantic -D clippy::nursery
+cargo fmt -p wetspring-barracuda -p wetspring-forge -- --check
+cargo clippy --workspace --all-targets --all-features -- -W clippy::pedantic -W clippy::nursery
 cargo doc --no-deps
 
 # Line coverage (requires cargo-llvm-cov)
@@ -715,10 +741,11 @@ All validation data comes from public repositories:
 - **hotSpring** — Nuclear/plasma physics validation (sibling Spring, precision shaders, f64 WGSL, 4-layer brain architecture, 36-head ESN, NautilusBrain)
 - **neuralSpring** — ML/neural inference validation (sibling Spring, eigensolvers, batch IPR, TransE)
 - **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
-- **ToadStool** — GPU compute engine (BarraCuda crate, 700+ WGSL shaders, S71+++)
-- **wateringHole** — Spring-local handoffs to ToadStool
-  - `handoffs/WETSPRING_TOADSTOOL_V92D_DEEP_DEBT_EVOLUTION_HANDOFF_MAR02_2026.md` — V92D (current: deep debt evolution, panic elimination, pedantic hardening)
-  - `handoffs/archive/` — V7-V92C (fossil record)
-  - `CROSS_SPRING_SHADER_EVOLUTION.md` — 700+ shader provenance (cross-spring, S71+++)
-- **blueFish** — Chemistry as irreducible research programme (`whitePaper/blueFish/`, analytical + computational, RootPulse provenance)
+- **barraCuda** — Standalone math primal (767+ f64-canonical WGSL shaders, universal precision)
+- **toadStool** — Hardware dispatch primal (GPU/NPU/CPU routing, adaptive tuning)
+- **wateringHole** — Inter-primal handoffs and cross-spring coordination
+  - `handoffs/WETSPRING_BARRACUDA_031_REWIRE_HANDOFF_MAR03_2026.md` — barraCuda v0.3.1 rewire
+  - `handoffs/archive/` — V7-V92J (fossil record)
+  - `CROSS_SPRING_SHADER_EVOLUTION.md` — 767+ shader provenance
+- **blueFish** — Chemistry as irreducible research programme (`whitePaper/blueFish/`)
 - **ecoPrimals** — Parent ecosystem

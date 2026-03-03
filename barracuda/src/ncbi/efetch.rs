@@ -7,7 +7,11 @@
 
 use crate::error::Error;
 
-const EFETCH_BASE: &str = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
+const EFETCH_BASE_DEFAULT: &str = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
+
+fn efetch_base() -> String {
+    std::env::var("WETSPRING_NCBI_EFETCH_URL").unwrap_or_else(|_| EFETCH_BASE_DEFAULT.to_owned())
+}
 
 /// Injectable HTTP GET function — enables mock injection for testing.
 pub type HttpGetFn = fn(&str) -> crate::error::Result<String>;
@@ -121,7 +125,8 @@ pub fn efetch_fasta_batch_with(
 
 /// Build an `EFetch` URL with the given parameters.
 fn build_url(db: &str, id: &str, rettype: &str, retmode: &str, api_key: &str) -> String {
-    format!("{EFETCH_BASE}?db={db}&id={id}&rettype={rettype}&retmode={retmode}&api_key={api_key}")
+    let base = efetch_base();
+    format!("{base}?db={db}&id={id}&rettype={rettype}&retmode={retmode}&api_key={api_key}")
 }
 
 /// Validate that a response body looks like FASTA (starts with `>`).

@@ -274,7 +274,10 @@ mod tests {
         let result = pcoa(&condensed, 3, 2).unwrap();
         assert_eq!(result.n_samples, 3);
         for &v in &result.coordinates {
-            assert!(v.abs() < 1e-10, "expected ~0, got {v}");
+            assert!(
+                v.abs() < tolerances::ANALYTICAL_LOOSE,
+                "expected ~0, got {v}"
+            );
         }
     }
 
@@ -285,7 +288,10 @@ mod tests {
         assert_eq!(result.n_samples, 2);
         assert_eq!(result.eigenvalues.len(), 1);
         let d = (result.coord(0, 0) - result.coord(1, 0)).abs();
-        assert!((d - 1.0).abs() < 1e-10, "expected distance 1.0, got {d}");
+        assert!(
+            (d - 1.0).abs() < tolerances::ANALYTICAL_LOOSE,
+            "expected distance 1.0, got {d}"
+        );
     }
 
     #[test]
@@ -313,7 +319,7 @@ mod tests {
         let result = pcoa(&condensed, 3, 2).unwrap();
         let sum: f64 = result.proportion_explained.iter().sum();
         assert!(
-            (sum - 1.0).abs() < 1e-10,
+            (sum - 1.0).abs() < tolerances::ANALYTICAL_LOOSE,
             "proportions should sum to 1.0, got {sum}"
         );
     }

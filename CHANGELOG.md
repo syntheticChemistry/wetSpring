@@ -3,6 +3,37 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V93 — Standalone barraCuda Rewire + Deep Debt Evolution (2026-03-03)
+
+### Changed
+- **barraCuda rewire**: Dependency path from `phase1/toadstool/crates/barracuda`
+  (v0.2.0) to standalone `barraCuda/crates/barracuda` (v0.3.1). Zero API breakage.
+- **MSRV**: 1.85 → 1.87 (all three Cargo.toml files)
+- **akida-driver**: Comment clarifies independence from barraCuda
+- **NCBI URLs**: Hardcoded → env-var configurable (`WETSPRING_NCBI_ESEARCH_URL`,
+  `WETSPRING_NCBI_EFETCH_URL`, `WETSPRING_NCBI_EUTILS_URL`)
+- **Data directory**: `/tmp/wetspring-data` → XDG-compliant
+  (`WETSPRING_DATA_DIR` → `XDG_DATA_HOME/wetspring` → `~/.local/share/wetspring`)
+- **File structure**: `validation.rs` → `validation/mod.rs` + `validation/tests.rs`,
+  `io/xml.rs` → `io/xml/mod.rs` + `io/xml/tests.rs`,
+  `bio/dnds.rs` → `bio/dnds/mod.rs` + `bio/dnds/tests.rs`
+- **Modern idioms**: 16 `is_multiple_of()`, 12 `const fn`, 27 `mul_add`, 4 clones removed
+- **Doc references**: ToadStool → barraCuda (standalone math primal) in gpu.rs, lib.rs, npu.rs
+
+### Added
+- Tolerance constants: `ANALYTICAL_LOOSE` (1e-10), `RIDGE_NAUTILUS_DEFAULT` (1e-4),
+  `LOG_PROB_FLOOR` (1e-300), `BOX_MULLER_U1_FLOOR_SYNTHETIC` (1e-30)
+- 60+ test tolerance replacements across 18 files → `tolerances::` references
+- Handoff: `WETSPRING_BARRACUDA_031_REWIRE_HANDOFF_MAR03_2026.md`
+
+### Removed
+- Dead code: `cpu_simpsons` collection (never read) in `validate_cpu_vs_gpu_v9.rs`
+- Duplicate `println!` in if-branches (barrier disruption)
+
+### Fixed
+- Clippy nursery: zero warnings (pedantic + nursery clean)
+- Extracted test files: `#![allow]` inner attributes (was `#[allow]` outer — ineffective)
+
 ## V92J — Cross-Spring Evolution Benchmark + S87 Modern Systems (2026-03-02)
 
 ### Added

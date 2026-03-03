@@ -226,7 +226,7 @@ fn bench_pangenome(device: &Arc<WgpuDevice>) {
                 let presence = (0..n_genomes)
                     .map(|_| {
                         rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-                        (rng >> 33) % 3 != 0
+                        !(rng >> 33).is_multiple_of(3)
                     })
                     .collect();
                 pangenome::GeneCluster {

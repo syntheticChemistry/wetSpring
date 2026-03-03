@@ -12,7 +12,7 @@
     clippy::cast_possible_truncation,
     clippy::cast_sign_loss
 )]
-//! wetSpring `BarraCuda` — Life Science + PFAS Analytical Chemistry Pipelines
+//! wetSpring — Life Science + PFAS Analytical Chemistry Pipelines (via `barraCuda`)
 //!
 //! Rust implementations validated against Python/`Galaxy`/`QIIME2`/`asari`/`FindPFAS`
 //! baselines. Each module mirrors a pipeline stage from the validated

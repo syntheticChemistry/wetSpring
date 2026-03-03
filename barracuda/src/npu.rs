@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! NPU integration via `ToadStool` akida-driver
+//! NPU integration via akida-driver (independent of `barraCuda`).
 //!
 //! Wraps `akida_driver` for wetSpring's neuromorphic compute pipeline:
 //! runtime device discovery, capability-based int8 inference, and
@@ -10,7 +10,7 @@
 //! - **Zero Mocks**: Real hardware only; tests skip when no device present
 //! - **Capability-Based**: Device features discovered at runtime
 //! - **Primal Self-Knowledge**: wetSpring discovers NPU, never hardcodes
-//! - **Fast AND Safe**: Pure Rust driver via `ToadStool`
+//! - **Fast AND Safe**: Pure Rust driver (sourced from toadStool neuromorphic crates)
 
 #![allow(
     clippy::cast_possible_truncation,

@@ -45,7 +45,7 @@ impl OdeResult {
     /// Number of time points in the trajectory.
     #[inline]
     #[must_use]
-    pub fn n_points(&self) -> usize {
+    pub const fn n_points(&self) -> usize {
         self.t.len()
     }
 

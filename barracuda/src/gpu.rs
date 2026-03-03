@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! GPU FP64 compute for wetSpring science workloads.
 //!
-//! Creates a wgpu device with `SHADER_F64` and bridges to `ToadStool`'s
-//! `WgpuDevice` + `TensorContext`. Core dispatch goes through `ToadStool`
-//! primitives (79 consumed, zero fallback code). ODE domains use
+//! Creates a wgpu device with `SHADER_F64` and bridges to `barraCuda`'s
+//! `WgpuDevice` + `TensorContext`. Core dispatch goes through `barraCuda`
+//! primitives (144+ consumed, zero fallback code). ODE domains use
 //! runtime-generated WGSL via `BatchedOdeRK4::generate_shader()`.
 //!
-//! # Precision (`ToadStool` S68+ → S79)
+//! # Precision (barraCuda universal precision)
 //!
-//! All 844 `ToadStool` WGSL shaders are f64-canonical (zero f32-only remain).
+//! All 767+ `barraCuda` WGSL shaders are f64-canonical (zero f32-only remain).
 //! `compile_shader_universal(source, precision)` routes through:
 //!
 //! - `Precision::F64` — native f64 (compute-class GPUs: Titan V, V100, MI250X)
-//! - `Precision::Df64` — double-float f32-pair (~48-bit mantissa, ~10× throughput
+//! - `Precision::Df64` — double-float f32-pair (~48-bit mantissa, ~10x throughput
 //!   on consumer FP32 cores: RTX 4070, RDNA2+)
 //! - `Precision::F32` — downcast from f64 canonical (inference, bandwidth-bound)
 //! - `Precision::F16` — half-precision (inference only)
@@ -21,7 +21,7 @@
 //! [`GpuF64::fp64_strategy`] (Native vs Hybrid). ODE modules currently use
 //! F64 directly; DF64 promotion requires host buffer protocol adaptation.
 //!
-//! # Consumed `ToadStool` GPU primitives (S79)
+//! # Consumed `barraCuda` GPU primitives
 //!
 //! - `FusedMapReduceF64` — Shannon, Simpson, alpha diversity
 //! - `BrayCurtisF64` — condensed distance matrices
@@ -37,13 +37,13 @@
 //! - `SmithWatermanGpu` — banded SW alignment (anti-diagonal wavefront)
 //! - `TreeInferenceGpu` — decision tree / RF inference (sample x tree)
 //! - `DiversityFusionGpu` — Shannon + Simpson + evenness fused
-//! - `MultiHeadEsn` — shared reservoir, per-head readout (S79 `head_disagreement`)
+//! - `MultiHeadEsn` — shared reservoir, per-head readout (`head_disagreement`)
 //! - Plus 20+ bio ops: ANI, SNP, dN/dS, pangenome, HMM, DADA2, etc.
 //!
 //! # WGSL Generation (Lean — zero local shaders)
 //!
 //! All ODE shaders are generated at runtime via `BatchedOdeRK4::generate_shader()`
-//! from `ToadStool`. wetSpring holds zero local `.wgsl` files.
+//! from `barraCuda`. wetSpring holds zero local `.wgsl` files.
 
 use barracuda::device::{GpuDriverProfile, TensorContext, WgpuDevice};
 use std::sync::Arc;
@@ -74,12 +74,12 @@ const MAX_STORAGE_BUFFERS_PER_STAGE: u32 = 16;
 
 /// GPU context with FP64 support for science workloads.
 ///
-/// Wraps a wgpu device with `SHADER_F64` + `ToadStool`'s `TensorContext`
+/// Wraps a wgpu device with `SHADER_F64` + `barraCuda`'s `TensorContext`
 /// for batched dispatch and buffer pooling.
 ///
-/// Most domains dispatch through absorbed `ToadStool` primitives via
+/// Most domains dispatch through `barraCuda` primitives via
 /// [`to_wgpu_device`](Self::to_wgpu_device). ODE domains use runtime-generated
-/// WGSL via `BatchedOdeRK4::generate_shader()` (`ToadStool`, zero local shaders).
+/// WGSL via `BatchedOdeRK4::generate_shader()` (zero local shaders).
 ///
 /// Driver-specific capabilities (NVK workarounds, eigensolve strategy,
 /// latency model) are available via [`driver_profile`](Self::driver_profile).
@@ -174,7 +174,7 @@ impl GpuF64 {
         })
     }
 
-    /// Bridge to `ToadStool`'s `WgpuDevice` for all GPU primitives.
+    /// Bridge to `barraCuda`'s `WgpuDevice` for all GPU primitives.
     #[must_use]
     pub fn to_wgpu_device(&self) -> Arc<WgpuDevice> {
         self.wgpu_device.clone()
@@ -186,7 +186,7 @@ impl GpuF64 {
         &self.tensor_ctx
     }
 
-    /// `ToadStool` driver profile for this GPU.
+    /// `barraCuda` driver profile for this GPU.
     ///
     /// Provides driver-specific capabilities: f64 workarounds, optimal
     /// eigensolve strategy, latency model for `WgslOptimizer`.
@@ -197,7 +197,7 @@ impl GpuF64 {
 
     /// Whether the underlying GPU device has been lost.
     ///
-    /// Delegates to `WgpuDevice::is_lost()` (`ToadStool` S68+). When `true`,
+    /// Delegates to `WgpuDevice::is_lost()`. When `true`,
     /// callers should fall back to the CPU path — the GPU will not accept
     /// new work until the device is recreated.
     #[must_use]
@@ -212,7 +212,7 @@ impl GpuF64 {
             || self.driver_profile.needs_log_f64_workaround()
     }
 
-    /// Runtime precision strategy for this GPU (hotSpring S58 → `ToadStool` S67).
+    /// Runtime precision strategy for this GPU (`barraCuda` universal precision).
     ///
     /// `Native` = compute-class GPU with full-rate f64 (Titan V, V100, MI250X).
     /// `Hybrid` = consumer GPU with throttled f64 — bulk math routes through

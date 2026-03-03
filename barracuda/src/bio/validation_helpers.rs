@@ -126,7 +126,7 @@ fn stream_fasta_subsampled(
         if let Some(header) = line.strip_prefix('>') {
             if !current_id.is_empty() && !current_seq.is_empty() {
                 n_parsed += 1;
-                if n_parsed % nth == 0 {
+                if n_parsed.is_multiple_of(nth) {
                     if let Some(tax) = tax_map.get(&current_id) {
                         refs.push(ReferenceSeq {
                             id: std::mem::take(&mut current_id),
@@ -150,7 +150,7 @@ fn stream_fasta_subsampled(
 
     if !current_id.is_empty() && !current_seq.is_empty() {
         n_parsed += 1;
-        if n_parsed % nth == 0 {
+        if n_parsed.is_multiple_of(nth) {
             if let Some(tax) = tax_map.get(&current_id) {
                 refs.push(ReferenceSeq {
                     id: current_id,

@@ -1,6 +1,6 @@
 # wetSpring — BarraCuda Requirements
 
-**Last Updated**: March 2, 2026 (V92I ToadStool S87, pin `2dc26792`, 144 primitives consumed (264 ComputeDispatch ops), fully lean, 1,219 tests, full 5-tier GREEN on S87)
+**Last Updated**: March 3, 2026 (Phase 93, standalone barraCuda v0.3.1, 144 primitives consumed (264 ComputeDispatch ops), fully lean, 1,044 lib tests, full 5-tier GREEN)
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---

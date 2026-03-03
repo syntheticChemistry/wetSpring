@@ -4,14 +4,14 @@
 name = "wetspring-forge"
 version = "0.3.0"
 edition = "2024"
-rust-version = "1.85"
+rust-version = "1.87"
 description = "Hardware discovery and cross-substrate dispatch for wetSpring"
 license = "AGPL-3.0-or-later"
 
 # Workspace root is wetSpring/Cargo.toml.
 
 [dependencies]
-barracuda = { path = "../../../phase1/toadstool/crates/barracuda" }
+barracuda = { path = "../../../barraCuda/crates/barracuda" }
 tempfile = "3"
 wetspring-barracuda = { path = "../../barracuda", default-features = false }
 

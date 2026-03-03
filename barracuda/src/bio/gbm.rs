@@ -196,7 +196,7 @@ impl GbmClassifier {
 
     /// Number of boosting rounds (trees).
     #[must_use]
-    pub fn n_estimators(&self) -> usize {
+    pub const fn n_estimators(&self) -> usize {
         self.trees.len()
     }
 
@@ -327,6 +327,7 @@ impl GbmMultiClassifier {
 #[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
     fn stump_positive() -> GbmTree {
         // f[0] <= 0.5 → -1.0 (push toward class 0), else → 1.0 (push toward class 1)
@@ -358,7 +359,7 @@ mod tests {
             GbmClassifier::new(vec![stump_positive(), stump_feature1()], 0.1, 0.0, 2).unwrap();
         let pred = gbm.predict_proba(&[0.7, 0.7]);
         // score = 0.0 + 0.1*1.0 + 0.1*0.5 = 0.15
-        assert!((pred.raw_score - 0.15).abs() < 1e-10);
+        assert!((pred.raw_score - 0.15).abs() < tolerances::ANALYTICAL_LOOSE);
         assert!(pred.probability > 0.5);
         assert_eq!(pred.class, 1);
     }
@@ -369,7 +370,7 @@ mod tests {
             GbmClassifier::new(vec![stump_positive(), stump_feature1()], 0.1, 0.0, 2).unwrap();
         let pred = gbm.predict_proba(&[0.3, 0.3]);
         // score = 0.0 + 0.1*(-1.0) + 0.1*(-0.5) = -0.15
-        assert!((pred.raw_score - (-0.15)).abs() < 1e-10);
+        assert!((pred.raw_score - (-0.15)).abs() < tolerances::ANALYTICAL_LOOSE);
         assert!(pred.probability < 0.5);
         assert_eq!(pred.class, 0);
     }
@@ -387,7 +388,7 @@ mod tests {
         let gbm = GbmClassifier::new(vec![stump_positive()], 0.1, 2.0, 2).unwrap();
         let pred = gbm.predict_proba(&[0.3]);
         // score = 2.0 + 0.1*(-1.0) = 1.9 → sigmoid(1.9) ≈ 0.87
-        assert!((pred.raw_score - 1.9).abs() < 1e-10);
+        assert!((pred.raw_score - 1.9).abs() < tolerances::ANALYTICAL_LOOSE);
         assert_eq!(pred.class, 1); // bias pulls toward 1
     }
 
@@ -431,7 +432,7 @@ mod tests {
         assert_eq!(pred.class, 0); // f[0]=0.2 ≤ 0.3 → class0 gets +1.0
         assert_eq!(pred.probabilities.len(), 3);
         let sum: f64 = pred.probabilities.iter().sum();
-        assert!((sum - 1.0).abs() < 1e-10);
+        assert!((sum - 1.0).abs() < tolerances::ANALYTICAL_LOOSE);
     }
 
     #[test]
@@ -439,7 +440,7 @@ mod tests {
         let gbm =
             GbmClassifier::new(vec![stump_positive(), stump_feature1()], 0.1, 0.0, 2).unwrap();
         assert_eq!(gbm.n_estimators(), 2);
-        assert!((gbm.learning_rate() - 0.1).abs() < 1e-10);
+        assert!((gbm.learning_rate() - 0.1).abs() < tolerances::ANALYTICAL_LOOSE);
         assert_eq!(gbm.n_features(), 2);
     }
 
@@ -454,7 +455,7 @@ mod tests {
         let gbm = GbmClassifier::new(vec![single_leaf_stump()], 0.1, 0.0, 2).unwrap();
         let pred = gbm.predict_proba(&[0.0, 0.0]);
         assert_eq!(pred.class, 1);
-        assert!((pred.raw_score - 0.05).abs() < 1e-10);
+        assert!((pred.raw_score - 0.05).abs() < tolerances::ANALYTICAL_LOOSE);
     }
 
     #[test]
@@ -488,7 +489,7 @@ mod tests {
         let gbm =
             GbmClassifier::new(vec![stump_positive(), stump_feature1()], 0.0, 0.5, 2).unwrap();
         let pred = gbm.predict_proba(&[0.7, 0.7]);
-        assert!((pred.raw_score - 0.5).abs() < 1e-10);
+        assert!((pred.raw_score - 0.5).abs() < tolerances::ANALYTICAL_LOOSE);
     }
 
     #[test]
@@ -546,8 +547,8 @@ mod tests {
         let batch = gbm.predict_batch_proba(&[vec![0.3, 0.3], vec![0.7, 0.7]]);
         let single0 = gbm.predict_proba(&[0.3, 0.3]);
         let single1 = gbm.predict_proba(&[0.7, 0.7]);
-        assert!((batch[0].raw_score - single0.raw_score).abs() < 1e-15);
-        assert!((batch[1].raw_score - single1.raw_score).abs() < 1e-15);
+        assert!((batch[0].raw_score - single0.raw_score).abs() < tolerances::MATRIX_EPS);
+        assert!((batch[1].raw_score - single1.raw_score).abs() < tolerances::MATRIX_EPS);
     }
 
     #[test]

@@ -39,6 +39,7 @@ use wetspring_barracuda::bio::brain::{BioBrain, BioNautilusBrain, BioObservation
 use wetspring_barracuda::bio::esn::heads::{
     self, AttentionState, BioHeadGroupDisagreement, NUM_HEADS,
 };
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 struct DomainResult {
@@ -90,16 +91,36 @@ fn main() {
 
         let uniform = vec![0.5; NUM_HEADS];
         let d = BioHeadGroupDisagreement::from_outputs(&uniform);
-        v.check("Uniform delta_regime", d.delta_regime, 0.0, 1e-10);
-        v.check("Uniform delta_anomaly", d.delta_anomaly, 0.0, 1e-10);
-        v.check("Uniform urgency", d.urgency(), 0.0, 0.01);
+        v.check(
+            "Uniform delta_regime",
+            d.delta_regime,
+            0.0,
+            tolerances::BRAIN_DISAGREEMENT_ANALYTICAL,
+        );
+        v.check(
+            "Uniform delta_anomaly",
+            d.delta_anomaly,
+            0.0,
+            tolerances::BRAIN_DISAGREEMENT_ANALYTICAL,
+        );
+        v.check(
+            "Uniform urgency",
+            d.urgency(),
+            0.0,
+            tolerances::BRAIN_URGENCY_TOL,
+        );
 
         let mut divergent = vec![0.5; NUM_HEADS];
         divergent[heads::A0_DIVERSITY_REGIME] = 0.0;
         divergent[heads::B0_SHANNON_REGIME] = 1.0;
         divergent[heads::C0_UNIFRAC_REGIME] = 0.5;
         let d = BioHeadGroupDisagreement::from_outputs(&divergent);
-        v.check("Regime divergence = 1.0", d.delta_regime, 1.0, 1e-10);
+        v.check(
+            "Regime divergence = 1.0",
+            d.delta_regime,
+            1.0,
+            tolerances::BRAIN_DISAGREEMENT_ANALYTICAL,
+        );
         v.check_pass("Regime divergence urgency > 0.1", d.urgency() > 0.1);
 
         let mut phase_max = vec![0.5; NUM_HEADS];
@@ -293,14 +314,14 @@ fn main() {
             let fi = f64::from(i);
             let obs = BioObservation {
                 sample_id: format!("exp272_naut_{i:02}"),
-                shannon: 1.0 + fi * 0.5,
-                simpson: 0.5 + fi * 0.03,
-                evenness: 0.4 + fi * 0.05,
-                chao1: 50.0 + fi * 20.0,
-                bray_curtis_mean: 0.3 + fi * 0.02,
-                anderson_w: 2.0 + fi * 0.5,
+                shannon: fi.mul_add(0.5, 1.0),
+                simpson: fi.mul_add(0.03, 0.5),
+                evenness: fi.mul_add(0.05, 0.4),
+                chao1: fi.mul_add(20.0, 50.0),
+                bray_curtis_mean: fi.mul_add(0.02, 0.3),
+                anderson_w: fi.mul_add(0.5, 2.0),
                 anderson_phase: if fi < 5.0 { 0.2 } else { 0.8 },
-                amr_load: 0.05 + fi * 0.01,
+                amr_load: fi.mul_add(0.01, 0.05),
             };
             nautilus.observe(&obs);
         }
@@ -319,7 +340,7 @@ fn main() {
             v.check_pass("Predicted health finite", health.is_finite());
         }
 
-        let candidates: Vec<f64> = (0..10).map(|i| 1.0 + f64::from(i) * 0.5).collect();
+        let candidates: Vec<f64> = (0..10).map(|i| f64::from(i).mul_add(0.5, 1.0)).collect();
         let screened = nautilus.screen_candidates(&candidates);
         v.check_count("Screening returns all", screened.len(), candidates.len());
 
@@ -349,10 +370,10 @@ fn main() {
             let is_anomaly = (6..=10).contains(&step);
             let obs = BioObservation {
                 sample_id: format!("pipeline_{step:02}"),
-                shannon: 2.5 + fi * 0.1 + if is_anomaly { -1.5 } else { 0.0 },
-                simpson: 0.7 + fi * 0.01,
-                evenness: 0.6 + fi * 0.015,
-                chao1: 80.0 + fi * 5.0,
+                shannon: fi.mul_add(0.1, 2.5) + if is_anomaly { -1.5 } else { 0.0 },
+                simpson: fi.mul_add(0.01, 0.7),
+                evenness: fi.mul_add(0.015, 0.6),
+                chao1: fi.mul_add(5.0, 80.0),
                 bray_curtis_mean: 0.35,
                 anderson_w: 3.0 + if is_anomaly { 5.0 } else { 0.0 },
                 anderson_phase: if is_anomaly { 0.1 } else { 0.7 },

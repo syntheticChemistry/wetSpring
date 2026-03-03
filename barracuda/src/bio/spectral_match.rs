@@ -202,7 +202,7 @@ mod tests {
         let mz = vec![100.0, 200.0, 300.0];
         let int = vec![50.0, 100.0, 75.0];
         let result = cosine_similarity(&mz, &int, &mz, &int, 0.5);
-        assert!((result.score - 1.0).abs() < 1e-10);
+        assert!((result.score - 1.0).abs() < crate::tolerances::ANALYTICAL_LOOSE);
         assert_eq!(result.matched_peaks, 3);
     }
 
@@ -213,7 +213,7 @@ mod tests {
         let r_mz = vec![500.0, 600.0]; // No overlap
         let r_int = vec![50.0, 100.0];
         let result = cosine_similarity(&q_mz, &q_int, &r_mz, &r_int, 0.5);
-        assert!((result.score).abs() < 1e-10);
+        assert!((result.score).abs() < crate::tolerances::ANALYTICAL_LOOSE);
         assert_eq!(result.matched_peaks, 0);
     }
 
@@ -243,7 +243,7 @@ mod tests {
         // Loose tolerance: match
         let loose = cosine_similarity(&q_mz, &q_int, &r_mz, &r_int, 0.5);
         assert_eq!(loose.matched_peaks, 1);
-        assert!((loose.score - 1.0).abs() < 1e-10);
+        assert!((loose.score - 1.0).abs() < crate::tolerances::ANALYTICAL_LOOSE);
     }
 
     #[test]
@@ -257,7 +257,7 @@ mod tests {
         let mz = vec![100.0, 200.0, 300.0];
         let int = vec![50.0, 100.0, 75.0];
         let result = cosine_similarity_weighted(&mz, &int, &mz, &int, 0.5, 0.0, 0.5);
-        assert!((result.score - 1.0).abs() < 1e-10);
+        assert!((result.score - 1.0).abs() < crate::tolerances::ANALYTICAL_LOOSE);
     }
 
     #[test]
@@ -269,7 +269,7 @@ mod tests {
         ];
         let scores = pairwise_cosine(&spectra, 0.5);
         assert_eq!(scores.len(), 3); // 3*(3-1)/2
-        assert!((scores[0] - 1.0).abs() < 1e-10); // (1,0) identical
+        assert!((scores[0] - 1.0).abs() < crate::tolerances::ANALYTICAL_LOOSE); // (1,0) identical
         assert!(scores[1] < 0.01); // (2,0) no overlap
         assert!(scores[2] < 0.01); // (2,1) no overlap
     }

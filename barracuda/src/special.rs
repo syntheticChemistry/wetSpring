@@ -75,30 +75,38 @@ mod tests {
 
     #[test]
     fn erf_known_values() {
-        assert!(erf(0.0).abs() < 5e-7, "erf(0) ≈ 0, got {}", erf(0.0));
-        assert!((erf(1.0) - 0.842_700_792_949_715).abs() < 5e-7);
-        assert!((erf(-1.0) + 0.842_700_792_949_715).abs() < 5e-7);
+        assert!(
+            erf(0.0).abs() < crate::tolerances::ERF_PARITY,
+            "erf(0) ≈ 0, got {}",
+            erf(0.0)
+        );
+        assert!((erf(1.0) - 0.842_700_792_949_715).abs() < crate::tolerances::ERF_PARITY);
+        assert!((erf(-1.0) + 0.842_700_792_949_715).abs() < crate::tolerances::ERF_PARITY);
         assert!(erf(3.0) > 0.999_9, "erf(3) near 1, got {}", erf(3.0));
-        assert!((erf(-3.0) + 1.0).abs() < 1e-4);
+        assert!((erf(-3.0) + 1.0).abs() < crate::tolerances::NORM_CDF_TAIL);
     }
 
     #[test]
     fn normal_cdf_known_values() {
         assert!((normal_cdf(0.0) - 0.5).abs() < 1e-7);
-        assert!((normal_cdf(1.96) - 0.975).abs() < 1e-3);
-        assert!(normal_cdf(-4.0) < 1e-4);
+        assert!((normal_cdf(1.96) - 0.975).abs() < crate::tolerances::NORM_CDF_PARITY);
+        assert!(normal_cdf(-4.0) < crate::tolerances::NORM_CDF_TAIL);
         assert!(normal_cdf(4.0) > 0.9999);
     }
 
     #[test]
     fn ln_gamma_known_values() {
-        assert!(ln_gamma(1.0).abs() < 1e-10, "Γ(1) = 1, ln(1) = 0");
         assert!(
-            (ln_gamma(5.0) - 24.0_f64.ln()).abs() < 1e-10,
+            ln_gamma(1.0).abs() < crate::tolerances::ANALYTICAL_LOOSE,
+            "Γ(1) = 1, ln(1) = 0"
+        );
+        assert!(
+            (ln_gamma(5.0) - 24.0_f64.ln()).abs() < crate::tolerances::ANALYTICAL_LOOSE,
             "Γ(5) = 4! = 24"
         );
         assert!(
-            (ln_gamma(0.5) - std::f64::consts::PI.sqrt().ln()).abs() < 1e-10,
+            (ln_gamma(0.5) - std::f64::consts::PI.sqrt().ln()).abs()
+                < crate::tolerances::ANALYTICAL_LOOSE,
             "Γ(0.5) = √π"
         );
     }
@@ -119,7 +127,7 @@ mod tests {
     #[test]
     fn regularized_gamma_right_tail() {
         let val = regularized_gamma_lower(1.0, 300.0);
-        assert!((val - 1.0).abs() < 1e-10);
+        assert!((val - 1.0).abs() < crate::tolerances::ANALYTICAL_LOOSE);
     }
 
     #[test]
@@ -132,7 +140,7 @@ mod tests {
         let val = regularized_gamma_lower(1.0, 1.0);
         let expected = 1.0 - (-1.0_f64).exp();
         assert!(
-            (val - expected).abs() < 1e-10,
+            (val - expected).abs() < crate::tolerances::ANALYTICAL_LOOSE,
             "P(1,1) = {val}, expected {expected}"
         );
     }
@@ -145,14 +153,23 @@ mod tests {
 
     #[test]
     fn erf_large_argument() {
-        assert!((erf(6.0) - 1.0).abs() < 1e-10, "erf(6) ≈ 1");
-        assert!((erf(-6.0) + 1.0).abs() < 1e-10, "erf(-6) ≈ -1");
+        assert!(
+            (erf(6.0) - 1.0).abs() < crate::tolerances::ANALYTICAL_LOOSE,
+            "erf(6) ≈ 1"
+        );
+        assert!(
+            (erf(-6.0) + 1.0).abs() < crate::tolerances::ANALYTICAL_LOOSE,
+            "erf(-6) ≈ -1"
+        );
     }
 
     #[test]
     fn erf_symmetry() {
         for &x in &[0.5, 1.0, 2.0, 3.5] {
-            assert!((erf(x) + erf(-x)).abs() < 1e-12, "erf is odd");
+            assert!(
+                (erf(x) + erf(-x)).abs() < crate::tolerances::ANALYTICAL_F64,
+                "erf is odd"
+            );
         }
     }
 
@@ -174,7 +191,7 @@ mod tests {
 
     #[test]
     fn l2_norm_3_4_5() {
-        assert!((l2_norm(&[3.0, 4.0]) - 5.0).abs() < 1e-12);
+        assert!((l2_norm(&[3.0, 4.0]) - 5.0).abs() < crate::tolerances::ANALYTICAL_F64);
     }
 
     #[test]

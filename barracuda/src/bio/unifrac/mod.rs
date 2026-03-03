@@ -36,6 +36,7 @@ mod tests {
     use std::collections::HashMap;
 
     use super::*;
+    use crate::tolerances;
 
     fn simple_tree() -> PhyloTree {
         PhyloTree::from_newick("((A:0.1,B:0.2):0.3,(C:0.4,D:0.5):0.6)")
@@ -61,13 +62,13 @@ mod tests {
 
         let d = unweighted_unifrac(&tree, &sample, &sample);
         assert!(
-            (d - 0.0).abs() < 1e-10,
+            (d - 0.0).abs() < tolerances::ANALYTICAL_LOOSE,
             "identical samples should have distance 0, got {d}"
         );
 
         let d = weighted_unifrac(&tree, &sample, &sample);
         assert!(
-            (d - 0.0).abs() < 1e-10,
+            (d - 0.0).abs() < tolerances::ANALYTICAL_LOOSE,
             "identical samples should have distance 0, got {d}"
         );
     }
@@ -113,11 +114,13 @@ mod tests {
         let mut sa: HashMap<String, f64> = HashMap::new();
         sa.insert("A".to_string(), 10.0);
 
-        assert!((unweighted_unifrac(&tree, &empty, &empty) - 0.0).abs() < 1e-10);
+        assert!(
+            (unweighted_unifrac(&tree, &empty, &empty) - 0.0).abs() < tolerances::ANALYTICAL_LOOSE
+        );
 
         let d = weighted_unifrac(&tree, &sa, &empty);
         assert!(
-            (d - 1.0).abs() < 1e-10,
+            (d - 1.0).abs() < tolerances::ANALYTICAL_LOOSE,
             "one empty should give distance 1.0, got {d}"
         );
     }
@@ -175,7 +178,7 @@ mod tests {
 
         let d = unweighted_unifrac(&tree, &sa, &sb);
         assert!(
-            (d - 1.0).abs() < 1e-10,
+            (d - 1.0).abs() < tolerances::ANALYTICAL_LOOSE,
             "completely disjoint on star tree should be 1.0, got {d}"
         );
     }
@@ -198,7 +201,8 @@ mod tests {
             );
         }
         assert!(
-            (restored.total_branch_length() - tree.total_branch_length()).abs() < 1e-12,
+            (restored.total_branch_length() - tree.total_branch_length()).abs()
+                < tolerances::ANALYTICAL_F64,
             "branch length mismatch"
         );
     }
@@ -219,14 +223,14 @@ mod tests {
         let d_orig = unweighted_unifrac(&tree, &sa, &sb);
         let d_flat = unweighted_unifrac(&restored, &sa, &sb);
         assert!(
-            (d_orig - d_flat).abs() < 1e-12,
+            (d_orig - d_flat).abs() < tolerances::ANALYTICAL_F64,
             "unweighted UniFrac mismatch: {d_orig} vs {d_flat}"
         );
 
         let d_orig_w = weighted_unifrac(&tree, &sa, &sb);
         let d_flat_w = weighted_unifrac(&restored, &sa, &sb);
         assert!(
-            (d_orig_w - d_flat_w).abs() < 1e-12,
+            (d_orig_w - d_flat_w).abs() < tolerances::ANALYTICAL_F64,
             "weighted UniFrac mismatch: {d_orig_w} vs {d_flat_w}"
         );
     }
@@ -251,7 +255,10 @@ mod tests {
         assert_eq!(n_leaves, 4);
         assert_eq!(matrix.len(), 8);
         let total: f64 = matrix.iter().sum();
-        assert!((total - 26.0).abs() < 1e-10, "total abundance mismatch");
+        assert!(
+            (total - 26.0).abs() < tolerances::ANALYTICAL_LOOSE,
+            "total abundance mismatch"
+        );
     }
 
     #[test]

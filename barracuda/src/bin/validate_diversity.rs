@@ -155,7 +155,6 @@ fn validate_bray_curtis_matrix(v: &mut Validator) {
     community.extend(std::iter::repeat_n(1.0, 20));
     community.extend(std::iter::repeat_n(2.0, 10));
 
-    let sample_a: Vec<f64> = community.clone();
     let sample_b: Vec<f64> = community.iter().map(|&c| c.mul_add(0.8, 5.0)).collect();
     let sample_c: Vec<f64> = community
         .iter()
@@ -163,7 +162,7 @@ fn validate_bray_curtis_matrix(v: &mut Validator) {
         .map(|(i, &c)| if i % 2 == 0 { c * 2.0 } else { 0.5 })
         .collect();
 
-    let dm = diversity::bray_curtis_matrix(&[sample_a, sample_b, sample_c]);
+    let dm = diversity::bray_curtis_matrix(&[community, sample_b, sample_c]);
 
     println!(
         "  BC(A,B) = {:.4}, BC(A,C) = {:.4}, BC(B,C) = {:.4}",

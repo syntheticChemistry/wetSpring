@@ -46,7 +46,7 @@ mod tests {
         let q = 30.0;
         let p = phred_to_error_prob(q);
         let q2 = error_prob_to_phred(p);
-        assert!((q - q2).abs() < 1e-12);
+        assert!((q - q2).abs() < crate::tolerances::ANALYTICAL_F64);
     }
 
     #[test]
@@ -59,7 +59,7 @@ mod tests {
 
     #[test]
     fn phred_q0_is_one() {
-        assert!((phred_to_error_prob(0.0) - 1.0).abs() < 1e-15);
+        assert!((phred_to_error_prob(0.0) - 1.0).abs() < crate::tolerances::MATRIX_EPS);
     }
 
     #[test]

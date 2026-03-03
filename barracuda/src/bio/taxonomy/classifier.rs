@@ -64,7 +64,9 @@ impl NaiveBayesClassifier {
         let n_kmers_total = all_kmers.len();
         let n_taxa = taxon_labels.len();
         #[allow(clippy::cast_precision_loss)]
-        let default_log_p = (0.5 / (n_kmers_total.max(1) as f64 + 1.0)).max(1e-300).ln();
+        let default_log_p = (0.5 / (n_kmers_total.max(1) as f64 + 1.0))
+            .max(crate::tolerances::LOG_PROB_FLOOR)
+            .ln();
 
         let mut dense_log_probs = vec![default_log_p; n_taxa * kmer_space];
         for (ti, (sparse, count)) in taxon_sparse.iter().zip(taxon_counts.iter()).enumerate() {
@@ -72,7 +74,8 @@ impl NaiveBayesClassifier {
             let row_start = ti * kmer_space;
             for (&kmer, &presence) in sparse {
                 let p = (presence as f64 + 0.5) / (n_refs + 1.0);
-                dense_log_probs[row_start + kmer as usize] = p.max(1e-300).ln();
+                dense_log_probs[row_start + kmer as usize] =
+                    p.max(crate::tolerances::LOG_PROB_FLOOR).ln();
             }
         }
 
@@ -82,7 +85,10 @@ impl NaiveBayesClassifier {
             .iter()
             .map(|&c| c as f64 / total_refs)
             .collect();
-        let log_priors: Vec<f64> = taxon_priors.iter().map(|&p| p.max(1e-300).ln()).collect();
+        let log_priors: Vec<f64> = taxon_priors
+            .iter()
+            .map(|&p| p.max(crate::tolerances::LOG_PROB_FLOOR).ln())
+            .collect();
 
         Self {
             k,
@@ -122,7 +128,7 @@ impl NaiveBayesClassifier {
 
     /// Number of taxa in the classifier.
     #[must_use]
-    pub fn n_taxa(&self) -> usize {
+    pub const fn n_taxa(&self) -> usize {
         self.taxon_labels.len()
     }
 

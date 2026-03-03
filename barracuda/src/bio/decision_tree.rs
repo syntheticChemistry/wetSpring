@@ -118,7 +118,7 @@ impl DecisionTree {
 
     /// Number of nodes in the tree.
     #[must_use]
-    pub fn n_nodes(&self) -> usize {
+    pub const fn n_nodes(&self) -> usize {
         self.nodes.len()
     }
 

@@ -299,7 +299,7 @@ mod tests {
         let (_, stats) = dereplicate(&records, DerepSort::Abundance, 0);
         assert_eq!(stats.unique_sequences, 4);
         assert_eq!(stats.singletons, 4);
-        assert!((stats.mean_abundance - 1.0).abs() < 1e-10);
+        assert!((stats.mean_abundance - 1.0).abs() < crate::tolerances::ANALYTICAL_LOOSE);
     }
 
     #[test]

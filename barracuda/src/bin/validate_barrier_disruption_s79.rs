@@ -148,12 +148,11 @@ fn main() {
 
         // Check if any depth crosses midpoint
         let transition_depth = rs.iter().find(|(_, r)| *r > midpoint);
+        println!("  │  ");
         if let Some((lz, r)) = transition_depth {
-            println!("  │  ");
             println!("  │  Transition at Lz={lz}: r={r:.4} > midpoint={midpoint:.4}");
             v.check_pass("Dimensional promotion transition found", true);
         } else {
-            println!("  │  ");
             println!("  │  No transition in this W — all depths localized");
             v.check_pass("Consistent regime across depths", true);
         }

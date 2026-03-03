@@ -122,7 +122,7 @@ fn main() {
     let communities: Vec<Vec<f64>> = (0..n_comm)
         .map(|s| {
             (0..n_features)
-                .map(|j| f64::from(((s * 7 + j * 3 + 1) % 40 + 1) as i32))
+                .map(|j| f64::from((s * 7 + j * 3 + 1) % 40 + 1))
                 .collect()
         })
         .collect();
@@ -205,9 +205,9 @@ fn main() {
 
     // ═══ D06: GemmCached — Device-Cached B Matrix ═══════════════════
     v.section("D06: GemmCached — Device-Cached B Matrix");
-    let cached = GemmCached::new(Arc::clone(&device), ctx.clone());
-    let ca: Vec<f64> = (0..64).map(|i| f64::from(i as i32) * 0.01).collect();
-    let cb: Vec<f64> = (0..32).map(|i| f64::from(i as i32) * 0.01).collect();
+    let cached = GemmCached::new(Arc::clone(&device), ctx);
+    let ca: Vec<f64> = (0..64).map(|i| f64::from(i) * 0.01).collect();
+    let cb: Vec<f64> = (0..32).map(|i| f64::from(i) * 0.01).collect();
     match cached.execute(&ca, &cb, 8, 8, 4, 1) {
         Ok(gc) => {
             v.check_pass(
@@ -221,9 +221,7 @@ fn main() {
 
     // ═══ D07: NMF — barracuda::linalg::nmf ═════════════════════════
     v.section("D07: NMF — Non-Negative Matrix Factorization");
-    let nmf_data: Vec<f64> = (0..100)
-        .map(|i| (f64::from(i as i32) * 0.1).abs() + 0.1)
-        .collect();
+    let nmf_data: Vec<f64> = (0..100).map(|i| (f64::from(i) * 0.1).abs() + 0.1).collect();
     let nmf_cfg = NmfConfig {
         rank: 3,
         max_iter: 100,
@@ -357,7 +355,7 @@ fn main() {
 
     // ═══ D15: Regression Model Selection ════════════════════════════
     v.section("D15: Regression — fit_all");
-    let x: Vec<f64> = (1..=20).map(|i| f64::from(i as i32)).collect();
+    let x: Vec<f64> = (1..=20).map(f64::from).collect();
     let y: Vec<f64> = x
         .iter()
         .map(|xi| 2.0 * xi + 1.0 + (xi * 0.1).sin())

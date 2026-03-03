@@ -453,7 +453,7 @@ fn load_silva_classifier(ref_dir: &Path) -> Option<NaiveBayesClassifier> {
         if let Some(header) = line.strip_prefix('>') {
             if !current_id.is_empty() && !current_seq.is_empty() {
                 n_parsed += 1;
-                if n_parsed % 87 == 0 {
+                if n_parsed.is_multiple_of(87) {
                     if let Some(tax) = tax_map.get(&current_id) {
                         refs.push(ReferenceSeq {
                             id: current_id.clone(),
@@ -476,7 +476,7 @@ fn load_silva_classifier(ref_dir: &Path) -> Option<NaiveBayesClassifier> {
     }
     if !current_id.is_empty() && !current_seq.is_empty() {
         n_parsed += 1;
-        if n_parsed % 87 == 0 {
+        if n_parsed.is_multiple_of(87) {
             if let Some(tax) = tax_map.get(&current_id) {
                 refs.push(ReferenceSeq {
                     id: current_id,

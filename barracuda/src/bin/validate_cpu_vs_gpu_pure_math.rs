@@ -99,11 +99,10 @@ fn main() {
                 cpu_obs,
                 tolerances::GPU_VS_CPU_F64,
             );
-            s1 += 1;
         } else {
             v.check_pass(&format!("GPU unavailable for n={n} — CPU valid"), true);
-            s1 += 1;
         }
+        s1 += 1;
 
         if n == sizes[0] {
             timings.push(Timing {

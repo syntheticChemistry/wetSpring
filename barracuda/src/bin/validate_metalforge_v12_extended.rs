@@ -405,7 +405,7 @@ fn main() {
             diversity::shannon(
                 &counts
                     .iter()
-                    .map(|&c| c + f64::from(i) * 0.1)
+                    .map(|&c| f64::from(i).mul_add(0.1, c))
                     .collect::<Vec<_>>(),
             )
         })

@@ -407,9 +407,15 @@ mod tests {
     #[test]
     fn jc69_transition_probabilities() {
         let p_same = jc69_prob(0, 0, 0.0, 1.0);
-        assert!((p_same - 1.0).abs() < 1e-12, "zero branch → identity");
+        assert!(
+            (p_same - 1.0).abs() < crate::tolerances::ANALYTICAL_F64,
+            "zero branch → identity"
+        );
         let p_diff = jc69_prob(0, 1, 0.0, 1.0);
-        assert!(p_diff.abs() < 1e-12, "zero branch → no change");
+        assert!(
+            p_diff.abs() < crate::tolerances::ANALYTICAL_F64,
+            "zero branch → no change"
+        );
 
         let p_large = jc69_prob(0, 0, 1000.0, 1.0);
         assert!((p_large - 0.25).abs() < 1e-6, "long branch → uniform");
@@ -420,7 +426,10 @@ mod tests {
         let mat = transition_matrix(0.5, 1.0);
         for row in &mat {
             let sum: f64 = row.iter().sum();
-            assert!((sum - 1.0).abs() < 1e-12, "row sum={sum}");
+            assert!(
+                (sum - 1.0).abs() < crate::tolerances::ANALYTICAL_F64,
+                "row sum={sum}"
+            );
         }
     }
 
@@ -464,7 +473,7 @@ mod tests {
         let per_site = site_log_likelihoods(&tree, 1.0);
         let sum: f64 = per_site.iter().sum();
         assert!(
-            (total - sum).abs() < 1e-12,
+            (total - sum).abs() < crate::tolerances::ANALYTICAL_F64,
             "per-site sum should equal total: {sum} vs {total}"
         );
     }
@@ -528,7 +537,7 @@ mod tests {
         let ll_recursive = log_likelihood(&tree, 1.0);
         let ll_flat = flat.log_likelihood();
         assert!(
-            (ll_recursive - ll_flat).abs() < 1e-12,
+            (ll_recursive - ll_flat).abs() < crate::tolerances::ANALYTICAL_F64,
             "flat should match recursive: {ll_flat} vs {ll_recursive}"
         );
     }
@@ -542,7 +551,7 @@ mod tests {
         assert_eq!(recursive.len(), flat_sites.len());
         for (r, f) in recursive.iter().zip(&flat_sites) {
             assert!(
-                (r - f).abs() < 1e-12,
+                (r - f).abs() < crate::tolerances::ANALYTICAL_F64,
                 "site LL mismatch: recursive={r} flat={f}"
             );
         }
@@ -594,7 +603,7 @@ mod tests {
         let ll_r = log_likelihood(&tree, 1.0);
         let ll_f = flat.log_likelihood();
         assert!(
-            (ll_r - ll_f).abs() < 1e-12,
+            (ll_r - ll_f).abs() < crate::tolerances::ANALYTICAL_F64,
             "12-site flat must match recursive: {ll_f} vs {ll_r}"
         );
     }

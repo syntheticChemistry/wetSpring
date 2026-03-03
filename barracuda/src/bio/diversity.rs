@@ -164,7 +164,7 @@ mod tests {
         // 4 equally abundant species: H = ln(4)
         let counts = vec![25.0, 25.0, 25.0, 25.0];
         let h = shannon(&counts);
-        assert!((h - 4.0_f64.ln()).abs() < 1e-10);
+        assert!((h - 4.0_f64.ln()).abs() < crate::tolerances::ANALYTICAL_LOOSE);
     }
 
     #[test]
@@ -177,7 +177,7 @@ mod tests {
     fn test_simpson_uniform() {
         // 4 equally abundant: Simpson = 1 - 4*(0.25)^2 = 0.75
         let counts = vec![25.0, 25.0, 25.0, 25.0];
-        assert!((simpson(&counts) - 0.75).abs() < 1e-10);
+        assert!((simpson(&counts) - 0.75).abs() < crate::tolerances::ANALYTICAL_LOOSE);
     }
 
     #[test]
@@ -218,7 +218,7 @@ mod tests {
         let b = vec![15.0, 10.0, 25.0, 5.0, 0.0];
         let bc_ab = bray_curtis(&a, &b);
         let bc_ba = bray_curtis(&b, &a);
-        assert!((bc_ab - bc_ba).abs() < 1e-15);
+        assert!((bc_ab - bc_ba).abs() < crate::tolerances::MATRIX_EPS);
     }
 
     #[test]
@@ -236,7 +236,7 @@ mod tests {
     fn test_pielou_uniform() {
         // Perfectly even community: J' = 1.0
         let counts = vec![25.0; 4];
-        assert!((pielou_evenness(&counts) - 1.0).abs() < 1e-10);
+        assert!((pielou_evenness(&counts) - 1.0).abs() < crate::tolerances::ANALYTICAL_LOOSE);
     }
 
     #[test]
@@ -260,7 +260,7 @@ mod tests {
         let counts = vec![10.0, 20.0, 30.0, 5.0];
         let total: f64 = counts.iter().sum();
         let curve = rarefaction_curve(&counts, &[total]);
-        assert!((curve[0] - 4.0).abs() < 1e-10);
+        assert!((curve[0] - 4.0).abs() < crate::tolerances::ANALYTICAL_LOOSE);
     }
 
     #[test]
@@ -279,7 +279,7 @@ mod tests {
 
         for i in 1..curve.len() {
             assert!(
-                curve[i] >= curve[i - 1] - 1e-10,
+                curve[i] >= curve[i - 1] - crate::tolerances::ANALYTICAL_LOOSE,
                 "rarefaction curve not monotonic at depth {}",
                 depths[i]
             );
@@ -299,7 +299,7 @@ mod tests {
         let counts = vec![100.0, 0.0, 0.0];
         let curve = rarefaction_curve(&counts, &[1.0, 50.0, 100.0]);
         for &val in &curve {
-            assert!((val - 1.0).abs() < 1e-10);
+            assert!((val - 1.0).abs() < crate::tolerances::ANALYTICAL_LOOSE);
         }
     }
 
@@ -308,9 +308,9 @@ mod tests {
         let counts = vec![25.0; 4];
         let ad = alpha_diversity(&counts);
         assert!((ad.observed - 4.0).abs() < f64::EPSILON);
-        assert!((ad.shannon - 4.0_f64.ln()).abs() < 1e-10);
-        assert!((ad.simpson - 0.75).abs() < 1e-10);
-        assert!((ad.evenness - 1.0).abs() < 1e-10);
+        assert!((ad.shannon - 4.0_f64.ln()).abs() < crate::tolerances::ANALYTICAL_LOOSE);
+        assert!((ad.simpson - 0.75).abs() < crate::tolerances::ANALYTICAL_LOOSE);
+        assert!((ad.evenness - 1.0).abs() < crate::tolerances::ANALYTICAL_LOOSE);
     }
 
     #[test]
@@ -343,7 +343,7 @@ mod tests {
         let counts = vec![10.0, 20.0, 30.0, 1.0, 1.0, 2.0];
         let c = chao1(&counts);
         // Chao1 = 6 + 2*(2-1)/(2*(1+1)) = 6 + 2/4 = 6.5
-        assert!((c - 6.5).abs() < 1e-10);
+        assert!((c - 6.5).abs() < crate::tolerances::ANALYTICAL_LOOSE);
     }
 
     #[test]
@@ -374,7 +374,7 @@ mod tests {
         let counts = vec![10.0, 20.0, 1.0, 1.0, 1.0];
         let c = chao1(&counts);
         // S_obs=5, f1=3, f2=0 → Chao1 = 5 + 3*2 / (2*1) = 5 + 3 = 8
-        assert!((c - 8.0).abs() < 1e-10);
+        assert!((c - 8.0).abs() < crate::tolerances::ANALYTICAL_LOOSE);
     }
 }
 
@@ -430,7 +430,7 @@ mod proptests {
             let b: Vec<f64> = a.iter().map(|x| x + 1.0).collect();
             let ab = bray_curtis(&a, &b);
             let ba = bray_curtis(&b, &a);
-            prop_assert!((ab - ba).abs() < 1e-12, "BC not symmetric: {ab} != {ba}");
+            prop_assert!((ab - ba).abs() < crate::tolerances::ANALYTICAL_F64, "BC not symmetric: {ab} != {ba}");
         }
 
         #[test]

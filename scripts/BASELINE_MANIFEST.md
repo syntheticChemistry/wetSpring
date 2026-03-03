@@ -33,21 +33,31 @@ cargo run --bin <binary>               # Rust must match within tolerance
 
 All baselines were generated and frozen on the following environment:
 
+- **Hardware:** Eastgate i9-12900K, 64 GB DDR5, NVIDIA RTX 4070 (Ada)
+- **OS:** Pop!_OS 22.04 (Ubuntu 22.04 base, x86_64, kernel 6.17.9)
 - **Python:** 3.11+ (CPython)
-- **OS:** Ubuntu 22.04 / Debian 12 (x86_64)
 - **NumPy:** 1.26+ (where used)
 - **SciPy:** 1.12+ (where used — ODE, peaks, integration)
 - **Galaxy:** quay.io/galaxy/galaxy:latest (Exp001 only, with qiime2-2026 conda env)
 - **Baseline freeze:** commit `48fb787` (2026-02-23)
 
-Standard reproduction for most scripts (no special environment):
+### Standard reproduction command (most scripts)
 
 ```bash
 cd /path/to/wetSpring
 python3 scripts/<script>.py
 ```
 
-For Exp001 (Galaxy/QIIME2), see `validate_exp001.py` for container instructions.
+### Per-script command exceptions
+
+| Script | Exact command | Notes |
+|--------|--------------|-------|
+| `validate_exp001.py` | `docker run ... && conda activate qiime2-2026 && python3 scripts/validate_exp001.py` | Galaxy container + QIIME2 conda env |
+| `validate_track2.py` | `python3 -m venv .venv && source .venv/bin/activate && pip install asari findpfas && python3 scripts/validate_track2.py` | Requires asari 1.13.1 + FindPFAS venv |
+| `run_exp002.py` | `python3 scripts/run_exp002.py --accession PRJNA488170` | SRA download utility, not a baseline |
+| All others | `python3 scripts/<script>.py` | No special environment |
+
+For Exp001 (Galaxy/QIIME2), see `validate_exp001.py` for full container instructions.
 For Track 2 (asari/FindPFAS), see `validate_track2.py` for venv instructions.
 
 ## Automated Drift Verification

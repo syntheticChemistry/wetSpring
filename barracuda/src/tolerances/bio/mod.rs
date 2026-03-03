@@ -3,6 +3,7 @@
 
 mod alignment;
 mod anderson;
+mod brain;
 mod diversity;
 mod esn;
 mod misc;
@@ -12,6 +13,7 @@ mod phylogeny;
 
 pub use alignment::*;
 pub use anderson::*;
+pub use brain::*;
 pub use diversity::*;
 pub use esn::*;
 pub use misc::*;

@@ -307,8 +307,8 @@ fn validate_merge_pairs(v: &mut Validator) {
     v.check_count("Mismatches", result.mismatches, 0);
 
     // Batch test: 10 identical pairs
-    let fwd_batch: Vec<_> = (0..10).map(|_| fwd.clone()).collect();
-    let rev_batch: Vec<_> = (0..10).map(|_| rev.clone()).collect();
+    let fwd_batch: Vec<_> = std::iter::repeat_with(|| fwd.clone()).take(10).collect();
+    let rev_batch: Vec<_> = std::iter::repeat_with(|| rev.clone()).take(10).collect();
     let (_merged_batch, stats) =
         merge_pairs::merge_pairs(&fwd_batch, &rev_batch, &merge_pairs::MergeParams::default());
 

@@ -73,7 +73,6 @@ fn main() {
     ];
 
     let mut cpu_shannons = Vec::new();
-    let mut cpu_simpsons = Vec::new();
 
     for (comm, name) in communities.iter().zip(track_names.iter()) {
         let (h, ms) = validation::bench(|| diversity::shannon(comm));
@@ -81,7 +80,6 @@ fn main() {
         v.check_pass(&format!("{name}: Shannon > 0"), h > 0.0);
         v.check_pass(&format!("{name}: Simpson ∈ (0,1)"), s > 0.0 && s < 1.0);
         cpu_shannons.push(h);
-        cpu_simpsons.push(s);
         println!("  {name}: H={h:.4}, S={s:.4} ({ms:.2} ms)");
     }
 

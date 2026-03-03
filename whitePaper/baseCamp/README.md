@@ -1,8 +1,8 @@
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** March 2, 2026
+**Date:** March 3, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 92J — 280 experiments, 8,241+ validation checks, ALL PASS; 1,219 tests, 268 binaries (provenance headers on all), ToadStool S87 (`2dc26792`), 144 primitives consumed (264 ComputeDispatch ops), 0 local WGSL, 103 named tolerances, 0 unsafe code, 0 panics in library, clippy pedantic CLEAN (`--all-features -W clippy::pedantic`). V92J: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147). Full 5-tier chain (Exp298, 499 checks). 54 metalForge workloads. All 58 papers have experiments, 52 + 6 reproduced with full three-tier + paper-math chain
+**Status:** Phase 93 — 280 experiments, 8,241+ validation checks, ALL PASS; 1,044 lib tests, 268 binaries, standalone `barraCuda` v0.3.1 (767+ WGSL shaders), 144 primitives consumed, 0 local WGSL, 106 named tolerances, 0 unsafe code, 0 panics in library, clippy pedantic + nursery ZERO WARNINGS. 52 + 6 papers reproduced with full three-tier + paper-math chain
 
 ---
 
@@ -14,8 +14,8 @@ a consistent five-stage path:
 
 ```
 Python/Galaxy baseline
-  -> Rust CPU (sovereign, 1 dependency)
-    -> GPU acceleration (ToadStool/BarraCuda WGSL)
+  -> Rust CPU (sovereign, 1 dependency: barraCuda)
+    -> GPU acceleration (barraCuda WGSL, toadStool dispatch)
       -> Pure GPU streaming (zero CPU round-trips)
         -> metalForge cross-substrate (CPU = GPU = NPU output)
           -> NPU reservoir deployment (ESN → int8 → Akida AKD1000)
@@ -101,11 +101,11 @@ Every paper goes through the full evolution. Status across all 52 papers:
 | Pure GPU streaming | Zero CPU round-trips, data stays on-device | 8 streaming experiments, unidirectional proof (0.10ms overhead, Exp255) |
 | metalForge | Same answer on CPU, GPU, NPU | 50/50 papers, 37+ domains |
 | NPU reservoir | ESN → int8 → NPU preserves classification (Cholesky solve) | 59 checks, 6 domains |
-| Cross-spring evolution | 700+ WGSL shaders traced to origin springs, 144 ToadStool primitives consumed | 21 checks |
+| Cross-spring evolution | 767+ WGSL shaders traced to origin springs, 144 barraCuda primitives consumed | 21 checks |
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
 | biomeOS IPC integration | JSON-RPC science primal, GPU-aware dispatch, Songbird registration | 321 checks (Exp203-208) |
-| Code quality audit | 95.86% line / 94.02% region / 95.40% fn, streaming I/O, 0 production mocks, ToadStool S70+++, barracuda always-on, `deny(missing_docs)`, zero unsafe code, clippy pedantic CLEAN, baseline manifest 51/51 | 1,219 tests |
+| Code quality audit | 95.86% line, streaming I/O, 0 production mocks, standalone `barraCuda` v0.3.1, `deny(missing_docs)`, zero unsafe code, clippy pedantic + nursery ZERO WARNINGS | 1,044 tests |
 | V66 dispatch evolution | Forge dispatch routing (29 workloads), streaming topology (PCIe bypass), NUCLEUS Tower/Node/Nest model, absorption audit (0 local WGSL) | 49 checks (Exp213) |
 | V66 NUCLEUS V8 | IPC dispatch with V66 I/O evolution (byte-native FASTQ, bytemuck nanopore, streaming MS2), Nest metrics, CPU fallback parity, full pipeline chain | 49 checks (Exp214) |
 | **V84 pipeline buildout** | Paper→CPU→GPU→Streaming proven end-to-end: 32 papers, 26 CPU domains, 21 GPU domains, Python parity, 0.10ms streaming overhead | 172 checks (Exp251-255) |
@@ -304,7 +304,7 @@ NPU spectral triage Exp124) with SHA-256 provenance in BASELINE_MANIFEST.md.
 11 extension papers (Exp144-149, 152-156) promoted to three-tier by adding
 metalForge workload definitions (`ShaderOrigin::Absorbed`). BandwidthTier
 and ComputeDispatch from Barracuda wired into metalForge bridge/dispatch.
-50/50 three-tier papers. 280 experiments, 8,241+ checks, 1,219 tests.
+50/50 three-tier papers. 280 experiments, 8,241+ checks, 1,044 lib tests.
 
 ## Open Data
 

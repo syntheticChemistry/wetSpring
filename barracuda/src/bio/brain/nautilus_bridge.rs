@@ -31,7 +31,7 @@ pub fn default_bio_config() -> NautilusBrainConfig {
         shell: ShellConfig {
             population_size: 24,
             n_targets: 3,
-            ridge_lambda: 1e-4,
+            ridge_lambda: crate::tolerances::RIDGE_NAUTILUS_DEFAULT,
             ..ShellConfig::default()
         },
         generations_per_cycle: 20,
@@ -124,7 +124,7 @@ impl BioNautilusBrain {
 
     /// Total observations accumulated.
     #[must_use]
-    pub fn observation_count(&self) -> usize {
+    pub const fn observation_count(&self) -> usize {
         self.inner.observations.len()
     }
 

@@ -67,7 +67,7 @@ fn simulate_16s_read(species_id: usize, length: usize, seed: u64) -> Vec<u8> {
     while read.len() < length.saturating_sub(20) {
         rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
         let r = (rng >> 33) as u32;
-        if r % 3 == 0 {
+        if r.is_multiple_of(3) {
             read.push(pattern_base);
         } else if r % 3 == 1 {
             read.push(pattern_alt);
@@ -85,7 +85,7 @@ fn simulate_16s_read(species_id: usize, length: usize, seed: u64) -> Vec<u8> {
     // Nanopore error simulation: ~5% substitution rate
     for base in &mut read {
         rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-        if (rng >> 33) % 20 == 0 {
+        if (rng >> 33).is_multiple_of(20) {
             *base = bases[((rng >> 40) as usize) % 4];
         }
     }

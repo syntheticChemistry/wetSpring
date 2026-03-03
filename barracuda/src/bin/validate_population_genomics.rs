@@ -159,7 +159,7 @@ fn validate_integrated_pipeline(v: &mut Validator) {
     ];
 
     // ANI: all pairs should be > 95%
-    let ani_mat = ani::ani_matrix(&genomes.clone());
+    let ani_mat = ani::ani_matrix(&genomes);
     let all_same_sp = ani_mat.iter().all(|&a| a > 0.95);
     v.check(
         "All ANI pairs > 0.95 (same species)",

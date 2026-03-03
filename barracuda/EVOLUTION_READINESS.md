@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 2, 2026 (V92J)
+**Date:** March 3, 2026 (Phase 93)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules + 1 IPC + 1 vault module (all lean, 0 local WGSL, 0 local derivative/regression math), 144 ToadStool primitives consumed (S87, barracuda always-on, zero fallback code, 264 ComputeDispatch ops), 1,219 tests, 279 experiments, 8,180+ checks, ToadStool S87 aligned (`2dc26792`), 103 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **V92J:** CPU↔GPU full domain parity (Exp301, 48/48, 17+ ComputeDispatch ops), NUCLEUS+PCIe+biomeOS (Exp302, 113/113, Tower/Node/Nest validated), mixed hardware NUCLEUS orchestration (Exp303, 147/147, 6 pipeline patterns, 54 workloads routed).
+**Status:** 47 CPU + 42 GPU modules + 1 IPC + 1 vault module (all lean, 0 local WGSL, 0 local derivative/regression math), 144 primitives consumed (standalone barraCuda v0.3.1, always-on, zero fallback code, 264 ComputeDispatch ops), 1,044 lib tests, 280 experiments, 8,241+ checks, standalone barraCuda v0.3.1, 106 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **Phase 93:** CPU↔GPU full domain parity (Exp301, 48/48, 17+ ComputeDispatch ops), NUCLEUS+PCIe+biomeOS (Exp302, 113/113, Tower/Node/Nest validated), mixed hardware NUCLEUS orchestration (Exp303, 147/147, 6 pipeline patterns, 54 workloads routed).
 
 ### Full Lean Phase
 

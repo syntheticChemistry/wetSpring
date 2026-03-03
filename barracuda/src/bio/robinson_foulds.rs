@@ -206,14 +206,14 @@ mod tests {
     #[test]
     fn normalized_identical_is_zero() {
         let t1 = tree("((A:0.1,B:0.2):0.3,(C:0.3,D:0.4):0.5);");
-        assert!((rf_distance_normalized(&t1, &t1) - 0.0).abs() < 1e-12);
+        assert!((rf_distance_normalized(&t1, &t1) - 0.0).abs() < crate::tolerances::ANALYTICAL_F64);
     }
 
     #[test]
     fn normalized_max_5leaf_is_one() {
         let t1 = tree("(((A:0.1,B:0.1):0.2,C:0.3):0.1,(D:0.2,E:0.3):0.4);");
         let t2 = tree("(((A:0.1,D:0.2):0.2,E:0.3):0.1,(B:0.1,C:0.3):0.4);");
-        assert!((rf_distance_normalized(&t1, &t2) - 1.0).abs() < 1e-12);
+        assert!((rf_distance_normalized(&t1, &t2) - 1.0).abs() < crate::tolerances::ANALYTICAL_F64);
     }
 
     // ── Determinism ──────────────────────────────────────────────

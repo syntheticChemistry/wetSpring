@@ -44,6 +44,7 @@ pub use types::{NanoporeRead, SignalStats};
 #[allow(clippy::expect_used, clippy::unwrap_used, clippy::cast_precision_loss)]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
     #[test]
     fn synthetic_read_has_correct_length() {
@@ -65,9 +66,9 @@ mod tests {
             calibration_scale: 0.15,
         };
         let cal = read.calibrated_signal();
-        assert!((cal[0] - 200.0).abs() < 1e-10);
-        assert!((cal[1] - 215.0).abs() < 1e-10);
-        assert!((cal[2] - 185.0).abs() < 1e-10);
+        assert!((cal[0] - 200.0).abs() < tolerances::ANALYTICAL_LOOSE);
+        assert!((cal[1] - 215.0).abs() < tolerances::ANALYTICAL_LOOSE);
+        assert!((cal[2] - 185.0).abs() < tolerances::ANALYTICAL_LOOSE);
     }
 
     #[test]
@@ -80,7 +81,7 @@ mod tests {
             calibration_offset: 0.0,
             calibration_scale: 1.0,
         };
-        assert!((read.duration_seconds() - 2.0).abs() < 1e-10);
+        assert!((read.duration_seconds() - 2.0).abs() < tolerances::ANALYTICAL_LOOSE);
     }
 
     #[test]
@@ -114,7 +115,7 @@ mod tests {
         };
         let stats = read.signal_stats();
         assert_eq!(stats.n_samples, 5);
-        assert!((stats.mean - 30.0).abs() < 1e-10);
+        assert!((stats.mean - 30.0).abs() < tolerances::ANALYTICAL_LOOSE);
         assert_eq!(stats.min, 10);
         assert_eq!(stats.max, 50);
         assert!(stats.std_dev > 0.0);

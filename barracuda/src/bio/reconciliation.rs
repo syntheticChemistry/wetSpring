@@ -76,13 +76,13 @@ const INF_COST: u32 = u32::MAX / 2;
 impl FlatRecTree {
     /// Number of nodes.
     #[must_use]
-    pub fn len(&self) -> usize {
+    pub const fn len(&self) -> usize {
         self.names.len()
     }
 
     /// Whether tree is empty.
     #[must_use]
-    pub fn is_empty(&self) -> bool {
+    pub const fn is_empty(&self) -> bool {
         self.names.is_empty()
     }
 

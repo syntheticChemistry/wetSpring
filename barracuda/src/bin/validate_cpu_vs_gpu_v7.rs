@@ -226,7 +226,12 @@ fn main() {
     }
 
     let communities: Vec<Vec<f64>> = (0..50)
-        .map(|i| counts.iter().map(|&c| c + f64::from(i) * 0.1).collect())
+        .map(|i| {
+            counts
+                .iter()
+                .map(|&c| f64::from(i).mul_add(0.1, c))
+                .collect()
+        })
         .collect();
     let bootstrap_shannon: Vec<f64> = communities.iter().map(|c| diversity::shannon(c)).collect();
     let mean = bootstrap_shannon.iter().sum::<f64>() / bootstrap_shannon.len() as f64;
