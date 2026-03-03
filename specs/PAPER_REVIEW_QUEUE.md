@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: March 2, 2026 (Phase 92I — 1,219 tests, ToadStool S87 (`2dc26792`), 144 primitives (264 ComputeDispatch ops), clippy pedantic CLEAN, 279 experiments, 52 papers complete + 6 reproduced, all 39 three-tier eligible papers validated at CPU + GPU + metalForge. V92I: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147))
+**Last Updated**: March 2, 2026 (Phase 92J — 1,219 tests, ToadStool S87 (`2dc26792`), 144 primitives (264 ComputeDispatch ops), clippy pedantic CLEAN, 279 experiments, 52 papers complete + 6 reproduced, all 39 three-tier eligible papers validated at CPU + GPU + metalForge. V92J: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147))
 **Purpose**: Track papers for reproduction/review across five tracks
 
 ---

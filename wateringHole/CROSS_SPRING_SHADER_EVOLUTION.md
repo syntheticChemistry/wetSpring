@@ -1,7 +1,7 @@
 # Cross-Spring Shader Evolution
 
-**Last updated**: Mar 2, 2026 — V92I ToadStool S87 (264 ComputeDispatch ops, 144 primitives consumed, 0 local WGSL/derivative/regression, 279 experiments, 8,180+ checks, GPU on RTX 4070, 103 named tolerances, clippy pedantic CLEAN). V92I: CPU↔GPU full domain (Exp301, 48/48, 17+ ops), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147).
-**Validated by**: V92I Exp301-303 (308/308), ToadStool S87 `2dc26792`, 1,219 unit tests, 264 ComputeDispatch ops exercised
+**Last updated**: Mar 2, 2026 — V92J ToadStool S87 (264 ComputeDispatch ops, 144 primitives consumed, 0 local WGSL/derivative/regression, 280 experiments, 8,241+ checks, GPU on RTX 4070, 103 named tolerances, clippy pedantic CLEAN). V92J: cross-spring evolution benchmark (Exp304, 61/61, shader provenance across 6 springs, GEMM 7.1× GPU speedup).
+**Validated by**: V92J Exp304 (61/61 cross-spring provenance), Exp301-303 (308/308), ToadStool S87 `2dc26792`, 1,219 unit tests, 264 ComputeDispatch ops exercised
 
 ---
 

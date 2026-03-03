@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-02 (Phase 92I: 279 experiments, 267 binaries, 8,180+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S87 (`2dc26792`), 144 primitives consumed (264 ComputeDispatch ops), barracuda always-on, 1,219 tests, 103 named tolerances, clippy pedantic CLEAN. V92I: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147))
+**Updated**: 2026-03-02 (Phase 92J: 280 experiments, 268 binaries, 8,241+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), ToadStool S87 (`2dc26792`), 144 primitives consumed (264 ComputeDispatch ops), barracuda always-on, 1,219 tests, 103 named tolerances, clippy pedantic CLEAN. V92J: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147), cross-spring evolution S87 (Exp304, 61/61))
 
 ---
 
@@ -187,6 +187,7 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 301 | [CPU↔GPU Full Domain V92G](301_cpu_gpu_full_domain_v92g.md) | gpu | DONE | RTX 4070 | 15-section parity: FusedMapReduce, DiversityFusion, BrayCurtis, BatchedEigh, GEMM, NMF, Anderson, Bootstrap, Boltzmann, Hydrology, DF64 | 48 |
 | 302 | [NUCLEUS+PCIe+biomeOS V92G](302_nucleus_biomeos_v92g.md) | forge | DONE | metalForge | Tower/Node/Nest, PCIe bypass, biomeOS DAG, 54 workloads dispatched, streaming patterns, absorption evolution | 113 |
 | 303 | [Mixed NUCLEUS V92G](303_mixed_nucleus_v92g.md) | forge | DONE | metalForge | Multi-GPU dispatch, 6 GPU/NPU/CPU pipeline patterns, topology matrix, all 54 workloads routed, bandwidth decisions | 147 |
+| 304 | [Cross-Spring Evolution S87](304_cross_spring_evolution_s87.md) | cross | DONE | ToadStool S87 | Cross-spring provenance, shader evolution, 61 checks | 61 |
 
 ---
 
@@ -393,10 +394,11 @@ thresholds from `src/tolerances.rs`.
 | `validate_biomeos_graph` | 270 | 29 | `cargo run -p wetspring-forge --bin validate_biomeos_graph` |
 | `validate_cross_spring_s86` | 296 | 64 | `cargo run --release --bin validate_cross_spring_s86` |
 | `validate_cross_spring_modern_s86` | 297 | 46 | `cargo run --release --features gpu --bin validate_cross_spring_modern_s86` |
+| `validate_cross_spring_evolution_s87` | 304 | 61 | `cargo run --release --features gpu --bin validate_cross_spring_evolution_s87` |
 
-**Total validation checks**: 8,180+
+**Total validation checks**: 8,241+
 **Rust tests**: 1,219
-**Binaries**: 267 total
+**Binaries**: 268 total
 **ToadStool primitives**: 144 consumed (264 ComputeDispatch ops, barracuda always-on, zero fallback code — S87 `2dc26792`)
 **Papers**: 52 (25 Tracks 1-2 + 5 Track 3 + 9 Track 4 + 1 cross-spring + 9 extensions + 3 reference)
 **Local WGSL shaders**: 0 (all absorbed by ToadStool S63)

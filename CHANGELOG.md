@@ -3,18 +3,24 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## V92I — ToadStool S87 Absorption + Full Revalidation (2026-03-02)
+## V92J — Cross-Spring Evolution Benchmark + S87 Modern Systems (2026-03-02)
+
+### Added
+- Exp304: `validate_cross_spring_evolution_s87` — 61/61 checks. Comprehensive
+  cross-spring shader provenance benchmark: 13 sections tracking when/where each
+  primitive was written, absorbed, and who consumes it. GPU scaling benchmarks
+  (GEMM 256×256: 7.1× speedup), CPU throughput table, DF64 roundtrip validation,
+  Anderson 1D→3D→4D spectral, all 6 hydrology ET₀ methods, NMF + Graph composition.
+  Documents how springs compose each other (wetSpring NMF = bio × neuralSpring GEMM
+  × hotSpring DF64).
 
 ### Changed
 - ToadStool pin: S86 (`2fee1969`) → S87 (`2dc26792`)
-- S87 upstream highlights: FHE shader arithmetic fixes, gpu_helpers refactored
-  (663→3 submodules), 75 async-trait reclassifications, device-lost recovery
-  (`with_device_retry`), unsafe audit across all GPU sites, 9 pre-existing
-  test failures fixed, 2,866+ barracuda tests pass upstream
-- Full 5-tier revalidation GREEN on S87: all 13 binaries, 1,219 tests, 175
+- Experiments: 279 → 280
+- Binaries: 267 → 268
+- Validation checks: 8,180+ → 8,241+
+- Full 5-tier revalidation GREEN on S87: all 14 binaries, 1,219 tests, 175
   forge tests — zero regressions, zero API breakage
-- No new ops absorbed (ComputeDispatch stays at 144/264); S87 is internal
-  debt evolution and test resilience, not new operations
 
 ## V92H — CPU↔GPU ComputeDispatch + NUCLEUS Mixed Hardware (2026-03-02)
 

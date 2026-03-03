@@ -6,7 +6,7 @@ and GPU shaders for ToadStool/BarraCuda absorption. Follows the
 
 **Date:** March 2, 2026
 **License:** AGPL-3.0-or-later
-**Status:** Phase 92I — 1,219 tests, 279 experiments, 8,180+ validation checks, 267 binaries, ToadStool S87 (`2dc26792`), 144 primitives consumed (264 ComputeDispatch ops), zero local WGSL, zero unsafe code, 103 named tolerances, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN. Full 5-tier chain GREEN on S87 (13 binaries, all pass). V92I: ToadStool S87 absorption — FHE shader fixes, gpu_helpers refactor, device-lost recovery, unsafe audit, 2,866+ upstream tests pass. 54 metalForge workloads.
+**Status:** Phase 92J — 1,219 tests, 280 experiments, 8,241+ validation checks, 268 binaries, ToadStool S87 (`2dc26792`), 144 primitives consumed (264 ComputeDispatch ops), zero local WGSL, zero unsafe code, 103 named tolerances, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN. Full 5-tier chain GREEN on S87 (14 binaries, all pass). V92J: cross-spring evolution benchmark (Exp304: 61/61, GEMM 7.1× GPU speedup, shader provenance across 6 springs). 54 metalForge workloads.
 
 ---
 

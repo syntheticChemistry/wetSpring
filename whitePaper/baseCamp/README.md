@@ -2,7 +2,7 @@
 
 **Date:** March 2, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 92I — 279 experiments, 8,180+ validation checks, ALL PASS; 1,219 tests, 267 binaries (provenance headers on all), ToadStool S87 (`2dc26792`), 144 primitives consumed (264 ComputeDispatch ops), 0 local WGSL, 103 named tolerances, 0 unsafe code, 0 panics in library, clippy pedantic CLEAN (`--all-features -W clippy::pedantic`). V92I: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147). Full 5-tier chain (Exp298, 499 checks). 54 metalForge workloads. All 58 papers have experiments, 52 + 6 reproduced with full three-tier + paper-math chain
+**Status:** Phase 92J — 279 experiments, 8,180+ validation checks, ALL PASS; 1,219 tests, 267 binaries (provenance headers on all), ToadStool S87 (`2dc26792`), 144 primitives consumed (264 ComputeDispatch ops), 0 local WGSL, 103 named tolerances, 0 unsafe code, 0 panics in library, clippy pedantic CLEAN (`--all-features -W clippy::pedantic`). V92J: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147). Full 5-tier chain (Exp298, 499 checks). 54 metalForge workloads. All 58 papers have experiments, 52 + 6 reproduced with full three-tier + paper-math chain
 
 ---
 
