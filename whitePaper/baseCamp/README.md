@@ -2,7 +2,7 @@
 
 **Date:** March 2, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 92J — 279 experiments, 8,180+ validation checks, ALL PASS; 1,219 tests, 267 binaries (provenance headers on all), ToadStool S87 (`2dc26792`), 144 primitives consumed (264 ComputeDispatch ops), 0 local WGSL, 103 named tolerances, 0 unsafe code, 0 panics in library, clippy pedantic CLEAN (`--all-features -W clippy::pedantic`). V92J: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147). Full 5-tier chain (Exp298, 499 checks). 54 metalForge workloads. All 58 papers have experiments, 52 + 6 reproduced with full three-tier + paper-math chain
+**Status:** Phase 92J — 280 experiments, 8,241+ validation checks, ALL PASS; 1,219 tests, 268 binaries (provenance headers on all), ToadStool S87 (`2dc26792`), 144 primitives consumed (264 ComputeDispatch ops), 0 local WGSL, 103 named tolerances, 0 unsafe code, 0 panics in library, clippy pedantic CLEAN (`--all-features -W clippy::pedantic`). V92J: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147). Full 5-tier chain (Exp298, 499 checks). 54 metalForge workloads. All 58 papers have experiments, 52 + 6 reproduced with full three-tier + paper-math chain
 
 ---
 
@@ -44,7 +44,7 @@ All code is AGPL-3.0.
 | **V88 Buildout** | — | cross | — | 263-270 | 427 | CPU v20, CPU↔GPU pure-math, metalForge v12, NUCLEUS v3, ToadStool dispatch v3, mixed-HW, biomeOS graph |
 | **V89 S79 Rewire** | — | cross | — | 271 | 73 | Cross-spring S79 provenance: 13 domains, 6 springs, `MultiHeadBioEsn`, `SpectralAnalysis` IPC, ToadStool S79 deep rewire |
 | **V90 Bio Brain** | — | cross | — | 272 | 64 | hotSpring 4-layer brain → `BioBrain`, 36-head Gen2 → `BioHeadGroupDisagreement` + `AttentionState`, bingoCube/nautilus → `BioNautilusBrain`, 3 IPC methods, 7 domains, 7 springs |
-| **Total** | | | **52** | | **7,220+** | |
+| **Total** | | | **52** | | **8,241+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -105,7 +105,7 @@ Every paper goes through the full evolution. Status across all 52 papers:
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
 | biomeOS IPC integration | JSON-RPC science primal, GPU-aware dispatch, Songbird registration | 321 checks (Exp203-208) |
-| Code quality audit | 95.86% line / 94.02% region / 95.40% fn, streaming I/O, 0 production mocks, ToadStool S70+++, barracuda always-on, `deny(missing_docs)`, zero unsafe code, clippy pedantic CLEAN, baseline manifest 51/51 | 1,276 tests |
+| Code quality audit | 95.86% line / 94.02% region / 95.40% fn, streaming I/O, 0 production mocks, ToadStool S70+++, barracuda always-on, `deny(missing_docs)`, zero unsafe code, clippy pedantic CLEAN, baseline manifest 51/51 | 1,219 tests |
 | V66 dispatch evolution | Forge dispatch routing (29 workloads), streaming topology (PCIe bypass), NUCLEUS Tower/Node/Nest model, absorption audit (0 local WGSL) | 49 checks (Exp213) |
 | V66 NUCLEUS V8 | IPC dispatch with V66 I/O evolution (byte-native FASTQ, bytemuck nanopore, streaming MS2), Nest metrics, CPU fallback parity, full pipeline chain | 49 checks (Exp214) |
 | **V84 pipeline buildout** | Paper→CPU→GPU→Streaming proven end-to-end: 32 papers, 26 CPU domains, 21 GPU domains, Python parity, 0.10ms streaming overhead | 172 checks (Exp251-255) |
@@ -304,7 +304,7 @@ NPU spectral triage Exp124) with SHA-256 provenance in BASELINE_MANIFEST.md.
 11 extension papers (Exp144-149, 152-156) promoted to three-tier by adding
 metalForge workload definitions (`ShaderOrigin::Absorbed`). BandwidthTier
 and ComputeDispatch from Barracuda wired into metalForge bridge/dispatch.
-50/50 three-tier papers. 272 experiments, 7,220+ checks, 1,276 tests.
+50/50 three-tier papers. 280 experiments, 8,241+ checks, 1,219 tests.
 
 ## Open Data
 

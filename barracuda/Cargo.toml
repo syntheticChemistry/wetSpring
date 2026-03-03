@@ -1518,6 +1518,39 @@ name = "validate_cross_spring_evolution_s87"
 path = "src/bin/validate_cross_spring_evolution_s87.rs"
 required-features = ["gpu"]
 
+# ── Exp: BarraCuda CPU v21 ──
+[[bin]]
+name = "validate_barracuda_cpu_v21"
+path = "src/bin/validate_barracuda_cpu_v21.rs"
+
+# ── Exp292: BarraCuda CPU v22 — Comprehensive Paper Parity ──
+[[bin]]
+name = "validate_barracuda_cpu_v22"
+path = "src/bin/validate_barracuda_cpu_v22.rs"
+
+# ── Exp293: CPU vs GPU v8 ──
+[[bin]]
+name = "validate_cpu_vs_gpu_v8"
+path = "src/bin/validate_cpu_vs_gpu_v8.rs"
+required-features = ["gpu"]
+
+# ── Exp293: CPU vs GPU v9 ──
+[[bin]]
+name = "validate_cpu_vs_gpu_v9"
+path = "src/bin/validate_cpu_vs_gpu_v9.rs"
+required-features = ["gpu"]
+
+# ── Exp294: Pure GPU Streaming v9 ──
+[[bin]]
+name = "validate_pure_gpu_streaming_v9"
+path = "src/bin/validate_pure_gpu_streaming_v9.rs"
+required-features = ["gpu"]
+
+# ── Exp291: Paper Math Control v4 ──
+[[bin]]
+name = "validate_paper_math_control_v4"
+path = "src/bin/validate_paper_math_control_v4.rs"
+
 # ── Exp301: CPU vs GPU Full Domain Parity — V92G ComputeDispatch ──
 [[bin]]
 name = "validate_cpu_gpu_full_domain_v92g"

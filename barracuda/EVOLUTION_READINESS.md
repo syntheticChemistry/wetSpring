@@ -477,7 +477,7 @@ no parallelism benefit) and `fastq_parsing` (I/O-bound).
 | metalForge | GPU + NPU hardware characterization | GPU + NPU + cross-substrate validation |
 | Handoffs | `../wateringHole/handoffs/` (36+ docs) | `ecoPrimals/archive/wetspring-early-handoffs-feb2026/` (v1-v9 fossil) |
 | Tests | 454 | 1,210 |
-| Validation | 418 checks | 6,656+ checks |
+| Validation | 418 checks | 8,241+ checks |
 | Experiments | 31 suites | 260 experiments |
 | Line coverage | — | 97% bio+io (55% overall) |
 | Pipeline caching | Upstream (ToadStool native) | Local (Exp068, 38% overhead reduction) |

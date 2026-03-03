@@ -6,6 +6,7 @@
 **ToadStool pin**: S86 (`2fee1969`)
 **License**: AGPL-3.0-or-later
 **Supersedes**: V92F (BarraCuda evolution + cross-spring modern S86)
+**Superseded by**: V92J (cross-spring evolution handoff, S87)
 
 ---
 

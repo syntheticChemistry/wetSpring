@@ -124,14 +124,14 @@ integration point.
 | V88 experiment buildout (Exp263-270) | 427 (CPU v20, CPU↔GPU v7, metalForge v12, NUCLEUS v3, ToadStool pure-math v3, CPU↔GPU pure-math, mixed-HW dispatch, biomeOS graph) |
 | Exp271: Cross-Spring S79 (13 domains) | 73 |
 | Exp272: Bio Brain (7 domains) | 64 |
-| **Total validation checks** | **7,220+** |
+| **Total validation checks** | **8,241+** |
 | Rust library unit tests | 1,044 (barracuda CPU + IPC, default features) |
 | metalForge forge tests | 175 |
 | Integration + determinism + doc tests | 90 |
-| **Total Rust tests** | **1,309** |
+| **Total Rust tests** | **1,219** |
 | Library code coverage | **95.86% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov) |
-| Experiments completed | 272 |
-| Validation/benchmark binaries | 249 validate + 20 benchmark = 255 total |
+| Experiments completed | 280 |
+| Validation/benchmark binaries | 284 |
 | CPU bio modules | 47 |
 | GPU bio modules | 42 (30 lean + 5 write→lean + 7 compose + 0 passthrough) |
 | Tier B (needs refactor) | 0 (all promoted) |
@@ -143,7 +143,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | ToadStool primitives consumed | **144** (barracuda always-on, zero fallback code — ToadStool S87, `2dc26792`) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 7,220+ validation checks **PASS**. All 1,309 tests **PASS** (1 ignored: hardware-dependent).
+All 8,241+ validation checks **PASS**. All 1,219 tests **PASS** (1 ignored: hardware-dependent).
 
 ### GPU Performance
 
@@ -378,13 +378,13 @@ barracuda math through GPU parity to mixed-hardware NUCLEUS dispatch:
 
 ### Phase 92C: Deep Audit & Evolution
 - 32 GPU modules received API test stubs
-- 249 validators classified with provenance headers (70 Analytical, 59 GPU-parity, 53 Python-parity, 35 Pipeline, 20 Cross-spring, 12 Synthetic)
+- 284 validators classified with provenance headers (70 Analytical, 59 GPU-parity, 53 Python-parity, 35 Pipeline, 20 Cross-spring, 12 Synthetic)
 - 20+ binaries: inline tolerance literals → `tolerances::` constants
 - 3 new diversity tolerance constants
 - 14 new tests (power.rs, nrs.rs, brain/observation.rs)
 - All doc_markdown clippy warnings fixed across 30+ files
 
-### Phase 92D: Deep Debt Resolution + Pedantic Evolution (current)
+### Phase 92J: Deep Debt Resolution + Pedantic Evolution (current)
 - `panic!` in ESN bridge → `Result`-based error handling (zero panics in library code)
 - IPC science handler: 8-arg function → `MetricCtx` struct pattern
 - 50+ binaries: clippy pedantic fully clean (`--all-features -W clippy::pedantic`)
@@ -393,7 +393,7 @@ barracuda math through GPU parity to mixed-hardware NUCLEUS dispatch:
 - Provenance documentation: `experiments/results/README.md`, BASELINE_MANIFEST clarification
 - Dependency health: CPU-only build is pure Rust; only C dep is `renderdoc-sys` via wgpu (GPU path)
 
-**1,309 tests** | **272 experiments** | **255 binaries** | **7,220+ checks**
+**1,219 tests** | **280 experiments** | **268 binaries** | **8,241+ checks**
 
 ### Phase 87: blueFish WhitePaper + hotSpring Brain Architecture Review (V87)
 
@@ -523,7 +523,7 @@ Rust 1.93 fixed across 20+ validation binaries.
 | Max file size | All under 1000 LOC |
 | External C dependencies | **0** (`flate2` uses `rust_backend`) |
 | Named tolerance constants | 103 (scientifically justified, hierarchy-tested) |
-| Provenance headers | All 255 binaries (249 validate + 20 benchmark) |
+| Provenance headers | All 268 binaries |
 | ESN ridge regression | **Proper Cholesky solve** (not diagonal approximation) |
 | I/O streaming | Buffering APIs deprecated; `stats_from_file` + iterators preferred |
 | Clone optimization | Hot-path clones eliminated (merge_pairs, derep entry API) |
@@ -628,11 +628,11 @@ wetSpring/
 │   │   ├── bio/                 ← 47 CPU + 42 GPU bio modules
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML, nanopore)
 │   │   ├── bench/               ← benchmark harness + power monitoring
-│   │   ├── bin/                 ← 255 validation/benchmark binaries (249 validate + 20 benchmark)
+│   │   ├── bin/                 ← 268 validation/benchmark binaries
 │   │   ├── ipc/                 ← JSON-RPC dispatch (biomeOS integration)
 │   │   └── shaders/             ← shared WGSL utilities (ODE shaders now generated at runtime)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024
-├── experiments/                   ← 272 experiment protocols + results
+├── experiments/                   ← 280 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
 │   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs, bridge.rs
@@ -656,7 +656,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (1,309 across barracuda + forge workspace)
+# Run all tests (1,219 across barracuda + forge workspace)
 cargo test --features ipc
 
 # Code quality checks

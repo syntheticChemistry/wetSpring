@@ -2,7 +2,7 @@
 
 **Date:** March 2, 2026 (updated)
 **Author:** wetSpring V92C (ecoPrimals)
-**Foundation:** 272 experiments, 7,220+ checks, 52 papers (6 proposed), 93+ ToadStool primitives (S79, 844 f64-canonical shaders), Python parity proven, cross-spring provenance validated (Exp271: 73/73, 6 springs + Exp272: 64/64, 7 springs), V91 deep debt: unified discovery, handler refactoring, 1,276 tests, V92C Paper 12: full three-tier immunological Anderson (Exp273-279: 157/157 checks — science, CPU parity, GPU, streaming, metalForge)
+**Foundation:** 280 experiments, 8,241+ checks, 52 papers (6 proposed), 144 ToadStool primitives (S87, 844 f64-canonical shaders), Python parity proven, cross-spring provenance validated (Exp271: 73/73, 6 springs + Exp272: 64/64, 7 springs), V91 deep debt: unified discovery, handler refactoring, 1,219 tests, V92C Paper 12: full three-tier immunological Anderson (Exp273-279: 157/157 checks — science, CPU parity, GPU, streaming, metalForge)
 
 ---
 

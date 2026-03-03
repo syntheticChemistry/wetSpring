@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: March 2, 2026
-**Status**: Phase 92J — 8,180+ checks, ALL PASS (1,219 tests, 279 experiments, 267 binaries, ToadStool S87 `2dc26792`, 144 primitives (264 ComputeDispatch ops), 0 local WGSL, 103 named tolerances, clippy pedantic CLEAN `--all-features`, 52 papers + 6 reproduced, full three-tier on all 39 eligible papers, 54 metalForge workloads). V92J: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147)
+**Status**: Phase 92J — 8,241+ checks, ALL PASS (1,219 tests, 280 experiments, 284 binaries, ToadStool S87 `2dc26792`, 144 primitives (264 ComputeDispatch ops), 0 local WGSL, 103 named tolerances, clippy pedantic CLEAN `--all-features`, 52 papers + 6 reproduced, full three-tier on all 39 eligible papers, 54 metalForge workloads). V92J: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -10,7 +10,7 @@
 
 | Metric | Value |
 |--------|-------|
-| CPU validation | 1,476+/1,476+ PASS — 47 modules, 262 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
+| CPU validation | 1,476+/1,476+ PASS — 47 modules, 280 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
 | GPU validation | 1,945+/1,945+ PASS — 144 ToadStool primitives (S87 `2dc26792`, always-on, 264 ComputeDispatch ops), 0 local WGSL (fully lean) |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 407/407 — 22.5x Rust speedup over Python (v1–v9) |
@@ -25,7 +25,7 @@
 | Full 5-tier chain | 499/499 PASS — Paper math → CPU → GPU → Streaming → metalForge (Exp298) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
-| Rust modules | 47 CPU + 42 GPU + 1 IPC + 1 vault, 1,089 tests, 262 binaries |
+| Rust modules | 47 CPU + 42 GPU + 1 IPC + 1 vault, 1,219 tests, 284 binaries |
 | Write phase | 0 local WGSL (fully lean) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
 | Paper queue | **ALL DONE** — 52/52 reproducible papers complete (Tracks 1-4 + Phase 37 extensions + cross-spring) |
@@ -160,7 +160,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 - **NPU edge inference** — ESN reservoir on AKD1000, online evolution, adaptive sampling (V60)
 - **Field genomics** (planned) — Nanopore sequencing + NPU classification + metalForge routing. See [FIELD_GENOMICS_REQUIREMENTS.md](FIELD_GENOMICS_REQUIREMENTS.md)
 - **Data type profiling** — Biological data format catalog driving NestGate data primal evolution. See [DATA_TYPES.md](DATA_TYPES.md)
-- **Sovereign Rust bioinformatics** — 47 CPU + 42 GPU modules + 0 local WGSL (fully lean), 2 runtime dependencies (flate2 + bytemuck), 144 ToadStool primitives (S86, always-on, zero fallback, 264 ComputeDispatch ops)
+- **Sovereign Rust bioinformatics** — 47 CPU + 42 GPU modules + 0 local WGSL (fully lean), 2 runtime dependencies (flate2 + bytemuck), 144 ToadStool primitives (S87, always-on, zero fallback, 264 ComputeDispatch ops)
 
 ### wetSpring IS NOT:
 - Sensor noise analysis (groundSpring)

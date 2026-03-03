@@ -88,7 +88,7 @@ As of V92D (March 2, 2026):
 - **144 ToadStool primitives** consumed by wetSpring
 - **0 local WGSL shaders** (all absorbed)
 - **844+ total WGSL shaders** in ToadStool across all Springs
-- **7,220+ validation checks** in wetSpring (1,309 tests)
+- **8,241+ validation checks** in wetSpring (1,219 tests)
 - **29 computational chemistry ops** mapped to BarraCUDA primitives (blueFish isomorphism proof)
 - **Zero panics** in library code, **zero unsafe**, **zero clippy warnings** (`--all-features -W pedantic`)
 

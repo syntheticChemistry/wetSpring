@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** February 24, 2026
+**Updated:** March 2, 2026
 
 ---
 
@@ -16,17 +16,17 @@ baseline through Rust CPU to GPU acceleration via ToadStool/BarraCuda.
 
 ```
 wetspring-barracuda
-├── 45 CPU bio modules          (pure Rust math, no external C deps)
+├── 47 CPU bio modules          (pure Rust math, no external C deps)
 ├── 42 GPU bio modules          (42 Lean + 7 Compose, 0 Passthrough)
 ├── 3 streaming I/O parsers     (FASTQ/gzip, mzML/base64, MS2)
-├── 109 validation/benchmark binaries
+├── 284 validation/benchmark binaries
 └── depends on: barracuda (ToadStool) via path dependency
 ```
 
 42 Lean GPU modules delegate to `barracuda::ops::*` primitives from ToadStool.
 7 Compose wrappers. All ODE shaders use trait-generated WGSL (Lean phase).
 
-## ToadStool Primitives Consumed (30)
+## ToadStool Primitives Consumed (144, 264 ComputeDispatch ops)
 
 | # | Primitive | Category | Origin | Consumed Since |
 |---|-----------|----------|--------|:--------------:|

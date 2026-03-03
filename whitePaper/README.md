@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** March 2, 2026
-**Status:** Phase 92J — Validation study active — 8,180+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 1,219 tests, 279 experiments, 267 binaries, ToadStool S87 aligned (`2dc26792`), 144 primitives consumed (264 ComputeDispatch ops), 0 local WGSL (barracuda always-on), 103 named tolerances with full provenance, clippy pedantic CLEAN (`--all-features`), 52 papers + 6 reproduced, all 39 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. V92J: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed hardware orchestration (Exp303, 147/147)
+**Status:** Phase 92J — Validation study active — 8,241+ checks (1,945+ GPU on RTX 4070, 60 NPU on AKD1000), 1,219 tests, 280 experiments, 284 binaries, ToadStool S87 aligned (`2dc26792`), 144 primitives consumed (264 ComputeDispatch ops), 0 local WGSL (barracuda always-on), 103 named tolerances with full provenance, clippy pedantic CLEAN (`--all-features`), 52 papers + 6 reproduced, all 39 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. V92J: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed hardware orchestration (Exp303, 147/147)
 **License:** AGPL-3.0-or-later
 
 ---
@@ -69,7 +69,7 @@ capability-based dispatch, and shader origin tracking as an absorption seam for 
 
 | Claim | Evidence |
 |-------|----------|
-| Rust matches Python across 229 experiments | 5,743+ checks pass (CPU + GPU + metalForge + streaming + cross-spring + soil QS + NPU) |
+| Rust matches Python across 280 experiments | 8,241+ checks pass (CPU + GPU + metalForge + streaming + cross-spring + soil QS + NPU) |
 | GPU matches CPU across all 42 GPU modules + 1 extension | 1,833+ GPU checks pass (incl. 48 all-domain + 58 metalForge v5 + 18 diversity fusion) |
 | BarraCuda CPU parity across 31+ domains (v1-v9) | 407/407 cross-domain checks pass |
 | 926× spectral cosine GPU speedup | Exp016 benchmark |
@@ -312,7 +312,7 @@ wetSpring is one of several **Springs** — validation targets that prove
 algorithms can be ported from interpreted languages to BarraCuda/ToadStool:
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (34+ WGSL shaders, active Write phase)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 144 ToadStool primitives, barracuda always-on, 1,223 tests, vault module)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 144 ToadStool primitives, barracuda always-on, 1,219 tests, vault module)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **ecoPrimals/archive/wetspring-early-handoffs-feb2026/** — Fossil record of early ToadStool handoffs (v1–v9)
 
@@ -332,11 +332,11 @@ hardware (GPU, NPU, CPU) and guides Rust implementations for optimal absorption.
 | Line coverage (`cargo-llvm-cov`) | **95.86% line / 94.02% region / 95.40% fn** |
 | `#![deny(unsafe_code)]` | Enforced crate-wide (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, clippy::unwrap_used)]` | Enforced crate-wide |
-| Named tolerance constants | 86 (all scientifically justified, hierarchy-tested) |
+| Named tolerance constants | 103 (all scientifically justified, hierarchy-tested) |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` files |
-| Provenance headers | All 184 validation/benchmark binaries |
+| Provenance headers | All 284 validation/benchmark binaries |
 
 ## metalForge — Hardware Discovery
 

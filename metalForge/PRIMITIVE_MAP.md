@@ -7,7 +7,7 @@ absorption pipeline and identifies what ToadStool needs to build next.
 
 > **Mar 1 update (latest):** 144 ToadStool primitives consumed. 0 local WGSL, 0 local derivative math (fully lean).
 > All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed). S87 aligned (`2dc26792`).
-> Forge crate v0.3.0. 260 experiments, 6,656+ checks (60 NPU). Phase 92C, 1,223 tests (975 barracuda lib + 60 integration + 22 doc + 166 forge), 97 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN. V92C: vault module (consent/provenance/encrypted storage).
+> Forge crate v0.3.0. 280 experiments, 8,241+ checks (60 NPU). Phase 92J, 1,219 tests (975 barracuda lib + 60 integration + 22 doc + 166 forge), 103 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN. V92C: vault module (consent/provenance/encrypted storage).
 
 ---
 

@@ -17,10 +17,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 ### Changed
 - ToadStool pin: S86 (`2fee1969`) → S87 (`2dc26792`)
 - Experiments: 279 → 280
-- Binaries: 267 → 268
+- Binaries: 267 → 284 (registered 6 previously unregistered bins: v21, v22,
+  cpu-vs-gpu v8/v9, streaming v9, paper-math v4)
 - Validation checks: 8,180+ → 8,241+
 - Full 5-tier revalidation GREEN on S87: all 14 binaries, 1,219 tests, 175
   forge tests — zero regressions, zero API breakage
+
+### Fixed
+- 6 orphan binaries in `barracuda/src/bin/` registered in Cargo.toml
+  (validate_barracuda_cpu_v21, v22, cpu_vs_gpu_v8, v9, pure_gpu_streaming_v9,
+  paper_math_control_v4) — all build clean
+- Stale metric sweep: updated 268→284 binaries, fixed Phase 92D→92J, S86→S87,
+  aligned experiment/test/check/tolerance counts across all docs
 
 ## V92H — CPU↔GPU ComputeDispatch + NUCLEUS Mixed Hardware (2026-03-02)
 
