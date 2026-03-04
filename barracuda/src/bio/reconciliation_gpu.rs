@@ -11,17 +11,17 @@
 //! - **Batch cost aggregation** (Tier A — live): After CPU `reconcile_dtl`
 //!   per family, `FusedMapReduceF64` sums optimal costs across families.
 //!   This validates the GPU pipeline and provides batch-level statistics.
-//! - **DP kernel** (Tier C — blocked on `ToadStool` primitive): The per-tree
+//! - **DP kernel** (Tier C — blocked on barraCuda primitive): The per-tree
 //!   DP has row dependencies that prevent naive GPU parallelism. Full GPU
 //!   promotion requires a `BatchReconcileGpu` primitive with one workgroup
 //!   per gene family, computing the DP in wavefront order. This is blocked
-//!   on `ToadStool` adding a wavefront DP WGSL shader.
+//!   on barraCuda adding a wavefront DP WGSL shader.
 //!
 //! # Evolution Path
 //!
 //! ```text
 //! Current:  CPU DP per family → GPU `FusedMapReduceF64` cost aggregation
-//! Tier C:   GPU wavefront DP (1 workgroup/family) → GPU reduce (ToadStool)
+//! Tier C:   GPU wavefront DP (1 workgroup/family) → GPU reduce (barraCuda)
 //! ```
 //!
 //! # CPU Fallback

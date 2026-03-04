@@ -210,7 +210,7 @@ async fn main() {
 
     v.check_pass(
         "Triangle: BC(h,a) ≤ BC(h,m) + BC(m,a)",
-        cpu_bc_ha <= cpu_bc_hm + cpu_bc_ma + 1e-10,
+        cpu_bc_ha <= cpu_bc_hm + cpu_bc_ma + tolerances::BOUNDED_METRIC_GUARD,
     );
     v.check_pass(
         "BC range: all in [0,1]",

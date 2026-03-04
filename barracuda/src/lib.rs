@@ -44,12 +44,12 @@
 //! - [`bio::feature_table`] — End-to-end feature extraction (`asari` pipeline)
 //!
 //! # GPU acceleration (feature = "gpu")
-//! - `gpu` — GPU device wrapper bridging to `ToadStool` `WgpuDevice` (wgpu v22)
+//! - `gpu` — GPU device wrapper bridging to barraCuda `WgpuDevice` (wgpu v22)
 //! - `bio::diversity_gpu` — Shannon, Simpson, observed, evenness, alpha via `FusedMapReduceF64`,
 //!   Bray-Curtis via `BrayCurtisF64` (absorbed upstream)
-//! - `bio::pcoa_gpu` — `PCoA` ordination via `ToadStool`'s `BatchedEighGpu`
+//! - `bio::pcoa_gpu` — `PCoA` ordination via barraCuda's `BatchedEighGpu`
 //! - `bio::spectral_match_gpu` — Pairwise cosine via `GemmF64` + `FusedMapReduceF64`
-//! - `bio::kriging` — Spatial interpolation via `ToadStool`'s `KrigingF64`
+//! - `bio::kriging` — Spatial interpolation via barraCuda's `KrigingF64`
 //! - `bio::stats_gpu` — Variance, correlation, covariance, weighted dot via
 //!   `VarianceF64`, `CorrelationF64`, `CovarianceF64`, `WeightedDotF64`
 //! - [`tolerances`] — Centralized validation tolerances (CPU, GPU vs CPU)

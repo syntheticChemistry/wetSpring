@@ -173,6 +173,52 @@ where
     }
 }
 
+/// Adaptive Runge-Kutta-Fehlberg (RK45) ODE solver via barraCuda.
+///
+/// Uses Dormand-Prince embedded 5(4) method with automatic step size control.
+/// Preferred over fixed-step [`rk4_integrate`] for stiff systems where the
+/// required `dt` is not known a priori.
+///
+/// # Cross-spring provenance
+///
+/// RK45 was contributed by hotSpring (computational physics) for orbital
+/// mechanics and quantum dynamics, then absorbed into barraCuda's `numerical`
+/// module. wetSpring uses it for stiff bio ODE systems.
+///
+/// # Errors
+///
+/// Returns `Err` if `t_end <= t_start`, `y0` is empty, or max steps exceeded.
+pub fn rk45_integrate<F>(
+    f: F,
+    y0: &[f64],
+    t_start: f64,
+    t_end: f64,
+    rtol: f64,
+    atol: f64,
+) -> std::result::Result<OdeResult, String>
+where
+    F: Fn(f64, &[f64]) -> Vec<f64>,
+{
+    let config = barracuda::numerical::rk45::Rk45Config::new(rtol, atol);
+    let result = barracuda::numerical::rk45::rk45_solve(&f, t_start, t_end, y0, &config)
+        .map_err(|e| format!("rk45: {e}"))?;
+
+    let n_vars = y0.len();
+    let y_flat: Vec<f64> = result
+        .y_history
+        .iter()
+        .flat_map(|v| v.iter().copied())
+        .collect();
+
+    Ok(OdeResult {
+        t: result.t_history,
+        n_vars,
+        y: y_flat,
+        y_final: result.y_final,
+        steps: result.n_steps,
+    })
+}
+
 /// Compute the mean of the last `frac` fraction of a trajectory column.
 ///
 /// Used for steady-state analysis: `steady_state_mean(&result, 0, 0.1)` gives
@@ -296,5 +342,30 @@ mod tests {
     fn zero_dt_does_not_panic() {
         let result = rk4_integrate(|y, _t| vec![-y[0]], &[1.0], 0.0, 0.0, 0.01, None);
         assert_eq!(result.y_final, vec![1.0]);
+    }
+
+    #[test]
+    fn rk45_exponential_decay() {
+        let result = rk45_integrate(|_t, y| vec![-0.5 * y[0]], &[1.0], 0.0, 10.0, 1e-8, 1e-10)
+            .expect("rk45 should succeed");
+        let expected = (-0.5_f64 * 10.0).exp();
+        assert!(
+            (result.y_final[0] - expected).abs() < 1e-6,
+            "RK45 exponential decay: got {}, expected {expected}",
+            result.y_final[0]
+        );
+    }
+
+    #[test]
+    fn rk45_fewer_steps_than_rk4_for_smooth() {
+        let rk4 = rk4_integrate(|y, _t| vec![-y[0]], &[1.0], 0.0, 10.0, 0.01, None);
+        let rk45 = rk45_integrate(|_t, y| vec![-y[0]], &[1.0], 0.0, 10.0, 1e-8, 1e-10)
+            .expect("rk45 should succeed");
+        assert!(
+            rk45.steps < rk4.steps,
+            "RK45 adaptive should need fewer steps ({}) than fixed-step RK4 ({})",
+            rk45.steps,
+            rk4.steps
+        );
     }
 }

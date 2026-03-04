@@ -9,7 +9,7 @@
 //!   ├── QualityFilterCached    ← pre-compiled QF shader (local extension)
 //!   ├── Dada2Gpu              ← pre-compiled DADA2 E-step shader (local extension)
 //!   ├── GemmCached             ← pre-compiled GEMM pipeline (local extension)
-//!   ├── FusedMapReduceF64      ← pre-compiled FMR pipeline (ToadStool)
+//!   ├── FusedMapReduceF64      ← pre-compiled FMR pipeline (barraCuda)
 //!   └── warmup dispatches      ← prime driver caches
 //!
 //! session.filter_reads_gpu(reads, params)
@@ -36,7 +36,7 @@
 //! | Taxonomy      | `GemmCached`           | GPU (GEMM)      |
 //! | Diversity     | `FusedMapReduceF64`    | GPU/CPU (FMR)   |
 //!
-//! # Local extensions (for `ToadStool` absorption)
+//! # Local extensions (for barraCuda absorption)
 //!
 //! - `QualityFilterCached`: per-read parallel quality trimming WGSL shader
 //! - `Dada2Gpu`: batch pair-wise `log_p_error` with precomputed log-err table
@@ -65,7 +65,7 @@ use std::time::Instant;
 ///
 /// Holds pre-compiled pipelines for all GPU-accelerated stages:
 /// quality filter, DADA2 E-step, taxonomy GEMM, and diversity FMR.
-/// Quality and DADA2 now delegate to `ToadStool` absorbed primitives.
+/// Quality and DADA2 now delegate to barraCuda absorbed primitives.
 pub struct GpuPipelineSession {
     qf: QualityFilterCached,
     dada2: Dada2Gpu,

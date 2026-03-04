@@ -13,7 +13,7 @@
 //! # GPU Promotion
 //!
 //! The pruning pass over sites is embarrassingly parallel — each site
-//! can be computed independently. `ToadStool` can dispatch one workgroup
+//! can be computed independently. barraCuda can dispatch one workgroup
 //! per site with shared memory for the transition matrix.
 
 /// Nucleotide states: A=0, C=1, G=2, T=3.
@@ -162,7 +162,7 @@ pub fn site_log_likelihoods(tree: &TreeNode, mu: f64) -> Vec<f64> {
 //
 // The following types linearize the recursive `TreeNode` into flat arrays
 // matching WGSL storage buffer layout. This is the data layout that
-// ToadStool will dispatch to GPU: one workgroup per site, sequential
+// barraCuda will dispatch to GPU: one workgroup per site, sequential
 // post-order traversal over the flat node array.
 
 /// GPU-ready flat tree layout (post-order node array).

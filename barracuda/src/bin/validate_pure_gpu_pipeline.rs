@@ -193,9 +193,9 @@ async fn main() {
     );
     v.check(
         "Bray-Curtis: all in [0,1]",
-        f64::from(u8::from(
-            gpu_bray.iter().all(|d| *d >= 0.0 && *d <= 1.0 + 1e-10),
-        )),
+        f64::from(u8::from(gpu_bray.iter().all(|d| {
+            *d >= 0.0 && *d <= 1.0 + tolerances::BOUNDED_METRIC_GUARD
+        }))),
         1.0,
         tolerances::EXACT,
     );
@@ -327,11 +327,9 @@ async fn main() {
     );
     v.check(
         "Cosine: all in [0,1]",
-        f64::from(u8::from(
-            gpu_cosine
-                .iter()
-                .all(|s| s.is_finite() && *s >= 0.0 && *s <= 1.0 + 1e-10),
-        )),
+        f64::from(u8::from(gpu_cosine.iter().all(|s| {
+            s.is_finite() && *s >= 0.0 && *s <= 1.0 + tolerances::BOUNDED_METRIC_GUARD
+        }))),
         1.0,
         tolerances::EXACT,
     );

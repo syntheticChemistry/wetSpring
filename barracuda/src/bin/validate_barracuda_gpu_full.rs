@@ -149,7 +149,7 @@ async fn main() {
         );
         let all_valid = gpu_pw
             .iter()
-            .all(|s| s.is_finite() && *s >= 0.0 && *s <= 1.0 + 1e-10);
+            .all(|s| s.is_finite() && *s >= 0.0 && *s <= 1.0 + tolerances::BOUNDED_METRIC_GUARD);
         v.check(
             "Cosine: all pairs in [0,1]",
             f64::from(u8::from(all_valid)),

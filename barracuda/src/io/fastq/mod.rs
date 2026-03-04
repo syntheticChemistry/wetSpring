@@ -245,6 +245,9 @@ where
 /// All I/O is byte-native — no UTF-8 requirement for sequence or quality
 /// lines. Handles both plain `.fastq` and gzip-compressed `.fastq.gz` files.
 ///
+/// Uses separate header and data buffers so the identifier can be extracted
+/// from the header while the data buffer is reused for sequence/quality lines.
+///
 /// # Errors
 ///
 /// The iterator yields `Result<FastqRecord>` — each item may fail with
@@ -265,6 +268,7 @@ where
 pub struct FastqIter {
     reader: Box<dyn BufRead>,
     path: std::path::PathBuf,
+    header_buf: Vec<u8>,
     buf: Vec<u8>,
     done: bool,
 }
@@ -280,6 +284,7 @@ impl FastqIter {
         Ok(Self {
             reader,
             path: path.to_path_buf(),
+            header_buf: Vec::new(),
             buf: Vec::new(),
             done: false,
         })
@@ -294,9 +299,10 @@ impl Iterator for FastqIter {
             return None;
         }
 
-        // Line 1: @identifier
-        self.buf.clear();
-        match read_byte_line(self.reader.as_mut(), &mut self.buf, &self.path) {
+        // Line 1: @identifier — read into dedicated header buffer so the
+        // id slice remains valid while we reuse `self.buf` for data lines.
+        self.header_buf.clear();
+        match read_byte_line(self.reader.as_mut(), &mut self.header_buf, &self.path) {
             Ok(0) => {
                 self.done = true;
                 return None;
@@ -307,15 +313,15 @@ impl Iterator for FastqIter {
                 return Some(Err(e));
             }
         }
-        if trim_end(&self.buf).is_empty() {
+        if trim_end(&self.header_buf).is_empty() {
             self.done = true;
             return None;
         }
-        if self.buf.first() != Some(&b'@') {
+        if self.header_buf.first() != Some(&b'@') {
             self.done = true;
-            return Some(Err(header_error_bytes(&self.buf)));
+            return Some(Err(header_error_bytes(&self.header_buf)));
         }
-        let id = extract_id(&self.buf).to_string();
+        let id = extract_id(&self.header_buf).to_string();
 
         // Line 2: sequence
         self.buf.clear();

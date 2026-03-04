@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated MS2 spectral similarity via `ToadStool` `GemmF64`.
+//! GPU-accelerated MS2 spectral similarity via barraCuda `GemmF64`.
 //!
 //! Computes pairwise cosine similarity for pre-aligned spectral vectors
 //! using GPU matrix multiplication for dot products and

@@ -154,9 +154,10 @@ fn main() {
             println!("  N={label}: {n_pairs} pairs, GPU {gpu_ms:.1} ms");
 
             // GPU values in [0, 1] (with small tolerance for rounding)
-            let all_valid = gpu_cosine
-                .iter()
-                .all(|&c| (-1e-10..=1.0 + 1e-10).contains(&c));
+            let all_valid = gpu_cosine.iter().all(|&c| {
+                (-tolerances::BOUNDED_METRIC_GUARD..=1.0 + tolerances::BOUNDED_METRIC_GUARD)
+                    .contains(&c)
+            });
             v.check_count(
                 &format!("N={label} GPU cosine valid"),
                 usize::from(all_valid),

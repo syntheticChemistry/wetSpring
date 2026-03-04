@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! `GemmCached` — pre-compiled GEMM pipeline + buffer pool.
 //!
-//! Uses `GemmF64` from `ToadStool`'s barracuda crate with DF64-aware
+//! Uses `GemmF64` from barraCuda's barracuda crate with DF64-aware
 //! shader selection: on consumer GPUs (`Fp64Strategy::Hybrid`) the GEMM
 //! inner loop runs on FP32 cores via double-float arithmetic, with f64
 //! scalar output. On compute-class GPUs (`Fp64Strategy::Native`) the
 //! native f64 GEMM shader is used.
 //!
 //! Hoists shader compilation to `new()` and reuses the pipeline across
-//! dispatches. Data buffers via `ToadStool`'s `BufferPool`.
+//! dispatches. Data buffers via barraCuda's `BufferPool`.
 
 use crate::error::{Error, Result};
 use barracuda::device::{BufferPool, ComputeDispatch, PooledBuffer, TensorContext, WgpuDevice};
@@ -53,10 +53,10 @@ impl GemmParams {
     }
 }
 
-/// Pre-compiled GEMM pipeline with `ToadStool` buffer pool integration.
+/// Pre-compiled GEMM pipeline with barraCuda buffer pool integration.
 ///
 /// Uses `ComputeDispatch` builder for bind-group layout and dispatch.
-/// Per-call resources (data buffers) are managed through `ToadStool`'s
+/// Per-call resources (data buffers) are managed through barraCuda's
 /// `BufferPool` for cross-call reuse via power-of-2 bucketing.
 ///
 /// DF64 auto-detection (S62+): on consumer GPUs the shader runs the
@@ -100,7 +100,7 @@ impl GemmCached {
     /// Execute C = A × B using the cached pipeline and buffer pool.
     ///
     /// - Pipeline: reused from init (no shader recompilation)
-    /// - Buffers A, B, C: acquired from `ToadStool` `BufferPool`, auto-returned on drop
+    /// - Buffers A, B, C: acquired from barraCuda `BufferPool`, auto-returned on drop
     /// - Params: uniform buffer (too small to pool meaningfully)
     ///
     /// # Errors

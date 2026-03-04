@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Alpha and beta diversity metrics for ecological community analysis.
 //!
-//! Delegates to `barracuda::stats::diversity` (`ToadStool` S64 absorption).
+//! Delegates to `barracuda::stats::diversity` (barraCuda S64 absorption).
 //! `chao1` uses `crate::tolerances::CHAO1_COUNT_HALFWIDTH` for singleton/doubleton
 //! detection — delegates to upstream which uses the same 0.5 halfwidth.
 //!

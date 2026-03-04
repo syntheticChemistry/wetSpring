@@ -1558,3 +1558,8 @@ path = "src/bin/validate_paper_math_control_v4.rs"
 name = "validate_cpu_gpu_full_domain_v92g"
 path = "src/bin/validate_cpu_gpu_full_domain_v92g.rs"
 required-features = ["gpu"]
+
+# ── Exp305: Cross-Spring S93 Evolution Validation + Benchmark ──
+[[bin]]
+name = "validate_cross_spring_s93"
+path = "src/bin/validate_cross_spring_s93.rs"

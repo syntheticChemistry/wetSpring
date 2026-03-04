@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! GPU-accelerated EIC extraction and peak integration.
 //!
-//! Uses `ToadStool`'s `FusedMapReduceF64` for parallel intensity summation
+//! Uses barraCuda's `FusedMapReduceF64` for parallel intensity summation
 //! across scans and `WeightedDotF64` for fast trapezoidal peak integration.
 //!
 //! The m/z filtering loop remains CPU-side (data-dependent branching), but

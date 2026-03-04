@@ -280,3 +280,199 @@ fn b64_val_all_chars() {
 fn escape_json_str_empty() {
     assert_eq!(json::escape_json_str(""), "");
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// Transport layer tests — real Unix socket round-trip
+// ═══════════════════════════════════════════════════════════════════
+
+fn start_echo_server(sock: &std::path::Path) -> std::thread::JoinHandle<()> {
+    let sock = sock.to_path_buf();
+    std::thread::spawn(move || {
+        let listener = std::os::unix::net::UnixListener::bind(&sock).unwrap();
+        if let Ok((stream, _)) = listener.accept() {
+            let mut reader = std::io::BufReader::new(&stream);
+            let mut line = String::new();
+            std::io::BufRead::read_line(&mut reader, &mut line).unwrap();
+            let resp = r#"{"jsonrpc":"2.0","result":true,"id":1}"#;
+            let mut writer = std::io::BufWriter::new(&stream);
+            std::io::Write::write_all(&mut writer, resp.as_bytes()).unwrap();
+            std::io::Write::write_all(&mut writer, b"\n").unwrap();
+            std::io::Write::flush(&mut writer).unwrap();
+        }
+    })
+}
+
+#[test]
+fn transport_rpc_round_trip() {
+    let dir = tempfile::tempdir().unwrap();
+    let sock = dir.path().join("rpc_test.sock");
+    let handle = start_echo_server(&sock);
+    std::thread::sleep(std::time::Duration::from_millis(50));
+    let req = r#"{"jsonrpc":"2.0","method":"ping","id":1}"#;
+    let resp = super::transport::rpc(&sock, req).unwrap();
+    assert!(resp.contains("\"result\":true"));
+    handle.join().unwrap();
+}
+
+#[test]
+fn transport_rpc_bad_socket() {
+    let dir = tempfile::tempdir().unwrap();
+    let sock = dir.path().join("nonexistent.sock");
+    let req = r#"{"jsonrpc":"2.0","method":"ping","id":1}"#;
+    let result = super::transport::rpc(&sock, req);
+    assert!(result.is_err());
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Client integration tests — full round-trip via transport
+// ═══════════════════════════════════════════════════════════════════
+
+fn start_storage_server(sock: &std::path::Path, response: &str) -> std::thread::JoinHandle<()> {
+    let sock = sock.to_path_buf();
+    let response = response.to_owned();
+    std::thread::spawn(move || {
+        let listener = std::os::unix::net::UnixListener::bind(&sock).unwrap();
+        while let Ok((stream, _)) = listener.accept() {
+            let mut reader = std::io::BufReader::new(&stream);
+            let mut line = String::new();
+            if std::io::BufRead::read_line(&mut reader, &mut line).is_err() {
+                break;
+            }
+            let mut writer = std::io::BufWriter::new(&stream);
+            std::io::Write::write_all(&mut writer, response.as_bytes()).unwrap();
+            std::io::Write::write_all(&mut writer, b"\n").unwrap();
+            std::io::Write::flush(&mut writer).unwrap();
+        }
+    })
+}
+
+#[test]
+fn client_exists_returns_true() {
+    let dir = tempfile::tempdir().unwrap();
+    let sock = dir.path().join("exists.sock");
+    let _handle = start_storage_server(&sock, r#"{"jsonrpc":"2.0","result":true,"id":1}"#);
+    std::thread::sleep(std::time::Duration::from_millis(50));
+    let client = NestClient::new(sock);
+    let result = client.exists("test-key").unwrap();
+    assert!(result);
+}
+
+#[test]
+fn client_exists_returns_false() {
+    let dir = tempfile::tempdir().unwrap();
+    let sock = dir.path().join("exists_false.sock");
+    let _handle = start_storage_server(&sock, r#"{"jsonrpc":"2.0","result":false,"id":1}"#);
+    std::thread::sleep(std::time::Duration::from_millis(50));
+    let client = NestClient::new(sock);
+    let result = client.exists("missing-key").unwrap();
+    assert!(!result);
+}
+
+#[test]
+fn client_store_succeeds() {
+    let dir = tempfile::tempdir().unwrap();
+    let sock = dir.path().join("store.sock");
+    let _handle = start_storage_server(&sock, r#"{"jsonrpc":"2.0","result":"ok","id":1}"#);
+    std::thread::sleep(std::time::Duration::from_millis(50));
+    let client = NestClient::new(sock);
+    let result = client.store("key", r#"{"val":1}"#).unwrap();
+    assert!(result.ok);
+}
+
+#[test]
+fn client_store_blob_and_retrieve() {
+    let dir = tempfile::tempdir().unwrap();
+    let sock = dir.path().join("blob.sock");
+    let _handle = start_storage_server(&sock, r#"{"jsonrpc":"2.0","result":"ok","id":1}"#);
+    std::thread::sleep(std::time::Duration::from_millis(50));
+    let client = NestClient::new(sock);
+    let result = client.store_blob("data", b"hello").unwrap();
+    assert!(result.ok);
+}
+
+#[test]
+fn client_retrieve_value() {
+    let dir = tempfile::tempdir().unwrap();
+    let sock = dir.path().join("retrieve.sock");
+    let _handle = start_storage_server(&sock, r#"{"jsonrpc":"2.0","result":"hello","id":1}"#);
+    std::thread::sleep(std::time::Duration::from_millis(50));
+    let client = NestClient::new(sock);
+    let result = client.retrieve("key").unwrap();
+    assert!(result.value.is_some());
+}
+
+#[test]
+fn client_delete_succeeds() {
+    let dir = tempfile::tempdir().unwrap();
+    let sock = dir.path().join("delete.sock");
+    let _handle = start_storage_server(&sock, r#"{"jsonrpc":"2.0","result":"ok","id":1}"#);
+    std::thread::sleep(std::time::Duration::from_millis(50));
+    let client = NestClient::new(sock);
+    let result = client.delete("key").unwrap();
+    assert!(result.ok);
+}
+
+#[test]
+fn client_list_returns_keys() {
+    let dir = tempfile::tempdir().unwrap();
+    let sock = dir.path().join("list.sock");
+    let _handle = start_storage_server(
+        &sock,
+        r#"{"jsonrpc":"2.0","result":{"keys":["a","b"]},"id":1}"#,
+    );
+    std::thread::sleep(std::time::Duration::from_millis(50));
+    let client = NestClient::new(sock);
+    let result = client.list(Some("")).unwrap();
+    assert_eq!(result.keys, vec!["a", "b"]);
+}
+
+#[test]
+fn client_stats_returns_raw() {
+    let dir = tempfile::tempdir().unwrap();
+    let sock = dir.path().join("stats.sock");
+    let _handle = start_storage_server(&sock, r#"{"jsonrpc":"2.0","result":{"count":5},"id":1}"#);
+    std::thread::sleep(std::time::Duration::from_millis(50));
+    let client = NestClient::new(sock);
+    let raw = client.stats().unwrap();
+    assert!(raw.contains("count"));
+}
+
+#[test]
+fn client_store_dataset_metadata() {
+    let dir = tempfile::tempdir().unwrap();
+    let sock = dir.path().join("meta.sock");
+    let _handle = start_storage_server(&sock, r#"{"jsonrpc":"2.0","result":"ok","id":1}"#);
+    std::thread::sleep(std::time::Duration::from_millis(50));
+    let client = NestClient::new(sock);
+    let result = client
+        .store_dataset_metadata("test_ds", "SRA", 10, 1024)
+        .unwrap();
+    assert!(result.ok);
+}
+
+#[test]
+fn client_retrieve_blob_with_data() {
+    let dir = tempfile::tempdir().unwrap();
+    let sock = dir.path().join("retrieve_blob.sock");
+    let encoded = base64::base64_encode(b"binary data");
+    let response = format!(r#"{{"jsonrpc":"2.0","result":{{"blob":"{encoded}"}},"id":1}}"#);
+    let _handle = start_storage_server(&sock, &response);
+    std::thread::sleep(std::time::Duration::from_millis(50));
+    let client = NestClient::new(sock);
+    let result = client.retrieve_blob("key").unwrap();
+    assert_eq!(result.unwrap(), b"binary data");
+}
+
+#[test]
+fn client_retrieve_blob_error_returns_none() {
+    let dir = tempfile::tempdir().unwrap();
+    let sock = dir.path().join("retrieve_blob_err.sock");
+    let _handle = start_storage_server(
+        &sock,
+        r#"{"jsonrpc":"2.0","error":{"code":-1,"message":"not found"},"id":1}"#,
+    );
+    std::thread::sleep(std::time::Duration::from_millis(50));
+    let client = NestClient::new(sock);
+    let result = client.retrieve_blob("missing").unwrap();
+    assert!(result.is_none());
+}

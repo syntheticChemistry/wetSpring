@@ -1,7 +1,7 @@
 # Cross-Spring Shader Evolution
 
-**Last updated**: Mar 3, 2026 — Phase 93 standalone barraCuda v0.3.1 (264 ComputeDispatch ops, 144 primitives consumed, 0 local WGSL/derivative/regression, 280 experiments, 8,241+ checks, GPU on RTX 4070, 106 named tolerances, clippy pedantic CLEAN). Phase 93: cross-spring evolution benchmark (Exp304, 61/61, shader provenance across 6 springs, GEMM 7.1× GPU speedup).
-**Validated by**: Phase 93 Exp304 (61/61 cross-spring provenance), Exp301-303 (308/308), standalone barraCuda v0.3.1, 1,044 lib tests, 264 ComputeDispatch ops exercised
+**Last updated**: Mar 4, 2026 — Phase 95 standalone barraCuda v0.3.1 (264 ComputeDispatch ops, 150+ primitives consumed, 0 local WGSL/derivative/regression, 281 experiments, 8,300+ checks, GPU on RTX 4070, 164 named tolerances, 94.69% line coverage, clippy pedantic CLEAN). Phase 95: full cross-spring evolution (Exp305, 59/59, 6 new GPU ops + 2 CPU delegations, RK45 adaptive ODE, provenance across 6 springs).
+**Validated by**: Phase 95 Exp304 (61/61 cross-spring provenance), Exp301-303 (308/308), standalone barraCuda v0.3.1, 1,044 lib tests, 264 ComputeDispatch ops exercised
 
 ---
 

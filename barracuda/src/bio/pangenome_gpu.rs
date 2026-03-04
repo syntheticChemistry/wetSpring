@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated pangenome gene classification via `ToadStool`.
+//! GPU-accelerated pangenome gene classification via barraCuda.
 //!
 //! Delegates to `barracuda::ops::bio::pangenome::PangenomeClassifyGpu` —
 //! the absorbed shader from wetSpring handoff v6. wetSpring provides the
@@ -55,7 +55,7 @@ impl PangenomeGpu {
     ///
     /// # Errors
     ///
-    /// Returns an error if `ToadStool` shader compilation fails.
+    /// Returns an error if barraCuda shader compilation fails.
     pub fn new(device: &Arc<WgpuDevice>) -> crate::error::Result<Self> {
         let inner = ToadStoolPangenome::new(Arc::clone(device))
             .map_err(|e| crate::error::Error::Gpu(format!("PangenomeClassifyGpu: {e}")))?;

@@ -63,6 +63,8 @@ pub mod jaccard_gpu;
 pub mod kmd;
 #[cfg(feature = "gpu")]
 pub mod kmd_gpu;
+#[cfg(feature = "gpu")]
+pub mod kmd_grouping_gpu;
 pub mod kmer;
 #[cfg(feature = "gpu")]
 pub mod kmer_gpu;
@@ -126,6 +128,8 @@ pub mod spectral_match;
 #[cfg(feature = "gpu")]
 pub mod spectral_match_gpu;
 #[cfg(feature = "gpu")]
+pub mod stats_extended_gpu;
+#[cfg(feature = "gpu")]
 pub mod stats_gpu;
 #[cfg(feature = "gpu")]
 pub mod streaming_gpu;
@@ -133,6 +137,8 @@ pub mod taxonomy;
 #[cfg(feature = "gpu")]
 pub mod taxonomy_gpu;
 pub mod tolerance_search;
+#[cfg(feature = "gpu")]
+pub mod tolerance_search_gpu;
 pub mod unifrac;
 #[cfg(feature = "gpu")]
 pub mod unifrac_gpu;

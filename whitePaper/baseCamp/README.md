@@ -2,7 +2,7 @@
 
 **Date:** March 4, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 93+ — 280 experiments, 8,241+ validation checks, ALL PASS; 1,054 lib tests, 284 binaries, standalone `barraCuda` v0.3.1 (767+ WGSL shaders), 144 primitives consumed, 0 local WGSL, 164 named tolerances, 0 unsafe code, 0 panics in library, 0 `unreachable!()` in library, clippy pedantic + nursery ZERO WARNINGS, `cargo doc` ZERO WARNINGS, all external deps pure Rust. 52 + 6 papers reproduced with full three-tier + paper-math chain
+**Status:** Phase 95 — 281 experiments, 8,300+ validation checks, ALL PASS; 1,261 lib+forge tests, 285 binaries, standalone `barraCuda` v0.3.1 (767+ WGSL shaders), 150+ primitives consumed (V95: 6 new GPU ops + 2 CPU delegations), 94.69% line coverage, 0 local WGSL, 164 named tolerances, 0 unsafe code, 0 panics in library, 0 `unreachable!()` in library, clippy pedantic + nursery ZERO WARNINGS, `cargo doc` ZERO WARNINGS, all external deps pure Rust. 52 + 6 papers reproduced with full three-tier + paper-math chain
 
 ---
 
@@ -44,7 +44,7 @@ All code is AGPL-3.0.
 | **V88 Buildout** | — | cross | — | 263-270 | 427 | CPU v20, CPU↔GPU pure-math, metalForge v12, NUCLEUS v3, ToadStool dispatch v3, mixed-HW, biomeOS graph |
 | **V89 S79 Rewire** | — | cross | — | 271 | 73 | Cross-spring S79 provenance: 13 domains, 6 springs, `MultiHeadBioEsn`, `SpectralAnalysis` IPC, ToadStool S79 deep rewire |
 | **V90 Bio Brain** | — | cross | — | 272 | 64 | hotSpring 4-layer brain → `BioBrain`, 36-head Gen2 → `BioHeadGroupDisagreement` + `AttentionState`, bingoCube/nautilus → `BioNautilusBrain`, 3 IPC methods, 7 domains, 7 springs |
-| **Total** | | | **52** | | **8,241+** | |
+| **Total** | | | **52** | | **8,300+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -304,7 +304,7 @@ NPU spectral triage Exp124) with SHA-256 provenance in BASELINE_MANIFEST.md.
 11 extension papers (Exp144-149, 152-156) promoted to three-tier by adding
 metalForge workload definitions (`ShaderOrigin::Absorbed`). BandwidthTier
 and ComputeDispatch from Barracuda wired into metalForge bridge/dispatch.
-50/50 three-tier papers. 280 experiments, 8,241+ checks, 1,044 lib tests.
+50/50 three-tier papers. 281 experiments, 8,300+ checks, 1,044 lib tests.
 
 ## Open Data
 

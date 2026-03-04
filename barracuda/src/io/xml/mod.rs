@@ -16,7 +16,7 @@
 
 use crate::error::{Error, Result};
 use std::borrow::Cow;
-use std::collections::VecDeque;
+use std::collections::{HashMap, VecDeque};
 use std::io::BufRead;
 
 const INITIAL_TEXT_BUF_CAPACITY: usize = 4096;
@@ -46,6 +46,10 @@ pub enum XmlEvent {
 }
 
 /// Streaming XML pull parser over any [`BufRead`] source.
+///
+/// Interns element names so repeated tags (e.g. mzML's `cvParam`,
+/// `spectrum`, `binaryDataArray`) share a single `String` allocation
+/// rather than allocating on every open/close tag.
 pub struct XmlReader<R> {
     reader: R,
     trim_text: bool,
@@ -53,6 +57,7 @@ pub struct XmlReader<R> {
     text_buf: Vec<u8>,
     tag_buf: Vec<u8>,
     eof: bool,
+    name_pool: HashMap<Box<str>, String>,
 }
 
 impl<R: BufRead> XmlReader<R> {
@@ -65,7 +70,20 @@ impl<R: BufRead> XmlReader<R> {
             text_buf: Vec::with_capacity(INITIAL_TEXT_BUF_CAPACITY),
             tag_buf: Vec::with_capacity(INITIAL_TAG_BUF_CAPACITY),
             eof: false,
+            name_pool: HashMap::with_capacity(32),
         }
+    }
+
+    /// Return a `String` for `name`, reusing a prior allocation if the
+    /// same element name was seen before. This avoids per-tag allocation
+    /// for the ~6 element names that dominate mzML files.
+    fn intern_name(&mut self, name: &str) -> String {
+        if let Some(existing) = self.name_pool.get(name) {
+            return existing.clone();
+        }
+        let owned = name.to_owned();
+        self.name_pool.insert(name.into(), owned.clone());
+        owned
     }
 
     /// Enable or disable whitespace trimming of text events.
@@ -165,15 +183,17 @@ impl<R: BufRead> XmlReader<R> {
 
             // End tag: </name>
             if self.tag_buf.starts_with(b"/") {
-                let name = std::str::from_utf8(&self.tag_buf[1..])
+                let raw = std::str::from_utf8(&self.tag_buf[1..])
                     .map_err(|e| Error::Xml(format!("invalid UTF-8 in end tag: {e}")))?
                     .trim()
                     .to_owned();
+                let name = self.intern_name(&raw);
                 self.queue.push_back(XmlEvent::EndElement { name });
                 return Ok(self.queue.pop_front().unwrap_or(XmlEvent::Eof));
             }
 
-            // Start or self-closing element.
+            // Start or self-closing element — parse name and attrs from
+            // tag_buf, then release the borrow before interning.
             let tag_str = std::str::from_utf8(&self.tag_buf)
                 .map_err(|e| Error::Xml(format!("invalid UTF-8 in tag: {e}")))?;
             let is_empty = tag_str.trim_end().ends_with('/');
@@ -191,15 +211,19 @@ impl<R: BufRead> XmlReader<R> {
                 .find(|c: char| c.is_ascii_whitespace())
                 .map_or((body, ""), |pos| (&body[..pos], body[pos..].trim()));
 
-            let name = name_part.to_owned();
+            let name_owned = name_part.to_owned();
             let attrs = parse_attributes(attr_part);
 
-            self.queue.push_back(XmlEvent::StartElement {
-                name: name.clone(), // ownership transfer: name also used for EndElement below
-                attrs,
-            });
+            let name = self.intern_name(&name_owned);
+
             if is_empty {
+                self.queue.push_back(XmlEvent::StartElement {
+                    name: name.clone(),
+                    attrs,
+                });
                 self.queue.push_back(XmlEvent::EndElement { name });
+            } else {
+                self.queue.push_back(XmlEvent::StartElement { name, attrs });
             }
 
             return Ok(self.queue.pop_front().unwrap_or(XmlEvent::Eof));

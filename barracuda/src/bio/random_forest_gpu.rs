@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated batch Random Forest inference via `ToadStool`.
+//! GPU-accelerated batch Random Forest inference via barraCuda.
 //!
 //! Delegates to `barracuda::ops::bio::rf_inference::RfBatchInferenceGpu` —
 //! the absorbed shader from wetSpring handoff v5. wetSpring provides the

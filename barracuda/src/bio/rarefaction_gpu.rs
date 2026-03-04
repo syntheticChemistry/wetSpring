@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! GPU-accelerated rarefaction with bootstrap confidence intervals.
 //!
-//! Uses `ToadStool`'s `BatchedMultinomialGpu` for batched multinomial
+//! Uses barraCuda's `BatchedMultinomialGpu` for batched multinomial
 //! subsampling across all bootstrap replicates in one GPU dispatch, then
 //! `DiversityFusionGpu` for fused Shannon + Simpson + evenness per replicate.
 //!
@@ -17,7 +17,7 @@
 //! # References
 //!
 //! - Gotelli & Colwell (2001). "Quantifying biodiversity."
-//! - `ToadStool` `batched_multinomial`, `diversity_fusion`.
+//! - barraCuda `batched_multinomial`, `diversity_fusion`.
 
 use crate::bio::diversity;
 use crate::error::{Error, Result};

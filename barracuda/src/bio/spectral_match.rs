@@ -15,7 +15,7 @@
 //!
 //! - Stein, S.E. & Scott, D.R. (1994). J. Am. Soc. Mass Spectrom. 5: 859–866.
 //! - `matchms` Python library (Netherlands eScience Center).
-//! - `ToadStool`'s `cosine_similarity_f64.wgsl` for GPU promotion.
+//! - barraCuda's `cosine_similarity_f64.wgsl` for GPU promotion.
 
 /// Result of a spectral similarity comparison.
 #[derive(Debug, Clone, PartialEq)]

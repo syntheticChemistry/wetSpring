@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** March 3, 2026
-**Status:** Phase 93 — Validation study active — 8,241+ checks, 1,044 lib tests, 280 experiments, 284 binaries, standalone `barraCuda` v0.3.1 (767+ f64-canonical WGSL shaders), 144 primitives consumed, 0 local WGSL, 106 named tolerances, clippy pedantic + nursery ZERO WARNINGS, 52 papers + 6 reproduced, all 39 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers
+**Status:** Phase 95 — Validation study active — 8,300+ checks, 1,044 lib tests, 281 experiments, 285 binaries, standalone `barraCuda` v0.3.1 (767+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, 164 named tolerances, clippy pedantic + nursery ZERO WARNINGS, 52 papers + 6 reproduced, all 39 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers
 **License:** AGPL-3.0-or-later
 
 ---
@@ -55,8 +55,8 @@ implementations into upstream `barraCuda` primitives:
 4. **Absorb** — `barraCuda` integrates as shared math primitives
 5. **Lean** — wetSpring rewires to upstream imports, deletes local code
 
-**Current status:** 42 GPU modules — Lean phase (fully absorbed). All 42 lean on
-upstream `barraCuda` primitives (144 consumed, v0.3.1 standalone, 767+ WGSL shaders).
+**Current status:** 45 GPU modules — Lean phase (fully absorbed). All 45 lean on
+upstream `barraCuda` primitives (150+ consumed, v0.3.1 standalone, 767+ WGSL shaders).
 7 compose `barraCuda` primitives for GPU-accelerated workflows. Zero Passthrough, zero
 Tier B/C modules remain. The forge crate (`metalForge/forge/` v0.3.0) provides substrate
 discovery, capability-based dispatch, and shader origin tracking.
@@ -67,8 +67,8 @@ discovery, capability-based dispatch, and shader origin tracking.
 
 | Claim | Evidence |
 |-------|----------|
-| Rust matches Python across 280 experiments | 8,241+ checks pass (CPU + GPU + metalForge + streaming + cross-spring + soil QS + NPU) |
-| GPU matches CPU across all 42 GPU modules + 1 extension | 1,833+ GPU checks pass (incl. 48 all-domain + 58 metalForge v5 + 18 diversity fusion) |
+| Rust matches Python across 281 experiments | 8,300+ checks pass (CPU + GPU + metalForge + streaming + cross-spring + soil QS + NPU) |
+| GPU matches CPU across all 45 GPU modules + 1 extension | 1,833+ GPU checks pass (incl. 48 all-domain + 58 metalForge v5 + 18 diversity fusion) |
 | BarraCuda CPU parity across 31+ domains (v1-v9) | 407/407 cross-domain checks pass |
 | 926× spectral cosine GPU speedup | Exp016 benchmark |
 | 2.45× full 16S pipeline GPU speedup | Exp015/016 benchmark |
@@ -330,11 +330,11 @@ orchestrates hardware routing separately.
 | Line coverage (`cargo-llvm-cov`) | **95.86% line / 94.02% region / 95.40% fn** |
 | `#![deny(unsafe_code)]` | Enforced crate-wide (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, clippy::unwrap_used)]` | Enforced crate-wide |
-| Named tolerance constants | 106 (all scientifically justified, hierarchy-tested) |
+| Named tolerance constants | 164 (all scientifically justified, hierarchy-tested) |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` files |
-| Provenance headers | All 284 validation/benchmark binaries |
+| Provenance headers | All 285 validation/benchmark binaries |
 
 ## metalForge — Hardware Discovery
 

@@ -224,7 +224,7 @@ fn validate_spectral_batch(gpu: &GpuF64, v: &mut Validator) {
     // GPU cosine on uniform-m/z spectra should give reasonable scores
     let mut all_finite = true;
     for (i, score) in gpu_pw.iter().enumerate() {
-        if !score.is_finite() || *score < 0.0 || *score > 1.0 + 1e-10 {
+        if !score.is_finite() || *score < 0.0 || *score > 1.0 + tolerances::BOUNDED_METRIC_GUARD {
             all_finite = false;
             println!("  [WARN] Spectral pair {i}: score={score:.6} out of range");
         }

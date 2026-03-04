@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated diversity metrics via `BarraCuda` / `ToadStool`.
+//! GPU-accelerated diversity metrics via barraCuda.
 //!
 //! Each function computes the same metric as its CPU counterpart in
 //! [`super::diversity`], but dispatches to GPU. Results should match
@@ -8,10 +8,10 @@
 //! # Shader architecture
 //!
 //! - **Shannon / Simpson / Observed / Evenness / Alpha**: Fused map-reduce
-//!   via `ToadStool`'s `FusedMapReduceF64` — single GPU dispatch with
+//!   via barraCuda's `FusedMapReduceF64` — single GPU dispatch with
 //!   workgroup reduction.
 //!
-//! - **Bray-Curtis pairs**: `ToadStool`'s `BrayCurtisF64` — absorbed from
+//! - **Bray-Curtis pairs**: barraCuda's `BrayCurtisF64` — absorbed from
 //!   wetSpring's custom shader. One thread per pair, with CPU fallback for
 //!   N < 32 samples.
 
@@ -22,7 +22,7 @@ use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
 
 /// Shannon entropy: H = -sum(p\_i \* ln(p\_i)), computed on GPU.
 ///
-/// Uses `ToadStool`'s `FusedMapReduceF64` for single-dispatch map-reduce.
+/// Uses barraCuda's `FusedMapReduceF64` for single-dispatch map-reduce.
 /// Returns same result as [`super::diversity::shannon`] within GPU f64
 /// tolerance.
 ///
@@ -42,8 +42,8 @@ pub fn shannon_gpu(gpu: &GpuF64, counts: &[f64]) -> Result<f64> {
 
 /// Simpson diversity: 1 - sum(p\_i^2), computed on GPU.
 ///
-/// Uses `ToadStool`'s `FusedMapReduceF64` for single-dispatch map-reduce.
-/// `ToadStool`'s `simpson_index` returns `Σ p²` (dominance); we subtract
+/// Uses barraCuda's `FusedMapReduceF64` for single-dispatch map-reduce.
+/// barraCuda's `simpson_index` returns `Σ p²` (dominance); we subtract
 /// from 1 to match the diversity convention used by our CPU
 /// [`super::diversity::simpson`].
 ///
@@ -60,17 +60,17 @@ pub fn simpson_gpu(gpu: &GpuF64, counts: &[f64]) -> Result<f64> {
     let dominance = fmr
         .simpson_index(counts)
         .map_err(|e| Error::Gpu(format!("Simpson GPU: {e}")))?;
-    // ToadStool returns Σ p² (dominance); convert to diversity = 1 - Σ p²
+    // barraCuda returns Σ p² (dominance); convert to diversity = 1 - Σ p²
     Ok(1.0 - dominance)
 }
 
 /// All-pairs Bray-Curtis condensed distance matrix, computed on GPU.
 ///
-/// Uses `ToadStool`'s `BrayCurtisF64` (absorbed from wetSpring's custom
+/// Uses barraCuda's `BrayCurtisF64` (absorbed from wetSpring's custom
 /// shader). Returns N*(N-1)/2 distances in condensed order:
 /// (1,0), (2,0), (2,1), (3,0), ...
 ///
-/// `ToadStool` automatically falls back to CPU for N < 32 samples.
+/// barraCuda automatically falls back to CPU for N < 32 samples.
 ///
 /// # Errors
 ///

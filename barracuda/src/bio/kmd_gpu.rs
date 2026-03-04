@@ -58,7 +58,7 @@ pub fn kendrick_mass_defect_gpu(
     // KMD is purely element-wise arithmetic: KM = mass * (nom/exact),
     // KMD = floor(KM) - KM. This maps cleanly and the FMR sum above
     // confirms the device works. The actual per-element KMD is computed
-    // with the CPU kernel for exact bit-parity until ToadStool provides
+    // with the CPU kernel for exact bit-parity until barraCuda provides
     // a per-element map-output primitive.
     Ok(kmd::kendrick_mass_defect(
         exact_masses,

@@ -5,7 +5,7 @@
 //! No math is duplicated — the dispatch layer is purely structural.
 //!
 //! When `--features gpu` is active, diversity and Anderson methods route
-//! through `ToadStool`'s GPU primitives (`FusedMapReduceF64`, Lanczos, etc.)
+//! through barraCuda's GPU primitives (`FusedMapReduceF64`, Lanczos, etc.)
 //! with automatic CPU fallback below the dispatch threshold or on GPU error.
 
 use serde_json::Value;

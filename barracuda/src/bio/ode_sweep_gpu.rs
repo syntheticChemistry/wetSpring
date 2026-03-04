@@ -34,7 +34,7 @@ pub struct OdeSweepConfig {
 
 /// GPU-backed ODE parameter sweep for the QS biofilm 5-variable system.
 ///
-/// Delegates to `barracuda::ops::BatchedOdeRK4F64` (`ToadStool` upstream).
+/// Delegates to `barracuda::ops::BatchedOdeRK4F64` (barraCuda upstream).
 pub struct OdeSweepGpu {
     device: Arc<WgpuDevice>,
 }

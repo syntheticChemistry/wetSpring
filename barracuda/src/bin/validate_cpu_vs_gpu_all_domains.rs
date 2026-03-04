@@ -791,7 +791,7 @@ fn validate_rarefaction(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timin
     v.check_pass("Rarefaction Shannon > 0", result.shannon.mean > 0.0);
     v.check_pass(
         "Rarefaction Shannon CI valid",
-        result.shannon.lower <= result.shannon.mean + 1e-10,
+        result.shannon.lower <= result.shannon.mean + tolerances::RAREFACTION_CI_GUARD,
     );
     v.check_pass(
         "Rarefaction Shannon ≤ full",

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! GPU-accelerated cooperative QS game theory ODE parameter sweep.
 //!
-//! **Lean phase complete**: Uses `ToadStool`'s `BatchedOdeRK4<CooperationOde>::generate_shader()`
+//! **Lean phase complete**: Uses barraCuda's `BatchedOdeRK4<CooperationOde>::generate_shader()`
 //! via the `OdeSystem` trait (see `bio::ode_systems::CooperationOde`).
 //! Local WGSL file deleted — shader now generated from trait impl at runtime.
 //!

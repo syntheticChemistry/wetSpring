@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![allow(clippy::missing_errors_doc, clippy::missing_const_for_fn)]
-//! Bridge to `ToadStool`'s `barracuda::esn_v2` for bio use cases.
+//! barraCuda ESN bridge for bio use cases.
 //!
 //! Two tiers:
 //! - [`BioEsn`]: single-head ESN for backward compatibility and simple classifiers.
-//! - [`MultiHeadBioEsn`]: wraps `ToadStool` `MultiHeadEsn` (S79) — shared reservoir
+//! - [`MultiHeadBioEsn`]: wraps barraCuda `MultiHeadEsn` (S79) — shared reservoir
 //!   with per-head bio readouts, head disagreement uncertainty, and labeled exports.
 //!
 //! # Cross-spring provenance
 //!
 //! - ESN core: hotSpring V0615 (36-head concept, `MultiHeadEsn`)
 //! - Reservoir WGSL shaders: neuralSpring V24 (`LstmReservoir`, `EsnClassifier`)
-//! - Ridge regression readout: `ToadStool` `barracuda::linalg::solve_f64_cpu`
+//! - Ridge regression readout: barraCuda `barracuda::linalg::solve_f64_cpu`
 //! - Bio feature mapping: wetSpring (diversity, taxonomy, AMR, bloom, disorder heads)
 
 use super::{EsnConfig, NpuReadoutWeights};
@@ -58,7 +58,7 @@ impl BioHeadKind {
     }
 }
 
-/// Bio-specific ESN configuration mapping to `ToadStool` `ESNConfig`.
+/// Bio-specific ESN configuration mapping to barraCuda `ESNConfig`.
 #[derive(Debug, Clone)]
 pub struct BioEsnConfig {
     /// Input feature size (e.g. diversity metrics, k-mer counts).
@@ -110,7 +110,7 @@ impl From<&EsnConfig> for BioEsnConfig {
 }
 
 impl BioEsnConfig {
-    /// Convert to `ToadStool` `ESNConfig` (f32).
+    /// Convert to barraCuda `ESNConfig` (f32).
     #[must_use]
     pub fn to_esn_config(&self) -> ESNConfig {
         ESNConfig {
@@ -141,16 +141,16 @@ impl BioEsnConfig {
     }
 }
 
-/// Bio ESN wrapping `ToadStool`'s hardware-agnostic ESN.
+/// Bio ESN wrapping barraCuda's hardware-agnostic ESN.
 ///
-/// Provides sync API over async `ToadStool` ESN for bio pipelines.
+/// Provides sync API over async barraCuda ESN for bio pipelines.
 /// Exports weights for NPU deployment via `ExportedWeights` and `NpuReadoutWeights`.
 pub struct BioEsn {
     inner: ESN,
 }
 
 impl BioEsn {
-    /// Create a new `BioEsn` (blocks on async `ToadStool` ESN init).
+    /// Create a new `BioEsn` (blocks on async barraCuda ESN init).
     ///
     /// # Errors
     /// Returns `barracuda::error::BarracudaError` if config is invalid or device init fails.
@@ -225,7 +225,7 @@ impl BioEsn {
                 })?;
         let n_res = self.inner.config().reservoir_size;
         let n_out = self.inner.config().output_size;
-        // ToadStool stores [reservoir_size, output_size]; wetSpring expects [output_size, reservoir_size].
+        // barraCuda stores [reservoir_size, output_size]; wetSpring expects [output_size, reservoir_size].
         let mut w_out_f64 = vec![0.0_f64; n_out * n_res];
         for r in 0..n_res {
             for o in 0..n_out {
@@ -239,7 +239,7 @@ impl BioEsn {
 
     /// Export all weights for cross-device deployment.
     ///
-    /// Includes `head_labels` for bio heads (`ToadStool` S79+).
+    /// Includes `head_labels` for bio heads (barraCuda S79+).
     pub fn export_weights(&self) -> Result<ExportedWeights, barracuda::error::BarracudaError> {
         let mut weights = self.inner.export_weights()?;
         if weights.head_labels.is_empty() && self.inner.config().output_size > 1 {
@@ -274,7 +274,7 @@ impl BioEsn {
     }
 }
 
-/// Multi-head bio ESN wrapping `ToadStool`'s `MultiHeadEsn` (S79).
+/// Multi-head bio ESN wrapping barraCuda's `MultiHeadEsn` (S79).
 ///
 /// Shared reservoir with per-head readouts for bio classification domains.
 /// Each head is independently trainable and exportable. Head disagreement
@@ -283,7 +283,7 @@ impl BioEsn {
 /// # Cross-spring provenance
 ///
 /// - Shared reservoir: hotSpring V0615 (36-head concept → `ToadStool` `MultiHeadEsn`)
-/// - Per-head ridge regression: `ToadStool` `barracuda::linalg::solve_f64_cpu`
+/// - Per-head ridge regression: barraCuda `barracuda::linalg::solve_f64_cpu`
 /// - Bio head mapping: wetSpring (diversity/taxonomy/AMR/bloom/disorder)
 /// - Head disagreement: hotSpring uncertainty metric (mean pairwise L2)
 pub struct MultiHeadBioEsn {
@@ -355,7 +355,7 @@ impl MultiHeadBioEsn {
     /// Mean pairwise L2 distance between head predictions (uncertainty signal).
     ///
     /// Higher disagreement → lower confidence in the consensus prediction.
-    /// Requires a reservoir state `Tensor` (from `ToadStool` ESN forward pass).
+    /// Requires a reservoir state `Tensor` (from barraCuda ESN forward pass).
     pub fn head_disagreement(
         &self,
         state: &Tensor,

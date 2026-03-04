@@ -59,6 +59,9 @@ impl NanoporeRead {
     }
 
     /// Compute basic signal statistics: (mean, `std_dev`, min, max).
+    ///
+    /// Uses Welford's online algorithm for numerically stable single-pass
+    /// computation — no intermediate `Vec<f64>` allocation.
     #[must_use]
     #[allow(clippy::cast_precision_loss)]
     pub fn signal_stats(&self) -> SignalStats {
@@ -72,19 +75,27 @@ impl NanoporeRead {
             };
         }
 
-        let signal_f64: Vec<f64> = self.signal.iter().map(|&s| f64::from(s)).collect();
-        let mean = barracuda::stats::mean(&signal_f64);
-        let n = signal_f64.len() as f64;
-        let std_dev = barracuda::stats::correlation::variance(&signal_f64)
-            .map(|var_sample| (var_sample * (n - 1.0) / n).sqrt())
-            .unwrap_or(0.0);
-        let (lo, hi) = self
-            .signal
-            .iter()
-            .fold((i16::MAX, i16::MIN), |(lo, hi), &s| (lo.min(s), hi.max(s)));
+        let mut lo = i16::MAX;
+        let mut hi = i16::MIN;
+        let mut welford_mean = 0.0_f64;
+        let mut m2 = 0.0_f64;
+
+        for (i, &s) in self.signal.iter().enumerate() {
+            lo = lo.min(s);
+            hi = hi.max(s);
+            let x = f64::from(s);
+            let count = (i + 1) as f64;
+            let delta = x - welford_mean;
+            welford_mean += delta / count;
+            let delta2 = x - welford_mean;
+            m2 += delta * delta2;
+        }
+
+        let n = self.signal.len() as f64;
+        let std_dev = if n > 1.0 { (m2 / n).sqrt() } else { 0.0 };
 
         SignalStats {
-            mean,
+            mean: welford_mean,
             std_dev,
             min: lo,
             max: hi,

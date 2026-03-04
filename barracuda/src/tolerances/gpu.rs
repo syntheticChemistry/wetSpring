@@ -23,7 +23,7 @@ pub const GPU_VS_CPU_TRANSCENDENTAL: f64 = 1e-10;
 
 /// GPU f64 log polyfill precision (software `log_f64` shader).
 ///
-/// When native WGSL `log(f64)` is unavailable, `ToadStool` uses a
+/// When native WGSL `log(f64)` is unavailable, barraCuda uses a
 /// polynomial `log_f64` polyfill with ~1e-8 absolute precision.
 /// Allow 1e-7 for single evaluations; accumulated chains (Shannon
 /// over N species) may reach ~1e-6 covered by [`GPU_VS_CPU_F64`].

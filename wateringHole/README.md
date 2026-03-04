@@ -9,9 +9,11 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V93+** | `handoffs/WETSPRING_V93_DEEP_DEBT_TOADSTOOL_HANDOFF_MAR04_2026.md` | Mar 4 | Deep debt round 3: 164 tolerances, test extraction, provenance complete, kmer fix, pcoa absorption docs, full audit results, patterns for barraCuda evolution |
-| **V93** | `handoffs/WETSPRING_BARRACUDA_031_REWIRE_HANDOFF_MAR03_2026.md` | Mar 3 | Standalone barraCuda v0.3.1 rewire: path swap, MSRV bump, NPU strategy, zero API breakage |
-| **V93** | `handoffs/WETSPRING_V93_BARRACUDA_EVOLUTION_FEEDBACK_MAR03_2026.md` | Mar 3 | Evolution feedback to barraCuda/toadStool: 144 primitives consumed, precision observations, deep debt patterns |
+| **V95** | `handoffs/WETSPRING_V95_CROSS_SPRING_EVOLUTION_COMPLETE_MAR04_2026.md` | Mar 4 | Cross-spring evolution complete: 6 GPU ops + 2 CPU delegations wired, Exp305 (59/59), full provenance table, benchmarks |
+| **V94** | `handoffs/WETSPRING_V94_BARRACUDA_EVOLUTION_SYNC_MAR04_2026.md` | Mar 4 | barraCuda evolution sync: norm_ppf wiring, 50+ doc files cleaned (ToadStool → barraCuda), gap analysis |
+| **V93+** | `handoffs/WETSPRING_V93_DEEP_DEBT_TOADSTOOL_HANDOFF_MAR04_2026.md` | Mar 4 | Deep debt round 3: 164 tolerances, test extraction, provenance complete |
+| **V93** | `handoffs/WETSPRING_BARRACUDA_031_REWIRE_HANDOFF_MAR03_2026.md` | Mar 3 | Standalone barraCuda v0.3.1 rewire: path swap, MSRV bump, zero API breakage |
+| **V93** | `handoffs/WETSPRING_V93_BARRACUDA_EVOLUTION_FEEDBACK_MAR03_2026.md` | Mar 3 | Evolution feedback: 150+ primitives consumed, precision observations |
 | **V92F** | `handoffs/WETSPRING_CROSS_SPRING_V92F_MODERN_S86_HANDOFF_MAR02_2026.md` | Mar 2 | Cross-spring modern S86 validation + benchmark |
 | **V92D+** | `handoffs/WETSPRING_PAPER_CHAIN_V92D_PLUS_HANDOFF_MAR02_2026.md` | Mar 2 | Paper-math chain: 52 papers, CPU→GPU→streaming→metalForge |
 | **V92B** | `handoffs/WETSPRING_GONZALES_REPRO_V92B_HANDOFF_MAR02_2026.md` | Mar 2 | Gonzales reproducibility handoff |
@@ -28,8 +30,7 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` — V7-V92J ToadStool-era handoffs (80+ files).
-All preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda.
+Superseded handoffs in `handoffs/archive/` — V7–V92J ToadStool-era handoffs (80+ files).
 Preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda.
 
 ## Convention

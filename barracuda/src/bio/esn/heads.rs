@@ -8,7 +8,7 @@
 //!
 //! - Layout concept: hotSpring v0.6.15 (`reservoir.rs` Gen 2 "Developed Organism")
 //! - Physics→bio mapping: wetSpring V89 (`CROSS_SPRING_EVOLUTION.md`)
-//! - Upstream ESN: `ToadStool` `MultiHeadEsn` (S79, hotSpring 36-head absorption)
+//! - Upstream ESN: barraCuda `MultiHeadEsn` (S79, hotSpring 36-head absorption)
 
 // ── Group A: Anderson-informed (disorder → localization → spectral) ──
 

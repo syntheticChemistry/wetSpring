@@ -325,7 +325,7 @@ fn npu_from_readout_weights() {
     assert_eq!(out.len(), 2);
 }
 
-// ── ToadStool bridge tests (gpu feature) ────────────────────────────────────
+// ── barraCuda bridge tests (gpu feature) ────────────────────────────────────
 
 #[cfg(feature = "gpu")]
 #[test]

@@ -21,7 +21,7 @@
 //! GBM is inherently sequential across trees (tree N depends on tree N-1
 //! cumulative sum). However, within each tree, the batch of samples can
 //! be dispatched in parallel. For multi-class, the K class chains can
-//! also run in parallel. `ToadStool` absorption as `GbmBatchInferenceGpu`.
+//! also run in parallel. barraCuda absorption as `GbmBatchInferenceGpu`.
 
 use crate::error;
 

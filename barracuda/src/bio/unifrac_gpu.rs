@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated `UniFrac` tree propagation via `ToadStool`.
+//! GPU-accelerated `UniFrac` tree propagation via barraCuda.
 //!
 //! Delegates to `barracuda::ops::bio::unifrac_propagate::UniFracPropagateGpu`.
 //! wetSpring provides the high-level API that builds CSR tree buffers from

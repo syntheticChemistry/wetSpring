@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-04 (Phase 93+: 280 experiments, 284 binaries, 8,241+ checks, standalone `barraCuda` v0.3.1 (767+ WGSL shaders), 144 primitives consumed, 1,054 lib tests, 164 named tolerances, clippy pedantic + nursery ZERO WARNINGS, `cargo doc` ZERO WARNINGS)
+**Updated**: 2026-03-04 (Phase 95: 281 experiments, 285 binaries, 8,300+ checks, standalone `barraCuda` v0.3.1 (767+ WGSL shaders), 150+ primitives consumed, 1,261 lib+forge tests, 94.69% coverage, 164 named tolerances, clippy pedantic + nursery ZERO WARNINGS, `cargo doc` ZERO WARNINGS)
 
 ---
 
@@ -188,6 +188,7 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 302 | [NUCLEUS+PCIe+biomeOS V92G](302_nucleus_biomeos_v92g.md) | forge | DONE | metalForge | Tower/Node/Nest, PCIe bypass, biomeOS DAG, 54 workloads dispatched, streaming patterns, absorption evolution | 113 |
 | 303 | [Mixed NUCLEUS V92G](303_mixed_nucleus_v92g.md) | forge | DONE | metalForge | Multi-GPU dispatch, 6 GPU/NPU/CPU pipeline patterns, topology matrix, all 54 workloads routed, bandwidth decisions | 147 |
 | 304 | [Cross-Spring Evolution S87](304_cross_spring_evolution_s87.md) | cross | DONE | ToadStool S87 | Cross-spring provenance, shader evolution, 61 checks | 61 |
+| 305 | Cross-Spring Evolution S93 | cross | DONE | barraCuda v0.3.1 | 12-domain validation: math, RK45 ODE, stats, spectral, linalg, sampling, numerical, bio ODE, tolerance search, KMD, benchmarks, provenance | 59 |
 
 ---
 
@@ -396,7 +397,7 @@ thresholds from `src/tolerances.rs`.
 | `validate_cross_spring_modern_s86` | 297 | 46 | `cargo run --release --features gpu --bin validate_cross_spring_modern_s86` |
 | `validate_cross_spring_evolution_s87` | 304 | 61 | `cargo run --release --features gpu --bin validate_cross_spring_evolution_s87` |
 
-**Total validation checks**: 8,241+
+**Total validation checks**: 8,300+
 **Rust tests**: 1,044 (library)
 **Binaries**: 268 total
 **barraCuda primitives**: 144 consumed (standalone v0.3.1, zero fallback code)

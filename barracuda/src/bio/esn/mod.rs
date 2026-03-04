@@ -11,9 +11,9 @@
 //!
 //! - **Legacy** (`LegacyEsn`): CPU-only, minimal LCG PRNG, custom reservoir.
 //!   Always available. Use for non-GPU builds and backward compatibility.
-//! - **`ToadStool` bridge** (`BioEsn`): Wraps `barracuda::esn_v2::ESN` for bio use cases.
+//! - **barraCuda bridge** (`BioEsn`): Wraps `barracuda::esn_v2::ESN` for bio use cases.
 //!   Hardware-agnostic (Tensor), WGSL fused reservoir update. Requires `gpu` feature.
-//! - **Multi-head** (`MultiHeadBioEsn`): Wraps `ToadStool` `MultiHeadEsn` (S79).
+//! - **Multi-head** (`MultiHeadBioEsn`): Wraps barraCuda `MultiHeadEsn` (S79).
 //!   Shared reservoir, per-head bio readout, head disagreement uncertainty.
 //!   Cross-spring provenance: hotSpring (36-head) + wetSpring (bio heads).
 //!
@@ -51,7 +51,7 @@ use training::solve_ridge;
 ///
 /// Uses minimal LCG PRNG, custom reservoir building, ridge regression training.
 /// Always available. For GPU/NPU-capable ESN when `gpu` feature is enabled,
-/// use `BioEsn` (requires `gpu` feature) which wraps `ToadStool`'s `barracuda::esn_v2::ESN`.
+/// use `BioEsn` (requires `gpu` feature) which wraps barraCuda's `barracuda::esn_v2::ESN`.
 pub struct LegacyEsn {
     w_in: Vec<f64>,
     w_res: Vec<f64>,

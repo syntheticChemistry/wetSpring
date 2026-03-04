@@ -13,7 +13,7 @@
 //! # GPU Promotion
 //!
 //! The Q-matrix computation is O(n²) and embarrassingly parallel — each
-//! element is independent. `ToadStool` can dispatch one workgroup for the
+//! element is independent. barraCuda can dispatch one workgroup for the
 //! Q-matrix, then CPU performs the sequential join step. For large n
 //! (thousands of taxa), the distance matrix computation from sequences
 //! is also a GPU target via `score_batch` (Smith-Waterman) or JC distance.

@@ -285,7 +285,12 @@ fn main() {
     );
     let jk = barracuda::stats::jackknife_mean_variance(&stat_data).unwrap();
     v.check_pass("D10: JK SE > 0", jk.std_error > 0.0);
-    v.check("D10: JK ≈ Bootstrap", jk.estimate, ci.estimate, 0.5);
+    v.check(
+        "D10: JK ≈ Bootstrap",
+        jk.estimate,
+        ci.estimate,
+        tolerances::JACKKNIFE_VS_BOOTSTRAP,
+    );
 
     // ═══ D11: Hydrology ET₀ ════════════════════════════════════════
     v.section("D11: Hydrology ET₀ — 6 Methods");
@@ -354,7 +359,10 @@ fn main() {
     let unpacked = wetspring_barracuda::df64_host::unpack_slice(&packed);
     v.check_pass("D14: unpack recovers length", unpacked.len() == vals.len());
     let err = wetspring_barracuda::df64_host::roundtrip_error(std::f64::consts::PI);
-    v.check_pass(&format!("D14: roundtrip err={err:.2e}"), err < 1e-10);
+    v.check_pass(
+        &format!("D14: roundtrip err={err:.2e}"),
+        err < tolerances::ANALYTICAL_LOOSE,
+    );
 
     // ═══ D15: Regression Model Selection ════════════════════════════
     v.section("D15: Regression — fit_all");

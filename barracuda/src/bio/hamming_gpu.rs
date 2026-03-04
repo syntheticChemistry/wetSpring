@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated pairwise Hamming distance via `ToadStool`.
+//! GPU-accelerated pairwise Hamming distance via barraCuda.
 //!
 //! Delegates to `barracuda::ops::bio::pairwise_hamming::PairwiseHammingGpu` —
 //! evolved by `neuralSpring`, absorbed in `ToadStool` session 31f.

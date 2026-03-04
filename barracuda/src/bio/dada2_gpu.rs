@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated DADA2 denoising via `ToadStool`.
+//! GPU-accelerated DADA2 denoising via barraCuda.
 //!
 //! The DADA2 EM loop has two cost centres:
 //!   1. `assign_to_centers` (E-step): O(seqs × centers × `seq_length`) — **GPU**
@@ -25,7 +25,7 @@ use barracuda::device::WgpuDevice;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
-/// Pre-compiled DADA2 E-step pipeline via `ToadStool`.
+/// Pre-compiled DADA2 E-step pipeline via barraCuda.
 pub struct Dada2Gpu {
     device: Arc<WgpuDevice>,
     inner: Dada2EStepGpu,
@@ -36,7 +36,7 @@ impl Dada2Gpu {
     ///
     /// # Errors
     ///
-    /// Returns an error if `ToadStool` shader compilation fails.
+    /// Returns an error if barraCuda shader compilation fails.
     pub fn new(device: Arc<WgpuDevice>) -> Result<Self> {
         let inner = Dada2EStepGpu::new(Arc::clone(&device))
             .map_err(|e| Error::Gpu(format!("Dada2EStepGpu: {e}")))?;

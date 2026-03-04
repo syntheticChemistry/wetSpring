@@ -345,11 +345,9 @@ async fn main() {
     );
     v.check(
         "Bray-Curtis: all valid [0,1]",
-        f64::from(u8::from(
-            routed_bray
-                .iter()
-                .all(|d| d.is_finite() && *d >= 0.0 && *d <= 1.0 + 1e-10),
-        )),
+        f64::from(u8::from(routed_bray.iter().all(|d| {
+            d.is_finite() && *d >= 0.0 && *d <= 1.0 + tolerances::BOUNDED_METRIC_GUARD
+        }))),
         1.0,
         tolerances::EXACT,
     );

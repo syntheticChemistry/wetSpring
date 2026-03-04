@@ -47,6 +47,7 @@ use std::time::Instant;
 
 use wetspring_barracuda::bio::{diversity, diversity_gpu};
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn bench_ms(f: impl FnOnce()) -> f64 {
@@ -175,7 +176,10 @@ fn main() {
         assert_eq!(lap.len(), n_nodes * n_nodes, "Laplacian should be n²");
         for i in 0..n_nodes {
             let row_sum: f64 = (0..n_nodes).map(|j| lap[i * n_nodes + j]).sum();
-            assert!(row_sum.abs() < 1e-10, "Laplacian row {i} sum = {row_sum}");
+            assert!(
+                row_sum.abs() < tolerances::LAPLACIAN_ROW_SUM,
+                "Laplacian row {i} sum = {row_sum}"
+            );
         }
         let diag: Vec<f64> = (0..n_nodes).map(|i| lap[i * n_nodes + i]).collect();
         eff_rank = barracuda::linalg::effective_rank(&diag);
@@ -201,7 +205,7 @@ fn main() {
     let final_sum: f64 = bp.last().unwrap().iter().sum();
     v.check_pass(
         "S4: final distribution sums to 1",
-        (final_sum - 1.0).abs() < 1e-10,
+        (final_sum - 1.0).abs() < tolerances::DISTRIBUTION_SUM_TO_ONE,
     );
 
     let hetero = vec![0.1, -0.2, 0.05, -0.1, 0.15];

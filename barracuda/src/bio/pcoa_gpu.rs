@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated `PCoA` via `ToadStool`'s `BatchedEighGpu`.
+//! GPU-accelerated `PCoA` via barraCuda's `BatchedEighGpu`.
 //!
 //! Workflow:
 //! 1. Double-center the squared distance matrix (CPU — O(N²))
@@ -24,7 +24,7 @@ use barracuda::ops::linalg::batched_eigh_gpu::BatchedEighGpu;
 
 /// `PCoA` with GPU-accelerated eigendecomposition.
 ///
-/// Uses `ToadStool`'s `BatchedEighGpu` for the eigensolve step.
+/// Uses barraCuda's `BatchedEighGpu` for the eigensolve step.
 /// CPU handles double-centering (O(N²)) and coordinate extraction.
 ///
 /// # Arguments
@@ -68,7 +68,7 @@ pub fn pcoa_gpu(
     // 1. Build double-centered matrix (CPU — fast for typical N < 1000)
     let centered = double_center(condensed, n);
 
-    // 2. GPU eigendecomposition via ToadStool
+    // 2. GPU eigendecomposition via barraCuda
     let device = gpu.to_wgpu_device();
     #[allow(clippy::cast_possible_truncation)] // capped at 5000, fits u32
     let max_sweeps = (100 * n).min(5000) as u32;

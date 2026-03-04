@@ -51,6 +51,7 @@ use barracuda::shaders::Precision;
 use wetspring_barracuda::bio::diversity_fusion_gpu::{DiversityFusionGpu, diversity_fusion_cpu};
 use wetspring_barracuda::bio::gemm_cached::GemmCached;
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 struct Timing {
@@ -663,11 +664,17 @@ fn main() {
 
         for (i, (&orig, &rt)) in values.iter().zip(unpacked.iter()).enumerate() {
             let err = (orig - rt).abs() / orig.abs().max(1e-300);
-            v.check_pass(&format!("DF64 roundtrip[{i}] < 1e-10"), err < 1e-10);
+            v.check_pass(
+                &format!("DF64 roundtrip[{i}] < ANALYTICAL_LOOSE"),
+                err < tolerances::ANALYTICAL_LOOSE,
+            );
         }
 
         let rt_err = wetspring_barracuda::df64_host::roundtrip_error(std::f64::consts::PI);
-        v.check_pass("DF64 π roundtrip < 1e-10", rt_err < 1e-10);
+        v.check_pass(
+            "DF64 π roundtrip < ANALYTICAL_LOOSE",
+            rt_err < tolerances::ANALYTICAL_LOOSE,
+        );
         println!("  DF64 π roundtrip error: {rt_err:.2e}");
 
         println!("  Written: hotSpring (DF64 core-streaming theory, f32-pair emulation)");

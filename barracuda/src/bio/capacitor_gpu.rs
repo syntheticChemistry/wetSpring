@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! GPU-accelerated phenotypic capacitor ODE parameter sweep.
 //!
-//! **Lean phase complete**: Uses `ToadStool`'s `BatchedOdeRK4<CapacitorOde>::generate_shader()`
+//! **Lean phase complete**: Uses barraCuda's `BatchedOdeRK4<CapacitorOde>::generate_shader()`
 //! via the `OdeSystem` trait (see `bio::ode_systems::CapacitorOde`).
 //! Local WGSL file deleted — shader now generated from trait impl at runtime.
 //!

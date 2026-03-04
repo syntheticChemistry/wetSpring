@@ -3,7 +3,7 @@
 //!
 //! Each read pair is merged independently — embarrassingly parallel across
 //! pairs. The GPU path validates device availability and batches pairs
-//! through the CPU merge kernel for exact parity. When `ToadStool` provides
+//! through the CPU merge kernel for exact parity. When barraCuda provides
 //! a `BatchMergePairsGpu` primitive (overlap scoring + quality consensus),
 //! this wrapper will be rewired to dispatch natively on GPU.
 //!

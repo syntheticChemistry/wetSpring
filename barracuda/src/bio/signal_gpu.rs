@@ -6,7 +6,7 @@
 //! interpolation. The batch dimension (multiple signals in a pipeline) is
 //! embarrassingly parallel.
 //!
-//! Delegates to `ToadStool`'s `PeakDetectF64` (S62) for native GPU dispatch
+//! Delegates to barraCuda's `PeakDetectF64` (S62) for native GPU dispatch
 //! with WGSL parallel local-maxima + prominence shader. Falls back to CPU
 //! `find_peaks` for signals shorter than 64 elements.
 
@@ -38,7 +38,7 @@ const fn upstream_to_local(det: &barracuda::ops::peak_detect_f64::DetectedPeak) 
 
 /// GPU-accelerated peak detection on a single signal.
 ///
-/// Uses `ToadStool`'s `PeakDetectF64` WGSL shader for parallel local-maxima
+/// Uses barraCuda's `PeakDetectF64` WGSL shader for parallel local-maxima
 /// detection and prominence computation. Falls back to CPU for short signals.
 ///
 /// # Errors

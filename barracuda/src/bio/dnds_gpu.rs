@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated batch pairwise dN/dS (Nei-Gojobori 1986) via `ToadStool`.
+//! GPU-accelerated batch pairwise dN/dS (Nei-Gojobori 1986) via barraCuda.
 //!
 //! Delegates to `barracuda::ops::bio::dnds::DnDsBatchF64` — the absorbed
 //! shader from wetSpring handoff v6. wetSpring provides the high-level
@@ -9,7 +9,7 @@
 //!
 //! dN/dS is codon-sequential but pair-parallel. Each thread runs the
 //! full Nei-Gojobori analysis for one pair. Requires `log()` for
-//! Jukes-Cantor — `ToadStool` handles polyfill on NVVM drivers.
+//! Jukes-Cantor — barraCuda handles polyfill on NVVM drivers.
 
 use barracuda::DnDsBatchF64;
 use barracuda::device::WgpuDevice;
@@ -49,7 +49,7 @@ impl DnDsGpu {
     ///
     /// # Errors
     ///
-    /// Returns an error if `ToadStool` shader compilation fails.
+    /// Returns an error if barraCuda shader compilation fails.
     pub fn new(device: &Arc<WgpuDevice>) -> crate::error::Result<Self> {
         let inner = DnDsBatchF64::new(Arc::clone(device))
             .map_err(|e| crate::error::Error::Gpu(format!("DnDsBatchF64: {e}")))?;

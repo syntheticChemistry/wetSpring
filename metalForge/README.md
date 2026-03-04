@@ -158,11 +158,11 @@ affinities. metalForge maps each validated algorithm to its optimal substrate.
 wetSpring follows hotSpring's pattern for ToadStool absorption:
 
 ```
-1. Validate in Rust CPU (barracuda/)          ← DONE: 47 CPU + 42 GPU + 1 vault, 1,223 tests, 280 experiments, 8,241+ checks
+1. Validate in Rust CPU (barracuda/)          ← DONE: 47 CPU + 45 GPU + 1 vault, 1,223 tests, 281 experiments, 8,300+ checks
 2. Characterize hardware (metalForge/)         ← THIS DIRECTORY — 166 forge tests
 3. Write Rust in GPU-friendly patterns         ← 34 Lean + 7 Compose; 0 local WGSL (fully lean); 0 Passthrough
 4. ToadStool absorbs as shared primitives      ← unidirectional handoff via wateringHole/handoffs/
-5. wetSpring consumes ToadStool primitives     ← 144 consumed, 42 GPU modules (S87, 2dc26792)
+5. wetSpring consumes ToadStool primitives     ← 150+ consumed, 45 GPU modules (S87, 2dc26792)
 ```
 
 ### What "GPU-Friendly Patterns" Means for Life Science
@@ -207,7 +207,7 @@ All 31+ algorithmic domains proven correct in pure Rust CPU:
 - **22.5× overall speedup** over Python (Exp059, peak 625× for SW)
 
 ### GPU: 1,578+ Checks Passing (Exp044–103)
-GPU math portability proven across all 42 GPU modules:
+GPU math portability proven across all 45 GPU modules:
 - **1,578+/1,578+ GPU checks** across 22 validation binaries
 - **Absorbed** (Lean): SW, Gillespie, DT, Felsenstein, GEMM, diversity, PCoA, spectral
 - **Absorbed** (Lean, Feb 22): HMM, DADA2, quality, ANI, SNP, dN/dS, pangenome, RF
@@ -332,7 +332,7 @@ it and rely on `compile_shader_f64` or `ShaderTemplate` preprocessing.
 
 ## GPU Module Status (V73)
 
-All 42 GPU modules are operational. 0 local WGSL shaders — fully lean.
+All 45 GPU modules are operational. 0 local WGSL shaders — fully lean.
 
 | Tier | Count | Examples | Status |
 |------|:-----:|---------|--------|

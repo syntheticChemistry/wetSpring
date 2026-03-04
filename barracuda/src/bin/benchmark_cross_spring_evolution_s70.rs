@@ -54,6 +54,7 @@
 //! | Command | `cargo run --bin benchmark_cross_spring_evolution_s70` |
 
 use std::time::Instant;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 struct ProvenanceTiming {
@@ -450,7 +451,12 @@ fn main() {
     {
         let diag_sum: f64 = (0..n).map(|i| lap[i * n + i]).sum();
         let off_diag_sum: f64 = lap.iter().sum::<f64>() - diag_sum;
-        v.check("Laplacian row-sum ≈ 0", diag_sum + off_diag_sum, 0.0, 1e-10);
+        v.check(
+            "Laplacian row-sum ≈ 0",
+            diag_sum + off_diag_sum,
+            0.0,
+            tolerances::LAPLACIAN_ROW_SUM,
+        );
     }
     timings.push(ProvenanceTiming {
         domain: "linalg",

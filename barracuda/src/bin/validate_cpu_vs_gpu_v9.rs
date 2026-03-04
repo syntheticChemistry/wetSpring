@@ -147,7 +147,12 @@ fn main() {
     }
 
     let cos_self = barracuda::linalg::nmf::cosine_similarity(&drug_matrix, &drug_matrix);
-    v.check("NMF: self-cosine = 1", cos_self, 1.0, 1e-10);
+    v.check(
+        "NMF: self-cosine = 1",
+        cos_self,
+        1.0,
+        tolerances::ANALYTICAL_LOOSE,
+    );
 
     // ═══ D35: Anderson W-Mapping ═════════════════════════════════════════
     v.section("D35: Anderson W-Mapping — CPU Reference");

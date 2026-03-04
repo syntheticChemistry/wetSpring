@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Ridge regression training for ESN readout.
 
-/// Solve `(SᵀS + λI)·w = Sᵀy` via `ToadStool`'s Cholesky-based ridge regression.
+/// Solve `(SᵀS + λI)·w = Sᵀy` via barraCuda's Cholesky-based ridge regression.
 ///
 /// Falls back to zero weights if the solve fails.
 pub(super) fn solve_ridge(

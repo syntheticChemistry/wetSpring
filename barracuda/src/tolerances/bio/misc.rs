@@ -127,6 +127,51 @@ pub const HESSIAN_H11_TOL: f64 = 1.0;
 /// Validated: Exp196b (simulated long-read 16S), Phase 61, 2026-02-26.
 pub const NANOPORE_MEAN_READ_LENGTH_TOL: f64 = 10.0;
 
+/// Range guard for bounded \[0, 1\] metrics (Bray-Curtis, cosine similarity).
+///
+/// Valid metrics must satisfy `0.0 <= x <= 1.0`. Numerical rounding can
+/// push values a few ULP past the boundary; this guard absorbs that
+/// without triggering false validation failures.
+/// Same order as [`ANALYTICAL_LOOSE`](crate::tolerances::ANALYTICAL_LOOSE).
+pub const BOUNDED_METRIC_GUARD: f64 = 1e-10;
+
+/// Jackknife vs bootstrap estimate parity.
+///
+/// Jackknife and bootstrap are different resampling methods that converge
+/// to the same estimate for smooth statistics. For small samples (N < 100),
+/// the two can differ by up to 0.5 due to different variance estimators.
+/// Calibrated: `BarraCuda` CPU v22 (stats domain), N=20 samples.
+pub const JACKKNIFE_VS_BOOTSTRAP: f64 = 0.5;
+
+/// Exact fit R² tolerance (linear regression on synthetic data).
+///
+/// Perfect linear data (slope=3.0, intercept=1.0) yields R²=1.0 exactly;
+/// f64 rounding in the summation chain allows at most a few ULP drift.
+/// Same order as [`ANALYTICAL_LOOSE`](crate::tolerances::ANALYTICAL_LOOSE).
+pub const REGRESSION_EXACT_FIT: f64 = 1e-10;
+
+/// Laplacian row-sum zero tolerance.
+///
+/// A graph Laplacian L has row sums exactly 0 by construction. Numerical
+/// rounding in the `degree - adjacency` subtraction allows O(n · ε) drift
+/// for an n-node graph. 1e-10 covers graphs up to ~10,000 nodes at f64
+/// precision.
+pub const LAPLACIAN_ROW_SUM: f64 = 1e-10;
+
+/// Probability distribution sum-to-one tolerance.
+///
+/// Final distributions (softmax, normalized frequencies, `PCoA` proportions)
+/// must sum to 1.0. Rounding in the normalization denominator allows at
+/// most a few ULP of drift.
+pub const DISTRIBUTION_SUM_TO_ONE: f64 = 1e-10;
+
+/// Rarefaction confidence interval ordering guard.
+///
+/// CI lower ≤ mean ≤ upper must hold for bootstrap rarefaction. Numerical
+/// rounding in parallel bootstrap aggregation can swap boundaries by a
+/// few ULP. Same order as [`ANALYTICAL_LOOSE`](crate::tolerances::ANALYTICAL_LOOSE).
+pub const RAREFACTION_CI_GUARD: f64 = 1e-10;
+
 /// PFAS fragment screening minimum intensity threshold (%).
 ///
 /// Fragments below 5% relative intensity are noise; above 5% they
@@ -201,7 +246,7 @@ pub const NMF_CONVERGENCE_RANK_SEARCH: f64 = 1e-5;
 /// Ridge regression default regularization (Tikhonov λ).
 ///
 /// Common default for small-to-medium regression problems. Prevents
-/// overfitting when `n_features` ≈ `n_samples`. Used in `ToadStool` Dispatch
+/// overfitting when `n_features` ≈ `n_samples`. Used in barraCuda dispatch
 /// and Paper Math Control ridge validation.
 pub const RIDGE_REGULARIZATION_DEFAULT: f64 = 0.01;
 

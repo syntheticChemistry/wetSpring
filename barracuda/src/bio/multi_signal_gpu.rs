@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! GPU-accelerated dual-signal QS ODE parameter sweep.
 //!
-//! **Lean phase complete**: Uses `ToadStool`'s `BatchedOdeRK4<MultiSignalOde>::generate_shader()`
+//! **Lean phase complete**: Uses barraCuda's `BatchedOdeRK4<MultiSignalOde>::generate_shader()`
 //! via the `OdeSystem` trait (see `bio::ode_systems::MultiSignalOde`).
 //! Local WGSL file deleted — shader now generated from trait impl at runtime.
 //!

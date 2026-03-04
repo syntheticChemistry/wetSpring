@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated statistical functions via `ToadStool` primitives.
+//! GPU-accelerated statistical functions via barraCuda primitives.
 //!
-//! Wraps newly wired `ToadStool` orchestrators for variance, correlation,
+//! Wraps newly wired barraCuda orchestrators for variance, correlation,
 //! covariance, and weighted dot products — useful for feature normalization,
 //! QC metrics, multivariate analysis, and weighted spectral scoring.
 

@@ -626,7 +626,7 @@ Phase 3 (target): All Springs route data through NestGate. No local data managem
 This catalog was compiled by interviewing:
 
 - 46 Rust CPU modules in `barracuda/src/`
-- 42 GPU wrapper modules
+- 45 GPU wrapper modules
 - 200 experiment documents in `experiments/`
 - 52 reproduced papers in `specs/PAPER_REVIEW_QUEUE.md`
 - NestGate v4.1.0-dev codebase (13 crates)

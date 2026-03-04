@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 4, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** Phase 93 — 1,054 lib tests, 280 experiments, 8,241+ validation checks, 284 binaries, standalone `barraCuda` v0.3.1 (767+ f64-canonical WGSL shaders), 144 primitives consumed, zero local WGSL, zero unsafe code, 164 named tolerances, `cargo clippy -W clippy::pedantic -W clippy::nursery` **ZERO WARNINGS**. XDG-compliant data paths. Configurable NCBI endpoints. All hardcoded tolerances centralized. Zero `unreachable!()` in library code. All `clone()` calls audited. All external deps pure Rust.
+**Status:** Phase 95 — 1,061 lib tests + 200 forge tests, 281 experiments (Exp305 cross-spring validation), 8,300+ validation checks, 285 binaries, standalone `barraCuda` v0.3.1 (767+ f64-canonical WGSL shaders), 150+ primitives consumed (6 new GPU ops + 2 CPU delegations in V95), zero local WGSL, zero unsafe code, 164 named tolerances, 94.69% line coverage, `cargo clippy -W clippy::pedantic -W clippy::nursery` **ZERO WARNINGS**. XDG-compliant data paths. Configurable NCBI endpoints. All hardcoded tolerances centralized. Zero `unreachable!()` in library code. All `clone()` calls audited. All external deps pure Rust.
 
 ---
 
@@ -53,10 +53,11 @@ WGSL          known physics   handoffs/                        delete local
 
 | Phase | Count | Description |
 |-------|:-----:|-------------|
-| **Lean** | 34 | GPU modules consuming upstream ToadStool primitives (ComputeDispatch builder adopted) |
-| **Compose** | 7 | GPU wrappers wiring ToadStool primitives (kmd, merge_pairs, robinson_foulds, derep, neighbor_joining, reconciliation, molecular_clock) |
+| **Lean** | 37 | GPU modules consuming upstream barraCuda primitives (V95: +tolerance_search_gpu, kmd_grouping_gpu, stats_extended_gpu) |
+| **Compose** | 7 | GPU wrappers wiring barraCuda primitives (kmd, merge_pairs, robinson_foulds, derep, neighbor_joining, reconciliation, molecular_clock) |
 | **Passthrough** | 0 | All promoted — `gbm` and `feature_table` compose upstream, `signal` leans on `PeakDetectF64` (S62) |
 | **Write → Lean** | 5 | ODE shaders fully lean — GPU modules use `generate_shader()` from `OdeSystem` traits (WGSL deleted) |
+| **CPU Delegation** | 2 | `rk45_integrate` (adaptive ODE) + `gradient_1d` (numerical gradient) — V95 |
 | **NPU** | 1 | ESN reservoir computing → int8 quantization → NPU deployment (esn) — bridge to ToadStool `esn_v2` |
 | **Tier B** | 0 | All promoted |
 | **Tier C** | 0 | All promoted |
@@ -126,16 +127,16 @@ integration point.
 | V88 experiment buildout (Exp263-270) | 427 (CPU v20, CPU↔GPU v7, metalForge v12, NUCLEUS v3, ToadStool pure-math v3, CPU↔GPU pure-math, mixed-HW dispatch, biomeOS graph) |
 | Exp271: Cross-Spring S79 (13 domains) | 73 |
 | Exp272: Bio Brain (7 domains) | 64 |
-| **Total validation checks** | **8,241+** |
-| Rust library unit tests | 1,054 (`barraCuda` CPU + IPC, default features) |
+| **Total validation checks** | **8,300+** |
+| Rust library unit tests | 1,261 (`barraCuda` CPU + IPC, default features) |
 | metalForge forge tests | 175 |
 | Doc-tests | 27 (barracuda 18 + forge 9) |
-| **Total Rust tests** | **1,054+** (library) |
+| **Total Rust tests** | **1,261+** (library) |
 | Library code coverage | **95.86% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov) |
-| Experiments completed | 280 |
-| Validation/benchmark binaries | 284 |
+| Experiments completed | 281 |
+| Validation/benchmark binaries | 285 |
 | CPU bio modules | 47 |
-| GPU bio modules | 42 (30 lean + 5 write→lean + 7 compose + 0 passthrough) |
+| GPU bio modules | 45 (30 lean + 5 write→lean + 7 compose + 0 passthrough) |
 | Tier B (needs refactor) | 0 (all promoted) |
 | Python baselines | 57 scripts (all with reproduction headers + SHA-256 integrity verification) |
 | BarraCuda CPU parity | 546/546 (v1-v11: 36+ domains, IPC fidelity proven) |
@@ -143,9 +144,9 @@ integration point.
 | metalForge cross-system | 37+ domains CPU↔GPU (Exp103+104+165+182+208), **39/39 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
-| `barraCuda` primitives consumed | **144** (always-on, zero fallback code — standalone `barraCuda` v0.3.1) |
+| `barraCuda` primitives consumed | **150+** (always-on, zero fallback code — standalone `barraCuda` v0.3.1) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 8,241+ validation checks **PASS**. All 1,044 library tests **PASS** (1 ignored: hardware-dependent).
+All 8,300+ validation checks **PASS**. All 1,044 library tests **PASS** (1 ignored: hardware-dependent).
 
 ### GPU Performance
 
@@ -386,7 +387,7 @@ barracuda math through GPU parity to mixed-hardware NUCLEUS dispatch:
 - 14 new tests (power.rs, nrs.rs, brain/observation.rs)
 - All doc_markdown clippy warnings fixed across 30+ files
 
-### Phase 93: Standalone barraCuda Rewire + Deep Debt Evolution (current)
+### Phase 95: Standalone barraCuda Rewire + Deep Debt Evolution (current)
 
 Rewired from ToadStool-embedded `barracuda` v0.2.0 to standalone `barraCuda`
 v0.3.1. Comprehensive deep debt resolution across the full codebase:
@@ -441,7 +442,7 @@ Continued deep debt evolution targeting remaining audit items:
 - Provenance documentation: `experiments/results/README.md`, BASELINE_MANIFEST clarification
 - Dependency health: CPU-only build is pure Rust; only C dep is `renderdoc-sys` via wgpu (GPU path)
 
-**1,044 tests** | **280 experiments** | **268 binaries** | **8,241+ checks**
+**1,044 tests** | **281 experiments** | **268 binaries** | **8,300+ checks**
 
 ### Phase 87: blueFish WhitePaper + hotSpring Brain Architecture Review (V87)
 
@@ -571,7 +572,7 @@ Rust 1.93 fixed across 20+ validation binaries.
 | Max file size | All under 1000 LOC |
 | External C dependencies | **0** (`flate2` uses `rust_backend`) |
 | Named tolerance constants | 164 (scientifically justified, hierarchy-tested) |
-| Provenance headers | All 284 binaries |
+| Provenance headers | All 285 binaries |
 | ESN ridge regression | **Proper Cholesky solve** (not diagonal approximation) |
 | I/O streaming | Buffering APIs deprecated; `stats_from_file` + iterators preferred |
 | Clone optimization | Hot-path clones eliminated (merge_pairs, derep entry API) |
@@ -673,14 +674,14 @@ wetSpring/
 │   │   ├── ncbi/                ← NCBI module (API key, HTTP, E-search, EFetch, SRA, NestGate, cache)
 │   │   ├── encoding.rs          ← sovereign base64 (zero dependencies)
 │   │   ├── error.rs             ← error types (no external crates)
-│   │   ├── bio/                 ← 47 CPU + 42 GPU bio modules
+│   │   ├── bio/                 ← 47 CPU + 45 GPU bio modules
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML, nanopore)
 │   │   ├── bench/               ← benchmark harness + power monitoring
-│   │   ├── bin/                 ← 284 validation/benchmark binaries
+│   │   ├── bin/                 ← 285 validation/benchmark binaries
 │   │   ├── ipc/                 ← JSON-RPC dispatch (biomeOS integration)
 │   │   └── shaders/             ← shared WGSL utilities (ODE shaders now generated at runtime)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024
-├── experiments/                   ← 280 experiment protocols + results
+├── experiments/                   ← 281 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
 │   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs, bridge.rs

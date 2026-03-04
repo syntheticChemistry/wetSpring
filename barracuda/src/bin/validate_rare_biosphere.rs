@@ -274,7 +274,12 @@ fn validate_pcoa(v: &mut Validator, piccard: &[f64], von_damm: &[f64], backgroun
 
     v.check(
         "PCoA: all eigenvalues non-negative",
-        f64::from(u8::from(result.eigenvalues.iter().all(|&e| e >= -1e-10))),
+        f64::from(u8::from(
+            result
+                .eigenvalues
+                .iter()
+                .all(|&e| e >= -tolerances::PCOA_EIGENVALUE_FLOOR),
+        )),
         1.0,
         0.0,
     );

@@ -11,7 +11,7 @@
 //!
 //! # Compose pattern
 //!
-//! This module composes two existing ToadStool-backed GPU modules:
+//! This module composes two existing barraCuda-backed GPU modules:
 //! - [`super::eic_gpu`]: `FusedMapReduceF64` + `WeightedDotF64` for EIC extraction
 //! - [`super::signal_gpu`]: `PeakDetectF64` for peak detection
 //!

@@ -1,8 +1,8 @@
 # baseCamp Extension Plan: From Validated Math to Real-World Science
 
 **Date:** March 3, 2026 (updated)
-**Author:** wetSpring Phase 93 (ecoPrimals)
-**Foundation:** 280 experiments, 8,241+ checks, 52 papers (6 proposed), 144 primitives (standalone barraCuda v0.3.1), Python parity proven, cross-spring provenance validated (Exp271: 73/73, 6 springs + Exp272: 64/64, 7 springs), unified discovery, handler refactoring, 1,044 lib tests, Paper 12: full three-tier immunological Anderson (Exp273-279: 157/157 checks — science, CPU parity, GPU, streaming, metalForge)
+**Author:** wetSpring Phase 95 (ecoPrimals)
+**Foundation:** 281 experiments, 8,300+ checks, 52 papers (6 proposed), 150+ primitives (standalone barraCuda v0.3.1), Python parity proven, cross-spring provenance validated (Exp271: 73/73, 6 springs + Exp272: 64/64, 7 springs + Exp305: 59/59, cross-spring evolution), unified discovery, handler refactoring, 1,261 lib+forge tests, 94.69% coverage, Paper 12: full three-tier immunological Anderson (Exp273-279: 157/157 checks — science, CPU parity, GPU, streaming, metalForge). V95: RK45 adaptive ODE, 6 new GPU ops, gradient_1d.
 
 ---
 
@@ -19,7 +19,7 @@ V90:    Bio brain cross-spring ingest?     ✅ PROVEN (Exp272: 7 springs, 64/64 
 V91:    Deep debt + idiomatic evolution?   ✅ PROVEN (unified discovery, handler refactoring, 1,088 tests)
 V92C:   Immunological Anderson (Paper 12)? ✅ PROVEN (Exp273-279: 157/157 — science + CPU parity + GPU + streaming + metalForge)
 V92b:   Gonzales paper reproductions? ✅ PROVEN (Exp280-286: 202/202 — IC50 dose-response + PK decay + IL-31 serum + CPU parity + GPU + streaming + metalForge)
-V93+:   What can we discover with it?      ← HERE
+V95:    What can we discover with it?      ← HERE
 ```
 
 ### New Since V84: Cross-Spring Evolution (V89–V90)

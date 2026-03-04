@@ -3,6 +3,35 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V95 — Cross-Spring Evolution Complete (2026-03-04)
+
+### Added
+- **GPU modules** (3 new): `tolerance_search_gpu` (`BatchToleranceSearchF64`),
+  `kmd_grouping_gpu` (`KmdGroupingF64`), `stats_extended_gpu` (`JackknifeMeanGpu`,
+  `BootstrapMeanGpu`, `KimuraGpu`, `HargreavesBatchGpu`)
+- **CPU delegations** (2 new): `rk45_integrate` (adaptive Dormand-Prince ODE solver
+  from barraCuda `numerical::rk45`), `gradient_1d` (central-difference numerical
+  gradient from barraCuda `numerical::gradient_1d`)
+- **Exp305**: Cross-spring evolution validation binary — 59/59 checks covering
+  12 domains (math, ODE, stats, spectral, linalg, sampling, numerical, bio,
+  tolerance search, KMD, benchmarks, provenance audit)
+- 4 new tests: `rk45_exponential_decay`, `rk45_fewer_steps_than_rk4`,
+  `gradient_1d_linear`, `gradient_1d_quadratic`
+
+### Changed
+- **GPU module count**: 44 → 47 (3 new lean GPU wrappers)
+- **Primitives consumed**: 144 → 150+ (6 GPU ops + 2 CPU delegations)
+- **Documentation**: 50+ bio module files cleaned (ToadStool → barraCuda for current
+  dependency references, historical provenance preserved)
+- **`norm_ppf`** wired from barraCuda `stats::norm_ppf` (V94)
+
+### Quality
+- **1,261 tests** (1,061 lib + 200 forge) | **94.69% coverage** | **0 clippy warnings**
+
+### Handoffs
+- `WETSPRING_V94_BARRACUDA_EVOLUTION_SYNC_MAR04_2026.md`
+- `WETSPRING_V95_CROSS_SPRING_EVOLUTION_COMPLETE_MAR04_2026.md`
+
 ## V93+ — Deep Debt Round 3 + Doc Cleanup (2026-03-04)
 
 ### Changed

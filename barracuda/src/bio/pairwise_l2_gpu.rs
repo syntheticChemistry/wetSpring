@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated pairwise L2 (Euclidean) distance via `ToadStool`.
+//! GPU-accelerated pairwise L2 (Euclidean) distance via barraCuda.
 //!
 //! Delegates to `barracuda::ops::bio::pairwise_l2::PairwiseL2Gpu` —
 //! computes condensed N*(N-1)/2 Euclidean distances for N feature vectors.

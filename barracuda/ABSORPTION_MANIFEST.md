@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** March 3, 2026 (Phase 93)
+**Date:** March 3, 2026 (Phase 95)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
 **barraCuda:** standalone v0.3.1
-**Status:** 144 primitives consumed (264 ComputeDispatch ops) via `compile_shader_universal`, 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 42 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,044 lib tests, standalone barraCuda v0.3.1, 280 experiments, 8,241+ checks, 268 binaries, 106 named tolerances, clippy pedantic CLEAN (`--all-features`). **Phase 93:** standalone barraCuda v0.3.1 absorption (FHE shader fixes, gpu_helpers refactor, device-lost recovery, unsafe audit), full 5-tier revalidation GREEN.
+**Status:** 150+ primitives consumed (264 ComputeDispatch ops) via `compile_shader_universal`, 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 45 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,044 lib tests, standalone barraCuda v0.3.1, 281 experiments, 8,300+ checks, 268 binaries, 164 named tolerances, clippy pedantic CLEAN (`--all-features`). **Phase 95:** standalone barraCuda v0.3.1 absorption (FHE shader fixes, gpu_helpers refactor, device-lost recovery, unsafe audit), full 5-tier revalidation GREEN.
 
 ---
 
@@ -50,8 +50,8 @@ WGSL          known physics   handoffs/                        delete local
 | Passthrough | Accept GPU buffers, CPU kernel | **0 modules** — all 3 former Passthrough promoted (V40) |
 | Validate | CPU ↔ GPU parity for all shaders | All 5 ODE: exact parity (Exp099/100/101) |
 | Hand off | wateringHole/handoffs/ documents | **V84** active (supersedes V83), V7-V82 archived |
-| Absorb | ToadStool integrates as `ops::bio::*` | **144 primitives** consumed (ToadStool S66: all DONE, +46 cross-spring total) |
-| Lean | Rewire to upstream, delete local code | 144 primitives consumed (S66), 5 `OdeSystem` trait rewires, BGL boilerplate removed, 0 Passthrough |
+| Absorb | ToadStool integrates as `ops::bio::*` | **150+ primitives** consumed (ToadStool S66: all DONE, +46 cross-spring total) |
+| Lean | Rewire to upstream, delete local code | 150+ primitives consumed (S66), 5 `OdeSystem` trait rewires, BGL boilerplate removed, 0 Passthrough |
 
 ---
 

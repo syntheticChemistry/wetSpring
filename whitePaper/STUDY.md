@@ -16,9 +16,9 @@ energy, and memory in a unified benchmark harness. The study covers
 four tracks: 16S amplicon metagenomics (Track 1), comparative genomics
 and mathematical biology (Track 1b), deep-sea metagenomics and microbial
 evolution (Track 1c), and PFAS detection via LC-MS (Track 2),
-validating 88 Rust modules (46 CPU + 42 GPU) against baselines from Galaxy,
+validating 88 Rust modules (47 CPU + 45 GPU) against baselines from Galaxy,
 QIIME2, asari, FindPFAS, scipy, sklearn, dendropy, real NCBI SRA data, and
-published paper models with 8,241+ quantitative checks across 280 experiments
+published paper models with 8,300+ quantitative checks across 281 experiments
 — all passing. The pipeline proves substrate independence: math produces
 identical results on CPU and GPU, validated via metalForge cross-substrate
 checks (Exp060). Random Forest ensemble and Gradient Boosting Machine
@@ -455,7 +455,7 @@ against Python baselines with public data.
 
 ### 4.2 Rust as a scientific computing platform
 
-87 modules (45 CPU bio, 42 GPU, plus I/O and benchmarking) with minimal
+87 modules (45 CPU bio, 45 GPU, plus I/O and benchmarking) with minimal
 runtime dependency (`flate2` for gzip) demonstrate that Rust can serve
 as a standalone platform for bioinformatics and analytical chemistry.
 The sovereign XML, FASTQ, mzML, and MS2 parsers eliminate the need for

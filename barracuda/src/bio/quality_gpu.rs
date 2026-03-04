@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated quality filtering via `ToadStool`.
+//! GPU-accelerated quality filtering via barraCuda.
 //!
 //! Delegates to `barracuda::ops::bio::quality_filter::QualityFilterGpu` —
 //! the absorbed shader from wetSpring handoff v6. wetSpring provides the
@@ -9,12 +9,12 @@
 //!
 //! ```text
 //! QualityFilterCached::new(device)
-//!   └── QualityFilterGpu::new(device)  ← ToadStool pre-compiles shader
+//!   └── QualityFilterGpu::new(device)  ← barraCuda pre-compiles shader
 //!
 //! filter_reads_gpu(gpu, reads, params)
 //!   ├── pack quality bytes (4 per u32) → GPU storage buffer
 //!   ├── upload offsets + lengths → GPU storage buffers
-//!   ├── dispatch: ToadStool handles pipeline + bind group + workgroups
+//!   ├── dispatch: barraCuda handles pipeline + bind group + workgroups
 //!   ├── readback: packed (start, end) per read
 //!   └── CPU: apply trim results to create filtered FastqRecords
 //! ```
@@ -29,7 +29,7 @@ use barracuda::ops::bio::quality_filter::QualityConfig;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
-/// Pre-compiled quality filter pipeline via `ToadStool`.
+/// Pre-compiled quality filter pipeline via barraCuda.
 pub struct QualityFilterCached {
     device: Arc<WgpuDevice>,
     inner: ToadStoolQF,
@@ -40,7 +40,7 @@ impl QualityFilterCached {
     ///
     /// # Errors
     ///
-    /// Returns an error if `ToadStool` shader compilation fails.
+    /// Returns an error if barraCuda shader compilation fails.
     pub fn new(device: Arc<WgpuDevice>) -> Result<Self> {
         let inner = ToadStoolQF::new(Arc::clone(&device))
             .map_err(|e| Error::Gpu(format!("QualityFilterGpu: {e}")))?;

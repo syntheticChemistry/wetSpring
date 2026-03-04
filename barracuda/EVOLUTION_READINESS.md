@@ -1,12 +1,12 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 3, 2026 (Phase 93)
+**Date:** March 4, 2026 (Phase 95 — Cross-Spring Evolution Complete)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 42 GPU modules + 1 IPC + 1 vault module (all lean, 0 local WGSL, 0 local derivative/regression math), 144 primitives consumed (standalone barraCuda v0.3.1, always-on, zero fallback code, 264 ComputeDispatch ops), 1,044 lib tests, 280 experiments, 8,241+ checks, standalone barraCuda v0.3.1, 106 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math. **Phase 93:** CPU↔GPU full domain parity (Exp301, 48/48, 17+ ComputeDispatch ops), NUCLEUS+PCIe+biomeOS (Exp302, 113/113, Tower/Node/Nest validated), mixed hardware NUCLEUS orchestration (Exp303, 147/147, 6 pipeline patterns, 54 workloads routed).
+**Status:** 47 CPU + 45 GPU modules + 1 IPC + 1 vault module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.1, always-on, zero fallback code, 264 ComputeDispatch ops), 1,061 lib tests + 200 forge tests, 281 experiments (Exp305 added), 8,300+ checks (59 new in Exp305), standalone barraCuda v0.3.1, 164 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math, 94.69% line coverage. **Phase 95:** Full cross-spring evolution rewire — `BatchToleranceSearchF64`, `KmdGroupingF64`, `JackknifeMeanGpu`, `BootstrapMeanGpu`, `KimuraGpu`, `HargreavesBatchGpu` GPU ops wired; `rk45_solve` adaptive ODE + `gradient_1d` numerical delegations added; Exp305 cross-spring validation binary (59/59 checks, full provenance documentation).
 
 ### Full Lean Phase
 
-All local WGSL shaders have been absorbed by ToadStool and deleted.
+All local WGSL shaders have been absorbed by barraCuda (via ToadStool absorption) and deleted.
 The 5 ODE systems completed Write → Absorb → Lean (S58).
 `diversity_fusion_f64.wgsl` completed Write → Absorb → Lean (S63).
 `bio::diversity` delegated to `barracuda::stats::diversity` (S64).
@@ -477,7 +477,7 @@ no parallelism benefit) and `fastq_parsing` (I/O-bound).
 | metalForge | GPU + NPU hardware characterization | GPU + NPU + cross-substrate validation |
 | Handoffs | `../wateringHole/handoffs/` (36+ docs) | `ecoPrimals/archive/wetspring-early-handoffs-feb2026/` (v1-v9 fossil) |
 | Tests | 454 | 1,210 |
-| Validation | 418 checks | 8,241+ checks |
+| Validation | 418 checks | 8,300+ checks |
 | Experiments | 31 suites | 260 experiments |
 | Line coverage | — | 97% bio+io (55% overall) |
 | Pipeline caching | Upstream (ToadStool native) | Local (Exp068, 38% overhead reduction) |

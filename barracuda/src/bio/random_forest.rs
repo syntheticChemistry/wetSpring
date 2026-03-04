@@ -18,7 +18,7 @@
 //! - Each thread traverses its tree for one sample
 //! - Reduce via voting/averaging
 //!
-//! This module is a `ToadStool` absorption candidate: the same array-based
+//! This module is a barraCuda absorption candidate: the same array-based
 //! tree representation used by `TreeInferenceGpu` can be extended to
 //! multi-tree dispatch.
 

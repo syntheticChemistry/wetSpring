@@ -47,6 +47,7 @@ use barracuda::spectral::{
 };
 use barracuda::stats::{hill, mean, r_squared};
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 struct Timing {
@@ -211,7 +212,9 @@ fn main() {
     let drg_combined = combined[0];
     v.check_pass(
         "DRG neurons have highest receptor density",
-        combined.iter().all(|&c| c <= drg_combined + 1e-10),
+        combined
+            .iter()
+            .all(|&c| c <= drg_combined + tolerances::ANALYTICAL_LOOSE),
     );
 
     let cpu_us = t0.elapsed().as_micros() as f64;

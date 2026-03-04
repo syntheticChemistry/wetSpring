@@ -45,6 +45,7 @@
 use std::time::Instant;
 
 use barracuda::stats::{fit_exponential, mean};
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 struct Timing {
@@ -322,7 +323,7 @@ fn main() {
         let sum: f64 = c.cell_types.iter().map(|(_, f)| f).sum();
         v.check_pass(
             &format!("{}: fractions sum to 1.0", c.name),
-            (sum - 1.0).abs() < 1e-10,
+            (sum - 1.0).abs() < tolerances::DISTRIBUTION_SUM_TO_ONE,
         );
         total_il31_receptors += 1.0;
 

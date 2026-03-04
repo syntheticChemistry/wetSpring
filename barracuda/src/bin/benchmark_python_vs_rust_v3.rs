@@ -337,14 +337,24 @@ fn main() {
     }
     let us = t.elapsed().as_micros();
 
-    v.check("Linear: slope = 3.0", fit.params[0], 3.0, 1e-10);
-    v.check("Linear: R² = 1.0 (exact)", fit.r_squared, 1.0, 1e-10);
+    v.check(
+        "Linear: slope = 3.0",
+        fit.params[0],
+        3.0,
+        tolerances::REGRESSION_EXACT_FIT,
+    );
+    v.check(
+        "Linear: R² = 1.0 (exact)",
+        fit.r_squared,
+        1.0,
+        tolerances::REGRESSION_EXACT_FIT,
+    );
     benches.push(ParityBench {
         domain: "Linear Fit",
         python_equiv: "scipy.stats.linregress",
         expected: 3.0,
         actual: fit.params[0],
-        tolerance: 1e-10,
+        tolerance: tolerances::REGRESSION_EXACT_FIT,
         rust_us: us,
         workload: "100 points × 10k iters",
     });

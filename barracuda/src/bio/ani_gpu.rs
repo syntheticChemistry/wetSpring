@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated batch pairwise ANI via `ToadStool`.
+//! GPU-accelerated batch pairwise ANI via barraCuda.
 //!
 //! Delegates to `barracuda::ops::bio::ani::AniBatchF64` — the absorbed
 //! shader from wetSpring handoff v6. wetSpring provides the high-level
@@ -37,7 +37,7 @@ impl AniGpu {
     ///
     /// # Errors
     ///
-    /// Returns an error if `ToadStool` shader compilation fails.
+    /// Returns an error if barraCuda shader compilation fails.
     pub fn new(device: &Arc<WgpuDevice>) -> crate::error::Result<Self> {
         let inner = AniBatchF64::new(Arc::clone(device))
             .map_err(|e| crate::error::Error::Gpu(format!("AniBatchF64: {e}")))?;

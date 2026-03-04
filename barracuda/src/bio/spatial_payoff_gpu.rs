@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated spatial payoff (game theory) via `ToadStool`.
+//! GPU-accelerated spatial payoff (game theory) via barraCuda.
 //!
 //! Delegates to `barracuda::ops::bio::spatial_payoff::SpatialPayoffGpu` —
 //! evolved by `neuralSpring`, absorbed in `ToadStool` session 31f.

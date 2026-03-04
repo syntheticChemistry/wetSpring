@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Host-side DF64 (double-float f32-pair) pack/unpack utilities.
 //!
-//! `ToadStool` S68+ provides universal precision: shaders authored in f64
+//! barraCuda S68+ provides universal precision: shaders authored in f64
 //! canonical form are compiled to any target via `compile_shader_universal`.
 //! When targeting `Precision::Df64`, GPU storage uses `vec2<f32>` pairs
 //! (hi, lo) instead of native f64. These utilities handle the host-side

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated k-mer histogram via `ToadStool`.
+//! GPU-accelerated k-mer histogram via barraCuda.
 //!
 //! Delegates to `barracuda::ops::bio::kmer_histogram::KmerHistogramGpu`.
 //! wetSpring provides the high-level API that encodes DNA sequences to

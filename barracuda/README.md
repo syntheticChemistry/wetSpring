@@ -17,13 +17,13 @@ baseline through Rust CPU to GPU acceleration via ToadStool/BarraCuda.
 ```
 wetspring-barracuda
 ├── 47 CPU bio modules          (pure Rust math, no external C deps)
-├── 42 GPU bio modules          (42 Lean + 7 Compose, 0 Passthrough)
+├── 45 GPU bio modules          (45 Lean + 7 Compose, 0 Passthrough)
 ├── 3 streaming I/O parsers     (FASTQ/gzip, mzML/base64, MS2)
 ├── 284 validation/benchmark binaries
 └── depends on: barracuda (ToadStool) via path dependency
 ```
 
-42 Lean GPU modules delegate to `barracuda::ops::*` primitives from ToadStool.
+45 Lean GPU modules delegate to `barracuda::ops::*` primitives from ToadStool.
 7 Compose wrappers. All ODE shaders use trait-generated WGSL (Lean phase).
 
 ## ToadStool Primitives Consumed (144, 264 ComputeDispatch ops)

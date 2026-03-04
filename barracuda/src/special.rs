@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Special mathematical functions for life-science computation.
 //!
-//! `erf`, `ln_gamma`, `regularized_gamma_lower`, and `normal_cdf` delegate
-//! to `ToadStool`'s `barracuda` crate — one implementation, no duplicate
-//! math. `barracuda` is always available (default-features = false for
-//! CPU-only builds, full GPU when `gpu` feature is active).
+//! `erf`, `ln_gamma`, `regularized_gamma_lower`, `normal_cdf`, and `norm_ppf`
+//! delegate to barraCuda (standalone math primal) — one implementation, no
+//! duplicate math. `barracuda` is always available (default-features = false
+//! for CPU-only builds, full GPU when `gpu` feature is active).
 //!
 //! `dot` and `l2_norm` delegate to `barracuda::stats` (S64 absorption).
 //!
@@ -51,6 +51,27 @@ pub fn ln_gamma(x: f64) -> f64 {
 #[must_use]
 pub fn regularized_gamma_lower(a: f64, x: f64) -> f64 {
     barracuda::special::regularized_gamma_p(a, x).unwrap_or(0.0)
+}
+
+/// Inverse normal CDF (percent-point function / quantile function).
+///
+/// Given probability `p` in (0, 1), returns `x` such that `Φ(x) = p`.
+/// Delegates to `barracuda::stats::norm_ppf` (barraCuda v0.3.1).
+///
+/// Uses the rational approximation from Abramowitz & Stegun 26.2.23
+/// with Beasley-Springer-Moro refinement for tail accuracy.
+#[must_use]
+pub fn norm_ppf(p: f64) -> f64 {
+    barracuda::stats::norm_ppf(p)
+}
+
+/// Numerical gradient of a uniformly-spaced 1D function.
+///
+/// Uses second-order central differences (forward/backward at endpoints).
+/// Delegates to `barracuda::numerical::gradient_1d`.
+#[must_use]
+pub fn gradient_1d(f: &[f64], dx: f64) -> Vec<f64> {
+    barracuda::numerical::gradient_1d(f, dx)
 }
 
 /// L2 (Euclidean) norm of a slice: `sqrt(Σ x²)`.
@@ -226,6 +247,65 @@ mod tests {
         assert!(
             (val - expected).abs() < 1e-8,
             "ln(Γ(10)) = {val}, expected {expected}"
+        );
+    }
+
+    #[test]
+    fn norm_ppf_median() {
+        assert!(
+            norm_ppf(0.5).abs() < 1e-10,
+            "Φ⁻¹(0.5) = 0, got {}",
+            norm_ppf(0.5)
+        );
+    }
+
+    #[test]
+    fn norm_ppf_round_trip() {
+        for &x in &[-2.0, -1.0, 0.0, 1.0, 2.0] {
+            let p = normal_cdf(x);
+            let recovered = norm_ppf(p);
+            assert!(
+                (recovered - x).abs() < 1e-5,
+                "round-trip failed: norm_ppf(Φ({x})) = {recovered}, error = {}",
+                (recovered - x).abs()
+            );
+        }
+    }
+
+    #[test]
+    fn gradient_1d_linear() {
+        let f = vec![0.0, 1.0, 2.0, 3.0, 4.0];
+        let grad = gradient_1d(&f, 1.0);
+        assert_eq!(grad.len(), 5);
+        for &g in &grad {
+            assert!(
+                (g - 1.0).abs() < 1e-10,
+                "gradient of linear f should be 1.0, got {g}"
+            );
+        }
+    }
+
+    #[test]
+    fn gradient_1d_quadratic() {
+        let f: Vec<f64> = (0..5).map(|i| (i as f64).powi(2)).collect();
+        let grad = gradient_1d(&f, 1.0);
+        assert!(
+            (grad[2] - 4.0).abs() < 1e-10,
+            "df/dx at x=2 for x² = 2x = 4"
+        );
+    }
+
+    #[test]
+    fn norm_ppf_known_quantiles() {
+        assert!(
+            (norm_ppf(0.975) - 1.96).abs() < 0.01,
+            "97.5th percentile ≈ 1.96, got {}",
+            norm_ppf(0.975)
+        );
+        assert!(
+            (norm_ppf(0.025) + 1.96).abs() < 0.01,
+            "2.5th percentile ≈ −1.96, got {}",
+            norm_ppf(0.025)
         );
     }
 }

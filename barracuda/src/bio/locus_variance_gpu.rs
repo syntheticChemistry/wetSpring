@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated locus variance (FST decomposition) via `ToadStool`.
+//! GPU-accelerated locus variance (FST decomposition) via barraCuda.
 //!
 //! Delegates to `barracuda::ops::bio::locus_variance::LocusVarianceGpu` —
 //! evolved by `neuralSpring`, absorbed in `ToadStool` session 31f.

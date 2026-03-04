@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Spatial interpolation of diversity metrics via `ToadStool`'s `KrigingF64`.
+//! Spatial interpolation of diversity metrics via barraCuda's `KrigingF64`.
 //!
 //! Wraps ordinary and simple kriging for ecological use: interpolating
 //! diversity indices (Shannon, Simpson, evenness, etc.) across geographic
@@ -114,7 +114,7 @@ pub struct SpatialResult {
 
 /// Interpolate a diversity metric across geographic space.
 ///
-/// Uses ordinary kriging (unknown mean) via `ToadStool`'s `KrigingF64`.
+/// Uses ordinary kriging (unknown mean) via barraCuda's `KrigingF64`.
 ///
 /// # Arguments
 ///
@@ -229,7 +229,7 @@ pub fn empirical_variogram(
         .map_err(|e| Error::Gpu(format!("variogram fitting: {e}")))
 }
 
-/// Convert `ToadStool`'s `KrigingResult` to our domain type (zero-copy).
+/// Convert barraCuda's `KrigingResult` to our domain type (zero-copy).
 fn from_kriging_result(result: KrigingResult) -> SpatialResult {
     SpatialResult {
         values: result.values,

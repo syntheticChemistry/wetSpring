@@ -1,6 +1,6 @@
 # wetSpring — BarraCuda Requirements
 
-**Last Updated**: March 3, 2026 (Phase 93, standalone barraCuda v0.3.1, 144 primitives consumed (264 ComputeDispatch ops), fully lean, 1,044 lib tests, full 5-tier GREEN)
+**Last Updated**: March 3, 2026 (Phase 95, standalone barraCuda v0.3.1, 150+ primitives consumed (264 ComputeDispatch ops), fully lean, 1,044 lib tests, full 5-tier GREEN)
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---
@@ -142,7 +142,7 @@ Python baseline (40 scripts)  ────────→  Rust CPU parity (380/
 GPU diversity (38/38)         ────────→  GPU Parity (29 domains)  ──────→  ✓ DONE (Exp101)
 GPU pipeline (88/88)          ────────→  GPU RF inference (13/13) ──────→  NPU for low-power inference
 CPU 22.5× faster than Python  ────────→  GPU math PROVEN portable ─────→  Streaming v2: 10 domains (Exp105+106)
-12 shaders absorbed (S31d/g + S39-41) ─→  42 GPU modules + 5 local ────→  Full Write→Absorb→Lean cycle
+12 shaders absorbed (S31d/g + S39-41) ─→  45 GPU modules + 5 local ────→  Full Write→Absorb→Lean cycle
 37 MF domains validated       ────────→  metalForge PROVEN (Exp104) ───→  ✓ 25/25 papers three-tier
 ```
 
@@ -223,7 +223,7 @@ Tier classification for GPU shader promotion (Write → Absorb → Lean lifecycl
 - Native `log(f64)` crashes NVIDIA NVVM compiler — all transcendentals must use portable implementations
 - **NVVM workaround**: force `ShaderTemplate::for_driver_auto(source, true)` for shaders using exp/log
 - Spectral cosine achieves 926× GPU speedup — the first "GPU wins decisively" benchmark from any spring
-- 47 CPU + 42 GPU Rust modules with 2 runtime dependencies (flate2 + bytemuck) — highest sovereignty ratio in the ecosystem
+- 47 CPU + 45 GPU Rust modules with 2 runtime dependencies (flate2 + bytemuck) — highest sovereignty ratio in the ecosystem
 - **V29 handoff**: cross-spring synthesis, deprecated API removal, dead-code cleanup, evolution handoff
 - **12 shaders absorbed + 5 ODE leaned (generate_shader) + 12 composed/lean wrappers (0 Passthrough)** — zero local WGSL remains; 8/9 P0-P3 requests delivered; see `barracuda/EVOLUTION_READINESS.md`
 - **Rust edition 2024**, MSRV 1.85 — `f64::midpoint()`, `usize::midpoint()`, `const fn` promotions

@@ -17,7 +17,7 @@
 //! trick is used for numerically stable summation:
 //!   `log(exp(a) + exp(b)) = max(a,b) + log(1 + exp(-|a-b|))`
 //!
-//! This is the same primitive needed by `ToadStool`'s `LogSumExp` shader.
+//! This is the same primitive needed by barraCuda's `LogSumExp` shader.
 
 /// Numerically stable log-sum-exp of two values.
 #[inline]

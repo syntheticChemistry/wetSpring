@@ -265,7 +265,7 @@ fn validate_kriging(v: &mut Validator, gpu: &GpuF64) {
     for (i, var) in ordinary.variances.iter().enumerate() {
         v.check_pass(
             &format!("kriging: variance {i} ≥ 0"),
-            *var >= 0.0 || (*var + 1e-10).is_sign_positive(),
+            *var >= 0.0 || (*var + tolerances::ANALYTICAL_LOOSE).is_sign_positive(),
         );
     }
 
@@ -329,11 +329,11 @@ fn validate_rarefaction(v: &mut Validator, gpu: &GpuF64) {
     v.check_pass("rarefaction: Shannon mean > 0", result.shannon.mean > 0.0);
     v.check_pass(
         "rarefaction: Shannon CI lower ≤ mean",
-        result.shannon.lower <= result.shannon.mean + 1e-10,
+        result.shannon.lower <= result.shannon.mean + tolerances::RAREFACTION_CI_GUARD,
     );
     v.check_pass(
         "rarefaction: Shannon CI upper ≥ mean",
-        result.shannon.upper >= result.shannon.mean - 1e-10,
+        result.shannon.upper >= result.shannon.mean - tolerances::RAREFACTION_CI_GUARD,
     );
 
     v.check_pass(

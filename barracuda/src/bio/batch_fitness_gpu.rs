@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! GPU-accelerated batch fitness evaluation via `ToadStool`.
+//! GPU-accelerated batch fitness evaluation via barraCuda.
 //!
 //! Delegates to `barracuda::ops::bio::batch_fitness::BatchFitnessGpu` —
 //! evolved by `neuralSpring`, absorbed in `ToadStool` session 31f.
