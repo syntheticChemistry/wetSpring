@@ -25,13 +25,16 @@
 //!
 //! Requires `--features gpu` and a GPU with f64 support.
 //!
+//! # Provenance
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | Date | 2026-03-02 |
-//! | Command | `cargo run --release --features gpu --bin validate_cpu_vs_gpu_v8` |
+//! | Provenance type | Cross-spring validation |
+//! | Date | 2026-03-03 |
+//! | Command | `cargo run --release --bin validate_cpu_vs_gpu_v8` |
 //!
-//! Validation class: GPU-parity
-//! Provenance: CPU reference implementation
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;

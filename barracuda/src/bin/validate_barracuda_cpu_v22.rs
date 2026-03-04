@@ -31,13 +31,16 @@
 //! - D39: Pharmacology (Hill, PK decay, dose-response)
 //! - D40: Statistics (bootstrap, jackknife, Pearson, regression)
 //!
+//! # Provenance
+//!
+//! Expected values are **analytical** — derived from mathematical
+//! identities and algebraic invariants.
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | Date | 2026-03-02 |
+//! | Provenance type | Analytical (mathematical invariants) |
+//! | Date | 2026-03-03 |
 //! | Command | `cargo run --release --bin validate_barracuda_cpu_v22` |
-//!
-//! Validation class: Analytical
-//! Provenance: Published equations + Python baselines
 
 use wetspring_barracuda::bio::{cooperation, diversity, gillespie, qs_biofilm};
 use wetspring_barracuda::tolerances;
@@ -177,7 +180,7 @@ fn main() {
         &barracuda::linalg::nmf::NmfConfig {
             rank: 2,
             max_iter: 200,
-            tol: 1e-4,
+            tol: tolerances::NMF_CONVERGENCE_KL,
             objective: barracuda::linalg::nmf::NmfObjective::KlDivergence,
             seed: 42,
         },
@@ -188,7 +191,10 @@ fn main() {
         v.check_pass("NMF: H ≥ 0", nmf.h.iter().all(|&x| x >= 0.0));
         let row0 = &nmf.w[..2];
         let cos = barracuda::linalg::nmf::cosine_similarity(row0, row0);
-        v.check_pass("NMF: self-cosine = 1", (cos - 1.0).abs() < 1e-10);
+        v.check_pass(
+            "NMF: self-cosine = 1",
+            (cos - 1.0).abs() < tolerances::ANALYTICAL_LOOSE,
+        );
     }
 
     let ridge = barracuda::linalg::ridge_regression(
@@ -236,7 +242,12 @@ fn main() {
 
     let c0 = 100.0_f64;
     let k = 2.0_f64.ln() / 72.0;
-    v.check("PK: C(t½) = C0/2", c0 * (-k * 72.0).exp(), 50.0, 1e-10);
+    v.check(
+        "PK: C(t½) = C0/2",
+        c0 * (-k * 72.0).exp(),
+        50.0,
+        tolerances::ANALYTICAL_LOOSE,
+    );
     v.check(
         "PK: C(0) = C0",
         c0 * (-k * 0.0).exp(),
@@ -275,8 +286,18 @@ fn main() {
     let x_fit = [1.0, 2.0, 3.0, 4.0, 5.0];
     let y_fit = [2.0, 4.0, 6.0, 8.0, 10.0];
     let fit = barracuda::stats::fit_linear(&x_fit, &y_fit).unwrap();
-    v.check("Linear fit: slope = 2", fit.params[0], 2.0, 1e-10);
-    v.check("Linear fit: R² = 1", fit.r_squared, 1.0, 1e-10);
+    v.check(
+        "Linear fit: slope = 2",
+        fit.params[0],
+        2.0,
+        tolerances::ANALYTICAL_LOOSE,
+    );
+    v.check(
+        "Linear fit: R² = 1",
+        fit.r_squared,
+        1.0,
+        tolerances::ANALYTICAL_LOOSE,
+    );
 
     let pearson = barracuda::stats::pearson_correlation(&x_fit, &y_fit).unwrap();
     v.check(

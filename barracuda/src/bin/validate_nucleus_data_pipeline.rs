@@ -33,13 +33,16 @@
 //! Exp203 (IPC pipeline) → Exp204 (Songbird) → Exp205 (sovereign fallback) →
 //! Exp206 (IPC dispatch fidelity) → **Exp257 (NUCLEUS data pipeline)**
 //!
+//! # Provenance
+//!
+//! Expected values are **analytical** — derived from mathematical
+//! identities and algebraic invariants.
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | Date | 2026-03-01 |
+//! | Provenance type | Analytical (mathematical invariants) |
+//! | Date | 2026-03-03 |
 //! | Command | `cargo run --release --bin validate_nucleus_data_pipeline` |
-//!
-//! Validation class: Pipeline
-//! Provenance: End-to-end pipeline integration test
 
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixStream;

@@ -33,13 +33,16 @@
 //! Paper (this) → CPU v22 (Exp292) → GPU v9 (Exp293) → Pure GPU (Exp294) → `metalForge` v14 (Exp295)
 //! ```
 //!
+//! # Provenance
+//!
+//! Expected values are **analytical** — derived from mathematical
+//! identities and algebraic invariants.
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | Date | 2026-03-02 |
+//! | Provenance type | Analytical (mathematical invariants) |
+//! | Date | 2026-03-03 |
 //! | Command | `cargo run --release --bin validate_paper_math_control_v4` |
-//!
-//! Validation class: Analytical
-//! Provenance: Published equations from open-access papers
 
 use wetspring_barracuda::bio::{cooperation, diversity, qs_biofilm};
 use wetspring_barracuda::tolerances;
@@ -155,7 +158,7 @@ fn main() {
     let nmf_cfg = barracuda::linalg::nmf::NmfConfig {
         rank: 2,
         max_iter: 200,
-        tol: 1e-4,
+        tol: tolerances::NMF_CONVERGENCE_KL,
         objective: barracuda::linalg::nmf::NmfObjective::KlDivergence,
         seed: 42,
     };
@@ -168,7 +171,10 @@ fn main() {
         let row0 = &nmf.w[..2];
         let row1 = &nmf.w[2..4];
         let cos_sim = barracuda::linalg::nmf::cosine_similarity(row0, row0);
-        v.check_pass("MATRIX: cosine self-sim = 1", (cos_sim - 1.0).abs() < 1e-10);
+        v.check_pass(
+            "MATRIX: cosine self-sim = 1",
+            (cos_sim - 1.0).abs() < tolerances::ANALYTICAL_LOOSE,
+        );
         let cross_cos = barracuda::linalg::nmf::cosine_similarity(row0, row1);
         v.check_pass(
             "MATRIX: cross-cosine ∈ [-1,1]",
@@ -192,7 +198,7 @@ fn main() {
         &barracuda::linalg::nmf::NmfConfig {
             rank: 2,
             max_iter: 200,
-            tol: 1e-4,
+            tol: tolerances::NMF_CONVERGENCE_KL,
             objective: barracuda::linalg::nmf::NmfObjective::KlDivergence,
             seed: 77,
         },

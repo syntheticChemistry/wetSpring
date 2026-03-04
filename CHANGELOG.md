@@ -3,6 +3,36 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V93+ — Deep Debt Round 3 + Doc Cleanup (2026-03-04)
+
+### Changed
+- **Named tolerances**: 106 → 164. ~82 inline literals migrated across 16 validation
+  binaries. 4 new constants: `LIMIT_CONVERGENCE`, `VARIANCE_EXACT`,
+  `NMF_SPARSITY_THRESHOLD`, `NMF_CONVERGENCE_RANK_SEARCH`.
+- **Test extraction**: 6 library files had `#[cfg(test)]` blocks extracted to
+  `*_tests.rs` files (`bench/power`, `bench/hardware`, `bio/gbm`, `bio/merge_pairs`,
+  `bio/felsenstein`, `metalForge/forge/ncbi`).
+- **`kmer.rs`**: `unreachable!()` match arm → `const BASES: [u8; 4]` lookup table.
+- **`pcoa.rs`**: CPU Jacobi absorption path documented (Write → Absorb → Lean).
+- **`data.rs`** (forge): `/tmp/wetspring-data` → `std::env::temp_dir()`.
+- **`ncbi_tests.rs`**: `/tmp/` and `/data/` paths → `std::env::temp_dir()`.
+- **`validation/mod.rs`**: Fixed `bench` intra-doc link ambiguity → `bench()`.
+- **`tolerances/mod.rs`**: Fixed `clippy::too_long_first_doc_paragraph` on `VARIANCE_EXACT`.
+
+### Added
+- 10 new validation module unit tests (data directory discovery, timing, Validator edges)
+- 9 doc-tests on forge public API (`data`, `dispatch`, `inventory`, `workloads`, `phylogeny`)
+- 30 provenance tables added to binaries previously missing them
+- Handoff: `WETSPRING_V93_DEEP_DEBT_TOADSTOOL_HANDOFF_MAR04_2026.md`
+
+### Audited (no action needed)
+- `clone()` calls: all Arc clones or necessary ownership transfers
+- `read_to_string`: all on small files (proc/sysfs/config/sidecar)
+- External dependencies: all pure Rust (no C deps to evolve)
+- Root docs, whitePaper/baseCamp, ecoPrimals gen3 baseCamp synchronized
+
+**1,054 tests** | **175 forge tests** | **27 doc-tests** | **164 tolerances** | **0 clippy warnings**
+
 ## V93 — Standalone barraCuda Rewire + Deep Debt Evolution (2026-03-03)
 
 ### Changed

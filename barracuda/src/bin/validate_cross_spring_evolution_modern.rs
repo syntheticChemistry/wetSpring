@@ -25,9 +25,13 @@
 //! | groundSpring | Evolution (Kimura), jackknife, bootstrap, grid |
 //! | airSpring | Hydrology, Brent optimizer, seasonal pipeline |
 //!
+//! # Provenance
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | Command | `cargo run --bin validate_cross_spring_evolution_modern` |
+//! | Provenance type | Cross-spring validation |
+//! | Date | 2026-03-03 |
+//! | Command | `cargo run --release --bin validate_cross_spring_evolution_modern` |
 //!
 //! Validation class: Cross-spring
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)

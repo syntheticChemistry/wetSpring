@@ -91,7 +91,7 @@ metalForge Cross-Substrate       ← Exp093/103: diversity domains three-tier
 |--------|-------|--------|
 | **Diversity Rust vs Python** | **> 9x** (< 1 µs vs 9 µs) | Exp059 D06 |
 | **Extended diversity Rust vs Python** | **> 12x** (< 1 µs vs 12 µs) | Exp059 D16 |
-| **Shannon GPU (10K samples)** | 12 ms CPU → 0.5 ms GPU = **24x** | BENCHMARK_RESULTS |
+| **Shannon GPU (10K samples)** | 12 ms CPU → 0.5 ms GPU = **24x** | Exp059 GPU benchmark |
 | **Streaming (128 timepoints)** | Single GpuPipelineSession dispatch | Exp090 |
 
 For surveillance workloads (128–1000 timepoints per monitoring window), the

@@ -30,13 +30,16 @@
 //!
 //! Key metric: streaming total < sum of individual dispatches.
 //!
+//! # Provenance
+//!
+//! Expected values are **analytical** — derived from mathematical
+//! identities and algebraic invariants.
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | Date | 2026-03-02 |
-//! | Command | `cargo run --release --features gpu --bin validate_pure_gpu_streaming_v9` |
-//!
-//! Validation class: GPU-parity + streaming
-//! Provenance: CPU reference (v22) + GPU dispatch (v9)
+//! | Provenance type | Analytical (mathematical invariants) |
+//! | Date | 2026-03-03 |
+//! | Command | `cargo run --release --bin validate_pure_gpu_streaming_v9` |
 
 use std::time::Instant;
 

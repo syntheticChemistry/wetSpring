@@ -191,6 +191,13 @@ pub const NMF_CONVERGENCE_KL: f64 = 1e-4;
 /// Validated: Exp164 (GPU Drug Repurposing).
 pub const NMF_CONVERGENCE_EUCLIDEAN: f64 = 1e-6;
 
+/// NMF convergence tolerance for rank-sensitivity sweeps.
+///
+/// Slightly tighter than [`NMF_CONVERGENCE_KL`] (1e-4) to capture
+/// rank-dependent convergence differences without over-iterating.
+/// Used in rank-search validation (Exp267, `RepoDB` NMF rank sweep).
+pub const NMF_CONVERGENCE_RANK_SEARCH: f64 = 1e-5;
+
 /// Ridge regression default regularization (Tikhonov λ).
 ///
 /// Common default for small-to-medium regression problems. Prevents

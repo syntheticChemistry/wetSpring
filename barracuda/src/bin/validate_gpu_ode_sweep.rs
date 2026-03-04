@@ -148,7 +148,9 @@ fn validate_ode_sweep(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 tolerances::EXACT,
             );
 
-            let all_nonneg = gpu_finals.iter().all(|&x| x >= -1e-10);
+            let all_nonneg = gpu_finals
+                .iter()
+                .all(|&x| x >= -tolerances::ANALYTICAL_LOOSE);
             v.check(
                 "ODE sweep: all finals ≥ 0",
                 f64::from(u8::from(all_nonneg)),
@@ -164,7 +166,7 @@ fn validate_ode_sweep(device: &Arc<WgpuDevice>, v: &mut Validator) {
                     let gpu_v = gpu_finals[batch * N_VARS + var];
                     let diff = (cpu_v - gpu_v).abs();
                     max_diff = max_diff.max(diff);
-                    if cpu_v.abs() > 1e-10 {
+                    if cpu_v.abs() > tolerances::ANALYTICAL_LOOSE {
                         max_rel_diff = max_rel_diff.max(diff / cpu_v.abs());
                     }
                 }
@@ -192,7 +194,9 @@ fn validate_ode_sweep(device: &Arc<WgpuDevice>, v: &mut Validator) {
             let last_bio = gpu_finals[(n_batches as usize - 1) * N_VARS + 4];
             v.check(
                 "ODE sweep: parameter sweep changes outcome",
-                f64::from(u8::from((first_bio - last_bio).abs() > 1e-6)),
+                f64::from(u8::from(
+                    (first_bio - last_bio).abs() > tolerances::ODE_GPU_PARITY,
+                )),
                 1.0,
                 tolerances::EXACT,
             );
@@ -237,7 +241,7 @@ fn validate_bifurcation(device: &Arc<WgpuDevice>, v: &mut Validator) {
     let result = qs_biofilm::run_scenario(&y0, 50.0, 0.01, &base);
     let steady = &result.y_final;
 
-    let eps = 1e-6;
+    let eps = tolerances::NMF_CONVERGENCE_EUCLIDEAN;
     let f0 = qs_rhs_wrap(steady, &base);
     let mut jacobian = [[0.0_f64; N_VARS]; N_VARS];
     for j in 0..N_VARS {
@@ -273,7 +277,7 @@ fn validate_bifurcation(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 }
             }
             let norm: f64 = special::l2_norm(&av);
-            if norm < 1e-15 {
+            if norm < tolerances::MATRIX_EPS {
                 break;
             }
             for i in 0..N_VARS {
@@ -321,7 +325,7 @@ fn validate_bifurcation(device: &Arc<WgpuDevice>, v: &mut Validator) {
             );
 
             let gpu_max = gpu_eigs.iter().copied().fold(f64::NEG_INFINITY, f64::max);
-            let rel = (gpu_max - max_eigen).abs() / max_eigen.abs().max(1e-15);
+            let rel = (gpu_max - max_eigen).abs() / max_eigen.abs().max(tolerances::MATRIX_EPS);
             println!("    GPU max eigenvalue: {gpu_max:.6}");
             println!("    CPU max eigenvalue: {max_eigen:.6}");
             println!("    relative diff:      {rel:.4e}");
@@ -331,7 +335,9 @@ fn validate_bifurcation(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 rel < tolerances::GPU_EIGENVALUE_REL,
             );
 
-            let all_psd = gpu_eigs.iter().all(|&e| e >= -1e-8);
+            let all_psd = gpu_eigs
+                .iter()
+                .all(|&e| e >= -tolerances::LIMIT_CONVERGENCE);
             v.check(
                 "Bifurcation: J^T*J eigenvalues ≥ 0 (PSD)",
                 f64::from(u8::from(all_psd)),

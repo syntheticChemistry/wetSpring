@@ -55,6 +55,31 @@ pub const ANALYTICAL_F64: f64 = 1e-12;
 /// than [`ANALYTICAL_F64`].
 pub const ANALYTICAL_LOOSE: f64 = 1e-10;
 
+/// Limit convergence tolerance for bounded values approaching
+/// theoretical limits (0 or 1) with residual from polynomial
+/// approximation or finite-sample effects.
+///
+/// Covers: `norm_cdf(large_x) → 1`, neutral drift `P_fix → 1/N`,
+/// eigenvalue positive-semidefiniteness checks. Tighter than
+/// [`ERF_PARITY`] (5e-7), looser than [`ANALYTICAL_LOOSE`] (1e-10).
+pub const LIMIT_CONVERGENCE: f64 = 1e-8;
+
+/// Variance of exactly constant data.
+///
+/// Theoretically zero, but generalized jackknife delete-1 can
+/// accumulate O(N) cancellation terms. Stricter than [`EXACT_F64`]
+/// (1e-15) to catch genuine non-zero variance while allowing
+/// extended-precision rounding.
+pub const VARIANCE_EXACT: f64 = 1e-20;
+
+/// NMF matrix sparsity threshold for counting near-zero entries.
+///
+/// Elements below this are considered effectively zero when computing
+/// W/H sparsity ratios. Between [`LIMIT_CONVERGENCE`] (1e-8) and
+/// [`ANALYTICAL_LOOSE`] (1e-10) to avoid counting numerical noise
+/// as non-zero structure.
+pub const NMF_SPARSITY_THRESHOLD: f64 = 1e-8;
+
 // ═══════════════════════════════════════════════════════════════════
 // Special-function evaluation tolerances
 // ═══════════════════════════════════════════════════════════════════

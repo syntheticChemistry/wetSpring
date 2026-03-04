@@ -52,6 +52,7 @@ use barracuda::spectral::{
 };
 use barracuda::stats::norm_cdf;
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 struct Timing {
@@ -318,7 +319,7 @@ fn main() {
                 .iter()
                 .max_by(|a, b| a.partial_cmp(b).unwrap())
                 .unwrap()
-                - 1e-10,
+                - tolerances::ANALYTICAL_LOOSE,
     );
     v.check_pass(
         "Crisaborole penalized by geometry",
@@ -330,7 +331,7 @@ fn main() {
     );
     v.check_pass(
         "Score = pathway × geometry (Apoquel check)",
-        (scores[0] - 0.95).abs() < 1e-10,
+        (scores[0] - 0.95).abs() < tolerances::ANALYTICAL_LOOSE,
     );
 
     let cpu_us = t0.elapsed().as_micros() as f64;

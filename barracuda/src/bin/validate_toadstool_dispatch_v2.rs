@@ -26,13 +26,16 @@
 //!
 //! Chain: Paper → CPU → GPU → Parity → **`ToadStool` (this)** → `metalForge`
 //!
+//! # Provenance
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | Date | 2026-02-28 |
-//! | Command | `cargo run --features gpu --bin validate_toadstool_dispatch_v2` |
+//! | Provenance type | Cross-spring validation |
+//! | Date | 2026-03-03 |
+//! | Command | `cargo run --release --bin validate_toadstool_dispatch_v2` |
 //!
-//! Validation class: Pipeline
-//! Provenance: End-to-end pipeline integration test
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::time::Instant;
 

@@ -26,13 +26,16 @@
 //! - S5: DF64 Precision — Pack/unpack at GPU boundary
 //! - S6: `GpuPipelineSession` — Streaming vs individual dispatch parity
 //!
+//! # Provenance
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | Date | 2026-03-01 |
-//! | Command | `cargo run --features gpu --bin validate_cpu_vs_gpu_pure_math` |
+//! | Provenance type | Cross-spring validation |
+//! | Date | 2026-03-03 |
+//! | Command | `cargo run --release --bin validate_cpu_vs_gpu_pure_math` |
 //!
-//! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in `barracuda::bio`
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::time::Instant;
 

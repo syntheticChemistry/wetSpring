@@ -29,14 +29,16 @@
 //! wateringHole → Boltzmann sampling, Sobol, LHS, chi-squared batch
 //! ```
 //!
+//! # Provenance
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | `ToadStool` pin | S86 (`2fee1969`) — 264 `ComputeDispatch` ops |
-//! | Date | 2026-03-02 |
-//! | Command | `cargo run --release --features gpu --bin validate_cross_spring_modern_s86` |
+//! | Provenance type | Cross-spring validation |
+//! | Date | 2026-03-03 |
+//! | Command | `cargo run --release --bin validate_cross_spring_modern_s86` |
 //!
 //! Validation class: Cross-spring
-//! Provenance: Validates across multiple primals/springs
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::sync::Arc;
 use std::time::Instant;
@@ -45,6 +47,7 @@ use barracuda::shaders::Precision;
 use wetspring_barracuda::bio::diversity_fusion_gpu::{DiversityFusionGpu, diversity_fusion_cpu};
 use wetspring_barracuda::bio::gemm_cached::GemmCached;
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 struct Timing {
@@ -212,7 +215,10 @@ fn main() {
                     .zip(cpu_c.iter())
                     .map(|(g, c)| (g - c).abs())
                     .fold(0.0_f64, f64::max);
-                v.check_pass("GEMM GPU≈CPU parity (DF64 tol)", max_err < 1e-3);
+                v.check_pass(
+                    "GEMM GPU≈CPU parity (DF64 tol)",
+                    max_err < tolerances::CROSS_SPRING_NUMERICAL,
+                );
                 println!("  Max |GPU−CPU|: {max_err:.2e}");
                 println!("  Speedup: {:.1}× GPU vs CPU", ms_cpu / ms_gpu.max(0.001));
 
@@ -562,7 +568,7 @@ fn main() {
                 &barracuda::linalg::NmfConfig {
                     rank: 5,
                     max_iter: 200,
-                    tol: 1e-6,
+                    tol: tolerances::NMF_CONVERGENCE_EUCLIDEAN,
                     objective: barracuda::linalg::NmfObjective::Euclidean,
                     seed: 42,
                 },
@@ -638,12 +644,18 @@ fn main() {
         v.check_pass("DF64 pack→unpack roundtrip", unpacked.len() == values.len());
 
         for (i, (&orig, &rt)) in values.iter().zip(unpacked.iter()).enumerate() {
-            let err = (orig - rt).abs() / orig.abs().max(1e-300);
-            v.check_pass(&format!("DF64 roundtrip[{i}] rel_err < 1e-10"), err < 1e-10);
+            let err = (orig - rt).abs() / orig.abs().max(tolerances::LOG_PROB_FLOOR);
+            v.check_pass(
+                &format!("DF64 roundtrip[{i}] rel_err < 1e-10"),
+                err < tolerances::ANALYTICAL_LOOSE,
+            );
         }
 
         let rt_err = wetspring_barracuda::df64_host::roundtrip_error(std::f64::consts::PI);
-        v.check_pass("DF64 roundtrip_error < 1e-10", rt_err < 1e-10);
+        v.check_pass(
+            "DF64 roundtrip_error < 1e-10",
+            rt_err < tolerances::ANALYTICAL_LOOSE,
+        );
         println!("  DF64 roundtrip error (π): {rt_err:.2e}");
         println!("  Origin: hotSpring (DF64 core-streaming theory)");
         println!("  wetSpring: pack/unpack validation harness");

@@ -28,6 +28,7 @@
 
 use std::time::Instant;
 
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn main() {
@@ -149,11 +150,14 @@ fn main() {
         let total_degree: f64 = adj.iter().sum::<f64>();
         v.check_pass(
             "Laplacian trace = total degree",
-            (diag_sum - total_degree).abs() < 1e-10,
+            (diag_sum - total_degree).abs() < tolerances::ANALYTICAL_LOOSE,
         );
 
         let off_diag_sum: f64 = lap.iter().sum::<f64>();
-        v.check_pass("Laplacian rows sum to 0", off_diag_sum.abs() < 1e-10);
+        v.check_pass(
+            "Laplacian rows sum to 0",
+            off_diag_sum.abs() < tolerances::ANALYTICAL_LOOSE,
+        );
 
         let hetero = vec![0.1, -0.2, 0.05, -0.1];
         let disordered = barracuda::linalg::disordered_laplacian(&lap, 4, &hetero, 1.0);
@@ -162,7 +166,10 @@ fn main() {
         let eig_approx: Vec<f64> = (0..4).map(|i| lap[i * 4 + i]).collect();
         let eff = barracuda::linalg::effective_rank(&eig_approx);
         v.check_pass("effective_rank > 0", eff > 0.0);
-        v.check_pass("effective_rank ≤ n", eff <= 4.0 + 1e-10);
+        v.check_pass(
+            "effective_rank ≤ n",
+            eff <= 4.0 + tolerances::ANALYTICAL_LOOSE,
+        );
 
         let input_dist = vec![0.5, 0.3, 0.2];
         let trans = vec![0.7, 0.2, 0.1, 0.3, 0.5, 0.2, 0.1, 0.3, 0.6];
@@ -171,7 +178,10 @@ fn main() {
             barracuda::linalg::belief_propagation_chain(&input_dist, &[trans.as_slice()], &dims);
         v.check_pass("belief_propagation returns layers", dists.len() == 2);
         let final_sum: f64 = dists.last().unwrap().iter().sum();
-        v.check_pass("final distribution ≈ 1", (final_sum - 1.0).abs() < 1e-10);
+        v.check_pass(
+            "final distribution ≈ 1",
+            (final_sum - 1.0).abs() < tolerances::ANALYTICAL_LOOSE,
+        );
 
         println!("  Laplacian: 4×4, trace={diag_sum:.1}, eff_rank={eff:.3}");
         println!("  Belief propagation: final dist sum={final_sum:.10}");
@@ -307,7 +317,8 @@ fn main() {
 
         v.check_pass(
             "GOLDEN_RATIO ≈ 1/φ ≈ 0.618",
-            (barracuda::spectral::GOLDEN_RATIO - 0.618_033_988_7).abs() < 1e-6,
+            (barracuda::spectral::GOLDEN_RATIO - 0.618_033_988_7).abs()
+                < tolerances::GPU_VS_CPU_F64,
         );
 
         let gcd_val = barracuda::spectral::gcd(12, 8);
@@ -340,7 +351,9 @@ fn main() {
         let eigs = barracuda::spectral::find_all_eigenvalues(&alpha, &beta);
         v.check_pass("tridiagonal: n eigenvalues", eigs.len() == n);
 
-        let sorted = eigs.windows(2).all(|w| w[0] <= w[1] + 1e-10);
+        let sorted = eigs
+            .windows(2)
+            .all(|w| w[0] <= w[1] + tolerances::ANALYTICAL_LOOSE);
         v.check_pass("eigenvalues sorted", sorted);
 
         let count = barracuda::spectral::sturm_count(&alpha, &beta, 3.0);
@@ -364,7 +377,10 @@ fn main() {
         v.check_pass("erf(0.5) ≈ 0.5205", (erf_half - 0.5205).abs() < 0.001);
 
         let lg = barracuda::special::ln_gamma(5.0).unwrap();
-        v.check_pass("ln_gamma(5) ≈ ln(24)", (lg - 24.0_f64.ln()).abs() < 1e-10);
+        v.check_pass(
+            "ln_gamma(5) ≈ ln(24)",
+            (lg - 24.0_f64.ln()).abs() < tolerances::ANALYTICAL_LOOSE,
+        );
 
         let hargreaves = barracuda::stats::hargreaves_et0(35.0, 32.0, 18.0).unwrap();
         v.check_pass("Hargreaves ET₀ > 0", hargreaves > 0.0);
@@ -375,7 +391,10 @@ fn main() {
         v.check_pass("FAO-56 ET₀ ≈ 3.88", (fao56 - 3.88).abs() < 0.15);
 
         let ncdf = barracuda::stats::norm_cdf(0.0);
-        v.check_pass("norm_cdf(0) = 0.5", (ncdf - 0.5).abs() < 1e-10);
+        v.check_pass(
+            "norm_cdf(0) = 0.5",
+            (ncdf - 0.5).abs() < tolerances::ANALYTICAL_LOOSE,
+        );
 
         let pearson = barracuda::stats::pearson_correlation(
             &[1.0, 2.0, 3.0, 4.0, 5.0],

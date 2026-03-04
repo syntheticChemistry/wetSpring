@@ -86,7 +86,7 @@ fn validate_nmf_reconstruction_parity(
     let config = NmfConfig {
         rank: 10,
         max_iter: 200,
-        tol: 1e-6,
+        tol: tolerances::NMF_CONVERGENCE_EUCLIDEAN,
         objective: NmfObjective::Euclidean,
         seed: 42,
     };
@@ -203,7 +203,7 @@ fn validate_transe_parity(
             *val = rng.next_f64().mul_add(0.2, -0.1);
         }
         let norm: f64 = row.iter().map(|x| x * x).sum::<f64>().sqrt();
-        if norm > 1e-12 {
+        if norm > tolerances::EMBEDDING_NORM_FLOOR {
             for val in row.iter_mut() {
                 *val /= norm;
             }
@@ -304,7 +304,7 @@ fn validate_drug_ranking_parity(v: &mut Validator, gemm: &GemmCached) {
     let config = NmfConfig {
         rank,
         max_iter: 200,
-        tol: 1e-6,
+        tol: tolerances::NMF_CONVERGENCE_EUCLIDEAN,
         objective: NmfObjective::Euclidean,
         seed: 42,
     };

@@ -11,6 +11,29 @@ use crate::substrate::{Substrate, SubstrateKind, SubstrateOrigin};
 /// # Errors
 ///
 /// Returns an I/O error if writing fails.
+///
+/// # Examples
+///
+/// ```
+/// use wetspring_forge::inventory::write_inventory;
+/// use wetspring_forge::substrate::{
+///     Capability, Identity, Properties, Substrate, SubstrateKind, SubstrateOrigin,
+/// };
+///
+/// let substrates = vec![Substrate {
+///     kind: SubstrateKind::Cpu,
+///     identity: Identity::named("test-cpu"),
+///     properties: Properties::default(),
+///     capabilities: vec![Capability::F64Compute, Capability::F32Compute],
+///     origin: SubstrateOrigin::Local,
+/// }];
+/// let mut buf = Vec::new();
+/// write_inventory(&substrates, &mut buf).unwrap();
+/// let output = String::from_utf8(buf).unwrap();
+/// assert!(output.contains("wetSpring Forge"));
+/// assert!(output.contains("test-cpu"));
+/// assert!(output.contains("f64"));
+/// ```
 pub fn write_inventory(substrates: &[Substrate], w: &mut impl Write) -> io::Result<()> {
     writeln!(w, "┌──────────────────────────────────────────────┐")?;
     writeln!(w, "│  wetSpring Forge — Hardware Inventory         │")?;

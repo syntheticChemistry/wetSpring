@@ -251,10 +251,10 @@ fi
 
 if [[ "$MODE" == "--all" || "$MODE" == "--pfas" || "$MODE" == "--t2" ]]; then
     echo "── Dataset 10: Michigan DEQ PFAS Water Data ──────────────"
-    mkdir -p "$DATA_DIR/michigan-pfas"
+    mkdir -p "$DATA_DIR/michigan_deq_pfas"
     echo "  [NOTE] Michigan PFAS water monitoring data available at:"
     echo "         https://www.michigan.gov/pfasresponse/drinking-water/testing"
-    echo "         Download sampling results CSV → data/michigan-pfas/"
+    echo "         Download sampling results CSV → data/michigan_deq_pfas/"
     echo "         This is the training data for the ML water monitoring model."
     echo
 fi

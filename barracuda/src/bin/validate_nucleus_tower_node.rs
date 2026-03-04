@@ -35,13 +35,16 @@
 //! Exp203-208 (IPC validated) → Exp256 (EMP atlas) → Exp257 (data pipeline) →
 //! **Exp258 (NUCLEUS Tower-Node)**
 //!
+//! # Provenance
+//!
+//! Expected values are **analytical** — derived from mathematical
+//! identities and algebraic invariants.
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | Date | 2026-03-01 |
+//! | Provenance type | Analytical (mathematical invariants) |
+//! | Date | 2026-03-03 |
 //! | Command | `cargo run --release --bin validate_nucleus_tower_node` |
-//!
-//! Validation class: Pipeline
-//! Provenance: End-to-end pipeline integration test
 
 use std::path::PathBuf;
 use std::process::Command;

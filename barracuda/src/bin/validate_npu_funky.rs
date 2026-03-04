@@ -31,15 +31,16 @@
 //! - **S5 Cross-Reservoir Crosstalk**: Rapid readout alternation to detect
 //!   whether SRAM state bleeds between consecutive classifiers.
 //!
-//! | Field        | Value |
-//! |--------------|-------|
-//! | Date         | 2026-02-26 |
-//! | NPU hardware | `BrainChip` `AKD1000` 80 NPU, 10 MB SRAM |
-//! | Driver       | `ToadStool` akida-driver 0.1.0 (pure Rust) |
-//! | Command      | `cargo run --release --features npu --bin validate_npu_funky` |
+//! # Provenance
 //!
-//! Validation class: Cross-spring
-//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
+//! Expected values are **analytical** — derived from mathematical
+//! identities and algebraic invariants.
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Provenance type | Analytical (mathematical invariants) |
+//! | Date | 2026-03-03 |
+//! | Command | `cargo run --release --bin validate_npu_funky` |
 
 use std::time::Instant;
 use wetspring_barracuda::bio::esn::{Esn, EsnConfig};

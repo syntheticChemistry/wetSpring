@@ -26,6 +26,7 @@
 //! Provenance: Known-value formulas and algorithmic invariants
 
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 struct LcgRng(u64);
@@ -117,7 +118,7 @@ fn validate_factorisation_and_structure(
 
     let wh = reconstruct_wh(result);
     let (within_mean, cross_mean) = compute_block_discrimination(&wh);
-    let disc_ratio = within_mean / (cross_mean + 1e-10);
+    let disc_ratio = within_mean / (cross_mean + tolerances::ANALYTICAL_LOOSE);
     println!("  Within-cluster mean score: {within_mean:.4}");
     println!("  Cross-cluster mean score: {cross_mean:.4}");
     println!("  Block discrimination ratio: {disc_ratio:.2}×");
@@ -133,10 +134,18 @@ fn validate_factorisation_and_structure(
 
     v.section("§4 Factor Quality Analysis");
 
-    let w_nonzero_frac =
-        result.w.iter().filter(|&&x| x > 1e-10).count() as f64 / result.w.len() as f64;
-    let h_nonzero_frac =
-        result.h.iter().filter(|&&x| x > 1e-10).count() as f64 / result.h.len() as f64;
+    let w_nonzero_frac = result
+        .w
+        .iter()
+        .filter(|&&x| x > tolerances::ANALYTICAL_LOOSE)
+        .count() as f64
+        / result.w.len() as f64;
+    let h_nonzero_frac = result
+        .h
+        .iter()
+        .filter(|&&x| x > tolerances::ANALYTICAL_LOOSE)
+        .count() as f64
+        / result.h.len() as f64;
 
     println!("  W factor density: {:.1}%", w_nonzero_frac * 100.0);
     println!("  H factor density: {:.1}%", h_nonzero_frac * 100.0);
@@ -166,7 +175,7 @@ fn validate_rank_sensitivity(v: &mut Validator, matrix: &[f64]) {
         let cfg = NmfConfig {
             rank,
             max_iter: 100,
-            tol: 1e-5,
+            tol: tolerances::NMF_CONVERGENCE_RANK_SEARCH,
             objective: NmfObjective::Euclidean,
             seed: 42,
         };
@@ -174,7 +183,7 @@ fn validate_rank_sensitivity(v: &mut Validator, matrix: &[f64]) {
         let re = nmf::relative_reconstruction_error(matrix, &res);
         let wh_r = reconstruct_wh(&res);
         let (wm, cm) = compute_block_discrimination(&wh_r);
-        let ratio = wm / (cm + 1e-10);
+        let ratio = wm / (cm + tolerances::ANALYTICAL_LOOSE);
         println!("  {rank:>6} {re:>10.4} {wm:>12.4} {cm:>12.4} {ratio:>8.2}×");
     }
 
@@ -243,7 +252,7 @@ fn main() {
     let config = NmfConfig {
         rank: N_CLUSTERS,
         max_iter: 200,
-        tol: 1e-6,
+        tol: tolerances::NMF_CONVERGENCE_EUCLIDEAN,
         objective: NmfObjective::Euclidean,
         seed: 42,
     };

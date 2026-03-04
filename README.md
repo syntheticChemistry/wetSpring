@@ -4,10 +4,10 @@
 against Rust implementations and GPU shaders via `barraCuda` (standalone math
 primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 
-**Date:** March 3, 2026
+**Date:** March 4, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** Phase 93 — 1,044 lib tests, 280 experiments, 8,241+ validation checks, 268 binaries, standalone `barraCuda` v0.3.1 (767+ f64-canonical WGSL shaders), 144 primitives consumed, zero local WGSL, zero unsafe code, 106 named tolerances, `cargo clippy -W clippy::pedantic -W clippy::nursery` **ZERO WARNINGS**. XDG-compliant data paths. Configurable NCBI endpoints. All hardcoded tolerances centralized.
+**Status:** Phase 93 — 1,054 lib tests, 280 experiments, 8,241+ validation checks, 284 binaries, standalone `barraCuda` v0.3.1 (767+ f64-canonical WGSL shaders), 144 primitives consumed, zero local WGSL, zero unsafe code, 164 named tolerances, `cargo clippy -W clippy::pedantic -W clippy::nursery` **ZERO WARNINGS**. XDG-compliant data paths. Configurable NCBI endpoints. All hardcoded tolerances centralized. Zero `unreachable!()` in library code. All `clone()` calls audited. All external deps pure Rust.
 
 ---
 
@@ -127,10 +127,10 @@ integration point.
 | Exp271: Cross-Spring S79 (13 domains) | 73 |
 | Exp272: Bio Brain (7 domains) | 64 |
 | **Total validation checks** | **8,241+** |
-| Rust library unit tests | 1,044 (`barraCuda` CPU + IPC, default features) |
+| Rust library unit tests | 1,054 (`barraCuda` CPU + IPC, default features) |
 | metalForge forge tests | 175 |
-| Integration + determinism + doc tests | 90 |
-| **Total Rust tests** | **1,044+** (library) |
+| Doc-tests | 27 (barracuda 18 + forge 9) |
+| **Total Rust tests** | **1,054+** (library) |
 | Library code coverage | **95.86% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov) |
 | Experiments completed | 280 |
 | Validation/benchmark binaries | 284 |
@@ -408,7 +408,29 @@ v0.3.1. Comprehensive deep debt resolution across the full codebase:
 - **Doc updates**: ToadStool references → barraCuda (standalone math primal) in
   architectural docs (`gpu.rs`, `lib.rs`, `npu.rs`, `Cargo.toml`).
 
-**1,044 tests** | **106 named tolerances** | **0 clippy warnings (pedantic + nursery)**
+**1,054 tests** | **164 named tolerances** | **0 clippy warnings (pedantic + nursery)** | **0 doc warnings**
+
+#### Deep Debt Round 3 (March 4, 2026)
+
+Continued deep debt evolution targeting remaining audit items:
+
+- **Tolerance migration completed**: Last inline literal (`1e-5` in `validate_repodb_nmf`)
+  replaced with `tolerances::NMF_CONVERGENCE_RANK_SEARCH`. ~82 total inline literals
+  migrated across 16 binaries. 4 new constants: `LIMIT_CONVERGENCE`, `VARIANCE_EXACT`,
+  `NMF_SPARSITY_THRESHOLD`, `NMF_CONVERGENCE_RANK_SEARCH`.
+- **Test extraction**: 6 large library files had `#[cfg(test)]` blocks extracted to
+  separate `*_tests.rs` files: `bench/power.rs`, `bench/hardware.rs`, `bio/gbm.rs`,
+  `bio/merge_pairs.rs`, `bio/felsenstein.rs`, `metalForge/forge/ncbi.rs`.
+- **Provenance completed**: 30 binaries received `# Provenance` tables. All 284
+  binaries now carry complete provenance documentation.
+- **Validation coverage**: 10 new unit tests for `validation/` module (data directory
+  discovery, timing helpers, `Validator` edge cases). 9 doc-tests added to forge public API.
+- **`unreachable!()` eliminated**: `kmer.rs` match-with-unreachable → const lookup table.
+- **Hardcoded paths evolved**: `/tmp/` in forge `data.rs` and test code → `std::env::temp_dir()`.
+- **Sovereignty**: `pcoa.rs` CPU Jacobi absorption path documented (Write → Absorb → Lean).
+- **Doc check fixed**: `bench` intra-doc link ambiguity resolved (was sole doc warning).
+- **Audits completed**: `clone()` calls (all Arc or necessary), `read_to_string` (all
+  on small files), external deps (all pure Rust). No action needed.
 
 ### Phase 92J: Deep Debt Resolution + Pedantic Evolution
 - `panic!` in ESN bridge → `Result`-based error handling (zero panics in library code)
@@ -539,17 +561,17 @@ Rust 1.93 fixed across 20+ validation binaries.
 |-------|--------|
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy -W pedantic -W nursery` | **Zero warnings** (pedantic + nursery clean) |
-| `cargo doc --no-deps` | Clean (1 pre-existing `bench` ambiguity) |
+| `cargo doc --no-deps` | Clean (0 warnings) |
 | Line coverage (`cargo-llvm-cov`) | **95.86% line / 93.54% fn / 94.99% branch** (1,044 lib tests) |
 | `#![deny(unsafe_code)]` | **Enforced crate-wide** (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | **Enforced crate-wide** |
 | TODO/FIXME markers | **0** |
-| Inline tolerance literals | **0** (all 106 use `tolerances::` constants) |
+| Inline tolerance literals | **0** (all use `tolerances::` constants) |
 | SPDX-License-Identifier | All `.rs` files |
 | Max file size | All under 1000 LOC |
 | External C dependencies | **0** (`flate2` uses `rust_backend`) |
-| Named tolerance constants | 106 (scientifically justified, hierarchy-tested) |
-| Provenance headers | All 268 binaries |
+| Named tolerance constants | 164 (scientifically justified, hierarchy-tested) |
+| Provenance headers | All 284 binaries |
 | ESN ridge regression | **Proper Cholesky solve** (not diagonal approximation) |
 | I/O streaming | Buffering APIs deprecated; `stats_from_file` + iterators preferred |
 | Clone optimization | Hot-path clones eliminated (merge_pairs, derep entry API) |
@@ -646,7 +668,7 @@ wetSpring/
 │   ├── src/
 │   │   ├── lib.rs               ← crate root (pedantic + nursery lints enforced)
 │   │   ├── special.rs           ← sovereign math (erf, ln_gamma, regularized_gamma)
-│   │   ├── tolerances/           ← 106 named tolerance constants (bio, gpu, spectral, instrument)
+│   │   ├── tolerances/           ← 164 named tolerance constants (bio, gpu, spectral, instrument)
 │   │   ├── validation/           ← hotSpring validation framework
 │   │   ├── ncbi/                ← NCBI module (API key, HTTP, E-search, EFetch, SRA, NestGate, cache)
 │   │   ├── encoding.rs          ← sovereign base64 (zero dependencies)
@@ -654,7 +676,7 @@ wetSpring/
 │   │   ├── bio/                 ← 47 CPU + 42 GPU bio modules
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML, nanopore)
 │   │   ├── bench/               ← benchmark harness + power monitoring
-│   │   ├── bin/                 ← 268 validation/benchmark binaries
+│   │   ├── bin/                 ← 284 validation/benchmark binaries
 │   │   ├── ipc/                 ← JSON-RPC dispatch (biomeOS integration)
 │   │   └── shaders/             ← shared WGSL utilities (ODE shaders now generated at runtime)
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024

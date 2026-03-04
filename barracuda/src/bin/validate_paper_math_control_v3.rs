@@ -32,13 +32,16 @@
 //! Paper (this) → CPU (v16-v19) → GPU (v8-v11) → Streaming (v6-v8) → `metalForge` (v10-v11)
 //! ```
 //!
+//! # Provenance
+//!
+//! Expected values are **analytical** — derived from mathematical
+//! identities and algebraic invariants.
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | Date | 2026-03-01 |
+//! | Provenance type | Analytical (mathematical invariants) |
+//! | Date | 2026-03-03 |
 //! | Command | `cargo run --release --bin validate_paper_math_control_v3` |
-//!
-//! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in `barracuda::bio`
 
 use wetspring_barracuda::bio::{
     diversity, dnds, felsenstein, gillespie, hmm, kmer, neighbor_joining, phage_defense,

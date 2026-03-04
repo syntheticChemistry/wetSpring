@@ -34,6 +34,7 @@
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 struct LcgRng(u64);
@@ -126,7 +127,7 @@ fn validate_factorisation(
         let config = NmfConfig {
             rank,
             max_iter: 200,
-            tol: 1e-6,
+            tol: tolerances::NMF_CONVERGENCE_EUCLIDEAN,
             objective: NmfObjective::Euclidean,
             seed: 42,
         };
@@ -172,7 +173,7 @@ fn validate_factorisation(
     let config_best = NmfConfig {
         rank: best_rank.max(5),
         max_iter: 200,
-        tol: 1e-6,
+        tol: tolerances::NMF_CONVERGENCE_EUCLIDEAN,
         objective: NmfObjective::Euclidean,
         seed: 42,
     };
@@ -211,11 +212,14 @@ fn validate_kl_and_sparsity(
     let config_kl = NmfConfig {
         rank: best_rank.max(5),
         max_iter: 200,
-        tol: 1e-6,
+        tol: tolerances::NMF_CONVERGENCE_EUCLIDEAN,
         objective: NmfObjective::KlDivergence,
         seed: 42,
     };
-    let train_kl: Vec<f64> = train_matrix.iter().map(|&x| x + 1e-10).collect();
+    let train_kl: Vec<f64> = train_matrix
+        .iter()
+        .map(|&x| x + tolerances::ANALYTICAL_LOOSE)
+        .collect();
     let result_kl = nmf::nmf(&train_kl, n_drugs, n_diseases, &config_kl).expect("KL NMF failed");
 
     let kl_top = nmf::top_k_predictions(&result_kl, n_test * 5);
@@ -245,17 +249,25 @@ fn validate_kl_and_sparsity(
     let config_best = NmfConfig {
         rank: best_rank.max(5),
         max_iter: 200,
-        tol: 1e-6,
+        tol: tolerances::NMF_CONVERGENCE_EUCLIDEAN,
         objective: NmfObjective::Euclidean,
         seed: 42,
     };
     let result_best =
         nmf::nmf(train_matrix, n_drugs, n_diseases, &config_best).expect("NMF failed");
 
-    let w_sparsity =
-        result_best.w.iter().filter(|&&x| x < 1e-8).count() as f64 / result_best.w.len() as f64;
-    let h_sparsity =
-        result_best.h.iter().filter(|&&x| x < 1e-8).count() as f64 / result_best.h.len() as f64;
+    let w_sparsity = result_best
+        .w
+        .iter()
+        .filter(|&&x| x < tolerances::NMF_SPARSITY_THRESHOLD)
+        .count() as f64
+        / result_best.w.len() as f64;
+    let h_sparsity = result_best
+        .h
+        .iter()
+        .filter(|&&x| x < tolerances::NMF_SPARSITY_THRESHOLD)
+        .count() as f64
+        / result_best.h.len() as f64;
 
     println!("  W factor sparsity: {:.1}%", w_sparsity * 100.0);
     println!("  H factor sparsity: {:.1}%", h_sparsity * 100.0);

@@ -20,13 +20,16 @@
 //! ComputeDispatch. Validates GPU=CPU for diversity, PCoA, GEMM,
 //! NMF, spectral, sampling, hydrology, DF64 protocol, and more.
 //!
+//! # Provenance
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | Date | 2026-03-02 |
-//! | Command | `cargo run --features gpu --release --bin validate_cpu_gpu_full_domain_v92g` |
+//! | Provenance type | Cross-spring validation |
+//! | Date | 2026-03-03 |
+//! | Command | `cargo run --release --bin validate_cpu_gpu_full_domain_v92g` |
 //!
-//! Validation class: GPU-parity + ComputeDispatch
-//! Provenance: CPU reference + ToadStool primitives (S86)
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::sync::Arc;
 use std::time::Instant;

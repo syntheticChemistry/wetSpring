@@ -20,15 +20,18 @@
 //! These primitives were absorbed from groundSpring into `ToadStool` at S70.
 //! wetSpring now consumes them directly for rare biosphere and population genetics.
 //!
+//! # Provenance
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | Date | 2026-03-01 |
-//! | `ToadStool` Pin | S70+++ (`1dd7e338`) |
-//! | Command | `cargo run --bin validate_toadstool_s70_rewire` |
+//! | Provenance type | Cross-spring validation |
+//! | Date | 2026-03-03 |
+//! | Command | `cargo run --release --bin validate_toadstool_s70_rewire` |
 //!
 //! Validation class: Cross-spring
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn main() {
@@ -38,7 +41,12 @@ fn main() {
     v.section("S1: Kimura Fixation Probability (evolution.rs)");
 
     let p_neutral = barracuda::stats::kimura_fixation_prob(1000, 0.0, 0.01);
-    v.check("Neutral: P_fix == p0 (drift)", p_neutral, 0.01, 1e-8);
+    v.check(
+        "Neutral: P_fix == p0 (drift)",
+        p_neutral,
+        0.01,
+        tolerances::LIMIT_CONVERGENCE,
+    );
 
     let p_beneficial = barracuda::stats::kimura_fixation_prob(1000, 0.01, 0.01);
     v.check_pass("Beneficial: P_fix > p0", p_beneficial > 0.01);
@@ -53,7 +61,12 @@ fn main() {
     println!("  Strong selection P_fix = {p_strong:.6} (Ne=10000, s=0.1, p0=0.001)");
 
     let p_fixed = barracuda::stats::kimura_fixation_prob(100, 0.1, 1.0);
-    v.check("Already fixed: P_fix ≈ 1.0", p_fixed, 1.0, 1e-6);
+    v.check(
+        "Already fixed: P_fix ≈ 1.0",
+        p_fixed,
+        1.0,
+        tolerances::NMF_CONVERGENCE_EUCLIDEAN,
+    );
 
     // ═══ S2: Eigen Error Threshold ══════════════════════════════════════════
     v.section("S2: Eigen Error Threshold (quasispecies)");
@@ -65,7 +78,12 @@ fn main() {
     println!("  μ_c(σ=10, L=100) = {mu_c_val:.6}");
 
     let expected_mu_c = 1.0 - 10.0_f64.powf(-1.0 / 100.0);
-    v.check("μ_c matches analytic", mu_c_val, expected_mu_c, 1e-14);
+    v.check(
+        "μ_c matches analytic",
+        mu_c_val,
+        expected_mu_c,
+        tolerances::PYTHON_PARITY_TIGHT,
+    );
 
     let mu_c_large = barracuda::stats::error_threshold(2.0, 10_000).unwrap();
     let mu_c_small = barracuda::stats::error_threshold(2.0, 100).unwrap();
@@ -89,7 +107,12 @@ fn main() {
     println!("  P(detect | p=0.001, D=1000) = {power_1k:.4}");
 
     let expected_power = 1.0 - 0.999_f64.powi(1000);
-    v.check("Power matches analytic", power_1k, expected_power, 1e-12);
+    v.check(
+        "Power matches analytic",
+        power_1k,
+        expected_power,
+        tolerances::ANALYTICAL_F64,
+    );
 
     let power_10k = barracuda::stats::detection_power(0.001, 10_000);
     v.check_pass("More reads → higher power", power_10k > power_1k);
@@ -99,13 +122,13 @@ fn main() {
         "p=0 → power=0",
         barracuda::stats::detection_power(0.0, 10_000),
         0.0,
-        1e-15,
+        tolerances::EXACT_F64,
     );
     v.check(
         "p=1 → power=1",
         barracuda::stats::detection_power(1.0, 1),
         1.0,
-        1e-12,
+        tolerances::ANALYTICAL_F64,
     );
 
     // ═══ S4: Detection Threshold ════════════════════════════════════════════
@@ -133,14 +156,14 @@ fn main() {
 
     let data = [1.0, 2.0, 3.0, 4.0, 5.0];
     let jk = barracuda::stats::jackknife_mean_variance(&data).unwrap();
-    v.check("Mean = 3.0", jk.estimate, 3.0, 1e-12);
+    v.check("Mean = 3.0", jk.estimate, 3.0, tolerances::ANALYTICAL_F64);
     v.check_pass("Variance ≥ 0", jk.variance >= 0.0);
     v.check_pass("Std error ≥ 0", jk.std_error >= 0.0);
     v.check(
         "Std error = sqrt(variance)",
         jk.std_error,
         jk.variance.sqrt(),
-        1e-15,
+        tolerances::EXACT_F64,
     );
     println!(
         "  Jackknife mean = {:.4}, var = {:.6}, se = {:.6}",
@@ -149,8 +172,18 @@ fn main() {
 
     let constant_data = [7.0; 20];
     let jk_const = barracuda::stats::jackknife_mean_variance(&constant_data).unwrap();
-    v.check("Constant data: mean = 7.0", jk_const.estimate, 7.0, 1e-12);
-    v.check("Constant data: variance ≈ 0", jk_const.variance, 0.0, 1e-20);
+    v.check(
+        "Constant data: mean = 7.0",
+        jk_const.estimate,
+        7.0,
+        tolerances::ANALYTICAL_F64,
+    );
+    v.check(
+        "Constant data: variance ≈ 0",
+        jk_const.variance,
+        0.0,
+        tolerances::VARIANCE_EXACT,
+    );
 
     v.check_pass(
         "Empty → None",
@@ -167,7 +200,12 @@ fn main() {
     let data_gen = [2.0, 4.0, 6.0, 8.0];
     let jk_gen =
         barracuda::stats::jackknife(&data_gen, |d| d.iter().sum::<f64>() / d.len() as f64).unwrap();
-    v.check("Generalized mean ≈ 5.0", jk_gen.estimate, 5.0, 1e-10);
+    v.check(
+        "Generalized mean ≈ 5.0",
+        jk_gen.estimate,
+        5.0,
+        tolerances::ANALYTICAL_LOOSE,
+    );
     v.check_pass("Generalized variance ≥ 0", jk_gen.variance >= 0.0);
     println!(
         "  Generalized jackknife mean = {:.4}, se = {:.6}",
@@ -210,7 +248,12 @@ fn main() {
     println!("  chao1_classic = {chao1_int:.2}");
 
     let expected_chao1 = s_obs + (f1 * f1) / (2.0 * f2);
-    v.check("Matches analytic formula", chao1_int, expected_chao1, 1e-12);
+    v.check(
+        "Matches analytic formula",
+        chao1_int,
+        expected_chao1,
+        tolerances::ANALYTICAL_F64,
+    );
 
     // chao1 (f64) uses bias-corrected formula: f1*(f1-1)/(2*(f2+1))
     // chao1_classic (u64) uses original Chao 1984: f1^2/(2*f2)
@@ -232,7 +275,7 @@ fn main() {
         "No singletons: chao1 == S_obs",
         chao1_no_f1,
         s_obs_no,
-        1e-12,
+        tolerances::ANALYTICAL_F64,
     );
 
     let no_doubles: Vec<u64> = vec![10, 5, 3, 1, 1, 1, 20];
@@ -244,7 +287,7 @@ fn main() {
         "No doubletons: f1*(f1-1)/2 formula",
         chao1_no_f2,
         expected_no_f2,
-        1e-12,
+        tolerances::ANALYTICAL_F64,
     );
     println!("  No-doubleton chao1 = {chao1_no_f2:.2} (expected {expected_no_f2:.2})");
 

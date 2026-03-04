@@ -26,12 +26,16 @@
 //! | Bio observation mapping | wetSpring V89 | `brain/observation.rs` |
 //! | ESN core | `ToadStool` S79 | `toadstool_bridge.rs` |
 //!
-//! # Command
+//! # Provenance
 //!
-//! `cargo run --release --features nautilus --bin validate_bio_brain_s79`
+//! Expected values are **analytical** — derived from mathematical
+//! identities and algebraic invariants.
 //!
-//! Validation class: Cross-spring
-//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
+//! | Field | Value |
+//! |-------|-------|
+//! | Provenance type | Analytical (mathematical invariants) |
+//! | Date | 2026-03-03 |
+//! | Command | `cargo run --release --bin validate_bio_brain_s79` |
 
 use std::time::Instant;
 

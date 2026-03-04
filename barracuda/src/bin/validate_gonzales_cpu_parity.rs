@@ -40,9 +40,10 @@ use barracuda::spectral::{
 };
 use barracuda::stats::{fit_exponential, hill, mean, r_squared};
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
-const TOL: f64 = 1e-12;
+const TOL: f64 = tolerances::ANALYTICAL_F64;
 
 struct Timing {
     domain: &'static str,
@@ -205,7 +206,7 @@ fn main() {
 
     v.check_pass(
         "Shannon parity",
-        (barracuda_shannon - manual_shannon).abs() < 1e-6,
+        (barracuda_shannon - manual_shannon).abs() < tolerances::GPU_VS_CPU_F64,
     );
 
     // Simpson: D = 1 - Σ p_i²
@@ -214,7 +215,7 @@ fn main() {
 
     v.check_pass(
         "Simpson parity",
-        (barracuda_simpson - manual_simpson).abs() < 1e-6,
+        (barracuda_simpson - manual_simpson).abs() < tolerances::GPU_VS_CPU_F64,
     );
 
     // Pielou: J = H / ln(S)
@@ -224,7 +225,7 @@ fn main() {
 
     v.check_pass(
         "Pielou parity",
-        (barracuda_pielou - manual_pielou).abs() < 1e-6,
+        (barracuda_pielou - manual_pielou).abs() < tolerances::GPU_VS_CPU_F64,
     );
 
     // Chao1: species richness estimator
@@ -247,7 +248,7 @@ fn main() {
 
     v.check_pass(
         "Chao1 parity",
-        (barracuda_chao1 - manual_chao1).abs() < 1e-6,
+        (barracuda_chao1 - manual_chao1).abs() < tolerances::GPU_VS_CPU_F64,
     );
 
     println!("  Shannon: barracuda={barracuda_shannon:.6}, manual={manual_shannon:.6}");
@@ -321,7 +322,7 @@ fn main() {
 
     v.check_pass(
         "Different seeds → different r values",
-        (r_s1 - r_s2).abs() > 1e-6,
+        (r_s1 - r_s2).abs() > tolerances::GPU_VS_CPU_F64,
     );
 
     let midpoint = f64::midpoint(POISSON_R, GOE_R);
@@ -365,7 +366,7 @@ fn main() {
         let recovered = (w / w_scale).exp();
         v.check_pass(
             &format!("Round-trip IC50={ic:.0}: |recovered - original| < 1e-10"),
-            (recovered - ic).abs() < 1e-10,
+            (recovered - ic).abs() < tolerances::ANALYTICAL_LOOSE,
         );
     }
 

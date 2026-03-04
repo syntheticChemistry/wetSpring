@@ -28,6 +28,20 @@ pub fn unifrac_propagate() -> BioWorkload {
 }
 
 /// Felsenstein phylogenetic pruning.
+///
+/// # Examples
+///
+/// ```
+/// use wetspring_forge::workloads::felsenstein;
+/// use wetspring_forge::workloads::ShaderOrigin;
+/// use wetspring_forge::substrate::Capability;
+///
+/// let w = felsenstein();
+/// assert_eq!(w.workload.name, "felsenstein");
+/// assert!(w.is_absorbed());
+/// assert!(w.workload.required.contains(&Capability::F64Compute));
+/// assert_eq!(w.primitive, Some("FelsensteinGpu"));
+/// ```
 #[must_use]
 pub fn felsenstein() -> BioWorkload {
     BioWorkload::new_static(ShaderOrigin::Absorbed)

@@ -26,14 +26,16 @@
 //! - S5: Diversity round-trip (wetSpring bio → `barracuda::stats` identity)
 //! - S6: Spectral (Anderson, Lanczos, level spacing ratio)
 //!
+//! # Provenance
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | Date | 2026-03-01 |
-//! | `ToadStool` Pin | S71+++ (`1dd7e338`) |
+//! | Provenance type | Cross-spring validation |
+//! | Date | 2026-03-03 |
 //! | Command | `cargo run --release --bin validate_toadstool_dispatch_v3` |
 //!
-//! Validation class: Pipeline
-//! Provenance: End-to-end pipeline integration test
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::time::Instant;
 
@@ -92,9 +94,24 @@ fn main() {
     );
 
     let fit = barracuda::stats::fit_linear(&x, &y).unwrap();
-    v.check("Linear fit: slope = 2.0", fit.params[0], 2.0, 1e-10);
-    v.check("Linear fit: intercept = 0.0", fit.params[1], 0.0, 1e-10);
-    v.check("Linear fit: r² ≈ 1.0", fit.r_squared, 1.0, 1e-10);
+    v.check(
+        "Linear fit: slope = 2.0",
+        fit.params[0],
+        2.0,
+        tolerances::ANALYTICAL_LOOSE,
+    );
+    v.check(
+        "Linear fit: intercept = 0.0",
+        fit.params[1],
+        0.0,
+        tolerances::ANALYTICAL_LOOSE,
+    );
+    v.check(
+        "Linear fit: r² ≈ 1.0",
+        fit.r_squared,
+        1.0,
+        tolerances::ANALYTICAL_LOOSE,
+    );
 
     let exp_x = [0.0_f64, 1.0, 2.0, 3.0];
     let exp_y: Vec<f64> = exp_x.iter().map(|&xi| (2.0 * xi).exp()).collect();
@@ -188,13 +205,18 @@ fn main() {
     v.check("erf(0) = 0", erf_0, 0.0, tolerances::EXACT_F64);
 
     let erf_inf = barracuda::special::erf(10.0);
-    v.check("erf(∞) → 1", erf_inf, 1.0, 1e-10);
+    v.check("erf(∞) → 1", erf_inf, 1.0, tolerances::ANALYTICAL_LOOSE);
 
     let erfc_0 = barracuda::special::erfc(0.0);
     v.check("erfc(0) = 1", erfc_0, 1.0, tolerances::EXACT_F64);
 
     let erf_complement = barracuda::special::erf(1.5) + barracuda::special::erfc(1.5);
-    v.check("erf(x) + erfc(x) = 1", erf_complement, 1.0, 1e-14);
+    v.check(
+        "erf(x) + erfc(x) = 1",
+        erf_complement,
+        1.0,
+        tolerances::PYTHON_PARITY_TIGHT,
+    );
 
     let ln_gamma_1 = barracuda::special::ln_gamma(1.0).unwrap();
     v.check(
@@ -210,7 +232,7 @@ fn main() {
         "ln_gamma(5) = ln(4!) = ln(24)",
         ln_gamma_5,
         expected_ln_24,
-        1e-10,
+        tolerances::ANALYTICAL_LOOSE,
     );
 
     // ═══ S4: Numerical ═══════════════════════════════════════════════════

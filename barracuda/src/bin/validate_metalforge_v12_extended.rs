@@ -27,13 +27,16 @@
 //!
 //! Chain position: Paper → CPU v20 → GPU v11 → Parity v7 → **`metalForge` v12 (this)**
 //!
+//! # Provenance
+//!
+//! Expected values are **analytical** — derived from mathematical
+//! identities and algebraic invariants.
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | Date | 2026-03-01 |
-//! | Command | `cargo run --features gpu,ipc --bin validate_metalforge_v12_extended` |
-//!
-//! Validation class: Pipeline
-//! Provenance: `metalForge` dispatch/routing validation
+//! | Provenance type | Analytical (mathematical invariants) |
+//! | Date | 2026-03-03 |
+//! | Command | `cargo run --release --bin validate_metalforge_v12_extended` |
 
 use std::time::Instant;
 

@@ -26,13 +26,16 @@
 //!
 //! Chain: Paper (Exp251) → CPU (Exp252) → **GPU (this)** → Streaming → metalForge
 //!
+//! # Provenance
+//!
+//! Expected values are **analytical** — derived from mathematical
+//! identities and algebraic invariants.
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | Date | 2026-03-01 |
-//! | Command | `cargo run --features gpu --bin validate_barracuda_gpu_v11` |
-//!
-//! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in `barracuda::bio`
+//! | Provenance type | Analytical (mathematical invariants) |
+//! | Date | 2026-03-03 |
+//! | Command | `cargo run --release --bin validate_barracuda_gpu_v11` |
 
 use std::time::Instant;
 

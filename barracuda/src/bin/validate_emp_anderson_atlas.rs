@@ -37,13 +37,16 @@
 //!
 //! Paper (Exp251) → CPU (Exp252) → GPU (Exp254) → **Data Extension (this)**
 //!
+//! # Provenance
+//!
+//! Expected values are **analytical** — derived from mathematical
+//! identities and algebraic invariants.
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | Date | 2026-03-01 |
-//! | Command | `cargo run --release --features gpu --bin validate_emp_anderson_atlas` |
-//!
-//! Validation class: Pipeline
-//! Provenance: End-to-end pipeline integration test
+//! | Provenance type | Analytical (mathematical invariants) |
+//! | Date | 2026-03-03 |
+//! | Command | `cargo run --release --bin validate_emp_anderson_atlas` |
 
 use std::time::Instant;
 

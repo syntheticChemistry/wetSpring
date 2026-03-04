@@ -20,6 +20,19 @@ use crate::nest;
 const NESTGATE_TIMEOUT: Duration = Duration::from_secs(5);
 
 /// Where data was resolved from.
+///
+/// # Examples
+///
+/// ```
+/// use wetspring_forge::data::DataSource;
+/// use std::path::PathBuf;
+///
+/// let synthetic = DataSource::Synthetic;
+/// assert_eq!(synthetic, DataSource::Synthetic);
+///
+/// let local = DataSource::LocalDir(PathBuf::from("/data"));
+/// assert!(matches!(local, DataSource::LocalDir(_)));
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DataSource {
     /// Resolved from a local directory via environment variable.
@@ -47,6 +60,19 @@ pub struct DataResolution {
 /// 1. `WETSPRING_DATA_DIR/<dataset>` (env var path)
 /// 2. `NestGate` IPC `storage.exists` / `storage.retrieve`
 /// 3. Synthetic fallback
+///
+/// # Examples
+///
+/// ```
+/// use wetspring_forge::data::{resolve_dataset, DataSource};
+///
+/// temp_env::with_var("WETSPRING_DATA_DIR", None::<&str>, || {
+///     let res = resolve_dataset("nonexistent_dataset");
+///     assert_eq!(res.source, DataSource::Synthetic);
+///     assert!(!res.is_real);
+///     assert!(res.path.is_none());
+/// });
+/// ```
 #[must_use]
 pub fn resolve_dataset(dataset: &str) -> DataResolution {
     if let Some(dir) = env_data_dir() {
@@ -117,6 +143,16 @@ pub fn resolve_file(dataset: &str, filename: &str) -> DataResolution {
 /// 3. `~/.local/share/wetspring` (XDG default when `XDG_DATA_HOME` is unset)
 ///
 /// Does not check existence — callers should create the directory if needed.
+///
+/// # Examples
+///
+/// ```
+/// use wetspring_forge::data::discover_data_dir;
+///
+/// let dir = discover_data_dir();
+/// assert!(!dir.as_os_str().is_empty());
+/// assert!(dir.to_string_lossy().contains("wetspring"));
+/// ```
 #[must_use]
 pub fn discover_data_dir() -> PathBuf {
     if let Ok(dir) = std::env::var("WETSPRING_DATA_DIR") {
@@ -131,7 +167,7 @@ pub fn discover_data_dir() -> PathBuf {
         return PathBuf::from(home).join(".local/share/wetspring");
     }
 
-    PathBuf::from("/tmp/wetspring-data")
+    std::env::temp_dir().join("wetspring-data")
 }
 
 /// Get the data directory from environment, falling back to `data/` relative

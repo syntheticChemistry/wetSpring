@@ -149,16 +149,10 @@ impl KmerCounts {
 /// Decode a 2-bit encoded k-mer back to a DNA string.
 #[must_use]
 pub fn decode_kmer(kmer: u64, k: usize) -> String {
+    const BASES: [u8; 4] = [b'A', b'C', b'G', b'T'];
     let mut result = Vec::with_capacity(k);
     for i in (0..k).rev() {
-        let base = (kmer >> (2 * i)) & 3;
-        result.push(match base {
-            0 => b'A',
-            1 => b'C',
-            2 => b'G',
-            3 => b'T',
-            _ => unreachable!(),
-        });
+        result.push(BASES[((kmer >> (2 * i)) & 3) as usize]);
     }
     String::from_utf8(result).unwrap_or_default()
 }

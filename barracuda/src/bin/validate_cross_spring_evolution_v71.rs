@@ -26,6 +26,14 @@
 //! groundSpring → bootstrap rawr_mean, batched multinomial
 //! ```
 //!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Provenance type | Cross-spring validation |
+//! | Date | 2026-03-03 |
+//! | Command | `cargo run --release --bin validate_cross_spring_evolution_v71` |
+//!
 //! Validation class: Cross-spring
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
@@ -322,7 +330,11 @@ fn main() {
             let b = x[0].mul_add(-x[0], x[1]);
             a * a + 100.0 * b * b
         };
-        barracuda::numerical::numerical_hessian(&rosenbrock, &[1.0, 1.0], 1e-5)
+        barracuda::numerical::numerical_hessian(
+            &rosenbrock,
+            &[1.0, 1.0],
+            tolerances::NUMERICAL_HESSIAN_EPSILON,
+        )
     });
     v.check_pass("Hessian 2×2", hessian.len() == 4);
     v.check(
@@ -458,7 +470,7 @@ fn main() {
         "new() == with_precision(F64)",
         res_explicit[0],
         res_f64[0],
-        1e-15,
+        tolerances::EXACT_F64,
     );
 
     // Cached dispatch throughput
@@ -504,7 +516,7 @@ fn main() {
     let nmf_cfg = barracuda::linalg::nmf::NmfConfig {
         rank: 3,
         max_iter: 100,
-        tol: 1e-4,
+        tol: tolerances::NMF_CONVERGENCE_KL,
         objective: barracuda::linalg::nmf::NmfObjective::KlDivergence,
         seed: 42,
     };
@@ -519,7 +531,14 @@ fn main() {
     let ridge_x: Vec<f64> = (0..100).map(|i| f64::from(i) * 0.01).collect();
     let ridge_y: Vec<f64> = (0..40).map(|i| f64::from(i).mul_add(0.25, 1.0)).collect();
     let (ridge_res, ridge_ms) = bench("Ridge regression (20×5→2)", || {
-        barracuda::linalg::ridge_regression(&ridge_x, &ridge_y, 20, 5, 2, 1e-6)
+        barracuda::linalg::ridge_regression(
+            &ridge_x,
+            &ridge_y,
+            20,
+            5,
+            2,
+            tolerances::RIDGE_REGULARIZATION_SMALL,
+        )
     });
     v.check_pass(
         "ridge weights finite",

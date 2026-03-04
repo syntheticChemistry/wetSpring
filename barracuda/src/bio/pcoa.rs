@@ -16,6 +16,13 @@
 //! 5. Sort eigenvalues descending, take top k
 //! 6. Coordinates: X\[i,j\] = eigenvector\[i,j\] × √(eigenvalue\[j\])
 //!
+//! # Absorption status
+//!
+//! The CPU Jacobi eigendecomposition (`jacobi_eigen`) is **local** to wetSpring.
+//! `barraCuda` provides GPU `BatchedEighGpu` (consumed by `pcoa_gpu`) but no
+//! CPU Jacobi in its public API. If `barraCuda` upstreams a CPU Jacobi, this
+//! module should absorb it and lean (Write → Absorb → Lean lifecycle).
+//!
 //! # References
 //!
 //! - Gower, J.C. (1966). "Some distance properties of latent root and vector

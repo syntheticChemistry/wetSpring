@@ -53,6 +53,21 @@ pub enum Reason {
 
 impl Workload {
     /// Create a workload with name and required capabilities.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use wetspring_forge::dispatch::Workload;
+    /// use wetspring_forge::substrate::Capability;
+    ///
+    /// let w = Workload::new("Felsenstein pruning", vec![
+    ///     Capability::F64Compute,
+    ///     Capability::ShaderDispatch,
+    /// ]);
+    /// assert_eq!(w.name, "Felsenstein pruning");
+    /// assert_eq!(w.required.len(), 2);
+    /// assert!(w.preferred_substrate.is_none());
+    /// ```
     #[must_use]
     pub fn new(name: impl Into<String>, required: Vec<Capability>) -> Self {
         Self {
@@ -85,6 +100,29 @@ impl Workload {
 /// 2. GPU (for compute-heavy work)
 /// 3. NPU (for inference)
 /// 4. CPU (fallback, always available)
+///
+/// # Examples
+///
+/// ```
+/// use wetspring_forge::dispatch::{route, Reason, Workload};
+/// use wetspring_forge::substrate::{
+///     Capability, Identity, Properties, Substrate, SubstrateKind, SubstrateOrigin,
+/// };
+///
+/// let cpu = Substrate {
+///     kind: SubstrateKind::Cpu,
+///     identity: Identity::named("CPU"),
+///     properties: Properties::default(),
+///     capabilities: vec![Capability::F64Compute, Capability::F32Compute],
+///     origin: SubstrateOrigin::Local,
+/// };
+/// let substrates = vec![cpu];
+/// let work = Workload::new("FASTQ parsing", vec![Capability::F64Compute]);
+///
+/// let decision = route(&work, &substrates).expect("CPU can run f64");
+/// assert_eq!(decision.substrate.kind, SubstrateKind::Cpu);
+/// assert_eq!(decision.reason, Reason::BestAvailable);
+/// ```
 #[must_use]
 pub fn route<'a>(workload: &Workload, substrates: &'a [Substrate]) -> Option<Decision<'a>> {
     let capable: Vec<&Substrate> = substrates

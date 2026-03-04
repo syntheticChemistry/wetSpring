@@ -79,7 +79,7 @@ fn main() {
         &barracuda::linalg::nmf::NmfConfig {
             rank: 1,
             max_iter: 50,
-            tol: 1e-4,
+            tol: tolerances::NMF_CONVERGENCE_KL,
             objective: barracuda::linalg::nmf::NmfObjective::KlDivergence,
             seed: 42,
         },
@@ -207,7 +207,7 @@ fn main() {
     v.check("Φ(0) = 0.5", ncdf_0, 0.5, tolerances::ANALYTICAL_F64);
 
     let ncdf_inf = barracuda::stats::norm_cdf(6.0);
-    v.check("Φ(∞) → 1", ncdf_inf, 1.0, 1e-8);
+    v.check("Φ(∞) → 1", ncdf_inf, 1.0, tolerances::LIMIT_CONVERGENCE);
 
     // ═══ D38: Cross-Domain Math Chain ═══════════════════════════════════
     v.section("D38: Cross-Domain — Stats → Diversity → Linalg Chain");
@@ -215,8 +215,18 @@ fn main() {
     let x_lin = [1.0, 2.0, 3.0, 4.0, 5.0];
     let y_lin = [2.0, 4.0, 6.0, 8.0, 10.0];
     let fit = barracuda::stats::fit_linear(&x_lin, &y_lin).unwrap();
-    v.check("Chain: fit_linear slope = 2", fit.params[0], 2.0, 1e-10);
-    v.check("Chain: fit_linear R² = 1", fit.r_squared, 1.0, 1e-10);
+    v.check(
+        "Chain: fit_linear slope = 2",
+        fit.params[0],
+        2.0,
+        tolerances::ANALYTICAL_LOOSE,
+    );
+    v.check(
+        "Chain: fit_linear R² = 1",
+        fit.r_squared,
+        1.0,
+        tolerances::ANALYTICAL_LOOSE,
+    );
 
     let counts_chain = [10.0, 20.0, 30.0, 40.0, 50.0];
     let sh = barracuda::stats::shannon(&counts_chain);
@@ -248,7 +258,7 @@ fn main() {
         &barracuda::linalg::nmf::NmfConfig {
             rank: 2,
             max_iter: 100,
-            tol: 1e-4,
+            tol: tolerances::NMF_CONVERGENCE_KL,
             objective: barracuda::linalg::nmf::NmfObjective::KlDivergence,
             seed: 42,
         },

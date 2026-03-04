@@ -33,14 +33,16 @@
 //! wateringHole → Boltzmann sampling (S76), Omelyan integrator (S83), BrentGpu (S83)
 //! ```
 //!
+//! # Provenance
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | `ToadStool` pin | S87 (`2dc26792`) — 264 `ComputeDispatch` ops |
-//! | Date | 2026-03-02 |
-//! | Command | `cargo run --release --features gpu --bin validate_cross_spring_evolution_s87` |
+//! | Provenance type | Cross-spring validation |
+//! | Date | 2026-03-03 |
+//! | Command | `cargo run --release --bin validate_cross_spring_evolution_s87` |
 //!
-//! Validation class: Cross-spring evolution
-//! Provenance: Validates across all primals/springs + S87 resilience features
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::sync::Arc;
 use std::time::Instant;

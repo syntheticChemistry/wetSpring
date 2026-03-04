@@ -65,12 +65,35 @@ pub use taxonomy::taxonomy;
 /// All known bio domain workloads.
 ///
 /// Returns the full catalog for dispatch planning and absorption tracking.
+///
+/// # Examples
+///
+/// ```
+/// use wetspring_forge::workloads::all_workloads;
+///
+/// let workloads = all_workloads();
+/// assert!(!workloads.is_empty());
+/// assert!(workloads.iter().any(|w| w.workload.name == "felsenstein"));
+/// assert!(workloads.iter().any(|w| w.workload.name == "diversity"));
+/// ```
 #[must_use]
 pub fn all_workloads() -> Vec<BioWorkload> {
     inventory::all_workloads()
 }
 
 /// Count workloads by shader origin.
+///
+/// Returns `(absorbed, local, cpu_only)` counts.
+///
+/// # Examples
+///
+/// ```
+/// use wetspring_forge::workloads::origin_summary;
+///
+/// let (absorbed, local, cpu_only) = origin_summary();
+/// assert!(absorbed + local + cpu_only > 0);
+/// assert!(absorbed >= 1, "at least one workload is absorbed");
+/// ```
 #[must_use]
 pub fn origin_summary() -> (usize, usize, usize) {
     let all = all_workloads();

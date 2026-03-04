@@ -26,13 +26,16 @@
 //! Without `--features gpu`: validates all CPU reference computations.
 //! With `--features gpu`: also validates GPU dispatch matches CPU exactly.
 //!
+//! # Provenance
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | Date | 2026-03-02 |
-//! | Command | `cargo run --release --features gpu --bin validate_cpu_vs_gpu_v9` |
+//! | Provenance type | Cross-spring validation |
+//! | Date | 2026-03-03 |
+//! | Command | `cargo run --release --bin validate_cpu_vs_gpu_v9` |
 //!
-//! Validation class: GPU-parity
-//! Provenance: CPU reference (v22) + GPU dispatch
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;

@@ -1,8 +1,8 @@
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** March 3, 2026
+**Date:** March 4, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 93 — 280 experiments, 8,241+ validation checks, ALL PASS; 1,044 lib tests, 268 binaries, standalone `barraCuda` v0.3.1 (767+ WGSL shaders), 144 primitives consumed, 0 local WGSL, 106 named tolerances, 0 unsafe code, 0 panics in library, clippy pedantic + nursery ZERO WARNINGS. 52 + 6 papers reproduced with full three-tier + paper-math chain
+**Status:** Phase 93+ — 280 experiments, 8,241+ validation checks, ALL PASS; 1,054 lib tests, 284 binaries, standalone `barraCuda` v0.3.1 (767+ WGSL shaders), 144 primitives consumed, 0 local WGSL, 164 named tolerances, 0 unsafe code, 0 panics in library, 0 `unreachable!()` in library, clippy pedantic + nursery ZERO WARNINGS, `cargo doc` ZERO WARNINGS, all external deps pure Rust. 52 + 6 papers reproduced with full three-tier + paper-math chain
 
 ---
 

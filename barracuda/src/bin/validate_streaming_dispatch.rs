@@ -293,7 +293,7 @@ fn validate_streaming_determinism(v: &mut Validator) {
             let matches = results[run]
                 .iter()
                 .zip(results[0].iter())
-                .all(|(a, b)| (a - b).abs() < 1e-15);
+                .all(|(a, b)| (a - b).abs() < tolerances::EXACT_F64);
             v.check_pass(&format!("run {run} matches run 0 (bitwise)"), matches);
         }
     }

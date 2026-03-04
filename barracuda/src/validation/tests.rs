@@ -228,6 +228,98 @@ fn validator_all_fail() {
     assert_eq!(v.counts(), (0, 5));
 }
 
+// ── resolve_data_dir: explicit branch coverage ──────────────────
+
+#[test]
+fn resolve_data_dir_specific_override() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().to_str().unwrap();
+    let result = resolve_data_dir(Some(path), None, "fallback");
+    assert_eq!(result, std::path::PathBuf::from(path));
+}
+
+#[test]
+fn resolve_data_dir_data_root_exists() {
+    let dir = tempfile::tempdir().unwrap();
+    let subdir = dir.path().join("subpath");
+    std::fs::create_dir_all(&subdir).unwrap();
+    let result = resolve_data_dir(None, Some(dir.path().to_str().unwrap()), "subpath");
+    assert_eq!(result, subdir);
+}
+
+#[test]
+fn resolve_data_dir_data_root_subpath_missing() {
+    let dir = tempfile::tempdir().unwrap();
+    let result = resolve_data_dir(None, Some(dir.path().to_str().unwrap()), "nonexistent");
+    // Falls through to CARGO_MANIFEST_DIR or deployment fallback
+    assert!(result.to_str().unwrap().contains("nonexistent"));
+}
+
+#[test]
+fn resolve_data_dir_deployment_fallback() {
+    let result = resolve_data_dir(None, None, "custom/path");
+    // Should either be the manifest-dir version or the raw subpath
+    assert!(result.to_str().unwrap().contains("custom/path"));
+}
+
+#[test]
+fn resolve_data_dir_cargo_manifest_fallback() {
+    let base = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .unwrap();
+    let subpath = "__validation_test_manifest_fallback";
+    let full = base.join(subpath);
+    std::fs::create_dir_all(&full).unwrap();
+    let result = resolve_data_dir(None, None, subpath);
+    assert_eq!(
+        result.canonicalize().unwrap(),
+        full.canonicalize().unwrap(),
+        "CARGO_MANIFEST_DIR/../subpath should resolve to workspace_root/subpath"
+    );
+    std::fs::remove_dir_all(&full).unwrap();
+}
+
+// ── bench, timed_us, print_timing_table ────────────────────────
+
+#[test]
+fn bench_returns_result_and_elapsed_ms() {
+    let (result, ms) = bench(|| 42);
+    assert_eq!(result, 42);
+    assert!(ms >= 0.0, "elapsed ms should be non-negative");
+}
+
+#[test]
+fn timed_us_returns_result_and_elapsed_us() {
+    let (result, us) = timed_us(|| 42u64);
+    assert_eq!(result, 42);
+    assert!(us >= 0.0, "elapsed µs should be non-negative");
+}
+
+#[test]
+fn print_timing_table_formats_rows() {
+    let rows = [
+        ("Domain A", 100.0, 50.0, "OK"),
+        ("Domain B", 200.0, 150.0, "FAIL"),
+    ];
+    print_timing_table(&rows);
+    // No panic = success
+}
+
+// ── Validator edge cases ────────────────────────────────────────
+
+#[test]
+fn validator_empty_name() {
+    let v = Validator::new("");
+    assert_eq!(v.counts(), (0, 0));
+}
+
+#[test]
+fn validator_zero_checks() {
+    let v = Validator::new("zero-checks");
+    // No check calls
+    assert_eq!(v.counts(), (0, 0));
+}
+
 // ── Determinism (rerun-identical) tests ────────────────────────
 
 #[test]

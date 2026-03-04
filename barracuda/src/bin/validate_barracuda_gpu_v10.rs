@@ -37,14 +37,16 @@
 //! availability and documents which ops need DF64 shader translation.
 //! All corresponding CPU paths remain validated (85+ primitives).
 //!
+//! # Provenance
+//!
+//! Expected values are **analytical** — derived from mathematical
+//! identities and algebraic invariants.
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | Date | 2026-03-01 |
-//! | `ToadStool` | S70+++ (`1dd7e338`) |
-//! | Command | `cargo run --features gpu --bin validate_barracuda_gpu_v10` |
-//!
-//! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in `barracuda::bio`
+//! | Provenance type | Analytical (mathematical invariants) |
+//! | Date | 2026-03-03 |
+//! | Command | `cargo run --release --bin validate_barracuda_gpu_v10` |
 
 use std::sync::Arc;
 use std::time::Instant;
@@ -408,7 +410,12 @@ fn main() {
     }));
     if let Ok(Ok(r)) = lap_result {
         v.check_pass("LaplacianGpu: dispatched", true);
-        v.check("LaplacianGpu row-sum", r.iter().sum::<f64>(), 0.0, 1e-10);
+        v.check(
+            "LaplacianGpu row-sum",
+            r.iter().sum::<f64>(),
+            0.0,
+            tolerances::ANALYTICAL_LOOSE,
+        );
         println!("  LaplacianGpu 2×2: {r:?}");
         timings.push(GpuTiming {
             op: "LaplacianGpu",
@@ -459,7 +466,12 @@ fn main() {
                 .abs()
         })
         .sum();
-    v.check("CPU Laplacian row-sum ≈ 0", row_sum, 0.0, 1e-10);
+    v.check(
+        "CPU Laplacian row-sum ≈ 0",
+        row_sum,
+        0.0,
+        tolerances::ANALYTICAL_LOOSE,
+    );
     println!("  CPU graph_laplacian 128×128: {cpu_lap_us:.0} µs (validated fallback)");
 
     timings.push(GpuTiming {

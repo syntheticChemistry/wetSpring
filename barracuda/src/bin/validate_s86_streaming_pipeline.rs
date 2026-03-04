@@ -32,13 +32,16 @@
 //! Key: S86 CPU primitives function correctly as intermediate stages in a
 //! streaming pipeline. Mathematical results verified at each stage.
 //!
+//! # Provenance
+//!
+//! Expected values are **analytical** — derived from mathematical
+//! identities and algebraic invariants.
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | Date | 2026-03-02 |
-//! | Command | `cargo run --features gpu --release --bin validate_s86_streaming_pipeline` |
-//!
-//! Validation class: Pipeline + Analytical
-//! Provenance: CPU reference implementations + GPU parity
+//! | Provenance type | Analytical (mathematical invariants) |
+//! | Date | 2026-03-03 |
+//! | Command | `cargo run --release --bin validate_s86_streaming_pipeline` |
 
 use std::time::Instant;
 

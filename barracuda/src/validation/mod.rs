@@ -181,7 +181,7 @@ pub fn bench<T>(f: impl FnOnce() -> T) -> (T, f64) {
 
 /// Run a closure and return `(result, elapsed_microseconds)`.
 ///
-/// Companion to [`bench`] (which returns milliseconds). This gives µs
+/// Companion to [`bench()`] (which returns milliseconds). This gives µs
 /// precision for per-domain timing tables in cross-spring validators.
 #[must_use]
 pub fn timed_us<T>(f: impl FnOnce() -> T) -> (T, f64) {

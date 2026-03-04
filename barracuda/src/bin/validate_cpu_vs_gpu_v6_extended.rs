@@ -21,13 +21,16 @@
 //!
 //! Chain: Paper → CPU → GPU → **Parity (this)** → `ToadStool` Dispatch → `metalForge`
 //!
+//! # Provenance
+//!
 //! | Field | Value |
 //! |-------|-------|
-//! | Date | 2026-02-28 |
-//! | Command | `cargo run --features gpu --bin validate_cpu_vs_gpu_v6_extended` |
+//! | Provenance type | Cross-spring validation |
+//! | Date | 2026-03-03 |
+//! | Command | `cargo run --release --bin validate_cpu_vs_gpu_v6_extended` |
 //!
-//! Validation class: GPU-parity
-//! Provenance: CPU reference implementation in `barracuda::bio`
+//! Validation class: Cross-spring
+//! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::time::Instant;
 
