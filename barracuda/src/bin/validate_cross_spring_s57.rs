@@ -126,7 +126,10 @@ fn readback_f32(
     slice.map_async(wgpu::MapMode::Read, move |result| {
         tx.send(result).expect("channel send");
     });
-    d.poll(wgpu::Maintain::Wait);
+    let _ = d.poll(wgpu::PollType::Wait {
+        submission_index: None,
+        timeout: None,
+    });
     rx.recv().expect("channel recv").expect("GPU buffer map");
 
     let data = slice.get_mapped_range();
@@ -821,7 +824,10 @@ async fn main() {
             mapped_at_creation: false,
         });
         fitness.dispatch(&pop_buf, &w_buf, &bf_buf, bf_pop, bf_glen);
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
         let bf_out = readback_f32(&device, &bf_buf, bf_pop as usize);
         let bf_matching = cpu_bf
             .iter()
@@ -871,7 +877,10 @@ async fn main() {
             mapped_at_creation: false,
         });
         locus.dispatch(&freq_buf, &var_buf, lv_pops, lv_loci);
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
         let lv_out = readback_f32(&device, &var_buf, lv_loci as usize);
         let lv_matching = cpu_lv
             .iter()

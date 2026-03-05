@@ -78,7 +78,10 @@ async fn main() {
             });
 
             op.dispatch(&kmer_buf, &hist_buf, 8, 2);
-            d.poll(wgpu::Maintain::Wait);
+            let _ = d.poll(wgpu::PollType::Wait {
+                submission_index: None,
+                timeout: None,
+            });
 
             device.read_buffer_u32(&hist_buf, 16).expect("readback")
         }));
@@ -159,7 +162,10 @@ async fn main() {
             });
 
             op.dispatch(&lp_buf, &prior_buf, &feat_buf, &score_buf, 2, 3, 4);
-            d.poll(wgpu::Maintain::Wait);
+            let _ = d.poll(wgpu::PollType::Wait {
+                submission_index: None,
+                timeout: None,
+            });
 
             device.read_buffer_f64(&score_buf, 6).expect("readback")
         }));

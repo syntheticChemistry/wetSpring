@@ -119,7 +119,10 @@ impl HmmGpuForward {
             )
             .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
 
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
 
         let log_alpha = self
             .device

@@ -101,7 +101,10 @@ impl UniFracGpu {
 
         self.inner
             .dispatch_leaf_init(&config, &parent_buf, &branch_buf, &sample_buf, &sums_buf);
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
 
         self.inner.dispatch_propagate_level(
             &config,
@@ -110,7 +113,10 @@ impl UniFracGpu {
             &sample_buf,
             &sums_buf,
         );
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
 
         let node_sums = self
             .device

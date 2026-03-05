@@ -106,7 +106,10 @@ impl Dada2Gpu {
             )
             .map_err(|e| Error::Gpu(format!("Dada2 dispatch: {e}")))?;
 
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
 
         self.device
             .read_buffer_f64(&scores_buf, total_pairs)

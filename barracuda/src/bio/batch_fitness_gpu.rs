@@ -80,7 +80,10 @@ impl BatchFitnessGpuWrapper {
             pop_size as u32,
             genome_len as u32,
         );
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
 
         self.device
             .read_buffer_f32(&fit_buf, pop_size)

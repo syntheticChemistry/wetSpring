@@ -80,7 +80,10 @@ impl SpatialPayoffGpuWrapper {
 
         self.inner
             .dispatch(&grid_buf, &fit_buf, grid_size as u32, benefit, cost);
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
 
         let fitness = self
             .device

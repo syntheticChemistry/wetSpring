@@ -3,6 +3,46 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V97 — barraCuda v0.3.3 Rewire + wgpu 28 Migration (2026-03-05)
+
+### Changed
+- **wgpu 22 → 28 migration**: Updated `wgpu` dependency from v22 to v28 across both
+  `wetspring-barracuda` and `wetspring-forge` crates. Matches upstream `barraCuda` v0.3.3.
+- **`Maintain::Wait` → `PollType::Wait`**: All 34 GPU poll sites across 20 files updated
+  to wgpu 28's struct-variant `PollType::Wait { submission_index: None, timeout: None }`.
+  Poll results now properly handled via `let _ =` (wgpu 28 returns `Result`).
+- **`Instance::new()` → reference**: wgpu 28 takes `&InstanceDescriptor` instead of owned.
+  Updated `gpu.rs` (barracuda) and `probe.rs` (forge).
+- **`DeviceDescriptor` evolution**: Added `experimental_features` and `trace` fields
+  required by wgpu 28. Used explicit type defaults (`wgpu::ExperimentalFeatures::default()`,
+  `wgpu::Trace::default()`) per clippy pedantic.
+- **`request_adapter` evolution**: wgpu 28 returns `Result` instead of `Option`. Updated
+  error handling from `.ok_or_else()` to `.map_err()`.
+- **`Arc<Device>` / `Arc<Queue>` removal**: wgpu 28 `Device` and `Queue` are internally
+  Arc'd. Removed manual `Arc::new()` wrapping in `GpuF64::new()`.
+- **`enumerate_adapters` async**: wgpu 28 makes this async. Forge's `probe_gpus()` now
+  uses `pollster::block_on()`.
+- **`request_device` signature**: Removed second `trace` parameter (absorbed into
+  `DeviceDescriptor`).
+- **`validate_emp_anderson_atlas`**: Added `required-features = ["ipc"]` to Cargo.toml
+  bin entry (was compiling unconditionally but using `ipc` module).
+- **Cargo.toml comments**: Updated barraCuda version references from v0.3.1 to v0.3.3.
+  Updated shader count (694+) and precision description (Fp64Strategy-based).
+
+### Fixed
+- **Upstream `chi_squared.rs` CPU gate**: Fixed barraCuda `chi_squared.rs` importing
+  `device::capabilities::WORKGROUP_SIZE_1D` without `#[cfg(feature = "gpu")]` guard.
+  This broke CPU-only builds (`default-features = false`).
+
+### Added
+- **`pollster` dependency** in `wetspring-forge` (for async `enumerate_adapters` in sync context).
+
+### Quality
+- **1,047 lib tests + 200 forge tests**: All passing (0 failures).
+- **Clippy pedantic+nursery**: Zero warnings (both CPU and GPU paths).
+- **Format**: Clean (`cargo fmt --check` passes).
+- **Docs**: Clean build (273 files generated, zero warnings).
+
 ## V96 — Deep Debt Audit + Chuna Paper Queue (2026-03-05)
 
 ### Changed

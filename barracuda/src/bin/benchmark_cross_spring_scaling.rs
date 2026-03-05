@@ -103,11 +103,17 @@ async fn main() {
         });
         let hamming = PairwiseHammingGpu::new(device.clone());
         hamming.dispatch(&seq_buf, &dist_buf, n_seqs, seq_len);
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
 
         let tg = Instant::now();
         hamming.dispatch(&seq_buf, &dist_buf, n_seqs, seq_len);
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
         let gpu_us = tg.elapsed().as_micros() as f64;
 
         let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
@@ -149,11 +155,17 @@ async fn main() {
         });
         let jaccard = PairwiseJaccardGpu::new(device.clone());
         jaccard.dispatch(&pa_buf, &dist_buf, n_genomes, n_genes);
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
 
         let tg = Instant::now();
         jaccard.dispatch(&pa_buf, &dist_buf, n_genomes, n_genes);
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
         let gpu_us = tg.elapsed().as_micros() as f64;
 
         let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
@@ -194,11 +206,17 @@ async fn main() {
         });
         let spatial = SpatialPayoffGpu::new(device.clone());
         spatial.dispatch(&grid_buf, &fit_buf, grid_size, benefit, cost);
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
 
         let tg = Instant::now();
         spatial.dispatch(&grid_buf, &fit_buf, grid_size, benefit, cost);
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
         let gpu_us = tg.elapsed().as_micros() as f64;
 
         let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
@@ -252,11 +270,17 @@ async fn main() {
         });
         let bf = BatchFitnessGpu::new(device.clone());
         bf.dispatch(&pop_buf, &w_buf, &fit_buf, pop_size, genome_len);
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
 
         let tg = Instant::now();
         bf.dispatch(&pop_buf, &w_buf, &fit_buf, pop_size, genome_len);
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
         let gpu_us = tg.elapsed().as_micros() as f64;
 
         let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
@@ -297,11 +321,17 @@ async fn main() {
         });
         let lv = LocusVarianceGpu::new(device.clone());
         lv.dispatch(&freq_buf, &var_buf, n_pops, n_loci);
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
 
         let tg = Instant::now();
         lv.dispatch(&freq_buf, &var_buf, n_pops, n_loci);
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
         let gpu_us = tg.elapsed().as_micros() as f64;
 
         let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };

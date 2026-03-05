@@ -71,7 +71,10 @@ impl LocusVarianceGpuWrapper {
 
         self.inner
             .dispatch(&freq_buf, &var_buf, n_pops as u32, n_loci as u32);
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
 
         self.device
             .read_buffer_f32(&var_buf, n_loci)

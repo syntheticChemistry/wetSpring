@@ -107,7 +107,10 @@ impl QualityFilterCached {
             )
             .map_err(|e| Error::Gpu(format!("QF dispatch: {e}")))?;
 
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
 
         let raw_results = self
             .device

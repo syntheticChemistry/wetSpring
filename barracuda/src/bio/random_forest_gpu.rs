@@ -137,7 +137,10 @@ impl RandomForestGpu {
             n_features as u32,
         );
 
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
 
         let raw = self
             .device

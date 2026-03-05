@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 5, 2026 (Phase 96 — Deep Debt Audit + Chuna Paper Queue)
+**Date:** March 5, 2026 (Phase 97 — barraCuda v0.3.3 Rewire + wgpu 28)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 45 GPU modules + 1 IPC + 1 vault module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.1, always-on, zero fallback code, 264 ComputeDispatch ops), 1,061 lib tests + 200 forge tests, 281 experiments, 8,300+ checks, standalone barraCuda v0.3.1, 164 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math, 94.69% line coverage, **0 TODO/FIXME/HACK** in 453 source files, **0 silent fallbacks** in library code. **Phase 96:** Deep debt audit — `classify_quantized` evolved to `Option<usize>`, `dada2_gpu` center_slot guarded, IPC socket paths evolved to capability-based discovery, benchmarks made platform-agnostic, `vault` feature-gated, Python baselines pinned. Chuna papers queued to hotSpring (43-45: gradient flow, dielectric, kinetic-fluid) and neuralSpring (26: T1D LSTM).
+**Status:** 47 CPU + 45 GPU modules + 1 IPC + 1 vault module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.3, wgpu 28, Fp64Strategy precision dispatch, DF64 core-streaming on consumer GPUs), 1,047 lib tests + 200 forge tests, 281 experiments, 8,300+ checks, 164 named tolerance constants, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math, **0 TODO/FIXME/HACK**, **0 silent fallbacks**. **Phase 97:** wgpu 22→28 migration, `PollType::Wait` struct variant, `Arc<Device>`/`Arc<Queue>` removal, `DeviceDescriptor` field evolution, async `enumerate_adapters`, upstream `chi_squared.rs` GPU gate fix.
 
 ### Full Lean Phase
 

@@ -15,12 +15,13 @@ barracuda = { path = "../../../barraCuda/crates/barracuda" }
 tempfile = "3"
 wetspring-barracuda = { path = "../../barracuda", default-features = false }
 
-wgpu = { version = "22", default-features = false, features = [
+wgpu = { version = "28", default-features = false, features = [
     "wgsl",
     "vulkan-portability",
 ] }
 
 tokio = { version = "1", features = ["rt"] }
+pollster = "0.4"
 
 [[bin]]
 name = "validate_dispatch_routing"

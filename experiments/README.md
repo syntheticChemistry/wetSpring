@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-05 (Phase 96: 281 experiments, 285 binaries, 8,300+ checks, standalone `barraCuda` v0.3.1 (767+ WGSL shaders), 150+ primitives consumed, 1,261 lib+forge tests, 94.69% coverage, 164 named tolerances, zero TODO/FIXME/HACK in 453 source files, clippy pedantic + nursery ZERO WARNINGS, `cargo doc` ZERO WARNINGS)
+**Updated**: 2026-03-05 (Phase 97: 281 experiments, 285 binaries, 8,300+ checks, standalone `barraCuda` v0.3.3 (wgpu 28, 694+ WGSL shaders, Fp64Strategy), 150+ primitives consumed, 1,247 lib+forge tests, 164 named tolerances, zero TODO/FIXME/HACK, clippy pedantic + nursery ZERO WARNINGS, `cargo doc` ZERO WARNINGS)
 
 ---
 

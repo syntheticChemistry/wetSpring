@@ -174,7 +174,10 @@ fn main() {
             n_loci,
             two_n,
         );
-        wgpu_dev.poll(wgpu::Maintain::Wait);
+        let _ = wgpu_dev.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
         let us = t.elapsed().as_micros() as f64;
 
         let freq_out = device.read_buffer_f64(&out_buf, total).unwrap();
@@ -253,7 +256,10 @@ fn main() {
 
         let t = Instant::now();
         stencil.dispatch(&strat_buf, &fit_buf, &new_buf, grid_size, 10.0, 0);
-        wgpu_dev.poll(wgpu::Maintain::Wait);
+        let _ = wgpu_dev.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
         let us = t.elapsed().as_micros() as f64;
 
         let new_strats = device.read_buffer_u32(&new_buf, n_cells).unwrap();
@@ -332,7 +338,10 @@ fn main() {
 
         let t = Instant::now();
         hill.dispatch(&a_buf, &b_buf, &out_buf, &params);
-        wgpu_dev.poll(wgpu::Maintain::Wait);
+        let _ = wgpu_dev.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
         let us = t.elapsed().as_micros() as f64;
 
         let hill_out = device.read_buffer_f64(&out_buf, n_hill as usize).unwrap();

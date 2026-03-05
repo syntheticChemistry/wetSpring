@@ -533,7 +533,10 @@ fn readback_bytes<T: bytemuck::Pod>(
     slice.map_async(wgpu::MapMode::Read, move |result| {
         tx.send(result).expect("channel send");
     });
-    d.poll(wgpu::Maintain::Wait);
+    let _ = d.poll(wgpu::PollType::Wait {
+        submission_index: None,
+        timeout: None,
+    });
     rx.recv().expect("channel recv").expect("GPU buffer map");
 
     let data = slice.get_mapped_range();

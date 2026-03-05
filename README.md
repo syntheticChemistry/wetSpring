@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 5, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** Phase 96 — 1,061 lib tests + 200 forge tests, 281 experiments, 8,300+ validation checks, 285 binaries, standalone `barraCuda` v0.3.1 (767+ f64-canonical WGSL shaders), 150+ primitives consumed, zero local WGSL, zero unsafe code, 164 named tolerances, 94.69% line coverage, `cargo clippy -W clippy::pedantic -W clippy::nursery` **ZERO WARNINGS**. Zero TODO/FIXME/HACK in 453 source files. `classify_quantized` evolved to `Option<usize>` (no silent fallbacks). Capability-based IPC discovery. Platform-agnostic benchmarks. `vault` feature-gated. Python baseline environment pinned. Chuna papers queued to hotSpring (43-45) and neuralSpring (26).
+**Status:** Phase 97 — 1,047 lib tests + 200 forge tests, 281 experiments, 8,300+ validation checks, 285 binaries, standalone `barraCuda` v0.3.3 (694+ WGSL shaders, wgpu 28, Fp64Strategy precision dispatch), 150+ primitives consumed, zero local WGSL, zero unsafe code, 164 named tolerances, `cargo clippy -W clippy::pedantic -W clippy::nursery` **ZERO WARNINGS**. wgpu 22 → 28 migration complete. DF64 core-streaming available on consumer GPUs (~10x throughput). Fused mean+variance and correlation shaders upstream. TensorContext fast path for 15+ ops.
 
 ---
 
@@ -144,7 +144,7 @@ integration point.
 | metalForge cross-system | 37+ domains CPU↔GPU (Exp103+104+165+182+208), **39/39 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
-| `barraCuda` primitives consumed | **150+** (always-on, zero fallback code — standalone `barraCuda` v0.3.1) |
+| `barraCuda` primitives consumed | **150+** (always-on, zero fallback code — standalone `barraCuda` v0.3.3, wgpu 28) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
 All 8,300+ validation checks **PASS**. All 1,044 library tests **PASS** (1 ignored: hardware-dependent).
 

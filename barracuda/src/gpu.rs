@@ -8,7 +8,7 @@
 //!
 //! # Precision (barraCuda universal precision)
 //!
-//! All 767+ `barraCuda` WGSL shaders are f64-canonical (zero f32-only remain).
+//! All 694+ `barraCuda` WGSL shaders are f64-canonical (zero f32-only remain).
 //! `compile_shader_universal(source, precision)` routes through:
 //!
 //! - `Precision::F64` — native f64 (compute-class GPUs: Titan V, V100, MI250X)
@@ -111,7 +111,7 @@ impl GpuF64 {
             _ => wgpu::Backends::all(),
         };
 
-        let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
+        let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor {
             backends,
             ..Default::default()
         });
@@ -123,7 +123,7 @@ impl GpuF64 {
                 force_fallback_adapter: false,
             })
             .await
-            .ok_or_else(|| crate::error::Error::Gpu("no GPU adapter found".into()))?;
+            .map_err(|e| crate::error::Error::Gpu(format!("no GPU adapter found: {e}")))?;
 
         let info = adapter.get_info();
         let features = adapter.features();
@@ -136,29 +136,26 @@ impl GpuF64 {
         }
 
         let (device, queue) = adapter
-            .request_device(
-                &wgpu::DeviceDescriptor {
-                    label: Some(DEVICE_LABEL),
-                    required_features,
-                    required_limits: wgpu::Limits {
-                        max_storage_buffer_binding_size: limits
-                            .max_storage_buffer_binding_size
-                            .min(MAX_STORAGE_BINDING_BYTES),
-                        max_buffer_size: limits.max_buffer_size.min(MAX_BUFFER_SIZE_BYTES),
-                        max_storage_buffers_per_shader_stage: limits
-                            .max_storage_buffers_per_shader_stage
-                            .min(MAX_STORAGE_BUFFERS_PER_STAGE),
-                        ..wgpu::Limits::default()
-                    },
-                    memory_hints: wgpu::MemoryHints::default(),
+            .request_device(&wgpu::DeviceDescriptor {
+                label: Some(DEVICE_LABEL),
+                required_features,
+                required_limits: wgpu::Limits {
+                    max_storage_buffer_binding_size: limits
+                        .max_storage_buffer_binding_size
+                        .min(MAX_STORAGE_BINDING_BYTES),
+                    max_buffer_size: limits.max_buffer_size.min(MAX_BUFFER_SIZE_BYTES),
+                    max_storage_buffers_per_shader_stage: limits
+                        .max_storage_buffers_per_shader_stage
+                        .min(MAX_STORAGE_BUFFERS_PER_STAGE),
+                    ..wgpu::Limits::default()
                 },
-                None,
-            )
+                memory_hints: wgpu::MemoryHints::default(),
+                experimental_features: wgpu::ExperimentalFeatures::default(),
+                trace: wgpu::Trace::default(),
+            })
             .await
             .map_err(|e| crate::error::Error::Gpu(format!("device creation: {e}")))?;
 
-        let device = Arc::new(device);
-        let queue = Arc::new(queue);
         let adapter_name = info.name.clone();
 
         let wgpu_device = Arc::new(WgpuDevice::from_existing(device, queue, info));

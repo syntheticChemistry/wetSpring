@@ -80,7 +80,10 @@ impl JaccardGpu {
 
         self.inner
             .dispatch(&pa_buf, &dist_buf, n_genomes as u32, n_genes as u32);
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
 
         let distances = self
             .device

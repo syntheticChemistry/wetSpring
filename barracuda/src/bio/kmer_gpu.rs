@@ -79,7 +79,10 @@ impl KmerGpu {
         });
 
         self.inner.dispatch(&kmer_buf, &hist_buf, n_kmers as u32, k);
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
 
         let histogram = self
             .device

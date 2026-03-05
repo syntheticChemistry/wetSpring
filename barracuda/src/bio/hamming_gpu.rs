@@ -84,7 +84,10 @@ impl HammingGpu {
 
         self.inner
             .dispatch(&seq_buf, &dist_buf, n_seqs as u32, seq_len as u32);
-        d.poll(wgpu::Maintain::Wait);
+        let _ = d.poll(wgpu::PollType::Wait {
+            submission_index: None,
+            timeout: None,
+        });
 
         let distances = self
             .device
