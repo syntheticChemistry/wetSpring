@@ -3,6 +3,32 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V97b — Fused Ops + Cross-Spring Evolution Validation (2026-03-05)
+
+### Added
+- **`mean_variance_gpu()`** — fused single-pass Welford mean+variance via barraCuda.
+  One dispatch instead of two. On `Fp64Strategy::Hybrid` GPUs, routes through DF64
+  fused shader (~10x throughput on consumer FP32 cores).
+- **`mean_sample_variance_gpu()`** — same as above with `ddof=1` for sample variance.
+- **`correlation_full_gpu()`** — fused 5-accumulator Pearson correlation. Returns
+  `CorrelationResult` (mean_x, mean_y, var_x, var_y, pearson_r) from a single
+  kernel launch. Replaces calling `correlation_gpu` + `covariance_gpu` + `variance_gpu`
+  separately on the same (x, y) pair.
+- **`pub use CorrelationResult`** — re-exported from `stats_gpu` for downstream use.
+
+### Changed
+- **`stats_gpu` module docs** — updated to describe cross-spring evolution provenance:
+  variance/correlation shaders absorbed from wetSpring + hotSpring precision patterns,
+  DF64 variants use hotSpring's `df64_core.wgsl`, `FusedMapReduceF64` (Shannon,
+  Simpson) originated in wetSpring and is now consumed by all springs.
+
+### Validated
+- **26 CPU validation binaries**: ALL PASS (0 failures)
+- **1,247 unit tests**: 1,047 lib + 200 forge, 0 failures
+- **Cross-spring S93**: 59/59 checks — cross-spring provenance audit verified
+- **Python vs Rust v3**: 35/35 parity checks — 15 domains, bit-identical to SciPy/NumPy
+- **ToadStool S70 rewire**: 42/42 checks — new stats primitives validated
+
 ## V97 — barraCuda v0.3.3 Rewire + wgpu 28 Migration (2026-03-05)
 
 ### Changed
