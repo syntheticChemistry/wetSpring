@@ -107,30 +107,31 @@ All 13 checks pass. 18.7 ms total for the full benchmark suite.
 | `stats_gpu::dot_gpu` | `WeightedDotF64` | Returns 0.0 |
 | `stats_gpu::weighted_dot_gpu` | `WeightedDotF64` | Returns 0.0 |
 
-### Root Cause
+### Root Cause (Refined V97d)
 
-`VarianceF64`, `CorrelationF64`, `CovarianceF64`, and `WeightedDotF64` use
-WGSL shaders with `enable f64;` that require native f64 hardware support.
-On `Fp64Strategy::Hybrid` GPUs (consumer NVIDIA), naga compiles the shaders
-but the ops return zero because the DF64 emulation path is not wired for
-these specific dispatch types.
+**UPDATE**: barraCuda now has DF64 dispatch routing wired for all four ops:
+- `VarianceF64`: `fused_shader_for_device()` routes to `mean_variance_df64.wgsl` on Hybrid
+- `CorrelationF64`: `fused_shader_for_device()` routes to `correlation_full_df64.wgsl` on Hybrid
+- `CovarianceF64`: `shader_for_device()` uses `rewrite_f64_infix_full()` for DF64 on Hybrid
+- `WeightedDotF64`: `shader_for_device()` uses `rewrite_f64_infix_full()` for DF64 on Hybrid
 
-The `FusedMapReduceF64` path **does** work on Hybrid because it already has
-DF64 core-streaming support. This proves DF64 is viable for these ops —
-the gap is in wiring, not capability.
+**However**, the DF64 fused shaders produce zero output on RTX 4070 despite
+correct dispatch routing. The `FusedMapReduceF64` path (Shannon/Simpson)
+works correctly on Hybrid — proving DF64 core-streaming is viable. The gap
+is in the specific DF64 fused shader content, not in dispatch wiring.
 
-### toadStool Action: Wire DF64 for VarianceF64/CorrelationF64/CovarianceF64/WeightedDotF64
+### barraCuda Action: Debug DF64 Fused Shader Zero Output
 
 Priority: **P2** (consumer GPU users need this; Pro/HPC GPUs with native f64 work today)
 
-The DF64 fused shaders (`mean_variance_df64.wgsl`, `correlation_full_df64.wgsl`)
-already exist in barraCuda. The gap is the dispatch routing:
+The dispatch routing is correct. The DF64 shaders compile without error.
+But they produce all-zero output buffers on RTX 4070 (Hybrid). Recommended
+investigation:
 
-1. `VarianceF64::execute()` should check `Fp64Strategy` and route to the DF64
-   shader when Hybrid is detected (same pattern as `FusedMapReduceF64`)
-2. Same for `CorrelationF64`, `CovarianceF64`, `WeightedDotF64`
-3. wetSpring's `stats_gpu.rs` thin wrappers will automatically benefit — no
-   downstream code changes needed
+1. Verify `mean_variance_df64.wgsl` accumulation loop produces non-zero in workgroup shared memory
+2. Check if the DF64 reduction tree correctly propagates partial sums
+3. Test on a different Hybrid GPU (RDNA3, Intel Arc) to isolate driver vs shader issue
+4. Compare dispatch parameters (workgroup count, buffer sizes) between native f64 and DF64 paths
 
 ### Also Still Open from V97 Handoff
 

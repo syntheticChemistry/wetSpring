@@ -3,6 +3,30 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V97d — toadStool S94b + barraCuda Evolution Sync (2026-03-05)
+
+### Reviewed
+- **toadStool S94b** (5,369 tests, 845 WGSL, 44 JSON-RPC): D-DF64 and D-CD transferred
+  to barraCuda, REST removed, full primal decoupling. wetSpring V92F is current pin (144
+  primitives absorbed).
+- **barraCuda v0.3.3 unreleased**: DF64 dispatch routing now wired for VarianceF64,
+  CorrelationF64, CovarianceF64, WeightedDotF64 (dedicated df64 shaders exist). However,
+  DF64 fused shaders produce zero output on RTX 4070 (Hybrid) — dispatch routing is
+  correct but shader content needs debugging. FusedMapReduceF64 works on Hybrid.
+- **coralNAK** cloned: sovereign Rust NVIDIA shader compiler (forked Mesa NAK, 72 files,
+  51K LOC). Addresses f64 transcendental emission gap. Phase 2 (NAK sources wired).
+
+### Changed
+- **`validate_barracuda_gpu_v12.rs`**: Refined Hybrid skip commentary to document
+  DF64 dispatch routing exists but shader output is zero (not a wiring gap, but a
+  shader validation gap). Updated doc comments.
+- **V97c handoff**: Refined root cause section with V97d findings.
+
+### Validated
+- **GPU v12**: 21/21 PASS (RTX 4070, Hybrid, DF64 dispatch routed)
+- **1,047 lib tests**: 0 failures
+- **Clippy pedantic**: CLEAN
+
 ## V97c — Fused Ops Experiment Buildout + Full Chain Validation (2026-03-05)
 
 ### Added

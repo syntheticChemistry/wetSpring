@@ -12,16 +12,19 @@
     clippy::items_after_statements,
     clippy::float_cmp
 )]
-//! # Exp308: `BarraCuda` GPU v12 — V97 Fused Ops GPU Portability
+//! # Exp308: `BarraCuda` GPU v12 — V97d Fused Ops GPU Portability
 //!
 //! Proves that `barraCuda` v0.3.3's fused GPU shaders produce results matching
-//! the CPU reference established in Exp306. Tests the new ops added in V97:
+//! the CPU reference established in Exp306. barraCuda has DF64 dispatch routing
+//! for `VarianceF64`/`CorrelationF64`/`CovarianceF64`/`WeightedDotF64` (dedicated
+//! df64 shaders exist), but the DF64 fused shaders produce zero output on RTX 4070
+//! (Hybrid). `FusedMapReduceF64` (Shannon/Simpson) works correctly on Hybrid —
+//! DF64 core-streaming is proven viable; the gap is in specific shader validation.
 //!
-//! - G22: Fused Welford mean+variance (single-pass `mean_variance_gpu`)
-//! - G23: Fused 5-accumulator Pearson (`correlation_full_gpu`)
-//! - G24: Variance GPU vs CPU decomposition
-//! - G25: Covariance GPU vs CPU
-//! - G26: Cross-paper datasets on GPU (diversity+stats composition)
+//! - G22: Diversity GPU — `FusedMapReduceF64` (Shannon/Simpson/Bray-Curtis)
+//! - G23: Fused Welford/Pearson — native f64 only (DF64 shader zero output on Hybrid)
+//! - G24: CPU statistics reference
+//! - G25: GPU diversity → CPU statistics composition
 //!
 //! Each check proves: `|GPU_result - CPU_result| < tolerance`.
 //!
@@ -64,10 +67,11 @@ fn main() {
     let is_hybrid = format!("{:?}", gpu.fp64_strategy()) == "Hybrid";
     if is_hybrid {
         println!("  NOTE: Fp64Strategy::Hybrid detected (consumer GPU).");
-        println!("  VarianceF64/CorrelationF64/CovarianceF64/WeightedDotF64 ops");
-        println!("  require native f64 shaders (not yet Hybrid-DF64 aware).");
-        println!("  These ops will be validated via FusedMapReduce path (diversity_gpu)");
-        println!("  and CPU parity (Exp306). Standalone fused ops tracked as upstream gap.");
+        println!("  barraCuda has DF64 dispatch routing for VarianceF64/CorrelationF64/");
+        println!("  CovarianceF64/WeightedDotF64 (dedicated df64 shaders exist), but the");
+        println!("  DF64 fused shaders produce zero output on this hardware (RTX 4070).");
+        println!("  FusedMapReduceF64 path (Shannon/Simpson) works correctly on Hybrid.");
+        println!("  Fused ops validated via CPU parity (Exp306) and GPU diversity path.");
         println!();
     }
 
@@ -130,13 +134,17 @@ fn main() {
     });
 
     // ═══════════════════════════════════════════════════════════════════
-    // G23: Fused Welford/Pearson — native f64 only (skip on Hybrid)
+    // G23: Fused Welford/Pearson — DF64 dispatch routed but zero output on Hybrid
+    // barraCuda has dedicated df64 shaders; dispatch routing correct; shader
+    // output zero on RTX 4070 (Hybrid). Tracked as upstream shader issue.
     // ═══════════════════════════════════════════════════════════════════
     if is_hybrid {
-        v.section("G23: Fused Welford/Pearson — SKIPPED (Hybrid GPU, upstream gap)");
-        println!("  VarianceF64/CorrelationF64 require native f64 (not DF64).");
-        println!("  CPU parity proven in Exp306. GPU portability deferred to");
-        println!("  toadStool absorption of Hybrid-aware fused shaders.");
+        v.section("G23: Fused Welford/Pearson — SKIPPED (Hybrid DF64 shader zero output)");
+        println!("  barraCuda DF64 dispatch routing is wired (fused_shader_for_device).");
+        println!("  Dedicated shaders: mean_variance_df64.wgsl, correlation_full_df64.wgsl.");
+        println!("  However, DF64 fused shaders produce zero output on RTX 4070.");
+        println!("  FusedMapReduceF64 (Shannon/Simpson) works — DF64 core proven viable.");
+        println!("  CPU parity proven in Exp306. Tracked as upstream shader validation gap.");
     } else {
         v.section("G23: Fused Welford mean+variance — native f64 GPU");
         let t = Instant::now();
@@ -176,7 +184,7 @@ fn main() {
         g23_checks += 1;
 
         let x: Vec<f64> = (1..=50).map(|i| f64::from(i)).collect();
-        let y: Vec<f64> = x.iter().map(|&xi| 2.0 * xi + 1.0).collect();
+        let y: Vec<f64> = x.iter().map(|&xi| 2.0f64.mul_add(xi, 1.0)).collect();
         let cpu_r = barracuda::stats::pearson_correlation(&x, &y).unwrap();
         let gpu_full = stats_gpu::correlation_full_gpu(&gpu, &x, &y).expect("correlation_full_gpu");
         v.check(
