@@ -9,8 +9,7 @@
     clippy::cast_sign_loss,
     clippy::similar_names,
     clippy::items_after_statements,
-    clippy::many_single_char_names,
-    dead_code
+    clippy::many_single_char_names
 )]
 //! Exp207: `BarraCuda` GPU Parity v4 — IPC Science Capabilities on GPU
 //!

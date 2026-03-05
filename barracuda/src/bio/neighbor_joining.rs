@@ -185,11 +185,15 @@ pub fn distance_matrix_batch(alignments: &[Vec<&[u8]>]) -> Vec<Vec<f64>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
     #[test]
     fn jc_distance_identical() {
         let d = jukes_cantor_distance(b"ACGTACGT", b"ACGTACGT");
-        assert!(d.abs() < 1e-12, "identical seqs → zero distance: {d}");
+        assert!(
+            d.abs() < tolerances::ANALYTICAL_F64,
+            "identical seqs → zero distance: {d}"
+        );
     }
 
     #[test]
@@ -202,7 +206,10 @@ mod tests {
     #[test]
     fn jc_distance_saturated() {
         let d = jukes_cantor_distance(b"AAAA", b"CCCC");
-        assert!((d - 10.0).abs() < 1e-12, "100% different → saturated: {d}");
+        assert!(
+            (d - 10.0).abs() < tolerances::ANALYTICAL_F64,
+            "100% different → saturated: {d}"
+        );
     }
 
     #[test]
@@ -286,11 +293,14 @@ mod tests {
         for i in 0..n {
             for j in 0..n {
                 assert!(
-                    (dm[i * n + j] - dm[j * n + i]).abs() < 1e-12,
+                    (dm[i * n + j] - dm[j * n + i]).abs() < tolerances::ANALYTICAL_F64,
                     "matrix must be symmetric"
                 );
             }
-            assert!(dm[i * n + i].abs() < 1e-12, "diagonal must be zero");
+            assert!(
+                dm[i * n + i].abs() < tolerances::ANALYTICAL_F64,
+                "diagonal must be zero"
+            );
         }
     }
 

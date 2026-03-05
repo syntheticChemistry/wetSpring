@@ -43,31 +43,10 @@ use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, diversity_gpu, streaming_gpu, taxonomy};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::{self, Validator, test_data};
 
 const N_SAMPLES: usize = 8;
 const N_FEATURES: usize = 256;
-
-fn make_communities() -> Vec<Vec<f64>> {
-    (0..N_SAMPLES)
-        .map(|s| {
-            (0..N_FEATURES)
-                .map(|f| {
-                    let base = ((s * N_FEATURES + f + 1) as f64).sqrt();
-                    let shift = ((s + 1) as f64) * 0.1;
-                    (base + shift).max(0.01)
-                })
-                .collect()
-        })
-        .collect()
-}
-
-fn make_sequences() -> Vec<Vec<u8>> {
-    let bases = [b'A', b'C', b'G', b'T'];
-    (0..N_SAMPLES * 4)
-        .map(|i| (0..80).map(|j| bases[(i * 80 + j) % 4]).collect())
-        .collect()
-}
 
 fn training_refs() -> Vec<taxonomy::ReferenceSeq> {
     vec![
@@ -93,17 +72,7 @@ fn training_refs() -> Vec<taxonomy::ReferenceSeq> {
 async fn main() {
     let mut v = Validator::new("Exp090: Pure GPU Streaming Pipeline — Zero CPU Round-Trips");
 
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            eprintln!("No GPU: {e}");
-            validation::exit_skipped("No GPU available");
-        }
-    };
-    gpu.print_info();
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
+    let gpu = validation::gpu_or_skip().await;
 
     let t0 = Instant::now();
 
@@ -125,7 +94,7 @@ fn validate_roundtrip_mode(v: &mut Validator, gpu: &GpuF64) {
     v.section("═══ Mode 1: Round-Trip (CPU ↔ GPU per stage) ═══");
     let t0 = Instant::now();
 
-    let communities = make_communities();
+    let communities = test_data::make_communities_shift(N_SAMPLES, N_FEATURES);
 
     let t_alpha = Instant::now();
     let rt_shannon: Vec<f64> = communities
@@ -184,8 +153,8 @@ fn validate_streaming_mode(v: &mut Validator, gpu: &GpuF64) {
     let session = streaming_gpu::GpuPipelineSession::new(gpu).expect("GPU streaming");
     println!("  Session: {}", session.ctx_stats());
 
-    let communities = make_communities();
-    let sequences = make_sequences();
+    let communities = test_data::make_communities_shift(N_SAMPLES, N_FEATURES);
+    let sequences = test_data::make_sequences(N_SAMPLES * 4, 80);
     let refs = training_refs();
     let k = 4;
     let classifier = taxonomy::NaiveBayesClassifier::train(&refs, k);
@@ -263,7 +232,7 @@ fn validate_modes_match(v: &mut Validator, gpu: &GpuF64) {
     v.section("═══ Mode 3: Round-Trip ↔ Streaming Parity ═══");
     let t0 = Instant::now();
 
-    let communities = make_communities();
+    let communities = test_data::make_communities_shift(N_SAMPLES, N_FEATURES);
 
     let rt_shannon: Vec<f64> = communities
         .iter()

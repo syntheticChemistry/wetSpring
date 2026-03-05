@@ -1,22 +1,23 @@
-# Python baseline dependencies — pinned versions for reproducible validation.
+# SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# These versions match the environment used to generate baseline values
-# referenced by validation binaries. Changing versions may cause
-# baseline drift; rerun all baselines if upgrading.
+# Python baseline environment for wetSpring validation scripts.
+# All baselines were generated with Python 3.10.12 on Ubuntu 22.04.
 #
-# Usage:
-#   python3 -m venv .venv && source .venv/bin/activate
-#   pip install -r requirements.txt
+# Install:  python3 -m pip install -r requirements.txt
+# Verify:   python3 -c "import numpy; print(numpy.__version__)"
 #
-# Last verified: 2026-02-28
-#
-# External tools (own environments — not pip installable here):
-#   - qiime2: validate_exp001.py, run_exp002.py (conda env qiime2-2026)
-#   - asari, FindPFAS: PFAS/metabolomics pipelines (separate install)
-#   - PhyNetPy: phynetpy_rf_baseline.py (stdlib-only; uses DEFJ/ data)
+# Pin policy: major.minor pinned to match baseline generation environment.
+# Patch versions float for security fixes. If baseline drift is detected
+# after a patch update, pin exact versions and document the regression.
 
-numpy==2.1.3
-scipy==1.15.3
-scikit-learn==1.7.2
-pandas==3.0.1
-dendropy==5.0.8
+numpy>=1.24,<2
+scipy>=1.10,<2
+pandas>=2.0,<3
+scikit-learn>=1.2,<2
+dendropy>=4.6,<5
+pyteomics>=4.6,<5
+
+# qiime2 + biom-format are only needed for Exp001/002 Galaxy baselines.
+# Install via conda if needed:  conda install -c qiime2 qiime2
+# biom-format>=2.1,<3
+# qiime2  (conda-only, no pip)

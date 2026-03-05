@@ -93,6 +93,7 @@ pub fn dot(a: &[f64], b: &[f64]) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
     #[test]
     fn erf_known_values() {
@@ -109,6 +110,7 @@ mod tests {
 
     #[test]
     fn normal_cdf_known_values() {
+        // 1e-7 tighter than ERF_PARITY (5e-7) for polynomial approximation at x=0
         assert!((normal_cdf(0.0) - 0.5).abs() < 1e-7);
         assert!((normal_cdf(1.96) - 0.975).abs() < crate::tolerances::NORM_CDF_PARITY);
         assert!(normal_cdf(-4.0) < crate::tolerances::NORM_CDF_TAIL);
@@ -196,6 +198,7 @@ mod tests {
 
     #[test]
     fn normal_cdf_symmetry() {
+        // 1e-7 tighter than ERF_PARITY (5e-7) for symmetry Φ(x)+Φ(-x)=1
         assert!((normal_cdf(1.0) + normal_cdf(-1.0) - 1.0).abs() < 1e-7);
     }
 
@@ -245,7 +248,7 @@ mod tests {
         let val = ln_gamma(10.0);
         let expected = (362_880.0_f64).ln();
         assert!(
-            (val - expected).abs() < 1e-8,
+            (val - expected).abs() < tolerances::LIMIT_CONVERGENCE,
             "ln(Γ(10)) = {val}, expected {expected}"
         );
     }
@@ -253,7 +256,7 @@ mod tests {
     #[test]
     fn norm_ppf_median() {
         assert!(
-            norm_ppf(0.5).abs() < 1e-10,
+            norm_ppf(0.5).abs() < tolerances::PYTHON_PARITY,
             "Φ⁻¹(0.5) = 0, got {}",
             norm_ppf(0.5)
         );
@@ -265,7 +268,7 @@ mod tests {
             let p = normal_cdf(x);
             let recovered = norm_ppf(p);
             assert!(
-                (recovered - x).abs() < 1e-5,
+                (recovered - x).abs() < tolerances::PYTHON_PVALUE,
                 "round-trip failed: norm_ppf(Φ({x})) = {recovered}, error = {}",
                 (recovered - x).abs()
             );
@@ -279,7 +282,7 @@ mod tests {
         assert_eq!(grad.len(), 5);
         for &g in &grad {
             assert!(
-                (g - 1.0).abs() < 1e-10,
+                (g - 1.0).abs() < tolerances::PYTHON_PARITY,
                 "gradient of linear f should be 1.0, got {g}"
             );
         }
@@ -287,10 +290,10 @@ mod tests {
 
     #[test]
     fn gradient_1d_quadratic() {
-        let f: Vec<f64> = (0..5).map(|i| (i as f64).powi(2)).collect();
+        let f: Vec<f64> = (0..5).map(|i| f64::from(i).powi(2)).collect();
         let grad = gradient_1d(&f, 1.0);
         assert!(
-            (grad[2] - 4.0).abs() < 1e-10,
+            (grad[2] - 4.0).abs() < tolerances::PYTHON_PARITY,
             "df/dx at x=2 for x² = 2x = 4"
         );
     }
@@ -298,12 +301,12 @@ mod tests {
     #[test]
     fn norm_ppf_known_quantiles() {
         assert!(
-            (norm_ppf(0.975) - 1.96).abs() < 0.01,
+            (norm_ppf(0.975) - 1.96).abs() < crate::tolerances::NORM_PPF_KNOWN,
             "97.5th percentile ≈ 1.96, got {}",
             norm_ppf(0.975)
         );
         assert!(
-            (norm_ppf(0.025) + 1.96).abs() < 0.01,
+            (norm_ppf(0.025) + 1.96).abs() < crate::tolerances::NORM_PPF_KNOWN,
             "2.5th percentile ≈ −1.96, got {}",
             norm_ppf(0.025)
         );

@@ -250,7 +250,11 @@ fn validate_five_stage_chain(v: &mut Validator) {
 
     let int8_indices: Vec<usize> = sequences
         .iter()
-        .map(|s| classifier.classify_quantized(s))
+        .map(|s| {
+            classifier
+                .classify_quantized(s)
+                .expect("trained classifier")
+        })
         .collect();
     for i in 0..4 {
         v.check(

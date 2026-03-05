@@ -244,15 +244,17 @@ pub fn steady_state_mean(result: &OdeResult, var_idx: usize, frac: f64) -> f64 {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used)]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
     #[test]
     fn exponential_decay() {
         let result = rk4_integrate(|y, _t| vec![-0.5 * y[0]], &[1.0], 0.0, 10.0, 0.01, None);
         let expected = (-0.5_f64 * 10.0).exp();
         assert!(
-            (result.y_final[0] - expected).abs() < 1e-8,
+            (result.y_final[0] - expected).abs() < tolerances::LIMIT_CONVERGENCE,
             "RK4 exponential decay: got {}, expected {expected}",
             result.y_final[0]
         );
@@ -273,7 +275,7 @@ mod tests {
             None,
         );
         assert!(
-            (result.y_final[0] - k).abs() < 1e-4,
+            (result.y_final[0] - k).abs() < tolerances::ML_F1_SCORE,
             "logistic should reach carrying capacity: got {}",
             result.y_final[0]
         );
@@ -292,7 +294,7 @@ mod tests {
         );
         let r = result.y_final[0].hypot(result.y_final[1]);
         assert!(
-            (r - 1.0).abs() < 1e-6,
+            (r - 1.0).abs() < tolerances::GPU_VS_CPU_F64,
             "circular orbit radius should be 1.0, got {r}"
         );
     }
@@ -350,7 +352,7 @@ mod tests {
             .expect("rk45 should succeed");
         let expected = (-0.5_f64 * 10.0).exp();
         assert!(
-            (result.y_final[0] - expected).abs() < 1e-6,
+            (result.y_final[0] - expected).abs() < tolerances::GPU_VS_CPU_F64,
             "RK45 exponential decay: got {}, expected {expected}",
             result.y_final[0]
         );

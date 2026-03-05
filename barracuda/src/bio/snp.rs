@@ -230,6 +230,7 @@ pub fn call_snps(sequences: &[&[u8]]) -> SnpResult {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
     #[test]
     fn no_variants_identical() {
@@ -259,8 +260,8 @@ mod tests {
         let result = call_snps(&seqs);
         assert_eq!(result.variants.len(), 1);
         let v = &result.variants[0];
-        assert!((v.ref_frequency() - 0.75).abs() < 1e-10);
-        assert!((v.alt_frequency() - 0.25).abs() < 1e-10);
+        assert!((v.ref_frequency() - 0.75).abs() < tolerances::PYTHON_PARITY);
+        assert!((v.alt_frequency() - 0.25).abs() < tolerances::PYTHON_PARITY);
     }
 
     #[test]
@@ -314,7 +315,7 @@ mod tests {
             assert_eq!(flat.positions[i], v.position as u32);
             assert_eq!(flat.ref_alleles[i], v.ref_allele);
             assert_eq!(flat.depths[i], v.depth as u32);
-            assert!((flat.alt_frequencies[i] - v.alt_frequency()).abs() < 1e-15);
+            assert!((flat.alt_frequencies[i] - v.alt_frequency()).abs() < tolerances::EXACT_F64);
         }
     }
 

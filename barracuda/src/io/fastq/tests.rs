@@ -8,6 +8,7 @@
 )]
 
 use super::*;
+use crate::tolerances;
 use std::io::Write;
 
 /// Write a minimal FASTQ file and return its path.
@@ -26,8 +27,8 @@ fn test_stats_from_file_single_record_quality() {
     let path = write_fastq(&dir, "q40.fastq", content);
     let stats = stats_from_file(&path).unwrap();
     assert_eq!(stats.num_sequences, 1);
-    assert!((stats.mean_quality - 40.0).abs() < 1e-10);
-    assert!((stats.gc_content - 0.5).abs() < 1e-10);
+    assert!((stats.mean_quality - 40.0).abs() < tolerances::PYTHON_PARITY);
+    assert!((stats.gc_content - 0.5).abs() < tolerances::PYTHON_PARITY);
     assert_eq!(stats.q30_count, 1);
 }
 
@@ -38,7 +39,7 @@ fn test_stats_from_file_low_quality() {
     let content = "@s1\nAAAA\n+\n!!!!\n";
     let path = write_fastq(&dir, "q0.fastq", content);
     let stats = stats_from_file(&path).unwrap();
-    assert!((stats.mean_quality - 0.0).abs() < 1e-10);
+    assert!((stats.mean_quality - 0.0).abs() < tolerances::PYTHON_PARITY);
     assert_eq!(stats.q30_count, 0);
 }
 
@@ -48,7 +49,7 @@ fn test_stats_gc_lowercase() {
     let content = "@s1\ngcgc\n+\nIIII\n";
     let path = write_fastq(&dir, "lc.fastq", content);
     let stats = stats_from_file(&path).unwrap();
-    assert!((stats.gc_content - 1.0).abs() < 1e-10);
+    assert!((stats.gc_content - 1.0).abs() < tolerances::PYTHON_PARITY);
 }
 
 #[test]
@@ -72,8 +73,14 @@ fn test_parse_and_stats_agree() {
     );
     assert_eq!(stats_from_records.min_length, stats_from_stream.min_length);
     assert_eq!(stats_from_records.max_length, stats_from_stream.max_length);
-    assert!((stats_from_records.gc_content - stats_from_stream.gc_content).abs() < 1e-12);
-    assert!((stats_from_records.mean_quality - stats_from_stream.mean_quality).abs() < 1e-12);
+    assert!(
+        (stats_from_records.gc_content - stats_from_stream.gc_content).abs()
+            < tolerances::ANALYTICAL_F64
+    );
+    assert!(
+        (stats_from_records.mean_quality - stats_from_stream.mean_quality).abs()
+            < tolerances::ANALYTICAL_F64
+    );
 }
 
 #[test]
@@ -94,8 +101,8 @@ fn test_single_record() {
     let stats = compute_stats(&[rec]);
     assert_eq!(stats.num_sequences, 1);
     assert_eq!(stats.total_bases, 8);
-    assert!((stats.gc_content - 0.5).abs() < 1e-10);
-    assert!((stats.mean_quality - 40.0).abs() < 1e-10);
+    assert!((stats.gc_content - 0.5).abs() < tolerances::PYTHON_PARITY);
+    assert!((stats.mean_quality - 40.0).abs() < tolerances::PYTHON_PARITY);
 }
 
 #[test]
@@ -106,7 +113,7 @@ fn test_gc_content_all_gc() {
         quality: b"IIIIIIII".to_vec(),
     };
     let stats = compute_stats(&[rec]);
-    assert!((stats.gc_content - 1.0).abs() < 1e-10);
+    assert!((stats.gc_content - 1.0).abs() < tolerances::PYTHON_PARITY);
 }
 
 #[test]
@@ -117,7 +124,7 @@ fn test_gc_content_no_gc() {
         quality: b"IIIIIIII".to_vec(),
     };
     let stats = compute_stats(&[rec]);
-    assert!(stats.gc_content.abs() < 1e-10);
+    assert!(stats.gc_content.abs() < tolerances::PYTHON_PARITY);
 }
 
 #[test]
@@ -165,7 +172,7 @@ fn test_stats_from_file_empty_quality_line() {
     let path = write_fastq(&dir, "noq.fastq", content);
     let stats = stats_from_file(&path).unwrap();
     assert_eq!(stats.num_sequences, 1);
-    assert!((stats.mean_quality - 0.0).abs() < 1e-10);
+    assert!((stats.mean_quality - 0.0).abs() < tolerances::PYTHON_PARITY);
 }
 
 #[test]
@@ -177,8 +184,8 @@ fn test_compute_stats_zero_gc_and_quality() {
         quality: vec![],
     };
     let stats = compute_stats(&[rec]);
-    assert!(stats.gc_content.abs() < 1e-10);
-    assert!(stats.mean_quality.abs() < 1e-10);
+    assert!(stats.gc_content.abs() < tolerances::PYTHON_PARITY);
+    assert!(stats.mean_quality.abs() < tolerances::PYTHON_PARITY);
     assert_eq!(stats.q30_count, 0);
 }
 
@@ -193,8 +200,8 @@ fn test_compute_stats_empty_sequence_record() {
     let stats = compute_stats(&[rec]);
     assert_eq!(stats.num_sequences, 1);
     assert_eq!(stats.total_bases, 0);
-    assert!(stats.gc_content.abs() < 1e-10);
-    assert!(stats.mean_quality.abs() < 1e-10);
+    assert!(stats.gc_content.abs() < tolerances::PYTHON_PARITY);
+    assert!(stats.mean_quality.abs() < tolerances::PYTHON_PARITY);
     assert_eq!(stats.min_length, 0);
     assert_eq!(stats.max_length, 0);
 }

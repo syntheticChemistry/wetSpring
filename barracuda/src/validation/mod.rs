@@ -91,6 +91,30 @@ pub fn exit_skipped(reason: &str) -> ! {
     std::process::exit(2)
 }
 
+/// Initialize GPU and exit with code 2 if unavailable or lacking f64.
+///
+/// Centralizes the GPU init + skip pattern used by 50+ validation binaries.
+/// Prints device info on success.
+///
+/// # Panics
+///
+/// Never — exits with code 2 on any failure.
+#[cfg(feature = "gpu")]
+pub async fn gpu_or_skip() -> crate::gpu::GpuF64 {
+    let gpu = match crate::gpu::GpuF64::new().await {
+        Ok(g) => g,
+        Err(e) => {
+            eprintln!("No GPU: {e}");
+            exit_skipped("No GPU available");
+        }
+    };
+    gpu.print_info();
+    if !gpu.has_f64 {
+        exit_skipped("No SHADER_F64 support on this GPU");
+    }
+    gpu
+}
+
 /// Discover the benchmark results directory via capability-based discovery.
 ///
 /// Discovery order:
@@ -291,6 +315,78 @@ impl Validator {
         let ok = print_result(&self.name, self.passed, self.total);
         std::process::exit(i32::from(!ok))
     }
+}
+
+pub mod test_data;
+
+/// Domain timing result for multi-domain validators.
+///
+/// Shared struct replacing duplicated `DomainResult` definitions across
+/// S79+ validation binaries (`validate_barrier_disruption_s79`,
+/// `validate_skin_anderson_s79`, etc.).
+#[derive(Debug)]
+pub struct DomainResult {
+    /// Domain or section name.
+    pub name: &'static str,
+    /// Optional originating spring (cross-spring validators).
+    pub spring: Option<&'static str>,
+    /// Elapsed time in milliseconds.
+    pub ms: f64,
+    /// Number of validation checks in this domain.
+    pub checks: u32,
+}
+
+/// Print a formatted domain summary table.
+///
+/// Renders a box-drawing table with optional Spring column for cross-spring
+/// validators. Totals are computed from the supplied slice.
+pub fn print_domain_summary(title: &str, domains: &[DomainResult]) {
+    let has_spring = domains.iter().any(|d| d.spring.is_some());
+    let mut total_checks: u32 = 0;
+    let mut total_ms: f64 = 0.0;
+
+    println!("\n╔════════════════════════════════════════════════════════════════════╗");
+    println!("║  {title:<64} ║");
+    println!("╠════════════════════════════════════════════════════════════════════╣");
+
+    if has_spring {
+        println!(
+            "║ {:<22} │ {:<18} │ {:>7} │ {:>3} ║",
+            "Domain", "Spring", "Time", "✓"
+        );
+    } else {
+        println!("║ {:<22} │ {:>7} │ {:>3} ║", "Domain", "Time", "✓");
+    }
+
+    println!("╠════════════════════════════════════════════════════════════════════╣");
+
+    for d in domains {
+        total_checks += d.checks;
+        total_ms += d.ms;
+        if has_spring {
+            let spring = d.spring.unwrap_or("—");
+            println!(
+                "║ {:<22} │ {:<18} │ {:>5.1}ms │ {:>3} ║",
+                d.name, spring, d.ms, d.checks
+            );
+        } else {
+            println!("║ {:<22} │ {:>5.1}ms │ {:>3} ║", d.name, d.ms, d.checks);
+        }
+    }
+
+    println!("╠════════════════════════════════════════════════════════════════════╣");
+    if has_spring {
+        println!(
+            "║ {:<22} │ {:<18} │ {:>5.1}ms │ {:>3} ║",
+            "TOTAL", "", total_ms, total_checks
+        );
+    } else {
+        println!(
+            "║ {:<22} │ {:>5.1}ms │ {:>3} ║",
+            "TOTAL", total_ms, total_checks
+        );
+    }
+    println!("╚════════════════════════════════════════════════════════════════════╝");
 }
 
 #[cfg(test)]

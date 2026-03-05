@@ -8,8 +8,7 @@
     clippy::cast_sign_loss,
     clippy::similar_names,
     clippy::items_after_statements,
-    clippy::many_single_char_names,
-    dead_code
+    clippy::many_single_char_names
 )]
 //! Exp191: GPU V59 Science Parity — Diversity + Anderson on GPU vs CPU
 //!

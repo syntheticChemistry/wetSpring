@@ -5,8 +5,7 @@
     clippy::similar_names,
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
-    clippy::too_many_lines,
-    unused_assignments
+    clippy::too_many_lines
 )]
 //! Exp073: Compute Dispatch Overhead — Streaming vs Individual vs CPU
 //!
@@ -30,15 +29,10 @@
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, streaming_gpu};
-use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::{self, Validator, test_data};
 
 use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
-
-fn make_abundances(n: usize) -> Vec<f64> {
-    (0..n).map(|i| ((i + 1) as f64).mul_add(1.5, 0.5)).collect()
-}
 
 const BATCH_SIZES: &[usize] = &[64, 256, 1024, 4096];
 const REPEATS: usize = 5;
@@ -47,17 +41,7 @@ const REPEATS: usize = 5;
 async fn main() {
     let mut v = Validator::new("Exp073: Compute Dispatch Overhead — Streaming vs Individual");
 
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            eprintln!("No GPU: {e}");
-            validation::exit_skipped("No GPU available");
-        }
-    };
-    gpu.print_info();
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
+    let gpu = validation::gpu_or_skip().await;
 
     let session = streaming_gpu::GpuPipelineSession::new(&gpu).expect("dispatch overhead");
     println!("  Session warmup: {:.1} ms", session.warmup_ms);
@@ -67,50 +51,50 @@ async fn main() {
 
     for &n in BATCH_SIZES {
         v.section(&format!("═══ Batch N={n} ═══"));
-        let abundances = make_abundances(n);
+        let abundances = test_data::make_abundances(n);
 
-        // Strategy A: CPU
+        // Strategy A: CPU — time REPEATS iterations, capture values on final run
         let t_cpu = Instant::now();
-        let mut cpu_shannon = 0.0;
-        let mut cpu_simpson = 0.0;
-        let mut cpu_observed = 0.0;
-        for _ in 0..REPEATS {
-            cpu_shannon = diversity::shannon(&abundances);
-            cpu_simpson = diversity::simpson(&abundances);
-            cpu_observed = diversity::observed_features(&abundances);
+        for _ in 0..REPEATS - 1 {
+            let _ = diversity::shannon(&abundances);
+            let _ = diversity::simpson(&abundances);
+            let _ = diversity::observed_features(&abundances);
         }
+        let cpu_shannon = diversity::shannon(&abundances);
+        let cpu_simpson = diversity::simpson(&abundances);
+        let cpu_observed = diversity::observed_features(&abundances);
         let cpu_us = t_cpu.elapsed().as_micros() as f64 / REPEATS as f64;
 
         // Strategy B: GPU Individual (new FMR each call)
         let t_ind = Instant::now();
-        let mut ind_shannon = 0.0;
-        let mut _ind_simpson = 0.0;
-        let mut _ind_observed = 0.0;
-        for _ in 0..REPEATS {
+        for _ in 0..REPEATS - 1 {
             let fmr = FusedMapReduceF64::new(gpu.to_wgpu_device()).expect("dispatch overhead");
-            ind_shannon = fmr.shannon_entropy(&abundances).expect("dispatch overhead");
-            let dom = fmr.simpson_index(&abundances).expect("dispatch overhead");
-            _ind_simpson = 1.0 - dom;
+            let _ = fmr.shannon_entropy(&abundances).expect("dispatch overhead");
+            let _ = fmr.simpson_index(&abundances).expect("dispatch overhead");
             let binary: Vec<f64> = abundances
                 .iter()
                 .map(|&c| if c > 0.0 { 1.0 } else { 0.0 })
                 .collect();
-            _ind_observed = fmr.sum(&binary).expect("dispatch overhead");
+            let _ = fmr.sum(&binary).expect("dispatch overhead");
         }
+        let fmr = FusedMapReduceF64::new(gpu.to_wgpu_device()).expect("dispatch overhead");
+        let ind_shannon = fmr.shannon_entropy(&abundances).expect("dispatch overhead");
         let ind_us = t_ind.elapsed().as_micros() as f64 / REPEATS as f64;
 
         // Strategy C: GPU Streaming (pre-warmed session)
         let t_stream = Instant::now();
-        let mut stream_shannon = 0.0;
-        let mut stream_simpson = 0.0;
-        let mut stream_observed = 0.0;
-        for _ in 0..REPEATS {
-            stream_shannon = session.shannon(&abundances).expect("dispatch overhead");
-            stream_simpson = session.simpson(&abundances).expect("dispatch overhead");
-            stream_observed = session
+        for _ in 0..REPEATS - 1 {
+            let _ = session.shannon(&abundances).expect("dispatch overhead");
+            let _ = session.simpson(&abundances).expect("dispatch overhead");
+            let _ = session
                 .observed_features(&abundances)
                 .expect("dispatch overhead");
         }
+        let stream_shannon = session.shannon(&abundances).expect("dispatch overhead");
+        let stream_simpson = session.simpson(&abundances).expect("dispatch overhead");
+        let stream_observed = session
+            .observed_features(&abundances)
+            .expect("dispatch overhead");
         let stream_us = t_stream.elapsed().as_micros() as f64 / REPEATS as f64;
 
         // Parity checks

@@ -262,7 +262,7 @@ mod tests {
         let nd_ss = steady_state_mean(&r, 1, SS_FRAC);
         let total = nc_ss + nd_ss;
         assert!(
-            (total - p.k_cap).abs() < 0.1,
+            (total - p.k_cap).abs() < crate::tolerances::ODE_TOTAL_DENSITY_CAPACITY,
             "total density should approach K: {total}"
         );
     }

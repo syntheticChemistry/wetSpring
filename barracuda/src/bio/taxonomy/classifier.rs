@@ -302,16 +302,18 @@ impl NaiveBayesClassifier {
     /// Classify using int8-quantized weights (NPU path).
     ///
     /// Produces the same argmax as full-precision for well-separated taxa.
+    /// Returns `None` when the query produces no k-mers or the classifier
+    /// has no taxa (empty reference database).
     #[allow(
         clippy::cast_precision_loss,
         clippy::cast_possible_truncation,
         clippy::cast_possible_wrap
     )]
     #[must_use]
-    pub fn classify_quantized(&self, sequence: &[u8]) -> usize {
+    pub fn classify_quantized(&self, sequence: &[u8]) -> Option<usize> {
         let query_kmers = extract_kmers(sequence, self.k);
         if query_kmers.is_empty() || self.taxon_labels.is_empty() {
-            return 0;
+            return None;
         }
 
         let npu = self.to_int8_weights();
@@ -333,6 +335,6 @@ impl NaiveBayesClassifier {
             }
         }
 
-        best_idx
+        Some(best_idx)
     }
 }

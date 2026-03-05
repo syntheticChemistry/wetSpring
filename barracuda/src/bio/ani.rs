@@ -90,12 +90,13 @@ pub fn pairwise_ani_batch(pairs: &[(&[u8], &[u8])]) -> Vec<AniResult> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
     #[test]
     fn identical_sequences() {
         let seq = b"ATGATGATGATG";
         let r = pairwise_ani(seq, seq);
-        assert!((r.ani - 1.0).abs() < 1e-15);
+        assert!((r.ani - 1.0).abs() < tolerances::EXACT_F64);
         assert_eq!(r.aligned_length, 12);
         assert_eq!(r.identical_positions, 12);
     }
@@ -103,14 +104,14 @@ mod tests {
     #[test]
     fn completely_different() {
         let r = pairwise_ani(b"AAAA", b"TTTT");
-        assert!((r.ani - 0.0).abs() < 1e-15);
+        assert!((r.ani - 0.0).abs() < tolerances::EXACT_F64);
         assert_eq!(r.aligned_length, 4);
     }
 
     #[test]
     fn half_identical() {
         let r = pairwise_ani(b"AATT", b"AAGC");
-        assert!((r.ani - 0.5).abs() < 1e-15);
+        assert!((r.ani - 0.5).abs() < tolerances::EXACT_F64);
     }
 
     #[test]
@@ -118,7 +119,7 @@ mod tests {
         let r = pairwise_ani(b"A-TG", b"ACTG");
         assert_eq!(r.aligned_length, 3);
         assert_eq!(r.identical_positions, 3);
-        assert!((r.ani - 1.0).abs() < 1e-15);
+        assert!((r.ani - 1.0).abs() < tolerances::EXACT_F64);
     }
 
     #[test]
@@ -131,7 +132,7 @@ mod tests {
     fn symmetric() {
         let r1 = pairwise_ani(b"ATGATG", b"ATGTTG");
         let r2 = pairwise_ani(b"ATGTTG", b"ATGATG");
-        assert!((r1.ani - r2.ani).abs() < 1e-15);
+        assert!((r1.ani - r2.ani).abs() < tolerances::EXACT_F64);
     }
 
     #[test]
@@ -155,7 +156,7 @@ mod tests {
     #[test]
     fn empty_sequences() {
         let r = pairwise_ani(b"", b"");
-        assert!((r.ani - 0.0).abs() < 1e-15);
+        assert!((r.ani - 0.0).abs() < tolerances::EXACT_F64);
         assert_eq!(r.aligned_length, 0);
     }
 }

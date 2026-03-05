@@ -350,6 +350,7 @@ pub fn batch_rarefaction_gpu(
 #[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
     /// Single-species community: every bootstrap replicate yields the same
     /// rarefied vector, so `Shannon=0`, `Simpson=0`, `observed=1` deterministically.
@@ -369,17 +370,17 @@ mod tests {
         let result = rarefaction_bootstrap_gpu(&gpu, &counts, &params).unwrap();
         // Deterministic: every subsample gives [50.0], so Shannon=0, Simpson=0, observed=1
         assert!(
-            result.shannon.mean.abs() < 1e-10,
+            result.shannon.mean.abs() < tolerances::PYTHON_PARITY,
             "Shannon single-species: got {}",
             result.shannon.mean
         );
         assert!(
-            result.simpson.mean.abs() < 1e-10,
+            result.simpson.mean.abs() < tolerances::PYTHON_PARITY,
             "Simpson single-species: got {}",
             result.simpson.mean
         );
         assert!(
-            (result.observed.mean - 1.0).abs() < 1e-10,
+            (result.observed.mean - 1.0).abs() < tolerances::PYTHON_PARITY,
             "Observed single-species: got {}",
             result.observed.mean
         );

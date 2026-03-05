@@ -226,6 +226,7 @@ pub fn benjamini_hochberg(pvalues: &[f64]) -> Vec<f64> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
     fn sample_clusters() -> Vec<GeneCluster> {
         vec![
@@ -307,7 +308,7 @@ mod tests {
     #[test]
     fn hypergeometric_not_enriched() {
         let p = hypergeometric_pvalue(2, 10, 20, 100);
-        assert!((p - 1.0).abs() < 1e-10);
+        assert!((p - 1.0).abs() < tolerances::PYTHON_PARITY);
     }
 
     #[test]

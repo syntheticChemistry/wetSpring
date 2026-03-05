@@ -337,7 +337,9 @@ fn validate_taxonomy_int8(v: &mut Validator) {
     let params = taxonomy::ClassifyParams::default();
     for (i, seq) in test_seqs.iter().enumerate() {
         let f64_result = classifier.classify(seq, &params);
-        let int8_result_idx = classifier.classify_quantized(seq);
+        let int8_result_idx = classifier
+            .classify_quantized(seq)
+            .expect("trained classifier must classify");
 
         v.check(
             &format!("seq {i}: int8 argmax matches f64 taxon_idx"),
@@ -408,7 +410,9 @@ fn validate_taxonomy_multi_taxon(v: &mut Validator) {
             result.confidence.iter().any(|&c| c > 0.0),
         );
 
-        let q_idx = classifier.classify_quantized(seq);
+        let q_idx = classifier
+            .classify_quantized(seq)
+            .expect("trained classifier must classify");
         v.check(
             &format!("taxon {i}: int8 matches f64"),
             q_idx as f64,

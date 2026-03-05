@@ -359,7 +359,10 @@ fn find_new_centers_from_matrix(
             continue;
         }
         let center_idx = partition[i];
-        let center_slot = centers.iter().position(|&c| c == center_idx).unwrap_or(0);
+        let Some(center_slot) = centers.iter().position(|&c| c == center_idx) else {
+            new_centers.push(i);
+            continue;
+        };
         let log_p = scores[i * n_centers + center_slot];
         let lambda = (seqs[center_idx].abundance as f64) * log_p.exp();
 

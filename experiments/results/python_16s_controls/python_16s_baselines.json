@@ -1,7 +1,7 @@
 {
   "PRJNA488170_SRR7760408": {
     "name": "PRJNA488170 / SRR7760408 (Nannochloropsis outdoor 16S, Wageningen)",
-    "fastq": "/home/eastgate/Development/ecoPrimals/wetSpring/data/paper_proxy/nannochloropsis_16s/SRR7760408/SRR7760408_1.fastq.gz",
+    "fastq": "./data/paper_proxy/nannochloropsis_16s/SRR7760408/SRR7760408_1.fastq.gz",
     "reads_parsed": 50000,
     "mean_read_length_bp": 301.0,
     "reads_after_qc": 49650,
@@ -20,7 +20,7 @@
   },
   "PRJNA382322_SRR5452557": {
     "name": "PRJNA382322 / SRR5452557 (AlgaeParc 2013 bacterial community)",
-    "fastq": "/home/eastgate/Development/ecoPrimals/wetSpring/data/ncbi_bulk/PRJNA382322/SRR5452557/SRR5452557_1.fastq.gz",
+    "fastq": "./data/ncbi_bulk/PRJNA382322/SRR5452557/SRR5452557_1.fastq.gz",
     "reads_parsed": 50000,
     "mean_read_length_bp": 301.0,
     "reads_after_qc": 49192,
@@ -39,7 +39,7 @@
   },
   "PRJNA1114688_SRR29127204": {
     "name": "PRJNA1114688 / SRR29127204 (N. oculata + B. plicatilis)",
-    "fastq": "/home/eastgate/Development/ecoPrimals/wetSpring/data/public_benchmarks/PRJNA1114688/SRR29127204/SRR29127204_1.fastq.gz",
+    "fastq": "./data/public_benchmarks/PRJNA1114688/SRR29127204/SRR29127204_1.fastq.gz",
     "reads_parsed": 50000,
     "mean_read_length_bp": 301.0,
     "reads_after_qc": 45059,
@@ -58,7 +58,7 @@
   },
   "PRJNA1114688_SRR29127205": {
     "name": "PRJNA1114688 / SRR29127205 (N. oculata + B. plicatilis)",
-    "fastq": "/home/eastgate/Development/ecoPrimals/wetSpring/data/public_benchmarks/PRJNA1114688/SRR29127205/SRR29127205_1.fastq.gz",
+    "fastq": "./data/public_benchmarks/PRJNA1114688/SRR29127205/SRR29127205_1.fastq.gz",
     "reads_parsed": 50000,
     "mean_read_length_bp": 301.0,
     "reads_after_qc": 45402,

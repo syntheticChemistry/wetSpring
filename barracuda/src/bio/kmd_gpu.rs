@@ -95,6 +95,7 @@ pub fn pfas_kmd_screen_gpu(
 #[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
     #[test]
     fn kmd_gpu_matches_cpu_small() {
@@ -106,7 +107,7 @@ mod tests {
         let kmd0 = cpu[0].kmd;
         for r in &cpu[1..] {
             assert!(
-                (r.kmd - kmd0).abs() < 0.01,
+                (r.kmd - kmd0).abs() < tolerances::KMD_GROUPING,
                 "homologous KMDs should be equal: {kmd0} vs {}",
                 r.kmd
             );

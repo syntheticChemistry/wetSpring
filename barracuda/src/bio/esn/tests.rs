@@ -293,7 +293,7 @@ fn lcg_gaussian_mean_near_zero() {
     let sum: f64 = (0..n).map(|_| rng.next_gaussian()).sum();
     let mean = sum / n as f64;
     assert!(
-        mean.abs() < 0.1,
+        mean.abs() < crate::tolerances::ESN_GAUSSIAN_MEAN,
         "Gaussian mean should be near 0, got {mean}"
     );
 }
@@ -309,7 +309,7 @@ fn spectral_radius_scaling() {
     let esn = Esn::new(config);
     let max_abs = esn.w_res().iter().map(|x| x.abs()).fold(0.0_f64, f64::max);
     assert!(
-        (max_abs - 0.5).abs() < 0.01,
+        (max_abs - 0.5).abs() < crate::tolerances::ESN_SPECTRAL_RADIUS,
         "max |w_res| should ≈ 0.5, got {max_abs}"
     );
 }

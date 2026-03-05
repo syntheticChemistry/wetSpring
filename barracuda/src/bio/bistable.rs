@@ -255,8 +255,9 @@ pub fn bifurcation_scan(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
-    const DT: f64 = crate::tolerances::ODE_DEFAULT_DT;
+    const DT: f64 = tolerances::ODE_DEFAULT_DT;
     const SS_FRAC: f64 = 0.1;
 
     #[test]
@@ -269,11 +270,11 @@ mod tests {
         let n_ss = steady_state_mean(&r, 0, SS_FRAC);
         let b_ss = steady_state_mean(&r, 4, SS_FRAC);
         assert!(
-            (n_ss - 0.975).abs() < 1e-3,
+            (n_ss - 0.975).abs() < tolerances::ODE_METHOD_PARITY,
             "zero feedback N_ss should match Python: {n_ss}"
         );
         assert!(
-            (b_ss - 0.040).abs() < 0.005,
+            (b_ss - 0.040).abs() < tolerances::ODE_BISTABLE_LOW_B,
             "zero feedback B_ss should match Python: {b_ss}"
         );
     }
@@ -287,7 +288,7 @@ mod tests {
         let r = run_bistable(&[0.01, 0.0, 0.0, 2.0, 0.8], 48.0, DT, &p);
         let b_ss = steady_state_mean(&r, 4, SS_FRAC);
         assert!(
-            (b_ss - 0.831).abs() < 0.01,
+            (b_ss - 0.831).abs() < tolerances::ODE_STEADY_STATE,
             "strong feedback should match Python sessile: B_ss={b_ss}"
         );
     }

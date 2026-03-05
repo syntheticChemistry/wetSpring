@@ -71,11 +71,16 @@ impl HardwareInventory {
         }
     }
 
-    /// Auto-detect hardware from Linux sysfs / nvidia-smi.
+    /// Auto-detect hardware via capability-based discovery.
+    ///
+    /// On Linux, reads `/proc/cpuinfo` and `/proc/meminfo`. On other
+    /// platforms these procfs files are absent and discovery gracefully
+    /// falls back to "unknown" / 0 values. GPU detection runs
+    /// `nvidia-smi` which is platform-agnostic where installed.
     #[must_use]
     pub fn detect(gate_name: &str) -> Self {
-        let cpuinfo = std::fs::read_to_string("/proc/cpuinfo").unwrap_or_default();
-        let meminfo = std::fs::read_to_string("/proc/meminfo").unwrap_or_default();
+        let cpuinfo = try_read("/proc/cpuinfo");
+        let meminfo = try_read("/proc/meminfo");
         let nvidia_csv = query_nvidia_smi_csv();
         let os_kernel = read_stdout("uname", &["-r"]);
         Self::from_content(gate_name, &cpuinfo, &meminfo, &nvidia_csv, &os_kernel)
@@ -241,6 +246,10 @@ pub fn query_nvidia_smi_csv() -> String {
         Ok(out) if out.status.success() => String::from_utf8_lossy(&out.stdout).trim().to_string(),
         _ => String::new(),
     }
+}
+
+fn try_read(path: &str) -> String {
+    std::fs::read_to_string(path).unwrap_or_default()
 }
 
 fn read_stdout(cmd: &str, args: &[&str]) -> String {

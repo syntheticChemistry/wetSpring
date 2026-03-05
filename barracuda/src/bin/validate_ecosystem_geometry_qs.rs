@@ -1,10 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::print_stdout,
-    dead_code
-)]
+#![allow(clippy::expect_used, clippy::unwrap_used, clippy::print_stdout)]
 //! # Exp133: Cave, Hot Spring & Rhizosphere QS Geometry
 //!
 //! Models three understudied ecosystems with physically appropriate lattice

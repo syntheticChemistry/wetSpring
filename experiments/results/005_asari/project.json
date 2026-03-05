@@ -1,6 +1,6 @@
 {
   "project_name": "asari_project",
-  "outdir": "/home/eastgate/Development/ecoPrimals/wetSpring/data/exp005_asari/results_MT02_asari_project_21694811",
+  "outdir": "./data/exp005_asari/results_MT02_asari_project_21694811",
   "pickle": false,
   "database_mode": "memory",
   "multicores": 4,
@@ -41,7 +41,7 @@
   "intensity_multiplier": 1,
   "min_prominence_threshold": 33000,
   "time_stamp": "2:16:9:48:11",
-  "tmp_pickle_dir": "/home/eastgate/Development/ecoPrimals/wetSpring/data/exp005_asari/results_MT02_asari_project_21694811/pickle",
+  "tmp_pickle_dir": "./data/exp005_asari/results_MT02_asari_project_21694811/pickle",
   "number_of_samples": 8,
   "number_scans": 785,
   "dropped_samples": []

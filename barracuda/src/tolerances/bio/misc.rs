@@ -135,6 +135,14 @@ pub const NANOPORE_MEAN_READ_LENGTH_TOL: f64 = 10.0;
 /// Same order as [`ANALYTICAL_LOOSE`](crate::tolerances::ANALYTICAL_LOOSE).
 pub const BOUNDED_METRIC_GUARD: f64 = 1e-10;
 
+/// Near-zero cosine similarity threshold for orthogonal spectra.
+///
+/// Spectra with no overlapping m/z peaks yield cosine similarity ≈ 0.
+/// Used in pairwise spectral matching tests to assert orthogonal
+/// (non-overlapping) spectra have score below this threshold.
+/// Validated: `spectral_match` `pairwise_three_spectra`.
+pub const COSINE_ORTHOGONAL: f64 = 0.01;
+
 /// Jackknife vs bootstrap estimate parity.
 ///
 /// Jackknife and bootstrap are different resampling methods that converge

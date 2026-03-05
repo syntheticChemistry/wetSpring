@@ -106,6 +106,14 @@ pub const NORM_CDF_PARITY: f64 = 1e-3;
 /// Validated: Exp185 (soil biofilm aggregate).
 pub const NORM_CDF_TAIL: f64 = 1e-4;
 
+/// Normal PPF (percent point function) tolerance for known quantile values.
+///
+/// `norm_ppf(0.975)` ≈ 1.96 and `norm_ppf(0.025)` ≈ −1.96. Newton-Raphson
+/// inversion of the CDF polynomial yields ~0.01 absolute error for these
+/// standard quantiles.
+/// Validated: `special` `norm_ppf_known_quantiles`.
+pub const NORM_PPF_KNOWN: f64 = 0.01;
+
 // ═══════════════════════════════════════════════════════════════════
 // Jacobi eigendecomposition (PCoA)
 // ═══════════════════════════════════════════════════════════════════

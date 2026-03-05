@@ -5,8 +5,7 @@
     clippy::print_stdout,
     clippy::cast_precision_loss,
     clippy::too_many_lines,
-    clippy::items_after_statements,
-    dead_code
+    clippy::items_after_statements
 )]
 //! # Exp122: 2D Anderson Spatial QS Lattice
 //!

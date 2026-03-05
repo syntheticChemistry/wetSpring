@@ -1,10 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::print_stdout,
-    dead_code
-)]
+#![allow(clippy::expect_used, clippy::unwrap_used, clippy::print_stdout)]
 //! # Exp130: Thick Biofilm 3D QS Extension
 //!
 //! Compares QS-active windows between 2D slab and 3D block geometries to

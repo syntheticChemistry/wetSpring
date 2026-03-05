@@ -7,8 +7,7 @@
     clippy::cast_possible_truncation,
     clippy::too_many_lines,
     clippy::items_after_statements,
-    clippy::similar_names,
-    dead_code
+    clippy::similar_names
 )]
 //! # Exp286: `metalForge` Cross-Substrate — Gonzales Reproductions
 //!

@@ -258,7 +258,11 @@ fn validate_pipeline_parity(v: &mut Validator) {
         .collect();
     let int8_classifications: Vec<usize> = sequences
         .iter()
-        .map(|s| classifier.classify_quantized(s))
+        .map(|s| {
+            classifier
+                .classify_quantized(s)
+                .expect("trained classifier")
+        })
         .collect();
 
     for i in 0..4 {
@@ -426,7 +430,11 @@ fn validate_dispatch_fallback(v: &mut Validator) {
         let results: Vec<usize> = if tax_target == Substrate::Npu {
             sequences
                 .iter()
-                .map(|s| classifier.classify_quantized(s))
+                .map(|s| {
+                    classifier
+                        .classify_quantized(s)
+                        .expect("trained classifier")
+                })
                 .collect()
         } else {
             sequences

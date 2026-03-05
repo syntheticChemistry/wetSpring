@@ -267,6 +267,7 @@ fn filter_by_distance(mut peaks: Vec<Peak>, data: &[f64], distance: usize) -> Ve
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
     #[test]
     fn single_peak() {
@@ -364,7 +365,7 @@ mod tests {
         let peaks = find_peaks(&data, &PeakParams::default());
         assert_eq!(peaks.len(), 1);
         assert_eq!(peaks[0].index, 50);
-        assert!((peaks[0].height - 1.0).abs() < 1e-10);
+        assert!((peaks[0].height - 1.0).abs() < tolerances::PYTHON_PARITY);
         // FWHM of Gaussian = 2*sqrt(2*ln(2))*sigma ≈ 23.55
         // Width at half-prominence ≈ FWHM
         assert!(peaks[0].width > 20.0);

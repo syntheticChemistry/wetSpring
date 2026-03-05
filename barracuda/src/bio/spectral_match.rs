@@ -270,7 +270,7 @@ mod tests {
         let scores = pairwise_cosine(&spectra, 0.5);
         assert_eq!(scores.len(), 3); // 3*(3-1)/2
         assert!((scores[0] - 1.0).abs() < crate::tolerances::ANALYTICAL_LOOSE); // (1,0) identical
-        assert!(scores[1] < 0.01); // (2,0) no overlap
-        assert!(scores[2] < 0.01); // (2,1) no overlap
+        assert!(scores[1] < crate::tolerances::COSINE_ORTHOGONAL); // (2,0) no overlap
+        assert!(scores[2] < crate::tolerances::COSINE_ORTHOGONAL); // (2,1) no overlap
     }
 }

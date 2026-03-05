@@ -77,7 +77,7 @@ fn main() {
     v.check("norm_ppf(Φ(1.645)) round-trip", cdf_then_ppf, 1.645, 1e-4);
 
     // gradient_1d (numerical gradient) — barraCuda S54
-    let f_lin: Vec<f64> = (0..100).map(|i| 2.0 * i as f64 + 1.0).collect();
+    let f_lin: Vec<f64> = (0..100).map(|i| 2.0f64.mul_add(i as f64, 1.0)).collect();
     let grad = wetspring_barracuda::special::gradient_1d(&f_lin, 1.0);
     let grad_max_err = grad
         .iter()
@@ -287,7 +287,7 @@ fn main() {
 
     // numerical_hessian returns flat Vec<f64> of size n*n
     let hessian = barracuda::numerical::numerical_hessian(
-        &|x: &[f64]| x[0].powi(2) + x[1].powi(2),
+        &|x: &[f64]| x[0].mul_add(x[0], x[1].powi(2)),
         &[1.0, 1.0],
         1e-5,
     );
@@ -303,8 +303,8 @@ fn main() {
             let prey = y[0];
             let pred = y[1];
             vec![
-                1.0 * prey - 0.1 * prey * pred,
-                -1.5 * pred + 0.075 * prey * pred,
+                prey.mul_add(1.0, -(0.1 * prey * pred)),
+                (-1.5f64).mul_add(pred, 0.075 * prey * pred),
             ]
         },
         &[10.0, 5.0],
@@ -375,8 +375,8 @@ fn main() {
         let _ = rk45_integrate(
             |_t, y| {
                 vec![
-                    1.0 * y[0] - 0.1 * y[0] * y[1],
-                    -1.5 * y[1] + 0.075 * y[0] * y[1],
+                    y[0].mul_add(1.0, -(0.1 * y[0] * y[1])),
+                    (-1.5f64).mul_add(y[1], 0.075 * y[0] * y[1]),
                 ]
             },
             &[10.0, 5.0],

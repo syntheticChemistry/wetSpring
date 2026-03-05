@@ -463,3 +463,67 @@ fn determinism_fastq_parsing() {
     assert_eq!(stats1.q30_count, stats2.q30_count);
     assert_eq!(stats1.length_distribution, stats2.length_distribution);
 }
+
+// ── DomainResult + print_domain_summary ─────────────────────
+
+#[test]
+fn domain_result_without_spring() {
+    let domains = vec![
+        DomainResult {
+            name: "diversity",
+            spring: None,
+            ms: 10.5,
+            checks: 4,
+        },
+        DomainResult {
+            name: "phylogeny",
+            spring: None,
+            ms: 20.3,
+            checks: 6,
+        },
+    ];
+    print_domain_summary("test: no spring column", &domains);
+}
+
+#[test]
+fn domain_result_with_spring() {
+    let domains = vec![
+        DomainResult {
+            name: "diversity",
+            spring: Some("wetSpring"),
+            ms: 10.5,
+            checks: 4,
+        },
+        DomainResult {
+            name: "anderson",
+            spring: Some("hotSpring"),
+            ms: 5.0,
+            checks: 3,
+        },
+    ];
+    print_domain_summary("test: spring column", &domains);
+}
+
+#[test]
+fn domain_result_empty() {
+    print_domain_summary("test: empty", &[]);
+}
+
+#[test]
+fn domain_result_mixed_spring() {
+    let domains = vec![
+        DomainResult {
+            name: "local",
+            spring: None,
+            ms: 1.0,
+            checks: 1,
+        },
+        DomainResult {
+            name: "cross",
+            spring: Some("groundSpring"),
+            ms: 2.0,
+            checks: 2,
+        },
+    ];
+    print_domain_summary("test: mixed", &domains);
+}

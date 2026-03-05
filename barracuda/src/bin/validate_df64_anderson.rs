@@ -6,8 +6,7 @@
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
     clippy::cast_sign_loss,
-    clippy::too_many_lines,
-    dead_code
+    clippy::too_many_lines
 )]
 //! # Exp187: DF64 Anderson at L=24+ — Extended Precision Large Lattice
 //!
@@ -36,7 +35,9 @@
 use wetspring_barracuda::validation::Validator;
 
 const LATTICE_SIZES: &[usize] = &[6, 8, 10, 12, 14];
+#[cfg(feature = "gpu")]
 const N_REALIZATIONS: usize = 6;
+#[cfg(feature = "gpu")]
 const N_W_POINTS: usize = 11;
 const W_MIN: f64 = 12.0;
 const W_MAX: f64 = 22.0;

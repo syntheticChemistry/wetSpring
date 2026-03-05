@@ -3,6 +3,50 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V96 — Deep Debt Audit + Chuna Paper Queue (2026-03-05)
+
+### Changed
+- **`classify_quantized`** (`taxonomy/classifier.rs`): Return type evolved from
+  `usize` to `Option<usize>` — empty/unclassifiable inputs return `None` instead
+  of silent fallback to index 0. All 5 callers updated.
+- **`dada2_gpu.rs`**: `unwrap_or(0)` for `center_slot` replaced with `Option`
+  guard — defensively handles missing center index without silent corruption.
+- **`validate_emp_anderson_atlas.rs`**: Hardcoded IPC socket paths replaced with
+  `ipc::discover::discover_socket()` capability-based discovery.
+- **`bench/mod.rs`**: `peak_rss_mb()` gated behind `#[cfg(target_os = "linux")]`
+  with graceful fallback on non-Linux platforms.
+- **`bench/hardware.rs`**: `HardwareInventory::detect()` uses `try_read()` for
+  `/proc` paths — capability-based hardware discovery.
+- **`validate_cross_spring_s93.rs`**: `clippy::suboptimal_flops` fixed via
+  `mul_add` replacements.
+- **`validate_dispatch_overhead_proof.rs`** + **`validate_pure_gpu_streaming.rs`**
+  + **`validate_barrier_disruption_s79.rs`**: Deduplicated inline helpers,
+  consolidated to `validation::gpu_or_skip()` and `validation::DomainResult`.
+- **`Cargo.toml`**: `vault` feature gated (`dep:chacha20poly1305`,
+  `dep:ed25519-dalek`, `dep:blake3`). `gpu` feature forwards
+  `barracuda/domain-esn` (fixes `--all-features` doc/clippy builds).
+- **`lib.rs`**: `vault` module gated behind `#[cfg(feature = "vault")]`.
+- **`scripts/requirements.txt`**: Python baseline environment pinned
+  (numpy, scipy, pandas, scikit-learn, dendropy, pyteomics).
+- **`validation/mod.rs`**: Added `gpu_or_skip()`, `DomainResult`,
+  `print_domain_summary()` for standardized validation binary patterns.
+- **Named tolerances**: New constants in `tolerances/bio/` (ESN, ODE, misc).
+
+### Quality
+- **0 TODO/FIXME/HACK/todo!/unimplemented!** in 453 .rs files
+- **0 clippy warnings** (pedantic + nursery)
+- **0 cargo doc warnings** (273 files, domain-esn feature forwarding fixed)
+- **0 unsafe code** | **0 local WGSL** | **164 named tolerances**
+- All `classify_quantized` callers handle `Option` — no silent fallbacks
+
+### Paper Queue
+- **hotSpring**: Papers 43-45 added (Chuna — gradient flow, dielectric functions,
+  kinetic-fluid coupling). Pipeline status 22 → 25 papers.
+- **neuralSpring**: Paper 26 added (Chuna — T1D blood glucose LSTM prediction).
+
+### Handoffs
+- `WETSPRING_V96_DEEP_DEBT_CHUNA_HANDOFF_MAR05_2026.md`
+
 ## V95 — Cross-Spring Evolution Complete (2026-03-04)
 
 ### Added

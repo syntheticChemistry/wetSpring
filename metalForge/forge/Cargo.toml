@@ -85,7 +85,7 @@ path = "src/bin/validate_mixed_nucleus_v92g.rs"
 
 [dev-dependencies]
 temp-env = "0.3"
-flate2 = "1"
+flate2 = { version = "1", default-features = false, features = ["rust_backend"] }
 
 [lints.clippy]
 pedantic = { level = "warn", priority = -1 }

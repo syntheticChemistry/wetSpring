@@ -92,4 +92,5 @@ pub mod npu;
 pub mod special;
 pub mod tolerances;
 pub mod validation;
+#[cfg(feature = "vault")]
 pub mod vault;

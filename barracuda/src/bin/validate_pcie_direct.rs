@@ -115,7 +115,11 @@ fn validate_gpu_to_npu_path(v: &mut Validator) {
 
     let gpu_path_results: Vec<usize> = sequences
         .iter()
-        .map(|s| classifier.classify_quantized(s))
+        .map(|s| {
+            classifier
+                .classify_quantized(s)
+                .expect("trained classifier")
+        })
         .collect();
 
     let cpu_path_results: Vec<usize> = {
@@ -150,7 +154,11 @@ fn validate_npu_to_gpu_path(v: &mut Validator) {
 
     let npu_classifications: Vec<usize> = sequences
         .iter()
-        .map(|s| classifier.classify_quantized(s))
+        .map(|s| {
+            classifier
+                .classify_quantized(s)
+                .expect("trained classifier")
+        })
         .collect();
 
     let mut taxon_counts = vec![0.0_f64; refs.len()];
@@ -342,7 +350,11 @@ fn validate_transfer_parity(v: &mut Validator) {
         if path.destination == Substrate::Npu {
             let q_results: Vec<usize> = sequences
                 .iter()
-                .map(|s| classifier.classify_quantized(s))
+                .map(|s| {
+                    classifier
+                        .classify_quantized(s)
+                        .expect("trained classifier")
+                })
                 .collect();
             let matches = q_results == reference_classifications;
             v.check_pass(&format!("{path}: classification parity"), matches);

@@ -202,6 +202,7 @@ mod tests {
     use super::*;
     use crate::bio::eic::Eic;
     use crate::bio::signal::Peak;
+    use crate::tolerances;
 
     /// Sum of intensities: `sum([1, 2, 3]) = 6` (analytical).
     #[tokio::test]
@@ -219,7 +220,7 @@ mod tests {
         let totals = batch_eic_total_intensity_gpu(&gpu, &eics).unwrap();
         let expected = 6.0;
         assert!(
-            (totals[0] - expected).abs() < 1e-10,
+            (totals[0] - expected).abs() < tolerances::PYTHON_PARITY,
             "EIC sum: got {}, expected {}",
             totals[0],
             expected
@@ -253,7 +254,7 @@ mod tests {
         let areas = batch_integrate_peaks_gpu(&gpu, &[eic], &[vec![peak]]).unwrap();
         let expected = 2.0;
         assert!(
-            (areas[0][0] - expected).abs() < 1e-10,
+            (areas[0][0] - expected).abs() < tolerances::PYTHON_PARITY,
             "Peak area: got {}, expected {}",
             areas[0][0],
             expected

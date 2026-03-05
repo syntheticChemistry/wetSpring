@@ -313,7 +313,7 @@ mod tests {
                 let dy = result.coord(i, 1) - result.coord(j, 1);
                 let dist = dx.hypot(dy);
                 assert!(
-                    (dist - 1.0).abs() < 1e-8,
+                    (dist - 1.0).abs() < tolerances::LIMIT_CONVERGENCE,
                     "pair ({i},{j}): expected dist 1.0, got {dist}"
                 );
             }

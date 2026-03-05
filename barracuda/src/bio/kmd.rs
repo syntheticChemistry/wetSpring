@@ -153,6 +153,7 @@ pub fn pfas_kmd_screen(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
     #[test]
     fn cf2_kmd_homologues() {
@@ -166,7 +167,10 @@ mod tests {
 
         // KMDs should be very similar for homologues
         let kmd_spread = (results[0].kmd - results[1].kmd).abs();
-        assert!(kmd_spread < 0.01, "KMD spread {kmd_spread} too large");
+        assert!(
+            kmd_spread < tolerances::KMD_GROUPING,
+            "KMD spread {kmd_spread} too large"
+        );
     }
 
     #[test]
@@ -177,7 +181,7 @@ mod tests {
             113.5, 163.5, 213.5, // series B — different KMD
         ];
         let results = kendrick_mass_defect(&masses, units::CF2_EXACT, units::CF2_NOMINAL);
-        let groups = group_homologues(&results, 0.01);
+        let groups = group_homologues(&results, tolerances::KMD_GROUPING);
 
         // Should have at least 2 distinct groups
         assert!(
@@ -201,7 +205,10 @@ mod tests {
         let masses = vec![100.0, 114.016, 128.031];
         let results = kendrick_mass_defect(&masses, units::CH2_EXACT, units::CH2_NOMINAL);
         let kmd_spread = (results[0].kmd - results[1].kmd).abs();
-        assert!(kmd_spread < 0.01, "CH2 KMD spread {kmd_spread}");
+        assert!(
+            kmd_spread < tolerances::KMD_GROUPING,
+            "CH2 KMD spread {kmd_spread}"
+        );
     }
 
     #[test]

@@ -9,8 +9,7 @@
     clippy::cast_sign_loss,
     clippy::similar_names,
     clippy::items_after_statements,
-    clippy::float_cmp,
-    unused_assignments
+    clippy::float_cmp
 )]
 //! # Exp244: `ToadStool` Compute Dispatch v2 — Extended Overhead Proof
 //!

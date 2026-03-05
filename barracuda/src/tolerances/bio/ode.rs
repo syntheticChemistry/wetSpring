@@ -18,6 +18,13 @@ pub const ODE_CDG_CONVERGENCE: f64 = 1e-12;
 /// Commit `48fb787`.
 pub const ODE_STEADY_STATE: f64 = 0.01;
 
+/// ODE total density at carrying capacity (Bruger 2018 cooperation).
+///
+/// Steady-state sum Nc + Nd should approach `K_cap`. RK4 accumulation over
+/// long integration allows ~0.1 drift from the theoretical equilibrium.
+/// Validated: `cooperation` `total_density_reaches_capacity`.
+pub const ODE_TOTAL_DENSITY_CAPACITY: f64 = 0.1;
+
 /// ODE method parity: RK4 vs LSODA integrator differences.
 ///
 /// Fixed-step RK4 diverges from adaptive LSODA by up to ~1e-3 in

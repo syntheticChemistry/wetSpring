@@ -190,6 +190,7 @@ fn require_f64(gpu: &GpuF64) -> Result<()> {
 #[allow(clippy::expect_used, clippy::unwrap_used, clippy::cast_precision_loss)]
 mod tests {
     use super::*;
+    use crate::tolerances;
     use crate::tolerances::GPU_VS_CPU_TRANSCENDENTAL;
 
     type ScalarGpuFn = fn(&GpuF64, &[f64]) -> Result<f64>;
@@ -247,7 +248,7 @@ mod tests {
         let result = simpson_gpu(&gpu, &counts).unwrap();
         let expected = (n - 1) as f64 / n as f64;
         assert!(
-            (result - expected).abs() < 1e-10,
+            (result - expected).abs() < tolerances::PYTHON_PARITY,
             "Simpson uniform: got {result}, expected {expected}"
         );
     }

@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** March 2, 2026
+**Updated:** March 5, 2026 (Phase 96)
 
 ---
 

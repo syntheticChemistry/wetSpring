@@ -119,7 +119,10 @@ mod tests {
     fn pack_unpack_roundtrip_high_precision() {
         let v = std::f64::consts::PI;
         let err = roundtrip_error(v);
-        assert!(err < 1e-14, "roundtrip error {err} exceeds DF64 precision");
+        assert!(
+            err < tolerances::PYTHON_PARITY_TIGHT,
+            "roundtrip error {err} exceeds DF64 precision"
+        );
     }
 
     #[test]
@@ -152,7 +155,10 @@ mod tests {
     fn pack_unpack_negative() {
         let v = -std::f64::consts::E;
         let err = roundtrip_error(v);
-        assert!(err < 1e-14, "negative roundtrip error {err}");
+        assert!(
+            err < tolerances::PYTHON_PARITY_TIGHT,
+            "negative roundtrip error {err}"
+        );
     }
 
     #[test]
@@ -164,7 +170,10 @@ mod tests {
         assert_eq!(unpacked.len(), 5);
         for (orig, restored) in data.iter().zip(&unpacked) {
             let err = (orig - restored).abs();
-            assert!(err < 1e-14, "slice roundtrip error {err} for {orig}");
+            assert!(
+                err < tolerances::PYTHON_PARITY_TIGHT,
+                "slice roundtrip error {err} for {orig}"
+            );
         }
     }
 

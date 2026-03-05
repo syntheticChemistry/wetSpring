@@ -172,10 +172,20 @@ pub fn parse_peak_rss_mb(status_content: &str) -> f64 {
 }
 
 /// Read peak resident set size (`VmHWM`) in MB from the live system.
+///
+/// Uses `/proc/self/status` on Linux. Returns `0.0` on non-Linux platforms
+/// where this procfs file is unavailable, rather than panicking.
 #[must_use]
 pub fn peak_rss_mb() -> f64 {
-    let status = std::fs::read_to_string("/proc/self/status").unwrap_or_default();
-    parse_peak_rss_mb(&status)
+    #[cfg(target_os = "linux")]
+    {
+        let status = std::fs::read_to_string("/proc/self/status").unwrap_or_default();
+        parse_peak_rss_mb(&status)
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        0.0
+    }
 }
 
 // ═══════════════════════════════════════════════════════════════════

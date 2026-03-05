@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
-**Last Updated**: March 3, 2026
-**Status**: Phase 95 — 8,300+ checks, ALL PASS (1,044 lib tests, 281 experiments, 268 binaries, standalone barraCuda v0.3.1, 150+ primitives (264 ComputeDispatch ops), 0 local WGSL, 164 named tolerances, clippy pedantic CLEAN `--all-features`, 52 papers + 6 reproduced, full three-tier on all 39 eligible papers, 54 metalForge workloads). Phase 95: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147)
+**Last Updated**: March 5, 2026
+**Status**: Phase 96 — 8,300+ checks, ALL PASS (1,261 lib+forge tests, 281 experiments, 285 binaries, standalone barraCuda v0.3.1, 150+ primitives (264 ComputeDispatch ops), 0 local WGSL, 164 named tolerances, 0 TODO/FIXME/HACK, 0 silent fallbacks, clippy pedantic CLEAN `--all-features`, 52 papers + 6 reproduced, full three-tier on all 39 eligible papers, 54 metalForge workloads). V96: deep debt audit (classify_quantized Option, dada2 guard, capability-based IPC, platform-agnostic benchmarks, vault feature-gated). Chuna papers queued to hotSpring (43-45) and neuralSpring (26)
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

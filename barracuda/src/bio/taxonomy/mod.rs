@@ -42,6 +42,7 @@ pub use types::{Classification, ClassifyParams, Lineage, NpuWeights, ReferenceSe
 #[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
     fn make_ref(id: &str, seq: &[u8], tax: &str) -> ReferenceSeq {
         ReferenceSeq {
@@ -208,14 +209,18 @@ mod tests {
         let classifier = NaiveBayesClassifier::train(&refs, 4);
 
         let full_result = classifier.classify(b"AAAAAAAAACCCCCCCCC", &ClassifyParams::default());
-        let quant_idx = classifier.classify_quantized(b"AAAAAAAAACCCCCCCCC");
+        let quant_idx = classifier
+            .classify_quantized(b"AAAAAAAAACCCCCCCCC")
+            .expect("non-empty classifier must produce a result");
         assert_eq!(
             full_result.taxon_idx, quant_idx,
             "int8 argmax must match f64 for Firmicutes query"
         );
 
         let full_result2 = classifier.classify(b"GGGGGGGGGTTTTTTTTTT", &ClassifyParams::default());
-        let quant_idx2 = classifier.classify_quantized(b"GGGGGGGGGTTTTTTTTTT");
+        let quant_idx2 = classifier
+            .classify_quantized(b"GGGGGGGGGTTTTTTTTTT")
+            .expect("non-empty classifier must produce a result");
         assert_eq!(
             full_result2.taxon_idx, quant_idx2,
             "int8 argmax must match f64 for Proteobacteria query"
@@ -239,7 +244,10 @@ mod tests {
         let priors = classifier.taxon_priors();
         assert_eq!(priors.len(), 2);
         let total: f64 = priors.iter().sum();
-        assert!((total - 1.0).abs() < 1e-10, "priors must sum to 1.0");
+        assert!(
+            (total - 1.0).abs() < tolerances::PYTHON_PARITY,
+            "priors must sum to 1.0"
+        );
         let max_prior = priors.iter().copied().fold(f64::NEG_INFINITY, f64::max);
         assert!(max_prior > 0.5, "majority taxon should have prior > 0.5");
 
@@ -259,7 +267,7 @@ mod tests {
         assert_eq!(npu.n_taxa, 0);
 
         let idx = classifier.classify_quantized(b"ACGT");
-        assert_eq!(idx, 0);
+        assert_eq!(idx, None);
     }
 
     #[test]

@@ -173,6 +173,7 @@ pub fn screen_pfas_fragments(
 #[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
     #[test]
     fn test_find_within_ppm() {
@@ -198,9 +199,9 @@ mod tests {
     #[test]
     fn test_pfas_fragments() {
         let frags = PfasFragments::default();
-        assert!((frags.cf2 - 49.99681).abs() < 1e-6);
-        assert!((frags.c2f4 - 99.99361).abs() < 1e-6);
-        assert!((frags.hf - 20.00623).abs() < 1e-6);
+        assert!((frags.cf2 - 49.99681).abs() < tolerances::MZ_SEARCH_EXACT);
+        assert!((frags.c2f4 - 99.99361).abs() < tolerances::MZ_SEARCH_EXACT);
+        assert!((frags.hf - 20.00623).abs() < tolerances::MZ_SEARCH_EXACT);
     }
 
     #[test]

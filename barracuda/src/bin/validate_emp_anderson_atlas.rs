@@ -347,14 +347,7 @@ fn main() {
 }
 
 fn check_nucleus_available() -> bool {
-    let xdg = std::env::var("XDG_RUNTIME_DIR").ok();
-    if let Some(xdg_dir) = xdg {
-        let biomeos_sock = std::path::PathBuf::from(&xdg_dir).join("biomeos/biomeos-default.sock");
-        let wetspring_sock =
-            std::path::PathBuf::from(&xdg_dir).join("biomeos/wetspring-default.sock");
-        if biomeos_sock.exists() || wetspring_sock.exists() {
-            return true;
-        }
-    }
-    false
+    wetspring_barracuda::ipc::discover::discover_socket("BIOMEOS_SOCKET", "biomeos").is_some()
+        || wetspring_barracuda::ipc::discover::discover_socket("WETSPRING_SOCKET", "wetspring")
+            .is_some()
 }

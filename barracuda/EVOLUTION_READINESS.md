@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 4, 2026 (Phase 95 — Cross-Spring Evolution Complete)
+**Date:** March 5, 2026 (Phase 96 — Deep Debt Audit + Chuna Paper Queue)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 45 GPU modules + 1 IPC + 1 vault module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.1, always-on, zero fallback code, 264 ComputeDispatch ops), 1,061 lib tests + 200 forge tests, 281 experiments (Exp305 added), 8,300+ checks (59 new in Exp305), standalone barraCuda v0.3.1, 164 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math, 94.69% line coverage. **Phase 95:** Full cross-spring evolution rewire — `BatchToleranceSearchF64`, `KmdGroupingF64`, `JackknifeMeanGpu`, `BootstrapMeanGpu`, `KimuraGpu`, `HargreavesBatchGpu` GPU ops wired; `rk45_solve` adaptive ODE + `gradient_1d` numerical delegations added; Exp305 cross-spring validation binary (59/59 checks, full provenance documentation).
+**Status:** 47 CPU + 45 GPU modules + 1 IPC + 1 vault module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.1, always-on, zero fallback code, 264 ComputeDispatch ops), 1,061 lib tests + 200 forge tests, 281 experiments, 8,300+ checks, standalone barraCuda v0.3.1, 164 named tolerance constants, 0 ad-hoc magic numbers, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math, 94.69% line coverage, **0 TODO/FIXME/HACK** in 453 source files, **0 silent fallbacks** in library code. **Phase 96:** Deep debt audit — `classify_quantized` evolved to `Option<usize>`, `dada2_gpu` center_slot guarded, IPC socket paths evolved to capability-based discovery, benchmarks made platform-agnostic, `vault` feature-gated, Python baselines pinned. Chuna papers queued to hotSpring (43-45: gradient flow, dielectric, kinetic-fluid) and neuralSpring (26: T1D LSTM).
 
 ### Full Lean Phase
 

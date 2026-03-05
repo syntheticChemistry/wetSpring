@@ -7,8 +7,7 @@
     clippy::cast_precision_loss,
     clippy::cast_possible_wrap,
     clippy::too_many_lines,
-    clippy::collection_is_never_read,
-    dead_code
+    clippy::collection_is_never_read
 )]
 //! # Exp131: Finite-Size Scaling for 3D Anderson QS
 //!

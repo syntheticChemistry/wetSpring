@@ -55,7 +55,7 @@ use barracuda::spectral::{
 };
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{self, DomainResult, Validator};
 
 fn ensemble_r_2d(lx: usize, ly: usize, w: f64, seeds: &[u64]) -> f64 {
     let n = lx * ly;
@@ -79,12 +79,6 @@ fn ensemble_r_3d(lx: usize, ly: usize, lz: usize, w: f64, seeds: &[u64]) -> f64 
         sum += level_spacing_ratio(&eigs);
     }
     sum / seeds.len() as f64
-}
-
-struct DomainResult {
-    name: &'static str,
-    ms: f64,
-    checks: u32,
 }
 
 fn main() {
@@ -162,6 +156,7 @@ fn main() {
         let ms = t0.elapsed().as_secs_f64() * 1000.0;
         domains.push(DomainResult {
             name: "Depth scan",
+            spring: None,
             ms,
             checks: 3,
         });
@@ -227,6 +222,7 @@ fn main() {
         let ms = t0.elapsed().as_secs_f64() * 1000.0;
         domains.push(DomainResult {
             name: "Phase diagram",
+            spring: None,
             ms,
             checks: 2,
         });
@@ -281,6 +277,7 @@ fn main() {
         let ms = t0.elapsed().as_secs_f64() * 1000.0;
         domains.push(DomainResult {
             name: "P06↔P12 duality",
+            spring: None,
             ms,
             checks: 3,
         });
@@ -419,6 +416,7 @@ fn main() {
         let ms = t0.elapsed().as_secs_f64() * 1000.0;
         domains.push(DomainResult {
             name: "AD disease cycle",
+            spring: None,
             ms,
             checks: 4,
         });
@@ -533,29 +531,17 @@ fn main() {
         let ms = t0.elapsed().as_secs_f64() * 1000.0;
         domains.push(DomainResult {
             name: "Fajgenbaum score",
+            spring: None,
             ms,
             checks: 3,
         });
     }
 
     // ── Summary ─────────────────────────────────────────────────────────
-    println!("╔════════════════════════════════════════════════════════════════════╗");
-    println!("║  Exp274: Barrier Disruption — Dimensional Promotion Threshold     ║");
-    println!("╠════════════════════════════════════════════════════════════════════╣");
-    println!("║ Domain                 │    Time │   ✓ ║");
-    println!("╠════════════════════════════════════════════════════════════════════╣");
-
-    let mut total_checks = 0_u32;
-    let mut total_ms = 0.0_f64;
-    for d in &domains {
-        let (name, ms, checks) = (&d.name, d.ms, d.checks);
-        println!("║ {name:<22} │ {ms:>6.1}ms │ {checks:>3} ║");
-        total_checks += d.checks;
-        total_ms += d.ms;
-    }
-    println!("╠════════════════════════════════════════════════════════════════════╣");
-    println!("║ TOTAL                  │ {total_ms:>6.1}ms │ {total_checks:>3} ║");
-    println!("╚════════════════════════════════════════════════════════════════════╝");
+    validation::print_domain_summary(
+        "Exp274: Barrier Disruption — Dimensional Promotion Threshold",
+        &domains,
+    );
 
     println!("\n  Paper 06 ↔ Paper 12 Duality:");
     println!("  Tillage COLLAPSE (3D→2D) = QS fails = ecosystem damage");

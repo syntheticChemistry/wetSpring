@@ -15,3 +15,19 @@ pub const ESN_REGULARIZATION: f64 = 1e-6;
 /// tighter fitting when reservoir size and connectivity allow.
 /// Validated: Exp194 (NPU Live — Exp118, Exp119).
 pub const ESN_REGULARIZATION_TIGHT: f64 = 1e-5;
+
+/// ESN Gaussian output mean tolerance (Box-Muller / LCG tests).
+///
+/// Sample mean of 10,000 Gaussian draws from the LCG-based generator
+/// should be near zero. 0.1 covers finite-sample sampling error
+/// (σ/√n ≈ 0.01 for n=10k) with margin for LCG bias.
+/// Validated: `esn/tests` `lcg_gaussian_mean_near_zero`.
+pub const ESN_GAUSSIAN_MEAN: f64 = 0.1;
+
+/// ESN spectral radius scaling tolerance.
+///
+/// Max `|w_res|` after scaling should equal the configured spectral radius.
+/// 0.01 covers rounding in the scaling chain (eigendecomposition,
+/// rescaling by `ρ/λ_max`).
+/// Validated: `esn/tests` `spectral_radius_scaling`.
+pub const ESN_SPECTRAL_RADIUS: f64 = 0.01;

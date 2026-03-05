@@ -139,15 +139,20 @@ pub fn hargreaves_et0_gpu(
 mod tests {
     use super::*;
 
+    type JkFn = fn(&GpuF64, &[f64]) -> Result<(f64, f64, f64)>;
+    type BootFn = fn(&GpuF64, &[f64], u32, u32) -> Result<Vec<f64>>;
+    type TriVecFn = fn(&GpuF64, &[f64], &[f64], &[f64]) -> Result<Vec<f64>>;
+
     #[test]
     fn api_surface_compiles() {
-        fn _jk(_: fn(&GpuF64, &[f64]) -> Result<(f64, f64, f64)>) {}
-        fn _boot(_: fn(&GpuF64, &[f64], u32, u32) -> Result<Vec<f64>>) {}
-        fn _kim(_: fn(&GpuF64, &[f64], &[f64], &[f64]) -> Result<Vec<f64>>) {}
-        fn _hg(_: fn(&GpuF64, &[f64], &[f64], &[f64]) -> Result<Vec<f64>>) {}
-        _jk(jackknife_mean_gpu);
-        _boot(bootstrap_means_gpu);
-        _kim(kimura_fixation_gpu);
-        _hg(hargreaves_et0_gpu);
+        let jk: JkFn = jackknife_mean_gpu;
+        let boot: BootFn = bootstrap_means_gpu;
+        let kim: TriVecFn = kimura_fixation_gpu;
+        let hg: TriVecFn = hargreaves_et0_gpu;
+        // Force the compiler to see these as used.
+        assert!(std::mem::size_of_val(&jk) > 0);
+        assert!(std::mem::size_of_val(&boot) > 0);
+        assert!(std::mem::size_of_val(&kim) > 0);
+        assert!(std::mem::size_of_val(&hg) > 0);
     }
 }

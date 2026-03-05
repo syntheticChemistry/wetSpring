@@ -4,10 +4,10 @@
 against Rust implementations and GPU shaders via `barraCuda` (standalone math
 primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 
-**Date:** March 4, 2026
+**Date:** March 5, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** Phase 95 — 1,061 lib tests + 200 forge tests, 281 experiments (Exp305 cross-spring validation), 8,300+ validation checks, 285 binaries, standalone `barraCuda` v0.3.1 (767+ f64-canonical WGSL shaders), 150+ primitives consumed (6 new GPU ops + 2 CPU delegations in V95), zero local WGSL, zero unsafe code, 164 named tolerances, 94.69% line coverage, `cargo clippy -W clippy::pedantic -W clippy::nursery` **ZERO WARNINGS**. XDG-compliant data paths. Configurable NCBI endpoints. All hardcoded tolerances centralized. Zero `unreachable!()` in library code. All `clone()` calls audited. All external deps pure Rust.
+**Status:** Phase 96 — 1,061 lib tests + 200 forge tests, 281 experiments, 8,300+ validation checks, 285 binaries, standalone `barraCuda` v0.3.1 (767+ f64-canonical WGSL shaders), 150+ primitives consumed, zero local WGSL, zero unsafe code, 164 named tolerances, 94.69% line coverage, `cargo clippy -W clippy::pedantic -W clippy::nursery` **ZERO WARNINGS**. Zero TODO/FIXME/HACK in 453 source files. `classify_quantized` evolved to `Option<usize>` (no silent fallbacks). Capability-based IPC discovery. Platform-agnostic benchmarks. `vault` feature-gated. Python baseline environment pinned. Chuna papers queued to hotSpring (43-45) and neuralSpring (26).
 
 ---
 
