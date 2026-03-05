@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: March 3, 2026 (Phase 95 — 1,044 lib tests, standalone barraCuda v0.3.1, 150+ primitives (264 ComputeDispatch ops), clippy pedantic CLEAN, 281 experiments, 52 papers complete + 6 reproduced, all 39 three-tier eligible papers validated at CPU + GPU + metalForge. Phase 95: CPU↔GPU full domain (Exp301, 48/48), NUCLEUS+PCIe+biomeOS (Exp302, 113/113), mixed NUCLEUS orchestration (Exp303, 147/147))
+**Last Updated**: March 5, 2026 (Phase 97 — 1,047 lib tests, barraCuda v0.3.3, wgpu 28, Fp64Strategy precision dispatch, 150+ primitives (264 ComputeDispatch ops + fused Welford/Pearson), clippy pedantic CLEAN, 286 experiments, 52 papers complete + 6 reproduced, all 39 three-tier eligible papers validated at CPU + GPU + metalForge. V97c: fused ops chain Exp306-310, GPU v12 with Hybrid-aware graceful degradation)
 **Purpose**: Track papers for reproduction/review across five tracks
 
 ---
@@ -310,6 +310,11 @@ No proprietary data dependencies.
 | **GPU v9 Portability** | 5-track GPU dispatch + Anderson W-map | Exp293 | 35 |
 | **Pure GPU Streaming v9** | End-to-end pipeline: diversity→BC→NMF→Anderson→stats | Exp294 | 16 |
 | **metalForge v14 Paper Chain** | Cross-system paper math (GPU→CPU transitions) | Exp295 | 28 |
+| **V97 CPU v23 Fused Parity** | Welford/Pearson/Cov decomposition + cross-paper | Exp306 | 38 |
+| **V97 Python vs Rust v4** | 8 fused ops domains, bit-identical to NumPy/SciPy | Exp307 | 13 |
+| **V97 GPU v12 Portability** | Fused ops GPU (Hybrid-aware + diversity composition) | Exp308 | 21 |
+| **V97 Pure GPU Streaming v10** | Diversity→Welford→Pearson→Cov→NMF pipeline | Exp309 | 18 |
+| **V97 metalForge v15** | Cross-system fused ops + determinism + cross-spring | Exp310 | 21 |
 
 ### Phase 37 — Anderson-QS Extension Papers
 
@@ -387,7 +392,7 @@ Open Data (NCBI SRA, Zenodo, EPA, journal tables, published equations)
       → metalForge:  Mixed-hardware routing produces identical results (CPU ↔ GPU ↔ NPU)
 ```
 
-**Verification**: 58 papers, 8,300+ checks (incl. Exp291-295: 164 new), 1,044 lib tests. Zero proprietary data dependencies.
+**Verification**: 58 papers, 8,400+ checks (incl. Exp306-310: 111 new V97c), 1,047 lib tests. Zero proprietary data dependencies.
 All Python baselines have reproduction headers (script, commit, date, hardware, SHA-256).
 All Rust validators have provenance classification headers.
 All 103 tolerance constants are scientifically justified and hierarchy-tested.

@@ -3,6 +3,40 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V97c — Fused Ops Experiment Buildout + Full Chain Validation (2026-03-05)
+
+### Added
+- **Exp306: `validate_barracuda_cpu_v23`** — V97 fused ops CPU parity. 6 domains (D41-D46):
+  Welford mean+variance decomposition, 5-accumulator Pearson, covariance decomposition,
+  cross-paper variance (soil QS/diversity/pharma/Anderson), Spearman rank correlation,
+  and correlation matrix + covariance matrix. 38/38 checks.
+- **Exp307: `benchmark_python_vs_rust_v4`** — V97 Python parity benchmark. 8 fused ops
+  domains (§16-§23): sample variance, covariance, Pearson, Spearman, CorrMatrix,
+  Jackknife, CovMatrix, Shannon+Var composition. Bit-identical to NumPy/SciPy.
+  13/13 checks, 18.7 ms total.
+- **Exp308: `validate_barracuda_gpu_v12`** — V97 fused ops GPU portability. Hybrid-aware
+  graceful degradation: `FusedMapReduceF64` path (Shannon/Simpson) validated on consumer
+  GPU (RTX 4070, Fp64Strategy::Hybrid). Standalone fused ops (VarianceF64/CorrelationF64)
+  require native f64 — tracked as upstream gap for toadStool. GPU→CPU composition chain
+  (diversity → variance → Pearson → jackknife) proven. 21/21 checks.
+- **Exp309: `validate_pure_gpu_streaming_v10`** — V97 fused streaming pipeline. 5-stage
+  chain: diversity → Welford → Pearson → covariance → NMF. All stages chainable on GPU
+  buffer via toadStool unidirectional streaming. 18/18 checks.
+- **Exp310: `validate_metalforge_v15`** — V97 cross-system fused ops. CPU reference →
+  determinism → mixed pipeline (soil/pharma/Anderson) → cross-spring evolution proof
+  (hotSpring precision, wetSpring bio, neuralSpring NMF, groundSpring validation).
+  21/21 checks.
+
+### Changed
+- **`PAPER_REVIEW_QUEUE.md`** updated to Phase 97 — 286 experiments, 8,400+ checks
+- **`Cargo.toml`** — added `[[bin]]` entries for Exp306-310 with proper `required-features`
+
+### Validated
+- **42/43 CPU validators PASS** (1 skipped: spectral_cross_spring feature-gated)
+- **GPU v12**: 21/21 on RTX 4070 (Hybrid, DF64 emulation)
+- **1,047 lib tests**: 0 failures
+- **Clippy pedantic**: CLEAN on all new files
+
 ## V97b — Fused Ops + Cross-Spring Evolution Validation (2026-03-05)
 
 ### Added

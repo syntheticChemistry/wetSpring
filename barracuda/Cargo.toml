@@ -1571,3 +1571,29 @@ required-features = ["gpu"]
 [[bin]]
 name = "validate_cross_spring_s93"
 path = "src/bin/validate_cross_spring_s93.rs"
+
+# ── Exp306: V97 Fused Ops CPU Parity ──
+[[bin]]
+name = "validate_barracuda_cpu_v23"
+path = "src/bin/validate_barracuda_cpu_v23.rs"
+
+# ── Exp307: V97 Python vs Rust Fused Ops Benchmark ──
+[[bin]]
+name = "benchmark_python_vs_rust_v4"
+path = "src/bin/benchmark_python_vs_rust_v4.rs"
+
+# ── Exp308: V97 Fused Ops GPU Portability ──
+[[bin]]
+name = "validate_barracuda_gpu_v12"
+path = "src/bin/validate_barracuda_gpu_v12.rs"
+required-features = ["gpu"]
+
+# ── Exp309: V97 Pure GPU Streaming Pipeline ──
+[[bin]]
+name = "validate_pure_gpu_streaming_v10"
+path = "src/bin/validate_pure_gpu_streaming_v10.rs"
+
+# ── Exp310: V97 metalForge Cross-System Fused Ops ──
+[[bin]]
+name = "validate_metalforge_v15"
+path = "src/bin/validate_metalforge_v15.rs"

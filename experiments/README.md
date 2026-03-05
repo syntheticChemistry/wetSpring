@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-05 (Phase 97: 281 experiments, 285 binaries, 8,300+ checks, standalone `barraCuda` v0.3.3 (wgpu 28, 694+ WGSL shaders, Fp64Strategy), 150+ primitives consumed, 1,247 lib+forge tests, 164 named tolerances, zero TODO/FIXME/HACK, clippy pedantic + nursery ZERO WARNINGS, `cargo doc` ZERO WARNINGS)
+**Updated**: 2026-03-05 (Phase 97c: 286 experiments, 290 binaries, 8,400+ checks, standalone `barraCuda` v0.3.3 (wgpu 28, 694+ WGSL shaders, Fp64Strategy), 150+ primitives consumed + fused Welford/Pearson, 1,047 lib tests, 164 named tolerances, zero TODO/FIXME/HACK, clippy pedantic CLEAN)
 
 ---
 
@@ -397,14 +397,24 @@ thresholds from `src/tolerances.rs`.
 | `validate_cross_spring_modern_s86` | 297 | 46 | `cargo run --release --features gpu --bin validate_cross_spring_modern_s86` |
 | `validate_cross_spring_evolution_s87` | 304 | 61 | `cargo run --release --features gpu --bin validate_cross_spring_evolution_s87` |
 
-**Total validation checks**: 8,300+
-**Rust tests**: 1,044 (library)
-**Binaries**: 268 total
-**barraCuda primitives**: 144 consumed (standalone v0.3.1, zero fallback code)
+**Total validation checks**: 8,400+
+**Rust tests**: 1,047 (library)
+**Binaries**: 290 total (250 validate + 20 benchmark + 20 other)
+**barraCuda primitives**: 150+ consumed (standalone v0.3.3, wgpu 28, Fp64Strategy, fused ops)
 **Papers**: 52 (25 Tracks 1-2 + 5 Track 3 + 9 Track 4 + 1 cross-spring + 9 extensions + 3 reference)
 **Local WGSL shaders**: 0 (all absorbed)
 **GPU modules**: 42 total (all lean on upstream primitives)
 **Benchmark infrastructure**: `bench.rs` harness with RAPL + nvidia-smi energy profiling, JSON output
+
+### V97c — Fused Ops Chain (Exp306-310)
+
+| Exp | Name | Chain | Checks |
+|-----|------|-------|:------:|
+| 306 | CPU v23 — Fused Ops Decomposition Parity | Paper → **CPU** | 38 |
+| 307 | Python vs Rust v4 — Fused Ops Benchmark | CPU → **Python parity** | 13 |
+| 308 | GPU v12 — Fused Ops GPU Portability | CPU → **GPU** | 21 |
+| 309 | Pure GPU Streaming v10 — Fused Pipeline | GPU → **Streaming** | 18 |
+| 310 | metalForge v15 — Cross-System Fused Ops | Streaming → **metalForge** | 21 |
 
 ---
 

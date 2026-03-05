@@ -1,8 +1,8 @@
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** March 4, 2026
+**Date:** March 5, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 95 — 281 experiments, 8,300+ validation checks, ALL PASS; 1,261 lib+forge tests, 285 binaries, standalone `barraCuda` v0.3.1 (767+ WGSL shaders), 150+ primitives consumed (V95: 6 new GPU ops + 2 CPU delegations), 94.69% line coverage, 0 local WGSL, 164 named tolerances, 0 unsafe code, 0 panics in library, 0 `unreachable!()` in library, clippy pedantic + nursery ZERO WARNINGS, `cargo doc` ZERO WARNINGS, all external deps pure Rust. 52 + 6 papers reproduced with full three-tier + paper-math chain
+**Status:** Phase 97c — 286 experiments, 8,400+ validation checks, ALL PASS; 1,047 lib tests + 200 forge tests, 290 binaries, standalone `barraCuda` v0.3.3 (wgpu 28, 694+ WGSL shaders, Fp64Strategy precision dispatch), 150+ primitives consumed + fused Welford/Pearson, 0 local WGSL, 164 named tolerances, 0 unsafe code, clippy pedantic ZERO WARNINGS. V97c: full fused ops chain (Exp306-310, 111 new checks), GPU Hybrid-aware graceful degradation. 52 + 6 papers reproduced with full three-tier + paper-math chain
 
 ---
 
@@ -44,7 +44,8 @@ All code is AGPL-3.0.
 | **V88 Buildout** | — | cross | — | 263-270 | 427 | CPU v20, CPU↔GPU pure-math, metalForge v12, NUCLEUS v3, ToadStool dispatch v3, mixed-HW, biomeOS graph |
 | **V89 S79 Rewire** | — | cross | — | 271 | 73 | Cross-spring S79 provenance: 13 domains, 6 springs, `MultiHeadBioEsn`, `SpectralAnalysis` IPC, ToadStool S79 deep rewire |
 | **V90 Bio Brain** | — | cross | — | 272 | 64 | hotSpring 4-layer brain → `BioBrain`, 36-head Gen2 → `BioHeadGroupDisagreement` + `AttentionState`, bingoCube/nautilus → `BioNautilusBrain`, 3 IPC methods, 7 domains, 7 springs |
-| **Total** | | | **52** | | **8,300+** | |
+| **V97c Fused Ops** | — | chain | — | Exp306-310 | 111 | Welford, Pearson, Spearman, CorrMatrix, streaming, metalForge |
+| **Total** | | | **52** | | **8,400+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -112,6 +113,7 @@ Every paper goes through the full evolution. Status across all 52 papers:
 | **V85 NUCLEUS + Vault** | EMP 30K atlas, NUCLEUS data pipeline, Tower-Node deployment, Genomic Vault organ model (consent-gated encrypted storage, Merkle provenance) | 87 checks (Exp256-259) |
 | **V87 blueFish whitePaper** | Chemistry as irreducible research programme (Fodor, Lakatos, Anderson). Isomorphism: 29 comp-chem ops → BarraCUDA (14 direct, 9 compose, 6 new). RootPulse provenance for DFT campaigns. hotSpring brain arch mapped to bio workloads. | 7 documents |
 | **V88 experiment buildout** | Full control validation: CPU v20 (37), CPU↔GPU v7 (22), metalForge v12 (63), NUCLEUS v3 (106), ToadStool pure-math v3 (41), CPU↔GPU pure-math (38), mixed-HW dispatch (91), biomeOS graph (29). Barracuda API deep dive documented for absorption. | 427 checks (Exp263-270) |
+| **V97c fused ops chain** | Full chain: CPU fused parity (38), Python benchmarks (13), GPU portability on Hybrid (21), pure GPU streaming (18), metalForge cross-substrate (21). Hybrid-aware graceful degradation for VarianceF64/CorrelationF64. DF64 FusedMapReduceF64 validated on consumer GPU. | 111 checks (Exp306-310) |
 
 ## Extension Roadmap
 
@@ -308,7 +310,7 @@ and ComputeDispatch from Barracuda wired into metalForge bridge/dispatch.
 
 ## Open Data
 
-All 52 reproductions use publicly accessible data or published model parameters.
+All 52 reproductions plus 5 fused ops experiments use publicly accessible data or published model parameters.
 No proprietary data dependencies. Sources: NCBI SRA, Zenodo, MassBank, EPA,
 Michigan EGLE, published ODE parameters, repoDB, algorithmic (no external data),
 published soil metrics (Islam 2014, Zuber 2016, Liang 2015), and published

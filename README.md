@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 5, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** Phase 97 — 1,047 lib tests + 200 forge tests, 281 experiments, 8,300+ validation checks, 285 binaries, standalone `barraCuda` v0.3.3 (694+ WGSL shaders, wgpu 28, Fp64Strategy precision dispatch), 150+ primitives consumed, zero local WGSL, zero unsafe code, 164 named tolerances, `cargo clippy -W clippy::pedantic -W clippy::nursery` **ZERO WARNINGS**. wgpu 22 → 28 migration complete. DF64 core-streaming available on consumer GPUs (~10x throughput). Fused mean+variance and correlation shaders upstream. TensorContext fast path for 15+ ops.
+**Status:** Phase 97c — 1,047 lib tests + 200 forge tests, 286 experiments, 8,400+ validation checks, 290 binaries, standalone `barraCuda` v0.3.3 (694+ WGSL shaders, wgpu 28, Fp64Strategy precision dispatch), 150+ primitives consumed + fused Welford/Pearson, zero local WGSL, zero unsafe code, 164 named tolerances, `cargo clippy -W clippy::pedantic -W clippy::nursery` **ZERO WARNINGS**. V97c: full fused ops chain (Exp306-310), GPU v12 with Hybrid-aware graceful degradation, 42/43 CPU validators GREEN.
 
 ---
 

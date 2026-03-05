@@ -14,8 +14,8 @@
 
 use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
-pub use barracuda::ops::correlation_f64_wgsl::CorrelationResult;
 use barracuda::ops::correlation_f64_wgsl::CorrelationF64;
+pub use barracuda::ops::correlation_f64_wgsl::CorrelationResult;
 use barracuda::ops::covariance_f64_wgsl::CovarianceF64;
 use barracuda::ops::variance_f64_wgsl::VarianceF64;
 use barracuda::ops::weighted_dot_f64::WeightedDotF64;
@@ -118,11 +118,7 @@ pub fn correlation_gpu(gpu: &GpuF64, x: &[f64], y: &[f64]) -> Result<f64> {
 ///
 /// Returns [`Error::Gpu`] if dispatch fails, vectors differ in length,
 /// or device lacks `SHADER_F64`.
-pub fn correlation_full_gpu(
-    gpu: &GpuF64,
-    x: &[f64],
-    y: &[f64],
-) -> Result<CorrelationResult> {
+pub fn correlation_full_gpu(gpu: &GpuF64, x: &[f64], y: &[f64]) -> Result<CorrelationResult> {
     require_f64(gpu)?;
     let c = CorrelationF64::new(gpu.to_wgpu_device())
         .map_err(|e| Error::Gpu(format!("CorrelationF64: {e}")))?;
