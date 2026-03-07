@@ -152,7 +152,8 @@ fn main() {
 
         let data_100: Vec<f64> = (1..=100).map(|i| f64::from(i)).collect();
         let cpu_mean = barracuda::stats::metrics::mean(&data_100);
-        let cpu_svar = barracuda::stats::correlation::variance(&data_100).unwrap();
+        let cpu_svar =
+            barracuda::stats::correlation::variance(&data_100).expect("CPU variance on data_100");
 
         let gpu_mv = stats_gpu::mean_variance_gpu(&gpu, &data_100).expect("mean_variance_gpu");
         v.check(
@@ -185,7 +186,7 @@ fn main() {
 
         let x: Vec<f64> = (1..=50).map(|i| f64::from(i)).collect();
         let y: Vec<f64> = x.iter().map(|&xi| 2.0f64.mul_add(xi, 1.0)).collect();
-        let cpu_r = barracuda::stats::pearson_correlation(&x, &y).unwrap();
+        let cpu_r = barracuda::stats::pearson_correlation(&x, &y).expect("CPU Pearson correlation");
         let gpu_full = stats_gpu::correlation_full_gpu(&gpu, &x, &y).expect("correlation_full_gpu");
         v.check(
             "Pearson GPU: r ≡ CPU",
@@ -207,7 +208,7 @@ fn main() {
         );
         g23_checks += 1;
 
-        let cpu_cov = barracuda::stats::covariance(&x, &y).unwrap();
+        let cpu_cov = barracuda::stats::covariance(&x, &y).expect("CPU covariance");
         let gpu_cov = stats_gpu::covariance_gpu(&gpu, &x, &y).expect("cov_gpu");
         v.check(
             "Cov GPU ≡ CPU",
@@ -234,8 +235,10 @@ fn main() {
 
     let data_100: Vec<f64> = (1..=100).map(|i| f64::from(i)).collect();
     let cpu_mean = barracuda::stats::metrics::mean(&data_100);
-    let cpu_svar = barracuda::stats::correlation::variance(&data_100).unwrap();
-    let cpu_sd = barracuda::stats::correlation::std_dev(&data_100).unwrap();
+    let cpu_svar =
+        barracuda::stats::correlation::variance(&data_100).expect("CPU variance on data_100");
+    let cpu_sd =
+        barracuda::stats::correlation::std_dev(&data_100).expect("CPU std dev on data_100");
 
     v.check(
         "CPU: mean(1..100) = 50.5",
@@ -262,11 +265,11 @@ fn main() {
 
     let x: Vec<f64> = (1..=50).map(|i| f64::from(i)).collect();
     let y: Vec<f64> = x.iter().map(|&xi| 2.0 * xi + 1.0).collect();
-    let r = barracuda::stats::pearson_correlation(&x, &y).unwrap();
+    let r = barracuda::stats::pearson_correlation(&x, &y).expect("CPU Pearson correlation x,y");
     v.check("CPU: r(x, 2x+1) = 1", r, 1.0, tolerances::ANALYTICAL_F64);
     g24_checks += 1;
 
-    let cov = barracuda::stats::covariance(&x, &y).unwrap();
+    let cov = barracuda::stats::covariance(&x, &y).expect("CPU covariance x,y");
     v.check_pass("CPU: Cov(x, 2x+1) > 0", cov > 0.0);
     g24_checks += 1;
 
@@ -285,8 +288,10 @@ fn main() {
     let mut g25_checks = 0_u32;
 
     // GPU Shannon variance via CPU stats on GPU-computed diversity
-    let cpu_h_var = barracuda::stats::correlation::variance(&cpu_shannons).unwrap();
-    let gpu_h_var = barracuda::stats::correlation::variance(&gpu_shannons).unwrap();
+    let cpu_h_var = barracuda::stats::correlation::variance(&cpu_shannons)
+        .expect("CPU variance of Shannon indices");
+    let gpu_h_var = barracuda::stats::correlation::variance(&gpu_shannons)
+        .expect("CPU variance of GPU Shannon indices");
     v.check(
         "GPU→CPU: Var(GPU Shannon) ≡ Var(CPU Shannon)",
         gpu_h_var,
@@ -296,8 +301,10 @@ fn main() {
     g25_checks += 1;
 
     // GPU Shannon correlation with Simpson
-    let r_gpu = barracuda::stats::pearson_correlation(&gpu_shannons, &gpu_simpsons).unwrap();
-    let r_cpu = barracuda::stats::pearson_correlation(&cpu_shannons, &cpu_simpsons).unwrap();
+    let r_gpu = barracuda::stats::pearson_correlation(&gpu_shannons, &gpu_simpsons)
+        .expect("CPU Pearson correlation GPU Shannon vs Simpson");
+    let r_cpu = barracuda::stats::pearson_correlation(&cpu_shannons, &cpu_simpsons)
+        .expect("CPU Pearson correlation CPU Shannon vs Simpson");
     v.check(
         "GPU→CPU: r(GPU H, GPU Si) ≡ r(CPU H, CPU Si)",
         r_gpu,
@@ -307,8 +314,10 @@ fn main() {
     g25_checks += 1;
 
     // Jackknife of GPU diversity
-    let jk_gpu = barracuda::stats::jackknife_mean_variance(&gpu_shannons).unwrap();
-    let jk_cpu = barracuda::stats::jackknife_mean_variance(&cpu_shannons).unwrap();
+    let jk_gpu = barracuda::stats::jackknife_mean_variance(&gpu_shannons)
+        .expect("jackknife mean variance on GPU Shannon");
+    let jk_cpu = barracuda::stats::jackknife_mean_variance(&cpu_shannons)
+        .expect("jackknife mean variance on CPU Shannon");
     v.check(
         "GPU→CPU: JK mean(GPU H) ≡ JK mean(CPU H)",
         jk_gpu.estimate,

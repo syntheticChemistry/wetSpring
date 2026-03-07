@@ -9,7 +9,8 @@
     clippy::cast_sign_loss,
     clippy::similar_names,
     clippy::items_after_statements,
-    clippy::many_single_char_names
+    clippy::many_single_char_names,
+    deprecated
 )]
 //! # Exp214: NUCLEUS Mixed Hardware V8 — V66 I/O Evolution via IPC
 //!

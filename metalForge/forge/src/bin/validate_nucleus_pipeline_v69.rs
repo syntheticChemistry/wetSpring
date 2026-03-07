@@ -128,7 +128,7 @@ fn section_nest_protocol(pass: &mut u32, fail: &mut u32) {
     check("NestGate socket discovery does not panic", true, pass, fail);
 
     // NestClient construction
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir().expect("tempdir creation for NestClient test should succeed");
     let sock = dir.path().join("test-nestgate.sock");
     let client = nest::NestClient::new(sock);
     check(
@@ -136,7 +136,7 @@ fn section_nest_protocol(pass: &mut u32, fail: &mut u32) {
         client
             .socket_path()
             .to_str()
-            .unwrap()
+            .expect("socket path should be valid UTF-8")
             .contains("test-nestgate"),
         pass,
         fail,
@@ -217,7 +217,10 @@ fn section_ncbi_acquisition(pass: &mut u32, fail: &mut u32) {
         check(
             "Assembly resolve: Vibrio GCF_000024825.1 found locally",
             result.is_ok()
-                && result.as_ref().unwrap().source
+                && result
+                    .as_ref()
+                    .expect("assembly result should be Ok when is_ok")
+                    .source
                     == ncbi::AssemblySource::LocalFile(vibrio_dir.join("GCF_000024825.1.fna.gz")),
             pass,
             fail,

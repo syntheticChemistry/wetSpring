@@ -4,7 +4,8 @@
 #![allow(
     clippy::expect_used,
     clippy::unwrap_used,
-    clippy::redundant_closure_for_method_calls
+    clippy::redundant_closure_for_method_calls,
+    deprecated
 )]
 
 use super::*;

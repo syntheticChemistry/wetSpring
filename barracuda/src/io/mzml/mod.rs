@@ -250,6 +250,10 @@ where
 /// Returns [`Error::Io`] if the file cannot be opened, [`Error::Xml`]
 /// for XML structure errors, or [`Error::Base64`] / [`Error::Zlib`]
 /// for binary array decoding failures.
+#[deprecated(
+    since = "0.1.0",
+    note = "buffers entire file; use MzmlIter or for_each_spectrum"
+)]
 #[must_use = "parsed spectra are discarded if not used"]
 pub fn parse_mzml(path: &Path) -> Result<Vec<MzmlSpectrum>> {
     MzmlIter::open(path)?.collect()

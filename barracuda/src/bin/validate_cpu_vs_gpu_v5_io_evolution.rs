@@ -8,7 +8,8 @@
     clippy::cast_possible_truncation,
     clippy::cast_sign_loss,
     clippy::similar_names,
-    clippy::many_single_char_names
+    clippy::many_single_char_names,
+    deprecated
 )]
 //! # Exp215: CPU vs GPU v5 — V66 I/O Evolution Domains
 //!

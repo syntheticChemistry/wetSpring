@@ -4,10 +4,10 @@
 against Rust implementations and GPU shaders via `barraCuda` (standalone math
 primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 
-**Date:** March 5, 2026
+**Date:** March 7, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** Phase 97c — 1,047 lib tests + 200 forge tests, 286 experiments, 8,400+ validation checks, 290 binaries, standalone `barraCuda` v0.3.3 (694+ WGSL shaders, wgpu 28, Fp64Strategy precision dispatch), 150+ primitives consumed + fused Welford/Pearson, zero local WGSL, zero unsafe code, 164 named tolerances, `cargo clippy -W clippy::pedantic -W clippy::nursery` **ZERO WARNINGS**. V97c: full fused ops chain (Exp306-310), GPU v12 with Hybrid-aware graceful degradation, 42/43 CPU validators GREEN.
+**Status:** Phase 97d — 1,047 lib tests + 200 forge tests, 286 experiments, 8,400+ validation checks, 290 binaries, standalone `barraCuda` v0.3.3 (694+ WGSL shaders, wgpu 28, Fp64Strategy precision dispatch), 150+ primitives consumed + fused Welford/Pearson, zero local WGSL, zero unsafe code, 164 named tolerances, `cargo clippy -W clippy::pedantic -W clippy::nursery` **ZERO WARNINGS**, `cargo doc` **ZERO WARNINGS**. V97d: buffering I/O APIs deprecated (streaming-first), `.unwrap()` evolved to `.expect()` across 12 validation binaries, 3 doc-accuracy fixes (MSRV, wgpu version, rustdoc escaping).
 
 ---
 
@@ -127,14 +127,14 @@ integration point.
 | V88 experiment buildout (Exp263-270) | 427 (CPU v20, CPU↔GPU v7, metalForge v12, NUCLEUS v3, ToadStool pure-math v3, CPU↔GPU pure-math, mixed-HW dispatch, biomeOS graph) |
 | Exp271: Cross-Spring S79 (13 domains) | 73 |
 | Exp272: Bio Brain (7 domains) | 64 |
-| **Total validation checks** | **8,300+** |
-| Rust library unit tests | 1,261 (`barraCuda` CPU + IPC, default features) |
-| metalForge forge tests | 175 |
+| **Total validation checks** | **8,400+** |
+| Rust library unit tests | 1,047 (barracuda) |
+| metalForge forge tests | 200 |
 | Doc-tests | 27 (barracuda 18 + forge 9) |
-| **Total Rust tests** | **1,261+** (library) |
+| **Total Rust tests** | **1,347** (lib + forge + integration + doc) |
 | Library code coverage | **95.86% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov) |
-| Experiments completed | 281 |
-| Validation/benchmark binaries | 285 |
+| Experiments completed | 286 |
+| Validation/benchmark binaries | 290 |
 | CPU bio modules | 47 |
 | GPU bio modules | 45 (30 lean + 5 write→lean + 7 compose + 0 passthrough) |
 | Tier B (needs refactor) | 0 (all promoted) |
@@ -146,7 +146,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | `barraCuda` primitives consumed | **150+** (always-on, zero fallback code — standalone `barraCuda` v0.3.3, wgpu 28) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 8,300+ validation checks **PASS**. All 1,044 library tests **PASS** (1 ignored: hardware-dependent).
+All 8,400+ validation checks **PASS**. All 1,047 library + 200 forge tests **PASS** (1 ignored: hardware-dependent).
 
 ### GPU Performance
 
@@ -679,7 +679,7 @@ wetSpring/
 │   │   ├── bench/               ← benchmark harness + power monitoring
 │   │   ├── bin/                 ← 285 validation/benchmark binaries
 │   │   ├── ipc/                 ← JSON-RPC dispatch (biomeOS integration)
-│   │   └── shaders/             ← shared WGSL utilities (ODE shaders now generated at runtime)
+│   │   └── vault/               ← encrypted consent-gated data storage
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024
 ├── experiments/                   ← 281 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing

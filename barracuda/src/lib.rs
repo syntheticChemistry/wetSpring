@@ -44,7 +44,7 @@
 //! - [`bio::feature_table`] — End-to-end feature extraction (`asari` pipeline)
 //!
 //! # GPU acceleration (feature = "gpu")
-//! - `gpu` — GPU device wrapper bridging to barraCuda `WgpuDevice` (wgpu v22)
+//! - `gpu` — GPU device wrapper bridging to barraCuda `WgpuDevice` (wgpu v28)
 //! - `bio::diversity_gpu` — Shannon, Simpson, observed, evenness, alpha via `FusedMapReduceF64`,
 //!   Bray-Curtis via `BrayCurtisF64` (absorbed upstream)
 //! - `bio::pcoa_gpu` — `PCoA` ordination via barraCuda's `BatchedEighGpu`

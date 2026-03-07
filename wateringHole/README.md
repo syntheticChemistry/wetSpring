@@ -1,6 +1,6 @@
 # wetSpring wateringHole
 
-**Date:** March 5, 2026
+**Date:** March 7, 2026
 **Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records.
 
 ---
@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V97d** | `handoffs/WETSPRING_V97C_FUSED_OPS_CHAIN_HANDOFF_MAR05_2026.md` | Mar 5 | Fused ops full chain: Exp306-310 (111 checks). **V97d refined**: DF64 dispatch routing confirmed wired; DF64 fused shaders produce zero on RTX 4070 (shader validation gap, not wiring). toadStool S94b + barraCuda evolution reviewed. coralNAK cloned. |
+| **V97d** | `handoffs/WETSPRING_V97D_DEEP_AUDIT_EVOLUTION_HANDOFF_MAR07_2026.md` | Mar 7 | Deep audit: I/O deprecation, unwrap→expect evolution, doc accuracy, broken ref cleanup (Exp311, 125 items) |
+| **V97c** | `handoffs/WETSPRING_V97C_FUSED_OPS_CHAIN_HANDOFF_MAR05_2026.md` | Mar 5 | Fused ops full chain: Exp306-310 (111 checks). DF64 dispatch routing confirmed wired; DF64 fused shaders produce zero on RTX 4070 (shader validation gap, not wiring). |
 | **V97** | `handoffs/WETSPRING_V97_BARRACUDA_033_WGPU28_REWIRE_HANDOFF_MAR05_2026.md` | Mar 5 | barraCuda v0.3.3 + wgpu 28 rewire: 1,247 tests, zero clippy, chi_squared upstream fix |
 | **V96** | `handoffs/WETSPRING_V96_DEEP_DEBT_CHUNA_HANDOFF_MAR05_2026.md` | Mar 5 | Deep debt: silent fallback elimination, capability IPC, Chuna papers queued |
 | **V95** | `handoffs/WETSPRING_V95_CROSS_SPRING_EVOLUTION_COMPLETE_MAR04_2026.md` | Mar 4 | Cross-spring evolution complete: 6 GPU ops + 2 CPU delegations wired, Exp305 (59/59), full provenance table, benchmarks |

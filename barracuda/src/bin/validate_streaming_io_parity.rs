@@ -5,7 +5,8 @@
     clippy::print_stdout,
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
-    clippy::cast_sign_loss
+    clippy::cast_sign_loss,
+    deprecated
 )]
 //! # Exp209: Streaming I/O Parity Validation
 //!

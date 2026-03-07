@@ -92,7 +92,8 @@ fn main() {
     let mut s2_checks = 0_u32;
 
     let h_mean = barracuda::stats::metrics::mean(&shannons);
-    let h_svar = barracuda::stats::correlation::variance(&shannons).unwrap();
+    let h_svar =
+        barracuda::stats::correlation::variance(&shannons).expect("Shannon variance requires n≥2");
 
     v.check_pass("Shannon mean > 0", h_mean > 0.0);
     s2_checks += 1;
@@ -103,7 +104,8 @@ fn main() {
 
     // Simpson variance
     let si_mean = barracuda::stats::metrics::mean(&simpsons);
-    let si_svar = barracuda::stats::correlation::variance(&simpsons).unwrap();
+    let si_svar =
+        barracuda::stats::correlation::variance(&simpsons).expect("Simpson variance requires n≥2");
     v.check_pass("Simpson mean ∈ (0,1)", si_mean > 0.0 && si_mean < 1.0);
     s2_checks += 1;
     v.check_pass("Simpson var > 0", si_svar > 0.0);
@@ -121,13 +123,15 @@ fn main() {
     let t = Instant::now();
     let mut s3_checks = 0_u32;
 
-    let r_hs = barracuda::stats::pearson_correlation(&shannons, &simpsons).unwrap();
+    let r_hs = barracuda::stats::pearson_correlation(&shannons, &simpsons)
+        .expect("Pearson correlation requires equal-length vectors with n≥2");
     v.check_pass("r(Shannon, Simpson) ∈ [-1,1]", (-1.0..=1.0).contains(&r_hs));
     s3_checks += 1;
     v.check_pass("r(Shannon, Simpson) > 0 (positive correlation)", r_hs > 0.0);
     s3_checks += 1;
 
-    let r_self = barracuda::stats::pearson_correlation(&shannons, &shannons).unwrap();
+    let r_self = barracuda::stats::pearson_correlation(&shannons, &shannons)
+        .expect("Pearson self-correlation requires n≥2");
     v.check(
         "r(Shannon, Shannon) = 1.0",
         r_self,
@@ -148,11 +152,13 @@ fn main() {
     let t = Instant::now();
     let mut s4_checks = 0_u32;
 
-    let cov_hs = barracuda::stats::covariance(&shannons, &simpsons).unwrap();
+    let cov_hs = barracuda::stats::covariance(&shannons, &simpsons)
+        .expect("Covariance(H, Simpson) requires equal-length vectors with n≥2");
     v.check_pass("Cov(H, Si) > 0", cov_hs > 0.0);
     s4_checks += 1;
 
-    let cov_hh = barracuda::stats::covariance(&shannons, &shannons).unwrap();
+    let cov_hh = barracuda::stats::covariance(&shannons, &shannons)
+        .expect("Covariance(H, H) = Var(H) requires n≥2");
     v.check(
         "Cov(H, H) = Var(H)",
         cov_hh,

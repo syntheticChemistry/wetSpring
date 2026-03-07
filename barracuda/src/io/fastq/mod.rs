@@ -163,6 +163,10 @@ fn extract_id(header: &[u8]) -> &str {
 ///
 /// Returns [`Error::Io`] if the file cannot be opened, or
 /// [`Error::Fastq`] if a record is malformed.
+#[deprecated(
+    since = "0.1.0",
+    note = "buffers entire file; use FastqIter or for_each_record"
+)]
 #[must_use = "parsed records are discarded if not used"]
 pub fn parse_fastq(path: &Path) -> Result<Vec<FastqRecord>> {
     FastqIter::open(path)?.collect()

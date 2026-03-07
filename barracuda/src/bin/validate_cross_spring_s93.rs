@@ -197,7 +197,10 @@ fn main() {
     // Lanczos needs a SpectralCsrMatrix; use anderson matrix + tridiag
     // We can verify the eigenvalues are sorted and real.
     let mut sorted_eigs = eigenvalues.clone();
-    sorted_eigs.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    sorted_eigs.sort_by(|a, b| {
+        a.partial_cmp(b)
+            .expect("Anderson eigenvalues must be finite for comparison")
+    });
     v.check_pass(
         "Anderson eigenvalues are real",
         sorted_eigs.iter().all(|e| e.is_finite()),

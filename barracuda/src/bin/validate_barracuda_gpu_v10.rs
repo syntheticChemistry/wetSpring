@@ -180,7 +180,9 @@ fn main() {
         });
         let us = t.elapsed().as_micros() as f64;
 
-        let freq_out = device.read_buffer_f64(&out_buf, total).unwrap();
+        let freq_out = device
+            .read_buffer_f64(&out_buf, total)
+            .expect("WrightFisher GPU buffer read");
         (freq_out, freq_in, us)
     }));
 
@@ -262,7 +264,9 @@ fn main() {
         });
         let us = t.elapsed().as_micros() as f64;
 
-        let new_strats = device.read_buffer_u32(&new_buf, n_cells).unwrap();
+        let new_strats = device
+            .read_buffer_u32(&new_buf, n_cells)
+            .expect("StencilCooperation GPU buffer read");
         (new_strats, n_cells, us)
     }));
 
@@ -344,7 +348,9 @@ fn main() {
         });
         let us = t.elapsed().as_micros() as f64;
 
-        let hill_out = device.read_buffer_f64(&out_buf, n_hill as usize).unwrap();
+        let hill_out = device
+            .read_buffer_f64(&out_buf, n_hill as usize)
+            .expect("HillGate GPU buffer read");
         (hill_out, input_a, input_b, us)
     }));
 
@@ -387,7 +393,7 @@ fn main() {
 
     let sym_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         use barracuda::ops::linalg::SymmetrizeGpu;
-        let sym = SymmetrizeGpu::new(Arc::clone(&device)).unwrap();
+        let sym = SymmetrizeGpu::new(Arc::clone(&device)).expect("SymmetrizeGpu construction");
         sym.execute(&[1.0, 2.0, 3.0, 4.0], 2)
     }));
     if let Ok(Ok(r)) = sym_result {
@@ -414,7 +420,7 @@ fn main() {
 
     let lap_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         use barracuda::ops::linalg::LaplacianGpu;
-        let lap = LaplacianGpu::new(Arc::clone(&device)).unwrap();
+        let lap = LaplacianGpu::new(Arc::clone(&device)).expect("LaplacianGpu construction");
         lap.execute(&[0.0, 1.0, 1.0, 0.0], 2)
     }));
     if let Ok(Ok(r)) = lap_result {

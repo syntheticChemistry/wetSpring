@@ -62,10 +62,13 @@ fn main() {
 
     // Stats stage (Welford + Pearson)
     let h_mean = barracuda::stats::metrics::mean(&shannons);
-    let h_svar = barracuda::stats::correlation::variance(&shannons).unwrap();
+    let h_svar =
+        barracuda::stats::correlation::variance(&shannons).expect("Shannon variance requires n≥2");
     let _si_mean = barracuda::stats::metrics::mean(&simpsons);
-    let r_hs = barracuda::stats::pearson_correlation(&shannons, &simpsons).unwrap();
-    let cov_hs = barracuda::stats::covariance(&shannons, &simpsons).unwrap();
+    let r_hs = barracuda::stats::pearson_correlation(&shannons, &simpsons)
+        .expect("Pearson correlation requires equal-length vectors with n≥2");
+    let cov_hs = barracuda::stats::covariance(&shannons, &simpsons)
+        .expect("Covariance(H, Simpson) requires equal-length vectors with n≥2");
 
     // NMF stage
     let drug_disease = vec![0.8, 0.1, 0.0, 0.2, 0.7, 0.1, 0.0, 0.1, 0.9];
@@ -126,7 +129,8 @@ fn main() {
     // Re-run the same pipeline — proves determinism
     let shannons_2: Vec<f64> = communities.iter().map(|c| diversity::shannon(c)).collect();
     let h_mean_2 = barracuda::stats::metrics::mean(&shannons_2);
-    let r_hs_2 = barracuda::stats::pearson_correlation(&shannons_2, &simpsons).unwrap();
+    let r_hs_2 = barracuda::stats::pearson_correlation(&shannons_2, &simpsons)
+        .expect("Pearson correlation re-run requires equal-length vectors with n≥2");
 
     v.check(
         "Determinism: H mean run1 = run2",
@@ -183,8 +187,10 @@ fn main() {
     let soil_notill = [0.793, 0.785, 0.801, 0.790, 0.798];
     let soil_tilled = [0.385, 0.392, 0.380, 0.390, 0.388];
 
-    let var_nt = barracuda::stats::correlation::variance(&soil_notill).unwrap();
-    let var_ti = barracuda::stats::correlation::variance(&soil_tilled).unwrap();
+    let var_nt = barracuda::stats::correlation::variance(&soil_notill)
+        .expect("soil no-till variance requires n≥2");
+    let var_ti = barracuda::stats::correlation::variance(&soil_tilled)
+        .expect("soil tilled variance requires n≥2");
     let mean_nt = barracuda::stats::metrics::mean(&soil_notill);
     let mean_ti = barracuda::stats::metrics::mean(&soil_tilled);
 
@@ -210,7 +216,8 @@ fn main() {
         .iter()
         .map(|&ic50| ic50 / (ic50 + 10.0))
         .collect();
-    let r_ic50 = barracuda::stats::pearson_correlation(&ic50_values, &hill_responses).unwrap();
+    let r_ic50 = barracuda::stats::pearson_correlation(&ic50_values, &hill_responses)
+        .expect("Pearson r(IC50, Hill) requires equal-length vectors with n≥2");
     v.check_pass("Pharma: r(IC50, Hill) > 0", r_ic50 > 0.0);
     mc_checks += 1;
 
@@ -267,7 +274,8 @@ fn main() {
     md_checks += 1;
 
     // groundSpring: validation patterns (jackknife)
-    let jk = barracuda::stats::jackknife_mean_variance(&[1.0, 2.0, 3.0, 4.0, 5.0]).unwrap();
+    let jk = barracuda::stats::jackknife_mean_variance(&[1.0, 2.0, 3.0, 4.0, 5.0])
+        .expect("jackknife requires n≥2");
     v.check(
         "groundSpring: JK mean = 3",
         jk.estimate,

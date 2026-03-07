@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-05 (Phase 97c: 286 experiments, 290 binaries, 8,400+ checks, standalone `barraCuda` v0.3.3 (wgpu 28, 694+ WGSL shaders, Fp64Strategy), 150+ primitives consumed + fused Welford/Pearson, 1,047 lib tests, 164 named tolerances, zero TODO/FIXME/HACK, clippy pedantic CLEAN)
+**Updated**: 2026-03-07 (Phase 97d: 286 experiments, 290 binaries, 8,400+ checks, standalone `barraCuda` v0.3.3 (wgpu 28, 694+ WGSL shaders, Fp64Strategy), 150+ primitives consumed + fused Welford/Pearson, 1,047 lib tests, 164 named tolerances, zero TODO/FIXME/HACK, clippy pedantic CLEAN. V97d: deep audit Exp311)
 
 ---
 
@@ -415,6 +415,16 @@ thresholds from `src/tolerances.rs`.
 | 308 | GPU v12 — Fused Ops GPU Portability | CPU → **GPU** | 21 |
 | 309 | Pure GPU Streaming v10 — Fused Pipeline | GPU → **Streaming** | 18 |
 | 310 | metalForge v15 — Cross-System Fused Ops | Streaming → **metalForge** | 21 |
+
+### V97d — Deep Audit & Idiomatic Evolution (Exp311)
+
+| Exp | Name | Domain | Items |
+|-----|------|--------|:-----:|
+| 311 | Deep Audit & Idiomatic Evolution | Infrastructure | 125 |
+
+V97d: Buffering I/O APIs deprecated (streaming-first), 104 unwrap→expect
+evolutions across 17 binaries, doc accuracy fixes (MSRV, wgpu, rustdoc),
+broken reference cleanup, full regression GREEN.
 
 ---
 

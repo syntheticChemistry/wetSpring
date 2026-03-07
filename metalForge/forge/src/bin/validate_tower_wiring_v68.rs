@@ -198,7 +198,7 @@ fn main() {
 
     if let Some(ref vibrio_path) = vibrio_res.path {
         let assemblies: Vec<_> = std::fs::read_dir(vibrio_path)
-            .unwrap()
+            .expect("read_dir vibrio_assemblies should succeed when path exists")
             .filter_map(Result::ok)
             .filter(|e| e.path().extension().is_some_and(|ext| ext == "gz"))
             .collect();
@@ -245,7 +245,7 @@ fn main() {
 
     if let Some(ref campy_path) = campy_res.path {
         let assemblies: Vec<_> = std::fs::read_dir(campy_path)
-            .unwrap()
+            .expect("read_dir campylobacterota_assemblies should succeed when path exists")
             .filter_map(Result::ok)
             .filter(|e| e.path().extension().is_some_and(|ext| ext == "gz"))
             .collect();
@@ -376,7 +376,7 @@ fn main() {
 
     if let Some(ref pfas_path) = pfas_res.path {
         let files: Vec<_> = std::fs::read_dir(pfas_path)
-            .unwrap()
+            .expect("read_dir pfas_zenodo should succeed when path exists")
             .filter_map(Result::ok)
             .collect();
 

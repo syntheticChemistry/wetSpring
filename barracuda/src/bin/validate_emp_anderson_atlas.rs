@@ -245,7 +245,8 @@ fn main() {
     let all_rs: Vec<f64> = atlas.iter().map(|e| e.mean_r).collect();
     let all_ws: Vec<f64> = atlas.iter().map(|e| e.mean_w).collect();
 
-    let jk = stats::jackknife_mean_variance(&all_rs).unwrap();
+    let jk =
+        stats::jackknife_mean_variance(&all_rs).expect("Atlas jackknife on mean r requires n≥2");
     v.check_pass("Atlas: jackknife SE on mean r > 0", jk.std_error > 0.0);
     v.check_pass("Atlas: jackknife mean r > midpoint", jk.estimate > midpoint);
     println!(
@@ -260,7 +261,7 @@ fn main() {
         0.95,
         42,
     )
-    .unwrap();
+    .expect("Atlas bootstrap 95% CI requires valid resampling");
     v.check_pass("Atlas: 95% CI lower > midpoint", ci.lower > midpoint);
     v.check_pass(
         "Atlas: CI contains estimate",
@@ -268,7 +269,8 @@ fn main() {
     );
     println!("  Atlas 95% CI: [{:.4}, {:.4}]", ci.lower, ci.upper);
 
-    let r_w_corr = stats::pearson_correlation(&all_ws, &all_rs).unwrap();
+    let r_w_corr = stats::pearson_correlation(&all_ws, &all_rs)
+        .expect("Atlas W↔r Pearson correlation requires n≥2");
     v.check_pass("Atlas: W↔r correlation finite", r_w_corr.is_finite());
     println!("  W↔r Pearson correlation: {r_w_corr:.4}");
 

@@ -109,7 +109,7 @@ Integration tests use streaming APIs exclusively (`Ms2Iter`, `MzmlIter`, `FastqI
 exercised outside their own deprecation-gated unit tests.
 GPU buffer limits and dispatch thresholds fully documented with hardware provenance.
 CI enforces fmt, clippy (pedantic+nursery), test, doc, and json feature check on
-every push/PR. **Rust edition 2024**, MSRV 1.85.
+every push/PR. **Rust edition 2024**, MSRV 1.87.
 
 See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 
@@ -391,7 +391,7 @@ no parallelism benefit) and `fastq_parsing` (I/O-bound).
 | Feb 21 | Phase 17: metalForge absorption engineering — shaped all modules for ToadStool readiness |
 | Feb 21 | `bio::special` consolidated (erf, ln_gamma, regularized_gamma) for extraction to `barracuda::math` |
 | Feb 21 | PRIMITIVE_MAP updated with absorption readiness gaps and shared math extraction plan |
-| Feb 21 | DEPRECATION_MIGRATION updated with `bio::special` extraction steps |
+| Feb 21 | `bio::special` extraction documented in EVOLUTION_READINESS.md |
 | Feb 21 | Exp064: GPU Parity v1 — 26/26 checks across 8 consolidated GPU domains |
 | Feb 21 | Exp065: metalForge Full Cross-System — 35/35 substrate-independence proof |
 | Feb 21 | Exp066: CPU vs GPU scaling benchmark — crossover characterization all domains |

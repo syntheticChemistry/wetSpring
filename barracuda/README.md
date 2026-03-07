@@ -188,14 +188,14 @@ cargo run --features gpu --release --bin validate_barracuda_gpu_full
 |----------|---------|
 | `EVOLUTION_READINESS.md` | Absorption tiers, shader inventory, ToadStool status |
 | `ABSORPTION_MANIFEST.md` | Write → Absorb → Lean lifecycle tracking |
-| `DEPRECATION_MIGRATION.md` | Deprecated APIs and migration paths |
+| `../CHANGELOG.md` | Version history and evolution log |
 | `../metalForge/PRIMITIVE_MAP.md` | Module ↔ ToadStool primitive mapping |
 | `../wateringHole/handoffs/` | ToadStool handoff documents |
 
 ## Dependencies
 
-- `barracuda` (ToadStool) — GPU primitives, via path: `../../phase1/toadstool/crates/barracuda`
+- `barracuda` — standalone math primal, via path: `../../barraCuda/crates/barracuda` (v0.3.3)
 - `flate2` (pure Rust backend) — gzip decompression
-- `serde` + `serde_json` — serialization
+- `serde_json` (optional, `json` feature) — model import for 2 binaries
 - `rand` + `rand_xoshiro` — RNG for Gillespie/rarefaction
 - `wgpu` (via `gpu` feature) — GPU device management

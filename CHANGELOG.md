@@ -3,6 +3,33 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V97d — Deep Audit & Idiomatic Evolution (2026-03-07)
+
+### Changed
+- **I/O APIs**: `parse_fastq`, `parse_mzml`, `parse_ms2` deprecated with
+  `#[deprecated]` pointing to streaming iterators (`FastqIter`, `MzmlIter`,
+  `Ms2Iter`).
+- **Crash diagnostics**: 104 bare `.unwrap()` → `.expect("context")` across
+  12 barracuda + 5 forge validation binaries.
+- **MSRV doc**: `EVOLUTION_READINESS.md` corrected from 1.85 to 1.87.
+- **wgpu version**: `lib.rs` doc updated from v22 to v28.
+- **Rustdoc**: Escaped `E[XY]` brackets in `validate_barracuda_cpu_v23.rs`.
+- **Broken refs**: `DEPRECATION_MIGRATION.md` phantom reference removed from
+  `barracuda/README.md`, replaced with `../CHANGELOG.md`. Stale dep path
+  (`phase1/toadstool`) corrected in README.
+- **Root README**: Stats updated (1,347 total tests, 286 exp, 290 bins),
+  phantom `shaders/` dir replaced with `vault/`.
+
+### Added
+- **Exp311**: Deep audit protocol documenting all V97d evolution items.
+- **V97d handoff**: `wateringHole/handoffs/WETSPRING_V97D_DEEP_AUDIT_EVOLUTION_HANDOFF_MAR07_2026.md`.
+
+### Validated
+- `cargo fmt --all -- --check`: CLEAN
+- `cargo clippy --workspace -- -D warnings -W clippy::pedantic`: ZERO WARNINGS
+- `cargo doc --workspace --no-deps`: ZERO WARNINGS
+- `cargo test --workspace`: 1,347 tests PASS (1 ignored)
+
 ## V97d — toadStool S94b + barraCuda Evolution Sync (2026-03-05)
 
 ### Reviewed

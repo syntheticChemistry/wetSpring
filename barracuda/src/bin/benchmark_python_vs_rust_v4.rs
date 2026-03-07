@@ -78,7 +78,8 @@ fn main() {
     let t = Instant::now();
     let mut actual_svar = 0.0;
     for _ in 0..10_000 {
-        actual_svar = barracuda::stats::correlation::variance(&data).unwrap();
+        actual_svar =
+            barracuda::stats::correlation::variance(&data).expect("variance requires n≥2");
     }
     let us = t.elapsed().as_micros();
 
@@ -111,7 +112,8 @@ fn main() {
     let t = Instant::now();
     let mut actual_cov = 0.0;
     for _ in 0..10_000 {
-        actual_cov = barracuda::stats::covariance(&x, &y).unwrap();
+        actual_cov = barracuda::stats::covariance(&x, &y)
+            .expect("covariance requires equal-length vectors with n≥2");
     }
     let us = t.elapsed().as_micros();
 
@@ -141,7 +143,8 @@ fn main() {
     let t = Instant::now();
     let mut actual_r = 0.0;
     for _ in 0..10_000 {
-        actual_r = barracuda::stats::pearson_correlation(&x, &y).unwrap();
+        actual_r = barracuda::stats::pearson_correlation(&x, &y)
+            .expect("Pearson correlation requires equal-length vectors with n≥2");
     }
     let us = t.elapsed().as_micros();
 
@@ -173,7 +176,8 @@ fn main() {
     let t = Instant::now();
     let mut actual_rs = 0.0;
     for _ in 0..10_000 {
-        actual_rs = barracuda::stats::correlation::spearman_correlation(&mono_x, &mono_y).unwrap();
+        actual_rs = barracuda::stats::correlation::spearman_correlation(&mono_x, &mono_y)
+            .expect("Spearman correlation requires equal-length vectors with n≥2");
     }
     let us = t.elapsed().as_micros();
 
@@ -210,7 +214,8 @@ fn main() {
     let t = Instant::now();
     let mut corr_mat = vec![0.0; 9];
     for _ in 0..1_000 {
-        corr_mat = barracuda::stats::correlation::correlation_matrix(&obs_rows).unwrap();
+        corr_mat = barracuda::stats::correlation::correlation_matrix(&obs_rows)
+            .expect("correlation_matrix requires non-empty rows with n≥2");
     }
     let us = t.elapsed().as_micros();
 
@@ -251,9 +256,11 @@ fn main() {
     let expected_jk_mean = 5.5;
 
     let t = Instant::now();
-    let mut jk_result = barracuda::stats::jackknife_mean_variance(&jk_data).unwrap();
+    let mut jk_result =
+        barracuda::stats::jackknife_mean_variance(&jk_data).expect("jackknife requires n≥2");
     for _ in 0..100_000 {
-        jk_result = barracuda::stats::jackknife_mean_variance(&jk_data).unwrap();
+        jk_result =
+            barracuda::stats::jackknife_mean_variance(&jk_data).expect("jackknife requires n≥2");
     }
     let us = t.elapsed().as_micros();
 
@@ -282,13 +289,14 @@ fn main() {
     let t = Instant::now();
     let mut cov_mat = vec![0.0; 9];
     for _ in 0..1_000 {
-        cov_mat = barracuda::stats::correlation::covariance_matrix(&obs_rows).unwrap();
+        cov_mat = barracuda::stats::correlation::covariance_matrix(&obs_rows)
+            .expect("covariance_matrix requires non-empty rows with n≥2");
     }
     let us = t.elapsed().as_micros();
 
     let var_col0 =
         barracuda::stats::correlation::variance(&obs_rows.iter().map(|r| r[0]).collect::<Vec<_>>())
-            .unwrap();
+            .expect("variance of column 0 requires n≥2");
     v.check(
         "CovMatrix: diag[0] = Var(col0)",
         cov_mat[0],
@@ -329,7 +337,8 @@ fn main() {
     }
     let us = t.elapsed().as_micros();
 
-    let h_var = barracuda::stats::correlation::variance(&shannons).unwrap();
+    let h_var =
+        barracuda::stats::correlation::variance(&shannons).expect("Shannon variance requires n≥2");
     v.check_pass("Shannon variance > 0", h_var > 0.0);
     let h_uniform = diversity::shannon(&communities[1]);
     v.check(
