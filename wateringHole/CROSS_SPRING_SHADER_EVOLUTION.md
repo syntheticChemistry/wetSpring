@@ -1,7 +1,7 @@
 # Cross-Spring Shader Evolution
 
-**Last updated**: Mar 7, 2026 — Phase 97e standalone barraCuda v0.3.3 (`2a6c072`, 694+ WGSL shaders, wgpu 28). 150+ primitives consumed, 0 local WGSL, 287 experiments, 8,431+ checks, 1,346 tests, clippy pedantic CLEAN. Builder patterns wired (`HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`). `PrecisionRoutingAdvice` for shared-memory f64 safety. `shaders::provenance` API live (28 shaders tracked, 22 cross-spring). Exp312: provenance validation (31/31).
-**Validated by**: Phase 97e Exp312 (31/31 provenance), Exp311 (deep audit), Exp306-310 (fused ops chain), standalone barraCuda v0.3.3, 1,346 tests
+**Last updated**: Mar 7, 2026 — V98 standalone barraCuda v0.3.3 (`2a6c072`, 694+ WGSL shaders, wgpu 28). 150+ primitives consumed, 0 local WGSL, 293 experiments, 8,604+ checks, 1,347 tests, clippy pedantic CLEAN. V98 full chain: 173/173 PASS (Paper→CPU→GPU→Streaming→metalForge).
+**Validated by**: V98 Exp313-318 (173/173 full chain), Exp312 (31/31 provenance), Exp311 (deep audit), Exp306-310 (fused ops chain), standalone barraCuda v0.3.3, 1,347 tests
 
 ---
 

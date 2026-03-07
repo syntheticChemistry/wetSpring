@@ -264,7 +264,7 @@ fn main() {
     g24_checks += 1;
 
     let x: Vec<f64> = (1..=50).map(f64::from).collect();
-    let y: Vec<f64> = x.iter().map(|&xi| 2.0 * xi + 1.0).collect();
+    let y: Vec<f64> = x.iter().map(|&xi| 2.0f64.mul_add(xi, 1.0)).collect();
     let r = barracuda::stats::pearson_correlation(&x, &y).expect("CPU Pearson correlation x,y");
     v.check("CPU: r(x, 2x+1) = 1", r, 1.0, tolerances::ANALYTICAL_F64);
     g24_checks += 1;

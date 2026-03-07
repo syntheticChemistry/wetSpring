@@ -12,6 +12,7 @@ use wetspring_barracuda::bio::{
     tolerance_search,
 };
 use wetspring_barracuda::io::{fastq, mzml};
+use wetspring_barracuda::tolerances;
 
 // ── Diversity analytical edge cases ─────────────────────────────
 
@@ -59,7 +60,7 @@ fn diversity_matrix_is_symmetric() {
             let ij = dm[i * 3 + j];
             let ji = dm[j * 3 + i];
             assert!(
-                (ij - ji).abs() < 1e-15,
+                (ij - ji).abs() < tolerances::BRAY_CURTIS_SYMMETRY,
                 "Matrix not symmetric at ({i},{j}): {ij} != {ji}"
             );
         }
@@ -264,7 +265,7 @@ fn spectral_match_library_search() {
 
     // (1,0) should be 1.0 (identical)
     assert!(
-        (scores[0] - 1.0).abs() < 1e-10,
+        (scores[0] - 1.0).abs() < tolerances::ANALYTICAL_LOOSE,
         "Identical should score 1.0"
     );
 }
@@ -400,7 +401,7 @@ fn eic_extract_and_integrate() {
     // Integrate: trapezoid over 3 points
     let area = eic::integrate_peak(&eics[0].rt, &eics[0].intensity, 0, 2);
     // (100+500)/2*1 + (500+100)/2*1 = 300 + 300 = 600
-    assert!((area - 600.0).abs() < 1e-10);
+    assert!((area - 600.0).abs() < tolerances::ANALYTICAL_LOOSE);
 }
 
 // ── Diversity pipeline integration ────────────────────────────
@@ -440,7 +441,7 @@ fn diversity_full_pipeline() {
     assert_eq!(curve.len(), 4);
     // Should be monotonically increasing
     for i in 1..curve.len() {
-        assert!(curve[i] >= curve[i - 1] - 1e-10);
+        assert!(curve[i] >= curve[i - 1] - tolerances::RAREFACTION_MONOTONIC);
     }
 }
 

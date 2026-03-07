@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-07 (Phase 97e: 287 experiments, 291 binaries, 8,431+ checks. barraCuda builder patterns (`HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`), `PrecisionRoutingAdvice`, `shaders::provenance` wired. 1,346 tests, clippy pedantic CLEAN. Exp311: deep audit, Exp312: provenance rewire)
+**Updated**: 2026-03-07 (V98: 293 experiments, 296 binaries, 8,604+ checks. V98 full chain: Paper Math v5 (32/32) → CPU v24 (67/67) → GPU v13 (25/25) → Streaming v11 (25/25) → metalForge v16 (24/24) = 173/173 PASS. All 52 papers, 33 bio modules + statistics, Hybrid-aware GPU. 1,347 tests, clippy pedantic CLEAN.)
 
 ---
 
@@ -189,6 +189,11 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 303 | [Mixed NUCLEUS V92G](303_mixed_nucleus_v92g.md) | forge | DONE | metalForge | Multi-GPU dispatch, 6 GPU/NPU/CPU pipeline patterns, topology matrix, all 54 workloads routed, bandwidth decisions | 147 |
 | 304 | [Cross-Spring Evolution S87](304_cross_spring_evolution_s87.md) | cross | DONE | ToadStool S87 | Cross-spring provenance, shader evolution, 61 checks | 61 |
 | 305 | Cross-Spring Evolution S93 | cross | DONE | barraCuda v0.3.1 | 12-domain validation: math, RK45 ODE, stats, spectral, linalg, sampling, numerical, bio ODE, tolerance search, KMD, benchmarks, provenance | 59 |
+| 313 | Paper Math Control v5 | paper | DONE | Published equations | All 52 papers — Track 4 soil strengthened, analytical identities | 32 |
+| 314 | BarraCuda CPU v24 | cpu | DONE | Analytical | 33 bio modules + statistics, 8 domains, 2.8ms pure Rust | 67 |
+| 316 | BarraCuda GPU v13 | gpu | DONE | CPU reference (Exp314) | Full-domain GPU portability, Hybrid-aware, diversity+Anderson+chemistry | 25 |
+| 317 | Pure GPU Streaming v11 | streaming | DONE | CPU+GPU reference | E2E pipeline: diversity→BC→Anderson→stats, zero CPU round-trips | 25 |
+| 318 | metalForge v16 | metalforge | DONE | Pipeline integration | Cross-system paper math, 6 domains, CPU=GPU=NPU | 24 |
 
 ---
 
@@ -397,13 +402,13 @@ thresholds from `src/tolerances.rs`.
 | `validate_cross_spring_modern_s86` | 297 | 46 | `cargo run --release --features gpu --bin validate_cross_spring_modern_s86` |
 | `validate_cross_spring_evolution_s87` | 304 | 61 | `cargo run --release --features gpu --bin validate_cross_spring_evolution_s87` |
 
-**Total validation checks**: 8,400+
+**Total validation checks**: 8,604+
 **Rust tests**: 1,047 (library)
-**Binaries**: 290 total (250 validate + 20 benchmark + 20 other)
+**Binaries**: 296 total (256 validate + 20 benchmark + 20 other)
 **barraCuda primitives**: 150+ consumed (standalone v0.3.3, wgpu 28, Fp64Strategy, fused ops)
 **Papers**: 52 (25 Tracks 1-2 + 5 Track 3 + 9 Track 4 + 1 cross-spring + 9 extensions + 3 reference)
 **Local WGSL shaders**: 0 (all absorbed)
-**GPU modules**: 42 total (all lean on upstream primitives)
+**GPU modules**: 45 total (all lean on upstream primitives)
 **Benchmark infrastructure**: `bench.rs` harness with RAPL + nvidia-smi energy profiling, JSON output
 
 ### V97c — Fused Ops Chain (Exp306-310)
@@ -436,6 +441,22 @@ V97e: Builder pattern migration (HMM, DADA2, Gillespie dispatch), precision rout
 via `PrecisionRoutingAdvice`, `shaders::provenance` wired with wetSpring-specific views,
 8 error propagation fixes, provenance validation binary (28 shaders tracked, 22 cross-spring,
 17 consumed by wetSpring). Full regression GREEN (1,346 tests).
+
+### V98 — Full-Chain Validation Buildout (Exp313–318)
+
+| Exp | Name | Chain | Checks |
+|-----|------|-------|:------:|
+| 313 | Paper Math Control v5 — All 52 Papers | Paper | 32 |
+| 314 | BarraCuda CPU v24 — Comprehensive Bio Domain Parity | CPU | 67 |
+| 316 | BarraCuda GPU v13 — Full-Domain GPU Portability | GPU | 25 |
+| 317 | Pure GPU Streaming v11 — End-to-End Pipeline | Streaming | 25 |
+| 318 | metalForge v16 — Cross-System Paper Math | metalForge | 24 |
+
+V98: Complete chain proving Paper → CPU → GPU → Streaming → metalForge
+for all 52 papers. 33 bio modules + statistics in CPU v24 (8 domains, 2.8ms
+pure Rust). GPU v13 Hybrid-aware (DF64 skip on consumer GPU, FusedMapReduceF64
+validated). Streaming v11 zero CPU round-trips. metalForge v16 proves
+CPU = GPU = NPU for all paper math domains. **173/173 PASS.**
 
 ---
 

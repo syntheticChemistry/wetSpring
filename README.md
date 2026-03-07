@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 7, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** Phase 97e — 1,046 lib tests + 200 forge tests + 100 doc tests, 287 experiments, 8,431+ validation checks, 291 binaries, standalone `barraCuda` v0.3.3 (`2a6c072`, 694+ WGSL shaders, wgpu 28). Builder patterns rewired (`HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`), `PrecisionRoutingAdvice` wired for shared-memory f64 safety, `shaders::provenance` API live (28 shaders tracked, 22 cross-spring, 17 consumed). Zero local WGSL, zero unsafe code, 164 named tolerances, `cargo clippy -D warnings` **ZERO WARNINGS** (default + GPU), `cargo doc -D warnings` **ZERO WARNINGS**. Ecosystem: barraCuda `2a6c072`, toadStool S130, coralReef Phase 10.
+**Status:** V98 — 1,046 lib tests + 200 forge tests + 100 doc tests, 293 experiments, 8,604+ validation checks, 296 binaries, standalone `barraCuda` v0.3.3 (`2a6c072`, 694+ WGSL shaders, wgpu 28). V98 full chain: Paper Math v5 (52 papers, 32/32) → CPU v24 (67/67) → GPU v13 (25/25) → Streaming v11 (25/25) → metalForge v16 (24/24) = **173/173 PASS**. Zero local WGSL, zero unsafe code, 164 named tolerances, `cargo clippy -D warnings` **ZERO WARNINGS** (default + GPU), `cargo doc -D warnings` **ZERO WARNINGS**. Ecosystem: barraCuda `2a6c072`, toadStool S130, coralReef Phase 10.
 
 ---
 
@@ -127,14 +127,15 @@ integration point.
 | V88 experiment buildout (Exp263-270) | 427 (CPU v20, CPU↔GPU v7, metalForge v12, NUCLEUS v3, ToadStool pure-math v3, CPU↔GPU pure-math, mixed-HW dispatch, biomeOS graph) |
 | Exp271: Cross-Spring S79 (13 domains) | 73 |
 | Exp272: Bio Brain (7 domains) | 64 |
-| **Total validation checks** | **8,400+** |
+| V98 full chain (Exp313-318) | 173 (Paper 32 + CPU 67 + GPU 25 + Streaming 25 + metalForge 24) |
+| **Total validation checks** | **8,604+** |
 | Rust library unit tests | 1,047 (barracuda) |
 | metalForge forge tests | 200 |
 | Doc-tests | 27 (barracuda 18 + forge 9) |
 | **Total Rust tests** | **1,347** (lib + forge + integration + doc) |
 | Library code coverage | **95.86% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov) |
-| Experiments completed | 286 |
-| Validation/benchmark binaries | 290 |
+| Experiments completed | 293 |
+| Validation/benchmark binaries | 296 |
 | CPU bio modules | 47 |
 | GPU bio modules | 45 (30 lean + 5 write→lean + 7 compose + 0 passthrough) |
 | Tier B (needs refactor) | 0 (all promoted) |
@@ -146,7 +147,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | `barraCuda` primitives consumed | **150+** (always-on, zero fallback code — standalone `barraCuda` v0.3.3 `2a6c072`, wgpu 28, PrecisionRoutingAdvice) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 8,400+ validation checks **PASS**. All 1,047 library + 200 forge tests **PASS** (1 ignored: hardware-dependent).
+All 8,604+ validation checks **PASS**. All 1,047 library + 200 forge tests **PASS** (1 ignored: hardware-dependent).
 
 ### GPU Performance
 
@@ -387,7 +388,30 @@ barracuda math through GPU parity to mixed-hardware NUCLEUS dispatch:
 - 14 new tests (power.rs, nrs.rs, brain/observation.rs)
 - All doc_markdown clippy warnings fixed across 30+ files
 
-### Phase 95: Standalone barraCuda Rewire + Deep Debt Evolution (current)
+### V98: Full-Chain Validation Buildout (Exp313–318) — current
+
+Complete V98 validation chain proving the full evolution path from paper math
+through pure Rust CPU to GPU portability to unidirectional streaming to
+cross-substrate dispatch. All 52 papers covered with strengthened analytical checks.
+
+| Exp | Name | Chain Position | Checks | Time |
+|-----|------|---------------|:------:|-----:|
+| 313 | Paper Math Control v5 — All 52 Papers | Paper | 32/32 | 0.4ms |
+| 314 | BarraCuda CPU v24 — Comprehensive Bio Domain Parity | CPU | 67/67 | 2.8ms |
+| 316 | BarraCuda GPU v13 — Full-Domain GPU Portability | GPU | 25/25 | 20.5ms |
+| 317 | Pure GPU Streaming v11 — End-to-End Pipeline | Streaming | 25/25 | 14.9ms |
+| 318 | metalForge v16 — Cross-System Paper Math | metalForge | 24/24 | 0.5ms |
+
+**173/173 checks PASS.** V98 additions over V97e:
+- 5 new Track 4 soil papers strengthened (Martínez-García, Feng, Islam, Zuber, Liang)
+- Analytical identities: `erf(0)=0`, `Φ(0)=0.5`, `BC(x,x)=0`, `H(uniform)=ln(n)`
+- GPU Hybrid-aware: DF64 fused ops skip on consumer GPU (FusedMapReduceF64 validated)
+- 33 bio modules + statistics in CPU v24 (8 domains, 2.8ms pure Rust)
+- Cross-system: CPU = GPU = NPU for all paper math domains
+
+**1,047 tests** | **293 experiments** | **296 binaries** | **8,604+ checks**
+
+### Phase 95: Standalone barraCuda Rewire + Deep Debt Evolution
 
 Rewired from ToadStool-embedded `barracuda` v0.2.0 to standalone `barraCuda`
 v0.3.1. Comprehensive deep debt resolution across the full codebase:

@@ -12,6 +12,7 @@ use std::path::Path;
 use tempfile::TempDir;
 use wetspring_barracuda::encoding::base64_encode;
 use wetspring_barracuda::io::{fastq, ms2, mzml, nanopore};
+use wetspring_barracuda::tolerances;
 
 use flate2::Compression;
 use flate2::write::GzEncoder;
@@ -452,8 +453,13 @@ fn fastq_streaming_stats_match_collected() {
     assert_eq!(collected_stats.total_bases, streaming_stats.total_bases);
     assert_eq!(collected_stats.min_length, streaming_stats.min_length);
     assert_eq!(collected_stats.max_length, streaming_stats.max_length);
-    assert!((collected_stats.mean_quality - streaming_stats.mean_quality).abs() < 1e-10);
-    assert!((collected_stats.gc_content - streaming_stats.gc_content).abs() < 1e-10);
+    assert!(
+        (collected_stats.mean_quality - streaming_stats.mean_quality).abs()
+            < tolerances::PYTHON_PARITY
+    );
+    assert!(
+        (collected_stats.gc_content - streaming_stats.gc_content).abs() < tolerances::PYTHON_PARITY
+    );
     assert_eq!(collected_stats.q30_count, streaming_stats.q30_count);
 }
 
@@ -595,8 +601,8 @@ fn fastq_gzip_roundtrip() {
     assert_eq!(collected.total_bases, streaming.total_bases);
     assert_eq!(collected.min_length, streaming.min_length);
     assert_eq!(collected.max_length, streaming.max_length);
-    assert!((collected.mean_quality - streaming.mean_quality).abs() < 1e-10);
-    assert!((collected.gc_content - streaming.gc_content).abs() < 1e-10);
+    assert!((collected.mean_quality - streaming.mean_quality).abs() < tolerances::PYTHON_PARITY);
+    assert!((collected.gc_content - streaming.gc_content).abs() < tolerances::PYTHON_PARITY);
 }
 
 #[test]
@@ -619,8 +625,8 @@ fn fastq_gzip_stats_correctness() {
     let stats = fastq::stats_from_file(&path).unwrap();
     assert_eq!(stats.num_sequences, 2);
     assert_eq!(stats.total_bases, 16);
-    assert!((stats.gc_content - 0.5).abs() < 1e-10);
-    assert!((stats.mean_quality - 20.0).abs() < 1e-10);
+    assert!((stats.gc_content - 0.5).abs() < tolerances::PYTHON_PARITY);
+    assert!((stats.mean_quality - 20.0).abs() < tolerances::PYTHON_PARITY);
     assert_eq!(stats.q30_count, 1);
 }
 

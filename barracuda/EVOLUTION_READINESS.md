@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 7, 2026 (Phase 97e — barraCuda v0.3.3 HEAD 2a6c072 + toadStool S130 + coralReef Phase 10)
+**Date:** March 7, 2026 (V98 — barraCuda v0.3.3 HEAD 2a6c072 + toadStool S130 + coralReef Phase 10)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 45 GPU modules + 1 IPC + 1 vault + 1 provenance module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.3, wgpu 28, builder patterns wired: `HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`), `PrecisionRoutingAdvice` routed for shared-memory f64 safety, `shaders::provenance` API live (28 shaders tracked, 22 cross-spring, 17 consumed by wetSpring). 1,346 tests, 287 experiments, 8,431+ checks, 164 tolerances, `cargo clippy -D warnings` CLEAN (default + GPU), **0 silent fallbacks**, I/O buffering deprecated. **Phase 97e:** Builder pattern migration complete (HMM, DADA2, Gillespie dispatch rewired). `PrecisionRoutingAdvice` replaces coarse `Fp64Strategy` match. New provenance module with Exp312 validation binary (31/31 checks). 8 `.submit()` error propagation fixes.
+**Status:** 47 CPU + 45 GPU modules + 1 IPC + 1 vault + 1 provenance module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.3, wgpu 28). 1,347 tests, 293 experiments, 8,604+ checks, 164 tolerances, 296 binaries. `cargo clippy -D warnings` CLEAN (default + GPU), **0 silent fallbacks**. **V98:** Full-chain validation: Paper Math v5 (32/32) → CPU v24 (67/67) → GPU v13 (25/25) → Streaming v11 (25/25) → metalForge v16 (24/24) = **173/173 PASS**. All 52 papers, 33 bio modules + statistics, Hybrid-aware GPU.
 
 ### Full Lean Phase
 

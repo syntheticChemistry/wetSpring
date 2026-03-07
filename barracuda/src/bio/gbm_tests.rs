@@ -206,7 +206,7 @@ fn gbm_sigmoid_extreme_negative() {
     .unwrap();
     let gbm = GbmClassifier::new(vec![stump], 1.0, -5.0, 1).unwrap();
     let pred = gbm.predict_proba(&[0.0]);
-    assert!(pred.probability < 1e-6);
+    assert!(pred.probability < crate::tolerances::DADA2_ERR_CONVERGENCE);
 }
 
 #[test]

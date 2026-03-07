@@ -1606,3 +1606,30 @@ path = "src/bin/validate_pure_gpu_streaming_v10.rs"
 [[bin]]
 name = "validate_metalforge_v15"
 path = "src/bin/validate_metalforge_v15.rs"
+
+# ── Exp313: V98 Paper Math Control v5 (all 52 papers) ──
+[[bin]]
+name = "validate_paper_math_control_v5"
+path = "src/bin/validate_paper_math_control_v5.rs"
+
+# ── Exp314: V98 CPU v24 Comprehensive Bio Domain Parity ──
+[[bin]]
+name = "validate_barracuda_cpu_v24"
+path = "src/bin/validate_barracuda_cpu_v24.rs"
+
+# ── Exp316: V98 GPU v13 Full-Domain Portability ──
+[[bin]]
+name = "validate_barracuda_gpu_v13"
+path = "src/bin/validate_barracuda_gpu_v13.rs"
+required-features = ["gpu"]
+
+# ── Exp317: V98 Pure GPU Streaming v11 ──
+[[bin]]
+name = "validate_pure_gpu_streaming_v11"
+path = "src/bin/validate_pure_gpu_streaming_v11.rs"
+required-features = ["gpu"]
+
+# ── Exp318: V98 metalForge v16 Cross-System ──
+[[bin]]
+name = "validate_metalforge_v16"
+path = "src/bin/validate_metalforge_v16.rs"

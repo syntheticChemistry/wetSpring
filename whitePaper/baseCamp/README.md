@@ -2,7 +2,7 @@
 
 **Date:** March 7, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 97e — 287 experiments, 8,431+ validation checks, ALL PASS; 1,346 tests, 291 binaries, standalone `barraCuda` v0.3.3 (wgpu 28, 694+ WGSL shaders). Builder patterns rewired (`HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`), `PrecisionRoutingAdvice` for shared-memory f64 safety, `shaders::provenance` API live (28 shaders tracked, 22 cross-spring). 0 local WGSL, 164 tolerances, 0 unsafe, clippy pedantic ZERO WARNINGS. V97e: provenance rewire (Exp312). V97d: deep audit (Exp311). 52+6 papers reproduced with full three-tier + paper-math chain
+**Status:** V98 — 293 experiments, 8,604+ validation checks, ALL PASS; 1,347 tests, 296 binaries, standalone `barraCuda` v0.3.3 (wgpu 28, 694+ WGSL shaders). V98 full chain: Paper Math v5 (32/32) → CPU v24 (67/67) → GPU v13 (25/25) → Streaming v11 (25/25) → metalForge v16 (24/24) = **173/173 PASS**. 0 local WGSL, 164 tolerances, 0 unsafe, clippy pedantic ZERO WARNINGS. 52 papers reproduced with full five-tier validation chain.
 
 ---
 
@@ -45,7 +45,8 @@ All code is AGPL-3.0.
 | **V89 S79 Rewire** | — | cross | — | 271 | 73 | Cross-spring S79 provenance: 13 domains, 6 springs, `MultiHeadBioEsn`, `SpectralAnalysis` IPC, ToadStool S79 deep rewire |
 | **V90 Bio Brain** | — | cross | — | 272 | 64 | hotSpring 4-layer brain → `BioBrain`, 36-head Gen2 → `BioHeadGroupDisagreement` + `AttentionState`, bingoCube/nautilus → `BioNautilusBrain`, 3 IPC methods, 7 domains, 7 springs |
 | **V97c Fused Ops** | — | chain | — | Exp306-310 | 111 | Welford, Pearson, Spearman, CorrMatrix, streaming, metalForge |
-| **Total** | | | **52** | | **8,400+** | |
+| **V98 Full Chain** | — | chain | — | Exp313-318 | 173 | All 52 papers, 33 bio modules, GPU Hybrid-aware, streaming, metalForge |
+| **Total** | | | **52** | | **8,604+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -116,6 +117,7 @@ Every paper goes through the full evolution. Status across all 52 papers:
 | **V97c fused ops chain** | Full chain: CPU fused parity (38), Python benchmarks (13), GPU portability on Hybrid (21), pure GPU streaming (18), metalForge cross-substrate (21). Hybrid-aware graceful degradation for VarianceF64/CorrelationF64. DF64 FusedMapReduceF64 validated on consumer GPU. | 111 checks (Exp306-310) |
 | **V97d deep audit** | Crate-wide deep audit: I/O buffering APIs deprecated (streaming-first), 104 unwrap→expect evolutions, doc accuracy (MSRV, wgpu version, rustdoc escaping), broken reference cleanup, full regression GREEN. | 125 items (Exp311) |
 | **V97e provenance rewire** | Builder pattern migration (HMM, DADA2, Gillespie dispatch → struct args). PrecisionRoutingAdvice for shared-memory f64 safety. shaders::provenance API (28 shaders, 22 cross-spring, 17 consumed). Error propagation fixes. | 31 checks (Exp312) |
+| **V98 full chain** | Paper Math v5 (52 papers) → CPU v24 (33 bio modules) → GPU v13 (Hybrid-aware, diversity+Anderson+chemistry) → Streaming v11 (zero CPU round-trips) → metalForge v16 (CPU=GPU=NPU). Strengthened Track 4 soil papers, analytical identities. | 173 checks (Exp313-318) |
 
 ## Extension Roadmap
 

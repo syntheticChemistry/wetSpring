@@ -2,6 +2,7 @@
 #![allow(clippy::expect_used, clippy::unwrap_used)]
 
 use super::*;
+use crate::tolerances;
 
 #[test]
 fn translate_standard_codons() {
@@ -15,8 +16,8 @@ fn translate_standard_codons() {
 fn identical_sequences_zero() {
     let seq = b"ATGATGATG";
     let result = pairwise_dnds(seq, seq).unwrap();
-    assert!((result.dn - 0.0).abs() < 1e-12);
-    assert!((result.ds - 0.0).abs() < 1e-12);
+    assert!((result.dn - 0.0).abs() < tolerances::ANALYTICAL_F64);
+    assert!((result.ds - 0.0).abs() < tolerances::ANALYTICAL_F64);
     assert_eq!(result.omega, None);
 }
 
@@ -27,7 +28,7 @@ fn synonymous_only_ds_positive() {
     let seq2 = b"TTCGCTAAA";
     let result = pairwise_dnds(seq1, seq2).unwrap();
     assert!(result.ds > 0.0);
-    assert!((result.dn - 0.0).abs() < 1e-12);
+    assert!((result.dn - 0.0).abs() < tolerances::ANALYTICAL_F64);
     assert_eq!(result.omega, Some(0.0));
 }
 
@@ -55,7 +56,7 @@ fn gap_codons_skipped() {
     let seq1 = b"ATG---GCT";
     let seq2 = b"ATG---GCT";
     let result = pairwise_dnds(seq1, seq2).unwrap();
-    assert!((result.dn - 0.0).abs() < 1e-12);
+    assert!((result.dn - 0.0).abs() < tolerances::ANALYTICAL_F64);
 }
 
 #[test]
@@ -70,7 +71,7 @@ fn not_divisible_by_3_error() {
 
 #[test]
 fn jukes_cantor_zero() {
-    assert!((jukes_cantor(0.0) - 0.0).abs() < 1e-15);
+    assert!((jukes_cantor(0.0) - 0.0).abs() < tolerances::EXACT_F64);
 }
 
 #[test]
@@ -83,8 +84,8 @@ fn jukes_cantor_small_p() {
 fn codon_sites_met() {
     // ATG: all changes are nonsynonymous (Met is unique codon)
     let (s, n) = codon_sites(b"ATG");
-    assert!((s - 0.0).abs() < 1e-12);
-    assert!((n - 3.0).abs() < 1e-12);
+    assert!((s - 0.0).abs() < tolerances::ANALYTICAL_F64);
+    assert!((n - 3.0).abs() < tolerances::ANALYTICAL_F64);
 }
 
 #[test]
@@ -102,13 +103,13 @@ fn deterministic() {
     let r1 = pairwise_dnds(seq1, seq2).unwrap();
     let r2 = pairwise_dnds(seq1, seq2).unwrap();
     assert!(
-        (r1.dn - r2.dn).abs() < 1e-12,
+        (r1.dn - r2.dn).abs() < tolerances::ANALYTICAL_F64,
         "dN not deterministic: {} vs {}",
         r1.dn,
         r2.dn
     );
     assert!(
-        (r1.ds - r2.ds).abs() < 1e-12,
+        (r1.ds - r2.ds).abs() < tolerances::ANALYTICAL_F64,
         "dS not deterministic: {} vs {}",
         r1.ds,
         r2.ds
@@ -125,8 +126,8 @@ fn batch_matches_individual() {
     assert_eq!(batch.len(), 3);
     let individual = pairwise_dnds(s1, s2).unwrap();
     let batch_0 = batch[0].as_ref().unwrap();
-    assert!((batch_0.dn - individual.dn).abs() < 1e-15);
-    assert!((batch_0.ds - individual.ds).abs() < 1e-15);
+    assert!((batch_0.dn - individual.dn).abs() < tolerances::EXACT_F64);
+    assert!((batch_0.ds - individual.ds).abs() < tolerances::EXACT_F64);
 }
 
 #[test]
@@ -159,15 +160,15 @@ fn translate_partial_codon_len_not_3() {
 #[test]
 fn codon_sites_stop_codon_returns_zero() {
     let (s, n) = codon_sites(b"TAA");
-    assert!((s - 0.0).abs() < 1e-12);
-    assert!((n - 0.0).abs() < 1e-12);
+    assert!((s - 0.0).abs() < tolerances::ANALYTICAL_F64);
+    assert!((n - 0.0).abs() < tolerances::ANALYTICAL_F64);
 }
 
 #[test]
 fn codon_sites_invalid_codon_returns_zero() {
     let (s, n) = codon_sites(b"NNN");
-    assert!((s - 0.0).abs() < 1e-12);
-    assert!((n - 0.0).abs() < 1e-12);
+    assert!((s - 0.0).abs() < tolerances::ANALYTICAL_F64);
+    assert!((n - 0.0).abs() < tolerances::ANALYTICAL_F64);
 }
 
 #[test]
@@ -175,8 +176,8 @@ fn sequences_too_short_single_codon() {
     // Single codon (3 bp): valid length, but all sites compare same codon pair
     // Result: dN=0, dS=0 (identical or counted as 0 differences)
     let result = pairwise_dnds(b"ATG", b"ATG").unwrap();
-    assert!((result.dn - 0.0).abs() < 1e-12);
-    assert!((result.ds - 0.0).abs() < 1e-12);
+    assert!((result.dn - 0.0).abs() < tolerances::ANALYTICAL_F64);
+    assert!((result.ds - 0.0).abs() < tolerances::ANALYTICAL_F64);
 }
 
 #[test]
@@ -197,7 +198,7 @@ fn jukes_cantor_saturation_p_ge_75() {
 
 #[test]
 fn jukes_cantor_negative_p_returns_zero() {
-    assert!((jukes_cantor(-0.1) - 0.0).abs() < 1e-15);
+    assert!((jukes_cantor(-0.1) - 0.0).abs() < tolerances::EXACT_F64);
 }
 
 #[test]
@@ -218,7 +219,7 @@ fn synonymous_only_ds_positive_omega_zero() {
     let seq2 = b"TTCGCTAAA";
     let result = pairwise_dnds(seq1, seq2).unwrap();
     assert!(result.ds > 0.0);
-    assert!((result.dn - 0.0).abs() < 1e-12);
+    assert!((result.dn - 0.0).abs() < tolerances::ANALYTICAL_F64);
     assert_eq!(result.omega, Some(0.0));
 }
 
@@ -258,7 +259,7 @@ fn gap_and_dot_codons_skipped() {
     let seq1 = b"ATG...GCT";
     let seq2 = b"ATG...GCT";
     let result = pairwise_dnds(seq1, seq2).unwrap();
-    assert!((result.dn - 0.0).abs() < 1e-12);
+    assert!((result.dn - 0.0).abs() < tolerances::ANALYTICAL_F64);
 }
 
 #[test]
@@ -266,6 +267,6 @@ fn lowercase_bases_handled() {
     let seq1 = b"atggctaaa";
     let seq2 = b"atggctaaa";
     let result = pairwise_dnds(seq1, seq2).unwrap();
-    assert!((result.dn - 0.0).abs() < 1e-12);
-    assert!((result.ds - 0.0).abs() < 1e-12);
+    assert!((result.dn - 0.0).abs() < tolerances::ANALYTICAL_F64);
+    assert!((result.ds - 0.0).abs() < tolerances::ANALYTICAL_F64);
 }

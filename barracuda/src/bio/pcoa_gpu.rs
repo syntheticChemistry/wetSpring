@@ -75,8 +75,12 @@ pub fn pcoa_gpu(
 
     let (raw_eigenvalues, raw_eigenvectors) = if n <= 32 {
         BatchedEighGpu::execute_single_dispatch(
-            device, &centered, n, 1, // batch_size = 1 (single matrix)
-            max_sweeps, 1e-12,
+            device,
+            &centered,
+            n,
+            1, // batch_size = 1 (single matrix)
+            max_sweeps,
+            crate::tolerances::ANALYTICAL_F64,
         )
     } else {
         BatchedEighGpu::execute_f64(device, &centered, n, 1, max_sweeps)

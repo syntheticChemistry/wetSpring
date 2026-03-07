@@ -421,7 +421,7 @@ impl GpuPipelineSession {
         for i in 0..n {
             for j in (i + 1)..n {
                 let denom = norms[i] * norms[j];
-                let cos = if denom > 1e-15 {
+                let cos = if denom > crate::tolerances::MATRIX_EPS {
                     dot_matrix[i * n + j] / denom
                 } else {
                     0.0

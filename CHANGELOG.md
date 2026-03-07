@@ -3,6 +3,38 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V98 — Full-Chain Validation Buildout (2026-03-07)
+
+### Added
+- **Exp313**: Paper Math Control v5 — all 52 papers, strengthened Track 4 soil papers
+  (Martínez-García, Feng, Islam, Zuber, Liang), analytical identities (32/32)
+- **Exp314**: BarraCuda CPU v24 — 33 bio modules + statistics across 8 domains (67/67, 2.8ms)
+- **Exp316**: BarraCuda GPU v13 — full-domain GPU portability, Hybrid-aware (25/25)
+- **Exp317**: Pure GPU Streaming v11 — unidirectional pipeline, zero CPU round-trips (25/25)
+- **Exp318**: metalForge v16 — cross-system paper math, CPU=GPU=NPU (24/24)
+- V98 handoff: `WETSPRING_V98_BARRACUDA_TOADSTOOL_FULL_CHAIN_HANDOFF_MAR07_2026.md`
+
+### Changed
+- Root README, experiments README, baseCamp README — updated to V98 (293 experiments,
+  8,604+ checks, 296 binaries)
+- `barracuda/README.md`, `EVOLUTION_READINESS.md` — updated to V98
+- `wateringHole/CROSS_SPRING_SHADER_EVOLUTION.md` — validation section updated to V98
+- `ecoPrimals/whitePaper/gen3/baseCamp/README.md` — wetSpring version updated to V98
+- `ecoPrimals/wateringHole/CROSS_SPRING_SHADER_EVOLUTION.md` — validation section updated
+
+### Key findings
+- GPU `FusedMapReduceF64` (Shannon/Simpson/BC) works on Hybrid (RTX 4070)
+- DF64 fused stat shaders (`VarianceF64`, `CorrelationF64`, etc.) produce zero on Hybrid
+- Sample variance of uniform {1..n}: `n(n+1)/12` (ddof=1), not `(n²-1)/12`
+- `bray_curtis` asserts equal-length inputs; synthetic data must match dimensions
+- Anderson spectral on small lattices (4³, 30 Lanczos) is noisy — use `r ∈ (0,1)` checks
+
+### Validated
+- `cargo fmt`: PASS
+- `cargo clippy -D warnings --features gpu`: ZERO WARNINGS
+- V98 full chain: **173/173 PASS** (Paper→CPU→GPU→Streaming→metalForge)
+- Total: 8,604+ checks, 1,347 tests, 296 binaries, 293 experiments
+
 ## V97e — Cross-Spring Provenance Rewire (2026-03-07)
 
 ### Rewired

@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** March 7, 2026 (Phase 97e — barraCuda v0.3.3 `2a6c072`, wgpu 28)
+**Updated:** March 7, 2026 (V98 — barraCuda v0.3.3 `2a6c072`, wgpu 28. V98 full chain: 173/173 PASS)
 
 ---
 

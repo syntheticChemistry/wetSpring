@@ -47,9 +47,9 @@ impl NestClient {
         &self.socket
     }
 
-    /// Family ID for storage operations (crate-visible for tests).
+    /// Family ID for storage operations.
+    #[cfg(test)]
     #[must_use]
-    #[allow(dead_code)]
     pub(crate) fn family_id(&self) -> &str {
         &self.family_id
     }

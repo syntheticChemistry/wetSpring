@@ -79,7 +79,7 @@ impl KgEmbedding {
                 .map(|x| x * x)
                 .sum::<f64>()
                 .sqrt();
-            if norm > 1e-15 {
+            if norm > wetspring_barracuda::tolerances::EMBEDDING_NORM_FLOOR {
                 for d in 0..EMBED_DIM {
                     entity_embeddings[start + d] /= norm;
                 }

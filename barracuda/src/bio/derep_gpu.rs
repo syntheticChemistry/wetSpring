@@ -36,7 +36,7 @@ const GPU_DISPATCH_THRESHOLD: usize = 16;
 const SKETCH_K: u32 = 8;
 
 /// Cosine threshold for "identical" sequences (1.0 - ε).
-const IDENTICAL_THRESHOLD: f64 = 1.0 - 1e-10;
+const IDENTICAL_THRESHOLD: f64 = 1.0 - crate::tolerances::PCOA_EIGENVALUE_FLOOR;
 
 fn require_f64(gpu: &GpuF64) -> Result<()> {
     if !gpu.has_f64 {

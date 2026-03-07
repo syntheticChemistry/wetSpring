@@ -28,7 +28,7 @@
 //! ## Cross-Spring Evolution Highlights
 //!
 //! - **hotSpring precision shaders** (DF64, SU(3), CG solver) → all springs
-//! - **wetSpring bio shaders** (SW, Felsenstein, Gillespie, HMM, fused_map_reduce) →
+//! - **wetSpring bio shaders** (SW, Felsenstein, Gillespie, HMM, `fused_map_reduce`) →
 //!   neuralSpring batched inference, evolutionary dynamics
 //! - **neuralSpring statistics** (KL divergence, chi-squared, correlation) →
 //!   wetSpring enrichment testing, hotSpring nuclear fits

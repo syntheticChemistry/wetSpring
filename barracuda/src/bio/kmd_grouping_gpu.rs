@@ -108,7 +108,7 @@ mod tests {
         let kmd0 = cpu[0].kmd;
         for r in &cpu[1..] {
             assert!(
-                (r.kmd - kmd0).abs() < 0.01,
+                (r.kmd - kmd0).abs() < crate::tolerances::COSINE_ORTHOGONAL,
                 "homologous KMDs should match: {kmd0} vs {}",
                 r.kmd
             );

@@ -39,7 +39,10 @@ fn jc69_transition_probabilities() {
     );
 
     let p_large = jc69_prob(0, 0, 1000.0, 1.0);
-    assert!((p_large - 0.25).abs() < 1e-6, "long branch → uniform");
+    assert!(
+        (p_large - 0.25).abs() < crate::tolerances::JC69_PROBABILITY,
+        "long branch → uniform"
+    );
 }
 
 #[test]
