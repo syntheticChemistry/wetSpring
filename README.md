@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 7, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** Phase 97d — 1,047 lib tests + 200 forge tests, 286 experiments, 8,400+ validation checks, 290 binaries, standalone `barraCuda` v0.3.3 (694+ WGSL shaders, wgpu 28, Fp64Strategy precision dispatch), 150+ primitives consumed + fused Welford/Pearson, zero local WGSL, zero unsafe code, 164 named tolerances, `cargo clippy -W clippy::pedantic -W clippy::nursery` **ZERO WARNINGS**, `cargo doc` **ZERO WARNINGS**. V97d: buffering I/O APIs deprecated (streaming-first), `.unwrap()` evolved to `.expect()` across 12 validation binaries, 3 doc-accuracy fixes (MSRV, wgpu version, rustdoc escaping).
+**Status:** Phase 97d+ — 1,047 lib tests + 200 forge tests, 286 experiments, 8,400+ validation checks, 290 binaries, standalone `barraCuda` v0.3.3 (`2a6c072`, 694+ WGSL shaders, wgpu 28, Fp64Strategy + `PrecisionRoutingAdvice`, `shaders::provenance`, `BatchedOdeRK45F64`), 150+ primitives consumed + fused Welford/Pearson, zero local WGSL, zero unsafe code, 164 named tolerances, `cargo clippy -W clippy::pedantic -W clippy::nursery` **ZERO WARNINGS**, `cargo doc` **ZERO WARNINGS**. Ecosystem sync: barraCuda `2a6c072`, toadStool S130 (19,140+ tests), coralReef Phase 10 (sovereign WGSL→native compiler). V97d: I/O deprecation, unwrap→expect evolution, doc accuracy fixes.
 
 ---
 
@@ -144,7 +144,7 @@ integration point.
 | metalForge cross-system | 37+ domains CPU↔GPU (Exp103+104+165+182+208), **39/39 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
-| `barraCuda` primitives consumed | **150+** (always-on, zero fallback code — standalone `barraCuda` v0.3.3, wgpu 28) |
+| `barraCuda` primitives consumed | **150+** (always-on, zero fallback code — standalone `barraCuda` v0.3.3 `2a6c072`, wgpu 28, PrecisionRoutingAdvice) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
 All 8,400+ validation checks **PASS**. All 1,047 library + 200 forge tests **PASS** (1 ignored: hardware-dependent).
 
@@ -764,8 +764,9 @@ All validation data comes from public repositories:
 - **hotSpring** — Nuclear/plasma physics validation (sibling Spring, precision shaders, f64 WGSL, 4-layer brain architecture, 36-head ESN, NautilusBrain)
 - **neuralSpring** — ML/neural inference validation (sibling Spring, eigensolvers, batch IPR, TransE)
 - **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
-- **barraCuda** — Standalone math primal (767+ f64-canonical WGSL shaders, universal precision)
-- **toadStool** — Hardware dispatch primal (GPU/NPU/CPU routing, adaptive tuning)
+- **barraCuda** — Standalone math primal (767+ f64-canonical WGSL shaders, universal precision, `PrecisionRoutingAdvice`, `shaders::provenance`, `BatchedOdeRK45F64`)
+- **toadStool** — Hardware dispatch primal (GPU/NPU/CPU routing, adaptive tuning, S130 — 19,140+ tests, `science.*` IPC, coralReef proxy)
+- **coralReef** — Sovereign GPU shader compiler (WGSL/SPIR-V → native binary, Phase 10, SM70–SM89 + RDNA2, `shader.compile.*` IPC)
 - **wateringHole** — Inter-primal handoffs and cross-spring coordination
   - `handoffs/WETSPRING_BARRACUDA_031_REWIRE_HANDOFF_MAR03_2026.md` — barraCuda v0.3.1 rewire
   - `handoffs/archive/` — V7-V92J (fossil record)

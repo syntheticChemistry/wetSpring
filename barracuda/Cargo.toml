@@ -39,14 +39,17 @@ vault = ["dep:chacha20poly1305", "dep:ed25519-dalek", "dep:blake3"]
 # serde_json: JSON parsing for validation data and model import (2 binaries).
 serde_json = { version = "1", optional = true }
 
-# barraCuda — standalone math primal (v0.3.3). Pure math + GPU compute.
+# barraCuda — standalone math primal (v0.3.3, HEAD 2a6c072). Pure math + GPU compute.
 # default-features = false: no wgpu/bytemuck pulled in for CPU builds.
 # When `gpu` feature is active, `barracuda/gpu` enables GPU ops.
-# 144+ primitives consumed. 694+ WGSL shaders. wgpu 28. MSRV 1.87.
+# 150+ primitives consumed. 694+ WGSL shaders. wgpu 28. MSRV 1.87.
 # CPU: linalg, special, numerical, spectral, stats, sample.
-# GPU: FusedMapReduceF64, BrayCurtisF64, GemmF64, BatchedOdeRK4, etc.
-# Universal precision: f64-canonical with Fp64Strategy-based shader selection.
+# GPU: FusedMapReduceF64, BrayCurtisF64, GemmF64, BatchedOdeRK4/RK45, etc.
+# Universal precision: f64-canonical with Fp64Strategy + PrecisionRoutingAdvice.
 # DF64 core-streaming on consumer GPUs (~10x throughput vs throttled f64).
+# New: shaders::provenance (27 cross-spring shader records, evolution_report()),
+#      BatchedOdeRK45F64 (adaptive Dormand-Prince), mean_variance_to_buffer(),
+#      builder patterns (HmmForwardArgs, Dada2DispatchArgs, GillespieModel, etc.).
 barracuda = { path = "../../barraCuda/crates/barracuda", default-features = false }
 
 # akida-driver — pure Rust NPU access (BrainChip AKD1000/AKD1500).

@@ -1,8 +1,10 @@
 # ToadStool barracuda vs wetSpring: Deep Gap Analysis
 
-**Date:** March 3, 2026 (Phase 93)
-**Scope:** Compare ToadStool barracuda public exports with wetSpring actual usage. Identify unused primitives, adoption opportunities, and maintenance reduction.
-**barraCuda:** standalone v0.3.1
+**Date:** March 7, 2026 (Phase 97d)
+**Scope:** Compare barraCuda public exports with wetSpring actual usage. Identify unused primitives, adoption opportunities, and maintenance reduction.
+**barraCuda:** standalone v0.3.3 (HEAD 2a6c072)
+**toadStool:** S130 (19,140+ tests, cross-spring provenance, coralReef proxy)
+**coralReef:** Phase 10 (sovereign WGSL→native compiler, shader.compile.* IPC)
 
 **V84 additions:** 7 new CPU domains validated (adapter, placement, PCoA, bootstrap phylo, EIC, KMD, feature table); Python parity proof (Exp253).
 

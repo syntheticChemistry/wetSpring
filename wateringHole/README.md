@@ -9,6 +9,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
+| **V97d+** | `handoffs/WETSPRING_V97D_ECOSYSTEM_SYNC_HANDOFF_MAR07_2026.md` | Mar 7 | Ecosystem sync: barraCuda 2a6c072, toadStool S130, coralReef Phase 10. Zero API breakage, 1,347 tests PASS. |
 | **V97d** | `handoffs/WETSPRING_V97D_DEEP_AUDIT_EVOLUTION_HANDOFF_MAR07_2026.md` | Mar 7 | Deep audit: I/O deprecation, unwrap→expect evolution, doc accuracy, broken ref cleanup (Exp311, 125 items) |
 | **V97c** | `handoffs/WETSPRING_V97C_FUSED_OPS_CHAIN_HANDOFF_MAR05_2026.md` | Mar 5 | Fused ops full chain: Exp306-310 (111 checks). DF64 dispatch routing confirmed wired; DF64 fused shaders produce zero on RTX 4070 (shader validation gap, not wiring). |
 | **V97** | `handoffs/WETSPRING_V97_BARRACUDA_033_WGPU28_REWIRE_HANDOFF_MAR05_2026.md` | Mar 5 | barraCuda v0.3.3 + wgpu 28 rewire: 1,247 tests, zero clippy, chi_squared upstream fix |

@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 5, 2026 (Phase 97 — barraCuda v0.3.3 Rewire + wgpu 28)
+**Date:** March 7, 2026 (Phase 97d — barraCuda v0.3.3 HEAD 2a6c072 + toadStool S130 + coralReef Phase 10)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 45 GPU modules + 1 IPC + 1 vault module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.3, wgpu 28, Fp64Strategy precision dispatch, DF64 core-streaming on consumer GPUs), 1,047 lib tests + 200 forge tests, 281 experiments, 8,300+ checks, 164 named tolerance constants, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math, **0 TODO/FIXME/HACK**, **0 silent fallbacks**. **Phase 97:** wgpu 22→28 migration, `PollType::Wait` struct variant, `Arc<Device>`/`Arc<Queue>` removal, `DeviceDescriptor` field evolution, async `enumerate_adapters`, upstream `chi_squared.rs` GPU gate fix.
+**Status:** 47 CPU + 45 GPU modules + 1 IPC + 1 vault module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.3, wgpu 28, Fp64Strategy + PrecisionRoutingAdvice, DF64 core-streaming on consumer GPUs), 1,047 lib tests + 200 forge tests, 286 experiments, 8,400+ checks, 164 named tolerance constants, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math, **0 TODO/FIXME/HACK**, **0 silent fallbacks**, I/O buffering APIs deprecated (streaming-first). **Phase 97d:** barraCuda sync to `2a6c072` (provenance module, BatchedOdeRK45F64, PrecisionRoutingAdvice, builder patterns). toadStool S130 (cross-spring provenance, coralReef proxy, 19,140+ tests). coralReef Phase 10 (sovereign WGSL→native compiler, shader.compile.* IPC).
 
 ### Full Lean Phase
 

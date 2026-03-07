@@ -3,6 +3,33 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V97d+ — barraCuda/toadStool/coralReef Ecosystem Sync (2026-03-07)
+
+### Synced
+- **barraCuda** `2a6c072` (was `0bd401f`): provenance module (`shaders::provenance`),
+  `BatchedOdeRK45F64`, `PrecisionRoutingAdvice`, builder patterns
+  (`HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`, `Rk45DispatchArgs`),
+  `mean_variance_to_buffer()`, DF64 Hybrid fallback now returns error (not silent
+  zeros). Module decomposition and Phase 10 IPC alignment.
+- **toadStool** S130 (was S94b): cross-spring provenance tracking,
+  coralReef `shader.compile.*` proxy, `PrecisionRoutingAdvice`, `science.*` IPC
+  namespace (10 methods), 19,140+ tests.
+- **coralReef** Phase 10: sovereign Rust GPU compiler (WGSL/SPIR-V → native
+  GPU binary), SM70–SM89 NVIDIA + RDNA2 AMD, `shader.compile.spirv/wgsl` IPC.
+
+### Validated
+- `cargo check --workspace`: PASS (against barraCuda 2a6c072)
+- `cargo clippy --workspace -- -D warnings -W clippy::pedantic`: ZERO WARNINGS
+- `cargo doc --workspace --no-deps`: ZERO WARNINGS
+- `cargo test --workspace`: 1,347 tests PASS (0 failures, 1 ignored)
+- Zero API breakage from barraCuda HEAD update
+
+### Updated
+- `Cargo.toml`: barraCuda dependency comment updated (provenance, RK45, builders)
+- `EVOLUTION_READINESS.md`: synced to barraCuda 2a6c072, toadStool S130, coralReef Phase 10
+- `TOADSTOOL_WETSPRING_GAP_ANALYSIS.md`: date and scope updated
+- Handoff: `WETSPRING_V97D_ECOSYSTEM_SYNC_HANDOFF_MAR07_2026.md` created
+
 ## V97d — Deep Audit & Idiomatic Evolution (2026-03-07)
 
 ### Changed
