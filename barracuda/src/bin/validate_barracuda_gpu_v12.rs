@@ -150,7 +150,7 @@ fn main() {
         let t = Instant::now();
         let mut g23_checks = 0_u32;
 
-        let data_100: Vec<f64> = (1..=100).map(|i| f64::from(i)).collect();
+        let data_100: Vec<f64> = (1..=100).map(f64::from).collect();
         let cpu_mean = barracuda::stats::metrics::mean(&data_100);
         let cpu_svar =
             barracuda::stats::correlation::variance(&data_100).expect("CPU variance on data_100");
@@ -184,7 +184,7 @@ fn main() {
         );
         g23_checks += 1;
 
-        let x: Vec<f64> = (1..=50).map(|i| f64::from(i)).collect();
+        let x: Vec<f64> = (1..=50).map(f64::from).collect();
         let y: Vec<f64> = x.iter().map(|&xi| 2.0f64.mul_add(xi, 1.0)).collect();
         let cpu_r = barracuda::stats::pearson_correlation(&x, &y).expect("CPU Pearson correlation");
         let gpu_full = stats_gpu::correlation_full_gpu(&gpu, &x, &y).expect("correlation_full_gpu");
@@ -233,7 +233,7 @@ fn main() {
     let t = Instant::now();
     let mut g24_checks = 0_u32;
 
-    let data_100: Vec<f64> = (1..=100).map(|i| f64::from(i)).collect();
+    let data_100: Vec<f64> = (1..=100).map(f64::from).collect();
     let cpu_mean = barracuda::stats::metrics::mean(&data_100);
     let cpu_svar =
         barracuda::stats::correlation::variance(&data_100).expect("CPU variance on data_100");
@@ -263,7 +263,7 @@ fn main() {
     );
     g24_checks += 1;
 
-    let x: Vec<f64> = (1..=50).map(|i| f64::from(i)).collect();
+    let x: Vec<f64> = (1..=50).map(f64::from).collect();
     let y: Vec<f64> = x.iter().map(|&xi| 2.0 * xi + 1.0).collect();
     let r = barracuda::stats::pearson_correlation(&x, &y).expect("CPU Pearson correlation x,y");
     v.check("CPU: r(x, 2x+1) = 1", r, 1.0, tolerances::ANALYTICAL_F64);

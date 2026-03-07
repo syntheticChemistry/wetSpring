@@ -22,6 +22,7 @@ use crate::bio::derep::UniqueSequence;
 use crate::error::{Error, Result};
 use barracuda::Dada2EStepGpu;
 use barracuda::device::WgpuDevice;
+use barracuda::ops::bio::dada2::{Dada2Buffers, Dada2Dimensions, Dada2DispatchArgs};
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
@@ -93,17 +94,21 @@ impl Dada2Gpu {
         });
 
         self.inner
-            .dispatch(
-                n_seqs as u32,
-                n_centers as u32,
-                max_len as u32,
-                &bases_buf,
-                &quals_buf,
-                &lengths_buf,
-                &centers_buf,
-                &log_err_buf,
-                &scores_buf,
-            )
+            .dispatch(&Dada2DispatchArgs {
+                dimensions: Dada2Dimensions {
+                    n_seqs: n_seqs as u32,
+                    n_centers: n_centers as u32,
+                    max_len: max_len as u32,
+                },
+                buffers: Dada2Buffers {
+                    bases: &bases_buf,
+                    quals: &quals_buf,
+                    lengths: &lengths_buf,
+                    center_indices: &centers_buf,
+                    log_err: &log_err_buf,
+                    scores: &scores_buf,
+                },
+            })
             .map_err(|e| Error::Gpu(format!("Dada2 dispatch: {e}")))?;
 
         let _ = d.poll(wgpu::PollType::Wait {

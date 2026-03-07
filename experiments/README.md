@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-07 (Phase 97d: 286 experiments, 290 binaries, 8,400+ checks, standalone `barraCuda` v0.3.3 (wgpu 28, 694+ WGSL shaders, Fp64Strategy), 150+ primitives consumed + fused Welford/Pearson, 1,047 lib tests, 164 named tolerances, zero TODO/FIXME/HACK, clippy pedantic CLEAN. V97d: deep audit Exp311)
+**Updated**: 2026-03-07 (Phase 97e: 287 experiments, 291 binaries, 8,431+ checks. barraCuda builder patterns (`HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`), `PrecisionRoutingAdvice`, `shaders::provenance` wired. 1,346 tests, clippy pedantic CLEAN. Exp311: deep audit, Exp312: provenance rewire)
 
 ---
 
@@ -425,6 +425,17 @@ thresholds from `src/tolerances.rs`.
 V97d: Buffering I/O APIs deprecated (streaming-first), 104 unwrap→expect
 evolutions across 17 binaries, doc accuracy fixes (MSRV, wgpu, rustdoc),
 broken reference cleanup, full regression GREEN.
+
+### V97e — Cross-Spring Provenance Rewire (Exp312)
+
+| Exp | Name | Domain | Items |
+|-----|------|--------|:-----:|
+| 312 | Cross-Spring Provenance Rewire | Ecosystem | 31 |
+
+V97e: Builder pattern migration (HMM, DADA2, Gillespie dispatch), precision routing
+via `PrecisionRoutingAdvice`, `shaders::provenance` wired with wetSpring-specific views,
+8 error propagation fixes, provenance validation binary (28 shaders tracked, 22 cross-spring,
+17 consumed by wetSpring). Full regression GREEN (1,346 tests).
 
 ---
 

@@ -45,6 +45,7 @@
 //! All ODE shaders are generated at runtime via `BatchedOdeRK4::generate_shader()`
 //! from `barraCuda`. wetSpring holds zero local `.wgsl` files.
 
+use barracuda::device::driver_profile::PrecisionRoutingAdvice;
 use barracuda::device::{GpuDriverProfile, TensorContext, WgpuDevice};
 use std::sync::Arc;
 
@@ -219,19 +220,35 @@ impl GpuF64 {
         self.driver_profile.fp64_strategy()
     }
 
+    /// Fine-grained precision routing advice from `barraCuda`.
+    ///
+    /// Returns [`PrecisionRoutingAdvice`] which accounts for shared-memory
+    /// f64 reduction safety (NVK returns zeros for shared-memory f64 atomics),
+    /// driver quirks, and hardware capability beyond the coarse
+    /// `Fp64Strategy` enum.
+    ///
+    /// Callers that perform workgroup reductions (mean, variance, dot products)
+    /// should check this instead of [`fp64_strategy`](Self::fp64_strategy) to
+    /// avoid silent precision loss.
+    #[must_use]
+    pub fn precision_routing(&self) -> PrecisionRoutingAdvice {
+        self.driver_profile.precision_routing()
+    }
+
     /// Optimal `Precision` for `compile_shader_universal` on this GPU.
     ///
-    /// Returns `Precision::F64` for compute-class GPUs (Native strategy),
-    /// `Precision::Df64` for consumer GPUs (Hybrid strategy — routes through
-    /// FP32 cores via DF64 core-streaming for ~10x effective throughput).
-    /// `Concurrent` mode runs both DF64 and native f64 side-by-side for
-    /// validation; defaults to F64 for the primary path.
+    /// Uses [`PrecisionRoutingAdvice`] for fine-grained routing:
+    /// - `F64Native` / `F64NativeNoSharedMem` → `Precision::F64`
+    /// - `Df64Only` → `Precision::Df64`
+    /// - `F32Only` → `Precision::F32`
     #[must_use]
     pub fn optimal_precision(&self) -> barracuda::shaders::Precision {
-        use barracuda::device::Fp64Strategy;
-        match self.fp64_strategy() {
-            Fp64Strategy::Native | Fp64Strategy::Concurrent => barracuda::shaders::Precision::F64,
-            Fp64Strategy::Hybrid => barracuda::shaders::Precision::Df64,
+        match self.precision_routing() {
+            PrecisionRoutingAdvice::F64Native | PrecisionRoutingAdvice::F64NativeNoSharedMem => {
+                barracuda::shaders::Precision::F64
+            }
+            PrecisionRoutingAdvice::Df64Only => barracuda::shaders::Precision::Df64,
+            PrecisionRoutingAdvice::F32Only => barracuda::shaders::Precision::F32,
         }
     }
 
@@ -242,6 +259,7 @@ impl GpuF64 {
         println!("  Arch: {:?}", self.driver_profile.arch);
         println!("  Driver: {:?}", self.driver_profile.driver);
         println!("  Fp64Strategy: {:?}", self.fp64_strategy());
+        println!("  PrecisionRouting: {:?}", self.precision_routing());
         println!("  Optimal precision: {:?}", self.optimal_precision());
         println!(
             "  f64 workarounds: exp={}, log={}",

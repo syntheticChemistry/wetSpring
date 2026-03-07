@@ -128,7 +128,8 @@ impl CapacitorGpu {
             .storage_read(2, &params_buf)
             .storage_rw(3, &out_buf)
             .dispatch(config.n_batches.div_ceil(64), 1, 1)
-            .submit();
+            .submit()
+            .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
 
         self.device
             .read_buffer_f64(&out_buf, b * N_VARS)

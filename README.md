@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 7, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** Phase 97d+ — 1,047 lib tests + 200 forge tests, 286 experiments, 8,400+ validation checks, 290 binaries, standalone `barraCuda` v0.3.3 (`2a6c072`, 694+ WGSL shaders, wgpu 28, Fp64Strategy + `PrecisionRoutingAdvice`, `shaders::provenance`, `BatchedOdeRK45F64`), 150+ primitives consumed + fused Welford/Pearson, zero local WGSL, zero unsafe code, 164 named tolerances, `cargo clippy -W clippy::pedantic -W clippy::nursery` **ZERO WARNINGS**, `cargo doc` **ZERO WARNINGS**. Ecosystem sync: barraCuda `2a6c072`, toadStool S130 (19,140+ tests), coralReef Phase 10 (sovereign WGSL→native compiler). V97d: I/O deprecation, unwrap→expect evolution, doc accuracy fixes.
+**Status:** Phase 97e — 1,046 lib tests + 200 forge tests + 100 doc tests, 287 experiments, 8,431+ validation checks, 291 binaries, standalone `barraCuda` v0.3.3 (`2a6c072`, 694+ WGSL shaders, wgpu 28). Builder patterns rewired (`HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`), `PrecisionRoutingAdvice` wired for shared-memory f64 safety, `shaders::provenance` API live (28 shaders tracked, 22 cross-spring, 17 consumed). Zero local WGSL, zero unsafe code, 164 named tolerances, `cargo clippy -D warnings` **ZERO WARNINGS** (default + GPU), `cargo doc -D warnings` **ZERO WARNINGS**. Ecosystem: barraCuda `2a6c072`, toadStool S130, coralReef Phase 10.
 
 ---
 

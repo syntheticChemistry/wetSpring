@@ -89,6 +89,8 @@ pub mod ipc;
 pub mod ncbi;
 #[cfg(feature = "npu")]
 pub mod npu;
+#[cfg(feature = "gpu")]
+pub mod provenance;
 pub mod special;
 pub mod tolerances;
 pub mod validation;

@@ -496,6 +496,12 @@ name = "validate_cross_spring_evolution"
 path = "src/bin/validate_cross_spring_evolution.rs"
 required-features = ["gpu"]
 
+# ── Cross-Spring Provenance — barraCuda registry + precision routing (Exp312) ──
+[[bin]]
+name = "validate_cross_spring_provenance"
+path = "src/bin/validate_cross_spring_provenance.rs"
+required-features = ["gpu"]
+
 # ── Cross-Spring Evolution Modern — ToadStool Primitives (CPU) ───
 [[bin]]
 name = "validate_cross_spring_evolution_modern"

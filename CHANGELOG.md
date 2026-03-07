@@ -3,6 +3,34 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V97e — Cross-Spring Provenance Rewire (2026-03-07)
+
+### Rewired
+- **HMM Forward**: positional args → `HmmForwardArgs` struct (barraCuda builder pattern)
+- **DADA2 E-step**: positional args → `Dada2DispatchArgs` (dimensions + buffers structs)
+- **Gillespie SSA**: positional args → `GillespieModel` struct (4 validation binaries updated)
+- **Precision routing**: `Fp64Strategy` match → `PrecisionRoutingAdvice` (fine-grained
+  shared-memory f64 safety: `F64Native`, `F64NativeNoSharedMem`, `Df64Only`, `F32Only`)
+- **Fp64Strategy::Sovereign**: new variant handled in `optimal_precision()`
+
+### Added
+- `wetspring_barracuda::provenance` module — wires `barracuda::shaders::provenance`
+  for wetSpring-specific views (authored, consumed, cross-spring flows, summaries)
+- `validate_cross_spring_provenance` binary (Exp312): 31 provenance checks, all pass
+- `GpuF64::precision_routing()` — exposes `PrecisionRoutingAdvice` from driver profile
+
+### Fixed
+- 8 `unused_must_use` warnings: `.submit()` results now propagated via `map_err()?`
+- 4 `redundant_closure` lints in `validate_barracuda_gpu_v12.rs`
+
+### Validated
+- `cargo fmt`: PASS
+- `cargo clippy -D warnings` (default + GPU): ZERO WARNINGS
+- `cargo doc -D warnings`: ZERO WARNINGS
+- `cargo test`: 1,346 tests PASS (0 failures)
+- Provenance binary: 31/31 checks pass
+- Cross-spring matrix: 28 shaders tracked, 22 cross-spring, 17 consumed by wetSpring
+
 ## V97d+ — barraCuda/toadStool/coralReef Ecosystem Sync (2026-03-07)
 
 ### Synced

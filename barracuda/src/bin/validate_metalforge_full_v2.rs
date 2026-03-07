@@ -31,6 +31,7 @@
 
 use barracuda::TreeInferenceGpu;
 use barracuda::device::WgpuDevice;
+use barracuda::ops::bio::gillespie::GillespieModel;
 use barracuda::{FlatForest, GillespieConfig, GillespieGpu, SmithWatermanGpu, SwConfig};
 use std::sync::Arc;
 use std::time::Instant;
@@ -605,17 +606,14 @@ fn validate_gillespie(
         max_steps: 10_000,
     };
 
+    let model = GillespieModel {
+        rate_k: &rate_k,
+        stoich_react: &stoich_react,
+        stoich_net: &stoich_net,
+    };
     let t_gpu = Instant::now();
     let gpu_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        gg.simulate(
-            &rate_k,
-            &stoich_react,
-            &stoich_net,
-            &initial_states,
-            &prng_seeds,
-            n_traj,
-            &config,
-        )
+        gg.simulate(&model, &initial_states, &prng_seeds, n_traj, &config)
     }));
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 

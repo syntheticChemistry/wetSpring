@@ -27,6 +27,7 @@
 //! Validation class: GPU-parity
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
+use barracuda::ops::bio::gillespie::GillespieModel;
 use barracuda::{
     FlatForest, GillespieConfig, GillespieGpu, SmithWatermanGpu, SwConfig, TreeInferenceGpu,
 };
@@ -493,12 +494,15 @@ fn validate_gillespie(
         t_max: 10.0,
         max_steps: 10_000,
     };
+    let model = GillespieModel {
+        rate_k: &[0.5, 0.1],
+        stoich_react: &[1_u32, 1],
+        stoich_net: &[1_i32, -1],
+    };
     let tg = Instant::now();
     let gpu_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         gg.simulate(
-            &[0.5, 0.1],
-            &[1_u32, 1],
-            &[1_i32, -1],
+            &model,
             &vec![100.0; n_traj],
             &(0..n_traj as u32 * 4).collect::<Vec<_>>(),
             n_traj,

@@ -38,6 +38,7 @@
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
 use barracuda::device::WgpuDevice;
+use barracuda::ops::bio::gillespie::GillespieModel;
 use barracuda::{FlatForest, TreeInferenceGpu};
 use barracuda::{GillespieConfig, GillespieGpu};
 use barracuda::{SmithWatermanGpu, SwConfig};
@@ -189,16 +190,13 @@ fn validate_gillespie(device: &Arc<WgpuDevice>, v: &mut Validator) {
 
     // GillespieGpu may fail on some drivers (NVVM f64 shader compilation).
     // Use catch_unwind to handle driver-level panics gracefully.
+    let model = GillespieModel {
+        rate_k: &rate_k,
+        stoich_react: &stoich_react,
+        stoich_net: &stoich_net,
+    };
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        gg.simulate(
-            &rate_k,
-            &stoich_react,
-            &stoich_net,
-            &initial_states,
-            &prng_seeds,
-            n_traj,
-            &config,
-        )
+        gg.simulate(&model, &initial_states, &prng_seeds, n_traj, &config)
     }));
 
     match result {

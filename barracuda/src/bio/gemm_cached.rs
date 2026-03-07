@@ -145,7 +145,8 @@ impl GemmCached {
             .storage_read(2, &b_buf)
             .storage_rw(3, &c_buf)
             .dispatch(wg_x, wg_y, wg_z)
-            .submit();
+            .submit()
+            .map_err(|e| Error::Gpu(format!("GemmCached dispatch: {e}")))?;
 
         self.device
             .read_f64_buffer(&c_buf, c_size)
@@ -198,7 +199,8 @@ impl GemmCached {
             .storage_read(2, &b_buf)
             .storage_rw(3, &c_buf)
             .dispatch(wg_x, wg_y, wg_z)
-            .submit();
+            .submit()
+            .map_err(|e| Error::Gpu(format!("GemmCached dispatch: {e}")))?;
 
         Ok(c_buf.into_buffer())
     }

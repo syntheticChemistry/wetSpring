@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 7, 2026 (Phase 97d — barraCuda v0.3.3 HEAD 2a6c072 + toadStool S130 + coralReef Phase 10)
+**Date:** March 7, 2026 (Phase 97e — barraCuda v0.3.3 HEAD 2a6c072 + toadStool S130 + coralReef Phase 10)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 45 GPU modules + 1 IPC + 1 vault module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.3, wgpu 28, Fp64Strategy + PrecisionRoutingAdvice, DF64 core-streaming on consumer GPUs), 1,047 lib tests + 200 forge tests, 286 experiments, 8,400+ checks, 164 named tolerance constants, `cargo clippy --all-features -- -W clippy::pedantic` CLEAN, 0 Passthrough, 0 debt, 0 duplicate math, **0 TODO/FIXME/HACK**, **0 silent fallbacks**, I/O buffering APIs deprecated (streaming-first). **Phase 97d:** barraCuda sync to `2a6c072` (provenance module, BatchedOdeRK45F64, PrecisionRoutingAdvice, builder patterns). toadStool S130 (cross-spring provenance, coralReef proxy, 19,140+ tests). coralReef Phase 10 (sovereign WGSL→native compiler, shader.compile.* IPC).
+**Status:** 47 CPU + 45 GPU modules + 1 IPC + 1 vault + 1 provenance module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.3, wgpu 28, builder patterns wired: `HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`), `PrecisionRoutingAdvice` routed for shared-memory f64 safety, `shaders::provenance` API live (28 shaders tracked, 22 cross-spring, 17 consumed by wetSpring). 1,346 tests, 287 experiments, 8,431+ checks, 164 tolerances, `cargo clippy -D warnings` CLEAN (default + GPU), **0 silent fallbacks**, I/O buffering deprecated. **Phase 97e:** Builder pattern migration complete (HMM, DADA2, Gillespie dispatch rewired). `PrecisionRoutingAdvice` replaces coarse `Fp64Strategy` match. New provenance module with Exp312 validation binary (31/31 checks). 8 `.submit()` error propagation fixes.
 
 ### Full Lean Phase
 

@@ -2,7 +2,7 @@
 
 **Date:** March 7, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** Phase 97d — 286 experiments, 8,400+ validation checks, ALL PASS; 1,047 lib tests + 200 forge tests, 290 binaries, standalone `barraCuda` v0.3.3 (wgpu 28, 694+ WGSL shaders, Fp64Strategy precision dispatch), 150+ primitives consumed + fused Welford/Pearson, 0 local WGSL, 164 named tolerances, 0 unsafe code, clippy pedantic ZERO WARNINGS, `cargo doc` ZERO WARNINGS. V97d: deep audit (Exp311), buffering I/O deprecated, unwrap→expect evolution, doc accuracy fixes. 52 + 6 papers reproduced with full three-tier + paper-math chain
+**Status:** Phase 97e — 287 experiments, 8,431+ validation checks, ALL PASS; 1,346 tests, 291 binaries, standalone `barraCuda` v0.3.3 (wgpu 28, 694+ WGSL shaders). Builder patterns rewired (`HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`), `PrecisionRoutingAdvice` for shared-memory f64 safety, `shaders::provenance` API live (28 shaders tracked, 22 cross-spring). 0 local WGSL, 164 tolerances, 0 unsafe, clippy pedantic ZERO WARNINGS. V97e: provenance rewire (Exp312). V97d: deep audit (Exp311). 52+6 papers reproduced with full three-tier + paper-math chain
 
 ---
 
@@ -115,6 +115,7 @@ Every paper goes through the full evolution. Status across all 52 papers:
 | **V88 experiment buildout** | Full control validation: CPU v20 (37), CPU↔GPU v7 (22), metalForge v12 (63), NUCLEUS v3 (106), ToadStool pure-math v3 (41), CPU↔GPU pure-math (38), mixed-HW dispatch (91), biomeOS graph (29). Barracuda API deep dive documented for absorption. | 427 checks (Exp263-270) |
 | **V97c fused ops chain** | Full chain: CPU fused parity (38), Python benchmarks (13), GPU portability on Hybrid (21), pure GPU streaming (18), metalForge cross-substrate (21). Hybrid-aware graceful degradation for VarianceF64/CorrelationF64. DF64 FusedMapReduceF64 validated on consumer GPU. | 111 checks (Exp306-310) |
 | **V97d deep audit** | Crate-wide deep audit: I/O buffering APIs deprecated (streaming-first), 104 unwrap→expect evolutions, doc accuracy (MSRV, wgpu version, rustdoc escaping), broken reference cleanup, full regression GREEN. | 125 items (Exp311) |
+| **V97e provenance rewire** | Builder pattern migration (HMM, DADA2, Gillespie dispatch → struct args). PrecisionRoutingAdvice for shared-memory f64 safety. shaders::provenance API (28 shaders, 22 cross-spring, 17 consumed). Error propagation fixes. | 31 checks (Exp312) |
 
 ## Extension Roadmap
 

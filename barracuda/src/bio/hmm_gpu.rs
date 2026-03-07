@@ -13,6 +13,7 @@
 
 use barracuda::HmmBatchForwardF64;
 use barracuda::device::WgpuDevice;
+use barracuda::ops::bio::hmm::HmmForwardArgs;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
@@ -105,18 +106,18 @@ impl HmmGpuForward {
         });
 
         self.inner
-            .dispatch(
-                s as u32,
-                model.n_symbols as u32,
-                n_steps as u32,
-                n_seqs as u32,
-                &trans_buf,
-                &emit_buf,
-                &pi_buf,
-                &obs_buf,
-                &alpha_buf,
-                &lik_buf,
-            )
+            .dispatch(&HmmForwardArgs {
+                n_states: s as u32,
+                n_symbols: model.n_symbols as u32,
+                n_steps: n_steps as u32,
+                n_seqs: n_seqs as u32,
+                log_trans: &trans_buf,
+                log_emit: &emit_buf,
+                log_pi: &pi_buf,
+                observations: &obs_buf,
+                log_alpha_out: &alpha_buf,
+                log_lik_out: &lik_buf,
+            })
             .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
 
         let _ = d.poll(wgpu::PollType::Wait {
