@@ -9,6 +9,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
+| **V97e** | `handoffs/WETSPRING_V97E_BARRACUDA_TOADSTOOL_EVOLUTION_HANDOFF_MAR07_2026.md` | Mar 7 | Full evolution handoff: 150+ primitive inventory, cross-spring insights, re-export suggestions, absorption feedback, next-gen targets (P1: BatchedOdeRK45F64). |
 | **V97e** | `handoffs/WETSPRING_V97E_PROVENANCE_REWIRE_HANDOFF_MAR07_2026.md` | Mar 7 | Provenance rewire: builder patterns (HMM, DADA2, Gillespie), PrecisionRoutingAdvice, shaders::provenance API, Exp312 (31/31). 1,346 tests, zero warnings. |
 | **V97d+** | `handoffs/WETSPRING_V97D_ECOSYSTEM_SYNC_HANDOFF_MAR07_2026.md` | Mar 7 | Ecosystem sync: barraCuda 2a6c072, toadStool S130, coralReef Phase 10. Zero API breakage, 1,347 tests PASS. |
 | **V97d** | `handoffs/WETSPRING_V97D_DEEP_AUDIT_EVOLUTION_HANDOFF_MAR07_2026.md` | Mar 7 | Deep audit: I/O deprecation, unwrap→expect evolution, doc accuracy, broken ref cleanup (Exp311, 125 items) |

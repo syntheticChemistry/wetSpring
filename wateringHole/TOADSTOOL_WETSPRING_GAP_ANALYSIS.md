@@ -1,6 +1,6 @@
 # ToadStool barracuda vs wetSpring: Deep Gap Analysis
 
-**Date:** March 7, 2026 (Phase 97d)
+**Date:** March 7, 2026 (Phase 97e)
 **Scope:** Compare barraCuda public exports with wetSpring actual usage. Identify unused primitives, adoption opportunities, and maintenance reduction.
 **barraCuda:** standalone v0.3.3 (HEAD 2a6c072)
 **toadStool:** S130 (19,140+ tests, cross-spring provenance, coralReef proxy)

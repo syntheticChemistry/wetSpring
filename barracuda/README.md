@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** March 5, 2026 (Phase 97 — barraCuda v0.3.3, wgpu 28)
+**Updated:** March 7, 2026 (Phase 97e — barraCuda v0.3.3 `2a6c072`, wgpu 28)
 
 ---
 
@@ -10,7 +10,7 @@
 
 Rust validation crate for wetSpring — life science, analytical chemistry,
 and environmental monitoring algorithms. Proves the full path from Python
-baseline through Rust CPU to GPU acceleration via ToadStool/BarraCuda.
+baseline through Rust CPU to GPU acceleration via barraCuda.
 
 ## Architecture
 
@@ -18,15 +18,17 @@ baseline through Rust CPU to GPU acceleration via ToadStool/BarraCuda.
 wetspring-barracuda
 ├── 47 CPU bio modules          (pure Rust math, no external C deps)
 ├── 45 GPU bio modules          (45 Lean + 7 Compose, 0 Passthrough)
+├── 1 provenance module         (barracuda::shaders::provenance wiring)
 ├── 3 streaming I/O parsers     (FASTQ/gzip, mzML/base64, MS2)
-├── 284 validation/benchmark binaries
-└── depends on: barracuda (ToadStool) via path dependency
+├── 291 validation/benchmark binaries
+└── depends on: barracuda via path dependency
 ```
 
-45 Lean GPU modules delegate to `barracuda::ops::*` primitives from ToadStool.
-7 Compose wrappers. All ODE shaders use trait-generated WGSL (Lean phase).
+45 Lean GPU modules delegate to `barracuda::ops::*` primitives.
+Builder patterns wired: `HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`.
+`PrecisionRoutingAdvice` for shared-memory f64 safety.
 
-## ToadStool Primitives Consumed (144, 264 ComputeDispatch ops)
+## barraCuda Primitives Consumed (150+, 264 ComputeDispatch ops)
 
 | # | Primitive | Category | Origin | Consumed Since |
 |---|-----------|----------|--------|:--------------:|
@@ -104,7 +106,7 @@ wetspring-barracuda
 
 ### GPU Bio (20 modules)
 
-| Module | ToadStool Primitive | Status |
+| Module | barraCuda Primitive | Status |
 |--------|-------------------|--------|
 | `ani_gpu` | `AniBatchF64` | ✅ Lean |
 | `chimera_gpu` | `FusedMapReduceF64` | ✅ Lean |
@@ -140,11 +142,12 @@ wetspring-barracuda
 | Module | Purpose |
 |--------|---------|
 | `special` | Sovereign math (erf, ln_gamma, regularized_gamma, normal_cdf) |
-| `tolerances` | 39 named constants (scientifically justified) |
+| `tolerances` | 164 named constants (scientifically justified) |
 | `validation` | Structured test harness with provenance |
 | `encoding` | Sovereign base64 (zero dependencies) |
 | `error` | Error types (no external crates) |
-| `gpu` | `GpuF64` device abstraction over ToadStool's `WgpuDevice` |
+| `gpu` | `GpuF64` device abstraction over barraCuda's `WgpuDevice` |
+| `provenance` | Cross-spring shader provenance (wires `barracuda::shaders::provenance`) |
 
 ## Code Quality
 
@@ -156,10 +159,10 @@ wetspring-barracuda
 | `#![deny(unsafe_code)]` | Enforced crate-wide (test-only `allow` for `env::set_var` in edition 2024) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | Enforced |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
-| Line coverage (`llvm-cov`) | **95.67%** (728 lib + 60 integration + 19 doc = 807 tests) |
+| Tests | 1,346 pass (1,047 lib + 200 forge + 99 doc) |
 | ESN ridge regression | Proper Cholesky solve (not diagonal approximation) |
 | I/O parsers | Streaming-first; buffering APIs deprecated |
-| Validation checks | 3,028+ (1,476 CPU + 702 GPU + 80 dispatch + streaming + extensions) |
+| Validation checks | 8,431+ across 291 binaries |
 
 ## Quick Start
 
@@ -186,16 +189,16 @@ cargo run --features gpu --release --bin validate_barracuda_gpu_full
 
 | Document | Purpose |
 |----------|---------|
-| `EVOLUTION_READINESS.md` | Absorption tiers, shader inventory, ToadStool status |
+| `EVOLUTION_READINESS.md` | Absorption tiers, shader inventory, ecosystem status |
 | `ABSORPTION_MANIFEST.md` | Write → Absorb → Lean lifecycle tracking |
 | `../CHANGELOG.md` | Version history and evolution log |
-| `../metalForge/PRIMITIVE_MAP.md` | Module ↔ ToadStool primitive mapping |
-| `../wateringHole/handoffs/` | ToadStool handoff documents |
+| `../metalForge/PRIMITIVE_MAP.md` | Module ↔ barraCuda primitive mapping |
+| `../wateringHole/handoffs/` | barraCuda/toadStool handoff documents |
 
 ## Dependencies
 
-- `barracuda` — standalone math primal, via path: `../../barraCuda/crates/barracuda` (v0.3.3)
+- `barracuda` — standalone math primal via path: `../../barraCuda/crates/barracuda` (v0.3.3, `2a6c072`)
 - `flate2` (pure Rust backend) — gzip decompression
 - `serde_json` (optional, `json` feature) — model import for 2 binaries
-- `rand` + `rand_xoshiro` — RNG for Gillespie/rarefaction
-- `wgpu` (via `gpu` feature) — GPU device management
+- `wgpu` 28 (via `gpu` feature) — GPU device management
+- `bytemuck` — zero-copy GPU buffer casting
