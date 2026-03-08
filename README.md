@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 7, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V98 — 1,046 lib tests + 200 forge tests + 100 doc tests, 293 experiments, 8,604+ validation checks, 296 binaries, standalone `barraCuda` v0.3.3 (`2a6c072`, 694+ WGSL shaders, wgpu 28). V98 full chain: Paper Math v5 (52 papers, 32/32) → CPU v24 (67/67) → GPU v13 (25/25) → Streaming v11 (25/25) → metalForge v16 (24/24) = **173/173 PASS**. Zero local WGSL, zero unsafe code, 164 named tolerances, `cargo clippy -D warnings` **ZERO WARNINGS** (default + GPU), `cargo doc -D warnings` **ZERO WARNINGS**. Ecosystem: barraCuda `2a6c072`, toadStool S130, coralReef Phase 10.
+**Status:** V98 — 1,046 lib tests + 200 forge tests + 100 doc tests, 293 experiments, 8,604+ validation checks, 296 binaries, standalone `barraCuda` v0.3.3 (`a898dee`, 694+ WGSL shaders, wgpu 28). V98 full chain: Paper Math v5 (52 papers, 32/32) → CPU v24 (67/67) → GPU v13 (25/25) → Streaming v11 (25/25) → metalForge v16 (24/24) = **173/173 PASS**. Zero local WGSL, zero unsafe code, 164 named tolerances, `cargo clippy -D warnings` **ZERO WARNINGS** (default + GPU), `cargo doc -D warnings` **ZERO WARNINGS**. Ecosystem: barraCuda `a898dee`, toadStool S130+ (`bfe7977b`), coralReef Phase 10 Iteration 10 (`d29a734`).
 
 ---
 
@@ -145,7 +145,7 @@ integration point.
 | metalForge cross-system | 37+ domains CPU↔GPU (Exp103+104+165+182+208), **39/39 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
-| `barraCuda` primitives consumed | **150+** (always-on, zero fallback code — standalone `barraCuda` v0.3.3 `2a6c072`, wgpu 28, PrecisionRoutingAdvice) |
+| `barraCuda` primitives consumed | **150+** (always-on, zero fallback code — standalone `barraCuda` v0.3.3 `a898dee`, wgpu 28, PrecisionRoutingAdvice) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
 All 8,604+ validation checks **PASS**. All 1,047 library + 200 forge tests **PASS** (1 ignored: hardware-dependent).
 

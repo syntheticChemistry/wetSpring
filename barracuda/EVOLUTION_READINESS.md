@@ -1,6 +1,6 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 7, 2026 (V98 — barraCuda v0.3.3 HEAD 2a6c072 + toadStool S130 + coralReef Phase 10)
+**Date:** March 7, 2026 (V98+ — barraCuda v0.3.3 `a898dee` + toadStool S130+ `bfe7977b` + coralReef Iteration 10 `d29a734`)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
 **Status:** 47 CPU + 45 GPU modules + 1 IPC + 1 vault + 1 provenance module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.3, wgpu 28). 1,347 tests, 293 experiments, 8,604+ checks, 164 tolerances, 296 binaries. `cargo clippy -D warnings` CLEAN (default + GPU), **0 silent fallbacks**. **V98:** Full-chain validation: Paper Math v5 (32/32) → CPU v24 (67/67) → GPU v13 (25/25) → Streaming v11 (25/25) → metalForge v16 (24/24) = **173/173 PASS**. All 52 papers, 33 bio modules + statistics, Hybrid-aware GPU.
 

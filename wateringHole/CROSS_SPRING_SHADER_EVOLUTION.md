@@ -1,7 +1,7 @@
 # Cross-Spring Shader Evolution
 
-**Last updated**: Mar 7, 2026 — V98 standalone barraCuda v0.3.3 (`2a6c072`, 694+ WGSL shaders, wgpu 28). 150+ primitives consumed, 0 local WGSL, 293 experiments, 8,604+ checks, 1,347 tests, clippy pedantic CLEAN. V98 full chain: 173/173 PASS (Paper→CPU→GPU→Streaming→metalForge).
-**Validated by**: V98 Exp313-318 (173/173 full chain), Exp312 (31/31 provenance), Exp311 (deep audit), Exp306-310 (fused ops chain), standalone barraCuda v0.3.3, 1,347 tests
+**Last updated**: Mar 7, 2026 — V98+ upstream rewire: barraCuda v0.3.3 (`a898dee`), toadStool S130+ (`bfe7977b`), coralReef Iteration 10 (`d29a734`). 150+ primitives consumed, 0 local WGSL, 293 experiments, 8,604+ checks, 1,347 tests, clippy pedantic CLEAN. V98 full chain: 173/173 PASS (Paper→CPU→GPU→Streaming→metalForge).
+**Validated by**: V98+ upstream rewire (zero API breakage), Exp313-318 (173/173 full chain), standalone barraCuda v0.3.3 `a898dee`, 1,347 tests
 
 ---
 

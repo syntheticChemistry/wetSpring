@@ -1,6 +1,6 @@
 # wetSpring wateringHole
 
-**Date:** March 7, 2026
+**Date:** March 8, 2026
 **Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records.
 
 ---
@@ -9,6 +9,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
+| **V98+** | `handoffs/WETSPRING_V98_UPSTREAM_REWIRE_HANDOFF_MAR08_2026.md` | Mar 8 | Upstream rewire: barraCuda `a898dee`, toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`. Zero API breakage. V98 chain 173/173 re-validated. |
 | **V98** | `handoffs/WETSPRING_V98_BARRACUDA_TOADSTOOL_FULL_CHAIN_HANDOFF_MAR07_2026.md` | Mar 7 | V98 full-chain validation (173/173), primitive inventory, GPU Hybrid findings, DF64 shader gap, absorption targets. |
 | **V97e** | `handoffs/WETSPRING_V97E_BARRACUDA_TOADSTOOL_EVOLUTION_HANDOFF_MAR07_2026.md` | Mar 7 | Full evolution handoff: 150+ primitive inventory, cross-spring insights, re-export suggestions, absorption feedback, next-gen targets (P1: BatchedOdeRK45F64). |
 | **V97e** | `handoffs/WETSPRING_V97E_PROVENANCE_REWIRE_HANDOFF_MAR07_2026.md` | Mar 7 | Provenance rewire: builder patterns (HMM, DADA2, Gillespie), PrecisionRoutingAdvice, shaders::provenance API, Exp312 (31/31). 1,346 tests, zero warnings. |

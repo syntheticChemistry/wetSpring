@@ -1,6 +1,6 @@
 # ToadStool barracuda vs wetSpring: Deep Gap Analysis
 
-**Date:** March 7, 2026 (V98)
+**Date:** March 7, 2026 (V98+ — barraCuda `a898dee`, toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`)
 **Scope:** Compare barraCuda public exports with wetSpring actual usage. Identify unused primitives, adoption opportunities, and maintenance reduction.
 **barraCuda:** standalone v0.3.3 (HEAD 2a6c072)
 **toadStool:** S130 (19,140+ tests, cross-spring provenance, coralReef proxy)

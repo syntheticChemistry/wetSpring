@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** March 7, 2026 (V98 — barraCuda v0.3.3 `2a6c072`, wgpu 28. V98 full chain: 173/173 PASS)
+**Updated:** March 7, 2026 (V98+ — barraCuda v0.3.3 `a898dee`, toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`, wgpu 28. V98 full chain: 173/173 PASS)
 
 ---
 

@@ -3,6 +3,21 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V98+ — Upstream Rewire (2026-03-08)
+
+### Rewired
+- **barraCuda**: `2a6c072` → `a898dee` (deep debt: typed errors, named constants, lint compliance)
+- **toadStool**: S130 → S130+ `bfe7977b` (deep debt, spring sync, clippy pedantic, docs)
+- **coralReef**: Iteration 7 → Iteration 10 `d29a734` (AMD E2E verified, 990 tests)
+
+### Validated
+- `cargo test`: 1,047 lib tests PASS (zero failures)
+- `cargo fmt`: CLEAN
+- `cargo clippy -D warnings` (default + GPU): ZERO WARNINGS
+- `cargo doc --workspace --no-deps`: ZERO WARNINGS
+- V98 full chain: **173/173 PASS** (Exp313-318 re-validated)
+- Zero API breakage across all three upstream dependencies
+
 ## V98 — Full-Chain Validation Buildout (2026-03-07)
 
 ### Added
