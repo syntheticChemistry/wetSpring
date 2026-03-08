@@ -1,7 +1,7 @@
 # Cross-Spring Shader Evolution
 
-**Last updated**: Mar 7, 2026 — V98+ upstream rewire: barraCuda v0.3.3 (`a898dee`), toadStool S130+ (`bfe7977b`), coralReef Iteration 10 (`d29a734`). 150+ primitives consumed, 0 local WGSL, 293 experiments, 8,604+ checks, 1,347 tests, clippy pedantic CLEAN. V98 full chain: 173/173 PASS (Paper→CPU→GPU→Streaming→metalForge).
-**Validated by**: V98+ upstream rewire (zero API breakage), Exp313-318 (173/173 full chain), standalone barraCuda v0.3.3 `a898dee`, 1,347 tests
+**Last updated**: Mar 8, 2026 — V98+ cross-spring evolution: barraCuda v0.3.3 (`a898dee`), toadStool S130+ (`bfe7977b`), coralReef Iteration 10 (`d29a734`). 150+ primitives consumed, 0 local WGSL, 295 experiments, 8,656+ checks, 1,347 tests, clippy pedantic CLEAN. V98 chain: 173/173 PASS. Cross-spring: Exp319 (52/52) + Exp320 benchmark. 28 shaders, 22 cross-spring, 5 wetSpring-authored.
+**Validated by**: V98+ cross-spring evolution (Exp319-320), upstream rewire (zero API breakage), Exp313-318 (173/173), standalone barraCuda v0.3.3 `a898dee`, 1,347 tests
 
 ---
 

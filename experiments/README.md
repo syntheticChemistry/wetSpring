@@ -458,6 +458,24 @@ pure Rust). GPU v13 Hybrid-aware (DF64 skip on consumer GPU, FusedMapReduceF64
 validated). Streaming v11 zero CPU round-trips. metalForge v16 proves
 CPU = GPU = NPU for all paper math domains. **173/173 PASS.**
 
+### V98+ — Upstream Rewire + Cross-Spring Evolution (Exp319–320)
+
+| Exp | Name | Type | Checks |
+|-----|------|------|:------:|
+| 319 | Cross-Spring Evolution V98+ Validation + Benchmark | Validation | 52 |
+| 320 | Cross-Spring Evolution V98+ Benchmark | Benchmark | — |
+
+V98+: Upstream rewire to barraCuda `a898dee`, toadStool S130+ `bfe7977b`,
+coralReef Iteration 10 `d29a734`. Cross-spring validation exercises all 5 springs'
+contributions (hotSpring DF64/spectral, wetSpring bio/HMM/Felsenstein/NMF,
+neuralSpring graph linalg/Pearson, airSpring 6 ET₀ methods, groundSpring
+bootstrap/jackknife/regression). Provenance registry: 28 shaders, 22 cross-spring.
+GPU: FusedMapReduceF64 Shannon/Simpson/BC validated on RTX 4070 (Hybrid/DF64).
+Benchmark: 24 cross-spring primitives profiled CPU + GPU.
+**Exp319: 52/52 PASS. Exp320: 24 primitives benchmarked.**
+
+**Totals: 295 experiments, 298 binaries, 8,656+ checks.**
+
 ---
 
 ## How to Add a New Experiment

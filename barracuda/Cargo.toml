@@ -1633,3 +1633,13 @@ required-features = ["gpu"]
 [[bin]]
 name = "validate_metalforge_v16"
 path = "src/bin/validate_metalforge_v16.rs"
+
+# ── Exp319: V98+ Cross-Spring Evolution Validation + Benchmark ──
+[[bin]]
+name = "validate_cross_spring_evolution_v98"
+path = "src/bin/validate_cross_spring_evolution_v98.rs"
+
+# ── Exp320: V98+ Cross-Spring Evolution Benchmark ──
+[[bin]]
+name = "benchmark_cross_spring_evolution_v98"
+path = "src/bin/benchmark_cross_spring_evolution_v98.rs"

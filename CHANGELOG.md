@@ -3,12 +3,21 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## V98+ — Upstream Rewire (2026-03-08)
+## V98+ — Upstream Rewire + Cross-Spring Evolution (2026-03-08)
 
 ### Rewired
 - **barraCuda**: `2a6c072` → `a898dee` (deep debt: typed errors, named constants, lint compliance)
 - **toadStool**: S130 → S130+ `bfe7977b` (deep debt, spring sync, clippy pedantic, docs)
 - **coralReef**: Iteration 7 → Iteration 10 `d29a734` (AMD E2E verified, 990 tests)
+
+### Added
+- **Exp319**: Cross-Spring Evolution V98+ Validation — exercises all 5 springs'
+  contributions (hotSpring DF64/spectral, wetSpring bio/HMM/Felsenstein/NMF,
+  neuralSpring graph Laplacian/Pearson, airSpring 6 ET₀, groundSpring bootstrap/
+  jackknife/regression). Provenance registry: 28 shaders, 22 cross-spring.
+  GPU: FusedMapReduceF64 Shannon/Simpson/BC on RTX 4070 (Hybrid/DF64). **52/52 PASS.**
+- **Exp320**: Cross-Spring Evolution V98+ Benchmark — 24 primitives profiled CPU + GPU
+  with evolution provenance tracking (origin spring → absorption session → consumers).
 
 ### Validated
 - `cargo test`: 1,047 lib tests PASS (zero failures)
@@ -16,6 +25,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - `cargo clippy -D warnings` (default + GPU): ZERO WARNINGS
 - `cargo doc --workspace --no-deps`: ZERO WARNINGS
 - V98 full chain: **173/173 PASS** (Exp313-318 re-validated)
+- V98+ cross-spring: **52/52 PASS** (Exp319), 24 benchmarks (Exp320)
 - Zero API breakage across all three upstream dependencies
 
 ## V98 — Full-Chain Validation Buildout (2026-03-07)

@@ -388,28 +388,31 @@ barracuda math through GPU parity to mixed-hardware NUCLEUS dispatch:
 - 14 new tests (power.rs, nrs.rs, brain/observation.rs)
 - All doc_markdown clippy warnings fixed across 30+ files
 
-### V98: Full-Chain Validation Buildout (Exp313–318) — current
+### V98+: Upstream Rewire + Cross-Spring Evolution (Exp313–320) — current
 
-Complete V98 validation chain proving the full evolution path from paper math
-through pure Rust CPU to GPU portability to unidirectional streaming to
-cross-substrate dispatch. All 52 papers covered with strengthened analytical checks.
+Complete V98 validation chain plus upstream rewire to modern barraCuda/toadStool/coralReef
+and cross-spring evolution validation exercising all 5 springs' contributions.
 
-| Exp | Name | Chain Position | Checks | Time |
-|-----|------|---------------|:------:|-----:|
+| Exp | Name | Type | Checks | Time |
+|-----|------|------|:------:|-----:|
 | 313 | Paper Math Control v5 — All 52 Papers | Paper | 32/32 | 0.4ms |
 | 314 | BarraCuda CPU v24 — Comprehensive Bio Domain Parity | CPU | 67/67 | 2.8ms |
 | 316 | BarraCuda GPU v13 — Full-Domain GPU Portability | GPU | 25/25 | 20.5ms |
 | 317 | Pure GPU Streaming v11 — End-to-End Pipeline | Streaming | 25/25 | 14.9ms |
 | 318 | metalForge v16 — Cross-System Paper Math | metalForge | 24/24 | 0.5ms |
+| 319 | Cross-Spring Evolution V98+ — All 5 Springs | Validation | 52/52 | ~1s |
+| 320 | Cross-Spring Evolution V98+ Benchmark | Benchmark | 24 ops | ~1.4s |
 
-**173/173 checks PASS.** V98 additions over V97e:
-- 5 new Track 4 soil papers strengthened (Martínez-García, Feng, Islam, Zuber, Liang)
-- Analytical identities: `erf(0)=0`, `Φ(0)=0.5`, `BC(x,x)=0`, `H(uniform)=ln(n)`
-- GPU Hybrid-aware: DF64 fused ops skip on consumer GPU (FusedMapReduceF64 validated)
-- 33 bio modules + statistics in CPU v24 (8 domains, 2.8ms pure Rust)
-- Cross-system: CPU = GPU = NPU for all paper math domains
+**225/225 validation checks PASS. 24 primitives benchmarked.** V98+ additions:
+- Upstream rewire: barraCuda `a898dee`, toadStool S130+ `bfe7977b`, coralReef Iter 10 `d29a734`
+- Cross-spring provenance: 28 shaders, 22 cross-spring, 5 wetSpring-authored
+- All 5 springs exercised: hotSpring (DF64, Anderson, erf), wetSpring (diversity, HMM,
+  Felsenstein, NMF), neuralSpring (graph Laplacian, Pearson), airSpring (6 ET₀),
+  groundSpring (bootstrap, jackknife, regression)
+- GPU: FusedMapReduceF64 Shannon/Simpson/BC on RTX 4070 Hybrid (DF64)
+- Evolution tracking: shader origin→consumer flow across springs
 
-**1,047 tests** | **293 experiments** | **296 binaries** | **8,604+ checks**
+**1,047 tests** | **295 experiments** | **298 binaries** | **8,656+ checks**
 
 ### Phase 95: Standalone barraCuda Rewire + Deep Debt Evolution
 

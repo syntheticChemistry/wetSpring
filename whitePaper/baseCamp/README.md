@@ -2,7 +2,7 @@
 
 **Date:** March 7, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V98 — 293 experiments, 8,604+ validation checks, ALL PASS; 1,347 tests, 296 binaries, standalone `barraCuda` v0.3.3 (wgpu 28, 694+ WGSL shaders). V98 full chain: Paper Math v5 (32/32) → CPU v24 (67/67) → GPU v13 (25/25) → Streaming v11 (25/25) → metalForge v16 (24/24) = **173/173 PASS**. 0 local WGSL, 164 tolerances, 0 unsafe, clippy pedantic ZERO WARNINGS. 52 papers reproduced with full five-tier validation chain.
+**Status:** V98+ — 295 experiments, 8,656+ validation checks, ALL PASS; 1,347 tests, 298 binaries, standalone `barraCuda` v0.3.3 `a898dee` (wgpu 28, 694+ WGSL shaders), toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`. V98 chain: Paper Math v5 (32/32) → CPU v24 (67/67) → GPU v13 (25/25) → Streaming v11 (25/25) → metalForge v16 (24/24) = **173/173 PASS**. Cross-spring V98+: Exp319 (52/52) + Exp320 benchmark (24 primitives). 0 local WGSL, 164 tolerances, 0 unsafe, clippy pedantic ZERO WARNINGS. 52 papers reproduced, 5 springs exercised.
 
 ---
 
@@ -46,7 +46,8 @@ All code is AGPL-3.0.
 | **V90 Bio Brain** | — | cross | — | 272 | 64 | hotSpring 4-layer brain → `BioBrain`, 36-head Gen2 → `BioHeadGroupDisagreement` + `AttentionState`, bingoCube/nautilus → `BioNautilusBrain`, 3 IPC methods, 7 domains, 7 springs |
 | **V97c Fused Ops** | — | chain | — | Exp306-310 | 111 | Welford, Pearson, Spearman, CorrMatrix, streaming, metalForge |
 | **V98 Full Chain** | — | chain | — | Exp313-318 | 173 | All 52 papers, 33 bio modules, GPU Hybrid-aware, streaming, metalForge |
-| **Total** | | | **52** | | **8,604+** | |
+| **V98+ Cross-Spring** | — | evolution | — | Exp319-320 | 52 | All 5 springs, 28 shaders, 22 cross-spring, GPU FusedMapReduceF64, 24 benchmarks |
+| **Total** | | | **52** | | **8,656+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
