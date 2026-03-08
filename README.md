@@ -427,7 +427,21 @@ with deploy graph `wetspring_deploy.toml` and cross-primal pipeline validation.
 - NUCLEUS: environment probe, deploy graph, Songbird discovery
 - Pipeline: airSpring ET₀ → wetSpring QS → diversity → neuralSpring graph → spectral
 
-**1,047 tests** | **297 experiments** | **300 binaries** | **8,720+ checks**
+### V99 Chain: CPU v25 → GPU v14 → metalForge v17 (Exp323–326)
+
+| Exp | Name | Checks |
+|-----|------|:------:|
+| 323 | CPU v25 — Cross-Primal Pure Rust Math | 46/46 |
+| 324 | GPU v14 — GPU + ToadStool Dispatch | 27/27 |
+| 326 | metalForge v17 — Mixed NUCLEUS + biomeOS Graph | 29/29 |
+
+- V99 chain: 102/102 PASS (CPU → GPU → metalForge)
+- Cross-primal: ET₀ hydrology, Anderson spectral, graph Laplacian, NMF
+- ToadStool: FusedMapReduce dispatch, provenance tracking, DF64 Hybrid
+- NUCLEUS: Tower/Node/Nest probes, biomeOS deploy graph + capability registry
+- V98 chain regression: 173/173 PASS (still green)
+
+**1,047 tests** | **300 experiments** | **305 binaries** | **8,886+ checks**
 
 ### Phase 95: Standalone barraCuda Rewire + Deep Debt Evolution
 

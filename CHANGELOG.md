@@ -3,7 +3,7 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## V99 — biomeOS/NUCLEUS Integration + Cross-Primal Pipeline (2026-03-08)
+## V99 — biomeOS/NUCLEUS Integration + Full Chain (2026-03-08)
 
 ### Added
 - **Exp321**: biomeOS/NUCLEUS V98+ Integration — IPC server lifecycle (health, science,
@@ -15,10 +15,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - **wetspring_deploy.toml**: biomeOS deploy graph for wetSpring as NUCLEUS science primal
   (Tower→ToadStool→wetSpring, 9 capabilities, health_check validation)
 
+- **Exp323**: BarraCuda CPU v25 — V99 cross-primal pure Rust math validation.
+  5 domains (bio, cross-spring, statistics, precision, IPC math). **46/46 PASS.**
+- **Exp324**: BarraCuda GPU v14 — GPU portability + ToadStool dispatch patterns.
+  4 domains (diversity GPU, Anderson, cross-domain, ToadStool). **27/27 PASS.**
+- **Exp326**: metalForge v17 — Mixed NUCLEUS atomics + biomeOS graph dispatch.
+  5 domains (diversity, cross-primal, statistics, NUCLEUS probes, biomeOS graph). **29/29 PASS.**
+
 ### Verified
+- V99 chain: CPU v25 (46) → GPU v14 (27) → metalForge v17 (29) = 102/102 PASS
+- V98 chain regression: Paper v5 (32) → CPU v24 (67) → GPU v13 (25) → Streaming v11 (25) → metalForge v16 (24) = 173/173 PASS
 - IPC overhead: ~2000x vs direct call (~0.1ms IPC vs sub-µs CPU)
-- Cross-primal data flow: 5 springs' primitives chained through IPC correctly
-- 297 experiments, 300 binaries, 8,720+ checks
+- ToadStool dispatch: 28 shaders tracked via provenance, FusedMapReduce + DF64 Hybrid
+- NUCLEUS probes: Tower/Node/Nest readiness scanning, biomeOS deploy graph validation
+- 300 experiments, 305 binaries, 8,886+ checks
 
 ## V98+ — Upstream Rewire + Cross-Spring Evolution (2026-03-08)
 

@@ -490,7 +490,20 @@ spectral→wetSpring Anderson, groundSpring bootstrap→diversity CI, full 5-sta
 IPC pipeline. Deploy graph `wetspring_deploy.toml` created in biomeOS.
 **Exp321: 42/42 PASS. Exp322: 22/22 PASS.**
 
-**Totals: 297 experiments, 300 binaries, 8,720+ checks.**
+### V99 Chain — CPU v25 → GPU v14 → metalForge v17 (Exp323–326)
+
+| Exp | Name | Type | Checks |
+|-----|------|------|:------:|
+| 323 | BarraCuda CPU v25 — V99 Cross-Primal Pure Rust Math | Validation | 46 |
+| 324 | BarraCuda GPU v14 — V99 GPU + ToadStool Dispatch | GPU Parity | 27 |
+| 326 | metalForge v17 — V99 Mixed NUCLEUS Atomics + biomeOS Graph | Cross-System | 29 |
+
+V99 chain: CPU v25 (46/46) → GPU v14 (27/27) → metalForge v17 (29/29) = **102/102 PASS**.
+Extends V98 chain with cross-primal math (ET₀, spectral, graph Laplacian), biomeOS
+integration primitives, ToadStool dispatch patterns, NUCLEUS atomic probes (Tower,
+Node, Nest), and biomeOS deploy graph validation.
+
+**Totals: 300 experiments, 305 binaries, 8,886+ checks.**
 
 ---
 

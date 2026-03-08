@@ -1655,3 +1655,19 @@ required-features = ["ipc"]
 name = "validate_cross_primal_pipeline_v98"
 path = "src/bin/validate_cross_primal_pipeline_v98.rs"
 required-features = ["ipc"]
+
+# ── Exp323: V99 BarraCuda CPU v25 — Cross-Primal Pure Rust Math ──
+[[bin]]
+name = "validate_barracuda_cpu_v25"
+path = "src/bin/validate_barracuda_cpu_v25.rs"
+
+# ── Exp324: V99 BarraCuda GPU v14 — GPU + ToadStool Dispatch ──
+[[bin]]
+name = "validate_barracuda_gpu_v14"
+path = "src/bin/validate_barracuda_gpu_v14.rs"
+required-features = ["gpu"]
+
+# ── Exp326: V99 metalForge v17 — Mixed NUCLEUS + biomeOS Graph ──
+[[bin]]
+name = "validate_metalforge_v17"
+path = "src/bin/validate_metalforge_v17.rs"
