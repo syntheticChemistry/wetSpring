@@ -474,7 +474,23 @@ GPU: FusedMapReduceF64 Shannon/Simpson/BC validated on RTX 4070 (Hybrid/DF64).
 Benchmark: 24 cross-spring primitives profiled CPU + GPU.
 **Exp319: 52/52 PASS. Exp320: 24 primitives benchmarked.**
 
-**Totals: 295 experiments, 298 binaries, 8,656+ checks.**
+### V99 — biomeOS/NUCLEUS Integration + Cross-Primal Pipeline (Exp321–322)
+
+| Exp | Name | Type | Checks |
+|-----|------|------|:------:|
+| 321 | biomeOS/NUCLEUS V98+ Integration Validation | Integration | 42 |
+| 322 | Cross-Primal Pipeline V98+ — Ecosystem Integration | Pipeline | 22 |
+
+V99: biomeOS integration proving wetSpring as a NUCLEUS science primal.
+Exp321: IPC server lifecycle (health, science, brain, metrics), NUCLEUS environment
+probe, deploy graph validation, JSON-RPC 2.0 protocol compliance, connection
+multiplexing, Songbird discovery. Exp322: cross-primal data flows —
+airSpring ET₀→wetSpring QS, wetSpring diversity→neuralSpring graph, hotSpring
+spectral→wetSpring Anderson, groundSpring bootstrap→diversity CI, full 5-stage
+IPC pipeline. Deploy graph `wetspring_deploy.toml` created in biomeOS.
+**Exp321: 42/42 PASS. Exp322: 22/22 PASS.**
+
+**Totals: 297 experiments, 300 binaries, 8,720+ checks.**
 
 ---
 

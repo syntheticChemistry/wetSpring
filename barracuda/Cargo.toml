@@ -1643,3 +1643,15 @@ path = "src/bin/validate_cross_spring_evolution_v98.rs"
 [[bin]]
 name = "benchmark_cross_spring_evolution_v98"
 path = "src/bin/benchmark_cross_spring_evolution_v98.rs"
+
+# ── Exp321: V98+ biomeOS/NUCLEUS Integration Validation ──
+[[bin]]
+name = "validate_biomeos_nucleus_v98"
+path = "src/bin/validate_biomeos_nucleus_v98.rs"
+required-features = ["ipc"]
+
+# ── Exp322: V98+ Cross-Primal Pipeline ──
+[[bin]]
+name = "validate_cross_primal_pipeline_v98"
+path = "src/bin/validate_cross_primal_pipeline_v98.rs"
+required-features = ["ipc"]

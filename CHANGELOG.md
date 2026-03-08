@@ -3,6 +3,23 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V99 — biomeOS/NUCLEUS Integration + Cross-Primal Pipeline (2026-03-08)
+
+### Added
+- **Exp321**: biomeOS/NUCLEUS V98+ Integration — IPC server lifecycle (health, science,
+  brain, metrics), NUCLEUS env probe, deploy graph validation, JSON-RPC 2.0 protocol
+  compliance, 10-request multiplexing, Songbird discovery. **42/42 PASS.**
+- **Exp322**: Cross-Primal Pipeline — airSpring ET₀→wetSpring QS, wetSpring diversity→
+  neuralSpring graph, hotSpring spectral→wetSpring Anderson, groundSpring bootstrap→
+  diversity CI, full 5-stage IPC pipeline. **22/22 PASS.**
+- **wetspring_deploy.toml**: biomeOS deploy graph for wetSpring as NUCLEUS science primal
+  (Tower→ToadStool→wetSpring, 9 capabilities, health_check validation)
+
+### Verified
+- IPC overhead: ~2000x vs direct call (~0.1ms IPC vs sub-µs CPU)
+- Cross-primal data flow: 5 springs' primitives chained through IPC correctly
+- 297 experiments, 300 binaries, 8,720+ checks
+
 ## V98+ — Upstream Rewire + Cross-Spring Evolution (2026-03-08)
 
 ### Rewired

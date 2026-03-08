@@ -412,7 +412,22 @@ and cross-spring evolution validation exercising all 5 springs' contributions.
 - GPU: FusedMapReduceF64 Shannon/Simpson/BC on RTX 4070 Hybrid (DF64)
 - Evolution tracking: shader origin→consumer flow across springs
 
-**1,047 tests** | **295 experiments** | **298 binaries** | **8,656+ checks**
+### V99: biomeOS/NUCLEUS Integration + Cross-Primal Pipeline (Exp321–322)
+
+wetSpring integrated as a biomeOS science primal via JSON-RPC IPC,
+with deploy graph `wetspring_deploy.toml` and cross-primal pipeline validation.
+
+| Exp | Name | Type | Checks |
+|-----|------|------|:------:|
+| 321 | biomeOS/NUCLEUS V98+ Integration | Integration | 42/42 |
+| 322 | Cross-Primal Pipeline V98+ | Pipeline | 22/22 |
+
+- IPC server: health, science.diversity, science.qs_model, full_pipeline, brain, metrics
+- Protocol: JSON-RPC 2.0, error codes, 10-request multiplexing on single connection
+- NUCLEUS: environment probe, deploy graph, Songbird discovery
+- Pipeline: airSpring ET₀ → wetSpring QS → diversity → neuralSpring graph → spectral
+
+**1,047 tests** | **297 experiments** | **300 binaries** | **8,720+ checks**
 
 ### Phase 95: Standalone barraCuda Rewire + Deep Debt Evolution
 
