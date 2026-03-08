@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-07 (V98: 293 experiments, 296 binaries, 8,604+ checks. V98 full chain: Paper Math v5 (32/32) → CPU v24 (67/67) → GPU v13 (25/25) → Streaming v11 (25/25) → metalForge v16 (24/24) = 173/173 PASS. All 52 papers, 33 bio modules + statistics, Hybrid-aware GPU. 1,347 tests, clippy pedantic CLEAN.)
+**Updated**: 2026-03-08 (V99: 300 experiments, 305 binaries, 8,886+ checks. V99 chain: biomeOS/NUCLEUS (42+22) + CPU v25 (46) + GPU v14 (27) + metalForge v17 (29) = 166/166 PASS. V98 chain regression: 173/173 PASS. All 52 papers, biomeOS IPC integration, cross-primal pipelines, ToadStool dispatch. 1,047 tests, clippy pedantic CLEAN.)
 
 ---
 

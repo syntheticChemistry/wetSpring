@@ -1,6 +1,7 @@
 # Python Baseline Manifest
 
 **Generated:** February 27, 2026 (Phase 61 audit — SPDX headers + provenance metadata added)
+**Verified:** March 8, 2026 (V99 — all scripts present, no orphans)
 **Last scripts commit:** Phase 61 audit (hashes updated after adding SPDX-License-Identifier headers)
 
 ## Commit History Clarification

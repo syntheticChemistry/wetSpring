@@ -1,8 +1,8 @@
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** March 7, 2026
+**Date:** March 8, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V98+ — 295 experiments, 8,656+ validation checks, ALL PASS; 1,347 tests, 298 binaries, standalone `barraCuda` v0.3.3 `a898dee` (wgpu 28, 694+ WGSL shaders), toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`. V98 chain: Paper Math v5 (32/32) → CPU v24 (67/67) → GPU v13 (25/25) → Streaming v11 (25/25) → metalForge v16 (24/24) = **173/173 PASS**. Cross-spring V98+: Exp319 (52/52) + Exp320 benchmark (24 primitives). 0 local WGSL, 164 tolerances, 0 unsafe, clippy pedantic ZERO WARNINGS. 52 papers reproduced, 5 springs exercised.
+**Status:** V99 — 300 experiments, 8,886+ validation checks, ALL PASS; 1,047 tests, 305 binaries, standalone `barraCuda` v0.3.3 `a898dee` (wgpu 28, 694+ WGSL shaders), toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`. V99 chain: biomeOS/NUCLEUS (42+22) + CPU v25 (46) + GPU v14 (27) + metalForge v17 (29) = **166/166 PASS**. V98 regression: 173/173 PASS. biomeOS deploy graph wired, cross-primal IPC pipeline validated, ToadStool dispatch patterns + provenance tracking. 0 local WGSL, 164 tolerances, 0 unsafe, clippy pedantic ZERO WARNINGS. 52 papers reproduced, 5 springs exercised.
 
 ---
 
@@ -47,7 +47,9 @@ All code is AGPL-3.0.
 | **V97c Fused Ops** | — | chain | — | Exp306-310 | 111 | Welford, Pearson, Spearman, CorrMatrix, streaming, metalForge |
 | **V98 Full Chain** | — | chain | — | Exp313-318 | 173 | All 52 papers, 33 bio modules, GPU Hybrid-aware, streaming, metalForge |
 | **V98+ Cross-Spring** | — | evolution | — | Exp319-320 | 52 | All 5 springs, 28 shaders, 22 cross-spring, GPU FusedMapReduceF64, 24 benchmarks |
-| **Total** | | | **52** | | **8,656+** | |
+| **V99 biomeOS/NUCLEUS** | — | integration | — | Exp321-322 | 64 | biomeOS IPC server, JSON-RPC 2.0, NUCLEUS env probe, cross-primal pipeline, brain module |
+| **V99 Chain** | — | chain | — | Exp323-326 | 102 | CPU v25 (46), GPU v14 (27), metalForge v17 (29), ToadStool dispatch, NUCLEUS probes |
+| **Total** | | | **52** | | **8,886+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 

@@ -9,6 +9,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
+| **V99** | `handoffs/WETSPRING_V99_BIOMEOS_NUCLEUS_FULL_CHAIN_HANDOFF_MAR08_2026.md` | Mar 8 | biomeOS/NUCLEUS integration + full V99 chain: Exp321-326 (166/166 PASS). Deploy graph, IPC server, cross-primal pipeline, CPU v25 (46), GPU v14 (27), metalForge v17 (29). ToadStool dispatch + NUCLEUS atomic probes. 300 experiments, 8,886+ checks. |
 | **V98+** | `handoffs/WETSPRING_V98_CROSS_SPRING_EVOLUTION_HANDOFF_MAR08_2026.md` | Mar 8 | Cross-spring evolution: Exp319 (52/52) + Exp320 benchmark. All 5 springs exercised, provenance registry (28 shaders, 22 cross-spring). GPU FusedMapReduceF64 validated. |
 | **V98+** | `handoffs/WETSPRING_V98_UPSTREAM_REWIRE_HANDOFF_MAR08_2026.md` | Mar 8 | Upstream rewire: barraCuda `a898dee`, toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`. Zero API breakage. V98 chain 173/173 re-validated. |
 | **V98** | `handoffs/WETSPRING_V98_BARRACUDA_TOADSTOOL_FULL_CHAIN_HANDOFF_MAR07_2026.md` | Mar 7 | V98 full-chain validation (173/173), primitive inventory, GPU Hybrid findings, DF64 shader gap, absorption targets. |
@@ -22,14 +23,8 @@
 | **V95** | `handoffs/WETSPRING_V95_CROSS_SPRING_EVOLUTION_COMPLETE_MAR04_2026.md` | Mar 4 | Cross-spring evolution complete: 6 GPU ops + 2 CPU delegations wired, Exp305 (59/59), full provenance table, benchmarks |
 | **V94** | `handoffs/WETSPRING_V94_BARRACUDA_EVOLUTION_SYNC_MAR04_2026.md` | Mar 4 | barraCuda evolution sync: norm_ppf wiring, 50+ doc files cleaned (ToadStool → barraCuda), gap analysis |
 | **V93+** | `handoffs/WETSPRING_V93_DEEP_DEBT_TOADSTOOL_HANDOFF_MAR04_2026.md` | Mar 4 | Deep debt round 3: 164 tolerances, test extraction, provenance complete |
-| **V93** | `handoffs/WETSPRING_BARRACUDA_031_REWIRE_HANDOFF_MAR03_2026.md` | Mar 3 | Standalone barraCuda v0.3.1 rewire: path swap, MSRV bump, zero API breakage |
 | **V93** | `handoffs/WETSPRING_V93_BARRACUDA_EVOLUTION_FEEDBACK_MAR03_2026.md` | Mar 3 | Evolution feedback: 150+ primitives consumed, precision observations |
-| **V92F** | `handoffs/WETSPRING_CROSS_SPRING_V92F_MODERN_S86_HANDOFF_MAR02_2026.md` | Mar 2 | Cross-spring modern S86 validation + benchmark |
-| **V92D+** | `handoffs/WETSPRING_PAPER_CHAIN_V92D_PLUS_HANDOFF_MAR02_2026.md` | Mar 2 | Paper-math chain: 52 papers, CPU→GPU→streaming→metalForge |
-| **V92B** | `handoffs/WETSPRING_GONZALES_REPRO_V92B_HANDOFF_MAR02_2026.md` | Mar 2 | Gonzales reproducibility handoff |
-| **V92** | `handoffs/WETSPRING_IMMUNO_ANDERSON_V92_HANDOFF_MAR02_2026.md` | Mar 2 | Immunological Anderson handoff |
-| **V91** | `handoffs/WETSPRING_DEEP_DEBT_V91_HANDOFF_MAR02_2026.md` | Mar 2 | Deep debt resolution handoff |
-| **V90** | `handoffs/WETSPRING_BIO_BRAIN_V90_CROSS_SPRING_HANDOFF_MAR02_2026.md` | Mar 2 | Bio Brain cross-spring handoff |
+| | *V92 and earlier → `handoffs/archive/`* | | Fossil record: V7–V92F (86 archived handoffs) |
 
 ## Cross-Spring Documents
 

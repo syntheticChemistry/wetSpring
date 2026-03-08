@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
-**Last Updated**: March 5, 2026
-**Status**: Phase 97 — 8,300+ checks, ALL PASS (1,247 lib+forge tests, 281 experiments, 285 binaries, standalone barraCuda v0.3.3, wgpu 28, 150+ primitives, 0 local WGSL, 164 named tolerances, 0 TODO/FIXME/HACK, 0 silent fallbacks, clippy pedantic CLEAN `--all-features`). V97: wgpu 22→28 migration, PollType::Wait evolution, Arc removal, Fp64Strategy precision dispatch, DF64 core-streaming available
+**Last Updated**: March 8, 2026
+**Status**: V99 — 8,886+ checks, ALL PASS (1,047 tests, 300 experiments, 305 binaries, standalone barraCuda v0.3.3 `a898dee`, wgpu 28, 150+ primitives, 0 local WGSL, 164 named tolerances, 0 TODO/FIXME/HACK, 0 silent fallbacks, clippy pedantic CLEAN `--all-features`). V99: biomeOS/NUCLEUS integration, cross-primal IPC pipeline, ToadStool dispatch, NUCLEUS atomics
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -140,7 +140,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 | Document | Location | Description |
 |----------|----------|-------------|
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
-| Handoff (V92F) | `../wateringHole/handoffs/WETSPRING_CROSS_SPRING_V92F_MODERN_S86_HANDOFF_MAR02_2026.md` | Current cross-spring evolution handoff |
+| Handoff (V99) | `../wateringHole/handoffs/WETSPRING_V99_BIOMEOS_NUCLEUS_FULL_CHAIN_HANDOFF_MAR08_2026.md` | Current biomeOS/NUCLEUS full-chain handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |

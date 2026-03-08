@@ -4,10 +4,10 @@
 against Rust implementations and GPU shaders via `barraCuda` (standalone math
 primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 
-**Date:** March 7, 2026
+**Date:** March 8, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V98 — 1,046 lib tests + 200 forge tests + 100 doc tests, 293 experiments, 8,604+ validation checks, 296 binaries, standalone `barraCuda` v0.3.3 (`a898dee`, 694+ WGSL shaders, wgpu 28). V98 full chain: Paper Math v5 (52 papers, 32/32) → CPU v24 (67/67) → GPU v13 (25/25) → Streaming v11 (25/25) → metalForge v16 (24/24) = **173/173 PASS**. Zero local WGSL, zero unsafe code, 164 named tolerances, `cargo clippy -D warnings` **ZERO WARNINGS** (default + GPU), `cargo doc -D warnings` **ZERO WARNINGS**. Ecosystem: barraCuda `a898dee`, toadStool S130+ (`bfe7977b`), coralReef Phase 10 Iteration 10 (`d29a734`).
+**Status:** V99 — 1,047 lib tests + 200 forge tests + 100 doc tests, 300 experiments, 8,886+ validation checks, 305 binaries. V99 chain: biomeOS/NUCLEUS (42+22) + CPU v25 (46) + GPU v14 (27) + metalForge v17 (29) = **166/166 PASS**. V98 chain regression: 173/173 PASS. Zero local WGSL, zero unsafe code, 164 named tolerances, `cargo clippy -D warnings` **ZERO WARNINGS**, `cargo doc -D warnings` **ZERO WARNINGS**. Ecosystem: barraCuda `a898dee`, toadStool S130+ (`bfe7977b`), coralReef Phase 10 Iteration 10 (`d29a734`).
 
 ---
 
