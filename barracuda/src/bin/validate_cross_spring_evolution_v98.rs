@@ -178,7 +178,7 @@ fn main() {
         let unpacked = wetspring_barracuda::df64_host::unpack_slice(&packed);
         v.check_pass("DF64 pack→unpack roundtrip", unpacked.len() == values.len());
         for (i, (&orig, &rt)) in values.iter().zip(unpacked.iter()).enumerate() {
-            let err = (orig - rt).abs() / orig.abs().max(1e-30);
+            let err = (orig - rt).abs() / orig.abs().max(tolerances::ODE_DIVISION_GUARD);
             v.check_pass(
                 &format!("DF64 roundtrip[{i}] rel_err < 1e-10"),
                 err < tolerances::ANALYTICAL_LOOSE,
@@ -523,7 +523,7 @@ fn main() {
         let config = barracuda::linalg::NmfConfig {
             rank: k,
             max_iter: 200,
-            tol: 1e-4,
+            tol: tolerances::NMF_CONVERGENCE_KL,
             objective: barracuda::linalg::NmfObjective::Euclidean,
             seed: 42,
         };

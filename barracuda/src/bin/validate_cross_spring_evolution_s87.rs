@@ -237,7 +237,10 @@ fn main() {
                         .zip(cpu_c.iter())
                         .map(|(g, c)| (g - c).abs())
                         .fold(0.0_f64, f64::max);
-                    v.check_pass(&format!("GEMM {n}: GPU≈CPU parity"), max_err < 1e-3);
+                    v.check_pass(
+                        &format!("GEMM {n}: GPU≈CPU parity"),
+                        max_err < tolerances::CROSS_SPRING_NUMERICAL,
+                    );
                     println!(
                         "  {n}×{n}: max|GPU−CPU|={max_err:.2e}, speedup={:.1}×",
                         ms_cpu / ms_gpu.max(0.001)
@@ -591,7 +594,7 @@ fn main() {
                 &barracuda::linalg::NmfConfig {
                     rank: 5,
                     max_iter: 200,
-                    tol: 1e-6,
+                    tol: tolerances::NMF_CONVERGENCE_EUCLIDEAN,
                     objective: barracuda::linalg::NmfObjective::Euclidean,
                     seed: 42,
                 },
@@ -663,7 +666,7 @@ fn main() {
         v.check_pass("DF64 pack→unpack roundtrip", unpacked.len() == values.len());
 
         for (i, (&orig, &rt)) in values.iter().zip(unpacked.iter()).enumerate() {
-            let err = (orig - rt).abs() / orig.abs().max(1e-300);
+            let err = (orig - rt).abs() / orig.abs().max(tolerances::LOG_PROB_FLOOR);
             v.check_pass(
                 &format!("DF64 roundtrip[{i}] < ANALYTICAL_LOOSE"),
                 err < tolerances::ANALYTICAL_LOOSE,

@@ -241,7 +241,7 @@ async fn main() {
     let prop_sum: f64 = gpu_pcoa.proportion_explained.iter().sum();
     v.check(
         "PCoA: proportion explained ≤ 1.0",
-        f64::from(u8::from(prop_sum <= 1.0 + 1e-6)),
+        f64::from(u8::from(prop_sum <= 1.0 + tolerances::GPU_VS_CPU_F64)),
         1.0,
         tolerances::EXACT,
     );

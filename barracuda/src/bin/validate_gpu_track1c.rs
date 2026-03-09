@@ -248,7 +248,7 @@ fn validate_snp_gpu(gpu: &SnpGpu, v: &mut Validator, timings: &mut Vec<(&str, f6
             let freq_ok = cpu_result.variants.iter().all(|cv| {
                 let gpu_freq = gpu_result.alt_frequencies[cv.position];
                 let cpu_freq = cv.alt_frequency();
-                (gpu_freq - cpu_freq).abs() < 1e-6
+                (gpu_freq - cpu_freq).abs() < tolerances::GPU_VS_CPU_F64
             });
             v.check(
                 "SNP GPU: alt frequencies match CPU",
@@ -258,11 +258,9 @@ fn validate_snp_gpu(gpu: &SnpGpu, v: &mut Validator, timings: &mut Vec<(&str, f6
             );
 
             // Non-variant positions should have 0 alt freq
-            let non_variants_clean = gpu_result
-                .is_variant
-                .iter()
-                .enumerate()
-                .all(|(i, v)| *v != 0 || gpu_result.alt_frequencies[i].abs() < 1e-15);
+            let non_variants_clean = gpu_result.is_variant.iter().enumerate().all(|(i, v)| {
+                *v != 0 || gpu_result.alt_frequencies[i].abs() < tolerances::EXACT_F64
+            });
             v.check(
                 "SNP GPU: non-variant alt_freq = 0",
                 f64::from(u8::from(non_variants_clean)),

@@ -155,7 +155,7 @@ fn main() {
         "Welford: sVar(large shifted) = N(N+1)/12",
         large_var,
         expected_large_sample_var,
-        1e-4,
+        tolerances::GPU_VS_CPU_ENSEMBLE,
     );
     d41_checks += 1;
 

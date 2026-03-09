@@ -26,7 +26,7 @@
 //!
 //! - D47: I/O + Quality — Phred, adapter, quality filter, merge, derep, kmer
 //! - D48: Alignment + Tree — SW, Felsenstein, RF, NJ, placement, reconciliation
-//! - D49: Diversity — Shannon, Simpson, Chao1, Pielou, BC, PCoA, UniFrac
+//! - D49: Diversity — Shannon, Simpson, Chao1, Pielou, BC, `PCoA`, `UniFrac`
 //! - D50: ODE Systems — QS, bistable, capacitor, multi-signal, phage, cooperation
 //! - D51: Metagenomics — ANI, SNP, dN/dS, pangenome, molecular clock
 //! - D52: Chemistry — EIC, signal peaks, KMD, tolerance search, spectral match
@@ -649,8 +649,7 @@ fn main() {
     let total_checks: u32 = domains.iter().map(|d| d.checks).sum();
     println!("╠════════════════════════════════════════════════════════════════════╣");
     println!(
-        "║ TOTAL                  │                    │ {:>5.1}ms │ {:>3} ║",
-        total_ms, total_checks
+        "║ TOTAL                  │                    │ {total_ms:>5.1}ms │ {total_checks:>3} ║",
     );
     println!("╚════════════════════════════════════════════════════════════════════╝");
     println!();

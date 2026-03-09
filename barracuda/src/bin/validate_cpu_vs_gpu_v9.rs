@@ -128,7 +128,7 @@ fn main() {
             &barracuda::linalg::nmf::NmfConfig {
                 rank: 2,
                 max_iter: 200,
-                tol: 1e-4,
+                tol: tolerances::NMF_CONVERGENCE_KL,
                 objective: barracuda::linalg::nmf::NmfObjective::KlDivergence,
                 seed: 42,
             },
@@ -244,7 +244,7 @@ fn main() {
             &barracuda::linalg::nmf::NmfConfig {
                 rank: 2,
                 max_iter: 200,
-                tol: 1e-4,
+                tol: tolerances::NMF_CONVERGENCE_KL,
                 objective: barracuda::linalg::nmf::NmfObjective::KlDivergence,
                 seed: 42,
             },

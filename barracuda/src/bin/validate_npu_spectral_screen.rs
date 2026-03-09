@@ -37,6 +37,7 @@
 
 use wetspring_barracuda::bio::esn::{Esn, EsnConfig};
 use wetspring_barracuda::special;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 const LIB_SIZE: usize = 2048;
@@ -166,7 +167,7 @@ fn main() {
         spectral_radius: 0.85,
         connectivity: 0.1,
         leak_rate: 0.3,
-        regularization: 1e-5,
+        regularization: tolerances::ESN_REGULARIZATION_TIGHT,
         seed: 99,
     });
     esn.train(&train_in, &train_out);

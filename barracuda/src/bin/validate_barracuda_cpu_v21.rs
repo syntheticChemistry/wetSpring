@@ -239,7 +239,14 @@ fn main() {
 
     let ridge_x: Vec<f64> = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
     let ridge_y: Vec<f64> = vec![5.0, 11.0, 17.0];
-    let ridge = barracuda::linalg::ridge_regression(&ridge_x, &ridge_y, 3, 2, 1, 1e-4);
+    let ridge = barracuda::linalg::ridge_regression(
+        &ridge_x,
+        &ridge_y,
+        3,
+        2,
+        1,
+        tolerances::RIDGE_TEST_TOL,
+    );
     v.check_pass("Chain: ridge regression Ok", ridge.is_ok());
     if let Ok(r) = &ridge {
         v.check_pass(

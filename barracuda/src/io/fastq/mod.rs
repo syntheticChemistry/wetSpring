@@ -163,6 +163,7 @@ fn extract_id(header: &[u8]) -> &str {
 ///
 /// Returns [`Error::Io`] if the file cannot be opened, or
 /// [`Error::Fastq`] if a record is malformed.
+#[doc(hidden)]
 #[deprecated(
     since = "0.1.0",
     note = "buffers entire file; use FastqIter or for_each_record"

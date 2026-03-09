@@ -45,6 +45,7 @@
 use std::time::Instant;
 use wetspring_barracuda::bio::esn::{Esn, EsnConfig};
 use wetspring_barracuda::npu;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 // ═══════════════════════════════════════════════════════════════════
@@ -183,7 +184,7 @@ fn main() {
         spectral_radius: 0.9,
         connectivity: 0.12,
         leak_rate: 0.3,
-        regularization: 1e-5,
+        regularization: tolerances::ESN_REGULARIZATION_TIGHT,
         seed: 2025,
     });
 

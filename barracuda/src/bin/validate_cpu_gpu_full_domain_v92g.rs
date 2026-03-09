@@ -138,7 +138,10 @@ fn main() {
                 .zip(cpu_bc.iter())
                 .map(|(g, c)| (g - c).abs())
                 .fold(0.0_f64, f64::max);
-            v.check_pass(&format!("D03: BC max err={max_err:.2e}"), max_err < 1e-3);
+            v.check_pass(
+                &format!("D03: BC max err={max_err:.2e}"),
+                max_err < tolerances::CROSS_SPRING_NUMERICAL,
+            );
         }
         Err(e) => v.check_pass(&format!("D03: BC fallback ({e})"), true),
     }
@@ -198,7 +201,7 @@ fn main() {
                     .fold(0.0_f64, f64::max);
                 v.check_pass(
                     &format!("D05: GEMM {m}×{k}×{n} err={max_err:.2e}"),
-                    max_err < 1e-3,
+                    max_err < tolerances::CROSS_SPRING_NUMERICAL,
                 );
             }
             Err(e) => v.check_pass(&format!("D05: GEMM fallback ({e})"), true),
@@ -228,7 +231,7 @@ fn main() {
     let nmf_cfg = NmfConfig {
         rank: 3,
         max_iter: 100,
-        tol: 1e-4,
+        tol: tolerances::NMF_CONVERGENCE_KL,
         objective: NmfObjective::Euclidean,
         seed: 42,
     };

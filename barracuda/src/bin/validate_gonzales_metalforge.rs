@@ -248,7 +248,7 @@ async fn main() {
 
         v.check_pass(
             &format!("{name}: at IC50 = 50%"),
-            (hill(ic50, ic50, 1.0) - 0.5).abs() < 1e-12,
+            (hill(ic50, ic50, 1.0) - 0.5).abs() < tolerances::ANALYTICAL_F64,
         );
 
         v.check_pass(

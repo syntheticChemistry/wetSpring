@@ -38,6 +38,7 @@
 
 use wetspring_barracuda::bio::esn::{Esn, EsnConfig};
 use wetspring_barracuda::bio::qs_biofilm::QsBiofilmParams;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 const N_TRAIN: usize = 512;
@@ -151,7 +152,7 @@ fn main() {
         spectral_radius: 0.9,
         connectivity: 0.1,
         leak_rate: 0.3,
-        regularization: 1e-6,
+        regularization: tolerances::ESN_REGULARIZATION,
         seed: 42,
     };
     let mut esn = Esn::new(config);
@@ -207,7 +208,7 @@ fn main() {
         spectral_radius: 0.9,
         connectivity: 0.1,
         leak_rate: 0.3,
-        regularization: 1e-6,
+        regularization: tolerances::ESN_REGULARIZATION,
         seed: 42,
     });
     esn_npu.reset_state();

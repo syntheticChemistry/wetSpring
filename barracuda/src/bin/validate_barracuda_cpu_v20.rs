@@ -249,7 +249,12 @@ fn main() {
     let [hi, lo] = df64_host::pack(std::f64::consts::PI);
     let restored = df64_host::unpack(hi, lo);
     let err = (restored - std::f64::consts::PI).abs();
-    v.check("DF64: PI roundtrip", err, 0.0, 1e-14);
+    v.check(
+        "DF64: PI roundtrip",
+        err,
+        0.0,
+        tolerances::PYTHON_PARITY_TIGHT,
+    );
     d30 += 1;
 
     let test_vals = [1.0, -1e-10, 1e20, std::f64::consts::E, 0.0];
@@ -265,7 +270,12 @@ fn main() {
         .zip(&unpacked)
         .map(|(a, b)| (a - b).abs())
         .fold(0.0_f64, f64::max);
-    v.check("DF64: slice max roundtrip error", max_err, 0.0, 1e-14);
+    v.check(
+        "DF64: slice max roundtrip error",
+        max_err,
+        0.0,
+        tolerances::PYTHON_PARITY_TIGHT,
+    );
     d30 += 1;
 
     let try_result = df64_host::try_unpack_slice(&packed);

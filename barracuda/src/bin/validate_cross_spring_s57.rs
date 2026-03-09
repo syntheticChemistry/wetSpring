@@ -298,7 +298,7 @@ async fn main() {
         let loss = |p: &[f64]| -> f64 { p[0].mul_add(p[1], p[0].mul_add(p[0], 2.0 * p[1] * p[1])) };
 
         let t0 = Instant::now();
-        let hessian = numerical_hessian(&loss, &params, 1e-5);
+        let hessian = numerical_hessian(&loss, &params, tolerances::NUMERICAL_HESSIAN_EPSILON);
         let hess_us = t0.elapsed().as_micros() as f64;
 
         // Expected: [[2, 1], [1, 4]] (flat row-major)

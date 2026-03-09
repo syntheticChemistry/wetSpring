@@ -192,7 +192,7 @@ fn validate_matrix_pharmacophenomics(v: &mut Validator) {
     let config = NmfConfig {
         rank: 5,
         max_iter: 200,
-        tol: 1e-6,
+        tol: tolerances::NMF_CONVERGENCE_EUCLIDEAN,
         objective: NmfObjective::Euclidean,
         seed: 42,
     };
@@ -257,7 +257,7 @@ fn validate_nmf_drug_repurposing(v: &mut Validator) {
         let config = NmfConfig {
             rank,
             max_iter: 200,
-            tol: 1e-6,
+            tol: tolerances::NMF_CONVERGENCE_EUCLIDEAN,
             objective: NmfObjective::Euclidean,
             seed: 42,
         };
@@ -276,7 +276,7 @@ fn validate_nmf_drug_repurposing(v: &mut Validator) {
     let best_config = NmfConfig {
         rank: 10,
         max_iter: 200,
-        tol: 1e-6,
+        tol: tolerances::NMF_CONVERGENCE_EUCLIDEAN,
         objective: NmfObjective::Euclidean,
         seed: 42,
     };
@@ -284,11 +284,14 @@ fn validate_nmf_drug_repurposing(v: &mut Validator) {
     let best_err = nmf::relative_reconstruction_error(&matrix, &best);
     v.check_pass("best rank error < 0.8", best_err < 0.8);
 
-    let kl_matrix: Vec<f64> = matrix.iter().map(|&x| x + 1e-10).collect();
+    let kl_matrix: Vec<f64> = matrix
+        .iter()
+        .map(|&x| x + tolerances::ANALYTICAL_LOOSE)
+        .collect();
     let kl_config = NmfConfig {
         rank: 10,
         max_iter: 200,
-        tol: 1e-6,
+        tol: tolerances::NMF_CONVERGENCE_EUCLIDEAN,
         objective: NmfObjective::KlDivergence,
         seed: 42,
     };
@@ -340,7 +343,7 @@ fn validate_repodb_nmf(v: &mut Validator) {
     let config = NmfConfig {
         rank: n_clusters,
         max_iter: 200,
-        tol: 1e-6,
+        tol: tolerances::NMF_CONVERGENCE_EUCLIDEAN,
         objective: NmfObjective::Euclidean,
         seed: 42,
     };
@@ -412,7 +415,7 @@ fn transe_score_fn(entity_emb: &[f64], relation_emb: &[f64], h: usize, r: usize,
 fn l2_normalize_row(emb: &mut [f64], idx: usize) {
     let row = &mut emb[idx * KG_EMBED_DIM..(idx + 1) * KG_EMBED_DIM];
     let norm: f64 = row.iter().map(|x| x * x).sum::<f64>().sqrt();
-    if norm > 1e-12 {
+    if norm > tolerances::EMBEDDING_NORM_FLOOR {
         for val in row.iter_mut() {
             *val /= norm;
         }
@@ -495,7 +498,7 @@ fn validate_kg_embedding(v: &mut Validator) {
                             - entity_emb[tt * KG_EMBED_DIM + d];
                         s += diff * diff;
                     }
-                    s.sqrt() + 1e-12
+                    s.sqrt() + tolerances::EMBEDDING_NORM_FLOOR
                 };
                 let neg_norm = {
                     let mut s = 0.0;
@@ -505,7 +508,7 @@ fn validate_kg_embedding(v: &mut Validator) {
                             - entity_emb[neg_t * KG_EMBED_DIM + d];
                         s += diff * diff;
                     }
-                    s.sqrt() + 1e-12
+                    s.sqrt() + tolerances::EMBEDDING_NORM_FLOOR
                 };
 
                 for d in 0..KG_EMBED_DIM {

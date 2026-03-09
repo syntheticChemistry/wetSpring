@@ -500,7 +500,14 @@ fn main() {
     let (ridge_res, ridge_ms) = bench("ridge regression (20×5→2) — barracuda::linalg", || {
         let x_data: Vec<f64> = (0..100).map(|i| f64::from(i) * 0.01).collect();
         let y_data: Vec<f64> = (0..40).map(|i| f64::from(i).mul_add(0.25, 1.0)).collect();
-        barracuda::linalg::ridge_regression(&x_data, &y_data, 20, 5, 2, 1e-6)
+        barracuda::linalg::ridge_regression(
+            &x_data,
+            &y_data,
+            20,
+            5,
+            2,
+            tolerances::RIDGE_REGULARIZATION_SMALL,
+        )
     });
     v.check_pass(
         "ridge weights finite",

@@ -34,6 +34,7 @@ use std::time::Instant;
 use barracuda::shaders::provenance::report::shader_count;
 use barracuda::shaders::provenance::types::SpringDomain;
 use barracuda::shaders::provenance::{cross_spring_shaders, shaders_consumed_by, shaders_from};
+use wetspring_barracuda::tolerances;
 
 struct BenchRow {
     primitive: &'static str,
@@ -330,7 +331,7 @@ fn main() {
     let nmf_config = barracuda::linalg::NmfConfig {
         rank: 5,
         max_iter: 200,
-        tol: 1e-4,
+        tol: tolerances::NMF_CONVERGENCE_KL,
         objective: barracuda::linalg::NmfObjective::Euclidean,
         seed: 42,
     };

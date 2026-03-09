@@ -64,6 +64,9 @@
 //! - [`error`] — Error types for all parsers and algorithms
 //! - [`bench`](mod@bench) — Benchmarking utilities and hardware detection
 //!
+//! # Visualization (feature = "json")
+//! - [`visualization`] — `petalTongue`-compatible scenario export (`DataChannel`, IPC push)
+//!
 //! # Evolution path
 //!
 //! ```text
@@ -96,3 +99,5 @@ pub mod tolerances;
 pub mod validation;
 #[cfg(feature = "vault")]
 pub mod vault;
+#[cfg(feature = "json")]
+pub mod visualization;

@@ -231,7 +231,12 @@ fn main() {
         .iter()
         .map(|s: &f64| s.abs())
         .fold(0.0_f64, f64::max);
-    v.check("Laplacian row sum = 0", max_sum, 0.0, 1e-14);
+    v.check(
+        "Laplacian row sum = 0",
+        max_sum,
+        0.0,
+        tolerances::PYTHON_PARITY_TIGHT,
+    );
     s4 += 1;
 
     for i in 0..n_g {
@@ -240,7 +245,7 @@ fn main() {
             &format!("Laplacian[{i},{i}] = degree"),
             cpu_lap[i * n_g + i],
             degree,
-            1e-15,
+            tolerances::EXACT_F64,
         );
         s4 += 1;
     }

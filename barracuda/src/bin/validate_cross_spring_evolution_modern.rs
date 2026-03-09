@@ -64,8 +64,15 @@ fn main() {
     // X: 3 samples, 2 features. y = [8, 13, 18] for x1=[1,2,3], x2=[2,3,4]
     let ridge_x: Vec<f64> = vec![1.0, 2.0, 2.0, 3.0, 3.0, 4.0];
     let ridge_y: Vec<f64> = vec![8.0, 13.0, 18.0]; // 2*1+3*2=8, 2*2+3*3=13, 2*3+3*4=18
-    let ridge = barracuda::linalg::ridge_regression(&ridge_x, &ridge_y, 3, 2, 1, 1e-6)
-        .expect("ridge_regression");
+    let ridge = barracuda::linalg::ridge_regression(
+        &ridge_x,
+        &ridge_y,
+        3,
+        2,
+        1,
+        tolerances::RIDGE_REGULARIZATION_SMALL,
+    )
+    .expect("ridge_regression");
     v.check("ridge: slope x1 ≈ 2", ridge.weights[0], 2.0, 0.01);
     v.check("ridge: slope x2 ≈ 3", ridge.weights[1], 3.0, 0.01);
 
@@ -176,7 +183,12 @@ fn main() {
 
     // 12. kimura_fixation_prob — neutral: P_fix = p0 (drift)
     let p_neutral = barracuda::stats::kimura_fixation_prob(1000, 0.0, 0.01);
-    v.check("kimura(neutral): P_fix = p0", p_neutral, 0.01, 1e-8);
+    v.check(
+        "kimura(neutral): P_fix = p0",
+        p_neutral,
+        0.01,
+        tolerances::LIMIT_CONVERGENCE,
+    );
 
     // 13. detection_power — P(detect) = 1 - (1-p)^D, exact by construction
     let power = barracuda::stats::detection_power(0.001, 1000);
@@ -185,7 +197,7 @@ fn main() {
         "detection_power matches analytic",
         power,
         expected_power,
-        1e-12,
+        tolerances::ANALYTICAL_F64,
     );
 
     // 14. jackknife_mean_variance — [1,2,3,4,5] → mean=3, var>0

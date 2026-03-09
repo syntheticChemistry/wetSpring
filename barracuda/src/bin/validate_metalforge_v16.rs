@@ -312,8 +312,7 @@ fn main() {
     let total_checks: u32 = domains.iter().map(|d| d.checks).sum();
     println!("╠════════════════════════════════════════════════════════════════════╣");
     println!(
-        "║ TOTAL                  │                    │ {:>5.1}ms │ {:>3} ║",
-        total_ms, total_checks
+        "║ TOTAL                  │                    │ {total_ms:>5.1}ms │ {total_checks:>3} ║",
     );
     println!("╚════════════════════════════════════════════════════════════════════╝");
     println!();

@@ -24,7 +24,7 @@ gpu = ["barracuda/gpu", "barracuda/domain-esn", "dep:wgpu", "dep:tokio"]
 # Provides runtime discovery, capability-based dispatch, int8 inference.
 npu = ["dep:akida-driver"]
 # JSON model import (2 bins: validate_pfas_decision_tree, benchmark_three_tier).
-json = ["dep:serde_json"]
+json = ["dep:serde", "dep:serde_json"]
 # IPC server for biomeOS science primal (wetspring-server binary).
 # Adds JSON-RPC 2.0 over Unix socket, Songbird registration, Neural API metrics.
 ipc = ["json"]
@@ -36,6 +36,8 @@ nautilus = ["dep:bingocube-nautilus"]
 vault = ["dep:chacha20poly1305", "dep:ed25519-dalek", "dep:blake3"]
 
 [dependencies]
+# serde: derive Serialize/Deserialize for visualization types (petalTongue schema).
+serde = { version = "1", features = ["derive"], optional = true }
 # serde_json: JSON parsing for validation data and model import (2 binaries).
 serde_json = { version = "1", optional = true }
 
@@ -1671,3 +1673,21 @@ required-features = ["gpu"]
 [[bin]]
 name = "validate_metalforge_v17"
 path = "src/bin/validate_metalforge_v17.rs"
+
+# ── petalTongue visualization scenarios ──
+[[bin]]
+name = "dump_wetspring_scenarios"
+path = "src/bin/dump_wetspring_scenarios.rs"
+required-features = ["json"]
+
+# ── Exp327: petalTongue Visualization V1 ──
+[[bin]]
+name = "validate_visualization_v1"
+path = "src/bin/validate_visualization_v1.rs"
+required-features = ["json"]
+
+# ── Exp328: CPU vs GPU Viz Math Parity ──
+[[bin]]
+name = "validate_cpu_gpu_viz_math"
+path = "src/bin/validate_cpu_gpu_viz_math.rs"
+required-features = ["gpu", "json"]

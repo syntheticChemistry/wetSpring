@@ -181,6 +181,7 @@ impl Iterator for Ms2Iter {
 ///
 /// Returns [`Error::Io`] if the file cannot be opened, or
 /// [`Error::Ms2`] if a record is malformed.
+#[doc(hidden)]
 #[deprecated(
     since = "0.1.0",
     note = "buffers entire file; use Ms2Iter or for_each_spectrum"

@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 7, 2026 (V98+ — barraCuda v0.3.3 `a898dee` + toadStool S130+ `bfe7977b` + coralReef Iteration 10 `d29a734`)
+**Date:** March 9, 2026 (V100 — barraCuda v0.3.3 `a898dee` + toadStool S130+ `bfe7977b` + coralReef Iteration 10 `d29a734`)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 45 GPU modules + 1 IPC + 1 vault + 1 provenance module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.3, wgpu 28). 1,047 tests, 300 experiments, 8,886+ checks, 164 tolerances, 305 binaries. `cargo clippy -D warnings` CLEAN (default + GPU), **0 silent fallbacks**. **V99:** biomeOS/NUCLEUS integration + full chain: Exp321-326 (166/166 PASS). V98 regression: 173/173 PASS. All 52 papers, biomeOS IPC server, cross-primal pipeline, ToadStool dispatch, NUCLEUS atomic probes.
+**Status:** 47 CPU + 47 GPU modules + 1 IPC + 1 vault + 1 provenance + 1 visualization module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.3, wgpu 28). 1,277 tests, 332 experiments, 8,982+ checks, 164 tolerances, 311 binaries. `cargo clippy -D warnings` CLEAN (default + GPU), **0 silent fallbacks**. **V100:** petalTongue visualization integration + local evolution + mixed hardware dispatch: Exp327-332 (173/173 PASS). V99 regression: 166/166 PASS. V98 regression: 173/173 PASS. All 52 papers, petalTongue schema-driven visualization, bandwidth-aware workload routing, FitResult `.slope()` migration, HmmModel doc aliases, NMF bio re-export.
 
 ### Full Lean Phase
 

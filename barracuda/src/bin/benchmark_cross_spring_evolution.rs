@@ -22,6 +22,7 @@ use std::time::Instant;
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::bio::esn::{Esn, EsnConfig};
 use wetspring_barracuda::bio::qs_biofilm::QsBiofilmParams;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 const N_SAMPLES: usize = 500;
@@ -159,7 +160,7 @@ fn main() {
         spectral_radius: 0.9,
         connectivity: 0.1,
         leak_rate: 0.3,
-        regularization: 1e-6,
+        regularization: tolerances::ESN_REGULARIZATION,
         seed: 42,
     };
 
@@ -217,7 +218,7 @@ fn main() {
             spectral_radius: 0.9,
             connectivity: 0.1,
             leak_rate: 0.3,
-            regularization: 1e-6,
+            regularization: tolerances::ESN_REGULARIZATION,
             seed: 42,
         });
         esn2.reset_state();

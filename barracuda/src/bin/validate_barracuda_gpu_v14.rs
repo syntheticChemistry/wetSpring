@@ -287,7 +287,6 @@ fn main() {
                 32.0,
                 tolerances::ANALYTICAL_F64,
             );
-            g29 += 1;
         } else {
             let dot =
                 stats_gpu::dot_gpu(&gpu, &[1.0, 2.0, 3.0], &[4.0, 5.0, 6.0]).expect("GPU dot");
@@ -297,8 +296,8 @@ fn main() {
                 32.0,
                 tolerances::GPU_VS_CPU_F64,
             );
-            g29 += 1;
         }
+        g29 += 1;
 
         let provenance_count = barracuda::shaders::provenance::report::shader_count();
         v.check_pass(

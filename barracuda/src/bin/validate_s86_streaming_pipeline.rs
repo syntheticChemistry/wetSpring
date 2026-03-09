@@ -99,7 +99,7 @@ fn main() {
             &format!("S1: Shannon[{i}] GPU≈CPU"),
             gpu_shannons[i],
             cpu_shannons[i],
-            1e-6,
+            tolerances::GPU_VS_CPU_F64,
         );
     }
     println!("  S1: {n_communities} communities, {s1_ms:.2} ms");
@@ -116,7 +116,10 @@ fn main() {
                 .zip(cpu_bc.iter())
                 .map(|(g, c)| (g - c).abs())
                 .fold(0.0_f64, f64::max);
-            v.check_pass(&format!("S2: BC max err = {max_err:.2e}"), max_err < 1e-3);
+            v.check_pass(
+                &format!("S2: BC max err = {max_err:.2e}"),
+                max_err < tolerances::CROSS_SPRING_NUMERICAL,
+            );
         }
         Err(e) => {
             v.check_pass(&format!("S2: BC GPU fallback ({e})"), true);
@@ -363,7 +366,12 @@ fn main() {
 
     let jk = barracuda::stats::jackknife_mean_variance(&gpu_shannons).unwrap();
     v.check_pass("S8: Jackknife SE > 0", jk.std_error > 0.0);
-    v.check("S8: Jackknife ≈ Bootstrap", jk.estimate, ci.estimate, 0.01);
+    v.check(
+        "S8: Jackknife ≈ Bootstrap",
+        jk.estimate,
+        ci.estimate,
+        tolerances::DIVERSITY_EVENNESS_TOL,
+    );
 
     let all_fits = barracuda::stats::fit_all(
         #[allow(clippy::cast_possible_wrap)]

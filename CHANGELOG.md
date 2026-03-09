@@ -3,6 +3,41 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V100 — petalTongue Visualization + Local Evolution + Mixed Hardware (2026-03-09)
+
+### Added
+- **Exp327**: petalTongue Visualization Schema Validation — `DataChannel` serialization,
+  5 scenario builders (diversity, KMD, PCoA, ODE, ordination), IPC push client. **45/45 PASS.**
+- **Exp328**: CPU vs GPU Pure Math Parity — Shannon, Simpson, observed features, Pielou,
+  Bray-Curtis, PCoA, Kendrick mass defect, QS biofilm ODE. **27/27 PASS.**
+- **Exp329**: metalForge petalTongue Integration — inventory, dispatch, NUCLEUS topology
+  scenarios via `forge/src/visualization/`. **19/19 PASS.**
+- **Exp330**: biomeOS + NUCLEUS + petalTongue Full Chain — apex validation of complete
+  ecosystem: biomeOS capabilities → NUCLEUS atomics → science compute → petalTongue
+  visualization → metalForge hardware overlay. **34/34 PASS.**
+- **Exp331**: Local Evolution & Upstream Readiness — FitResult `.slope()` migration,
+  HmmModel doc aliases, NMF bio re-export, quality test extraction. **24/24 PASS.**
+- **Exp332**: Mixed Hardware Dispatch Evolution — bandwidth-aware routing, workload
+  `data_bytes` wiring, GPU→NPU→CPU priority chain, PCIe cost model. **24/24 PASS.**
+- `barracuda/src/visualization/` — petalTongue types, scenario builders, IPC push client
+- `metalForge/forge/src/visualization/` — hardware inventory, dispatch, NUCLEUS topology
+- `BioWorkload::with_data_bytes()` — bandwidth hints for kmer (10 MB), smith_waterman
+  (50 MB), pcoa (8 MB), dada2 (100 MB)
+
+### Changed
+- `pangenome::fit_heaps_law` — `.params[0]` → `.slope()` (upstream FitResult named accessor)
+- `HmmModel` — added `#[doc(alias = "HMM")]` and `#[doc(alias = "HiddenMarkovModel")]`
+- `bio::nmf` — convenience re-export from `barracuda::linalg::nmf`
+- `quality/mod.rs` — 239 LOC tests extracted to `quality_tests.rs` (547 → 308 LOC)
+
+### Verified
+- V100 chain: Exp327 (45) + Exp328 (27) + Exp329 (19) + Exp330 (34) + Exp331 (24) + Exp332 (24) = 173/173 PASS
+- V99 chain regression: 166/166 PASS
+- V98 chain regression: 173/173 PASS
+- 1,074 barracuda + 203 forge = 1,277 lib tests PASS
+- `cargo clippy -D warnings` ZERO WARNINGS, `cargo doc` ZERO WARNINGS
+- 332 experiments, 311 binaries, 8,982+ checks
+
 ## V99 — biomeOS/NUCLEUS Integration + Full Chain (2026-03-08)
 
 ### Added

@@ -27,6 +27,7 @@
 //! Provenance: Generated data with known statistical properties
 
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective, NmfResult, cosine_similarity};
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn top_k_cosine(result: &NmfResult, top_k: usize) -> Vec<(usize, usize, f64)> {
@@ -103,7 +104,7 @@ fn validate_nmf_analysis(v: &mut Validator, matrix_scores: &[f64], ranked: &[(us
     let config = NmfConfig {
         rank: 5,
         max_iter: 200,
-        tol: 1e-6,
+        tol: tolerances::NMF_CONVERGENCE_EUCLIDEAN,
         objective: NmfObjective::Euclidean,
         seed: 42,
     };

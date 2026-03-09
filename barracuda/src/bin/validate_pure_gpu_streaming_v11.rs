@@ -24,12 +24,12 @@
 //!
 //! ## Pipeline stages
 //!
-//! 1. Shannon entropy (FusedMapReduceF64 via `diversity_gpu`)
-//! 2. Bray-Curtis distance matrix (BrayCurtisF64 via `diversity_gpu`)
+//! 1. Shannon entropy (`FusedMapReduceF64` via `diversity_gpu`)
+//! 2. Bray-Curtis distance matrix (`BrayCurtisF64` via `diversity_gpu`)
 //! 3. Anderson disorder mapping (barracuda spectral)
 //! 4. Statistical summary (Welford mean+variance, jackknife, bootstrap)
 //!
-//! ToadStool enables unidirectional streaming, massively reducing dispatch
+//! `ToadStool` enables unidirectional streaming, massively reducing dispatch
 //! overhead and round-trips.
 //!
 //! # Provenance

@@ -169,7 +169,7 @@ fn fit_heaps_law(clusters: &[GeneCluster], n_genomes: usize) -> Option<f64> {
     let ln_g: Vec<f64> = points.iter().map(|(g, _)| g.ln()).collect();
     let ln_n: Vec<f64> = points.iter().map(|(_, n)| n.ln()).collect();
 
-    barracuda::stats::fit_linear(&ln_g, &ln_n).map(|r| r.params[0])
+    barracuda::stats::fit_linear(&ln_g, &ln_n).and_then(|r| r.slope())
 }
 
 /// Hypergeometric test for enrichment (Fisher exact approximation).

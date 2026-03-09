@@ -497,7 +497,7 @@ fn validate_topk_ranking(v: &mut Validator, timings: &mut Vec<(&'static str, f64
     let config = NmfConfig {
         rank,
         max_iter: 200,
-        tol: 1e-6,
+        tol: tolerances::NMF_CONVERGENCE_EUCLIDEAN,
         objective: NmfObjective::Euclidean,
         seed: 42,
     };

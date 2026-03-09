@@ -71,6 +71,11 @@ impl BioWorkload {
         self
     }
 
+    pub(crate) const fn with_data_bytes(mut self, bytes: usize) -> Self {
+        self.workload.data_bytes = Some(bytes);
+        self
+    }
+
     pub(crate) const fn with_ode(mut self, n_vars: u32, n_params: u32) -> Self {
         self.ode_dims = Some(OdeDims { n_vars, n_params });
         self

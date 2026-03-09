@@ -67,14 +67,29 @@ fn main() {
 
     // norm_ppf (inverse normal CDF) — barraCuda S59
     let ppf_0_5 = wetspring_barracuda::special::norm_ppf(0.5);
-    v.check("norm_ppf(0.5) = 0", ppf_0_5, 0.0, 1e-10);
+    v.check(
+        "norm_ppf(0.5) = 0",
+        ppf_0_5,
+        0.0,
+        tolerances::ANALYTICAL_LOOSE,
+    );
 
     let ppf_975 = wetspring_barracuda::special::norm_ppf(0.975);
-    v.check("norm_ppf(0.975) ≈ 1.96", ppf_975, 1.96, 0.01);
+    v.check(
+        "norm_ppf(0.975) ≈ 1.96",
+        ppf_975,
+        1.96,
+        tolerances::NORM_PPF_KNOWN,
+    );
 
     let cdf_then_ppf =
         wetspring_barracuda::special::norm_ppf(wetspring_barracuda::special::normal_cdf(1.645));
-    v.check("norm_ppf(Φ(1.645)) round-trip", cdf_then_ppf, 1.645, 1e-4);
+    v.check(
+        "norm_ppf(Φ(1.645)) round-trip",
+        cdf_then_ppf,
+        1.645,
+        tolerances::NORM_CDF_TAIL,
+    );
 
     // gradient_1d (numerical gradient) — barraCuda S54
     let f_lin: Vec<f64> = (0..100).map(|i| 2.0f64.mul_add(i as f64, 1.0)).collect();
@@ -83,24 +98,34 @@ fn main() {
         .iter()
         .map(|&g| (g - 2.0).abs())
         .fold(0.0_f64, f64::max);
-    v.check("gradient_1d(linear) = const 2.0", grad_max_err, 0.0, 1e-10);
+    v.check(
+        "gradient_1d(linear) = const 2.0",
+        grad_max_err,
+        0.0,
+        tolerances::ANALYTICAL_LOOSE,
+    );
 
     let f_quad: Vec<f64> = (0..100).map(|i| (i as f64).powi(2)).collect();
     let grad_q = wetspring_barracuda::special::gradient_1d(&f_quad, 1.0);
-    v.check("gradient_1d(x²) at x=50 ≈ 100", grad_q[50], 100.0, 1e-6);
+    v.check(
+        "gradient_1d(x²) at x=50 ≈ 100",
+        grad_q[50],
+        100.0,
+        tolerances::GPU_VS_CPU_F64,
+    );
 
     // erf, ln_gamma (always-on delegations)
     v.check(
         "erf(0) = 0",
         wetspring_barracuda::special::erf(0.0),
         0.0,
-        1e-10,
+        tolerances::ANALYTICAL_LOOSE,
     );
     v.check(
         "ln_gamma(5) = ln(24)",
         wetspring_barracuda::special::ln_gamma(5.0),
         24.0_f64.ln(),
-        1e-8,
+        tolerances::LIMIT_CONVERGENCE,
     );
 
     // ── D01: RK45 Adaptive ODE (hotSpring → barraCuda S58) ──
@@ -108,11 +133,23 @@ fn main() {
 
     use wetspring_barracuda::bio::ode::{rk4_integrate, rk45_integrate};
 
-    let rk45_result = rk45_integrate(|_t, y| vec![-0.5 * y[0]], &[1.0], 0.0, 10.0, 1e-8, 1e-10);
+    let rk45_result = rk45_integrate(
+        |_t, y| vec![-0.5 * y[0]],
+        &[1.0],
+        0.0,
+        10.0,
+        tolerances::RK45_DEFAULT_REL_TOL,
+        tolerances::RK45_DEFAULT_ABS_TOL,
+    );
     v.check_pass("rk45 exponential decay solves", rk45_result.is_ok());
     if let Ok(ref result) = rk45_result {
         let expected = (-5.0_f64).exp();
-        v.check("rk45 y(10) = exp(-5)", result.y_final[0], expected, 1e-6);
+        v.check(
+            "rk45 y(10) = exp(-5)",
+            result.y_final[0],
+            expected,
+            tolerances::GPU_VS_CPU_F64,
+        );
         v.check_pass(
             &format!("rk45 adaptive: {} steps (< 1000)", result.steps),
             result.steps < 1000,
@@ -123,7 +160,7 @@ fn main() {
     let rk4 = rk4_integrate(|y, _t| vec![-0.5 * y[0]], &[1.0], 0.0, 10.0, 0.01, None);
     if let Ok(ref r45) = rk45_result {
         let diff = (rk4.y_final[0] - r45.y_final[0]).abs();
-        v.check("RK4 vs RK45 parity", diff, 0.0, 1e-5);
+        v.check("RK4 vs RK45 parity", diff, 0.0, tolerances::GPU_F32_PARITY);
         v.check_pass(
             &format!("RK45 {} steps vs RK4 {}", r45.steps, rk4.steps),
             r45.steps < rk4.steps,
@@ -144,12 +181,22 @@ fn main() {
         &[0.01],
         0.0,
         30.0,
-        1e-8,
-        1e-10,
+        tolerances::RK45_DEFAULT_REL_TOL,
+        tolerances::RK45_DEFAULT_ABS_TOL,
     );
-    v.check("RK4 logistic → K=1", rk4_log.y_final[0], 1.0, 0.01);
+    v.check(
+        "RK4 logistic → K=1",
+        rk4_log.y_final[0],
+        1.0,
+        tolerances::ODE_STEADY_STATE,
+    );
     if let Ok(ref r45) = rk45_log {
-        v.check("RK45 logistic → K=1", r45.y_final[0], 1.0, 0.01);
+        v.check(
+            "RK45 logistic → K=1",
+            r45.y_final[0],
+            1.0,
+            tolerances::ODE_STEADY_STATE,
+        );
     }
 
     // ── D02: Stats Primitives (CPU) — cross-spring ──
@@ -158,7 +205,10 @@ fn main() {
     let counts = vec![10.0, 20.0, 30.0, 40.0];
     let h = barracuda::stats::shannon(&counts);
     v.check_pass("shannon([10,20,30,40]) > 0", h > 0.0);
-    v.check_pass("shannon < ln(4)", h < 4.0_f64.ln() + 0.01);
+    v.check_pass(
+        "shannon < ln(4)",
+        h < 4.0_f64.ln() + tolerances::DIVERSITY_EVENNESS_TOL,
+    );
 
     // Jackknife (CPU)
     let jk = barracuda::stats::jackknife_mean_variance(&counts);
@@ -174,7 +224,12 @@ fn main() {
     v.check_pass("bootstrap_mean succeeds", boot.is_ok());
     if let Ok(ci) = boot {
         v.check_pass("bootstrap CI lower <= upper", ci.lower <= ci.upper);
-        v.check("bootstrap estimate ≈ 50.5", ci.estimate, 50.5, 0.01);
+        v.check(
+            "bootstrap estimate ≈ 50.5",
+            ci.estimate,
+            50.5,
+            tolerances::DIVERSITY_EVENNESS_TOL,
+        );
     }
 
     // Kimura fixation (CPU) — groundSpring → barraCuda S58
@@ -227,14 +282,21 @@ fn main() {
     // ridge_regression(x, y, n_samples, n_features, n_outputs, reg)
     let x = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0];
     let y_vec = vec![2.0, 4.0, 6.0];
-    let ridge = barracuda::linalg::ridge_regression(&x, &y_vec, 3, 3, 1, 0.01);
+    let ridge = barracuda::linalg::ridge_regression(
+        &x,
+        &y_vec,
+        3,
+        3,
+        1,
+        tolerances::RIDGE_REGULARIZATION_DEFAULT,
+    );
     v.check_pass("ridge regression succeeds", ridge.is_ok());
 
     // NMF (wetSpring drug repurposing → barraCuda S58)
     let nmf_cfg = barracuda::linalg::nmf::NmfConfig {
         rank: 2,
         max_iter: 100,
-        tol: 1e-4,
+        tol: tolerances::NMF_CONVERGENCE_KL,
         objective: barracuda::linalg::nmf::NmfObjective::Euclidean,
         seed: 42,
     };
@@ -292,10 +354,20 @@ fn main() {
     let hessian = barracuda::numerical::numerical_hessian(
         &|x: &[f64]| x[0].mul_add(x[0], x[1].powi(2)),
         &[1.0, 1.0],
-        1e-5,
+        tolerances::NUMERICAL_HESSIAN_EPSILON,
     );
-    v.check("Hessian [0,0] ≈ 2", hessian[0], 2.0, 1e-4);
-    v.check("Hessian [1,1] ≈ 2", hessian[3], 2.0, 1e-4);
+    v.check(
+        "Hessian [0,0] ≈ 2",
+        hessian[0],
+        2.0,
+        tolerances::HESSIAN_TEST_TOL,
+    );
+    v.check(
+        "Hessian [1,1] ≈ 2",
+        hessian[3],
+        2.0,
+        tolerances::HESSIAN_TEST_TOL,
+    );
 
     // ── D07: Bio ODE Systems ──
     v.section("D07: Bio ODE — wetSpring → barraCuda lean");
@@ -313,8 +385,8 @@ fn main() {
         &[10.0, 5.0],
         0.0,
         50.0,
-        1e-8,
-        1e-10,
+        tolerances::RK45_DEFAULT_REL_TOL,
+        tolerances::RK45_DEFAULT_ABS_TOL,
     );
     v.check_pass("Lotka-Volterra RK45 solves", lv.is_ok());
     if let Ok(ref r) = lv {
@@ -339,7 +411,12 @@ fn main() {
         kmd::kendrick_mass_defect(&pfas_masses, kmd::units::CF2_EXACT, kmd::units::CF2_NOMINAL);
     v.check_count("KMD results count = 3", kmd_results.len(), 3);
     let kmd0 = kmd_results[0].kmd;
-    v.check("homologous KMDs match", kmd_results[1].kmd, kmd0, 0.01);
+    v.check(
+        "homologous KMDs match",
+        kmd_results[1].kmd,
+        kmd0,
+        tolerances::KMD_GROUPING,
+    );
 
     // ── D10: Benchmarks — CPU primitive timing ──
     v.section("D10: Benchmark — CPU Primitive Timing");
@@ -362,7 +439,14 @@ fn main() {
 
     let (_, rk45_us) = validation::timed_us(|| {
         for _ in 0..10 {
-            let _ = rk45_integrate(|_t, y| vec![-0.5 * y[0]], &[1.0], 0.0, 10.0, 1e-8, 1e-10);
+            let _ = rk45_integrate(
+                |_t, y| vec![-0.5 * y[0]],
+                &[1.0],
+                0.0,
+                10.0,
+                tolerances::RK45_DEFAULT_REL_TOL,
+                tolerances::RK45_DEFAULT_ABS_TOL,
+            );
         }
     });
     let rk45_avg = rk45_us / 10.0;
@@ -385,8 +469,8 @@ fn main() {
             &[10.0, 5.0],
             0.0,
             50.0,
-            1e-6,
-            1e-8,
+            tolerances::RK45_DEFAULT_REL_TOL,
+            tolerances::RK45_DEFAULT_ABS_TOL,
         );
     });
 

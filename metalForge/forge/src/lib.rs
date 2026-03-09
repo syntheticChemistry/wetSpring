@@ -82,4 +82,5 @@ pub mod node;
 pub mod probe;
 pub mod streaming;
 pub mod substrate;
+pub mod visualization;
 pub mod workloads;

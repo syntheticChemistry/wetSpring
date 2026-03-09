@@ -52,7 +52,12 @@ pub fn log_sum_exp(values: &[f64]) -> f64 {
 }
 
 /// HMM specification: transition and emission probabilities in log-space.
+///
+/// All probability matrices are stored in natural-log space for numerical
+/// stability. Field names use the `log_` prefix to make this explicit.
 #[derive(Debug, Clone)]
+#[doc(alias = "HMM")]
+#[doc(alias = "HiddenMarkovModel")]
 pub struct HmmModel {
     /// Number of hidden states.
     pub n_states: usize,

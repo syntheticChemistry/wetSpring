@@ -14,6 +14,7 @@ pub fn kmer_histogram() -> BioWorkload {
             vec![Capability::F64Compute, Capability::ShaderDispatch],
         )
         .with_primitive("KmerHistogramGpu")
+        .with_data_bytes(10_000_000) // ~10 MB per k-mer batch
 }
 
 /// Smith-Waterman alignment.
@@ -25,6 +26,7 @@ pub fn smith_waterman() -> BioWorkload {
             vec![Capability::F64Compute, Capability::ShaderDispatch],
         )
         .with_primitive("SmithWatermanGpu")
+        .with_data_bytes(50_000_000) // ~50 MB for pairwise alignment batches
 }
 
 /// Dereplication — parallel hashing via `KmerHistogramGpu` pattern.

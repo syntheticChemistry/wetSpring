@@ -203,7 +203,7 @@ fn main() {
         3,
         2,
         1,
-        1e-4,
+        tolerances::RIDGE_TEST_TOL,
     );
     v.check_pass("Ridge: converged", ridge.is_ok());
 

@@ -1,0 +1,311 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//! Push visualization data to `petalTongue` via JSON-RPC IPC.
+//!
+//! Springs discover `petalTongue` at runtime and push [`DataChannel`] payloads
+//! without compile-time coupling. Uses the `visualization.render` and
+//! `visualization.render.stream` JSON-RPC methods.
+
+use std::io::{Read, Write};
+use std::os::unix::net::UnixStream;
+use std::path::PathBuf;
+
+use super::types::{DataChannel, EcologyScenario};
+
+/// Client for pushing visualization data to `petalTongue`.
+pub struct PetalTonguePushClient {
+    socket_path: PathBuf,
+}
+
+/// Error type for push operations.
+#[derive(Debug)]
+pub enum PushError {
+    /// `petalTongue` socket not found at any candidate path.
+    NotFound(String),
+    /// Connection to `petalTongue` socket failed.
+    ConnectionFailed(std::io::Error),
+    /// JSON serialization error.
+    SerializationError(String),
+    /// JSON-RPC error response from `petalTongue`.
+    RpcError {
+        /// JSON-RPC error code.
+        code: i64,
+        /// Error message from `petalTongue`.
+        message: String,
+    },
+}
+
+impl std::fmt::Display for PushError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::NotFound(msg) => write!(f, "petalTongue not found: {msg}"),
+            Self::ConnectionFailed(e) => write!(f, "connection failed: {e}"),
+            Self::SerializationError(e) => write!(f, "serialization error: {e}"),
+            Self::RpcError { code, message } => write!(f, "RPC error {code}: {message}"),
+        }
+    }
+}
+
+impl std::error::Error for PushError {}
+
+/// Result type for push operations.
+pub type PushResult<T> = Result<T, PushError>;
+
+fn build_render_params(
+    session_id: &str,
+    title: &str,
+    scenario: &EcologyScenario,
+) -> serde_json::Value {
+    let bindings: Vec<&DataChannel> = scenario
+        .nodes
+        .iter()
+        .flat_map(|n| n.data_channels.iter())
+        .collect();
+
+    serde_json::json!({
+        "session_id": session_id,
+        "title": title,
+        "bindings": bindings,
+        "domain": scenario.domain,
+    })
+}
+
+fn build_append_params(
+    session_id: &str,
+    binding_id: &str,
+    x_values: &[f64],
+    y_values: &[f64],
+) -> serde_json::Value {
+    serde_json::json!({
+        "session_id": session_id,
+        "binding_id": binding_id,
+        "operation": {
+            "type": "append",
+            "x_values": x_values,
+            "y_values": y_values,
+        },
+    })
+}
+
+fn build_gauge_params(session_id: &str, binding_id: &str, value: f64) -> serde_json::Value {
+    serde_json::json!({
+        "session_id": session_id,
+        "binding_id": binding_id,
+        "operation": {
+            "type": "set_value",
+            "value": value,
+        },
+    })
+}
+
+impl PetalTonguePushClient {
+    /// Discover `petalTongue` socket at runtime.
+    ///
+    /// Resolution order:
+    /// 1. `PETALTONGUE_SOCKET` env var
+    /// 2. `$XDG_RUNTIME_DIR/petaltongue/*.sock`
+    /// 3. `/tmp/petaltongue-*.sock`
+    ///
+    /// # Errors
+    ///
+    /// Returns [`PushError::NotFound`] if no `petalTongue` socket is found.
+    pub fn discover() -> PushResult<Self> {
+        if let Ok(path) = std::env::var("PETALTONGUE_SOCKET") {
+            let path = PathBuf::from(path);
+            if path.exists() {
+                return Ok(Self { socket_path: path });
+            }
+        }
+        if let Ok(runtime) = std::env::var("XDG_RUNTIME_DIR") {
+            let dir = PathBuf::from(runtime).join("petaltongue");
+            if dir.is_dir() {
+                if let Ok(entries) = std::fs::read_dir(&dir) {
+                    for entry in entries.flatten() {
+                        let p = entry.path();
+                        if p.extension().is_some_and(|e| e == "sock") {
+                            return Ok(Self { socket_path: p });
+                        }
+                    }
+                }
+            }
+        }
+        if let Ok(entries) = std::fs::read_dir("/tmp") {
+            for entry in entries.flatten() {
+                let name = entry.file_name();
+                let name = name.to_string_lossy();
+                if name.starts_with("petaltongue") && name.ends_with(".sock") {
+                    return Ok(Self {
+                        socket_path: entry.path(),
+                    });
+                }
+            }
+        }
+        Err(PushError::NotFound("no petalTongue socket found".into()))
+    }
+
+    /// Create client with an explicit socket path.
+    #[must_use]
+    pub const fn new(socket_path: PathBuf) -> Self {
+        Self { socket_path }
+    }
+
+    /// Push a full visualization render request.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`PushError`] on connection, serialization, or RPC failure.
+    pub fn push_render(
+        &self,
+        session_id: &str,
+        title: &str,
+        scenario: &EcologyScenario,
+    ) -> PushResult<()> {
+        let params = build_render_params(session_id, title, scenario);
+        self.send_rpc("visualization.render", &params)?;
+        Ok(())
+    }
+
+    /// Push a streaming append (add data points to a `TimeSeries` channel).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`PushError`] on connection, serialization, or RPC failure.
+    pub fn push_append(
+        &self,
+        session_id: &str,
+        binding_id: &str,
+        x_values: &[f64],
+        y_values: &[f64],
+    ) -> PushResult<()> {
+        let params = build_append_params(session_id, binding_id, x_values, y_values);
+        self.send_rpc("visualization.render.stream", &params)?;
+        Ok(())
+    }
+
+    /// Push a gauge value update.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`PushError`] on connection, serialization, or RPC failure.
+    pub fn push_gauge_update(
+        &self,
+        session_id: &str,
+        binding_id: &str,
+        value: f64,
+    ) -> PushResult<()> {
+        let params = build_gauge_params(session_id, binding_id, value);
+        self.send_rpc("visualization.render.stream", &params)?;
+        Ok(())
+    }
+
+    fn send_rpc(&self, method: &str, params: &serde_json::Value) -> PushResult<serde_json::Value> {
+        let request = serde_json::json!({
+            "jsonrpc": "2.0",
+            "method": method,
+            "params": params,
+            "id": 1,
+        });
+
+        let payload = serde_json::to_vec(&request)
+            .map_err(|e| PushError::SerializationError(e.to_string()))?;
+
+        let mut stream =
+            UnixStream::connect(&self.socket_path).map_err(PushError::ConnectionFailed)?;
+        stream
+            .write_all(&payload)
+            .map_err(PushError::ConnectionFailed)?;
+        stream
+            .write_all(b"\n")
+            .map_err(PushError::ConnectionFailed)?;
+        stream.flush().map_err(PushError::ConnectionFailed)?;
+
+        let mut buf = vec![0u8; 4096];
+        let n = stream.read(&mut buf).map_err(PushError::ConnectionFailed)?;
+
+        let response: serde_json::Value = serde_json::from_slice(&buf[..n])
+            .map_err(|e| PushError::SerializationError(e.to_string()))?;
+
+        if let Some(error) = response.get("error") {
+            return Err(PushError::RpcError {
+                code: error
+                    .get("code")
+                    .and_then(serde_json::Value::as_i64)
+                    .unwrap_or(-1),
+                message: error
+                    .get("message")
+                    .and_then(|m| m.as_str())
+                    .unwrap_or("unknown")
+                    .to_string(),
+            });
+        }
+
+        Ok(response)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn discover_returns_not_found_when_no_socket() {
+        temp_env::with_vars(
+            [
+                ("PETALTONGUE_SOCKET", None::<&str>),
+                ("XDG_RUNTIME_DIR", Some("/nonexistent_xdg_wetspring_test")),
+            ],
+            || {
+                let result = PetalTonguePushClient::discover();
+                assert!(result.is_err());
+            },
+        );
+    }
+
+    #[test]
+    fn new_creates_client_with_path() {
+        let client = PetalTonguePushClient::new(PathBuf::from("/tmp/test.sock"));
+        assert_eq!(client.socket_path, PathBuf::from("/tmp/test.sock"));
+    }
+
+    #[test]
+    fn build_render_params_produces_valid_json() {
+        let scenario = EcologyScenario {
+            name: "test".into(),
+            description: "test scenario".into(),
+            version: "1.0.0".into(),
+            mode: "static".into(),
+            domain: "ecology".into(),
+            nodes: vec![],
+            edges: vec![],
+        };
+        let params = build_render_params("s1", "Test", &scenario);
+        assert_eq!(params["session_id"], "s1");
+        assert_eq!(params["title"], "Test");
+        assert_eq!(params["domain"], "ecology");
+    }
+
+    #[test]
+    fn build_append_params_structure() {
+        let params = build_append_params("s1", "ch1", &[1.0, 2.0], &[3.0, 4.0]);
+        assert_eq!(params["binding_id"], "ch1");
+        assert_eq!(params["operation"]["type"], "append");
+    }
+
+    #[test]
+    fn build_gauge_params_structure() {
+        let params = build_gauge_params("s1", "g1", 42.0);
+        assert_eq!(params["binding_id"], "g1");
+        assert_eq!(params["operation"]["type"], "set_value");
+    }
+
+    #[test]
+    fn push_error_display() {
+        let e = PushError::NotFound("test".into());
+        assert!(e.to_string().contains("petalTongue not found"));
+
+        let e = PushError::RpcError {
+            code: -32600,
+            message: "invalid".into(),
+        };
+        assert!(e.to_string().contains("-32600"));
+    }
+}

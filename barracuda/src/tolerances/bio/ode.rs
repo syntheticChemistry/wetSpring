@@ -132,3 +132,23 @@ pub const PHAGE_LARGE_POPULATION: f64 = 1000.0;
 /// biologically insignificant floor.
 /// Validated: Exp030 (Hsueh 2022), `scripts/hsueh2022_phage_defense.py`.
 pub const PHAGE_CRASH_FLOOR: f64 = 1.0;
+
+// ═══════════════════════════════════════════════════════════════════
+// RK45 adaptive solver defaults
+// ═══════════════════════════════════════════════════════════════════
+
+/// Default relative tolerance for `rk45_integrate` adaptive step control.
+///
+/// Controls step-size adaptation via `|error| / (rel_tol * |y| + abs_tol)`.
+/// 1e-8 matches `scipy.integrate.solve_ivp` default `rtol` and provides
+/// ~8 digits of accuracy per step for non-stiff systems.
+/// Validated: Exp020/023/024/025/027/030 (all 6 ODE models).
+pub const RK45_DEFAULT_REL_TOL: f64 = 1e-8;
+
+/// Default absolute tolerance for `rk45_integrate` adaptive step control.
+///
+/// Floor for error scaling when `|y|` is near zero. 1e-10 prevents
+/// overly aggressive step refinement for repressed species at the
+/// numerical floor. Matches `scipy.integrate.solve_ivp` default `atol`.
+/// Validated: Exp020/023/024/025/027/030 (all 6 ODE models).
+pub const RK45_DEFAULT_ABS_TOL: f64 = 1e-10;

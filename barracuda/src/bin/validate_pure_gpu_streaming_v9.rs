@@ -165,7 +165,7 @@ fn main() {
             &barracuda::linalg::nmf::NmfConfig {
                 rank: 3,
                 max_iter: 300,
-                tol: 1e-5,
+                tol: tolerances::GEMM_GPU_MAX_ERR,
                 objective: barracuda::linalg::nmf::NmfObjective::KlDivergence,
                 seed: 42,
             },
@@ -204,7 +204,9 @@ fn main() {
             .zip(p_qs.iter().copied())
             .collect();
         sorted_pairs.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
-        sorted_pairs.windows(2).all(|w| w[1].1 <= w[0].1 + 1e-15)
+        sorted_pairs
+            .windows(2)
+            .all(|w| w[1].1 <= w[0].1 + tolerances::EXACT_F64)
     });
 
     for (i, (&w, &p)) in w_from_diversity.iter().zip(p_qs.iter()).enumerate() {
@@ -260,7 +262,7 @@ fn main() {
         &barracuda::linalg::nmf::NmfConfig {
             rank: 3,
             max_iter: 300,
-            tol: 1e-5,
+            tol: tolerances::GEMM_GPU_MAX_ERR,
             objective: barracuda::linalg::nmf::NmfObjective::KlDivergence,
             seed: 42,
         },

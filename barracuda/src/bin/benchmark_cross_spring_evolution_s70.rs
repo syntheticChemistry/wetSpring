@@ -89,7 +89,12 @@ fn main() {
         }
         acc / 10_000.0
     });
-    v.check("Kimura neutral drift: P_fix = p0", p_neutral, 0.01, 1e-8);
+    v.check(
+        "Kimura neutral drift: P_fix = p0",
+        p_neutral,
+        0.01,
+        tolerances::LIMIT_CONVERGENCE,
+    );
 
     let (mu_c, us_thresh) = bench_us(|| {
         let mut acc = 0.0;
@@ -99,7 +104,12 @@ fn main() {
         acc / 10_000.0
     });
     let expected_mu_c = 1.0 - 10.0_f64.powf(-1.0 / 100.0);
-    v.check("Eigen error threshold", mu_c, expected_mu_c, 1e-12);
+    v.check(
+        "Eigen error threshold",
+        mu_c,
+        expected_mu_c,
+        tolerances::ANALYTICAL_F64,
+    );
     timings.push(ProvenanceTiming {
         domain: "popgen",
         primitive: "kimura_fixation_prob",
@@ -386,7 +396,12 @@ fn main() {
         }
         e
     });
-    v.check("erf(1) ≈ 0.8427", erf_val, 0.842_700_792_949_715, 1e-6);
+    v.check(
+        "erf(1) ≈ 0.8427",
+        erf_val,
+        0.842_700_792_949_715,
+        tolerances::GPU_VS_CPU_F64,
+    );
 
     let (gamma_val, us_gamma) = bench_us(|| {
         let mut g = 0.0;
@@ -395,7 +410,12 @@ fn main() {
         }
         g
     });
-    v.check("ln_Γ(5) = ln(24)", gamma_val, 24.0_f64.ln(), 1e-12);
+    v.check(
+        "ln_Γ(5) = ln(24)",
+        gamma_val,
+        24.0_f64.ln(),
+        tolerances::ANALYTICAL_F64,
+    );
 
     let (ncdf, us_norm) = bench_us(|| {
         let mut n = 0.0;
@@ -404,7 +424,7 @@ fn main() {
         }
         n
     });
-    v.check("Φ(0) = 0.5", ncdf, 0.5, 1e-15);
+    v.check("Φ(0) = 0.5", ncdf, 0.5, tolerances::EXACT_F64);
     timings.push(ProvenanceTiming {
         domain: "special",
         primitive: "erf",

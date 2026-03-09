@@ -27,6 +27,7 @@
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use wetspring_barracuda::bio::esn::{Esn, EsnConfig};
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 const N_WINDOWS: usize = 80;
@@ -140,7 +141,7 @@ fn main() {
         spectral_radius: 0.9,
         connectivity: 0.12,
         leak_rate: 0.3,
-        regularization: 1e-5,
+        regularization: tolerances::ESN_REGULARIZATION_TIGHT,
         seed: 2026,
     };
     let mut esn_stateful = Esn::new(config.clone());

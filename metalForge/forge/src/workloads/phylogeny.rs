@@ -14,6 +14,7 @@ pub fn pcoa() -> BioWorkload {
             vec![Capability::F64Compute, Capability::ShaderDispatch],
         )
         .with_primitive("BatchedEighGpu")
+        .with_data_bytes(8_000_000) // ~8 MB for 1000×1000 f64 distance matrix
 }
 
 /// `UniFrac` tree propagation.
@@ -72,6 +73,7 @@ pub fn dada2() -> BioWorkload {
             vec![Capability::F64Compute, Capability::ShaderDispatch],
         )
         .with_primitive("Dada2EStepGpu")
+        .with_data_bytes(100_000_000) // ~100 MB for DADA2 E-step matrices
 }
 
 /// Phylogenetic bootstrap — column resampling + `FelsensteinGpu` per replicate.

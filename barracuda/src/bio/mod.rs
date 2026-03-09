@@ -143,3 +143,10 @@ pub mod unifrac;
 #[cfg(feature = "gpu")]
 pub mod unifrac_gpu;
 pub mod validation_helpers;
+
+/// Convenience re-export of `barracuda::linalg::nmf` for domain discovery.
+///
+/// NMF (Non-negative Matrix Factorization) is used for community type
+/// detection, metagenome binning, and spectral decomposition. Re-exported
+/// here so bio-domain callers can find it alongside other bio modules.
+pub use barracuda::linalg::nmf;

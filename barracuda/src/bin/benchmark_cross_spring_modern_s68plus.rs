@@ -374,7 +374,7 @@ fn main() {
     let nmf_cfg = barracuda::linalg::nmf::NmfConfig {
         rank: 3,
         max_iter: 100,
-        tol: 1e-4,
+        tol: tolerances::NMF_CONVERGENCE_KL,
         objective: barracuda::linalg::nmf::NmfObjective::KlDivergence,
         seed: 42,
     };
@@ -389,7 +389,14 @@ fn main() {
     let ridge_x: Vec<f64> = (0..100).map(|i| f64::from(i) * 0.01).collect();
     let ridge_y: Vec<f64> = (0..40).map(|i| f64::from(i).mul_add(0.25, 1.0)).collect();
     let (ridge_res, ridge_ms) = bench("ridge regression (20×5→2)", || {
-        barracuda::linalg::ridge_regression(&ridge_x, &ridge_y, 20, 5, 2, 1e-6)
+        barracuda::linalg::ridge_regression(
+            &ridge_x,
+            &ridge_y,
+            20,
+            5,
+            2,
+            tolerances::RIDGE_REGULARIZATION_SMALL,
+        )
     });
     v.check_pass(
         "ridge weights finite",
