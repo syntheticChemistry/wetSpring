@@ -33,7 +33,7 @@
 
 pub mod discover;
 pub mod dispatch;
-pub(crate) mod handlers;
+pub mod handlers;
 pub mod metrics;
 pub mod protocol;
 pub mod server;

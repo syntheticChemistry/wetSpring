@@ -1,8 +1,8 @@
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** March 8, 2026
+**Date:** March 9, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V99 — 300 experiments, 8,886+ validation checks, ALL PASS; 1,047 tests, 305 binaries, standalone `barraCuda` v0.3.3 `a898dee` (wgpu 28, 694+ WGSL shaders), toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`. V99 chain: biomeOS/NUCLEUS (42+22) + CPU v25 (46) + GPU v14 (27) + metalForge v17 (29) = **166/166 PASS**. V98 regression: 173/173 PASS. biomeOS deploy graph wired, cross-primal IPC pipeline validated, ToadStool dispatch patterns + provenance tracking. 0 local WGSL, 164 tolerances, 0 unsafe, clippy pedantic ZERO WARNINGS. 52 papers reproduced, 5 springs exercised.
+**Status:** V101 — 334 experiments, 9,060+ validation checks, ALL PASS; 1,455 tests, 316 binaries, standalone `barraCuda` v0.3.3 `a898dee` (wgpu 28, 784+ WGSL shaders), toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`. V101 chain: viz evolution (44) + science-to-viz pipeline (34) = **78/78 PASS**. V100 chain: 173/173 PASS. V99 chain: 166/166 PASS. V98 regression: 173/173 PASS. petalTongue: 7 DataChannel types, 13 scenario builders, StreamSession, Songbird capabilities. biomeOS deploy graph wired, cross-primal IPC pipeline validated. 0 local WGSL, 179 tolerances, 0 unsafe, clippy pedantic ZERO WARNINGS. 52 papers reproduced, 5 springs exercised.
 
 ---
 
@@ -49,7 +49,9 @@ All code is AGPL-3.0.
 | **V98+ Cross-Spring** | — | evolution | — | Exp319-320 | 52 | All 5 springs, 28 shaders, 22 cross-spring, GPU FusedMapReduceF64, 24 benchmarks |
 | **V99 biomeOS/NUCLEUS** | — | integration | — | Exp321-322 | 64 | biomeOS IPC server, JSON-RPC 2.0, NUCLEUS env probe, cross-primal pipeline, brain module |
 | **V99 Chain** | — | chain | — | Exp323-326 | 102 | CPU v25 (46), GPU v14 (27), metalForge v17 (29), ToadStool dispatch, NUCLEUS probes |
-| **Total** | | | **52** | | **8,886+** | |
+| **V100 petalTongue + Mixed HW** | — | viz+dispatch | — | Exp327-332 | 173 | petalTongue schema, 5 scenario builders, CPU/GPU math parity, metalForge viz, biomeOS full chain, local evolution, mixed HW dispatch |
+| **V101 Viz Evolution** | — | viz | — | Exp333-334 | 78 | 7 DataChannel types, 13 scenario builders, StreamSession, Songbird, IPC science→viz, streaming pipeline |
+| **Total** | | | **52** | | **9,060+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -100,7 +102,7 @@ Every paper goes through the full evolution. Status across all 52 papers:
 | Stage | What It Proves | Coverage |
 |-------|---------------|----------|
 | Paper math control | Published equations reproduced exactly | 32 papers (Exp251), 27 checks |
-| Python baseline | Algorithm correctness against published tools | 57 scripts (all with reproduction headers + SHA-256 integrity verification) |
+| Python baseline | Algorithm correctness against published tools | 65 scripts (all with reproduction headers + SHA-256 integrity verification) |
 | BarraCuda CPU | Rust matches Python within machine precision | 26 domains (v1-v19), bit-identical to SciPy/NumPy (Exp253) |
 | BarraCuda GPU | GPU matches CPU within 1e-6 | 21 GPU domains, 1,783+ checks |
 | Pure GPU streaming | Zero CPU round-trips, data stays on-device | 8 streaming experiments, unidirectional proof (0.10ms overhead, Exp255) |
@@ -110,7 +112,8 @@ Every paper goes through the full evolution. Status across all 52 papers:
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
 | biomeOS IPC integration | JSON-RPC science primal, GPU-aware dispatch, Songbird registration | 321 checks (Exp203-208) |
-| Code quality audit | 95.86% line, streaming I/O, 0 production mocks, standalone `barraCuda` v0.3.1, `deny(missing_docs)`, zero unsafe code, clippy pedantic + nursery ZERO WARNINGS | 1,044 tests |
+| petalTongue visualization | 7 DataChannel types, 13 scenario builders, StreamSession, Songbird capabilities, IPC science→viz wiring | 78 checks (Exp333-334) |
+| Code quality audit | 93.94% line, streaming I/O, 0 production mocks, standalone `barraCuda` v0.3.3, `deny(missing_docs)`, zero unsafe code, clippy pedantic + nursery ZERO WARNINGS | 1,455 tests |
 | V66 dispatch evolution | Forge dispatch routing (29 workloads), streaming topology (PCIe bypass), NUCLEUS Tower/Node/Nest model, absorption audit (0 local WGSL) | 49 checks (Exp213) |
 | V66 NUCLEUS V8 | IPC dispatch with V66 I/O evolution (byte-native FASTQ, bytemuck nanopore, streaming MS2), Nest metrics, CPU fallback parity, full pipeline chain | 49 checks (Exp214) |
 | **V84 pipeline buildout** | Paper→CPU→GPU→Streaming proven end-to-end: 32 papers, 26 CPU domains, 21 GPU domains, Python parity, 0.10ms streaming overhead | 172 checks (Exp251-255) |

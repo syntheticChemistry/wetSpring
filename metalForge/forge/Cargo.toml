@@ -13,7 +13,7 @@ license = "AGPL-3.0-or-later"
 [dependencies]
 barracuda = { path = "../../../barraCuda/crates/barracuda" }
 tempfile = "3"
-wetspring-barracuda = { path = "../../barracuda", default-features = false, features = ["json"] }
+wetspring-barracuda = { path = "../../barracuda", default-features = false, features = ["json", "ipc"] }
 
 wgpu = { version = "28", default-features = false, features = [
     "wgsl",
@@ -104,6 +104,16 @@ path = "src/bin/validate_local_evolution_v1.rs"
 [[bin]]
 name = "validate_mixed_hw_dispatch_v2"
 path = "src/bin/validate_mixed_hw_dispatch_v2.rs"
+
+# ── Exp333: Visualization Evolution ──
+[[bin]]
+name = "validate_viz_evolution_v1"
+path = "src/bin/validate_viz_evolution_v1.rs"
+
+# ── Exp334: Science-to-Viz Pipeline ──
+[[bin]]
+name = "validate_science_viz_pipeline"
+path = "src/bin/validate_science_viz_pipeline.rs"
 
 # ── Previously unregistered binaries (registered V100) ──
 [[bin]]

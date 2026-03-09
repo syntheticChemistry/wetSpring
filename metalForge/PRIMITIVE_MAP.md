@@ -1,13 +1,13 @@
 # Primitive Map: wetSpring Rust → ToadStool GPU
 
-**Date:** March 1, 2026
+**Date:** March 9, 2026
 **Purpose:** Map every wetSpring Rust module to its ToadStool/BarraCuda
 GPU primitive (or explain why it stays CPU-only). This guides the
 absorption pipeline and identifies what ToadStool needs to build next.
 
-> **Mar 3 update (latest):** 150+ primitives consumed. 0 local WGSL, 0 local derivative math (fully lean).
-> All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed). standalone barraCuda v0.3.1.
-> Forge crate v0.3.0. 281 experiments, 8,300+ checks (60 NPU). Phase 95, 1,044 lib tests, 164 named tolerances, 0 ad-hoc magic numbers, clippy pedantic CLEAN. Vault module (consent/provenance/encrypted storage).
+> **Mar 9 update (V101):** 150+ primitives consumed. 0 local WGSL, 0 local derivative math (fully lean).
+> All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed). standalone barraCuda v0.3.3.
+> Forge crate v0.3.0. 334 experiments, 9,060+ checks (60 NPU). 1,455 tests, 316 binaries, 179 named tolerances, clippy pedantic CLEAN. petalTongue visualization: 7 DataChannel types, 13 scenario builders. Vault module (consent/provenance/encrypted storage).
 
 ---
 

@@ -132,11 +132,21 @@ fn main() {
         phase_max[heads::B1_DIVERSITY_PHASE] = 0.5;
         phase_max[heads::C1_PHYLO_PHASE] = 0.9;
         let d = BioHeadGroupDisagreement::from_outputs(&phase_max);
-        v.check("3 phases → delta_phase = 2", d.delta_phase, 2.0, 0.0);
+        v.check(
+            "3 phases → delta_phase = 2",
+            d.delta_phase,
+            2.0,
+            tolerances::EXACT,
+        );
 
         let short = vec![0.5; 10];
         let d = BioHeadGroupDisagreement::from_outputs(&short);
-        v.check("Short vector → urgency 0", d.urgency(), 0.0, 0.0);
+        v.check(
+            "Short vector → urgency 0",
+            d.urgency(),
+            0.0,
+            tolerances::EXACT,
+        );
 
         let extreme = BioHeadGroupDisagreement {
             delta_regime: 5.0,
@@ -144,7 +154,12 @@ fn main() {
             delta_anomaly: 5.0,
             delta_priority: 5.0,
         };
-        v.check("Urgency clamped to 1.0", extreme.urgency(), 1.0, 0.0);
+        v.check(
+            "Urgency clamped to 1.0",
+            extreme.urgency(),
+            1.0,
+            tolerances::EXACT,
+        );
 
         domains.push(DomainResult {
             name: "Head Disagreement",
@@ -218,8 +233,13 @@ fn main() {
             features.len(),
             BioObservation::FEATURE_COUNT,
         );
-        v.check("Feature[0] = shannon", features[0], 3.5, 0.0);
-        v.check("Feature[7] = amr_load", features[7], 0.12, 0.0);
+        v.check("Feature[0] = shannon", features[0], 3.5, tolerances::EXACT);
+        v.check(
+            "Feature[7] = amr_load",
+            features[7],
+            0.12,
+            tolerances::EXACT,
+        );
         v.check(
             "Default shannon = 0",
             BioObservation::default().shannon,
@@ -264,7 +284,12 @@ fn main() {
             update.attention == AttentionState::Healthy,
         );
         v.check_count("DiversityUpdate n_species", update.n_species, 100);
-        v.check("DiversityUpdate shannon_h", update.shannon_h, 3.0, 0.0);
+        v.check(
+            "DiversityUpdate shannon_h",
+            update.shannon_h,
+            3.0,
+            tolerances::EXACT,
+        );
 
         let mut divergent = vec![0.5; NUM_HEADS];
         divergent[heads::A0_DIVERSITY_REGIME] = 0.0;

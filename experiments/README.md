@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-08 (V99: 300 experiments, 305 binaries, 8,886+ checks. V99 chain: biomeOS/NUCLEUS (42+22) + CPU v25 (46) + GPU v14 (27) + metalForge v17 (29) = 166/166 PASS. V98 chain regression: 173/173 PASS. All 52 papers, biomeOS IPC integration, cross-primal pipelines, ToadStool dispatch. 1,047 tests, clippy pedantic CLEAN.)
+**Updated**: 2026-03-09 (V101: 334 experiments, 316 binaries, 9,060+ checks. V101 chain: viz evolution (44) + science-to-viz pipeline (34) = 78/78 PASS. V100: 173/173 PASS. V99: 166/166 PASS. V98 regression: 173/173 PASS. All 52 papers, biomeOS IPC, petalTongue visualization, cross-primal pipelines, ToadStool dispatch. 1,455 tests, 179 tolerances, clippy pedantic CLEAN.)
 
 ---
 
@@ -503,7 +503,38 @@ Extends V98 chain with cross-primal math (ET₀, spectral, graph Laplacian), bio
 integration primitives, ToadStool dispatch patterns, NUCLEUS atomic probes (Tower,
 Node, Nest), and biomeOS deploy graph validation.
 
-**Totals: 300 experiments, 305 binaries, 8,886+ checks.**
+### V100 — petalTongue Visualization + Local Evolution + Mixed Hardware (Exp327–332)
+
+| Exp | Name | Type | Checks |
+|-----|------|------|:------:|
+| 327 | petalTongue Visualization Schema Validation | Viz | 45 |
+| 328 | CPU vs GPU Pure Math Parity (Viz Domains) | GPU Parity | 27 |
+| 329 | metalForge petalTongue Integration | Cross-System | 19 |
+| 330 | biomeOS + NUCLEUS + petalTongue Full Chain | Integration | 34 |
+| 331 | Local Evolution & Upstream Readiness | Evolution | 24 |
+| 332 | Mixed Hardware Dispatch Evolution | Dispatch | 24 |
+
+V100: Full petalTongue integration — DataChannel schema types, 5 scenario builders
+(diversity, KMD, PCoA, ODE, ordination), IPC push client. CPU/GPU math parity for
+viz domains. metalForge visualization scenarios. biomeOS + NUCLEUS + petalTongue
+apex chain. Local evolution (FitResult, HmmModel, NMF). Mixed hardware dispatch
+with bandwidth-aware routing.
+**V100 chain: 173/173 PASS.**
+
+### V101 — petalTongue Visualization Evolution (Exp333–334)
+
+| Exp | Name | Type | Checks |
+|-----|------|------|:------:|
+| 333 | Visualization Evolution | Viz | 44 |
+| 334 | Science-to-Viz Pipeline | Pipeline | 34 |
+
+V101: Spectrum DataChannel (7th type), StreamSession lifecycle, Songbird capability
+announcement, 6 new scenario builders (pangenome, HMM, stochastic, similarity,
+rarefaction, NMF), streaming pipeline builder. IPC `visualization: bool` wiring.
+`dump_wetspring_scenarios` expanded to 13 scenarios with `--stream` flag.
+**V101 chain: 78/78 PASS.**
+
+**Totals: 334 experiments, 316 binaries, 9,060+ checks.**
 
 ---
 

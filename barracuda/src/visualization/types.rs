@@ -119,6 +119,20 @@ pub enum DataChannel {
         /// Unit for axes.
         unit: String,
     },
+    /// Power spectrum / FFT amplitude plot (Anderson spectral, HRV, signal).
+    #[serde(rename = "spectrum")]
+    Spectrum {
+        /// Unique channel identifier.
+        id: String,
+        /// Human-readable label.
+        label: String,
+        /// Unit for amplitude values.
+        unit: String,
+        /// Frequency axis values.
+        frequencies: Vec<f64>,
+        /// Amplitude axis values (same length as `frequencies`).
+        amplitudes: Vec<f64>,
+    },
 }
 
 /// Reference range for threshold coloring on gauge/chart overlays.

@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** March 7, 2026 (V98+ — barraCuda v0.3.3 `a898dee`, toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`, wgpu 28. V98 full chain: 173/173 PASS)
+**Updated:** March 9, 2026 (V101 — barraCuda v0.3.3 `a898dee`, toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`, wgpu 28. 1,455 tests, 316 binaries, 179 tolerances. V101 chain: 78/78 PASS. V100: 173/173. V99: 166/166. V98 regression: 173/173 PASS)
 
 ---
 
@@ -142,7 +142,7 @@ Builder patterns wired: `HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`.
 | Module | Purpose |
 |--------|---------|
 | `special` | Sovereign math (erf, ln_gamma, regularized_gamma, normal_cdf) |
-| `tolerances` | 164 named constants (scientifically justified) |
+| `tolerances` | 179 named constants (scientifically justified) |
 | `validation` | Structured test harness with provenance |
 | `encoding` | Sovereign base64 (zero dependencies) |
 | `error` | Error types (no external crates) |

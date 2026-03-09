@@ -73,8 +73,18 @@ fn main() {
         tolerances::RIDGE_REGULARIZATION_SMALL,
     )
     .expect("ridge_regression");
-    v.check("ridge: slope x1 ≈ 2", ridge.weights[0], 2.0, 0.01);
-    v.check("ridge: slope x2 ≈ 3", ridge.weights[1], 3.0, 0.01);
+    v.check(
+        "ridge: slope x1 ≈ 2",
+        ridge.weights[0],
+        2.0,
+        tolerances::RIDGE_TEST_TOL,
+    );
+    v.check(
+        "ridge: slope x2 ≈ 3",
+        ridge.weights[1],
+        3.0,
+        tolerances::RIDGE_TEST_TOL,
+    );
 
     // ═══ wetSpring: Bio diversity ═════════════════════════════════════════════
     v.section("═══ wetSpring: Bio diversity ═══");
@@ -175,8 +185,18 @@ fn main() {
     let x_fit: Vec<f64> = (0..15).map(f64::from).collect();
     let y_fit: Vec<f64> = x_fit.iter().map(|&x| 3.0f64.mul_add(x, 2.0)).collect();
     let fit = barracuda::stats::fit_linear(&x_fit, &y_fit).unwrap();
-    v.check("fit_linear: slope ≈ 3", fit.params[0], 3.0, 0.01);
-    v.check("fit_linear: intercept ≈ 2", fit.params[1], 2.0, 0.01);
+    v.check(
+        "fit_linear: slope ≈ 3",
+        fit.params[0],
+        3.0,
+        tolerances::RIDGE_TEST_TOL,
+    );
+    v.check(
+        "fit_linear: intercept ≈ 2",
+        fit.params[1],
+        2.0,
+        tolerances::RIDGE_TEST_TOL,
+    );
 
     // ═══ groundSpring: Evolution ═════════════════════════════════════════════
     v.section("═══ groundSpring: Evolution ═══");

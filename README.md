@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 9, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V100 — 1,074 lib tests + 203 forge tests + 100 doc tests, 332 experiments, 8,982+ validation checks, 311 binaries. V100 chain: petalTongue viz (45) + CPU/GPU math parity (27) + metalForge viz (19) + biomeOS full chain (34) + local evolution (24) + mixed HW dispatch (24) = **173/173 PASS** (Exp327–332). V99 chain regression: 166/166 PASS. V98 chain regression: 173/173 PASS. Zero local WGSL, zero unsafe code, 164 named tolerances, `cargo clippy -D warnings` **ZERO WARNINGS**, `cargo doc -D warnings` **ZERO WARNINGS**. Ecosystem: barraCuda `a898dee`, toadStool S130+ (`bfe7977b`), coralReef Phase 10 Iteration 10 (`d29a734`). petalTongue visualization integrated via IPC schema.
+**Status:** V101 — 1,047 lib tests + 203 forge tests + 27 doc tests + 178 integration tests = **1,455 total**, 334 experiments, 9,060+ validation checks, 316 binaries. V101 chain: viz evolution (44) + science-to-viz pipeline (34) = **78/78 PASS** (Exp333–334). V100 chain: 173/173 PASS. V99 chain regression: 166/166 PASS. V98 chain regression: 173/173 PASS. Zero local WGSL, zero unsafe code, 179 named tolerances, `cargo clippy -D warnings -W pedantic` **ZERO WARNINGS**, `cargo doc -D warnings` **ZERO WARNINGS**. Ecosystem: barraCuda `a898dee`, toadStool S130+ (`bfe7977b`), coralReef Phase 10 Iteration 10 (`d29a734`). petalTongue visualization: 7 DataChannel types, 13 scenario builders, StreamSession, Songbird capabilities.
 
 ---
 
@@ -129,18 +129,21 @@ integration point.
 | Exp271: Cross-Spring S79 (13 domains) | 73 |
 | Exp272: Bio Brain (7 domains) | 64 |
 | V98 full chain (Exp313-318) | 173 (Paper 32 + CPU 67 + GPU 25 + Streaming 25 + metalForge 24) |
-| **Total validation checks** | **8,982+** |
-| Rust library unit tests | 1,074 (barracuda) |
+| V100 viz + local evolution (Exp327-332) | 173 (petalTongue 45 + CPU/GPU 27 + metalForge 19 + biomeOS 34 + local evo 24 + mixed HW 24) |
+| V101 viz evolution (Exp333-334) | 78 (viz evolution 44 + science-to-viz 34) |
+| **Total validation checks** | **9,060+** |
+| Rust library unit tests | 1,047 (barracuda) |
 | metalForge forge tests | 203 |
 | Doc-tests | 27 (barracuda 18 + forge 9) |
-| **Total Rust tests** | **1,377** (lib + forge + integration + doc) |
-| Library code coverage | **95.86% line / 93.54% fn / 94.99% branch** (cargo-llvm-cov) |
-| Experiments completed | 332 |
-| Validation/benchmark binaries | 311 |
+| Integration tests | 178 |
+| **Total Rust tests** | **1,455** (lib + forge + integration + doc) |
+| Library code coverage | **93.94% line / 91.85% fn / 93.60% branch** (cargo-llvm-cov) |
+| Experiments completed | 334 |
+| Validation/benchmark binaries | 316 |
 | CPU bio modules | 47 |
 | GPU bio modules | 47 (30 lean + 5 write→lean + 7 compose + 0 passthrough + 5 visualization) |
 | Tier B (needs refactor) | 0 (all promoted) |
-| Python baselines | 57 scripts (all with reproduction headers + SHA-256 integrity verification) |
+| Python baselines | 65 scripts (all with reproduction headers + SHA-256 integrity verification) |
 | BarraCuda CPU parity | 546/546 (v1-v11: 36+ domains, IPC fidelity proven) |
 | BarraCuda GPU parity | 36+ domains (17 absorbed + 5 local ODE + 7 compose + IPC GPU-aware dispatch) |
 | metalForge cross-system | 37+ domains CPU↔GPU (Exp103+104+165+182+208), **39/39 papers three-tier** |
@@ -148,7 +151,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | `barraCuda` primitives consumed | **150+** (always-on, zero fallback code — standalone `barraCuda` v0.3.3 `a898dee`, wgpu 28, PrecisionRoutingAdvice) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 8,982+ validation checks **PASS**. All 1,074 library + 203 forge tests **PASS** (1 ignored: hardware-dependent).
+All 9,060+ validation checks **PASS**. All 1,047 library + 203 forge + 178 integration tests **PASS** (1 ignored: hardware-dependent).
 
 ### GPU Performance
 
@@ -467,6 +470,27 @@ for upstream absorption, and mixed hardware dispatch validation:
 
 **1,277 tests** | **332 experiments** | **311 binaries** | **8,982+ checks**
 
+### V101: petalTongue Visualization Evolution (Exp333–334)
+
+Full visualization evolution: 7 new scenario builders, Spectrum DataChannel type,
+StreamSession for progressive rendering, Songbird capability announcement, and
+science-to-visualization IPC wiring:
+
+| Exp | Name | Checks |
+|-----|------|:------:|
+| 333 | Visualization Evolution | 44/44 |
+| 334 | Science-to-Viz Pipeline | 34/34 |
+
+- **Spectrum DataChannel**: 7th channel type for FFT/power spectrum data (Anderson spectral, HRV, signal)
+- **StreamSession**: Session lifecycle for progressive petalTongue rendering (`push_initial_render`, `push_timeseries_append`, `push_gauge_update`, `push_replace`)
+- **Songbird capabilities**: `VisualizationAnnouncement` struct with 16 capabilities, 7 channel types
+- **6 new scenario builders**: pangenome (heatmap+bar+gauge), HMM (timeseries+bar+heatmap), stochastic (timeseries+distribution+gauge), similarity (heatmap+distribution), rarefaction (timeseries+gauge), NMF (heatmap+bar)
+- **Streaming pipeline builder**: Multi-node graph for GPU pipeline stages (QF→DADA2→taxonomy→diversity→β-diversity)
+- **IPC wiring**: `science.diversity` and `science.full_pipeline` gain `visualization: bool` parameter — auto-build scenario + push to petalTongue
+- **dump_wetspring_scenarios**: 13 scenarios (was 6), `--stream` flag for StreamSession demo
+
+**1,455 tests** | **334 experiments** | **316 binaries** | **9,060+ checks**
+
 ### Phase 95: Standalone barraCuda Rewire + Deep Debt Evolution
 
 Rewired from ToadStool-embedded `barracuda` v0.2.0 to standalone `barraCuda`
@@ -643,7 +667,7 @@ Rust 1.93 fixed across 20+ validation binaries.
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy -W pedantic -W nursery` | **Zero warnings** (pedantic + nursery clean) |
 | `cargo doc --no-deps` | Clean (0 warnings) |
-| Line coverage (`cargo-llvm-cov`) | **95.86% line / 93.54% fn / 94.99% branch** (1,044 lib tests) |
+| Line coverage (`cargo-llvm-cov`) | **93.94% line / 91.85% fn / 93.60% branch** (1,455 tests) |
 | `#![deny(unsafe_code)]` | **Enforced crate-wide** (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | **Enforced crate-wide** |
 | TODO/FIXME markers | **0** |
@@ -651,8 +675,8 @@ Rust 1.93 fixed across 20+ validation binaries.
 | SPDX-License-Identifier | All `.rs` files |
 | Max file size | All under 1000 LOC |
 | External C dependencies | **0** (`flate2` uses `rust_backend`) |
-| Named tolerance constants | 164 (scientifically justified, hierarchy-tested) |
-| Provenance headers | All 311 binaries |
+| Named tolerance constants | 179 (scientifically justified, hierarchy-tested) |
+| Provenance headers | All 316 binaries |
 | ESN ridge regression | **Proper Cholesky solve** (not diagonal approximation) |
 | I/O streaming | Buffering APIs deprecated; `stats_from_file` + iterators preferred |
 | Clone optimization | Hot-path clones eliminated (merge_pairs, derep entry API) |
@@ -749,7 +773,7 @@ wetSpring/
 │   ├── src/
 │   │   ├── lib.rs               ← crate root (pedantic + nursery lints enforced)
 │   │   ├── special.rs           ← sovereign math (erf, ln_gamma, regularized_gamma)
-│   │   ├── tolerances/           ← 164 named tolerance constants (bio, gpu, spectral, instrument)
+│   │   ├── tolerances/           ← 179 named tolerance constants (bio, gpu, spectral, instrument)
 │   │   ├── validation/           ← hotSpring validation framework
 │   │   ├── ncbi/                ← NCBI module (API key, HTTP, E-search, EFetch, SRA, NestGate, cache)
 │   │   ├── encoding.rs          ← sovereign base64 (zero dependencies)
@@ -757,12 +781,12 @@ wetSpring/
 │   │   ├── bio/                 ← 47 CPU + 47 GPU bio modules
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML, nanopore)
 │   │   ├── bench/               ← benchmark harness + power monitoring
-│   │   ├── bin/                 ← 294 validation/benchmark binaries
+│   │   ├── bin/                 ← 294 validation/benchmark binaries (+ 22 forge)
 │   │   ├── ipc/                 ← JSON-RPC dispatch (biomeOS integration)
-│   │   ├── visualization/       ← petalTongue schema types + scenario builders
+│   │   ├── visualization/       ← petalTongue schema types, 13 scenario builders, StreamSession, Songbird
 │   │   └── vault/               ← encrypted consent-gated data storage
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024
-├── experiments/                   ← 332 experiment protocols + results
+├── experiments/                   ← 334 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
 │   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs, bridge.rs
@@ -786,8 +810,8 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (1,044 library tests)
-cargo test --workspace
+# Run all tests (1,455 library + forge + doc + integration tests)
+cargo test --workspace --all-features
 
 # Code quality checks
 cargo fmt -p wetspring-barracuda -p wetspring-forge -- --check

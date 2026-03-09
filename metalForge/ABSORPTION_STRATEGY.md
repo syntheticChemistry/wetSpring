@@ -1,8 +1,8 @@
 # Absorption Strategy: wetSpring → ToadStool
 
-**Date:** March 3, 2026
+**Date:** March 9, 2026
 **Pattern:** Write → Absorb → Lean (from hotSpring)
-**Status:** 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 45 GPU modules total, 0 Tier B/C, standalone barraCuda v0.3.1
+**Status:** V101 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 47 GPU modules total, 0 Tier B/C, standalone barraCuda v0.3.3, 13 petalTongue scenario builders, StreamSession, Songbird
 
 ---
 

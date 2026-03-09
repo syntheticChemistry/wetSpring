@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: March 5, 2026 (Phase 97 — 1,047 lib tests, barraCuda v0.3.3, wgpu 28, Fp64Strategy precision dispatch, 150+ primitives (264 ComputeDispatch ops + fused Welford/Pearson), clippy pedantic CLEAN, 286 experiments, 52 papers complete + 6 reproduced, all 39 three-tier eligible papers validated at CPU + GPU + metalForge. V97c: fused ops chain Exp306-310, GPU v12 with Hybrid-aware graceful degradation)
+**Last Updated**: March 9, 2026 (V101 — 1,455 tests, 316 binaries, 179 tolerances, barraCuda v0.3.3, wgpu 28, 150+ primitives (264 ComputeDispatch ops), clippy pedantic CLEAN, 334 experiments, 52 papers complete + 6 reproduced, all 39 three-tier eligible papers validated at CPU + GPU + metalForge. V101: petalTongue viz evolution, StreamSession, Songbird, 13 scenario builders, 9,060+ checks)
 **Purpose**: Track papers for reproduction/review across five tracks
 
 ---

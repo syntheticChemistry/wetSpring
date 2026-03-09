@@ -103,6 +103,20 @@ pub fn handle_diversity(params: &Value) -> Result<Value, RpcError> {
         result.insert("substrate".into(), json!(substrate));
     }
 
+    if params
+        .get("visualization")
+        .and_then(Value::as_bool)
+        .unwrap_or(false)
+    {
+        let labels = vec!["sample".into()];
+        let (scenario, _edges) =
+            crate::visualization::scenarios::ecology_scenario(&[counts], &labels);
+        if let Ok(json_str) = crate::visualization::scenario_to_json(&scenario) {
+            result.insert("visualization".into(), json!(json_str));
+        }
+        push_scenario_best_effort(&scenario);
+    }
+
     Ok(Value::Object(result))
 }
 
@@ -270,6 +284,13 @@ pub fn handle_anderson(params: &Value) -> Result<Value, RpcError> {
     }
 }
 
+/// Best-effort push of a scenario to petalTongue (non-fatal on failure).
+fn push_scenario_best_effort(scenario: &crate::visualization::EcologyScenario) {
+    if let Ok(client) = crate::visualization::ipc_push::PetalTonguePushClient::discover() {
+        let _ = client.push_render("wetspring-ipc", &scenario.name, scenario);
+    }
+}
+
 /// Full pipeline: diversity + QS model + Anderson (non-fatal).
 pub fn handle_full_pipeline(params: &Value) -> Result<Value, RpcError> {
     let mut pipeline_result = serde_json::Map::new();
@@ -296,6 +317,27 @@ pub fn handle_full_pipeline(params: &Value) -> Result<Value, RpcError> {
                 "anderson".into(),
                 json!({"status": "skipped", "reason": "gpu not available"}),
             );
+        }
+    }
+
+    if params
+        .get("visualization")
+        .and_then(Value::as_bool)
+        .unwrap_or(false)
+    {
+        let counts: Vec<f64> = params
+            .get("counts")
+            .and_then(Value::as_array)
+            .map(|a| a.iter().filter_map(Value::as_f64).collect())
+            .unwrap_or_default();
+        if !counts.is_empty() {
+            let labels = vec!["pipeline_sample".into()];
+            let (scenario, _) =
+                crate::visualization::scenarios::full_pipeline_scenario(&[counts], &labels);
+            if let Ok(json_str) = crate::visualization::scenario_to_json(&scenario) {
+                pipeline_result.insert("visualization".into(), json!(json_str));
+            }
+            push_scenario_best_effort(&scenario);
         }
     }
 

@@ -52,3 +52,22 @@ pub const GILLESPIE_FANO_PHYSICAL: f64 = 1.0;
 /// ±5.0 log-likelihood units for typical 400-site alignments.
 /// Validated: Exp031 (Wang 2021 RAWR), `scripts/wang2021_rawr_bootstrap.py`.
 pub const BOOTSTRAP_LL_ENSEMBLE: f64 = 5.0;
+
+/// Single-run SSA mean tolerance (absolute) for birth-death steady state.
+///
+/// A single Gillespie SSA trajectory of a birth-death process with
+/// `k_b/k_d = 100` has large shot-noise variance. The steady-state mean
+/// can deviate by ±30 from the analytical expectation. This is wider
+/// than [`GILLESPIE_MEAN_REL`] (10% relative for 10 000-replicate
+/// ensembles) because single runs lack CLT averaging.
+/// Validated: Exp292 (`BarraCuda` CPU v22, D34 stochastic domain).
+pub const SSA_SINGLE_RUN_ABSOLUTE: f64 = 30.0;
+
+/// Bootstrap estimate tolerance for small-sample CI.
+///
+/// For `N = 10` data points with `mean ≈ 5.5`, 1 000 bootstrap replicates
+/// produce a point estimate within ±0.5 of the sample mean. Wider than
+/// [`JACKKNIFE_VS_BOOTSTRAP`] because bootstrap resampling introduces
+/// additional sampling noise beyond jackknife leave-one-out.
+/// Validated: Exp292 (`BarraCuda` CPU v22, D40 statistics domain).
+pub const BOOTSTRAP_ESTIMATE_SMALL: f64 = 0.5;

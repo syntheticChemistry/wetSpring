@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![allow(clippy::similar_names)]
 //! Exp328: CPU vs GPU pure math parity for visualization-exercised domains.
 //!
 //! Runs the same scientific computations on CPU and GPU, compares results
@@ -26,73 +27,55 @@ use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
-fn main() {
-    let rt = tokio::runtime::Builder::new_current_thread()
-        .enable_all()
-        .build()
-        .expect("tokio runtime");
-    let gpu = match rt.block_on(GpuF64::new()) {
-        Ok(g) => g,
-        Err(e) => {
-            eprintln!("GPU unavailable: {e}");
-            validation::exit_skipped("no GPU device");
-        }
-    };
-
-    let mut v = Validator::new("Exp328: CPU vs GPU Viz Math Parity");
-
-    let counts = vec![10.0, 20.0, 30.0, 40.0, 50.0, 5.0, 15.0, 25.0, 35.0, 45.0];
-
-    // ── G1: Shannon ──
+fn validate_alpha_diversity(v: &mut Validator, gpu: &GpuF64, counts: &[f64]) {
     v.section("G1 — Shannon H'");
-    let h_cpu = diversity::shannon(&counts);
-    let h_gpu = diversity_gpu::shannon_gpu(&gpu, &counts).unwrap_or(f64::NAN);
+    let cpu_val = diversity::shannon(counts);
+    let gpu_val = diversity_gpu::shannon_gpu(gpu, counts).unwrap_or(f64::NAN);
     v.check(
         "Shannon CPU vs GPU",
-        h_gpu,
-        h_cpu,
+        gpu_val,
+        cpu_val,
         tolerances::GPU_VS_CPU_F64,
     );
 
-    // ── G2: Simpson ──
     v.section("G2 — Simpson D");
-    let s_cpu = diversity::simpson(&counts);
-    let s_gpu = diversity_gpu::simpson_gpu(&gpu, &counts).unwrap_or(f64::NAN);
+    let cpu_val = diversity::simpson(counts);
+    let gpu_val = diversity_gpu::simpson_gpu(gpu, counts).unwrap_or(f64::NAN);
     v.check(
         "Simpson CPU vs GPU",
-        s_gpu,
-        s_cpu,
+        gpu_val,
+        cpu_val,
         tolerances::GPU_VS_CPU_F64,
     );
 
-    // ── G3: Observed features ──
     v.section("G3 — Observed Features");
-    let obs_cpu = diversity::observed_features(&counts);
-    let obs_gpu = diversity_gpu::observed_features_gpu(&gpu, &counts).unwrap_or(f64::NAN);
+    let cpu_val = diversity::observed_features(counts);
+    let gpu_val = diversity_gpu::observed_features_gpu(gpu, counts).unwrap_or(f64::NAN);
     v.check(
         "Observed CPU vs GPU",
-        obs_gpu,
-        obs_cpu,
+        gpu_val,
+        cpu_val,
         tolerances::GPU_VS_CPU_F64,
     );
 
-    // ── G4: Pielou evenness ──
     v.section("G4 — Pielou Evenness");
-    let j_cpu = diversity::pielou_evenness(&counts);
-    let j_gpu = diversity_gpu::pielou_evenness_gpu(&gpu, &counts).unwrap_or(f64::NAN);
+    let cpu_val = diversity::pielou_evenness(counts);
+    let gpu_val = diversity_gpu::pielou_evenness_gpu(gpu, counts).unwrap_or(f64::NAN);
     v.check(
         "Pielou CPU vs GPU",
-        j_gpu,
-        j_cpu,
+        gpu_val,
+        cpu_val,
         tolerances::GPU_VS_CPU_F64,
     );
+}
 
-    // ── G5: Bray-Curtis condensed ──
+fn validate_beta_and_ordination(v: &mut Validator, gpu: &GpuF64) {
     v.section("G5 — Bray-Curtis Matrix");
-    let s1 = vec![10.0, 20.0, 30.0, 40.0, 50.0];
-    let s2 = vec![15.0, 25.0, 5.0, 35.0, 45.0];
-    let s3 = vec![8.0, 12.0, 40.0, 20.0, 60.0];
-    let samples = vec![s1.clone(), s2.clone(), s3.clone()];
+    let samples = vec![
+        vec![10.0, 20.0, 30.0, 40.0, 50.0],
+        vec![15.0, 25.0, 5.0, 35.0, 45.0],
+        vec![8.0, 12.0, 40.0, 20.0, 60.0],
+    ];
     let bc_full = diversity::bray_curtis_matrix(&samples);
     let n = samples.len();
     let mut bc_cpu_condensed = Vec::new();
@@ -101,7 +84,7 @@ fn main() {
             bc_cpu_condensed.push(bc_full[i * n + j]);
         }
     }
-    let bc_gpu = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).unwrap_or_default();
+    let bc_gpu = diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).unwrap_or_default();
     v.check_count("BC condensed length", bc_gpu.len(), bc_cpu_condensed.len());
     for (i, (cpu_v, gpu_v)) in bc_cpu_condensed.iter().zip(bc_gpu.iter()).enumerate() {
         v.check(
@@ -112,11 +95,10 @@ fn main() {
         );
     }
 
-    // ── G6: PCoA ──
     v.section("G6 — PCoA Ordination");
     let dm_condensed = vec![0.5, 0.8, 0.6];
     let pcoa_cpu = pcoa::pcoa(&dm_condensed, 3, 2);
-    let pcoa_gpu_result = pcoa_gpu::pcoa_gpu(&gpu, &dm_condensed, 3, 2);
+    let pcoa_gpu_result = pcoa_gpu::pcoa_gpu(gpu, &dm_condensed, 3, 2);
     match (&pcoa_cpu, &pcoa_gpu_result) {
         (Ok(cpu_r), Ok(gpu_r)) => {
             for ax in 0..2 {
@@ -144,14 +126,15 @@ fn main() {
             v.check_pass("PCoA: both succeed", false);
         }
     }
+}
 
-    // ── G7: KMD ──
+fn validate_kmd(v: &mut Validator, gpu: &GpuF64) {
     v.section("G7 — Kendrick Mass Defect");
     let test_masses = vec![200.0, 250.0, 300.0, 350.0, 400.0];
     let kmd_cpu =
         kmd::kendrick_mass_defect(&test_masses, kmd::units::CF2_EXACT, kmd::units::CF2_NOMINAL);
     let kmd_gpu_result = kmd_gpu::kendrick_mass_defect_gpu(
-        &gpu,
+        gpu,
         &test_masses,
         kmd::units::CF2_EXACT,
         kmd::units::CF2_NOMINAL,
@@ -172,8 +155,9 @@ fn main() {
             v.check_pass("KMD GPU succeeds", false);
         }
     }
+}
 
-    // ── G8: ODE (CPU reference — QS biofilm determinism) ──
+fn validate_ode_determinism(v: &mut Validator) {
     v.section("G8 — ODE Determinism (CPU)");
     let params = qs_biofilm::QsBiofilmParams::default();
     let y0 = [0.01, 0.0, 0.0, 0.0, 0.0];
@@ -185,9 +169,31 @@ fn main() {
             &format!("ODE var[{var}] determinism"),
             r1.y_final[var],
             r2.y_final[var],
-            0.0,
+            tolerances::EXACT,
         );
     }
+}
+
+fn main() {
+    let rt = tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .expect("tokio runtime");
+    let gpu = match rt.block_on(GpuF64::new()) {
+        Ok(g) => g,
+        Err(e) => {
+            eprintln!("GPU unavailable: {e}");
+            validation::exit_skipped("no GPU device");
+        }
+    };
+
+    let mut v = Validator::new("Exp328: CPU vs GPU Viz Math Parity");
+    let counts = vec![10.0, 20.0, 30.0, 40.0, 50.0, 5.0, 15.0, 25.0, 35.0, 45.0];
+
+    validate_alpha_diversity(&mut v, &gpu, &counts);
+    validate_beta_and_ordination(&mut v, &gpu);
+    validate_kmd(&mut v, &gpu);
+    validate_ode_determinism(&mut v);
 
     v.finish();
 }

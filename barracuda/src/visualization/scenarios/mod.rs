@@ -10,14 +10,27 @@ pub mod benchmarks;
 pub mod chemistry;
 pub mod dynamics;
 pub mod ecology;
+pub mod hmm;
+pub mod nmf;
 pub mod ordination;
+pub mod pangenome;
+pub mod rarefaction;
+pub mod similarity;
+pub mod stochastic;
+pub mod streaming_pipeline;
 
 pub use anderson::anderson_scenario;
 pub use benchmarks::benchmark_scenario;
 pub use chemistry::chemistry_scenario;
 pub use dynamics::{dynamics_scenario, qs_biofilm_scenario};
 pub use ecology::ecology_scenario;
+pub use hmm::hmm_scenario;
+pub use nmf::nmf_scenario;
 pub use ordination::ordination_scenario;
+pub use pangenome::pangenome_scenario;
+pub use rarefaction::rarefaction_scenario;
+pub use similarity::similarity_scenario;
+pub use stochastic::stochastic_scenario;
 
 use super::types::{DataChannel, EcologyScenario, ScenarioEdge, ScenarioNode};
 
@@ -164,6 +177,43 @@ fn scatter(
         x_label: x_label.into(),
         y_label: y_label.into(),
         unit: unit.into(),
+    }
+}
+
+/// Create a `Spectrum` channel.
+#[allow(dead_code)]
+pub(crate) fn spectrum(
+    id: &str,
+    label: &str,
+    unit: &str,
+    frequencies: &[f64],
+    amplitudes: &[f64],
+) -> DataChannel {
+    DataChannel::Spectrum {
+        id: id.into(),
+        label: label.into(),
+        unit: unit.into(),
+        frequencies: frequencies.to_vec(),
+        amplitudes: amplitudes.to_vec(),
+    }
+}
+
+/// Create a `Distribution` channel.
+fn distribution(
+    id: &str,
+    label: &str,
+    unit: &str,
+    values: &[f64],
+    mean: f64,
+    std: f64,
+) -> DataChannel {
+    DataChannel::Distribution {
+        id: id.into(),
+        label: label.into(),
+        unit: unit.into(),
+        values: values.to_vec(),
+        mean,
+        std,
     }
 }
 

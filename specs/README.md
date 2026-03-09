@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
-**Last Updated**: March 8, 2026
-**Status**: V99 — 8,886+ checks, ALL PASS (1,047 tests, 300 experiments, 305 binaries, standalone barraCuda v0.3.3 `a898dee`, wgpu 28, 150+ primitives, 0 local WGSL, 164 named tolerances, 0 TODO/FIXME/HACK, 0 silent fallbacks, clippy pedantic CLEAN `--all-features`). V99: biomeOS/NUCLEUS integration, cross-primal IPC pipeline, ToadStool dispatch, NUCLEUS atomics
+**Last Updated**: March 9, 2026
+**Status**: V101 — 9,060+ checks, ALL PASS (1,455 tests, 334 experiments, 316 binaries, standalone barraCuda v0.3.3 `a898dee`, wgpu 28, 150+ primitives, 0 local WGSL, 179 named tolerances, 0 TODO/FIXME/HACK, 0 silent fallbacks, clippy pedantic CLEAN `--all-features`). V101: petalTongue visualization evolution (7 DataChannel types, 13 scenario builders, StreamSession, Songbird, IPC science→viz). V100: mixed HW dispatch. V99: biomeOS/NUCLEUS integration
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -10,7 +10,7 @@
 
 | Metric | Value |
 |--------|-------|
-| CPU validation | 1,476+/1,476+ PASS — 47 modules, 281 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
+| CPU validation | 1,476+/1,476+ PASS — 47 modules, 334 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
 | GPU validation | 1,945+/1,945+ PASS — 150+ primitives (standalone barraCuda v0.3.1, always-on, 264 ComputeDispatch ops), 0 local WGSL (fully lean) |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 407/407 — 22.5x Rust speedup over Python (v1–v9) |
@@ -25,7 +25,7 @@
 | Full 5-tier chain | 499/499 PASS — Paper math → CPU → GPU → Streaming → metalForge (Exp298) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
-| Rust modules | 47 CPU + 45 GPU + 1 IPC + 1 vault, 1,044 lib tests, 268 binaries |
+| Rust modules | 47 CPU + 47 GPU + 1 IPC + 1 vault + 1 visualization, 1,455 tests, 316 binaries |
 | Write phase | 0 local WGSL (fully lean) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
 | Paper queue | **ALL DONE** — 52/52 reproducible papers complete (Tracks 1-4 + Phase 37 extensions + cross-spring) |
@@ -43,7 +43,7 @@ Every paper in the queue goes through the full evolution path. Status:
 
 | Stage | What It Proves | Status |
 |-------|---------------|--------|
-| **Python baseline** | Algorithm correctness against published tools | 42 scripts, all reproducible |
+| **Python baseline** | Algorithm correctness against published tools | 65 scripts, all reproducible |
 | **BarraCuda CPU** | Pure Rust math matches Python | 1,476 checks, 380/380 cross-domain parity (v1–v8) |
 | **BarraCuda GPU** | GPU produces same answer as CPU | 1,783 checks, 29 GPU domains |
 | **Pure GPU streaming** | Zero CPU round-trips, data stays on-device | 152 checks, 10+ domains, 441-837× over round-trip (Exp090/105/106) |
@@ -127,6 +127,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 | [PAPER_REVIEW_QUEUE.md](PAPER_REVIEW_QUEUE.md) | Complete | 52/52 papers reproduced across 6 tracks + cross-spring |
 | [BARRACUDA_REQUIREMENTS.md](BARRACUDA_REQUIREMENTS.md) | Active | GPU kernel requirements and gap analysis |
 | [CROSS_SPRING_EVOLUTION.md](CROSS_SPRING_EVOLUTION.md) | Active | Cross-spring shader and primitive evolution — five Springs → BarraCuda |
+| [CONTROLS_VERIFICATION_V101.md](CONTROLS_VERIFICATION_V101.md) | V101 | 7-tier controls: open data, Python, CPU, GPU, streaming, metalForge, biomeOS, petalTongue |
 
 ### Data & Infrastructure
 
@@ -140,7 +141,8 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 | Document | Location | Description |
 |----------|----------|-------------|
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
-| Handoff (V99) | `../wateringHole/handoffs/WETSPRING_V99_BIOMEOS_NUCLEUS_FULL_CHAIN_HANDOFF_MAR08_2026.md` | Current biomeOS/NUCLEUS full-chain handoff |
+| Handoff (V101 Viz) | `wateringHole/.../WETSPRING_V101_VISUALIZATION_EVOLUTION_HANDOFF_MAR09_2026.md` | petalTongue visualization evolution handoff |
+| Handoff (V101 Absorption) | `wateringHole/.../WETSPRING_V101_BARRACUDA_TOADSTOOL_ABSORPTION_HANDOFF_MAR09_2026.md` | Comprehensive barraCuda/toadStool absorption handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |

@@ -24,13 +24,8 @@ use wetspring_barracuda::visualization::{
     DataChannel, EcologyScenario, ScenarioNode, ScientificRange, scenario_with_edges_json,
 };
 
-fn main() {
-    let mut v = Validator::new("Exp327: petalTongue Visualization V1");
-
-    // ── V1: DataChannel schema round-trips ──
-    v.section("V1 — DataChannel Schema");
-
-    let ts = DataChannel::TimeSeries {
+fn make_test_timeseries() -> DataChannel {
+    DataChannel::TimeSeries {
         id: "t1".into(),
         label: "Test TS".into(),
         x_label: "X".into(),
@@ -38,7 +33,13 @@ fn main() {
         unit: "AU".into(),
         x_values: vec![1.0, 2.0, 3.0],
         y_values: vec![4.0, 5.0, 6.0],
-    };
+    }
+}
+
+fn validate_schema(v: &mut Validator) -> DataChannel {
+    v.section("V1 — DataChannel Schema");
+
+    let ts = make_test_timeseries();
     let ts_json = serde_json::to_string(&ts).unwrap();
     v.check_pass(
         "TimeSeries has channel_type tag",
@@ -129,17 +130,13 @@ fn main() {
         dist_json.contains("\"channel_type\":\"distribution\""),
     );
 
-    // ── V2: Scenario builders ──
+    ts
+}
+
+fn validate_scenario_builders(v: &mut Validator, samples: &[Vec<f64>], labels: &[String]) {
     v.section("V2 — Scenario Builders");
 
-    let samples = vec![
-        vec![10.0, 20.0, 30.0, 40.0, 50.0, 5.0, 15.0, 25.0],
-        vec![15.0, 25.0, 5.0, 35.0, 45.0, 10.0, 20.0, 30.0],
-        vec![8.0, 12.0, 40.0, 20.0, 60.0, 3.0, 7.0, 50.0],
-    ];
-    let labels: Vec<String> = (1..=3).map(|i| format!("Sample{i}")).collect();
-
-    let (eco, eco_edges) = scenarios::ecology_scenario(&samples, &labels);
+    let (eco, eco_edges) = scenarios::ecology_scenario(samples, labels);
     v.check_pass("ecology: domain = ecology", eco.domain == "ecology");
     v.check_count("ecology: ≥2 nodes (alpha + beta)", eco.nodes.len(), 2);
     v.check_pass(
@@ -248,8 +245,9 @@ fn main() {
         bench.nodes[0].data_channels.len(),
         4,
     );
+}
 
-    // ── V3: IPC param shapes ──
+fn validate_ipc(v: &mut Validator, ts: &DataChannel) {
     v.section("V3 — IPC Param Shapes");
 
     let test_scenario = EcologyScenario {
@@ -292,11 +290,12 @@ fn main() {
             .push_render("s1", "t", &test_scenario)
             .is_err(),
     );
+}
 
-    // ── V4: Full chain ──
+fn validate_full_chain(v: &mut Validator, samples: &[Vec<f64>], labels: &[String]) {
     v.section("V4 — Full Chain");
 
-    let (full, full_edges) = scenarios::full_pipeline_scenario(&samples, &labels);
+    let (full, full_edges) = scenarios::full_pipeline_scenario(samples, labels);
     v.check_pass("full_pipeline: ≥3 nodes", full.nodes.len() >= 3);
     v.check_pass("full_pipeline: merges ecology + dynamics", {
         let has_diversity = full.nodes.iter().any(|n| n.id == "diversity");
@@ -321,9 +320,7 @@ fn main() {
         );
     }
 
-    // ── V5: Metadata compliance ──
     v.section("V5 — Metadata Compliance");
-
     v.check_pass("ScientificRange serializes", {
         let r = ScientificRange {
             label: "Optimal".into(),
@@ -333,13 +330,28 @@ fn main() {
         };
         serde_json::to_string(&r).is_ok()
     });
-
     v.check_pass(
         "node family is wetspring",
         full.nodes.iter().all(|n| n.family == "wetspring"),
     );
     v.check_pass("version is semver", full.version.split('.').count() == 3);
     v.check_pass("mode is live-ecosystem", full.mode == "live-ecosystem");
+}
+
+fn main() {
+    let mut v = Validator::new("Exp327: petalTongue Visualization V1");
+
+    let samples = vec![
+        vec![10.0, 20.0, 30.0, 40.0, 50.0, 5.0, 15.0, 25.0],
+        vec![15.0, 25.0, 5.0, 35.0, 45.0, 10.0, 20.0, 30.0],
+        vec![8.0, 12.0, 40.0, 20.0, 60.0, 3.0, 7.0, 50.0],
+    ];
+    let labels: Vec<String> = (1..=3).map(|i| format!("Sample{i}")).collect();
+
+    let ts = validate_schema(&mut v);
+    validate_scenario_builders(&mut v, &samples, &labels);
+    validate_ipc(&mut v, &ts);
+    validate_full_chain(&mut v, &samples, &labels);
 
     v.finish();
 }

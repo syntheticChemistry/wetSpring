@@ -79,7 +79,12 @@ fn main() {
     let ssa = gillespie::birth_death_ssa(10.0, 0.1, 50.0, 42);
     v.check_pass("SSA: events > 100", ssa.times.len() > 100);
     let ssa_mean = ssa.final_state()[0] as f64;
-    v.check("SSA: E[X] ≈ k_b/k_d = 100", ssa_mean, 100.0, 30.0);
+    v.check(
+        "SSA: E[X] ≈ k_b/k_d = 100",
+        ssa_mean,
+        100.0,
+        tolerances::SSA_SINGLE_RUN_ABSOLUTE,
+    );
 
     let coop_params = cooperation::CooperationParams::default();
     let (coop, coop_ms) =
@@ -272,7 +277,12 @@ fn main() {
     .unwrap();
     v.check_pass("Bootstrap: lower < estimate", ci.lower <= ci.estimate);
     v.check_pass("Bootstrap: estimate < upper", ci.estimate <= ci.upper);
-    v.check("Bootstrap: estimate ≈ 5.5", ci.estimate, 5.5, 0.5);
+    v.check(
+        "Bootstrap: estimate ≈ 5.5",
+        ci.estimate,
+        5.5,
+        tolerances::BOOTSTRAP_ESTIMATE_SMALL,
+    );
 
     let jk = barracuda::stats::jackknife_mean_variance(&data).unwrap();
     v.check(

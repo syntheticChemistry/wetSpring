@@ -12,7 +12,7 @@
 //! 1. **biomeOS discover** → wetSpring capabilities detected
 //! 2. **NUCLEUS dispatch** → Tower probes substrates, Node routes science
 //! 3. **Science compute** → diversity, ordination, dynamics
-//! 4. **petalTongue export** → all scenarios → DataChannel JSON
+//! 4. **petalTongue export** → all scenarios → `DataChannel` JSON
 //! 5. **metalForge overlay** → hardware inventory + dispatch scenarios merged
 //!
 //! This is the apex validation: every primal interaction in one binary.

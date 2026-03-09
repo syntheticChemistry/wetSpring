@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 9, 2026 (V100 — barraCuda v0.3.3 `a898dee` + toadStool S130+ `bfe7977b` + coralReef Iteration 10 `d29a734`)
+**Date:** March 9, 2026 (V101 — barraCuda v0.3.3 `a898dee` + toadStool S130+ `bfe7977b` + coralReef Iteration 10 `d29a734`)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 47 GPU modules + 1 IPC + 1 vault + 1 provenance + 1 visualization module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.3, wgpu 28). 1,277 tests, 332 experiments, 8,982+ checks, 164 tolerances, 311 binaries. `cargo clippy -D warnings` CLEAN (default + GPU), **0 silent fallbacks**. **V100:** petalTongue visualization integration + local evolution + mixed hardware dispatch: Exp327-332 (173/173 PASS). V99 regression: 166/166 PASS. V98 regression: 173/173 PASS. All 52 papers, petalTongue schema-driven visualization, bandwidth-aware workload routing, FitResult `.slope()` migration, HmmModel doc aliases, NMF bio re-export.
+**Status:** 47 CPU + 47 GPU modules + 1 IPC + 1 vault + 1 provenance + 1 visualization module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.3, wgpu 28). 1,455 tests, 334 experiments, 9,060+ checks, 179 tolerances, 316 binaries. `cargo clippy -D warnings` CLEAN (default + GPU), **0 silent fallbacks**. **V101:** petalTongue visualization evolution — Spectrum DataChannel, StreamSession, Songbird capabilities, 7 new scenario builders (pangenome, HMM, stochastic, similarity, rarefaction, NMF, streaming pipeline), IPC science→viz wiring: Exp333-334 (78/78 PASS). V100: 173/173 PASS. V99: 166/166 PASS.
 
 ### Full Lean Phase
 
@@ -89,7 +89,7 @@ All GPU bio modules are now either Lean (upstream primitive) or Compose
 
 All modules pass `clippy::pedantic` + `clippy::nursery` (0 warnings, `-D` enforced
 in CI), `cargo fmt` (0 diffs), `cargo doc` (0 warnings with and without `--all-features`).
-All tolerances centralized in `tolerances.rs` (97 named constants — includes
+All tolerances centralized in `tolerances.rs` (179 named constants — includes
 Jacobi eigendecomposition (Golub & Van Loan), ESN regularisation (Jaeger 2001/
 Lukoševičius 2012), Chao1 count detection (skbio parity), and 8 V39 audit
 additions: rarefaction, PCoA, KMD, HMM, Gillespie, asari). NMF convergence

@@ -8,8 +8,10 @@
 //! No `petalTongue` crate dependency — integration is via JSON schema only.
 //! All scenarios are built from live `barraCuda` math, never mock data.
 
+pub mod capabilities;
 pub mod ipc_push;
 pub mod scenarios;
+pub mod stream;
 mod types;
 
 pub use types::*;
@@ -171,6 +173,21 @@ mod tests {
         };
         let json = serde_json::to_string(&ch).expect("serialize");
         assert!(json.contains("\"channel_type\":\"distribution\""));
+    }
+
+    #[test]
+    fn data_channel_spectrum_serializes() {
+        let ch = DataChannel::Spectrum {
+            id: "sp1".into(),
+            label: "Test Spectrum".into(),
+            unit: "dB".into(),
+            frequencies: vec![100.0, 200.0, 300.0],
+            amplitudes: vec![0.5, 0.8, 0.3],
+        };
+        let json = serde_json::to_string(&ch).expect("serialize");
+        assert!(json.contains("\"channel_type\":\"spectrum\""));
+        assert!(json.contains("\"frequencies\""));
+        assert!(json.contains("\"amplitudes\""));
     }
 
     #[test]

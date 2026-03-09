@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** March 9, 2026 (V100)
+**Date:** March 9, 2026 (V101)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
 **barraCuda:** standalone v0.3.3 `a898dee`
-**Status:** 150+ primitives consumed (264 ComputeDispatch ops) via `compile_shader_universal`, 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 47 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,277 lib tests, standalone barraCuda v0.3.3, 332 experiments, 8,982+ checks, 311 binaries, 164 named tolerances, clippy pedantic CLEAN (`--all-features`). **V100:** petalTongue visualization module, FitResult `.slope()` migration, HmmModel doc aliases, NMF bio re-export, quality test extraction, bandwidth-aware workload routing, Exp327-332 (173/173 PASS).
+**Status:** 150+ primitives consumed (264 ComputeDispatch ops) via `compile_shader_universal`, 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 47 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,455 tests, standalone barraCuda v0.3.3, 334 experiments, 9,060+ checks, 316 binaries, 179 named tolerances, clippy pedantic CLEAN (`--all-features`). **V101:** petalTongue visualization evolution — 7 DataChannel types, 13 scenario builders, StreamSession, Songbird capabilities, IPC science→viz wiring, Exp333-334 (78/78 PASS). V100: 173/173 PASS.
 
 ---
 
@@ -125,7 +125,7 @@ workflows. No local WGSL needed — these compose upstream ops.
 | `robinson_foulds_gpu` | `PairwiseHammingGpu` | Bipartition distance via Hamming | 101 |
 | `derep_gpu` | `KmerHistogramGpu` | Sequence hashing via k-mer histogram | 101 |
 | `neighbor_joining_gpu` | `GemmCachedF64` | Distance matrix operations | 101 |
-| `reconciliation_gpu` | `TreeInferenceGpu` | DTL cost inference via tree traversal | 101 |
+| `reconciliation_gpu` | `FusedMapReduceF64` | DTL cost aggregation (CPU DP core; blocked on `BatchReconcileGpu`) | 101 |
 | `molecular_clock_gpu` | `GemmCachedF64` | Rate matrix operations | 101 |
 
 ---

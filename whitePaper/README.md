@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
-**Date:** March 3, 2026
-**Status:** Phase 95 — Validation study active — 8,300+ checks, 1,044 lib tests, 281 experiments, 285 binaries, standalone `barraCuda` v0.3.1 (767+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, 164 named tolerances, clippy pedantic + nursery ZERO WARNINGS, 52 papers + 6 reproduced, all 39 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers
+**Date:** March 9, 2026
+**Status:** V101 — Validation study active — 9,060+ checks, 1,455 tests, 334 experiments, 316 binaries, standalone `barraCuda` v0.3.3 `a898dee` (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, 179 named tolerances, clippy pedantic + nursery ZERO WARNINGS, 52 papers reproduced, all 39 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. petalTongue: 7 DataChannel types, 13 scenario builders, StreamSession, Songbird capabilities.
 **License:** AGPL-3.0-or-later
 
 ---
@@ -67,7 +67,7 @@ discovery, capability-based dispatch, and shader origin tracking.
 
 | Claim | Evidence |
 |-------|----------|
-| Rust matches Python across 281 experiments | 8,300+ checks pass (CPU + GPU + metalForge + streaming + cross-spring + soil QS + NPU) |
+| Rust matches Python across 334 experiments | 9,060+ checks pass (CPU + GPU + metalForge + streaming + cross-spring + soil QS + NPU + biomeOS + petalTongue) |
 | GPU matches CPU across all 45 GPU modules + 1 extension | 1,833+ GPU checks pass (incl. 48 all-domain + 58 metalForge v5 + 18 diversity fusion) |
 | BarraCuda CPU parity across 31+ domains (v1-v9) | 407/407 cross-domain checks pass |
 | 926× spectral cosine GPU speedup | Exp016 benchmark |
@@ -311,7 +311,7 @@ algorithms can be ported from interpreted languages to `barraCuda` (math)
 and `toadStool` (hardware dispatch):
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (62 WGSL shaders, 660 tests)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 144 barraCuda primitives, 1,044 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 150+ barraCuda primitives, 1,455 tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **airSpring** — Precision agriculture, IoT, Richards PDE, Kriging
 
@@ -327,14 +327,14 @@ orchestrates hardware routing separately.
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy --pedantic --nursery -D warnings` | 0 diagnostics |
 | `cargo doc --no-deps` | 0 warnings |
-| Line coverage (`cargo-llvm-cov`) | **95.86% line / 94.02% region / 95.40% fn** |
+| Line coverage (`cargo-llvm-cov`) | **93.94% line / 91.85% fn / 93.60% branch** |
 | `#![deny(unsafe_code)]` | Enforced crate-wide (edition 2024; `allow` only in test env-var calls) |
 | `#![deny(clippy::expect_used, clippy::unwrap_used)]` | Enforced crate-wide |
-| Named tolerance constants | 164 (all scientifically justified, hierarchy-tested) |
+| Named tolerance constants | 179 (all scientifically justified, hierarchy-tested) |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` files |
-| Provenance headers | All 285 validation/benchmark binaries |
+| Provenance headers | All 316 validation/benchmark binaries |
 
 ## metalForge — Hardware Discovery
 

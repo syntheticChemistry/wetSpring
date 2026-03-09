@@ -3,6 +3,43 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V101 — petalTongue Visualization Evolution + Controls Verification (2026-03-09)
+
+### Added
+- **Exp333**: Visualization Evolution — Spectrum DataChannel, StreamSession lifecycle,
+  Songbird capability announcement, 6 new scenario builders (pangenome, HMM, stochastic,
+  similarity, rarefaction, NMF), streaming pipeline builder. **44/44 PASS.**
+- **Exp334**: Science-to-Viz Pipeline — end-to-end diversity→scenario→JSON, IPC
+  `visualization: bool` wiring, pangenome/HMM/stochastic/NMF science→viz, streaming
+  pipeline roundtrip, existing scenario regression. **34/34 PASS.**
+- `DataChannel::Spectrum` — 7th channel type for FFT/power spectrum data
+- `visualization/stream.rs` — `StreamSession` with session lifecycle and typed push helpers
+- `visualization/capabilities.rs` — `VisualizationAnnouncement` for Songbird discovery
+- `scenarios/pangenome.rs` — presence/absence heatmap, core/accessory bars, Heap's alpha gauge
+- `scenarios/hmm.rs` — forward log-alpha timeseries, Viterbi path bar, posterior heatmap
+- `scenarios/stochastic.rs` — Gillespie SSA trajectory timeseries, final-state distribution
+- `scenarios/similarity.rs` — ANI pairwise heatmap, ANI value distribution
+- `scenarios/rarefaction.rs` — rarefaction curves with richness estimation gauge
+- `scenarios/nmf.rs` — W/H factor heatmaps, top-feature loading bars
+- `scenarios/streaming_pipeline.rs` — multi-node pipeline graph (QF→DADA2→taxonomy→diversity→β-diversity)
+- `specs/CONTROLS_VERIFICATION_V101.md` — 7-tier controls audit (open data → Python → CPU → GPU → streaming → metalForge → biomeOS → petalTongue)
+- `wateringHole/.../WETSPRING_V101_BARRACUDA_TOADSTOOL_ABSORPTION_HANDOFF_MAR09_2026.md` — comprehensive absorption handoff with primitive map, controls matrix, action items
+
+### Changed
+- `ipc/handlers/science.rs` — `handle_diversity` and `handle_full_pipeline` gain `visualization: bool` parameter
+- `ipc/mod.rs` — `handlers` module visibility: `pub(crate)` → `pub`
+- `dump_wetspring_scenarios` — 13 scenarios (was 6), `--stream` flag for StreamSession demo
+- `scenarios/mod.rs` — registered 7 new builders, added `spectrum` and `distribution` helpers
+- Root docs, `specs/README.md`, `whitePaper/baseCamp/README.md`, `metalForge/PRIMITIVE_MAP.md`, `metalForge/ABSORPTION_STRATEGY.md` — synchronized to V101
+
+### Verified
+- V101 chain: Exp333 (44) + Exp334 (34) = 78/78 PASS
+- V100 chain regression: 173/173 PASS
+- 1,047 barracuda lib + 203 forge + 27 doc + 178 integration = 1,455 tests PASS
+- `cargo clippy -D warnings -W pedantic` ZERO WARNINGS
+- 334 experiments, 316 binaries, 9,060+ checks, 179 named tolerances
+- 7-tier controls: 39/39 actionable papers with CPU + GPU + metalForge, all open data
+
 ## V100 — petalTongue Visualization + Local Evolution + Mixed Hardware (2026-03-09)
 
 ### Added

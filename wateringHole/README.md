@@ -1,6 +1,6 @@
 # wetSpring wateringHole
 
-**Date:** March 8, 2026
+**Date:** March 9, 2026
 **Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records.
 
 ---
@@ -9,6 +9,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
+| **V101** | `handoffs/WETSPRING_V101_DEEP_DEBT_EVOLUTION_HANDOFF_MAR09_2026.md` | Mar 9 | Deep debt evolution: 179 tolerances (was 164), all bare literals promoted, 3 binaries refactored, clippy pedantic clean, absorption manifest corrected. 1,455 tests, 316 binaries, 9,060+ checks. |
 | **V99** | `handoffs/WETSPRING_V99_BIOMEOS_NUCLEUS_FULL_CHAIN_HANDOFF_MAR08_2026.md` | Mar 8 | biomeOS/NUCLEUS integration + full V99 chain: Exp321-326 (166/166 PASS). Deploy graph, IPC server, cross-primal pipeline, CPU v25 (46), GPU v14 (27), metalForge v17 (29). ToadStool dispatch + NUCLEUS atomic probes. 300 experiments, 8,886+ checks. |
 | **V98+** | `handoffs/WETSPRING_V98_CROSS_SPRING_EVOLUTION_HANDOFF_MAR08_2026.md` | Mar 8 | Cross-spring evolution: Exp319 (52/52) + Exp320 benchmark. All 5 springs exercised, provenance registry (28 shaders, 22 cross-spring). GPU FusedMapReduceF64 validated. |
 | **V98+** | `handoffs/WETSPRING_V98_UPSTREAM_REWIRE_HANDOFF_MAR08_2026.md` | Mar 8 | Upstream rewire: barraCuda `a898dee`, toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`. Zero API breakage. V98 chain 173/173 re-validated. |
