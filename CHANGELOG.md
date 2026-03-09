@@ -3,6 +3,40 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V102 — petalTongue V2 Full-Domain Visualization (2026-03-09)
+
+### Added
+- **petalTongue V2 integration**: 28 new scenario builders across 6 scientific tracks
+  (phylogenetics, ODE systems, 16S pipeline, population genomics, LC-MS/PFAS, ML models).
+- **4 composite full-pipeline scenarios**: `full_16s`, `full_pfas`, `full_qs`,
+  `full_ecology` (scientist dashboard) — following healthSpring's `full_study()` pattern.
+- `DataChannel::FieldMap` — 8th channel type for spatial ecology (grid_x, grid_y, values).
+- `UiConfig` + `ShowPanels` — domain-themed rendering config (theme, zoom, panel visibility).
+- `PetalTonguePushClient::push_render_with_config()` — send UI config alongside scenario.
+- `PetalTonguePushClient::push_replace()` — full channel replacement via JSON-RPC.
+- `BackpressureConfig` — 500ms timeout, 200ms cooldown, 3 slow pushes (healthSpring pattern).
+- `StreamSession::open_with_backpressure()` — configurable backpressure on streaming sessions.
+- 3 domain push helpers: `push_diversity_update()`, `push_ode_step()`, `push_pipeline_progress()`.
+- `wetspring_dashboard` binary — builds all 26 scenarios, dumps JSON, pushes to petalTongue.
+- `validate_visualization_v2` binary — **140/140 checks PASS**.
+- `scripts/visualize.sh` — build + dump + optional petalTongue launch.
+- `scripts/live_dashboard.sh` — discovers socket, runs streaming dashboard.
+
+### Fixed
+- `StreamSession::push_replace()` — was building JSON-RPC payload but discarding it
+  (assigned to `_payload`). Now delegates to `client.push_replace()` via `send_rpc()`.
+
+### Changed
+- `Spectrum` channel helper — removed `#[allow(dead_code)]` (now used by `kmer_spectrum_scenario`).
+- `scenarios/mod.rs` — registered 28 new builders + 4 composite, 6 new submodules.
+- Root README.md, CHANGELOG.md, baseCamp README, experiments README — synchronized to V102.
+
+### Verified
+- V102: validate_visualization_v2 **140/140 PASS**
+- 1,047 barracuda lib + 203 forge = 1,250 lib tests PASS, 0 failures
+- cargo clippy (pedantic + nursery) ZERO ERRORS on new code
+- cargo fmt clean
+
 ## V101 — petalTongue Visualization Evolution + Controls Verification (2026-03-09)
 
 ### Added

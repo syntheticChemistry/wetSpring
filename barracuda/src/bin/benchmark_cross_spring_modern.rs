@@ -16,6 +16,16 @@
 //!
 //! Benchmarks `BarraCuda` primitives evolved from all five Springs,
 //! tracking cross-spring lineage and proving shared evolution benefits.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Validation class | Benchmark |
+//! | Baseline tool | timing harness |
+//! | Baseline version | N/A (performance measurement, not correctness) |
+//! | Exact command | `cargo run --release --bin benchmark_cross_spring_modern` |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use std::time::Instant;
 

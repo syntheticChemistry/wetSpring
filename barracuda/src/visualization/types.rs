@@ -133,6 +133,25 @@ pub enum DataChannel {
         /// Amplitude axis values (same length as `frequencies`).
         amplitudes: Vec<f64>,
     },
+    /// Spatial field map for gridded 2D data (environmental sampling, spatial ecology).
+    ///
+    /// Per wateringHole `VISUALIZATION_INTEGRATION_GUIDE` v2.0: `grid_x`, `grid_y`,
+    /// `values` in row-major order. Enables spatial ecology, ET0 maps, Richards PDE.
+    #[serde(rename = "fieldmap")]
+    FieldMap {
+        /// Unique channel identifier.
+        id: String,
+        /// Human-readable label.
+        label: String,
+        /// X-axis grid coordinates.
+        grid_x: Vec<f64>,
+        /// Y-axis grid coordinates.
+        grid_y: Vec<f64>,
+        /// Row-major values (`grid_x.len() * grid_y.len()`).
+        values: Vec<f64>,
+        /// Unit for cell values.
+        unit: String,
+    },
 }
 
 /// Reference range for threshold coloring on gauge/chart overlays.
@@ -208,4 +227,44 @@ pub struct EcologyScenario {
     /// Graph edges.
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub edges: Vec<ScenarioEdge>,
+}
+
+/// UI configuration for domain-themed rendering.
+///
+/// Follows healthSpring's `UiConfig` pattern — sent alongside the scenario
+/// via `push_render_with_config()` to control petalTongue panel layout,
+/// theme, and initial viewport.
+#[derive(Debug, Clone, Serialize)]
+pub struct UiConfig {
+    /// Theme name (`"ecology-dark"`, `"metagenomics"`, `"default"`).
+    pub theme: String,
+    /// Initial zoom level (`"fit"`, `"100%"`, `"auto"`).
+    pub initial_zoom: String,
+    /// Panel visibility.
+    pub show_panels: ShowPanels,
+}
+
+/// Panel visibility configuration for `petalTongue` layout.
+#[derive(Debug, Clone, Serialize)]
+pub struct ShowPanels {
+    /// Show left sidebar (node list, search).
+    pub left_sidebar: bool,
+    /// Show data inspector panel.
+    pub data_inspector: bool,
+    /// Show pipeline progress panel.
+    pub pipeline_progress: bool,
+}
+
+impl Default for UiConfig {
+    fn default() -> Self {
+        Self {
+            theme: "ecology-dark".into(),
+            initial_zoom: "fit".into(),
+            show_panels: ShowPanels {
+                left_sidebar: true,
+                data_inspector: true,
+                pipeline_progress: false,
+            },
+        }
+    }
 }

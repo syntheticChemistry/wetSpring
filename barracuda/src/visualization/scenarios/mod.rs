@@ -8,12 +8,19 @@
 pub mod anderson;
 pub mod benchmarks;
 pub mod chemistry;
+pub mod composite;
 pub mod dynamics;
 pub mod ecology;
 pub mod hmm;
+pub mod lcms;
+pub mod ml_models;
 pub mod nmf;
+pub mod ode_systems;
 pub mod ordination;
 pub mod pangenome;
+pub mod phylogenetics;
+pub mod pipeline;
+pub mod popgen;
 pub mod rarefaction;
 pub mod similarity;
 pub mod stochastic;
@@ -25,12 +32,30 @@ pub use chemistry::chemistry_scenario;
 pub use dynamics::{dynamics_scenario, qs_biofilm_scenario};
 pub use ecology::ecology_scenario;
 pub use hmm::hmm_scenario;
+pub use lcms::{pfas_overview_scenario, spectral_match_scenario, tolerance_search_scenario};
+pub use ml_models::{decision_tree_scenario, esn_scenario, random_forest_scenario};
 pub use nmf::nmf_scenario;
+pub use ode_systems::{
+    bistable_scenario, capacitor_scenario, cooperation_scenario, multi_signal_scenario,
+    phage_defense_scenario,
+};
 pub use ordination::ordination_scenario;
 pub use pangenome::pangenome_scenario;
+pub use phylogenetics::{
+    dnds_scenario, felsenstein_scenario, molecular_clock_scenario, placement_scenario,
+    reconciliation_scenario, unifrac_scenario,
+};
+pub use pipeline::{
+    dada2_scenario, pipeline_overview_scenario, quality_scenario, taxonomy_scenario,
+};
+pub use popgen::{kmer_spectrum_scenario, population_genomics_scenario, snp_scenario};
 pub use rarefaction::rarefaction_scenario;
 pub use similarity::similarity_scenario;
 pub use stochastic::stochastic_scenario;
+
+pub use composite::{
+    full_16s_scenario, full_ecology_scenario, full_pfas_scenario, full_qs_scenario,
+};
 
 use super::types::{DataChannel, EcologyScenario, ScenarioEdge, ScenarioNode};
 
@@ -180,8 +205,27 @@ fn scatter(
     }
 }
 
-/// Create a `Spectrum` channel.
+/// Create a `FieldMap` channel.
 #[allow(dead_code)]
+fn fieldmap(
+    id: &str,
+    label: &str,
+    grid_x: &[f64],
+    grid_y: &[f64],
+    values: &[f64],
+    unit: &str,
+) -> DataChannel {
+    DataChannel::FieldMap {
+        id: id.into(),
+        label: label.into(),
+        grid_x: grid_x.to_vec(),
+        grid_y: grid_y.to_vec(),
+        values: values.to_vec(),
+        unit: unit.into(),
+    }
+}
+
+/// Create a `Spectrum` channel.
 pub(crate) fn spectrum(
     id: &str,
     label: &str,

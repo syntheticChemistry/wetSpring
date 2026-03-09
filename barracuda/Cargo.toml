@@ -1691,3 +1691,15 @@ required-features = ["json"]
 name = "validate_cpu_gpu_viz_math"
 path = "src/bin/validate_cpu_gpu_viz_math.rs"
 required-features = ["gpu", "json"]
+
+# ── Scientist Dashboard ──
+[[bin]]
+name = "wetspring_dashboard"
+path = "src/bin/wetspring_dashboard.rs"
+required-features = ["json"]
+
+# ── Visualization V2 Validation ──
+[[bin]]
+name = "validate_visualization_v2"
+path = "src/bin/validate_visualization_v2.rs"
+required-features = ["json"]

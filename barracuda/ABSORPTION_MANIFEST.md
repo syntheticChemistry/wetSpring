@@ -1,6 +1,6 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** March 9, 2026 (V101)
+**Date:** March 9, 2026 (V102)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
 **barraCuda:** standalone v0.3.3 `a898dee`
 **Status:** 150+ primitives consumed (264 ComputeDispatch ops) via `compile_shader_universal`, 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 47 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,455 tests, standalone barraCuda v0.3.3, 334 experiments, 9,060+ checks, 316 binaries, 179 named tolerances, clippy pedantic CLEAN (`--all-features`). **V101:** petalTongue visualization evolution — 7 DataChannel types, 13 scenario builders, StreamSession, Songbird capabilities, IPC science→viz wiring, Exp333-334 (78/78 PASS). V100: 173/173 PASS.

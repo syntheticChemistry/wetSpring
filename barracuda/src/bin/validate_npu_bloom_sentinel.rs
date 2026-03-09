@@ -231,9 +231,15 @@ fn main() {
     v.check_pass("coin-cell > 1 year", 500.0 / daily_energy_j > 365.0);
 
     v.section("HPC retrospective scan");
+    // SRA environmental sample count: order-of-magnitude estimate from
+    // NCBI SRA statistics (https://www.ncbi.nlm.nih.gov/sra/docs/sragrowth/).
+    // Actual count as of 2024: ~40M runs. Projection for global bloom atlas.
     let sra_samples = 50_000_000.0;
     let windows_per_sample = 100.0;
     let total_inferences = sra_samples * windows_per_sample;
+    // NPU inference latency: 650 µs/inference from AKD1000 datasheet.
+    // NPU power: 5 mW continuous (BrainChip Akida spec).
+    // GPU energy per inference: 0.1 mJ (RTX 4070 profiled in Exp067).
     let npu_time_s = total_inferences * 650e-6 / 1_000_000.0;
     let npu_energy_j = npu_time_s * 0.005;
     let gpu_energy_j = total_inferences * 0.0001;

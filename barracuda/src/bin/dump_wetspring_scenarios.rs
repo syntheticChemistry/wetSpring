@@ -30,7 +30,7 @@ struct CheckTracker {
 }
 
 impl CheckTracker {
-    fn new() -> Self {
+    const fn new() -> Self {
         Self {
             checks: 0,
             passed: 0,
@@ -91,6 +91,10 @@ fn build_core_scenarios<'a>(
     );
     all.push(("anderson", and, and_edges));
 
+    // Benchmark timings from Exp069 (three-tier benchmark, 2026-02-21).
+    // Galaxy: Docker QIIME2 on Eastgate hardware (i9-12900K, 64 GB).
+    // CPU: BarraCuda v0.1.0, Rust 1.87, --release.
+    // GPU: ToadStool S41, RTX 4070 12 GB, wgpu 28.
     let tiers = vec![
         scenarios::benchmarks::TierResult {
             stage: "DADA2".into(),

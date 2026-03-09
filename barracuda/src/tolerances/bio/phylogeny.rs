@@ -67,7 +67,7 @@ pub const SSA_SINGLE_RUN_ABSOLUTE: f64 = 30.0;
 ///
 /// For `N = 10` data points with `mean ≈ 5.5`, 1 000 bootstrap replicates
 /// produce a point estimate within ±0.5 of the sample mean. Wider than
-/// [`JACKKNIFE_VS_BOOTSTRAP`] because bootstrap resampling introduces
+/// jackknife-vs-bootstrap tolerance because bootstrap resampling introduces
 /// additional sampling noise beyond jackknife leave-one-out.
 /// Validated: Exp292 (`BarraCuda` CPU v22, D40 statistics domain).
 pub const BOOTSTRAP_ESTIMATE_SMALL: f64 = 0.5;

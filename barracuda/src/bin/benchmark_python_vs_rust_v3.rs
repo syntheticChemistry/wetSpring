@@ -25,6 +25,18 @@
 //!
 //! This is the "pure math proof" step before GPU portability (Exp254).
 //!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Validation class | Benchmark (Python-parity proof) |
+//! | Baseline commit | `e4358c5` |
+//! | Baseline tool | Python SciPy/NumPy/skbio/hmmlearn/astropy/BioPython/khmer |
+//! | Baseline date | 2026-02-27 |
+//! | Exact command | `cargo run --release --bin benchmark_python_vs_rust_v3` |
+//! | Data | Analytical values + Python library expected outputs |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
 //! # Chain
 //!
 //! ```text

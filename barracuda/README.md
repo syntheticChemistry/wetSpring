@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** March 9, 2026 (V101 — barraCuda v0.3.3 `a898dee`, toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`, wgpu 28. 1,455 tests, 316 binaries, 179 tolerances. V101 chain: 78/78 PASS. V100: 173/173. V99: 166/166. V98 regression: 173/173 PASS)
+**Updated:** March 9, 2026 (V102 — barraCuda v0.3.3 `a898dee`, toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`, wgpu 28. 1,455 tests, 318 binaries, 179 tolerances. V102: petalTongue V2 — 41 scenario builders, 8 DataChannel types, 4 composite, 140/140 viz validation. V101: 78/78. V100: 173/173. V99: 166/166. V98: 173/173 PASS)
 
 ---
 

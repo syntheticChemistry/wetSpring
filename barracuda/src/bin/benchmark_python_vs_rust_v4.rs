@@ -22,6 +22,18 @@
 //! 2. The analytical / known result
 //! 3. `BarraCuda`'s computed result + timing
 //!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Validation class | Benchmark (Python-parity proof) |
+//! | Baseline commit | `1f9f80e` |
+//! | Baseline tool | Python NumPy/SciPy equivalents (§1–§15 from v3) |
+//! | Baseline date | 2026-03-07 |
+//! | Exact command | `cargo run --release --bin benchmark_python_vs_rust_v4` |
+//! | Data | Analytical values + Python library expected outputs |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
 //! New domains:
 //! - §16: Sample variance — `numpy.var(ddof=1)` parity
 //! - §17: Sample covariance — `numpy.cov` parity

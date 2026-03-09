@@ -9,7 +9,7 @@ use std::io::{Read, Write};
 use std::os::unix::net::UnixStream;
 use std::path::PathBuf;
 
-use super::types::{DataChannel, EcologyScenario};
+use super::types::{DataChannel, EcologyScenario, UiConfig};
 
 /// Client for pushing visualization data to `petalTongue`.
 pub struct PetalTonguePushClient {
@@ -194,6 +194,54 @@ impl PetalTonguePushClient {
     ) -> PushResult<()> {
         let params = build_gauge_params(session_id, binding_id, value);
         self.send_rpc("visualization.render.stream", &params)?;
+        Ok(())
+    }
+
+    /// Replace an entire channel with new data.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`PushError`] on connection, serialization, or RPC failure.
+    pub fn push_replace(&self, session_id: &str, channel: &DataChannel) -> PushResult<()> {
+        let params = serde_json::json!({
+            "session_id": session_id,
+            "operation": {
+                "type": "replace",
+                "channel": channel,
+            },
+        });
+        self.send_rpc("visualization.render.stream", &params)?;
+        Ok(())
+    }
+
+    /// Push a full render with domain theme and UI configuration.
+    ///
+    /// Follows healthSpring's `push_render_with_config` pattern for
+    /// domain-specific theming (panel visibility, zoom, theme name).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`PushError`] on connection, serialization, or RPC failure.
+    pub fn push_render_with_config(
+        &self,
+        session_id: &str,
+        title: &str,
+        scenario: &EcologyScenario,
+        config: &UiConfig,
+    ) -> PushResult<()> {
+        let bindings: Vec<&DataChannel> = scenario
+            .nodes
+            .iter()
+            .flat_map(|n| n.data_channels.iter())
+            .collect();
+        let params = serde_json::json!({
+            "session_id": session_id,
+            "title": title,
+            "bindings": bindings,
+            "domain": scenario.domain,
+            "ui_config": config,
+        });
+        self.send_rpc("visualization.render", &params)?;
         Ok(())
     }
 

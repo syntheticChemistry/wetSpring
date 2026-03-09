@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 9, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V101 — 1,047 lib tests + 203 forge tests + 27 doc tests + 178 integration tests = **1,455 total**, 334 experiments, 9,060+ validation checks, 316 binaries. V101 chain: viz evolution (44) + science-to-viz pipeline (34) = **78/78 PASS** (Exp333–334). V100 chain: 173/173 PASS. V99 chain regression: 166/166 PASS. V98 chain regression: 173/173 PASS. Zero local WGSL, zero unsafe code, 179 named tolerances, `cargo clippy -D warnings -W pedantic` **ZERO WARNINGS**, `cargo doc -D warnings` **ZERO WARNINGS**. Ecosystem: barraCuda `a898dee`, toadStool S130+ (`bfe7977b`), coralReef Phase 10 Iteration 10 (`d29a734`). petalTongue visualization: 7 DataChannel types, 13 scenario builders, StreamSession, Songbird capabilities.
+**Status:** V102 — 1,047 lib tests + 203 forge tests + 27 doc tests + 178 integration tests = **1,455 total**, 334 experiments, 9,200+ validation checks, 318 binaries. V102: petalTongue V2 visualization — 8 DataChannel types (added `FieldMap`), **41 scenario builders** (was 13), 4 composite full-pipeline scenarios, `UiConfig`/`ShowPanels`, `BackpressureConfig`, 3 domain push helpers, `push_render_with_config()`, `push_replace()` fix, `wetspring_dashboard` binary, `validate_visualization_v2` (140/140 PASS). V101 chain: 78/78 PASS. V100: 173/173 PASS. V99: 166/166 PASS. V98: 173/173 PASS. Zero local WGSL, zero unsafe code, 179 named tolerances, `cargo clippy -D warnings -W pedantic` **ZERO WARNINGS**. Ecosystem: barraCuda `a898dee`, toadStool S130+ (`bfe7977b`), coralReef Phase 10 Iteration 10 (`d29a734`). petalTongue visualization: 8 DataChannel types, 41 scenario builders, StreamSession with backpressure, Songbird capabilities, `wetspring_dashboard` scientist binary.
 
 ---
 
@@ -92,7 +92,7 @@ integration point.
 | `dispatch` | Capability-based workload routing |
 | `streaming` | Multi-stage GPU pipeline analysis |
 | `bridge` | forge ↔ barracuda device bridge |
-| `visualization` | petalTongue scenario builders (inventory, dispatch, NUCLEUS) |
+| `visualization` | petalTongue scenario builders (41 builders, 8 channel types, streaming, Songbird) |
 
 ---
 
@@ -151,7 +151,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | `barraCuda` primitives consumed | **150+** (always-on, zero fallback code — standalone `barraCuda` v0.3.3 `a898dee`, wgpu 28, PrecisionRoutingAdvice) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 9,060+ validation checks **PASS**. All 1,047 library + 203 forge + 178 integration tests **PASS** (1 ignored: hardware-dependent).
+All 9,200+ validation checks **PASS**. All 1,047 library + 203 forge + 178 integration tests **PASS** (1 ignored: hardware-dependent).
 
 ### GPU Performance
 

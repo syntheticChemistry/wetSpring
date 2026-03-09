@@ -32,15 +32,38 @@ fn data_dir() -> PathBuf {
     validation::data_dir("WETSPRING_NCBI_DIR", "data/ncbi_phase35")
 }
 
+/// Maximum JSON metadata file size (10 MiB).
+///
+/// NCBI metadata files (genome assemblies, biome projects) are typically
+/// 100 KB–2 MB. This guard prevents accidental loading of sequence data
+/// files which belong in streaming parsers, not `read_to_string`.
+const MAX_JSON_METADATA_SIZE: u64 = 10 * 1024 * 1024;
+
 /// Load JSON array — returns an error when data is unavailable.
 ///
-/// Production-grade API: callers handle the error explicitly.
+/// Uses `read_to_string` because the custom bracket-depth JSON splitter
+/// requires random access over the full string. Bounded by
+/// [`MAX_JSON_METADATA_SIZE`] to prevent accidental loading of large
+/// sequence files. For large-file I/O, use the streaming parsers in
+/// `io::fastq`, `io::mzml`, and `io::ms2`.
 fn try_load_json_array<T>(
     path: &std::path::Path,
     array_key: &str,
     from_json: impl Fn(&str) -> T,
     is_valid: impl Fn(&T) -> bool,
 ) -> crate::error::Result<Vec<T>> {
+    let metadata = std::fs::metadata(path).map_err(|e| crate::error::Error::Io {
+        path: path.to_path_buf(),
+        source: e,
+    })?;
+    if metadata.len() > MAX_JSON_METADATA_SIZE {
+        return Err(crate::error::Error::InvalidInput(format!(
+            "JSON metadata file {} is {} bytes (max {}); use streaming parsers for large data",
+            path.display(),
+            metadata.len(),
+            MAX_JSON_METADATA_SIZE,
+        )));
+    }
     let content = std::fs::read_to_string(path).map_err(|e| crate::error::Error::Io {
         path: path.to_path_buf(),
         source: e,

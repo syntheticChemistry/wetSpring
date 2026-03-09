@@ -10,7 +10,17 @@ use std::path::Path;
 
 use crate::bio::taxonomy::{Lineage, NaiveBayesClassifier, ReferenceSeq};
 
+/// SILVA 138 NR99 representative sequences (FASTA).
+///
+/// Source: <https://www.arb-silva.de/download/archive/qiime/>
+/// Accession: SILVA SSU NR99, release 138.1 (2020-08-27).
+/// Mirrored at `data.qiime2.org` for QIIME 2 compatibility.
 const SILVA_FASTA: &str = "silva_138_99_seqs.fasta";
+
+/// SILVA 138 NR99 7-rank taxonomy (TSV).
+///
+/// Source: <https://www.arb-silva.de/download/archive/qiime/>
+/// Accession: SILVA SSU NR99, release 138.1 (2020-08-27).
 const SILVA_TAX_TSV: &str = "silva_138_99_taxonomy.tsv";
 
 /// Subsample stride for SILVA reference (every Nth sequence).

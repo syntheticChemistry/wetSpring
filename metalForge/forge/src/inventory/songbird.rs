@@ -204,7 +204,7 @@ pub fn extract_json_string(json: &str, key: &str) -> Option<String> {
     Some(inner[..end].to_string())
 }
 
-/// Extract a JSON array of strings by key.
+/// Extract a JSON array of strings by key (minimal parser — no serde dependency).
 pub fn extract_json_array_strings(json: &str, key: &str) -> Vec<String> {
     let pattern = format!("\"{key}\"");
     let Some(start) = json.find(&pattern) else {
@@ -230,4 +230,118 @@ pub fn extract_json_array_strings(json: &str, key: &str) -> Vec<String> {
             }
         })
         .collect()
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn extract_json_string_basic() {
+        let json = r#"{"name": "strandgate", "version": "1.0"}"#;
+        assert_eq!(extract_json_string(json, "name").unwrap(), "strandgate");
+        assert_eq!(extract_json_string(json, "version").unwrap(), "1.0");
+    }
+
+    #[test]
+    fn extract_json_string_missing_key() {
+        let json = r#"{"name": "strandgate"}"#;
+        assert!(extract_json_string(json, "missing").is_none());
+    }
+
+    #[test]
+    fn extract_json_array_strings_basic() {
+        let json = r#"{"capabilities": ["compute", "gpu", "f64"]}"#;
+        let caps = extract_json_array_strings(json, "capabilities");
+        assert_eq!(caps, vec!["compute", "gpu", "f64"]);
+    }
+
+    #[test]
+    fn extract_json_array_strings_empty() {
+        let json = r#"{"capabilities": []}"#;
+        let caps = extract_json_array_strings(json, "capabilities");
+        assert!(caps.is_empty());
+    }
+
+    #[test]
+    fn extract_json_array_strings_missing_key() {
+        let json = r#"{"name": "test"}"#;
+        let caps = extract_json_array_strings(json, "capabilities");
+        assert!(caps.is_empty());
+    }
+
+    #[test]
+    fn split_json_objects_basic() {
+        let content = r#"{"a": 1}, {"b": 2}"#;
+        let objects = split_json_objects(content);
+        assert_eq!(objects.len(), 2);
+    }
+
+    #[test]
+    fn split_json_objects_nested() {
+        let content = r#"{"a": {"inner": 1}}, {"b": 2}"#;
+        let objects = split_json_objects(content);
+        assert_eq!(objects.len(), 2);
+    }
+
+    #[test]
+    fn split_json_objects_empty() {
+        assert!(split_json_objects("").is_empty());
+    }
+
+    #[test]
+    fn parse_songbird_substrates_empty_result() {
+        let response = r#"{"jsonrpc":"2.0","result":[],"id":1}"#;
+        let subs = parse_songbird_substrates(response).unwrap();
+        assert!(subs.is_empty());
+    }
+
+    #[test]
+    fn parse_songbird_substrates_error_response() {
+        let response = r#"{"jsonrpc":"2.0","error":{"code":-1,"message":"fail"},"id":1}"#;
+        assert!(parse_songbird_substrates(response).is_err());
+    }
+
+    #[test]
+    fn parse_songbird_substrates_single_gpu_node() {
+        let response = r#"{"jsonrpc":"2.0","result":[{"name":"strandgate","capabilities":["compute","gpu","f64"]}],"id":1}"#;
+        let subs = parse_songbird_substrates(response).unwrap();
+        assert_eq!(subs.len(), 1);
+        assert_eq!(subs[0].kind, SubstrateKind::Gpu);
+        assert!(subs[0].properties.has_f64);
+    }
+
+    #[test]
+    fn parse_single_service_cpu() {
+        let json = r#"{"name": "local-cpu", "capabilities": ["compute", "f64"]}"#;
+        let sub = parse_single_service(json).unwrap();
+        assert_eq!(sub.kind, SubstrateKind::Cpu);
+        assert!(sub.properties.has_f64);
+    }
+
+    #[test]
+    fn parse_single_service_npu() {
+        let json = r#"{"name": "akida-node", "capabilities": ["compute", "npu"]}"#;
+        let sub = parse_single_service(json).unwrap();
+        assert_eq!(sub.kind, SubstrateKind::Npu);
+    }
+
+    #[test]
+    fn parse_single_service_missing_name() {
+        let json = r#"{"capabilities": ["compute"]}"#;
+        assert!(parse_single_service(json).is_none());
+    }
+
+    #[test]
+    fn parse_songbird_substrates_no_result_key() {
+        let response = r#"{"jsonrpc":"2.0","id":1}"#;
+        let subs = parse_songbird_substrates(response).unwrap();
+        assert!(subs.is_empty());
+    }
+
+    #[test]
+    fn discover_songbird_socket_returns_none_without_env() {
+        assert!(discover_songbird_socket().is_none());
+    }
 }

@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 9, 2026 (V101 — barraCuda v0.3.3 `a898dee` + toadStool S130+ `bfe7977b` + coralReef Iteration 10 `d29a734`)
+**Date:** March 9, 2026 (V102 — barraCuda v0.3.3 `a898dee` + toadStool S130+ `bfe7977b` + coralReef Iteration 10 `d29a734`)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 47 GPU modules + 1 IPC + 1 vault + 1 provenance + 1 visualization module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.3, wgpu 28). 1,455 tests, 334 experiments, 9,060+ checks, 179 tolerances, 316 binaries. `cargo clippy -D warnings` CLEAN (default + GPU), **0 silent fallbacks**. **V101:** petalTongue visualization evolution — Spectrum DataChannel, StreamSession, Songbird capabilities, 7 new scenario builders (pangenome, HMM, stochastic, similarity, rarefaction, NMF, streaming pipeline), IPC science→viz wiring: Exp333-334 (78/78 PASS). V100: 173/173 PASS. V99: 166/166 PASS.
+**Status:** 47 CPU + 47 GPU modules + 1 IPC + 1 vault + 1 provenance + 1 visualization module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.3, wgpu 28). 1,455 tests, 334 experiments, 9,200+ checks, 179 tolerances, 318 binaries. `cargo clippy -D warnings` CLEAN (default + GPU), **0 silent fallbacks**. **V102:** petalTongue V2 full-domain visualization — 8 DataChannel types (added FieldMap), 41 scenario builders (28 new domain + 4 composite), UiConfig/BackpressureConfig, wetspring_dashboard binary, validate_visualization_v2 (140/140 PASS). V101: 78/78 PASS. V100: 173/173 PASS. V99: 166/166 PASS.
 
 ### Full Lean Phase
 
@@ -499,3 +499,69 @@ hotSpring's `pub const WGSL` inline approach and wetSpring's upstream Lean
 approach both work for absorption. wetSpring is in Lean phase (all absorbed);
 hotSpring actively in Write phases for new domain-specific ODE shaders.
 Convergent handoff patterns via `wateringHole/`.
+
+---
+
+## Unwired Upstream Primitives — Evolution Plan
+
+Available ToadStool/BarraCuda primitives not yet consumed by wetSpring.
+Each has a concrete use case; wiring is deferred until the domain requires it.
+
+| Primitive | Session | Domain | wetSpring Use Case | Priority |
+|-----------|---------|--------|--------------------|----------|
+| `LogsumexpWgsl` | Early | GPU log-sum-exp | HMM forward pass stability (currently stable without it) | Low |
+| `SparseGemmF64` | S60 | Sparse matrix | Track 3 drug repurposing NMF (CSR × dense) | Medium |
+| `TranseScoreF64` | S60 | KG embedding | Track 3 knowledge graph drug-disease scoring | Medium |
+| `TopK` | S60 | GPU sorting | Track 3 drug-disease pair ranking | Medium |
+| `BandwidthTier` | S62 | PCIe routing | metalForge PCIe-aware cross-substrate dispatch | Low |
+| `ComputeDispatch` | S65 | Pipeline builder | Eliminate remaining BGL/pipeline boilerplate in GPU modules | Medium |
+| `ValidationHarness` | S59 | Test framework | Richer check API (check_abs/check_rel/check_upper) — local `Validator` preferred for now | Low |
+
+**Track 3 blocking:** `SparseGemmF64`, `TranseScoreF64`, and `TopK` are the next
+wiring targets when the drug repurposing sub-thesis advances to GPU promotion.
+
+---
+
+## External Dependency Evolution — Pure Rust Audit
+
+All production dependencies are pure Rust or have pure Rust backends.
+
+| Dependency | Version | Pure Rust? | Notes |
+|------------|---------|:----------:|-------|
+| `barracuda` | path (v0.3.3) | **Yes** | Standalone math primal, zero FFI |
+| `flate2` | 1.0 | **Yes** | `rust_backend` feature → miniz_oxide (no C zlib) |
+| `bytemuck` | 1 | **Yes** | Zero-copy GPU buffer casting |
+| `serde` | 1 (optional) | **Yes** | Derive only |
+| `serde_json` | 1 (optional) | **Yes** | JSON for viz/config |
+| `wgpu` | 28 (optional, gpu) | **Mostly** | Pure Rust WebGPU; `renderdoc-sys` C dep pulled on native via `wgpu-hal` (debug instrumentation only, not required) |
+| `tokio` | 1 (optional, gpu) | **Yes** | Async runtime for GPU device init |
+| `chacha20poly1305` | 0.10 (optional, vault) | **Yes** | RustCrypto AEAD |
+| `ed25519-dalek` | 2.2 (optional, vault) | **Yes** | Dalek Ed25519 signing |
+| `blake3` | 1.8 (optional, vault) | **Yes** | BLAKE3 hashing (SIMD via safe intrinsics) |
+| `akida-driver` | path (optional, npu) | **Yes** | BrainChip AKD1000 via ioctl |
+| `bingocube-nautilus` | path (optional, nautilus) | **Yes** | Evolutionary reservoir computing |
+
+### Sovereign I/O (zero external parsers)
+
+| Format | Implementation | External dep? |
+|--------|---------------|:-------------:|
+| XML (mzML) | `io::xml` sovereign pull parser | **No** |
+| Base64 | `encoding.rs` sovereign decoder | **No** |
+| FASTQ | `io::fastq` streaming parser | **No** |
+| MS2 | `io::ms2` streaming parser | **No** |
+| Newick | `bio::newick` parser | **No** |
+| JSON (minimal) | `ncbi_data` bracket-depth splitter | **No** (full JSON via optional `serde_json`) |
+
+### Evolution target: `renderdoc-sys`
+
+The only transitive C dependency is `renderdoc-sys` via `wgpu-hal`. This provides
+RenderDoc GPU debugging instrumentation. It does not affect runtime correctness
+and is only linked on native targets. Evolution path:
+1. **Current:** Accept as debug-only transitive dep (does not affect ecoBin compliance for CPU builds)
+2. **Future:** When wgpu makes renderdoc optional, disable it via feature flags
+3. **Sovereign:** coralReef sovereign GPU compiler (Level 3+) eliminates wgpu entirely
+
+### ecoBin compliance
+
+CPU builds (`default-features = false`) have **zero C dependencies**: pure Rust
+throughout. GPU builds carry `renderdoc-sys` only; all computation is pure Rust/WGSL.

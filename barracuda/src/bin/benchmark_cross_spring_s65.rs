@@ -25,6 +25,17 @@
 //! 5. GEMM pipeline — wetSpring `GemmCached` → `ToadStool` `GemmF64`
 //! 6. Anderson spectral — `hotSpring` → `ToadStool` → wetSpring
 //! 7. Cross-spring primitive inventory + timing
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Validation class | Benchmark |
+//! | Baseline commit | `e4358c5` |
+//! | Baseline tool | timing harness |
+//! | Baseline date | 2026-02-22 |
+//! | Exact command | `cargo run --features gpu --release --bin benchmark_cross_spring_s65` |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use std::sync::Arc;
 use std::time::Instant;

@@ -9,6 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
+| **V102** | `handoffs/WETSPRING_V102_PETALTONGUE_V2_FULL_DOMAIN_VIZ_HANDOFF_MAR09_2026.md` | Mar 9 | petalTongue V2: 28 new scenario builders (6 tracks), 4 composite full-pipeline, FieldMap channel, UiConfig/BackpressureConfig, push_replace fix, wetspring_dashboard binary, validate_visualization_v2 (140/140). 9,200+ checks. |
+| **V102** | `handoffs/WETSPRING_V102_BARRACUDA_TOADSTOOL_VIZ_EVOLUTION_HANDOFF_MAR09_2026.md` | Mar 9 | barraCuda/toadStool evolution: primitive consumption patterns, API observations (OdeResult helpers, KmerCounts f64), GPU gap (placement batch), lessons learned. |
 | **V101** | `handoffs/WETSPRING_V101_DEEP_DEBT_EVOLUTION_HANDOFF_MAR09_2026.md` | Mar 9 | Deep debt evolution: 179 tolerances (was 164), all bare literals promoted, 3 binaries refactored, clippy pedantic clean, absorption manifest corrected. 1,455 tests, 316 binaries, 9,060+ checks. |
 | **V99** | `handoffs/WETSPRING_V99_BIOMEOS_NUCLEUS_FULL_CHAIN_HANDOFF_MAR08_2026.md` | Mar 8 | biomeOS/NUCLEUS integration + full V99 chain: Exp321-326 (166/166 PASS). Deploy graph, IPC server, cross-primal pipeline, CPU v25 (46), GPU v14 (27), metalForge v17 (29). ToadStool dispatch + NUCLEUS atomic probes. 300 experiments, 8,886+ checks. |
 | **V98+** | `handoffs/WETSPRING_V98_CROSS_SPRING_EVOLUTION_HANDOFF_MAR08_2026.md` | Mar 8 | Cross-spring evolution: Exp319 (52/52) + Exp320 benchmark. All 5 springs exercised, provenance registry (28 shaders, 22 cross-spring). GPU FusedMapReduceF64 validated. |

@@ -2,7 +2,7 @@
 
 **Date:** March 9, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V101 — 334 experiments, 9,060+ validation checks, ALL PASS; 1,455 tests, 316 binaries, standalone `barraCuda` v0.3.3 `a898dee` (wgpu 28, 784+ WGSL shaders), toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`. V101 chain: viz evolution (44) + science-to-viz pipeline (34) = **78/78 PASS**. V100 chain: 173/173 PASS. V99 chain: 166/166 PASS. V98 regression: 173/173 PASS. petalTongue: 7 DataChannel types, 13 scenario builders, StreamSession, Songbird capabilities. biomeOS deploy graph wired, cross-primal IPC pipeline validated. 0 local WGSL, 179 tolerances, 0 unsafe, clippy pedantic ZERO WARNINGS. 52 papers reproduced, 5 springs exercised.
+**Status:** V102 — 334 experiments, 9,200+ validation checks, ALL PASS; 1,455 tests, 318 binaries, standalone `barraCuda` v0.3.3 `a898dee` (wgpu 28, 784+ WGSL shaders), toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`. V102: petalTongue V2 full-domain visualization — 8 DataChannel types, **41 scenario builders**, 4 composite full-pipeline, `UiConfig`/`BackpressureConfig`, `wetspring_dashboard` binary, validate_visualization_v2 **140/140 PASS**. V101 chain: 78/78 PASS. V100: 173/173 PASS. V99: 166/166 PASS. V98: 173/173 PASS. biomeOS deploy graph wired, cross-primal IPC pipeline validated. 0 local WGSL, 179 tolerances, 0 unsafe, clippy pedantic ZERO WARNINGS. 52 papers reproduced, 5 springs exercised.
 
 ---
 
