@@ -39,3 +39,68 @@ pub(super) fn rpc(socket: &Path, request: &str) -> Result<String, String> {
     }
     Ok(line)
 }
+
+#[cfg(test)]
+#[expect(clippy::unwrap_used)]
+mod tests {
+    use super::*;
+    use std::os::unix::net::UnixListener;
+
+    #[test]
+    fn rpc_nonexistent_socket() {
+        let bad = Path::new("/tmp/wetspring_nest_nonexistent_test.sock");
+        let result = rpc(bad, r#"{"jsonrpc":"2.0","method":"ping","id":1}"#);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("connect"));
+    }
+
+    #[test]
+    fn rpc_roundtrip_echo() {
+        let dir = tempfile::tempdir().unwrap();
+        let sock_path = dir.path().join("test_rpc.sock");
+        let listener = UnixListener::bind(&sock_path).unwrap();
+
+        let handle = std::thread::spawn(move || {
+            rpc(&sock_path, r#"{"jsonrpc":"2.0","method":"ping","id":1}"#)
+        });
+
+        let (stream, _) = listener.accept().unwrap();
+        let mut reader = BufReader::new(&stream);
+        let mut req = String::new();
+        reader.read_line(&mut req).unwrap();
+        assert!(req.contains("ping"));
+
+        let mut writer = std::io::BufWriter::new(&stream);
+        writer
+            .write_all(br#"{"jsonrpc":"2.0","result":"pong","id":1}"#)
+            .unwrap();
+        writer.write_all(b"\n").unwrap();
+        writer.flush().unwrap();
+
+        let response = handle.join().unwrap().unwrap();
+        assert!(response.contains("pong"));
+    }
+
+    #[test]
+    fn rpc_server_closes_immediately() {
+        let dir = tempfile::tempdir().unwrap();
+        let sock_path = dir.path().join("close_rpc.sock");
+        let listener = UnixListener::bind(&sock_path).unwrap();
+
+        let handle = std::thread::spawn(move || {
+            rpc(&sock_path, r#"{"jsonrpc":"2.0","method":"ping","id":1}"#)
+        });
+
+        let (stream, _) = listener.accept().unwrap();
+        drop(stream);
+
+        let result = handle.join().unwrap();
+        assert!(result.is_err() || result.as_ref().is_ok_and(String::is_empty));
+    }
+
+    #[test]
+    fn rpc_invalid_socket_path() {
+        let result = rpc(Path::new(""), r#"{"jsonrpc":"2.0","method":"ping","id":1}"#);
+        assert!(result.is_err());
+    }
+}

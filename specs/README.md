@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
-**Last Updated**: March 9, 2026
-**Status**: V105 — 9,200+ checks, ALL PASS (1,288 lib + 219 integration tests, 334 experiments, 318 binaries, standalone barraCuda v0.3.3 `a898dee`, wgpu 28, 150+ primitives, 0 local WGSL, 179 named tolerances, 0 TODO/FIXME/HACK, 0 silent fallbacks, clippy pedantic CLEAN `--all-features`). V105: petalTongue V2 full-domain visualization (9 DataChannel types, 33 scenario builders, 4 composite, UiConfig, BackpressureConfig, wetspring_dashboard). V104: upstream rewire. V103: clippy expect. V102: viz evolution. V101: viz evolution. V100: mixed HW. V99: biomeOS/NUCLEUS
+**Last Updated**: March 10, 2026
+**Status**: V107 — 9,250+ checks, ALL PASS (1,288 lib + 218 forge + 72 integration + 27 doc = 1,605 tests, 335 experiments, 319 binaries, standalone barraCuda v0.3.3 `a898dee`, wgpu 28, 150+ primitives, 0 local WGSL, 180 named tolerances, 0 TODO/FIXME/HACK, 0 silent fallbacks, clippy pedantic CLEAN `--all-features`). V107: R industry parity baselines (vegan, DADA2, phyloseq), 53/53 PASS, `PhyloTree::patristic_distance()`, phyloseq trifurcation bug documented. V106: deep debt cleanup. V105: petalTongue V2. V104: upstream rewire. V103: clippy expect. V102: viz evolution. V101: viz evolution. V100: mixed HW. V99: biomeOS/NUCLEUS
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

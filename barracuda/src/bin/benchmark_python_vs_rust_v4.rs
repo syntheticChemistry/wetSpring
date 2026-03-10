@@ -63,9 +63,7 @@ use wetspring_barracuda::validation::Validator;
 struct ParityBench {
     domain: &'static str,
     python_equiv: &'static str,
-    #[expect(dead_code)]
     expected: f64,
-    #[expect(dead_code)]
     actual: f64,
     tolerance: f64,
     rust_us: u128,
@@ -385,22 +383,28 @@ fn main() {
         "╠═══════════════════════════════════════════════════════════════════════════════════════════════════╣"
     );
     println!(
-        "║ {:19}│ {:36}│ {:>10} │ {:>8} │ {:25} ║",
-        "Domain", "Python Equivalent", "Rust (µs)", "Max Δ", "Workload"
+        "║ {:19}│ {:36}│ {:>10} │ {:>8} │ {:>8} │ {:17} ║",
+        "Domain", "Python Equivalent", "Rust (µs)", "Δ actual", "Tol", "Workload"
     );
     println!(
-        "╠═══════════════════════════════════════════════════════════════════════════════════════════════════╣"
+        "╠═══════════════════════════════════════════════════════════════════════════════════════════════════════════╣"
     );
 
     for b in &benches {
-        let delta = if b.tolerance == 0.0 {
+        let actual_delta = (b.actual - b.expected).abs();
+        let delta_str = if actual_delta == 0.0 {
             "0.00e0".to_string()
         } else {
-            format!("{:.2e}", b.tolerance)
+            format!("{actual_delta:.2e}")
+        };
+        let tol_str = if b.tolerance == 0.0 {
+            "exact".to_string()
+        } else {
+            format!("{:.0e}", b.tolerance)
         };
         println!(
-            "║ {:19}│ {:36}│ {:>10} │ {:>8} │ {:25} ║",
-            b.domain, b.python_equiv, b.rust_us, delta, b.workload
+            "║ {:19}│ {:36}│ {:>10} │ {:>8} │ {:>8} │ {:17} ║",
+            b.domain, b.python_equiv, b.rust_us, delta_str, tol_str, b.workload
         );
     }
 

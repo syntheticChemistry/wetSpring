@@ -2,7 +2,7 @@
 
 **Date:** March 10, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V106 — 334 experiments, 9,200+ validation checks, ALL PASS; 1,605 tests (1,288 lib + 218 forge + 72 integration + 27 doc), 318 binaries, standalone `barraCuda` v0.3.3 `a898dee` (wgpu 28, 784+ WGSL shaders), toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`. V106: deep debt cleanup — 112 stale `#[expect()]` removed, `#![forbid(unsafe_code)]` on all 320 crate roots, BIOM streaming parser, 8 doc link fixes, `NMF_CONVERGENCE` constant. V105: petalTongue V2 full-domain visualization — 9 DataChannel types, **33 scenario builders**, 4 composite full-pipeline. biomeOS deploy graph wired, cross-primal IPC pipeline validated. 0 local WGSL, 180 tolerances, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS. 52 papers reproduced, 5 springs exercised.
+**Status:** V107 — 335 experiments, 9,250+ validation checks, ALL PASS; 1,605 tests (1,288 lib + 218 forge + 72 integration + 27 doc), 319 binaries, standalone `barraCuda` v0.3.3 `a898dee` (wgpu 28, 784+ WGSL shaders), toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`. V107: R industry parity baselines — R/vegan, R/DADA2, R/phyloseq gold-standard references, `validate_r_industry_parity` (53/53 PASS), `PhyloTree::patristic_distance()`, phyloseq trifurcation bug documented. V106: deep debt cleanup — 112 stale `#[expect()]` removed, `#![forbid(unsafe_code)]` on all 320 crate roots, BIOM streaming parser. V105: petalTongue V2 full-domain visualization — 9 DataChannel types, **33 scenario builders**, 4 composite full-pipeline. biomeOS deploy graph wired, cross-primal IPC pipeline validated. 0 local WGSL, 180 tolerances, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS. 52 papers reproduced, 5 springs exercised, R industry parity proven.
 
 ---
 
@@ -103,6 +103,7 @@ Every paper goes through the full evolution. Status across all 52 papers:
 |-------|---------------|----------|
 | Paper math control | Published equations reproduced exactly | 32 papers (Exp251), 27 checks |
 | Python baseline | Algorithm correctness against published tools | 65 scripts (all with reproduction headers + SHA-256 integrity verification) |
+| **R industry baseline** | **Gold-standard parity against R/vegan, R/DADA2, R/phyloseq** | **3 R scripts, 53 checks (Exp335), JSON baselines with SHA-256** |
 | BarraCuda CPU | Rust matches Python within machine precision | 26 domains (v1-v19), bit-identical to SciPy/NumPy (Exp253) |
 | BarraCuda GPU | GPU matches CPU within 1e-6 | 21 GPU domains, 1,783+ checks |
 | Pure GPU streaming | Zero CPU round-trips, data stays on-device | 8 streaming experiments, unidirectional proof (0.10ms overhead, Exp255) |

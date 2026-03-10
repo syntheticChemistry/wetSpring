@@ -39,6 +39,15 @@
 //!
 //! Validation class: GPU-parity
 //! Provenance: CPU reference implementation in `barracuda::bio`
+//!
+//! # Python Baselines
+//!
+//! Multi-domain: analytical (Weir-Cockerham, Euclidean, Gotelli-Colwell).
+//! Contributing scripts:
+//! - `scripts/anderson2017_population_genomics.py` (FST, SNP, pangenome)
+//! - `scripts/algae_timeseries_baseline.py` (rarefaction, diversity)
+//! - `scripts/spectral_match_baseline.py` (spectral cosine)
+//! - `scripts/zheng2023_dtl_reconciliation.py` (DTL reconciliation)
 
 use std::collections::HashMap;
 use wetspring_barracuda::bio::{

@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 10, 2026 (V106 — barraCuda v0.3.3 `a898dee` + toadStool S130+ `bfe7977b` + coralReef Phase 10 `d29a734`)
+**Date:** March 10, 2026 (V107 — barraCuda v0.3.3 `a898dee` + toadStool S130+ `bfe7977b` + coralReef Phase 10 `d29a734`)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 47 GPU modules + 1 IPC + 1 vault + 1 provenance + 1 visualization module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.3, wgpu 28). 1,605 tests (1,288 lib + 218 forge + 72 integration + 27 doc), 334 experiments, 9,200+ checks, 180 tolerances, 318 binaries. `cargo clippy -D warnings -W pedantic -W nursery` CLEAN, **0 silent fallbacks**. `#![forbid(unsafe_code)]` on all 320 crate roots. **V106:** deep debt cleanup — 112 stale `#[expect()]` removed, BIOM streaming, NMF_CONVERGENCE constant, 8 doc link fixes. V105: full-domain viz. V103: upstream rewire. V102: petalTongue V2 (33 scenario builders, 9 DataChannel types). V101: 78/78. V100: 173/173. V99: 166/166.
+**Status:** 47 CPU + 47 GPU modules + 1 IPC + 1 vault + 1 provenance + 1 visualization module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.3, wgpu 28). 1,605 tests (1,288 lib + 218 forge + 72 integration + 27 doc), 335 experiments, 9,250+ checks, 180 tolerances, 319 binaries. `cargo clippy -D warnings -W pedantic -W nursery` CLEAN, **0 silent fallbacks**. `#![forbid(unsafe_code)]` on all 320 crate roots. **V107:** R industry parity baselines — R/vegan + R/DADA2 + R/phyloseq gold-standard references, `validate_r_industry_parity` (53/53 PASS), `PhyloTree::patristic_distance()`, phyloseq trifurcation bug documented. **V106:** deep debt cleanup — 112 stale `#[expect()]` removed, BIOM streaming, NMF_CONVERGENCE constant. V105: full-domain viz. V103: upstream rewire. V102: petalTongue V2 (33 scenario builders, 9 DataChannel types). V101: 78/78. V100: 173/173. V99: 166/166.
 
 ### Full Lean Phase
 

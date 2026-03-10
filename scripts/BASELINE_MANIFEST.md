@@ -172,6 +172,65 @@ Compares current SHA-256 hashes against this manifest. Exit 0 = no drift.
 
 ---
 
+## R Industry Baselines (vegan / dada2 / phyloseq)
+
+**Added:** 2026-03-10 (V106 — R industry parity validation)
+
+These R baselines validate sovereign Rust implementations against the
+gold-standard R packages used by the microbial ecology community (QIIME2,
+mothur, phyloseq workflows). R baselines are supplementary to the Python
+baselines above.
+
+### R Environment
+
+- **R:** 4.1.2 ("Bird Hippie") on x86_64-pc-linux-gnu
+- **vegan:** 2.7.3 (Oksanen et al. — CRAN alpha/beta diversity standard)
+- **dada2:** 1.22.0 (Callahan et al. 2016 — Bioconductor ASV denoiser)
+- **phyloseq:** 1.38.0 (McMurdie & Holmes 2013 — Bioconductor UniFrac/ordination)
+- **ape:** 5.8.1 (Paradis et al. — phylogenetic tree operations)
+- **jsonlite:** (JSON output for Rust validator consumption)
+
+### R Baseline Scripts
+
+| Script | Rust Binary | Domain | SHA-256 (first 16) |
+|--------|-------------|--------|---------------------|
+| `r_vegan_diversity_baseline.R` | `validate_r_industry_parity` | Shannon, Simpson, BC, Chao1, rarefaction, Pielou | `49fd0469caaf16aa` |
+| `r_dada2_error_baseline.R` | `validate_r_industry_parity` | Error model, Phred, OMEGA_A, consensus Q | `edcfbe026b102d14` |
+| `r_phyloseq_unifrac_baseline.R` | `validate_r_industry_parity` | Weighted/unweighted UniFrac, PCoA, cophenetic | `caec562710d8cc3d` |
+
+### R Baseline JSON Outputs
+
+| JSON Output | Source Script | SHA-256 (first 16) |
+|-------------|--------------|---------------------|
+| `experiments/results/r_baselines/vegan_diversity.json` | `r_vegan_diversity_baseline.R` | `a9387cec33513368` |
+| `experiments/results/r_baselines/dada2_error_model.json` | `r_dada2_error_baseline.R` | `1424bf67c6fcdf51` |
+| `experiments/results/r_baselines/phyloseq_unifrac.json` | `r_phyloseq_unifrac_baseline.R` | `088354c831db08f8` |
+
+### Weighted UniFrac Normalization Note
+
+Our Rust `weighted_unifrac` uses **max-normalization**: `Σ b_i|pA-pB| / Σ b_i·max(pA,pB)`.
+R/phyloseq uses **sum-normalization**: `Σ b_i|pA-pB| / Σ tipAge·(pA+pB)`.
+Both are valid weighted UniFrac variants (Lozupone et al. 2007). The validator
+checks structural properties (symmetry, self-distance, bounds, ordering) rather
+than exact values for weighted UniFrac, as the normalization difference is
+well-understood and documented.
+
+Additionally, phyloseq's `fastUniFrac` has a known trifurcation bug: its
+`node.desc` matrix assumes `ncol=2` (binary tree), silently dropping the 3rd
+child via R's matrix recycling. The R baseline uses a strictly bifurcating tree
+to avoid this.
+
+### Reproduction
+
+```bash
+Rscript scripts/r_vegan_diversity_baseline.R
+Rscript scripts/r_dada2_error_baseline.R
+Rscript scripts/r_phyloseq_unifrac_baseline.R
+cargo run --release --bin validate_r_industry_parity
+```
+
+---
+
 ## Verification
 
 Automated (preferred):

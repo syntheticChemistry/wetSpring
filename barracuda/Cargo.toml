@@ -1703,3 +1703,8 @@ required-features = ["json"]
 name = "validate_visualization_v2"
 path = "src/bin/validate_visualization_v2.rs"
 required-features = ["json"]
+
+# ── R Industry Parity Validation (V107) ──
+[[bin]]
+name = "validate_r_industry_parity"
+path = "src/bin/validate_r_industry_parity.rs"

@@ -16,6 +16,7 @@
 //! - `<http://biom-format.org/documentation/format_versions/biom-1.0.html>`
 
 use crate::error::{Error, Result};
+use serde::Deserialize;
 use std::io::BufReader;
 use std::path::Path;
 
@@ -38,6 +39,34 @@ pub struct BiomTable {
     pub sample_ids: Vec<String>,
     /// Dense data matrix (row-major, `n_rows × n_cols`).
     pub data: Vec<f64>,
+}
+
+/// Typed deserialization target — eliminates the `serde_json::Value` DOM.
+#[derive(Deserialize)]
+struct BiomJson {
+    #[serde(default)]
+    id: Option<String>,
+    #[serde(default = "default_format")]
+    format: String,
+    #[serde(default = "default_matrix_type")]
+    matrix_type: String,
+    rows: Vec<BiomRow>,
+    columns: Vec<BiomRow>,
+    data: serde_json::Value,
+}
+
+#[derive(Deserialize)]
+struct BiomRow {
+    #[serde(default)]
+    id: String,
+}
+
+fn default_format() -> String {
+    "1.0.0".into()
+}
+
+fn default_matrix_type() -> String {
+    "dense".into()
 }
 
 impl BiomTable {
@@ -85,6 +114,11 @@ impl BiomTable {
 
 /// Parse a BIOM 1.0 JSON file.
 ///
+/// Uses typed `Deserialize` for direct struct construction — no
+/// intermediate `serde_json::Value` DOM tree. The `data` field is
+/// still parsed as `Value` to handle dense/sparse polymorphism, but
+/// metadata (rows, columns, id, format) deserializes directly.
+///
 /// # Errors
 ///
 /// Returns [`Error::Io`] if the file cannot be read, or
@@ -95,9 +129,9 @@ pub fn parse_biom(path: &Path) -> Result<BiomTable> {
         source: e,
     })?;
     let reader = BufReader::new(file);
-    let val: serde_json::Value = serde_json::from_reader(reader)
+    let raw: BiomJson = serde_json::from_reader(reader)
         .map_err(|e| Error::InvalidInput(format!("BIOM JSON: {e}")))?;
-    parse_biom_value(&val)
+    biom_from_typed(raw)
 }
 
 /// Parse a BIOM 1.0 JSON string.
@@ -106,77 +140,27 @@ pub fn parse_biom(path: &Path) -> Result<BiomTable> {
 ///
 /// Returns [`Error::InvalidInput`] for malformed BIOM JSON.
 pub fn parse_biom_str(json: &str) -> Result<BiomTable> {
-    let val: serde_json::Value =
+    let raw: BiomJson =
         serde_json::from_str(json).map_err(|e| Error::InvalidInput(format!("BIOM JSON: {e}")))?;
-    parse_biom_value(&val)
+    biom_from_typed(raw)
 }
 
-fn parse_biom_value(val: &serde_json::Value) -> Result<BiomTable> {
-    let id = val
-        .get("id")
-        .and_then(serde_json::Value::as_str)
-        .unwrap_or("")
-        .to_owned();
-
-    let format = val
-        .get("format")
-        .and_then(serde_json::Value::as_str)
-        .unwrap_or("1.0.0")
-        .to_owned();
-
-    let matrix_type = val
-        .get("matrix_type")
-        .and_then(serde_json::Value::as_str)
-        .unwrap_or("dense")
-        .to_owned();
-
-    let rows = val
-        .get("rows")
-        .and_then(serde_json::Value::as_array)
-        .ok_or_else(|| Error::InvalidInput("BIOM: missing 'rows' array".into()))?;
-
-    let columns = val
-        .get("columns")
-        .and_then(serde_json::Value::as_array)
-        .ok_or_else(|| Error::InvalidInput("BIOM: missing 'columns' array".into()))?;
-
-    let observation_ids: Vec<String> = rows
-        .iter()
-        .map(|r| {
-            r.get("id")
-                .and_then(serde_json::Value::as_str)
-                .unwrap_or("")
-                .to_owned()
-        })
-        .collect();
-
-    let sample_ids: Vec<String> = columns
-        .iter()
-        .map(|c| {
-            c.get("id")
-                .and_then(serde_json::Value::as_str)
-                .unwrap_or("")
-                .to_owned()
-        })
-        .collect();
-
+fn biom_from_typed(raw: BiomJson) -> Result<BiomTable> {
+    let observation_ids: Vec<String> = raw.rows.into_iter().map(|r| r.id).collect();
+    let sample_ids: Vec<String> = raw.columns.into_iter().map(|c| c.id).collect();
     let n_rows = observation_ids.len();
     let n_cols = sample_ids.len();
 
-    let data_val = val
-        .get("data")
-        .ok_or_else(|| Error::InvalidInput("BIOM: missing 'data' field".into()))?;
-
-    let data = if matrix_type == "sparse" {
-        parse_sparse_data(data_val, n_rows, n_cols)?
+    let data = if raw.matrix_type == "sparse" {
+        parse_sparse_data(&raw.data, n_rows, n_cols)?
     } else {
-        parse_dense_data(data_val, n_rows, n_cols)?
+        parse_dense_data(&raw.data, n_rows, n_cols)?
     };
 
     Ok(BiomTable {
-        id,
-        format,
-        matrix_type,
+        id: raw.id.unwrap_or_default(),
+        format: raw.format,
+        matrix_type: raw.matrix_type,
         n_rows,
         n_cols,
         observation_ids,

@@ -7,18 +7,19 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 10, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V106 — **1,605 tests** (1,288 lib + 218 forge + 72 integration + 27 doc), 334 experiments, 9,200+ validation checks. V106: deep debt cleanup — 112 stale `#[expect()]` removed, `#![forbid(unsafe_code)]` on all 320 crate roots, BIOM streaming parser, 8 doc link fixes, NMF_CONVERGENCE constant. All checks green: fmt, clippy (pedantic+nursery), doc, test. V105: petalTongue visualization evolution — `LivePipelineSession`, `Scatter3D`, 33 scenario builders. Zero local WGSL, zero unsafe code, zero `#[allow]`, `cargo clippy --workspace --all-targets --all-features` **ZERO WARNINGS**. Ecosystem: barraCuda v0.3.3, toadStool S130+, coralReef Phase 10.
+**Status:** V107 — **1,605 tests** (1,288 lib + 218 forge + 72 integration + 27 doc), 335 experiments, 9,250+ validation checks. V107: R industry parity baselines — 3 R scripts (vegan, DADA2, phyloseq) generating gold-standard references, `validate_r_industry_parity` binary (53/53 PASS), `PhyloTree::patristic_distance()`, phyloseq trifurcation bug discovered and documented. V106: deep debt cleanup — 112 stale `#[expect()]` removed, `#![forbid(unsafe_code)]` on all 320 crate roots, BIOM streaming parser. Zero local WGSL, zero unsafe code, zero `#[allow]`, `cargo clippy --workspace --all-targets --all-features` **ZERO WARNINGS**. Ecosystem: barraCuda v0.3.3, toadStool S130+, coralReef Phase 10.
 
 ---
 
 ## What This Is
 
 wetSpring validates the entire evolution path from interpreted-language
-scientific computing (Python/numpy/scipy/sklearn) to sovereign Rust CPU
-implementations, and then to GPU acceleration via `barraCuda`:
+scientific computing (Python/numpy/scipy/sklearn and R/vegan/DADA2/phyloseq)
+to sovereign Rust CPU implementations, and then to GPU acceleration via
+`barraCuda`:
 
 ```
-Python baseline → Rust CPU validation → GPU acceleration → metalForge cross-substrate
+R/Python baseline → Rust CPU validation → GPU acceleration → metalForge cross-substrate
 ```
 
 Six tracks cover the life science, environmental monitoring, and drug repurposing domains:

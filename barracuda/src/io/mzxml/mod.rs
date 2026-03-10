@@ -52,9 +52,19 @@ pub struct MzxmlSpectrum {
     pub intensity_array: Vec<f64>,
 }
 
+/// Reusable zlib decompression buffer for `<peaks>` decoding.
+///
+/// Amortizes allocation across scans — same pattern as
+/// [`crate::io::mzml::decode::DecodeBuffer`].
+#[derive(Default)]
+struct ZlibBuffer {
+    buf: Vec<u8>,
+}
+
 /// Streaming iterator that yields one [`MzxmlSpectrum`] at a time.
 pub struct MzxmlIter {
     reader: XmlReader<BufReader<File>>,
+    zlib_buf: ZlibBuffer,
     done: bool,
 }
 
@@ -74,6 +84,7 @@ impl MzxmlIter {
         reader.set_trim_text(true);
         Ok(Self {
             reader,
+            zlib_buf: ZlibBuffer::default(),
             done: false,
         })
     }
@@ -163,6 +174,7 @@ impl Iterator for MzxmlIter {
                                     peaks_precision,
                                     peaks_byte_order,
                                     peaks_compression,
+                                    &mut self.zlib_buf,
                                 ) {
                                     Ok((mz, intensity)) => {
                                         b.mz_array = mz;
@@ -276,11 +288,13 @@ fn parse_retention_time(s: &str) -> f64 {
 ///
 /// mzXML stores interleaved m/z-intensity pairs in network byte order
 /// (big-endian) by default, unlike mzML which uses little-endian.
+/// Reuses `zlib_buf` across scans to amortize zlib allocation.
 fn decode_peaks(
     encoded: &str,
     precision: u8,
     byte_order: ByteOrder,
     compression: Compression,
+    zlib_buf: &mut ZlibBuffer,
 ) -> Result<(Vec<f64>, Vec<f64>)> {
     let trimmed = encoded.trim();
     if trimmed.is_empty() {
@@ -289,17 +303,17 @@ fn decode_peaks(
 
     let raw = crate::encoding::base64_decode(trimmed)?;
 
-    let bytes: Vec<u8> = match compression {
+    let bytes: &[u8] = match compression {
         Compression::Zlib => {
             use flate2::read::ZlibDecoder;
             use std::io::Read;
+            zlib_buf.buf.clear();
             let mut dec = ZlibDecoder::new(&raw[..]);
-            let mut buf = Vec::new();
-            dec.read_to_end(&mut buf)
+            dec.read_to_end(&mut zlib_buf.buf)
                 .map_err(|e| Error::Zlib(format!("{e}")))?;
-            buf
+            &zlib_buf.buf
         }
-        Compression::None => raw,
+        Compression::None => &raw,
     };
 
     let elem_size: usize = if precision == 64 { 8 } else { 4 };
@@ -419,7 +433,9 @@ mod tests {
     fn decode_peaks_32bit_be() {
         let pairs = [(100.0_f32, 500.0_f32), (200.0, 1500.0), (300.0, 1000.0)];
         let b64 = make_peaks_b64_32be(&pairs);
-        let (mz, int) = decode_peaks(&b64, 32, ByteOrder::Network, Compression::None).unwrap();
+        let mut zb = ZlibBuffer::default();
+        let (mz, int) =
+            decode_peaks(&b64, 32, ByteOrder::Network, Compression::None, &mut zb).unwrap();
         assert_eq!(mz.len(), 3);
         assert!((mz[0] - 100.0).abs() < 0.01);
         assert!((mz[1] - 200.0).abs() < 0.01);
@@ -432,7 +448,9 @@ mod tests {
     fn decode_peaks_64bit_be() {
         let pairs = [(100.0_f64, 500.0_f64), (200.0, 1500.0)];
         let b64 = make_peaks_b64_64be(&pairs);
-        let (mz, int) = decode_peaks(&b64, 64, ByteOrder::Network, Compression::None).unwrap();
+        let mut zb = ZlibBuffer::default();
+        let (mz, int) =
+            decode_peaks(&b64, 64, ByteOrder::Network, Compression::None, &mut zb).unwrap();
         assert_eq!(mz.len(), 2);
         assert!((mz[0] - 100.0).abs() < f64::EPSILON);
         assert!((int[1] - 1500.0).abs() < f64::EPSILON);
@@ -440,7 +458,9 @@ mod tests {
 
     #[test]
     fn decode_empty_peaks() {
-        let (mz, int) = decode_peaks("", 32, ByteOrder::Network, Compression::None).unwrap();
+        let mut zb = ZlibBuffer::default();
+        let (mz, int) =
+            decode_peaks("", 32, ByteOrder::Network, Compression::None, &mut zb).unwrap();
         assert!(mz.is_empty());
         assert!(int.is_empty());
     }
@@ -448,7 +468,8 @@ mod tests {
     #[test]
     fn decode_peaks_wrong_length() {
         let b64 = crate::encoding::base64_encode(&[1, 2, 3]);
-        let result = decode_peaks(&b64, 32, ByteOrder::Network, Compression::None);
+        let mut zb = ZlibBuffer::default();
+        let result = decode_peaks(&b64, 32, ByteOrder::Network, Compression::None, &mut zb);
         assert!(result.is_err());
     }
 

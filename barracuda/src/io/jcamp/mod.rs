@@ -38,8 +38,12 @@ pub struct JcampBlock {
 ///
 /// Handles compound files (multiple `##TITLE=`...`##END=` blocks) by
 /// yielding one [`JcampBlock`] per logical data block.
+///
+/// Uses a single reusable `String` buffer for line I/O — no per-line
+/// allocation (unlike `BufRead::lines()`).
 pub struct JcampIter {
-    lines: std::io::Lines<BufReader<std::fs::File>>,
+    reader: BufReader<std::fs::File>,
+    line_buf: String,
     pending_line: Option<String>,
     done: bool,
 }
@@ -56,10 +60,19 @@ impl JcampIter {
             source: e,
         })?;
         Ok(Self {
-            lines: BufReader::new(file).lines(),
+            reader: BufReader::new(file),
+            line_buf: String::new(),
             pending_line: None,
             done: false,
         })
+    }
+
+    fn read_line(&mut self) -> std::result::Result<Option<&str>, std::io::Error> {
+        self.line_buf.clear();
+        match self.reader.read_line(&mut self.line_buf)? {
+            0 => Ok(None),
+            _ => Ok(Some(&self.line_buf)),
+        }
     }
 }
 
@@ -80,22 +93,22 @@ impl Iterator for JcampIter {
         let mut found_title = false;
 
         loop {
-            let line = if let Some(pending) = self.pending_line.take() {
+            let line: String = if let Some(pending) = self.pending_line.take() {
                 pending
             } else {
-                match self.lines.next() {
-                    Some(Ok(l)) => l,
-                    Some(Err(e)) => {
-                        self.done = true;
-                        return Some(Err(Error::Jcamp(format!("I/O: {e}"))));
-                    }
-                    None => {
+                match self.read_line() {
+                    Ok(Some(l)) => l.to_owned(),
+                    Ok(None) => {
                         self.done = true;
                         return if found_title {
                             Some(Ok(build_block(&metadata, x_vals, y_vals)))
                         } else {
                             None
                         };
+                    }
+                    Err(e) => {
+                        self.done = true;
+                        return Some(Err(Error::Jcamp(format!("I/O: {e}"))));
                     }
                 }
             };

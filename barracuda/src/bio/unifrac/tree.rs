@@ -128,6 +128,57 @@ impl PhyloTree {
     pub fn n_leaves(&self) -> usize {
         self.leaf_index.len()
     }
+
+    /// Patristic (cophenetic) distance between two tips.
+    ///
+    /// Returns `None` if either label is not a leaf. Computes the sum of
+    /// branch lengths on the unique path between the two tips by tracing
+    /// each tip to the root and finding the LCA.
+    #[must_use]
+    pub fn patristic_distance(&self, a: &str, b: &str) -> Option<f64> {
+        let idx_a = self.leaf_idx(a)?;
+        let idx_b = self.leaf_idx(b)?;
+
+        let ancestors_a = self.path_to_root(idx_a);
+        let ancestors_b = self.path_to_root(idx_b);
+
+        let set_b: std::collections::HashSet<usize> =
+            ancestors_b.iter().map(|&(idx, _)| idx).collect();
+
+        let mut dist = 0.0_f64;
+        let mut lca = self.root;
+        for &(node, bl) in &ancestors_a {
+            if set_b.contains(&node) {
+                lca = node;
+                break;
+            }
+            dist += bl;
+        }
+
+        for &(node, bl) in &ancestors_b {
+            if node == lca {
+                break;
+            }
+            dist += bl;
+        }
+
+        Some(dist)
+    }
+
+    /// Trace a node to the root, returning `(node_index, branch_length)` pairs.
+    fn path_to_root(&self, start: usize) -> Vec<(usize, f64)> {
+        let mut path = vec![(start, self.nodes[start].branch_length)];
+        let mut current = start;
+        while current != self.root {
+            let parent = self.nodes[current].parent;
+            if parent == current {
+                break;
+            }
+            current = parent;
+            path.push((current, self.nodes[current].branch_length));
+        }
+        path
+    }
 }
 
 fn parse_label_length(chars: &[char]) -> (String, f64, usize) {

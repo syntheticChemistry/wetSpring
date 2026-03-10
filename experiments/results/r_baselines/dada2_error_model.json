@@ -1,0 +1,29 @@
+{
+  "omega_a": 9.999999999999999e-41,
+  "omega_c": 9.999999999999999e-41,
+  "band_size": 16,
+  "match_score": 4,
+  "mismatch_score": -5,
+  "gap_penalty": -8,
+  "error_rate_q2": 0.6309573444801932,
+  "error_rate_q10": 0.1,
+  "error_rate_q20": 0.01,
+  "error_rate_q30": 0.001,
+  "error_rate_q40": 0.0001,
+  "abundance_pvalues": [1.70967002934891e-10, 0.2642411176571153, 0.9932620530009145, 3.255872177214822e-165, 0.0009995001666250082],
+  "abundance_test_n": [10, 2, 1, 50, 1],
+  "abundance_test_lambda": [0.5, 1, 5, 0.01, 0.001],
+  "phred_qualities": [0, 2, 10, 15, 20, 25, 30, 35, 40],
+  "phred_error_probs": [1, 0.6309573444801932, 0.1, 0.03162277660168379, 0.01, 0.003162277660168379, 0.001, 0.0003162277660168379, 0.0001],
+  "consensus_read_quals": [30, 32, 28, 35, 30],
+  "consensus_mean_error_prob": 0.000906415660591629,
+  "consensus_quality": 30.426725995592964,
+  "metadata": {
+    "tool": "dada2",
+    "version": "1.22.0",
+    "r_version": "4.1.2",
+    "date": "2026-03-10",
+    "platform": "x86_64-pc-linux-gnu",
+    "command": "Rscript scripts/r_dada2_error_baseline.R"
+  }
+}

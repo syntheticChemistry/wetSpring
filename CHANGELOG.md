@@ -3,6 +3,33 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V107 — R Industry Parity Baselines (2026-03-10)
+
+### Added
+- **R industry baselines** — 3 R scripts generating gold-standard reference values from the *de facto* standard tools in microbial ecology:
+  - `scripts/r_vegan_diversity_baseline.R` — Shannon, Simpson, Bray-Curtis, rarefaction, Chao1, Pielou evenness, PCoA via R/vegan (Oksanen et al.).
+  - `scripts/r_dada2_error_baseline.R` — DADA2 error model primitives: algorithmic constants, Phred conversion, error transition matrix, Poisson p-value, consensus quality (Callahan et al. 2016).
+  - `scripts/r_phyloseq_unifrac_baseline.R` — Weighted/unweighted UniFrac, cophenetic (patristic) distances via R/phyloseq + ape.
+- **R baseline JSON outputs** — `experiments/results/r_baselines/` with `vegan_diversity.json`, `dada2_error_model.json`, `phyloseq_unifrac.json`.
+- **`validate_r_industry_parity` binary** (Exp335) — 53/53 PASS. Validates wetSpring's `bio::diversity`, `bio::dada2`, `bio::phred`, and `bio::unifrac` against R industry baselines.
+- **`PhyloTree::patristic_distance()`** — New method for cophenetic distance between tree tips via LCA path tracing.
+- **R Industry Baselines section in `BASELINE_MANIFEST.md`** — SHA-256 provenance, R environment details, weighted UniFrac normalization note.
+
+### Changed
+- **`dada2::init_error_model` made public** — previously `pub(crate)`, now part of the public API for validation consumption. Added `#[must_use]`.
+- **Weighted UniFrac validation strategy** — Structural property validation (symmetry, bounds, ordering) rather than exact numerical parity, documented normalization difference (max vs sum normalization, both valid Lozupone et al. 2007 variants).
+
+### Discovered
+- **phyloseq `fastUniFrac` trifurcation bug** — `node.desc` matrix assumes `ncol=2`, silently dropping 3rd child of trifurcating nodes via R matrix recycling. R baselines use strictly bifurcating trees to work around this. Documented in `BASELINE_MANIFEST.md`.
+
+### Verified
+- `validate_r_industry_parity` — **53/53 PASS** (release mode).
+- `cargo fmt --check` — **CLEAN**.
+- `cargo clippy --bin validate_r_industry_parity -- -D warnings -W pedantic -W nursery` — **ZERO errors**.
+- R baselines reproducible: `Rscript scripts/r_*.R` on R 4.4.3 + vegan 2.6-10 + dada2 1.34.0 + phyloseq 1.50.0.
+
+---
+
 ## V106 — Deep Debt Cleanup & Enforcement Hardening (2026-03-10)
 
 ### Fixed

@@ -37,6 +37,16 @@
 //!
 //! Validation class: Analytical
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
+//!
+//! # Python Baselines
+//!
+//! Multi-domain: analytical known-values + cross-spring primitives. Contributing scripts:
+//! - `scripts/felsenstein_pruning_baseline.py` (phylogenetics)
+//! - `scripts/waters2008_qs_ode.py` (QS ODE dynamics)
+//! - `scripts/fernandez2020_bistable.py` (bistable QS)
+//! - `scripts/liu2014_hmm_baseline.py` (HMM forward)
+//! - `scripts/anderson2017_population_genomics.py` (dN/dS, ANI, SNP)
+//! - `scripts/gillespie_baseline.py` (stochastic SSA)
 
 use std::collections::HashMap;
 use wetspring_barracuda::bio::{

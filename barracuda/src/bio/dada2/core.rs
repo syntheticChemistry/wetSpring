@@ -76,6 +76,7 @@ fn em_step(
 }
 
 /// Initialize error model from Phred quality scores (no prior data).
+#[must_use]
 #[expect(clippy::needless_range_loop)] // 3D array requires indexing by from/to/q
 pub fn init_error_model() -> ErrorModel {
     let mut err = [[[0.0_f64; MAX_QUAL]; NUM_BASES]; NUM_BASES];

@@ -1,0 +1,36 @@
+{
+  "unifrac_unweighted": {
+    "s1_s2": 0,
+    "s1_s3": 0,
+    "s2_s3": 0
+  },
+  "unifrac_weighted": {
+    "s1_s2": 0.6413415468856948,
+    "s1_s3": 0.3259557344064387,
+    "s2_s3": 0.323699421965318
+  },
+  "pcoa_eigenvalues": [0.2056603681511117, 0.001788777293840922],
+  "pcoa_relative_eigenvalues": [0.9913772732589272, 0.008622726741072938],
+  "pcoa_axis1": [0.3210550364860897, -0.3202864983842016, -0.0007685381018881494],
+  "pcoa_axis2": [-0.01720431874046812, -0.01732846363477135, 0.03453278237524028],
+  "cophenetic_ab": 0.3,
+  "cophenetic_ac": 1.4,
+  "cophenetic_cd": 0.9,
+  "tree_newick": "((A:0.1,B:0.2):0.3,(C:0.4,D:0.5):0.6);",
+  "otu_table": {
+    "A": [100, 10, 50],
+    "B": [50, 10, 50],
+    "C": [30, 50, 50],
+    "D": [10, 80, 50]
+  },
+  "sample_names": ["Sample1", "Sample2", "Sample3"],
+  "otu_names": ["A", "B", "C", "D"],
+  "metadata": {
+    "phyloseq_version": "1.38.0",
+    "ape_version": "5.8.1",
+    "r_version": "4.1.2",
+    "date": "2026-03-10",
+    "platform": "x86_64-pc-linux-gnu",
+    "command": "Rscript scripts/r_phyloseq_unifrac_baseline.R"
+  }
+}

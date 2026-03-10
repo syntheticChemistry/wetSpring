@@ -9,6 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
+| **V107** | `handoffs/WETSPRING_V107_R_INDUSTRY_PARITY_BARRACUDA_TOADSTOOL_HANDOFF_MAR10_2026.md` | Mar 10 | R industry parity baselines: R/vegan + R/DADA2 + R/phyloseq gold-standard references, 53/53 PASS, `PhyloTree::patristic_distance()`, phyloseq trifurcation bug discovered, weighted UniFrac normalization analysis, 3 new upstream absorption opportunities (CopheneticMatrixGpu, dual-normalization weighted_unifrac, GPU DADA2 error model). |
+| **V106** | `handoffs/WETSPRING_V106_DEEP_DEBT_CLEANUP_HANDOFF_MAR10_2026.md` | Mar 10 | Deep debt cleanup: 112+ stale `#[expect()]` removed, `#![forbid(unsafe_code)]` on all 320 crate roots, BIOM streaming parser, validates absorption fidelity. |
 | **V105** | `handoffs/WETSPRING_V105_PETALTONGUE_EVOLUTION_HANDOFF_MAR10_2026.md` | Mar 10 | petalTongue visualization evolution: LivePipelineSession, Scatter3D, 33 scenario builders, 5 new domain scenarios (MSA, calibration, spectroscopy, basecalling, NJ), 3 sample profiles, IPC 64KB, scientific ranges. 1,288 lib + 219 integration tests. |
 | **V105** | `handoffs/WETSPRING_V105_BARRACUDA_TOADSTOOL_EVOLUTION_HANDOFF_MAR10_2026.md` | Mar 10 | Comprehensive upstream handoff: 150+ primitives consumed, 47 GPU modules, 6 upstream requests (BipartitionEncodeGpu, CPU Jacobi, merge pairs GPU, BatchReconcileGpu), API evolution observations, visualization layer evolution. |
 | **V104** | `handoffs/WETSPRING_V104_DEEP_DEBT_EVOLUTION_HANDOFF_MAR09_2026.md` | Mar 9 | Deep debt: JCAMP-DX parser, Dorado basecaller, GPU peak integration, #[allow]→#[expect] migration, 56 stale suppressions removed, 8 clippy warnings resolved. |

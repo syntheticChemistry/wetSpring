@@ -124,6 +124,7 @@ pub fn spectroscopy_scenario_from_data(
 }
 
 #[cfg(test)]
+#[expect(clippy::unwrap_used)]
 mod tests {
     use super::*;
 
@@ -144,5 +145,110 @@ mod tests {
     fn from_data_empty() {
         let (scenario, _) = spectroscopy_scenario_from_data("Empty", &[], &[], "x", "y");
         assert_eq!(scenario.nodes.len(), 1);
+    }
+
+    #[test]
+    fn from_data_has_timeseries_channel() {
+        let (scenario, edges) = spectroscopy_scenario_from_data(
+            "UV-Vis",
+            &[200.0, 300.0, 400.0, 500.0],
+            &[0.1, 0.9, 0.5, 0.2],
+            "nm",
+            "Abs",
+        );
+        assert!(edges.is_empty());
+        assert_eq!(scenario.nodes.len(), 1);
+        assert!(!scenario.nodes[0].data_channels.is_empty());
+    }
+
+    #[test]
+    fn scenario_from_jcamp_file() {
+        use std::io::Write;
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("test.jcamp");
+        let mut f = std::fs::File::create(&path).unwrap();
+        writeln!(f, "##TITLE= Test Spectrum").unwrap();
+        writeln!(f, "##DATA TYPE= INFRARED SPECTRUM").unwrap();
+        writeln!(f, "##XUNITS= 1/CM").unwrap();
+        writeln!(f, "##YUNITS= ABSORBANCE").unwrap();
+        writeln!(f, "##PEAK TABLE= (XY..XY)").unwrap();
+        writeln!(f, "4000.0, 0.1").unwrap();
+        writeln!(f, "3500.0, 0.9").unwrap();
+        writeln!(f, "3000.0, 0.5").unwrap();
+        writeln!(f, "##END=").unwrap();
+
+        let (scenario, edges) = spectroscopy_scenario(path.as_path()).unwrap();
+        assert!(edges.is_empty());
+        assert_eq!(scenario.domain, "measurement");
+        assert_eq!(scenario.nodes.len(), 1);
+        let node = &scenario.nodes[0];
+        assert_eq!(node.data_channels.len(), 2);
+        assert!(!node.scientific_ranges.is_empty());
+    }
+
+    #[test]
+    fn scenario_from_jcamp_multi_block() {
+        use std::io::Write;
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("multi.jcamp");
+        let mut f = std::fs::File::create(&path).unwrap();
+        writeln!(f, "##TITLE= Block A").unwrap();
+        writeln!(f, "##XUNITS= 1/CM").unwrap();
+        writeln!(f, "##YUNITS= T").unwrap();
+        writeln!(f, "##PEAK TABLE= (XY..XY)").unwrap();
+        writeln!(f, "1000.0, 50.0").unwrap();
+        writeln!(f, "##END=").unwrap();
+        writeln!(f, "##TITLE= Block B").unwrap();
+        writeln!(f, "##XUNITS= nm").unwrap();
+        writeln!(f, "##YUNITS= Abs").unwrap();
+        writeln!(f, "##PEAK TABLE= (XY..XY)").unwrap();
+        writeln!(f, "200.0, 0.3").unwrap();
+        writeln!(f, "300.0, 0.9").unwrap();
+        writeln!(f, "##END=").unwrap();
+
+        let (scenario, _) = spectroscopy_scenario(path.as_path()).unwrap();
+        let node = &scenario.nodes[0];
+        assert!(node.data_channels.len() >= 3);
+    }
+
+    #[test]
+    fn scenario_empty_title_fallback() {
+        use std::io::Write;
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("notitle.jcamp");
+        let mut f = std::fs::File::create(&path).unwrap();
+        writeln!(f, "##TITLE=").unwrap();
+        writeln!(f, "##PEAK TABLE= (XY..XY)").unwrap();
+        writeln!(f, "100.0, 1.0").unwrap();
+        writeln!(f, "##END=").unwrap();
+
+        let (scenario, _) = spectroscopy_scenario(path.as_path()).unwrap();
+        assert!(scenario.name.contains("JCAMP-DX Spectrum"));
+    }
+
+    #[test]
+    fn scenario_large_peak_table_no_bar() {
+        use std::io::Write;
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("large.jcamp");
+        let mut f = std::fs::File::create(&path).unwrap();
+        writeln!(f, "##TITLE= Large").unwrap();
+        writeln!(f, "##XUNITS= cm-1").unwrap();
+        writeln!(f, "##YUNITS= T").unwrap();
+        writeln!(f, "##PEAK TABLE= (XY..XY)").unwrap();
+        for i in 0..60 {
+            writeln!(f, "{}.0, {}.0", i * 10, i).unwrap();
+        }
+        writeln!(f, "##END=").unwrap();
+
+        let (scenario, _) = spectroscopy_scenario(path.as_path()).unwrap();
+        let node = &scenario.nodes[0];
+        assert_eq!(node.data_channels.len(), 1);
+    }
+
+    #[test]
+    fn scenario_nonexistent_file() {
+        let path = std::path::Path::new("/tmp/nonexistent_wetspring_jcamp_test.jcamp");
+        assert!(spectroscopy_scenario(path).is_err());
     }
 }

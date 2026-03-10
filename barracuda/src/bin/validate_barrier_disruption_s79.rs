@@ -431,7 +431,6 @@ fn main() {
             name: &'static str,
             pathway_score: f64,
             delivery: &'static str,
-            #[expect(dead_code)]
             molecular_weight_da: f64,
             reaches_dermis: bool,
             crosses_barrier_topical: bool,
@@ -487,19 +486,36 @@ fn main() {
 
         let mut scores: Vec<f64> = Vec::new();
         for drug in &drugs {
+            // Lipinski-informed MW penalty: molecules >500 Da get a
+            // permeability discount (Lipinski et al. 1997, Rule of Five).
+            // Biologics (>10 kDa) get heavy penalty for topical delivery.
+            let mw_factor = if drug.molecular_weight_da <= 500.0 {
+                1.0
+            } else if drug.molecular_weight_da <= 10_000.0 {
+                0.9
+            } else {
+                0.6
+            };
+
             let geom = if drug.reaches_dermis { 1.0 } else { 0.4 }
                 * if drug.crosses_barrier_topical {
                     1.0
                 } else {
                     0.8
-                };
+                }
+                * mw_factor;
 
             let anderson_score = drug.pathway_score * geom;
             scores.push(anderson_score);
 
             println!(
-                "  │  {:<24}│ {:.2}    │ {:.2}  │ {:.2}  │ {}",
-                drug.name, drug.pathway_score, geom, anderson_score, drug.delivery
+                "  │  {:<24}│ {:.2}    │ {:.2}  │ {:.2}  │ {} ({:.0} Da)",
+                drug.name,
+                drug.pathway_score,
+                geom,
+                anderson_score,
+                drug.delivery,
+                drug.molecular_weight_da,
             );
         }
 

@@ -40,18 +40,24 @@ impl StatsAccumulator {
 
     #[inline]
     fn add_record(&mut self, sequence: &[u8], quality: &[u8]) {
-        self.num_sequences += 1;
-        let len = sequence.len();
-        self.total_bases += len as u64;
-        self.min_len = self.min_len.min(len);
-        self.max_len = self.max_len.max(len);
-        *self.length_dist.entry(len).or_insert(0) += 1;
+        let gc = sequence
+            .iter()
+            .filter(|&&b| b == b'G' || b == b'C' || b == b'g' || b == b'c')
+            .count();
+        self.add_record_borrowed(sequence.len(), gc, quality);
+    }
 
-        for &base in sequence {
-            if base == b'G' || base == b'C' || base == b'g' || base == b'c' {
-                self.gc_count += 1;
-            }
-        }
+    /// Zero-copy path: accepts pre-computed sequence length and GC count
+    /// so the caller can borrow directly from the I/O buffer without
+    /// allocating a `Vec<u8>` copy.
+    #[inline]
+    fn add_record_borrowed(&mut self, seq_len: usize, gc: usize, quality: &[u8]) {
+        self.num_sequences += 1;
+        self.total_bases += seq_len as u64;
+        self.min_len = self.min_len.min(seq_len);
+        self.max_len = self.max_len.max(seq_len);
+        *self.length_dist.entry(seq_len).or_insert(0) += 1;
+        self.gc_count += gc as u64;
 
         if !quality.is_empty() {
             let mut q_sum: u64 = 0;
@@ -152,10 +158,14 @@ pub fn stats_from_file(path: &Path) -> Result<FastqStats> {
             return Err(header_error_bytes(&buf));
         }
 
-        // Sequence line
+        // Sequence line — borrow directly from buf, no .to_vec()
         buf.clear();
         read_byte_line(reader.as_mut(), &mut buf, path)?;
-        let seq = trim_end(&buf).to_vec();
+        let seq_len = trim_end(&buf).len();
+        let seq_gc = trim_end(&buf)
+            .iter()
+            .filter(|&&b| b == b'G' || b == b'C' || b == b'g' || b == b'c')
+            .count();
 
         // Separator line
         buf.clear();
@@ -166,7 +176,7 @@ pub fn stats_from_file(path: &Path) -> Result<FastqStats> {
         read_byte_line(reader.as_mut(), &mut buf, path)?;
         let qual = trim_end(&buf);
 
-        acc.add_record(&seq, qual);
+        acc.add_record_borrowed(seq_len, seq_gc, qual);
     }
 
     Ok(acc.finish())

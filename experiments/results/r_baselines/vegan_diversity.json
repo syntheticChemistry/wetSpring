@@ -1,0 +1,32 @@
+{
+  "shannon_uniform_10": 2.302585092994045,
+  "simpson_uniform_10": 0.9,
+  "shannon_skewed": 0.5408419468178044,
+  "simpson_skewed": 0.1872863854845837,
+  "bray_curtis_ab": 0.4,
+  "bray_curtis_ac": 0,
+  "bray_curtis_symmetric": true,
+  "rarefaction_depths": [10, 50, 100, 150],
+  "rarefaction_expected_richness": [4.722447124364075, 7.637127333577093, 9.027738574169444, 9.846473673621082],
+  "rarefaction_monotonic": true,
+  "shannon_5species": 1.489750318850591,
+  "simpson_5species": 0.7555555555555555,
+  "jaccard_ab": 0,
+  "pcoa_eigenvalues": [0.1066666666666667, 2.775557561562891e-17, 0],
+  "pcoa_coordinates": {
+    "V1": [0.1333333333333333, -0.2666666666666667, 0.1333333333333334],
+    "V2": [-4.809329095243685e-09, -1.923731638097474e-09, 9.618658190487368e-10]
+  },
+  "chao1_s_obs": 10,
+  "chao1_estimate": 20,
+  "pielou_uniform": 0.9999999999999998,
+  "pielou_skewed": 0.2348846730847844,
+  "metadata": {
+    "tool": "vegan",
+    "version": "2.7.3",
+    "r_version": "4.1.2",
+    "date": "2026-03-10",
+    "platform": "x86_64-pc-linux-gnu",
+    "command": "Rscript scripts/r_vegan_diversity_baseline.R"
+  }
+}

@@ -39,6 +39,14 @@
 //!
 //! Validation class: Analytical
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
+//!
+//! # Python Baselines
+//!
+//! Multi-domain: analytical known-values (no Python script dependency).
+//! I/O fidelity validated against:
+//! - `scripts/validate_exp001.py` (FASTQ parsing parity)
+//! - `scripts/spectral_match_baseline.py` (MS2 spectral math)
+//! - `scripts/algae_timeseries_baseline.py` (diversity formulas)
 
 use std::io::Write;
 use std::path::PathBuf;

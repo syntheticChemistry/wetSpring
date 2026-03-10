@@ -32,6 +32,13 @@
 //!
 //! Validation class: Cross-spring
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
+//!
+//! # Python Baselines
+//!
+//! Physics literature reference — no Python baseline script (analytical/numerical literature values).
+//! Critical exponent ν and `W_c` from published scaling analyses:
+//! - Slevin & Ohtsuki, PRL 82 (1999): `W_c` = 16.54 ± 0.10
+//! - Rodriguez et al., PRB 84 (2011): ν = 1.571 ± 0.004
 
 use wetspring_barracuda::validation::Validator;
 

@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-10 (V106: 334 experiments, 318 binaries, 9,200+ checks. V106: deep debt cleanup — 112 stale `#[expect()]` removed, `#![forbid(unsafe_code)]` on all 320 crate roots, BIOM streaming parser, 8 doc link fixes, `NMF_CONVERGENCE` tolerance. V105: petalTongue V2 full-domain viz — 33 scenario builders, 9 DataChannel types, 4 composite. All 52 papers, biomeOS IPC, petalTongue, cross-primal pipelines, ToadStool dispatch. 1,605 tests, 180 tolerances, clippy pedantic+nursery CLEAN.)
+**Updated**: 2026-03-10 (V107: 335 experiments, 319 binaries, 9,250+ checks. V107: R industry parity baselines — R/vegan, R/DADA2, R/phyloseq gold-standard references, `validate_r_industry_parity` (53/53 PASS), `PhyloTree::patristic_distance()`, phyloseq trifurcation bug documented. V106: deep debt cleanup — 112 stale `#[expect()]` removed, `#![forbid(unsafe_code)]` on all 320 crate roots, BIOM streaming parser. All 52 papers, biomeOS IPC, petalTongue, cross-primal pipelines, ToadStool dispatch. 1,605 tests, 180 tolerances, clippy pedantic+nursery CLEAN.)
 
 ---
 
@@ -194,6 +194,7 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 316 | BarraCuda GPU v13 | gpu | DONE | CPU reference (Exp314) | Full-domain GPU portability, Hybrid-aware, diversity+Anderson+chemistry | 25 |
 | 317 | Pure GPU Streaming v11 | streaming | DONE | CPU+GPU reference | E2E pipeline: diversity→BC→Anderson→stats, zero CPU round-trips | 25 |
 | 318 | metalForge v16 | metalforge | DONE | Pipeline integration | Cross-system paper math, 6 domains, CPU=GPU=NPU | 24 |
+| 335 | R Industry Parity Baselines | cross | DONE | R/vegan + R/DADA2 + R/phyloseq | bio::diversity, bio::dada2, bio::phred, bio::unifrac | 53 |
 
 ---
 
@@ -248,6 +249,10 @@ experiments/
     │   └── rf_python_baseline.json           ← dendropy RF distance baseline
     ├── 022_gillespie/
     │   └── gillespie_python_baseline.json    ← numpy SSA ensemble stats
+    ├── r_baselines/
+    │   ├── vegan_diversity.json        ← R/vegan Shannon, Simpson, BC, rarefaction, Chao1, PCoA
+    │   ├── dada2_error_model.json      ← R/DADA2 error model primitives, Poisson p-values, Phred
+    │   └── phyloseq_unifrac.json       ← R/phyloseq UniFrac, cophenetic distances
     └── track2_validation_report.json   ← combined Track 2 validation
 ```
 
@@ -401,8 +406,9 @@ thresholds from `src/tolerances.rs`.
 | `validate_cross_spring_s86` | 296 | 64 | `cargo run --release --bin validate_cross_spring_s86` |
 | `validate_cross_spring_modern_s86` | 297 | 46 | `cargo run --release --features gpu --bin validate_cross_spring_modern_s86` |
 | `validate_cross_spring_evolution_s87` | 304 | 61 | `cargo run --release --features gpu --bin validate_cross_spring_evolution_s87` |
+| `validate_r_industry_parity` | 335 | 53 | `cargo run --release --bin validate_r_industry_parity` |
 
-**Total validation checks**: 8,604+
+**Total validation checks**: 8,657+
 **Rust tests**: 1,288 lib + 219 integration
 **Binaries**: 296 total (256 validate + 20 benchmark + 20 other)
 **barraCuda primitives**: 150+ consumed (standalone v0.3.3, wgpu 28, Fp64Strategy, fused ops)
@@ -534,7 +540,21 @@ rarefaction, NMF), streaming pipeline builder. IPC `visualization: bool` wiring.
 `dump_wetspring_scenarios` expanded to 13 scenarios with `--stream` flag.
 **V101 chain: 78/78 PASS.**
 
-**Totals: 334 experiments, 316 binaries, 9,060+ checks.**
+### V107 — R Industry Parity Baselines (Exp335)
+
+| Exp | Name | Baseline Tool | Checks | Key Finding |
+|:---:|------|---------------|:------:|-------------|
+| 335 | R Industry Parity Baselines | R/vegan 2.6-10 + R/DADA2 1.34.0 + R/phyloseq 1.50.0 | 53 | wetSpring diversity, DADA2 error model, and UniFrac match R industry standard tools. phyloseq trifurcation bug discovered. |
+
+V107: R/vegan (Shannon, Simpson, Bray-Curtis, rarefaction, Chao1, Pielou, PCoA),
+R/DADA2 (error model constants, Phred conversion, Poisson p-value, consensus quality),
+R/phyloseq (weighted/unweighted UniFrac, cophenetic distances). 3 R scripts emit JSON
+consumed by `validate_r_industry_parity` (53/53 PASS). Discovery: phyloseq's `fastUniFrac`
+has a trifurcation bug (node.desc matrix assumes ncol=2). Normalization difference
+documented (max vs sum normalization, both valid Lozupone et al. 2007 variants).
+New `PhyloTree::patristic_distance()` method added for cophenetic validation.
+
+**Totals: 335 experiments, 319 binaries, 9,110+ checks.**
 
 ---
 
