@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: March 10, 2026 (V108 — 346 experiments, 9,430+ checks, 63 papers complete + 6 reproduced. V108: Track 6 anaerobic digestion (Liao/ADREC) — 5 papers, full 6-tier chain (Paper → CPU → Python parity → GPU → Streaming → metalForge), 183 new checks. Track 5 + Track 6 added to paper math control v6 (63 papers, 38/38). All 46 three-tier eligible papers validated at CPU + GPU + metalForge. barraCuda v0.3.3, clippy pedantic CLEAN)
+**Last Updated**: March 10, 2026 (V109 — 352 experiments, 9,575+ checks, 63 papers complete + 6 reproduced. V109: upstream rewire validation + mixed hardware (NPU→GPU PCIe bypass) + NUCLEUS atomics (Tower/Node/Nest via biomeOS). 6 new experiments (Exp347-352), 145 new checks. V108: Track 6 anaerobic digestion, 5 papers, full 6-tier chain. All 46 three-tier eligible papers validated. barraCuda v0.3.3, clippy ZERO WARNINGS)
 **Purpose**: Track papers for reproduction/review across five tracks
 
 ---
@@ -309,7 +309,7 @@ in a noisy medium (Track 1).
 
 ## Open Data Provenance Audit
 
-All 52 reproductions use publicly accessible data or published model parameters.
+All 63 reproductions use publicly accessible data or published model parameters.
 No proprietary data dependencies.
 
 | Category | Papers | Data Source | Access |
@@ -331,6 +331,7 @@ No proprietary data dependencies.
 | **Drug repurposing** | Exp157-165 | repoDB (1,571 × 1,209), published equations, ROBOKOP KG | Open (PMC, repoDB, algorithmic) |
 | **Diversity fusion** | Exp167 | Synthetic abundance data (CPU ↔ GPU parity) | Open (generated) |
 | **Track 4 soil QS** | Exp170-182 | Published soil metrics (Islam 2014, Zuber 2016, Liang 2015), model equations (Martínez-García 2023, Mukherjee 2024), pore geometry data (Feng 2024), review frameworks (Tecon & Or 2017, Rabot 2018), tillage microbiome (Wang 2025) | Open (journal tables, published equations) |
+| **Track 6 anaerobic** | Exp336-346 | Published biogas kinetics (Yang 2016, Chen 2016, Rojas-Sossa 2017/2019, Zhong 2016), Gompertz/Monod/Haldane parameters, community composition tables | Open (journal tables, published equations) |
 
 ### Validation Tiers by Hardware
 
@@ -372,6 +373,12 @@ No proprietary data dependencies.
 | **V108 GPU v10** | Track 6 GPU portability (4 domains) | Exp344 | 14 |
 | **V108 Pure GPU Streaming v12** | Track 6 unidirectional pipeline (5 stages) | Exp345 | 12 |
 | **V108 metalForge v18** | Track 6 cross-substrate proof (4 domains) | Exp346 | 16 |
+| **V109 CPU v27** | Upstream rewire + Track 6 (6 domains) | Exp347 | 39 |
+| **V109 CPU vs GPU v11** | Sync GPU API + upstream evolution (4 domains) | Exp348 | 19 |
+| **V109 ToadStool v4** | Compute dispatch (6 sections) | Exp349 | 32 |
+| **V109 Streaming v13** | Unidirectional pipeline (7 stages) | Exp350 | 17 |
+| **V109 metalForge v19** | Mixed HW + NUCLEUS atomics (6 domains) | Exp351 | 22 |
+| **V109 NUCLEUS v4** | Tower/Node/Nest + biomeOS graph (6 phases) | Exp352 | 16 |
 
 ### Phase 37 — Anderson-QS Extension Papers
 
@@ -450,10 +457,10 @@ Open Data (NCBI SRA, Zenodo, EPA, journal tables, published equations)
       → metalForge:  Mixed-hardware routing produces identical results (CPU ↔ GPU ↔ NPU)
 ```
 
-**Verification**: 58 papers, 8,400+ checks (incl. Exp306-310: 111 new V97c), 1,288 lib + 219 integration tests. Zero proprietary data dependencies.
+**Verification**: 63 papers, 9,430+ checks (incl. Exp336-346: 183 Track 6), 1,288 lib + 219 integration tests. Zero proprietary data dependencies.
 All Python baselines have reproduction headers (script, commit, date, hardware, SHA-256).
 All Rust validators have provenance classification headers.
-All 103 tolerance constants are scientifically justified and hierarchy-tested.
+All tolerance constants are scientifically justified and hierarchy-tested.
 
 ---
 
@@ -467,5 +474,5 @@ All 103 tolerance constants are scientifically justified and hierarchy-tested.
 - Cahill/Smallwood papers may require Sandia data access agreements
 - Paper 23 (Kachkovskiy) is now validated via cross-spring spectral primitives (Exp107: 25/25 checks)
 - Extension papers (Phase 37-39) are CPU-only by design — they validate analytical models where GPU is not the bottleneck
-- Track 6 papers (Liao/ADREC) are queued for baseCamp Paper 16 — anaerobic-aerobic QS phase transition. Faculty anchor: Wei Liao (ADREC, MSU BAE)
+- Track 6 papers (Liao/ADREC) complete — 5 papers reproduced, full 6-tier chain (Exp336-346, 183 checks). baseCamp Paper 16 Stage 1 computational foundation done. Faculty anchor: Wei Liao (ADREC, MSU BAE)
 - V92D: all library code is panic-free, all clippy pedantic warnings resolved under `--all-features`

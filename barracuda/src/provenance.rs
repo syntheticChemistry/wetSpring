@@ -22,21 +22,21 @@ use barracuda::shaders::provenance::{
 /// Shaders that wetSpring originated and barraCuda absorbed.
 #[must_use]
 pub fn shaders_authored() -> Vec<&'static ShaderRecord> {
-    provenance::shaders_from(SpringDomain::WetSpring)
+    provenance::shaders_from(SpringDomain::WET_SPRING)
 }
 
 /// All shaders wetSpring consumes (from any spring, including self).
 #[must_use]
 pub fn shaders_consumed() -> Vec<&'static ShaderRecord> {
-    provenance::shaders_consumed_by(SpringDomain::WetSpring)
+    provenance::shaders_consumed_by(SpringDomain::WET_SPRING)
 }
 
 /// Shaders from other springs that wetSpring benefits from.
 #[must_use]
 pub fn shaders_from_other_springs() -> Vec<&'static ShaderRecord> {
-    provenance::shaders_consumed_by(SpringDomain::WetSpring)
+    provenance::shaders_consumed_by(SpringDomain::WET_SPRING)
         .into_iter()
-        .filter(|r| r.origin != SpringDomain::WetSpring)
+        .filter(|r| r.origin != SpringDomain::WET_SPRING)
         .collect()
 }
 
@@ -66,7 +66,7 @@ pub fn wetspring_provenance_summary() -> String {
         let consumers: Vec<_> = r
             .consumers
             .iter()
-            .filter(|c| **c != SpringDomain::WetSpring)
+            .filter(|c| **c != SpringDomain::WET_SPRING)
             .map(|c| format!("{c}"))
             .collect();
         if consumers.is_empty() {
@@ -96,12 +96,12 @@ pub fn wetspring_provenance_summary() -> String {
     let _ = writeln!(s, "## Cross-Spring Flows involving wetSpring\n");
     let inbound: usize = matrix
         .iter()
-        .filter(|((_, to), _)| *to == SpringDomain::WetSpring)
+        .filter(|((_, to), _)| *to == SpringDomain::WET_SPRING)
         .map(|(_, v)| v)
         .sum();
     let outbound: usize = matrix
         .iter()
-        .filter(|((from, _), _)| *from == SpringDomain::WetSpring)
+        .filter(|((from, _), _)| *from == SpringDomain::WET_SPRING)
         .map(|(_, v)| v)
         .sum();
     let _ = writeln!(s, "- Inbound (other→wetSpring): {inbound} shader-flows");
@@ -137,15 +137,15 @@ mod tests {
         let consumed = shaders_consumed();
         assert!(consumed.len() >= 10, "wetSpring should consume 10+ shaders");
         let origins: Vec<_> = consumed.iter().map(|r| r.origin).collect();
-        assert!(origins.contains(&SpringDomain::HotSpring));
-        assert!(origins.contains(&SpringDomain::NeuralSpring));
+        assert!(origins.contains(&SpringDomain::HOT_SPRING));
+        assert!(origins.contains(&SpringDomain::NEURAL_SPRING));
     }
 
     #[test]
     fn from_other_springs_excludes_self() {
         let others = shaders_from_other_springs();
         for r in &others {
-            assert_ne!(r.origin, SpringDomain::WetSpring);
+            assert_ne!(r.origin, SpringDomain::WET_SPRING);
         }
     }
 

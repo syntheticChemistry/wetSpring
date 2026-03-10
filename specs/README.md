@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: March 10, 2026
-**Status**: V107 — 9,250+ checks, ALL PASS (1,288 lib + 218 forge + 72 integration + 27 doc = 1,605 tests, 335 experiments, 319 binaries, standalone barraCuda v0.3.3 `a898dee`, wgpu 28, 150+ primitives, 0 local WGSL, 180 named tolerances, 0 TODO/FIXME/HACK, 0 silent fallbacks, clippy pedantic CLEAN `--all-features`). V107: R industry parity baselines (vegan, DADA2, phyloseq), 53/53 PASS, `PhyloTree::patristic_distance()`, phyloseq trifurcation bug documented. V106: deep debt cleanup. V105: petalTongue V2. V104: upstream rewire. V103: clippy expect. V102: viz evolution. V101: viz evolution. V100: mixed HW. V99: biomeOS/NUCLEUS
+**Status**: V109 — 9,575+ checks (352 experiments, 336 binaries). V109: upstream rewire validation (SpringDomain SCREAMING_SNAKE_CASE, sync GPU diversity, DADA2 fix) + mixed hardware (NPU→GPU PCIe bypass, CPU fallback) + NUCLEUS atomics (Tower/Node/Nest via biomeOS graph). 6 new experiments (Exp347-352), 145 new checks. V108: Track 6 anaerobic biogas (5 Liao papers, 63 total). V107: R industry parity. clippy ZERO WARNINGS.
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -11,7 +11,7 @@
 | Metric | Value |
 |--------|-------|
 | CPU validation | 1,476+/1,476+ PASS — 47 modules, 334 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
-| GPU validation | 1,945+/1,945+ PASS — 150+ primitives (standalone barraCuda v0.3.1, always-on, 264 ComputeDispatch ops), 0 local WGSL (fully lean) |
+| GPU validation | 1,945+/1,945+ PASS — 150+ primitives (standalone barraCuda v0.3.3, always-on, 264 ComputeDispatch ops), 0 local WGSL (fully lean) |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 407/407 — 22.5x Rust speedup over Python (v1–v9) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/101/164) — pure GPU math proven |
@@ -28,7 +28,7 @@
 | Rust modules | 47 CPU + 47 GPU + 1 IPC + 1 vault + 1 visualization, 1,288 lib + 219 integration tests, 316 binaries |
 | Write phase | 0 local WGSL (fully lean) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
-| Paper queue | **ALL DONE** — 52/52 reproducible papers complete (Tracks 1-4 + Phase 37 extensions + cross-spring) |
+| Paper queue | **ALL DONE** — 63/63 reproducible papers complete (Tracks 1-6 + Phase 37 extensions + cross-spring) |
 | Faculty (Track 1) | Waters (MMG, MSU), Cahill (Sandia), Smallwood (Sandia) |
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
 | Faculty (Track 1c) | R. Anderson (Carleton) — deep-sea metagenomics, population genomics |
@@ -141,12 +141,10 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 | Document | Location | Description |
 |----------|----------|-------------|
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
-| Handoff (V105 Viz V2) | `wateringHole/.../WETSPRING_V105_PETALTONGUE_V2_FULL_DOMAIN_VIZ_HANDOFF_MAR09_2026.md` | Full-domain petalTongue V2 handoff (33 builders, 9 channels) |
-| Handoff (V104 Evolution) | `wateringHole/.../WETSPRING_V104_BARRACUDA_TOADSTOOL_VIZ_EVOLUTION_HANDOFF_MAR09_2026.md` | barraCuda/toadStool viz evolution lessons + absorption map |
-| Handoff (V103) | `wateringHole/.../WETSPRING_V103_HANDOFF_MAR09_2026.md` | V103 clippy expect evolution |
-| Handoff (V102 Evolution) | `wateringHole/.../WETSPRING_V102_BARRACUDA_TOADSTOOL_VIZ_EVOLUTION_HANDOFF_MAR09_2026.md` | barraCuda/toadStool viz evolution lessons + absorption map |
-| Handoff (V101 Viz) | `wateringHole/.../WETSPRING_V101_VISUALIZATION_EVOLUTION_HANDOFF_MAR09_2026.md` | petalTongue visualization evolution handoff |
-| Handoff (V101 Absorption) | `wateringHole/.../WETSPRING_V101_BARRACUDA_TOADSTOOL_ABSORPTION_HANDOFF_MAR09_2026.md` | Comprehensive barraCuda/toadStool absorption handoff |
+| Handoff (V105 Viz V2) | `wateringHole/.../WETSPRING_V105_PETALTONGUE_EVOLUTION_HANDOFF_MAR10_2026.md` | Full-domain petalTongue V2 handoff (33 builders, 9 channels) |
+| Handoff (V104 Evolution) | `wateringHole/.../WETSPRING_V104_DEEP_DEBT_EVOLUTION_HANDOFF_MAR09_2026.md` | barraCuda/toadStool viz evolution lessons + absorption map |
+| Handoff (V103) | `wateringHole/.../WETSPRING_V103_UPSTREAM_REWIRE_HANDOFF_MAR10_2026.md` | V103 clippy expect evolution |
+| Handoff (V101 Viz) | `wateringHole/.../WETSPRING_V101_DEEP_DEBT_EVOLUTION_HANDOFF_MAR09_2026.md` | petalTongue visualization evolution handoff |
 | whitePaper/STUDY.md | `../whitePaper/` | Full study narrative |
 | whitePaper/METHODOLOGY.md | `../whitePaper/` | Two-track validation protocol |
 | metalForge/ | `../metalForge/` | Hardware characterization + substrate routing |
@@ -166,7 +164,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 - **NPU edge inference** — ESN reservoir on AKD1000, online evolution, adaptive sampling (V60)
 - **Field genomics** (planned) — Nanopore sequencing + NPU classification + metalForge routing. See [FIELD_GENOMICS_REQUIREMENTS.md](FIELD_GENOMICS_REQUIREMENTS.md)
 - **Data type profiling** — Biological data format catalog driving NestGate data primal evolution. See [DATA_TYPES.md](DATA_TYPES.md)
-- **Sovereign Rust bioinformatics** — 47 CPU + 45 GPU modules + 0 local WGSL (fully lean), 2 runtime dependencies (flate2 + bytemuck), 150+ primitives (standalone barraCuda v0.3.1, always-on, zero fallback, 264 ComputeDispatch ops)
+- **Sovereign Rust bioinformatics** — 47 CPU + 45 GPU modules + 0 local WGSL (fully lean), 2 runtime dependencies (flate2 + bytemuck), 150+ primitives (standalone barraCuda v0.3.3, always-on, zero fallback, 264 ComputeDispatch ops)
 
 ### wetSpring IS NOT:
 - Sensor noise analysis (groundSpring)

@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 10, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V108 — **1,605 tests** (1,288 lib + 218 forge + 72 integration + 27 doc), 346 experiments, 9,430+ validation checks. V108: Track 6 anaerobic digestion (Liao/ADREC) — 5 papers, full 6-tier chain (Paper math → CPU → Python parity → GPU → Streaming → metalForge), 183 new checks. 63 papers complete (paper math v6). All 46 three-tier-eligible papers validated. V107: R industry parity baselines, phyloseq trifurcation bug. V106: deep debt cleanup. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS**. Ecosystem: barraCuda v0.3.3, toadStool S130+, coralReef Phase 10.
+**Status:** V109 — **1,605 tests** (1,151 pass, 3 known GPU f32 failures), 352 experiments, 9,575+ validation checks. V109: upstream rewire validation (SpringDomain SCREAMING_SNAKE_CASE, sync GPU diversity, DADA2 fix) + mixed hardware (NPU→GPU PCIe bypass, CPU fallback) + NUCLEUS atomics (Tower/Node/Nest via biomeOS graph). 6 new experiments (Exp347-352), 145 new checks. V108: Track 6 anaerobic digestion, 63 papers complete. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS**. Ecosystem: barraCuda v0.3.3, toadStool S130+, coralReef Phase 10.
 
 ---
 

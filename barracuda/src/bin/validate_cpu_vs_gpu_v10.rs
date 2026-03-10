@@ -130,24 +130,22 @@ fn main() {
             .expect("GPU");
         gpu.print_info();
 
-        let gpu_h_dig = rt.block_on(wetspring_barracuda::bio::diversity_gpu::shannon_gpu(
-            &gpu, &digester,
-        ));
-        let gpu_h_soil = rt.block_on(wetspring_barracuda::bio::diversity_gpu::shannon_gpu(
-            &gpu, &soil,
-        ));
+        let gpu_h_dig = wetspring_barracuda::bio::diversity_gpu::shannon_gpu(&gpu, &digester)
+            .expect("GPU Shannon digester");
+        let gpu_h_soil = wetspring_barracuda::bio::diversity_gpu::shannon_gpu(&gpu, &soil)
+            .expect("GPU Shannon soil");
         v.check(
             "D39: GPU Shannon(digester) = CPU",
             gpu_h_dig,
             cpu_h_dig,
-            tolerances::GPU_CPU_PARITY,
+            tolerances::GPU_VS_CPU_F64,
         );
         d39 += 1;
         v.check(
             "D39: GPU Shannon(soil) = CPU",
             gpu_h_soil,
             cpu_h_soil,
-            tolerances::GPU_CPU_PARITY,
+            tolerances::GPU_VS_CPU_F64,
         );
         d39 += 1;
     }

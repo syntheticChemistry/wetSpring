@@ -41,9 +41,7 @@ mod types;
 use std::fmt::Write;
 
 #[cfg(feature = "gpu")]
-pub(crate) use core::{
-    ErrorModel, base_to_idx, err_model_converged, estimate_error_model, init_error_model,
-};
+pub(crate) use core::{ErrorModel, base_to_idx, err_model_converged, estimate_error_model};
 pub use core::{MAX_ERR_ITERS, denoise, init_error_model, poisson_pvalue};
 #[cfg(feature = "gpu")]
 pub(crate) use core::{MAX_QUAL, MIN_ERR, NUM_BASES};

@@ -82,7 +82,7 @@ fn main() {
 
     println!("\n── §2 wetSpring Authored Shaders ──\n");
 
-    let authored = shaders_from(SpringDomain::WetSpring);
+    let authored = shaders_from(SpringDomain::WET_SPRING);
     println!("  wetSpring originated: {} shaders", authored.len());
     check!("wetSpring authored 4+ bio shaders", authored.len() >= 4);
 
@@ -114,25 +114,25 @@ fn main() {
 
     println!("\n── §3 Cross-Spring Consumption ──\n");
 
-    let consumed = shaders_consumed_by(SpringDomain::WetSpring);
+    let consumed = shaders_consumed_by(SpringDomain::WET_SPRING);
     println!("  wetSpring consumes: {} shaders total", consumed.len());
     check!("wetSpring consumes 10+ shaders", consumed.len() >= 10);
 
     let from_hot: Vec<_> = consumed
         .iter()
-        .filter(|r| r.origin == SpringDomain::HotSpring)
+        .filter(|r| r.origin == SpringDomain::HOT_SPRING)
         .collect();
     let from_neural: Vec<_> = consumed
         .iter()
-        .filter(|r| r.origin == SpringDomain::NeuralSpring)
+        .filter(|r| r.origin == SpringDomain::NEURAL_SPRING)
         .collect();
     let from_air: Vec<_> = consumed
         .iter()
-        .filter(|r| r.origin == SpringDomain::AirSpring)
+        .filter(|r| r.origin == SpringDomain::AIR_SPRING)
         .collect();
     let from_ground: Vec<_> = consumed
         .iter()
-        .filter(|r| r.origin == SpringDomain::GroundSpring)
+        .filter(|r| r.origin == SpringDomain::GROUND_SPRING)
         .collect();
 
     println!(
@@ -161,10 +161,10 @@ fn main() {
     );
 
     // Verify neuralSpring consumes wetSpring bio shaders (bidirectional flow)
-    let neural_consumes = shaders_consumed_by(SpringDomain::NeuralSpring);
+    let neural_consumes = shaders_consumed_by(SpringDomain::NEURAL_SPRING);
     let neural_from_wet: Vec<_> = neural_consumes
         .iter()
-        .filter(|r| r.origin == SpringDomain::WetSpring)
+        .filter(|r| r.origin == SpringDomain::WET_SPRING)
         .collect();
     println!(
         "\n  Bidirectional: neuralSpring consumes {} wetSpring shaders",
@@ -185,15 +185,15 @@ fn main() {
     check!("15+ cross-spring shaders", cross.len() >= 15);
 
     let hot_to_wet = matrix
-        .get(&(SpringDomain::HotSpring, SpringDomain::WetSpring))
+        .get(&(SpringDomain::HOT_SPRING, SpringDomain::WET_SPRING))
         .copied()
         .unwrap_or(0);
     let wet_to_neural = matrix
-        .get(&(SpringDomain::WetSpring, SpringDomain::NeuralSpring))
+        .get(&(SpringDomain::WET_SPRING, SpringDomain::NEURAL_SPRING))
         .copied()
         .unwrap_or(0);
     let neural_to_wet = matrix
-        .get(&(SpringDomain::NeuralSpring, SpringDomain::WetSpring))
+        .get(&(SpringDomain::NEURAL_SPRING, SpringDomain::WET_SPRING))
         .copied()
         .unwrap_or(0);
 
@@ -215,7 +215,7 @@ fn main() {
 
     let wet_events: Vec<_> = timeline
         .iter()
-        .filter(|e| e.from == SpringDomain::WetSpring)
+        .filter(|e| e.from == SpringDomain::WET_SPRING)
         .collect();
     check!(
         "wetSpring has timeline events (bio shader write)",
@@ -264,7 +264,7 @@ fn main() {
         );
         check!(
             "df64_core origin is hotSpring",
-            d.origin == SpringDomain::HotSpring
+            d.origin == SpringDomain::HOT_SPRING
         );
     } else {
         println!("  [FAIL] df64_core.wgsl not found in registry");
@@ -278,7 +278,7 @@ fn main() {
         check!("Welford consumed by all 5 springs", w.consumers.len() == 5);
         check!(
             "Welford origin is groundSpring",
-            w.origin == SpringDomain::GroundSpring
+            w.origin == SpringDomain::GROUND_SPRING
         );
     } else {
         println!("  [FAIL] welford_mean_variance not found in registry");

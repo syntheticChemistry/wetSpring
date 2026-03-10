@@ -1753,3 +1753,30 @@ path = "src/bin/validate_pure_gpu_streaming_v12.rs"
 [[bin]]
 name = "validate_metalforge_v18"
 path = "src/bin/validate_metalforge_v18.rs"
+
+# ── V109: Upstream Rewire + NUCLEUS Atomics (Exp347-352) ──
+
+[[bin]]
+name = "validate_barracuda_cpu_v27"
+path = "src/bin/validate_barracuda_cpu_v27.rs"
+
+[[bin]]
+name = "validate_cpu_vs_gpu_v11"
+path = "src/bin/validate_cpu_vs_gpu_v11.rs"
+
+[[bin]]
+name = "validate_toadstool_dispatch_v4"
+path = "src/bin/validate_toadstool_dispatch_v4.rs"
+
+[[bin]]
+name = "validate_pure_gpu_streaming_v13"
+path = "src/bin/validate_pure_gpu_streaming_v13.rs"
+
+[[bin]]
+name = "validate_metalforge_v19"
+path = "src/bin/validate_metalforge_v19.rs"
+
+[[bin]]
+name = "validate_nucleus_v4"
+path = "src/bin/validate_nucleus_v4.rs"
+required-features = ["ipc"]

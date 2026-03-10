@@ -308,7 +308,7 @@ fn main() {
         g29 += 1;
 
         let wetspring_shaders = barracuda::shaders::provenance::shaders_from(
-            barracuda::shaders::provenance::types::SpringDomain::WetSpring,
+            barracuda::shaders::provenance::types::SpringDomain::WET_SPRING,
         );
         v.check_pass(
             &format!(

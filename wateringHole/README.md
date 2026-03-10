@@ -9,6 +9,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
+| **V109** | `handoffs/WETSPRING_V109_UPSTREAM_REWIRE_NUCLEUS_HANDOFF_MAR10_2026.md` | Mar 10 | Upstream rewire validation (SpringDomain SCREAMING_SNAKE_CASE, sync GPU diversity, DADA2 fix) + mixed hardware (NPU→GPU PCIe bypass, CPU fallback) + NUCLEUS atomics (Tower/Node/Nest via biomeOS graph). 6 experiments (Exp347-352), 145/145 PASS. Absorption: Gompertz/Monod/Haldane → `barracuda::bio::kinetics`, `variance` re-export, spectral CPU fallback. |
 | **V107** | `handoffs/WETSPRING_V107_R_INDUSTRY_PARITY_BARRACUDA_TOADSTOOL_HANDOFF_MAR10_2026.md` | Mar 10 | R industry parity baselines: R/vegan + R/DADA2 + R/phyloseq gold-standard references, 53/53 PASS, `PhyloTree::patristic_distance()`, phyloseq trifurcation bug discovered, weighted UniFrac normalization analysis, 3 new upstream absorption opportunities (CopheneticMatrixGpu, dual-normalization weighted_unifrac, GPU DADA2 error model). |
 | **V106** | `handoffs/WETSPRING_V106_DEEP_DEBT_CLEANUP_HANDOFF_MAR10_2026.md` | Mar 10 | Deep debt cleanup: 112+ stale `#[expect()]` removed, `#![forbid(unsafe_code)]` on all 320 crate roots, BIOM streaming parser, validates absorption fidelity. |
 | **V105** | `handoffs/WETSPRING_V105_PETALTONGUE_EVOLUTION_HANDOFF_MAR10_2026.md` | Mar 10 | petalTongue visualization evolution: LivePipelineSession, Scatter3D, 33 scenario builders, 5 new domain scenarios (MSA, calibration, spectroscopy, basecalling, NJ), 3 sample profiles, IPC 64KB, scientific ranges. 1,288 lib + 219 integration tests. |

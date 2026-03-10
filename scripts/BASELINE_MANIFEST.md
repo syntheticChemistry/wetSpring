@@ -142,6 +142,12 @@ Compares current SHA-256 hashes against this manifest. Exit 0 = no drift.
 | `fajgenbaum_pathway_scoring.py` | `validate_fajgenbaum_pathway` | 157 | Pathway scoring | `6e906b0159e0c26a` |
 | `transe_knowledge_graph.py` | `validate_knowledge_graph_embedding` | 161 | TransE (KG) | `a8d567aaf686a847` |
 
+### Track 6 — Anaerobic Biogas Kinetics (Liao / ADREC)
+
+| Script | Rust Binary | Exp | Tool | SHA-256 (first 16) |
+|--------|-------------|-----|------|---------------------|
+| `python_anaerobic_biogas_baseline.py` | `validate_barracuda_cpu_v27`, `validate_anaerobic_*` | 336-346 | scipy/numpy | `c6b8082fad3abc73` |
+
 ### Track 4 — No-Till Soil QS & Anderson Geometry
 
 | Script | Rust Binary | Exp | Tool | SHA-256 (first 16) |

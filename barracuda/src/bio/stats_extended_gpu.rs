@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Extended GPU statistics via barraCuda v0.3.1 primitives.
+//! Extended GPU statistics via barraCuda v0.3.3 primitives.
 //!
 //! Wires barraCuda's GPU-accelerated jackknife, bootstrap, Kimura fixation,
 //! and Hargreaves ET₀ — avoiding CPU round-trips for large-batch operations.

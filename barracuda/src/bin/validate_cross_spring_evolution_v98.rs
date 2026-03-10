@@ -88,11 +88,11 @@ fn main() {
         println!("  Total shaders in registry: {total}");
 
         let domains = [
-            ("hotSpring", SpringDomain::HotSpring),
-            ("wetSpring", SpringDomain::WetSpring),
-            ("neuralSpring", SpringDomain::NeuralSpring),
-            ("airSpring", SpringDomain::AirSpring),
-            ("groundSpring", SpringDomain::GroundSpring),
+            ("hotSpring", SpringDomain::HOT_SPRING),
+            ("wetSpring", SpringDomain::WET_SPRING),
+            ("neuralSpring", SpringDomain::NEURAL_SPRING),
+            ("airSpring", SpringDomain::AIR_SPRING),
+            ("groundSpring", SpringDomain::GROUND_SPRING),
         ];
 
         println!("\n  Shaders originated per spring:");
@@ -126,7 +126,7 @@ fn main() {
             );
         }
 
-        let wet_authored = shaders_from(SpringDomain::WetSpring);
+        let wet_authored = shaders_from(SpringDomain::WET_SPRING);
         println!("\n  wetSpring-authored shaders:");
         for s in &wet_authored {
             println!("    {} → {:?}", s.path, s.consumers);

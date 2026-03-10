@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-10 (V108: 346 experiments, 330+ binaries, 9,430+ checks. V108: Track 6 anaerobic digestion (Liao/ADREC) — 5 papers, full 6-tier chain, 183 new checks. 63 papers (paper math v6). V107: R industry parity baselines, phyloseq bug. V106: deep debt cleanup. All 63 papers + 6 reproduced, biomeOS IPC, petalTongue, cross-primal pipelines, ToadStool dispatch. 1,605 tests, 180 tolerances, clippy pedantic+nursery CLEAN.)
+**Updated**: 2026-03-10 (V109: 352 experiments, 330+ binaries, 9,575+ checks. V109: upstream rewire validation + mixed hardware (NPU→GPU PCIe bypass) + NUCLEUS atomics (Tower/Node/Nest via biomeOS). 6 new experiments (Exp347-352), 145 new checks. V108: Track 6 anaerobic digestion, 63 papers. V107: R industry parity. 1,605 tests, clippy ZERO WARNINGS.)
 
 ---
 
@@ -554,7 +554,18 @@ has a trifurcation bug (node.desc matrix assumes ncol=2). Normalization differen
 documented (max vs sum normalization, both valid Lozupone et al. 2007 variants).
 New `PhyloTree::patristic_distance()` method added for cophenetic validation.
 
-**Totals: 335 experiments, 319 binaries, 9,110+ checks.**
+### V109 — Upstream Rewire + NUCLEUS Atomics (March 2026)
+
+Exp347-352: V109 validation chain proving upstream rewire correctness, mixed
+hardware dispatch (NPU→GPU PCIe bypass, CPU fallback), and NUCLEUS atomic
+coordination (Tower/Node/Nest via biomeOS graph execution). 6 experiments,
+12 new Rust binaries, 145 new checks (39 + 19 + 32 + 17 + 22 + 16).
+
+Upstream barracuda evolved: `plasma_dispersion` and `spectral::stats` now
+require `gpu` feature; `variance` not exported (use `covariance(x,x)`);
+`ln_gamma` returns `Result<f64>`.
+
+**Totals: 352 experiments, 336 binaries, 9,575+ checks.**
 
 ---
 

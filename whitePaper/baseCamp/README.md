@@ -2,7 +2,7 @@
 
 **Date:** March 10, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V107 — 335 experiments, 9,250+ validation checks, ALL PASS; 1,605 tests (1,288 lib + 218 forge + 72 integration + 27 doc), 319 binaries, standalone `barraCuda` v0.3.3 `a898dee` (wgpu 28, 784+ WGSL shaders), toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`. V107: R industry parity baselines — R/vegan, R/DADA2, R/phyloseq gold-standard references, `validate_r_industry_parity` (53/53 PASS), `PhyloTree::patristic_distance()`, phyloseq trifurcation bug documented. V106: deep debt cleanup — 112 stale `#[expect()]` removed, `#![forbid(unsafe_code)]` on all 320 crate roots, BIOM streaming parser. V105: petalTongue V2 full-domain visualization — 9 DataChannel types, **33 scenario builders**, 4 composite full-pipeline. biomeOS deploy graph wired, cross-primal IPC pipeline validated. 0 local WGSL, 180 tolerances, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS. 52 papers reproduced, 5 springs exercised, R industry parity proven.
+**Status:** V109 — 352 experiments, 9,575+ validation checks, ALL PASS; 1,605 tests (1,151 pass, 3 known GPU f32 failures), 330+ binaries, standalone `barraCuda` v0.3.3 (wgpu 28, 784+ WGSL shaders), toadStool S142+, coralReef Iteration 29. V109: upstream rewire validation (SpringDomain SCREAMING_SNAKE_CASE, sync GPU diversity API, DADA2 fix) + mixed hardware (NPU→GPU PCIe bypass, CPU fallback) + NUCLEUS atomics (Tower/Node/Nest via biomeOS graph), 6 experiments (Exp347-352, 145/145 PASS). V108: Track 6 anaerobic biogas — 5 Liao group papers, Gompertz/first-order/Monod/Haldane kinetics, full 6-tier chain (Exp336-346, 183 checks). V107: R industry parity — R/vegan + R/DADA2 + R/phyloseq gold-standard (53/53 PASS). 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL, 180 tolerances, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS.
 
 ---
 
@@ -45,13 +45,14 @@ All code is AGPL-3.0.
 | **V89 S79 Rewire** | — | cross | — | 271 | 73 | Cross-spring S79 provenance: 13 domains, 6 springs, `MultiHeadBioEsn`, `SpectralAnalysis` IPC, ToadStool S79 deep rewire |
 | **V90 Bio Brain** | — | cross | — | 272 | 64 | hotSpring 4-layer brain → `BioBrain`, 36-head Gen2 → `BioHeadGroupDisagreement` + `AttentionState`, bingoCube/nautilus → `BioNautilusBrain`, 3 IPC methods, 7 domains, 7 springs |
 | **V97c Fused Ops** | — | chain | — | Exp306-310 | 111 | Welford, Pearson, Spearman, CorrMatrix, streaming, metalForge |
-| **V98 Full Chain** | — | chain | — | Exp313-318 | 173 | All 52 papers, 33 bio modules, GPU Hybrid-aware, streaming, metalForge |
+| **V98 Full Chain** | — | chain | — | Exp313-318 | 173 | 52 papers (pre-Track 6), 33 bio modules, GPU Hybrid-aware, streaming, metalForge |
 | **V98+ Cross-Spring** | — | evolution | — | Exp319-320 | 52 | All 5 springs, 28 shaders, 22 cross-spring, GPU FusedMapReduceF64, 24 benchmarks |
 | **V99 biomeOS/NUCLEUS** | — | integration | — | Exp321-322 | 64 | biomeOS IPC server, JSON-RPC 2.0, NUCLEUS env probe, cross-primal pipeline, brain module |
 | **V99 Chain** | — | chain | — | Exp323-326 | 102 | CPU v25 (46), GPU v14 (27), metalForge v17 (29), ToadStool dispatch, NUCLEUS probes |
 | **V100 petalTongue + Mixed HW** | — | viz+dispatch | — | Exp327-332 | 173 | petalTongue schema, 5 scenario builders, CPU/GPU math parity, metalForge viz, biomeOS full chain, local evolution, mixed HW dispatch |
 | **V101 Viz Evolution** | — | viz | — | Exp333-334 | 78 | 9 DataChannel types, 33 scenario builders, StreamSession, Songbird, IPC science→viz, streaming pipeline |
-| **Total** | | | **52** | | **9,060+** | |
+| **V108 Track 6 Anaerobic** | Liao (MSU BAE) | 6 | 5+6 | Exp336-346 | 183 | Gompertz, first-order, Monod, Haldane kinetics, anaerobic diversity, Anderson W mapping, full 6-tier chain |
+| **Total** | | | **63** | | **9,430+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -97,17 +98,17 @@ All code is AGPL-3.0.
 
 ## Validation Chain
 
-Every paper goes through the full evolution. Status across all 52 papers:
+Every paper goes through the full evolution. Status across all 63 papers:
 
 | Stage | What It Proves | Coverage |
 |-------|---------------|----------|
-| Paper math control | Published equations reproduced exactly | 32 papers (Exp251), 27 checks |
+| Paper math control | Published equations reproduced exactly | 63 papers (Exp341), 38 checks |
 | Python baseline | Algorithm correctness against published tools | 65 scripts (all with reproduction headers + SHA-256 integrity verification) |
 | **R industry baseline** | **Gold-standard parity against R/vegan, R/DADA2, R/phyloseq** | **3 R scripts, 53 checks (Exp335), JSON baselines with SHA-256** |
 | BarraCuda CPU | Rust matches Python within machine precision | 26 domains (v1-v19), bit-identical to SciPy/NumPy (Exp253) |
 | BarraCuda GPU | GPU matches CPU within 1e-6 | 21 GPU domains, 1,783+ checks |
 | Pure GPU streaming | Zero CPU round-trips, data stays on-device | 8 streaming experiments, unidirectional proof (0.10ms overhead, Exp255) |
-| metalForge | Same answer on CPU, GPU, NPU | 50/50 papers, 37+ domains |
+| metalForge | Same answer on CPU, GPU, NPU | 63/63 papers, 37+ domains |
 | NPU reservoir | ESN → int8 → NPU preserves classification (Cholesky solve) | 59 checks, 6 domains |
 | Cross-spring evolution | 767+ WGSL shaders traced to origin springs, 144 barraCuda primitives consumed | 21 checks |
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
@@ -321,10 +322,11 @@ and ComputeDispatch from Barracuda wired into metalForge bridge/dispatch.
 
 ## Open Data
 
-All 52 reproductions plus 5 fused ops experiments use publicly accessible data or published model parameters.
+All 63 reproductions plus 5 fused ops experiments use publicly accessible data or published model parameters.
 No proprietary data dependencies. Sources: NCBI SRA, Zenodo, MassBank, EPA,
 Michigan EGLE, published ODE parameters, repoDB, algorithmic (no external data),
-published soil metrics (Islam 2014, Zuber 2016, Liang 2015), and published
-model equations (Martínez-García 2023, Tecon & Or 2017, Wang 2025).
+published soil metrics (Islam 2014, Zuber 2016, Liang 2015), published
+model equations (Martínez-García 2023, Tecon & Or 2017, Wang 2025), and published
+biogas kinetics parameters (Yang 2016, Chen 2016, Rojas-Sossa 2017/2019, Zhong 2016).
 
 See `../specs/PAPER_REVIEW_QUEUE.md` for the full provenance audit.

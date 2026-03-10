@@ -3,6 +3,31 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V109 — Upstream Rewire + NUCLEUS Atomics Validation Chain (2026-03-10)
+
+### Added
+- **V109 validation chain** — 6 experiments proving upstream rewire correctness, mixed hardware dispatch, and NUCLEUS atomic coordination:
+  - Exp347: BarraCuda CPU v27 — 39/39 PASS. Upstream stats/linalg/special regression + Track 6 biogas + cross-spring provenance (SpringDomain::WET_SPRING).
+  - Exp348: CPU vs GPU v11 — 19/19 PASS. Sync GPU diversity API (shannon_gpu now sync), GPU_VS_CPU_F64 tolerance.
+  - Exp349: ToadStool Dispatch v4 — 32/32 PASS. Full compute dispatch: stats, linalg, special, numerical (trapz), bio, Track 6 kinetics.
+  - Exp350: Pure GPU Streaming v13 — 17/17 PASS. 7-stage unidirectional pipeline: Shannon→BC→Gompertz→Monod/Haldane→W→stats→cross-track.
+  - Exp351: metalForge v19 — 22/22 PASS. Mixed hardware: NPU→GPU PCIe bypass, CPU fallback, cross-substrate determinism.
+  - Exp352: NUCLEUS v4 — 16/16 PASS. Tower/Node/Nest atomics, biomeOS graph execution, IPC dispatch (~117µs/call, bit-exact vs direct).
+
+### Changed
+- **Upstream barracuda** — plasma_dispersion and spectral::stats now require `gpu` feature; `barracuda::stats::variance` not publicly exported (use `covariance(x,x)`); `barracuda::special::ln_gamma` returns `Result<f64>`.
+- **Test suite** — 1,151/1,154 pass (3 known pre-existing GPU f32 parity failures: hamming_gpu, jaccard_gpu, spatial_payoff_gpu).
+
+### Verified
+- `validate_barracuda_cpu_v27` — **39/39 PASS** (6 domains)
+- `validate_cpu_vs_gpu_v11` — **19/19 PASS** (4 domains, GPU parity included)
+- `validate_toadstool_dispatch_v4` — **32/32 PASS** (6 sections)
+- `validate_pure_gpu_streaming_v13` — **17/17 PASS** (7 pipeline stages)
+- `validate_metalforge_v19` — **22/22 PASS** (6 domains)
+- `validate_nucleus_v4` — **16/16 PASS** (6 phases, Tower/Node/Nest READY)
+- `cargo fmt --check` — **CLEAN**
+- `cargo clippy --features gpu,ipc` — **ZERO warnings**
+
 ## V108 — Track 6 Anaerobic Digestion Full Chain (2026-03-10)
 
 ### Added

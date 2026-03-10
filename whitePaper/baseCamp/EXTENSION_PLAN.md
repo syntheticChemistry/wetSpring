@@ -1,8 +1,8 @@
 # baseCamp Extension Plan: From Validated Math to Real-World Science
 
-**Date:** March 3, 2026 (updated)
-**Author:** wetSpring Phase 95 (ecoPrimals)
-**Foundation:** 281 experiments, 8,300+ checks, 52 papers (6 proposed), 150+ primitives (standalone barraCuda v0.3.1), Python parity proven, cross-spring provenance validated (Exp271: 73/73, 6 springs + Exp272: 64/64, 7 springs + Exp305: 59/59, cross-spring evolution), unified discovery, handler refactoring, 1,261 lib+forge tests, 94.69% coverage, Paper 12: full three-tier immunological Anderson (Exp273-279: 157/157 checks — science, CPU parity, GPU, streaming, metalForge). V95: RK45 adaptive ODE, 6 new GPU ops, gradient_1d.
+**Date:** March 10, 2026 (V109 update)
+**Author:** wetSpring V109 (ecoPrimals)
+**Foundation:** 352 experiments, 9,575+ checks, 63 papers reproduced, 150+ primitives (standalone barraCuda v0.3.3), Python parity proven, cross-spring provenance validated (Exp271: 73/73, 6 springs + Exp272: 64/64, 7 springs + Exp305: 59/59, cross-spring evolution), 1,605 tests, Paper 12: full three-tier immunological Anderson, Paper 16: Stage 1 computational foundation complete (Track 6 anaerobic biogas, Exp336-346, 183 checks). V109: upstream API migration complete, NUCLEUS atomics validated (Tower/Node/Nest via biomeOS graph), 8-tier validation chain proven.
 
 ---
 
@@ -19,7 +19,8 @@ V90:    Bio brain cross-spring ingest?     ✅ PROVEN (Exp272: 7 springs, 64/64 
 V91:    Deep debt + idiomatic evolution?   ✅ PROVEN (unified discovery, handler refactoring, 1,088 tests)
 V92C:   Immunological Anderson (Paper 12)? ✅ PROVEN (Exp273-279: 157/157 — science + CPU parity + GPU + streaming + metalForge)
 V92b:   Gonzales paper reproductions? ✅ PROVEN (Exp280-286: 202/202 — IC50 dose-response + PK decay + IL-31 serum + CPU parity + GPU + streaming + metalForge)
-V95:    What can we discover with it?      ← HERE
+V108:   Track 6 anaerobic biogas?        ✅ PROVEN (Exp336-346: 183/183 — 5 Liao papers, Gompertz/Monod/Haldane, full 6-tier chain, 63 papers total)
+V108+:  What can we discover with it?      ← HERE
 ```
 
 ### New Since V84: Cross-Spring Evolution (V89–V90)
@@ -254,8 +255,12 @@ reader) and `bio::basecall` (signal → base) into BarraCuda.
 
 | Extension | Data Size | Compute Time | Hardware | Priority |
 |-----------|-----------|--------------|----------|----------|
+| Liao group supplementary | <1GB | minutes | Eastgate alone | **P0 — do now** |
 | EMP 30K samples | 2GB | 20 min GPU | Eastgate alone | **P0 — do now** |
 | KBS LTER time series | 200GB | 4 hours | Eastgate alone | **P0 — do now** |
+| Cold seep 170 metagenomes | 5GB | 2h GPU | Eastgate alone | P0.5 |
+| Tara Oceans 243 stations | ~10GB | 30 min GPU | Eastgate alone | P1 |
+| HMP 4,700 samples | ~20GB | 1h GPU | Eastgate alone | P1 |
 | SRA longitudinal atlas | 1-50TB | 80 tower-hours | LAN mesh | P1 — after 10G cables |
 | AMR surveillance | 50GB | hours | Eastgate alone | P1 |
 | Mycorrhizal Anderson | 10GB | hours | Eastgate alone | P1 |
@@ -266,6 +271,8 @@ reader) and `bio::basecall` (signal → base) into BarraCuda.
 **Total storage appetite:** ~50TB at full SRA atlas scale. Westgate has 76TB.
 **Total compute appetite:** ~100 tower-hours for the full atlas. LAN mesh
 handles it in a weekend. Eastgate alone handles everything else.
+**Track 6 note:** All P0 and P0.5 items can leverage the newly validated
+Gompertz/Monod/Haldane kinetics models for any microbial growth system.
 
 ---
 
@@ -309,6 +316,7 @@ By the end of Phase 2, the baseCamp papers have:
 | 08 NPU IoT | Live hardware | Multi-gate NPU mesh |
 | 09 Field Genomics | Architecture defined | MinION hardware-validated |
 | 10 coralForge | GPU pipeline proven | (neuralSpring leads) |
+| 16 Anaerobic QS | Stage 1 complete (V108) | Real NCBI community data + ADREC collaboration |
 
 The infrastructure is built. The math is proven. The data is public. The
 hardware is in the basement. The primals know how to talk to each other.
@@ -316,7 +324,43 @@ Now we do the science.
 
 ---
 
-## Extension Axis 4: Primal Integration Strategy (V89+)
+## Extension Axis 4: Track 6 Anaerobic Biogas Extensions (V108)
+
+### New Kinetics Models (validated, full 6-tier chain)
+
+| Model | Equation | Reuse Potential |
+|-------|----------|-----------------|
+| Modified Gompertz | `H(t) = P * exp(-exp((Rm*e/P)*(λ-t) + 1))` | Any batch growth/production curve |
+| First-order kinetics | `B(t) = B_max * (1 - exp(-k*t))` | Cumulative yield, degradation |
+| Monod growth | `μ = μ_max * S / (Ks + S)` | Any microbial growth system |
+| Haldane inhibition | `μ = μ_max * S / (Ks + S + S²/Ki)` | Substrate inhibition with `S_opt = √(Ks * Ki)` |
+
+### Staged Data Extensions for Track 6
+
+**Tier 1 — Liao group supplementary data (next session):**
+- Community composition tables from Yang 2016, Chen 2016, Rojas-Sossa 2017/2019, Zhong 2016
+- Biogas yield curves for Gompertz fitting on real data
+- Search NCBI SRA for Liao group BioProjects (MSU BAE)
+
+**Tier 2 — Anaerobic reference communities:**
+- Cold seep 16S (PRJNA315684): Track 6 Gompertz + Anderson W on real anaerobic communities
+- Tara Oceans deep stations: marine anaerobic reference
+- HMP gut lumen: human anaerobic reference
+
+**Tier 3 — Cross-regime comparison (Paper 16 core):**
+- EMP samples stratified by oxygen regime (aerobic surface vs anaerobic deep)
+- KBS LTER waterlogged vs drained soil pores
+- Fermentation starter cultures (public 16S data)
+
+### QS Gene Extensions
+
+- Cross-reference 34 QS types with FNR/ArcAB/Rex regulon databases
+- Map anaerobic-specific QS genes from NCBI Protein
+- Time-series QS via LTEE (PRJNA294072, 60K generations)
+
+---
+
+## Extension Axis 5: Primal Integration Strategy (V89+)
 
 The extensions above assume single-primal execution. The next evolution
 brings multiple primals into the pipeline, coordinated through biomeOS.

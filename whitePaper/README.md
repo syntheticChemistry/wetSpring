@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** March 9, 2026
-**Status:** V105 — Validation study active — 9,200+ checks, 1,288 lib + 219 integration tests, 334 experiments, 318 binaries, standalone `barraCuda` v0.3.3 `a898dee` (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, 179 named tolerances, clippy pedantic + nursery ZERO WARNINGS, 52 papers reproduced, all 39 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. petalTongue V2: 9 DataChannel types, 33 scenario builders, 4 composite full-pipeline, UiConfig/BackpressureConfig, StreamSession with backpressure, Songbird, wetspring_dashboard scientist binary.
+**Status:** V109 — Validation study active — 9,200+ checks, 1,288 lib + 219 integration tests, 334 experiments, 318 binaries, standalone `barraCuda` v0.3.3 `a898dee` (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, 179 named tolerances, clippy pedantic + nursery ZERO WARNINGS, 52 papers reproduced, all 39 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. petalTongue V2: 9 DataChannel types, 33 scenario builders, 4 composite full-pipeline, UiConfig/BackpressureConfig, StreamSession with backpressure, Songbird, wetspring_dashboard scientist binary.
 **License:** AGPL-3.0-or-later
 
 ---
@@ -56,7 +56,7 @@ implementations into upstream `barraCuda` primitives:
 5. **Lean** — wetSpring rewires to upstream imports, deletes local code
 
 **Current status:** 45 GPU modules — Lean phase (fully absorbed). All 45 lean on
-upstream `barraCuda` primitives (150+ consumed, v0.3.1 standalone, 767+ WGSL shaders).
+upstream `barraCuda` primitives (150+ consumed, v0.3.3 standalone, 767+ WGSL shaders).
 7 compose `barraCuda` primitives for GPU-accelerated workflows. Zero Passthrough, zero
 Tier B/C modules remain. The forge crate (`metalForge/forge/` v0.3.0) provides substrate
 discovery, capability-based dispatch, and shader origin tracking.

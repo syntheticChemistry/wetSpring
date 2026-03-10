@@ -74,11 +74,11 @@ fn main() {
     let cross = cross_spring_shaders().len();
     println!("  Shader registry: {total} total, {cross} cross-spring");
     for (name, domain) in [
-        ("hotSpring", SpringDomain::HotSpring),
-        ("wetSpring", SpringDomain::WetSpring),
-        ("neuralSpring", SpringDomain::NeuralSpring),
-        ("airSpring", SpringDomain::AirSpring),
-        ("groundSpring", SpringDomain::GroundSpring),
+        ("hotSpring", SpringDomain::HOT_SPRING),
+        ("wetSpring", SpringDomain::WET_SPRING),
+        ("neuralSpring", SpringDomain::NEURAL_SPRING),
+        ("airSpring", SpringDomain::AIR_SPRING),
+        ("groundSpring", SpringDomain::GROUND_SPRING),
     ] {
         let a = shaders_from(domain).len();
         let c = shaders_consumed_by(domain).len();
