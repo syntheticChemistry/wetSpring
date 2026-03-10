@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: March 9, 2026 (V105 — 1,288 lib + 219 integration tests, 318 binaries, 179 tolerances, barraCuda v0.3.3, wgpu 28, 150+ primitives (264 ComputeDispatch ops), clippy pedantic CLEAN, 334 experiments, 52 papers complete + 6 reproduced, all 39 three-tier eligible papers validated at CPU + GPU + metalForge. V105: petalTongue V2 full-domain viz, 33 scenario builders, 9 DataChannel types, 140/140 viz validation PASS, 9,200+ checks)
+**Last Updated**: March 10, 2026 (V108 — 346 experiments, 9,430+ checks, 63 papers complete + 6 reproduced. V108: Track 6 anaerobic digestion (Liao/ADREC) — 5 papers, full 6-tier chain (Paper → CPU → Python parity → GPU → Streaming → metalForge), 183 new checks. Track 5 + Track 6 added to paper math control v6 (63 papers, 38/38). All 46 three-tier eligible papers validated at CPU + GPU + metalForge. barraCuda v0.3.3, clippy pedantic CLEAN)
 **Purpose**: Track papers for reproduction/review across five tracks
 
 ---
@@ -269,21 +269,21 @@ Paper 01 (Anderson-QS framework); healthSpring (gut = human anaerobic digester).
 
 | # | Paper | Journal | Year | Faculty | Why | Status |
 |---|-------|---------|------|---------|-----|--------|
-| 59 | Yang et al. "Phylogenetic analysis of anaerobic co-digestion of animal manure and corn stover reveals linkages between bacterial communities and digestion performance" | Adv Microbiol 6:879-897 | 2016 | Liao | Community-function linkage via phylogenetics in **anaerobic** conditions — the anaerobic counterpart to Track 1b (Liu phylogenetics). 16S data processable through wetSpring sovereign pipeline | Queued |
-| 60 | Chen et al. "Response of anaerobic microorganisms to different culture conditions and corresponding effects on biogas production and solid digestate quality" | Biomass Bioenergy 85:84-93 | 2016 | Liao | **Core of the aerobic/anaerobic question** — same organisms, different culture conditions, different community dynamics. Tests whether W shifts measurably with operating conditions | Queued |
+| 59 | Yang et al. "Phylogenetic analysis of anaerobic co-digestion of animal manure and corn stover reveals linkages between bacterial communities and digestion performance" | Adv Microbiol 6:879-897 | 2016 | Liao | Community-function linkage via phylogenetics in **anaerobic** conditions — the anaerobic counterpart to Track 1b (Liu phylogenetics). 16S data processable through wetSpring sovereign pipeline | **DONE** (Exp336: 12/12 — Gompertz kinetics, diversity, Anderson W) |
+| 60 | Chen et al. "Response of anaerobic microorganisms to different culture conditions and corresponding effects on biogas production and solid digestate quality" | Biomass Bioenergy 85:84-93 | 2016 | Liao | **Core of the aerobic/anaerobic question** — same organisms, different culture conditions, different community dynamics. Tests whether W shifts measurably with operating conditions | **DONE** (Exp337: 14/14 — First-order kinetics, thermo/meso comparison, Anderson W shift) |
 
 #### Tier 2 — Substrate Perturbation and Community Response
 
 | # | Paper | Journal | Year | Faculty | Why | Status |
 |---|-------|---------|------|---------|-----|--------|
-| 61 | Rojas-Sossa et al. "Effects of coffee processing residues on anaerobic microorganisms and corresponding digestion performance" | Bioresour Technol 245:714-723 | 2017 | Liao | Substrate perturbation → anaerobic community response. Maps to disorder perturbation in Anderson model — how does changing the "food" change W? Costa Rica deployment (Liao group) | Queued |
-| 62 | Rojas-Sossa et al. "Effect of ammonia fiber expansion (AFEX) treated corn stover on anaerobic microbes and corresponding digestion performance" | Biomass Bioenergy 127:105263 | 2019 | Liao | Pretreated substrate → microbial community shift. AFEX is a specific controlled perturbation — ideal for measuring ΔW from substrate change | Queued |
+| 61 | Rojas-Sossa et al. "Effects of coffee processing residues on anaerobic microorganisms and corresponding digestion performance" | Bioresour Technol 245:714-723 | 2017 | Liao | Substrate perturbation → anaerobic community response. Maps to disorder perturbation in Anderson model — how does changing the "food" change W? Costa Rica deployment (Liao group) | **DONE** (Exp338: 10/10 — Haldane inhibition, substrate perturbation, diversity shift) |
+| 62 | Rojas-Sossa et al. "Effect of ammonia fiber expansion (AFEX) treated corn stover on anaerobic microbes and corresponding digestion performance" | Biomass Bioenergy 127:105263 | 2019 | Liao | Pretreated substrate → microbial community shift. AFEX is a specific controlled perturbation — ideal for measuring ΔW from substrate change | **DONE** (Exp339: 11/11 — AFEX vs untreated Gompertz, Anderson W ordering) |
 
 #### Tier 3 — Aerobic-Anaerobic Interface
 
 | # | Paper | Journal | Year | Faculty | Why | Status |
 |---|-------|---------|------|---------|-----|--------|
-| 63 | Zhong et al. "Fungal fermentation on anaerobic digestate for lipid-based biofuel production" | Biotechnol Biofuels 9:253 | 2016 | Liao | **Aerobic process operating on anaerobic substrate** — the oxygen boundary in practice. Fungal fermentation (aerobic) consuming digestate (anaerobic product). Tests QS dynamics at the regime interface | Queued |
+| 63 | Zhong et al. "Fungal fermentation on anaerobic digestate for lipid-based biofuel production" | Biotechnol Biofuels 9:253 | 2016 | Liao | **Aerobic process operating on anaerobic substrate** — the oxygen boundary in practice. Fungal fermentation (aerobic) consuming digestate (anaerobic product). Tests QS dynamics at the regime interface | **DONE** (Exp340: 10/10 — Monod kinetics, aerobic-anaerobic W transition, P(QS) comparison) |
 
 **Open Data Strategy**: All Liao group papers use agricultural feedstock
 data and microbial community analysis. 16S amplicon data likely deposited
@@ -365,6 +365,13 @@ No proprietary data dependencies.
 | **V97 GPU v12 Portability** | Fused ops GPU (Hybrid-aware + diversity composition) | Exp308 | 21 |
 | **V97 Pure GPU Streaming v10** | Diversity→Welford→Pearson→Cov→NMF pipeline | Exp309 | 18 |
 | **V97 metalForge v15** | Cross-system fused ops + determinism + cross-spring | Exp310 | 21 |
+| **Track 6 anaerobic (science)** | Gompertz, Monod, Haldane, diversity, Anderson W mapping | Exp336-340 | 57 |
+| **Paper Math Control v6** | All 63 papers' core equations (Tracks 1-6) | Exp341 | 38 |
+| **V108 CPU v26** | Track 6 pure Rust math (5 domains) | Exp342 | 33 |
+| **V108 Python vs Rust v5** | Track 6 Python parity (Gompertz, Monod, Haldane, diversity) | Exp343 | 13 |
+| **V108 GPU v10** | Track 6 GPU portability (4 domains) | Exp344 | 14 |
+| **V108 Pure GPU Streaming v12** | Track 6 unidirectional pipeline (5 stages) | Exp345 | 12 |
+| **V108 metalForge v18** | Track 6 cross-substrate proof (4 domains) | Exp346 | 16 |
 
 ### Phase 37 — Anderson-QS Extension Papers
 
@@ -412,8 +419,8 @@ Core finding: **no prior work applies Anderson localization to QS signaling**.
 | Extensions (Phase 37-39) | 9 | 9/9 | — | — | CPU only (by design — analytical/catalog) |
 | Track 5 immuno-Anderson (science) | 6 | 1/1 | 4/4 | 1/1 | Full three-tier (Exp273-279: 157/157) |
 | Track 5 Gonzales reproductions | 6 | 1/1 | 1/1 | 1/1 | Full three-tier (Exp280-286: 202/202) |
-| Track 6 (Anaerobic QS/ADREC) | 5 | 0/5 | 0/5 | 0/5 | Queued — Paper 16 targets |
-| **Grand total** | **57 + 6 reproduced** | **54/54** | **48/48** | **41/41** | |
+| Track 6 (Anaerobic QS/ADREC) | 5 | 5/5 | 5/5 | 5/5 | Full three-tier (Exp336-346: 183/183) |
+| **Grand total** | **62 + 6 reproduced** | **59/59** | **53/53** | **46/46** | |
 
 **All GPU primitives upstream:** NMF (S58), TransE (S60), SpMM (S60), PeakDetect (S62), BGL helpers (S62+DF64).
 **All 39 three-tier-eligible papers now have full three-tier validation** (CPU, GPU, metalForge).

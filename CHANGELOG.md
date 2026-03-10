@@ -3,6 +3,38 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V108 — Track 6 Anaerobic Digestion Full Chain (2026-03-10)
+
+### Added
+- **Track 6 (Anaerobic QS / ADREC)** — 5 papers from Liao group (MSU BAE) now fully validated:
+  - Paper 59: Yang 2016 — co-digestion phylogenetics (Exp336: 12/12)
+  - Paper 60: Chen 2016 — culture conditions response (Exp337: 14/14)
+  - Paper 61: Rojas-Sossa 2017 — coffee residues (Exp338: 10/10)
+  - Paper 62: Rojas-Sossa 2019 — AFEX corn stover (Exp339: 11/11)
+  - Paper 63: Zhong 2016 — fungal fermentation on digestate (Exp340: 10/10)
+- **Paper Math Control v6** (Exp341) — 63 papers, 38/38 PASS. Added Track 5 (P53-P58: immuno-Anderson, Gonzales) and Track 6 (P59-P63: anaerobic digestion).
+- **BarraCuda CPU v26** (Exp342) — 33/33 PASS. Pure Rust math for biogas kinetics (Gompertz, first-order), microbial growth (Monod, Haldane), anaerobic diversity, Anderson W mapping.
+- **Python vs Rust v5** (Exp343) — 13/13 PASS. Track 6 Python/SciPy parity proof.
+- **GPU v10** (Exp344) — 14/14 PASS. Track 6 GPU portability proof.
+- **Pure GPU Streaming v12** (Exp345) — 12/12 PASS. Unidirectional pipeline: diversity→BC→kinetics→W→stats.
+- **metalForge v18** (Exp346) — 16/16 PASS. Cross-substrate proof: CPU = GPU = NPU for all Track 6 math.
+- **Python baseline** — `scripts/python_anaerobic_biogas_baseline.py` generating Track 6 reference values (Gompertz, first-order, Monod, Haldane, diversity, Anderson W).
+- **New biogas kinetics models** — Modified Gompertz (`P·exp(-exp((Rm·e/P)·(λ-t)+1))`), first-order (`B_max·(1-exp(-k·t))`), Monod (`μ_max·S/(Ks+S)`), Haldane substrate inhibition (`μ_max·S/(Ks+S+S²/Ki)`).
+
+### Changed
+- **Paper queue** — Track 6 status changed from "Queued" to "DONE" for all 5 papers. Grand total: 62 + 6 reproduced.
+- **Three-tier control** — Track 6 now has full three-tier validation (CPU + GPU + metalForge). All 46 three-tier-eligible papers validated.
+
+### Verified
+- `validate_paper_math_control_v6` — **38/38 PASS** (63 papers, release mode)
+- `validate_barracuda_cpu_v26` — **33/33 PASS** (5 domains)
+- `benchmark_python_vs_rust_v5` — **13/13 PASS** (all Track 6 parity)
+- `validate_cpu_vs_gpu_v10` — **14/14 PASS** (CPU reference, GPU-ready)
+- `validate_pure_gpu_streaming_v12` — **12/12 PASS** (5-stage pipeline)
+- `validate_metalforge_v18` — **16/16 PASS** (4 cross-system domains)
+- `cargo fmt --check` — **CLEAN**
+- `cargo clippy` — **ZERO warnings** (all new binaries)
+
 ## V107 — R Industry Parity Baselines (2026-03-10)
 
 ### Added

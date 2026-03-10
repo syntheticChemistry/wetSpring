@@ -1708,3 +1708,48 @@ required-features = ["json"]
 [[bin]]
 name = "validate_r_industry_parity"
 path = "src/bin/validate_r_industry_parity.rs"
+
+# ── Track 6 Anaerobic Digestion (V108) ──
+[[bin]]
+name = "validate_paper_math_control_v6"
+path = "src/bin/validate_paper_math_control_v6.rs"
+
+[[bin]]
+name = "validate_barracuda_cpu_v26"
+path = "src/bin/validate_barracuda_cpu_v26.rs"
+
+[[bin]]
+name = "validate_anaerobic_codigestion"
+path = "src/bin/validate_anaerobic_codigestion.rs"
+
+[[bin]]
+name = "validate_anaerobic_culture_response"
+path = "src/bin/validate_anaerobic_culture_response.rs"
+
+[[bin]]
+name = "validate_anaerobic_coffee_residues"
+path = "src/bin/validate_anaerobic_coffee_residues.rs"
+
+[[bin]]
+name = "validate_anaerobic_afex_stover"
+path = "src/bin/validate_anaerobic_afex_stover.rs"
+
+[[bin]]
+name = "validate_fungal_fermentation_digestate"
+path = "src/bin/validate_fungal_fermentation_digestate.rs"
+
+[[bin]]
+name = "benchmark_python_vs_rust_v5"
+path = "src/bin/benchmark_python_vs_rust_v5.rs"
+
+[[bin]]
+name = "validate_cpu_vs_gpu_v10"
+path = "src/bin/validate_cpu_vs_gpu_v10.rs"
+
+[[bin]]
+name = "validate_pure_gpu_streaming_v12"
+path = "src/bin/validate_pure_gpu_streaming_v12.rs"
+
+[[bin]]
+name = "validate_metalforge_v18"
+path = "src/bin/validate_metalforge_v18.rs"

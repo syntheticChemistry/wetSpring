@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 10, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V107 — **1,605 tests** (1,288 lib + 218 forge + 72 integration + 27 doc), 335 experiments, 9,250+ validation checks. V107: R industry parity baselines — 3 R scripts (vegan, DADA2, phyloseq) generating gold-standard references, `validate_r_industry_parity` binary (53/53 PASS), `PhyloTree::patristic_distance()`, phyloseq trifurcation bug discovered and documented. V106: deep debt cleanup — 112 stale `#[expect()]` removed, `#![forbid(unsafe_code)]` on all 320 crate roots, BIOM streaming parser. Zero local WGSL, zero unsafe code, zero `#[allow]`, `cargo clippy --workspace --all-targets --all-features` **ZERO WARNINGS**. Ecosystem: barraCuda v0.3.3, toadStool S130+, coralReef Phase 10.
+**Status:** V108 — **1,605 tests** (1,288 lib + 218 forge + 72 integration + 27 doc), 346 experiments, 9,430+ validation checks. V108: Track 6 anaerobic digestion (Liao/ADREC) — 5 papers, full 6-tier chain (Paper math → CPU → Python parity → GPU → Streaming → metalForge), 183 new checks. 63 papers complete (paper math v6). All 46 three-tier-eligible papers validated. V107: R industry parity baselines, phyloseq trifurcation bug. V106: deep debt cleanup. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS**. Ecosystem: barraCuda v0.3.3, toadStool S130+, coralReef Phase 10.
 
 ---
 

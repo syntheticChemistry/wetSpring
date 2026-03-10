@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-10 (V107: 335 experiments, 319 binaries, 9,250+ checks. V107: R industry parity baselines — R/vegan, R/DADA2, R/phyloseq gold-standard references, `validate_r_industry_parity` (53/53 PASS), `PhyloTree::patristic_distance()`, phyloseq trifurcation bug documented. V106: deep debt cleanup — 112 stale `#[expect()]` removed, `#![forbid(unsafe_code)]` on all 320 crate roots, BIOM streaming parser. All 52 papers, biomeOS IPC, petalTongue, cross-primal pipelines, ToadStool dispatch. 1,605 tests, 180 tolerances, clippy pedantic+nursery CLEAN.)
+**Updated**: 2026-03-10 (V108: 346 experiments, 330+ binaries, 9,430+ checks. V108: Track 6 anaerobic digestion (Liao/ADREC) — 5 papers, full 6-tier chain, 183 new checks. 63 papers (paper math v6). V107: R industry parity baselines, phyloseq bug. V106: deep debt cleanup. All 63 papers + 6 reproduced, biomeOS IPC, petalTongue, cross-primal pipelines, ToadStool dispatch. 1,605 tests, 180 tolerances, clippy pedantic+nursery CLEAN.)
 
 ---
 
