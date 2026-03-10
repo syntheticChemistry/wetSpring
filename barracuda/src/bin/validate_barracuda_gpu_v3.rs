@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Exp044: `BarraCuda` GPU parity for v3 domains — proves CPU→GPU portability.
 //!
 //! Tests GPU implementations of domains validated in CPU v3 that have

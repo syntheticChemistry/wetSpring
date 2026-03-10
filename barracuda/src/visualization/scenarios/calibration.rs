@@ -76,10 +76,7 @@ pub fn calibration_scenario(
     let mut results_node = node("results", "Predicted Unknowns", "data", &["quantitation"]);
     let predicted: Vec<f64> = unknown_resp
         .iter()
-        .map(|&r| {
-            fit.predict(r)
-                .map_or(0.0, |q| q.concentration)
-        })
+        .map(|&r| fit.predict(r).map_or(0.0, |q| q.concentration))
         .collect();
     results_node.data_channels.push(bar(
         "predicted",
@@ -107,7 +104,8 @@ mod tests {
         let resp = [0.0, 120.0, 600.0, 1200.0];
         let labels = vec!["U1".into(), "U2".into()];
         let unk = [350.0, 800.0];
-        let (scenario, edges) = calibration_scenario("Caffeine", &conc, &resp, &labels, &unk).unwrap();
+        let (scenario, edges) =
+            calibration_scenario("Caffeine", &conc, &resp, &labels, &unk).unwrap();
         assert_eq!(scenario.nodes.len(), 2);
         assert_eq!(scenario.domain, "measurement");
         assert!(!edges.is_empty());

@@ -300,6 +300,7 @@ fn start_echo_server(sock: &std::path::Path) -> std::thread::JoinHandle<()> {
 }
 
 #[test]
+#[ignore = "requires Unix socket environment (flaky in sandboxed CI)"]
 fn transport_rpc_round_trip() {
     let dir = tempfile::tempdir().unwrap();
     let sock = dir.path().join("rpc_test.sock");

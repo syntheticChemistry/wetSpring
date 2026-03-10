@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 #![expect(clippy::similar_names)]
 //! `BarraCuda` CPU Parity v3 — comprehensive coverage of ALL 18 algorithmic
 //! domains.  Extends v1 (9 domains) and v2 (batch/flat APIs) with the 9

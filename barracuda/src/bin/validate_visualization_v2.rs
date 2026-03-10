@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Validate all visualization scenario builders and streaming infrastructure.
 //!
 //! Exercises every scenario builder introduced in the `petalTongue` V2 integration,
@@ -30,7 +31,7 @@ struct CheckTracker {
 }
 
 impl CheckTracker {
-    fn new() -> Self {
+    const fn new() -> Self {
         Self {
             checks: 0,
             passed: 0,

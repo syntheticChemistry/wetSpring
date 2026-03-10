@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Exp079: `BarraCuda` CPU Parity v6 — ODE Flat Param Fidelity
 //!
 //! Validates that the GPU-compatible flat parameter APIs (`to_flat`/`from_flat`)

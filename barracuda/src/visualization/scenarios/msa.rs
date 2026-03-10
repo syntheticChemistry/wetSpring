@@ -67,7 +67,11 @@ pub fn msa_scenario(
     let mut identities = Vec::with_capacity(n * n);
     for a in &result.aligned {
         for b in &result.aligned {
-            let matches = a.iter().zip(b.iter()).filter(|&(&x, &y)| x == y && x != b'-').count();
+            let matches = a
+                .iter()
+                .zip(b.iter())
+                .filter(|&(&x, &y)| x == y && x != b'-')
+                .count();
             let compared = a
                 .iter()
                 .zip(b.iter())

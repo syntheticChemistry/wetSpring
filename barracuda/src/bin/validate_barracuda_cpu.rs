@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! `BarraCuda` CPU parity validation — proves pure Rust math matches Python.
 //!
 //! This is the bridge between Python baselines and GPU promotion. It runs

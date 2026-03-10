@@ -80,6 +80,13 @@ pub const VARIANCE_EXACT: f64 = 1e-20;
 /// as non-zero structure.
 pub const NMF_SPARSITY_THRESHOLD: f64 = 1e-8;
 
+/// NMF iteration convergence tolerance.
+///
+/// Iteration stops when the relative change in reconstruction error
+/// drops below this threshold. 1e-4 provides ~4 significant digits
+/// of accuracy while avoiding excessive iterations.
+pub const NMF_CONVERGENCE: f64 = 1e-4;
+
 // ═══════════════════════════════════════════════════════════════════
 // Special-function evaluation tolerances
 // ═══════════════════════════════════════════════════════════════════

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![expect(clippy::expect_used, clippy::unwrap_used, clippy::print_stdout)]
+#![forbid(unsafe_code)]
+#![expect(clippy::print_stdout)]
 //! # Exp133: Cave, Hot Spring & Rhizosphere QS Geometry
 //!
 //! Models three understudied ecosystems with physically appropriate lattice
@@ -59,7 +60,7 @@ struct EcoZone {
     rationale: &'static str,
 }
 
-#[expect(clippy::cast_precision_loss, clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp133: Cave, Hot Spring & Rhizosphere QS Geometry");
 

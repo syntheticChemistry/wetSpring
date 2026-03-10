@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![expect(clippy::expect_used, clippy::unwrap_used, clippy::print_stdout)]
+#![forbid(unsafe_code)]
+#![expect(clippy::expect_used, clippy::print_stdout)]
 //! # Exp111: Full `MassBank` GPU Spectral Screening at Scale
 //!
 //! Validates GPU spectral cosine similarity at library-scale (2048×2048)

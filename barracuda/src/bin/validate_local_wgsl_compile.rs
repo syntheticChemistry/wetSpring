@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![expect(clippy::expect_used, clippy::unwrap_used, clippy::too_many_lines)]
+#![forbid(unsafe_code)]
+#![expect(clippy::expect_used, clippy::too_many_lines)]
 //! Exp096: `ToadStool` Bio Op Absorption Validation
 //!
 //! # Provenance

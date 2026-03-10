@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 #![allow(
     clippy::expect_used,
     clippy::unwrap_used,
@@ -39,7 +40,7 @@ use barracuda::spectral::{
     GOE_R, POISSON_R, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 
-#[expect(clippy::cast_precision_loss, clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp137: Planktonic & Mixed Fluid 3D — Dilution Effects");
 

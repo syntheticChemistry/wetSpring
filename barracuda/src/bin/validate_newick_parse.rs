@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Validation: Newick tree parsing — Exp019 Phase 1.
 //!
 //! Parses the same set of Newick trees used in the Python/dendropy baseline

@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Exp203: `biomeOS` Science Pipeline Integration Validation
 //!
 //! Validates the wetSpring IPC server end-to-end as a `biomeOS` science primal.

@@ -10,7 +10,7 @@
 //!
 //! 1. All-vs-all pairwise scoring via [`alignment::score_batch`]
 //! 2. Score → distance conversion (`d = max_score − score`)
-//! 3. Neighbor-joining guide tree via [`neighbor_joining::neighbor_joining`]
+//! 3. Neighbor-joining guide tree via [`super::neighbor_joining::neighbor_joining`]
 //! 4. Progressive alignment following the guide tree topology
 //!    - Leaf–leaf: standard Smith-Waterman → global extension
 //!    - Profile–leaf / profile–profile: majority-consensus scoring
@@ -115,11 +115,7 @@ pub fn align_multiple(
 }
 
 /// Two-sequence case: global extension of Smith-Waterman alignment.
-fn align_pair(
-    sequences: &[&[u8]],
-    labels: &[impl AsRef<str>],
-    params: &MsaParams,
-) -> MsaResult {
+fn align_pair(sequences: &[&[u8]], labels: &[impl AsRef<str>], params: &MsaParams) -> MsaResult {
     let r = alignment::smith_waterman(sequences[0], sequences[1], &params.scoring);
     let (a, b) = extend_to_global(sequences[0], sequences[1], &r);
 
@@ -430,7 +426,11 @@ fn consensus(profile: &[Vec<u8>]) -> Vec<u8> {
                     counts[idx] += 1;
                 }
             }
-            let best = counts.iter().enumerate().max_by_key(|&(_, c)| *c).map_or(4, |(i, _)| i);
+            let best = counts
+                .iter()
+                .enumerate()
+                .max_by_key(|&(_, c)| *c)
+                .map_or(4, |(i, _)| i);
             match best {
                 0 => b'A',
                 1 => b'C',
@@ -499,7 +499,12 @@ mod tests {
 
     #[test]
     fn msa_four_sequences() {
-        let seqs: Vec<&[u8]> = vec![b"ACGTACGTACGT", b"ACGTACTTACGT", b"TGCATGCATGCA", b"ACGTACGTACTT"];
+        let seqs: Vec<&[u8]> = vec![
+            b"ACGTACGTACGT",
+            b"ACGTACTTACGT",
+            b"TGCATGCATGCA",
+            b"ACGTACGTACTT",
+        ];
         let labels = ["S1", "S2", "S3", "S4"];
         let result = align_multiple(&seqs, &labels, &MsaParams::default());
         assert_eq!(result.aligned.len(), 4);

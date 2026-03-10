@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Validate Rust 16S pipeline on PUBLIC open data, benchmarked against paper findings.
 #![expect(clippy::cast_precision_loss)] // usize→f64 for stats/display; loss acceptable
 //!

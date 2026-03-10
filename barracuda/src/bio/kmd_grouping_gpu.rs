@@ -95,7 +95,6 @@ pub fn kmd_group_gpu(
 }
 
 #[cfg(test)]
-#[expect(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
 

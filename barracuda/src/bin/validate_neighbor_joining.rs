@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Validation binary for Exp033: Neighbor-Joining tree construction.
 //!
 //! Validates Rust NJ against Python baseline (Saitou & Nei 1987).

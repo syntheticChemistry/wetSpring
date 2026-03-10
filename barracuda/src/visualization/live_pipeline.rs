@@ -80,10 +80,7 @@ impl LivePipelineSession {
     /// # Errors
     ///
     /// Returns an error if petalTongue discovery fails.
-    pub fn new(
-        session_id: impl Into<String>,
-        domain: PipelineDomain,
-    ) -> PushResult<Self> {
+    pub fn new(session_id: impl Into<String>, domain: PipelineDomain) -> PushResult<Self> {
         let client = PetalTonguePushClient::discover()?;
         let stream = StreamSession::open(client, session_id);
         Ok(Self {
@@ -114,21 +111,19 @@ impl LivePipelineSession {
     ///
     /// # Errors
     ///
-    /// Returns [`PushError`] on IPC failure.
+    /// Returns [`super::ipc_push::PushError`] on IPC failure.
     pub fn initialize(&mut self, stages: Vec<PipelineStage>) -> PushResult<()> {
         self.stages = stages;
         let scenario = self.build_scenario();
-        self.stream.push_initial_render(
-            self.domain.pipeline_name(),
-            &scenario,
-        )
+        self.stream
+            .push_initial_render(self.domain.pipeline_name(), &scenario)
     }
 
     /// Mark the current stage as running and update the gauge.
     ///
     /// # Errors
     ///
-    /// Returns [`PushError`] on IPC failure.
+    /// Returns [`super::ipc_push::PushError`] on IPC failure.
     pub fn begin_stage(&mut self) -> PushResult<()> {
         if self.current_stage < self.stages.len() {
             self.stages[self.current_stage].status = "running".into();
@@ -143,7 +138,7 @@ impl LivePipelineSession {
     ///
     /// # Errors
     ///
-    /// Returns [`PushError`] on IPC failure.
+    /// Returns [`super::ipc_push::PushError`] on IPC failure.
     pub fn update_progress(&mut self, progress: f64) -> PushResult<()> {
         if self.current_stage < self.stages.len() {
             self.stages[self.current_stage].progress = progress;
@@ -160,7 +155,7 @@ impl LivePipelineSession {
     ///
     /// # Errors
     ///
-    /// Returns [`PushError`] on IPC failure.
+    /// Returns [`super::ipc_push::PushError`] on IPC failure.
     pub fn complete_stage(&mut self, channels: Vec<DataChannel>) -> PushResult<()> {
         if self.current_stage < self.stages.len() {
             self.stages[self.current_stage].status = "complete".into();
@@ -183,7 +178,7 @@ impl LivePipelineSession {
     ///
     /// # Errors
     ///
-    /// Returns [`PushError`] on IPC failure.
+    /// Returns [`super::ipc_push::PushError`] on IPC failure.
     pub fn push_live_update(&mut self, channel: &DataChannel) -> PushResult<()> {
         self.stream.push_replace(channel)
     }
@@ -192,7 +187,7 @@ impl LivePipelineSession {
     ///
     /// # Errors
     ///
-    /// Returns [`PushError`] on IPC failure.
+    /// Returns [`super::ipc_push::PushError`] on IPC failure.
     pub fn push_gauge(&mut self, binding_id: &str, value: f64) -> PushResult<()> {
         self.stream.push_gauge_update(binding_id, value)
     }
@@ -201,13 +196,8 @@ impl LivePipelineSession {
     ///
     /// # Errors
     ///
-    /// Returns [`PushError`] on IPC failure.
-    pub fn push_timeseries(
-        &mut self,
-        binding_id: &str,
-        x: &[f64],
-        y: &[f64],
-    ) -> PushResult<()> {
+    /// Returns [`super::ipc_push::PushError`] on IPC failure.
+    pub fn push_timeseries(&mut self, binding_id: &str, x: &[f64], y: &[f64]) -> PushResult<()> {
         self.stream.push_timeseries_append(binding_id, x, y)
     }
 
@@ -283,8 +273,7 @@ impl LivePipelineSession {
     /// Returns an I/O error if the file cannot be written.
     pub fn export_json(&self, path: &Path) -> std::io::Result<()> {
         let scenario = self.build_scenario();
-        let json = serde_json::to_string_pretty(&scenario)
-            .map_err(std::io::Error::other)?;
+        let json = serde_json::to_string_pretty(&scenario).map_err(std::io::Error::other)?;
         std::fs::write(path, json)
     }
 
@@ -549,14 +538,10 @@ mod tests {
 
     #[test]
     fn build_scenario_from_stages() {
-        let client = PetalTonguePushClient::new(
-            std::env::temp_dir().join("nonexistent-live-test.sock"),
-        );
-        let session = LivePipelineSession::with_client(
-            client,
-            "test-live",
-            PipelineDomain::Amplicon16S,
-        );
+        let client =
+            PetalTonguePushClient::new(std::env::temp_dir().join("nonexistent-live-test.sock"));
+        let session =
+            LivePipelineSession::with_client(client, "test-live", PipelineDomain::Amplicon16S);
         let scenario = session.build_scenario();
         assert_eq!(scenario.name, "16S Amplicon Pipeline");
         assert_eq!(scenario.domain, "ecology");
@@ -565,33 +550,28 @@ mod tests {
 
     #[test]
     fn build_scenario_with_stages() {
-        let client = PetalTonguePushClient::new(
-            std::env::temp_dir().join("nonexistent-live-test2.sock"),
-        );
-        let mut session = LivePipelineSession::with_client(
-            client,
-            "test-stages",
-            PipelineDomain::LcMs,
-        );
+        let client =
+            PetalTonguePushClient::new(std::env::temp_dir().join("nonexistent-live-test2.sock"));
+        let mut session =
+            LivePipelineSession::with_client(client, "test-stages", PipelineDomain::LcMs);
         session.stages = lcms_stages();
         let scenario = session.build_scenario();
         assert_eq!(scenario.nodes.len(), 5);
         assert_eq!(scenario.domain, "measurement");
         for node in &scenario.nodes {
-            assert!(!node.data_channels.is_empty(), "each stage should have a progress gauge");
+            assert!(
+                !node.data_channels.is_empty(),
+                "each stage should have a progress gauge"
+            );
         }
     }
 
     #[test]
     fn export_json_writes_file() {
-        let client = PetalTonguePushClient::new(
-            std::env::temp_dir().join("nonexistent-export-test.sock"),
-        );
-        let mut session = LivePipelineSession::with_client(
-            client,
-            "test-export",
-            PipelineDomain::Phylogenetics,
-        );
+        let client =
+            PetalTonguePushClient::new(std::env::temp_dir().join("nonexistent-export-test.sock"));
+        let mut session =
+            LivePipelineSession::with_client(client, "test-export", PipelineDomain::Phylogenetics);
         session.stages = phylo_stages();
 
         let dir = tempfile::tempdir().unwrap();
@@ -608,11 +588,8 @@ mod tests {
         let client = PetalTonguePushClient::new(
             std::env::temp_dir().join("nonexistent-lifecycle-test.sock"),
         );
-        let mut session = LivePipelineSession::with_client(
-            client,
-            "test-lifecycle",
-            PipelineDomain::General,
-        );
+        let mut session =
+            LivePipelineSession::with_client(client, "test-lifecycle", PipelineDomain::General);
         assert_eq!(session.domain(), PipelineDomain::General);
         assert_eq!(session.stage_count(), 0);
         assert_eq!(session.current_stage_index(), 0);

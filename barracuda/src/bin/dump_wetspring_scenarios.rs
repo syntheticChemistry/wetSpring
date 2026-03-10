@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Dump wetSpring `petalTongue` scenarios to JSON or push via IPC.
 //!
 //! Constructs all scenario types from synthetic/known-value data,

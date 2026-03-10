@@ -1,8 +1,8 @@
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** March 9, 2026
+**Date:** March 10, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V105 — 334 experiments, 9,200+ validation checks, ALL PASS; 1,288 lib + 219 integration tests, 318 binaries, standalone `barraCuda` v0.3.3 `a898dee` (wgpu 28, 784+ WGSL shaders), toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`. V105: petalTongue V2 full-domain visualization — 9 DataChannel types, **33 scenario builders**, 4 composite full-pipeline, `UiConfig`/`BackpressureConfig`, `wetspring_dashboard` binary, validate_visualization_v2 **140/140 PASS**. V101 chain: 78/78 PASS. V100: 173/173 PASS. V99: 166/166 PASS. V98: 173/173 PASS. biomeOS deploy graph wired, cross-primal IPC pipeline validated. 0 local WGSL, 179 tolerances, 0 unsafe, clippy pedantic ZERO WARNINGS. 52 papers reproduced, 5 springs exercised.
+**Status:** V106 — 334 experiments, 9,200+ validation checks, ALL PASS; 1,605 tests (1,288 lib + 218 forge + 72 integration + 27 doc), 318 binaries, standalone `barraCuda` v0.3.3 `a898dee` (wgpu 28, 784+ WGSL shaders), toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`. V106: deep debt cleanup — 112 stale `#[expect()]` removed, `#![forbid(unsafe_code)]` on all 320 crate roots, BIOM streaming parser, 8 doc link fixes, `NMF_CONVERGENCE` constant. V105: petalTongue V2 full-domain visualization — 9 DataChannel types, **33 scenario builders**, 4 composite full-pipeline. biomeOS deploy graph wired, cross-primal IPC pipeline validated. 0 local WGSL, 180 tolerances, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS. 52 papers reproduced, 5 springs exercised.
 
 ---
 
@@ -113,7 +113,7 @@ Every paper goes through the full evolution. Status across all 52 papers:
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
 | biomeOS IPC integration | JSON-RPC science primal, GPU-aware dispatch, Songbird registration | 321 checks (Exp203-208) |
 | petalTongue visualization | 9 DataChannel types, 33 scenario builders, StreamSession, Songbird capabilities, IPC science→viz wiring | 78 checks (Exp333-334) |
-| Code quality audit | 93.94% line, streaming I/O, 0 production mocks, standalone `barraCuda` v0.3.3, `deny(missing_docs)`, zero unsafe code, clippy pedantic + nursery ZERO WARNINGS | 1,288 lib + 219 integration tests |
+| Code quality audit | 94.01% line (barracuda), 88.78% (forge), streaming I/O, 0 production mocks, standalone `barraCuda` v0.3.3, `deny(missing_docs)`, `forbid(unsafe_code)` on all 320 crate roots, clippy pedantic + nursery ZERO WARNINGS, 180 named tolerances | 1,605 tests (1,288 lib + 218 forge + 72 integration + 27 doc) |
 | V66 dispatch evolution | Forge dispatch routing (29 workloads), streaming topology (PCIe bypass), NUCLEUS Tower/Node/Nest model, absorption audit (0 local WGSL) | 49 checks (Exp213) |
 | V66 NUCLEUS V8 | IPC dispatch with V66 I/O evolution (byte-native FASTQ, bytemuck nanopore, streaming MS2), Nest metrics, CPU fallback parity, full pipeline chain | 49 checks (Exp214) |
 | **V84 pipeline buildout** | Paper→CPU→GPU→Streaming proven end-to-end: 32 papers, 26 CPU domains, 21 GPU domains, Python parity, 0.10ms streaming overhead | 172 checks (Exp251-255) |

@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 10, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V105 — **1,288 lib + 219 integration tests** (json feature: 1,231 lib), 334 experiments, 9,200+ validation checks. V105: petalTongue visualization evolution — `LivePipelineSession` for real-time pipeline streaming, `Scatter3D` channel, 33 scenario builders (was 28), 5 new domain scenarios (MSA, calibration, spectroscopy, basecalling, NJ tree), 3 sample-parameterized profiles, IPC evolved (64KB buffer, `query_capabilities`, `subscribe_interactions`), scientific ranges on all gauge scenarios. V104: deep debt — JCAMP-DX parser, Dorado basecaller, GPU peak integration, `#[allow]` → `#[expect]` migration. Zero local WGSL, zero unsafe code, zero `#[allow]`, `cargo clippy --features json --lib` **ZERO WARNINGS**. Ecosystem: barraCuda v0.3.3, toadStool S130+, coralReef Phase 10.
+**Status:** V106 — **1,605 tests** (1,288 lib + 218 forge + 72 integration + 27 doc), 334 experiments, 9,200+ validation checks. V106: deep debt cleanup — 112 stale `#[expect()]` removed, `#![forbid(unsafe_code)]` on all 320 crate roots, BIOM streaming parser, 8 doc link fixes, NMF_CONVERGENCE constant. All checks green: fmt, clippy (pedantic+nursery), doc, test. V105: petalTongue visualization evolution — `LivePipelineSession`, `Scatter3D`, 33 scenario builders. Zero local WGSL, zero unsafe code, zero `#[allow]`, `cargo clippy --workspace --all-targets --all-features` **ZERO WARNINGS**. Ecosystem: barraCuda v0.3.3, toadStool S130+, coralReef Phase 10.
 
 ---
 
@@ -132,14 +132,14 @@ integration point.
 | V100 viz + local evolution (Exp327-332) | 173 (petalTongue 45 + CPU/GPU 27 + metalForge 19 + biomeOS 34 + local evo 24 + mixed HW 24) |
 | V101 viz evolution (Exp333-334) | 78 (viz evolution 44 + science-to-viz 34) |
 | **Total validation checks** | **9,060+** |
-| Rust library unit tests | 1,047 (barracuda) |
-| metalForge forge tests | 203 |
+| Rust library unit tests | 1,288 (barracuda) |
+| metalForge forge tests | 218 |
 | Doc-tests | 27 (barracuda 18 + forge 9) |
-| Integration tests | 178 |
-| **Total Rust tests** | **1,455** (lib + forge + integration + doc) |
-| Library code coverage | **93.94% line / 91.85% fn / 93.60% branch** (cargo-llvm-cov) |
+| Integration tests | 72 |
+| **Total Rust tests** | **1,605** (lib + forge + integration + doc) |
+| Library code coverage | **94.01% line** (barracuda), **88.78% line** (forge) (cargo-llvm-cov) |
 | Experiments completed | 334 |
-| Validation/benchmark binaries | 316 |
+| Validation/benchmark binaries | 318 |
 | CPU bio modules | 47 |
 | GPU bio modules | 47 (30 lean + 5 write→lean + 7 compose + 0 passthrough + 5 visualization) |
 | Tier B (needs refactor) | 0 (all promoted) |
@@ -151,7 +151,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | `barraCuda` primitives consumed | **150+** (always-on, zero fallback code — standalone `barraCuda` v0.3.3 `a898dee`, wgpu 28, PrecisionRoutingAdvice) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 9,200+ validation checks **PASS**. All 1,047 library + 203 forge + 178 integration tests **PASS** (1 ignored: hardware-dependent).
+All 9,200+ validation checks **PASS**. All 1,288 library + 218 forge + 72 integration + 27 doc tests **PASS** (2 ignored: hardware-dependent).
 
 ### GPU Performance
 
@@ -667,16 +667,16 @@ Rust 1.93 fixed across 20+ validation binaries.
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy -W pedantic -W nursery` | **Zero warnings** (pedantic + nursery clean) |
 | `cargo doc --no-deps` | Clean (0 warnings) |
-| Line coverage (`cargo-llvm-cov`) | **93.94% line / 91.85% fn / 93.60% branch** (1,455 tests) |
-| `#![deny(unsafe_code)]` | **Enforced crate-wide** (edition 2024; `allow` only in test env-var calls) |
+| Line coverage (`cargo-llvm-cov`) | **94.01% line** (barracuda), **88.78% line** (forge) (1,605 tests) |
+| `#![forbid(unsafe_code)]` | **Enforced on all 320 crate roots** (2 lib + 318 bin; edition 2024) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | **Enforced crate-wide** |
 | TODO/FIXME markers | **0** |
 | Inline tolerance literals | **0** (all use `tolerances::` constants) |
 | SPDX-License-Identifier | All `.rs` files |
 | Max file size | All under 1000 LOC |
 | External C dependencies | **0** (`flate2` uses `rust_backend`) |
-| Named tolerance constants | 179 (scientifically justified, hierarchy-tested) |
-| Provenance headers | All 316 binaries |
+| Named tolerance constants | 180 (scientifically justified, hierarchy-tested; +NMF_CONVERGENCE) |
+| Provenance headers | All 318 binaries |
 | ESN ridge regression | **Proper Cholesky solve** (not diagonal approximation) |
 | I/O streaming | Buffering APIs deprecated; `stats_from_file` + iterators preferred |
 | Clone optimization | Hot-path clones eliminated (merge_pairs, derep entry API) |
@@ -810,7 +810,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (1,455 library + forge + doc + integration tests)
+# Run all tests (1,605 library + forge + doc + integration tests)
 cargo test --workspace --all-features
 
 # Code quality checks

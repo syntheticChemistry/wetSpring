@@ -179,12 +179,7 @@ pub fn cosine_vs_library_gpu(
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::type_complexity,
-    clippy::used_underscore_items
-)]
+#[expect(clippy::type_complexity, clippy::used_underscore_items)]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

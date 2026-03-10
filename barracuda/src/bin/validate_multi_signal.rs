@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Validation: Srivastava 2011 multi-input QS network (Exp024).
 //!
 //! # Provenance

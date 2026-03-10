@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Exp039 — Algal pond time-series diversity surveillance.
 //!
 //! # Provenance

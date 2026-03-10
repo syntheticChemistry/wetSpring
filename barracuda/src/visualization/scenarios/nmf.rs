@@ -4,8 +4,8 @@
 use barracuda::prelude::BarracudaError;
 
 use crate::bio::nmf::{NmfConfig, NmfResult};
-use crate::visualization::types::{EcologyScenario, ScenarioEdge};
 use crate::visualization::ScientificRange;
+use crate::visualization::types::{EcologyScenario, ScenarioEdge};
 
 use super::{bar, heatmap, node, scaffold};
 
@@ -115,6 +115,7 @@ pub fn nmf_scenario_from_data(
 mod tests {
     use super::*;
     use crate::bio::nmf::{NmfConfig, NmfObjective};
+    use crate::tolerances;
 
     #[test]
     fn nmf_scenario_produces_channels() {
@@ -122,7 +123,7 @@ mod tests {
         let config = NmfConfig {
             rank: 2,
             max_iter: 50,
-            tol: 1e-4,
+            tol: tolerances::NMF_CONVERGENCE,
             objective: NmfObjective::KlDivergence,
             seed: 42,
         };

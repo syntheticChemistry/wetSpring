@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! `BarraCuda` CPU Parity v4 — Track 1c domains (deep-sea metagenomics).
 //!
 //! Extends v1-v3 (18 domains) with the 5 Track 1c modules:

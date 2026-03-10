@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 #![expect(clippy::too_many_lines, clippy::expect_used)]
 //! # Exp334: Science-to-Viz Pipeline
 //!

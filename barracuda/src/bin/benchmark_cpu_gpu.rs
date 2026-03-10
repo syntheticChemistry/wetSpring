@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 #![allow(
     clippy::expect_used,
     clippy::unwrap_used,
@@ -125,7 +126,6 @@ fn generate_f64(n: usize, seed: u64) -> Vec<f64> {
     v
 }
 
-#[expect(clippy::cast_precision_loss)]
 fn display_and_record(
     label: &str,
     n: usize,

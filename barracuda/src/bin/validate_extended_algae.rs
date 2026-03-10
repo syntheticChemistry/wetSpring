@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Validate Rust 16S pipeline on extended algae-pond data (Exp017).
 //!
 //! # Provenance

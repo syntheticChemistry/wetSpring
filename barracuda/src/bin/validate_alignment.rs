@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Validation: Smith-Waterman local alignment (Exp028).
 //!
 //! # Provenance

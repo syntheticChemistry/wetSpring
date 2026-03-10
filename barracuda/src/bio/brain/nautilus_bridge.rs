@@ -188,7 +188,7 @@ fn bio_to_beta(obs: &BioObservation) -> BetaObservation {
 }
 
 #[cfg(test)]
-#[expect(clippy::expect_used, clippy::unwrap_used, clippy::suboptimal_flops)]
+#[expect(clippy::expect_used)]
 mod tests {
     use super::*;
 

@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Validation: PFAS decision tree inference — Exp008 Phase 3.
 //!
 //! Loads a decision tree trained in Python (`sklearn`) and exported to JSON,

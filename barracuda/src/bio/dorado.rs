@@ -129,8 +129,7 @@ pub fn is_dorado_available() -> bool {
 ///
 /// Returns [`Error::Nanopore`] if Dorado is not found or version query fails.
 pub fn dorado_version() -> Result<String> {
-    let bin = discover_dorado()
-        .ok_or_else(|| Error::Nanopore("dorado binary not found".into()))?;
+    let bin = discover_dorado().ok_or_else(|| Error::Nanopore("dorado binary not found".into()))?;
 
     let output = Command::new(&bin)
         .arg("--version")
@@ -153,11 +152,7 @@ pub fn dorado_version() -> Result<String> {
 ///
 /// Returns [`Error::Nanopore`] if Dorado is not found, the input file
 /// doesn't exist, or the subprocess fails.
-pub fn basecall(
-    input: &Path,
-    output_dir: &Path,
-    config: &DoradoConfig,
-) -> Result<DoradoResult> {
+pub fn basecall(input: &Path, output_dir: &Path, config: &DoradoConfig) -> Result<DoradoResult> {
     if !input.exists() {
         return Err(Error::Nanopore(format!(
             "input file not found: {}",
@@ -171,17 +166,17 @@ pub fn basecall(
         .or_else(discover_dorado)
         .ok_or_else(|| Error::Nanopore("dorado binary not found".into()))?;
 
-    std::fs::create_dir_all(output_dir).map_err(|e| Error::Nanopore(format!(
-        "cannot create output directory {}: {e}",
-        output_dir.display()
-    )))?;
+    std::fs::create_dir_all(output_dir).map_err(|e| {
+        Error::Nanopore(format!(
+            "cannot create output directory {}: {e}",
+            output_dir.display()
+        ))
+    })?;
 
     let output_path = output_dir.join("basecalled.fastq");
 
     let mut cmd = Command::new(&bin);
-    cmd.arg("basecaller")
-        .arg(config.model.as_str())
-        .arg(input);
+    cmd.arg("basecaller").arg(config.model.as_str()).arg(input);
 
     if let Some(device) = &config.device {
         cmd.arg("--device").arg(device);
@@ -207,9 +202,8 @@ pub fn basecall(
         )));
     }
 
-    std::fs::write(&output_path, &output.stdout).map_err(|e| Error::Nanopore(format!(
-        "failed to write output: {e}"
-    )))?;
+    std::fs::write(&output_path, &output.stdout)
+        .map_err(|e| Error::Nanopore(format!("failed to write output: {e}")))?;
 
     let (n_reads, total_bases) = count_fastq_reads(&output.stdout);
 
@@ -231,7 +225,11 @@ pub fn parse_basecalled_reads(fastq_bytes: &[u8]) -> Vec<BasecalledRead> {
     let mut i = 0;
     while i + 3 < lines.len() {
         if let Some(header) = lines[i].strip_prefix('@') {
-            let read_id = header.split_whitespace().next().unwrap_or(header).to_string();
+            let read_id = header
+                .split_whitespace()
+                .next()
+                .unwrap_or(header)
+                .to_string();
             let sequence = lines[i + 1].as_bytes().to_vec();
             let quality = lines[i + 3].as_bytes().to_vec();
             reads.push(BasecalledRead {

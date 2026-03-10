@@ -152,10 +152,7 @@ impl CalibrationCurve {
 /// (only possible for degenerate curves with zero slope).
 #[must_use]
 pub fn quantify_batch(curve: &CalibrationCurve, responses: &[f64]) -> Vec<QuantResult> {
-    responses
-        .iter()
-        .filter_map(|&r| curve.predict(r))
-        .collect()
+    responses.iter().filter_map(|&r| curve.predict(r)).collect()
 }
 
 #[cfg(test)]

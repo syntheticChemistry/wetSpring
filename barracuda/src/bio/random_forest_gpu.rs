@@ -42,9 +42,7 @@ impl RandomForestGpu {
     #[expect(
         clippy::cast_possible_truncation,
         clippy::cast_possible_wrap,
-        clippy::cast_sign_loss,
-        clippy::similar_names,
-        clippy::too_many_lines
+        clippy::similar_names
     )]
     pub fn predict_batch(
         &self,
@@ -177,7 +175,7 @@ impl RandomForestGpu {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(clippy::expect_used, clippy::unwrap_used)]
+#[expect(clippy::expect_used)]
 mod tests {
     use super::*;
     use crate::bio::decision_tree::DecisionTree;

@@ -76,7 +76,6 @@ fn cpu_fallback(samples: &[f64], refs: &[f64], ppm_tol: f64, da_tol: f64) -> Vec
 }
 
 #[cfg(test)]
-#[expect(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
 

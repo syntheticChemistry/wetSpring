@@ -72,7 +72,6 @@ pub fn extract_eics_gpu(
 /// # Errors
 ///
 /// Returns an error if GPU dispatch fails or the device lacks f64 support.
-#[expect(clippy::cast_precision_loss)]
 pub fn batch_integrate_peaks_gpu(
     gpu: &GpuF64,
     eics: &[Eic],

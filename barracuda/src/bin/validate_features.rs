@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Validate feature extraction pipeline against `asari` MT02 baseline (Exp009).
 //!
 //! # Provenance

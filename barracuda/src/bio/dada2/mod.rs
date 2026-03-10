@@ -40,12 +40,12 @@ mod types;
 
 use std::fmt::Write;
 
-#[expect(unused_imports)]
+#[cfg(feature = "gpu")]
 pub(crate) use core::{
     ErrorModel, base_to_idx, err_model_converged, estimate_error_model, init_error_model,
 };
 pub use core::{MAX_ERR_ITERS, denoise, poisson_pvalue};
-#[expect(unused_imports)]
+#[cfg(feature = "gpu")]
 pub(crate) use core::{MAX_QUAL, MIN_ERR, NUM_BASES};
 pub use types::{Asv, Dada2Params, Dada2Stats};
 

@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-09 (V105: 334 experiments, 318 binaries, 9,200+ checks. V105: petalTongue V2 full-domain viz — 33 scenario builders, 9 DataChannel types, 4 composite, 140/140 viz validation PASS. V101: 78/78 PASS. V100: 173/173 PASS. V99: 166/166 PASS. V98: 173/173 PASS. All 52 papers, biomeOS IPC, petalTongue, cross-primal pipelines, ToadStool dispatch. 1,288 lib + 219 integration tests, 179 tolerances, clippy pedantic CLEAN.)
+**Updated**: 2026-03-10 (V106: 334 experiments, 318 binaries, 9,200+ checks. V106: deep debt cleanup — 112 stale `#[expect()]` removed, `#![forbid(unsafe_code)]` on all 320 crate roots, BIOM streaming parser, 8 doc link fixes, `NMF_CONVERGENCE` tolerance. V105: petalTongue V2 full-domain viz — 33 scenario builders, 9 DataChannel types, 4 composite. All 52 papers, biomeOS IPC, petalTongue, cross-primal pipelines, ToadStool dispatch. 1,605 tests, 180 tolerances, clippy pedantic+nursery CLEAN.)
 
 ---
 

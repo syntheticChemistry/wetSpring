@@ -95,12 +95,7 @@ pub fn rate_variation_cv_gpu(gpu: &GpuF64, rates: &[f64]) -> Result<f64> {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::type_complexity,
-    clippy::manual_let_else
-)]
+#[expect(clippy::type_complexity)]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

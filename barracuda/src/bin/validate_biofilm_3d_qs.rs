@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![expect(clippy::expect_used, clippy::unwrap_used, clippy::print_stdout)]
+#![forbid(unsafe_code)]
+#![expect(clippy::print_stdout)]
 //! # Exp130: Thick Biofilm 3D QS Extension
 //!
 //! Compares QS-active windows between 2D slab and 3D block geometries to
@@ -58,7 +59,6 @@ fn plateau_count(sweep: &[(f64, f64)], midpoint: f64, w_above: f64) -> usize {
         .count()
 }
 
-#[expect(clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp130: Thick Biofilm 3D QS Extension");
 

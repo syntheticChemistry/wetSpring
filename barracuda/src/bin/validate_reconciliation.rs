@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Validation binary for Exp034: DTL Reconciliation.
 //!
 //! Validates Rust DTL reconciliation against Python baseline

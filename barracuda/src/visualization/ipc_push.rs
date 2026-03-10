@@ -296,10 +296,7 @@ impl PetalTonguePushClient {
     /// # Errors
     ///
     /// Returns [`PushError`] on connection or RPC failure.
-    pub fn subscribe_interactions(
-        &self,
-        session_id: &str,
-    ) -> PushResult<serde_json::Value> {
+    pub fn subscribe_interactions(&self, session_id: &str) -> PushResult<serde_json::Value> {
         let params = serde_json::json!({
             "session_id": session_id,
         });

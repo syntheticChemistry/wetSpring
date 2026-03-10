@@ -80,12 +80,7 @@ pub fn distance_matrix_batch_gpu(gpu: &GpuF64, alignments: &[Vec<&[u8]>]) -> Res
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::type_complexity,
-    clippy::manual_let_else
-)]
+#[expect(clippy::type_complexity)]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

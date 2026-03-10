@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Exp329: metalForge + petalTongue visualization integration.
 //!
 //! Validates hardware inventory, workload dispatch, and NUCLEUS topology

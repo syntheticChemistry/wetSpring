@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! wetSpring interactive dashboard — single binary for scientists.
 //!
 //! Discovers local GPU via wgpu, runs diversity + ODE + phylogenetics

@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Validation: Gillespie SSA — Massie 2012 c-di-GMP birth-death model.
 //!
 //! Validates the Rust Gillespie implementation against the Python baseline

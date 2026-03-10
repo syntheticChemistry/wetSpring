@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Validation: Bruger & Waters 2018 cooperative QS game theory (Exp025).
 //!
 //! # Provenance

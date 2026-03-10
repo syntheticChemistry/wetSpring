@@ -173,11 +173,7 @@ fn split_ldr(ldr: &str) -> Option<(&str, &str)> {
     Some((key, value))
 }
 
-fn build_block(
-    metadata: &BTreeMap<String, String>,
-    x: Vec<f64>,
-    y: Vec<f64>,
-) -> JcampBlock {
+fn build_block(metadata: &BTreeMap<String, String>, x: Vec<f64>, y: Vec<f64>) -> JcampBlock {
     JcampBlock {
         title: metadata.get("TITLE").cloned().unwrap_or_default(),
         data_type: metadata.get("DATA TYPE").cloned().unwrap_or_default(),
@@ -196,7 +192,8 @@ fn parse_data_line(
     first_x: Option<f64>,
     delta_x: Option<f64>,
 ) {
-    let tokens: Vec<&str> = line.split(|c: char| c == ',' || c.is_ascii_whitespace())
+    let tokens: Vec<&str> = line
+        .split(|c: char| c == ',' || c.is_ascii_whitespace())
         .filter(|t| !t.is_empty())
         .collect();
 
@@ -222,10 +219,7 @@ fn parse_data_line(
         // XY pairs
         let mut i = 0;
         while i + 1 < tokens.len() {
-            if let (Ok(xv), Ok(yv)) = (
-                tokens[i].parse::<f64>(),
-                tokens[i + 1].parse::<f64>(),
-            ) {
+            if let (Ok(xv), Ok(yv)) = (tokens[i].parse::<f64>(), tokens[i + 1].parse::<f64>()) {
                 x_vals.push(xv);
                 y_vals.push(yv);
             }
@@ -274,7 +268,10 @@ fn parse_jcamp_value(token: &str) -> std::result::Result<f64, ()> {
         _ => return Err(()),
     };
 
-    let rest: String = token[1..].chars().filter(|c| c.is_ascii_digit() || *c == '.').collect();
+    let rest: String = token[1..]
+        .chars()
+        .filter(|c| c.is_ascii_digit() || *c == '.')
+        .collect();
     let mantissa = if rest.is_empty() {
         f64::from(digit)
     } else {
@@ -447,10 +444,7 @@ mod tests {
             blocks[0].metadata.get(".OBSERVE FREQUENCY").unwrap(),
             "400.13"
         );
-        assert_eq!(
-            blocks[0].metadata.get(".OBSERVE NUCLEUS").unwrap(),
-            "^1H"
-        );
+        assert_eq!(blocks[0].metadata.get(".OBSERVE NUCLEUS").unwrap(), "^1H");
     }
 
     #[test]

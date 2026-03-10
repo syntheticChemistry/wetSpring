@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** March 9, 2026 (V105)
+**Date:** March 10, 2026 (V106)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
 **barraCuda:** standalone v0.3.3 `a898dee`
-**Status:** 150+ primitives consumed (264 ComputeDispatch ops) via `compile_shader_universal`, 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 47 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,288 lib + 219 integration tests, standalone barraCuda v0.3.3, 334 experiments, 9,060+ checks, 316 binaries, 179 named tolerances, clippy pedantic CLEAN (`--all-features`). **V105:** petalTongue visualization evolution — 9 DataChannel types, 33 scenario builders, StreamSession, Songbird capabilities, IPC science→viz wiring, Exp333-334 (78/78 PASS). V100: 173/173 PASS.
+**Status:** 150+ primitives consumed (264 ComputeDispatch ops) via `compile_shader_universal`, 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 47 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,605 tests (1,288 lib + 218 forge + 72 integration + 27 doc), standalone barraCuda v0.3.3, 334 experiments, 9,200+ checks, 318 binaries, 180 named tolerances, `#![forbid(unsafe_code)]` on all 320 crate roots, clippy pedantic+nursery CLEAN (`--all-features`). **V106:** deep debt cleanup — 112 stale `#[expect()]` removed (absorption fidelity confirmed), BIOM streaming parser, NMF_CONVERGENCE tolerance, 8 doc links fixed. V105: petalTongue visualization evolution — 9 DataChannel types, 33 scenario builders, StreamSession, Songbird capabilities, IPC science→viz wiring, Exp333-334 (78/78 PASS). V100: 173/173 PASS.
 
 ---
 

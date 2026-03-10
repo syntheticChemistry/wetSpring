@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Validation: Hsueh/Severin 2022 phage defense deaminase (Exp030).
 //!
 //! # Provenance

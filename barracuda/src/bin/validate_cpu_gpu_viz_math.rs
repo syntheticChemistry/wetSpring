@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![expect(clippy::similar_names)]
+#![forbid(unsafe_code)]
 //! Exp328: CPU vs GPU pure math parity for visualization-exercised domains.
 //!
 //! Runs the same scientific computations on CPU and GPU, compares results

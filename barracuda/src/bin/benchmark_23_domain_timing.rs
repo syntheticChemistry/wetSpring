@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Exp059: 23-Domain Head-to-Head Timing Benchmark
 //!
 //! Runs all 23 `BarraCuda` CPU domains with wall-clock timing,

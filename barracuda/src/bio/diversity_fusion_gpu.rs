@@ -11,12 +11,7 @@ pub use barracuda::ops::bio::diversity_fusion::{
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::type_complexity,
-    clippy::manual_let_else
-)]
+#[expect(clippy::expect_used)]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

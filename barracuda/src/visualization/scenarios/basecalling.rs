@@ -23,9 +23,7 @@ pub fn basecalling_scenario(
 ) -> (EcologyScenario, Vec<ScenarioEdge>) {
     let mut s = scaffold(
         "Nanopore Basecalling QC",
-        &format!(
-            "{total_reads} total reads, {passed_reads} passed (Q >= 10)"
-        ),
+        &format!("{total_reads} total reads, {passed_reads} passed (Q >= 10)"),
     );
 
     let mut qc_node = node("basecall_qc", "Basecalling QC", "compute", &["basecalling"]);
@@ -58,7 +56,10 @@ pub fn basecalling_scenario(
 
     if !read_lengths.is_empty() {
         let mean_len = read_lengths.iter().sum::<f64>() / read_lengths.len() as f64;
-        let variance = read_lengths.iter().map(|&l| (l - mean_len).powi(2)).sum::<f64>()
+        let variance = read_lengths
+            .iter()
+            .map(|&l| (l - mean_len).powi(2))
+            .sum::<f64>()
             / read_lengths.len() as f64;
         let std_dev = variance.sqrt();
 

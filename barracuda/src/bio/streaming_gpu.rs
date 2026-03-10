@@ -384,7 +384,6 @@ impl GpuPipelineSession {
     /// # Errors
     ///
     /// Returns an error if GPU dispatch fails.
-    #[expect(clippy::cast_precision_loss)]
     pub fn spectral_cosine_matrix(&self, spectra: &[&[f64]]) -> Result<Vec<f64>> {
         let n = spectra.len();
         if n < 2 {
@@ -488,7 +487,6 @@ impl GpuPipelineSession {
     /// # Errors
     ///
     /// Returns an error if GPU dispatch fails for any stage.
-    #[expect(clippy::cast_precision_loss)]
     pub fn stream_full_analytics(
         &self,
         classifier: &NaiveBayesClassifier,
@@ -653,12 +651,7 @@ fn argmax_with_priors(scores: &[f64], log_priors: &[f64]) -> usize {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::type_complexity,
-    clippy::manual_let_else
-)]
+#[expect(clippy::expect_used)]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

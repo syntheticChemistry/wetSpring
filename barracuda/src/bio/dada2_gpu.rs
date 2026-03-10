@@ -130,11 +130,7 @@ impl Dada2Gpu {
 /// # Errors
 ///
 /// Returns an error if GPU dispatch fails or the device lacks f64 support.
-#[expect(
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::too_many_lines
-)]
+#[expect(clippy::cast_possible_truncation, clippy::too_many_lines)]
 pub fn denoise_gpu(
     dada2: &Dada2Gpu,
     seqs: &[UniqueSequence],
@@ -411,12 +407,7 @@ fn build_asvs(seqs: &[&UniqueSequence], partition: &[usize], centers: &[usize]) 
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::manual_let_else,
-    clippy::used_underscore_items
-)]
+#[expect(clippy::manual_let_else)]
 mod tests {
     use super::*;
     use crate::bio::derep::UniqueSequence;

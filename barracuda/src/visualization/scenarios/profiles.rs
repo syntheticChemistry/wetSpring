@@ -160,10 +160,7 @@ pub fn environmental_study_scenario(
         let xs: Vec<f64> = (0..profile.sample_labels.len())
             .map(|i| (i as f64).mul_add(0.3, -0.5))
             .collect();
-        let ys: Vec<f64> = shannons
-            .iter()
-            .map(|&h| h.mul_add(0.1, -0.2))
-            .collect();
+        let ys: Vec<f64> = shannons.iter().map(|&h| h.mul_add(0.1, -0.2)).collect();
         ord_node.data_channels.push(scatter(
             "pcoa",
             "PCoA (Bray-Curtis)",
@@ -197,7 +194,12 @@ pub fn pfas_screening_scenario(
     s.domain = "measurement".into();
 
     // Detection node
-    let mut det_node = node("detection", "Suspect Screening", "compute", &["spectral_match"]);
+    let mut det_node = node(
+        "detection",
+        "Suspect Screening",
+        "compute",
+        &["spectral_match"],
+    );
     det_node.data_channels.push(scatter(
         "rt_mz_scatter",
         "RT vs m/z",

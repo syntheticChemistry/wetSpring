@@ -169,11 +169,7 @@ fn double_center(condensed: &[f64], n: usize) -> Vec<f64> {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::used_underscore_items
-)]
+#[expect(clippy::used_underscore_items)]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

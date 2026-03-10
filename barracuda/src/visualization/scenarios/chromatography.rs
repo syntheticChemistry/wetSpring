@@ -188,11 +188,7 @@ pub fn quantitation_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     }
     s.nodes.push(quant_node);
 
-    let edges = vec![edge(
-        "calibration",
-        "quantitation",
-        "calibration → predict",
-    )];
+    let edges = vec![edge("calibration", "quantitation", "calibration → predict")];
     (s, edges)
 }
 

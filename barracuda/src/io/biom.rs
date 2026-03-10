@@ -16,6 +16,7 @@
 //! - `<http://biom-format.org/documentation/format_versions/biom-1.0.html>`
 
 use crate::error::{Error, Result};
+use std::io::BufReader;
 use std::path::Path;
 
 /// A parsed BIOM table.
@@ -62,13 +63,17 @@ impl BiomTable {
     /// Get a column (sample) as a vector.
     #[must_use]
     pub fn column(&self, col: usize) -> Vec<f64> {
-        (0..self.n_rows).map(|r| self.data[r * self.n_cols + col]).collect()
+        (0..self.n_rows)
+            .map(|r| self.data[r * self.n_cols + col])
+            .collect()
     }
 
     /// Total count per sample (column sums).
     #[must_use]
     pub fn sample_totals(&self) -> Vec<f64> {
-        (0..self.n_cols).map(|c| self.column(c).iter().sum()).collect()
+        (0..self.n_cols)
+            .map(|c| self.column(c).iter().sum())
+            .collect()
     }
 
     /// Total count per observation (row sums).
@@ -85,11 +90,14 @@ impl BiomTable {
 /// Returns [`Error::Io`] if the file cannot be read, or
 /// [`Error::InvalidInput`] for malformed BIOM JSON.
 pub fn parse_biom(path: &Path) -> Result<BiomTable> {
-    let content = std::fs::read_to_string(path).map_err(|e| Error::Io {
+    let file = std::fs::File::open(path).map_err(|e| Error::Io {
         path: path.to_path_buf(),
         source: e,
     })?;
-    parse_biom_str(&content)
+    let reader = BufReader::new(file);
+    let val: serde_json::Value = serde_json::from_reader(reader)
+        .map_err(|e| Error::InvalidInput(format!("BIOM JSON: {e}")))?;
+    parse_biom_value(&val)
 }
 
 /// Parse a BIOM 1.0 JSON string.
@@ -100,7 +108,10 @@ pub fn parse_biom(path: &Path) -> Result<BiomTable> {
 pub fn parse_biom_str(json: &str) -> Result<BiomTable> {
     let val: serde_json::Value =
         serde_json::from_str(json).map_err(|e| Error::InvalidInput(format!("BIOM JSON: {e}")))?;
+    parse_biom_value(&val)
+}
 
+fn parse_biom_value(val: &serde_json::Value) -> Result<BiomTable> {
     let id = val
         .get("id")
         .and_then(serde_json::Value::as_str)
@@ -189,9 +200,9 @@ fn parse_dense_data(val: &serde_json::Value, n_rows: usize, n_cols: usize) -> Re
 
     let mut data = Vec::with_capacity(n_rows * n_cols);
     for row in outer {
-        let inner = row.as_array().ok_or_else(|| {
-            Error::InvalidInput("BIOM: dense data rows must be arrays".into())
-        })?;
+        let inner = row
+            .as_array()
+            .ok_or_else(|| Error::InvalidInput("BIOM: dense data rows must be arrays".into()))?;
         if inner.len() != n_cols {
             return Err(Error::InvalidInput(format!(
                 "BIOM: expected {n_cols} columns, got {}",

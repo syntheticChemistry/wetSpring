@@ -2,8 +2,8 @@
 //! HMM scenario: forward log-alpha, Viterbi path, posterior probability heatmap.
 
 use crate::bio::hmm::{self, HmmModel};
-use crate::visualization::types::{EcologyScenario, ScenarioEdge};
 use crate::visualization::ScientificRange;
+use crate::visualization::types::{EcologyScenario, ScenarioEdge};
 
 use super::{bar, heatmap, node, scaffold, timeseries};
 

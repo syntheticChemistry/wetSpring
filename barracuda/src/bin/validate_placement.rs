@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Validation: Alamin & Liu 2024 phylogenetic placement (Exp032).
 //!
 //! # Provenance

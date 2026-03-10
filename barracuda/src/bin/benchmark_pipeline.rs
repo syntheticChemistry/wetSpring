@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Benchmark: Full 16S pipeline timing — Rust CPU vs `Galaxy`/Python reference.
 //!
 //! Measures wall-clock time and energy for every pipeline stage on real public

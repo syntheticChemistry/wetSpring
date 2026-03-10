@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 #![allow(
     clippy::expect_used,
     clippy::unwrap_used,
@@ -89,7 +90,6 @@ fn main() {
     let mut all_shannon = Vec::with_capacity(N_SYNTHETIC_SAMPLES);
     let mut all_simpson = Vec::with_capacity(N_SYNTHETIC_SAMPLES);
     let mut all_obs = Vec::with_capacity(N_SYNTHETIC_SAMPLES);
-    #[expect(clippy::collection_is_never_read)]
     let mut all_pielou = Vec::with_capacity(N_SYNTHETIC_SAMPLES);
 
     println!(

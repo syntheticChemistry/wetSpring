@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 #![expect(clippy::cast_precision_loss)]
 //! Exp085: `BarraCuda` CPU Parity v7 — Tier A Data Layout Fidelity
 //!

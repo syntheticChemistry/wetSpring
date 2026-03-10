@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Validation: Mhatre 2020 phenotypic capacitor (Exp027).
 //!
 //! # Provenance

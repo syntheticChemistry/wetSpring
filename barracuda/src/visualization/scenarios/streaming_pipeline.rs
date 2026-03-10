@@ -5,8 +5,8 @@
 //! into a multi-node scenario graph suitable for progressive streaming
 //! via [`StreamSession`](crate::visualization::stream::StreamSession).
 
-use crate::visualization::types::{EcologyScenario, ScenarioEdge};
 use crate::visualization::ScientificRange;
+use crate::visualization::types::{EcologyScenario, ScenarioEdge};
 
 use super::{bar, edge, gauge, node, scaffold};
 

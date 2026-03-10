@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Validate the complete 16S amplicon pipeline: derep → DADA2 → chimera → taxonomy → `UniFrac`.
 //!
 //! # Provenance

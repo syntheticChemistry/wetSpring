@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Validate peak detection and retention index matching against Reese 2019 (Exp013).
 //!
 //! # Provenance

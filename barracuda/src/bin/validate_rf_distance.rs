@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Validation binary: Robinson-Foulds tree distance (Exp021).
 //!
 //! Compares Rust RF distance against dendropy (Python) ground truth

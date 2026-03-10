@@ -34,7 +34,9 @@ pub mod stochastic;
 pub mod streaming_pipeline;
 
 pub use anderson::anderson_scenario;
+pub use basecalling::basecalling_scenario;
 pub use benchmarks::benchmark_scenario;
+pub use calibration::calibration_scenario;
 pub use chemistry::chemistry_scenario;
 pub use chromatography::{chromatogram_scenario, eic_scenario, quantitation_scenario};
 pub use dynamics::{dynamics_scenario, qs_biofilm_scenario};
@@ -42,6 +44,8 @@ pub use ecology::ecology_scenario;
 pub use hmm::hmm_scenario;
 pub use lcms::{pfas_overview_scenario, spectral_match_scenario, tolerance_search_scenario};
 pub use ml_models::{decision_tree_scenario, esn_scenario, random_forest_scenario};
+pub use msa::msa_scenario;
+pub use neighbor_joining::neighbor_joining_scenario;
 pub use nmf::nmf_scenario;
 pub use ode_systems::{
     bistable_scenario, capacitor_scenario, cooperation_scenario, multi_signal_scenario,
@@ -57,16 +61,12 @@ pub use pipeline::{
     dada2_scenario, pipeline_overview_scenario, quality_scenario, taxonomy_scenario,
 };
 pub use popgen::{kmer_spectrum_scenario, population_genomics_scenario, snp_scenario};
+pub use profiles::{
+    CalibrationProfile, EnvironmentalProfile, PfasScreeningProfile, calibration_report_scenario,
+    environmental_study_scenario, pfas_screening_scenario,
+};
 pub use rarefaction::rarefaction_scenario;
 pub use similarity::similarity_scenario;
-pub use profiles::{
-    calibration_report_scenario, environmental_study_scenario, pfas_screening_scenario,
-    CalibrationProfile, EnvironmentalProfile, PfasScreeningProfile,
-};
-pub use basecalling::basecalling_scenario;
-pub use calibration::calibration_scenario;
-pub use msa::msa_scenario;
-pub use neighbor_joining::neighbor_joining_scenario;
 pub use spectroscopy::{spectroscopy_scenario, spectroscopy_scenario_from_data};
 pub use stochastic::stochastic_scenario;
 

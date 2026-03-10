@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 #![allow(
     clippy::expect_used,
     clippy::unwrap_used,
@@ -85,7 +86,6 @@ fn validate_tree_inference(device: &Arc<WgpuDevice>, v: &mut Validator) {
 
     let ti = TreeInferenceGpu::new(device);
 
-    #[expect(clippy::cast_precision_loss)]
     let samples: Vec<f64> = vec![
         3.0, 0.0, 0.0, // sample 0: feature[0]=3 < 5 → class 0
         7.0, 0.0, 0.0, // sample 1: feature[0]=7 > 5 → class 1

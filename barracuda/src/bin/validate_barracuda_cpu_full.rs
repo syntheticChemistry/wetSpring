@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 #![expect(clippy::too_many_lines, clippy::cast_precision_loss)]
 //! Exp070: `BarraCuda` CPU — 25-Domain Pure Rust Math Proof
 //!

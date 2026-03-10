@@ -25,11 +25,13 @@ pub fn spectroscopy_scenario(
 ) -> crate::error::Result<(EcologyScenario, Vec<ScenarioEdge>)> {
     let blocks = jcamp::parse_jcamp(path)?;
 
-    let title = blocks
-        .first()
-        .map_or("JCAMP-DX Spectrum", |b| {
-            if b.title.is_empty() { "JCAMP-DX Spectrum" } else { &b.title }
-        });
+    let title = blocks.first().map_or("JCAMP-DX Spectrum", |b| {
+        if b.title.is_empty() {
+            "JCAMP-DX Spectrum"
+        } else {
+            &b.title
+        }
+    });
 
     let mut s = scaffold(
         &format!("{title} — Spectroscopy"),
@@ -37,12 +39,7 @@ pub fn spectroscopy_scenario(
     );
     s.domain = "measurement".into();
 
-    let mut spec_node = node(
-        "spectroscopy",
-        "JCAMP-DX Data",
-        "data",
-        &["spectroscopy"],
-    );
+    let mut spec_node = node("spectroscopy", "JCAMP-DX Data", "data", &["spectroscopy"]);
 
     for (i, block) in blocks.iter().enumerate() {
         let block_label = if block.title.is_empty() {
@@ -52,8 +49,16 @@ pub fn spectroscopy_scenario(
         };
 
         if !block.x.is_empty() && !block.y.is_empty() {
-            let x_unit = if block.x_units.is_empty() { "x" } else { &block.x_units };
-            let y_unit = if block.y_units.is_empty() { "y" } else { &block.y_units };
+            let x_unit = if block.x_units.is_empty() {
+                "x"
+            } else {
+                &block.x_units
+            };
+            let y_unit = if block.y_units.is_empty() {
+                "y"
+            } else {
+                &block.y_units
+            };
 
             spec_node.data_channels.push(timeseries(
                 &format!("spectrum_{i}"),
@@ -68,12 +73,12 @@ pub fn spectroscopy_scenario(
 
         // Compact peak tables get a bar chart
         if block.x.len() <= 50 && !block.x.is_empty() {
-            let labels: Vec<String> = block
-                .x
-                .iter()
-                .map(|x| format!("{x:.2}"))
-                .collect();
-            let y_unit = if block.y_units.is_empty() { "intensity" } else { &block.y_units };
+            let labels: Vec<String> = block.x.iter().map(|x| format!("{x:.2}")).collect();
+            let y_unit = if block.y_units.is_empty() {
+                "intensity"
+            } else {
+                &block.y_units
+            };
             spec_node.data_channels.push(bar(
                 &format!("peaks_{i}"),
                 &format!("{block_label} Peaks"),
@@ -112,13 +117,7 @@ pub fn spectroscopy_scenario_from_data(
 
     let mut spec_node = node("spectrum", "Spectrum Data", "data", &["spectroscopy"]);
     spec_node.data_channels.push(timeseries(
-        "spectrum",
-        title,
-        x_unit,
-        y_unit,
-        y_unit,
-        x_values,
-        y_values,
+        "spectrum", title, x_unit, y_unit, y_unit, x_values, y_values,
     ));
     s.nodes.push(spec_node);
     (s, vec![])
@@ -130,8 +129,13 @@ mod tests {
 
     #[test]
     fn from_data_basic() {
-        let (scenario, _) =
-            spectroscopy_scenario_from_data("Test IR", &[4000.0, 3500.0, 3000.0], &[0.5, 0.8, 0.3], "cm⁻¹", "T");
+        let (scenario, _) = spectroscopy_scenario_from_data(
+            "Test IR",
+            &[4000.0, 3500.0, 3000.0],
+            &[0.5, 0.8, 0.3],
+            "cm⁻¹",
+            "T",
+        );
         assert_eq!(scenario.nodes.len(), 1);
         assert_eq!(scenario.domain, "measurement");
     }

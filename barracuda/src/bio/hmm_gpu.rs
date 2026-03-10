@@ -146,7 +146,7 @@ impl HmmGpuForward {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(clippy::expect_used, clippy::unwrap_used, clippy::manual_let_else)]
+#[expect(clippy::manual_let_else)]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

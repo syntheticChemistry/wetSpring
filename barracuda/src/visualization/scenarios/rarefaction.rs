@@ -2,8 +2,8 @@
 //! Rarefaction scenario: rarefaction curves with bootstrap CI bands.
 
 use crate::bio::diversity;
-use crate::visualization::types::{EcologyScenario, ScenarioEdge};
 use crate::visualization::ScientificRange;
+use crate::visualization::types::{EcologyScenario, ScenarioEdge};
 
 use super::{gauge, node, scaffold, timeseries};
 

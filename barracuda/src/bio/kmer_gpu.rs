@@ -99,7 +99,6 @@ impl KmerGpu {
     /// # Errors
     ///
     /// Returns `Err` if GPU dispatch or readback fails.
-    #[expect(clippy::cast_possible_truncation)]
     pub fn count_from_sequence(
         &self,
         sequence: &[u8],
@@ -144,7 +143,6 @@ impl KmerGpu {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

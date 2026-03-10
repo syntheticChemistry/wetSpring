@@ -90,12 +90,6 @@ pub fn rf_distance_matrix_gpu(gpu: &GpuF64, trees: &[PhyloTree]) -> Result<Vec<f
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::type_complexity,
-    clippy::manual_let_else
-)]
 mod tests {
     use super::*;
     use crate::bio::unifrac::tree::PhyloTree;

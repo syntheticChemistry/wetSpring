@@ -178,11 +178,7 @@ fn require_f64(gpu: &GpuF64) -> Result<()> {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::used_underscore_items
-)]
+#[expect(clippy::used_underscore_items)]
 mod tests {
     use super::*;
 

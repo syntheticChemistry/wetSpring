@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Exp037 — HMM discordance detection on real `PhyNetPy` gene tree RF sequence.
 //!
 //! # Provenance

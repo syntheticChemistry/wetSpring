@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Validation: Fernandez 2020 bistable phenotypic switching (Exp023).
 //!
 //! Validates the Rust bistable ODE model against the Python/`scipy` baseline.

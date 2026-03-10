@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 #![allow(
     clippy::expect_used,
     clippy::unwrap_used,
@@ -48,7 +49,7 @@ fn chimney_to_disorder(zone: &ChimneyZone) -> f64 {
     (w_mineral + w_temp) * porosity_factor
 }
 
-#[expect(clippy::cast_precision_loss, clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp128: Vent Chimney Geometry QS Prediction");
 

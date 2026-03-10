@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Validation binary: Waters 2008 QS/c-di-GMP ODE model (Exp020).
 //!
 //! Runs 4 biological scenarios through the Rust RK4 integrator and compares

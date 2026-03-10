@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Date: 2026-03-10
+# Commit: be581fd
 """wetSpring — Priority-2 Data Download
 
 Downloads priority-2 datasets:

@@ -49,11 +49,6 @@ fn require_f64(gpu: &GpuF64) -> Result<()> {
 /// # Errors
 ///
 /// Returns an error if the device lacks `SHADER_F64` support.
-#[expect(
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss
-)]
 pub fn extract_features_gpu(
     gpu: &GpuF64,
     spectra: &[MzmlSpectrum],
@@ -179,12 +174,6 @@ fn estimate_noise(intensity: &[f64]) -> f64 {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::type_complexity,
-    clippy::manual_let_else
-)]
 mod tests {
     use super::*;
     use crate::bio::feature_table::FeatureParams;

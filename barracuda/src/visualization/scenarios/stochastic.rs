@@ -2,8 +2,8 @@
 //! Stochastic scenario: Gillespie SSA trajectories and ensemble statistics.
 
 use crate::bio::gillespie::{self, EnsembleStats, Trajectory};
-use crate::visualization::types::{EcologyScenario, ScenarioEdge};
 use crate::visualization::ScientificRange;
+use crate::visualization::types::{EcologyScenario, ScenarioEdge};
 
 use super::{distribution, gauge, node, scaffold, timeseries};
 

@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 //! Exp107: Cross-Spring Spectral Theory — Anderson Localization for Quorum Sensing
 //!
 //! Exercises `barracuda::spectral` primitives from wetSpring's import path,

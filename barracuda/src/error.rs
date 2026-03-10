@@ -137,10 +137,7 @@ mod tests {
                 "nanopore parse error",
             ),
             (Error::Ipc("socket refused".into()), "IPC error"),
-            (
-                Error::Jcamp("missing TITLE".into()),
-                "JCAMP-DX parse error",
-            ),
+            (Error::Jcamp("missing TITLE".into()), "JCAMP-DX parse error"),
         ];
         for (err, expected_prefix) in cases {
             let msg = err.to_string();

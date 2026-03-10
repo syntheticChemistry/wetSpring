@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![forbid(unsafe_code)]
 #![expect(clippy::similar_names)]
 //! Exp055 — Anderson 2017: Population genomics at hydrothermal vents.
 //!

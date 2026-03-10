@@ -9,11 +9,11 @@ pub mod ani_gpu;
 #[cfg(feature = "gpu")]
 pub mod batch_fitness_gpu;
 pub mod bistable;
-pub mod calibration;
 #[cfg(feature = "gpu")]
 pub mod bistable_gpu;
 pub mod bootstrap;
 pub mod brain;
+pub mod calibration;
 pub mod capacitor;
 #[cfg(feature = "gpu")]
 pub mod capacitor_gpu;
@@ -28,7 +28,6 @@ pub mod dada2;
 pub mod dada2_gpu;
 pub mod decision_tree;
 pub mod derep;
-pub mod dorado;
 #[cfg(feature = "gpu")]
 pub mod derep_gpu;
 pub mod diversity;
@@ -39,6 +38,7 @@ pub mod diversity_gpu;
 pub mod dnds;
 #[cfg(feature = "gpu")]
 pub mod dnds_gpu;
+pub mod dorado;
 pub mod eic;
 #[cfg(feature = "gpu")]
 pub mod eic_gpu;
