@@ -61,7 +61,7 @@ impl StatsAccumulator {
             self.total_quality_sum += q_sum;
             self.total_quality_count += quality.len() as u64;
 
-            #[allow(clippy::cast_precision_loss)]
+            #[expect(clippy::cast_precision_loss)]
             let mean_q = q_sum as f64 / quality.len() as f64;
             if mean_q >= 30.0 {
                 self.q30_count += 1;
@@ -69,7 +69,7 @@ impl StatsAccumulator {
         }
     }
 
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     fn finish(self) -> FastqStats {
         let n = self.num_sequences;
         FastqStats {

@@ -164,7 +164,7 @@ const N_PATHWAYS: usize = 10;
 const N_ENTITIES: usize = N_DRUGS + N_DISEASES + N_GENES + N_PATHWAYS;
 const N_RELATIONS: usize = 4;
 
-#[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+#[expect(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
 fn generate_triples(rng: &mut LcgRng) -> Vec<(usize, usize, usize)> {
     let mut triples: Vec<(usize, usize, usize)> = Vec::new();
 

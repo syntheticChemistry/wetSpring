@@ -299,9 +299,9 @@ fn run_stream_demo(all_scenarios: &[ScenarioEntry<'_>]) {
         }
         Err(e) => {
             eprintln!("  --stream: {e} — session lifecycle demo only (no IPC)");
-            let client = PetalTonguePushClient::new(std::path::PathBuf::from(
-                "/tmp/nonexistent-stream-demo.sock",
-            ));
+            let client = PetalTonguePushClient::new(
+                std::env::temp_dir().join("nonexistent-stream-demo.sock"),
+            );
             let mut session = wetspring_barracuda::visualization::stream::StreamSession::open(
                 client,
                 "dump-stream-demo",

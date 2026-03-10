@@ -236,7 +236,7 @@ fn nestgate_rpc(socket: &Path, request: &str) -> Result<String, String> {
 }
 
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
+#[expect(clippy::unwrap_used)]
 mod tests {
     use super::*;
 

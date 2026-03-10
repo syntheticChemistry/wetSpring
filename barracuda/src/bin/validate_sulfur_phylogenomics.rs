@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::similar_names)]
 //! Exp053 — Mateos & Anderson 2023: Sulfur-cycling enzyme phylogenomics.
 //!
 //! Validates DTL reconciliation, molecular clock, and Robinson-Foulds

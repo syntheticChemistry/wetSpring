@@ -125,7 +125,7 @@ pub fn relaxed_clock_rates(
 ///
 /// CV near 0 → strict clock; CV > 0.5 → substantial rate variation.
 #[must_use]
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 pub fn rate_variation_cv(rates: &[f64]) -> f64 {
     let positive: Vec<f64> = rates.iter().copied().filter(|&r| r > 0.0).collect();
     if positive.len() < 2 {
@@ -152,8 +152,8 @@ fn root_tree_height(branch_lengths: &[f64], parent_indices: &[Option<usize>]) ->
     dist_from_root.iter().copied().fold(0.0_f64, f64::max)
 }
 
+#[expect(clippy::unwrap_used)]
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use crate::tolerances;

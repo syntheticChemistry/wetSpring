@@ -91,7 +91,7 @@ fn cosine_spectrum(a: &[(f64, f64)], b: &[(f64, f64)]) -> f64 {
     spectral_match::cosine_similarity(&mz_a, &int_a, &mz_b, &int_b, 2.0).score
 }
 
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp124: MassBank Full-Scale NPU Spectral Triage");
 

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::too_many_lines, clippy::unwrap_used, clippy::expect_used)]
+#![expect(clippy::too_many_lines)]
 //! # Exp331: Local Evolution & Upstream Readiness
 //!
 //! Validates all idiomatic improvements made for upstream absorption:

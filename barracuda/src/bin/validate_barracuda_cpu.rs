@@ -47,7 +47,7 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
-#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
+#[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("BarraCuda CPU Parity — Pure Rust Math vs Python");
     let mut timings: Vec<(&str, f64)> = Vec::new();

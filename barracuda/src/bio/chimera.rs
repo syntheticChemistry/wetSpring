@@ -140,7 +140,7 @@ fn sketch_similarity(a: &KmerSketch, b: &KmerSketch) -> u32 {
 ///
 /// Sequences must be sorted by abundance (descending). Returns chimera
 /// results for each sequence and the filtered non-chimeric sequences.
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 #[must_use]
 pub fn detect_chimeras(seqs: &[Asv], params: &ChimeraParams) -> (Vec<ChimeraResult>, ChimeraStats) {
     let n = seqs.len();
@@ -225,7 +225,6 @@ pub fn remove_chimeras(seqs: &[Asv], params: &ChimeraParams) -> (Vec<Asv>, Chime
 /// For each parent pair, precomputes cumulative match vectors once (O(L)),
 /// then evaluates all crossover points in O(1) each. Early termination
 /// when score exceeds threshold.
-#[allow(clippy::cast_precision_loss)]
 pub(crate) fn test_chimera_fast(
     query: &Asv,
     seqs: &[Asv],
@@ -328,7 +327,7 @@ pub(crate) fn test_chimera_fast(
 }
 
 /// O(1) chimera score evaluation using precomputed prefix sums.
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn score_from_prefix(
     cum_left: &[u32],
     cum_right: &[u32],

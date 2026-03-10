@@ -39,7 +39,7 @@ impl RandomForestGpu {
     /// # Errors
     ///
     /// Returns `Err` if GPU buffer creation or readback fails.
-    #[allow(
+    #[expect(
         clippy::cast_possible_truncation,
         clippy::cast_possible_wrap,
         clippy::cast_sign_loss,
@@ -162,7 +162,7 @@ impl RandomForestGpu {
                 .enumerate()
                 .max_by_key(|&(_, v)| v)
                 .unwrap_or((0, 0));
-            #[allow(clippy::cast_precision_loss)]
+            #[expect(clippy::cast_precision_loss)]
             let confidence = max_votes as f64 / n_trees as f64;
             results.push(RfPrediction {
                 class,
@@ -177,7 +177,7 @@ impl RandomForestGpu {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
+#[expect(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use crate::bio::decision_tree::DecisionTree;

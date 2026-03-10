@@ -36,7 +36,7 @@ struct GemmParams {
 }
 
 impl GemmParams {
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     const fn new(m: u32, k: u32, n: u32, batch_size: u32, alpha: f64, beta: f64) -> Self {
         let alpha_bits = alpha.to_bits();
         let beta_bits = beta.to_bits();
@@ -106,7 +106,7 @@ impl GemmCached {
     /// # Errors
     ///
     /// Returns an error if GPU dispatch or readback fails.
-    #[allow(clippy::many_single_char_names)]
+    #[expect(clippy::many_single_char_names)]
     pub fn execute(
         &self,
         a: &[f64],
@@ -161,7 +161,7 @@ impl GemmCached {
     /// # Errors
     ///
     /// Returns an error if GPU dispatch fails.
-    #[allow(clippy::many_single_char_names)]
+    #[expect(clippy::many_single_char_names)]
     pub fn execute_to_buffer(
         &self,
         a: &[f64],
@@ -205,7 +205,7 @@ impl GemmCached {
         Ok(c_buf.into_buffer())
     }
 
-    #[allow(clippy::many_single_char_names, clippy::too_many_arguments)]
+    #[expect(clippy::many_single_char_names, clippy::too_many_arguments)]
     fn acquire_and_upload(
         &self,
         pool: &BufferPool,
@@ -237,7 +237,7 @@ impl GemmCached {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[allow(
+#[expect(
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::type_complexity,

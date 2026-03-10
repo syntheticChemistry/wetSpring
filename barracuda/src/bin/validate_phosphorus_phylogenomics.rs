@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::similar_names)]
 //! Exp054 — Boden & Anderson 2024: Phosphorus-cycling enzyme phylogenomics.
 //!
 //! Cross-validates the same reconciliation + molecular clock pipeline from

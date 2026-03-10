@@ -29,7 +29,7 @@ use wetspring_barracuda::bio::decision_tree::DecisionTree;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
-#[allow(clippy::cast_possible_truncation)]
+#[expect(clippy::cast_possible_truncation)]
 fn load_tree() -> DecisionTree {
     let tree_path =
         validation::data_dir("WETSPRING_PFAS_ML_DIR", "experiments/results/008_pfas_ml")
@@ -78,7 +78,7 @@ struct TestData {
     expected_f1: f64,
 }
 
-#[allow(clippy::cast_possible_truncation)]
+#[expect(clippy::cast_possible_truncation)]
 fn load_test_data() -> TestData {
     let test_path =
         validation::data_dir("WETSPRING_PFAS_ML_DIR", "experiments/results/008_pfas_ml")
@@ -156,17 +156,17 @@ fn main() {
     }
 
     let n_samples = data.samples.len();
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     let parity_rate = match_count as f64 / n_samples as f64;
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     let rust_accuracy = (true_pos + true_neg) as f64 / n_samples as f64;
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     let precision = if true_pos + false_pos > 0 {
         true_pos as f64 / (true_pos + false_pos) as f64
     } else {
         0.0
     };
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     let recall = if true_pos + false_neg > 0 {
         true_pos as f64 / (true_pos + false_neg) as f64
     } else {

@@ -88,9 +88,54 @@ pub fn find_peaks_batch_gpu(
         .collect()
 }
 
+/// GPU-accelerated peak detection with integrated area computation.
+///
+/// Uses the GPU for parallel peak detection, then computes trapezoidal
+/// integration for each detected peak on CPU (integration is sequential
+/// per peak and dominated by the peak detection cost).
+///
+/// # Errors
+///
+/// Returns an error if the device lacks `SHADER_F64` support.
+pub fn find_peaks_with_area_gpu(
+    gpu: &GpuF64,
+    x: &[f64],
+    y: &[f64],
+    params: &PeakParams,
+) -> Result<Vec<(Peak, f64)>> {
+    let peaks = find_peaks_gpu(gpu, y, params)?;
+    Ok(peaks
+        .into_iter()
+        .map(|p| {
+            let area = signal::integrate_peak(x, y, &p);
+            (p, area)
+        })
+        .collect())
+}
+
+/// GPU-accelerated batch peak detection with area integration.
+///
+/// Each `(x, y)` signal pair is dispatched independently for peak detection
+/// on the GPU, then areas are computed per peak.
+///
+/// # Errors
+///
+/// Returns an error if the device lacks `SHADER_F64` support.
+pub fn find_peaks_with_area_batch_gpu(
+    gpu: &GpuF64,
+    signals: &[(&[f64], &[f64])],
+    params: &PeakParams,
+) -> Result<Vec<Vec<(Peak, f64)>>> {
+    require_f64(gpu)?;
+    signals
+        .iter()
+        .map(|(x, y)| find_peaks_with_area_gpu(gpu, x, y, params))
+        .collect()
+}
+
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[allow(
+#[expect(
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::type_complexity,
@@ -104,6 +149,10 @@ mod tests {
     fn api_surface_compiles() {
         let _: fn(&GpuF64, &[f64], &PeakParams) -> Result<Vec<Peak>> = find_peaks_gpu;
         let _: fn(&GpuF64, &[&[f64]], &PeakParams) -> Result<Vec<Vec<Peak>>> = find_peaks_batch_gpu;
+        let _: fn(&GpuF64, &[f64], &[f64], &PeakParams) -> Result<Vec<(Peak, f64)>> =
+            find_peaks_with_area_gpu;
+        let _: fn(&GpuF64, &[(&[f64], &[f64])], &PeakParams) -> Result<Vec<Vec<(Peak, f64)>>> =
+            find_peaks_with_area_batch_gpu;
     }
 
     #[tokio::test]

@@ -21,7 +21,7 @@ pub struct NpuReadoutWeights {
 impl NpuReadoutWeights {
     /// Quantize raw readout weights to NPU format (shared by `LegacyEsn` and `BioEsn`).
     #[must_use]
-    #[allow(clippy::cast_possible_truncation, clippy::cast_precision_loss)]
+    #[expect(clippy::cast_possible_truncation)]
     pub fn from_readout_weights(w_out: &[f64], output_size: usize, reservoir_size: usize) -> Self {
         if w_out.is_empty() {
             return Self {
@@ -60,7 +60,7 @@ impl NpuReadoutWeights {
     /// Run int8 inference on a reservoir state vector.
     /// Returns f64 outputs (dequantized from int8 accumulation).
     #[must_use]
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     pub fn infer(&self, state: &[f64]) -> Vec<f64> {
         let n_res = self.reservoir_size;
         let n_out = self.output_size;

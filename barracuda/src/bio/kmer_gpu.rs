@@ -49,7 +49,7 @@ impl KmerGpu {
     /// # Errors
     ///
     /// Returns `Err` if GPU buffer readback fails.
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     pub fn count_histogram(
         &self,
         kmer_indices: &[u32],
@@ -99,7 +99,7 @@ impl KmerGpu {
     /// # Errors
     ///
     /// Returns `Err` if GPU dispatch or readback fails.
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     pub fn count_from_sequence(
         &self,
         sequence: &[u8],
@@ -144,7 +144,7 @@ impl KmerGpu {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
+#[expect(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

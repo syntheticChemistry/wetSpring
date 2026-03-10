@@ -211,7 +211,7 @@ pub fn bench<T>(f: impl FnOnce() -> T) -> (T, f64) {
 pub fn timed_us<T>(f: impl FnOnce() -> T) -> (T, f64) {
     let start = std::time::Instant::now();
     let result = f();
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     let us = start.elapsed().as_micros() as f64;
     (result, us)
 }

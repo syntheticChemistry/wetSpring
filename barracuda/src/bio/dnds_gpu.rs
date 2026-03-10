@@ -67,7 +67,7 @@ impl DnDsGpu {
     /// # Errors
     ///
     /// Returns `Err` if GPU dispatch or buffer readback fails.
-    #[allow(clippy::cast_possible_truncation, clippy::similar_names)]
+    #[expect(clippy::cast_possible_truncation, clippy::similar_names)]
     pub fn batch_dnds(&self, pairs: &[(&[u8], &[u8])]) -> crate::error::Result<DnDsGpuResult> {
         let n_pairs = pairs.len();
         if n_pairs == 0 {
@@ -182,7 +182,7 @@ impl DnDsGpu {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[allow(
+#[expect(
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::manual_let_else,

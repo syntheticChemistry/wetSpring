@@ -109,7 +109,7 @@ fn convert_tree(tree: &TreeNode, mu: f64) -> TreeConversion {
                 il.push(false);
                 let left_idx = walk(left, *left_branch, depth + 1, lc, rc, bl, ls, dv, il);
                 let right_idx = walk(right, *right_branch, depth + 1, lc, rc, bl, ls, dv, il);
-                #[allow(clippy::cast_possible_wrap)]
+                #[expect(clippy::cast_possible_wrap)]
                 {
                     lc[my_idx] = left_idx as i32;
                     rc[my_idx] = right_idx as i32;
@@ -143,7 +143,7 @@ fn convert_tree(tree: &TreeNode, mu: f64) -> TreeConversion {
     let max_depth = depths.iter().copied().max().unwrap_or(0);
     let mut levels: Vec<Vec<u32>> = Vec::with_capacity(max_depth + 1);
     for d in (0..=max_depth).rev() {
-        #[allow(clippy::cast_possible_truncation)]
+        #[expect(clippy::cast_possible_truncation)]
         let group: Vec<u32> = (0..n_nodes)
             .filter(|&i| depths[i] == d)
             .map(|i| i as u32)
@@ -474,7 +474,7 @@ fn validate_gpu_bootstrap(device: &Arc<WgpuDevice>, v: &mut Validator) {
     }
 
     if gpu_ok {
-        #[allow(clippy::cast_precision_loss)]
+        #[expect(clippy::cast_precision_loss)]
         {
             v.check(
                 "Bootstrap: replicate count",
@@ -575,7 +575,7 @@ fn validate_gpu_placement(device: &Arc<WgpuDevice>, v: &mut Validator) {
     }
 
     if gpu_ok {
-        #[allow(clippy::cast_precision_loss)]
+        #[expect(clippy::cast_precision_loss)]
         {
             v.check(
                 "Placement: edge count",
@@ -613,7 +613,7 @@ fn validate_gpu_placement(device: &Arc<WgpuDevice>, v: &mut Validator) {
             .max_by(|(_, a), (_, b)| a.total_cmp(b))
             .map(|(i, _)| i)
             .unwrap_or(0);
-        #[allow(clippy::cast_precision_loss)]
+        #[expect(clippy::cast_precision_loss)]
         {
             v.check(
                 "Placement: best edge CPU == GPU",

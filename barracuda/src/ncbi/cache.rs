@@ -112,7 +112,7 @@ fn sha256_hex(data: &[u8]) -> String {
 }
 
 /// SHA-256 implementation (FIPS 180-4). Pure Rust, zero dependencies.
-#[allow(clippy::many_single_char_names, clippy::too_many_lines)]
+#[expect(clippy::many_single_char_names, clippy::too_many_lines)]
 fn sha256(data: &[u8]) -> [u8; 32] {
     const K: [u32; 64] = [
         0x428a_2f98,
@@ -279,7 +279,7 @@ fn resolve(data_dir: Option<&str>, manifest_dir: &str, filename: &str) -> PathBu
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used)]
 mod tests {
     use super::*;
 

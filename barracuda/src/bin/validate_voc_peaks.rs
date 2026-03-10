@@ -194,7 +194,7 @@ fn validate_synthetic_chromatogram(v: &mut Validator, compounds: &[VocCompound])
     let mut expected_peak_indices = Vec::new();
     for c in &ar_only {
         let frac = (c.experimental_ri - ri_min) / (ri_max - ri_min);
-        #[allow(
+        #[expect(
             clippy::cast_possible_truncation,
             clippy::cast_sign_loss,
             clippy::cast_precision_loss
@@ -208,7 +208,7 @@ fn validate_synthetic_chromatogram(v: &mut Validator, compounds: &[VocCompound])
         let sigma = 8.0;
         let lo = center.saturating_sub(40);
         let hi = (center + 40).min(n_points - 1);
-        #[allow(clippy::cast_precision_loss)]
+        #[expect(clippy::cast_precision_loss)]
         for (i, val) in chromatogram[lo..=hi].iter_mut().enumerate() {
             let x = (lo + i) as f64 - center as f64;
             *val += height * (-0.5 * (x / sigma).powi(2)).exp();
@@ -234,7 +234,7 @@ fn validate_synthetic_chromatogram(v: &mut Validator, compounds: &[VocCompound])
 
     let mut matched = 0_usize;
     for &expected_idx in &expected_peak_indices {
-        #[allow(clippy::cast_possible_wrap)]
+        #[expect(clippy::cast_possible_wrap)]
         let found = peaks
             .iter()
             .any(|p| (p.index as i64 - expected_idx as i64).unsigned_abs() <= 3);

@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: March 9, 2026
-**Status**: V102 — 9,200+ checks, ALL PASS (1,455 tests, 334 experiments, 318 binaries, standalone barraCuda v0.3.3 `a898dee`, wgpu 28, 150+ primitives, 0 local WGSL, 179 named tolerances, 0 TODO/FIXME/HACK, 0 silent fallbacks, clippy pedantic CLEAN `--all-features`). V102: petalTongue V2 full-domain visualization (8 DataChannel types, 41 scenario builders, 4 composite, UiConfig, BackpressureConfig, wetspring_dashboard). V101: viz evolution. V100: mixed HW. V99: biomeOS/NUCLEUS
+**Status**: V105 — 9,200+ checks, ALL PASS (1,288 lib + 219 integration tests, 334 experiments, 318 binaries, standalone barraCuda v0.3.3 `a898dee`, wgpu 28, 150+ primitives, 0 local WGSL, 179 named tolerances, 0 TODO/FIXME/HACK, 0 silent fallbacks, clippy pedantic CLEAN `--all-features`). V105: petalTongue V2 full-domain visualization (9 DataChannel types, 33 scenario builders, 4 composite, UiConfig, BackpressureConfig, wetspring_dashboard). V104: upstream rewire. V103: clippy expect. V102: viz evolution. V101: viz evolution. V100: mixed HW. V99: biomeOS/NUCLEUS
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -25,7 +25,7 @@
 | Full 5-tier chain | 499/499 PASS — Paper math → CPU → GPU → Streaming → metalForge (Exp298) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
-| Rust modules | 47 CPU + 47 GPU + 1 IPC + 1 vault + 1 visualization, 1,455 tests, 316 binaries |
+| Rust modules | 47 CPU + 47 GPU + 1 IPC + 1 vault + 1 visualization, 1,288 lib + 219 integration tests, 316 binaries |
 | Write phase | 0 local WGSL (fully lean) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
 | Paper queue | **ALL DONE** — 52/52 reproducible papers complete (Tracks 1-4 + Phase 37 extensions + cross-spring) |
@@ -141,7 +141,9 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 | Document | Location | Description |
 |----------|----------|-------------|
 | EVOLUTION_READINESS.md | `../barracuda/` | Module-by-module GPU promotion assessment |
-| Handoff (V102 Viz V2) | `wateringHole/.../WETSPRING_V102_PETALTONGUE_V2_FULL_DOMAIN_VIZ_HANDOFF_MAR09_2026.md` | Full-domain petalTongue V2 handoff (41 builders, 8 channels) |
+| Handoff (V105 Viz V2) | `wateringHole/.../WETSPRING_V105_PETALTONGUE_V2_FULL_DOMAIN_VIZ_HANDOFF_MAR09_2026.md` | Full-domain petalTongue V2 handoff (33 builders, 9 channels) |
+| Handoff (V104 Evolution) | `wateringHole/.../WETSPRING_V104_BARRACUDA_TOADSTOOL_VIZ_EVOLUTION_HANDOFF_MAR09_2026.md` | barraCuda/toadStool viz evolution lessons + absorption map |
+| Handoff (V103) | `wateringHole/.../WETSPRING_V103_HANDOFF_MAR09_2026.md` | V103 clippy expect evolution |
 | Handoff (V102 Evolution) | `wateringHole/.../WETSPRING_V102_BARRACUDA_TOADSTOOL_VIZ_EVOLUTION_HANDOFF_MAR09_2026.md` | barraCuda/toadStool viz evolution lessons + absorption map |
 | Handoff (V101 Viz) | `wateringHole/.../WETSPRING_V101_VISUALIZATION_EVOLUTION_HANDOFF_MAR09_2026.md` | petalTongue visualization evolution handoff |
 | Handoff (V101 Absorption) | `wateringHole/.../WETSPRING_V101_BARRACUDA_TOADSTOOL_ABSORPTION_HANDOFF_MAR09_2026.md` | Comprehensive barraCuda/toadStool absorption handoff |

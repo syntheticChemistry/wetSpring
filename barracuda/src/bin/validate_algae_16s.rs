@@ -88,7 +88,7 @@ fn main() {
 
 // ── Synthetic pipeline: Nannochloropsis-like communities ────────────────────
 
-#[allow(clippy::too_many_lines, clippy::cast_precision_loss)] // sequential 16S pipeline validation: quality → merge → derep → DADA2 → chimera → taxonomy → diversity
+#[expect(clippy::too_many_lines, clippy::cast_precision_loss)] // sequential 16S pipeline validation: quality → merge → derep → DADA2 → chimera → taxonomy → diversity
 fn validate_synthetic_pipeline(v: &mut Validator) {
     v.section("Synthetic Algae-Pond Pipeline");
 
@@ -285,7 +285,7 @@ fn validate_synthetic_pipeline(v: &mut Validator) {
 
 // ── Cross-validate against Humphrey 2023 published results ─────────────────
 
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn validate_humphrey_reference(v: &mut Validator) {
     v.section("Humphrey 2023 Reference Points");
 
@@ -468,7 +468,7 @@ fn decompress_partial_gz(path: &Path) -> Result<Vec<FastqRecord>, String> {
 
 // ── Real data validation (when FASTQ files are available) ──────────────────
 
-#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn validate_real_data(v: &mut Validator, data_dir: &Path) {
     v.section("Real FASTQ Data (SRR7760408)");
 
@@ -491,7 +491,7 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
     };
     println!("  Parsing R1: {}", r1.display());
 
-    #[allow(clippy::redundant_closure_for_method_calls)]
+    #[expect(clippy::redundant_closure_for_method_calls)]
     let records_result = fastq::FastqIter::open(&r1)
         .and_then(|iter| iter.collect::<Result<Vec<_>, _>>())
         .or_else(|_| {
@@ -590,7 +590,7 @@ fn validate_real_data(v: &mut Validator, data_dir: &Path) {
                     let counts: Vec<f64> = asvs.iter().map(|a| a.abundance as f64).collect();
                     let shannon = diversity::shannon(&counts);
                     let observed = diversity::observed_features(&counts);
-                    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+                    #[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
                     let observed_int = observed as usize;
                     println!("  Real diversity: observed={observed_int}, Shannon={shannon:.3}");
 

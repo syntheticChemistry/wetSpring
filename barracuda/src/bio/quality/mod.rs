@@ -205,11 +205,8 @@ pub fn filter_reads(
         let orig_len = record.sequence.len();
 
         if let Some((start, end)) = trim_read(record, params) {
-            #[allow(clippy::cast_possible_truncation)]
-            {
-                stats.leading_bases_trimmed += start as u64;
-                stats.trailing_bases_trimmed += (orig_len - end) as u64;
-            }
+            stats.leading_bases_trimmed += start as u64;
+            stats.trailing_bases_trimmed += (orig_len - end) as u64;
             output.push(apply_trim(record, start, end));
             stats.output_reads += 1;
         } else {
@@ -246,7 +243,7 @@ pub struct QualityFlatResult {
 /// * `lengths` — Length of each read.
 /// * `params` — Quality filtering parameters.
 #[must_use]
-#[allow(clippy::cast_possible_truncation)]
+#[expect(clippy::cast_possible_truncation)]
 pub fn filter_reads_flat(
     qualities: &[u8],
     offsets: &[usize],

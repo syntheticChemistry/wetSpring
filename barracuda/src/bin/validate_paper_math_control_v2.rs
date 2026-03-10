@@ -462,7 +462,7 @@ use wetspring_barracuda::bio::ode::OdeResult;
 fn ode_tail_mean(r: &OdeResult, var_idx: usize, tail_frac: f64) -> f64 {
     let states: Vec<&[f64]> = r.states().collect();
     let n = states.len();
-    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    #[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
     let tail_start = (n as f64 * (1.0 - tail_frac)) as usize;
     let tail: Vec<f64> = states[tail_start..].iter().map(|s| s[var_idx]).collect();
     tail.iter().sum::<f64>() / tail.len() as f64

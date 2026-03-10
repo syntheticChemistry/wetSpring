@@ -125,7 +125,7 @@ fn generate_f64(n: usize, seed: u64) -> Vec<f64> {
     v
 }
 
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn display_and_record(
     label: &str,
     n: usize,
@@ -180,7 +180,7 @@ fn format_time(us: f64) -> String {
 const WARMUP: usize = 3;
 
 /// Time a closure with energy monitoring, returning (microseconds/iter, energy report).
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn bench_with_energy<F: FnMut()>(mut f: F) -> (f64, EnergyReport) {
     for _ in 0..WARMUP {
         f();
@@ -234,7 +234,7 @@ fn bench_simpson(gpu: &GpuF64, report: &mut BenchReport) {
 
 // ── Variance ─────────────────────────────────────────────────────────
 
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn bench_variance(gpu: &GpuF64, report: &mut BenchReport) {
     for &n in &[1_000, 10_000, 100_000, 1_000_000] {
         let data = generate_f64(n, 7);

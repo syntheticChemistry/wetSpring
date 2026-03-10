@@ -179,7 +179,7 @@ pub fn cosine_vs_library_gpu(
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[allow(
+#[expect(
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::type_complexity,

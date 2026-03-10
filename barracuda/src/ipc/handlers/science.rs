@@ -222,7 +222,6 @@ pub fn handle_ncbi_fetch(params: &Value) -> Result<Value, RpcError> {
 }
 
 /// Anderson spectral analysis (GPU-preferred).
-#[allow(clippy::unnecessary_wraps)]
 pub fn handle_anderson(params: &Value) -> Result<Value, RpcError> {
     #[cfg(not(feature = "gpu"))]
     {

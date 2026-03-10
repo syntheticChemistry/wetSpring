@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Validate all visualization scenario builders and streaming infrastructure.
 //!
-//! Exercises every scenario builder introduced in the petalTongue V2 integration,
+//! Exercises every scenario builder introduced in the `petalTongue` V2 integration,
 //! validates JSON serialization round-trips, checks node/edge counts, and confirms
 //! the streaming session API. Exit code 0 if all checks pass.
 //!
@@ -9,7 +9,7 @@
 //!
 //! | Field             | Value                                     |
 //! |-------------------|-------------------------------------------|
-//! | Validation class  | Visualization V2 (petalTongue integration)|
+//! | Validation class  | Visualization V2 (`petalTongue` integration)|
 //! | Covers            | 28 scenario builders + streaming + types  |
 //! | Date              | 2026-03-09                                |
 
@@ -74,26 +74,7 @@ impl CheckTracker {
     }
 }
 
-fn main() {
-    eprintln!("validate_visualization_v2: petalTongue V2 integration checks\n");
-    let mut c = CheckTracker::new();
-
-    let samples = vec![
-        vec![10.0, 20.0, 30.0, 40.0, 50.0],
-        vec![15.0, 25.0, 5.0, 35.0, 45.0],
-    ];
-    let labels: Vec<String> = vec!["S1".into(), "S2".into()];
-
-    // ── Existing scenario builders ──────────────────────────────────────
-    eprintln!("=== Existing Scenarios ===");
-
-    let (s, e) = scenarios::ecology_scenario(&samples, &labels);
-    c.check_scenario("ecology", &s, &e, 1, 1);
-
-    let (s, e) = scenarios::dynamics_scenario();
-    c.check_scenario("dynamics", &s, &e, 2, 1);
-
-    // ── Phase 1: Types ──────────────────────────────────────────────────
+fn validate_types(c: &mut CheckTracker) {
     eprintln!("\n=== Phase 1: Types ===");
 
     let fm = DataChannel::FieldMap {
@@ -116,70 +97,71 @@ fn main() {
     c.check("UiConfig serializes", cfg_json.is_ok());
     c.check("UiConfig default theme", cfg.theme == "ecology-dark");
     c.check("UiConfig panels left_sidebar", cfg.show_panels.left_sidebar);
+}
 
-    // ── Phase 2: Phylogenetics ──────────────────────────────────────────
+fn validate_scenarios(c: &mut CheckTracker) {
+    let samples = vec![
+        vec![10.0, 20.0, 30.0, 40.0, 50.0],
+        vec![15.0, 25.0, 5.0, 35.0, 45.0],
+    ];
+    let labels: Vec<String> = vec!["S1".into(), "S2".into()];
+
+    eprintln!("=== Existing Scenarios ===");
+    let (s, e) = scenarios::ecology_scenario(&samples, &labels);
+    c.check_scenario("ecology", &s, &e, 1, 1);
+    let (s, e) = scenarios::dynamics_scenario();
+    c.check_scenario("dynamics", &s, &e, 2, 1);
+
     eprintln!("\n=== Phase 2: Phylogenetics ===");
+    for (name, builder) in [
+        ("felsenstein", scenarios::felsenstein_scenario as fn() -> _),
+        ("placement", scenarios::placement_scenario),
+        ("unifrac", scenarios::unifrac_scenario),
+        ("dnds", scenarios::dnds_scenario),
+        ("molecular_clock", scenarios::molecular_clock_scenario),
+        ("reconciliation", scenarios::reconciliation_scenario),
+    ] {
+        let (s, e) = builder();
+        let min_ch = if name == "molecular_clock" { 1 } else { 2 };
+        c.check_scenario(name, &s, &e, 1, min_ch);
+    }
 
-    let (s, e) = scenarios::felsenstein_scenario();
-    c.check_scenario("felsenstein", &s, &e, 1, 2);
-
-    let (s, e) = scenarios::placement_scenario();
-    c.check_scenario("placement", &s, &e, 1, 2);
-
-    let (s, e) = scenarios::unifrac_scenario();
-    c.check_scenario("unifrac", &s, &e, 1, 2);
-
-    let (s, e) = scenarios::dnds_scenario();
-    c.check_scenario("dnds", &s, &e, 1, 2);
-
-    let (s, e) = scenarios::molecular_clock_scenario();
-    c.check_scenario("molecular_clock", &s, &e, 1, 1);
-
-    let (s, e) = scenarios::reconciliation_scenario();
-    c.check_scenario("reconciliation", &s, &e, 1, 2);
-
-    // ── Phase 2: ODE Systems ────────────────────────────────────────────
     eprintln!("\n=== Phase 2: ODE Systems ===");
+    for (name, builder, min_ch) in [
+        (
+            "phage_defense",
+            scenarios::phage_defense_scenario as fn() -> _,
+            4,
+        ),
+        ("bistable", scenarios::bistable_scenario, 5),
+        ("cooperation", scenarios::cooperation_scenario, 4),
+        ("multi_signal", scenarios::multi_signal_scenario, 7),
+        ("capacitor", scenarios::capacitor_scenario, 6),
+    ] {
+        let (s, e) = builder();
+        c.check_scenario(name, &s, &e, 1, min_ch);
+    }
 
-    let (s, e) = scenarios::phage_defense_scenario();
-    c.check_scenario("phage_defense", &s, &e, 1, 4);
-
-    let (s, e) = scenarios::bistable_scenario();
-    c.check_scenario("bistable", &s, &e, 1, 5);
-
-    let (s, e) = scenarios::cooperation_scenario();
-    c.check_scenario("cooperation", &s, &e, 1, 4);
-
-    let (s, e) = scenarios::multi_signal_scenario();
-    c.check_scenario("multi_signal", &s, &e, 1, 7);
-
-    let (s, e) = scenarios::capacitor_scenario();
-    c.check_scenario("capacitor", &s, &e, 1, 6);
-
-    // ── Phase 2: 16S Pipeline ───────────────────────────────────────────
     eprintln!("\n=== Phase 2: 16S Pipeline ===");
+    for (name, builder, min_ch) in [
+        ("quality", scenarios::quality_scenario as fn() -> _, 2),
+        ("dada2", scenarios::dada2_scenario, 3),
+        ("taxonomy", scenarios::taxonomy_scenario, 2),
+        (
+            "pipeline_overview",
+            scenarios::pipeline_overview_scenario,
+            2,
+        ),
+    ] {
+        let (s, e) = builder();
+        c.check_scenario(name, &s, &e, 1, min_ch);
+    }
 
-    let (s, e) = scenarios::quality_scenario();
-    c.check_scenario("quality", &s, &e, 1, 2);
-
-    let (s, e) = scenarios::dada2_scenario();
-    c.check_scenario("dada2", &s, &e, 1, 3);
-
-    let (s, e) = scenarios::taxonomy_scenario();
-    c.check_scenario("taxonomy", &s, &e, 1, 2);
-
-    let (s, e) = scenarios::pipeline_overview_scenario();
-    c.check_scenario("pipeline_overview", &s, &e, 1, 2);
-
-    // ── Phase 2: Population Genomics ────────────────────────────────────
     eprintln!("\n=== Phase 2: Population Genomics ===");
-
     let (s, e) = scenarios::snp_scenario();
     c.check_scenario("snp", &s, &e, 1, 1);
-
     let (s, e) = scenarios::population_genomics_scenario();
     c.check_scenario("population_genomics", &s, &e, 1, 2);
-
     let (s, e) = scenarios::kmer_spectrum_scenario();
     c.check_scenario("kmer_spectrum", &s, &e, 1, 2);
     let has_spectrum = s.nodes.iter().any(|n| {
@@ -189,49 +171,50 @@ fn main() {
     });
     c.check("kmer_spectrum uses Spectrum channel", has_spectrum);
 
-    // ── Phase 2: LC-MS / PFAS ───────────────────────────────────────────
     eprintln!("\n=== Phase 2: LC-MS / PFAS ===");
-
-    let (s, e) = scenarios::spectral_match_scenario();
-    c.check_scenario("spectral_match", &s, &e, 1, 2);
-
-    let (s, e) = scenarios::tolerance_search_scenario();
-    c.check_scenario("tolerance_search", &s, &e, 1, 2);
-
+    for (name, builder) in [
+        (
+            "spectral_match",
+            scenarios::spectral_match_scenario as fn() -> _,
+        ),
+        ("tolerance_search", scenarios::tolerance_search_scenario),
+    ] {
+        let (s, e) = builder();
+        c.check_scenario(name, &s, &e, 1, 2);
+    }
     let (s, e) = scenarios::pfas_overview_scenario();
     c.check_scenario("pfas_overview", &s, &e, 3, 4);
 
-    // ── Phase 2: ML Models ──────────────────────────────────────────────
     eprintln!("\n=== Phase 2: ML Models ===");
+    for (name, builder, min_ch) in [
+        (
+            "decision_tree",
+            scenarios::decision_tree_scenario as fn() -> _,
+            2,
+        ),
+        ("random_forest", scenarios::random_forest_scenario, 2),
+        ("esn", scenarios::esn_scenario, 3),
+    ] {
+        let (s, e) = builder();
+        c.check_scenario(name, &s, &e, 1, min_ch);
+    }
 
-    let (s, e) = scenarios::decision_tree_scenario();
-    c.check_scenario("decision_tree", &s, &e, 1, 2);
-
-    let (s, e) = scenarios::random_forest_scenario();
-    c.check_scenario("random_forest", &s, &e, 1, 2);
-
-    let (s, e) = scenarios::esn_scenario();
-    c.check_scenario("esn", &s, &e, 1, 3);
-
-    // ── Phase 3: Composite Scenarios ────────────────────────────────────
     eprintln!("\n=== Phase 3: Composite ===");
-
     let (s, e) = scenarios::full_16s_scenario(&samples, &labels);
     c.check_scenario("full_16s", &s, &e, 4, 5);
-
     let (s, e) = scenarios::full_pfas_scenario();
     c.check_scenario("full_pfas", &s, &e, 3, 4);
-
     let (s, e) = scenarios::full_qs_scenario();
     c.check_scenario("full_qs", &s, &e, 5, 20);
-
     let (s, e) = scenarios::full_ecology_scenario(&samples, &labels);
     c.check_scenario("full_ecology", &s, &e, 10, 20);
+}
 
-    // ── Phase 4: Streaming ──────────────────────────────────────────────
+fn validate_streaming(c: &mut CheckTracker) {
     eprintln!("\n=== Phase 4: Streaming ===");
 
-    let client = PetalTonguePushClient::new(PathBuf::from("/tmp/nonexistent-viz-v2.sock"));
+    let sock_path = std::env::temp_dir().join("wetspring-viz-v2-nonexistent.sock");
+    let client = PetalTonguePushClient::new(PathBuf::from(&sock_path));
     let mut session = StreamSession::open(client, "validate-v2");
     c.check("stream session opens", session.is_open());
     c.check(
@@ -277,15 +260,23 @@ fn main() {
         cooldown: std::time::Duration::from_millis(50),
         max_slow_pushes: 2,
     };
-    let client2 = PetalTonguePushClient::new(PathBuf::from("/tmp/nonexistent-viz-v2.sock"));
+    let client2 = PetalTonguePushClient::new(PathBuf::from(&sock_path));
     let session2 = StreamSession::open_with_backpressure(client2, "bp-test", bp_custom);
     c.check("backpressure session opens", session2.is_open());
     c.check(
         "backpressure config timeout",
         session2.backpressure().timeout.as_millis() == 100,
     );
+}
 
-    // ── Summary ─────────────────────────────────────────────────────────
+fn main() {
+    eprintln!("validate_visualization_v2: petalTongue V2 integration checks\n");
+    let mut c = CheckTracker::new();
+
+    validate_types(&mut c);
+    validate_scenarios(&mut c);
+    validate_streaming(&mut c);
+
     eprintln!("\n════════════════════════════════════════════════════════════");
     eprintln!("  {}/{} checks passed", c.passed, c.checks);
 

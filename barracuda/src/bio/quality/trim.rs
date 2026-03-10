@@ -35,7 +35,7 @@ pub(super) fn trim_trailing(quality: &[u8], min_quality: u8, phred_offset: u8) -
 ///
 /// Returns the trim position (index one past the last retained base).
 #[must_use]
-#[allow(clippy::cast_precision_loss)] // window sizes are small
+#[expect(clippy::cast_precision_loss)] // window sizes are small
 pub(super) fn trim_sliding_window(
     quality: &[u8],
     window_size: usize,
@@ -62,7 +62,7 @@ pub(super) fn trim_sliding_window(
         .map(|&q| u32::from(q.saturating_sub(phred_offset)))
         .sum();
 
-    #[allow(clippy::cast_possible_truncation)] // read lengths are always small
+    #[expect(clippy::cast_possible_truncation)] // read lengths are always small
     let threshold = u32::from(min_quality) * window_size as u32;
 
     if window_sum < threshold {

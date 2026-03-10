@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-#![allow(clippy::expect_used, clippy::unwrap_used, deprecated)]
+#![expect(clippy::expect_used, clippy::unwrap_used, deprecated)]
 
 use super::*;
 
@@ -323,7 +323,7 @@ fn validator_zero_checks() {
 // ── Determinism (rerun-identical) tests ────────────────────────
 
 #[test]
-#[allow(clippy::float_cmp)]
+#[expect(clippy::float_cmp)]
 fn determinism_diversity() {
     use crate::bio::diversity::{bray_curtis, chao1, shannon, simpson};
 
@@ -349,7 +349,7 @@ fn determinism_diversity() {
 }
 
 #[test]
-#[allow(clippy::float_cmp)]
+#[expect(clippy::float_cmp)]
 fn determinism_ode() {
     use crate::bio::qs_biofilm::{QsBiofilmParams, run_scenario};
 
@@ -371,7 +371,7 @@ fn determinism_ode() {
 }
 
 #[test]
-#[allow(clippy::float_cmp)]
+#[expect(clippy::float_cmp)]
 fn determinism_special_functions() {
     let x = 1.5;
     let erf1 = barracuda::special::erf(x);
@@ -389,7 +389,7 @@ fn determinism_special_functions() {
 
 #[cfg(feature = "gpu")]
 #[test]
-#[allow(clippy::float_cmp)]
+#[expect(clippy::float_cmp)]
 fn determinism_anderson_spectral() {
     use barracuda::spectral::{anderson_2d, lanczos, lanczos_eigenvalues, level_spacing_ratio};
 
@@ -429,7 +429,7 @@ fn determinism_encoding_roundtrip() {
 }
 
 #[test]
-#[allow(clippy::float_cmp)]
+#[expect(clippy::float_cmp)]
 fn determinism_fastq_parsing() {
     use crate::io::fastq::{compute_stats, parse_fastq};
     use std::fs::File;

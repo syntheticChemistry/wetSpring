@@ -52,7 +52,7 @@ struct ColdSeepSample {
     expected_qs_density: &'static str,
 }
 
-#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
+#[expect(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp144: Cold Seep QS Gene Catalog — 299K Genes × 34 Types");
 

@@ -273,7 +273,7 @@ pub fn npu_infer_i8(
 /// # Errors
 ///
 /// Returns error if the weights exceed SRAM capacity or DMA fails.
-#[allow(clippy::cast_possible_truncation)]
+#[expect(clippy::cast_possible_truncation)]
 pub fn load_reservoir_weights(
     handle: &mut NpuHandle,
     w_in_f64: &[f64],
@@ -333,7 +333,7 @@ pub struct ReservoirLoadResult {
 /// # Errors
 ///
 /// Returns error if DMA transfer fails.
-#[allow(clippy::cast_possible_truncation)]
+#[expect(clippy::cast_possible_truncation)]
 pub fn load_readout_weights(handle: &mut NpuHandle, w_out_i8: &[i8]) -> Result<u64, Error> {
     let bytes: Vec<u8> = w_out_i8.iter().map(|&x| x as u8).collect();
     let t = std::time::Instant::now();

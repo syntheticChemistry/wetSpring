@@ -94,7 +94,7 @@ fn generate_sequences(n_seqs: usize, seq_len: usize, seed: u64) -> Vec<Vec<u8>> 
     seqs
 }
 
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp110: Cross-Ecosystem Pangenome Analysis");
 

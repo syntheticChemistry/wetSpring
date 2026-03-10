@@ -2,9 +2,7 @@
 
 //! Nest module tests.
 
-#![allow(clippy::expect_used, clippy::unwrap_used)]
-
-use std::path::PathBuf;
+#![expect(clippy::unwrap_used)]
 
 use super::{NestClient, discover_nestgate_socket};
 use super::{base64, json, time};
@@ -240,7 +238,7 @@ fn parse_string_list_empty() {
 
 #[test]
 fn nest_client_new_and_socket_path() {
-    let p = PathBuf::from("/tmp/test.sock");
+    let p = std::env::temp_dir().join("test.sock");
     let client = NestClient::new(p.clone());
     assert_eq!(client.socket_path(), p);
 }
@@ -256,7 +254,6 @@ fn nest_client_discover_returns_none_without_socket() {
 
 #[test]
 fn base64_large_binary() {
-    #[allow(clippy::cast_possible_truncation)]
     let data: Vec<u8> = (0_u32..1024).map(|i| (i & 0xFF) as u8).collect();
     let encoded = base64::base64_encode(&data);
     let decoded = base64::base64_decode(&encoded);

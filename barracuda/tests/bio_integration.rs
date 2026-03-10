@@ -204,7 +204,6 @@ fn quality_adapter_trim_integration() {
 fn signal_chromatographic_pipeline() {
     // Simulate a chromatogram with 3 Gaussian peaks
     let n = 300;
-    #[allow(clippy::cast_precision_loss)]
     let data: Vec<f64> = (0..n)
         .map(|i| {
             let x = f64::from(i);
@@ -295,7 +294,7 @@ fn feature_table_synthetic_lcms() {
     let n_scans = 50;
     let spectra: Vec<mzml::MzmlSpectrum> = (0..n_scans)
         .map(|i| {
-            #[allow(clippy::cast_precision_loss)]
+            #[expect(clippy::cast_precision_loss)]
             let rt = (i as f64).mul_add(0.2, 2.0); // 2.0 to 11.8 min
             let x1 = (rt - 5.0) / 0.5;
             let x2 = (rt - 8.0) / 0.6;

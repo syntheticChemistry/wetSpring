@@ -430,7 +430,7 @@ fn main() {
             name: &'static str,
             pathway_score: f64,
             delivery: &'static str,
-            #[allow(dead_code)]
+            #[expect(dead_code)]
             molecular_weight_da: f64,
             reaches_dermis: bool,
             crosses_barrier_topical: bool,

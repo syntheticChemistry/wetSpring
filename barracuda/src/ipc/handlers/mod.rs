@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::missing_errors_doc)]
+#![expect(clippy::missing_errors_doc)]
 //! JSON-RPC method handlers for science capabilities.
 //!
 //! Each handler maps a method + params to barracuda library calls.
@@ -62,8 +62,6 @@ fn try_gpu() -> Option<&'static GpuF64> {
 
 /// Health/readiness probe.
 pub fn handle_health() -> Result<Value, RpcError> {
-    #![allow(clippy::unnecessary_wraps)]
-
     #[cfg(feature = "gpu")]
     let substrate = if try_gpu().is_some() {
         "gpu"

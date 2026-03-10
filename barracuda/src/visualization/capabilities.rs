@@ -23,6 +23,11 @@ pub const VISUALIZATION_CAPABILITIES: &[&str] = &[
     "visualization.ecology.streaming",
     "visualization.ecology.benchmarks",
     "visualization.ecology.anderson",
+    "visualization.ecology.msa",
+    "visualization.ecology.calibration",
+    "visualization.ecology.spectroscopy",
+    "visualization.ecology.basecalling",
+    "visualization.ecology.live_pipeline",
     "visualization.metalforge.inventory",
     "visualization.metalforge.dispatch",
     "visualization.metalforge.nucleus",
@@ -63,7 +68,9 @@ pub fn announcement() -> VisualizationAnnouncement {
             "gauge".into(),
             "heatmap".into(),
             "scatter".into(),
+            "scatter3d".into(),
             "spectrum".into(),
+            "fieldmap".into(),
         ],
         supports_streaming: true,
     }
@@ -79,11 +86,7 @@ pub fn announcement_json() -> serde_json::Result<String> {
 }
 
 #[cfg(test)]
-#[allow(
-    clippy::unwrap_used,
-    clippy::expect_used,
-    reason = "tests use unwrap/expect for clarity"
-)]
+#[expect(clippy::expect_used, reason = "tests use unwrap/expect for clarity")]
 mod tests {
     use super::*;
 

@@ -47,7 +47,7 @@ impl SpatialPayoffGpuWrapper {
     /// # Errors
     ///
     /// Returns an error if grid size mismatches or GPU read fails.
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     pub fn compute(
         &self,
         grid: &[u32],
@@ -95,7 +95,7 @@ impl SpatialPayoffGpuWrapper {
 }
 
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
+#[expect(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

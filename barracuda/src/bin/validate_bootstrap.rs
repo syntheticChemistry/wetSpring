@@ -80,7 +80,7 @@ fn main() {
     v.section("── Resampling preserves dimensions ──");
     let mut rng = Lcg64::new(42);
     let rep = resample_columns(&aln, &mut rng);
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     {
         v.check(
             "Replicate n_taxa",
@@ -98,7 +98,7 @@ fn main() {
 
     v.section("── Bootstrap likelihoods ──");
     let lls = bootstrap_likelihoods(&tree, &aln, 100, 1.0, 42);
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     {
         v.check("100 replicates", lls.len() as f64, 100.0, tolerances::EXACT);
     }

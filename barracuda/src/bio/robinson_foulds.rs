@@ -42,7 +42,7 @@ pub fn rf_distance(tree_a: &PhyloTree, tree_b: &PhyloTree) -> usize {
 /// For unrooted binary trees with n leaves, max RF = 2(n-3).
 /// Returns 0.0 for degenerate cases (n ≤ 3).
 #[must_use]
-#[allow(clippy::cast_precision_loss)] // leaf counts are small
+#[expect(clippy::cast_precision_loss)] // leaf counts are small
 pub fn rf_distance_normalized(tree_a: &PhyloTree, tree_b: &PhyloTree) -> f64 {
     let n = leaf_count(tree_a);
     if n <= 3 {

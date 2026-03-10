@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: March 9, 2026 (V102 — 1,455 tests, 318 binaries, 179 tolerances, barraCuda v0.3.3, wgpu 28, 150+ primitives (264 ComputeDispatch ops), clippy pedantic CLEAN, 334 experiments, 52 papers complete + 6 reproduced, all 39 three-tier eligible papers validated at CPU + GPU + metalForge. V102: petalTongue V2 full-domain viz, 41 scenario builders, 8 DataChannel types, 140/140 viz validation PASS, 9,200+ checks)
+**Last Updated**: March 9, 2026 (V105 — 1,288 lib + 219 integration tests, 318 binaries, 179 tolerances, barraCuda v0.3.3, wgpu 28, 150+ primitives (264 ComputeDispatch ops), clippy pedantic CLEAN, 334 experiments, 52 papers complete + 6 reproduced, all 39 three-tier eligible papers validated at CPU + GPU + metalForge. V105: petalTongue V2 full-domain viz, 33 scenario builders, 9 DataChannel types, 140/140 viz validation PASS, 9,200+ checks)
 **Purpose**: Track papers for reproduction/review across five tracks
 
 ---
@@ -392,7 +392,7 @@ Open Data (NCBI SRA, Zenodo, EPA, journal tables, published equations)
       → metalForge:  Mixed-hardware routing produces identical results (CPU ↔ GPU ↔ NPU)
 ```
 
-**Verification**: 58 papers, 8,400+ checks (incl. Exp306-310: 111 new V97c), 1,047 lib tests. Zero proprietary data dependencies.
+**Verification**: 58 papers, 8,400+ checks (incl. Exp306-310: 111 new V97c), 1,288 lib + 219 integration tests. Zero proprietary data dependencies.
 All Python baselines have reproduction headers (script, commit, date, hardware, SHA-256).
 All Rust validators have provenance classification headers.
 All 103 tolerance constants are scientifically justified and hierarchy-tested.

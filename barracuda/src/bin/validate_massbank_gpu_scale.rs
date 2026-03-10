@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::expect_used, clippy::unwrap_used, clippy::print_stdout)]
+#![expect(clippy::expect_used, clippy::unwrap_used, clippy::print_stdout)]
 //! # Exp111: Full `MassBank` GPU Spectral Screening at Scale
 //!
 //! Validates GPU spectral cosine similarity at library-scale (2048×2048)
@@ -34,14 +34,14 @@ fn generate_spectra(n_spectra: usize, n_bins: usize, seed: u64) -> Vec<Vec<f64>>
         let mut bins = Vec::with_capacity(n_bins);
         for _ in 0..n_bins {
             rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-            #[allow(clippy::cast_precision_loss)]
+            #[expect(clippy::cast_precision_loss)]
             let raw = ((rng >> 33) as f64) / f64::from(u32::MAX);
             // Sparse: ~80% of bins are zero (typical MS data)
             if raw < 0.8 {
                 bins.push(0.0);
             } else {
                 rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-                #[allow(clippy::cast_precision_loss)]
+                #[expect(clippy::cast_precision_loss)]
                 let intensity = ((rng >> 33) as f64) / f64::from(u32::MAX) * 1000.0;
                 bins.push(intensity);
             }
@@ -201,7 +201,7 @@ fn main() {
         let _ = cpu_pairwise_cosine(&lib);
         let cpu_ms = t0.elapsed().as_secs_f64() * 1000.0;
         let n_pairs = n * (n - 1) / 2;
-        #[allow(clippy::cast_precision_loss)]
+        #[expect(clippy::cast_precision_loss)]
         let pairs_per_ms = n_pairs as f64 / cpu_ms;
         println!("  N={n}: {n_pairs} pairs, CPU {cpu_ms:.1} ms ({pairs_per_ms:.0} pairs/ms)");
     }

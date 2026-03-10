@@ -170,7 +170,7 @@ fn sovereign_hash(input: &[u8]) -> [u8; 32] {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used)]
 mod tests {
     use super::*;
 

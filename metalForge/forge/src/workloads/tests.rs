@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-#![allow(clippy::expect_used, clippy::unwrap_used)]
+#![expect(clippy::expect_used)]
 
 use crate::substrate::SubstrateKind;
 use crate::workloads::*;

@@ -19,13 +19,13 @@ mod parser;
 mod stats;
 mod types;
 
-#[allow(deprecated)]
+#[expect(deprecated)]
 pub use parser::{Ms2Iter, for_each_spectrum, parse_ms2};
 pub use stats::{compute_stats, stats_from_file};
 pub use types::{Ms2Spectrum, Ms2Stats};
 
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used, deprecated)]
+#[expect(clippy::unwrap_used, deprecated)]
 mod tests {
     use super::*;
     use crate::error::Result;

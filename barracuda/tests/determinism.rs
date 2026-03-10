@@ -339,7 +339,6 @@ fn determinism_felsenstein() {
 #[test]
 fn determinism_signal_peak() {
     let n = 100;
-    #[allow(clippy::cast_precision_loss)]
     let data: Vec<f64> = (0..n)
         .map(|i| {
             let x = f64::from(i);

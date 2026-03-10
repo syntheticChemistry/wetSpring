@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::expect_used, clippy::unwrap_used, clippy::too_many_lines)]
+#![expect(clippy::expect_used, clippy::too_many_lines)]
 //! Exp080: metalForge Dispatch Routing Validation
 //!
 //! Validates the forge dispatch router's life-science workload classification

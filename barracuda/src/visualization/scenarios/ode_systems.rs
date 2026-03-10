@@ -86,7 +86,7 @@ pub fn bistable_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
         let y_vals = extract_variable(&result, i);
         ode_node.data_channels.push(timeseries(
             &format!("bs_{}", name.to_lowercase().replace('-', "_")),
-            &format!("{name}"),
+            name,
             "Time (h)",
             "Concentration",
             "AU",
@@ -136,7 +136,7 @@ pub fn cooperation_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
         let y_vals = extract_variable(&result, i);
         ode_node.data_channels.push(timeseries(
             &format!("coop_{}", name.to_lowercase()),
-            &format!("{name}"),
+            name,
             "Time (h)",
             "Concentration",
             "AU",
@@ -186,7 +186,7 @@ pub fn multi_signal_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
         let y_vals = extract_variable(&result, i);
         ode_node.data_channels.push(timeseries(
             &format!("ms_{}", name.to_lowercase().replace('-', "_")),
-            &format!("{name}"),
+            name,
             "Time (h)",
             "Concentration",
             "AU",
@@ -224,7 +224,7 @@ pub fn capacitor_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
         let y_vals = extract_variable(&result, i);
         ode_node.data_channels.push(timeseries(
             &format!("cap_{}", name.to_lowercase().replace('-', "_")),
-            &format!("{name}"),
+            name,
             "Time (h)",
             "Concentration",
             "AU",

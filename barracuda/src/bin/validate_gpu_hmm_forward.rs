@@ -288,7 +288,7 @@ fn validate_batch(gpu: &HmmGpuForward, v: &mut Validator) {
 
     match result {
         Ok(Ok(gpu_result)) => {
-            #[allow(clippy::cast_precision_loss)]
+            #[expect(clippy::cast_precision_loss)]
             {
                 v.check(
                     "Batch: n_seqs",
@@ -318,7 +318,7 @@ fn validate_batch(gpu: &HmmGpuForward, v: &mut Validator) {
             );
             println!("    (max per-sequence diff = {max_diff:.2e})");
 
-            #[allow(clippy::cast_precision_loss)]
+            #[expect(clippy::cast_precision_loss)]
             {
                 let cpu_mean: f64 = cpu_lls.iter().sum::<f64>() / n_seqs as f64;
                 let gpu_mean: f64 = gpu_result.log_likelihoods.iter().sum::<f64>() / n_seqs as f64;

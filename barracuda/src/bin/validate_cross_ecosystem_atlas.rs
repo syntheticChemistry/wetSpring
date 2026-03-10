@@ -36,7 +36,7 @@ fn evenness_to_disorder(pielou_j: f64) -> f64 {
     pielou_j.mul_add(14.5, 0.5)
 }
 
-#[allow(clippy::cast_precision_loss)] // u64/usize→f64 for RNG and species count; intentional in scientific code
+#[expect(clippy::cast_precision_loss)] // u64/usize→f64 for RNG and species count; intentional in scientific code
 fn generate_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     let mut counts = Vec::with_capacity(n_species);
     let mut rng = seed;
@@ -49,7 +49,7 @@ fn generate_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     counts
 }
 
-#[allow(
+#[expect(
     clippy::cast_precision_loss,
     clippy::too_many_lines,
     clippy::items_after_statements

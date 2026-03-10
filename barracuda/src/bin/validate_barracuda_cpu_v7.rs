@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::too_many_lines, clippy::cast_precision_loss)]
+#![expect(clippy::cast_precision_loss)]
 //! Exp085: `BarraCuda` CPU Parity v7 — Tier A Data Layout Fidelity
 //!
 //! Proves that the 3 newly Tier A modules (kmer, unifrac, taxonomy) preserve

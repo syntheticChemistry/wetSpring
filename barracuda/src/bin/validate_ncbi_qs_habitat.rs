@@ -83,7 +83,7 @@ fn chrono_date() -> String {
     "2026-02-23".to_string()
 }
 
-#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
+#[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp141: NCBI QS Gene Prevalence by Habitat");
 

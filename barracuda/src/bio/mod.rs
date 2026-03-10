@@ -9,6 +9,7 @@ pub mod ani_gpu;
 #[cfg(feature = "gpu")]
 pub mod batch_fitness_gpu;
 pub mod bistable;
+pub mod calibration;
 #[cfg(feature = "gpu")]
 pub mod bistable_gpu;
 pub mod bootstrap;
@@ -27,6 +28,7 @@ pub mod dada2;
 pub mod dada2_gpu;
 pub mod decision_tree;
 pub mod derep;
+pub mod dorado;
 #[cfg(feature = "gpu")]
 pub mod derep_gpu;
 pub mod diversity;
@@ -78,6 +80,7 @@ pub mod merge_pairs_gpu;
 pub mod molecular_clock;
 #[cfg(feature = "gpu")]
 pub mod molecular_clock_gpu;
+pub mod msa;
 pub mod multi_signal;
 #[cfg(feature = "gpu")]
 pub mod multi_signal_gpu;

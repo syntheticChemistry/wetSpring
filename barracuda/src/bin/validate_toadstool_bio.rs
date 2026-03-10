@@ -85,7 +85,7 @@ fn validate_tree_inference(device: &Arc<WgpuDevice>, v: &mut Validator) {
 
     let ti = TreeInferenceGpu::new(device);
 
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     let samples: Vec<f64> = vec![
         3.0, 0.0, 0.0, // sample 0: feature[0]=3 < 5 → class 0
         7.0, 0.0, 0.0, // sample 1: feature[0]=7 > 5 → class 1
@@ -96,7 +96,7 @@ fn validate_tree_inference(device: &Arc<WgpuDevice>, v: &mut Validator) {
 
     match ti.predict(&forest, &samples, n_samples) {
         Ok(predictions) => {
-            #[allow(clippy::cast_precision_loss)]
+            #[expect(clippy::cast_precision_loss)]
             {
                 v.check(
                     "TI: n_predictions = 4",
@@ -201,7 +201,7 @@ fn validate_gillespie(device: &Arc<WgpuDevice>, v: &mut Validator) {
 
     match result {
         Ok(Ok(result)) => {
-            #[allow(clippy::cast_precision_loss)]
+            #[expect(clippy::cast_precision_loss)]
             {
                 v.check(
                     "SSA: n_trajectories",

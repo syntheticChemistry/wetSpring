@@ -40,7 +40,7 @@ use wetspring_barracuda::ipc::Server;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation;
 
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn main() {
     let mut v = validation::Validator::new("Exp203: biomeOS Science Pipeline");
 

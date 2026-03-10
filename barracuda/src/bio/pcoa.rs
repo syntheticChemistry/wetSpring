@@ -113,7 +113,7 @@ pub fn pcoa(condensed: &[f64], n_samples: usize, n_axes: usize) -> Result<PcoaRe
     }
 
     // 2. Double-center: B = -0.5 * (D² - row_means - col_means + grand_mean)
-    #[allow(clippy::cast_precision_loss)] // N < 2^53 for any real dataset
+    #[expect(clippy::cast_precision_loss)] // N < 2^53 for any real dataset
     let n_f = n as f64;
     let mut row_means = vec![0.0; n];
     for i in 0..n {
@@ -197,7 +197,7 @@ fn condensed_index(i: usize, j: usize) -> usize {
 /// Returns (eigenvalues, eigenvectors) where eigenvectors is row-major N×N.
 /// All thresholds from [`tolerances`]: convergence, element skip, tau overflow,
 /// and sweep multiplier — see Golub & Van Loan (2013) §8.5.
-#[allow(clippy::many_single_char_names)] // standard notation: a=matrix, v=eigvecs, t/c/s=Givens
+#[expect(clippy::many_single_char_names)] // standard notation: a=matrix, v=eigvecs, t/c/s=Givens
 fn jacobi_eigen(matrix: &[f64], n: usize) -> (Vec<f64>, Vec<f64>) {
     let mut a = matrix.to_vec();
     let mut v = vec![0.0; n * n];
@@ -270,8 +270,8 @@ fn jacobi_eigen(matrix: &[f64], n: usize) -> (Vec<f64>, Vec<f64>) {
     (eigenvalues, v)
 }
 
+#[expect(clippy::unwrap_used)]
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
 

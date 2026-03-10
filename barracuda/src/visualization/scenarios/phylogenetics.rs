@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Phylogenetics scenario builders: tree estimation, placement, UniFrac,
+//! Phylogenetics scenario builders: tree estimation, placement, `UniFrac`,
 //! dN/dS, molecular clock, and gene-species reconciliation.
 
 use crate::bio::bootstrap;
@@ -45,8 +45,9 @@ fn demo_tree() -> TreeNode {
 /// Felsenstein pruning + bootstrap support scenario.
 ///
 /// Computes site log-likelihoods and bootstrap replicate distribution using
-/// live BarraCUDA math (JC69 + RK4 pruning).
+/// live `BarraCUDA` math (JC69 + RK4 pruning).
 #[must_use]
+#[expect(clippy::cast_precision_loss)] // site/bootstrap counts < 1000
 pub fn felsenstein_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     let mut s = scaffold(
         "Felsenstein Pruning",
@@ -171,10 +172,10 @@ pub fn placement_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     (s, vec![])
 }
 
-/// UniFrac beta-diversity scenario.
+/// `UniFrac` beta-diversity scenario.
 ///
-/// Computes unweighted and weighted UniFrac distance matrices and projects
-/// samples via PCoA scatter (using first two BC axes as proxy).
+/// Computes unweighted and weighted `UniFrac` distance matrices and projects
+/// samples via `PCoA` scatter (using first two BC axes as proxy).
 #[must_use]
 pub fn unifrac_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     use crate::bio::unifrac;
@@ -267,6 +268,7 @@ pub fn unifrac_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
 /// Computes pairwise dN/dS (omega) ratios for codon-aligned sequences and
 /// visualises per-gene omega distributions.
 #[must_use]
+#[expect(clippy::cast_precision_loss)] // pair counts < 100
 pub fn dnds_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     use crate::bio::dnds;
 
@@ -286,15 +288,15 @@ pub fn dnds_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
 
     let mut pair_labels = Vec::new();
     let mut omegas = Vec::new();
-    let mut dn_values = Vec::new();
-    let mut ds_values = Vec::new();
+    let mut nonsyn_rates = Vec::new();
+    let mut syn_rates = Vec::new();
 
     for (i, r) in results.iter().enumerate() {
         if let Ok(res) = r {
             pair_labels.push(format!("pair_{i}"));
             omegas.push(res.omega.unwrap_or(f64::INFINITY).min(10.0));
-            dn_values.push(res.dn);
-            ds_values.push(res.ds);
+            nonsyn_rates.push(res.dn);
+            syn_rates.push(res.ds);
         }
     }
 
@@ -323,8 +325,8 @@ pub fn dnds_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     dnds_node.data_channels.push(scatter(
         "dn_vs_ds",
         "dN vs dS",
-        &ds_values,
-        &dn_values,
+        &syn_rates,
+        &nonsyn_rates,
         &pair_labels,
         "dS (synonymous)",
         "dN (non-synonymous)",
@@ -339,6 +341,7 @@ pub fn dnds_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
 /// Applies strict clock to branch lengths with calibration constraints
 /// and visualises divergence times and rate variation.
 #[must_use]
+#[expect(clippy::cast_precision_loss)] // node/branch counts < 100
 pub fn molecular_clock_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     let mut s = scaffold(
         "Molecular Clock",
@@ -457,18 +460,16 @@ pub fn reconciliation_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
         ],
         "cost units",
     ));
+    let cost = f64::from(result.optimal_cost);
     rec_node.data_channels.push(gauge(
         "optimal_cost",
         "Optimal Reconciliation Cost",
-        f64::from(result.optimal_cost),
+        cost,
         0.0,
-        f64::from(result.optimal_cost) * 3.0 + 1.0,
+        cost.mul_add(3.0, 1.0),
         "cost units",
-        [0.0, f64::from(result.optimal_cost) * 1.5],
-        [
-            f64::from(result.optimal_cost) * 1.5,
-            f64::from(result.optimal_cost) * 3.0,
-        ],
+        [0.0, cost * 1.5],
+        [cost * 1.5, cost * 3.0],
     ));
     s.nodes.push(rec_node);
     (s, vec![])

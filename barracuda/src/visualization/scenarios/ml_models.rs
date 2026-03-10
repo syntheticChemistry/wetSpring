@@ -26,16 +26,15 @@ pub fn decision_tree_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     let right_children = vec![2, 4, -1, -1, -1];
     let predictions: Vec<Option<usize>> = vec![None, None, Some(0), Some(1), Some(0)];
 
-    let tree = match DecisionTree::from_arrays(
+    let Ok(tree) = DecisionTree::from_arrays(
         &features,
         &thresholds,
         &left_children,
         &right_children,
         &predictions,
         2,
-    ) {
-        Ok(t) => t,
-        Err(_) => return (s, vec![]),
+    ) else {
+        return (s, vec![]);
     };
 
     let test_samples = vec![
@@ -53,6 +52,7 @@ pub fn decision_tree_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
         .zip(expected.iter())
         .filter(|(p, e)| p == e)
         .count();
+    #[expect(clippy::cast_precision_loss)] // sample counts < 100
     let accuracy = correct as f64 / predictions_vec.len() as f64;
 
     let mut dt_node = node(
@@ -133,14 +133,13 @@ pub fn random_forest_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     ];
     let mut trees = Vec::with_capacity(tree_results.len());
     for r in tree_results {
-        match r {
-            Ok(t) => trees.push(t),
-            Err(_) => return (s, vec![]),
-        }
+        let Ok(t) = r else {
+            return (s, vec![]);
+        };
+        trees.push(t);
     }
-    let forest = match RandomForest::from_trees(trees, 2) {
-        Ok(f) => f,
-        Err(_) => return (s, vec![]),
+    let Ok(forest) = RandomForest::from_trees(trees, 2) else {
+        return (s, vec![]);
     };
 
     let test_samples = vec![
@@ -171,12 +170,14 @@ pub fn random_forest_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
         "importance",
     ));
 
-    let mean_oob = oob_errors.iter().sum::<f64>() / oob_errors.len() as f64;
+    #[expect(clippy::cast_precision_loss)] // vote counts < 100
+    let n_oob = oob_errors.len() as f64;
+    let mean_oob = oob_errors.iter().sum::<f64>() / n_oob;
     let std_oob = (oob_errors
         .iter()
         .map(|v| (v - mean_oob).powi(2))
         .sum::<f64>()
-        / oob_errors.len() as f64)
+        / n_oob)
         .sqrt();
     rf_node.data_channels.push(distribution(
         "oob_error",
@@ -206,6 +207,7 @@ pub fn random_forest_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
 /// Trains a small reservoir on a sine wave and visualises predictions
 /// vs actual values alongside reservoir state gauge.
 #[must_use]
+#[expect(clippy::cast_precision_loss)] // loop indices < 300
 pub fn esn_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     let mut s = scaffold(
         "Echo State Network",

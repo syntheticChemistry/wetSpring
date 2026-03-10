@@ -52,7 +52,7 @@ impl QualityFilterCached {
     /// # Errors
     ///
     /// Returns an error if GPU dispatch or readback fails.
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     pub fn execute(
         &self,
         reads: &[FastqRecord],
@@ -178,7 +178,7 @@ pub fn filter_reads_gpu(
     }
 }
 
-#[allow(clippy::cast_possible_truncation)]
+#[expect(clippy::cast_possible_truncation)]
 fn pack_quality_data(reads: &[FastqRecord]) -> (Vec<u32>, Vec<u32>, Vec<u32>) {
     let mut offsets = Vec::with_capacity(reads.len());
     let mut lengths = Vec::with_capacity(reads.len());
@@ -209,7 +209,7 @@ fn pack_quality_data(reads: &[FastqRecord]) -> (Vec<u32>, Vec<u32>, Vec<u32>) {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[allow(
+#[expect(
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::type_complexity,

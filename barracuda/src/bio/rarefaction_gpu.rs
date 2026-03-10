@@ -94,7 +94,7 @@ fn require_f64(gpu: &GpuF64) -> Result<()> {
 /// # Errors
 ///
 /// Returns an error if GPU dispatch fails or the device lacks f64 support.
-#[allow(
+#[expect(
     clippy::cast_possible_truncation,
     clippy::cast_precision_loss,
     clippy::cast_sign_loss
@@ -238,7 +238,7 @@ pub fn rarefaction_bootstrap_gpu(
 }
 
 /// Subsample a community to the given depth using multinomial sampling.
-#[allow(
+#[expect(
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
     clippy::cast_sign_loss
@@ -311,7 +311,7 @@ fn compute_ci(samples: &[f64]) -> BootstrapCi {
 /// # Errors
 ///
 /// Returns an error if GPU dispatch fails or the device lacks f64 support.
-#[allow(
+#[expect(
     clippy::cast_possible_truncation,
     clippy::cast_precision_loss,
     clippy::cast_sign_loss
@@ -347,7 +347,7 @@ pub fn batch_rarefaction_gpu(
 }
 
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
+#[expect(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use crate::tolerances;

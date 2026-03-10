@@ -76,11 +76,11 @@ fn em_step(
 }
 
 /// Initialize error model from Phred quality scores (no prior data).
-#[allow(clippy::needless_range_loop)] // 3D array requires indexing by from/to/q
+#[expect(clippy::needless_range_loop)] // 3D array requires indexing by from/to/q
 pub fn init_error_model() -> ErrorModel {
     let mut err = [[[0.0_f64; MAX_QUAL]; NUM_BASES]; NUM_BASES];
     for q in 0..MAX_QUAL {
-        #[allow(clippy::cast_precision_loss)] // q is 0..42, exact
+        #[expect(clippy::cast_precision_loss)] // q is 0..42, exact
         let p_err = (10.0_f64).powf(-(q as f64) / 10.0).clamp(MIN_ERR, MAX_ERR);
         for from in 0..NUM_BASES {
             for to in 0..NUM_BASES {
@@ -95,7 +95,7 @@ pub fn init_error_model() -> ErrorModel {
     err
 }
 
-#[allow(clippy::match_same_arms)]
+#[expect(clippy::match_same_arms)]
 /// Map nucleotide to error-matrix index: A=0, C=1, G=2, T=3.
 ///
 /// Ambiguous/unknown bases (N, IUPAC degenerate) map to 0 (A).
@@ -153,7 +153,7 @@ fn assign_to_centers(
 }
 
 /// Re-estimate error model from observed substitution patterns.
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss, clippy::needless_range_loop)]
 pub fn estimate_error_model(
     seqs: &[&UniqueSequence],
     partition: &[usize],
@@ -184,7 +184,6 @@ pub fn estimate_error_model(
     }
 
     let mut err = init_error_model();
-    #[allow(clippy::needless_range_loop)] // 3D array requires indexing by from/to/q
     for from in 0..NUM_BASES {
         for q in 0..MAX_QUAL {
             if totals[from][q] > 0.0 {
@@ -197,7 +196,6 @@ pub fn estimate_error_model(
     }
 
     // Ensure rows sum to ~1
-    #[allow(clippy::needless_range_loop)] // 3D array requires indexing by from/to/q
     for from in 0..NUM_BASES {
         for q in 0..MAX_QUAL {
             let sum: f64 = (0..NUM_BASES).map(|to| err[from][to][q]).sum();
@@ -212,7 +210,6 @@ pub fn estimate_error_model(
     err
 }
 
-#[allow(clippy::needless_range_loop)]
 pub fn err_model_converged(old: &ErrorModel, new: &ErrorModel) -> bool {
     let mut max_diff = 0.0_f64;
     for from in 0..NUM_BASES {
@@ -233,7 +230,7 @@ pub fn err_model_converged(old: &ErrorModel, new: &ErrorModel) -> bool {
 /// For each non-center sequence, computes the expected abundance under the
 /// error model and tests whether the observed abundance is significantly
 /// higher using a Poisson CDF approximation.
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn find_new_centers(
     seqs: &[&UniqueSequence],
     partition: &[usize],
@@ -276,7 +273,7 @@ fn find_new_centers(
 /// Upper-tail Poisson p-value: P(X >= k) for X ~ Poisson(lambda).
 /// Uses the identity: P(X >= k | Poisson(λ)) = P(k, λ) where P is the
 /// regularized lower incomplete gamma function.
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 #[must_use]
 pub fn poisson_pvalue(k: usize, lambda: f64) -> f64 {
     if lambda <= 0.0 || k == 0 {
@@ -310,7 +307,6 @@ fn build_asvs(seqs: &[&UniqueSequence], partition: &[usize], centers: &[usize]) 
 ///
 /// This is the main entry point. Takes abundance-sorted `UniqueSequence`s
 /// (from `bio::derep::dereplicate`) and returns ASVs.
-#[allow(clippy::cast_precision_loss)]
 #[must_use]
 pub fn denoise(seqs: &[UniqueSequence], params: &Dada2Params) -> (Vec<Asv>, Dada2Stats) {
     let seqs: Vec<&UniqueSequence> = seqs

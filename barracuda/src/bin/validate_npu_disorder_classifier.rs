@@ -77,7 +77,7 @@ fn generate_diversity_profile(seed: u64, regime: usize) -> Vec<f64> {
     ]
 }
 
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp119: ESN QS-Disorder Classifier → NPU");
 

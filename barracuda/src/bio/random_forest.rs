@@ -84,7 +84,7 @@ impl RandomForest {
             .max_by_key(|&(_, &v)| v)
             .unwrap_or((0, &0));
 
-        #[allow(clippy::cast_precision_loss)] // vote counts are small
+        #[expect(clippy::cast_precision_loss)] // vote counts are small
         let confidence = if self.trees.is_empty() {
             0.0
         } else {
@@ -148,7 +148,7 @@ impl RandomForest {
 
     /// Average tree depth across the forest.
     #[must_use]
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     pub fn avg_depth(&self) -> f64 {
         if self.trees.is_empty() {
             return 0.0;
@@ -164,8 +164,8 @@ impl RandomForest {
     }
 }
 
+#[expect(clippy::unwrap_used)]
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use crate::tolerances;
@@ -278,7 +278,7 @@ mod tests {
     }
 
     #[test]
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     fn avg_depth_positive() {
         let rf = RandomForest::from_trees(vec![tree_a(), tree_b(), tree_c()], 2).unwrap();
         let avg = rf.avg_depth();

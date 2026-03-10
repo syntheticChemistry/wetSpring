@@ -57,7 +57,7 @@ impl SnpGpu {
     /// # Errors
     ///
     /// Returns `Err` if GPU buffer creation or readback fails.
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     pub fn call_snps(&self, sequences: &[&[u8]]) -> crate::error::Result<SnpGpuResult> {
         let n_sequences = sequences.len();
         if n_sequences == 0 {
@@ -162,7 +162,7 @@ impl SnpGpu {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[allow(
+#[expect(
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::manual_let_else,

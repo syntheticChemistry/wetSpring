@@ -3,8 +3,12 @@
 //!
 //! All parsers stream from disk — no full-file buffering.
 
+#[cfg(feature = "json")]
+pub mod biom;
 pub mod fastq;
+pub mod jcamp;
 pub mod ms2;
 pub mod mzml;
+pub mod mzxml;
 pub mod nanopore;
 pub mod xml;

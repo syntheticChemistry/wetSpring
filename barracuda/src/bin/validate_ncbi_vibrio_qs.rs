@@ -82,7 +82,7 @@ fn classify_outcome(y_final: &[f64]) -> &'static str {
     }
 }
 
-#[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
+#[expect(clippy::cast_precision_loss)]
 fn derive_params(assembly: &VibrioAssembly) -> QsBiofilmParams {
     let density = f64::from(assembly.gene_count) / (assembly.genome_size_bp as f64 / 1e6);
     QsBiofilmParams {
@@ -100,7 +100,7 @@ fn is_clinical(source: &str) -> bool {
     s.contains("clinical") || s.contains("patient") || s.contains("hospital")
 }
 
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp121: NCBI Vibrio QS Parameter Landscape");
 

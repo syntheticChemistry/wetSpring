@@ -2,7 +2,7 @@
 use super::*;
 
 #[test]
-#[allow(clippy::assertions_on_constants)]
+#[expect(clippy::assertions_on_constants)]
 fn tolerance_hierarchy_is_monotonic() {
     assert!(EXACT < EXACT_F64);
     assert!(EXACT_F64 < ANALYTICAL_F64);
@@ -14,7 +14,7 @@ fn tolerance_hierarchy_is_monotonic() {
 }
 
 #[test]
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn all_tolerances_are_non_negative() {
     let all = [
         EXACT,

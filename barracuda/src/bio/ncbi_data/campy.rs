@@ -49,7 +49,6 @@ pub fn try_load_campylobacterota() -> crate::error::Result<Vec<CampyAssembly>> {
 ///
 /// Returns `(records, is_real_data)`. See [`try_load_campylobacterota`] for
 /// explicit error handling.
-#[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
 #[must_use]
 pub fn load_campylobacterota() -> (Vec<CampyAssembly>, bool) {
     try_load_campylobacterota().map_or_else(|_| (gen_synthetic_campy(), false), |a| (a, true))
@@ -58,7 +57,7 @@ pub fn load_campylobacterota() -> (Vec<CampyAssembly>, bool) {
 /// Synthetic data: 80 assemblies across genera and ecosystems.
 ///
 /// Deterministic accessions (`GCF_CAM_*`). Used only as offline/CI fallback.
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 pub fn gen_synthetic_campy() -> Vec<CampyAssembly> {
     let genera = [
         (
@@ -139,7 +138,7 @@ pub fn gen_synthetic_campy() -> Vec<CampyAssembly> {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used)]
 mod tests {
     use super::*;
     use tempfile::TempDir;

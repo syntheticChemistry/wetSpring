@@ -89,7 +89,7 @@ fn make_tree_16s() -> TreeNode {
     }
 }
 
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp029: Felsenstein Pruning Phylogenetic Likelihood");
 

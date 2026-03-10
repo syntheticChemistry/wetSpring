@@ -3,6 +3,7 @@
 
 use crate::bio::diversity;
 use crate::visualization::types::{EcologyScenario, ScenarioEdge};
+use crate::visualization::ScientificRange;
 
 use super::{gauge, node, scaffold, timeseries};
 
@@ -64,16 +65,28 @@ pub fn rarefaction_scenario(
         ));
     }
 
+    if let Some(first) = samples.first() {
+        let chao1_ref = diversity::chao1(first);
+        rare_node.scientific_ranges.push(ScientificRange {
+            label: "Species richness > 50% of Chao1 estimate".into(),
+            min: 0.5 * chao1_ref,
+            max: chao1_ref * 1.2,
+            status: "normal".into(),
+        });
+        rare_node.scientific_ranges.push(ScientificRange {
+            label: "Species richness below 50% of Chao1".into(),
+            min: 0.0,
+            max: 0.5 * chao1_ref,
+            status: "warning".into(),
+        });
+    }
+
     s.nodes.push(rare_node);
     (s, vec![])
 }
 
 #[cfg(test)]
-#[allow(
-    clippy::unwrap_used,
-    clippy::expect_used,
-    reason = "tests use unwrap/expect for clarity"
-)]
+#[expect(clippy::expect_used, reason = "tests use unwrap/expect for clarity")]
 mod tests {
     use super::*;
 

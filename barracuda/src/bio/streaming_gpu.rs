@@ -231,7 +231,7 @@ impl GpuPipelineSession {
     /// # Errors
     ///
     /// Returns an error if GPU dispatch fails or GEMM readback fails.
-    #[allow(
+    #[expect(
         clippy::cast_possible_truncation,
         clippy::cast_precision_loss,
         clippy::cast_sign_loss
@@ -384,7 +384,7 @@ impl GpuPipelineSession {
     /// # Errors
     ///
     /// Returns an error if GPU dispatch fails.
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     pub fn spectral_cosine_matrix(&self, spectra: &[&[f64]]) -> Result<Vec<f64>> {
         let n = spectra.len();
         if n < 2 {
@@ -439,7 +439,7 @@ impl GpuPipelineSession {
     /// # Errors
     ///
     /// Returns an error if GPU dispatch fails for taxonomy or diversity.
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     pub fn stream_sample(
         &self,
         classifier: &NaiveBayesClassifier,
@@ -488,7 +488,7 @@ impl GpuPipelineSession {
     /// # Errors
     ///
     /// Returns an error if GPU dispatch fails for any stage.
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     pub fn stream_full_analytics(
         &self,
         classifier: &NaiveBayesClassifier,
@@ -653,7 +653,7 @@ fn argmax_with_priors(scores: &[f64], log_priors: &[f64]) -> usize {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[allow(
+#[expect(
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::type_complexity,

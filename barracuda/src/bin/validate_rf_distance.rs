@@ -84,7 +84,6 @@ const CASES: &[(&str, &str, &str, usize)] = &[
     ),
 ];
 
-#[allow(clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("validate_rf_distance (Exp021: Robinson-Foulds)");
 

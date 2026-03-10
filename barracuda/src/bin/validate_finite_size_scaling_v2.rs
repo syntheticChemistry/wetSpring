@@ -101,7 +101,7 @@ fn find_crossing(sweep_a: &[(f64, f64, f64)], sweep_b: &[(f64, f64, f64)]) -> Op
     None
 }
 
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp150: Finite-Size Scaling with Disorder Averaging");
 

@@ -45,7 +45,7 @@ fn make_reference_tree() -> TreeNode {
     }
 }
 
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp032: Alamin & Liu 2024 Phylogenetic Placement");
     let tree = make_reference_tree();

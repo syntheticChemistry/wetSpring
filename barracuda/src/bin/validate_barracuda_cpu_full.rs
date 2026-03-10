@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::too_many_lines, clippy::cast_precision_loss)]
+#![expect(clippy::too_many_lines, clippy::cast_precision_loss)]
 //! Exp070: `BarraCuda` CPU — 25-Domain Pure Rust Math Proof
 //!
 //! Consolidates all 25 algorithmic domains into one definitive validation

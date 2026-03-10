@@ -41,6 +41,8 @@ pub enum Error {
     Nanopore(String),
     /// IPC server/client protocol error (socket, JSON-RPC, dispatch).
     Ipc(String),
+    /// JCAMP-DX spectroscopy format parsing error.
+    Jcamp(String),
 }
 
 /// Result type alias for wetSpring operations.
@@ -62,6 +64,7 @@ impl fmt::Display for Error {
             Self::Npu(msg) => write!(f, "NPU error: {msg}"),
             Self::Nanopore(msg) => write!(f, "nanopore parse error: {msg}"),
             Self::Ipc(msg) => write!(f, "IPC error: {msg}"),
+            Self::Jcamp(msg) => write!(f, "JCAMP-DX parse error: {msg}"),
         }
     }
 }
@@ -81,7 +84,8 @@ impl std::error::Error for Error {
             | Self::Ncbi(_)
             | Self::Npu(_)
             | Self::Nanopore(_)
-            | Self::Ipc(_) => None,
+            | Self::Ipc(_)
+            | Self::Jcamp(_) => None,
         }
     }
 }
@@ -133,6 +137,10 @@ mod tests {
                 "nanopore parse error",
             ),
             (Error::Ipc("socket refused".into()), "IPC error"),
+            (
+                Error::Jcamp("missing TITLE".into()),
+                "JCAMP-DX parse error",
+            ),
         ];
         for (err, expected_prefix) in cases {
             let msg = err.to_string();
@@ -169,6 +177,7 @@ mod tests {
             Error::Npu("x".into()),
             Error::Nanopore("x".into()),
             Error::Ipc("x".into()),
+            Error::Jcamp("x".into()),
         ];
         for err in &variants {
             assert!(std::error::Error::source(err).is_none());

@@ -42,7 +42,7 @@ pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used)]
 mod tests {
     use super::*;
     use serde_json::json;

@@ -230,7 +230,7 @@ fn validate_evenness_and_rarefaction(v: &mut Validator) {
     );
 
     // Rarefaction monotonicity: check increasing with depth
-    #[allow(
+    #[expect(
         clippy::cast_possible_truncation,
         clippy::cast_sign_loss,
         clippy::cast_precision_loss
@@ -271,7 +271,7 @@ fn validate_exp002_galaxy_baseline(v: &mut Validator) {
     let n_otus = 856; // all vectors padded to max OTU count for BC compatibility
     let mut low_div = vec![0.0_f64; n_otus];
     low_div[0] = 5000.0;
-    #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
+    #[expect(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
     for (i, val) in low_div[1..91].iter_mut().enumerate() {
         *val = (5000.0 * 0.92_f64.powi((i + 1) as i32)).max(1.0);
     }
@@ -303,7 +303,7 @@ fn validate_exp002_galaxy_baseline(v: &mut Validator) {
     // Construct a high-diversity sample (856 ASVs, Shannon ~3.85, Simpson ~0.94)
     // Power-law rank-abundance curve matching Exp002's high-diversity profile.
     let mut high_div = vec![0.0_f64; n_otus];
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     for (i, val) in high_div[..856].iter_mut().enumerate() {
         *val = 5000.0 / ((i as f64) + 1.0).powf(1.2);
     }
@@ -344,7 +344,7 @@ fn validate_exp002_galaxy_baseline(v: &mut Validator) {
 
     // PCoA on 3 communities: eigenvalues should be non-negative
     let mut mid_div = vec![0.0_f64; n_otus];
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     for (i, val) in mid_div[..300].iter_mut().enumerate() {
         *val = (i as f64).mul_add(0.5, 100.0);
     }

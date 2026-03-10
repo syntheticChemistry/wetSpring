@@ -89,7 +89,7 @@ fn main() {
     let mut all_shannon = Vec::with_capacity(N_SYNTHETIC_SAMPLES);
     let mut all_simpson = Vec::with_capacity(N_SYNTHETIC_SAMPLES);
     let mut all_obs = Vec::with_capacity(N_SYNTHETIC_SAMPLES);
-    #[allow(clippy::collection_is_never_read)]
+    #[expect(clippy::collection_is_never_read)]
     let mut all_pielou = Vec::with_capacity(N_SYNTHETIC_SAMPLES);
 
     println!(

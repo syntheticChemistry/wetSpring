@@ -66,7 +66,7 @@ use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 async fn main() {
     println!("╔══════════════════════════════════════════════════════════════════════╗");
     println!("║  wetSpring 16S Pipeline GPU Validation — Math Parity Check         ║");
@@ -251,7 +251,7 @@ async fn main() {
 
 // ── Process a sample through both CPU and GPU pipelines, comparing results ──
 
-#[allow(
+#[expect(
     clippy::cast_precision_loss,
     clippy::too_many_arguments,
     clippy::too_many_lines
@@ -598,7 +598,7 @@ fn process_sample_gpu_vs_cpu(
 
 // ── Scaling benchmark: dispatch overhead + parallelization ───────────────────
 
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn run_scaling_benchmark(session: &GpuPipelineSession, classifier: &NaiveBayesClassifier) {
     println!("\n╔══════════════════════════════════════════════════════════════════════╗");
     println!("║           SCALING BENCHMARK — GPU vs CPU at Varying Load           ║");

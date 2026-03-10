@@ -52,7 +52,7 @@ pub fn resample_columns(alignment: &Alignment, rng: &mut Lcg64) -> Alignment {
     let n = alignment.n_sites;
     let mut new_columns = Vec::with_capacity(n);
     for _ in 0..n {
-        #[allow(
+        #[expect(
             clippy::cast_precision_loss,
             clippy::cast_possible_truncation,
             clippy::cast_sign_loss
@@ -149,7 +149,7 @@ pub fn bootstrap_support(
             a_wins += 1;
         }
     }
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     {
         a_wins as f64 / n_reps as f64
     }

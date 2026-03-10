@@ -4,7 +4,7 @@
 use crate::bio::pcoa;
 use crate::visualization::types::{EcologyScenario, ScenarioEdge};
 
-use super::{bar, node, scaffold, scatter};
+use super::{bar, node, scaffold, scatter, scatter3d};
 
 /// Build a `PCoA` ordination scenario from a distance matrix.
 ///
@@ -75,6 +75,29 @@ pub fn ordination_scenario(
         &pct_explained,
         "%",
     ));
+
+    // Add 3D scatter when we have at least 3 axes
+    if n_axes >= 3 {
+        let z: Vec<f64> = (0..n_samples)
+            .map(|i| result.coordinates[i * n_axes + 2])
+            .collect();
+        let z_label = format!(
+            "PC3 ({:.1}%)",
+            result.proportion_explained.get(2).unwrap_or(&0.0) * 100.0
+        );
+        pcoa_node.data_channels.push(scatter3d(
+            "pcoa_scatter3d",
+            "PCoA 3D Ordination",
+            &x,
+            &y,
+            &z,
+            sample_labels,
+            &x_label,
+            &y_label,
+            &z_label,
+            "coordinate",
+        ));
+    }
 
     s.nodes.push(pcoa_node);
     Ok((s, vec![]))

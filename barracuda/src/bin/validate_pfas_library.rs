@@ -248,7 +248,7 @@ fn main() {
 
 // ── Systematic tolerance search at 5, 10, 20 ppm ───────────────────────────
 
-#[allow(clippy::similar_names, clippy::cast_precision_loss)]
+#[expect(clippy::similar_names)]
 fn validate_tolerance_search_systematic(v: &mut Validator) {
     v.section("Systematic Tolerance Search (5/10/20 ppm)");
 
@@ -274,7 +274,7 @@ fn validate_tolerance_search_systematic(v: &mut Validator) {
             }
         }
 
-        #[allow(clippy::cast_precision_loss)]
+        #[expect(clippy::cast_precision_loss)]
         let hit_rate = hits as f64 / total as f64;
         println!(
             "  {ppm:.0} ppm: {hits}/{total} self-hits ({:.1}%)",
@@ -352,7 +352,7 @@ fn validate_tolerance_search_systematic(v: &mut Validator) {
 
 // ── KMD homologue series detection ──────────────────────────────────────────
 
-#[allow(clippy::similar_names, clippy::cast_precision_loss)]
+#[expect(clippy::similar_names, clippy::cast_precision_loss)]
 fn validate_kmd_homologue_series(v: &mut Validator) {
     v.section("KMD Homologue Series Detection");
 
@@ -459,7 +459,7 @@ fn validate_kmd_homologue_series(v: &mut Validator) {
 
 // ── Spectral matching for PFAS compound classes ─────────────────────────────
 
-#[allow(clippy::similar_names)]
+#[expect(clippy::similar_names)]
 fn validate_spectral_match_pfas(v: &mut Validator) {
     v.section("PFAS Spectral Matching");
 
@@ -549,7 +549,7 @@ fn validate_spectral_match_pfas(v: &mut Validator) {
 
 // ── Cross-series discrimination ─────────────────────────────────────────────
 
-#[allow(clippy::similar_names, clippy::cast_precision_loss)]
+#[expect(clippy::similar_names, clippy::cast_precision_loss)]
 fn validate_cross_series_discrimination(v: &mut Validator) {
     v.section("Cross-Series Discrimination");
 
@@ -574,7 +574,7 @@ fn validate_cross_series_discrimination(v: &mut Validator) {
         }
     }
 
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     let selectivity = correct_single_hit as f64 / total_queries as f64;
     println!(
         "  5 ppm selectivity: {correct_single_hit}/{total_queries} unique hits ({:.1}%)",
@@ -639,7 +639,7 @@ fn validate_cross_series_discrimination(v: &mut Validator) {
 /// m/z, CCS, and RT values from LC-DTIMS-HRMS with certified standards.
 ///
 /// Jones/Joseph et al. 2025, Nature Scientific Data, DOI 10.1038/s41597-024-04363-0
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn validate_jones_library_expansion(v: &mut Validator) {
     v.section("Jones Lab PFAS Library (175 compounds, Zenodo 14341321)");
 

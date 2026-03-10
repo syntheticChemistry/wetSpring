@@ -93,7 +93,7 @@ pub fn stats_from_file(path: &Path) -> Result<Ms2Stats> {
         num_spectra += 1;
     }
 
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     Ok(Ms2Stats {
         num_spectra,
         total_peaks,
@@ -138,7 +138,7 @@ pub fn compute_stats(spectra: &[Ms2Spectrum]) -> Ms2Stats {
         max_rt = Some(max_rt.map_or(s.rt_minutes, |v: f64| v.max(s.rt_minutes)));
     }
 
-    #[allow(clippy::cast_precision_loss)] // counts are small
+    #[expect(clippy::cast_precision_loss)] // counts are small
     Ms2Stats {
         num_spectra: spectra.len(),
         total_peaks,

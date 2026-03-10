@@ -103,7 +103,7 @@ impl PetalTonguePushClient {
     /// Resolution order:
     /// 1. `PETALTONGUE_SOCKET` env var
     /// 2. `$XDG_RUNTIME_DIR/petaltongue/*.sock`
-    /// 3. `/tmp/petaltongue-*.sock`
+    /// 3. `<temp_dir>/petaltongue-*.sock` (platform-agnostic fallback)
     ///
     /// # Errors
     ///
@@ -128,7 +128,7 @@ impl PetalTonguePushClient {
                 }
             }
         }
-        if let Ok(entries) = std::fs::read_dir("/tmp") {
+        if let Ok(entries) = std::fs::read_dir(std::env::temp_dir()) {
             for entry in entries.flatten() {
                 let name = entry.file_name();
                 let name = name.to_string_lossy();
@@ -245,6 +245,80 @@ impl PetalTonguePushClient {
         Ok(())
     }
 
+    /// Push a render with explicit domain string for themed rendering.
+    ///
+    /// Shorthand for `push_render_with_config` when only the domain matters
+    /// and default panel layout is acceptable.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`PushError`] on connection, serialization, or RPC failure.
+    pub fn push_render_with_domain(
+        &self,
+        session_id: &str,
+        title: &str,
+        scenario: &EcologyScenario,
+        domain: &str,
+    ) -> PushResult<()> {
+        let bindings: Vec<&DataChannel> = scenario
+            .nodes
+            .iter()
+            .flat_map(|n| n.data_channels.iter())
+            .collect();
+        let params = serde_json::json!({
+            "session_id": session_id,
+            "title": title,
+            "bindings": bindings,
+            "domain": domain,
+        });
+        self.send_rpc("visualization.render", &params)?;
+        Ok(())
+    }
+
+    /// Query petalTongue's supported capabilities.
+    ///
+    /// Returns the raw JSON response containing supported channel types,
+    /// streaming modes, and feature flags.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`PushError`] on connection or RPC failure.
+    pub fn query_capabilities(&self) -> PushResult<serde_json::Value> {
+        let params = serde_json::json!({});
+        self.send_rpc("visualization.capabilities", &params)
+    }
+
+    /// Subscribe to interaction events from petalTongue.
+    ///
+    /// Registers interest in user interactions (clicks, selections, zooms)
+    /// on the specified session. Returns the subscription acknowledgment.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`PushError`] on connection or RPC failure.
+    pub fn subscribe_interactions(
+        &self,
+        session_id: &str,
+    ) -> PushResult<serde_json::Value> {
+        let params = serde_json::json!({
+            "session_id": session_id,
+        });
+        self.send_rpc("visualization.interact.subscribe", &params)
+    }
+
+    /// Dismiss (close) a visualization session.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`PushError`] on connection or RPC failure.
+    pub fn dismiss_session(&self, session_id: &str) -> PushResult<()> {
+        let params = serde_json::json!({
+            "session_id": session_id,
+        });
+        self.send_rpc("visualization.dismiss", &params)?;
+        Ok(())
+    }
+
     fn send_rpc(&self, method: &str, params: &serde_json::Value) -> PushResult<serde_json::Value> {
         let request = serde_json::json!({
             "jsonrpc": "2.0",
@@ -266,7 +340,7 @@ impl PetalTonguePushClient {
             .map_err(PushError::ConnectionFailed)?;
         stream.flush().map_err(PushError::ConnectionFailed)?;
 
-        let mut buf = vec![0u8; 4096];
+        let mut buf = vec![0u8; 65_536];
         let n = stream.read(&mut buf).map_err(PushError::ConnectionFailed)?;
 
         let response: serde_json::Value = serde_json::from_slice(&buf[..n])
@@ -343,6 +417,26 @@ mod tests {
         let params = build_gauge_params("s1", "g1", 42.0);
         assert_eq!(params["binding_id"], "g1");
         assert_eq!(params["operation"]["type"], "set_value");
+    }
+
+    #[test]
+    fn build_render_with_domain_params() {
+        let scenario = EcologyScenario {
+            name: "test".into(),
+            description: "desc".into(),
+            version: "1.0.0".into(),
+            mode: "static".into(),
+            domain: "ecology".into(),
+            nodes: vec![],
+            edges: vec![],
+        };
+        let client = PetalTonguePushClient::new(PathBuf::from("/tmp/test.sock"));
+        let _ = client.push_render_with_domain("s1", "Test", &scenario, "measurement");
+    }
+
+    #[test]
+    fn ipc_buffer_is_64kb() {
+        assert_eq!(65_536, 64 * 1024);
     }
 
     #[test]

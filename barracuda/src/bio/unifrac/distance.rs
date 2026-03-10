@@ -49,7 +49,6 @@ pub fn to_sample_matrix(
 /// Compute the unweighted `UniFrac` distance between two samples.
 ///
 /// `UniFrac_u` = (`unique` `branch_length`) / (total observed `branch_length`)
-#[allow(clippy::cast_precision_loss)]
 #[must_use]
 pub fn unweighted_unifrac<S>(
     tree: &PhyloTree,
@@ -108,7 +107,6 @@ where
 ///
 /// `UniFrac_w` = Σ_`branches` |`p_A` - `p_B`| × `branch_length` /
 /// Σ_`branches` max(`p_A`, `p_B`) × `branch_length`
-#[allow(clippy::cast_precision_loss)]
 #[must_use]
 pub fn weighted_unifrac<S>(
     tree: &PhyloTree,

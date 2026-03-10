@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** March 9, 2026
-**Status:** V102 — Validation study active — 9,200+ checks, 1,455 tests, 334 experiments, 318 binaries, standalone `barraCuda` v0.3.3 `a898dee` (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, 179 named tolerances, clippy pedantic + nursery ZERO WARNINGS, 52 papers reproduced, all 39 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. petalTongue V2: 8 DataChannel types, 41 scenario builders, 4 composite full-pipeline, UiConfig/BackpressureConfig, StreamSession with backpressure, Songbird, wetspring_dashboard scientist binary.
+**Status:** V105 — Validation study active — 9,200+ checks, 1,288 lib + 219 integration tests, 334 experiments, 318 binaries, standalone `barraCuda` v0.3.3 `a898dee` (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, 179 named tolerances, clippy pedantic + nursery ZERO WARNINGS, 52 papers reproduced, all 39 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. petalTongue V2: 9 DataChannel types, 33 scenario builders, 4 composite full-pipeline, UiConfig/BackpressureConfig, StreamSession with backpressure, Songbird, wetspring_dashboard scientist binary.
 **License:** AGPL-3.0-or-later
 
 ---
@@ -311,7 +311,7 @@ algorithms can be ported from interpreted languages to `barraCuda` (math)
 and `toadStool` (hardware dispatch):
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (62 WGSL shaders, 660 tests)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 150+ barraCuda primitives, 1,455 tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 150+ barraCuda primitives, 1,288 lib + 219 integration tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **airSpring** — Precision agriculture, IoT, Richards PDE, Kriging
 

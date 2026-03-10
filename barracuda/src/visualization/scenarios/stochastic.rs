@@ -3,6 +3,7 @@
 
 use crate::bio::gillespie::{self, EnsembleStats, Trajectory};
 use crate::visualization::types::{EcologyScenario, ScenarioEdge};
+use crate::visualization::ScientificRange;
 
 use super::{distribution, gauge, node, scaffold, timeseries};
 
@@ -77,6 +78,28 @@ pub fn stochastic_scenario(
         [0.0, (stats.mean - stats.std_dev).max(0.0)],
     ));
 
+    let lo = 2.0_f64.mul_add(-stats.std_dev, stats.mean).max(0.0);
+    let hi = 2.0_f64.mul_add(stats.std_dev, stats.mean);
+    let gauge_max = if upper > 0.0 { upper } else { 100.0 };
+    stoch_node.scientific_ranges.push(ScientificRange {
+        label: "Within 2 SD of mean".into(),
+        min: lo,
+        max: hi,
+        status: "normal".into(),
+    });
+    stoch_node.scientific_ranges.push(ScientificRange {
+        label: "Below 2 SD of mean".into(),
+        min: 0.0,
+        max: lo,
+        status: "warning".into(),
+    });
+    stoch_node.scientific_ranges.push(ScientificRange {
+        label: "Above 2 SD of mean".into(),
+        min: hi,
+        max: gauge_max,
+        status: "warning".into(),
+    });
+
     s.nodes.push(stoch_node);
     (s, vec![])
 }
@@ -100,11 +123,7 @@ pub fn birth_death_scenario(
 }
 
 #[cfg(test)]
-#[allow(
-    clippy::unwrap_used,
-    clippy::expect_used,
-    reason = "tests use unwrap/expect for clarity"
-)]
+#[expect(clippy::expect_used, reason = "tests use unwrap/expect for clarity")]
 mod tests {
     use super::*;
 

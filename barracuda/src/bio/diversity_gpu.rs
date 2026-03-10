@@ -187,7 +187,7 @@ fn require_f64(gpu: &GpuF64) -> Result<()> {
 }
 
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used, clippy::cast_precision_loss)]
+#[expect(clippy::expect_used, clippy::unwrap_used, clippy::cast_precision_loss)]
 mod tests {
     use super::*;
     use crate::tolerances;

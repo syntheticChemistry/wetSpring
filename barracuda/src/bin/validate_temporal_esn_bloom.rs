@@ -114,7 +114,7 @@ fn one_hot(class: usize) -> Vec<f64> {
     v
 }
 
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp123: Temporal ESN Bloom Cascade");
 

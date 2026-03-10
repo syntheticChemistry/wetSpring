@@ -50,7 +50,7 @@ mod tests {
     }
 
     #[test]
-    #[allow(clippy::float_cmp)]
+    #[expect(clippy::float_cmp)]
     fn error_prob_boundaries() {
         assert_eq!(error_prob_to_phred(0.0), 41.0);
         assert_eq!(error_prob_to_phred(1.0), 0.0);

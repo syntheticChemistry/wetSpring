@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::similar_names)]
+#![expect(clippy::similar_names)]
 //! Exp060: Cross-Substrate Validation (`metalForge`)
 //!
 //! Proves that the same algorithm produces identical results on CPU and GPU
@@ -34,7 +34,7 @@ use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
-#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
+#[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
 async fn main() {
     let mut v = Validator::new("Exp060: metalForge Cross-Substrate Validation");
 

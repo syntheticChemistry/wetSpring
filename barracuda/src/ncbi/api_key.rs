@@ -55,7 +55,7 @@ fn parse_toml(path: &Path) -> Option<String> {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used)]
 mod tests {
     use super::*;
     use std::io::Write;

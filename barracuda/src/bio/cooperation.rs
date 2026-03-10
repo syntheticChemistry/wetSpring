@@ -209,7 +209,7 @@ mod tests {
     const SS_FRAC: f64 = 0.1;
 
     #[test]
-    #[allow(clippy::similar_names)]
+    #[expect(clippy::similar_names)]
     fn equal_start_coexistence() {
         let p = CooperationParams::default();
         let r = scenario_equal_start(&p, DT);
@@ -254,7 +254,7 @@ mod tests {
     }
 
     #[test]
-    #[allow(clippy::similar_names)]
+    #[expect(clippy::similar_names)]
     fn total_density_reaches_capacity() {
         let p = CooperationParams::default();
         let r = scenario_equal_start(&p, DT);

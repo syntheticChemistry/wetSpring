@@ -92,7 +92,7 @@ pub fn pfas_kmd_screen_gpu(
 }
 
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
+#[expect(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use crate::tolerances;

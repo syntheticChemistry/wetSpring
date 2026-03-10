@@ -38,7 +38,7 @@ use barracuda::spectral::{
     GOE_R, POISSON_R, anderson_2d, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp136: Square-Cubed Law & Interior Fraction Scaling");
 

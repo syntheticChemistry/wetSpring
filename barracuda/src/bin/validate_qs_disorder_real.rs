@@ -34,7 +34,7 @@ use barracuda::spectral::{
     anderson_hamiltonian, find_all_eigenvalues, level_spacing_ratio, lyapunov_exponent,
 };
 
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn generate_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     let mut counts = Vec::with_capacity(n_species);
     let mut rng = seed;
@@ -58,7 +58,7 @@ fn evenness_to_disorder(pielou_j: f64) -> f64 {
     pielou_j.mul_add(14.5, 0.5)
 }
 
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp113: QS-Disorder Prediction from Real Diversity");
 
@@ -195,9 +195,9 @@ fn main() {
             .collect();
 
         if !low_w.is_empty() && !high_w.is_empty() {
-            #[allow(clippy::cast_precision_loss)]
+            #[expect(clippy::cast_precision_loss)]
             let avg_r_low = low_w.iter().map(|(_, _, r, _)| r).sum::<f64>() / low_w.len() as f64;
-            #[allow(clippy::cast_precision_loss)]
+            #[expect(clippy::cast_precision_loss)]
             let avg_r_high = high_w.iter().map(|(_, _, r, _)| r).sum::<f64>() / high_w.len() as f64;
 
             println!("  Low-W ⟨r⟩ avg: {avg_r_low:.4}");

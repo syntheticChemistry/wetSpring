@@ -21,7 +21,7 @@ pub struct Variant {
 impl Variant {
     /// Allele frequency of the reference allele.
     #[must_use]
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     pub fn ref_frequency(&self) -> f64 {
         if self.depth == 0 {
             return 0.0;
@@ -32,7 +32,7 @@ impl Variant {
 
     /// Allele frequency of the major alternative allele.
     #[must_use]
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     pub fn alt_frequency(&self) -> f64 {
         if self.depth == 0 {
             return 0.0;
@@ -56,7 +56,7 @@ pub struct SnpResult {
 impl SnpResult {
     /// SNP density: variants per base pair.
     #[must_use]
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     pub fn snp_density(&self) -> f64 {
         if self.alignment_length == 0 {
             return 0.0;
@@ -105,7 +105,7 @@ pub struct SnpFlatResult {
 /// Equivalent to `call_snps` but returns `SoA` layout for direct
 /// GPU buffer binding in future absorption.
 #[must_use]
-#[allow(clippy::cast_possible_truncation)]
+#[expect(clippy::cast_possible_truncation)]
 pub fn call_snps_flat(sequences: &[&[u8]]) -> SnpFlatResult {
     let result = call_snps(sequences);
     let n = result.variants.len();
@@ -159,7 +159,6 @@ pub fn call_snps_batch(alignments: &[Vec<Vec<u8>>]) -> Vec<SnpFlatResult> {
 /// bases are identical are invariant. Positions with 2+ different bases
 /// are called as variants.
 #[must_use]
-#[allow(clippy::cast_precision_loss)]
 pub fn call_snps(sequences: &[&[u8]]) -> SnpResult {
     if sequences.is_empty() {
         return SnpResult {

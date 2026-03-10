@@ -131,7 +131,7 @@ fn interpret_output(output: std::process::Output, cmd: &str) -> crate::error::Re
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used)]
 mod tests {
     use super::*;
 

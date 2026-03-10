@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::too_many_lines, clippy::cast_precision_loss)]
+#![expect(clippy::cast_precision_loss)]
 //! Exp089: `ToadStool` Streaming Dispatch Proof
 //!
 //! Proves that unidirectional streaming (data flows source → GPU → sink

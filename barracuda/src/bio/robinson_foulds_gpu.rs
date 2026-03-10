@@ -59,7 +59,7 @@ pub fn rf_distance_normalized_gpu(
 /// # Errors
 ///
 /// Returns an error if GPU dispatch fails.
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 pub fn rf_distance_matrix_gpu(gpu: &GpuF64, trees: &[PhyloTree]) -> Result<Vec<f64>> {
     require_f64(gpu)?;
 
@@ -90,7 +90,7 @@ pub fn rf_distance_matrix_gpu(gpu: &GpuF64, trees: &[PhyloTree]) -> Result<Vec<f
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[allow(
+#[expect(
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::type_complexity,

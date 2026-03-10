@@ -21,6 +21,7 @@ use wetspring_barracuda::visualization::{EcologyScenario, ScenarioEdge, scenario
 
 type ScenarioEntry<'a> = (&'a str, EcologyScenario, Vec<ScenarioEdge>);
 
+#[expect(clippy::similar_names)]
 fn main() {
     eprintln!("╔═══════════════════════════════════════════════════════════╗");
     eprintln!("║  wetSpring Scientist Dashboard                           ║");
@@ -150,22 +151,20 @@ fn main() {
         out_dir.display()
     );
 
-    match PetalTonguePushClient::discover() {
-        Ok(client) => {
-            eprintln!("\npetalTongue discovered — pushing scenarios via IPC...");
-            let mut pushed = 0u32;
-            for (name, scenario, _) in &entries {
-                match client.push_render(name, name, scenario) {
-                    Ok(()) => pushed += 1,
-                    Err(e) => eprintln!("  push {name}: {e}"),
-                }
+    if let Ok(client) = PetalTonguePushClient::discover() {
+        eprintln!("\npetalTongue discovered — pushing scenarios via IPC...");
+        let mut pushed = 0u32;
+        for (name, scenario, _) in &entries {
+            if let Err(e) = client.push_render(name, name, scenario) {
+                eprintln!("  push {name}: {e}");
+            } else {
+                pushed += 1;
             }
-            eprintln!("Pushed {pushed}/{} scenarios.", entries.len());
         }
-        Err(_) => {
-            eprintln!("\npetalTongue not running — scenarios saved as JSON.");
-            eprintln!("To view: petaltongue --scenario {}/", out_dir.display());
-        }
+        eprintln!("Pushed {pushed}/{} scenarios.", entries.len());
+    } else {
+        eprintln!("\npetalTongue not running — scenarios saved as JSON.");
+        eprintln!("To view: petaltongue --scenario {}/", out_dir.display());
     }
 
     eprintln!("\nDone. {} domains visualized.", entries.len());

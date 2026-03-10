@@ -65,7 +65,7 @@ fn cpu_fallback(samples: &[f64], refs: &[f64], ppm_tol: f64, da_tol: f64) -> Vec
         for &r in refs {
             let diff = (s - r).abs();
             if diff <= tol {
-                #[allow(clippy::cast_possible_truncation)]
+                #[expect(clippy::cast_possible_truncation)]
                 scores.push((1.0 - diff / tol) as f32);
             } else {
                 scores.push(0.0);
@@ -76,7 +76,7 @@ fn cpu_fallback(samples: &[f64], refs: &[f64], ppm_tol: f64, da_tol: f64) -> Vec
 }
 
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
+#[expect(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
 

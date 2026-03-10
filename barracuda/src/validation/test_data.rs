@@ -11,7 +11,7 @@
 /// Used by: `validate_pure_gpu_streaming`, `validate_pure_gpu_pipeline`,
 /// `benchmark_streaming_vs_roundtrip`.
 #[must_use]
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 pub fn make_communities_shift(n_samples: usize, n_features: usize) -> Vec<Vec<f64>> {
     (0..n_samples)
         .map(|s| {
@@ -33,7 +33,7 @@ pub fn make_communities_shift(n_samples: usize, n_features: usize) -> Vec<Vec<f6
 ///
 /// Used by: `validate_cross_substrate_pipeline`.
 #[must_use]
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 pub fn make_communities_gradient(n_samples: usize, n_features: usize) -> Vec<Vec<f64>> {
     (0..n_samples)
         .map(|s| {
@@ -54,7 +54,7 @@ pub fn make_communities_gradient(n_samples: usize, n_features: usize) -> Vec<Vec
 ///
 /// Used by: `validate_dispatch_overhead_proof`.
 #[must_use]
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 pub fn make_abundances(n: usize) -> Vec<f64> {
     (0..n).map(|i| ((i + 1) as f64).mul_add(1.5, 0.5)).collect()
 }

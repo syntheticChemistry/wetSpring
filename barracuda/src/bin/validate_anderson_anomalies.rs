@@ -50,7 +50,7 @@ struct AndersonAnomaly {
     np_solution_type: &'static str,
 }
 
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp143: Anderson Anomaly Hunter — Nature's NP Solutions");
 

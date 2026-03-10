@@ -62,7 +62,7 @@ impl HmmGpuForward {
     /// # Errors
     ///
     /// Returns `Err` if GPU dispatch or buffer readback fails.
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     pub fn forward_batch(
         &self,
         model: &HmmModel,
@@ -146,7 +146,7 @@ impl HmmGpuForward {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[allow(clippy::expect_used, clippy::unwrap_used, clippy::manual_let_else)]
+#[expect(clippy::expect_used, clippy::unwrap_used, clippy::manual_let_else)]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

@@ -133,6 +133,34 @@ pub enum DataChannel {
         /// Amplitude axis values (same length as `frequencies`).
         amplitudes: Vec<f64>,
     },
+    /// 3D scatter plot for ordination, KMD, and multi-dimensional analysis.
+    ///
+    /// Follows healthSpring's `Scatter3D` pattern for `PCoA`, `UMAP`, and population
+    /// pharmacokinetics (CL/Vd/AUC). `petalTongue` renders with optional rotation.
+    #[serde(rename = "scatter3d")]
+    Scatter3D {
+        /// Unique channel identifier.
+        id: String,
+        /// Human-readable label.
+        label: String,
+        /// X coordinates.
+        x: Vec<f64>,
+        /// Y coordinates.
+        y: Vec<f64>,
+        /// Z coordinates.
+        z: Vec<f64>,
+        /// Per-point labels (optional).
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        point_labels: Vec<String>,
+        /// X-axis label.
+        x_label: String,
+        /// Y-axis label.
+        y_label: String,
+        /// Z-axis label.
+        z_label: String,
+        /// Unit for axes.
+        unit: String,
+    },
     /// Spatial field map for gridded 2D data (environmental sampling, spatial ecology).
     ///
     /// Per wateringHole `VISUALIZATION_INTEGRATION_GUIDE` v2.0: `grid_x`, `grid_y`,

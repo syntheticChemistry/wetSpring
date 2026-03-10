@@ -62,9 +62,9 @@ use wetspring_barracuda::validation::Validator;
 struct ParityBench {
     domain: &'static str,
     python_equiv: &'static str,
-    #[allow(dead_code)]
+    #[expect(dead_code)]
     expected: f64,
-    #[allow(dead_code)]
+    #[expect(dead_code)]
     actual: f64,
     tolerance: f64,
     rust_us: u128,

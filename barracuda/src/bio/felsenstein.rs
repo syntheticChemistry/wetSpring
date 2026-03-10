@@ -199,7 +199,7 @@ pub struct FlatTree {
 impl FlatTree {
     /// Flatten a recursive `TreeNode` into GPU-ready layout.
     #[must_use]
-    #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
+    #[expect(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
     pub fn from_tree(tree: &TreeNode, mu: f64) -> Self {
         struct Collector {
             leaf_seqs: Vec<Vec<usize>>,
@@ -259,7 +259,7 @@ impl FlatTree {
         let mut leaf_states = vec![0u8; n_sites * n_leaves];
         for (leaf_idx, states) in leaf_seqs.iter().enumerate() {
             for (site, &s) in states.iter().enumerate() {
-                #[allow(clippy::cast_possible_truncation)]
+                #[expect(clippy::cast_possible_truncation)]
                 {
                     leaf_states[site * n_leaves + leaf_idx] = s as u8;
                 }
@@ -340,7 +340,7 @@ impl FlatTree {
     }
 
     #[inline]
-    #[allow(clippy::cast_sign_loss)]
+    #[expect(clippy::cast_sign_loss)]
     fn get_partial(
         &self,
         child: i32,

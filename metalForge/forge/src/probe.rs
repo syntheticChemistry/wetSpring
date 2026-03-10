@@ -263,7 +263,7 @@ fn parse_meminfo(content: &str) -> Option<u64> {
 }
 
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
+#[expect(clippy::unwrap_used)]
 mod tests {
     use super::*;
 

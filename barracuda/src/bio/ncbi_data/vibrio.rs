@@ -23,7 +23,7 @@ impl VibrioAssembly {
     ///
     /// NCBI `gene_count` and `scaffold_count` fit in u32 for all known assemblies.
     #[must_use]
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     pub fn from_json_obj(obj: &str) -> Self {
         Self {
             accession: super::json_str_value(obj, "accession"),
@@ -57,7 +57,6 @@ pub fn try_load_vibrio_assemblies() -> crate::error::Result<Vec<VibrioAssembly>>
 /// Returns `(records, is_real_data)`. Validation binaries use this for
 /// CI/offline resilience. Library consumers should prefer
 /// [`try_load_vibrio_assemblies`] for explicit error handling.
-#[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
 #[must_use]
 pub fn load_vibrio_assemblies() -> (Vec<VibrioAssembly>, bool) {
     try_load_vibrio_assemblies().map_or_else(|_| (gen_synthetic_vibrio(), false), |a| (a, true))
@@ -69,7 +68,7 @@ pub fn load_vibrio_assemblies() -> (Vec<VibrioAssembly>, bool) {
 /// synthetic from real data. Used only as offline/CI fallback.
 ///
 /// `rng>>33` yields ≤2^31; `genome_size`/`gene_count`/`scaffold_count` fit target types.
-#[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
+#[expect(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
 pub fn gen_synthetic_vibrio() -> Vec<VibrioAssembly> {
     let mut rng = 42_u64;
     let species = [
@@ -117,7 +116,7 @@ pub fn gen_synthetic_vibrio() -> Vec<VibrioAssembly> {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used)]
 mod tests {
     use super::*;
     use tempfile::TempDir;

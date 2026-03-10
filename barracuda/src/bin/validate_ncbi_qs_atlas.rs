@@ -76,7 +76,7 @@ const LATTICE_N: usize = 200;
 
 type AtlasEntry = (String, f64, f64, f64, Option<f64>, Option<&'static str>);
 
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp126: Global QS-Disorder Atlas from NCBI 16S Surveys");
 

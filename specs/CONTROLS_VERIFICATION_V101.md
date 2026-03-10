@@ -139,8 +139,8 @@ Waters 2021) is a reference-only review article.
 | **Total** | | **251** | **ALL PASS** |
 
 **Visualization coverage:**
-- 7 DataChannel types: TimeSeries, Distribution, Bar, Gauge, Heatmap, Scatter, Spectrum
-- 13 scenario builders across all science domains
+- 9 DataChannel types: TimeSeries, Distribution, Bar, Gauge, Heatmap, Scatter, Spectrum, and 2 more
+- 33 scenario builders across all science domains
 - StreamSession for progressive rendering
 - Songbird capability announcement (16 capabilities)
 - IPC science→viz wiring (optional `visualization: bool` flag)

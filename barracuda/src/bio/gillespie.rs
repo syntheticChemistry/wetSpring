@@ -52,7 +52,7 @@ impl Lcg64 {
     }
 
     /// Uniform `f64` in `[0, 1)`.
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     #[must_use]
     pub fn next_f64(&mut self) -> f64 {
         (self.next_u64() >> 11) as f64 / ((1_u64 << 53) as f64)
@@ -217,7 +217,7 @@ pub fn birth_death_ssa(k_dgc: f64, k_pde: f64, t_max: f64, seed: u64) -> Traject
         },
         Reaction {
             propensity: Box::new(move |state: &[i64]| {
-                #[allow(clippy::cast_precision_loss)]
+                #[expect(clippy::cast_precision_loss)]
                 let count = state[0].max(0) as f64;
                 k_pde * count
             }),
@@ -246,7 +246,7 @@ pub struct EnsembleStats {
 
 /// Run an ensemble of birth-death SSA and compute statistics.
 #[must_use]
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 pub fn birth_death_ensemble(
     k_dgc: f64,
     k_pde: f64,
@@ -256,7 +256,6 @@ pub fn birth_death_ensemble(
 ) -> EnsembleStats {
     let final_counts: Vec<i64> = (0..n_runs)
         .map(|i| {
-            #[allow(clippy::cast_possible_truncation)]
             let seed = base_seed + i as u64;
             let traj = birth_death_ssa(k_dgc, k_pde, t_max, seed);
             traj.final_state()[0]

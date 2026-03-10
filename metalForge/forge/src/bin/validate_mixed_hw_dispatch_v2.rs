@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::too_many_lines, clippy::unwrap_used, clippy::expect_used)]
+#![expect(clippy::too_many_lines, clippy::unwrap_used)]
 //! # Exp332: Mixed Hardware Dispatch Evolution
 //!
 //! Validates bandwidth-aware routing, workload `data_bytes` wiring,

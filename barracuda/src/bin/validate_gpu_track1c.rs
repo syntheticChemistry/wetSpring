@@ -103,7 +103,7 @@ async fn main() {
     v.finish();
 }
 
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn validate_ani_gpu(gpu: &AniGpu, v: &mut Validator, timings: &mut Vec<(&str, f64)>) {
     v.section("═══ Section 1: GPU ANI Batch ═══");
 
@@ -186,7 +186,7 @@ fn validate_ani_gpu(gpu: &AniGpu, v: &mut Validator, timings: &mut Vec<(&str, f6
     }
 }
 
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn validate_snp_gpu(gpu: &SnpGpu, v: &mut Validator, timings: &mut Vec<(&str, f64)>) {
     v.section("═══ Section 2: GPU SNP Calling ═══");
 
@@ -286,7 +286,7 @@ fn validate_snp_gpu(gpu: &SnpGpu, v: &mut Validator, timings: &mut Vec<(&str, f6
     }
 }
 
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn validate_pangenome_gpu(gpu: &PangenomeGpu, v: &mut Validator, timings: &mut Vec<(&str, f64)>) {
     v.section("═══ Section 3: GPU Pangenome Classification ═══");
 
@@ -404,7 +404,7 @@ fn validate_pangenome_gpu(gpu: &PangenomeGpu, v: &mut Validator, timings: &mut V
     }
 }
 
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn validate_dnds_gpu(gpu: &DnDsGpu, v: &mut Validator, timings: &mut Vec<(&str, f64)>) {
     v.section("═══ Section 4: GPU dN/dS Batch (Nei-Gojobori 1986) ═══");
 

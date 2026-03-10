@@ -48,7 +48,7 @@ fn chimney_to_disorder(zone: &ChimneyZone) -> f64 {
     (w_mineral + w_temp) * porosity_factor
 }
 
-#[allow(clippy::cast_precision_loss, clippy::too_many_lines)]
+#[expect(clippy::cast_precision_loss, clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp128: Vent Chimney Geometry QS Prediction");
 

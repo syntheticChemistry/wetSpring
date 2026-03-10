@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** March 9, 2026 (V102 — barraCuda v0.3.3 `a898dee`, toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`, wgpu 28. 1,455 tests, 318 binaries, 179 tolerances. V102: petalTongue V2 — 41 scenario builders, 8 DataChannel types, 4 composite, 140/140 viz validation. V101: 78/78. V100: 173/173. V99: 166/166. V98: 173/173 PASS)
+**Updated:** March 9, 2026 (V105 — barraCuda v0.3.3 `a898dee`, toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`, wgpu 28. 1,288 lib + 219 integration tests, 318 binaries, 179 tolerances. V105: petalTongue V2 — 33 scenario builders, 9 DataChannel types, 4 composite, 140/140 viz validation. V101: 78/78. V100: 173/173. V99: 166/166. V98: 173/173 PASS)
 
 ---
 
@@ -159,7 +159,7 @@ Builder patterns wired: `HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`.
 | `#![deny(unsafe_code)]` | Enforced crate-wide (test-only `allow` for `env::set_var` in edition 2024) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | Enforced |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
-| Tests | 1,346 pass (1,047 lib + 200 forge + 99 doc) |
+| Tests | 1,288 lib + 219 integration (plus forge + doc) |
 | ESN ridge regression | Proper Cholesky solve (not diagonal approximation) |
 | I/O parsers | Streaming-first; buffering APIs deprecated |
 | Validation checks | 8,431+ across 291 binaries |

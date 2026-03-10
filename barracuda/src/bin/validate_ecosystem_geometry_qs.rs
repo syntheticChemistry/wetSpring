@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::expect_used, clippy::unwrap_used, clippy::print_stdout)]
+#![expect(clippy::expect_used, clippy::unwrap_used, clippy::print_stdout)]
 //! # Exp133: Cave, Hot Spring & Rhizosphere QS Geometry
 //!
 //! Models three understudied ecosystems with physically appropriate lattice
@@ -34,7 +34,7 @@ fn evenness_to_disorder(pielou_j: f64) -> f64 {
     pielou_j.mul_add(14.5, 0.5)
 }
 
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn generate_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     let mut counts = Vec::with_capacity(n_species);
     let mut rng = seed;
@@ -59,7 +59,7 @@ struct EcoZone {
     rationale: &'static str,
 }
 
-#[allow(clippy::cast_precision_loss, clippy::too_many_lines)]
+#[expect(clippy::cast_precision_loss, clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp133: Cave, Hot Spring & Rhizosphere QS Geometry");
 

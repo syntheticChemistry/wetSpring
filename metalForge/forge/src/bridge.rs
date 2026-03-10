@@ -121,7 +121,7 @@ pub fn estimated_transfer_us(substrate: &Substrate, data_bytes: usize) -> Option
 }
 
 #[cfg(test)]
-#[allow(clippy::expect_used)]
+#[expect(clippy::expect_used)]
 mod tests {
     use super::*;
     use crate::inventory;

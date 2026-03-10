@@ -15,7 +15,7 @@ use wetspring_barracuda::visualization::{DataChannel, scenario_with_edges_json};
 use wetspring_forge::inventory;
 use wetspring_forge::visualization;
 
-#[allow(clippy::too_many_lines, reason = "validation binary — linear checks")]
+#[expect(clippy::too_many_lines, reason = "validation binary — linear checks")]
 fn main() {
     let start = std::time::Instant::now();
     let mut passed = 0_u32;

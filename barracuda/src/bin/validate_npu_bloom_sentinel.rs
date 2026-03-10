@@ -88,7 +88,7 @@ fn simulate_diversity_window(seed: u64, state: usize) -> Vec<f64> {
     ]
 }
 
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp118: ESN Bloom Sentinel → NPU");
 

@@ -275,9 +275,9 @@ async fn main() {
     let t = Instant::now();
     v.section("G08: Variance GPU");
     let data: Vec<f64> = (1..=1000).map(f64::from).collect();
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     let cpu_mean = data.iter().sum::<f64>() / data.len() as f64;
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     let cpu_var = data.iter().map(|x| (x - cpu_mean).powi(2)).sum::<f64>() / data.len() as f64;
     v.check(
         "Variance",

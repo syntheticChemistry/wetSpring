@@ -6,14 +6,19 @@
 //! `petalTongue` can render them directly.
 
 pub mod anderson;
+pub mod basecalling;
 pub mod benchmarks;
+pub mod calibration;
 pub mod chemistry;
+pub mod chromatography;
 pub mod composite;
 pub mod dynamics;
 pub mod ecology;
 pub mod hmm;
 pub mod lcms;
 pub mod ml_models;
+pub mod msa;
+pub mod neighbor_joining;
 pub mod nmf;
 pub mod ode_systems;
 pub mod ordination;
@@ -21,14 +26,17 @@ pub mod pangenome;
 pub mod phylogenetics;
 pub mod pipeline;
 pub mod popgen;
+pub mod profiles;
 pub mod rarefaction;
 pub mod similarity;
+pub mod spectroscopy;
 pub mod stochastic;
 pub mod streaming_pipeline;
 
 pub use anderson::anderson_scenario;
 pub use benchmarks::benchmark_scenario;
 pub use chemistry::chemistry_scenario;
+pub use chromatography::{chromatogram_scenario, eic_scenario, quantitation_scenario};
 pub use dynamics::{dynamics_scenario, qs_biofilm_scenario};
 pub use ecology::ecology_scenario;
 pub use hmm::hmm_scenario;
@@ -51,6 +59,15 @@ pub use pipeline::{
 pub use popgen::{kmer_spectrum_scenario, population_genomics_scenario, snp_scenario};
 pub use rarefaction::rarefaction_scenario;
 pub use similarity::similarity_scenario;
+pub use profiles::{
+    calibration_report_scenario, environmental_study_scenario, pfas_screening_scenario,
+    CalibrationProfile, EnvironmentalProfile, PfasScreeningProfile,
+};
+pub use basecalling::basecalling_scenario;
+pub use calibration::calibration_scenario;
+pub use msa::msa_scenario;
+pub use neighbor_joining::neighbor_joining_scenario;
+pub use spectroscopy::{spectroscopy_scenario, spectroscopy_scenario_from_data};
 pub use stochastic::stochastic_scenario;
 
 pub use composite::{
@@ -205,8 +222,36 @@ fn scatter(
     }
 }
 
+/// Create a `Scatter3D` channel.
+#[expect(clippy::too_many_arguments, reason = "mirrors petalTongue schema")]
+fn scatter3d(
+    id: &str,
+    label: &str,
+    x: &[f64],
+    y: &[f64],
+    z: &[f64],
+    point_labels: &[impl AsRef<str>],
+    x_label: &str,
+    y_label: &str,
+    z_label: &str,
+    unit: &str,
+) -> DataChannel {
+    DataChannel::Scatter3D {
+        id: id.into(),
+        label: label.into(),
+        x: x.to_vec(),
+        y: y.to_vec(),
+        z: z.to_vec(),
+        point_labels: point_labels.iter().map(|s| s.as_ref().into()).collect(),
+        x_label: x_label.into(),
+        y_label: y_label.into(),
+        z_label: z_label.into(),
+        unit: unit.into(),
+    }
+}
+
 /// Create a `FieldMap` channel.
-#[allow(dead_code)]
+#[expect(dead_code)]
 fn fieldmap(
     id: &str,
     label: &str,

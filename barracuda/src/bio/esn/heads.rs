@@ -218,7 +218,7 @@ impl BioHeadGroupDisagreement {
             max - min
         };
         let phase_disagree = {
-            #[allow(clippy::bool_to_int_with_if)]
+            #[expect(clippy::bool_to_int_with_if)]
             let phase_label = |v: f64| -> u8 {
                 if v > 0.6 {
                     2

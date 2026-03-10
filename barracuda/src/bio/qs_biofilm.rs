@@ -175,7 +175,6 @@ pub fn hill(x: f64, k: f64, n: f64) -> f64 {
 ///
 /// This is the monostable Waters 2008 model. For the bistable extension
 /// (Fernandez 2020), see [`super::bistable`].
-#[allow(clippy::many_single_char_names)]
 #[must_use]
 pub fn qs_rhs(state: &[f64], _t: f64, p: &QsBiofilmParams) -> Vec<f64> {
     let cell = state[0].max(0.0);

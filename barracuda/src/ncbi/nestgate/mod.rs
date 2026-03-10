@@ -33,7 +33,7 @@ pub use rpc::{escape_json, extract_error, extract_result_value, health};
 pub use storage::{exists, retrieve, store};
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used)]
 mod tests {
     use super::*;
 

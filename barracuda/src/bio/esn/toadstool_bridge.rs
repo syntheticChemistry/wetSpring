@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::missing_errors_doc, clippy::missing_const_for_fn)]
+#![expect(clippy::missing_errors_doc, clippy::missing_const_for_fn)]
 //! barraCuda ESN bridge for bio use cases.
 //!
 //! Two tiers:

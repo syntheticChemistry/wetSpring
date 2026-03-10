@@ -39,7 +39,7 @@ impl LocusVarianceGpuWrapper {
     /// # Errors
     ///
     /// Returns an error if matrix size mismatches or GPU read fails.
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     pub fn compute(
         &self,
         allele_freqs: &[f32],
@@ -83,7 +83,7 @@ impl LocusVarianceGpuWrapper {
 }
 
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
+#[expect(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

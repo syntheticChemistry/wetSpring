@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::expect_used, clippy::unwrap_used, clippy::print_stdout)]
+#![expect(clippy::expect_used, clippy::unwrap_used, clippy::print_stdout)]
 //! # Exp130: Thick Biofilm 3D QS Extension
 //!
 //! Compares QS-active windows between 2D slab and 3D block geometries to
@@ -28,7 +28,7 @@ const W_MIN: f64 = 0.5;
 const W_MAX: f64 = 20.0;
 
 #[cfg(feature = "gpu")]
-#[allow(clippy::cast_precision_loss)] // usize→f64 for sweep index; N_SWEEP small, intentional
+#[expect(clippy::cast_precision_loss)] // usize→f64 for sweep index; N_SWEEP small, intentional
 fn sweep_w(i: usize) -> f64 {
     W_MIN + (i as f64) * (W_MAX - W_MIN) / (N_SWEEP - 1) as f64
 }
@@ -58,7 +58,7 @@ fn plateau_count(sweep: &[(f64, f64)], midpoint: f64, w_above: f64) -> usize {
         .count()
 }
 
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp130: Thick Biofilm 3D QS Extension");
 

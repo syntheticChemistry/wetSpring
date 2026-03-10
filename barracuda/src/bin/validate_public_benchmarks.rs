@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Validate Rust 16S pipeline on PUBLIC open data, benchmarked against paper findings.
-#![allow(clippy::cast_precision_loss)] // usize→f64 for stats/display; loss acceptable
+#![expect(clippy::cast_precision_loss)] // usize→f64 for stats/display; loss acceptable
 //!
 //! # Provenance
 //!
@@ -163,7 +163,7 @@ fn run_dataset(
 
 // ── Process a single sample through the full 16S pipeline ───────────────────
 
-#[allow(clippy::too_many_lines)] // sequential validation: parse → filter → derep → DADA2 → diversity → taxonomy
+#[expect(clippy::too_many_lines)] // sequential validation: parse → filter → derep → DADA2 → diversity → taxonomy
 fn process_sample(
     v: &mut Validator,
     sample_dir: &Path,
@@ -184,7 +184,7 @@ fn process_sample(
         return None;
     };
 
-    #[allow(clippy::redundant_closure_for_method_calls)]
+    #[expect(clippy::redundant_closure_for_method_calls)]
     let records = match wetspring_barracuda::io::fastq::FastqIter::open(&fastq_path)
         .and_then(|iter| iter.collect::<std::result::Result<Vec<_>, _>>())
     {
@@ -263,7 +263,7 @@ fn process_sample(
     let simpson = diversity::simpson(&counts);
     let observed = diversity::observed_features(&counts);
 
-    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    #[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
     let observed_usize = observed as usize;
     println!("  {label}: observed={observed_usize}, Shannon={shannon:.3}, Simpson={simpson:.3}",);
 
@@ -322,7 +322,6 @@ fn process_sample(
 
 // ── Temporal analysis ───────────────────────────────────────────────────────
 
-#[allow(clippy::too_many_lines)] // sequential time-series checks across PRJNA1114688 samples
 fn filter_temporal_group<'a>(
     results: &'a [SampleResult],
     org: &str,
@@ -456,7 +455,7 @@ fn temporal_analysis(v: &mut Validator, all_results: &[SampleResult]) {
 
 // ── Cross-dataset benchmark ─────────────────────────────────────────────────
 
-#[allow(clippy::too_many_lines)] // sequential cross-BioProject validation checks
+#[expect(clippy::too_many_lines)] // sequential cross-BioProject validation checks
 fn cross_dataset_benchmark(v: &mut Validator, all_results: &[SampleResult]) {
     v.section("Cross-Dataset Paper Benchmark");
 

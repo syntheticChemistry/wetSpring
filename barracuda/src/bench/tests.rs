@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Benchmark harness tests.
-
-#![allow(clippy::expect_used, clippy::unwrap_used)]
+#![expect(clippy::unwrap_used)]
 
 use super::*;
 
 #[test]
-#[allow(clippy::float_cmp)]
+#[expect(clippy::float_cmp)]
 fn energy_report_default_values() {
     let r = EnergyReport::default();
     assert_eq!(r.cpu_joules, 0.0);

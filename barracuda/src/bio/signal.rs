@@ -96,7 +96,7 @@ pub fn find_peaks(data: &[f64], params: &PeakParams) -> Vec<Peak> {
 
     // Also handle flat-topped peaks: find runs where consecutive values are equal
     // and both edges are strictly lower. Pick the midpoint.
-    #[allow(clippy::float_cmp)] // exact equality is intentional for plateau detection
+    #[expect(clippy::float_cmp)] // exact equality is intentional for plateau detection
     let eq = |a: f64, b: f64| a == b;
 
     let mut i = 1;
@@ -207,7 +207,7 @@ fn compute_peak_properties(data: &[f64], peak_idx: usize) -> Peak {
 }
 
 /// Linearly interpolate where the signal crosses a threshold.
-#[allow(clippy::cast_precision_loss)] // indices are tiny relative to f64 range
+#[expect(clippy::cast_precision_loss)] // indices are tiny relative to f64 range
 fn interpolate_crossing(data: &[f64], peak_idx: usize, threshold: f64, go_left: bool) -> f64 {
     if go_left {
         for i in (1..=peak_idx).rev() {
@@ -226,6 +226,54 @@ fn interpolate_crossing(data: &[f64], peak_idx: usize, threshold: f64, go_left: 
         }
         (data.len() - 1) as f64
     }
+}
+
+/// Integrate a single peak's area under the curve via trapezoidal rule.
+///
+/// Uses the peak's `left_base`/`right_base` indices to slice the signal
+/// and x-axis arrays, then delegates to `barracuda::numerical::trapz`.
+///
+/// # Arguments
+///
+/// * `x` — X-axis values (e.g. retention time, index positions).
+/// * `y` — Y-axis values (signal intensities, same length as `x`).
+/// * `peak` — Detected peak whose `left_base`..=`right_base` defines the
+///   integration window.
+///
+/// # Returns
+///
+/// Integrated area (y-units × x-units), or `0.0` if the window is invalid.
+#[must_use]
+pub fn integrate_peak(x: &[f64], y: &[f64], peak: &Peak) -> f64 {
+    if peak.left_base >= peak.right_base || peak.right_base >= y.len() || x.len() != y.len() {
+        return 0.0;
+    }
+    let x_slice = &x[peak.left_base..=peak.right_base];
+    let y_slice = &y[peak.left_base..=peak.right_base];
+    barracuda::numerical::trapz(y_slice, x_slice).unwrap_or(0.0)
+}
+
+/// Detect peaks and compute their integrated areas in one pass.
+///
+/// Convenience wrapper that calls [`find_peaks`] followed by
+/// [`integrate_peak`] for each detected peak. Returns `(peaks, areas)`
+/// where `areas[i]` is the integrated area for `peaks[i]`.
+///
+/// # Arguments
+///
+/// * `x` — X-axis values (e.g. retention time).
+/// * `y` — Y-axis values (signal intensities).
+/// * `params` — Peak detection parameters.
+#[must_use]
+pub fn find_peaks_with_area(x: &[f64], y: &[f64], params: &PeakParams) -> Vec<(Peak, f64)> {
+    let peaks = find_peaks(y, params);
+    peaks
+        .into_iter()
+        .map(|p| {
+            let area = integrate_peak(x, y, &p);
+            (p, area)
+        })
+        .collect()
 }
 
 /// Keep only the highest peak within each `distance` window.
@@ -394,7 +442,7 @@ mod tests {
         let peaks = find_peaks(&data, &params);
         assert_eq!(peaks.len(), 3);
         // Peaks should be near 40, 100, 160
-        #[allow(clippy::cast_precision_loss)]
+        #[expect(clippy::cast_precision_loss)]
         {
             assert!((peaks[0].index as f64 - 40.0).abs() < 2.0);
             assert!((peaks[1].index as f64 - 100.0).abs() < 2.0);
@@ -421,5 +469,64 @@ mod tests {
         // Only interior peak at index 3 if it qualifies — actually index 3 has data[3]=3 > data[2]=1 but data[3]=3 < data[4]=5
         // So no peaks
         assert!(peaks.is_empty());
+    }
+
+    #[test]
+    fn integrate_peak_triangle() {
+        let x = [0.0, 1.0, 2.0, 3.0, 4.0];
+        let y = [0.0, 0.0, 10.0, 0.0, 0.0];
+        let peaks = find_peaks(&y, &PeakParams::default());
+        assert_eq!(peaks.len(), 1);
+        let area = integrate_peak(&x, &y, &peaks[0]);
+        // Triangle: base=2 (index 1..3), height=10 → area = 10.0
+        assert!((area - 10.0).abs() < tolerances::ANALYTICAL_LOOSE);
+    }
+
+    #[test]
+    fn integrate_peak_gaussian() {
+        let n = 201;
+        let sigma = 10.0;
+        let x: Vec<f64> = (0..n).map(f64::from).collect();
+        let y: Vec<f64> = (0..n)
+            .map(|i| {
+                let t = (f64::from(i) - 100.0) / sigma;
+                1000.0 * (-0.5 * t * t).exp()
+            })
+            .collect();
+
+        let peaks = find_peaks(&y, &PeakParams::default());
+        assert_eq!(peaks.len(), 1);
+        let area = integrate_peak(&x, &y, &peaks[0]);
+        // Gaussian integral ≈ amplitude × σ × √(2π) ≈ 1000 × 10 × 2.5066 ≈ 25066
+        // We integrate over left_base..right_base which captures most of it
+        assert!(area > 20000.0, "area should be substantial: {area}");
+        assert!(area < 30000.0, "area should be bounded: {area}");
+    }
+
+    #[test]
+    fn integrate_peak_invalid_returns_zero() {
+        let x = [0.0, 1.0, 2.0];
+        let y = [0.0, 5.0, 0.0];
+        let peak = Peak {
+            index: 1,
+            height: 5.0,
+            prominence: 5.0,
+            left_base: 2,
+            right_base: 0, // invalid: left > right
+            width: 1.0,
+            left_ips: 0.5,
+            right_ips: 1.5,
+        };
+        assert!(integrate_peak(&x, &y, &peak).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn find_peaks_with_area_basic() {
+        let x = [0.0, 1.0, 2.0, 3.0, 4.0];
+        let y = [0.0, 0.0, 10.0, 0.0, 0.0];
+        let results = find_peaks_with_area(&x, &y, &PeakParams::default());
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].0.index, 2);
+        assert!((results[0].1 - 10.0).abs() < tolerances::ANALYTICAL_LOOSE);
     }
 }

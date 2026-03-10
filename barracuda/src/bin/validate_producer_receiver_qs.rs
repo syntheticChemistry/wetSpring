@@ -85,7 +85,7 @@ fn save_cache(results: &[(String, String, String, u64)]) {
     }
 }
 
-#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
+#[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp142: QS Producer vs Receiver Separation");
 

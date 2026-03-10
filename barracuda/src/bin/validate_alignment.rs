@@ -114,7 +114,7 @@ fn main() {
     let scores = pairwise_scores(&seqs, &params);
     v.check(
         "Pairwise: 3 sequences → 3 pairs",
-        #[allow(clippy::cast_precision_loss)]
+        #[expect(clippy::cast_precision_loss)]
         {
             scores.len() as f64
         },

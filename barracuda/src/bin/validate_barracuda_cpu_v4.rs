@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::similar_names)]
 //! `BarraCuda` CPU Parity v4 — Track 1c domains (deep-sea metagenomics).
 //!
 //! Extends v1-v3 (18 domains) with the 5 Track 1c modules:
@@ -32,7 +31,7 @@ use wetspring_barracuda::bio::{ani, dnds, molecular_clock, pangenome, snp};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
-#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
+#[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("BarraCuda CPU v4 — Track 1c (5 Domains)");
     let mut timings: Vec<(&str, f64)> = Vec::new();

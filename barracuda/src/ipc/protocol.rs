@@ -148,7 +148,7 @@ pub fn error_response(id: &Value, code: i64, message: &str) -> String {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used)]
 mod tests {
     use super::*;
 

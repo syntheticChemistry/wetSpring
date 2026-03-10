@@ -6,6 +6,7 @@
 //! via [`StreamSession`](crate::visualization::stream::StreamSession).
 
 use crate::visualization::types::{EcologyScenario, ScenarioEdge};
+use crate::visualization::ScientificRange;
 
 use super::{bar, edge, gauge, node, scaffold};
 
@@ -111,6 +112,18 @@ pub fn streaming_pipeline_scenario(
                 [80.0, 100.0],
                 [50.0, 80.0],
             ));
+            stage_node.scientific_ranges.push(ScientificRange {
+                label: "Quality pass rate 80–100%".into(),
+                min: 80.0,
+                max: 100.0,
+                status: "normal".into(),
+            });
+            stage_node.scientific_ranges.push(ScientificRange {
+                label: "Quality pass rate 0–80%".into(),
+                min: 0.0,
+                max: 80.0,
+                status: "warning".into(),
+            });
         }
 
         if let Some(ref prev) = prev_id {
@@ -173,11 +186,7 @@ pub fn demo_streaming_pipeline_scenario() -> (EcologyScenario, Vec<ScenarioEdge>
 }
 
 #[cfg(test)]
-#[allow(
-    clippy::unwrap_used,
-    clippy::expect_used,
-    reason = "tests use unwrap/expect for clarity"
-)]
+#[expect(clippy::expect_used, reason = "tests use unwrap/expect for clarity")]
 mod tests {
     use super::*;
 

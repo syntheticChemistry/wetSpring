@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::similar_names)]
+#![expect(clippy::similar_names)]
 //! `BarraCuda` CPU Parity v3 — comprehensive coverage of ALL 18 algorithmic
 //! domains.  Extends v1 (9 domains) and v2 (batch/flat APIs) with the 9
 //! remaining math modules:  multi-signal QS, phage defense, bootstrap
@@ -34,7 +34,7 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
-#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
+#[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("BarraCuda CPU v3 — All 18 Domains");
     let mut timings: Vec<(&str, f64)> = Vec::new();

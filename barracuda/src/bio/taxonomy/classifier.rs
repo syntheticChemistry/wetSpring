@@ -30,7 +30,7 @@ impl NaiveBayesClassifier {
     ///
     /// Groups reference sequences by genus-level lineage, extracts k-mers,
     /// and precomputes a flat log-probability table for O(1) scoring.
-    #[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
     #[must_use]
     pub fn train(refs: &[ReferenceSeq], k: usize) -> Self {
         let kmer_space = 1_usize << (2 * k);
@@ -63,7 +63,7 @@ impl NaiveBayesClassifier {
 
         let n_kmers_total = all_kmers.len();
         let n_taxa = taxon_labels.len();
-        #[allow(clippy::cast_precision_loss)]
+        #[expect(clippy::cast_precision_loss)]
         let default_log_p = (0.5 / (n_kmers_total.max(1) as f64 + 1.0))
             .max(crate::tolerances::LOG_PROB_FLOOR)
             .ln();
@@ -79,7 +79,7 @@ impl NaiveBayesClassifier {
             }
         }
 
-        #[allow(clippy::cast_precision_loss)]
+        #[expect(clippy::cast_precision_loss)]
         let total_refs: f64 = taxon_counts.iter().sum::<usize>() as f64;
         let taxon_priors: Vec<f64> = taxon_counts
             .iter()
@@ -145,7 +145,6 @@ impl NaiveBayesClassifier {
     }
 
     /// Classify a query sequence.
-    #[allow(clippy::cast_precision_loss)]
     #[must_use]
     pub fn classify(&self, sequence: &[u8], params: &ClassifyParams) -> Classification {
         let query_kmers: Vec<u64> = extract_kmers(sequence, self.k);
@@ -172,7 +171,6 @@ impl NaiveBayesClassifier {
 
     /// Score using all query k-mers and return best taxon index.
     #[inline]
-    #[allow(clippy::cast_possible_truncation)]
     fn score_all_kmers(&self, query_kmers: &[u64]) -> usize {
         let n_taxa = self.taxon_labels.len();
         let mut best_score = f64::NEG_INFINITY;
@@ -197,7 +195,7 @@ impl NaiveBayesClassifier {
     ///
     /// Repeatedly classifies random subsets of k-mers and counts how often
     /// each rank agrees with the full classification.
-    #[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_precision_loss)] // vote counts and n_boot are tiny
     fn bootstrap_confidence(
         &self,
         query_kmers: &[u64],
@@ -243,7 +241,7 @@ impl NaiveBayesClassifier {
     /// Maps the f64 log-probability range to `[-128, 127]` using affine
     /// quantization: `q = round((x - zero_point) / scale)`.
     #[must_use]
-    #[allow(clippy::cast_possible_truncation, clippy::cast_precision_loss)]
+    #[expect(clippy::cast_possible_truncation)]
     pub fn to_int8_weights(&self) -> NpuWeights {
         if self.dense_log_probs.is_empty() {
             return NpuWeights {
@@ -304,11 +302,7 @@ impl NaiveBayesClassifier {
     /// Produces the same argmax as full-precision for well-separated taxa.
     /// Returns `None` when the query produces no k-mers or the classifier
     /// has no taxa (empty reference database).
-    #[allow(
-        clippy::cast_precision_loss,
-        clippy::cast_possible_truncation,
-        clippy::cast_possible_wrap
-    )]
+    #[expect(clippy::cast_possible_truncation)]
     #[must_use]
     pub fn classify_quantized(&self, sequence: &[u8]) -> Option<usize> {
         let query_kmers = extract_kmers(sequence, self.k);

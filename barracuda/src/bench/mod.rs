@@ -201,7 +201,7 @@ pub(crate) fn json_escape(s: &str) -> String {
 }
 
 /// Current time as ISO8601 string (e.g., `2025-02-21T14:30:00`). No timezone.
-#[allow(
+#[expect(
     clippy::cast_possible_truncation,
     clippy::cast_possible_wrap,
     clippy::cast_sign_loss

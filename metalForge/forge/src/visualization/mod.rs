@@ -54,7 +54,7 @@ fn scaffold(name: &str, description: &str) -> EcologyScenario {
 /// Each substrate becomes a node with gauge channels for memory, cores,
 /// and capability counts.
 #[must_use]
-#[allow(
+#[expect(
     clippy::cast_precision_loss,
     reason = "memory bytes and device counts are safely representable in f64"
 )]
@@ -168,7 +168,7 @@ pub fn inventory_scenario(substrates: &[Substrate]) -> (EcologyScenario, Vec<Sce
 
 /// Build a workload dispatch scenario showing which substrates handle which domains.
 #[must_use]
-#[allow(
+#[expect(
     clippy::cast_precision_loss,
     reason = "workload count < 100 — safely representable in f64"
 )]
@@ -229,7 +229,7 @@ pub fn dispatch_scenario(substrates: &[Substrate]) -> (EcologyScenario, Vec<Scen
 
 /// Build a NUCLEUS topology scenario showing Tower→Node→Nest flow.
 #[must_use]
-#[allow(
+#[expect(
     clippy::cast_precision_loss,
     reason = "substrate count < 100 — safely representable in f64"
 )]
@@ -273,7 +273,6 @@ pub fn nucleus_scenario(substrates: &[Substrate]) -> (EcologyScenario, Vec<Scena
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::expect_used)]
 mod tests {
     use super::*;
     use crate::substrate::{Capability, Identity, Properties, SubstrateOrigin};

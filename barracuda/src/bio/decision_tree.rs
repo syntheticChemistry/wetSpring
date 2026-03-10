@@ -93,7 +93,7 @@ impl DecisionTree {
     /// Traverses from root to leaf, returning the predicted class.
     /// Panics if the tree structure is invalid (broken child pointers).
     #[must_use]
-    #[allow(clippy::cast_sign_loss)]
+    #[expect(clippy::cast_sign_loss)]
     pub fn predict(&self, features: &[f64]) -> usize {
         let mut idx = 0usize;
         loop {
@@ -149,7 +149,7 @@ impl DecisionTree {
         self.node_depth(0)
     }
 
-    #[allow(clippy::cast_sign_loss)]
+    #[expect(clippy::cast_sign_loss)]
     fn node_depth(&self, idx: usize) -> usize {
         let node = &self.nodes[idx];
         if node.is_leaf() {
@@ -161,8 +161,8 @@ impl DecisionTree {
     }
 }
 
+#[expect(clippy::unwrap_used)]
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
 

@@ -3,6 +3,7 @@
 
 use crate::bio::hmm::{self, HmmModel};
 use crate::visualization::types::{EcologyScenario, ScenarioEdge};
+use crate::visualization::ScientificRange;
 
 use super::{bar, heatmap, node, scaffold, timeseries};
 
@@ -59,6 +60,19 @@ pub fn hmm_scenario(
 
     build_posterior_heatmap(&mut hmm_node, &forward_result, state_labels);
 
+    hmm_node.scientific_ranges.push(ScientificRange {
+        label: "Transition probability 0.0–0.5 per transition".into(),
+        min: 0.0,
+        max: 0.5,
+        status: "normal".into(),
+    });
+    hmm_node.scientific_ranges.push(ScientificRange {
+        label: "Transition probability 0.5–1.0 (suggests overfitting)".into(),
+        min: 0.5,
+        max: 1.0,
+        status: "warning".into(),
+    });
+
     s.nodes.push(hmm_node);
     (s, vec![])
 }
@@ -92,11 +106,7 @@ fn build_posterior_heatmap(
 }
 
 #[cfg(test)]
-#[allow(
-    clippy::unwrap_used,
-    clippy::expect_used,
-    reason = "tests use unwrap/expect for clarity"
-)]
+#[expect(clippy::expect_used, reason = "tests use unwrap/expect for clarity")]
 mod tests {
     use super::*;
 

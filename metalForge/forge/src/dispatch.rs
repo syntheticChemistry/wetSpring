@@ -207,7 +207,7 @@ pub fn route_bandwidth_aware<'a>(
 }
 
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
+#[expect(clippy::expect_used)]
 mod tests {
     use super::*;
     use crate::substrate::{Identity, Properties, SubstrateOrigin};

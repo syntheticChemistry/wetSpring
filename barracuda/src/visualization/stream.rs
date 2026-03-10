@@ -310,17 +310,10 @@ impl StreamSession {
 }
 
 #[cfg(test)]
-#[allow(
-    clippy::unwrap_used,
-    clippy::expect_used,
-    reason = "tests use unwrap/expect for clarity"
-)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
-
     fn dummy_client() -> PetalTonguePushClient {
-        PetalTonguePushClient::new(PathBuf::from("/tmp/nonexistent-petaltongue-test.sock"))
+        PetalTonguePushClient::new(std::env::temp_dir().join("nonexistent-petaltongue-test.sock"))
     }
 
     #[test]

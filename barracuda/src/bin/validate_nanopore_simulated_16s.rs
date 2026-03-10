@@ -117,7 +117,7 @@ fn generate_community_reads(
 }
 
 /// Classify a read by comparing its variable region to known patterns.
-#[allow(clippy::naive_bytecount)] // sovereign — no external byte-counting crate
+#[expect(clippy::naive_bytecount)] // sovereign — no external byte-counting crate
 fn classify_read(read: &[u8], n_species: usize) -> usize {
     let bases = [b'A', b'C', b'G', b'T'];
     let variable_region = if read.len() > 40 {

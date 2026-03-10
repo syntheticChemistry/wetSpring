@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::needless_range_loop)]
 //! Reservoir generation and update logic.
 
 use super::config::EsnConfig;

@@ -83,7 +83,7 @@ impl TimingAccumulator {
     }
 }
 
-#[allow(clippy::too_many_lines, clippy::similar_names)] // benchmark harness: sequential timing of each pipeline stage; pipeline_ms/pipeline_s are related units
+#[expect(clippy::too_many_lines, clippy::similar_names)] // benchmark harness: sequential timing of each pipeline stage; pipeline_ms/pipeline_s are related units
 fn main() {
     let wall_monitor = PowerMonitor::start();
     let wall_start = Instant::now();
@@ -196,7 +196,7 @@ fn main() {
             phase: name.to_string(),
             substrate: "Rust CPU".to_string(),
             wall_time_s: ms / 1000.0,
-            #[allow(clippy::cast_precision_loss)] // sample count always fits in f64
+            #[expect(clippy::cast_precision_loss)] // sample count always fits in f64
             per_eval_us: if acc.samples_processed > 0 {
                 ms * 1000.0 / acc.samples_processed as f64
             } else {
@@ -253,7 +253,7 @@ fn main() {
     );
 
     // ── Galaxy comparison ───────────────────────────────────────────────
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     let samples_f64 = acc.samples_processed as f64;
     let galaxy_per_sample = 95.6 / 10.0;
     let rust_per_sample = if samples_f64 > 0.0 {
@@ -288,7 +288,6 @@ fn main() {
 
     // ── Energy estimate ─────────────────────────────────────────────────
     let cpu_tdp_w = 125.0_f64;
-    #[allow(clippy::similar_names)] // pipeline_s and pipeline_ms are related units
     let pipeline_s = pipeline_ms / 1000.0;
     let rapl_j = wall_energy.cpu_joules;
     let rust_kwh = if rapl_j > 0.0 {
@@ -408,7 +407,7 @@ fn benchmark_sample(
     // 7. Diversity metrics
     let mon = PowerMonitor::start();
     let t = Instant::now();
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     let counts: Vec<f64> = asvs.iter().map(|a| a.abundance as f64).collect();
     let _ = diversity::shannon(&counts);
     let _ = diversity::simpson(&counts);

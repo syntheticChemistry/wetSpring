@@ -4,10 +4,10 @@
 against Rust implementations and GPU shaders via `barraCuda` (standalone math
 primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 
-**Date:** March 9, 2026
+**Date:** March 10, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V102 — 1,047 lib tests + 203 forge tests + 27 doc tests + 178 integration tests = **1,455 total**, 334 experiments, 9,200+ validation checks, 318 binaries. V102: petalTongue V2 visualization — 8 DataChannel types (added `FieldMap`), **41 scenario builders** (was 13), 4 composite full-pipeline scenarios, `UiConfig`/`ShowPanels`, `BackpressureConfig`, 3 domain push helpers, `push_render_with_config()`, `push_replace()` fix, `wetspring_dashboard` binary, `validate_visualization_v2` (140/140 PASS). V101 chain: 78/78 PASS. V100: 173/173 PASS. V99: 166/166 PASS. V98: 173/173 PASS. Zero local WGSL, zero unsafe code, 179 named tolerances, `cargo clippy -D warnings -W pedantic` **ZERO WARNINGS**. Ecosystem: barraCuda `a898dee`, toadStool S130+ (`bfe7977b`), coralReef Phase 10 Iteration 10 (`d29a734`). petalTongue visualization: 8 DataChannel types, 41 scenario builders, StreamSession with backpressure, Songbird capabilities, `wetspring_dashboard` scientist binary.
+**Status:** V105 — **1,288 lib + 219 integration tests** (json feature: 1,231 lib), 334 experiments, 9,200+ validation checks. V105: petalTongue visualization evolution — `LivePipelineSession` for real-time pipeline streaming, `Scatter3D` channel, 33 scenario builders (was 28), 5 new domain scenarios (MSA, calibration, spectroscopy, basecalling, NJ tree), 3 sample-parameterized profiles, IPC evolved (64KB buffer, `query_capabilities`, `subscribe_interactions`), scientific ranges on all gauge scenarios. V104: deep debt — JCAMP-DX parser, Dorado basecaller, GPU peak integration, `#[allow]` → `#[expect]` migration. Zero local WGSL, zero unsafe code, zero `#[allow]`, `cargo clippy --features json --lib` **ZERO WARNINGS**. Ecosystem: barraCuda v0.3.3, toadStool S130+, coralReef Phase 10.
 
 ---
 
@@ -92,7 +92,7 @@ integration point.
 | `dispatch` | Capability-based workload routing |
 | `streaming` | Multi-stage GPU pipeline analysis |
 | `bridge` | forge ↔ barracuda device bridge |
-| `visualization` | petalTongue scenario builders (41 builders, 8 channel types, streaming, Songbird) |
+| `visualization` | petalTongue scenario builders (33 builders, 9 channel types, LivePipelineSession, streaming, Songbird) |
 
 ---
 

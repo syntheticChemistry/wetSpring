@@ -74,7 +74,7 @@ pub struct DerepStats {
 /// # Returns
 ///
 /// Tuple of (unique sequences, statistics).
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 pub fn dereplicate(
     records: &[FastqRecord],
     sort: DerepSort,
@@ -151,7 +151,6 @@ pub fn dereplicate(
 }
 
 /// Compute mean Phred quality (offset 33) from quality bytes.
-#[allow(clippy::cast_precision_loss)]
 pub(crate) fn mean_quality(qual: &[u8]) -> f64 {
     if qual.is_empty() {
         return 0.0;
@@ -194,7 +193,7 @@ pub fn to_fasta_with_abundance(uniques: &[UniqueSequence]) -> String {
 /// Returns a vector of f64 counts (one per unique sequence), sorted
 /// by abundance descending — ready for Shannon/Simpson/Chao1.
 #[must_use]
-#[allow(clippy::cast_precision_loss)] // abundance to f64 for diversity calculations
+#[expect(clippy::cast_precision_loss)] // abundance to f64 for diversity calculations
 pub fn abundance_vector(uniques: &[UniqueSequence]) -> Vec<f64> {
     let mut counts: Vec<f64> = uniques.iter().map(|u| u.abundance as f64).collect();
     counts.sort_by(|a, b| b.total_cmp(a));

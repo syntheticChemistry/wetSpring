@@ -11,7 +11,7 @@ pub use barracuda::ops::bio::diversity_fusion::{
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[allow(
+#[expect(
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::type_complexity,

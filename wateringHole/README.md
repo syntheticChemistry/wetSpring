@@ -1,6 +1,6 @@
 # wetSpring wateringHole
 
-**Date:** March 9, 2026
+**Date:** March 10, 2026
 **Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records.
 
 ---
@@ -9,6 +9,10 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
+| **V105** | `handoffs/WETSPRING_V105_PETALTONGUE_EVOLUTION_HANDOFF_MAR10_2026.md` | Mar 10 | petalTongue visualization evolution: LivePipelineSession, Scatter3D, 33 scenario builders, 5 new domain scenarios (MSA, calibration, spectroscopy, basecalling, NJ), 3 sample profiles, IPC 64KB, scientific ranges. 1,288 lib + 219 integration tests. |
+| **V105** | `handoffs/WETSPRING_V105_BARRACUDA_TOADSTOOL_EVOLUTION_HANDOFF_MAR10_2026.md` | Mar 10 | Comprehensive upstream handoff: 150+ primitives consumed, 47 GPU modules, 6 upstream requests (BipartitionEncodeGpu, CPU Jacobi, merge pairs GPU, BatchReconcileGpu), API evolution observations, visualization layer evolution. |
+| **V104** | `handoffs/WETSPRING_V104_DEEP_DEBT_EVOLUTION_HANDOFF_MAR09_2026.md` | Mar 9 | Deep debt: JCAMP-DX parser, Dorado basecaller, GPU peak integration, #[allow]→#[expect] migration, 56 stale suppressions removed, 8 clippy warnings resolved. |
+| **V103** | `handoffs/WETSPRING_V103_UPSTREAM_REWIRE_HANDOFF_MAR10_2026.md` | Mar 10 | Upstream rewire: #[allow]→#[expect] across 209 files, 37 stale suppressions, /tmp/→temp_dir(). |
 | **V102** | `handoffs/WETSPRING_V102_PETALTONGUE_V2_FULL_DOMAIN_VIZ_HANDOFF_MAR09_2026.md` | Mar 9 | petalTongue V2: 28 new scenario builders (6 tracks), 4 composite full-pipeline, FieldMap channel, UiConfig/BackpressureConfig, push_replace fix, wetspring_dashboard binary, validate_visualization_v2 (140/140). 9,200+ checks. |
 | **V102** | `handoffs/WETSPRING_V102_BARRACUDA_TOADSTOOL_VIZ_EVOLUTION_HANDOFF_MAR09_2026.md` | Mar 9 | barraCuda/toadStool evolution: primitive consumption patterns, API observations (OdeResult helpers, KmerCounts f64), GPU gap (placement batch), lessons learned. |
 | **V101** | `handoffs/WETSPRING_V101_DEEP_DEBT_EVOLUTION_HANDOFF_MAR09_2026.md` | Mar 9 | Deep debt evolution: 179 tolerances (was 164), all bare literals promoted, 3 binaries refactored, clippy pedantic clean, absorption manifest corrected. 1,455 tests, 316 binaries, 9,060+ checks. |

@@ -54,7 +54,7 @@ fn generate_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
 }
 
 #[cfg(feature = "gpu")]
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn sweep_w(i: usize) -> f64 {
     W_MIN + (i as f64) * (W_MAX - W_MIN) / (N_SWEEP - 1) as f64
 }

@@ -174,8 +174,8 @@ fn stream_fasta_subsampled(
     Some(refs)
 }
 
+#[expect(clippy::unwrap_used)]
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use std::io::Write;

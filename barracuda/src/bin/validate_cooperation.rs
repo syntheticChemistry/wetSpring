@@ -27,7 +27,7 @@ use wetspring_barracuda::validation::Validator;
 const DT: f64 = 0.001;
 const SS_FRAC: f64 = 0.1;
 
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp025: Bruger & Waters 2018 Cooperative QS Game Theory");
     let params = CooperationParams::default();

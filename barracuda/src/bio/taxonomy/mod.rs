@@ -39,7 +39,7 @@ pub use kmers::{extract_kmers, parse_reference_fasta};
 pub use types::{Classification, ClassifyParams, Lineage, NpuWeights, ReferenceSeq, TaxRank};
 
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
+#[expect(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use crate::tolerances;

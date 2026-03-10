@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::needless_range_loop)]
+#![expect(clippy::needless_range_loop)]
 //! Minimal Echo State Network (ESN) for NPU deployment validation.
 //!
 //! Implements reservoir computing: a fixed random recurrent network (reservoir)

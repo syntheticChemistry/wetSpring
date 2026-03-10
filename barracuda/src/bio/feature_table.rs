@@ -112,11 +112,7 @@ pub struct FeatureTable {
 /// # Returns
 ///
 /// [`FeatureTable`] with detected features.
-#[allow(
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss
-)] // index → f64 for RT interpolation; right_ips/left_ips are small
+#[expect(clippy::cast_precision_loss)] // index → f64 for RT interpolation; right_ips/left_ips are small
 #[must_use]
 pub fn extract_features(spectra: &[MzmlSpectrum], params: &FeatureParams) -> FeatureTable {
     // 1. Detect mass tracks
@@ -233,7 +229,7 @@ fn estimate_noise(intensity: &[f64], peak_start: usize, peak_end: usize) -> f64 
 }
 
 /// Interpolate RT at a fractional index position.
-#[allow(
+#[expect(
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
     clippy::cast_sign_loss

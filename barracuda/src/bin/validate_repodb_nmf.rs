@@ -43,7 +43,7 @@ impl LcgRng {
         let bits = (self.0 >> 11) | 0x3FF0_0000_0000_0000;
         f64::from_bits(bits) - 1.0
     }
-    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     fn next_usize(&mut self, max: usize) -> usize {
         (self.next_f64() * max as f64) as usize % max
     }

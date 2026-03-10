@@ -39,7 +39,7 @@ use barracuda::spectral::{
     lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn generate_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     let mut counts = Vec::with_capacity(n_species);
     let mut rng = seed;
@@ -52,7 +52,7 @@ fn generate_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     counts
 }
 
-#[allow(
+#[expect(
     clippy::cast_precision_loss,
     clippy::too_many_lines,
     clippy::items_after_statements

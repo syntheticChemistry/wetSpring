@@ -31,7 +31,7 @@ use std::collections::HashSet;
 /// # Errors
 ///
 /// Returns [`Error::Gpu`] if the device lacks `SHADER_F64` or GEMM dispatch fails.
-#[allow(
+#[expect(
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
     clippy::cast_sign_loss
@@ -198,7 +198,7 @@ fn argmax_with_priors(scores: &[f64], log_priors: &[f64]) -> usize {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[allow(
+#[expect(
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::type_complexity,

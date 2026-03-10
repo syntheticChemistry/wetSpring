@@ -53,7 +53,7 @@ impl LcgRng {
     }
 }
 
-#[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+#[expect(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
 fn build_block_matrix(rng: &mut LcgRng) -> (Vec<f64>, usize) {
     let n_drugs = 200;
     let n_diseases = 100;
@@ -321,7 +321,7 @@ fn main() {
     let mut test_pairs: Vec<(usize, usize)> = Vec::new();
     let mut train_matrix = matrix.clone();
     let test_frac = 0.2;
-    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     let n_test = ((actual_nonzero as f64) * test_frac) as usize;
 
     let positives: Vec<(usize, usize)> = (0..n_drugs)

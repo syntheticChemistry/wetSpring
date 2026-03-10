@@ -77,7 +77,7 @@ fn main() {
             (0..n_taxa)
                 .map(|j| {
                     let val = (seed * 13 + j * 7 + 5) % 60 + 1;
-                    #[allow(clippy::cast_possible_wrap)]
+                    #[expect(clippy::cast_possible_wrap)]
                     f64::from(val as i32)
                 })
                 .collect()
@@ -374,7 +374,7 @@ fn main() {
     );
 
     let all_fits = barracuda::stats::fit_all(
-        #[allow(clippy::cast_possible_wrap)]
+        #[expect(clippy::cast_possible_wrap)]
         &(1..=n_communities)
             .map(|i| f64::from(i as i32))
             .collect::<Vec<_>>(),

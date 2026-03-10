@@ -31,7 +31,7 @@ use wetspring_barracuda::bio::{
     placement, qs_biofilm, robinson_foulds, signal, snp, spectral_match, unifrac::PhyloTree,
 };
 
-#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
+#[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {
     println!("═══════════════════════════════════════════════════════════");
     println!("  Exp059: 23-Domain Rust Timing Benchmark (BarraCuda CPU)");
@@ -54,7 +54,7 @@ fn main() {
     let reactions = vec![
         gillespie::Reaction {
             propensity: Box::new(|state: &[i64]| {
-                #[allow(clippy::cast_precision_loss)]
+                #[expect(clippy::cast_precision_loss)]
                 {
                     0.5 * state[0] as f64
                 }
@@ -63,7 +63,7 @@ fn main() {
         },
         gillespie::Reaction {
             propensity: Box::new(|state: &[i64]| {
-                #[allow(clippy::cast_precision_loss)]
+                #[expect(clippy::cast_precision_loss)]
                 {
                     0.1 * state[0] as f64
                 }

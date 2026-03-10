@@ -47,7 +47,7 @@ impl Dada2Gpu {
     /// Compute `log_p_error` for all (seq, center) pairs in a single GPU dispatch.
     ///
     /// Returns an `n_seqs × n_centers` matrix (row-major).
-    #[allow(clippy::cast_possible_truncation, clippy::too_many_arguments)]
+    #[expect(clippy::cast_possible_truncation, clippy::too_many_arguments)]
     fn batch_log_p_error(
         &self,
         bases: &[u32],
@@ -130,7 +130,7 @@ impl Dada2Gpu {
 /// # Errors
 ///
 /// Returns an error if GPU dispatch fails or the device lacks f64 support.
-#[allow(
+#[expect(
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
     clippy::too_many_lines
@@ -290,12 +290,12 @@ pub fn denoise_gpu(
 
 // ── Data packing for GPU ─────────────────────────────────────────────────────
 
-#[allow(clippy::cast_possible_truncation)]
+#[expect(clippy::cast_possible_truncation)]
 const fn base_to_idx(b: u8) -> u32 {
     dada2::base_to_idx(b) as u32
 }
 
-#[allow(clippy::cast_possible_truncation)]
+#[expect(clippy::cast_possible_truncation)]
 fn pack_sequences(seqs: &[&UniqueSequence], max_len: usize) -> (Vec<u32>, Vec<u32>, Vec<u32>) {
     let n = seqs.len();
     let mut bases = vec![0u32; n * max_len];
@@ -325,7 +325,7 @@ fn init_error_model() -> ErrorModel {
     dada2::init_error_model()
 }
 
-#[allow(clippy::needless_range_loop)]
+#[expect(clippy::needless_range_loop)]
 fn flatten_log_error_model(err: &ErrorModel) -> Vec<f64> {
     let mut flat = vec![0.0_f64; NUM_BASES * NUM_BASES * MAX_QUAL];
     for from in 0..NUM_BASES {
@@ -351,7 +351,7 @@ fn err_model_converged(old: &ErrorModel, new: &ErrorModel) -> bool {
     dada2::err_model_converged(old, new)
 }
 
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn find_new_centers_from_matrix(
     seqs: &[&UniqueSequence],
     partition: &[usize],
@@ -411,7 +411,7 @@ fn build_asvs(seqs: &[&UniqueSequence], partition: &[usize], centers: &[usize]) 
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[allow(
+#[expect(
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::manual_let_else,

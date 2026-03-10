@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 9, 2026 (V102 — barraCuda v0.3.3 `a898dee` + toadStool S130+ `bfe7977b` + coralReef Iteration 10 `d29a734`)
+**Date:** March 10, 2026 (V105 — barraCuda v0.3.3 `a898dee` + toadStool S130+ `bfe7977b` + coralReef Phase 10 `d29a734`)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 47 GPU modules + 1 IPC + 1 vault + 1 provenance + 1 visualization module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.3, wgpu 28). 1,455 tests, 334 experiments, 9,200+ checks, 179 tolerances, 318 binaries. `cargo clippy -D warnings` CLEAN (default + GPU), **0 silent fallbacks**. **V102:** petalTongue V2 full-domain visualization — 8 DataChannel types (added FieldMap), 41 scenario builders (28 new domain + 4 composite), UiConfig/BackpressureConfig, wetspring_dashboard binary, validate_visualization_v2 (140/140 PASS). V101: 78/78 PASS. V100: 173/173 PASS. V99: 166/166 PASS.
+**Status:** 47 CPU + 47 GPU modules + 1 IPC + 1 vault + 1 provenance + 1 visualization module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.3, wgpu 28). 1,288 lib + 219 integration tests, 334 experiments, 9,200+ checks, 179 tolerances, 318 binaries. `cargo clippy -D warnings -W pedantic` CLEAN, **0 silent fallbacks**. **V105:** full-domain viz. V103: upstream rewire — `#[allow(clippy::)]` → `#[expect(clippy::)]` across 209 files, 37 stale suppressions removed, hardcoded paths evolved. V102: petalTongue V2 (33 scenario builders, 9 DataChannel types). V101: 78/78. V100: 173/173. V99: 166/166.
 
 ### Full Lean Phase
 
@@ -476,7 +476,7 @@ no parallelism benefit) and `fastq_parsing` (I/O-bound).
 | WGSL pattern | `pub const WGSL: &str` inline | `include_str!("../shaders/...")` |
 | metalForge | GPU + NPU hardware characterization | GPU + NPU + cross-substrate validation |
 | Handoffs | `../wateringHole/handoffs/` (36+ docs) | `ecoPrimals/archive/wetspring-early-handoffs-feb2026/` (v1-v9 fossil) |
-| Tests | 454 | 1,210 |
+| Tests | 454 | 1,288 lib + 219 integration |
 | Validation | 418 checks | 8,300+ checks |
 | Experiments | 31 suites | 260 experiments |
 | Line coverage | — | 97% bio+io (55% overall) |

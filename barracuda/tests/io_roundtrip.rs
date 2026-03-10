@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::redundant_closure_for_method_calls)]
+#![expect(clippy::redundant_closure_for_method_calls, clippy::unwrap_used)]
 //! Integration tests for I/O parsers: round-trip, determinism, edge cases.
 //!
 //! Each test creates synthetic data in a temporary directory,
@@ -697,8 +697,8 @@ fn fault_fastq_empty_file() {
 
 #[test]
 fn fault_fastq_nonexistent_file() {
-    use std::path::Path;
-    let result = fastq::stats_from_file(Path::new("/tmp/wetspring_nonexistent_12345.fastq"));
+    let result =
+        fastq::stats_from_file(&std::env::temp_dir().join("wetspring_nonexistent_12345.fastq"));
     assert!(result.is_err());
 }
 

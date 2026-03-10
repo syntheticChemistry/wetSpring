@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::too_many_lines, clippy::cast_precision_loss)]
 //! Exp079: `BarraCuda` CPU Parity v6 — ODE Flat Param Fidelity
 //!
 //! Validates that the GPU-compatible flat parameter APIs (`to_flat`/`from_flat`)
@@ -55,7 +54,7 @@ fn main() {
     validate_cooperation(&mut v);
     validate_capacitor(&mut v);
 
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     let elapsed_us = t_total.elapsed().as_nanos() as f64 / 1000.0;
     println!("\n  Total ODE flat-param validation: {elapsed_us:.0} µs");
 
@@ -390,13 +389,13 @@ fn bitwise_diff(a: &[f64], b: &[f64]) -> f64 {
             diffs += 1;
         }
     }
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     let d = diffs as f64;
     d
 }
 
 fn print_timing(name: &str, t0: Instant) {
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     let us = t0.elapsed().as_nanos() as f64 / 1000.0;
     println!("  {name}: {us:.0} µs");
 }

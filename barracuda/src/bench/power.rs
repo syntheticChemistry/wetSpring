@@ -77,7 +77,7 @@ pub fn parse_nvidia_smi_sample(line: &str) -> Option<(f64, f64, f64)> {
 }
 
 /// Compute RAPL energy delta in Joules, handling counter wraparound.
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 #[must_use]
 pub fn rapl_delta_joules(start_uj: u64, end_uj: u64, max_uj: u64) -> f64 {
     let delta = if end_uj >= start_uj {
@@ -89,7 +89,7 @@ pub fn rapl_delta_joules(start_uj: u64, end_uj: u64, max_uj: u64) -> f64 {
 }
 
 /// Compute GPU energy report from a slice of samples and wall-clock time.
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 #[must_use]
 pub fn compute_gpu_energy(samples: &[GpuSample], wall_elapsed_s: f64) -> EnergyReport {
     let n = samples.len();
@@ -173,7 +173,7 @@ impl PowerMonitor {
     }
 
     /// Stop monitoring and return the energy report.
-    #[allow(clippy::cast_precision_loss, clippy::significant_drop_tightening)]
+    #[expect(clippy::significant_drop_tightening)]
     pub fn stop(mut self) -> EnergyReport {
         let wall_elapsed = self.wall_start.elapsed().as_secs_f64();
 

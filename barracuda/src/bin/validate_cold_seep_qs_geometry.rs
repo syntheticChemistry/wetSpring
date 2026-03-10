@@ -40,7 +40,7 @@ struct QsTypeGeometry {
     cold_seep_prediction: &'static str,
 }
 
-#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
+#[expect(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp145: Cold Seep QS Type vs Anderson Geometry Predictions");
 

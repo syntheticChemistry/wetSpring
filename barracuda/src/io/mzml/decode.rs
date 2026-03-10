@@ -141,7 +141,7 @@ impl DecodeBuffer {
 }
 
 /// Tracks encoding properties for a `<binaryDataArray>`.
-#[allow(clippy::struct_excessive_bools)] // maps directly to mzML cvParam flags
+#[expect(clippy::struct_excessive_bools)] // maps directly to mzML cvParam flags
 pub struct BinaryArrayState {
     pub is_mz: bool,
     pub is_intensity: bool,
@@ -239,7 +239,7 @@ pub fn decode_binary_array(encoded: &str, is_zlib: bool, is_64bit: bool) -> Resu
 /// Build an mzML with configurable compression and precision per array.
 /// Test helper used by both decode and mod tests.
 #[cfg(test)]
-#[allow(clippy::fn_params_excessive_bools)] // maps directly to mzML encoding flags
+#[expect(clippy::fn_params_excessive_bools)] // maps directly to mzML encoding flags
 pub fn custom_binary_mzml(
     mz_b64: &str,
     int_b64: &str,
@@ -300,7 +300,7 @@ pub fn custom_binary_mzml(
 
 /// Write text to a temp mzML file and return the path.
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used)]
 pub fn write_temp_mzml(dir: &tempfile::TempDir, name: &str, xml: &str) -> std::path::PathBuf {
     use std::io::Write;
     let path = dir.path().join(name);
@@ -310,7 +310,7 @@ pub fn write_temp_mzml(dir: &tempfile::TempDir, name: &str, xml: &str) -> std::p
 }
 
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used, deprecated)]
+#[expect(clippy::unwrap_used, deprecated)]
 mod tests {
     use super::*;
 

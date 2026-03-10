@@ -5,6 +5,7 @@ use barracuda::prelude::BarracudaError;
 
 use crate::bio::nmf::{NmfConfig, NmfResult};
 use crate::visualization::types::{EcologyScenario, ScenarioEdge};
+use crate::visualization::ScientificRange;
 
 use super::{bar, heatmap, node, scaffold};
 
@@ -75,6 +76,19 @@ pub fn nmf_scenario(
         ));
     }
 
+    nmf_node.scientific_ranges.push(ScientificRange {
+        label: "Reconstruction error < 0.1".into(),
+        min: 0.0,
+        max: 0.1,
+        status: "normal".into(),
+    });
+    nmf_node.scientific_ranges.push(ScientificRange {
+        label: "Reconstruction error 0.1–0.5".into(),
+        min: 0.1,
+        max: 0.5,
+        status: "warning".into(),
+    });
+
     s.nodes.push(nmf_node);
     (s, vec![])
 }
@@ -97,11 +111,7 @@ pub fn nmf_scenario_from_data(
 }
 
 #[cfg(test)]
-#[allow(
-    clippy::unwrap_used,
-    clippy::expect_used,
-    reason = "tests use unwrap/expect for clarity"
-)]
+#[expect(clippy::expect_used, reason = "tests use unwrap/expect for clarity")]
 mod tests {
     use super::*;
     use crate::bio::nmf::{NmfConfig, NmfObjective};

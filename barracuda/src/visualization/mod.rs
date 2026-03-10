@@ -10,6 +10,7 @@
 
 pub mod capabilities;
 pub mod ipc_push;
+pub mod live_pipeline;
 pub mod scenarios;
 pub mod stream;
 mod types;
@@ -188,6 +189,26 @@ mod tests {
         assert!(json.contains("\"channel_type\":\"spectrum\""));
         assert!(json.contains("\"frequencies\""));
         assert!(json.contains("\"amplitudes\""));
+    }
+
+    #[test]
+    fn data_channel_scatter3d_serializes() {
+        let ch = DataChannel::Scatter3D {
+            id: "s3d".into(),
+            label: "3D PCoA".into(),
+            x: vec![1.0, 2.0],
+            y: vec![3.0, 4.0],
+            z: vec![5.0, 6.0],
+            point_labels: vec!["A".into(), "B".into()],
+            x_label: "PC1".into(),
+            y_label: "PC2".into(),
+            z_label: "PC3".into(),
+            unit: "proportion".into(),
+        };
+        let json = serde_json::to_string(&ch).expect("serialize");
+        assert!(json.contains("\"channel_type\":\"scatter3d\""));
+        assert!(json.contains("\"z\""));
+        assert!(json.contains("\"z_label\""));
     }
 
     #[test]

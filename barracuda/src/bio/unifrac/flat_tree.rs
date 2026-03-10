@@ -37,7 +37,7 @@ impl PhyloTree {
     ///
     /// Tree node counts fit in u32 for any realistic phylogeny.
     #[must_use]
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     pub fn to_flat_tree(&self) -> FlatTree {
         let n = self.nodes.len();
         let mut parent = Vec::with_capacity(n);
@@ -84,7 +84,7 @@ impl FlatTree {
     ///
     /// u32→usize is infallible widening on 64-bit; tree indices fit on 32-bit.
     #[must_use]
-    #[allow(clippy::cast_possible_truncation)] // loop index i < n_nodes, fits in u32
+    #[expect(clippy::cast_possible_truncation)] // loop index i < n_nodes, fits in u32
     pub fn to_phylo_tree(&self) -> PhyloTree {
         let n = self.n_nodes as usize;
         let mut nodes = Vec::with_capacity(n);

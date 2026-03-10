@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::unwrap_used, clippy::cast_precision_loss)]
 
 use super::*;
 use crate::bio::esn::heads::{

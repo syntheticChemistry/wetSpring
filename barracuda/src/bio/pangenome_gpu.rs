@@ -72,7 +72,7 @@ impl PangenomeGpu {
     /// # Errors
     ///
     /// Returns `Err` if GPU buffer creation or readback fails.
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     pub fn classify(
         &self,
         presence_flat: &[u8],
@@ -138,7 +138,7 @@ impl PangenomeGpu {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[allow(clippy::expect_used, clippy::unwrap_used, clippy::manual_let_else)]
+#[expect(clippy::expect_used, clippy::unwrap_used, clippy::manual_let_else)]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

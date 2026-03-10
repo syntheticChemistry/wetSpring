@@ -111,7 +111,7 @@ fn validate_ms2_parsing(ms2_path: &Path, v: &mut Validator) {
     }
 
     // Unique precursors (rounded to 2 decimal places, same as Python)
-    #[allow(clippy::cast_possible_truncation)] // intentional rounding
+    #[expect(clippy::cast_possible_truncation)] // intentional rounding
     let unique_mzs: HashSet<i64> = pfas_hits
         .iter()
         .map(|h| (h.precursor_mz * 100.0).round() as i64)

@@ -41,7 +41,7 @@ struct SignalMode {
     biological_example: &'static str,
 }
 
-#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
+#[expect(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp147: Anderson Framework for Mechanical Wave Signaling");
 

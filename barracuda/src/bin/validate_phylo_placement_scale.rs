@@ -82,7 +82,7 @@ fn seq_to_states(seq: &[u8]) -> Vec<usize> {
         .collect()
 }
 
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp109: Large-Scale Phylogenetic Placement");
 

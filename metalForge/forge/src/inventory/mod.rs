@@ -59,7 +59,7 @@ pub fn discover_with_tower() -> Vec<Substrate> {
 }
 
 #[cfg(test)]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
+#[expect(clippy::unwrap_used)]
 mod tests {
     use super::*;
     use crate::substrate::{

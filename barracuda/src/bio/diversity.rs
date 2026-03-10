@@ -379,7 +379,6 @@ mod tests {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
 mod proptests {
     use super::*;
     use proptest::prelude::*;
@@ -401,7 +400,7 @@ mod proptests {
         }
 
         #[test]
-        #[allow(clippy::cast_precision_loss)]
+        #[expect(clippy::cast_precision_loss)]
         fn observed_features_leq_length(counts in non_negative_vec()) {
             let obs = observed_features(&counts);
             prop_assert!(obs <= counts.len() as f64);

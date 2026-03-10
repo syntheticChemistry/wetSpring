@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # wetSpring — Rust vs Python Head-to-Head Benchmark
-# Runs all BarraCUDA CPU validators (v1–v8 release) and Python baseline, captures timings.
+# Benchmarks v1–v10 CPU validators against Python baselines.
+# Full suite extends to v25; this script covers the core 10 for quick comparison.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"

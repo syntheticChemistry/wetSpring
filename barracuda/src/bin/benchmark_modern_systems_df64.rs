@@ -48,7 +48,7 @@ fn bench<F: FnOnce() -> R, R>(label: &str, f: F) -> (R, f64) {
     (r, ms)
 }
 
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn main() {
     let mut v = Validator::new("Exp166: Modern Systems Benchmark (S62+DF64)");
 

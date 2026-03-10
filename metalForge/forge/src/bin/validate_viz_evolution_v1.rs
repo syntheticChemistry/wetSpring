@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::too_many_lines, clippy::unwrap_used, clippy::expect_used)]
+#![expect(clippy::too_many_lines, clippy::expect_used)]
 //! # Exp333: Visualization Evolution
 //!
 //! Validates all new visualization capabilities:
@@ -16,8 +16,6 @@
 //! | V8 Rarefaction  | Scenario builder: timeseries, gauge channels |
 //! | V9 NMF          | Scenario builder: heatmap W/H, bar top features |
 //! | V10 Pipeline    | Streaming pipeline scenario: multi-node graph |
-
-use std::path::PathBuf;
 
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::visualization;
@@ -47,9 +45,9 @@ fn main() {
     // ── V2: StreamSession ──
     v.section("V2 — StreamSession Lifecycle");
 
-    let client = visualization::ipc_push::PetalTonguePushClient::new(PathBuf::from(
-        "/tmp/nonexistent-exp333.sock",
-    ));
+    let client = visualization::ipc_push::PetalTonguePushClient::new(
+        std::env::temp_dir().join("nonexistent-exp333.sock"),
+    );
     let mut session = visualization::stream::StreamSession::open(client, "exp333-session");
     v.check_pass("session is open", session.is_open());
     v.check_count(

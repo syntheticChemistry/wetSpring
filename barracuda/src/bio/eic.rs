@@ -106,7 +106,7 @@ pub fn extract_eics(spectra: &[MzmlSpectrum], target_mzs: &[f64], ppm: f64) -> V
 ///
 /// Sorted vector of centroid m/z values for detected mass tracks.
 #[must_use]
-#[allow(clippy::cast_precision_loss)] // scan counts < 2^53
+#[expect(clippy::cast_precision_loss)] // scan counts < 2^53
 pub fn detect_mass_tracks(spectra: &[MzmlSpectrum], ppm: f64, min_scans: usize) -> Vec<f64> {
     // Collect all m/z values from MS1 spectra
     let ms1: Vec<&MzmlSpectrum> = spectra.iter().filter(|s| s.ms_level == 1).collect();

@@ -133,7 +133,7 @@ where
     F: Fn(&[f64], f64) -> Vec<f64>,
 {
     let n_vars = y0.len();
-    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    #[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
     let n_steps = ((t_end - t_start) / dt).ceil() as usize;
 
     let mut t_vec = Vec::with_capacity(n_steps + 1);
@@ -226,7 +226,7 @@ where
 #[must_use]
 pub fn steady_state_mean(result: &OdeResult, var_idx: usize, frac: f64) -> f64 {
     let n = result.n_points();
-    #[allow(
+    #[expect(
         clippy::cast_possible_truncation,
         clippy::cast_sign_loss,
         clippy::cast_precision_loss
@@ -238,13 +238,13 @@ pub fn steady_state_mean(result: &OdeResult, var_idx: usize, frac: f64) -> f64 {
         return 0.0;
     }
     let sum: f64 = (start..n).map(|i| result.var_at(i, var_idx)).sum();
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     let mean = sum / count as f64;
     mean
 }
 
 #[cfg(test)]
-#[allow(clippy::expect_used)]
+#[expect(clippy::expect_used)]
 mod tests {
     use super::*;
     use crate::tolerances;

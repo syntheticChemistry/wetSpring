@@ -153,7 +153,7 @@ fn validate_chimera(v: &mut Validator) {
     let (clean, stats) = chimera::remove_chimeras(&asvs, &params);
 
     v.check_count("Chimera: input sequences", stats.input_sequences, 3);
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     let clean_len_f64 = clean.len() as f64;
     v.check(
         "Chimera: parents preserved",
@@ -407,7 +407,7 @@ fn validate_end_to_end(v: &mut Validator) {
     v.check_count("Pipeline: 0 chimeras", chimera_stats.chimeras_found, 0);
 
     // Step 4: Diversity from abundance vector
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     let counts: Vec<f64> = clean_asvs.iter().map(|a| a.abundance as f64).collect();
     let shannon = diversity::shannon(&counts);
     let simpson = diversity::simpson(&counts);

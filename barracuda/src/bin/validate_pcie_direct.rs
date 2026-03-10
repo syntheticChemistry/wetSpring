@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::too_many_lines, clippy::cast_precision_loss)]
+#![expect(clippy::cast_precision_loss)]
 //! Exp088: `metalForge` `PCIe` Direct Transfer Proof
 //!
 //! Validates that data can flow between compute substrates without CPU

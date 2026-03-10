@@ -49,7 +49,7 @@ fn require_f64(gpu: &GpuF64) -> Result<()> {
 /// # Errors
 ///
 /// Returns an error if the device lacks `SHADER_F64` support.
-#[allow(
+#[expect(
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
     clippy::cast_sign_loss
@@ -162,7 +162,7 @@ pub fn extract_features_gpu(
 }
 
 /// Estimate noise floor from median of bottom 25% of intensities.
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn estimate_noise(intensity: &[f64]) -> f64 {
     if intensity.is_empty() {
         return 0.0;
@@ -179,7 +179,7 @@ fn estimate_noise(intensity: &[f64]) -> f64 {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[allow(
+#[expect(
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::type_complexity,

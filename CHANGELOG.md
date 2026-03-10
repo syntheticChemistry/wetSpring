@@ -3,6 +3,108 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V105 — petalTongue Visualization Evolution (2026-03-10)
+
+### Added
+- **`visualization::live_pipeline`** — `LivePipelineSession` for progressive
+  real-time visualization. Domain-specific stage builders for 16S amplicon,
+  LC-MS, and phylogenetic pipelines. JSON export fallback when petalTongue
+  unavailable. 9 tests.
+- **`DataChannel::Scatter3D`** — 3D scatter for PCoA, UMAP, KMD ordination.
+  Wired into ordination scenario for 3+ axes. 1 test.
+- **`scenarios::profiles`** — Sample-parameterized scenario builders:
+  `environmental_study_scenario`, `pfas_screening_scenario`,
+  `calibration_report_scenario`. Scientists bring data, wetSpring builds
+  the viz. 5 tests.
+- **`scenarios::msa`** — MSA visualization: conservation bar, pairwise identity
+  heatmap, mean identity gauge. 2 tests.
+- **`scenarios::calibration`** — Calibration curve scenario wrapping
+  `bio::calibration::fit_calibration`. R² gauge with linearity ranges. 2 tests.
+- **`scenarios::spectroscopy`** — JCAMP-DX file and in-memory spectrum
+  scenarios. Auto-generates timeseries and peak bar charts. 2 tests.
+- **`scenarios::basecalling`** — Nanopore basecalling QC: pass rate, mean
+  quality, read length distribution. 3 tests.
+- **`scenarios::neighbor_joining`** — NJ tree visualization: distance heatmap,
+  branch length bar, total tree length gauge. 2 tests.
+- **IPC client evolution** — 64KB buffer (was 4KB), `query_capabilities`,
+  `subscribe_interactions`, `push_render_with_domain`, `dismiss_session`.
+- **5 new visualization capabilities** announced: `msa`, `calibration`,
+  `spectroscopy`, `basecalling`, `live_pipeline`.
+- **`scatter3d` and `fieldmap`** added to announced channel types.
+- **Scientific ranges** added to stochastic, rarefaction, HMM, NMF, and
+  streaming_pipeline scenarios for actionable thresholds.
+
+### Changed
+- Total scenario builders: **33** (was 28).
+- Total DataChannel types: **9** (was 8: added Scatter3D).
+- Visualization capabilities: **21** (was 16: +5 new domains).
+
+### Verified
+- 1,288 lib tests + 219 integration tests PASS with `--features json`.
+- 1,100 lib tests PASS without json feature.
+- `cargo clippy --features json --lib` — **ZERO WARNINGS**.
+- `cargo clippy --lib` — **ZERO WARNINGS**.
+- Zero `#[allow]`, zero `unsafe`, zero production mocks.
+
+---
+
+## V104 — Deep Debt Evolution & Gap Closure (2026-03-09)
+
+### Added
+- **`io::jcamp`** — JCAMP-DX streaming parser for spectroscopy data (IR, UV-Vis,
+  Raman, NMR, MS). Supports XYDATA, PEAK TABLE, compound files, SQZ encoding.
+  10 tests.
+- **`bio::dorado`** — Dorado basecaller subprocess delegation for nanopore data.
+  Capability-based discovery ($WETSPRING_DORADO_BIN → $PATH → standard paths).
+  Graceful degradation to built-in basecaller. 9 tests.
+- **`signal_gpu::find_peaks_with_area_gpu`** — GPU peak detection + CPU
+  trapezoidal integration per peak. Batch version for pipeline use.
+- **`Error::Jcamp`** variant added to crate error enum.
+
+### Changed
+- **Complete `#[allow] → #[expect]` migration** — All 74 remaining `#[allow]`
+  attributes converted. 56 stale suppressions discovered and removed.
+- **All 8 remaining clippy warnings resolved** — `cast_precision_loss` justified,
+  unused imports removed, `naive_bytecount` suppressed in tests, stale unwrap
+  expectations cleaned.
+- **Industry tool coverage updated** to 20 sovereign replacements (was 18).
+- **I/O parser coverage** expanded to 8 formats (JCAMP-DX added).
+
+### Verified
+- 1,260 tests PASS, 0 failures, 1 ignored.
+- `cargo clippy --all-targets` — **ZERO WARNINGS**.
+- Zero `#[allow]`, zero `unsafe`, zero production mocks, zero hardcoded paths.
+
+---
+
+## V103 — Upstream Rewire & Modern Rust Evolution (2026-03-10)
+
+### Changed
+- **`#[allow(clippy::...)]` → `#[expect(clippy::...)]` evolution** across 209 files
+  in both workspace crates. Follows ToadStool S131 pattern — stale suppressions
+  now surface as compile errors instead of silently hiding.
+- **37 stale suppressions removed** — discovered by the `#[expect]` evolution.
+  Includes `cast_precision_loss`, `too_many_lines`, `similar_names`,
+  `needless_range_loop`, `unnecessary_wraps` on functions that evolved past
+  needing them.
+- **`#![deny(unsafe_code)]` → `#![forbid(unsafe_code)]`** in barracuda lib.
+  Cannot be overridden by inner `#[allow]`. metalForge already had `forbid`.
+- **Hardcoded `/tmp/` paths → `std::env::temp_dir()`** in 6 locations
+  (production discovery path in `PetalTonguePushClient::discover()`,
+  3 validation binaries, 1 test helper, 1 integration test).
+- **Full deep debt audit**: all deps pure Rust (except unavoidable wgpu),
+  all files under 1000 lines, zero unsafe, zero production mocks, zero
+  production `unwrap()`/`expect()`, all URLs use env var override pattern.
+
+### Verified
+- Synced against: barraCuda `a898dee` (v0.3.3), toadStool S130+ (`bfe7977b`),
+  coralReef Phase 10 (`d29a734`). Zero API breakage.
+- 1,513 tests PASS (1,195 barracuda lib + 219 forge lib + 72 integration + 27 doctests),
+  0 failures, 1 ignored.
+- `cargo clippy --workspace -- -D warnings -W clippy::pedantic` — **ZERO WARNINGS**.
+- `cargo fmt --check` — clean.
+- `cargo doc --workspace --no-deps` — 182+ pages.
+
 ## V102 — petalTongue V2 Full-Domain Visualization (2026-03-09)
 
 ### Added

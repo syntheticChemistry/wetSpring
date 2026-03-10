@@ -21,7 +21,7 @@ use wgpu::util::DeviceExt;
 /// # Errors
 ///
 /// Returns [`Error::Gpu`] if dispatch fails or dimensions are invalid.
-#[allow(clippy::cast_possible_truncation, clippy::cast_precision_loss)]
+#[expect(clippy::cast_possible_truncation, clippy::cast_precision_loss)]
 pub fn pairwise_l2_condensed_gpu(
     gpu: &GpuF64,
     coords: &[f64],
@@ -75,7 +75,7 @@ pub fn pairwise_l2_condensed_gpu(
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[allow(
+#[expect(
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::type_complexity,

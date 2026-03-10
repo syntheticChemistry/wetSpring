@@ -13,6 +13,7 @@ use super::{bar, distribution, edge, gauge, heatmap, node, scaffold, timeseries}
 /// Demonstrates Phred score distributions and per-position quality profiles
 /// using synthetic reads.
 #[must_use]
+#[expect(clippy::cast_precision_loss)] // position/count indices < 300
 pub fn quality_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     let mut s = scaffold(
         "Quality Filtering",
@@ -22,11 +23,13 @@ pub fn quality_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     let params = QualityParams::default();
     let phred_scores: Vec<f64> = (0..150)
         .map(|i| {
-            let base = 35.0 - (i as f64 / 150.0) * 15.0;
-            base + ((i as f64) * 0.3).sin() * 3.0
+            let fi = f64::from(i);
+            (fi * 0.3)
+                .sin()
+                .mul_add(3.0, (fi / 150.0).mul_add(-15.0, 35.0))
         })
         .collect();
-    let positions: Vec<f64> = (0..150).map(|i| i as f64).collect();
+    let positions: Vec<f64> = (0..150).map(f64::from).collect();
 
     let mut qual_node = node(
         "quality",
@@ -45,12 +48,13 @@ pub fn quality_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
         &phred_scores,
     ));
 
-    let mean_q = phred_scores.iter().sum::<f64>() / phred_scores.len() as f64;
+    let n_scores = phred_scores.len() as f64;
+    let mean_q = phred_scores.iter().sum::<f64>() / n_scores;
     let std_q = (phred_scores
         .iter()
         .map(|v| (v - mean_q).powi(2))
         .sum::<f64>()
-        / phred_scores.len() as f64)
+        / n_scores)
         .sqrt();
     qual_node.data_channels.push(distribution(
         "phred_dist",
@@ -80,6 +84,7 @@ pub fn quality_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
 /// Runs DADA2 on synthetic unique sequences and visualises the error model
 /// and ASV output counts.
 #[must_use]
+#[expect(clippy::cast_precision_loss)] // ASV/read counts < 10_000
 pub fn dada2_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     use crate::bio::derep::UniqueSequence;
 
@@ -145,7 +150,7 @@ pub fn dada2_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     ));
 
     let error_rates: Vec<f64> = (0..16)
-        .map(|i| 0.01 * (1.0 + (i as f64 * 0.5).sin().abs()))
+        .map(|i| 0.01 * (1.0 + (f64::from(i) * 0.5).sin().abs()))
         .collect();
     let _nuc_pairs: Vec<String> = [
         "AA", "AC", "AG", "AT", "CA", "CC", "CG", "CT", "GA", "GC", "GG", "GT", "TA", "TC", "TG",

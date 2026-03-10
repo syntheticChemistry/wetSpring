@@ -117,11 +117,7 @@ fn build_heaps_gauge(pan_node: &mut crate::visualization::ScenarioNode, result: 
 }
 
 #[cfg(test)]
-#[allow(
-    clippy::unwrap_used,
-    clippy::expect_used,
-    reason = "tests use unwrap/expect for clarity"
-)]
+#[expect(clippy::expect_used, reason = "tests use unwrap/expect for clarity")]
 mod tests {
     use super::*;
 

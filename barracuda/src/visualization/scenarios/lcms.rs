@@ -97,7 +97,7 @@ pub fn tolerance_search_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
         150.0,
         200.0,
     ];
-    let mut sorted_mz = mz_array.clone();
+    let mut sorted_mz = mz_array;
     sorted_mz.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
 
     let cf2_hits = tolerance_search::find_within_da(&sorted_mz, fragments.cf2, 0.01);
@@ -111,15 +111,17 @@ pub fn tolerance_search_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
         &["science.tolerance_search"],
     );
 
+    #[expect(clippy::cast_precision_loss)] // hit counts are tiny (< 100)
+    let hit_counts = [
+        cf2_hits.len() as f64,
+        c2f4_hits.len() as f64,
+        hf_hits.len() as f64,
+    ];
     tol_node.data_channels.push(bar(
         "hit_counts",
         "Fragment Hit Counts",
         &["CF₂⁺", "C₂F₄⁺", "HF⁺"],
-        &[
-            cf2_hits.len() as f64,
-            c2f4_hits.len() as f64,
-            hf_hits.len() as f64,
-        ],
+        &hit_counts,
         "hits",
     ));
 

@@ -233,7 +233,7 @@ pub fn extract_json_array_strings(json: &str, key: &str) -> Vec<String> {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used)]
 mod tests {
     use super::*;
 

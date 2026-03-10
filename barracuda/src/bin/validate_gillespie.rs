@@ -37,7 +37,7 @@ const BASE_SEED: u64 = 42;
 
 const ANALYTICAL_MEAN: f64 = 100.0; // k_dgc / k_pde
 
-#[allow(
+#[expect(
     clippy::cast_possible_truncation,
     clippy::cast_sign_loss,
     clippy::cast_precision_loss

@@ -2,7 +2,7 @@
 
 **Date:** March 9, 2026
 **Pattern:** Write → Absorb → Lean (from hotSpring)
-**Status:** V102 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 47 GPU modules total, 0 Tier B/C, standalone barraCuda v0.3.3, 41 petalTongue scenario builders (8 DataChannel types, 4 composite), StreamSession with backpressure, Songbird, wetspring_dashboard
+**Status:** V105 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 47 GPU modules total, 0 Tier B/C, standalone barraCuda v0.3.3, 33 petalTongue scenario builders (9 DataChannel types, 4 composite), StreamSession with backpressure, Songbird, wetspring_dashboard
 
 ---
 

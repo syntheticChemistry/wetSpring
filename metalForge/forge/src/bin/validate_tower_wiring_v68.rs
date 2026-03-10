@@ -215,7 +215,7 @@ fn main() {
             .iter()
             .map(|e| e.metadata().map_or(0, |m| m.len()))
             .sum();
-        #[allow(clippy::cast_precision_loss)]
+        #[expect(clippy::cast_precision_loss)]
         let total_mb = total_bytes as f64 / (1024.0 * 1024.0);
         check(
             &format!("Vibrio: {total_mb:.0} MB total (expect ~250 MB)"),

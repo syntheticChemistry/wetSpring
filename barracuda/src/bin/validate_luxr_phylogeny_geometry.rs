@@ -41,7 +41,7 @@ struct LuxrLineage {
     notes: &'static str,
 }
 
-#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
+#[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {
     let mut v = Validator::new("Exp146: luxR Phylogeny × Habitat Geometry Overlay");
 

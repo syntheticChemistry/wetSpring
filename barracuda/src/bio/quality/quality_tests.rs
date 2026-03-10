@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![allow(clippy::expect_used, clippy::unwrap_used, clippy::naive_bytecount)]
+#![expect(clippy::unwrap_used, clippy::naive_bytecount)]
 
 use super::super::adapter::bases_match;
 use super::trim;
