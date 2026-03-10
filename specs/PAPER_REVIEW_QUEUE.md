@@ -244,6 +244,56 @@ the "reach" condition.
 | Exp285 | ToadStool streaming: Gonzales batched GPU pipeline (Shannon, Simpson, BC matrix) | Streaming dispatch for pharmacological workloads | **37/37 PASS** |
 | Exp286 | metalForge cross-substrate: Gonzales CPU↔GPU + Hill + Anderson + NUCLEUS | Cross-hardware portability for drug reproductions | **36/36 PASS** |
 
+### Track 6 — Anaerobic Microbial Ecology & Bioprocess (Liao / ADREC)
+
+Wei Liao (MSU Biosystems & Agricultural Engineering) directs ADREC — the
+Anaerobic Digestion Research and Education Center. His group studies microbial
+community dynamics in anaerobic digesters: the same community ecology wetSpring
+models for aerobic QS, but in the oxygen-absent regime. The author's MSUBI
+bioreactor experience (5 years — Pivot Bio, MycoWorks, fermentation, BSL2
+fungi/anaerobes) is the direct counterpart.
+
+**Scientific question (baseCamp Paper 16)**: What happens to quorum sensing
+when the same organisms face aerobic vs anaerobic conditions? Global
+transcription regulators (FNR, ArcAB, Rex) reprogram gene expression under
+anaerobic conditions. If QS autoinducer production and receptor expression
+change with oxygen availability, the Anderson disorder parameter W undergoes
+a phase transition at the oxygen boundary.
+
+**Connection to existing wetSpring work**: Track 1 (QS in aerobic Vibrio,
+Pseudomonas); Track 4 (soil pore networks — aerobic/anaerobic zones by water
+saturation); Track 5 (immunological Anderson — gut mucosal O₂ gradient);
+Paper 01 (Anderson-QS framework); healthSpring (gut = human anaerobic digester).
+
+#### Tier 1 — Direct Reproduction Targets
+
+| # | Paper | Journal | Year | Faculty | Why | Status |
+|---|-------|---------|------|---------|-----|--------|
+| 59 | Yang et al. "Phylogenetic analysis of anaerobic co-digestion of animal manure and corn stover reveals linkages between bacterial communities and digestion performance" | Adv Microbiol 6:879-897 | 2016 | Liao | Community-function linkage via phylogenetics in **anaerobic** conditions — the anaerobic counterpart to Track 1b (Liu phylogenetics). 16S data processable through wetSpring sovereign pipeline | Queued |
+| 60 | Chen et al. "Response of anaerobic microorganisms to different culture conditions and corresponding effects on biogas production and solid digestate quality" | Biomass Bioenergy 85:84-93 | 2016 | Liao | **Core of the aerobic/anaerobic question** — same organisms, different culture conditions, different community dynamics. Tests whether W shifts measurably with operating conditions | Queued |
+
+#### Tier 2 — Substrate Perturbation and Community Response
+
+| # | Paper | Journal | Year | Faculty | Why | Status |
+|---|-------|---------|------|---------|-----|--------|
+| 61 | Rojas-Sossa et al. "Effects of coffee processing residues on anaerobic microorganisms and corresponding digestion performance" | Bioresour Technol 245:714-723 | 2017 | Liao | Substrate perturbation → anaerobic community response. Maps to disorder perturbation in Anderson model — how does changing the "food" change W? Costa Rica deployment (Liao group) | Queued |
+| 62 | Rojas-Sossa et al. "Effect of ammonia fiber expansion (AFEX) treated corn stover on anaerobic microbes and corresponding digestion performance" | Biomass Bioenergy 127:105263 | 2019 | Liao | Pretreated substrate → microbial community shift. AFEX is a specific controlled perturbation — ideal for measuring ΔW from substrate change | Queued |
+
+#### Tier 3 — Aerobic-Anaerobic Interface
+
+| # | Paper | Journal | Year | Faculty | Why | Status |
+|---|-------|---------|------|---------|-----|--------|
+| 63 | Zhong et al. "Fungal fermentation on anaerobic digestate for lipid-based biofuel production" | Biotechnol Biofuels 9:253 | 2016 | Liao | **Aerobic process operating on anaerobic substrate** — the oxygen boundary in practice. Fungal fermentation (aerobic) consuming digestate (anaerobic product). Tests QS dynamics at the regime interface | Queued |
+
+**Open Data Strategy**: All Liao group papers use agricultural feedstock
+data and microbial community analysis. 16S amplicon data likely deposited
+in NCBI SRA. Chen 2016 and Yang 2016 include published community
+composition and gas yield data sufficient for model parameterization.
+
+**Pipeline**: wetSpring sovereign 16S → diversity indices → Anderson W mapping
+→ compare aerobic (Track 1) vs anaerobic (Track 6) W distributions →
+test Paper 16 predictions (bimodal W, spatial O₂ gradient → spatial W gradient).
+
 ### Cross-Spring — Spectral Theory (Kachkovskiy, via groundSpring/hotSpring)
 
 Kachkovskiy's spectral theory has an indirect but real connection to wetSpring
@@ -362,7 +412,8 @@ Core finding: **no prior work applies Anderson localization to QS signaling**.
 | Extensions (Phase 37-39) | 9 | 9/9 | — | — | CPU only (by design — analytical/catalog) |
 | Track 5 immuno-Anderson (science) | 6 | 1/1 | 4/4 | 1/1 | Full three-tier (Exp273-279: 157/157) |
 | Track 5 Gonzales reproductions | 6 | 1/1 | 1/1 | 1/1 | Full three-tier (Exp280-286: 202/202) |
-| **Grand total** | **52 + 6 reproduced** | **54/54** | **48/48** | **41/41** | |
+| Track 6 (Anaerobic QS/ADREC) | 5 | 0/5 | 0/5 | 0/5 | Queued — Paper 16 targets |
+| **Grand total** | **57 + 6 reproduced** | **54/54** | **48/48** | **41/41** | |
 
 **All GPU primitives upstream:** NMF (S58), TransE (S60), SpMM (S60), PeakDetect (S62), BGL helpers (S62+DF64).
 **All 39 three-tier-eligible papers now have full three-tier validation** (CPU, GPU, metalForge).
@@ -409,4 +460,5 @@ All 103 tolerance constants are scientifically justified and hierarchy-tested.
 - Cahill/Smallwood papers may require Sandia data access agreements
 - Paper 23 (Kachkovskiy) is now validated via cross-spring spectral primitives (Exp107: 25/25 checks)
 - Extension papers (Phase 37-39) are CPU-only by design — they validate analytical models where GPU is not the bottleneck
+- Track 6 papers (Liao/ADREC) are queued for baseCamp Paper 16 — anaerobic-aerobic QS phase transition. Faculty anchor: Wei Liao (ADREC, MSU BAE)
 - V92D: all library code is panic-free, all clippy pedantic warnings resolved under `--all-features`
