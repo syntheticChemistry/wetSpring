@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-11 (V111: 360 experiments, 344 binaries, 9,774+ checks. V111: barraCuda v0.3.5 upstream rewire + GPU learning system (Exp357–360: PrecisionBrain, HW calibration, stable specials, sovereign dispatch, 88/88). V110: petalTongue visualization + Anderson QS (Exp353-356). V109: upstream rewire + mixed hardware + NUCLEUS. V108: Track 6, 63 papers. V107: R industry parity. 1,611 tests, clippy ZERO WARNINGS.)
+**Updated**: 2026-03-11 (V112: 363 experiments, 347 binaries, 9,819+ checks. V112: NVIDIA hardware learning prototype (Exp361-363: nouveau diagnostic, probe-calibrate-route-apply, adaptive dispatch, 45/45 PASS). V111: barraCuda v0.3.5 upstream rewire + GPU learning system (Exp357–360: PrecisionBrain, HW calibration, stable specials, sovereign dispatch, 88/88). V110: petalTongue visualization + Anderson QS (Exp353-356). V109: upstream rewire + mixed hardware + NUCLEUS. V108: Track 6, 63 papers. V107: R industry parity. 1,611 tests, clippy ZERO WARNINGS.)
 
 ---
 
@@ -613,6 +613,22 @@ avoid catastrophic cancellation. Sovereign dispatch readiness assessed.
 JSON artifact: output/gpu_capability_landscape.json (petalTongue tier heatmap + domain routing).
 
 **Totals: 360 experiments, 344 binaries, 9,774+ checks.**
+
+### V112 — NVIDIA Hardware Learning Prototype (March 2026)
+
+Exp361-363: NVIDIA hardware learning prototype. Dual-GPU rig discovery,
+firmware inventory, nouveau dispatch diagnostic, probe-calibrate-route-apply
+pattern, machine-readable capability profile, adaptive workload selection.
+
+| Exp | Name | Domains | Checks | Key Finding |
+|:---:|------|:-------:|:------:|-------------|
+| 361 | Nouveau RTX 4070 Diagnostic v1 | D87-D91 | 15 | RTX 4070 nvidia (wgpu working), Titan V nouveau (VM_INIT OK, CHANNEL_ALLOC blocked). AD104 GSP-only firmware. |
+| 362 | Hardware Learning Prototype v1 | D92-D95 | 13 | probe-calibrate-route-apply: 4-tier HW calibration, 12-domain PrecisionBrain routing, capability profile JSON. |
+| 363 | Adaptive Dispatch from Profile v1 | D96-D100 | 17 | Reads profile, adapts workloads: F32 always, DF64 arith (hw present), skip transcendentals (NVVM risk), VRAM-aware. |
+
+JSON artifact: output/hardware_capability_profile.json (4.3KB, machine-readable dispatch recipe).
+
+**Totals: 363 experiments, 347 binaries, 9,819+ checks.**
 
 ---
 

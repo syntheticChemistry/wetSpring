@@ -2,7 +2,7 @@
 
 **Date:** March 11, 2026
 **Pattern:** Write → Absorb → Lean (from hotSpring)
-**Status:** V111 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 47 GPU modules total, 0 Tier B/C, standalone barraCuda v0.3.5, 33 petalTongue scenario builders, StreamSession with backpressure, Songbird, wetspring_dashboard. V111: barraCuda v0.3.5 rewire + GPU learning system (PrecisionBrain, HW calibration, stable specials, sovereign dispatch). V110: petalTongue viz, stream_ecology, Anderson QS O₂-modulated model
+**Status:** V112 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 47 GPU modules total, 0 Tier B/C, standalone barraCuda v0.3.5, 33 petalTongue scenario builders, StreamSession with backpressure, Songbird, wetspring_dashboard. V111: barraCuda v0.3.5 rewire + GPU learning system (PrecisionBrain, HW calibration, stable specials, sovereign dispatch). V112: NVIDIA hardware learning prototype (Exp361-363: nouveau diagnostic, probe-calibrate-route-apply, adaptive dispatch, 45/45 PASS). V110: petalTongue viz, stream_ecology, Anderson QS O₂-modulated model
 
 ---
 

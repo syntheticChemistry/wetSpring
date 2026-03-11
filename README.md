@@ -4,10 +4,10 @@
 against Rust implementations and GPU shaders via `barraCuda` (standalone math
 primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 
-**Date:** March 10, 2026
+**Date:** March 11, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V111 — **1,611 tests** (1,294 pass, 3 known GPU f32 failures), 360 experiments, 9,774+ validation checks. V111: barraCuda v0.3.5 upstream rewire + GPU learning system (Exp357–360: PrecisionBrain, HardwareCalibration, stable specials, sovereign dispatch readiness, 88/88). V110: petalTongue visualization pipeline (Exp353–356). V109: upstream rewire + mixed hardware + NUCLEUS atomics (Exp347-352). V108: Track 6 anaerobic digestion, 63 papers complete. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS**. Ecosystem: barraCuda v0.3.5, toadStool S146, coralReef Iter 33.
+**Status:** V112 — **1,611 tests** (1,294 pass, 3 known GPU f32 failures), 363 experiments, 9,819+ validation checks. V112: NVIDIA hardware learning prototype (Exp361-363: nouveau diagnostic, probe-calibrate-route-apply, adaptive dispatch, 45/45). V111: barraCuda v0.3.5 upstream rewire + GPU learning system (Exp357–360: PrecisionBrain, HardwareCalibration, stable specials, sovereign dispatch readiness, 88/88). V110: petalTongue visualization pipeline (Exp353–356). V109: upstream rewire + mixed hardware + NUCLEUS atomics (Exp347-352). V108: Track 6 anaerobic digestion, 63 papers complete. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS**. Ecosystem: barraCuda v0.3.5, toadStool S146, coralReef Iter 33.
 
 ---
 

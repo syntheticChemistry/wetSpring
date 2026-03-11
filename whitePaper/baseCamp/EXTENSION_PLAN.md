@@ -1,8 +1,8 @@
 # baseCamp Extension Plan: From Validated Math to Real-World Science
 
-**Date:** March 11, 2026 (V111 update)
-**Author:** wetSpring V111 (ecoPrimals)
-**Foundation:** 360 experiments, 9,774+ checks, 63 papers reproduced, 150+ primitives (standalone barraCuda v0.3.5), Python parity proven, cross-spring provenance validated, 1,611 tests. V111: barraCuda v0.3.5 upstream rewire + GPU learning system (Exp357-360: PrecisionBrain, HW calibration, stable specials, sovereign dispatch, 88/88). V110: petalTongue visualization pipeline (Exp353-356). V109: upstream API migration, NUCLEUS atomics, 8-tier validation chain proven.
+**Date:** March 11, 2026 (V112 update)
+**Author:** wetSpring V112 (ecoPrimals)
+**Foundation:** 363 experiments, 9,819+ checks, 63 papers reproduced, 150+ primitives (standalone barraCuda v0.3.5), Python parity proven, cross-spring provenance validated, 1,611 tests. V112: NVIDIA hardware learning prototype (Exp361-363: nouveau diagnostic, probe-calibrate-route-apply, adaptive dispatch, 45/45 PASS). V111: barraCuda v0.3.5 upstream rewire + GPU learning system (Exp357-360: PrecisionBrain, HW calibration, stable specials, sovereign dispatch, 88/88). V110: petalTongue visualization pipeline (Exp353-356). V109: upstream API migration, NUCLEUS atomics, 8-tier validation chain proven.
 
 ---
 

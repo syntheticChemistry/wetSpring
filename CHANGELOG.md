@@ -3,6 +3,22 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V112 — NVIDIA Hardware Learning Prototype (2026-03-11)
+
+### Added
+- **NVIDIA hardware learning prototype** — 3 experiments building the probe-calibrate-route-apply pattern:
+  - Exp361: Nouveau RTX 4070 Diagnostic v1 (15/15 PASS) — dual-GPU rig discovery (RTX 4070 nvidia + Titan V nouveau), firmware inventory (AD104 GSP-only, GV100 no GSP), nouveau dispatch (VM_INIT OK, CHANNEL_ALLOC EINVAL on Volta), wgpu baseline (RTX 4070 F32 safe, NVVM risk), petalTongue dispatch dashboard.
+  - Exp362: Hardware Learning Prototype v1 (13/13 PASS) — probe-calibrate-route-apply pattern, HardwareCalibration 4-tier probing, PrecisionBrain 12-domain routing, FMA policy, bio workload CPU/GPU crossover thresholds, VRAM ceiling (12GB max pairwise N≈40K), firmware inventory, machine-readable capability profile JSON (output/hardware_capability_profile.json).
+  - Exp363: Adaptive Dispatch from Hardware Profile v1 (17/17 PASS) — reads capability profile, adaptive workload selection (F32 always, DF64 arith if f64 hw, skip transcendentals on NVVM risk, VRAM-aware scaling), Shannon/Simpson diversity, Anderson eigenvalues, Bray-Curtis at scale. Graceful degradation proven.
+- **Hardware capability profile** — `output/hardware_capability_profile.json` machine-readable recipe: adapter, tiers, domain routing, firmware, thresholds, sovereign status. Consumable by any primal.
+
+### Key Findings
+- RTX 4070 (nvidia proprietary): wgpu/Vulkan dispatch working, F32 safe, DF64/F64 compile+dispatch but transcendentals unsafe (NVVM risk). PrecisionBrain routes all 12 domains to F32.
+- Titan V (nouveau): VM_INIT succeeds (kernel 6.17.9 new UAPI), CHANNEL_ALLOC EINVAL — Volta lacks GSP, PMU firmware missing. Ada (AD104) has GSP-only firmware present.
+- RTX 4070 on nouveau: untested (nvidia proprietary active). This is the highest-ROI next step — Ada GSP should bypass the Volta PMU blocker.
+- Adaptive dispatch correctly: runs F32 (always), runs DF64 arithmetic (f64 hw present), skips F64 transcendentals (NVVM risk), runs large-N (12GB VRAM), skips sovereign (not available).
+- Hardware capability profile format ready for toadStool hw-learn module absorption.
+
 ## V111 — barraCuda v0.3.5 Upstream Rewire + GPU Learning System (2026-03-11)
 
 ### Added

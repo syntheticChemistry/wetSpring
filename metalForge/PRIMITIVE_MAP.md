@@ -5,8 +5,8 @@
 GPU primitive (or explain why it stays CPU-only). This guides the
 absorption pipeline and identifies what ToadStool needs to build next.
 
-> **Mar 11 update (V111):** 150+ primitives consumed. 0 local WGSL, 0 local derivative math (fully lean). 33 petalTongue scenario builders. standalone barraCuda v0.3.5.
-> All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed). Forge crate v0.3.0. 360 experiments, 9,774+ checks (60 NPU). 1,611 tests, 344 binaries, 180 named tolerances, clippy pedantic CLEAN. V111: GPU learning system (Exp357-360: PrecisionBrain, HW calibration, stable specials, sovereign dispatch). V110: petalTongue live viz (Exp353-356). Vault module.
+> **Mar 11 update (V112):** 150+ primitives consumed. 0 local WGSL, 0 local derivative math (fully lean). 33 petalTongue scenario builders. standalone barraCuda v0.3.5.
+> All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed). Forge crate v0.3.0. 363 experiments, 9,819+ checks (60 NPU). 1,611 tests, 347 binaries, 180 named tolerances, clippy pedantic CLEAN. V111: GPU learning system (Exp357-360: PrecisionBrain, HW calibration, stable specials, sovereign dispatch). V112: NVIDIA hardware learning prototype (Exp361-363: nouveau diagnostic, probe-calibrate-route-apply, adaptive dispatch, 45/45 PASS). V110: petalTongue live viz (Exp353-356). Vault module.
 
 ---
 
