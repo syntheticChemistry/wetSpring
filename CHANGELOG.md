@@ -3,6 +3,27 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V111 — barraCuda v0.3.5 Upstream Rewire + GPU Learning System (2026-03-11)
+
+### Added
+- **Upstream rewire** — barraCuda v0.3.3 → v0.3.5 (`0649cd0`), toadStool S146, coralReef Iter 33. ESNConfig SGD fields added. All 1,294 lib tests pass (3 known GPU f32 failures).
+- **New experiments** — 4 experiments validating GPU learning system infrastructure:
+  - Exp357: GPU Hardware Discovery + PrecisionBrain v1 (24/24 PASS) — HardwareCalibration, PrecisionBrain bio routing (Bioinformatics→F32), NVVM transcendental risk detected on RTX 4070, FmaPolicy validation, sovereign probe, petalTongue GPU landscape dashboard.
+  - Exp358: Workload Routing + VRAM-Aware Dispatch v1 (18/18 PASS) — PrecisionBrain advice for 6 bio domains, VRAM estimation (RTX 4070 12GB max pairwise N≈39K), CPU→GPU crossover thresholds, biomeOS/NUCLEUS readiness probing.
+  - Exp359: Stable GPU Specials + Tridiag Eigensolver v1 (34/34 PASS) — log1p_f64, expm1_f64, erfc_f64, bessel_j0_minus1_f64 validated against reference. Tridiagonal QL eigensolver for Anderson lattice (bandwidth scaling with disorder W). anderson_diagonalize convenience wrapper.
+  - Exp360: Sovereign Dispatch Readiness v1 (12/12 PASS) — sovereign-dispatch feature gate probe, Device enum validation, wgpu path confirmed, upstream pin verification. Sovereign path requires coral-gpu crate (not compiled in standard builds).
+- **GPU landscape JSON** — `output/gpu_capability_landscape.json` petalTongue dashboard (tier heatmap, domain routing bar chart, NVVM risk gauge).
+
+### Changed
+- `barracuda/src/bio/esn/toadstool_bridge.rs` — added `sgd_learning_rate`, `sgd_min_iterations`, `sgd_max_iterations` fields to `ESNConfig` constructor (barraCuda v0.3.5 API change).
+
+### Key Findings
+- RTX 4070 (Ada Lovelace, SM89): F32 safe, DF64/F64/F64Precise compile+dispatch but transcendentals unsafe (NVVM poisoning risk). PrecisionBrain routes all bio domains to F32.
+- Stable specials (log1p, expm1, erfc, bessel_j0_minus1) avoid catastrophic cancellation at x=1e-15.
+- Anderson tridiagonal QL eigenvalues: bandwidth scales with disorder W (confirmed for W=1..30).
+- Sovereign dispatch (coralReef) requires coral-gpu crate — not available in standard builds. DRM EINVAL expected on NVIDIA proprietary.
+- VRAM ceiling: 12GB RTX 4070 supports pairwise distance matrices up to ~39K samples.
+
 ## V110 — petalTongue Visualization + Anderson QS Evolution (2026-03-10)
 
 ### Added

@@ -1,6 +1,6 @@
 # wetSpring wateringHole
 
-**Date:** March 10, 2026
+**Date:** March 11, 2026
 **Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records.
 
 ---
@@ -9,6 +9,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
+| **V111** | `handoffs/WETSPRING_V111_GPU_LEARNING_SYSTEM_HANDOFF_MAR11_2026.md` | Mar 11 | barraCuda v0.3.5 upstream rewire + GPU learning system (Exp357-360, 88/88). PrecisionBrain bio routing (F32 on RTX 4070), HW calibration (NVVM risk), stable specials (log1p/expm1/erfc/bessel), tridiagonal QL eigensolver, sovereign dispatch probe. Upstream pins: barraCuda v0.3.5 `0649cd0`, toadStool S146, coralReef Iter 33. |
 | **V110** | `handoffs/WETSPRING_V110_PETALTONGUE_VIZ_PIPELINE_HANDOFF_MAR10_2026.md` | Mar 10 | petalTongue visualization pipeline (Exp353-355, 93/93) + Anderson QS cross-environment validation (Exp356, 18/18). O₂-modulated W model (H3, r=0.851). `stream_ecology` module. 6 JSON scenario artifacts. biomeOS/NUCLEUS readiness probing. Anderson W evolution target for `barracuda::bio::anderson`. |
 | **V109** | `handoffs/WETSPRING_V109_UPSTREAM_REWIRE_NUCLEUS_HANDOFF_MAR10_2026.md` | Mar 10 | Upstream rewire validation (SpringDomain SCREAMING_SNAKE_CASE, sync GPU diversity, DADA2 fix) + mixed hardware (NPU→GPU PCIe bypass, CPU fallback) + NUCLEUS atomics (Tower/Node/Nest via biomeOS graph). 6 experiments (Exp347-352), 145/145 PASS. Absorption: Gompertz/Monod/Haldane → `barracuda::bio::kinetics`, `variance` re-export, spectral CPU fallback. |
 | **V107** | `handoffs/WETSPRING_V107_R_INDUSTRY_PARITY_BARRACUDA_TOADSTOOL_HANDOFF_MAR10_2026.md` | Mar 10 | R industry parity baselines: R/vegan + R/DADA2 + R/phyloseq gold-standard references, 53/53 PASS, `PhyloTree::patristic_distance()`, phyloseq trifurcation bug discovered, weighted UniFrac normalization analysis, 3 new upstream absorption opportunities (CopheneticMatrixGpu, dual-normalization weighted_unifrac, GPU DADA2 error model). |

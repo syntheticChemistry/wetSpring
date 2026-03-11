@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
-**Date:** March 10, 2026
-**Status:** V110 — Validation study active — 9,686+ checks, 1,611 tests (1,157 pass, 3 known GPU f32), 356 experiments, 340 binaries, standalone `barraCuda` v0.3.3 (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, 180 named tolerances, clippy pedantic + nursery ZERO WARNINGS, 63 papers reproduced, all 46 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. V110: petalTongue live visualization pipeline (Exp353-355) + Anderson QS O₂-modulated model (Exp356, H3 r=0.851, 18/18). stream_ecology module, 6 JSON scenario artifacts, biomeOS/NUCLEUS readiness probing.
+**Date:** March 11, 2026
+**Status:** V111 — Validation study active — 9,774+ checks, 1,611 tests (1,294 pass, 3 known GPU f32), 360 experiments, 344 binaries, standalone `barraCuda` v0.3.5 (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, 180 named tolerances, clippy pedantic + nursery ZERO WARNINGS, 63 papers reproduced, all 46 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. V111: barraCuda v0.3.5 upstream rewire + GPU learning system (Exp357-360: PrecisionBrain, HW calibration, stable specials, sovereign dispatch, 88/88). V110: petalTongue visualization (Exp353-356). biomeOS/NUCLEUS readiness probing.
 **License:** AGPL-3.0-or-later
 
 ---

@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 10, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V110 — **1,611 tests** (1,157 pass, 3 known GPU f32 failures), 356 experiments, 9,686+ validation checks. V110: petalTongue visualization pipeline (Exp353–355, stream_ecology, dashboard scenarios) + Anderson QS cross-environment validation (Exp356: O₂-modulated W model, H3 r=0.851). V109: upstream rewire + mixed hardware + NUCLEUS atomics (Exp347-352, 145/145). V108: Track 6 anaerobic digestion, 63 papers complete. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS**. Ecosystem: barraCuda v0.3.3, toadStool S130+, coralReef Phase 10.
+**Status:** V111 — **1,611 tests** (1,294 pass, 3 known GPU f32 failures), 360 experiments, 9,774+ validation checks. V111: barraCuda v0.3.5 upstream rewire + GPU learning system (Exp357–360: PrecisionBrain, HardwareCalibration, stable specials, sovereign dispatch readiness, 88/88). V110: petalTongue visualization pipeline (Exp353–356). V109: upstream rewire + mixed hardware + NUCLEUS atomics (Exp347-352). V108: Track 6 anaerobic digestion, 63 papers complete. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS**. Ecosystem: barraCuda v0.3.5, toadStool S146, coralReef Iter 33.
 
 ---
 

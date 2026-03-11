@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
-**Last Updated**: March 10, 2026
-**Status**: V110 — 9,686+ checks (356 experiments, 340 binaries). V110: petalTongue visualization pipeline (Exp353–355) + Anderson QS cross-environment validation (Exp356: O₂-modulated W, H3 r=0.851, 18/18). V109: upstream rewire + NUCLEUS atomics (Exp347-352). V108: Track 6 anaerobic biogas (63 papers). V107: R industry parity. clippy ZERO WARNINGS.
+**Last Updated**: March 11, 2026
+**Status**: V111 — 9,774+ checks (360 experiments, 344 binaries). V111: barraCuda v0.3.5 upstream rewire + GPU learning system (Exp357-360, 88/88). V110: petalTongue visualization (Exp353-356). V109: upstream rewire + NUCLEUS atomics (Exp347-352). V108: Track 6 (63 papers). V107: R industry parity. clippy ZERO WARNINGS.
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

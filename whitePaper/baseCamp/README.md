@@ -2,7 +2,7 @@
 
 **Date:** March 10, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V110 — 356 experiments, 9,686+ validation checks, ALL PASS; 1,611 tests (1,157 pass, 3 known GPU f32 failures), 340 binaries, standalone `barraCuda` v0.3.3 (wgpu 28, 784+ WGSL shaders), toadStool S142+, coralReef Iteration 29. V110: petalTongue visualization pipeline (Exp353-355, 93/93) + Anderson QS cross-environment validation (Exp356: O₂-modulated W, H3 r=0.851, 18/18). `stream_ecology` module, 6 JSON scenario artifacts. V109: upstream rewire + mixed hardware + NUCLEUS atomics (Exp347-352, 145/145). V108: Track 6 anaerobic biogas — Gompertz/Monod/Haldane kinetics. V107: R industry parity (53/53). 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL, 180 tolerances, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS.
+**Status:** V111 — 360 experiments, 9,774+ validation checks, ALL PASS; 1,611 tests (1,294 pass, 3 known GPU f32 failures), 344 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 784+ WGSL shaders), toadStool S146, coralReef Iter 33. V111: barraCuda v0.3.5 upstream rewire + GPU learning system (Exp357-360: PrecisionBrain, HW calibration, stable specials, sovereign dispatch, 88/88). V110: petalTongue visualization pipeline (Exp353-356). V109: upstream rewire + mixed hardware + NUCLEUS atomics (Exp347-352, 145/145). V108: Track 6 anaerobic biogas. V107: R industry parity (53/53). 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL, 180 tolerances, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS.
 
 ---
 

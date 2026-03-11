@@ -122,6 +122,9 @@ impl BioEsnConfig {
             leak_rate: self.leak_rate as f32,
             regularization: self.regularization as f32,
             seed: self.seed,
+            sgd_learning_rate: 0.01,
+            sgd_min_iterations: 50,
+            sgd_max_iterations: 1000,
         }
     }
 

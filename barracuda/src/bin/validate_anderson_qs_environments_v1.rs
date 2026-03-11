@@ -61,7 +61,7 @@ use barracuda::stats::norm_cdf;
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::visualization::{
-    scenario_to_json, DataChannel, EcologyScenario, ScenarioEdge, ScenarioNode, ScientificRange,
+    DataChannel, EcologyScenario, ScenarioEdge, ScenarioNode, ScientificRange, scenario_to_json,
 };
 
 /// Environment profile with literature-based community + O₂ regime.
@@ -113,7 +113,10 @@ fn main() {
             name: "Human Gut (Healthy)",
             o2_regime: "anaerobic",
             o2_level: 0.001,
-            community: vec![200.0, 150.0, 120.0, 80.0, 60.0, 40.0, 30.0, 20.0, 15.0, 10.0, 8.0, 5.0, 3.0, 2.0, 1.0],
+            community: vec![
+                200.0, 150.0, 120.0, 80.0, 60.0, 40.0, 30.0, 20.0, 15.0, 10.0, 8.0, 5.0, 3.0, 2.0,
+                1.0,
+            ],
             known_qs_prevalence: "HIGH",
             qs_score: 0.80,
             _notes: "AI-2 universal, luxS in >50% species; Firmicutes AIP",
@@ -140,7 +143,10 @@ fn main() {
             name: "Rhizosphere Soil",
             o2_regime: "variable aerobic",
             o2_level: 0.15,
-            community: vec![80.0, 75.0, 65.0, 55.0, 45.0, 35.0, 25.0, 15.0, 12.0, 10.0, 8.0, 6.0, 5.0, 4.0, 3.0, 2.0, 2.0, 1.0, 1.0, 1.0],
+            community: vec![
+                80.0, 75.0, 65.0, 55.0, 45.0, 35.0, 25.0, 15.0, 12.0, 10.0, 8.0, 6.0, 5.0, 4.0,
+                3.0, 2.0, 2.0, 1.0, 1.0, 1.0,
+            ],
             known_qs_prevalence: "MODERATE",
             qs_score: 0.55,
             _notes: "Root exudate hotspot; AHL producers common but diluted",
@@ -149,7 +155,10 @@ fn main() {
             name: "Ocean Surface (Open)",
             o2_regime: "fully aerobic",
             o2_level: 0.21,
-            community: vec![50.0, 45.0, 40.0, 35.0, 30.0, 25.0, 20.0, 18.0, 15.0, 12.0, 10.0, 8.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+            community: vec![
+                50.0, 45.0, 40.0, 35.0, 30.0, 25.0, 20.0, 18.0, 15.0, 12.0, 10.0, 8.0, 6.0, 5.0,
+                4.0, 3.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+            ],
             known_qs_prevalence: "LOW-MODERATE",
             qs_score: 0.35,
             _notes: "High dilution, Roseobacter AHL but signal disperses rapidly",
@@ -158,7 +167,10 @@ fn main() {
             name: "Bulk Soil (Grassland)",
             o2_regime: "aerobic",
             o2_level: 0.18,
-            community: vec![30.0, 28.0, 25.0, 22.0, 20.0, 18.0, 15.0, 13.0, 11.0, 10.0, 9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 4.0, 3.0, 3.0, 2.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+            community: vec![
+                30.0, 28.0, 25.0, 22.0, 20.0, 18.0, 15.0, 13.0, 11.0, 10.0, 9.0, 8.0, 7.0, 6.0,
+                5.0, 4.0, 4.0, 3.0, 3.0, 2.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+            ],
             known_qs_prevalence: "LOW",
             qs_score: 0.25,
             _notes: "Extreme diversity, AHL lactonases degrade signals, spatial isolation",
@@ -176,7 +188,9 @@ fn main() {
             name: "Deep-Sea Hydrothermal",
             o2_regime: "anaerobic",
             o2_level: 0.0,
-            community: vec![150.0, 120.0, 80.0, 50.0, 30.0, 20.0, 15.0, 10.0, 5.0, 3.0, 2.0, 1.0],
+            community: vec![
+                150.0, 120.0, 80.0, 50.0, 30.0, 20.0, 15.0, 10.0, 5.0, 3.0, 2.0, 1.0,
+            ],
             known_qs_prevalence: "MODERATE-HIGH",
             qs_score: 0.65,
             _notes: "Dense communities around vents, AI-2 in Epsilonproteobacteria",
@@ -213,7 +227,10 @@ fn main() {
             known_qs: env.known_qs_prevalence.to_string(),
             qs_score: env.qs_score,
         });
-        println!("  {}: H'={h:.3}, D={d:.3}, S={obs:.0}, O₂={:.3}, QS={}", env.name, env.o2_level, env.known_qs_prevalence);
+        println!(
+            "  {}: H'={h:.3}, D={d:.3}, S={obs:.0}, O₂={:.3}, QS={}",
+            env.name, env.o2_level, env.known_qs_prevalence
+        );
     }
 
     v.check_pass("all 10 environments computed", results.len() == 10);
@@ -223,7 +240,12 @@ fn main() {
     );
     v.check_pass(
         "bulk soil has highest diversity",
-        results.iter().max_by(|a, b| a.h_prime.partial_cmp(&b.h_prime).unwrap()).unwrap().name.contains("Bulk Soil"),
+        results
+            .iter()
+            .max_by(|a, b| a.h_prime.partial_cmp(&b.h_prime).unwrap())
+            .unwrap()
+            .name
+            .contains("Bulk Soil"),
     );
 
     // ── S2: Three W parameterizations ──
@@ -250,14 +272,20 @@ fn main() {
 
     let p_qs = |w: f64| -> f64 { norm_cdf((16.5 - w) / 3.0) };
 
-    println!("\n  {:30} {:>5} {:>5}  {:>7} {:>7} {:>7}  {:>7} {:>7} {:>7}  {:>10}",
-        "Environment", "H'", "O₂", "W(H1)", "W(H2)", "W(H3)", "P1", "P2", "P3", "Known QS");
+    println!(
+        "\n  {:30} {:>5} {:>5}  {:>7} {:>7} {:>7}  {:>7} {:>7} {:>7}  {:>10}",
+        "Environment", "H'", "O₂", "W(H1)", "W(H2)", "W(H3)", "P1", "P2", "P3", "Known QS"
+    );
     println!("  {}", "-".repeat(120));
 
     struct ModelResult {
         name: String,
-        _w1: f64, _w2: f64, _w3: f64,
-        p1: f64, p2: f64, p3: f64,
+        _w1: f64,
+        _w2: f64,
+        _w3: f64,
+        p1: f64,
+        p2: f64,
+        p3: f64,
         known_qs_score: f64,
     }
 
@@ -271,12 +299,19 @@ fn main() {
         let p2 = p_qs(w2);
         let p3 = p_qs(w3);
 
-        println!("  {:30} {:5.2} {:5.3}  {:7.2} {:7.2} {:7.2}  {:7.3} {:7.3} {:7.3}  {} ({:.2})",
-            r.name, r.h_prime, r.o2_level, w1, w2, w3, p1, p2, p3, r.known_qs, r.qs_score);
+        println!(
+            "  {:30} {:5.2} {:5.3}  {:7.2} {:7.2} {:7.2}  {:7.3} {:7.3} {:7.3}  {} ({:.2})",
+            r.name, r.h_prime, r.o2_level, w1, w2, w3, p1, p2, p3, r.known_qs, r.qs_score
+        );
 
         model_results.push(ModelResult {
             name: r.name.clone(),
-            _w1: w1, _w2: w2, _w3: w3, p1, p2, p3,
+            _w1: w1,
+            _w2: w2,
+            _w3: w3,
+            p1,
+            p2,
+            p3,
             known_qs_score: r.qs_score,
         });
     }
@@ -298,7 +333,9 @@ fn main() {
             var_p += dp * dp;
             var_k += dk * dk;
         }
-        if var_p < 1e-12 || var_k < 1e-12 { return 0.0; }
+        if var_p < 1e-12 || var_k < 1e-12 {
+            return 0.0;
+        }
         cov / (var_p.sqrt() * var_k.sqrt())
     }
 
@@ -351,7 +388,11 @@ fn main() {
 
     // H2/H3 should predict: monoculture > biofilm > gut > digester > rhizosphere > ocean > soil
     println!("\n  Using best model predictions:");
-    let use_p = if corr_h3 >= corr_h2 { &p3_vals } else { &p2_vals };
+    let use_p = if corr_h3 >= corr_h2 {
+        &p3_vals
+    } else {
+        &p2_vals
+    };
 
     v.check_pass(
         "monoculture E. coli has highest P(QS)",
@@ -370,54 +411,116 @@ fn main() {
         use_p[digester_idx] > use_p[bulk_soil_idx],
     );
 
-    println!("  E. coli monoculture:  P(QS) = {:.3}  (expected: ~0.95)", use_p[ecoli_idx]);
-    println!("  P. aeruginosa film:   P(QS) = {:.3}  (expected: ~0.90)", use_p[biofilm_idx]);
-    println!("  Healthy gut:          P(QS) = {:.3}  (expected: ~0.80)", use_p[gut_idx]);
-    println!("  Anaerobic digester:   P(QS) = {:.3}  (expected: ~0.70)", use_p[digester_idx]);
-    println!("  Bulk soil (aerobic):  P(QS) = {:.3}  (expected: ~0.25)", use_p[bulk_soil_idx]);
-    println!("  Ocean surface:        P(QS) = {:.3}  (expected: ~0.35)", use_p[ocean_idx]);
+    println!(
+        "  E. coli monoculture:  P(QS) = {:.3}  (expected: ~0.95)",
+        use_p[ecoli_idx]
+    );
+    println!(
+        "  P. aeruginosa film:   P(QS) = {:.3}  (expected: ~0.90)",
+        use_p[biofilm_idx]
+    );
+    println!(
+        "  Healthy gut:          P(QS) = {:.3}  (expected: ~0.80)",
+        use_p[gut_idx]
+    );
+    println!(
+        "  Anaerobic digester:   P(QS) = {:.3}  (expected: ~0.70)",
+        use_p[digester_idx]
+    );
+    println!(
+        "  Bulk soil (aerobic):  P(QS) = {:.3}  (expected: ~0.25)",
+        use_p[bulk_soil_idx]
+    );
+    println!(
+        "  Ocean surface:        P(QS) = {:.3}  (expected: ~0.35)",
+        use_p[ocean_idx]
+    );
 
     // ── S5: Aerobic vs anaerobic aggregate comparison ──
     println!("\n── S5: Aerobic vs anaerobic aggregate ──");
 
-    let aerobic_envs: Vec<usize> = results.iter().enumerate()
+    let aerobic_envs: Vec<usize> = results
+        .iter()
+        .enumerate()
         .filter(|(_, r)| r.o2_level > 0.10)
         .map(|(i, _)| i)
         .collect();
-    let anaerobic_envs: Vec<usize> = results.iter().enumerate()
+    let anaerobic_envs: Vec<usize> = results
+        .iter()
+        .enumerate()
         .filter(|(_, r)| r.o2_level < 0.01)
         .map(|(i, _)| i)
         .collect();
-    let microaerobic_envs: Vec<usize> = results.iter().enumerate()
+    let microaerobic_envs: Vec<usize> = results
+        .iter()
+        .enumerate()
         .filter(|(_, r)| r.o2_level >= 0.01 && r.o2_level <= 0.10)
         .map(|(i, _)| i)
         .collect();
 
     let mean_p = |indices: &[usize], vals: &[f64]| -> f64 {
-        if indices.is_empty() { return 0.0; }
+        if indices.is_empty() {
+            return 0.0;
+        }
         indices.iter().map(|&i| vals[i]).sum::<f64>() / indices.len() as f64
     };
 
     println!("  Model H1 (inverse diversity):");
-    println!("    Aerobic mean P(QS):       {:.3}", mean_p(&aerobic_envs, &p1_vals));
-    println!("    Microaerobic mean P(QS):  {:.3}", mean_p(&microaerobic_envs, &p1_vals));
-    println!("    Anaerobic mean P(QS):     {:.3}", mean_p(&anaerobic_envs, &p1_vals));
+    println!(
+        "    Aerobic mean P(QS):       {:.3}",
+        mean_p(&aerobic_envs, &p1_vals)
+    );
+    println!(
+        "    Microaerobic mean P(QS):  {:.3}",
+        mean_p(&microaerobic_envs, &p1_vals)
+    );
+    println!(
+        "    Anaerobic mean P(QS):     {:.3}",
+        mean_p(&anaerobic_envs, &p1_vals)
+    );
 
     println!("  Model H2 (signal dilution):");
-    println!("    Aerobic mean P(QS):       {:.3}", mean_p(&aerobic_envs, &p2_vals));
-    println!("    Microaerobic mean P(QS):  {:.3}", mean_p(&microaerobic_envs, &p2_vals));
-    println!("    Anaerobic mean P(QS):     {:.3}", mean_p(&anaerobic_envs, &p2_vals));
+    println!(
+        "    Aerobic mean P(QS):       {:.3}",
+        mean_p(&aerobic_envs, &p2_vals)
+    );
+    println!(
+        "    Microaerobic mean P(QS):  {:.3}",
+        mean_p(&microaerobic_envs, &p2_vals)
+    );
+    println!(
+        "    Anaerobic mean P(QS):     {:.3}",
+        mean_p(&anaerobic_envs, &p2_vals)
+    );
 
     println!("  Model H3 (O₂-modulated):");
-    println!("    Aerobic mean P(QS):       {:.3}", mean_p(&aerobic_envs, &p3_vals));
-    println!("    Microaerobic mean P(QS):  {:.3}", mean_p(&microaerobic_envs, &p3_vals));
-    println!("    Anaerobic mean P(QS):     {:.3}", mean_p(&anaerobic_envs, &p3_vals));
+    println!(
+        "    Aerobic mean P(QS):       {:.3}",
+        mean_p(&aerobic_envs, &p3_vals)
+    );
+    println!(
+        "    Microaerobic mean P(QS):  {:.3}",
+        mean_p(&microaerobic_envs, &p3_vals)
+    );
+    println!(
+        "    Anaerobic mean P(QS):     {:.3}",
+        mean_p(&anaerobic_envs, &p3_vals)
+    );
 
     let known_qs: Vec<f64> = results.iter().map(|r| r.qs_score).collect();
     println!("  Known biology:");
-    println!("    Aerobic mean QS score:       {:.3}", mean_p(&aerobic_envs, &known_qs));
-    println!("    Microaerobic mean QS score:  {:.3}", mean_p(&microaerobic_envs, &known_qs));
-    println!("    Anaerobic mean QS score:     {:.3}", mean_p(&anaerobic_envs, &known_qs));
+    println!(
+        "    Aerobic mean QS score:       {:.3}",
+        mean_p(&aerobic_envs, &known_qs)
+    );
+    println!(
+        "    Microaerobic mean QS score:  {:.3}",
+        mean_p(&microaerobic_envs, &known_qs)
+    );
+    println!(
+        "    Anaerobic mean QS score:     {:.3}",
+        mean_p(&anaerobic_envs, &known_qs)
+    );
 
     // The user's intuition: anaerobic should show MORE QS than aerobic
     let known_anaerobic = mean_p(&anaerobic_envs, &known_qs);
@@ -439,9 +542,12 @@ fn main() {
     println!("\n── S6: Mean absolute error (P(QS) vs known QS score) ──");
 
     let mae = |predicted: &[f64], known: &[f64]| -> f64 {
-        predicted.iter().zip(known.iter())
+        predicted
+            .iter()
+            .zip(known.iter())
             .map(|(p, k)| (p - k).abs())
-            .sum::<f64>() / predicted.len() as f64
+            .sum::<f64>()
+            / predicted.len() as f64
     };
 
     let mae_h1 = mae(&p1_vals, &known);
@@ -460,7 +566,8 @@ fn main() {
 
     let mut scenario = EcologyScenario {
         name: "Anderson QS: Model Comparison Across Environments".into(),
-        description: "Three W parameterizations tested against known QS biology in 10 environments".into(),
+        description: "Three W parameterizations tested against known QS biology in 10 environments"
+            .into(),
         version: "1.0.0".into(),
         mode: "live-ecosystem".into(),
         domain: "ecology".into(),
@@ -475,7 +582,8 @@ fn main() {
         node_type: "compute".into(),
         family: "wetspring".into(),
         status: "healthy".into(),
-        health: 100, confidence: 100,
+        health: 100,
+        confidence: 100,
         capabilities: vec!["science.anderson".into(), "science.validation".into()],
         data_channels: vec![],
         scientific_ranges: vec![],
@@ -531,19 +639,34 @@ fn main() {
         node_type: "compute".into(),
         family: "wetspring".into(),
         status: "healthy".into(),
-        health: 100, confidence: 100,
+        health: 100,
+        confidence: 100,
         capabilities: vec!["science.anderson.oxygen".into()],
         data_channels: vec![],
         scientific_ranges: vec![
-            ScientificRange { label: "Anaerobic QS zone".into(), min: 0.6, max: 1.0, status: "normal".into() },
-            ScientificRange { label: "Aerobic dilution zone".into(), min: 0.0, max: 0.4, status: "warning".into() },
+            ScientificRange {
+                label: "Anaerobic QS zone".into(),
+                min: 0.6,
+                max: 1.0,
+                status: "normal".into(),
+            },
+            ScientificRange {
+                label: "Aerobic dilution zone".into(),
+                min: 0.0,
+                max: 0.4,
+                status: "warning".into(),
+            },
         ],
     };
     o2_node.data_channels.push(DataChannel::Bar {
         id: "regime_means".into(),
         label: "Mean P(QS) by O₂ Regime (H3)".into(),
         categories: vec!["Anaerobic".into(), "Microaerobic".into(), "Aerobic".into()],
-        values: vec![h3_anaerobic, mean_p(&microaerobic_envs, &p3_vals), h3_aerobic],
+        values: vec![
+            h3_anaerobic,
+            mean_p(&microaerobic_envs, &p3_vals),
+            h3_aerobic,
+        ],
         unit: "P(QS)".into(),
     });
 
@@ -567,7 +690,8 @@ fn main() {
         node_type: "compute".into(),
         family: "wetspring".into(),
         status: "healthy".into(),
-        health: 100, confidence: 100,
+        health: 100,
+        confidence: 100,
         capabilities: vec!["science.validation".into()],
         data_channels: vec![],
         scientific_ranges: vec![],
@@ -576,7 +700,8 @@ fn main() {
         id: "corr_h1".into(),
         label: "H1 Correlation (inverse)".into(),
         value: corr_h1,
-        min: -1.0, max: 1.0,
+        min: -1.0,
+        max: 1.0,
         unit: "r".into(),
         normal_range: [0.7, 1.0],
         warning_range: [-1.0, 0.7],
@@ -585,7 +710,8 @@ fn main() {
         id: "corr_h2".into(),
         label: "H2 Correlation (dilution)".into(),
         value: corr_h2,
-        min: -1.0, max: 1.0,
+        min: -1.0,
+        max: 1.0,
         unit: "r".into(),
         normal_range: [0.7, 1.0],
         warning_range: [-1.0, 0.7],
@@ -594,7 +720,8 @@ fn main() {
         id: "corr_h3".into(),
         label: "H3 Correlation (O₂-modulated)".into(),
         value: corr_h3,
-        min: -1.0, max: 1.0,
+        min: -1.0,
+        max: 1.0,
         unit: "r".into(),
         normal_range: [0.7, 1.0],
         warning_range: [-1.0, 0.7],
@@ -603,7 +730,8 @@ fn main() {
         id: "mae_h3".into(),
         label: "H3 Mean Absolute Error".into(),
         value: mae_h3,
-        min: 0.0, max: 0.5,
+        min: 0.0,
+        max: 0.5,
         unit: "MAE".into(),
         normal_range: [0.0, 0.15],
         warning_range: [0.15, 0.3],
@@ -611,8 +739,18 @@ fn main() {
     scenario.nodes.push(corr_node);
 
     scenario.edges = vec![
-        ScenarioEdge { from: "model_comparison".into(), to: "o2_regimes".into(), edge_type: "data_flow".into(), label: "model → O₂ analysis".into() },
-        ScenarioEdge { from: "model_comparison".into(), to: "correlations".into(), edge_type: "validation".into(), label: "predictions → correlation".into() },
+        ScenarioEdge {
+            from: "model_comparison".into(),
+            to: "o2_regimes".into(),
+            edge_type: "data_flow".into(),
+            label: "model → O₂ analysis".into(),
+        },
+        ScenarioEdge {
+            from: "model_comparison".into(),
+            to: "correlations".into(),
+            edge_type: "validation".into(),
+            label: "predictions → correlation".into(),
+        },
     ];
 
     let json = scenario_to_json(&scenario).expect("serialize");
@@ -640,9 +778,24 @@ fn main() {
     println!("  │ reduce transcriptional noise for QS operons under low    │");
     println!("  │ O₂. Captures gut > ocean, digester > soil.               │");
     println!("  │                                                           │");
-    println!("  │ Best model: {} (r={:.3}, MAE={:.3})    │", best_model, 
-        if best_model.contains("H3") { corr_h3 } else if best_model.contains("H2") { corr_h2 } else { corr_h1 },
-        if best_model.contains("H3") { mae_h3 } else if best_model.contains("H2") { mae_h2 } else { mae_h1 });
+    println!(
+        "  │ Best model: {} (r={:.3}, MAE={:.3})    │",
+        best_model,
+        if best_model.contains("H3") {
+            corr_h3
+        } else if best_model.contains("H2") {
+            corr_h2
+        } else {
+            corr_h1
+        },
+        if best_model.contains("H3") {
+            mae_h3
+        } else if best_model.contains("H2") {
+            mae_h2
+        } else {
+            mae_h1
+        }
+    );
     println!("  └───────────────────────────────────────────────────────────┘");
 
     println!("\n  Implication: the Anderson QS model needs BOTH diversity");

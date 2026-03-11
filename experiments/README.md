@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-10 (V110: 356 experiments, 340 binaries, 9,686+ checks. V110: petalTongue visualization pipeline (Exp353–355) + Anderson QS cross-environment validation (Exp356: O₂-modulated W, H3 r=0.851). V109: upstream rewire + mixed hardware + NUCLEUS. V108: Track 6, 63 papers. V107: R industry parity. 1,611 tests, clippy ZERO WARNINGS.)
+**Updated**: 2026-03-11 (V111: 360 experiments, 344 binaries, 9,774+ checks. V111: barraCuda v0.3.5 upstream rewire + GPU learning system (Exp357–360: PrecisionBrain, HW calibration, stable specials, sovereign dispatch, 88/88). V110: petalTongue visualization + Anderson QS (Exp353-356). V109: upstream rewire + mixed hardware + NUCLEUS. V108: Track 6, 63 papers. V107: R industry parity. 1,611 tests, clippy ZERO WARNINGS.)
 
 ---
 
@@ -596,7 +596,23 @@ H1 (inverse diversity, r=-0.575) refuted. H2 (signal dilution, r=+0.812) and
 H3 (O₂-modulated, r=+0.851) validated. Oxygen adds second disorder dimension:
 anaerobic communities have lower effective W, explaining higher QS prevalence.
 
-**Totals: 356 experiments, 340 binaries, 9,686+ checks.**
+### V111 — barraCuda v0.3.5 Upstream Rewire + GPU Learning System (March 2026)
+
+Exp357-360: barraCuda v0.3.5 upstream rewire validated, GPU learning system
+infrastructure probed. PrecisionBrain routes bio workloads to optimal precision
+tiers. HardwareCalibration discovers RTX 4070 capabilities. Stable specials
+avoid catastrophic cancellation. Sovereign dispatch readiness assessed.
+
+| Exp | Name | Domains | Checks | Key Finding |
+|:---:|------|:-------:|:------:|-------------|
+| 357 | GPU Hardware Discovery + PrecisionBrain v1 | D71-D75 | 24 | RTX 4070: F32 safe, NVVM transcendental risk on DF64/F64/F64Precise. Bio→F32. |
+| 358 | Workload Routing + VRAM-Aware Dispatch v1 | D76-D79 | 18 | 12GB max pairwise N≈39K. CPU→GPU crossover modeled. NUCLEUS probed. |
+| 359 | Stable GPU Specials + Tridiag Eigensolver v1 | D80-D82 | 34 | log1p/expm1/erfc/bessel_j0_minus1 validated. Anderson QL bandwidth scales with W. |
+| 360 | Sovereign Dispatch Readiness v1 | D83-D86 | 12 | sovereign-dispatch not compiled in (expected). wgpu path confirmed. v0.3.5 pin verified. |
+
+JSON artifact: output/gpu_capability_landscape.json (petalTongue tier heatmap + domain routing).
+
+**Totals: 360 experiments, 344 binaries, 9,774+ checks.**
 
 ---
 
