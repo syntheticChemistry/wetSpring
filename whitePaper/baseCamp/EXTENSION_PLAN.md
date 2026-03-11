@@ -1,8 +1,8 @@
 # baseCamp Extension Plan: From Validated Math to Real-World Science
 
-**Date:** March 10, 2026 (V109 update)
-**Author:** wetSpring V109 (ecoPrimals)
-**Foundation:** 352 experiments, 9,575+ checks, 63 papers reproduced, 150+ primitives (standalone barraCuda v0.3.3), Python parity proven, cross-spring provenance validated (Exp271: 73/73, 6 springs + Exp272: 64/64, 7 springs + Exp305: 59/59, cross-spring evolution), 1,605 tests, Paper 12: full three-tier immunological Anderson, Paper 16: Stage 1 computational foundation complete (Track 6 anaerobic biogas, Exp336-346, 183 checks). V109: upstream API migration complete, NUCLEUS atomics validated (Tower/Node/Nest via biomeOS graph), 8-tier validation chain proven.
+**Date:** March 10, 2026 (V110 update)
+**Author:** wetSpring V110 (ecoPrimals)
+**Foundation:** 356 experiments, 9,686+ checks, 63 papers reproduced, 150+ primitives (standalone barraCuda v0.3.3), Python parity proven, cross-spring provenance validated (Exp271: 73/73, 6 springs + Exp272: 64/64, 7 springs + Exp305: 59/59, cross-spring evolution), 1,611 tests. V110: petalTongue visualization pipeline (Exp353-355) + Anderson QS cross-environment validation (Exp356: O₂-modulated W, H3 r=0.851) — live dashboards, JSON scenario export, stream_ecology module. V109: upstream API migration, NUCLEUS atomics (Tower/Node/Nest via biomeOS graph), 8-tier validation chain proven.
 
 ---
 

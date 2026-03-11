@@ -13,6 +13,7 @@ pub mod ipc_push;
 pub mod live_pipeline;
 pub mod scenarios;
 pub mod stream;
+pub mod stream_ecology;
 mod types;
 
 pub use types::*;

@@ -3,6 +3,21 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V110 — petalTongue Visualization + Anderson QS Evolution (2026-03-10)
+
+### Added
+- **New experiments** — 4 experiments validating petalTongue visualization and Anderson model evolution:
+  - Exp353: petalTongue Live Ecology Dashboard v1 (54/54 PASS) — first live visualization, all 9 DataChannel types, IPC push, StreamSession, biomeOS/NUCLEUS readiness.
+  - Exp354: Anderson QS Landscape v1 (21/21 PASS) — flagship visualization, 5 biomes, diversity→disorder→P(QS), FieldMap lattice, 21KB scenario.
+  - Exp355: petalTongue Biogas Dashboard v1 (18/18 PASS) — Track 6 kinetics (Gompertz, Monod, Haldane), 3 feedstocks, operational envelopes.
+  - Exp356: Anderson QS Cross-Environment Validation v1 (18/18 PASS) — tests 3 W parameterizations against 10 environments; O₂-modulated model (H3, r=0.851) outperforms original (H1, r=-0.575). Diversity IS disorder (signal dilution), oxygen adds second dimension.
+- **New module: `stream_ecology.rs`** — ecology-specific StreamSession methods: `push_diversity_frame`, `push_bray_curtis_update`, `push_rarefaction_point`, `push_anderson_w`, `push_kinetics_step`. 6 tests.
+- **JSON scenario artifacts** — `ecology_dashboard.json`, `anderson_qs_landscape.json`, `anderson_qs_landscape_full.json`, `amplicon_pipeline.json`, `biogas_kinetics_dashboard.json`, `anderson_qs_model_comparison.json`.
+
+### Key Findings
+- **Anderson W model evolution:** The original inverse-diversity W mapping is wrong for cross-environment QS prediction. W = 3.5·H' + 8·O₂ (H3) captures both signal dilution and FNR/ArcAB/Rex-mediated QS regulation. Testable with paired 16S/metatranscriptome data.
+- `petaltongue ui --scenario` loads any dashboard for offline viewing.
+
 ## V109 — Upstream Rewire + NUCLEUS Atomics Validation Chain (2026-03-10)
 
 ### Added

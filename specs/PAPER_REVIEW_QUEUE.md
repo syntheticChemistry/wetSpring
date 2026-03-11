@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: March 10, 2026 (V109 — 352 experiments, 9,575+ checks, 63 papers complete + 6 reproduced. V109: upstream rewire validation + mixed hardware (NPU→GPU PCIe bypass) + NUCLEUS atomics (Tower/Node/Nest via biomeOS). 6 new experiments (Exp347-352), 145 new checks. V108: Track 6 anaerobic digestion, 5 papers, full 6-tier chain. All 46 three-tier eligible papers validated. barraCuda v0.3.3, clippy ZERO WARNINGS)
+**Last Updated**: March 10, 2026 (V110 — 356 experiments, 9,686+ checks, 63 papers complete + 6 reproduced. V110: petalTongue visualization (Exp353-355) + Anderson QS O₂-modulated model (Exp356, H3 r=0.851). V109: upstream rewire + mixed hardware + NUCLEUS (Exp347-352, 145/145). V108: Track 6 anaerobic digestion, 63 papers, full 6-tier chain. All 46 three-tier eligible papers validated. barraCuda v0.3.3, clippy ZERO WARNINGS)
 **Purpose**: Track papers for reproduction/review across five tracks
 
 ---

@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: March 10, 2026
-**Status**: V109 — 9,575+ checks (352 experiments, 336 binaries). V109: upstream rewire validation (SpringDomain SCREAMING_SNAKE_CASE, sync GPU diversity, DADA2 fix) + mixed hardware (NPU→GPU PCIe bypass, CPU fallback) + NUCLEUS atomics (Tower/Node/Nest via biomeOS graph). 6 new experiments (Exp347-352), 145 new checks. V108: Track 6 anaerobic biogas (5 Liao papers, 63 total). V107: R industry parity. clippy ZERO WARNINGS.
+**Status**: V110 — 9,686+ checks (356 experiments, 340 binaries). V110: petalTongue visualization pipeline (Exp353–355) + Anderson QS cross-environment validation (Exp356: O₂-modulated W, H3 r=0.851, 18/18). V109: upstream rewire + NUCLEUS atomics (Exp347-352). V108: Track 6 anaerobic biogas (63 papers). V107: R industry parity. clippy ZERO WARNINGS.
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

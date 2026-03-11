@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
-**Date:** March 9, 2026
-**Status:** V109 — Validation study active — 9,200+ checks, 1,288 lib + 219 integration tests, 334 experiments, 318 binaries, standalone `barraCuda` v0.3.3 `a898dee` (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, 179 named tolerances, clippy pedantic + nursery ZERO WARNINGS, 52 papers reproduced, all 39 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. petalTongue V2: 9 DataChannel types, 33 scenario builders, 4 composite full-pipeline, UiConfig/BackpressureConfig, StreamSession with backpressure, Songbird, wetspring_dashboard scientist binary.
+**Date:** March 10, 2026
+**Status:** V110 — Validation study active — 9,686+ checks, 1,611 tests (1,157 pass, 3 known GPU f32), 356 experiments, 340 binaries, standalone `barraCuda` v0.3.3 (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, 180 named tolerances, clippy pedantic + nursery ZERO WARNINGS, 63 papers reproduced, all 46 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. V110: petalTongue live visualization pipeline (Exp353-355) + Anderson QS O₂-modulated model (Exp356, H3 r=0.851, 18/18). stream_ecology module, 6 JSON scenario artifacts, biomeOS/NUCLEUS readiness probing.
 **License:** AGPL-3.0-or-later
 
 ---

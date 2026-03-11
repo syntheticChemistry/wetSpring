@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 10, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V109 — **1,605 tests** (1,151 pass, 3 known GPU f32 failures), 352 experiments, 9,575+ validation checks. V109: upstream rewire validation (SpringDomain SCREAMING_SNAKE_CASE, sync GPU diversity, DADA2 fix) + mixed hardware (NPU→GPU PCIe bypass, CPU fallback) + NUCLEUS atomics (Tower/Node/Nest via biomeOS graph). 6 new experiments (Exp347-352), 145 new checks. V108: Track 6 anaerobic digestion, 63 papers complete. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS**. Ecosystem: barraCuda v0.3.3, toadStool S130+, coralReef Phase 10.
+**Status:** V110 — **1,611 tests** (1,157 pass, 3 known GPU f32 failures), 356 experiments, 9,686+ validation checks. V110: petalTongue visualization pipeline (Exp353–355, stream_ecology, dashboard scenarios) + Anderson QS cross-environment validation (Exp356: O₂-modulated W model, H3 r=0.851). V109: upstream rewire + mixed hardware + NUCLEUS atomics (Exp347-352, 145/145). V108: Track 6 anaerobic digestion, 63 papers complete. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS**. Ecosystem: barraCuda v0.3.3, toadStool S130+, coralReef Phase 10.
 
 ---
 
@@ -139,7 +139,7 @@ integration point.
 | Integration tests | 72 |
 | **Total Rust tests** | **1,605** (lib + forge + integration + doc) |
 | Library code coverage | **94.01% line** (barracuda), **88.78% line** (forge) (cargo-llvm-cov) |
-| Experiments completed | 334 |
+| Experiments completed | 355 |
 | Validation/benchmark binaries | 318 |
 | CPU bio modules | 47 |
 | GPU bio modules | 47 (30 lean + 5 write→lean + 7 compose + 0 passthrough + 5 visualization) |
@@ -668,7 +668,7 @@ Rust 1.93 fixed across 20+ validation binaries.
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy -W pedantic -W nursery` | **Zero warnings** (pedantic + nursery clean) |
 | `cargo doc --no-deps` | Clean (0 warnings) |
-| Line coverage (`cargo-llvm-cov`) | **94.01% line** (barracuda), **88.78% line** (forge) (1,605 tests) |
+| Line coverage (`cargo-llvm-cov`) | **94.01% line** (barracuda), **88.78% line** (forge) (1,611 tests) |
 | `#![forbid(unsafe_code)]` | **Enforced on all 320 crate roots** (2 lib + 318 bin; edition 2024) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | **Enforced crate-wide** |
 | TODO/FIXME markers | **0** |
@@ -787,7 +787,7 @@ wetSpring/
 │   │   ├── visualization/       ← petalTongue schema types, 13 scenario builders, StreamSession, Songbird
 │   │   └── vault/               ← encrypted consent-gated data storage
 │   └── rustfmt.toml             ← max_width = 100, edition = 2024
-├── experiments/                   ← 334 experiment protocols + results
+├── experiments/                   ← 355 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
 │   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs, bridge.rs

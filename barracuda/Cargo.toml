@@ -1780,3 +1780,19 @@ path = "src/bin/validate_metalforge_v19.rs"
 name = "validate_nucleus_v4"
 path = "src/bin/validate_nucleus_v4.rs"
 required-features = ["ipc"]
+
+[[bin]]
+name = "validate_petaltongue_live_v1"
+path = "src/bin/validate_petaltongue_live_v1.rs"
+
+[[bin]]
+name = "validate_petaltongue_anderson_v1"
+path = "src/bin/validate_petaltongue_anderson_v1.rs"
+
+[[bin]]
+name = "validate_petaltongue_biogas_v1"
+path = "src/bin/validate_petaltongue_biogas_v1.rs"
+
+[[bin]]
+name = "validate_anderson_qs_environments_v1"
+path = "src/bin/validate_anderson_qs_environments_v1.rs"

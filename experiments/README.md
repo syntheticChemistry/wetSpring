@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-10 (V109: 352 experiments, 330+ binaries, 9,575+ checks. V109: upstream rewire validation + mixed hardware (NPU→GPU PCIe bypass) + NUCLEUS atomics (Tower/Node/Nest via biomeOS). 6 new experiments (Exp347-352), 145 new checks. V108: Track 6 anaerobic digestion, 63 papers. V107: R industry parity. 1,605 tests, clippy ZERO WARNINGS.)
+**Updated**: 2026-03-10 (V110: 356 experiments, 340 binaries, 9,686+ checks. V110: petalTongue visualization pipeline (Exp353–355) + Anderson QS cross-environment validation (Exp356: O₂-modulated W, H3 r=0.851). V109: upstream rewire + mixed hardware + NUCLEUS. V108: Track 6, 63 papers. V107: R industry parity. 1,611 tests, clippy ZERO WARNINGS.)
 
 ---
 
@@ -565,7 +565,38 @@ Upstream barracuda evolved: `plasma_dispersion` and `spectral::stats` now
 require `gpu` feature; `variance` not exported (use `covariance(x,x)`);
 `ln_gamma` returns `Result<f64>`.
 
-**Totals: 352 experiments, 336 binaries, 9,575+ checks.**
+**Totals: 352 experiments, 336 binaries, 9,575+ checks.** *(V109 baseline)*
+
+### V110 — petalTongue Visualization Pipeline (March 2026)
+
+Exp353-355: Live petalTongue visualization pipeline. All experiments produce
+petalTongue-loadable JSON scenario files and attempt live IPC push (graceful
+degradation when petalTongue is not running). New `stream_ecology` module adds
+ecology-specific streaming methods.
+
+| Exp | Name | DataChannel Types | Checks | Key Finding |
+|:---:|------|:-----------------:|:------:|-------------|
+| 353 | petalTongue Live Ecology v1 | all 9 | 54 | Full IPC+JSON pipeline validated, biomeOS/NUCLEUS readiness probed |
+| 354 | Anderson QS Landscape v1 | 6 (Bar, Scatter, TS, Gauge, FieldMap, Heatmap) | 21 | Digester QS SUPPRESSED (P=0.25), diverse biomes QS ACTIVE (P>0.88) |
+| 355 | Biogas Dashboard v1 | 5 (TS, Bar, Gauge, Distribution, Heatmap) | 18 | Co-digestion HEALTHY (W=11.3), monoculture STRESSED (W>13) |
+| 356 | Anderson QS Cross-Environment v1 | 2 (Bar, Scatter) | 18 | H3 O₂-modulated W (r=0.851) > H2 signal dilution (0.812) > H1 original (-0.575) |
+
+New module: `stream_ecology.rs` (push_diversity_frame, push_bray_curtis_update,
+push_rarefaction_point, push_anderson_w, push_kinetics_step) — 6 unit tests.
+
+JSON artifacts: ecology_dashboard.json, anderson_qs_landscape.json,
+anderson_qs_landscape_full.json, amplicon_pipeline.json, biogas_kinetics_dashboard.json,
+anderson_qs_model_comparison.json.
+Load any: `petaltongue ui --scenario output/<name>.json`.
+
+### Exp356: Anderson QS Cross-Environment Validation v1 (18/18 PASS)
+
+Tests 3 W parameterizations against literature QS prevalence in 10 environments.
+H1 (inverse diversity, r=-0.575) refuted. H2 (signal dilution, r=+0.812) and
+H3 (O₂-modulated, r=+0.851) validated. Oxygen adds second disorder dimension:
+anaerobic communities have lower effective W, explaining higher QS prevalence.
+
+**Totals: 356 experiments, 340 binaries, 9,686+ checks.**
 
 ---
 

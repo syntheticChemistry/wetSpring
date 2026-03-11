@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** March 10, 2026 (V109 — barraCuda v0.3.3 standalone, toadStool S142+, coralReef Iteration 29, wgpu 28. 1,605 tests (1,151 pass, 3 known GPU f32), 330+ binaries, 180 tolerances. V109: upstream rewire + NUCLEUS atomics (Exp347-352, 145/145 PASS). V108: Track 6 biogas (183 checks). V107: R industry parity (53/53). V106: deep debt. V105: petalTongue V2. V101: 78/78. V100: 173/173. V99: 166/166. V98: 173/173 PASS)
+**Updated:** March 10, 2026 (V110 — barraCuda v0.3.3 standalone, toadStool S142+, coralReef Iteration 29, wgpu 28. 1,611 tests (1,157 pass, 3 known GPU f32), 340 binaries, 180 tolerances. V110: petalTongue visualization pipeline (Exp353-355) + Anderson QS O₂-modulated model (Exp356, H3 r=0.851). V109: upstream rewire + NUCLEUS atomics (Exp347-352, 145/145 PASS). V108: Track 6 biogas (183 checks). V107: R industry parity (53/53). V106: deep debt. V105: petalTongue V2. V101: 78/78. V100: 173/173. V99: 166/166. V98: 173/173 PASS)
 
 ---
 

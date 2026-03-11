@@ -2,7 +2,7 @@
 
 **Date:** March 10, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V109 — 352 experiments, 9,575+ validation checks, ALL PASS; 1,605 tests (1,151 pass, 3 known GPU f32 failures), 330+ binaries, standalone `barraCuda` v0.3.3 (wgpu 28, 784+ WGSL shaders), toadStool S142+, coralReef Iteration 29. V109: upstream rewire validation (SpringDomain SCREAMING_SNAKE_CASE, sync GPU diversity API, DADA2 fix) + mixed hardware (NPU→GPU PCIe bypass, CPU fallback) + NUCLEUS atomics (Tower/Node/Nest via biomeOS graph), 6 experiments (Exp347-352, 145/145 PASS). V108: Track 6 anaerobic biogas — 5 Liao group papers, Gompertz/first-order/Monod/Haldane kinetics, full 6-tier chain (Exp336-346, 183 checks). V107: R industry parity — R/vegan + R/DADA2 + R/phyloseq gold-standard (53/53 PASS). 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL, 180 tolerances, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS.
+**Status:** V110 — 356 experiments, 9,686+ validation checks, ALL PASS; 1,611 tests (1,157 pass, 3 known GPU f32 failures), 340 binaries, standalone `barraCuda` v0.3.3 (wgpu 28, 784+ WGSL shaders), toadStool S142+, coralReef Iteration 29. V110: petalTongue visualization pipeline (Exp353-355, 93/93) + Anderson QS cross-environment validation (Exp356: O₂-modulated W, H3 r=0.851, 18/18). `stream_ecology` module, 6 JSON scenario artifacts. V109: upstream rewire + mixed hardware + NUCLEUS atomics (Exp347-352, 145/145). V108: Track 6 anaerobic biogas — Gompertz/Monod/Haldane kinetics. V107: R industry parity (53/53). 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL, 180 tolerances, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS.
 
 ---
 
@@ -52,7 +52,8 @@ All code is AGPL-3.0.
 | **V100 petalTongue + Mixed HW** | — | viz+dispatch | — | Exp327-332 | 173 | petalTongue schema, 5 scenario builders, CPU/GPU math parity, metalForge viz, biomeOS full chain, local evolution, mixed HW dispatch |
 | **V101 Viz Evolution** | — | viz | — | Exp333-334 | 78 | 9 DataChannel types, 33 scenario builders, StreamSession, Songbird, IPC science→viz, streaming pipeline |
 | **V108 Track 6 Anaerobic** | Liao (MSU BAE) | 6 | 5+6 | Exp336-346 | 183 | Gompertz, first-order, Monod, Haldane kinetics, anaerobic diversity, Anderson W mapping, full 6-tier chain |
-| **Total** | | | **63** | | **9,430+** | |
+| **V110 petalTongue + Anderson H3** | — | viz+science | — | Exp353-356 | 111 | petalTongue live dashboards, Anderson QS O₂-modulated W model (H3, r=0.851), stream_ecology, 6 JSON scenarios |
+| **Total** | | | **63** | | **9,686+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -115,7 +116,8 @@ Every paper goes through the full evolution. Status across all 63 papers:
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
 | biomeOS IPC integration | JSON-RPC science primal, GPU-aware dispatch, Songbird registration | 321 checks (Exp203-208) |
 | petalTongue visualization | 9 DataChannel types, 33 scenario builders, StreamSession, Songbird capabilities, IPC science→viz wiring | 78 checks (Exp333-334) |
-| Code quality audit | 94.01% line (barracuda), 88.78% (forge), streaming I/O, 0 production mocks, standalone `barraCuda` v0.3.3, `deny(missing_docs)`, `forbid(unsafe_code)` on all 320 crate roots, clippy pedantic + nursery ZERO WARNINGS, 180 named tolerances | 1,605 tests (1,288 lib + 218 forge + 72 integration + 27 doc) |
+| **V110 live viz + Anderson H3** | petalTongue live dashboards (IPC push + JSON export), all 9 DataChannel types validated with real math, stream_ecology module, Anderson QS O₂-modulated W model (H3, r=0.851 vs 10 environments), biomeOS/NUCLEUS readiness probing | 111 checks (Exp353-356) |
+| Code quality audit | 94.01% line (barracuda), 88.78% (forge), streaming I/O, 0 production mocks, standalone `barraCuda` v0.3.3, `deny(missing_docs)`, `forbid(unsafe_code)` on all 320 crate roots, clippy pedantic + nursery ZERO WARNINGS, 180 named tolerances | 1,611 tests (1,294 lib + 218 forge + 72 integration + 27 doc) |
 | V66 dispatch evolution | Forge dispatch routing (29 workloads), streaming topology (PCIe bypass), NUCLEUS Tower/Node/Nest model, absorption audit (0 local WGSL) | 49 checks (Exp213) |
 | V66 NUCLEUS V8 | IPC dispatch with V66 I/O evolution (byte-native FASTQ, bytemuck nanopore, streaming MS2), Nest metrics, CPU fallback parity, full pipeline chain | 49 checks (Exp214) |
 | **V84 pipeline buildout** | Paper→CPU→GPU→Streaming proven end-to-end: 32 papers, 26 CPU domains, 21 GPU domains, Python parity, 0.10ms streaming overhead | 172 checks (Exp251-255) |
