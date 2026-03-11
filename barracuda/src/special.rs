@@ -56,7 +56,7 @@ pub fn regularized_gamma_lower(a: f64, x: f64) -> f64 {
 /// Inverse normal CDF (percent-point function / quantile function).
 ///
 /// Given probability `p` in (0, 1), returns `x` such that `Φ(x) = p`.
-/// Delegates to `barracuda::stats::norm_ppf` (barraCuda v0.3.3).
+/// Delegates to `barracuda::stats::norm_ppf` (barraCuda v0.3.5).
 ///
 /// Uses the rational approximation from Abramowitz & Stegun 26.2.23
 /// with Beasley-Springer-Moro refinement for tail accuracy.

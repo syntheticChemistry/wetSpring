@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: March 11, 2026 (V112 — 363 experiments, 9,819+ checks, 63 papers complete + 6 reproduced. V112: NVIDIA hardware learning prototype (Exp361-363: nouveau diagnostic, probe-calibrate-route-apply, adaptive dispatch, 45/45). V111: barraCuda v0.3.5 rewire + GPU learning system (Exp357-360, 88/88). V110: petalTongue visualization (Exp353-356). V109: upstream rewire + NUCLEUS (Exp347-352). All 46 three-tier eligible papers validated. barraCuda v0.3.5, clippy ZERO WARNINGS)
+**Last Updated**: March 11, 2026 (V113 — 370 experiments, 9,886+ checks, 63 papers complete + 6 reproduced. V113: Paper extension roadmap (Exp364-370: EMP 28K atlas, Liao real data, KBS LTER temporal, QS gene profiling, primal pipeline, P1 framework, LAN mesh plan, 67/67). V112: NVIDIA hardware learning (Exp361-363, 45/45). V111: GPU learning system (Exp357-360, 88/88). V110: petalTongue visualization (Exp353-356). All 46 three-tier eligible papers validated. barraCuda v0.3.5, clippy ZERO WARNINGS)
 **Purpose**: Track papers for reproduction/review across five tracks
 
 ---

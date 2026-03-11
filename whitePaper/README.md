@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** March 11, 2026
-**Status:** V112 — Validation study active — 9,819+ checks, 1,611 tests (1,294 pass, 3 known GPU f32), 363 experiments, 347 binaries, standalone `barraCuda` v0.3.5 (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, 180 named tolerances, clippy pedantic + nursery ZERO WARNINGS, 63 papers reproduced, all 46 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. V112: NVIDIA hardware learning prototype (Exp361-363: nouveau diagnostic, probe-calibrate-route-apply, adaptive dispatch, 45/45 PASS). V111: barraCuda v0.3.5 upstream rewire + GPU learning system (Exp357-360: PrecisionBrain, HW calibration, stable specials, sovereign dispatch, 88/88). V110: petalTongue visualization (Exp353-356). biomeOS/NUCLEUS readiness probing.
+**Status:** V113 — Validation study active — 9,886+ checks, 1,611 tests (1,294 pass, 3 known GPU f32), 370 experiments, 354 binaries, standalone `barraCuda` v0.3.5 (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, 180 named tolerances, clippy pedantic + nursery ZERO WARNINGS, 63 papers reproduced, all 46 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. V113: Paper extension roadmap (Exp364-370: EMP 28K atlas, Liao real data, KBS LTER temporal, QS gene profiling, primal pipeline, P1 framework, LAN mesh plan, 67/67 PASS). V112: NVIDIA hardware learning (Exp361-363, 45/45). V111: GPU learning system (Exp357-360, 88/88). V110: petalTongue visualization (Exp353-356). biomeOS/NUCLEUS readiness probing.
 **License:** AGPL-3.0-or-later
 
 ---

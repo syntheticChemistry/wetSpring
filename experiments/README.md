@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-11 (V112: 363 experiments, 347 binaries, 9,819+ checks. V112: NVIDIA hardware learning prototype (Exp361-363: nouveau diagnostic, probe-calibrate-route-apply, adaptive dispatch, 45/45 PASS). V111: barraCuda v0.3.5 upstream rewire + GPU learning system (Exp357–360: PrecisionBrain, HW calibration, stable specials, sovereign dispatch, 88/88). V110: petalTongue visualization + Anderson QS (Exp353-356). V109: upstream rewire + mixed hardware + NUCLEUS. V108: Track 6, 63 papers. V107: R industry parity. 1,611 tests, clippy ZERO WARNINGS.)
+**Updated**: 2026-03-11 (V113: 370 experiments, 354 binaries, 9,886+ checks. V113: Paper extension roadmap (Exp364-370: EMP 28K atlas, Liao real data, KBS LTER temporal, QS gene profiling, primal pipeline, P1 framework, LAN mesh plan, 67/67 PASS). V112: NVIDIA hardware learning prototype (Exp361-363, 45/45). V111: GPU learning system (Exp357-360, 88/88). V110: petalTongue visualization (Exp353-356). V109: mixed hardware + NUCLEUS (Exp347-352). V108: Track 6, 63 papers. 1,611 tests, clippy ZERO WARNINGS.)
 
 ---
 
@@ -628,7 +628,34 @@ pattern, machine-readable capability profile, adaptive workload selection.
 
 JSON artifact: output/hardware_capability_profile.json (4.3KB, machine-readable dispatch recipe).
 
-**Totals: 363 experiments, 347 binaries, 9,819+ checks.**
+### V113 Paper Extension Roadmap (Exp364-370)
+
+Exp364-367: P0 dataset extension pipelines. EMP 28K-sample atlas, Liao group
+real community data, KBS LTER 30-year tillage temporal model, QS gene profiling
+with FNR/ArcAB/Rex regulon mapping.
+
+| Exp | Name | Domains | Checks | Key Finding |
+|:---:|------|:-------:|:------:|-------------|
+| 364 | EMP Anderson QS Atlas v1 | D101-D105 | 14 | 28K samples, 28 biomes, H3 model: anaerobic P(QS)=0.81 vs aerobic 0.16. |
+| 365 | Liao Group Real Community Data v1 | D106-D110 | 12 | 8 communities from 5 papers, Gompertz R²>0.95, all digesters QS active (P>0.5). |
+| 366 | KBS LTER Anderson Temporal v1 | D111-D115 | 5 | 30-year tillage × disorder, dynamic W(t), both treatments near W_c≈16.5. |
+| 367 | QS Gene Profiling v1 | D116-D120 | 10 | 14 QS types, 8 signal systems, FNR/ArcAB/Rex mapping. Aerobic W 2× anaerobic. |
+
+Exp368: Primal integration pipeline validation — NestGate, ToadStool, petalTongue.
+
+| 368 | Primal Integration Pipeline v1 | D121-D125 | 9 | Socket discovery, three-tier NCBI routing, wgpu dispatch, sovereign fallback. |
+
+Exp369-370: P1 extensions framework and LAN mesh SRA atlas planning.
+
+| 369 | P1 Extensions Framework v1 | D126-D130 | 8 | 5 P1 extensions (cold seep, Tara, HMP, AMR, mycorrhizal). H3 validated across all. |
+| 370 | LAN Mesh + SRA Atlas Plan v1 | D131-D135 | 9 | 5 towers, 96GB VRAM, 208 TFLOPS, 85TB. Standard atlas 1.6h, $0.29 electricity. |
+
+JSON artifacts: output/emp_anderson_qs_atlas.json, output/liao_real_community_analysis.json,
+output/kbs_lter_anderson_temporal.json, output/qs_gene_regulon_analysis.json,
+output/primal_pipeline_status.json, output/p1_extensions_framework.json,
+output/lan_mesh_sra_atlas_plan.json.
+
+**Totals: 370 experiments, 354 binaries, 9,886+ checks.**
 
 ---
 

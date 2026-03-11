@@ -1,8 +1,8 @@
 # NUCLEUS Local Deployment — Eastgate Tower
 
-**Date:** February 27, 2026
+**Date:** March 11, 2026
 **Node:** Eastgate (i9-12900, RTX 4070, AKD1000, 32GB DDR5)
-**Status:** OPERATIONAL — 4 primals + Neural API live, NCBI data flowing
+**Status:** OPERATIONAL — 4 primals + Neural API live, NCBI data flowing. V112: RTX 4070 fully profiled (F32 safe, DF64 arith-only, NVVM risk). Hardware capability profile exported (output/hardware_capability_profile.json). PrecisionBrain routes all 12 domains to F32. Adaptive dispatch validated (Exp363).
 
 ---
 
@@ -198,10 +198,31 @@ biomeOS Neural API (121 capability translations)
           └── storage.store / retrieve / list / blob
 ```
 
+## V112 Hardware Discovery
+
+V112 (Exp361-363) established the hardware learning prototype on Eastgate:
+
+| Finding | Result |
+|---------|--------|
+| RTX 4070 driver | nvidia proprietary (wgpu/Vulkan) |
+| F32 tier | Safe (compile + dispatch + transcendentals) |
+| DF64 tier | Arithmetic-only (transcendentals unsafe, NVVM risk) |
+| F64/F64Precise | Arithmetic-only (same NVVM risk) |
+| PrecisionBrain routing | All 12 domains → F32 |
+| VRAM ceiling | 12GB, max pairwise N≈40K |
+| Titan V (card1) | nouveau, VM_INIT OK, CHANNEL_ALLOC blocked (no GSP) |
+| Capability profile | `output/hardware_capability_profile.json` |
+
+The Titan V on nouveau cannot dispatch compute (Volta lacks GSP firmware).
+The RTX 4070 on nvidia proprietary dispatches F32 safely. DF64 arithmetic
+(no transcendentals) is safe for Anderson eigenvalue problems.
+
 ## Next Steps
 
 1. Register wetSpring as a science capability provider (needs Songbird registration fix F4)
-2. Wire NestGate `NCBILiveProvider` for bulk data acquisition
+2. Wire NestGate `NCBILiveProvider` for bulk data acquisition (EMP, KBS LTER, cold seep)
 3. SRA toolkit integration for FASTQ downloads
 4. Test ToadStool compute dispatch from wetSpring science pipeline
 5. Multi-tower extension (bring up Strandgate as second node)
+6. **NEW (V112):** RTX 4070 on nouveau — test Ada GSP dispatch (highest-ROI GPU unlock)
+7. **NEW (V112):** Consume hardware capability profile in pipeline experiments

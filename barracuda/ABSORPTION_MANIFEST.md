@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** March 11, 2026 (V112)
+**Date:** March 11, 2026 (V113)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
 **barraCuda:** standalone v0.3.5 `0649cd0`
-**Status:** 150+ primitives consumed (264 ComputeDispatch ops) via `compile_shader_universal`, 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 47 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,611 tests (1,294 pass, 3 known GPU f32), standalone barraCuda v0.3.5, 363 experiments, 9,819+ checks, 347 binaries, 180 named tolerances, `#![forbid(unsafe_code)]` on all crate roots, clippy pedantic+nursery CLEAN (`--all-features`). **V111:** barraCuda v0.3.5 rewire + GPU learning system (Exp357-360: PrecisionBrain, HW calibration, stable specials, sovereign dispatch, 88/88 PASS). **V112:** NVIDIA hardware learning prototype (Exp361-363: nouveau diagnostic, probe-calibrate-route-apply, adaptive dispatch, 45/45 PASS). **V110:** petalTongue viz (Exp353-356). **V109:** upstream rewire + NUCLEUS atomics (Exp347-352, 145/145 PASS). **V108:** Track 6 biogas (183 checks). **V107:** R industry parity (53/53 PASS). V106: deep debt. V105: petalTongue viz. V100: 173/173 PASS.
+**Status:** 150+ primitives consumed (264 ComputeDispatch ops) via `compile_shader_universal`, 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 47 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,611 tests (1,294 pass, 3 known GPU f32), standalone barraCuda v0.3.5, 370 experiments, 9,886+ checks, 354 binaries, 180 named tolerances, `#![forbid(unsafe_code)]` on all crate roots, clippy pedantic+nursery CLEAN (`--all-features`). **V113:** Paper extension roadmap (Exp364-370: EMP 28K atlas, Liao real data, KBS LTER temporal, QS gene profiling, primal pipeline, P1 framework, LAN mesh plan, 67/67 PASS). **V112:** NVIDIA hardware learning (Exp361-363, 45/45). **V111:** GPU learning system (Exp357-360, 88/88). **V110:** petalTongue viz (Exp353-356). **V109:** upstream rewire + NUCLEUS (Exp347-352, 145/145). **V108:** Track 6 biogas. **V107:** R industry parity (53/53). V106: deep debt. V100: 173/173.
 
 ---
 

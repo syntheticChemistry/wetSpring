@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: March 11, 2026
-**Status**: V112 — 9,819+ checks (363 experiments, 347 binaries). V112: NVIDIA hardware learning prototype (Exp361-363: nouveau diagnostic, probe-calibrate-route-apply, adaptive dispatch, 45/45). V111: barraCuda v0.3.5 upstream rewire + GPU learning system (Exp357-360, 88/88). V110: petalTongue visualization (Exp353-356). V109: upstream rewire + NUCLEUS atomics (Exp347-352). V108: Track 6 (63 papers). V107: R industry parity. clippy ZERO WARNINGS.
+**Status**: V113 — 9,886+ checks (370 experiments, 354 binaries). V113: Paper extension roadmap (Exp364-370: EMP atlas, Liao real data, KBS LTER temporal, QS gene profiling, primal pipeline, P1 framework, LAN mesh plan, 67/67). V112: NVIDIA hardware learning (Exp361-363, 45/45). V111: GPU learning system (Exp357-360, 88/88). V110: petalTongue (Exp353-356). V109: NUCLEUS (Exp347-352). V108: Track 6 (63 papers). clippy ZERO WARNINGS.
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

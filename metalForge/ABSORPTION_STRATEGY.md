@@ -2,7 +2,7 @@
 
 **Date:** March 11, 2026
 **Pattern:** Write → Absorb → Lean (from hotSpring)
-**Status:** V112 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 47 GPU modules total, 0 Tier B/C, standalone barraCuda v0.3.5, 33 petalTongue scenario builders, StreamSession with backpressure, Songbird, wetspring_dashboard. V111: barraCuda v0.3.5 rewire + GPU learning system (PrecisionBrain, HW calibration, stable specials, sovereign dispatch). V112: NVIDIA hardware learning prototype (Exp361-363: nouveau diagnostic, probe-calibrate-route-apply, adaptive dispatch, 45/45 PASS). V110: petalTongue viz, stream_ecology, Anderson QS O₂-modulated model
+**Status:** V113 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 47 GPU modules total, 0 Tier B/C, 0 Passthrough, standalone barraCuda v0.3.5, 33 petalTongue scenario builders, StreamSession with backpressure, Songbird, wetspring_dashboard. V113: Paper extension roadmap (Exp364-370: EMP atlas, Liao data, KBS LTER, QS genes, primal pipeline, P1 framework, LAN mesh plan, 67/67). V112: NVIDIA hardware learning (Exp361-363, 45/45). V111: GPU learning system (Exp357-360, 88/88). V110: petalTongue viz, stream_ecology, Anderson QS O₂-modulated model
 
 ---
 
@@ -133,13 +133,12 @@ upstream ToadStool (S58+). The `OdeSystem` trait implementations remain local
 | `reconciliation_gpu` | `TreeInferenceGpu` | DTL reconciliation |
 | `molecular_clock_gpu` | `GemmCachedF64` | Molecular clock |
 
-### Passthrough GPU Wrappers (3 — Phase 28)
+### Former Passthrough GPU Wrappers (all promoted — V40+)
 
-| Module | CPU Kernel | Needed Primitive |
-|--------|-----------|-----------------|
-| `gbm_gpu` | Sequential boosting | `GbmBatchInferenceGpu` |
-| `feature_table_gpu` | Feature extraction | `FeatureExtractionGpu` |
-| `signal_gpu` | Peak detection (1D) | `PeakDetectGpu` |
+> All 3 former Passthrough modules were promoted in V40+:
+> - `gbm_gpu` → Compose (`TreeInferenceGpu`)
+> - `feature_table_gpu` → Compose (`FMR` + `WeightedDotF64`)
+> - `signal_gpu` → Lean (`PeakDetectF64` S62)
 
 ### Completed Compositions (were candidates, now validated)
 
@@ -175,16 +174,10 @@ SoA layout: separate node_features, node_thresholds (f64), node_children buffers
 
 ### Remaining Absorption Candidates
 
-All former Tier A/B/C modules now have GPU paths. Remaining absorption
-candidates are the 5 ODE WGSL shaders → ToadStool `BatchedOdeRK4Generic`,
-and the 3 Passthrough modules which need new ToadStool primitives:
-
-| Candidate | Type | ToadStool Target |
-|-----------|------|-----------------|
-| 5 ODE WGSL shaders | Write → Absorb | `BatchedOdeRK4Generic<N_VARS, N_PARAMS>` |
-| `gbm_gpu` | Passthrough → Write | `GbmBatchInferenceGpu` (new primitive) |
-| `feature_table_gpu` | Passthrough → Write | `FeatureExtractionGpu` (new primitive) |
-| `signal_gpu` | Passthrough → Write | `PeakDetectGpu` (new primitive) |
+All former Tier A/B/C/Passthrough modules now have GPU paths or are fully
+lean. The ODE WGSL shaders were absorbed upstream (BatchedOdeRK4 S58).
+All 3 Passthrough modules were promoted (V40+). **Zero remaining
+absorption candidates — fully lean.**
 
 ---
 

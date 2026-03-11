@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! GPU-accelerated statistical functions via barraCuda primitives.
 //!
-//! Thin wrappers around barraCuda v0.3.3 GPU ops. Fused ops
+//! Thin wrappers around barraCuda v0.3.5 GPU ops. Fused ops
 //! (`mean_variance_gpu`, `correlation_full_gpu`) use single-pass Welford
 //! and 5-accumulator Pearson shaders respectively — one dispatch instead
 //! of multiple. On consumer GPUs with `Fp64Strategy::Hybrid`, these

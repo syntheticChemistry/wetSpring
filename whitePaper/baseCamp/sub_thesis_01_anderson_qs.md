@@ -1,8 +1,8 @@
 # Sub-thesis 01: Anderson Localization as QS Null Hypothesis
 
-**Date:** February 27, 2026
+**Date:** March 11, 2026
 **Faculty:** Kachkovskiy (MSU CMSE), Waters (MSU MMG)
-**Status:** Active — 184 experiments (Exp107-156, 170-182, 356), 3,418+ checks, W_c = 16.26 ± 0.95 (finite-size scaling L=6-12), Track 4 soil QS complete (9 papers, full three-tier), 9 extension papers validated, correlated disorder + dilution effects quantified, **V110: O₂-modulated W model (H3, r=0.851) validated against 10 environments**, clippy pedantic CLEAN, 79 named tolerances
+**Status:** Active — 184 experiments (Exp107-156, 170-182, 356), 3,418+ checks, W_c = 16.26 ± 0.95 (finite-size scaling L=6-12), Track 4 soil QS complete (9 papers, full three-tier), 9 extension papers validated, correlated disorder + dilution effects quantified, **V110: O₂-modulated W model (H3, r=0.851) validated against 10 environments**, **V112: tridiagonal QL eigensolver validated (Exp359), DF64 arithmetic-only Lanczos path confirmed safe on RTX 4070 (Exp362-363)**, clippy pedantic CLEAN, 79 named tolerances
 
 ---
 
@@ -92,17 +92,44 @@ follow the W = 3.5·H' + 8·O₂ curve.
 Prediction: reporter activation should decrease with diversity (signal dilution)
 and increase under anaerobic conditions (O₂ disorder reduction), following H3.
 
+## V111-V112: Hardware Learning and Eigensolver Validation
+
+**V111 (Exp359):** Tridiagonal QL eigensolver validated for Anderson lattice
+problems. `barracuda::special::tridiagonal_ql` computes eigenvalues of the
+Anderson Hamiltonian H = diag(ε₁,...,εₙ) + off-diag(-1,...,-1) directly on
+CPU. Bandwidth scales with disorder W as expected (confirmed W=1..30).
+This is the eigensolver that GPU Lanczos would need to match for L>12.
+
+**V112 (Exp361-363):** Hardware capability profile for the RTX 4070:
+- F32 tier: safe (compile + dispatch + transcendentals) — used for
+  Shannon/Simpson/Bray-Curtis diversity at GPU speed
+- DF64 tier: arithmetic-only (compile + dispatch, transcendentals unsafe) —
+  Anderson eigenvalue arithmetic is safe, exp/log/sqrt are not
+- CPU tridiagonal QL: validated for Anderson spectral problems (Exp359)
+- GPU Lanczos for L>12: needs DF64 arithmetic-only shaders, which are safe
+  on RTX 4070 per V112 profile. No transcendentals needed for Lanczos
+  iteration (tri-diag QR is all multiply/add).
+
+**Implication for ν extraction:** The DF64 arithmetic-only path on RTX 4070
+can run Lanczos for L=14-20 Anderson lattices (up to 8000×8000 matrices).
+This is the path to precise ν extraction without Titan V or nouveau.
+
 ## Open Questions
 
 1. Can ν be extracted precisely with L > 12 (needs GPU Lanczos)?
+   — **V112 update:** DF64 arithmetic-only Lanczos is safe on RTX 4070.
+   CPU tridiagonal QL validated (Exp359). Path is clear.
 2. Does correlated disorder explain hot spring mat QS anomalies?
 3. Can ⟨r⟩ be computed from real bacterial colony coordinates (Exp149 proposal)?
 4. **NEW (V110):** Does the two-dimensional W(H', O₂) model hold for real metatranscriptomic QS gene expression data?
 5. **NEW (V110):** What is the oxygen coefficient in W = α·H' + β·O₂? Is β consistent across biome types?
+6. **NEW (V112):** Can the EMP 30K dataset confirm the 28-biome atlas at N=30K?
+7. **NEW (V112):** Does KBS LTER 30-year time series show dynamic W(t) recovery after tillage perturbation?
 
 ## Connection to Gen3 Thesis
 
 Chapter 14: Biological validation of Anderson localization framework.
 The Anderson model is the null hypothesis; nature's violations are the science.
 The V110 H3 model refines the null hypothesis: disorder has two sources
-(community diversity and oxygen regime), not one.
+(community diversity and oxygen regime), not one. V112 hardware capability
+profiling ensures the GPU compute path is correctly adapted to the hardware.

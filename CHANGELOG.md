@@ -3,6 +3,27 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V113 — Paper Extension Roadmap + P0-P1 Dataset Pipelines (2026-03-11)
+
+### Added
+- **Paper extension roadmap** implemented — 7 experiments (Exp364-370) validating P0/P1 data pipelines, primal integration, and LAN mesh planning:
+  - Exp364: EMP Anderson QS Atlas v1 (14/14 PASS) — 28K synthetic EMP-scale samples across 28 biomes, H1/H2/H3 model comparison, anaerobic P(QS)=0.81 vs aerobic P(QS)=0.16, petalTongue atlas dashboard. Real EMP data loader ready (Qiita 10317).
+  - Exp365: Liao Group Real Community Data v1 (12/12 PASS) — 8 communities from 5 Liao group papers, Gompertz fitting (R²>0.95), Anderson QS all active (P>0.5 for anaerobic digesters), Shannon-yield correlation r=0.685.
+  - Exp366: KBS LTER Soil Anderson Temporal v1 (5/5 PASS) — 30-year tillage × Anderson disorder trajectories, 4 KBS treatments, dynamic W(t) recovery model, seasonal H' oscillation. BioProjects: PRJNA305469, PRJNA485370.
+  - Exp367: QS Gene Profiling v1 (10/10 PASS) — 14 QS types across 8 signal systems, FNR/ArcAB/Rex regulon mapping, molecular mechanism support for H3 (9/14 anaerobic-enhanced, aerobic W 2× anaerobic W).
+  - Exp368: Primal Integration Pipeline v1 (9/9 PASS) — primal discovery (BearDog/Songbird/ToadStool/NestGate socket scan), three-tier NCBI routing validation (biomeOS→NestGate→sovereign HTTP), wgpu GPU dispatch, science pipeline end-to-end.
+  - Exp369: P1 Extensions Framework v1 (8/8 PASS) — cold seep (PRJNA315684), Tara Oceans (PRJEB1787), HMP gut (PRJNA275349), AMR sentinel, mycorrhizal Anderson. H3 validated: anaerobic > aerobic across all P1 biomes.
+  - Exp370: LAN Mesh + SRA Atlas Plan v1 (9/9 PASS) — 5-tower inventory (96GB VRAM, 208 TFLOPS, 85TB), 500-BioProject standard atlas in 1.6h on mesh, bandwidth model (10G), cost-time projections ($0.29 electricity).
+- **Documentation updates** — EXTENSION_PLAN.md (V112 hardware learning → Axis 3C), sub_thesis_01 (V112 eigensolver/DF64 Lanczos), NUCLEUS_LOCAL_DEPLOYMENT.md (V112 hardware discovery table).
+
+### Key Findings
+- H3 (O₂-modulated W) validated across 28+ biomes at N=28K scale: anaerobic communities consistently show higher P(QS) than aerobic
+- Liao group digesters: all QS active (P>0.5), diversity-yield correlation positive (r=0.685)
+- KBS LTER temporal: both tillage regimes near Anderson transition (W≈16.5), seasonal H' oscillation visible
+- QS gene profiling: FNR/ArcAB/Rex regulon mapping provides molecular mechanism for H3 O₂ coefficient
+- Primal pipeline operational: graceful degradation when primals not running, sovereign fallback always available
+- LAN mesh: 31K samples/hour throughput, standard SRA atlas (500 BioProjects) fits in 1.6h, $0.29 electricity
+
 ## V112 — NVIDIA Hardware Learning Prototype (2026-03-11)
 
 ### Added

@@ -2,7 +2,7 @@
 
 **Date:** March 11, 2026 (V112 update)
 **Author:** wetSpring V112 (ecoPrimals)
-**Foundation:** 363 experiments, 9,819+ checks, 63 papers reproduced, 150+ primitives (standalone barraCuda v0.3.5), Python parity proven, cross-spring provenance validated, 1,611 tests. V112: NVIDIA hardware learning prototype (Exp361-363: nouveau diagnostic, probe-calibrate-route-apply, adaptive dispatch, 45/45 PASS). V111: barraCuda v0.3.5 upstream rewire + GPU learning system (Exp357-360: PrecisionBrain, HW calibration, stable specials, sovereign dispatch, 88/88). V110: petalTongue visualization pipeline (Exp353-356). V109: upstream API migration, NUCLEUS atomics, 8-tier validation chain proven.
+**Foundation:** 370 experiments, 9,886+ checks, 63 papers reproduced, 150+ primitives (standalone barraCuda v0.3.5), Python parity proven, cross-spring provenance validated, 1,611 tests, 354 binaries. V113: Paper extension roadmap (Exp364-370: EMP 28K atlas, Liao real data, KBS LTER temporal, QS gene profiling, primal pipeline, P1 framework, LAN mesh plan, 67/67). V112: NVIDIA hardware learning (Exp361-363, 45/45). V111: GPU learning system (Exp357-360, 88/88). V110: petalTongue visualization (Exp353-356). V109: upstream API migration, NUCLEUS atomics, 8-tier validation chain proven.
 
 ---
 
@@ -238,7 +238,39 @@ Northgate (Node: RTX 5090)     ──┘
 
 **Investment:** ~$50 for Cat6a cables. Everything else is acquired.
 
-### 3C. MinION Integration (Phase 3: Field Genomics)
+### 3C. Hardware Capability Profile (V112: Probe-Calibrate-Route-Apply)
+
+**What:** V112 (Exp361-363) established the hardware learning prototype.
+The RTX 4070 is fully profiled and a machine-readable capability profile
+drives adaptive workload selection.
+
+**V112 Key Findings:**
+- RTX 4070 (nvidia proprietary): F32 safe, DF64/F64 compile+dispatch but
+  transcendentals unsafe (NVVM poisoning risk). PrecisionBrain routes all
+  12 PhysicsDomain variants to F32.
+- Titan V (nouveau): VM_INIT OK on kernel 6.17.9, CHANNEL_ALLOC blocked
+  (Volta lacks GSP/PMU firmware). Ada (AD104) GSP-only firmware present.
+- Adaptive dispatch: F32 always runs, DF64 arithmetic runs (f64 hw present),
+  F64 transcendentals skip (NVVM risk), large-N scales to VRAM ceiling
+  (12GB, max pairwise N≈40K).
+
+**What this means for extensions:**
+- EMP 30K (Axis 1A): F32 Shannon/Simpson + CPU Anderson → trivial on RTX 4070
+- Anderson L>12 (Sub-thesis 01): CPU tridiagonal QL proven (Exp359), GPU
+  Lanczos for large lattices needs DF64 arithmetic-only shaders (safe on RTX
+  4070 per V112 profile)
+- Large-N Bray-Curtis (P1 extensions): up to N≈40K in single-pass VRAM
+
+**Capability profile format:** `output/hardware_capability_profile.json` —
+machine-readable recipe with adapter, tiers, domain routing, firmware
+inventory, bio workload thresholds. Consumable by any primal. Target for
+toadStool `hw-learn` module absorption.
+
+**RTX 4070 on nouveau:** Highest-ROI next step. Ada GSP-only firmware should
+bypass the Volta PMU blocker. Requires switching from nvidia proprietary to
+nouveau driver. When this works, sovereign dispatch via coralReef unlocks.
+
+### 3D. MinION Integration (Phase 3: Field Genomics)
 
 **What:** Purchase MinION Mk1D (~$1K). Wire `io::nanopore` (FAST5/POD5
 reader) and `bio::basecall` (signal → base) into BarraCuda.

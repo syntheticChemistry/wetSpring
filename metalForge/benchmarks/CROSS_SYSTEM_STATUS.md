@@ -1,6 +1,6 @@
 # Cross-System Benchmark Status
 
-**Date:** February 21, 2026
+**Date:** March 11, 2026 (V113)
 **Purpose:** Track which algorithms are validated on which substrates
 
 ---
@@ -36,7 +36,7 @@
 | Neighbor-Joining | ✓ | **Compose GemmCachedF64** | — | **CPU+GPU** |
 | DTL Reconciliation | ✓ | **Compose TreeInferenceGpu** | — | **CPU+GPU** |
 | Robinson-Foulds | ✓ | **Compose PairwiseHammingGpu** | — | **CPU+GPU** |
-| Signal processing | ✓ | Passthrough (CPU kernel) | — | CPU+GPU buffer |
+| Signal processing | ✓ | **Lean** (PeakDetectF64 S62) | — | **CPU+GPU** |
 | **— Track 1c —** | | | | |
 | ANI (pairwise identity) | 24/24 | **Local WGSL** (7/7) | — | **CPU+GPU** |
 | SNP calling | 24/24 | **Local WGSL** (5/5) | — | **CPU+GPU** |
@@ -46,7 +46,7 @@
 | Rare biosphere diversity | 35/35 | Lean (diversity) | — | CPU+GPU via existing |
 | **— ML Ensembles —** | | | | |
 | Random Forest | 29/29 | **Local WGSL** (13/13) | Candidate | **CPU+GPU** |
-| GBM (binary + multi) | 29/29 | Passthrough (CPU kernel) | — | CPU+GPU buffer |
+| GBM (binary + multi) | 29/29 | **Compose** (TreeInferenceGpu) | — | **CPU+GPU** |
 
 *\* = Shader absorbed but driver skip on RTX 4070 (Gillespie uses native f64 exp)*
 
@@ -63,7 +63,7 @@
 | Substrate | Validated Checks | Algorithms |
 |-----------|:----------------:|:----------:|
 | CPU (Rust) | 1,476 | 31+ domains (v1-v8) |
-| GPU (wgpu) | 702+ | 42 modules (27 Lean + 5 Write + 7 Compose + 3 Passthrough) |
+| GPU (wgpu) | 702+ | 47 modules (34 Lean + 5 Write + 8 Compose, 0 Passthrough) |
 | NPU | 0 | 0 (3 candidates) |
 | **Total** | **2,178+** | — |
 
