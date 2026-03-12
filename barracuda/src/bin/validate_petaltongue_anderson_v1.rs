@@ -18,14 +18,14 @@
 //! Builds the "one picture that tells the whole story" dashboard for the
 //! Anderson localization / quorum sensing thesis. Combines diversity,
 //! disorder mapping, propagation probability, cross-biome comparison,
-//! and spatial FieldMap into a single petalTongue scenario.
+//! and spatial `FieldMap` into a single `petalTongue` scenario.
 //!
 //! ## What This Visualizes
 //!
 //! 1. Shannon diversity across biome types (algae, soil, digester, deep-sea)
 //! 2. Diversity → Disorder (W) mapping curve
 //! 3. W → P(QS) propagation probability (the core finding)
-//! 4. Spatial FieldMap of W across a lattice (Anderson localization visual)
+//! 4. Spatial `FieldMap` of W across a lattice (Anderson localization visual)
 //! 5. Cross-biome Bray-Curtis distance heatmap
 //! 6. Rarefaction curves per biome
 //! 7. Community composition bar charts
@@ -213,7 +213,7 @@ fn main() {
         unit: "index".into(),
     });
 
-    let w_sweep: Vec<f64> = (0..100).map(|i| i as f64 * 0.25).collect();
+    let w_sweep: Vec<f64> = (0..100).map(|i| f64::from(i) * 0.25).collect();
     let p_sweep: Vec<f64> = w_sweep.iter().map(|&w| p_qs(w)).collect();
     mapping_node.data_channels.push(DataChannel::TimeSeries {
         id: "w_pqs_curve".into(),
@@ -449,34 +449,31 @@ fn main() {
     // ── S5: Live push (when available) ──
     println!("\n── S5: petalTongue live push ──");
 
-    match PetalTonguePushClient::discover() {
-        Ok(client) => {
-            println!("  petalTongue discovered — attempting live push");
-            match client.push_render("exp354-anderson", "Anderson QS Landscape", &scenario) {
-                Ok(()) => {
-                    println!("  ✓ Full Anderson landscape pushed to petalTongue");
-                    v.check_pass("live push succeeded", true);
+    if let Ok(client) = PetalTonguePushClient::discover() {
+        println!("  petalTongue discovered — attempting live push");
+        match client.push_render("exp354-anderson", "Anderson QS Landscape", &scenario) {
+            Ok(()) => {
+                println!("  ✓ Full Anderson landscape pushed to petalTongue");
+                v.check_pass("live push succeeded", true);
 
-                    let mut session = StreamSession::open(client, "exp354-stream");
-                    for (i, name) in names.iter().enumerate() {
-                        let gauge_id = format!("pqs_{}", name.to_lowercase().replace(' ', "_"));
-                        let _ = session.push_gauge_update(&gauge_id, pqs_values[i]);
-                    }
-                    session.close();
-                    v.check_pass("streaming gauge updates sent", true);
+                let mut session = StreamSession::open(client, "exp354-stream");
+                for (i, name) in names.iter().enumerate() {
+                    let gauge_id = format!("pqs_{}", name.to_lowercase().replace(' ', "_"));
+                    let _ = session.push_gauge_update(&gauge_id, pqs_values[i]);
                 }
-                Err(e) => {
-                    println!("  ○ Push: {e} (petalTongue socket found but not accepting)");
-                    v.check_pass("graceful push degradation", true);
-                    v.check_pass("JSON export available as fallback", true);
-                }
+                session.close();
+                v.check_pass("streaming gauge updates sent", true);
+            }
+            Err(e) => {
+                println!("  ○ Push: {e} (petalTongue socket found but not accepting)");
+                v.check_pass("graceful push degradation", true);
+                v.check_pass("JSON export available as fallback", true);
             }
         }
-        Err(_) => {
-            println!("  ○ petalTongue not running — JSON export mode");
-            v.check_pass("graceful degradation to JSON", true);
-            v.check_pass("JSON file available for offline loading", path.exists());
-        }
+    } else {
+        println!("  ○ petalTongue not running — JSON export mode");
+        v.check_pass("graceful degradation to JSON", true);
+        v.check_pass("JSON file available for offline loading", path.exists());
     }
 
     // ── S6: Science summary ──

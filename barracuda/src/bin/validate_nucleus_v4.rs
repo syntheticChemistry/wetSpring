@@ -19,9 +19,9 @@
 //! by biomeOS graph execution:
 //!
 //! 1. biomeOS binary discovery and version check
-//! 2. Tower Atomic (BearDog + Songbird) readiness
-//! 3. Node Atomic (Tower + ToadStool) readiness
-//! 4. Nest Atomic (Node + NestGate + Squirrel) readiness
+//! 2. Tower Atomic (`BearDog` + `Songbird`) readiness
+//! 3. Node Atomic (Tower + `ToadStool`) readiness
+//! 4. Nest Atomic (Node + `NestGate` + `Squirrel`) readiness
 //! 5. IPC dispatch overhead measurement
 //! 6. Science pipeline through each deployment mode
 //!

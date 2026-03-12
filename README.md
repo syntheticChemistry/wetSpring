@@ -4,10 +4,10 @@
 against Rust implementations and GPU shaders via `barraCuda` (standalone math
 primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 
-**Date:** March 11, 2026
+**Date:** March 12, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V113 — **1,611 tests** (1,294 pass, 3 known GPU f32 failures), 370 experiments, 9,886+ validation checks. V113: Paper extension roadmap (Exp364-370: EMP 28K atlas, Liao real data, KBS LTER temporal, QS gene profiling, primal pipeline, P1 framework, LAN mesh plan, 67/67). V112: NVIDIA hardware learning prototype (Exp361-363, 45/45). V111: barraCuda v0.3.5 upstream rewire + GPU learning system (Exp357–360, 88/88). V110: petalTongue visualization pipeline (Exp353–356). V109: upstream rewire + mixed hardware + NUCLEUS atomics (Exp347-352). V108: Track 6 anaerobic digestion, 63 papers complete. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS**. Ecosystem: barraCuda v0.3.5, toadStool S146, coralReef Iter 33.
+**Status:** V114 — **1,611 tests** (1,294 pass, 3 known GPU f32 failures), 370 experiments, 9,886+ validation checks. V114: Deep audit — 15 binaries received `required-features` gates fixing default build, 52 clippy pedantic/nursery warnings fixed, 4 deprecated batch parsers migrated to streaming, inline tolerances evolved to `tolerances::*`, VRAM estimate evolved from hardcoded to capability-based, `argmax_with_priors` unified in taxonomy module. V113: Paper extension roadmap (Exp364-370, 67/67). V112: NVIDIA hardware learning prototype (Exp361-363, 45/45). Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS**. Ecosystem: barraCuda v0.3.5, toadStool S146, coralReef Iter 33.
 
 ---
 
@@ -150,9 +150,9 @@ integration point.
 | metalForge cross-system | 37+ domains CPU↔GPU (Exp103+104+165+182+208), **39/39 papers three-tier** |
 | metalForge dispatch routing | 35 checks across 5 configs (Exp080) |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
-| `barraCuda` primitives consumed | **150+** (always-on, zero fallback code — standalone `barraCuda` v0.3.3 `a898dee`, wgpu 28, PrecisionRoutingAdvice) |
+| `barraCuda` primitives consumed | **150+** (always-on, zero fallback code — standalone `barraCuda` v0.3.5 `0649cd0`, wgpu 28, PrecisionRoutingAdvice) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 9,200+ validation checks **PASS**. All 1,288 library + 218 forge + 72 integration + 27 doc tests **PASS** (2 ignored: hardware-dependent).
+All 9,886+ validation checks **PASS**. All 1,288 library + 218 forge + 72 integration + 27 doc tests **PASS** (2 ignored: hardware-dependent).
 
 ### GPU Performance
 

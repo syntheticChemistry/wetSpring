@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 11, 2026 (V113 — barraCuda v0.3.5 `0649cd0` + toadStool S146 `751b3849` + coralReef Iter 33)
+**Date:** March 12, 2026 (V114 — barraCuda v0.3.5 `0649cd0` + toadStool S146 `751b3849` + coralReef Iter 33)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 47 GPU modules + 1 IPC + 1 vault + 1 provenance + 1 visualization module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.5, wgpu 28). 1,611 tests (1,294 pass, 3 known GPU f32), 370 experiments, 9,886+ checks, 180 tolerances, 354 binaries. `cargo clippy -D warnings -W pedantic -W nursery` CLEAN, **0 silent fallbacks**. `#![forbid(unsafe_code)]` on all crate roots. **V113:** Paper extension roadmap (Exp364-370: EMP 28K atlas, Liao real data, KBS LTER temporal W(t), QS gene profiling (FNR/ArcAB/Rex), primal pipeline, P1 framework, LAN mesh plan, 67/67 PASS). H3 model validated at 28K-sample scale. **V112:** NVIDIA hardware learning prototype (Exp361-363, 45/45). RTX 4070: F32 safe, NVVM risk. Titan V nouveau: VM_INIT OK, CHANNEL_ALLOC blocked. **V111:** GPU learning system (Exp357-360, 88/88). **V110:** petalTongue visualization (Exp353-356) + Anderson QS O₂-modulated model (H3 r=0.851). **V109:** upstream rewire + NPU→GPU PCIe bypass + NUCLEUS atomics (Exp347-352, 145/145 PASS). **V108:** Track 6 anaerobic biogas (5 Liao papers, 183 checks). **V107:** R industry parity (53/53 PASS). V106: deep debt. V105: full-domain viz. V103: upstream rewire. V101: 78/78. V100: 173/173.
+**Status:** 47 CPU + 47 GPU modules + 1 IPC + 1 vault + 1 provenance + 1 visualization module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.5, wgpu 28). 1,611 tests (1,294 pass, 3 known GPU f32), 371 experiments, 9,886+ checks, 180 tolerances, 354 binaries. `cargo clippy -D warnings -W pedantic -W nursery` CLEAN, **0 silent fallbacks**. `#![forbid(unsafe_code)]` on all crate roots. **V114:** Deep audit — 15 `required-features` gate fixes, 52 clippy pedantic/nursery warnings resolved, 4 deprecated parsers migrated to streaming, inline tolerances eliminated, VRAM capability-based, `argmax_with_priors` unified. **V113:** Paper extension roadmap (Exp364-370, 67/67). **V112:** NVIDIA hardware learning prototype (Exp361-363, 45/45). RTX 4070: F32 safe, NVVM risk. **V111:** GPU learning system (Exp357-360, 88/88). **V110:** petalTongue visualization (Exp353-356) + Anderson QS O₂-modulated model (H3 r=0.851). **V109:** upstream rewire + NPU→GPU PCIe bypass + NUCLEUS atomics (Exp347-352, 145/145 PASS). **V108:** Track 6 anaerobic biogas (5 Liao papers, 183 checks). **V107:** R industry parity (53/53 PASS). V106: deep debt. V105: full-domain viz. V103: upstream rewire. V101: 78/78. V100: 173/173.
 
 ### Full Lean Phase
 
@@ -88,7 +88,9 @@ All GPU bio modules are now either Lean (upstream primitive) or Compose
 ### Code Quality (Phase 15+)
 
 All modules pass `clippy::pedantic` + `clippy::nursery` (0 warnings, `-D` enforced
-in CI), `cargo fmt` (0 diffs), `cargo doc` (0 warnings with and without `--all-features`).
+in CI). V114: 15 binaries received `required-features` gates (tokio/serde_json
+dependencies). 52 clippy pedantic/nursery warnings fixed across 25 V113 binaries.
+`cargo fmt` (0 diffs), `cargo doc` (0 warnings with and without `--all-features`).
 All tolerances centralized in `tolerances.rs` (179 named constants — includes
 Jacobi eigendecomposition (Golub & Van Loan), ESN regularisation (Jaeger 2001/
 Lukoševičius 2012), Chao1 count detection (skbio parity), and 8 V39 audit
@@ -106,7 +108,8 @@ Python baselines carry SPDX-License-Identifier + Date headers. DADA2 algorithmic
 constants fully documented with provenance (Callahan et al. 2016, R package defaults).
 Integration tests use streaming APIs exclusively (`Ms2Iter`, `MzmlIter`, `FastqIter`)
 — deprecated buffering APIs (`parse_ms2`, `parse_mzml`, `parse_fastq`) are no longer
-exercised outside their own deprecation-gated unit tests.
+exercised outside their own deprecation-gated unit tests. V114: Last 4 validation
+binaries migrated from deprecated batch APIs to streaming (FastqIter, Ms2Iter).
 GPU buffer limits and dispatch thresholds fully documented with hardware provenance.
 CI enforces fmt, clippy (pedantic+nursery), test, doc, and json feature check on
 every push/PR. **Rust edition 2024**, MSRV 1.87.
@@ -462,6 +465,7 @@ no parallelism benefit) and `fastq_parsing` (I/O-bound).
 | Feb 22 | **Exp100: metalForge Cross-Substrate v4** — 28/28 checks, 3 ODE domains exact parity, NPU routing, GPU→GPU→CPU pipeline |
 | Feb 22 | 5 new GPU wrappers: `kmer_gpu`, `unifrac_gpu`, `bistable_gpu`, `multi_signal_gpu`, `phage_defense_gpu` |
 | Feb 22 | GPU module count: 25 → 30. Local WGSL: 0 → 3. Absorbed ToadStool primitives: 32 → 30 (recounted after tier reclassification) |
+| Mar 12 | **V114 Deep Audit:** 15 binaries received `required-features` gates fixing default build. 52 clippy pedantic/nursery warnings fixed. 4 validation binaries migrated from deprecated batch parsers to streaming APIs. Inline tolerances replaced with `tolerances::*`. VRAM estimate evolved from hardcoded 12 GB to capability-based `max_buffer_size` derivation. |
 
 ---
 

@@ -15,8 +15,8 @@
 )]
 //! # Exp367: QS Gene Profiling — Anaerobic Regulon Cross-Reference
 //!
-//! Cross-references 34 known QS types with anaerobic transcription factor
-//! regulon databases (FNR, ArcAB, Rex) to predict oxygen-dependent QS gene
+//! Cross-references 34 known `QS` types with anaerobic transcription factor
+//! regulon databases (`FNR`, `ArcAB`, `Rex`) to predict oxygen-dependent `QS` gene
 //! regulation. Extends the H3 Anderson model with molecular mechanism support.
 //!
 //! ## Pipeline
@@ -29,8 +29,8 @@
 //!
 //! ## Data Source
 //!
-//! Cold seep QS catalog: 299,355 QS genes, 170 metagenomes, 34 QS types (Exp144-145)
-//! FNR/ArcAB/Rex regulon data: literature-curated (RegulonDB, DBTBS)
+//! Cold seep `QS` catalog: 299,355 `QS` genes, 170 metagenomes, 34 `QS` types (Exp144-145)
+//! `FNR`/`ArcAB`/`Rex` regulon data: literature-curated (`RegulonDB`, `DBTBS`)
 //! NCBI Protein: anaerobic-specific QS gene homologs
 //!
 //! ## Domains
@@ -53,10 +53,11 @@ use std::time::Instant;
 use wetspring_barracuda::validation::Validator;
 
 #[derive(Clone)]
+#[allow(clippy::struct_excessive_bools)]
 struct QsType {
     name: &'static str,
     signal_system: &'static str,
-    signal_molecule: &'static str,
+    _signal_molecule: &'static str,
     fnr_regulated: bool,
     arcab_regulated: bool,
     rex_regulated: bool,
@@ -71,7 +72,7 @@ fn qs_catalog() -> Vec<QsType> {
         QsType {
             name: "luxI/luxR (AHL-1)",
             signal_system: "AHL",
-            signal_molecule: "3OC6-HSL",
+            _signal_molecule: "3OC6-HSL",
             fnr_regulated: true,
             arcab_regulated: false,
             rex_regulated: false,
@@ -83,7 +84,7 @@ fn qs_catalog() -> Vec<QsType> {
         QsType {
             name: "lasI/lasR (AHL-2)",
             signal_system: "AHL",
-            signal_molecule: "3OC12-HSL",
+            _signal_molecule: "3OC12-HSL",
             fnr_regulated: false,
             arcab_regulated: true,
             rex_regulated: false,
@@ -95,7 +96,7 @@ fn qs_catalog() -> Vec<QsType> {
         QsType {
             name: "rhlI/rhlR (AHL-3)",
             signal_system: "AHL",
-            signal_molecule: "C4-HSL",
+            _signal_molecule: "C4-HSL",
             fnr_regulated: false,
             arcab_regulated: true,
             rex_regulated: false,
@@ -107,7 +108,7 @@ fn qs_catalog() -> Vec<QsType> {
         QsType {
             name: "ainS/ainR (AHL-4)",
             signal_system: "AHL",
-            signal_molecule: "C8-HSL",
+            _signal_molecule: "C8-HSL",
             fnr_regulated: true,
             arcab_regulated: false,
             rex_regulated: false,
@@ -119,7 +120,7 @@ fn qs_catalog() -> Vec<QsType> {
         QsType {
             name: "luxS (AI-2)",
             signal_system: "AI-2",
-            signal_molecule: "DPD/AI-2",
+            _signal_molecule: "DPD/AI-2",
             fnr_regulated: true,
             arcab_regulated: true,
             rex_regulated: true,
@@ -131,7 +132,7 @@ fn qs_catalog() -> Vec<QsType> {
         QsType {
             name: "luxPQ (AI-2 receptor)",
             signal_system: "AI-2",
-            signal_molecule: "DPD/AI-2",
+            _signal_molecule: "DPD/AI-2",
             fnr_regulated: false,
             arcab_regulated: false,
             rex_regulated: false,
@@ -143,7 +144,7 @@ fn qs_catalog() -> Vec<QsType> {
         QsType {
             name: "comQXPA (CSP)",
             signal_system: "CSP",
-            signal_molecule: "CSP peptide",
+            _signal_molecule: "CSP peptide",
             fnr_regulated: false,
             arcab_regulated: false,
             rex_regulated: false,
@@ -155,7 +156,7 @@ fn qs_catalog() -> Vec<QsType> {
         QsType {
             name: "agrBDCA (AIP)",
             signal_system: "AIP",
-            signal_molecule: "Thiolactone",
+            _signal_molecule: "Thiolactone",
             fnr_regulated: false,
             arcab_regulated: false,
             rex_regulated: true,
@@ -167,7 +168,7 @@ fn qs_catalog() -> Vec<QsType> {
         QsType {
             name: "dsf/rpfF (DSF)",
             signal_system: "DSF",
-            signal_molecule: "cis-2-decenoic acid",
+            _signal_molecule: "cis-2-decenoic acid",
             fnr_regulated: false,
             arcab_regulated: false,
             rex_regulated: false,
@@ -179,7 +180,7 @@ fn qs_catalog() -> Vec<QsType> {
         QsType {
             name: "PQS (pqsABCDE)",
             signal_system: "PQS",
-            signal_molecule: "2-heptyl-3-hydroxy-4-quinolone",
+            _signal_molecule: "2-heptyl-3-hydroxy-4-quinolone",
             fnr_regulated: false,
             arcab_regulated: true,
             rex_regulated: false,
@@ -191,7 +192,7 @@ fn qs_catalog() -> Vec<QsType> {
         QsType {
             name: "IQS (ambBCDE)",
             signal_system: "IQS",
-            signal_molecule: "2-(2-hydroxyphenyl)-thiazole",
+            _signal_molecule: "2-(2-hydroxyphenyl)-thiazole",
             fnr_regulated: false,
             arcab_regulated: false,
             rex_regulated: false,
@@ -203,7 +204,7 @@ fn qs_catalog() -> Vec<QsType> {
         QsType {
             name: "CAI-1 (cqsA/cqsS)",
             signal_system: "CAI-1",
-            signal_molecule: "3-aminotridecan-4-one",
+            _signal_molecule: "3-aminotridecan-4-one",
             fnr_regulated: true,
             arcab_regulated: false,
             rex_regulated: false,
@@ -215,7 +216,7 @@ fn qs_catalog() -> Vec<QsType> {
         QsType {
             name: "DarABC (c-di-GMP)",
             signal_system: "c-di-GMP",
-            signal_molecule: "cyclic di-GMP",
+            _signal_molecule: "cyclic di-GMP",
             fnr_regulated: true,
             arcab_regulated: true,
             rex_regulated: false,
@@ -227,7 +228,7 @@ fn qs_catalog() -> Vec<QsType> {
         QsType {
             name: "QseBC (AI-3/epi/NE)",
             signal_system: "AI-3",
-            signal_molecule: "Epinephrine/AI-3",
+            _signal_molecule: "Epinephrine/AI-3",
             fnr_regulated: false,
             arcab_regulated: false,
             rex_regulated: false,
@@ -380,7 +381,8 @@ fn main() {
             .iter()
             .map(|q| {
                 let t = *o2;
-                q.w_contribution_aerobic * t + q.w_contribution_anaerobic * (1.0 - t)
+                q.w_contribution_aerobic
+                    .mul_add(t, q.w_contribution_anaerobic * (1.0 - t))
             })
             .sum::<f64>()
             / catalog.len() as f64;
@@ -388,8 +390,8 @@ fn main() {
         println!("  {name:30} {h:6.1} {o2:6.2} {w_h3:8.2} {p_qs:8.4} {gene_w:8.3}");
     }
 
-    let gut_p = barracuda::stats::norm_cdf((16.5 - (3.5 * 2.8 + 8.0 * 0.1)) / 3.0);
-    let ocean_p = barracuda::stats::norm_cdf((16.5 - (3.5 * 4.0 + 8.0 * 0.9)) / 3.0);
+    let gut_p = barracuda::stats::norm_cdf((16.5 - 3.5f64.mul_add(2.8, 8.0 * 0.1)) / 3.0);
+    let ocean_p = barracuda::stats::norm_cdf((16.5 - 3.5f64.mul_add(4.0, 8.0 * 0.9)) / 3.0);
     v.check_pass("gut P(QS) > ocean P(QS)", gut_p > ocean_p);
 
     // ─── D120: Anderson H3 Molecular Support ───

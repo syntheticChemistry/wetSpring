@@ -88,7 +88,7 @@ fn fasta_to_species_counts(fasta: &str) -> Vec<f64> {
     counts
 }
 
-#[expect(clippy::many_single_char_names)]
+#[allow(clippy::many_single_char_names)]
 fn main() {
     let mut v = Validator::new("Exp184: Real NCBI 16S Through Sovereign Pipeline");
 
@@ -214,6 +214,7 @@ fn main() {
     let mut all_shannon = Vec::new();
     let mut all_simpson = Vec::new();
     let mut all_obs = Vec::new();
+    #[allow(clippy::collection_is_never_read)]
     let mut all_pielou = Vec::new();
 
     for (name, counts) in &sample_data {

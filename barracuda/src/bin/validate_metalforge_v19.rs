@@ -16,7 +16,7 @@
 //! # Exp351: `metalForge` v19 — V109 Mixed Hardware + NUCLEUS Atomics
 //!
 //! Proves substrate independence for V109 math across mixed hardware:
-//! NPU→GPU PCIe bypass (bypassing CPU roundtrip), GPU→CPU fallback,
+//! `NPU`→`GPU` `PCIe` bypass (bypassing `CPU` roundtrip), `GPU`→`CPU` fallback,
 //! CPU→NPU offload. NUCLEUS Tower/Node/Nest atomic coordination.
 //!
 //! CPU, GPU, and NPU produce identical results through `metalForge`
@@ -32,8 +32,8 @@
 //! - MF31: Diversity Mixed HW — cross-substrate Shannon/Simpson/BC parity
 //! - MF32: Biogas Kinetics Mixed HW — Gompertz/Monod across substrates
 //! - MF33: Anderson W Mixed HW — disorder mapping cross-system
-//! - MF34: NPU→GPU PCIe Bypass — direct transfer without CPU roundtrip
-//! - MF35: CPU Fallback Path — graceful degradation when GPU/NPU unavailable
+//! - MF34: `NPU`→`GPU` `PCIe` Bypass — direct transfer without `CPU` roundtrip
+//! - MF35: `CPU` Fallback Path — graceful degradation when `GPU`/`NPU` unavailable
 //! - MF36: End-to-End Pipeline — diversity → kinetics → W → P(QS)
 //!
 //! # Provenance
@@ -52,7 +52,10 @@ use wetspring_barracuda::validation::{DomainResult, Validator};
 use barracuda::stats::norm_cdf;
 
 fn gompertz(t: f64, p: f64, rm: f64, lambda: f64) -> f64 {
-    p * (-((rm * std::f64::consts::E / p) * (lambda - t) + 1.0).exp()).exp()
+    p * (-(rm * std::f64::consts::E / p)
+        .mul_add(lambda - t, 1.0)
+        .exp())
+    .exp()
 }
 
 #[expect(dead_code)]

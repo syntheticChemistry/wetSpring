@@ -20,9 +20,9 @@
 //!
 //! ## Domains
 //!
-//! - D80: Stable Specials CPU — log1p, expm1, erfc, bessel_j0_minus1 against reference
-//! - D81: Anderson Eigenvalue Problem — tridiagonal_ql for Anderson lattice
-//! - D82: Cross-Validation — stable vs naive implementations, cancellation comparison
+//! - `D80`: Stable Specials CPU — `log1p`, `expm1`, `erfc`, `bessel_j0_minus1` against reference
+//! - `D81`: Anderson Eigenvalue Problem — `tridiagonal_ql` for Anderson lattice
+//! - `D82`: Cross-Validation — stable vs naive implementations, cancellation comparison
 //!
 //! # Provenance
 //!
@@ -50,7 +50,7 @@ fn main() {
     println!("  log1p(x) vs ln(1+x):");
     for &x in &small_x_values {
         let stable = log1p_f64(x);
-        let naive = (1.0 + x).ln();
+        let naive = x.ln_1p();
         let reldiff = if stable.abs() > 1e-300 {
             ((stable - naive) / stable).abs()
         } else {
@@ -71,7 +71,7 @@ fn main() {
     println!("\n  expm1(x) vs exp(x)-1:");
     for &x in &small_x_values {
         let stable = expm1_f64(x);
-        let naive = x.exp() - 1.0;
+        let naive = x.exp_m1();
         let reldiff = if stable.abs() > 1e-300 {
             ((stable - naive) / stable).abs()
         } else {
@@ -90,11 +90,11 @@ fn main() {
     let erfc_test_points = [0.0_f64, 0.5, 1.0, 2.0, 3.0, 5.0];
     let erfc_reference = [
         1.0,
-        0.4795001221,
-        0.1572992070,
-        0.0046777350,
-        0.0000220905,
-        1.5374597945e-12,
+        0.479_500_122_1,
+        0.157_299_207_0,
+        0.004_677_735_0,
+        0.000_022_090_5,
+        1.537_459_794_5e-12,
     ];
 
     for (i, &x) in erfc_test_points.iter().enumerate() {
@@ -102,7 +102,10 @@ fn main() {
         let reference = erfc_reference[i];
         let absdiff = (computed - reference).abs();
         println!("    erfc({x:.1}) = {computed:.10e}  ref={reference:.10e}  diff={absdiff:.2e}");
-        v.check_pass(&format!("erfc({x}) within tolerance"), absdiff < 1e-6);
+        v.check_pass(
+            &format!("erfc({x}) within tolerance"),
+            absdiff < tolerances::ERF_PARITY,
+        );
     }
 
     println!("\n  bessel_j0_minus1(x):");
@@ -116,7 +119,7 @@ fn main() {
     let j0m1_tiny = bessel_j0_minus1_f64(1e-15);
     v.check_pass(
         "bessel_j0_minus1(1e-15) ≈ 0 (J₀(0)=1)",
-        j0m1_tiny.abs() < 1e-20,
+        j0m1_tiny.abs() < tolerances::VARIANCE_EXACT,
     );
 
     // ─── D81: Anderson Eigenvalue Problem ───
@@ -240,14 +243,14 @@ fn main() {
         "erfc(0) ≈ 1",
         (erfc_f64(0.0) - 1.0).abs() < tolerances::LIMIT_CONVERGENCE,
     );
-    v.check_pass("erfc(∞) → 0", erfc_f64(10.0) < 1e-10);
+    v.check_pass("erfc(∞) → 0", erfc_f64(10.0) < tolerances::ANALYTICAL_LOOSE);
 
     let clean_lattice = vec![0.0_f64; 8];
     let clean_sub = vec![-1.0_f64; 7];
     let (clean_eigs, _) = tridiagonal_ql(&clean_lattice, &clean_sub);
     v.check_pass(
         "clean lattice eigenvalues are symmetric around 0",
-        (clean_eigs.iter().sum::<f64>()).abs() < 1e-10,
+        (clean_eigs.iter().sum::<f64>()).abs() < tolerances::ANALYTICAL_LOOSE,
     );
 
     let elapsed = start.elapsed();

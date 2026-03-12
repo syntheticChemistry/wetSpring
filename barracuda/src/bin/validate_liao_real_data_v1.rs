@@ -49,93 +49,96 @@ use wetspring_barracuda::validation::Validator;
 
 struct DigestorCommunity {
     name: &'static str,
-    paper: &'static str,
+    _paper: &'static str,
     substrate: &'static str,
     relative_abundances: Vec<f64>,
     published_biogas_yield_ml_g: Option<f64>,
-    published_methane_pct: Option<f64>,
-    published_vs_removal_pct: Option<f64>,
+    _published_methane_pct: Option<f64>,
+    _published_vs_removal_pct: Option<f64>,
 }
 
 fn liao_communities() -> Vec<DigestorCommunity> {
     vec![
         DigestorCommunity {
             name: "Yang2016_FW_mono",
-            paper: "Yang et al. 2016",
+            _paper: "Yang et al. 2016",
             substrate: "Food waste mono-digestion",
             relative_abundances: vec![0.35, 0.20, 0.15, 0.10, 0.08, 0.05, 0.03, 0.02, 0.01, 0.01],
             published_biogas_yield_ml_g: Some(546.0),
-            published_methane_pct: Some(62.0),
-            published_vs_removal_pct: Some(78.3),
+            _published_methane_pct: Some(62.0),
+            _published_vs_removal_pct: Some(78.3),
         },
         DigestorCommunity {
             name: "Yang2016_FW_SS_codig",
-            paper: "Yang et al. 2016",
+            _paper: "Yang et al. 2016",
             substrate: "Food waste + sewage sludge co-digestion",
             relative_abundances: vec![0.22, 0.18, 0.15, 0.12, 0.10, 0.08, 0.06, 0.04, 0.03, 0.02],
             published_biogas_yield_ml_g: Some(621.0),
-            published_methane_pct: Some(65.0),
-            published_vs_removal_pct: Some(82.1),
+            _published_methane_pct: Some(65.0),
+            _published_vs_removal_pct: Some(82.1),
         },
         DigestorCommunity {
             name: "Chen2016_thermophilic",
-            paper: "Chen et al. 2016",
+            _paper: "Chen et al. 2016",
             substrate: "Thermophilic anaerobic culture",
             relative_abundances: vec![0.40, 0.25, 0.12, 0.08, 0.05, 0.04, 0.03, 0.02, 0.01],
             published_biogas_yield_ml_g: Some(410.0),
-            published_methane_pct: Some(58.0),
-            published_vs_removal_pct: Some(65.0),
+            _published_methane_pct: Some(58.0),
+            _published_vs_removal_pct: Some(65.0),
         },
         DigestorCommunity {
             name: "Chen2016_mesophilic",
-            paper: "Chen et al. 2016",
+            _paper: "Chen et al. 2016",
             substrate: "Mesophilic anaerobic culture",
             relative_abundances: vec![0.28, 0.20, 0.15, 0.12, 0.08, 0.06, 0.05, 0.03, 0.02, 0.01],
             published_biogas_yield_ml_g: Some(480.0),
-            published_methane_pct: Some(61.0),
-            published_vs_removal_pct: Some(72.0),
+            _published_methane_pct: Some(61.0),
+            _published_vs_removal_pct: Some(72.0),
         },
         DigestorCommunity {
             name: "RojasSossa2017_coffee",
-            paper: "Rojas-Sossa et al. 2017",
+            _paper: "Rojas-Sossa et al. 2017",
             substrate: "Coffee processing residues",
             relative_abundances: vec![0.30, 0.22, 0.15, 0.10, 0.08, 0.06, 0.04, 0.03, 0.01, 0.01],
             published_biogas_yield_ml_g: Some(380.0),
-            published_methane_pct: Some(55.0),
-            published_vs_removal_pct: Some(60.0),
+            _published_methane_pct: Some(55.0),
+            _published_vs_removal_pct: Some(60.0),
         },
         DigestorCommunity {
             name: "RojasSossa2019_AFEX",
-            paper: "Rojas-Sossa et al. 2019",
+            _paper: "Rojas-Sossa et al. 2019",
             substrate: "AFEX corn stover",
             relative_abundances: vec![0.25, 0.20, 0.15, 0.12, 0.10, 0.07, 0.05, 0.03, 0.02, 0.01],
             published_biogas_yield_ml_g: Some(520.0),
-            published_methane_pct: Some(63.0),
-            published_vs_removal_pct: Some(75.0),
+            _published_methane_pct: Some(63.0),
+            _published_vs_removal_pct: Some(75.0),
         },
         DigestorCommunity {
             name: "Zhong2016_fungal_pre",
-            paper: "Zhong et al. 2016",
+            _paper: "Zhong et al. 2016",
             substrate: "Fungal fermentation pretreatment",
             relative_abundances: vec![0.20, 0.18, 0.15, 0.13, 0.10, 0.08, 0.06, 0.05, 0.03, 0.02],
             published_biogas_yield_ml_g: Some(490.0),
-            published_methane_pct: Some(60.0),
-            published_vs_removal_pct: Some(70.0),
+            _published_methane_pct: Some(60.0),
+            _published_vs_removal_pct: Some(70.0),
         },
         DigestorCommunity {
             name: "Zhong2016_untreated",
-            paper: "Zhong et al. 2016",
+            _paper: "Zhong et al. 2016",
             substrate: "Untreated digestate",
             relative_abundances: vec![0.45, 0.20, 0.10, 0.08, 0.05, 0.04, 0.03, 0.02, 0.02, 0.01],
             published_biogas_yield_ml_g: Some(320.0),
-            published_methane_pct: Some(52.0),
-            published_vs_removal_pct: Some(55.0),
+            _published_methane_pct: Some(52.0),
+            _published_vs_removal_pct: Some(55.0),
         },
     ]
 }
 
 fn gompertz(t: f64, p: f64, rm: f64, lambda: f64) -> f64 {
-    p * (-((rm * std::f64::consts::E / p) * (lambda - t) + 1.0).exp()).exp()
+    p * (-(rm * std::f64::consts::E / p)
+        .mul_add(lambda - t, 1.0)
+        .exp())
+    .exp()
 }
 
 fn main() {
@@ -175,8 +178,8 @@ fn main() {
     struct DigestResult {
         name: String,
         shannon: f64,
-        simpson: f64,
-        richness: usize,
+        _simpson: f64,
+        _richness: usize,
         w_h3: f64,
         p_qs_h3: f64,
         biogas_yield: Option<f64>,
@@ -190,7 +193,7 @@ fn main() {
         let richness = c.relative_abundances.iter().filter(|&&a| a > 0.0).count();
 
         let o2 = 0.05;
-        let w_h3 = 3.5 * shannon + 8.0 * o2;
+        let w_h3 = 3.5f64.mul_add(shannon, 8.0 * o2);
         let p_qs_h3 = barracuda::stats::norm_cdf((16.5 - w_h3) / 3.0);
 
         println!(
@@ -201,8 +204,8 @@ fn main() {
         digest_results.push(DigestResult {
             name: c.name.to_string(),
             shannon,
-            simpson,
-            richness,
+            _simpson: simpson,
+            _richness: richness,
             w_h3,
             p_qs_h3,
             biogas_yield: c.published_biogas_yield_ml_g,
@@ -222,10 +225,10 @@ fn main() {
     println!("\n  ── D108: Gompertz Fitting ──");
 
     struct GompertzFit {
-        name: String,
-        p: f64,
-        rm: f64,
-        lambda: f64,
+        _name: String,
+        _p: f64,
+        _rm: f64,
+        _lambda: f64,
         r_squared: f64,
     }
 
@@ -237,13 +240,13 @@ fn main() {
             let rm = max_yield * 0.08;
             let lambda = 2.0;
 
-            let times: Vec<f64> = (0..30).map(|i| i as f64).collect();
+            let times: Vec<f64> = (0..30).map(f64::from).collect();
             let predicted: Vec<f64> = times.iter().map(|&t| gompertz(t, p, rm, lambda)).collect();
             let observed: Vec<f64> = times
                 .iter()
                 .map(|&t| {
                     let g = gompertz(t, p, rm, lambda);
-                    g * (1.0 + 0.02 * ((t * 7.0).sin()))
+                    g * 0.02f64.mul_add((t * 7.0).sin(), 1.0)
                 })
                 .collect();
 
@@ -261,10 +264,10 @@ fn main() {
                 c.name
             );
             fits.push(GompertzFit {
-                name: c.name.to_string(),
-                p,
-                rm,
-                lambda,
+                _name: c.name.to_string(),
+                _p: p,
+                _rm: rm,
+                _lambda: lambda,
                 r_squared: r_sq,
             });
         }

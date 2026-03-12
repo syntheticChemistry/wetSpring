@@ -103,8 +103,16 @@ fn main() {
 
         v.check_pass("adapter name populated", !cal.adapter_name.is_empty());
 
-        // VRAM estimate from device limits
-        let vram_estimate_gb = 12_u64;
+        let vram_estimate_gb = {
+            let caps = barracuda::device::DeviceCapabilities::from_device(dev);
+            let gb = caps.max_buffer_size / (1024 * 1024 * 1024);
+            if gb > 0 {
+                gb
+            } else {
+                // Conservative default when wgpu does not expose adapter memory info.
+                12_u64
+            }
+        };
         profile.insert(
             "vram_estimate_gb".into(),
             serde_json::json!(vram_estimate_gb),
@@ -235,7 +243,7 @@ fn main() {
                 serde_json::json!({
                     "cpu_gpu_crossover_n": crossover_n,
                     "gpu_advantage_at_10k": format!("{gpu_advantage_10k:.1}x"),
-                    "max_pairwise_n_12gb": max_pairwise_n,
+                    "max_pairwise_n": max_pairwise_n,
                 }),
             );
             println!(

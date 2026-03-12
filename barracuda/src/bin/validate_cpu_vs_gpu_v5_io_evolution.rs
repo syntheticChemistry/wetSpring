@@ -9,8 +9,7 @@
     clippy::cast_possible_truncation,
     clippy::cast_sign_loss,
     clippy::similar_names,
-    clippy::many_single_char_names,
-    deprecated
+    clippy::many_single_char_names
 )]
 //! # Exp215: CPU vs GPU v5 — V66 I/O Evolution Domains
 //!
@@ -174,7 +173,10 @@ fn validate_quality_gpu_derep(v: &mut Validator, gpu: &GpuF64) {
         }
     }
 
-    let records = fastq::parse_fastq(&path).unwrap();
+    let records: Vec<_> = fastq::FastqIter::open(&path)
+        .unwrap()
+        .collect::<Result<Vec<_>, _>>()
+        .unwrap();
     let params = quality::QualityParams {
         window_size: 4,
         window_min_quality: 15,
@@ -247,7 +249,10 @@ fn validate_ms2_gpu_spectral(v: &mut Validator, _gpu: &GpuF64) {
     })
     .unwrap();
 
-    let batch = ms2::parse_ms2(&path).unwrap();
+    let batch: Vec<_> = ms2::Ms2Iter::open(&path)
+        .unwrap()
+        .collect::<Result<Vec<_>, _>>()
+        .unwrap();
 
     v.check_count("4 spectra from stream", stream_spectra.len(), 4);
     v.check_count("4 spectra from batch", batch.len(), 4);
@@ -355,7 +360,10 @@ fn validate_full_gpu_chain(v: &mut Validator, gpu: &GpuF64) {
         }
     }
 
-    let records = fastq::parse_fastq(&path).unwrap();
+    let records: Vec<_> = fastq::FastqIter::open(&path)
+        .unwrap()
+        .collect::<Result<Vec<_>, _>>()
+        .unwrap();
     v.check_count("pipeline: 200 reads", records.len(), 200);
 
     let params = quality::QualityParams {

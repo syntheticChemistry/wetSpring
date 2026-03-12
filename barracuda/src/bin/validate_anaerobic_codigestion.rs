@@ -17,7 +17,10 @@ use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn gompertz(t: f64, p: f64, rm: f64, lambda: f64) -> f64 {
-    p * (-((rm * std::f64::consts::E / p) * (lambda - t) + 1.0).exp()).exp()
+    p * (-(rm * std::f64::consts::E / p)
+        .mul_add(lambda - t, 1.0)
+        .exp())
+    .exp()
 }
 
 fn main() {

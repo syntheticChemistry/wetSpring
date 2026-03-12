@@ -176,7 +176,10 @@ fn validate_quality_derep_chain(v: &mut Validator) {
         }
     }
 
-    let records = fastq::parse_fastq(&path).unwrap();
+    let records: Vec<_> = fastq::FastqIter::open(&path)
+        .unwrap()
+        .collect::<Result<Vec<_>, _>>()
+        .unwrap();
     v.check_count("parsed 20 reads", records.len(), 20);
 
     let params = quality::QualityParams {
@@ -304,7 +307,10 @@ fn validate_ms2_spectral_math(v: &mut Validator) {
     })
     .unwrap();
 
-    let batch_spectra = ms2::parse_ms2(&path).unwrap();
+    let batch_spectra: Vec<_> = ms2::Ms2Iter::open(&path)
+        .unwrap()
+        .collect::<Result<Vec<_>, _>>()
+        .unwrap();
 
     v.check_count("5 spectra from streaming", stream_spectra.len(), 5);
     v.check_count("5 spectra from batch", batch_spectra.len(), 5);
@@ -403,13 +409,19 @@ fn validate_end_to_end_pipeline(v: &mut Validator) {
         }
     }
 
-    let fwd_records = fastq::parse_fastq(&fwd_path).unwrap();
-    let rev_records = fastq::parse_fastq(&rev_path).unwrap();
+    let fwd_records: Vec<_> = fastq::FastqIter::open(&fwd_path)
+        .unwrap()
+        .collect::<Result<Vec<_>, _>>()
+        .unwrap();
+    let rev_records: Vec<_> = fastq::FastqIter::open(&rev_path)
+        .unwrap()
+        .collect::<Result<Vec<_>, _>>()
+        .unwrap();
     v.check_count("parsed 50 forward reads", fwd_records.len(), 50);
     v.check_count("parsed 50 reverse reads", rev_records.len(), 50);
 
-    let fwd_stats = fastq::compute_stats(&fwd_records);
-    let rev_stats = fastq::compute_stats(&rev_records);
+    let fwd_stats = fastq::stats_from_file(&fwd_path).unwrap();
+    let rev_stats = fastq::stats_from_file(&rev_path).unwrap();
     v.check_count("all forward reads 250bp", fwd_stats.min_length, 250);
     v.check_count("all reverse reads 250bp", rev_stats.min_length, 250);
 

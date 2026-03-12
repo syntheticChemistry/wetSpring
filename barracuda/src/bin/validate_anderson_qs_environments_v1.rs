@@ -40,12 +40,12 @@
 //! **H3 (Oxygen-modulated)**: W = h(H', O₂). Oxygen is an additional
 //!   disorder dimension — FNR/ArcAB/Rex regulate QS genes, so anaerobic
 //!   conditions reduce transcriptional noise for QS operons.
-//!   W_total = W_diversity + W_oxygen.
+//!   `W_total` = `W_diversity` + `W_oxygen`.
 //!
 //! ## What This Proves
 //!
 //! Which W parameterization best matches known QS biology from literature.
-//! Exports a petalTongue scenario comparing all three models side-by-side.
+//! Exports a `petalTongue` scenario comparing all three models side-by-side.
 //!
 //! # Provenance
 //!
@@ -601,7 +601,7 @@ fn main() {
         id: "p_h1".into(),
         label: "H1: P(QS) Inverse Diversity".into(),
         categories: env_names.clone(),
-        values: p1_vals.clone(),
+        values: p1_vals,
         unit: "probability".into(),
     });
     compare_node.data_channels.push(DataChannel::Bar {
@@ -623,7 +623,7 @@ fn main() {
     compare_node.data_channels.push(DataChannel::Scatter {
         id: "h3_vs_known".into(),
         label: "H3 P(QS) vs Known QS Score".into(),
-        x: known.clone(),
+        x: known,
         y: p3_vals.clone(),
         point_labels: env_names.clone(),
         x_label: "Known QS Score".into(),
@@ -676,7 +676,7 @@ fn main() {
         label: "O₂ Level vs P(QS) [H3]".into(),
         x: o2_levels,
         y: p3_vals.clone(),
-        point_labels: env_names.clone(),
+        point_labels: env_names,
         x_label: "O₂ (fraction)".into(),
         y_label: "P(QS) H3".into(),
         unit: "probability".into(),

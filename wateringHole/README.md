@@ -1,6 +1,6 @@
 # wetSpring wateringHole
 
-**Date:** March 11, 2026
+**Date:** March 12, 2026
 **Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records.
 
 ---
@@ -9,6 +9,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
+| **V114** | `handoffs/WETSPRING_V114_DEEP_AUDIT_BARRACUDA_TOADSTOOL_HANDOFF_MAR12_2026.md` | Mar 12 | **Deep audit handoff** — 15 `required-features` gate fixes, 52 clippy warnings resolved, deprecated parsers migrated, inline tolerances eliminated, VRAM capability-based, code deduplicated. Absorption status (fully lean), upstream requests (P0-P2 carried forward), API observations, Python baseline audit, evolution roadmap. |
 | **V113** | `handoffs/WETSPRING_V113_BARRACUDA_TOADSTOOL_EVOLUTION_HANDOFF_MAR11_2026.md` | Mar 11 | **Upstream evolution handoff** — 150+ primitives, P0/P1/P2 absorption targets (BIOM parser, esearch_ids, Gompertz fit, hw-learn profile consumer, SRA prefetch, temporal W, regulon DB, distributed Anderson graph), API observations, hardware learning findings (RTX 4070 F32/DF64, nouveau status), science pipeline architecture, deployment feedback. |
 | **V113** | `handoffs/WETSPRING_V113_PAPER_EXTENSION_ROADMAP_HANDOFF_MAR11_2026.md` | Mar 11 | Paper extension roadmap (Exp364-370, 67/67). EMP 28K atlas, Liao real data, KBS LTER temporal, QS gene profiling (FNR/ArcAB/Rex regulons), primal integration pipeline, P1 framework (cold seep/Tara/HMP/AMR/mycorrhizal), LAN mesh SRA atlas plan (5 towers, 96GB VRAM, 208 TFLOPS). |
 | **V112** | `handoffs/WETSPRING_V112_NVIDIA_HARDWARE_LEARNING_HANDOFF_MAR11_2026.md` | Mar 11 | NVIDIA hardware learning prototype (Exp361-363, 45/45). Probe-calibrate-route-apply pattern. Dual-GPU discovery (RTX 4070 nvidia + Titan V nouveau), firmware inventory, nouveau diagnostic (VM_INIT OK, CHANNEL_ALLOC blocked on Volta), capability profile JSON, adaptive dispatch from profile. |
@@ -21,8 +22,7 @@
 | **V105** | `handoffs/WETSPRING_V105_BARRACUDA_TOADSTOOL_EVOLUTION_HANDOFF_MAR10_2026.md` | Mar 10 | Comprehensive upstream handoff: 150+ primitives consumed, 47 GPU modules, 6 upstream requests (BipartitionEncodeGpu, CPU Jacobi, merge pairs GPU, BatchReconcileGpu), API evolution observations, visualization layer evolution. |
 | **V104** | `handoffs/WETSPRING_V104_DEEP_DEBT_EVOLUTION_HANDOFF_MAR09_2026.md` | Mar 9 | Deep debt: JCAMP-DX parser, Dorado basecaller, GPU peak integration, #[allow]→#[expect] migration, 56 stale suppressions removed, 8 clippy warnings resolved. |
 | **V103** | `handoffs/WETSPRING_V103_UPSTREAM_REWIRE_HANDOFF_MAR10_2026.md` | Mar 10 | Upstream rewire: #[allow]→#[expect] across 209 files, 37 stale suppressions, /tmp/→temp_dir(). |
-| **V102** | `handoffs/WETSPRING_V102_PETALTONGUE_V2_FULL_DOMAIN_VIZ_HANDOFF_MAR09_2026.md` | Mar 9 | petalTongue V2: 28 new scenario builders (6 tracks), 4 composite full-pipeline, FieldMap channel, UiConfig/BackpressureConfig, push_replace fix, wetspring_dashboard binary, validate_visualization_v2 (140/140). 9,200+ checks. |
-| **V102** | `handoffs/WETSPRING_V102_BARRACUDA_TOADSTOOL_VIZ_EVOLUTION_HANDOFF_MAR09_2026.md` | Mar 9 | barraCuda/toadStool evolution: primitive consumption patterns, API observations (OdeResult helpers, KmerCounts f64), GPU gap (placement batch), lessons learned. |
+| **V102** | *(archived — V102 handoffs superseded by V105 petalTongue + evolution handoffs)* | Mar 9 | petalTongue V2 + barraCuda evolution (content folded into V105 handoffs) |
 | **V101** | `handoffs/WETSPRING_V101_DEEP_DEBT_EVOLUTION_HANDOFF_MAR09_2026.md` | Mar 9 | Deep debt evolution: 179 tolerances (was 164), all bare literals promoted, 3 binaries refactored, clippy pedantic clean, absorption manifest corrected. 1,455 tests, 316 binaries, 9,060+ checks. |
 | **V99** | `handoffs/WETSPRING_V99_BIOMEOS_NUCLEUS_FULL_CHAIN_HANDOFF_MAR08_2026.md` | Mar 8 | biomeOS/NUCLEUS integration + full V99 chain: Exp321-326 (166/166 PASS). Deploy graph, IPC server, cross-primal pipeline, CPU v25 (46), GPU v14 (27), metalForge v17 (29). ToadStool dispatch + NUCLEUS atomic probes. 300 experiments, 8,886+ checks. |
 | **V98+** | `handoffs/WETSPRING_V98_CROSS_SPRING_EVOLUTION_HANDOFF_MAR08_2026.md` | Mar 8 | Cross-spring evolution: Exp319 (52/52) + Exp320 benchmark. All 5 springs exercised, provenance registry (28 shaders, 22 cross-spring). GPU FusedMapReduceF64 validated. |

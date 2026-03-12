@@ -758,6 +758,7 @@ required-features = ["gpu"]
 [[bin]]
 name = "validate_knowledge_graph_embedding"
 path = "src/bin/validate_knowledge_graph_embedding.rs"
+required-features = ["gpu"]
 
 # ── Exp152-156: Paper Queue Extension (Phase 39) ──────────────
 [[bin]]
@@ -802,6 +803,7 @@ required-features = ["gpu"]
 [[bin]]
 name = "validate_ncbi_vibrio_qs"
 path = "src/bin/validate_ncbi_vibrio_qs.rs"
+required-features = ["gpu"]
 
 # ── 2D Anderson Spatial QS Lattice (Exp122) ──────────────────────
 [[bin]]
@@ -1640,11 +1642,13 @@ path = "src/bin/validate_metalforge_v16.rs"
 [[bin]]
 name = "validate_cross_spring_evolution_v98"
 path = "src/bin/validate_cross_spring_evolution_v98.rs"
+required-features = ["gpu"]
 
 # ── Exp320: V98+ Cross-Spring Evolution Benchmark ──
 [[bin]]
 name = "benchmark_cross_spring_evolution_v98"
 path = "src/bin/benchmark_cross_spring_evolution_v98.rs"
+required-features = ["gpu"]
 
 # ── Exp321: V98+ biomeOS/NUCLEUS Integration Validation ──
 [[bin]]
@@ -1745,6 +1749,7 @@ path = "src/bin/benchmark_python_vs_rust_v5.rs"
 [[bin]]
 name = "validate_cpu_vs_gpu_v10"
 path = "src/bin/validate_cpu_vs_gpu_v10.rs"
+required-features = ["gpu"]
 
 [[bin]]
 name = "validate_pure_gpu_streaming_v12"
@@ -1759,10 +1764,12 @@ path = "src/bin/validate_metalforge_v18.rs"
 [[bin]]
 name = "validate_barracuda_cpu_v27"
 path = "src/bin/validate_barracuda_cpu_v27.rs"
+required-features = ["gpu"]
 
 [[bin]]
 name = "validate_cpu_vs_gpu_v11"
 path = "src/bin/validate_cpu_vs_gpu_v11.rs"
+required-features = ["gpu"]
 
 [[bin]]
 name = "validate_toadstool_dispatch_v4"
@@ -1784,6 +1791,7 @@ required-features = ["ipc"]
 [[bin]]
 name = "validate_petaltongue_live_v1"
 path = "src/bin/validate_petaltongue_live_v1.rs"
+required-features = ["json"]
 
 [[bin]]
 name = "validate_petaltongue_anderson_v1"
@@ -1800,10 +1808,12 @@ path = "src/bin/validate_anderson_qs_environments_v1.rs"
 [[bin]]
 name = "validate_precision_brain_v1"
 path = "src/bin/validate_precision_brain_v1.rs"
+required-features = ["gpu", "json"]
 
 [[bin]]
 name = "validate_workload_routing_v1"
 path = "src/bin/validate_workload_routing_v1.rs"
+required-features = ["gpu"]
 
 [[bin]]
 name = "validate_stable_specials_v1"
@@ -1812,43 +1822,54 @@ path = "src/bin/validate_stable_specials_v1.rs"
 [[bin]]
 name = "validate_sovereign_dispatch_v1"
 path = "src/bin/validate_sovereign_dispatch_v1.rs"
+required-features = ["gpu"]
 
 [[bin]]
 name = "validate_nouveau_diagnostic_v1"
 path = "src/bin/validate_nouveau_diagnostic_v1.rs"
+required-features = ["gpu", "json"]
 
 [[bin]]
 name = "validate_hardware_learning_v1"
 path = "src/bin/validate_hardware_learning_v1.rs"
+required-features = ["gpu", "json"]
 
 [[bin]]
 name = "validate_adaptive_dispatch_v1"
 path = "src/bin/validate_adaptive_dispatch_v1.rs"
+required-features = ["gpu", "json"]
 
 [[bin]]
 name = "validate_emp_anderson_v1"
 path = "src/bin/validate_emp_anderson_v1.rs"
+required-features = ["json"]
 
 [[bin]]
 name = "validate_liao_real_data_v1"
 path = "src/bin/validate_liao_real_data_v1.rs"
+required-features = ["json"]
 
 [[bin]]
 name = "validate_kbs_lter_anderson_v1"
 path = "src/bin/validate_kbs_lter_anderson_v1.rs"
+required-features = ["json"]
 
 [[bin]]
 name = "validate_qs_gene_profiling_v1"
 path = "src/bin/validate_qs_gene_profiling_v1.rs"
+required-features = ["json"]
 
 [[bin]]
 name = "validate_primal_pipeline_v1"
 path = "src/bin/validate_primal_pipeline_v1.rs"
+required-features = ["gpu", "json"]
 
 [[bin]]
 name = "validate_p1_extensions_v1"
 path = "src/bin/validate_p1_extensions_v1.rs"
+required-features = ["json"]
 
 [[bin]]
 name = "validate_lan_mesh_plan_v1"
 path = "src/bin/validate_lan_mesh_plan_v1.rs"
+required-features = ["json"]

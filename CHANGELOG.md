@@ -3,6 +3,28 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## V114 — Deep Audit + Build Fix + Idiomatic Evolution (2026-03-12)
+
+### Fixed
+- **Build broken** — 15 validation binaries missing `required-features` gates for `gpu` and/or `json` features (`tokio`, `serde_json`, `barracuda::device` used without feature gates). Default `cargo check` now passes.
+- **Clippy pedantic/nursery** — 52 warnings fixed across 25 V113 binaries: `doc_markdown` (backtick wrapping), `suboptimal_flops` (`mul_add`), `cast_lossless` (`f64::from`), `manual_clamp`, `needless_range_loop`, `redundant_clone`, `single_match_else`, dead struct fields, bare URLs.
+- **Deprecated batch parsers** — Last 4 validation binaries (`validate_barracuda_cpu_v12`, `validate_cpu_vs_gpu_v5_io_evolution`, `validate_nucleus_v8_mixed`, `validate_streaming_io_parity`) migrated from `parse_fastq`/`parse_ms2` to streaming APIs (`FastqIter`, `Ms2Iter`).
+
+### Changed
+- **Inline tolerances** — `validate_stable_specials_v1.rs` inline `1e-6`, `1e-20`, `1e-10` replaced with `tolerances::ERF_PARITY`, `VARIANCE_EXACT`, `ANALYTICAL_LOOSE`.
+- **VRAM estimate** — `validate_hardware_learning_v1.rs` hardcoded `12_u64` GB evolved to capability-based derivation from `DeviceCapabilities::max_buffer_size`.
+- **Code deduplication** — `argmax_with_priors` unified in `bio::taxonomy` module (was duplicated in `streaming_gpu.rs` and `taxonomy_gpu.rs`).
+- **EVOLUTION_READINESS.md** — Updated with V114 audit entries (build fix, clippy, streaming migration, tolerance evolution).
+
+### Quality
+- `cargo fmt --check`: **0 diffs**
+- `cargo clippy -W pedantic -W nursery`: **0 warnings** (was 52)
+- `cargo doc --no-deps`: **0 warnings** (was 2)
+- `cargo test`: **All pass** (was broken)
+- All files under 1000 LOC
+- 0 TODO/FIXME markers
+- 0 unsafe code blocks
+
 ## V113 — Paper Extension Roadmap + P0-P1 Dataset Pipelines (2026-03-11)
 
 ### Added

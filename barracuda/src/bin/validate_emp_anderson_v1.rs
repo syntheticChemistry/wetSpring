@@ -21,17 +21,17 @@
 //!
 //! ## Pipeline
 //!
-//! 1. Load OTU/ASV table (TSV: samples × taxa, counts)
+//! 1. Load `OTU`/`ASV` table (`TSV`: samples × taxa, counts)
 //! 2. Per sample: Shannon H', Simpson D, Pielou J, richness S
 //! 3. Map to Anderson W via three models (H1, H2, H3)
-//! 4. Compute P(QS) = norm_cdf((16.5 - W) / 3.0)
+//! 4. Compute P(QS) = `norm_cdf((16.5 - W) / 3.0)`
 //! 5. Stratify by biome metadata
 //! 6. Export atlas JSON + petalTongue dashboard
 //!
 //! ## Data Source
 //!
 //! EMP study 10317 on Qiita (Thompson et al. 2017)
-//! URL: https://qiita.ucsd.edu/study/description/10317
+//! URL: <https://qiita.ucsd.edu/study/description/10317>
 //! Format: BIOM or TSV OTU table + sample metadata TSV
 //!
 //! For V1, we demonstrate the pipeline with synthetic EMP-scale data
@@ -66,7 +66,7 @@ struct OtuSample {
 }
 
 struct DiversityResult {
-    sample_id: String,
+    _sample_id: String,
     biome: String,
     oxygen_regime: f64,
     shannon: f64,
@@ -76,8 +76,8 @@ struct DiversityResult {
     w_h1: f64,
     w_h2: f64,
     w_h3: f64,
-    p_qs_h1: f64,
-    p_qs_h2: f64,
+    _p_qs_h1: f64,
+    _p_qs_h2: f64,
     p_qs_h3: f64,
 }
 
@@ -122,17 +122,17 @@ fn generate_emp_scale_synthetic(n_per_biome: usize) -> Vec<OtuSample> {
                 .wrapping_mul(6_364_136_223_846_793_005)
                 .wrapping_add(i as u64);
             let mut counts = vec![0.0_f64; n_taxa];
-            let richness_frac = (*mean_h / 4.5).min(1.0).max(0.1);
+            let richness_frac = (*mean_h / 4.5).clamp(0.1, 1.0);
             let n_present = ((richness_frac * n_taxa as f64) as usize).max(3);
 
-            for j in 0..n_present {
+            for (j, count) in counts.iter_mut().take(n_present).enumerate() {
                 let pseudo = ((seed
                     .wrapping_mul(6_364_136_223_846_793_005)
                     .wrapping_add(j as u64 * 1_442_695_040_888_963_407))
                     as f64)
                     / u64::MAX as f64;
                 let rank_weight = 1.0 / (1.0 + j as f64).powf(0.8 + pseudo * 0.4);
-                counts[j] = (rank_weight * 100.0 * (0.5 + pseudo)).max(1.0);
+                *count = (rank_weight * 100.0 * (0.5 + pseudo)).max(1.0);
             }
 
             samples.push(OtuSample {
@@ -188,7 +188,7 @@ fn compute_diversity(sample: &OtuSample) -> DiversityResult {
 
     let w_h1 = 20.0 * (-0.3 * shannon).exp();
     let w_h2 = 4.0 * shannon;
-    let w_h3 = 3.5 * shannon + 8.0 * sample.oxygen_regime;
+    let w_h3 = 3.5f64.mul_add(shannon, 8.0 * sample.oxygen_regime);
 
     let norm_cdf = barracuda::stats::norm_cdf;
     let p_qs_h1 = norm_cdf((16.5 - w_h1) / 3.0);
@@ -196,7 +196,7 @@ fn compute_diversity(sample: &OtuSample) -> DiversityResult {
     let p_qs_h3 = norm_cdf((16.5 - w_h3) / 3.0);
 
     DiversityResult {
-        sample_id: sample.sample_id.clone(),
+        _sample_id: sample.sample_id.clone(),
         biome: sample.biome.clone(),
         oxygen_regime: sample.oxygen_regime,
         shannon,
@@ -206,8 +206,8 @@ fn compute_diversity(sample: &OtuSample) -> DiversityResult {
         w_h1,
         w_h2,
         w_h3,
-        p_qs_h1,
-        p_qs_h2,
+        _p_qs_h1: p_qs_h1,
+        _p_qs_h2: p_qs_h2,
         p_qs_h3,
     }
 }
@@ -222,17 +222,14 @@ fn main() {
     let real_path = "data/emp_otu_table.tsv";
     let samples = if std::path::Path::new(real_path).exists() {
         println!("  Loading REAL EMP data from {real_path}...");
-        match load_real_emp_tsv(real_path) {
-            Some(s) => {
-                println!("  Loaded {} real samples", s.len());
-                v.check_pass("real EMP data loaded", true);
-                s
-            }
-            None => {
-                println!("  Failed to parse real data, falling back to synthetic");
-                v.check_pass("fallback to synthetic", true);
-                generate_emp_scale_synthetic(1000)
-            }
+        if let Some(s) = load_real_emp_tsv(real_path) {
+            println!("  Loaded {} real samples", s.len());
+            v.check_pass("real EMP data loaded", true);
+            s
+        } else {
+            println!("  Failed to parse real data, falling back to synthetic");
+            v.check_pass("fallback to synthetic", true);
+            generate_emp_scale_synthetic(1000)
         }
     } else {
         println!("  No real EMP data at {real_path} — using synthetic EMP-scale");
@@ -372,13 +369,11 @@ fn main() {
     let monoculture_p = biome_summary
         .iter()
         .find(|(b, _, _, _, _)| b.contains("monoculture"))
-        .map(|(_, p, _, _, _)| *p)
-        .unwrap_or(0.0);
+        .map_or(0.0, |(_, p, _, _, _)| *p);
     let ocean_p = biome_summary
         .iter()
         .find(|(b, _, _, _, _)| b.contains("ocean"))
-        .map(|(_, p, _, _, _)| *p)
-        .unwrap_or(1.0);
+        .map_or(1.0, |(_, p, _, _, _)| *p);
 
     v.check_pass(
         "monoculture P(QS) > ocean P(QS) (expected)",
@@ -390,7 +385,7 @@ fn main() {
 
     #[cfg(feature = "json")]
     {
-        use wetspring_barracuda::visualization::*;
+        use wetspring_barracuda::visualization::{DataChannel, EcologyScenario, ScenarioNode};
 
         let mut atlas_node = ScenarioNode {
             id: "emp_atlas".into(),

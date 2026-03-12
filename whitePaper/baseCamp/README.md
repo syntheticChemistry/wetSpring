@@ -1,8 +1,8 @@
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** March 11, 2026
+**Date:** March 12, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V113 — 370 experiments, 9,886+ validation checks, ALL PASS; 1,611 tests (1,294 pass, 3 known GPU f32 failures), 354 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 784+ WGSL shaders), toadStool S146, coralReef Iter 33. V113: Paper extension roadmap (Exp364-370: EMP 28K atlas, Liao real data, KBS LTER temporal, QS gene profiling, primal pipeline, P1 framework, LAN mesh plan, 67/67 PASS). V112: NVIDIA hardware learning (Exp361-363, 45/45). V111: GPU learning system (Exp357-360, 88/88). V110: petalTongue visualization (Exp353-356). V109: upstream rewire + NUCLEUS (Exp347-352, 145/145). V108: Track 6 anaerobic biogas. V107: R industry parity (53/53). 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL, 180 tolerances, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS.
+**Status:** V114 — 371 experiments, 9,886+ validation checks, ALL PASS; 1,611 tests (1,294 pass, 3 known GPU f32 failures), 354 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 784+ WGSL shaders), toadStool S146, coralReef Iter 33. V114: Deep audit — 15 `required-features` gate fixes, 52 clippy pedantic/nursery warnings resolved, 4 deprecated parsers migrated to streaming, inline tolerances eliminated, VRAM capability-based, `argmax_with_priors` unified. V113: Paper extension roadmap (Exp364-370, 67/67). V112: NVIDIA hardware learning (Exp361-363, 45/45). V107: R industry parity (53/53). 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL, 180 tolerances, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS.
 
 ---
 

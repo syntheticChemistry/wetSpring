@@ -31,9 +31,9 @@
 //! ## Domains
 //!
 //! - D131: Tower Inventory — hardware capabilities per node
-//! - D132: SRA Atlas Sizing — storage + compute estimates for 500-2000 BioProjects
-//! - D133: Workload Distribution — NUCLEUS graph for distributed DADA2 + Anderson
-//! - D134: Bandwidth Model — 10G throughput for NestGate ↔ node transfers
+//! - D132: `SRA` Atlas Sizing — storage + compute estimates for 500-2000 `BioProject`s
+//! - D133: Workload Distribution — `NUCLEUS` graph for distributed `DADA2` + `Anderson`
+//! - D134: Bandwidth Model — 10G throughput for `NestGate` ↔ node transfers
 //! - D135: Cost-Time Trade-off — weekend vs week vs month projections
 //!
 //! # Provenance
@@ -53,7 +53,7 @@ struct TowerNode {
     gpu: &'static str,
     vram_gb: f64,
     cpu_cores: usize,
-    ram_gb: f64,
+    _ram_gb: f64,
     storage_tb: f64,
     gpu_tflops_f32: f64,
     anderson_samples_per_hour: f64,
@@ -67,7 +67,7 @@ fn tower_inventory() -> Vec<TowerNode> {
             gpu: "RTX 4070 (AD104)",
             vram_gb: 12.0,
             cpu_cores: 24,
-            ram_gb: 32.0,
+            _ram_gb: 32.0,
             storage_tb: 2.0,
             gpu_tflops_f32: 29.1,
             anderson_samples_per_hour: 5000.0,
@@ -78,7 +78,7 @@ fn tower_inventory() -> Vec<TowerNode> {
             gpu: "RTX 3090 + RX 6950 XT",
             vram_gb: 24.0 + 16.0,
             cpu_cores: 128,
-            ram_gb: 128.0,
+            _ram_gb: 128.0,
             storage_tb: 4.0,
             gpu_tflops_f32: 35.6 + 23.7,
             anderson_samples_per_hour: 8000.0,
@@ -89,7 +89,7 @@ fn tower_inventory() -> Vec<TowerNode> {
             gpu: "RTX 5090",
             vram_gb: 32.0,
             cpu_cores: 16,
-            ram_gb: 64.0,
+            _ram_gb: 64.0,
             storage_tb: 2.0,
             gpu_tflops_f32: 104.8,
             anderson_samples_per_hour: 15_000.0,
@@ -100,7 +100,7 @@ fn tower_inventory() -> Vec<TowerNode> {
             gpu: "Titan V (GV100)",
             vram_gb: 12.0,
             cpu_cores: 8,
-            ram_gb: 32.0,
+            _ram_gb: 32.0,
             storage_tb: 1.0,
             gpu_tflops_f32: 14.9,
             anderson_samples_per_hour: 3000.0,
@@ -111,7 +111,7 @@ fn tower_inventory() -> Vec<TowerNode> {
             gpu: "none",
             vram_gb: 0.0,
             cpu_cores: 4,
-            ram_gb: 16.0,
+            _ram_gb: 16.0,
             storage_tb: 76.0,
             gpu_tflops_f32: 0.0,
             anderson_samples_per_hour: 0.0,

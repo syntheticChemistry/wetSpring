@@ -22,9 +22,9 @@
 //!
 //! ## What This Proves
 //!
-//! 1. All 9 DataChannel types serialize correctly for petalTongue
+//! 1. All 9 `DataChannel` types serialize correctly for `petalTongue`
 //! 2. IPC push client discovers petalTongue socket (or gracefully degrades)
-//! 3. StreamSession lifecycle works with ecology data
+//! 3. `StreamSession` lifecycle works with ecology data
 //! 4. Scenario JSON export produces valid petalTongue-loadable files
 //! 5. biomeOS binary discovery and NUCLEUS readiness (when available)
 //! 6. Real barraCuda math produces actionable visualizations
@@ -443,7 +443,7 @@ fn main() {
         warning_range: [0.0, 0.5],
     });
 
-    let w_sweep: Vec<f64> = (0..50).map(|i| i as f64 * 0.5).collect();
+    let w_sweep: Vec<f64> = (0..50).map(|i| f64::from(i) * 0.5).collect();
     let p_sweep: Vec<f64> = w_sweep.iter().map(|&w| p_qs(w)).collect();
     anderson_node.data_channels.push(DataChannel::TimeSeries {
         id: "w_vs_pqs".into(),
@@ -473,7 +473,7 @@ fn main() {
         id: "bc_biomes".into(),
         label: "Bray-Curtis Across Biomes".into(),
         x_labels: labels.clone(),
-        y_labels: labels.clone(),
+        y_labels: labels,
         values: bc_matrix,
         unit: "BC index".into(),
     });

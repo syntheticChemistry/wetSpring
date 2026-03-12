@@ -38,6 +38,20 @@ pub use classifier::NaiveBayesClassifier;
 pub use kmers::{extract_kmers, parse_reference_fasta};
 pub use types::{Classification, ClassifyParams, Lineage, NpuWeights, ReferenceSeq, TaxRank};
 
+#[cfg(feature = "gpu")]
+pub(crate) fn argmax_with_priors(scores: &[f64], log_priors: &[f64]) -> usize {
+    let mut best = f64::NEG_INFINITY;
+    let mut best_idx = 0;
+    for (i, (&s, &lp)) in scores.iter().zip(log_priors.iter()).enumerate() {
+        let total = s + lp;
+        if total > best {
+            best = total;
+            best_idx = i;
+        }
+    }
+    best_idx
+}
+
 #[cfg(test)]
 #[expect(clippy::expect_used, clippy::unwrap_used)]
 mod tests {

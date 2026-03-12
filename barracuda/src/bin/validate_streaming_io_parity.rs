@@ -7,7 +7,7 @@
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
     clippy::cast_sign_loss,
-    deprecated
+    clippy::redundant_closure_for_method_calls
 )]
 //! # Exp209: Streaming I/O Parity Validation
 //!
@@ -85,7 +85,10 @@ fn validate_fastq_stats_parity(v: &mut Validator) {
     let path = temp_path("stats_parity.fastq");
     write_synthetic_fastq(&path);
 
-    let batch_records = fastq::parse_fastq(&path).unwrap();
+    let batch_records: Vec<_> = fastq::FastqIter::open(&path)
+        .unwrap()
+        .collect::<Result<Vec<_>, _>>()
+        .unwrap();
     let batch_stats = fastq::compute_stats(&batch_records);
 
     let stream_stats = fastq::stats_from_file(&path).unwrap();
@@ -149,7 +152,10 @@ fn validate_fastq_record_parity(v: &mut Validator) {
     let path = temp_path("record_parity.fastq");
     write_synthetic_fastq(&path);
 
-    let batch_records = fastq::parse_fastq(&path).unwrap();
+    let batch_records: Vec<_> = fastq::FastqIter::open(&path)
+        .unwrap()
+        .collect::<Result<Vec<_>, _>>()
+        .unwrap();
 
     let mut stream_ids = Vec::new();
     let mut stream_seqs: Vec<Vec<u8>> = Vec::new();
@@ -210,7 +216,7 @@ fn validate_utf8_header_safety(v: &mut Validator) {
         writeln!(f, "FFFFFFFF").unwrap();
     }
 
-    let result = fastq::parse_fastq(&path);
+    let result = fastq::FastqIter::open(&path).and_then(|i| i.collect::<Result<Vec<_>, _>>());
     v.check_pass(
         "multi-byte UTF-8 headers parse without panic",
         result.is_ok(),
@@ -231,7 +237,8 @@ fn validate_utf8_header_safety(v: &mut Validator) {
         writeln!(f, "IIII").unwrap();
     }
 
-    let malformed_result = fastq::parse_fastq(&malformed_path);
+    let malformed_result =
+        fastq::FastqIter::open(&malformed_path).and_then(|i| i.collect::<Result<Vec<_>, _>>());
     v.check_pass(
         "malformed header returns Err (not panic)",
         malformed_result.is_err(),
@@ -358,7 +365,10 @@ fn validate_ms2_streaming_parity(v: &mut Validator) {
         writeln!(f, "450.0\t500.0").unwrap();
     }
 
-    let batch = ms2::parse_ms2(&path).unwrap();
+    let batch: Vec<_> = ms2::Ms2Iter::open(&path)
+        .unwrap()
+        .collect::<Result<Vec<_>, _>>()
+        .unwrap();
 
     let mut stream_count = 0_usize;
     let mut stream_mz_sums = Vec::new();

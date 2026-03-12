@@ -24,14 +24,14 @@
 //!
 //! 1. Load KBS LTER diversity time series (or synthetic proxy)
 //! 2. Compute W(t) = 3.5·H'(t) + 8·O₂ for each time point
-//! 3. Model perturbation → recovery dynamics: W(t) = W_eq + ΔW·exp(-t/τ)
+//! 3. Model perturbation → recovery dynamics: W(t) = `W_eq` + ΔW·exp(-t/τ)
 //! 4. Compare tillage regimes: no-till vs conventional
-//! 5. Export time series + petalTongue dashboard
+//! 5. Export time series + `petalTongue` dashboard
 //!
 //! ## Data
 //!
-//! KBS LTER: https://lter.kbs.msu.edu/
-//! Known BioProjects: PRJNA305469 (KBS soil 16S), PRJNA485370 (KBS GLBRC)
+//! KBS LTER: <https://lter.kbs.msu.edu/>
+//! Known `BioProjects`: `PRJNA305469` (KBS soil 16S), `PRJNA485370` (KBS GLBRC)
 //! For V1: synthetic time series matching KBS tillage treatments
 //!
 //! ## Domains
@@ -40,7 +40,7 @@
 //! - D112: Temporal Diversity Dynamics — H'(t) under each treatment
 //! - D113: Anderson W(t) Trajectories — disorder dynamics post-perturbation
 //! - D114: Recovery Time Estimation — τ per treatment
-//! - D115: petalTongue Time Series Dashboard
+//! - D115: `petalTongue` Time Series Dashboard
 //!
 //! # Provenance
 //!
@@ -135,7 +135,7 @@ fn main() {
     struct TimePoint {
         year: f64,
         treatment: String,
-        shannon: f64,
+        _shannon: f64,
         w_h3: f64,
         p_qs: f64,
     }
@@ -152,19 +152,20 @@ fn main() {
             let h = if t.recovery_tau_years.is_infinite() {
                 t.base_shannon
             } else {
-                t.base_shannon + t.perturbation_delta * (-year / t.recovery_tau_years).exp()
+                t.perturbation_delta
+                    .mul_add((-year / t.recovery_tau_years).exp(), t.base_shannon)
             };
 
             let season_effect = 0.15 * (2.0 * std::f64::consts::PI * year).sin();
             let h_final = (h + season_effect).max(0.1);
 
-            let w = 3.5 * h_final + 8.0 * t.oxygen_regime;
+            let w = 3.5f64.mul_add(h_final, 8.0 * t.oxygen_regime);
             let p_qs = barracuda::stats::norm_cdf((16.5 - w) / 3.0);
 
             all_points.push(TimePoint {
                 year,
                 treatment: t.name.to_string(),
-                shannon: h_final,
+                _shannon: h_final,
                 w_h3: w,
                 p_qs,
             });
@@ -190,8 +191,8 @@ fn main() {
             .iter()
             .filter(|p| p.treatment == t.name)
             .collect();
-        let initial_w = points.first().map(|p| p.w_h3).unwrap_or(0.0);
-        let final_w = points.last().map(|p| p.w_h3).unwrap_or(0.0);
+        let initial_w = points.first().map_or(0.0, |p| p.w_h3);
+        let final_w = points.last().map_or(0.0, |p| p.w_h3);
         let mean_p_qs = points.iter().map(|p| p.p_qs).sum::<f64>() / points.len() as f64;
 
         println!(
@@ -238,7 +239,7 @@ fn main() {
             .filter(|p| p.treatment == t.name)
             .collect();
 
-        let target_w = 3.5 * t.base_shannon + 8.0 * t.oxygen_regime;
+        let target_w = 3.5f64.mul_add(t.base_shannon, 8.0 * t.oxygen_regime);
         let threshold = 0.95 * target_w;
         let recovery_year = points.iter().find(|p| p.w_h3 >= threshold).map(|p| p.year);
 
@@ -261,7 +262,7 @@ fn main() {
 
     #[cfg(feature = "json")]
     {
-        use wetspring_barracuda::visualization::*;
+        use wetspring_barracuda::visualization::{DataChannel, EcologyScenario, ScenarioNode};
 
         let mut ts_node = ScenarioNode {
             id: "kbs_lter".into(),

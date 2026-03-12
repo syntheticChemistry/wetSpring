@@ -25,7 +25,6 @@ Each script:
 pip install numpy scipy scikit-learn
 
 # Track-specific:
-python scripts/python_track1_baseline.py
 python scripts/benchmark_python_baseline.py
 ```
 

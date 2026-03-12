@@ -14,7 +14,8 @@
 //! so the full classification + bootstrap execute as a single GEMM.
 
 use crate::bio::taxonomy::{
-    Classification, ClassifyParams, NaiveBayesClassifier, TaxRank, extract_kmers,
+    Classification, ClassifyParams, NaiveBayesClassifier, TaxRank, argmax_with_priors,
+    extract_kmers,
 };
 use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
@@ -181,19 +182,6 @@ pub fn classify_batch_gpu(
     }
 
     Ok(results)
-}
-
-fn argmax_with_priors(scores: &[f64], log_priors: &[f64]) -> usize {
-    let mut best = f64::NEG_INFINITY;
-    let mut best_idx = 0;
-    for (i, (&s, &lp)) in scores.iter().zip(log_priors.iter()).enumerate() {
-        let total = s + lp;
-        if total > best {
-            best = total;
-            best_idx = i;
-        }
-    }
-    best_idx
 }
 
 #[cfg(test)]

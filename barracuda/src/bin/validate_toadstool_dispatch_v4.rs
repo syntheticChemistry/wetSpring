@@ -23,14 +23,14 @@
 //! Sections:
 //! - S7: Stats regression (bootstrap, jackknife, correlation, linear/exp fit)
 //! - S8: Linalg (graph Laplacian, effective rank, ridge regression)
-//! - S9: Special functions (erf, ln_gamma, norm_cdf)
+//! - S9: Special functions (`erf`, `ln_gamma`, `norm_cdf`)
 //! - S10: Numerical (trapezoidal integration, numerical derivative)
 //! - S11: Bio diversity round-trip (Shannon, Simpson, Bray-Curtis, Chao1)
 //! - S12: Track 6 kinetics dispatch (Gompertz, Monod, Haldane through pipeline)
 //!
 //! ```text
 //! CPU (Exp347) → GPU (Exp348) → ToadStool (this)
-//! → Streaming (Exp350) → metalForge (Exp351) → NUCLEUS (Exp352)
+//! → Streaming (Exp350) → `metalForge` (Exp351) → `NUCLEUS` (Exp352)
 //! ```
 //!
 //! # Provenance
@@ -50,7 +50,10 @@ use wetspring_barracuda::validation::Validator;
 use barracuda::stats::norm_cdf;
 
 fn gompertz(t: f64, p: f64, rm: f64, lambda: f64) -> f64 {
-    p * (-((rm * std::f64::consts::E / p) * (lambda - t) + 1.0).exp()).exp()
+    p * (-(rm * std::f64::consts::E / p)
+        .mul_add(lambda - t, 1.0)
+        .exp())
+    .exp()
 }
 
 fn first_order(t: f64, b_max: f64, k: f64) -> f64 {

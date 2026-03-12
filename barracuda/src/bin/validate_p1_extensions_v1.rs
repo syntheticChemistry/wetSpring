@@ -55,8 +55,8 @@ struct P1Extension {
     biome: &'static str,
     oxygen_regime: f64,
     expected_shannon_range: (f64, f64),
-    expected_pqs_range: (f64, f64),
-    description: &'static str,
+    _expected_pqs_range: (f64, f64),
+    _description: &'static str,
 }
 
 fn p1_extensions() -> Vec<P1Extension> {
@@ -70,8 +70,8 @@ fn p1_extensions() -> Vec<P1Extension> {
             biome: "deep_sea_cold_seep",
             oxygen_regime: 0.02,
             expected_shannon_range: (1.5, 3.5),
-            expected_pqs_range: (0.6, 0.99),
-            description: "170 metagenomes from Guaymas Basin cold seeps, anaerobic reference for QS",
+            _expected_pqs_range: (0.6, 0.99),
+            _description: "170 metagenomes from Guaymas Basin cold seeps, anaerobic reference for QS",
         },
         P1Extension {
             name: "tara_oceans",
@@ -82,8 +82,8 @@ fn p1_extensions() -> Vec<P1Extension> {
             biome: "ocean_epipelagic",
             oxygen_regime: 0.9,
             expected_shannon_range: (3.0, 5.0),
-            expected_pqs_range: (0.01, 0.3),
-            description: "243 stations from Tara Oceans, marine diversity gradient",
+            _expected_pqs_range: (0.01, 0.3),
+            _description: "243 stations from Tara Oceans, marine diversity gradient",
         },
         P1Extension {
             name: "hmp_gut",
@@ -94,8 +94,8 @@ fn p1_extensions() -> Vec<P1Extension> {
             biome: "human_gut",
             oxygen_regime: 0.05,
             expected_shannon_range: (2.0, 4.0),
-            expected_pqs_range: (0.5, 0.95),
-            description: "4,700 human gut samples from HMP, anaerobic gut reference",
+            _expected_pqs_range: (0.5, 0.95),
+            _description: "4,700 human gut samples from HMP, anaerobic gut reference",
         },
         P1Extension {
             name: "amr_surveillance",
@@ -106,8 +106,8 @@ fn p1_extensions() -> Vec<P1Extension> {
             biome: "clinical",
             oxygen_regime: 0.5,
             expected_shannon_range: (1.0, 3.0),
-            expected_pqs_range: (0.3, 0.8),
-            description: "AMR gene diversity as Anderson disorder, sentinel framework",
+            _expected_pqs_range: (0.3, 0.8),
+            _description: "AMR gene diversity as Anderson disorder, sentinel framework",
         },
         P1Extension {
             name: "mycorrhizal",
@@ -118,8 +118,8 @@ fn p1_extensions() -> Vec<P1Extension> {
             biome: "rhizosphere_fungal",
             oxygen_regime: 0.4,
             expected_shannon_range: (1.5, 3.5),
-            expected_pqs_range: (0.3, 0.7),
-            description: "Fungal hyphal network as Anderson lattice, ITS + micro-CT topology",
+            _expected_pqs_range: (0.3, 0.7),
+            _description: "Fungal hyphal network as Anderson lattice, ITS + micro-CT topology",
         },
     ]
 }
@@ -135,9 +135,9 @@ fn generate_synthetic_community(
             let s = seed
                 .wrapping_mul(6_364_136_223_846_793_005)
                 .wrapping_add(i as u64 * 1_442_695_040_888_963_407);
-            let frac = (i as f64 / n_samples.max(1) as f64) * (shannon_range.1 - shannon_range.0)
-                + shannon_range.0;
-            let richness_frac = (frac / 5.0).min(1.0).max(0.05);
+            let frac = (i as f64 / n_samples.max(1) as f64)
+                .mul_add(shannon_range.1 - shannon_range.0, shannon_range.0);
+            let richness_frac = (frac / 5.0).clamp(0.05, 1.0);
             let n_present = ((richness_frac * n_taxa as f64) as usize).max(2);
 
             (0..n_taxa)
@@ -199,7 +199,7 @@ fn main() {
         .iter()
         .map(|c| {
             let h = barracuda::stats::diversity::shannon(c);
-            let w = 3.5 * h + 8.0 * cold_seep.oxygen_regime;
+            let w = 3.5f64.mul_add(h, 8.0 * cold_seep.oxygen_regime);
             let p = barracuda::stats::norm_cdf((16.5 - w) / 3.0);
             (h, p)
         })
@@ -219,7 +219,7 @@ fn main() {
         .iter()
         .map(|c| {
             let h = barracuda::stats::diversity::shannon(c);
-            let w = 3.5 * h + 8.0 * tara.oxygen_regime;
+            let w = 3.5f64.mul_add(h, 8.0 * tara.oxygen_regime);
             let p = barracuda::stats::norm_cdf((16.5 - w) / 3.0);
             (h, p)
         })
@@ -241,7 +241,7 @@ fn main() {
         .iter()
         .map(|c| {
             let h = barracuda::stats::diversity::shannon(c);
-            let w = 3.5 * h + 8.0 * hmp.oxygen_regime;
+            let w = 3.5f64.mul_add(h, 8.0 * hmp.oxygen_regime);
             let p = barracuda::stats::norm_cdf((16.5 - w) / 3.0);
             (h, p)
         })
@@ -265,7 +265,7 @@ fn main() {
         .iter()
         .map(|c| {
             let h = barracuda::stats::diversity::shannon(c);
-            let w = 3.5 * h + 8.0 * amr.oxygen_regime;
+            let w = 3.5f64.mul_add(h, 8.0 * amr.oxygen_regime);
             barracuda::stats::norm_cdf((16.5 - w) / 3.0)
         })
         .collect();
@@ -290,7 +290,7 @@ fn main() {
         .iter()
         .map(|c| {
             let h = barracuda::stats::diversity::shannon(c);
-            let w = 3.5 * h + 8.0 * myc.oxygen_regime;
+            let w = 3.5f64.mul_add(h, 8.0 * myc.oxygen_regime);
             barracuda::stats::norm_cdf((16.5 - w) / 3.0)
         })
         .collect();

@@ -10,8 +10,7 @@
     clippy::cast_sign_loss,
     clippy::similar_names,
     clippy::items_after_statements,
-    clippy::many_single_char_names,
-    deprecated
+    clippy::many_single_char_names
 )]
 //! # Exp214: NUCLEUS Mixed Hardware V8 — V66 I/O Evolution via IPC
 //!
@@ -261,7 +260,10 @@ fn validate_ms2_spectral(v: &mut Validator) {
         }
     }
 
-    let batch = ms2::parse_ms2(&path).unwrap();
+    let batch: Vec<_> = ms2::Ms2Iter::open(&path)
+        .unwrap()
+        .collect::<Result<Vec<_>, _>>()
+        .unwrap();
     v.check_count("batch parsed 3 spectra", batch.len(), 3);
 
     let mut stream_count = 0_usize;
@@ -442,7 +444,10 @@ fn validate_full_pipeline(v: &mut Validator) {
         }
     }
 
-    let records = fastq::parse_fastq(&path).unwrap();
+    let records: Vec<_> = fastq::FastqIter::open(&path)
+        .unwrap()
+        .collect::<Result<Vec<_>, _>>()
+        .unwrap();
     v.check_count("pipeline: parsed 100 reads", records.len(), 100);
 
     let params = quality::QualityParams {

@@ -47,7 +47,10 @@ use wetspring_barracuda::validation::{DomainResult, Validator};
 use barracuda::stats::norm_cdf;
 
 fn gompertz(t: f64, p: f64, rm: f64, lambda: f64) -> f64 {
-    p * (-((rm * std::f64::consts::E / p) * (lambda - t) + 1.0).exp()).exp()
+    p * (-(rm * std::f64::consts::E / p)
+        .mul_add(lambda - t, 1.0)
+        .exp())
+    .exp()
 }
 
 fn first_order(t: f64, b_max: f64, k: f64) -> f64 {
