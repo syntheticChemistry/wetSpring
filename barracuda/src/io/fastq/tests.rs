@@ -4,13 +4,16 @@
 #![allow(
     clippy::expect_used,
     clippy::unwrap_used,
-    clippy::redundant_closure_for_method_calls,
-    deprecated
+    clippy::redundant_closure_for_method_calls
 )]
 
 use super::*;
 use crate::tolerances;
 use std::io::Write;
+
+fn collect_fastq(path: &std::path::Path) -> crate::error::Result<Vec<FastqRecord>> {
+    FastqIter::open(path)?.collect()
+}
 
 /// Write a minimal FASTQ file and return its path.
 fn write_fastq(dir: &tempfile::TempDir, name: &str, content: &str) -> std::path::PathBuf {
@@ -506,7 +509,7 @@ fn parse_fastq_truncated_returns_partial() {
     let dir = tempfile::tempdir().unwrap();
     // First record complete, second truncated (no + or quality)
     let path = write_fastq(&dir, "partial.fastq", "@r1\nACGT\n+\nIIII\n@r2\nGG\n");
-    let records = parse_fastq(&path).unwrap();
+    let records = collect_fastq(&path).unwrap();
     assert_eq!(records.len(), 2);
     assert_eq!(records[0].id, "r1");
     assert_eq!(records[0].sequence, b"ACGT");

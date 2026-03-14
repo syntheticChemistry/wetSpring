@@ -23,7 +23,7 @@
 //!
 //! - D92: Hardware Probe — adapter, driver, compute class, VRAM, firmware
 //! - D93: Precision Calibration — per-tier capabilities, NVVM risk, FMA policy
-//! - D94: Domain Routing — 12 PhysicsDomain routes, bio-specific thresholds
+//! - D94: Domain Routing — 12 `PhysicsDomain` routes, bio-specific thresholds
 //! - D95: Capability Profile Export — JSON profile for primal consumption
 //!
 //! # Provenance

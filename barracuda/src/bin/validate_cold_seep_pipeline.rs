@@ -90,6 +90,7 @@ fn main() {
     let mut all_shannon = Vec::with_capacity(N_SYNTHETIC_SAMPLES);
     let mut all_simpson = Vec::with_capacity(N_SYNTHETIC_SAMPLES);
     let mut all_obs = Vec::with_capacity(N_SYNTHETIC_SAMPLES);
+    let mut all_pielou = Vec::with_capacity(N_SYNTHETIC_SAMPLES);
     println!(
         "  {:>6} {:>10} {:>10} {:>8} {:>8}",
         "Sample", "Shannon", "Simpson", "S_obs", "Pielou"
@@ -104,6 +105,7 @@ fn main() {
         all_shannon.push(shannon_h);
         all_simpson.push(simpson_d);
         all_obs.push(observed);
+        all_pielou.push(pielou);
 
         if i < 5 || i == N_SYNTHETIC_SAMPLES - 1 {
             println!("  {i:>6} {shannon_h:>10.4} {simpson_d:>10.4} {observed:>8.0} {pielou:>8.4}");
@@ -176,7 +178,7 @@ fn main() {
         let mut n_extended = 0_usize;
         let mut r_values = Vec::with_capacity(N_SYNTHETIC_SAMPLES);
 
-        for j in &_all_pielou {
+        for j in &all_pielou {
             let w = evenness_to_disorder(*j);
             let mat = anderson_3d(l, l, l, w, fixed_seed);
             let tri = lanczos(&mat, n_lattice, 42);

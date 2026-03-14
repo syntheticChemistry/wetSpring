@@ -15,16 +15,16 @@
 )]
 //! # Exp368: Primal Integration Pipeline Validation
 //!
-//! Validates the full primal integration pipeline: NestGate NCBI wiring,
-//! ToadStool GPU dispatch probing, and petalTongue dashboard of the
+//! Validates the full primal integration pipeline: `NestGate` NCBI wiring,
+//! `ToadStool` GPU dispatch probing, and petalTongue dashboard of the
 //! integrated pipeline status. Tests the three-tier NCBI routing
-//! (biomeOS → NestGate → sovereign HTTP) and records what works.
+//! (biomeOS → `NestGate` → sovereign HTTP) and records what works.
 //!
 //! ## Pipeline
 //!
-//! 1. Discover running primals (biomeOS, NestGate, ToadStool, Songbird)
-//! 2. Probe NestGate NCBI fetch capability (data.ncbi_search, data.ncbi_fetch)
-//! 3. Probe ToadStool GPU dispatch (toadstool.health)
+//! 1. Discover running primals (biomeOS, `NestGate`, `ToadStool`, Songbird)
+//! 2. Probe `NestGate` NCBI fetch capability (`data.ncbi_search`, `data.ncbi_fetch`)
+//! 3. Probe `ToadStool` GPU dispatch (toadstool.health)
 //! 4. Test three-tier NCBI routing with a real query
 //! 5. Run diversity → Anderson pipeline on fetched data
 //! 6. Export primal pipeline status dashboard
@@ -32,8 +32,8 @@
 //! ## Domains
 //!
 //! - D121: Primal Discovery — socket scanning, capability probing
-//! - D122: NestGate NCBI Pipeline — three-tier routing validation
-//! - D123: ToadStool GPU Readiness — compute dispatch status
+//! - D122: `NestGate` NCBI Pipeline — three-tier routing validation
+//! - D123: `ToadStool` GPU Readiness — compute dispatch status
 //! - D124: Integrated Science Pipeline — fetch → diversity → Anderson
 //! - D125: petalTongue Pipeline Dashboard
 //!
@@ -57,10 +57,7 @@ fn probe_socket_rpc(socket_path: &Path, method: &str) -> Result<String, String> 
     use std::io::{Read, Write};
     use std::os::unix::net::UnixStream;
 
-    let request = format!(
-        r#"{{"jsonrpc":"2.0","method":"{}","params":{{}},"id":1}}"#,
-        method
-    );
+    let request = format!(r#"{{"jsonrpc":"2.0","method":"{method}","params":{{}},"id":1}}"#);
 
     let mut stream = UnixStream::connect(socket_path).map_err(|e| format!("connect: {e}"))?;
     stream
@@ -83,7 +80,8 @@ fn main() {
     let mut v = Validator::new("Exp368: Primal Integration Pipeline v1");
 
     let family = std::env::var("FAMILY_ID").unwrap_or_else(|_| "eastgate".into());
-    let biomeos_base = "/run/user/1000/biomeos";
+    let xdg_runtime = std::env::var("XDG_RUNTIME_DIR").unwrap_or_else(|_| "/run/user/1000".into());
+    let biomeos_base = format!("{xdg_runtime}/biomeos");
 
     // ─── D121: Primal Discovery ───
     println!("\n  ── D121: Primal Discovery ──");
@@ -93,7 +91,7 @@ fn main() {
         socket_path: PathBuf,
         present: bool,
         healthy: bool,
-        info: String,
+        _info: String,
     }
 
     let primal_sockets = [
@@ -145,7 +143,7 @@ fn main() {
             socket_path: PathBuf::from(path),
             present,
             healthy,
-            info,
+            _info: info,
         });
     }
 
@@ -278,10 +276,10 @@ fn main() {
     let test_community = [10.0, 20.0, 30.0, 15.0, 5.0, 8.0, 12.0];
     let shannon = barracuda::stats::diversity::shannon(&test_community);
     let simpson = barracuda::stats::diversity::simpson(&test_community);
-    let w_h3 = 3.5 * shannon + 8.0 * 0.5;
+    let w_h3 = 3.5f64.mul_add(shannon, 8.0 * 0.5);
     let p_qs = barracuda::stats::norm_cdf((16.5 - w_h3) / 3.0);
 
-    println!("  Test community: {:?}", test_community);
+    println!("  Test community: {test_community:?}");
     println!("  Shannon H': {shannon:.4}");
     println!("  Simpson D: {simpson:.4}");
     println!("  Anderson W (H3, O₂=0.5): {w_h3:.2}");
@@ -292,15 +290,13 @@ fn main() {
 
     println!("\n  Pipeline integration status:");
     println!(
-        "    Data acquisition: {} NCBI → {} NestGate cache → {} sovereign HTTP",
+        "    Data acquisition: {} NCBI → {} NestGate cache → active sovereign HTTP",
         if neural_api_present { "biomeOS" } else { "—" },
-        if nestgate_available { "active" } else { "—" },
-        "active"
+        if nestgate_available { "active" } else { "—" }
     );
     println!(
-        "    Compute: {} ToadStool IPC → {} wgpu direct → CPU fallback",
-        if toadstool_available { "active" } else { "—" },
-        "active"
+        "    Compute: {} ToadStool IPC → active wgpu direct → CPU fallback",
+        if toadstool_available { "active" } else { "—" }
     );
     println!("    Visualization: petalTongue JSON export → IPC push (if running)");
 
@@ -309,7 +305,7 @@ fn main() {
 
     #[cfg(feature = "json")]
     {
-        use wetspring_barracuda::visualization::*;
+        use wetspring_barracuda::visualization::{DataChannel, EcologyScenario, ScenarioNode};
 
         let mut pipeline_node = ScenarioNode {
             id: "primal_pipeline".into(),

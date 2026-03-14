@@ -310,7 +310,7 @@ pub fn write_temp_mzml(dir: &tempfile::TempDir, name: &str, xml: &str) -> std::p
 }
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used, deprecated)]
+#[expect(clippy::unwrap_used)]
 mod tests {
     use super::*;
 
@@ -426,7 +426,7 @@ mod tests {
 
     #[test]
     fn parse_mzml_f32_arrays() {
-        use super::super::parse_mzml;
+        use super::super::MzmlIter;
 
         let mz_vals = [100.0_f32, 200.0, 300.0];
         let int_vals = [500.0_f32, 1500.0, 1000.0];
@@ -439,7 +439,10 @@ mod tests {
         let xml = custom_binary_mzml(&mz_b64, &int_b64, false, false, false, false);
         let path = write_temp_mzml(&dir, "f32.mzML", &xml);
 
-        let spectra = parse_mzml(&path).unwrap();
+        let spectra = MzmlIter::open(&path)
+            .unwrap()
+            .collect::<crate::error::Result<Vec<_>>>()
+            .unwrap();
         assert_eq!(spectra.len(), 1);
         assert_eq!(spectra[0].mz_array.len(), 3);
         assert!((spectra[0].mz_array[0] - 100.0).abs() < 0.01);
@@ -451,7 +454,7 @@ mod tests {
         use flate2::Compression;
         use flate2::write::ZlibEncoder;
 
-        use super::super::parse_mzml;
+        use super::super::MzmlIter;
 
         let mz_vals = [100.0_f64, 200.0, 300.0];
         let int_vals = [500.0_f64, 1500.0, 1000.0];
@@ -470,7 +473,10 @@ mod tests {
         let xml = custom_binary_mzml(&mz_b64, &int_b64, true, true, true, true);
         let path = write_temp_mzml(&dir, "zlib.mzML", &xml);
 
-        let spectra = parse_mzml(&path).unwrap();
+        let spectra = MzmlIter::open(&path)
+            .unwrap()
+            .collect::<crate::error::Result<Vec<_>>>()
+            .unwrap();
         assert_eq!(spectra.len(), 1);
         assert_eq!(spectra[0].mz_array.len(), 3);
         assert!((spectra[0].mz_array[1] - 200.0).abs() < f64::EPSILON);
@@ -559,12 +565,15 @@ mod tests {
 
     #[test]
     fn parse_mzml_empty_binary_element() {
-        use super::super::parse_mzml;
+        use super::super::MzmlIter;
 
         let dir = tempfile::tempdir().unwrap();
         let xml = custom_binary_mzml("", "", false, true, false, true);
         let path = write_temp_mzml(&dir, "emptybinary.mzML", &xml);
-        let spectra = parse_mzml(&path).unwrap();
+        let spectra = MzmlIter::open(&path)
+            .unwrap()
+            .collect::<crate::error::Result<Vec<_>>>()
+            .unwrap();
         assert_eq!(spectra.len(), 1);
         assert!(spectra[0].mz_array.is_empty());
     }

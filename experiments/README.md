@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-14 (V111: 356 experiments, 340 binaries, 5,707+ checks. V111: debt/cleanup pass — build health, clippy pedantic, bingocube-nautilus, barraCuda v0.3.5. No new experiments. V110: petalTongue visualization pipeline (Exp353–355) + Anderson QS cross-environment validation (Exp356). 1,621 tests, clippy ZERO WARNINGS.)
+**Updated**: 2026-03-14 (V112: 372 experiments, 340 binaries, 5,707+ checks. V112: Exp372 — streaming-only I/O (deprecated buffering parsers removed), capability-based runtime discovery, zero clippy pedantic+nursery warnings. V111: debt/cleanup pass — build health, clippy pedantic, bingocube-nautilus, barraCuda v0.3.5. V110: petalTongue visualization pipeline (Exp353–355) + Anderson QS cross-environment validation (Exp356). 1,621 tests, clippy ZERO WARNINGS.)
 
 ---
 
@@ -596,7 +596,15 @@ H1 (inverse diversity, r=-0.575) refuted. H2 (signal dilution, r=+0.812) and
 H3 (O₂-modulated, r=+0.851) validated. Oxygen adds second disorder dimension:
 anaerobic communities have lower effective W, explaining higher QS prevalence.
 
-**Totals: 356 experiments, 340 binaries, 5,707+ checks.**
+### Exp372: V112 Streaming-Only I/O + Zero-Warning Pedantic + Capability Discovery (PASS)
+
+Evolution pass: deprecated buffering parsers (`parse_fastq`, `parse_mzml`, `parse_ms2`)
+removed, streaming-only I/O architecture, 40 clippy pedantic+nursery warnings eliminated,
+hardcoded primal paths replaced with `$PATH`/`$XDG_RUNTIME_DIR` capability discovery.
+Build-breaking `_all_pielou` compilation errors fixed. Inline tolerance promoted to named
+constant. All quality gates green: fmt, clippy, doc, build, test.
+
+**Totals: 372 experiments, 340 binaries, 5,707+ checks.**
 
 ---
 

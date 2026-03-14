@@ -3,6 +3,48 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V112] — 2026-03-14
+
+### Streaming-Only I/O + Zero-Warning Pedantic + Capability-Based Discovery
+
+Build-breaking compilation errors fixed, deprecated buffering I/O removed,
+all clippy pedantic+nursery warnings eliminated, hardcoded paths evolved
+to capability-based runtime discovery.
+
+#### Build-Breaking Fixes
+- `validate_real_ncbi_pipeline.rs`: missing `all_pielou` Vec — Pielou evenness
+  computed but never collected; added `all_pielou` Vec + push in sample loop
+- `validate_cold_seep_pipeline.rs`: same pattern — added `all_pielou` collection
+
+#### Deprecated I/O Removed (Streaming-Only Evolution)
+- Removed `parse_fastq()`, `parse_mzml()`, `parse_ms2()` — whole-file buffering
+  functions deprecated since v0.1.0, now deleted
+- All callers migrated to streaming: `FastqIter`, `MzmlIter`, `Ms2Iter`,
+  `stats_from_file()`, `for_each_record()`, `for_each_spectrum()`
+- 15+ test functions updated to use local `collect_*()` helpers wrapping iterators
+- Stale `#[expect(deprecated)]` attributes removed (3 locations)
+- Broken intra-doc link fixed (`parse_fastq` → `FastqIter`)
+
+#### Clippy Pedantic + Nursery (40 → 0 Warnings)
+- ~30 auto-fixed: uninlined format args, redundant closures, redundant clone
+- Manual: `many_single_char_names` allow, dead `info` field → `_info`,
+  unreadable literal formatted with digit separators, wildcard imports resolved
+- `validate_sovereign_dispatch_v1`: inline `1e-10` → `tolerances::ANALYTICAL_LOOSE`
+
+#### Hardcoded Paths → Capability-Based Discovery
+- `validate_workload_routing_v1`: relative paths (`../../phase1/...`) replaced
+  with `$PATH`-based runtime discovery — zero compile-time primal coupling
+- `validate_primal_pipeline_v1`: hardcoded `/run/user/1000/biomeos` replaced
+  with `$XDG_RUNTIME_DIR/biomeos`
+
+#### Quality Gates
+- `cargo fmt --check`: PASS
+- `cargo clippy --pedantic --nursery`: **0 warnings** (exit 0)
+- `cargo doc --no-deps`: **0 warnings** (exit 0)
+- `cargo build --all-features`: **0 warnings** (exit 0)
+- `cargo test --all-features`: 1,384 passed, 4 failed (pre-existing), 42 ignored
+- Pre-existing failures: 3 GPU f32 parity (known), 1 nautilus JSON roundtrip (upstream)
+
 ## [V111] — 2026-03-14
 
 ### Deep Debt Resolution + Idiomatic Evolution

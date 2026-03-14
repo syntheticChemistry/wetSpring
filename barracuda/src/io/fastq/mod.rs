@@ -16,9 +16,9 @@
 //! All I/O is byte-native — no UTF-8 assumption for sequence or quality
 //! data. Header identifiers are extracted as lossy UTF-8.
 //!
-//! [`parse_fastq`] collects records via [`FastqIter`] for multi-pass
-//! analysis (k-mer counting, diversity). For single-pass statistics on
-//! large files, prefer [`stats_from_file`] which processes lines in-place
+//! [`FastqIter`] streams records for multi-pass analysis (k-mer counting,
+//! diversity). For single-pass statistics on large files, prefer
+//! [`stats_from_file`] which processes lines in-place
 //! and never allocates per-record storage.
 
 mod stats;
@@ -153,25 +153,6 @@ fn extract_id(header: &[u8]) -> &str {
 }
 
 // ── Public API ───────────────────────────────────────────────────
-
-/// Collect all records from a FASTQ file into memory via [`FastqIter`].
-///
-/// Convenience wrapper — streams records from disk, then collects.
-/// For single-pass processing prefer [`FastqIter`] or [`for_each_record`].
-///
-/// # Errors
-///
-/// Returns [`Error::Io`] if the file cannot be opened, or
-/// [`Error::Fastq`] if a record is malformed.
-#[doc(hidden)]
-#[deprecated(
-    since = "0.1.0",
-    note = "buffers entire file; use FastqIter or for_each_record"
-)]
-#[must_use = "parsed records are discarded if not used"]
-pub fn parse_fastq(path: &Path) -> Result<Vec<FastqRecord>> {
-    FastqIter::open(path)?.collect()
-}
 
 /// Process each record without per-record allocation.
 ///

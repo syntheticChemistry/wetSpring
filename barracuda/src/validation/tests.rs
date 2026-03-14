@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-#![expect(clippy::expect_used, clippy::unwrap_used, deprecated)]
+#![expect(clippy::expect_used, clippy::unwrap_used)]
 
 use super::*;
 
@@ -431,7 +431,7 @@ fn determinism_encoding_roundtrip() {
 #[test]
 #[expect(clippy::float_cmp)]
 fn determinism_fastq_parsing() {
-    use crate::io::fastq::{compute_stats, parse_fastq};
+    use crate::io::fastq::stats_from_file;
     use std::fs::File;
     use std::io::Write;
 
@@ -442,10 +442,8 @@ fn determinism_fastq_parsing() {
     f.write_all(synthetic.as_bytes()).expect("write");
     drop(f);
 
-    let records1 = parse_fastq(&path).expect("parse 1");
-    let records2 = parse_fastq(&path).expect("parse 2");
-    let stats1 = compute_stats(&records1);
-    let stats2 = compute_stats(&records2);
+    let stats1 = stats_from_file(&path).expect("stats 1");
+    let stats2 = stats_from_file(&path).expect("stats 2");
 
     assert_eq!(stats1.num_sequences, stats2.num_sequences);
     assert_eq!(stats1.total_bases, stats2.total_bases);

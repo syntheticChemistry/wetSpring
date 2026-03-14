@@ -19,18 +19,21 @@ mod parser;
 mod stats;
 mod types;
 
-#[expect(deprecated)]
-pub use parser::{Ms2Iter, for_each_spectrum, parse_ms2};
+pub use parser::{Ms2Iter, for_each_spectrum};
 pub use stats::{compute_stats, stats_from_file};
 pub use types::{Ms2Spectrum, Ms2Stats};
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used, deprecated)]
+#[expect(clippy::unwrap_used)]
 mod tests {
     use super::*;
     use crate::error::Result;
     use std::fs::File;
     use std::io::Write;
+
+    fn collect_ms2(path: &std::path::Path) -> Result<Vec<Ms2Spectrum>> {
+        Ms2Iter::open(path)?.collect()
+    }
 
     fn write_test_ms2(dir: &std::path::Path) -> std::path::PathBuf {
         let path = dir.join("test.ms2");
@@ -55,7 +58,7 @@ mod tests {
     fn parse_synthetic_ms2() {
         let dir = tempfile::tempdir().unwrap();
         let path = write_test_ms2(dir.path());
-        let spectra = parse_ms2(&path).unwrap();
+        let spectra = collect_ms2(&path).unwrap();
 
         assert_eq!(spectra.len(), 2);
 
@@ -73,7 +76,7 @@ mod tests {
     fn compute_stats_two_spectra() {
         let dir = tempfile::tempdir().unwrap();
         let path = write_test_ms2(dir.path());
-        let spectra = parse_ms2(&path).unwrap();
+        let spectra = collect_ms2(&path).unwrap();
         let stats = compute_stats(&spectra);
 
         assert_eq!(stats.num_spectra, 2);
@@ -93,7 +96,7 @@ mod tests {
     #[test]
     fn parse_nonexistent_file() {
         let path = std::env::temp_dir().join("nonexistent_wetspring_9f8a2.ms2");
-        let result = parse_ms2(&path);
+        let result = collect_ms2(&path);
         assert!(result.is_err());
     }
 
@@ -113,7 +116,7 @@ mod tests {
         writeln!(f, "100.0\t200.0").unwrap();
         writeln!(f, "bad_peak_line").unwrap(); // peak line with < 2 fields
 
-        let spectra = parse_ms2(&path).unwrap();
+        let spectra = collect_ms2(&path).unwrap();
         assert_eq!(spectra.len(), 1);
         assert!((spectra[0].precursor_mz - 400.0).abs() < f64::EPSILON);
         assert!((spectra[0].rt_minutes - 3.0).abs() < f64::EPSILON);
@@ -131,7 +134,7 @@ mod tests {
         writeln!(f, "S\t1\t1\t300.00").unwrap();
         writeln!(f, "50.0\t100.0").unwrap();
 
-        let spectra = parse_ms2(&path).unwrap();
+        let spectra = collect_ms2(&path).unwrap();
         assert_eq!(spectra.len(), 1);
         assert_eq!(spectra[0].mz_array.len(), 1);
         assert!((spectra[0].mz_array[0] - 50.0).abs() < f64::EPSILON);
@@ -150,7 +153,7 @@ mod tests {
         writeln!(f, "Z\t3\t600.0").unwrap();
         writeln!(f, "50.0\t100.0").unwrap();
 
-        let spectra = parse_ms2(&path).unwrap();
+        let spectra = collect_ms2(&path).unwrap();
         assert_eq!(spectra.len(), 1);
         assert!((spectra[0].rt_minutes - 10.0).abs() < f64::EPSILON);
         assert_eq!(spectra[0].charge, 3);
@@ -161,7 +164,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let path = write_test_ms2(dir.path());
 
-        let buffered = parse_ms2(&path).unwrap();
+        let buffered = collect_ms2(&path).unwrap();
         let streamed: Vec<Ms2Spectrum> = Ms2Iter::open(&path)
             .unwrap()
             .collect::<Result<Vec<_>>>()
@@ -269,7 +272,7 @@ mod tests {
         writeln!(f, "S").unwrap();
         writeln!(f, "50.0\t100.0").unwrap();
 
-        let result = parse_ms2(&path);
+        let result = collect_ms2(&path);
         assert!(result.is_err(), "S-line without scan should error");
     }
 
@@ -281,7 +284,7 @@ mod tests {
         writeln!(f, "S\t1").unwrap();
         writeln!(f, "100.0\t200.0").unwrap();
 
-        let result = parse_ms2(&path);
+        let result = collect_ms2(&path);
         assert!(result.is_err(), "S-line without precursor m/z should error");
     }
 
@@ -314,7 +317,7 @@ mod tests {
         writeln!(f, "100.0\t500.0").unwrap();
         writeln!(f, "200.0\t300.0").unwrap();
 
-        let spectra = parse_ms2(&path).unwrap();
+        let spectra = collect_ms2(&path).unwrap();
         assert_eq!(spectra.len(), 1);
         assert_eq!(spectra[0].scan, 1);
         assert!((spectra[0].precursor_mz - 500.25).abs() < f64::EPSILON);
@@ -330,7 +333,7 @@ mod tests {
         writeln!(f, "I\tRTime\tnot_a_number").unwrap();
         writeln!(f, "100.0\t200.0").unwrap();
 
-        let result = parse_ms2(&path);
+        let result = collect_ms2(&path);
         assert!(result.is_err(), "I-line with invalid RTime should error");
     }
 
@@ -345,7 +348,7 @@ mod tests {
         writeln!(f, "Z\tbad\t999.49").unwrap();
         writeln!(f, "100.0\t200.0").unwrap();
 
-        let result = parse_ms2(&path);
+        let result = collect_ms2(&path);
         assert!(result.is_err(), "Z-line with invalid charge should error");
     }
 
@@ -360,7 +363,7 @@ mod tests {
         writeln!(f, "abc\tdef").unwrap();
         writeln!(f, "300.0\t400.0").unwrap();
 
-        let spectra = parse_ms2(&path).unwrap();
+        let spectra = collect_ms2(&path).unwrap();
         assert_eq!(spectra.len(), 1);
         assert_eq!(spectra[0].mz_array.len(), 2);
     }

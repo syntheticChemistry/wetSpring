@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 14, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V111 — **1,621 tests** (1,506 barracuda lib + 222 forge + 72 integration + 27 doc, 2 ignored), 356 experiments, 5,707+ validation checks across 340 binaries (318 barracuda + 22 forge). Ecosystem: barraCuda v0.3.5, toadStool S130+, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery).
+**Status:** V112 — **1,621 tests** (1,506 barracuda lib + 222 forge + 72 integration + 27 doc), 356 experiments, 5,707+ validation checks across 340 binaries (318 barracuda + 22 forge). Ecosystem: barraCuda v0.3.5, toadStool S130+, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). Streaming-only I/O (deprecated buffering parsers removed). Capability-based runtime discovery (zero hardcoded primal paths).
 
 ---
 
@@ -307,6 +307,14 @@ science-to-visualization IPC wiring:
 
 **1,621 tests** | **356 experiments** | **340 binaries** | **5,707+ checks**
 
+### V112: Streaming-Only I/O + Zero-Warning Pedantic + Capability Discovery (2026-03-14)
+
+- Deprecated buffering parsers (`parse_fastq`, `parse_mzml`, `parse_ms2`) removed — streaming-only I/O
+- All clippy pedantic+nursery warnings eliminated (40 → 0)
+- Hardcoded primal paths evolved to `$PATH`/`$XDG_RUNTIME_DIR` capability discovery
+- Build-breaking `_all_pielou` compilation errors fixed in 2 validation binaries
+- Inline tolerance `1e-10` → `tolerances::ANALYTICAL_LOOSE`
+
 ### V111: Deep Debt Resolution + Idiomatic Evolution (2026-03-14)
 
 Build health restored, comprehensive clippy/fmt/doc cleanup, and dependency evolution.
@@ -332,7 +340,7 @@ See CHANGELOG.md for full V111 entry.
 | Named tolerance constants | 180 (scientifically justified, hierarchy-tested; +NMF_CONVERGENCE) |
 | Provenance headers | All 340 binaries |
 | ESN ridge regression | **Proper Cholesky solve** (not diagonal approximation) |
-| I/O streaming | Buffering APIs deprecated; `stats_from_file` + iterators preferred |
+| I/O streaming | **Streaming-only** — buffering `parse_*` functions removed; `FastqIter` / `MzmlIter` / `Ms2Iter` + `stats_from_file` |
 | Clone optimization | Hot-path clones eliminated (merge_pairs, derep entry API) |
 
 ---

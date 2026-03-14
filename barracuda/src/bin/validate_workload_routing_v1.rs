@@ -15,12 +15,12 @@
 //! # Exp358: Workload Routing + VRAM-Aware Dispatch for Bio Pipelines
 //!
 //! Validates the toadStool S146 workload routing concepts using barraCuda v0.3.5
-//! PrecisionBrain for bio-specific problem sizes. Tests CPU vs GPU threshold
-//! decisions, VRAM estimates, and PCIe topology awareness.
+//! `PrecisionBrain` for bio-specific problem sizes. Tests CPU vs GPU threshold
+//! decisions, VRAM estimates, and `PCIe` topology awareness.
 //!
 //! ## Domains
 //!
-//! - D76: PrecisionBrain Bio Routing — route all bio domains at various problem sizes
+//! - D76: `PrecisionBrain` Bio Routing — route all bio domains at various problem sizes
 //! - D77: VRAM Estimation — estimate memory for diversity, HMM, ODE workloads
 //! - D78: CPU vs GPU Thresholds — small N CPU, large N GPU decision boundary
 //! - D79: biomeOS/NUCLEUS Readiness — primal scan and deployment status
@@ -37,39 +37,34 @@ use std::time::Instant;
 use wetspring_barracuda::validation::Validator;
 
 fn discover_biomeos() -> Option<String> {
-    let candidates = [
-        "../../phase2/biomeOS/target/release/biomeos",
-        "../../phase2/biomeOS/target/debug/biomeos",
-    ];
-    for c in &candidates {
-        let p = std::path::Path::new(c);
-        if p.exists() {
-            return Some(p.display().to_string());
+    which_primal("biomeos")
+}
+
+fn which_primal(name: &str) -> Option<String> {
+    let path_dirs = std::env::var("PATH").unwrap_or_default();
+    for dir in path_dirs.split(':') {
+        let candidate = std::path::Path::new(dir).join(name);
+        if candidate.exists() {
+            return Some(candidate.display().to_string());
         }
     }
     None
 }
 
 fn discover_primals() -> Vec<String> {
-    let known = [
-        ("beardog", "../../phase1/songbird/target/release/beardog"),
-        ("songbird", "../../phase1/songbird/target/release/songbird"),
-        (
-            "toadstool",
-            "../../phase1/toadstool/target/release/toadstool",
-        ),
-        ("nestgate", "../../phase1/nestgate/target/release/nestgate"),
-        ("squirrel", "../../phase1/nestgate/target/release/squirrel"),
-        (
-            "petaltongue",
-            "../../phase2/petalTongue/target/release/petaltongue",
-        ),
-        ("biomeos", "../../phase2/biomeOS/target/release/biomeos"),
+    let names = [
+        "beardog",
+        "songbird",
+        "toadstool",
+        "nestgate",
+        "squirrel",
+        "petaltongue",
+        "biomeos",
     ];
-    known
+    names
         .iter()
-        .filter(|(_, path)| std::path::Path::new(path).exists())
-        .map(|(name, _)| (*name).to_string())
+        .filter(|name| which_primal(name).is_some())
+        .map(|name| (*name).to_string())
         .collect()
 }
 

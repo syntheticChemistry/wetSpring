@@ -35,6 +35,7 @@
 //! | Command | `cargo run --release --features gpu --bin validate_sovereign_dispatch_v1` |
 
 use std::time::Instant;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn main() {
@@ -120,7 +121,7 @@ fn main() {
             println!("  Shannon test (CPU): {shannon:.6}");
             v.check_pass(
                 "barraCuda CPU diversity works",
-                (shannon - 1.2798542258336676).abs() < 1e-10,
+                (shannon - 1.279_854_225_833_667_6).abs() < tolerances::ANALYTICAL_LOOSE,
             );
 
             println!("\n  Dispatch path summary:");

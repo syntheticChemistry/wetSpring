@@ -172,25 +172,6 @@ impl Iterator for Ms2Iter {
     }
 }
 
-/// Collect all spectra from an MS2 file into memory via [`Ms2Iter`].
-///
-/// Convenience wrapper — streams from disk, then collects.
-/// For large files, prefer iterating with [`Ms2Iter`] directly.
-///
-/// # Errors
-///
-/// Returns [`Error::Io`] if the file cannot be opened, or
-/// [`Error::Ms2`] if a record is malformed.
-#[doc(hidden)]
-#[deprecated(
-    since = "0.1.0",
-    note = "buffers entire file; use Ms2Iter or for_each_spectrum"
-)]
-#[must_use = "parsed spectra are discarded if not used"]
-pub fn parse_ms2(path: &Path) -> Result<Vec<Ms2Spectrum>> {
-    Ms2Iter::open(path)?.collect()
-}
-
 /// Process each spectrum without collecting to a `Vec`.
 ///
 /// The callback receives each [`Ms2Spectrum`] as it is parsed. For

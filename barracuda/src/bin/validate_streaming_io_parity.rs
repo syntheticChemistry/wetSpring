@@ -14,13 +14,13 @@
 //! Validates that the byte-native I/O evolution preserves all existing results:
 //!
 //! - **S1**: FASTQ `stats_from_file` (streaming byte-native) matches
-//!   `compute_stats(parse_fastq())` (batch → accumulate)
+//!   `compute_stats(FastqIter::collect())` (batch → accumulate)
 //! - **S2**: FASTQ `for_each_record` (streaming borrowed) yields identical
-//!   records to `parse_fastq()` (batch owned)
+//!   records to `FastqIter::collect()` (batch owned)
 //! - **S3**: Multi-byte UTF-8 in FASTQ headers does not panic (fuzz fix)
 //! - **S4**: Nanopore bulk `bytemuck::cast_slice_mut` read matches per-field
 //!   reference (NRS round-trip with synthetic data)
-//! - **S5**: MS2 `for_each_spectrum` streaming matches `parse_ms2` batch
+//! - **S5**: MS2 `for_each_spectrum` streaming matches `Ms2Iter::collect()` batch
 //!
 //! This is a post-audit "trust but verify" binary — no external data needed.
 //!
@@ -144,10 +144,10 @@ fn validate_fastq_stats_parity(v: &mut Validator) {
     let _ = std::fs::remove_file(&path);
 }
 
-// ── S2: FASTQ for_each_record ↔ parse_fastq parity ─────────────────────────
+// ── S2: FASTQ for_each_record ↔ FastqIter parity ─────────────────────────
 
 fn validate_fastq_record_parity(v: &mut Validator) {
-    v.section("═══ S2: FASTQ for_each_record ↔ parse_fastq record parity ═══");
+    v.section("═══ S2: FASTQ for_each_record ↔ FastqIter record parity ═══");
 
     let path = temp_path("record_parity.fastq");
     write_synthetic_fastq(&path);

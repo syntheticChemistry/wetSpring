@@ -1,8 +1,8 @@
 # Absorption Strategy: wetSpring → ToadStool
 
-**Date:** March 11, 2026
+**Date:** March 14, 2026
 **Pattern:** Write → Absorb → Lean (from hotSpring)
-**Status:** V113 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 47 GPU modules total, 0 Tier B/C, 0 Passthrough, standalone barraCuda v0.3.5, 33 petalTongue scenario builders, StreamSession with backpressure, Songbird, wetspring_dashboard. V113: Paper extension roadmap (Exp364-370: EMP atlas, Liao data, KBS LTER, QS genes, primal pipeline, P1 framework, LAN mesh plan, 67/67). V112: NVIDIA hardware learning (Exp361-363, 45/45). V111: GPU learning system (Exp357-360, 88/88). V110: petalTongue viz, stream_ecology, Anderson QS O₂-modulated model
+**Status:** V112 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 47 GPU modules total, 0 Tier B/C, 0 Passthrough, standalone barraCuda v0.3.5, 33 petalTongue scenario builders, StreamSession with backpressure, Songbird, wetspring_dashboard. V112: streaming-only I/O (deprecated buffering parsers removed), capability-based runtime discovery, zero clippy warnings. V111: deep debt — build health, bingocube-nautilus. V110: petalTongue viz, stream_ecology, Anderson QS O₂-modulated model
 
 ---
 

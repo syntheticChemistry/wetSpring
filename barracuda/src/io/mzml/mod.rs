@@ -227,35 +227,3 @@ where
     }
     Ok(())
 }
-
-/// Collect all spectra from an mzML file into memory via [`MzmlIter`].
-///
-/// Convenience wrapper — streams from disk, then collects.
-/// For large files, prefer iterating with [`MzmlIter`] directly.
-///
-/// # Examples
-///
-/// ```no_run
-/// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-/// use std::path::Path;
-/// use wetspring_barracuda::io::mzml;
-///
-/// let spectra = mzml::parse_mzml(Path::new("data.mzML"))?;
-/// assert!(!spectra.is_empty());
-/// # Ok(()) }
-/// ```
-///
-/// # Errors
-///
-/// Returns [`Error::Io`] if the file cannot be opened, [`Error::Xml`]
-/// for XML structure errors, or [`Error::Base64`] / [`Error::Zlib`]
-/// for binary array decoding failures.
-#[doc(hidden)]
-#[deprecated(
-    since = "0.1.0",
-    note = "buffers entire file; use MzmlIter or for_each_spectrum"
-)]
-#[must_use = "parsed spectra are discarded if not used"]
-pub fn parse_mzml(path: &Path) -> Result<Vec<MzmlSpectrum>> {
-    MzmlIter::open(path)?.collect()
-}

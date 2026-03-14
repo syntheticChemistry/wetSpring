@@ -1,8 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! mzML parser tests.
-#![expect(clippy::unwrap_used, deprecated)]
+#![expect(clippy::unwrap_used)]
 
 use super::*;
+
+fn collect_mzml(path: &std::path::Path) -> crate::error::Result<Vec<MzmlSpectrum>> {
+    MzmlIter::open(path)?.collect()
+}
 use std::io::Write;
 
 /// Build a minimal valid mzML document with one MS1 spectrum.
@@ -56,7 +60,7 @@ fn test_parse_mzml_minimal() {
     f.write_all(minimal_mzml(&mz_b64, &int_b64).as_bytes())
         .unwrap();
 
-    let spectra = parse_mzml(&path).unwrap();
+    let spectra = collect_mzml(&path).unwrap();
     assert_eq!(spectra.len(), 1);
     assert_eq!(spectra[0].ms_level, 1);
     assert_eq!(spectra[0].mz_array.len(), 3);
@@ -81,7 +85,7 @@ fn test_parse_mzml_stats_integration() {
     f.write_all(minimal_mzml(&mz_b64, &int_b64).as_bytes())
         .unwrap();
 
-    let spectra = parse_mzml(&path).unwrap();
+    let spectra = collect_mzml(&path).unwrap();
     let stats = compute_stats(&spectra);
     assert_eq!(stats.num_spectra, 1);
     assert_eq!(stats.num_ms1, 1);
@@ -91,7 +95,7 @@ fn test_parse_mzml_stats_integration() {
 #[test]
 fn test_parse_mzml_nonexistent() {
     let path = std::env::temp_dir().join("nonexistent_wetspring_9f8a2.mzML");
-    let result = parse_mzml(&path);
+    let result = collect_mzml(&path);
     assert!(result.is_err());
 }
 
@@ -106,7 +110,7 @@ fn test_parse_mzml_empty_spectrumlist() {
     let mut f = std::fs::File::create(&path).unwrap();
     f.write_all(xml.as_bytes()).unwrap();
 
-    let spectra = parse_mzml(&path).unwrap();
+    let spectra = collect_mzml(&path).unwrap();
     assert!(spectra.is_empty());
 }
 
@@ -230,7 +234,7 @@ fn mzml_iter_matches_parse() {
     f.write_all(minimal_mzml(&mz_b64, &int_b64).as_bytes())
         .unwrap();
 
-    let buffered = parse_mzml(&path).unwrap();
+    let buffered = collect_mzml(&path).unwrap();
     let streamed: Vec<MzmlSpectrum> = MzmlIter::open(&path)
         .unwrap()
         .collect::<Result<Vec<_>>>()
@@ -483,7 +487,7 @@ fn mzml_iter_xml_error() {
 fn mzml_nonexistent_file() {
     let dir = tempfile::tempdir().unwrap();
     let path = dir.path().join("nonexistent.mzML");
-    let result = parse_mzml(&path);
+    let result = collect_mzml(&path);
     assert!(result.is_err());
 }
 
@@ -492,7 +496,7 @@ fn mzml_empty_file() {
     let dir = tempfile::tempdir().unwrap();
     let path = dir.path().join("empty.mzML");
     std::fs::File::create(&path).unwrap();
-    let spectra = parse_mzml(&path).unwrap();
+    let spectra = collect_mzml(&path).unwrap();
     assert!(spectra.is_empty());
 }
 

@@ -23,8 +23,8 @@
 //!
 //! - D87: GPU Driver Discovery — lspci-equivalent, driver identification, DRM nodes
 //! - D88: Firmware Inventory — GSP, PMU, ACR, GR, SEC2 presence per chip
-//! - D89: Nouveau Dispatch Status — VM_INIT, CHANNEL_ALLOC readiness
-//! - D90: wgpu Path Baseline — HardwareCalibration via wgpu/Vulkan
+//! - D89: Nouveau Dispatch Status — `VM_INIT`, `CHANNEL_ALLOC` readiness
+//! - D90: wgpu Path Baseline — `HardwareCalibration` via wgpu/Vulkan
 //! - D91: petalTongue Dispatch Dashboard — JSON export of pipeline status
 //!
 //! # Provenance
@@ -57,7 +57,7 @@ fn scan_firmware(chip: &str) -> Vec<String> {
 }
 
 fn check_drm_node(path: &str) -> Option<String> {
-    let driver_link = format!("/sys/class/drm/{}/device/driver", path);
+    let driver_link = format!("/sys/class/drm/{path}/device/driver");
     let p = std::path::Path::new(&driver_link);
     if p.exists() {
         if let Ok(target) = std::fs::read_link(p) {
@@ -293,7 +293,7 @@ fn main() {
 
     #[cfg(feature = "json")]
     {
-        use wetspring_barracuda::visualization::*;
+        use wetspring_barracuda::visualization::{DataChannel, EcologyScenario, ScenarioNode};
 
         let mut dispatch_node = ScenarioNode {
             id: "dispatch_pipeline".into(),
@@ -323,7 +323,10 @@ fn main() {
         dispatch_node.data_channels.push(DataChannel::Bar {
             id: "pipeline_stages".into(),
             label: "Sovereign Dispatch Pipeline Readiness".into(),
-            categories: pipeline_stages.iter().map(|s| s.to_string()).collect(),
+            categories: pipeline_stages
+                .iter()
+                .map(std::string::ToString::to_string)
+                .collect(),
             values: stage_status,
             unit: "ready (1=yes, 0=blocked)".into(),
         });
@@ -333,7 +336,10 @@ fn main() {
         dispatch_node.data_channels.push(DataChannel::Bar {
             id: "driver_readiness".into(),
             label: "Driver Backend Readiness".into(),
-            categories: drivers.iter().map(|s| s.to_string()).collect(),
+            categories: drivers
+                .iter()
+                .map(std::string::ToString::to_string)
+                .collect(),
             values: driver_status,
             unit: "readiness (1=working, 0.5=partial, 0=blocked)".into(),
         });

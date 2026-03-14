@@ -13,10 +13,10 @@
     clippy::items_after_statements,
     clippy::float_cmp
 )]
-//! # Exp357: GPU Hardware Discovery + PrecisionBrain for Bio Workloads
+//! # Exp357: GPU Hardware Discovery + `PrecisionBrain` for Bio Workloads
 //!
-//! First experiment consuming barraCuda v0.3.5 PrecisionBrain, HardwareCalibration,
-//! and FmaPolicy. Discovers the RTX 4070's capabilities, routes bio workloads to
+//! First experiment consuming barraCuda v0.3.5 `PrecisionBrain`, `HardwareCalibration`,
+//! and `FmaPolicy`. Discovers the RTX 4070's capabilities, routes bio workloads to
 //! optimal precision tiers, and validates NVVM safety classification.
 //!
 //! Produces a petalTongue JSON dashboard showing the GPU capability landscape.
@@ -24,8 +24,8 @@
 //! ## Domains
 //!
 //! - D71: Hardware Calibration — tier probing, NVVM risk, adapter discovery
-//! - D72: PrecisionBrain — domain routing, bio tier selection, advice rationale
-//! - D73: FmaPolicy — domain-aware FMA safety, separate vs contract
+//! - D72: `PrecisionBrain` — domain routing, bio tier selection, advice rationale
+//! - D73: `FmaPolicy` — domain-aware FMA safety, separate vs contract
 //! - D74: Sovereign Probe — coralReef availability check
 //! - D75: petalTongue Dashboard — GPU landscape visualization
 //!
@@ -57,7 +57,7 @@ fn main() {
             Some(d)
         }
         Err(e) => {
-            println!("  ○ No GPU available ({}), testing CPU-only paths", e);
+            println!("  ○ No GPU available ({e}), testing CPU-only paths");
             v.check_pass("GPU probe completes without panic", true);
             None
         }
@@ -90,8 +90,8 @@ fn main() {
 
         let best_f64 = cal.best_f64_tier();
         let best_any = cal.best_any_tier();
-        println!("  Best f64 tier: {:?}", best_f64);
-        println!("  Best any tier: {:?}", best_any);
+        println!("  Best f64 tier: {best_f64:?}");
+        println!("  Best any tier: {best_any:?}");
         v.check_pass("best_any_tier() returns Some", best_any.is_some());
 
         use barracuda::device::PrecisionTier;
@@ -201,7 +201,7 @@ fn main() {
             PhysicsDomain::Hydrology,
         ] {
             let needs = domain_requires_separate_fma(domain);
-            println!("  {:?} → separate FMA: {}", domain, needs);
+            println!("  {domain:?} → separate FMA: {needs}");
         }
 
         // ─── D74: Sovereign Probe ───
@@ -230,7 +230,7 @@ fn main() {
 
     #[cfg(feature = "json")]
     {
-        use wetspring_barracuda::visualization::*;
+        use wetspring_barracuda::visualization::{DataChannel, EcologyScenario, ScenarioNode};
 
         let mut nodes = vec![];
 
@@ -271,7 +271,7 @@ fn main() {
             overview.data_channels.push(DataChannel::Heatmap {
                 id: "tier_capabilities".into(),
                 label: "Precision Tier Capabilities".into(),
-                x_labels: tier_names.clone(),
+                x_labels: tier_names,
                 y_labels: vec![
                     "Compiles".into(),
                     "Dispatches".into(),
