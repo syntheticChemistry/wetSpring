@@ -88,7 +88,6 @@ fn fasta_to_species_counts(fasta: &str) -> Vec<f64> {
     counts
 }
 
-#[allow(clippy::many_single_char_names)]
 fn main() {
     let mut v = Validator::new("Exp184: Real NCBI 16S Through Sovereign Pipeline");
 
@@ -214,8 +213,6 @@ fn main() {
     let mut all_shannon = Vec::new();
     let mut all_simpson = Vec::new();
     let mut all_obs = Vec::new();
-    #[allow(clippy::collection_is_never_read)]
-    let mut all_pielou = Vec::new();
 
     for (name, counts) in &sample_data {
         let h = diversity::shannon(counts);
@@ -228,7 +225,6 @@ fn main() {
         all_shannon.push(h);
         all_simpson.push(d);
         all_obs.push(s_obs);
-        all_pielou.push(j);
     }
 
     for (i, h) in all_shannon.iter().enumerate() {
@@ -312,7 +308,7 @@ fn main() {
         let l = 8;
         let n_lattice = l * l * l;
 
-        for (i, j) in all_pielou.iter().enumerate() {
+        for (i, j) in _all_pielou.iter().enumerate() {
             let w = j.mul_add(-14.5, 15.0);
             let mat = anderson_3d(l, l, l, w, 42 + i as u64);
             let tri = lanczos(&mat, n_lattice, 42);
@@ -338,7 +334,7 @@ fn main() {
         let high_div_extended =
             all_shannon
                 .iter()
-                .zip(all_pielou.iter())
+                .zip(_all_pielou.iter())
                 .enumerate()
                 .all(|(i, (h, j))| {
                     if *h > 3.0 {

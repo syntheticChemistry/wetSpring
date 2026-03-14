@@ -258,7 +258,8 @@ mod tests {
             _ => return,
         };
         let device = gpu.to_wgpu_device();
-        let ctx = gpu.tensor_context().clone();
+        // Arc bump, O(1)
+        let ctx = Arc::clone(gpu.tensor_context());
         let gemm = GemmCached::new(Arc::clone(&device), ctx);
         let a = vec![1.0; 4];
         let b = vec![1.0; 4];

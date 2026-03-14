@@ -5,10 +5,11 @@
 #![warn(clippy::pedantic, clippy::nursery)]
 #![allow(
     clippy::module_name_repetitions,
-    // GPU interop requires pervasive usize↔u32↔f64 conversion (wgpu APIs
-    // use u32 for buffer sizes, dispatch counts; f64 for scientific values).
-    // Individual modules add targeted #[allow] where precision loss is
-    // asserted safe by domain constraints (e.g., n_samples < 2^32).
+    // Cast lints: crate-level allow for GPU interop. wgpu uses u32 for buffer
+    // sizes, dispatch counts, and vertex counts; scientific code uses f64 and
+    // usize. Pervasive usize↔u32↔f64 conversion would require hundreds of
+    // per-site #[allow] attributes. Individual casts are checked by domain
+    // constraints (e.g., n_samples < 2^32, buffer sizes within u32 range).
     clippy::cast_possible_truncation,
     clippy::cast_sign_loss
 )]

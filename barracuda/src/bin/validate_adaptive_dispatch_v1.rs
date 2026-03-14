@@ -21,11 +21,11 @@
 //!
 //! ## Domains
 //!
-//! - D96: Profile Loading — read and validate hardware_capability_profile.json
+//! - D96: Profile Loading — read and validate `hardware_capability_profile.json`
 //! - D97: Adaptive Workload Selection — choose workloads based on tier safety
 //! - D98: F32 Bio Workloads — Shannon diversity, Simpson index (always safe)
 //! - D99: Conditional F64 Workloads — Anderson eigenvalue, QL eigensolver (if F64 safe)
-//! - D100: VRAM-Aware Scaling — adjust problem size to hardware ceiling
+//! - D100: `VRAM`-Aware Scaling — adjust problem size to hardware ceiling
 //!
 //! # Provenance
 //!
@@ -50,46 +50,43 @@ fn main() {
         .ok()
         .and_then(|s| serde_json::from_str(&s).ok());
 
-    let profile = match profile {
-        Some(p) => {
-            println!("  Loaded profile from {profile_path}");
-            v.check_pass("profile loaded", true);
-            p
-        }
-        None => {
-            println!("  Profile not found — running live probe");
-            v.check_pass("profile fallback to live probe", true);
-            serde_json::json!({})
-        }
+    let profile = if let Some(p) = profile {
+        println!("  Loaded profile from {profile_path}");
+        v.check_pass("profile loaded", true);
+        p
+    } else {
+        println!("  Profile not found — running live probe");
+        v.check_pass("profile fallback to live probe", true);
+        serde_json::json!({})
     };
 
     let adapter = profile
         .get("adapter_name")
-        .and_then(|v| v.as_str())
+        .and_then(serde_json::Value::as_str)
         .unwrap_or("unknown");
     println!("  Adapter: {adapter}");
 
     let nvvm_risk = profile
         .get("nvvm_transcendental_risk")
-        .and_then(|v| v.as_bool())
+        .and_then(serde_json::Value::as_bool)
         .unwrap_or(false);
     println!("  NVVM transcendental risk: {nvvm_risk}");
 
     let has_f64 = profile
         .get("has_any_f64")
-        .and_then(|v| v.as_bool())
+        .and_then(serde_json::Value::as_bool)
         .unwrap_or(false);
     println!("  Has f64: {has_f64}");
 
     let df64_safe = profile
         .get("df64_safe")
-        .and_then(|v| v.as_bool())
+        .and_then(serde_json::Value::as_bool)
         .unwrap_or(false);
     println!("  DF64 safe: {df64_safe}");
 
     let vram_gb = profile
         .get("vram_estimate_gb")
-        .and_then(|v| v.as_u64())
+        .and_then(serde_json::Value::as_u64)
         .unwrap_or(4);
     println!("  VRAM: {vram_gb} GB");
 
@@ -213,7 +210,7 @@ fn main() {
         println!("  Running Bray-Curtis at N={test_n} (within VRAM ceiling)...");
 
         let sample_a: Vec<f64> = (0..test_n).map(|i| (i as f64) * 0.1).collect();
-        let sample_b: Vec<f64> = (0..test_n).map(|i| (i as f64) * 0.1 + 1.0).collect();
+        let sample_b: Vec<f64> = (0..test_n).map(|i| (i as f64).mul_add(0.1, 1.0)).collect();
         let sum_min: f64 = sample_a
             .iter()
             .zip(sample_b.iter())

@@ -194,6 +194,7 @@ fn build_block(metadata: &BTreeMap<String, String>, x: Vec<f64>, y: Vec<f64>) ->
         y_units: metadata.get("YUNITS").cloned().unwrap_or_default(),
         x,
         y,
+        // ownership transfer: JcampBlock owns metadata, caller retains for next block
         metadata: metadata.clone(),
     }
 }

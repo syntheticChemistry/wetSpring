@@ -60,6 +60,7 @@ use crate::io::fastq::FastqRecord;
 use barracuda::ops::bray_curtis_f64::BrayCurtisF64;
 use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
 use std::collections::HashSet;
+use std::sync::Arc;
 use std::time::Instant;
 
 /// Pre-warmed GPU pipeline session with full-stage coverage.
@@ -90,13 +91,14 @@ impl GpuPipelineSession {
 
         let warmup_start = Instant::now();
         let device = gpu.to_wgpu_device();
-        let ctx = gpu.tensor_context().clone();
+        // Arc bump, O(1)
+        let ctx = Arc::clone(gpu.tensor_context());
 
-        let qf = QualityFilterCached::new(device.clone())?;
-        let dada2 = Dada2Gpu::new(device.clone())?;
-        let fmr = FusedMapReduceF64::new(device.clone())
+        let qf = QualityFilterCached::new(Arc::clone(&device))?;
+        let dada2 = Dada2Gpu::new(Arc::clone(&device))?;
+        let fmr = FusedMapReduceF64::new(Arc::clone(&device))
             .map_err(|e| Error::Gpu(format!("FMR init: {e}")))?;
-        let gemm = GemmCached::new(device.clone(), ctx);
+        let gemm = GemmCached::new(Arc::clone(&device), ctx);
         let bc = BrayCurtisF64::new(device)
             .map_err(|e| Error::Gpu(format!("BrayCurtisF64 init: {e}")))?;
 
@@ -346,6 +348,7 @@ impl GpuPipelineSession {
                 .collect();
 
             results.push(Classification {
+                // ownership transfer: Classification owns lineage, classifier retains taxon_labels
                 lineage: taxon_labels[best_taxon].clone(),
                 confidence,
                 taxon_idx: best_taxon,

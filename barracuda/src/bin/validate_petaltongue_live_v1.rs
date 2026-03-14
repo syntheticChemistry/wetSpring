@@ -22,8 +22,8 @@
 //!
 //! ## What This Proves
 //!
-//! 1. All 9 `DataChannel` types serialize correctly for `petalTongue`
-//! 2. IPC push client discovers petalTongue socket (or gracefully degrades)
+//! 1. All 9 `DataChannel` types serialize correctly for petalTongue
+//! 2. `IPC` push client discovers petalTongue socket (or gracefully degrades)
 //! 3. `StreamSession` lifecycle works with ecology data
 //! 4. Scenario JSON export produces valid petalTongue-loadable files
 //! 5. biomeOS binary discovery and NUCLEUS readiness (when available)
@@ -43,9 +43,11 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Provenance type | petalTongue visualization (IPC + JSON export) |
-//! | Date | 2026-03-10 |
+//! | Baseline commit | `5e6a00b` |
+//! | Baseline type | `petalTongue` visualization (JSON scenario export + IPC) |
+//! | Date | 2026-03-14 |
 //! | Command | `cargo run --features gpu --bin validate_petaltongue_live_v1` |
+//! | Validation class | Visualization — synthetic data with analytical checks |
 
 use std::path::{Path, PathBuf};
 
@@ -443,7 +445,7 @@ fn main() {
         warning_range: [0.0, 0.5],
     });
 
-    let w_sweep: Vec<f64> = (0..50).map(|i| f64::from(i) * 0.5).collect();
+    let w_sweep: Vec<f64> = (0i32..50).map(|i| f64::from(i) * 0.5).collect();
     let p_sweep: Vec<f64> = w_sweep.iter().map(|&w| p_qs(w)).collect();
     anderson_node.data_channels.push(DataChannel::TimeSeries {
         id: "w_vs_pqs".into(),
@@ -516,7 +518,9 @@ fn main() {
     // ── S9: Real math validation in scenarios ──
     println!("\n── S9: Real math in scenarios ──");
 
+    // Wide tolerance: visualization scenario, not baseline-parity
     v.check("Shannon H' algae > 0", h_algae, 1.55, 0.5);
+    // Wide tolerance: visualization scenario, not baseline-parity
     v.check("Shannon H' soil > algae (more even)", h_soil, 2.0, 0.2);
     v.check_pass(
         "W inversely related to H' (low H → high W)",

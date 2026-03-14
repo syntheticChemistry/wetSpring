@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-11 (V113: 370 experiments, 354 binaries, 9,886+ checks. V113: Paper extension roadmap (Exp364-370: EMP 28K atlas, Liao real data, KBS LTER temporal, QS gene profiling, primal pipeline, P1 framework, LAN mesh plan, 67/67 PASS). V112: NVIDIA hardware learning prototype (Exp361-363, 45/45). V111: GPU learning system (Exp357-360, 88/88). V110: petalTongue visualization (Exp353-356). V109: mixed hardware + NUCLEUS (Exp347-352). V108: Track 6, 63 papers. 1,611 tests, clippy ZERO WARNINGS.)
+**Updated**: 2026-03-14 (V111: 356 experiments, 340 binaries, 5,707+ checks. V111: debt/cleanup pass — build health, clippy pedantic, bingocube-nautilus, barraCuda v0.3.5. No new experiments. V110: petalTongue visualization pipeline (Exp353–355) + Anderson QS cross-environment validation (Exp356). 1,621 tests, clippy ZERO WARNINGS.)
 
 ---
 
@@ -408,7 +408,7 @@ thresholds from `src/tolerances.rs`.
 | `validate_cross_spring_evolution_s87` | 304 | 61 | `cargo run --release --features gpu --bin validate_cross_spring_evolution_s87` |
 | `validate_r_industry_parity` | 335 | 53 | `cargo run --release --bin validate_r_industry_parity` |
 
-**Total validation checks**: 8,657+
+**Total validation checks**: 5,707+
 **Rust tests**: 1,288 lib + 219 integration
 **Binaries**: 296 total (256 validate + 20 benchmark + 20 other)
 **barraCuda primitives**: 150+ consumed (standalone v0.3.3, wgpu 28, Fp64Strategy, fused ops)
@@ -596,66 +596,7 @@ H1 (inverse diversity, r=-0.575) refuted. H2 (signal dilution, r=+0.812) and
 H3 (O₂-modulated, r=+0.851) validated. Oxygen adds second disorder dimension:
 anaerobic communities have lower effective W, explaining higher QS prevalence.
 
-### V111 — barraCuda v0.3.5 Upstream Rewire + GPU Learning System (March 2026)
-
-Exp357-360: barraCuda v0.3.5 upstream rewire validated, GPU learning system
-infrastructure probed. PrecisionBrain routes bio workloads to optimal precision
-tiers. HardwareCalibration discovers RTX 4070 capabilities. Stable specials
-avoid catastrophic cancellation. Sovereign dispatch readiness assessed.
-
-| Exp | Name | Domains | Checks | Key Finding |
-|:---:|------|:-------:|:------:|-------------|
-| 357 | GPU Hardware Discovery + PrecisionBrain v1 | D71-D75 | 24 | RTX 4070: F32 safe, NVVM transcendental risk on DF64/F64/F64Precise. Bio→F32. |
-| 358 | Workload Routing + VRAM-Aware Dispatch v1 | D76-D79 | 18 | 12GB max pairwise N≈39K. CPU→GPU crossover modeled. NUCLEUS probed. |
-| 359 | Stable GPU Specials + Tridiag Eigensolver v1 | D80-D82 | 34 | log1p/expm1/erfc/bessel_j0_minus1 validated. Anderson QL bandwidth scales with W. |
-| 360 | Sovereign Dispatch Readiness v1 | D83-D86 | 12 | sovereign-dispatch not compiled in (expected). wgpu path confirmed. v0.3.5 pin verified. |
-
-JSON artifact: output/gpu_capability_landscape.json (petalTongue tier heatmap + domain routing).
-
-**Totals: 360 experiments, 344 binaries, 9,774+ checks.**
-
-### V112 — NVIDIA Hardware Learning Prototype (March 2026)
-
-Exp361-363: NVIDIA hardware learning prototype. Dual-GPU rig discovery,
-firmware inventory, nouveau dispatch diagnostic, probe-calibrate-route-apply
-pattern, machine-readable capability profile, adaptive workload selection.
-
-| Exp | Name | Domains | Checks | Key Finding |
-|:---:|------|:-------:|:------:|-------------|
-| 361 | Nouveau RTX 4070 Diagnostic v1 | D87-D91 | 15 | RTX 4070 nvidia (wgpu working), Titan V nouveau (VM_INIT OK, CHANNEL_ALLOC blocked). AD104 GSP-only firmware. |
-| 362 | Hardware Learning Prototype v1 | D92-D95 | 13 | probe-calibrate-route-apply: 4-tier HW calibration, 12-domain PrecisionBrain routing, capability profile JSON. |
-| 363 | Adaptive Dispatch from Profile v1 | D96-D100 | 17 | Reads profile, adapts workloads: F32 always, DF64 arith (hw present), skip transcendentals (NVVM risk), VRAM-aware. |
-
-JSON artifact: output/hardware_capability_profile.json (4.3KB, machine-readable dispatch recipe).
-
-### V113 Paper Extension Roadmap (Exp364-370)
-
-Exp364-367: P0 dataset extension pipelines. EMP 28K-sample atlas, Liao group
-real community data, KBS LTER 30-year tillage temporal model, QS gene profiling
-with FNR/ArcAB/Rex regulon mapping.
-
-| Exp | Name | Domains | Checks | Key Finding |
-|:---:|------|:-------:|:------:|-------------|
-| 364 | EMP Anderson QS Atlas v1 | D101-D105 | 14 | 28K samples, 28 biomes, H3 model: anaerobic P(QS)=0.81 vs aerobic 0.16. |
-| 365 | Liao Group Real Community Data v1 | D106-D110 | 12 | 8 communities from 5 papers, Gompertz R²>0.95, all digesters QS active (P>0.5). |
-| 366 | KBS LTER Anderson Temporal v1 | D111-D115 | 5 | 30-year tillage × disorder, dynamic W(t), both treatments near W_c≈16.5. |
-| 367 | QS Gene Profiling v1 | D116-D120 | 10 | 14 QS types, 8 signal systems, FNR/ArcAB/Rex mapping. Aerobic W 2× anaerobic. |
-
-Exp368: Primal integration pipeline validation — NestGate, ToadStool, petalTongue.
-
-| 368 | Primal Integration Pipeline v1 | D121-D125 | 9 | Socket discovery, three-tier NCBI routing, wgpu dispatch, sovereign fallback. |
-
-Exp369-370: P1 extensions framework and LAN mesh SRA atlas planning.
-
-| 369 | P1 Extensions Framework v1 | D126-D130 | 8 | 5 P1 extensions (cold seep, Tara, HMP, AMR, mycorrhizal). H3 validated across all. |
-| 370 | LAN Mesh + SRA Atlas Plan v1 | D131-D135 | 9 | 5 towers, 96GB VRAM, 208 TFLOPS, 85TB. Standard atlas 1.6h, $0.29 electricity. |
-
-JSON artifacts: output/emp_anderson_qs_atlas.json, output/liao_real_community_analysis.json,
-output/kbs_lter_anderson_temporal.json, output/qs_gene_regulon_analysis.json,
-output/primal_pipeline_status.json, output/p1_extensions_framework.json,
-output/lan_mesh_sra_atlas_plan.json.
-
-**Totals: 370 experiments, 354 binaries, 9,886+ checks.**
+**Totals: 356 experiments, 340 binaries, 5,707+ checks.**
 
 ---
 

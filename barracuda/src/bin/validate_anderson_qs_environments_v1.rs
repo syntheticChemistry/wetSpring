@@ -30,22 +30,22 @@
 //!
 //! ## Three Hypotheses Tested
 //!
-//! **H1 (Current model)**: W = f(H') only. High diversity → low W → QS active.
+//! **H1 (Current model)**: `W` = f(`H'`) only. High diversity → low `W` → QS active.
 //!   Problem: predicts MORE QS in diverse aerobic soil than in a digester.
 //!
-//! **H2 (Signal dilution)**: W = g(H') where high diversity → high W.
+//! **H2 (Signal dilution)**: `W` = g(`H'`) where high diversity → high `W`.
 //!   Monocultures are ordered lattices; polycultures are disordered.
 //!   QS signals from one species get "scattered" by others.
 //!
-//! **H3 (Oxygen-modulated)**: W = h(H', O₂). Oxygen is an additional
+//! **H3 (Oxygen-modulated)**: `W` = h(`H'`, O₂). Oxygen is an additional
 //!   disorder dimension — FNR/ArcAB/Rex regulate QS genes, so anaerobic
 //!   conditions reduce transcriptional noise for QS operons.
 //!   `W_total` = `W_diversity` + `W_oxygen`.
 //!
 //! ## What This Proves
 //!
-//! Which W parameterization best matches known QS biology from literature.
-//! Exports a `petalTongue` scenario comparing all three models side-by-side.
+//! Which `W` parameterization best matches known QS biology from literature.
+//! Exports a petalTongue scenario comparing all three models side-by-side.
 //!
 //! # Provenance
 //!

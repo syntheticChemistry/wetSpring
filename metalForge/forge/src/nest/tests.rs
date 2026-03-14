@@ -305,7 +305,7 @@ fn transport_rpc_round_trip() {
     let dir = tempfile::tempdir().unwrap();
     let sock = dir.path().join("rpc_test.sock");
     let handle = start_echo_server(&sock);
-    std::thread::sleep(std::time::Duration::from_millis(50));
+    wait_for_socket(&sock);
     let req = r#"{"jsonrpc":"2.0","method":"ping","id":1}"#;
     let resp = super::transport::rpc(&sock, req).unwrap();
     assert!(resp.contains("\"result\":true"));
@@ -344,12 +344,22 @@ fn start_storage_server(sock: &std::path::Path, response: &str) -> std::thread::
     })
 }
 
+fn wait_for_socket(sock: &std::path::Path) {
+    for _ in 0..100 {
+        if sock.exists() {
+            return;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
+    panic!("socket did not appear: {}", sock.display());
+}
+
 #[test]
 fn client_exists_returns_true() {
     let dir = tempfile::tempdir().unwrap();
     let sock = dir.path().join("exists.sock");
     let _handle = start_storage_server(&sock, r#"{"jsonrpc":"2.0","result":true,"id":1}"#);
-    std::thread::sleep(std::time::Duration::from_millis(50));
+    wait_for_socket(&sock);
     let client = NestClient::new(sock);
     let result = client.exists("test-key").unwrap();
     assert!(result);
@@ -360,7 +370,7 @@ fn client_exists_returns_false() {
     let dir = tempfile::tempdir().unwrap();
     let sock = dir.path().join("exists_false.sock");
     let _handle = start_storage_server(&sock, r#"{"jsonrpc":"2.0","result":false,"id":1}"#);
-    std::thread::sleep(std::time::Duration::from_millis(50));
+    wait_for_socket(&sock);
     let client = NestClient::new(sock);
     let result = client.exists("missing-key").unwrap();
     assert!(!result);
@@ -371,7 +381,7 @@ fn client_store_succeeds() {
     let dir = tempfile::tempdir().unwrap();
     let sock = dir.path().join("store.sock");
     let _handle = start_storage_server(&sock, r#"{"jsonrpc":"2.0","result":"ok","id":1}"#);
-    std::thread::sleep(std::time::Duration::from_millis(50));
+    wait_for_socket(&sock);
     let client = NestClient::new(sock);
     let result = client.store("key", r#"{"val":1}"#).unwrap();
     assert!(result.ok);
@@ -382,7 +392,7 @@ fn client_store_blob_and_retrieve() {
     let dir = tempfile::tempdir().unwrap();
     let sock = dir.path().join("blob.sock");
     let _handle = start_storage_server(&sock, r#"{"jsonrpc":"2.0","result":"ok","id":1}"#);
-    std::thread::sleep(std::time::Duration::from_millis(50));
+    wait_for_socket(&sock);
     let client = NestClient::new(sock);
     let result = client.store_blob("data", b"hello").unwrap();
     assert!(result.ok);
@@ -393,7 +403,7 @@ fn client_retrieve_value() {
     let dir = tempfile::tempdir().unwrap();
     let sock = dir.path().join("retrieve.sock");
     let _handle = start_storage_server(&sock, r#"{"jsonrpc":"2.0","result":"hello","id":1}"#);
-    std::thread::sleep(std::time::Duration::from_millis(50));
+    wait_for_socket(&sock);
     let client = NestClient::new(sock);
     let result = client.retrieve("key").unwrap();
     assert!(result.value.is_some());
@@ -404,7 +414,7 @@ fn client_delete_succeeds() {
     let dir = tempfile::tempdir().unwrap();
     let sock = dir.path().join("delete.sock");
     let _handle = start_storage_server(&sock, r#"{"jsonrpc":"2.0","result":"ok","id":1}"#);
-    std::thread::sleep(std::time::Duration::from_millis(50));
+    wait_for_socket(&sock);
     let client = NestClient::new(sock);
     let result = client.delete("key").unwrap();
     assert!(result.ok);
@@ -418,7 +428,7 @@ fn client_list_returns_keys() {
         &sock,
         r#"{"jsonrpc":"2.0","result":{"keys":["a","b"]},"id":1}"#,
     );
-    std::thread::sleep(std::time::Duration::from_millis(50));
+    wait_for_socket(&sock);
     let client = NestClient::new(sock);
     let result = client.list(Some("")).unwrap();
     assert_eq!(result.keys, vec!["a", "b"]);
@@ -429,7 +439,7 @@ fn client_stats_returns_raw() {
     let dir = tempfile::tempdir().unwrap();
     let sock = dir.path().join("stats.sock");
     let _handle = start_storage_server(&sock, r#"{"jsonrpc":"2.0","result":{"count":5},"id":1}"#);
-    std::thread::sleep(std::time::Duration::from_millis(50));
+    wait_for_socket(&sock);
     let client = NestClient::new(sock);
     let raw = client.stats().unwrap();
     assert!(raw.contains("count"));
@@ -440,7 +450,7 @@ fn client_store_dataset_metadata() {
     let dir = tempfile::tempdir().unwrap();
     let sock = dir.path().join("meta.sock");
     let _handle = start_storage_server(&sock, r#"{"jsonrpc":"2.0","result":"ok","id":1}"#);
-    std::thread::sleep(std::time::Duration::from_millis(50));
+    wait_for_socket(&sock);
     let client = NestClient::new(sock);
     let result = client
         .store_dataset_metadata("test_ds", "SRA", 10, 1024)
@@ -455,7 +465,7 @@ fn client_retrieve_blob_with_data() {
     let encoded = base64::base64_encode(b"binary data");
     let response = format!(r#"{{"jsonrpc":"2.0","result":{{"blob":"{encoded}"}},"id":1}}"#);
     let _handle = start_storage_server(&sock, &response);
-    std::thread::sleep(std::time::Duration::from_millis(50));
+    wait_for_socket(&sock);
     let client = NestClient::new(sock);
     let result = client.retrieve_blob("key").unwrap();
     assert_eq!(result.unwrap(), b"binary data");
@@ -469,7 +479,7 @@ fn client_retrieve_blob_error_returns_none() {
         &sock,
         r#"{"jsonrpc":"2.0","error":{"code":-1,"message":"not found"},"id":1}"#,
     );
-    std::thread::sleep(std::time::Duration::from_millis(50));
+    wait_for_socket(&sock);
     let client = NestClient::new(sock);
     let result = client.retrieve_blob("missing").unwrap();
     assert!(result.is_none());

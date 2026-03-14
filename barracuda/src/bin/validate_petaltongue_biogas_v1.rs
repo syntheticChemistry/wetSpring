@@ -32,9 +32,11 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Provenance type | petalTongue biogas visualization |
-//! | Date | 2026-03-10 |
+//! | Baseline commit | `5e6a00b` |
+//! | Baseline type | Track 6 biogas kinetics visualization (Gompertz, Monod, Haldane) |
+//! | Date | 2026-03-14 |
 //! | Command | `cargo run --features gpu --bin validate_petaltongue_biogas_v1` |
+//! | Validation class | Visualization — synthetic data with analytical checks |
 
 use std::path::PathBuf;
 
@@ -47,10 +49,7 @@ use wetspring_barracuda::visualization::{
 };
 
 fn gompertz(t: f64, p: f64, rm: f64, lambda: f64) -> f64 {
-    p * (-(rm * std::f64::consts::E / p)
-        .mul_add(lambda - t, 1.0)
-        .exp())
-    .exp()
+    p * (-((rm * std::f64::consts::E / p).mul_add(lambda - t, 1.0)).exp()).exp()
 }
 
 fn first_order(t: f64, b_max: f64, k: f64) -> f64 {
@@ -127,7 +126,7 @@ fn main() {
     // ── S1: Kinetics computation ──
     println!("\n── S1: Biogas kinetics ──");
 
-    let t_points: Vec<f64> = (0..60).map(f64::from).collect();
+    let t_points: Vec<f64> = (0i32..60).map(f64::from).collect();
 
     let mut scenario = EcologyScenario {
         name: "Biogas Kinetics Dashboard".into(),
@@ -229,7 +228,7 @@ fn main() {
         data_channels: vec![],
         scientific_ranges: vec![],
     };
-    let s_range: Vec<f64> = (0..100).map(|i| f64::from(i) * 5.0).collect();
+    let s_range: Vec<f64> = (0i32..100).map(|i| f64::from(i) * 5.0).collect();
     for fs in &feedstocks {
         let y_monod: Vec<f64> = s_range
             .iter()
@@ -349,8 +348,8 @@ fn main() {
         ],
     };
 
-    let temp_data: Vec<f64> = (0..50)
-        .map(|i| f64::from(i).mul_add(0.2, 35.0) + (f64::from(i * 7 % 10) * 0.1))
+    let temp_data: Vec<f64> = (0i32..50)
+        .map(|i| f64::from(i).mul_add(0.2, 35.0) + f64::from((i * 7) % 10) * 0.1)
         .collect();
     let temp_mean = temp_data.iter().sum::<f64>() / temp_data.len() as f64;
     let temp_var = temp_data
@@ -367,8 +366,8 @@ fn main() {
         std: temp_var.sqrt(),
     });
 
-    let ph_data: Vec<f64> = (0..50)
-        .map(|i| f64::from(i).mul_add(0.02, 6.8) + (f64::from(i * 3 % 10) * 0.02))
+    let ph_data: Vec<f64> = (0i32..50)
+        .map(|i| f64::from(i).mul_add(0.02, 6.8) + f64::from((i * 3) % 10) * 0.02)
         .collect();
     let ph_mean = ph_data.iter().sum::<f64>() / ph_data.len() as f64;
     let ph_var = ph_data.iter().map(|&x| (x - ph_mean).powi(2)).sum::<f64>() / ph_data.len() as f64;
@@ -427,13 +426,16 @@ fn main() {
     let g30 = gompertz(30.0, fs0.p, fs0.rm, fs0.lambda);
     v.check_pass("Gompertz t=30 > 0", g30 > 0.0);
     v.check_pass("Gompertz t=30 < P_max", g30 < fs0.p);
+    // Wide tolerance: visualization scenario, kinetics curve shape not baseline-parity
     v.check("Gompertz corn stover t=30", g30, 250.0, 50.0);
 
     let fo30 = first_order(30.0, fs0.b_max, fs0.k);
     v.check_pass("first-order t=30 > 0", fo30 > 0.0);
+    // Wide tolerance: visualization scenario, kinetics curve shape not baseline-parity
     v.check("first-order corn stover t=30", fo30, 230.0, 50.0);
 
     let m100 = monod(100.0, fs0.mu_max, fs0.ks);
+    // Domain tolerance: Monod growth rate at S=100; μ_max·S/(K_s+S) ≈ 0.3 for corn stover
     v.check("Monod S=100 (corn stover)", m100, 0.3, 0.1);
 
     let h100 = haldane(100.0, fs0.mu_max, fs0.ks, fs0.ki);

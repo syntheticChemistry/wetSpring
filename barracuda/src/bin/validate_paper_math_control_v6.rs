@@ -63,19 +63,19 @@ fn gompertz(t: f64, p: f64, rm: f64, lambda: f64) -> f64 {
     .exp()
 }
 
-/// First-order biogas kinetics: `B(t) = B_max * (1 - exp(-k*t))`
+/// First-order biogas kinetics: B(t) = `B_max` * (1 - exp(-k*t))
 fn first_order(t: f64, b_max: f64, k: f64) -> f64 {
-    b_max * (1.0 - (-k * t).exp())
+    b_max * (1.0 - (-k).mul_add(t, 0.0).exp())
 }
 
-/// `Monod` growth kinetics: `mu = mu_max * S / (Ks + S)`
+/// Monod growth kinetics: mu = `mu_max` * S / (Ks + S)
 fn monod(s: f64, mu_max: f64, ks: f64) -> f64 {
-    mu_max * s / (ks + s)
+    mu_max.mul_add(s, 0.0) / (ks + s)
 }
 
-/// `Haldane` substrate inhibition: `mu = mu_max * S / (Ks + S + S²/Ki)`
+/// Haldane substrate inhibition: mu = `mu_max` * S / (Ks + S + S²/Ki)
 fn haldane(s: f64, mu_max: f64, ks: f64, ki: f64) -> f64 {
-    mu_max * s / (ks + s + s * s / ki)
+    mu_max.mul_add(s, 0.0) / (ks + s + s * s / ki)
 }
 
 fn main() {

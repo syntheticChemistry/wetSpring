@@ -222,6 +222,8 @@ fn validate_vegan_chao1(v: &mut Validator) {
     let chao = diversity::chao1(&comm);
 
     v.check("Chao1 S.obs vs R/vegan", obs, 10.0, 0.0);
+    // Chao1 estimator variance: R/vegan estimateR uses bias correction; 0.5 covers
+    // small-sample variance and implementation differences (singleton/doubleton handling)
     v.check("Chao1 estimate vs R/vegan", chao, 20.0, 0.5);
 }
 

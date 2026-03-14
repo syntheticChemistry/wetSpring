@@ -14,14 +14,15 @@
 //!
 //! # Provenance
 //!
-//! | Item        | Value |
-//! |-------------|-------|
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline commit | `5e6a00b` |
+//! | Baseline type | Synthetic parameter sweep (GPU ODE) |
 //! | Data source | Synthetic (mirrors ~12,000 Vibrio genomes on NCBI) |
-//! | GPU prims   | `BatchedOdeRK4F64` (via `OdeSweepGpu`) |
-//! | Date        | 2026-02-23 |
-//!
-//! Validation class: Synthetic
-//! Provenance: Generated data with known statistical properties
+//! | GPU prims | `BatchedOdeRK4F64` (via `OdeSweepGpu`) |
+//! | Date | 2026-03-14 |
+//! | Command | `cargo run --features gpu --bin validate_vibrio_qs_landscape` |
+//! | Validation class | Synthetic — analytical known-values (GPU vs CPU parity) |
 
 use std::time::Instant;
 #[cfg(feature = "gpu")]

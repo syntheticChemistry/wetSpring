@@ -193,9 +193,9 @@ fn progressive_align(sequences: &[&[u8]], newick: &str, params: &MsaParams) -> V
         }
     }
 
-    // Find the surviving profile
-    if let Some(profile) = profiles.iter().flatten().next() {
-        return profile.clone();
+    // Find the surviving profile (take ownership to avoid clone)
+    if let Some(profile) = profiles.into_iter().flatten().next() {
+        return profile;
     }
 
     // Fallback: shouldn't happen, but return unaligned with gap padding
@@ -250,15 +250,14 @@ fn extract_newick_leaves(newick: &str) -> Vec<String> {
         match ch {
             '(' | ',' | ')' | ';' => {
                 if !in_branch_length && !current.is_empty() {
-                    leaves.push(current.clone());
+                    leaves.push(std::mem::take(&mut current));
                 }
                 current.clear();
                 in_branch_length = false;
             }
             ':' => {
                 if !current.is_empty() {
-                    leaves.push(current.clone());
-                    current.clear();
+                    leaves.push(std::mem::take(&mut current));
                 }
                 in_branch_length = true;
             }

@@ -1,8 +1,8 @@
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** March 12, 2026
+**Date:** March 14, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V114 — 371 experiments, 9,886+ validation checks, ALL PASS; 1,611 tests (1,294 pass, 3 known GPU f32 failures), 354 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 784+ WGSL shaders), toadStool S146, coralReef Iter 33. V114: Deep audit — 15 `required-features` gate fixes, 52 clippy pedantic/nursery warnings resolved, 4 deprecated parsers migrated to streaming, inline tolerances eliminated, VRAM capability-based, `argmax_with_priors` unified. V113: Paper extension roadmap (Exp364-370, 67/67). V112: NVIDIA hardware learning (Exp361-363, 45/45). V107: R industry parity (53/53). 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL, 180 tolerances, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS.
+**Status:** V111 — 356 experiments, 5,707+ validation checks, ALL PASS; 1,621 tests, 340 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 784+ WGSL shaders), toadStool S142+, coralReef Iteration 29. V111: debt/cleanup pass — build health, clippy pedantic, bingocube-nautilus, hot-path clone elimination. V110: petalTongue visualization pipeline (Exp353-355) + Anderson QS cross-environment validation (Exp356). V109: upstream rewire + mixed hardware + NUCLEUS atomics. 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL, 180 tolerances, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS.
 
 ---
 
@@ -53,7 +53,7 @@ All code is AGPL-3.0.
 | **V101 Viz Evolution** | — | viz | — | Exp333-334 | 78 | 9 DataChannel types, 33 scenario builders, StreamSession, Songbird, IPC science→viz, streaming pipeline |
 | **V108 Track 6 Anaerobic** | Liao (MSU BAE) | 6 | 5+6 | Exp336-346 | 183 | Gompertz, first-order, Monod, Haldane kinetics, anaerobic diversity, Anderson W mapping, full 6-tier chain |
 | **V110 petalTongue + Anderson H3** | — | viz+science | — | Exp353-356 | 111 | petalTongue live dashboards, Anderson QS O₂-modulated W model (H3, r=0.851), stream_ecology, 6 JSON scenarios |
-| **Total** | | | **63** | | **9,686+** | |
+| **Total** | | | **63** | | **5,707+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 

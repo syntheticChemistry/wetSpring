@@ -3,85 +3,43 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## V114 — Deep Audit + Build Fix + Idiomatic Evolution (2026-03-12)
+## [V111] — 2026-03-14
 
-### Fixed
-- **Build broken** — 15 validation binaries missing `required-features` gates for `gpu` and/or `json` features (`tokio`, `serde_json`, `barracuda::device` used without feature gates). Default `cargo check` now passes.
-- **Clippy pedantic/nursery** — 52 warnings fixed across 25 V113 binaries: `doc_markdown` (backtick wrapping), `suboptimal_flops` (`mul_add`), `cast_lossless` (`f64::from`), `manual_clamp`, `needless_range_loop`, `redundant_clone`, `single_match_else`, dead struct fields, bare URLs.
-- **Deprecated batch parsers** — Last 4 validation binaries (`validate_barracuda_cpu_v12`, `validate_cpu_vs_gpu_v5_io_evolution`, `validate_nucleus_v8_mixed`, `validate_streaming_io_parity`) migrated from `parse_fastq`/`parse_ms2` to streaming APIs (`FastqIter`, `Ms2Iter`).
+### Deep Debt Resolution + Idiomatic Evolution
 
-### Changed
-- **Inline tolerances** — `validate_stable_specials_v1.rs` inline `1e-6`, `1e-20`, `1e-10` replaced with `tolerances::ERF_PARITY`, `VARIANCE_EXACT`, `ANALYTICAL_LOOSE`.
-- **VRAM estimate** — `validate_hardware_learning_v1.rs` hardcoded `12_u64` GB evolved to capability-based derivation from `DeviceCapabilities::max_buffer_size`.
-- **Code deduplication** — `argmax_with_priors` unified in `bio::taxonomy` module (was duplicated in `streaming_gpu.rs` and `taxonomy_gpu.rs`).
-- **EVOLUTION_READINESS.md** — Updated with V114 audit entries (build fix, clippy, streaming migration, tolerance evolution).
+Build health restored, comprehensive clippy/fmt/doc cleanup, and dependency
+evolution across the full workspace.
 
-### Quality
-- `cargo fmt --check`: **0 diffs**
-- `cargo clippy -W pedantic -W nursery`: **0 warnings** (was 52)
-- `cargo doc --no-deps`: **0 warnings** (was 2)
-- `cargo test`: **All pass** (was broken)
-- All files under 1000 LOC
-- 0 TODO/FIXME markers
-- 0 unsafe code blocks
+#### Build Blockers Fixed
+- `akida-driver` path case corrected (`toadstool` → `toadStool`)
+- `bingocube-nautilus` crate created at `primalTools/bingoCube/nautilus/` — real
+  evolutionary reservoir computing implementation (not a mock)
+- `provenance` feature gate: `validate_barracuda_cpu_v27` and
+  `validate_cpu_vs_gpu_v11` now correctly require `gpu` feature
 
-## V113 — Paper Extension Roadmap + P0-P1 Dataset Pipelines (2026-03-11)
+#### Clippy + Format
+- 29 clippy errors fixed: `suboptimal_flops` (mul_add), `cast_lossless` (f64::from),
+  `doc_markdown` (backticks), `single_match_else` (if let), `redundant_clone`,
+  `collection_is_never_read`
+- `cargo fmt` applied to full workspace
+- All checks pass: fmt, clippy (pedantic + nursery), doc, test (1,621/1,621)
 
-### Added
-- **Paper extension roadmap** implemented — 7 experiments (Exp364-370) validating P0/P1 data pipelines, primal integration, and LAN mesh planning:
-  - Exp364: EMP Anderson QS Atlas v1 (14/14 PASS) — 28K synthetic EMP-scale samples across 28 biomes, H1/H2/H3 model comparison, anaerobic P(QS)=0.81 vs aerobic P(QS)=0.16, petalTongue atlas dashboard. Real EMP data loader ready (Qiita 10317).
-  - Exp365: Liao Group Real Community Data v1 (12/12 PASS) — 8 communities from 5 Liao group papers, Gompertz fitting (R²>0.95), Anderson QS all active (P>0.5 for anaerobic digesters), Shannon-yield correlation r=0.685.
-  - Exp366: KBS LTER Soil Anderson Temporal v1 (5/5 PASS) — 30-year tillage × Anderson disorder trajectories, 4 KBS treatments, dynamic W(t) recovery model, seasonal H' oscillation. BioProjects: PRJNA305469, PRJNA485370.
-  - Exp367: QS Gene Profiling v1 (10/10 PASS) — 14 QS types across 8 signal systems, FNR/ArcAB/Rex regulon mapping, molecular mechanism support for H3 (9/14 anaerobic-enhanced, aerobic W 2× anaerobic W).
-  - Exp368: Primal Integration Pipeline v1 (9/9 PASS) — primal discovery (BearDog/Songbird/ToadStool/NestGate socket scan), three-tier NCBI routing validation (biomeOS→NestGate→sovereign HTTP), wgpu GPU dispatch, science pipeline end-to-end.
-  - Exp369: P1 Extensions Framework v1 (8/8 PASS) — cold seep (PRJNA315684), Tara Oceans (PRJEB1787), HMP gut (PRJNA275349), AMR sentinel, mycorrhizal Anderson. H3 validated: anaerobic > aerobic across all P1 biomes.
-  - Exp370: LAN Mesh + SRA Atlas Plan v1 (9/9 PASS) — 5-tower inventory (96GB VRAM, 208 TFLOPS, 85TB), 500-BioProject standard atlas in 1.6h on mesh, bandwidth model (10G), cost-time projections ($0.29 electricity).
-- **Documentation updates** — EXTENSION_PLAN.md (V112 hardware learning → Axis 3C), sub_thesis_01 (V112 eigensolver/DF64 Lanczos), NUCLEUS_LOCAL_DEPLOYMENT.md (V112 hardware discovery table).
+#### Code Quality
+- Hot-path clones eliminated in `msa.rs` (ownership transfer via `std::mem::take`)
+- Arc clones documented with `Arc::clone()` idiom
+- Dead `all_pielou` collections removed from 2 validation binaries
+- Flaky nest tests fixed: sleep-based → poll-based socket wait
 
-### Key Findings
-- H3 (O₂-modulated W) validated across 28+ biomes at N=28K scale: anaerobic communities consistently show higher P(QS) than aerobic
-- Liao group digesters: all QS active (P>0.5), diversity-yield correlation positive (r=0.685)
-- KBS LTER temporal: both tillage regimes near Anderson transition (W≈16.5), seasonal H' oscillation visible
-- QS gene profiling: FNR/ArcAB/Rex regulon mapping provides molecular mechanism for H3 O₂ coefficient
-- Primal pipeline operational: graceful degradation when primals not running, sovereign fallback always available
-- LAN mesh: 31K samples/hour throughput, standard SRA atlas (500 BioProjects) fits in 1.6h, $0.29 electricity
+#### Validation Provenance
+- Provenance tables added to 4 visualization validators
+- Ad-hoc tolerance values justified with inline documentation
+- `BARRACUDA_REQUIREMENTS.md` version updated v0.3.3 → v0.3.5
 
-## V112 — NVIDIA Hardware Learning Prototype (2026-03-11)
+#### Dependencies
+- barraCuda v0.3.5 (was v0.3.3)
+- `bingocube-nautilus` v0.1.0 (new — evolutionary reservoir computing)
 
-### Added
-- **NVIDIA hardware learning prototype** — 3 experiments building the probe-calibrate-route-apply pattern:
-  - Exp361: Nouveau RTX 4070 Diagnostic v1 (15/15 PASS) — dual-GPU rig discovery (RTX 4070 nvidia + Titan V nouveau), firmware inventory (AD104 GSP-only, GV100 no GSP), nouveau dispatch (VM_INIT OK, CHANNEL_ALLOC EINVAL on Volta), wgpu baseline (RTX 4070 F32 safe, NVVM risk), petalTongue dispatch dashboard.
-  - Exp362: Hardware Learning Prototype v1 (13/13 PASS) — probe-calibrate-route-apply pattern, HardwareCalibration 4-tier probing, PrecisionBrain 12-domain routing, FMA policy, bio workload CPU/GPU crossover thresholds, VRAM ceiling (12GB max pairwise N≈40K), firmware inventory, machine-readable capability profile JSON (output/hardware_capability_profile.json).
-  - Exp363: Adaptive Dispatch from Hardware Profile v1 (17/17 PASS) — reads capability profile, adaptive workload selection (F32 always, DF64 arith if f64 hw, skip transcendentals on NVVM risk, VRAM-aware scaling), Shannon/Simpson diversity, Anderson eigenvalues, Bray-Curtis at scale. Graceful degradation proven.
-- **Hardware capability profile** — `output/hardware_capability_profile.json` machine-readable recipe: adapter, tiers, domain routing, firmware, thresholds, sovereign status. Consumable by any primal.
-
-### Key Findings
-- RTX 4070 (nvidia proprietary): wgpu/Vulkan dispatch working, F32 safe, DF64/F64 compile+dispatch but transcendentals unsafe (NVVM risk). PrecisionBrain routes all 12 domains to F32.
-- Titan V (nouveau): VM_INIT succeeds (kernel 6.17.9 new UAPI), CHANNEL_ALLOC EINVAL — Volta lacks GSP, PMU firmware missing. Ada (AD104) has GSP-only firmware present.
-- RTX 4070 on nouveau: untested (nvidia proprietary active). This is the highest-ROI next step — Ada GSP should bypass the Volta PMU blocker.
-- Adaptive dispatch correctly: runs F32 (always), runs DF64 arithmetic (f64 hw present), skips F64 transcendentals (NVVM risk), runs large-N (12GB VRAM), skips sovereign (not available).
-- Hardware capability profile format ready for toadStool hw-learn module absorption.
-
-## V111 — barraCuda v0.3.5 Upstream Rewire + GPU Learning System (2026-03-11)
-
-### Added
-- **Upstream rewire** — barraCuda v0.3.3 → v0.3.5 (`0649cd0`), toadStool S146, coralReef Iter 33. ESNConfig SGD fields added. All 1,294 lib tests pass (3 known GPU f32 failures).
-- **New experiments** — 4 experiments validating GPU learning system infrastructure:
-  - Exp357: GPU Hardware Discovery + PrecisionBrain v1 (24/24 PASS) — HardwareCalibration, PrecisionBrain bio routing (Bioinformatics→F32), NVVM transcendental risk detected on RTX 4070, FmaPolicy validation, sovereign probe, petalTongue GPU landscape dashboard.
-  - Exp358: Workload Routing + VRAM-Aware Dispatch v1 (18/18 PASS) — PrecisionBrain advice for 6 bio domains, VRAM estimation (RTX 4070 12GB max pairwise N≈39K), CPU→GPU crossover thresholds, biomeOS/NUCLEUS readiness probing.
-  - Exp359: Stable GPU Specials + Tridiag Eigensolver v1 (34/34 PASS) — log1p_f64, expm1_f64, erfc_f64, bessel_j0_minus1_f64 validated against reference. Tridiagonal QL eigensolver for Anderson lattice (bandwidth scaling with disorder W). anderson_diagonalize convenience wrapper.
-  - Exp360: Sovereign Dispatch Readiness v1 (12/12 PASS) — sovereign-dispatch feature gate probe, Device enum validation, wgpu path confirmed, upstream pin verification. Sovereign path requires coral-gpu crate (not compiled in standard builds).
-- **GPU landscape JSON** — `output/gpu_capability_landscape.json` petalTongue dashboard (tier heatmap, domain routing bar chart, NVVM risk gauge).
-
-### Changed
-- `barracuda/src/bio/esn/toadstool_bridge.rs` — added `sgd_learning_rate`, `sgd_min_iterations`, `sgd_max_iterations` fields to `ESNConfig` constructor (barraCuda v0.3.5 API change).
-
-### Key Findings
-- RTX 4070 (Ada Lovelace, SM89): F32 safe, DF64/F64/F64Precise compile+dispatch but transcendentals unsafe (NVVM poisoning risk). PrecisionBrain routes all bio domains to F32.
-- Stable specials (log1p, expm1, erfc, bessel_j0_minus1) avoid catastrophic cancellation at x=1e-15.
-- Anderson tridiagonal QL eigenvalues: bandwidth scales with disorder W (confirmed for W=1..30).
-- Sovereign dispatch (coralReef) requires coral-gpu crate — not available in standard builds. DRM EINVAL expected on NVIDIA proprietary.
-- VRAM ceiling: 12GB RTX 4070 supports pairwise distance matrices up to ~39K samples.
+**1,621 tests** | **340 binaries** | **5,707+ checks** | **0 clippy warnings (pedantic + nursery)**
 
 ## V110 — petalTongue Visualization + Anderson QS Evolution (2026-03-10)
 

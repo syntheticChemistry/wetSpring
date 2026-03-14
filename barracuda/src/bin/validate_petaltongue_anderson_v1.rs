@@ -18,7 +18,7 @@
 //! Builds the "one picture that tells the whole story" dashboard for the
 //! Anderson localization / quorum sensing thesis. Combines diversity,
 //! disorder mapping, propagation probability, cross-biome comparison,
-//! and spatial `FieldMap` into a single `petalTongue` scenario.
+//! and spatial `FieldMap` into a single petalTongue scenario.
 //!
 //! ## What This Visualizes
 //!
@@ -34,9 +34,11 @@
 //!
 //! | Field | Value |
 //! |-------|-------|
-//! | Provenance type | petalTongue Anderson QS visualization |
-//! | Date | 2026-03-10 |
+//! | Baseline commit | `5e6a00b` |
+//! | Baseline type | petalTongue Anderson QS Landscape visualization |
+//! | Date | 2026-03-14 |
 //! | Command | `cargo run --features gpu --bin validate_petaltongue_anderson_v1` |
+//! | Validation class | Visualization — synthetic data with analytical checks |
 
 use std::path::PathBuf;
 
@@ -213,7 +215,7 @@ fn main() {
         unit: "index".into(),
     });
 
-    let w_sweep: Vec<f64> = (0..100).map(|i| f64::from(i) * 0.25).collect();
+    let w_sweep: Vec<f64> = (0i32..100).map(|i| f64::from(i) * 0.25).collect();
     let p_sweep: Vec<f64> = w_sweep.iter().map(|&w| p_qs(w)).collect();
     mapping_node.data_channels.push(DataChannel::TimeSeries {
         id: "w_pqs_curve".into(),

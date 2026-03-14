@@ -18,7 +18,7 @@
 //! Validates the full NUCLEUS atomic deployment model coordinated
 //! by biomeOS graph execution:
 //!
-//! 1. biomeOS binary discovery and version check
+//! 1. `biomeOS` binary discovery and version check
 //! 2. Tower Atomic (`BearDog` + `Songbird`) readiness
 //! 3. Node Atomic (Tower + `ToadStool`) readiness
 //! 4. Nest Atomic (Node + `NestGate` + `Squirrel`) readiness

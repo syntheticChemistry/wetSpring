@@ -20,6 +20,14 @@
 
 mod observation;
 
+/// Nautilus Shell: evolutionary reservoir computing via `bingocube-nautilus`.
+///
+/// `bingocube-nautilus` is a shared ecosystem tool from primalTools/bingoCube.
+/// It provides evolutionary reservoir computing (board populations + LOO edge
+/// detection) for concept edge detection, drift monitoring, and evolutionary
+/// adaptation in bio sentinel pipelines. The feature is gated behind the
+/// `nautilus` feature flag. Cross-primal provenance: originated from hotSpring
+/// v0.6.15 brain architecture.
 #[cfg(feature = "nautilus")]
 pub mod nautilus_bridge;
 
