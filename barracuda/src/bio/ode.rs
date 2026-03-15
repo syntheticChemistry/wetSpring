@@ -196,13 +196,13 @@ pub fn rk45_integrate<F>(
     t_end: f64,
     rtol: f64,
     atol: f64,
-) -> std::result::Result<OdeResult, String>
+) -> crate::error::Result<OdeResult>
 where
     F: Fn(f64, &[f64]) -> Vec<f64>,
 {
     let config = barracuda::numerical::rk45::Rk45Config::new(rtol, atol);
     let result = barracuda::numerical::rk45::rk45_solve(&f, t_start, t_end, y0, &config)
-        .map_err(|e| format!("rk45: {e}"))?;
+        .map_err(|e| crate::error::Error::InvalidInput(format!("rk45: {e}")))?;
 
     let n_vars = y0.len();
     let y_flat: Vec<f64> = result

@@ -181,7 +181,7 @@ fn handle_connection(stream: &std::os::unix::net::UnixStream, metrics: &Metrics)
 
 /// Resolve the socket path for binding.
 fn resolve_bind_path() -> PathBuf {
-    super::discover::resolve_bind_path("WETSPRING_SOCKET", crate::PRIMAL_NAME)
+    super::discover::resolve_bind_path("WETSPRING_SOCKET", super::primal_names::SELF)
 }
 
 #[cfg(test)]
@@ -371,14 +371,14 @@ mod tests {
         reader.read_line(&mut metrics_resp).unwrap();
 
         let val: serde_json::Value = serde_json::from_str(&metrics_resp).unwrap();
-        assert_eq!(val["result"]["primal"], "wetspring");
+        assert_eq!(val["result"]["primal"], super::super::primal_names::SELF);
         assert!(val["result"]["total_calls"].as_u64().unwrap() >= 1);
     }
 
     #[test]
     fn resolve_bind_path_default() {
         let path = resolve_bind_path();
-        assert!(path.to_string_lossy().contains("wetspring"));
+        assert!(path.to_string_lossy().contains(super::super::primal_names::SELF));
     }
 
     #[test]

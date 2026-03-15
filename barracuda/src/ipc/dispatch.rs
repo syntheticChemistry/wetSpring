@@ -60,6 +60,9 @@ pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
         "brain.attention" => handlers::handle_brain_attention(params),
         "brain.urgency" => handlers::handle_brain_urgency(params),
 
+        // AI assist (Squirrel)
+        "ai.ecology_interpret" => handlers::handle_ai_ecology_interpret(params),
+
         _ => Err(RpcError::method_not_found(method)),
     }
 }
@@ -74,7 +77,7 @@ mod tests {
     fn dispatch_health_check() {
         let result = dispatch("health.check", &json!({})).unwrap();
         assert_eq!(result["status"], "healthy");
-        assert_eq!(result["primal"], "wetspring");
+        assert_eq!(result["primal"], crate::ipc::primal_names::SELF);
     }
 
     #[test]
@@ -263,17 +266,18 @@ mod tests {
     #[test]
     fn capability_list_returns_all_domains() {
         let result = dispatch("capability.list", &json!({})).unwrap();
-        assert_eq!(result["primal"], "wetspring");
+        assert_eq!(result["primal"], crate::ipc::primal_names::SELF);
         assert_eq!(result["domain"], "ecology");
 
         let domains = result["domains"].as_array().unwrap();
-        assert_eq!(domains.len(), 14);
+        assert_eq!(domains.len(), 15);
 
         let domain_names: Vec<&str> = domains.iter().filter_map(|d| d["name"].as_str()).collect();
         assert!(domain_names.contains(&"ecology.diversity"));
         assert!(domain_names.contains(&"provenance"));
         assert!(domain_names.contains(&"brain"));
         assert!(domain_names.contains(&"metrics"));
+        assert!(domain_names.contains(&"ecology.ai_assist"));
     }
 
     #[test]
@@ -286,6 +290,6 @@ mod tests {
             .filter_map(|d| d["methods"].as_array())
             .map(|m| m.len())
             .sum();
-        assert_eq!(total_methods, 19);
+        assert_eq!(total_methods, 20);
     }
 }

@@ -23,6 +23,7 @@ use chacha20poly1305::ChaCha20Poly1305;
 use chacha20poly1305::aead::{Aead, KeyInit};
 
 use super::consent::ConsentTicket;
+use super::error::VaultError;
 use super::provenance::ProvenanceChain;
 
 /// An encrypted blob in the vault.
@@ -90,12 +91,12 @@ impl VaultStore {
         owner_id: &str,
         key: &[u8; 32],
         ticket: &ConsentTicket,
-    ) -> Result<[u8; 32], String> {
+    ) -> Result<[u8; 32], VaultError> {
         if ticket.owner_id != owner_id {
-            return Err("consent ticket owner mismatch".to_string());
+            return Err(VaultError::ConsentOwnerMismatch);
         }
         if !ticket.is_valid() {
-            return Err("consent ticket expired or revoked".to_string());
+            return Err(VaultError::ConsentExpiredOrRevoked);
         }
 
         let content_hash = sovereign_hash(plaintext);
@@ -136,25 +137,25 @@ impl VaultStore {
         content_hash: &[u8; 32],
         key: &[u8; 32],
         ticket: &ConsentTicket,
-    ) -> Result<VaultRetrieveResult, String> {
+    ) -> Result<VaultRetrieveResult, VaultError> {
         if !ticket.is_valid() {
-            return Err("consent ticket expired or revoked".to_string());
+            return Err(VaultError::ConsentExpiredOrRevoked);
         }
 
         let blob = self
             .blobs
             .get(content_hash)
-            .ok_or_else(|| "blob not found".to_string())?;
+            .ok_or(VaultError::BlobNotFound)?;
 
         if blob.owner_id != ticket.owner_id {
-            return Err("consent ticket owner does not match blob owner".to_string());
+            return Err(VaultError::ConsentOwnerMismatch);
         }
 
         let plaintext = sovereign_decrypt(&blob.ciphertext, key, &blob.nonce)?;
 
         let verify_hash = sovereign_hash(&plaintext);
         if verify_hash != *content_hash {
-            return Err("decryption integrity check failed".to_string());
+            return Err(VaultError::IntegrityCheckFailed);
         }
 
         self.chain.append(
@@ -205,11 +206,11 @@ impl VaultStore {
     /// # Errors
     ///
     /// Always returns `Err` — unauthorized access is never permitted.
-    pub fn retrieve_unauthorized(&self, content_hash: &[u8; 32]) -> Result<(), String> {
+    pub fn retrieve_unauthorized(&self, content_hash: &[u8; 32]) -> Result<(), VaultError> {
         if self.blobs.contains_key(content_hash) {
-            Err("blob exists but no valid consent ticket presented".to_string())
+            Err(VaultError::Unauthorized)
         } else {
-            Err("blob not found".to_string())
+            Err(VaultError::BlobNotFound)
         }
     }
 }
@@ -222,14 +223,14 @@ fn sovereign_encrypt(
     plaintext: &[u8],
     lineage_seed: &[u8; 32],
     nonce: &[u8; 12],
-) -> Result<Vec<u8>, String> {
+) -> Result<Vec<u8>, VaultError> {
     let key = derive_key(lineage_seed);
     let cipher =
-        ChaCha20Poly1305::new_from_slice(&key).map_err(|_| "invalid key length".to_string())?;
+        ChaCha20Poly1305::new_from_slice(&key).map_err(|_| VaultError::InvalidKeyLength)?;
     let nonce_arr = chacha20poly1305::Nonce::from_slice(nonce);
     cipher
         .encrypt(nonce_arr, plaintext)
-        .map_err(|e| format!("encryption failed: {e}"))
+        .map_err(|e| VaultError::EncryptionFailed(e.to_string()))
 }
 
 /// Decrypt ciphertext with ChaCha20-Poly1305.
@@ -237,14 +238,14 @@ fn sovereign_decrypt(
     ciphertext: &[u8],
     lineage_seed: &[u8; 32],
     nonce: &[u8; 12],
-) -> Result<Vec<u8>, String> {
+) -> Result<Vec<u8>, VaultError> {
     let key = derive_key(lineage_seed);
     let cipher =
-        ChaCha20Poly1305::new_from_slice(&key).map_err(|_| "invalid key length".to_string())?;
+        ChaCha20Poly1305::new_from_slice(&key).map_err(|_| VaultError::InvalidKeyLength)?;
     let nonce_arr = chacha20poly1305::Nonce::from_slice(nonce);
     cipher
         .decrypt(nonce_arr, ciphertext)
-        .map_err(|_| "decryption failed (wrong key or tampered ciphertext)".to_string())
+        .map_err(|_| VaultError::DecryptionFailed)
 }
 
 /// Derive 32-byte encryption key from lineage seed using BLAKE3.
@@ -314,7 +315,10 @@ mod tests {
         let err = vault
             .store(b"data", "label", "owner-2", &key, &ticket)
             .unwrap_err();
-        assert!(err.contains("owner mismatch"));
+        assert!(
+            err.to_string().contains("owner mismatch"),
+            "expected owner mismatch, got: {err}"
+        );
     }
 
     #[test]
@@ -331,7 +335,10 @@ mod tests {
         expired_ticket.duration = Duration::from_secs(1);
 
         let err = vault.retrieve(&hash, &key, &expired_ticket).unwrap_err();
-        assert!(err.contains("expired"));
+        assert!(
+            err.to_string().contains("expired"),
+            "expected expired, got: {err}"
+        );
     }
 
     #[test]
@@ -345,7 +352,10 @@ mod tests {
 
         ticket.revoke();
         let err = vault.retrieve(&hash, &key, &ticket).unwrap_err();
-        assert!(err.contains("expired or revoked"));
+        assert!(
+            err.to_string().contains("expired or revoked"),
+            "expected expired or revoked, got: {err}"
+        );
     }
 
     #[test]
@@ -374,9 +384,9 @@ mod tests {
             .store(b"data", "label", "owner-1", &key, &ticket)
             .unwrap();
         let err = vault.retrieve(&hash, &wrong_key, &ticket).unwrap_err();
-        // ChaCha20-Poly1305: wrong key fails at decrypt (AEAD tag) or content hash
+        let msg = err.to_string();
         assert!(
-            err.contains("decryption failed") || err.contains("integrity check failed"),
+            msg.contains("decryption failed") || msg.contains("integrity check failed"),
             "expected decrypt or integrity error, got: {err}"
         );
     }
@@ -391,6 +401,9 @@ mod tests {
             .unwrap();
 
         let err = vault.retrieve_unauthorized(&hash).unwrap_err();
-        assert!(err.contains("no valid consent ticket"));
+        assert!(
+            err.to_string().contains("no valid consent ticket"),
+            "expected unauthorized, got: {err}"
+        );
     }
 }

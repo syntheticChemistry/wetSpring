@@ -208,11 +208,11 @@ pub fn handle_ncbi_fetch(params: &Value) -> Result<Value, RpcError> {
     crate::ncbi::nestgate::fetch_tiered(db, id, &api_key)
         .map(|fasta| {
             let source = if crate::ncbi::nestgate::discover_biomeos_socket().is_some() {
-                "biomeos"
+                super::super::primal_names::BIOMEOS
             } else if crate::ncbi::nestgate::is_enabled()
                 && crate::ncbi::nestgate::discover_socket().is_some()
             {
-                "nestgate"
+                super::super::primal_names::NESTGATE
             } else {
                 "sovereign"
             };

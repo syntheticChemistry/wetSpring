@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 15, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V117 — **1,667 tests** (0 failures), 376 experiments, 5,707+ validation checks across 354 binaries. Ecosystem: barraCuda v0.3.5, toadStool S130+, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). **biomeOS niche** — deploy graph (`graphs/wetspring_deploy.toml`), 14 capability domains / 19 methods (`capability_domains.rs`), provenance trio integration, cross-spring time series exchange. **UniBin compliant** (`wetspring server|status|version`). 200+ named tolerance constants (4 submodules). V117 deep tolerance centralization + code quality: 39 `cargo fmt` violations resolved, 12 unfulfilled `#[expect()]` removed, 4 production `panic!()` eliminated (GPU modules + nautilus bridge → `Result`), 5 ESN urgency thresholds centralized, 13 new tolerance constants, 30+ inline literals replaced in 17 binaries. Superseded handoffs archived (V111–V116).
+**Status:** V119 — **1,687 tests** (0 failures), 376 experiments, 5,707+ validation checks across 354 binaries. Ecosystem: barraCuda v0.3.5, toadStool S130+, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). **biomeOS niche** — deploy graph (`graphs/wetspring_deploy.toml`), niche self-knowledge (`niche.rs` + `wetspring-ecology.yaml` BYOB manifest), 15 capability domains / 20 methods (`capability_domains.rs`), Squirrel AI integration (`ai.ecology_interpret`), provenance trio integration, cross-spring time series exchange. **UniBin compliant** (`wetspring server|status|version`). 200+ named tolerance constants (4 submodules). V119 Deep Debt Evolution Sprint: niche architecture, typed errors (`VaultError`, `NestError`, `SongbirdError`, `AssemblyError`), 7 large files refactored into domain-organized submodules (net −3,496 lines), `#[allow()]` → `#[expect(reason)]` in 10 binaries, hardcoded primal names → `primal_names.rs` constants + library discovery, `proptest` adopted (4 stochastic property tests), Squirrel AI wired with graceful degradation, clone reduction (`into_flat_tree` zero-copy). Superseded handoffs archived (V111–V118).
 
 ---
 
@@ -133,11 +133,10 @@ integration point.
 | V100 viz + local evolution (Exp327-332) | 173 (petalTongue 45 + CPU/GPU 27 + metalForge 19 + biomeOS 34 + local evo 24 + mixed HW 24) |
 | V101 viz evolution (Exp333-334) | 78 (viz evolution 44 + science-to-viz 34) |
 | **Total validation checks** | **5,707+** |
-| Rust library unit tests | 1,335 (barracuda) |
+| Rust library unit tests | 1,353 (barracuda) |
 | metalForge forge tests | 234 |
-| Doc-tests | 9 |
-| Integration tests | 89 (72 barracuda + 17 forge) |
-| **Total Rust tests** | **1,667** (lib + forge + integration + doc) |
+| Integration tests | 98 (72 barracuda + 26 forge) |
+| **Total Rust tests** | **1,687** (lib + forge + integration) |
 | Library code coverage | **94.01% line** (barracuda), **88.78% line** (forge) (cargo-llvm-cov) |
 | Experiments completed | 376 |
 | Validation/benchmark binaries | 354 (332 barracuda + 22 forge) |
@@ -152,7 +151,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | `barraCuda` primitives consumed | **150+** (v0.3.5, always-on, zero fallback code — standalone `barraCuda`, wgpu 28, PrecisionRoutingAdvice) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 5,707+ validation checks **PASS**. All 1,335 library + 234 forge + 89 integration + 9 doc tests **PASS** (2 ignored: hardware-dependent).
+All 5,707+ validation checks **PASS**. All 1,353 library + 234 forge + 98 integration tests **PASS** (2 ignored: hardware-dependent).
 
 ### GPU Performance
 
@@ -242,7 +241,7 @@ with deploy graph `wetspring_deploy.toml` and cross-primal pipeline validation.
 | 321 | biomeOS/NUCLEUS V98+ Integration | Integration | 42/42 |
 | 322 | Cross-Primal Pipeline V98+ | Pipeline | 22/22 |
 
-- IPC server: health, science.diversity, science.qs_model, full_pipeline, brain, metrics
+- IPC server: health, science.diversity, science.qs_model, full_pipeline, brain, metrics, ai.ecology_interpret
 - Protocol: JSON-RPC 2.0, error codes, 10-request multiplexing on single connection
 - NUCLEUS: environment probe, deploy graph, Songbird discovery
 - Pipeline: airSpring ET₀ → wetSpring QS → diversity → neuralSpring graph → spectral
@@ -305,7 +304,27 @@ science-to-visualization IPC wiring:
 - **IPC wiring**: `science.diversity` and `science.full_pipeline` gain `visualization: bool` parameter — auto-build scenario + push to petalTongue
 - **dump_wetspring_scenarios**: 13 scenarios (was 6), `--stream` flag for StreamSession demo
 
-**1,667 tests** | **376 experiments** | **354 binaries** | **5,707+ checks**
+**1,687 tests** | **376 experiments** | **354 binaries** | **5,707+ checks**
+
+### V119: Deep Debt Evolution Sprint (2026-03-15)
+
+Niche architecture, typed errors, domain-organized refactoring, modern lint attributes,
+capability-based discovery, property-based testing, Squirrel AI integration:
+
+| Change | Detail |
+|--------|--------|
+| **Niche self-knowledge** | `niche.rs` module (capabilities, dependencies, cost estimates, ecology semantic mappings) + `wetspring-ecology.yaml` BYOB manifest |
+| **Typed errors** | `VaultError` (vault), `NestError` / `SongbirdError` / `AssemblyError` (forge) — `Result<_, String>` reduced from ~25 to 8 |
+| **7 large files → submodules** | `streaming_gpu` (670→688 LOC/3 files), `chimera` (531→562/3), `signal` (532→558/4), `msa` (565→606/3), `mzxml` (583→605/3), `mzml/decode` (580→650/3), `handlers/expanded` (485→444/7) — net **−3,496 lines** |
+| **`#[expect(reason)]` migration** | 10 validation binaries: `#[allow(clippy::*)]` → `#[expect(clippy::*, reason = "validation binary: ...")]` |
+| **Hardcoding eliminated** | `primal_names.rs` constants replace 15+ hardcoded strings across 8 IPC modules; 4 binaries evolved from local `discover_socket()` to library `ipc::discover` |
+| **`proptest` adopted** | 4 property-based tests: Gillespie steady-state convergence, bootstrap CI coverage, rarefaction monotonicity + Shannon bounds, cooperation population bounds |
+| **Squirrel AI** | `ai.ecology_interpret` capability domain (15th), `discover_squirrel()`, handler with graceful degradation (unavailable/timeout/error → Ok with status) |
+| **Clone reduction** | `PhyloTree::into_flat_tree(self)` zero-copy consuming method; `Box<dyn Fn>` retained for Gillespie (documented: heterogeneous reactions require dynamic dispatch) |
+
+- `cargo check --workspace` — clean
+- `cargo test --workspace` — **1,687 passed**, 0 failed, 2 ignored
+- 48 files changed, 463 insertions, 3,959 deletions (net −3,496)
 
 ### V116: Deep Audit Execution — Capability Discovery + Tolerance Centralization (2026-03-15)
 
@@ -354,9 +373,10 @@ See CHANGELOG.md for full V111 entry.
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy -W pedantic -W nursery` | **Zero warnings** (pedantic + nursery clean) |
 | `cargo doc --no-deps` | Clean (0 warnings) |
-| Line coverage (`cargo-llvm-cov`) | **94.01% line** (barracuda), **90%+ line** (forge) (1,667 tests) |
+| Line coverage (`cargo-llvm-cov`) | **94.01% line** (barracuda), **90%+ line** (forge) (1,687 tests) |
 | `#![forbid(unsafe_code)]` | **Enforced on all 356 crate roots** (2 lib + 354 bin; edition 2024) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | **Enforced crate-wide** |
+| `#[expect(reason = "...")]` | All validation binary lint overrides documented |
 | TODO/FIXME markers | **0** |
 | Inline tolerance literals | **0** (all use `tolerances::` constants) |
 | SPDX-License-Identifier | All `.rs` files |
@@ -469,12 +489,14 @@ wetSpring/
 │   │   ├── io/                  ← streaming parsers (FASTQ, mzML, MS2, XML, nanopore)
 │   │   ├── bench/               ← benchmark harness + power monitoring
 │   │   ├── bin/                 ← 318 validation/benchmark binaries (+ 22 forge)
-│   │   ├── ipc/                 ← JSON-RPC dispatch (biomeOS integration, capability_domains.rs)
+│   │   ├── niche.rs             ← self-knowledge: capabilities, dependencies, cost estimates
+│   │   ├── ipc/                 ← JSON-RPC dispatch (biomeOS integration, capability_domains.rs, primal_names.rs)
 │   │   ├── visualization/       ← petalTongue schema types, 13 scenario builders, StreamSession, Songbird
 │   │   └── vault/               ← encrypted consent-gated data storage
 │   ├── rustfmt.toml             ← max_width = 100, edition = 2024
 │   └── capability_registry.toml ← machine-readable capability manifest (19 capabilities, 4 domains)
-├── experiments/                   ← 375 experiment protocols + results
+├── niches/                        ← BYOB niche manifests (wetspring-ecology.yaml)
+├── experiments/                   ← 376 experiment protocols + results
 ├── metalForge/                    ← hardware characterization + substrate routing
 │   ├── forge/                    ← Rust crate: wetspring-forge (discovery + dispatch)
 │   │   ├── src/                  ← substrate.rs, probe.rs, inventory.rs, dispatch.rs, bridge.rs
@@ -498,7 +520,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (1,667 library + forge + doc + integration tests)
+# Run all tests (1,687 library + forge + integration tests)
 cargo test --workspace --all-features
 
 # Code quality checks
@@ -561,8 +583,8 @@ All validation data comes from public repositories:
 - **toadStool** — Hardware dispatch primal (GPU/NPU/CPU routing, adaptive tuning, S130 — 19,140+ tests, `science.*` IPC, coralReef proxy)
 - **coralReef** — Sovereign GPU shader compiler (WGSL/SPIR-V → native binary, Phase 10, SM70–SM89 + RDNA2, `shader.compile.*` IPC)
 - **wateringHole** — Inter-primal handoffs and cross-spring coordination
-  - `handoffs/WETSPRING_BARRACUDA_031_REWIRE_HANDOFF_MAR03_2026.md` — barraCuda v0.3.1 rewire
-  - `handoffs/archive/` — V7-V92J (fossil record)
+  - `handoffs/WETSPRING_V119_DEEP_DEBT_EVOLUTION_HANDOFF_MAR15_2026.md` — V119 deep debt evolution
+  - `handoffs/archive/` — V7-V118 (fossil record)
   - `CROSS_SPRING_SHADER_EVOLUTION.md` — 767+ shader provenance
 - **blueFish** — Chemistry as irreducible research programme (`whitePaper/blueFish/`)
 - **ecoPrimals** — Parent ecosystem

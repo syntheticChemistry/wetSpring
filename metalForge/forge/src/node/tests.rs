@@ -273,7 +273,9 @@ mod tests {
         std::fs::write(dir.path().join("data.txt"), "not fasta").unwrap();
         let result = compute_collection_from_dir("test", dir.path());
         assert!(result.is_err());
-        assert!(result.unwrap_err().contains("no .fna.gz"));
+        assert!(
+            result.unwrap_err().to_string().contains("no .fna.gz"),
+        );
     }
 
     #[test]

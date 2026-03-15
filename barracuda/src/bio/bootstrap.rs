@@ -255,4 +255,36 @@ mod tests {
             assert_eq!(a.to_bits(), b.to_bits());
         }
     }
+
+    mod prop {
+        use proptest::prelude::*;
+
+        proptest! {
+            #![proptest_config(ProptestConfig::with_cases(32))]
+
+            #[test]
+            fn bootstrap_ci_contains_mean(
+                data in proptest::collection::vec(0.1..100.0_f64, 20..60),
+                seed in 0u64..1000,
+            ) {
+                let sample_mean: f64 = data.iter().sum::<f64>() / data.len() as f64;
+                let ci = barracuda::stats::bootstrap_ci(
+                    &data,
+                    barracuda::stats::mean,
+                    200,
+                    0.95,
+                    seed,
+                )
+                .expect("bootstrap_ci");
+                let eps = crate::tolerances::ANALYTICAL_LOOSE;
+                prop_assert!(
+                    ci.lower - eps <= sample_mean && sample_mean <= ci.upper + eps,
+                    "CI [{:.4}, {:.4}] does not contain sample mean {:.4}",
+                    ci.lower,
+                    ci.upper,
+                    sample_mean
+                );
+            }
+        }
+    }
 }

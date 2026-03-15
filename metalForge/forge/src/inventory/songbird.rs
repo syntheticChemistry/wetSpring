@@ -43,41 +43,46 @@ pub fn discover_songbird_socket() -> Option<PathBuf> {
 ///
 /// Sends `discovery.discover("compute")` and parses the response into
 /// `Substrate` entries with `SubstrateOrigin::Mesh`.
-pub fn query_songbird_substrates(socket: &Path) -> Result<Vec<Substrate>, String> {
+pub fn query_songbird_substrates(socket: &Path) -> Result<Vec<Substrate>, crate::error::SongbirdError> {
     let request = r#"{"jsonrpc":"2.0","method":"discovery.discover","params":{"capability":"compute"},"id":1}"#;
     let response = songbird_rpc(socket, request)?;
     parse_songbird_substrates(&response)
 }
 
 /// Send a JSON-RPC request to Songbird and read the response.
-fn songbird_rpc(socket: &Path, request: &str) -> Result<String, String> {
+fn songbird_rpc(socket: &Path, request: &str) -> Result<String, crate::error::SongbirdError> {
+    use crate::error::SongbirdError;
+
     let addr = std::os::unix::net::SocketAddr::from_pathname(socket)
-        .map_err(|e| format!("invalid Songbird socket: {e}"))?;
-    let stream = UnixStream::connect_addr(&addr).map_err(|e| format!("Songbird connect: {e}"))?;
+        .map_err(|e| SongbirdError::InvalidSocket(e.to_string()))?;
+    let stream =
+        UnixStream::connect_addr(&addr).map_err(|e| SongbirdError::Connect(e.to_string()))?;
     stream
         .set_read_timeout(Some(SONGBIRD_TIMEOUT))
-        .map_err(|e| format!("set timeout: {e}"))?;
+        .map_err(|e| SongbirdError::Timeout(e.to_string()))?;
     stream
         .set_write_timeout(Some(SONGBIRD_TIMEOUT))
-        .map_err(|e| format!("set timeout: {e}"))?;
+        .map_err(|e| SongbirdError::Timeout(e.to_string()))?;
 
     let mut writer = io::BufWriter::new(&stream);
     writer
         .write_all(request.as_bytes())
-        .map_err(|e| format!("write: {e}"))?;
+        .map_err(|e| SongbirdError::Write(e.to_string()))?;
     writer
         .write_all(b"\n")
-        .map_err(|e| format!("write newline: {e}"))?;
-    writer.flush().map_err(|e| format!("flush: {e}"))?;
+        .map_err(|e| SongbirdError::Write(e.to_string()))?;
+    writer
+        .flush()
+        .map_err(|e| SongbirdError::Flush(e.to_string()))?;
 
     let mut reader = BufReader::new(&stream);
     let mut line = String::new();
     reader
         .read_line(&mut line)
-        .map_err(|e| format!("read: {e}"))?;
+        .map_err(|e| SongbirdError::Read(e.to_string()))?;
 
     if line.is_empty() {
-        return Err("Songbird returned empty response".to_string());
+        return Err(SongbirdError::EmptyResponse);
     }
     Ok(line)
 }
@@ -86,11 +91,11 @@ fn songbird_rpc(socket: &Path, request: &str) -> Result<String, String> {
 ///
 /// Expected format: `{"result":[{"name":"strandgate","capabilities":["compute","gpu","f64"],...}]}`
 /// Gracefully handles missing fields and unknown capability strings.
-pub fn parse_songbird_substrates(response: &str) -> Result<Vec<Substrate>, String> {
+pub fn parse_songbird_substrates(response: &str) -> Result<Vec<Substrate>, crate::error::SongbirdError> {
     let mut substrates = Vec::new();
 
     if response.contains("\"error\"") {
-        return Err("Songbird returned error".to_string());
+        return Err(crate::error::SongbirdError::ErrorResponse);
     }
 
     let Some(result_start) = response.find("\"result\"") else {

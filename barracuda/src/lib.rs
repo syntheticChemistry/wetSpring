@@ -91,6 +91,7 @@ pub mod io;
 #[cfg(feature = "ipc")]
 pub mod ipc;
 pub mod ncbi;
+pub mod niche;
 #[cfg(feature = "npu")]
 pub mod npu;
 #[cfg(feature = "gpu")]

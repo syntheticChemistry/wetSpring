@@ -415,7 +415,7 @@ FASTQ → quality filter → adapter trim → paired-end merge
   → diversity metrics → UniFrac distance → PCoA ordination
 ```
 
-Each stage has unit tests (1,667 total, 94% barracuda line coverage), end-to-end
+Each stage has unit tests (1,687 total, 94% barracuda line coverage), end-to-end
 validation against Galaxy baselines, GPU math parity checks, and
 determinism tests ensuring identical output across runs.
 
@@ -576,7 +576,7 @@ repository (AGPL-3.0). No institutional access required.
 ```bash
 # Run all CPU validations (1,476+ checks)
 cd barracuda
-cargo test --release          # 1,667 tests (1,335 barracuda lib + 234 forge lib + 89 integration + 9 doc)
+cargo test --release          # 1,687 tests (1,353 barracuda lib + 234 forge lib + 98 integration)
 cargo run --release --bin validate_fastq
 cargo run --release --bin validate_diversity
 cargo run --release --bin validate_mzml

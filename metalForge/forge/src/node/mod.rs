@@ -42,7 +42,7 @@ pub use types::{AssemblyStats, CollectionStats, PipelineResult};
 ///
 /// Returns an error if no capable substrate is found, the dataset has no local
 /// path, or assembly file parsing fails.
-pub fn compute_assembly_stats(dataset: &str) -> Result<PipelineResult, String> {
+pub fn compute_assembly_stats(dataset: &str) -> Result<PipelineResult, crate::error::AssemblyError> {
     let resolution = data::resolve_dataset(dataset);
 
     let substrates = inventory::discover_with_tower();
@@ -53,15 +53,17 @@ pub fn compute_assembly_stats(dataset: &str) -> Result<PipelineResult, String> {
     );
 
     let decision = dispatch::route_bandwidth_aware(&workload, &substrates)
-        .ok_or_else(|| "no capable substrate for f64 assembly stats".to_string())?;
+        .ok_or_else(|| crate::error::AssemblyError::ReadDir(
+            "no capable substrate for f64 assembly stats".to_string(),
+        ))?;
 
     let stats = match &resolution.path {
         Some(dir) if dir.is_dir() => compute_collection_from_dir(dataset, dir)?,
         _ => {
-            return Err(format!(
+            return Err(crate::error::AssemblyError::ReadDir(format!(
                 "dataset {dataset} resolved as {:?} but no local path available for compute",
                 resolution.source
-            ));
+            )));
         }
     };
 
@@ -79,10 +81,12 @@ pub fn compute_assembly_stats(dataset: &str) -> Result<PipelineResult, String> {
 ///
 /// Returns an error if the directory cannot be read, contains no `.fna.gz`
 /// files, or all assemblies fail to parse.
-pub fn compute_collection_from_dir(dataset: &str, dir: &Path) -> Result<CollectionStats, String> {
+pub fn compute_collection_from_dir(dataset: &str, dir: &Path) -> Result<CollectionStats, crate::error::AssemblyError> {
     let entries = assembly::list_assembly_files(dir)?;
     if entries.is_empty() {
-        return Err(format!("no .fna.gz files in {}", dir.display()));
+        return Err(crate::error::AssemblyError::ReadDir(
+            format!("no .fna.gz files in {}", dir.display()),
+        ));
     }
 
     let mut assemblies = Vec::with_capacity(entries.len());
@@ -102,7 +106,7 @@ pub fn compute_collection_from_dir(dataset: &str, dir: &Path) -> Result<Collecti
     }
 
     if assemblies.is_empty() {
-        return Err("all assemblies failed to parse".to_string());
+        return Err(crate::error::AssemblyError::NoSequences);
     }
 
     Ok(assembly::aggregate_collection(dataset, assemblies))

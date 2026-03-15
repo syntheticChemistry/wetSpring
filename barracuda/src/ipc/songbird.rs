@@ -32,7 +32,7 @@ const RPC_TIMEOUT: Duration = Duration::from_secs(5);
 /// Returns `None` if no Songbird socket is found (standalone mode).
 #[must_use]
 pub fn discover_socket() -> Option<PathBuf> {
-    super::discover::discover_socket("SONGBIRD_SOCKET", "songbird")
+    super::discover::discover_socket("SONGBIRD_SOCKET", super::primal_names::SONGBIRD)
 }
 
 /// Register wetSpring capabilities with Songbird.

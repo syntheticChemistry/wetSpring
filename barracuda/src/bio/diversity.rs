@@ -376,18 +376,16 @@ mod tests {
         // S_obs=5, f1=3, f2=0 → Chao1 = 5 + 3*2 / (2*1) = 5 + 3 = 8
         assert!((c - 8.0).abs() < crate::tolerances::ANALYTICAL_LOOSE);
     }
-}
 
-#[cfg(test)]
-mod proptests {
-    use super::*;
-    use proptest::prelude::*;
+    mod prop {
+        use super::*;
+        use proptest::prelude::*;
 
-    fn non_negative_vec() -> impl Strategy<Value = Vec<f64>> {
-        prop::collection::vec(0.0..1000.0_f64, 1..50)
-    }
+        fn non_negative_vec() -> impl Strategy<Value = Vec<f64>> {
+            proptest::collection::vec(0.0..1000.0_f64, 1..50)
+        }
 
-    proptest! {
+        proptest! {
         #[test]
         fn shannon_is_non_negative(counts in non_negative_vec()) {
             prop_assert!(shannon(&counts) >= 0.0);
@@ -424,9 +422,9 @@ mod proptests {
 
         #[test]
         fn bray_curtis_symmetric(
-            a in prop::collection::vec(0.0..100.0_f64, 1..20),
+            a in proptest::collection::vec(0.0..100.0_f64, 1..20),
         ) {
-            let b: Vec<f64> = a.iter().map(|x| x + 1.0).collect();
+            let b: Vec<f64> = a.iter().map(|&x| x + 1.0).collect();
             let ab = bray_curtis(&a, &b);
             let ba = bray_curtis(&b, &a);
             prop_assert!((ab - ba).abs() < crate::tolerances::ANALYTICAL_F64, "BC not symmetric: {ab} != {ba}");
@@ -434,11 +432,49 @@ mod proptests {
 
         #[test]
         fn bray_curtis_bounded(
-            a in prop::collection::vec(0.0..100.0_f64, 1..20),
+            a in proptest::collection::vec(0.0..100.0_f64, 1..20),
         ) {
-            let b: Vec<f64> = a.iter().map(|x| x * 0.5 + 1.0).collect();
+            let b: Vec<f64> = a.iter().map(|&x| x * 0.5 + 1.0).collect();
             let bc = bray_curtis(&a, &b);
             prop_assert!((0.0..=1.0).contains(&bc), "BC out of [0,1]: {bc}");
         }
+
+        #[test]
+        fn prop_rarefaction_monotonic(
+            counts in proptest::collection::vec(0.5..100.0_f64, 2..25),
+        ) {
+            let total: f64 = counts.iter().sum();
+            prop_assume!(total >= 2.0);
+            let n_depths = 15.min(total as usize);
+            let mut depths: Vec<f64> = (1..=n_depths)
+                .map(|i| i as f64 * total / (n_depths as f64 + 1.0))
+                .collect();
+            depths.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+            prop_assume!(!depths.is_empty());
+            let curve = rarefaction_curve(&counts, &depths);
+            for i in 1..curve.len() {
+                prop_assert!(
+                    curve[i] >= curve[i - 1] - crate::tolerances::ANALYTICAL_LOOSE,
+                    "rarefaction not monotonic at i={i}: {} -> {}",
+                    curve[i - 1],
+                    curve[i]
+                );
+            }
+        }
+
+        #[test]
+        #[expect(clippy::cast_precision_loss)]
+        fn shannon_bounds(counts in proptest::collection::vec(0.01..1000.0_f64, 1..30)) {
+            let s = counts.iter().filter(|&&x| x > 0.0).count() as f64;
+            prop_assume!(s >= 1.0);
+            let h = shannon(&counts);
+            prop_assert!(h >= 0.0, "Shannon H={h} < 0");
+            prop_assert!(
+                h <= s.ln() + crate::tolerances::ANALYTICAL_LOOSE,
+                "Shannon H={h} > ln(S)={}",
+                s.ln()
+            );
+        }
+    }
     }
 }

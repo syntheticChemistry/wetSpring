@@ -12,10 +12,18 @@
 //! | `brain`   | `brain.observe`, `brain.attention`, `brain.urgency`   |
 //! | `science` | `science.diversity`, `science.qs_model`, Anderson, …  |
 
+mod ai;
+mod alignment;
+mod anderson;
 mod brain;
+mod drug;
 mod expanded;
+mod kinetics;
+mod phylogenetics;
 mod science;
+mod taxonomy;
 
+pub use ai::handle_ai_ecology_interpret;
 pub use brain::{handle_brain_attention, handle_brain_observe, handle_brain_urgency};
 pub use expanded::{
     handle_alignment, handle_kinetics, handle_nmf, handle_phylogenetics, handle_taxonomy,
@@ -54,6 +62,7 @@ pub const CAPABILITIES: &[&str] = &[
     "brain.attention",
     "brain.urgency",
     "metrics.snapshot",
+    "ai.ecology_interpret",
 ];
 
 #[cfg(feature = "gpu")]

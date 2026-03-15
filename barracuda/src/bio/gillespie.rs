@@ -70,6 +70,17 @@ impl Lcg64 {
 }
 
 /// Propensity function type: maps molecule state to a reaction rate.
+///
+/// Uses `Box<dyn Fn>` rather than a generic parameter because:
+/// - Reactions are stored in a heterogeneous `Vec<Reaction>`; each reaction
+///   can have a different propensity closure (e.g. birth vs death with different
+///   captured rates).
+/// - A generic `Reaction<F: Fn(&[i64]) -> f64>` would require `Vec<Reaction<???>>`
+///   with a single `F`, or type erasure anyway.
+/// - Enum dispatch would require enumerating all propensity shapes at compile time;
+///   user-defined or model-specific reactions would not fit.
+/// - The cost of dynamic dispatch is negligible vs. the SSA loop (propensity eval
+///   is O(reactions), not O(state)); the flexibility is worth it.
 pub type PropensityFn = Box<dyn Fn(&[i64]) -> f64>;
 
 /// A single reaction in the system.
@@ -402,6 +413,33 @@ mod tests {
         let traj = birth_death_ssa(10.0, 0.1, 50.0, 42);
         for w in traj.times.windows(2) {
             assert!(w[1] >= w[0], "time went backwards: {} -> {}", w[0], w[1]);
+        }
+    }
+
+    mod prop {
+        use super::*;
+        use proptest::prelude::*;
+
+        proptest! {
+            #![proptest_config(ProptestConfig::with_cases(32))]
+
+            #[test]
+            fn steady_state_converges(
+                k_dgc in 2.0..30.0_f64,
+                k_pde in 0.2..2.0_f64,
+                seed in 0u64..1000,
+            ) {
+                let analytical = k_dgc / k_pde;
+                let stats = birth_death_ensemble(k_dgc, k_pde, 40.0, 80, seed);
+                let error_pct = (stats.mean - analytical).abs() / analytical.max(0.1);
+                prop_assert!(
+                    error_pct < 0.25,
+                    "ensemble mean {:.1} too far from analytical {:.1} ({:.1}%)",
+                    stats.mean,
+                    analytical,
+                    error_pct * 100.0
+                );
+            }
         }
     }
 }

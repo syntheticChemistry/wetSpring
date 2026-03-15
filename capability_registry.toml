@@ -125,3 +125,9 @@ method = "metrics.snapshot"
 domain = "metrics"
 description = "Server metrics snapshot (calls, errors, latency)"
 gpu_accelerated = false
+
+[capabilities.ai_ecology_interpret]
+method = "ai.ecology_interpret"
+domain = "ecology.ai_assist"
+description = "Forward ecology queries to Squirrel AI with graceful degradation"
+gpu_accelerated = false

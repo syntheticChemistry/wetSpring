@@ -362,7 +362,7 @@ All experiments run on a single consumer workstation:
 | `validate_barracuda_cpu_v8` | 175 | 13 promoted GPU domains (Exp102) |
 | **Total** | **1,476** | **All pass** |
 
-Current status: **1,476/1,476 CPU pass (historical milestone).** 1,667 total tests, 376 experiments across 6 tracks.
+Current status: **1,476/1,476 CPU pass (historical milestone).** 1,687 total tests, 376 experiments across 6 tracks.
 546/546 BarraCuda CPU parity checks across 36+ domains (v1-v27).
 33.4× Rust speedup over Python.
 

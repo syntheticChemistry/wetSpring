@@ -1,0 +1,297 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//! Niche deployment self-knowledge for wetSpring.
+//!
+//! A Spring is a niche validation domain — not a primal. It proves that
+//! scientific Python baselines can be faithfully ported to sovereign
+//! Rust + GPU compute using the ecoPrimals stack. The niche deploys as
+//! a biomeOS graph (`graphs/wetspring_deploy.toml`) that composes
+//! real primals (`BearDog`, `Songbird`, `ToadStool`, etc.).
+//!
+//! This module holds the niche's self-knowledge:
+//! - Capability table (what the niche exposes via biomeOS)
+//! - Semantic mappings (capability domain → science methods)
+//! - Operation dependencies (parallelization hints for Pathway Learner)
+//! - Cost estimates (scheduling hints for biomeOS)
+//!
+//! # Evolution
+//!
+//! The transitional `wetspring_server` binary exposes these capabilities
+//! via a JSON-RPC server. The final form is graph-only deployment where
+//! biomeOS orchestrates the niche directly from deploy graphs.
+
+/// Niche identity.
+pub const NICHE_NAME: &str = "wetspring";
+
+/// Human-readable niche description for biomeOS.
+pub const NICHE_DESCRIPTION: &str =
+    "Life science and analytical chemistry validation environment";
+
+/// Niche version (tracks the spring version, not the crate version).
+pub const NICHE_VERSION: &str = "1.0.0";
+
+/// Primals this niche depends on (germination order matters).
+pub const DEPENDENCIES: &[NicheDependency] = &[
+    NicheDependency {
+        name: "beardog",
+        role: "security",
+        required: true,
+        capability: "security",
+    },
+    NicheDependency {
+        name: "songbird",
+        role: "discovery",
+        required: true,
+        capability: "discovery",
+    },
+    NicheDependency {
+        name: "rhizocrypt",
+        role: "dag",
+        required: true,
+        capability: "dag",
+    },
+    NicheDependency {
+        name: "loamspine",
+        role: "commit",
+        required: true,
+        capability: "commit",
+    },
+    NicheDependency {
+        name: "sweetgrass",
+        role: "provenance",
+        required: true,
+        capability: "provenance",
+    },
+    NicheDependency {
+        name: "nestgate",
+        role: "storage",
+        required: false,
+        capability: "storage",
+    },
+    NicheDependency {
+        name: "petaltongue",
+        role: "visualization",
+        required: false,
+        capability: "visualization",
+    },
+];
+
+/// All capabilities this niche exposes to biomeOS.
+///
+/// Derived from `ipc::capability_domains::DOMAINS` — kept as a flat list
+/// for biomeOS registration and Songbird advertisement.
+pub const CAPABILITIES: &[&str] = &[
+    // ── ecology (science) ──
+    "science.diversity",
+    "science.qs_model",
+    "science.anderson",
+    "science.kinetics",
+    "science.alignment",
+    "science.taxonomy",
+    "science.phylogenetics",
+    "science.nmf",
+    "science.timeseries",
+    "science.timeseries_diversity",
+    "science.ncbi_fetch",
+    "science.full_pipeline",
+    // ── provenance trio ──
+    "provenance.begin",
+    "provenance.record",
+    "provenance.complete",
+    // ── brain sentinel ──
+    "brain.observe",
+    "brain.attention",
+    "brain.urgency",
+    // ── metrics ──
+    "metrics.snapshot",
+    // ── AI assist (Squirrel) ──
+    "ai.ecology_interpret",
+    // ── niche infrastructure ──
+    "capability.list",
+];
+
+/// A primal dependency for this niche.
+pub struct NicheDependency {
+    /// Primal identifier (e.g. `"beardog"`).
+    pub name: &'static str,
+    /// Role in the niche (e.g. `"security"`, `"discovery"`).
+    pub role: &'static str,
+    /// Whether the niche can function without this primal.
+    pub required: bool,
+    /// Capability used to discover this primal at runtime.
+    pub capability: &'static str,
+}
+
+/// Operation dependency hints for biomeOS Pathway Learner parallelization.
+///
+/// Maps each operation to the data inputs it requires, enabling the Pathway
+/// Learner to build a DAG and parallelize independent operations.
+#[cfg(feature = "json")]
+#[must_use]
+pub fn operation_dependencies() -> serde_json::Value {
+    serde_json::json!({
+        "science.diversity": ["abundance_table"],
+        "science.qs_model": ["ode_parameters"],
+        "science.anderson": ["lattice_dimension", "disorder_strength"],
+        "science.kinetics": ["time_series", "kinetic_model"],
+        "science.alignment": ["query_sequence", "reference_sequence"],
+        "science.taxonomy": ["kmer_profiles", "reference_db"],
+        "science.phylogenetics": ["newick_trees"],
+        "science.nmf": ["expression_matrix", "rank"],
+        "science.timeseries": ["station", "date_range"],
+        "science.ncbi_fetch": ["accession", "database"],
+        "science.full_pipeline": ["fastq_paths"],
+        "provenance.begin": ["experiment_name"],
+        "provenance.record": ["session_id", "step_data"],
+        "provenance.complete": ["session_id"],
+        "brain.observe": ["observation_data"],
+        "brain.attention": ["head_group"],
+        "brain.urgency": ["domain"],
+        "metrics.snapshot": [],
+    })
+}
+
+/// Cost estimates for biomeOS scheduling (measured on Eastgate — RTX 4070 12 GB).
+///
+/// Guides the Pathway Learner on expected latency and resource usage per operation.
+#[cfg(feature = "json")]
+#[must_use]
+pub fn cost_estimates() -> serde_json::Value {
+    serde_json::json!({
+        "science.diversity":      { "latency_ms": 0.5, "cpu": "low", "memory_bytes": 4096 },
+        "science.qs_model":       { "latency_ms": 2.0, "cpu": "medium", "memory_bytes": 8192 },
+        "science.anderson":       { "latency_ms": 5.0, "cpu": "medium", "memory_bytes": 16384 },
+        "science.kinetics":       { "latency_ms": 1.0, "cpu": "low", "memory_bytes": 4096 },
+        "science.alignment":      { "latency_ms": 0.3, "cpu": "low", "memory_bytes": 2048 },
+        "science.taxonomy":       { "latency_ms": 1.5, "cpu": "medium", "memory_bytes": 32768 },
+        "science.phylogenetics":  { "latency_ms": 1.0, "cpu": "low", "memory_bytes": 4096 },
+        "science.nmf":            { "latency_ms": 50.0, "cpu": "high", "memory_bytes": 65536 },
+        "science.timeseries":     { "latency_ms": 5.0, "cpu": "low", "memory_bytes": 8192 },
+        "science.ncbi_fetch":     { "latency_ms": 500.0, "cpu": "low", "memory_bytes": 16384 },
+        "science.full_pipeline":  { "latency_ms": 200.0, "cpu": "high", "memory_bytes": 131072 },
+        "provenance.begin":       { "latency_ms": 10.0, "cpu": "low", "memory_bytes": 512 },
+        "provenance.record":      { "latency_ms": 5.0, "cpu": "low", "memory_bytes": 1024 },
+        "provenance.complete":    { "latency_ms": 50.0, "cpu": "medium", "memory_bytes": 2048 },
+        "brain.observe":          { "latency_ms": 1.0, "cpu": "low", "memory_bytes": 4096 },
+        "brain.attention":        { "latency_ms": 0.5, "cpu": "low", "memory_bytes": 2048 },
+        "brain.urgency":          { "latency_ms": 0.3, "cpu": "low", "memory_bytes": 1024 },
+        "metrics.snapshot":       { "latency_ms": 0.1, "cpu": "low", "memory_bytes": 256 },
+    })
+}
+
+/// Semantic mappings for ecology capability domain routing.
+///
+/// Maps short operation names to fully-qualified IPC method names,
+/// enabling biomeOS Neural API to route natural-language requests.
+#[cfg(feature = "json")]
+#[must_use]
+pub fn ecology_semantic_mappings() -> serde_json::Value {
+    serde_json::json!({
+        "diversity":       "science.diversity",
+        "qs_model":        "science.qs_model",
+        "anderson":        "science.anderson",
+        "kinetics":        "science.kinetics",
+        "alignment":       "science.alignment",
+        "taxonomy":        "science.taxonomy",
+        "phylogenetics":   "science.phylogenetics",
+        "nmf":             "science.nmf",
+        "timeseries":             "science.timeseries",
+        "timeseries_diversity":   "science.timeseries_diversity",
+        "ncbi_fetch":             "science.ncbi_fetch",
+        "full_pipeline":   "science.full_pipeline",
+    })
+}
+
+/// Returns the deploy graph path for this niche.
+#[must_use]
+pub fn deploy_graph_path() -> &'static str {
+    "graphs/wetspring_deploy.toml"
+}
+
+/// Returns the number of required dependencies.
+#[must_use]
+pub fn required_dependency_count() -> usize {
+    DEPENDENCIES.iter().filter(|d| d.required).count()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn capabilities_are_not_empty() {
+        assert!(!CAPABILITIES.is_empty());
+    }
+
+    #[test]
+    fn capabilities_follow_semantic_naming() {
+        for cap in CAPABILITIES {
+            assert!(
+                cap.contains('.'),
+                "capability '{cap}' should follow domain.operation format"
+            );
+        }
+    }
+
+    #[test]
+    fn capabilities_count_matches_domains() {
+        assert_eq!(
+            CAPABILITIES.len(),
+            21,
+            "20 science/provenance/brain/metrics/ai + capability.list"
+        );
+    }
+
+    #[test]
+    fn dependencies_include_security_and_discovery() {
+        assert!(DEPENDENCIES.iter().any(|d| d.role == "security"));
+        assert!(DEPENDENCIES.iter().any(|d| d.role == "discovery"));
+    }
+
+    #[test]
+    fn required_dependencies_are_five() {
+        assert_eq!(required_dependency_count(), 5);
+    }
+
+    #[test]
+    fn niche_name_matches_convention() {
+        assert_eq!(NICHE_NAME, "wetspring");
+        assert!(NICHE_NAME.chars().all(|c| c.is_ascii_lowercase()));
+    }
+
+    #[test]
+    fn deploy_graph_path_is_toml() {
+        assert!(deploy_graph_path().ends_with(".toml"));
+    }
+
+    #[cfg(feature = "json")]
+    #[test]
+    fn operation_dependencies_is_object() {
+        let deps = operation_dependencies();
+        assert!(deps.is_object());
+    }
+
+    #[cfg(feature = "json")]
+    #[test]
+    fn cost_estimates_is_object() {
+        let costs = cost_estimates();
+        assert!(costs.is_object());
+    }
+
+    #[cfg(feature = "json")]
+    #[test]
+    fn ecology_mappings_cover_science_capabilities() {
+        let mappings = ecology_semantic_mappings();
+        let map = mappings.as_object().expect("mappings should be an object");
+        let science_caps: Vec<&&str> = CAPABILITIES
+            .iter()
+            .filter(|c| c.starts_with("science."))
+            .collect();
+        for cap in &science_caps {
+            assert!(
+                map.values()
+                    .any(|v| v.as_str() == Some(cap)),
+                "science capability '{cap}' should appear in ecology mappings"
+            );
+        }
+    }
+}

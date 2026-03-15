@@ -82,6 +82,7 @@
 pub mod bridge;
 pub mod data;
 pub mod dispatch;
+pub mod error;
 pub mod inventory;
 pub mod ncbi;
 pub mod nest;

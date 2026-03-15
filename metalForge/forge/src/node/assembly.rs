@@ -16,11 +16,11 @@ use super::types::{AssemblyStats, CollectionStats};
 pub fn compute_assembly_stats_from_file(
     accession: &str,
     path: &Path,
-) -> Result<AssemblyStats, String> {
+) -> Result<AssemblyStats, crate::error::AssemblyError> {
     let sequences = read_fasta_gz(path)?;
 
     if sequences.is_empty() {
-        return Err("no sequences in FASTA".to_string());
+        return Err(crate::error::AssemblyError::NoSequences);
     }
 
     let mut contig_lengths: Vec<u64> = sequences.iter().map(|s| s.len() as u64).collect();
@@ -77,30 +77,30 @@ pub fn aggregate_collection(dataset: &str, assemblies: Vec<AssemblyStats>) -> Co
 
 // ── FASTA gz reader ─────────────────────────────────────────────────
 
-pub fn read_fasta_gz(path: &Path) -> Result<Vec<Vec<u8>>, String> {
+pub fn read_fasta_gz(path: &Path) -> Result<Vec<Vec<u8>>, crate::error::AssemblyError> {
     let output = std::process::Command::new("gzip")
         .args(["-dc", &path.display().to_string()])
         .output()
-        .map_err(|e| format!("gzip: {e}"))?;
+        .map_err(|e| crate::error::AssemblyError::ToolFailed(format!("gzip: {e}")))?;
 
     if !output.status.success() {
-        return Err(format!(
+        return Err(crate::error::AssemblyError::ToolFailed(format!(
             "gzip -dc failed ({})",
             output.status.code().unwrap_or(-1)
-        ));
+        )));
     }
 
     let reader = BufReader::new(&output.stdout[..]);
     parse_fasta_sequences(reader)
 }
 
-pub fn parse_fasta_sequences<R: BufRead>(reader: R) -> Result<Vec<Vec<u8>>, String> {
+pub fn parse_fasta_sequences<R: BufRead>(reader: R) -> Result<Vec<Vec<u8>>, crate::error::AssemblyError> {
     let mut sequences = Vec::new();
     let mut current = Vec::new();
     let mut in_seq = false;
 
     for line in reader.lines() {
-        let line = line.map_err(|e| format!("read line: {e}"))?;
+        let line = line.map_err(|e| crate::error::AssemblyError::ReadLine(e.to_string()))?;
         if line.starts_with('>') {
             if in_seq && !current.is_empty() {
                 sequences.push(std::mem::take(&mut current));
@@ -207,8 +207,9 @@ pub fn shannon_entropy_binned(values: &[f64], n_bins: usize) -> f64 {
 /// # Errors
 ///
 /// Returns an error if the directory cannot be read.
-pub fn list_assembly_files(dir: &Path) -> Result<Vec<PathBuf>, String> {
-    let entries = std::fs::read_dir(dir).map_err(|e| format!("read dir {}: {e}", dir.display()))?;
+pub fn list_assembly_files(dir: &Path) -> Result<Vec<PathBuf>, crate::error::AssemblyError> {
+    let entries = std::fs::read_dir(dir)
+        .map_err(|e| crate::error::AssemblyError::ReadDir(format!("read dir {}: {e}", dir.display())))?;
 
     let mut paths: Vec<PathBuf> = entries
         .filter_map(Result::ok)

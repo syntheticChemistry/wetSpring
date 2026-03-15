@@ -135,7 +135,7 @@ impl Metrics {
             });
 
         serde_json::json!({
-            "primal": crate::PRIMAL_NAME,
+            "primal": crate::ipc::primal_names::SELF,
             "total_calls": self.total_calls.load(Ordering::Relaxed),
             "success_count": self.success_count.load(Ordering::Relaxed),
             "error_count": self.error_count.load(Ordering::Relaxed),
@@ -195,7 +195,7 @@ mod tests {
     fn snapshot_structure() {
         let m = Metrics::new();
         let snap = m.snapshot();
-        assert_eq!(snap["primal"], "wetspring");
+        assert_eq!(snap["primal"], super::super::primal_names::SELF);
         assert_eq!(snap["total_calls"], 0);
         assert!(snap["methods"].is_object());
     }

@@ -9,8 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V116** | `handoffs/WETSPRING_V116_CAPABILITY_DISCOVERY_TOLERANCE_CENTRALIZATION_HANDOFF_MAR15_2026.md` | Mar 15 | **Capability discovery + tolerance centralization** — `capability.list` handler, 14 domains / 19 methods, inline tolerance centralization (15 binaries), capability-based primal discovery (3 binaries), forge lint parity. 8 GPU primitive opportunities carried forward. |
-| | *V113–V115 → `handoffs/archive/`* | | V113–V115 handoffs archived. |
+| **V119** | `handoffs/WETSPRING_V119_DEEP_DEBT_EVOLUTION_HANDOFF_MAR15_2026.md` | Mar 15 | **Deep Debt Evolution Sprint** — niche self-knowledge (`niche.rs` + BYOB), typed errors (`VaultError`/`NestError`/`SongbirdError`/`AssemblyError`), 7 large files → domain submodules (net −3,496 lines), `primal_names.rs` hardcoding elimination, Squirrel AI (`ai.ecology_interpret`, 15 domains / 20 methods), `proptest` adopted, clone reduction. |
+| | *V113–V118 → `handoffs/archive/`* | | V113–V118 handoffs archived. |
 | | *V112 and earlier → `handoffs/archive/`* | | Fossil record: V7–V112 (95+ archived handoffs) |
 
 ## Cross-Spring Documents
@@ -22,7 +22,7 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` — V7–V115 (123+ files).
+Superseded handoffs in `handoffs/archive/` — V7–V118 (126+ files).
 Preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda.
 
 ## Convention

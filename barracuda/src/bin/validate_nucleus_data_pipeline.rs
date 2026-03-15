@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
+#![expect(clippy::expect_used, reason = "validation binary: expect() for pass/fail assertions")]
+#![expect(clippy::unwrap_used, reason = "validation binary: unwrap() for pass/fail assertions")]
+#![expect(clippy::print_stdout, reason = "validation binary: stdout is the output medium")]
 #![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::print_stdout,
     clippy::too_many_lines,
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
@@ -51,6 +51,7 @@ use std::path::PathBuf;
 use std::time::{Duration, Instant};
 
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::ipc::discover;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
@@ -62,10 +63,10 @@ fn main() {
 
     v.section("Phase 1: Ecosystem Probe — Socket Discovery");
 
-    let biomeos_socket = discover_socket("biomeos");
-    let songbird_socket = discover_socket("songbird");
-    let nestgate_socket = discover_socket("nestgate");
-    let wetspring_socket = discover_socket("wetspring");
+    let biomeos_socket = discover::discover_socket("BIOMEOS_SOCKET", "biomeos");
+    let songbird_socket = discover::discover_socket("SONGBIRD_SOCKET", "songbird");
+    let nestgate_socket = discover::discover_socket("NESTGATE_SOCKET", "nestgate");
+    let wetspring_socket = discover::discover_socket("WETSPRING_SOCKET", "wetspring");
 
     println!("  Socket scan results:");
     println!("  ─────────────────────────────────────────");
@@ -370,30 +371,6 @@ fn main() {
     println!("  4. Wire EMP OTU table download via NestGate HTTP fetch");
 
     v.finish();
-}
-
-fn discover_socket(primal: &str) -> Option<PathBuf> {
-    let env_key = format!("{}_SOCKET", primal.to_uppercase());
-    if let Ok(path) = std::env::var(&env_key) {
-        let p = PathBuf::from(&path);
-        if p.exists() {
-            return Some(p);
-        }
-    }
-
-    if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
-        let p = PathBuf::from(&xdg).join(format!("biomeos/{primal}-default.sock"));
-        if p.exists() {
-            return Some(p);
-        }
-    }
-
-    let fallback = std::env::temp_dir().join(format!("{primal}-default.sock"));
-    if fallback.exists() {
-        return Some(fallback);
-    }
-
-    None
 }
 
 fn report_socket(label: &str, path: Option<&PathBuf>) {

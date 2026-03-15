@@ -3,6 +3,68 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V119] — 2026-03-15
+
+### Deep Debt Evolution Sprint — Niche Architecture + Typed Errors + Domain Refactoring
+
+Systematic codebase evolution: niche self-knowledge, typed error enums, domain-organized
+module refactoring, modern lint attributes, capability-based discovery, property-based
+testing, Squirrel AI integration, and clone reduction.
+
+#### Niche Architecture (BYOB + Self-Knowledge)
+- `barracuda/src/niche.rs`: self-knowledge module — `NICHE_NAME`, `CAPABILITIES` (20 methods), `DEPENDENCIES` (7 primals), `NicheDependency` struct, `#[cfg(feature = "json")]` cost estimates + ecology semantic mappings
+- `niches/wetspring-ecology.yaml`: BYOB manifest following groundSpring template — organisms, interactions, deploy graph, resource requirements
+- 10 niche module tests: capabilities match `capability_domains.rs`, dependencies list, mappings cover all science capabilities
+
+#### Typed Error Evolution (Result<_, String> → Typed Enums)
+- `barracuda/src/vault/error.rs`: `VaultError` enum (7 variants — ConsentOwnerMismatch, BlobNotFound, DecryptionFailed, etc.)
+- `metalForge/forge/src/error.rs`: `NestError` (6 variants), `SongbirdError` (4 variants), `AssemblyError` (4 variants)
+- `ipc/provenance.rs`: `Result<Value, String>` → `Result<Value, crate::error::Error>`
+- `bio/ode.rs`: `Result<OdeResult, String>` → `crate::error::Result<OdeResult>`
+- Remaining `Result<_, String>`: 8 (down from ~25 — intentional in niche places)
+
+#### Large File Refactoring (7 files → 26 submodules, net −3,496 lines)
+- `bio/streaming_gpu.rs` (670 LOC) → `streaming_gpu/mod.rs` + `stages.rs` + `analytics.rs`
+- `bio/chimera.rs` (531 LOC) → `chimera/mod.rs` + `detection.rs` + `kmer_sketch.rs`
+- `bio/signal.rs` (532 LOC) → `signal/mod.rs` + `peak_detect.rs` + `prominence.rs` + `smoothing.rs`
+- `bio/msa.rs` (565 LOC) → `msa/mod.rs` + `alignment.rs` + `scoring.rs`
+- `io/mzxml/mod.rs` (583 LOC) → `mzxml/mod.rs` + `parser.rs` + `types.rs`
+- `io/mzml/decode.rs` (580 LOC) → `decode/mod.rs` + `base64.rs` + `compression.rs`
+- `ipc/handlers/expanded.rs` (485 LOC) → `expanded.rs` (re-export) + `kinetics.rs` + `drug.rs` + `alignment.rs` + `taxonomy.rs` + `phylogenetics.rs` + `anderson.rs`
+- All public APIs preserved; `pub(super)` for internal fields
+
+#### #[allow()] → #[expect(reason)] Migration (10 binaries)
+- `validate_nucleus_data_pipeline`, `validate_gpu_extended`, `validate_barracuda_cpu_v23`, `validate_vibrio_qs_landscape`, `validate_df64_anderson`, `validate_heterogeneity_sweep_s79`, `validate_vent_chimney_qs`, `validate_gonzales_ic50_s79`, `validate_gonzales_pk_s79`, `validate_paper_math_control_v4`
+- All `#[allow(clippy::expect_used, unwrap_used, print_stdout)]` → `#[expect(clippy::*, reason = "validation binary: ...")]`
+- Crate-level `#[allow()]` in `lib.rs` retained (no `reason` support at crate level without triggering unfulfilled lint warnings)
+
+#### Hardcoding Elimination
+- `ipc/primal_names.rs`: constants for `SELF`, `BIOMEOS`, `SONGBIRD`, `SQUIRREL`, `NESTGATE`, `PETALTONGUE`, `RHIZOCRYPT`
+- 8 IPC modules updated: `server.rs`, `songbird.rs`, `provenance.rs`, `discover.rs`, `dispatch.rs`, `metrics.rs`, `handlers/science.rs`
+- 4 binaries (`validate_nucleus_data_pipeline`, `validate_workload_routing_v1`, `validate_primal_pipeline_v1`, `validate_petaltongue_live_v1`) evolved from local `discover_socket()` to library `ipc::discover`
+
+#### proptest Adoption (4 stochastic property tests)
+- `bio/gillespie.rs`: Gillespie steady-state convergence for any 2-reaction system
+- `bio/bootstrap.rs`: bootstrap 95% CI contains true mean
+- `bio/diversity.rs`: rarefaction monotonicity + Shannon entropy bounds (0 ≤ H ≤ ln(S))
+- `bio/cooperation.rs`: cooperation ODE total population bounded
+
+#### Squirrel AI Integration
+- `ipc/capability_domains.rs`: `ecology.ai_assist` domain with `ai.ecology_interpret` method (15 domains, 20 methods)
+- `ipc/discover.rs`: `discover_squirrel()` using generic `discover_socket` pattern
+- `ipc/handlers/ai.rs`: graceful degradation handler — forwards to Squirrel JSON-RPC, returns Ok with status on failure
+- `ipc/dispatch.rs`: routes `ai.ecology_interpret` to handler
+
+#### Clone Reduction + Box<dyn Fn> Evaluation
+- `bio/unifrac/flat_tree.rs`: `PhyloTree::into_flat_tree(self)` consuming method for zero-copy leaf label transfer
+- `bio/gillespie.rs`: `PropensityFn = Box<dyn Fn>` retained — documented rationale (heterogeneous reactions, dynamic dispatch from JSON configs)
+
+#### Quality Gates
+- `cargo check --workspace` — clean
+- `cargo test --workspace` — 1,687 passed, 0 failed, 2 ignored
+- Zero TODO/FIXME in library code
+- 48 files changed, 463 insertions, 3,959 deletions (net −3,496)
+
 ## [V117] — 2026-03-15
 
 ### Deep Tolerance Centralization + Code Quality Hardening

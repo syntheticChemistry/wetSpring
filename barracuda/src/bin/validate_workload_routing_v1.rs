@@ -35,24 +35,8 @@
 
 use std::path::PathBuf;
 use std::time::Instant;
+use wetspring_barracuda::ipc::discover;
 use wetspring_barracuda::validation::Validator;
-
-/// Resolve primal socket path via capability-based discovery cascade.
-/// Order: env var → XDG_RUNTIME_DIR/biomeos/{primal}-default.sock →
-/// BIOMEOS_SOCKET_DIR/{primal}-default.sock → temp_dir.
-#[must_use]
-fn discover_socket(env_var: &str, primal: &str) -> PathBuf {
-    if let Ok(path) = std::env::var(env_var) {
-        return PathBuf::from(path);
-    }
-    if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
-        return PathBuf::from(xdg).join(format!("biomeos/{primal}-default.sock"));
-    }
-    if let Ok(dir) = std::env::var("BIOMEOS_SOCKET_DIR") {
-        return PathBuf::from(dir).join(format!("{primal}-default.sock"));
-    }
-    std::env::temp_dir().join(format!("{primal}-default.sock"))
-}
 
 /// Discover primal sockets via env-based discovery. Returns capability names
 /// for primals whose sockets exist.
@@ -68,14 +52,13 @@ fn discover_primal_sockets() -> Vec<&'static str> {
     ];
     configs
         .iter()
-        .filter(|(env, primal, _)| discover_socket(env, primal).exists())
+        .filter(|(env, primal, _)| discover::discover_socket(env, primal).is_some())
         .map(|(_, _, cap)| *cap)
         .collect()
 }
 
 fn discover_biomeos() -> Option<PathBuf> {
-    let p = discover_socket("BIOMEOS_SOCKET", "biomeos");
-    if p.exists() { Some(p) } else { None }
+    discover::discover_socket("BIOMEOS_SOCKET", "biomeos")
 }
 
 fn main() {

@@ -1383,6 +1383,7 @@ required-features = ["ipc"]
 [[bin]]
 name = "validate_nucleus_data_pipeline"
 path = "src/bin/validate_nucleus_data_pipeline.rs"
+required-features = ["ipc"]
 
 # ── Exp258: NUCLEUS Tower-Node Deployment — Live Primal Orchestration ──
 [[bin]]
@@ -1788,6 +1789,7 @@ required-features = ["ipc"]
 [[bin]]
 name = "validate_petaltongue_live_v1"
 path = "src/bin/validate_petaltongue_live_v1.rs"
+required-features = ["ipc"]
 
 [[bin]]
 name = "validate_petaltongue_anderson_v1"
@@ -1829,7 +1831,7 @@ required-features = ["gpu", "ipc"]
 [[bin]]
 name = "validate_workload_routing_v1"
 path = "src/bin/validate_workload_routing_v1.rs"
-required-features = ["gpu"]
+required-features = ["gpu", "ipc"]
 
 [[bin]]
 name = "validate_adaptive_dispatch_v1"

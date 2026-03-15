@@ -28,9 +28,11 @@
 //! validate the vault protocol so specific primals can absorb.
 
 pub mod consent;
+pub mod error;
 pub mod provenance;
 pub mod storage;
 
 pub use consent::{ConsentScope, ConsentTicket};
+pub use error::VaultError;
 pub use provenance::{ProvenanceChain, ProvenanceEntry};
 pub use storage::{VaultBlob, VaultStore};

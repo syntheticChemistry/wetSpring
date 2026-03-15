@@ -35,6 +35,9 @@ pub struct FlatTree {
 impl PhyloTree {
     /// Convert to a GPU-compatible flat tree (CSR layout).
     ///
+    /// Clones leaf labels from the tree. Use [`into_flat_tree`](Self::into_flat_tree) when
+    /// the tree is no longer needed to avoid those clones.
+    ///
     /// Tree node counts fit in u32 for any realistic phylogeny.
     #[must_use]
     #[expect(clippy::cast_possible_truncation)] // Truncation: node counts and indices fit u32
@@ -62,6 +65,54 @@ impl PhyloTree {
             if node.children.is_empty() && !node.label.is_empty() {
                 leaf_indices.push(idx as u32);
                 leaf_labels.push(node.label.clone());
+            }
+        }
+
+        FlatTree {
+            parent,
+            branch_length,
+            n_children,
+            children_offset,
+            children_flat,
+            n_nodes: n as u32,
+            root: self.root as u32,
+            leaf_indices,
+            leaf_labels,
+        }
+    }
+
+    /// Convert to a GPU-compatible flat tree (CSR layout), consuming `self`.
+    ///
+    /// Avoids cloning leaf labels by moving them from the tree. Use this when
+    /// the tree is no longer needed after conversion.
+    ///
+    /// Tree node counts fit in u32 for any realistic phylogeny.
+    #[must_use]
+    #[expect(clippy::cast_possible_truncation)] // Truncation: node counts and indices fit u32
+    pub fn into_flat_tree(self) -> FlatTree {
+        let n = self.nodes.len();
+        let mut parent = Vec::with_capacity(n);
+        let mut branch_length = Vec::with_capacity(n);
+        let mut n_children = Vec::with_capacity(n);
+        let mut children_offset = Vec::with_capacity(n);
+        let mut children_flat = Vec::new();
+
+        for node in &self.nodes {
+            parent.push(node.parent as u32);
+            branch_length.push(node.branch_length);
+            n_children.push(node.children.len() as u32);
+            children_offset.push(children_flat.len() as u32);
+            for &c in &node.children {
+                children_flat.push(c as u32);
+            }
+        }
+
+        let mut leaf_indices = Vec::new();
+        let mut leaf_labels = Vec::new();
+        for (idx, node) in self.nodes.into_iter().enumerate() {
+            if node.children.is_empty() && !node.label.is_empty() {
+                leaf_indices.push(idx as u32);
+                leaf_labels.push(node.label);
             }
         }
 

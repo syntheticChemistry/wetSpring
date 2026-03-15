@@ -329,4 +329,38 @@ mod tests {
             );
         }
     }
+
+    mod prop {
+        use super::*;
+        use proptest::prelude::*;
+
+        proptest! {
+            #![proptest_config(ProptestConfig::with_cases(24))]
+
+            #[test]
+            fn population_stays_bounded(
+                nc0 in 0.001..0.1_f64,
+                nd0 in 0.001..0.1_f64,
+                k_cap in 0.5..2.0_f64,
+                death_rate in 0.01..0.1_f64,
+            ) {
+                let params = CooperationParams {
+                    k_cap,
+                    death_rate,
+                    ..CooperationParams::default()
+                };
+                let y0 = [nc0, nd0, 0.0, 0.0];
+                let result = run_cooperation(&y0, 24.0, 0.05, &params);
+                let max_total: f64 = result
+                    .states()
+                    .map(|row| row[0].max(0.0) + row[1].max(0.0))
+                    .fold(0.0_f64, f64::max);
+                let bound = k_cap * 3.0;
+                prop_assert!(
+                    max_total <= bound,
+                    "total population {max_total} exceeded bound {bound}"
+                );
+            }
+        }
+    }
 }

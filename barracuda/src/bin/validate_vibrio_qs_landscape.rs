@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::print_stdout,
-    clippy::field_reassign_with_default
-)]
+#![expect(clippy::expect_used, reason = "validation binary: expect() for pass/fail assertions")]
+#![expect(clippy::unwrap_used, reason = "validation binary: unwrap() for pass/fail assertions")]
+#![expect(clippy::print_stdout, reason = "validation binary: stdout is the output medium")]
+#![allow(clippy::field_reassign_with_default)]
 //! # Exp108: Vibrio QS Parameter Landscape via GPU ODE Sweep
 //!
 //! Sweeps 1024 QS parameter combinations through `OdeSweepGpu`, mapping the

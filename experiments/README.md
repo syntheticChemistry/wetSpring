@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-15 (V117: 376 experiments, 354 binaries, 5,707+ checks, 1,667 tests. V117 — deep tolerance centralization + code quality: 39 fmt fixes, 12 unfulfilled expects removed, 4 production panics eliminated, 5 ESN thresholds centralized, 13 new tolerance constants (200+ total), 30+ inline literals replaced in 17 binaries. Zero clippy warnings, zero fmt violations, zero unsafe, zero production panics.)
+**Updated**: 2026-03-15 (V119: 376 experiments, 354 binaries, 5,707+ checks, 1,687 tests. V119 Deep Debt Evolution Sprint: niche self-knowledge (`niche.rs` + BYOB), typed errors (`VaultError`/`NestError`/`SongbirdError`/`AssemblyError`), 7 large files refactored into domain submodules (net −3,496 lines), `#[expect(reason)]` in 10 binaries, hardcoded primal names → `primal_names.rs` constants + library discovery, `proptest` adopted (4 stochastic property tests), Squirrel AI integration (`ai.ecology_interpret`, 15 domains / 20 methods), clone reduction. Zero clippy warnings, zero fmt violations, zero unsafe.)
 
 ---
 
@@ -410,7 +410,7 @@ thresholds from `src/tolerances.rs`.
 | `validate_r_industry_parity` | 335 | 53 | `cargo run --release --bin validate_r_industry_parity` |
 
 **Total validation checks**: 5,707+
-**Rust tests**: 1,667 total (1,335 barracuda lib + 234 forge + 89 integration + 9 doc)
+**Rust tests**: 1,687 total (1,353 barracuda lib + 234 forge + 98 integration)
 **Binaries**: 354 total (332 barracuda + 22 forge)
 **barraCuda primitives**: 150+ consumed (standalone v0.3.5, wgpu 28, Fp64Strategy, fused ops)
 **Papers**: 63 (reproduced across 6 tracks)

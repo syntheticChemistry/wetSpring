@@ -276,7 +276,7 @@ fn validate_unifrac_sample_matrix(v: &mut Validator) {
 
     let newick = "((A:0.1,B:0.2):0.3,(C:0.4,D:0.5):0.6);";
     let tree = unifrac::PhyloTree::from_newick(newick);
-    let flat = tree.to_flat_tree();
+    let flat = tree.into_flat_tree();
 
     let mut samples = unifrac::AbundanceTable::new();
     samples.insert(

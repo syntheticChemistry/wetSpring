@@ -103,6 +103,12 @@ pub const DOMAINS: &[CapabilityDomain] = &[
         description: "Server metrics snapshot (calls, errors, latency)",
         methods: &["metrics.snapshot"],
     },
+    // ── AI assist (Squirrel) ────────────────────────────────────────
+    CapabilityDomain {
+        name: "ecology.ai_assist",
+        description: "AI-assisted diversity interpretation and parameter exploration",
+        methods: &["ai.ecology_interpret"],
+    },
 ];
 
 /// A capability domain grouping related IPC methods.
@@ -176,20 +182,21 @@ mod tests {
     fn total_capability_count_matches_registry() {
         assert_eq!(
             DOMAINS.len(),
-            14,
-            "14 domains (11 ecology + provenance + brain + metrics)"
+            15,
+            "15 domains (11 ecology + provenance + brain + metrics + ai_assist)"
         );
         let total_methods: usize = DOMAINS.iter().map(|d| d.methods.len()).sum();
-        assert_eq!(total_methods, 19, "19 total capability methods");
+        assert_eq!(total_methods, 20, "20 total capability methods");
     }
 
     #[test]
     fn all_methods_returns_flat_list() {
         let methods = all_methods();
-        assert_eq!(methods.len(), 19);
+        assert_eq!(methods.len(), 20);
         assert!(methods.contains(&"science.diversity"));
         assert!(methods.contains(&"provenance.begin"));
         assert!(methods.contains(&"brain.observe"));
         assert!(methods.contains(&"metrics.snapshot"));
+        assert!(methods.contains(&"ai.ecology_interpret"));
     }
 }

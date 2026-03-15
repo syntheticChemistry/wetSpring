@@ -1,0 +1,239 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# wetSpring Ecology Validation Niche
+#
+# BYOB niche definition for biomeOS deployment.
+# Deploy: biomeos niche deploy wetspring-ecology
+# Graph:  graphs/wetspring_deploy.toml
+
+niche:
+  id: "wetspring-ecology"
+  name: "Ecology & Analytical Chemistry Validation"
+  version: "1.0.0"
+  description: |
+    Life science and PFAS analytical chemistry validation environment.
+    Proves that scientific Python baselines (16S amplicon, PFAS screening,
+    biodiversity, spectral analysis, ODE kinetics, drug repurposing) can be
+    faithfully ported to sovereign Rust + GPU compute. GPU-accelerated via
+    ToadStool, live data from NCBI/EPA/SRA via NestGate, provenance
+    tracking via the Trio.
+  category: "science"
+  difficulty: "advanced"
+  author: "ecoPrimals / wetSpring Team"
+  deploy_graph: "graphs/wetspring_deploy.toml"
+
+  features:
+    - "16S amplicon diversity pipeline (Shannon, Simpson, Chao1, Bray-Curtis)"
+    - "PFAS suspect screening (ppm tolerance, Kendrick mass defect)"
+    - "Quorum-sensing biofilm ODE models (Waters 2008, Fernandez 2020)"
+    - "Anderson spectral disorder analysis (2D/3D lattice)"
+    - "Biogas kinetics curve fitting (Gompertz, Monod, Haldane)"
+    - "Smith-Waterman local sequence alignment"
+    - "Naive Bayes k-mer taxonomy classification"
+    - "Robinson-Foulds phylogenetic tree comparison"
+    - "Non-negative Matrix Factorization for drug repurposing"
+    - "Cross-spring time series diversity tracking"
+    - "GPU-accelerated compute via ToadStool (diversity, PCoA, spectral match)"
+    - "NCBI SRA/EPA data retrieval via NestGate"
+    - "Provenance Trio lineage tracking"
+    - "Neural sentinel (brain observe/attention/urgency)"
+
+organisms:
+
+  primals:
+    wetspring:
+      type: "wetspring"
+      required: true
+      role: "science"
+      capabilities:
+        - "science.diversity"
+        - "science.qs_model"
+        - "science.anderson"
+        - "science.kinetics"
+        - "science.alignment"
+        - "science.taxonomy"
+        - "science.phylogenetics"
+        - "science.nmf"
+        - "science.timeseries"
+        - "science.timeseries_diversity"
+        - "science.ncbi_fetch"
+        - "science.full_pipeline"
+        - "provenance.begin"
+        - "provenance.record"
+        - "provenance.complete"
+        - "brain.observe"
+        - "brain.attention"
+        - "brain.urgency"
+        - "metrics.snapshot"
+      config:
+        mode: "server"
+
+    beardog:
+      type: "beardog"
+      required: true
+      role: "security"
+      capabilities:
+        - "crypto.encrypt"
+        - "crypto.sign"
+        - "identity.verify"
+
+    songbird:
+      type: "songbird"
+      required: true
+      role: "discovery"
+      capabilities:
+        - "discovery.query"
+        - "mesh.join"
+
+    rhizocrypt:
+      type: "rhizocrypt"
+      required: true
+      role: "dag"
+      capabilities:
+        - "dag.append"
+        - "dag.verify"
+
+    loamspine:
+      type: "loamspine"
+      required: true
+      role: "commit"
+      capabilities:
+        - "commit.record"
+        - "commit.query"
+
+    sweetgrass:
+      type: "sweetgrass"
+      required: true
+      role: "provenance"
+      capabilities:
+        - "provenance.track"
+        - "provenance.lineage"
+
+    toadstool:
+      type: "toadstool"
+      required: false
+      role: "compute"
+      capabilities:
+        - "compute.execute"
+        - "compute.submit"
+      config:
+        features: ["gpu", "f64"]
+        precision_strategy: "f64_capable_with_fallback"
+
+    nestgate:
+      type: "nestgate"
+      required: false
+      role: "data"
+      capabilities:
+        - "storage.put"
+        - "storage.get"
+        - "data.ncbi_search"
+        - "data.sra_fetch"
+        - "data.epa_pfas"
+      config:
+        providers: ["ncbi", "sra", "epa"]
+        storage_backend: "local_fs"
+
+    petaltongue:
+      type: "petaltongue"
+      required: false
+      role: "visualization"
+      capabilities:
+        - "viz.scenario"
+        - "viz.stream"
+      config:
+        mode: "push"
+
+  chimeras: {}
+
+interactions:
+  - from: "wetspring"
+    to: "songbird"
+    type: "capability_call"
+    config:
+      capabilities: ["discovery.query"]
+
+  - from: "wetspring"
+    to: "toadstool"
+    type: "capability_call"
+    config:
+      capabilities: ["compute.execute", "compute.submit"]
+
+  - from: "wetspring"
+    to: "nestgate"
+    type: "capability_call"
+    config:
+      capabilities: ["storage.put", "storage.get", "data.ncbi_search", "data.sra_fetch", "data.epa_pfas"]
+
+  - from: "wetspring"
+    to: "petaltongue"
+    type: "capability_call"
+    config:
+      capabilities: ["viz.scenario", "viz.stream"]
+
+  - from: "wetspring"
+    to: "rhizocrypt"
+    type: "capability_call"
+    config:
+      capabilities: ["dag.append", "dag.verify"]
+
+  - from: "wetspring"
+    to: "loamspine"
+    type: "capability_call"
+    config:
+      capabilities: ["commit.record", "commit.query"]
+
+  - from: "wetspring"
+    to: "sweetgrass"
+    type: "capability_call"
+    config:
+      capabilities: ["provenance.track", "provenance.lineage"]
+
+customization:
+
+  - id: "gpu_enabled"
+    name: "GPU Compute"
+    description: "Enable ToadStool GPU acceleration for diversity, PCoA, spectral matching"
+    type: "boolean"
+    default: true
+
+  - id: "tracks"
+    name: "Science Tracks"
+    description: "Which science tracks to enable"
+    type: "multi_select"
+    options: ["life_science", "pfas_chemistry", "field_genomics", "drug_repurposing"]
+    default: ["life_science", "pfas_chemistry"]
+
+  - id: "data_providers"
+    name: "Data Providers"
+    description: "Which NestGate data providers to enable"
+    type: "multi_select"
+    options: ["ncbi", "sra", "epa"]
+    default: ["ncbi", "sra"]
+
+  - id: "provenance_trio"
+    name: "Provenance Tracking"
+    description: "Enable Provenance Trio (rhizoCrypt + loamSpine + sweetGrass) for lineage"
+    type: "boolean"
+    default: true
+
+  - id: "visualization"
+    name: "Live Visualization"
+    description: "Enable petalTongue scenario push for live experiment visualization"
+    type: "boolean"
+    default: false
+
+  - id: "storage_backend"
+    name: "Storage Backend"
+    description: "NestGate storage backend"
+    type: "select"
+    options: ["local_fs", "sqlite"]
+    default: "local_fs"
+
+resources:
+  base:
+    cpu_cores: 4
+    memory_gb: 8
+    storage_gb: 20
+  gpu:
+    required: false
+    recommended_vram_gb: 8

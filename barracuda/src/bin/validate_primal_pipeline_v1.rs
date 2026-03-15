@@ -47,24 +47,8 @@
 
 use std::path::{Path, PathBuf};
 use std::time::Instant;
+use wetspring_barracuda::ipc::discover;
 use wetspring_barracuda::validation::Validator;
-
-/// Resolve primal socket path via capability-based discovery cascade.
-/// Order: env var → XDG_RUNTIME_DIR/biomeos/{primal}-default.sock →
-/// BIOMEOS_SOCKET_DIR/{primal}-default.sock → temp_dir.
-#[must_use]
-fn discover_socket(env_var: &str, primal: &str) -> PathBuf {
-    if let Ok(path) = std::env::var(env_var) {
-        return PathBuf::from(path);
-    }
-    if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
-        return PathBuf::from(xdg).join(format!("biomeos/{primal}-default.sock"));
-    }
-    if let Ok(dir) = std::env::var("BIOMEOS_SOCKET_DIR") {
-        return PathBuf::from(dir).join(format!("{primal}-default.sock"));
-    }
-    std::env::temp_dir().join(format!("{primal}-default.sock"))
-}
 
 /// Discover ToadStool socket (tries both .sock and .jsonrpc.sock).
 #[must_use]
@@ -151,18 +135,18 @@ fn main() {
         (
             "BearDog",
             "orchestration",
-            discover_socket("BEARDOG_SOCKET", "beardog"),
+            discover::resolve_bind_path("BEARDOG_SOCKET", "beardog"),
         ),
         (
             "Songbird",
             "discovery",
-            discover_socket("SONGBIRD_SOCKET", "songbird"),
+            discover::resolve_bind_path("SONGBIRD_SOCKET", "songbird"),
         ),
         ("ToadStool", "compute", toadstool_path),
         (
             "NestGate",
             "data.ncbi",
-            discover_socket("NESTGATE_SOCKET", "nestgate"),
+            discover::resolve_bind_path("NESTGATE_SOCKET", "nestgate"),
         ),
     ];
 

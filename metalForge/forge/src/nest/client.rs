@@ -60,7 +60,7 @@ impl NestClient {
     ///
     /// Returns an error if the socket is invalid, connection fails, or the RPC
     /// response cannot be read.
-    pub fn exists(&self, key: &str) -> Result<bool, String> {
+    pub fn exists(&self, key: &str) -> Result<bool, crate::error::NestError> {
         let escaped = json::escape_json_str(key);
         let family = json::escape_json_str(&self.family_id);
         let req = format!(
@@ -76,7 +76,7 @@ impl NestClient {
     ///
     /// Returns an error if the socket is invalid, connection fails, or the RPC
     /// response cannot be read.
-    pub fn store(&self, key: &str, value: &str) -> Result<StoreResult, String> {
+    pub fn store(&self, key: &str, value: &str) -> Result<StoreResult, crate::error::NestError> {
         let escaped_key = json::escape_json_str(key);
         let family = json::escape_json_str(&self.family_id);
         let req = format!(
@@ -95,7 +95,7 @@ impl NestClient {
     ///
     /// Returns an error if the socket is invalid, connection fails, or the RPC
     /// response cannot be read.
-    pub fn store_blob(&self, key: &str, data: &[u8]) -> Result<StoreResult, String> {
+    pub fn store_blob(&self, key: &str, data: &[u8]) -> Result<StoreResult, crate::error::NestError> {
         let escaped_key = json::escape_json_str(key);
         let family = json::escape_json_str(&self.family_id);
         let encoded = base64::base64_encode(data);
@@ -115,7 +115,7 @@ impl NestClient {
     ///
     /// Returns an error if the socket is invalid, connection fails, or the RPC
     /// response cannot be read.
-    pub fn retrieve(&self, key: &str) -> Result<RetrieveResult, String> {
+    pub fn retrieve(&self, key: &str) -> Result<RetrieveResult, crate::error::NestError> {
         let escaped_key = json::escape_json_str(key);
         let family = json::escape_json_str(&self.family_id);
         let req = format!(
@@ -132,7 +132,7 @@ impl NestClient {
     ///
     /// Returns an error if the socket is invalid, connection fails, or the RPC
     /// response cannot be read.
-    pub fn retrieve_blob(&self, key: &str) -> Result<Option<Vec<u8>>, String> {
+    pub fn retrieve_blob(&self, key: &str) -> Result<Option<Vec<u8>>, crate::error::NestError> {
         let escaped_key = json::escape_json_str(key);
         let family = json::escape_json_str(&self.family_id);
         let req = format!(
@@ -153,7 +153,7 @@ impl NestClient {
     ///
     /// Returns an error if the socket is invalid, connection fails, or the RPC
     /// response cannot be read.
-    pub fn delete(&self, key: &str) -> Result<StoreResult, String> {
+    pub fn delete(&self, key: &str) -> Result<StoreResult, crate::error::NestError> {
         let escaped_key = json::escape_json_str(key);
         let family = json::escape_json_str(&self.family_id);
         let req = format!(
@@ -172,7 +172,7 @@ impl NestClient {
     ///
     /// Returns an error if the socket is invalid, connection fails, or the RPC
     /// response cannot be read.
-    pub fn list(&self, prefix: Option<&str>) -> Result<ListResult, String> {
+    pub fn list(&self, prefix: Option<&str>) -> Result<ListResult, crate::error::NestError> {
         let family = json::escape_json_str(&self.family_id);
         let params = prefix.map_or_else(
             || format!(r#"{{"family_id":"{family}"}}"#),
@@ -196,7 +196,7 @@ impl NestClient {
     ///
     /// Returns an error if the socket is invalid, connection fails, or the RPC
     /// response cannot be read.
-    pub fn stats(&self) -> Result<String, String> {
+    pub fn stats(&self) -> Result<String, crate::error::NestError> {
         let family = json::escape_json_str(&self.family_id);
         let req = format!(
             r#"{{"jsonrpc":"2.0","method":"storage.stats","params":{{"family_id":"{family}"}},"id":1}}"#,
@@ -212,8 +212,11 @@ impl NestClient {
     /// # Errors
     ///
     /// Returns an error if the file cannot be read or storage operations fail.
-    pub fn ingest_file(&self, key: &str, path: &Path) -> Result<StoreResult, String> {
-        let data = std::fs::read(path).map_err(|e| format!("read {}: {e}", path.display()))?;
+    pub fn ingest_file(&self, key: &str, path: &Path) -> Result<StoreResult, crate::error::NestError> {
+        let data = std::fs::read(path).map_err(|e| crate::error::NestError::FileRead {
+            path: path.to_path_buf(),
+            source: e.to_string(),
+        })?;
         self.store_blob(key, &data)
     }
 
@@ -232,7 +235,7 @@ impl NestClient {
         source: &str,
         file_count: usize,
         total_bytes: u64,
-    ) -> Result<StoreResult, String> {
+    ) -> Result<StoreResult, crate::error::NestError> {
         let meta_key = format!("meta:{dataset}");
         let value = format!(
             r#"{{"dataset":"{dataset}","source":"{source}","file_count":{file_count},"total_bytes":{total_bytes},"stored_at":"{}"}}"#,

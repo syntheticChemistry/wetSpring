@@ -2,12 +2,17 @@
 //! Binary array decoding for mzML spectra.
 //!
 //! Handles base64 + optional zlib decompression and f32/f64 parsing.
+//! See [`base64`] for base64 decoding and [`compression`] for zlib/float parsing.
+
+mod base64;
+mod compression;
 
 use super::MzmlSpectrum;
-use crate::encoding::base64_decode;
-use crate::error::{Error, Result};
-use flate2::read::ZlibDecoder;
-use std::io::Read;
+use crate::error::Result;
+use base64::decode_base64;
+use compression::{decode_float_array, decompress_zlib};
+
+// ── Spectrum builder ───────────────────────────────────────────────────────
 
 /// Builder that accumulates fields while parsing a single `<spectrum>`.
 pub struct SpectrumBuilder {
@@ -68,6 +73,8 @@ impl SpectrumBuilder {
     }
 }
 
+// ── Decode buffer ───────────────────────────────────────────────────────────
+
 /// Reusable buffer for binary array decoding, avoiding per-spectrum allocation
 /// for the intermediate decompression step.
 ///
@@ -93,52 +100,20 @@ impl DecodeBuffer {
     /// Returns [`Error::Base64`] for invalid base64, [`Error::Zlib`] for decompression
     /// failures, or [`Error::BinaryFormat`] for length mismatches.
     pub fn decode(&mut self, encoded: &str, is_zlib: bool, is_64bit: bool) -> Result<Vec<f64>> {
-        let bytes = base64_decode(encoded.trim())?;
+        let bytes = decode_base64(encoded)?;
 
         let decompressed: &[u8] = if is_zlib {
-            self.decompressed.clear();
-            let mut decoder = ZlibDecoder::new(&bytes[..]);
-            decoder
-                .read_to_end(&mut self.decompressed)
-                .map_err(|e| Error::Zlib(format!("{e}")))?;
+            decompress_zlib(&bytes, &mut self.decompressed)?;
             &self.decompressed[..]
         } else {
             &bytes[..]
         };
 
-        if is_64bit {
-            if !decompressed.len().is_multiple_of(8) {
-                return Err(Error::BinaryFormat(format!(
-                    "f64 array length {} not divisible by 8",
-                    decompressed.len()
-                )));
-            }
-            Ok(decompressed
-                .chunks_exact(8)
-                .map(|chunk| {
-                    let mut arr = [0_u8; 8];
-                    arr.copy_from_slice(chunk);
-                    f64::from_le_bytes(arr)
-                })
-                .collect())
-        } else {
-            if !decompressed.len().is_multiple_of(4) {
-                return Err(Error::BinaryFormat(format!(
-                    "f32 array length {} not divisible by 4",
-                    decompressed.len()
-                )));
-            }
-            Ok(decompressed
-                .chunks_exact(4)
-                .map(|chunk| {
-                    let mut arr = [0_u8; 4];
-                    arr.copy_from_slice(chunk);
-                    f64::from(f32::from_le_bytes(arr))
-                })
-                .collect())
-        }
+        decode_float_array(decompressed, is_64bit)
     }
 }
+
+// ── Binary array state ──────────────────────────────────────────────────────
 
 /// Tracks encoding properties for a `<binaryDataArray>`.
 #[expect(clippy::struct_excessive_bools)] // maps directly to mzML cvParam flags
@@ -223,6 +198,8 @@ impl BinaryArrayState {
     }
 }
 
+// ── Entry point ─────────────────────────────────────────────────────────────
+
 /// Decode a base64 + optional zlib-compressed array of f64 values.
 ///
 /// For streaming use, prefer [`DecodeBuffer::decode`] to reuse the decompression buffer.
@@ -235,6 +212,8 @@ pub fn decode_binary_array(encoded: &str, is_zlib: bool, is_64bit: bool) -> Resu
     let mut buffer = DecodeBuffer::new();
     buffer.decode(encoded, is_zlib, is_64bit)
 }
+
+// ── Test helpers ───────────────────────────────────────────────────────────
 
 /// Build an mzML with configurable compression and precision per array.
 /// Test helper used by both decode and mod tests.
@@ -308,6 +287,8 @@ pub fn write_temp_mzml(dir: &tempfile::TempDir, name: &str, xml: &str) -> std::p
     f.write_all(xml.as_bytes()).unwrap();
     path
 }
+
+// ── Tests ──────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
 #[expect(clippy::unwrap_used)]
