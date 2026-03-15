@@ -3,6 +3,60 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V116] — 2026-03-15
+
+### Deep Audit Execution — Capability Discovery + Tolerance Centralization + Doc Evolution
+
+Full execution of V115's 12-finding audit: capability.list handler, expanded
+domain architecture, inline tolerance centralization, capability-based primal
+discovery, forge lint parity, and stale documentation evolution.
+
+#### capability.list JSON-RPC Handler
+- `dispatch.rs`: new `"capability.list"` match arm routes to `handlers::handle_capability_list()`
+- Response includes primal name, version, domain, all 14 capability domains with methods
+- 2 new dispatch tests: `capability_list_returns_all_domains`, `capability_list_methods_total`
+
+#### Capability Domain Expansion (11 → 14 domains, 19 methods)
+- `capability_domains.rs`: ecology (11 domains) + provenance (begin/record/complete) + brain (observe/attention/urgency) + metrics (snapshot)
+- `VALID_DOMAIN_PREFIXES` gated `#[cfg(test)]` for domain family validation
+- `all_methods()` public function for flat method introspection
+- 4 new tests: prefix validation, 4-family coverage, total count matches registry, flat list
+
+#### Inline Tolerance Centralization (15 replacements, 10 binaries)
+- `validate_barracuda_cpu_v26.rs`: `1e-10` → `tolerances::PYTHON_PARITY`
+- `benchmark_python_vs_rust_v5.rs`: `0.001` → `tolerances::ODE_DEFAULT_DT`
+- `validate_anderson_qs_environments_v1.rs`: `1e-12` / `1e-15` → `ANALYTICAL_F64` / `EXACT_F64`
+- `validate_phage_defense.rs`: `1e-10` → `tolerances::PYTHON_PARITY`
+- `validate_pure_gpu_complete.rs`: `1e-5` / `1e-6` → `GEMM_GPU_MAX_ERR` / `GPU_VS_CPU_F64`
+- Plus 5 more binaries — zero remaining inline tolerance literals in validation code
+
+#### Capability-Based Primal Discovery (3 binaries)
+- `validate_primal_pipeline_v1.rs`: `discover_socket()` helper replaces hardcoded paths
+- `validate_workload_routing_v1.rs`: primal name checks → capability checks
+- `validate_petaltongue_live_v1.rs`: same pattern — env var → XDG → BIOMEOS_SOCKET_DIR → temp
+
+#### metalForge Forge Lint Parity
+- `forge/src/lib.rs`: `#![deny(missing_docs)]`, `#![warn(clippy::pedantic, clippy::nursery)]`
+- Matches wetspring-barracuda lint strictness
+
+#### Documentation Evolution
+- `discovery.rs`: corrected socket fallback docs (`temp_dir()`, not `/run/nestgate/default.sock`)
+- `handlers/mod.rs`: `CAPABILITIES` array updated, doc comments clarified
+- `whitePaper/STUDY.md`: tolerance count 53→180+, modules 88→94, WGSL 5→0, passthrough 3→0
+- `barracuda/README.md`: binaries 291→354, GPU modules 45→47
+- `scripts/README.md`: script count 40+→71
+- `specs/README.md`: test counts, binary count, handoff count, barraCuda version
+
+#### Audit False-Positive Resolution
+- All 4 `panic!()` instances confirmed `#[cfg(test)]` only — zero production violations
+- All ~20 `#[expect(clippy::unwrap_used)]` confirmed test-gated — `#![deny]` enforces production
+
+#### Quality Gates
+- `cargo check --workspace` — clean
+- `cargo clippy --workspace -- -D warnings` — zero warnings (pedantic + nursery)
+- 31 IPC tests pass (capability_domains + dispatch modules)
+- 19 files changed, 342 insertions, 130 deletions
+
 ## [V115] — 2026-03-15
 
 ### Deep Audit Execution + UniBin + Capability Domains + Tolerance Evolution

@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: March 15, 2026
-**Status**: V115 — 5,707+ checks (375 experiments, 354 binaries). biomeOS niche — deploy graph, 19 capabilities, provenance trio, cross-spring time series. V114: docs cleanup, niche guidance, BarraCUDA absorption handoff. V113: trio + capabilities + deploy graph. V112: streaming I/O, capability discovery.
+**Status**: V116 — 5,707+ checks (375 experiments, 354 binaries). biomeOS niche — deploy graph, 19 capabilities, provenance trio, cross-spring time series. V114: docs cleanup, niche guidance, BarraCUDA absorption handoff. V113: trio + capabilities + deploy graph. V112: streaming I/O, capability discovery.
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -11,9 +11,9 @@
 | Metric | Value |
 |--------|-------|
 | CPU validation | 1,476+/1,476+ PASS — 47 modules, 334 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
-| GPU validation | 1,945+/1,945+ PASS — 150+ primitives (standalone barraCuda v0.3.3, always-on, 264 ComputeDispatch ops), 0 local WGSL (fully lean) |
+| GPU validation | 1,945+/1,945+ PASS — 150+ primitives (standalone barraCuda v0.3.5, always-on, 264 ComputeDispatch ops), 0 local WGSL (fully lean) |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
-| BarraCuda CPU parity | 407/407 — 22.5x Rust speedup over Python (v1–v9) |
+| BarraCuda CPU parity | 546/546 — 22.5x Rust speedup over Python (v1–v9) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/101/164) — pure GPU math proven |
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip (Exp090/091) |
 | metalForge cross-system | 37 domains CPU↔GPU (Exp103+104+165) + dispatch (Exp080) + pipeline (Exp086) + PCIe (Exp088) + S86 science (Exp299, 7 new workloads) |
@@ -25,7 +25,7 @@
 | Full 5-tier chain | 499/499 PASS — Paper math → CPU → GPU → Streaming → metalForge (Exp298) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
-| Rust modules | 47 CPU + 47 GPU + 1 IPC + 1 vault + 1 visualization, 1,288 lib + 219 integration tests, 316 binaries |
+| Rust modules | 47 CPU + 47 GPU + 1 IPC + 1 vault + 1 visualization, 1,330 lib + 234 forge + 89 integration + 9 doc = 1,662 tests, 354 binaries |
 | Write phase | 0 local WGSL (fully lean) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
 | Paper queue | **ALL DONE** — 63/63 reproducible papers complete (Tracks 1-6 + Phase 37 extensions + cross-spring) |
@@ -33,7 +33,7 @@
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
 | Faculty (Track 1c) | R. Anderson (Carleton) — deep-sea metagenomics, population genomics |
 | Faculty (Track 2) | Jones (BMB/Chemistry, MSU) — PFAS mass spectrometry |
-| Handoffs | Eighty-seven delivered (v1–v87) |
+| Handoffs | V116 active + 123 archived (v7–v115) |
 
 ---
 
@@ -43,7 +43,7 @@ Every paper in the queue goes through the full evolution path. Status:
 
 | Stage | What It Proves | Status |
 |-------|---------------|--------|
-| **Python baseline** | Algorithm correctness against published tools | 65 scripts, all reproducible |
+| **Python baseline** | Algorithm correctness against published tools | 71 scripts, all reproducible |
 | **BarraCuda CPU** | Pure Rust math matches Python | 1,476 checks, 380/380 cross-domain parity (v1–v8) |
 | **BarraCuda GPU** | GPU produces same answer as CPU | 1,783 checks, 29 GPU domains |
 | **Pure GPU streaming** | Zero CPU round-trips, data stays on-device | 152 checks, 10+ domains, 441-837× over round-trip (Exp090/105/106) |
@@ -164,7 +164,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 - **NPU edge inference** — ESN reservoir on AKD1000, online evolution, adaptive sampling (V60)
 - **Field genomics** (planned) — Nanopore sequencing + NPU classification + metalForge routing. See [FIELD_GENOMICS_REQUIREMENTS.md](FIELD_GENOMICS_REQUIREMENTS.md)
 - **Data type profiling** — Biological data format catalog driving NestGate data primal evolution. See [DATA_TYPES.md](DATA_TYPES.md)
-- **Sovereign Rust bioinformatics** — 47 CPU + 45 GPU modules + 0 local WGSL (fully lean), 2 runtime dependencies (flate2 + bytemuck), 150+ primitives (standalone barraCuda v0.3.3, always-on, zero fallback, 264 ComputeDispatch ops)
+- **Sovereign Rust bioinformatics** — 47 CPU + 47 GPU modules + 0 local WGSL (fully lean), 2 runtime dependencies (flate2 + bytemuck), 150+ primitives (standalone barraCuda v0.3.5, always-on, zero fallback, 264 ComputeDispatch ops)
 
 ### wetSpring IS NOT:
 - Sensor noise analysis (groundSpring)

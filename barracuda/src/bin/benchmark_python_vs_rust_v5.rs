@@ -144,13 +144,13 @@ fn main() {
     let t0 = Instant::now();
     let b_half = first_order(t_half, b_max, k);
     let us = t0.elapsed().as_nanos();
-    v.check("§24a: B(t_half) = B_max/2", b_half, b_max / 2.0, 1e-10);
+    v.check("§24a: B(t_half) = B_max/2", b_half, b_max / 2.0, tolerances::PYTHON_PARITY);
     benches.push(ParityBench {
         domain: "First-order half-life",
         python_equiv: "B_max * (1 - np.exp(-k * t_half))",
         expected: b_max / 2.0,
         actual: b_half,
-        tolerance: 1e-10,
+        tolerance: tolerances::PYTHON_PARITY,
         rust_us: us / 1000,
         workload: "1 evaluation",
     });

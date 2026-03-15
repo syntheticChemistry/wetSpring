@@ -33,39 +33,53 @@
 //! | Date | 2026-03-11 |
 //! | Command | `cargo run --release --features gpu,json --bin validate_workload_routing_v1` |
 
+use std::path::PathBuf;
 use std::time::Instant;
 use wetspring_barracuda::validation::Validator;
 
-fn discover_biomeos() -> Option<String> {
-    which_primal("biomeos")
-}
-
-fn which_primal(name: &str) -> Option<String> {
-    let path_dirs = std::env::var("PATH").unwrap_or_default();
-    for dir in path_dirs.split(':') {
-        let candidate = std::path::Path::new(dir).join(name);
-        if candidate.exists() {
-            return Some(candidate.display().to_string());
-        }
+/// Resolve primal socket path via capability-based discovery cascade.
+/// Order: env var → XDG_RUNTIME_DIR/biomeos/{primal}-default.sock →
+/// BIOMEOS_SOCKET_DIR/{primal}-default.sock → temp_dir.
+#[must_use]
+fn discover_socket(env_var: &str, primal: &str) -> PathBuf {
+    if let Ok(path) = std::env::var(env_var) {
+        return PathBuf::from(path);
     }
-    None
+    if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
+        return PathBuf::from(xdg).join(format!("biomeos/{primal}-default.sock"));
+    }
+    if let Ok(dir) = std::env::var("BIOMEOS_SOCKET_DIR") {
+        return PathBuf::from(dir).join(format!("{primal}-default.sock"));
+    }
+    std::env::temp_dir().join(format!("{primal}-default.sock"))
 }
 
-fn discover_primals() -> Vec<String> {
-    let names = [
-        "beardog",
-        "songbird",
-        "toadstool",
-        "nestgate",
-        "squirrel",
-        "petaltongue",
-        "biomeos",
+/// Discover primal sockets via env-based discovery. Returns capability names
+/// for primals whose sockets exist.
+fn discover_primal_sockets() -> Vec<&'static str> {
+    let configs = [
+        ("BEARDOG_SOCKET", "beardog", "orchestration"),
+        ("SONGBIRD_SOCKET", "songbird", "discovery"),
+        ("TOADSTOOL_SOCKET", "toadstool", "compute"),
+        ("NESTGATE_SOCKET", "nestgate", "data.ncbi"),
+        ("SQUIRREL_SOCKET", "squirrel", "storage"),
+        ("PETALTONGUE_SOCKET", "petaltongue", "visualization"),
+        ("BIOMEOS_SOCKET", "biomeos", "coordination"),
     ];
-    names
+    configs
         .iter()
-        .filter(|name| which_primal(name).is_some())
-        .map(|name| (*name).to_string())
+        .filter(|(env, primal, _)| discover_socket(env, primal).exists())
+        .map(|(_, _, cap)| *cap)
         .collect()
+}
+
+fn discover_biomeos() -> Option<PathBuf> {
+    let p = discover_socket("BIOMEOS_SOCKET", "biomeos");
+    if p.exists() {
+        Some(p)
+    } else {
+        None
+    }
 }
 
 fn main() {
@@ -192,49 +206,49 @@ fn main() {
     // ─── D79: biomeOS/NUCLEUS Readiness ───
     println!("\n  ── D79: biomeOS/NUCLEUS Readiness ──");
 
-    let biomeos_bin = discover_biomeos();
-    let biomeos_available = biomeos_bin.is_some();
+    let biomeos_socket = discover_biomeos();
+    let biomeos_available = biomeos_socket.is_some();
     if biomeos_available {
-        println!("  ✓ biomeOS binary found — NUCLEUS coordination available");
+        println!("  ✓ biomeOS socket discovered — NUCLEUS coordination available");
     } else {
         println!("  ○ biomeOS not found — standalone mode (expected for local builds)");
     }
     v.check_pass("biomeOS discovery returns cleanly", true);
 
-    let primals = discover_primals();
+    let capabilities: Vec<&str> = discover_primal_sockets();
     println!(
-        "  Primals found: {}",
-        if primals.is_empty() {
+        "  Capabilities found: {}",
+        if capabilities.is_empty() {
             "none".to_string()
         } else {
-            primals.join(", ")
+            capabilities.join(", ")
         }
     );
-    v.check_pass("primal scan completes", true);
+    v.check_pass("primal socket scan completes", true);
 
-    let tower_ready =
-        primals.contains(&"beardog".to_string()) && primals.contains(&"songbird".to_string());
-    let node_ready = tower_ready && primals.contains(&"toadstool".to_string());
+    // Capability-based readiness: Tower = orchestration + discovery; Node = + compute; Nest = + data.ncbi + storage
+    let tower_ready = capabilities.contains(&"orchestration") && capabilities.contains(&"discovery");
+    let node_ready = tower_ready && capabilities.contains(&"compute");
     let nest_ready = node_ready
-        && primals.contains(&"nestgate".to_string())
-        && primals.contains(&"squirrel".to_string());
+        && capabilities.contains(&"data.ncbi")
+        && capabilities.contains(&"storage");
 
     println!(
         "  Tower: {} | Node: {} | Nest: {}",
         if tower_ready {
             "READY"
         } else {
-            "needs primals"
+            "needs orchestration+discovery"
         },
         if node_ready {
             "READY"
         } else {
-            "needs toadstool"
+            "needs compute"
         },
         if nest_ready {
             "READY"
         } else {
-            "needs nestgate+squirrel"
+            "needs data.ncbi+storage"
         },
     );
     v.check_pass("NUCLEUS readiness probed", true);

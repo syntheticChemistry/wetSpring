@@ -49,8 +49,61 @@ use std::path::{Path, PathBuf};
 use std::time::Instant;
 use wetspring_barracuda::validation::Validator;
 
-fn socket_exists(path: &str) -> bool {
-    Path::new(path).exists()
+/// Resolve primal socket path via capability-based discovery cascade.
+/// Order: env var → XDG_RUNTIME_DIR/biomeos/{primal}-default.sock →
+/// BIOMEOS_SOCKET_DIR/{primal}-default.sock → temp_dir.
+#[must_use]
+fn discover_socket(env_var: &str, primal: &str) -> PathBuf {
+    if let Ok(path) = std::env::var(env_var) {
+        return PathBuf::from(path);
+    }
+    if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
+        return PathBuf::from(xdg).join(format!("biomeos/{primal}-default.sock"));
+    }
+    if let Ok(dir) = std::env::var("BIOMEOS_SOCKET_DIR") {
+        return PathBuf::from(dir).join(format!("{primal}-default.sock"));
+    }
+    std::env::temp_dir().join(format!("{primal}-default.sock"))
+}
+
+/// Discover ToadStool socket (tries both .sock and .jsonrpc.sock).
+#[must_use]
+fn discover_toadstool_socket() -> Option<PathBuf> {
+    if let Ok(path) = std::env::var("TOADSTOOL_SOCKET") {
+        let p = PathBuf::from(path);
+        if p.exists() {
+            return Some(p);
+        }
+    }
+    let base = std::env::var("XDG_RUNTIME_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| std::env::temp_dir())
+        .join("biomeos");
+    for suffix in ["toadstool-default.sock", "toadstool-default.jsonrpc.sock"] {
+        let p = base.join(suffix);
+        if p.exists() {
+            return Some(p);
+        }
+    }
+    if let Ok(dir) = std::env::var("BIOMEOS_SOCKET_DIR") {
+        for suffix in ["toadstool-default.sock", "toadstool-default.jsonrpc.sock"] {
+            let p = PathBuf::from(&dir).join(suffix);
+            if p.exists() {
+                return Some(p);
+            }
+        }
+    }
+    for suffix in ["toadstool-default.sock", "toadstool-default.jsonrpc.sock"] {
+        let p = std::env::temp_dir().join(suffix);
+        if p.exists() {
+            return Some(p);
+        }
+    }
+    None
+}
+
+fn socket_exists(path: &Path) -> bool {
+    path.exists()
 }
 
 fn probe_socket_rpc(socket_path: &Path, method: &str) -> Result<String, String> {
@@ -79,47 +132,34 @@ fn main() {
     let start = Instant::now();
     let mut v = Validator::new("Exp368: Primal Integration Pipeline v1");
 
-    let family = std::env::var("FAMILY_ID").unwrap_or_else(|_| "eastgate".into());
-    let xdg_runtime = std::env::var("XDG_RUNTIME_DIR").unwrap_or_else(|_| "/run/user/1000".into());
-    let biomeos_base = format!("{xdg_runtime}/biomeos");
-
     // ─── D121: Primal Discovery ───
     println!("\n  ── D121: Primal Discovery ──");
 
     struct PrimalStatus {
         name: String,
+        capability: &'static str,
         socket_path: PathBuf,
         present: bool,
         healthy: bool,
         _info: String,
     }
 
-    let primal_sockets = [
-        ("BearDog", format!("{biomeos_base}/beardog-{family}.sock")),
-        ("Songbird", format!("{biomeos_base}/songbird-{family}.sock")),
-        (
-            "ToadStool",
-            format!("{biomeos_base}/toadstool-{family}.jsonrpc.sock"),
-        ),
-        ("NestGate", format!("{biomeos_base}/nestgate-{family}.sock")),
-    ];
-
-    let temp_dir = std::env::temp_dir();
-    let neural_api_paths = [
-        format!("{biomeos_base}/biomeos-neural-api-{family}.sock"),
-        format!(
-            "{}/biomeos-neural-api-{family}.sock",
-            temp_dir.display()
-        ),
-        format!("{}/neural-api-{family}.sock", temp_dir.display()),
+    // Capability-based discovery: env vars → XDG → BIOMEOS_SOCKET_DIR → temp
+    let toadstool_path = discover_toadstool_socket()
+        .unwrap_or_else(|| std::env::temp_dir().join("toadstool-nonexistent.sock"));
+    let primal_sockets: Vec<(&str, &str, PathBuf)> = vec![
+        ("BearDog", "orchestration", discover_socket("BEARDOG_SOCKET", "beardog")),
+        ("Songbird", "discovery", discover_socket("SONGBIRD_SOCKET", "songbird")),
+        ("ToadStool", "compute", toadstool_path),
+        ("NestGate", "data.ncbi", discover_socket("NESTGATE_SOCKET", "nestgate")),
     ];
 
     let mut statuses: Vec<PrimalStatus> = vec![];
 
-    for (name, path) in &primal_sockets {
+    for (name, capability, path) in &primal_sockets {
         let present = socket_exists(path);
         let (healthy, info) = if present {
-            match probe_socket_rpc(Path::new(path), "primal.info") {
+            match probe_socket_rpc(path, "primal.info") {
                 Ok(resp) => {
                     let is_healthy = resp.contains("\"result\"");
                     (
@@ -138,21 +178,24 @@ fn main() {
         };
 
         println!(
-            "  {name:12} {path}: {} {}",
+            "  {name:12} {}: {} {}",
+            path.display(),
             if present { "FOUND" } else { "absent" },
             if healthy { "(healthy)" } else { "" }
         );
 
         statuses.push(PrimalStatus {
             name: name.to_string(),
-            socket_path: PathBuf::from(path),
+            capability,
+            socket_path: path.clone(),
             present,
             healthy,
             _info: info,
         });
     }
 
-    let neural_api_present = neural_api_paths.iter().any(|p| socket_exists(p));
+    let neural_api_present =
+        wetspring_barracuda::ipc::provenance::neural_api_socket().is_some();
     println!(
         "  Neural API: {}",
         if neural_api_present {
@@ -169,7 +212,7 @@ fn main() {
     // ─── D122: NestGate NCBI Pipeline ───
     println!("\n  ── D122: NestGate NCBI Pipeline ──");
 
-    let nestgate = statuses.iter().find(|s| s.name == "NestGate");
+    let nestgate = statuses.iter().find(|s| s.capability == "data.ncbi");
     let nestgate_available = nestgate.is_some_and(|s| s.present);
 
     if nestgate_available {
@@ -238,7 +281,7 @@ fn main() {
     // ─── D123: ToadStool GPU Readiness ───
     println!("\n  ── D123: ToadStool GPU Readiness ──");
 
-    let toadstool = statuses.iter().find(|s| s.name == "ToadStool");
+    let toadstool = statuses.iter().find(|s| s.capability == "compute");
     let toadstool_available = toadstool.is_some_and(|s| s.present);
 
     if toadstool_available {

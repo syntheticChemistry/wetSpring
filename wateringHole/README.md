@@ -9,8 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V115** | `handoffs/WETSPRING_V115_DEEP_AUDIT_EVOLUTION_HANDOFF_MAR15_2026.md` | Mar 15 | **Deep audit evolution** — UniBin compliance, capability domains, tolerance centralization, XDG path resolution, metalForge 90% coverage. |
-| | *V113 and V114 → `handoffs/archive/`* | | V113 and V114 handoffs archived. |
+| **V116** | `handoffs/WETSPRING_V116_CAPABILITY_DISCOVERY_TOLERANCE_CENTRALIZATION_HANDOFF_MAR15_2026.md` | Mar 15 | **Capability discovery + tolerance centralization** — `capability.list` handler, 14 domains / 19 methods, inline tolerance centralization (15 binaries), capability-based primal discovery (3 binaries), forge lint parity. 8 GPU primitive opportunities carried forward. |
+| | *V113–V115 → `handoffs/archive/`* | | V113–V115 handoffs archived. |
 | | *V112 and earlier → `handoffs/archive/`* | | Fossil record: V7–V112 (95+ archived handoffs) |
 
 ## Cross-Spring Documents
@@ -22,7 +22,7 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` — V7–V112 (95+ files).
+Superseded handoffs in `handoffs/archive/` — V7–V115 (123+ files).
 Preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda.
 
 ## Convention

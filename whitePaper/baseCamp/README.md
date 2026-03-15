@@ -2,7 +2,7 @@
 
 **Date:** March 15, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V115 — 375 experiments, 5,707+ validation checks, ALL PASS; 1,662 tests (0 failures), 354 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 784+ WGSL shaders), toadStool S130+, coralReef Phase 10. biomeOS niche — deploy graph, 19 capabilities, provenance trio integration, cross-spring time series, Neural API workflow graphs. V115: deep audit — UniBin compliance, capability domains (4 domains), tolerance centralization, XDG path resolution, metalForge 90% coverage. V114: docs cleanup, niche guidance, BarraCUDA absorption handoff. V113: provenance trio + expanded capabilities + deploy graph. V112: streaming-only I/O, capability-based discovery. 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL, 180 tolerances, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS.
+**Status:** V116 — 376 experiments, 5,707+ validation checks, ALL PASS; 1,662 tests (0 failures), 354 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 784+ WGSL shaders), toadStool S130+, coralReef Phase 10. biomeOS niche — deploy graph, 19 capabilities, provenance trio integration, cross-spring time series, Neural API workflow graphs. V115: deep audit — UniBin compliance, capability domains (4 domains), tolerance centralization, XDG path resolution, metalForge 90% coverage. V114: docs cleanup, niche guidance, BarraCUDA absorption handoff. V113: provenance trio + expanded capabilities + deploy graph. V112: streaming-only I/O, capability-based discovery. 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL, 180 tolerances, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS.
 
 ---
 
@@ -104,7 +104,7 @@ Every paper goes through the full evolution. Status across all 63 papers:
 | Stage | What It Proves | Coverage |
 |-------|---------------|----------|
 | Paper math control | Published equations reproduced exactly | 63 papers (Exp341), 38 checks |
-| Python baseline | Algorithm correctness against published tools | 65 scripts (all with reproduction headers + SHA-256 integrity verification) |
+| Python baseline | Algorithm correctness against published tools | 71 scripts (all with reproduction headers + SHA-256 integrity verification) |
 | **R industry baseline** | **Gold-standard parity against R/vegan, R/DADA2, R/phyloseq** | **3 R scripts, 53 checks (Exp335), JSON baselines with SHA-256** |
 | BarraCuda CPU | Rust matches Python within machine precision | 26 domains (v1-v19), bit-identical to SciPy/NumPy (Exp253) |
 | BarraCuda GPU | GPU matches CPU within 1e-6 | 21 GPU domains, 1,783+ checks |

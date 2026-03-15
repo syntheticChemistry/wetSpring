@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 15, 2026 (V115 — barraCuda v0.3.5 `03986ce` + toadStool S130+ + coralReef Phase 10)
+**Date:** March 15, 2026 (V116 — barraCuda v0.3.5 `03986ce` + toadStool S130+ + coralReef Phase 10)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 47 CPU + 47 GPU modules + 1 IPC + 1 vault + 1 provenance + 1 visualization module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.5, wgpu 28). 1,662 tests (0 failures), 375 experiments, 5,707+ checks, 180 tolerances, 354 binaries. `cargo clippy -D warnings -W pedantic -W nursery` CLEAN, **0 silent fallbacks**. `#![forbid(unsafe_code)]` on all crate roots. **V114:** Docs cleanup, niche setup guidance, BarraCUDA absorption handoff (8 GPU primitive opportunities mapped). **V113:** Provenance trio integration (rhizoCrypt → loamSpine → sweetGrass), 19 biomeOS capabilities (was 9), cross-spring time series exchange, biomeOS deploy graph, NMF implementation. **V112:** Streaming-only I/O (deprecated parsers removed), capability-based runtime discovery.
+**Status:** 47 CPU + 47 GPU modules + 1 IPC + 1 vault + 1 provenance + 1 visualization module (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.5, wgpu 28). 1,662 tests (0 failures), 376 experiments, 5,707+ checks, 180 tolerances, 354 binaries. `cargo clippy -D warnings -W pedantic -W nursery` CLEAN, **0 silent fallbacks**. `#![forbid(unsafe_code)]` on all crate roots. **V114:** Docs cleanup, niche setup guidance, BarraCUDA absorption handoff (8 GPU primitive opportunities mapped). **V113:** Provenance trio integration (rhizoCrypt → loamSpine → sweetGrass), 19 biomeOS capabilities (was 9), cross-spring time series exchange, biomeOS deploy graph, NMF implementation. **V112:** Streaming-only I/O (deprecated parsers removed), capability-based runtime discovery.
 
 ### Full Lean Phase
 

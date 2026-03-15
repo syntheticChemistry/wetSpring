@@ -184,7 +184,7 @@ fn validate_case(v: &mut Validator, dir: &Path, name: &str, params: &PeakParams)
             let sci_idx = scipy_indices[i];
             (p.index as i64 - sci_idx as i64).unsigned_abs() <= 1
         }) {
-            let rel_err = if sci_height.abs() > 1e-12 {
+            let rel_err = if sci_height.abs() > tolerances::ANALYTICAL_F64 {
                 (rp.height - sci_height).abs() / sci_height
             } else {
                 (rp.height - sci_height).abs()

@@ -1824,7 +1824,7 @@ required-features = ["gpu"]
 [[bin]]
 name = "validate_primal_pipeline_v1"
 path = "src/bin/validate_primal_pipeline_v1.rs"
-required-features = ["gpu"]
+required-features = ["gpu", "ipc"]
 
 [[bin]]
 name = "validate_workload_routing_v1"

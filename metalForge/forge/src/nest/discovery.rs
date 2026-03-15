@@ -5,7 +5,7 @@
 //! Discovery order:
 //! 1. `NESTGATE_SOCKET` environment variable (if path exists)
 //! 2. `$XDG_RUNTIME_DIR/biomeos/nestgate-default.sock` (if exists)
-//! 3. Default path from `default_socket_path()` (`/run/nestgate/default.sock` if env unset)
+//! 3. Platform-agnostic `temp_dir()/nestgate-default.sock` fallback
 
 use std::path::PathBuf;
 

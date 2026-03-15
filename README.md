@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 15, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V115 — **1,662 tests** (0 failures), 375 experiments, 5,707+ validation checks across 354 binaries. Ecosystem: barraCuda v0.3.5, toadStool S130+, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). **biomeOS niche** — deploy graph (`graphs/wetspring_deploy.toml`), 19 capabilities (4 domains, `capability_registry.toml`), provenance trio integration, cross-spring time series exchange. **UniBin compliant** (`wetspring server|status|version`). Deep audit: tolerance centralization (180+ named constants), XDG path resolution, Python baseline provenance (SHA-256 + git), metalForge 90% coverage target. Superseded handoffs archived (V111–V114).
+**Status:** V116 — **1,662 tests** (0 failures), 376 experiments, 5,707+ validation checks across 354 binaries. Ecosystem: barraCuda v0.3.5, toadStool S130+, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). **biomeOS niche** — deploy graph (`graphs/wetspring_deploy.toml`), 20 capabilities (4 domains, `capability_registry.toml`), provenance trio integration, cross-spring time series exchange. **UniBin compliant** (`wetspring server|status|version`). V116 deep audit execution: `capability.list` implemented (Spring-as-Niche standard), `capability_domains.rs` expanded to 14 domains / 19 methods, inline tolerance literals centralized (15 binaries), hardcoded primal names evolved to capability-based discovery (3 binaries), forge lint parity (`missing_docs` + pedantic + nursery). Superseded handoffs archived (V111–V115).
 
 ---
 
@@ -54,8 +54,8 @@ WGSL          known physics   handoffs/                        delete local
 
 | Phase | Count | Description |
 |-------|:-----:|-------------|
-| **Lean** | 37 | GPU modules consuming upstream barraCuda primitives (V95: +tolerance_search_gpu, kmd_grouping_gpu, stats_extended_gpu) |
-| **Compose** | 7 | GPU wrappers wiring barraCuda primitives (kmd, merge_pairs, robinson_foulds, derep, neighbor_joining, reconciliation, molecular_clock) |
+| **Lean** | 35 | GPU modules consuming upstream barraCuda primitives directly |
+| **Compose** | 12 | GPU modules wiring multiple barraCuda primitives (kmd, merge_pairs, robinson_foulds, derep, neighbor_joining, reconciliation, molecular_clock, chimera, gbm, feature_table, streaming, taxonomy) |
 | **Passthrough** | 0 | All promoted — `gbm` and `feature_table` compose upstream, `signal` leans on `PeakDetectF64` (S62) |
 | **Write → Lean** | 5 | ODE shaders fully lean — GPU modules use `generate_shader()` from `OdeSystem` traits (WGSL deleted) |
 | **CPU Delegation** | 2 | `rk45_integrate` (adaptive ODE) + `gradient_1d` (numerical gradient) — V95 |
@@ -139,7 +139,7 @@ integration point.
 | Integration tests | 89 (72 barracuda + 17 forge) |
 | **Total Rust tests** | **1,662** (lib + forge + integration + doc) |
 | Library code coverage | **94.01% line** (barracuda), **88.78% line** (forge) (cargo-llvm-cov) |
-| Experiments completed | 375 |
+| Experiments completed | 376 |
 | Validation/benchmark binaries | 354 (332 barracuda + 22 forge) |
 | CPU bio modules | 47 |
 | GPU bio modules | 47 (30 lean + 5 write→lean + 7 compose + 0 passthrough + 5 visualization) |
@@ -305,7 +305,19 @@ science-to-visualization IPC wiring:
 - **IPC wiring**: `science.diversity` and `science.full_pipeline` gain `visualization: bool` parameter — auto-build scenario + push to petalTongue
 - **dump_wetspring_scenarios**: 13 scenarios (was 6), `--stream` flag for StreamSession demo
 
-**1,662 tests** | **375 experiments** | **354 binaries** | **5,707+ checks**
+**1,662 tests** | **376 experiments** | **354 binaries** | **5,707+ checks**
+
+### V116: Deep Audit Execution — Capability Discovery + Tolerance Centralization (2026-03-15)
+
+Full execution of V115 audit findings:
+- **`capability.list` JSON-RPC handler**: `dispatch.rs` routes `capability.list` → `handle_capability_list()` returning all 14 domains / 19 methods with primal metadata
+- **`capability_domains.rs` expanded**: 11 ecology-only → 14 domains across 4 families (ecology, provenance, brain, metrics), 19 methods, test-gated `VALID_DOMAIN_PREFIXES`, `all_methods()` introspection
+- **Inline tolerance centralization**: 15 replacements across 10 validation binaries — `1e-10`/`0.001`/`1e-12`/`1e-15`/`1e-5`/`1e-6` → `tolerances::PYTHON_PARITY`, `ODE_DEFAULT_DT`, `ANALYTICAL_F64`, `EXACT_F64`, `GEMM_GPU_MAX_ERR`, `GPU_VS_CPU_F64`
+- **Capability-based primal discovery**: 3 binaries (`validate_primal_pipeline_v1`, `validate_workload_routing_v1`, `validate_petaltongue_live_v1`) refactored — `discover_socket(env_var, primal)` helper (env → XDG → `BIOMEOS_SOCKET_DIR` → temp), primal name checks → capability checks
+- **metalForge forge lint parity**: `#![deny(missing_docs)]`, `#![warn(clippy::pedantic, clippy::nursery)]` to match barracuda
+- **Doc correction**: `discovery.rs` socket fallback documentation now reflects actual `temp_dir()` behavior
+- **Audit false-positive resolution**: All 4 reported `panic!()` and ~20 `#[expect(clippy::unwrap_used)]` confirmed test-only — zero production code violations
+- **All 31 IPC tests pass** (capability_domains + dispatch)
 
 ### V115: Deep Audit + UniBin + Capability Domains + Tolerance Evolution (2026-03-15)
 

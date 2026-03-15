@@ -84,11 +84,11 @@ fn validate_cooperation_gpu(device: &Arc<WgpuDevice>, v: &mut Validator) {
     v.section("M01: Cooperation ODE GPU");
 
     let params = CooperationParams::default();
-    let cpu = cooperation::scenario_equal_start(&params, 0.001);
+    let cpu = cooperation::scenario_equal_start(&params, tolerances::ODE_DEFAULT_DT);
 
     let gpu_engine = CooperationGpu::new(Arc::clone(device)).expect("shader compile");
     let results = gpu_engine
-        .integrate_params(&[params], &[[0.01, 0.01, 0.0, 0.0]], 48000, 0.001)
+        .integrate_params(&[params], &[[0.01, 0.01, 0.0, 0.0]], 48000, tolerances::ODE_DEFAULT_DT)
         .expect("GPU integrate");
 
     for (i, (&g, &c)) in results[0]
@@ -112,11 +112,11 @@ fn validate_capacitor_gpu(device: &Arc<WgpuDevice>, v: &mut Validator) {
     v.section("M02: Capacitor ODE GPU");
 
     let params = CapacitorParams::default();
-    let cpu = capacitor::scenario_normal(&params, 0.001);
+    let cpu = capacitor::scenario_normal(&params, tolerances::ODE_DEFAULT_DT);
 
     let gpu_engine = CapacitorGpu::new(Arc::clone(device)).expect("shader compile");
     let results = gpu_engine
-        .integrate_params(&[params], &[[0.01, 1.0, 0.0, 0.0, 0.5, 0.0]], 48000, 0.001)
+        .integrate_params(&[params], &[[0.01, 1.0, 0.0, 0.0, 0.5, 0.0]], 48000, tolerances::ODE_DEFAULT_DT)
         .expect("GPU integrate");
 
     for (i, (&g, &c)) in results[0]

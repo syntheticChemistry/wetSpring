@@ -213,7 +213,7 @@ fn validate_cross_exp053(v: &mut Validator) {
     );
     v.check(
         "Different rates for different gene families",
-        f64::from(u8::from((r1.rate - r2.rate).abs() > 1e-15)),
+        f64::from(u8::from((r1.rate - r2.rate).abs() > tolerances::EXACT_F64)),
         1.0,
         0.0,
     );

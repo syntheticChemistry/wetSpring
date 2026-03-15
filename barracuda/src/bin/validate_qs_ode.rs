@@ -31,7 +31,7 @@ use wetspring_barracuda::bio::qs_biofilm::{
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
-const DT: f64 = 0.001;
+const DT: f64 = tolerances::ODE_DEFAULT_DT;
 const SS_FRAC: f64 = 0.1;
 
 /// ODE method parity — centralized in `tolerances::ODE_METHOD_PARITY`.

@@ -49,7 +49,7 @@
 //! | Command | `cargo run --features gpu --bin validate_petaltongue_live_v1` |
 //! | Validation class | Visualization — synthetic data with analytical checks |
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use barracuda::stats::{covariance, mean, norm_cdf};
 use wetspring_barracuda::bio::diversity;
@@ -540,42 +540,42 @@ fn main() {
     // ── S10: biomeOS / NUCLEUS readiness probe ──
     println!("\n── S10: biomeOS / NUCLEUS readiness ──");
 
-    let biomeos_bin = discover_biomeos();
-    let biomeos_available = biomeos_bin.is_some();
+    let biomeos_socket = discover_biomeos();
+    let biomeos_available = biomeos_socket.is_some();
     if biomeos_available {
-        println!("  ✓ biomeOS binary found — NUCLEUS coordination available");
+        println!("  ✓ biomeOS socket discovered — NUCLEUS coordination available");
     } else {
         println!("  ○ biomeOS not found — standalone mode (expected for local builds)");
     }
     v.check_pass("biomeOS discovery returns cleanly", true);
 
-    let primals = discover_primals();
-    println!("  Primals found: {}", primals.join(", "));
-    v.check_pass("primal scan completes", true);
+    let capabilities: Vec<&str> = discover_primal_sockets();
+    println!("  Capabilities found: {}", capabilities.join(", "));
+    v.check_pass("primal socket scan completes", true);
 
-    let tower_ready =
-        primals.contains(&"beardog".to_string()) && primals.contains(&"songbird".to_string());
-    let node_ready = tower_ready && primals.contains(&"toadstool".to_string());
+    // Capability-based readiness: Tower = orchestration + discovery; Node = + compute; Nest = + data.ncbi + storage
+    let tower_ready = capabilities.contains(&"orchestration") && capabilities.contains(&"discovery");
+    let node_ready = tower_ready && capabilities.contains(&"compute");
     let nest_ready = node_ready
-        && primals.contains(&"nestgate".to_string())
-        && primals.contains(&"squirrel".to_string());
+        && capabilities.contains(&"data.ncbi")
+        && capabilities.contains(&"storage");
 
     println!(
         "  Tower: {} | Node: {} | Nest: {}",
         if tower_ready {
             "READY"
         } else {
-            "needs primals"
+            "needs orchestration+discovery"
         },
         if node_ready {
             "READY"
         } else {
-            "needs toadstool"
+            "needs compute"
         },
         if nest_ready {
             "READY"
         } else {
-            "needs nestgate+squirrel"
+            "needs data.ncbi+storage"
         },
     );
     v.check_pass("NUCLEUS readiness probed", true);
@@ -627,29 +627,47 @@ fn main() {
     v.finish();
 }
 
-fn discover_biomeos() -> Option<PathBuf> {
-    let candidates = [
-        PathBuf::from("../../phase2/biomeOS/target/release/biomeos"),
-        PathBuf::from("../../phase2/biomeOS/target/debug/biomeos"),
-    ];
-    candidates.into_iter().find(|p| p.exists())
+/// Resolve primal socket path via capability-based discovery cascade.
+/// Order: env var → XDG_RUNTIME_DIR/biomeos/{primal}-default.sock →
+/// BIOMEOS_SOCKET_DIR/{primal}-default.sock → temp_dir.
+#[must_use]
+fn discover_socket(env_var: &str, primal: &str) -> PathBuf {
+    if let Ok(path) = std::env::var(env_var) {
+        return PathBuf::from(path);
+    }
+    if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
+        return PathBuf::from(xdg).join(format!("biomeos/{primal}-default.sock"));
+    }
+    if let Ok(dir) = std::env::var("BIOMEOS_SOCKET_DIR") {
+        return PathBuf::from(dir).join(format!("{primal}-default.sock"));
+    }
+    std::env::temp_dir().join(format!("{primal}-default.sock"))
 }
 
-fn discover_primals() -> Vec<String> {
-    let mut found = Vec::new();
-    let primal_paths = [
-        ("beardog", "../../phase1/beardog"),
-        ("songbird", "../../phase1/songbird"),
-        ("toadstool", "../../phase1/toadstool"),
-        ("nestgate", "../../phase1/nestgate"),
-        ("squirrel", "../../phase2/rhizoCrypt"),
-        ("petaltongue", "../../phase2/petalTongue"),
-        ("biomeos", "../../phase2/biomeOS"),
+/// Discover primal sockets via env-based discovery. Returns capability names
+/// for primals whose sockets exist.
+fn discover_primal_sockets() -> Vec<&'static str> {
+    let configs = [
+        ("BEARDOG_SOCKET", "beardog", "orchestration"),
+        ("SONGBIRD_SOCKET", "songbird", "discovery"),
+        ("TOADSTOOL_SOCKET", "toadstool", "compute"),
+        ("NESTGATE_SOCKET", "nestgate", "data.ncbi"),
+        ("SQUIRREL_SOCKET", "squirrel", "storage"),
+        ("PETALTONGUE_SOCKET", "petaltongue", "visualization"),
+        ("BIOMEOS_SOCKET", "biomeos", "coordination"),
     ];
-    for (name, path) in &primal_paths {
-        if Path::new(path).exists() {
-            found.push((*name).to_string());
-        }
+    configs
+        .iter()
+        .filter(|(env, primal, _)| discover_socket(env, primal).exists())
+        .map(|(_, _, cap)| *cap)
+        .collect()
+}
+
+fn discover_biomeos() -> Option<PathBuf> {
+    let p = discover_socket("BIOMEOS_SOCKET", "biomeos");
+    if p.exists() {
+        Some(p)
+    } else {
+        None
     }
-    found
 }

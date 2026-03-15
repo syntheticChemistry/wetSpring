@@ -187,7 +187,7 @@ fn validate_pcoa(v: &mut Validator, gpu: &GpuF64) {
         let cc = cpu_result.sample_coords(si);
         let gc = gpu_result.sample_coords(si);
         for (ai, (&cv, &gv)) in cc.iter().zip(gc.iter()).enumerate() {
-            let sign_flip = if cv.signum() != gv.signum() && cv.abs() > 1e-6 {
+            let sign_flip = if cv.signum() != gv.signum() && cv.abs() > tolerances::GPU_VS_CPU_F64 {
                 -1.0
             } else {
                 1.0

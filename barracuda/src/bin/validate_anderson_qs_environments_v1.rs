@@ -332,7 +332,7 @@ fn main() {
             var_p += dp * dp;
             var_k += dk * dk;
         }
-        if var_p < 1e-12 || var_k < 1e-12 {
+        if var_p < tolerances::ANALYTICAL_F64 || var_k < tolerances::ANALYTICAL_F64 {
             return 0.0;
         }
         cov / (var_p.sqrt() * var_k.sqrt())

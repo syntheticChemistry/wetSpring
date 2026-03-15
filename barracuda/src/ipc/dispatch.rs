@@ -30,6 +30,7 @@ pub use handlers::{extract_f64_array, extract_string_array};
 pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
     match method {
         "health.check" => handlers::handle_health(),
+        "capability.list" => handlers::handle_capability_list(),
 
         // Core science capabilities
         "science.diversity" => handlers::handle_diversity(params),
@@ -257,5 +258,37 @@ mod tests {
 
         let att = dispatch("brain.attention", &json!({})).unwrap();
         assert!(att["observation_count"].as_u64().unwrap() >= 1);
+    }
+
+    #[test]
+    fn capability_list_returns_all_domains() {
+        let result = dispatch("capability.list", &json!({})).unwrap();
+        assert_eq!(result["primal"], "wetspring");
+        assert_eq!(result["domain"], "ecology");
+
+        let domains = result["domains"].as_array().unwrap();
+        assert_eq!(domains.len(), 14);
+
+        let domain_names: Vec<&str> = domains
+            .iter()
+            .filter_map(|d| d["name"].as_str())
+            .collect();
+        assert!(domain_names.contains(&"ecology.diversity"));
+        assert!(domain_names.contains(&"provenance"));
+        assert!(domain_names.contains(&"brain"));
+        assert!(domain_names.contains(&"metrics"));
+    }
+
+    #[test]
+    fn capability_list_methods_total() {
+        let result = dispatch("capability.list", &json!({})).unwrap();
+        let total_methods: usize = result["domains"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter_map(|d| d["methods"].as_array())
+            .map(|m| m.len())
+            .sum();
+        assert_eq!(total_methods, 19);
     }
 }

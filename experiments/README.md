@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-15 (V115: 375 experiments, 354 binaries, 5,707+ checks, 1,662 tests. Exp375 — V115 deep audit: UniBin compliance, capability domains, tolerance centralization, XDG path resolution, metalForge 90% coverage. V114: Exp374 — docs cleanup, niche guidance, BarraCUDA absorption handoff.)
+**Updated**: 2026-03-15 (V116: 376 experiments, 354 binaries, 5,707+ checks, 1,662 tests. Exp376 — V116 deep audit execution: `capability.list` handler, capability domain expansion (14 domains, 19 methods), inline tolerance centralization (15 binaries), capability-based primal discovery (3 binaries), forge lint parity, stale documentation evolution. V115: Exp375 — deep audit: UniBin compliance, capability domains, tolerance centralization, XDG path resolution, metalForge 90% coverage.)
 
 ---
 
@@ -621,7 +621,27 @@ Updated STUDY.md, baseCamp, README to current counts. Created BarraCUDA
 absorption handoff mapping 8 GPU primitive opportunities from wetSpring science
 modules. Created niche setup guidance for springs modeling the wetSpring pattern.
 
-**Totals: 375 experiments, 354 binaries, 5,707+ checks.**
+### Exp375: V115 Deep Audit — UniBin + Capability Domains + Tolerance + XDG (PASS)
+
+12-finding audit: UniBin binary compliance, capability domain architecture
+(19 capabilities, 4 domains), tolerance centralization (NMF_CONVERGENCE,
+MATRIX_EPS, STABLE_SPECIAL_TINY), XDG path resolution, Python baseline
+provenance (SHA-256 + git commit), bitflag refactoring, metalForge 90%
+coverage boost, cast safety documentation.
+
+### Exp376: V116 Deep Audit Execution — Capability Discovery + Tolerance Centralization (PASS)
+
+Full execution of V115 audit findings: `capability.list` JSON-RPC handler
+implemented (dispatch + handlers), capability domains expanded (11 → 14
+domains, 4 families, 19 methods), 15 inline tolerance literals centralized
+across 10 validation binaries, 3 binaries refactored to capability-based
+primal discovery (env → XDG → BIOMEOS_SOCKET_DIR → temp), forge lint parity
+(`missing_docs`, `pedantic`, `nursery`), stale documentation evolved
+(STUDY.md, barracuda/README, scripts/README, specs/README). Audit
+false-positives resolved (all `panic!()` and `unwrap()` confirmed test-only).
+31 IPC tests pass, 19 files changed (342+, 130−).
+
+**Totals: 376 experiments, 354 binaries, 5,707+ checks.**
 
 ---
 

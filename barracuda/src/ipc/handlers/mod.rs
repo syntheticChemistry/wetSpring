@@ -29,7 +29,12 @@ use serde_json::{Value, json};
 use crate::ipc::protocol::RpcError;
 
 /// Capabilities advertised by this primal, derived from the dispatch table.
+///
+/// Kept in sync with [`crate::ipc::capability_domains::DOMAINS`] — the domain
+/// registry is the source of truth; this list adds `capability.list` (the
+/// introspection method that is not itself a domain capability).
 pub const CAPABILITIES: &[&str] = &[
+    "capability.list",
     "science.diversity",
     "science.anderson",
     "science.qs_model",
@@ -72,6 +77,32 @@ fn try_gpu() -> Option<&'static GpuF64> {
         })
         .as_ref()
         .filter(|g| !g.is_lost())
+}
+
+/// Capability listing per Spring-as-Niche Deployment Standard.
+///
+/// Returns all domains with their methods, descriptions, and GPU status.
+pub fn handle_capability_list() -> Result<Value, RpcError> {
+    use crate::ipc::capability_domains::DOMAINS;
+
+    let domains: Vec<Value> = DOMAINS
+        .iter()
+        .map(|d| {
+            json!({
+                "name": d.name,
+                "description": d.description,
+                "methods": d.methods,
+            })
+        })
+        .collect();
+
+    Ok(json!({
+        "primal": crate::PRIMAL_NAME,
+        "version": env!("CARGO_PKG_VERSION"),
+        "domain": crate::ipc::capability_domains::DOMAIN,
+        "capabilities": CAPABILITIES,
+        "domains": domains,
+    }))
 }
 
 /// Health/readiness probe.

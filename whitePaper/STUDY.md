@@ -16,7 +16,7 @@ energy, and memory in a unified benchmark harness. The study covers
 four tracks: 16S amplicon metagenomics (Track 1), comparative genomics
 and mathematical biology (Track 1b), deep-sea metagenomics and microbial
 evolution (Track 1c), and PFAS detection via LC-MS (Track 2),
-validating 88+ Rust modules (47 CPU + 45 GPU) against baselines from Galaxy,
+validating 94+ Rust modules (47 CPU + 47 GPU) against baselines from Galaxy,
 QIIME2, asari, FindPFAS, scipy, sklearn, dendropy, real NCBI SRA data, and
 published paper models with 5,707+ quantitative checks across 375 experiments
 and 354 validation binaries — all passing. The pipeline proves substrate independence: math produces
@@ -69,7 +69,7 @@ chemistry:
 | Baseline | Python scipy | Galaxy/QIIME2 | asari/PFΔScreen |
 | GPU layer | ToadStool (wgpu) | ToadStool (wgpu) | ToadStool (wgpu) |
 | Success metric | chi² match | Same taxonomy | Same PFAS detected |
-| Checks | 418/418 | 2,673+/2,673+ | (included in 2,673+) |
+| Checks | 418/418 | 5,707+/5,707+ | (included in 5,707+) |
 
 Both prove the ecoPrimals thesis: sovereign compute on consumer hardware
 can replicate institutional results, then exceed them via Rust + GPU.
@@ -245,17 +245,7 @@ Pipeline flow:
     → taxonomy GEMM (GPU) → diversity FMR (GPU) → results
 ```
 
-**Local WGSL shaders (5 in Write phase — 24 absorbed lean):**
-
-| Shader | Vars | Params | Status |
-|--------|------|--------|--------|
-| `phage_defense_ode_rk4_f64.wgsl` | 4 | 11 | Exact CPU ↔ GPU parity (Exp099) |
-| `bistable_ode_rk4_f64.wgsl` | 5 | 21 | Exact CPU ↔ GPU parity (Exp100) |
-| `multi_signal_ode_rk4_f64.wgsl` | 7 | 24 | Exact CPU ↔ GPU parity (Exp100) |
-| `cooperation_ode_rk4_f64.wgsl` | 4 | 13 | Exact CPU ↔ GPU parity (Exp101) |
-| `capacitor_ode_rk4_f64.wgsl` | 6 | 16 | Exact CPU ↔ GPU parity (Exp101) |
-
-Absorption target: ToadStool `BatchedOdeRK4Generic<N_VARS, N_PARAMS>`.
+**Local WGSL shaders: 0 (all absorbed by barraCuda).**
 
 **Previously local, now upstream ToadStool primitives (8 absorbed):**
 
@@ -525,7 +515,7 @@ Code quality gates (all enforced in CI):
 - `cargo clippy --all-targets --features gpu -- -D warnings` — zero GPU-specific warnings
 - `RUSTDOCFLAGS="-D warnings" cargo doc --no-deps` — zero doc warnings
 - 0 production `unsafe` blocks (`#![deny(unsafe_code)]`; test-only `allow` for edition 2024 `env::set_var`), 0 `TODO`/`FIXME`, 0 production `unwrap()`/`expect()` (`#![deny(clippy::expect_used, clippy::unwrap_used)]` enforced crate-wide)
-- 53 named tolerance constants in `tolerances.rs` (scientifically justified, hierarchy-tested)
+- 180+ named tolerance constants in `tolerances.rs` (scientifically justified, hierarchy-tested)
 - Shared math consolidated in `crate::special` (erf, ln_gamma, `regularized_gamma_lower`, `normal_cdf`) — no duplication
 - 6 determinism tests covering diversity, Bray-Curtis, DADA2, chimera, taxonomy, and the full 16S pipeline
 
@@ -538,7 +528,7 @@ the shared crate. This cycle has completed for **12 bio primitives**: the origin
 4 (SmithWatermanGpu, GillespieGpu, TreeInferenceGpu, FelsensteinGpu) plus
 8 absorbed on Feb 22, 2026 (HmmBatchForwardF64, AniBatchF64, SnpCallingF64,
 DnDsBatchF64, PangenomeClassifyGpu, QualityFilterGpu, Dada2EStepGpu,
-RfBatchInferenceGpu). 5 local WGSL ODE shaders (Write phase; pending ToadStool absorption as `BatchedOdeRK4Generic`).
+RfBatchInferenceGpu). 0 local WGSL (all absorbed by barraCuda).
 The rewire process itself discovered
 and fixed two ToadStool bugs: an SNP binding layout mismatch and an
 AdapterInfo propagation failure that broke f64 polyfill detection on RTX 4070.
@@ -546,9 +536,9 @@ AdapterInfo propagation failure that broke f64 polyfill detection on RTX 4070.
 | Stage | Extensions | Status |
 |-------|-----------|--------|
 | **Absorbed/Lean** (27) | SW, Gillespie, DT, Felsenstein, GEMM, diversity, HMM, ANI, SNP, dN/dS, Pangenome, QF, DADA2, RF, kmer, unifrac, taxonomy, + 5 cross-spring | Lean on upstream |
-| **Write** (5 local WGSL) | phage_defense, bistable, multi_signal, cooperation, capacitor | ODE shaders pending ToadStool absorption |
+| **Write** (0 local WGSL) | — | All absorbed by barraCuda |
 | **Compose** (7) | kmd, merge_pairs, robinson_foulds, derep, NJ, reconciliation, molecular_clock | Wire ToadStool primitives |
-| **Passthrough** (3) | gbm, feature_table, signal | Accept GPU buffers, CPU kernel |
+| **Passthrough** (0) — all promoted | — | — |
 | **Tier B** | 0 | All promoted (Phase 28) |
 | **Tier C** | 0 | All promoted (Phase 28) |
 

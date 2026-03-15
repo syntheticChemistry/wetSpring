@@ -165,7 +165,7 @@ fn main() {
         "D60: First-order B(t_half) = B_max/2",
         first_order(t_half, b_max, k_rate),
         b_max / 2.0,
-        1e-10,
+        tolerances::ANALYTICAL_LOOSE,
     );
     d60 += 1;
 
@@ -387,7 +387,7 @@ fn main() {
     // norm_cdf analytical checks (shared with Track 4)
     v.check("D64: Φ(0) = 0.5", norm_cdf(0.0), 0.5, tolerances::EXACT_F64);
     d64 += 1;
-    v.check("D64: Φ(-∞) → 0", norm_cdf(-10.0), 0.0, 1e-10);
+    v.check("D64: Φ(-∞) → 0", norm_cdf(-10.0), 0.0, tolerances::PYTHON_PARITY);
     d64 += 1;
 
     // Gompertz parameter sensitivity: doubling Rm doubles early-phase rate

@@ -120,7 +120,7 @@ fn validate_molecular_clock(v: &mut Validator) {
     let cv = molecular_clock::rate_variation_cv(&positive_rates);
     v.check(
         "Strict tree rate CV ≈ 0",
-        f64::from(u8::from(cv < 1e-10)),
+        f64::from(u8::from(cv < tolerances::PYTHON_PARITY)),
         1.0,
         tolerances::EXACT,
     );

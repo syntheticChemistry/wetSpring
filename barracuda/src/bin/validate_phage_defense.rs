@@ -26,7 +26,7 @@ use wetspring_barracuda::bio::phage_defense::{
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
-const DT: f64 = 0.001;
+const DT: f64 = tolerances::ODE_DEFAULT_DT;
 const SS: f64 = 0.1;
 
 fn main() {

@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** March 15, 2026 (V115 — barraCuda v0.3.5 standalone, toadStool S130+, coralReef Phase 10, wgpu 28. 1,662 tests (0 failures), 354 binaries, 180 tolerances. biomeOS niche — deploy graph, 19 capabilities, provenance trio, cross-spring time series. V114: docs cleanup, niche guidance, BarraCUDA absorption handoff (8 GPU primitive opportunities). V113: trio + capabilities + deploy graph. clippy ZERO WARNINGS pedantic+nursery.)
+**Updated:** March 15, 2026 (V116 — barraCuda v0.3.5 standalone, toadStool S130+, coralReef Phase 10, wgpu 28. 1,662 tests (0 failures), 354 binaries, 180 tolerances. biomeOS niche — deploy graph, 20 capabilities (14 domains, 19 methods), provenance trio, cross-spring time series. V114: docs cleanup, niche guidance, BarraCUDA absorption handoff (8 GPU primitive opportunities). V113: trio + capabilities + deploy graph. clippy ZERO WARNINGS pedantic+nursery.)
 
 ---
 
@@ -17,14 +17,14 @@ baseline through Rust CPU to GPU acceleration via barraCuda.
 ```
 wetspring-barracuda
 ├── 47 CPU bio modules          (pure Rust math, no external C deps)
-├── 45 GPU bio modules          (45 Lean + 7 Compose, 0 Passthrough)
+├── 47 GPU bio modules          (47 Lean/Compose, 0 Passthrough)
 ├── 1 provenance module         (barracuda::shaders::provenance wiring)
 ├── 3 streaming I/O parsers     (FASTQ/gzip, mzML/base64, MS2)
-├── 291 validation/benchmark binaries
+├── 354 validation/benchmark binaries
 └── depends on: barracuda via path dependency
 ```
 
-45 Lean GPU modules delegate to `barracuda::ops::*` primitives.
+47 Lean GPU modules delegate to `barracuda::ops::*` primitives.
 Builder patterns wired: `HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`.
 `PrecisionRoutingAdvice` for shared-memory f64 safety.
 
@@ -104,7 +104,7 @@ Builder patterns wired: `HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`.
 | `tolerance_search` | ppm/Da m/z search | FindPFAS |
 | `unifrac` | UniFrac + Newick parser | QIIME2 |
 
-### GPU Bio (20 modules)
+### GPU Bio (47 modules)
 
 | Module | barraCuda Primitive | Status |
 |--------|-------------------|--------|
@@ -162,7 +162,7 @@ Builder patterns wired: `HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`.
 | Tests | 1,288 lib + 219 integration (plus forge + doc) |
 | ESN ridge regression | Proper Cholesky solve (not diagonal approximation) |
 | I/O parsers | Streaming-first; buffering APIs deprecated |
-| Validation checks | 8,431+ across 291 binaries |
+| Validation checks | 8,431+ across 354 binaries |
 
 ## Quick Start
 

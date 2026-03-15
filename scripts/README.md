@@ -3,7 +3,7 @@
 **Purpose:** Python/numpy/scipy/sklearn/vegan baselines for validation against
 Rust CPU and GPU implementations.
 
-**Status:** Frozen — 40+ scripts, mathematical outputs validated. See
+**Status:** Frozen — 71 scripts, mathematical outputs validated. See
 `BASELINE_MANIFEST.md` for per-script provenance and SHA-256 hashes.
 
 These scripts establish the gold-standard reference output that wetSpring's
