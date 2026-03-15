@@ -137,3 +137,20 @@ pub const MZ_SEARCH_RELAXED: f64 = 1e-4;
 /// from library should match within 0.01 Da for correct series detection.
 /// Validated: Exp018 (cross-series discrimination).
 pub const CF2_SPACING_TOL: f64 = 0.01;
+
+/// PFSA homologue separation window (Da) for library filtering.
+///
+/// PFSA homologous series members (e.g., PFBS → `PFHxS` → PFOS) are
+/// spaced ~50 Da apart. The filtering window of 60 Da allows matching
+/// with margin for adduct variation and mass calibration drift.
+/// Validated: Exp018 (PFAS library validation).
+pub const PFSA_HOMOLOGUE_WINDOW: f64 = 60.0;
+
+/// Retention index matching tolerance (unitless RI units).
+///
+/// Kovats or linear retention indices from GC-MS should match
+/// literature/theoretical values within 0.1 RI units for confirmed
+/// VOC identifications. Covers column-temperature variation and
+/// calibrant drift.
+/// Validated: Exp013 (VOC peak validation vs Reese 2019 Table 1).
+pub const RETENTION_INDEX_MATCH: f64 = 0.1;

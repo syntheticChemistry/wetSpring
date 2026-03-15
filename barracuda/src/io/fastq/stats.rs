@@ -67,7 +67,8 @@ impl StatsAccumulator {
             self.total_quality_sum += q_sum;
             self.total_quality_count += quality.len() as u64;
 
-            #[expect(clippy::cast_precision_loss)] // Precision: quality.len() and q_sum bounded by read
+            #[expect(clippy::cast_precision_loss)]
+            // Precision: quality.len() and q_sum bounded by read
             let mean_q = q_sum as f64 / quality.len() as f64;
             if mean_q >= 30.0 {
                 self.q30_count += 1;

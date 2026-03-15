@@ -269,10 +269,7 @@ mod tests {
         let domains = result["domains"].as_array().unwrap();
         assert_eq!(domains.len(), 14);
 
-        let domain_names: Vec<&str> = domains
-            .iter()
-            .filter_map(|d| d["name"].as_str())
-            .collect();
+        let domain_names: Vec<&str> = domains.iter().filter_map(|d| d["name"].as_str()).collect();
         assert!(domain_names.contains(&"ecology.diversity"));
         assert!(domain_names.contains(&"provenance"));
         assert!(domain_names.contains(&"brain"));

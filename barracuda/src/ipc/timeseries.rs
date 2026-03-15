@@ -44,10 +44,7 @@ pub fn build_time_series(
 ///
 /// Returns `RpcError::invalid_params` if schema is missing or wrong version.
 pub fn parse_time_series(params: &Value) -> Result<TimeSeriesData, RpcError> {
-    let schema = params
-        .get("schema")
-        .and_then(Value::as_str)
-        .unwrap_or("");
+    let schema = params.get("schema").and_then(Value::as_str).unwrap_or("");
 
     if schema != SCHEMA {
         return Err(RpcError::invalid_params(format!(
@@ -187,7 +184,9 @@ fn extract_ts_data(params: &Value) -> Result<TimeSeriesData, RpcError> {
         .and_then(parse_time_series)?;
 
     if data.values.is_empty() {
-        return Err(RpcError::invalid_params("time_series values array is empty"));
+        return Err(RpcError::invalid_params(
+            "time_series values array is empty",
+        ));
     }
 
     Ok(data)

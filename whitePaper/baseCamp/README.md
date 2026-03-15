@@ -2,7 +2,7 @@
 
 **Date:** March 15, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V116 — 376 experiments, 5,707+ validation checks, ALL PASS; 1,662 tests (0 failures), 354 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 784+ WGSL shaders), toadStool S130+, coralReef Phase 10. biomeOS niche — deploy graph, 19 capabilities, provenance trio integration, cross-spring time series, Neural API workflow graphs. V115: deep audit — UniBin compliance, capability domains (4 domains), tolerance centralization, XDG path resolution, metalForge 90% coverage. V114: docs cleanup, niche guidance, BarraCUDA absorption handoff. V113: provenance trio + expanded capabilities + deploy graph. V112: streaming-only I/O, capability-based discovery. 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL, 180 tolerances, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS.
+**Status:** V117 — 376 experiments, 5,707+ validation checks, ALL PASS; 1,667 tests (0 failures), 354 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 784+ WGSL shaders), toadStool S130+, coralReef Phase 10. biomeOS niche — deploy graph, 14 capability domains / 19 methods, provenance trio integration, cross-spring time series, Neural API workflow graphs. V117: deep tolerance centralization — 39 fmt fixes, 12 unfulfilled expects removed, 4 production panics eliminated, 5 ESN thresholds centralized, 13 new tolerance constants, 30+ inline literals replaced in 17 binaries. 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL, 200+ tolerances, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS.
 
 ---
 

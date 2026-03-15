@@ -84,10 +84,7 @@ fn run_server() {
         },
     );
 
-    eprintln!(
-        "  Capabilities: {} methods registered",
-        CAPABILITIES.len()
-    );
+    eprintln!("  Capabilities: {} methods registered", CAPABILITIES.len());
     eprintln!("  Ready.");
 
     server.run();

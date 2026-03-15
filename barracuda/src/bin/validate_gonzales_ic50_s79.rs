@@ -44,6 +44,7 @@
 use std::time::Instant;
 
 use barracuda::stats::{hill, mean};
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 struct Timing {
@@ -117,7 +118,10 @@ fn main() {
     }
     println!("  └─────────────────┴──────────┴─────────────────────────┘");
 
-    v.check_pass("JAK1 IC50 = 10 nM", (targets[0].ic50_nm - 10.0).abs() < 0.1);
+    v.check_pass(
+        "JAK1 IC50 = 10 nM",
+        (targets[0].ic50_nm - 10.0).abs() < tolerances::PHARMACOKINETIC_PARITY,
+    );
     v.check_pass(
         "IC50 ordering: JAK1 < IL-2 < IL-31 < IL-6 < IL-4 < IL-13",
         targets[0].ic50_nm < targets[1].ic50_nm
@@ -131,11 +135,11 @@ fn main() {
     let selectivity_il4 = targets[4].ic50_nm / targets[0].ic50_nm;
     v.check_pass(
         "JAK1 selectivity: IL-31/JAK1 ≈ 7.1×",
-        (selectivity_il31 - 7.1).abs() < 0.1,
+        (selectivity_il31 - 7.1).abs() < tolerances::PHARMACOKINETIC_PARITY,
     );
     v.check_pass(
         "JAK1 selectivity: IL-4/JAK1 = 15×",
-        (selectivity_il4 - 15.0).abs() < 0.1,
+        (selectivity_il4 - 15.0).abs() < tolerances::PHARMACOKINETIC_PARITY,
     );
 
     let cpu_us = t0.elapsed().as_micros() as f64;
@@ -166,7 +170,7 @@ fn main() {
         let at_ic50 = inhibition(t.ic50_nm, t.ic50_nm, n_hill);
         v.check_pass(
             &format!("{}: inhibition at IC50 ≈ 50%", t.name),
-            (at_ic50 - 0.5).abs() < 0.01,
+            (at_ic50 - 0.5).abs() < tolerances::IC50_RESPONSE_TOL,
         );
 
         let at_low = inhibition(t.ic50_nm * 0.01, t.ic50_nm, n_hill);

@@ -18,7 +18,7 @@ and mathematical biology (Track 1b), deep-sea metagenomics and microbial
 evolution (Track 1c), and PFAS detection via LC-MS (Track 2),
 validating 94+ Rust modules (47 CPU + 47 GPU) against baselines from Galaxy,
 QIIME2, asari, FindPFAS, scipy, sklearn, dendropy, real NCBI SRA data, and
-published paper models with 5,707+ quantitative checks across 375 experiments
+published paper models with 5,707+ quantitative checks across 376 experiments
 and 354 validation binaries — all passing. The pipeline proves substrate independence: math produces
 identical results on CPU and GPU, validated via metalForge cross-substrate
 checks (Exp060). Random Forest ensemble and Gradient Boosting Machine
@@ -26,7 +26,7 @@ inference achieve 100% specification parity, joining the existing decision
 tree engine to cover the three dominant ensemble ML methods in pure Rust.
 Gillespie stochastic simulation converges to analytical
 steady state within 0.2%. Robinson-Foulds tree distance matches dendropy
-exactly. Rust runs 22.5× faster than Python across all 25 algorithmic domains
+exactly. Rust runs 33.4× faster than Python across all 25 algorithmic domains
 (Exp059), with peak speedup of 625× for Smith-Waterman alignment. The full 16S pipeline
 runs 8.3–13× faster than Galaxy on CPU (depending on sample size) and
 2.45× faster again on GPU, with 88/88 math parity checks proving
@@ -119,7 +119,7 @@ detection in water via LC-MS. Source papers: asari (Nature Communications
 | RAM | 64 GB DDR5 |
 | GPU | NVIDIA RTX 4070 12 GB (SHADER_F64) |
 | OS | Pop!_OS 22.04 (Linux 6.17) |
-| Rust | stable 1.85+ (edition 2024) |
+| Rust | stable 1.87+ (edition 2024) |
 | wgpu | v22 (Vulkan backend) |
 
 ---
@@ -330,7 +330,7 @@ and cross-substrate routing.
 |-----|--------|:------:|---------------|
 | 064 | `validate_barracuda_gpu_v1` | 26 | All GPU-eligible domains in one binary |
 | 065 | `validate_metalforge_full` | 35 | CPU↔GPU parity for full portfolio |
-| 070 | `validate_barracuda_cpu_full` | 50 | 25-domain pure Rust math, 22.5× vs Python |
+| 070 | `validate_barracuda_cpu_full` | 50 | 25-domain pure Rust math, 33.4× vs Python |
 | 071 | `validate_barracuda_gpu_full` | 24 | 11-domain GPU portability proof |
 
 **Streaming and dispatch:**
@@ -415,7 +415,7 @@ FASTQ → quality filter → adapter trim → paired-end merge
   → diversity metrics → UniFrac distance → PCoA ordination
 ```
 
-Each stage has unit tests (750 total, 97% bio+io line coverage), end-to-end
+Each stage has unit tests (1,667 total, 94% barracuda line coverage), end-to-end
 validation against Galaxy baselines, GPU math parity checks, and
 determinism tests ensuring identical output across runs.
 
@@ -435,7 +435,7 @@ determinism tests ensuring identical output across runs.
 
 ### 4.1 Replication success
 
-All 29 actionable papers in the review queue are now reproduced, covering
+All 63 papers in the review queue are now reproduced, covering
 ODE systems (6 models), stochastic simulation, HMM, phylogenetic algorithms
 (Felsenstein, Robinson-Foulds, bootstrap, placement), sequence alignment
 (Smith-Waterman), phage defense dynamics, and deep-sea metagenomics
@@ -445,7 +445,7 @@ against Python baselines with public data.
 
 ### 4.2 Rust as a scientific computing platform
 
-87 modules (45 CPU bio, 45 GPU, plus I/O and benchmarking) with minimal
+94+ modules (47 CPU bio, 47 GPU, plus I/O and benchmarking) with minimal
 runtime dependency (`flate2` for gzip) demonstrate that Rust can serve
 as a standalone platform for bioinformatics and analytical chemistry.
 The sovereign XML, FASTQ, mzML, and MS2 parsers eliminate the need for
@@ -515,7 +515,7 @@ Code quality gates (all enforced in CI):
 - `cargo clippy --all-targets --features gpu -- -D warnings` — zero GPU-specific warnings
 - `RUSTDOCFLAGS="-D warnings" cargo doc --no-deps` — zero doc warnings
 - 0 production `unsafe` blocks (`#![deny(unsafe_code)]`; test-only `allow` for edition 2024 `env::set_var`), 0 `TODO`/`FIXME`, 0 production `unwrap()`/`expect()` (`#![deny(clippy::expect_used, clippy::unwrap_used)]` enforced crate-wide)
-- 180+ named tolerance constants in `tolerances.rs` (scientifically justified, hierarchy-tested)
+- 200+ named tolerance constants across `tolerances/` submodules (scientifically justified, hierarchy-tested)
 - Shared math consolidated in `crate::special` (erf, ln_gamma, `regularized_gamma_lower`, `normal_cdf`) — no duplication
 - 6 determinism tests covering diversity, Bray-Curtis, DADA2, chimera, taxonomy, and the full 16S pipeline
 
@@ -558,8 +558,8 @@ A fourth function (`integrate_peak` in `bio::eic`) duplicates
 shaped for ToadStool absorption via GPU-friendly patterns: flat arrays (SoA),
 `#[repr(C)]` parameter structs, batch APIs, preallocated buffers, and
 deterministic math. The `metalForge/` directory characterizes local hardware
-(GPU, NPU, CPU) and documents substrate routing for each algorithm. 39 named
-tolerance constants in `tolerances.rs` (43 total) ensure all validation
+(GPU, NPU, CPU) and documents substrate routing for each algorithm. 200+ named
+tolerance constants across `tolerances/` submodules (4 submodules: bio, gpu, spectral, instrument) ensure all validation
 thresholds are scientifically justified and ready for cross-Spring adoption.
 
 Full absorption map: `barracuda/EVOLUTION_READINESS.md`.
@@ -576,7 +576,7 @@ repository (AGPL-3.0). No institutional access required.
 ```bash
 # Run all CPU validations (1,476+ checks)
 cd barracuda
-cargo test --release          # 1,662 tests (1,330 barracuda lib + 234 forge lib + 89 integration + 9 doc)
+cargo test --release          # 1,667 tests (1,335 barracuda lib + 234 forge lib + 89 integration + 9 doc)
 cargo run --release --bin validate_fastq
 cargo run --release --bin validate_diversity
 cargo run --release --bin validate_mzml

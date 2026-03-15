@@ -616,7 +616,10 @@ fn validate_cross_series_discrimination(v: &mut Validator) {
 
     // PFSA has a gap (PFPeS→PFHxS, PFHpS→PFOS, PFOS→PFDS)
     // Only adjacent-by-1-CF2 pairs should be ~50 Da
-    let single_cf2: Vec<&f64> = pfsa_diffs.iter().filter(|d| d.abs() < 60.0).collect();
+    let single_cf2: Vec<&f64> = pfsa_diffs
+        .iter()
+        .filter(|d| d.abs() < tolerances::PFSA_HOMOLOGUE_WINDOW)
+        .collect();
 
     if !single_cf2.is_empty() {
         let pfsa_cf2_mean: f64 = single_cf2.iter().copied().sum::<f64>() / single_cf2.len() as f64;

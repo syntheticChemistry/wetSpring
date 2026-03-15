@@ -195,10 +195,7 @@ mod tests {
 
     #[test]
     fn write_inventory_mixed() {
-        let substrates = vec![
-            cpu_substrate("cpu-0"),
-            gpu_substrate("gpu-0"),
-        ];
+        let substrates = vec![cpu_substrate("cpu-0"), gpu_substrate("gpu-0")];
         let mut buf = Vec::new();
         write_inventory(&substrates, &mut buf).unwrap();
         let output = String::from_utf8(buf).unwrap();

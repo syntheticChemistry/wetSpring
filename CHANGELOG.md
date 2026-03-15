@@ -3,6 +3,40 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V117] — 2026-03-15
+
+### Deep Tolerance Centralization + Code Quality Hardening
+
+Systematic code quality sweep: format compliance, lint purity, panic elimination,
+and deep tolerance centralization across library code and validation binaries.
+
+#### Format + Lint Compliance
+- 39 `cargo fmt` violations resolved across 19 files
+- 12 unfulfilled `#[expect()]` attributes removed from `validate_cpu_vs_gpu_v11.rs` (7) and `validate_barracuda_cpu_v27.rs` (5)
+- Zero clippy warnings (pedantic + nursery), zero fmt violations
+
+#### Production Panic Elimination (4 → 0)
+- `bio/brain/nautilus_bridge.rs`: `panic!("expected continuous input")` → `Err(Error::InvalidInput(...))`
+- `bio/derep_gpu.rs`, `bio/chimera_gpu.rs`, `bio/reconciliation_gpu.rs`: `.unwrap_or_else(|e| panic!())` → `?`
+
+#### ESN Urgency Threshold Centralization
+- 5 named constants in `bio/esn/heads.rs`: `URGENCY_ESCALATE_ALERT` (0.6), `URGENCY_ESCALATE_CRITICAL` (0.8), `URGENCY_DEESCALATE` (0.3), `PHASE_LABEL_LOW` (0.3), `PHASE_LABEL_HIGH` (0.6)
+
+#### Tolerance Constant Expansion (13 new, 200+ total)
+- `spectral.rs`: `SOIL_QS_TILLAGE`, `ANDERSON_NU_PARITY`, `GEOMETRY_DIMENSIONAL_PARITY`, `FAO56_ET0_PARITY`, `INTERCEPT_NEAR_ZERO`
+- `gpu.rs`: `ODE_GPU_LANDSCAPE_PARITY`
+- `instrument.rs`: `PFSA_HOMOLOGUE_WINDOW`, `RETENTION_INDEX_MATCH`
+- `mod.rs`: `PHARMACOKINETIC_PARITY`, `IC50_RESPONSE_TOL`, `REGRESSION_FIT_PARITY`, `RAREFACTION_BOOTSTRAP_SHANNON`
+
+#### Binary Tolerance Replacements (30+ across 17 binaries)
+- Inline float literals replaced with named constants from `tolerances::*`
+- Affected: `validate_gonzales_*`, `validate_cross_spring_*`, `validate_kbs_lter_*`, `validate_pfas_*`, and 12 more
+
+#### Quality Gates
+- 1,667 tests (1,335 barracuda + 234 forge + 89 integration + 9 doc), 0 failures, 2 ignored
+- Zero `panic!()` in production code, zero `unsafe`, zero clippy warnings
+- 44 files changed (385 insertions, 173 deletions)
+
 ## [V116] — 2026-03-15
 
 ### Deep Audit Execution — Capability Discovery + Tolerance Centralization + Doc Evolution

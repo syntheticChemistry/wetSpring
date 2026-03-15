@@ -207,10 +207,12 @@ mod tests {
     /// is identical via `test_chimera_fast`.
     #[tokio::test]
     #[ignore = "requires GPU hardware"]
-    async fn gpu_matches_cpu_chimera() {
-        let Ok(gpu) = GpuF64::new().await else { return };
+    async fn gpu_matches_cpu_chimera() -> Result<()> {
+        let Ok(gpu) = GpuF64::new().await else {
+            return Ok(());
+        };
         if !gpu.has_f64 {
-            return;
+            return Ok(());
         }
 
         let parent_a = b"ACGTACGTACTTTTTTTTTT";
@@ -232,8 +234,7 @@ mod tests {
         }
 
         let (cpu_results, cpu_stats) = chimera::detect_chimeras(&asvs, &ChimeraParams::default());
-        let (gpu_results, gpu_stats) = detect_chimeras_gpu(&gpu, &asvs, &ChimeraParams::default())
-            .unwrap_or_else(|e| panic!("GPU: {e}"));
+        let (gpu_results, gpu_stats) = detect_chimeras_gpu(&gpu, &asvs, &ChimeraParams::default())?;
 
         assert_eq!(cpu_stats.chimeras_found, gpu_stats.chimeras_found);
         assert_eq!(cpu_stats.retained, gpu_stats.retained);
@@ -243,5 +244,6 @@ mod tests {
                 "query_idx={i}"
             );
         }
+        Ok(())
     }
 }

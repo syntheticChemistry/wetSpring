@@ -272,7 +272,12 @@ fn validate_dada2_constants(v: &mut Validator) {
     let params = dada2::Dada2Params::default();
 
     // R/dada2: OMEGA_A = 1e-40
-    v.check("OMEGA_A vs R/dada2", params.omega_a, 1e-40, tolerances::EXACT);
+    v.check(
+        "OMEGA_A vs R/dada2",
+        params.omega_a,
+        1e-40,
+        tolerances::EXACT,
+    );
 
     // R/dada2: BAND_SIZE = 16
     v.check_count(
@@ -493,13 +498,28 @@ fn validate_phyloseq_cophenetic(v: &mut Validator) {
 
     // R/ape cophenetic: d(A,B) = 0.1 + 0.2 = 0.3
     let d_ab = tree.patristic_distance("A", "B").unwrap_or(f64::NAN);
-    v.check("d(A,B) vs R/ape cophenetic", d_ab, 0.3, tolerances::ANALYTICAL_F64);
+    v.check(
+        "d(A,B) vs R/ape cophenetic",
+        d_ab,
+        0.3,
+        tolerances::ANALYTICAL_F64,
+    );
 
     // R/ape cophenetic: d(A,C) = 0.1 + 0.3 + 0.6 + 0.4 = 1.4
     let dist_ac = tree.patristic_distance("A", "C").unwrap_or(f64::NAN);
-    v.check("d(A,C) vs R/ape cophenetic", dist_ac, 1.4, tolerances::ANALYTICAL_F64);
+    v.check(
+        "d(A,C) vs R/ape cophenetic",
+        dist_ac,
+        1.4,
+        tolerances::ANALYTICAL_F64,
+    );
 
     // R/ape cophenetic: d(C,D) = 0.4 + 0.5 = 0.9
     let d_cd = tree.patristic_distance("C", "D").unwrap_or(f64::NAN);
-    v.check("d(C,D) vs R/ape cophenetic", d_cd, 0.9, tolerances::ANALYTICAL_F64);
+    v.check(
+        "d(C,D) vs R/ape cophenetic",
+        d_cd,
+        0.9,
+        tolerances::ANALYTICAL_F64,
+    );
 }

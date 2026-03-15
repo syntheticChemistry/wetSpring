@@ -137,10 +137,12 @@ mod tests {
     /// GPU reconciliation should match CPU (same DP, GPU used for cost aggregation).
     #[tokio::test]
     #[ignore = "requires GPU hardware"]
-    async fn gpu_matches_cpu_reconcile() {
-        let Ok(gpu) = GpuF64::new().await else { return };
+    async fn gpu_matches_cpu_reconcile() -> Result<()> {
+        let Ok(gpu) = GpuF64::new().await else {
+            return Ok(());
+        };
         if !gpu.has_f64 {
-            return;
+            return Ok(());
         }
 
         let host = make_2leaf_host();
@@ -149,10 +151,10 @@ mod tests {
         let costs = DtlCosts::default();
 
         let cpu_result = reconciliation::reconcile_dtl(&host, &para, &tip_map, &costs);
-        let gpu_result = reconcile_dtl_gpu(&gpu, &host, &para, &tip_map, &costs)
-            .unwrap_or_else(|e| panic!("GPU: {e}"));
+        let gpu_result = reconcile_dtl_gpu(&gpu, &host, &para, &tip_map, &costs)?;
 
         assert_eq!(cpu_result.optimal_cost, gpu_result.optimal_cost);
         assert_eq!(cpu_result.optimal_host, gpu_result.optimal_host);
+        Ok(())
     }
 }

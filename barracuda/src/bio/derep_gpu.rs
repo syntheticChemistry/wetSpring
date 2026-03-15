@@ -235,10 +235,12 @@ mod tests {
     /// GPU output should match CPU for dereplication (identical grouping).
     #[tokio::test]
     #[ignore = "requires GPU hardware"]
-    async fn gpu_matches_cpu_derep() {
-        let Ok(gpu) = GpuF64::new().await else { return };
+    async fn gpu_matches_cpu_derep() -> Result<()> {
+        let Ok(gpu) = GpuF64::new().await else {
+            return Ok(());
+        };
         if !gpu.has_f64 {
-            return;
+            return Ok(());
         }
 
         // Need >= 16 records to hit GPU path
@@ -262,8 +264,7 @@ mod tests {
 
         let (cpu_uniques, cpu_stats) =
             super::super::derep::dereplicate(&records, DerepSort::Abundance, 0);
-        let (gpu_uniques, gpu_stats) = dereplicate_gpu(&gpu, &records, DerepSort::Abundance, 0)
-            .unwrap_or_else(|e| panic!("GPU: {e}"));
+        let (gpu_uniques, gpu_stats) = dereplicate_gpu(&gpu, &records, DerepSort::Abundance, 0)?;
 
         assert_eq!(cpu_stats.unique_sequences, gpu_stats.unique_sequences);
         assert_eq!(cpu_stats.max_abundance, gpu_stats.max_abundance);
@@ -272,5 +273,6 @@ mod tests {
             assert_eq!(c.sequence, g.sequence);
             assert_eq!(c.abundance, g.abundance);
         }
+        Ok(())
     }
 }

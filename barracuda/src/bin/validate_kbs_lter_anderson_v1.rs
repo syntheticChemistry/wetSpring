@@ -51,6 +51,7 @@
 //! | Command | `cargo run --release --features gpu,json --bin validate_kbs_lter_anderson_v1` |
 
 use std::time::Instant;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 struct TillageTreatment {
@@ -222,7 +223,7 @@ fn main() {
     // because aerobic soil adds more O₂ disorder. Both are near W_c≈16.5.
     v.check_pass(
         "both treatments near W_c (Anderson transition zone)",
-        (notill_mean_p - conv_mean_p).abs() < 0.2,
+        (notill_mean_p - conv_mean_p).abs() < tolerances::SOIL_QS_TILLAGE,
     );
 
     // ─── D114: Recovery Time Estimation ───

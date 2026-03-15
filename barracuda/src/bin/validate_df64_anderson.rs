@@ -40,6 +40,7 @@
 //! - Slevin & Ohtsuki, PRL 82 (1999): `W_c` = 16.54 ± 0.10
 //! - Rodriguez et al., PRB 84 (2011): ν = 1.571 ± 0.004
 
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 const LATTICE_SIZES: &[usize] = &[6, 8, 10, 12, 14];
@@ -223,7 +224,7 @@ fn main() {
             v.check_pass("ν in [1.0, 2.0]", (1.0..=2.0).contains(&best_nu));
             v.check_pass(
                 "ν within 0.4 of literature (1.57)",
-                (best_nu - LITERATURE_NU).abs() < 0.4,
+                (best_nu - LITERATURE_NU).abs() < tolerances::ANDERSON_NU_PARITY,
             );
         } else {
             v.check_pass("scaling collapse deferred (need more L)", true);

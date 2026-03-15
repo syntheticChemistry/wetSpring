@@ -153,7 +153,7 @@ fn main() {
 
     v.check_pass(
         "Onset ≈ 3 hours (published)",
-        (onset_hours - 3.0).abs() < 0.1,
+        (onset_hours - 3.0).abs() < tolerances::PHARMACOKINETIC_PARITY,
     );
 
     let cpu_us = t0.elapsed().as_micros() as f64;

@@ -153,11 +153,11 @@ fn main() {
     let fit = fit_exponential(&x_data, &y_data).expect("exponential fit on clean data");
     v.check_pass(
         "fit.params[0] ≈ a_true (2.5)",
-        (fit.params[0] - a_true).abs() < 0.01,
+        (fit.params[0] - a_true).abs() < tolerances::REGRESSION_FIT_PARITY,
     );
     v.check_pass(
         "fit.params[1] ≈ b_true (0.3)",
-        (fit.params[1] - b_true).abs() < 0.01,
+        (fit.params[1] - b_true).abs() < tolerances::REGRESSION_FIT_PARITY,
     );
     v.check_pass("fit R² ≈ 1.0 on clean data", fit.r_squared > 0.9999);
 
@@ -165,7 +165,7 @@ fn main() {
         let pred = fit.predict_one(xi).unwrap();
         v.check_pass(
             &format!("predict_one({xi}) ≈ y[{i}]"),
-            (pred - y_data[i]).abs() < 0.01,
+            (pred - y_data[i]).abs() < tolerances::REGRESSION_FIT_PARITY,
         );
     }
 
@@ -235,11 +235,11 @@ fn main() {
     let s_obs = integer_counts.iter().filter(|&&c| c > 0.0).count() as f64;
     let f1 = integer_counts
         .iter()
-        .filter(|&&c| (c - 1.0).abs() < 0.5)
+        .filter(|&&c| (c - 1.0).abs() < tolerances::CHAO1_COUNT_HALFWIDTH)
         .count() as f64;
     let f2 = integer_counts
         .iter()
-        .filter(|&&c| (c - 2.0).abs() < 0.5)
+        .filter(|&&c| (c - 2.0).abs() < tolerances::CHAO1_COUNT_HALFWIDTH)
         .count() as f64;
     let manual_chao1 = if f2 > 0.0 {
         s_obs + f1 * (f1 - 1.0) / (2.0 * (f2 + 1.0))

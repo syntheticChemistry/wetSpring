@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-15 (V116: 376 experiments, 354 binaries, 5,707+ checks, 1,662 tests. Exp376 — V116 deep audit execution: `capability.list` handler, capability domain expansion (14 domains, 19 methods), inline tolerance centralization (15 binaries), capability-based primal discovery (3 binaries), forge lint parity, stale documentation evolution. V115: Exp375 — deep audit: UniBin compliance, capability domains, tolerance centralization, XDG path resolution, metalForge 90% coverage.)
+**Updated**: 2026-03-15 (V117: 376 experiments, 354 binaries, 5,707+ checks, 1,667 tests. V117 — deep tolerance centralization + code quality: 39 fmt fixes, 12 unfulfilled expects removed, 4 production panics eliminated, 5 ESN thresholds centralized, 13 new tolerance constants (200+ total), 30+ inline literals replaced in 17 binaries. Zero clippy warnings, zero fmt violations, zero unsafe, zero production panics.)
 
 ---
 
@@ -410,12 +410,13 @@ thresholds from `src/tolerances.rs`.
 | `validate_r_industry_parity` | 335 | 53 | `cargo run --release --bin validate_r_industry_parity` |
 
 **Total validation checks**: 5,707+
-**Rust tests**: 1,288 lib + 219 integration
-**Binaries**: 296 total (256 validate + 20 benchmark + 20 other)
-**barraCuda primitives**: 150+ consumed (standalone v0.3.3, wgpu 28, Fp64Strategy, fused ops)
-**Papers**: 52 (25 Tracks 1-2 + 5 Track 3 + 9 Track 4 + 1 cross-spring + 9 extensions + 3 reference)
+**Rust tests**: 1,667 total (1,335 barracuda lib + 234 forge + 89 integration + 9 doc)
+**Binaries**: 354 total (332 barracuda + 22 forge)
+**barraCuda primitives**: 150+ consumed (standalone v0.3.5, wgpu 28, Fp64Strategy, fused ops)
+**Papers**: 63 (reproduced across 6 tracks)
 **Local WGSL shaders**: 0 (all absorbed)
-**GPU modules**: 45 total (all lean on upstream primitives)
+**GPU modules**: 47 total (35 lean + 12 compose + 5 write-to-lean ODE)
+**Named tolerances**: 200+ across 4 submodules (bio, gpu, spectral, instrument)
 **Benchmark infrastructure**: `bench.rs` harness with RAPL + nvidia-smi energy profiling, JSON output
 
 ### V97c — Fused Ops Chain (Exp306-310)

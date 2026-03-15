@@ -58,10 +58,7 @@ pub fn neural_api_socket() -> Option<PathBuf> {
         Some(std::env::temp_dir().join(&sock_name)),
     ];
 
-    candidates
-        .into_iter()
-        .flatten()
-        .find(|p| p.exists())
+    candidates.into_iter().flatten().find(|p| p.exists())
 }
 
 /// Send a `capability.call` JSON-RPC request to the Neural API.
@@ -407,8 +404,7 @@ mod tests {
     #[test]
     fn handle_record_without_trio() {
         let result =
-            handle_provenance_record(&json!({"session_id": "local-1", "step": {"a": 1}}))
-                .unwrap();
+            handle_provenance_record(&json!({"session_id": "local-1", "step": {"a": 1}})).unwrap();
         assert_eq!(result["provenance"], "unavailable");
     }
 

@@ -1,16 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(clippy::expect_used)]
-#![expect(clippy::unwrap_used)]
 #![expect(clippy::print_stdout)]
 #![expect(clippy::too_many_lines)]
-#![expect(clippy::cast_precision_loss)]
-#![expect(clippy::cast_possible_truncation)]
-#![expect(clippy::cast_sign_loss)]
 #![expect(clippy::similar_names)]
-#![expect(clippy::many_single_char_names)]
-#![expect(clippy::items_after_statements)]
-#![expect(clippy::float_cmp)]
 //! # Exp348: CPU vs GPU v11 — V109 Sync Diversity API + Upstream Evolution
 //!
 //! Proves GPU portability after V109 upstream changes:

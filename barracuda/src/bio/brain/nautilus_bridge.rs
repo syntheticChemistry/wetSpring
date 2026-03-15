@@ -267,13 +267,18 @@ mod tests {
     }
 
     #[test]
-    fn reservoir_input_dimensions() {
+    fn reservoir_input_dimensions() -> Result<(), crate::error::Error> {
         let obs = sample_obs();
         let input = BioNautilusBrain::bio_to_reservoir_input(&obs);
         match input {
             ReservoirInput::Continuous(v) => assert_eq!(v.len(), 5),
-            ReservoirInput::Discrete(_) => panic!("expected continuous input"),
+            ReservoirInput::Discrete(_) => {
+                return Err(crate::error::Error::InvalidInput(
+                    "expected continuous input".into(),
+                ));
+            }
         }
+        Ok(())
     }
 
     #[test]

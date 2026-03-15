@@ -22,7 +22,11 @@ use super::extract_f64_array;
 /// # Errors
 ///
 /// Returns `RpcError::invalid_params` for unknown model names.
-#[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss, clippy::cast_precision_loss)] // Cast: steps, indices bounded
+#[expect(
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::cast_precision_loss
+)] // Cast: steps, indices bounded
 pub fn handle_kinetics(params: &Value) -> Result<Value, RpcError> {
     let model = params
         .get("model")
@@ -36,14 +40,8 @@ pub fn handle_kinetics(params: &Value) -> Result<Value, RpcError> {
 
     match model {
         "gompertz" => {
-            let p_max = params
-                .get("p_max")
-                .and_then(Value::as_f64)
-                .unwrap_or(300.0);
-            let r_max = params
-                .get("r_max")
-                .and_then(Value::as_f64)
-                .unwrap_or(15.0);
+            let p_max = params.get("p_max").and_then(Value::as_f64).unwrap_or(300.0);
+            let r_max = params.get("r_max").and_then(Value::as_f64).unwrap_or(15.0);
             let lag = params.get("lag").and_then(Value::as_f64).unwrap_or(2.0);
 
             let mut final_p = 0.0_f64;
@@ -105,10 +103,7 @@ pub fn handle_alignment(params: &Value) -> Result<Value, RpcError> {
             .get("mismatch_penalty")
             .and_then(Value::as_i64)
             .unwrap_or(-1) as i32,
-        gap_open: params
-            .get("gap_open")
-            .and_then(Value::as_i64)
-            .unwrap_or(-3) as i32,
+        gap_open: params.get("gap_open").and_then(Value::as_i64).unwrap_or(-3) as i32,
         gap_extend: params
             .get("gap_extend")
             .and_then(Value::as_i64)
@@ -153,10 +148,7 @@ pub fn handle_taxonomy(params: &Value) -> Result<Value, RpcError> {
         .and_then(Value::as_str)
         .ok_or_else(|| RpcError::invalid_params("missing required param: sequence"))?;
 
-    let k = params
-        .get("k")
-        .and_then(Value::as_u64)
-        .unwrap_or(8) as usize;
+    let k = params.get("k").and_then(Value::as_u64).unwrap_or(8) as usize;
 
     let ref_fasta = params.get("reference_fasta").and_then(Value::as_str);
 
@@ -240,15 +232,14 @@ pub fn handle_nmf(params: &Value) -> Result<Value, RpcError> {
     let n_rows = params
         .get("n_rows")
         .and_then(Value::as_u64)
-        .ok_or_else(|| RpcError::invalid_params("missing required param: n_rows"))? as usize;
+        .ok_or_else(|| RpcError::invalid_params("missing required param: n_rows"))?
+        as usize;
     let n_cols = params
         .get("n_cols")
         .and_then(Value::as_u64)
-        .ok_or_else(|| RpcError::invalid_params("missing required param: n_cols"))? as usize;
-    let rank = params
-        .get("rank")
-        .and_then(Value::as_u64)
-        .unwrap_or(2) as usize;
+        .ok_or_else(|| RpcError::invalid_params("missing required param: n_cols"))?
+        as usize;
+    let rank = params.get("rank").and_then(Value::as_u64).unwrap_or(2) as usize;
     let max_iter = params
         .get("max_iter")
         .and_then(Value::as_u64)

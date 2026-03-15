@@ -213,7 +213,10 @@ fn main() {
     let cos_x: Vec<f64> = (0..100).map(|i| (f64::from(i) * 0.1).cos()).collect();
     let r_ortho = barracuda::stats::pearson_correlation(&sin_x, &cos_x)
         .expect("Pearson r(sin, cos) orthogonal");
-    v.check_pass("Pearson: |r(sin,cos)| < 0.1", r_ortho.abs() < 0.1);
+    v.check_pass(
+        "Pearson: |r(sin,cos)| < 0.1",
+        r_ortho.abs() < tolerances::SOIL_MODEL_APPROX,
+    );
     d42_checks += 1;
 
     // 42e: Decomposition check — Pearson = Cov(x,y) / (σ_x × σ_y)

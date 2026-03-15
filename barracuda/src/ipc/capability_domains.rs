@@ -118,16 +118,16 @@ pub struct CapabilityDomain {
 /// Build the Songbird registration payload for this primal's capabilities.
 #[must_use]
 pub fn registration_domains() -> Vec<(&'static str, &'static str)> {
-    DOMAINS
-        .iter()
-        .map(|d| (d.name, d.description))
-        .collect()
+    DOMAINS.iter().map(|d| (d.name, d.description)).collect()
 }
 
 /// Flat list of every IPC method this primal supports, derived from [`DOMAINS`].
 #[must_use]
 pub fn all_methods() -> Vec<&'static str> {
-    DOMAINS.iter().flat_map(|d| d.methods.iter().copied()).collect()
+    DOMAINS
+        .iter()
+        .flat_map(|d| d.methods.iter().copied())
+        .collect()
 }
 
 #[cfg(test)]
@@ -153,11 +153,7 @@ mod tests {
     #[test]
     fn no_empty_method_lists() {
         for d in DOMAINS {
-            assert!(
-                !d.methods.is_empty(),
-                "domain '{}' has no methods",
-                d.name
-            );
+            assert!(!d.methods.is_empty(), "domain '{}' has no methods", d.name);
         }
     }
 
@@ -178,7 +174,11 @@ mod tests {
 
     #[test]
     fn total_capability_count_matches_registry() {
-        assert_eq!(DOMAINS.len(), 14, "14 domains (11 ecology + provenance + brain + metrics)");
+        assert_eq!(
+            DOMAINS.len(),
+            14,
+            "14 domains (11 ecology + provenance + brain + metrics)"
+        );
         let total_methods: usize = DOMAINS.iter().map(|d| d.methods.len()).sum();
         assert_eq!(total_methods, 19, "19 total capability methods");
     }

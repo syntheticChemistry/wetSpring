@@ -30,6 +30,7 @@ use wetspring_barracuda::bio::ode_sweep_gpu::{N_PARAMS, N_VARS, OdeSweepConfig, 
 use wetspring_barracuda::bio::qs_biofilm::{self, QsBiofilmParams};
 #[cfg(feature = "gpu")]
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 const N_BATCHES: usize = 1024;
@@ -200,7 +201,11 @@ fn main() {
         println!("  max |GPU-CPU| (64 batches): {max_diff:.4}");
         // Long-horizon ODE drift (500 steps × dt=0.01) accumulates; absolute
         // tolerance matches documented GPU ODE parity from Exp049.
-        v.check_count("GPU≈CPU parity < 2.0", usize::from(max_diff < 2.0), 1);
+        v.check_count(
+            "GPU≈CPU parity < 2.0",
+            usize::from(max_diff < tolerances::ODE_GPU_LANDSCAPE_PARITY),
+            1,
+        );
 
         // Classify GPU landscape
         let mut gpu_classes = std::collections::HashMap::new();

@@ -151,3 +151,46 @@ pub const SOIL_COOP_FREQ_AFFECTED: f64 = 0.005;
 /// approximate models with ~5% uncertainty from parameter fitting.
 /// Validated: Exp170–182 (Track 4 soil QS).
 pub const SOIL_MODEL_APPROX: f64 = 0.1;
+
+/// Tillage effect tolerance on `P(QS)` and model ratios.
+///
+/// No-till vs conventional tillage comparisons (P(QS) difference,
+/// receiver:inhibitor ratio) are inherently approximate due to
+/// community-level variability. 0.2 covers inter-sample spread in
+/// meta-analysis data (Zuber & Villamil 2016, Islam 2014).
+/// Validated: Exp175 (KBS LTER), Exp291 (paper math control v4).
+pub const SOIL_QS_TILLAGE: f64 = 0.2;
+
+/// Anderson localization exponent ν fitting tolerance.
+///
+/// Critical exponent ν from finite-size scaling fits to Anderson
+/// lattice data. Literature ν ≈ 1.57 (3D) with numerical fitting
+/// uncertainty ~0.3 from lattice-size and disorder-averaging limitations.
+/// Validated: Exp142 (DF64 Anderson).
+pub const ANDERSON_NU_PARITY: f64 = 0.4;
+
+/// 3D vs 2D geometry ratio tolerance for level-spacing and
+/// cross-species correlation comparisons.
+///
+/// Dimensional comparisons (e.g., 3D vent vs 2D surface, canine vs
+/// human epidermis) carry inherent model uncertainty from the mapping
+/// between biological structure and effective lattice dimension.
+/// Validated: Exp144 (vent chimney QS), Exp275 (heterogeneity sweep).
+pub const GEOMETRY_DIMENSIONAL_PARITY: f64 = 0.15;
+
+/// FAO-56 reference evapotranspiration cross-spring parity.
+///
+/// Cross-spring ET₀ computation (airSpring → wetSpring bridge) matches
+/// to within 0.15 due to different numerical integration paths for the
+/// Penman-Monteith equation (airSpring uses Brent optimization).
+/// Validated: Exp157 (cross-spring S86).
+pub const FAO56_ET0_PARITY: f64 = 0.15;
+
+/// Regression intercept near-zero tolerance.
+///
+/// Linear regression fits where the true intercept is zero (e.g.,
+/// proportional relationships) produce residual intercepts from
+/// finite-sample effects. 0.5 covers typical scatter in biological
+/// datasets with N < 100 samples.
+/// Validated: Exp157 (cross-spring S86).
+pub const INTERCEPT_NEAR_ZERO: f64 = 0.5;

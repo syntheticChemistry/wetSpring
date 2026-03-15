@@ -6,12 +6,7 @@
     clippy::print_stdout,
     clippy::too_many_lines,
     clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
-    clippy::similar_names,
-    clippy::many_single_char_names,
-    clippy::items_after_statements,
-    clippy::float_cmp
+    clippy::similar_names
 )]
 //! # Exp347: `BarraCuda` CPU v27 — V109 Upstream Rewire + Track 6 Validation
 //!
@@ -279,9 +274,19 @@ fn main() {
 
     v.check("D67: Φ(0) = 0.5", norm_cdf(0.0), 0.5, tolerances::EXACT_F64);
     d67 += 1;
-    v.check("D67: Φ(-10) → 0", norm_cdf(-10.0), 0.0, tolerances::ANALYTICAL_LOOSE);
+    v.check(
+        "D67: Φ(-10) → 0",
+        norm_cdf(-10.0),
+        0.0,
+        tolerances::ANALYTICAL_LOOSE,
+    );
     d67 += 1;
-    v.check("D67: Φ(10) → 1", norm_cdf(10.0), 1.0, tolerances::ANALYTICAL_LOOSE);
+    v.check(
+        "D67: Φ(10) → 1",
+        norm_cdf(10.0),
+        1.0,
+        tolerances::ANALYTICAL_LOOSE,
+    );
     d67 += 1;
 
     let lng_1 = barracuda::special::ln_gamma(1.0).expect("ln_gamma(1)");
@@ -369,7 +374,7 @@ fn main() {
     d69 += 1;
     let t_half = (2.0_f64).ln() / 0.08;
     v.check(
-        "D69: First-order B(t_half) = B_max/2",  // python_anaerobic_biogas_baseline.py: B_max=320, k=0.08
+        "D69: First-order B(t_half) = B_max/2", // python_anaerobic_biogas_baseline.py: B_max=320, k=0.08
         first_order(t_half, 320.0, 0.08),
         160.0,
         tolerances::ANALYTICAL_LOOSE,

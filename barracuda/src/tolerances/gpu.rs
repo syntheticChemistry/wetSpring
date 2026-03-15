@@ -70,3 +70,12 @@ pub const GPU_F32_SPATIAL: f64 = 1e-4;
 /// 1e-5 covers worst-case element-wise drift in streaming pipeline.
 /// Validated: Exp227 (Pure GPU Streaming v4).
 pub const GEMM_GPU_MAX_ERR: f64 = 1e-5;
+
+/// ODE landscape GPU vs CPU tolerance for QS parameter sweeps.
+///
+/// Multi-parameter ODE landscape comparisons (e.g., Vibrio QS parameter
+/// grid) produce max element-wise differences up to ~1.5 due to GPU
+/// instruction reordering in stiff systems with exponential sensitivity.
+/// 2.0 covers worst-case chaotic-regime drift.
+/// Validated: Exp113 (Vibrio QS landscape), Exp293 (GPU v9).
+pub const ODE_GPU_LANDSCAPE_PARITY: f64 = 2.0;

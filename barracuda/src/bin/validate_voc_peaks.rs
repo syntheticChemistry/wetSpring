@@ -296,9 +296,9 @@ fn validate_ri_tolerance_matching(v: &mut Validator, compounds: &[VocCompound]) 
         let matches =
             tolerance_search::find_within_da(&sorted_theoretical, c.experimental_ri, tolerance);
 
-        let correct_found = matches
-            .iter()
-            .any(|&idx| (sorted_theoretical[idx] - c.theoretical_ri).abs() < 0.1);
+        let correct_found = matches.iter().any(|&idx| {
+            (sorted_theoretical[idx] - c.theoretical_ri).abs() < tolerances::RETENTION_INDEX_MATCH
+        });
 
         if !correct_found {
             all_matched = false;

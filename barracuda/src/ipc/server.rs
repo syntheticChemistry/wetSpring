@@ -98,10 +98,7 @@ impl Server {
     /// Each connection is handled in its own OS thread. The call blocks
     /// on `accept()` and never returns under normal operation.
     pub fn run(&self) {
-        eprintln!(
-            "[wetspring] listening on {}",
-            self.socket_path.display()
-        );
+        eprintln!("[wetspring] listening on {}", self.socket_path.display());
 
         for stream in self.listener.incoming() {
             match stream {

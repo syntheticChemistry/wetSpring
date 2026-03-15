@@ -93,7 +93,10 @@ fn main() {
     let luxr_count = 30_u32;
     let luxi_count = 13_u32;
     let ratio = f64::from(luxr_count) / f64::from(luxi_count);
-    v.check_pass("Nitrifying: R:I ratio ≈ 2.3", (ratio - 2.3).abs() < 0.2);
+    v.check_pass(
+        "Nitrifying: R:I ratio ≈ 2.3",
+        (ratio - 2.3).abs() < tolerances::SOIL_QS_TILLAGE,
+    );
     v.check_pass(
         "Nitrifying: eavesdropper prediction (R > I)",
         luxr_count > luxi_count,

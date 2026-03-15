@@ -244,5 +244,46 @@ pub const DF64_ROUNDTRIP: f64 = 1e-13;
 /// a driver or shader complexity regression.
 pub const GEMM_COMPILE_TIMEOUT_MS: f64 = 30_000.0;
 
+// ═══════════════════════════════════════════════════════════════════
+// Pharmacological / dose-response
+// ═══════════════════════════════════════════════════════════════════
+
+/// Pharmacokinetic and IC50 dose-response parity tolerance.
+///
+/// Published IC50 values (e.g., Gonzales 2014: JAK1 IC50 = 10 nM),
+/// onset times, and selectivity ratios are reproduced within 0.1
+/// absolute units. Covers rounding in Hill equation fitting and
+/// log-space IC50 conversion.
+/// Validated: Exp280 (Gonzales IC50), Exp281 (Gonzales PK).
+pub const PHARMACOKINETIC_PARITY: f64 = 0.1;
+
+/// IC50 response-at-midpoint tolerance.
+///
+/// At the IC50 concentration, the Hill equation predicts exactly 50%
+/// inhibition. 0.01 covers numerical drift in the Hill sigmoid
+/// evaluation at the inflection point.
+/// Validated: Exp280 (Gonzales IC50 dose-response).
+pub const IC50_RESPONSE_TOL: f64 = 0.01;
+
+/// Regression parameter fit parity tolerance.
+///
+/// Nonlinear regression (Levenberg-Marquardt, Newton) parameter
+/// estimates should match published values within 0.01 when fitting
+/// to the same data. Covers optimizer convergence differences.
+/// Validated: Exp283 (Gonzales CPU parity).
+pub const REGRESSION_FIT_PARITY: f64 = 0.01;
+
+// ═══════════════════════════════════════════════════════════════════
+// Bootstrap / rarefaction
+// ═══════════════════════════════════════════════════════════════════
+
+/// Bootstrap Shannon mean tolerance (GPU extended rarefaction).
+///
+/// Bootstrap resampling (1,000 replicates) of Shannon diversity produces
+/// a mean that should be within 0.5 of the CPU point estimate. The margin
+/// covers stochastic variation from multinomial resampling at small N.
+/// Validated: Exp101 (GPU extended validation).
+pub const RAREFACTION_BOOTSTRAP_SHANNON: f64 = 0.5;
+
 #[cfg(test)]
 mod tests;

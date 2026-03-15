@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 15, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V116 — **1,662 tests** (0 failures), 376 experiments, 5,707+ validation checks across 354 binaries. Ecosystem: barraCuda v0.3.5, toadStool S130+, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). **biomeOS niche** — deploy graph (`graphs/wetspring_deploy.toml`), 20 capabilities (4 domains, `capability_registry.toml`), provenance trio integration, cross-spring time series exchange. **UniBin compliant** (`wetspring server|status|version`). V116 deep audit execution: `capability.list` implemented (Spring-as-Niche standard), `capability_domains.rs` expanded to 14 domains / 19 methods, inline tolerance literals centralized (15 binaries), hardcoded primal names evolved to capability-based discovery (3 binaries), forge lint parity (`missing_docs` + pedantic + nursery). Superseded handoffs archived (V111–V115).
+**Status:** V117 — **1,667 tests** (0 failures), 376 experiments, 5,707+ validation checks across 354 binaries. Ecosystem: barraCuda v0.3.5, toadStool S130+, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). **biomeOS niche** — deploy graph (`graphs/wetspring_deploy.toml`), 14 capability domains / 19 methods (`capability_domains.rs`), provenance trio integration, cross-spring time series exchange. **UniBin compliant** (`wetspring server|status|version`). 200+ named tolerance constants (4 submodules). V117 deep tolerance centralization + code quality: 39 `cargo fmt` violations resolved, 12 unfulfilled `#[expect()]` removed, 4 production `panic!()` eliminated (GPU modules + nautilus bridge → `Result`), 5 ESN urgency thresholds centralized, 13 new tolerance constants, 30+ inline literals replaced in 17 binaries. Superseded handoffs archived (V111–V116).
 
 ---
 
@@ -133,11 +133,11 @@ integration point.
 | V100 viz + local evolution (Exp327-332) | 173 (petalTongue 45 + CPU/GPU 27 + metalForge 19 + biomeOS 34 + local evo 24 + mixed HW 24) |
 | V101 viz evolution (Exp333-334) | 78 (viz evolution 44 + science-to-viz 34) |
 | **Total validation checks** | **5,707+** |
-| Rust library unit tests | 1,330 (barracuda) |
+| Rust library unit tests | 1,335 (barracuda) |
 | metalForge forge tests | 234 |
 | Doc-tests | 9 |
 | Integration tests | 89 (72 barracuda + 17 forge) |
-| **Total Rust tests** | **1,662** (lib + forge + integration + doc) |
+| **Total Rust tests** | **1,667** (lib + forge + integration + doc) |
 | Library code coverage | **94.01% line** (barracuda), **88.78% line** (forge) (cargo-llvm-cov) |
 | Experiments completed | 376 |
 | Validation/benchmark binaries | 354 (332 barracuda + 22 forge) |
@@ -152,7 +152,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | `barraCuda` primitives consumed | **150+** (v0.3.5, always-on, zero fallback code — standalone `barraCuda`, wgpu 28, PrecisionRoutingAdvice) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 5,707+ validation checks **PASS**. All 1,330 library + 234 forge + 89 integration + 9 doc tests **PASS** (2 ignored: hardware-dependent).
+All 5,707+ validation checks **PASS**. All 1,335 library + 234 forge + 89 integration + 9 doc tests **PASS** (2 ignored: hardware-dependent).
 
 ### GPU Performance
 
@@ -305,7 +305,7 @@ science-to-visualization IPC wiring:
 - **IPC wiring**: `science.diversity` and `science.full_pipeline` gain `visualization: bool` parameter — auto-build scenario + push to petalTongue
 - **dump_wetspring_scenarios**: 13 scenarios (was 6), `--stream` flag for StreamSession demo
 
-**1,662 tests** | **376 experiments** | **354 binaries** | **5,707+ checks**
+**1,667 tests** | **376 experiments** | **354 binaries** | **5,707+ checks**
 
 ### V116: Deep Audit Execution — Capability Discovery + Tolerance Centralization (2026-03-15)
 
@@ -354,7 +354,7 @@ See CHANGELOG.md for full V111 entry.
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy -W pedantic -W nursery` | **Zero warnings** (pedantic + nursery clean) |
 | `cargo doc --no-deps` | Clean (0 warnings) |
-| Line coverage (`cargo-llvm-cov`) | **94.01% line** (barracuda), **90%+ line** (forge) (1,662 tests) |
+| Line coverage (`cargo-llvm-cov`) | **94.01% line** (barracuda), **90%+ line** (forge) (1,667 tests) |
 | `#![forbid(unsafe_code)]` | **Enforced on all 356 crate roots** (2 lib + 354 bin; edition 2024) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | **Enforced crate-wide** |
 | TODO/FIXME markers | **0** |
@@ -362,7 +362,7 @@ See CHANGELOG.md for full V111 entry.
 | SPDX-License-Identifier | All `.rs` files |
 | Max file size | All under 1000 LOC |
 | External C dependencies | **0** (`flate2` uses `rust_backend`) |
-| Named tolerance constants | 180+ (scientifically justified, hierarchy-tested; NMF_CONVERGENCE, MATRIX_EPS, STABLE_SPECIAL_TINY) |
+| Named tolerance constants | 200+ (scientifically justified, hierarchy-tested; NMF_CONVERGENCE, MATRIX_EPS, STABLE_SPECIAL_TINY) |
 | Provenance headers | All 340 binaries |
 | ESN ridge regression | **Proper Cholesky solve** (not diagonal approximation) |
 | I/O streaming | **Streaming-only** — buffering `parse_*` functions removed; `FastqIter` / `MzmlIter` / `Ms2Iter` + `stats_from_file` |
@@ -460,7 +460,7 @@ wetSpring/
 │   ├── src/
 │   │   ├── lib.rs               ← crate root (pedantic + nursery lints enforced)
 │   │   ├── special.rs           ← sovereign math (erf, ln_gamma, regularized_gamma)
-│   │   ├── tolerances/           ← 180+ named tolerance constants (bio, gpu, spectral, instrument)
+│   │   ├── tolerances/           ← 200+ named tolerance constants (bio, gpu, spectral, instrument)
 │   │   ├── validation/           ← hotSpring validation framework
 │   │   ├── ncbi/                ← NCBI module (API key, HTTP, E-search, EFetch, SRA, NestGate, cache)
 │   │   ├── encoding.rs          ← sovereign base64 (zero dependencies)
@@ -498,7 +498,7 @@ wetSpring/
 ```bash
 cd barracuda
 
-# Run all tests (1,662 library + forge + doc + integration tests)
+# Run all tests (1,667 library + forge + doc + integration tests)
 cargo test --workspace --all-features
 
 # Code quality checks

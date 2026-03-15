@@ -23,6 +23,7 @@
 //! Validation class: Analytical
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 #[cfg(feature = "gpu")]
@@ -204,7 +205,8 @@ fn main() {
         let young_2d_r = level_spacing_ratio(&eigs_2d_young);
         v.check_pass(
             "3D captures depth dimension (3D ⟨r⟩ >= 2D ⟨r⟩ for young sulfide, or both valid)",
-            (young_3d_r - young_2d_r).abs() < 0.15 || young_3d_r >= young_2d_r - 0.02,
+            (young_3d_r - young_2d_r).abs() < tolerances::GEOMETRY_DIMENSIONAL_PARITY
+                || young_3d_r >= young_2d_r - 0.02,
         );
     }
 

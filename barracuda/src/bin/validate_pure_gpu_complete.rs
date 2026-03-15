@@ -88,7 +88,12 @@ fn validate_cooperation_gpu(device: &Arc<WgpuDevice>, v: &mut Validator) {
 
     let gpu_engine = CooperationGpu::new(Arc::clone(device)).expect("shader compile");
     let results = gpu_engine
-        .integrate_params(&[params], &[[0.01, 0.01, 0.0, 0.0]], 48000, tolerances::ODE_DEFAULT_DT)
+        .integrate_params(
+            &[params],
+            &[[0.01, 0.01, 0.0, 0.0]],
+            48000,
+            tolerances::ODE_DEFAULT_DT,
+        )
         .expect("GPU integrate");
 
     for (i, (&g, &c)) in results[0]
@@ -116,7 +121,12 @@ fn validate_capacitor_gpu(device: &Arc<WgpuDevice>, v: &mut Validator) {
 
     let gpu_engine = CapacitorGpu::new(Arc::clone(device)).expect("shader compile");
     let results = gpu_engine
-        .integrate_params(&[params], &[[0.01, 1.0, 0.0, 0.0, 0.5, 0.0]], 48000, tolerances::ODE_DEFAULT_DT)
+        .integrate_params(
+            &[params],
+            &[[0.01, 1.0, 0.0, 0.0, 0.5, 0.0]],
+            48000,
+            tolerances::ODE_DEFAULT_DT,
+        )
         .expect("GPU integrate");
 
     for (i, (&g, &c)) in results[0]

@@ -554,11 +554,11 @@ fn main() {
     v.check_pass("primal socket scan completes", true);
 
     // Capability-based readiness: Tower = orchestration + discovery; Node = + compute; Nest = + data.ncbi + storage
-    let tower_ready = capabilities.contains(&"orchestration") && capabilities.contains(&"discovery");
+    let tower_ready =
+        capabilities.contains(&"orchestration") && capabilities.contains(&"discovery");
     let node_ready = tower_ready && capabilities.contains(&"compute");
-    let nest_ready = node_ready
-        && capabilities.contains(&"data.ncbi")
-        && capabilities.contains(&"storage");
+    let nest_ready =
+        node_ready && capabilities.contains(&"data.ncbi") && capabilities.contains(&"storage");
 
     println!(
         "  Tower: {} | Node: {} | Nest: {}",
@@ -567,11 +567,7 @@ fn main() {
         } else {
             "needs orchestration+discovery"
         },
-        if node_ready {
-            "READY"
-        } else {
-            "needs compute"
-        },
+        if node_ready { "READY" } else { "needs compute" },
         if nest_ready {
             "READY"
         } else {
@@ -665,9 +661,5 @@ fn discover_primal_sockets() -> Vec<&'static str> {
 
 fn discover_biomeos() -> Option<PathBuf> {
     let p = discover_socket("BIOMEOS_SOCKET", "biomeos");
-    if p.exists() {
-        Some(p)
-    } else {
-        None
-    }
+    if p.exists() { Some(p) } else { None }
 }

@@ -299,8 +299,8 @@ All experiments run on a single consumer workstation:
 | RAM | 64 GB DDR5 |
 | GPU | NVIDIA RTX 4070 12 GB (`SHADER_F64` confirmed, Vulkan) |
 | OS | Pop!_OS 22.04 (Linux 6.17) |
-| Rust | stable (1.82+) |
-| wgpu | v22 |
+| Rust | stable (1.87+, edition 2024) |
+| wgpu | v28 |
 
 ---
 
@@ -362,9 +362,9 @@ All experiments run on a single consumer workstation:
 | `validate_barracuda_cpu_v8` | 175 | 13 promoted GPU domains (Exp102) |
 | **Total** | **1,476** | **All pass** |
 
-Current status: **1,476/1,476 CPU pass (historical milestone).** 1,044 lib tests, 281 experiments across 4 tracks.
-380/380 BarraCuda CPU parity checks across 31+ domains (v1-v8).
-~22.5× Rust speedup over Python.
+Current status: **1,476/1,476 CPU pass (historical milestone).** 1,667 total tests, 376 experiments across 6 tracks.
+546/546 BarraCuda CPU parity checks across 36+ domains (v1-v27).
+33.4× Rust speedup over Python.
 
 ### Phase 3 (GPU): 702+/702+ checks pass
 
@@ -383,10 +383,10 @@ Current status: **1,476/1,476 CPU pass (historical milestone).** 1,044 lib tests
 | `validate_cross_substrate` | 20 | metalForge cross-substrate CPU↔GPU parity (Exp060) |
 | `validate_gpu_rf` | 13 | RF batch inference shader (Exp063) |
 
-Current status: **702+/702+ pass (historical milestone).** 144 ToadStool primitives consumed.
-5 local WGSL shaders (Write phase) + 7 Compose + 3 Passthrough = 45 GPU modules total.
+Current status: **702+/702+ pass (historical milestone).** 150+ barraCuda primitives consumed (v0.3.5).
+0 local WGSL shaders (all absorbed) + 12 Compose + 35 Lean = 47 GPU modules total.
 
-### Grand Total: 8,300+/8,300+ quantitative checks pass
+### Grand Total: 5,707+/5,707+ quantitative checks pass
 
 ---
 
@@ -399,7 +399,7 @@ Current status: **702+/702+ pass (historical milestone).** 144 ToadStool primiti
 | GPU workload | Large-matrix eigensolve, MD force evaluation | Diversity, phylogenetics, ODE sweeps, HMM |
 | Validation metric | chi2/datum | Pass/fail within documented tolerance |
 | Data size | Small (52–2,042 nuclei) | Large (millions of reads, thousands of spectra) |
-| Local shaders | 10+ WGSL (HFB, MD, lattice QCD) | 5 WGSL ODE (30 ToadStool primitives + 12 GPU wrappers) |
+| Local shaders | 10+ WGSL (HFB, MD, lattice QCD) | 0 local WGSL (150+ barraCuda primitives, 47 GPU modules) |
 | Absorption tracking | `EVOLUTION_READINESS.md` with tiers | `EVOLUTION_READINESS.md` with tiers (adopted) |
 | Key insight | GPU-resident hybrid beats CPU for matrix physics | Full GPU pipeline 2.45× faster; ODE/HMM/phylo math portable to GPU |
 
@@ -413,14 +413,14 @@ results, then exceed them via Rust + GPU.
 
 | Component | Version | Notes |
 |-----------|---------|-------|
-| Rust | stable (1.82+) | MSRV set in `Cargo.toml` |
-| wgpu | v22 | Vulkan backend, `SHADER_F64` |
+| Rust | stable (1.87+) | MSRV set in `Cargo.toml`, edition 2024 |
+| wgpu | v28 | Vulkan backend, `SHADER_F64` |
 | Galaxy | 24.1 | Local Docker instance |
 | QIIME2 | 2026.1.0 | Galaxy plugin (q2-amplicon-2026.1) |
 | asari | 1.13.1 | LC-MS feature extraction |
 | `PFΔScreen` | Latest | PFAS non-target screening |
 | flate2 | 1.0 | Pure Rust backend (`rust_backend`), no C dependencies |
-| barracuda | 0.2.0 (path dep) | 30 ToadStool primitives consumed |
+| barraCuda | v0.3.5 (standalone) | 150+ primitives consumed, 784+ WGSL shaders |
 
 ---
 
@@ -431,11 +431,11 @@ results, then exceed them via Rust + GPU.
 | `cargo fmt --check` | Clean (0 diffs, `max_width = 100`) |
 | `cargo clippy -W pedantic -W nursery` | 0 warnings (crate-level enforcement) |
 | `cargo doc --no-deps` | 0 warnings |
-| `cargo-llvm-cov` | **97% bio+io** line coverage |
-| `unsafe` in production | 0 |
-| `.unwrap()` in production | 0 |
-| Named tolerances | 43 constants in `tolerances.rs`, hierarchy-tested |
-| Provenance headers | All 109 validation/benchmark binaries |
+| `cargo-llvm-cov` | **94.01% barracuda**, **88.78% forge** line coverage |
+| `unsafe` in production | 0 (`#![forbid(unsafe_code)]`) |
+| `.unwrap()` in production | 0 (`#![deny(clippy::unwrap_used)]`) |
+| Named tolerances | 200+ constants across `tolerances/` (4 submodules), hierarchy-tested |
+| Provenance headers | All 354 validation/benchmark binaries |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` and `.wgsl` files |

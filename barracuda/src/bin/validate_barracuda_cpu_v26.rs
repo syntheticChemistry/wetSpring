@@ -387,7 +387,12 @@ fn main() {
     // norm_cdf analytical checks (shared with Track 4)
     v.check("D64: Φ(0) = 0.5", norm_cdf(0.0), 0.5, tolerances::EXACT_F64);
     d64 += 1;
-    v.check("D64: Φ(-∞) → 0", norm_cdf(-10.0), 0.0, tolerances::PYTHON_PARITY);
+    v.check(
+        "D64: Φ(-∞) → 0",
+        norm_cdf(-10.0),
+        0.0,
+        tolerances::PYTHON_PARITY,
+    );
     d64 += 1;
 
     // Gompertz parameter sensitivity: doubling Rm doubles early-phase rate

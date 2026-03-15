@@ -51,6 +51,7 @@ use std::path::PathBuf;
 use std::time::{Duration, Instant};
 
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 const RPC_TIMEOUT: Duration = Duration::from_secs(5);
@@ -264,8 +265,14 @@ fn main() {
 
     let s_obs = counts.iter().filter(|&&c| c > 0.0).count();
     let _n: f64 = counts.iter().sum();
-    let f1 = counts.iter().filter(|&&c| (c - 1.0).abs() < 0.5).count() as f64;
-    let f2 = counts.iter().filter(|&&c| (c - 2.0).abs() < 0.5).count() as f64;
+    let f1 = counts
+        .iter()
+        .filter(|&&c| (c - 1.0).abs() < tolerances::CHAO1_COUNT_HALFWIDTH)
+        .count() as f64;
+    let f2 = counts
+        .iter()
+        .filter(|&&c| (c - 2.0).abs() < tolerances::CHAO1_COUNT_HALFWIDTH)
+        .count() as f64;
     let chao1 = if f2 > 0.0 {
         s_obs as f64 + (f1 * f1) / (2.0 * f2)
     } else {

@@ -364,11 +364,11 @@ fn validate_rarefaction(v: &mut Validator, gpu: &GpuF64) {
 
     v.check_pass(
         "rarefaction: bootstrap Shannon ≤ full Shannon",
-        result.shannon.mean <= cpu_shannon + 0.5,
+        result.shannon.mean <= cpu_shannon + tolerances::RAREFACTION_BOOTSTRAP_SHANNON,
     );
     v.check_pass(
         "rarefaction: bootstrap Simpson reasonable",
-        (result.simpson.mean - cpu_simpson).abs() < 0.3,
+        (result.simpson.mean - cpu_simpson).abs() < tolerances::NANOPORE_DIVERSITY_TOLERANCE,
     );
 
     let params_batch = rarefaction_gpu::RarefactionGpuParams {

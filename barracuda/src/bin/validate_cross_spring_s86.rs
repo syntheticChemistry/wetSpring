@@ -290,10 +290,16 @@ fn main() {
         v.check_pass("fit_linear: R² > 0.99", fit.r_squared > 0.99);
 
         let slope = fit.slope().unwrap();
-        v.check_pass("slope() ≈ 2.0", (slope - 2.0).abs() < 0.1);
+        v.check_pass(
+            "slope() ≈ 2.0",
+            (slope - 2.0).abs() < tolerances::SOIL_MODEL_APPROX,
+        );
 
         let intercept = fit.intercept().unwrap();
-        v.check_pass("intercept() near 0", intercept.abs() < 0.5);
+        v.check_pass(
+            "intercept() near 0",
+            intercept.abs() < tolerances::INTERCEPT_NEAR_ZERO,
+        );
 
         let coeffs = fit.coefficients();
         v.check_pass("coefficients len ≥ 2", coeffs.len() >= 2);
@@ -375,7 +381,10 @@ fn main() {
         v.section("S11: Regression — existing primitives post-rewire");
 
         let erf_half = barracuda::special::erf(0.5);
-        v.check_pass("erf(0.5) ≈ 0.5205", (erf_half - 0.5205).abs() < 0.001);
+        v.check_pass(
+            "erf(0.5) ≈ 0.5205",
+            (erf_half - 0.5205).abs() < tolerances::CROSS_SPRING_NUMERICAL,
+        );
 
         let lg = barracuda::special::ln_gamma(5.0).unwrap();
         v.check_pass(
@@ -389,7 +398,10 @@ fn main() {
         let fao56 =
             barracuda::stats::fao56_et0(21.5, 12.3, 84.0, 63.0, 2.78, 22.07, 100.0, 50.8, 187)
                 .unwrap();
-        v.check_pass("FAO-56 ET₀ ≈ 3.88", (fao56 - 3.88).abs() < 0.15);
+        v.check_pass(
+            "FAO-56 ET₀ ≈ 3.88",
+            (fao56 - 3.88).abs() < tolerances::FAO56_ET0_PARITY,
+        );
 
         let ncdf = barracuda::stats::norm_cdf(0.0);
         v.check_pass(

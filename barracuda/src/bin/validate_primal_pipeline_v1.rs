@@ -148,10 +148,22 @@ fn main() {
     let toadstool_path = discover_toadstool_socket()
         .unwrap_or_else(|| std::env::temp_dir().join("toadstool-nonexistent.sock"));
     let primal_sockets: Vec<(&str, &str, PathBuf)> = vec![
-        ("BearDog", "orchestration", discover_socket("BEARDOG_SOCKET", "beardog")),
-        ("Songbird", "discovery", discover_socket("SONGBIRD_SOCKET", "songbird")),
+        (
+            "BearDog",
+            "orchestration",
+            discover_socket("BEARDOG_SOCKET", "beardog"),
+        ),
+        (
+            "Songbird",
+            "discovery",
+            discover_socket("SONGBIRD_SOCKET", "songbird"),
+        ),
         ("ToadStool", "compute", toadstool_path),
-        ("NestGate", "data.ncbi", discover_socket("NESTGATE_SOCKET", "nestgate")),
+        (
+            "NestGate",
+            "data.ncbi",
+            discover_socket("NESTGATE_SOCKET", "nestgate"),
+        ),
     ];
 
     let mut statuses: Vec<PrimalStatus> = vec![];
@@ -194,8 +206,7 @@ fn main() {
         });
     }
 
-    let neural_api_present =
-        wetspring_barracuda::ipc::provenance::neural_api_socket().is_some();
+    let neural_api_present = wetspring_barracuda::ipc::provenance::neural_api_socket().is_some();
     println!(
         "  Neural API: {}",
         if neural_api_present {

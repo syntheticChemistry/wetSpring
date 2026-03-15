@@ -44,6 +44,8 @@
 
 use std::time::Instant;
 
+use wetspring_barracuda::tolerances;
+
 use barracuda::spectral::{
     GOE_R, POISSON_R, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
@@ -346,7 +348,7 @@ fn main() {
         );
         v.check_pass(
             "Species comparison is meaningful",
-            (r_canine_epi - r_human_epi).abs() < 0.15,
+            (r_canine_epi - r_human_epi).abs() < tolerances::GEOMETRY_DIMENSIONAL_PARITY,
         );
 
         println!("  ┌─ D4: Cross-Species Epidermal Barrier (One Health, W={w})");

@@ -132,6 +132,44 @@ pub const PRIORITY_HEADS: [usize; 3] = [
     C5_PHYLO_PRIORITY,
 ];
 
+/// Urgency threshold for escalation from `Healthy` to `Alert`.
+///
+/// When head-group disagreement urgency exceeds this value, the attention
+/// state machine escalates from normal operation to increased monitoring.
+/// 0.6 balances sensitivity (catching real anomalies) against false alarms
+/// (normal stochastic variation in head outputs).
+///
+/// Provenance: adapted from hotSpring `AttentionState` physics thresholds,
+/// re-calibrated for bio diversity prediction uncertainty ranges.
+pub const URGENCY_ESCALATE_ALERT: f64 = 0.6;
+
+/// Urgency threshold for escalation from `Alert` to `Critical`.
+///
+/// Requires higher disagreement than alert escalation to avoid
+/// premature human-review flagging. 0.8 means ≥80% of the maximum
+/// possible head-group disagreement.
+pub const URGENCY_ESCALATE_CRITICAL: f64 = 0.8;
+
+/// Urgency threshold for de-escalation (recovery to lower state).
+///
+/// The system only de-escalates when urgency drops below this value,
+/// requiring sustained agreement across head groups before relaxing
+/// monitoring cadence. 0.3 provides hysteresis against oscillation
+/// at boundary urgency levels.
+pub const URGENCY_DEESCALATE: f64 = 0.3;
+
+/// Phase label boundary between low (0) and medium (1) regimes.
+///
+/// Used by [`BioHeadGroupDisagreement::from_outputs`] to discretize
+/// continuous head outputs into phase labels for disagreement counting.
+/// Matches [`URGENCY_DEESCALATE`] for consistency in the state machine.
+pub const PHASE_LABEL_LOW: f64 = 0.3;
+
+/// Phase label boundary between medium (1) and high (2) regimes.
+///
+/// Matches [`URGENCY_ESCALATE_ALERT`] for consistency.
+pub const PHASE_LABEL_HIGH: f64 = 0.6;
+
 /// Bio attention state (adapted from hotSpring `AttentionState`).
 ///
 /// Tracks the overall health of the bio monitoring pipeline.
@@ -153,23 +191,23 @@ impl AttentionState {
     pub fn transition(self, urgency: f64) -> Self {
         match self {
             Self::Healthy => {
-                if urgency > 0.6 {
+                if urgency > URGENCY_ESCALATE_ALERT {
                     Self::Alert
                 } else {
                     Self::Healthy
                 }
             }
             Self::Alert => {
-                if urgency > 0.8 {
+                if urgency > URGENCY_ESCALATE_CRITICAL {
                     Self::Critical
-                } else if urgency < 0.3 {
+                } else if urgency < URGENCY_DEESCALATE {
                     Self::Healthy
                 } else {
                     Self::Alert
                 }
             }
             Self::Critical => {
-                if urgency < 0.3 {
+                if urgency < URGENCY_DEESCALATE {
                     Self::Alert
                 } else {
                     Self::Critical
@@ -220,9 +258,9 @@ impl BioHeadGroupDisagreement {
         let phase_disagree = {
             #[expect(clippy::bool_to_int_with_if)]
             let phase_label = |v: f64| -> u8 {
-                if v > 0.6 {
+                if v > PHASE_LABEL_HIGH {
                     2
-                } else if v < 0.3 {
+                } else if v < PHASE_LABEL_LOW {
                     0
                 } else {
                     1

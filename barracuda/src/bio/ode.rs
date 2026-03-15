@@ -133,7 +133,8 @@ where
     F: Fn(&[f64], f64) -> Vec<f64>,
 {
     let n_vars = y0.len();
-    #[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss)] // Truncation/Sign: step count bounded by integration range
+    #[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    // Truncation/Sign: step count bounded by integration range
     let n_steps = ((t_end - t_start) / dt).ceil() as usize;
 
     let mut t_vec = Vec::with_capacity(n_steps + 1);
