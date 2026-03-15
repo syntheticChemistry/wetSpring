@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-15 (V113: 373 experiments, 340 binaries, 5,707+ checks. V113: Exp373 — provenance trio integration, expanded capabilities (9→19), cross-spring time series exchange, biomeOS deploy graph. V112: Exp372 — streaming-only I/O, capability-based runtime discovery, zero clippy pedantic+nursery warnings.)
+**Updated**: 2026-03-15 (V114: 374 experiments, 340 binaries, 5,707+ checks. V114: Exp374 — docs cleanup, niche setup guidance, BarraCUDA absorption handoff, 6 handoffs archived. V113: Exp373 — provenance trio integration, expanded capabilities (9→19), cross-spring time series exchange, biomeOS deploy graph.)
 
 ---
 
@@ -613,7 +613,14 @@ time series exchange format (`ecoPrimals/time-series/v1`). biomeOS deploy graph
 (`graphs/wetspring_deploy.toml`) following `SPRING_AS_NICHE_DEPLOYMENT_STANDARD`.
 All quality gates green.
 
-**Totals: 373 experiments, 340 binaries, 5,707+ checks.**
+### Exp374: V114 Documentation Cleanup + Niche Setup Guidance + BarraCUDA Handoff
+
+Documentation-only experiment. Archived 6 superseded handoffs (V111–V113).
+Updated STUDY.md, baseCamp, README to current counts. Created BarraCUDA
+absorption handoff mapping 8 GPU primitive opportunities from wetSpring science
+modules. Created niche setup guidance for springs modeling the wetSpring pattern.
+
+**Totals: 374 experiments, 340 binaries, 5,707+ checks.**
 
 ---
 

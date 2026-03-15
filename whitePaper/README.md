@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** March 15, 2026
-**Status:** V113 — Validation study active — 5,707+ checks, 1,326 tests, 373 experiments, 340 binaries, standalone `barraCuda` v0.3.5 (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, 180 named tolerances, clippy pedantic + nursery ZERO WARNINGS, 63 papers reproduced, all 46 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. V113: provenance trio integration (rhizoCrypt → loamSpine → sweetGrass), 19 biomeOS capabilities (was 9), cross-spring time series exchange, biomeOS deploy graph. V112: streaming-only I/O, capability-based runtime discovery.
+**Status:** V114 — Validation study active — 5,707+ checks, 1,326 tests, 374 experiments, 340 binaries, standalone `barraCuda` v0.3.5 (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, 180 named tolerances, clippy pedantic + nursery ZERO WARNINGS, 63 papers reproduced, all 46 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. biomeOS niche — deploy graph, 19 capabilities, provenance trio integration, cross-spring time series, Neural API workflow graphs. V114: docs cleanup, niche setup guidance, BarraCUDA absorption handoff. V113: trio + capabilities + deploy graph. V112: streaming-only I/O, capability-based runtime discovery.
 **License:** AGPL-3.0-or-later
 
 ---

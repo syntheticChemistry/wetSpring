@@ -1,8 +1,8 @@
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** March 14, 2026
+**Date:** March 15, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V112 — 356 experiments, 5,707+ validation checks, ALL PASS; 1,621 tests, 340 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 784+ WGSL shaders), toadStool S142+, coralReef Iteration 29. V112: streaming-only I/O (deprecated buffering parsers removed), capability-based runtime discovery (zero hardcoded primal paths), all 40 clippy pedantic+nursery warnings eliminated. V111: debt/cleanup pass — build health, clippy pedantic, bingocube-nautilus, hot-path clone elimination. V110: petalTongue visualization pipeline (Exp353-355) + Anderson QS cross-environment validation (Exp356). 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL, 180 tolerances, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS.
+**Status:** V114 — 374 experiments, 5,707+ validation checks, ALL PASS; 1,326 tests (0 failures), 340 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 784+ WGSL shaders), toadStool S130+, coralReef Phase 10. biomeOS niche — deploy graph, 19 capabilities, provenance trio integration, cross-spring time series, Neural API workflow graphs. V114: docs cleanup, niche guidance, BarraCUDA absorption handoff. V113: provenance trio + expanded capabilities + deploy graph. V112: streaming-only I/O, capability-based discovery. 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL, 180 tolerances, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS.
 
 ---
 

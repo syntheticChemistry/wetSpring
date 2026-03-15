@@ -1,6 +1,6 @@
 # wetSpring: Replicable Life Science and Analytical Chemistry on Consumer GPU Hardware
 
-**Working Draft** — March 2, 2026
+**Working Draft** — March 15, 2026
 
 ---
 
@@ -16,10 +16,10 @@ energy, and memory in a unified benchmark harness. The study covers
 four tracks: 16S amplicon metagenomics (Track 1), comparative genomics
 and mathematical biology (Track 1b), deep-sea metagenomics and microbial
 evolution (Track 1c), and PFAS detection via LC-MS (Track 2),
-validating 88 Rust modules (47 CPU + 45 GPU) against baselines from Galaxy,
+validating 88+ Rust modules (47 CPU + 45 GPU) against baselines from Galaxy,
 QIIME2, asari, FindPFAS, scipy, sklearn, dendropy, real NCBI SRA data, and
-published paper models with 8,300+ quantitative checks across 281 experiments
-— all passing. The pipeline proves substrate independence: math produces
+published paper models with 5,707+ quantitative checks across 374 experiments
+and 340 validation binaries — all passing. The pipeline proves substrate independence: math produces
 identical results on CPU and GPU, validated via metalForge cross-substrate
 checks (Exp060). Random Forest ensemble and Gradient Boosting Machine
 inference achieve 100% specification parity, joining the existing decision

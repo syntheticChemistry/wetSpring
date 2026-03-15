@@ -4,10 +4,10 @@
 against Rust implementations and GPU shaders via `barraCuda` (standalone math
 primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 
-**Date:** March 14, 2026
+**Date:** March 15, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V113 — **1,621 tests** (1,326 default + 295 feature-gated), 373 experiments, 5,707+ validation checks across 340 binaries. Ecosystem: barraCuda v0.3.5, toadStool S130+, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). Provenance trio integration (rhizoCrypt → loamSpine → sweetGrass). Cross-spring time series exchange (`ecoPrimals/time-series/v1`). 19 biomeOS capabilities registered (was 9). biomeOS deploy graph with provenance trio composition.
+**Status:** V114 — **1,326 tests** (0 failures), 374 experiments, 5,707+ validation checks across 340 binaries. Ecosystem: barraCuda v0.3.5, toadStool S130+, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). **biomeOS niche** — deploy graph (`graphs/wetspring_deploy.toml`), 19 capabilities, provenance trio integration, cross-spring time series exchange. Neural API workflow graphs for automated experiment pipelines. Superseded handoffs archived (V111–V112).
 
 ---
 

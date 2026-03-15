@@ -175,6 +175,8 @@ Compares current SHA-256 hashes against this manifest. Exit 0 = no drift.
 | `run_exp002.py` | SRA data download (Exp002) | `7fbcd4bf2f3ec2b6` |
 | `search_ncbi_datasets.py` | NCBI dataset search | `00f1e1133cdd14d4` |
 | `fetch_ncbi_phase35.py` | Phase 35 NCBI bulk fetch | `0c55e7fd85ede4e6` |
+| `download_priority1.py` | PFAS/Vibrio/Campy/SILVA downloads (Track 1/2 data) | — |
+| `download_priority2.py` | NCBI bulk download utility | — |
 
 ---
 

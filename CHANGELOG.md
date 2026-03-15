@@ -3,6 +3,37 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V114] — 2026-03-15
+
+### Documentation Cleanup + Niche Setup Guidance + BarraCUDA Handoff
+
+Root documentation refresh, archive cleanup, and niche model alignment with
+wateringHole standards. Crafted BarraCUDA/ToadStool absorption handoff
+capturing all wetSpring learnings relevant to GPU shader evolution.
+
+#### Documentation
+- README updated to V114 with accurate test counts and niche status
+- whitePaper/STUDY.md refreshed with current experiment/binary/check counts
+- Superseded handoffs archived (V111×2, V112×2, V113×2 → `handoffs/archive/`)
+- Active handoffs: V113 Provenance Trio (Mar 15), V114 Deep Audit (Mar 12), V114 Niche (new)
+- `download_priority1.py` and `download_priority2.py` documented in BASELINE_MANIFEST
+
+#### Niche Setup Guidance
+- wateringHole/ handoff with niche setup checklist for springs modeling the wetSpring pattern
+- Deploy graph (`graphs/wetspring_deploy.toml`) validated against SPRING_AS_NICHE_DEPLOYMENT_STANDARD
+- Capability registration, UniBin, socket discovery, provenance trio — all documented
+
+#### BarraCUDA/ToadStool Absorption Handoff
+- Comprehensive handoff for BarraCUDA team: NMF GPU primitives, kinetics ODE solvers, taxonomy ML
+- Maps 10 wetSpring science modules to BarraCUDA primitive opportunities
+- Identifies 5 GPU-ready algorithms (NMF, alignment, phylogenetics, kinetics, diversity)
+- Documents F64/DF64 precision requirements per algorithm
+
+#### Quality Gates
+- `cargo check --features ipc,json` — clean
+- `cargo clippy --features ipc,json -- -W clippy::pedantic -W clippy::nursery` — zero warnings
+- `cargo test` — 1,326 tests pass, 0 fail
+
 ## [V113] — 2026-03-15
 
 ### Provenance Trio + Expanded Capabilities + biomeOS Deploy Graph
