@@ -23,7 +23,7 @@ impl SyntheticSignalGenerator {
     /// The signal consists of a baseline current with Gaussian-like noise,
     /// simulating an open channel at `channel_id`.
     #[must_use]
-    #[expect(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)] // Precision: n_samples and RNG values fit f64
     pub fn generate_read(
         &self,
         channel_id: u32,
@@ -80,7 +80,7 @@ impl SyntheticSignalGenerator {
     ) -> Vec<NanoporeRead> {
         (0..n_reads)
             .map(|i| {
-                #[expect(clippy::cast_possible_truncation)]
+                #[expect(clippy::cast_possible_truncation)] // Truncation: i < n_reads, 512 fits u32
                 let ch = (i as u32) % 512 + 1;
                 self.generate_read(ch, samples_per_read, sample_rate)
             })
@@ -93,7 +93,7 @@ impl SyntheticSignalGenerator {
     /// T=700 ADC units) with `samples_per_base` samples per nucleotide,
     /// plus Gaussian noise. Used for basecalling validation.
     #[must_use]
-    #[expect(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)] // Precision: sequence length and RNG fit f64
     pub fn generate_from_sequence(
         &self,
         channel_id: u32,
@@ -178,7 +178,7 @@ pub fn threshold_basecall(calibrated_pa: f64) -> u8 {
 /// computes the mean of each, and classifies by threshold.
 /// Returns the basecalled sequence.
 #[must_use]
-#[expect(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)] // Precision: segment.len() bounded by calibrated len
 pub fn simple_basecall(calibrated: &[f64], n_bases: usize) -> Vec<u8> {
     if n_bases == 0 || calibrated.is_empty() {
         return Vec::new();

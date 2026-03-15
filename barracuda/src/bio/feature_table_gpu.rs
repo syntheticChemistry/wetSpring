@@ -157,7 +157,7 @@ pub fn extract_features_gpu(
 }
 
 /// Estimate noise floor from median of bottom 25% of intensities.
-#[expect(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)] // Precision: noise_slice.len() bounded
 fn estimate_noise(intensity: &[f64]) -> f64 {
     if intensity.is_empty() {
         return 0.0;

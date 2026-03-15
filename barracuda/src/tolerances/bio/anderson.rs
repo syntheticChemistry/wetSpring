@@ -62,3 +62,17 @@ pub const ANDERSON_STRONG_DISORDER_CEILING: f64 = 0.45;
 /// higher disorder than 1D.
 /// Validated: Exp122 (`validate_anderson_2d_qs`, commit `756df26`, 2026-02-26).
 pub const ANDERSON_2D_WEAK_DISORDER_FLOOR: f64 = 0.45;
+
+/// Anderson QS model correlation comparison margin.
+///
+/// When comparing model correlations (e.g. H3 vs H2), allow H3 to be
+/// up to 0.1 lower than H2 and still consider them "comparable."
+/// Validated: `validate_anderson_qs_environments_v1` S3.
+pub const MODEL_CORRELATION_MARGIN: f64 = 0.1;
+
+/// Anderson QS model MAE comparison margin.
+///
+/// When comparing model MAE (e.g. H3 vs H2), allow H3 to exceed H2 by
+/// up to 0.05 and still consider H3 "close" to H2.
+/// Validated: `validate_anderson_qs_environments_v1` S6.
+pub const MODEL_MAE_MARGIN: f64 = 0.05;

@@ -28,9 +28,11 @@
 # Output:
 #   experiments/results/track6_anaerobic/biogas_kinetics_baseline.json
 
+import hashlib
 import json
 import math
 import platform
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -38,6 +40,24 @@ from pathlib import Path
 import numpy as np
 from scipy.optimize import minimize_scalar
 from scipy.spatial.distance import braycurtis
+
+
+def _script_sha256() -> str:
+    """SHA-256 of this script file for provenance tracking."""
+    script_path = Path(__file__).resolve()
+    return hashlib.sha256(script_path.read_bytes()).hexdigest()[:16]
+
+
+def _git_commit() -> str:
+    """Current git HEAD short hash, or 'unknown' if not in a repo."""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"],
+            capture_output=True, text=True, timeout=5, check=False,
+        )
+        return result.stdout.strip() if result.returncode == 0 else "unknown"
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        return "unknown"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # §1 Modified Gompertz: H(t) = P * exp(-exp((Rm*e/P)*(lambda_-t) + 1))
@@ -127,6 +147,8 @@ def main():
             "numpy_version": np.__version__,
             "scipy_version": __import__("scipy").__version__,
             "command": " ".join(sys.argv) or "python3 scripts/python_anaerobic_biogas_baseline.py",
+            "script_sha256": _script_sha256(),
+            "git_commit": _git_commit(),
         },
         "gompertz": {},
         "first_order": {},

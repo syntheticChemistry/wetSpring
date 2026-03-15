@@ -1,18 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::print_stdout,
-    clippy::too_many_lines,
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
-    clippy::similar_names,
-    clippy::many_single_char_names,
-    clippy::items_after_statements,
-    clippy::float_cmp
-)]
+#![allow(clippy::expect_used)]
+#![allow(clippy::unwrap_used)]
+#![allow(clippy::print_stdout)]
+#![allow(clippy::too_many_lines)]
+#![allow(clippy::cast_precision_loss)]
+#![allow(clippy::cast_possible_truncation)]
+#![allow(clippy::cast_sign_loss)]
+#![allow(clippy::similar_names)]
+#![allow(clippy::many_single_char_names)]
+#![allow(clippy::items_after_statements)]
+#![allow(clippy::float_cmp)]
 //! # Exp356: Anderson QS Cross-Environment Validation
 //!
 //! Tests the Anderson QS model against real biological expectations:
@@ -59,6 +57,7 @@ use std::path::PathBuf;
 
 use barracuda::stats::norm_cdf;
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::visualization::{
     DataChannel, EcologyScenario, ScenarioEdge, ScenarioNode, ScientificRange, scenario_to_json,
@@ -236,7 +235,7 @@ fn main() {
     v.check_pass("all 10 environments computed", results.len() == 10);
     v.check_pass(
         "E. coli monoculture has H'=0 (single species)",
-        results[0].h_prime < 0.01,
+        results[0].h_prime < tolerances::DIVERSITY_MONOCULTURE_NEAR_ZERO,
     );
     v.check_pass(
         "bulk soil has highest diversity",
@@ -373,7 +372,7 @@ fn main() {
     );
     v.check_pass(
         "O₂-modulated (H3) improves on signal dilution (H2) or is comparable",
-        corr_h3 >= corr_h2 - 0.1,
+        corr_h3 >= corr_h2 - tolerances::MODEL_CORRELATION_MARGIN,
     );
 
     // ── S4: Specific biological predictions ──
@@ -559,7 +558,10 @@ fn main() {
     println!("  H3 MAE: {mae_h3:.4}");
 
     v.check_pass("H2 MAE < H1 MAE", mae_h2 < mae_h1);
-    v.check_pass("H3 MAE <= H2 MAE or close", mae_h3 <= mae_h2 + 0.05);
+    v.check_pass(
+        "H3 MAE <= H2 MAE or close",
+        mae_h3 <= mae_h2 + tolerances::MODEL_MAE_MARGIN,
+    );
 
     // ── S7: petalTongue scenario export ──
     println!("\n── S7: petalTongue scenario export ──");

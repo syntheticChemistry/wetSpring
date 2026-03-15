@@ -238,7 +238,7 @@ pub fn rarefaction_bootstrap_gpu(
 }
 
 /// Subsample a community to the given depth using multinomial sampling.
-#[expect(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)] // Precision: u64 RNG bits / 2^53 fits f64
 fn subsample_community(counts: &[f64], depth: usize, rng: &mut u64) -> Vec<f64> {
     let total: f64 = counts.iter().sum();
     if total <= 0.0 {
@@ -307,7 +307,7 @@ fn compute_ci(samples: &[f64]) -> BootstrapCi {
 /// # Errors
 ///
 /// Returns an error if GPU dispatch fails or the device lacks f64 support.
-#[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+#[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss)] // Truncation/Sign: sample sizes fit u32
 pub fn batch_rarefaction_gpu(
     gpu: &GpuF64,
     samples: &[Vec<f64>],

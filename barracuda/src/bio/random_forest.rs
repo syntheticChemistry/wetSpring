@@ -148,7 +148,7 @@ impl RandomForest {
 
     /// Average tree depth across the forest.
     #[must_use]
-    #[expect(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)] // Precision: total depth and tree count bounded
     pub fn avg_depth(&self) -> f64 {
         if self.trees.is_empty() {
             return 0.0;

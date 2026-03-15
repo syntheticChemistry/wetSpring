@@ -41,6 +41,7 @@
 //! - **Existing math unchanged**: the server is a thin JSON-RPC wrapper over
 //!   validated barracuda library functions.
 
+pub mod capability_domains;
 pub mod discover;
 pub mod dispatch;
 pub mod handlers;

@@ -49,7 +49,7 @@ impl KmerGpu {
     /// # Errors
     ///
     /// Returns `Err` if GPU buffer readback fails.
-    #[expect(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)] // Truncation: hist_len = 4^k, k small, fits u32
     pub fn count_histogram(
         &self,
         kmer_indices: &[u32],

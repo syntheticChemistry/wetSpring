@@ -12,12 +12,17 @@ use std::path::PathBuf;
 /// Default socket path when `NESTGATE_SOCKET` is not set.
 ///
 /// Uses environment-based discovery: checks `NESTGATE_SOCKET` first,
-/// falls back to `/run/nestgate/default.sock`.
+/// then `$XDG_RUNTIME_DIR/biomeos/nestgate-default.sock`, then
+/// platform-agnostic temp dir fallback. No hardcoded absolute paths.
 #[must_use]
 pub fn default_socket_path() -> PathBuf {
-    std::env::var("NESTGATE_SOCKET")
-        .unwrap_or_else(|_| String::from("/run/nestgate/default.sock"))
-        .into()
+    if let Ok(path) = std::env::var("NESTGATE_SOCKET") {
+        return PathBuf::from(path);
+    }
+    if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
+        return PathBuf::from(xdg).join("biomeos/nestgate-default.sock");
+    }
+    std::env::temp_dir().join("nestgate-default.sock")
 }
 
 /// Discover the `NestGate` Unix socket.

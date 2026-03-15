@@ -153,7 +153,7 @@ fn find_best_overlap(
         }
 
         // Check mismatch constraints
-        #[expect(clippy::cast_precision_loss)]
+        #[expect(clippy::cast_precision_loss)] // Precision: mismatches and overlap bounded
         let mismatch_frac = mismatches as f64 / overlap as f64;
 
         if mismatches > params.max_mismatches || mismatch_frac > params.max_mismatch_fraction {
@@ -271,7 +271,7 @@ pub fn merge_pair(fwd: &FastqRecord, rev: &FastqRecord, params: &MergeParams) ->
 
     // Quality filter on merged read
     if params.min_merged_quality > 0 {
-        #[expect(clippy::cast_precision_loss)]
+        #[expect(clippy::cast_precision_loss)] // Precision: merged_qual.len() bounded
         let mean_q: f64 = merged_qual
             .iter()
             .map(|&q| f64::from(q.saturating_sub(params.phred_offset)))
@@ -305,7 +305,7 @@ pub fn merge_pair(fwd: &FastqRecord, rev: &FastqRecord, params: &MergeParams) ->
 ///
 /// Panics if `fwd_reads.len() != rev_reads.len()` (forward and reverse read
 /// counts must match).
-#[expect(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)] // Precision: overlap and length counts bounded
 #[must_use]
 pub fn merge_pairs(
     fwd_reads: &[FastqRecord],

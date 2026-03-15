@@ -7,6 +7,14 @@
 /// rounds falls below this value. Matches the DADA2 R package default.
 pub const DADA2_ERR_CONVERGENCE: f64 = 1e-6;
 
+/// DADA2 error model P(error) parity vs R/dada2.
+///
+/// P(error) = 10^(-Q/10), P(sub) = P(error)/3. R/dada2 §2 formula
+/// matches our implementation; 1e-7 covers accumulated rounding in
+/// the probability table initialization.
+/// Validated: `validate_r_industry_parity` §7 (`init_error_model`).
+pub const DADA2_ERROR_MODEL_PARITY: f64 = 1e-7;
+
 /// `PCoA` eigenvalue non-negativity floor.
 ///
 /// Jacobi eigendecomposition of a centered distance matrix should produce

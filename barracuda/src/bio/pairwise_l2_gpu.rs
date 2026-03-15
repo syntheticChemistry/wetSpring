@@ -21,7 +21,7 @@ use wgpu::util::DeviceExt;
 /// # Errors
 ///
 /// Returns [`Error::Gpu`] if dispatch fails or dimensions are invalid.
-#[expect(clippy::cast_possible_truncation)]
+#[expect(clippy::cast_possible_truncation)] // Truncation: n, dim fit u32 (wgpu dispatch)
 pub fn pairwise_l2_condensed_gpu(
     gpu: &GpuF64,
     coords: &[f64],

@@ -50,7 +50,7 @@ impl HammingGpu {
     /// # Errors
     ///
     /// Returns an error if sequences have unequal lengths or GPU read fails.
-    #[expect(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)] // Truncation: n_seqs, seq_len fit u32
     pub fn pairwise_hamming(&self, sequences: &[&[u32]]) -> crate::error::Result<HammingGpuResult> {
         let n_seqs = sequences.len();
         if n_seqs < 2 {

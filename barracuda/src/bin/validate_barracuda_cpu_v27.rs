@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
+#![expect(
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
@@ -45,6 +45,17 @@
 //! | Provenance type | `BarraCuda` CPU (pure Rust — zero external runtime) |
 //! | Date | 2026-03-10 |
 //! | Command | `cargo run --release --bin validate_barracuda_cpu_v27` |
+//!
+//! ## Baseline sources
+//!
+//! | Domain | Baseline | Script / Tool |
+//! |--------|----------|---------------|
+//! | D65 | Analytical known-values | Exact: mean([1..5])=3, var([1..5])=2.5, slope(x,2x)=2 |
+//! | D66 | Analytical graph theory | Laplacian row-sum=0, degree matrix properties |
+//! | D67 | Abramowitz & Stegun tables | erf(0)=0, Φ(0)=0.5, ln_gamma(1)=0 |
+//! | D68 | barraCuda shaders::provenance | Registry cross-spring metadata |
+//! | D69 | `scripts/python_anaerobic_biogas_baseline.py` (V107, 2026-03-10) | Yang 2016: P=350/Rm=25/λ=3, B_max=320/k=0.08, μ_max=0.4/Ks=200/Ki=3000 |
+//! | D70 | `scripts/python_anaerobic_biogas_baseline.py` (V107, 2026-03-10) | W=20·(1−J), communities: anaerobic=[45,25,15,8,3,2,1,0.5,0.3,0.2] |
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, qs_biofilm};
@@ -268,9 +279,9 @@ fn main() {
 
     v.check("D67: Φ(0) = 0.5", norm_cdf(0.0), 0.5, tolerances::EXACT_F64);
     d67 += 1;
-    v.check("D67: Φ(-10) → 0", norm_cdf(-10.0), 0.0, 1e-10);
+    v.check("D67: Φ(-10) → 0", norm_cdf(-10.0), 0.0, tolerances::ANALYTICAL_LOOSE);
     d67 += 1;
-    v.check("D67: Φ(10) → 1", norm_cdf(10.0), 1.0, 1e-10);
+    v.check("D67: Φ(10) → 1", norm_cdf(10.0), 1.0, tolerances::ANALYTICAL_LOOSE);
     d67 += 1;
 
     let lng_1 = barracuda::special::ln_gamma(1.0).expect("ln_gamma(1)");
@@ -358,10 +369,10 @@ fn main() {
     d69 += 1;
     let t_half = (2.0_f64).ln() / 0.08;
     v.check(
-        "D69: First-order B(t_half) = B_max/2",
+        "D69: First-order B(t_half) = B_max/2",  // python_anaerobic_biogas_baseline.py: B_max=320, k=0.08
         first_order(t_half, 320.0, 0.08),
         160.0,
-        1e-10,
+        tolerances::ANALYTICAL_LOOSE,
     );
     d69 += 1;
 

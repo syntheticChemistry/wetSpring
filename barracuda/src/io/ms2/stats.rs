@@ -93,7 +93,7 @@ pub fn stats_from_file(path: &Path) -> Result<Ms2Stats> {
         num_spectra += 1;
     }
 
-    #[expect(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)] // Precision: num_spectra and total_peaks bounded
     Ok(Ms2Stats {
         num_spectra,
         total_peaks,

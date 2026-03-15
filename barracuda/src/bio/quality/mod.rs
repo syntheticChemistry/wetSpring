@@ -243,7 +243,7 @@ pub struct QualityFlatResult {
 /// * `lengths` — Length of each read.
 /// * `params` — Quality filtering parameters.
 #[must_use]
-#[expect(clippy::cast_possible_truncation)]
+#[expect(clippy::cast_possible_truncation)] // Truncation: read lengths fit u32
 pub fn filter_reads_flat(
     qualities: &[u8],
     offsets: &[usize],

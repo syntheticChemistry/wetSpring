@@ -70,7 +70,7 @@ jobs:
           cargo llvm-cov --lib --fail-under-lines 90
 
   coverage-forge:
-    name: Coverage — metalForge (80% gate)
+    name: Coverage — metalForge (90% gate)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -81,10 +81,10 @@ jobs:
         with:
           workspaces: metalForge/forge
       - uses: taiki-e/install-action@cargo-llvm-cov
-      - name: Run coverage and enforce 80% threshold
+      - name: Run coverage and enforce 90% threshold
         working-directory: metalForge/forge
         run: |
-          cargo llvm-cov --lib --fail-under-lines 80
+          cargo llvm-cov --lib --fail-under-lines 90
 
   doc:
     name: Documentation

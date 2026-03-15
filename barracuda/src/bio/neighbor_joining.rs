@@ -38,7 +38,7 @@ pub struct NjResult {
 pub fn jukes_cantor_distance(seq1: &[u8], seq2: &[u8]) -> f64 {
     assert_eq!(seq1.len(), seq2.len(), "sequences must have equal length");
     let diffs = seq1.iter().zip(seq2.iter()).filter(|(a, b)| a != b).count();
-    #[expect(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)] // Precision: diffs and seq len bounded
     let p = diffs as f64 / seq1.len() as f64;
     if p >= 0.75 {
         return 10.0;
@@ -72,7 +72,7 @@ pub fn distance_matrix(sequences: &[&[u8]]) -> Vec<f64> {
 ///
 /// Panics if `labels.len() < 2` or `dist.len() != n * n`.
 #[must_use]
-#[expect(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)] // Precision: n and max_nodes bounded
 pub fn neighbor_joining(dist: &[f64], labels: &[impl AsRef<str>]) -> NjResult {
     let n = labels.len();
     assert!(n >= 2, "need at least 2 taxa");

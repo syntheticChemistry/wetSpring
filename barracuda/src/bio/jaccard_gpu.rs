@@ -48,7 +48,7 @@ impl JaccardGpu {
     /// # Errors
     ///
     /// Returns an error if matrix size mismatches or GPU read fails.
-    #[expect(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)] // Truncation: n_genomes, n_genes fit u32
     pub fn pairwise_jaccard(
         &self,
         pa_matrix: &[f32],

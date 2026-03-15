@@ -3,6 +3,60 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V115] — 2026-03-15
+
+### Deep Audit Execution + UniBin + Capability Domains + Tolerance Evolution
+
+Comprehensive 12-finding audit executed: UniBin binary compliance, capability
+domain architecture, centralized tolerance hierarchy, XDG-compliant path
+resolution, Python baseline provenance, bitflag struct refactoring, metalForge
+coverage boost, cast safety documentation, and lint hardening.
+
+#### UniBin Compliance
+- `wetspring_server` binary renamed to `wetspring` (ecoBin standard)
+- Subcommands: `server` (default), `status`, `version`, `help`
+- `status` reports socket state, Songbird discovery, and all registered capabilities
+- Help dynamically lists all capabilities from `capability_domains::ALL_CAPABILITIES`
+
+#### Capability Domain Architecture
+- New `ipc/capability_domains.rs`: 19 capabilities across 4 domains (ecology, science, provenance, brain)
+- `capability_registry.toml`: machine-readable TOML manifest for all capabilities
+- Each capability declares domain, description, GPU acceleration status
+- Runtime discovery via Songbird registration uses domain constants
+
+#### Tolerance Centralization
+- `NMF_CONVERGENCE` (1e-6) and `NMF_CONVERGENCE_LOOSE` (1e-4) for IPC NMF handler
+- `MATRIX_EPS` replaces inline 1e-12 in NMF epsilon guard
+- `STABLE_SPECIAL_TINY` (1e-28) for stable special function precision
+- All inline tolerance literals in `expanded.rs` replaced with `tolerances::` constants
+
+#### Path Resolution Evolution
+- `/tmp/` hardcodes in `validate_primal_pipeline_v1.rs` → XDG_RUNTIME_DIR with temp_dir fallback
+- NestGate socket discovery (`metalForge/forge/src/nest/discovery.rs`): removed hardcoded `/run/nestgate/default.sock`
+- All socket paths now: env var → XDG_RUNTIME_DIR → std::env::temp_dir()
+
+#### Python Baseline Provenance
+- `scripts/python_anaerobic_biogas_baseline.py`: SHA-256 self-hash + git commit in JSON metadata
+- New `scripts/verify_baseline_outputs.sh`: automated baseline integrity + numeric drift checker
+- Provenance headers in `validate_barracuda_cpu_v27.rs`: D65-D70 baseline source table
+
+#### Code Quality Hardening
+- `QsType` struct in `validate_qs_gene_profiling_v1.rs`: booleans → bitflag u8 (clippy struct_excessive_bools resolved)
+- Cast safety documentation: all `#[expect(clippy::cast_*)]` annotated with rationale
+- `doc_markdown` lint fixes across 5 tolerance modules
+- metalForge CI coverage threshold: 80% → 90%
+
+#### metalForge Coverage
+- 6 new tests in `forge/src/inventory/output.rs` (empty, CPU-only, GPU detail, mesh, mixed)
+- 6 new tests in `forge/src/data.rs` (discover fallbacks, NestGate unreachable, key escaping)
+- `Identity` struct corrections, `Capability::ShaderDispatch` fix
+
+#### Quality Gates
+- `cargo check --workspace` — clean
+- `cargo clippy --workspace -- -D warnings` — zero warnings (pedantic + nursery)
+- `cargo test --workspace` — 1,662 tests pass, 0 fail (was 1,621)
+- 374 experiments, 5,707+ validation checks, 354 binaries
+
 ## [V114] — 2026-03-15
 
 ### Documentation Cleanup + Niche Setup Guidance + BarraCUDA Handoff

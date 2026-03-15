@@ -37,7 +37,7 @@ impl NanoporeRead {
 
     /// Duration of this read in seconds.
     #[must_use]
-    #[expect(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)] // Precision: signal.len() fits f64
     pub fn duration_seconds(&self) -> f64 {
         if self.sample_rate > 0.0 {
             self.signal.len() as f64 / self.sample_rate
@@ -63,7 +63,7 @@ impl NanoporeRead {
     /// Uses Welford's online algorithm for numerically stable single-pass
     /// computation — no intermediate `Vec<f64>` allocation.
     #[must_use]
-    #[expect(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)] // Precision: signal.len() fits f64
     pub fn signal_stats(&self) -> SignalStats {
         if self.signal.is_empty() {
             return SignalStats {

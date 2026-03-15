@@ -259,7 +259,7 @@ impl FlatTree {
         let mut leaf_states = vec![0u8; n_sites * n_leaves];
         for (leaf_idx, states) in leaf_seqs.iter().enumerate() {
             for (site, &s) in states.iter().enumerate() {
-                #[expect(clippy::cast_possible_truncation)]
+                #[expect(clippy::cast_possible_truncation)] // Truncation: s is DNA state 0..4
                 {
                     leaf_states[site * n_leaves + leaf_idx] = s as u8;
                 }
@@ -340,7 +340,7 @@ impl FlatTree {
     }
 
     #[inline]
-    #[expect(clippy::cast_sign_loss)]
+    #[expect(clippy::cast_sign_loss)] // Sign: leaf_idx from -child-1, child is negative leaf id
     fn get_partial(
         &self,
         child: i32,

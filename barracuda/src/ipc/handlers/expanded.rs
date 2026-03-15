@@ -10,6 +10,7 @@ use crate::bio::alignment::{AlignmentResult, ScoringParams};
 use crate::bio::robinson_foulds;
 use crate::bio::unifrac::PhyloTree;
 use crate::ipc::protocol::RpcError;
+use crate::tolerances;
 
 use super::extract_f64_array;
 
@@ -21,7 +22,7 @@ use super::extract_f64_array;
 /// # Errors
 ///
 /// Returns `RpcError::invalid_params` for unknown model names.
-#[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss, clippy::cast_precision_loss)]
+#[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss, clippy::cast_precision_loss)] // Cast: steps, indices bounded
 pub fn handle_kinetics(params: &Value) -> Result<Value, RpcError> {
     let model = params
         .get("model")
@@ -84,7 +85,7 @@ pub fn handle_kinetics(params: &Value) -> Result<Value, RpcError> {
 /// # Errors
 ///
 /// Returns `RpcError::invalid_params` if `seq_a` or `seq_b` is missing.
-#[expect(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)] // Precision: match count and aligned_len bounded by sequence length
 pub fn handle_alignment(params: &Value) -> Result<Value, RpcError> {
     let seq_a = params
         .get("seq_a")
@@ -281,7 +282,7 @@ pub fn handle_nmf(params: &Value) -> Result<Value, RpcError> {
 
 /// Multiplicative-update NMF (Lee & Seung 2001).
 /// Returns (W, H, `final_error`, `iterations_used`).
-#[expect(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)] // Precision: rank and loop indices small (< 2^53)
 fn nmf_mu(
     v: &[f64],
     n_rows: usize,
@@ -289,8 +290,8 @@ fn nmf_mu(
     rank: usize,
     max_iter: usize,
 ) -> (Vec<f64>, Vec<f64>, f64, usize) {
-    let epsilon = 1e-12_f64;
-    let tol = 1e-6_f64;
+    let epsilon = tolerances::MATRIX_EPS;
+    let tol = tolerances::NMF_CONVERGENCE;
 
     let mut w = vec![1.0 / rank as f64; n_rows * rank];
     let mut h = vec![1.0 / rank as f64; rank * n_cols];

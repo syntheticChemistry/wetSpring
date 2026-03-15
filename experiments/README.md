@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-15 (V114: 374 experiments, 340 binaries, 5,707+ checks. V114: Exp374 — docs cleanup, niche setup guidance, BarraCUDA absorption handoff, 6 handoffs archived. V113: Exp373 — provenance trio integration, expanded capabilities (9→19), cross-spring time series exchange, biomeOS deploy graph.)
+**Updated**: 2026-03-15 (V115: 375 experiments, 354 binaries, 5,707+ checks, 1,662 tests. Exp375 — V115 deep audit: UniBin compliance, capability domains, tolerance centralization, XDG path resolution, metalForge 90% coverage. V114: Exp374 — docs cleanup, niche guidance, BarraCUDA absorption handoff.)
 
 ---
 
@@ -195,6 +195,7 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 317 | Pure GPU Streaming v11 | streaming | DONE | CPU+GPU reference | E2E pipeline: diversity→BC→Anderson→stats, zero CPU round-trips | 25 |
 | 318 | metalForge v16 | metalforge | DONE | Pipeline integration | Cross-system paper math, 6 domains, CPU=GPU=NPU | 24 |
 | 335 | R Industry Parity Baselines | cross | DONE | R/vegan + R/DADA2 + R/phyloseq | bio::diversity, bio::dada2, bio::phred, bio::unifrac | 53 |
+| 375 | [V115 Deep Audit](375_v115_deep_audit_unibin_capability_domains.md) | cross | DONE | V114 codebase audit | UniBin, capability_domains, tolerances, XDG, coverage | — |
 
 ---
 
@@ -615,12 +616,12 @@ All quality gates green.
 
 ### Exp374: V114 Documentation Cleanup + Niche Setup Guidance + BarraCUDA Handoff
 
-Documentation-only experiment. Archived 6 superseded handoffs (V111–V113).
+Documentation-only experiment. Archived 6 superseded handoffs (V111–V114).
 Updated STUDY.md, baseCamp, README to current counts. Created BarraCUDA
 absorption handoff mapping 8 GPU primitive opportunities from wetSpring science
 modules. Created niche setup guidance for springs modeling the wetSpring pattern.
 
-**Totals: 374 experiments, 340 binaries, 5,707+ checks.**
+**Totals: 375 experiments, 354 binaries, 5,707+ checks.**
 
 ---
 

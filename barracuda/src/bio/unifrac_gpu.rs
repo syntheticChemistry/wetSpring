@@ -59,7 +59,7 @@ impl UniFracGpu {
     /// # Errors
     ///
     /// Returns `Err` if GPU dispatch or readback fails.
-    #[expect(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)] // Truncation: n_nodes, n_samples, n_leaves fit u32
     pub fn propagate(
         &self,
         parent_array: &[u32],

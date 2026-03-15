@@ -39,7 +39,7 @@ impl BatchFitnessGpuWrapper {
     /// # Errors
     ///
     /// Returns an error if size mismatches or GPU read fails.
-    #[expect(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)] // Truncation: pop_size, genome_len fit u32
     pub fn evaluate(
         &self,
         population: &[f32],

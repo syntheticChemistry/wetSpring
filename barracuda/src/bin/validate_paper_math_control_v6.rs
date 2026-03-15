@@ -1,18 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::print_stdout,
-    clippy::too_many_lines,
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
-    clippy::similar_names,
-    clippy::many_single_char_names,
-    clippy::items_after_statements,
-    clippy::float_cmp
-)]
+#![allow(clippy::expect_used)]
+#![allow(clippy::unwrap_used)]
+#![allow(clippy::print_stdout)]
+#![allow(clippy::too_many_lines)]
+#![allow(clippy::cast_precision_loss)]
+#![allow(clippy::cast_possible_truncation)]
+#![allow(clippy::cast_sign_loss)]
+#![allow(clippy::similar_names)]
+#![allow(clippy::many_single_char_names)]
+#![allow(clippy::items_after_statements)]
+#![allow(clippy::float_cmp)]
 //! # Exp341: Paper Math Control v6 — 63 Papers (V108)
 //!
 //! Extends v5 (52 papers, Exp313) with Track 5 immuno-Anderson (P53-P58)
@@ -204,7 +202,7 @@ fn main() {
         "P57: PK C(t_half) = C0/2",
         pk_decay(t_half),
         c0 / 2.0,
-        1e-12,
+        tolerances::ANALYTICAL_F64,
     );
     v.check_pass("P57: PK decay monotonic", pk_decay(5.0) > pk_decay(10.0));
 

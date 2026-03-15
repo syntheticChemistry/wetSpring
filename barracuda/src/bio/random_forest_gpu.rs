@@ -160,7 +160,7 @@ impl RandomForestGpu {
                 .enumerate()
                 .max_by_key(|&(_, v)| v)
                 .unwrap_or((0, 0));
-            #[expect(clippy::cast_precision_loss)]
+            #[expect(clippy::cast_precision_loss)] // Precision: vote counts and n_trees bounded
             let confidence = max_votes as f64 / n_trees as f64;
             results.push(RfPrediction {
                 class,

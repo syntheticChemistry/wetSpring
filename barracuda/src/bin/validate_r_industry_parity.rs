@@ -42,6 +42,7 @@ use std::collections::HashMap;
 use std::time::Instant;
 
 use wetspring_barracuda::bio::{dada2, diversity, phred, unifrac};
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn main() {
@@ -71,10 +72,6 @@ fn main() {
 // §1  vegan: Shannon & Simpson
 // ═══════════════════════════════════════════════════════════════════
 
-/// Analytical f64 tolerance: vegan uses the same `ln` formula, so the only
-/// difference is accumulator order. 1e-12 covers all realistic community sizes.
-const ANALYTICAL_TOL: f64 = 1e-12;
-
 fn validate_vegan_shannon_simpson(v: &mut Validator) {
     v.section("§1  vegan: Shannon & Simpson");
 
@@ -85,7 +82,7 @@ fn validate_vegan_shannon_simpson(v: &mut Validator) {
         "Shannon(uniform,S=10) vs R/vegan",
         diversity::shannon(&uniform),
         2.302_585_092_994_045,
-        ANALYTICAL_TOL,
+        tolerances::ANALYTICAL_F64,
     );
 
     // R/vegan: 0.9 (exact analytical)
@@ -93,7 +90,7 @@ fn validate_vegan_shannon_simpson(v: &mut Validator) {
         "Simpson(uniform,S=10) vs R/vegan",
         diversity::simpson(&uniform),
         0.9,
-        ANALYTICAL_TOL,
+        tolerances::ANALYTICAL_F64,
     );
 
     // §1b  Skewed community: [900, 11, 11, 11, 11, 11, 11, 11, 11, 11]
@@ -107,7 +104,7 @@ fn validate_vegan_shannon_simpson(v: &mut Validator) {
         "Shannon(skewed) vs R/vegan",
         diversity::shannon(&skewed),
         0.540_841_946_817_804_4,
-        ANALYTICAL_TOL,
+        tolerances::ANALYTICAL_F64,
     );
 
     // R/vegan: 0.1872863854845837
@@ -115,7 +112,7 @@ fn validate_vegan_shannon_simpson(v: &mut Validator) {
         "Simpson(skewed) vs R/vegan",
         diversity::simpson(&skewed),
         0.187_286_385_484_583_7,
-        ANALYTICAL_TOL,
+        tolerances::ANALYTICAL_F64,
     );
 
     // §1c  5-species community [100, 80, 60, 40, 20] (Exp002 proxy)
@@ -125,7 +122,7 @@ fn validate_vegan_shannon_simpson(v: &mut Validator) {
         "Shannon(5sp) vs R/vegan",
         diversity::shannon(&exp002_proxy),
         1.489_750_318_850_591,
-        ANALYTICAL_TOL,
+        tolerances::ANALYTICAL_F64,
     );
 
     // R/vegan: 0.7555555555555555
@@ -133,7 +130,7 @@ fn validate_vegan_shannon_simpson(v: &mut Validator) {
         "Simpson(5sp) vs R/vegan",
         diversity::simpson(&exp002_proxy),
         0.755_555_555_555_555_5,
-        ANALYTICAL_TOL,
+        tolerances::ANALYTICAL_F64,
     );
 }
 
@@ -153,7 +150,7 @@ fn validate_vegan_bray_curtis(v: &mut Validator) {
         "BC(a,b) vs R/vegan",
         diversity::bray_curtis(&comm_a, &comm_b),
         0.4,
-        ANALYTICAL_TOL,
+        tolerances::ANALYTICAL_F64,
     );
 
     // R/vegan: 0.0 (identical samples)
@@ -161,13 +158,18 @@ fn validate_vegan_bray_curtis(v: &mut Validator) {
         "BC(a,c) self-distance vs R/vegan",
         diversity::bray_curtis(&comm_a, &comm_c),
         0.0,
-        ANALYTICAL_TOL,
+        tolerances::EXACT,
     );
 
     // Symmetry: BC(a,b) == BC(b,a)
     let ab = diversity::bray_curtis(&comm_a, &comm_b);
     let ba = diversity::bray_curtis(&comm_b, &comm_a);
-    v.check("BC symmetry |BC(a,b)-BC(b,a)|", (ab - ba).abs(), 0.0, 1e-15);
+    v.check(
+        "BC symmetry |BC(a,b)-BC(b,a)|",
+        (ab - ba).abs(),
+        0.0,
+        tolerances::BRAY_CURTIS_SYMMETRY,
+    );
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -189,9 +191,7 @@ fn validate_vegan_rarefaction(v: &mut Validator) {
     let result = diversity::rarefaction_curve(&comm, &depths);
 
     // Rarefaction uses hypergeometric formula — exact same math as vegan::rarefy.
-    // Tolerance 1e-6: our implementation may use a different combinatorial path.
-    let rare_tol = 1e-6;
-
+    // Our implementation may use a different combinatorial path.
     for (i, &exp) in expected.iter().enumerate() {
         #[expect(clippy::cast_possible_truncation)]
         let depth = depths[i] as u32;
@@ -199,12 +199,14 @@ fn validate_vegan_rarefaction(v: &mut Validator) {
             &format!("Rarefaction(n={depth}) vs R/vegan"),
             result[i],
             exp,
-            rare_tol,
+            tolerances::NMF_CONVERGENCE,
         );
     }
 
     // Monotonicity (rarefaction must be non-decreasing)
-    let monotonic = result.windows(2).all(|w| w[1] >= w[0] - 1e-10);
+    let monotonic = result
+        .windows(2)
+        .all(|w| w[1] >= w[0] - tolerances::ANALYTICAL_LOOSE);
     v.check_pass("Rarefaction monotonicity", monotonic);
 }
 
@@ -221,10 +223,13 @@ fn validate_vegan_chao1(v: &mut Validator) {
     let obs = diversity::observed_features(&comm);
     let chao = diversity::chao1(&comm);
 
-    v.check("Chao1 S.obs vs R/vegan", obs, 10.0, 0.0);
-    // Chao1 estimator variance: R/vegan estimateR uses bias correction; 0.5 covers
-    // small-sample variance and implementation differences (singleton/doubleton handling)
-    v.check("Chao1 estimate vs R/vegan", chao, 20.0, 0.5);
+    v.check("Chao1 S.obs vs R/vegan", obs, 10.0, tolerances::EXACT);
+    v.check(
+        "Chao1 estimate vs R/vegan",
+        chao,
+        20.0,
+        tolerances::CHAO1_ESTIMATE_VARIANCE,
+    );
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -240,7 +245,7 @@ fn validate_vegan_pielou(v: &mut Validator) {
         "Pielou J(uniform) vs R/vegan",
         diversity::pielou_evenness(&uniform),
         1.0,
-        ANALYTICAL_TOL,
+        tolerances::ANALYTICAL_F64,
     );
 
     // R/vegan: J(skewed) = 0.2348846730847844
@@ -253,7 +258,7 @@ fn validate_vegan_pielou(v: &mut Validator) {
         "Pielou J(skewed) vs R/vegan",
         diversity::pielou_evenness(&skewed),
         0.234_884_673_084_784_4,
-        ANALYTICAL_TOL,
+        tolerances::ANALYTICAL_F64,
     );
 }
 
@@ -267,7 +272,7 @@ fn validate_dada2_constants(v: &mut Validator) {
     let params = dada2::Dada2Params::default();
 
     // R/dada2: OMEGA_A = 1e-40
-    v.check("OMEGA_A vs R/dada2", params.omega_a, 1e-40, 0.0);
+    v.check("OMEGA_A vs R/dada2", params.omega_a, 1e-40, tolerances::EXACT);
 
     // R/dada2: BAND_SIZE = 16
     v.check_count(
@@ -299,25 +304,24 @@ fn validate_dada2_error_model(v: &mut Validator) {
 
     // R/dada2 §2: P(error) = 10^(-Q/10), P(sub) = P(error)/3
     // Check at Q=10: P(err)=0.1, P(correct)=0.9, P(sub)=0.03333...
-    // A→A at Q10
-    v.check("err[A→A][Q10] vs R/dada2", err[0][0][10], 0.9, 1e-7);
-    // A→C at Q10
-    v.check("err[A→C][Q10] vs R/dada2", err[0][1][10], 0.1 / 3.0, 1e-7);
+    let tol = tolerances::DADA2_ERROR_MODEL_PARITY;
+    v.check("err[A→A][Q10] vs R/dada2", err[0][0][10], 0.9, tol);
+    v.check("err[A→C][Q10] vs R/dada2", err[0][1][10], 0.1 / 3.0, tol);
 
     // Q20: P(err)=0.01
-    v.check("err[A→A][Q20] vs R/dada2", err[0][0][20], 0.99, 1e-7);
-    v.check("err[A→C][Q20] vs R/dada2", err[0][1][20], 0.01 / 3.0, 1e-7);
+    v.check("err[A→A][Q20] vs R/dada2", err[0][0][20], 0.99, tol);
+    v.check("err[A→C][Q20] vs R/dada2", err[0][1][20], 0.01 / 3.0, tol);
 
     // Q30: P(err)=0.001
-    v.check("err[A→A][Q30] vs R/dada2", err[0][0][30], 0.999, 1e-7);
-    v.check("err[G→T][Q30] vs R/dada2", err[2][3][30], 0.001 / 3.0, 1e-7);
+    v.check("err[A→A][Q30] vs R/dada2", err[0][0][30], 0.999, tol);
+    v.check("err[G→T][Q30] vs R/dada2", err[2][3][30], 0.001 / 3.0, tol);
 
     // Symmetry: P(A→C|Q) == P(G→T|Q) for all Q (uniform substitution model)
     v.check(
         "err symmetry: P(A→C)==P(G→T) at Q20",
         err[0][1][20],
         err[2][3][20],
-        0.0,
+        tolerances::EXACT,
     );
 }
 
@@ -348,7 +352,7 @@ fn validate_dada2_phred(v: &mut Validator) {
             &format!("phred_to_error_prob(Q{qi}) vs R/dada2"),
             phred::phred_to_error_prob(q),
             expected_p,
-            1e-15,
+            tolerances::MATRIX_EPS,
         );
     }
 
@@ -357,7 +361,12 @@ fn validate_dada2_phred(v: &mut Validator) {
         let roundtrip = phred::error_prob_to_phred(phred::phred_to_error_prob(q));
         #[expect(clippy::cast_possible_truncation)]
         let qi = q as u32;
-        v.check(&format!("Phred roundtrip Q{qi}"), roundtrip, q, 1e-12);
+        v.check(
+            &format!("Phred roundtrip Q{qi}"),
+            roundtrip,
+            q,
+            tolerances::ANALYTICAL_F64,
+        );
     }
 }
 
@@ -383,13 +392,13 @@ fn validate_dada2_consensus(v: &mut Validator) {
         "Mean P(error) vs R/dada2",
         mean_p,
         9.064_156_605_916_29e-4,
-        1e-15,
+        tolerances::MATRIX_EPS,
     );
     v.check(
         "Consensus Q vs R/dada2",
         consensus_q,
         30.426_725_995_592_964,
-        1e-10,
+        tolerances::ANALYTICAL_LOOSE,
     );
 }
 
@@ -446,12 +455,17 @@ fn validate_phyloseq_unifrac(v: &mut Validator) {
         "WUF symmetry |WUF(1,2)-WUF(2,1)|",
         (wuf_12 - wuf_21).abs(),
         0.0,
-        1e-15,
+        tolerances::BRAY_CURTIS_SYMMETRY,
     );
 
     // Self-distance = 0
     let wuf_11 = unifrac::weighted_unifrac(&tree, &s1, &s1);
-    v.check("WUF self-distance WUF(S1,S1)", wuf_11, 0.0, 1e-15);
+    v.check(
+        "WUF self-distance WUF(S1,S1)",
+        wuf_11,
+        0.0,
+        tolerances::BRAY_CURTIS_SYMMETRY,
+    );
 
     // Ordering preserved: S1 and S2 are most different (opposite dominance),
     // S1-S3 and S2-S3 are closer (S3 is even). This matches phyloseq.
@@ -464,7 +478,7 @@ fn validate_phyloseq_unifrac(v: &mut Validator) {
         "UF_unweighted(S1,S2) vs R/phyloseq (all OTUs shared → 0)",
         uf_12,
         0.0,
-        1e-15,
+        tolerances::BRAY_CURTIS_SYMMETRY,
     );
 }
 
@@ -479,13 +493,13 @@ fn validate_phyloseq_cophenetic(v: &mut Validator) {
 
     // R/ape cophenetic: d(A,B) = 0.1 + 0.2 = 0.3
     let d_ab = tree.patristic_distance("A", "B").unwrap_or(f64::NAN);
-    v.check("d(A,B) vs R/ape cophenetic", d_ab, 0.3, 1e-12);
+    v.check("d(A,B) vs R/ape cophenetic", d_ab, 0.3, tolerances::ANALYTICAL_F64);
 
     // R/ape cophenetic: d(A,C) = 0.1 + 0.3 + 0.6 + 0.4 = 1.4
     let dist_ac = tree.patristic_distance("A", "C").unwrap_or(f64::NAN);
-    v.check("d(A,C) vs R/ape cophenetic", dist_ac, 1.4, 1e-12);
+    v.check("d(A,C) vs R/ape cophenetic", dist_ac, 1.4, tolerances::ANALYTICAL_F64);
 
     // R/ape cophenetic: d(C,D) = 0.4 + 0.5 = 0.9
     let d_cd = tree.patristic_distance("C", "D").unwrap_or(f64::NAN);
-    v.check("d(C,D) vs R/ape cophenetic", d_cd, 0.9, 1e-12);
+    v.check("d(C,D) vs R/ape cophenetic", d_cd, 0.9, tolerances::ANALYTICAL_F64);
 }

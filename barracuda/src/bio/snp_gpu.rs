@@ -57,7 +57,7 @@ impl SnpGpu {
     /// # Errors
     ///
     /// Returns `Err` if GPU buffer creation or readback fails.
-    #[expect(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)] // Truncation: n_sequences, aln_len fit u32
     pub fn call_snps(&self, sequences: &[&[u8]]) -> crate::error::Result<SnpGpuResult> {
         let n_sequences = sequences.len();
         if n_sequences == 0 {

@@ -39,7 +39,7 @@ impl LocusVarianceGpuWrapper {
     /// # Errors
     ///
     /// Returns an error if matrix size mismatches or GPU read fails.
-    #[expect(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)] // Truncation: n_pops, n_loci fit u32
     pub fn compute(
         &self,
         allele_freqs: &[f32],

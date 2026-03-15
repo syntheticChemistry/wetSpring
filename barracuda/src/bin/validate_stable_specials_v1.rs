@@ -1,17 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::print_stdout,
-    clippy::too_many_lines,
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
-    clippy::similar_names,
-    clippy::items_after_statements,
-    clippy::float_cmp
-)]
+#![allow(clippy::expect_used)]
+#![allow(clippy::unwrap_used)]
+#![allow(clippy::print_stdout)]
+#![allow(clippy::too_many_lines)]
+#![allow(clippy::cast_precision_loss)]
+#![allow(clippy::cast_possible_truncation)]
+#![allow(clippy::cast_sign_loss)]
+#![allow(clippy::similar_names)]
+#![allow(clippy::items_after_statements)]
+#![allow(clippy::float_cmp)]
 //! # Exp359: Stable GPU Specials + Tridiag Eigensolver Validation
 //!
 //! Validates barraCuda v0.3.5 stable special functions that avoid catastrophic
@@ -65,7 +63,7 @@ fn main() {
     let log1p_tiny = log1p_f64(1e-15);
     v.check_pass(
         "log1p(1e-15) is close to 1e-15",
-        (log1p_tiny - 1e-15).abs() < 1e-28,
+        (log1p_tiny - 1e-15).abs() < tolerances::STABLE_SPECIAL_TINY,
     );
 
     println!("\n  expm1(x) vs exp(x)-1:");
@@ -84,7 +82,10 @@ fn main() {
     v.check_pass("expm1 computed for 9 test points", true);
 
     let expm1_tiny = expm1_f64(1e-15);
-    v.check_pass("expm1(1e-15) ≈ 1e-15", (expm1_tiny - 1e-15).abs() < 1e-28);
+    v.check_pass(
+        "expm1(1e-15) ≈ 1e-15",
+        (expm1_tiny - 1e-15).abs() < tolerances::STABLE_SPECIAL_TINY,
+    );
 
     println!("\n  erfc(x):");
     let erfc_test_points = [0.0_f64, 0.5, 1.0, 2.0, 3.0, 5.0];

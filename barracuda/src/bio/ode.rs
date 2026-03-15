@@ -133,7 +133,7 @@ where
     F: Fn(&[f64], f64) -> Vec<f64>,
 {
     let n_vars = y0.len();
-    #[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    #[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss)] // Truncation/Sign: step count bounded by integration range
     let n_steps = ((t_end - t_start) / dt).ceil() as usize;
 
     let mut t_vec = Vec::with_capacity(n_steps + 1);
@@ -238,7 +238,7 @@ pub fn steady_state_mean(result: &OdeResult, var_idx: usize, frac: f64) -> f64 {
         return 0.0;
     }
     let sum: f64 = (start..n).map(|i| result.var_at(i, var_idx)).sum();
-    #[expect(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)] // Precision: count bounded by n
     let mean = sum / count as f64;
     mean
 }

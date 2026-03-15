@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-//! wetSpring IPC server — `biomeOS` science primal.
+//! wetSpring — biomeOS science primal (UniBin).
 //!
 //! Listens on a Unix socket (or TCP via `WETSPRING_TCP_ADDR`) and handles
 //! JSON-RPC 2.0 requests for science capabilities (diversity, QS model,
@@ -10,7 +10,7 @@
 //! # Usage
 //!
 //! ```text
-//! wetspring-server [--help | --version | serve]
+//! wetspring <server|status|version|help>
 //! ```
 //!
 //! # Environment
@@ -19,7 +19,8 @@
 //! - `WETSPRING_TCP_ADDR` — Bind TCP instead of Unix socket (e.g. `127.0.0.1:9800`)
 //! - `SONGBIRD_SOCKET` — Override Songbird discovery socket
 
-use wetspring_barracuda::ipc::{Server, songbird};
+use wetspring_barracuda::ipc::handlers::CAPABILITIES;
+use wetspring_barracuda::ipc::{Server, discover, songbird};
 
 const PRIMAL: &str = wetspring_barracuda::PRIMAL_NAME;
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -32,10 +33,11 @@ fn print_help() {
     println!("{PRIMAL} {VERSION} — biomeOS science primal (BarraCuda-powered)");
     println!();
     println!("USAGE:");
-    println!("  wetspring-server [COMMAND]");
+    println!("  wetspring <COMMAND>");
     println!();
     println!("COMMANDS:");
-    println!("  serve       Start the IPC server (default)");
+    println!("  server      Start the IPC server (default)");
+    println!("  status      Report health, capabilities, and socket info");
     println!("  version     Print version and exit");
     println!("  help        Print this help and exit");
     println!();
@@ -49,9 +51,9 @@ fn print_help() {
     println!("  SONGBIRD_SOCKET      Override Songbird socket");
     println!();
     println!("CAPABILITIES:");
-    println!("  health.check, science.diversity, science.anderson,");
-    println!("  science.qs_model, science.ncbi_fetch, science.full_pipeline,");
-    println!("  metrics.snapshot");
+    for cap in CAPABILITIES {
+        println!("  {cap}");
+    }
 }
 
 fn run_server() {
@@ -83,11 +85,40 @@ fn run_server() {
     );
 
     eprintln!(
-        "  Capabilities: health.check, science.{{diversity,anderson,qs_model,ncbi_fetch,full_pipeline}}"
+        "  Capabilities: {} methods registered",
+        CAPABILITIES.len()
     );
     eprintln!("  Ready.");
 
     server.run();
+}
+
+fn run_status() {
+    println!("{PRIMAL} {VERSION}");
+    println!();
+
+    let bind_path = discover::resolve_bind_path("WETSPRING_SOCKET", PRIMAL);
+    let socket_exists = bind_path.exists();
+    println!("Socket:  {}", bind_path.display());
+    println!("Exists:  {socket_exists}");
+    println!();
+
+    let songbird_status = songbird::discover_socket()
+        .map_or_else(|| "not found".to_owned(), |p| p.display().to_string());
+    println!("Songbird: {songbird_status}");
+    println!();
+
+    println!("Capabilities ({}):", CAPABILITIES.len());
+    for cap in CAPABILITIES {
+        println!("  {cap}");
+    }
+    println!();
+
+    if socket_exists {
+        println!("Status: RUNNING (socket present)");
+    } else {
+        println!("Status: STOPPED (no socket)");
+    }
 }
 
 fn main() {
@@ -96,10 +127,11 @@ fn main() {
     match args.first().map(String::as_str) {
         Some("--help" | "-h" | "help") => print_help(),
         Some("--version" | "-V" | "version") => print_version(),
-        Some("serve") | None => run_server(),
+        Some("status") => run_status(),
+        Some("server") | None => run_server(),
         Some(unknown) => {
             eprintln!("error: unknown command '{unknown}'");
-            eprintln!("Run '{PRIMAL} --help' for usage.");
+            eprintln!("Run '{PRIMAL} help' for usage.");
             std::process::exit(2);
         }
     }

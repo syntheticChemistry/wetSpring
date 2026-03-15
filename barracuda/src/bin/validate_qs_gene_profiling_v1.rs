@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![allow(
-    unexpected_cfgs,
     clippy::expect_used,
     clippy::unwrap_used,
     clippy::print_stdout,
@@ -52,19 +51,38 @@
 use std::time::Instant;
 use wetspring_barracuda::validation::Validator;
 
+const FNR_REGULATED: u8 = 1 << 0;
+const ARCAB_REGULATED: u8 = 1 << 1;
+const REX_REGULATED: u8 = 1 << 2;
+const ANAEROBIC_ENHANCED: u8 = 1 << 3;
+const AEROBIC_ENHANCED: u8 = 1 << 4;
+
 #[derive(Clone)]
-#[allow(clippy::struct_excessive_bools)]
 struct QsType {
     name: &'static str,
     signal_system: &'static str,
     _signal_molecule: &'static str,
-    fnr_regulated: bool,
-    arcab_regulated: bool,
-    rex_regulated: bool,
-    anaerobic_enhanced: bool,
-    aerobic_enhanced: bool,
+    regulation: u8,
     w_contribution_aerobic: f64,
     w_contribution_anaerobic: f64,
+}
+
+impl QsType {
+    const fn is_fnr_regulated(&self) -> bool {
+        self.regulation & FNR_REGULATED != 0
+    }
+    const fn is_arcab_regulated(&self) -> bool {
+        self.regulation & ARCAB_REGULATED != 0
+    }
+    const fn is_rex_regulated(&self) -> bool {
+        self.regulation & REX_REGULATED != 0
+    }
+    const fn is_anaerobic_enhanced(&self) -> bool {
+        self.regulation & ANAEROBIC_ENHANCED != 0
+    }
+    const fn is_aerobic_enhanced(&self) -> bool {
+        self.regulation & AEROBIC_ENHANCED != 0
+    }
 }
 
 fn qs_catalog() -> Vec<QsType> {
@@ -73,11 +91,7 @@ fn qs_catalog() -> Vec<QsType> {
             name: "luxI/luxR (AHL-1)",
             signal_system: "AHL",
             _signal_molecule: "3OC6-HSL",
-            fnr_regulated: true,
-            arcab_regulated: false,
-            rex_regulated: false,
-            anaerobic_enhanced: true,
-            aerobic_enhanced: false,
+            regulation: FNR_REGULATED | ANAEROBIC_ENHANCED,
             w_contribution_aerobic: 1.2,
             w_contribution_anaerobic: 0.4,
         },
@@ -85,11 +99,7 @@ fn qs_catalog() -> Vec<QsType> {
             name: "lasI/lasR (AHL-2)",
             signal_system: "AHL",
             _signal_molecule: "3OC12-HSL",
-            fnr_regulated: false,
-            arcab_regulated: true,
-            rex_regulated: false,
-            anaerobic_enhanced: true,
-            aerobic_enhanced: false,
+            regulation: ARCAB_REGULATED | ANAEROBIC_ENHANCED,
             w_contribution_aerobic: 1.5,
             w_contribution_anaerobic: 0.6,
         },
@@ -97,11 +107,7 @@ fn qs_catalog() -> Vec<QsType> {
             name: "rhlI/rhlR (AHL-3)",
             signal_system: "AHL",
             _signal_molecule: "C4-HSL",
-            fnr_regulated: false,
-            arcab_regulated: true,
-            rex_regulated: false,
-            anaerobic_enhanced: true,
-            aerobic_enhanced: false,
+            regulation: ARCAB_REGULATED | ANAEROBIC_ENHANCED,
             w_contribution_aerobic: 1.3,
             w_contribution_anaerobic: 0.5,
         },
@@ -109,11 +115,7 @@ fn qs_catalog() -> Vec<QsType> {
             name: "ainS/ainR (AHL-4)",
             signal_system: "AHL",
             _signal_molecule: "C8-HSL",
-            fnr_regulated: true,
-            arcab_regulated: false,
-            rex_regulated: false,
-            anaerobic_enhanced: true,
-            aerobic_enhanced: false,
+            regulation: FNR_REGULATED | ANAEROBIC_ENHANCED,
             w_contribution_aerobic: 1.0,
             w_contribution_anaerobic: 0.3,
         },
@@ -121,11 +123,7 @@ fn qs_catalog() -> Vec<QsType> {
             name: "luxS (AI-2)",
             signal_system: "AI-2",
             _signal_molecule: "DPD/AI-2",
-            fnr_regulated: true,
-            arcab_regulated: true,
-            rex_regulated: true,
-            anaerobic_enhanced: true,
-            aerobic_enhanced: false,
+            regulation: FNR_REGULATED | ARCAB_REGULATED | REX_REGULATED | ANAEROBIC_ENHANCED,
             w_contribution_aerobic: 1.8,
             w_contribution_anaerobic: 0.2,
         },
@@ -133,11 +131,7 @@ fn qs_catalog() -> Vec<QsType> {
             name: "luxPQ (AI-2 receptor)",
             signal_system: "AI-2",
             _signal_molecule: "DPD/AI-2",
-            fnr_regulated: false,
-            arcab_regulated: false,
-            rex_regulated: false,
-            anaerobic_enhanced: false,
-            aerobic_enhanced: false,
+            regulation: 0,
             w_contribution_aerobic: 0.8,
             w_contribution_anaerobic: 0.8,
         },
@@ -145,11 +139,7 @@ fn qs_catalog() -> Vec<QsType> {
             name: "comQXPA (CSP)",
             signal_system: "CSP",
             _signal_molecule: "CSP peptide",
-            fnr_regulated: false,
-            arcab_regulated: false,
-            rex_regulated: false,
-            anaerobic_enhanced: false,
-            aerobic_enhanced: true,
+            regulation: AEROBIC_ENHANCED,
             w_contribution_aerobic: 0.5,
             w_contribution_anaerobic: 1.0,
         },
@@ -157,11 +147,7 @@ fn qs_catalog() -> Vec<QsType> {
             name: "agrBDCA (AIP)",
             signal_system: "AIP",
             _signal_molecule: "Thiolactone",
-            fnr_regulated: false,
-            arcab_regulated: false,
-            rex_regulated: true,
-            anaerobic_enhanced: true,
-            aerobic_enhanced: false,
+            regulation: REX_REGULATED | ANAEROBIC_ENHANCED,
             w_contribution_aerobic: 1.4,
             w_contribution_anaerobic: 0.5,
         },
@@ -169,11 +155,7 @@ fn qs_catalog() -> Vec<QsType> {
             name: "dsf/rpfF (DSF)",
             signal_system: "DSF",
             _signal_molecule: "cis-2-decenoic acid",
-            fnr_regulated: false,
-            arcab_regulated: false,
-            rex_regulated: false,
-            anaerobic_enhanced: false,
-            aerobic_enhanced: true,
+            regulation: AEROBIC_ENHANCED,
             w_contribution_aerobic: 0.6,
             w_contribution_anaerobic: 1.2,
         },
@@ -181,11 +163,7 @@ fn qs_catalog() -> Vec<QsType> {
             name: "PQS (pqsABCDE)",
             signal_system: "PQS",
             _signal_molecule: "2-heptyl-3-hydroxy-4-quinolone",
-            fnr_regulated: false,
-            arcab_regulated: true,
-            rex_regulated: false,
-            anaerobic_enhanced: true,
-            aerobic_enhanced: false,
+            regulation: ARCAB_REGULATED | ANAEROBIC_ENHANCED,
             w_contribution_aerobic: 1.6,
             w_contribution_anaerobic: 0.4,
         },
@@ -193,11 +171,7 @@ fn qs_catalog() -> Vec<QsType> {
             name: "IQS (ambBCDE)",
             signal_system: "IQS",
             _signal_molecule: "2-(2-hydroxyphenyl)-thiazole",
-            fnr_regulated: false,
-            arcab_regulated: false,
-            rex_regulated: false,
-            anaerobic_enhanced: false,
-            aerobic_enhanced: false,
+            regulation: 0,
             w_contribution_aerobic: 0.9,
             w_contribution_anaerobic: 0.9,
         },
@@ -205,11 +179,7 @@ fn qs_catalog() -> Vec<QsType> {
             name: "CAI-1 (cqsA/cqsS)",
             signal_system: "CAI-1",
             _signal_molecule: "3-aminotridecan-4-one",
-            fnr_regulated: true,
-            arcab_regulated: false,
-            rex_regulated: false,
-            anaerobic_enhanced: true,
-            aerobic_enhanced: false,
+            regulation: FNR_REGULATED | ANAEROBIC_ENHANCED,
             w_contribution_aerobic: 1.1,
             w_contribution_anaerobic: 0.3,
         },
@@ -217,11 +187,7 @@ fn qs_catalog() -> Vec<QsType> {
             name: "DarABC (c-di-GMP)",
             signal_system: "c-di-GMP",
             _signal_molecule: "cyclic di-GMP",
-            fnr_regulated: true,
-            arcab_regulated: true,
-            rex_regulated: false,
-            anaerobic_enhanced: true,
-            aerobic_enhanced: false,
+            regulation: FNR_REGULATED | ARCAB_REGULATED | ANAEROBIC_ENHANCED,
             w_contribution_aerobic: 1.7,
             w_contribution_anaerobic: 0.3,
         },
@@ -229,11 +195,7 @@ fn qs_catalog() -> Vec<QsType> {
             name: "QseBC (AI-3/epi/NE)",
             signal_system: "AI-3",
             _signal_molecule: "Epinephrine/AI-3",
-            fnr_regulated: false,
-            arcab_regulated: false,
-            rex_regulated: false,
-            anaerobic_enhanced: false,
-            aerobic_enhanced: false,
+            regulation: 0,
             w_contribution_aerobic: 0.7,
             w_contribution_anaerobic: 0.7,
         },
@@ -273,11 +235,11 @@ fn main() {
     // ─── D117: Oxygen Regulon Mapping ───
     println!("\n  ── D117: Oxygen Regulon Mapping ──");
 
-    let fnr_count = catalog.iter().filter(|q| q.fnr_regulated).count();
-    let arcab_count = catalog.iter().filter(|q| q.arcab_regulated).count();
-    let rex_count = catalog.iter().filter(|q| q.rex_regulated).count();
-    let anaerobic_count = catalog.iter().filter(|q| q.anaerobic_enhanced).count();
-    let aerobic_count = catalog.iter().filter(|q| q.aerobic_enhanced).count();
+    let fnr_count = catalog.iter().filter(|q| q.is_fnr_regulated()).count();
+    let arcab_count = catalog.iter().filter(|q| q.is_arcab_regulated()).count();
+    let rex_count = catalog.iter().filter(|q| q.is_rex_regulated()).count();
+    let anaerobic_count = catalog.iter().filter(|q| q.is_anaerobic_enhanced()).count();
+    let aerobic_count = catalog.iter().filter(|q| q.is_aerobic_enhanced()).count();
     let neutral_count = catalog.len() - anaerobic_count - aerobic_count;
 
     println!("  Regulon mapping:");
@@ -397,7 +359,7 @@ fn main() {
     // ─── D120: Anderson H3 Molecular Support ───
     println!("\n  ── D120: Anderson H3 Molecular Support ──");
 
-    let fnr_types: Vec<&QsType> = catalog.iter().filter(|q| q.fnr_regulated).collect();
+    let fnr_types: Vec<&QsType> = catalog.iter().filter(|q| q.is_fnr_regulated()).collect();
     let fnr_aerobic_mean: f64 = fnr_types
         .iter()
         .map(|q| q.w_contribution_aerobic)

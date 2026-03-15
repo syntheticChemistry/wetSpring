@@ -9,10 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V114** | `handoffs/WETSPRING_V114_BARRACUDA_TOADSTOOL_ABSORPTION_HANDOFF_MAR15_2026.md` | Mar 15 | **BarraCUDA absorption** — 8 GPU primitive opportunities mapped (NMF, adaptive ODE, batched SW, taxonomy, phylogenetics). |
-| **V114** | `handoffs/WETSPRING_V114_NICHE_SETUP_GUIDANCE_HANDOFF_MAR15_2026.md` | Mar 15 | **Niche setup guide** — 7-step checklist for springs modeling the wetSpring niche pattern. |
-| **V114** | `handoffs/WETSPRING_V114_DEEP_AUDIT_BARRACUDA_TOADSTOOL_HANDOFF_MAR12_2026.md` | Mar 12 | Deep audit handoff — features gate fixes, clippy, deprecated parsers, inline tolerances. |
-| **V113** | `handoffs/WETSPRING_V113_PROVENANCE_TRIO_CAPABILITIES_DEPLOY_HANDOFF_MAR15_2026.md` | Mar 15 | Provenance trio + deploy graph — rhizoCrypt/loamSpine/sweetGrass, 19 capabilities, time series, NMF. |
+| **V115** | `handoffs/WETSPRING_V115_DEEP_AUDIT_EVOLUTION_HANDOFF_MAR15_2026.md` | Mar 15 | **Deep audit evolution** — UniBin compliance, capability domains, tolerance centralization, XDG path resolution, metalForge 90% coverage. |
+| | *V113 and V114 → `handoffs/archive/`* | | V113 and V114 handoffs archived. |
 | | *V112 and earlier → `handoffs/archive/`* | | Fossil record: V7–V112 (95+ archived handoffs) |
 
 ## Cross-Spring Documents

@@ -72,7 +72,7 @@ impl PangenomeGpu {
     /// # Errors
     ///
     /// Returns `Err` if GPU buffer creation or readback fails.
-    #[expect(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)] // Truncation: n_genes, n_genomes fit u32
     pub fn classify(
         &self,
         presence_flat: &[u8],

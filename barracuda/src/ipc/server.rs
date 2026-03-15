@@ -99,7 +99,7 @@ impl Server {
     /// on `accept()` and never returns under normal operation.
     pub fn run(&self) {
         eprintln!(
-            "[wetspring-server] listening on {}",
+            "[wetspring] listening on {}",
             self.socket_path.display()
         );
 
@@ -112,7 +112,7 @@ impl Server {
                     });
                 }
                 Err(e) => {
-                    eprintln!("[wetspring-server] accept error: {e}");
+                    eprintln!("[wetspring] accept error: {e}");
                 }
             }
         }
@@ -128,7 +128,7 @@ impl Drop for Server {
 /// Handle a single client connection: read newline-delimited JSON-RPC, dispatch, respond.
 fn handle_connection(stream: &std::os::unix::net::UnixStream, metrics: &Metrics) {
     if let Err(e) = stream.set_read_timeout(Some(CONNECTION_READ_TIMEOUT)) {
-        eprintln!("[wetspring-server] set timeout: {e}");
+        eprintln!("[wetspring] set timeout: {e}");
         return;
     }
 

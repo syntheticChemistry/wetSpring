@@ -104,9 +104,14 @@ fn main() {
         ("NestGate", format!("{biomeos_base}/nestgate-{family}.sock")),
     ];
 
+    let temp_dir = std::env::temp_dir();
     let neural_api_paths = [
-        format!("/tmp/biomeos-neural-api-{family}.sock"),
-        format!("/tmp/neural-api-{family}.sock"),
+        format!("{biomeos_base}/biomeos-neural-api-{family}.sock"),
+        format!(
+            "{}/biomeos-neural-api-{family}.sock",
+            temp_dir.display()
+        ),
+        format!("{}/neural-api-{family}.sock", temp_dir.display()),
     ];
 
     let mut statuses: Vec<PrimalStatus> = vec![];

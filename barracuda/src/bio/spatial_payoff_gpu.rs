@@ -47,7 +47,7 @@ impl SpatialPayoffGpuWrapper {
     /// # Errors
     ///
     /// Returns an error if grid size mismatches or GPU read fails.
-    #[expect(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)] // Truncation: grid_size² fits u32 (wgpu)
     pub fn compute(
         &self,
         grid: &[u32],

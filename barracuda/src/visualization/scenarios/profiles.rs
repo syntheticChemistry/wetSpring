@@ -66,7 +66,7 @@ pub struct CalibrationProfile {
 /// Creates nodes for diversity, taxonomy, ordination, and rarefaction
 /// with real data from the profile.
 #[must_use]
-#[expect(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)] // Precision: sample/ASV counts bounded
 pub fn environmental_study_scenario(
     profile: &EnvironmentalProfile,
 ) -> (EcologyScenario, Vec<ScenarioEdge>) {

@@ -65,7 +65,7 @@ fn cpu_fallback(samples: &[f64], refs: &[f64], ppm_tol: f64, da_tol: f64) -> Vec
         for &r in refs {
             let diff = (s - r).abs();
             if diff <= tol {
-                #[expect(clippy::cast_possible_truncation)]
+                #[expect(clippy::cast_possible_truncation)] // Truncation: score in [0,1], fits f32
                 scores.push((1.0 - diff / tol) as f32);
             } else {
                 scores.push(0.0);

@@ -62,7 +62,7 @@ impl HmmGpuForward {
     /// # Errors
     ///
     /// Returns `Err` if GPU dispatch or buffer readback fails.
-    #[expect(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)] // Truncation: n_seqs, n_steps fit u32
     pub fn forward_batch(
         &self,
         model: &HmmModel,

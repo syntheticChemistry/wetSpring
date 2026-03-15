@@ -222,7 +222,7 @@ fn parse_data_line(
         if tokens[0].parse::<f64>().is_ok() {
             for tok in &tokens[1..] {
                 if let Ok(yv) = parse_jcamp_value(tok) {
-                    #[expect(clippy::cast_precision_loss)]
+                    #[expect(clippy::cast_precision_loss)] // Precision: x_vals.len() bounded by spectrum points
                     let xi = dx.mul_add(x_vals.len() as f64, fx);
                     x_vals.push(xi);
                     y_vals.push(yv);

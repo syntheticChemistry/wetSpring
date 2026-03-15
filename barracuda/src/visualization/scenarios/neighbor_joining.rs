@@ -17,7 +17,7 @@ use super::{gauge, heatmap, node, scaffold};
 /// - **Heatmap**: pairwise distance matrix
 /// - **Gauge**: number of join operations
 #[must_use]
-#[expect(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)] // Precision: n_joins and taxa count bounded
 pub fn neighbor_joining_scenario(
     distance_matrix: &[f64],
     labels: &[String],

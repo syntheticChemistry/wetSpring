@@ -133,6 +133,13 @@ pub const PHAGE_LARGE_POPULATION: f64 = 1000.0;
 /// Validated: Exp030 (Hsueh 2022), `scripts/hsueh2022_phage_defense.py`.
 pub const PHAGE_CRASH_FLOOR: f64 = 1.0;
 
+/// Biogas kinetics asymptotic tolerance (Gompertz H(∞) → P).
+///
+/// Modified Gompertz H(t) approaches P (maximum potential) as t → ∞.
+/// At t=50 days with typical parameters, H ≈ P within 1.0 mL/g VS.
+/// Validated: `validate_cpu_vs_gpu_v11` D44, `validate_toadstool_dispatch_v4` S12.
+pub const BIOGAS_KINETICS_ASYMPTOTIC: f64 = 1.0;
+
 // ═══════════════════════════════════════════════════════════════════
 // RK45 adaptive solver defaults
 // ═══════════════════════════════════════════════════════════════════

@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** March 15, 2026 (V114 — barraCuda v0.3.5 standalone, toadStool S130+, coralReef Phase 10, wgpu 28. 1,326 tests (0 failures), 340 binaries, 180 tolerances. biomeOS niche — deploy graph, 19 capabilities, provenance trio, cross-spring time series. V114: docs cleanup, niche guidance, BarraCUDA absorption handoff (8 GPU primitive opportunities). V113: trio + capabilities + deploy graph. clippy ZERO WARNINGS pedantic+nursery.)
+**Updated:** March 15, 2026 (V115 — barraCuda v0.3.5 standalone, toadStool S130+, coralReef Phase 10, wgpu 28. 1,662 tests (0 failures), 354 binaries, 180 tolerances. biomeOS niche — deploy graph, 19 capabilities, provenance trio, cross-spring time series. V114: docs cleanup, niche guidance, BarraCUDA absorption handoff (8 GPU primitive opportunities). V113: trio + capabilities + deploy graph. clippy ZERO WARNINGS pedantic+nursery.)
 
 ---
 

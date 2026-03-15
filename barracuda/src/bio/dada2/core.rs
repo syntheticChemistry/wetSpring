@@ -154,7 +154,7 @@ fn assign_to_centers(
 }
 
 /// Re-estimate error model from observed substitution patterns.
-#[expect(clippy::cast_precision_loss, clippy::needless_range_loop)]
+#[expect(clippy::cast_precision_loss, clippy::needless_range_loop)] // Precision: abundance and quality indices bounded
 pub fn estimate_error_model(
     seqs: &[&UniqueSequence],
     partition: &[usize],
@@ -231,7 +231,7 @@ pub fn err_model_converged(old: &ErrorModel, new: &ErrorModel) -> bool {
 /// For each non-center sequence, computes the expected abundance under the
 /// error model and tests whether the observed abundance is significantly
 /// higher using a Poisson CDF approximation.
-#[expect(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)] // Precision: abundance and indices bounded by partition size
 fn find_new_centers(
     seqs: &[&UniqueSequence],
     partition: &[usize],
@@ -274,7 +274,7 @@ fn find_new_centers(
 /// Upper-tail Poisson p-value: P(X >= k) for X ~ Poisson(lambda).
 /// Uses the identity: P(X >= k | Poisson(λ)) = P(k, λ) where P is the
 /// regularized lower incomplete gamma function.
-#[expect(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)] // Precision: k bounded by read count (< 2^53)
 #[must_use]
 pub fn poisson_pvalue(k: usize, lambda: f64) -> f64 {
     if lambda <= 0.0 || k == 0 {

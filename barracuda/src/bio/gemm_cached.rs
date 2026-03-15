@@ -36,7 +36,7 @@ struct GemmParams {
 }
 
 impl GemmParams {
-    #[expect(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)] // Truncation: f64.to_bits() hi/lo halves fit u32
     const fn new(m: u32, k: u32, n: u32, batch_size: u32, alpha: f64, beta: f64) -> Self {
         let alpha_bits = alpha.to_bits();
         let beta_bits = beta.to_bits();

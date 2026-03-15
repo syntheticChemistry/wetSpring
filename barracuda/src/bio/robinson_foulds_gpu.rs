@@ -59,7 +59,7 @@ pub fn rf_distance_normalized_gpu(
 /// # Errors
 ///
 /// Returns an error if GPU dispatch fails.
-#[expect(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)] // Precision: RF distance bounded by tree size
 pub fn rf_distance_matrix_gpu(gpu: &GpuF64, trees: &[PhyloTree]) -> Result<Vec<f64>> {
     require_f64(gpu)?;
 

@@ -18,8 +18,8 @@ and mathematical biology (Track 1b), deep-sea metagenomics and microbial
 evolution (Track 1c), and PFAS detection via LC-MS (Track 2),
 validating 88+ Rust modules (47 CPU + 45 GPU) against baselines from Galaxy,
 QIIME2, asari, FindPFAS, scipy, sklearn, dendropy, real NCBI SRA data, and
-published paper models with 5,707+ quantitative checks across 374 experiments
-and 340 validation binaries — all passing. The pipeline proves substrate independence: math produces
+published paper models with 5,707+ quantitative checks across 375 experiments
+and 354 validation binaries — all passing. The pipeline proves substrate independence: math produces
 identical results on CPU and GPU, validated via metalForge cross-substrate
 checks (Exp060). Random Forest ensemble and Gradient Boosting Machine
 inference achieve 100% specification parity, joining the existing decision
@@ -586,7 +586,7 @@ repository (AGPL-3.0). No institutional access required.
 ```bash
 # Run all CPU validations (1,476+ checks)
 cd barracuda
-cargo test --release          # 759 tests (680 lib + 79 integration/doc)
+cargo test --release          # 1,662 tests (1,330 barracuda lib + 234 forge lib + 89 integration + 9 doc)
 cargo run --release --bin validate_fastq
 cargo run --release --bin validate_diversity
 cargo run --release --bin validate_mzml

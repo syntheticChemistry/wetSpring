@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
 **Date:** March 15, 2026
-**Status:** V114 — Validation study active — 5,707+ checks, 1,326 tests, 374 experiments, 340 binaries, standalone `barraCuda` v0.3.5 (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, 180 named tolerances, clippy pedantic + nursery ZERO WARNINGS, 63 papers reproduced, all 46 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. biomeOS niche — deploy graph, 19 capabilities, provenance trio integration, cross-spring time series, Neural API workflow graphs. V114: docs cleanup, niche setup guidance, BarraCUDA absorption handoff. V113: trio + capabilities + deploy graph. V112: streaming-only I/O, capability-based runtime discovery.
+**Status:** V115 — Validation study active — 5,707+ checks, 1,662 tests, 375 experiments, 354 binaries, standalone `barraCuda` v0.3.5 (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, 180 named tolerances, clippy pedantic + nursery ZERO WARNINGS, 63 papers reproduced, all 46 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. biomeOS niche — deploy graph, 19 capabilities, provenance trio integration, cross-spring time series, Neural API workflow graphs. V115: deep audit — UniBin compliance, capability domains (4 domains), tolerance centralization, XDG path resolution, metalForge 90% coverage. V114: docs cleanup, niche setup guidance, BarraCUDA absorption handoff. V113: trio + capabilities + deploy graph. V112: streaming-only I/O, capability-based runtime discovery.
 **License:** AGPL-3.0-or-later
 
 ---
@@ -311,7 +311,7 @@ algorithms can be ported from interpreted languages to `barraCuda` (math)
 and `toadStool` (hardware dispatch):
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (62 WGSL shaders, 660 tests)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 150+ barraCuda primitives, 1,288 lib + 219 integration tests)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 150+ barraCuda primitives, 1,330 barracuda lib + 234 forge lib + 89 integration + 9 doc tests)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **airSpring** — Precision agriculture, IoT, Richards PDE, Kriging
 

@@ -2,7 +2,7 @@
 
 **Date:** March 15, 2026
 **Pattern:** Write → Absorb → Lean (from hotSpring)
-**Status:** V114 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 47 GPU modules total, 0 Tier B/C, 0 Passthrough, standalone barraCuda v0.3.5, 33 petalTongue scenario builders, StreamSession with backpressure, Songbird, wetspring_dashboard. biomeOS niche — deploy graph, 19 capabilities, provenance trio, cross-spring time series. V114: docs cleanup, niche guidance, BarraCUDA absorption handoff. V113: trio + capabilities + deploy graph.
+**Status:** V115 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 47 GPU modules total, 0 Tier B/C, 0 Passthrough, standalone barraCuda v0.3.5, 33 petalTongue scenario builders, StreamSession with backpressure, Songbird, wetspring_dashboard. biomeOS niche — deploy graph, 19 capabilities, provenance trio, cross-spring time series. V114: docs cleanup, niche guidance, BarraCUDA absorption handoff. V113: trio + capabilities + deploy graph.
 
 ---
 

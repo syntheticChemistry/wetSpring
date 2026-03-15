@@ -58,6 +58,22 @@ pub const BRAY_CURTIS_SYMMETRY: f64 = 1e-15;
 /// Matches the rounding behavior of `skbio.diversity.alpha.chao1`.
 pub const CHAO1_COUNT_HALFWIDTH: f64 = 0.5;
 
+/// Chao1 richness estimator vs R/vegan estimateR variance.
+///
+/// R/vegan estimateR uses bias correction; singleton/doubleton handling
+/// differs slightly between implementations. 0.5 covers small-sample
+/// variance and implementation differences for typical communities.
+/// Validated: `validate_r_industry_parity` §4 (Chao1 `S.chao1`=20).
+pub const CHAO1_ESTIMATE_VARIANCE: f64 = 0.5;
+
+/// Shannon H' near-zero threshold for monoculture (single species).
+///
+/// Monoculture has H' = 0 exactly. Floating-point residual from
+/// `diversity::shannon` on `[1000.0]` can be non-zero; 0.01 captures
+/// any such residual for "effectively zero" checks.
+/// Validated: `validate_anderson_qs_environments_v1` (E. coli monoculture).
+pub const DIVERSITY_MONOCULTURE_NEAR_ZERO: f64 = 0.01;
+
 /// Minimum GC content range (fraction) for genus-level diversity.
 ///
 /// Vibrio genus assemblies should span ≥2% GC range to confirm

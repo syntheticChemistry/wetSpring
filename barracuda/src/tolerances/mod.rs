@@ -80,12 +80,19 @@ pub const VARIANCE_EXACT: f64 = 1e-20;
 /// as non-zero structure.
 pub const NMF_SPARSITY_THRESHOLD: f64 = 1e-8;
 
-/// NMF iteration convergence tolerance.
+/// NMF iteration convergence tolerance (IPC handler).
 ///
-/// Iteration stops when the relative change in reconstruction error
-/// drops below this threshold. 1e-4 provides ~4 significant digits
-/// of accuracy while avoiding excessive iterations.
-pub const NMF_CONVERGENCE: f64 = 1e-4;
+/// Iteration stops when the absolute change in reconstruction error
+/// drops below this threshold. 1e-6 provides ~6 significant digits
+/// of accuracy for the multiplicative-update algorithm (Lee & Seung 2001).
+/// Tighter than [`NMF_CONVERGENCE_LOOSE`] for science-grade results.
+pub const NMF_CONVERGENCE: f64 = 1e-6;
+
+/// NMF convergence tolerance (loose).
+///
+/// Used in contexts where fast convergence is preferred over
+/// precision. 1e-4 provides ~4 significant digits.
+pub const NMF_CONVERGENCE_LOOSE: f64 = 1e-4;
 
 // ═══════════════════════════════════════════════════════════════════
 // Special-function evaluation tolerances
@@ -198,6 +205,14 @@ pub const GAMMA_SERIES_CONVERGENCE: f64 = 1e-15;
 
 /// Maximum iterations for regularized gamma series expansion.
 pub const GAMMA_SERIES_MAX_ITER: usize = 1000;
+
+/// Stable special functions (log1p, expm1) near-machine precision for tiny x.
+///
+/// log1p(1e-15) ≈ 1e-15 and expm1(1e-15) ≈ 1e-15 to within 1e-28 absolute.
+/// Used to verify stable implementations avoid catastrophic cancellation
+/// at sub-epsilon arguments. 1e-28 is ~(1e-14)² — squared machine epsilon.
+/// Validated: `validate_stable_specials_v1` (D80).
+pub const STABLE_SPECIAL_TINY: f64 = 1e-28;
 
 // ═══════════════════════════════════════════════════════════════════
 // ODE integration parameters

@@ -286,12 +286,12 @@ pub fn denoise_gpu(
 
 // ── Data packing for GPU ─────────────────────────────────────────────────────
 
-#[expect(clippy::cast_possible_truncation)]
+#[expect(clippy::cast_possible_truncation)] // Truncation: base_to_idx returns 0..4, fits u32
 const fn base_to_idx(b: u8) -> u32 {
     dada2::base_to_idx(b) as u32
 }
 
-#[expect(clippy::cast_possible_truncation)]
+#[expect(clippy::cast_possible_truncation)] // Truncation: read length fits u32 (typical < 500)
 fn pack_sequences(seqs: &[&UniqueSequence], max_len: usize) -> (Vec<u32>, Vec<u32>, Vec<u32>) {
     let n = seqs.len();
     let mut bases = vec![0u32; n * max_len];
@@ -347,7 +347,7 @@ fn err_model_converged(old: &ErrorModel, new: &ErrorModel) -> bool {
     dada2::err_model_converged(old, new)
 }
 
-#[expect(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)] // Precision: abundance bounded by partition size
 fn find_new_centers_from_matrix(
     seqs: &[&UniqueSequence],
     partition: &[usize],

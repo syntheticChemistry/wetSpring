@@ -125,7 +125,7 @@ pub fn relaxed_clock_rates(
 ///
 /// CV near 0 → strict clock; CV > 0.5 → substantial rate variation.
 #[must_use]
-#[expect(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)] // Precision: positive.len() bounded
 pub fn rate_variation_cv(rates: &[f64]) -> f64 {
     let positive: Vec<f64> = rates.iter().copied().filter(|&r| r > 0.0).collect();
     if positive.len() < 2 {

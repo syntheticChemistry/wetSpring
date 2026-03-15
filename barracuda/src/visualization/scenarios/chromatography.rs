@@ -71,7 +71,7 @@ pub fn chromatogram_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
         &["science.signal"],
     );
 
-    #[expect(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)] // Precision: peak count bounded
     let peak_count = peaks_with_area.len() as f64;
 
     let peak_names: Vec<String> = peaks_with_area
@@ -252,7 +252,7 @@ pub fn eic_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
             },
         );
 
-        #[expect(clippy::cast_precision_loss)]
+        #[expect(clippy::cast_precision_loss)] // Precision: peak count bounded
         let n_peaks = peaks.len() as f64;
         eic_node.data_channels.push(gauge(
             "eic_peaks",

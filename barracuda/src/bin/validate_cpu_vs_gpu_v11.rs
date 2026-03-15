@@ -1,18 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::print_stdout,
-    clippy::too_many_lines,
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
-    clippy::similar_names,
-    clippy::many_single_char_names,
-    clippy::items_after_statements,
-    clippy::float_cmp
-)]
+#![expect(clippy::expect_used)]
+#![expect(clippy::unwrap_used)]
+#![expect(clippy::print_stdout)]
+#![expect(clippy::too_many_lines)]
+#![expect(clippy::cast_precision_loss)]
+#![expect(clippy::cast_possible_truncation)]
+#![expect(clippy::cast_sign_loss)]
+#![expect(clippy::similar_names)]
+#![expect(clippy::many_single_char_names)]
+#![expect(clippy::items_after_statements)]
+#![expect(clippy::float_cmp)]
 //! # Exp348: CPU vs GPU v11 — V109 Sync Diversity API + Upstream Evolution
 //!
 //! Proves GPU portability after V109 upstream changes:
@@ -45,12 +43,10 @@
 
 use std::time::Instant;
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{DomainResult, Validator};
 
 use barracuda::stats::norm_cdf;
-
-#[cfg(feature = "gpu")]
-use wetspring_barracuda::tolerances;
 
 fn gompertz(t: f64, p: f64, rm: f64, lambda: f64) -> f64 {
     p * (-(rm * std::f64::consts::E / p)
@@ -173,7 +169,12 @@ fn main() {
         .collect();
     v.check_pass("D44: Gompertz H(0) < 5", g_vals[0] < 5.0);
     d44 += 1;
-    v.check("D44: Gompertz H(50) → P", g_vals[7], 350.0, 1.0);
+    v.check(
+        "D44: Gompertz H(50) → P",
+        g_vals[7],
+        350.0,
+        tolerances::BIOGAS_KINETICS_ASYMPTOTIC,
+    );
     d44 += 1;
 
     let fo_vals: Vec<f64> = times
@@ -239,7 +240,10 @@ fn main() {
 
     // Determinism check
     let w_dig_2 = w_max * (1.0 - diversity::pielou_evenness(&digester));
-    v.check_pass("D45: W deterministic", (w_dig - w_dig_2).abs() < 1e-15);
+    v.check_pass(
+        "D45: W deterministic",
+        (w_dig - w_dig_2).abs() < tolerances::MATRIX_EPS,
+    );
     d45 += 1;
 
     domains.push(domain("Anderson W GPU", "wetSpring", t.elapsed(), d45));

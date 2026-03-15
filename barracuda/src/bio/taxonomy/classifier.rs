@@ -30,7 +30,7 @@ impl NaiveBayesClassifier {
     ///
     /// Groups reference sequences by genus-level lineage, extracts k-mers,
     /// and precomputes a flat log-probability table for O(1) scoring.
-    #[expect(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_precision_loss, clippy::cast_possible_truncation)] // Precision/Truncation: kmer indices bounded
     #[must_use]
     pub fn train(refs: &[ReferenceSeq], k: usize) -> Self {
         let kmer_space = 1_usize << (2 * k);
@@ -63,7 +63,7 @@ impl NaiveBayesClassifier {
 
         let n_kmers_total = all_kmers.len();
         let n_taxa = taxon_labels.len();
-        #[expect(clippy::cast_precision_loss)]
+        #[expect(clippy::cast_precision_loss)] // Precision: n_kmers_total bounded
         let default_log_p = (0.5 / (n_kmers_total.max(1) as f64 + 1.0))
             .max(crate::tolerances::LOG_PROB_FLOOR)
             .ln();
@@ -79,7 +79,7 @@ impl NaiveBayesClassifier {
             }
         }
 
-        #[expect(clippy::cast_precision_loss)]
+        #[expect(clippy::cast_precision_loss)] // Precision: taxon_counts sum bounded
         let total_refs: f64 = taxon_counts.iter().sum::<usize>() as f64;
         let taxon_priors: Vec<f64> = taxon_counts
             .iter()
@@ -241,7 +241,7 @@ impl NaiveBayesClassifier {
     /// Maps the f64 log-probability range to `[-128, 127]` using affine
     /// quantization: `q = round((x - zero_point) / scale)`.
     #[must_use]
-    #[expect(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)] // Truncation: q clamped to [-128,127]
     pub fn to_int8_weights(&self) -> NpuWeights {
         if self.dense_log_probs.is_empty() {
             return NpuWeights {
@@ -302,7 +302,7 @@ impl NaiveBayesClassifier {
     /// Produces the same argmax as full-precision for well-separated taxa.
     /// Returns `None` when the query produces no k-mers or the classifier
     /// has no taxa (empty reference database).
-    #[expect(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)] // Truncation: kmer index fits u32
     #[must_use]
     pub fn classify_quantized(&self, sequence: &[u8]) -> Option<usize> {
         let query_kmers = extract_kmers(sequence, self.k);

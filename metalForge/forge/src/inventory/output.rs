@@ -99,3 +99,117 @@ pub fn print_inventory(substrates: &[Substrate]) {
     let mut stdout = io::stdout().lock();
     let _ = write_inventory(substrates, &mut stdout);
 }
+
+#[cfg(test)]
+#[expect(clippy::unwrap_used)]
+mod tests {
+    use super::*;
+    use crate::substrate::{Capability, Identity, Properties};
+
+    fn cpu_substrate(name: &str) -> Substrate {
+        Substrate {
+            kind: SubstrateKind::Cpu,
+            identity: Identity::named(name),
+            properties: Properties::default(),
+            capabilities: vec![Capability::F64Compute, Capability::F32Compute],
+            origin: SubstrateOrigin::Local,
+        }
+    }
+
+    fn gpu_substrate(name: &str) -> Substrate {
+        let mut props = Properties::default();
+        props.has_f64 = true;
+        props.core_count = Some(2048);
+        props.thread_count = Some(2048);
+        Substrate {
+            kind: SubstrateKind::Gpu,
+            identity: Identity {
+                name: name.into(),
+                driver: Some("nvidia-580".into()),
+                backend: Some("vulkan".into()),
+                adapter_index: Some(0),
+                device_node: Some("/dev/dri/card0".into()),
+                pci_id: Some("10de:2504".into()),
+            },
+            properties: props,
+            capabilities: vec![
+                Capability::F64Compute,
+                Capability::F32Compute,
+                Capability::ShaderDispatch,
+            ],
+            origin: SubstrateOrigin::Local,
+        }
+    }
+
+    #[test]
+    fn write_inventory_empty() {
+        let mut buf = Vec::new();
+        write_inventory(&[], &mut buf).unwrap();
+        let output = String::from_utf8(buf).unwrap();
+        assert!(output.contains("wetSpring Forge"));
+        assert!(output.contains("Total: 0 local, 0 mesh, 0 GPU(s), 0 NPU(s)"));
+    }
+
+    #[test]
+    fn write_inventory_cpu_only() {
+        let substrates = vec![cpu_substrate("test-cpu")];
+        let mut buf = Vec::new();
+        write_inventory(&substrates, &mut buf).unwrap();
+        let output = String::from_utf8(buf).unwrap();
+        assert!(output.contains("test-cpu"));
+        assert!(output.contains("Total: 1 local, 0 mesh, 0 GPU(s)"));
+    }
+
+    #[test]
+    fn write_inventory_gpu_with_details() {
+        let substrates = vec![gpu_substrate("test-gpu")];
+        let mut buf = Vec::new();
+        write_inventory(&substrates, &mut buf).unwrap();
+        let output = String::from_utf8(buf).unwrap();
+        assert!(output.contains("test-gpu"));
+        assert!(output.contains("vulkan"));
+        assert!(output.contains("adapter: 0"));
+        assert!(output.contains("/dev/dri/card0"));
+        assert!(output.contains("SHADER_F64: YES"));
+        assert!(output.contains("2048"));
+        assert!(output.contains("1 GPU(s)"));
+    }
+
+    #[test]
+    fn write_inventory_mesh_substrate() {
+        let substrates = vec![Substrate {
+            kind: SubstrateKind::Gpu,
+            identity: Identity::named("remote-gpu"),
+            properties: Properties::default(),
+            capabilities: vec![Capability::F32Compute],
+            origin: SubstrateOrigin::Mesh {
+                gate_name: "lab-gate".into(),
+            },
+        }];
+        let mut buf = Vec::new();
+        write_inventory(&substrates, &mut buf).unwrap();
+        let output = String::from_utf8(buf).unwrap();
+        assert!(output.contains("[mesh: lab-gate]"));
+        assert!(output.contains("0 local, 1 mesh"));
+    }
+
+    #[test]
+    fn write_inventory_mixed() {
+        let substrates = vec![
+            cpu_substrate("cpu-0"),
+            gpu_substrate("gpu-0"),
+        ];
+        let mut buf = Vec::new();
+        write_inventory(&substrates, &mut buf).unwrap();
+        let output = String::from_utf8(buf).unwrap();
+        assert!(output.contains("cpu-0"));
+        assert!(output.contains("gpu-0"));
+        assert!(output.contains("2 local, 0 mesh, 1 GPU(s)"));
+    }
+
+    #[test]
+    fn print_inventory_does_not_panic() {
+        let substrates = vec![cpu_substrate("stdout-cpu")];
+        print_inventory(&substrates);
+    }
+}

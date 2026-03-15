@@ -83,7 +83,7 @@ impl GbmTree {
 
     /// Predict the residual for a single sample.
     #[must_use]
-    #[expect(clippy::cast_sign_loss)]
+    #[expect(clippy::cast_sign_loss)] // Sign: node.feature and child indices from tree structure
     pub fn predict(&self, features: &[f64]) -> f64 {
         let mut idx = 0usize;
         loop {

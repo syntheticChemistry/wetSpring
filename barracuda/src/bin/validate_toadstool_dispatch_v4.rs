@@ -1,18 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::print_stdout,
-    clippy::too_many_lines,
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
-    clippy::similar_names,
-    clippy::many_single_char_names,
-    clippy::items_after_statements,
-    clippy::float_cmp
-)]
+#![allow(clippy::expect_used)]
+#![allow(clippy::unwrap_used)]
+#![allow(clippy::print_stdout)]
+#![allow(clippy::too_many_lines)]
+#![allow(clippy::cast_precision_loss)]
+#![allow(clippy::cast_possible_truncation)]
+#![allow(clippy::cast_sign_loss)]
+#![allow(clippy::similar_names)]
+#![allow(clippy::many_single_char_names)]
+#![allow(clippy::items_after_statements)]
+#![allow(clippy::float_cmp)]
 //! # Exp349: `ToadStool` Dispatch v4 — V109 Compute Dispatch Validation
 //!
 //! Validates that every `ToadStool` abstraction layer preserves mathematical
@@ -180,8 +178,18 @@ fn main() {
     v.check("erf(6) ≈ 1", erf_6, 1.0, tolerances::LIMIT_CONVERGENCE);
 
     v.check("Φ(0) = 0.5", norm_cdf(0.0), 0.5, tolerances::EXACT_F64);
-    v.check("Φ(-10) → 0", norm_cdf(-10.0), 0.0, 1e-10);
-    v.check("Φ(10) → 1", norm_cdf(10.0), 1.0, 1e-10);
+    v.check(
+        "Φ(-10) → 0",
+        norm_cdf(-10.0),
+        0.0,
+        tolerances::ANALYTICAL_LOOSE,
+    );
+    v.check(
+        "Φ(10) → 1",
+        norm_cdf(10.0),
+        1.0,
+        tolerances::ANALYTICAL_LOOSE,
+    );
 
     let lng_1 = barracuda::special::ln_gamma(1.0).expect("ln_gamma(1)");
     v.check("ln_gamma(1) = 0", lng_1, 0.0, tolerances::ANALYTICAL_F64);
@@ -192,7 +200,12 @@ fn main() {
     let xs: Vec<f64> = (0..=100).map(|i| f64::from(i) * 0.01).collect();
     let ys: Vec<f64> = xs.iter().map(|&x_val| x_val * x_val).collect();
     let integral = barracuda::numerical::trapz(&ys, &xs).expect("trapz");
-    v.check("∫₀¹ x² dx ≈ 1/3", integral, 1.0 / 3.0, 1e-4);
+    v.check(
+        "∫₀¹ x² dx ≈ 1/3",
+        integral,
+        1.0 / 3.0,
+        tolerances::TRAPZ_101,
+    );
 
     // ═══ S11: Bio Diversity Round-Trip ═══════════════════════════════
     v.section("S11: Bio Diversity Round-Trip (V109 rewire)");
@@ -222,7 +235,12 @@ fn main() {
 
     let p_manure = 350.0;
     let h_50 = gompertz(50.0, p_manure, 25.0, 3.0);
-    v.check("Gompertz H(50) → P", h_50, p_manure, 1.0);
+    v.check(
+        "Gompertz H(50) → P",
+        h_50,
+        p_manure,
+        tolerances::BIOGAS_KINETICS_ASYMPTOTIC,
+    );
     v.check(
         "First-order B(0) = 0",
         first_order(0.0, 320.0, 0.08),

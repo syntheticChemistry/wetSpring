@@ -366,4 +366,67 @@ mod tests {
             },
         );
     }
+
+    #[test]
+    fn discover_data_dir_with_explicit_env() {
+        temp_env::with_var("WETSPRING_DATA_DIR", Some("/custom/data"), || {
+            let dir = discover_data_dir();
+            assert_eq!(dir, PathBuf::from("/custom/data"));
+        });
+    }
+
+    #[test]
+    fn discover_data_dir_xdg_fallback() {
+        let tmp = tempfile::tempdir().unwrap();
+        temp_env::with_vars(
+            [
+                ("WETSPRING_DATA_DIR", None::<&str>),
+                ("XDG_DATA_HOME", Some(tmp.path().to_str().unwrap())),
+            ],
+            || {
+                let dir = discover_data_dir();
+                assert!(dir.to_string_lossy().contains("wetspring"));
+                assert!(dir.starts_with(tmp.path()));
+            },
+        );
+    }
+
+    #[test]
+    fn discover_data_dir_home_fallback() {
+        let tmp = tempfile::tempdir().unwrap();
+        temp_env::with_vars(
+            [
+                ("WETSPRING_DATA_DIR", None::<&str>),
+                ("XDG_DATA_HOME", None::<&str>),
+                ("HOME", Some(tmp.path().to_str().unwrap())),
+            ],
+            || {
+                let dir = discover_data_dir();
+                assert!(dir.to_string_lossy().contains("wetspring"));
+                assert!(dir.to_string_lossy().contains(".local/share"));
+            },
+        );
+    }
+
+    #[test]
+    fn nestgate_has_dataset_unreachable() {
+        let dir = tempfile::tempdir().unwrap();
+        let nonexistent = dir.path().join("nonexistent.sock");
+        assert!(!nestgate_has_dataset(&nonexistent, "test-key"));
+    }
+
+    #[test]
+    fn nestgate_rpc_invalid_socket() {
+        let dir = tempfile::tempdir().unwrap();
+        let bad_sock = dir.path().join("bad.sock");
+        let result = nestgate_rpc(&bad_sock, r#"{"jsonrpc":"2.0","method":"test","id":1}"#);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn nestgate_has_dataset_key_escaping() {
+        let dir = tempfile::tempdir().unwrap();
+        let nonexistent = dir.path().join("nonexistent.sock");
+        assert!(!nestgate_has_dataset(&nonexistent, r#"key"with\slash"#));
+    }
 }

@@ -1,0 +1,127 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# wetSpring capability registry — biomeOS science primal.
+#
+# Declares the capabilities this primal registers with Songbird for
+# capability-based discovery. Self-knowledge only: no references to
+# other primals' capabilities.
+
+[primal]
+name = "wetspring"
+version = "0.1.0"
+domain = "ecology"
+license = "AGPL-3.0-or-later"
+description = "Life science + PFAS analytical chemistry pipelines via barraCuda"
+
+[capabilities.ecology_diversity]
+method = "science.diversity"
+domain = "ecology.diversity"
+description = "Alpha/beta diversity metrics (Shannon, Simpson, Chao1, Bray-Curtis)"
+gpu_accelerated = true
+
+[capabilities.ecology_qs_model]
+method = "science.qs_model"
+domain = "ecology.qs_model"
+description = "Quorum-sensing biofilm ODE models (Waters 2008, Fernandez 2020)"
+gpu_accelerated = true
+
+[capabilities.ecology_anderson]
+method = "science.anderson"
+domain = "ecology.anderson"
+description = "Anderson spectral disorder analysis (2D/3D lattice)"
+gpu_accelerated = true
+
+[capabilities.ecology_kinetics]
+method = "science.kinetics"
+domain = "ecology.kinetics"
+description = "Biogas production curve fitting (Gompertz, first-order, Monod, Haldane)"
+gpu_accelerated = false
+
+[capabilities.ecology_alignment]
+method = "science.alignment"
+domain = "ecology.alignment"
+description = "Smith-Waterman local sequence alignment"
+gpu_accelerated = false
+
+[capabilities.ecology_taxonomy]
+method = "science.taxonomy"
+domain = "ecology.taxonomy"
+description = "Naive Bayes k-mer classification (RDP-style)"
+gpu_accelerated = false
+
+[capabilities.ecology_phylogenetics]
+method = "science.phylogenetics"
+domain = "ecology.phylogenetics"
+description = "Robinson-Foulds tree distance and phylogenetic placement"
+gpu_accelerated = false
+
+[capabilities.ecology_nmf]
+method = "science.nmf"
+domain = "ecology.nmf"
+description = "Non-negative Matrix Factorization for drug repurposing"
+gpu_accelerated = false
+
+[capabilities.ecology_ncbi_fetch]
+method = "science.ncbi_fetch"
+domain = "ecology.ncbi"
+description = "NCBI sequence retrieval (E-search, EFetch, SRA)"
+gpu_accelerated = false
+
+[capabilities.ecology_full_pipeline]
+method = "science.full_pipeline"
+domain = "ecology.pipeline"
+description = "End-to-end 16S amplicon analysis pipeline"
+gpu_accelerated = true
+
+[capabilities.ecology_timeseries]
+method = "science.timeseries"
+domain = "ecology.timeseries"
+description = "Cross-spring time series analysis"
+gpu_accelerated = false
+
+[capabilities.ecology_timeseries_diversity]
+method = "science.timeseries_diversity"
+domain = "ecology.timeseries"
+description = "Diversity tracking on time series abundances"
+gpu_accelerated = false
+
+[capabilities.provenance_begin]
+method = "provenance.begin"
+domain = "provenance"
+description = "Start provenance-tracked session"
+gpu_accelerated = false
+
+[capabilities.provenance_record]
+method = "provenance.record"
+domain = "provenance"
+description = "Record step in provenance DAG"
+gpu_accelerated = false
+
+[capabilities.provenance_complete]
+method = "provenance.complete"
+domain = "provenance"
+description = "Dehydrate, commit, and attribute provenance session"
+gpu_accelerated = false
+
+[capabilities.brain_observe]
+method = "brain.observe"
+domain = "brain"
+description = "Neural observation for bio sentinel monitoring"
+gpu_accelerated = false
+
+[capabilities.brain_attention]
+method = "brain.attention"
+domain = "brain"
+description = "Attention-weighted observation aggregation"
+gpu_accelerated = false
+
+[capabilities.brain_urgency]
+method = "brain.urgency"
+domain = "brain"
+description = "Urgency scoring for time-sensitive observations"
+gpu_accelerated = false
+
+[capabilities.metrics_snapshot]
+method = "metrics.snapshot"
+domain = "metrics"
+description = "Server metrics snapshot (calls, errors, latency)"
+gpu_accelerated = false

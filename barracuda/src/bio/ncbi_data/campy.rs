@@ -57,7 +57,7 @@ pub fn load_campylobacterota() -> (Vec<CampyAssembly>, bool) {
 /// Synthetic data: 80 assemblies across genera and ecosystems.
 ///
 /// Deterministic accessions (`GCF_CAM_*`). Used only as offline/CI fallback.
-#[expect(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)] // Precision: genome size and counts fit f64
 pub fn gen_synthetic_campy() -> Vec<CampyAssembly> {
     let genera = [
         (
