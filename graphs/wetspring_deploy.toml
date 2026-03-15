@@ -1,0 +1,277 @@
+# wetSpring biomeOS Deploy Graph
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Follows: wateringHole/SPRING_AS_NICHE_DEPLOYMENT_STANDARD.md
+#
+# Germination order:
+#   1. BearDog (security foundation)
+#   2. Songbird (discovery)
+#   3. rhizoCrypt + loamSpine + sweetGrass (provenance trio)
+#   4. nestGate (content-addressed cache)
+#   5. BarraCUDA/ToadStool (GPU compute — optional)
+#   6. petalTongue (visualization — optional)
+#   7. wetSpring (science)
+#   8. Validation
+#
+# Composition evolution opportunity: biomeOS can extend this graph
+# with additional primals (airSpring, healthSpring) that consume
+# wetSpring capabilities via cross-spring time series exchange.
+
+[graph]
+id = "wetspring_deploy"
+description = "wetSpring life-science validation atop Node Atomic with provenance trio"
+coordination = "Sequential"
+
+# ── Phase 1: Tower Atomic ───────────────────────────────────────────
+
+[[nodes]]
+id = "germinate_beardog"
+output = "beardog_genesis"
+
+[nodes.primal]
+by_capability = "security"
+
+[nodes.operation]
+name = "start"
+
+[nodes.operation.params]
+mode = "server"
+family_id = "${FAMILY_ID}"
+
+[nodes.operation.environment]
+BIOMEOS_SOCKET_DIR = "${XDG_RUNTIME_DIR}/biomeos"
+FAMILY_ID = "${FAMILY_ID}"
+
+[nodes.constraints]
+timeout_ms = 10000
+
+[[nodes]]
+id = "germinate_songbird"
+depends_on = ["germinate_beardog"]
+output = "songbird_genesis"
+
+[nodes.primal]
+by_capability = "discovery"
+
+[nodes.operation]
+name = "start"
+
+[nodes.operation.params]
+mode = "server"
+family_id = "${FAMILY_ID}"
+
+[nodes.operation.environment]
+BIOMEOS_SOCKET_DIR = "${XDG_RUNTIME_DIR}/biomeos"
+FAMILY_ID = "${FAMILY_ID}"
+
+[nodes.constraints]
+timeout_ms = 10000
+
+# ── Phase 2: Provenance Trio ────────────────────────────────────────
+
+[[nodes]]
+id = "germinate_rhizocrypt"
+depends_on = ["germinate_beardog", "germinate_songbird"]
+output = "rhizocrypt_genesis"
+
+[nodes.primal]
+by_capability = "dag"
+
+[nodes.operation]
+name = "start"
+
+[nodes.operation.params]
+mode = "server"
+family_id = "${FAMILY_ID}"
+
+[nodes.operation.environment]
+BIOMEOS_SOCKET_DIR = "${XDG_RUNTIME_DIR}/biomeos"
+FAMILY_ID = "${FAMILY_ID}"
+
+[nodes.constraints]
+timeout_ms = 15000
+
+[[nodes]]
+id = "germinate_loamspine"
+depends_on = ["germinate_beardog", "germinate_songbird"]
+output = "loamspine_genesis"
+
+[nodes.primal]
+by_capability = "commit"
+
+[nodes.operation]
+name = "start"
+
+[nodes.operation.params]
+mode = "server"
+family_id = "${FAMILY_ID}"
+
+[nodes.operation.environment]
+BIOMEOS_SOCKET_DIR = "${XDG_RUNTIME_DIR}/biomeos"
+FAMILY_ID = "${FAMILY_ID}"
+
+[nodes.constraints]
+timeout_ms = 15000
+
+[[nodes]]
+id = "germinate_sweetgrass"
+depends_on = ["germinate_beardog", "germinate_songbird"]
+output = "sweetgrass_genesis"
+
+[nodes.primal]
+by_capability = "provenance"
+
+[nodes.operation]
+name = "start"
+
+[nodes.operation.params]
+mode = "server"
+family_id = "${FAMILY_ID}"
+
+[nodes.operation.environment]
+BIOMEOS_SOCKET_DIR = "${XDG_RUNTIME_DIR}/biomeos"
+FAMILY_ID = "${FAMILY_ID}"
+
+[nodes.constraints]
+timeout_ms = 15000
+
+# ── Phase 3: Compute & Cache (Optional Enrichment) ─────────────────
+
+[[nodes]]
+id = "germinate_nestgate"
+depends_on = ["germinate_beardog", "germinate_songbird"]
+output = "nestgate_genesis"
+
+[nodes.primal]
+by_capability = "storage"
+
+[nodes.operation]
+name = "start"
+
+[nodes.operation.params]
+mode = "server"
+family_id = "${FAMILY_ID}"
+
+[nodes.operation.environment]
+BIOMEOS_SOCKET_DIR = "${XDG_RUNTIME_DIR}/biomeos"
+FAMILY_ID = "${FAMILY_ID}"
+
+[nodes.constraints]
+timeout_ms = 15000
+optional = true
+
+[[nodes]]
+id = "germinate_petaltongue"
+depends_on = ["germinate_beardog", "germinate_songbird"]
+output = "petaltongue_genesis"
+
+[nodes.primal]
+by_capability = "visualization"
+
+[nodes.operation]
+name = "start"
+
+[nodes.operation.params]
+mode = "server"
+family_id = "${FAMILY_ID}"
+
+[nodes.operation.environment]
+BIOMEOS_SOCKET_DIR = "${XDG_RUNTIME_DIR}/biomeos"
+FAMILY_ID = "${FAMILY_ID}"
+
+[nodes.constraints]
+timeout_ms = 15000
+optional = true
+
+# ── Phase 4: wetSpring Science ──────────────────────────────────────
+
+[[nodes]]
+id = "germinate_wetspring"
+depends_on = [
+    "germinate_beardog",
+    "germinate_songbird",
+    "germinate_rhizocrypt",
+    "germinate_loamspine",
+    "germinate_sweetgrass",
+]
+output = "wetspring_genesis"
+capabilities = [
+    "science",
+    "science.diversity",
+    "science.anderson",
+    "science.qs_model",
+    "science.ncbi_fetch",
+    "science.full_pipeline",
+    "science.kinetics",
+    "science.alignment",
+    "science.taxonomy",
+    "science.phylogenetics",
+    "science.nmf",
+    "science.timeseries",
+    "science.timeseries_diversity",
+    "provenance.begin",
+    "provenance.record",
+    "provenance.complete",
+    "brain.observe",
+    "brain.attention",
+    "brain.urgency",
+]
+
+[nodes.primal]
+by_capability = "science"
+
+[nodes.operation]
+name = "start"
+
+[nodes.operation.params]
+mode = "server"
+family_id = "${FAMILY_ID}"
+
+[nodes.operation.environment]
+BIOMEOS_SOCKET_DIR = "${XDG_RUNTIME_DIR}/biomeos"
+FAMILY_ID = "${FAMILY_ID}"
+
+[nodes.operation.environment.optional]
+WETSPRING_SOCKET = "${XDG_RUNTIME_DIR}/biomeos/wetspring-${FAMILY_ID}.sock"
+
+[nodes.constraints]
+timeout_ms = 20000
+
+[nodes.capabilities_provided]
+"science.diversity" = "science.diversity"
+"science.anderson" = "science.anderson"
+"science.qs_model" = "science.qs_model"
+"science.ncbi_fetch" = "science.ncbi_fetch"
+"science.full_pipeline" = "science.full_pipeline"
+"science.kinetics" = "science.kinetics"
+"science.alignment" = "science.alignment"
+"science.taxonomy" = "science.taxonomy"
+"science.phylogenetics" = "science.phylogenetics"
+"science.nmf" = "science.nmf"
+"science.timeseries" = "science.timeseries"
+"science.timeseries_diversity" = "science.timeseries_diversity"
+"provenance.begin" = "provenance.begin"
+"provenance.record" = "provenance.record"
+"provenance.complete" = "provenance.complete"
+"brain.observe" = "brain.observe"
+"brain.attention" = "brain.attention"
+"brain.urgency" = "brain.urgency"
+
+# ── Phase 5: Validation ────────────────────────────────────────────
+
+[[nodes]]
+id = "validate_wetspring_atomic"
+depends_on = [
+    "germinate_beardog",
+    "germinate_songbird",
+    "germinate_wetspring",
+]
+output = "wetspring_validated"
+
+[nodes.operation]
+name = "health_check"
+
+[nodes.operation.params]
+check_wetspring = true
+timeout_seconds = 15

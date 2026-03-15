@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-14 (V112: 372 experiments, 340 binaries, 5,707+ checks. V112: Exp372 — streaming-only I/O (deprecated buffering parsers removed), capability-based runtime discovery, zero clippy pedantic+nursery warnings. V111: debt/cleanup pass — build health, clippy pedantic, bingocube-nautilus, barraCuda v0.3.5. V110: petalTongue visualization pipeline (Exp353–355) + Anderson QS cross-environment validation (Exp356). 1,621 tests, clippy ZERO WARNINGS.)
+**Updated**: 2026-03-15 (V113: 373 experiments, 340 binaries, 5,707+ checks. V113: Exp373 — provenance trio integration, expanded capabilities (9→19), cross-spring time series exchange, biomeOS deploy graph. V112: Exp372 — streaming-only I/O, capability-based runtime discovery, zero clippy pedantic+nursery warnings.)
 
 ---
 
@@ -604,7 +604,16 @@ hardcoded primal paths replaced with `$PATH`/`$XDG_RUNTIME_DIR` capability disco
 Build-breaking `_all_pielou` compilation errors fixed. Inline tolerance promoted to named
 constant. All quality gates green: fmt, clippy, doc, build, test.
 
-**Totals: 372 experiments, 340 binaries, 5,707+ checks.**
+### Exp373: V113 Provenance Trio + Expanded Capabilities + Deploy Graph
+
+Provenance trio integration (`rhizoCrypt` → `loamSpine` → `sweetGrass`) via
+`capability.call`. IPC surface expanded from 9 to 19 capabilities (kinetics,
+alignment, taxonomy, phylogenetics, NMF, time series, provenance). Cross-spring
+time series exchange format (`ecoPrimals/time-series/v1`). biomeOS deploy graph
+(`graphs/wetspring_deploy.toml`) following `SPRING_AS_NICHE_DEPLOYMENT_STANDARD`.
+All quality gates green.
+
+**Totals: 373 experiments, 340 binaries, 5,707+ checks.**
 
 ---
 

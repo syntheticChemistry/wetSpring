@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** March 14, 2026 (V112)
+**Date:** March 15, 2026 (V113)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
 **barraCuda:** standalone v0.3.5 `0649cd0`
-**Status:** 150+ primitives consumed (264 ComputeDispatch ops) via `compile_shader_universal`, 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 47 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,621 tests (1,384 pass, 4 known failures), standalone barraCuda v0.3.5, 372 experiments, 5,707+ checks, 340 binaries, 180 named tolerances, `#![forbid(unsafe_code)]` on all crate roots, clippy pedantic+nursery CLEAN (`--all-features`). **V112:** streaming-only I/O (deprecated `parse_*` removed), capability-based runtime discovery (`$PATH`/`$XDG_RUNTIME_DIR`), 40 clippy warnings eliminated. **V111:** deep debt — build health, bingocube-nautilus. **V110:** petalTongue viz (Exp353-356). **V109:** upstream rewire + NUCLEUS (Exp347-352, 145/145). **V108:** Track 6 biogas. **V107:** R industry parity (53/53).
+**Status:** 150+ primitives consumed (264 ComputeDispatch ops) via `compile_shader_universal`, 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 47 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,326 tests (0 failures), standalone barraCuda v0.3.5, 373 experiments, 5,707+ checks, 340 binaries, 180 named tolerances, `#![forbid(unsafe_code)]` on all crate roots, clippy pedantic+nursery CLEAN. **V113:** provenance trio integration, 19 biomeOS capabilities (was 9), cross-spring time series exchange, biomeOS deploy graph. **V112:** streaming-only I/O, capability-based runtime discovery. **V111:** deep debt. **V110:** petalTongue viz (Exp353-356). **V109:** upstream rewire + NUCLEUS (Exp347-352, 145/145). **V108:** Track 6 biogas. **V107:** R industry parity (53/53).
 
 ---
 

@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 14, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V112 — **1,621 tests** (1,506 barracuda lib + 222 forge + 72 integration + 27 doc), 356 experiments, 5,707+ validation checks across 340 binaries (318 barracuda + 22 forge). Ecosystem: barraCuda v0.3.5, toadStool S130+, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). Streaming-only I/O (deprecated buffering parsers removed). Capability-based runtime discovery (zero hardcoded primal paths).
+**Status:** V113 — **1,621 tests** (1,326 default + 295 feature-gated), 373 experiments, 5,707+ validation checks across 340 binaries. Ecosystem: barraCuda v0.3.5, toadStool S130+, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). Provenance trio integration (rhizoCrypt → loamSpine → sweetGrass). Cross-spring time series exchange (`ecoPrimals/time-series/v1`). 19 biomeOS capabilities registered (was 9). biomeOS deploy graph with provenance trio composition.
 
 ---
 

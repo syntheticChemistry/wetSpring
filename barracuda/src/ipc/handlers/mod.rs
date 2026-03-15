@@ -13,9 +13,13 @@
 //! | `science` | `science.diversity`, `science.qs_model`, Anderson, …  |
 
 mod brain;
+mod expanded;
 mod science;
 
 pub use brain::{handle_brain_attention, handle_brain_observe, handle_brain_urgency};
+pub use expanded::{
+    handle_alignment, handle_kinetics, handle_nmf, handle_phylogenetics, handle_taxonomy,
+};
 pub use science::{
     handle_anderson, handle_diversity, handle_full_pipeline, handle_ncbi_fetch, handle_qs_model,
 };
@@ -31,6 +35,16 @@ pub const CAPABILITIES: &[&str] = &[
     "science.qs_model",
     "science.ncbi_fetch",
     "science.full_pipeline",
+    "science.kinetics",
+    "science.alignment",
+    "science.taxonomy",
+    "science.phylogenetics",
+    "science.nmf",
+    "science.timeseries",
+    "science.timeseries_diversity",
+    "provenance.begin",
+    "provenance.record",
+    "provenance.complete",
     "brain.observe",
     "brain.attention",
     "brain.urgency",

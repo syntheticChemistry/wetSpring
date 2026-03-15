@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
-**Last Updated**: March 14, 2026
-**Status**: V112 — 5,707+ checks (372 experiments, 340 binaries). V112: streaming-only I/O (deprecated buffering parsers removed), capability-based runtime discovery, zero clippy warnings. V111: deep debt — build health, bingocube-nautilus. V110: petalTongue (Exp353-356). V109: NUCLEUS (Exp347-352). V108: Track 6 (63 papers). clippy ZERO WARNINGS.
+**Last Updated**: March 15, 2026
+**Status**: V113 — 5,707+ checks (373 experiments, 340 binaries). V113: provenance trio integration, 19 biomeOS capabilities, cross-spring time series exchange, biomeOS deploy graph. V112: streaming-only I/O, capability-based runtime discovery, zero clippy warnings.
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

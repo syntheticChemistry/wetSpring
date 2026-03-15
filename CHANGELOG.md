@@ -3,6 +3,56 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V113] — 2026-03-15
+
+### Provenance Trio + Expanded Capabilities + biomeOS Deploy Graph
+
+Complete provenance trio integration, expanded IPC surface from 9 to 19
+capabilities, cross-spring time series exchange format, NMF implementation,
+and biomeOS deploy graph with composition evolution opportunities.
+
+#### Provenance Trio Integration (`ipc/provenance.rs`)
+- `provenance.begin` — start provenance-tracked experiment session via rhizoCrypt
+- `provenance.record` — append step to DAG with vertex tracking
+- `provenance.complete` — three-phase: dehydrate → commit (loamSpine) → attribute (sweetGrass)
+- Full graceful degradation: domain logic never fails when trio is unavailable
+- Neural API socket discovery: `NEURAL_API_SOCKET` → `BIOMEOS_SOCKET_DIR` → `XDG_RUNTIME_DIR` → temp
+- 9 unit tests covering all degradation paths
+
+#### Expanded Science Capabilities (`ipc/handlers/expanded.rs`)
+- `science.kinetics` — Gompertz and first-order biogas production models
+- `science.alignment` — Smith-Waterman local alignment wrapping `bio::alignment`
+- `science.taxonomy` — Naive Bayes k-mer classification (RDP-style) wrapping `bio::taxonomy`
+- `science.phylogenetics` — Robinson-Foulds distance wrapping `bio::robinson_foulds`
+- `science.nmf` — Non-negative Matrix Factorization (Lee & Seung multiplicative update)
+- 11 unit tests with known-value validation
+
+#### Cross-Spring Time Series Exchange (`ipc/timeseries.rs`)
+- `science.timeseries` — analyze incoming `ecoPrimals/time-series/v1` payloads (mean, variance, trend)
+- `science.timeseries_diversity` — compute diversity metrics on time series abundances
+- `build_time_series()` — build outbound payloads for other springs
+- `build_diversity_series()` — convenience for Shannon diversity series
+- Schema validation: rejects wrong versions with clear error
+- 5 unit tests including roundtrip and schema validation
+
+#### biomeOS Deploy Graph (`graphs/wetspring_deploy.toml`)
+- Full TOML DAG following `SPRING_AS_NICHE_DEPLOYMENT_STANDARD`
+- Germination order: BearDog → Songbird → Provenance Trio → wetSpring → Validation
+- Optional enrichment: nestGate (content cache), petalTongue (visualization)
+- 19 capabilities registered in graph node
+- Composition evolution opportunity: other springs can consume wetSpring via the graph
+
+#### IPC Surface Expansion (9 → 19 Capabilities)
+- `CAPABILITIES` array in `handlers/mod.rs`: 19 entries (was 9)
+- Dispatch table in `dispatch.rs`: 18 method routes (was 9) + metrics intercept
+- Songbird registration automatically advertises all 19 capabilities
+
+#### Quality Gates
+- `cargo check --features ipc,json` — clean
+- `cargo clippy --features ipc,json -- -W clippy::pedantic -W clippy::nursery` — zero new warnings
+- `cargo test` — 1,326 tests pass, 0 fail
+- All new code: zero `unsafe`, zero `unwrap` outside tests, `#[must_use]` on all pure functions
+
 ## [V112] — 2026-03-14
 
 ### Streaming-Only I/O + Zero-Warning Pedantic + Capability-Based Discovery

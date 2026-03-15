@@ -7,14 +7,24 @@
 //!
 //! # Capabilities
 //!
-//! | Method                  | Description                                  |
-//! |-------------------------|----------------------------------------------|
-//! | `health.check`          | Health/readiness probe                       |
-//! | `science.diversity`     | Alpha diversity metrics (Shannon, Simpson, …) |
-//! | `science.anderson`      | Anderson spectral analysis (GPU-preferred)    |
-//! | `science.qs_model`      | QS/c-di-GMP biofilm ODE integration          |
-//! | `science.ncbi_fetch`    | NCBI sequence retrieval                      |
-//! | `science.full_pipeline` | Chains all above stages                      |
+//! | Method                          | Description                                  |
+//! |---------------------------------|----------------------------------------------|
+//! | `health.check`                  | Health/readiness probe                       |
+//! | `science.diversity`             | Alpha diversity metrics (Shannon, Simpson, …) |
+//! | `science.anderson`              | Anderson spectral analysis (GPU-preferred)    |
+//! | `science.qs_model`              | QS/c-di-GMP biofilm ODE integration          |
+//! | `science.ncbi_fetch`            | NCBI sequence retrieval                      |
+//! | `science.full_pipeline`         | Chains all above stages                      |
+//! | `science.kinetics`              | Biogas production models (Gompertz, etc.)    |
+//! | `science.alignment`             | Smith-Waterman local alignment               |
+//! | `science.taxonomy`              | Naive Bayes classification (RDP-style)       |
+//! | `science.phylogenetics`         | Robinson-Foulds tree distance                |
+//! | `science.nmf`                   | Non-negative Matrix Factorization            |
+//! | `science.timeseries`            | Cross-spring time series analysis            |
+//! | `science.timeseries_diversity`  | Diversity on time series abundances          |
+//! | `provenance.begin`              | Start provenance-tracked session             |
+//! | `provenance.record`             | Record step in provenance DAG                |
+//! | `provenance.complete`           | Dehydrate → commit → attribute               |
 //!
 //! # Socket discovery
 //!
@@ -36,8 +46,10 @@ pub mod dispatch;
 pub mod handlers;
 pub mod metrics;
 pub mod protocol;
+pub mod provenance;
 pub mod server;
 pub mod songbird;
+pub mod timeseries;
 pub mod transport;
 
 pub use server::Server;

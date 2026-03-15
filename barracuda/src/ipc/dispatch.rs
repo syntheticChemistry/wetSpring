@@ -12,6 +12,7 @@ use serde_json::Value;
 
 use crate::ipc::handlers;
 use crate::ipc::protocol::RpcError;
+use crate::ipc::{provenance, timeseries};
 
 // Re-export for tests
 pub use handlers::{extract_f64_array, extract_string_array};
@@ -29,14 +30,35 @@ pub use handlers::{extract_f64_array, extract_string_array};
 pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
     match method {
         "health.check" => handlers::handle_health(),
+
+        // Core science capabilities
         "science.diversity" => handlers::handle_diversity(params),
         "science.qs_model" => handlers::handle_qs_model(params),
         "science.ncbi_fetch" => handlers::handle_ncbi_fetch(params),
         "science.anderson" => handlers::handle_anderson(params),
         "science.full_pipeline" => handlers::handle_full_pipeline(params),
+
+        // Expanded science capabilities
+        "science.kinetics" => handlers::handle_kinetics(params),
+        "science.alignment" => handlers::handle_alignment(params),
+        "science.taxonomy" => handlers::handle_taxonomy(params),
+        "science.phylogenetics" => handlers::handle_phylogenetics(params),
+        "science.nmf" => handlers::handle_nmf(params),
+
+        // Cross-spring time series
+        "science.timeseries" => timeseries::handle_timeseries(params),
+        "science.timeseries_diversity" => timeseries::handle_timeseries_diversity(params),
+
+        // Provenance trio integration
+        "provenance.begin" => provenance::handle_provenance_begin(params),
+        "provenance.record" => provenance::handle_provenance_record(params),
+        "provenance.complete" => provenance::handle_provenance_complete(params),
+
+        // Brain (attention, urgency)
         "brain.observe" => handlers::handle_brain_observe(params),
         "brain.attention" => handlers::handle_brain_attention(params),
         "brain.urgency" => handlers::handle_brain_urgency(params),
+
         _ => Err(RpcError::method_not_found(method)),
     }
 }
