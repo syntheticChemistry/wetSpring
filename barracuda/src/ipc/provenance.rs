@@ -52,9 +52,11 @@ pub fn neural_api_socket() -> Option<PathBuf> {
         std::env::var("BIOMEOS_SOCKET_DIR")
             .ok()
             .map(|d| PathBuf::from(d).join(&sock_name)),
-        std::env::var("XDG_RUNTIME_DIR")
-            .ok()
-            .map(|d| PathBuf::from(d).join(super::primal_names::BIOMEOS).join(&sock_name)),
+        std::env::var("XDG_RUNTIME_DIR").ok().map(|d| {
+            PathBuf::from(d)
+                .join(super::primal_names::BIOMEOS)
+                .join(&sock_name)
+        }),
         Some(std::env::temp_dir().join(&sock_name)),
     ];
 

@@ -4,12 +4,12 @@
 use std::fmt;
 use std::path::PathBuf;
 
-/// Errors produced by NestGate client operations.
+/// Errors produced by `NestGate` client operations.
 #[derive(Debug, PartialEq, Eq)]
 pub enum NestError {
     /// Unix socket path is invalid.
     InvalidSocket(String),
-    /// Connection to NestGate failed.
+    /// Connection to `NestGate` failed.
     Connect(String),
     /// Timeout configuration failed.
     Timeout(String),
@@ -19,7 +19,7 @@ pub enum NestError {
     Flush(String),
     /// Read from socket failed.
     Read(String),
-    /// NestGate returned an empty response.
+    /// `NestGate` returned an empty response.
     EmptyResponse,
     /// File I/O error.
     FileRead {
@@ -49,12 +49,12 @@ impl fmt::Display for NestError {
 
 impl std::error::Error for NestError {}
 
-/// Errors produced by Songbird mesh discovery.
+/// Errors produced by `Songbird` mesh discovery.
 #[derive(Debug)]
 pub enum SongbirdError {
     /// Unix socket path is invalid.
     InvalidSocket(String),
-    /// Connection to Songbird failed.
+    /// Connection to `Songbird` failed.
     Connect(String),
     /// Timeout configuration failed.
     Timeout(String),
@@ -64,9 +64,9 @@ pub enum SongbirdError {
     Flush(String),
     /// Read from socket failed.
     Read(String),
-    /// Songbird returned an empty response.
+    /// `Songbird` returned an empty response.
     EmptyResponse,
-    /// Songbird returned an error response.
+    /// `Songbird` returned an error response.
     ErrorResponse,
 }
 
@@ -122,7 +122,7 @@ pub enum NcbiError {
     InvalidUtf8(String),
     /// NCBI assembly not found.
     AssemblyNotFound(String),
-    /// NestGate cache operation failed.
+    /// `NestGate` cache operation failed.
     CacheFailed(String),
     /// Filesystem error during local assembly lookup.
     FileSystem(String),
@@ -142,12 +142,12 @@ impl fmt::Display for NcbiError {
 
 impl std::error::Error for NcbiError {}
 
-/// Errors produced by NestGate data pipeline RPC.
+/// Errors produced by `NestGate` data pipeline RPC.
 #[derive(Debug)]
 pub enum DataError {
     /// Socket path is invalid.
     InvalidSocket(String),
-    /// Connection to NestGate failed.
+    /// Connection to `NestGate` failed.
     Connect(String),
     /// Timeout configuration failed.
     Timeout(String),
@@ -157,7 +157,7 @@ pub enum DataError {
     Flush(String),
     /// Read from socket failed.
     Read(String),
-    /// NestGate returned empty response.
+    /// `NestGate` returned empty response.
     EmptyResponse,
 }
 

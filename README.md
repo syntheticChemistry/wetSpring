@@ -4,10 +4,10 @@
 against Rust implementations and GPU shaders via `barraCuda` (standalone math
 primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 
-**Date:** March 15, 2026
+**Date:** March 16, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V120 — **1,680 tests** (0 failures, 3 pre-existing GPU hw-specific), 376 experiments, 5,707+ validation checks across 354 binaries. Ecosystem: barraCuda v0.3.5, toadStool S130+, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). **biomeOS niche** — deploy graph with `fallback = "skip"` for optional primals (`graphs/wetspring_deploy.toml`), niche self-knowledge (`niche.rs` + `wetspring-ecology.yaml` BYOB manifest), 16 capability domains / 22 methods (`capability_domains.rs`), Squirrel AI + ToadStool as optional deploy nodes, provenance trio integration, cross-spring time series exchange. **UniBin compliant** (`wetspring server|status|version`). 200+ named tolerance constants (4 submodules) + shared Python tolerance module (`scripts/tolerances.py`). V120 Cross-Spring Absorption: typed errors completed in forge (`NcbiError`, `DataError`) and barracuda (`Error::Ipc`), deploy graph evolved (Squirrel + ToadStool optional nodes, `fallback = "skip"`), `live_pipeline.rs` refactored (611 LOC → `mod.rs` + `stages.rs`), hardcoded primal names eliminated in nestgate discovery + visualization, shared Python tolerance module (mirrors 120+ Rust constants). Superseded handoffs archived (V111–V118).
+**Status:** V121 — **1,685 tests** (0 failures), 376 experiments, 5,707+ validation checks across 354 binaries. Ecosystem: barraCuda v0.3.5, toadStool S155, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery), `cargo fmt` clean, zero `#[allow()]` in production code. **biomeOS niche** — deploy graph with `fallback = "skip"` for optional primals (`graphs/wetspring_deploy.toml`), niche self-knowledge (`niche.rs` + `wetspring-ecology.yaml` BYOB manifest), 16 capability domains / 20 methods (`capability_domains.rs`), Squirrel AI + ToadStool as optional deploy nodes, provenance trio integration, cross-spring time series exchange. **UniBin compliant** (`wetspring server|status|version`). 214 named tolerance constants (4 submodules) + shared Python tolerance module (`scripts/tolerances.py`). V121 deep debt evolution: all inline tolerance literals centralized (14 new constants, ~50 replacements), all hardcoded primal names replaced with `primal_names::*` constants, stale `#[expect()]` attributes removed, crate-level `#[allow()]` evolved to `#[expect(reason)]`, `/tmp/` test paths evolved to `tempfile`, `blake3` evolved to pure Rust (default-features=false), doc-lint and const-fn evolution, `verify_baseline_outputs.sh` rerun bug fixed. Superseded handoffs archived (V111–V120).
 
 ---
 
@@ -93,7 +93,7 @@ integration point.
 | `dispatch` | Capability-based workload routing |
 | `streaming` | Multi-stage GPU pipeline analysis |
 | `bridge` | forge ↔ barracuda device bridge |
-| `visualization` | petalTongue scenario builders (33 builders, 9 channel types, LivePipelineSession, streaming, Songbird) |
+| `visualization` | petalTongue scenario builders (28 builders, 9 channel types, LivePipelineSession, streaming, Songbird) |
 
 ---
 
@@ -136,14 +136,14 @@ integration point.
 | Rust library unit tests | 1,353 (barracuda) |
 | metalForge forge tests | 234 |
 | Integration tests | 98 (72 barracuda + 26 forge) |
-| **Total Rust tests** | **1,687** (lib + forge + integration) |
+| **Total Rust tests** | **1,685** (lib + forge + integration) |
 | Library code coverage | **94.01% line** (barracuda), **88.78% line** (forge) (cargo-llvm-cov) |
 | Experiments completed | 376 |
 | Validation/benchmark binaries | 354 (332 barracuda + 22 forge) |
 | CPU bio modules | 47 |
 | GPU bio modules | 47 (30 lean + 5 write→lean + 7 compose + 0 passthrough + 5 visualization) |
 | Tier B (needs refactor) | 0 (all promoted) |
-| Python baselines | 71 scripts (all with reproduction headers + SHA-256 integrity verification) |
+| Python baselines | 58 scripts (all with reproduction headers + SHA-256 integrity verification) |
 | BarraCuda CPU parity | 546/546 (v1-v11: 36+ domains, IPC fidelity proven) |
 | BarraCuda GPU parity | 36+ domains (17 absorbed + 5 local ODE + 7 compose + IPC GPU-aware dispatch) |
 | metalForge cross-system | 37+ domains CPU↔GPU (Exp103+104+165+182+208), **39/39 papers three-tier** |
@@ -151,7 +151,7 @@ integration point.
 | Pure GPU streaming | 152 checks — analytics (Exp105), ODE+phylo (Exp106), 441-837× vs round-trip |
 | `barraCuda` primitives consumed | **150+** (v0.3.5, always-on, zero fallback code — standalone `barraCuda`, wgpu 28, PrecisionRoutingAdvice) |
 | Local WGSL shaders | **0** (diversity fusion absorbed S63 — fully lean) |
-All 5,707+ validation checks **PASS**. All 1,353 library + 234 forge + 98 integration tests **PASS** (2 ignored: hardware-dependent).
+All 5,707+ validation checks **PASS**. All 1,353 library + 234 forge + 98 integration tests **PASS** (2 ignored: hardware-dependent). Zero clippy warnings, zero fmt diffs, zero `#[allow()]` in production code.
 
 ### GPU Performance
 
@@ -373,7 +373,7 @@ See CHANGELOG.md for full V111 entry.
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy -W pedantic -W nursery` | **Zero warnings** (pedantic + nursery clean) |
 | `cargo doc --no-deps` | Clean (0 warnings) |
-| Line coverage (`cargo-llvm-cov`) | **94.01% line** (barracuda), **90%+ line** (forge) (1,687 tests) |
+| Line coverage (`cargo-llvm-cov`) | **94.01% line** (barracuda), **90%+ line** (forge) (1,685 tests) |
 | `#![forbid(unsafe_code)]` | **Enforced on all 356 crate roots** (2 lib + 354 bin; edition 2024) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | **Enforced crate-wide** |
 | `#[expect(reason = "...")]` | All validation binary lint overrides documented |
@@ -382,7 +382,7 @@ See CHANGELOG.md for full V111 entry.
 | SPDX-License-Identifier | All `.rs` files |
 | Max file size | All under 1000 LOC |
 | External C dependencies | **0** (`flate2` uses `rust_backend`) |
-| Named tolerance constants | 200+ (scientifically justified, hierarchy-tested; NMF_CONVERGENCE, MATRIX_EPS, STABLE_SPECIAL_TINY) |
+| Named tolerance constants | **214** (scientifically justified, hierarchy-tested; zero inline literals — all `tolerances::*`) |
 | Provenance headers | All 340 binaries |
 | ESN ridge regression | **Proper Cholesky solve** (not diagonal approximation) |
 | I/O streaming | **Streaming-only** — buffering `parse_*` functions removed; `FastqIter` / `MzmlIter` / `Ms2Iter` + `stats_from_file` |
@@ -480,7 +480,7 @@ wetSpring/
 │   ├── src/
 │   │   ├── lib.rs               ← crate root (pedantic + nursery lints enforced)
 │   │   ├── special.rs           ← sovereign math (erf, ln_gamma, regularized_gamma)
-│   │   ├── tolerances/           ← 200+ named tolerance constants (bio, gpu, spectral, instrument)
+│   │   ├── tolerances/           ← 214 named tolerance constants (bio, gpu, spectral, instrument)
 │   │   ├── validation/           ← hotSpring validation framework
 │   │   ├── ncbi/                ← NCBI module (API key, HTTP, E-search, EFetch, SRA, NestGate, cache)
 │   │   ├── encoding.rs          ← sovereign base64 (zero dependencies)
@@ -507,7 +507,7 @@ wetSpring/
 │       └── CROSS_SYSTEM_STATUS.md ← algorithm × substrate matrix
 ├── wateringHole/                   ← spring-local handoffs (following hotSpring pattern)
 │   └── handoffs/                  ← ToadStool/barraCuda rewire + cross-spring evolution docs
-├── scripts/                       ← Python baselines (71 scripts)
+├── scripts/                       ← Python baselines (58 scripts)
 ├── specs/                         ← specifications and paper queue (CROSS_SPRING_EVOLUTION.md)
 ├── whitePaper/                    ← validation study draft
 └── data/                          ← local datasets (not committed)
@@ -580,11 +580,11 @@ All validation data comes from public repositories:
 - **neuralSpring** — ML/neural inference validation (sibling Spring, eigensolvers, batch IPR, TransE)
 - **airSpring** — Precision agriculture / IoT validation (sibling Spring, Richards PDE, Kriging)
 - **barraCuda** — Standalone math primal v0.3.5 (767+ f64-canonical WGSL shaders, universal precision, `PrecisionRoutingAdvice`, `shaders::provenance`, `BatchedOdeRK45F64`)
-- **toadStool** — Hardware dispatch primal (GPU/NPU/CPU routing, adaptive tuning, S130 — 19,140+ tests, `science.*` IPC, coralReef proxy)
+- **toadStool** — Hardware dispatch primal (GPU/NPU/CPU routing, adaptive tuning, S155 — 19,140+ tests, `science.*` IPC, coralReef proxy)
 - **coralReef** — Sovereign GPU shader compiler (WGSL/SPIR-V → native binary, Phase 10, SM70–SM89 + RDNA2, `shader.compile.*` IPC)
 - **wateringHole** — Inter-primal handoffs and cross-spring coordination
-  - `handoffs/WETSPRING_V119_DEEP_DEBT_EVOLUTION_HANDOFF_MAR15_2026.md` — V119 deep debt evolution
-  - `handoffs/archive/` — V7-V118 (fossil record)
+  - `handoffs/WETSPRING_V121_DEEP_DEBT_EVOLUTION_HANDOFF_MAR16_2026.md` — V121 deep debt evolution + toadStool/barraCuda absorption
+  - `handoffs/archive/` — V7-V120 (fossil record)
   - `CROSS_SPRING_SHADER_EVOLUTION.md` — 767+ shader provenance
 - **blueFish** — Chemistry as irreducible research programme (`whitePaper/blueFish/`)
 - **ecoPrimals** — Parent ecosystem

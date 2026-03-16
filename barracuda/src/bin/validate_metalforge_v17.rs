@@ -42,6 +42,7 @@
 use std::path::PathBuf;
 use std::time::Instant;
 use wetspring_barracuda::bio::{cooperation, diversity, qs_biofilm};
+use wetspring_barracuda::ipc::primal_names;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{DomainResult, Validator};
 
@@ -215,10 +216,16 @@ fn main() {
     v.check_pass("MF25: XDG_RUNTIME_DIR present", has_runtime);
     mf25 += 1;
 
-    let primals = ["beardog", "songbird", "toadstool", "nestgate", "squirrel"];
+    let primals = [
+        primal_names::BEARDOG,
+        primal_names::SONGBIRD,
+        primal_names::TOADSTOOL,
+        primal_names::NESTGATE,
+        primal_names::SQUIRREL,
+    ];
     let mut found_sockets = Vec::new();
     if let Some(ref rd) = runtime_dir {
-        let biomeos_dir = PathBuf::from(rd).join("biomeos");
+        let biomeos_dir = PathBuf::from(rd).join(primal_names::BIOMEOS);
         for primal in &primals {
             let patterns = [
                 biomeos_dir.join(format!("{primal}-eastgate.sock")),
@@ -405,7 +412,7 @@ fn discover_biomeos_bin() -> Option<PathBuf> {
     }
     let path_var = std::env::var("PATH").ok()?;
     for dir in path_var.split(':') {
-        let candidate = PathBuf::from(dir).join("biomeos");
+        let candidate = PathBuf::from(dir).join(primal_names::BIOMEOS);
         if candidate.exists() && candidate.is_file() {
             return Some(candidate);
         }

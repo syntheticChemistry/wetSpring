@@ -3,15 +3,19 @@
 #![deny(clippy::expect_used, clippy::unwrap_used)]
 #![deny(missing_docs)]
 #![warn(clippy::pedantic, clippy::nursery)]
-#![allow(
+#![expect(
     clippy::module_name_repetitions,
-    // Cast lints: crate-level allow for GPU interop. wgpu uses u32 for buffer
-    // sizes, dispatch counts, and vertex counts; scientific code uses f64 and
-    // usize. Pervasive usize↔u32↔f64 conversion would require hundreds of
-    // per-site #[allow] attributes. Individual casts are checked by domain
-    // constraints (e.g., n_samples < 2^32, buffer sizes within u32 range).
+    reason = "ecosystem convention: primal modules use domain-qualified names"
+)]
+#![expect(
     clippy::cast_possible_truncation,
-    clippy::cast_sign_loss
+    reason = "GPU interop: wgpu uses u32 for buffer sizes/dispatch counts; \
+              domain constraints guarantee values fit (n_samples < 2^32)"
+)]
+#![expect(
+    clippy::cast_sign_loss,
+    reason = "GPU interop: usize→u32 conversions for wgpu APIs; \
+              callers ensure non-negative values"
 )]
 //! wetSpring — Life Science + PFAS Analytical Chemistry Pipelines (via `barraCuda`)
 //!

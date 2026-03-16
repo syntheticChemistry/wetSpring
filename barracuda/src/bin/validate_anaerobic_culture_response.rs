@@ -50,7 +50,7 @@ fn main() {
         "First-order B(t_half) = B_max/2",
         first_order(t_half, b_max, k),
         b_max / 2.0,
-        1e-10,
+        tolerances::ANALYTICAL_LOOSE,
     );
 
     v.section("Thermophilic vs mesophilic at t=30");

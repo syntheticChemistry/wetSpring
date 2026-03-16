@@ -21,8 +21,7 @@ use local_primal_names::{BIOMEOS, NESTGATE};
 /// Whether `NestGate` routing is enabled via environment.
 #[must_use]
 pub fn is_enabled() -> bool {
-    std::env::var("WETSPRING_DATA_PROVIDER")
-        .is_ok_and(|v| v.trim().eq_ignore_ascii_case(NESTGATE))
+    std::env::var("WETSPRING_DATA_PROVIDER").is_ok_and(|v| v.trim().eq_ignore_ascii_case(NESTGATE))
 }
 
 /// Discover the `NestGate` Unix socket path.

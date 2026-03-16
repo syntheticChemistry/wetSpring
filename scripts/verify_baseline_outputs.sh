@@ -133,9 +133,7 @@ def compare_values(a, b, path='', tol=1e-10):
     return diffs
 
 stored = json.load(open('$json_path'))
-# The new output may go to a different path; check if the script
-# overwrote the original file
-new = json.load(open('$json_path'))
+new = json.load(open('$tmp_output'))
 diffs = compare_values(new, stored)
 if diffs:
     for d in diffs[:20]:

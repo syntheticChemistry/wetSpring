@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![expect(clippy::expect_used, reason = "validation binary: expect() for pass/fail assertions")]
-#![expect(clippy::unwrap_used, reason = "validation binary: unwrap() for pass/fail assertions")]
-#![expect(clippy::print_stdout, reason = "validation binary: stdout is the output medium")]
+#![expect(
+    clippy::print_stdout,
+    reason = "validation binary: stdout is the output medium"
+)]
 #![allow(
     clippy::too_many_lines,
     clippy::cast_precision_loss,
@@ -52,6 +53,7 @@ use std::time::{Duration, Instant};
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::ipc::discover;
+use wetspring_barracuda::ipc::primal_names;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
@@ -63,10 +65,10 @@ fn main() {
 
     v.section("Phase 1: Ecosystem Probe — Socket Discovery");
 
-    let biomeos_socket = discover::discover_socket("BIOMEOS_SOCKET", "biomeos");
-    let songbird_socket = discover::discover_socket("SONGBIRD_SOCKET", "songbird");
-    let nestgate_socket = discover::discover_socket("NESTGATE_SOCKET", "nestgate");
-    let wetspring_socket = discover::discover_socket("WETSPRING_SOCKET", "wetspring");
+    let biomeos_socket = discover::discover_socket("BIOMEOS_SOCKET", primal_names::BIOMEOS);
+    let songbird_socket = discover::discover_socket("SONGBIRD_SOCKET", primal_names::SONGBIRD);
+    let nestgate_socket = discover::discover_socket("NESTGATE_SOCKET", primal_names::NESTGATE);
+    let wetspring_socket = discover::discover_socket("WETSPRING_SOCKET", primal_names::SELF);
 
     println!("  Socket scan results:");
     println!("  ─────────────────────────────────────────");

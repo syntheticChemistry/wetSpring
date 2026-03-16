@@ -15,8 +15,7 @@ pub(super) fn rpc(socket: &Path, request: &str) -> Result<String, crate::error::
 
     let addr = std::os::unix::net::SocketAddr::from_pathname(socket)
         .map_err(|e| NestError::InvalidSocket(e.to_string()))?;
-    let stream =
-        UnixStream::connect_addr(&addr).map_err(|e| NestError::Connect(e.to_string()))?;
+    let stream = UnixStream::connect_addr(&addr).map_err(|e| NestError::Connect(e.to_string()))?;
     stream
         .set_read_timeout(Some(NESTGATE_TIMEOUT))
         .map_err(|e| NestError::Timeout(e.to_string()))?;
@@ -55,8 +54,9 @@ mod tests {
 
     #[test]
     fn rpc_nonexistent_socket() {
-        let bad = Path::new("/tmp/wetspring_nest_nonexistent_test.sock");
-        let result = rpc(bad, r#"{"jsonrpc":"2.0","method":"ping","id":1}"#);
+        let dir = tempfile::tempdir().unwrap();
+        let bad = dir.path().join("wetspring_nest_nonexistent_test.sock");
+        let result = rpc(&bad, r#"{"jsonrpc":"2.0","method":"ping","id":1}"#);
         assert!(result.is_err());
         let msg = result.unwrap_err().to_string();
         assert!(

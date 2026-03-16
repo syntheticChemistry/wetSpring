@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-15 (V120: 376 experiments, 354 binaries, 5,707+ checks, 1,638 tests. V120 Cross-Spring Absorption: typed errors completed in forge (`NcbiError`, `DataError`) and barracuda (`Error::Ipc`), deploy graph hardened (`fallback = "skip"` for Squirrel/ToadStool/NestGate/petalTongue), `live_pipeline.rs` refactored, hardcoded primal names eliminated in nestgate/viz, shared Python tolerance module (120+ constants). 16 capability domains / 22 methods. Zero clippy warnings, zero fmt violations, zero unsafe.)
+**Updated**: 2026-03-15 (V121: 376 experiments, 354 binaries, 5,707+ checks, 1,638 tests. V120 Cross-Spring Absorption: typed errors completed in forge (`NcbiError`, `DataError`) and barracuda (`Error::Ipc`), deploy graph hardened (`fallback = "skip"` for Squirrel/ToadStool/NestGate/petalTongue), `live_pipeline.rs` refactored, hardcoded primal names eliminated in nestgate/viz, shared Python tolerance module (120+ constants). 16 capability domains / 22 methods. Zero clippy warnings, zero fmt violations, zero unsafe.)
 
 ---
 

@@ -94,7 +94,9 @@ pub fn read_fasta_gz(path: &Path) -> Result<Vec<Vec<u8>>, crate::error::Assembly
     parse_fasta_sequences(reader)
 }
 
-pub fn parse_fasta_sequences<R: BufRead>(reader: R) -> Result<Vec<Vec<u8>>, crate::error::AssemblyError> {
+pub fn parse_fasta_sequences<R: BufRead>(
+    reader: R,
+) -> Result<Vec<Vec<u8>>, crate::error::AssemblyError> {
     let mut sequences = Vec::new();
     let mut current = Vec::new();
     let mut in_seq = false;
@@ -208,8 +210,9 @@ pub fn shannon_entropy_binned(values: &[f64], n_bins: usize) -> f64 {
 ///
 /// Returns an error if the directory cannot be read.
 pub fn list_assembly_files(dir: &Path) -> Result<Vec<PathBuf>, crate::error::AssemblyError> {
-    let entries = std::fs::read_dir(dir)
-        .map_err(|e| crate::error::AssemblyError::ReadDir(format!("read dir {}: {e}", dir.display())))?;
+    let entries = std::fs::read_dir(dir).map_err(|e| {
+        crate::error::AssemblyError::ReadDir(format!("read dir {}: {e}", dir.display()))
+    })?;
 
     let mut paths: Vec<PathBuf> = entries
         .filter_map(Result::ok)

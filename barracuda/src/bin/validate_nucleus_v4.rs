@@ -51,6 +51,7 @@ use std::process::Command;
 use std::time::Instant;
 
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::ipc::primal_names;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
@@ -59,7 +60,7 @@ use barracuda::stats::norm_cdf;
 fn discover_biomeos_bin() -> Option<PathBuf> {
     let candidates = [
         "biomeOS",
-        "biomeos",
+        primal_names::BIOMEOS,
         "../../../phase2/biomeOS/target/release/biomeos",
         "../../../phase2/biomeOS/target/debug/biomeos",
     ];
@@ -144,11 +145,11 @@ fn main() {
     v.section("Phase 2: Primal Binary Scan");
 
     let primals = [
-        ("beardog", "BearDog — crypto/trust"),
-        ("songbird", "Songbird — discovery"),
-        ("toadstool", "ToadStool — GPU compute"),
-        ("nestgate", "NestGate — data/storage"),
-        ("squirrel", "Squirrel — configuration"),
+        (primal_names::BEARDOG, "BearDog — crypto/trust"),
+        (primal_names::SONGBIRD, "Songbird — discovery"),
+        (primal_names::TOADSTOOL, "ToadStool — GPU compute"),
+        (primal_names::NESTGATE, "NestGate — data/storage"),
+        (primal_names::SQUIRREL, "Squirrel — configuration"),
     ];
 
     for (name, description) in &primals {
@@ -167,10 +168,10 @@ fn main() {
     // ═══════════════════════════════════════════════════════════════════
     v.section("Phase 3: NUCLEUS Mode Readiness — Tower/Node/Nest");
 
-    let has_beardog = discover_primal_bin("beardog").is_some();
-    let has_songbird = discover_primal_bin("songbird").is_some();
-    let has_toadstool = discover_primal_bin("toadstool").is_some();
-    let has_nestgate = discover_primal_bin("nestgate").is_some();
+    let has_beardog = discover_primal_bin(primal_names::BEARDOG).is_some();
+    let has_songbird = discover_primal_bin(primal_names::SONGBIRD).is_some();
+    let has_toadstool = discover_primal_bin(primal_names::TOADSTOOL).is_some();
+    let has_nestgate = discover_primal_bin(primal_names::NESTGATE).is_some();
 
     let tower_ready = has_beardog && has_songbird;
     let node_ready = tower_ready && has_toadstool;

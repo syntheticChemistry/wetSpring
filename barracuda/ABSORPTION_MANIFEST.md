@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** March 15, 2026 (V120)
+**Date:** March 16, 2026 (V121)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**barraCuda:** standalone v0.3.5, **toadStool:** S155
-**Status:** 150+ primitives consumed, 44 GPU modules (all lean), 0 local WGSL, 0 local ODE/regression math, 1,638 tests, 376 experiments, 5,707+ checks, 328 binaries, 200+ named tolerances, `#![forbid(unsafe_code)]`, clippy pedantic+nursery CLEAN. 16 capability domains / 22 methods. Deploy graph with `fallback = "skip"` for optional primals. Typed errors complete across all library code. **See also:** `wateringHole/handoffs/WETSPRING_V120_TOADSTOOL_BARRACUDA_EVOLUTION_HANDOFF_MAR15_2026.md` for current primitive consumption details and evolution targets.
+**barraCuda:** standalone v0.3.5 (pure Rust, default-features=false), **toadStool:** S155
+**Status:** 150+ primitives consumed, 44 GPU modules (all lean), 0 local WGSL, 0 local ODE/regression math, 1,685 tests, 376 experiments, 5,707+ checks, 354 binaries, 214 named tolerances (zero inline literals), `#![forbid(unsafe_code)]`, clippy pedantic+nursery CLEAN, zero `#[allow()]` in production code. 16 capability domains / 20 methods. Deploy graph with `fallback = "skip"` for optional primals. Typed errors complete across all library code. All primal names via `primal_names::*` constants. **See also:** `wateringHole/handoffs/WETSPRING_V121_DEEP_DEBT_EVOLUTION_HANDOFF_MAR16_2026.md` for current primitive consumption details and evolution targets.
 
 ---
 
@@ -49,7 +49,7 @@ WGSL          known physics   handoffs/                        delete local
 | Compose | GPU wrappers wiring ToadStool primitives | **7 modules** (kmd, merge_pairs, RF, derep, NJ, reconciliation, molecular_clock) |
 | Passthrough | Accept GPU buffers, CPU kernel | **0 modules** — all 3 former Passthrough promoted (V40) |
 | Validate | CPU ↔ GPU parity for all shaders | All 5 ODE: exact parity (Exp099/100/101) |
-| Hand off | wateringHole/handoffs/ documents | **V84** active (supersedes V83), V7-V82 archived |
+| Hand off | wateringHole/handoffs/ documents | **V121** active, V7-V120 archived |
 | Absorb | ToadStool integrates as `ops::bio::*` | **150+ primitives** consumed (ToadStool S66: all DONE, +46 cross-spring total) |
 | Lean | Rewire to upstream, delete local code | 150+ primitives consumed (S66), 5 `OdeSystem` trait rewires, BGL boilerplate removed, 0 Passthrough |
 
@@ -204,7 +204,7 @@ removed (~200 lines). wetSpring retains:
 
 ## metalForge Forge Crate
 
-The `metalForge/forge/` crate (`wetspring-forge` v0.3.0, 113 tests) provides:
+The `metalForge/forge/` crate (`wetspring-forge` v0.3.0, 234 tests) provides:
 
 | Module | Purpose | Absorption Path |
 |--------|---------|-----------------|

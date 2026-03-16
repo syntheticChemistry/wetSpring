@@ -43,7 +43,9 @@ pub fn discover_songbird_socket() -> Option<PathBuf> {
 ///
 /// Sends `discovery.discover("compute")` and parses the response into
 /// `Substrate` entries with `SubstrateOrigin::Mesh`.
-pub fn query_songbird_substrates(socket: &Path) -> Result<Vec<Substrate>, crate::error::SongbirdError> {
+pub fn query_songbird_substrates(
+    socket: &Path,
+) -> Result<Vec<Substrate>, crate::error::SongbirdError> {
     let request = r#"{"jsonrpc":"2.0","method":"discovery.discover","params":{"capability":"compute"},"id":1}"#;
     let response = songbird_rpc(socket, request)?;
     parse_songbird_substrates(&response)
@@ -91,7 +93,9 @@ fn songbird_rpc(socket: &Path, request: &str) -> Result<String, crate::error::So
 ///
 /// Expected format: `{"result":[{"name":"strandgate","capabilities":["compute","gpu","f64"],...}]}`
 /// Gracefully handles missing fields and unknown capability strings.
-pub fn parse_songbird_substrates(response: &str) -> Result<Vec<Substrate>, crate::error::SongbirdError> {
+pub fn parse_songbird_substrates(
+    response: &str,
+) -> Result<Vec<Substrate>, crate::error::SongbirdError> {
     let mut substrates = Vec::new();
 
     if response.contains("\"error\"") {

@@ -295,7 +295,7 @@ mod tests {
         let r = scenario_standard_growth(&p, DT);
         let n_ss = steady_state_mean(&r, 0, SS_FRAC);
         assert!(
-            (n_ss - p.k_cap).abs() < 0.05,
+            (n_ss - p.k_cap).abs() < crate::tolerances::ODE_CARRYING_CAPACITY_LOOSE,
             "cell density should reach K={}, got {n_ss}",
             p.k_cap
         );
@@ -364,7 +364,10 @@ mod tests {
         let c_ss = steady_state_mean(&r, 3, SS_FRAC);
         let b_ss = steady_state_mean(&r, 4, SS_FRAC);
         assert!((c_ss - 2.5).abs() < tol, "C_ss={c_ss}");
-        assert!((b_ss - 0.786).abs() < 0.01, "B_ss={b_ss}");
+        assert!(
+            (b_ss - 0.786).abs() < crate::tolerances::ODE_STEADY_STATE,
+            "B_ss={b_ss}"
+        );
 
         // DGC OE
         let r = scenario_dgc_overexpression(&p, DT);

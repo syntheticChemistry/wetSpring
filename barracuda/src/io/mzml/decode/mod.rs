@@ -294,6 +294,7 @@ pub fn write_temp_mzml(dir: &tempfile::TempDir, name: &str, xml: &str) -> std::p
 #[expect(clippy::unwrap_used)]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
     #[test]
     fn decode_f64_uncompressed() {
@@ -426,8 +427,8 @@ mod tests {
             .unwrap();
         assert_eq!(spectra.len(), 1);
         assert_eq!(spectra[0].mz_array.len(), 3);
-        assert!((spectra[0].mz_array[0] - 100.0).abs() < 0.01);
-        assert!((spectra[0].mz_array[2] - 300.0).abs() < 0.01);
+        assert!((spectra[0].mz_array[0] - 100.0).abs() < tolerances::MZ_TOLERANCE);
+        assert!((spectra[0].mz_array[2] - 300.0).abs() < tolerances::MZ_TOLERANCE);
     }
 
     #[test]

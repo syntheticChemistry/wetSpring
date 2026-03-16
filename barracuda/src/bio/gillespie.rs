@@ -372,7 +372,7 @@ mod tests {
         let analytical = 10.0 / 0.1;
         let error_pct = (stats.mean - analytical).abs() / analytical;
         assert!(
-            error_pct < 0.15,
+            error_pct < crate::tolerances::GILLESPIE_ENSEMBLE_MEAN_PCT,
             "ensemble mean {:.1} too far from analytical {analytical:.1} ({:.1}%)",
             stats.mean,
             error_pct * 100.0
@@ -433,7 +433,7 @@ mod tests {
                 let stats = birth_death_ensemble(k_dgc, k_pde, 40.0, 80, seed);
                 let error_pct = (stats.mean - analytical).abs() / analytical.max(0.1);
                 prop_assert!(
-                    error_pct < 0.25,
+                    error_pct < crate::tolerances::GILLESPIE_PROPTEST_PCT,
                     "ensemble mean {:.1} too far from analytical {:.1} ({:.1}%)",
                     stats.mean,
                     analytical,

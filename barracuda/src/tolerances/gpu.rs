@@ -71,6 +71,22 @@ pub const GPU_F32_SPATIAL: f64 = 1e-4;
 /// Validated: Exp227 (Pure GPU Streaming v4).
 pub const GEMM_GPU_MAX_ERR: f64 = 1e-5;
 
+/// GPU f32 `PairwiseL2` element-wise parity (f32 kernel).
+///
+/// `PairwiseL2` runs in f32 on GPU; element-wise max error vs CPU f64
+/// reference is bounded by f32 precision (~7 digits). 1e-3 covers
+/// accumulated rounding in the L2 norm reduction across feature vectors.
+/// Validated: Exp230 (`BarraCuda` GPU v7), `PairwiseL2` domain.
+pub const GPU_F32_PAIRWISE_L2: f64 = 1e-3;
+
+/// metalForge transfer-time parity tolerance.
+///
+/// Dispatch and transfer timing metadata must agree within 1e-6 seconds
+/// between observed and recorded values. Covers timer resolution and
+/// scheduling jitter in the NUCLEUS pipeline.
+/// Validated: metalForge mixed-hardware dispatch binaries.
+pub const TRANSFER_TIME_PARITY: f64 = 1e-6;
+
 /// ODE landscape GPU vs CPU tolerance for QS parameter sweeps.
 ///
 /// Multi-parameter ODE landscape comparisons (e.g., Vibrio QS parameter

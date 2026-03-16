@@ -105,6 +105,12 @@ pub const NMF_CONVERGENCE_LOOSE: f64 = 1e-4;
 /// Validated: Exp179 (Track 4 QS pore geometry), Exp183 (no-till meta-analysis).
 pub const ERF_PARITY: f64 = 5e-7;
 
+/// Normal CDF symmetry check: `Φ(x) + Φ(−x) = 1`.
+///
+/// Polynomial approximation preserves odd symmetry of erf(x) to ~1e-7.
+/// Validated: `special` `norm_cdf_symmetry`.
+pub const NORM_CDF_SYMMETRY: f64 = 1e-7;
+
 /// Normal CDF Φ(x) evaluation tolerance for non-extreme arguments.
 ///
 /// `norm_cdf(x)` for |x| < 4 agrees with Python `scipy.stats.norm.cdf`

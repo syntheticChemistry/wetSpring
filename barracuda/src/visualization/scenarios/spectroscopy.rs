@@ -248,7 +248,8 @@ mod tests {
 
     #[test]
     fn scenario_nonexistent_file() {
-        let path = std::path::Path::new("/tmp/nonexistent_wetspring_jcamp_test.jcamp");
-        assert!(spectroscopy_scenario(path).is_err());
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("nonexistent_wetspring_jcamp_test.jcamp");
+        assert!(spectroscopy_scenario(path.as_path()).is_err());
     }
 }

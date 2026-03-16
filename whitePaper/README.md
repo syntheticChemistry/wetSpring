@@ -1,7 +1,7 @@
 # wetSpring White Paper
 
-**Date:** March 15, 2026
-**Status:** V116 — Validation study active — 5,707+ checks, 1,662 tests, 376 experiments, 354 binaries, standalone `barraCuda` v0.3.5 (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, 180 named tolerances, clippy pedantic + nursery ZERO WARNINGS, 63 papers reproduced, all 46 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. biomeOS niche — deploy graph, 19 capabilities, provenance trio integration, cross-spring time series, Neural API workflow graphs. V115: deep audit — UniBin compliance, capability domains (4 domains), tolerance centralization, XDG path resolution, metalForge 90% coverage. V114: docs cleanup, niche setup guidance, BarraCUDA absorption handoff. V113: trio + capabilities + deploy graph. V112: streaming-only I/O, capability-based runtime discovery.
+**Date:** March 16, 2026
+**Status:** V121 — Validation study active — 5,707+ checks, 1,685 tests, 376 experiments, 354 binaries, standalone `barraCuda` v0.3.5 (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, 214 named tolerances (zero inline literals), clippy pedantic + nursery ZERO WARNINGS, zero `#[allow()]` in production code, 63 papers reproduced, all 46 three-tier eligible papers fully validated at CPU + GPU + metalForge tiers. biomeOS niche — deploy graph with `fallback = "skip"`, 16 capability domains / 20 methods, provenance trio integration, cross-spring time series, Neural API workflow graphs. V121: deep debt evolution — all inline tolerance literals centralized, all hardcoded primal names replaced with `primal_names::*`, crate-level `#[allow()]` → `#[expect(reason)]`, blake3 pure Rust, tempfile test paths, verify_baseline_outputs.sh rerun fix. V120: typed errors, deploy graph, cross-spring absorption. V119: niche architecture, proptest, Squirrel AI.
 **License:** AGPL-3.0-or-later
 
 ---
@@ -328,13 +328,13 @@ orchestrates hardware routing separately.
 | `cargo clippy --pedantic --nursery -D warnings` | 0 diagnostics |
 | `cargo doc --no-deps` | 0 warnings |
 | Line coverage (`cargo-llvm-cov`) | **93.94% line / 91.85% fn / 93.60% branch** |
-| `#![deny(unsafe_code)]` | Enforced crate-wide (edition 2024; `allow` only in test env-var calls) |
+| `#![forbid(unsafe_code)]` | Enforced on all 356 crate roots (edition 2024) |
 | `#![deny(clippy::expect_used, clippy::unwrap_used)]` | Enforced crate-wide |
-| Named tolerance constants | 179 (all scientifically justified, hierarchy-tested) |
+| Named tolerance constants | **214** (all scientifically justified, zero inline literals) |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` files |
-| Provenance headers | All 316 validation/benchmark binaries |
+| Provenance headers | All 354 validation/benchmark binaries |
 
 ## metalForge — Hardware Discovery
 

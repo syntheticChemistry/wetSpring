@@ -168,7 +168,7 @@ fn main() {
         if prev_p <= 1.0 {
             v.check_pass(
                 &format!("W={w}: P(QS) monotone decreasing"),
-                p <= prev_p + 1e-15,
+                p <= prev_p + tolerances::MATRIX_EPS,
             );
         }
         prev_p = p;

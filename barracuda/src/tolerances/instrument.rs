@@ -146,6 +146,50 @@ pub const CF2_SPACING_TOL: f64 = 0.01;
 /// Validated: Exp018 (PFAS library validation).
 pub const PFSA_HOMOLOGUE_WINDOW: f64 = 60.0;
 
+/// Retention time parse-back parity (minutes).
+///
+/// Retention time strings parsed from mzXML/mzML (e.g. "PT1.5S" → 0.025 min)
+/// must round-trip within 1e-6 minutes of the reference value.
+/// Validated: `io::mzxml` and `io::mzml` unit tests.
+pub const RT_PARSE_PARITY: f64 = 1e-6;
+
+/// JCAMP-DX Y-value parse precision.
+///
+/// Y-axis data in JCAMP-DX files (absorbance, transmittance) is parsed
+/// from ASCII float strings. 1e-9 covers rounding in the ASCII→f64 path
+/// for the typical 6–8 significant digit JCAMP encoding.
+/// Validated: `io::jcamp` unit tests.
+pub const JCAMP_Y_PARSE: f64 = 1e-9;
+
+/// Feature m/z match tolerance (Da) for feature-table pipeline.
+///
+/// After EIC extraction and peak detection, features are matched to
+/// expected targets within ±1.0 Da. Looser than instrument-grade
+/// [`MZ_TOLERANCE`] because the feature table aggregates across scans.
+/// Validated: Exp009 (asari pipeline), `bio::feature_table` tests.
+pub const FEATURE_MZ_MATCH: f64 = 1.0;
+
+/// Feature RT apex tolerance (minutes) for feature-table pipeline.
+///
+/// Extracted chromatographic peak apex should match expected retention
+/// time within ±0.2 minutes. Covers scan-to-scan RT jitter in LC-MS.
+/// Validated: Exp009 (asari pipeline), `bio::feature_table` tests.
+pub const FEATURE_RT_APEX: f64 = 0.2;
+
+/// Retention index paper deviation (%) for VOC identification.
+///
+/// Published Kovats RI values (Reese 2019 Table 1) are matched within
+/// ±5% relative tolerance. Covers column-phase and temperature-program
+/// variation between laboratories.
+/// Validated: Exp013 (VOC peaks, Reese 2019).
+pub const RI_PAPER_DEVIATION: f64 = 5.0;
+
+/// Retention index search relative fraction (5% = 0.05).
+///
+/// The RI search window is `theoretical_ri × RI_SEARCH_RELATIVE`.
+/// Validated: Exp013 (VOC peak validation).
+pub const RI_SEARCH_RELATIVE: f64 = 0.05;
+
 /// Retention index matching tolerance (unitless RI units).
 ///
 /// Kovats or linear retention indices from GC-MS should match

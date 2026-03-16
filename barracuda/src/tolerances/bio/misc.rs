@@ -215,6 +215,29 @@ pub const PFAS_ML_ACCEPTANCE_FLOOR: f64 = 0.80;
 /// Validated: Exp183 (soil QS), commit `48fb787`.
 pub const SOIL_DISORDER_ANALYTICAL: f64 = 0.01;
 
+/// Gillespie SSA ensemble mean error ceiling (%).
+///
+/// Birth-death ensemble mean (1000 replicates) should be within 15%
+/// of the analytical expectation. Stochastic variance in finite
+/// ensembles dominates; 15% covers 2σ for typical N=100 populations.
+/// Validated: Exp022 (Massie 2012), `bio::gillespie` `birth_death_ensemble`.
+pub const GILLESPIE_ENSEMBLE_MEAN_PCT: f64 = 0.15;
+
+/// Gillespie SSA proptest steady-state error ceiling (%).
+///
+/// Property-based tests with random parameters produce wider variance;
+/// 25% covers the explored parameter space while still catching regressions.
+/// Validated: `bio::gillespie` `proptest_basic_model_reaches_steady_state`.
+pub const GILLESPIE_PROPTEST_PCT: f64 = 0.25;
+
+/// Genome assembly mean size tolerance (bp).
+///
+/// Aggregated mean genome size from FASTA collection parsing.
+/// Integer-derived statistic cast to f64; ±1.0 bp covers floating-point
+/// rounding in the mean computation.
+/// Validated: metalForge `node::tests` assembly statistics.
+pub const ASSEMBLY_MEAN_SIZE_TOL: f64 = 1.0;
+
 /// Asari cross-match percentage tolerance (Exp009).
 ///
 /// At least 30% of asari features must be recovered by Rust. Expressed as

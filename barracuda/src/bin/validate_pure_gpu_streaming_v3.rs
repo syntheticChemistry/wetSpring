@@ -438,7 +438,11 @@ fn cpu_cosine_condensed(spectra: &[Vec<f64>]) -> Vec<f64> {
         for j in (i + 1)..n {
             let dot: f64 = special::dot(&spectra[i], &spectra[j]);
             let denom = norms[i] * norms[j];
-            let cos = if denom > 1e-15 { dot / denom } else { 0.0 };
+            let cos = if denom > tolerances::MATRIX_EPS {
+                dot / denom
+            } else {
+                0.0
+            };
             out.push(cos.clamp(0.0, 1.0));
         }
     }

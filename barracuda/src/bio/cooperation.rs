@@ -215,8 +215,14 @@ mod tests {
         let r = scenario_equal_start(&p, DT);
         let nc_ss = steady_state_mean(&r, 0, SS_FRAC);
         let nd_ss = steady_state_mean(&r, 1, SS_FRAC);
-        assert!(nc_ss > 0.01, "cooperators should survive: Nc={nc_ss}");
-        assert!(nd_ss > 0.01, "cheaters should survive: Nd={nd_ss}");
+        assert!(
+            nc_ss > crate::tolerances::ODE_CELL_GROWTH_THRESHOLD,
+            "cooperators should survive: Nc={nc_ss}"
+        );
+        assert!(
+            nd_ss > crate::tolerances::ODE_CELL_GROWTH_THRESHOLD,
+            "cheaters should survive: Nd={nd_ss}"
+        );
     }
 
     #[test]
@@ -236,7 +242,7 @@ mod tests {
         let r = scenario_pure_cheat(&p, DT);
         let ai_ss = steady_state_mean(&r, 2, SS_FRAC);
         assert!(
-            ai_ss < 0.01,
+            ai_ss < crate::tolerances::ODE_CELL_GROWTH_THRESHOLD,
             "pure cheaters should have no signal: AI={ai_ss}"
         );
     }

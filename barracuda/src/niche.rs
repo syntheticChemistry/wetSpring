@@ -23,8 +23,7 @@
 pub const NICHE_NAME: &str = "wetspring";
 
 /// Human-readable niche description for biomeOS.
-pub const NICHE_DESCRIPTION: &str =
-    "Life science and analytical chemistry validation environment";
+pub const NICHE_DESCRIPTION: &str = "Life science and analytical chemistry validation environment";
 
 /// Niche version (tracks the spring version, not the crate version).
 pub const NICHE_VERSION: &str = "1.0.0";
@@ -167,7 +166,7 @@ pub fn cost_estimates() -> serde_json::Value {
         "science.nmf":            { "latency_ms": 50.0, "cpu": "high", "memory_bytes": 65536 },
         "science.timeseries":     { "latency_ms": 5.0, "cpu": "low", "memory_bytes": 8192 },
         "science.ncbi_fetch":     { "latency_ms": 500.0, "cpu": "low", "memory_bytes": 16384 },
-        "science.full_pipeline":  { "latency_ms": 200.0, "cpu": "high", "memory_bytes": 131072 },
+        "science.full_pipeline":  { "latency_ms": 200.0, "cpu": "high", "memory_bytes": 131_072 },
         "provenance.begin":       { "latency_ms": 10.0, "cpu": "low", "memory_bytes": 512 },
         "provenance.record":      { "latency_ms": 5.0, "cpu": "low", "memory_bytes": 1024 },
         "provenance.complete":    { "latency_ms": 50.0, "cpu": "medium", "memory_bytes": 2048 },
@@ -203,7 +202,7 @@ pub fn ecology_semantic_mappings() -> serde_json::Value {
 
 /// Returns the deploy graph path for this niche.
 #[must_use]
-pub fn deploy_graph_path() -> &'static str {
+pub const fn deploy_graph_path() -> &'static str {
     "graphs/wetspring_deploy.toml"
 }
 
@@ -288,8 +287,7 @@ mod tests {
             .collect();
         for cap in &science_caps {
             assert!(
-                map.values()
-                    .any(|v| v.as_str() == Some(cap)),
+                map.values().any(|v| v.as_str() == Some(cap)),
                 "science capability '{cap}' should appear in ecology mappings"
             );
         }

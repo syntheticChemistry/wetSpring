@@ -7,7 +7,7 @@
 
 use crate::bio::dada2::Asv;
 
-use super::kmer_sketch::{build_sketch, sketch_similarity, KmerSketch};
+use super::kmer_sketch::{KmerSketch, build_sketch, sketch_similarity};
 use super::{ChimeraParams, ChimeraResult};
 
 const MAX_PARENT_CANDIDATES: usize = 8;
@@ -18,7 +18,10 @@ const MAX_PARENT_CANDIDATES: usize = 8;
 /// results for each sequence and the filtered non-chimeric sequences.
 #[expect(clippy::cast_precision_loss)]
 #[must_use]
-pub fn detect_chimeras(seqs: &[Asv], params: &ChimeraParams) -> (Vec<ChimeraResult>, super::ChimeraStats) {
+pub fn detect_chimeras(
+    seqs: &[Asv],
+    params: &ChimeraParams,
+) -> (Vec<ChimeraResult>, super::ChimeraStats) {
     let n = seqs.len();
     let mut results = Vec::with_capacity(n);
 
@@ -101,7 +104,7 @@ pub fn remove_chimeras(seqs: &[Asv], params: &ChimeraParams) -> (Vec<Asv>, super
 /// For each parent pair, precomputes cumulative match vectors once (O(L)),
 /// then evaluates all crossover points in O(1) each. Early termination
 /// when score exceeds threshold.
-pub(crate) fn test_chimera_fast(
+pub fn test_chimera_fast(
     query: &Asv,
     seqs: &[Asv],
     candidates: &[usize],

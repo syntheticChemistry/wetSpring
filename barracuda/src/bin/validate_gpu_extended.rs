@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![expect(clippy::expect_used, reason = "validation binary: expect() for pass/fail assertions")]
-#![expect(clippy::unwrap_used, reason = "validation binary: unwrap() for pass/fail assertions")]
-#![allow(
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation
+#![expect(
+    clippy::expect_used,
+    reason = "validation binary: expect() for pass/fail assertions"
 )]
+#![allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
 //! Exp087: GPU Extended Domains — EIC, `PCoA`, Kriging, Rarefaction
 //!
 //! Extends the GPU validation suite with 4 previously uncovered domains:

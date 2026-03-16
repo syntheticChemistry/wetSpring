@@ -19,7 +19,7 @@ proof: same math, different hardware, same answer.
 |-----------|------|
 | GPU | NVIDIA GeForce RTX 4070 |
 | SHADER_F64 | YES |
-| Backend | wgpu v22 (Vulkan) |
+| Backend | wgpu v28 (Vulkan) |
 | ToadStool primitives | FusedMapReduceF64, BrayCurtisF64, BatchedEighGpu, GemmF64, VarianceF64, CorrelationF64, WeightedDotF64 |
 
 ## Validation Results

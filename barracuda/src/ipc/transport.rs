@@ -62,7 +62,9 @@ mod tests {
 
     #[test]
     fn display_format() {
-        let t = Transport::Unix(PathBuf::from("/tmp/test.sock"));
-        assert_eq!(t.to_string(), "unix:/tmp/test.sock");
+        let dir = tempfile::tempdir().unwrap();
+        let sock_path = dir.path().join("test.sock");
+        let t = Transport::Unix(sock_path.clone().into());
+        assert_eq!(t.to_string(), format!("unix:{}", sock_path.display()));
     }
 }

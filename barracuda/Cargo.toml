@@ -88,7 +88,7 @@ flate2 = { version = "1.0", default-features = false, features = ["rust_backend"
 # Optional — only needed for `vault` feature (genomic vault + consent).
 chacha20poly1305 = { version = "0.10", optional = true }
 ed25519-dalek = { version = "2.2", optional = true }
-blake3 = { version = "1.8", optional = true }
+blake3 = { version = "1.8", optional = true, default-features = false, features = ["pure"] }
 
 [dev-dependencies]
 tempfile = "3"

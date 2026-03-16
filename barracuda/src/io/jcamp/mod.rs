@@ -300,6 +300,7 @@ fn parse_jcamp_value(token: &str) -> std::result::Result<f64, ()> {
 #[expect(clippy::unwrap_used)]
 mod tests {
     use super::*;
+    use crate::tolerances;
     use std::fs::File;
     use std::io::Write;
 
@@ -338,9 +339,9 @@ mod tests {
         assert!((b.x[0] - 400.0).abs() < f64::EPSILON);
         assert!((b.x[1] - 401.0).abs() < f64::EPSILON);
         assert!((b.x[2] - 402.0).abs() < f64::EPSILON);
-        assert!((b.y[0] - 0.123).abs() < 1e-9);
-        assert!((b.y[1] - 0.456).abs() < 1e-9);
-        assert!((b.y[2] - 0.789).abs() < 1e-9);
+        assert!((b.y[0] - 0.123).abs() < tolerances::JCAMP_Y_PARSE);
+        assert!((b.y[1] - 0.456).abs() < tolerances::JCAMP_Y_PARSE);
+        assert!((b.y[2] - 0.789).abs() < tolerances::JCAMP_Y_PARSE);
     }
 
     #[test]

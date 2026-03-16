@@ -14,13 +14,13 @@ pub const BIOMEOS: &str = "biomeos";
 /// Songbird discovery mesh.
 pub const SONGBIRD: &str = "songbird";
 
-/// NestGate content-addressed storage.
+/// `NestGate` content-addressed storage.
 pub const NESTGATE: &str = "nestgate";
 
-/// BearDog security foundation.
+/// `BearDog` security foundation.
 pub const BEARDOG: &str = "beardog";
 
-/// ToadStool compute orchestrator.
+/// `ToadStool` compute orchestrator.
 pub const TOADSTOOL: &str = "toadstool";
 
 /// petalTongue visualization.

@@ -17,7 +17,11 @@ use crate::ipc::protocol::RpcError;
 const RPC_TIMEOUT: Duration = Duration::from_secs(30);
 
 /// Send a JSON-RPC `ai.query` request to Squirrel.
-fn squirrel_query(socket_path: &Path, query: &str, context: &Value) -> Result<Value, crate::error::Error> {
+fn squirrel_query(
+    socket_path: &Path,
+    query: &str,
+    context: &Value,
+) -> Result<Value, crate::error::Error> {
     let request = json!({
         "jsonrpc": "2.0",
         "method": "ai.query",
@@ -28,7 +32,8 @@ fn squirrel_query(socket_path: &Path, query: &str, context: &Value) -> Result<Va
         "id": 1,
     });
 
-    let payload = serde_json::to_string(&request).map_err(|e| crate::error::Error::Ipc(format!("serialize: {e}")))?;
+    let payload = serde_json::to_string(&request)
+        .map_err(|e| crate::error::Error::Ipc(format!("serialize: {e}")))?;
 
     let stream = std::os::unix::net::UnixStream::connect(socket_path)
         .map_err(|e| crate::error::Error::Ipc(format!("connect {}: {e}", socket_path.display())))?;
@@ -42,7 +47,9 @@ fn squirrel_query(socket_path: &Path, query: &str, context: &Value) -> Result<Va
     writer
         .write_all(b"\n")
         .map_err(|e| crate::error::Error::Ipc(format!("write newline: {e}")))?;
-    writer.flush().map_err(|e| crate::error::Error::Ipc(format!("flush: {e}")))?;
+    writer
+        .flush()
+        .map_err(|e| crate::error::Error::Ipc(format!("flush: {e}")))?;
     drop(writer);
 
     stream
@@ -55,7 +62,8 @@ fn squirrel_query(socket_path: &Path, query: &str, context: &Value) -> Result<Va
         .read_line(&mut line)
         .map_err(|e| crate::error::Error::Ipc(format!("read: {e}")))?;
 
-    let parsed: Value = serde_json::from_str(line.trim()).map_err(|e| crate::error::Error::Ipc(format!("parse: {e}")))?;
+    let parsed: Value = serde_json::from_str(line.trim())
+        .map_err(|e| crate::error::Error::Ipc(format!("parse: {e}")))?;
 
     if let Some(err) = parsed.get("error") {
         let msg = err
@@ -83,10 +91,7 @@ pub fn handle_ai_ecology_interpret(params: &Value) -> Result<Value, RpcError> {
         .and_then(Value::as_str)
         .unwrap_or("Interpret this ecology context.");
 
-    let context = params
-        .get("context")
-        .cloned()
-        .unwrap_or_else(|| json!({}));
+    let context = params.get("context").cloned().unwrap_or_else(|| json!({}));
 
     let Some(socket) = discover::discover_squirrel() else {
         return Ok(json!({
@@ -124,7 +129,8 @@ mod tests {
 
     #[test]
     fn handle_degrades_gracefully_when_squirrel_unavailable() {
-        let result = handle_ai_ecology_interpret(&json!({"query": "Explain Shannon diversity"})).unwrap();
+        let result =
+            handle_ai_ecology_interpret(&json!({"query": "Explain Shannon diversity"})).unwrap();
         assert_eq!(result["squirrel"], "unavailable");
         assert!(result["message"].as_str().unwrap().contains("unavailable"));
         assert_eq!(result["query"], "Explain Shannon diversity");

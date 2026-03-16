@@ -309,8 +309,8 @@ mod tests {
         );
 
         let f = &ft.features[0];
-        assert!((f.mz - target_mz).abs() < 1.0);
-        assert!((f.rt_apex - peak_rt).abs() < 0.2);
+        assert!((f.mz - target_mz).abs() < crate::tolerances::FEATURE_MZ_MATCH);
+        assert!((f.rt_apex - peak_rt).abs() < crate::tolerances::FEATURE_RT_APEX);
         assert!(f.height > 40000.0);
         assert!(f.area > 0.0);
         assert!(f.snr > 3.0);

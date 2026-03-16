@@ -286,7 +286,7 @@ mod tests {
         let r = scenario_wild_type(&p, DT);
         let n_ss = steady_state_mean(&r, 0, SS_FRAC);
         assert!(
-            (n_ss - p.k_cap).abs() < 0.05,
+            (n_ss - p.k_cap).abs() < crate::tolerances::ODE_CARRYING_CAPACITY_LOOSE,
             "wild type should reach K: N_ss={n_ss}"
         );
     }
@@ -308,7 +308,7 @@ mod tests {
         let r = scenario_wild_type(&p, DT);
         let b_ss = steady_state_mean(&r, 6, SS_FRAC);
         assert!(
-            (b_ss - 0.413).abs() < 0.01,
+            (b_ss - 0.413).abs() < crate::tolerances::ODE_STEADY_STATE,
             "wild type should match Python B_ss: {b_ss}"
         );
     }

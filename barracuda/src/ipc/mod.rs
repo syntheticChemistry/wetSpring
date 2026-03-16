@@ -43,10 +43,10 @@
 
 pub mod capability_domains;
 pub mod discover;
-pub mod primal_names;
 pub mod dispatch;
 pub mod handlers;
 pub mod metrics;
+pub mod primal_names;
 pub mod protocol;
 pub mod provenance;
 pub mod server;

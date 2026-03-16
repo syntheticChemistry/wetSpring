@@ -95,7 +95,11 @@ impl NestClient {
     ///
     /// Returns an error if the socket is invalid, connection fails, or the RPC
     /// response cannot be read.
-    pub fn store_blob(&self, key: &str, data: &[u8]) -> Result<StoreResult, crate::error::NestError> {
+    pub fn store_blob(
+        &self,
+        key: &str,
+        data: &[u8],
+    ) -> Result<StoreResult, crate::error::NestError> {
         let escaped_key = json::escape_json_str(key);
         let family = json::escape_json_str(&self.family_id);
         let encoded = base64::base64_encode(data);
@@ -212,7 +216,11 @@ impl NestClient {
     /// # Errors
     ///
     /// Returns an error if the file cannot be read or storage operations fail.
-    pub fn ingest_file(&self, key: &str, path: &Path) -> Result<StoreResult, crate::error::NestError> {
+    pub fn ingest_file(
+        &self,
+        key: &str,
+        path: &Path,
+    ) -> Result<StoreResult, crate::error::NestError> {
         let data = std::fs::read(path).map_err(|e| crate::error::NestError::FileRead {
             path: path.to_path_buf(),
             source: e.to_string(),

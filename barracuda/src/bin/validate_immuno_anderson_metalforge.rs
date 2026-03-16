@@ -306,7 +306,7 @@ async fn main() {
                 .iter()
                 .max_by(|a, b| a.partial_cmp(b).unwrap())
                 .unwrap()
-                - 1e-10,
+                - tolerances::ANALYTICAL_LOOSE,
     );
     v.check_pass("Crisaborole penalized by geometry", scores[3] < scores[0]);
     v.check_pass(

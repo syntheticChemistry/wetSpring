@@ -15,6 +15,7 @@
 //! PETALTONGUE_SOCKET=/tmp/petaltongue.sock cargo run --features json --bin dump_wetspring_scenarios
 //! ```
 
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::visualization::ipc_push::PetalTonguePushClient;
 use wetspring_barracuda::visualization::scenarios;
 use wetspring_barracuda::visualization::{EcologyScenario, ScenarioEdge, scenario_with_edges_json};
@@ -206,7 +207,7 @@ fn build_analysis_scenarios<'a>(
     let nmf_config = wetspring_barracuda::bio::nmf::NmfConfig {
         rank: 2,
         max_iter: 50,
-        tol: 1e-4,
+        tol: tolerances::NMF_CONVERGENCE_LOOSE,
         objective: wetspring_barracuda::bio::nmf::NmfObjective::KlDivergence,
         seed: 42,
     };

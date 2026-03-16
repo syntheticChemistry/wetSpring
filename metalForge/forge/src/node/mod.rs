@@ -42,7 +42,9 @@ pub use types::{AssemblyStats, CollectionStats, PipelineResult};
 ///
 /// Returns an error if no capable substrate is found, the dataset has no local
 /// path, or assembly file parsing fails.
-pub fn compute_assembly_stats(dataset: &str) -> Result<PipelineResult, crate::error::AssemblyError> {
+pub fn compute_assembly_stats(
+    dataset: &str,
+) -> Result<PipelineResult, crate::error::AssemblyError> {
     let resolution = data::resolve_dataset(dataset);
 
     let substrates = inventory::discover_with_tower();
@@ -52,10 +54,11 @@ pub fn compute_assembly_stats(dataset: &str) -> Result<PipelineResult, crate::er
         vec![Capability::F64Compute],
     );
 
-    let decision = dispatch::route_bandwidth_aware(&workload, &substrates)
-        .ok_or_else(|| crate::error::AssemblyError::ReadDir(
+    let decision = dispatch::route_bandwidth_aware(&workload, &substrates).ok_or_else(|| {
+        crate::error::AssemblyError::ReadDir(
             "no capable substrate for f64 assembly stats".to_string(),
-        ))?;
+        )
+    })?;
 
     let stats = match &resolution.path {
         Some(dir) if dir.is_dir() => compute_collection_from_dir(dataset, dir)?,
@@ -81,12 +84,16 @@ pub fn compute_assembly_stats(dataset: &str) -> Result<PipelineResult, crate::er
 ///
 /// Returns an error if the directory cannot be read, contains no `.fna.gz`
 /// files, or all assemblies fail to parse.
-pub fn compute_collection_from_dir(dataset: &str, dir: &Path) -> Result<CollectionStats, crate::error::AssemblyError> {
+pub fn compute_collection_from_dir(
+    dataset: &str,
+    dir: &Path,
+) -> Result<CollectionStats, crate::error::AssemblyError> {
     let entries = assembly::list_assembly_files(dir)?;
     if entries.is_empty() {
-        return Err(crate::error::AssemblyError::ReadDir(
-            format!("no .fna.gz files in {}", dir.display()),
-        ));
+        return Err(crate::error::AssemblyError::ReadDir(format!(
+            "no .fna.gz files in {}",
+            dir.display()
+        )));
     }
 
     let mut assemblies = Vec::with_capacity(entries.len());

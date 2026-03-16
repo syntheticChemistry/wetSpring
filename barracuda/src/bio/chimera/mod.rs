@@ -33,9 +33,9 @@
 mod detection;
 mod kmer_sketch;
 
-pub use detection::{detect_chimeras, remove_chimeras};
 #[cfg(feature = "gpu")]
 pub(crate) use detection::test_chimera_fast;
+pub use detection::{detect_chimeras, remove_chimeras};
 
 /// Result of chimera detection for a single sequence.
 #[derive(Debug, Clone)]

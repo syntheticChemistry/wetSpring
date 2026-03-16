@@ -209,8 +209,7 @@ fn nestgate_has_dataset(socket: &Path, key: &str) -> bool {
 fn nestgate_rpc(socket: &Path, request: &str) -> Result<String, DataError> {
     let addr = std::os::unix::net::SocketAddr::from_pathname(socket)
         .map_err(|e| DataError::InvalidSocket(e.to_string()))?;
-    let stream =
-        UnixStream::connect_addr(&addr).map_err(|e| DataError::Connect(e.to_string()))?;
+    let stream = UnixStream::connect_addr(&addr).map_err(|e| DataError::Connect(e.to_string()))?;
     stream
         .set_read_timeout(Some(NESTGATE_TIMEOUT))
         .map_err(|e| DataError::Timeout(e.to_string()))?;

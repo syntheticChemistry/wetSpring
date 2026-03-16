@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![expect(clippy::expect_used, reason = "validation binary: expect() for pass/fail assertions")]
-#![expect(clippy::unwrap_used, reason = "validation binary: unwrap() for pass/fail assertions")]
-#![expect(clippy::print_stdout, reason = "validation binary: stdout is the output medium")]
+#![expect(
+    clippy::print_stdout,
+    reason = "validation binary: stdout is the output medium"
+)]
 #![allow(
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,

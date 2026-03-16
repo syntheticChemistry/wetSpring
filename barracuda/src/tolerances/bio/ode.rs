@@ -133,6 +133,22 @@ pub const PHAGE_LARGE_POPULATION: f64 = 1000.0;
 /// Validated: Exp030 (Hsueh 2022), `scripts/hsueh2022_phage_defense.py`.
 pub const PHAGE_CRASH_FLOOR: f64 = 1.0;
 
+/// ODE carrying-capacity loose parity (±5%).
+///
+/// Steady-state total density (`N_ss`) should approach `K_cap` within 5%.
+/// Used for QS biofilm and multi-signal models where stiff integrator
+/// drift is larger than the tighter [`ODE_STEADY_STATE`] (0.01).
+/// Validated: `bio::qs_biofilm`, `bio::multi_signal` carrying-capacity checks.
+pub const ODE_CARRYING_CAPACITY_LOOSE: f64 = 0.05;
+
+/// ODE sweep / proptest time-step (coarse integration).
+///
+/// 10× the default [`ODE_DEFAULT_DT`](crate::tolerances::ODE_DEFAULT_DT) for
+/// parameter sweeps and proptest-driven explorations where speed matters
+/// more than sub-percent accuracy.
+/// Validated: `validate_vibrio_qs_landscape`, `bio::cooperation` proptest.
+pub const ODE_DT_SWEEP: f64 = 0.01;
+
 /// Biogas kinetics asymptotic tolerance (Gompertz H(∞) → P).
 ///
 /// Modified Gompertz H(t) approaches P (maximum potential) as t → ∞.

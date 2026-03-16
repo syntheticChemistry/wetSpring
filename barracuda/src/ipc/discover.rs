@@ -33,7 +33,11 @@ pub fn discover_socket(env_var: &str, primal: &str) -> Option<PathBuf> {
     }
 
     if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
-        let p = PathBuf::from(xdg).join(format!("{}/{}-default.sock", super::primal_names::BIOMEOS, primal));
+        let p = PathBuf::from(xdg).join(format!(
+            "{}/{}-default.sock",
+            super::primal_names::BIOMEOS,
+            primal
+        ));
         if p.exists() {
             return Some(p);
         }
@@ -58,7 +62,11 @@ pub fn resolve_bind_path(env_var: &str, primal: &str) -> PathBuf {
     }
 
     if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
-        return PathBuf::from(xdg).join(format!("{}/{}-default.sock", super::primal_names::BIOMEOS, primal));
+        return PathBuf::from(xdg).join(format!(
+            "{}/{}-default.sock",
+            super::primal_names::BIOMEOS,
+            primal
+        ));
     }
 
     std::env::temp_dir().join(format!("{primal}-default.sock"))
@@ -126,10 +134,16 @@ mod tests {
 
     #[test]
     fn resolve_bind_path_uses_env() {
-        temp_env::with_var("WETSPRING_BIND_TEST", Some("/tmp/test-bind.sock"), || {
-            let p = resolve_bind_path("WETSPRING_BIND_TEST", super::super::primal_names::SELF);
-            assert_eq!(p, PathBuf::from("/tmp/test-bind.sock"));
-        });
+        let dir = tempfile::tempdir().unwrap();
+        let sock_path = dir.path().join("test-bind.sock");
+        temp_env::with_var(
+            "WETSPRING_BIND_TEST",
+            Some(sock_path.to_str().unwrap()),
+            || {
+                let p = resolve_bind_path("WETSPRING_BIND_TEST", super::super::primal_names::SELF);
+                assert_eq!(p, sock_path);
+            },
+        );
     }
 
     #[test]

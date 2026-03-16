@@ -120,7 +120,7 @@ detection in water via LC-MS. Source papers: asari (Nature Communications
 | GPU | NVIDIA RTX 4070 12 GB (SHADER_F64) |
 | OS | Pop!_OS 22.04 (Linux 6.17) |
 | Rust | stable 1.87+ (edition 2024) |
-| wgpu | v22 (Vulkan backend) |
+| wgpu | v28 (Vulkan backend) |
 
 ---
 

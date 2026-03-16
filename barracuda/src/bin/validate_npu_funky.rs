@@ -556,6 +556,11 @@ fn hamming_similarity(a: &[u8], b: &[u8]) -> f64 {
     100.0 * same as f64 / len as f64
 }
 
+/// Byte-level Shannon entropy (log₂) for NPU weight-file diagnostics.
+///
+/// Domain-specific: measures randomness of raw byte distributions, not
+/// ecological community diversity. Not a candidate for barraCuda delegation
+/// (barraCuda `stats::shannon` is community-diversity over species counts).
 fn shannon_byte_entropy(data: &[u8]) -> f64 {
     if data.is_empty() {
         return 0.0;
@@ -692,6 +697,11 @@ fn eval_npu_fitness(
     100.0 * correct as f64 / test_labels.len() as f64
 }
 
+/// Integer percentile for NPU timing diagnostics (u64 latency samples).
+///
+/// Domain-specific: operates on `u64` hardware counters, not `f64`
+/// statistical distributions. Not a candidate for barraCuda delegation
+/// (barraCuda `stats::percentile` is `f64`-only).
 fn percentile(data: &[u64], pct: usize) -> u64 {
     if data.is_empty() {
         return 0;

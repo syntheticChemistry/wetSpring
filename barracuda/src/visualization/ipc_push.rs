@@ -386,8 +386,10 @@ mod tests {
 
     #[test]
     fn new_creates_client_with_path() {
-        let client = PetalTonguePushClient::new(PathBuf::from("/tmp/test.sock"));
-        assert_eq!(client.socket_path, PathBuf::from("/tmp/test.sock"));
+        let dir = tempfile::tempdir().unwrap();
+        let sock_path = dir.path().join("test.sock");
+        let client = PetalTonguePushClient::new(sock_path.clone().into());
+        assert_eq!(client.socket_path, sock_path);
     }
 
     #[test]
@@ -432,7 +434,9 @@ mod tests {
             nodes: vec![],
             edges: vec![],
         };
-        let client = PetalTonguePushClient::new(PathBuf::from("/tmp/test.sock"));
+        let dir = tempfile::tempdir().unwrap();
+        let sock_path = dir.path().join("test.sock");
+        let client = PetalTonguePushClient::new(sock_path.into());
         let _ = client.push_render_with_domain("s1", "Test", &scenario, "measurement");
     }
 

@@ -20,15 +20,16 @@
 mod parser;
 mod types;
 
-pub use parser::{for_each_scan, parse_mzxml, MzxmlIter};
+pub use parser::{MzxmlIter, for_each_scan, parse_mzxml};
 pub use types::MzxmlSpectrum;
 
 #[cfg(test)]
 #[expect(clippy::unwrap_used)]
 mod tests {
+    use super::parser::{MzxmlIter, for_each_scan, parse_mzxml};
     use super::parser::{decode_peaks, parse_retention_time};
-    use super::parser::{for_each_scan, parse_mzxml, MzxmlIter};
     use super::types::{ByteOrder, Compression, ZlibBuffer};
+    use crate::tolerances;
 
     fn make_peaks_b64_32be(pairs: &[(f32, f32)]) -> String {
         let bytes: Vec<u8> = pairs
@@ -79,9 +80,9 @@ mod tests {
 
     #[test]
     fn parse_retention_time_iso8601() {
-        assert!((parse_retention_time("PT60.0S") - 1.0).abs() < 1e-6);
-        assert!((parse_retention_time("PT120.0S") - 2.0).abs() < 1e-6);
-        assert!((parse_retention_time("PT0.0S") - 0.0).abs() < 1e-6);
+        assert!((parse_retention_time("PT60.0S") - 1.0).abs() < tolerances::RT_PARSE_PARITY);
+        assert!((parse_retention_time("PT120.0S") - 2.0).abs() < tolerances::RT_PARSE_PARITY);
+        assert!((parse_retention_time("PT0.0S") - 0.0).abs() < tolerances::RT_PARSE_PARITY);
     }
 
     #[test]
@@ -92,11 +93,11 @@ mod tests {
         let (mz, int) =
             decode_peaks(&b64, 32, ByteOrder::Network, Compression::None, &mut zb).unwrap();
         assert_eq!(mz.len(), 3);
-        assert!((mz[0] - 100.0).abs() < 0.01);
-        assert!((mz[1] - 200.0).abs() < 0.01);
-        assert!((mz[2] - 300.0).abs() < 0.01);
-        assert!((int[0] - 500.0).abs() < 0.01);
-        assert!((int[1] - 1500.0).abs() < 0.01);
+        assert!((mz[0] - 100.0).abs() < tolerances::MZ_TOLERANCE);
+        assert!((mz[1] - 200.0).abs() < tolerances::MZ_TOLERANCE);
+        assert!((mz[2] - 300.0).abs() < tolerances::MZ_TOLERANCE);
+        assert!((int[0] - 500.0).abs() < tolerances::MZ_TOLERANCE);
+        assert!((int[1] - 1500.0).abs() < tolerances::MZ_TOLERANCE);
     }
 
     #[test]
@@ -142,12 +143,12 @@ mod tests {
         let s = &spectra[0];
         assert_eq!(s.index, 0); // num=1 → 0-based
         assert_eq!(s.ms_level, 1);
-        assert!((s.rt_minutes - 1.0).abs() < 1e-6);
-        assert!((s.tic - 5000.0).abs() < 1e-6);
+        assert!((s.rt_minutes - 1.0).abs() < tolerances::RT_PARSE_PARITY);
+        assert!((s.tic - 5000.0).abs() < tolerances::RT_PARSE_PARITY);
         assert_eq!(s.mz_array.len(), 3);
-        assert!((s.mz_array[0] - 100.0).abs() < 0.01);
-        assert!((s.mz_array[2] - 300.0).abs() < 0.01);
-        assert!((s.intensity_array[1] - 1500.0).abs() < 0.01);
+        assert!((s.mz_array[0] - 100.0).abs() < tolerances::MZ_TOLERANCE);
+        assert!((s.mz_array[2] - 300.0).abs() < tolerances::MZ_TOLERANCE);
+        assert!((s.intensity_array[1] - 1500.0).abs() < tolerances::MZ_TOLERANCE);
     }
 
     #[test]

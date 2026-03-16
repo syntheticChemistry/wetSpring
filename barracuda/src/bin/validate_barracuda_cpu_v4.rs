@@ -294,7 +294,7 @@ fn main() {
         "Clock: root age = 3500 Ma",
         clock.node_ages[0],
         3500.0,
-        1e-6,
+        tolerances::NMF_CONVERGENCE,
     );
     v.check(
         "Clock: child age < root age",

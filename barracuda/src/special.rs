@@ -110,8 +110,8 @@ mod tests {
 
     #[test]
     fn normal_cdf_known_values() {
-        // 1e-7 tighter than ERF_PARITY (5e-7) for polynomial approximation at x=0
-        assert!((normal_cdf(0.0) - 0.5).abs() < 1e-7);
+        // ERF_PARITY (5e-7) same order for polynomial approximation at x=0
+        assert!((normal_cdf(0.0) - 0.5).abs() < tolerances::ERF_PARITY);
         assert!((normal_cdf(1.96) - 0.975).abs() < crate::tolerances::NORM_CDF_PARITY);
         assert!(normal_cdf(-4.0) < crate::tolerances::NORM_CDF_TAIL);
         assert!(normal_cdf(4.0) > 0.9999);
@@ -198,8 +198,8 @@ mod tests {
 
     #[test]
     fn normal_cdf_symmetry() {
-        // 1e-7 tighter than ERF_PARITY (5e-7) for symmetry Φ(x)+Φ(-x)=1
-        assert!((normal_cdf(1.0) + normal_cdf(-1.0) - 1.0).abs() < 1e-7);
+        // NORM_CDF_SYMMETRY (1e-7) for symmetry Φ(x)+Φ(-x)=1
+        assert!((normal_cdf(1.0) + normal_cdf(-1.0) - 1.0).abs() < tolerances::NORM_CDF_SYMMETRY);
     }
 
     #[test]

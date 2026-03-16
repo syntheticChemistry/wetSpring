@@ -328,7 +328,7 @@ mod tests {
         );
         let ss = steady_state_mean(&result, 0, 0.1);
         assert!(
-            (ss - 1.0).abs() < 0.01,
+            (ss - 1.0).abs() < tolerances::ODE_STEADY_STATE,
             "steady-state mean should be ~1.0, got {ss}"
         );
     }
@@ -349,8 +349,15 @@ mod tests {
 
     #[test]
     fn rk45_exponential_decay() {
-        let result = rk45_integrate(|_t, y| vec![-0.5 * y[0]], &[1.0], 0.0, 10.0, 1e-8, 1e-10)
-            .expect("rk45 should succeed");
+        let result = rk45_integrate(
+            |_t, y| vec![-0.5 * y[0]],
+            &[1.0],
+            0.0,
+            10.0,
+            tolerances::RK45_DEFAULT_REL_TOL,
+            tolerances::RK45_DEFAULT_ABS_TOL,
+        )
+        .expect("rk45 should succeed");
         let expected = (-0.5_f64 * 10.0).exp();
         assert!(
             (result.y_final[0] - expected).abs() < tolerances::GPU_VS_CPU_F64,
@@ -362,8 +369,15 @@ mod tests {
     #[test]
     fn rk45_fewer_steps_than_rk4_for_smooth() {
         let rk4 = rk4_integrate(|y, _t| vec![-y[0]], &[1.0], 0.0, 10.0, 0.01, None);
-        let rk45 = rk45_integrate(|_t, y| vec![-y[0]], &[1.0], 0.0, 10.0, 1e-8, 1e-10)
-            .expect("rk45 should succeed");
+        let rk45 = rk45_integrate(
+            |_t, y| vec![-y[0]],
+            &[1.0],
+            0.0,
+            10.0,
+            tolerances::RK45_DEFAULT_REL_TOL,
+            tolerances::RK45_DEFAULT_ABS_TOL,
+        )
+        .expect("rk45 should succeed");
         assert!(
             rk45.steps < rk4.steps,
             "RK45 adaptive should need fewer steps ({}) than fixed-step RK4 ({})",

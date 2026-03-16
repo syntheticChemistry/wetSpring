@@ -1,8 +1,8 @@
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** March 15, 2026
+**Date:** March 16, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V120 — 376 experiments, 5,707+ validation checks, ALL PASS; 1,638 tests (0 failures, 3 pre-existing GPU hw-specific), 354 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 784+ WGSL shaders), toadStool S130+, coralReef Phase 10. biomeOS niche — deploy graph with `fallback = "skip"` for optional primals, niche self-knowledge (`niche.rs` + BYOB `wetspring-ecology.yaml`), 16 capability domains / 22 methods, Squirrel AI + ToadStool as optional deploy nodes, provenance trio integration, cross-spring time series, Neural API workflow graphs. V120 Cross-Spring Absorption: typed errors completed in forge (`NcbiError`, `DataError`) and barracuda (`Error::Ipc`), deploy graph hardened (Squirrel + ToadStool optional, `fallback = "skip"`), `live_pipeline.rs` refactored, hardcoded primal names eliminated in nestgate/viz, shared Python tolerance module (120+ constants). 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL, 200+ tolerances, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS.
+**Status:** V121 — 376 experiments, 5,707+ validation checks, ALL PASS; 1,685 tests (0 failures), 354 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 784+ WGSL shaders), toadStool S155, coralReef Phase 10. biomeOS niche — deploy graph with `fallback = "skip"` for optional primals, niche self-knowledge (`niche.rs` + BYOB `wetspring-ecology.yaml`), 16 capability domains / 20 methods, Squirrel AI + ToadStool as optional deploy nodes, provenance trio integration, cross-spring time series. V121 deep debt evolution: 214 named tolerance constants (zero inline literals), all hardcoded primal names → `primal_names::*`, zero `#[allow()]` in production code (all `#[expect(reason)]`), blake3 pure Rust, tempfile test paths, baseline verification fix. 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL, 0 unsafe, clippy pedantic+nursery ZERO WARNINGS.
 
 ---
 

@@ -3,6 +3,47 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V121] — 2026-03-16
+
+### Deep Debt Evolution — Full Audit Execution
+
+Comprehensive audit against wateringHole ecosystem standards, executed all findings:
+
+#### Tolerance Centralization (14 new constants, ~50 replacements)
+- `NORM_CDF_SYMMETRY`, `RT_PARSE_PARITY`, `JCAMP_Y_PARSE`, `FEATURE_MZ_MATCH`,
+  `FEATURE_RT_APEX`, `RI_PAPER_DEVIATION`, `RI_SEARCH_RELATIVE`, `GPU_F32_PAIRWISE_L2`,
+  `TRANSFER_TIME_PARITY`, `ODE_CARRYING_CAPACITY_LOOSE`, `ODE_DT_SWEEP`,
+  `GILLESPIE_ENSEMBLE_MEAN_PCT`, `GILLESPIE_PROPTEST_PCT`, `ASSEMBLY_MEAN_SIZE_TOL`
+- Replaced inline literals in: `bio/ode.rs`, `bio/qs_biofilm.rs`, `bio/multi_signal.rs`,
+  `bio/feature_table.rs`, `bio/cooperation.rs`, `bio/gillespie.rs`, `io/mzxml`,
+  `io/mzml`, `io/jcamp`, `special.rs`, and 9 validation binaries
+
+#### Lint Evolution
+- Crate-level `#[allow()]` → three `#[expect(reason)]` in `lib.rs`
+- 8 stale `#[expect()]` removed across 7 validation binaries
+- Long literal separator (`131072` → `131_072`), `const fn` promotion
+- `pub(crate)` → `pub` in private chimera submodule
+- 10 doc-backtick fixes in `metalForge/forge/src/error.rs` and `primal_names.rs`
+
+#### Primal Name Centralization
+- Hardcoded strings (`"squirrel"`, `"biomeOS"`, `"toadstool"`, etc.) replaced with
+  `primal_names::*` constants in 7 validation binaries
+
+#### Dependency Evolution
+- `blake3 = { default-features = false, features = ["pure"] }` — eliminates `cc` build-dep
+- 8 hardcoded `/tmp/` test paths → `tempfile::TempDir`
+
+#### Infrastructure Fixes
+- `verify_baseline_outputs.sh` rerun comparison bug fixed (was comparing stored vs stored)
+- Local `shannon_byte_entropy` and `percentile` documented as domain-specific
+
+#### Quality
+- 1,685 tests pass, 0 failures, 2 ignored
+- `cargo clippy --workspace --all-features` — zero warnings
+- `cargo fmt --all --check` — clean
+- 214 named tolerance constants, zero inline literals
+- Zero `#[allow()]` in production code
+
 ## [V120] — 2026-03-15
 
 ### Cross-Spring Absorption — Typed Errors + Deploy Graph + Refactoring + Tolerance Module

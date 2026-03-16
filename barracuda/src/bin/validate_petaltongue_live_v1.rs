@@ -54,6 +54,7 @@ use std::path::PathBuf;
 use barracuda::stats::{covariance, mean, norm_cdf};
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::ipc::discover;
+use wetspring_barracuda::ipc::primal_names;
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::visualization::ipc_push::PetalTonguePushClient;
 use wetspring_barracuda::visualization::live_pipeline::{LivePipelineSession, PipelineDomain};
@@ -628,13 +629,17 @@ fn main() {
 /// for primals whose sockets exist.
 fn discover_primal_sockets() -> Vec<&'static str> {
     let configs = [
-        ("BEARDOG_SOCKET", "beardog", "orchestration"),
-        ("SONGBIRD_SOCKET", "songbird", "discovery"),
-        ("TOADSTOOL_SOCKET", "toadstool", "compute"),
-        ("NESTGATE_SOCKET", "nestgate", "data.ncbi"),
-        ("SQUIRREL_SOCKET", "squirrel", "storage"),
-        ("PETALTONGUE_SOCKET", "petaltongue", "visualization"),
-        ("BIOMEOS_SOCKET", "biomeos", "coordination"),
+        ("BEARDOG_SOCKET", primal_names::BEARDOG, "orchestration"),
+        ("SONGBIRD_SOCKET", primal_names::SONGBIRD, "discovery"),
+        ("TOADSTOOL_SOCKET", primal_names::TOADSTOOL, "compute"),
+        ("NESTGATE_SOCKET", primal_names::NESTGATE, "data.ncbi"),
+        ("SQUIRREL_SOCKET", primal_names::SQUIRREL, "storage"),
+        (
+            "PETALTONGUE_SOCKET",
+            primal_names::PETALTONGUE,
+            "visualization",
+        ),
+        ("BIOMEOS_SOCKET", primal_names::BIOMEOS, "coordination"),
     ];
     configs
         .iter()
@@ -644,5 +649,5 @@ fn discover_primal_sockets() -> Vec<&'static str> {
 }
 
 fn discover_biomeos() -> Option<PathBuf> {
-    discover::discover_socket("BIOMEOS_SOCKET", "biomeos")
+    discover::discover_socket("BIOMEOS_SOCKET", primal_names::BIOMEOS)
 }

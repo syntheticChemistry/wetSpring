@@ -207,8 +207,8 @@ impl NcbiClient {
         if let Some(ref nest) = self.nest {
             if nest.exists(&cache_key) == Ok(true) {
                 if let Ok(Some(data)) = nest.retrieve_blob(&cache_key) {
-                    let content =
-                        String::from_utf8(data).map_err(|e| NcbiError::InvalidUtf8(e.to_string()))?;
+                    let content = String::from_utf8(data)
+                        .map_err(|e| NcbiError::InvalidUtf8(e.to_string()))?;
                     return Ok(FetchResult {
                         content,
                         rettype: rettype.to_string(),
@@ -320,8 +320,7 @@ fn curl_get(url: &str) -> Result<String, NcbiError> {
         )));
     }
 
-    String::from_utf8(output.stdout)
-        .map_err(|e| NcbiError::InvalidUtf8(e.to_string()))
+    String::from_utf8(output.stdout).map_err(|e| NcbiError::InvalidUtf8(e.to_string()))
 }
 
 fn url_encode(s: &str) -> String {

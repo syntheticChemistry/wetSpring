@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: March 15, 2026
-**Status**: V116 — 5,707+ checks (375 experiments, 354 binaries). biomeOS niche — deploy graph, 19 capabilities, provenance trio, cross-spring time series. V114: docs cleanup, niche guidance, BarraCUDA absorption handoff. V113: trio + capabilities + deploy graph. V112: streaming I/O, capability discovery.
+**Status**: V121 — 5,707+ checks (375 experiments, 354 binaries). biomeOS niche — deploy graph, 19 capabilities, provenance trio, cross-spring time series. V114: docs cleanup, niche guidance, BarraCUDA absorption handoff. V113: trio + capabilities + deploy graph. V112: streaming I/O, capability discovery.
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

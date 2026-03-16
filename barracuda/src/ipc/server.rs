@@ -378,7 +378,10 @@ mod tests {
     #[test]
     fn resolve_bind_path_default() {
         let path = resolve_bind_path();
-        assert!(path.to_string_lossy().contains(super::super::primal_names::SELF));
+        assert!(
+            path.to_string_lossy()
+                .contains(super::super::primal_names::SELF)
+        );
     }
 
     #[test]

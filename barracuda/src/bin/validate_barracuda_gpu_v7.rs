@@ -127,14 +127,17 @@ async fn main() {
         .map(|(c, g)| (c - g).abs())
         .fold(0.0_f64, f64::max);
     println!("  PairwiseL2 max |CPU-GPU| (sorted): {max_l2_err:.2e}");
-    v.check_pass("PairwiseL2 max err < 1e-3 (f32 kernel)", max_l2_err < 1e-3);
+    v.check_pass(
+        "PairwiseL2 max err < 1e-3 (f32 kernel)",
+        max_l2_err < tolerances::GPU_F32_PAIRWISE_L2,
+    );
 
     for i in 0..5.min(cpu_sorted.len()) {
         v.check(
             &format!("L2 sorted[{i}]: CPU ≈ GPU"),
             gpu_sorted[i],
             cpu_sorted[i],
-            1e-3,
+            tolerances::GPU_F32_PAIRWISE_L2,
         );
     }
 

@@ -2,7 +2,7 @@
 
 **Date:** March 15, 2026
 **Pattern:** Write → Absorb → Lean (from hotSpring)
-**Status:** V120 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 44 GPU modules, 0 Tier B/C, 0 Passthrough, standalone barraCuda v0.3.5, toadStool S155. Typed errors complete (`NcbiError`/`DataError` in forge, `Error::Ipc` in barracuda). Deploy graph with `fallback = "skip"`. 16 capability domains / 22 methods. 200+ named tolerances + shared Python tolerance module. V120: cross-spring absorption. V119: niche architecture, typed errors, domain refactoring.
+**Status:** V121 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 44 GPU modules, 0 Tier B/C, 0 Passthrough, standalone barraCuda v0.3.5, toadStool S155. 1,685 tests, 354 binaries, 214 named tolerances (zero inline literals), zero `#[allow()]` in production code. 16 capability domains / 20 methods. All primal names via `primal_names::*`. V121: deep debt evolution (tolerance centralization, lint evolution). V120: cross-spring absorption, typed errors, deploy graph.
 
 ---
 

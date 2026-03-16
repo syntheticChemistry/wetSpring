@@ -26,7 +26,7 @@ workload sizes — else we have math bottlenecks.
 | RAM | 64 GB DDR5 |
 | OS | Pop!_OS 22.04, Linux 6.17.4 |
 | Rust | release mode, LLVM -O3 |
-| ToadStool | wgpu v22, Vulkan backend |
+| ToadStool | wgpu v28, Vulkan backend |
 
 ## Architecture: Full-Stage GPU Pipeline (v3)
 

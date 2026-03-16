@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 15, 2026 (V120 — barraCuda v0.3.5 + toadStool S155 + coralReef Phase 10)
+**Date:** March 16, 2026 (V121 — barraCuda v0.3.5 + toadStool S155 + coralReef Phase 10)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 44 GPU modules + CPU modules + IPC + vault + provenance + visualization (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.5, wgpu 28). 1,638 tests (0 failures, 3 pre-existing GPU hw-specific), 376 experiments, 5,707+ checks, 200+ tolerances, 328 binaries. `cargo clippy -D warnings -W pedantic -W nursery` CLEAN, **0 silent fallbacks**. `#![forbid(unsafe_code)]` on all crate roots. **V120:** Cross-spring absorption: typed errors complete (`NcbiError`/`DataError`/`Error::Ipc`), deploy graph hardened, shared Python tolerance module. **V119:** Niche architecture, typed errors, domain refactoring, `proptest`, Squirrel AI. **See also:** `wateringHole/handoffs/WETSPRING_V120_TOADSTOOL_BARRACUDA_EVOLUTION_HANDOFF_MAR15_2026.md`.
+**Status:** 44 GPU modules + CPU modules + IPC + vault + provenance + visualization (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.5, wgpu 28). 1,685 tests (0 failures), 376 experiments, 5,707+ checks, 214 named tolerances (zero inline literals), 354 binaries. `cargo clippy -D warnings -W pedantic -W nursery` CLEAN, **0 silent fallbacks**, **0 `#[allow()]` in production code**. `#![forbid(unsafe_code)]` on all crate roots. All primal names via `primal_names::*` constants. **V121:** Deep debt evolution: all inline tolerance literals centralized (14 new constants, ~50 replacements), crate-level `#[allow()]` → `#[expect(reason)]`, blake3 pure Rust, stale `#[expect()]` removed, tempfile test paths, doc-lint + const-fn evolution. **V120:** Cross-spring absorption: typed errors, deploy graph. **V119:** Niche architecture, proptest, Squirrel AI. **See also:** `wateringHole/handoffs/WETSPRING_V121_DEEP_DEBT_EVOLUTION_HANDOFF_MAR16_2026.md`.
 
 ### Full Lean Phase
 
@@ -88,14 +88,12 @@ All GPU bio modules are now either Lean (upstream primitive) or Compose
 ### Code Quality (Phase 15+)
 
 All modules pass `clippy::pedantic` + `clippy::nursery` (0 warnings, `-D` enforced
-in CI). V114: 15 binaries received `required-features` gates (tokio/serde_json
-dependencies). 52 clippy pedantic/nursery warnings fixed across 25 V113 binaries.
+in CI). Zero `#[allow()]` in production code — all lint suppressions use `#[expect(reason)]`.
 `cargo fmt` (0 diffs), `cargo doc` (0 warnings with and without `--all-features`).
-All tolerances centralized in `tolerances.rs` (179 named constants — includes
-Jacobi eigendecomposition (Golub & Van Loan), ESN regularisation (Jaeger 2001/
-Lukoševičius 2012), Chao1 count detection (skbio parity), and 8 V39 audit
-additions: rarefaction, PCoA, KMD, HMM, Gillespie, asari). NMF convergence
-constants removed after lean to `barracuda::linalg::nmf`.
+All tolerances centralized in `tolerances/` (214 named constants across 10 submodules —
+includes bio, gpu, spectral, instrument domains; zero inline literals remain).
+V121: 14 new tolerance constants, ~50 inline literal replacements, crate-level
+`#[allow()]` → `#[expect(reason)]`, all hardcoded primal names → `primal_names::*`.
 `bio::spectral_match` uses `special::{dot, l2_norm}` instead of inline computation.
 `#![deny(unsafe_code)]` enforced crate-wide — **zero unsafe blocks** in library or
 test code as of Feb 24, 2026. Test env-var manipulation refactored to pure-function
@@ -532,7 +530,7 @@ All production dependencies are pure Rust or have pure Rust backends.
 
 | Dependency | Version | Pure Rust? | Notes |
 |------------|---------|:----------:|-------|
-| `barracuda` | path (v0.3.3) | **Yes** | Standalone math primal, zero FFI |
+| `barracuda` | path (v0.3.5) | **Yes** | Standalone math primal, zero FFI |
 | `flate2` | 1.0 | **Yes** | `rust_backend` feature → miniz_oxide (no C zlib) |
 | `bytemuck` | 1 | **Yes** | Zero-copy GPU buffer casting |
 | `serde` | 1 (optional) | **Yes** | Derive only |
@@ -541,7 +539,7 @@ All production dependencies are pure Rust or have pure Rust backends.
 | `tokio` | 1 (optional, gpu) | **Yes** | Async runtime for GPU device init |
 | `chacha20poly1305` | 0.10 (optional, vault) | **Yes** | RustCrypto AEAD |
 | `ed25519-dalek` | 2.2 (optional, vault) | **Yes** | Dalek Ed25519 signing |
-| `blake3` | 1.8 (optional, vault) | **Yes** | BLAKE3 hashing (SIMD via safe intrinsics) |
+| `blake3` | 1.8 (optional, vault) | **Yes** | BLAKE3 hashing (pure Rust, default-features=false + features=["pure"]) |
 | `akida-driver` | path (optional, npu) | **Yes** | BrainChip AKD1000 via ioctl |
 | `bingocube-nautilus` | path (optional, nautilus) | **Yes** | Evolutionary reservoir computing |
 
