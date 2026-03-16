@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V119** | `handoffs/WETSPRING_V119_DEEP_DEBT_EVOLUTION_HANDOFF_MAR15_2026.md` | Mar 15 | **Deep Debt Evolution Sprint** — niche self-knowledge (`niche.rs` + BYOB), typed errors (`VaultError`/`NestError`/`SongbirdError`/`AssemblyError`), 7 large files → domain submodules (net −3,496 lines), `primal_names.rs` hardcoding elimination, Squirrel AI (`ai.ecology_interpret`, 15 domains / 20 methods), `proptest` adopted, clone reduction. |
+| **V120** | `handoffs/WETSPRING_V120_CROSS_SPRING_ABSORPTION_HANDOFF_MAR15_2026.md` | Mar 15 | **Cross-Spring Absorption** — typed errors completed (`NcbiError`/`DataError`/`Error::Ipc`), deploy graph hardened (`fallback = "skip"`, Squirrel + ToadStool optional nodes), `live_pipeline.rs` refactored, hardcoding eliminated in nestgate/viz, shared Python tolerance module (120+ constants). |
+| **V119** | `handoffs/WETSPRING_V119_DEEP_DEBT_EVOLUTION_HANDOFF_MAR15_2026.md` | Mar 15 | **Deep Debt Evolution Sprint** — niche self-knowledge, typed errors, 7 large files refactored, `primal_names.rs`, Squirrel AI, `proptest`. |
 | | *V113–V118 → `handoffs/archive/`* | | V113–V118 handoffs archived. |
 | | *V112 and earlier → `handoffs/archive/`* | | Fossil record: V7–V112 (95+ archived handoffs) |
 

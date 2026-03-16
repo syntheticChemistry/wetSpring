@@ -160,6 +160,7 @@ FAMILY_ID = "${FAMILY_ID}"
 [nodes.constraints]
 timeout_ms = 15000
 optional = true
+fallback = "skip"
 
 [[nodes]]
 id = "germinate_petaltongue"
@@ -183,6 +184,57 @@ FAMILY_ID = "${FAMILY_ID}"
 [nodes.constraints]
 timeout_ms = 15000
 optional = true
+fallback = "skip"
+
+# ── Phase 3b: Optional ToadStool + Squirrel ───────────────────────────
+
+[[nodes]]
+id = "germinate_toadstool"
+depends_on = ["germinate_beardog", "germinate_songbird"]
+output = "toadstool_genesis"
+
+[nodes.primal]
+by_capability = "compute"
+
+[nodes.operation]
+name = "start"
+
+[nodes.operation.params]
+mode = "server"
+family_id = "${FAMILY_ID}"
+
+[nodes.operation.environment]
+BIOMEOS_SOCKET_DIR = "${XDG_RUNTIME_DIR}/biomeos"
+FAMILY_ID = "${FAMILY_ID}"
+
+[nodes.constraints]
+timeout_ms = 15000
+optional = true
+fallback = "skip"
+
+[[nodes]]
+id = "germinate_squirrel"
+depends_on = ["germinate_beardog", "germinate_songbird"]
+output = "squirrel_genesis"
+
+[nodes.primal]
+by_capability = "ai"
+
+[nodes.operation]
+name = "start"
+
+[nodes.operation.params]
+mode = "server"
+family_id = "${FAMILY_ID}"
+
+[nodes.operation.environment]
+BIOMEOS_SOCKET_DIR = "${XDG_RUNTIME_DIR}/biomeos"
+FAMILY_ID = "${FAMILY_ID}"
+
+[nodes.constraints]
+timeout_ms = 15000
+optional = true
+fallback = "skip"
 
 # ── Phase 4: wetSpring Science ──────────────────────────────────────
 
@@ -197,6 +249,8 @@ depends_on = [
 ]
 output = "wetspring_genesis"
 capabilities = [
+    "ai.ecology_interpret",
+    "metrics.snapshot",
     "science",
     "science.diversity",
     "science.anderson",

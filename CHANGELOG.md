@@ -3,6 +3,54 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V120] — 2026-03-15
+
+### Cross-Spring Absorption — Typed Errors + Deploy Graph + Refactoring + Tolerance Module
+
+Absorbed patterns from sibling springs (airSpring, neuralSpring, groundSpring) and completed
+deep debt evolution: final typed error migration, deploy graph hardening, large file
+refactoring, hardcoded primal name elimination, and a shared Python tolerance module.
+
+#### Typed Error Completion (Result<_, String> → 0 in library code)
+- `metalForge/forge/src/error.rs`: added `NcbiError` (5 variants) and `DataError` (7 variants)
+- `metalForge/forge/src/ncbi.rs`: `esearch`, `esummary`, `efetch`, `acquire_assembly`, `curl_get` all evolved from `Result<_, String>` to `Result<_, NcbiError>`
+- `metalForge/forge/src/data.rs`: `nestgate_rpc` evolved from `Result<String, String>` to `Result<String, DataError>`
+- `barracuda/src/ipc/handlers/ai.rs`: `squirrel_query` evolved from `Result<Value, String>` to `Result<Value, crate::error::Error>`
+- Only remaining `Result<_, String>`: ESN bridge `OnceLock<Result<Runtime, String>>` (legitimate static-init pattern)
+
+#### Deploy Graph Hardening (fallback = "skip" for optional primals)
+- `graphs/wetspring_deploy.toml`: added optional ToadStool node (`by_capability = "compute"`, `fallback = "skip"`)
+- Added optional Squirrel node (`by_capability = "ai"`, `fallback = "skip"`)
+- NestGate and petalTongue nodes now include `fallback = "skip"` alongside `optional = true`
+- wetSpring node capabilities expanded with `ai.ecology_interpret` and `metrics.snapshot`
+
+#### Large File Refactoring
+- `visualization/live_pipeline.rs` (611 LOC) → `live_pipeline/mod.rs` (core session) + `live_pipeline/stages.rs` (stage definitions)
+- `scenarios/phylogenetics.rs` (522 LOC): evaluated but retained as single file — cohesive scenario builder pattern, smart decision not to split
+
+#### Hardcoding Elimination (Continued)
+- `ncbi/nestgate/discovery.rs`: hardcoded "nestgate" and "biomeos" strings → `primal_names` constants (feature-gated with local fallback)
+- `visualization/ipc_push.rs`: hardcoded "petaltongue" → `primal_names::PETALTONGUE` constant (feature-gated)
+
+#### Shared Python Tolerance Module
+- `scripts/tolerances.py`: 120+ named constants mirroring all Rust tolerance submodules
+- Covers: machine precision, instrument, GPU, ODE, bio, spectral, phylogeny, ESN, brain
+- 21 Python scripts identified as migration candidates
+
+#### Audit Results (verified clean)
+- Zero `set_var`/`remove_var` (Edition 2024 safe)
+- Zero `#[allow()]` in non-crate-level production code
+- Zero `unsafe` blocks
+- Zero `Box<dyn Error>` or `anyhow`
+- Zero TODO/FIXME in library code
+- All mocks/dummies confirmed test-only (`#[cfg(test)]`)
+- Dependencies minimal: `barracuda`, `bytemuck`, `flate2` (direct); all else feature-gated
+
+#### Quality Gates
+- `cargo check --workspace` — clean (1 pre-existing unused-import warning in validator binary)
+- `cargo test --lib` — 1,638 passed (1,404 barracuda + 234 forge), 3 pre-existing GPU hw-specific failures
+- `cargo test --lib -p wetspring-forge` — 234 passed, 0 failed
+
 ## [V119] — 2026-03-15
 
 ### Deep Debt Evolution Sprint — Niche Architecture + Typed Errors + Domain Refactoring

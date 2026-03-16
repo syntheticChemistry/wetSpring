@@ -7,11 +7,22 @@
 
 use std::path::PathBuf;
 
+#[cfg(feature = "ipc")]
+use crate::ipc::primal_names::{BIOMEOS, NESTGATE};
+
+#[cfg(not(feature = "ipc"))]
+mod local_primal_names {
+    pub const BIOMEOS: &str = "biomeos";
+    pub const NESTGATE: &str = "nestgate";
+}
+#[cfg(not(feature = "ipc"))]
+use local_primal_names::{BIOMEOS, NESTGATE};
+
 /// Whether `NestGate` routing is enabled via environment.
 #[must_use]
 pub fn is_enabled() -> bool {
     std::env::var("WETSPRING_DATA_PROVIDER")
-        .is_ok_and(|v| v.trim().eq_ignore_ascii_case("nestgate"))
+        .is_ok_and(|v| v.trim().eq_ignore_ascii_case(NESTGATE))
 }
 
 /// Discover the `NestGate` Unix socket path.
@@ -22,7 +33,7 @@ pub fn is_enabled() -> bool {
 /// 3. `<temp_dir>/nestgate-default.sock` (platform-agnostic fallback)
 #[must_use]
 pub fn discover_socket() -> Option<PathBuf> {
-    discover_primal_socket("NESTGATE_SOCKET", "nestgate")
+    discover_primal_socket("NESTGATE_SOCKET", NESTGATE)
 }
 
 /// Discover the biomeOS Neural API socket for capability-based routing.
@@ -32,7 +43,7 @@ pub fn discover_socket() -> Option<PathBuf> {
 /// 3. `<temp_dir>/biomeos-default.sock`
 #[must_use]
 pub fn discover_biomeos_socket() -> Option<PathBuf> {
-    discover_primal_socket("BIOMEOS_SOCKET", "biomeos")
+    discover_primal_socket("BIOMEOS_SOCKET", BIOMEOS)
 }
 
 /// Pure-logic socket path resolution for testing.

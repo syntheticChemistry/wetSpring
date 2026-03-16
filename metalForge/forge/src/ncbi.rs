@@ -22,6 +22,7 @@
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+use crate::error::NcbiError;
 use crate::nest::NestClient;
 
 const EUTILS_BASE_DEFAULT: &str = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils";
@@ -145,7 +146,7 @@ impl NcbiClient {
     ///
     /// Returns an error if the HTTP request fails, the response is invalid UTF-8,
     /// or `NestGate` storage operations fail when caching.
-    pub fn esearch(&self, db: &str, term: &str, retmax: u32) -> Result<SearchResult, String> {
+    pub fn esearch(&self, db: &str, term: &str, retmax: u32) -> Result<SearchResult, NcbiError> {
         let cache_key = format!("ncbi:esearch:{db}:{term}:{retmax}");
 
         if let Some(ref nest) = self.nest {
@@ -179,7 +180,7 @@ impl NcbiClient {
     /// # Errors
     ///
     /// Returns an error if the HTTP request fails or the response is invalid UTF-8.
-    pub fn esummary(&self, db: &str, ids: &[String]) -> Result<SummaryResult, String> {
+    pub fn esummary(&self, db: &str, ids: &[String]) -> Result<SummaryResult, NcbiError> {
         if ids.is_empty() {
             return Ok(SummaryResult {
                 raw_xml: String::new(),
@@ -200,13 +201,14 @@ impl NcbiClient {
     ///
     /// Returns an error if the HTTP request fails, the response is invalid UTF-8,
     /// or `NestGate` storage operations fail when caching.
-    pub fn efetch(&self, db: &str, id: &str, rettype: &str) -> Result<FetchResult, String> {
+    pub fn efetch(&self, db: &str, id: &str, rettype: &str) -> Result<FetchResult, NcbiError> {
         let cache_key = format!("ncbi:efetch:{db}:{id}:{rettype}");
 
         if let Some(ref nest) = self.nest {
             if nest.exists(&cache_key) == Ok(true) {
                 if let Ok(Some(data)) = nest.retrieve_blob(&cache_key) {
-                    let content = String::from_utf8(data).map_err(|e| format!("utf8: {e}"))?;
+                    let content =
+                        String::from_utf8(data).map_err(|e| NcbiError::InvalidUtf8(e.to_string()))?;
                     return Ok(FetchResult {
                         content,
                         rettype: rettype.to_string(),
@@ -250,7 +252,7 @@ impl NcbiClient {
         &self,
         accession: &str,
         local_dir: Option<&Path>,
-    ) -> Result<AssemblyResult, String> {
+    ) -> Result<AssemblyResult, NcbiError> {
         let nest_key = format!("data:assembly:{accession}");
 
         if let Some(ref nest) = self.nest {
@@ -280,7 +282,7 @@ impl NcbiClient {
 
         let search = self.esearch("assembly", accession, 1)?;
         if search.count == 0 {
-            return Err(format!("assembly {accession} not found in NCBI"));
+            return Err(NcbiError::AssemblyNotFound(accession.to_string()));
         }
 
         Ok(AssemblyResult {
@@ -304,21 +306,22 @@ impl NcbiClient {
 
 // ── HTTP via curl ───────────────────────────────────────────────────
 
-fn curl_get(url: &str) -> Result<String, String> {
+fn curl_get(url: &str) -> Result<String, NcbiError> {
     let output = Command::new("curl")
         .args(["-fsSL", "--max-time", "30", url])
         .output()
-        .map_err(|e| format!("curl not available: {e}"))?;
+        .map_err(|e| NcbiError::HttpRequest(format!("curl not available: {e}")))?;
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(format!(
+        return Err(NcbiError::HttpRequest(format!(
             "curl failed ({}): {stderr}",
             output.status.code().unwrap_or(-1)
-        ));
+        )));
     }
 
-    String::from_utf8(output.stdout).map_err(|e| format!("invalid utf8: {e}"))
+    String::from_utf8(output.stdout)
+        .map_err(|e| NcbiError::InvalidUtf8(e.to_string()))
 }
 
 fn url_encode(s: &str) -> String {

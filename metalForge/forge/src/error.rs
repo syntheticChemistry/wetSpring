@@ -112,3 +112,67 @@ impl fmt::Display for AssemblyError {
 }
 
 impl std::error::Error for AssemblyError {}
+
+/// Errors produced by NCBI E-utilities operations.
+#[derive(Debug)]
+pub enum NcbiError {
+    /// HTTP request (curl) failed or is unavailable.
+    HttpRequest(String),
+    /// Response body is not valid UTF-8.
+    InvalidUtf8(String),
+    /// NCBI assembly not found.
+    AssemblyNotFound(String),
+    /// NestGate cache operation failed.
+    CacheFailed(String),
+    /// Filesystem error during local assembly lookup.
+    FileSystem(String),
+}
+
+impl fmt::Display for NcbiError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::HttpRequest(e) => write!(f, "HTTP request failed: {e}"),
+            Self::InvalidUtf8(e) => write!(f, "invalid UTF-8: {e}"),
+            Self::AssemblyNotFound(acc) => write!(f, "assembly {acc} not found in NCBI"),
+            Self::CacheFailed(e) => write!(f, "NestGate cache: {e}"),
+            Self::FileSystem(e) => write!(f, "filesystem: {e}"),
+        }
+    }
+}
+
+impl std::error::Error for NcbiError {}
+
+/// Errors produced by NestGate data pipeline RPC.
+#[derive(Debug)]
+pub enum DataError {
+    /// Socket path is invalid.
+    InvalidSocket(String),
+    /// Connection to NestGate failed.
+    Connect(String),
+    /// Timeout configuration failed.
+    Timeout(String),
+    /// Write to socket failed.
+    Write(String),
+    /// Flush to socket failed.
+    Flush(String),
+    /// Read from socket failed.
+    Read(String),
+    /// NestGate returned empty response.
+    EmptyResponse,
+}
+
+impl fmt::Display for DataError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::InvalidSocket(e) => write!(f, "invalid NestGate socket: {e}"),
+            Self::Connect(e) => write!(f, "NestGate connect: {e}"),
+            Self::Timeout(e) => write!(f, "timeout: {e}"),
+            Self::Write(e) => write!(f, "write: {e}"),
+            Self::Flush(e) => write!(f, "flush: {e}"),
+            Self::Read(e) => write!(f, "read: {e}"),
+            Self::EmptyResponse => write!(f, "NestGate returned empty response"),
+        }
+    }
+}
+
+impl std::error::Error for DataError {}

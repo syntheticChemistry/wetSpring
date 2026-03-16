@@ -5,6 +5,11 @@
 //! without compile-time coupling. Uses the `visualization.render` and
 //! `visualization.render.stream` JSON-RPC methods.
 
+#[cfg(feature = "ipc")]
+use crate::ipc::primal_names::PETALTONGUE;
+#[cfg(not(feature = "ipc"))]
+const PETALTONGUE: &str = "petaltongue";
+
 use std::io::{Read, Write};
 use std::os::unix::net::UnixStream;
 use std::path::PathBuf;
@@ -116,7 +121,7 @@ impl PetalTonguePushClient {
             }
         }
         if let Ok(runtime) = std::env::var("XDG_RUNTIME_DIR") {
-            let dir = PathBuf::from(runtime).join("petaltongue");
+            let dir = PathBuf::from(runtime).join(PETALTONGUE);
             if dir.is_dir() {
                 if let Ok(entries) = std::fs::read_dir(&dir) {
                     for entry in entries.flatten() {
@@ -132,7 +137,7 @@ impl PetalTonguePushClient {
             for entry in entries.flatten() {
                 let name = entry.file_name();
                 let name = name.to_string_lossy();
-                if name.starts_with("petaltongue") && name.ends_with(".sock") {
+                if name.starts_with(PETALTONGUE) && name.ends_with(".sock") {
                     return Ok(Self {
                         socket_path: entry.path(),
                     });

@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** March 15, 2026 (V119 — barraCuda v0.3.5 standalone, toadStool S130+, coralReef Phase 10, wgpu 28. 1,687 tests (0 failures), 354 binaries, 200+ tolerances. biomeOS niche — deploy graph, niche self-knowledge (`niche.rs` + BYOB), 20 capabilities (15 domains, 20 methods), Squirrel AI integration, provenance trio, cross-spring time series. V119 Deep Debt Evolution Sprint: typed errors (`VaultError`/`NestError`/`SongbirdError`/`AssemblyError`), 7 large files → domain submodules (net −3,496 lines), `#[expect(reason)]` in 10 binaries, `primal_names.rs` hardcoding elimination, `proptest` adopted, clone reduction. clippy ZERO WARNINGS pedantic+nursery.)
+**Updated:** March 15, 2026 (V120 — barraCuda v0.3.5 standalone, toadStool S130+, coralReef Phase 10, wgpu 28. 1,638 tests (0 failures, 3 pre-existing GPU hw-specific), 354 binaries, 200+ tolerances. biomeOS niche — deploy graph with `fallback = "skip"`, niche self-knowledge (`niche.rs` + BYOB), 22 capabilities (16 domains), Squirrel AI + ToadStool optional deploy nodes, provenance trio, cross-spring time series. V120 Cross-Spring Absorption: typed errors completed (`NcbiError`, `DataError`, `Error::Ipc`), deploy graph hardened, `live_pipeline.rs` refactored, shared Python tolerance module, hardcoding eliminated. clippy ZERO WARNINGS pedantic+nursery.)
 
 ---
 
