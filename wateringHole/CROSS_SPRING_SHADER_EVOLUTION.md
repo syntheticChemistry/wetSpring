@@ -1,6 +1,6 @@
 # Cross-Spring Shader Evolution
 
-**Last updated**: Mar 8, 2026 — V98+ cross-spring evolution: barraCuda v0.3.3 (`a898dee`), toadStool S130+ (`bfe7977b`), coralReef Iteration 10 (`d29a734`). 150+ primitives consumed, 0 local WGSL, 295 experiments, 8,656+ checks, 1,347 tests, clippy pedantic CLEAN. V98 chain: 173/173 PASS. Cross-spring: Exp319 (52/52) + Exp320 benchmark. 28 shaders, 22 cross-spring, 5 wetSpring-authored.
+**Last updated**: Mar 16, 2026 — V123
 **Validated by**: V98+ cross-spring evolution (Exp319-320), upstream rewire (zero API breakage), Exp313-318 (173/173), standalone barraCuda v0.3.3 `a898dee`, 1,347 tests
 
 ---
@@ -8,7 +8,7 @@
 ## Overview
 
 barraCuda is the shared GPU/NPU compute substrate for the ecoPrimals
-ecosystem. Its 694 WGSL shaders across 38 categories evolved through cross-spring contributions:
+ecosystem. Its 784+ WGSL shaders across 38 categories evolved through cross-spring contributions:
 each spring (hotSpring, wetSpring, neuralSpring, airSpring) contributed
 domain-specific shaders that were absorbed into ToadStool, refined, and made
 available to all springs. This document tracks that evolution.

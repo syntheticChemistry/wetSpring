@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: March 15, 2026
-**Status**: V122 — 5,707+ checks (376 experiments, 354 binaries), 1,703 tests. biomeOS niche — deploy graph, 19 capabilities, provenance trio, cross-spring time series. Zero `#[allow()]` in entire codebase — all `#[expect(reason)]`. V122: modern idiomatic Rust evolution (298 files). V121: tolerance centralization, lint evolution.
+**Status**: V123 — 5,707+ checks (376 experiments, 354 binaries), 1,703 tests. biomeOS niche — deploy graph, 19 capabilities, provenance trio, cross-spring time series. Zero `#[allow()]` in entire codebase — all `#[expect(reason)]`. V122: modern idiomatic Rust evolution (298 files). V121: tolerance centralization, lint evolution. V123: zero-panic validation (OrExit trait, 1,154 .expect() + 687 .unwrap() replaced across 219 binaries), dual-format capability discovery (operation_dependencies/cost_estimates/semantic_mappings), centralized extract_rpc_error(), Python deps upper-bounded. Zero .expect() and zero .unwrap() in all validation binaries.
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
