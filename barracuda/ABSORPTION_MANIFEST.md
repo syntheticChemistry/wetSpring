@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** March 15, 2026 (V116)
+**Date:** March 15, 2026 (V120)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**barraCuda:** standalone v0.3.5 `03986ce`
-**Status:** 150+ primitives consumed (264 ComputeDispatch ops) via `compile_shader_universal`, 0 local WGSL (fully lean), 0 local ODE derivative math, 0 local regression math, 5 GPU ODE via trait-generated WGSL, 47 GPU modules (all lean), 0 Tier B/C, 0 Passthrough, 1,662 tests (0 failures), standalone barraCuda v0.3.5, 376 experiments, 5,707+ checks, 354 binaries, 180 named tolerances, `#![forbid(unsafe_code)]` on all crate roots, clippy pedantic+nursery CLEAN. **V114:** docs cleanup, niche guidance, BarraCUDA absorption handoff (8 GPU primitive opportunities). **V113:** provenance trio integration, 19 biomeOS capabilities, cross-spring time series, biomeOS deploy graph. **V112:** streaming-only I/O, capability-based runtime discovery.
+**barraCuda:** standalone v0.3.5, **toadStool:** S155
+**Status:** 150+ primitives consumed, 44 GPU modules (all lean), 0 local WGSL, 0 local ODE/regression math, 1,638 tests, 376 experiments, 5,707+ checks, 328 binaries, 200+ named tolerances, `#![forbid(unsafe_code)]`, clippy pedantic+nursery CLEAN. 16 capability domains / 22 methods. Deploy graph with `fallback = "skip"` for optional primals. Typed errors complete across all library code. **See also:** `wateringHole/handoffs/WETSPRING_V120_TOADSTOOL_BARRACUDA_EVOLUTION_HANDOFF_MAR15_2026.md` for current primitive consumption details and evolution targets.
 
 ---
 

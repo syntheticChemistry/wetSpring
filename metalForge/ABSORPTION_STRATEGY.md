@@ -2,7 +2,7 @@
 
 **Date:** March 15, 2026
 **Pattern:** Write → Absorb → Lean (from hotSpring)
-**Status:** V115 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 47 GPU modules total, 0 Tier B/C, 0 Passthrough, standalone barraCuda v0.3.5, 33 petalTongue scenario builders, StreamSession with backpressure, Songbird, wetspring_dashboard. biomeOS niche — deploy graph, 19 capabilities, provenance trio, cross-spring time series. V114: docs cleanup, niche guidance, BarraCUDA absorption handoff. V113: trio + capabilities + deploy graph.
+**Status:** V120 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 44 GPU modules, 0 Tier B/C, 0 Passthrough, standalone barraCuda v0.3.5, toadStool S155. Typed errors complete (`NcbiError`/`DataError` in forge, `Error::Ipc` in barracuda). Deploy graph with `fallback = "skip"`. 16 capability domains / 22 methods. 200+ named tolerances + shared Python tolerance module. V120: cross-spring absorption. V119: niche architecture, typed errors, domain refactoring.
 
 ---
 

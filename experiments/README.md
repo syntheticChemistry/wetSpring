@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-15 (V119: 376 experiments, 354 binaries, 5,707+ checks, 1,687 tests. V119 Deep Debt Evolution Sprint: niche self-knowledge (`niche.rs` + BYOB), typed errors (`VaultError`/`NestError`/`SongbirdError`/`AssemblyError`), 7 large files refactored into domain submodules (net −3,496 lines), `#[expect(reason)]` in 10 binaries, hardcoded primal names → `primal_names.rs` constants + library discovery, `proptest` adopted (4 stochastic property tests), Squirrel AI integration (`ai.ecology_interpret`, 15 domains / 20 methods), clone reduction. Zero clippy warnings, zero fmt violations, zero unsafe.)
+**Updated**: 2026-03-15 (V120: 376 experiments, 354 binaries, 5,707+ checks, 1,638 tests. V120 Cross-Spring Absorption: typed errors completed in forge (`NcbiError`, `DataError`) and barracuda (`Error::Ipc`), deploy graph hardened (`fallback = "skip"` for Squirrel/ToadStool/NestGate/petalTongue), `live_pipeline.rs` refactored, hardcoded primal names eliminated in nestgate/viz, shared Python tolerance module (120+ constants). 16 capability domains / 22 methods. Zero clippy warnings, zero fmt violations, zero unsafe.)
 
 ---
 
@@ -410,7 +410,7 @@ thresholds from `src/tolerances.rs`.
 | `validate_r_industry_parity` | 335 | 53 | `cargo run --release --bin validate_r_industry_parity` |
 
 **Total validation checks**: 5,707+
-**Rust tests**: 1,687 total (1,353 barracuda lib + 234 forge + 98 integration)
+**Rust tests**: 1,638 total (1,404 barracuda lib + 234 forge)
 **Binaries**: 354 total (332 barracuda + 22 forge)
 **barraCuda primitives**: 150+ consumed (standalone v0.3.5, wgpu 28, Fp64Strategy, fused ops)
 **Papers**: 63 (reproduced across 6 tracks)

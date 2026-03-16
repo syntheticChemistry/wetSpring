@@ -9,10 +9,11 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V120** | `handoffs/WETSPRING_V120_CROSS_SPRING_ABSORPTION_HANDOFF_MAR15_2026.md` | Mar 15 | **Cross-Spring Absorption** — typed errors completed (`NcbiError`/`DataError`/`Error::Ipc`), deploy graph hardened (`fallback = "skip"`, Squirrel + ToadStool optional nodes), `live_pipeline.rs` refactored, hardcoding eliminated in nestgate/viz, shared Python tolerance module (120+ constants). |
-| **V119** | `handoffs/WETSPRING_V119_DEEP_DEBT_EVOLUTION_HANDOFF_MAR15_2026.md` | Mar 15 | **Deep Debt Evolution Sprint** — niche self-knowledge, typed errors, 7 large files refactored, `primal_names.rs`, Squirrel AI, `proptest`. |
+| **V120** | `handoffs/WETSPRING_V120_CROSS_SPRING_ABSORPTION_HANDOFF_MAR15_2026.md` | Mar 15 | **Cross-Spring Absorption** — typed errors completed, deploy graph hardened (`fallback = "skip"`), `live_pipeline.rs` refactored, shared Python tolerance module (120+ constants). |
+| **V120** | `handoffs/WETSPRING_V120_TOADSTOOL_BARRACUDA_EVOLUTION_HANDOFF_MAR15_2026.md` | Mar 15 | **toadStool/barraCuda Team** — 44 GPU modules, 150+ primitives consumed, typed error patterns, tolerance centralization, deploy graph integration, ESN evolution, cross-spring learnings. |
+| | *V119 → `handoffs/archive/`* | | V119 Deep Debt Evolution Sprint handoff archived. |
 | | *V113–V118 → `handoffs/archive/`* | | V113–V118 handoffs archived. |
-| | *V112 and earlier → `handoffs/archive/`* | | Fossil record: V7–V112 (95+ archived handoffs) |
+| | *V112 and earlier → `handoffs/archive/`* | | Fossil record: V7–V112 (95+ archived handoffs). 127 total archived. |
 
 ## Cross-Spring Documents
 
