@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(clippy::too_many_lines)]
-#![allow(clippy::cast_precision_loss)]
-#![allow(clippy::cast_possible_truncation)]
-#![allow(clippy::cast_sign_loss)]
-#![allow(clippy::similar_names)]
-#![allow(clippy::many_single_char_names)]
-#![allow(deprecated)]
+#![expect(
+    clippy::cast_precision_loss,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
+    clippy::many_single_char_names,
+    reason = "validation harness: mathematical variable names from papers"
+)]
 //! Exp212: `BarraCuda` CPU Parity v12 — Post-Audit Math Fidelity
 //!
 //! Validates that the V66 audit evolution (byte-native FASTQ, bytemuck

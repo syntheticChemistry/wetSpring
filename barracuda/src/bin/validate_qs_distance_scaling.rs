@@ -1,14 +1,24 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
+#![expect(
     clippy::print_stdout,
-    dead_code,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::similar_names,
+    reason = "validation harness: domain variables from published notation"
+)]
+#![expect(
     clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
     clippy::items_after_statements,
-    clippy::no_effect_underscore_binding
+    reason = "validation harness: local helpers defined near use site"
+)]
+#![expect(
+    clippy::no_effect_underscore_binding,
+    reason = "validation harness: required for domain validation"
 )]
 //! # Exp139: QS Distance Scaling — Bacteria Shouting vs Human Shouting
 //!

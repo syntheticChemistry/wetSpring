@@ -1,13 +1,24 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
+#![expect(
     clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::similar_names,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::cast_precision_loss,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
     clippy::cast_possible_truncation,
+    reason = "validation harness: u128→u64 timing, f64→u32 counts"
+)]
+#![expect(
     clippy::approx_constant,
-    clippy::unnecessary_cast
+    reason = "validation harness: required for domain validation"
+)]
+#![expect(
+    clippy::unnecessary_cast,
+    reason = "validation harness: required for domain validation"
 )]
 //! Exp066: CPU vs GPU Scaling Benchmark — All GPU Domains
 //!

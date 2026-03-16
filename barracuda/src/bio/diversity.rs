@@ -156,6 +156,14 @@ pub fn alpha_diversity(counts: &[f64]) -> AlphaDiversity {
 }
 
 #[cfg(test)]
+#[expect(
+    clippy::cast_precision_loss,
+    reason = "test module: usize→f64 for proptest depth indices"
+)]
+#[expect(
+    clippy::suboptimal_flops,
+    reason = "test module: arithmetic clarity over mul_add in proptests"
+)]
 mod tests {
     use super::*;
 

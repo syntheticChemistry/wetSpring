@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
+#![expect(
     clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::too_many_lines,
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation
+    reason = "validation harness: sequential domain checks in single main()"
 )]
 //! # Exp272: Bio Brain Cross-Spring Validation
 //!

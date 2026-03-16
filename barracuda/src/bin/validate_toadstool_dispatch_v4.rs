@@ -1,16 +1,29 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(clippy::expect_used)]
-#![allow(clippy::unwrap_used)]
-#![allow(clippy::print_stdout)]
-#![allow(clippy::too_many_lines)]
-#![allow(clippy::cast_precision_loss)]
-#![allow(clippy::cast_possible_truncation)]
-#![allow(clippy::cast_sign_loss)]
-#![allow(clippy::similar_names)]
-#![allow(clippy::many_single_char_names)]
-#![allow(clippy::items_after_statements)]
-#![allow(clippy::float_cmp)]
+#![expect(
+    clippy::expect_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
+    clippy::unwrap_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
+    clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
+    clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
+    clippy::cast_precision_loss,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
+    clippy::many_single_char_names,
+    reason = "validation harness: mathematical variable names from papers"
+)]
 //! # Exp349: `ToadStool` Dispatch v4 — V109 Compute Dispatch Validation
 //!
 //! Validates that every `ToadStool` abstraction layer preserves mathematical

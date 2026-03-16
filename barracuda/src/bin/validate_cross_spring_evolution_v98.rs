@@ -1,18 +1,36 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
+#![expect(
     clippy::expect_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::unwrap_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
     clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
     clippy::items_after_statements,
-    clippy::float_cmp,
+    reason = "validation harness: local helpers defined near use site"
+)]
+#![expect(
     clippy::many_single_char_names,
-    clippy::cast_sign_loss,
+    reason = "validation harness: mathematical variable names from papers"
+)]
+#![expect(
     clippy::similar_names,
-    clippy::needless_raw_string_hashes
+    reason = "validation harness: domain variables from published notation"
 )]
 //! # Exp319: Cross-Spring Modern Evolution Validation + Benchmark (V98+)
 //!

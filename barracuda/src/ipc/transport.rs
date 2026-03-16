@@ -42,6 +42,10 @@ impl std::fmt::Display for Transport {
 }
 
 #[cfg(test)]
+#[expect(
+    clippy::unwrap_used,
+    reason = "test module: assertions use unwrap for clarity"
+)]
 mod tests {
     use super::*;
 
@@ -64,7 +68,7 @@ mod tests {
     fn display_format() {
         let dir = tempfile::tempdir().unwrap();
         let sock_path = dir.path().join("test.sock");
-        let t = Transport::Unix(sock_path.clone().into());
+        let t = Transport::Unix(sock_path.clone());
         assert_eq!(t.to_string(), format!("unix:{}", sock_path.display()));
     }
 }

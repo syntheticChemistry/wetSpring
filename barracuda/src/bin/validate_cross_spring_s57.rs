@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
+#![expect(
     clippy::expect_used,
-    clippy::unwrap_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
     clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::cast_possible_wrap,
-    clippy::similar_names,
-    clippy::items_after_statements
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
 //! Exp162: Cross-Spring S57 Evolution — Rewire + Validate + Benchmark
 //!

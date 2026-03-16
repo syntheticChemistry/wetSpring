@@ -1,16 +1,28 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
+#![expect(
     clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::cast_precision_loss,
-    clippy::cast_possible_wrap,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
     clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
     clippy::items_after_statements,
-    dead_code,
+    reason = "validation harness: local helpers defined near use site"
+)]
+#![expect(
     clippy::cast_sign_loss,
-    clippy::cast_possible_truncation
+    reason = "validation harness: non-negative values cast to unsigned"
+)]
+#![expect(
+    clippy::cast_possible_truncation,
+    reason = "validation harness: u128→u64 timing, f64→u32 counts"
 )]
 //! # Exp177: Soil Structure as Function Indicator — Rabot et al. 2018
 //!
@@ -79,8 +91,8 @@ fn main() {
 
     struct StructuralProperty {
         name: &'static str,
-        description: &'static str,
-        anderson_param: &'static str,
+        _description: &'static str,
+        _anderson_param: &'static str,
         good_value: f64,
         poor_value: f64,
     }
@@ -88,29 +100,29 @@ fn main() {
     let properties = [
         StructuralProperty {
             name: "Aggregate stability",
-            description: "Resistance to disruption",
-            anderson_param: "W (disorder)",
+            _description: "Resistance to disruption",
+            _anderson_param: "W (disorder)",
             good_value: 3.0,
             poor_value: 20.0,
         },
         StructuralProperty {
             name: "Porosity",
-            description: "Total void fraction",
-            anderson_param: "Lattice dimension",
+            _description: "Total void fraction",
+            _anderson_param: "Lattice dimension",
             good_value: 5.0,
             poor_value: 15.0,
         },
         StructuralProperty {
             name: "Pore connectivity",
-            description: "Network percolation",
-            anderson_param: "Hopping amplitude t",
+            _description: "Network percolation",
+            _anderson_param: "Hopping amplitude t",
             good_value: 4.0,
             poor_value: 18.0,
         },
         StructuralProperty {
             name: "Pore size distribution",
-            description: "Micro/meso/macro pore ratio",
-            anderson_param: "Energy band width",
+            _description: "Micro/meso/macro pore ratio",
+            _anderson_param: "Energy band width",
             good_value: 5.0,
             poor_value: 16.0,
         },
@@ -200,34 +212,34 @@ fn main() {
     struct Management {
         practice: &'static str,
         aggregate_stability_pct: f64,
-        porosity_pct: f64,
+        _porosity_pct: f64,
     }
 
     let managements = [
         Management {
             practice: "Native forest",
             aggregate_stability_pct: 92.0,
-            porosity_pct: 65.0,
+            _porosity_pct: 65.0,
         },
         Management {
             practice: "No-till + cover crop",
             aggregate_stability_pct: 78.0,
-            porosity_pct: 55.0,
+            _porosity_pct: 55.0,
         },
         Management {
             practice: "Reduced tillage",
             aggregate_stability_pct: 55.0,
-            porosity_pct: 48.0,
+            _porosity_pct: 48.0,
         },
         Management {
             practice: "Conventional tillage",
             aggregate_stability_pct: 35.0,
-            porosity_pct: 42.0,
+            _porosity_pct: 42.0,
         },
         Management {
             practice: "Intensive + bare fallow",
             aggregate_stability_pct: 18.0,
-            porosity_pct: 35.0,
+            _porosity_pct: 35.0,
         },
     ];
 

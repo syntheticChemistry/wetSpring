@@ -40,14 +40,13 @@
 //! Validation class: Pipeline
 //! Provenance: End-to-end pipeline integration test
 
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::similar_names,
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
+#![expect(
     clippy::useless_let_if_seq,
-    clippy::option_if_let_else
+    reason = "validation harness: required for domain validation"
+)]
+#![expect(
+    clippy::option_if_let_else,
+    reason = "validation harness: required for domain validation"
 )]
 
 use std::path::Path;

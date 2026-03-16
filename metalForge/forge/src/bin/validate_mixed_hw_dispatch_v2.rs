@@ -16,6 +16,7 @@
 //! | D5 petalTongue      | Dispatch + inventory scenarios serialize |
 
 use barracuda::unified_hardware::BandwidthTier;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 use wetspring_forge::dispatch::{self, Reason, Workload};
 use wetspring_forge::substrate::{
@@ -236,7 +237,7 @@ fn main() {
         "bridge transfer matches direct",
         bridge_us,
         transfer_1mb,
-        1e-6,
+        tolerances::TRANSFER_TIME_PARITY,
     );
 
     // ── D5: petalTongue Visualization ──

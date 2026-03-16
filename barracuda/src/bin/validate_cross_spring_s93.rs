@@ -1,21 +1,36 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
+#![expect(
     clippy::expect_used,
-    clippy::unwrap_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::too_many_lines,
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
     clippy::similar_names,
-    clippy::many_single_char_names,
+    reason = "validation harness: domain variables from published notation"
+)]
+#![expect(
     clippy::items_after_statements,
-    clippy::float_cmp,
+    reason = "validation harness: local helpers defined near use site"
+)]
+#![expect(
     clippy::doc_markdown,
+    reason = "validation harness: required for domain validation"
+)]
+#![expect(
     clippy::ignored_unit_patterns,
-    clippy::wildcard_imports,
-    clippy::cast_lossless
+    reason = "validation harness: required for domain validation"
+)]
+#![expect(
+    clippy::cast_lossless,
+    reason = "validation harness: required for domain validation"
 )]
 //! # Exp305: Cross-Spring S93 Evolution Validation + Benchmark
 //!

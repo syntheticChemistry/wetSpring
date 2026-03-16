@@ -1,13 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::too_many_lines,
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
-    clippy::similar_names,
-    clippy::many_single_char_names
-)]
 //! Exp206: `BarraCuda` CPU Parity v11 — IPC Dispatch Layer Math Fidelity
 //!
 //! Proves that calling barracuda science functions through the IPC dispatch

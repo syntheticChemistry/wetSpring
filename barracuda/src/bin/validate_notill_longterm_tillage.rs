@@ -1,17 +1,28 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
+#![expect(
     clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::cast_precision_loss,
-    clippy::cast_possible_wrap,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
     clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
     clippy::items_after_statements,
-    clippy::needless_range_loop,
-    dead_code,
+    reason = "validation harness: local helpers defined near use site"
+)]
+#![expect(
     clippy::cast_sign_loss,
-    clippy::cast_possible_truncation
+    reason = "validation harness: non-negative values cast to unsigned"
+)]
+#![expect(
+    clippy::cast_possible_truncation,
+    reason = "validation harness: u128→u64 timing, f64→u32 counts"
 )]
 //! # Exp175: Long-Term Tillage Effects — Liang et al. 2015
 //!

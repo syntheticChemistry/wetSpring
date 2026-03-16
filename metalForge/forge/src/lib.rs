@@ -4,10 +4,9 @@
 #![deny(clippy::expect_used, clippy::unwrap_used)]
 #![deny(missing_docs)]
 #![warn(clippy::pedantic, clippy::nursery)]
-#![allow(
+#![expect(
     clippy::module_name_repetitions,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss
+    reason = "ecosystem convention: primal modules use domain-qualified names"
 )]
 
 //! wetSpring Forge v0.3.0 — hardware discovery, dispatch, and absorption tracking.

@@ -8,7 +8,10 @@
     clippy::print_stdout,
     reason = "validation binary: stdout is the output medium"
 )]
-#![allow(clippy::field_reassign_with_default)]
+#![expect(
+    clippy::field_reassign_with_default,
+    reason = "validation harness: incremental struct field override for clarity"
+)]
 //! # Exp108: Vibrio QS Parameter Landscape via GPU ODE Sweep
 //!
 //! Sweeps 1024 QS parameter combinations through `OdeSweepGpu`, mapping the

@@ -1,10 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
+#![expect(
     clippy::expect_used,
-    clippy::unwrap_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::print_stdout,
-    clippy::cast_precision_loss
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
+    clippy::cast_precision_loss,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
 //! # Exp159: NMF Drug-Disease Matrix Factorization
 //!

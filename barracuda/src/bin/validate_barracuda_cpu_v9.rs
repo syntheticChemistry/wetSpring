@@ -1,11 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::too_many_lines,
+#![expect(
     clippy::cast_precision_loss,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
     clippy::cast_possible_truncation,
+    reason = "validation harness: u128→u64 timing, f64→u32 counts"
+)]
+#![expect(
     clippy::cast_sign_loss,
-    clippy::similar_names
+    reason = "validation harness: non-negative values cast to unsigned"
 )]
 //! Exp163: `BarraCuda` CPU Parity v9 — Pure Rust Math for Track 3 Drug Repurposing
 //!

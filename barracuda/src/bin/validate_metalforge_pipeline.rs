@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::too_many_lines,
+#![expect(
     clippy::cast_precision_loss,
-    clippy::cast_possible_truncation
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
+    clippy::cast_possible_truncation,
+    reason = "validation harness: u128→u64 timing, f64→u32 counts"
 )]
 //! Exp086: `metalForge` End-to-End Pipeline Proof
 //!

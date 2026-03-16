@@ -1,14 +1,20 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
+#![expect(
     clippy::unwrap_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::print_stdout,
-    clippy::cast_precision_loss,
-    clippy::cast_possible_wrap,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::too_many_lines,
-    dead_code,
-    clippy::items_after_statements
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
+    clippy::items_after_statements,
+    reason = "validation harness: local helpers defined near use site"
 )]
 //! # Exp170: Soil QS-Pore Geometry — Martínez-García et al. 2023
 //!
@@ -265,7 +271,7 @@ fn main() {
         name: &'static str,
         pore_um: f64,
         expect_qs: bool,
-        expect_coop: bool,
+        _expect_coop: bool,
     }
 
     let scenarios = [
@@ -273,25 +279,25 @@ fn main() {
             name: "Sandy loam (large pores, 100µm)",
             pore_um: 100.0,
             expect_qs: true,
-            expect_coop: true,
+            _expect_coop: true,
         },
         SoilScenario {
             name: "Clay (small pores, 5µm)",
             pore_um: 5.0,
             expect_qs: false,
-            expect_coop: false,
+            _expect_coop: false,
         },
         SoilScenario {
             name: "No-till aggregate (mixed, 80µm)",
             pore_um: 80.0,
             expect_qs: true,
-            expect_coop: true,
+            _expect_coop: true,
         },
         SoilScenario {
             name: "Tilled (destroyed aggregates, 15µm)",
             pore_um: 15.0,
             expect_qs: false,
-            expect_coop: false,
+            _expect_coop: false,
         },
     ];
 

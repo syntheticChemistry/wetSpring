@@ -1,17 +1,32 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
+#![expect(
     clippy::expect_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::unwrap_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
     clippy::cast_precision_loss,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
     clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
-    clippy::similar_names,
+    reason = "validation harness: u128→u64 timing, f64→u32 counts"
+)]
+#![expect(
     clippy::items_after_statements,
-    clippy::many_single_char_names,
-    dead_code
+    reason = "validation harness: local helpers defined near use site"
 )]
 //! # Exp228: `metalForge` v8 — Cross-System (GPU → NPU → CPU) Dispatch
 //!
@@ -165,48 +180,48 @@ fn main() {
     v.section("MF04: GPU→NPU→CPU Routing Model");
 
     struct WorkloadRoute {
-        name: &'static str,
+        _name: &'static str,
         optimal_substrate: &'static str,
     }
     let routes = [
         WorkloadRoute {
-            name: "Diversity (fused)",
+            _name: "Diversity (fused)",
             optimal_substrate: "GPU",
         },
         WorkloadRoute {
-            name: "GEMM (matmul)",
+            _name: "GEMM (matmul)",
             optimal_substrate: "GPU",
         },
         WorkloadRoute {
-            name: "ODE sweep",
+            _name: "ODE sweep",
             optimal_substrate: "GPU",
         },
         WorkloadRoute {
-            name: "Anderson eigens",
+            _name: "Anderson eigens",
             optimal_substrate: "GPU",
         },
         WorkloadRoute {
-            name: "NMF factorize",
+            _name: "NMF factorize",
             optimal_substrate: "GPU",
         },
         WorkloadRoute {
-            name: "ESN classify",
+            _name: "ESN classify",
             optimal_substrate: "NPU",
         },
         WorkloadRoute {
-            name: "Spectral triage",
+            _name: "Spectral triage",
             optimal_substrate: "NPU",
         },
         WorkloadRoute {
-            name: "Int8 basecall",
+            _name: "Int8 basecall",
             optimal_substrate: "NPU",
         },
         WorkloadRoute {
-            name: "FASTQ parsing",
+            _name: "FASTQ parsing",
             optimal_substrate: "CPU",
         },
         WorkloadRoute {
-            name: "Tree traversal",
+            _name: "Tree traversal",
             optimal_substrate: "CPU",
         },
     ];

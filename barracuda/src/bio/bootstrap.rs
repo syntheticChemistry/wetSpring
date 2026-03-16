@@ -156,6 +156,14 @@ pub fn bootstrap_support(
 }
 
 #[cfg(test)]
+#[expect(
+    clippy::expect_used,
+    reason = "test module: assertions use expect for clarity"
+)]
+#[expect(
+    clippy::cast_precision_loss,
+    reason = "test module: usize→f64 for sample mean computation"
+)]
 mod tests {
     use super::*;
     use crate::bio::felsenstein::encode_dna;

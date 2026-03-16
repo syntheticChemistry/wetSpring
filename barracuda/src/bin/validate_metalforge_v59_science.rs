@@ -1,16 +1,20 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
+#![expect(
     clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
     clippy::similar_names,
-    clippy::items_after_statements,
+    reason = "validation harness: domain variables from published notation"
+)]
+#![expect(
     clippy::many_single_char_names,
-    dead_code
+    reason = "validation harness: mathematical variable names from papers"
 )]
 //! Exp192: `metalForge` V59 Cross-Substrate — CPU↔GPU Parity for Science Domains
 //!

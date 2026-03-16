@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! FASTQ parser tests.
 
-#![allow(
-    clippy::expect_used,
+#![expect(
     clippy::unwrap_used,
-    clippy::redundant_closure_for_method_calls
+    reason = "test module: assertions use unwrap for clarity"
+)]
+#![expect(
+    clippy::redundant_closure_for_method_calls,
+    reason = "test module: closures clarify intent in iterator chains"
 )]
 
 use super::*;

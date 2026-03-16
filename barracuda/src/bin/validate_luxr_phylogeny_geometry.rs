@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
+#![expect(
     clippy::print_stdout,
-    dead_code
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
+    dead_code,
+    reason = "validation harness: helper functions used conditionally across domains"
 )]
 //! # Exp146: luxR Phylogeny × Habitat Geometry Overlay
 //!

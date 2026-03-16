@@ -4,7 +4,10 @@
     clippy::print_stdout,
     reason = "validation binary: stdout is the output medium"
 )]
-#![allow(clippy::many_single_char_names, dead_code)]
+#![expect(
+    clippy::many_single_char_names,
+    reason = "validation harness: mathematical variable names from papers"
+)]
 //! # Exp128: Vent Chimney Geometry QS Prediction
 //!
 //! Maps hydrothermal vent chimney physical parameters (porosity, mineral

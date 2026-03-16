@@ -1,16 +1,20 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
+#![expect(
     clippy::expect_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::unwrap_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::print_stdout,
-    clippy::too_many_lines,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
-    clippy::similar_names,
-    clippy::items_after_statements,
-    clippy::many_single_char_names
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
 //! # Exp214: NUCLEUS Mixed Hardware V8 — V66 I/O Evolution via IPC
 //!

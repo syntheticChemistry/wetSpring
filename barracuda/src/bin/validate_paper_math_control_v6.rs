@@ -1,16 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(clippy::expect_used)]
-#![allow(clippy::unwrap_used)]
-#![allow(clippy::print_stdout)]
-#![allow(clippy::too_many_lines)]
-#![allow(clippy::cast_precision_loss)]
-#![allow(clippy::cast_possible_truncation)]
-#![allow(clippy::cast_sign_loss)]
-#![allow(clippy::similar_names)]
-#![allow(clippy::many_single_char_names)]
-#![allow(clippy::items_after_statements)]
-#![allow(clippy::float_cmp)]
+#![expect(
+    clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
+    clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
 //! # Exp341: Paper Math Control v6 — 63 Papers (V108)
 //!
 //! Extends v5 (52 papers, Exp313) with Track 5 immuno-Anderson (P53-P58)

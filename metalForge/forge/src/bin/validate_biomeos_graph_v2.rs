@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
+#![expect(
     clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
     clippy::print_stdout,
-    clippy::similar_names
+    reason = "validation harness: results printed to stdout"
 )]
 //! # Exp290: biomeOS Graph v2 — Tower/Node/Nest + Sovereign Pipeline
 //!

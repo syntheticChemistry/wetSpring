@@ -1,12 +1,24 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
+#![expect(
     clippy::expect_used,
-    clippy::unwrap_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::similar_names,
+    reason = "validation harness: domain variables from published notation"
+)]
+#![expect(
     clippy::cast_precision_loss,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
     clippy::cast_possible_truncation,
-    clippy::too_many_lines
+    reason = "validation harness: u128→u64 timing, f64→u32 counts"
+)]
+#![expect(
+    clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
 )]
 //! Exp064: `BarraCuda` GPU Parity v1 — Consolidated GPU Domain Validation
 //!

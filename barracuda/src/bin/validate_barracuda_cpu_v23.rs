@@ -8,15 +8,25 @@
     clippy::print_stdout,
     reason = "validation binary: stdout is the output medium"
 )]
-#![allow(
+#![expect(
     clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
     clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
     clippy::cast_sign_loss,
+    reason = "validation harness: non-negative values cast to unsigned"
+)]
+#![expect(
     clippy::similar_names,
+    reason = "validation harness: domain variables from published notation"
+)]
+#![expect(
     clippy::many_single_char_names,
-    clippy::items_after_statements,
-    clippy::float_cmp
+    reason = "validation harness: mathematical variable names from papers"
 )]
 //! # Exp306: `BarraCuda` CPU v23 — V97 Fused Ops Decomposition Parity
 //!

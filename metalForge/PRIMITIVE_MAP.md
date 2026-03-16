@@ -5,7 +5,7 @@
 GPU primitive (or explain why it stays CPU-only). This guides the
 absorption pipeline and identifies what ToadStool needs to build next.
 
-> **Mar 16 update (V121):** 150+ primitives consumed. 0 local WGSL, 0 local derivative math (fully lean). 28 petalTongue scenario builders. standalone barraCuda v0.3.5. 376 experiments, 5,707+ checks. All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed). Forge crate v0.3.0 (234 tests, 90% coverage). 1,685 tests, 354 binaries, 214 named tolerances (zero inline literals), clippy pedantic+nursery CLEAN, zero `#[allow()]` in production code. V121: deep debt evolution (tolerance centralization, lint evolution, primal name constants).
+> **Mar 16 update (V122):** 150+ primitives consumed. 0 local WGSL, 0 local derivative math (fully lean). 28 petalTongue scenario builders. standalone barraCuda v0.3.5. 376 experiments, 5,707+ checks. All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed). Forge crate v0.3.0 (252 tests, 90%+ coverage). 1,703 tests, 354 binaries, 214 named tolerances (zero inline literals), clippy pedantic+nursery CLEAN, **zero `#[allow()]` in entire codebase**. V122: modern idiomatic Rust evolution (298 files, `#[expect(reason)]` migration, 18 new forge tests).
 
 ---
 

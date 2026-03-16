@@ -12,10 +12,19 @@
 //! - **Primal Self-Knowledge**: wetSpring discovers NPU, never hardcodes
 //! - **Fast AND Safe**: Pure Rust driver (sourced from toadStool neuromorphic crates)
 
-#![allow(
+#![expect(
     clippy::cast_possible_truncation,
+    reason = "NPU interop: u128→u64 timing (valid for durations < 580 years), \
+              f64→i8 quantization where clamping guarantees [0,127] range"
+)]
+#![expect(
     clippy::cast_possible_wrap,
-    clippy::cast_precision_loss
+    reason = "NPU DMA: i8↔u8 bit reinterpretation for int8 data path"
+)]
+#![expect(
+    clippy::cast_precision_loss,
+    reason = "NPU metrics: usize→f64 for batch counts and timing ratios; \
+              values well within f64 53-bit significand"
 )]
 
 pub use akida_driver::{

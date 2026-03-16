@@ -1,13 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::similar_names,
+#![expect(
     clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
     clippy::needless_range_loop,
-    clippy::missing_const_for_fn
+    reason = "validation harness: index needed for multi-array access"
+)]
+#![expect(
+    clippy::missing_const_for_fn,
+    reason = "validation harness: required for domain validation"
 )]
 //! Exp049: GPU ODE Parameter Sweep — QS/c-di-GMP
 //! Exp050: GPU Bifurcation Eigenvalue Analysis

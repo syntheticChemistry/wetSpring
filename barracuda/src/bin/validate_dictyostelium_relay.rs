@@ -1,10 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
+#![expect(
     clippy::print_stdout,
-    clippy::cast_precision_loss
+    reason = "validation harness: results printed to stdout"
 )]
 //! # Exp156: Dictyostelium cAMP Relay — Non-Hermitian Anderson Analysis
 //!

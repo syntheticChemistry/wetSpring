@@ -1,15 +1,20 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
+#![expect(
     clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
     clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
     clippy::items_after_statements,
-    clippy::similar_names,
-    dead_code
+    reason = "validation harness: local helpers defined near use site"
 )]
 //! # Exp282: Gonzales 2013 — IL-31 Serum Elevation & Anderson Disorder (Paper 53)
 //!
@@ -316,7 +321,7 @@ fn main() {
         epi_thickness_um: f64,
         il31_serum_ad_pg_ml: f64,
         il31_serum_healthy_pg_ml: f64,
-        jak1_ic50_nm: f64,
+        _jak1_ic50_nm: f64,
     }
 
     let species = [
@@ -325,14 +330,14 @@ fn main() {
             epi_thickness_um: 25.0,
             il31_serum_ad_pg_ml: 53.0,
             il31_serum_healthy_pg_ml: 5.5,
-            jak1_ic50_nm: 10.0,
+            _jak1_ic50_nm: 10.0,
         },
         SpeciesIl31 {
             name: "Human",
             epi_thickness_um: 75.0,
             il31_serum_ad_pg_ml: 40.0,
             il31_serum_healthy_pg_ml: 8.0,
-            jak1_ic50_nm: 12.0,
+            _jak1_ic50_nm: 12.0,
         },
     ];
 

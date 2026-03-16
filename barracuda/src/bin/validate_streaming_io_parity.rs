@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
+#![expect(
     clippy::unwrap_used,
-    clippy::print_stdout,
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
-    clippy::redundant_closure_for_method_calls
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
+    clippy::redundant_closure_for_method_calls,
+    reason = "validation harness: required for domain validation"
 )]
 //! # Exp209: Streaming I/O Parity Validation
 //!

@@ -32,12 +32,9 @@
 //! Validation class: GPU-parity
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
-#![allow(
+#![expect(
     clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::similar_names,
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation
+    reason = "validation harness: fail-fast on setup errors"
 )]
 
 use wetspring_barracuda::bio::{

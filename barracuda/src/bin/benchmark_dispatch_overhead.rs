@@ -1,13 +1,20 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
+#![expect(
     clippy::expect_used,
-    clippy::unwrap_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::similar_names,
+    reason = "validation harness: domain variables from published notation"
+)]
+#![expect(
     clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
     clippy::too_many_lines,
-    clippy::approx_constant
+    reason = "validation harness: sequential domain checks in single main()"
 )]
 //! Exp067: `ToadStool` Dispatch Overhead Profiling
 //!

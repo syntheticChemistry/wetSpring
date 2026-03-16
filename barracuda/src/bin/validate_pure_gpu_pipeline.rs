@@ -1,12 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
+#![expect(
     clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::similar_names,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::too_many_lines
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
+    clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
 )]
 //! Exp075: Pure GPU Multi-Stage Analytics Pipeline
 //!

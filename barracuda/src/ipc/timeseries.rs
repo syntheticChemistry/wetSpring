@@ -210,6 +210,10 @@ pub fn build_diversity_series(
 
 #[cfg(test)]
 #[expect(clippy::unwrap_used)]
+#[expect(
+    clippy::approx_constant,
+    reason = "3.14 is a Shannon diversity value, not std::f64::consts::PI"
+)]
 mod tests {
     use super::*;
 

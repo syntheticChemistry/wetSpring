@@ -4,7 +4,7 @@
 
 #![expect(clippy::unwrap_used)]
 
-use super::{NestClient, discover_nestgate_socket};
+use super::{NestClient, default_socket_path, discover_nestgate_socket};
 use super::{base64, json, time};
 
 #[test]
@@ -483,4 +483,29 @@ fn client_retrieve_blob_error_returns_none() {
     let client = NestClient::new(sock);
     let result = client.retrieve_blob("missing").unwrap();
     assert!(result.is_none());
+}
+
+#[test]
+fn default_socket_path_returns_non_empty() {
+    let path = default_socket_path();
+    assert!(!path.as_os_str().is_empty());
+    assert!(path.to_string_lossy().contains("nestgate"));
+}
+
+#[test]
+fn discover_nestgate_socket_returns_none_when_no_socket() {
+    let result = discover_nestgate_socket();
+    if let Some(path) = result {
+        assert!(path.exists(), "discovered socket must exist");
+    }
+}
+
+#[test]
+fn default_socket_path_contains_nestgate() {
+    let path = default_socket_path();
+    let path_str = path.to_string_lossy();
+    assert!(
+        path_str.contains("nestgate"),
+        "socket path should contain 'nestgate': {path_str}"
+    );
 }

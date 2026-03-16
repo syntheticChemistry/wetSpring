@@ -1,10 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
+#![expect(
     clippy::expect_used,
-    clippy::unwrap_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::too_many_lines,
-    clippy::cast_precision_loss
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
+    clippy::cast_precision_loss,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
 //! Exp100: `metalForge` Cross-Substrate v4 — 20 Domains + NPU Dispatch
 //!

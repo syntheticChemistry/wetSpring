@@ -1,13 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::print_stdout,
-    clippy::too_many_lines,
+#![expect(
     clippy::cast_precision_loss,
-    clippy::items_after_statements,
-    clippy::float_cmp
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
 //! Exp337: Chen 2016 — Culture conditions response.
 //! Lightweight validator for single-paper math.

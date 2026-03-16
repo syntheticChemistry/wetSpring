@@ -26,11 +26,17 @@
 //! Validation class: Pipeline
 //! Provenance: End-to-end pipeline integration test
 
-#![allow(
+#![expect(
     clippy::expect_used,
-    clippy::unwrap_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::cast_precision_loss,
-    clippy::cast_possible_truncation
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
+    clippy::cast_possible_truncation,
+    reason = "validation harness: u128→u64 timing, f64→u32 counts"
 )]
 
 use wetspring_barracuda::tolerances;

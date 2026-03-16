@@ -1,12 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
+#![expect(
     clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::too_many_lines,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::print_stdout,
-    clippy::cast_precision_loss,
-    clippy::items_after_statements
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
+    clippy::items_after_statements,
+    reason = "validation harness: local helpers defined near use site"
 )]
 //! # Exp213: Compute Dispatch + Streaming Evolution (V66)
 //!

@@ -1,10 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::too_many_lines,
-    clippy::cast_precision_loss,
-    clippy::similar_names
-)]
 //! Exp102: `BarraCuda` CPU Parity v8 — Pure Rust Math for 13 GPU-Promoted Domains
 //!
 //! Validates that the 13 modules promoted to GPU in the pure GPU completion

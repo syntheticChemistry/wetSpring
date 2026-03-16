@@ -1,17 +1,20 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
+#![expect(
     clippy::unwrap_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::too_many_lines,
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
     clippy::similar_names,
-    clippy::many_single_char_names,
-    clippy::items_after_statements,
-    clippy::float_cmp
+    reason = "validation harness: domain variables from published notation"
 )]
 //! # Exp351: `metalForge` v19 — V109 Mixed Hardware + NUCLEUS Atomics
 //!

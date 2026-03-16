@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
+#![expect(
     clippy::print_stdout,
-    clippy::cast_precision_loss,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
+    reason = "validation harness: u128→u64 timing, f64→u32 counts"
+)]
+#![expect(
     clippy::too_many_lines,
-    clippy::similar_names
+    reason = "validation harness: sequential domain checks in single main()"
 )]
 //! # Exp184b: GPU Anderson Finite-Size Scaling L=14–20
 //!

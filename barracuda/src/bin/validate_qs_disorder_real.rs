@@ -1,11 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
+#![expect(
     clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::many_single_char_names,
-    clippy::items_after_statements
+    reason = "validation harness: mathematical variable names from papers"
+)]
+#![expect(
+    clippy::items_after_statements,
+    reason = "validation harness: local helpers defined near use site"
 )]
 //! # Exp113: QS-Disorder Prediction from Real Metagenomics Diversity
 //!

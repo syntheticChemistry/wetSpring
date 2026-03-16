@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
+#![expect(
     clippy::expect_used,
-    clippy::unwrap_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::too_many_lines,
-    clippy::similar_names
+    reason = "validation harness: sequential domain checks in single main()"
 )]
 //! Exp221: Tower Atomic Wiring + Real Data Validation (V68)
 //!

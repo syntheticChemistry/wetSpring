@@ -1,14 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
+#![expect(
     clippy::print_stdout,
-    dead_code,
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::cast_sign_loss,
-    clippy::cast_possible_wrap
+    reason = "validation harness: non-negative values cast to unsigned"
 )]
 //! # Exp141: NCBI QS Gene Query by Habitat
 //!

@@ -367,6 +367,10 @@ impl PetalTonguePushClient {
 }
 
 #[cfg(test)]
+#[expect(
+    clippy::unwrap_used,
+    reason = "test module: assertions use unwrap for clarity"
+)]
 mod tests {
     use super::*;
 
@@ -388,7 +392,7 @@ mod tests {
     fn new_creates_client_with_path() {
         let dir = tempfile::tempdir().unwrap();
         let sock_path = dir.path().join("test.sock");
-        let client = PetalTonguePushClient::new(sock_path.clone().into());
+        let client = PetalTonguePushClient::new(sock_path.clone());
         assert_eq!(client.socket_path, sock_path);
     }
 
@@ -436,7 +440,7 @@ mod tests {
         };
         let dir = tempfile::tempdir().unwrap();
         let sock_path = dir.path().join("test.sock");
-        let client = PetalTonguePushClient::new(sock_path.into());
+        let client = PetalTonguePushClient::new(sock_path);
         let _ = client.push_render_with_domain("s1", "Test", &scenario, "measurement");
     }
 

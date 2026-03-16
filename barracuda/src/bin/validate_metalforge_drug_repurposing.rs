@@ -1,14 +1,32 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
+#![expect(
     clippy::expect_used,
-    clippy::unwrap_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::cast_precision_loss,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
     clippy::cast_possible_truncation,
+    reason = "validation harness: u128→u64 timing, f64→u32 counts"
+)]
+#![expect(
     clippy::cast_sign_loss,
+    reason = "validation harness: non-negative values cast to unsigned"
+)]
+#![expect(
     clippy::similar_names,
-    clippy::items_after_statements
+    reason = "validation harness: domain variables from published notation"
+)]
+#![expect(
+    clippy::items_after_statements,
+    reason = "validation harness: local helpers defined near use site"
 )]
 //! Exp165: `metalForge` Drug Repurposing — CPU vs GPU Cross-Substrate Parity
 //!

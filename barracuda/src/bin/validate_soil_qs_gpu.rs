@@ -1,18 +1,28 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
+#![expect(
     clippy::expect_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::unwrap_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::cast_precision_loss,
-    clippy::cast_possible_wrap,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
     clippy::too_many_lines,
-    clippy::items_after_statements,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
     clippy::similar_names,
-    clippy::needless_range_loop,
-    dead_code
+    reason = "validation harness: domain variables from published notation"
 )]
 //! # Exp180: Track 4 GPU Validation — Soil QS on GPU
 //!

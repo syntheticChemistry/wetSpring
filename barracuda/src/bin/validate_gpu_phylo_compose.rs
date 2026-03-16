@@ -1,15 +1,24 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::similar_names,
+#![expect(
     clippy::cast_precision_loss,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
     clippy::cast_possible_truncation,
+    reason = "validation harness: u128→u64 timing, f64→u32 counts"
+)]
+#![expect(
     clippy::too_many_arguments,
+    reason = "validation harness: required for domain validation"
+)]
+#![expect(
     clippy::map_unwrap_or,
+    reason = "validation harness: required for domain validation"
+)]
+#![expect(
     clippy::items_after_statements,
-    clippy::redundant_closure_for_method_calls
+    reason = "validation harness: local helpers defined near use site"
 )]
 //! Exp046: GPU Phylogenetic Composition
 //!

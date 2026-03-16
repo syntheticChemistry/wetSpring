@@ -1,11 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
+#![expect(
     clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::cast_precision_loss,
-    dead_code
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
+    dead_code,
+    reason = "validation harness: helper functions used conditionally across domains"
 )]
 //! # Exp154: Marine Interkingdom QS — Refining Planktonic Predictions
 //!

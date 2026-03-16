@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
+#![expect(
     clippy::print_stdout,
-    dead_code,
-    clippy::too_many_lines
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
+    clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
 )]
 //! # Exp136: Square-Cubed Law & Interior Fraction Scaling
 //!

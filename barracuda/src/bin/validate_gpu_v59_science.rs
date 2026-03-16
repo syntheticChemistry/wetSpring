@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
+#![expect(
     clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
-    clippy::similar_names,
-    clippy::items_after_statements,
-    clippy::many_single_char_names
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
+    clippy::many_single_char_names,
+    reason = "validation harness: mathematical variable names from papers"
 )]
 //! Exp191: GPU V59 Science Parity — Diversity + Anderson on GPU vs CPU
 //!

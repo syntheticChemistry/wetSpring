@@ -117,10 +117,12 @@ mod tests {
     }
 
     fn gpu_substrate(name: &str) -> Substrate {
-        let mut props = Properties::default();
-        props.has_f64 = true;
-        props.core_count = Some(2048);
-        props.thread_count = Some(2048);
+        let props = Properties {
+            has_f64: true,
+            core_count: Some(2048),
+            thread_count: Some(2048),
+            ..Properties::default()
+        };
         Substrate {
             kind: SubstrateKind::Gpu,
             identity: Identity {

@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
+#![expect(
     clippy::print_stdout,
-    clippy::cast_precision_loss,
-    clippy::cast_possible_wrap,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
     clippy::items_after_statements,
-    dead_code
+    reason = "validation harness: local helpers defined near use site"
 )]
 //! # Exp174: No-Till Meta-Analysis — Zuber & Villamil 2016
 //!
@@ -148,7 +150,7 @@ fn main() {
 
     struct DepthLayer {
         label: &'static str,
-        depth_cm: f64,
+        _depth_cm: f64,
         notill_w: f64,
         tilled_w: f64,
     }
@@ -156,25 +158,25 @@ fn main() {
     let layers = [
         DepthLayer {
             label: "0-5 cm (surface)",
-            depth_cm: 2.5,
+            _depth_cm: 2.5,
             notill_w: 4.0,
             tilled_w: 18.0,
         },
         DepthLayer {
             label: "5-15 cm",
-            depth_cm: 10.0,
+            _depth_cm: 10.0,
             notill_w: 6.0,
             tilled_w: 14.0,
         },
         DepthLayer {
             label: "15-30 cm",
-            depth_cm: 22.5,
+            _depth_cm: 22.5,
             notill_w: 10.0,
             tilled_w: 12.0,
         },
         DepthLayer {
             label: ">30 cm (deep)",
-            depth_cm: 40.0,
+            _depth_cm: 40.0,
             notill_w: 11.0,
             tilled_w: 11.5,
         },

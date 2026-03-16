@@ -213,6 +213,10 @@ pub fn required_dependency_count() -> usize {
 }
 
 #[cfg(test)]
+#[expect(
+    clippy::expect_used,
+    reason = "test module: assertions use expect for clarity"
+)]
 mod tests {
     use super::*;
 
@@ -259,7 +263,8 @@ mod tests {
 
     #[test]
     fn deploy_graph_path_is_toml() {
-        assert!(deploy_graph_path().ends_with(".toml"));
+        let path = std::path::Path::new(deploy_graph_path());
+        assert_eq!(path.extension().and_then(|e| e.to_str()), Some("toml"));
     }
 
     #[cfg(feature = "json")]

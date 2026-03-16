@@ -2,7 +2,7 @@
 
 **Date:** March 15, 2026
 **Pattern:** Write → Absorb → Lean (from hotSpring)
-**Status:** V121 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 44 GPU modules, 0 Tier B/C, 0 Passthrough, standalone barraCuda v0.3.5, toadStool S155. 1,685 tests, 354 binaries, 214 named tolerances (zero inline literals), zero `#[allow()]` in production code. 16 capability domains / 20 methods. All primal names via `primal_names::*`. V121: deep debt evolution (tolerance centralization, lint evolution). V120: cross-spring absorption, typed errors, deploy graph.
+**Status:** V122 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 44 GPU modules, 0 Tier B/C, 0 Passthrough, standalone barraCuda v0.3.5, toadStool S155. 1,703 tests, 354 binaries, 214 named tolerances (zero inline literals), **zero `#[allow()]` in entire codebase** — all `#[expect(reason)]`. 16 capability domains / 20 methods. All primal names via `primal_names::*`. V122: modern idiomatic Rust evolution (298 files, `#[expect(reason)]` migration). V121: tolerance centralization. V120: typed errors, deploy graph.
 
 ---
 

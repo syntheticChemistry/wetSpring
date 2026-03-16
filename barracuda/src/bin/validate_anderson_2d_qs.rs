@@ -1,12 +1,20 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
+#![expect(
     clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::cast_precision_loss,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
     clippy::too_many_lines,
-    clippy::items_after_statements
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
+    clippy::items_after_statements,
+    reason = "validation harness: local helpers defined near use site"
 )]
 //! # Exp122: 2D Anderson Spatial QS Lattice
 //!

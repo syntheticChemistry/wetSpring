@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
+#![expect(
     clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::similar_names,
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
+    clippy::cast_possible_truncation,
+    reason = "validation harness: u128→u64 timing, f64→u32 counts"
 )]
 //! Exp058: GPU Track 1c Promotion — ANI + SNP + Pangenome + dN/dS
 //!

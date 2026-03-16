@@ -14,6 +14,7 @@
 //! | E5 Workloads | `data_bytes` wired into bandwidth-sensitive workloads |
 
 use wetspring_barracuda::bio::{hmm, pangenome};
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 fn main() {
@@ -27,12 +28,17 @@ fn main() {
     if let Some(ref r) = fit {
         v.check_pass("slope() available", r.slope().is_some());
         v.check_pass("intercept() available", r.intercept().is_some());
-        v.check("slope() ≈ 2.0", r.slope().unwrap_or(0.0), 2.0, 1e-10);
+        v.check(
+            "slope() ≈ 2.0",
+            r.slope().unwrap_or(0.0),
+            2.0,
+            tolerances::ANALYTICAL_LOOSE,
+        );
         v.check(
             "intercept() ≈ 0.0",
             r.intercept().unwrap_or(99.0),
             0.0,
-            1e-10,
+            tolerances::ANALYTICAL_LOOSE,
         );
         v.check_pass("coefficients() returns slice", r.coefficients().len() >= 2);
     }
@@ -126,13 +132,13 @@ fn main() {
         "default leading_min_quality",
         f64::from(params.leading_min_quality),
         3.0,
-        0.0,
+        tolerances::EXACT,
     );
     v.check(
         "default trailing_min_quality",
         f64::from(params.trailing_min_quality),
         3.0,
-        0.0,
+        tolerances::EXACT,
     );
 
     // ── E5: Workload data_bytes ──

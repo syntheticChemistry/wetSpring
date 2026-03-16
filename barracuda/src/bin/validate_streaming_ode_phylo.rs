@@ -1,19 +1,24 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
+#![expect(
     clippy::expect_used,
-    clippy::unwrap_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::cast_precision_loss,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
     clippy::cast_possible_truncation,
+    reason = "validation harness: u128→u64 timing, f64→u32 counts"
+)]
+#![expect(
     clippy::cast_possible_wrap,
-    clippy::similar_names,
+    reason = "validation harness: i8↔u8 bit reinterpretation for NPU data path"
+)]
+#![expect(
     clippy::needless_range_loop,
-    clippy::too_many_arguments,
-    clippy::items_after_statements,
-    clippy::cloned_ref_to_slice_refs,
-    clippy::collection_is_never_read,
-    clippy::match_same_arms,
-    clippy::assigning_clones
+    reason = "validation harness: index needed for multi-array access"
 )]
 //! Exp106: Pure GPU Streaming — ODE Biology + Phylogenetics
 //!

@@ -8,13 +8,17 @@
     clippy::print_stdout,
     reason = "validation binary: stdout is the output medium"
 )]
-#![allow(
+#![expect(
     clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
     clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
     clippy::items_after_statements,
-    clippy::similar_names,
-    dead_code
+    reason = "validation harness: local helpers defined near use site"
 )]
 //! # Exp280: Gonzales 2014 — Oclacitinib IC50 Dose-Response (Paper 54)
 //!

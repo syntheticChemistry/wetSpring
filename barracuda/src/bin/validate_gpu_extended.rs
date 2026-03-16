@@ -4,7 +4,10 @@
     clippy::expect_used,
     reason = "validation binary: expect() for pass/fail assertions"
 )]
-#![allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
+#![expect(
+    clippy::cast_precision_loss,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
 //! Exp087: GPU Extended Domains — EIC, `PCoA`, Kriging, Rarefaction
 //!
 //! Extends the GPU validation suite with 4 previously uncovered domains:

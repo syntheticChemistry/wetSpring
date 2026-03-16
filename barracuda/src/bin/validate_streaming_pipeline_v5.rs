@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::too_many_lines,
+#![expect(
     clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::items_after_statements,
-    clippy::print_stdout
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
+    clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
 )]
 //! # Exp231: Streaming Pipeline v5 — Diversity → L2 → `PCoA` → Rarefaction Chain
 //!

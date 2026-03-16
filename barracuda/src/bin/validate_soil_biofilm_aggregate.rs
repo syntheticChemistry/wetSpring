@@ -1,14 +1,20 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
+#![expect(
     clippy::unwrap_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::print_stdout,
-    clippy::cast_precision_loss,
-    clippy::cast_possible_wrap,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
     clippy::items_after_statements,
-    dead_code
+    reason = "validation harness: local helpers defined near use site"
 )]
 //! # Exp176: Soil Biofilm & Aggregate Geometry — Tecon & Or 2017
 //!

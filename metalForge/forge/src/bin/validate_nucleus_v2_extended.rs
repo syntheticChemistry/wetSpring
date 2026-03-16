@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::too_many_lines,
+#![expect(
     clippy::print_stdout,
-    clippy::similar_names
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
+    clippy::similar_names,
+    reason = "validation harness: domain variables from published notation"
 )]
 //! # Exp246: NUCLEUS Tower→Node→Nest v2 — Extended Pipeline
 //!

@@ -50,6 +50,10 @@ sandbox/
 # Generated JSON scenario artifacts (petalTongue dashboards)
 output/
 
+# Coverage artifacts
+cobertura.xml
+lcov.info
+
 # Temp / backup / logs
 *.tmp
 *.bak

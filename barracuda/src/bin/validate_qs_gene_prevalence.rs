@@ -1,10 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
+#![expect(
     clippy::expect_used,
-    clippy::unwrap_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::print_stdout,
-    dead_code
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
+    dead_code,
+    reason = "validation harness: helper functions used conditionally across domains"
 )]
 //! # Exp140: QS Gene Prevalence by Habitat Geometry
 //!

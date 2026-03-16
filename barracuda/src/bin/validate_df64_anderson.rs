@@ -4,11 +4,13 @@
     clippy::print_stdout,
     reason = "validation binary: stdout is the output medium"
 )]
-#![allow(
+#![expect(
     clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
-    clippy::too_many_lines
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
+    clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
 )]
 //! # Exp187: DF64 Anderson at L=24+ — Extended Precision Large Lattice
 //!

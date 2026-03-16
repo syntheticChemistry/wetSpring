@@ -228,4 +228,42 @@ mod tests {
         let cpu = crate::probe::probe_cpu();
         assert!(estimated_transfer_us(&cpu, 1024).is_none());
     }
+
+    #[test]
+    fn estimated_transfer_us_zero_bytes() {
+        let gpu = Substrate {
+            kind: SubstrateKind::Gpu,
+            identity: Identity::named("NVIDIA GeForce RTX 4070"),
+            properties: Properties::default(),
+            capabilities: vec![Capability::F64Compute],
+            origin: SubstrateOrigin::Local,
+        };
+        let us = estimated_transfer_us(&gpu, 0).expect("should have cost");
+        assert!(us >= 0.0, "zero-byte transfer cost must be non-negative");
+    }
+
+    #[test]
+    fn detect_bandwidth_tier_unknown_adapter() {
+        let gpu = Substrate {
+            kind: SubstrateKind::Gpu,
+            identity: Identity::named("Unknown Vendor XGPU 9000"),
+            properties: Properties::default(),
+            capabilities: vec![Capability::F32Compute],
+            origin: SubstrateOrigin::Local,
+        };
+        let tier = detect_bandwidth_tier(&gpu).expect("GPU should have tier");
+        assert_eq!(tier, BandwidthTier::Unknown);
+    }
+
+    #[test]
+    fn detect_bandwidth_tier_none_for_npu() {
+        let npu = Substrate {
+            kind: SubstrateKind::Npu,
+            identity: Identity::named("AKD1000"),
+            properties: Properties::default(),
+            capabilities: vec![Capability::F32Compute],
+            origin: SubstrateOrigin::Local,
+        };
+        assert!(detect_bandwidth_tier(&npu).is_none());
+    }
 }

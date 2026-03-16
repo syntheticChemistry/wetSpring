@@ -1,15 +1,29 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(clippy::expect_used)]
-#![allow(clippy::unwrap_used)]
-#![allow(clippy::print_stdout)]
-#![allow(clippy::too_many_lines)]
-#![allow(clippy::cast_precision_loss)]
-#![allow(clippy::cast_possible_truncation)]
-#![allow(clippy::cast_sign_loss)]
-#![allow(clippy::similar_names)]
-#![allow(clippy::items_after_statements)]
-#![allow(clippy::float_cmp)]
+#![expect(
+    clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
+    clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
+    clippy::cast_precision_loss,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
+    clippy::cast_possible_truncation,
+    reason = "validation harness: u128→u64 timing, f64→u32 counts"
+)]
+#![expect(
+    clippy::cast_sign_loss,
+    reason = "validation harness: non-negative values cast to unsigned"
+)]
+#![expect(
+    clippy::items_after_statements,
+    reason = "validation harness: local helpers defined near use site"
+)]
 //! # Exp359: Stable GPU Specials + Tridiag Eigensolver Validation
 //!
 //! Validates barraCuda v0.3.5 stable special functions that avoid catastrophic

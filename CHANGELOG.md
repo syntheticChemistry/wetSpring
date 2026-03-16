@@ -3,6 +3,51 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V122] — 2026-03-16
+
+### Full Audit Execution — Modern Idiomatic Rust Evolution
+
+Comprehensive `#[expect(reason)]` migration across all 276+ validation binaries, automated
+unfulfilled expectation cleanup, new test coverage, unsafe code elimination, and idiomatic
+Rust evolution. 298 files changed, +3,593 −1,628 lines.
+
+#### `#[expect(reason)]` Migration (276+ validation binaries, 298 files)
+- All `#[allow(lint)]` → `#[expect(lint, reason = "...")]` with lint-specific justifications
+  across every validation and benchmark binary in `barracuda/src/bin/` and `metalForge/forge/src/bin/`
+- Curated reason dictionary: `expect_used`/`unwrap_used` → "validation harness: fail-fast on
+  setup errors", `cast_*` → "validation harness: small-range numeric conversions", etc.
+- Automated unfulfilled expectation cleanup: 1,139 stale `#[expect()]` lines removed across
+  278 files (detected via `cargo clippy --message-format=json` parsing)
+- Every lint suppression is now self-documenting and stale-detectable
+
+#### Test Coverage Improvements (forge: 234 → 252 tests)
+- `metalForge/forge/src/error.rs`: 10 new tests — Display/Error implementations for all
+  error enum variants (`NestError`, `SongbirdError`, `AssemblyError`, `NcbiError`, `DataError`)
+- `metalForge/forge/src/bridge.rs`: 3 new tests — edge cases for `estimated_transfer_us`
+  (zero bytes) and `detect_bandwidth_tier` (unknown adapter, non-GPU substrate)
+- `metalForge/forge/src/nest/tests.rs`: 3 new tests — `default_socket_path` content check,
+  `discover_nestgate_socket` when no socket exists, safer env-based socket override
+
+#### Idiomatic Rust Evolution
+- `map(|m| m.len())` → `map(Vec::len)` (`ipc/dispatch.rs`)
+- `.ends_with(".toml")` → `Path::extension()` (`niche.rs`)
+- Struct field reassign → `..Default::default()` pattern (`inventory/output.rs`)
+- Unused struct fields prefixed with `_` in validation binaries (dead code)
+- `unsafe` env var manipulation removed from `nest/tests.rs`
+- NPU module: 3 detailed `#[expect(reason)]` for cast truncation/wrap/precision
+- metalForge `lib.rs`: unfulfilled cast `#[expect()]` removed, `module_name_repetitions` kept
+- Test modules: `#[expect(clippy::expect_used)]` and `#[expect(clippy::unwrap_used)]` added
+  to `#[cfg(test)]` blocks where needed (6 modules)
+- `clippy::approx_constant` false positive documented in `ipc/timeseries.rs` tests
+
+#### Quality
+- `cargo clippy --workspace --all-targets --all-features` — **ZERO warnings, ZERO errors**
+- `cargo fmt --all -- --check` — clean
+- `cargo test --workspace --lib` — **1,605 passed** (1,353 barracuda + 252 forge)
+- Zero `#[allow()]` in entire codebase (production + validation + test)
+- `#![forbid(unsafe_code)]` confirmed on all crate roots
+- Zero `unsafe` blocks anywhere
+
 ## [V121] — 2026-03-16
 
 ### Deep Debt Evolution — Full Audit Execution

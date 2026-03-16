@@ -9,10 +9,10 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V121** | `handoffs/WETSPRING_V121_DEEP_DEBT_EVOLUTION_HANDOFF_MAR16_2026.md` | Mar 16 | **Deep Debt Evolution + Absorption** — 214 named tolerances (zero inline literals), all primal names via `primal_names::*`, crate-level `#[allow()]` → `#[expect(reason)]`, blake3 pure Rust, tempfile test paths, baseline verification fix. Full toadStool/barraCuda absorption handoff with patterns and evolution requests. |
-| | *V119–V120 → `handoffs/archive/`* | | V119–V120 handoffs archived. |
+| **V122** | `handoffs/WETSPRING_V122_MODERN_IDIOMATIC_RUST_HANDOFF_MAR16_2026.md` | Mar 16 | **Modern Idiomatic Rust Evolution + Absorption** — all `#[allow()]` → `#[expect(reason)]` across 276+ validation binaries (298 files), 1,139 unfulfilled expectations cleaned, 18 new forge tests, idiomatic Rust fixes, unsafe eliminated from tests. Zero `#[allow()]` in entire codebase. Full toadStool/barraCuda absorption handoff with migration guide and patterns. |
+| | *V119–V121 → `handoffs/archive/`* | | V119–V121 handoffs archived. |
 | | *V113–V118 → `handoffs/archive/`* | | V113–V118 handoffs archived. |
-| | *V112 and earlier → `handoffs/archive/`* | | Fossil record: V7–V112 (95+ archived handoffs). 129 total archived. |
+| | *V112 and earlier → `handoffs/archive/`* | | Fossil record: V7–V112 (95+ archived handoffs). 130 total archived. |
 
 ## Cross-Spring Documents
 
@@ -23,7 +23,7 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` — V7–V120 (129 files).
+Superseded handoffs in `handoffs/archive/` — V7–V121 (130 files).
 Preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda.
 
 ## Convention

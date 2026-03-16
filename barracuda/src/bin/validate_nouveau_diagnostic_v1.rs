@@ -1,17 +1,24 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
+#![expect(
     unexpected_cfgs,
+    reason = "validation harness: cross-spring feature gates not defined in this crate"
+)]
+#![expect(
     clippy::expect_used,
-    clippy::unwrap_used,
+    reason = "validation harness: fail-fast on setup errors"
+)]
+#![expect(
     clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::too_many_lines,
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
     clippy::similar_names,
-    clippy::items_after_statements,
-    clippy::float_cmp
+    reason = "validation harness: domain variables from published notation"
 )]
 //! # Exp361: Nouveau RTX 4070 Diagnostic + GPU Dispatch Pipeline Status
 //!

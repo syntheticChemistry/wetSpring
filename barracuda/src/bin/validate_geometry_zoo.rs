@@ -1,15 +1,28 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![allow(
-    clippy::expect_used,
-    clippy::unwrap_used,
+#![expect(
     clippy::print_stdout,
+    reason = "validation harness: results printed to stdout"
+)]
+#![expect(
     clippy::type_complexity,
+    reason = "validation harness: required for domain validation"
+)]
+#![expect(
     clippy::cast_precision_loss,
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
+)]
+#![expect(
     clippy::cast_possible_wrap,
+    reason = "validation harness: i8↔u8 bit reinterpretation for NPU data path"
+)]
+#![expect(
     clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
     clippy::items_after_statements,
-    dead_code
+    reason = "validation harness: local helpers defined near use site"
 )]
 //! # Exp132: Geometry Zoo — Shape Determines QS
 //!

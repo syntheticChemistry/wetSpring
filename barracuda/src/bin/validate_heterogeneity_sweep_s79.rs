@@ -4,12 +4,13 @@
     clippy::print_stdout,
     reason = "validation binary: stdout is the output medium"
 )]
-#![allow(
+#![expect(
     clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
+#![expect(
     clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::items_after_statements,
-    clippy::float_cmp
+    reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
 //! # Exp275: Cell-Type Heterogeneity Sweep — W vs r in 3D Dermis
 //!

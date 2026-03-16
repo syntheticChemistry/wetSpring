@@ -288,7 +288,7 @@ mod tests {
             .unwrap()
             .iter()
             .filter_map(|d| d["methods"].as_array())
-            .map(|m| m.len())
+            .map(Vec::len)
             .sum();
         assert_eq!(total_methods, 20);
     }
