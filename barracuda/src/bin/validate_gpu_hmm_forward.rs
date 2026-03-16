@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::similar_names,
     reason = "validation harness: domain variables from published notation"
 )]
@@ -51,6 +47,7 @@ use wetspring_barracuda::bio::hmm_gpu::HmmGpuForward;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 fn weather_model() -> HmmModel {
     HmmModel {
@@ -117,7 +114,7 @@ async fn main() {
     println!();
 
     let device = gpu.to_wgpu_device();
-    let hmm_gpu = HmmGpuForward::new(&device).expect("HMM GPU shader");
+    let hmm_gpu = HmmGpuForward::new(&device).or_exit("HMM GPU shader");
 
     validate_2state(&hmm_gpu, &mut v);
     validate_3state(&hmm_gpu, &mut v);

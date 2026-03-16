@@ -5,10 +5,6 @@
     reason = "validation binary: stdout is the output medium"
 )]
 #![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
     clippy::too_many_lines,
     reason = "validation harness: sequential domain checks in single main()"
 )]
@@ -43,7 +39,6 @@
 //! - Slevin & Ohtsuki, PRL 82 (1999): `W_c` = 16.54 ± 0.10
 //! - Rodriguez et al., PRB 84 (2011): ν = 1.571 ± 0.004
 
-use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 const LATTICE_SIZES: &[usize] = &[6, 8, 10, 12, 14];

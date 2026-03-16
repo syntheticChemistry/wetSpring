@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::too_many_lines,
     reason = "validation harness: sequential domain checks in single main()"
 )]
@@ -70,6 +66,7 @@ use wgpu::util::DeviceExt;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 struct BenchEntry {
     primitive: &'static str,
@@ -127,13 +124,13 @@ fn readback_f32(
     let slice = staging.slice(..);
     let (tx, rx) = std::sync::mpsc::channel();
     slice.map_async(wgpu::MapMode::Read, move |result| {
-        tx.send(result).expect("channel send");
+        tx.send(result).or_exit("channel send");
     });
     let _ = d.poll(wgpu::PollType::Wait {
         submission_index: None,
         timeout: None,
     });
-    rx.recv().expect("channel recv").expect("GPU buffer map");
+    rx.recv().or_exit("channel recv").or_exit("GPU buffer map");
 
     let data = slice.get_mapped_range();
     let result: Vec<f32> = bytemuck::cast_slice(&data).to_vec();

@@ -31,6 +31,7 @@ use std::path::Path;
 use wetspring_barracuda::bio::signal::{PeakParams, find_peaks};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("wetSpring Peak Detection Validation (Exp010)");
@@ -119,7 +120,7 @@ fn validate_case(v: &mut Validator, dir: &Path, name: &str, params: &PeakParams)
 
     let data: Vec<f64> = lines[0]
         .split_whitespace()
-        .map(|s| s.parse::<f64>().expect("parse data value"))
+        .map(|s| s.parse::<f64>().or_exit("parse data value"))
         .collect();
 
     let scipy_indices: Vec<usize> = if lines[1].trim().is_empty() {
@@ -127,7 +128,7 @@ fn validate_case(v: &mut Validator, dir: &Path, name: &str, params: &PeakParams)
     } else {
         lines[1]
             .split_whitespace()
-            .map(|s| s.parse::<usize>().expect("parse index"))
+            .map(|s| s.parse::<usize>().or_exit("parse index"))
             .collect()
     };
 
@@ -136,7 +137,7 @@ fn validate_case(v: &mut Validator, dir: &Path, name: &str, params: &PeakParams)
     } else {
         lines[2]
             .split_whitespace()
-            .map(|s| s.parse::<f64>().expect("parse height"))
+            .map(|s| s.parse::<f64>().or_exit("parse height"))
             .collect()
     };
 

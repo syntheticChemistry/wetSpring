@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -72,6 +64,7 @@ use barracuda::stats::norm_cdf;
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::visualization::{
     DataChannel, EcologyScenario, ScenarioEdge, ScenarioNode, ScientificRange, scenario_to_json,
 };
@@ -254,8 +247,8 @@ fn main() {
         "bulk soil has highest diversity",
         results
             .iter()
-            .max_by(|a, b| a.h_prime.partial_cmp(&b.h_prime).unwrap())
-            .unwrap()
+            .max_by(|a, b| a.h_prime.partial_cmp(&b.h_prime).or_exit("unexpected error"))
+            .or_exit("unexpected error")
             .name
             .contains("Bulk Soil"),
     );
@@ -768,13 +761,13 @@ fn main() {
         },
     ];
 
-    let json = scenario_to_json(&scenario).expect("serialize");
+    let json = scenario_to_json(&scenario).or_exit("serialize");
     let output_dir = PathBuf::from("output");
     let _ = std::fs::create_dir_all(&output_dir);
     let path = output_dir.join("anderson_qs_model_comparison.json");
-    std::fs::write(&path, &json).expect("write JSON");
+    std::fs::write(&path, &json).or_exit("write JSON");
     v.check_pass("scenario JSON written", path.exists());
-    let size = std::fs::metadata(&path).expect("meta").len();
+    let size = std::fs::metadata(&path).or_exit("meta").len();
     println!("  → File: {} ({} bytes)", path.display(), size);
     println!("  → Load: petaltongue ui --scenario {}", path.display());
     v.check_pass("scenario has 3 nodes", scenario.nodes.len() == 3);

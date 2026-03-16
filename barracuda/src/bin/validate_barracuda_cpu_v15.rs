@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -66,6 +58,7 @@ use wetspring_barracuda::validation::Validator;
 
 use barracuda::special::erf;
 use barracuda::stats::norm_cdf;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp229: BarraCuda CPU v15 — V76 Pure Rust Math (54 Domains)");
@@ -78,7 +71,7 @@ fn main() {
     let allele_freqs = [0.8, 0.6, 0.3];
     let sample_sizes = [50, 60, 40];
     let fst_result =
-        fst_variance::fst_variance_decomposition(&allele_freqs, &sample_sizes).unwrap();
+        fst_variance::fst_variance_decomposition(&allele_freqs, &sample_sizes).or_exit("unexpected error");
 
     v.check_pass("FST in [0,1]", (0.0..=1.0).contains(&fst_result.fst));
     v.check_pass("FIS finite", fst_result.f_is.is_finite());
@@ -88,7 +81,7 @@ fn main() {
     let identical_freqs = [0.5, 0.5, 0.5];
     let large_sizes = [1000, 1000, 1000];
     let fst_identical =
-        fst_variance::fst_variance_decomposition(&identical_freqs, &large_sizes).unwrap();
+        fst_variance::fst_variance_decomposition(&identical_freqs, &large_sizes).or_exit("unexpected error");
     v.check_pass(
         "FST(identical) ≈ 0",
         fst_identical.fst.abs() < tolerances::ODE_STEADY_STATE,
@@ -275,7 +268,7 @@ fn main() {
     let dm = [0.5, 0.8, 0.6];
     v.check_pass(
         "PCoA produces coords",
-        pcoa::pcoa(&dm, 3, 2).unwrap().n_samples == 3,
+        pcoa::pcoa(&dm, 3, 2).or_exit("unexpected error").n_samples == 3,
     );
 
     let tree = unifrac::tree::PhyloTree::from_newick("((A:1,B:2):1,(C:3,D:4):2);");
@@ -339,7 +332,7 @@ fn main() {
             .map(|i| f64::from(i).mul_add(0.2, 1.0))
             .collect::<Vec<_>>(),
     )
-    .expect("pearson");
+    .or_exit("pearson");
     v.check(
         "Pearson(linear) = 1.0",
         pearson,
@@ -356,7 +349,7 @@ fn main() {
             .collect::<Vec<_>>(),
         &(0..1001).map(|i| f64::from(i) / 1000.0).collect::<Vec<_>>(),
     )
-    .expect("trapz");
+    .or_exit("trapz");
     v.check(
         "trapz(x²) ≈ 1/3",
         trapz,

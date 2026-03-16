@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -55,6 +51,7 @@ use wetspring_barracuda::bio::gemm_cached::GemmCached;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct LcgRng(u64);
 
@@ -109,7 +106,7 @@ fn validate_nmf_reconstruction_parity(
         objective: NmfObjective::Euclidean,
         seed: 42,
     };
-    let result = nmf::nmf(&matrix, n_drugs, n_diseases, &config).expect("NMF failed");
+    let result = nmf::nmf(&matrix, n_drugs, n_diseases, &config).or_exit("NMF failed");
     let rank = result.k;
 
     let t_cpu = Instant::now();
@@ -127,7 +124,7 @@ fn validate_nmf_reconstruction_parity(
     let t_gpu = Instant::now();
     let gpu_wh = gemm
         .execute(&result.w, &result.h, n_drugs, rank, n_diseases, 1)
-        .expect("GEMM failed");
+        .or_exit("GEMM failed");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     let max_diff = cpu_wh
@@ -179,9 +176,9 @@ fn validate_cosine_scoring_parity(
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
         let t_gpu = Instant::now();
-        let gpu_dot = fmr.dot(&a, &b).expect("FMR dot");
-        let gpu_na = fmr.sum_of_squares(&a).expect("FMR sos").sqrt();
-        let gpu_nb = fmr.sum_of_squares(&b).expect("FMR sos").sqrt();
+        let gpu_dot = fmr.dot(&a, &b).or_exit("FMR dot");
+        let gpu_na = fmr.sum_of_squares(&a).or_exit("FMR sos").sqrt();
+        let gpu_nb = fmr.sum_of_squares(&b).or_exit("FMR sos").sqrt();
         let gpu_cos = gpu_dot / (gpu_na * gpu_nb);
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
@@ -276,7 +273,7 @@ fn validate_transe_parity(
     };
 
     let t_gpu = Instant::now();
-    let gpu_scores = scorer.execute(&device).expect("GPU TransE");
+    let gpu_scores = scorer.execute(&device).or_exit("GPU TransE");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     let max_diff = gpu_scores
@@ -327,7 +324,7 @@ fn validate_drug_ranking_parity(v: &mut Validator, gemm: &GemmCached) {
         objective: NmfObjective::Euclidean,
         seed: 42,
     };
-    let result = nmf::nmf(&matrix, n_drugs, n_diseases, &config).expect("NMF failed");
+    let result = nmf::nmf(&matrix, n_drugs, n_diseases, &config).or_exit("NMF failed");
 
     let mut cpu_wh = vec![0.0_f64; total];
     for i in 0..n_drugs {
@@ -341,7 +338,7 @@ fn validate_drug_ranking_parity(v: &mut Validator, gemm: &GemmCached) {
 
     let gpu_wh = gemm
         .execute(&result.w, &result.h, n_drugs, rank, n_diseases, 1)
-        .expect("GEMM failed");
+        .or_exit("GEMM failed");
 
     let top_k = 20;
 
@@ -385,10 +382,10 @@ fn print_timing_summary(timings: &[(&str, f64, f64, f64)]) {
 }
 
 fn main() {
-    let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
+    let rt = tokio::runtime::Runtime::new().or_exit("tokio runtime");
     let gpu = rt
         .block_on(GpuF64::new())
-        .expect("GPU init — requires SHADER_F64");
+        .or_exit("GPU init — requires SHADER_F64");
     let device = gpu.to_wgpu_device();
     let ctx = gpu.tensor_context().clone();
 
@@ -398,7 +395,7 @@ fn main() {
     let mut timings: Vec<(&str, f64, f64, f64)> = Vec::new();
 
     let gemm = GemmCached::new(device.clone(), ctx);
-    let fmr = FusedMapReduceF64::new(device).expect("FMR init");
+    let fmr = FusedMapReduceF64::new(device).or_exit("FMR init");
 
     validate_nmf_reconstruction_parity(&mut v, &gemm, &mut timings);
     validate_cosine_scoring_parity(&mut v, &fmr, &mut timings);

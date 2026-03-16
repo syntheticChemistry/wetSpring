@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -56,6 +48,7 @@ use wetspring_barracuda::df64_host;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct Timing {
     name: &'static str,
@@ -66,8 +59,8 @@ fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
-        .expect("tokio runtime");
-    let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+        .or_exit("tokio runtime");
+    let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
 
     let mut v = Validator::new("Exp268: CPU vs GPU Pure Math — ToadStool Primitives");
     let t_total = Instant::now();
@@ -189,7 +182,7 @@ fn main() {
     let condensed = vec![0.3, 0.6, 0.9, 0.4, 0.7, 0.5];
     let n_axes = 2;
 
-    let cpu_pcoa = wetspring_barracuda::bio::pcoa::pcoa(&condensed, n, n_axes).expect("CPU PCoA");
+    let cpu_pcoa = wetspring_barracuda::bio::pcoa::pcoa(&condensed, n, n_axes).or_exit("CPU PCoA");
 
     let gpu_pcoa = wetspring_barracuda::bio::pcoa_gpu::pcoa_gpu(&gpu, &condensed, n, n_axes);
 
@@ -332,11 +325,11 @@ fn main() {
     v.section("S6: GpuPipelineSession — Streaming vs Individual Parity");
     let mut s6 = 0_u32;
 
-    let session = wetspring_barracuda::bio::streaming_gpu::GpuPipelineSession::new(&gpu).unwrap();
+    let session = wetspring_barracuda::bio::streaming_gpu::GpuPipelineSession::new(&gpu).or_exit("unexpected error");
     let abundances: Vec<f64> = (0..512).map(|i| f64::from(i + 1) * 0.75 + 1.0).collect();
 
-    let ind_sh = diversity_gpu::shannon_gpu(&gpu, &abundances).unwrap();
-    let stream_sh = session.shannon(&abundances).unwrap();
+    let ind_sh = diversity_gpu::shannon_gpu(&gpu, &abundances).or_exit("unexpected error");
+    let stream_sh = session.shannon(&abundances).or_exit("unexpected error");
     v.check(
         "Shannon: individual == streaming",
         stream_sh,
@@ -345,8 +338,8 @@ fn main() {
     );
     s6 += 1;
 
-    let ind_si = diversity_gpu::simpson_gpu(&gpu, &abundances).unwrap();
-    let stream_si = session.simpson(&abundances).unwrap();
+    let ind_si = diversity_gpu::simpson_gpu(&gpu, &abundances).or_exit("unexpected error");
+    let stream_si = session.simpson(&abundances).or_exit("unexpected error");
     v.check(
         "Simpson: individual == streaming",
         stream_si,
@@ -357,7 +350,7 @@ fn main() {
 
     let mut runs = Vec::new();
     for _ in 0..5 {
-        runs.push(session.shannon(&abundances).unwrap());
+        runs.push(session.shannon(&abundances).or_exit("unexpected error"));
     }
     let all_equal = runs.windows(2).all(|w| w[0] == w[1]);
     v.check_pass("Determinism: 5 identical streaming runs", all_equal);

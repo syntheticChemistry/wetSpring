@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -44,6 +40,7 @@
 
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct LcgRng(u64);
 
@@ -303,10 +300,10 @@ fn validate_novel_predictions(
 fn validate_gpu_transe(v: &mut Validator, kg: &KgEmbedding, triples: &[(usize, usize, usize)]) {
     v.section("§6 GPU TransE Parity (ToadStool S60)");
 
-    let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
+    let rt = tokio::runtime::Runtime::new().or_exit("tokio runtime");
     let gpu = rt
         .block_on(wetspring_barracuda::gpu::GpuF64::new())
-        .expect("GPU init");
+        .or_exit("GPU init");
     let device = gpu.to_wgpu_device();
 
     let heads: Vec<u32> = triples.iter().map(|t| t.0 as u32).collect();
@@ -324,7 +321,7 @@ fn validate_gpu_transe(v: &mut Validator, kg: &KgEmbedding, triples: &[(usize, u
         tails: &tails,
     };
 
-    let gpu_scores = scorer.execute(&device).expect("GPU TransE");
+    let gpu_scores = scorer.execute(&device).or_exit("GPU TransE");
 
     let cpu_scores: Vec<f64> = triples.iter().map(|&(h, r, t)| kg.score(h, r, t)).collect();
 
@@ -437,7 +434,7 @@ fn main() {
 
     v.check_pass(
         "training loss decreases",
-        losses.last().expect("losses non-empty") < &losses[0],
+        losses.last().or_exit("losses non-empty") < &losses[0],
     );
 
     validate_link_prediction(&mut v, &kg, &triples);

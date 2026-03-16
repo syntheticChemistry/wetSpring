@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -44,6 +40,7 @@ use wetspring_barracuda::validation::Validator;
 
 use barracuda::special::erf;
 use barracuda::stats::norm_cdf;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp216: BarraCuda CPU v13 — 47-Domain Pure Rust Math Proof");
@@ -203,7 +200,7 @@ fn main() {
     v.section("═══ G9: dN/dS ═══");
     total_domains += 1;
 
-    let dnds_result = dnds::pairwise_dnds(b"ATGATG", b"ATGGTG").unwrap();
+    let dnds_result = dnds::pairwise_dnds(b"ATGATG", b"ATGGTG").or_exit("unexpected error");
     v.check_pass(
         "omega is computed",
         dnds_result.omega.is_none_or(f64::is_finite),
@@ -253,7 +250,7 @@ fn main() {
 
     let qs_params = qs_biofilm::QsBiofilmParams::default();
     let qs_result = qs_biofilm::scenario_standard_growth(&qs_params, 0.01);
-    let final_n = *qs_result.states().last().unwrap().first().unwrap();
+    let final_n = *qs_result.states().last().or_exit("unexpected error").first().or_exit("unexpected error");
     v.check_pass("QS: cell density > 0", final_n > 0.0);
 
     // ═══ G14: Cooperation ODE ════════════════════════════════════════════
@@ -265,7 +262,7 @@ fn main() {
     let freq = cooperation::cooperator_frequency(&coop_result);
     v.check_pass(
         "cooperators persist (freq > 0.1)",
-        *freq.last().unwrap() > 0.1,
+        *freq.last().or_exit("unexpected error") > 0.1,
     );
 
     // ═══ G15: Bistable ODE ═══════════════════════════════════════════════
@@ -394,7 +391,7 @@ fn main() {
     // PCoA expects condensed distance matrix (upper triangle, n*(n-1)/2 values).
     // For 3 samples: pairs (1,0), (2,0), (2,1) → [d10, d20, d21]
     let condensed = [0.5, 0.8, 0.6];
-    let pcoa_result = pcoa::pcoa(&condensed, 3, 2).unwrap();
+    let pcoa_result = pcoa::pcoa(&condensed, 3, 2).or_exit("unexpected error");
     v.check_pass("PCoA produces coordinates", pcoa_result.n_samples == 3);
 
     // ═══ G27: Math Primitives ════════════════════════════════════════════

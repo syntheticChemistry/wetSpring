@@ -108,13 +108,14 @@ fn main() {
     {
         use wetspring_barracuda::bio::diversity_gpu::{shannon_gpu, simpson_gpu};
         use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::validation::OrExit;
 
-        let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
-        let gpu = rt.block_on(GpuF64::new()).expect("GPU init failed");
-        let gpu_h_dig = shannon_gpu(&gpu, &digester).expect("shannon_gpu digester");
-        let gpu_h_soil = shannon_gpu(&gpu, &soil).expect("shannon_gpu soil");
-        let gpu_s_dig = simpson_gpu(&gpu, &digester).expect("simpson_gpu digester");
-        let gpu_s_soil = simpson_gpu(&gpu, &soil).expect("simpson_gpu soil");
+        let rt = tokio::runtime::Runtime::new().or_exit("tokio runtime");
+        let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init failed");
+        let gpu_h_dig = shannon_gpu(&gpu, &digester).or_exit("shannon_gpu digester");
+        let gpu_h_soil = shannon_gpu(&gpu, &soil).or_exit("shannon_gpu soil");
+        let gpu_s_dig = simpson_gpu(&gpu, &digester).or_exit("simpson_gpu digester");
+        let gpu_s_soil = simpson_gpu(&gpu, &soil).or_exit("simpson_gpu soil");
 
         v.check(
             "D43: GPU H(digester) ≈ CPU",

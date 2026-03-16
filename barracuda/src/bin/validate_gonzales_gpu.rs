@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -54,6 +50,7 @@ use wetspring_barracuda::bio::{diversity, diversity_gpu};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 struct Timing {
     domain: &'static str,
@@ -106,8 +103,8 @@ async fn main() {
         d1_cpu += tc.elapsed().as_micros() as f64;
 
         let tg = Instant::now();
-        let gpu_shannon = diversity_gpu::shannon_gpu(&gpu, pop).expect("shannon GPU");
-        let gpu_simpson = diversity_gpu::simpson_gpu(&gpu, pop).expect("simpson GPU");
+        let gpu_shannon = diversity_gpu::shannon_gpu(&gpu, pop).or_exit("shannon GPU");
+        let gpu_simpson = diversity_gpu::simpson_gpu(&gpu, pop).or_exit("simpson GPU");
         d1_gpu += tg.elapsed().as_micros() as f64;
 
         let diff_sh = (cpu_shannon - gpu_shannon).abs();
@@ -148,7 +145,7 @@ async fn main() {
 
     let t_gpu = Instant::now();
     let gpu_pielou =
-        diversity_gpu::pielou_evenness_gpu(&gpu, &receptor_counts).expect("pielou GPU");
+        diversity_gpu::pielou_evenness_gpu(&gpu, &receptor_counts).or_exit("pielou GPU");
     let d2_gpu = t_gpu.elapsed().as_micros() as f64;
 
     let diff_p = (cpu_pielou - gpu_pielou).abs();
@@ -188,7 +185,7 @@ async fn main() {
 
     let tg = Instant::now();
     let gpu_bc_condensed =
-        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).expect("BC condensed GPU");
+        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).or_exit("BC condensed GPU");
     let d3_gpu = tg.elapsed().as_micros() as f64;
 
     // Condensed matrix order: (0,1), (0,2), (1,2) → healthy↔mild, healthy↔AD, mild↔AD
@@ -253,8 +250,8 @@ async fn main() {
     let d4_cpu = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
-    let gpu_sh = diversity_gpu::shannon_gpu(&gpu, &large_pop).expect("large shannon GPU");
-    let gpu_si = diversity_gpu::simpson_gpu(&gpu, &large_pop).expect("large simpson GPU");
+    let gpu_sh = diversity_gpu::shannon_gpu(&gpu, &large_pop).or_exit("large shannon GPU");
+    let gpu_si = diversity_gpu::simpson_gpu(&gpu, &large_pop).or_exit("large simpson GPU");
     let d4_gpu = tg.elapsed().as_micros() as f64;
 
     v.check_pass(
@@ -299,8 +296,8 @@ async fn main() {
     let d5_cpu = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
-    let gpu_ic_sh = diversity_gpu::shannon_gpu(&gpu, &ic50_pop).expect("ic50 shannon GPU");
-    let gpu_ic_si = diversity_gpu::simpson_gpu(&gpu, &ic50_pop).expect("ic50 simpson GPU");
+    let gpu_ic_sh = diversity_gpu::shannon_gpu(&gpu, &ic50_pop).or_exit("ic50 shannon GPU");
+    let gpu_ic_si = diversity_gpu::simpson_gpu(&gpu, &ic50_pop).or_exit("ic50 simpson GPU");
     let d5_gpu = tg.elapsed().as_micros() as f64;
 
     v.check_pass("IC50 Shannon CPU≈GPU", (cpu_ic_sh - gpu_ic_sh).abs() < tol);

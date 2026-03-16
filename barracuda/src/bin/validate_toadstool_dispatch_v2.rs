@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -55,13 +51,14 @@ use wetspring_barracuda::bio::{diversity, diversity_gpu, streaming_gpu, taxonomy
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
-        .expect("tokio runtime");
-    let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+        .or_exit("tokio runtime");
+    let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
 
     let mut v = Validator::new("Exp244: ToadStool Compute Dispatch v2 — Extended Overhead Proof");
     let t_total = Instant::now();
@@ -72,7 +69,7 @@ fn main() {
     v.section("S1: GpuPipelineSession Pre-Warmup");
     let t_warmup = Instant::now();
     let session =
-        streaming_gpu::GpuPipelineSession::new(&gpu).expect("GpuPipelineSession creation");
+        streaming_gpu::GpuPipelineSession::new(&gpu).or_exit("GpuPipelineSession creation");
     let warmup_ms = t_warmup.elapsed().as_secs_f64() * 1000.0;
     v.check_pass("Session created", true);
     v.check_pass("Warmup < 5s", warmup_ms < 5000.0);
@@ -92,18 +89,18 @@ fn main() {
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg_ind = Instant::now();
-    let gpu_sh_ind = diversity_gpu::shannon_gpu(&gpu, &abundances).expect("GPU Shannon dispatch");
-    let gpu_si_ind = diversity_gpu::simpson_gpu(&gpu, &abundances).expect("GPU Simpson dispatch");
+    let gpu_sh_ind = diversity_gpu::shannon_gpu(&gpu, &abundances).or_exit("GPU Shannon dispatch");
+    let gpu_si_ind = diversity_gpu::simpson_gpu(&gpu, &abundances).or_exit("GPU Simpson dispatch");
     let gpu_obs_ind = diversity_gpu::observed_features_gpu(&gpu, &abundances)
-        .expect("GPU observed features dispatch");
+        .or_exit("GPU observed features dispatch");
     let ind_us = tg_ind.elapsed().as_micros() as f64;
 
     let tg_stream = Instant::now();
-    let stream_sh = session.shannon(&abundances).expect("streaming Shannon");
-    let stream_si = session.simpson(&abundances).expect("streaming Simpson");
+    let stream_sh = session.shannon(&abundances).or_exit("streaming Shannon");
+    let stream_si = session.simpson(&abundances).or_exit("streaming Simpson");
     let stream_obs = session
         .observed_features(&abundances)
-        .expect("streaming observed features");
+        .or_exit("streaming observed features");
     let stream_us = tg_stream.elapsed().as_micros() as f64;
 
     v.check(
@@ -169,7 +166,7 @@ fn main() {
     let tg = Instant::now();
     let stream_bc = session
         .bray_curtis_matrix(&slices)
-        .expect("streaming Bray-Curtis matrix");
+        .or_exit("streaming Bray-Curtis matrix");
     let stream_us = tg.elapsed().as_micros() as f64;
 
     v.check_pass("BC matrix: condensed len = 3", stream_bc.len() == 3);
@@ -224,7 +221,7 @@ fn main() {
     let tg = Instant::now();
     let gpu_result = session
         .stream_sample(&classifier, &query_seqs, &counts, &classify_params)
-        .expect("streaming taxonomy + diversity");
+        .or_exit("streaming taxonomy + diversity");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check(
@@ -263,7 +260,7 @@ fn main() {
     let tg = Instant::now();
     let full = session
         .stream_full_analytics(&classifier, &query_seqs, &multi_samples, &classify_params)
-        .expect("streaming full analytics pipeline");
+        .or_exit("streaming full analytics pipeline");
     let full_us = tg.elapsed().as_micros() as f64;
 
     v.check_pass(
@@ -291,7 +288,7 @@ fn main() {
     for run in 0..3 {
         let s = session
             .shannon(&abundances)
-            .expect("streaming Shannon for determinism check");
+            .or_exit("streaming Shannon for determinism check");
         shannons.push(s);
         println!("    Run {}: {s:.15}", run + 1);
     }

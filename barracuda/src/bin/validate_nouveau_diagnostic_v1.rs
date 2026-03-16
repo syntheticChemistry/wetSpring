@@ -5,10 +5,6 @@
     reason = "validation harness: cross-spring feature gates not defined in this crate"
 )]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -241,7 +237,7 @@ fn main() {
     // ─── D90: wgpu Path Baseline ───
     println!("\n  ── D90: wgpu Path Baseline ──");
 
-    let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
+    let rt = tokio::runtime::Runtime::new().or_exit("tokio runtime");
     let device = rt.block_on(async { barracuda::device::WgpuDevice::new().await });
 
     match device {
@@ -301,6 +297,7 @@ fn main() {
     #[cfg(feature = "json")]
     {
         use wetspring_barracuda::visualization::{DataChannel, EcologyScenario, ScenarioNode};
+use wetspring_barracuda::validation::OrExit;
 
         let mut dispatch_node = ScenarioNode {
             id: "dispatch_pipeline".into(),
@@ -372,10 +369,10 @@ fn main() {
             edges: vec![],
         };
 
-        let json = serde_json::to_string_pretty(&scenario).expect("serialize");
+        let json = serde_json::to_string_pretty(&scenario).or_exit("serialize");
         std::fs::create_dir_all("output").ok();
         let path = "output/dispatch_pipeline_status.json";
-        std::fs::write(path, &json).expect("write JSON");
+        std::fs::write(path, &json).or_exit("write JSON");
         println!("  Dashboard exported: {path} ({} bytes)", json.len());
         v.check_pass("petalTongue dispatch dashboard exported", true);
     }

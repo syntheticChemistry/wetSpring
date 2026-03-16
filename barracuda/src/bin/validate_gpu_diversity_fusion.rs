@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -43,6 +39,7 @@ use wetspring_barracuda::bio::diversity_fusion_gpu::{
 };
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn validate_uniform(v: &mut Validator, fusion: &DiversityFusionGpu) {
     let n_species = 4;
@@ -55,7 +52,7 @@ fn validate_uniform(v: &mut Validator, fusion: &DiversityFusionGpu) {
     let cpu = diversity_fusion_cpu(&abundances, n_species);
     let gpu_result = fusion
         .compute(&abundances, n_samples, n_species)
-        .expect("GPU compute");
+        .or_exit("GPU compute");
 
     let cpu_tol = tolerances::ANALYTICAL_F64;
     let gpu_log_tol = tolerances::GPU_LOG_POLYFILL;
@@ -117,7 +114,7 @@ fn validate_skewed(v: &mut Validator, fusion: &DiversityFusionGpu) {
     let cpu = diversity_fusion_cpu(&abundances, n_species);
     let gpu_result = fusion
         .compute(&abundances, 1, n_species)
-        .expect("GPU compute");
+        .or_exit("GPU compute");
 
     v.check(
         "skewed Shannon CPU↔GPU",
@@ -158,7 +155,7 @@ fn validate_batch(v: &mut Validator, fusion: &DiversityFusionGpu) {
     let cpu = diversity_fusion_cpu(&abundances, n_species);
     let gpu_result = fusion
         .compute(&abundances, n_samples, n_species)
-        .expect("GPU compute");
+        .or_exit("GPU compute");
 
     let all_parity = check_batch_parity(&cpu, &gpu_result);
     v.check_pass("128-sample batch CPU↔GPU parity", all_parity);
@@ -182,15 +179,15 @@ fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
-        .expect("tokio runtime");
+        .or_exit("tokio runtime");
 
     let gpu = rt
         .block_on(wetspring_barracuda::gpu::GpuF64::new())
-        .expect("GPU init");
+        .or_exit("GPU init");
     let device = Arc::new(gpu.to_wgpu_device());
 
     let fusion =
-        DiversityFusionGpu::new(Arc::clone(&device)).expect("DiversityFusionGpu shader compile");
+        DiversityFusionGpu::new(Arc::clone(&device)).or_exit("DiversityFusionGpu shader compile");
 
     v.section("Test 1: Uniform distribution (4 species, 2 samples)");
     validate_uniform(&mut v, &fusion);

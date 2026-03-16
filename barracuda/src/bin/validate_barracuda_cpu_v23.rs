@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation binary: expect() for pass/fail assertions"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation binary: stdout is the output medium"
 )]
@@ -69,6 +65,7 @@ use std::time::Instant;
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, DomainResult, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp306: BarraCuda CPU v23 — V97 Fused Ops Decomposition Parity");
@@ -97,7 +94,7 @@ fn main() {
     d41_checks += 1;
 
     let bc_var =
-        barracuda::stats::correlation::variance(&uniform).expect("variance of uniform 1..100");
+        barracuda::stats::correlation::variance(&uniform).or_exit("variance of uniform 1..100");
     // Sample var of 1..N = N(N+1)/12
     let expected_sample_var = n * (n + 1.0) / 12.0; // 100*101/12 = 841.666...
     v.check(
@@ -122,7 +119,7 @@ fn main() {
     // 41b: Constant data — variance must be zero
     let constant = vec![42.0; 50];
     let const_var =
-        barracuda::stats::correlation::variance(&constant).expect("variance of constant vector");
+        barracuda::stats::correlation::variance(&constant).or_exit("variance of constant vector");
     v.check(
         "Welford: Var(constant) = 0",
         const_var,
@@ -143,7 +140,7 @@ fn main() {
     // 41c: Two-point data — sVar([3,7]): mean=5, Σ(x-5)² = 4+4 = 8, /(n-1)=8/1=8
     let two = [3.0, 7.0];
     let two_var =
-        barracuda::stats::correlation::variance(&two).expect("variance of two-point [3,7]");
+        barracuda::stats::correlation::variance(&two).or_exit("variance of two-point [3,7]");
     v.check(
         "Welford: sVar([3,7]) = 8.0",
         two_var,
@@ -165,7 +162,7 @@ fn main() {
     d41_checks += 1;
 
     let large_var =
-        barracuda::stats::correlation::variance(&large).expect("variance of large shifted dataset");
+        barracuda::stats::correlation::variance(&large).or_exit("variance of large shifted dataset");
     let expected_large_sample_var = large_n * (large_n + 1.0) / 12.0;
     v.check(
         "Welford: sVar(large shifted) = N(N+1)/12",
@@ -192,7 +189,7 @@ fn main() {
     // 42a: Perfect correlation r(x, 2x+1) = 1.0
     let x: Vec<f64> = (1..=20).map(f64::from).collect();
     let y: Vec<f64> = x.iter().map(|&xi| 2.0_f64.mul_add(xi, 1.0)).collect();
-    let r = barracuda::stats::pearson_correlation(&x, &y).expect("Pearson r(x, 2x+1) = 1.0");
+    let r = barracuda::stats::pearson_correlation(&x, &y).or_exit("Pearson r(x, 2x+1) = 1.0");
     v.check(
         "Pearson: r(x, 2x+1) = 1.0",
         r,
@@ -203,7 +200,7 @@ fn main() {
 
     // 42b: Negative correlation r(x, -x) = -1.0
     let neg_y: Vec<f64> = x.iter().map(|&xi| -xi).collect();
-    let r_neg = barracuda::stats::pearson_correlation(&x, &neg_y).expect("Pearson r(x, -x) = -1.0");
+    let r_neg = barracuda::stats::pearson_correlation(&x, &neg_y).or_exit("Pearson r(x, -x) = -1.0");
     v.check(
         "Pearson: r(x, -x) = -1.0",
         r_neg,
@@ -214,7 +211,7 @@ fn main() {
 
     // 42c: Self-correlation r(x, x) = 1.0
     let r_self =
-        barracuda::stats::pearson_correlation(&x, &x).expect("Pearson self-correlation r(x, x)");
+        barracuda::stats::pearson_correlation(&x, &x).or_exit("Pearson self-correlation r(x, x)");
     v.check(
         "Pearson: r(x, x) = 1.0",
         r_self,
@@ -227,7 +224,7 @@ fn main() {
     let sin_x: Vec<f64> = (0..100).map(|i| (f64::from(i) * 0.1).sin()).collect();
     let cos_x: Vec<f64> = (0..100).map(|i| (f64::from(i) * 0.1).cos()).collect();
     let r_ortho = barracuda::stats::pearson_correlation(&sin_x, &cos_x)
-        .expect("Pearson r(sin, cos) orthogonal");
+        .or_exit("Pearson r(sin, cos) orthogonal");
     v.check_pass(
         "Pearson: |r(sin,cos)| < 0.1",
         r_ortho.abs() < tolerances::SOIL_MODEL_APPROX,
@@ -236,11 +233,11 @@ fn main() {
 
     // 42e: Decomposition check — Pearson = Cov(x,y) / (σ_x × σ_y)
     let cov_xy =
-        barracuda::stats::covariance(&x, &y).expect("covariance for Pearson decomposition");
+        barracuda::stats::covariance(&x, &y).or_exit("covariance for Pearson decomposition");
     let sd_x =
-        barracuda::stats::correlation::std_dev(&x).expect("std dev of x for Pearson decomposition");
+        barracuda::stats::correlation::std_dev(&x).or_exit("std dev of x for Pearson decomposition");
     let sd_y =
-        barracuda::stats::correlation::std_dev(&y).expect("std dev of y for Pearson decomposition");
+        barracuda::stats::correlation::std_dev(&y).or_exit("std dev of y for Pearson decomposition");
     let r_decomposed = cov_xy / (sd_x * sd_y);
     v.check(
         "Pearson: decomposed = direct",
@@ -254,7 +251,7 @@ fn main() {
     let qs_signal = [0.01, 0.05, 0.1, 0.5, 1.0, 2.0, 5.0, 10.0];
     let biofilm = [0.02, 0.08, 0.15, 0.6, 1.2, 2.5, 5.5, 11.0];
     let r_qs = barracuda::stats::pearson_correlation(&qs_signal, &biofilm)
-        .expect("Pearson QS vs biofilm correlation");
+        .or_exit("Pearson QS vs biofilm correlation");
     v.check_pass("Pearson: QS↔biofilm r > 0.99", r_qs > 0.99);
     d42_checks += 1;
 
@@ -273,9 +270,9 @@ fn main() {
     let mut d43_checks = 0_u32;
 
     // 43a: Cov(x, x) = Var(x)
-    let cov_xx = barracuda::stats::covariance(&x, &x).expect("covariance cov(x, x)");
+    let cov_xx = barracuda::stats::covariance(&x, &x).or_exit("covariance cov(x, x)");
     let var_x =
-        barracuda::stats::correlation::variance(&x).expect("variance of x for Cov(x,x)=Var(x)");
+        barracuda::stats::correlation::variance(&x).or_exit("variance of x for Cov(x,x)=Var(x)");
     v.check(
         "Cov(x,x) = Var(x)",
         cov_xx,
@@ -286,7 +283,7 @@ fn main() {
 
     // 43b: Cov(x, c) = 0 for constant c
     let const_c = vec![5.0; x.len()];
-    let cov_xc = barracuda::stats::covariance(&x, &const_c).expect("covariance cov(x, constant)");
+    let cov_xc = barracuda::stats::covariance(&x, &const_c).or_exit("covariance cov(x, constant)");
     v.check(
         "Cov(x, constant) = 0",
         cov_xc,
@@ -306,7 +303,7 @@ fn main() {
         .sum::<f64>()
         / (n_xy - 1.0);
     let bc_cov =
-        barracuda::stats::covariance(&x, &y).expect("covariance for manual sample cov comparison");
+        barracuda::stats::covariance(&x, &y).or_exit("covariance for manual sample cov comparison");
     v.check(
         "Cov: manual sample cov = barracuda",
         manual_sample_cov,
@@ -320,7 +317,7 @@ fn main() {
     let c_coeff = 2.0;
     let ax: Vec<f64> = x.iter().map(|&xi| a_coeff * xi + 7.0).collect();
     let cy: Vec<f64> = y.iter().map(|&yi| c_coeff * yi - 5.0).collect();
-    let cov_scaled = barracuda::stats::covariance(&ax, &cy).expect("covariance cov(ax+b, cy+d)");
+    let cov_scaled = barracuda::stats::covariance(&ax, &cy).or_exit("covariance cov(ax+b, cy+d)");
     let expected_scaled = a_coeff * c_coeff * bc_cov;
     v.check(
         "Cov(ax+b, cy+d) = ac·Cov(x,y)",
@@ -348,9 +345,9 @@ fn main() {
     let notill_conn = [0.793, 0.785, 0.801, 0.790, 0.798];
     let tilled_conn = [0.385, 0.392, 0.380, 0.390, 0.388];
     let var_notill = barracuda::stats::correlation::variance(&notill_conn)
-        .expect("soil no-till connectivity variance");
+        .or_exit("soil no-till connectivity variance");
     let var_tilled = barracuda::stats::correlation::variance(&tilled_conn)
-        .expect("soil tilled connectivity variance");
+        .or_exit("soil tilled connectivity variance");
     v.check_pass("Soil: Var(no-till conn) > 0", var_notill > 0.0);
     d44_checks += 1;
     v.check_pass("Soil: Var(tilled conn) > 0", var_tilled > 0.0);
@@ -366,7 +363,7 @@ fn main() {
     ];
     let shannons: Vec<f64> = communities.iter().map(|c| diversity::shannon(c)).collect();
     let h_var = barracuda::stats::correlation::variance(&shannons)
-        .expect("Shannon diversity variance across communities");
+        .or_exit("Shannon diversity variance across communities");
     v.check_pass("Diversity: Var(H') > 0 across communities", h_var > 0.0);
     d44_checks += 1;
 
@@ -379,20 +376,20 @@ fn main() {
     // 44c: Pharmacology — IC50 variance (Gonzales 2014)
     let ic50_values = [10.0, 36.0, 75.0, 130.0, 249.0]; // nM, from paper
     let ic50_var =
-        barracuda::stats::correlation::variance(&ic50_values).expect("IC50 pharmacology variance");
+        barracuda::stats::correlation::variance(&ic50_values).or_exit("IC50 pharmacology variance");
     v.check_pass("Pharma: Var(IC50) > 1000", ic50_var > 1000.0);
     d44_checks += 1;
 
     // 44d: Anderson W scores — variance tracks disorder spread
     let w_scores = [3.5, 8.2, 12.7, 16.1, 19.8];
     let w_var =
-        barracuda::stats::correlation::variance(&w_scores).expect("Anderson W scores variance");
+        barracuda::stats::correlation::variance(&w_scores).or_exit("Anderson W scores variance");
     v.check_pass("Anderson: Var(W) > 0", w_var > 0.0);
     d44_checks += 1;
 
     // 44e: Jackknife SE of Shannon — cross-spring pattern
     let jk = barracuda::stats::jackknife_mean_variance(&shannons)
-        .expect("jackknife mean-variance for Shannon");
+        .or_exit("jackknife mean-variance for Shannon");
     v.check_pass("JK: Shannon SE > 0", jk.std_error > 0.0);
     d44_checks += 1;
     v.check(
@@ -419,7 +416,7 @@ fn main() {
 
     // 45a: Perfect monotonic r_s(x, 2x+1) = 1.0
     let r_spearman = barracuda::stats::correlation::spearman_correlation(&x, &y)
-        .expect("Spearman r_s(x, 2x+1) = 1.0");
+        .or_exit("Spearman r_s(x, 2x+1) = 1.0");
     v.check(
         "Spearman: r_s(x, 2x+1) = 1.0",
         r_spearman,
@@ -430,7 +427,7 @@ fn main() {
 
     // 45b: Perfect negative monotonic
     let r_s_neg = barracuda::stats::correlation::spearman_correlation(&x, &neg_y)
-        .expect("Spearman r_s(x, -x) = -1.0");
+        .or_exit("Spearman r_s(x, -x) = -1.0");
     v.check(
         "Spearman: r_s(x, -x) = -1.0",
         r_s_neg,
@@ -443,9 +440,9 @@ fn main() {
     let mono_x: Vec<f64> = (1..=10).map(f64::from).collect();
     let expo_y: Vec<f64> = mono_x.iter().map(|&xi| xi.powi(3)).collect();
     let r_s_mono = barracuda::stats::correlation::spearman_correlation(&mono_x, &expo_y)
-        .expect("Spearman r_s(x, x³) monotonic");
+        .or_exit("Spearman r_s(x, x³) monotonic");
     let r_p_mono = barracuda::stats::pearson_correlation(&mono_x, &expo_y)
-        .expect("Pearson r(x, x³) monotonic");
+        .or_exit("Pearson r(x, x³) monotonic");
     v.check(
         "Spearman: r_s(x, x³) = 1.0",
         r_s_mono,
@@ -487,7 +484,7 @@ fn main() {
         .map(|i| var_cols.iter().map(|col| col[i]).collect())
         .collect();
     let corr_mat = barracuda::stats::correlation::correlation_matrix(&obs_rows)
-        .expect("correlation matrix for multi-variable structure");
+        .or_exit("correlation matrix for multi-variable structure");
 
     // 46a: Diagonal = 1.0
     for i in 0..n_vars as usize {
@@ -530,9 +527,9 @@ fn main() {
 
     // 46e: Covariance matrix diagonal matches variance
     let cov_mat = barracuda::stats::correlation::covariance_matrix(&obs_rows)
-        .expect("covariance matrix for diagonal check");
+        .or_exit("covariance matrix for diagonal check");
     let var_0 = barracuda::stats::correlation::variance(&var_cols[0])
-        .expect("variance of first variable for CovMat diag");
+        .or_exit("variance of first variable for CovMat diag");
     v.check(
         "CovMat: diag[0] = Var(x)",
         cov_mat[0],

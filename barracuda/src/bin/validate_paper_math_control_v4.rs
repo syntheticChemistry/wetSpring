@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation binary: unwrap() for pass/fail assertions"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation binary: stdout is the output medium"
 )]
@@ -55,6 +51,7 @@
 use wetspring_barracuda::bio::{cooperation, diversity, qs_biofilm};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp291: Paper Math Control v4 — 52 Papers via BarraCuda CPU");
@@ -85,7 +82,7 @@ fn main() {
             diversity::shannon(&abundances)
         })
         .collect();
-    let jk_wave = barracuda::stats::jackknife_mean_variance(&wave_h).unwrap();
+    let jk_wave = barracuda::stats::jackknife_mean_variance(&wave_h).or_exit("unexpected error");
     v.check_pass(
         "Meyer: diversity gradient JK SE > 0",
         jk_wave.std_error > 0.0,
@@ -134,7 +131,7 @@ fn main() {
         .iter()
         .map(|&p| p.max(0.001_f64).ln())
         .collect();
-    let fit_myxo = barracuda::stats::fit_linear(&log_dens, &log_fruit).unwrap();
+    let fit_myxo = barracuda::stats::fit_linear(&log_dens, &log_fruit).or_exit("unexpected error");
     v.check_pass(
         "Myxococcus: dose-response fit R² > 0",
         fit_myxo.r_squared > 0.0,
@@ -429,7 +426,7 @@ fn main() {
         0.95,
         42,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     v.check_pass(
         "V92D: cross-paper diversity CI finite",
         cross_ci.estimate.is_finite(),

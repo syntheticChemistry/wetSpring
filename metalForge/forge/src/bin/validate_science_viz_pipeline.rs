@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![expect(clippy::too_many_lines, clippy::expect_used)]
+#![expect(clippy::too_many_lines)]
 //! # Exp334: Science-to-Viz Pipeline
 //!
 //! End-to-end validation of the science → visualization pipeline:
@@ -19,6 +19,7 @@
 
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::visualization;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp334: Science-to-Viz Pipeline");
@@ -36,7 +37,7 @@ fn main() {
         !eco_s.nodes[0].data_channels.is_empty(),
     );
     v.check_pass("ecology edges empty (single sample)", eco_edges.is_empty());
-    let eco_json = visualization::scenario_to_json(&eco_s).expect("eco json");
+    let eco_json = visualization::scenario_to_json(&eco_s).or_exit("eco json");
     v.check_pass("ecology JSON valid", !eco_json.is_empty());
     v.check_pass(
         "ecology JSON has rarefaction",
@@ -50,7 +51,7 @@ fn main() {
         visualization::scenarios::full_pipeline_scenario(std::slice::from_ref(&counts), &labels);
     v.check_pass("full pipeline ≥ 2 nodes", full_s.nodes.len() >= 2);
     v.check_pass("full pipeline has edges", !full_edges.is_empty());
-    let full_json = visualization::scenario_with_edges_json(&full_s, &full_edges).expect("json");
+    let full_json = visualization::scenario_with_edges_json(&full_s, &full_edges).or_exit("json");
     v.check_pass("full pipeline JSON valid", !full_json.is_empty());
 
     // ── P3: IPC Wire ──
@@ -62,7 +63,7 @@ fn main() {
         "visualization": true,
     });
     let diversity_result =
-        wetspring_barracuda::ipc::handlers::handle_diversity(&ipc_params).expect("diversity");
+        wetspring_barracuda::ipc::handlers::handle_diversity(&ipc_params).or_exit("diversity");
     v.check_pass(
         "diversity result has visualization field",
         diversity_result.get("visualization").is_some(),
@@ -95,7 +96,7 @@ fn main() {
     v.check_pass("pangenome core_size > 0", pan_result.core_size > 0);
     let genome_labels = vec!["A".into(), "B".into(), "C".into(), "D".into()];
     let (pan_s, _) = visualization::scenarios::pangenome_scenario(&clusters, 4, &genome_labels);
-    let pan_json = serde_json::to_string(&pan_s).expect("pan json");
+    let pan_json = serde_json::to_string(&pan_s).or_exit("pan json");
     v.check_pass("pangenome → JSON valid", !pan_json.is_empty());
     v.check_pass(
         "pangenome JSON has heatmap",
@@ -141,7 +142,7 @@ fn main() {
 
     let state_labels = vec!["Low".into(), "Med".into(), "High".into()];
     let (hmm_s, _) = visualization::scenarios::hmm_scenario(&model, &obs, &state_labels);
-    let hmm_json = serde_json::to_string(&hmm_s).expect("hmm json");
+    let hmm_json = serde_json::to_string(&hmm_s).or_exit("hmm json");
     v.check_pass("hmm → JSON valid", !hmm_json.is_empty());
     v.check_pass("hmm JSON has viterbi", hmm_json.contains("viterbi_path"));
     v.check_pass("hmm JSON has posterior", hmm_json.contains("posterior"));
@@ -155,7 +156,7 @@ fn main() {
 
     let (stoch_s, _) =
         visualization::scenarios::stochastic::birth_death_scenario(1.0, 0.3, 20.0, 10, 42);
-    let stoch_json = serde_json::to_string(&stoch_s).expect("stoch json");
+    let stoch_json = serde_json::to_string(&stoch_s).or_exit("stoch json");
     v.check_pass("stochastic → JSON valid", !stoch_json.is_empty());
     v.check_pass(
         "stochastic JSON has trajectory",
@@ -187,7 +188,7 @@ fn main() {
         ];
         let (nmf_s, _) =
             visualization::scenarios::nmf::nmf_scenario(nmf, &sample_labels, &feature_labels);
-        let nmf_json = serde_json::to_string(&nmf_s).expect("nmf json");
+        let nmf_json = serde_json::to_string(&nmf_s).or_exit("nmf json");
         v.check_pass("nmf → JSON valid", !nmf_json.is_empty());
         v.check_pass("nmf JSON has w_matrix", nmf_json.contains("w_matrix"));
         v.check_pass("nmf JSON has h_matrix", nmf_json.contains("h_matrix"));
@@ -199,9 +200,9 @@ fn main() {
     let (pipe_s, pipe_edges) =
         visualization::scenarios::streaming_pipeline::demo_streaming_pipeline_scenario();
     let pipe_json =
-        visualization::scenario_with_edges_json(&pipe_s, &pipe_edges).expect("pipe json");
+        visualization::scenario_with_edges_json(&pipe_s, &pipe_edges).or_exit("pipe json");
     v.check_pass("pipeline JSON valid", !pipe_json.is_empty());
-    let parsed: serde_json::Value = serde_json::from_str(&pipe_json).expect("parse");
+    let parsed: serde_json::Value = serde_json::from_str(&pipe_json).or_exit("parse");
     v.check_pass("parsed JSON is object", parsed.is_object());
     v.check_pass("parsed has nodes array", parsed["nodes"].is_array());
     v.check_pass("parsed has edges array", parsed["edges"].is_array());

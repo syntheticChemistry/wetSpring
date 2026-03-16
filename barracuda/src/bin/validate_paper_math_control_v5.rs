@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -52,6 +48,7 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp313: Paper Math Control v5 — All 52 Papers via BarraCuda CPU");
@@ -176,7 +173,7 @@ fn main() {
             diversity::shannon(&base)
         })
         .collect();
-    let jk = barracuda::stats::jackknife_mean_variance(&replicate_h).unwrap();
+    let jk = barracuda::stats::jackknife_mean_variance(&replicate_h).or_exit("unexpected error");
     v.check_pass(
         "Zuber16: meta-analysis mean H finite",
         jk.estimate.is_finite(),
@@ -192,7 +189,7 @@ fn main() {
         0.95,
         42,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     v.check_pass(
         "Zuber16: 95% CI contains mean",
         ci.lower <= jk.estimate && jk.estimate <= ci.upper,
@@ -301,7 +298,7 @@ fn main() {
 
     let coop_params = cooperation::CooperationParams::default();
     let coop = cooperation::scenario_equal_start(&coop_params, 0.1);
-    let final_coop = coop.y.last().unwrap();
+    let final_coop = coop.y.last().or_exit("unexpected error");
     v.check_pass(
         "Cooperation: total population conserved > 0",
         *final_coop > 0.0,
@@ -319,7 +316,7 @@ fn main() {
     v.check_pass("Cross-track: mean diversity finite", mean_h.is_finite());
     v.check_pass("Cross-track: mean diversity > 0", mean_h > 0.0);
 
-    let cross_jk = barracuda::stats::jackknife_mean_variance(&all_h).unwrap();
+    let cross_jk = barracuda::stats::jackknife_mean_variance(&all_h).or_exit("unexpected error");
     v.check_pass(
         "Cross-track: jackknife variance > 0 (real cross-paper spread)",
         cross_jk.variance > 0.0,

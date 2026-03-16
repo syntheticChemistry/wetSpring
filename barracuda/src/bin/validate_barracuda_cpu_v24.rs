@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -59,6 +55,7 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{DomainResult, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 fn domain(
     name: &'static str,
@@ -324,7 +321,7 @@ fn main() {
     let cap_r = capacitor::scenario_normal(&cap_p, 0.1);
     v.check_pass("Capacitor: converges", cap_r.t.len() > 100);
     d50 += 1;
-    let cap_final = cap_r.states().last().unwrap();
+    let cap_final = cap_r.states().last().or_exit("unexpected error");
     v.check_pass(
         "Capacitor: all state vars ≥ 0",
         cap_final.iter().all(|x| *x >= 0.0),
@@ -351,7 +348,7 @@ fn main() {
     d50 += 1;
 
     let exp_ode = ode::rk4_integrate(|y, _t| vec![-y[0]], &[1.0], 0.0, 5.0, 0.01, None);
-    let y_final = exp_ode.states().last().unwrap()[0];
+    let y_final = exp_ode.states().last().or_exit("unexpected error")[0];
     v.check(
         "RK4: exp(-5) ≈ e^{-5}",
         y_final,
@@ -494,7 +491,7 @@ fn main() {
         &[None, Some(0), Some(1)],
         2,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     let pred = dt.predict(&[2.0, 0.0]);
     v.check_pass("DT: predicts class 0 for feature < threshold", pred == 0);
     d53 += 1;
@@ -548,7 +545,7 @@ fn main() {
     );
     d54 += 1;
 
-    let var = barracuda::stats::correlation::variance(&data).unwrap();
+    let var = barracuda::stats::correlation::variance(&data).or_exit("unexpected error");
     let expected_var = 100.0 * 101.0 / 12.0;
     v.check(
         "var(1..100) = n(n+1)/12",
@@ -560,12 +557,12 @@ fn main() {
 
     let x: Vec<f64> = (0..50).map(|i| f64::from(i) * 0.1).collect();
     let y = x.clone();
-    let r = barracuda::stats::correlation::pearson_correlation(&x, &y).unwrap();
+    let r = barracuda::stats::correlation::pearson_correlation(&x, &y).or_exit("unexpected error");
     v.check("Pearson(x, x) = 1.0", r, 1.0, tolerances::ANALYTICAL_F64);
     d54 += 1;
 
     let neg_y: Vec<f64> = x.iter().map(|xi| -xi).collect();
-    let r_neg = barracuda::stats::correlation::pearson_correlation(&x, &neg_y).unwrap();
+    let r_neg = barracuda::stats::correlation::pearson_correlation(&x, &neg_y).or_exit("unexpected error");
     v.check(
         "Pearson(x, -x) = -1.0",
         r_neg,
@@ -574,7 +571,7 @@ fn main() {
     );
     d54 += 1;
 
-    let jk = barracuda::stats::jackknife_mean_variance(&[1.0, 2.0, 3.0, 4.0, 5.0]).unwrap();
+    let jk = barracuda::stats::jackknife_mean_variance(&[1.0, 2.0, 3.0, 4.0, 5.0]).or_exit("unexpected error");
     v.check(
         "Jackknife estimate = 3.0",
         jk.estimate,
@@ -590,7 +587,7 @@ fn main() {
         0.95,
         42,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     v.check_pass("Bootstrap CI: lower < upper", ci.lower < ci.upper);
     d54 += 1;
     v.check_pass(
@@ -616,7 +613,7 @@ fn main() {
     d54 += 1;
 
     let linear =
-        barracuda::stats::fit_linear(&[1.0, 2.0, 3.0, 4.0], &[2.0, 4.0, 6.0, 8.0]).unwrap();
+        barracuda::stats::fit_linear(&[1.0, 2.0, 3.0, 4.0], &[2.0, 4.0, 6.0, 8.0]).or_exit("unexpected error");
     v.check(
         "fit_linear slope = 2.0",
         linear.params[0],

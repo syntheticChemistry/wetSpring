@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -63,6 +59,7 @@ use wetspring_barracuda::bio::{diversity, diversity_gpu};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct Timing {
     domain: &'static str,
@@ -113,9 +110,9 @@ async fn main() {
         d1_cpu += tc.elapsed().as_micros() as f64;
 
         let tg = Instant::now();
-        let gpu_sh = diversity_gpu::shannon_gpu(&gpu, pop).expect("shannon");
-        let gpu_si = diversity_gpu::simpson_gpu(&gpu, pop).expect("simpson");
-        let gpu_pi = diversity_gpu::pielou_evenness_gpu(&gpu, pop).expect("pielou");
+        let gpu_sh = diversity_gpu::shannon_gpu(&gpu, pop).or_exit("shannon");
+        let gpu_si = diversity_gpu::simpson_gpu(&gpu, pop).or_exit("simpson");
+        let gpu_pi = diversity_gpu::pielou_evenness_gpu(&gpu, pop).or_exit("pielou");
         d1_gpu += tg.elapsed().as_micros() as f64;
 
         v.check_pass(
@@ -158,7 +155,7 @@ async fn main() {
     let d2_cpu = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
-    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).expect("BC condensed");
+    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).or_exit("BC condensed");
     let d2_gpu = tg.elapsed().as_micros() as f64;
 
     let labels = [

@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -271,6 +267,7 @@ fn main() {
     #[cfg(feature = "json")]
     {
         use wetspring_barracuda::visualization::{DataChannel, EcologyScenario, ScenarioNode};
+use wetspring_barracuda::validation::OrExit;
 
         let mut ts_node = ScenarioNode {
             id: "kbs_lter".into(),
@@ -314,9 +311,9 @@ fn main() {
             edges: vec![],
         };
 
-        let json = serde_json::to_string_pretty(&scenario).expect("serialize");
+        let json = serde_json::to_string_pretty(&scenario).or_exit("serialize");
         std::fs::create_dir_all("output").ok();
-        std::fs::write("output/kbs_lter_anderson_temporal.json", &json).expect("write");
+        std::fs::write("output/kbs_lter_anderson_temporal.json", &json).or_exit("write");
         println!(
             "  Exported: output/kbs_lter_anderson_temporal.json ({} bytes)",
             json.len()

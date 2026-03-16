@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -68,6 +64,7 @@ use wetspring_barracuda::bio::esn::{Esn, EsnConfig};
 use wetspring_barracuda::npu;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 // ═══════════════════════════════════════════════════════════════════
 // LCG — deterministic, no deps
@@ -116,8 +113,8 @@ fn main() {
         v.finish();
     }
 
-    let summary = npu::npu_summary().expect("NPU summary");
-    let mut handle = npu::discover_npu().expect("open NPU");
+    let summary = npu::npu_summary().or_exit("NPU summary");
+    let mut handle = npu::discover_npu().or_exit("open NPU");
 
     println!("  NPU: {} @ {}", summary.chip, summary.pcie_address);
     println!(
@@ -147,10 +144,10 @@ fn main() {
 
         for _probe in 0..N_PROBES {
             let pattern: Vec<u8> = (0..PROBE_LEN).map(|_| rng.next_i8() as u8).collect();
-            handle.write_raw(&pattern).expect("probe write");
+            handle.write_raw(&pattern).or_exit("probe write");
 
             let mut resp = vec![0u8; PROBE_LEN];
-            handle.read_raw(&mut resp).expect("probe read");
+            handle.read_raw(&mut resp).or_exit("probe read");
             response_concat.extend_from_slice(&resp);
         }
 
@@ -172,9 +169,9 @@ fn main() {
     let alt_pattern: Vec<u8> = (0..PROBE_LEN * N_PROBES)
         .map(|_| diff_rng.next_i8() as u8)
         .collect();
-    handle.write_raw(&alt_pattern).expect("alt write");
+    handle.write_raw(&alt_pattern).or_exit("alt write");
     let mut alt_resp = vec![0u8; PROBE_LEN * N_PROBES];
-    handle.read_raw(&mut alt_resp).expect("alt read");
+    handle.read_raw(&mut alt_resp).or_exit("alt read");
     let inter_diff = 100.0 - hamming_similarity(&fingerprints[0], &alt_resp);
     println!("  Inter-probe entropy (diff seeds): {inter_diff:.2}% different");
 
@@ -231,7 +228,7 @@ fn main() {
             *w = new_val.clamp(-128, 127) as i8;
         }
 
-        npu::load_readout_weights(&mut handle, &candidate).expect("evo load");
+        npu::load_readout_weights(&mut handle, &candidate).or_exit("evo load");
         let fitness = eval_npu_fitness(&mut handle, &mut esn, &test_inputs, &test_labels);
 
         if fitness >= best_fitness {
@@ -283,7 +280,7 @@ fn main() {
     let trained_weights = esn.to_npu_weights();
 
     esn.reset_state();
-    npu::load_readout_weights(&mut handle, &trained_weights.weights_i8).expect("stream load");
+    npu::load_readout_weights(&mut handle, &trained_weights.weights_i8).or_exit("stream load");
 
     let mut stream_classes: Vec<usize> = Vec::with_capacity(STREAM_STEPS);
     let mut stream_latencies_ns: Vec<u64> = Vec::with_capacity(STREAM_STEPS);
@@ -298,7 +295,7 @@ fn main() {
 
         let state_i8 = quantize_state(esn.state());
         let t_step = Instant::now();
-        let r = npu::npu_infer_i8(&mut handle, &state_i8, N_OUT).expect("stream infer");
+        let r = npu::npu_infer_i8(&mut handle, &state_i8, N_OUT).or_exit("stream infer");
         stream_latencies_ns.push(t_step.elapsed().as_nanos() as u64);
         stream_classes.push(r.class);
     }
@@ -386,15 +383,15 @@ fn main() {
             })
             .collect();
 
-        handle.write_raw(&weights).expect("chaos weights write");
+        handle.write_raw(&weights).or_exit("chaos weights write");
 
         let mut responses: Vec<Vec<u8>> = Vec::new();
         for _ in 0..CHAOS_STEPS {
             let input_bytes: Vec<u8> = probe_input.iter().map(|&x| x as u8).collect();
-            handle.write_raw(&input_bytes).expect("chaos input write");
+            handle.write_raw(&input_bytes).or_exit("chaos input write");
 
             let mut resp = vec![0u8; CHAOS_N_RES];
-            handle.read_raw(&mut resp).expect("chaos read");
+            handle.read_raw(&mut resp).or_exit("chaos read");
             responses.push(resp);
         }
 
@@ -476,17 +473,17 @@ fn main() {
 
     for _ in 0..XTALK_ROUNDS {
         let t_sw = Instant::now();
-        npu::load_readout_weights(&mut handle, &weights_a.weights_i8).expect("xtalk A load");
+        npu::load_readout_weights(&mut handle, &weights_a.weights_i8).or_exit("xtalk A load");
         switch_latencies.push(t_sw.elapsed().as_nanos() as u64);
 
-        let r_a = npu::npu_infer_i8(&mut handle, &probe_a, 3).expect("xtalk A infer");
+        let r_a = npu::npu_infer_i8(&mut handle, &probe_a, 3).or_exit("xtalk A infer");
         a_responses.push(r_a.raw_i8);
 
         let t_sw = Instant::now();
-        npu::load_readout_weights(&mut handle, &weights_b.weights_i8).expect("xtalk B load");
+        npu::load_readout_weights(&mut handle, &weights_b.weights_i8).or_exit("xtalk B load");
         switch_latencies.push(t_sw.elapsed().as_nanos() as u64);
 
-        let r_b = npu::npu_infer_i8(&mut handle, &probe_b, 4).expect("xtalk B infer");
+        let r_b = npu::npu_infer_i8(&mut handle, &probe_b, 4).or_exit("xtalk B infer");
         b_responses.push(r_b.raw_i8);
     }
 

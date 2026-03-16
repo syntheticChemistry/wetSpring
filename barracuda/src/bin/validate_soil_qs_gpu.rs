@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -62,6 +54,7 @@ use barracuda::spectral::{
     GOE_R, POISSON_R, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 use barracuda::stats::norm_cdf;
+use wetspring_barracuda::validation::OrExit;
 
 struct Timing {
     domain: &'static str,
@@ -97,8 +90,8 @@ async fn main() {
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
-    let gpu_sh = diversity_gpu::shannon_gpu(&gpu, &soil_community).expect("GPU Shannon");
-    let gpu_si = diversity_gpu::simpson_gpu(&gpu, &soil_community).expect("GPU Simpson");
+    let gpu_sh = diversity_gpu::shannon_gpu(&gpu, &soil_community).or_exit("GPU Shannon");
+    let gpu_si = diversity_gpu::simpson_gpu(&gpu, &soil_community).or_exit("GPU Simpson");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check(
@@ -140,7 +133,7 @@ async fn main() {
 
     let tg = Instant::now();
     let gpu_bc =
-        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).expect("GPU Bray-Curtis");
+        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).or_exit("GPU Bray-Curtis");
     let gpu_bc_us = tg.elapsed().as_micros() as f64;
 
     v.check_pass(
@@ -219,8 +212,8 @@ async fn main() {
 
     let tc = Instant::now();
     let cpu_std = qs_biofilm::scenario_standard_growth(&params, dt);
-    let cpu_n = *cpu_std.states().last().unwrap().first().unwrap();
-    let cpu_b = cpu_std.states().last().unwrap()[4];
+    let cpu_n = *cpu_std.states().last().or_exit("unexpected error").first().or_exit("unexpected error");
+    let cpu_b = cpu_std.states().last().or_exit("unexpected error")[4];
     let qs_cpu_us = tc.elapsed().as_micros() as f64;
 
     v.check_pass(
@@ -245,7 +238,7 @@ async fn main() {
 
     let tc = Instant::now();
     let equal = cooperation::scenario_equal_start(&coop_p, dt);
-    let freq = *cooperation::cooperator_frequency(&equal).last().unwrap();
+    let freq = *cooperation::cooperator_frequency(&equal).last().or_exit("unexpected error");
     let coop_us = tc.elapsed().as_micros() as f64;
 
     v.check_pass("Cooperation freq in (0, 1)", freq > 0.0 && freq < 1.0);

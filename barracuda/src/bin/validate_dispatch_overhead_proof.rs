@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -34,6 +30,7 @@ use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator, test_data};
 
 use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
+use wetspring_barracuda::validation::OrExit;
 
 const BATCH_SIZES: &[usize] = &[64, 256, 1024, 4096];
 const REPEATS: usize = 5;
@@ -44,7 +41,7 @@ async fn main() {
 
     let gpu = validation::gpu_or_skip().await;
 
-    let session = streaming_gpu::GpuPipelineSession::new(&gpu).expect("dispatch overhead");
+    let session = streaming_gpu::GpuPipelineSession::new(&gpu).or_exit("dispatch overhead");
     println!("  Session warmup: {:.1} ms", session.warmup_ms);
 
     let mut results: Vec<(usize, f64, f64, f64)> = Vec::new();
@@ -69,33 +66,33 @@ async fn main() {
         // Strategy B: GPU Individual (new FMR each call)
         let t_ind = Instant::now();
         for _ in 0..REPEATS - 1 {
-            let fmr = FusedMapReduceF64::new(gpu.to_wgpu_device()).expect("dispatch overhead");
-            let _ = fmr.shannon_entropy(&abundances).expect("dispatch overhead");
-            let _ = fmr.simpson_index(&abundances).expect("dispatch overhead");
+            let fmr = FusedMapReduceF64::new(gpu.to_wgpu_device()).or_exit("dispatch overhead");
+            let _ = fmr.shannon_entropy(&abundances).or_exit("dispatch overhead");
+            let _ = fmr.simpson_index(&abundances).or_exit("dispatch overhead");
             let binary: Vec<f64> = abundances
                 .iter()
                 .map(|&c| if c > 0.0 { 1.0 } else { 0.0 })
                 .collect();
-            let _ = fmr.sum(&binary).expect("dispatch overhead");
+            let _ = fmr.sum(&binary).or_exit("dispatch overhead");
         }
-        let fmr = FusedMapReduceF64::new(gpu.to_wgpu_device()).expect("dispatch overhead");
-        let ind_shannon = fmr.shannon_entropy(&abundances).expect("dispatch overhead");
+        let fmr = FusedMapReduceF64::new(gpu.to_wgpu_device()).or_exit("dispatch overhead");
+        let ind_shannon = fmr.shannon_entropy(&abundances).or_exit("dispatch overhead");
         let ind_us = t_ind.elapsed().as_micros() as f64 / REPEATS as f64;
 
         // Strategy C: GPU Streaming (pre-warmed session)
         let t_stream = Instant::now();
         for _ in 0..REPEATS - 1 {
-            let _ = session.shannon(&abundances).expect("dispatch overhead");
-            let _ = session.simpson(&abundances).expect("dispatch overhead");
+            let _ = session.shannon(&abundances).or_exit("dispatch overhead");
+            let _ = session.simpson(&abundances).or_exit("dispatch overhead");
             let _ = session
                 .observed_features(&abundances)
-                .expect("dispatch overhead");
+                .or_exit("dispatch overhead");
         }
-        let stream_shannon = session.shannon(&abundances).expect("dispatch overhead");
-        let stream_simpson = session.simpson(&abundances).expect("dispatch overhead");
+        let stream_shannon = session.shannon(&abundances).or_exit("dispatch overhead");
+        let stream_simpson = session.simpson(&abundances).or_exit("dispatch overhead");
         let stream_observed = session
             .observed_features(&abundances)
-            .expect("dispatch overhead");
+            .or_exit("dispatch overhead");
         let stream_us = t_stream.elapsed().as_micros() as f64 / REPEATS as f64;
 
         // Parity checks

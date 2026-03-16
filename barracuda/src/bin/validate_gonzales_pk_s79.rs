@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation binary: expect() for pass/fail assertions"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation binary: unwrap() for pass/fail assertions"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation binary: stdout is the output medium"
 )]
@@ -64,6 +56,7 @@ use std::time::Instant;
 use barracuda::stats::{fit_exponential, mean};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct Timing {
     domain: &'static str,
@@ -148,9 +141,9 @@ fn main() {
         let peak = conc_curve
             .iter()
             .copied()
-            .max_by(|a, b| a.partial_cmp(b).unwrap())
-            .unwrap();
-        let final_conc = *conc_curve.last().unwrap();
+            .max_by(|a, b| a.partial_cmp(b).or_exit("unexpected error"))
+            .or_exit("unexpected error");
+        let final_conc = *conc_curve.last().or_exit("unexpected error");
 
         v.check_pass(
             &format!("Dose {dose:.3}: peak ≈ dose"),
@@ -186,11 +179,11 @@ fn main() {
     let t0 = Instant::now();
 
     let log_doses: Vec<f64> = doses_mg_kg.iter().map(|&d| d.ln()).collect();
-    let fit = fit_exponential(&log_doses, &durations_days).expect("exponential fit");
+    let fit = fit_exponential(&log_doses, &durations_days).or_exit("exponential fit");
 
     let predicted: Vec<f64> = log_doses
         .iter()
-        .map(|&x| fit.predict_one(x).unwrap())
+        .map(|&x| fit.predict_one(x).or_exit("unexpected error"))
         .collect();
     let r2 = fit.r_squared;
 

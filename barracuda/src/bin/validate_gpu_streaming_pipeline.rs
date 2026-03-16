@@ -8,10 +8,6 @@
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
-#![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
 //! Exp072: `ToadStool` Unidirectional Streaming — Zero CPU Round-Trips
 //!
 //! Proves that chaining GPU stages via pre-warmed pipelines eliminates
@@ -45,6 +41,7 @@ use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
 
 use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
+use wetspring_barracuda::validation::OrExit;
 
 fn cosine_cpu(a: &[f64], b: &[f64]) -> f64 {
     let dot: f64 = special::dot(a, b);
@@ -165,13 +162,13 @@ async fn main() {
     v.section("PATH B: GPU Individual Dispatch");
 
     let t_ind = Instant::now();
-    let ind_shannon = diversity_gpu::shannon_gpu(&gpu, &abundances).expect("GPU streaming");
-    let ind_simpson = diversity_gpu::simpson_gpu(&gpu, &abundances).expect("GPU streaming");
+    let ind_shannon = diversity_gpu::shannon_gpu(&gpu, &abundances).or_exit("GPU streaming");
+    let ind_simpson = diversity_gpu::simpson_gpu(&gpu, &abundances).or_exit("GPU streaming");
     let ind_observed =
-        diversity_gpu::observed_features_gpu(&gpu, &abundances).expect("GPU streaming");
-    let ind_bray = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).expect("GPU streaming");
+        diversity_gpu::observed_features_gpu(&gpu, &abundances).or_exit("GPU streaming");
+    let ind_bray = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).or_exit("GPU streaming");
     let ind_cosine =
-        spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).expect("GPU streaming");
+        spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).or_exit("GPU streaming");
     let ind_total_us = t_ind.elapsed().as_micros() as f64;
 
     v.check(
@@ -212,15 +209,15 @@ async fn main() {
     // ═══════════════════════════════════════════════════════════════════
     v.section("PATH C: GPU Streaming (Pre-Warmed Session)");
 
-    let session = streaming_gpu::GpuPipelineSession::new(&gpu).expect("GPU streaming");
+    let session = streaming_gpu::GpuPipelineSession::new(&gpu).or_exit("GPU streaming");
     println!("  Session warmup: {:.1} ms", session.warmup_ms);
 
     let t_stream = Instant::now();
-    let stream_shannon = session.shannon(&abundances).expect("GPU streaming");
-    let stream_simpson = session.simpson(&abundances).expect("GPU streaming");
+    let stream_shannon = session.shannon(&abundances).or_exit("GPU streaming");
+    let stream_simpson = session.simpson(&abundances).or_exit("GPU streaming");
     let stream_observed = session
         .observed_features(&abundances)
-        .expect("GPU streaming");
+        .or_exit("GPU streaming");
     let stream_total_us = t_stream.elapsed().as_micros() as f64;
 
     v.check(
@@ -278,20 +275,20 @@ async fn main() {
 
     let t_ind_10 = Instant::now();
     for _ in 0..10 {
-        let fmr = FusedMapReduceF64::new(gpu.to_wgpu_device()).expect("GPU streaming");
-        let _ = fmr.shannon_entropy(&big_abundances).expect("GPU streaming");
-        let _ = fmr.simpson_index(&big_abundances).expect("GPU streaming");
-        let _ = fmr.sum(&big_abundances).expect("GPU streaming");
+        let fmr = FusedMapReduceF64::new(gpu.to_wgpu_device()).or_exit("GPU streaming");
+        let _ = fmr.shannon_entropy(&big_abundances).or_exit("GPU streaming");
+        let _ = fmr.simpson_index(&big_abundances).or_exit("GPU streaming");
+        let _ = fmr.sum(&big_abundances).or_exit("GPU streaming");
     }
     let ind_10_us = t_ind_10.elapsed().as_micros() as f64;
 
     let t_stream_10 = Instant::now();
     for _ in 0..10 {
-        let _ = session.shannon(&big_abundances).expect("GPU streaming");
-        let _ = session.simpson(&big_abundances).expect("GPU streaming");
+        let _ = session.shannon(&big_abundances).or_exit("GPU streaming");
+        let _ = session.simpson(&big_abundances).or_exit("GPU streaming");
         let _ = session
             .observed_features(&big_abundances)
-            .expect("GPU streaming");
+            .or_exit("GPU streaming");
     }
     let stream_10_us = t_stream_10.elapsed().as_micros() as f64;
 

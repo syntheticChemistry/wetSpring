@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -58,6 +50,7 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 use barracuda::spectral::{
     GOE_R, POISSON_R, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
@@ -99,8 +92,8 @@ async fn main() {
     let div_cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
-    let gpu_sh = diversity_gpu::shannon_gpu(&gpu, &soil_comm).expect("GPU Shannon");
-    let gpu_si = diversity_gpu::simpson_gpu(&gpu, &soil_comm).expect("GPU Simpson");
+    let gpu_sh = diversity_gpu::shannon_gpu(&gpu, &soil_comm).or_exit("GPU Shannon");
+    let gpu_si = diversity_gpu::simpson_gpu(&gpu, &soil_comm).or_exit("GPU Simpson");
     let div_gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check(
@@ -146,7 +139,7 @@ async fn main() {
     let bc_cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
-    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).expect("GPU BC");
+    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).or_exit("GPU BC");
     let bc_gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check_pass("BC vector length match", cpu_bc.len() == gpu_bc.len());
@@ -187,9 +180,9 @@ async fn main() {
     let mutant = qs_biofilm::scenario_hapr_mutant(&params, dt);
     let qs_cpu_us = tc.elapsed().as_micros() as f64;
 
-    let std_n = *standard.states().last().unwrap().first().unwrap();
-    let high_b = high.states().last().unwrap()[4];
-    let mut_b = mutant.states().last().unwrap()[4];
+    let std_n = *standard.states().last().or_exit("unexpected error").first().or_exit("unexpected error");
+    let high_b = high.states().last().or_exit("unexpected error")[4];
+    let mut_b = mutant.states().last().or_exit("unexpected error")[4];
 
     v.check_pass("QS standard: N converges", std_n > params.k_cap * 0.5);
     v.check_pass(
@@ -217,9 +210,9 @@ async fn main() {
     let ch = cooperation::scenario_cheat_dominated(&coop_p, dt);
     let coop_cpu_us = tc.elapsed().as_micros() as f64;
 
-    let freq_eq = *cooperation::cooperator_frequency(&eq).last().unwrap();
-    let freq_cd = *cooperation::cooperator_frequency(&cd).last().unwrap();
-    let freq_ch = *cooperation::cooperator_frequency(&ch).last().unwrap();
+    let freq_eq = *cooperation::cooperator_frequency(&eq).last().or_exit("unexpected error");
+    let freq_cd = *cooperation::cooperator_frequency(&cd).last().or_exit("unexpected error");
+    let freq_ch = *cooperation::cooperator_frequency(&ch).last().or_exit("unexpected error");
 
     v.check_pass("Equal start: 0 < freq < 1", freq_eq > 0.0 && freq_eq < 1.0);
     v.check_pass("Coop dominated > cheat dominated", freq_cd > freq_ch);

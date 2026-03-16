@@ -29,6 +29,7 @@ use std::fs;
 use wetspring_barracuda::bio::decision_tree::DecisionTree;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 #[expect(clippy::cast_possible_truncation)]
 fn load_tree() -> DecisionTree {
@@ -36,12 +37,12 @@ fn load_tree() -> DecisionTree {
         validation::data_dir("WETSPRING_PFAS_ML_DIR", "experiments/results/008_pfas_ml")
             .join("decision_tree_exported.json");
     let tree_json =
-        fs::read_to_string(&tree_path).expect("cannot read decision_tree_exported.json");
+        fs::read_to_string(&tree_path).or_exit("cannot read decision_tree_exported.json");
 
     let tree_data: serde_json::Value =
-        serde_json::from_str(&tree_json).expect("cannot parse tree JSON");
+        serde_json::from_str(&tree_json).or_exit("cannot parse tree JSON");
 
-    let nodes = tree_data["nodes"].as_array().expect("nodes array");
+    let nodes = tree_data["nodes"].as_array().or_exit("nodes array");
     let n_features = tree_data["n_features"].as_u64().unwrap_or(28) as usize;
 
     let mut features_arr = Vec::new();
@@ -70,7 +71,7 @@ fn load_tree() -> DecisionTree {
         &predictions_arr,
         n_features,
     )
-    .expect("invalid tree structure")
+    .or_exit("invalid tree structure")
 }
 
 struct TestData {
@@ -84,12 +85,12 @@ fn load_test_data() -> TestData {
     let test_path =
         validation::data_dir("WETSPRING_PFAS_ML_DIR", "experiments/results/008_pfas_ml")
             .join("decision_tree_test_data.json");
-    let test_json = fs::read_to_string(&test_path).expect("cannot read test data");
+    let test_json = fs::read_to_string(&test_path).or_exit("cannot read test data");
 
     let test_data: serde_json::Value =
-        serde_json::from_str(&test_json).expect("cannot parse test JSON");
+        serde_json::from_str(&test_json).or_exit("cannot parse test JSON");
 
-    let raw_samples = test_data["samples"].as_array().expect("samples array");
+    let raw_samples = test_data["samples"].as_array().or_exit("samples array");
     let expected_accuracy = test_data["test_accuracy"].as_f64().unwrap_or(0.0);
     let expected_f1 = test_data["test_f1"].as_f64().unwrap_or(0.0);
 
@@ -98,7 +99,7 @@ fn load_test_data() -> TestData {
         .map(|s| {
             let feats: Vec<f64> = s["features"]
                 .as_array()
-                .expect("features array")
+                .or_exit("features array")
                 .iter()
                 .map(|v| v.as_f64().unwrap_or(0.0))
                 .collect();

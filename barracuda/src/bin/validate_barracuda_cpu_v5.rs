@@ -33,6 +33,7 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("BarraCuda CPU v5 — RF + GBM (Domains 24-25)");
@@ -53,7 +54,7 @@ fn main() {
         &[None, Some(0), None, Some(1), Some(2)],
         2,
     )
-    .expect("Barracuda CPU v5");
+    .or_exit("Barracuda CPU v5");
 
     let tree2 = DecisionTree::from_arrays(
         &[1, -2, -2],
@@ -63,7 +64,7 @@ fn main() {
         &[None, Some(0), Some(2)],
         2,
     )
-    .expect("Barracuda CPU v5");
+    .or_exit("Barracuda CPU v5");
 
     let tree3 = DecisionTree::from_arrays(
         &[0, -2, -2],
@@ -73,7 +74,7 @@ fn main() {
         &[None, Some(1), Some(2)],
         2,
     )
-    .expect("Barracuda CPU v5");
+    .or_exit("Barracuda CPU v5");
 
     let tree4 = DecisionTree::from_arrays(
         &[0, 1, -2, -2, -2],
@@ -83,7 +84,7 @@ fn main() {
         &[None, None, Some(0), Some(1), Some(2)],
         2,
     )
-    .expect("Barracuda CPU v5");
+    .or_exit("Barracuda CPU v5");
 
     let tree5 = DecisionTree::from_arrays(
         &[1, -2, 0, -2, -2],
@@ -93,10 +94,10 @@ fn main() {
         &[None, Some(0), None, Some(1), Some(2)],
         2,
     )
-    .expect("Barracuda CPU v5");
+    .or_exit("Barracuda CPU v5");
 
     let rf = RandomForest::from_trees(vec![tree1, tree2, tree3, tree4, tree5], 3)
-        .expect("Barracuda CPU v5");
+        .or_exit("Barracuda CPU v5");
 
     // Structural checks
     v.check(
@@ -210,7 +211,7 @@ fn main() {
         &[2, -1, -1],
         &[0.0, -1.0, 1.0],
     )
-    .expect("Barracuda CPU v5");
+    .or_exit("Barracuda CPU v5");
 
     let stump2 = GbmTree::from_arrays(
         &[1, -2, -2],
@@ -219,7 +220,7 @@ fn main() {
         &[2, -1, -1],
         &[0.0, -0.8, 0.8],
     )
-    .expect("Barracuda CPU v5");
+    .or_exit("Barracuda CPU v5");
 
     let stump3 = GbmTree::from_arrays(
         &[0, -2, -2],
@@ -228,10 +229,10 @@ fn main() {
         &[2, -1, -1],
         &[0.0, -0.5, 1.5],
     )
-    .expect("Barracuda CPU v5");
+    .or_exit("Barracuda CPU v5");
 
     let gbm =
-        GbmClassifier::new(vec![stump1, stump2, stump3], 0.1, 0.0, 2).expect("Barracuda CPU v5");
+        GbmClassifier::new(vec![stump1, stump2, stump3], 0.1, 0.0, 2).or_exit("Barracuda CPU v5");
 
     // Structural checks
     v.check(
@@ -317,12 +318,12 @@ fn main() {
 
     // Initial bias check
     let gbm_biased = GbmClassifier::new(
-        vec![GbmTree::from_arrays(&[-2], &[0.0], &[-1], &[-1], &[0.0]).expect("Barracuda CPU v5")],
+        vec![GbmTree::from_arrays(&[-2], &[0.0], &[-1], &[-1], &[0.0]).or_exit("Barracuda CPU v5")],
         0.1,
         5.0,
         2,
     )
-    .expect("Barracuda CPU v5");
+    .or_exit("Barracuda CPU v5");
     let biased_pred = gbm_biased.predict_proba(&[0.0]);
     v.check(
         "GBM: biased initial → prob > 0.99",
@@ -341,7 +342,7 @@ fn main() {
         &[2, -1, -1],
         &[0.0, 2.0, -1.0],
     )
-    .expect("Barracuda CPU v5");
+    .or_exit("Barracuda CPU v5");
     let mc_tree1 = GbmTree::from_arrays(
         &[0, -2, -2],
         &[0.5, 0.0, 0.0],
@@ -349,7 +350,7 @@ fn main() {
         &[2, -1, -1],
         &[0.0, -1.0, 2.0],
     )
-    .expect("Barracuda CPU v5");
+    .or_exit("Barracuda CPU v5");
     let mc_tree2 = GbmTree::from_arrays(
         &[1, -2, -2],
         &[0.5, 0.0, 0.0],
@@ -357,7 +358,7 @@ fn main() {
         &[2, -1, -1],
         &[0.0, 2.0, -1.0],
     )
-    .expect("Barracuda CPU v5");
+    .or_exit("Barracuda CPU v5");
 
     let mgbm = GbmMultiClassifier::new(
         vec![vec![mc_tree0], vec![mc_tree1], vec![mc_tree2]],
@@ -365,7 +366,7 @@ fn main() {
         vec![0.0, 0.0, 0.0],
         2,
     )
-    .expect("Barracuda CPU v5");
+    .or_exit("Barracuda CPU v5");
 
     v.check(
         "GBM-MC: n_classes = 3",

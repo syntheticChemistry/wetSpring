@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -35,6 +31,7 @@
 //! Provenance: Known-value formulas and algorithmic invariants
 
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 /// A signaling pathway with activation score from patient proteomic data.
 struct Pathway {
@@ -154,7 +151,7 @@ fn validate_pathway_identification(v: &mut Validator) {
                 .partial_cmp(&b.activation_score)
                 .unwrap_or(std::cmp::Ordering::Equal)
         })
-        .expect("PATHWAYS non-empty");
+        .or_exit("PATHWAYS non-empty");
     v.check_pass(
         "PI3K/AKT/mTOR is highest-activation pathway",
         top_pathway.name == "PI3K/AKT/mTOR",
@@ -216,7 +213,7 @@ fn validate_score_matrix(v: &mut Validator) {
             > scores
                 .iter()
                 .find(|(d, _)| d.generic == "tocilizumab")
-                .expect("known drug tocilizumab")
+                .or_exit("known drug tocilizumab")
                 .1,
     );
 }
@@ -236,11 +233,11 @@ fn validate_discovery_logic(v: &mut Validator) {
         let mtor = PATHWAYS
             .iter()
             .find(|p| p.name == "PI3K/AKT/mTOR")
-            .expect("known pathway PI3K/AKT/mTOR");
+            .or_exit("known pathway PI3K/AKT/mTOR");
         let il6 = PATHWAYS
             .iter()
             .find(|p| p.name == "IL-6/gp130")
-            .expect("known pathway IL-6/gp130");
+            .or_exit("known pathway IL-6/gp130");
         mtor.activation_score > il6.activation_score
     });
 

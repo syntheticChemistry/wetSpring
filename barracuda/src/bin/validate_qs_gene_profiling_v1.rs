@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -54,6 +50,7 @@
 
 use std::time::Instant;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 const FNR_REGULATED: u8 = 1 << 0;
 const ARCAB_REGULATED: u8 = 1 << 1;
@@ -416,9 +413,9 @@ fn main() {
             "h3_model": "W = 3.5*H' + 8*O2",
             "molecular_support": "FNR/ArcAB/Rex regulate QS transcription under anaerobic conditions",
         });
-        let json = serde_json::to_string_pretty(&export).expect("serialize");
+        let json = serde_json::to_string_pretty(&export).or_exit("serialize");
         std::fs::create_dir_all("output").ok();
-        std::fs::write("output/qs_gene_regulon_analysis.json", &json).expect("write");
+        std::fs::write("output/qs_gene_regulon_analysis.json", &json).or_exit("write");
         println!("\n  Exported: output/qs_gene_regulon_analysis.json");
         v.check_pass("JSON export", true);
     }

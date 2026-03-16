@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -48,6 +44,7 @@ use wetspring_barracuda::bio::cooperation::CooperationParams;
 use wetspring_barracuda::bio::multi_signal::MultiSignalParams;
 use wetspring_barracuda::bio::phage_defense::PhageDefenseParams;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 const DT: f64 = 0.01;
 const N_STEPS: usize = 4800;
@@ -97,7 +94,7 @@ fn main() {
         let flat = p.to_flat();
         let (upstream_result, upstream_us) = bench("upstream integrate_cpu (4800 steps)", || {
             BatchedOdeRK4::<CapacitorOde>::integrate_cpu(&y0, &flat, DT, N_STEPS, 1)
-                .expect("capacitor upstream")
+                .or_exit("capacitor upstream")
         });
 
         let max_diff = local_result
@@ -121,7 +118,7 @@ fn main() {
             let params: Vec<f64> = flat.iter().copied().cycle().take(bs * 16).collect();
             let (_, us) = bench(&format!("batched CPU ({bs} batches)"), || {
                 BatchedOdeRK4::<CapacitorOde>::integrate_cpu(&states, &params, DT, N_STEPS, bs)
-                    .expect("batched")
+                    .or_exit("batched")
             });
             batch_timings.push((bs, us));
         }
@@ -153,7 +150,7 @@ fn main() {
         let flat = p.to_flat();
         let (upstream_result, upstream_us) = bench("upstream integrate_cpu (4800 steps)", || {
             BatchedOdeRK4::<CooperationOde>::integrate_cpu(&y0, &flat, DT, N_STEPS, 1)
-                .expect("cooperation upstream")
+                .or_exit("cooperation upstream")
         });
 
         let max_diff = local_result
@@ -175,7 +172,7 @@ fn main() {
             let params: Vec<f64> = flat.iter().copied().cycle().take(bs * 13).collect();
             let (_, us) = bench(&format!("batched CPU ({bs} batches)"), || {
                 BatchedOdeRK4::<CooperationOde>::integrate_cpu(&states, &params, DT, N_STEPS, bs)
-                    .expect("batched")
+                    .or_exit("batched")
             });
             batch_timings.push((bs, us));
         }
@@ -207,7 +204,7 @@ fn main() {
         let flat = p.to_flat();
         let (upstream_result, upstream_us) = bench("upstream integrate_cpu (4800 steps)", || {
             BatchedOdeRK4::<MultiSignalOde>::integrate_cpu(&y0, &flat, DT, N_STEPS, 1)
-                .expect("multi_signal upstream")
+                .or_exit("multi_signal upstream")
         });
 
         let max_diff = local_result
@@ -229,7 +226,7 @@ fn main() {
             let params: Vec<f64> = flat.iter().copied().cycle().take(bs * 24).collect();
             let (_, us) = bench(&format!("batched CPU ({bs} batches)"), || {
                 BatchedOdeRK4::<MultiSignalOde>::integrate_cpu(&states, &params, DT, N_STEPS, bs)
-                    .expect("batched")
+                    .or_exit("batched")
             });
             batch_timings.push((bs, us));
         }
@@ -261,7 +258,7 @@ fn main() {
         let flat = p.to_flat();
         let (upstream_result, upstream_us) = bench("upstream integrate_cpu (4800 steps)", || {
             BatchedOdeRK4::<BistableOde>::integrate_cpu(&y0, &flat, DT, N_STEPS, 1)
-                .expect("bistable upstream")
+                .or_exit("bistable upstream")
         });
 
         let max_diff = local_result
@@ -283,7 +280,7 @@ fn main() {
             let params: Vec<f64> = flat.iter().copied().cycle().take(bs * 21).collect();
             let (_, us) = bench(&format!("batched CPU ({bs} batches)"), || {
                 BatchedOdeRK4::<BistableOde>::integrate_cpu(&states, &params, DT, N_STEPS, bs)
-                    .expect("batched")
+                    .or_exit("batched")
             });
             batch_timings.push((bs, us));
         }
@@ -319,7 +316,7 @@ fn main() {
         let steps = 500;
         let (upstream_result, upstream_us) = bench("upstream integrate_cpu (500 steps)", || {
             BatchedOdeRK4::<PhageDefenseOde>::integrate_cpu(&y0, &flat, DT, steps, 1)
-                .expect("phage_defense upstream")
+                .or_exit("phage_defense upstream")
         });
 
         v.check_pass(
@@ -350,7 +347,7 @@ fn main() {
             let params: Vec<f64> = flat.iter().copied().cycle().take(bs * 11).collect();
             let (_, us) = bench(&format!("batched CPU ({bs} batches)"), || {
                 BatchedOdeRK4::<PhageDefenseOde>::integrate_cpu(&states, &params, DT, steps, bs)
-                    .expect("batched")
+                    .or_exit("batched")
             });
             batch_timings.push((bs, us));
         }

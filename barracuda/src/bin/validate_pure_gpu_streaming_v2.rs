@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -44,6 +40,7 @@ use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 #[tokio::main]
 async fn main() {
@@ -110,9 +107,9 @@ fn validate_alpha_streaming(
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
-    let gpu_shannon = session.shannon(&counts).expect("shannon stream");
-    let gpu_simpson = session.simpson(&counts).expect("simpson stream");
-    let gpu_observed = session.observed_features(&counts).expect("observed stream");
+    let gpu_shannon = session.shannon(&counts).or_exit("shannon stream");
+    let gpu_simpson = session.simpson(&counts).or_exit("simpson stream");
+    let gpu_observed = session.observed_features(&counts).or_exit("observed stream");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check(
@@ -157,7 +154,7 @@ fn validate_bray_curtis_streaming(
 
     let sample_refs: Vec<&[f64]> = samples.iter().map(Vec::as_slice).collect();
     let tg = Instant::now();
-    let gpu_bc = session.bray_curtis_matrix(&sample_refs).expect("BC stream");
+    let gpu_bc = session.bray_curtis_matrix(&sample_refs).or_exit("BC stream");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check(
@@ -201,7 +198,7 @@ fn validate_spectral_streaming(
     let tg = Instant::now();
     let gpu_cos = session
         .spectral_cosine_matrix(&spec_refs)
-        .expect("cosine stream");
+        .or_exit("cosine stream");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check(
@@ -278,7 +275,7 @@ fn validate_full_pipeline(
     let tg = Instant::now();
     let gpu_result = session
         .stream_full_analytics(&classifier, &[], &sample_counts, &params)
-        .expect("full stream");
+        .or_exit("full stream");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     // Verify alpha diversity parity

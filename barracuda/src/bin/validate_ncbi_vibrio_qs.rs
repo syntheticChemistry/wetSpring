@@ -1,20 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
 #![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
-    clippy::cast_possible_truncation,
-    reason = "validation harness: u128→u64 timing, f64→u32 counts"
 )]
 //! # Exp121: NCBI Vibrio QS Parameter Landscape
 //!
@@ -42,6 +34,8 @@ use wetspring_barracuda::gpu::GpuF64;
 #[cfg(feature = "gpu")]
 use wetspring_barracuda::validation;
 use wetspring_barracuda::validation::Validator;
+#[cfg(feature = "gpu")]
+use wetspring_barracuda::validation::OrExit;
 
 #[cfg(feature = "gpu")]
 const N_PARAMS: usize = 17;
@@ -190,8 +184,8 @@ fn main() {
 
     #[cfg(feature = "gpu")]
     {
-        let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
-        let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+        let rt = tokio::runtime::Runtime::new().or_exit("tokio runtime");
+        let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
         if !gpu.has_f64 {
             validation::exit_skipped("No SHADER_F64 support");
         }
@@ -209,7 +203,7 @@ fn main() {
         let all_params: Vec<f64> = derived_params.iter().flat_map(params_to_flat_17).collect();
         let gpu_output = sweeper
             .integrate(&config, &all_y0, &all_params)
-            .expect("ODE integrate");
+            .or_exit("ODE integrate");
 
         v.check_count("GPU output size", gpu_output.len(), n * N_VARS);
         let gpu_all_finite = gpu_output.iter().all(|x| x.is_finite());

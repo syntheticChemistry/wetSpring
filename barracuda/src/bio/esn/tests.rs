@@ -1,19 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![expect(
-    clippy::expect_used,
-    reason = "test module: assertions use expect for clarity"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "test module: f64 arithmetic for ESN weight comparisons"
 )]
 #![expect(
     clippy::cast_lossless,
     reason = "test module: explicit casts for readability in ESN math"
-)]
-#![expect(
-    clippy::suboptimal_flops,
-    reason = "test module: mathematical expressions match paper notation"
 )]
 
 use super::*;

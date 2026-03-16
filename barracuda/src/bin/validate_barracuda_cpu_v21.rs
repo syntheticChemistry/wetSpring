@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -48,6 +44,7 @@
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp287: BarraCuda CPU v21 — V92D Deep Debt Evolution");
@@ -222,7 +219,7 @@ fn main() {
 
     let x_lin = [1.0, 2.0, 3.0, 4.0, 5.0];
     let y_lin = [2.0, 4.0, 6.0, 8.0, 10.0];
-    let fit = barracuda::stats::fit_linear(&x_lin, &y_lin).unwrap();
+    let fit = barracuda::stats::fit_linear(&x_lin, &y_lin).or_exit("unexpected error");
     v.check(
         "Chain: fit_linear slope = 2",
         fit.params[0],

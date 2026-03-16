@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -59,6 +55,7 @@ use wetspring_barracuda::bio::hmm_gpu::HmmGpuForward;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 const MU: f64 = 1.0;
 const PI: [f64; 4] = [0.25, 0.25, 0.25, 0.25];
@@ -415,7 +412,7 @@ fn bench_hmm_batch(device: &Arc<barracuda::device::WgpuDevice>, v: &mut Validato
         .collect();
     let cpu_us = start.elapsed().as_micros();
 
-    let hmm_gpu = HmmGpuForward::new(device).expect("HMM GPU shader");
+    let hmm_gpu = HmmGpuForward::new(device).or_exit("HMM GPU shader");
     let start = Instant::now();
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         hmm_gpu.forward_batch(&model, &all_obs_u32, n_seqs, n_steps)

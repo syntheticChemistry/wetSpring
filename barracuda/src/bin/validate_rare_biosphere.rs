@@ -54,6 +54,7 @@
 use wetspring_barracuda::bio::{diversity, pcoa};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp051: Anderson 2015 Rare Biosphere Validation");
@@ -281,7 +282,7 @@ fn validate_pcoa(v: &mut Validator, piccard: &[f64], von_damm: &[f64], backgroun
 
     let bc_condensed = diversity::bray_curtis_condensed(&padded);
     let result =
-        pcoa::pcoa(&bc_condensed, padded.len(), 2).expect("PCoA on valid condensed BC matrix");
+        pcoa::pcoa(&bc_condensed, padded.len(), 2).or_exit("PCoA on valid condensed BC matrix");
 
     v.check(
         "PCoA: all eigenvalues non-negative",

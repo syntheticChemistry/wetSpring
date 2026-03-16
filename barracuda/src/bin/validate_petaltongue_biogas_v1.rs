@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -51,6 +47,7 @@ use barracuda::stats::norm_cdf;
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::visualization::ipc_push::PetalTonguePushClient;
+use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::visualization::{
     DataChannel, EcologyScenario, ScenarioEdge, ScenarioNode, ScientificRange, scenario_to_json,
 };
@@ -455,7 +452,7 @@ fn main() {
     // ── S4: JSON export ──
     println!("\n── S4: JSON export ──");
 
-    let json = scenario_to_json(&scenario).expect("serialize");
+    let json = scenario_to_json(&scenario).or_exit("serialize");
     v.check_pass("JSON valid", json.contains("Biogas Kinetics Dashboard"));
     v.check_pass("JSON has Gompertz", json.contains("Gompertz"));
     v.check_pass("JSON has Haldane", json.contains("Haldane"));
@@ -463,10 +460,10 @@ fn main() {
     let output_dir = PathBuf::from("output");
     let _ = std::fs::create_dir_all(&output_dir);
     let path = output_dir.join("biogas_kinetics_dashboard.json");
-    std::fs::write(&path, &json).expect("write JSON");
+    std::fs::write(&path, &json).or_exit("write JSON");
     v.check_pass("JSON file written", path.exists());
 
-    let size = std::fs::metadata(&path).expect("meta").len();
+    let size = std::fs::metadata(&path).or_exit("meta").len();
     println!("  → File: {} ({} bytes)", path.display(), size);
     println!("  → Load: petaltongue ui --scenario {}", path.display());
     v.check_pass("JSON has content", size > 5000);

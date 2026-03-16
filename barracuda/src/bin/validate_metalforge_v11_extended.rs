@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -54,6 +46,7 @@ use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::ipc::dispatch;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Hardware {
@@ -168,8 +161,8 @@ fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
-        .expect("tokio runtime");
-    let _gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+        .or_exit("tokio runtime");
+    let _gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
 
     let mut v = Validator::new("Exp242: metalForge v11 — Extended Cross-System Dispatch");
     let t_total = Instant::now();
@@ -269,8 +262,8 @@ fn main() {
         &[2, -1, -1],
         &[0.0, -0.5, 0.5],
     )
-    .unwrap();
-    let model = gbm::GbmClassifier::new(vec![tree1], 0.1, 0.0, 2).unwrap();
+    .or_exit("unexpected error");
+    let model = gbm::GbmClassifier::new(vec![tree1], 0.1, 0.0, 2).or_exit("unexpected error");
     let pred = model.predict_proba(&[0.8, 0.5]);
     v.check_pass(
         "GBM dispatch: probability valid",
@@ -315,8 +308,8 @@ fn main() {
         &[None, Some(0), Some(1)],
         2,
     )
-    .unwrap();
-    let forest = random_forest::RandomForest::from_trees(vec![dt], 2).unwrap();
+    .or_exit("unexpected error");
+    let forest = random_forest::RandomForest::from_trees(vec![dt], 2).or_exit("unexpected error");
     let rf_pred = forest.predict(&[0.8, 0.3]);
     v.check_pass("RF dispatch: class valid", rf_pred <= 1);
 
@@ -329,14 +322,14 @@ fn main() {
         "science.diversity",
         &json!({"counts": &ipc_counts, "metrics": ["all"]}),
     )
-    .expect("IPC diversity");
-    let ipc_h = ipc_result["shannon"].as_f64().unwrap();
-    let ipc_si = ipc_result["simpson"].as_f64().unwrap();
+    .or_exit("IPC diversity");
+    let ipc_h = ipc_result["shannon"].as_f64().or_exit("unexpected error");
+    let ipc_si = ipc_result["simpson"].as_f64().or_exit("unexpected error");
     v.check("IPC Shannon", ipc_h, cpu_h, tolerances::EXACT);
     v.check("IPC Simpson", ipc_si, cpu_si, tolerances::EXACT);
 
     v.section("N13: IPC Dispatch Parity (QS Model)");
-    let ipc_qs = dispatch::dispatch("science.qs_model", &json!({})).expect("IPC QS model");
+    let ipc_qs = dispatch::dispatch("science.qs_model", &json!({})).or_exit("IPC QS model");
     v.check_pass("IPC QS: result present", !ipc_qs.is_null());
 
     v.section("N14: IPC Full Pipeline");
@@ -344,7 +337,7 @@ fn main() {
         "science.full_pipeline",
         &json!({"counts": [10.0, 20.0, 30.0]}),
     )
-    .expect("IPC pipeline");
+    .or_exit("IPC pipeline");
     v.check_pass(
         "Pipeline has diversity",
         pipe_result.get("diversity").is_some(),

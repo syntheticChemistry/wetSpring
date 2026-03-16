@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -71,6 +63,7 @@ use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::io::fastq::FastqRecord;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 #[tokio::main]
 async fn main() {
@@ -114,7 +107,7 @@ async fn main() {
         let cpu_filt = quality::filter_reads(&reads, &qparams);
         let cpu_us = t0.elapsed().as_micros() as f64;
         let t1 = Instant::now();
-        let (gpu_filt, _stats) = session.filter_reads(&reads, &qparams).unwrap();
+        let (gpu_filt, _stats) = session.filter_reads(&reads, &qparams).or_exit("unexpected error");
         let gpu_us = t1.elapsed().as_micros() as f64;
         v.check_count("S1: filtered count", gpu_filt.len(), cpu_filt.0.len());
         (cpu_us, gpu_us, gpu_filt.len())
@@ -140,9 +133,9 @@ async fn main() {
     let t1 = Instant::now();
     let gpu_shannons: Vec<f64> = samples
         .iter()
-        .map(|c| session.shannon(c).unwrap())
+        .map(|c| session.shannon(c).or_exit("unexpected error"))
         .collect();
-    let gpu_bc = session.bray_curtis_matrix(&sample_refs).unwrap();
+    let gpu_bc = session.bray_curtis_matrix(&sample_refs).or_exit("unexpected error");
     let gpu_div_us = t1.elapsed().as_micros() as f64;
 
     for (i, (&c, &g)) in cpu_shannons.iter().zip(&gpu_shannons).enumerate() {
@@ -165,11 +158,11 @@ async fn main() {
     let cpu_fuse = diversity_fusion_cpu(&flat, n_species);
     let cpu_fuse_us = t0.elapsed().as_micros() as f64;
 
-    let fusion_gpu = DiversityFusionGpu::new(Arc::clone(&device)).expect("DiversityFusionGpu");
+    let fusion_gpu = DiversityFusionGpu::new(Arc::clone(&device)).or_exit("DiversityFusionGpu");
     let t1 = Instant::now();
     let gpu_fuse = fusion_gpu
         .compute(&flat, n_fuse_samples, n_species)
-        .expect("fusion");
+        .or_exit("fusion");
     let gpu_fuse_us = t1.elapsed().as_micros() as f64;
 
     for (i, (c, g)) in cpu_fuse.iter().zip(&gpu_fuse).enumerate() {
@@ -209,7 +202,7 @@ async fn main() {
 
     let gemm = GemmCached::with_precision(Arc::clone(&device), Arc::clone(&ctx), Precision::F64);
     let t1 = Instant::now();
-    let gpu_c = gemm.execute(&a_mat, &b_mat, m, k, n, 1).expect("GEMM");
+    let gpu_c = gemm.execute(&a_mat, &b_mat, m, k, n, 1).or_exit("GEMM");
     let gpu_gemm_us = t1.elapsed().as_micros() as f64;
 
     v.check(
@@ -239,11 +232,11 @@ async fn main() {
     v.section("S5: PCoA (zero round-trip from Stage 2 BC)");
 
     let t0 = Instant::now();
-    let cpu_pcoa = pcoa::pcoa(&cpu_bc, 4, 2).unwrap();
+    let cpu_pcoa = pcoa::pcoa(&cpu_bc, 4, 2).or_exit("unexpected error");
     let cpu_pcoa_us = t0.elapsed().as_micros() as f64;
 
     let t1 = Instant::now();
-    let gpu_pcoa = pcoa_gpu::pcoa_gpu(&gpu, &gpu_bc, 4, 2).unwrap();
+    let gpu_pcoa = pcoa_gpu::pcoa_gpu(&gpu, &gpu_bc, 4, 2).or_exit("unexpected error");
     let gpu_pcoa_us = t1.elapsed().as_micros() as f64;
 
     v.check_count("PCoA samples", gpu_pcoa.n_samples, cpu_pcoa.n_samples);
@@ -260,7 +253,7 @@ async fn main() {
         vec![100.0, 200.0, 50.0, 300.0, 150.0],
         vec![10.0, 20.0, 500.0, 30.0, 15.0],
     ];
-    let gpu_cos = spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).unwrap();
+    let gpu_cos = spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).or_exit("unexpected error");
     v.check_pass(
         "Self-cosine ≈ 1",
         (gpu_cos[0] - 1.0).abs() < tolerances::GPU_VS_CPU_F64,

@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -56,6 +52,7 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{DomainResult, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 fn domain(
     name: &'static str,
@@ -160,13 +157,13 @@ fn main() {
     );
     mf18 += 1;
 
-    let var = barracuda::stats::correlation::variance(&data).unwrap();
+    let var = barracuda::stats::correlation::variance(&data).or_exit("unexpected error");
     v.check_pass("MF18: var > 0", var > 0.0);
     mf18 += 1;
 
     let x: Vec<f64> = (0..20).map(|i| f64::from(i) * 0.5).collect();
     let y = x.clone();
-    let r = barracuda::stats::correlation::pearson_correlation(&x, &y).unwrap();
+    let r = barracuda::stats::correlation::pearson_correlation(&x, &y).or_exit("unexpected error");
     v.check(
         "MF18: Pearson(x, x) = 1.0",
         r,
@@ -182,7 +179,7 @@ fn main() {
         0.95,
         42,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     v.check_pass("MF18: CI lower < upper", ci.lower < ci.upper);
     mf18 += 1;
 
@@ -281,7 +278,7 @@ fn main() {
     v.check_pass("MF21: cross-track mean H > 0", cross_mean > 0.0);
     mf21 += 1;
 
-    let jk = barracuda::stats::jackknife_mean_variance(&all_h).unwrap();
+    let jk = barracuda::stats::jackknife_mean_variance(&all_h).or_exit("unexpected error");
     v.check_pass("MF21: jackknife variance finite", jk.variance.is_finite());
     mf21 += 1;
 

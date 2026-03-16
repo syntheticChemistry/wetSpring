@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -57,6 +49,7 @@ use barracuda::stats::norm_cdf;
 
 #[cfg(feature = "gpu")]
 use wetspring_barracuda::tolerances;
+use wetspring_barracuda::validation::OrExit;
 
 fn gompertz(t: f64, p: f64, rm: f64, lambda: f64) -> f64 {
     p * (-(rm * std::f64::consts::E / p)
@@ -134,16 +127,16 @@ fn main() {
         let rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()
-            .expect("tokio");
+            .or_exit("tokio");
         let gpu = rt
             .block_on(wetspring_barracuda::gpu::GpuF64::new())
-            .expect("GPU");
+            .or_exit("GPU");
         gpu.print_info();
 
         let gpu_h_dig = wetspring_barracuda::bio::diversity_gpu::shannon_gpu(&gpu, &digester)
-            .expect("GPU Shannon digester");
+            .or_exit("GPU Shannon digester");
         let gpu_h_soil = wetspring_barracuda::bio::diversity_gpu::shannon_gpu(&gpu, &soil)
-            .expect("GPU Shannon soil");
+            .or_exit("GPU Shannon soil");
         v.check(
             "D39: GPU Shannon(digester) = CPU",
             gpu_h_dig,
@@ -213,8 +206,8 @@ fn main() {
     let s_opt_idx = haldane_batch
         .iter()
         .enumerate()
-        .max_by(|a, b| a.1.partial_cmp(b.1).unwrap())
-        .unwrap()
+        .max_by(|a, b| a.1.partial_cmp(b.1).or_exit("unexpected error"))
+        .or_exit("unexpected error")
         .0;
     v.check_pass(
         "D40: Haldane peak in batch interior",

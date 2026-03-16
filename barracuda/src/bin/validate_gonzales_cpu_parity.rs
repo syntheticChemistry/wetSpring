@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -52,6 +44,7 @@ use barracuda::stats::{fit_exponential, hill, mean, r_squared};
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 const TOL: f64 = tolerances::ANALYTICAL_F64;
 
@@ -159,7 +152,7 @@ fn main() {
         .map(|&x| a_true * (b_true * x).exp())
         .collect();
 
-    let fit = fit_exponential(&x_data, &y_data).expect("exponential fit on clean data");
+    let fit = fit_exponential(&x_data, &y_data).or_exit("exponential fit on clean data");
     v.check_pass(
         "fit.params[0] ≈ a_true (2.5)",
         (fit.params[0] - a_true).abs() < tolerances::REGRESSION_FIT_PARITY,
@@ -171,7 +164,7 @@ fn main() {
     v.check_pass("fit R² ≈ 1.0 on clean data", fit.r_squared > 0.9999);
 
     for (i, &xi) in x_data.iter().enumerate() {
-        let pred = fit.predict_one(xi).unwrap();
+        let pred = fit.predict_one(xi).or_exit("unexpected error");
         v.check_pass(
             &format!("predict_one({xi}) ≈ y[{i}]"),
             (pred - y_data[i]).abs() < tolerances::REGRESSION_FIT_PARITY,
@@ -180,7 +173,7 @@ fn main() {
 
     let dose_x = [-2.079, -0.693, 0.693]; // ln(0.125), ln(0.5), ln(2.0)
     let dose_y = [14.0, 28.0, 42.0];
-    let dose_fit = fit_exponential(&dose_x, &dose_y).expect("PK dose-duration fit");
+    let dose_fit = fit_exponential(&dose_x, &dose_y).or_exit("PK dose-duration fit");
     v.check_pass("PK fit R² > 0.95", dose_fit.r_squared > 0.95);
 
     println!(
@@ -367,7 +360,7 @@ fn main() {
     v.check_pass("All barrier gaps positive", ratios.iter().all(|&r| r > 0.0));
 
     // Barrier range
-    let range = barriers.last().unwrap() - barriers.first().unwrap();
+    let range = barriers.last().or_exit("unexpected error") - barriers.first().or_exit("unexpected error");
     v.check_pass("Barrier range > 10", range > 10.0);
 
     // Verify ln transform is correct

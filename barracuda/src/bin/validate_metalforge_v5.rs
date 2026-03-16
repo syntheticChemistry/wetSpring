@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -127,10 +123,10 @@ fn validate_cooperation_mf(
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
-    let gpu_engine = CooperationGpu::new(Arc::clone(device)).expect("shader compile");
+    let gpu_engine = CooperationGpu::new(Arc::clone(device)).or_exit("shader compile");
     let results = gpu_engine
         .integrate_params(&[params], &[[0.01, 0.01, 0.0, 0.0]], 48000, 0.001)
-        .expect("GPU integrate");
+        .or_exit("GPU integrate");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     for (i, (&g, &c)) in results[0]
@@ -161,10 +157,10 @@ fn validate_capacitor_mf(
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
-    let gpu_engine = CapacitorGpu::new(Arc::clone(device)).expect("shader compile");
+    let gpu_engine = CapacitorGpu::new(Arc::clone(device)).or_exit("shader compile");
     let results = gpu_engine
         .integrate_params(&[params], &[[0.01, 1.0, 0.0, 0.0, 0.5, 0.0]], 48000, 0.001)
-        .expect("GPU integrate");
+        .or_exit("GPU integrate");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     for (i, (&g, &c)) in results[0]
@@ -197,7 +193,7 @@ fn validate_kmd_mf(
     let tg = Instant::now();
     let gpu_results =
         kmd_gpu::kendrick_mass_defect_gpu(gpu, &masses, units::CF2_EXACT, units::CF2_NOMINAL)
-            .expect("KMD GPU");
+            .or_exit("KMD GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     for (i, (c, g)) in cpu.iter().zip(&gpu_results).enumerate() {
@@ -229,7 +225,7 @@ fn validate_gbm_mf(
         &[2, -1, -1],
         &[0.0, 0.3, -0.1],
     )
-    .expect("MetalForge v5");
+    .or_exit("MetalForge v5");
     let t2 = GbmTree::from_arrays(
         &[1, -1, -1],
         &[0.3, 0.0, 0.0],
@@ -237,8 +233,8 @@ fn validate_gbm_mf(
         &[2, -1, -1],
         &[0.0, 0.2, -0.2],
     )
-    .expect("MetalForge v5");
-    let model = GbmClassifier::new(vec![t1, t2], 0.1, 0.0, 2).expect("MetalForge v5");
+    .or_exit("MetalForge v5");
+    let model = GbmClassifier::new(vec![t1, t2], 0.1, 0.0, 2).or_exit("MetalForge v5");
 
     let samples = vec![vec![0.8, 0.5], vec![0.2, 0.1], vec![0.6, 0.4]];
     let tc = Instant::now();
@@ -246,7 +242,7 @@ fn validate_gbm_mf(
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
-    let gpu_results = gbm_gpu::predict_batch_gpu(gpu, &model, &samples).expect("GBM GPU");
+    let gpu_results = gbm_gpu::predict_batch_gpu(gpu, &model, &samples).or_exit("GBM GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     for (i, (c, g)) in cpu.iter().zip(&gpu_results).enumerate() {
@@ -288,7 +284,7 @@ fn validate_merge_pairs_mf(
 
     let tg = Instant::now();
     let (gpu_merged, gpu_stats) =
-        merge_pairs_gpu::merge_pairs_gpu(gpu, &fwd, &rev, &params).expect("merge GPU");
+        merge_pairs_gpu::merge_pairs_gpu(gpu, &fwd, &rev, &params).or_exit("merge GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check(
@@ -336,7 +332,7 @@ fn validate_signal_mf(
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
-    let gpu_peaks = signal_gpu::find_peaks_gpu(gpu, &data, &params).expect("signal GPU");
+    let gpu_peaks = signal_gpu::find_peaks_gpu(gpu, &data, &params).or_exit("signal GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check(
@@ -373,7 +369,7 @@ fn validate_feature_table_mf(
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
-    let gpu_ft = feature_table_gpu::extract_features_gpu(gpu, &[], &params).expect("FT GPU");
+    let gpu_ft = feature_table_gpu::extract_features_gpu(gpu, &[], &params).or_exit("FT GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check(
@@ -404,7 +400,7 @@ fn validate_robinson_foulds_mf(
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
-    let gpu_dist = robinson_foulds_gpu::rf_distance_gpu(gpu, &t1, &t2).expect("RF GPU");
+    let gpu_dist = robinson_foulds_gpu::rf_distance_gpu(gpu, &t1, &t2).or_exit("RF GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check(
@@ -451,7 +447,7 @@ fn validate_derep_mf(
 
     let tg = Instant::now();
     let (gpu_uniq, gpu_stats) =
-        derep_gpu::dereplicate_gpu(gpu, &records, DerepSort::Abundance, 1).expect("derep GPU");
+        derep_gpu::dereplicate_gpu(gpu, &records, DerepSort::Abundance, 1).or_exit("derep GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check(
@@ -505,7 +501,7 @@ fn validate_chimera_mf(
 
     let tg = Instant::now();
     let (gpu_results, gpu_stats) =
-        chimera_gpu::detect_chimeras_gpu(gpu, &asvs, &params).expect("chimera GPU");
+        chimera_gpu::detect_chimeras_gpu(gpu, &asvs, &params).or_exit("chimera GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check(
@@ -541,7 +537,7 @@ fn validate_neighbor_joining_mf(
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
-    let gpu_dist = neighbor_joining_gpu::distance_matrix_gpu(gpu, &seqs).expect("NJ GPU");
+    let gpu_dist = neighbor_joining_gpu::distance_matrix_gpu(gpu, &seqs).or_exit("NJ GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     for (i, (c, g)) in cpu_dist.iter().zip(&gpu_dist).enumerate() {
@@ -589,7 +585,7 @@ fn validate_reconciliation_mf(
     let tg = Instant::now();
     let gpu_result =
         reconciliation_gpu::reconcile_dtl_gpu(gpu, &host, &parasite, &tip_mapping, &costs)
-            .expect("reconciliation GPU");
+            .or_exit("reconciliation GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check(
@@ -609,6 +605,7 @@ fn validate_molecular_clock_mf(
     timings: &mut Vec<(&'static str, f64, f64, &'static str)>,
 ) {
     use wetspring_barracuda::bio::molecular_clock_gpu;
+use wetspring_barracuda::validation::OrExit;
 
     v.section("MF-N13: Molecular Clock");
 
@@ -627,7 +624,7 @@ fn validate_molecular_clock_mf(
     let tg = Instant::now();
     let gpu_result =
         molecular_clock_gpu::strict_clock_gpu(gpu, &branch_lengths, &parent_indices, root_age, &[])
-            .expect("clock GPU");
+            .or_exit("clock GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     match (&cpu, &gpu_result) {
@@ -655,7 +652,7 @@ fn validate_molecular_clock_mf(
         &node_ages,
         &parent_indices,
     )
-    .expect("relaxed clock GPU");
+    .or_exit("relaxed clock GPU");
 
     for (i, (c, g)) in cpu_rates.iter().zip(&gpu_rates).enumerate() {
         v.check(

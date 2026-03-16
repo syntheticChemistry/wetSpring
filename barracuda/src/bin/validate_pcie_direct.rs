@@ -34,6 +34,7 @@ use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, kmer, taxonomy, unifrac};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Substrate {
@@ -119,7 +120,7 @@ fn validate_gpu_to_npu_path(v: &mut Validator) {
         .map(|s| {
             classifier
                 .classify_quantized(s)
-                .expect("trained classifier")
+                .or_exit("trained classifier")
         })
         .collect();
 
@@ -158,7 +159,7 @@ fn validate_npu_to_gpu_path(v: &mut Validator) {
         .map(|s| {
             classifier
                 .classify_quantized(s)
-                .expect("trained classifier")
+                .or_exit("trained classifier")
         })
         .collect();
 
@@ -354,7 +355,7 @@ fn validate_transfer_parity(v: &mut Validator) {
                 .map(|s| {
                     classifier
                         .classify_quantized(s)
-                        .expect("trained classifier")
+                        .or_exit("trained classifier")
                 })
                 .collect();
             let matches = q_results == reference_classifications;

@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -66,6 +62,7 @@ use wetspring_barracuda::bio::unifrac_gpu::UniFracGpu;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 #[tokio::main]
 async fn main() {
@@ -91,9 +88,9 @@ async fn main() {
     let warmup_start = Instant::now();
 
     let ode_gpu = OdeSweepGpu::new(device.clone());
-    let phage_gpu = PhageDefenseGpu::new(device.clone()).expect("PhageDefenseGpu init");
-    let bistable_gpu_inst = BistableGpu::new(device.clone()).expect("BistableGpu init");
-    let multi_gpu = MultiSignalGpu::new(device.clone()).expect("MultiSignalGpu init");
+    let phage_gpu = PhageDefenseGpu::new(device.clone()).or_exit("PhageDefenseGpu init");
+    let bistable_gpu_inst = BistableGpu::new(device.clone()).or_exit("BistableGpu init");
+    let multi_gpu = MultiSignalGpu::new(device.clone()).or_exit("MultiSignalGpu init");
     let felsenstein_gpu = FelsensteinGpu::new(&device);
     let unifrac_gpu = UniFracGpu::new(&device);
 
@@ -167,7 +164,7 @@ fn validate_ode_streaming(
     let tg = Instant::now();
     let gpu_out = ode_gpu
         .integrate(&config, &flat_y0, &flat_params)
-        .expect("ODE GPU");
+        .or_exit("ODE GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     for batch_idx in 0..n_batch {
@@ -230,7 +227,7 @@ fn validate_phage_streaming(
     let tg = Instant::now();
     let gpu_result = phage_gpu
         .integrate_params(&[params], &[y0], n_steps, h)
-        .expect("Phage GPU");
+        .or_exit("Phage GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     let gpu_final = &gpu_result[0];
@@ -247,7 +244,7 @@ fn validate_phage_streaming(
     };
     let gpu_result2 = phage_gpu
         .integrate_params(&[params2], &[y0], n_steps, h)
-        .expect("Phage GPU dispatch 2");
+        .or_exit("Phage GPU dispatch 2");
     v.check_pass("phage dispatch 2 finite", gpu_result2[0][0].is_finite());
 
     timings.push(("Phage Defense", cpu_us, gpu_us));
@@ -274,7 +271,7 @@ fn validate_bistable_streaming(
     let tg = Instant::now();
     let gpu_result = bistable_gpu_inst
         .integrate_params(&[params], &[y0], n_steps, h)
-        .expect("Bistable GPU");
+        .or_exit("Bistable GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     let gpu_final = &gpu_result[0];
@@ -294,7 +291,7 @@ fn validate_bistable_streaming(
     };
     let gpu2 = bistable_gpu_inst
         .integrate_params(&[params2], &[y0], n_steps, h)
-        .expect("Bistable GPU dispatch 2");
+        .or_exit("Bistable GPU dispatch 2");
     v.check_pass("bistable dispatch 2 finite", gpu2[0][0].is_finite());
 
     timings.push(("Bistable Switch", cpu_us, gpu_us));
@@ -321,7 +318,7 @@ fn validate_multi_signal_streaming(
     let tg = Instant::now();
     let gpu_result = multi_gpu
         .integrate_params(&[params], &[y0], n_steps, h)
-        .expect("MultiSignal GPU");
+        .or_exit("MultiSignal GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     let gpu_final = &gpu_result[0];
@@ -341,7 +338,7 @@ fn validate_multi_signal_streaming(
     };
     let gpu2 = multi_gpu
         .integrate_params(&[params2], &[y0], n_steps, h)
-        .expect("MultiSignal GPU dispatch 2");
+        .or_exit("MultiSignal GPU dispatch 2");
     v.check_pass("multi_sig dispatch 2 finite", gpu2[0][0].is_finite());
 
     timings.push(("Multi-Signal", cpu_us, gpu_us));
@@ -674,7 +671,7 @@ fn validate_unifrac_streaming(
             n_samples,
             n_leaves,
         )
-        .expect("UniFrac GPU");
+        .or_exit("UniFrac GPU");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check(
@@ -710,7 +707,7 @@ fn validate_unifrac_streaming(
             n_samples,
             n_leaves,
         )
-        .expect("UniFrac GPU dispatch 2");
+        .or_exit("UniFrac GPU dispatch 2");
     v.check_pass(
         "UniFrac dispatch 2 finite",
         r2.node_sums.iter().all(|x| x.is_finite()),

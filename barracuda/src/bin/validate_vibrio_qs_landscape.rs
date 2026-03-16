@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation binary: expect() for pass/fail assertions"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation binary: stdout is the output medium"
 )]
@@ -38,6 +34,7 @@ use wetspring_barracuda::bio::qs_biofilm::{self, QsBiofilmParams};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 const N_BATCHES: usize = 1024;
 const N_STEPS: u32 = 500;
@@ -155,8 +152,8 @@ fn main() {
 
     #[cfg(feature = "gpu")]
     {
-        let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
-        let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+        let rt = tokio::runtime::Runtime::new().or_exit("tokio runtime");
+        let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
 
         if !gpu.has_f64 {
             validation::exit_skipped("No SHADER_F64 support");
@@ -181,7 +178,7 @@ fn main() {
         let gpu_start = Instant::now();
         let gpu_output = sweeper
             .integrate(&config, &all_y0, &all_params)
-            .expect("ODE integrate");
+            .or_exit("ODE integrate");
         let gpu_elapsed = gpu_start.elapsed();
 
         println!(

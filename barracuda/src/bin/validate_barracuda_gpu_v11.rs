@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -57,6 +49,7 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct GpuTiming {
     name: &'static str,
@@ -68,8 +61,8 @@ fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
-        .expect("tokio runtime");
-    let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+        .or_exit("tokio runtime");
+    let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
     println!("  GPU: {}", gpu.adapter_name);
     println!("  f64 shaders: {}", gpu.has_f64);
     println!("  Fp64Strategy: {:?}", gpu.fp64_strategy());
@@ -88,9 +81,9 @@ fn main() {
     v.section("G00: Diversity GPU Sanity (inherited)");
     let ab = vec![10.0, 20.0, 30.0, 15.0, 25.0, 5.0, 12.0, 8.0, 17.0, 22.0];
     let cpu_h = diversity::shannon(&ab);
-    let gpu_h = diversity_gpu::shannon_gpu(&gpu, &ab).expect("GPU shannon");
+    let gpu_h = diversity_gpu::shannon_gpu(&gpu, &ab).or_exit("GPU shannon");
     let cpu_si = diversity::simpson(&ab);
-    let gpu_si = diversity_gpu::simpson_gpu(&gpu, &ab).expect("GPU simpson");
+    let gpu_si = diversity_gpu::simpson_gpu(&gpu, &ab).or_exit("GPU simpson");
     v.check(
         "Shannon: GPU ≡ CPU",
         gpu_h,
@@ -119,7 +112,7 @@ fn main() {
         .collect();
     let condensed = diversity::bray_curtis_condensed(&samples);
 
-    let cpu_pcoa = pcoa::pcoa(&condensed, 10, 3).expect("CPU PCoA");
+    let cpu_pcoa = pcoa::pcoa(&condensed, 10, 3).or_exit("CPU PCoA");
     let gpu_pcoa = pcoa_gpu::pcoa_gpu(&gpu, &condensed, 10, 3);
 
     match gpu_pcoa {
@@ -274,7 +267,7 @@ fn main() {
         0.95,
         42,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     v.check_pass("G19: Bootstrap CI lower < upper", ci.lower < ci.upper);
     g19_checks += 1;
     v.check_pass("G19: Bootstrap SE > 0", ci.std_error > 0.0);
@@ -289,7 +282,7 @@ fn main() {
         ci.estimate, ci.lower, ci.upper
     );
 
-    let jk = barracuda::stats::jackknife_mean_variance(&gpu_shannons).unwrap();
+    let jk = barracuda::stats::jackknife_mean_variance(&gpu_shannons).or_exit("unexpected error");
     v.check_pass("G19: Jackknife SE > 0", jk.std_error > 0.0);
     g19_checks += 1;
     println!("  Jackknife: {:.4} ± {:.6}", jk.estimate, jk.std_error);
@@ -397,7 +390,7 @@ fn main() {
     }
 
     let (variogram_lags, variogram_gamma) =
-        kriging::empirical_variogram(&sites, 5, 2.0).expect("empirical variogram");
+        kriging::empirical_variogram(&sites, 5, 2.0).or_exit("empirical variogram");
     v.check_pass(
         "Kriging: empirical variogram computed",
         !variogram_lags.is_empty(),

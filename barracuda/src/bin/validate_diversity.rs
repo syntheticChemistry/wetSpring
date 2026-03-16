@@ -35,6 +35,7 @@
 use wetspring_barracuda::bio::{diversity, kmer, pcoa};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("wetSpring Diversity Metrics Validation");
@@ -351,7 +352,7 @@ fn validate_exp002_galaxy_baseline(v: &mut Validator) {
     }
     let samples = vec![low_div, mid_div, high_div];
     let dm = diversity::bray_curtis_condensed(&samples);
-    let pcoa = pcoa::pcoa(&dm, 3, 2).expect("PCoA failed");
+    let pcoa = pcoa::pcoa(&dm, 3, 2).or_exit("PCoA failed");
     let total_var: f64 = pcoa.eigenvalues.iter().sum();
     println!(
         "  PCoA eigenvalues: {:?}, total={:.4}",

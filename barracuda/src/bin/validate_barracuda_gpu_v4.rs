@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -44,6 +40,7 @@ use wetspring_barracuda::bio::qs_biofilm::{self, QsBiofilmParams};
 use wetspring_barracuda::ipc::dispatch;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn synthetic_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     let mut counts = Vec::with_capacity(n_species);
@@ -90,11 +87,11 @@ fn validate_gpu_diversity(v: &mut Validator) {
         let cpu_j = diversity::pielou_evenness(counts);
 
         let params = json!({"counts": counts, "metrics": ["all"]});
-        let result = dispatch::dispatch("science.diversity", &params).expect("dispatch");
-        let disp_h = result["shannon"].as_f64().expect("shannon");
-        let disp_d = result["simpson"].as_f64().expect("simpson");
-        let disp_s = result["observed"].as_f64().expect("observed");
-        let disp_j = result["pielou"].as_f64().expect("pielou");
+        let result = dispatch::dispatch("science.diversity", &params).or_exit("dispatch");
+        let disp_h = result["shannon"].as_f64().or_exit("shannon");
+        let disp_d = result["simpson"].as_f64().or_exit("simpson");
+        let disp_s = result["observed"].as_f64().or_exit("observed");
+        let disp_j = result["pielou"].as_f64().or_exit("pielou");
 
         println!("  community_{i:>2} {cpu_h:>10.6} {cpu_d:>10.6} {cpu_s:>8.0} {cpu_j:>8.6}");
 
@@ -139,8 +136,8 @@ fn validate_gpu_bray_curtis(v: &mut Validator) {
     let cpu_bc = diversity::bray_curtis(&comm_a, &comm_b);
 
     let params = json!({"counts": comm_a, "counts_b": comm_b});
-    let result = dispatch::dispatch("science.diversity", &params).expect("dispatch bc");
-    let gpu_bc = result["bray_curtis"].as_f64().expect("bray_curtis");
+    let result = dispatch::dispatch("science.diversity", &params).or_exit("dispatch bc");
+    let gpu_bc = result["bray_curtis"].as_f64().or_exit("bray_curtis");
 
     v.check(
         "Bray-Curtis GPU==CPU (dispatch)",
@@ -197,9 +194,9 @@ fn validate_gpu_qs_model(v: &mut Validator) {
             .fold(0.0_f64, f64::max);
 
         let params = json!({"scenario": scenario, "dt": dt});
-        let result = dispatch::dispatch("science.qs_model", &params).expect("dispatch qs");
-        let gpu_t_end = result["t_end"].as_f64().expect("t_end");
-        let gpu_peak = result["peak_biofilm"].as_f64().expect("peak_biofilm");
+        let result = dispatch::dispatch("science.qs_model", &params).or_exit("dispatch qs");
+        let gpu_t_end = result["t_end"].as_f64().or_exit("t_end");
+        let gpu_peak = result["peak_biofilm"].as_f64().or_exit("peak_biofilm");
 
         v.check(
             &format!("{scenario} t_end GPU==CPU"),
@@ -230,7 +227,7 @@ fn validate_gpu_anderson(v: &mut Validator) {
 
     for &w in disorder_values {
         let params = json!({"lattice_size": 8, "disorder": w, "seed": 42});
-        let result = dispatch::dispatch("science.anderson", &params).expect("anderson dispatch");
+        let result = dispatch::dispatch("science.anderson", &params).or_exit("anderson dispatch");
 
         v.check_pass(
             &format!("W={w} status=computed"),
@@ -241,7 +238,7 @@ fn validate_gpu_anderson(v: &mut Validator) {
             result["substrate"] == "gpu",
         );
 
-        let r = result["level_spacing_ratio"].as_f64().expect("r");
+        let r = result["level_spacing_ratio"].as_f64().or_exit("r");
         let regime = result["regime"].as_str().unwrap_or("unknown");
         println!("    W={w:5.1} → r={r:.4} ({regime})");
 
@@ -268,14 +265,14 @@ fn validate_gpu_full_pipeline(v: &mut Validator) {
         "dt": 0.01,
     });
 
-    let result = dispatch::dispatch("science.full_pipeline", &params).expect("full pipeline");
+    let result = dispatch::dispatch("science.full_pipeline", &params).or_exit("full pipeline");
 
     v.check_pass("pipeline complete", result["pipeline"] == "complete");
     v.check_pass("pipeline has diversity", result.get("diversity").is_some());
     v.check_pass("pipeline has qs_model", result.get("qs_model").is_some());
     v.check_pass("pipeline has anderson", result.get("anderson").is_some());
 
-    let pipeline_h = result["diversity"]["shannon"].as_f64().expect("h");
+    let pipeline_h = result["diversity"]["shannon"].as_f64().or_exit("h");
     let direct_h = diversity::shannon(&counts);
     v.check(
         "pipeline Shannon==direct (GPU path)",
@@ -302,9 +299,9 @@ fn validate_toadstool_dispatch(v: &mut Validator) {
     v.section("═══ G06: ToadStool Compute Dispatch Model ═══");
     let t = Instant::now();
 
-    let health = dispatch::dispatch("health.check", &json!({})).expect("health");
+    let health = dispatch::dispatch("health.check", &json!({})).or_exit("health");
     let version = health["version"].as_str().unwrap_or("unknown");
-    let caps = health["capabilities"].as_array().expect("capabilities");
+    let caps = health["capabilities"].as_array().or_exit("capabilities");
 
     println!("  Primal: wetspring v{version}");
     println!("  Capabilities: {}", caps.len());

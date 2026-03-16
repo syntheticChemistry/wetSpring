@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::similar_names,
     reason = "validation harness: domain variables from published notation"
 )]
@@ -88,8 +84,8 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
         let t_gpu = Instant::now();
-        let gpu_sh = diversity_gpu::shannon_gpu(&gpu, &counts).expect("MetalForge full");
-        let gpu_si = diversity_gpu::simpson_gpu(&gpu, &counts).expect("MetalForge full");
+        let gpu_sh = diversity_gpu::shannon_gpu(&gpu, &counts).or_exit("MetalForge full");
+        let gpu_si = diversity_gpu::simpson_gpu(&gpu, &counts).or_exit("MetalForge full");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
         v.check(
@@ -127,7 +123,7 @@ async fn main() {
 
         let t_gpu = Instant::now();
         let gpu_bc =
-            diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).expect("MetalForge full");
+            diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).or_exit("MetalForge full");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
         for (i, (c, g)) in cpu_bc.iter().zip(gpu_bc.iter()).enumerate() {
@@ -163,8 +159,8 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
         let t_gpu = Instant::now();
-        let gpu_ani = AniGpu::new(&device).expect("ANI GPU shader");
-        let gpu_r = gpu_ani.batch_ani(&pairs).expect("MetalForge full");
+        let gpu_ani = AniGpu::new(&device).or_exit("ANI GPU shader");
+        let gpu_r = gpu_ani.batch_ani(&pairs).or_exit("MetalForge full");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
         for (i, (cr, gv)) in cpu_r.iter().zip(gpu_r.ani_values.iter()).enumerate() {
@@ -196,8 +192,8 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
         let t_gpu = Instant::now();
-        let gpu_snp = SnpGpu::new(&device).expect("SNP GPU shader");
-        let gpu_r = gpu_snp.call_snps(&seqs).expect("MetalForge full");
+        let gpu_snp = SnpGpu::new(&device).or_exit("SNP GPU shader");
+        let gpu_r = gpu_snp.call_snps(&seqs).or_exit("MetalForge full");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
         let cpu_cnt = cpu_snp.variants.len();
@@ -246,8 +242,8 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
         let t_gpu = Instant::now();
-        let gpu_mod = DnDsGpu::new(&device).expect("dN/dS GPU shader");
-        let gpu_r = gpu_mod.batch_dnds(&pairs).expect("MetalForge full");
+        let gpu_mod = DnDsGpu::new(&device).or_exit("dN/dS GPU shader");
+        let gpu_r = gpu_mod.batch_dnds(&pairs).or_exit("MetalForge full");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
         for (i, cpu_res) in cpu_r.iter().enumerate() {
@@ -312,10 +308,10 @@ async fn main() {
             .collect();
 
         let t_gpu = Instant::now();
-        let gpu_pan = PangenomeGpu::new(&device).expect("Pangenome GPU shader");
+        let gpu_pan = PangenomeGpu::new(&device).or_exit("Pangenome GPU shader");
         let gpu_r = gpu_pan
             .classify(&flat, 6, n_genomes)
-            .expect("MetalForge full");
+            .or_exit("MetalForge full");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
         v.check(
@@ -357,7 +353,7 @@ async fn main() {
             &[None, Some(0), None, Some(1), Some(2)],
             2,
         )
-        .expect("MetalForge full");
+        .or_exit("MetalForge full");
         let tree2 = DecisionTree::from_arrays(
             &[1, -2, -2],
             &[4.0, 0.0, 0.0],
@@ -366,7 +362,7 @@ async fn main() {
             &[None, Some(0), Some(2)],
             2,
         )
-        .expect("MetalForge full");
+        .or_exit("MetalForge full");
         let tree3 = DecisionTree::from_arrays(
             &[0, -2, -2],
             &[6.0, 0.0, 0.0],
@@ -375,9 +371,9 @@ async fn main() {
             &[None, Some(1), Some(2)],
             2,
         )
-        .expect("MetalForge full");
+        .or_exit("MetalForge full");
 
-        let rf = RandomForest::from_trees(vec![tree1, tree2, tree3], 3).expect("MetalForge full");
+        let rf = RandomForest::from_trees(vec![tree1, tree2, tree3], 3).or_exit("MetalForge full");
         let samples = vec![
             vec![3.0, 1.0],
             vec![7.0, 6.0],
@@ -393,7 +389,7 @@ async fn main() {
         let rf_gpu = RandomForestGpu::new(&device);
         let gpu_preds = rf_gpu
             .predict_batch(&rf, &samples)
-            .expect("MetalForge full");
+            .or_exit("MetalForge full");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
         for (i, (c, g)) in cpu_preds.iter().zip(gpu_preds.iter()).enumerate() {
@@ -413,6 +409,7 @@ async fn main() {
     v.section("═══ metalForge 8: HMM Forward CPU ↔ GPU ═══");
     {
         use wetspring_barracuda::bio::{hmm, hmm_gpu::HmmGpuForward};
+use wetspring_barracuda::validation::OrExit;
 
         let model = hmm::HmmModel {
             n_states: 2,
@@ -440,10 +437,10 @@ async fn main() {
             .collect();
 
         let t_gpu = Instant::now();
-        let hmm_gpu = HmmGpuForward::new(&device).expect("HMM GPU shader");
+        let hmm_gpu = HmmGpuForward::new(&device).or_exit("HMM GPU shader");
         let gpu_r = hmm_gpu
             .forward_batch(&model, &flat_obs, 3, n_steps)
-            .expect("MetalForge full");
+            .or_exit("MetalForge full");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
         v.check(

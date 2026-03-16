@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -54,12 +50,13 @@ use wetspring_barracuda::bio::{diversity, diversity_gpu, stats_gpu};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, DomainResult, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
-        .expect("tokio runtime");
+        .or_exit("tokio runtime");
     let gpu = match rt.block_on(GpuF64::new()) {
         Ok(g) => g,
         Err(e) => {
@@ -109,7 +106,7 @@ fn main() {
     let cpu_shannons: Vec<f64> = communities.iter().map(|c| diversity::shannon(c)).collect();
     let gpu_shannons: Vec<f64> = communities
         .iter()
-        .map(|c| diversity_gpu::shannon_gpu(&gpu, c).expect("GPU shannon"))
+        .map(|c| diversity_gpu::shannon_gpu(&gpu, c).or_exit("GPU shannon"))
         .collect();
 
     for (i, (cpu, g)) in cpu_shannons.iter().zip(gpu_shannons.iter()).enumerate() {
@@ -125,7 +122,7 @@ fn main() {
     let cpu_simpsons: Vec<f64> = communities.iter().map(|c| diversity::simpson(c)).collect();
     let gpu_simpsons: Vec<f64> = communities
         .iter()
-        .map(|c| diversity_gpu::simpson_gpu(&gpu, c).expect("GPU simpson"))
+        .map(|c| diversity_gpu::simpson_gpu(&gpu, c).or_exit("GPU simpson"))
         .collect();
 
     for (i, (cpu, g)) in cpu_simpsons.iter().zip(gpu_simpsons.iter()).enumerate() {
@@ -165,9 +162,9 @@ fn main() {
         let data_100: Vec<f64> = (1..=100).map(f64::from).collect();
         let cpu_mean = barracuda::stats::metrics::mean(&data_100);
         let cpu_svar =
-            barracuda::stats::correlation::variance(&data_100).expect("CPU variance on data_100");
+            barracuda::stats::correlation::variance(&data_100).or_exit("CPU variance on data_100");
 
-        let gpu_mv = stats_gpu::mean_variance_gpu(&gpu, &data_100).expect("mean_variance_gpu");
+        let gpu_mv = stats_gpu::mean_variance_gpu(&gpu, &data_100).or_exit("mean_variance_gpu");
         v.check(
             "Welford GPU: mean ≡ CPU",
             gpu_mv[0],
@@ -187,7 +184,7 @@ fn main() {
         g23_checks += 1;
 
         let gpu_msv =
-            stats_gpu::mean_sample_variance_gpu(&gpu, &data_100).expect("mean_sample_variance_gpu");
+            stats_gpu::mean_sample_variance_gpu(&gpu, &data_100).or_exit("mean_sample_variance_gpu");
         v.check(
             "Welford GPU: sample var ≡ CPU",
             gpu_msv[1],
@@ -198,8 +195,8 @@ fn main() {
 
         let x: Vec<f64> = (1..=50).map(f64::from).collect();
         let y: Vec<f64> = x.iter().map(|&xi| 2.0f64.mul_add(xi, 1.0)).collect();
-        let cpu_r = barracuda::stats::pearson_correlation(&x, &y).expect("CPU Pearson correlation");
-        let gpu_full = stats_gpu::correlation_full_gpu(&gpu, &x, &y).expect("correlation_full_gpu");
+        let cpu_r = barracuda::stats::pearson_correlation(&x, &y).or_exit("CPU Pearson correlation");
+        let gpu_full = stats_gpu::correlation_full_gpu(&gpu, &x, &y).or_exit("correlation_full_gpu");
         v.check(
             "Pearson GPU: r ≡ CPU",
             gpu_full.pearson_r,
@@ -211,7 +208,7 @@ fn main() {
         g23_checks += 1;
 
         let neg_y: Vec<f64> = x.iter().map(|&xi| -xi).collect();
-        let gpu_neg = stats_gpu::correlation_full_gpu(&gpu, &x, &neg_y).expect("corr neg");
+        let gpu_neg = stats_gpu::correlation_full_gpu(&gpu, &x, &neg_y).or_exit("corr neg");
         v.check(
             "Pearson GPU: r(x,-x) = -1",
             gpu_neg.pearson_r,
@@ -220,8 +217,8 @@ fn main() {
         );
         g23_checks += 1;
 
-        let cpu_cov = barracuda::stats::covariance(&x, &y).expect("CPU covariance");
-        let gpu_cov = stats_gpu::covariance_gpu(&gpu, &x, &y).expect("cov_gpu");
+        let cpu_cov = barracuda::stats::covariance(&x, &y).or_exit("CPU covariance");
+        let gpu_cov = stats_gpu::covariance_gpu(&gpu, &x, &y).or_exit("cov_gpu");
         v.check(
             "Cov GPU ≡ CPU",
             gpu_cov,
@@ -248,9 +245,9 @@ fn main() {
     let data_100: Vec<f64> = (1..=100).map(f64::from).collect();
     let cpu_mean = barracuda::stats::metrics::mean(&data_100);
     let cpu_svar =
-        barracuda::stats::correlation::variance(&data_100).expect("CPU variance on data_100");
+        barracuda::stats::correlation::variance(&data_100).or_exit("CPU variance on data_100");
     let cpu_sd =
-        barracuda::stats::correlation::std_dev(&data_100).expect("CPU std dev on data_100");
+        barracuda::stats::correlation::std_dev(&data_100).or_exit("CPU std dev on data_100");
 
     v.check(
         "CPU: mean(1..100) = 50.5",
@@ -277,11 +274,11 @@ fn main() {
 
     let x: Vec<f64> = (1..=50).map(f64::from).collect();
     let y: Vec<f64> = x.iter().map(|&xi| 2.0f64.mul_add(xi, 1.0)).collect();
-    let r = barracuda::stats::pearson_correlation(&x, &y).expect("CPU Pearson correlation x,y");
+    let r = barracuda::stats::pearson_correlation(&x, &y).or_exit("CPU Pearson correlation x,y");
     v.check("CPU: r(x, 2x+1) = 1", r, 1.0, tolerances::ANALYTICAL_F64);
     g24_checks += 1;
 
-    let cov = barracuda::stats::covariance(&x, &y).expect("CPU covariance x,y");
+    let cov = barracuda::stats::covariance(&x, &y).or_exit("CPU covariance x,y");
     v.check_pass("CPU: Cov(x, 2x+1) > 0", cov > 0.0);
     g24_checks += 1;
 
@@ -301,9 +298,9 @@ fn main() {
 
     // GPU Shannon variance via CPU stats on GPU-computed diversity
     let cpu_h_var = barracuda::stats::correlation::variance(&cpu_shannons)
-        .expect("CPU variance of Shannon indices");
+        .or_exit("CPU variance of Shannon indices");
     let gpu_h_var = barracuda::stats::correlation::variance(&gpu_shannons)
-        .expect("CPU variance of GPU Shannon indices");
+        .or_exit("CPU variance of GPU Shannon indices");
     v.check(
         "GPU→CPU: Var(GPU Shannon) ≡ Var(CPU Shannon)",
         gpu_h_var,
@@ -314,9 +311,9 @@ fn main() {
 
     // GPU Shannon correlation with Simpson
     let r_gpu = barracuda::stats::pearson_correlation(&gpu_shannons, &gpu_simpsons)
-        .expect("CPU Pearson correlation GPU Shannon vs Simpson");
+        .or_exit("CPU Pearson correlation GPU Shannon vs Simpson");
     let r_cpu = barracuda::stats::pearson_correlation(&cpu_shannons, &cpu_simpsons)
-        .expect("CPU Pearson correlation CPU Shannon vs Simpson");
+        .or_exit("CPU Pearson correlation CPU Shannon vs Simpson");
     v.check(
         "GPU→CPU: r(GPU H, GPU Si) ≡ r(CPU H, CPU Si)",
         r_gpu,
@@ -327,9 +324,9 @@ fn main() {
 
     // Jackknife of GPU diversity
     let jk_gpu = barracuda::stats::jackknife_mean_variance(&gpu_shannons)
-        .expect("jackknife mean variance on GPU Shannon");
+        .or_exit("jackknife mean variance on GPU Shannon");
     let jk_cpu = barracuda::stats::jackknife_mean_variance(&cpu_shannons)
-        .expect("jackknife mean variance on CPU Shannon");
+        .or_exit("jackknife mean variance on CPU Shannon");
     v.check(
         "GPU→CPU: JK mean(GPU H) ≡ JK mean(CPU H)",
         jk_gpu.estimate,
@@ -348,7 +345,7 @@ fn main() {
     // Bray-Curtis condensed GPU (pairwise matrix)
     let cpu_bc_cond = diversity::bray_curtis_condensed(&communities);
     let gpu_bc_cond =
-        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).expect("GPU BC condensed");
+        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).or_exit("GPU BC condensed");
     v.check_pass(
         "BrayCurtis GPU: same length",
         cpu_bc_cond.len() == gpu_bc_cond.len(),

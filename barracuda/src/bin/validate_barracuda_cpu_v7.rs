@@ -35,6 +35,7 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp085: BarraCuda CPU v7 — Tier A Data Layout Fidelity");
@@ -340,7 +341,7 @@ fn validate_taxonomy_int8(v: &mut Validator) {
         let f64_result = classifier.classify(seq, &params);
         let int8_result_idx = classifier
             .classify_quantized(seq)
-            .expect("trained classifier must classify");
+            .or_exit("trained classifier must classify");
 
         v.check(
             &format!("seq {i}: int8 argmax matches f64 taxon_idx"),
@@ -413,7 +414,7 @@ fn validate_taxonomy_multi_taxon(v: &mut Validator) {
 
         let q_idx = classifier
             .classify_quantized(seq)
-            .expect("trained classifier must classify");
+            .or_exit("trained classifier must classify");
         v.check(
             &format!("taxon {i}: int8 matches f64"),
             q_idx as f64,

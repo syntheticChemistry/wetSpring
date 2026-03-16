@@ -315,6 +315,72 @@ impl Validator {
         let ok = print_result(&self.name, self.passed, self.total);
         std::process::exit(i32::from(!ok))
     }
+
+    /// Print summary and return `ExitCode` without calling `process::exit`.
+    ///
+    /// Prefer this over [`finish`](Self::finish) in binaries that use the
+    /// `fn main() -> ExitCode` + `fn run()` zero-panic pattern.
+    #[must_use]
+    pub fn finish_with_code(self) -> std::process::ExitCode {
+        let ok = print_result(&self.name, self.passed, self.total);
+        if ok {
+            std::process::ExitCode::SUCCESS
+        } else {
+            std::process::ExitCode::FAILURE
+        }
+    }
+
+    /// Returns `true` if every check so far has passed.
+    #[must_use]
+    pub const fn all_passed(&self) -> bool {
+        self.passed == self.total
+    }
+}
+
+/// Zero-panic error handling for validation infrastructure.
+///
+/// Replaces `.expect("msg")` and `.unwrap()` in validation binaries with
+/// clean stderr + `process::exit(1)` — no panic, deterministic exit code.
+/// Follows the groundSpring V109 zero-panic validation pattern.
+///
+/// # Examples
+///
+/// ```
+/// use wetspring_barracuda::validation::OrExit;
+///
+/// let val: Result<i32, &str> = Ok(42);
+/// assert_eq!(val.or_exit("should not fail"), 42);
+///
+/// let opt: Option<i32> = Some(7);
+/// assert_eq!(opt.or_exit("should not be None"), 7);
+/// ```
+pub trait OrExit<T> {
+    /// Unwrap or print to stderr and `process::exit(1)`.
+    fn or_exit(self, context: &str) -> T;
+}
+
+impl<T, E: std::fmt::Display> OrExit<T> for Result<T, E> {
+    fn or_exit(self, context: &str) -> T {
+        match self {
+            Ok(v) => v,
+            Err(e) => {
+                eprintln!("FATAL: {context}: {e}");
+                std::process::exit(1)
+            }
+        }
+    }
+}
+
+impl<T> OrExit<T> for Option<T> {
+    fn or_exit(self, context: &str) -> T {
+        match self {
+            Some(v) => v,
+            None => {
+                eprintln!("FATAL: {context}");
+                std::process::exit(1)
+            }
+        }
+    }
 }
 
 pub mod test_data;

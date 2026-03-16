@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -43,6 +39,7 @@ use wetspring_forge::substrate::{
     Capability, Identity, Properties, Substrate, SubstrateKind, SubstrateOrigin,
 };
 use wetspring_forge::workloads;
+use wetspring_barracuda::validation::OrExit;
 
 fn check(pass: &mut u32, fail: &mut u32, total: &mut u32, name: &str, ok: bool) {
     *total += 1;
@@ -203,7 +200,7 @@ fn section_bandwidth_routing(pass: &mut u32, fail: &mut u32, total: &mut u32) {
 
     let no_data = Workload::new("no_data", vec![Capability::F64Compute]);
     let d_nodata = dispatch::route_bandwidth_aware(&no_data, &inventory)
-        .expect("no_data workload should route to GPU when GPU is available");
+        .or_exit("no_data workload should route to GPU when GPU is available");
     check(
         pass,
         fail,
@@ -216,7 +213,7 @@ fn section_bandwidth_routing(pass: &mut u32, fail: &mut u32, total: &mut u32) {
         .prefer(SubstrateKind::Gpu)
         .with_data_bytes(1);
     let d_pref = dispatch::route_bandwidth_aware(&preferred, &inventory)
-        .expect("forced_gpu workload with GPU preference should route when GPU available");
+        .or_exit("forced_gpu workload with GPU preference should route when GPU available");
     check(
         pass,
         fail,
@@ -247,11 +244,11 @@ fn section_cross_substrate_flow(pass: &mut u32, fail: &mut u32, total: &mut u32)
     let cpu_work = Workload::new("fastq_io", vec![Capability::CpuCompute]);
 
     let d_gpu =
-        dispatch::route(&gpu_work, &inventory).expect("diversity_gpu workload should route to GPU");
+        dispatch::route(&gpu_work, &inventory).or_exit("diversity_gpu workload should route to GPU");
     let d_npu = dispatch::route(&npu_work, &inventory)
-        .expect("taxonomy_triage workload should route to NPU");
+        .or_exit("taxonomy_triage workload should route to NPU");
     let d_cpu =
-        dispatch::route(&cpu_work, &inventory).expect("fastq_io workload should route to CPU");
+        dispatch::route(&cpu_work, &inventory).or_exit("fastq_io workload should route to CPU");
 
     check(
         pass,
@@ -331,8 +328,8 @@ fn section_transfer_cost(pass: &mut u32, fail: &mut u32, total: &mut u32) {
         fail,
         total,
         "1 GB transfer > 1 KB transfer",
-        cost_1gb.expect("1 GB transfer cost should exist for RTX 4070")
-            > cost_1kb.expect("1 KB transfer cost should exist for RTX 4070"),
+        cost_1gb.or_exit("1 GB transfer cost should exist for RTX 4070")
+            > cost_1kb.or_exit("1 KB transfer cost should exist for RTX 4070"),
     );
 
     let cost_zero = bridge::estimated_transfer_us(&rtx4070, 0);

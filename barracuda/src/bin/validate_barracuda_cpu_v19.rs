@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -58,6 +50,7 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct DomainTiming {
     name: &'static str,
@@ -177,7 +170,7 @@ fn main() {
     let mut d22_checks = 0_u32;
 
     let condensed = [0.1, 0.5, 0.3, 0.4, 0.6, 0.2];
-    let result = pcoa::pcoa(&condensed, 4, 2).expect("PCoA");
+    let result = pcoa::pcoa(&condensed, 4, 2).or_exit("PCoA");
     v.check_pass(
         "PCoA: 4 samples, 2 axes",
         result.n_samples == 4 && result.n_axes == 2,
@@ -271,7 +264,7 @@ fn main() {
     );
     d23_checks += 1;
 
-    let jk_lls = barracuda::stats::jackknife_mean_variance(&lls).unwrap();
+    let jk_lls = barracuda::stats::jackknife_mean_variance(&lls).or_exit("unexpected error");
     v.check_pass(
         "Bootstrap×Jackknife: cross-validation SE > 0",
         jk_lls.std_error > 0.0,

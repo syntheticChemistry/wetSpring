@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -63,6 +59,7 @@ use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 use barracuda::stats::norm_cdf;
+use wetspring_barracuda::validation::OrExit;
 
 fn discover_biomeos_bin() -> Option<PathBuf> {
     let candidates = [
@@ -231,8 +228,8 @@ fn main() {
     for _ in 0..n_iterations {
         let params = serde_json::json!({"counts": counts, "metrics": ["shannon"]});
         let result =
-            wetspring_barracuda::ipc::dispatch::dispatch("science.diversity", &params).unwrap();
-        json_h = result["shannon"].as_f64().unwrap();
+            wetspring_barracuda::ipc::dispatch::dispatch("science.diversity", &params).or_exit("unexpected error");
+        json_h = result["shannon"].as_f64().or_exit("unexpected error");
     }
     let json_us = t_json.elapsed().as_nanos() as f64 / f64::from(n_iterations) / 1000.0;
 
@@ -273,8 +270,8 @@ fn main() {
     // IPC dispatch of same pipeline
     let ipc_params = serde_json::json!({"counts": digester, "metrics": ["shannon", "pielou"]});
     let ipc_result =
-        wetspring_barracuda::ipc::dispatch::dispatch("science.diversity", &ipc_params).unwrap();
-    let ipc_h = ipc_result["shannon"].as_f64().unwrap();
+        wetspring_barracuda::ipc::dispatch::dispatch("science.diversity", &ipc_params).or_exit("unexpected error");
+    let ipc_h = ipc_result["shannon"].as_f64().or_exit("unexpected error");
     v.check(
         "NUCLEUS IPC Shannon = Direct",
         ipc_h,

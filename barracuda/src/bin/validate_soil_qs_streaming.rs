@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -48,6 +44,7 @@ use wetspring_barracuda::validation::{self, Validator};
 
 use barracuda::spectral::{anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio};
 use barracuda::stats::norm_cdf;
+use wetspring_barracuda::validation::OrExit;
 
 const N_SAMPLES: usize = 8;
 const N_FEATURES: usize = 200;
@@ -130,13 +127,13 @@ async fn main() {
 
     let gpu_shannons: Vec<f64> = communities
         .iter()
-        .map(|c| diversity_gpu::shannon_gpu(&gpu, c).expect("GPU Shannon"))
+        .map(|c| diversity_gpu::shannon_gpu(&gpu, c).or_exit("GPU Shannon"))
         .collect();
     let gpu_simpsons: Vec<f64> = communities
         .iter()
-        .map(|c| diversity_gpu::simpson_gpu(&gpu, c).expect("GPU Simpson"))
+        .map(|c| diversity_gpu::simpson_gpu(&gpu, c).or_exit("GPU Simpson"))
         .collect();
-    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).expect("GPU BC");
+    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).or_exit("GPU BC");
 
     let stream_us = t_stream.elapsed().as_micros() as f64;
     println!("  GPU streaming total: {stream_us:.0}µs");

@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -39,6 +35,7 @@ use wetspring_barracuda::bio::{diversity, diversity_gpu};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 // ═══════════════════════════════════════════════════════════════════
 // Substrate Router — dispatch decisions based on hardware + workload
@@ -120,7 +117,7 @@ fn route_shannon(router: &SubstrateRouter, gpu: Option<&GpuF64>, counts: &[f64])
     let target = router.route(WorkloadClass::BatchParallel, counts.len());
     let t = Instant::now();
     let value = match target {
-        Substrate::Gpu => diversity_gpu::shannon_gpu(gpu.expect("GPU when Gpu substrate"), counts)
+        Substrate::Gpu => diversity_gpu::shannon_gpu(gpu.or_exit("GPU when Gpu substrate"), counts)
             .unwrap_or_else(|_| diversity::shannon(counts)),
         Substrate::Cpu | Substrate::Npu => diversity::shannon(counts),
     };
@@ -135,7 +132,7 @@ fn route_simpson(router: &SubstrateRouter, gpu: Option<&GpuF64>, counts: &[f64])
     let target = router.route(WorkloadClass::BatchParallel, counts.len());
     let t = Instant::now();
     let value = match target {
-        Substrate::Gpu => diversity_gpu::simpson_gpu(gpu.expect("GPU when Gpu substrate"), counts)
+        Substrate::Gpu => diversity_gpu::simpson_gpu(gpu.or_exit("GPU when Gpu substrate"), counts)
             .unwrap_or_else(|_| diversity::simpson(counts)),
         Substrate::Cpu | Substrate::Npu => diversity::simpson(counts),
     };
@@ -156,7 +153,7 @@ fn route_bray_curtis(
     let t = Instant::now();
     let value = match target {
         Substrate::Gpu => {
-            diversity_gpu::bray_curtis_condensed_gpu(gpu.expect("GPU when Gpu substrate"), samples)
+            diversity_gpu::bray_curtis_condensed_gpu(gpu.or_exit("GPU when Gpu substrate"), samples)
                 .unwrap_or_else(|_| diversity::bray_curtis_condensed(samples))
         }
         Substrate::Cpu | Substrate::Npu => diversity::bray_curtis_condensed(samples),

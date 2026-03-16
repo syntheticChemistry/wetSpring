@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -55,6 +47,7 @@ use wetspring_barracuda::ipc::dispatch;
 use wetspring_barracuda::ipc::metrics::Metrics;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn temp_path(name: &str) -> PathBuf {
     std::env::temp_dir().join(format!("wetspring_exp214_{name}"))
@@ -65,7 +58,7 @@ fn temp_path(name: &str) -> PathBuf {
 fn validate_tower_capabilities(v: &mut Validator) {
     v.section("═══ MH01: Tower capabilities — V66 evolved endpoints ═══");
 
-    let health = dispatch::dispatch("health.check", &json!({})).expect("health.check");
+    let health = dispatch::dispatch("health.check", &json!({})).or_exit("health.check");
 
     v.check_pass(
         "Tower: primal == wetspring",
@@ -112,7 +105,7 @@ fn validate_fastq_diversity_dispatch(v: &mut Validator) {
 
     let path = temp_path("nucleus_community.fastq");
     {
-        let mut f = std::fs::File::create(&path).unwrap();
+        let mut f = std::fs::File::create(&path).or_exit("unexpected error");
         let species: &[(&str, usize)] = &[
             ("ATGCATGCATGCATGC", 50),
             ("GCGCGCGCGCGCGCGC", 30),
@@ -123,7 +116,7 @@ fn validate_fastq_diversity_dispatch(v: &mut Validator) {
         let mut idx = 0_usize;
         for (seq, count) in species {
             for _ in 0..*count {
-                writeln!(f, "@sp_{idx}\n{seq}\n+\n{}", "I".repeat(seq.len())).unwrap();
+                writeln!(f, "@sp_{idx}\n{seq}\n+\n{}", "I".repeat(seq.len())).or_exit("unexpected error");
                 idx += 1;
             }
         }
@@ -135,17 +128,17 @@ fn validate_fastq_diversity_dispatch(v: &mut Validator) {
         *seq_counts.entry(rec.sequence.to_vec()).or_insert(0) += 1;
         Ok(())
     })
-    .unwrap();
+    .or_exit("unexpected error");
 
     let direct_counts: Vec<f64> = seq_counts.values().map(|&c| c as f64).collect();
     let direct_h = diversity::shannon(&direct_counts);
     let direct_d = diversity::simpson(&direct_counts);
 
     let result = dispatch::dispatch("science.diversity", &json!({ "counts": direct_counts }))
-        .expect("diversity dispatch");
+        .or_exit("diversity dispatch");
 
-    let dispatch_h = result["shannon"].as_f64().expect("shannon");
-    let dispatch_d = result["simpson"].as_f64().expect("simpson");
+    let dispatch_h = result["shannon"].as_f64().or_exit("shannon");
+    let dispatch_d = result["simpson"].as_f64().or_exit("simpson");
 
     v.check(
         "Shannon: direct == IPC dispatch",
@@ -177,10 +170,10 @@ fn validate_nanopore_signal(v: &mut Validator) {
     let reads = sig.generate_batch(10, 2000, 4000.0);
 
     let path = temp_path("nucleus_nanopore.nrs");
-    nanopore::write_nrs(&path, &reads).unwrap();
+    nanopore::write_nrs(&path, &reads).or_exit("unexpected error");
     let loaded: Vec<_> = NanoporeIter::open(&path)
-        .unwrap()
-        .map(|r| r.unwrap())
+        .or_exit("unexpected error")
+        .map(|r| r.or_exit("unexpected error"))
         .collect();
 
     v.check_count("loaded 10 nanopore reads", loaded.len(), 10);
@@ -243,15 +236,15 @@ fn validate_ms2_spectral(v: &mut Validator) {
 
     let path = temp_path("nucleus_spectral.ms2");
     {
-        let mut f = std::fs::File::create(&path).unwrap();
-        writeln!(f, "H\tCreatedBy\tExp214").unwrap();
+        let mut f = std::fs::File::create(&path).or_exit("unexpected error");
+        writeln!(f, "H\tCreatedBy\tExp214").or_exit("unexpected error");
         for scan in 1..=3_u32 {
             let precursor = f64::from(scan).mul_add(100.0, 400.0);
-            writeln!(f, "S\t{scan}\t{scan}\t{precursor:.3}").unwrap();
-            writeln!(f, "I\tRTime\t{:.1}", f64::from(scan) * 0.5).unwrap();
-            writeln!(f, "I\tBPI\t10000.0").unwrap();
-            writeln!(f, "I\tTIC\t50000.0").unwrap();
-            writeln!(f, "Z\t2\t{:.3}", precursor * 2.0 - 1.008).unwrap();
+            writeln!(f, "S\t{scan}\t{scan}\t{precursor:.3}").or_exit("unexpected error");
+            writeln!(f, "I\tRTime\t{:.1}", f64::from(scan) * 0.5).or_exit("unexpected error");
+            writeln!(f, "I\tBPI\t10000.0").or_exit("unexpected error");
+            writeln!(f, "I\tTIC\t50000.0").or_exit("unexpected error");
+            writeln!(f, "Z\t2\t{:.3}", precursor * 2.0 - 1.008).or_exit("unexpected error");
             for frag in 0..=scan {
                 writeln!(
                     f,
@@ -259,15 +252,15 @@ fn validate_ms2_spectral(v: &mut Validator) {
                     f64::from(frag).mul_add(100.0, 100.0),
                     1000.0 * f64::from(scan + 1 - frag)
                 )
-                .unwrap();
+                .or_exit("unexpected error");
             }
         }
     }
 
     let batch: Vec<_> = ms2::Ms2Iter::open(&path)
-        .unwrap()
+        .or_exit("unexpected error")
         .collect::<Result<Vec<_>, _>>()
-        .unwrap();
+        .or_exit("unexpected error");
     v.check_count("batch parsed 3 spectra", batch.len(), 3);
 
     let mut stream_count = 0_usize;
@@ -277,7 +270,7 @@ fn validate_ms2_spectral(v: &mut Validator) {
         stream_precursors.push(spec.precursor_mz);
         Ok(())
     })
-    .unwrap();
+    .or_exit("unexpected error");
 
     v.check_count("stream parsed 3 spectra", stream_count, 3);
 
@@ -296,7 +289,7 @@ fn validate_ms2_spectral(v: &mut Validator) {
     }
 
     let stats = ms2::compute_stats(&batch);
-    let stream_stats = ms2::stats_from_file(&path).unwrap();
+    let stream_stats = ms2::stats_from_file(&path).or_exit("unexpected error");
     v.check_count(
         "stats: num_spectra batch == stream",
         stats.num_spectra,
@@ -390,12 +383,12 @@ fn validate_cpu_fallback(v: &mut Validator) {
     let direct_s = diversity::observed_features(&counts);
 
     let result = dispatch::dispatch("science.diversity", &json!({ "counts": counts }))
-        .expect("diversity dispatch");
+        .or_exit("diversity dispatch");
 
-    let d_h = result["shannon"].as_f64().expect("h");
-    let d_d = result["simpson"].as_f64().expect("d");
-    let d_j = result["pielou"].as_f64().expect("j");
-    let d_s = result["observed"].as_f64().expect("s");
+    let d_h = result["shannon"].as_f64().or_exit("h");
+    let d_d = result["simpson"].as_f64().or_exit("d");
+    let d_j = result["pielou"].as_f64().or_exit("j");
+    let d_s = result["observed"].as_f64().or_exit("s");
 
     v.check(
         "fallback Shannon parity",
@@ -431,7 +424,7 @@ fn validate_full_pipeline(v: &mut Validator) {
 
     let path = temp_path("nucleus_pipeline.fastq");
     {
-        let mut f = std::fs::File::create(&path).unwrap();
+        let mut f = std::fs::File::create(&path).or_exit("unexpected error");
         let species: &[(&str, usize)] = &[
             ("ATGCATGCATGCATGCATGCATGCATGCATGC", 40),
             ("GCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGC", 30),
@@ -442,16 +435,16 @@ fn validate_full_pipeline(v: &mut Validator) {
         for (seq, count) in species {
             for _ in 0..*count {
                 let qual: String = std::iter::repeat_n('I', seq.len()).collect();
-                writeln!(f, "@read_{idx}\n{seq}\n+\n{qual}").unwrap();
+                writeln!(f, "@read_{idx}\n{seq}\n+\n{qual}").or_exit("unexpected error");
                 idx += 1;
             }
         }
     }
 
     let records: Vec<_> = fastq::FastqIter::open(&path)
-        .unwrap()
+        .or_exit("unexpected error")
         .collect::<Result<Vec<_>, _>>()
-        .unwrap();
+        .or_exit("unexpected error");
     v.check_count("pipeline: parsed 100 reads", records.len(), 100);
 
     let params = quality::QualityParams {
@@ -478,12 +471,12 @@ fn validate_full_pipeline(v: &mut Validator) {
 
     let direct_h = diversity::shannon(&counts);
     let result = dispatch::dispatch("science.diversity", &json!({ "counts": counts }))
-        .expect("pipeline diversity");
+        .or_exit("pipeline diversity");
 
     v.check(
         "pipeline: Shannon direct == dispatch",
         direct_h,
-        result["shannon"].as_f64().expect("h"),
+        result["shannon"].as_f64().or_exit("h"),
         tolerances::ANALYTICAL_F64,
     );
 
@@ -491,7 +484,7 @@ fn validate_full_pipeline(v: &mut Validator) {
         "science.qs_model",
         &json!({ "scenario": "standard_growth", "dt": 0.01 }),
     )
-    .expect("pipeline qs");
+    .or_exit("pipeline qs");
 
     let qs_steps = qs_result["steps"].as_u64().unwrap_or(0);
     v.check_pass(
@@ -516,7 +509,7 @@ fn validate_dispatch_routing(v: &mut Validator) {
 
     let small_counts: Vec<f64> = vec![10.0, 20.0, 30.0];
     let result_small = dispatch::dispatch("science.diversity", &json!({ "counts": small_counts }))
-        .expect("small dispatch");
+        .or_exit("small dispatch");
 
     v.check_pass(
         "small input: has shannon result",
@@ -525,14 +518,14 @@ fn validate_dispatch_routing(v: &mut Validator) {
 
     let large_counts: Vec<f64> = (0..20_000_i32).map(|i| f64::from((i % 100) + 1)).collect();
     let result_large = dispatch::dispatch("science.diversity", &json!({ "counts": large_counts }))
-        .expect("large dispatch");
+        .or_exit("large dispatch");
 
     v.check_pass(
         "large input: has shannon result",
         result_large.get("shannon").is_some(),
     );
 
-    let large_h = result_large["shannon"].as_f64().unwrap();
+    let large_h = result_large["shannon"].as_f64().or_exit("unexpected error");
     let cpu_h = diversity::shannon(&large_counts);
     v.check(
         "large input: Shannon dispatch == direct",

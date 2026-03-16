@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -79,8 +75,8 @@ fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
-        .expect("tokio runtime");
-    let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+        .or_exit("tokio runtime");
+    let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
     let fp64_strategy = gpu.fp64_strategy();
     let has_f64 = gpu.has_f64;
 
@@ -104,8 +100,8 @@ fn main() {
 
     let ab = vec![10.0, 20.0, 30.0, 15.0, 25.0, 5.0, 12.0, 8.0, 17.0, 22.0];
     let t0 = Instant::now();
-    let gpu_shannon = diversity_gpu::shannon_gpu(&gpu, &ab).expect("GPU shannon");
-    let gpu_simpson = diversity_gpu::simpson_gpu(&gpu, &ab).expect("GPU simpson");
+    let gpu_shannon = diversity_gpu::shannon_gpu(&gpu, &ab).or_exit("GPU shannon");
+    let gpu_simpson = diversity_gpu::simpson_gpu(&gpu, &ab).or_exit("GPU simpson");
     let g01_us = t0.elapsed().as_micros() as f64;
 
     let cpu_shannon = diversity::shannon(&ab);
@@ -194,7 +190,7 @@ fn main() {
 
         let freq_out = device
             .read_buffer_f64(&out_buf, total)
-            .expect("WrightFisher GPU buffer read");
+            .or_exit("WrightFisher GPU buffer read");
         (freq_out, freq_in, us)
     }));
 
@@ -278,7 +274,7 @@ fn main() {
 
         let new_strats = device
             .read_buffer_u32(&new_buf, n_cells)
-            .expect("StencilCooperation GPU buffer read");
+            .or_exit("StencilCooperation GPU buffer read");
         (new_strats, n_cells, us)
     }));
 
@@ -362,7 +358,7 @@ fn main() {
 
         let hill_out = device
             .read_buffer_f64(&out_buf, n_hill as usize)
-            .expect("HillGate GPU buffer read");
+            .or_exit("HillGate GPU buffer read");
         (hill_out, input_a, input_b, us)
     }));
 
@@ -405,7 +401,7 @@ fn main() {
 
     let sym_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         use barracuda::ops::linalg::SymmetrizeGpu;
-        let sym = SymmetrizeGpu::new(Arc::clone(&device)).expect("SymmetrizeGpu construction");
+        let sym = SymmetrizeGpu::new(Arc::clone(&device)).or_exit("SymmetrizeGpu construction");
         sym.execute(&[1.0, 2.0, 3.0, 4.0], 2)
     }));
     if let Ok(Ok(r)) = sym_result {
@@ -432,7 +428,8 @@ fn main() {
 
     let lap_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         use barracuda::ops::linalg::LaplacianGpu;
-        let lap = LaplacianGpu::new(Arc::clone(&device)).expect("LaplacianGpu construction");
+use wetspring_barracuda::validation::OrExit;
+        let lap = LaplacianGpu::new(Arc::clone(&device)).or_exit("LaplacianGpu construction");
         lap.execute(&[0.0, 1.0, 1.0, 0.0], 2)
     }));
     if let Ok(Ok(r)) = lap_result {

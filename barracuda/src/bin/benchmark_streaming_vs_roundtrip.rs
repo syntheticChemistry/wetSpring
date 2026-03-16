@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -37,6 +33,7 @@ use wetspring_barracuda::bio::{diversity, diversity_gpu, streaming_gpu, taxonomy
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 const N_FEATURES: usize = 256;
 
@@ -93,7 +90,7 @@ async fn main() {
         validation::exit_skipped("No SHADER_F64 support on this GPU");
     }
 
-    let session = streaming_gpu::GpuPipelineSession::new(&gpu).expect("streaming benchmark");
+    let session = streaming_gpu::GpuPipelineSession::new(&gpu).or_exit("streaming benchmark");
     println!("  Session warmup: {}", session.ctx_stats());
 
     let refs = training_refs();
@@ -133,8 +130,8 @@ async fn main() {
         let roundtrip_start = Instant::now();
         let mut rt_sh = Vec::with_capacity(n);
         for c in &communities {
-            rt_sh.push(diversity_gpu::shannon_gpu(&gpu, c).expect("streaming benchmark"));
-            let _ = diversity_gpu::simpson_gpu(&gpu, c).expect("streaming benchmark");
+            rt_sh.push(diversity_gpu::shannon_gpu(&gpu, c).or_exit("streaming benchmark"));
+            let _ = diversity_gpu::simpson_gpu(&gpu, c).or_exit("streaming benchmark");
         }
         let rt_us = roundtrip_start.elapsed().as_micros() as f64;
 
@@ -142,12 +139,12 @@ async fn main() {
         let streaming_start = Instant::now();
         let mut st_sh = Vec::with_capacity(n);
         for c in &communities {
-            st_sh.push(session.shannon(c).expect("streaming benchmark"));
-            let _ = session.simpson(c).expect("streaming benchmark");
+            st_sh.push(session.shannon(c).or_exit("streaming benchmark"));
+            let _ = session.simpson(c).or_exit("streaming benchmark");
         }
         let st_result = session
             .stream_sample(&classifier, &seq_refs, &communities[0], &params)
-            .expect("streaming benchmark");
+            .or_exit("streaming benchmark");
         let st_us = streaming_start.elapsed().as_micros() as f64;
 
         let gpu_vs_cpu = if cpu_us > 0.0 { rt_us / cpu_us } else { 0.0 };
@@ -180,7 +177,7 @@ async fn main() {
     // Final parity check at largest batch
     let communities = make_communities(128);
     let rt_bc =
-        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).expect("streaming benchmark");
+        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).or_exit("streaming benchmark");
     let cpu_bc = diversity::bray_curtis_condensed(&communities);
 
     let bc_max_err = rt_bc

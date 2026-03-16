@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -55,6 +51,7 @@ use wetspring_barracuda::bio::unifrac_gpu::UniFracGpu;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 #[tokio::main]
 async fn main() {
@@ -268,7 +265,7 @@ fn validate_unifrac_mf(
             n_samples,
             n_leaves,
         )
-        .expect("GPU UniFrac dispatch");
+        .or_exit("GPU UniFrac dispatch");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check(
@@ -335,7 +332,7 @@ fn validate_dada2_mf(
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
-    let dada2_engine = Dada2Gpu::new(device.clone()).expect("DADA2 shader compile");
+    let dada2_engine = Dada2Gpu::new(device.clone()).or_exit("DADA2 shader compile");
     let gpu_result = dada2_gpu::denoise_gpu(&dada2_engine, &seqs, &params);
     let gpu_us = tg.elapsed().as_micros() as f64;
 
@@ -422,7 +419,7 @@ fn validate_kmer_mf(
     let kmer_gpu = KmerGpu::new(&gpu.to_wgpu_device());
     let gpu_result = kmer_gpu
         .count_from_sequence(seq, k as u32)
-        .expect("K-mer GPU dispatch");
+        .or_exit("K-mer GPU dispatch");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check(

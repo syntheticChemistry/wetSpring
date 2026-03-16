@@ -31,6 +31,7 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp054: Boden 2024 Phosphorus Enzyme Phylogenomics");
@@ -54,7 +55,7 @@ fn validate_molecular_clock(v: &mut Validator) {
     let root_age = 2500.0; // 2.5 Gya
 
     let result = molecular_clock::strict_clock(&branch_lengths, &parents, root_age, &[])
-        .expect("strict clock");
+        .or_exit("strict clock");
 
     v.check(
         "Clock rate positive",
@@ -93,7 +94,7 @@ fn validate_molecular_clock(v: &mut Validator) {
         max_age_ma: 3000.0,
     }];
     let result_cal = molecular_clock::strict_clock(&branch_lengths, &parents, root_age, &cals)
-        .expect("strict clock");
+        .or_exit("strict clock");
     v.check(
         "GOE calibration satisfied",
         f64::from(u8::from(result_cal.calibrations_satisfied)),
@@ -169,7 +170,7 @@ fn validate_python_parity(v: &mut Validator) {
 
     let py_rate = 1.480_000_000_000e-4;
     let result = molecular_clock::strict_clock(&branch_lengths, &parents, 2500.0, &[])
-        .expect("strict clock");
+        .or_exit("strict clock");
 
     v.check(
         "Python: clock rate",
@@ -202,8 +203,8 @@ fn validate_cross_exp053(v: &mut Validator) {
     let p_054: Vec<Option<usize>> =
         vec![None, Some(0), Some(0), Some(1), Some(1), Some(2), Some(2)];
 
-    let r1 = molecular_clock::strict_clock(&bl_053, &p_053, 3000.0, &[]).expect("strict clock");
-    let r2 = molecular_clock::strict_clock(&bl_054, &p_054, 2500.0, &[]).expect("strict clock");
+    let r1 = molecular_clock::strict_clock(&bl_053, &p_053, 3000.0, &[]).or_exit("strict clock");
+    let r2 = molecular_clock::strict_clock(&bl_054, &p_054, 2500.0, &[]).or_exit("strict clock");
 
     v.check(
         "Both clock rates positive",

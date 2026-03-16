@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -36,6 +32,7 @@ use wetspring_barracuda::bio::kriging::{
 };
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 fn sample_grid() -> Vec<SpatialSample> {
     vec![
@@ -88,9 +85,9 @@ fn validate_ordinary(v: &mut Validator, gpu: &GpuF64) {
 
     for (name, config) in &models {
         let result_known = kriging::interpolate_diversity(gpu, &sites, &targets_at_known, config)
-            .expect("kriging at known sites");
+            .or_exit("kriging at known sites");
         let result_unknown = kriging::interpolate_diversity(gpu, &sites, &targets_unknown, config)
-            .expect("kriging at unknown sites");
+            .or_exit("kriging at unknown sites");
 
         v.check_count(
             &format!("{name}: known site count"),
@@ -146,9 +143,9 @@ fn validate_simple(v: &mut Validator, gpu: &GpuF64) {
     let config = VariogramConfig::spherical(0.0, 1.0, 2.0);
 
     let ordinary =
-        kriging::interpolate_diversity(gpu, &sites, &targets, &config).expect("ordinary kriging");
+        kriging::interpolate_diversity(gpu, &sites, &targets, &config).or_exit("ordinary kriging");
     let simple = kriging::interpolate_diversity_simple(gpu, &sites, &targets, &config, known_mean)
-        .expect("simple kriging");
+        .or_exit("simple kriging");
 
     v.check_count("simple values count", simple.values.len(), targets.len());
 
@@ -174,7 +171,7 @@ fn validate_variogram(v: &mut Validator) {
     v.section("§3 Empirical Variogram Estimation");
 
     let sites = sample_grid();
-    let (lags, semivariances) = empirical_variogram(&sites, 5, 2.0).expect("variogram estimation");
+    let (lags, semivariances) = empirical_variogram(&sites, 5, 2.0).or_exit("variogram estimation");
 
     v.check_count("variogram lag count", lags.len(), 5);
     v.check_count("variogram semivar count", semivariances.len(), 5);

@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -55,13 +47,14 @@ use wetspring_barracuda::bio::{diversity, diversity_gpu, kriging, pcoa, pcoa_gpu
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
-        .expect("tokio runtime");
-    let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+        .or_exit("tokio runtime");
+    let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
 
     println!("  GPU: {}", gpu.adapter_name);
     println!("  Fp64Strategy: {:?}", gpu.fp64_strategy());
@@ -114,7 +107,7 @@ fn main() {
         0.95,
         42,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     let s2_ms = t_s2.elapsed().as_secs_f64() * 1000.0;
 
     v.check_pass("S2: CI lower < upper", ci.lower < ci.upper);
@@ -132,7 +125,7 @@ fn main() {
     v.section("Stage 3: Jackknife Cross-Validation of GPU Results");
     let t_s3 = Instant::now();
 
-    let jk = barracuda::stats::jackknife_mean_variance(&gpu_shannons).unwrap();
+    let jk = barracuda::stats::jackknife_mean_variance(&gpu_shannons).or_exit("unexpected error");
     let s3_ms = t_s3.elapsed().as_secs_f64() * 1000.0;
 
     v.check(
@@ -166,7 +159,7 @@ fn main() {
     v.check_pass("S4: fit_all returns models", !all_fits.is_empty());
     let best = all_fits
         .iter()
-        .max_by(|a, b| a.r_squared.partial_cmp(&b.r_squared).unwrap());
+        .max_by(|a, b| a.r_squared.partial_cmp(&b.r_squared).or_exit("unexpected error"));
     if let Some(b) = best {
         v.check_pass("S4: best model R² > 0", b.r_squared > 0.0);
         println!(
@@ -183,7 +176,7 @@ fn main() {
     let t_s5 = Instant::now();
 
     let bc_condensed = diversity::bray_curtis_condensed(&communities[..10]);
-    let cpu_pcoa = pcoa::pcoa(&bc_condensed, 10, 3).expect("CPU PCoA");
+    let cpu_pcoa = pcoa::pcoa(&bc_condensed, 10, 3).or_exit("CPU PCoA");
     let gpu_pcoa = pcoa_gpu::pcoa_gpu(&gpu, &bc_condensed, 10, 3);
     let s5_ms = t_s5.elapsed().as_secs_f64() * 1000.0;
 

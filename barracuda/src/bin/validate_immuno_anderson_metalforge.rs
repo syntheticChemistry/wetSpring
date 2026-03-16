@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -69,6 +61,7 @@ use wetspring_barracuda::bio::{diversity, diversity_gpu};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 struct SubstrateTiming {
     domain: &'static str,
@@ -148,11 +141,11 @@ async fn main() {
     let tg = Instant::now();
     let gpu_shannons: Vec<f64> = cell_pops
         .iter()
-        .map(|(_, c)| diversity_gpu::shannon_gpu(&gpu, c).expect("GPU Shannon"))
+        .map(|(_, c)| diversity_gpu::shannon_gpu(&gpu, c).or_exit("GPU Shannon"))
         .collect();
     let gpu_simpsons: Vec<f64> = cell_pops
         .iter()
-        .map(|(_, c)| diversity_gpu::simpson_gpu(&gpu, c).expect("GPU Simpson"))
+        .map(|(_, c)| diversity_gpu::simpson_gpu(&gpu, c).or_exit("GPU Simpson"))
         .collect();
     let div_gpu_us = tg.elapsed().as_micros() as f64;
 
@@ -199,7 +192,7 @@ async fn main() {
     let bc_cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
-    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).expect("GPU BC");
+    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).or_exit("GPU BC");
     let bc_gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check_pass("BC vector length match", cpu_bc.len() == gpu_bc.len());
@@ -317,8 +310,8 @@ async fn main() {
         scores[0]
             >= *scores
                 .iter()
-                .max_by(|a, b| a.partial_cmp(b).unwrap())
-                .unwrap()
+                .max_by(|a, b| a.partial_cmp(b).or_exit("unexpected error"))
+                .or_exit("unexpected error")
                 - tolerances::ANALYTICAL_LOOSE,
     );
     v.check_pass("Crisaborole penalized by geometry", scores[3] < scores[0]);

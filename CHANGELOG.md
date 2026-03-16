@@ -3,6 +3,50 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V123] — 2026-03-16
+
+### Deep Debt Execution — Zero-Panic, Dual-Format Discovery, Cross-Ecosystem Absorption
+
+Comprehensive cross-ecosystem absorption executing priorities from sibling springs and primals.
+192 validation binaries transformed. IPC layer enriched. Python deps hardened.
+
+#### Zero-Panic Validation (groundSpring V109 pattern — 192 binaries)
+- New `OrExit<T>` trait in `validation/mod.rs` — zero-panic replacement for `.expect()`/`.unwrap()`
+  in validation binaries. `Result::or_exit("context")` and `Option::or_exit("context")` print
+  to stderr and `process::exit(1)` — no panic, deterministic exit code
+- 1,039 `.expect("msg")` → `.or_exit("msg")` across 192 validation/benchmark binaries
+- 632 `.unwrap()` → `.or_exit("unexpected error")` across the same files
+- 231 `clippy::expect_used`/`clippy::unwrap_used` lint suppressions removed
+- All empty `#![expect()]` blocks cleaned up
+- `Validator::finish_with_code()` added — returns `ExitCode` without `process::exit()` for
+  composable `fn main() -> ExitCode` pattern
+- `Validator::all_passed()` added — `const fn` for external pass/fail queries
+
+#### Dual-Format Capability Discovery (neuralSpring/ludoSpring pattern)
+- `handle_capability_list()` now returns `operation_dependencies`, `cost_estimates`, and
+  `semantic_mappings` from `niche.rs` alongside flat capability list (when `json` feature enabled)
+- Songbird `discovery.register` enriched with `niche`, `niche_description`, and
+  `required_dependencies` metadata for biomeOS scheduling
+- Format A (flat capabilities) preserved for backward compatibility
+- Format B (rich niche data) available for biomeOS Pathway Learner
+
+#### Centralized RPC Error Extraction (healthSpring V29 pattern)
+- `protocol::extract_rpc_error()` — parse `(code, message)` from JSON-RPC error responses
+- Songbird `register()` and `heartbeat()` migrated from ad-hoc `contains("error")` to
+  structured error extraction with code+message in error context
+- 3 new tests for `extract_rpc_error()` (error response, success response, malformed input)
+
+#### Python Dependency Hardening (groundSpring V109 pattern)
+- `requirements.txt`: all deps pinned with upper bounds (`numpy>=1.24,<3`, `scipy>=1.12,<2`, etc.)
+- `scripts/requirements.txt`: already had upper bounds (verified)
+
+#### Quality
+- `cargo clippy --workspace --all-targets --all-features` — **ZERO warnings, ZERO errors**
+- `cargo test --workspace --lib` — **1,703 passed** (all)
+- Zero `.expect()` and zero `.unwrap()` in validation binaries
+- Zero `#[expect(clippy::expect_used)]` or `#[expect(clippy::unwrap_used)]` anywhere
+- All `OrExit` imports correctly placed and gated
+
 ## [V122] — 2026-03-16
 
 ### Full Audit Execution — Modern Idiomatic Rust Evolution

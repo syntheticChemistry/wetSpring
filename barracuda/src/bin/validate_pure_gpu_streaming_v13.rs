@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -55,6 +51,7 @@ use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{DomainResult, Validator};
 
 use barracuda::stats::norm_cdf;
+use wetspring_barracuda::validation::OrExit;
 
 fn gompertz(t: f64, p: f64, rm: f64, lambda: f64) -> f64 {
     p * (-(rm * std::f64::consts::E / p)
@@ -248,7 +245,7 @@ fn main() {
 
     let all_h = [h_dig, h_soil, diversity::shannon(&algae)];
     let mean_h = barracuda::stats::mean(&all_h);
-    let cov_h = barracuda::stats::covariance(&all_h, &all_h).expect("cov(H,H)");
+    let cov_h = barracuda::stats::covariance(&all_h, &all_h).or_exit("cov(H,H)");
 
     v.check_pass("S6: Mean H > 0", mean_h > 0.0);
     s6 += 1;

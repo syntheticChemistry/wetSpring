@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -57,6 +53,7 @@ use wetspring_barracuda::validation::Validator;
 
 use barracuda::special::erf;
 use barracuda::stats::norm_cdf;
+use wetspring_barracuda::validation::OrExit;
 
 #[cfg(feature = "gpu")]
 use barracuda::spectral::{
@@ -81,7 +78,7 @@ fn main() {
     let result = qs_biofilm::scenario_standard_growth(&params, dt);
     let qs_us = t0.elapsed().as_micros();
 
-    let final_n = *result.states().last().unwrap().first().unwrap();
+    let final_n = *result.states().last().or_exit("unexpected error").first().or_exit("unexpected error");
     v.check(
         "Standard growth → high cell density",
         final_n,
@@ -89,11 +86,11 @@ fn main() {
         params.k_cap * 0.3,
     );
 
-    let final_b = result.states().last().unwrap()[4];
+    let final_b = result.states().last().or_exit("unexpected error")[4];
     v.check_pass("Standard growth → biofilm initiated (B > 0)", final_b > 0.0);
 
     let high_dens = qs_biofilm::scenario_high_density(&params, dt);
-    let high_b = high_dens.states().last().unwrap()[4];
+    let high_b = high_dens.states().last().or_exit("unexpected error")[4];
     v.check_pass(
         "High density → stronger biofilm than standard",
         high_b > final_b,
@@ -116,7 +113,7 @@ fn main() {
     let equal = cooperation::scenario_equal_start(&coop_params, dt);
     let coop_us = t0.elapsed().as_micros();
     let freq = cooperation::cooperator_frequency(&equal);
-    let final_freq = *freq.last().unwrap();
+    let final_freq = *freq.last().or_exit("unexpected error");
 
     v.check_pass(
         "Equal start → cooperators persist (freq > 0.1)",
@@ -124,7 +121,7 @@ fn main() {
     );
 
     let coop_dom = cooperation::scenario_coop_dominated(&coop_params, dt);
-    let coop_dom_freq = *cooperation::cooperator_frequency(&coop_dom).last().unwrap();
+    let coop_dom_freq = *cooperation::cooperator_frequency(&coop_dom).last().or_exit("unexpected error");
     v.check_pass(
         "Coop-dominated start → cooperators > 50%",
         coop_dom_freq > 0.5,
@@ -133,7 +130,7 @@ fn main() {
     let cheat_dom = cooperation::scenario_cheat_dominated(&coop_params, dt);
     let cheat_dom_freq = *cooperation::cooperator_frequency(&cheat_dom)
         .last()
-        .unwrap();
+        .or_exit("unexpected error");
     v.check_pass(
         "Cheat-dominated start → cheats dominate (coop < 50%)",
         cheat_dom_freq < 0.5,

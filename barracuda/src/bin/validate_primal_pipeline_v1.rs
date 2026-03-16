@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -227,7 +219,7 @@ fn main() {
     let nestgate_available = nestgate.is_some_and(|s| s.present);
 
     if nestgate_available {
-        let socket = &nestgate.unwrap().socket_path;
+        let socket = &nestgate.or_exit("unexpected error").socket_path;
         println!("  NestGate socket: {}", socket.display());
 
         match probe_socket_rpc(socket, "health") {
@@ -296,7 +288,7 @@ fn main() {
     let toadstool_available = toadstool.is_some_and(|s| s.present);
 
     if toadstool_available {
-        let socket = &toadstool.unwrap().socket_path;
+        let socket = &toadstool.or_exit("unexpected error").socket_path;
         match probe_socket_rpc(socket, "toadstool.health") {
             Ok(resp) => {
                 println!("  ToadStool health: OK");
@@ -312,7 +304,7 @@ fn main() {
         v.check_pass("ToadStool fallback to wgpu", true);
     }
 
-    let rt = tokio::runtime::Runtime::new().expect("tokio");
+    let rt = tokio::runtime::Runtime::new().or_exit("tokio");
     match rt.block_on(async { barracuda::device::WgpuDevice::new().await }) {
         Ok(dev) => {
             println!("  wgpu device: {}", dev.name());
@@ -365,6 +357,7 @@ fn main() {
     #[cfg(feature = "json")]
     {
         use wetspring_barracuda::visualization::{DataChannel, EcologyScenario, ScenarioNode};
+use wetspring_barracuda::validation::OrExit;
 
         let mut pipeline_node = ScenarioNode {
             id: "primal_pipeline".into(),
@@ -430,9 +423,9 @@ fn main() {
             edges: vec![],
         };
 
-        let json = serde_json::to_string_pretty(&scenario).expect("serialize");
+        let json = serde_json::to_string_pretty(&scenario).or_exit("serialize");
         std::fs::create_dir_all("output").ok();
-        std::fs::write("output/primal_pipeline_status.json", &json).expect("write");
+        std::fs::write("output/primal_pipeline_status.json", &json).or_exit("write");
         println!(
             "  Exported: output/primal_pipeline_status.json ({} bytes)",
             json.len()

@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -270,7 +266,7 @@ fn main() {
     let mut sorted_eigs = eigenvalues.clone();
     sorted_eigs.sort_by(|a, b| {
         a.partial_cmp(b)
-            .expect("Anderson eigenvalues must be finite for comparison")
+            .or_exit("Anderson eigenvalues must be finite for comparison")
     });
     v.check_pass(
         "Anderson eigenvalues are real",
@@ -422,6 +418,7 @@ fn main() {
     v.section("D09: KMD — CPU validation (PFAS CF₂ repeat)");
 
     use wetspring_barracuda::bio::kmd;
+use wetspring_barracuda::validation::OrExit;
     let pfas_masses = vec![498.930, 398.936, 298.943];
     let kmd_results =
         kmd::kendrick_mass_defect(&pfas_masses, kmd::units::CF2_EXACT, kmd::units::CF2_NOMINAL);

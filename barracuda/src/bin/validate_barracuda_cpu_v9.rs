@@ -37,6 +37,7 @@ use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 use std::time::Instant;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct LcgRng(u64);
 
@@ -84,7 +85,7 @@ fn validate_pathway_scoring(v: &mut Validator) {
     let (top_name, top_score) = pathways
         .iter()
         .max_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal))
-        .expect("pathways non-empty");
+        .or_exit("pathways non-empty");
 
     v.check_pass(
         "PI3K/AKT/mTOR is highest-activation pathway",
@@ -117,12 +118,12 @@ fn validate_pathway_scoring(v: &mut Validator) {
     let mtor = pathways
         .iter()
         .find(|p| p.0 == "PI3K/AKT/mTOR")
-        .expect("known pathway PI3K/AKT/mTOR")
+        .or_exit("known pathway PI3K/AKT/mTOR")
         .1;
     let il6 = pathways
         .iter()
         .find(|p| p.0 == "IL-6/gp130")
-        .expect("known pathway IL-6/gp130")
+        .or_exit("known pathway IL-6/gp130")
         .1;
     v.check_pass("mTOR pathway > IL-6 pathway", mtor > il6);
 
@@ -202,7 +203,7 @@ fn validate_matrix_pharmacophenomics(v: &mut Validator) {
         objective: NmfObjective::Euclidean,
         seed: 42,
     };
-    let result = nmf::nmf(&score_matrix, n_drugs, n_diseases, &config).expect("NMF failed");
+    let result = nmf::nmf(&score_matrix, n_drugs, n_diseases, &config).or_exit("NMF failed");
     let rel_err = nmf::relative_reconstruction_error(&score_matrix, &result);
     v.check_pass(
         "NMF converges",
@@ -267,7 +268,7 @@ fn validate_nmf_drug_repurposing(v: &mut Validator) {
             objective: NmfObjective::Euclidean,
             seed: 42,
         };
-        let result = nmf::nmf(&matrix, n_drugs, n_diseases, &config).expect("NMF failed");
+        let result = nmf::nmf(&matrix, n_drugs, n_diseases, &config).or_exit("NMF failed");
         let rel_err = nmf::relative_reconstruction_error(&matrix, &result);
         println!(
             "  NMF rank={rank}: rel_err={rel_err:.4}, iters={}",
@@ -286,7 +287,7 @@ fn validate_nmf_drug_repurposing(v: &mut Validator) {
         objective: NmfObjective::Euclidean,
         seed: 42,
     };
-    let best = nmf::nmf(&matrix, n_drugs, n_diseases, &best_config).expect("NMF failed");
+    let best = nmf::nmf(&matrix, n_drugs, n_diseases, &best_config).or_exit("NMF failed");
     let best_err = nmf::relative_reconstruction_error(&matrix, &best);
     v.check_pass("best rank error < 0.8", best_err < 0.8);
 
@@ -301,7 +302,7 @@ fn validate_nmf_drug_repurposing(v: &mut Validator) {
         objective: NmfObjective::KlDivergence,
         seed: 42,
     };
-    let kl = nmf::nmf(&kl_matrix, n_drugs, n_diseases, &kl_config).expect("KL NMF failed");
+    let kl = nmf::nmf(&kl_matrix, n_drugs, n_diseases, &kl_config).or_exit("KL NMF failed");
     v.check_pass(
         "KL NMF produces factors",
         !kl.w.is_empty() && !kl.h.is_empty(),
@@ -353,7 +354,7 @@ fn validate_repodb_nmf(v: &mut Validator) {
         objective: NmfObjective::Euclidean,
         seed: 42,
     };
-    let result = nmf::nmf(&matrix, n_drugs, n_diseases, &config).expect("NMF failed");
+    let result = nmf::nmf(&matrix, n_drugs, n_diseases, &config).or_exit("NMF failed");
     let rel_err = nmf::relative_reconstruction_error(&matrix, &result);
 
     v.check_pass(

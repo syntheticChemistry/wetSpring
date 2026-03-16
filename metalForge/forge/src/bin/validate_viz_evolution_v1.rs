@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![expect(clippy::too_many_lines, clippy::expect_used)]
+#![expect(clippy::too_many_lines)]
 //! # Exp333: Visualization Evolution
 //!
 //! Validates all new visualization capabilities:
@@ -20,6 +20,7 @@
 
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::visualization;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp333: Visualization Evolution");
@@ -34,7 +35,7 @@ fn main() {
         frequencies: vec![100.0, 200.0, 300.0],
         amplitudes: vec![0.5, 0.8, 0.3],
     };
-    let json = serde_json::to_string(&spectrum).expect("serialize spectrum");
+    let json = serde_json::to_string(&spectrum).or_exit("serialize spectrum");
     v.check_pass("Spectrum serializes", !json.is_empty());
     v.check_pass(
         "channel_type = spectrum",
@@ -106,7 +107,7 @@ fn main() {
             .contains(&"visualization.ecology.pangenome".into()),
     );
 
-    let ann_json = visualization::capabilities::announcement_json().expect("serialize");
+    let ann_json = visualization::capabilities::announcement_json().or_exit("serialize");
     v.check_pass("announcement JSON non-empty", !ann_json.is_empty());
 
     // ── V4: Pangenome Scenario ──
@@ -131,7 +132,7 @@ fn main() {
     v.check_count("pangenome nodes", pan_s.nodes.len(), 1);
     v.check_count("pangenome channels", pan_s.nodes[0].data_channels.len(), 3);
     v.check_pass("pangenome edges empty", pan_edges.is_empty());
-    let pan_json = serde_json::to_string(&pan_s).expect("serialize pangenome");
+    let pan_json = serde_json::to_string(&pan_s).or_exit("serialize pangenome");
     v.check_pass(
         "pangenome JSON has presence_absence",
         pan_json.contains("presence_absence"),
@@ -235,7 +236,7 @@ fn main() {
         visualization::scenarios::streaming_pipeline::demo_streaming_pipeline_scenario();
     v.check_pass("pipeline ≥ 6 nodes", pipe_s.nodes.len() >= 6);
     v.check_pass("pipeline has edges", !pipe_edges.is_empty());
-    let pipe_json = serde_json::to_string(&pipe_s).expect("serialize pipeline");
+    let pipe_json = serde_json::to_string(&pipe_s).or_exit("serialize pipeline");
     v.check_pass(
         "pipeline JSON has Quality Filter",
         pipe_json.contains("Quality Filter"),

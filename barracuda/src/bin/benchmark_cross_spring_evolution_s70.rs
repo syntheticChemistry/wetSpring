@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -76,6 +72,7 @@
 use std::time::Instant;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct ProvenanceTiming {
     domain: &'static str,
@@ -190,7 +187,7 @@ fn main() {
         for _ in 0..1_000 {
             last = barracuda::stats::jackknife_mean_variance(&jk_data);
         }
-        last.unwrap()
+        last.or_exit("unexpected error")
     });
     v.check_pass("Jackknife: estimate > 0", jk_result.estimate > 0.0);
     v.check_pass("Jackknife: SE ≥ 0", jk_result.std_error >= 0.0);
@@ -209,7 +206,7 @@ fn main() {
                 })
                 .sum::<f64>()
         })
-        .unwrap()
+        .or_exit("unexpected error")
     });
     v.check_pass(
         "Generalized jackknife Shannon > 0",
@@ -246,14 +243,14 @@ fn main() {
             0.95,
             42,
         )
-        .unwrap()
+        .or_exit("unexpected error")
     });
     v.check_pass("Bootstrap: CI lower < upper", ci.lower < ci.upper);
     v.check_pass("Bootstrap: SE > 0", ci.std_error > 0.0);
     v.check_pass("Bootstrap: n_bootstrap = 10000", ci.n_bootstrap == 10_000);
 
     let (rawr, us_rawr) =
-        bench_us(|| barracuda::stats::rawr_mean(&bs_data, 5_000, 0.95, 77).unwrap());
+        bench_us(|| barracuda::stats::rawr_mean(&bs_data, 5_000, 0.95, 77).or_exit("unexpected error"));
     v.check_pass("RAWR: CI lower < upper", rawr.lower < rawr.upper);
     timings.push(ProvenanceTiming {
         domain: "confidence",
@@ -305,7 +302,7 @@ fn main() {
     let (all_fits, us_all) = bench_us(|| barracuda::stats::fit_all(&x, &y_log));
     let best = all_fits
         .iter()
-        .max_by(|a, b| a.r_squared.partial_cmp(&b.r_squared).unwrap());
+        .max_by(|a, b| a.r_squared.partial_cmp(&b.r_squared).or_exit("unexpected error"));
     v.check_pass(
         "fit_all selects logarithmic",
         best.is_some_and(|b| b.model == "logarithmic"),
@@ -426,7 +423,7 @@ fn main() {
     let (gamma_val, us_gamma) = bench_us(|| {
         let mut g = 0.0;
         for _ in 0..100_000 {
-            g = barracuda::special::ln_gamma(5.0).unwrap();
+            g = barracuda::special::ln_gamma(5.0).or_exit("unexpected error");
         }
         g
     });
@@ -535,7 +532,7 @@ fn main() {
     let (pear, us_pear) = bench_us(|| {
         let mut p = 0.0;
         for _ in 0..1_000 {
-            p = barracuda::stats::pearson_correlation(&a, &b).unwrap();
+            p = barracuda::stats::pearson_correlation(&a, &b).or_exit("unexpected error");
         }
         p
     });
@@ -599,12 +596,12 @@ fn main() {
         0.95,
         99,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     v.check_pass("Depth CI lower > 0", depth_ci.lower > 0.0);
 
     let depth_jk =
         barracuda::stats::jackknife(&depths_for_bs, |d| d.iter().sum::<f64>() / d.len() as f64)
-            .unwrap();
+            .or_exit("unexpected error");
     v.check_pass("Depth JK SE > 0", depth_jk.std_error > 0.0);
 
     let pipeline_us = t_pipeline.elapsed().as_micros() as f64;

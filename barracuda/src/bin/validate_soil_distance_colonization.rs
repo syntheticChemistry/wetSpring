@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -70,6 +66,7 @@ use wetspring_barracuda::validation::Validator;
 
 use barracuda::special::erf;
 use barracuda::stats::norm_cdf;
+use wetspring_barracuda::validation::OrExit;
 
 fn autoinducer_at_distance(source_conc: f64, distance_um: f64, diffusion_length: f64) -> f64 {
     source_conc * (-distance_um / diffusion_length).exp()
@@ -139,7 +136,7 @@ fn main() {
         params.k_ai_prod /= factor;
 
         let result = qs_biofilm::scenario_standard_growth(&params, dt);
-        let final_b = result.states().last().unwrap()[4];
+        let final_b = result.states().last().or_exit("unexpected error")[4];
         biofilm_vs_distance.push((factor, final_b));
 
         println!("  Distance factor {factor}×: biofilm B={final_b:.4}");
@@ -179,14 +176,14 @@ fn main() {
     let baseline_result = cooperation::scenario_equal_start(&coop_base, dt);
     let baseline_freq = *cooperation::cooperator_frequency(&baseline_result)
         .last()
-        .unwrap();
+        .or_exit("unexpected error");
 
     for &factor in &distance_factors {
         let mut params = coop_base.clone();
         params.benefit *= (1.0 / factor).min(1.0);
 
         let result = cooperation::scenario_equal_start(&params, dt);
-        let freq = *cooperation::cooperator_frequency(&result).last().unwrap();
+        let freq = *cooperation::cooperator_frequency(&result).last().or_exit("unexpected error");
         let affected = (freq - baseline_freq).abs() > tolerances::SOIL_COOP_FREQ_AFFECTED;
         if affected {
             affected_count += 1;

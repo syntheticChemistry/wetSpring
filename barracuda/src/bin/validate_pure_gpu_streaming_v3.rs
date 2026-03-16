@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -136,7 +128,7 @@ fn validate_quality_filter(
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
-    let (gpu_filtered, gpu_stats) = session.filter_reads(&reads, &params).unwrap();
+    let (gpu_filtered, gpu_stats) = session.filter_reads(&reads, &params).or_exit("unexpected error");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check_count(
@@ -179,13 +171,13 @@ fn validate_diversity_streaming(
     let tg = Instant::now();
     let gpu_shannons: Vec<f64> = samples
         .iter()
-        .map(|c| session.shannon(c).unwrap())
+        .map(|c| session.shannon(c).or_exit("unexpected error"))
         .collect();
     let gpu_simpsons: Vec<f64> = samples
         .iter()
-        .map(|c| session.simpson(c).unwrap())
+        .map(|c| session.simpson(c).or_exit("unexpected error"))
         .collect();
-    let gpu_bc = session.bray_curtis_matrix(&sample_refs).unwrap();
+    let gpu_bc = session.bray_curtis_matrix(&sample_refs).or_exit("unexpected error");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     for (i, (c, g)) in cpu_shannons.iter().zip(&gpu_shannons).enumerate() {
@@ -223,11 +215,11 @@ fn validate_pcoa_streaming(
     let n_axes = 2;
 
     let tc = Instant::now();
-    let cpu_pcoa = pcoa::pcoa(cpu_bc, n_samples, n_axes).unwrap();
+    let cpu_pcoa = pcoa::pcoa(cpu_bc, n_samples, n_axes).or_exit("unexpected error");
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
-    let gpu_pcoa = pcoa_gpu::pcoa_gpu(gpu, gpu_bc, n_samples, n_axes).unwrap();
+    let gpu_pcoa = pcoa_gpu::pcoa_gpu(gpu, gpu_bc, n_samples, n_axes).or_exit("unexpected error");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check_count("PCoA samples", gpu_pcoa.n_samples, cpu_pcoa.n_samples);
@@ -270,7 +262,7 @@ fn validate_spectral_streaming(
     let tg = Instant::now();
     let gpu_cos = session
         .spectral_cosine_matrix(&spec_refs)
-        .expect("cosine stream");
+        .or_exit("cosine stream");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check_count("cosine condensed length", gpu_cos.len(), cpu_cos.len());
@@ -285,7 +277,7 @@ fn validate_spectral_streaming(
         tolerances::GPU_VS_CPU_F64,
     );
 
-    let gpu_pairwise = spectral_match_gpu::pairwise_cosine_gpu(gpu, &spectra).unwrap();
+    let gpu_pairwise = spectral_match_gpu::pairwise_cosine_gpu(gpu, &spectra).or_exit("unexpected error");
     v.check_count(
         "pairwise vs session length",
         gpu_pairwise.len(),
@@ -336,7 +328,7 @@ fn validate_full_pipeline(
     let tg = Instant::now();
     let result = session
         .stream_full_analytics(&classifier, &[], &sample_refs, &params)
-        .unwrap();
+        .or_exit("unexpected error");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     for (i, (cpu_a, gpu_a)) in cpu_alpha.iter().zip(&result.alpha).enumerate() {
@@ -380,24 +372,25 @@ fn benchmark_streaming_vs_dispatch(
 
     let t_stream = Instant::now();
     for _ in 0..iters {
-        let _ = session.shannon(&counts).unwrap();
-        let _ = session.simpson(&counts).unwrap();
-        let _ = session.observed_features(&counts).unwrap();
+        let _ = session.shannon(&counts).or_exit("unexpected error");
+        let _ = session.simpson(&counts).or_exit("unexpected error");
+        let _ = session.observed_features(&counts).or_exit("unexpected error");
     }
     let stream_us = t_stream.elapsed().as_micros() as f64;
 
     let t_individual = Instant::now();
     for _ in 0..iters {
         use wetspring_barracuda::bio::diversity_gpu;
-        let _ = diversity_gpu::shannon_gpu(gpu, &counts).unwrap();
-        let _ = diversity_gpu::simpson_gpu(gpu, &counts).unwrap();
-        let _ = diversity_gpu::observed_features_gpu(gpu, &counts).unwrap();
+use wetspring_barracuda::validation::OrExit;
+        let _ = diversity_gpu::shannon_gpu(gpu, &counts).or_exit("unexpected error");
+        let _ = diversity_gpu::simpson_gpu(gpu, &counts).or_exit("unexpected error");
+        let _ = diversity_gpu::observed_features_gpu(gpu, &counts).or_exit("unexpected error");
     }
     let individual_us = t_individual.elapsed().as_micros() as f64;
 
-    let stream_val = session.shannon(&counts).unwrap();
+    let stream_val = session.shannon(&counts).or_exit("unexpected error");
     let individual_val =
-        wetspring_barracuda::bio::diversity_gpu::shannon_gpu(gpu, &counts).unwrap();
+        wetspring_barracuda::bio::diversity_gpu::shannon_gpu(gpu, &counts).or_exit("unexpected error");
     v.check(
         "Streaming == Individual (Shannon)",
         stream_val,

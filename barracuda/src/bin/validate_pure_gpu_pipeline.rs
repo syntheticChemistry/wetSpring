@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -46,6 +42,7 @@ use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 const N_SAMPLES: usize = 8;
 const N_FEATURES: usize = 512;
@@ -130,7 +127,7 @@ async fn main() {
     let t1 = Instant::now();
     let mut gpu_alpha: Vec<diversity::AlphaDiversity> = Vec::with_capacity(N_SAMPLES);
     for community in &communities {
-        let alpha = diversity_gpu::alpha_diversity_gpu(&gpu, community).expect("GPU pipeline");
+        let alpha = diversity_gpu::alpha_diversity_gpu(&gpu, community).or_exit("GPU pipeline");
         gpu_alpha.push(alpha);
     }
     let stage1_us = t1.elapsed().as_micros() as f64;
@@ -172,7 +169,7 @@ async fn main() {
 
     let t2 = Instant::now();
     let gpu_bray =
-        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).expect("GPU pipeline");
+        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).or_exit("GPU pipeline");
     let stage2_us = t2.elapsed().as_micros() as f64;
 
     let cpu_bray = diversity::bray_curtis_condensed(&communities);
@@ -213,10 +210,10 @@ async fn main() {
     v.section("Stage 3: PCoA Ordination (GPU Eigh)");
 
     let t3 = Instant::now();
-    let gpu_pcoa = pcoa_gpu::pcoa_gpu(&gpu, &gpu_bray, N_SAMPLES, N_AXES).expect("GPU pipeline");
+    let gpu_pcoa = pcoa_gpu::pcoa_gpu(&gpu, &gpu_bray, N_SAMPLES, N_AXES).or_exit("GPU pipeline");
     let stage3_us = t3.elapsed().as_micros() as f64;
 
-    let cpu_pcoa = pcoa::pcoa(&cpu_bray, N_SAMPLES, N_AXES).expect("GPU pipeline");
+    let cpu_pcoa = pcoa::pcoa(&cpu_bray, N_SAMPLES, N_AXES).or_exit("GPU pipeline");
 
     v.check(
         "PCoA: correct n_axes",
@@ -266,9 +263,9 @@ async fn main() {
         .collect();
 
     let t4 = Instant::now();
-    let gpu_var_pc1 = stats_gpu::variance_gpu(&gpu, &pc1).expect("GPU pipeline");
-    let gpu_var_pc2 = stats_gpu::variance_gpu(&gpu, &pc2).expect("GPU pipeline");
-    let gpu_corr = stats_gpu::correlation_gpu(&gpu, &pc1, &pc2).expect("GPU pipeline");
+    let gpu_var_pc1 = stats_gpu::variance_gpu(&gpu, &pc1).or_exit("GPU pipeline");
+    let gpu_var_pc2 = stats_gpu::variance_gpu(&gpu, &pc2).or_exit("GPU pipeline");
+    let gpu_corr = stats_gpu::correlation_gpu(&gpu, &pc1, &pc2).or_exit("GPU pipeline");
     let stage4_us = t4.elapsed().as_micros() as f64;
 
     let cpu_var_pc1 = stats_variance(&pc1)
@@ -306,7 +303,7 @@ async fn main() {
     v.section("Stage 5: Spectral Cosine (GPU GEMM)");
 
     let t5 = Instant::now();
-    let gpu_cosine = spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).expect("GPU pipeline");
+    let gpu_cosine = spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).or_exit("GPU pipeline");
     let stage5_us = t5.elapsed().as_micros() as f64;
 
     let cpu_cosine = pairwise_cosine_cpu(&spectra);

@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -42,6 +38,7 @@ use wetspring_forge::substrate::{
     Capability, Identity, Properties, Substrate, SubstrateKind, SubstrateOrigin,
 };
 use wetspring_forge::workloads;
+use wetspring_barracuda::validation::OrExit;
 
 fn check(pass: &mut u32, fail: &mut u32, total: &mut u32, name: &str, ok: bool) {
     *total += 1;
@@ -358,7 +355,7 @@ fn section_mixed_dispatch(pass: &mut u32, fail: &mut u32, total: &mut u32) {
     let fq = Workload::new("fastq_parse", vec![Capability::CpuCompute]);
 
     let d1 = dispatch::route(&div, &full)
-        .expect("diversity workload should route to GPU on full system");
+        .or_exit("diversity workload should route to GPU on full system");
     check(
         pass,
         fail,
@@ -375,7 +372,7 @@ fn section_mixed_dispatch(pass: &mut u32, fail: &mut u32, total: &mut u32) {
     );
 
     let d2 =
-        dispatch::route(&tax, &full).expect("taxonomy workload should route to NPU on full system");
+        dispatch::route(&tax, &full).or_exit("taxonomy workload should route to NPU on full system");
     check(
         pass,
         fail,
@@ -385,7 +382,7 @@ fn section_mixed_dispatch(pass: &mut u32, fail: &mut u32, total: &mut u32) {
     );
 
     let d3 =
-        dispatch::route(&fq, &full).expect("FASTQ workload should route to CPU on full system");
+        dispatch::route(&fq, &full).or_exit("FASTQ workload should route to CPU on full system");
     check(
         pass,
         fail,
@@ -405,7 +402,7 @@ fn section_mixed_dispatch(pass: &mut u32, fail: &mut u32, total: &mut u32) {
 
     let fq = Workload::new("fastq_parse", vec![Capability::CpuCompute]);
     let d4b = dispatch::route(&fq, &cpu_only)
-        .expect("FASTQ workload should route to CPU on CPU-only inventory");
+        .or_exit("FASTQ workload should route to CPU on CPU-only inventory");
     check(
         pass,
         fail,
@@ -425,7 +422,7 @@ fn section_mixed_dispatch(pass: &mut u32, fail: &mut u32, total: &mut u32) {
 
     let pref = Workload::new("test", vec![Capability::F64Compute]).prefer(SubstrateKind::Gpu);
     let d6 = dispatch::route(&pref, &full)
-        .expect("workload with GPU preference should route when GPU available");
+        .or_exit("workload with GPU preference should route when GPU available");
     check(
         pass,
         fail,
@@ -436,7 +433,7 @@ fn section_mixed_dispatch(pass: &mut u32, fail: &mut u32, total: &mut u32) {
 
     let bad_pref = Workload::new("test", vec![Capability::F64Compute]).prefer(SubstrateKind::Npu);
     let d7 = dispatch::route(&bad_pref, &full)
-        .expect("workload with NPU preference should fallback to GPU when NPU lacks f64");
+        .or_exit("workload with NPU preference should fallback to GPU when NPU lacks f64");
     check(
         pass,
         fail,
@@ -509,7 +506,7 @@ fn section_nucleus_model(pass: &mut u32, fail: &mut u32, total: &mut u32) {
     for (name, caps, expected_kind) in &node_workloads {
         let w = Workload::new(*name, caps.clone());
         let d = dispatch::route(&w, &inventory)
-            .expect("NUCLEUS workload should route to expected substrate");
+            .or_exit("NUCLEUS workload should route to expected substrate");
         check(
             pass,
             fail,

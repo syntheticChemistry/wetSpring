@@ -40,6 +40,7 @@ use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, kmer, pcoa, taxonomy};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v =
@@ -195,7 +196,7 @@ fn validate_six_stage_chain(v: &mut Validator) {
     }
 
     // Stage 5: PCoA on Bray-Curtis
-    let pcoa_result = pcoa::pcoa(&bc, n, 2).unwrap();
+    let pcoa_result = pcoa::pcoa(&bc, n, 2).or_exit("unexpected error");
 
     // Stage 6: Taxonomy
     let refs = training_references();
@@ -250,7 +251,7 @@ fn validate_pcoa_in_pipeline(v: &mut Validator) {
 
     let bc = diversity::bray_curtis_condensed(&float_vecs);
     let n = float_vecs.len();
-    let result = pcoa::pcoa(&bc, n, 2).unwrap();
+    let result = pcoa::pcoa(&bc, n, 2).or_exit("unexpected error");
 
     v.check_pass("PCoA in pipeline: n_samples == 4", result.n_samples == 4);
     v.check_pass("PCoA in pipeline: 2 axes", result.n_axes == 2);

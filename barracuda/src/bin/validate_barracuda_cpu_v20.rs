@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -46,6 +42,7 @@ use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::vault::consent::{ConsentScope, ConsentTicket};
 use wetspring_barracuda::vault::provenance::ProvenanceChain;
 use wetspring_barracuda::vault::storage::VaultStore;
+use wetspring_barracuda::validation::OrExit;
 
 struct DomainTiming {
     name: &'static str,
@@ -83,7 +80,7 @@ fn main() {
     d27 += 1;
     v.check_pass(
         "Provenance: head is export",
-        chain.head().unwrap().operation == "export",
+        chain.head().or_exit("unexpected error").operation == "export",
     );
     d27 += 1;
     v.check_count(
@@ -99,8 +96,8 @@ fn main() {
     );
     d27 += 1;
 
-    let second_hash = chain.iter().nth(1).unwrap().hash;
-    let third_parent = chain.iter().nth(2).unwrap().parent;
+    let second_hash = chain.iter().nth(1).or_exit("unexpected error").hash;
+    let third_parent = chain.iter().nth(2).or_exit("unexpected error").parent;
     v.check_pass(
         "Provenance: chain link [2].parent == [1].hash",
         third_parent == second_hash,
@@ -194,11 +191,11 @@ fn main() {
             &key,
             &consent,
         )
-        .unwrap();
+        .or_exit("unexpected error");
     v.check_count("Vault: 1 blob stored", vault.blob_count(), 1);
     d29 += 1;
 
-    let result = vault.retrieve(&hash, &key, &consent).unwrap();
+    let result = vault.retrieve(&hash, &key, &consent).or_exit("unexpected error");
     v.check_pass(
         "Vault: decrypted matches original",
         result.plaintext == sample_data,
@@ -306,14 +303,14 @@ fn main() {
 
     let input = b"ATCGATCGATCG 16S rRNA gene partial";
     let encoded = encoding::base64_encode(input);
-    let decoded = encoding::base64_decode(&encoded).unwrap();
+    let decoded = encoding::base64_decode(&encoded).or_exit("unexpected error");
     v.check_pass("Base64: roundtrip matches original", decoded == input);
     d31 += 1;
 
     let empty_enc = encoding::base64_encode(b"");
     v.check_pass("Base64: empty encodes to empty", empty_enc.is_empty());
     d31 += 1;
-    let empty_dec = encoding::base64_decode("").unwrap();
+    let empty_dec = encoding::base64_decode("").or_exit("unexpected error");
     v.check_pass("Base64: empty decodes to empty", empty_dec.is_empty());
     d31 += 1;
 

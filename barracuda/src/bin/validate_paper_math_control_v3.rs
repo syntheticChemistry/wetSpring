@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -55,6 +47,7 @@ use wetspring_barracuda::bio::{
     diversity, dnds, felsenstein, gillespie, hmm, kmer, neighbor_joining, phage_defense,
 };
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp251: Paper Math Control v3 — 32 Papers via BarraCuda CPU");
@@ -77,7 +70,7 @@ fn main() {
     let phage_params = phage_defense::PhageDefenseParams::default();
     let phage_r = phage_defense::scenario_phage_attack(&phage_params, 0.01);
     v.check_pass("Phage: ODE converges", phage_r.states().count() > 100);
-    let final_state: Vec<f64> = phage_r.states().last().unwrap().to_vec();
+    let final_state: Vec<f64> = phage_r.states().last().or_exit("unexpected error").to_vec();
     v.check_pass(
         "Phage: bacteria survive (coexistence)",
         final_state[0] > 0.0,
@@ -95,7 +88,7 @@ fn main() {
     let jk_phage = barracuda::stats::jackknife(&phage_diversity, |d| {
         diversity::shannon(&d.iter().map(|&x| x.max(1.0)).collect::<Vec<_>>())
     })
-    .unwrap();
+    .or_exit("unexpected error");
     v.check_pass("Phage: jackknife SE > 0", jk_phage.std_error > 0.0);
 
     // ═══════════════════════════════════════════════════════════════════
@@ -127,7 +120,7 @@ fn main() {
         0.95,
         42,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     v.check_pass(
         "Raceway: bootstrap CI lower < upper",
         raceway_ci.lower < raceway_ci.upper,
@@ -142,10 +135,10 @@ fn main() {
     let soil_pores = [0.35, 0.42, 0.38, 0.41, 0.37, 0.40, 0.36, 0.43, 0.39, 0.44];
     let soil_diversity = [2.1, 2.5, 2.3, 2.4, 2.2, 2.6, 2.0, 2.7, 2.35, 2.55];
 
-    let pear = barracuda::stats::pearson_correlation(&soil_pores, &soil_diversity).unwrap();
+    let pear = barracuda::stats::pearson_correlation(&soil_pores, &soil_diversity).or_exit("unexpected error");
     v.check_pass("Rabot: porosity↔diversity correlated (r > 0.5)", pear > 0.5);
 
-    let fit = barracuda::stats::fit_linear(&soil_pores, &soil_diversity).unwrap();
+    let fit = barracuda::stats::fit_linear(&soil_pores, &soil_diversity).or_exit("unexpected error");
     v.check_pass("Rabot: linear fit R² > 0.5", fit.r_squared > 0.5);
     println!(
         "  Rabot: r={pear:.4}, slope={:.4}, R²={:.4}",
@@ -168,8 +161,8 @@ fn main() {
     let bc_till = diversity::bray_curtis(&notill, &tilled);
     v.check_pass("Wang: tillage shift (BC > 0.1)", bc_till > 0.1);
 
-    let jk_notill = barracuda::stats::jackknife_mean_variance(&notill).unwrap();
-    let jk_tilled = barracuda::stats::jackknife_mean_variance(&tilled).unwrap();
+    let jk_notill = barracuda::stats::jackknife_mean_variance(&notill).or_exit("unexpected error");
+    let jk_tilled = barracuda::stats::jackknife_mean_variance(&tilled).or_exit("unexpected error");
     v.check_pass(
         "Wang: both JK SE > 0",
         jk_notill.std_error > 0.0 && jk_tilled.std_error > 0.0,
@@ -184,7 +177,7 @@ fn main() {
 
     let gene_a = b"ATGCGATCGATCGTAGCTAGCTAGCTAGCTAGCTAG";
     let gene_b = b"ATGCGATCGATCGTAGCAAGCTAGCTAGCTAGCTAG";
-    let dnds_result = dnds::pairwise_dnds(gene_a, gene_b).expect("dN/dS");
+    let dnds_result = dnds::pairwise_dnds(gene_a, gene_b).or_exit("dN/dS");
     v.check_pass("Boden: dN computed", dnds_result.dn.is_finite());
     v.check_pass("Boden: dS computed", dnds_result.ds.is_finite());
 
@@ -264,7 +257,7 @@ fn main() {
         0.95,
         77,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     v.check_pass(
         "Anderson14: Shannon CI finite",
         viral_ci.estimate.is_finite(),
@@ -276,7 +269,7 @@ fn main() {
     v.section("V83 Cross-Paper Composition: S70+++ Statistics");
 
     let all_diversities = vec![h_raceway, h_notill, h_tilled, h_viral, jk_phage.estimate];
-    let jk_cross = barracuda::stats::jackknife_mean_variance(&all_diversities).unwrap();
+    let jk_cross = barracuda::stats::jackknife_mean_variance(&all_diversities).or_exit("unexpected error");
     v.check_pass(
         "V83: Cross-paper diversity JK mean > 0",
         jk_cross.estimate > 0.0,

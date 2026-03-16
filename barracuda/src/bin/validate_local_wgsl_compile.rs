@@ -36,6 +36,7 @@ use wetspring_barracuda::bio::ode_sweep_gpu::{OdeSweepConfig, OdeSweepGpu};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 #[tokio::main]
 async fn main() {
@@ -84,7 +85,7 @@ async fn main() {
                 timeout: None,
             });
 
-            device.read_buffer_u32(&hist_buf, 16).expect("readback")
+            device.read_buffer_u32(&hist_buf, 16).or_exit("readback")
         }));
         let us = t0.elapsed().as_micros();
 
@@ -168,7 +169,7 @@ async fn main() {
                 timeout: None,
             });
 
-            device.read_buffer_f64(&score_buf, 6).expect("readback")
+            device.read_buffer_f64(&score_buf, 6).or_exit("readback")
         }));
         let us = t0.elapsed().as_micros();
 

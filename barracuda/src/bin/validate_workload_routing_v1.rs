@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -89,7 +85,7 @@ fn main() {
     // ─── D76: PrecisionBrain Bio Routing ───
     println!("\n  ── D76: PrecisionBrain Bio Routing ──");
 
-    let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
+    let rt = tokio::runtime::Runtime::new().or_exit("tokio runtime");
     let device = rt.block_on(async { barracuda::device::WgpuDevice::new().await });
 
     if let Ok(ref dev) = device {
@@ -184,6 +180,7 @@ fn main() {
 
         println!("\n  PrecisionBrain tier safety summary:");
         use barracuda::device::PrecisionTier;
+use wetspring_barracuda::validation::OrExit;
         for tier in [
             PrecisionTier::F32,
             PrecisionTier::DF64,

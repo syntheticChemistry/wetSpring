@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_possible_truncation,
     reason = "validation harness: u128→u64 timing, f64→u32 counts"
 )]
@@ -49,6 +45,7 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 #[tokio::main]
 async fn main() {
@@ -70,22 +67,22 @@ async fn main() {
     let mut timings: Vec<(&str, f64)> = Vec::new();
 
     validate_ani_gpu(
-        &AniGpu::new(&device).expect("ANI GPU shader"),
+        &AniGpu::new(&device).or_exit("ANI GPU shader"),
         &mut v,
         &mut timings,
     );
     validate_snp_gpu(
-        &SnpGpu::new(&device).expect("SNP GPU shader"),
+        &SnpGpu::new(&device).or_exit("SNP GPU shader"),
         &mut v,
         &mut timings,
     );
     validate_pangenome_gpu(
-        &PangenomeGpu::new(&device).expect("Pangenome GPU shader"),
+        &PangenomeGpu::new(&device).or_exit("Pangenome GPU shader"),
         &mut v,
         &mut timings,
     );
     validate_dnds_gpu(
-        &DnDsGpu::new(&device).expect("dN/dS GPU shader"),
+        &DnDsGpu::new(&device).or_exit("dN/dS GPU shader"),
         &mut v,
         &mut timings,
     );
@@ -433,7 +430,7 @@ fn validate_dnds_gpu(gpu: &DnDsGpu, v: &mut Validator, timings: &mut Vec<(&str, 
     match result {
         Ok(Ok(gpu_result)) => {
             // Pair 0: identical → dN=0, dS=0
-            let cpu0 = cpu_results[0].as_ref().expect("dN/dS result");
+            let cpu0 = cpu_results[0].as_ref().or_exit("dN/dS result");
             v.check(
                 "dN/dS GPU: identical dN=0",
                 gpu_result.dn[0],
@@ -448,7 +445,7 @@ fn validate_dnds_gpu(gpu: &DnDsGpu, v: &mut Validator, timings: &mut Vec<(&str, 
             );
 
             // Pair 1: synonymous only → dS>0, dN=0
-            let cpu1 = cpu_results[1].as_ref().expect("dN/dS result");
+            let cpu1 = cpu_results[1].as_ref().or_exit("dN/dS result");
             v.check(
                 "dN/dS GPU: syn-only dN=0",
                 gpu_result.dn[1],
@@ -469,7 +466,7 @@ fn validate_dnds_gpu(gpu: &DnDsGpu, v: &mut Validator, timings: &mut Vec<(&str, 
             );
 
             // Pair 2: nonsynonymous → dN>0
-            let cpu2 = cpu_results[2].as_ref().expect("dN/dS result");
+            let cpu2 = cpu_results[2].as_ref().or_exit("dN/dS result");
             v.check(
                 "dN/dS GPU: nonsyn dN>0",
                 f64::from(u8::from(gpu_result.dn[2] > 0.0)),
@@ -484,7 +481,7 @@ fn validate_dnds_gpu(gpu: &DnDsGpu, v: &mut Validator, timings: &mut Vec<(&str, 
             );
 
             // Pair 3: mixed → both sites and diffs present
-            let cpu3 = cpu_results[3].as_ref().expect("dN/dS result");
+            let cpu3 = cpu_results[3].as_ref().or_exit("dN/dS result");
             v.check(
                 "dN/dS GPU: mixed dS matches CPU",
                 gpu_result.ds[3],

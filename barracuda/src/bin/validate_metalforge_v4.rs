@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::too_many_lines,
     reason = "validation harness: sequential domain checks in single main()"
 )]
@@ -44,6 +40,7 @@ use wetspring_barracuda::bio::phage_defense_gpu::{PhageDefenseGpu, PhageDefenseO
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 #[tokio::main]
 async fn main() {
@@ -74,9 +71,9 @@ async fn main() {
         let dt = tolerances::ODE_DEFAULT_DT;
 
         let cpu_result = phage_defense::run_defense(&y0, f64::from(n_steps) * dt, dt, &params);
-        let cpu_finals: Vec<f64> = cpu_result.states().last().expect("MetalForge v4").to_vec();
+        let cpu_finals: Vec<f64> = cpu_result.states().last().or_exit("MetalForge v4").to_vec();
 
-        let gpu_engine = PhageDefenseGpu::new(device.clone()).expect("PhageDefense GPU compile");
+        let gpu_engine = PhageDefenseGpu::new(device.clone()).or_exit("PhageDefense GPU compile");
         let flat = params.to_flat();
         let all_y0: Vec<f64> = (0..n_batches).flat_map(|_| y0.iter().copied()).collect();
         let all_params: Vec<f64> = (0..n_batches).flat_map(|_| flat.iter().copied()).collect();
@@ -94,7 +91,7 @@ async fn main() {
                 &all_y0,
                 &all_params,
             )
-            .expect("GPU dispatch");
+            .or_exit("GPU dispatch");
         let us = t0.elapsed().as_micros();
 
         let batch0 = &gpu_result[..4];
@@ -122,9 +119,9 @@ async fn main() {
         let dt = 0.01;
 
         let cpu_result = bistable::run_bistable(&y0, f64::from(n_steps) * dt, dt, &params);
-        let cpu_finals: Vec<f64> = cpu_result.states().last().expect("MetalForge v4").to_vec();
+        let cpu_finals: Vec<f64> = cpu_result.states().last().or_exit("MetalForge v4").to_vec();
 
-        let gpu_engine = BistableGpu::new(device.clone()).expect("Bistable GPU compile");
+        let gpu_engine = BistableGpu::new(device.clone()).or_exit("Bistable GPU compile");
         let flat = params.to_flat();
         let all_y0: Vec<f64> = (0..n_batches).flat_map(|_| y0.iter().copied()).collect();
         let all_params: Vec<f64> = (0..n_batches).flat_map(|_| flat.iter().copied()).collect();
@@ -142,7 +139,7 @@ async fn main() {
                 &all_y0,
                 &all_params,
             )
-            .expect("GPU dispatch");
+            .or_exit("GPU dispatch");
         let us = t0.elapsed().as_micros();
 
         let batch0 = &gpu_result[..5];
@@ -175,9 +172,9 @@ async fn main() {
         let dt = 0.01;
 
         let cpu_result = multi_signal::run_multi_signal(&y0, f64::from(n_steps) * dt, dt, &params);
-        let cpu_finals: Vec<f64> = cpu_result.states().last().expect("MetalForge v4").to_vec();
+        let cpu_finals: Vec<f64> = cpu_result.states().last().or_exit("MetalForge v4").to_vec();
 
-        let gpu_engine = MultiSignalGpu::new(device.clone()).expect("MultiSignal GPU compile");
+        let gpu_engine = MultiSignalGpu::new(device.clone()).or_exit("MultiSignal GPU compile");
         let flat = params.to_flat();
         let all_y0: Vec<f64> = (0..n_batches).flat_map(|_| y0.iter().copied()).collect();
         let all_params: Vec<f64> = (0..n_batches).flat_map(|_| flat.iter().copied()).collect();
@@ -195,7 +192,7 @@ async fn main() {
                 &all_y0,
                 &all_params,
             )
-            .expect("GPU dispatch");
+            .or_exit("GPU dispatch");
         let us = t0.elapsed().as_micros();
 
         let batch0 = &gpu_result[..7];
@@ -247,7 +244,7 @@ async fn main() {
             .enumerate()
             .max_by(|a, b| a.1.total_cmp(b.1))
             .map(|(i, _)| i)
-            .expect("MetalForge v4");
+            .or_exit("MetalForge v4");
         v.check("NPU classify argmax", argmax as f64, 0.0, tolerances::EXACT);
 
         let us = t0.elapsed().as_micros();
@@ -260,7 +257,7 @@ async fn main() {
         let t0 = Instant::now();
 
         // Stage 1 (GPU): Phage defense ODE → final state
-        let phage_gpu = PhageDefenseGpu::new(device.clone()).expect("PhageDefense GPU");
+        let phage_gpu = PhageDefenseGpu::new(device.clone()).or_exit("PhageDefense GPU");
         let params = PhageDefenseParams::default();
         let y0 = [100.0, 100.0, 10.0, 50.0];
         let flat = params.to_flat();
@@ -277,10 +274,10 @@ async fn main() {
                 &y0,
                 &flat,
             )
-            .expect("Stage 1 GPU");
+            .or_exit("Stage 1 GPU");
 
         // Stage 2 (GPU→GPU): Feed defended bacteria count into bistable model
-        let bistable_gpu = BistableGpu::new(device).expect("Bistable GPU");
+        let bistable_gpu = BistableGpu::new(device).or_exit("Bistable GPU");
         let bparams = BistableParams::default();
         let bistable_y0 = [result[0] / 100.0, 0.0, 0.0, 0.5, 0.0]; // normalize
         let bflat = bparams.to_flat();
@@ -297,7 +294,7 @@ async fn main() {
                 &bistable_y0,
                 &bflat,
             )
-            .expect("Stage 2 GPU");
+            .or_exit("Stage 2 GPU");
 
         // Stage 3 (CPU): Aggregate results
         let final_biofilm = bistable_result[4];

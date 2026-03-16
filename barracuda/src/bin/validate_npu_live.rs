@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -46,6 +42,7 @@ use wetspring_barracuda::bio::esn::{Esn, EsnConfig};
 use wetspring_barracuda::npu;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 // ═══════════════════════════════════════════════════════════════════
 // Shared helpers
@@ -296,8 +293,8 @@ fn main() {
         v.finish();
     }
 
-    let summary = npu::npu_summary().expect("NPU summary");
-    let mut handle = npu::discover_npu().expect("open NPU");
+    let summary = npu::npu_summary().or_exit("NPU summary");
+    let mut handle = npu::discover_npu().or_exit("open NPU");
 
     println!("  NPU: {} @ {}", summary.chip, summary.pcie_address);
     println!(
@@ -421,7 +418,7 @@ fn main() {
         .collect();
 
     let load_result =
-        npu::load_reservoir_weights(&mut handle, &w_in_f64, &w_res_f64).expect("reservoir load");
+        npu::load_reservoir_weights(&mut handle, &w_in_f64, &w_res_f64).or_exit("reservoir load");
 
     let total_weight_bytes = load_result.w_in_bytes + load_result.w_res_bytes;
     let nonzero_res = w_res_f64.iter().filter(|&&x| x != 0.0).count();
@@ -472,16 +469,16 @@ fn main() {
     let bloom_npu = esn_bloom_sw.to_npu_weights();
 
     let t_switch = Instant::now();
-    let _qs_load_ns = npu::load_readout_weights(&mut handle, &qs_npu.weights_i8).expect("QS load");
+    let _qs_load_ns = npu::load_readout_weights(&mut handle, &qs_npu.weights_i8).or_exit("QS load");
     let switch_1_us = t_switch.elapsed().as_micros();
 
     let t_switch = Instant::now();
     let _bloom_load_ns =
-        npu::load_readout_weights(&mut handle, &bloom_npu.weights_i8).expect("Bloom load");
+        npu::load_readout_weights(&mut handle, &bloom_npu.weights_i8).or_exit("Bloom load");
     let switch_2_us = t_switch.elapsed().as_micros();
 
     let t_switch = Instant::now();
-    let _ = npu::load_readout_weights(&mut handle, &qs_npu.weights_i8).expect("QS reload");
+    let _ = npu::load_readout_weights(&mut handle, &qs_npu.weights_i8).or_exit("QS reload");
     let switch_3_us = t_switch.elapsed().as_micros();
 
     println!(
@@ -518,7 +515,7 @@ fn main() {
         })
         .collect();
 
-    let batch_result = npu::npu_batch_infer(&mut handle, &batch_inputs, 4).expect("batch infer");
+    let batch_result = npu::npu_batch_infer(&mut handle, &batch_inputs, 4).or_exit("batch infer");
 
     println!("  Batch size:      8");
     println!("  Classes:         {:?}", batch_result.classes);
@@ -534,7 +531,7 @@ fn main() {
     v.check_pass("throughput > 100 Hz", batch_result.throughput_hz > 100.0);
 
     // Run single-inference baseline for comparison
-    let single_result = npu::npu_infer_i8(&mut handle, &batch_inputs[0], 4).expect("single infer");
+    let single_result = npu::npu_infer_i8(&mut handle, &batch_inputs[0], 4).or_exit("single infer");
     let single_ns = single_result.write_ns + single_result.read_ns;
     let single_hz = if single_ns > 0 {
         1_000_000_000.0 / single_ns as f64

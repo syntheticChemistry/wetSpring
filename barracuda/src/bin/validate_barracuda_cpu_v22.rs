@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -57,6 +49,7 @@
 use wetspring_barracuda::bio::{cooperation, diversity, gillespie, qs_biofilm};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp292: BarraCuda CPU v22 — Comprehensive Paper Parity");
@@ -183,7 +176,7 @@ fn main() {
         b"ATGCGATCGATCGTAGCTAGCTAGCTAGCTAGCTAG",
         b"ATGCGATCGATCGTAGCAAGCTAGCTAGCTAGCTAG",
     )
-    .expect("dN/dS");
+    .or_exit("dN/dS");
     v.check_pass("dN/dS: dN finite", dnds.dn.is_finite());
     v.check_pass("dN/dS: dS finite", dnds.ds.is_finite());
 
@@ -286,7 +279,7 @@ fn main() {
         0.95,
         42,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     v.check_pass("Bootstrap: lower < estimate", ci.lower <= ci.estimate);
     v.check_pass("Bootstrap: estimate < upper", ci.estimate <= ci.upper);
     v.check(
@@ -296,7 +289,7 @@ fn main() {
         tolerances::BOOTSTRAP_ESTIMATE_SMALL,
     );
 
-    let jk = barracuda::stats::jackknife_mean_variance(&data).unwrap();
+    let jk = barracuda::stats::jackknife_mean_variance(&data).or_exit("unexpected error");
     v.check(
         "Jackknife: mean = 5.5",
         jk.estimate,
@@ -307,7 +300,7 @@ fn main() {
 
     let x_fit = [1.0, 2.0, 3.0, 4.0, 5.0];
     let y_fit = [2.0, 4.0, 6.0, 8.0, 10.0];
-    let fit = barracuda::stats::fit_linear(&x_fit, &y_fit).unwrap();
+    let fit = barracuda::stats::fit_linear(&x_fit, &y_fit).or_exit("unexpected error");
     v.check(
         "Linear fit: slope = 2",
         fit.params[0],
@@ -321,7 +314,7 @@ fn main() {
         tolerances::ANALYTICAL_LOOSE,
     );
 
-    let pearson = barracuda::stats::pearson_correlation(&x_fit, &y_fit).unwrap();
+    let pearson = barracuda::stats::pearson_correlation(&x_fit, &y_fit).or_exit("unexpected error");
     v.check(
         "Pearson(x, 2x) = 1",
         pearson,

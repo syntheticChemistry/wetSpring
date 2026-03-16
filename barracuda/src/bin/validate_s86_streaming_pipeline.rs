@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -61,6 +53,7 @@ use wetspring_barracuda::bio::{diversity, diversity_gpu};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn bench_ms(f: impl FnOnce()) -> f64 {
     let t = Instant::now();
@@ -72,8 +65,8 @@ fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
-        .expect("tokio runtime");
-    let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+        .or_exit("tokio runtime");
+    let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
 
     let mut v = Validator::new("Exp300: S86 Streaming Pipeline — Spectral + Graph + Sampling");
     let t_total = Instant::now();
@@ -217,7 +210,7 @@ fn main() {
         &format!("S4: belief propagation {} layers", bp.len()),
         bp.len() == 2,
     );
-    let final_sum: f64 = bp.last().unwrap().iter().sum();
+    let final_sum: f64 = bp.last().or_exit("unexpected error").iter().sum();
     v.check_pass(
         "S4: final distribution sums to 1",
         (final_sum - 1.0).abs() < tolerances::DISTRIBUTION_SUM_TO_ONE,
@@ -266,22 +259,22 @@ fn main() {
             &[(-5.0, 5.0), (-5.0, 5.0), (-5.0, 5.0), (0.0, 10.0)],
             42,
         )
-        .unwrap();
+        .or_exit("unexpected error");
         let _ = barracuda::sample::sobol_scaled(
             128,
             &[(0.0, 1.0), (-1.0, 1.0), (0.0, 10.0), (5.0, 15.0)],
         )
-        .unwrap();
+        .or_exit("unexpected error");
     });
     let lhs_samples = barracuda::sample::latin_hypercube(
         100,
         &[(-5.0, 5.0), (-5.0, 5.0), (-5.0, 5.0), (0.0, 10.0)],
         42,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     let sobol_samples =
         barracuda::sample::sobol_scaled(128, &[(0.0, 1.0), (-1.0, 1.0), (0.0, 10.0), (5.0, 15.0)])
-            .unwrap();
+            .or_exit("unexpected error");
     v.check_pass(
         &format!("S6: LHS {}×{}", lhs_samples.len(), lhs_samples[0].len()),
         lhs_samples.len() == 100 && lhs_samples[0].len() == 4,
@@ -369,14 +362,14 @@ fn main() {
         0.95,
         42,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     v.check_pass("S8: CI lower < upper", ci.lower < ci.upper);
     v.check_pass(
         "S8: CI contains estimate",
         ci.lower <= ci.estimate && ci.estimate <= ci.upper,
     );
 
-    let jk = barracuda::stats::jackknife_mean_variance(&gpu_shannons).unwrap();
+    let jk = barracuda::stats::jackknife_mean_variance(&gpu_shannons).or_exit("unexpected error");
     v.check_pass("S8: Jackknife SE > 0", jk.std_error > 0.0);
     v.check(
         "S8: Jackknife ≈ Bootstrap",

@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -42,6 +38,7 @@ use wetspring_barracuda::bio::unifrac_gpu::UniFracGpu;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 fn validate_kmer(v: &mut Validator, device: &Arc<barracuda::device::WgpuDevice>) {
     v.section("K-mer Histogram: CPU ↔ GPU (k=4, raw)");
@@ -51,7 +48,7 @@ fn validate_kmer(v: &mut Validator, device: &Arc<barracuda::device::WgpuDevice>)
     let kmer_gpu = KmerGpu::new(device);
     let gpu_result = kmer_gpu
         .count_from_sequence(seq, 4)
-        .expect("GPU kmer dispatch");
+        .or_exit("GPU kmer dispatch");
     let gpu_hist = &gpu_result.histogram;
 
     let k = 4usize;
@@ -130,7 +127,7 @@ fn validate_unifrac(v: &mut Validator, device: &Arc<barracuda::device::WgpuDevic
             n_samples,
             n_leaves,
         )
-        .expect("GPU UniFrac dispatch");
+        .or_exit("GPU UniFrac dispatch");
     let us = t0.elapsed().as_micros();
 
     v.check(
@@ -186,7 +183,7 @@ fn validate_ode_sweep(v: &mut Validator, device: &Arc<barracuda::device::WgpuDev
     let cpu_finals: Vec<f64> = cpu_result
         .states()
         .last()
-        .expect("CPU/GPU expanded")
+        .or_exit("CPU/GPU expanded")
         .to_vec();
 
     let config = OdeSweepConfig {
@@ -201,7 +198,7 @@ fn validate_ode_sweep(v: &mut Validator, device: &Arc<barracuda::device::WgpuDev
     let sweeper = OdeSweepGpu::new(Arc::clone(device));
     let gpu_result = sweeper
         .integrate(&config, &all_y0, &all_params)
-        .expect("GPU ODE dispatch");
+        .or_exit("GPU ODE dispatch");
     let us = t0.elapsed().as_micros();
 
     v.check(
@@ -252,10 +249,10 @@ fn validate_phage_defense(v: &mut Validator, device: &Arc<barracuda::device::Wgp
     let cpu_finals: Vec<f64> = cpu_result
         .states()
         .last()
-        .expect("CPU/GPU expanded")
+        .or_exit("CPU/GPU expanded")
         .to_vec();
 
-    let phage_gpu = PhageDefenseGpu::new(Arc::clone(device)).expect("PhageDefense GPU compile");
+    let phage_gpu = PhageDefenseGpu::new(Arc::clone(device)).or_exit("PhageDefense GPU compile");
 
     let mut all_y0 = Vec::with_capacity(n_batches as usize * 4);
     let mut all_params = Vec::with_capacity(n_batches as usize * phage_defense::N_PARAMS);
@@ -275,7 +272,7 @@ fn validate_phage_defense(v: &mut Validator, device: &Arc<barracuda::device::Wgp
     };
     let gpu_result = phage_gpu
         .integrate(&gpu_config, &all_y0, &all_params)
-        .expect("PhageDefense GPU dispatch");
+        .or_exit("PhageDefense GPU dispatch");
     let us = t0.elapsed().as_micros();
 
     v.check(
@@ -319,7 +316,7 @@ fn validate_metalforge_pipeline(v: &mut Validator, device: &Arc<barracuda::devic
 
     let seq = b"ACGTACGTACGTACGTAAACCCCGGGGTTTT";
     let kmer_gpu = KmerGpu::new(device);
-    let gpu_kmer_result = kmer_gpu.count_from_sequence(seq, 4).expect("GPU kmer");
+    let gpu_kmer_result = kmer_gpu.count_from_sequence(seq, 4).or_exit("GPU kmer");
 
     let total: u32 = gpu_kmer_result.histogram.iter().sum();
     let nonzero_bins: usize = gpu_kmer_result.histogram.iter().filter(|&&x| x > 0).count();

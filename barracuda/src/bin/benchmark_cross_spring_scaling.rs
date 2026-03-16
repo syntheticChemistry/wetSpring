@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::too_many_lines,
     reason = "validation harness: sequential domain checks in single main()"
 )]
@@ -56,6 +52,7 @@ use wgpu::util::DeviceExt;
 
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::validation;
+use wetspring_barracuda::validation::OrExit;
 
 struct BenchResult {
     primitive: &'static str,
@@ -377,11 +374,11 @@ async fn main() {
         let cpu_us = tc.elapsed().as_micros() as f64;
 
         let gpu_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            let fmr = FusedMapReduceF64::new(device.clone()).expect("FMR");
-            fmr.shannon_entropy(&data).expect("shannon warm");
+            let fmr = FusedMapReduceF64::new(device.clone()).or_exit("FMR");
+            fmr.shannon_entropy(&data).or_exit("shannon warm");
 
             let tg = Instant::now();
-            let _result = fmr.shannon_entropy(&data).expect("shannon bench");
+            let _result = fmr.shannon_entropy(&data).or_exit("shannon bench");
             tg.elapsed().as_micros() as f64
         }));
 
@@ -422,10 +419,10 @@ async fn main() {
         let cpu_us = tc.elapsed().as_micros() as f64;
 
         let gpu_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            GemmF64::execute(device.clone(), &a, &b, n, n, n, 1).expect("gemm warm");
+            GemmF64::execute(device.clone(), &a, &b, n, n, n, 1).or_exit("gemm warm");
 
             let tg = Instant::now();
-            let _c = GemmF64::execute(device.clone(), &a, &b, n, n, n, 1).expect("gemm bench");
+            let _c = GemmF64::execute(device.clone(), &a, &b, n, n, n, 1).or_exit("gemm bench");
             tg.elapsed().as_micros() as f64
         }));
 

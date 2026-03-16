@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -54,6 +46,7 @@ use wetspring_barracuda::io::ms2;
 use wetspring_barracuda::io::nanopore::{self, NanoporeIter, SyntheticSignalGenerator};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn temp_path(name: &str) -> PathBuf {
     std::env::temp_dir().join(format!("wetspring_exp215_{name}"))
@@ -67,7 +60,7 @@ fn validate_fastq_gpu_diversity(v: &mut Validator, gpu: &GpuF64) {
 
     let path = temp_path("gpu_community.fastq");
     {
-        let mut f = std::fs::File::create(&path).unwrap();
+        let mut f = std::fs::File::create(&path).or_exit("unexpected error");
         let species: &[(&str, usize)] = &[
             ("ATGCATGCATGCATGC", 200),
             ("GCGCGCGCGCGCGCGC", 150),
@@ -80,7 +73,7 @@ fn validate_fastq_gpu_diversity(v: &mut Validator, gpu: &GpuF64) {
         let mut idx = 0_usize;
         for (seq, count) in species {
             for _ in 0..*count {
-                writeln!(f, "@sp_{idx}\n{seq}\n+\n{}", "I".repeat(seq.len())).unwrap();
+                writeln!(f, "@sp_{idx}\n{seq}\n+\n{}", "I".repeat(seq.len())).or_exit("unexpected error");
                 idx += 1;
             }
         }
@@ -92,7 +85,7 @@ fn validate_fastq_gpu_diversity(v: &mut Validator, gpu: &GpuF64) {
         *seq_counts.entry(rec.sequence.to_vec()).or_insert(0) += 1;
         Ok(())
     })
-    .unwrap();
+    .or_exit("unexpected error");
 
     let counts: Vec<f64> = seq_counts.values().map(|&c| c as f64).collect();
 
@@ -101,7 +94,7 @@ fn validate_fastq_gpu_diversity(v: &mut Validator, gpu: &GpuF64) {
     let cpu_j = diversity::pielou_evenness(&counts);
     let cpu_s = diversity::observed_features(&counts);
 
-    let gpu_result = diversity_gpu::alpha_diversity_gpu(gpu, &counts).unwrap();
+    let gpu_result = diversity_gpu::alpha_diversity_gpu(gpu, &counts).or_exit("unexpected error");
     let gpu_h = gpu_result.shannon;
     let gpu_d = gpu_result.simpson;
     let gpu_j = gpu_result.evenness;
@@ -130,7 +123,7 @@ fn validate_fastq_gpu_diversity(v: &mut Validator, gpu: &GpuF64) {
     let n = counts.len();
     let samples: Vec<Vec<f64>> = counts.iter().map(|&c| vec![c]).collect();
     let cpu_bc = diversity::bray_curtis_condensed(&samples);
-    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).unwrap();
+    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).or_exit("unexpected error");
 
     v.check_pass("Bray-Curtis condensed: CPU computed", !cpu_bc.is_empty());
     v.check_count(
@@ -162,7 +155,7 @@ fn validate_quality_gpu_derep(v: &mut Validator, gpu: &GpuF64) {
 
     let path = temp_path("gpu_quality.fastq");
     {
-        let mut f = std::fs::File::create(&path).unwrap();
+        let mut f = std::fs::File::create(&path).or_exit("unexpected error");
         for i in 0..100_u32 {
             let seq = if i < 60 {
                 "ATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGC"
@@ -174,14 +167,14 @@ fn validate_quality_gpu_derep(v: &mut Validator, gpu: &GpuF64) {
             } else {
                 std::iter::repeat_n('I', seq.len()).collect()
             };
-            writeln!(f, "@read_{i}\n{seq}\n+\n{qual}").unwrap();
+            writeln!(f, "@read_{i}\n{seq}\n+\n{qual}").or_exit("unexpected error");
         }
     }
 
     let records: Vec<_> = fastq::FastqIter::open(&path)
-        .unwrap()
+        .or_exit("unexpected error")
         .collect::<Result<Vec<_>, _>>()
-        .unwrap();
+        .or_exit("unexpected error");
     let params = quality::QualityParams {
         window_size: 4,
         window_min_quality: 15,
@@ -205,7 +198,7 @@ fn validate_quality_gpu_derep(v: &mut Validator, gpu: &GpuF64) {
 
     let counts: Vec<f64> = uniques.iter().map(|u| u.abundance as f64).collect();
     let cpu_h = diversity::shannon(&counts);
-    let gpu_result = diversity_gpu::alpha_diversity_gpu(gpu, &counts).unwrap();
+    let gpu_result = diversity_gpu::alpha_diversity_gpu(gpu, &counts).or_exit("unexpected error");
 
     v.check(
         "derep → Shannon: CPU == GPU",
@@ -226,15 +219,15 @@ fn validate_ms2_gpu_spectral(v: &mut Validator, _gpu: &GpuF64) {
 
     let path = temp_path("gpu_spectral.ms2");
     {
-        let mut f = std::fs::File::create(&path).unwrap();
-        writeln!(f, "H\tCreatedBy\tExp215").unwrap();
+        let mut f = std::fs::File::create(&path).or_exit("unexpected error");
+        writeln!(f, "H\tCreatedBy\tExp215").or_exit("unexpected error");
         for scan in 1..=4_u32 {
             let precursor = f64::from(scan).mul_add(100.0, 300.0);
-            writeln!(f, "S\t{scan}\t{scan}\t{precursor:.3}").unwrap();
-            writeln!(f, "I\tRTime\t{:.1}", f64::from(scan) * 0.5).unwrap();
-            writeln!(f, "I\tBPI\t10000.0").unwrap();
-            writeln!(f, "I\tTIC\t50000.0").unwrap();
-            writeln!(f, "Z\t2\t{:.3}", precursor * 2.0 - 1.008).unwrap();
+            writeln!(f, "S\t{scan}\t{scan}\t{precursor:.3}").or_exit("unexpected error");
+            writeln!(f, "I\tRTime\t{:.1}", f64::from(scan) * 0.5).or_exit("unexpected error");
+            writeln!(f, "I\tBPI\t10000.0").or_exit("unexpected error");
+            writeln!(f, "I\tTIC\t50000.0").or_exit("unexpected error");
+            writeln!(f, "Z\t2\t{:.3}", precursor * 2.0 - 1.008).or_exit("unexpected error");
             for frag in 0..scan {
                 writeln!(
                     f,
@@ -242,7 +235,7 @@ fn validate_ms2_gpu_spectral(v: &mut Validator, _gpu: &GpuF64) {
                     f64::from(frag).mul_add(50.0, 100.0),
                     1000.0 * f64::from(scan - frag)
                 )
-                .unwrap();
+                .or_exit("unexpected error");
             }
         }
     }
@@ -252,12 +245,12 @@ fn validate_ms2_gpu_spectral(v: &mut Validator, _gpu: &GpuF64) {
         stream_spectra.push(spec);
         Ok(())
     })
-    .unwrap();
+    .or_exit("unexpected error");
 
     let batch: Vec<_> = ms2::Ms2Iter::open(&path)
-        .unwrap()
+        .or_exit("unexpected error")
         .collect::<Result<Vec<_>, _>>()
-        .unwrap();
+        .or_exit("unexpected error");
 
     v.check_count("4 spectra from stream", stream_spectra.len(), 4);
     v.check_count("4 spectra from batch", batch.len(), 4);
@@ -290,10 +283,10 @@ fn validate_nanopore_gpu_stats(v: &mut Validator, _gpu: &GpuF64) {
     let reads = sig.generate_batch(20, 4000, 4000.0);
 
     let path = temp_path("gpu_nanopore.nrs");
-    nanopore::write_nrs(&path, &reads).unwrap();
+    nanopore::write_nrs(&path, &reads).or_exit("unexpected error");
     let loaded: Vec<_> = NanoporeIter::open(&path)
-        .unwrap()
-        .map(|r| r.unwrap())
+        .or_exit("unexpected error")
+        .map(|r| r.or_exit("unexpected error"))
         .collect();
 
     v.check_count("loaded 20 reads", loaded.len(), 20);
@@ -348,7 +341,7 @@ fn validate_full_gpu_chain(v: &mut Validator, gpu: &GpuF64) {
 
     let path = temp_path("gpu_pipeline.fastq");
     {
-        let mut f = std::fs::File::create(&path).unwrap();
+        let mut f = std::fs::File::create(&path).or_exit("unexpected error");
         let species: &[(&str, usize)] = &[
             ("ATGCATGCATGCATGCATGCATGCATGCATGC", 80),
             ("GCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGC", 60),
@@ -359,16 +352,16 @@ fn validate_full_gpu_chain(v: &mut Validator, gpu: &GpuF64) {
         for (seq, count) in species {
             for _ in 0..*count {
                 let qual: String = std::iter::repeat_n('I', seq.len()).collect();
-                writeln!(f, "@read_{idx}\n{seq}\n+\n{qual}").unwrap();
+                writeln!(f, "@read_{idx}\n{seq}\n+\n{qual}").or_exit("unexpected error");
                 idx += 1;
             }
         }
     }
 
     let records: Vec<_> = fastq::FastqIter::open(&path)
-        .unwrap()
+        .or_exit("unexpected error")
         .collect::<Result<Vec<_>, _>>()
-        .unwrap();
+        .or_exit("unexpected error");
     v.check_count("pipeline: 200 reads", records.len(), 200);
 
     let params = quality::QualityParams {
@@ -390,7 +383,7 @@ fn validate_full_gpu_chain(v: &mut Validator, gpu: &GpuF64) {
     let cpu_h = diversity::shannon(&counts);
     let cpu_d = diversity::simpson(&counts);
 
-    let gpu_result = diversity_gpu::alpha_diversity_gpu(gpu, &counts).unwrap();
+    let gpu_result = diversity_gpu::alpha_diversity_gpu(gpu, &counts).or_exit("unexpected error");
 
     v.check(
         "pipeline Shannon: CPU == GPU",
@@ -429,7 +422,7 @@ fn validate_gpu_threshold(v: &mut Validator, gpu: &GpuF64) {
 
     let cpu_h = diversity::shannon(&small);
     let gpu_h = diversity_gpu::alpha_diversity_gpu(gpu, &small)
-        .unwrap()
+        .or_exit("unexpected error")
         .shannon;
     v.check(
         "small set: CPU == GPU math identical",
@@ -440,10 +433,10 @@ fn validate_gpu_threshold(v: &mut Validator, gpu: &GpuF64) {
 }
 
 fn main() {
-    let rt = tokio::runtime::Runtime::new().unwrap();
+    let rt = tokio::runtime::Runtime::new().or_exit("unexpected error");
     let gpu = rt
         .block_on(GpuF64::new())
-        .expect("GPU with SHADER_F64 required for Exp215");
+        .or_exit("GPU with SHADER_F64 required for Exp215");
 
     gpu.print_info();
     println!();

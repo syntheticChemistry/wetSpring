@@ -1,16 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
-)]
-#![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
 #![expect(
     clippy::too_many_lines,
@@ -99,6 +91,7 @@ fn main() {
     #[cfg(feature = "gpu")]
     {
         use barracuda::spectral::{GOE_R, POISSON_R};
+use wetspring_barracuda::validation::OrExit;
 
         let midpoint = f64::midpoint(GOE_R, POISSON_R);
         let l = 8;
@@ -124,8 +117,8 @@ fn main() {
             println!("  {t:>6.1} {w:>8.2} {r:>8.4} {err:>8.4}  {marker}");
         }
 
-        let r_start = trajectory.first().unwrap().2;
-        let r_end = trajectory.last().unwrap().2;
+        let r_start = trajectory.first().or_exit("unexpected error").2;
+        let r_end = trajectory.last().or_exit("unexpected error").2;
 
         v.check_pass("r(t=0) < midpoint (localized start)", r_start < midpoint);
         v.check_pass("r(t=∞) > midpoint (extended end)", r_end > midpoint);
@@ -167,13 +160,13 @@ fn main() {
             println!("  {t:>6.0} {w:>8.2} {r:>8.4} {err:>8.4}  {marker}");
         }
 
-        let r_pre = ab_traj.first().unwrap().2;
+        let r_pre = ab_traj.first().or_exit("unexpected error").2;
         let r_during = ab_traj
             .iter()
             .filter(|(t, _, _, _)| (3.0..=10.0).contains(t))
             .map(|(_, _, r, _)| *r)
             .fold(f64::MAX, f64::min);
-        let r_post = ab_traj.last().unwrap().2;
+        let r_post = ab_traj.last().or_exit("unexpected error").2;
 
         v.check_pass("r drops during antibiotic treatment", r_during < r_pre);
         v.check_pass("r recovers after treatment", r_post > r_during);

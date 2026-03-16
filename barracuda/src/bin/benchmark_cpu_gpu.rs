@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -62,10 +58,11 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::special;
 use wetspring_barracuda::validation;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
-    let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
-    let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+    let rt = tokio::runtime::Runtime::new().or_exit("tokio runtime");
+    let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
 
     let hw = HardwareInventory::detect("wetSpring CPU vs GPU");
     hw.print();

@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -45,6 +41,7 @@ use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 use barracuda::stats::norm_cdf;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp176: Soil Biofilm & Aggregate Geometry (Tecon & Or 2017)");
@@ -138,7 +135,7 @@ fn main() {
         params.d_ai *= (1.0 / factor).sqrt();
 
         let result = qs_biofilm::scenario_standard_growth(&params, dt);
-        let final_b = result.states().last().unwrap()[4];
+        let final_b = result.states().last().or_exit("unexpected error")[4];
         biofilms.push(final_b);
 
         println!("  Water film factor {factor:.1}×: biofilm B={final_b:.4}");

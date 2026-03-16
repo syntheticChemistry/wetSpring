@@ -29,6 +29,7 @@ use wetspring_barracuda::bio::qs_biofilm::{self, QsBiofilmParams};
 use wetspring_barracuda::ipc::dispatch;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 // ── D01: Dispatch↔Direct Diversity Parity ────────────────────────────────────
 
@@ -54,13 +55,13 @@ fn validate_diversity_dispatch_parity(v: &mut Validator) {
         let direct_j = diversity::pielou_evenness(counts);
 
         let params = json!({"counts": counts, "metrics": ["all"]});
-        let result = dispatch::dispatch("science.diversity", &params).expect("dispatch diversity");
+        let result = dispatch::dispatch("science.diversity", &params).or_exit("dispatch diversity");
 
-        let disp_h = result["shannon"].as_f64().expect("shannon");
-        let disp_d = result["simpson"].as_f64().expect("simpson");
-        let disp_c = result["chao1"].as_f64().expect("chao1");
-        let disp_s = result["observed"].as_f64().expect("observed");
-        let disp_j = result["pielou"].as_f64().expect("pielou");
+        let disp_h = result["shannon"].as_f64().or_exit("shannon");
+        let disp_d = result["simpson"].as_f64().or_exit("simpson");
+        let disp_c = result["chao1"].as_f64().or_exit("chao1");
+        let disp_s = result["observed"].as_f64().or_exit("observed");
+        let disp_j = result["pielou"].as_f64().or_exit("pielou");
 
         v.check(
             &format!("comm{i} Shannon dispatch==direct"),
@@ -116,8 +117,8 @@ fn validate_bray_curtis_dispatch_parity(v: &mut Validator) {
         let direct = diversity::bray_curtis(a, b);
 
         let params = json!({"counts": a, "counts_b": b});
-        let result = dispatch::dispatch("science.diversity", &params).expect("dispatch bc");
-        let dispatched = result["bray_curtis"].as_f64().expect("bray_curtis");
+        let result = dispatch::dispatch("science.diversity", &params).or_exit("dispatch bc");
+        let dispatched = result["bray_curtis"].as_f64().or_exit("bray_curtis");
 
         v.check(
             &format!("pair{i} Bray-Curtis dispatch==direct"),
@@ -175,10 +176,10 @@ fn validate_qs_dispatch_parity(v: &mut Validator) {
             .fold(0.0_f64, f64::max);
 
         let params = json!({"scenario": scenario, "dt": dt});
-        let result = dispatch::dispatch("science.qs_model", &params).expect("dispatch qs");
-        let disp_t_end = result["t_end"].as_f64().expect("t_end");
-        let disp_peak = result["peak_biofilm"].as_f64().expect("peak_biofilm");
-        let disp_steps = result["steps"].as_u64().expect("steps");
+        let result = dispatch::dispatch("science.qs_model", &params).or_exit("dispatch qs");
+        let disp_t_end = result["t_end"].as_f64().or_exit("t_end");
+        let disp_peak = result["peak_biofilm"].as_f64().or_exit("peak_biofilm");
+        let disp_steps = result["steps"].as_u64().or_exit("steps");
 
         v.check(
             &format!("{scenario} t_end dispatch==direct"),
@@ -218,7 +219,7 @@ fn validate_full_pipeline_dispatch(v: &mut Validator) {
         "scenario": "standard_growth",
         "dt": 0.01,
     });
-    let result = dispatch::dispatch("science.full_pipeline", &params).expect("dispatch pipeline");
+    let result = dispatch::dispatch("science.full_pipeline", &params).or_exit("dispatch pipeline");
 
     v.check_pass(
         "pipeline contains diversity stage",
@@ -232,7 +233,7 @@ fn validate_full_pipeline_dispatch(v: &mut Validator) {
 
     let div = &result["diversity"];
     let direct_h = diversity::shannon(counts);
-    let pipeline_h = div["shannon"].as_f64().expect("pipeline shannon");
+    let pipeline_h = div["shannon"].as_f64().or_exit("pipeline shannon");
     v.check(
         "pipeline diversity Shannon==direct",
         pipeline_h,
@@ -241,7 +242,7 @@ fn validate_full_pipeline_dispatch(v: &mut Validator) {
     );
 
     let qs = &result["qs_model"];
-    let pipeline_t_end = qs["t_end"].as_f64().expect("pipeline t_end");
+    let pipeline_t_end = qs["t_end"].as_f64().or_exit("pipeline t_end");
     v.check_pass("pipeline QS t_end > 0", pipeline_t_end > 0.0);
 
     println!(
@@ -288,8 +289,8 @@ fn validate_nucleus_atomics(v: &mut Validator) {
     v.section("═══ D06: NUCLEUS Atomic Coordination (Tower→Node→Nest) ═══");
     let t = Instant::now();
 
-    let health = dispatch::dispatch("health.check", &json!({})).expect("health");
-    let caps = health["capabilities"].as_array().expect("capabilities");
+    let health = dispatch::dispatch("health.check", &json!({})).or_exit("health");
+    let caps = health["capabilities"].as_array().or_exit("capabilities");
     let cap_names: Vec<&str> = caps.iter().filter_map(|c| c.as_str()).collect();
 
     v.check_pass(

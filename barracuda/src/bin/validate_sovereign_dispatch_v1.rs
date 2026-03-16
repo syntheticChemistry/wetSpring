@@ -5,10 +5,6 @@
     reason = "validation harness: cross-spring feature gates not defined in this crate"
 )]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -82,6 +78,7 @@ fn main() {
     println!("\n  ── D84: Device Enum ──");
 
     use barracuda::device::Device;
+use wetspring_barracuda::validation::OrExit;
 
     let devices = [Device::CPU, Device::GPU, Device::Auto];
 
@@ -107,7 +104,7 @@ fn main() {
     // ─── D85: wgpu Path Validation ───
     println!("\n  ── D85: wgpu Path Validation ──");
 
-    let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
+    let rt = tokio::runtime::Runtime::new().or_exit("tokio runtime");
     let device = rt.block_on(async { barracuda::device::WgpuDevice::new().await });
 
     match device {

@@ -33,6 +33,7 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 #[tokio::main]
 #[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
@@ -73,8 +74,8 @@ async fn main() {
     let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
     let t_gpu = Instant::now();
-    let gpu_ani = AniGpu::new(&device).expect("ANI GPU shader");
-    let gpu_results = gpu_ani.batch_ani(&ani_pairs).expect("cross substrate");
+    let gpu_ani = AniGpu::new(&device).or_exit("ANI GPU shader");
+    let gpu_results = gpu_ani.batch_ani(&ani_pairs).or_exit("cross substrate");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     for (i, (cpu_r, gpu_val)) in cpu_results
@@ -105,8 +106,8 @@ async fn main() {
     let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
     let t_gpu = Instant::now();
-    let gpu_snp = SnpGpu::new(&device).expect("SNP GPU shader");
-    let gpu_snp_result = gpu_snp.call_snps(&snp_seqs).expect("cross substrate");
+    let gpu_snp = SnpGpu::new(&device).or_exit("SNP GPU shader");
+    let gpu_snp_result = gpu_snp.call_snps(&snp_seqs).or_exit("cross substrate");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     let cpu_variant_count = cpu_snp.variants.len();
@@ -170,10 +171,10 @@ async fn main() {
         .collect();
 
     let t_gpu = Instant::now();
-    let gpu_pan = PangenomeGpu::new(&device).expect("Pangenome GPU shader");
+    let gpu_pan = PangenomeGpu::new(&device).or_exit("Pangenome GPU shader");
     let gpu_pan_result = gpu_pan
         .classify(&presence_flat, 5, 4)
-        .expect("cross substrate");
+        .or_exit("cross substrate");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     v.check(
@@ -228,10 +229,10 @@ async fn main() {
     let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
     let t_gpu = Instant::now();
-    let gpu_dnds_mod = DnDsGpu::new(&device).expect("dN/dS GPU shader");
+    let gpu_dnds_mod = DnDsGpu::new(&device).or_exit("dN/dS GPU shader");
     let gpu_dnds_result = gpu_dnds_mod
         .batch_dnds(&dnds_pairs)
-        .expect("cross substrate");
+        .or_exit("cross substrate");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     for (i, cpu_r) in cpu_dnds.iter().enumerate() {

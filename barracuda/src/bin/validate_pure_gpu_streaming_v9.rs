@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -99,12 +91,13 @@ fn main() {
     {
         use wetspring_barracuda::bio::diversity_gpu;
         use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::validation::OrExit;
 
         let rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()
-            .expect("tokio runtime");
-        let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+            .or_exit("tokio runtime");
+        let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
         println!("  GPU: {}", gpu.adapter_name);
 
         let t_gpu = Instant::now();
@@ -211,7 +204,7 @@ fn main() {
             .copied()
             .zip(p_qs.iter().copied())
             .collect();
-        sorted_pairs.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+        sorted_pairs.sort_by(|a, b| a.0.partial_cmp(&b.0).or_exit("unexpected error"));
         sorted_pairs
             .windows(2)
             .all(|w| w[1].1 <= w[0].1 + tolerances::EXACT_F64)
@@ -231,11 +224,11 @@ fn main() {
         0.95,
         42,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     v.check_pass("Bootstrap CI: lower < upper", ci.lower < ci.upper);
     v.check_pass("Bootstrap CI: finite", ci.estimate.is_finite());
 
-    let jk = barracuda::stats::jackknife_mean_variance(&cpu_shannons).unwrap();
+    let jk = barracuda::stats::jackknife_mean_variance(&cpu_shannons).or_exit("unexpected error");
     v.check_pass("Jackknife: SE > 0", jk.std_error > 0.0);
 
     let pear = barracuda::stats::pearson_correlation(&w_from_diversity, &p_qs);

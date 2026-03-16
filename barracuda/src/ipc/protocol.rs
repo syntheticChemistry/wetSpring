@@ -147,6 +147,23 @@ pub fn error_response(id: &Value, code: i64, message: &str) -> String {
     })
 }
 
+/// Extract an RPC error message from a raw JSON-RPC response string.
+///
+/// Returns `Some((code, message))` if the response contains an `"error"` field
+/// with `"code"` and `"message"` subfields. Returns `None` for success responses
+/// or unparseable strings.
+///
+/// Centralizes the JSON-RPC error extraction pattern used by Songbird, NestGate,
+/// and provenance clients (healthSpring V29 pattern).
+#[must_use]
+pub fn extract_rpc_error(response: &str) -> Option<(i64, String)> {
+    let val: Value = serde_json::from_str(response).ok()?;
+    let err = val.get("error")?;
+    let code = err.get("code")?.as_i64()?;
+    let message = err.get("message")?.as_str()?.to_string();
+    Some((code, message))
+}
+
 #[cfg(test)]
 #[expect(clippy::unwrap_used)]
 mod tests {
@@ -210,5 +227,25 @@ mod tests {
         let line = r#"{"jsonrpc":"2.0","method":"test","params":{}}"#;
         let req = parse_request(line).unwrap();
         assert!(req.id.is_null());
+    }
+
+    #[test]
+    fn extract_rpc_error_from_error_response() {
+        let resp = r#"{"jsonrpc":"2.0","error":{"code":-32601,"message":"method not found"},"id":1}"#;
+        let (code, msg) = extract_rpc_error(resp).unwrap();
+        assert_eq!(code, -32601);
+        assert_eq!(msg, "method not found");
+    }
+
+    #[test]
+    fn extract_rpc_error_from_success_response() {
+        let resp = r#"{"jsonrpc":"2.0","result":{"status":"ok"},"id":1}"#;
+        assert!(extract_rpc_error(resp).is_none());
+    }
+
+    #[test]
+    fn extract_rpc_error_from_malformed() {
+        assert!(extract_rpc_error("not json").is_none());
+        assert!(extract_rpc_error("").is_none());
     }
 }

@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -68,6 +60,7 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn bench_ms(f: impl FnOnce()) -> f64 {
     let t = Instant::now();
@@ -79,8 +72,8 @@ fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
-        .expect("tokio runtime");
-    let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+        .or_exit("tokio runtime");
+    let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
     let device = gpu.to_wgpu_device();
     let ctx = gpu.tensor_context().clone();
 
@@ -98,7 +91,7 @@ fn main() {
     for &n in &sizes {
         let counts: Vec<f64> = (1..=n).map(f64::from).collect();
         let cpu_sh = diversity::shannon(&counts);
-        let gpu_sh = diversity_gpu::shannon_gpu(&gpu, &counts).expect("GPU Shannon");
+        let gpu_sh = diversity_gpu::shannon_gpu(&gpu, &counts).or_exit("GPU Shannon");
         v.check(
             &format!("D01: Shannon@{n}"),
             gpu_sh,
@@ -107,7 +100,7 @@ fn main() {
         );
 
         let cpu_si = diversity::simpson(&counts);
-        let gpu_si = diversity_gpu::simpson_gpu(&gpu, &counts).expect("GPU Simpson");
+        let gpu_si = diversity_gpu::simpson_gpu(&gpu, &counts).or_exit("GPU Simpson");
         v.check(
             &format!("D01: Simpson@{n}"),
             gpu_si,
@@ -116,7 +109,7 @@ fn main() {
         );
 
         let cpu_obs = diversity::observed_features(&counts);
-        let gpu_obs = diversity_gpu::observed_features_gpu(&gpu, &counts).expect("GPU obs");
+        let gpu_obs = diversity_gpu::observed_features_gpu(&gpu, &counts).or_exit("GPU obs");
         v.check(
             &format!("D01: Observed@{n}"),
             gpu_obs,
@@ -130,7 +123,7 @@ fn main() {
     let n_taxa = 200_usize;
     let fuse_counts: Vec<f64> = (1..=n_taxa).map(|i| f64::from(i as i32)).collect();
     let fuse_cpu_sh = diversity::shannon(&fuse_counts);
-    let fusion = DiversityFusionGpu::new(Arc::clone(&device)).unwrap();
+    let fusion = DiversityFusionGpu::new(Arc::clone(&device)).or_exit("unexpected error");
     match fusion.compute(&fuse_counts, 1, n_taxa) {
         Ok(ref results) => {
             let gpu_sh = results[0].shannon;
@@ -175,7 +168,7 @@ fn main() {
     // ═══ D04: PCoA — BatchedEighGpu ════════════════════════════════
     v.section("D04: PCoA — BatchedEighGpu");
     let small_bc = diversity::bray_curtis_condensed(&communities[..6]);
-    let cpu_pcoa = pcoa::pcoa(&small_bc, 6, 3).expect("CPU PCoA");
+    let cpu_pcoa = pcoa::pcoa(&small_bc, 6, 3).or_exit("CPU PCoA");
     match pcoa_gpu::pcoa_gpu(&gpu, &small_bc, 6, 3) {
         Ok(gpc) => {
             v.check(
@@ -306,13 +299,13 @@ fn main() {
         0.95,
         42,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     v.check_pass("D10: CI lower < upper", ci.lower < ci.upper);
     v.check_pass(
         "D10: CI contains estimate",
         ci.lower <= ci.estimate && ci.estimate <= ci.upper,
     );
-    let jk = barracuda::stats::jackknife_mean_variance(&stat_data).unwrap();
+    let jk = barracuda::stats::jackknife_mean_variance(&stat_data).or_exit("unexpected error");
     v.check_pass("D10: JK SE > 0", jk.std_error > 0.0);
     v.check(
         "D10: JK ≈ Bootstrap",
@@ -369,12 +362,12 @@ fn main() {
     // ═══ D13: LHS + Sobol ══════════════════════════════════════════
     v.section("D13: LHS + Sobol Sampling");
     let bounds = vec![(-5.0, 5.0), (-5.0, 5.0), (-5.0, 5.0)];
-    let lhs = barracuda::sample::latin_hypercube(100, &bounds, 42).unwrap();
+    let lhs = barracuda::sample::latin_hypercube(100, &bounds, 42).or_exit("unexpected error");
     v.check_pass(
         &format!("D13: LHS {}×{}", lhs.len(), lhs[0].len()),
         lhs.len() == 100 && lhs[0].len() == 3,
     );
-    let sobol = barracuda::sample::sobol_scaled(64, &bounds).unwrap();
+    let sobol = barracuda::sample::sobol_scaled(64, &bounds).or_exit("unexpected error");
     v.check_pass(
         &format!("D13: Sobol {}×{}", sobol.len(), sobol[0].len()),
         sobol.len() == 64 && sobol[0].len() == 3,
@@ -404,7 +397,7 @@ fn main() {
     v.check_pass("D15: fit_all returns models", !fits.is_empty());
     let best = fits
         .iter()
-        .max_by(|a, b| a.r_squared.partial_cmp(&b.r_squared).unwrap());
+        .max_by(|a, b| a.r_squared.partial_cmp(&b.r_squared).or_exit("unexpected error"));
     if let Some(b) = best {
         v.check_pass(
             &format!("D15: best R²={:.4}", b.r_squared),

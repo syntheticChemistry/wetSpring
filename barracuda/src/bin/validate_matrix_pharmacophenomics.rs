@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -32,6 +28,7 @@
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective, NmfResult, cosine_similarity};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn top_k_cosine(result: &NmfResult, top_k: usize) -> Vec<(usize, usize, f64)> {
     let m = result.m;
@@ -111,7 +108,7 @@ fn validate_nmf_analysis(v: &mut Validator, matrix_scores: &[f64], ranked: &[(us
         objective: NmfObjective::Euclidean,
         seed: 42,
     };
-    let result = nmf::nmf(matrix_scores, n_drugs, n_diseases, &config).expect("NMF failed");
+    let result = nmf::nmf(matrix_scores, n_drugs, n_diseases, &config).or_exit("NMF failed");
 
     let rel_err = nmf::relative_reconstruction_error(matrix_scores, &result);
     let rank = config.rank;
@@ -120,7 +117,7 @@ fn validate_nmf_analysis(v: &mut Validator, matrix_scores: &[f64], ranked: &[(us
 
     v.check_pass("NMF converges (error decreases)", {
         let e = &result.errors;
-        e.len() >= 2 && e.last().expect("errors non-empty") < &e[0]
+        e.len() >= 2 && e.last().or_exit("errors non-empty") < &e[0]
     });
     v.check_pass("relative reconstruction error < 0.5", rel_err < 0.5);
 

@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -43,6 +39,7 @@
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct LcgRng(u64);
 
@@ -66,7 +63,7 @@ fn build_block_matrix(rng: &mut LcgRng) -> (Vec<f64>, usize) {
     let n_diseases = 100;
     let target_sparsity = 0.05;
     let n_known =
-        (f64::from(u32::try_from(n_drugs * n_diseases).expect("n_drugs*n_diseases fits u32"))
+        (f64::from(u32::try_from(n_drugs * n_diseases).or_exit("n_drugs*n_diseases fits u32"))
             * target_sparsity) as usize;
 
     let mut matrix = vec![0.0; n_drugs * n_diseases];
@@ -81,12 +78,12 @@ fn build_block_matrix(rng: &mut LcgRng) -> (Vec<f64>, usize) {
             let d = drug_start
                 + (rng.next_f64()
                     * f64::from(
-                        u32::try_from(drugs_per_cluster).expect("drugs_per_cluster fits u32"),
+                        u32::try_from(drugs_per_cluster).or_exit("drugs_per_cluster fits u32"),
                     )) as usize;
             let dis = disease_start
                 + (rng.next_f64()
                     * f64::from(
-                        u32::try_from(diseases_per_cluster).expect("diseases_per_cluster fits u32"),
+                        u32::try_from(diseases_per_cluster).or_exit("diseases_per_cluster fits u32"),
                     )) as usize;
             if d < n_drugs && dis < n_diseases {
                 matrix[d * n_diseases + dis] = 1.0;
@@ -138,7 +135,7 @@ fn validate_factorisation(
             objective: NmfObjective::Euclidean,
             seed: 42,
         };
-        let result = nmf::nmf(train_matrix, n_drugs, n_diseases, &config).expect("NMF failed");
+        let result = nmf::nmf(train_matrix, n_drugs, n_diseases, &config).or_exit("NMF failed");
         let rel_err = nmf::relative_reconstruction_error(train_matrix, &result);
 
         let top_k_preds = nmf::top_k_predictions(&result, n_test * 5);
@@ -185,7 +182,7 @@ fn validate_factorisation(
         seed: 42,
     };
     let result_best =
-        nmf::nmf(train_matrix, n_drugs, n_diseases, &config_best).expect("NMF failed");
+        nmf::nmf(train_matrix, n_drugs, n_diseases, &config_best).or_exit("NMF failed");
     let rel_best = nmf::relative_reconstruction_error(train_matrix, &result_best);
     println!("  Best-rank reconstruction error: {rel_best:.4}");
     v.check_pass(
@@ -227,7 +224,7 @@ fn validate_kl_and_sparsity(
         .iter()
         .map(|&x| x + tolerances::ANALYTICAL_LOOSE)
         .collect();
-    let result_kl = nmf::nmf(&train_kl, n_drugs, n_diseases, &config_kl).expect("KL NMF failed");
+    let result_kl = nmf::nmf(&train_kl, n_drugs, n_diseases, &config_kl).or_exit("KL NMF failed");
 
     let kl_top = nmf::top_k_predictions(&result_kl, n_test * 5);
     let kl_novel: Vec<(usize, usize, f64)> = kl_top
@@ -261,7 +258,7 @@ fn validate_kl_and_sparsity(
         seed: 42,
     };
     let result_best =
-        nmf::nmf(train_matrix, n_drugs, n_diseases, &config_best).expect("NMF failed");
+        nmf::nmf(train_matrix, n_drugs, n_diseases, &config_best).or_exit("NMF failed");
 
     let w_sparsity = result_best
         .w

@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -27,10 +19,6 @@
 #![expect(
     clippy::many_single_char_names,
     reason = "validation harness: mathematical variable names from papers"
-)]
-#![expect(
-    clippy::similar_names,
-    reason = "validation harness: domain variables from published notation"
 )]
 //! # Exp319: Cross-Spring Modern Evolution Validation + Benchmark (V98+)
 //!
@@ -70,7 +58,7 @@ use barracuda::shaders::provenance::{
     cross_spring_matrix, cross_spring_shaders, shaders_consumed_by, shaders_from,
 };
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{OrExit, Validator};
 
 struct Timing {
     label: &'static str,
@@ -378,7 +366,7 @@ fn main() {
         let x = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0];
         let y = vec![2.1, 3.9, 6.2, 7.8, 10.1, 12.0, 14.2, 15.9, 18.1, 20.0];
         let (corr, ms) = bench("Pearson correlation", || {
-            barracuda::stats::pearson_correlation(&x, &y).unwrap()
+            barracuda::stats::pearson_correlation(&x, &y).or_exit("unexpected error")
         });
         v.check_pass("Pearson r > 0.99", corr > 0.99);
         timings.push(Timing {
@@ -401,7 +389,7 @@ fn main() {
         let hi = barracuda::stats::thornthwaite_heat_index(&monthly);
 
         let (harg, ms) = bench("Hargreaves ET₀", || {
-            barracuda::stats::hargreaves_et0(35.0, 32.0, 18.0).unwrap()
+            barracuda::stats::hargreaves_et0(35.0, 32.0, 18.0).or_exit("unexpected error")
         });
         v.check_pass("Hargreaves ET₀ > 0", harg > 0.0);
         timings.push(Timing {
@@ -412,7 +400,7 @@ fn main() {
 
         let (fao, ms) = bench("FAO-56 PM ET₀", || {
             barracuda::stats::fao56_et0(21.5, 12.3, 84.0, 63.0, 2.78, 22.07, 100.0, 50.8, 187)
-                .unwrap()
+                .or_exit("unexpected error")
         });
         v.check_pass("FAO-56 ET₀ > 0", fao > 0.0);
         timings.push(Timing {
@@ -422,22 +410,22 @@ fn main() {
         });
 
         let (thorn, _) = bench("Thornthwaite ET₀", || {
-            barracuda::stats::thornthwaite_et0(21.0, hi, 14.5, 30.0).unwrap()
+            barracuda::stats::thornthwaite_et0(21.0, hi, 14.5, 30.0).or_exit("unexpected error")
         });
         v.check_pass("Thornthwaite ET₀ > 0", thorn > 0.0);
 
         let (mak, _) = bench("Makkink ET₀", || {
-            barracuda::stats::makkink_et0(20.0, 18.0).unwrap()
+            barracuda::stats::makkink_et0(20.0, 18.0).or_exit("unexpected error")
         });
         v.check_pass("Makkink ET₀ > 0", mak > 0.0);
 
         let (turc, _) = bench("Turc ET₀", || {
-            barracuda::stats::turc_et0(20.0, 18.0, 70.0).unwrap()
+            barracuda::stats::turc_et0(20.0, 18.0, 70.0).or_exit("unexpected error")
         });
         v.check_pass("Turc ET₀ > 0", turc > 0.0);
 
         let (hamon, _) = bench("Hamon ET₀", || {
-            barracuda::stats::hamon_et0(20.0, 14.0).unwrap()
+            barracuda::stats::hamon_et0(20.0, 14.0).or_exit("unexpected error")
         });
         v.check_pass("Hamon ET₀ > 0", hamon > 0.0);
         println!("  6 ET₀ methods: airSpring V039 → barraCuda → wetSpring soil models");
@@ -460,7 +448,7 @@ fn main() {
         });
 
         let (var, _) = bench("variance(1..100)", || {
-            barracuda::stats::correlation::variance(&data).unwrap()
+            barracuda::stats::correlation::variance(&data).or_exit("unexpected error")
         });
         let expected_var = 100.0 * 101.0 / 12.0;
         v.check(
@@ -472,7 +460,7 @@ fn main() {
 
         let jk_data = [1.0, 2.0, 3.0, 4.0, 5.0];
         let (jk, ms) = bench("jackknife mean", || {
-            barracuda::stats::jackknife_mean_variance(&jk_data).unwrap()
+            barracuda::stats::jackknife_mean_variance(&jk_data).or_exit("unexpected error")
         });
         v.check(
             "jackknife estimate ≈ 3.0",
@@ -494,7 +482,7 @@ fn main() {
                 0.95,
                 42,
             )
-            .unwrap()
+            .or_exit("unexpected error")
         });
         v.check_pass("bootstrap lower < mean", bs.lower < mean);
         v.check_pass("bootstrap upper > mean", bs.upper > mean);
@@ -507,7 +495,7 @@ fn main() {
         let xs = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0];
         let ys = [2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0];
         let (fit, ms) = bench("fit_linear", || {
-            barracuda::stats::fit_linear(&xs, &ys).unwrap()
+            barracuda::stats::fit_linear(&xs, &ys).or_exit("unexpected error")
         });
         v.check(
             "linear slope = 2.0",
@@ -556,7 +544,7 @@ fn main() {
                 v.check_pass("NMF errors tracked", !r.errors.is_empty());
                 v.check_pass("NMF W non-negative", r.w.iter().all(|&x| x >= 0.0));
                 v.check_pass("NMF H non-negative", r.h.iter().all(|&x| x >= 0.0));
-                let err = *r.errors.last().unwrap();
+                let err = *r.errors.last().or_exit("unexpected error");
                 println!("  NMF: {} iters, final err={err:.6}", r.errors.len());
             }
             Err(e) => {
@@ -581,10 +569,10 @@ fn main() {
         let rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()
-            .expect("tokio runtime");
+            .or_exit("tokio runtime");
         let gpu = rt
             .block_on(wetspring_barracuda::gpu::GpuF64::new())
-            .expect("GPU init");
+            .or_exit("GPU init");
 
         let strategy = gpu.fp64_strategy();
         let precision = gpu.optimal_precision();
@@ -601,7 +589,7 @@ fn main() {
 
         let community = vec![30.0, 25.0, 20.0, 15.0, 10.0];
         let (h_gpu, ms) = bench("GPU Shannon", || {
-            diversity_gpu::shannon_gpu(&gpu, &community).expect("GPU Shannon")
+            diversity_gpu::shannon_gpu(&gpu, &community).or_exit("GPU Shannon")
         });
         let h_cpu = wetspring_barracuda::bio::diversity::shannon(&community);
         v.check(
@@ -617,7 +605,7 @@ fn main() {
         });
 
         let (s_gpu, ms) = bench("GPU Simpson", || {
-            diversity_gpu::simpson_gpu(&gpu, &community).expect("GPU Simpson")
+            diversity_gpu::simpson_gpu(&gpu, &community).or_exit("GPU Simpson")
         });
         let s_cpu = wetspring_barracuda::bio::diversity::simpson(&community);
         v.check(

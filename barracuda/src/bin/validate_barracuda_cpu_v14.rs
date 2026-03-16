@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -75,6 +67,7 @@ use wetspring_barracuda::validation::Validator;
 
 use barracuda::special::erf;
 use barracuda::stats::norm_cdf;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp225: BarraCuda CPU v14 — V71 Pure Rust Math (50 Domains)");
@@ -236,7 +229,7 @@ fn main() {
 
     v.section("D09: dN/dS");
     total_domains += 1;
-    let dnds_result = dnds::pairwise_dnds(b"ATGATG", b"ATGGTG").unwrap();
+    let dnds_result = dnds::pairwise_dnds(b"ATGATG", b"ATGGTG").or_exit("unexpected error");
     v.check_pass(
         "omega computed",
         dnds_result.omega.is_none_or(f64::is_finite),
@@ -279,7 +272,7 @@ fn main() {
     let qs_r = qs_biofilm::scenario_standard_growth(&qs_biofilm::QsBiofilmParams::default(), 0.01);
     v.check_pass(
         "QS ODE: N > 0",
-        *qs_r.states().last().unwrap().first().unwrap() > 0.0,
+        *qs_r.states().last().or_exit("unexpected error").first().or_exit("unexpected error") > 0.0,
     );
 
     let coop_r =
@@ -288,7 +281,7 @@ fn main() {
         "Cooperation: freq finite",
         cooperation::cooperator_frequency(&coop_r)
             .last()
-            .unwrap()
+            .or_exit("unexpected error")
             .is_finite(),
     );
 
@@ -394,7 +387,7 @@ fn main() {
     let dm = [0.5, 0.8, 0.6];
     v.check_pass(
         "PCoA produces coords",
-        pcoa::pcoa(&dm, 3, 2).unwrap().n_samples == 3,
+        pcoa::pcoa(&dm, 3, 2).or_exit("unexpected error").n_samples == 3,
     );
 
     v.section("D29: Math Primitives");
@@ -478,7 +471,7 @@ fn main() {
         objective: barracuda::linalg::nmf::NmfObjective::KlDivergence,
         seed: 42,
     };
-    let nmf = barracuda::linalg::nmf::nmf(&v_mat, 20, 10, &nmf_cfg).expect("NMF");
+    let nmf = barracuda::linalg::nmf::nmf(&v_mat, 20, 10, &nmf_cfg).or_exit("NMF");
     v.check_pass("NMF W,H ≥ 0", nmf.w.iter().chain(&nmf.h).all(|&x| x >= 0.0));
 
     v.section("D34: Ridge Regression (wetSpring → ToadStool)");
@@ -493,7 +486,7 @@ fn main() {
         2,
         tolerances::RIDGE_REGULARIZATION_SMALL,
     )
-    .expect("ridge");
+    .or_exit("ridge");
     v.check_pass(
         "ridge weights finite",
         ridge.weights.iter().all(|w| w.is_finite()),
@@ -513,7 +506,7 @@ fn main() {
     total_domains += 1;
     let a: Vec<f64> = (0..100).map(|i| f64::from(i) * 0.1).collect();
     let b: Vec<f64> = a.iter().map(|&x| 2.0f64.mul_add(x, 1.0)).collect();
-    let pearson = barracuda::stats::pearson_correlation(&a, &b).expect("pearson");
+    let pearson = barracuda::stats::pearson_correlation(&a, &b).or_exit("pearson");
     v.check(
         "Pearson(linear) = 1.0",
         pearson,
@@ -530,7 +523,7 @@ fn main() {
             .collect::<Vec<_>>(),
         &(0..1001).map(|i| f64::from(i) / 1000.0).collect::<Vec<_>>(),
     )
-    .expect("trapz");
+    .or_exit("trapz");
     v.check(
         "trapz(x²) ≈ 1/3",
         trapz,

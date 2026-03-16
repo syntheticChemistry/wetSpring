@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -48,6 +44,7 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::validation;
+use wetspring_barracuda::validation::OrExit;
 
 const WARMUP: usize = 2;
 const MIN_ITERS: u64 = 3;
@@ -167,7 +164,7 @@ fn bench_ani(device: &Arc<WgpuDevice>) {
                 let _ = ani::pairwise_ani(a, b);
             }
         });
-        let gpu_ani = AniGpu::new(device).expect("ANI GPU shader");
+        let gpu_ani = AniGpu::new(device).or_exit("ANI GPU shader");
         let gpu = time_fn(|| {
             let _ = gpu_ani.batch_ani(&pairs);
         });
@@ -188,7 +185,7 @@ fn bench_snp(device: &Arc<WgpuDevice>) {
         let cpu = time_fn(|| {
             let _ = snp::call_snps(&refs);
         });
-        let gpu_snp = SnpGpu::new(device).expect("SNP GPU shader");
+        let gpu_snp = SnpGpu::new(device).or_exit("SNP GPU shader");
         let gpu = time_fn(|| {
             let _ = gpu_snp.call_snps(&refs);
         });
@@ -219,7 +216,7 @@ fn bench_dnds(device: &Arc<WgpuDevice>) {
                 let _ = dnds::pairwise_dnds(a, b);
             }
         });
-        let gpu_mod = DnDsGpu::new(device).expect("dN/dS GPU shader");
+        let gpu_mod = DnDsGpu::new(device).or_exit("dN/dS GPU shader");
         let gpu = time_fn(|| {
             let _ = gpu_mod.batch_dnds(&pairs);
         });
@@ -256,7 +253,7 @@ fn bench_pangenome(device: &Arc<WgpuDevice>) {
         let cpu = time_fn(|| {
             let _ = pangenome::analyze(&clusters, n_genomes);
         });
-        let gpu_pan = PangenomeGpu::new(device).expect("Pangenome GPU shader");
+        let gpu_pan = PangenomeGpu::new(device).or_exit("Pangenome GPU shader");
         let gpu = time_fn(|| {
             let _ = gpu_pan.classify(&flat, n_genes, n_genomes);
         });
@@ -283,13 +280,13 @@ fn bench_random_forest(device: &Arc<WgpuDevice>) {
             &[None, Some(left_class), Some(right_class)],
             2,
         )
-        .expect("benchmark")
+        .or_exit("benchmark")
     };
 
     let trees: Vec<DecisionTree> = (0..10)
         .map(|i| mk_stump((i % 2) as i32, f64::from(i).mul_add(0.3, 5.0), 0, 1))
         .collect();
-    let rf = RandomForest::from_trees(trees, 2).expect("benchmark");
+    let rf = RandomForest::from_trees(trees, 2).or_exit("benchmark");
 
     for &n_samples in &[10, 50, 200, 1000] {
         let mut rng = 400_u64;
@@ -356,7 +353,7 @@ fn bench_hmm(device: &Arc<WgpuDevice>) {
                 let _ = hmm::forward(&model, seq);
             }
         });
-        let hmm_gpu = HmmGpuForward::new(device).expect("HMM GPU shader");
+        let hmm_gpu = HmmGpuForward::new(device).or_exit("HMM GPU shader");
         let gpu = time_fn(|| {
             let _ = hmm_gpu.forward_batch(&model, &flat_obs, n_seqs, n_steps);
         });

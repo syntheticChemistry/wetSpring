@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -70,6 +66,7 @@ use std::time::Instant;
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct ParityBench {
     domain: &'static str,
@@ -101,7 +98,7 @@ fn main() {
     let mut actual_svar = 0.0;
     for _ in 0..10_000 {
         actual_svar =
-            barracuda::stats::correlation::variance(&data).expect("variance requires n≥2");
+            barracuda::stats::correlation::variance(&data).or_exit("variance requires n≥2");
     }
     let us = t.elapsed().as_micros();
 
@@ -135,7 +132,7 @@ fn main() {
     let mut actual_cov = 0.0;
     for _ in 0..10_000 {
         actual_cov = barracuda::stats::covariance(&x, &y)
-            .expect("covariance requires equal-length vectors with n≥2");
+            .or_exit("covariance requires equal-length vectors with n≥2");
     }
     let us = t.elapsed().as_micros();
 
@@ -166,7 +163,7 @@ fn main() {
     let mut actual_r = 0.0;
     for _ in 0..10_000 {
         actual_r = barracuda::stats::pearson_correlation(&x, &y)
-            .expect("Pearson correlation requires equal-length vectors with n≥2");
+            .or_exit("Pearson correlation requires equal-length vectors with n≥2");
     }
     let us = t.elapsed().as_micros();
 
@@ -199,7 +196,7 @@ fn main() {
     let mut actual_rs = 0.0;
     for _ in 0..10_000 {
         actual_rs = barracuda::stats::correlation::spearman_correlation(&mono_x, &mono_y)
-            .expect("Spearman correlation requires equal-length vectors with n≥2");
+            .or_exit("Spearman correlation requires equal-length vectors with n≥2");
     }
     let us = t.elapsed().as_micros();
 
@@ -237,7 +234,7 @@ fn main() {
     let mut corr_mat = vec![0.0; 9];
     for _ in 0..1_000 {
         corr_mat = barracuda::stats::correlation::correlation_matrix(&obs_rows)
-            .expect("correlation_matrix requires non-empty rows with n≥2");
+            .or_exit("correlation_matrix requires non-empty rows with n≥2");
     }
     let us = t.elapsed().as_micros();
 
@@ -279,10 +276,10 @@ fn main() {
 
     let t = Instant::now();
     let mut jk_result =
-        barracuda::stats::jackknife_mean_variance(&jk_data).expect("jackknife requires n≥2");
+        barracuda::stats::jackknife_mean_variance(&jk_data).or_exit("jackknife requires n≥2");
     for _ in 0..100_000 {
         jk_result =
-            barracuda::stats::jackknife_mean_variance(&jk_data).expect("jackknife requires n≥2");
+            barracuda::stats::jackknife_mean_variance(&jk_data).or_exit("jackknife requires n≥2");
     }
     let us = t.elapsed().as_micros();
 
@@ -312,13 +309,13 @@ fn main() {
     let mut cov_mat = vec![0.0; 9];
     for _ in 0..1_000 {
         cov_mat = barracuda::stats::correlation::covariance_matrix(&obs_rows)
-            .expect("covariance_matrix requires non-empty rows with n≥2");
+            .or_exit("covariance_matrix requires non-empty rows with n≥2");
     }
     let us = t.elapsed().as_micros();
 
     let var_col0 =
         barracuda::stats::correlation::variance(&obs_rows.iter().map(|r| r[0]).collect::<Vec<_>>())
-            .expect("variance of column 0 requires n≥2");
+            .or_exit("variance of column 0 requires n≥2");
     v.check(
         "CovMatrix: diag[0] = Var(col0)",
         cov_mat[0],
@@ -360,7 +357,7 @@ fn main() {
     let us = t.elapsed().as_micros();
 
     let h_var =
-        barracuda::stats::correlation::variance(&shannons).expect("Shannon variance requires n≥2");
+        barracuda::stats::correlation::variance(&shannons).or_exit("Shannon variance requires n≥2");
     v.check_pass("Shannon variance > 0", h_var > 0.0);
     let h_uniform = diversity::shannon(&communities[1]);
     v.check(

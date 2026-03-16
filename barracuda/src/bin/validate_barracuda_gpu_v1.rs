@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::similar_names,
     reason = "validation harness: domain variables from published notation"
 )]
@@ -88,8 +84,8 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
         let t_gpu = Instant::now();
-        let gpu_shannon = diversity_gpu::shannon_gpu(&gpu, &abundances).expect("Barracuda GPU v1");
-        let gpu_simpson = diversity_gpu::simpson_gpu(&gpu, &abundances).expect("Barracuda GPU v1");
+        let gpu_shannon = diversity_gpu::shannon_gpu(&gpu, &abundances).or_exit("Barracuda GPU v1");
+        let gpu_simpson = diversity_gpu::simpson_gpu(&gpu, &abundances).or_exit("Barracuda GPU v1");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
         v.check(
@@ -126,7 +122,7 @@ async fn main() {
 
         let t_gpu = Instant::now();
         let gpu_bc =
-            diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).expect("Barracuda GPU v1");
+            diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).or_exit("Barracuda GPU v1");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
         for (i, (c, g)) in cpu_bc.iter().zip(gpu_bc.iter()).enumerate() {
@@ -156,8 +152,8 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
         let t_gpu = Instant::now();
-        let gpu_ani = AniGpu::new(&device).expect("ANI GPU shader");
-        let gpu_results = gpu_ani.batch_ani(&pairs).expect("Barracuda GPU v1");
+        let gpu_ani = AniGpu::new(&device).or_exit("ANI GPU shader");
+        let gpu_results = gpu_ani.batch_ani(&pairs).or_exit("Barracuda GPU v1");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
         for (i, (cpu_r, gpu_val)) in cpu_results
@@ -192,8 +188,8 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
         let t_gpu = Instant::now();
-        let gpu_snp = SnpGpu::new(&device).expect("SNP GPU shader");
-        let gpu_snp_result = gpu_snp.call_snps(&seqs).expect("Barracuda GPU v1");
+        let gpu_snp = SnpGpu::new(&device).or_exit("SNP GPU shader");
+        let gpu_snp_result = gpu_snp.call_snps(&seqs).or_exit("Barracuda GPU v1");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
         let cpu_variant_count = cpu_snp.variants.len();
@@ -242,8 +238,8 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
         let t_gpu = Instant::now();
-        let gpu_dnds_mod = DnDsGpu::new(&device).expect("dN/dS GPU shader");
-        let gpu_dnds_result = gpu_dnds_mod.batch_dnds(&pairs).expect("Barracuda GPU v1");
+        let gpu_dnds_mod = DnDsGpu::new(&device).or_exit("dN/dS GPU shader");
+        let gpu_dnds_result = gpu_dnds_mod.batch_dnds(&pairs).or_exit("Barracuda GPU v1");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
         for (i, cpu_r) in cpu_dnds.iter().enumerate() {
@@ -303,10 +299,10 @@ async fn main() {
             .collect();
 
         let t_gpu = Instant::now();
-        let gpu_pan = PangenomeGpu::new(&device).expect("Pangenome GPU shader");
+        let gpu_pan = PangenomeGpu::new(&device).or_exit("Pangenome GPU shader");
         let gpu_result = gpu_pan
             .classify(&presence_flat, 5, 4)
-            .expect("Barracuda GPU v1");
+            .or_exit("Barracuda GPU v1");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
         v.check(
@@ -360,7 +356,7 @@ async fn main() {
             &[None, Some(0), None, Some(1), Some(2)],
             2,
         )
-        .expect("Barracuda GPU v1");
+        .or_exit("Barracuda GPU v1");
         let tree2 = DecisionTree::from_arrays(
             &[1, -2, -2],
             &[4.0, 0.0, 0.0],
@@ -369,7 +365,7 @@ async fn main() {
             &[None, Some(0), Some(2)],
             2,
         )
-        .expect("Barracuda GPU v1");
+        .or_exit("Barracuda GPU v1");
         let tree3 = DecisionTree::from_arrays(
             &[0, -2, -2],
             &[6.0, 0.0, 0.0],
@@ -378,9 +374,9 @@ async fn main() {
             &[None, Some(1), Some(2)],
             2,
         )
-        .expect("Barracuda GPU v1");
+        .or_exit("Barracuda GPU v1");
 
-        let rf = RandomForest::from_trees(vec![tree1, tree2, tree3], 3).expect("Barracuda GPU v1");
+        let rf = RandomForest::from_trees(vec![tree1, tree2, tree3], 3).or_exit("Barracuda GPU v1");
         let samples = vec![vec![3.0, 1.0], vec![7.0, 6.0], vec![5.5, 3.5]];
 
         let t_cpu = Instant::now();
@@ -391,7 +387,7 @@ async fn main() {
         let rf_gpu = RandomForestGpu::new(&device);
         let gpu_preds = rf_gpu
             .predict_batch(&rf, &samples)
-            .expect("Barracuda GPU v1");
+            .or_exit("Barracuda GPU v1");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
         for (i, (c, g)) in cpu_preds.iter().zip(gpu_preds.iter()).enumerate() {
@@ -411,6 +407,7 @@ async fn main() {
     v.section("═══ GPU Domain 8: HMM Forward ═══");
     {
         use wetspring_barracuda::bio::{hmm, hmm_gpu::HmmGpuForward};
+use wetspring_barracuda::validation::OrExit;
 
         let model = hmm::HmmModel {
             n_states: 2,
@@ -429,10 +426,10 @@ async fn main() {
 
         let flat_obs: Vec<u32> = obs1.iter().chain(obs2.iter()).map(|&x| x as u32).collect();
         let t_gpu = Instant::now();
-        let hmm_gpu = HmmGpuForward::new(&device).expect("HMM GPU shader");
+        let hmm_gpu = HmmGpuForward::new(&device).or_exit("HMM GPU shader");
         let gpu_result = hmm_gpu
             .forward_batch(&model, &flat_obs, 2, 4)
-            .expect("Barracuda GPU v1");
+            .or_exit("Barracuda GPU v1");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
         v.check(

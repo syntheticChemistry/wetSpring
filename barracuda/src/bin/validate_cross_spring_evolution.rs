@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::too_many_lines,
     reason = "validation harness: sequential domain checks in single main()"
 )]
@@ -492,6 +488,7 @@ fn cpu_batch_fitness_f64(
 
 fn cpu_locus_variance_rowmajor_f64(freqs: &[f64], n_pops: usize, n_loci: usize) -> Vec<f64> {
     use barracuda::stats::correlation;
+use wetspring_barracuda::validation::OrExit;
     (0..n_loci)
         .map(|l| {
             let col: Vec<f64> = (0..n_pops).map(|p| freqs[p * n_loci + l]).collect();
@@ -543,13 +540,13 @@ fn readback_bytes<T: bytemuck::Pod>(
     let slice = staging.slice(..);
     let (tx, rx) = std::sync::mpsc::channel();
     slice.map_async(wgpu::MapMode::Read, move |result| {
-        tx.send(result).expect("channel send");
+        tx.send(result).or_exit("channel send");
     });
     let _ = d.poll(wgpu::PollType::Wait {
         submission_index: None,
         timeout: None,
     });
-    rx.recv().expect("channel recv").expect("GPU buffer map");
+    rx.recv().or_exit("channel recv").or_exit("GPU buffer map");
 
     let data = slice.get_mapped_range();
     let result: Vec<T> = bytemuck::cast_slice(&data).to_vec();

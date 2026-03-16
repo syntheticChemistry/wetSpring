@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -53,6 +49,7 @@ use wetspring_barracuda::validation::{self, DomainResult, Validator};
 use wetspring_barracuda::bio::diversity_gpu;
 #[cfg(feature = "gpu")]
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     #[cfg(not(feature = "gpu"))]
@@ -70,7 +67,7 @@ fn main() {
         let rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()
-            .expect("tokio runtime");
+            .or_exit("tokio runtime");
         let gpu = match rt.block_on(GpuF64::new()) {
             Ok(g) => g,
             Err(e) => {
@@ -106,7 +103,7 @@ fn main() {
         let cpu_h: Vec<f64> = communities.iter().map(|c| diversity::shannon(c)).collect();
         let gpu_h: Vec<f64> = communities
             .iter()
-            .map(|c| diversity_gpu::shannon_gpu(&gpu, c).expect("GPU Shannon"))
+            .map(|c| diversity_gpu::shannon_gpu(&gpu, c).or_exit("GPU Shannon"))
             .collect();
 
         for (i, (g, c)) in gpu_h.iter().zip(cpu_h.iter()).enumerate() {
@@ -135,7 +132,7 @@ fn main() {
 
         let cpu_bc_cond = diversity::bray_curtis_condensed(&communities);
         let gpu_bc_cond =
-            diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).expect("GPU BC condensed");
+            diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).or_exit("GPU BC condensed");
 
         v.check_pass(
             "Stage2: BC condensed same length",
@@ -206,7 +203,7 @@ fn main() {
         }
 
         let r_w_h =
-            barracuda::stats::pearson_correlation(&w_values, &gpu_h).expect("Pearson W vs H");
+            barracuda::stats::pearson_correlation(&w_values, &gpu_h).or_exit("Pearson W vs H");
         v.check_pass("Stage3: W anti-correlates with H (r < 0)", r_w_h < 0.0);
         s3 += 1;
 
@@ -228,11 +225,11 @@ fn main() {
         v.check_pass("Stage4: mean H finite", mean_h.is_finite());
         s4 += 1;
 
-        let var_h = barracuda::stats::correlation::variance(&gpu_h).expect("variance of GPU H");
+        let var_h = barracuda::stats::correlation::variance(&gpu_h).or_exit("variance of GPU H");
         v.check_pass("Stage4: var(H) ≥ 0", var_h >= 0.0);
         s4 += 1;
 
-        let jk = barracuda::stats::jackknife_mean_variance(&gpu_h).expect("jackknife GPU H");
+        let jk = barracuda::stats::jackknife_mean_variance(&gpu_h).or_exit("jackknife GPU H");
         v.check_pass("Stage4: jackknife variance finite", jk.variance.is_finite());
         s4 += 1;
 
@@ -243,7 +240,7 @@ fn main() {
             0.95,
             42,
         )
-        .expect("bootstrap CI");
+        .or_exit("bootstrap CI");
         v.check_pass(
             "Stage4: 95% CI contains mean",
             ci.lower <= mean_h && mean_h <= ci.upper,

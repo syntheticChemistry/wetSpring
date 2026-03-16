@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -33,6 +29,7 @@
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct LcgRng(u64);
 
@@ -115,7 +112,7 @@ fn validate_factorisation_and_structure(
 
     v.check_pass("NMF converges (error decreases)", {
         let e = &result.errors;
-        e.len() >= 2 && e.last().expect("errors non-empty") < &e[0]
+        e.len() >= 2 && e.last().or_exit("errors non-empty") < &e[0]
     });
     v.check_pass("relative error < 0.85", rel_err < 0.85);
 
@@ -184,7 +181,7 @@ fn validate_rank_sensitivity(v: &mut Validator, matrix: &[f64]) {
             objective: NmfObjective::Euclidean,
             seed: 42,
         };
-        let res = nmf::nmf(matrix, N_DRUGS, N_DISEASES, &cfg).expect("NMF failed");
+        let res = nmf::nmf(matrix, N_DRUGS, N_DISEASES, &cfg).or_exit("NMF failed");
         let re = nmf::relative_reconstruction_error(matrix, &res);
         let wh_r = reconstruct_wh(&res);
         let (wm, cm) = compute_block_discrimination(&wh_r);
@@ -263,7 +260,7 @@ fn main() {
     };
 
     let start = std::time::Instant::now();
-    let result = nmf::nmf(&matrix, N_DRUGS, N_DISEASES, &config).expect("NMF failed");
+    let result = nmf::nmf(&matrix, N_DRUGS, N_DISEASES, &config).or_exit("NMF failed");
     let elapsed_ms = start.elapsed().as_millis();
     let rel_err = nmf::relative_reconstruction_error(&matrix, &result);
 

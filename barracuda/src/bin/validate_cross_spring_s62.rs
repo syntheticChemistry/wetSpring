@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -86,6 +82,7 @@ use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct LcgRng(u64);
 
@@ -128,7 +125,7 @@ fn validate_hotspring_precision(v: &mut Validator, device: &Arc<WgpuDevice>) {
         tolerances::ERF_PARITY,
     );
 
-    let lng_val = barracuda::special::ln_gamma(5.0).expect("ln_gamma");
+    let lng_val = barracuda::special::ln_gamma(5.0).or_exit("ln_gamma");
     v.check(
         "ln_gamma(5.0) — barracuda::special",
         lng_val,
@@ -136,7 +133,7 @@ fn validate_hotspring_precision(v: &mut Validator, device: &Arc<WgpuDevice>) {
         tolerances::PYTHON_PARITY,
     );
 
-    let gamma_p = barracuda::special::regularized_gamma_p(1.0, 1.0).expect("gamma_p");
+    let gamma_p = barracuda::special::regularized_gamma_p(1.0, 1.0).or_exit("gamma_p");
     v.check(
         "regularized_gamma_p(1,1)",
         gamma_p,
@@ -145,7 +142,7 @@ fn validate_hotspring_precision(v: &mut Validator, device: &Arc<WgpuDevice>) {
     );
 
     let trapz_result =
-        barracuda::numerical::trapz(&[0.0, 1.0, 4.0, 9.0], &[0.0, 1.0, 2.0, 3.0]).expect("trapz");
+        barracuda::numerical::trapz(&[0.0, 1.0, 4.0, 9.0], &[0.0, 1.0, 2.0, 3.0]).or_exit("trapz");
     v.check("trapz(x²) [0,3]", trapz_result, 9.5, tolerances::EXACT);
 
     let (_, gemm_ms) = bench(
@@ -179,7 +176,7 @@ fn validate_wetspring_bio_absorbed(v: &mut Validator, device: &Arc<WgpuDevice>, 
     let community = vec![100.0, 50.0, 25.0, 12.0, 6.0, 3.0, 1.5, 0.75];
     let (cpu_shannon, _) = bench("Shannon CPU (wetSpring)", || diversity::shannon(&community));
     let (gpu_shannon, _) = bench("Shannon GPU (ToadStool FMR, wetSpring origin)", || {
-        diversity_gpu::shannon_gpu(gpu, &community).expect("GPU Shannon")
+        diversity_gpu::shannon_gpu(gpu, &community).or_exit("GPU Shannon")
     });
     v.check(
         "Shannon CPU↔GPU parity",
@@ -191,7 +188,7 @@ fn validate_wetspring_bio_absorbed(v: &mut Validator, device: &Arc<WgpuDevice>, 
     let (_, ode_ms) = bench(
         "Bistable ODE GPU (128 batches, trait-generated WGSL)",
         || {
-            let gpu_ode = BistableGpu::new(Arc::clone(device)).expect("BistableGpu");
+            let gpu_ode = BistableGpu::new(Arc::clone(device)).or_exit("BistableGpu");
             let params: Vec<BistableParams> = (0..128)
                 .map(|i| BistableParams {
                     alpha_fb: 2.0 + (i as f64) * 0.01,
@@ -201,7 +198,7 @@ fn validate_wetspring_bio_absorbed(v: &mut Validator, device: &Arc<WgpuDevice>, 
             let initial = vec![[0.01, 0.0, 0.0, 0.0, 0.5]; 128];
             gpu_ode
                 .integrate_params(&params, &initial, 500, 0.01)
-                .expect("integrate")
+                .or_exit("integrate")
         },
     );
     v.check_pass("ODE GPU all finite", ode_ms > 0.0);
@@ -287,7 +284,7 @@ fn validate_neuralspring_crossspring(v: &mut Validator, gpu: &GpuF64) {
     let counts: Vec<f64> = (0..50).map(|_| rng.next_f64() * 100.0 + 1.0).collect();
     let (gpu_simpson, _) = bench(
         "Simpson GPU (neuralSpring fitness landscape use case)",
-        || diversity_gpu::simpson_gpu(gpu, &counts).expect("GPU Simpson"),
+        || diversity_gpu::simpson_gpu(gpu, &counts).or_exit("GPU Simpson"),
     );
     let cpu_simpson = diversity::simpson(&counts);
     v.check(
@@ -313,13 +310,13 @@ fn validate_track3_gpu_path(v: &mut Validator, device: &Arc<WgpuDevice>, gpu: &G
         "  Evolution: CPU-only → ToadStool S58 (NMF) → S60 (TransE, SpMM, TopK) → S62 (PeakDetect)"
     );
 
-    let fmr = FusedMapReduceF64::new(Arc::clone(device)).expect("FMR");
+    let fmr = FusedMapReduceF64::new(Arc::clone(device)).or_exit("FMR");
     let mut rng = LcgRng::new(42);
 
     let a: Vec<f64> = (0..50).map(|_| rng.next_f64()).collect();
     let b: Vec<f64> = (0..50).map(|_| rng.next_f64()).collect();
     let (gpu_dot, _) = bench("FMR dot (cosine component)", || {
-        fmr.dot(&a, &b).expect("dot")
+        fmr.dot(&a, &b).or_exit("dot")
     });
     let cpu_dot = special::dot(&a, &b);
     v.check(
@@ -444,8 +441,8 @@ fn main() {
     let mut v = Validator::new("Exp168: Cross-Spring Evolution Validation (S62+DF64)");
     let t_total = Instant::now();
 
-    let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
-    let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+    let rt = tokio::runtime::Runtime::new().or_exit("tokio runtime");
+    let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
     let device = gpu.to_wgpu_device();
 
     validate_hotspring_precision(&mut v, &device);

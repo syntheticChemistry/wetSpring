@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![expect(clippy::expect_used, clippy::too_many_lines)]
+#![expect(clippy::too_many_lines)]
 //! Exp080: metalForge Dispatch Routing Validation
 //!
 //! Validates the forge dispatch router's life-science workload classification
@@ -32,6 +32,7 @@
 
 use wetspring_forge::dispatch::{self, Reason, Workload};
 use wetspring_forge::inventory;
+use wetspring_barracuda::validation::OrExit;
 use wetspring_forge::substrate::{
     Capability, Identity, Properties, Substrate, SubstrateKind, SubstrateOrigin,
 };
@@ -503,7 +504,7 @@ fn section_mixed_pcie(pass: &mut u32, fail: &mut u32, total: &mut u32) {
     ];
 
     let ode = ode_workload("ODE PCIe test");
-    let d = dispatch::route(&ode, &subs).expect("should route ODE");
+    let d = dispatch::route(&ode, &subs).or_exit("should route ODE");
     check(
         "ODE → f64 GPU (not f32 iGPU)",
         d.substrate.kind == SubstrateKind::Gpu && d.substrate.identity.name == "RTX 4070",
@@ -523,7 +524,7 @@ fn section_mixed_pcie(pass: &mut u32, fail: &mut u32, total: &mut u32) {
     );
 
     let div = diversity_workload();
-    let d2 = dispatch::route(&div, &subs).expect("should route diversity");
+    let d2 = dispatch::route(&div, &subs).or_exit("should route diversity");
     check(
         "Diversity → f64 GPU (needs ScalarReduce)",
         d2.substrate.kind == SubstrateKind::Gpu && d2.substrate.identity.name == "RTX 4070",
@@ -552,7 +553,7 @@ fn section_preference(pass: &mut u32, fail: &mut u32, total: &mut u32) {
 
     let forced_cpu =
         Workload::new("ODE forced CPU", vec![Capability::F64Compute]).prefer(SubstrateKind::Cpu);
-    let d = dispatch::route(&forced_cpu, &subs).expect("should route");
+    let d = dispatch::route(&forced_cpu, &subs).or_exit("should route");
     check(
         "ODE prefer CPU → CPU (even with GPU)",
         d.substrate.kind == SubstrateKind::Cpu && d.reason == Reason::Preferred,
@@ -566,7 +567,7 @@ fn section_preference(pass: &mut u32, fail: &mut u32, total: &mut u32) {
         vec![Capability::F64Compute, Capability::ShaderDispatch],
     )
     .prefer(SubstrateKind::Npu);
-    let d = dispatch::route(&forced_missing, &subs).expect("should route");
+    let d = dispatch::route(&forced_missing, &subs).or_exit("should route");
     check(
         "ODE prefer NPU → GPU (NPU incapable, falls back)",
         d.substrate.kind == SubstrateKind::Gpu && d.reason == Reason::BestAvailable,

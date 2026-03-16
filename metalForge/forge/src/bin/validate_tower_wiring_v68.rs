@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::too_many_lines,
     reason = "validation harness: sequential domain checks in single main()"
 )]
@@ -37,6 +33,7 @@ use wetspring_forge::substrate::{
     Capability, Identity, Properties, Substrate, SubstrateKind, SubstrateOrigin,
 };
 use wetspring_forge::workloads;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut pass = 0u32;
@@ -201,7 +198,7 @@ fn main() {
 
     if let Some(ref vibrio_path) = vibrio_res.path {
         let assemblies: Vec<_> = std::fs::read_dir(vibrio_path)
-            .expect("read_dir vibrio_assemblies should succeed when path exists")
+            .or_exit("read_dir vibrio_assemblies should succeed when path exists")
             .filter_map(Result::ok)
             .filter(|e| e.path().extension().is_some_and(|ext| ext == "gz"))
             .collect();
@@ -248,7 +245,7 @@ fn main() {
 
     if let Some(ref campy_path) = campy_res.path {
         let assemblies: Vec<_> = std::fs::read_dir(campy_path)
-            .expect("read_dir campylobacterota_assemblies should succeed when path exists")
+            .or_exit("read_dir campylobacterota_assemblies should succeed when path exists")
             .filter_map(Result::ok)
             .filter(|e| e.path().extension().is_some_and(|ext| ext == "gz"))
             .collect();
@@ -379,7 +376,7 @@ fn main() {
 
     if let Some(ref pfas_path) = pfas_res.path {
         let files: Vec<_> = std::fs::read_dir(pfas_path)
-            .expect("read_dir pfas_zenodo should succeed when path exists")
+            .or_exit("read_dir pfas_zenodo should succeed when path exists")
             .filter_map(Result::ok)
             .collect();
 

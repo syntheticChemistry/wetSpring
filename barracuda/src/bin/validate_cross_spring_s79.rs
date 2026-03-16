@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -73,7 +69,7 @@
 use std::time::Instant;
 
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{OrExit, Validator};
 
 struct DomainResult {
     name: &'static str,
@@ -177,7 +173,7 @@ fn main() {
         );
         v.check_pass(
             "rarefaction(full) = S_obs",
-            (curve.last().unwrap() - 8.0).abs() < tolerances::PHYLO_LIKELIHOOD,
+            (curve.last().or_exit("unexpected error") - 8.0).abs() < tolerances::PHYLO_LIKELIHOOD,
         );
 
         domains.push(DomainResult {

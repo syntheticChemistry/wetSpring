@@ -31,6 +31,7 @@ use std::time::Instant;
 use wetspring_barracuda::bio::{ani, dnds, molecular_clock, pangenome, snp};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 #[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {
@@ -198,7 +199,7 @@ fn main() {
 
     let t0 = Instant::now();
 
-    let identical_dnds = dnds::pairwise_dnds(b"ATGATGATG", b"ATGATGATG").expect("Barracuda CPU v4");
+    let identical_dnds = dnds::pairwise_dnds(b"ATGATGATG", b"ATGATGATG").or_exit("Barracuda CPU v4");
     v.check(
         "dN/dS: identical → dN=0",
         identical_dnds.dn,
@@ -213,7 +214,7 @@ fn main() {
     );
 
     // TTT→TTC: Phe→Phe (synonymous at pos 3)
-    let syn_result = dnds::pairwise_dnds(b"TTTGCTAAA", b"TTCGCTAAA").expect("Barracuda CPU v4");
+    let syn_result = dnds::pairwise_dnds(b"TTTGCTAAA", b"TTCGCTAAA").or_exit("Barracuda CPU v4");
     v.check(
         "dN/dS: syn-only → dS > 0",
         f64::from(u8::from(syn_result.ds > 0.0)),
@@ -237,7 +238,7 @@ fn main() {
         b"ATGGCTAAATTTGCTGCTGCTGCTGCTGCT",
         b"ATGGCCGAATTTGCTGCTGCTGCTGCCGCT",
     )
-    .expect("Barracuda CPU v4");
+    .or_exit("Barracuda CPU v4");
     v.check(
         "dN/dS: mixed → syn_sites > 0",
         f64::from(u8::from(mixed.syn_sites > 0.0)),
@@ -256,14 +257,14 @@ fn main() {
     let batch = dnds::pairwise_dnds_batch(&batch_pairs);
     v.check(
         "dN/dS batch: first identical dN=0",
-        batch[0].as_ref().expect("Barracuda CPU v4").dn,
+        batch[0].as_ref().or_exit("Barracuda CPU v4").dn,
         0.0,
         tolerances::ANALYTICAL_F64,
     );
     v.check(
         "dN/dS batch: second syn-only dS>0",
         f64::from(u8::from(
-            batch[1].as_ref().expect("Barracuda CPU v4").ds > 0.0,
+            batch[1].as_ref().or_exit("Barracuda CPU v4").ds > 0.0,
         )),
         1.0,
         tolerances::EXACT,
@@ -283,7 +284,7 @@ fn main() {
     let parents = vec![None, Some(0), Some(0), Some(1), Some(1), Some(2), Some(2)];
 
     let clock = molecular_clock::strict_clock(&branch_lengths, &parents, 3500.0, &[])
-        .expect("Barracuda CPU v4");
+        .or_exit("Barracuda CPU v4");
     v.check(
         "Clock: rate > 0",
         f64::from(u8::from(clock.rate > 0.0)),
@@ -325,7 +326,7 @@ fn main() {
         max_age_ma: 4000.0,
     };
     let cal_clock = molecular_clock::strict_clock(&branch_lengths, &parents, 3500.0, &[cal])
-        .expect("Barracuda CPU v4");
+        .or_exit("Barracuda CPU v4");
     v.check(
         "Clock: calibration satisfied",
         f64::from(u8::from(cal_clock.calibrations_satisfied)),
@@ -339,7 +340,7 @@ fn main() {
         max_age_ma: 6000.0,
     };
     let bad_clock = molecular_clock::strict_clock(&branch_lengths, &parents, 3500.0, &[bad_cal])
-        .expect("Barracuda CPU v4");
+        .or_exit("Barracuda CPU v4");
     v.check(
         "Clock: violated calibration fails",
         f64::from(u8::from(!bad_clock.calibrations_satisfied)),

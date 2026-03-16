@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -32,6 +28,7 @@
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use std::time::Instant;
+use wetspring_barracuda::validation::OrExit;
 
 struct BenchRow {
     primitive: &'static str,
@@ -52,7 +49,7 @@ where
     }
     let elapsed_ns = t.elapsed().as_nanos() as f64;
     let us_per_iter = elapsed_ns / 1000.0 / n as f64;
-    (result.unwrap(), us_per_iter)
+    (result.or_exit("unexpected error"), us_per_iter)
 }
 
 fn main() {

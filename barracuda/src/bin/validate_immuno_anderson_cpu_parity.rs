@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -63,6 +59,7 @@ use barracuda::stats::norm_cdf;
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct Timing {
     domain: &'static str,
@@ -326,8 +323,8 @@ fn main() {
         scores[0]
             >= *scores
                 .iter()
-                .max_by(|a, b| a.partial_cmp(b).unwrap())
-                .unwrap()
+                .max_by(|a, b| a.partial_cmp(b).or_exit("unexpected error"))
+                .or_exit("unexpected error")
                 - tolerances::ANALYTICAL_LOOSE,
     );
     v.check_pass(

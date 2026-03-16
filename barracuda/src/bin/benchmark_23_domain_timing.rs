@@ -26,6 +26,7 @@
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use std::time::Instant;
+use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::bio::{
     alignment, ani, bootstrap, cooperation, decision_tree::DecisionTree, diversity, dnds,
     felsenstein, gillespie, hmm, kmer, molecular_clock, multi_signal, pangenome, phage_defense,
@@ -206,7 +207,7 @@ fn main() {
         &[None, None, Some(0), Some(1)],
         2,
     )
-    .expect("domain timing");
+    .or_exit("domain timing");
     let _p1 = dt.predict(&[3.0, 0.0]);
     let _p2 = dt.predict(&[7.0, 0.0]);
     let _pb = dt.predict_batch(&[
@@ -299,7 +300,7 @@ fn main() {
     let bl = [0.0, 0.1, 0.2, 0.05, 0.05, 0.15, 0.15];
     let parents: Vec<Option<usize>> =
         vec![None, Some(0), Some(0), Some(1), Some(1), Some(2), Some(2)];
-    let sc = molecular_clock::strict_clock(&bl, &parents, 3500.0, &[]).expect("domain timing");
+    let sc = molecular_clock::strict_clock(&bl, &parents, 3500.0, &[]).or_exit("domain timing");
     let rates = molecular_clock::relaxed_clock_rates(&bl, &sc.node_ages, &parents);
     let _cv = molecular_clock::rate_variation_cv(&rates);
     timings.push((

@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation binary: expect() for pass/fail assertions"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -39,6 +35,7 @@ use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::io::mzml::MzmlSpectrum;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 #[tokio::main]
 async fn main() {
@@ -83,7 +80,7 @@ fn validate_eic_total_intensity(v: &mut Validator, gpu: &GpuF64) {
 
     let cpu_eics = eic::extract_eics(&spectra, &target_mzs, ppm);
     let gpu_eics =
-        eic_gpu::extract_eics_gpu(gpu, &spectra, &target_mzs, ppm).expect("GPU extended");
+        eic_gpu::extract_eics_gpu(gpu, &spectra, &target_mzs, ppm).or_exit("GPU extended");
 
     v.check(
         "EIC count matches",
@@ -102,7 +99,7 @@ fn validate_eic_total_intensity(v: &mut Validator, gpu: &GpuF64) {
     }
 
     let cpu_totals = eic_total_intensity_cpu(&cpu_eics);
-    let gpu_totals = eic_gpu::batch_eic_total_intensity_gpu(gpu, &gpu_eics).expect("GPU extended");
+    let gpu_totals = eic_gpu::batch_eic_total_intensity_gpu(gpu, &gpu_eics).or_exit("GPU extended");
 
     for (i, (ct, gt)) in cpu_totals.iter().zip(gpu_totals.iter()).enumerate() {
         v.check(
@@ -141,8 +138,8 @@ fn validate_pcoa(v: &mut Validator, gpu: &GpuF64) {
 
     let condensed = diversity::bray_curtis_condensed(&samples);
 
-    let cpu_result = pcoa::pcoa(&condensed, n_samples, n_axes).expect("GPU extended");
-    let gpu_result = pcoa_gpu::pcoa_gpu(gpu, &condensed, n_samples, n_axes).expect("GPU extended");
+    let cpu_result = pcoa::pcoa(&condensed, n_samples, n_axes).or_exit("GPU extended");
+    let gpu_result = pcoa_gpu::pcoa_gpu(gpu, &condensed, n_samples, n_axes).or_exit("GPU extended");
 
     v.check(
         "PCoA: axes count",
@@ -247,7 +244,7 @@ fn validate_kriging(v: &mut Validator, gpu: &GpuF64) {
     let config = kriging::VariogramConfig::spherical(0.0, 1.0, 2.0);
 
     let ordinary =
-        kriging::interpolate_diversity(gpu, &sites, &targets, &config).expect("GPU extended");
+        kriging::interpolate_diversity(gpu, &sites, &targets, &config).or_exit("GPU extended");
 
     v.check(
         "kriging ordinary: value count",
@@ -274,7 +271,7 @@ fn validate_kriging(v: &mut Validator, gpu: &GpuF64) {
 
     let known_mean = sites.iter().map(|s| s.value).sum::<f64>() / sites.len() as f64;
     let simple = kriging::interpolate_diversity_simple(gpu, &sites, &targets, &config, known_mean)
-        .expect("GPU extended");
+        .or_exit("GPU extended");
 
     v.check(
         "kriging simple: value count",
@@ -290,7 +287,7 @@ fn validate_kriging(v: &mut Validator, gpu: &GpuF64) {
         );
     }
 
-    let variogram = kriging::empirical_variogram(&sites, 5, 1.5).expect("GPU extended");
+    let variogram = kriging::empirical_variogram(&sites, 5, 1.5).or_exit("GPU extended");
     v.check_pass("variogram: has lags", !variogram.0.is_empty());
     v.check(
         "variogram: lag count = semivariance count",
@@ -323,7 +320,7 @@ fn validate_rarefaction(v: &mut Validator, gpu: &GpuF64) {
     };
 
     let result =
-        rarefaction_gpu::rarefaction_bootstrap_gpu(gpu, &counts, &params).expect("GPU extended");
+        rarefaction_gpu::rarefaction_bootstrap_gpu(gpu, &counts, &params).or_exit("GPU extended");
 
     v.check_pass(
         "rarefaction: Shannon mean is finite",
@@ -381,7 +378,7 @@ fn validate_rarefaction(v: &mut Validator, gpu: &GpuF64) {
 
     let batch_samples = vec![counts, vec![50.0, 100.0, 200.0, 50.0, 100.0]];
     let batch_results = rarefaction_gpu::batch_rarefaction_gpu(gpu, &batch_samples, &params_batch)
-        .expect("GPU extended");
+        .or_exit("GPU extended");
 
     v.check(
         "batch rarefaction: result count",

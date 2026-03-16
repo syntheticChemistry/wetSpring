@@ -1,20 +1,20 @@
 # wetSpring Python dependencies — runtime tools and experiment environment.
 #
-# WARNING: This file uses minimum-version ranges for broad compatibility.
-# It is NOT suitable for reproducing validation baselines. For baseline
-# reproduction, use scripts/requirements.txt which pins exact versions.
+# Pin policy: major.minor floor + major upper bound per groundSpring V109 pattern.
+# Patch versions float for security. For exact baseline reproduction, use
+# scripts/requirements.txt which pins tighter ranges.
 #
 # Install: pip install -r requirements.txt
 
 # Core scientific stack
-numpy>=1.24
-scipy>=1.12
+numpy>=1.24,<3
+scipy>=1.12,<2
 
 # Track 2: LC-MS metabolomics
-asari-metabolomics>=1.13
+asari-metabolomics>=1.13,<2
 
 # Track 2: PFAS screening
-pyopenms>=3.0
+pyopenms>=3.0,<4
 
 # Diversity baseline (Python benchmark)
-scikit-bio>=0.6
+scikit-bio>=0.6,<1

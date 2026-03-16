@@ -27,6 +27,7 @@
 use wetspring_barracuda::bio::{ani, diversity, dnds, snp};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp055: Anderson 2017 Population Genomics Validation");
@@ -179,7 +180,7 @@ fn validate_integrated_pipeline(v: &mut Validator) {
     );
 
     // dN/dS on the variant region
-    let r = dnds::pairwise_dnds(genomes[0], genomes[2]).expect("dN/dS");
+    let r = dnds::pairwise_dnds(genomes[0], genomes[2]).or_exit("dN/dS");
     v.check(
         "dN/dS computable on population pair",
         f64::from(u8::from(r.syn_sites > 0.0 || r.nonsyn_sites > 0.0)),

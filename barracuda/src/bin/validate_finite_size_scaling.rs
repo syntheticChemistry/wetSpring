@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -46,6 +42,7 @@
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 #[cfg(feature = "gpu")]
 use barracuda::spectral::{
@@ -159,7 +156,7 @@ fn main() {
                 "  W_c(L={}) = {:.2}, W_c(L={}) = {:.2}",
                 w_c_values[0].0,
                 first_w_c,
-                w_c_values.last().expect("w_c_values non-empty").0,
+                w_c_values.last().or_exit("w_c_values non-empty").0,
                 last_w_c
             );
             v.check_pass("W_c found for multiple sizes", w_c_values.len() >= 2);

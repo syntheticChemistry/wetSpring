@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -42,6 +38,7 @@ use wetspring_forge::inventory;
 use wetspring_forge::streaming::{PipelineStage, StreamingSession};
 use wetspring_forge::substrate::{Capability, SubstrateKind};
 use wetspring_forge::workloads;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     println!("═══════════════════════════════════════════════════════════");
@@ -389,7 +386,7 @@ fn section_s86_math_through_dispatch(pass: &mut u32, fail: &mut u32) {
     // LHS + Sobol
     let bounds = vec![(-5.0, 5.0), (-5.0, 5.0), (-5.0, 5.0)];
     let lhs = barracuda::sample::latin_hypercube(50, &bounds, 42)
-        .expect("latin_hypercube sampling should succeed for valid bounds and seed");
+        .or_exit("latin_hypercube sampling should succeed for valid bounds and seed");
     check(
         &format!("LHS: {}×{} samples", lhs.len(), lhs[0].len()),
         lhs.len() == 50 && lhs[0].len() == 3,
@@ -398,7 +395,7 @@ fn section_s86_math_through_dispatch(pass: &mut u32, fail: &mut u32) {
     );
     let sobol_bounds = vec![(0.0, 1.0), (0.0, 1.0), (0.0, 1.0)];
     let sobol = barracuda::sample::sobol_scaled(64, &sobol_bounds)
-        .expect("sobol_scaled sampling should succeed for valid bounds");
+        .or_exit("sobol_scaled sampling should succeed for valid bounds");
     check(
         &format!("Sobol: {}×{} samples", sobol.len(), sobol[0].len()),
         sobol.len() == 64 && sobol[0].len() == 3,

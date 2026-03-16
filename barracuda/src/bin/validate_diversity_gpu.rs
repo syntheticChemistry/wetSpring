@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::similar_names,
     reason = "validation harness: domain variables from published notation"
 )]
@@ -57,6 +53,7 @@ use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 #[tokio::main]
 async fn main() {
@@ -97,7 +94,7 @@ fn validate_shannon(gpu: &GpuF64, v: &mut Validator) {
     {
         let counts = vec![25.0, 25.0, 25.0, 25.0];
         let cpu = diversity::shannon(&counts);
-        let gpu_val = diversity_gpu::shannon_gpu(gpu, &counts).expect("GPU shannon uniform");
+        let gpu_val = diversity_gpu::shannon_gpu(gpu, &counts).or_exit("GPU shannon uniform");
         v.check(
             "Shannon uniform (4 species)",
             gpu_val,
@@ -110,7 +107,7 @@ fn validate_shannon(gpu: &GpuF64, v: &mut Validator) {
     {
         let counts = vec![100.0, 0.0, 0.0, 0.0];
         let cpu = diversity::shannon(&counts);
-        let gpu_val = diversity_gpu::shannon_gpu(gpu, &counts).expect("GPU shannon single");
+        let gpu_val = diversity_gpu::shannon_gpu(gpu, &counts).or_exit("GPU shannon single");
         v.check(
             "Shannon single species",
             gpu_val,
@@ -123,7 +120,7 @@ fn validate_shannon(gpu: &GpuF64, v: &mut Validator) {
     {
         let counts = vec![10.0; 100];
         let cpu = diversity::shannon(&counts);
-        let gpu_val = diversity_gpu::shannon_gpu(gpu, &counts).expect("GPU shannon 100");
+        let gpu_val = diversity_gpu::shannon_gpu(gpu, &counts).or_exit("GPU shannon 100");
         v.check(
             "Shannon 100 uniform species",
             gpu_val,
@@ -140,7 +137,7 @@ fn validate_simpson(gpu: &GpuF64, v: &mut Validator) {
     {
         let counts = vec![25.0, 25.0, 25.0, 25.0];
         let cpu = diversity::simpson(&counts);
-        let gpu_val = diversity_gpu::simpson_gpu(gpu, &counts).expect("GPU simpson uniform");
+        let gpu_val = diversity_gpu::simpson_gpu(gpu, &counts).or_exit("GPU simpson uniform");
         v.check(
             "Simpson uniform (4 species)",
             gpu_val,
@@ -153,7 +150,7 @@ fn validate_simpson(gpu: &GpuF64, v: &mut Validator) {
     {
         let counts = vec![100.0, 0.0, 0.0];
         let cpu = diversity::simpson(&counts);
-        let gpu_val = diversity_gpu::simpson_gpu(gpu, &counts).expect("GPU simpson single");
+        let gpu_val = diversity_gpu::simpson_gpu(gpu, &counts).or_exit("GPU simpson single");
         v.check(
             "Simpson single species",
             gpu_val,
@@ -166,7 +163,7 @@ fn validate_simpson(gpu: &GpuF64, v: &mut Validator) {
     {
         let counts = vec![50.0; 10];
         let cpu = diversity::simpson(&counts);
-        let gpu_val = diversity_gpu::simpson_gpu(gpu, &counts).expect("GPU simpson 10");
+        let gpu_val = diversity_gpu::simpson_gpu(gpu, &counts).or_exit("GPU simpson 10");
         v.check(
             "Simpson 10 uniform species",
             gpu_val,
@@ -188,7 +185,7 @@ fn validate_bray_curtis(gpu: &GpuF64, v: &mut Validator) {
         ];
         let cpu = diversity::bray_curtis_condensed(&samples);
         let gpu_val =
-            diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).expect("GPU BC 3 samples");
+            diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).or_exit("GPU BC 3 samples");
 
         assert_eq!(gpu_val.len(), cpu.len(), "BC pair count mismatch");
         for (i, (&g, &c)) in gpu_val.iter().zip(cpu.iter()).enumerate() {
@@ -206,7 +203,7 @@ fn validate_bray_curtis(gpu: &GpuF64, v: &mut Validator) {
         let samples = vec![vec![10.0, 20.0, 30.0], vec![10.0, 20.0, 30.0]];
         let cpu = diversity::bray_curtis_condensed(&samples);
         let gpu_val =
-            diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).expect("GPU BC identical");
+            diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).or_exit("GPU BC identical");
         v.check(
             "Bray-Curtis identical samples",
             gpu_val[0],
@@ -220,7 +217,7 @@ fn validate_bray_curtis(gpu: &GpuF64, v: &mut Validator) {
         let samples = vec![vec![10.0, 0.0, 0.0], vec![0.0, 0.0, 10.0]];
         let cpu = diversity::bray_curtis_condensed(&samples);
         let gpu_val =
-            diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).expect("GPU BC disjoint");
+            diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).or_exit("GPU BC disjoint");
         v.check(
             "Bray-Curtis disjoint samples",
             gpu_val[0],
@@ -243,7 +240,7 @@ fn validate_bray_curtis(gpu: &GpuF64, v: &mut Validator) {
 
         let cpu = diversity::bray_curtis_condensed(&samples);
         let gpu_val =
-            diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).expect("GPU BC 10×50");
+            diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).or_exit("GPU BC 10×50");
 
         let n_pairs = n * (n - 1) / 2;
         assert_eq!(gpu_val.len(), n_pairs);
@@ -281,8 +278,8 @@ fn validate_pcoa(gpu: &GpuF64, v: &mut Validator) {
         let condensed = diversity::bray_curtis_condensed(&samples);
         let n = samples.len();
 
-        let cpu_result = pcoa::pcoa(&condensed, n, 2).expect("CPU PCoA");
-        let gpu_result = pcoa_gpu::pcoa_gpu(gpu, &condensed, n, 2).expect("GPU PCoA");
+        let cpu_result = pcoa::pcoa(&condensed, n, 2).or_exit("CPU PCoA");
+        let gpu_result = pcoa_gpu::pcoa_gpu(gpu, &condensed, n, 2).or_exit("GPU PCoA");
 
         // Eigenvalues should match closely
         for (axis, (&cpu_ev, &gpu_ev)) in cpu_result
@@ -364,7 +361,7 @@ fn validate_pairwise_l2(gpu: &GpuF64, v: &mut Validator) {
         }
 
         let gpu_condensed = pairwise_l2_gpu::pairwise_l2_condensed_gpu(gpu, &coords, n, dim)
-            .expect("PairwiseL2Gpu");
+            .or_exit("PairwiseL2Gpu");
 
         assert_eq!(gpu_condensed.len(), cpu_condensed.len());
 
@@ -395,7 +392,7 @@ fn validate_alpha_diversity(gpu: &GpuF64, v: &mut Validator) {
         let counts = vec![10.0, 0.0, 20.0, 0.0, 5.0];
         let cpu = diversity::observed_features(&counts);
         let gpu_val =
-            diversity_gpu::observed_features_gpu(gpu, &counts).expect("GPU observed features");
+            diversity_gpu::observed_features_gpu(gpu, &counts).or_exit("GPU observed features");
         v.check(
             "Observed features",
             gpu_val,
@@ -408,7 +405,7 @@ fn validate_alpha_diversity(gpu: &GpuF64, v: &mut Validator) {
     {
         let counts = vec![25.0; 4];
         let cpu = diversity::pielou_evenness(&counts);
-        let gpu_val = diversity_gpu::pielou_evenness_gpu(gpu, &counts).expect("GPU Pielou uniform");
+        let gpu_val = diversity_gpu::pielou_evenness_gpu(gpu, &counts).or_exit("GPU Pielou uniform");
         v.check(
             "Pielou evenness uniform",
             gpu_val,
@@ -422,7 +419,7 @@ fn validate_alpha_diversity(gpu: &GpuF64, v: &mut Validator) {
         let counts = vec![50.0, 30.0, 20.0, 10.0, 5.0, 3.0, 2.0, 1.0];
         let cpu = diversity::alpha_diversity(&counts);
         let gpu_val =
-            diversity_gpu::alpha_diversity_gpu(gpu, &counts).expect("GPU alpha diversity");
+            diversity_gpu::alpha_diversity_gpu(gpu, &counts).or_exit("GPU alpha diversity");
         v.check(
             "Alpha: observed",
             gpu_val.observed,
@@ -477,7 +474,7 @@ fn validate_spectral_match(gpu: &GpuF64, v: &mut Validator) {
         }
 
         let gpu_val =
-            spectral_match_gpu::pairwise_cosine_gpu(gpu, &spectra).expect("GPU pairwise cosine");
+            spectral_match_gpu::pairwise_cosine_gpu(gpu, &spectra).or_exit("GPU pairwise cosine");
 
         assert_eq!(gpu_val.len(), cpu_condensed.len());
 
@@ -500,7 +497,7 @@ fn validate_spectral_match(gpu: &GpuF64, v: &mut Validator) {
         ];
 
         let gpu_scores =
-            spectral_match_gpu::cosine_vs_library_gpu(gpu, &query, &refs).expect("GPU vs library");
+            spectral_match_gpu::cosine_vs_library_gpu(gpu, &query, &refs).or_exit("GPU vs library");
 
         v.check(
             "Library match: identical",
@@ -528,9 +525,9 @@ fn validate_stats_gpu(v: &mut Validator, gpu: &GpuF64) {
     let cpu_sample_var = cpu_var * n / (n - 1.0);
     let cpu_std = cpu_sample_var.sqrt();
 
-    let gpu_var = stats_gpu::variance_gpu(gpu, &data).expect("variance GPU");
-    let gpu_sample_var = stats_gpu::sample_variance_gpu(gpu, &data).expect("sample variance GPU");
-    let gpu_std = stats_gpu::std_dev_gpu(gpu, &data).expect("std dev GPU");
+    let gpu_var = stats_gpu::variance_gpu(gpu, &data).or_exit("variance GPU");
+    let gpu_sample_var = stats_gpu::sample_variance_gpu(gpu, &data).or_exit("sample variance GPU");
+    let gpu_std = stats_gpu::std_dev_gpu(gpu, &data).or_exit("std dev GPU");
 
     v.check(
         "Population variance",
@@ -568,8 +565,8 @@ fn validate_stats_gpu(v: &mut Validator, gpu: &GpuF64) {
         (y.iter().map(|&yi| (yi - y_mean).powi(2)).sum::<f64>() / (y.len() as f64 - 1.0)).sqrt();
     let cpu_corr = cpu_cov / (x_std * y_std);
 
-    let gpu_cov = stats_gpu::covariance_gpu(gpu, &x, &y).expect("covariance GPU");
-    let gpu_corr = stats_gpu::correlation_gpu(gpu, &x, &y).expect("correlation GPU");
+    let gpu_cov = stats_gpu::covariance_gpu(gpu, &x, &y).or_exit("covariance GPU");
+    let gpu_corr = stats_gpu::correlation_gpu(gpu, &x, &y).or_exit("correlation GPU");
 
     v.check(
         "Sample covariance",
@@ -592,7 +589,7 @@ fn validate_stats_gpu(v: &mut Validator, gpu: &GpuF64) {
         .zip(a.iter().zip(b.iter()))
         .map(|(&wi, (&ai, &bi))| wi * ai * bi)
         .sum();
-    let gpu_wdot = stats_gpu::weighted_dot_gpu(gpu, &w, &a, &b).expect("weighted dot GPU");
+    let gpu_wdot = stats_gpu::weighted_dot_gpu(gpu, &w, &a, &b).or_exit("weighted dot GPU");
     v.check(
         "Weighted dot product",
         gpu_wdot,
@@ -601,7 +598,7 @@ fn validate_stats_gpu(v: &mut Validator, gpu: &GpuF64) {
     );
 
     let cpu_dot: f64 = special::dot(&x, &y);
-    let gpu_dot = stats_gpu::dot_gpu(gpu, &x, &y).expect("dot GPU");
+    let gpu_dot = stats_gpu::dot_gpu(gpu, &x, &y).or_exit("dot GPU");
     v.check(
         "Dot product",
         gpu_dot,

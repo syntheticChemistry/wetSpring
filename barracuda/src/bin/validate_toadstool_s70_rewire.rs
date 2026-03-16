@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -51,6 +47,7 @@
 
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp247: ToadStool S70+++ Rewire — New Stats Primitives");
@@ -91,7 +88,7 @@ fn main() {
 
     let mu_c = barracuda::stats::error_threshold(10.0, 100);
     v.check_pass("σ=10, L=100: Some(μ_c)", mu_c.is_some());
-    let mu_c_val = mu_c.unwrap();
+    let mu_c_val = mu_c.or_exit("unexpected error");
     v.check_pass("μ_c ∈ (0, 1)", mu_c_val > 0.0 && mu_c_val < 1.0);
     println!("  μ_c(σ=10, L=100) = {mu_c_val:.6}");
 
@@ -103,8 +100,8 @@ fn main() {
         tolerances::PYTHON_PARITY_TIGHT,
     );
 
-    let mu_c_large = barracuda::stats::error_threshold(2.0, 10_000).unwrap();
-    let mu_c_small = barracuda::stats::error_threshold(2.0, 100).unwrap();
+    let mu_c_large = barracuda::stats::error_threshold(2.0, 10_000).or_exit("unexpected error");
+    let mu_c_small = barracuda::stats::error_threshold(2.0, 100).or_exit("unexpected error");
     v.check_pass("Longer genome → lower threshold", mu_c_large < mu_c_small);
     println!("  μ_c(L=10000) = {mu_c_large:.8} < μ_c(L=100) = {mu_c_small:.8}");
 
@@ -173,7 +170,7 @@ fn main() {
     v.section("S5: Jackknife Mean Variance");
 
     let data = [1.0, 2.0, 3.0, 4.0, 5.0];
-    let jk = barracuda::stats::jackknife_mean_variance(&data).unwrap();
+    let jk = barracuda::stats::jackknife_mean_variance(&data).or_exit("unexpected error");
     v.check("Mean = 3.0", jk.estimate, 3.0, tolerances::ANALYTICAL_F64);
     v.check_pass("Variance ≥ 0", jk.variance >= 0.0);
     v.check_pass("Std error ≥ 0", jk.std_error >= 0.0);
@@ -189,7 +186,7 @@ fn main() {
     );
 
     let constant_data = [7.0; 20];
-    let jk_const = barracuda::stats::jackknife_mean_variance(&constant_data).unwrap();
+    let jk_const = barracuda::stats::jackknife_mean_variance(&constant_data).or_exit("unexpected error");
     v.check(
         "Constant data: mean = 7.0",
         jk_const.estimate,
@@ -217,7 +214,7 @@ fn main() {
 
     let data_gen = [2.0, 4.0, 6.0, 8.0];
     let jk_gen =
-        barracuda::stats::jackknife(&data_gen, |d| d.iter().sum::<f64>() / d.len() as f64).unwrap();
+        barracuda::stats::jackknife(&data_gen, |d| d.iter().sum::<f64>() / d.len() as f64).or_exit("unexpected error");
     v.check(
         "Generalized mean ≈ 5.0",
         jk_gen.estimate,
@@ -244,7 +241,7 @@ fn main() {
             })
             .sum::<f64>()
     })
-    .unwrap();
+    .or_exit("unexpected error");
     v.check_pass("Jackknife Shannon > 0", jk_shannon.estimate > 0.0);
     v.check_pass("Shannon SE > 0 (non-trivial)", jk_shannon.std_error > 0.0);
     println!(

@@ -105,13 +105,31 @@ pub fn handle_capability_list() -> Result<Value, RpcError> {
         })
         .collect();
 
-    Ok(json!({
+    let mut response = json!({
         "primal": crate::PRIMAL_NAME,
         "version": env!("CARGO_PKG_VERSION"),
         "domain": crate::ipc::capability_domains::DOMAIN,
         "capabilities": CAPABILITIES,
         "domains": domains,
-    }))
+    });
+
+    #[cfg(feature = "json")]
+    if let Some(obj) = response.as_object_mut() {
+        obj.insert(
+            "operation_dependencies".to_string(),
+            crate::niche::operation_dependencies(),
+        );
+        obj.insert(
+            "cost_estimates".to_string(),
+            crate::niche::cost_estimates(),
+        );
+        obj.insert(
+            "semantic_mappings".to_string(),
+            crate::niche::ecology_semantic_mappings(),
+        );
+    }
+
+    Ok(response)
 }
 
 /// Health/readiness probe.

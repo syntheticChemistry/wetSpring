@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -62,6 +58,7 @@ use wetspring_barracuda::bio::gemm_cached::GemmCached;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct BenchResult {
     label: &'static str,
@@ -160,7 +157,7 @@ fn main() {
     // CPU special functions (hotSpring → S59)
     let (erf_val, cpu_erf_ms) = bench("CPU erf(1.0) + ln_gamma(5.0) + norm_cdf(1.96)", || {
         let e = barracuda::special::erf(1.0);
-        let l = barracuda::special::ln_gamma(5.0).expect("ln_gamma");
+        let l = barracuda::special::ln_gamma(5.0).or_exit("ln_gamma");
         let n = barracuda::stats::norm_cdf(1.96);
         (e, l, n)
     });
@@ -186,7 +183,7 @@ fn main() {
     let x: Vec<f64> = (0..100).map(|i| f64::from(i as u32) * 0.1).collect();
     let y: Vec<f64> = x.iter().map(|&xi| 2.0f64.mul_add(xi, 1.0)).collect();
     let (pearson, cpu_stats_ms) = bench("CPU Pearson + MAE + RMSE", || {
-        let p = barracuda::stats::pearson_correlation(&x, &y).expect("pearson");
+        let p = barracuda::stats::pearson_correlation(&x, &y).or_exit("pearson");
         let m = barracuda::stats::mae(&x, &y);
         let r = barracuda::stats::rmse(&x, &y);
         (p, m, r)
@@ -214,19 +211,19 @@ fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
-        .expect("tokio runtime");
-    let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+        .or_exit("tokio runtime");
+    let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
     gpu.print_info();
 
     let device = gpu.to_wgpu_device();
     let ctx = gpu.tensor_context().clone();
 
     // GPU DiversityFusion
-    let fusion_gpu = DiversityFusionGpu::new(Arc::clone(&device)).expect("DiversityFusionGpu");
+    let fusion_gpu = DiversityFusionGpu::new(Arc::clone(&device)).or_exit("DiversityFusionGpu");
     let (gpu_fusion, gpu_div_ms) = bench("GPU DiversityFusion (20 × 2000)", || {
         fusion_gpu
             .compute(&abundances, n_samples, n_taxa)
-            .expect("GPU diversity")
+            .or_exit("GPU diversity")
     });
     v.check(
         "GPU Shannon ≈ CPU",
@@ -255,7 +252,7 @@ fn main() {
     }
 
     let (gpu_gemm, gpu_gemm_ms) = bench("GPU GEMM 64×32 × 32×64", || {
-        gemm.execute(&mat_a, &mat_b, m, k, n, 1).expect("GEMM")
+        gemm.execute(&mat_a, &mat_b, m, k, n, 1).or_exit("GEMM")
     });
     let cpu_c00: f64 = (0..k).map(|j| mat_a[j] * mat_b[j * n]).sum();
     v.check(
@@ -297,12 +294,12 @@ fn main() {
         || {
             let c1_buf = gemm
                 .execute_to_buffer(&sq_a, &sq_b, s, s, s, 1)
-                .expect("GEMM stage 1");
+                .or_exit("GEMM stage 1");
             let c1_data = device
                 .read_f64_buffer(&c1_buf, s * s)
-                .expect("readback stage 1");
+                .or_exit("readback stage 1");
             gemm.execute(&c1_data, &sq_b, s, s, s, 1)
-                .expect("GEMM stage 2")
+                .or_exit("GEMM stage 2")
         },
     );
     v.check_pass(
@@ -314,8 +311,8 @@ fn main() {
     let (_, rt_ms) = bench(
         "Round-trip: GEMM → CPU → GEMM (2 dispatches, 2 readbacks)",
         || {
-            let c1 = gemm.execute(&sq_a, &sq_b, s, s, s, 1).expect("GEMM 1");
-            gemm.execute(&c1, &sq_b, s, s, s, 1).expect("GEMM 2")
+            let c1 = gemm.execute(&sq_a, &sq_b, s, s, s, 1).or_exit("GEMM 1");
+            gemm.execute(&c1, &sq_b, s, s, s, 1).or_exit("GEMM 2")
         },
     );
 
@@ -324,9 +321,9 @@ fn main() {
         || {
             let c1_buf = gemm
                 .execute_to_buffer(&sq_a, &sq_b, s, s, s, 1)
-                .expect("GEMM 1");
-            let c1 = device.read_f64_buffer(&c1_buf, s * s).expect("readback");
-            gemm.execute(&c1, &sq_b, s, s, s, 1).expect("GEMM 2")
+                .or_exit("GEMM 1");
+            let c1 = device.read_f64_buffer(&c1_buf, s * s).or_exit("readback");
+            gemm.execute(&c1, &sq_b, s, s, s, 1).or_exit("GEMM 2")
         },
     );
 
@@ -350,7 +347,7 @@ fn main() {
     let (_, batch_ms) = bench("GPU batched diversity (20 samples, 1 dispatch)", || {
         fusion_gpu
             .compute(&abundances, n_samples, n_taxa)
-            .expect("batch")
+            .or_exit("batch")
     });
     results.push(BenchResult {
         label: "Batched diversity 20×2k",
@@ -393,7 +390,7 @@ fn main() {
         bench("GPU DiversityFusion (1×50k — above threshold)", || {
             fusion_gpu
                 .compute(&large_abundances, 1, 50_000)
-                .expect("GPU 50k")
+                .or_exit("GPU 50k")
         });
     v.check(
         "GPU 50k Shannon ≈ CPU",

@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -55,6 +51,7 @@ use wetspring_barracuda::bio::{diversity, diversity_gpu, streaming_gpu};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 struct Timing {
     domain: &'static str,
@@ -122,14 +119,14 @@ async fn main() {
     let ti = Instant::now();
     let ind_shannons: Vec<f64> = cell_pops
         .iter()
-        .map(|(_, c)| diversity_gpu::shannon_gpu(&gpu, c).expect("ind Shannon"))
+        .map(|(_, c)| diversity_gpu::shannon_gpu(&gpu, c).or_exit("ind Shannon"))
         .collect();
     let ind_us = ti.elapsed().as_micros() as f64;
 
     let ts = Instant::now();
     let stream_shannons: Vec<f64> = cell_pops
         .iter()
-        .map(|(_, c)| session.shannon(c).expect("stream Shannon"))
+        .map(|(_, c)| session.shannon(c).or_exit("stream Shannon"))
         .collect();
     let stream_us = ts.elapsed().as_micros() as f64;
 
@@ -157,14 +154,14 @@ async fn main() {
     let ti = Instant::now();
     let ind_simpsons: Vec<f64> = cell_pops
         .iter()
-        .map(|(_, c)| diversity_gpu::simpson_gpu(&gpu, c).expect("ind Simpson"))
+        .map(|(_, c)| diversity_gpu::simpson_gpu(&gpu, c).or_exit("ind Simpson"))
         .collect();
     let ind_us = ti.elapsed().as_micros() as f64;
 
     let ts = Instant::now();
     let stream_simpsons: Vec<f64> = cell_pops
         .iter()
-        .map(|(_, c)| session.simpson(c).expect("stream Simpson"))
+        .map(|(_, c)| session.simpson(c).or_exit("stream Simpson"))
         .collect();
     let stream_us = ts.elapsed().as_micros() as f64;
 
@@ -193,11 +190,11 @@ async fn main() {
     let owned: Vec<Vec<f64>> = cell_pops.iter().map(|(_, c)| c.clone()).collect();
 
     let ti = Instant::now();
-    let ind_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &owned).expect("ind BC");
+    let ind_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &owned).or_exit("ind BC");
     let ind_bc_us = ti.elapsed().as_micros() as f64;
 
     let ts = Instant::now();
-    let stream_bc = session.bray_curtis_matrix(&refs).expect("stream BC");
+    let stream_bc = session.bray_curtis_matrix(&refs).or_exit("stream BC");
     let stream_bc_us = ts.elapsed().as_micros() as f64;
 
     v.check_pass("BC ind length", ind_bc.len() == 15); // C(6,2)
@@ -233,7 +230,7 @@ async fn main() {
     let r = level_spacing_ratio(&eigs);
 
     let cpu_sh = diversity::shannon(&cell_pops[0].1);
-    let stream_sh = session.shannon(&cell_pops[0].1).expect("stream");
+    let stream_sh = session.shannon(&cell_pops[0].1).or_exit("stream");
 
     v.check_pass("Anderson r computed", r > 0.35 && r < 0.55);
     v.check(

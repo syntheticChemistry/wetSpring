@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -61,6 +57,7 @@ use wetspring_barracuda::visualization::scenarios::{
     anderson_scenario, ecology_scenario, full_pipeline_scenario,
 };
 use wetspring_barracuda::visualization::stream::StreamSession;
+use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::visualization::{
     DataChannel, EcologyScenario, ScenarioEdge, ScenarioNode, ScientificRange, UiConfig,
     scenario_to_json, scenario_with_edges_json,
@@ -210,7 +207,7 @@ fn main() {
         "fieldmap",
     ];
     for (ch, name) in channels.iter().zip(type_names.iter()) {
-        let json = serde_json::to_string(ch).expect("serialize channel");
+        let json = serde_json::to_string(ch).or_exit("serialize channel");
         v.check_pass(
             &format!("{name} serializes with channel_type tag"),
             json.contains(&format!("\"channel_type\":\"{name}\"")),
@@ -220,7 +217,7 @@ fn main() {
     // ── S3: Scenario JSON export ──
     println!("\n── S3: Scenario JSON export ──");
 
-    let json = scenario_to_json(&eco_scenario).expect("serialize ecology scenario");
+    let json = scenario_to_json(&eco_scenario).or_exit("serialize ecology scenario");
     v.check_pass(
         "ecology JSON contains domain",
         json.contains("\"domain\": \"ecology\""),
@@ -232,7 +229,7 @@ fn main() {
     );
 
     let json_with_edges =
-        scenario_with_edges_json(&eco_scenario, &eco_edges).expect("serialize with edges");
+        scenario_with_edges_json(&eco_scenario, &eco_edges).or_exit("serialize with edges");
     v.check_pass(
         "edges JSON contains from/to",
         json_with_edges.contains("\"from\""),
@@ -244,7 +241,7 @@ fn main() {
         let _ = std::fs::create_dir_all(&output_dir);
     }
     let eco_path = output_dir.join("ecology_dashboard.json");
-    std::fs::write(&eco_path, &json_with_edges).expect("write ecology JSON");
+    std::fs::write(&eco_path, &json_with_edges).or_exit("write ecology JSON");
     v.check_pass("ecology JSON file written", eco_path.exists());
     println!("  → Scenario: {}", eco_path.display());
     println!(
@@ -262,7 +259,7 @@ fn main() {
     );
     v.check_pass("left sidebar enabled", config.show_panels.left_sidebar);
     v.check_pass("data inspector enabled", config.show_panels.data_inspector);
-    let config_json = serde_json::to_string(&config).expect("serialize config");
+    let config_json = serde_json::to_string(&config).or_exit("serialize config");
     v.check_pass("UiConfig serializes", config_json.contains("ecology-dark"));
 
     // ── S5: IPC push client discovery ──
@@ -337,7 +334,7 @@ fn main() {
     let pipe_path = output_dir.join("amplicon_pipeline.json");
     pipeline
         .export_json(&pipe_path)
-        .expect("export pipeline JSON");
+        .or_exit("export pipeline JSON");
     v.check_pass("pipeline JSON exported", pipe_path.exists());
     println!("  → Pipeline: {}", pipe_path.display());
 
@@ -497,7 +494,7 @@ fn main() {
         },
     ];
 
-    let anderson_json = scenario_to_json(&anderson_dashboard).expect("serialize anderson");
+    let anderson_json = scenario_to_json(&anderson_dashboard).or_exit("serialize anderson");
     v.check_pass(
         "anderson dashboard has 3 nodes",
         anderson_dashboard.nodes.len() == 3,
@@ -512,7 +509,7 @@ fn main() {
     );
 
     let anderson_path = output_dir.join("anderson_qs_landscape.json");
-    std::fs::write(&anderson_path, &anderson_json).expect("write anderson JSON");
+    std::fs::write(&anderson_path, &anderson_json).or_exit("write anderson JSON");
     v.check_pass("anderson JSON file written", anderson_path.exists());
     println!("  → Anderson: {}", anderson_path.display());
 
@@ -532,7 +529,7 @@ fn main() {
         p_qs(w_soil) > 0.3,
     );
 
-    let var_algae = covariance(counts_algae, counts_algae).expect("covariance");
+    let var_algae = covariance(counts_algae, counts_algae).or_exit("covariance");
     v.check_pass("variance computable for viz", var_algae > 0.0);
 
     let mean_algae = mean(counts_algae);
@@ -581,7 +578,7 @@ fn main() {
     println!("\n── S11: Live push integration ──");
 
     if petaltongue_available {
-        let client = PetalTonguePushClient::discover().expect("re-discover");
+        let client = PetalTonguePushClient::discover().or_exit("re-discover");
         match client.push_render("exp353-ecology", "Ecology Dashboard", &eco_scenario) {
             Ok(()) => {
                 println!("  ✓ Pushed ecology scenario to petalTongue");

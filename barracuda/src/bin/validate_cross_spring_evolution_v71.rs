@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -62,6 +58,7 @@ use wetspring_barracuda::df64_host;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct Timing {
     label: &'static str,
@@ -90,8 +87,8 @@ fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
-        .expect("tokio runtime");
-    let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+        .or_exit("tokio runtime");
+    let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
 
     let strategy = gpu.fp64_strategy();
     let precision = gpu.optimal_precision();
@@ -199,7 +196,7 @@ fn main() {
         tolerances::ERF_PARITY,
     );
 
-    let lng = barracuda::special::ln_gamma(5.0).expect("ln_gamma");
+    let lng = barracuda::special::ln_gamma(5.0).or_exit("ln_gamma");
     v.check(
         "ln_gamma(5.0) = ln(24)",
         lng,
@@ -260,11 +257,11 @@ fn main() {
         diversity_fusion_cpu(&large_counts, n_species)
     });
 
-    let fusion_gpu = DiversityFusionGpu::new(Arc::clone(&device)).expect("DiversityFusionGpu");
+    let fusion_gpu = DiversityFusionGpu::new(Arc::clone(&device)).or_exit("DiversityFusionGpu");
     let (gpu_fusion, gpu_fusion_ms) = bench("GPU DiversityFusion (5×10k)", || {
         fusion_gpu
             .compute(&large_counts, n_samples, n_species)
-            .expect("fusion GPU")
+            .or_exit("fusion GPU")
     });
 
     v.check(
@@ -396,7 +393,7 @@ fn main() {
         .map(|&x| 0.01f64.mul_add(x.sin(), 2.0f64.mul_add(x, 1.0)))
         .collect();
 
-    let pearson = barracuda::stats::pearson_correlation(&obs, &sim).expect("pearson");
+    let pearson = barracuda::stats::pearson_correlation(&obs, &sim).or_exit("pearson");
     v.check(
         "Pearson(linear) ≈ 1.0",
         pearson,
@@ -420,7 +417,7 @@ fn main() {
         .collect();
     let trap_y: Vec<f64> = trap_x.iter().map(|&xi| xi * xi).collect();
     let (trapz_val, trapz_ms) = bench("trapz(x², 2000 pts)", || {
-        barracuda::numerical::trapz(&trap_y, &trap_x).expect("trapz")
+        barracuda::numerical::trapz(&trap_y, &trap_x).or_exit("trapz")
     });
     v.check(
         "trapz(x²) ≈ 1/3",
@@ -458,7 +455,7 @@ fn main() {
     let (res_f64, f64_ms) = bench("GEMM 256×128×256 @ Precision::F64", || {
         gemm_f64
             .execute(&a_mat, &b_mat, m, k, n, 1)
-            .expect("GEMM F64")
+            .or_exit("GEMM F64")
     });
     v.check_pass(
         "F64 GEMM result finite",
@@ -478,7 +475,7 @@ fn main() {
     let (res_explicit, _) = bench("GEMM via with_precision(F64)", || {
         gemm_f64_explicit
             .execute(&a_mat, &b_mat, m, k, n, 1)
-            .expect("GEMM explicit F64")
+            .or_exit("GEMM explicit F64")
     });
     v.check(
         "new() == with_precision(F64)",
@@ -535,7 +532,7 @@ fn main() {
         seed: 42,
     };
     let (nmf_res, nmf_ms) = bench("NMF 20×10 (KL, k=3)", || {
-        barracuda::linalg::nmf::nmf(&v_mat, 20, 10, &nmf_cfg).expect("NMF")
+        barracuda::linalg::nmf::nmf(&v_mat, 20, 10, &nmf_cfg).or_exit("NMF")
     });
     v.check_pass(
         "NMF W, H non-negative",

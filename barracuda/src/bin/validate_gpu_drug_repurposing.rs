@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -85,6 +77,7 @@ use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct LcgRng(u64);
 
@@ -140,7 +133,7 @@ fn validate_gemm_nmf_reconstruction(
         objective: NmfObjective::Euclidean,
         seed: 42,
     };
-    let result = nmf::nmf(&matrix, n_drugs, n_diseases, &config).expect("NMF failed");
+    let result = nmf::nmf(&matrix, n_drugs, n_diseases, &config).or_exit("NMF failed");
 
     let t_cpu = Instant::now();
     let mut cpu_wh = vec![0.0_f64; total];
@@ -157,7 +150,7 @@ fn validate_gemm_nmf_reconstruction(
     let t_gpu = Instant::now();
     let gpu_wh = gemm
         .execute(&result.w, &result.h, n_drugs, rank, n_diseases, 1)
-        .expect("GEMM execute failed");
+        .or_exit("GEMM execute failed");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     let max_diff = cpu_wh
@@ -204,9 +197,9 @@ fn validate_gpu_cosine_similarity(
     let cpu_us = t_cpu.elapsed().as_micros() as f64;
 
     let t_gpu = Instant::now();
-    let gpu_dot = fmr.dot(&a, &b).expect("FMR dot");
-    let gpu_na_sq = fmr.sum_of_squares(&a).expect("FMR sos a");
-    let gpu_nb_sq = fmr.sum_of_squares(&b).expect("FMR sos b");
+    let gpu_dot = fmr.dot(&a, &b).or_exit("FMR dot");
+    let gpu_na_sq = fmr.sum_of_squares(&a).or_exit("FMR sos a");
+    let gpu_nb_sq = fmr.sum_of_squares(&b).or_exit("FMR sos b");
     let gpu_cos = gpu_dot / (gpu_na_sq.sqrt() * gpu_nb_sq.sqrt());
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
@@ -225,7 +218,7 @@ fn validate_gpu_cosine_similarity(
     let big_a: Vec<f64> = (0..vlen).map(|_| rng.next_f64()).collect();
     let big_b: Vec<f64> = (0..vlen).map(|_| rng.next_f64()).collect();
     let cpu_d = special::dot(&big_a, &big_b);
-    let gpu_d = fmr.dot(&big_a, &big_b).expect("FMR dot 1000");
+    let gpu_d = fmr.dot(&big_a, &big_b).or_exit("FMR dot 1000");
     v.check(
         "GPU dot product 1000-dim",
         gpu_d,
@@ -310,7 +303,7 @@ fn validate_gpu_transe(
     };
 
     let t_gpu = Instant::now();
-    let gpu_scores = scorer.execute(device).expect("GPU TransE");
+    let gpu_scores = scorer.execute(device).or_exit("GPU TransE");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     let max_diff = gpu_scores
@@ -441,7 +434,7 @@ fn validate_sparse_gemm(
                 nnz_row += 1;
             }
         }
-        row_ptr.push(row_ptr.last().unwrap() + nnz_row);
+        row_ptr.push(row_ptr.last().or_exit("unexpected error") + nnz_row);
     }
     let nnz = values.len();
     let fill_pct = 100.0 * nnz as f64 / (m * k) as f64;
@@ -539,7 +532,7 @@ fn validate_topk_ranking(v: &mut Validator, timings: &mut Vec<(&'static str, f64
         objective: NmfObjective::Euclidean,
         seed: 42,
     };
-    let nmf_result = nmf::nmf(&matrix, n_drugs, n_diseases, &config).expect("NMF");
+    let nmf_result = nmf::nmf(&matrix, n_drugs, n_diseases, &config).or_exit("NMF");
 
     let t_cpu = Instant::now();
     let top_k = nmf::top_k_predictions(&nmf_result, k_val);
@@ -569,10 +562,10 @@ fn validate_topk_ranking(v: &mut Validator, timings: &mut Vec<(&'static str, f64
 }
 
 fn main() {
-    let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
+    let rt = tokio::runtime::Runtime::new().or_exit("tokio runtime");
     let gpu = rt
         .block_on(GpuF64::new())
-        .expect("GPU init — requires SHADER_F64");
+        .or_exit("GPU init — requires SHADER_F64");
     let device = gpu.to_wgpu_device();
     let ctx = gpu.tensor_context().clone();
 
@@ -583,7 +576,7 @@ fn main() {
     let mut timings: Vec<(&str, f64, f64)> = Vec::new();
 
     let gemm = GemmCached::new(device.clone(), ctx);
-    let fmr = FusedMapReduceF64::new(device.clone()).expect("FMR init");
+    let fmr = FusedMapReduceF64::new(device.clone()).or_exit("FMR init");
 
     validate_gemm_nmf_reconstruction(&mut v, &gemm, &mut timings);
     validate_gpu_cosine_similarity(&mut v, &fmr, &mut timings);

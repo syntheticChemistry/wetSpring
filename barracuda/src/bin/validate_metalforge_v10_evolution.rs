@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -55,6 +47,7 @@ use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::ipc::dispatch;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Hardware {
@@ -150,7 +143,7 @@ fn main() {
     let t_total = Instant::now();
 
     let gpu = {
-        let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
+        let rt = tokio::runtime::Runtime::new().or_exit("tokio runtime");
         match rt.block_on(GpuF64::new()) {
             Ok(g) => g,
             Err(e) => {
@@ -200,7 +193,7 @@ fn main() {
     v.section("N03: GPU Workloads via Dispatch");
     let ab = vec![10.0, 20.0, 30.0, 15.0, 25.0];
     let cpu_sh = diversity::shannon(&ab);
-    let gpu_sh = diversity_gpu::shannon_gpu(&gpu, &ab).unwrap();
+    let gpu_sh = diversity_gpu::shannon_gpu(&gpu, &ab).or_exit("unexpected error");
     v.check(
         "Shannon CPU==GPU",
         gpu_sh,
@@ -209,7 +202,7 @@ fn main() {
     );
 
     let cpu_si = diversity::simpson(&ab);
-    let gpu_si = diversity_gpu::simpson_gpu(&gpu, &ab).unwrap();
+    let gpu_si = diversity_gpu::simpson_gpu(&gpu, &ab).or_exit("unexpected error");
     v.check(
         "Simpson CPU==GPU",
         gpu_si,
@@ -228,7 +221,7 @@ fn main() {
 
     // ═══ N04: CPU-Only Workloads ═════════════════════════════════════
     v.section("N04: CPU-Only Workloads");
-    let fst = fst_variance::fst_variance_decomposition(&[0.8, 0.6, 0.3], &[100, 100, 100]).unwrap();
+    let fst = fst_variance::fst_variance_decomposition(&[0.8, 0.6, 0.3], &[100, 100, 100]).or_exit("unexpected error");
     v.check_pass("FST > 0", fst.fst > 0.0);
     v.check_pass("FST < 1", fst.fst < 1.0);
     println!(
@@ -241,7 +234,7 @@ fn main() {
 
     let sa = b"ATGATGATGATGATGATGATGATGATGATG";
     let sb = b"ATGGTGATGATGATGCTGATGATGATGATG";
-    let dnds_result = dnds::pairwise_dnds(sa, sb).unwrap();
+    let dnds_result = dnds::pairwise_dnds(sa, sb).or_exit("unexpected error");
     v.check_pass(
         "dN/dS finite",
         dnds_result.dn.is_finite() && dnds_result.ds.is_finite(),
@@ -301,9 +294,9 @@ fn main() {
         "science.diversity",
         &json!({"counts": &ipc_counts, "metrics": ["all"]}),
     )
-    .expect("IPC diversity");
-    let ipc_h = ipc_result["shannon"].as_f64().unwrap();
-    let ipc_si = ipc_result["simpson"].as_f64().unwrap();
+    .or_exit("IPC diversity");
+    let ipc_h = ipc_result["shannon"].as_f64().or_exit("unexpected error");
+    let ipc_si = ipc_result["simpson"].as_f64().or_exit("unexpected error");
     v.check("IPC Shannon", ipc_h, cpu_h, tolerances::EXACT);
     v.check("IPC Simpson", ipc_si, cpu_si, tolerances::EXACT);
 
@@ -314,7 +307,7 @@ fn main() {
         "science.full_pipeline",
         &json!({"counts": &pipeline_counts, "scenario": "standard_growth"}),
     )
-    .expect("IPC pipeline");
+    .or_exit("IPC pipeline");
     v.check_pass(
         "Pipeline has diversity",
         pipe_result.get("diversity").is_some(),
@@ -325,7 +318,7 @@ fn main() {
     );
 
     let qs_ipc = dispatch::dispatch("science.qs_model", &json!({"scenario": "standard_growth"}))
-        .expect("IPC QS");
+        .or_exit("IPC QS");
     v.check_pass(
         "QS IPC has final_state",
         qs_ipc.get("final_state").is_some(),
@@ -339,7 +332,7 @@ fn main() {
     let bad_pcoa = pcoa::pcoa(&[], 0, 2);
     v.check_pass("PCoA empty → error", bad_pcoa.is_err());
 
-    let health = dispatch::dispatch("health.check", &json!({})).expect("health");
+    let health = dispatch::dispatch("health.check", &json!({})).or_exit("health");
     v.check_pass("Health check OK", health.get("status").is_some());
 
     let err = dispatch::dispatch("science.nonexistent", &json!({}));

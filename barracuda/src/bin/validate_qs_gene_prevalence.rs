@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -40,6 +36,7 @@
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 #[derive(Debug, Clone)]
 struct OrganismQs {
@@ -506,15 +503,15 @@ fn main() {
     let dense_3d = results
         .iter()
         .find(|(g, _, _, _, _)| *g == "3D_dense")
-        .expect("known geometry 3D_dense");
+        .or_exit("known geometry 3D_dense");
     let dilute_3d = results
         .iter()
         .find(|(g, _, _, _, _)| *g == "3D_dilute")
-        .expect("known geometry 3D_dilute");
+        .or_exit("known geometry 3D_dilute");
     let mat_2d = results
         .iter()
         .find(|(g, _, _, _, _)| *g == "2D_mat")
-        .expect("known geometry 2D_mat");
+        .or_exit("known geometry 2D_mat");
 
     println!("  Anderson predictions vs observed QS gene prevalence:");
     println!();

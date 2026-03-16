@@ -50,15 +50,19 @@ pub fn register(songbird_socket: &Path, wetspring_socket: &Path) -> crate::error
     let caps = super::handlers::CAPABILITIES;
     let caps_json: Vec<String> = caps.iter().map(|c| format!("\"{c}\"")).collect();
     let caps_str = caps_json.join(",");
+
+    let niche = crate::niche::NICHE_NAME;
+    let niche_desc = crate::niche::NICHE_DESCRIPTION;
+    let dep_count = crate::niche::required_dependency_count();
+
     let request = format!(
-        r#"{{"jsonrpc":"2.0","method":"discovery.register","params":{{"primal":"{primal}","socket":"{ws_path}","capabilities":[{caps_str}],"version":"{version}"}},"id":1}}"#,
+        r#"{{"jsonrpc":"2.0","method":"discovery.register","params":{{"primal":"{primal}","socket":"{ws_path}","capabilities":[{caps_str}],"version":"{version}","niche":"{niche}","niche_description":"{niche_desc}","required_dependencies":{dep_count}}},"id":1}}"#,
     );
 
     let response = rpc_call(songbird_socket, &request)?;
-    if response.contains("\"error\"") {
+    if let Some((code, msg)) = super::protocol::extract_rpc_error(&response) {
         Err(crate::error::Error::Ipc(format!(
-            "Songbird registration rejected: {}",
-            &response[..response.len().min(200)]
+            "Songbird registration rejected [{code}]: {msg}"
         )))
     } else {
         Ok(())
@@ -76,10 +80,9 @@ pub fn heartbeat(songbird_socket: &Path) -> crate::error::Result<()> {
         r#"{{"jsonrpc":"2.0","method":"discovery.heartbeat","params":{{"primal":"{primal}"}},"id":2}}"#
     );
     let response = rpc_call(songbird_socket, &request)?;
-    if response.contains("\"error\"") {
+    if let Some((code, msg)) = super::protocol::extract_rpc_error(&response) {
         Err(crate::error::Error::Ipc(format!(
-            "Songbird heartbeat failed: {}",
-            &response[..response.len().min(200)]
+            "Songbird heartbeat failed [{code}]: {msg}"
         )))
     } else {
         Ok(())

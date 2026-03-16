@@ -12,10 +12,6 @@
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
 //! # Exp236: Pure GPU Streaming v6 — `ToadStool` Unidirectional Pipeline
 //!
 //! Proves that the full science pipeline (kmer → diversity → BC → L2 → `PCoA` →
@@ -53,6 +49,7 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 fn synthetic_sequences() -> Vec<&'static [u8]> {
     vec![
@@ -103,7 +100,7 @@ async fn main() {
 
     let rt_shannon: Vec<f64> = float_vecs.iter().map(|s| diversity::shannon(s)).collect();
     let rt_bc = diversity::bray_curtis_condensed(&float_vecs);
-    let rt_pcoa = pcoa::pcoa(&rt_bc, n, 2).unwrap();
+    let rt_pcoa = pcoa::pcoa(&rt_bc, n, 2).or_exit("unexpected error");
 
     let rt_ms = t.elapsed().as_secs_f64() * 1000.0;
     v.check_pass("RT: 4 Shannon values", rt_shannon.len() == 4);
@@ -122,9 +119,9 @@ async fn main() {
 
     let gpu_shannon: Vec<f64> = float_vecs
         .iter()
-        .map(|s| diversity_gpu::shannon_gpu(&gpu, s).unwrap())
+        .map(|s| diversity_gpu::shannon_gpu(&gpu, s).or_exit("unexpected error"))
         .collect();
-    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &float_vecs).unwrap();
+    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &float_vecs).or_exit("unexpected error");
 
     let stream_ms = t.elapsed().as_secs_f64() * 1000.0;
 
@@ -154,9 +151,9 @@ async fn main() {
     let n_species = float_vecs[0].len();
     let cpu_fusion = diversity_fusion_cpu(&flat, n_species);
     let gpu_fusion = DiversityFusionGpu::new(Arc::clone(&device))
-        .unwrap()
+        .or_exit("unexpected error")
         .compute(&flat, n, n_species)
-        .unwrap();
+        .or_exit("unexpected error");
 
     for i in 0..n {
         v.check(
@@ -175,7 +172,7 @@ async fn main() {
 
     let coords: Vec<f64> = float_vecs.iter().flat_map(|v| v.iter().copied()).collect();
     let dim = float_vecs[0].len();
-    let gpu_l2 = pairwise_l2_gpu::pairwise_l2_condensed_gpu(&gpu, &coords, n, dim).unwrap();
+    let gpu_l2 = pairwise_l2_gpu::pairwise_l2_condensed_gpu(&gpu, &coords, n, dim).or_exit("unexpected error");
     v.check_pass("L2: pair count", gpu_l2.len() == n * (n - 1) / 2);
     v.check_pass("L2: all finite", gpu_l2.iter().all(|d| d.is_finite()));
     let l2_ms = t.elapsed().as_secs_f64() * 1000.0;
@@ -185,7 +182,7 @@ async fn main() {
     v.section("═══ Spectral Cosine GPU ═══");
     let t = Instant::now();
     let spec: Vec<Vec<f64>> = float_vecs.clone();
-    let gpu_cos = spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spec).unwrap();
+    let gpu_cos = spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spec).or_exit("unexpected error");
     v.check_pass("cosine: results produced", !gpu_cos.is_empty());
     let cos_ms = t.elapsed().as_secs_f64() * 1000.0;
     println!("  Spectral cosine: {cos_ms:.2} ms");

@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -72,6 +64,7 @@ use wetspring_barracuda::bio::gemm_cached::GemmCached;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct Timing {
     label: &'static str,
@@ -95,7 +88,7 @@ fn bench_n<T>(n: usize, mut f: impl FnMut() -> T) -> (T, f64) {
         result = Some(f());
     }
     let us = t0.elapsed().as_nanos() as f64 / 1000.0 / n as f64;
-    (result.unwrap(), us)
+    (result.or_exit("unexpected error"), us)
 }
 
 fn main() {
@@ -116,8 +109,8 @@ fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
-        .expect("tokio runtime");
-    let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+        .or_exit("tokio runtime");
+    let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
 
     let strategy = gpu.fp64_strategy();
     let precision = gpu.optimal_precision();
@@ -174,7 +167,7 @@ fn main() {
             cpu_simpson > 0.0 && cpu_simpson < 1.0,
         );
 
-        let fusion = DiversityFusionGpu::new(Arc::clone(&device)).unwrap();
+        let fusion = DiversityFusionGpu::new(Arc::clone(&device)).or_exit("unexpected error");
         let (gpu_results, ms_gpu) = bench("DiversityFusionGpu 500 taxa", || {
             fusion.compute(&counts, 1, n_taxa)
         });
@@ -448,38 +441,38 @@ fn main() {
         let methods: Vec<(&str, f64, &str, &str)> = vec![
             (
                 "Hargreaves",
-                barracuda::stats::hargreaves_et0(35.0, 32.0, 18.0).unwrap(),
+                barracuda::stats::hargreaves_et0(35.0, 32.0, 18.0).or_exit("unexpected error"),
                 "airSpring V039",
                 "→ ToadStool S70 (Feb 26)",
             ),
             (
                 "FAO-56 PM",
                 barracuda::stats::fao56_et0(21.5, 12.3, 84.0, 63.0, 2.78, 22.07, 100.0, 50.8, 187)
-                    .unwrap(),
+                    .or_exit("unexpected error"),
                 "airSpring V039",
                 "→ ToadStool S70 (Feb 26)",
             ),
             (
                 "Thornthwaite",
-                barracuda::stats::thornthwaite_et0(21.0, hi, 14.5, 30.0).unwrap(),
+                barracuda::stats::thornthwaite_et0(21.0, hi, 14.5, 30.0).or_exit("unexpected error"),
                 "ToadStool S81",
                 "(Mar 1) — new in ToadStool",
             ),
             (
                 "Makkink",
-                barracuda::stats::makkink_et0(20.0, 18.0).unwrap(),
+                barracuda::stats::makkink_et0(20.0, 18.0).or_exit("unexpected error"),
                 "ToadStool S81",
                 "(Mar 1) — new in ToadStool",
             ),
             (
                 "Turc",
-                barracuda::stats::turc_et0(20.0, 18.0, 70.0).unwrap(),
+                barracuda::stats::turc_et0(20.0, 18.0, 70.0).or_exit("unexpected error"),
                 "ToadStool S81",
                 "(Mar 1) — new in ToadStool",
             ),
             (
                 "Hamon",
-                barracuda::stats::hamon_et0(20.0, 14.0).unwrap(),
+                barracuda::stats::hamon_et0(20.0, 14.0).or_exit("unexpected error"),
                 "ToadStool S81",
                 "(Mar 1) — new in ToadStool",
             ),
@@ -513,7 +506,7 @@ fn main() {
                 0.95,
                 42,
             )
-            .unwrap()
+            .or_exit("unexpected error")
         });
         v.check_pass("Bootstrap: lo < hi", ci.lower < ci.upper);
         println!("  CI: [{:.4}, {:.4}]", ci.lower, ci.upper);
@@ -524,7 +517,7 @@ fn main() {
             ms: ms_boot,
         });
 
-        let jk = barracuda::stats::jackknife_mean_variance(&data).unwrap();
+        let jk = barracuda::stats::jackknife_mean_variance(&data).or_exit("unexpected error");
         v.check_pass("Jackknife: variance ≥ 0", jk.variance >= 0.0);
 
         let (_, us_fix) = bench_n(10_000, || {
@@ -544,7 +537,7 @@ fn main() {
         v.check_pass("fit_all: models converge", !fits.is_empty());
         if let Some(b) = fits
             .iter()
-            .max_by(|a, b| a.r_squared.partial_cmp(&b.r_squared).unwrap())
+            .max_by(|a, b| a.r_squared.partial_cmp(&b.r_squared).or_exit("unexpected error"))
         {
             v.check_pass("best R² > 0.95", b.r_squared > 0.95);
             v.check_pass("slope() accessor", b.slope().is_some());
@@ -570,7 +563,7 @@ fn main() {
         let (boltz, ms_boltz) = bench("Boltzmann 5k steps", || {
             barracuda::sample::boltzmann_sampling(&rosenbrock, &initial, 0.1, 0.5, 5000, 42)
         });
-        let boltz_final = *boltz.losses.last().unwrap();
+        let boltz_final = *boltz.losses.last().or_exit("unexpected error");
         v.check_pass("Boltzmann converges", boltz_final < rosenbrock(&initial));
         timings.push(Timing {
             label: "Boltzmann 5k×2D",
@@ -580,12 +573,12 @@ fn main() {
         });
 
         let (sobol, _) = bench("Sobol 10k×5D", || {
-            barracuda::sample::sobol_scaled(10_000, &[(0.0, 1.0); 5]).unwrap()
+            barracuda::sample::sobol_scaled(10_000, &[(0.0, 1.0); 5]).or_exit("unexpected error")
         });
         v.check_pass("Sobol: 10k points", sobol.len() == 10_000);
 
         let (lhs, _) = bench("LHS 10k×5D", || {
-            barracuda::sample::latin_hypercube(10_000, &[(0.0, 1.0); 5], 42).unwrap()
+            barracuda::sample::latin_hypercube(10_000, &[(0.0, 1.0); 5], 42).or_exit("unexpected error")
         });
         v.check_pass("LHS: 10k points", lhs.len() == 10_000);
 
@@ -622,8 +615,8 @@ fn main() {
         match nmf {
             Ok(ref r) => {
                 v.check_pass("NMF converged", !r.errors.is_empty());
-                let last = *r.errors.last().unwrap();
-                let first = *r.errors.first().unwrap();
+                let last = *r.errors.last().or_exit("unexpected error");
+                let first = *r.errors.first().or_exit("unexpected error");
                 v.check_pass("NMF: error decreases", last < first);
                 println!(
                     "  {rows}×{cols}→k=5, {} iters, err={last:.6}",

@@ -34,6 +34,7 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 #[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {
@@ -247,7 +248,7 @@ fn main() {
         &[None, Some(0), Some(1)],
         3,
     )
-    .expect("valid tree");
+    .or_exit("valid tree");
 
     let t0 = Instant::now();
     let pred_low = dt.predict(&[3.0, 0.0, 0.0]);

@@ -44,6 +44,7 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::io::fastq::FastqRecord;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 const SS_FRAC: f64 = 0.1;
 
@@ -227,7 +228,7 @@ fn validate_gbm(v: &mut Validator) {
         &[2, -1, -1],
         &[0.0, 0.3, -0.1],
     )
-    .expect("Barracuda CPU v8");
+    .or_exit("Barracuda CPU v8");
     let t2 = GbmTree::from_arrays(
         &[1, -1, -1],
         &[0.3, 0.0, 0.0],
@@ -235,8 +236,8 @@ fn validate_gbm(v: &mut Validator) {
         &[2, -1, -1],
         &[0.0, 0.2, -0.2],
     )
-    .expect("Barracuda CPU v8");
-    let model = GbmClassifier::new(vec![t1, t2], 0.1, 0.0, 2).expect("Barracuda CPU v8");
+    .or_exit("Barracuda CPU v8");
+    let model = GbmClassifier::new(vec![t1, t2], 0.1, 0.0, 2).or_exit("Barracuda CPU v8");
 
     let samples = vec![vec![0.8, 0.5], vec![0.2, 0.1], vec![0.6, 0.4]];
     let preds = model.predict_batch_proba(&samples);

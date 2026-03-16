@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -91,14 +87,15 @@ fn main() {
     {
         use wetspring_barracuda::bio::diversity_gpu;
         use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::validation::OrExit;
 
         v.section("D28-GPU: FusedMapReduce — Shannon/Simpson GPU Dispatch");
 
         let rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()
-            .expect("tokio runtime");
-        let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+            .or_exit("tokio runtime");
+        let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
 
         if let Ok(g_sh) = diversity_gpu::shannon_gpu(&gpu, &counts_large) {
             v.check(

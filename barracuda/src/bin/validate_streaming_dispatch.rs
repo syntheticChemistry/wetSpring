@@ -31,6 +31,7 @@ use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, kmer, taxonomy, unifrac};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp089: ToadStool Streaming Dispatch Proof");
@@ -254,7 +255,7 @@ fn validate_five_stage_chain(v: &mut Validator) {
         .map(|s| {
             classifier
                 .classify_quantized(s)
-                .expect("trained classifier")
+                .or_exit("trained classifier")
         })
         .collect();
     for i in 0..4 {

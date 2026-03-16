@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -177,7 +173,7 @@ fn main() {
     v.check_pass("ANI > 0.8", ani::pairwise_ani(sa, sb).ani > 0.8);
     v.check_pass(
         "dN/dS computed",
-        dnds::pairwise_dnds(sa, sb).unwrap().dn.is_finite(),
+        dnds::pairwise_dnds(sa, sb).or_exit("unexpected error").dn.is_finite(),
     );
     v.check_pass(
         "SNPs detected",
@@ -264,7 +260,7 @@ fn main() {
     // ═══ D08: FST Variance ═══════════════════════════════════════════
     let t = Instant::now();
     v.section("D08: FST Variance (Weir-Cockerham)");
-    let fst = fst_variance::fst_variance_decomposition(&[0.8, 0.6, 0.3], &[100, 100, 100]).unwrap();
+    let fst = fst_variance::fst_variance_decomposition(&[0.8, 0.6, 0.3], &[100, 100, 100]).or_exit("unexpected error");
     v.check_pass("FST > 0", fst.fst > 0.0);
     v.check_pass("FST < 1", fst.fst < 1.0);
     timings.push(DomainTiming {
@@ -289,7 +285,7 @@ fn main() {
             seed: 42,
         },
     )
-    .unwrap();
+    .or_exit("unexpected error");
     v.check_pass("NMF W,H ≥ 0", nmf.w.iter().chain(&nmf.h).all(|&x| x >= 0.0));
     v.check(
         "erf(1)",
@@ -304,7 +300,7 @@ fn main() {
             .map(|i| f64::from(i).mul_add(0.2, 1.0))
             .collect::<Vec<_>>(),
     )
-    .unwrap();
+    .or_exit("unexpected error");
     v.check(
         "Pearson(linear) = 1",
         pearson,
@@ -321,7 +317,7 @@ fn main() {
     v.section("D10: PCoA + UniFrac");
     v.check_pass(
         "PCoA 3 samples",
-        pcoa::pcoa(&[0.5, 0.8, 0.6], 3, 2).unwrap().n_samples == 3,
+        pcoa::pcoa(&[0.5, 0.8, 0.6], 3, 2).or_exit("unexpected error").n_samples == 3,
     );
     let tree = unifrac::tree::PhyloTree::from_newick("((A:1,B:2):1,(C:3,D:4):2);");
     let mut s1 = std::collections::HashMap::new();
@@ -376,3 +372,4 @@ fn main() {
 
 use wetspring_barracuda::bio::quality;
 use wetspring_barracuda::bio::robinson_foulds;
+use wetspring_barracuda::validation::OrExit;

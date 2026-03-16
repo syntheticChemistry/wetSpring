@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -57,6 +49,7 @@
 
 use std::time::Instant;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct DigestorCommunity {
     name: &'static str,
@@ -334,11 +327,11 @@ fn main() {
     let codig = digest_results
         .iter()
         .find(|r| r.name.contains("codig"))
-        .unwrap();
+        .or_exit("unexpected error");
     let mono = digest_results
         .iter()
         .find(|r| r.name.contains("FW_mono"))
-        .unwrap();
+        .or_exit("unexpected error");
 
     println!(
         "  Co-digestion (Yang2016): H'={:.4}, W={:.2}, P(QS)={:.4}, yield={:.0} mL/g",
@@ -402,9 +395,9 @@ fn main() {
                 })
             }).collect::<Vec<_>>(),
         });
-        let json = serde_json::to_string_pretty(&summary).expect("serialize");
+        let json = serde_json::to_string_pretty(&summary).or_exit("serialize");
         std::fs::create_dir_all("output").ok();
-        std::fs::write("output/liao_real_community_analysis.json", &json).expect("write");
+        std::fs::write("output/liao_real_community_analysis.json", &json).or_exit("write");
         println!("  Exported: output/liao_real_community_analysis.json");
         v.check_pass("JSON export", true);
     }

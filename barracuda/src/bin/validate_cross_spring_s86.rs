@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -35,6 +31,7 @@ use std::time::Instant;
 
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp296: Cross-Spring S86 Rewire Validation");
@@ -53,7 +50,7 @@ fn main() {
         v.check_pass("eigenvalue count matches n", eigs.len() == n);
 
         let mut sorted = eigs;
-        sorted.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        sorted.sort_by(|a, b| a.partial_cmp(b).or_exit("unexpected error"));
         let bandwidth = sorted[n - 1] - sorted[0];
         v.check_pass("1D bandwidth > 0", bandwidth > 0.0);
         v.check_pass("1D bandwidth < 4+W+1", bandwidth < 4.0 + w + 1.0);
@@ -182,7 +179,7 @@ fn main() {
         let dists =
             barracuda::linalg::belief_propagation_chain(&input_dist, &[trans.as_slice()], &dims);
         v.check_pass("belief_propagation returns layers", dists.len() == 2);
-        let final_sum: f64 = dists.last().unwrap().iter().sum();
+        let final_sum: f64 = dists.last().or_exit("unexpected error").iter().sum();
         v.check_pass(
             "final distribution ≈ 1",
             (final_sum - 1.0).abs() < tolerances::ANALYTICAL_LOOSE,
@@ -224,7 +221,7 @@ fn main() {
         v.section("S6: Sample — LHS + Sobol [CPU samplers]");
 
         let bounds = vec![(-5.0, 5.0), (-5.0, 5.0)];
-        let lhs = barracuda::sample::latin_hypercube(100, &bounds, 42).unwrap();
+        let lhs = barracuda::sample::latin_hypercube(100, &bounds, 42).or_exit("unexpected error");
         v.check_pass("LHS: 100 points generated", lhs.len() == 100);
         v.check_pass("LHS: 2D points", lhs[0].len() == 2);
         let all_in_bounds = lhs
@@ -236,7 +233,7 @@ fn main() {
         v.check_pass("random_uniform: 50 points", uniform.len() == 50);
 
         let sobol_bounds = vec![(0.0, 1.0), (0.0, 1.0)];
-        let sobol = barracuda::sample::sobol_scaled(64, &sobol_bounds).unwrap();
+        let sobol = barracuda::sample::sobol_scaled(64, &sobol_bounds).or_exit("unexpected error");
         v.check_pass("Sobol: 64 points generated", sobol.len() == 64);
         let sobol_ok = sobol
             .iter()
@@ -259,20 +256,20 @@ fn main() {
         let hi = barracuda::stats::thornthwaite_heat_index(&monthly);
         v.check_pass("Thornthwaite heat index > 0", hi > 0.0);
 
-        let thorn = barracuda::stats::thornthwaite_et0(21.0, hi, 14.5, 30.0).unwrap();
+        let thorn = barracuda::stats::thornthwaite_et0(21.0, hi, 14.5, 30.0).or_exit("unexpected error");
         v.check_pass("Thornthwaite ET₀ > 0", thorn > 0.0);
         v.check_pass("Thornthwaite ET₀ < 200 mm/month", thorn < 200.0);
 
-        let makk = barracuda::stats::makkink_et0(20.0, 18.0).unwrap();
+        let makk = barracuda::stats::makkink_et0(20.0, 18.0).or_exit("unexpected error");
         v.check_pass("Makkink ET₀ > 0", makk > 0.0);
         v.check_pass("Makkink ET₀ < 10", makk < 10.0);
 
-        let turc_h = barracuda::stats::turc_et0(20.0, 18.0, 70.0).unwrap();
+        let turc_h = barracuda::stats::turc_et0(20.0, 18.0, 70.0).or_exit("unexpected error");
         v.check_pass("Turc ET₀ > 0", turc_h > 0.0);
-        let turc_d = barracuda::stats::turc_et0(20.0, 18.0, 30.0).unwrap();
+        let turc_d = barracuda::stats::turc_et0(20.0, 18.0, 30.0).or_exit("unexpected error");
         v.check_pass("Turc: dry > humid", turc_d > turc_h);
 
-        let hamon = barracuda::stats::hamon_et0(20.0, 14.0).unwrap();
+        let hamon = barracuda::stats::hamon_et0(20.0, 14.0).or_exit("unexpected error");
         v.check_pass("Hamon ET₀ > 0", hamon > 0.0);
         v.check_pass("Hamon ET₀ < 10", hamon < 10.0);
 
@@ -289,17 +286,17 @@ fn main() {
 
         let x = [1.0_f64, 2.0, 3.0, 4.0, 5.0];
         let y = [2.1_f64, 3.9, 6.1, 8.0, 9.9];
-        let fit = barracuda::stats::fit_linear(&x, &y).unwrap();
+        let fit = barracuda::stats::fit_linear(&x, &y).or_exit("unexpected error");
 
         v.check_pass("fit_linear: R² > 0.99", fit.r_squared > 0.99);
 
-        let slope = fit.slope().unwrap();
+        let slope = fit.slope().or_exit("unexpected error");
         v.check_pass(
             "slope() ≈ 2.0",
             (slope - 2.0).abs() < tolerances::SOIL_MODEL_APPROX,
         );
 
-        let intercept = fit.intercept().unwrap();
+        let intercept = fit.intercept().or_exit("unexpected error");
         v.check_pass(
             "intercept() near 0",
             intercept.abs() < tolerances::INTERCEPT_NEAR_ZERO,
@@ -372,8 +369,8 @@ fn main() {
 
         println!(
             "  Tridiagonal: n={n}, λ_min={:.4}, λ_max={:.4}",
-            eigs.first().unwrap(),
-            eigs.last().unwrap()
+            eigs.first().or_exit("unexpected error"),
+            eigs.last().or_exit("unexpected error")
         );
         println!("  Sturm count below 3.0: {count}");
         println!("  {:.2} ms", t.elapsed().as_secs_f64() * 1000.0);
@@ -390,18 +387,18 @@ fn main() {
             (erf_half - 0.5205).abs() < tolerances::CROSS_SPRING_NUMERICAL,
         );
 
-        let lg = barracuda::special::ln_gamma(5.0).unwrap();
+        let lg = barracuda::special::ln_gamma(5.0).or_exit("unexpected error");
         v.check_pass(
             "ln_gamma(5) ≈ ln(24)",
             (lg - 24.0_f64.ln()).abs() < tolerances::ANALYTICAL_LOOSE,
         );
 
-        let hargreaves = barracuda::stats::hargreaves_et0(35.0, 32.0, 18.0).unwrap();
+        let hargreaves = barracuda::stats::hargreaves_et0(35.0, 32.0, 18.0).or_exit("unexpected error");
         v.check_pass("Hargreaves ET₀ > 0", hargreaves > 0.0);
 
         let fao56 =
             barracuda::stats::fao56_et0(21.5, 12.3, 84.0, 63.0, 2.78, 22.07, 100.0, 50.8, 187)
-                .unwrap();
+                .or_exit("unexpected error");
         v.check_pass(
             "FAO-56 ET₀ ≈ 3.88",
             (fao56 - 3.88).abs() < tolerances::FAO56_ET0_PARITY,
@@ -417,7 +414,7 @@ fn main() {
             &[1.0, 2.0, 3.0, 4.0, 5.0],
             &[2.0, 4.0, 5.0, 4.0, 5.0],
         )
-        .unwrap();
+        .or_exit("unexpected error");
         v.check_pass("pearson in [-1,1]", (-1.0..=1.0).contains(&pearson));
 
         println!("  erf(0.5)={erf_half:.6}, ln_Γ(5)={lg:.6}");

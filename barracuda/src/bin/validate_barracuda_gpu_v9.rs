@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -56,6 +48,7 @@ use wetspring_barracuda::df64_host;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct GpuTiming {
     name: &'static str,
@@ -66,8 +59,8 @@ fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
-        .expect("tokio runtime");
-    let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+        .or_exit("tokio runtime");
+    let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
     println!("  GPU: {}", gpu.adapter_name);
     println!("  f64 shaders: {}", gpu.has_f64);
     println!();
@@ -86,13 +79,13 @@ fn main() {
     let ab = vec![10.0, 20.0, 30.0, 15.0, 25.0, 5.0, 12.0, 8.0];
     v.check(
         "Shannon: CPU == GPU",
-        diversity_gpu::shannon_gpu(&gpu, &ab).unwrap(),
+        diversity_gpu::shannon_gpu(&gpu, &ab).or_exit("unexpected error"),
         diversity::shannon(&ab),
         tolerances::GPU_VS_CPU_F64,
     );
     v.check(
         "Simpson: CPU == GPU",
-        diversity_gpu::simpson_gpu(&gpu, &ab).unwrap(),
+        diversity_gpu::simpson_gpu(&gpu, &ab).or_exit("unexpected error"),
         diversity::simpson(&ab),
         tolerances::GPU_VS_CPU_F64,
     );
@@ -139,7 +132,7 @@ fn main() {
     ];
     let cpu_chimera = chimera::detect_chimeras(&asvs, &chimera::ChimeraParams::default());
     let gpu_chimera =
-        chimera_gpu::detect_chimeras_gpu(&gpu, &asvs, &chimera::ChimeraParams::default()).unwrap();
+        chimera_gpu::detect_chimeras_gpu(&gpu, &asvs, &chimera::ChimeraParams::default()).or_exit("unexpected error");
     v.check_pass(
         "Chimera GPU: same result count",
         gpu_chimera.0.len() == cpu_chimera.0.len(),
@@ -157,7 +150,7 @@ fn main() {
     let t = Instant::now();
     v.section("G10: DADA2 GPU");
     let dada2_device = gpu.to_wgpu_device();
-    let dada2_engine = dada2_gpu::Dada2Gpu::new(dada2_device).unwrap();
+    let dada2_engine = dada2_gpu::Dada2Gpu::new(dada2_device).or_exit("unexpected error");
     let seqs = vec![
         derep::UniqueSequence {
             sequence: b"ACGTACGTACGT".to_vec(),
@@ -183,7 +176,7 @@ fn main() {
     ];
     let cpu_dada2 = dada2::denoise(&seqs, &dada2::Dada2Params::default());
     let gpu_dada2 =
-        dada2_gpu::denoise_gpu(&dada2_engine, &seqs, &dada2::Dada2Params::default()).unwrap();
+        dada2_gpu::denoise_gpu(&dada2_engine, &seqs, &dada2::Dada2Params::default()).or_exit("unexpected error");
     v.check_pass(
         "DADA2 GPU: same ASV count",
         gpu_dada2.0.len() == cpu_dada2.0.len(),
@@ -207,7 +200,7 @@ fn main() {
         &[2, -1, -1],
         &[0.0, -0.5, 0.5],
     )
-    .unwrap();
+    .or_exit("unexpected error");
     let tree2 = gbm::GbmTree::from_arrays(
         &[1, -1, -1],
         &[0.3, 0.0, 0.0],
@@ -215,11 +208,11 @@ fn main() {
         &[2, -1, -1],
         &[0.0, -0.3, 0.3],
     )
-    .unwrap();
-    let model = gbm::GbmClassifier::new(vec![tree1, tree2], 0.1, 0.0, 2).unwrap();
+    .or_exit("unexpected error");
+    let model = gbm::GbmClassifier::new(vec![tree1, tree2], 0.1, 0.0, 2).or_exit("unexpected error");
     let samples = vec![vec![0.8, 0.5], vec![0.2, 0.1], vec![0.5, 0.5]];
     let cpu_preds = model.predict_batch_proba(&samples);
-    let gpu_preds = gbm_gpu::predict_batch_gpu(&gpu, &model, &samples).unwrap();
+    let gpu_preds = gbm_gpu::predict_batch_gpu(&gpu, &model, &samples).or_exit("unexpected error");
     v.check_pass(
         "GBM GPU: same batch size",
         gpu_preds.len() == cpu_preds.len(),
@@ -256,7 +249,7 @@ fn main() {
     let cpu_dtl = reconciliation::reconcile_dtl(&host, &parasite, &tip_mapping, &costs);
     let gpu_dtl =
         reconciliation_gpu::reconcile_dtl_gpu(&gpu, &host, &parasite, &tip_mapping, &costs)
-            .unwrap();
+            .or_exit("unexpected error");
     v.check_pass(
         "DTL GPU: cost matches CPU",
         gpu_dtl.optimal_cost == cpu_dtl.optimal_cost,
@@ -273,7 +266,7 @@ fn main() {
     let parent_indices_cpu = vec![Some(4), Some(4), Some(3), Some(4), None];
     let parent_indices_gpu: Vec<i64> = parent_indices_cpu
         .iter()
-        .map(|p| p.map_or(-1, |x| i64::try_from(x).expect("index fits i64")))
+        .map(|p| p.map_or(-1, |x| i64::try_from(x).or_exit("index fits i64")))
         .collect();
     let calibrations = vec![molecular_clock::CalibrationPoint {
         node_id: 4,
@@ -289,7 +282,7 @@ fn main() {
         30.0,
         &calibrations,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     v.check_pass(
         "Clock GPU: both produce result",
         cpu_clock.is_some() == gpu_clock.is_some(),
@@ -309,7 +302,7 @@ fn main() {
         &node_ages,
         &parent_indices_gpu,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     v.check_pass(
         "Relaxed GPU: rates count",
         gpu_rates.len() == branch_lengths.len(),
@@ -330,7 +323,7 @@ fn main() {
         &[None, Some(0), Some(1)],
         2,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     let dt2 = decision_tree::DecisionTree::from_arrays(
         &[1, -1, -1],
         &[0.3, 0.0, 0.0],
@@ -339,12 +332,12 @@ fn main() {
         &[None, Some(0), Some(1)],
         2,
     )
-    .unwrap();
-    let forest = random_forest::RandomForest::from_trees(vec![dt1, dt2], 2).unwrap();
+    .or_exit("unexpected error");
+    let forest = random_forest::RandomForest::from_trees(vec![dt1, dt2], 2).or_exit("unexpected error");
     let rf_gpu = random_forest_gpu::RandomForestGpu::new(&gpu.to_wgpu_device());
     let samples = vec![vec![0.8, 0.5], vec![0.1, 0.9]];
     let cpu_rf = forest.predict_batch_with_votes(&samples);
-    let gpu_rf = rf_gpu.predict_batch(&forest, &samples).unwrap();
+    let gpu_rf = rf_gpu.predict_batch(&forest, &samples).or_exit("unexpected error");
     v.check_pass("RF GPU: same count", gpu_rf.len() == cpu_rf.len());
     for (i, (cp, gp)) in cpu_rf.iter().zip(gpu_rf.iter()).enumerate() {
         v.check_pass(&format!("RF GPU [{i}]: class match"), cp.class == gp.class);
@@ -364,7 +357,7 @@ fn main() {
         seed: 42,
     };
     let rare_result =
-        rarefaction_gpu::rarefaction_bootstrap_gpu(&gpu, &rare_counts, &rare_params).unwrap();
+        rarefaction_gpu::rarefaction_bootstrap_gpu(&gpu, &rare_counts, &rare_params).or_exit("unexpected error");
     v.check_pass(
         "Rarefaction: Shannon CI valid",
         rare_result.shannon.lower <= rare_result.shannon.upper,
@@ -414,7 +407,7 @@ fn main() {
     ];
     let targets = vec![(0.25, 0.25), (0.75, 0.75)];
     let config = kriging::VariogramConfig::spherical(0.0, 1.0, 2.0);
-    let krig = kriging::interpolate_diversity(&gpu, &sites, &targets, &config).unwrap();
+    let krig = kriging::interpolate_diversity(&gpu, &sites, &targets, &config).or_exit("unexpected error");
     v.check_pass("Kriging: 2 values", krig.values.len() == 2);
     v.check_pass("Kriging: finite", krig.values.iter().all(|x| x.is_finite()));
     v.check_pass(

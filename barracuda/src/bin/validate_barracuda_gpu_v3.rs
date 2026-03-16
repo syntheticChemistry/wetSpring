@@ -32,10 +32,6 @@
 //! Validation class: GPU-parity
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
-#![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
 
 use wetspring_barracuda::bio::{
     diversity, diversity_gpu, spectral_match, spectral_match_gpu, stats_gpu,
@@ -43,6 +39,7 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 #[tokio::main]
 async fn main() {
@@ -76,7 +73,7 @@ fn validate_extended_diversity(gpu: &GpuF64, v: &mut Validator) {
     {
         let counts = vec![25.0; 4];
         let cpu = diversity::pielou_evenness(&counts);
-        let gpu_val = diversity_gpu::pielou_evenness_gpu(gpu, &counts).expect("GPU Pielou uniform");
+        let gpu_val = diversity_gpu::pielou_evenness_gpu(gpu, &counts).or_exit("GPU Pielou uniform");
         v.check(
             "Pielou GPU uniform ≈ 1.0",
             gpu_val,
@@ -89,7 +86,7 @@ fn validate_extended_diversity(gpu: &GpuF64, v: &mut Validator) {
     {
         let counts = vec![97.0, 1.0, 1.0, 1.0];
         let cpu = diversity::pielou_evenness(&counts);
-        let gpu_val = diversity_gpu::pielou_evenness_gpu(gpu, &counts).expect("GPU Pielou uneven");
+        let gpu_val = diversity_gpu::pielou_evenness_gpu(gpu, &counts).or_exit("GPU Pielou uneven");
         v.check(
             "Pielou GPU uneven < 0.5",
             gpu_val,
@@ -102,7 +99,7 @@ fn validate_extended_diversity(gpu: &GpuF64, v: &mut Validator) {
     {
         let counts: Vec<f64> = (1..=100).map(f64::from).collect();
         let cpu = diversity::shannon(&counts);
-        let gpu_val = diversity_gpu::shannon_gpu(gpu, &counts).expect("GPU Shannon 100");
+        let gpu_val = diversity_gpu::shannon_gpu(gpu, &counts).or_exit("GPU Shannon 100");
         v.check(
             "Shannon GPU 100 species",
             gpu_val,
@@ -115,7 +112,7 @@ fn validate_extended_diversity(gpu: &GpuF64, v: &mut Validator) {
     {
         let counts: Vec<f64> = (1..=100).map(f64::from).collect();
         let cpu = diversity::simpson(&counts);
-        let gpu_val = diversity_gpu::simpson_gpu(gpu, &counts).expect("GPU Simpson 100");
+        let gpu_val = diversity_gpu::simpson_gpu(gpu, &counts).or_exit("GPU Simpson 100");
         v.check(
             "Simpson GPU 100 species",
             gpu_val,
@@ -128,7 +125,7 @@ fn validate_extended_diversity(gpu: &GpuF64, v: &mut Validator) {
     {
         let counts = vec![10.0, 0.0, 20.0, 0.0, 5.0, 0.0, 0.0, 1.0];
         let cpu = diversity::observed_features(&counts);
-        let gpu_val = diversity_gpu::observed_features_gpu(gpu, &counts).expect("GPU observed");
+        let gpu_val = diversity_gpu::observed_features_gpu(gpu, &counts).or_exit("GPU observed");
         v.check("Observed GPU", gpu_val, cpu, tolerances::GPU_VS_CPU_F64);
     }
 }
@@ -146,7 +143,7 @@ fn validate_bray_curtis_matrix(gpu: &GpuF64, v: &mut Validator) {
             })
             .collect();
         let cpu = diversity::bray_curtis_condensed(&samples);
-        let gpu_val = diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).expect("GPU BC 5×10");
+        let gpu_val = diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).or_exit("GPU BC 5×10");
 
         let n_pairs = 5 * 4 / 2;
         assert_eq!(gpu_val.len(), n_pairs);
@@ -179,7 +176,7 @@ fn validate_bray_curtis_matrix(gpu: &GpuF64, v: &mut Validator) {
             .collect();
         let cpu = diversity::bray_curtis_condensed(&samples);
         let gpu_val =
-            diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).expect("GPU BC 20×50");
+            diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).or_exit("GPU BC 20×50");
 
         let n_pairs = 20 * 19 / 2;
         assert_eq!(gpu_val.len(), n_pairs);
@@ -214,7 +211,7 @@ fn validate_spectral_batch(gpu: &GpuF64, v: &mut Validator) {
     ];
 
     let gpu_pw =
-        spectral_match_gpu::pairwise_cosine_gpu(gpu, &spectra_gpu).expect("GPU pairwise cosine");
+        spectral_match_gpu::pairwise_cosine_gpu(gpu, &spectra_gpu).or_exit("GPU pairwise cosine");
 
     let n_pairs = spectra_gpu.len() * (spectra_gpu.len() - 1) / 2;
     assert_eq!(gpu_pw.len(), n_pairs);
@@ -237,7 +234,7 @@ fn validate_spectral_batch(gpu: &GpuF64, v: &mut Validator) {
     // Self-match (identical vectors) should be ~1.0
     let self_spectra = vec![spectra_gpu[0].clone(), spectra_gpu[0].clone()];
     let self_pw =
-        spectral_match_gpu::pairwise_cosine_gpu(gpu, &self_spectra).expect("GPU self-match");
+        spectral_match_gpu::pairwise_cosine_gpu(gpu, &self_spectra).or_exit("GPU self-match");
     v.check(
         "Spectral GPU self-match ≈ 1.0",
         self_pw[0],
@@ -267,7 +264,7 @@ fn validate_statistics(gpu: &GpuF64, v: &mut Validator) {
     // Variance: GPU returns population variance for this dataset
     {
         let data = vec![2.0, 4.0, 4.0, 4.0, 5.0, 5.0, 7.0, 9.0];
-        let gpu_val = stats_gpu::variance_gpu(gpu, &data).expect("GPU variance");
+        let gpu_val = stats_gpu::variance_gpu(gpu, &data).or_exit("GPU variance");
         let cpu_pop_var = 4.0;
         v.check(
             "Variance GPU (population)",
@@ -281,7 +278,7 @@ fn validate_statistics(gpu: &GpuF64, v: &mut Validator) {
     {
         let x = vec![1.0, 2.0, 3.0, 4.0, 5.0];
         let y = vec![2.0, 4.0, 5.0, 4.0, 5.0];
-        let gpu_corr = stats_gpu::correlation_gpu(gpu, &x, &y).expect("GPU correlation");
+        let gpu_corr = stats_gpu::correlation_gpu(gpu, &x, &y).or_exit("GPU correlation");
         let cpu_corr = 0.774_596_669_241_483_4;
         v.check(
             "Pearson correlation",
@@ -296,7 +293,7 @@ fn validate_statistics(gpu: &GpuF64, v: &mut Validator) {
         let w = vec![1.0; 5];
         let a = vec![1.0, 2.0, 3.0, 4.0, 5.0];
         let b = vec![5.0, 4.0, 3.0, 2.0, 1.0];
-        let gpu_dot = stats_gpu::weighted_dot_gpu(gpu, &w, &a, &b).expect("GPU weighted dot");
+        let gpu_dot = stats_gpu::weighted_dot_gpu(gpu, &w, &a, &b).or_exit("GPU weighted dot");
         let cpu_dot = 35.0;
         v.check(
             "Weighted dot product",
@@ -312,9 +309,9 @@ fn validate_gpu_determinism(gpu: &GpuF64, v: &mut Validator) {
 
     let counts: Vec<f64> = (1..=50).map(f64::from).collect();
 
-    let s1 = diversity_gpu::shannon_gpu(gpu, &counts).expect("GPU Shannon run 1");
-    let s2 = diversity_gpu::shannon_gpu(gpu, &counts).expect("GPU Shannon run 2");
-    let s3 = diversity_gpu::shannon_gpu(gpu, &counts).expect("GPU Shannon run 3");
+    let s1 = diversity_gpu::shannon_gpu(gpu, &counts).or_exit("GPU Shannon run 1");
+    let s2 = diversity_gpu::shannon_gpu(gpu, &counts).or_exit("GPU Shannon run 2");
+    let s3 = diversity_gpu::shannon_gpu(gpu, &counts).or_exit("GPU Shannon run 3");
     v.check(
         "GPU determinism: 3 runs identical",
         f64::from(u8::from(

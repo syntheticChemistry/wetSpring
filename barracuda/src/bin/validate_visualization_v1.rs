@@ -21,6 +21,7 @@
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::visualization::ipc_push::PetalTonguePushClient;
 use wetspring_barracuda::visualization::scenarios::{self, benchmarks::TierResult};
+use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::visualization::{
     DataChannel, EcologyScenario, ScenarioNode, ScientificRange, scenario_with_edges_json,
 };
@@ -41,7 +42,7 @@ fn validate_schema(v: &mut Validator) -> DataChannel {
     v.section("V1 — DataChannel Schema");
 
     let ts = make_test_timeseries();
-    let ts_json = serde_json::to_string(&ts).unwrap();
+    let ts_json = serde_json::to_string(&ts).or_exit("unexpected error");
     v.check_pass(
         "TimeSeries has channel_type tag",
         ts_json.contains("\"channel_type\":\"timeseries\""),
@@ -56,7 +57,7 @@ fn validate_schema(v: &mut Validator) -> DataChannel {
         values: vec![1.0, 2.0],
         unit: "count".into(),
     };
-    let bar_json = serde_json::to_string(&bar).unwrap();
+    let bar_json = serde_json::to_string(&bar).or_exit("unexpected error");
     v.check_pass(
         "Bar has channel_type tag",
         bar_json.contains("\"channel_type\":\"bar\""),
@@ -73,7 +74,7 @@ fn validate_schema(v: &mut Validator) -> DataChannel {
         normal_range: [20.0, 80.0],
         warning_range: [10.0, 20.0],
     };
-    let gauge_json = serde_json::to_string(&gauge).unwrap();
+    let gauge_json = serde_json::to_string(&gauge).or_exit("unexpected error");
     v.check_pass(
         "Gauge has channel_type tag",
         gauge_json.contains("\"channel_type\":\"gauge\""),
@@ -91,7 +92,7 @@ fn validate_schema(v: &mut Validator) -> DataChannel {
         values: vec![0.5],
         unit: "index".into(),
     };
-    let hm_json = serde_json::to_string(&heatmap).unwrap();
+    let hm_json = serde_json::to_string(&heatmap).or_exit("unexpected error");
     v.check_pass(
         "Heatmap has channel_type tag",
         hm_json.contains("\"channel_type\":\"heatmap\""),
@@ -107,7 +108,7 @@ fn validate_schema(v: &mut Validator) -> DataChannel {
         y_label: "PC2".into(),
         unit: "AU".into(),
     };
-    let sc_json = serde_json::to_string(&scatter_ch).unwrap();
+    let sc_json = serde_json::to_string(&scatter_ch).or_exit("unexpected error");
     v.check_pass(
         "Scatter has channel_type tag",
         sc_json.contains("\"channel_type\":\"scatter\""),
@@ -125,7 +126,7 @@ fn validate_schema(v: &mut Validator) -> DataChannel {
         mean: 2.0,
         std: 0.816,
     };
-    let dist_json = serde_json::to_string(&dist).unwrap();
+    let dist_json = serde_json::to_string(&dist).or_exit("unexpected error");
     v.check_pass(
         "Distribution has channel_type tag",
         dist_json.contains("\"channel_type\":\"distribution\""),
@@ -272,7 +273,7 @@ fn validate_ipc(v: &mut Validator, ts: &DataChannel) {
         edges: vec![],
     };
 
-    let render_json = serde_json::to_string(&test_scenario).unwrap();
+    let render_json = serde_json::to_string(&test_scenario).or_exit("unexpected error");
     v.check_pass("IPC render: scenario serializes", !render_json.is_empty());
     v.check_pass(
         "IPC render: contains nodes",

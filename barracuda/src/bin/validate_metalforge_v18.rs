@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -48,6 +44,7 @@ use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{DomainResult, Validator};
 
 use barracuda::stats::norm_cdf;
+use wetspring_barracuda::validation::OrExit;
 
 fn gompertz(t: f64, p: f64, rm: f64, lambda: f64) -> f64 {
     p * (-(rm * std::f64::consts::E / p)
@@ -168,7 +165,7 @@ fn main() {
     // Cross-system property: Gompertz asymptotic
     v.check(
         "MF28: Gompertz H(50) → P across substrates",
-        *g1.last().unwrap(),
+        *g1.last().or_exit("unexpected error"),
         350.0,
         1.0,
     );

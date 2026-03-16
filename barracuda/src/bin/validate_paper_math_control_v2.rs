@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -117,7 +109,7 @@ fn main() {
         &cooperation::CooperationParams::default(),
         0.01,
     ));
-    v.check_pass("Bruger: cooperators persist", *freq.last().unwrap() > 0.1);
+    v.check_pass("Bruger: cooperators persist", *freq.last().or_exit("unexpected error") > 0.1);
 
     v.section("P6: Hsueh 2022 — Phage Defense");
     n_papers += 1;
@@ -203,7 +195,7 @@ fn main() {
         objective: barracuda::linalg::nmf::NmfObjective::KlDivergence,
         seed: 42,
     };
-    let nmf_res = barracuda::linalg::nmf::nmf(&v_mat, 30, 15, &nmf_cfg).expect("NMF");
+    let nmf_res = barracuda::linalg::nmf::nmf(&v_mat, 30, 15, &nmf_cfg).or_exit("NMF");
     v.check_pass(
         "Fajgenbaum: W,H ≥ 0",
         nmf_res.w.iter().chain(&nmf_res.h).all(|&x| x >= 0.0),
@@ -228,7 +220,7 @@ fn main() {
             seed: 42,
         },
     )
-    .expect("NMF rank=3");
+    .or_exit("NMF rank=3");
     let yang_r5 = barracuda::linalg::nmf::nmf(
         &yang_v,
         50,
@@ -241,14 +233,14 @@ fn main() {
             seed: 42,
         },
     )
-    .expect("NMF rank=5");
+    .or_exit("NMF rank=5");
     v.check_pass(
         "Yang: rank=3 converges",
-        *yang_r3.errors.last().unwrap() < *yang_r3.errors.first().unwrap(),
+        *yang_r3.errors.last().or_exit("unexpected error") < *yang_r3.errors.first().or_exit("unexpected error"),
     );
     v.check_pass(
         "Yang: rank=5 converges",
-        *yang_r5.errors.last().unwrap() < *yang_r5.errors.first().unwrap(),
+        *yang_r5.errors.last().or_exit("unexpected error") < *yang_r5.errors.first().or_exit("unexpected error"),
     );
     v.check_pass(
         "Yang: rank=5 lower error",
@@ -341,7 +333,7 @@ fn main() {
     );
     v.check_pass("Anderson: related seqs ANI > 0.8", ani_result.ani > 0.8);
 
-    let dnds_result = dnds::pairwise_dnds(seq_a, seq_b).unwrap();
+    let dnds_result = dnds::pairwise_dnds(seq_a, seq_b).or_exit("unexpected error");
     v.check_pass("Anderson: dN finite", dnds_result.dn.is_finite());
     v.check_pass("Anderson: dS finite", dnds_result.ds.is_finite());
 
@@ -470,6 +462,7 @@ fn main() {
 }
 
 use wetspring_barracuda::bio::ode::OdeResult;
+use wetspring_barracuda::validation::OrExit;
 
 fn ode_tail_mean(r: &OdeResult, var_idx: usize, tail_frac: f64) -> f64 {
     let states: Vec<&[f64]> = r.states().collect();

@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -92,8 +88,8 @@ fn main() {
     );
     let mut timings: Vec<Timing> = Vec::new();
 
-    let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
-    let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+    let rt = tokio::runtime::Runtime::new().or_exit("tokio runtime");
+    let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
     let device = gpu.to_wgpu_device();
     let ctx = gpu.tensor_context().clone();
 
@@ -113,7 +109,7 @@ fn main() {
     let nb = n_batches as usize;
 
     let (bist_res, bist_ms) = bench("Bistable GPU (128 batches)", || {
-        let gpu_ode = BistableGpu::new(Arc::clone(&device)).expect("BistableGpu");
+        let gpu_ode = BistableGpu::new(Arc::clone(&device)).or_exit("BistableGpu");
         let params: Vec<BistableParams> = (0..nb)
             .map(|i| BistableParams {
                 alpha_fb: (i as f64).mul_add(0.01, 2.0),
@@ -123,7 +119,7 @@ fn main() {
         let initial: Vec<[f64; BIST_VARS]> = vec![[0.01, 0.0, 0.0, 0.0, 0.5]; nb];
         gpu_ode
             .integrate_params(&params, &initial, 500, 0.01)
-            .expect("integrate")
+            .or_exit("integrate")
     });
     v.check_pass(
         "Bistable: 128 batches finite",
@@ -136,7 +132,7 @@ fn main() {
     });
 
     let (coop_res, coop_ms) = bench("Cooperation GPU (128 batches)", || {
-        let gpu_ode = CooperationGpu::new(Arc::clone(&device)).expect("CooperationGpu");
+        let gpu_ode = CooperationGpu::new(Arc::clone(&device)).or_exit("CooperationGpu");
         let flat_y0: Vec<f64> = (0..nb)
             .flat_map(|_| [0.01, 0.0, 0.0, 0.0].iter().copied())
             .collect();
@@ -157,7 +153,7 @@ fn main() {
         };
         gpu_ode
             .integrate(&config, &flat_y0, &flat_p)
-            .expect("integrate")
+            .or_exit("integrate")
     });
     v.check_pass(
         "Cooperation: 128 batches finite",
@@ -170,7 +166,7 @@ fn main() {
     });
 
     let (phage_res, phage_ms) = bench("PhageDefense GPU (128 batches)", || {
-        let gpu_ode = PhageDefenseGpu::new(Arc::clone(&device)).expect("PhageDefenseGpu");
+        let gpu_ode = PhageDefenseGpu::new(Arc::clone(&device)).or_exit("PhageDefenseGpu");
         let flat_y0: Vec<f64> = (0..nb)
             .flat_map(|_| [1.0, 0.001, 0.01, 10.0].iter().copied())
             .collect();
@@ -194,7 +190,7 @@ fn main() {
         };
         gpu_ode
             .integrate(&config, &flat_y0, &flat_p)
-            .expect("integrate")
+            .or_exit("integrate")
     });
     v.check_pass(
         "PhageDefense: 128 batches finite",
@@ -208,7 +204,7 @@ fn main() {
 
     let (cap_res, cap_ms) = bench("Capacitor GPU (128 batches)", || {
         use wetspring_barracuda::bio::capacitor::CapacitorParams;
-        let gpu_ode = CapacitorGpu::new(Arc::clone(&device)).expect("CapacitorGpu");
+        let gpu_ode = CapacitorGpu::new(Arc::clone(&device)).or_exit("CapacitorGpu");
         let flat_y0: Vec<f64> = (0..nb)
             .flat_map(|_| [0.01, 0.0, 0.0, 0.0, 0.0, 0.0].iter().copied())
             .collect();
@@ -229,7 +225,7 @@ fn main() {
         };
         gpu_ode
             .integrate(&config, &flat_y0, &flat_p)
-            .expect("integrate")
+            .or_exit("integrate")
     });
     v.check_pass(
         "Capacitor: 128 batches finite",
@@ -243,7 +239,8 @@ fn main() {
 
     let (multi_res, multi_ms) = bench("MultiSignal GPU (128 batches)", || {
         use wetspring_barracuda::bio::multi_signal::MultiSignalParams;
-        let gpu_ode = MultiSignalGpu::new(Arc::clone(&device)).expect("MultiSignalGpu");
+use wetspring_barracuda::validation::OrExit;
+        let gpu_ode = MultiSignalGpu::new(Arc::clone(&device)).or_exit("MultiSignalGpu");
         let flat_y0: Vec<f64> = (0..nb)
             .flat_map(|_| [0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0].iter().copied())
             .collect();
@@ -264,7 +261,7 @@ fn main() {
         };
         gpu_ode
             .integrate(&config, &flat_y0, &flat_p)
-            .expect("integrate")
+            .or_exit("integrate")
     });
     v.check_pass(
         "MultiSignal: 128 batches finite",
@@ -289,9 +286,9 @@ fn main() {
     let n_samples = abundances.len() / n_species;
 
     let (fusion_gpu_res, fusion_gpu_ms) = bench("DiversityFusion GPU (4 samples)", || {
-        let dfg = DiversityFusionGpu::new(Arc::clone(&device)).expect("DiversityFusion init");
+        let dfg = DiversityFusionGpu::new(Arc::clone(&device)).or_exit("DiversityFusion init");
         dfg.compute(&abundances, n_samples, n_species)
-            .expect("DiversityFusion GPU")
+            .or_exit("DiversityFusion GPU")
     });
     let fusion_cpu_res = diversity_fusion_cpu(&abundances, n_species);
 
@@ -397,7 +394,7 @@ fn main() {
     });
 
     let (lng_val, lng_ms) = bench("ln_gamma(5.0) — barracuda::special", || {
-        barracuda::special::ln_gamma(5.0).expect("ln_gamma")
+        barracuda::special::ln_gamma(5.0).or_exit("ln_gamma")
     });
     v.check(
         "ln_gamma(5.0) = ln(24)",
@@ -534,7 +531,7 @@ fn main() {
         let n = 1000;
         let x: Vec<f64> = (0..n).map(|i| f64::from(i) / f64::from(n - 1)).collect();
         let y: Vec<f64> = x.iter().map(|&xi| xi * xi).collect();
-        barracuda::numerical::trapz(&y, &x).expect("trapz")
+        barracuda::numerical::trapz(&y, &x).or_exit("trapz")
     });
     v.check(
         "trapz(x²) ≈ 1/3",
@@ -578,7 +575,7 @@ fn main() {
         .collect();
 
     let (gemm_res, first_ms) = bench("GEMM first dispatch (256×128 × 128×256)", || {
-        gemm.execute(&a_mat, &b_mat, m, k, n, 1).expect("GEMM")
+        gemm.execute(&a_mat, &b_mat, m, k, n, 1).or_exit("GEMM")
     });
     v.check_pass("GEMM result finite", gemm_res.iter().all(|x| x.is_finite()));
     let expected_00: f64 = (0..k).map(|j| a_mat[j] * b_mat[j * n]).sum();
@@ -596,12 +593,12 @@ fn main() {
 
     // Warm-up: amortize GPU clock ramp and ToadStool dispatch_semaphore init
     for _ in 0..5 {
-        let _ = gemm.execute(&a_mat, &b_mat, m, k, n, 1).expect("GEMM");
+        let _ = gemm.execute(&a_mat, &b_mat, m, k, n, 1).or_exit("GEMM");
     }
 
     let ((), repeat_ms) = bench("GEMM ×100 (cached pipeline)", || {
         for _ in 0..100 {
-            let _ = gemm.execute(&a_mat, &b_mat, m, k, n, 1).expect("GEMM");
+            let _ = gemm.execute(&a_mat, &b_mat, m, k, n, 1).or_exit("GEMM");
         }
     });
     let per_dispatch = repeat_ms / 100.0;
@@ -625,7 +622,7 @@ fn main() {
     let vec_b: Vec<f64> = (0..100).map(|i| f64::from(100 - i) * 0.1).collect();
 
     let (pear_val, pear_ms) = bench("pearson_correlation — barracuda::stats", || {
-        barracuda::stats::pearson_correlation(&vec_a, &vec_b).expect("pearson")
+        barracuda::stats::pearson_correlation(&vec_a, &vec_b).or_exit("pearson")
     });
     v.check(
         "pearson(linear, anti-linear) ≈ -1",

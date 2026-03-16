@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -53,6 +49,7 @@ use wetspring_barracuda::validation::{self, DomainResult, Validator};
 use wetspring_barracuda::bio::{diversity_gpu, stats_gpu};
 #[cfg(feature = "gpu")]
 use wetspring_barracuda::gpu::GpuF64;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     #[cfg(not(feature = "gpu"))]
@@ -70,7 +67,7 @@ fn main() {
         let rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()
-            .expect("tokio runtime");
+            .or_exit("tokio runtime");
         let gpu = match rt.block_on(GpuF64::new()) {
             Ok(g) => g,
             Err(e) => {
@@ -106,7 +103,7 @@ fn main() {
         let cpu_shannons: Vec<f64> = communities.iter().map(|c| diversity::shannon(c)).collect();
         let gpu_shannons: Vec<f64> = communities
             .iter()
-            .map(|c| diversity_gpu::shannon_gpu(&gpu, c).expect("GPU shannon"))
+            .map(|c| diversity_gpu::shannon_gpu(&gpu, c).or_exit("GPU shannon"))
             .collect();
 
         for (i, (cpu, g)) in cpu_shannons.iter().zip(gpu_shannons.iter()).enumerate() {
@@ -122,7 +119,7 @@ fn main() {
         let cpu_simpsons: Vec<f64> = communities.iter().map(|c| diversity::simpson(c)).collect();
         let gpu_simpsons: Vec<f64> = communities
             .iter()
-            .map(|c| diversity_gpu::simpson_gpu(&gpu, c).expect("GPU simpson"))
+            .map(|c| diversity_gpu::simpson_gpu(&gpu, c).or_exit("GPU simpson"))
             .collect();
 
         for (i, (cpu, g)) in cpu_simpsons.iter().zip(gpu_simpsons.iter()).enumerate() {
@@ -167,7 +164,7 @@ fn main() {
 
         let cpu_bc_cond = diversity::bray_curtis_condensed(&communities);
         let gpu_bc_cond =
-            diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).expect("GPU BC condensed");
+            diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).or_exit("GPU BC condensed");
         v.check_pass(
             "BrayCurtis GPU: same length as CPU",
             cpu_bc_cond.len() == gpu_bc_cond.len(),
@@ -275,7 +272,7 @@ fn main() {
                 tolerances::ANALYTICAL_F64,
             );
         } else {
-            let gpu_dot = stats_gpu::dot_gpu(&gpu, &query_int, &ref_int).expect("GPU dot");
+            let gpu_dot = stats_gpu::dot_gpu(&gpu, &query_int, &ref_int).or_exit("GPU dot");
             let q_norm: f64 = query_int.iter().map(|x| x * x).sum::<f64>().sqrt();
             let r_norm: f64 = ref_int.iter().map(|x| x * x).sum::<f64>().sqrt();
             let gpu_cosine = gpu_dot / (q_norm * r_norm);
@@ -303,9 +300,9 @@ fn main() {
         let mut g25 = 0_u32;
 
         let cpu_h_var = barracuda::stats::correlation::variance(&cpu_shannons)
-            .expect("CPU variance of Shannon");
+            .or_exit("CPU variance of Shannon");
         let gpu_h_var = barracuda::stats::correlation::variance(&gpu_shannons)
-            .expect("CPU variance of GPU Shannon");
+            .or_exit("CPU variance of GPU Shannon");
         v.check(
             "Cross: Var(GPU H) ≡ Var(CPU H)",
             gpu_h_var,
@@ -315,9 +312,9 @@ fn main() {
         g25 += 1;
 
         let r_gpu = barracuda::stats::pearson_correlation(&gpu_shannons, &gpu_simpsons)
-            .expect("Pearson r GPU H vs Simpson");
+            .or_exit("Pearson r GPU H vs Simpson");
         let r_cpu = barracuda::stats::pearson_correlation(&cpu_shannons, &cpu_simpsons)
-            .expect("Pearson r CPU H vs Simpson");
+            .or_exit("Pearson r CPU H vs Simpson");
         v.check(
             "Cross: r(GPU H, GPU Si) ≡ r(CPU H, CPU Si)",
             r_gpu,
@@ -327,9 +324,9 @@ fn main() {
         g25 += 1;
 
         let jk_gpu =
-            barracuda::stats::jackknife_mean_variance(&gpu_shannons).expect("JK GPU Shannon");
+            barracuda::stats::jackknife_mean_variance(&gpu_shannons).or_exit("JK GPU Shannon");
         let jk_cpu =
-            barracuda::stats::jackknife_mean_variance(&cpu_shannons).expect("JK CPU Shannon");
+            barracuda::stats::jackknife_mean_variance(&cpu_shannons).or_exit("JK CPU Shannon");
         v.check(
             "Cross: JK mean(GPU H) ≡ JK mean(CPU H)",
             jk_gpu.estimate,

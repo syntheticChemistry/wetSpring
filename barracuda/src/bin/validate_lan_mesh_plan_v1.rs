@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -61,6 +57,7 @@
 
 use std::time::Instant;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct TowerNode {
     name: &'static str,
@@ -361,9 +358,9 @@ fn main() {
             },
             "status": "validated — awaiting 10G cables",
         });
-        let json = serde_json::to_string_pretty(&export).expect("serialize");
+        let json = serde_json::to_string_pretty(&export).or_exit("serialize");
         std::fs::create_dir_all("output").ok();
-        std::fs::write("output/lan_mesh_sra_atlas_plan.json", &json).expect("write");
+        std::fs::write("output/lan_mesh_sra_atlas_plan.json", &json).or_exit("write");
         println!("\n  Exported: output/lan_mesh_sra_atlas_plan.json");
         v.check_pass("planning export", true);
     }

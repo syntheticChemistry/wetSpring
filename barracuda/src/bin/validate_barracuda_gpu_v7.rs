@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -61,6 +53,7 @@ use wetspring_barracuda::df64_host;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 fn bench<T>(label: &str, f: impl FnOnce() -> T) -> T {
     let t0 = Instant::now();
@@ -121,15 +114,15 @@ async fn main() {
     });
 
     let gpu_l2 = bench("PairwiseL2 GPU", || {
-        pairwise_l2_gpu::pairwise_l2_condensed_gpu(&gpu, &coords, n, dim).unwrap()
+        pairwise_l2_gpu::pairwise_l2_condensed_gpu(&gpu, &coords, n, dim).or_exit("unexpected error")
     });
 
     v.check_pass("L2 pair count match", gpu_l2.len() == cpu_l2.len());
 
     let mut cpu_sorted = cpu_l2;
     let mut gpu_sorted = gpu_l2;
-    cpu_sorted.sort_by(|a, b| a.partial_cmp(b).unwrap());
-    gpu_sorted.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    cpu_sorted.sort_by(|a, b| a.partial_cmp(b).or_exit("unexpected error"));
+    gpu_sorted.sort_by(|a, b| a.partial_cmp(b).or_exit("unexpected error"));
 
     let max_l2_err = cpu_sorted
         .iter()
@@ -201,8 +194,8 @@ async fn main() {
     let abundances = vec![10.0, 20.0, 30.0, 15.0, 25.0, 5.0, 12.0, 8.0];
     let cpu_h = diversity::shannon(&abundances);
     let cpu_d = diversity::simpson(&abundances);
-    let gpu_h = diversity_gpu::shannon_gpu(&gpu, &abundances).unwrap();
-    let gpu_d = diversity_gpu::simpson_gpu(&gpu, &abundances).unwrap();
+    let gpu_h = diversity_gpu::shannon_gpu(&gpu, &abundances).or_exit("unexpected error");
+    let gpu_d = diversity_gpu::simpson_gpu(&gpu, &abundances).or_exit("unexpected error");
 
     v.check(
         "Shannon: CPU == GPU",
@@ -224,7 +217,7 @@ async fn main() {
         vec![5.0, 10.0, 40.0, 12.0],
     ];
     let cpu_bc = diversity::bray_curtis_condensed(&samples);
-    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).unwrap();
+    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).or_exit("unexpected error");
     for (k, (&c, &g)) in cpu_bc.iter().zip(gpu_bc.iter()).enumerate() {
         v.check(
             &format!("BC[{k}]: CPU == GPU"),
@@ -242,10 +235,10 @@ async fn main() {
         .map(|i| ((i * 13 + 7) % 200 + 1) as f64)
         .collect();
     let cpu_fusion = diversity_fusion_cpu(&large, n_species);
-    let fusion_gpu = DiversityFusionGpu::new(Arc::clone(&device)).expect("DiversityFusionGpu");
+    let fusion_gpu = DiversityFusionGpu::new(Arc::clone(&device)).or_exit("DiversityFusionGpu");
     let gpu_fusion = fusion_gpu
         .compute(&large, n_samples, n_species)
-        .expect("fusion");
+        .or_exit("fusion");
     v.check(
         "Fusion Shannon[0]: CPU == GPU",
         gpu_fusion[0].shannon,
@@ -264,7 +257,7 @@ async fn main() {
     let allele_freqs = [0.8, 0.6, 0.3];
     let sample_sizes = [50, 60, 40];
     let fst_result =
-        fst_variance::fst_variance_decomposition(&allele_freqs, &sample_sizes).unwrap();
+        fst_variance::fst_variance_decomposition(&allele_freqs, &sample_sizes).or_exit("unexpected error");
     v.check_pass("FST in [0,1]", (0.0..=1.0).contains(&fst_result.fst));
     v.check_pass("FST divergent > 0", fst_result.fst > 0.0);
 
@@ -275,7 +268,7 @@ async fn main() {
     let cpu_mean = data.iter().sum::<f64>() / data.len() as f64;
     #[expect(clippy::cast_precision_loss)]
     let cpu_var: f64 = data.iter().map(|x| (x - cpu_mean).powi(2)).sum::<f64>() / data.len() as f64;
-    let gpu_var = stats_gpu::variance_gpu(&gpu, &data).unwrap();
+    let gpu_var = stats_gpu::variance_gpu(&gpu, &data).or_exit("unexpected error");
     v.check(
         "Variance: CPU == GPU",
         gpu_var,
@@ -289,7 +282,7 @@ async fn main() {
         vec![1000.0, 500.0, 200.0, 100.0],
         vec![1000.0, 500.0, 200.0, 100.0],
     ];
-    let gpu_cosines = spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spec).unwrap();
+    let gpu_cosines = spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spec).or_exit("unexpected error");
     v.check(
         "Self-cosine == 1.0",
         gpu_cosines[0],

@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -401,6 +397,7 @@ fn main() {
     #[cfg(feature = "json")]
     {
         use wetspring_barracuda::visualization::{DataChannel, EcologyScenario, ScenarioNode};
+use wetspring_barracuda::validation::OrExit;
 
         let mut atlas_node = ScenarioNode {
             id: "emp_atlas".into(),
@@ -473,10 +470,10 @@ fn main() {
             edges: vec![],
         };
 
-        let json = serde_json::to_string_pretty(&scenario).expect("serialize");
+        let json = serde_json::to_string_pretty(&scenario).or_exit("serialize");
         std::fs::create_dir_all("output").ok();
         let path = "output/emp_anderson_qs_atlas.json";
-        std::fs::write(path, &json).expect("write");
+        std::fs::write(path, &json).or_exit("write");
         println!("  Atlas exported: {path} ({} bytes)", json.len());
         v.check_pass("petalTongue atlas exported", true);
 
@@ -491,9 +488,9 @@ fn main() {
             "model": "H3: W = 3.5*H' + 8*O2",
             "data_source": if std::path::Path::new(real_path).exists() { "real_emp" } else { "synthetic_emp_scale" },
         });
-        let summary_json = serde_json::to_string_pretty(&summary).expect("serialize");
+        let summary_json = serde_json::to_string_pretty(&summary).or_exit("serialize");
         let summary_path = "output/emp_atlas_summary.json";
-        std::fs::write(summary_path, &summary_json).expect("write");
+        std::fs::write(summary_path, &summary_json).or_exit("write");
         println!("  Summary exported: {summary_path}");
         v.check_pass("atlas summary exported", true);
     }

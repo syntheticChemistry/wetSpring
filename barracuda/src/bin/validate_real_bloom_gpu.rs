@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -43,6 +39,7 @@ use wetspring_barracuda::bio::diversity_gpu;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 fn generate_ecosystem(
     name: &str,
@@ -176,8 +173,8 @@ fn main() {
 
     #[cfg(feature = "gpu")]
     {
-        let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
-        let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+        let rt = tokio::runtime::Runtime::new().or_exit("tokio runtime");
+        let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
 
         if !gpu.has_f64 {
             validation::exit_skipped("No SHADER_F64 support");
@@ -195,12 +192,12 @@ fn main() {
         {
             let gpu_shannon: Vec<f64> = eco
                 .iter()
-                .map(|c| diversity_gpu::shannon_gpu(&gpu, c).expect("Shannon GPU"))
+                .map(|c| diversity_gpu::shannon_gpu(&gpu, c).or_exit("Shannon GPU"))
                 .collect();
 
             let _gpu_simpson: Vec<f64> = eco
                 .iter()
-                .map(|c| diversity_gpu::simpson_gpu(&gpu, c).expect("Simpson GPU"))
+                .map(|c| diversity_gpu::simpson_gpu(&gpu, c).or_exit("Simpson GPU"))
                 .collect();
 
             // Parity: GPU Shannon ≈ CPU Shannon
@@ -226,7 +223,7 @@ fn main() {
                         &gpu,
                         &[w[0].clone(), w[1].clone()],
                     )
-                    .expect("Bray-Curtis GPU");
+                    .or_exit("Bray-Curtis GPU");
                     bc_mat[0]
                 })
                 .collect();

@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::similar_names,
     reason = "validation harness: domain variables from published notation"
 )]
@@ -48,6 +44,7 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 #[tokio::main]
 async fn main() {
@@ -71,7 +68,7 @@ async fn main() {
     v.section("G01: Shannon");
     let abundances = vec![10.0, 20.0, 30.0, 15.0, 25.0, 5.0, 12.0, 8.0];
     let cpu_h = diversity::shannon(&abundances);
-    let gpu_h = diversity_gpu::shannon_gpu(&gpu, &abundances).unwrap();
+    let gpu_h = diversity_gpu::shannon_gpu(&gpu, &abundances).or_exit("unexpected error");
     v.check(
         "Shannon: CPU == GPU",
         gpu_h,
@@ -82,7 +79,7 @@ async fn main() {
     // ═══ G02: Simpson (FMR) ══════════════════════════════════════════
     v.section("G02: Simpson");
     let cpu_d = diversity::simpson(&abundances);
-    let gpu_d = diversity_gpu::simpson_gpu(&gpu, &abundances).unwrap();
+    let gpu_d = diversity_gpu::simpson_gpu(&gpu, &abundances).or_exit("unexpected error");
     v.check(
         "Simpson: CPU == GPU",
         gpu_d,
@@ -93,7 +90,7 @@ async fn main() {
     // ═══ G03: Observed Features (FMR) ════════════════════════════════
     v.section("G03: Observed Features");
     let cpu_obs = diversity::observed_features(&abundances);
-    let gpu_obs = diversity_gpu::observed_features_gpu(&gpu, &abundances).unwrap();
+    let gpu_obs = diversity_gpu::observed_features_gpu(&gpu, &abundances).or_exit("unexpected error");
     v.check(
         "Observed: CPU == GPU",
         gpu_obs,
@@ -104,7 +101,7 @@ async fn main() {
     // ═══ G04: Pielou Evenness (FMR) ══════════════════════════════════
     v.section("G04: Pielou Evenness");
     let cpu_j = diversity::pielou_evenness(&abundances);
-    let gpu_j = diversity_gpu::pielou_evenness_gpu(&gpu, &abundances).unwrap();
+    let gpu_j = diversity_gpu::pielou_evenness_gpu(&gpu, &abundances).or_exit("unexpected error");
     v.check(
         "Pielou: CPU == GPU",
         gpu_j,
@@ -120,7 +117,7 @@ async fn main() {
         vec![5.0, 10.0, 40.0, 12.0],
     ];
     let cpu_bc = diversity::bray_curtis_condensed(&samples);
-    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).unwrap();
+    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).or_exit("unexpected error");
     v.check_count("BC length match", gpu_bc.len(), cpu_bc.len());
     for (k, (&c, &g)) in cpu_bc.iter().zip(gpu_bc.iter()).enumerate() {
         v.check(
@@ -133,7 +130,7 @@ async fn main() {
 
     // ═══ G06: Alpha Diversity (full) ═════════════════════════════════
     v.section("G06: Full Alpha Diversity");
-    let alpha = diversity_gpu::alpha_diversity_gpu(&gpu, &abundances).unwrap();
+    let alpha = diversity_gpu::alpha_diversity_gpu(&gpu, &abundances).or_exit("unexpected error");
     v.check(
         "Alpha Shannon",
         alpha.shannon,
@@ -158,9 +155,9 @@ async fn main() {
     };
     let obs_cpu: Vec<usize> = (0..100).map(|i| i % 2).collect();
     let cpu_fwd = hmm::forward(&hmm_model, &obs_cpu);
-    let hmm_gpu = HmmGpuForward::new(&device).unwrap();
+    let hmm_gpu = HmmGpuForward::new(&device).or_exit("unexpected error");
     let obs_gpu: Vec<u32> = obs_cpu.iter().map(|&o| o as u32).collect();
-    let gpu_fwd = hmm_gpu.forward_batch(&hmm_model, &obs_gpu, 1, 100).unwrap();
+    let gpu_fwd = hmm_gpu.forward_batch(&hmm_model, &obs_gpu, 1, 100).or_exit("unexpected error");
     v.check(
         "HMM log-likelihood: CPU == GPU",
         gpu_fwd.log_likelihoods[0],
@@ -172,10 +169,10 @@ async fn main() {
     v.section("G08: dN/dS");
     let seq_a = b"ATGATGATGATGATGATGATGATGATGATG";
     let seq_b = b"ATGGTGATGATGATGCTGATGATGATGATG";
-    let cpu_dnds = dnds::pairwise_dnds(seq_a, seq_b).unwrap();
-    let dnds_gpu = DnDsGpu::new(&device).unwrap();
+    let cpu_dnds = dnds::pairwise_dnds(seq_a, seq_b).or_exit("unexpected error");
+    let dnds_gpu = DnDsGpu::new(&device).or_exit("unexpected error");
     let pairs: Vec<(&[u8], &[u8])> = vec![(seq_a.as_slice(), seq_b.as_slice())];
-    let gpu_batch = dnds_gpu.batch_dnds(&pairs).unwrap();
+    let gpu_batch = dnds_gpu.batch_dnds(&pairs).or_exit("unexpected error");
     v.check(
         "dN: CPU == GPU",
         gpu_batch.dn[0],
@@ -194,8 +191,8 @@ async fn main() {
     let snp_seqs: Vec<&[u8]> = vec![b"ATGCATGCATGCATGCATGCATGC", b"ATGGATGCATGCATGCATGCATGC"];
     let cpu_snps = snp::call_snps(&snp_seqs);
     let cpu_variant_count = cpu_snps.variants.len();
-    let snp_gpu_dev = SnpGpu::new(&device).unwrap();
-    let gpu_snps = snp_gpu_dev.call_snps(&snp_seqs).unwrap();
+    let snp_gpu_dev = SnpGpu::new(&device).or_exit("unexpected error");
+    let gpu_snps = snp_gpu_dev.call_snps(&snp_seqs).or_exit("unexpected error");
     let gpu_variant_count = gpu_snps.is_variant.iter().filter(|&&v| v == 1).count();
     v.check_count(
         "SNP variant count: CPU == GPU",
@@ -220,12 +217,12 @@ async fn main() {
         },
     ];
     let cpu_pan = pangenome::analyze(&clusters, 3);
-    let pan_gpu_dev = PangenomeGpu::new(&device).unwrap();
+    let pan_gpu_dev = PangenomeGpu::new(&device).or_exit("unexpected error");
     let presence_flat: Vec<u8> = clusters
         .iter()
         .flat_map(|c| c.presence.iter().map(|&p| u8::from(p)))
         .collect();
-    let gpu_pan = pan_gpu_dev.classify(&presence_flat, 3, 3).unwrap();
+    let gpu_pan = pan_gpu_dev.classify(&presence_flat, 3, 3).or_exit("unexpected error");
     v.check_count("Core: CPU == GPU", gpu_pan.core_count(), cpu_pan.core_size);
 
     // ═══ G11: Stats GPU (variance) ═══════════════════════════════════
@@ -233,7 +230,7 @@ async fn main() {
     let data: Vec<f64> = (1..=1000).map(f64::from).collect();
     let cpu_mean = data.iter().sum::<f64>() / data.len() as f64;
     let cpu_var: f64 = data.iter().map(|x| (x - cpu_mean).powi(2)).sum::<f64>() / data.len() as f64;
-    let gpu_var = stats_gpu::variance_gpu(&gpu, &data).unwrap();
+    let gpu_var = stats_gpu::variance_gpu(&gpu, &data).or_exit("unexpected error");
     v.check(
         "Variance: CPU == GPU",
         gpu_var,
@@ -246,7 +243,7 @@ async fn main() {
     let spec_a: Vec<f64> = vec![1000.0, 500.0, 200.0, 100.0];
     let spec_b: Vec<f64> = vec![1000.0, 500.0, 200.0, 100.0];
     let spectra = vec![spec_a, spec_b];
-    let gpu_cosines = spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).unwrap();
+    let gpu_cosines = spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).or_exit("unexpected error");
     v.check(
         "Self-cosine == 1.0",
         gpu_cosines[0],

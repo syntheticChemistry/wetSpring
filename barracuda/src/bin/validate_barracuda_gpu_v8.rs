@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::similar_names,
     reason = "validation harness: domain variables from published notation"
 )]
@@ -75,6 +71,7 @@ use wetspring_barracuda::df64_host;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 struct GpuTiming {
     name: &'static str,
@@ -110,13 +107,13 @@ async fn main() {
     let ab = vec![10.0, 20.0, 30.0, 15.0, 25.0, 5.0, 12.0, 8.0];
     v.check(
         "Shannon: CPU == GPU",
-        diversity_gpu::shannon_gpu(&gpu, &ab).unwrap(),
+        diversity_gpu::shannon_gpu(&gpu, &ab).or_exit("unexpected error"),
         diversity::shannon(&ab),
         tolerances::GPU_VS_CPU_F64,
     );
     v.check(
         "Simpson: CPU == GPU",
-        diversity_gpu::simpson_gpu(&gpu, &ab).unwrap(),
+        diversity_gpu::simpson_gpu(&gpu, &ab).or_exit("unexpected error"),
         diversity::simpson(&ab),
         tolerances::GPU_VS_CPU_F64,
     );
@@ -127,7 +124,7 @@ async fn main() {
         vec![5.0, 10.0, 40.0],
     ];
     let cpu_bc = diversity::bray_curtis_condensed(&samples);
-    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).unwrap();
+    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).or_exit("unexpected error");
     for (k, (&c, &g)) in cpu_bc.iter().zip(gpu_bc.iter()).enumerate() {
         v.check(&format!("BC[{k}]"), g, c, tolerances::GPU_VS_CPU_F64);
     }
@@ -146,9 +143,9 @@ async fn main() {
         .collect();
     let cpu_f = diversity_fusion_cpu(&large, n_sp);
     let gpu_f = DiversityFusionGpu::new(Arc::clone(&device))
-        .unwrap()
+        .or_exit("unexpected error")
         .compute(&large, n_sa, n_sp)
-        .unwrap();
+        .or_exit("unexpected error");
     v.check(
         "Fusion Shannon[0]",
         gpu_f[0].shannon,
@@ -178,7 +175,7 @@ async fn main() {
     };
     let obs: Vec<usize> = (0..100).map(|i| i % 2).collect();
     let cpu_ll = hmm::forward(&hmm_model, &obs).log_likelihood;
-    let hmm_dev = HmmGpuForward::new(&device).unwrap();
+    let hmm_dev = HmmGpuForward::new(&device).or_exit("unexpected error");
     let gpu_ll = hmm_dev
         .forward_batch(
             &hmm_model,
@@ -186,7 +183,7 @@ async fn main() {
             1,
             100,
         )
-        .unwrap();
+        .or_exit("unexpected error");
     v.check(
         "HMM LL",
         gpu_ll.log_likelihoods[0],
@@ -203,11 +200,11 @@ async fn main() {
     v.section("G04: dN/dS GPU");
     let sa = b"ATGATGATGATGATGATGATGATGATGATG";
     let sb = b"ATGGTGATGATGATGCTGATGATGATGATG";
-    let cpu_dnds = dnds::pairwise_dnds(sa, sb).unwrap();
-    let dnds_dev = DnDsGpu::new(&device).unwrap();
+    let cpu_dnds = dnds::pairwise_dnds(sa, sb).or_exit("unexpected error");
+    let dnds_dev = DnDsGpu::new(&device).or_exit("unexpected error");
     let gpu_dnds = dnds_dev
         .batch_dnds(&[(sa.as_slice(), sb.as_slice())])
-        .unwrap();
+        .or_exit("unexpected error");
     v.check(
         "dN",
         gpu_dnds.dn[0],
@@ -230,7 +227,7 @@ async fn main() {
     v.section("G05: SNP GPU");
     let snp_seqs: Vec<&[u8]> = vec![b"ATGCATGCATGCATGCATGCATGC", b"ATGGATGCATGCATGCATGCATGC"];
     let cpu_snps = snp::call_snps(&snp_seqs);
-    let gpu_snps = SnpGpu::new(&device).unwrap().call_snps(&snp_seqs).unwrap();
+    let gpu_snps = SnpGpu::new(&device).or_exit("unexpected error").call_snps(&snp_seqs).or_exit("unexpected error");
     v.check_count(
         "SNP count",
         gpu_snps.is_variant.iter().filter(|&&x| x == 1).count(),
@@ -264,9 +261,9 @@ async fn main() {
         .flat_map(|c| c.presence.iter().map(|&p| u8::from(p)))
         .collect();
     let gpu_pan = PangenomeGpu::new(&device)
-        .unwrap()
+        .or_exit("unexpected error")
         .classify(&flat, 3, 3)
-        .unwrap();
+        .or_exit("unexpected error");
     v.check_count("Core", gpu_pan.core_count(), cpu_pan.core_size);
     timings.push(GpuTiming {
         name: "Pangenome",
@@ -281,7 +278,7 @@ async fn main() {
     let coords: Vec<f64> = (0..n * dim)
         .map(|i| ((i * 17 + 3) % 100) as f64 / 100.0)
         .collect();
-    let gpu_l2 = pairwise_l2_gpu::pairwise_l2_condensed_gpu(&gpu, &coords, n, dim).unwrap();
+    let gpu_l2 = pairwise_l2_gpu::pairwise_l2_condensed_gpu(&gpu, &coords, n, dim).or_exit("unexpected error");
     v.check_pass("L2 pair count", gpu_l2.len() == n * (n - 1) / 2);
     v.check_pass("L2 all finite", gpu_l2.iter().all(|d| d.is_finite()));
     timings.push(GpuTiming {
@@ -299,7 +296,7 @@ async fn main() {
     let cpu_var = data.iter().map(|x| (x - cpu_mean).powi(2)).sum::<f64>() / data.len() as f64;
     v.check(
         "Variance",
-        stats_gpu::variance_gpu(&gpu, &data).unwrap(),
+        stats_gpu::variance_gpu(&gpu, &data).or_exit("unexpected error"),
         cpu_var,
         tolerances::GPU_VS_CPU_F64,
     );
@@ -317,7 +314,7 @@ async fn main() {
     ];
     v.check(
         "Self-cosine",
-        spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spec).unwrap()[0],
+        spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spec).or_exit("unexpected error")[0],
         1.0,
         tolerances::GPU_VS_CPU_F64,
     );
@@ -339,7 +336,7 @@ async fn main() {
         .map(|i| ((i * 11 + 5) % 100) as f64 / 100.0)
         .collect();
     let gemm = GemmCached::new(Arc::clone(&device), Arc::clone(&ctx));
-    let res = gemm.execute(&a, &b_mat, m, k, n_g, 1).unwrap();
+    let res = gemm.execute(&a, &b_mat, m, k, n_g, 1).or_exit("unexpected error");
     v.check_pass("GEMM finite", res.iter().all(|x| x.is_finite()));
     let expected_00: f64 = (0..k).map(|j| a[j] * b_mat[j * n_g]).sum();
     v.check(

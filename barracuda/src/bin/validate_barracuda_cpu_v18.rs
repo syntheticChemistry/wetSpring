@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -44,6 +36,7 @@
 use std::time::Instant;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct Timing {
     name: &'static str,
@@ -66,7 +59,7 @@ fn main() {
     let t0 = Instant::now();
     let ci =
         barracuda::stats::bootstrap_ci(&diversity_data, barracuda::stats::mean, 10_000, 0.95, 42)
-            .expect("bootstrap_ci");
+            .or_exit("bootstrap_ci");
     let bs_us = t0.elapsed().as_micros() as f64;
     timings.push(Timing {
         name: "bootstrap_ci(10k)",
@@ -104,7 +97,7 @@ fn main() {
     let abundances = [10.0, 25.0, 3.0, 1.0, 42.0, 7.0, 15.0, 2.0, 8.0, 30.0];
 
     let t1 = Instant::now();
-    let rawr = barracuda::stats::rawr_mean(&abundances, 5_000, 0.95, 123).expect("rawr_mean");
+    let rawr = barracuda::stats::rawr_mean(&abundances, 5_000, 0.95, 123).or_exit("rawr_mean");
     let rawr_us = t1.elapsed().as_micros() as f64;
     timings.push(Timing {
         name: "rawr_mean(5k)",
@@ -128,7 +121,7 @@ fn main() {
     // ═══ S3: Bootstrap + Jackknife Cross-Validation ═════════════════════════
     v.section("S3: Bootstrap vs Jackknife — SE Comparison (cross-spring validation)");
 
-    let jk = barracuda::stats::jackknife_mean_variance(&diversity_data).unwrap();
+    let jk = barracuda::stats::jackknife_mean_variance(&diversity_data).or_exit("unexpected error");
     let bs_se = ci.std_error;
     let jk_se = jk.std_error;
 
@@ -242,7 +235,7 @@ fn main() {
     v.check_pass("fit_all: non-empty", !all_fits.is_empty());
     let best = all_fits
         .iter()
-        .max_by(|a, b| a.r_squared.partial_cmp(&b.r_squared).unwrap());
+        .max_by(|a, b| a.r_squared.partial_cmp(&b.r_squared).or_exit("unexpected error"));
     if let Some(fb) = best {
         v.check_pass(
             "Best model = logarithmic (for log data)",
@@ -272,7 +265,7 @@ fn main() {
             0.95,
             99,
         )
-        .expect("residual bootstrap");
+        .or_exit("residual bootstrap");
 
         v.check_pass(
             "Residual CI contains 0 (unbiased fit)",
@@ -332,7 +325,7 @@ fn main() {
         0.95,
         77,
     )
-    .expect("power bootstrap");
+    .or_exit("power bootstrap");
     v.check_pass("Power CI: lower > 0", obs_ci.lower > 0.0);
     v.check_pass("Power CI: meaningful range", obs_ci.upper >= obs_ci.lower);
     println!(

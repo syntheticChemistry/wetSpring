@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -39,6 +35,7 @@ use std::time::Instant;
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, DomainResult, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp310: metalForge v15 — V97 Cross-System Fused Ops");
@@ -67,12 +64,12 @@ fn main() {
     // Stats stage (Welford + Pearson)
     let h_mean = barracuda::stats::metrics::mean(&shannons);
     let h_svar =
-        barracuda::stats::correlation::variance(&shannons).expect("Shannon variance requires n≥2");
+        barracuda::stats::correlation::variance(&shannons).or_exit("Shannon variance requires n≥2");
     let _si_mean = barracuda::stats::metrics::mean(&simpsons);
     let r_hs = barracuda::stats::pearson_correlation(&shannons, &simpsons)
-        .expect("Pearson correlation requires equal-length vectors with n≥2");
+        .or_exit("Pearson correlation requires equal-length vectors with n≥2");
     let cov_hs = barracuda::stats::covariance(&shannons, &simpsons)
-        .expect("Covariance(H, Simpson) requires equal-length vectors with n≥2");
+        .or_exit("Covariance(H, Simpson) requires equal-length vectors with n≥2");
 
     // NMF stage
     let drug_disease = vec![0.8, 0.1, 0.0, 0.2, 0.7, 0.1, 0.0, 0.1, 0.9];
@@ -88,7 +85,7 @@ fn main() {
             seed: 42,
         },
     )
-    .expect("NMF");
+    .or_exit("NMF");
 
     // Anderson stage
     let w = 5.0_f64;
@@ -134,7 +131,7 @@ fn main() {
     let shannons_2: Vec<f64> = communities.iter().map(|c| diversity::shannon(c)).collect();
     let h_mean_2 = barracuda::stats::metrics::mean(&shannons_2);
     let r_hs_2 = barracuda::stats::pearson_correlation(&shannons_2, &simpsons)
-        .expect("Pearson correlation re-run requires equal-length vectors with n≥2");
+        .or_exit("Pearson correlation re-run requires equal-length vectors with n≥2");
 
     v.check(
         "Determinism: H mean run1 = run2",
@@ -164,7 +161,7 @@ fn main() {
             seed: 42,
         },
     )
-    .expect("NMF re-run");
+    .or_exit("NMF re-run");
     v.check(
         "Determinism: NMF W[0] run1 = run2",
         nmf_2.w[0],
@@ -192,9 +189,9 @@ fn main() {
     let soil_tilled = [0.385, 0.392, 0.380, 0.390, 0.388];
 
     let var_nt = barracuda::stats::correlation::variance(&soil_notill)
-        .expect("soil no-till variance requires n≥2");
+        .or_exit("soil no-till variance requires n≥2");
     let var_ti = barracuda::stats::correlation::variance(&soil_tilled)
-        .expect("soil tilled variance requires n≥2");
+        .or_exit("soil tilled variance requires n≥2");
     let mean_nt = barracuda::stats::metrics::mean(&soil_notill);
     let mean_ti = barracuda::stats::metrics::mean(&soil_tilled);
 
@@ -221,7 +218,7 @@ fn main() {
         .map(|&ic50| ic50 / (ic50 + 10.0))
         .collect();
     let r_ic50 = barracuda::stats::pearson_correlation(&ic50_values, &hill_responses)
-        .expect("Pearson r(IC50, Hill) requires equal-length vectors with n≥2");
+        .or_exit("Pearson r(IC50, Hill) requires equal-length vectors with n≥2");
     v.check_pass("Pharma: r(IC50, Hill) > 0", r_ic50 > 0.0);
     mc_checks += 1;
 
@@ -279,7 +276,7 @@ fn main() {
 
     // groundSpring: validation patterns (jackknife)
     let jk = barracuda::stats::jackknife_mean_variance(&[1.0, 2.0, 3.0, 4.0, 5.0])
-        .expect("jackknife requires n≥2");
+        .or_exit("jackknife requires n≥2");
     v.check(
         "groundSpring: JK mean = 3",
         jk.estimate,

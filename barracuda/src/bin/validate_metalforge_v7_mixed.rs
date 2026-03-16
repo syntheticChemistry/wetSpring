@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -54,6 +50,7 @@ use wetspring_barracuda::bio::qs_biofilm::{self, QsBiofilmParams};
 use wetspring_barracuda::ipc::dispatch;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn synthetic_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     let mut counts = Vec::with_capacity(n_species);
@@ -88,11 +85,11 @@ fn validate_cross_substrate_diversity(v: &mut Validator) {
         let cpu_j = diversity::pielou_evenness(counts);
 
         let params = json!({"counts": counts, "metrics": ["all"]});
-        let result = dispatch::dispatch("science.diversity", &params).expect("dispatch");
-        let mf_h = result["shannon"].as_f64().expect("h");
-        let mf_d = result["simpson"].as_f64().expect("d");
-        let mf_c = result["chao1"].as_f64().expect("c");
-        let mf_j = result["pielou"].as_f64().expect("j");
+        let result = dispatch::dispatch("science.diversity", &params).or_exit("dispatch");
+        let mf_h = result["shannon"].as_f64().or_exit("h");
+        let mf_d = result["simpson"].as_f64().or_exit("d");
+        let mf_c = result["chao1"].as_f64().or_exit("c");
+        let mf_j = result["pielou"].as_f64().or_exit("j");
 
         v.check(
             &format!("comm{i} Shannon cross-substrate"),
@@ -141,8 +138,8 @@ fn validate_cross_substrate_bray_curtis(v: &mut Validator) {
     for (i, (a, b)) in pairs.iter().enumerate() {
         let cpu_bc = diversity::bray_curtis(a, b);
         let params = json!({"counts": a, "counts_b": b});
-        let result = dispatch::dispatch("science.diversity", &params).expect("bc");
-        let mf_bc = result["bray_curtis"].as_f64().expect("bray_curtis");
+        let result = dispatch::dispatch("science.diversity", &params).or_exit("bc");
+        let mf_bc = result["bray_curtis"].as_f64().or_exit("bray_curtis");
 
         v.check(
             &format!("pair{i} BC cross-substrate"),
@@ -156,8 +153,8 @@ fn validate_cross_substrate_bray_curtis(v: &mut Validator) {
     let large_b = synthetic_community(300, 0.3, 5678);
     let cpu_bc = diversity::bray_curtis(&large_a, &large_b);
     let params = json!({"counts": large_a, "counts_b": large_b});
-    let result = dispatch::dispatch("science.diversity", &params).expect("large bc");
-    let mf_bc = result["bray_curtis"].as_f64().expect("bray_curtis");
+    let result = dispatch::dispatch("science.diversity", &params).or_exit("large bc");
+    let mf_bc = result["bray_curtis"].as_f64().or_exit("bray_curtis");
 
     v.check(
         "large BC cross-substrate",
@@ -205,10 +202,10 @@ fn validate_cross_substrate_qs(v: &mut Validator) {
             .fold(0.0_f64, f64::max);
 
         let params = json!({"scenario": scenario, "dt": dt});
-        let result = dispatch::dispatch("science.qs_model", &params).expect("qs");
-        let mf_t_end = result["t_end"].as_f64().expect("t_end");
-        let mf_peak = result["peak_biofilm"].as_f64().expect("peak");
-        let mf_steps = result["steps"].as_u64().expect("steps");
+        let result = dispatch::dispatch("science.qs_model", &params).or_exit("qs");
+        let mf_t_end = result["t_end"].as_f64().or_exit("t_end");
+        let mf_peak = result["peak_biofilm"].as_f64().or_exit("peak");
+        let mf_steps = result["steps"].as_u64().or_exit("steps");
 
         v.check(
             &format!("{scenario} t_end cross-substrate"),
@@ -368,10 +365,10 @@ fn validate_gpu_cpu_fallback(v: &mut Validator) {
 
     let counts: &[f64] = &[100.0, 80.0, 60.0, 40.0, 20.0, 10.0, 5.0, 3.0, 2.0, 1.0];
     let fallback_result = dispatch::dispatch("science.diversity", &json!({"counts": counts}))
-        .expect("diversity always works (CPU fallback)");
+        .or_exit("diversity always works (CPU fallback)");
 
     let cpu_h = diversity::shannon(counts);
-    let fb_h = fallback_result["shannon"].as_f64().expect("h");
+    let fb_h = fallback_result["shannon"].as_f64().or_exit("h");
     v.check(
         "diversity CPU fallback parity",
         fb_h,
@@ -383,7 +380,7 @@ fn validate_gpu_cpu_fallback(v: &mut Validator) {
         "science.full_pipeline",
         &json!({"counts": counts, "scenario": "standard_growth"}),
     )
-    .expect("pipeline works with fallback");
+    .or_exit("pipeline works with fallback");
     v.check_pass(
         "pipeline completes with fallback",
         pipeline["pipeline"] == "complete",
@@ -410,11 +407,11 @@ fn validate_nucleus_coordination(v: &mut Validator) {
     v.section("═══ MF06: NUCLEUS Tower→Node→Nest Coordination ═══");
     let t = Instant::now();
 
-    let health = dispatch::dispatch("health.check", &json!({})).expect("health");
+    let health = dispatch::dispatch("health.check", &json!({})).or_exit("health");
     v.check_pass("Tower: primal=wetspring", health["primal"] == "wetspring");
     v.check_pass("Tower: status=healthy", health["status"] == "healthy");
 
-    let caps = health["capabilities"].as_array().expect("caps");
+    let caps = health["capabilities"].as_array().or_exit("caps");
     let cap_strs: Vec<&str> = caps.iter().filter_map(|c| c.as_str()).collect();
 
     let expected_caps = [
@@ -431,9 +428,9 @@ fn validate_nucleus_coordination(v: &mut Validator) {
 
     let node_counts: &[f64] = &[50.0, 40.0, 30.0, 20.0, 10.0];
     let node_result = dispatch::dispatch("science.diversity", &json!({"counts": node_counts}))
-        .expect("node diversity");
+        .or_exit("node diversity");
     let direct_h = diversity::shannon(node_counts);
-    let node_h = node_result["shannon"].as_f64().expect("h");
+    let node_h = node_result["shannon"].as_f64().or_exit("h");
     v.check(
         "Node: diversity math fidelity",
         node_h,
@@ -443,7 +440,7 @@ fn validate_nucleus_coordination(v: &mut Validator) {
 
     let nest_result =
         dispatch::dispatch("science.qs_model", &json!({"scenario": "standard_growth"}))
-            .expect("nest qs");
+            .or_exit("nest qs");
     v.check_pass(
         "Nest: QS result has steps",
         nest_result.get("steps").is_some(),
@@ -480,14 +477,14 @@ fn validate_biomeos_graph_e2e(v: &mut Validator) {
         "dt": 0.01,
     });
 
-    let result = dispatch::dispatch("science.full_pipeline", &params).expect("e2e pipeline");
+    let result = dispatch::dispatch("science.full_pipeline", &params).or_exit("e2e pipeline");
 
     v.check_pass("E2E: pipeline complete", result["pipeline"] == "complete");
 
     let div = &result["diversity"];
-    let h = div["shannon"].as_f64().expect("h");
-    let d = div["simpson"].as_f64().expect("d");
-    let bc = div["bray_curtis"].as_f64().expect("bc");
+    let h = div["shannon"].as_f64().or_exit("h");
+    let d = div["simpson"].as_f64().or_exit("d");
+    let bc = div["bray_curtis"].as_f64().or_exit("bc");
 
     v.check_pass("E2E: Shannon > 0", h > 0.0);
     v.check_pass("E2E: Simpson in [0,1]", (0.0..=1.0).contains(&d));
@@ -502,8 +499,8 @@ fn validate_biomeos_graph_e2e(v: &mut Validator) {
     v.check("E2E: BC parity", bc, direct_bc, tolerances::EXACT_F64);
 
     let qs = &result["qs_model"];
-    let qs_t_end = qs["t_end"].as_f64().expect("t_end");
-    let qs_peak = qs["peak_biofilm"].as_f64().expect("peak");
+    let qs_t_end = qs["t_end"].as_f64().or_exit("t_end");
+    let qs_peak = qs["peak_biofilm"].as_f64().or_exit("peak");
     v.check_pass("E2E: QS t_end > 0", qs_t_end > 0.0);
     v.check_pass("E2E: QS peak > 0", qs_peak > 0.0);
 

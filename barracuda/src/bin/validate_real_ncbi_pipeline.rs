@@ -12,10 +12,6 @@
     clippy::too_many_lines,
     reason = "validation harness: sequential domain checks in single main()"
 )]
-#![expect(
-    clippy::many_single_char_names,
-    reason = "validation harness: mathematical variable names from papers"
-)]
 //! # Exp184: Real NCBI 16S Through Sovereign Pipeline
 //!
 //! Downloads real 16S sequences from NCBI, processes them through the

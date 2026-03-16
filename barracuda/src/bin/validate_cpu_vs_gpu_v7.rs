@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -55,6 +51,7 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct Timing {
     name: &'static str,
@@ -67,8 +64,8 @@ fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
-        .expect("tokio runtime");
-    let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+        .or_exit("tokio runtime");
+    let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
 
     let mut v = Validator::new("Exp264: CPU vs GPU v7 — G17–G21 Parity (27 Domains)");
     let t_total = Instant::now();
@@ -88,7 +85,7 @@ fn main() {
     let n_axes = 2;
 
     let tc = Instant::now();
-    let cpu_pcoa = pcoa::pcoa(&condensed, n, n_axes).expect("CPU PCoA");
+    let cpu_pcoa = pcoa::pcoa(&condensed, n, n_axes).or_exit("CPU PCoA");
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();

@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -52,6 +48,7 @@ use std::sync::Arc;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 #[tokio::main]
 async fn main() {
@@ -143,7 +140,7 @@ fn validate_tree_inference(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 &[None, Some(0), Some(1)],
                 3,
             )
-            .expect("valid tree");
+            .or_exit("valid tree");
             let cpu_preds: Vec<usize> = [
                 vec![3.0, 0.0, 0.0],
                 vec![7.0, 0.0, 0.0],

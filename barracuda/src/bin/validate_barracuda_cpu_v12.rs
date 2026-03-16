@@ -57,6 +57,7 @@ use wetspring_barracuda::io::ms2;
 use wetspring_barracuda::io::nanopore::{self, NanoporeIter, SyntheticSignalGenerator};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn temp_path(name: &str) -> PathBuf {
     std::env::temp_dir().join(format!("wetspring_exp212_{name}"))
@@ -65,16 +66,16 @@ fn temp_path(name: &str) -> PathBuf {
 // ── D01: FASTQ byte-native → diversity math ─────────────────────────────────
 
 fn write_community_fastq(path: &std::path::Path, species: &[(&str, usize)]) {
-    let mut f = std::fs::File::create(path).unwrap();
+    let mut f = std::fs::File::create(path).or_exit("unexpected error");
     let mut idx = 0_usize;
     for (seq, count) in species {
         for _ in 0..*count {
-            writeln!(f, "@species_{idx}").unwrap();
-            writeln!(f, "{seq}").unwrap();
-            writeln!(f, "+").unwrap();
+            writeln!(f, "@species_{idx}").or_exit("unexpected error");
+            writeln!(f, "{seq}").or_exit("unexpected error");
+            writeln!(f, "+").or_exit("unexpected error");
             let qual = vec![b'I'; seq.len()];
-            f.write_all(&qual).unwrap();
-            writeln!(f).unwrap();
+            f.write_all(&qual).or_exit("unexpected error");
+            writeln!(f).or_exit("unexpected error");
             idx += 1;
         }
     }
@@ -101,7 +102,7 @@ fn validate_fastq_to_diversity(v: &mut Validator) {
         *seq_counts.entry(rec.sequence.to_vec()).or_insert(0) += 1;
         Ok(())
     })
-    .unwrap();
+    .or_exit("unexpected error");
 
     let counts: Vec<f64> = seq_counts.values().map(|&c| c as f64).collect();
 
@@ -155,7 +156,7 @@ fn validate_quality_derep_chain(v: &mut Validator) {
 
     let path = temp_path("quality_derep.fastq");
     {
-        let mut f = std::fs::File::create(&path).unwrap();
+        let mut f = std::fs::File::create(&path).or_exit("unexpected error");
         for i in 0..20_u32 {
             let id = format!("read_{i}");
             let seq = if i < 10 {
@@ -168,17 +169,17 @@ fn validate_quality_derep_chain(v: &mut Validator) {
             } else {
                 std::iter::repeat_n('I', seq.len()).collect() // Q40 = good
             };
-            writeln!(f, "@{id} desc").unwrap();
-            writeln!(f, "{seq}").unwrap();
-            writeln!(f, "+").unwrap();
-            writeln!(f, "{qual}").unwrap();
+            writeln!(f, "@{id} desc").or_exit("unexpected error");
+            writeln!(f, "{seq}").or_exit("unexpected error");
+            writeln!(f, "+").or_exit("unexpected error");
+            writeln!(f, "{qual}").or_exit("unexpected error");
         }
     }
 
     let records: Vec<_> = fastq::FastqIter::open(&path)
-        .unwrap()
+        .or_exit("unexpected error")
         .collect::<Result<Vec<_>, _>>()
-        .unwrap();
+        .or_exit("unexpected error");
     v.check_count("parsed 20 reads", records.len(), 20);
 
     let params = quality::QualityParams {
@@ -219,10 +220,10 @@ fn validate_nanopore_calibration_math(v: &mut Validator) {
     let reads = sig.generate_batch(25, 4000, 4000.0);
 
     let path = temp_path("calibration.nrs");
-    nanopore::write_nrs(&path, &reads).unwrap();
+    nanopore::write_nrs(&path, &reads).or_exit("unexpected error");
     let loaded: Vec<_> = NanoporeIter::open(&path)
-        .unwrap()
-        .map(|r| r.unwrap())
+        .or_exit("unexpected error")
+        .map(|r| r.or_exit("unexpected error"))
         .collect();
 
     for (i, (orig, rt)) in reads.iter().zip(loaded.iter()).enumerate().take(5) {
@@ -282,19 +283,19 @@ fn validate_ms2_spectral_math(v: &mut Validator) {
 
     let path = temp_path("spectral.ms2");
     {
-        let mut f = std::fs::File::create(&path).unwrap();
-        writeln!(f, "H\tCreatedBy\twetSpring Exp212").unwrap();
+        let mut f = std::fs::File::create(&path).or_exit("unexpected error");
+        writeln!(f, "H\tCreatedBy\twetSpring Exp212").or_exit("unexpected error");
         for scan in 1..=5_u32 {
             let precursor = f64::from(scan).mul_add(50.0, 400.0);
-            writeln!(f, "S\t{scan}\t{scan}\t{precursor:.3}").unwrap();
-            writeln!(f, "I\tRTime\t{:.1}", f64::from(scan) * 0.5).unwrap();
-            writeln!(f, "I\tBPI\t10000.0").unwrap();
-            writeln!(f, "I\tTIC\t50000.0").unwrap();
-            writeln!(f, "Z\t2\t{:.3}", precursor * 2.0 - 1.008).unwrap();
+            writeln!(f, "S\t{scan}\t{scan}\t{precursor:.3}").or_exit("unexpected error");
+            writeln!(f, "I\tRTime\t{:.1}", f64::from(scan) * 0.5).or_exit("unexpected error");
+            writeln!(f, "I\tBPI\t10000.0").or_exit("unexpected error");
+            writeln!(f, "I\tTIC\t50000.0").or_exit("unexpected error");
+            writeln!(f, "Z\t2\t{:.3}", precursor * 2.0 - 1.008).or_exit("unexpected error");
             for frag in 0..scan {
                 let mz = f64::from(frag).mul_add(100.0, 100.0);
                 let intensity = 1000.0 * f64::from(scan - frag);
-                writeln!(f, "{mz:.1}\t{intensity:.1}").unwrap();
+                writeln!(f, "{mz:.1}\t{intensity:.1}").or_exit("unexpected error");
             }
         }
     }
@@ -304,12 +305,12 @@ fn validate_ms2_spectral_math(v: &mut Validator) {
         stream_spectra.push(spec);
         Ok(())
     })
-    .unwrap();
+    .or_exit("unexpected error");
 
     let batch_spectra: Vec<_> = ms2::Ms2Iter::open(&path)
-        .unwrap()
+        .or_exit("unexpected error")
         .collect::<Result<Vec<_>, _>>()
-        .unwrap();
+        .or_exit("unexpected error");
 
     v.check_count("5 spectra from streaming", stream_spectra.len(), 5);
     v.check_count("5 spectra from batch", batch_spectra.len(), 5);
@@ -384,43 +385,43 @@ fn validate_end_to_end_pipeline(v: &mut Validator) {
     let fwd_path = temp_path("e2e_R1.fastq");
     let rev_path = temp_path("e2e_R2.fastq");
     {
-        let mut fwd_f = std::fs::File::create(&fwd_path).unwrap();
-        let mut rev_f = std::fs::File::create(&rev_path).unwrap();
+        let mut fwd_f = std::fs::File::create(&fwd_path).or_exit("unexpected error");
+        let mut rev_f = std::fs::File::create(&rev_path).or_exit("unexpected error");
 
         for pair_idx in 0..50_u32 {
             let fwd_seq = &amplicon[..250];
             let rev_region = &amplicon[3..];
             let rev_seq = merge_pairs::reverse_complement(rev_region);
 
-            writeln!(fwd_f, "@pair_{pair_idx}/1").unwrap();
-            fwd_f.write_all(fwd_seq).unwrap();
-            writeln!(fwd_f).unwrap();
-            writeln!(fwd_f, "+").unwrap();
+            writeln!(fwd_f, "@pair_{pair_idx}/1").or_exit("unexpected error");
+            fwd_f.write_all(fwd_seq).or_exit("unexpected error");
+            writeln!(fwd_f).or_exit("unexpected error");
+            writeln!(fwd_f, "+").or_exit("unexpected error");
             let fwd_qual: String = std::iter::repeat_n('I', 250).collect();
-            writeln!(fwd_f, "{fwd_qual}").unwrap();
+            writeln!(fwd_f, "{fwd_qual}").or_exit("unexpected error");
 
-            writeln!(rev_f, "@pair_{pair_idx}/2").unwrap();
-            rev_f.write_all(&rev_seq).unwrap();
-            writeln!(rev_f).unwrap();
-            writeln!(rev_f, "+").unwrap();
+            writeln!(rev_f, "@pair_{pair_idx}/2").or_exit("unexpected error");
+            rev_f.write_all(&rev_seq).or_exit("unexpected error");
+            writeln!(rev_f).or_exit("unexpected error");
+            writeln!(rev_f, "+").or_exit("unexpected error");
             let rev_qual: String = std::iter::repeat_n('I', 250).collect();
-            writeln!(rev_f, "{rev_qual}").unwrap();
+            writeln!(rev_f, "{rev_qual}").or_exit("unexpected error");
         }
     }
 
     let fwd_records: Vec<_> = fastq::FastqIter::open(&fwd_path)
-        .unwrap()
+        .or_exit("unexpected error")
         .collect::<Result<Vec<_>, _>>()
-        .unwrap();
+        .or_exit("unexpected error");
     let rev_records: Vec<_> = fastq::FastqIter::open(&rev_path)
-        .unwrap()
+        .or_exit("unexpected error")
         .collect::<Result<Vec<_>, _>>()
-        .unwrap();
+        .or_exit("unexpected error");
     v.check_count("parsed 50 forward reads", fwd_records.len(), 50);
     v.check_count("parsed 50 reverse reads", rev_records.len(), 50);
 
-    let fwd_stats = fastq::stats_from_file(&fwd_path).unwrap();
-    let rev_stats = fastq::stats_from_file(&rev_path).unwrap();
+    let fwd_stats = fastq::stats_from_file(&fwd_path).or_exit("unexpected error");
+    let rev_stats = fastq::stats_from_file(&rev_path).or_exit("unexpected error");
     v.check_count("all forward reads 250bp", fwd_stats.min_length, 250);
     v.check_count("all reverse reads 250bp", rev_stats.min_length, 250);
 

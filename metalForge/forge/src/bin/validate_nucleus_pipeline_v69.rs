@@ -27,10 +27,6 @@
 //! Provenance: End-to-end pipeline integration test
 
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -50,6 +46,7 @@ use wetspring_forge::substrate::{Capability, SubstrateKind};
 use wetspring_forge::workloads;
 
 use std::path::PathBuf;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     println!("═══════════════════════════════════════════════════════════");
@@ -135,7 +132,7 @@ fn section_nest_protocol(pass: &mut u32, fail: &mut u32) {
     check("NestGate socket discovery does not panic", true, pass, fail);
 
     // NestClient construction
-    let dir = tempfile::tempdir().expect("tempdir creation for NestClient test should succeed");
+    let dir = tempfile::tempdir().or_exit("tempdir creation for NestClient test should succeed");
     let sock = dir.path().join("test-nestgate.sock");
     let client = nest::NestClient::new(sock);
     check(
@@ -143,7 +140,7 @@ fn section_nest_protocol(pass: &mut u32, fail: &mut u32) {
         client
             .socket_path()
             .to_str()
-            .expect("socket path should be valid UTF-8")
+            .or_exit("socket path should be valid UTF-8")
             .contains("test-nestgate"),
         pass,
         fail,
@@ -226,7 +223,7 @@ fn section_ncbi_acquisition(pass: &mut u32, fail: &mut u32) {
             result.is_ok()
                 && result
                     .as_ref()
-                    .expect("assembly result should be Ok when is_ok")
+                    .or_exit("assembly result should be Ok when is_ok")
                     .source
                     == ncbi::AssemblySource::LocalFile(vibrio_dir.join("GCF_000024825.1.fna.gz")),
             pass,

@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -42,6 +38,7 @@ use wetspring_barracuda::bio::{diversity, diversity_gpu, stats_gpu};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 const N_SAMPLES: usize = 12;
 const N_FEATURES: usize = 256;
@@ -139,20 +136,20 @@ async fn main() {
 
     let t_gpu_compute = Instant::now();
     for community in &communities {
-        let shannon = diversity_gpu::shannon_gpu(&gpu, community).expect("Shannon GPU");
-        let simpson = diversity_gpu::simpson_gpu(&gpu, community).expect("Simpson GPU");
+        let shannon = diversity_gpu::shannon_gpu(&gpu, community).or_exit("Shannon GPU");
+        let simpson = diversity_gpu::simpson_gpu(&gpu, community).or_exit("Simpson GPU");
         let observed =
-            diversity_gpu::observed_features_gpu(&gpu, community).expect("observed features GPU");
+            diversity_gpu::observed_features_gpu(&gpu, community).or_exit("observed features GPU");
         gpu_results.push((shannon, simpson, observed));
     }
 
     let gpu_shannons: Vec<f64> = gpu_results.iter().map(|(s, _, _)| *s).collect();
-    let gpu_variance = stats_gpu::variance_gpu(&gpu, &gpu_shannons).expect("variance GPU");
+    let gpu_variance = stats_gpu::variance_gpu(&gpu, &gpu_shannons).or_exit("variance GPU");
     let gpu_compute_us = t_gpu_compute.elapsed().as_micros() as f64;
 
     let t_bray = Instant::now();
     let gpu_bray =
-        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).expect("Bray-Curtis GPU");
+        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).or_exit("Bray-Curtis GPU");
     let bray_us = t_bray.elapsed().as_micros() as f64;
 
     let t_readback = Instant::now();

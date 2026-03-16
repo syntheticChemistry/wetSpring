@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -73,6 +69,7 @@ use std::time::Instant;
 use barracuda::stats;
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 const EMP_BIOMES: &[(&str, f64, f64)] = &[
     ("Animal corpus", 0.55, 0.15),
@@ -266,7 +263,7 @@ fn main() {
     let all_ws: Vec<f64> = atlas.iter().map(|e| e.mean_w).collect();
 
     let jk =
-        stats::jackknife_mean_variance(&all_rs).expect("Atlas jackknife on mean r requires n≥2");
+        stats::jackknife_mean_variance(&all_rs).or_exit("Atlas jackknife on mean r requires n≥2");
     v.check_pass("Atlas: jackknife SE on mean r > 0", jk.std_error > 0.0);
     v.check_pass("Atlas: jackknife mean r > midpoint", jk.estimate > midpoint);
     println!(
@@ -281,7 +278,7 @@ fn main() {
         0.95,
         42,
     )
-    .expect("Atlas bootstrap 95% CI requires valid resampling");
+    .or_exit("Atlas bootstrap 95% CI requires valid resampling");
     v.check_pass("Atlas: 95% CI lower > midpoint", ci.lower > midpoint);
     v.check_pass(
         "Atlas: CI contains estimate",
@@ -290,7 +287,7 @@ fn main() {
     println!("  Atlas 95% CI: [{:.4}, {:.4}]", ci.lower, ci.upper);
 
     let r_w_corr = stats::pearson_correlation(&all_ws, &all_rs)
-        .expect("Atlas W↔r Pearson correlation requires n≥2");
+        .or_exit("Atlas W↔r Pearson correlation requires n≥2");
     v.check_pass("Atlas: W↔r correlation finite", r_w_corr.is_finite());
     println!("  W↔r Pearson correlation: {r_w_corr:.4}");
 

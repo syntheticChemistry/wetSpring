@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -47,6 +43,7 @@ use wetspring_barracuda::io::nanopore::{
 };
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn temp_nrs(name: &str) -> std::path::PathBuf {
     std::env::temp_dir().join(format!("wetspring_exp196a_{name}.nrs"))
@@ -59,11 +56,11 @@ fn validate_nrs_roundtrip(v: &mut Validator) {
     let reads = sig.generate_batch(20, 4000, 4000.0);
 
     let path = temp_nrs("roundtrip");
-    nanopore::write_nrs(&path, &reads).unwrap();
+    nanopore::write_nrs(&path, &reads).or_exit("unexpected error");
 
     let loaded: Vec<NanoporeRead> = NanoporeIter::open(&path)
-        .unwrap()
-        .map(|r| r.unwrap())
+        .or_exit("unexpected error")
+        .map(|r| r.or_exit("unexpected error"))
         .collect();
 
     v.check_count("read count round-trip", loaded.len(), 20);
@@ -247,8 +244,8 @@ fn validate_edge_cases(v: &mut Validator) {
 
     let empty_reads: Vec<NanoporeRead> = Vec::new();
     let p2 = temp_nrs("empty");
-    nanopore::write_nrs(&p2, &empty_reads).unwrap();
-    let empty_count = NanoporeIter::open(&p2).unwrap().count();
+    nanopore::write_nrs(&p2, &empty_reads).or_exit("unexpected error");
+    let empty_count = NanoporeIter::open(&p2).or_exit("unexpected error").count();
     v.check_count("empty NRS round-trip", empty_count, 0);
 
     let tiny = NanoporeRead {
@@ -260,10 +257,10 @@ fn validate_edge_cases(v: &mut Validator) {
         calibration_scale: 0.2,
     };
     let p3 = temp_nrs("single");
-    nanopore::write_nrs(&p3, &[tiny]).unwrap();
+    nanopore::write_nrs(&p3, &[tiny]).or_exit("unexpected error");
     let loaded3: Vec<NanoporeRead> = NanoporeIter::open(&p3)
-        .unwrap()
-        .map(|r| r.unwrap())
+        .or_exit("unexpected error")
+        .map(|r| r.or_exit("unexpected error"))
         .collect();
     v.check_count("single-sample read round-trip", loaded3.len(), 1);
     v.check_count(
@@ -273,7 +270,7 @@ fn validate_edge_cases(v: &mut Validator) {
     );
 
     let p4 = temp_nrs("badmagic");
-    std::fs::write(&p4, b"BAD!").unwrap();
+    std::fs::write(&p4, b"BAD!").or_exit("unexpected error");
     v.check_pass(
         "invalid NRS magic rejected",
         NanoporeIter::open(&p4).is_err(),

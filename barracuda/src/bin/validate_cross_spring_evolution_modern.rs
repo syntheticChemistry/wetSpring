@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -47,6 +39,7 @@
 
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Cross-Spring Evolution — Modern ToadStool Primitives");
@@ -60,7 +53,7 @@ fn main() {
     v.check("mean([1..5]) = 3.0", m, 3.0, tolerances::EXACT);
 
     // 2. variance — sample variance (n-1): [1,2,3,4,5] → 10/4 = 2.5
-    let var = barracuda::stats::correlation::variance(&data_mean).expect("variance");
+    let var = barracuda::stats::correlation::variance(&data_mean).or_exit("variance");
     let expected_var = 2.5; // sum((x-3)²)/(n-1) = (4+1+0+1+4)/4 = 2.5
     v.check(
         "variance([1..5]) = 2.5",
@@ -81,7 +74,7 @@ fn main() {
         1,
         tolerances::RIDGE_REGULARIZATION_SMALL,
     )
-    .expect("ridge_regression");
+    .or_exit("ridge_regression");
     v.check(
         "ridge: slope x1 ≈ 2",
         ridge.weights[0],
@@ -171,7 +164,7 @@ fn main() {
     // 9. pearson_correlation — perfect linear y = 2x + 1 → r = 1
     let x_lin: Vec<f64> = (0..20).map(f64::from).collect();
     let y_lin: Vec<f64> = x_lin.iter().map(|&x| 2.0f64.mul_add(x, 1.0)).collect();
-    let pearson = barracuda::stats::pearson_correlation(&x_lin, &y_lin).unwrap();
+    let pearson = barracuda::stats::pearson_correlation(&x_lin, &y_lin).or_exit("unexpected error");
     v.check(
         "pearson(perfect linear) = 1",
         pearson,
@@ -182,7 +175,7 @@ fn main() {
     // 10. spearman_correlation — perfect ranks → ρ = 1
     let x_rank: Vec<f64> = vec![1.0, 2.0, 3.0, 4.0, 5.0];
     let y_rank: Vec<f64> = vec![5.0, 4.0, 3.0, 2.0, 1.0]; // perfect negative
-    let spearman = barracuda::stats::spearman_correlation(&x_rank, &y_rank).unwrap();
+    let spearman = barracuda::stats::spearman_correlation(&x_rank, &y_rank).or_exit("unexpected error");
     v.check(
         "spearman(perfect neg ranks) = -1",
         spearman,
@@ -193,7 +186,7 @@ fn main() {
     // 11. fit_linear — known line y = 3x + 2
     let x_fit: Vec<f64> = (0..15).map(f64::from).collect();
     let y_fit: Vec<f64> = x_fit.iter().map(|&x| 3.0f64.mul_add(x, 2.0)).collect();
-    let fit = barracuda::stats::fit_linear(&x_fit, &y_fit).unwrap();
+    let fit = barracuda::stats::fit_linear(&x_fit, &y_fit).or_exit("unexpected error");
     v.check(
         "fit_linear: slope ≈ 3",
         fit.params[0],
@@ -231,7 +224,7 @@ fn main() {
 
     // 14. jackknife_mean_variance — [1,2,3,4,5] → mean=3, var>0
     let jk_data = [1.0, 2.0, 3.0, 4.0, 5.0];
-    let jk = barracuda::stats::jackknife_mean_variance(&jk_data).unwrap();
+    let jk = barracuda::stats::jackknife_mean_variance(&jk_data).or_exit("unexpected error");
     v.check(
         "jackknife mean = 3",
         jk.estimate,
@@ -246,7 +239,7 @@ fn main() {
     // 15. trapz — ∫₀¹ x² dx = 1/3 (exact by trapezoid on fine grid)
     let trap_x: Vec<f64> = (0..1001).map(|i| f64::from(i) / 1000.0).collect();
     let trap_y: Vec<f64> = trap_x.iter().map(|x| x * x).collect();
-    let trapz_val = barracuda::numerical::trapz(&trap_y, &trap_x).expect("trapz");
+    let trapz_val = barracuda::numerical::trapz(&trap_y, &trap_x).or_exit("trapz");
     v.check(
         "trapz(x²) ≈ 1/3",
         trapz_val,
@@ -260,10 +253,10 @@ fn main() {
         .iter()
         .map(|&x| 2.0f64.mul_add((0.15 * x).exp(), 0.5))
         .collect();
-    let fit_exp = barracuda::stats::fit_exponential(&x_exp, &y_exp).unwrap();
+    let fit_exp = barracuda::stats::fit_exponential(&x_exp, &y_exp).or_exit("unexpected error");
     v.check_pass("fit_exponential: Some", true);
     v.check_pass("fit_exponential R² > 0.95", fit_exp.r_squared > 0.95);
-    let pred = fit_exp.predict_one(10.0).unwrap();
+    let pred = fit_exp.predict_one(10.0).or_exit("unexpected error");
     let expected_pred = 2.0f64.mul_add((0.15_f64 * 10.0).exp(), 0.5);
     v.check(
         "fit_exponential predict(10) ≈ truth",

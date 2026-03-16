@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -40,6 +36,7 @@ use std::time::{Duration, Instant};
 use wetspring_barracuda::ipc::Server;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp321: biomeOS/NUCLEUS V98+ Integration Validation");
@@ -66,7 +63,7 @@ fn main() {
     v.check_pass("XDG_RUNTIME_DIR present", has_runtime);
 
     if has_runtime {
-        let biomeos_dir = PathBuf::from(runtime_dir.as_ref().unwrap()).join("biomeos");
+        let biomeos_dir = PathBuf::from(runtime_dir.as_ref().or_exit("unexpected error")).join("biomeos");
         let dir_exists = biomeos_dir.exists();
         println!(
             "  biomeos socket dir: {} (exists: {dir_exists})",
@@ -106,9 +103,9 @@ fn main() {
 
     let deploy_graph = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
         .parent()
-        .unwrap()
+        .or_exit("unexpected error")
         .parent()
-        .unwrap()
+        .or_exit("unexpected error")
         .join("phase2/biomeOS/graphs/wetspring_deploy.toml");
     let graph_exists = deploy_graph.exists();
     println!(
@@ -118,7 +115,7 @@ fn main() {
     v.check_pass("wetspring_deploy.toml exists", graph_exists);
 
     if graph_exists {
-        let contents = std::fs::read_to_string(&deploy_graph).unwrap();
+        let contents = std::fs::read_to_string(&deploy_graph).or_exit("unexpected error");
         v.check_pass(
             "deploy graph references wetspring",
             contents.contains("germinate_wetspring"),
@@ -276,7 +273,7 @@ fn main() {
     v.check_pass("empty counts → error", empty_counts.contains("error"));
 
     // Multiplexing: 10 requests on one connection
-    let stream = UnixStream::connect(&server_path).unwrap();
+    let stream = UnixStream::connect(&server_path).or_exit("unexpected error");
     let _ = stream.set_read_timeout(Some(Duration::from_secs(10)));
     let mut writer = std::io::BufWriter::new(&stream);
     let mut reader = BufReader::new(&stream);

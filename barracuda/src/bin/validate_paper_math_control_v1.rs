@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -179,11 +171,11 @@ fn main() {
     let bi_params = bistable::BistableParams::default();
     let y0_low = [0.01, 0.0, 0.0, 2.0, 0.5];
     let r_low = bistable::run_bistable(&y0_low, tolerances::ODE_DEFAULT_DT, 200.0, &bi_params);
-    let final_low: Vec<f64> = r_low.states().last().unwrap().to_vec();
+    let final_low: Vec<f64> = r_low.states().last().or_exit("unexpected error").to_vec();
 
     let y0_high = [0.5, 1.0, 1.0, 0.1, 0.1];
     let r_high = bistable::run_bistable(&y0_high, tolerances::ODE_DEFAULT_DT, 200.0, &bi_params);
-    let final_high: Vec<f64> = r_high.states().last().unwrap().to_vec();
+    let final_high: Vec<f64> = r_high.states().last().or_exit("unexpected error").to_vec();
 
     v.check_pass(
         "Fernandez: all states non-negative (low)",
@@ -204,8 +196,8 @@ fn main() {
     let ms_wt = multi_signal::scenario_wild_type(&ms_params, tolerances::ODE_DEFAULT_DT);
     let ms_noqs = multi_signal::scenario_no_qs(&ms_params, tolerances::ODE_DEFAULT_DT);
 
-    let wt_final: Vec<f64> = ms_wt.states().last().unwrap().to_vec();
-    let noqs_final: Vec<f64> = ms_noqs.states().last().unwrap().to_vec();
+    let wt_final: Vec<f64> = ms_wt.states().last().or_exit("unexpected error").to_vec();
+    let noqs_final: Vec<f64> = ms_noqs.states().last().or_exit("unexpected error").to_vec();
 
     v.check_pass(
         "Srivastava: wild-type produces trajectory",
@@ -232,7 +224,7 @@ fn main() {
     let coop_params = cooperation::CooperationParams::default();
     let coop_result = cooperation::scenario_equal_start(&coop_params, tolerances::ODE_DEFAULT_DT);
     let freq = cooperation::cooperator_frequency(&coop_result);
-    let final_freq = *freq.last().unwrap();
+    let final_freq = *freq.last().or_exit("unexpected error");
     v.check_pass("Bruger: cooperators persist (f > 0.1)", final_freq > 0.1);
     v.check_pass("Bruger: cooperator fraction finite", final_freq.is_finite());
 
@@ -286,8 +278,8 @@ fn main() {
     let cap_normal = capacitor::scenario_normal(&cap_params, tolerances::ODE_DEFAULT_DT);
     let cap_stress = capacitor::scenario_stress(&cap_params, tolerances::ODE_DEFAULT_DT);
 
-    let normal_final: Vec<f64> = cap_normal.states().last().unwrap().to_vec();
-    let stress_final: Vec<f64> = cap_stress.states().last().unwrap().to_vec();
+    let normal_final: Vec<f64> = cap_normal.states().last().or_exit("unexpected error").to_vec();
+    let stress_final: Vec<f64> = cap_stress.states().last().or_exit("unexpected error").to_vec();
 
     v.check_pass(
         "Mhatre: normal states finite",
@@ -402,7 +394,7 @@ fn main() {
         objective: barracuda::linalg::nmf::NmfObjective::KlDivergence,
         seed: 42,
     };
-    let nmf_res = barracuda::linalg::nmf::nmf(&v_mat, 30, 15, &nmf_cfg).expect("NMF");
+    let nmf_res = barracuda::linalg::nmf::nmf(&v_mat, 30, 15, &nmf_cfg).or_exit("NMF");
     v.check_pass(
         "Fajgenbaum: W non-negative",
         nmf_res.w.iter().all(|&x| x >= 0.0),
@@ -426,7 +418,7 @@ fn main() {
         2,
         tolerances::RIDGE_REGULARIZATION_SMALL,
     )
-    .expect("ridge");
+    .or_exit("ridge");
     v.check_pass(
         "Fajgenbaum: ridge weights finite",
         ridge.weights.iter().all(|w| w.is_finite()),
@@ -581,6 +573,7 @@ fn main() {
 }
 
 use wetspring_barracuda::bio::ode::OdeResult;
+use wetspring_barracuda::validation::OrExit;
 
 fn ode_tail_mean(r: &OdeResult, var_idx: usize, tail_frac: f64) -> f64 {
     let states: Vec<&[f64]> = r.states().collect();

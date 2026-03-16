@@ -23,6 +23,7 @@
 
 use wetspring_barracuda::bio::decision_tree::DecisionTree;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp041: EPA PFAS National-Scale ML");
@@ -37,7 +38,7 @@ fn main() {
         &[None, Some(0), Some(1)], // predictions
         5,                         // n_features
     )
-    .expect("valid tree");
+    .or_exit("valid tree");
 
     // ── Section 1: Tree structure ───────────────────────────────
     v.section("── Decision tree structure ──");

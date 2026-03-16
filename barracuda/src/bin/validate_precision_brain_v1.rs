@@ -5,10 +5,6 @@
     reason = "validation harness: cross-spring feature gates not defined in this crate"
 )]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -54,7 +50,7 @@ fn main() {
     // ─── D71: Hardware Calibration ───
     println!("\n  ── D71: Hardware Calibration ──");
 
-    let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
+    let rt = tokio::runtime::Runtime::new().or_exit("tokio runtime");
     let device = rt.block_on(async { barracuda::device::WgpuDevice::new().await });
 
     let device = match device {
@@ -289,6 +285,7 @@ fn main() {
             });
 
             use barracuda::device::PhysicsDomain;
+use wetspring_barracuda::validation::OrExit;
             let domains = [
                 PhysicsDomain::Bioinformatics,
                 PhysicsDomain::Statistics,
@@ -357,10 +354,10 @@ fn main() {
             edges: vec![],
         };
 
-        let json = serde_json::to_string_pretty(&scenario).expect("serialize");
+        let json = serde_json::to_string_pretty(&scenario).or_exit("serialize");
         let path = "output/gpu_capability_landscape.json";
         std::fs::create_dir_all("output").ok();
-        std::fs::write(path, &json).expect("write JSON");
+        std::fs::write(path, &json).or_exit("write JSON");
         println!("  ✓ Dashboard exported: {path} ({} bytes)", json.len());
         v.check_pass("petalTongue JSON scenario exported", true);
         v.check_pass("scenario has nodes", !scenario.nodes.is_empty());

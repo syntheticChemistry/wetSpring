@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -53,6 +49,7 @@ use std::time::Instant;
 use wetspring_barracuda::npu;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp193: NPU Hardware Validation (AKD1000)");
@@ -71,7 +68,7 @@ fn main() {
         v.finish();
     }
 
-    let summary = npu::npu_summary().expect("NPU summary");
+    let summary = npu::npu_summary().or_exit("NPU summary");
     println!("  Chip:       {}", summary.chip);
     println!("  PCIe:       {}", summary.pcie_address);
     println!("  NPUs:       {}", summary.npu_count);
@@ -98,7 +95,7 @@ fn main() {
     v.section("S2: Device Open + Capability Query");
 
     let t_open = Instant::now();
-    let mut handle = npu::discover_npu().expect("open NPU");
+    let mut handle = npu::discover_npu().or_exit("open NPU");
     let open_us = t_open.elapsed().as_micros();
 
     println!("  Device opened in {open_us} µs");
@@ -135,7 +132,7 @@ fn main() {
         let pattern: Vec<u8> = (0..size).map(|i| (i % 256) as u8).collect();
 
         let t = Instant::now();
-        let written = handle.write_raw(&pattern).expect("DMA write");
+        let written = handle.write_raw(&pattern).or_exit("DMA write");
         let elapsed_us = t.elapsed().as_micros() as f64;
 
         let throughput_mbps = if elapsed_us > 0.0 {
@@ -173,7 +170,7 @@ fn main() {
         let mut buffer = vec![0u8; size];
 
         let t = Instant::now();
-        let bytes_read = handle.read_raw(&mut buffer).expect("DMA read");
+        let bytes_read = handle.read_raw(&mut buffer).or_exit("DMA read");
         let elapsed_us = t.elapsed().as_micros() as f64;
 
         let throughput_mbps = if elapsed_us > 0.0 {
@@ -251,12 +248,12 @@ fn main() {
     let feature_bytes: Vec<u8> = features.iter().map(|&x| x as u8).collect();
 
     let t = Instant::now();
-    let written = handle.write_raw(&feature_bytes).expect("feature write");
+    let written = handle.write_raw(&feature_bytes).or_exit("feature write");
     let write_ns = t.elapsed().as_nanos();
 
     let mut readback = vec![0u8; 8];
     let t = Instant::now();
-    let bytes_read = handle.read_raw(&mut readback).expect("feature read");
+    let bytes_read = handle.read_raw(&mut readback).or_exit("feature read");
     let read_ns = t.elapsed().as_nanos();
 
     println!("  Feature write: {written} bytes in {write_ns} ns");
@@ -293,7 +290,7 @@ fn main() {
 
     let t = Instant::now();
     for _ in 0..n_iterations {
-        handle.write_raw(&bulk_data).expect("bulk write");
+        handle.write_raw(&bulk_data).or_exit("bulk write");
     }
     let bulk_write_us = t.elapsed().as_micros() as f64;
     let bulk_write_mbps = (bulk_size as f64 * n_iterations as f64) / bulk_write_us;
@@ -301,7 +298,7 @@ fn main() {
     let mut bulk_read_buf = vec![0u8; bulk_size];
     let t = Instant::now();
     for _ in 0..n_iterations {
-        handle.read_raw(&mut bulk_read_buf).expect("bulk read");
+        handle.read_raw(&mut bulk_read_buf).or_exit("bulk read");
     }
     let bulk_read_us = t.elapsed().as_micros() as f64;
     let bulk_read_mbps = (bulk_size as f64 * n_iterations as f64) / bulk_read_us;

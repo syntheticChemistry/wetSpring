@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -54,6 +50,7 @@ use wetspring_barracuda::bio::{diversity, diversity_gpu, streaming_gpu};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 struct Timing {
     domain: &'static str,
@@ -105,11 +102,11 @@ async fn main() {
 
     for (name, pop) in &populations {
         let ti = Instant::now();
-        let ind_val = diversity_gpu::shannon_gpu(&gpu, pop).expect("individual shannon");
+        let ind_val = diversity_gpu::shannon_gpu(&gpu, pop).or_exit("individual shannon");
         d1_ind += ti.elapsed().as_micros() as f64;
 
         let ts = Instant::now();
-        let str_val = session.shannon(pop).expect("streaming shannon");
+        let str_val = session.shannon(pop).or_exit("streaming shannon");
         d1_str += ts.elapsed().as_micros() as f64;
 
         let diff = (ind_val - str_val).abs();
@@ -148,11 +145,11 @@ async fn main() {
 
     for (name, pop) in &populations {
         let ti = Instant::now();
-        let ind_val = diversity_gpu::simpson_gpu(&gpu, pop).expect("individual simpson");
+        let ind_val = diversity_gpu::simpson_gpu(&gpu, pop).or_exit("individual simpson");
         d2_ind += ti.elapsed().as_micros() as f64;
 
         let ts = Instant::now();
-        let str_val = session.simpson(pop).expect("streaming simpson");
+        let str_val = session.simpson(pop).or_exit("streaming simpson");
         d2_str += ts.elapsed().as_micros() as f64;
 
         let diff = (ind_val - str_val).abs();
@@ -194,13 +191,13 @@ async fn main() {
 
     let ti = Instant::now();
     let ind_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples_vec)
-        .expect("individual BC condensed");
+        .or_exit("individual BC condensed");
     let d3_ind = ti.elapsed().as_micros() as f64;
 
     let ts = Instant::now();
     let str_bc = session
         .bray_curtis_matrix(&sample_refs)
-        .expect("streaming BC matrix");
+        .or_exit("streaming BC matrix");
     let d3_str = ts.elapsed().as_micros() as f64;
 
     let labels = ["healthy↔mild", "healthy↔AD", "mild↔AD"];
@@ -243,8 +240,8 @@ async fn main() {
     let mut batch_checks = 0_usize;
 
     for pop in &all_pops {
-        let str_sh = session.shannon(pop).expect("batch shannon");
-        let str_si = session.simpson(pop).expect("batch simpson");
+        let str_sh = session.shannon(pop).or_exit("batch shannon");
+        let str_si = session.simpson(pop).or_exit("batch simpson");
         let cpu_sh = diversity::shannon(pop);
         let cpu_si = diversity::simpson(pop);
 
@@ -263,7 +260,7 @@ async fn main() {
     let large: Vec<f64> = (0..50_000)
         .map(|i| f64::from((i * 17 + 7) % 500) + 1.0)
         .collect();
-    let str_large_sh = session.shannon(&large).expect("large batch shannon");
+    let str_large_sh = session.shannon(&large).or_exit("large batch shannon");
     let cpu_large_sh = diversity::shannon(&large);
     v.check_pass(
         &format!(

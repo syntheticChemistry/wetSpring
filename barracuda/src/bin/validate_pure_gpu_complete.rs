@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -94,7 +90,7 @@ fn validate_cooperation_gpu(device: &Arc<WgpuDevice>, v: &mut Validator) {
     let params = CooperationParams::default();
     let cpu = cooperation::scenario_equal_start(&params, tolerances::ODE_DEFAULT_DT);
 
-    let gpu_engine = CooperationGpu::new(Arc::clone(device)).expect("shader compile");
+    let gpu_engine = CooperationGpu::new(Arc::clone(device)).or_exit("shader compile");
     let results = gpu_engine
         .integrate_params(
             &[params],
@@ -102,7 +98,7 @@ fn validate_cooperation_gpu(device: &Arc<WgpuDevice>, v: &mut Validator) {
             48000,
             tolerances::ODE_DEFAULT_DT,
         )
-        .expect("GPU integrate");
+        .or_exit("GPU integrate");
 
     for (i, (&g, &c)) in results[0]
         .iter()
@@ -127,7 +123,7 @@ fn validate_capacitor_gpu(device: &Arc<WgpuDevice>, v: &mut Validator) {
     let params = CapacitorParams::default();
     let cpu = capacitor::scenario_normal(&params, tolerances::ODE_DEFAULT_DT);
 
-    let gpu_engine = CapacitorGpu::new(Arc::clone(device)).expect("shader compile");
+    let gpu_engine = CapacitorGpu::new(Arc::clone(device)).or_exit("shader compile");
     let results = gpu_engine
         .integrate_params(
             &[params],
@@ -135,7 +131,7 @@ fn validate_capacitor_gpu(device: &Arc<WgpuDevice>, v: &mut Validator) {
             48000,
             tolerances::ODE_DEFAULT_DT,
         )
-        .expect("GPU integrate");
+        .or_exit("GPU integrate");
 
     for (i, (&g, &c)) in results[0]
         .iter()
@@ -161,7 +157,7 @@ fn validate_kmd_gpu(gpu: &GpuF64, v: &mut Validator) {
     let cpu = kmd::kendrick_mass_defect(&masses, units::CF2_EXACT, units::CF2_NOMINAL);
     let gpu_results =
         kmd_gpu::kendrick_mass_defect_gpu(gpu, &masses, units::CF2_EXACT, units::CF2_NOMINAL)
-            .expect("KMD GPU");
+            .or_exit("KMD GPU");
 
     for (i, (c, g)) in cpu.iter().zip(&gpu_results).enumerate() {
         v.check(
@@ -185,7 +181,7 @@ fn validate_gbm_gpu(gpu: &GpuF64, v: &mut Validator) {
         &[2, -1, -1],
         &[0.0, 0.3, -0.1],
     )
-    .expect("pure GPU complete");
+    .or_exit("pure GPU complete");
     let t2 = GbmTree::from_arrays(
         &[1, -1, -1],
         &[0.3, 0.0, 0.0],
@@ -193,12 +189,12 @@ fn validate_gbm_gpu(gpu: &GpuF64, v: &mut Validator) {
         &[2, -1, -1],
         &[0.0, 0.2, -0.2],
     )
-    .expect("pure GPU complete");
-    let model = GbmClassifier::new(vec![t1, t2], 0.1, 0.0, 2).expect("pure GPU complete");
+    .or_exit("pure GPU complete");
+    let model = GbmClassifier::new(vec![t1, t2], 0.1, 0.0, 2).or_exit("pure GPU complete");
 
     let samples = vec![vec![0.8, 0.5], vec![0.2, 0.1], vec![0.6, 0.4]];
     let cpu: Vec<_> = model.predict_batch_proba(&samples);
-    let gpu_results = gbm_gpu::predict_batch_gpu(gpu, &model, &samples).expect("GBM GPU");
+    let gpu_results = gbm_gpu::predict_batch_gpu(gpu, &model, &samples).or_exit("GBM GPU");
 
     for (i, (c, g)) in cpu.iter().zip(&gpu_results).enumerate() {
         v.check(
@@ -229,7 +225,7 @@ fn validate_merge_pairs_gpu(gpu: &GpuF64, v: &mut Validator) {
     let params = MergeParams::default();
     let (cpu_merged, cpu_stats) = merge_pairs::merge_pairs(&fwd, &rev, &params);
     let (gpu_merged, gpu_stats) =
-        merge_pairs_gpu::merge_pairs_gpu(gpu, &fwd, &rev, &params).expect("merge GPU");
+        merge_pairs_gpu::merge_pairs_gpu(gpu, &fwd, &rev, &params).or_exit("merge GPU");
 
     v.check(
         "merge count CPU≈GPU",
@@ -265,7 +261,7 @@ fn validate_signal_gpu(gpu: &GpuF64, v: &mut Validator) {
     };
 
     let cpu = signal::find_peaks(&data, &params);
-    let gpu_peaks = signal_gpu::find_peaks_gpu(gpu, &data, &params).expect("signal GPU");
+    let gpu_peaks = signal_gpu::find_peaks_gpu(gpu, &data, &params).or_exit("signal GPU");
 
     v.check(
         "peak count CPU≈GPU",
@@ -290,7 +286,7 @@ fn validate_feature_table_gpu(gpu: &GpuF64, v: &mut Validator) {
 
     let params = FeatureParams::default();
     let cpu = feature_table::extract_features(&[], &params);
-    let gpu_ft = feature_table_gpu::extract_features_gpu(gpu, &[], &params).expect("FT GPU");
+    let gpu_ft = feature_table_gpu::extract_features_gpu(gpu, &[], &params).or_exit("FT GPU");
 
     v.check(
         "feature count CPU≈GPU (empty)",
@@ -310,7 +306,7 @@ fn validate_robinson_foulds_gpu(gpu: &GpuF64, v: &mut Validator) {
     let t2 = PhyloTree::from_newick("((C:0.5,(A:1.0,B:1.0):0.5):0.5,(D:0.5,E:0.5):0.5);");
 
     let cpu_dist = robinson_foulds::rf_distance(&t1, &t2);
-    let gpu_dist = robinson_foulds_gpu::rf_distance_gpu(gpu, &t1, &t2).expect("RF GPU");
+    let gpu_dist = robinson_foulds_gpu::rf_distance_gpu(gpu, &t1, &t2).or_exit("RF GPU");
 
     v.check(
         "RF distance CPU≈GPU",
@@ -346,7 +342,7 @@ fn validate_derep_gpu(gpu: &GpuF64, v: &mut Validator) {
 
     let (cpu_uniq, cpu_stats) = derep::dereplicate(&records, DerepSort::Abundance, 1);
     let (gpu_uniq, gpu_stats) =
-        derep_gpu::dereplicate_gpu(gpu, &records, DerepSort::Abundance, 1).expect("derep GPU");
+        derep_gpu::dereplicate_gpu(gpu, &records, DerepSort::Abundance, 1).or_exit("derep GPU");
 
     v.check(
         "derep unique count CPU≈GPU",
@@ -389,7 +385,7 @@ fn validate_chimera_gpu(gpu: &GpuF64, v: &mut Validator) {
     let params = ChimeraParams::default();
     let (cpu_results, cpu_stats) = chimera::detect_chimeras(&asvs, &params);
     let (gpu_results, gpu_stats) =
-        chimera_gpu::detect_chimeras_gpu(gpu, &asvs, &params).expect("chimera GPU");
+        chimera_gpu::detect_chimeras_gpu(gpu, &asvs, &params).or_exit("chimera GPU");
 
     v.check(
         "chimera count CPU≈GPU",
@@ -412,7 +408,7 @@ fn validate_neighbor_joining_gpu(gpu: &GpuF64, v: &mut Validator) {
 
     let seqs: Vec<&[u8]> = vec![b"ATCGATCG", b"ATCAATCG", b"GCTAGCTA", b"GCTGGCTA"];
     let cpu_dist = neighbor_joining::distance_matrix(&seqs);
-    let gpu_dist = neighbor_joining_gpu::distance_matrix_gpu(gpu, &seqs).expect("NJ distance GPU");
+    let gpu_dist = neighbor_joining_gpu::distance_matrix_gpu(gpu, &seqs).or_exit("NJ distance GPU");
 
     for (i, (c, g)) in cpu_dist.iter().zip(&gpu_dist).enumerate() {
         v.check(
@@ -453,7 +449,7 @@ fn validate_reconciliation_gpu(gpu: &GpuF64, v: &mut Validator) {
     let cpu = reconciliation::reconcile_dtl(&host, &parasite, &tip_mapping, &costs);
     let gpu_result =
         reconciliation_gpu::reconcile_dtl_gpu(gpu, &host, &parasite, &tip_mapping, &costs)
-            .expect("reconciliation GPU");
+            .or_exit("reconciliation GPU");
 
     v.check(
         "reconciliation cost CPU≈GPU",
@@ -465,6 +461,7 @@ fn validate_reconciliation_gpu(gpu: &GpuF64, v: &mut Validator) {
 
 fn validate_molecular_clock_gpu(gpu: &GpuF64, v: &mut Validator) {
     use wetspring_barracuda::bio::molecular_clock_gpu;
+use wetspring_barracuda::validation::OrExit;
 
     v.section("M13: Molecular Clock GPU");
 
@@ -479,7 +476,7 @@ fn validate_molecular_clock_gpu(gpu: &GpuF64, v: &mut Validator) {
     let cpu = molecular_clock::strict_clock(&branch_lengths, &parent_opt, root_age, &[]);
     let gpu_result =
         molecular_clock_gpu::strict_clock_gpu(gpu, &branch_lengths, &parent_indices, root_age, &[])
-            .expect("clock GPU");
+            .or_exit("clock GPU");
 
     match (&cpu, &gpu_result) {
         (Some(c), Some(g)) => {
@@ -506,7 +503,7 @@ fn validate_molecular_clock_gpu(gpu: &GpuF64, v: &mut Validator) {
         &node_ages,
         &parent_indices,
     )
-    .expect("relaxed clock GPU");
+    .or_exit("relaxed clock GPU");
 
     for (i, (c, g)) in cpu_rates.iter().zip(&gpu_rates).enumerate() {
         v.check(

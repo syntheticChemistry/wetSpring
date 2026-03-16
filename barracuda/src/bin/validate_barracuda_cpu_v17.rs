@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -55,6 +51,7 @@ use wetspring_barracuda::bio::{
     reconciliation,
 };
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct DomainTiming {
     name: &'static str,
@@ -215,7 +212,7 @@ fn main() {
         &[2, -1, -1],
         &[0.0, -0.5, 0.5],
     )
-    .unwrap();
+    .or_exit("unexpected error");
     let tree2 = gbm::GbmTree::from_arrays(
         &[1, -1, -1],
         &[0.3, 0.0, 0.0],
@@ -223,8 +220,8 @@ fn main() {
         &[2, -1, -1],
         &[0.0, -0.3, 0.3],
     )
-    .unwrap();
-    let gbm_model = gbm::GbmClassifier::new(vec![tree1, tree2], 0.1, 0.0, 2).unwrap();
+    .or_exit("unexpected error");
+    let gbm_model = gbm::GbmClassifier::new(vec![tree1, tree2], 0.1, 0.0, 2).or_exit("unexpected error");
     let pred = gbm_model.predict_proba(&[0.8, 0.5]);
     v.check_pass(
         "GBM: probability ∈ [0,1]",
@@ -312,7 +309,7 @@ fn main() {
         &[None, Some(0), Some(1)],
         2,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     let dt_pred = dt.predict(&[0.8, 0.3]);
     v.check_pass("DT: valid class", dt_pred <= 1);
     v.check_pass("DT: depth > 0", dt.depth() > 0);
@@ -324,8 +321,8 @@ fn main() {
         &[None, Some(0), Some(1)],
         2,
     )
-    .unwrap();
-    let forest = random_forest::RandomForest::from_trees(vec![dt, dt2], 2).unwrap();
+    .or_exit("unexpected error");
+    let forest = random_forest::RandomForest::from_trees(vec![dt, dt2], 2).or_exit("unexpected error");
     let rf_pred = forest.predict(&[0.8, 0.5]);
     v.check_pass("RF: valid class", rf_pred <= 1);
     let rf_batch = forest.predict_batch(&[vec![0.8, 0.5], vec![0.1, 0.9]]);

@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -63,13 +55,14 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
-        .expect("tokio runtime");
-    let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+        .or_exit("tokio runtime");
+    let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
 
     let mut v = Validator::new(
         "Exp241: Pure GPU Streaming v7 — Extended ToadStool Unidirectional Pipeline",
@@ -79,7 +72,7 @@ fn main() {
     // ═══ Stage 1: DADA2 GPU Denoising ════════════════════════════════════
     v.section("Stage 1: DADA2 GPU Denoising");
     let dada2_device = gpu.to_wgpu_device();
-    let dada2_engine = dada2_gpu::Dada2Gpu::new(dada2_device).unwrap();
+    let dada2_engine = dada2_gpu::Dada2Gpu::new(dada2_device).or_exit("unexpected error");
     let raw_seqs = vec![
         derep::UniqueSequence {
             sequence: b"ACGTACGTACGTACGT".to_vec(),
@@ -111,7 +104,7 @@ fn main() {
         },
     ];
     let (gpu_asvs, gpu_stats) =
-        dada2_gpu::denoise_gpu(&dada2_engine, &raw_seqs, &dada2::Dada2Params::default()).unwrap();
+        dada2_gpu::denoise_gpu(&dada2_engine, &raw_seqs, &dada2::Dada2Params::default()).or_exit("unexpected error");
     let (cpu_asvs, _) = dada2::denoise(&raw_seqs, &dada2::Dada2Params::default());
     v.check_pass(
         "DADA2: GPU ASV count matches CPU",
@@ -128,7 +121,7 @@ fn main() {
     v.section("Stage 2: Chimera GPU Filtering");
     let (clean_asvs_gpu, chim_stats) =
         chimera_gpu::remove_chimeras_gpu(&gpu, &gpu_asvs, &chimera::ChimeraParams::default())
-            .unwrap();
+            .or_exit("unexpected error");
     let (clean_asvs_cpu, _) =
         chimera::remove_chimeras(&gpu_asvs, &chimera::ChimeraParams::default());
     v.check_pass(
@@ -145,7 +138,7 @@ fn main() {
     // ═══ Stage 3: Diversity GPU ══════════════════════════════════════════
     v.section("Stage 3: Diversity GPU (Shannon + BC)");
     let combined: Vec<f64> = clean_asvs_gpu.iter().map(|a| a.abundance as f64).collect();
-    let gpu_shannon = diversity_gpu::shannon_gpu(&gpu, &combined).unwrap();
+    let gpu_shannon = diversity_gpu::shannon_gpu(&gpu, &combined).or_exit("unexpected error");
     let cpu_shannon = diversity::shannon(&combined);
     v.check(
         "Diversity: Shannon CPU == GPU",
@@ -153,7 +146,7 @@ fn main() {
         cpu_shannon,
         tolerances::GPU_VS_CPU_F64,
     );
-    let gpu_simpson = diversity_gpu::simpson_gpu(&gpu, &combined).unwrap();
+    let gpu_simpson = diversity_gpu::simpson_gpu(&gpu, &combined).or_exit("unexpected error");
     let cpu_simpson = diversity::simpson(&combined);
     v.check(
         "Diversity: Simpson CPU == GPU",
@@ -170,7 +163,7 @@ fn main() {
         depth: None,
         seed: 42,
     };
-    let rare = rarefaction_gpu::rarefaction_bootstrap_gpu(&gpu, &combined, &rare_params).unwrap();
+    let rare = rarefaction_gpu::rarefaction_bootstrap_gpu(&gpu, &combined, &rare_params).or_exit("unexpected error");
     v.check_pass(
         "Rarefaction: Shannon CI valid",
         rare.shannon.lower <= rare.shannon.upper,
@@ -202,7 +195,7 @@ fn main() {
     if sites.len() >= 3 {
         let targets = vec![(0.25, 0.15), (0.75, 0.45)];
         let config = kriging::VariogramConfig::spherical(0.0, 1.0, 5.0);
-        let krig = kriging::interpolate_diversity(&gpu, &sites, &targets, &config).unwrap();
+        let krig = kriging::interpolate_diversity(&gpu, &sites, &targets, &config).or_exit("unexpected error");
         v.check_pass(
             "Kriging: interpolated values present",
             krig.values.len() == 2,
@@ -236,7 +229,7 @@ fn main() {
     let cpu_dtl = reconciliation::reconcile_dtl(&host, &parasite, &tip_mapping, &costs);
     let gpu_dtl =
         reconciliation_gpu::reconcile_dtl_gpu(&gpu, &host, &parasite, &tip_mapping, &costs)
-            .unwrap();
+            .or_exit("unexpected error");
     v.check_pass(
         "DTL: GPU cost == CPU",
         gpu_dtl.optimal_cost == cpu_dtl.optimal_cost,
@@ -246,7 +239,7 @@ fn main() {
     v.section("Determinism Check (3 runs)");
     let mut shannons = Vec::new();
     for run in 0..3 {
-        let s = diversity_gpu::shannon_gpu(&gpu, &combined).unwrap();
+        let s = diversity_gpu::shannon_gpu(&gpu, &combined).or_exit("unexpected error");
         shannons.push(s);
         println!("    Run {}: Shannon = {s:.15}", run + 1);
     }
@@ -266,7 +259,7 @@ fn main() {
             .iter()
             .map(|a| vec![a.abundance as f64])
             .collect();
-        let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &bc_vecs).unwrap();
+        let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &bc_vecs).or_exit("unexpected error");
         let cpu_bc = diversity::bray_curtis_condensed(&bc_vecs);
         v.check_pass(
             "BC GPU: condensed len matches",

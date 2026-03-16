@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -61,6 +53,7 @@ use wetspring_barracuda::df64_host;
 use wetspring_barracuda::ipc::dispatch;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn synthetic_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     let mut counts = Vec::with_capacity(n_species);
@@ -92,10 +85,10 @@ fn main() {
         let cpu_d = diversity::simpson(counts);
 
         let params = json!({"counts": counts, "metrics": ["all"]});
-        let result = dispatch::dispatch("science.diversity", &params).expect("dispatch");
+        let result = dispatch::dispatch("science.diversity", &params).or_exit("dispatch");
 
-        let ipc_h = result["shannon"].as_f64().unwrap();
-        let ipc_d = result["simpson"].as_f64().unwrap();
+        let ipc_h = result["shannon"].as_f64().or_exit("unexpected error");
+        let ipc_d = result["simpson"].as_f64().or_exit("unexpected error");
 
         v.check(
             &format!("Shannon[{i}]: IPC == direct"),
@@ -116,7 +109,7 @@ fn main() {
 
     let allele_freqs = [0.8, 0.6, 0.3];
     let sample_sizes = [100, 100, 100];
-    let cpu_fst = fst_variance::fst_variance_decomposition(&allele_freqs, &sample_sizes).unwrap();
+    let cpu_fst = fst_variance::fst_variance_decomposition(&allele_freqs, &sample_sizes).or_exit("unexpected error");
 
     v.check_pass("FST direct: in [0,1]", (0.0..=1.0).contains(&cpu_fst.fst));
     v.check_pass("FST direct: divergent > 0", cpu_fst.fst > 0.0);
@@ -132,11 +125,11 @@ fn main() {
 
     let qs_params = QsBiofilmParams::default();
     let cpu_r = qs_biofilm::scenario_standard_growth(&qs_params, 0.01);
-    let cpu_n_ss = cpu_r.states().last().unwrap()[0];
+    let cpu_n_ss = cpu_r.states().last().or_exit("unexpected error")[0];
 
     let ipc_params = json!({"scenario": "standard_growth"});
-    let ipc_result = dispatch::dispatch("science.qs_model", &ipc_params).expect("dispatch QS");
-    let ipc_n_ss = ipc_result["final_state"][0].as_f64().unwrap();
+    let ipc_result = dispatch::dispatch("science.qs_model", &ipc_params).or_exit("dispatch QS");
+    let ipc_n_ss = ipc_result["final_state"][0].as_f64().or_exit("unexpected error");
     v.check(
         "QS N_ss: IPC == direct",
         ipc_n_ss,
@@ -154,9 +147,9 @@ fn main() {
             "scenario": "standard_growth"
         }),
     )
-    .expect("full_pipeline");
+    .or_exit("full_pipeline");
 
-    let pipe_h = pipe_result["diversity"]["shannon"].as_f64().unwrap();
+    let pipe_h = pipe_result["diversity"]["shannon"].as_f64().or_exit("unexpected error");
     let expected_h = diversity::shannon(&pipeline_community);
     v.check(
         "Pipeline Shannon == direct",
@@ -290,8 +283,8 @@ fn main() {
     let counts = synthetic_community(100, 0.5, 42);
     let cpu_h = diversity::shannon(&counts);
     let fallback_params = json!({"counts": &counts, "substrate": "cpu"});
-    let fallback = dispatch::dispatch("science.diversity", &fallback_params).expect("fallback");
-    let fb_h = fallback["shannon"].as_f64().unwrap();
+    let fallback = dispatch::dispatch("science.diversity", &fallback_params).or_exit("fallback");
+    let fb_h = fallback["shannon"].as_f64().or_exit("unexpected error");
     v.check(
         "Fallback Shannon == CPU",
         fb_h,
@@ -301,7 +294,7 @@ fn main() {
 
     // ═══ MF09: Health + Error Handling ═══════════════════════════════
     v.section("MF09: IPC Health + Error Handling");
-    let health = dispatch::dispatch("health.check", &json!({})).expect("health");
+    let health = dispatch::dispatch("health.check", &json!({})).or_exit("health");
     v.check_pass("health check OK", health.get("status").is_some());
 
     let err = dispatch::dispatch("science.nonexistent", &json!({}));

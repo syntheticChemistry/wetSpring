@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::redundant_closure_for_method_calls,
     reason = "validation harness: required for domain validation"
 )]
@@ -44,6 +40,7 @@ use wetspring_barracuda::io::ms2;
 use wetspring_barracuda::io::nanopore::{self, NanoporeIter, SyntheticSignalGenerator};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn temp_path(name: &str) -> PathBuf {
     std::env::temp_dir().join(format!("wetspring_exp209_{name}"))
@@ -52,7 +49,7 @@ fn temp_path(name: &str) -> PathBuf {
 // ── S1: FASTQ byte-native stats parity ──────────────────────────────────────
 
 fn write_synthetic_fastq(path: &std::path::Path) {
-    let mut f = std::fs::File::create(path).unwrap();
+    let mut f = std::fs::File::create(path).or_exit("unexpected error");
     let reads: &[(&str, &[u8], &[u8])] = &[
         ("read1", b"ATGCATGCATGCATGC", b"IIIIIIIIIIIIIIII"),
         ("read2", b"GGGGCCCCAAAA", b"FFFFFFFFFFFF"),
@@ -69,12 +66,12 @@ fn write_synthetic_fastq(path: &std::path::Path) {
         ),
     ];
     for (id, seq, qual) in reads {
-        writeln!(f, "@{id}").unwrap();
-        f.write_all(seq).unwrap();
-        writeln!(f).unwrap();
-        writeln!(f, "+").unwrap();
-        f.write_all(qual).unwrap();
-        writeln!(f).unwrap();
+        writeln!(f, "@{id}").or_exit("unexpected error");
+        f.write_all(seq).or_exit("unexpected error");
+        writeln!(f).or_exit("unexpected error");
+        writeln!(f, "+").or_exit("unexpected error");
+        f.write_all(qual).or_exit("unexpected error");
+        writeln!(f).or_exit("unexpected error");
     }
 }
 
@@ -85,12 +82,12 @@ fn validate_fastq_stats_parity(v: &mut Validator) {
     write_synthetic_fastq(&path);
 
     let batch_records: Vec<_> = fastq::FastqIter::open(&path)
-        .unwrap()
+        .or_exit("unexpected error")
         .collect::<Result<Vec<_>, _>>()
-        .unwrap();
+        .or_exit("unexpected error");
     let batch_stats = fastq::compute_stats(&batch_records);
 
-    let stream_stats = fastq::stats_from_file(&path).unwrap();
+    let stream_stats = fastq::stats_from_file(&path).or_exit("unexpected error");
 
     v.check_count(
         "num_sequences batch==stream",
@@ -152,9 +149,9 @@ fn validate_fastq_record_parity(v: &mut Validator) {
     write_synthetic_fastq(&path);
 
     let batch_records: Vec<_> = fastq::FastqIter::open(&path)
-        .unwrap()
+        .or_exit("unexpected error")
         .collect::<Result<Vec<_>, _>>()
-        .unwrap();
+        .or_exit("unexpected error");
 
     let mut stream_ids = Vec::new();
     let mut stream_seqs: Vec<Vec<u8>> = Vec::new();
@@ -166,7 +163,7 @@ fn validate_fastq_record_parity(v: &mut Validator) {
         stream_quals.push(rec.quality.to_vec());
         Ok(())
     })
-    .unwrap();
+    .or_exit("unexpected error");
 
     v.check_count(
         "record count batch==stream",
@@ -204,15 +201,15 @@ fn validate_utf8_header_safety(v: &mut Validator) {
 
     let path = temp_path("utf8_headers.fastq");
     {
-        let mut f = std::fs::File::create(&path).unwrap();
-        writeln!(f, "@read_with_émojis_and_über_chars description here").unwrap();
-        writeln!(f, "ATGCATGC").unwrap();
-        writeln!(f, "+").unwrap();
-        writeln!(f, "IIIIIIII").unwrap();
-        writeln!(f, "@read_with_日本語_header").unwrap();
-        writeln!(f, "GCGCGCGC").unwrap();
-        writeln!(f, "+").unwrap();
-        writeln!(f, "FFFFFFFF").unwrap();
+        let mut f = std::fs::File::create(&path).or_exit("unexpected error");
+        writeln!(f, "@read_with_émojis_and_über_chars description here").or_exit("unexpected error");
+        writeln!(f, "ATGCATGC").or_exit("unexpected error");
+        writeln!(f, "+").or_exit("unexpected error");
+        writeln!(f, "IIIIIIII").or_exit("unexpected error");
+        writeln!(f, "@read_with_日本語_header").or_exit("unexpected error");
+        writeln!(f, "GCGCGCGC").or_exit("unexpected error");
+        writeln!(f, "+").or_exit("unexpected error");
+        writeln!(f, "FFFFFFFF").or_exit("unexpected error");
     }
 
     let result = fastq::FastqIter::open(&path).and_then(|i| i.collect::<Result<Vec<_>, _>>());
@@ -229,11 +226,11 @@ fn validate_utf8_header_safety(v: &mut Validator) {
 
     let malformed_path = temp_path("malformed_header.fastq");
     {
-        let mut f = std::fs::File::create(&malformed_path).unwrap();
-        writeln!(f, "NOT_A_HEADER_LINE").unwrap();
-        writeln!(f, "ATGC").unwrap();
-        writeln!(f, "+").unwrap();
-        writeln!(f, "IIII").unwrap();
+        let mut f = std::fs::File::create(&malformed_path).or_exit("unexpected error");
+        writeln!(f, "NOT_A_HEADER_LINE").or_exit("unexpected error");
+        writeln!(f, "ATGC").or_exit("unexpected error");
+        writeln!(f, "+").or_exit("unexpected error");
+        writeln!(f, "IIII").or_exit("unexpected error");
     }
 
     let malformed_result =
@@ -257,11 +254,11 @@ fn validate_nanopore_bulk_parity(v: &mut Validator) {
     let reads = sig.generate_batch(50, 8000, 4000.0);
 
     let path = temp_path("bulk_parity.nrs");
-    nanopore::write_nrs(&path, &reads).unwrap();
+    nanopore::write_nrs(&path, &reads).or_exit("unexpected error");
 
     let loaded: Vec<_> = NanoporeIter::open(&path)
-        .unwrap()
-        .map(|r| r.unwrap())
+        .or_exit("unexpected error")
+        .map(|r| r.or_exit("unexpected error"))
         .collect();
 
     v.check_count("read count round-trip", loaded.len(), 50);
@@ -342,32 +339,32 @@ fn validate_ms2_streaming_parity(v: &mut Validator) {
 
     let path = temp_path("stream_parity.ms2");
     {
-        let mut f = std::fs::File::create(&path).unwrap();
-        writeln!(f, "H\tCreatedBy\twetSpring Exp209").unwrap();
-        writeln!(f, "H\tExtractor\tsynthetic").unwrap();
-        writeln!(f, "S\t1\t1\t500.250").unwrap();
-        writeln!(f, "I\tRTime\t1.5").unwrap();
-        writeln!(f, "I\tBPI\t10000.0").unwrap();
-        writeln!(f, "I\tTIC\t50000.0").unwrap();
-        writeln!(f, "Z\t2\t999.493").unwrap();
-        writeln!(f, "100.0\t1000.0").unwrap();
-        writeln!(f, "200.0\t5000.0").unwrap();
-        writeln!(f, "300.0\t3000.0").unwrap();
-        writeln!(f, "S\t2\t2\t750.500").unwrap();
-        writeln!(f, "I\tRTime\t3.2").unwrap();
-        writeln!(f, "I\tBPI\t8000.0").unwrap();
-        writeln!(f, "I\tTIC\t35000.0").unwrap();
-        writeln!(f, "Z\t3\t1124.730").unwrap();
-        writeln!(f, "150.0\t2000.0").unwrap();
-        writeln!(f, "250.0\t8000.0").unwrap();
-        writeln!(f, "350.0\t1500.0").unwrap();
-        writeln!(f, "450.0\t500.0").unwrap();
+        let mut f = std::fs::File::create(&path).or_exit("unexpected error");
+        writeln!(f, "H\tCreatedBy\twetSpring Exp209").or_exit("unexpected error");
+        writeln!(f, "H\tExtractor\tsynthetic").or_exit("unexpected error");
+        writeln!(f, "S\t1\t1\t500.250").or_exit("unexpected error");
+        writeln!(f, "I\tRTime\t1.5").or_exit("unexpected error");
+        writeln!(f, "I\tBPI\t10000.0").or_exit("unexpected error");
+        writeln!(f, "I\tTIC\t50000.0").or_exit("unexpected error");
+        writeln!(f, "Z\t2\t999.493").or_exit("unexpected error");
+        writeln!(f, "100.0\t1000.0").or_exit("unexpected error");
+        writeln!(f, "200.0\t5000.0").or_exit("unexpected error");
+        writeln!(f, "300.0\t3000.0").or_exit("unexpected error");
+        writeln!(f, "S\t2\t2\t750.500").or_exit("unexpected error");
+        writeln!(f, "I\tRTime\t3.2").or_exit("unexpected error");
+        writeln!(f, "I\tBPI\t8000.0").or_exit("unexpected error");
+        writeln!(f, "I\tTIC\t35000.0").or_exit("unexpected error");
+        writeln!(f, "Z\t3\t1124.730").or_exit("unexpected error");
+        writeln!(f, "150.0\t2000.0").or_exit("unexpected error");
+        writeln!(f, "250.0\t8000.0").or_exit("unexpected error");
+        writeln!(f, "350.0\t1500.0").or_exit("unexpected error");
+        writeln!(f, "450.0\t500.0").or_exit("unexpected error");
     }
 
     let batch: Vec<_> = ms2::Ms2Iter::open(&path)
-        .unwrap()
+        .or_exit("unexpected error")
         .collect::<Result<Vec<_>, _>>()
-        .unwrap();
+        .or_exit("unexpected error");
 
     let mut stream_count = 0_usize;
     let mut stream_mz_sums = Vec::new();
@@ -377,7 +374,7 @@ fn validate_ms2_streaming_parity(v: &mut Validator) {
         stream_count += 1;
         Ok(())
     })
-    .unwrap();
+    .or_exit("unexpected error");
 
     v.check_count(
         "MS2 spectrum count batch==stream",
@@ -412,7 +409,7 @@ fn validate_ms2_streaming_parity(v: &mut Validator) {
     );
 
     let batch_stats = ms2::compute_stats(&batch);
-    let stream_stats = ms2::stats_from_file(&path).unwrap();
+    let stream_stats = ms2::stats_from_file(&path).or_exit("unexpected error");
     v.check_count(
         "MS2 stats num_spectra batch==stream",
         batch_stats.num_spectra,

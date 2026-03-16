@@ -35,6 +35,7 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp070: BarraCuda CPU — 25-Domain Pure Rust Math Proof");
@@ -366,7 +367,7 @@ fn main() {
         &[None, Some(0), Some(1)],
         3,
     )
-    .expect("valid tree");
+    .or_exit("valid tree");
     let t0 = Instant::now();
     let pred_low = dt.predict(&[3.0, 0.0, 0.0]);
     let pred_high = dt.predict(&[7.0, 0.0, 0.0]);
@@ -534,8 +535,8 @@ fn main() {
     // ═══ D21: dN/dS ═══════════════════════════════════════════════
     v.section("D21: dN/dS (Nei & Gojobori 1986)");
     let t0 = Instant::now();
-    let identical_dnds = dnds::pairwise_dnds(b"ATGATGATG", b"ATGATGATG").expect("dN/dS identical");
-    let syn_result = dnds::pairwise_dnds(b"TTTGCTAAA", b"TTCGCTAAA").expect("dN/dS synonymous");
+    let identical_dnds = dnds::pairwise_dnds(b"ATGATGATG", b"ATGATGATG").or_exit("dN/dS identical");
+    let syn_result = dnds::pairwise_dnds(b"TTTGCTAAA", b"TTCGCTAAA").or_exit("dN/dS synonymous");
     let dnds_us = t0.elapsed().as_micros() as f64;
     v.check(
         "dN/dS: identical → dN=0",
@@ -569,7 +570,7 @@ fn main() {
     let parents = vec![None, Some(0), Some(0), Some(1), Some(1), Some(2), Some(2)];
     let t0 = Instant::now();
     let clock = molecular_clock::strict_clock(&branch_lengths, &parents, 3500.0, &[])
-        .expect("strict clock");
+        .or_exit("strict clock");
     let relaxed = molecular_clock::relaxed_clock_rates(&branch_lengths, &clock.node_ages, &parents);
     let positive_rates: Vec<f64> = relaxed.iter().copied().filter(|&r| r > 0.0).collect();
     let cv = molecular_clock::rate_variation_cv(&positive_rates);
@@ -665,7 +666,7 @@ fn main() {
         &[None, Some(0), Some(1)],
         3,
     )
-    .expect("valid tree");
+    .or_exit("valid tree");
     let dt2 = DecisionTree::from_arrays(
         &[1, -1, -1],
         &[3.0, 0.0, 0.0],
@@ -674,8 +675,8 @@ fn main() {
         &[None, Some(1), Some(0)],
         3,
     )
-    .expect("valid tree");
-    let rf = RandomForest::from_trees(vec![dt1, dt2], 2).expect("valid forest");
+    .or_exit("valid tree");
+    let rf = RandomForest::from_trees(vec![dt1, dt2], 2).or_exit("valid forest");
     let t0 = Instant::now();
     let pred = rf.predict(&[3.0, 2.0, 0.0]);
     let batch_preds = rf.predict_batch(&[
@@ -707,8 +708,8 @@ fn main() {
         &[2, -1, -1],
         &[-0.5, -0.3, 0.3],
     )
-    .expect("valid tree");
-    let gbm = GbmClassifier::new(vec![gbm_tree], 0.1, 0.0, 3).expect("valid GBM");
+    .or_exit("valid tree");
+    let gbm = GbmClassifier::new(vec![gbm_tree], 0.1, 0.0, 3).or_exit("valid GBM");
     let t0 = Instant::now();
     let pred_gbm = gbm.predict_proba(&[3.0, 0.0, 0.0]);
     let gbm_us = t0.elapsed().as_micros() as f64;

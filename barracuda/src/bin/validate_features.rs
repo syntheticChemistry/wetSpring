@@ -46,6 +46,7 @@ use wetspring_barracuda::bio::signal::PeakParams;
 use wetspring_barracuda::io::mzml;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 #[expect(clippy::too_many_lines)] // sequential feature validation: parse → tracks → EIC → features → asari cross-reference
 fn main() {
@@ -95,9 +96,9 @@ fn main() {
             .map_or_else(|| first_file.to_string_lossy(), |n| n.to_string_lossy())
     );
     let spectra: Vec<_> = mzml::MzmlIter::open(first_file)
-        .expect("open mzML")
+        .or_exit("open mzML")
         .collect::<std::result::Result<Vec<_>, _>>()
-        .expect("parse mzML");
+        .or_exit("parse mzML");
     let ms1: Vec<_> = spectra
         .iter()
         .filter(|s| s.ms_level == 1)

@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -52,6 +48,7 @@ use wetspring_barracuda::bio::{cooperation, diversity, qs_biofilm};
 use wetspring_barracuda::ipc::primal_names;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{DomainResult, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 fn domain(
     name: &'static str,
@@ -116,11 +113,11 @@ fn main() {
     let mut mf23 = 0_u32;
 
     let et0 =
-        barracuda::stats::fao56_et0(21.5, 12.3, 84.0, 63.0, 2.78, 22.07, 100.0, 50.8, 187).unwrap();
+        barracuda::stats::fao56_et0(21.5, 12.3, 84.0, 63.0, 2.78, 22.07, 100.0, 50.8, 187).or_exit("unexpected error");
     v.check_pass("MF23: FAO-56 ET₀ > 0", et0 > 0.0);
     mf23 += 1;
 
-    let harg = barracuda::stats::hargreaves_et0(35.0, 32.0, 18.0).unwrap();
+    let harg = barracuda::stats::hargreaves_et0(35.0, 32.0, 18.0).or_exit("unexpected error");
     v.check_pass("MF23: Hargreaves > 0", harg > 0.0);
     mf23 += 1;
 
@@ -172,13 +169,13 @@ fn main() {
         0.95,
         42,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     v.check_pass("MF24: CI contains mean", ci.lower < mean && ci.upper > mean);
     mf24 += 1;
 
     let x: Vec<f64> = (0..30).map(|i| f64::from(i) * 0.1).collect();
     let y = x.clone();
-    let r_pearson = barracuda::stats::pearson_correlation(&x, &y).unwrap();
+    let r_pearson = barracuda::stats::pearson_correlation(&x, &y).or_exit("unexpected error");
     v.check(
         "MF24: Pearson(x,x) = 1",
         r_pearson,
@@ -187,7 +184,7 @@ fn main() {
     );
     mf24 += 1;
 
-    let fit = barracuda::stats::fit_linear(&x, &y).unwrap();
+    let fit = barracuda::stats::fit_linear(&x, &y).or_exit("unexpected error");
     v.check(
         "MF24: slope = 1",
         fit.params[0],
@@ -300,7 +297,7 @@ fn main() {
     let mut mf26 = 0_u32;
 
     let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    let ecop = manifest.parent().unwrap().parent().unwrap().to_path_buf();
+    let ecop = manifest.parent().or_exit("unexpected error").parent().or_exit("unexpected error").to_path_buf();
     let graphs = [
         (
             "wetspring_deploy",
@@ -314,7 +311,7 @@ fn main() {
 
     for (name, path) in &graphs {
         if path.exists() {
-            let contents = std::fs::read_to_string(path).unwrap();
+            let contents = std::fs::read_to_string(path).or_exit("unexpected error");
             v.check_pass(
                 &format!("MF26: {name}.toml exists + parseable"),
                 contents.contains("[graph]") && contents.contains("[[nodes]]"),
@@ -327,7 +324,7 @@ fn main() {
 
     let cap_reg = ecop.join("phase2/biomeOS/config/capability_registry.toml");
     if cap_reg.exists() {
-        let contents = std::fs::read_to_string(&cap_reg).unwrap();
+        let contents = std::fs::read_to_string(&cap_reg).or_exit("unexpected error");
         v.check_pass(
             "MF26: capability_registry has science.diversity",
             contents.contains("science.diversity"),
@@ -352,7 +349,7 @@ fn main() {
     v.check_pass("MF26: graph pipeline BC computed", bc_cond.len() == 3);
     mf26 += 1;
 
-    let jk = barracuda::stats::jackknife_mean_variance(&bc_cond).unwrap();
+    let jk = barracuda::stats::jackknife_mean_variance(&bc_cond).or_exit("unexpected error");
     v.check_pass("MF26: graph pipeline JK finite", jk.estimate.is_finite());
     mf26 += 1;
 

@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -42,6 +34,7 @@ use barracuda::shaders::provenance::report::shader_count;
 use barracuda::shaders::provenance::types::SpringDomain;
 use barracuda::shaders::provenance::{cross_spring_shaders, shaders_consumed_by, shaders_from};
 use wetspring_barracuda::tolerances;
+use wetspring_barracuda::validation::OrExit;
 
 struct BenchRow {
     primitive: &'static str,
@@ -63,7 +56,7 @@ where
     }
     let elapsed_ns = t.elapsed().as_nanos() as f64;
     let us_per_iter = elapsed_ns / 1000.0 / n as f64;
-    (result.unwrap(), us_per_iter)
+    (result.or_exit("unexpected error"), us_per_iter)
 }
 
 fn main() {
@@ -401,7 +394,7 @@ fn main() {
         let rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()
-            .expect("tokio runtime");
+            .or_exit("tokio runtime");
 
         match rt.block_on(wetspring_barracuda::gpu::GpuF64::new()) {
             Ok(gpu) => {

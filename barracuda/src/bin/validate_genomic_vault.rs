@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -49,6 +45,7 @@ use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::vault::consent::{ConsentScope, ConsentTicket};
 use wetspring_barracuda::vault::provenance::ProvenanceChain;
 use wetspring_barracuda::vault::storage::VaultStore;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp259: Genomic Vault — Consent + Encrypted Storage + Provenance");
@@ -146,7 +143,7 @@ fn main() {
             &key,
             &store_ticket,
         )
-        .unwrap();
+        .or_exit("unexpected error");
     v.check_pass("Vault: 16S sequence stored", vault.blob_count() == 1);
     println!(
         "  Stored: sample_001.fasta ({} bytes) → hash {:02x}{:02x}{:02x}{:02x}...",
@@ -157,7 +154,7 @@ fn main() {
         hash[3]
     );
 
-    let result = vault.retrieve(&hash, &key, &store_ticket).unwrap();
+    let result = vault.retrieve(&hash, &key, &store_ticket).or_exit("unexpected error");
     v.check_pass(
         "Vault: retrieved plaintext matches original",
         result.plaintext == sample_16s,
@@ -196,7 +193,7 @@ fn main() {
     for (label, data) in &samples {
         vault
             .store(data, label, "patient-001", &key, &store_ticket)
-            .unwrap();
+            .or_exit("unexpected error");
     }
     v.check_pass("Vault: 5 samples stored", vault.blob_count() == 5);
 
@@ -243,7 +240,7 @@ fn main() {
 
     for (i, entry) in chain.iter().enumerate() {
         if i > 0 {
-            let prev = &chain.iter().nth(i - 1).unwrap();
+            let prev = &chain.iter().nth(i - 1).or_exit("unexpected error");
             assert_eq!(entry.parent, prev.hash, "chain link broken at entry {i}");
         }
     }
@@ -273,7 +270,7 @@ fn main() {
     );
     v.check_pass(
         "Provenance: head is export",
-        standalone.head().unwrap().operation == "export",
+        standalone.head().or_exit("unexpected error").operation == "export",
     );
 
     v.check_pass(

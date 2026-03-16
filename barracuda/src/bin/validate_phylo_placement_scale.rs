@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -33,6 +29,7 @@ use std::time::Instant;
 use wetspring_barracuda::bio::felsenstein::{self, TreeNode};
 use wetspring_barracuda::bio::neighbor_joining;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 const N_TAXA: usize = 128;
 const SEQ_LEN: usize = 300;
@@ -212,7 +209,7 @@ fn main() {
             .enumerate()
             .min_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal))
             .map(|(i, _)| i)
-            .expect("placement target found");
+            .or_exit("placement target found");
         best_targets.push(best);
     }
     let place_ms = place_start.elapsed().as_secs_f64() * 1000.0;

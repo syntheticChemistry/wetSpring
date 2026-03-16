@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -67,6 +63,7 @@ use barracuda::spectral::{
 };
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct DomainResult {
     name: &'static str,
@@ -270,7 +267,7 @@ fn main() {
                 found_transition = true;
                 w_c_estimate = f64::midpoint(
                     w,
-                    disorders[disorders.iter().position(|&d| d == w).unwrap() - 1],
+                    disorders[disorders.iter().position(|&d| d == w).or_exit("unexpected error") - 1],
                 );
             }
             prev_r = r;

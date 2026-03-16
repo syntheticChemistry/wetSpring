@@ -9,10 +9,11 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V122** | `handoffs/WETSPRING_V122_MODERN_IDIOMATIC_RUST_HANDOFF_MAR16_2026.md` | Mar 16 | **Modern Idiomatic Rust Evolution + Absorption** — all `#[allow()]` → `#[expect(reason)]` across 276+ validation binaries (298 files), 1,139 unfulfilled expectations cleaned, 18 new forge tests, idiomatic Rust fixes, unsafe eliminated from tests. Zero `#[allow()]` in entire codebase. Full toadStool/barraCuda absorption handoff with migration guide and patterns. |
+| **V123** | `handoffs/WETSPRING_V123_ZERO_PANIC_DUAL_DISCOVERY_HANDOFF_MAR16_2026.md` | Mar 16 | **Zero-Panic + Dual Discovery** — `OrExit` trait replaces 1,039 `.expect()` + 632 `.unwrap()` across 192 binaries (groundSpring V109 pattern). Dual-format capability discovery with `operation_dependencies`/`cost_estimates`/`semantic_mappings` (neuralSpring/ludoSpring). `extract_rpc_error()` centralized (healthSpring V29). Python deps upper-bounded. |
+| | *V122 → `handoffs/archive/`* | | V122 handoff archived. |
 | | *V119–V121 → `handoffs/archive/`* | | V119–V121 handoffs archived. |
 | | *V113–V118 → `handoffs/archive/`* | | V113–V118 handoffs archived. |
-| | *V112 and earlier → `handoffs/archive/`* | | Fossil record: V7–V112 (95+ archived handoffs). 130 total archived. |
+| | *V112 and earlier → `handoffs/archive/`* | | Fossil record: V7–V112 (95+ archived handoffs). 131 total archived. |
 
 ## Cross-Spring Documents
 
@@ -23,7 +24,7 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` — V7–V121 (130 files).
+Superseded handoffs in `handoffs/archive/` — V7–V122 (131 files).
 Preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda.
 
 ## Convention

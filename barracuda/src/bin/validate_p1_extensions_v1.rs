@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -56,6 +52,7 @@
 
 use std::time::Instant;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct P1Extension {
     name: &'static str,
@@ -364,9 +361,9 @@ fn main() {
             "total_compute_hours": total_hours,
             "status": "framework validated, awaiting real data",
         });
-        let json = serde_json::to_string_pretty(&export).expect("serialize");
+        let json = serde_json::to_string_pretty(&export).or_exit("serialize");
         std::fs::create_dir_all("output").ok();
-        std::fs::write("output/p1_extensions_framework.json", &json).expect("write");
+        std::fs::write("output/p1_extensions_framework.json", &json).or_exit("write");
         println!("\n  Exported: output/p1_extensions_framework.json");
         v.check_pass("P1 framework export", true);
     }

@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -54,6 +46,7 @@ use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::visualization::ipc_push::PetalTonguePushClient;
 use wetspring_barracuda::visualization::stream::StreamSession;
+use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::visualization::{
     DataChannel, EcologyScenario, ScenarioEdge, ScenarioNode, ScientificRange, scenario_to_json,
 };
@@ -112,8 +105,8 @@ fn main() {
         h_values[2]
             < *h_values
                 .iter()
-                .min_by(|a, b| a.partial_cmp(b).unwrap())
-                .unwrap()
+                .min_by(|a, b| a.partial_cmp(b).or_exit("unexpected error"))
+                .or_exit("unexpected error")
                 + 0.01,
     );
     v.check_pass(
@@ -297,7 +290,7 @@ fn main() {
         scientific_ranges: vec![],
     };
 
-    let max_len = biomes.iter().map(|(_, c)| c.len()).max().unwrap();
+    let max_len = biomes.iter().map(|(_, c)| c.len()).max().or_exit("unexpected error");
     let padded: Vec<Vec<f64>> = biomes
         .iter()
         .map(|(_, c)| {
@@ -426,7 +419,7 @@ fn main() {
     // ── S4: JSON export ──
     println!("\n── S4: JSON export ──");
 
-    let json = scenario_to_json(&scenario).expect("serialize scenario");
+    let json = scenario_to_json(&scenario).or_exit("serialize scenario");
     v.check_pass(
         "JSON contains Anderson",
         json.contains("Anderson QS Landscape"),
@@ -447,10 +440,10 @@ fn main() {
     let output_dir = PathBuf::from("output");
     let _ = std::fs::create_dir_all(&output_dir);
     let path = output_dir.join("anderson_qs_landscape_full.json");
-    std::fs::write(&path, &json).expect("write JSON");
+    std::fs::write(&path, &json).or_exit("write JSON");
     v.check_pass("JSON file written", path.exists());
 
-    let file_size = std::fs::metadata(&path).expect("metadata").len();
+    let file_size = std::fs::metadata(&path).or_exit("metadata").len();
     println!("  → File: {} ({} bytes)", path.display(), file_size);
     println!("  → Load: petaltongue ui --scenario {}", path.display());
     v.check_pass("JSON file has content", file_size > 1000);

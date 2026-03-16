@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::cast_precision_loss,
     reason = "validation harness: f64 arithmetic for timing and metric ratios"
 )]
@@ -39,6 +35,7 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 #[tokio::main]
 async fn main() {
@@ -68,7 +65,7 @@ async fn main() {
         &[None, Some(0), None, Some(1), Some(2)],
         2,
     )
-    .expect("GPU RF");
+    .or_exit("GPU RF");
 
     let tree2 = DecisionTree::from_arrays(
         &[1, -2, -2],
@@ -78,7 +75,7 @@ async fn main() {
         &[None, Some(0), Some(2)],
         2,
     )
-    .expect("GPU RF");
+    .or_exit("GPU RF");
 
     let tree3 = DecisionTree::from_arrays(
         &[0, -2, -2],
@@ -88,7 +85,7 @@ async fn main() {
         &[None, Some(1), Some(2)],
         2,
     )
-    .expect("GPU RF");
+    .or_exit("GPU RF");
 
     let tree4 = DecisionTree::from_arrays(
         &[0, 1, -2, -2, -2],
@@ -98,7 +95,7 @@ async fn main() {
         &[None, None, Some(0), Some(1), Some(2)],
         2,
     )
-    .expect("GPU RF");
+    .or_exit("GPU RF");
 
     let tree5 = DecisionTree::from_arrays(
         &[1, -2, 0, -2, -2],
@@ -108,9 +105,9 @@ async fn main() {
         &[None, Some(0), None, Some(1), Some(2)],
         2,
     )
-    .expect("GPU RF");
+    .or_exit("GPU RF");
 
-    let rf = RandomForest::from_trees(vec![tree1, tree2, tree3, tree4, tree5], 3).expect("GPU RF");
+    let rf = RandomForest::from_trees(vec![tree1, tree2, tree3, tree4, tree5], 3).or_exit("GPU RF");
 
     let samples = vec![
         vec![3.0, 1.0],

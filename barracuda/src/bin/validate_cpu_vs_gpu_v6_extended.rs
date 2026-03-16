@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -53,6 +45,7 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct Timing {
     name: &'static str,
@@ -64,8 +57,8 @@ fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
-        .expect("tokio runtime");
-    let gpu = rt.block_on(GpuF64::new()).expect("GPU init");
+        .or_exit("tokio runtime");
+    let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
 
     let mut v = Validator::new("Exp243: CPU vs GPU Extended Parity — 22 Domains");
     let t_total = Instant::now();
@@ -100,7 +93,7 @@ fn main() {
     let (cpu_results, cpu_stats) = chimera::detect_chimeras(&asvs, &params);
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
-    let (gpu_results, gpu_stats) = chimera_gpu::detect_chimeras_gpu(&gpu, &asvs, &params).unwrap();
+    let (gpu_results, gpu_stats) = chimera_gpu::detect_chimeras_gpu(&gpu, &asvs, &params).or_exit("unexpected error");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check_pass(
         "Chimera: result count match",
@@ -150,10 +143,10 @@ fn main() {
     let (cpu_asvs, cpu_dstats) = dada2::denoise(&seqs, &dada2_params);
     let cpu_us = tc.elapsed().as_micros() as f64;
     let dada2_device = gpu.to_wgpu_device();
-    let dada2_engine = dada2_gpu::Dada2Gpu::new(dada2_device).unwrap();
+    let dada2_engine = dada2_gpu::Dada2Gpu::new(dada2_device).or_exit("unexpected error");
     let tg = Instant::now();
     let (gpu_asvs, gpu_dstats) =
-        dada2_gpu::denoise_gpu(&dada2_engine, &seqs, &dada2_params).unwrap();
+        dada2_gpu::denoise_gpu(&dada2_engine, &seqs, &dada2_params).or_exit("unexpected error");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check_pass("DADA2: ASV count match", gpu_asvs.len() == cpu_asvs.len());
     v.check_pass(
@@ -179,7 +172,7 @@ fn main() {
         &[2, -1, -1],
         &[0.0, -0.5, 0.5],
     )
-    .unwrap();
+    .or_exit("unexpected error");
     let tree2 = gbm::GbmTree::from_arrays(
         &[1, -1, -1],
         &[0.3, 0.0, 0.0],
@@ -187,8 +180,8 @@ fn main() {
         &[2, -1, -1],
         &[0.0, -0.3, 0.3],
     )
-    .unwrap();
-    let model = gbm::GbmClassifier::new(vec![tree1, tree2], 0.1, 0.0, 2).unwrap();
+    .or_exit("unexpected error");
+    let model = gbm::GbmClassifier::new(vec![tree1, tree2], 0.1, 0.0, 2).or_exit("unexpected error");
     let samples = vec![
         vec![0.8, 0.5],
         vec![0.2, 0.1],
@@ -199,7 +192,7 @@ fn main() {
     let cpu_preds = model.predict_batch_proba(&samples);
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
-    let gpu_preds = gbm_gpu::predict_batch_gpu(&gpu, &model, &samples).unwrap();
+    let gpu_preds = gbm_gpu::predict_batch_gpu(&gpu, &model, &samples).or_exit("unexpected error");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check_pass("GBM: batch size match", gpu_preds.len() == cpu_preds.len());
     for (i, (cp, gp)) in cpu_preds.iter().zip(gpu_preds.iter()).enumerate() {
@@ -233,7 +226,7 @@ fn main() {
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
     let gpu_dtl =
-        reconciliation_gpu::reconcile_dtl_gpu(&gpu, &host, &parasite, &tip_map, &costs).unwrap();
+        reconciliation_gpu::reconcile_dtl_gpu(&gpu, &host, &parasite, &tip_map, &costs).or_exit("unexpected error");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check_pass(
         "DTL: cost match",
@@ -255,7 +248,7 @@ fn main() {
     let parents_cpu = vec![Some(4), Some(4), Some(3), Some(4), None];
     let parents_gpu: Vec<i64> = parents_cpu
         .iter()
-        .map(|p| p.map_or(-1, |x| i64::try_from(x).expect("index fits i64")))
+        .map(|p| p.map_or(-1, |x| i64::try_from(x).or_exit("index fits i64")))
         .collect();
     let cal = vec![molecular_clock::CalibrationPoint {
         node_id: 4,
@@ -267,7 +260,7 @@ fn main() {
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
     let gpu_clock =
-        molecular_clock_gpu::strict_clock_gpu(&gpu, &bl, &parents_gpu, 30.0, &cal).unwrap();
+        molecular_clock_gpu::strict_clock_gpu(&gpu, &bl, &parents_gpu, 30.0, &cal).or_exit("unexpected error");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check_pass(
         "Clock: both present",
@@ -284,7 +277,7 @@ fn main() {
     let ages = vec![0.0, 0.0, 10.0, 15.0, 30.0];
     let cpu_rates = molecular_clock::relaxed_clock_rates(&bl, &ages, &parents_cpu);
     let gpu_rates =
-        molecular_clock_gpu::relaxed_clock_rates_gpu(&gpu, &bl, &ages, &parents_gpu).unwrap();
+        molecular_clock_gpu::relaxed_clock_rates_gpu(&gpu, &bl, &ages, &parents_gpu).or_exit("unexpected error");
     for (i, (cr, gr)) in cpu_rates.iter().zip(gpu_rates.iter()).enumerate() {
         v.check(
             &format!("Relaxed [{i}]"),
@@ -309,7 +302,7 @@ fn main() {
         &[None, Some(0), Some(1)],
         2,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     let dt2 = decision_tree::DecisionTree::from_arrays(
         &[1, -1, -1],
         &[0.3, 0.0, 0.0],
@@ -318,15 +311,15 @@ fn main() {
         &[None, Some(0), Some(1)],
         2,
     )
-    .unwrap();
-    let forest = random_forest::RandomForest::from_trees(vec![dt1, dt2], 2).unwrap();
+    .or_exit("unexpected error");
+    let forest = random_forest::RandomForest::from_trees(vec![dt1, dt2], 2).or_exit("unexpected error");
     let rf_gpu = random_forest_gpu::RandomForestGpu::new(&gpu.to_wgpu_device());
     let rf_samples = vec![vec![0.8, 0.5], vec![0.1, 0.9], vec![0.5, 0.3]];
     let tc = Instant::now();
     let cpu_rf = forest.predict_batch_with_votes(&rf_samples);
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
-    let gpu_rf = rf_gpu.predict_batch(&forest, &rf_samples).unwrap();
+    let gpu_rf = rf_gpu.predict_batch(&forest, &rf_samples).or_exit("unexpected error");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check_pass("RF: batch size match", gpu_rf.len() == cpu_rf.len());
     for (i, (cp, gp)) in cpu_rf.iter().zip(gpu_rf.iter()).enumerate() {

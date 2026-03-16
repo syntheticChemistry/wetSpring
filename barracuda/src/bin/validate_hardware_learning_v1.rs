@@ -5,10 +5,6 @@
     reason = "validation harness: cross-spring feature gates not defined in this crate"
 )]
 #![expect(
-    clippy::expect_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -81,7 +77,7 @@ fn main() {
     // ─── D92: Hardware Probe ───
     println!("\n  ── D92: Hardware Probe ──");
 
-    let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
+    let rt = tokio::runtime::Runtime::new().or_exit("tokio runtime");
     let device = rt.block_on(async { barracuda::device::WgpuDevice::new().await });
 
     let dev = match device {
@@ -187,6 +183,7 @@ fn main() {
         v.check_pass("precision tiers probed", !cal.tiers.is_empty());
 
         use barracuda::device::{FmaPolicy, PhysicsDomain, domain_requires_separate_fma};
+use wetspring_barracuda::validation::OrExit;
 
         let fma_info = serde_json::json!({
             "contract_allows_contraction": FmaPolicy::Contract.allows_contraction(),
@@ -296,17 +293,17 @@ fn main() {
     #[cfg(feature = "json")]
     {
         let json = serde_json::to_string_pretty(&serde_json::Value::Object(profile.clone()))
-            .expect("serialize");
+            .or_exit("serialize");
         std::fs::create_dir_all("output").ok();
         let path = "output/hardware_capability_profile.json";
-        std::fs::write(path, &json).expect("write");
+        std::fs::write(path, &json).or_exit("write");
         println!(
             "  Capability profile exported: {path} ({} bytes)",
             json.len()
         );
         v.check_pass("capability profile JSON exported", true);
 
-        let parsed: serde_json::Value = serde_json::from_str(&json).expect("reparse");
+        let parsed: serde_json::Value = serde_json::from_str(&json).or_exit("reparse");
         v.check_pass(
             "profile has adapter_name",
             parsed.get("adapter_name").is_some(),

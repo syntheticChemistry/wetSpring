@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -64,6 +60,7 @@ use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, dnds, hmm, kmer, pcoa};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 struct ParityBench {
     domain: &'static str,
@@ -209,7 +206,7 @@ fn main() {
     let t = Instant::now();
     let mut actual_r = 0.0;
     for _ in 0..10_000 {
-        actual_r = barracuda::stats::pearson_correlation(&x, &y).unwrap();
+        actual_r = barracuda::stats::pearson_correlation(&x, &y).or_exit("unexpected error");
     }
     let us = t.elapsed().as_micros();
 
@@ -293,7 +290,7 @@ fn main() {
         0.95,
         42,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     let us = t.elapsed().as_micros();
 
     v.check(
@@ -323,9 +320,9 @@ fn main() {
     v.section("§8 Jackknife — Python: astropy.stats.jackknife_stats");
 
     let t = Instant::now();
-    let mut jk = barracuda::stats::jackknife_mean_variance(&bs_data).unwrap();
+    let mut jk = barracuda::stats::jackknife_mean_variance(&bs_data).or_exit("unexpected error");
     for _ in 0..1_000 {
-        jk = barracuda::stats::jackknife_mean_variance(&bs_data).unwrap();
+        jk = barracuda::stats::jackknife_mean_variance(&bs_data).or_exit("unexpected error");
     }
     let us = t.elapsed().as_micros();
 
@@ -355,9 +352,9 @@ fn main() {
     let yr: Vec<f64> = xr.iter().map(|&xi| 3.0f64.mul_add(xi, 7.0)).collect();
 
     let t = Instant::now();
-    let mut fit = barracuda::stats::fit_linear(&xr, &yr).unwrap();
+    let mut fit = barracuda::stats::fit_linear(&xr, &yr).or_exit("unexpected error");
     for _ in 0..10_000 {
-        fit = barracuda::stats::fit_linear(&xr, &yr).unwrap();
+        fit = barracuda::stats::fit_linear(&xr, &yr).or_exit("unexpected error");
     }
     let us = t.elapsed().as_micros();
 
@@ -392,9 +389,9 @@ fn main() {
     let ye: Vec<f64> = xe.iter().map(|&xi| 2.0 * (0.1 * xi).exp()).collect();
 
     let t = Instant::now();
-    let mut fe = barracuda::stats::fit_exponential(&xe, &ye).unwrap();
+    let mut fe = barracuda::stats::fit_exponential(&xe, &ye).or_exit("unexpected error");
     for _ in 0..1_000 {
-        fe = barracuda::stats::fit_exponential(&xe, &ye).unwrap();
+        fe = barracuda::stats::fit_exponential(&xe, &ye).or_exit("unexpected error");
     }
     let us = t.elapsed().as_micros();
 
@@ -490,9 +487,9 @@ fn main() {
     let condensed = diversity::bray_curtis_condensed(&samples);
 
     let t = Instant::now();
-    let mut pc = pcoa::pcoa(&condensed, 20, 3).unwrap();
+    let mut pc = pcoa::pcoa(&condensed, 20, 3).or_exit("unexpected error");
     for _ in 0..100 {
-        pc = pcoa::pcoa(&condensed, 20, 3).unwrap();
+        pc = pcoa::pcoa(&condensed, 20, 3).or_exit("unexpected error");
     }
     let us = t.elapsed().as_micros();
 
@@ -547,7 +544,7 @@ fn main() {
     let mut dn: f64 = 0.0;
     let mut ds: f64 = 0.0;
     for _ in 0..10_000 {
-        let r = dnds::pairwise_dnds(gene_a, gene_b).unwrap();
+        let r = dnds::pairwise_dnds(gene_a, gene_b).or_exit("unexpected error");
         dn = r.dn;
         ds = r.ds;
     }

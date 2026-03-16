@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -58,6 +54,7 @@ use std::time::Instant;
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp267: ToadStool Dispatch v3 — Pure Rust Math Validation");
@@ -77,12 +74,12 @@ fn main() {
         0.95,
         42,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     v.check_pass("Bootstrap CI: lower < estimate", ci.lower <= ci.estimate);
     v.check_pass("Bootstrap CI: estimate < upper", ci.estimate <= ci.upper);
     v.check_pass("Bootstrap SE > 0", ci.std_error > 0.0);
 
-    let jk = barracuda::stats::jackknife_mean_variance(&data_5).unwrap();
+    let jk = barracuda::stats::jackknife_mean_variance(&data_5).or_exit("unexpected error");
     v.check(
         "Jackknife mean = 3.0",
         jk.estimate,
@@ -93,7 +90,7 @@ fn main() {
 
     let x = [1.0, 2.0, 3.0, 4.0, 5.0];
     let y = [2.0, 4.0, 6.0, 8.0, 10.0];
-    let pearson = barracuda::stats::pearson_correlation(&x, &y).unwrap();
+    let pearson = barracuda::stats::pearson_correlation(&x, &y).or_exit("unexpected error");
     v.check(
         "Pearson(x, 2x) = 1.0",
         pearson,
@@ -101,7 +98,7 @@ fn main() {
         tolerances::ANALYTICAL_F64,
     );
 
-    let spearman = barracuda::stats::spearman_correlation(&x, &y).unwrap();
+    let spearman = barracuda::stats::spearman_correlation(&x, &y).or_exit("unexpected error");
     v.check(
         "Spearman(x, 2x) = 1.0",
         spearman,
@@ -109,7 +106,7 @@ fn main() {
         tolerances::ANALYTICAL_F64,
     );
 
-    let fit = barracuda::stats::fit_linear(&x, &y).unwrap();
+    let fit = barracuda::stats::fit_linear(&x, &y).or_exit("unexpected error");
     v.check(
         "Linear fit: slope = 2.0",
         fit.params[0],
@@ -131,7 +128,7 @@ fn main() {
 
     let exp_x = [0.0_f64, 1.0, 2.0, 3.0];
     let exp_y: Vec<f64> = exp_x.iter().map(|&xi| (2.0 * xi).exp()).collect();
-    let exp_fit = barracuda::stats::fit_exponential(&exp_x, &exp_y).unwrap();
+    let exp_fit = barracuda::stats::fit_exponential(&exp_x, &exp_y).or_exit("unexpected error");
     v.check_pass("Exp fit: R² > 0.95", exp_fit.r_squared > 0.95);
 
     // ═══ S2: Linalg ══════════════════════════════════════════════════════
@@ -234,7 +231,7 @@ fn main() {
         tolerances::PYTHON_PARITY_TIGHT,
     );
 
-    let ln_gamma_1 = barracuda::special::ln_gamma(1.0).unwrap();
+    let ln_gamma_1 = barracuda::special::ln_gamma(1.0).or_exit("unexpected error");
     v.check(
         "ln_gamma(1) = 0",
         ln_gamma_1,
@@ -242,7 +239,7 @@ fn main() {
         tolerances::ANALYTICAL_F64,
     );
 
-    let ln_gamma_5 = barracuda::special::ln_gamma(5.0).unwrap();
+    let ln_gamma_5 = barracuda::special::ln_gamma(5.0).or_exit("unexpected error");
     let expected_ln_24 = (24.0_f64).ln();
     v.check(
         "ln_gamma(5) = ln(4!) = ln(24)",
@@ -256,7 +253,7 @@ fn main() {
 
     let trap_x: Vec<f64> = (0..=100).map(|i| f64::from(i) * 0.01).collect();
     let trap_y: Vec<f64> = trap_x.iter().map(|&x| x * x).collect();
-    let trap_area = barracuda::numerical::trapz(&trap_y, &trap_x).unwrap();
+    let trap_area = barracuda::numerical::trapz(&trap_y, &trap_x).or_exit("unexpected error");
     v.check(
         "∫x² dx [0,1] ≈ 1/3",
         trap_area,

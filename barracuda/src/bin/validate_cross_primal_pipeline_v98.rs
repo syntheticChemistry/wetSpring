@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::unwrap_used,
-    reason = "validation harness: fail-fast on setup errors"
-)]
-#![expect(
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
@@ -43,6 +39,7 @@ use std::time::{Duration, Instant};
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::ipc::Server;
 use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp322: Cross-Primal Pipeline V98+ — Ecosystem Integration");
@@ -72,12 +69,12 @@ fn main() {
 
     let t = Instant::now();
     let et0 =
-        barracuda::stats::fao56_et0(21.5, 12.3, 84.0, 63.0, 2.78, 22.07, 100.0, 50.8, 187).unwrap();
+        barracuda::stats::fao56_et0(21.5, 12.3, 84.0, 63.0, 2.78, 22.07, 100.0, 50.8, 187).or_exit("unexpected error");
     v.check_pass("airSpring: FAO-56 ET₀ > 0", et0 > 0.0);
     println!("  ET₀ = {et0:.2} mm/day (drives soil moisture → biofilm)");
 
-    let harg = barracuda::stats::hargreaves_et0(35.0, 32.0, 18.0).unwrap();
-    let mak = barracuda::stats::makkink_et0(20.0, 18.0).unwrap();
+    let harg = barracuda::stats::hargreaves_et0(35.0, 32.0, 18.0).or_exit("unexpected error");
+    let mak = barracuda::stats::makkink_et0(20.0, 18.0).or_exit("unexpected error");
     v.check_pass("airSpring: Hargreaves > 0", harg > 0.0);
     v.check_pass("airSpring: Makkink > 0", mak > 0.0);
 
@@ -213,7 +210,7 @@ fn main() {
         0.95,
         42,
     )
-    .unwrap();
+    .or_exit("unexpected error");
     let stats_ms = t.elapsed().as_secs_f64() * 1000.0;
 
     v.check_pass("groundSpring: bootstrap lower < H", boot_h.lower < h);
@@ -225,7 +222,7 @@ fn main() {
     println!("  Simpson D = {s:.4}, Chao1 = {c1:.1}");
     println!("  bootstrap CI: {stats_ms:.1}ms (5000 resamples)");
 
-    let jk = barracuda::stats::jackknife_mean_variance(&sample).unwrap();
+    let jk = barracuda::stats::jackknife_mean_variance(&sample).or_exit("unexpected error");
     v.check_pass(
         "groundSpring: jackknife estimate finite",
         jk.estimate.is_finite(),

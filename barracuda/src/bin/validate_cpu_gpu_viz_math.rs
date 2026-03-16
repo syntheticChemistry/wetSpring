@@ -26,6 +26,7 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::OrExit;
 
 fn validate_alpha_diversity(v: &mut Validator, gpu: &GpuF64, counts: &[f64]) {
     v.section("G1 — Shannon H'");
@@ -178,7 +179,7 @@ fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
-        .expect("tokio runtime");
+        .or_exit("tokio runtime");
     let gpu = match rt.block_on(GpuF64::new()) {
         Ok(g) => g,
         Err(e) => {
