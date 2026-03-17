@@ -70,6 +70,8 @@ fn capability_call(
     operation: &str,
     args: &Value,
 ) -> Result<Value, crate::error::Error> {
+    use crate::error::IpcError;
+
     let request = json!({
         "jsonrpc": "2.0",
         "method": "capability.call",
@@ -81,51 +83,56 @@ fn capability_call(
         "id": 1,
     });
 
-    let payload = serde_json::to_string(&request)
-        .map_err(|e| crate::error::Error::Ipc(format!("serialize: {e}")))?;
+    let payload =
+        serde_json::to_string(&request).map_err(|e| IpcError::Codec(format!("serialize: {e}")))?;
 
     let stream = std::os::unix::net::UnixStream::connect(socket_path)
-        .map_err(|e| crate::error::Error::Ipc(format!("connect {}: {e}", socket_path.display())))?;
+        .map_err(|e| IpcError::Connect(format!("{}: {e}", socket_path.display())))?;
     stream.set_read_timeout(Some(RPC_TIMEOUT)).ok();
     stream.set_write_timeout(Some(RPC_TIMEOUT)).ok();
 
     let mut writer = std::io::BufWriter::new(&stream);
     writer
         .write_all(payload.as_bytes())
-        .map_err(|e| crate::error::Error::Ipc(format!("write: {e}")))?;
+        .map_err(|e| IpcError::Transport(format!("write: {e}")))?;
     writer
         .write_all(b"\n")
-        .map_err(|e| crate::error::Error::Ipc(format!("write newline: {e}")))?;
+        .map_err(|e| IpcError::Transport(format!("write newline: {e}")))?;
     writer
         .flush()
-        .map_err(|e| crate::error::Error::Ipc(format!("flush: {e}")))?;
+        .map_err(|e| IpcError::Transport(format!("flush: {e}")))?;
     drop(writer);
 
     stream
         .shutdown(std::net::Shutdown::Write)
-        .map_err(|e| crate::error::Error::Ipc(format!("shutdown: {e}")))?;
+        .map_err(|e| IpcError::Transport(format!("shutdown: {e}")))?;
 
     let mut reader = BufReader::new(&stream);
     let mut line = String::new();
     reader
         .read_line(&mut line)
-        .map_err(|e| crate::error::Error::Ipc(format!("read: {e}")))?;
+        .map_err(|e| IpcError::Transport(format!("read: {e}")))?;
 
-    let parsed: Value = serde_json::from_str(line.trim())
-        .map_err(|e| crate::error::Error::Ipc(format!("parse response: {e}")))?;
+    let parsed: Value =
+        serde_json::from_str(line.trim()).map_err(|e| IpcError::Codec(format!("parse: {e}")))?;
 
     if let Some(err) = parsed.get("error") {
+        let code = err.get("code").and_then(Value::as_i64).unwrap_or(-32000);
         let msg = err
             .get("message")
             .and_then(Value::as_str)
             .unwrap_or("unknown");
-        return Err(crate::error::Error::Ipc(format!("rpc error: {msg}")));
+        return Err(IpcError::RpcReject {
+            code,
+            message: msg.to_string(),
+        }
+        .into());
     }
 
     parsed
         .get("result")
         .cloned()
-        .ok_or_else(|| crate::error::Error::Ipc("no result in response".to_string()))
+        .ok_or_else(|| IpcError::EmptyResponse.into())
 }
 
 fn local_session_id() -> String {

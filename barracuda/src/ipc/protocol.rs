@@ -164,6 +164,105 @@ pub fn extract_rpc_error(response: &str) -> Option<(i64, String)> {
     Some((code, message))
 }
 
+/// Extracted capability information from a `capability.list` response.
+///
+/// Supports both flat format (Format A: `"capabilities": ["a","b"]`) and
+/// nested format (Format B: `"domains": [{"name":"x","methods":["a"]}]`).
+#[derive(Debug, Clone, Default)]
+pub struct CapabilityInfo {
+    /// Flat capability list (Format A).
+    pub capabilities: Vec<String>,
+    /// Structured domain groupings (Format B), if present.
+    pub domains: Vec<CapabilityDomain>,
+    /// Primal name, if present.
+    pub primal: Option<String>,
+    /// Primal version, if present.
+    pub version: Option<String>,
+}
+
+/// A structured capability domain from Format B.
+#[derive(Debug, Clone)]
+pub struct CapabilityDomain {
+    /// Domain name (e.g. `"ecology.diversity"`).
+    pub name: String,
+    /// Human-readable description.
+    pub description: String,
+    /// IPC methods in this domain.
+    pub methods: Vec<String>,
+}
+
+/// Extract capabilities from a `capability.list` JSON-RPC response.
+///
+/// Parses both the flat `"capabilities"` array (Format A) and the structured
+/// `"domains"` array (Format B) from a response, following the dual-format
+/// pattern established by groundSpring/ludoSpring.
+///
+/// Returns `None` if the response is not valid JSON or has no result.
+#[must_use]
+pub fn extract_capabilities(response: &str) -> Option<CapabilityInfo> {
+    let val: Value = serde_json::from_str(response).ok()?;
+    let result = val.get("result")?;
+
+    let primal = result
+        .get("primal")
+        .and_then(Value::as_str)
+        .map(str::to_string);
+    let version = result
+        .get("version")
+        .and_then(Value::as_str)
+        .map(str::to_string);
+
+    let capabilities = result
+        .get("capabilities")
+        .and_then(Value::as_array)
+        .map(|arr| {
+            arr.iter()
+                .filter_map(Value::as_str)
+                .map(str::to_string)
+                .collect()
+        })
+        .unwrap_or_default();
+
+    let domains = result
+        .get("domains")
+        .and_then(Value::as_array)
+        .map(|arr| {
+            arr.iter()
+                .filter_map(|d| {
+                    let name = d.get("name")?.as_str()?.to_string();
+                    let description = d
+                        .get("description")
+                        .and_then(Value::as_str)
+                        .unwrap_or("")
+                        .to_string();
+                    let methods = d
+                        .get("methods")
+                        .and_then(Value::as_array)
+                        .map(|m| {
+                            m.iter()
+                                .filter_map(Value::as_str)
+                                .map(str::to_string)
+                                .collect()
+                        })
+                        .unwrap_or_default();
+                    Some(CapabilityDomain {
+                        name,
+                        description,
+                        methods,
+                    })
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+
+    Some(CapabilityInfo {
+        capabilities,
+        domains,
+        primal,
+        version,
+    })
+}
+
 #[cfg(test)]
 #[expect(clippy::unwrap_used)]
 mod tests {
@@ -248,5 +347,46 @@ mod tests {
     fn extract_rpc_error_from_malformed() {
         assert!(extract_rpc_error("not json").is_none());
         assert!(extract_rpc_error("").is_none());
+    }
+
+    #[test]
+    fn extract_capabilities_flat_format() {
+        let resp = r#"{"jsonrpc":"2.0","result":{"primal":"wetspring","version":"0.2.0","capabilities":["science.diversity","science.anderson"]},"id":1}"#;
+        let info = extract_capabilities(resp).unwrap();
+        assert_eq!(info.primal.as_deref(), Some("wetspring"));
+        assert_eq!(info.version.as_deref(), Some("0.2.0"));
+        assert_eq!(info.capabilities.len(), 2);
+        assert!(info.domains.is_empty());
+    }
+
+    #[test]
+    fn extract_capabilities_dual_format() {
+        let resp = r#"{"jsonrpc":"2.0","result":{"primal":"wetspring","capabilities":["science.diversity"],"domains":[{"name":"ecology.diversity","description":"Alpha diversity","methods":["science.diversity"]}]},"id":1}"#;
+        let info = extract_capabilities(resp).unwrap();
+        assert_eq!(info.capabilities.len(), 1);
+        assert_eq!(info.domains.len(), 1);
+        assert_eq!(info.domains[0].name, "ecology.diversity");
+        assert_eq!(info.domains[0].methods, vec!["science.diversity"]);
+    }
+
+    #[test]
+    fn extract_capabilities_no_result() {
+        let resp = r#"{"jsonrpc":"2.0","error":{"code":-1,"message":"fail"},"id":1}"#;
+        assert!(extract_capabilities(resp).is_none());
+    }
+
+    #[test]
+    fn extract_capabilities_empty_response() {
+        assert!(extract_capabilities("").is_none());
+        assert!(extract_capabilities("not json").is_none());
+    }
+
+    #[test]
+    fn extract_capabilities_minimal() {
+        let resp = r#"{"jsonrpc":"2.0","result":{},"id":1}"#;
+        let info = extract_capabilities(resp).unwrap();
+        assert!(info.capabilities.is_empty());
+        assert!(info.domains.is_empty());
+        assert!(info.primal.is_none());
     }
 }

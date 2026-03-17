@@ -7,6 +7,47 @@
 use std::fmt;
 use std::path::PathBuf;
 
+/// Typed IPC error variants for structured error recovery.
+///
+/// Evolved from opaque `Ipc(String)` following the healthSpring/biomeOS pattern
+/// so callers can match on failure category (retry on [`Connect`](Self::Connect),
+/// degrade on [`RpcReject`](Self::RpcReject), abort on [`SocketPath`](Self::SocketPath)).
+#[derive(Debug)]
+pub enum IpcError {
+    /// Socket path is invalid or inaccessible (create/remove/bind).
+    SocketPath(String),
+    /// Cannot connect to a primal socket.
+    Connect(String),
+    /// I/O error during an established RPC exchange (write, read, flush, timeout, shutdown).
+    Transport(String),
+    /// JSON serialization or deserialization failure.
+    Codec(String),
+    /// Remote primal returned a JSON-RPC error response.
+    RpcReject {
+        /// JSON-RPC error code.
+        code: i64,
+        /// Human-readable error message from the remote primal.
+        message: String,
+    },
+    /// Remote primal returned an empty or missing response.
+    EmptyResponse,
+}
+
+impl fmt::Display for IpcError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::SocketPath(msg) => write!(f, "socket: {msg}"),
+            Self::Connect(msg) => write!(f, "connect: {msg}"),
+            Self::Transport(msg) => write!(f, "transport: {msg}"),
+            Self::Codec(msg) => write!(f, "codec: {msg}"),
+            Self::RpcReject { code, message } => write!(f, "RPC reject [{code}]: {message}"),
+            Self::EmptyResponse => write!(f, "empty response"),
+        }
+    }
+}
+
+impl std::error::Error for IpcError {}
+
 /// Errors produced by wetSpring parsers and algorithms.
 #[derive(Debug)]
 pub enum Error {
@@ -39,10 +80,16 @@ pub enum Error {
     Npu(String),
     /// Nanopore raw signal parsing error (POD5/FAST5).
     Nanopore(String),
-    /// IPC server/client protocol error (socket, JSON-RPC, dispatch).
-    Ipc(String),
+    /// Structured IPC server/client protocol error.
+    Ipc(IpcError),
     /// JCAMP-DX spectroscopy format parsing error.
     Jcamp(String),
+}
+
+impl From<IpcError> for Error {
+    fn from(e: IpcError) -> Self {
+        Self::Ipc(e)
+    }
 }
 
 /// Result type alias for wetSpring operations.
@@ -63,7 +110,7 @@ impl fmt::Display for Error {
             Self::Ncbi(msg) => write!(f, "NCBI error: {msg}"),
             Self::Npu(msg) => write!(f, "NPU error: {msg}"),
             Self::Nanopore(msg) => write!(f, "nanopore parse error: {msg}"),
-            Self::Ipc(msg) => write!(f, "IPC error: {msg}"),
+            Self::Ipc(e) => write!(f, "IPC error: {e}"),
             Self::Jcamp(msg) => write!(f, "JCAMP-DX parse error: {msg}"),
         }
     }
@@ -84,8 +131,8 @@ impl std::error::Error for Error {
             | Self::Ncbi(_)
             | Self::Npu(_)
             | Self::Nanopore(_)
-            | Self::Ipc(_)
             | Self::Jcamp(_) => None,
+            Self::Ipc(e) => Some(e),
         }
     }
 }
@@ -136,7 +183,10 @@ mod tests {
                 Error::Nanopore("truncated signal".into()),
                 "nanopore parse error",
             ),
-            (Error::Ipc("socket refused".into()), "IPC error"),
+            (
+                Error::Ipc(IpcError::Transport("socket refused".into())),
+                "IPC error",
+            ),
             (Error::Jcamp("missing TITLE".into()), "JCAMP-DX parse error"),
         ];
         for (err, expected_prefix) in cases {
@@ -158,6 +208,40 @@ mod tests {
 
         let parse_err = Error::Xml("bad xml".into());
         assert!(std::error::Error::source(&parse_err).is_none());
+
+        let ipc_err = Error::Ipc(IpcError::Connect("refused".into()));
+        assert!(std::error::Error::source(&ipc_err).is_some());
+    }
+
+    #[test]
+    fn ipc_error_display_all_variants() {
+        assert!(IpcError::SocketPath("bad".into()).to_string().contains("socket"));
+        assert!(IpcError::Connect("refused".into()).to_string().contains("connect"));
+        assert!(IpcError::Transport("broken pipe".into()).to_string().contains("transport"));
+        assert!(IpcError::Codec("invalid json".into()).to_string().contains("codec"));
+        assert!(
+            IpcError::RpcReject {
+                code: -32601,
+                message: "not found".into()
+            }
+            .to_string()
+            .contains("-32601")
+        );
+        assert!(IpcError::EmptyResponse.to_string().contains("empty"));
+    }
+
+    #[test]
+    fn ipc_error_is_std_error() {
+        let err: Box<dyn std::error::Error> = Box::new(IpcError::Connect("refused".into()));
+        assert!(!err.to_string().is_empty());
+    }
+
+    #[test]
+    fn ipc_error_from_conversion() {
+        let ipc: IpcError = IpcError::Transport("write failed".into());
+        let err: Error = ipc.into();
+        assert!(err.to_string().contains("IPC error"));
+        assert!(err.to_string().contains("transport"));
     }
 
     #[test]
@@ -173,11 +257,16 @@ mod tests {
             Error::Ncbi("x".into()),
             Error::Npu("x".into()),
             Error::Nanopore("x".into()),
-            Error::Ipc("x".into()),
             Error::Jcamp("x".into()),
         ];
         for err in &variants {
             assert!(std::error::Error::source(err).is_none());
         }
+    }
+
+    #[test]
+    fn ipc_variant_has_source() {
+        let err = Error::Ipc(IpcError::EmptyResponse);
+        assert!(std::error::Error::source(&err).is_some());
     }
 }

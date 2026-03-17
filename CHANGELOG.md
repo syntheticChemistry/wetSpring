@@ -3,6 +3,47 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V125] — 2026-03-16
+
+### Structured IpcError, Dual-Format Capabilities, Discovery Helpers, Binary Fixes
+
+Deep debt cleanup: typed IPC errors, dual-format capability parsing, generic socket
+discovery helpers, and zero-compilation errors across all 354 binaries.
+Zero new warnings, 1,719+ tests (0 failures).
+
+#### Structured `IpcError` Enum (healthSpring/biomeOS pattern)
+- Replaced opaque `Error::Ipc(String)` with typed `IpcError` enum: `SocketPath`,
+  `Connect`, `Transport`, `Codec`, `RpcReject { code, message }`, `EmptyResponse`
+- 28 construction sites updated across 5 files (songbird, server, provenance, ai, error)
+- Callers can now match on failure category for structured recovery (retry on
+  `Connect`, degrade on `RpcReject`, abort on `SocketPath`)
+- `From<IpcError> for Error` enables ergonomic `?` propagation
+- `Error::Ipc` now chains `source()` through `IpcError` (proper error chain)
+- 4 new tests: variant display, std::Error impl, From conversion, source chain
+
+#### Dual-Format Capability Parsing (`extract_capabilities()`)
+- New `protocol::extract_capabilities()` — parses both flat `"capabilities"` array
+  (Format A) and structured `"domains"` array (Format B) from `capability.list` responses
+- `CapabilityInfo` struct: `capabilities`, `domains`, `primal`, `version`
+- `CapabilityDomain` struct: `name`, `description`, `methods`
+- groundSpring/ludoSpring dual-format pattern now usable by all IPC clients
+- 5 new tests: flat format, dual format, no result, empty, minimal
+
+#### Generic Socket Discovery Helpers (sweetGrass pattern)
+- New `discover::socket_env_var()` — derives standard env var name from primal name
+  (e.g. `"songbird"` → `"SONGBIRD_SOCKET"`)
+- New `discover::discover_primal()` — generic by-name discovery using env var convention
+- `discover_squirrel()` refactored to use `discover_primal()`
+- metalForge songbird: extracted `SONGBIRD_ENV_VAR`, `BIOMEOS_DIR`, `SONGBIRD_PRIMAL`
+  constants replacing hardcoded string literals
+- 2 new tests: env var convention, primal discovery
+
+#### Binary OrExit Import Fixes
+- Fixed misplaced `use OrExit` imports in 18 validation/benchmark binaries
+- Imports moved from inside function bodies to module-level scope
+- Restored `use tolerances` in `validate_df64_anderson.rs`
+- Full crate now compiles with zero errors across all 354 binaries
+
 ## [V124] — 2026-03-16
 
 ### Cross-Ecosystem Absorption — deny.toml, compute.dispatch, Structured Tracing

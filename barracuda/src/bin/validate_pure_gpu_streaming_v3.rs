@@ -48,7 +48,7 @@ use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::io::fastq::FastqRecord;
 use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::{self, OrExit, Validator};
 
 #[tokio::main]
 async fn main() {
@@ -388,7 +388,6 @@ fn benchmark_streaming_vs_dispatch(
     let t_individual = Instant::now();
     for _ in 0..iters {
         use wetspring_barracuda::bio::diversity_gpu;
-        use wetspring_barracuda::validation::OrExit;
         let _ = diversity_gpu::shannon_gpu(gpu, &counts).or_exit("unexpected error");
         let _ = diversity_gpu::simpson_gpu(gpu, &counts).or_exit("unexpected error");
         let _ = diversity_gpu::observed_features_gpu(gpu, &counts).or_exit("unexpected error");

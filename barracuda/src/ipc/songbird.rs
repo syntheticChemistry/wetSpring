@@ -44,6 +44,8 @@ pub fn discover_socket() -> Option<PathBuf> {
 ///
 /// Returns `Err` if Songbird is unreachable or the registration is rejected.
 pub fn register(songbird_socket: &Path, wetspring_socket: &Path) -> crate::error::Result<()> {
+    use crate::error::IpcError;
+
     let ws_path = wetspring_socket.display();
     let version = env!("CARGO_PKG_VERSION");
     let primal = crate::PRIMAL_NAME;
@@ -61,9 +63,10 @@ pub fn register(songbird_socket: &Path, wetspring_socket: &Path) -> crate::error
 
     let response = rpc_call(songbird_socket, &request)?;
     if let Some((code, msg)) = super::protocol::extract_rpc_error(&response) {
-        Err(crate::error::Error::Ipc(format!(
-            "Songbird registration rejected [{code}]: {msg}"
-        )))
+        Err(IpcError::RpcReject {
+            code,
+            message: format!("Songbird registration: {msg}"),
+        })?
     } else {
         Ok(())
     }
@@ -75,15 +78,18 @@ pub fn register(songbird_socket: &Path, wetspring_socket: &Path) -> crate::error
 ///
 /// Returns `Err` if Songbird is unreachable or the heartbeat is rejected.
 pub fn heartbeat(songbird_socket: &Path) -> crate::error::Result<()> {
+    use crate::error::IpcError;
+
     let primal = crate::PRIMAL_NAME;
     let request = format!(
         r#"{{"jsonrpc":"2.0","method":"discovery.heartbeat","params":{{"primal":"{primal}"}},"id":2}}"#
     );
     let response = rpc_call(songbird_socket, &request)?;
     if let Some((code, msg)) = super::protocol::extract_rpc_error(&response) {
-        Err(crate::error::Error::Ipc(format!(
-            "Songbird heartbeat failed [{code}]: {msg}"
-        )))
+        Err(IpcError::RpcReject {
+            code,
+            message: format!("Songbird heartbeat: {msg}"),
+        })?
     } else {
         Ok(())
     }
@@ -130,41 +136,40 @@ pub fn start_heartbeat_loop(
 
 /// Send a JSON-RPC request to Songbird and read the response.
 fn rpc_call(socket: &Path, request: &str) -> crate::error::Result<String> {
-    let addr = std::os::unix::net::SocketAddr::from_pathname(socket)
-        .map_err(|e| crate::error::Error::Ipc(format!("invalid socket path: {e}")))?;
+    use crate::error::IpcError;
 
-    let stream = UnixStream::connect_addr(&addr).map_err(|e| {
-        crate::error::Error::Ipc(format!("Songbird connect {}: {e}", socket.display()))
-    })?;
+    let addr = std::os::unix::net::SocketAddr::from_pathname(socket)
+        .map_err(|e| IpcError::SocketPath(format!("{}: {e}", socket.display())))?;
+
+    let stream = UnixStream::connect_addr(&addr)
+        .map_err(|e| IpcError::Connect(format!("Songbird {}: {e}", socket.display())))?;
 
     stream
         .set_read_timeout(Some(RPC_TIMEOUT))
-        .map_err(|e| crate::error::Error::Ipc(format!("set read timeout: {e}")))?;
+        .map_err(|e| IpcError::Transport(format!("set read timeout: {e}")))?;
     stream
         .set_write_timeout(Some(RPC_TIMEOUT))
-        .map_err(|e| crate::error::Error::Ipc(format!("set write timeout: {e}")))?;
+        .map_err(|e| IpcError::Transport(format!("set write timeout: {e}")))?;
 
     let mut writer = std::io::BufWriter::new(&stream);
     writer
         .write_all(request.as_bytes())
-        .map_err(|e| crate::error::Error::Ipc(format!("write to Songbird: {e}")))?;
+        .map_err(|e| IpcError::Transport(format!("write: {e}")))?;
     writer
         .write_all(b"\n")
-        .map_err(|e| crate::error::Error::Ipc(format!("write newline: {e}")))?;
+        .map_err(|e| IpcError::Transport(format!("write newline: {e}")))?;
     writer
         .flush()
-        .map_err(|e| crate::error::Error::Ipc(format!("flush: {e}")))?;
+        .map_err(|e| IpcError::Transport(format!("flush: {e}")))?;
 
     let mut reader = BufReader::new(&stream);
     let mut line = String::new();
     reader
         .read_line(&mut line)
-        .map_err(|e| crate::error::Error::Ipc(format!("read from Songbird: {e}")))?;
+        .map_err(|e| IpcError::Transport(format!("read: {e}")))?;
 
     if line.is_empty() {
-        return Err(crate::error::Error::Ipc(
-            "Songbird returned empty response".to_string(),
-        ));
+        return Err(IpcError::EmptyResponse.into());
     }
 
     Ok(line)
@@ -200,7 +205,7 @@ mod tests {
         let err = register(&bad_path, &ws_path).unwrap_err();
         let msg = err.to_string();
         assert!(
-            msg.contains("Songbird connect") || msg.contains("invalid socket"),
+            msg.contains("connect") || msg.contains("socket"),
             "unexpected error: {msg}"
         );
     }
@@ -210,9 +215,10 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let bad_path = dir.path().join("wetspring_test_no_songbird_hb.sock");
         let err = heartbeat(&bad_path).unwrap_err();
+        let msg = err.to_string();
         assert!(
-            err.to_string().contains("Songbird connect")
-                || err.to_string().contains("invalid socket")
+            msg.contains("connect") || msg.contains("socket"),
+            "unexpected error: {msg}"
         );
     }
 }

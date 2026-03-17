@@ -37,7 +37,7 @@ use wetspring_barracuda::bio::{
     random_forest_gpu::RandomForestGpu, snp, snp_gpu::SnpGpu,
 };
 use wetspring_barracuda::gpu::GpuF64;
-use wetspring_barracuda::validation;
+use wetspring_barracuda::validation::{self, OrExit};
 
 const WARMUP: usize = 3;
 const ITERS: usize = 10;
@@ -195,7 +195,6 @@ async fn main() {
     // RF (minimal: 3 trees, 2 samples)
     {
         use wetspring_barracuda::bio::{decision_tree::DecisionTree, random_forest::RandomForest};
-        use wetspring_barracuda::validation::OrExit;
 
         let t1 = DecisionTree::from_arrays(
             &[0, -2, -2],

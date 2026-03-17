@@ -9,12 +9,13 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V124** | `handoffs/WETSPRING_V124_DISPATCH_TRACING_DENY_HANDOFF_MAR16_2026.md` | Mar 16 | **compute.dispatch + Tracing + deny.toml** — Typed `compute.dispatch` IPC client for toadStool S156+ (healthSpring/ludoSpring pattern). Structured `tracing` replaces 14 `eprintln!` in server/songbird/fetch/metalForge (coralReef pattern). Workspace `deny.toml` with `wildcards=deny`, `yanked=deny` (groundSpring/airSpring pattern). |
+| **V125** | `handoffs/WETSPRING_V125_IPCERROR_CAPABILITIES_DISCOVERY_HANDOFF_MAR16_2026.md` | Mar 16 | **Structured IpcError + Dual-Format Capabilities + Discovery Helpers** — Typed `IpcError` enum (28 sites, healthSpring/biomeOS pattern). `extract_capabilities()` for flat + nested formats (groundSpring/ludoSpring). `socket_env_var()` + `discover_primal()` (sweetGrass pattern). 18 binary OrExit import fixes. |
+| | *V124 → `handoffs/archive/`* | | V124 handoff archived. |
 | | *V123 → `handoffs/archive/`* | | V123 handoff archived. |
 | | *V122 → `handoffs/archive/`* | | V122 handoff archived. |
 | | *V119–V121 → `handoffs/archive/`* | | V119–V121 handoffs archived. |
 | | *V113–V118 → `handoffs/archive/`* | | V113–V118 handoffs archived. |
-| | *V112 and earlier → `handoffs/archive/`* | | Fossil record: V7–V112 (95+ archived handoffs). 132 total archived. |
+| | *V112 and earlier → `handoffs/archive/`* | | Fossil record: V7–V112 (95+ archived handoffs). 133 total archived. |
 
 ## Cross-Spring Documents
 
@@ -25,7 +26,7 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` — V7–V123 (132 files).
+Superseded handoffs in `handoffs/archive/` — V7–V124 (133 files).
 Preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda.
 
 ## Convention

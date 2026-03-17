@@ -49,7 +49,7 @@ use std::path::PathBuf;
 use std::time::Instant;
 use wetspring_barracuda::ipc::discover;
 use wetspring_barracuda::ipc::primal_names;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{OrExit, Validator};
 
 /// Discover primal sockets via env-based discovery. Returns capability names
 /// for primals whose sockets exist.
@@ -180,7 +180,6 @@ fn main() {
 
         println!("\n  PrecisionBrain tier safety summary:");
         use barracuda::device::PrecisionTier;
-        use wetspring_barracuda::validation::OrExit;
         for tier in [
             PrecisionTier::F32,
             PrecisionTier::DF64,

@@ -52,27 +52,22 @@ impl Server {
     /// Returns `Err` if the directory cannot be created, a stale socket cannot
     /// be removed, or the bind fails.
     pub fn bind(path: &Path) -> crate::error::Result<Self> {
+        use crate::error::IpcError;
+
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent).map_err(|e| {
-                crate::error::Error::Ipc(format!(
-                    "cannot create socket directory {}: {e}",
-                    parent.display()
-                ))
+                IpcError::SocketPath(format!("create dir {}: {e}", parent.display()))
             })?;
         }
 
-        // Remove stale socket from a previous run
         if path.exists() {
             std::fs::remove_file(path).map_err(|e| {
-                crate::error::Error::Ipc(format!(
-                    "cannot remove stale socket {}: {e}",
-                    path.display()
-                ))
+                IpcError::SocketPath(format!("remove stale {}: {e}", path.display()))
             })?;
         }
 
         let listener = UnixListener::bind(path)
-            .map_err(|e| crate::error::Error::Ipc(format!("bind {}: {e}", path.display())))?;
+            .map_err(|e| IpcError::SocketPath(format!("bind {}: {e}", path.display())))?;
 
         Ok(Self {
             listener,

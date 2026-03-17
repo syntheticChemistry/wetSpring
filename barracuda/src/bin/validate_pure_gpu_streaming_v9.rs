@@ -45,7 +45,7 @@ use std::time::Instant;
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::{self, OrExit, Validator};
 
 fn main() {
     let mut v = Validator::new("Exp294: Pure GPU Streaming v9 — Full Workload Validation");
@@ -91,7 +91,6 @@ fn main() {
     {
         use wetspring_barracuda::bio::diversity_gpu;
         use wetspring_barracuda::gpu::GpuF64;
-        use wetspring_barracuda::validation::OrExit;
 
         let rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()

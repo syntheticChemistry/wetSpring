@@ -56,7 +56,7 @@ use std::path::{Path, PathBuf};
 use std::time::Instant;
 use wetspring_barracuda::ipc::discover;
 use wetspring_barracuda::ipc::primal_names;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{OrExit, Validator};
 
 /// Discover ToadStool socket (tries both .sock and .jsonrpc.sock).
 #[must_use]
@@ -356,7 +356,6 @@ fn main() {
 
     #[cfg(feature = "json")]
     {
-        use wetspring_barracuda::validation::OrExit;
         use wetspring_barracuda::visualization::{DataChannel, EcologyScenario, ScenarioNode};
 
         let mut pipeline_node = ScenarioNode {

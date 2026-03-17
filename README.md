@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 16, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V124 — **1,719 tests** (0 failures), 376 experiments, 5,707+ validation checks across 354 binaries. Ecosystem: barraCuda v0.3.5, toadStool S155, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery), `cargo fmt` clean. **Workspace `deny.toml`** — `wildcards=deny`, `yanked=deny`, advisory DB. **Typed `compute.dispatch` client** — `DispatchHandle`/`DispatchError`, toadStool S156+ dispatch (healthSpring pattern). **Structured `tracing`** — 14 `eprintln!` → `tracing::info!/warn!` in server/songbird/fetch/metalForge (coralReef pattern). Zero-panic validation, dual-format discovery, centralized RPC error extraction from V123. Superseded handoffs archived (V111–V123).
+**Status:** V125 — **1,719+ tests** (0 failures), 376 experiments, 5,707+ validation checks across 354 binaries. Ecosystem: barraCuda v0.3.5, toadStool S155, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery), `cargo fmt` clean. **Structured `IpcError` enum** — `SocketPath`/`Connect`/`Transport`/`Codec`/`RpcReject`/`EmptyResponse` (28 sites, healthSpring/biomeOS pattern). **Dual-format capability parsing** — `extract_capabilities()` for flat + nested formats (groundSpring/ludoSpring). **Generic socket discovery** — `socket_env_var()` + `discover_primal()` (sweetGrass pattern). **18 binary OrExit import fixes** — all 354 binaries compile clean. From V124: workspace `deny.toml`, typed `compute.dispatch` client, structured `tracing`. Superseded handoffs archived (V111–V124).
 
 ---
 

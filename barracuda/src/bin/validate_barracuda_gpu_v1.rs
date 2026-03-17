@@ -47,7 +47,7 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::{self, OrExit, Validator};
 
 #[tokio::main]
 async fn main() {
@@ -407,7 +407,6 @@ async fn main() {
     v.section("═══ GPU Domain 8: HMM Forward ═══");
     {
         use wetspring_barracuda::bio::{hmm, hmm_gpu::HmmGpuForward};
-        use wetspring_barracuda::validation::OrExit;
 
         let model = hmm::HmmModel {
             n_states: 2,

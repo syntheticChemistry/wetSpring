@@ -41,7 +41,7 @@
 //! | Command | `cargo run --release --features gpu,json --bin validate_precision_brain_v1` |
 
 use std::time::Instant;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{OrExit, Validator};
 
 fn main() {
     let start = Instant::now();
@@ -285,7 +285,6 @@ fn main() {
             });
 
             use barracuda::device::PhysicsDomain;
-            use wetspring_barracuda::validation::OrExit;
             let domains = [
                 PhysicsDomain::Bioinformatics,
                 PhysicsDomain::Statistics,

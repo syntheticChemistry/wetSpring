@@ -13,6 +13,10 @@ use crate::substrate::{
 
 const SONGBIRD_TIMEOUT: Duration = Duration::from_secs(3);
 
+const SONGBIRD_ENV_VAR: &str = "SONGBIRD_SOCKET";
+const BIOMEOS_DIR: &str = "biomeos";
+const SONGBIRD_PRIMAL: &str = "songbird";
+
 /// Discover the Songbird Unix socket path.
 ///
 /// 1. `SONGBIRD_SOCKET` env var
@@ -20,19 +24,23 @@ const SONGBIRD_TIMEOUT: Duration = Duration::from_secs(3);
 /// 3. `<temp_dir>/songbird-default.sock`
 #[must_use]
 pub fn discover_songbird_socket() -> Option<PathBuf> {
-    if let Ok(path) = std::env::var("SONGBIRD_SOCKET") {
+    if let Ok(path) = std::env::var(SONGBIRD_ENV_VAR) {
         let p = PathBuf::from(path);
         if p.exists() {
             return Some(p);
         }
     }
+
+    let sock_name = format!("{SONGBIRD_PRIMAL}-default.sock");
+
     if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
-        let p = PathBuf::from(xdg).join("biomeos/songbird-default.sock");
+        let p = PathBuf::from(xdg).join(BIOMEOS_DIR).join(&sock_name);
         if p.exists() {
             return Some(p);
         }
     }
-    let fallback = std::env::temp_dir().join("songbird-default.sock");
+
+    let fallback = std::env::temp_dir().join(&sock_name);
     if fallback.exists() {
         return Some(fallback);
     }

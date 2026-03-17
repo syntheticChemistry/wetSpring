@@ -50,7 +50,7 @@
 //! | Command | `cargo run --release --features gpu,json --bin validate_hardware_learning_v1` |
 
 use std::time::Instant;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{OrExit, Validator};
 
 fn scan_firmware(chip: &str) -> Vec<String> {
     let base = format!("/lib/firmware/nvidia/{chip}");
@@ -183,7 +183,6 @@ fn main() {
         v.check_pass("precision tiers probed", !cal.tiers.is_empty());
 
         use barracuda::device::{FmaPolicy, PhysicsDomain, domain_requires_separate_fma};
-        use wetspring_barracuda::validation::OrExit;
 
         let fma_info = serde_json::json!({
             "contract_allows_contraction": FmaPolicy::Contract.allows_contraction(),

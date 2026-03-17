@@ -66,7 +66,7 @@ use wetspring_barracuda::bio::phage_defense::PhageDefenseParams;
 use wetspring_barracuda::bio::phage_defense_gpu::{PhageDefenseGpu, PhageDefenseOdeConfig};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{OrExit, Validator};
 
 struct Timing {
     label: &'static str,
@@ -239,7 +239,6 @@ fn main() {
 
     let (multi_res, multi_ms) = bench("MultiSignal GPU (128 batches)", || {
         use wetspring_barracuda::bio::multi_signal::MultiSignalParams;
-        use wetspring_barracuda::validation::OrExit;
         let gpu_ode = MultiSignalGpu::new(Arc::clone(&device)).or_exit("MultiSignalGpu");
         let flat_y0: Vec<f64> = (0..nb)
             .flat_map(|_| [0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0].iter().copied())

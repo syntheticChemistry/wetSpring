@@ -61,7 +61,7 @@ use std::time::Instant;
 
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{OrExit, Validator};
 
 struct GpuTiming {
     op: &'static str,
@@ -428,7 +428,6 @@ fn main() {
 
     let lap_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         use barracuda::ops::linalg::LaplacianGpu;
-        use wetspring_barracuda::validation::OrExit;
         let lap = LaplacianGpu::new(Arc::clone(&device)).or_exit("LaplacianGpu construction");
         lap.execute(&[0.0, 1.0, 1.0, 0.0], 2)
     }));

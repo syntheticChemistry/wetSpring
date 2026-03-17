@@ -11,12 +11,36 @@
 
 use std::path::PathBuf;
 
+/// Derive the standard env var name for a primal socket.
+///
+/// Convention: uppercase primal name + `_SOCKET` suffix.
+///
+/// ```
+/// # use wetspring_barracuda::ipc::discover::socket_env_var;
+/// assert_eq!(socket_env_var("songbird"), "SONGBIRD_SOCKET");
+/// assert_eq!(socket_env_var("wetspring"), "WETSPRING_SOCKET");
+/// ```
+#[must_use]
+pub fn socket_env_var(primal: &str) -> String {
+    let mut var = primal.to_ascii_uppercase();
+    var.push_str("_SOCKET");
+    var
+}
+
+/// Discover a primal by name using the standard env var convention.
+///
+/// Equivalent to `discover_socket(socket_env_var(primal), primal)`.
+#[must_use]
+pub fn discover_primal(primal: &str) -> Option<PathBuf> {
+    discover_socket(&socket_env_var(primal), primal)
+}
+
 /// Discover Squirrel AI socket.
 ///
 /// Priority: `SQUIRREL_SOCKET` env → XDG runtime → temp dir.
 #[must_use]
 pub fn discover_squirrel() -> Option<PathBuf> {
-    discover_socket("SQUIRREL_SOCKET", super::primal_names::SQUIRREL)
+    discover_primal(super::primal_names::SQUIRREL)
 }
 
 /// Discover an existing primal socket by env var and primal name.
@@ -175,5 +199,19 @@ mod tests {
         let found =
             resolve_socket_explicit(Some("/nonexistent/path.sock"), None, "unused", "unused");
         assert!(found.is_none());
+    }
+
+    #[test]
+    fn socket_env_var_convention() {
+        assert_eq!(socket_env_var("songbird"), "SONGBIRD_SOCKET");
+        assert_eq!(socket_env_var("wetspring"), "WETSPRING_SOCKET");
+        assert_eq!(socket_env_var("toadstool"), "TOADSTOOL_SOCKET");
+        assert_eq!(socket_env_var("biomeos"), "BIOMEOS_SOCKET");
+    }
+
+    #[test]
+    fn discover_primal_returns_none_when_no_socket() {
+        let result = discover_primal("nonexistent_test_primal_xyzzy");
+        assert!(result.is_none());
     }
 }

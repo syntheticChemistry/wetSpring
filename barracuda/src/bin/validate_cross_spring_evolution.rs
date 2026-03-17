@@ -60,7 +60,7 @@ use wgpu::util::DeviceExt;
 
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::{self, OrExit, Validator};
 
 #[tokio::main]
 async fn main() {
@@ -488,7 +488,6 @@ fn cpu_batch_fitness_f64(
 
 fn cpu_locus_variance_rowmajor_f64(freqs: &[f64], n_pops: usize, n_loci: usize) -> Vec<f64> {
     use barracuda::stats::correlation;
-    use wetspring_barracuda::validation::OrExit;
     (0..n_loci)
         .map(|l| {
             let col: Vec<f64> = (0..n_pops).map(|p| freqs[p * n_loci + l]).collect();

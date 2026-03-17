@@ -2,7 +2,7 @@
 
 **Date:** March 16, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V124 — 376 experiments, 5,707+ validation checks, ALL PASS; 1,719 tests (0 failures), 354 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 784+ WGSL shaders), toadStool S155, coralReef Phase 10. V124: workspace `deny.toml` (`wildcards=deny`, `yanked=deny`), typed `compute.dispatch` IPC client for toadStool S156+ dispatch (healthSpring/ludoSpring pattern), structured `tracing` replaces 14 `eprintln!` in server/songbird/fetch/metalForge (coralReef pattern). V123: zero-panic validation (`OrExit` trait), dual-format capability discovery, centralized `extract_rpc_error()`, Python deps upper-bounded. V122: modern idiomatic Rust (`#[expect(reason)]` across 276+ binaries), zero `#[allow()]`, clippy pedantic+nursery ZERO WARNINGS. 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL.
+**Status:** V125 — 376 experiments, 5,707+ validation checks, ALL PASS; 1,719+ tests (0 failures), 354 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 784+ WGSL shaders), toadStool S155, coralReef Phase 10. V125: structured `IpcError` enum (28 sites, healthSpring/biomeOS pattern), dual-format `extract_capabilities()` (groundSpring/ludoSpring), generic `socket_env_var()`/`discover_primal()` (sweetGrass pattern), 18 binary OrExit import fixes. V124: workspace `deny.toml`, typed `compute.dispatch` IPC client, structured `tracing`. V123: zero-panic `OrExit`, dual-format discovery, `extract_rpc_error()`. V122: `#[expect(reason)]`, clippy pedantic+nursery ZERO WARNINGS. 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL.
 
 ---
 

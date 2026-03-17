@@ -39,7 +39,7 @@
 //! | Command | `cargo run --release --features gpu,json --bin validate_nouveau_diagnostic_v1` |
 
 use std::time::Instant;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{OrExit, Validator};
 
 fn scan_firmware(chip: &str) -> Vec<String> {
     let base = format!("/lib/firmware/nvidia/{chip}");
@@ -296,7 +296,6 @@ fn main() {
 
     #[cfg(feature = "json")]
     {
-        use wetspring_barracuda::validation::OrExit;
         use wetspring_barracuda::visualization::{DataChannel, EcologyScenario, ScenarioNode};
 
         let mut dispatch_node = ScenarioNode {
