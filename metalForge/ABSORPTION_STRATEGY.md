@@ -2,7 +2,7 @@
 
 **Date:** March 16, 2026
 **Pattern:** Write → Absorb → Lean (from hotSpring)
-**Status:** V123 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 44 GPU modules, 0 Tier B/C, 0 Passthrough, standalone barraCuda v0.3.5, toadStool S155. 1,703 tests, 354 binaries, 214 named tolerances (zero inline literals), **zero `#[allow()]` in entire codebase** — all `#[expect(reason)]`. 16 capability domains / 20 methods. All primal names via `primal_names::*`. V123: zero-panic validation (OrExit trait), dual-format capability discovery, centralized RPC error extraction, Python dep pinning, zero .expect()/.unwrap() in ALL validation binaries. V122: modern idiomatic Rust evolution. V121: tolerance centralization. V120: typed errors, deploy graph.
+**Status:** V125 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 44 GPU modules, 0 Tier B/C, 0 Passthrough, standalone barraCuda v0.3.5, toadStool S155. 1,719+ tests, 354 binaries, 214 named tolerances, **zero `#[allow()]`**. V125: structured `IpcError` enum, `extract_capabilities()`, `discover_primal()`, 18 binary fixes. V124: `deny.toml`, `compute.dispatch`, `tracing`. V123: zero-panic `OrExit`, dual-format discovery. V122: `#[expect(reason)]`. All primal names via `primal_names::*`.
 
 ---
 

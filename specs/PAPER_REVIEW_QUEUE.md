@@ -1,6 +1,6 @@
 # wetSpring — Paper Review Queue
 
-**Last Updated**: March 16, 2026 (V123 — 376 experiments, 5,707+ checks, 1,703 tests, 63 papers complete + 6 reproduced. V123: zero-panic validation (OrExit trait), dual-format capability discovery, centralized RPC error extraction, Python dep pinning, zero .expect()/.unwrap() in ALL validation binaries. All 46 three-tier eligible papers validated. barraCuda v0.3.5, clippy ZERO WARNINGS)
+**Last Updated**: March 16, 2026 (V125 — 376 experiments, 5,707+ checks, 1,719+ tests, 63 papers complete + 6 reproduced. V125: structured `IpcError`, `extract_capabilities()`, `discover_primal()`, 18 binary fixes. V124: `deny.toml`, `compute.dispatch`, `tracing`. V123: zero-panic `OrExit`, dual-format discovery. All 46 three-tier eligible papers validated. barraCuda v0.3.5, clippy ZERO WARNINGS)
 **Purpose**: Track papers for reproduction/review across five tracks
 
 ---

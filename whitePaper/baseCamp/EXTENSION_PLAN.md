@@ -1,8 +1,8 @@
 # baseCamp Extension Plan: From Validated Math to Real-World Science
 
-**Date:** March 16, 2026 (V123 update)
-**Author:** wetSpring V123 (ecoPrimals)
-**Foundation:** 371 experiments, 9,886+ checks, 63 papers reproduced, 150+ primitives (standalone barraCuda v0.3.5), Python parity proven, cross-spring provenance validated, 1,662 tests, 354 binaries. V114: Deep audit — 15 feature-gate fixes, 52 clippy warnings resolved, deprecated parsers migrated, inline tolerances eliminated, VRAM capability-based, code deduplicated. V113: Paper extension roadmap (Exp364-370, 67/67). V112: NVIDIA hardware learning (Exp361-363, 45/45). Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS**. Ecosystem: barraCuda v0.3.5, toadStool S155, coralReef Iter 33.
+**Date:** March 16, 2026 (V125 update)
+**Author:** wetSpring V125 (ecoPrimals)
+**Foundation:** 376 experiments, 5,707+ checks, 63 papers reproduced, 150+ primitives (standalone barraCuda v0.3.5), Python parity proven, cross-spring provenance validated, 1,719+ tests, 354 binaries. V125: structured `IpcError`, `extract_capabilities()`, `discover_primal()`, 18 binary fixes. V124: `deny.toml`, `compute.dispatch`, structured `tracing`. V123: zero-panic `OrExit`, dual-format discovery. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). Ecosystem: barraCuda v0.3.5, toadStool S155, coralReef Phase 10.
 
 ---
 

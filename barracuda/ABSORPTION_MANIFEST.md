@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** March 16, 2026 (V123)
+**Date:** March 16, 2026 (V125)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
 **barraCuda:** standalone v0.3.5 (pure Rust, default-features=false), **toadStool:** S155
-**Status:** 150+ primitives consumed, 44 GPU modules (all lean), 0 local WGSL, 0 local ODE/regression math, 1,703 tests, 376 experiments, 5,707+ checks, 354 binaries, 214 named tolerances (zero inline literals), `#![forbid(unsafe_code)]`, clippy pedantic+nursery CLEAN, **zero `#[allow()]` in entire codebase** — all `#[expect(reason)]` with self-documenting justifications. 16 capability domains / 20 methods. Deploy graph with `fallback = "skip"` for optional primals. Typed errors complete across all library code. All primal names via `primal_names::*` constants. **V123:** Zero-panic validation (OrExit trait), dual-format capability discovery, centralized RPC error extraction, Python dep pinning with upper bounds, zero .expect()/.unwrap() in ALL validation binaries. **See also:** `wateringHole/handoffs/WETSPRING_V123_ZERO_PANIC_DUAL_DISCOVERY_HANDOFF_MAR16_2026.md` for current primitive consumption details and evolution targets.
+**Status:** 150+ primitives consumed, 44 GPU modules (all lean), 0 local WGSL, 0 local ODE/regression math, 1,719+ tests, 376 experiments, 5,707+ checks, 354 binaries, 214 named tolerances (zero inline literals), `#![forbid(unsafe_code)]`, clippy pedantic+nursery CLEAN, **zero `#[allow()]` in entire codebase**. 16 capability domains / 20 methods. Deploy graph with `fallback = "skip"`. All primal names via `primal_names::*` constants. **V125:** Structured `IpcError` enum (28 sites), `extract_capabilities()` for dual-format parsing, `socket_env_var()`/`discover_primal()` generic helpers, 18 binary fixes. **V124:** `deny.toml`, `compute.dispatch` IPC client, structured `tracing`. **V123:** Zero-panic `OrExit`, dual-format discovery, `extract_rpc_error()`. **See also:** `wateringHole/handoffs/WETSPRING_V125_IPCERROR_CAPABILITIES_DISCOVERY_HANDOFF_MAR16_2026.md`.
 
 ---
 

@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-16 (V123: 376 experiments, 354 binaries, 5,707+ checks, 1,703 tests. V122 modern idiomatic Rust evolution: all `#[allow()]` → `#[expect(reason)]` across 276+ validation binaries (298 files), 1,139 unfulfilled expectations cleaned, 18 new forge tests (error/bridge/nest coverage), idiomatic Rust fixes, unsafe eliminated from tests. Zero `#[allow()]` in entire codebase, zero clippy warnings, zero fmt violations, zero unsafe. V123: zero-panic validation (OrExit trait), dual-format capability discovery, extract_rpc_error(), Python deps upper-bounded. Zero .expect() and zero .unwrap() in all validation binaries.)
+**Updated**: 2026-03-16 (V125: 376 experiments, 354 binaries, 5,707+ checks, 1,719+ tests. V125: structured `IpcError` enum, dual-format `extract_capabilities()`, generic `socket_env_var()`/`discover_primal()`, 18 binary OrExit import fixes — all 354 binaries compile clean. V124: workspace `deny.toml`, typed `compute.dispatch` client, structured `tracing`. V123: zero-panic `OrExit`, dual-format discovery. V122: `#[expect(reason)]` across 276+ binaries. Zero `#[allow()]`, zero clippy warnings, zero unsafe.)
 
 ---
 

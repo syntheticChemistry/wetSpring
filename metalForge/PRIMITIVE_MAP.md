@@ -5,7 +5,7 @@
 GPU primitive (or explain why it stays CPU-only). This guides the
 absorption pipeline and identifies what ToadStool needs to build next.
 
-> **Mar 16 update (V123):** 150+ primitives consumed. 0 local WGSL, 0 local derivative math (fully lean). 28 petalTongue scenario builders. standalone barraCuda v0.3.5. 376 experiments, 5,707+ checks. All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed). Forge crate v0.3.0 (252 tests, 90%+ coverage). 1,703 tests, 354 binaries, 214 named tolerances (zero inline literals), clippy pedantic+nursery CLEAN, **zero `#[allow()]` in entire codebase**. V123: zero-panic validation (OrExit trait), dual-format capability discovery, zero .expect()/.unwrap() in ALL validation binaries.
+> **Mar 16 update (V125):** 150+ primitives consumed. 0 local WGSL, 0 local derivative math (fully lean). 28 petalTongue scenario builders. standalone barraCuda v0.3.5. 376 experiments, 5,707+ checks. All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed). Forge crate v0.3.0 (252 tests, 90%+ coverage). 1,719+ tests, 354 binaries, 214 named tolerances, clippy pedantic+nursery CLEAN. V125: structured `IpcError`, `extract_capabilities()`, `discover_primal()`, 18 binary fixes. V124: `deny.toml`, `compute.dispatch`, `tracing`. V123: zero-panic `OrExit`, dual-format discovery.
 
 ---
 
