@@ -35,8 +35,8 @@ use std::time::{Duration, Instant};
 
 use wetspring_barracuda::ipc::Server;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn main() {
     let mut v = Validator::new("Exp321: biomeOS/NUCLEUS V98+ Integration Validation");
@@ -63,7 +63,8 @@ fn main() {
     v.check_pass("XDG_RUNTIME_DIR present", has_runtime);
 
     if has_runtime {
-        let biomeos_dir = PathBuf::from(runtime_dir.as_ref().or_exit("unexpected error")).join("biomeos");
+        let biomeos_dir =
+            PathBuf::from(runtime_dir.as_ref().or_exit("unexpected error")).join("biomeos");
         let dir_exists = biomeos_dir.exists();
         println!(
             "  biomeos socket dir: {} (exists: {dir_exists})",

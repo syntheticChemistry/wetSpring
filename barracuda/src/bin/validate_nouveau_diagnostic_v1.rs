@@ -296,8 +296,8 @@ fn main() {
 
     #[cfg(feature = "json")]
     {
+        use wetspring_barracuda::validation::OrExit;
         use wetspring_barracuda::visualization::{DataChannel, EcologyScenario, ScenarioNode};
-use wetspring_barracuda::validation::OrExit;
 
         let mut dispatch_node = ScenarioNode {
             id: "dispatch_pipeline".into(),

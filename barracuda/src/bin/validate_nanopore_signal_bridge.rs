@@ -42,8 +42,8 @@ use wetspring_barracuda::io::nanopore::{
     self, NanoporeIter, NanoporeRead, SyntheticSignalGenerator,
 };
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn temp_nrs(name: &str) -> std::path::PathBuf {
     std::env::temp_dir().join(format!("wetspring_exp196a_{name}.nrs"))

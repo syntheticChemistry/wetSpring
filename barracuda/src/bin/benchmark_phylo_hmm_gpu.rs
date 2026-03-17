@@ -54,8 +54,8 @@ use wetspring_barracuda::bio::hmm::{self, HmmModel};
 use wetspring_barracuda::bio::hmm_gpu::HmmGpuForward;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 const MU: f64 = 1.0;
 const PI: [f64; 4] = [0.25, 0.25, 0.25, 0.25];

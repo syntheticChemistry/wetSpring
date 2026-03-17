@@ -38,8 +38,8 @@ use wetspring_barracuda::bio::diversity_fusion_gpu::{
     DiversityFusionGpu, DiversityResult, diversity_fusion_cpu,
 };
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn validate_uniform(v: &mut Validator, fusion: &DiversityFusionGpu) {
     let n_species = 4;

@@ -33,8 +33,8 @@ use wetspring_barracuda::bio::{
     phage_defense, placement, spectral_match,
 };
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 #[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {

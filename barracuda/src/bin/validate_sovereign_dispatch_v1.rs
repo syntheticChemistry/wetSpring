@@ -78,7 +78,7 @@ fn main() {
     println!("\n  ── D84: Device Enum ──");
 
     use barracuda::device::Device;
-use wetspring_barracuda::validation::OrExit;
+    use wetspring_barracuda::validation::OrExit;
 
     let devices = [Device::CPU, Device::GPU, Device::Auto];
 

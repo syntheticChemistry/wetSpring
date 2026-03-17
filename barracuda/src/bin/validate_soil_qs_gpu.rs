@@ -212,7 +212,12 @@ async fn main() {
 
     let tc = Instant::now();
     let cpu_std = qs_biofilm::scenario_standard_growth(&params, dt);
-    let cpu_n = *cpu_std.states().last().or_exit("unexpected error").first().or_exit("unexpected error");
+    let cpu_n = *cpu_std
+        .states()
+        .last()
+        .or_exit("unexpected error")
+        .first()
+        .or_exit("unexpected error");
     let cpu_b = cpu_std.states().last().or_exit("unexpected error")[4];
     let qs_cpu_us = tc.elapsed().as_micros() as f64;
 
@@ -238,7 +243,9 @@ async fn main() {
 
     let tc = Instant::now();
     let equal = cooperation::scenario_equal_start(&coop_p, dt);
-    let freq = *cooperation::cooperator_frequency(&equal).last().or_exit("unexpected error");
+    let freq = *cooperation::cooperator_frequency(&equal)
+        .last()
+        .or_exit("unexpected error");
     let coop_us = tc.elapsed().as_micros() as f64;
 
     v.check_pass("Cooperation freq in (0, 1)", freq > 0.0 && freq < 1.0);

@@ -166,7 +166,8 @@ async fn main() {
     let ind_simpson = diversity_gpu::simpson_gpu(&gpu, &abundances).or_exit("GPU streaming");
     let ind_observed =
         diversity_gpu::observed_features_gpu(&gpu, &abundances).or_exit("GPU streaming");
-    let ind_bray = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).or_exit("GPU streaming");
+    let ind_bray =
+        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).or_exit("GPU streaming");
     let ind_cosine =
         spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).or_exit("GPU streaming");
     let ind_total_us = t_ind.elapsed().as_micros() as f64;
@@ -276,7 +277,9 @@ async fn main() {
     let t_ind_10 = Instant::now();
     for _ in 0..10 {
         let fmr = FusedMapReduceF64::new(gpu.to_wgpu_device()).or_exit("GPU streaming");
-        let _ = fmr.shannon_entropy(&big_abundances).or_exit("GPU streaming");
+        let _ = fmr
+            .shannon_entropy(&big_abundances)
+            .or_exit("GPU streaming");
         let _ = fmr.simpson_index(&big_abundances).or_exit("GPU streaming");
         let _ = fmr.sum(&big_abundances).or_exit("GPU streaming");
     }

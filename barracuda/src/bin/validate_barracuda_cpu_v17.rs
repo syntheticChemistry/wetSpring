@@ -50,8 +50,8 @@ use wetspring_barracuda::bio::{
     alignment, chimera, dada2, decision_tree, derep, esn, gbm, molecular_clock, random_forest,
     reconciliation,
 };
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 struct DomainTiming {
     name: &'static str,
@@ -221,7 +221,8 @@ fn main() {
         &[0.0, -0.3, 0.3],
     )
     .or_exit("unexpected error");
-    let gbm_model = gbm::GbmClassifier::new(vec![tree1, tree2], 0.1, 0.0, 2).or_exit("unexpected error");
+    let gbm_model =
+        gbm::GbmClassifier::new(vec![tree1, tree2], 0.1, 0.0, 2).or_exit("unexpected error");
     let pred = gbm_model.predict_proba(&[0.8, 0.5]);
     v.check_pass(
         "GBM: probability ∈ [0,1]",
@@ -322,7 +323,8 @@ fn main() {
         2,
     )
     .or_exit("unexpected error");
-    let forest = random_forest::RandomForest::from_trees(vec![dt, dt2], 2).or_exit("unexpected error");
+    let forest =
+        random_forest::RandomForest::from_trees(vec![dt, dt2], 2).or_exit("unexpected error");
     let rf_pred = forest.predict(&[0.8, 0.5]);
     v.check_pass("RF: valid class", rf_pred <= 1);
     let rf_batch = forest.predict_batch(&[vec![0.8, 0.5], vec![0.1, 0.9]]);

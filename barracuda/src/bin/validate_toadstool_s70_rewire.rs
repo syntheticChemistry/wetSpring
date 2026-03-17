@@ -46,8 +46,8 @@
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn main() {
     let mut v = Validator::new("Exp247: ToadStool S70+++ Rewire — New Stats Primitives");
@@ -186,7 +186,8 @@ fn main() {
     );
 
     let constant_data = [7.0; 20];
-    let jk_const = barracuda::stats::jackknife_mean_variance(&constant_data).or_exit("unexpected error");
+    let jk_const =
+        barracuda::stats::jackknife_mean_variance(&constant_data).or_exit("unexpected error");
     v.check(
         "Constant data: mean = 7.0",
         jk_const.estimate,
@@ -213,8 +214,8 @@ fn main() {
     v.section("S6: Generalized Jackknife");
 
     let data_gen = [2.0, 4.0, 6.0, 8.0];
-    let jk_gen =
-        barracuda::stats::jackknife(&data_gen, |d| d.iter().sum::<f64>() / d.len() as f64).or_exit("unexpected error");
+    let jk_gen = barracuda::stats::jackknife(&data_gen, |d| d.iter().sum::<f64>() / d.len() as f64)
+        .or_exit("unexpected error");
     v.check(
         "Generalized mean ≈ 5.0",
         jk_gen.estimate,

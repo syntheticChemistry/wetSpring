@@ -49,8 +49,8 @@ use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, diversity_gpu, stats_gpu};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, DomainResult, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, DomainResult, Validator};
 
 fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
@@ -183,8 +183,8 @@ fn main() {
         );
         g23_checks += 1;
 
-        let gpu_msv =
-            stats_gpu::mean_sample_variance_gpu(&gpu, &data_100).or_exit("mean_sample_variance_gpu");
+        let gpu_msv = stats_gpu::mean_sample_variance_gpu(&gpu, &data_100)
+            .or_exit("mean_sample_variance_gpu");
         v.check(
             "Welford GPU: sample var ≡ CPU",
             gpu_msv[1],
@@ -195,8 +195,10 @@ fn main() {
 
         let x: Vec<f64> = (1..=50).map(f64::from).collect();
         let y: Vec<f64> = x.iter().map(|&xi| 2.0f64.mul_add(xi, 1.0)).collect();
-        let cpu_r = barracuda::stats::pearson_correlation(&x, &y).or_exit("CPU Pearson correlation");
-        let gpu_full = stats_gpu::correlation_full_gpu(&gpu, &x, &y).or_exit("correlation_full_gpu");
+        let cpu_r =
+            barracuda::stats::pearson_correlation(&x, &y).or_exit("CPU Pearson correlation");
+        let gpu_full =
+            stats_gpu::correlation_full_gpu(&gpu, &x, &y).or_exit("correlation_full_gpu");
         v.check(
             "Pearson GPU: r ≡ CPU",
             gpu_full.pearson_r,

@@ -45,8 +45,8 @@ use wetspring_barracuda::bio::feature_table::{self, FeatureParams};
 use wetspring_barracuda::bio::signal::PeakParams;
 use wetspring_barracuda::io::mzml;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 #[expect(clippy::too_many_lines)] // sequential feature validation: parse → tracks → EIC → features → asari cross-reference
 fn main() {

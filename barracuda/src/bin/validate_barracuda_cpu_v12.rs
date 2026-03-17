@@ -56,8 +56,8 @@ use wetspring_barracuda::io::fastq::{self, FastqRefRecord};
 use wetspring_barracuda::io::ms2;
 use wetspring_barracuda::io::nanopore::{self, NanoporeIter, SyntheticSignalGenerator};
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn temp_path(name: &str) -> PathBuf {
     std::env::temp_dir().join(format!("wetspring_exp212_{name}"))

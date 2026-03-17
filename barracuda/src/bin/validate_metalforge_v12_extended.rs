@@ -54,11 +54,11 @@ use wetspring_barracuda::df64_host;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::ipc::dispatch;
 use wetspring_barracuda::tolerances;
+use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::vault::consent::{ConsentScope, ConsentTicket};
 use wetspring_barracuda::vault::provenance::ProvenanceChain;
 use wetspring_barracuda::vault::storage::VaultStore;
-use wetspring_barracuda::validation::OrExit;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Hardware {
@@ -519,7 +519,9 @@ fn main() {
             &raw_consent,
         )
         .or_exit("unexpected error");
-    let retrieved = vault.retrieve(&hash, &key, &raw_consent).or_exit("unexpected error");
+    let retrieved = vault
+        .retrieve(&hash, &key, &raw_consent)
+        .or_exit("unexpected error");
     v.check_pass(
         "Vault-dispatch: store/retrieve roundtrip",
         retrieved.plaintext == b"dispatch-test-data",

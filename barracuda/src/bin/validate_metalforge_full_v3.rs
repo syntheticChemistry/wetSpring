@@ -50,8 +50,8 @@ use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::io::mzml::MzmlSpectrum;
 use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 fn validate_shannon_simpson(
     v: &mut Validator,
@@ -493,7 +493,8 @@ fn validate_eic(
     let cpu_totals: Vec<f64> = cpu_eics.iter().map(|e| e.intensity.iter().sum()).collect();
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
-    let gpu_totals = eic_gpu::batch_eic_total_intensity_gpu(gpu, &gpu_eics).or_exit("MetalForge v3");
+    let gpu_totals =
+        eic_gpu::batch_eic_total_intensity_gpu(gpu, &gpu_eics).or_exit("MetalForge v3");
     let gpu_us = tg.elapsed().as_micros() as f64;
     for (i, (c, g)) in cpu_totals.iter().zip(gpu_totals.iter()).enumerate() {
         v.check(

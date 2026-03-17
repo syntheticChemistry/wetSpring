@@ -33,9 +33,9 @@ use wetspring_barracuda::bio::qs_biofilm::{self, QsBiofilmParams};
 use wetspring_barracuda::gpu::GpuF64;
 #[cfg(feature = "gpu")]
 use wetspring_barracuda::validation;
-use wetspring_barracuda::validation::Validator;
 #[cfg(feature = "gpu")]
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 #[cfg(feature = "gpu")]
 const N_PARAMS: usize = 17;

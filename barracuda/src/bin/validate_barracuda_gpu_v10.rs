@@ -428,7 +428,7 @@ fn main() {
 
     let lap_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         use barracuda::ops::linalg::LaplacianGpu;
-use wetspring_barracuda::validation::OrExit;
+        use wetspring_barracuda::validation::OrExit;
         let lap = LaplacianGpu::new(Arc::clone(&device)).or_exit("LaplacianGpu construction");
         lap.execute(&[0.0, 1.0, 1.0, 0.0], 2)
     }));

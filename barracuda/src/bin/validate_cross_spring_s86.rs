@@ -30,8 +30,8 @@
 use std::time::Instant;
 
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn main() {
     let mut v = Validator::new("Exp296: Cross-Spring S86 Rewire Validation");
@@ -256,7 +256,8 @@ fn main() {
         let hi = barracuda::stats::thornthwaite_heat_index(&monthly);
         v.check_pass("Thornthwaite heat index > 0", hi > 0.0);
 
-        let thorn = barracuda::stats::thornthwaite_et0(21.0, hi, 14.5, 30.0).or_exit("unexpected error");
+        let thorn =
+            barracuda::stats::thornthwaite_et0(21.0, hi, 14.5, 30.0).or_exit("unexpected error");
         v.check_pass("Thornthwaite ET₀ > 0", thorn > 0.0);
         v.check_pass("Thornthwaite ET₀ < 200 mm/month", thorn < 200.0);
 
@@ -393,7 +394,8 @@ fn main() {
             (lg - 24.0_f64.ln()).abs() < tolerances::ANALYTICAL_LOOSE,
         );
 
-        let hargreaves = barracuda::stats::hargreaves_et0(35.0, 32.0, 18.0).or_exit("unexpected error");
+        let hargreaves =
+            barracuda::stats::hargreaves_et0(35.0, 32.0, 18.0).or_exit("unexpected error");
         v.check_pass("Hargreaves ET₀ > 0", hargreaves > 0.0);
 
         let fao56 =

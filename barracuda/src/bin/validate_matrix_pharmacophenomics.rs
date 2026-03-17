@@ -27,8 +27,8 @@
 
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective, NmfResult, cosine_similarity};
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn top_k_cosine(result: &NmfResult, top_k: usize) -> Vec<(usize, usize, f64)> {
     let m = result.m;

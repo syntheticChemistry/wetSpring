@@ -45,8 +45,8 @@ use wetspring_barracuda::io::fastq::{self, FastqRefRecord};
 use wetspring_barracuda::io::ms2;
 use wetspring_barracuda::io::nanopore::{self, NanoporeIter, SyntheticSignalGenerator};
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn temp_path(name: &str) -> PathBuf {
     std::env::temp_dir().join(format!("wetspring_exp215_{name}"))
@@ -73,7 +73,8 @@ fn validate_fastq_gpu_diversity(v: &mut Validator, gpu: &GpuF64) {
         let mut idx = 0_usize;
         for (seq, count) in species {
             for _ in 0..*count {
-                writeln!(f, "@sp_{idx}\n{seq}\n+\n{}", "I".repeat(seq.len())).or_exit("unexpected error");
+                writeln!(f, "@sp_{idx}\n{seq}\n+\n{}", "I".repeat(seq.len()))
+                    .or_exit("unexpected error");
                 idx += 1;
             }
         }
@@ -123,7 +124,8 @@ fn validate_fastq_gpu_diversity(v: &mut Validator, gpu: &GpuF64) {
     let n = counts.len();
     let samples: Vec<Vec<f64>> = counts.iter().map(|&c| vec![c]).collect();
     let cpu_bc = diversity::bray_curtis_condensed(&samples);
-    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).or_exit("unexpected error");
+    let gpu_bc =
+        diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).or_exit("unexpected error");
 
     v.check_pass("Bray-Curtis condensed: CPU computed", !cpu_bc.is_empty());
     v.check_count(

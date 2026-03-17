@@ -272,7 +272,13 @@ fn main() {
     let qs_r = qs_biofilm::scenario_standard_growth(&qs_biofilm::QsBiofilmParams::default(), 0.01);
     v.check_pass(
         "QS ODE: N > 0",
-        *qs_r.states().last().or_exit("unexpected error").first().or_exit("unexpected error") > 0.0,
+        *qs_r
+            .states()
+            .last()
+            .or_exit("unexpected error")
+            .first()
+            .or_exit("unexpected error")
+            > 0.0,
     );
 
     let coop_r =

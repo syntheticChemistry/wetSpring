@@ -38,8 +38,8 @@
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn main() {
     let mut v = Validator::new("Cross-Spring Evolution — Modern ToadStool Primitives");
@@ -175,7 +175,8 @@ fn main() {
     // 10. spearman_correlation — perfect ranks → ρ = 1
     let x_rank: Vec<f64> = vec![1.0, 2.0, 3.0, 4.0, 5.0];
     let y_rank: Vec<f64> = vec![5.0, 4.0, 3.0, 2.0, 1.0]; // perfect negative
-    let spearman = barracuda::stats::spearman_correlation(&x_rank, &y_rank).or_exit("unexpected error");
+    let spearman =
+        barracuda::stats::spearman_correlation(&x_rank, &y_rank).or_exit("unexpected error");
     v.check(
         "spearman(perfect neg ranks) = -1",
         spearman,

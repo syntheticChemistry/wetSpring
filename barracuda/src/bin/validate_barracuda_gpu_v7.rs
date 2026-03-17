@@ -52,8 +52,8 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::df64_host;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 fn bench<T>(label: &str, f: impl FnOnce() -> T) -> T {
     let t0 = Instant::now();
@@ -114,7 +114,8 @@ async fn main() {
     });
 
     let gpu_l2 = bench("PairwiseL2 GPU", || {
-        pairwise_l2_gpu::pairwise_l2_condensed_gpu(&gpu, &coords, n, dim).or_exit("unexpected error")
+        pairwise_l2_gpu::pairwise_l2_condensed_gpu(&gpu, &coords, n, dim)
+            .or_exit("unexpected error")
     });
 
     v.check_pass("L2 pair count match", gpu_l2.len() == cpu_l2.len());
@@ -217,7 +218,8 @@ async fn main() {
         vec![5.0, 10.0, 40.0, 12.0],
     ];
     let cpu_bc = diversity::bray_curtis_condensed(&samples);
-    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).or_exit("unexpected error");
+    let gpu_bc =
+        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).or_exit("unexpected error");
     for (k, (&c, &g)) in cpu_bc.iter().zip(gpu_bc.iter()).enumerate() {
         v.check(
             &format!("BC[{k}]: CPU == GPU"),
@@ -256,8 +258,8 @@ async fn main() {
     v.section("G08: FST Variance (CPU, verify no regression)");
     let allele_freqs = [0.8, 0.6, 0.3];
     let sample_sizes = [50, 60, 40];
-    let fst_result =
-        fst_variance::fst_variance_decomposition(&allele_freqs, &sample_sizes).or_exit("unexpected error");
+    let fst_result = fst_variance::fst_variance_decomposition(&allele_freqs, &sample_sizes)
+        .or_exit("unexpected error");
     v.check_pass("FST in [0,1]", (0.0..=1.0).contains(&fst_result.fst));
     v.check_pass("FST divergent > 0", fst_result.fst > 0.0);
 
@@ -282,7 +284,8 @@ async fn main() {
         vec![1000.0, 500.0, 200.0, 100.0],
         vec![1000.0, 500.0, 200.0, 100.0],
     ];
-    let gpu_cosines = spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spec).or_exit("unexpected error");
+    let gpu_cosines =
+        spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spec).or_exit("unexpected error");
     v.check(
         "Self-cosine == 1.0",
         gpu_cosines[0],

@@ -285,7 +285,7 @@ fn main() {
             });
 
             use barracuda::device::PhysicsDomain;
-use wetspring_barracuda::validation::OrExit;
+            use wetspring_barracuda::validation::OrExit;
             let domains = [
                 PhysicsDomain::Bioinformatics,
                 PhysicsDomain::Statistics,

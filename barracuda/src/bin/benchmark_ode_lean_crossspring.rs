@@ -43,8 +43,8 @@ use wetspring_barracuda::bio::capacitor::CapacitorParams;
 use wetspring_barracuda::bio::cooperation::CooperationParams;
 use wetspring_barracuda::bio::multi_signal::MultiSignalParams;
 use wetspring_barracuda::bio::phage_defense::PhageDefenseParams;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 const DT: f64 = 0.01;
 const N_STEPS: usize = 4800;

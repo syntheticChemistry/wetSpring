@@ -18,9 +18,9 @@
 //! | V9 NMF          | Scenario builder: heatmap W/H, bar top features |
 //! | V10 Pipeline    | Streaming pipeline scenario: multi-node graph |
 
+use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::visualization;
-use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp333: Visualization Evolution");

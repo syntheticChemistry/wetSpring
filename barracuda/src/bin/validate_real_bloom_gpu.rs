@@ -38,8 +38,8 @@ use wetspring_barracuda::bio::diversity_gpu;
 #[cfg(feature = "gpu")]
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 fn generate_ecosystem(
     name: &str,

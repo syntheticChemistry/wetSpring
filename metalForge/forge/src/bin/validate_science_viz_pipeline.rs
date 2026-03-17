@@ -17,9 +17,9 @@
 //! | P8 Pipeline Viz | demo_streaming_pipeline → JSON roundtrip |
 //! | P9 Regression  | Existing scenarios still produce valid output |
 
+use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::visualization;
-use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp334: Science-to-Viz Pipeline");

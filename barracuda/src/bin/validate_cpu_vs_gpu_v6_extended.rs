@@ -44,8 +44,8 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 struct Timing {
     name: &'static str,
@@ -93,7 +93,8 @@ fn main() {
     let (cpu_results, cpu_stats) = chimera::detect_chimeras(&asvs, &params);
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
-    let (gpu_results, gpu_stats) = chimera_gpu::detect_chimeras_gpu(&gpu, &asvs, &params).or_exit("unexpected error");
+    let (gpu_results, gpu_stats) =
+        chimera_gpu::detect_chimeras_gpu(&gpu, &asvs, &params).or_exit("unexpected error");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check_pass(
         "Chimera: result count match",
@@ -181,7 +182,8 @@ fn main() {
         &[0.0, -0.3, 0.3],
     )
     .or_exit("unexpected error");
-    let model = gbm::GbmClassifier::new(vec![tree1, tree2], 0.1, 0.0, 2).or_exit("unexpected error");
+    let model =
+        gbm::GbmClassifier::new(vec![tree1, tree2], 0.1, 0.0, 2).or_exit("unexpected error");
     let samples = vec![
         vec![0.8, 0.5],
         vec![0.2, 0.1],
@@ -225,8 +227,8 @@ fn main() {
     let cpu_dtl = reconciliation::reconcile_dtl(&host, &parasite, &tip_map, &costs);
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
-    let gpu_dtl =
-        reconciliation_gpu::reconcile_dtl_gpu(&gpu, &host, &parasite, &tip_map, &costs).or_exit("unexpected error");
+    let gpu_dtl = reconciliation_gpu::reconcile_dtl_gpu(&gpu, &host, &parasite, &tip_map, &costs)
+        .or_exit("unexpected error");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check_pass(
         "DTL: cost match",
@@ -259,8 +261,8 @@ fn main() {
     let cpu_clock = molecular_clock::strict_clock(&bl, &parents_cpu, 30.0, &cal);
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
-    let gpu_clock =
-        molecular_clock_gpu::strict_clock_gpu(&gpu, &bl, &parents_gpu, 30.0, &cal).or_exit("unexpected error");
+    let gpu_clock = molecular_clock_gpu::strict_clock_gpu(&gpu, &bl, &parents_gpu, 30.0, &cal)
+        .or_exit("unexpected error");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check_pass(
         "Clock: both present",
@@ -276,8 +278,8 @@ fn main() {
     }
     let ages = vec![0.0, 0.0, 10.0, 15.0, 30.0];
     let cpu_rates = molecular_clock::relaxed_clock_rates(&bl, &ages, &parents_cpu);
-    let gpu_rates =
-        molecular_clock_gpu::relaxed_clock_rates_gpu(&gpu, &bl, &ages, &parents_gpu).or_exit("unexpected error");
+    let gpu_rates = molecular_clock_gpu::relaxed_clock_rates_gpu(&gpu, &bl, &ages, &parents_gpu)
+        .or_exit("unexpected error");
     for (i, (cr, gr)) in cpu_rates.iter().zip(gpu_rates.iter()).enumerate() {
         v.check(
             &format!("Relaxed [{i}]"),
@@ -312,14 +314,17 @@ fn main() {
         2,
     )
     .or_exit("unexpected error");
-    let forest = random_forest::RandomForest::from_trees(vec![dt1, dt2], 2).or_exit("unexpected error");
+    let forest =
+        random_forest::RandomForest::from_trees(vec![dt1, dt2], 2).or_exit("unexpected error");
     let rf_gpu = random_forest_gpu::RandomForestGpu::new(&gpu.to_wgpu_device());
     let rf_samples = vec![vec![0.8, 0.5], vec![0.1, 0.9], vec![0.5, 0.3]];
     let tc = Instant::now();
     let cpu_rf = forest.predict_batch_with_votes(&rf_samples);
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
-    let gpu_rf = rf_gpu.predict_batch(&forest, &rf_samples).or_exit("unexpected error");
+    let gpu_rf = rf_gpu
+        .predict_batch(&forest, &rf_samples)
+        .or_exit("unexpected error");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check_pass("RF: batch size match", gpu_rf.len() == cpu_rf.len());
     for (i, (cp, gp)) in cpu_rf.iter().zip(gpu_rf.iter()).enumerate() {

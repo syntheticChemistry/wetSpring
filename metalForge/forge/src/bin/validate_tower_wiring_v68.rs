@@ -26,6 +26,7 @@
 //! Validation class: Pipeline
 //! Provenance: End-to-end pipeline integration test
 
+use wetspring_barracuda::validation::OrExit;
 use wetspring_forge::data::{self, DataSource};
 use wetspring_forge::dispatch::{self, Workload};
 use wetspring_forge::inventory;
@@ -33,7 +34,6 @@ use wetspring_forge::substrate::{
     Capability, Identity, Properties, Substrate, SubstrateKind, SubstrateOrigin,
 };
 use wetspring_forge::workloads;
-use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut pass = 0u32;

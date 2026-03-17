@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# cargo-deny configuration for wetSpring barracuda crate.
+# cargo-deny configuration for wetSpring workspace.
 #
-# Run: cargo deny check
+# Run:     cargo deny check
 # Install: cargo install cargo-deny
 
 [graph]

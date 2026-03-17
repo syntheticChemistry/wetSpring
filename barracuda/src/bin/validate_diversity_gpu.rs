@@ -52,8 +52,8 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
 async fn main() {
@@ -405,7 +405,8 @@ fn validate_alpha_diversity(gpu: &GpuF64, v: &mut Validator) {
     {
         let counts = vec![25.0; 4];
         let cpu = diversity::pielou_evenness(&counts);
-        let gpu_val = diversity_gpu::pielou_evenness_gpu(gpu, &counts).or_exit("GPU Pielou uniform");
+        let gpu_val =
+            diversity_gpu::pielou_evenness_gpu(gpu, &counts).or_exit("GPU Pielou uniform");
         v.check(
             "Pielou evenness uniform",
             gpu_val,

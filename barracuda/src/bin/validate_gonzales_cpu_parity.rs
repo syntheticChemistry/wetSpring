@@ -43,8 +43,8 @@ use barracuda::spectral::{
 use barracuda::stats::{fit_exponential, hill, mean, r_squared};
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 const TOL: f64 = tolerances::ANALYTICAL_F64;
 
@@ -360,7 +360,8 @@ fn main() {
     v.check_pass("All barrier gaps positive", ratios.iter().all(|&r| r > 0.0));
 
     // Barrier range
-    let range = barriers.last().or_exit("unexpected error") - barriers.first().or_exit("unexpected error");
+    let range =
+        barriers.last().or_exit("unexpected error") - barriers.first().or_exit("unexpected error");
     v.check_pass("Barrier range > 10", range > 10.0);
 
     // Verify ln transform is correct

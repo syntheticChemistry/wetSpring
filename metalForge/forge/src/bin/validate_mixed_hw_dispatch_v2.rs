@@ -17,9 +17,9 @@
 
 use barracuda::unified_hardware::BandwidthTier;
 use wetspring_barracuda::tolerances;
+use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
 use wetspring_forge::dispatch::{self, Reason, Workload};
-use wetspring_barracuda::validation::OrExit;
 use wetspring_forge::substrate::{
     Capability, Identity, Properties, Substrate, SubstrateKind, SubstrateOrigin,
 };
@@ -92,7 +92,8 @@ fn main() {
 
     let small_work =
         Workload::new("small_diversity", vec![Capability::F64Compute]).with_data_bytes(64);
-    let d_small = dispatch::route_bandwidth_aware(&small_work, &inventory).or_exit("unexpected error");
+    let d_small =
+        dispatch::route_bandwidth_aware(&small_work, &inventory).or_exit("unexpected error");
     v.check_pass(
         "small data (64B): routes to GPU (compute > transfer)",
         d_small.substrate.kind == SubstrateKind::Gpu,
@@ -100,14 +101,16 @@ fn main() {
 
     let large_work =
         Workload::new("large_diversity", vec![Capability::F64Compute]).with_data_bytes(100_000_000);
-    let d_large = dispatch::route_bandwidth_aware(&large_work, &inventory).or_exit("unexpected error");
+    let d_large =
+        dispatch::route_bandwidth_aware(&large_work, &inventory).or_exit("unexpected error");
     v.check_pass(
         "large data (100MB): falls back to CPU (transfer dominates)",
         d_large.substrate.kind == SubstrateKind::Cpu && d_large.reason == Reason::BandwidthFallback,
     );
 
     let no_data = Workload::new("no_data_workload", vec![Capability::F64Compute]);
-    let d_nodata = dispatch::route_bandwidth_aware(&no_data, &inventory).or_exit("unexpected error");
+    let d_nodata =
+        dispatch::route_bandwidth_aware(&no_data, &inventory).or_exit("unexpected error");
     v.check_pass(
         "no data_bytes: standard routing (GPU)",
         d_nodata.substrate.kind == SubstrateKind::Gpu,
@@ -116,7 +119,8 @@ fn main() {
     let forced_gpu = Workload::new("forced_gpu", vec![Capability::F64Compute])
         .prefer(SubstrateKind::Gpu)
         .with_data_bytes(500_000_000);
-    let d_forced = dispatch::route_bandwidth_aware(&forced_gpu, &inventory).or_exit("unexpected error");
+    let d_forced =
+        dispatch::route_bandwidth_aware(&forced_gpu, &inventory).or_exit("unexpected error");
     v.check_pass(
         "preferred GPU ignores bandwidth fallback",
         d_forced.substrate.kind == SubstrateKind::Gpu,
@@ -163,12 +167,14 @@ fn main() {
     );
 
     // Dispatch bio workloads through bandwidth-aware path
-    let kmer_d = dispatch::route_bandwidth_aware(&kmer.workload, &inventory).or_exit("unexpected error");
+    let kmer_d =
+        dispatch::route_bandwidth_aware(&kmer.workload, &inventory).or_exit("unexpected error");
     v.check_pass(
         "kmer_histogram routes to GPU (10MB < threshold)",
         kmer_d.substrate.kind == SubstrateKind::Gpu,
     );
-    let dada2_d = dispatch::route_bandwidth_aware(&dada2_w.workload, &inventory).or_exit("unexpected error");
+    let dada2_d =
+        dispatch::route_bandwidth_aware(&dada2_w.workload, &inventory).or_exit("unexpected error");
     v.check_pass(
         "dada2 bandwidth decision made",
         dada2_d.substrate.kind == SubstrateKind::Gpu || dada2_d.reason == Reason::BandwidthFallback,
@@ -226,14 +232,15 @@ fn main() {
     v.check_pass("1 MB transfer < 1000 µs", transfer_1mb < 1000.0);
     v.check_pass("1 MB transfer > 0 µs", transfer_1mb > 0.0);
 
-    let bridge_tier = wetspring_forge::bridge::detect_bandwidth_tier(&inventory[0]).or_exit("unexpected error");
+    let bridge_tier =
+        wetspring_forge::bridge::detect_bandwidth_tier(&inventory[0]).or_exit("unexpected error");
     v.check_pass(
         "bridge detects PciE4x16 for RTX 4070",
         bridge_tier == BandwidthTier::PciE4x16,
     );
 
-    let bridge_us =
-        wetspring_forge::bridge::estimated_transfer_us(&inventory[0], 1_048_576).or_exit("unexpected error");
+    let bridge_us = wetspring_forge::bridge::estimated_transfer_us(&inventory[0], 1_048_576)
+        .or_exit("unexpected error");
     v.check(
         "bridge transfer matches direct",
         bridge_us,

@@ -63,8 +63,8 @@ use std::path::PathBuf;
 use barracuda::stats::norm_cdf;
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::visualization::{
     DataChannel, EcologyScenario, ScenarioEdge, ScenarioNode, ScientificRange, scenario_to_json,
 };
@@ -247,7 +247,11 @@ fn main() {
         "bulk soil has highest diversity",
         results
             .iter()
-            .max_by(|a, b| a.h_prime.partial_cmp(&b.h_prime).or_exit("unexpected error"))
+            .max_by(|a, b| {
+                a.h_prime
+                    .partial_cmp(&b.h_prime)
+                    .or_exit("unexpected error")
+            })
             .or_exit("unexpected error")
             .name
             .contains("Bulk Soil"),

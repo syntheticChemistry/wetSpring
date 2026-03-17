@@ -50,6 +50,7 @@ use barracuda::stats::{covariance, mean, norm_cdf};
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::ipc::discover;
 use wetspring_barracuda::ipc::primal_names;
+use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::visualization::ipc_push::PetalTonguePushClient;
 use wetspring_barracuda::visualization::live_pipeline::{LivePipelineSession, PipelineDomain};
@@ -57,7 +58,6 @@ use wetspring_barracuda::visualization::scenarios::{
     anderson_scenario, ecology_scenario, full_pipeline_scenario,
 };
 use wetspring_barracuda::visualization::stream::StreamSession;
-use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::visualization::{
     DataChannel, EcologyScenario, ScenarioEdge, ScenarioNode, ScientificRange, UiConfig,
     scenario_to_json, scenario_with_edges_json,

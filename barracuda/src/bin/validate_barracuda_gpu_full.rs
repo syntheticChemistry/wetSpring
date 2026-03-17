@@ -45,8 +45,8 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
 async fn main() {
@@ -360,7 +360,9 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
         let t_gpu = Instant::now();
         let rf_gpu = RandomForestGpu::new(&device);
-        let gpu_preds = rf_gpu.predict_batch(&rf, &samples).or_exit("GPU validation");
+        let gpu_preds = rf_gpu
+            .predict_batch(&rf, &samples)
+            .or_exit("GPU validation");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
         for (i, (c, g)) in cpu_preds.iter().zip(gpu_preds.iter()).enumerate() {
             v.check(

@@ -48,8 +48,8 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 fn synthetic_sequences() -> Vec<&'static [u8]> {
     vec![
@@ -121,7 +121,8 @@ async fn main() {
         .iter()
         .map(|s| diversity_gpu::shannon_gpu(&gpu, s).or_exit("unexpected error"))
         .collect();
-    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &float_vecs).or_exit("unexpected error");
+    let gpu_bc =
+        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &float_vecs).or_exit("unexpected error");
 
     let stream_ms = t.elapsed().as_secs_f64() * 1000.0;
 
@@ -172,7 +173,8 @@ async fn main() {
 
     let coords: Vec<f64> = float_vecs.iter().flat_map(|v| v.iter().copied()).collect();
     let dim = float_vecs[0].len();
-    let gpu_l2 = pairwise_l2_gpu::pairwise_l2_condensed_gpu(&gpu, &coords, n, dim).or_exit("unexpected error");
+    let gpu_l2 = pairwise_l2_gpu::pairwise_l2_condensed_gpu(&gpu, &coords, n, dim)
+        .or_exit("unexpected error");
     v.check_pass("L2: pair count", gpu_l2.len() == n * (n - 1) / 2);
     v.check_pass("L2: all finite", gpu_l2.iter().all(|d| d.is_finite()));
     let l2_ms = t.elapsed().as_secs_f64() * 1000.0;

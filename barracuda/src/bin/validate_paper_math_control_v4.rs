@@ -50,8 +50,8 @@
 
 use wetspring_barracuda::bio::{cooperation, diversity, qs_biofilm};
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn main() {
     let mut v = Validator::new("Exp291: Paper Math Control v4 — 52 Papers via BarraCuda CPU");

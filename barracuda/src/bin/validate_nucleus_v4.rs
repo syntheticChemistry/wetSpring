@@ -227,8 +227,8 @@ fn main() {
     let mut json_h = 0.0;
     for _ in 0..n_iterations {
         let params = serde_json::json!({"counts": counts, "metrics": ["shannon"]});
-        let result =
-            wetspring_barracuda::ipc::dispatch::dispatch("science.diversity", &params).or_exit("unexpected error");
+        let result = wetspring_barracuda::ipc::dispatch::dispatch("science.diversity", &params)
+            .or_exit("unexpected error");
         json_h = result["shannon"].as_f64().or_exit("unexpected error");
     }
     let json_us = t_json.elapsed().as_nanos() as f64 / f64::from(n_iterations) / 1000.0;
@@ -269,8 +269,8 @@ fn main() {
 
     // IPC dispatch of same pipeline
     let ipc_params = serde_json::json!({"counts": digester, "metrics": ["shannon", "pielou"]});
-    let ipc_result =
-        wetspring_barracuda::ipc::dispatch::dispatch("science.diversity", &ipc_params).or_exit("unexpected error");
+    let ipc_result = wetspring_barracuda::ipc::dispatch::dispatch("science.diversity", &ipc_params)
+        .or_exit("unexpected error");
     let ipc_h = ipc_result["shannon"].as_f64().or_exit("unexpected error");
     v.check(
         "NUCLEUS IPC Shannon = Direct",

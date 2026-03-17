@@ -39,8 +39,8 @@ use wetspring_barracuda::bio::phage_defense::{self, PhageDefenseParams};
 use wetspring_barracuda::bio::phage_defense_gpu::{PhageDefenseGpu, PhageDefenseOdeConfig};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
 async fn main() {

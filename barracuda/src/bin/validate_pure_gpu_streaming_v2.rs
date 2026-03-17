@@ -39,8 +39,8 @@ use wetspring_barracuda::bio::taxonomy::{
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
 async fn main() {
@@ -109,7 +109,9 @@ fn validate_alpha_streaming(
     let tg = Instant::now();
     let gpu_shannon = session.shannon(&counts).or_exit("shannon stream");
     let gpu_simpson = session.simpson(&counts).or_exit("simpson stream");
-    let gpu_observed = session.observed_features(&counts).or_exit("observed stream");
+    let gpu_observed = session
+        .observed_features(&counts)
+        .or_exit("observed stream");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check(
@@ -154,7 +156,9 @@ fn validate_bray_curtis_streaming(
 
     let sample_refs: Vec<&[f64]> = samples.iter().map(Vec::as_slice).collect();
     let tg = Instant::now();
-    let gpu_bc = session.bray_curtis_matrix(&sample_refs).or_exit("BC stream");
+    let gpu_bc = session
+        .bray_curtis_matrix(&sample_refs)
+        .or_exit("BC stream");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check(

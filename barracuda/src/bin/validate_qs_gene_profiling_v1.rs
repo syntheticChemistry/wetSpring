@@ -49,8 +49,8 @@
 //! | Command | `cargo run --release --features gpu,json --bin validate_qs_gene_profiling_v1` |
 
 use std::time::Instant;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 const FNR_REGULATED: u8 = 1 << 0;
 const ARCAB_REGULATED: u8 = 1 << 1;

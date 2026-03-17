@@ -461,7 +461,7 @@ fn validate_reconciliation_gpu(gpu: &GpuF64, v: &mut Validator) {
 
 fn validate_molecular_clock_gpu(gpu: &GpuF64, v: &mut Validator) {
     use wetspring_barracuda::bio::molecular_clock_gpu;
-use wetspring_barracuda::validation::OrExit;
+    use wetspring_barracuda::validation::OrExit;
 
     v.section("M13: Molecular Clock GPU");
 

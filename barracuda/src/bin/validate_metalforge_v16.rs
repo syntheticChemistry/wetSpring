@@ -51,8 +51,8 @@ use wetspring_barracuda::bio::{
     ani, cooperation, diversity, kmd, pangenome, qs_biofilm, signal, snp, spectral_match,
 };
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{DomainResult, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{DomainResult, Validator};
 
 fn domain(
     name: &'static str,

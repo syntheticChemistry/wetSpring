@@ -26,8 +26,8 @@ use wetspring_barracuda::bio::spectral_match_gpu;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 fn generate_spectra(n_spectra: usize, n_bins: usize, seed: u64) -> Vec<Vec<f64>> {
     let mut spectra = Vec::with_capacity(n_spectra);

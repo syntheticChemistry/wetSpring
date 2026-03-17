@@ -26,8 +26,8 @@
 
 use wetspring_barracuda::bio::{ani, diversity, dnds, snp};
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn main() {
     let mut v = Validator::new("Exp055: Anderson 2017 Population Genomics Validation");

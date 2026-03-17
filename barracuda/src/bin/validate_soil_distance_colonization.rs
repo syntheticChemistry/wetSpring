@@ -183,7 +183,9 @@ fn main() {
         params.benefit *= (1.0 / factor).min(1.0);
 
         let result = cooperation::scenario_equal_start(&params, dt);
-        let freq = *cooperation::cooperator_frequency(&result).last().or_exit("unexpected error");
+        let freq = *cooperation::cooperator_frequency(&result)
+            .last()
+            .or_exit("unexpected error");
         let affected = (freq - baseline_freq).abs() > tolerances::SOIL_COOP_FREQ_AFFECTED;
         if affected {
             affected_count += 1;

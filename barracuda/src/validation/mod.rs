@@ -372,13 +372,16 @@ impl<T, E: std::fmt::Display> OrExit<T> for Result<T, E> {
 }
 
 impl<T> OrExit<T> for Option<T> {
+    #[expect(
+        clippy::option_if_let_else,
+        reason = "explicit if-let is clearer for a fatal-exit path"
+    )]
     fn or_exit(self, context: &str) -> T {
-        match self {
-            Some(v) => v,
-            None => {
-                eprintln!("FATAL: {context}");
-                std::process::exit(1)
-            }
+        if let Some(v) = self {
+            v
+        } else {
+            eprintln!("FATAL: {context}");
+            std::process::exit(1)
         }
     }
 }

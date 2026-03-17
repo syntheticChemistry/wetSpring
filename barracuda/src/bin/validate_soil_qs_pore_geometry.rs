@@ -78,7 +78,12 @@ fn main() {
     let result = qs_biofilm::scenario_standard_growth(&params, dt);
     let qs_us = t0.elapsed().as_micros();
 
-    let final_n = *result.states().last().or_exit("unexpected error").first().or_exit("unexpected error");
+    let final_n = *result
+        .states()
+        .last()
+        .or_exit("unexpected error")
+        .first()
+        .or_exit("unexpected error");
     v.check(
         "Standard growth → high cell density",
         final_n,
@@ -121,7 +126,9 @@ fn main() {
     );
 
     let coop_dom = cooperation::scenario_coop_dominated(&coop_params, dt);
-    let coop_dom_freq = *cooperation::cooperator_frequency(&coop_dom).last().or_exit("unexpected error");
+    let coop_dom_freq = *cooperation::cooperator_frequency(&coop_dom)
+        .last()
+        .or_exit("unexpected error");
     v.check_pass(
         "Coop-dominated start → cooperators > 50%",
         coop_dom_freq > 0.5,

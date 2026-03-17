@@ -33,12 +33,12 @@
 //! Validation class: Pipeline + Analytical
 //! Provenance: S86 ungated primitives via metalForge Node dispatch
 
+use wetspring_barracuda::validation::OrExit;
 use wetspring_forge::dispatch;
 use wetspring_forge::inventory;
 use wetspring_forge::streaming::{PipelineStage, StreamingSession};
 use wetspring_forge::substrate::{Capability, SubstrateKind};
 use wetspring_forge::workloads;
-use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     println!("═══════════════════════════════════════════════════════════");

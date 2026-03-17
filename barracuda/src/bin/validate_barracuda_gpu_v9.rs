@@ -47,8 +47,8 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::df64_host;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 struct GpuTiming {
     name: &'static str,
@@ -132,7 +132,8 @@ fn main() {
     ];
     let cpu_chimera = chimera::detect_chimeras(&asvs, &chimera::ChimeraParams::default());
     let gpu_chimera =
-        chimera_gpu::detect_chimeras_gpu(&gpu, &asvs, &chimera::ChimeraParams::default()).or_exit("unexpected error");
+        chimera_gpu::detect_chimeras_gpu(&gpu, &asvs, &chimera::ChimeraParams::default())
+            .or_exit("unexpected error");
     v.check_pass(
         "Chimera GPU: same result count",
         gpu_chimera.0.len() == cpu_chimera.0.len(),
@@ -175,8 +176,8 @@ fn main() {
         },
     ];
     let cpu_dada2 = dada2::denoise(&seqs, &dada2::Dada2Params::default());
-    let gpu_dada2 =
-        dada2_gpu::denoise_gpu(&dada2_engine, &seqs, &dada2::Dada2Params::default()).or_exit("unexpected error");
+    let gpu_dada2 = dada2_gpu::denoise_gpu(&dada2_engine, &seqs, &dada2::Dada2Params::default())
+        .or_exit("unexpected error");
     v.check_pass(
         "DADA2 GPU: same ASV count",
         gpu_dada2.0.len() == cpu_dada2.0.len(),
@@ -209,7 +210,8 @@ fn main() {
         &[0.0, -0.3, 0.3],
     )
     .or_exit("unexpected error");
-    let model = gbm::GbmClassifier::new(vec![tree1, tree2], 0.1, 0.0, 2).or_exit("unexpected error");
+    let model =
+        gbm::GbmClassifier::new(vec![tree1, tree2], 0.1, 0.0, 2).or_exit("unexpected error");
     let samples = vec![vec![0.8, 0.5], vec![0.2, 0.1], vec![0.5, 0.5]];
     let cpu_preds = model.predict_batch_proba(&samples);
     let gpu_preds = gbm_gpu::predict_batch_gpu(&gpu, &model, &samples).or_exit("unexpected error");
@@ -333,11 +335,14 @@ fn main() {
         2,
     )
     .or_exit("unexpected error");
-    let forest = random_forest::RandomForest::from_trees(vec![dt1, dt2], 2).or_exit("unexpected error");
+    let forest =
+        random_forest::RandomForest::from_trees(vec![dt1, dt2], 2).or_exit("unexpected error");
     let rf_gpu = random_forest_gpu::RandomForestGpu::new(&gpu.to_wgpu_device());
     let samples = vec![vec![0.8, 0.5], vec![0.1, 0.9]];
     let cpu_rf = forest.predict_batch_with_votes(&samples);
-    let gpu_rf = rf_gpu.predict_batch(&forest, &samples).or_exit("unexpected error");
+    let gpu_rf = rf_gpu
+        .predict_batch(&forest, &samples)
+        .or_exit("unexpected error");
     v.check_pass("RF GPU: same count", gpu_rf.len() == cpu_rf.len());
     for (i, (cp, gp)) in cpu_rf.iter().zip(gpu_rf.iter()).enumerate() {
         v.check_pass(&format!("RF GPU [{i}]: class match"), cp.class == gp.class);
@@ -356,8 +361,8 @@ fn main() {
         depth: Some(80),
         seed: 42,
     };
-    let rare_result =
-        rarefaction_gpu::rarefaction_bootstrap_gpu(&gpu, &rare_counts, &rare_params).or_exit("unexpected error");
+    let rare_result = rarefaction_gpu::rarefaction_bootstrap_gpu(&gpu, &rare_counts, &rare_params)
+        .or_exit("unexpected error");
     v.check_pass(
         "Rarefaction: Shannon CI valid",
         rare_result.shannon.lower <= rare_result.shannon.upper,
@@ -407,7 +412,8 @@ fn main() {
     ];
     let targets = vec![(0.25, 0.25), (0.75, 0.75)];
     let config = kriging::VariogramConfig::spherical(0.0, 1.0, 2.0);
-    let krig = kriging::interpolate_diversity(&gpu, &sites, &targets, &config).or_exit("unexpected error");
+    let krig =
+        kriging::interpolate_diversity(&gpu, &sites, &targets, &config).or_exit("unexpected error");
     v.check_pass("Kriging: 2 values", krig.values.len() == 2);
     v.check_pass("Kriging: finite", krig.values.iter().all(|x| x.is_finite()));
     v.check_pass(

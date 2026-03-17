@@ -62,8 +62,8 @@ use barracuda::spectral::{
     level_spacing_ratio,
 };
 use wetspring_barracuda::bio::diversity;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 struct DomainResult {
     name: &'static str,
@@ -267,7 +267,11 @@ fn main() {
                 found_transition = true;
                 w_c_estimate = f64::midpoint(
                     w,
-                    disorders[disorders.iter().position(|&d| d == w).or_exit("unexpected error") - 1],
+                    disorders[disorders
+                        .iter()
+                        .position(|&d| d == w)
+                        .or_exit("unexpected error")
+                        - 1],
                 );
             }
             prev_r = r;

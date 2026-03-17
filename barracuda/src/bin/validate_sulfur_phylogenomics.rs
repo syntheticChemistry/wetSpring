@@ -30,8 +30,8 @@ use wetspring_barracuda::bio::{
     unifrac::PhyloTree,
 };
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn main() {
     let mut v = Validator::new("Exp053: Mateos 2023 Sulfur Enzyme Phylogenomics");

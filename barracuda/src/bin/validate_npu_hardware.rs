@@ -48,8 +48,8 @@
 use std::time::Instant;
 use wetspring_barracuda::npu;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn main() {
     let mut v = Validator::new("Exp193: NPU Hardware Validation (AKD1000)");

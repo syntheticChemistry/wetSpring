@@ -57,26 +57,31 @@ fn print_help() {
 }
 
 fn run_server() {
-    eprintln!("{PRIMAL} v{VERSION}");
-    eprintln!("  Science primal for biomeOS — BarraCuda-powered");
+    tracing_subscriber::fmt::init();
+
+    tracing::info!(
+        primal = PRIMAL,
+        version = VERSION,
+        "starting science primal"
+    );
 
     let server = match Server::bind_default() {
         Ok(s) => s,
         Err(e) => {
-            eprintln!("FATAL: cannot bind socket: {e}");
+            tracing::error!(error = %e, "cannot bind socket");
             std::process::exit(1);
         }
     };
 
-    eprintln!("  Socket: {}", server.socket_path().display());
+    tracing::info!(socket = %server.socket_path().display(), "bound");
 
     let _heartbeat = songbird::discover_socket().map_or_else(
         || {
-            eprintln!("  Songbird: not found (standalone mode)");
+            tracing::info!("Songbird not found, standalone mode");
             None
         },
         |songbird_socket| {
-            eprintln!("  Songbird: {}", songbird_socket.display());
+            tracing::info!(songbird = %songbird_socket.display(), "Songbird discovered");
             Some(songbird::start_heartbeat_loop(
                 songbird_socket,
                 server.socket_path().to_path_buf(),
@@ -84,8 +89,7 @@ fn run_server() {
         },
     );
 
-    eprintln!("  Capabilities: {} methods registered", CAPABILITIES.len());
-    eprintln!("  Ready.");
+    tracing::info!(capabilities = CAPABILITIES.len(), "ready");
 
     server.run();
 }

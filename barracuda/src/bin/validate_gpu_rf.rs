@@ -34,8 +34,8 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
 async fn main() {

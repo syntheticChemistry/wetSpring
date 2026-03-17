@@ -22,8 +22,8 @@
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::decision_tree::DecisionTree;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn main() {
     let mut v = Validator::new("Exp041: EPA PFAS National-Scale ML");

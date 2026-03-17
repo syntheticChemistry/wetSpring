@@ -28,8 +28,8 @@
 use std::fs;
 use wetspring_barracuda::bio::decision_tree::DecisionTree;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 #[expect(clippy::cast_possible_truncation)]
 fn load_tree() -> DecisionTree {

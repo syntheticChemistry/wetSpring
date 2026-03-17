@@ -32,8 +32,8 @@ use wetspring_barracuda::bio::{
     random_forest::RandomForest,
 };
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn main() {
     let mut v = Validator::new("BarraCuda CPU v5 — RF + GBM (Domains 24-25)");

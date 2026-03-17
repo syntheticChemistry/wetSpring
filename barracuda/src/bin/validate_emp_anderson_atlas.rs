@@ -68,8 +68,8 @@ use std::time::Instant;
 
 use barracuda::stats;
 use wetspring_barracuda::bio::diversity;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 const EMP_BIOMES: &[(&str, f64, f64)] = &[
     ("Animal corpus", 0.55, 0.15),

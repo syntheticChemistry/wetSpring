@@ -18,10 +18,10 @@
 //! Follows `hotSpring` validation pattern: hardcoded expected, explicit
 //! pass/fail, exit code 0/1.
 
+use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::visualization::ipc_push::PetalTonguePushClient;
 use wetspring_barracuda::visualization::scenarios::{self, benchmarks::TierResult};
-use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::visualization::{
     DataChannel, EcologyScenario, ScenarioNode, ScientificRange, scenario_with_edges_json,
 };

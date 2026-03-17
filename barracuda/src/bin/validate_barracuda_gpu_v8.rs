@@ -70,8 +70,8 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::df64_host;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 struct GpuTiming {
     name: &'static str,
@@ -124,7 +124,8 @@ async fn main() {
         vec![5.0, 10.0, 40.0],
     ];
     let cpu_bc = diversity::bray_curtis_condensed(&samples);
-    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).or_exit("unexpected error");
+    let gpu_bc =
+        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).or_exit("unexpected error");
     for (k, (&c, &g)) in cpu_bc.iter().zip(gpu_bc.iter()).enumerate() {
         v.check(&format!("BC[{k}]"), g, c, tolerances::GPU_VS_CPU_F64);
     }
@@ -227,7 +228,10 @@ async fn main() {
     v.section("G05: SNP GPU");
     let snp_seqs: Vec<&[u8]> = vec![b"ATGCATGCATGCATGCATGCATGC", b"ATGGATGCATGCATGCATGCATGC"];
     let cpu_snps = snp::call_snps(&snp_seqs);
-    let gpu_snps = SnpGpu::new(&device).or_exit("unexpected error").call_snps(&snp_seqs).or_exit("unexpected error");
+    let gpu_snps = SnpGpu::new(&device)
+        .or_exit("unexpected error")
+        .call_snps(&snp_seqs)
+        .or_exit("unexpected error");
     v.check_count(
         "SNP count",
         gpu_snps.is_variant.iter().filter(|&&x| x == 1).count(),
@@ -278,7 +282,8 @@ async fn main() {
     let coords: Vec<f64> = (0..n * dim)
         .map(|i| ((i * 17 + 3) % 100) as f64 / 100.0)
         .collect();
-    let gpu_l2 = pairwise_l2_gpu::pairwise_l2_condensed_gpu(&gpu, &coords, n, dim).or_exit("unexpected error");
+    let gpu_l2 = pairwise_l2_gpu::pairwise_l2_condensed_gpu(&gpu, &coords, n, dim)
+        .or_exit("unexpected error");
     v.check_pass("L2 pair count", gpu_l2.len() == n * (n - 1) / 2);
     v.check_pass("L2 all finite", gpu_l2.iter().all(|d| d.is_finite()));
     timings.push(GpuTiming {
@@ -336,7 +341,9 @@ async fn main() {
         .map(|i| ((i * 11 + 5) % 100) as f64 / 100.0)
         .collect();
     let gemm = GemmCached::new(Arc::clone(&device), Arc::clone(&ctx));
-    let res = gemm.execute(&a, &b_mat, m, k, n_g, 1).or_exit("unexpected error");
+    let res = gemm
+        .execute(&a, &b_mat, m, k, n_g, 1)
+        .or_exit("unexpected error");
     v.check_pass("GEMM finite", res.iter().all(|x| x.is_finite()));
     let expected_00: f64 = (0..k).map(|j| a[j] * b_mat[j * n_g]).sum();
     v.check(

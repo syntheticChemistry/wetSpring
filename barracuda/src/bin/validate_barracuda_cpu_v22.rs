@@ -48,8 +48,8 @@
 
 use wetspring_barracuda::bio::{cooperation, diversity, gillespie, qs_biofilm};
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 fn main() {
     let mut v = Validator::new("Exp292: BarraCuda CPU v22 — Comprehensive Paper Parity");

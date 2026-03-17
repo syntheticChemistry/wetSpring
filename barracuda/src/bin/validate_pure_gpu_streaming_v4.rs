@@ -62,8 +62,8 @@ use wetspring_barracuda::df64_host;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::io::fastq::FastqRecord;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
 async fn main() {
@@ -107,7 +107,9 @@ async fn main() {
         let cpu_filt = quality::filter_reads(&reads, &qparams);
         let cpu_us = t0.elapsed().as_micros() as f64;
         let t1 = Instant::now();
-        let (gpu_filt, _stats) = session.filter_reads(&reads, &qparams).or_exit("unexpected error");
+        let (gpu_filt, _stats) = session
+            .filter_reads(&reads, &qparams)
+            .or_exit("unexpected error");
         let gpu_us = t1.elapsed().as_micros() as f64;
         v.check_count("S1: filtered count", gpu_filt.len(), cpu_filt.0.len());
         (cpu_us, gpu_us, gpu_filt.len())
@@ -135,7 +137,9 @@ async fn main() {
         .iter()
         .map(|c| session.shannon(c).or_exit("unexpected error"))
         .collect();
-    let gpu_bc = session.bray_curtis_matrix(&sample_refs).or_exit("unexpected error");
+    let gpu_bc = session
+        .bray_curtis_matrix(&sample_refs)
+        .or_exit("unexpected error");
     let gpu_div_us = t1.elapsed().as_micros() as f64;
 
     for (i, (&c, &g)) in cpu_shannons.iter().zip(&gpu_shannons).enumerate() {
@@ -253,7 +257,8 @@ async fn main() {
         vec![100.0, 200.0, 50.0, 300.0, 150.0],
         vec![10.0, 20.0, 500.0, 30.0, 15.0],
     ];
-    let gpu_cos = spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).or_exit("unexpected error");
+    let gpu_cos =
+        spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).or_exit("unexpected error");
     v.check_pass(
         "Self-cosine ≈ 1",
         (gpu_cos[0] - 1.0).abs() < tolerances::GPU_VS_CPU_F64,

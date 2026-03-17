@@ -48,8 +48,8 @@
 //! | Command | `cargo run --release --features gpu,json --bin validate_liao_real_data_v1` |
 
 use std::time::Instant;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 struct DigestorCommunity {
     name: &'static str,

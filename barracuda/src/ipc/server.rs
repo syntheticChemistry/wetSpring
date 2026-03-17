@@ -98,7 +98,7 @@ impl Server {
     /// Each connection is handled in its own OS thread. The call blocks
     /// on `accept()` and never returns under normal operation.
     pub fn run(&self) {
-        eprintln!("[wetspring] listening on {}", self.socket_path.display());
+        tracing::info!(socket = %self.socket_path.display(), "listening");
 
         for stream in self.listener.incoming() {
             match stream {
@@ -109,7 +109,7 @@ impl Server {
                     });
                 }
                 Err(e) => {
-                    eprintln!("[wetspring] accept error: {e}");
+                    tracing::warn!(error = %e, "accept error");
                 }
             }
         }
@@ -125,7 +125,7 @@ impl Drop for Server {
 /// Handle a single client connection: read newline-delimited JSON-RPC, dispatch, respond.
 fn handle_connection(stream: &std::os::unix::net::UnixStream, metrics: &Metrics) {
     if let Err(e) = stream.set_read_timeout(Some(CONNECTION_READ_TIMEOUT)) {
-        eprintln!("[wetspring] set timeout: {e}");
+        tracing::warn!(error = %e, "set read timeout");
         return;
     }
 

@@ -30,8 +30,8 @@
 //! Validation class: Analytical
 //! Provenance: Known-value formulas and algorithmic invariants
 
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 /// A signaling pathway with activation score from patient proteomic data.
 struct Pathway {

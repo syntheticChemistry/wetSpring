@@ -50,8 +50,8 @@ use std::time::Instant;
 
 use barracuda::stats::{hill, mean};
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 struct Timing {
     domain: &'static str,
@@ -287,7 +287,8 @@ fn main() {
         w_jak1 < w_il31,
     );
 
-    let w_range = anderson_barriers.last().or_exit("unexpected error") - anderson_barriers.first().or_exit("unexpected error");
+    let w_range = anderson_barriers.last().or_exit("unexpected error")
+        - anderson_barriers.first().or_exit("unexpected error");
     v.check_pass(
         "Anderson barrier range spans meaningful interval",
         w_range > 5.0,

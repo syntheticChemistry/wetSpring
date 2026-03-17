@@ -195,7 +195,7 @@ async fn main() {
     // RF (minimal: 3 trees, 2 samples)
     {
         use wetspring_barracuda::bio::{decision_tree::DecisionTree, random_forest::RandomForest};
-use wetspring_barracuda::validation::OrExit;
+        use wetspring_barracuda::validation::OrExit;
 
         let t1 = DecisionTree::from_arrays(
             &[0, -2, -2],

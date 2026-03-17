@@ -278,8 +278,16 @@ fn main() {
     let cap_normal = capacitor::scenario_normal(&cap_params, tolerances::ODE_DEFAULT_DT);
     let cap_stress = capacitor::scenario_stress(&cap_params, tolerances::ODE_DEFAULT_DT);
 
-    let normal_final: Vec<f64> = cap_normal.states().last().or_exit("unexpected error").to_vec();
-    let stress_final: Vec<f64> = cap_stress.states().last().or_exit("unexpected error").to_vec();
+    let normal_final: Vec<f64> = cap_normal
+        .states()
+        .last()
+        .or_exit("unexpected error")
+        .to_vec();
+    let stress_final: Vec<f64> = cap_stress
+        .states()
+        .last()
+        .or_exit("unexpected error")
+        .to_vec();
 
     v.check_pass(
         "Mhatre: normal states finite",

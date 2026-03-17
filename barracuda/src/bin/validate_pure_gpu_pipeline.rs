@@ -41,8 +41,8 @@ use wetspring_barracuda::bio::{
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 const N_SAMPLES: usize = 8;
 const N_FEATURES: usize = 512;
@@ -303,7 +303,8 @@ async fn main() {
     v.section("Stage 5: Spectral Cosine (GPU GEMM)");
 
     let t5 = Instant::now();
-    let gpu_cosine = spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).or_exit("GPU pipeline");
+    let gpu_cosine =
+        spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).or_exit("GPU pipeline");
     let stage5_us = t5.elapsed().as_micros() as f64;
 
     let cpu_cosine = pairwise_cosine_cpu(&spectra);

@@ -71,8 +71,8 @@
 
 use std::time::Instant;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 struct ProvenanceTiming {
     domain: &'static str,
@@ -249,8 +249,9 @@ fn main() {
     v.check_pass("Bootstrap: SE > 0", ci.std_error > 0.0);
     v.check_pass("Bootstrap: n_bootstrap = 10000", ci.n_bootstrap == 10_000);
 
-    let (rawr, us_rawr) =
-        bench_us(|| barracuda::stats::rawr_mean(&bs_data, 5_000, 0.95, 77).or_exit("unexpected error"));
+    let (rawr, us_rawr) = bench_us(|| {
+        barracuda::stats::rawr_mean(&bs_data, 5_000, 0.95, 77).or_exit("unexpected error")
+    });
     v.check_pass("RAWR: CI lower < upper", rawr.lower < rawr.upper);
     timings.push(ProvenanceTiming {
         domain: "confidence",
@@ -300,9 +301,11 @@ fn main() {
     );
 
     let (all_fits, us_all) = bench_us(|| barracuda::stats::fit_all(&x, &y_log));
-    let best = all_fits
-        .iter()
-        .max_by(|a, b| a.r_squared.partial_cmp(&b.r_squared).or_exit("unexpected error"));
+    let best = all_fits.iter().max_by(|a, b| {
+        a.r_squared
+            .partial_cmp(&b.r_squared)
+            .or_exit("unexpected error")
+    });
     v.check_pass(
         "fit_all selects logarithmic",
         best.is_some_and(|b| b.model == "logarithmic"),

@@ -58,8 +58,8 @@ use wetspring_barracuda::bio::qs_biofilm::{self, QsBiofilmParams};
 use wetspring_barracuda::df64_host;
 use wetspring_barracuda::ipc::dispatch;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn synthetic_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     let mut counts = Vec::with_capacity(n_species);
@@ -129,7 +129,9 @@ fn main() {
 
     let ipc_params = json!({"scenario": "standard_growth"});
     let ipc_result = dispatch::dispatch("science.qs_model", &ipc_params).or_exit("dispatch QS");
-    let ipc_n_ss = ipc_result["final_state"][0].as_f64().or_exit("unexpected error");
+    let ipc_n_ss = ipc_result["final_state"][0]
+        .as_f64()
+        .or_exit("unexpected error");
     v.check(
         "QS N_ss: IPC == direct",
         ipc_n_ss,
@@ -156,7 +158,9 @@ fn main() {
     )
     .or_exit("full_pipeline");
 
-    let pipe_h = pipe_result["diversity"]["shannon"].as_f64().or_exit("unexpected error");
+    let pipe_h = pipe_result["diversity"]["shannon"]
+        .as_f64()
+        .or_exit("unexpected error");
     let expected_h = diversity::shannon(&pipeline_community);
     v.check(
         "Pipeline Shannon == direct",

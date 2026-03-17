@@ -56,8 +56,8 @@
 //! | Command | `cargo run --release --features gpu,json --bin validate_lan_mesh_plan_v1` |
 
 use std::time::Instant;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 struct TowerNode {
     name: &'static str,

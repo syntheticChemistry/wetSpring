@@ -30,9 +30,9 @@
 //! Validation class: Pipeline
 //! Provenance: End-to-end pipeline integration test
 
+use wetspring_barracuda::validation::OrExit;
 use wetspring_forge::dispatch::{self, Reason, Workload};
 use wetspring_forge::inventory;
-use wetspring_barracuda::validation::OrExit;
 use wetspring_forge::substrate::{
     Capability, Identity, Properties, Substrate, SubstrateKind, SubstrateOrigin,
 };

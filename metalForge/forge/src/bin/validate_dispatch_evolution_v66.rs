@@ -32,13 +32,13 @@
 //! Validation class: Pipeline
 //! Provenance: End-to-end pipeline integration test
 
+use wetspring_barracuda::validation::OrExit;
 use wetspring_forge::dispatch::{self, Reason, Workload};
 use wetspring_forge::streaming::{PipelineStage, StreamingSession};
 use wetspring_forge::substrate::{
     Capability, Identity, Properties, Substrate, SubstrateKind, SubstrateOrigin,
 };
 use wetspring_forge::workloads;
-use wetspring_barracuda::validation::OrExit;
 
 fn check(pass: &mut u32, fail: &mut u32, total: &mut u32, name: &str, ok: bool) {
     *total += 1;
@@ -371,8 +371,8 @@ fn section_mixed_dispatch(pass: &mut u32, fail: &mut u32, total: &mut u32) {
         d1.reason == Reason::BestAvailable,
     );
 
-    let d2 =
-        dispatch::route(&tax, &full).or_exit("taxonomy workload should route to NPU on full system");
+    let d2 = dispatch::route(&tax, &full)
+        .or_exit("taxonomy workload should route to NPU on full system");
     check(
         pass,
         fail,

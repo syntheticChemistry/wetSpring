@@ -49,8 +49,8 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 use barracuda::spectral::{
     GOE_R, POISSON_R, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
@@ -180,7 +180,12 @@ async fn main() {
     let mutant = qs_biofilm::scenario_hapr_mutant(&params, dt);
     let qs_cpu_us = tc.elapsed().as_micros() as f64;
 
-    let std_n = *standard.states().last().or_exit("unexpected error").first().or_exit("unexpected error");
+    let std_n = *standard
+        .states()
+        .last()
+        .or_exit("unexpected error")
+        .first()
+        .or_exit("unexpected error");
     let high_b = high.states().last().or_exit("unexpected error")[4];
     let mut_b = mutant.states().last().or_exit("unexpected error")[4];
 
@@ -210,9 +215,15 @@ async fn main() {
     let ch = cooperation::scenario_cheat_dominated(&coop_p, dt);
     let coop_cpu_us = tc.elapsed().as_micros() as f64;
 
-    let freq_eq = *cooperation::cooperator_frequency(&eq).last().or_exit("unexpected error");
-    let freq_cd = *cooperation::cooperator_frequency(&cd).last().or_exit("unexpected error");
-    let freq_ch = *cooperation::cooperator_frequency(&ch).last().or_exit("unexpected error");
+    let freq_eq = *cooperation::cooperator_frequency(&eq)
+        .last()
+        .or_exit("unexpected error");
+    let freq_cd = *cooperation::cooperator_frequency(&cd)
+        .last()
+        .or_exit("unexpected error");
+    let freq_ch = *cooperation::cooperator_frequency(&ch)
+        .last()
+        .or_exit("unexpected error");
 
     v.check_pass("Equal start: 0 < freq < 1", freq_eq > 0.0 && freq_eq < 1.0);
     v.check_pass("Coop dominated > cheat dominated", freq_cd > freq_ch);

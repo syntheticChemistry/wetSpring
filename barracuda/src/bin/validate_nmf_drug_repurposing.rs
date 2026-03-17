@@ -38,8 +38,8 @@
 
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 struct LcgRng(u64);
 
@@ -83,7 +83,8 @@ fn build_block_matrix(rng: &mut LcgRng) -> (Vec<f64>, usize) {
             let dis = disease_start
                 + (rng.next_f64()
                     * f64::from(
-                        u32::try_from(diseases_per_cluster).or_exit("diseases_per_cluster fits u32"),
+                        u32::try_from(diseases_per_cluster)
+                            .or_exit("diseases_per_cluster fits u32"),
                     )) as usize;
             if d < n_drugs && dis < n_diseases {
                 matrix[d * n_diseases + dis] = 1.0;

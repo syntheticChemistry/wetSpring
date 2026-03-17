@@ -43,10 +43,10 @@ use std::path::PathBuf;
 
 use barracuda::stats::norm_cdf;
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::visualization::ipc_push::PetalTonguePushClient;
 use wetspring_barracuda::visualization::stream::StreamSession;
-use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::visualization::{
     DataChannel, EcologyScenario, ScenarioEdge, ScenarioNode, ScientificRange, scenario_to_json,
 };
@@ -290,7 +290,11 @@ fn main() {
         scientific_ranges: vec![],
     };
 
-    let max_len = biomes.iter().map(|(_, c)| c.len()).max().or_exit("unexpected error");
+    let max_len = biomes
+        .iter()
+        .map(|(_, c)| c.len())
+        .max()
+        .or_exit("unexpected error");
     let padded: Vec<Vec<f64>> = biomes
         .iter()
         .map(|(_, c)| {

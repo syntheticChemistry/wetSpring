@@ -38,8 +38,8 @@ use std::time::{Duration, Instant};
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::ipc::Server;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn main() {
     let mut v = Validator::new("Exp322: Cross-Primal Pipeline V98+ — Ecosystem Integration");
@@ -68,8 +68,8 @@ fn main() {
     println!("  Graph: ecology.et0_fao56 → science.qs_model → diversity");
 
     let t = Instant::now();
-    let et0 =
-        barracuda::stats::fao56_et0(21.5, 12.3, 84.0, 63.0, 2.78, 22.07, 100.0, 50.8, 187).or_exit("unexpected error");
+    let et0 = barracuda::stats::fao56_et0(21.5, 12.3, 84.0, 63.0, 2.78, 22.07, 100.0, 50.8, 187)
+        .or_exit("unexpected error");
     v.check_pass("airSpring: FAO-56 ET₀ > 0", et0 > 0.0);
     println!("  ET₀ = {et0:.2} mm/day (drives soil moisture → biofilm)");
 

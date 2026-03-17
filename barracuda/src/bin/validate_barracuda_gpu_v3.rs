@@ -32,14 +32,13 @@
 //! Validation class: GPU-parity
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
-
 use wetspring_barracuda::bio::{
     diversity, diversity_gpu, spectral_match, spectral_match_gpu, stats_gpu,
 };
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
 async fn main() {
@@ -73,7 +72,8 @@ fn validate_extended_diversity(gpu: &GpuF64, v: &mut Validator) {
     {
         let counts = vec![25.0; 4];
         let cpu = diversity::pielou_evenness(&counts);
-        let gpu_val = diversity_gpu::pielou_evenness_gpu(gpu, &counts).or_exit("GPU Pielou uniform");
+        let gpu_val =
+            diversity_gpu::pielou_evenness_gpu(gpu, &counts).or_exit("GPU Pielou uniform");
         v.check(
             "Pielou GPU uniform ≈ 1.0",
             gpu_val,
@@ -143,7 +143,8 @@ fn validate_bray_curtis_matrix(gpu: &GpuF64, v: &mut Validator) {
             })
             .collect();
         let cpu = diversity::bray_curtis_condensed(&samples);
-        let gpu_val = diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).or_exit("GPU BC 5×10");
+        let gpu_val =
+            diversity_gpu::bray_curtis_condensed_gpu(gpu, &samples).or_exit("GPU BC 5×10");
 
         let n_pairs = 5 * 4 / 2;
         assert_eq!(gpu_val.len(), n_pairs);

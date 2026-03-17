@@ -42,8 +42,8 @@ use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, diversity_gpu, streaming_gpu, taxonomy};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator, test_data};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator, test_data};
 
 const N_SAMPLES: usize = 8;
 const N_FEATURES: usize = 256;
@@ -109,7 +109,8 @@ fn validate_roundtrip_mode(v: &mut Validator, gpu: &GpuF64) {
     let alpha_us = t_alpha.elapsed().as_micros();
 
     let t_bray = Instant::now();
-    let rt_bc = diversity_gpu::bray_curtis_condensed_gpu(gpu, &communities).or_exit("GPU streaming");
+    let rt_bc =
+        diversity_gpu::bray_curtis_condensed_gpu(gpu, &communities).or_exit("GPU streaming");
     let bray_us = t_bray.elapsed().as_micros();
 
     v.check(

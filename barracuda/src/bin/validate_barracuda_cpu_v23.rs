@@ -64,8 +64,8 @@
 use std::time::Instant;
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, DomainResult, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, DomainResult, Validator};
 
 fn main() {
     let mut v = Validator::new("Exp306: BarraCuda CPU v23 — V97 Fused Ops Decomposition Parity");
@@ -161,8 +161,8 @@ fn main() {
     );
     d41_checks += 1;
 
-    let large_var =
-        barracuda::stats::correlation::variance(&large).or_exit("variance of large shifted dataset");
+    let large_var = barracuda::stats::correlation::variance(&large)
+        .or_exit("variance of large shifted dataset");
     let expected_large_sample_var = large_n * (large_n + 1.0) / 12.0;
     v.check(
         "Welford: sVar(large shifted) = N(N+1)/12",
@@ -200,7 +200,8 @@ fn main() {
 
     // 42b: Negative correlation r(x, -x) = -1.0
     let neg_y: Vec<f64> = x.iter().map(|&xi| -xi).collect();
-    let r_neg = barracuda::stats::pearson_correlation(&x, &neg_y).or_exit("Pearson r(x, -x) = -1.0");
+    let r_neg =
+        barracuda::stats::pearson_correlation(&x, &neg_y).or_exit("Pearson r(x, -x) = -1.0");
     v.check(
         "Pearson: r(x, -x) = -1.0",
         r_neg,
@@ -234,10 +235,10 @@ fn main() {
     // 42e: Decomposition check — Pearson = Cov(x,y) / (σ_x × σ_y)
     let cov_xy =
         barracuda::stats::covariance(&x, &y).or_exit("covariance for Pearson decomposition");
-    let sd_x =
-        barracuda::stats::correlation::std_dev(&x).or_exit("std dev of x for Pearson decomposition");
-    let sd_y =
-        barracuda::stats::correlation::std_dev(&y).or_exit("std dev of y for Pearson decomposition");
+    let sd_x = barracuda::stats::correlation::std_dev(&x)
+        .or_exit("std dev of x for Pearson decomposition");
+    let sd_y = barracuda::stats::correlation::std_dev(&y)
+        .or_exit("std dev of y for Pearson decomposition");
     let r_decomposed = cov_xy / (sd_x * sd_y);
     v.check(
         "Pearson: decomposed = direct",

@@ -153,7 +153,7 @@ pub fn error_response(id: &Value, code: i64, message: &str) -> String {
 /// with `"code"` and `"message"` subfields. Returns `None` for success responses
 /// or unparseable strings.
 ///
-/// Centralizes the JSON-RPC error extraction pattern used by Songbird, NestGate,
+/// Centralizes the JSON-RPC error extraction pattern used by Songbird, `NestGate`,
 /// and provenance clients (healthSpring V29 pattern).
 #[must_use]
 pub fn extract_rpc_error(response: &str) -> Option<(i64, String)> {
@@ -231,7 +231,8 @@ mod tests {
 
     #[test]
     fn extract_rpc_error_from_error_response() {
-        let resp = r#"{"jsonrpc":"2.0","error":{"code":-32601,"message":"method not found"},"id":1}"#;
+        let resp =
+            r#"{"jsonrpc":"2.0","error":{"code":-32601,"message":"method not found"},"id":1}"#;
         let (code, msg) = extract_rpc_error(resp).unwrap();
         assert_eq!(code, -32601);
         assert_eq!(msg, "method not found");

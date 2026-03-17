@@ -63,8 +63,8 @@ use wetspring_barracuda::bio::diversity_fusion_gpu::{DiversityFusionGpu, diversi
 use wetspring_barracuda::bio::gemm_cached::GemmCached;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 struct Timing {
     label: &'static str,
@@ -454,7 +454,8 @@ fn main() {
             ),
             (
                 "Thornthwaite",
-                barracuda::stats::thornthwaite_et0(21.0, hi, 14.5, 30.0).or_exit("unexpected error"),
+                barracuda::stats::thornthwaite_et0(21.0, hi, 14.5, 30.0)
+                    .or_exit("unexpected error"),
                 "ToadStool S81",
                 "(Mar 1) — new in ToadStool",
             ),
@@ -535,10 +536,11 @@ fn main() {
         let y: Vec<f64> = x.iter().map(|&xi| 3.0f64.mul_add(xi.ln(), 1.0)).collect();
         let fits = barracuda::stats::fit_all(&x, &y);
         v.check_pass("fit_all: models converge", !fits.is_empty());
-        if let Some(b) = fits
-            .iter()
-            .max_by(|a, b| a.r_squared.partial_cmp(&b.r_squared).or_exit("unexpected error"))
-        {
+        if let Some(b) = fits.iter().max_by(|a, b| {
+            a.r_squared
+                .partial_cmp(&b.r_squared)
+                .or_exit("unexpected error")
+        }) {
             v.check_pass("best R² > 0.95", b.r_squared > 0.95);
             v.check_pass("slope() accessor", b.slope().is_some());
             v.check_pass("intercept() accessor", b.intercept().is_some());
@@ -578,7 +580,8 @@ fn main() {
         v.check_pass("Sobol: 10k points", sobol.len() == 10_000);
 
         let (lhs, _) = bench("LHS 10k×5D", || {
-            barracuda::sample::latin_hypercube(10_000, &[(0.0, 1.0); 5], 42).or_exit("unexpected error")
+            barracuda::sample::latin_hypercube(10_000, &[(0.0, 1.0); 5], 42)
+                .or_exit("unexpected error")
         });
         v.check_pass("LHS: 10k points", lhs.len() == 10_000);
 

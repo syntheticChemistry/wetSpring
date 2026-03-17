@@ -33,8 +33,8 @@ use std::fmt;
 use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, kmer, taxonomy, unifrac};
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Substrate {

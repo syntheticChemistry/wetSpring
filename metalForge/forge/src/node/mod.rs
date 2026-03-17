@@ -107,7 +107,7 @@ pub fn compute_collection_from_dir(
         match assembly::compute_assembly_stats_from_file(&accession, path) {
             Ok(stats) => assemblies.push(stats),
             Err(e) => {
-                eprintln!("[node] skip {}: {e}", path.display());
+                tracing::warn!(path = %path.display(), error = %e, "skipping assembly");
             }
         }
     }

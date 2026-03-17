@@ -163,8 +163,8 @@ fn main() {
         g22 += 1;
 
         let cpu_bc_cond = diversity::bray_curtis_condensed(&communities);
-        let gpu_bc_cond =
-            diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).or_exit("GPU BC condensed");
+        let gpu_bc_cond = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities)
+            .or_exit("GPU BC condensed");
         v.check_pass(
             "BrayCurtis GPU: same length as CPU",
             cpu_bc_cond.len() == gpu_bc_cond.len(),

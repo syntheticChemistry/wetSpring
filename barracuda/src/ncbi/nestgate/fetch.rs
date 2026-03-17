@@ -55,7 +55,7 @@ pub fn fetch_tiered(db: &str, id: &str, api_key: &str) -> crate::error::Result<S
         match fetch_via_biomeos(&biomeos_socket, db, id, api_key) {
             Ok(fasta) => return Ok(fasta),
             Err(e) => {
-                eprintln!("[nestgate] biomeOS routing failed, falling back: {e}");
+                tracing::warn!(error = %e, "biomeOS routing failed, falling back");
             }
         }
     }
@@ -65,7 +65,7 @@ pub fn fetch_tiered(db: &str, id: &str, api_key: &str) -> crate::error::Result<S
             match fetch_or_fallback(&nestgate_socket, db, id, api_key) {
                 Ok(fasta) => return Ok(fasta),
                 Err(e) => {
-                    eprintln!("[nestgate] NestGate failed, falling back to sovereign: {e}");
+                    tracing::warn!(error = %e, "NestGate failed, falling back to sovereign");
                 }
             }
         }

@@ -35,8 +35,8 @@
 
 use std::time::Instant;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 struct Timing {
     name: &'static str,
@@ -233,9 +233,11 @@ fn main() {
     });
 
     v.check_pass("fit_all: non-empty", !all_fits.is_empty());
-    let best = all_fits
-        .iter()
-        .max_by(|a, b| a.r_squared.partial_cmp(&b.r_squared).or_exit("unexpected error"));
+    let best = all_fits.iter().max_by(|a, b| {
+        a.r_squared
+            .partial_cmp(&b.r_squared)
+            .or_exit("unexpected error")
+    });
     if let Some(fb) = best {
         v.check_pass(
             "Best model = logarithmic (for log data)",

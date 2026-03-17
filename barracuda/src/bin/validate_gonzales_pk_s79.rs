@@ -55,8 +55,8 @@ use std::time::Instant;
 
 use barracuda::stats::{fit_exponential, mean};
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 struct Timing {
     domain: &'static str,

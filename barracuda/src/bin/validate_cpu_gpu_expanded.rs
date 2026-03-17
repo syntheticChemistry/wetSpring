@@ -37,8 +37,8 @@ use wetspring_barracuda::bio::qs_biofilm;
 use wetspring_barracuda::bio::unifrac_gpu::UniFracGpu;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 fn validate_kmer(v: &mut Validator, device: &Arc<barracuda::device::WgpuDevice>) {
     v.section("K-mer Histogram: CPU ↔ GPU (k=4, raw)");

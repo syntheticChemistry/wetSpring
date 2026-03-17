@@ -87,7 +87,7 @@ fn main() {
     {
         use wetspring_barracuda::bio::diversity_gpu;
         use wetspring_barracuda::gpu::GpuF64;
-use wetspring_barracuda::validation::OrExit;
+        use wetspring_barracuda::validation::OrExit;
 
         v.section("D28-GPU: FusedMapReduce — Shannon/Simpson GPU Dispatch");
 

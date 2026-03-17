@@ -31,8 +31,8 @@ use wetspring_barracuda::bio::kriging::{
     self, SpatialResult, SpatialSample, VariogramConfig, empirical_variogram,
 };
 use wetspring_barracuda::gpu::GpuF64;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 fn sample_grid() -> Vec<SpatialSample> {
     vec![

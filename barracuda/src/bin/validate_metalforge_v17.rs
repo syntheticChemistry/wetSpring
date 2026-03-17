@@ -47,8 +47,8 @@ use std::time::Instant;
 use wetspring_barracuda::bio::{cooperation, diversity, qs_biofilm};
 use wetspring_barracuda::ipc::primal_names;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{DomainResult, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{DomainResult, Validator};
 
 fn domain(
     name: &'static str,
@@ -112,8 +112,8 @@ fn main() {
     let t = Instant::now();
     let mut mf23 = 0_u32;
 
-    let et0 =
-        barracuda::stats::fao56_et0(21.5, 12.3, 84.0, 63.0, 2.78, 22.07, 100.0, 50.8, 187).or_exit("unexpected error");
+    let et0 = barracuda::stats::fao56_et0(21.5, 12.3, 84.0, 63.0, 2.78, 22.07, 100.0, 50.8, 187)
+        .or_exit("unexpected error");
     v.check_pass("MF23: FAO-56 ET₀ > 0", et0 > 0.0);
     mf23 += 1;
 
@@ -297,7 +297,12 @@ fn main() {
     let mut mf26 = 0_u32;
 
     let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    let ecop = manifest.parent().or_exit("unexpected error").parent().or_exit("unexpected error").to_path_buf();
+    let ecop = manifest
+        .parent()
+        .or_exit("unexpected error")
+        .parent()
+        .or_exit("unexpected error")
+        .to_path_buf();
     let graphs = [
         (
             "wetspring_deploy",

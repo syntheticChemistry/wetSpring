@@ -41,11 +41,11 @@
 
 use std::time::Duration;
 
+use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::vault::consent::{ConsentScope, ConsentTicket};
 use wetspring_barracuda::vault::provenance::ProvenanceChain;
 use wetspring_barracuda::vault::storage::VaultStore;
-use wetspring_barracuda::validation::OrExit;
 
 fn main() {
     let mut v = Validator::new("Exp259: Genomic Vault — Consent + Encrypted Storage + Provenance");
@@ -154,7 +154,9 @@ fn main() {
         hash[3]
     );
 
-    let result = vault.retrieve(&hash, &key, &store_ticket).or_exit("unexpected error");
+    let result = vault
+        .retrieve(&hash, &key, &store_ticket)
+        .or_exit("unexpected error");
     v.check_pass(
         "Vault: retrieved plaintext matches original",
         result.plaintext == sample_16s,

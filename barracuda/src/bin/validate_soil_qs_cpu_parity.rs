@@ -124,7 +124,12 @@ fn main() {
     let mutant = qs_biofilm::scenario_hapr_mutant(&params, dt);
     let dgc = qs_biofilm::scenario_dgc_overexpression(&params, dt);
 
-    let std_n = *standard.states().last().or_exit("unexpected error").first().or_exit("unexpected error");
+    let std_n = *standard
+        .states()
+        .last()
+        .or_exit("unexpected error")
+        .first()
+        .or_exit("unexpected error");
     let std_b = standard.states().last().or_exit("unexpected error")[4];
     let high_b = high.states().last().or_exit("unexpected error")[4];
     let mut_b = mutant.states().last().or_exit("unexpected error")[4];
@@ -175,13 +180,21 @@ fn main() {
     let pure_c = cooperation::scenario_pure_coop(&coop_p, dt);
     let pure_ch = cooperation::scenario_pure_cheat(&coop_p, dt);
 
-    let freq_eq = *cooperation::cooperator_frequency(&equal).last().or_exit("unexpected error");
-    let freq_cd = *cooperation::cooperator_frequency(&coop_dom).last().or_exit("unexpected error");
+    let freq_eq = *cooperation::cooperator_frequency(&equal)
+        .last()
+        .or_exit("unexpected error");
+    let freq_cd = *cooperation::cooperator_frequency(&coop_dom)
+        .last()
+        .or_exit("unexpected error");
     let freq_ch = *cooperation::cooperator_frequency(&cheat_dom)
         .last()
         .or_exit("unexpected error");
-    let freq_pc = *cooperation::cooperator_frequency(&pure_c).last().or_exit("unexpected error");
-    let freq_pch = *cooperation::cooperator_frequency(&pure_ch).last().or_exit("unexpected error");
+    let freq_pc = *cooperation::cooperator_frequency(&pure_c)
+        .last()
+        .or_exit("unexpected error");
+    let freq_pch = *cooperation::cooperator_frequency(&pure_ch)
+        .last()
+        .or_exit("unexpected error");
 
     v.check_pass(
         "Equal start: coop freq in (0, 1)",

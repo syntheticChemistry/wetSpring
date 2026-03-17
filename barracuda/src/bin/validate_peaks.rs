@@ -30,8 +30,8 @@
 use std::path::Path;
 use wetspring_barracuda::bio::signal::{PeakParams, find_peaks};
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 fn main() {
     let mut v = Validator::new("wetSpring Peak Detection Validation (Exp010)");

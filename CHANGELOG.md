@@ -3,6 +3,62 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V124] — 2026-03-16
+
+### Cross-Ecosystem Absorption — deny.toml, compute.dispatch, Structured Tracing
+
+Absorbing patterns from 4+ sibling springs and primals into production code.
+Zero new warnings, 1,719 tests (0 failures).
+
+#### Workspace-Level `deny.toml` (groundSpring V109 / airSpring pattern)
+- New root `deny.toml` for workspace-wide `cargo deny check`
+- `wildcards = "deny"` enforced at workspace level
+- `yanked = "deny"` (upgraded from "warn"), `confidence-threshold = 0.8`
+- Advisory DB path + URLs explicitly configured
+- `ring` license clarification for transitive wgpu deps
+- `barracuda/deny.toml` hardened to match (advisory DB, yanked=deny)
+
+#### Typed `compute.dispatch` IPC Client (healthSpring V29 / ludoSpring V22 pattern)
+- New `ipc::compute_dispatch` module — typed client for toadStool S156+ dispatch
+- `DispatchHandle` (job_id + optional compute_socket) / `DispatchError` enum
+- `submit()`, `result()`, `capabilities()` with auto-discovery variants
+- `ComputeBackend` struct for querying available compute hardware
+- Capability-based socket discovery via `TOADSTOOL_SOCKET` env / XDG / temp
+- Graceful fallback: `DispatchError::NoComputePrimal` in standalone mode
+- Zero serde dependency — lightweight JSON string extraction
+- 11 tests covering discovery, submit/result parsing, error display
+
+#### Structured Tracing (coralReef Phase 10 pattern)
+- `tracing` v0.1 added to barracuda + metalForge/forge (pure Rust, ecoBin compliant)
+- `tracing-subscriber` v0.3 behind `ipc` feature for server binary output
+- Replaced 11 `eprintln!` calls with structured `tracing` macros in production code:
+  - `ipc::server` — listening, accept errors, timeout (3 calls)
+  - `ipc::songbird` — registration, heartbeat, re-registration (6 calls)
+  - `ncbi::nestgate::fetch` — biomeOS/NestGate fallback logging (2 calls)
+  - `metalForge::forge::node` — assembly skip warning (1 call)
+  - `metalForge::forge::inventory` — Songbird discovery logging (2 calls)
+- `wetspring_server` binary: `tracing_subscriber::fmt::init()` for structured stderr
+- Validation `OrExit` trait retains `eprintln!` for fatal exits (appropriate)
+
+#### Clippy Fixes
+- `OrExit<Option>` — `match` → `if let` with `#[expect(clippy::option_if_let_else)]`
+- `compute_dispatch` — eliminated redundant `.to_string()` clone
+- `compute_dispatch` — unwrapped unnecessary `Result` return in `parse_result_response`
+- `protocol.rs` — backticked `NestGate` in doc comment
+
+#### External Dependency Analysis
+- All dependencies verified pure Rust (ecoBin compliant)
+- `wgpu` — hardware interface (Vulkan/Metal/DX12), acknowledged C driver boundary
+- `flate2` — `rust_backend` feature (miniz_oxide), no C zlib
+- `blake3` — `pure` feature, no C SIMD backend
+- `tracing` / `tracing-subscriber` — pure Rust, zero C deps
+
+#### Quality
+- `cargo clippy --workspace` — **ZERO warnings from V124 code** (2 pre-existing dead_code in bins)
+- `cargo test --workspace` — **1,719 passed** (0 failures, 1 ignored)
+- `cargo check --workspace` — **ZERO errors**
+- `cargo fmt` — clean
+
 ## [V123] — 2026-03-16
 
 ### Deep Debt Execution — Zero-Panic, Dual-Format Discovery, Cross-Ecosystem Absorption

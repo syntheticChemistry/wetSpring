@@ -28,8 +28,8 @@
 use std::time::Instant;
 use wetspring_barracuda::bio::felsenstein::{self, TreeNode};
 use wetspring_barracuda::bio::neighbor_joining;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 const N_TAXA: usize = 128;
 const SEQ_LEN: usize = 300;

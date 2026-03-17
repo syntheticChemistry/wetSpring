@@ -46,11 +46,11 @@ pub fn discover_with_tower() -> Vec<Substrate> {
                 let n = remote.len();
                 substrates.extend(remote);
                 if n > 0 {
-                    eprintln!("[forge] Songbird: {n} remote substrate(s) discovered");
+                    tracing::info!(count = n, "Songbird remote substrates discovered");
                 }
             }
             Err(e) => {
-                eprintln!("[forge] Songbird query failed (local-only): {e}");
+                tracing::warn!(error = %e, "Songbird query failed, local-only");
             }
         }
     }

@@ -42,6 +42,7 @@
 //!   validated barracuda library functions.
 
 pub mod capability_domains;
+pub mod compute_dispatch;
 pub mod discover;
 pub mod dispatch;
 pub mod handlers;

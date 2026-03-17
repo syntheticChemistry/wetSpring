@@ -34,8 +34,8 @@ use wetspring_barracuda::bio::{
     unifrac::PhyloTree,
 };
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn main() {
     let mut v = Validator::new("Exp070: BarraCuda CPU — 25-Domain Pure Rust Math Proof");

@@ -185,7 +185,7 @@ fn main() {
     // MultiSignal (7 vars)
     let (multi_gpu_result, multi_ms) = bench("MultiSignal GPU (128 batches)", || {
         use wetspring_barracuda::bio::multi_signal::{MultiSignalParams, N_VARS as MS_V};
-use wetspring_barracuda::validation::OrExit;
+        use wetspring_barracuda::validation::OrExit;
         let gpu_ode = MultiSignalGpu::new(Arc::clone(&device)).or_exit("MultiSignalGpu init");
         let flat_y0: Vec<f64> = (0..nb)
             .flat_map(|_| {

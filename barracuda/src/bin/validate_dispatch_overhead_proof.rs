@@ -67,7 +67,9 @@ async fn main() {
         let t_ind = Instant::now();
         for _ in 0..REPEATS - 1 {
             let fmr = FusedMapReduceF64::new(gpu.to_wgpu_device()).or_exit("dispatch overhead");
-            let _ = fmr.shannon_entropy(&abundances).or_exit("dispatch overhead");
+            let _ = fmr
+                .shannon_entropy(&abundances)
+                .or_exit("dispatch overhead");
             let _ = fmr.simpson_index(&abundances).or_exit("dispatch overhead");
             let binary: Vec<f64> = abundances
                 .iter()
@@ -76,7 +78,9 @@ async fn main() {
             let _ = fmr.sum(&binary).or_exit("dispatch overhead");
         }
         let fmr = FusedMapReduceF64::new(gpu.to_wgpu_device()).or_exit("dispatch overhead");
-        let ind_shannon = fmr.shannon_entropy(&abundances).or_exit("dispatch overhead");
+        let ind_shannon = fmr
+            .shannon_entropy(&abundances)
+            .or_exit("dispatch overhead");
         let ind_us = t_ind.elapsed().as_micros() as f64 / REPEATS as f64;
 
         // Strategy C: GPU Streaming (pre-warmed session)

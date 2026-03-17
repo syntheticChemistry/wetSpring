@@ -409,7 +409,7 @@ async fn main() {
     v.section("═══ metalForge 8: HMM Forward CPU ↔ GPU ═══");
     {
         use wetspring_barracuda::bio::{hmm, hmm_gpu::HmmGpuForward};
-use wetspring_barracuda::validation::OrExit;
+        use wetspring_barracuda::validation::OrExit;
 
         let model = hmm::HmmModel {
             n_states: 2,

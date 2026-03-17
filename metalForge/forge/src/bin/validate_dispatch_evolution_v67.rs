@@ -32,6 +32,7 @@
 //! Validation class: Pipeline
 //! Provenance: End-to-end pipeline integration test
 
+use wetspring_barracuda::validation::OrExit;
 use wetspring_forge::bridge;
 use wetspring_forge::dispatch::{self, Workload};
 use wetspring_forge::streaming::{PipelineStage, StreamingSession};
@@ -39,7 +40,6 @@ use wetspring_forge::substrate::{
     Capability, Identity, Properties, Substrate, SubstrateKind, SubstrateOrigin,
 };
 use wetspring_forge::workloads;
-use wetspring_barracuda::validation::OrExit;
 
 fn check(pass: &mut u32, fail: &mut u32, total: &mut u32, name: &str, ok: bool) {
     *total += 1;
@@ -243,8 +243,8 @@ fn section_cross_substrate_flow(pass: &mut u32, fail: &mut u32, total: &mut u32)
     );
     let cpu_work = Workload::new("fastq_io", vec![Capability::CpuCompute]);
 
-    let d_gpu =
-        dispatch::route(&gpu_work, &inventory).or_exit("diversity_gpu workload should route to GPU");
+    let d_gpu = dispatch::route(&gpu_work, &inventory)
+        .or_exit("diversity_gpu workload should route to GPU");
     let d_npu = dispatch::route(&npu_work, &inventory)
         .or_exit("taxonomy_triage workload should route to NPU");
     let d_cpu =

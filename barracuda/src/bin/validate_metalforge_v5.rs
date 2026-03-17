@@ -605,7 +605,7 @@ fn validate_molecular_clock_mf(
     timings: &mut Vec<(&'static str, f64, f64, &'static str)>,
 ) {
     use wetspring_barracuda::bio::molecular_clock_gpu;
-use wetspring_barracuda::validation::OrExit;
+    use wetspring_barracuda::validation::OrExit;
 
     v.section("MF-N13: Molecular Clock");
 

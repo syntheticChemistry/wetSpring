@@ -43,8 +43,8 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::io::fastq::FastqRecord;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 const SS_FRAC: f64 = 0.1;
 

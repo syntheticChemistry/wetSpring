@@ -91,7 +91,7 @@ fn main() {
     #[cfg(feature = "gpu")]
     {
         use barracuda::spectral::{GOE_R, POISSON_R};
-use wetspring_barracuda::validation::OrExit;
+        use wetspring_barracuda::validation::OrExit;
 
         let midpoint = f64::midpoint(GOE_R, POISSON_R);
         let l = 8;

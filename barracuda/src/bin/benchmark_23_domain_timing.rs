@@ -26,12 +26,12 @@
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 
 use std::time::Instant;
-use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::bio::{
     alignment, ani, bootstrap, cooperation, decision_tree::DecisionTree, diversity, dnds,
     felsenstein, gillespie, hmm, kmer, molecular_clock, multi_signal, pangenome, phage_defense,
     placement, qs_biofilm, robinson_foulds, signal, snp, spectral_match, unifrac::PhyloTree,
 };
+use wetspring_barracuda::validation::OrExit;
 
 #[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {

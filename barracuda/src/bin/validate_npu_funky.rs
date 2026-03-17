@@ -63,8 +63,8 @@ use std::time::Instant;
 use wetspring_barracuda::bio::esn::{Esn, EsnConfig};
 use wetspring_barracuda::npu;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 // ═══════════════════════════════════════════════════════════════════
 // LCG — deterministic, no deps

@@ -54,8 +54,8 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
@@ -104,7 +104,8 @@ fn main() {
         },
     ];
     let (gpu_asvs, gpu_stats) =
-        dada2_gpu::denoise_gpu(&dada2_engine, &raw_seqs, &dada2::Dada2Params::default()).or_exit("unexpected error");
+        dada2_gpu::denoise_gpu(&dada2_engine, &raw_seqs, &dada2::Dada2Params::default())
+            .or_exit("unexpected error");
     let (cpu_asvs, _) = dada2::denoise(&raw_seqs, &dada2::Dada2Params::default());
     v.check_pass(
         "DADA2: GPU ASV count matches CPU",
@@ -163,7 +164,8 @@ fn main() {
         depth: None,
         seed: 42,
     };
-    let rare = rarefaction_gpu::rarefaction_bootstrap_gpu(&gpu, &combined, &rare_params).or_exit("unexpected error");
+    let rare = rarefaction_gpu::rarefaction_bootstrap_gpu(&gpu, &combined, &rare_params)
+        .or_exit("unexpected error");
     v.check_pass(
         "Rarefaction: Shannon CI valid",
         rare.shannon.lower <= rare.shannon.upper,
@@ -195,7 +197,8 @@ fn main() {
     if sites.len() >= 3 {
         let targets = vec![(0.25, 0.15), (0.75, 0.45)];
         let config = kriging::VariogramConfig::spherical(0.0, 1.0, 5.0);
-        let krig = kriging::interpolate_diversity(&gpu, &sites, &targets, &config).or_exit("unexpected error");
+        let krig = kriging::interpolate_diversity(&gpu, &sites, &targets, &config)
+            .or_exit("unexpected error");
         v.check_pass(
             "Kriging: interpolated values present",
             krig.values.len() == 2,
@@ -259,7 +262,8 @@ fn main() {
             .iter()
             .map(|a| vec![a.abundance as f64])
             .collect();
-        let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &bc_vecs).or_exit("unexpected error");
+        let gpu_bc =
+            diversity_gpu::bray_curtis_condensed_gpu(&gpu, &bc_vecs).or_exit("unexpected error");
         let cpu_bc = diversity::bray_curtis_condensed(&bc_vecs);
         v.check_pass(
             "BC GPU: condensed len matches",

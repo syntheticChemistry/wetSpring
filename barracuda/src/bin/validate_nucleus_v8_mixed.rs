@@ -46,8 +46,8 @@ use wetspring_barracuda::io::nanopore::{self, NanoporeIter, SyntheticSignalGener
 use wetspring_barracuda::ipc::dispatch;
 use wetspring_barracuda::ipc::metrics::Metrics;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn temp_path(name: &str) -> PathBuf {
     std::env::temp_dir().join(format!("wetspring_exp214_{name}"))
@@ -116,7 +116,8 @@ fn validate_fastq_diversity_dispatch(v: &mut Validator) {
         let mut idx = 0_usize;
         for (seq, count) in species {
             for _ in 0..*count {
-                writeln!(f, "@sp_{idx}\n{seq}\n+\n{}", "I".repeat(seq.len())).or_exit("unexpected error");
+                writeln!(f, "@sp_{idx}\n{seq}\n+\n{}", "I".repeat(seq.len()))
+                    .or_exit("unexpected error");
                 idx += 1;
             }
         }

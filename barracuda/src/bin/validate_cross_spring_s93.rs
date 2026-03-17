@@ -418,7 +418,7 @@ fn main() {
     v.section("D09: KMD — CPU validation (PFAS CF₂ repeat)");
 
     use wetspring_barracuda::bio::kmd;
-use wetspring_barracuda::validation::OrExit;
+    use wetspring_barracuda::validation::OrExit;
     let pfas_masses = vec![498.930, 398.936, 298.943];
     let kmd_results =
         kmd::kendrick_mass_defect(&pfas_masses, kmd::units::CF2_EXACT, kmd::units::CF2_NOMINAL);

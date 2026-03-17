@@ -53,8 +53,8 @@ use std::time::Instant;
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::ipc::primal_names;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn main() {
     let mut v = Validator::new("Exp258: NUCLEUS Tower-Node Deployment — Live Primal Orchestration");
@@ -173,8 +173,8 @@ fn main() {
     let mut json_h = 0.0;
     for _ in 0..n_iterations {
         let params = serde_json::json!({"counts": counts, "metrics": ["shannon"]});
-        let result =
-            wetspring_barracuda::ipc::dispatch::dispatch("science.diversity", &params).or_exit("unexpected error");
+        let result = wetspring_barracuda::ipc::dispatch::dispatch("science.diversity", &params)
+            .or_exit("unexpected error");
         json_h = result["shannon"].as_f64().or_exit("unexpected error");
     }
     let json_us = t_json.elapsed().as_nanos() as f64 / f64::from(n_iterations) / 1000.0;

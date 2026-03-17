@@ -70,8 +70,8 @@ fn main() {
 
     let allele_freqs = [0.8, 0.6, 0.3];
     let sample_sizes = [50, 60, 40];
-    let fst_result =
-        fst_variance::fst_variance_decomposition(&allele_freqs, &sample_sizes).or_exit("unexpected error");
+    let fst_result = fst_variance::fst_variance_decomposition(&allele_freqs, &sample_sizes)
+        .or_exit("unexpected error");
 
     v.check_pass("FST in [0,1]", (0.0..=1.0).contains(&fst_result.fst));
     v.check_pass("FIS finite", fst_result.f_is.is_finite());
@@ -80,8 +80,8 @@ fn main() {
 
     let identical_freqs = [0.5, 0.5, 0.5];
     let large_sizes = [1000, 1000, 1000];
-    let fst_identical =
-        fst_variance::fst_variance_decomposition(&identical_freqs, &large_sizes).or_exit("unexpected error");
+    let fst_identical = fst_variance::fst_variance_decomposition(&identical_freqs, &large_sizes)
+        .or_exit("unexpected error");
     v.check_pass(
         "FST(identical) ≈ 0",
         fst_identical.fst.abs() < tolerances::ODE_STEADY_STATE,

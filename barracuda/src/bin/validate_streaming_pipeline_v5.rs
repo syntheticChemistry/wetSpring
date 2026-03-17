@@ -39,8 +39,8 @@
 use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, kmer, pcoa, taxonomy};
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn main() {
     let mut v =

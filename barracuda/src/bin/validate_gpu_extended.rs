@@ -34,8 +34,8 @@ use wetspring_barracuda::bio::{diversity, eic, eic_gpu, kriging, pcoa, pcoa_gpu,
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::io::mzml::MzmlSpectrum;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
 async fn main() {

@@ -46,8 +46,8 @@ use wetspring_barracuda::df64_host;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::ipc::dispatch;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Hardware {
@@ -221,7 +221,8 @@ fn main() {
 
     // ═══ N04: CPU-Only Workloads ═════════════════════════════════════
     v.section("N04: CPU-Only Workloads");
-    let fst = fst_variance::fst_variance_decomposition(&[0.8, 0.6, 0.3], &[100, 100, 100]).or_exit("unexpected error");
+    let fst = fst_variance::fst_variance_decomposition(&[0.8, 0.6, 0.3], &[100, 100, 100])
+        .or_exit("unexpected error");
     v.check_pass("FST > 0", fst.fst > 0.0);
     v.check_pass("FST < 1", fst.fst < 1.0);
     println!(

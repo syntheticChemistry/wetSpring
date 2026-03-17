@@ -53,8 +53,8 @@
 
 use wetspring_barracuda::bio::{diversity, pcoa};
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn main() {
     let mut v = Validator::new("Exp051: Anderson 2015 Rare Biosphere Validation");

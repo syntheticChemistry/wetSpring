@@ -50,8 +50,8 @@ use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::io::mzml::MzmlSpectrum;
 use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 struct Timing {
     name: &'static str,
@@ -754,8 +754,8 @@ fn validate_kriging(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timing>) 
     let targets = vec![(0.25, 0.25), (0.75, 0.75)];
     let config = kriging::VariogramConfig::spherical(0.0, 1.0, 2.0);
     let tg = Instant::now();
-    let ordinary =
-        kriging::interpolate_diversity(gpu, &sites, &targets, &config).or_exit("GPU/CPU validation");
+    let ordinary = kriging::interpolate_diversity(gpu, &sites, &targets, &config)
+        .or_exit("GPU/CPU validation");
     let gpu_us = tg.elapsed().as_micros() as f64;
     let known_mean = sites.iter().map(|s| s.value).sum::<f64>() / sites.len() as f64;
     let simple = kriging::interpolate_diversity_simple(gpu, &sites, &targets, &config, known_mean)

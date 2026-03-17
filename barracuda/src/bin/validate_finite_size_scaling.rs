@@ -41,8 +41,8 @@
 //! Validation class: Analytical
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 #[cfg(feature = "gpu")]
 use barracuda::spectral::{

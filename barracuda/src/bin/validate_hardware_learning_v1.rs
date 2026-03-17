@@ -183,7 +183,7 @@ fn main() {
         v.check_pass("precision tiers probed", !cal.tiers.is_empty());
 
         use barracuda::device::{FmaPolicy, PhysicsDomain, domain_requires_separate_fma};
-use wetspring_barracuda::validation::OrExit;
+        use wetspring_barracuda::validation::OrExit;
 
         let fma_info = serde_json::json!({
             "contract_allows_contraction": FmaPolicy::Contract.allows_contraction(),

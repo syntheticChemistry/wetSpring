@@ -59,8 +59,8 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn bench_ms(f: impl FnOnce()) -> f64 {
     let t = Instant::now();
@@ -395,9 +395,11 @@ fn main() {
         .collect();
     let fits = barracuda::stats::fit_all(&x, &y);
     v.check_pass("D15: fit_all returns models", !fits.is_empty());
-    let best = fits
-        .iter()
-        .max_by(|a, b| a.r_squared.partial_cmp(&b.r_squared).or_exit("unexpected error"));
+    let best = fits.iter().max_by(|a, b| {
+        a.r_squared
+            .partial_cmp(&b.r_squared)
+            .or_exit("unexpected error")
+    });
     if let Some(b) = best {
         v.check_pass(
             &format!("D15: best R²={:.4}", b.r_squared),

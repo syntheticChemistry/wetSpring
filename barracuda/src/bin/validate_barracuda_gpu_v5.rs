@@ -43,8 +43,8 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
 async fn main() {
@@ -90,7 +90,8 @@ async fn main() {
     // ═══ G03: Observed Features (FMR) ════════════════════════════════
     v.section("G03: Observed Features");
     let cpu_obs = diversity::observed_features(&abundances);
-    let gpu_obs = diversity_gpu::observed_features_gpu(&gpu, &abundances).or_exit("unexpected error");
+    let gpu_obs =
+        diversity_gpu::observed_features_gpu(&gpu, &abundances).or_exit("unexpected error");
     v.check(
         "Observed: CPU == GPU",
         gpu_obs,
@@ -117,7 +118,8 @@ async fn main() {
         vec![5.0, 10.0, 40.0, 12.0],
     ];
     let cpu_bc = diversity::bray_curtis_condensed(&samples);
-    let gpu_bc = diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).or_exit("unexpected error");
+    let gpu_bc =
+        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).or_exit("unexpected error");
     v.check_count("BC length match", gpu_bc.len(), cpu_bc.len());
     for (k, (&c, &g)) in cpu_bc.iter().zip(gpu_bc.iter()).enumerate() {
         v.check(
@@ -157,7 +159,9 @@ async fn main() {
     let cpu_fwd = hmm::forward(&hmm_model, &obs_cpu);
     let hmm_gpu = HmmGpuForward::new(&device).or_exit("unexpected error");
     let obs_gpu: Vec<u32> = obs_cpu.iter().map(|&o| o as u32).collect();
-    let gpu_fwd = hmm_gpu.forward_batch(&hmm_model, &obs_gpu, 1, 100).or_exit("unexpected error");
+    let gpu_fwd = hmm_gpu
+        .forward_batch(&hmm_model, &obs_gpu, 1, 100)
+        .or_exit("unexpected error");
     v.check(
         "HMM log-likelihood: CPU == GPU",
         gpu_fwd.log_likelihoods[0],
@@ -222,7 +226,9 @@ async fn main() {
         .iter()
         .flat_map(|c| c.presence.iter().map(|&p| u8::from(p)))
         .collect();
-    let gpu_pan = pan_gpu_dev.classify(&presence_flat, 3, 3).or_exit("unexpected error");
+    let gpu_pan = pan_gpu_dev
+        .classify(&presence_flat, 3, 3)
+        .or_exit("unexpected error");
     v.check_count("Core: CPU == GPU", gpu_pan.core_count(), cpu_pan.core_size);
 
     // ═══ G11: Stats GPU (variance) ═══════════════════════════════════
@@ -243,7 +249,8 @@ async fn main() {
     let spec_a: Vec<f64> = vec![1000.0, 500.0, 200.0, 100.0];
     let spec_b: Vec<f64> = vec![1000.0, 500.0, 200.0, 100.0];
     let spectra = vec![spec_a, spec_b];
-    let gpu_cosines = spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).or_exit("unexpected error");
+    let gpu_cosines =
+        spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).or_exit("unexpected error");
     v.check(
         "Self-cosine == 1.0",
         gpu_cosines[0],

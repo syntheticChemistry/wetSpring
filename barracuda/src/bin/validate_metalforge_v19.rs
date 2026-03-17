@@ -157,7 +157,12 @@ fn main() {
     v.check("MF32: Haldane deterministic", h1, h2, tolerances::EXACT_F64);
     mf32 += 1;
 
-    v.check("MF32: Gompertz H(50) → P", *g1.last().or_exit("unexpected error"), 350.0, 1.0);
+    v.check(
+        "MF32: Gompertz H(50) → P",
+        *g1.last().or_exit("unexpected error"),
+        350.0,
+        1.0,
+    );
     mf32 += 1;
 
     domains.push(domain("Biogas X-System", "wetSpring", t.elapsed(), mf32));

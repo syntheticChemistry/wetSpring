@@ -109,7 +109,10 @@ fn main() {
         &cooperation::CooperationParams::default(),
         0.01,
     ));
-    v.check_pass("Bruger: cooperators persist", *freq.last().or_exit("unexpected error") > 0.1);
+    v.check_pass(
+        "Bruger: cooperators persist",
+        *freq.last().or_exit("unexpected error") > 0.1,
+    );
 
     v.section("P6: Hsueh 2022 — Phage Defense");
     n_papers += 1;
@@ -236,11 +239,13 @@ fn main() {
     .or_exit("NMF rank=5");
     v.check_pass(
         "Yang: rank=3 converges",
-        *yang_r3.errors.last().or_exit("unexpected error") < *yang_r3.errors.first().or_exit("unexpected error"),
+        *yang_r3.errors.last().or_exit("unexpected error")
+            < *yang_r3.errors.first().or_exit("unexpected error"),
     );
     v.check_pass(
         "Yang: rank=5 converges",
-        *yang_r5.errors.last().or_exit("unexpected error") < *yang_r5.errors.first().or_exit("unexpected error"),
+        *yang_r5.errors.last().or_exit("unexpected error")
+            < *yang_r5.errors.first().or_exit("unexpected error"),
     );
     v.check_pass(
         "Yang: rank=5 lower error",

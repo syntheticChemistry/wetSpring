@@ -38,11 +38,11 @@ use std::time::{Duration, Instant};
 use wetspring_barracuda::df64_host;
 use wetspring_barracuda::encoding;
 use wetspring_barracuda::tolerances;
+use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::vault::consent::{ConsentScope, ConsentTicket};
 use wetspring_barracuda::vault::provenance::ProvenanceChain;
 use wetspring_barracuda::vault::storage::VaultStore;
-use wetspring_barracuda::validation::OrExit;
 
 struct DomainTiming {
     name: &'static str,
@@ -195,7 +195,9 @@ fn main() {
     v.check_count("Vault: 1 blob stored", vault.blob_count(), 1);
     d29 += 1;
 
-    let result = vault.retrieve(&hash, &key, &consent).or_exit("unexpected error");
+    let result = vault
+        .retrieve(&hash, &key, &consent)
+        .or_exit("unexpected error");
     v.check_pass(
         "Vault: decrypted matches original",
         result.plaintext == sample_data,

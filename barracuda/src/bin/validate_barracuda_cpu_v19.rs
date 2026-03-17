@@ -49,8 +49,8 @@ use wetspring_barracuda::bio::{
     adapter, bootstrap, eic, feature_table, felsenstein, kmd, pcoa, placement,
 };
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 struct DomainTiming {
     name: &'static str,

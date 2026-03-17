@@ -46,8 +46,8 @@
 use wetspring_barracuda::bio::{
     diversity, dnds, felsenstein, gillespie, hmm, kmer, neighbor_joining, phage_defense,
 };
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn main() {
     let mut v = Validator::new("Exp251: Paper Math Control v3 — 32 Papers via BarraCuda CPU");
@@ -135,10 +135,12 @@ fn main() {
     let soil_pores = [0.35, 0.42, 0.38, 0.41, 0.37, 0.40, 0.36, 0.43, 0.39, 0.44];
     let soil_diversity = [2.1, 2.5, 2.3, 2.4, 2.2, 2.6, 2.0, 2.7, 2.35, 2.55];
 
-    let pear = barracuda::stats::pearson_correlation(&soil_pores, &soil_diversity).or_exit("unexpected error");
+    let pear = barracuda::stats::pearson_correlation(&soil_pores, &soil_diversity)
+        .or_exit("unexpected error");
     v.check_pass("Rabot: porosity↔diversity correlated (r > 0.5)", pear > 0.5);
 
-    let fit = barracuda::stats::fit_linear(&soil_pores, &soil_diversity).or_exit("unexpected error");
+    let fit =
+        barracuda::stats::fit_linear(&soil_pores, &soil_diversity).or_exit("unexpected error");
     v.check_pass("Rabot: linear fit R² > 0.5", fit.r_squared > 0.5);
     println!(
         "  Rabot: r={pear:.4}, slope={:.4}, R²={:.4}",
@@ -269,7 +271,8 @@ fn main() {
     v.section("V83 Cross-Paper Composition: S70+++ Statistics");
 
     let all_diversities = vec![h_raceway, h_notill, h_tilled, h_viral, jk_phage.estimate];
-    let jk_cross = barracuda::stats::jackknife_mean_variance(&all_diversities).or_exit("unexpected error");
+    let jk_cross =
+        barracuda::stats::jackknife_mean_variance(&all_diversities).or_exit("unexpected error");
     v.check_pass(
         "V83: Cross-paper diversity JK mean > 0",
         jk_cross.estimate > 0.0,

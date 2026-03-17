@@ -45,8 +45,8 @@
 use std::time::Instant;
 use wetspring_barracuda::bio::{cooperation, diversity, felsenstein, hmm, pcoa, qs_biofilm};
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{DomainResult, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{DomainResult, Validator};
 
 fn domain(
     name: &'static str,
@@ -177,8 +177,8 @@ fn main() {
     let t = Instant::now();
     let mut d56 = 0_u32;
 
-    let et0 =
-        barracuda::stats::fao56_et0(21.5, 12.3, 84.0, 63.0, 2.78, 22.07, 100.0, 50.8, 187).or_exit("unexpected error");
+    let et0 = barracuda::stats::fao56_et0(21.5, 12.3, 84.0, 63.0, 2.78, 22.07, 100.0, 50.8, 187)
+        .or_exit("unexpected error");
     v.check_pass("D56: FAO-56 ET₀ > 0", et0 > 0.0);
     d56 += 1;
 
@@ -202,7 +202,8 @@ fn main() {
         3.0, 4.0, 8.0, 12.0, 17.0, 21.0, 24.0, 23.0, 19.0, 13.0, 8.0, 4.0,
     ];
     let hi = barracuda::stats::thornthwaite_heat_index(&monthly);
-    let thorn = barracuda::stats::thornthwaite_et0(21.0, hi, 14.5, 30.0).or_exit("unexpected error");
+    let thorn =
+        barracuda::stats::thornthwaite_et0(21.0, hi, 14.5, 30.0).or_exit("unexpected error");
     v.check_pass("D56: Thornthwaite > 0", thorn > 0.0);
     d56 += 1;
 
@@ -366,7 +367,8 @@ fn main() {
         objective: barracuda::linalg::nmf::NmfObjective::KlDivergence,
         seed: 42,
     };
-    let nmf_result = barracuda::linalg::nmf::nmf(&nmf_data, 3, 3, &nmf_config).or_exit("unexpected error");
+    let nmf_result =
+        barracuda::linalg::nmf::nmf(&nmf_data, 3, 3, &nmf_config).or_exit("unexpected error");
     v.check_pass(
         "D58: NMF W non-negative",
         nmf_result.w.iter().all(|&x| x >= 0.0),

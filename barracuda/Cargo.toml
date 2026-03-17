@@ -27,7 +27,7 @@ npu = ["dep:akida-driver"]
 json = ["dep:serde", "dep:serde_json"]
 # IPC server for biomeOS science primal (wetspring-server binary).
 # Adds JSON-RPC 2.0 over Unix socket, Songbird registration, Neural API metrics.
-ipc = ["json"]
+ipc = ["json", "dep:tracing-subscriber"]
 # Nautilus Shell: evolutionary reservoir computing for bio sentinel monitoring.
 # Adds concept edge detection, drift monitoring, evolutionary adaptation.
 nautilus = ["dep:bingocube-nautilus", "bingocube-nautilus/json"]
@@ -73,6 +73,12 @@ tokio = { version = "1", features = ["rt", "macros"], optional = true }
 # detection, drift monitoring, evolutionary adaptation for bio sentinel).
 # Cross-spring provenance: primalTools/bingoCube (shared ecosystem tool).
 bingocube-nautilus = { path = "../../primalTools/bingoCube/nautilus", optional = true }
+
+# tracing: structured diagnostic logging (replaces ad-hoc eprintln! in IPC/server code).
+# Pure Rust, zero C deps, ~4KB. Used by 4+ sibling springs (coralReef, neuralSpring, etc.).
+tracing = "0.1"
+# tracing-subscriber: stderr output for the wetspring server binary (IPC feature only).
+tracing-subscriber = { version = "0.3", optional = true, default-features = false, features = ["fmt", "ansi"] }
 
 # bytemuck: zero-copy casting for GPU uniform buffers (GemmCached params).
 # Already a transitive dep via barracuda; pinned here for local extensions.

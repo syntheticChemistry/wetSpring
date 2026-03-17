@@ -180,7 +180,7 @@ fn main() {
 
         println!("\n  PrecisionBrain tier safety summary:");
         use barracuda::device::PrecisionTier;
-use wetspring_barracuda::validation::OrExit;
+        use wetspring_barracuda::validation::OrExit;
         for tier in [
             PrecisionTier::F32,
             PrecisionTier::DF64,

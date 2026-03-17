@@ -250,7 +250,12 @@ fn main() {
 
     let qs_params = qs_biofilm::QsBiofilmParams::default();
     let qs_result = qs_biofilm::scenario_standard_growth(&qs_params, 0.01);
-    let final_n = *qs_result.states().last().or_exit("unexpected error").first().or_exit("unexpected error");
+    let final_n = *qs_result
+        .states()
+        .last()
+        .or_exit("unexpected error")
+        .first()
+        .or_exit("unexpected error");
     v.check_pass("QS: cell density > 0", final_n > 0.0);
 
     // ═══ G14: Cooperation ODE ════════════════════════════════════════════

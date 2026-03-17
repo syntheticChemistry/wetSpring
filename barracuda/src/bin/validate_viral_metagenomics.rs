@@ -27,8 +27,8 @@
 use wetspring_barracuda::bio::{diversity, dnds};
 use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn main() {
     let mut v = Validator::new("Exp052: Anderson 2014 Viral Metagenomics Validation");

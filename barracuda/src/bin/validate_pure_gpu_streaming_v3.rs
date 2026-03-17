@@ -128,7 +128,9 @@ fn validate_quality_filter(
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
-    let (gpu_filtered, gpu_stats) = session.filter_reads(&reads, &params).or_exit("unexpected error");
+    let (gpu_filtered, gpu_stats) = session
+        .filter_reads(&reads, &params)
+        .or_exit("unexpected error");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     v.check_count(
@@ -177,7 +179,9 @@ fn validate_diversity_streaming(
         .iter()
         .map(|c| session.simpson(c).or_exit("unexpected error"))
         .collect();
-    let gpu_bc = session.bray_curtis_matrix(&sample_refs).or_exit("unexpected error");
+    let gpu_bc = session
+        .bray_curtis_matrix(&sample_refs)
+        .or_exit("unexpected error");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
     for (i, (c, g)) in cpu_shannons.iter().zip(&gpu_shannons).enumerate() {
@@ -277,7 +281,8 @@ fn validate_spectral_streaming(
         tolerances::GPU_VS_CPU_F64,
     );
 
-    let gpu_pairwise = spectral_match_gpu::pairwise_cosine_gpu(gpu, &spectra).or_exit("unexpected error");
+    let gpu_pairwise =
+        spectral_match_gpu::pairwise_cosine_gpu(gpu, &spectra).or_exit("unexpected error");
     v.check_count(
         "pairwise vs session length",
         gpu_pairwise.len(),
@@ -374,14 +379,16 @@ fn benchmark_streaming_vs_dispatch(
     for _ in 0..iters {
         let _ = session.shannon(&counts).or_exit("unexpected error");
         let _ = session.simpson(&counts).or_exit("unexpected error");
-        let _ = session.observed_features(&counts).or_exit("unexpected error");
+        let _ = session
+            .observed_features(&counts)
+            .or_exit("unexpected error");
     }
     let stream_us = t_stream.elapsed().as_micros() as f64;
 
     let t_individual = Instant::now();
     for _ in 0..iters {
         use wetspring_barracuda::bio::diversity_gpu;
-use wetspring_barracuda::validation::OrExit;
+        use wetspring_barracuda::validation::OrExit;
         let _ = diversity_gpu::shannon_gpu(gpu, &counts).or_exit("unexpected error");
         let _ = diversity_gpu::simpson_gpu(gpu, &counts).or_exit("unexpected error");
         let _ = diversity_gpu::observed_features_gpu(gpu, &counts).or_exit("unexpected error");
@@ -389,8 +396,8 @@ use wetspring_barracuda::validation::OrExit;
     let individual_us = t_individual.elapsed().as_micros() as f64;
 
     let stream_val = session.shannon(&counts).or_exit("unexpected error");
-    let individual_val =
-        wetspring_barracuda::bio::diversity_gpu::shannon_gpu(gpu, &counts).or_exit("unexpected error");
+    let individual_val = wetspring_barracuda::bio::diversity_gpu::shannon_gpu(gpu, &counts)
+        .or_exit("unexpected error");
     v.check(
         "Streaming == Individual (Shannon)",
         stream_val,

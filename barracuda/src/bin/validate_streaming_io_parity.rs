@@ -39,8 +39,8 @@ use wetspring_barracuda::io::fastq::{self, FastqRefRecord};
 use wetspring_barracuda::io::ms2;
 use wetspring_barracuda::io::nanopore::{self, NanoporeIter, SyntheticSignalGenerator};
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn temp_path(name: &str) -> PathBuf {
     std::env::temp_dir().join(format!("wetspring_exp209_{name}"))
@@ -202,7 +202,8 @@ fn validate_utf8_header_safety(v: &mut Validator) {
     let path = temp_path("utf8_headers.fastq");
     {
         let mut f = std::fs::File::create(&path).or_exit("unexpected error");
-        writeln!(f, "@read_with_émojis_and_über_chars description here").or_exit("unexpected error");
+        writeln!(f, "@read_with_émojis_and_über_chars description here")
+            .or_exit("unexpected error");
         writeln!(f, "ATGCATGC").or_exit("unexpected error");
         writeln!(f, "+").or_exit("unexpected error");
         writeln!(f, "IIIIIIII").or_exit("unexpected error");

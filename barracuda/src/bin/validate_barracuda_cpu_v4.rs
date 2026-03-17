@@ -30,8 +30,8 @@
 use std::time::Instant;
 use wetspring_barracuda::bio::{ani, dnds, molecular_clock, pangenome, snp};
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 #[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
 fn main() {
@@ -199,7 +199,8 @@ fn main() {
 
     let t0 = Instant::now();
 
-    let identical_dnds = dnds::pairwise_dnds(b"ATGATGATG", b"ATGATGATG").or_exit("Barracuda CPU v4");
+    let identical_dnds =
+        dnds::pairwise_dnds(b"ATGATGATG", b"ATGATGATG").or_exit("Barracuda CPU v4");
     v.check(
         "dN/dS: identical → dN=0",
         identical_dnds.dn,

@@ -28,8 +28,8 @@
 
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 struct LcgRng(u64);
 

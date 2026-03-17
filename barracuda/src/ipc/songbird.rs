@@ -104,8 +104,8 @@ pub fn start_heartbeat_loop(
 
     std::thread::spawn(move || {
         match register(&songbird_socket, &wetspring_socket) {
-            Ok(()) => eprintln!("[wetspring-server] registered with Songbird"),
-            Err(e) => eprintln!("[wetspring-server] Songbird registration failed: {e}"),
+            Ok(()) => tracing::info!("registered with Songbird"),
+            Err(e) => tracing::warn!(error = %e, "Songbird registration failed"),
         }
 
         while !shutdown_clone.load(Ordering::Relaxed) {
@@ -114,15 +114,15 @@ pub fn start_heartbeat_loop(
                 break;
             }
             if let Err(e) = heartbeat(&songbird_socket) {
-                eprintln!("[wetspring-server] heartbeat failed: {e}");
+                tracing::warn!(error = %e, "heartbeat failed");
                 match register(&songbird_socket, &wetspring_socket) {
-                    Ok(()) => eprintln!("[wetspring-server] re-registered with Songbird"),
-                    Err(e2) => eprintln!("[wetspring-server] re-registration failed: {e2}"),
+                    Ok(()) => tracing::info!("re-registered with Songbird"),
+                    Err(e2) => tracing::warn!(error = %e2, "re-registration failed"),
                 }
             }
         }
 
-        eprintln!("[wetspring-server] heartbeat loop stopped");
+        tracing::info!("heartbeat loop stopped");
     });
 
     shutdown

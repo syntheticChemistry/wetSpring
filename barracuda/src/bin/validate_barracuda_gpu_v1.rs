@@ -407,7 +407,7 @@ async fn main() {
     v.section("═══ GPU Domain 8: HMM Forward ═══");
     {
         use wetspring_barracuda::bio::{hmm, hmm_gpu::HmmGpuForward};
-use wetspring_barracuda::validation::OrExit;
+        use wetspring_barracuda::validation::OrExit;
 
         let model = hmm::HmmModel {
             n_states: 2,

@@ -51,8 +51,8 @@
 //! | Command | `cargo run --release --features gpu,json --bin validate_p1_extensions_v1` |
 
 use std::time::Instant;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 struct P1Extension {
     name: &'static str,

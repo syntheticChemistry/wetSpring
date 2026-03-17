@@ -54,8 +54,8 @@ use wetspring_barracuda::bio::{
     tolerance_search, unifrac,
 };
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{DomainResult, Validator};
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::{DomainResult, Validator};
 
 fn domain(
     name: &'static str,
@@ -562,7 +562,8 @@ fn main() {
     d54 += 1;
 
     let neg_y: Vec<f64> = x.iter().map(|xi| -xi).collect();
-    let r_neg = barracuda::stats::correlation::pearson_correlation(&x, &neg_y).or_exit("unexpected error");
+    let r_neg =
+        barracuda::stats::correlation::pearson_correlation(&x, &neg_y).or_exit("unexpected error");
     v.check(
         "Pearson(x, -x) = -1.0",
         r_neg,
@@ -571,7 +572,8 @@ fn main() {
     );
     d54 += 1;
 
-    let jk = barracuda::stats::jackknife_mean_variance(&[1.0, 2.0, 3.0, 4.0, 5.0]).or_exit("unexpected error");
+    let jk = barracuda::stats::jackknife_mean_variance(&[1.0, 2.0, 3.0, 4.0, 5.0])
+        .or_exit("unexpected error");
     v.check(
         "Jackknife estimate = 3.0",
         jk.estimate,
@@ -612,8 +614,8 @@ fn main() {
     );
     d54 += 1;
 
-    let linear =
-        barracuda::stats::fit_linear(&[1.0, 2.0, 3.0, 4.0], &[2.0, 4.0, 6.0, 8.0]).or_exit("unexpected error");
+    let linear = barracuda::stats::fit_linear(&[1.0, 2.0, 3.0, 4.0], &[2.0, 4.0, 6.0, 8.0])
+        .or_exit("unexpected error");
     v.check(
         "fit_linear slope = 2.0",
         linear.params[0],

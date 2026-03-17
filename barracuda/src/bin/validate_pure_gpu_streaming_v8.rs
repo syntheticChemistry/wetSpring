@@ -46,8 +46,8 @@ use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, diversity_gpu, kriging, pcoa, pcoa_gpu};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::validation::OrExit;
+use wetspring_barracuda::validation::Validator;
 
 fn main() {
     let rt = tokio::runtime::Builder::new_current_thread()
@@ -157,9 +157,11 @@ fn main() {
     let s4_ms = t_s4.elapsed().as_secs_f64() * 1000.0;
 
     v.check_pass("S4: fit_all returns models", !all_fits.is_empty());
-    let best = all_fits
-        .iter()
-        .max_by(|a, b| a.r_squared.partial_cmp(&b.r_squared).or_exit("unexpected error"));
+    let best = all_fits.iter().max_by(|a, b| {
+        a.r_squared
+            .partial_cmp(&b.r_squared)
+            .or_exit("unexpected error")
+    });
     if let Some(b) = best {
         v.check_pass("S4: best model R² > 0", b.r_squared > 0.0);
         println!(
