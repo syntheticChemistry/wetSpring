@@ -472,7 +472,11 @@ use wetspring_barracuda::validation::OrExit;
 fn ode_tail_mean(r: &OdeResult, var_idx: usize, tail_frac: f64) -> f64 {
     let states: Vec<&[f64]> = r.states().collect();
     let n = states.len();
-    #[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    #[expect(
+        clippy::cast_possible_truncation,
+        clippy::cast_sign_loss,
+        reason = "validation: bounded float→integer for index/count; value known non-negative from domain logic"
+    )]
     let tail_start = (n as f64 * (1.0 - tail_frac)) as usize;
     let tail: Vec<f64> = states[tail_start..].iter().map(|s| s[var_idx]).collect();
     tail.iter().sum::<f64>() / tail.len() as f64

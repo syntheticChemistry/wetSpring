@@ -3,7 +3,7 @@
 # Date: 2026-03-10
 # Commit: wetSpring V107
 # Hardware: Any (CPU-only, pure Python + numpy + scipy)
-# SHA-256: (computed after creation)
+# SHA-256: 43904432c151f80bdfff62a7a4c18b8c90b7edf6feac3438041ea33a91bafffb
 #
 # Track 6 Baseline — Anaerobic Biogas Kinetics & Community Diversity
 #

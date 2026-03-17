@@ -62,7 +62,7 @@ fn validate_tower_capabilities(v: &mut Validator) {
 
     v.check_pass(
         "Tower: primal == wetspring",
-        health["primal"].as_str() == Some("wetspring"),
+        health["primal"].as_str() == Some(wetspring_barracuda::ipc::primal_names::SELF),
     );
     v.check_pass(
         "Tower: status == healthy",
@@ -322,7 +322,7 @@ fn validate_nest_metrics(v: &mut Validator) {
     v.check_pass("Nest: snapshot is object", snap.is_object());
     v.check_pass(
         "Nest: primal == wetspring",
-        snap["primal"].as_str() == Some("wetspring"),
+        snap["primal"].as_str() == Some(wetspring_barracuda::ipc::primal_names::SELF),
     );
     v.check_pass(
         "Nest: total_calls == 4",

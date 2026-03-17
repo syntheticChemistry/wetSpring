@@ -33,7 +33,11 @@ use wetspring_barracuda::bio::{
 };
 use wetspring_barracuda::validation::OrExit;
 
-#[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
+#[expect(
+    clippy::too_many_lines,
+    clippy::cast_precision_loss,
+    reason = "validation harness: sequential domain checks in single function; precision: bounded integer→f64 for validation metrics"
+)]
 fn main() {
     println!("═══════════════════════════════════════════════════════════");
     println!("  Exp059: 23-Domain Rust Timing Benchmark (BarraCuda CPU)");
@@ -56,7 +60,10 @@ fn main() {
     let reactions = vec![
         gillespie::Reaction {
             propensity: Box::new(|state: &[i64]| {
-                #[expect(clippy::cast_precision_loss)]
+                #[expect(
+                    clippy::cast_precision_loss,
+                    reason = "precision: bounded integer→f64 for validation metrics"
+                )]
                 {
                     0.5 * state[0] as f64
                 }
@@ -65,7 +72,10 @@ fn main() {
         },
         gillespie::Reaction {
             propensity: Box::new(|state: &[i64]| {
-                #[expect(clippy::cast_precision_loss)]
+                #[expect(
+                    clippy::cast_precision_loss,
+                    reason = "precision: bounded integer→f64 for validation metrics"
+                )]
                 {
                     0.1 * state[0] as f64
                 }

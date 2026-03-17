@@ -31,7 +31,10 @@ pub fn compute_assembly_stats_from_file(
     let n50 = compute_n50(&contig_lengths, total_length);
 
     let (gc_count, total_bases) = count_gc(&sequences);
-    #[expect(clippy::cast_precision_loss)]
+    #[expect(
+        clippy::cast_precision_loss,
+        reason = "precision: index→f64 lossless for array sizes below 2^53"
+    )]
     let gc_content = if total_bases > 0 {
         gc_count as f64 / total_bases as f64
     } else {
@@ -49,7 +52,10 @@ pub fn compute_assembly_stats_from_file(
 }
 
 /// Aggregate individual assembly stats into collection-level metrics.
-#[expect(clippy::cast_precision_loss)]
+#[expect(
+    clippy::cast_precision_loss,
+    reason = "precision: index→f64 lossless for array sizes below 2^53"
+)]
 pub fn aggregate_collection(dataset: &str, assemblies: Vec<AssemblyStats>) -> CollectionStats {
     let sizes: Vec<f64> = assemblies.iter().map(|a| a.total_length as f64).collect();
     let gcs: Vec<f64> = assemblies.iter().map(|a| a.gc_content).collect();
@@ -169,7 +175,8 @@ fn std_dev(values: &[f64], _mean_val: f64) -> f64 {
 #[expect(
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
-    clippy::cast_sign_loss
+    clippy::cast_sign_loss,
+    reason = "precision: bounded f64→integer for display ranges"
 )]
 pub fn shannon_entropy_binned(values: &[f64], n_bins: usize) -> f64 {
     if values.is_empty() || n_bins == 0 {

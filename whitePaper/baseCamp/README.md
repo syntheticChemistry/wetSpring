@@ -1,8 +1,8 @@
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** March 16, 2026
+**Date:** March 17, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V126 — 376 experiments, 5,707+ validation checks, ALL PASS; 1,443+ tests (0 failures), 354 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 784+ WGSL shaders), toadStool S155, coralReef Phase 10. V126: `DispatchOutcome<T>` protocol vs application error separation (groundSpring/airSpring/sweetGrass), `health.liveness`/`health.readiness` probes (healthSpring V32), `IpcError` query helpers (`is_retriable()`, `is_timeout_likely()`, `is_method_not_found()`, `is_connection_error()`) for sweetGrass circuit-breaker pattern. 24 capabilities, 16 domains. V125: structured `IpcError` enum, dual-format capabilities, generic discovery. V124: `deny.toml`, `compute.dispatch`, `tracing`. V123: `OrExit`, `extract_rpc_error()`. V122: `#[expect(reason)]`, clippy ZERO WARNINGS. 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL.
+**Status:** V127 — 376 experiments, 5,707+ validation checks, ALL PASS; 1,443+ tests (0 failures), 354 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 806+ WGSL shaders), toadStool S155, coralReef Phase 10. V127: `RetryPolicy` + `CircuitBreaker` IPC resilience (sweetGrass pattern), 4-format capability parsing (airSpring/sweetGrass standard), `extract_rpc_result()` (healthSpring V29), `anderson_spectral` batch sweep module, `numerics` stable floating-point helpers, `GemmCached::execute_ex()` transpose support. V126: `DispatchOutcome<T>`, health probes, `IpcError` query helpers. 24 capabilities, 16 domains. 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL. Leverage guide published to `wateringHole/WETSPRING_LEVERAGE_GUIDE.md`.
 
 ---
 

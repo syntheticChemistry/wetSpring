@@ -36,6 +36,7 @@
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
+#[cfg(feature = "gpu")]
 const N_REALIZATIONS: usize = 4;
 
 fn w_tillage(t: f64) -> f64 {
@@ -81,6 +82,10 @@ fn compute_r_at_w(l: usize, w: f64, n_real: usize) -> (f64, f64) {
     }
     let mean = mean(&r_values);
     let variance = correlation::variance(&r_values).unwrap_or(0.0);
+    #[expect(
+        clippy::cast_precision_loss,
+        reason = "n_real is small (≤100); usize→f64 is lossless in this range"
+    )]
     let stderr = (variance / n_real as f64).sqrt();
     (mean, stderr)
 }

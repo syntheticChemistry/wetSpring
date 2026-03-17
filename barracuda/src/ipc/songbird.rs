@@ -32,7 +32,10 @@ const RPC_TIMEOUT: Duration = Duration::from_secs(5);
 /// Returns `None` if no Songbird socket is found (standalone mode).
 #[must_use]
 pub fn discover_socket() -> Option<PathBuf> {
-    super::discover::discover_socket("SONGBIRD_SOCKET", super::primal_names::SONGBIRD)
+    super::discover::discover_socket(
+        &super::discover::socket_env_var(super::primal_names::SONGBIRD),
+        super::primal_names::SONGBIRD,
+    )
 }
 
 /// Register wetSpring capabilities with Songbird.
@@ -176,7 +179,10 @@ fn rpc_call(socket: &Path, request: &str) -> crate::error::Result<String> {
 }
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used)]
+#[expect(
+    clippy::unwrap_used,
+    reason = "test module: assertions use unwrap for clarity"
+)]
 mod tests {
     use super::*;
 

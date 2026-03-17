@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-#![expect(clippy::unwrap_used)]
+#![expect(
+    clippy::unwrap_used,
+    reason = "test module: assertions use unwrap for clarity"
+)]
 
 use super::*;
 

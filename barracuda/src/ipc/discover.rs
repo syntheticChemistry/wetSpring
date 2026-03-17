@@ -130,7 +130,10 @@ pub fn resolve_socket_explicit(
 }
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used)]
+#[expect(
+    clippy::unwrap_used,
+    reason = "test module: assertions use unwrap for clarity"
+)]
 mod tests {
     use super::*;
 

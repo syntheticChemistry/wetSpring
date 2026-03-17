@@ -4,10 +4,10 @@
 against Rust implementations and GPU shaders via `barraCuda` (standalone math
 primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 
-**Date:** March 16, 2026
+**Date:** March 17, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V126 — **1,443+ tests** (0 failures), 376 experiments, 5,707+ validation checks across 354 binaries. Ecosystem: barraCuda v0.3.5, toadStool S155, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery), `cargo fmt` clean. **`DispatchOutcome<T>` enum** — protocol vs application error separation (groundSpring/airSpring/sweetGrass pattern). **`health.liveness` + `health.readiness` probes** — biomeOS orchestration health (healthSpring V32 pattern). **`IpcError` query helpers** — `is_retriable()`, `is_timeout_likely()`, `is_method_not_found()`, `is_connection_error()` (sweetGrass circuit-breaker pattern). 24 capabilities across 16 domains. Full audit: zero unsafe, zero mocks in production, zero hardcoding in library, zero TODO/FIXME.
+**Status:** V127 — **1,443+ tests** (0 failures), 376 experiments, 5,707+ validation checks across 354 binaries. Ecosystem: barraCuda v0.3.5, toadStool S155, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery), `cargo fmt` clean. **`RetryPolicy` + `CircuitBreaker`** — IPC resilience module (sweetGrass pattern). **4-format capability parsing** — `method_info` + `semantic_mappings` (airSpring/sweetGrass standard). **`extract_rpc_result()`** — centralized JSON-RPC result extraction (healthSpring V29 pattern). **`anderson_spectral` module** — batch Anderson sweep, W_c estimation, Pielou→disorder mapping. **`numerics` module** — stable `ln_1p`/`exp_m1`, `log_sum_exp`, Kahan summation. **`GemmCached::execute_ex()`** — transpose support for Tikhonov regularization. 24 capabilities across 16 domains. Full audit: zero unsafe, zero mocks in production, zero hardcoding in library, zero TODO/FIXME.
 
 ---
 

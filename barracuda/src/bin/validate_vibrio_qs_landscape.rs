@@ -100,7 +100,10 @@ fn classify_outcome(y_final: &[f64]) -> &'static str {
     }
 }
 
-#[expect(clippy::too_many_lines)]
+#[expect(
+    clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single function"
+)]
 fn main() {
     let mut v = Validator::new("Exp108: Vibrio QS Parameter Landscape");
 
@@ -163,7 +166,10 @@ fn main() {
         let sweeper = OdeSweepGpu::new(device);
 
         let config = OdeSweepConfig {
-            #[expect(clippy::cast_possible_truncation)]
+            #[expect(
+                clippy::cast_possible_truncation,
+                reason = "validation: bounded float→integer for index/count"
+            )]
             n_batches: N_BATCHES as u32,
             n_steps: N_STEPS,
             h: DT,
@@ -219,7 +225,10 @@ fn main() {
 
         println!("  Landscape classification ({N_BATCHES} genomes):");
         for (class, count) in &gpu_classes {
-            #[expect(clippy::cast_precision_loss)]
+            #[expect(
+                clippy::cast_precision_loss,
+                reason = "precision: bounded integer→f64 for validation metrics"
+            )]
             let pct = (*count as f64) / (N_BATCHES as f64) * 100.0;
             println!("    {class}: {count} ({pct:.1}%)");
         }
@@ -237,7 +246,10 @@ fn main() {
             1,
         );
 
-        #[expect(clippy::cast_precision_loss)]
+        #[expect(
+            clippy::cast_precision_loss,
+            reason = "precision: bounded integer→f64 for validation metrics"
+        )]
         let cpu_extrapolated_ms =
             cpu_elapsed.as_secs_f64() * 1000.0 * (N_BATCHES as f64 / cpu_subset_size as f64);
         println!("  Estimated CPU for {N_BATCHES}: {cpu_extrapolated_ms:.0} ms");

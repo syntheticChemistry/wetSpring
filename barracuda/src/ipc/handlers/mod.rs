@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![expect(clippy::missing_errors_doc)]
+#![expect(
+    clippy::missing_errors_doc,
+    reason = "IPC handlers: error documentation at module level"
+)]
 //! JSON-RPC method handlers for science capabilities.
 //!
 //! Each handler maps a method + params to barracuda library calls.

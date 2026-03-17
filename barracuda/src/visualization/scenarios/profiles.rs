@@ -8,6 +8,43 @@
 use super::{bar, edge, gauge, node, scaffold, scatter, timeseries};
 use crate::visualization::{EcologyScenario, ScenarioEdge, ScientificRange};
 
+/// Compute ordination coordinates for the environmental profile.
+///
+/// Uses **classical MDS (`PCoA`)** when abundance data is valid: Bray-Curtis distance
+/// matrix → double-center D² → eigendecomposition → PC1, PC2. Falls back to
+/// Shannon-diversity-based 1D ordination when abundances are missing or inconsistent.
+#[expect(
+    clippy::cast_precision_loss,
+    reason = "precision: sample counts bounded for real datasets"
+)]
+fn ordination_coords(profile: &EnvironmentalProfile, shannons: &[f64]) -> (Vec<f64>, Vec<f64>) {
+    let n = profile.sample_labels.len();
+    if n < 2 {
+        return (vec![], vec![]);
+    }
+
+    // Check if we have valid abundance data for Bray-Curtis: same-length vectors, ≥2 samples
+    let ref_len = profile.abundances.first().map_or(0, Vec::len);
+    let valid_abundances = ref_len > 0
+        && profile.abundances.len() == n
+        && profile.abundances.iter().all(|v| v.len() == ref_len);
+
+    if valid_abundances {
+        let condensed = crate::bio::diversity::bray_curtis_condensed(&profile.abundances);
+        if let Ok(result) = crate::bio::pcoa::pcoa(&condensed, n, 2) {
+            let xs: Vec<f64> = (0..result.n_samples).map(|i| result.coord(i, 0)).collect();
+            let ys: Vec<f64> = (0..result.n_samples).map(|i| result.coord(i, 1)).collect();
+            return (xs, ys);
+        }
+    }
+
+    // Fallback: Shannon-based 1D ordination (PC1 = centered Shannon, PC2 = 0)
+    let mean_h: f64 = shannons.iter().sum::<f64>() / n as f64;
+    let xs: Vec<f64> = shannons.iter().map(|&h| h - mean_h).collect();
+    let ys = vec![0.0; n];
+    (xs, ys)
+}
+
 /// Sample profile for a 16S environmental microbiome study.
 #[derive(Debug, Clone)]
 pub struct EnvironmentalProfile {
@@ -154,13 +191,15 @@ pub fn environmental_study_scenario(
     }
     s.nodes.push(tax_node);
 
-    // Ordination node (simple PCoA placeholder using first 2-3 samples)
+    // Ordination node: real PCoA (Bray-Curtis + classical MDS) or Shannon-based 1D fallback.
+    //
+    // When abundance data is valid (≥2 samples, same-length taxon vectors), we compute
+    // Bray-Curtis pairwise distances, double-center D², eigendecompose, and take PC1/PC2.
+    // Otherwise we use centered Shannon diversity as a 1D ordination (more meaningful than
+    // synthetic coordinates).
     let mut ord_node = node("ordination", "PCoA Ordination", "compute", &["ordination"]);
     if profile.sample_labels.len() >= 2 {
-        let xs: Vec<f64> = (0..profile.sample_labels.len())
-            .map(|i| (i as f64).mul_add(0.3, -0.5))
-            .collect();
-        let ys: Vec<f64> = shannons.iter().map(|&h| h.mul_add(0.1, -0.2)).collect();
+        let (xs, ys) = ordination_coords(profile, &shannons);
         ord_node.data_channels.push(scatter(
             "pcoa",
             "PCoA (Bray-Curtis)",

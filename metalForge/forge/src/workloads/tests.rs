@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-#![expect(clippy::expect_used)]
+#![expect(
+    clippy::expect_used,
+    reason = "test module: assertions use expect for clarity"
+)]
 
 use crate::substrate::SubstrateKind;
 use crate::workloads::*;

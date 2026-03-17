@@ -64,6 +64,10 @@ struct KgEmbedding {
     entity_embeddings: Vec<f64>,
     relation_embeddings: Vec<f64>,
     n_entities: usize,
+    #[cfg_attr(
+        not(feature = "gpu"),
+        expect(dead_code, reason = "used by GPU TransE scorer")
+    )]
     n_relations: usize,
 }
 
@@ -173,7 +177,11 @@ const N_PATHWAYS: usize = 10;
 const N_ENTITIES: usize = N_DRUGS + N_DISEASES + N_GENES + N_PATHWAYS;
 const N_RELATIONS: usize = 4;
 
-#[expect(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+#[expect(
+    clippy::cast_sign_loss,
+    clippy::cast_possible_truncation,
+    reason = "validation: value known non-negative from domain logic; bounded float→integer for index/count"
+)]
 fn generate_triples(rng: &mut LcgRng) -> Vec<(usize, usize, usize)> {
     let mut triples: Vec<(usize, usize, usize)> = Vec::new();
 

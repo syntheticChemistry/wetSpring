@@ -5,6 +5,53 @@ use std::fmt;
 
 use serde_json::Value;
 
+/// Returns `true` if the JSON-RPC input is a notification (Request without "id").
+///
+/// Per JSON-RPC 2.0 Section 4.1: a Notification has no "id" member (key absent).
+/// Note: `"id": null` is NOT a notification — it is a request and must get a response.
+/// Detection checks whether the "id" key EXISTS in the top-level object.
+///
+/// Returns `false` for invalid JSON, non-objects, or when "id" is present.
+#[must_use]
+pub fn is_notification(raw_json: &str) -> bool {
+    let val: Value = match serde_json::from_str(raw_json.trim()) {
+        Ok(v) => v,
+        Err(_) => return false,
+    };
+    let Some(obj) = val.as_object() else {
+        return false;
+    };
+    !obj.contains_key("id")
+}
+
+/// Returns `true` if the trimmed input is a JSON-RPC batch (array of requests).
+#[must_use]
+pub fn is_batch(raw_json: &str) -> bool {
+    raw_json.trim().starts_with('[')
+}
+
+/// Splits a JSON-RPC batch array into individual request strings.
+///
+/// Handles nested objects and arrays correctly. Returns an empty vec for invalid
+/// JSON or non-array input. Each element is serialized back to a JSON string.
+///
+/// # Errors
+///
+/// Returns empty `Vec` if input is not a valid JSON array.
+#[must_use]
+pub fn parse_batch(raw_json: &str) -> Vec<String> {
+    let val: Value = match serde_json::from_str(raw_json.trim()) {
+        Ok(v) => v,
+        Err(_) => return vec![],
+    };
+    let Some(arr) = val.as_array() else {
+        return vec![];
+    };
+    arr.iter()
+        .filter_map(|v| serde_json::to_string(v).ok())
+        .collect()
+}
+
 /// JSON-RPC 2.0 error with numeric code and human-readable message.
 #[derive(Debug, Clone)]
 pub struct RpcError {
@@ -164,20 +211,52 @@ pub fn extract_rpc_error(response: &str) -> Option<(i64, String)> {
     Some((code, message))
 }
 
+/// Extract the `"result"` value from a JSON-RPC success response.
+///
+/// Returns `Some(result_value)` for success responses, `None` for error
+/// responses or unparseable strings. Complements [`extract_rpc_error`].
+///
+/// Follows the healthSpring V29 centralized extraction pattern — callers
+/// use `extract_rpc_result` + `extract_rpc_error` instead of ad-hoc
+/// `serde_json::from_str` + `val["result"]` everywhere.
+#[must_use]
+pub fn extract_rpc_result(response: &str) -> Option<Value> {
+    let val: Value = serde_json::from_str(response).ok()?;
+    val.get("result").cloned()
+}
+
 /// Extracted capability information from a `capability.list` response.
 ///
-/// Supports both flat format (Format A: `"capabilities": ["a","b"]`) and
-/// nested format (Format B: `"domains": [{"name":"x","methods":["a"]}]`).
+/// Supports four formats (airSpring/sweetGrass 4-format standard):
+/// - Format A: `"capabilities": ["a","b"]` — flat string list
+/// - Format B: `"domains": [{"name":"x","methods":["a"]}]` — structured domains
+/// - Format C: `"method_info": {"a": {"description":"...", "cost":"low"}}` — per-method metadata
+/// - Format D: `"semantic_mappings": {"domain.op": "method.name"}` — semantic aliases
 #[derive(Debug, Clone, Default)]
 pub struct CapabilityInfo {
     /// Flat capability list (Format A).
     pub capabilities: Vec<String>,
     /// Structured domain groupings (Format B), if present.
     pub domains: Vec<CapabilityDomain>,
+    /// Per-method metadata (Format C), if present.
+    pub method_info: Vec<MethodInfo>,
+    /// Semantic domain→method mappings (Format D), if present.
+    pub semantic_mappings: Vec<(String, String)>,
     /// Primal name, if present.
     pub primal: Option<String>,
     /// Primal version, if present.
     pub version: Option<String>,
+}
+
+/// Per-method metadata from Format C.
+#[derive(Debug, Clone)]
+pub struct MethodInfo {
+    /// Method name (e.g. `"science.diversity"`).
+    pub method: String,
+    /// Human-readable description.
+    pub description: String,
+    /// Cost estimate (`"low"`, `"medium"`, `"high"`), if provided.
+    pub cost: Option<String>,
 }
 
 /// A structured capability domain from Format B.
@@ -193,9 +272,11 @@ pub struct CapabilityDomain {
 
 /// Extract capabilities from a `capability.list` JSON-RPC response.
 ///
-/// Parses both the flat `"capabilities"` array (Format A) and the structured
-/// `"domains"` array (Format B) from a response, following the dual-format
-/// pattern established by groundSpring/ludoSpring.
+/// Parses all four capability formats (airSpring/sweetGrass standard):
+/// - Format A: flat `"capabilities"` array
+/// - Format B: structured `"domains"` array
+/// - Format C: per-method `"method_info"` object
+/// - Format D: `"semantic_mappings"` object (domain alias → method name)
 ///
 /// Returns `None` if the response is not valid JSON or has no result.
 #[must_use]
@@ -255,16 +336,49 @@ pub fn extract_capabilities(response: &str) -> Option<CapabilityInfo> {
         })
         .unwrap_or_default();
 
+    let method_info = result
+        .get("method_info")
+        .and_then(Value::as_object)
+        .map(|obj| {
+            obj.iter()
+                .map(|(method, info)| MethodInfo {
+                    method: method.clone(),
+                    description: info
+                        .get("description")
+                        .and_then(Value::as_str)
+                        .unwrap_or("")
+                        .to_string(),
+                    cost: info.get("cost").and_then(Value::as_str).map(str::to_string),
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+
+    let semantic_mappings = result
+        .get("semantic_mappings")
+        .and_then(Value::as_object)
+        .map(|obj| {
+            obj.iter()
+                .filter_map(|(alias, method)| Some((alias.clone(), method.as_str()?.to_string())))
+                .collect()
+        })
+        .unwrap_or_default();
+
     Some(CapabilityInfo {
         capabilities,
         domains,
+        method_info,
+        semantic_mappings,
         primal,
         version,
     })
 }
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used)]
+#[expect(
+    clippy::unwrap_used,
+    reason = "test module: assertions use unwrap for clarity"
+)]
 mod tests {
     use super::*;
 
@@ -387,6 +501,128 @@ mod tests {
         let info = extract_capabilities(resp).unwrap();
         assert!(info.capabilities.is_empty());
         assert!(info.domains.is_empty());
+        assert!(info.method_info.is_empty());
+        assert!(info.semantic_mappings.is_empty());
         assert!(info.primal.is_none());
+    }
+
+    #[test]
+    fn extract_capabilities_format_c_method_info() {
+        let resp = r#"{"jsonrpc":"2.0","result":{"primal":"wetspring","method_info":{"science.diversity":{"description":"Alpha diversity","cost":"low"},"science.anderson":{"description":"Spectral"}}},"id":1}"#;
+        let info = extract_capabilities(resp).unwrap();
+        assert_eq!(info.method_info.len(), 2);
+        let div = info
+            .method_info
+            .iter()
+            .find(|m| m.method == "science.diversity")
+            .unwrap();
+        assert_eq!(div.description, "Alpha diversity");
+        assert_eq!(div.cost.as_deref(), Some("low"));
+        let and = info
+            .method_info
+            .iter()
+            .find(|m| m.method == "science.anderson")
+            .unwrap();
+        assert!(and.cost.is_none());
+    }
+
+    #[test]
+    fn extract_capabilities_format_d_semantic_mappings() {
+        let resp = r#"{"jsonrpc":"2.0","result":{"primal":"wetspring","semantic_mappings":{"ecology.alpha_diversity":"science.diversity","ecology.spectral":"science.anderson"}},"id":1}"#;
+        let info = extract_capabilities(resp).unwrap();
+        assert_eq!(info.semantic_mappings.len(), 2);
+        assert!(
+            info.semantic_mappings
+                .iter()
+                .any(|(k, v)| k == "ecology.alpha_diversity" && v == "science.diversity")
+        );
+    }
+
+    #[test]
+    fn extract_rpc_result_success() {
+        let resp = r#"{"jsonrpc":"2.0","result":{"shannon":1.386},"id":1}"#;
+        let result = extract_rpc_result(resp).unwrap();
+        assert!((result["shannon"].as_f64().unwrap() - 1.386).abs() < 1e-6);
+    }
+
+    #[test]
+    fn extract_rpc_result_error_response() {
+        let resp =
+            r#"{"jsonrpc":"2.0","error":{"code":-32601,"message":"method not found"},"id":1}"#;
+        assert!(extract_rpc_result(resp).is_none());
+    }
+
+    #[test]
+    fn extract_rpc_result_malformed() {
+        assert!(extract_rpc_result("not json").is_none());
+        assert!(extract_rpc_result("").is_none());
+    }
+
+    #[test]
+    fn is_notification_id_absent() {
+        let req = r#"{"jsonrpc":"2.0","method":"health.check","params":{}}"#;
+        assert!(is_notification(req));
+    }
+
+    #[test]
+    fn is_notification_id_null_is_not_notification() {
+        let req = r#"{"jsonrpc":"2.0","method":"health.check","params":{},"id":null}"#;
+        assert!(!is_notification(req));
+    }
+
+    #[test]
+    fn is_notification_id_present() {
+        let req = r#"{"jsonrpc":"2.0","method":"health.check","params":{},"id":1}"#;
+        assert!(!is_notification(req));
+    }
+
+    #[test]
+    fn is_notification_nested_id_ignored() {
+        let req = r#"{"jsonrpc":"2.0","method":"x","params":{"id":"nested"},"id":2}"#;
+        assert!(!is_notification(req));
+    }
+
+    #[test]
+    fn is_batch_array() {
+        assert!(is_batch("[1,2,3]"));
+        assert!(is_batch("  [{}]  "));
+    }
+
+    #[test]
+    fn is_batch_not_array() {
+        assert!(!is_batch(r#"{"jsonrpc":"2.0","method":"x","id":1}"#));
+    }
+
+    #[test]
+    fn parse_batch_empty_returns_empty() {
+        let batch = "[]";
+        let elems = parse_batch(batch);
+        assert!(elems.is_empty());
+    }
+
+    #[test]
+    fn parse_batch_single() {
+        let batch = r#"[{"jsonrpc":"2.0","method":"health.check","params":{},"id":1}]"#;
+        let elems = parse_batch(batch);
+        assert_eq!(elems.len(), 1);
+        let req = parse_request(&elems[0]).unwrap();
+        assert_eq!(req.method, "health.check");
+        assert_eq!(req.id, serde_json::json!(1));
+    }
+
+    #[test]
+    fn parse_batch_multiple() {
+        let batch =
+            r#"[{"jsonrpc":"2.0","method":"a","id":1},{"jsonrpc":"2.0","method":"b","id":2}]"#;
+        let elems = parse_batch(batch);
+        assert_eq!(elems.len(), 2);
+    }
+
+    #[test]
+    fn parse_batch_nested() {
+        let batch = r#"[{"params":{"nested":[1,2,3]},"method":"x","id":1}]"#;
+        let elems = parse_batch(batch);
+        assert_eq!(elems.len(), 1);
+        assert!(elems[0].contains("nested"));
     }
 }

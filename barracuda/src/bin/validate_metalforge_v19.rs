@@ -58,7 +58,7 @@ fn gompertz(t: f64, p: f64, rm: f64, lambda: f64) -> f64 {
     .exp()
 }
 
-#[expect(dead_code)]
+#[expect(dead_code, reason = "validation: reserved for future domain expansion")]
 fn first_order(t: f64, b_max: f64, k: f64) -> f64 {
     b_max * (1.0 - (-k * t).exp())
 }

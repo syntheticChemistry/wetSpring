@@ -380,7 +380,11 @@ struct TreeConversion {
     root_idx: usize,
 }
 
-#[expect(clippy::items_after_statements, clippy::too_many_arguments)]
+#[expect(
+    clippy::items_after_statements,
+    clippy::too_many_arguments,
+    reason = "validation: local helpers defined near use site; helper mirrors complex domain function signature"
+)]
 fn convert_tree(tree: &TreeNode, mu: f64) -> TreeConversion {
     let mut left_child = Vec::new();
     let mut right_child = Vec::new();

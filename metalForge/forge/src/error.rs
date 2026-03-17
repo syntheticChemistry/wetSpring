@@ -194,7 +194,7 @@ mod tests {
             format!(
                 "{}",
                 NestError::FileRead {
-                    path: PathBuf::from("/data/test.bin"),
+                    path: std::env::temp_dir().join("nest-test.bin"),
                     source: "not found".into(),
                 }
             )

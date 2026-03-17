@@ -104,7 +104,10 @@ pub struct ComputeBackend {
 /// Returns `None` if no toadStool socket is found (standalone mode).
 #[must_use]
 pub fn discover() -> Option<PathBuf> {
-    super::discover::discover_socket("TOADSTOOL_SOCKET", super::primal_names::TOADSTOOL)
+    super::discover::discover_socket(
+        &super::discover::socket_env_var(super::primal_names::TOADSTOOL),
+        super::primal_names::TOADSTOOL,
+    )
 }
 
 /// Submit a compute workload to toadStool.
@@ -426,9 +429,7 @@ fn rpc_call_outcome(socket: &Path, request: &str) -> DispatchOutcome<String> {
         return DispatchOutcome::Protocol(DispatchError::Transport(format!("write: {e}")));
     }
     if let Err(e) = writer.write_all(b"\n") {
-        return DispatchOutcome::Protocol(DispatchError::Transport(format!(
-            "write newline: {e}"
-        )));
+        return DispatchOutcome::Protocol(DispatchError::Transport(format!("write newline: {e}")));
     }
     if let Err(e) = writer.flush() {
         return DispatchOutcome::Protocol(DispatchError::Transport(format!("flush: {e}")));
@@ -543,10 +544,14 @@ mod tests {
 
     #[test]
     fn parse_submit_response_ok() {
-        let response = r#"{"jsonrpc":"2.0","result":{"job_id":"abc-123","compute_socket":"/tmp/gpu.sock"},"id":1}"#;
-        let handle = parse_submit_response(response).unwrap();
+        let sock = std::env::temp_dir().join("toadstool-test-gpu.sock");
+        let response = format!(
+            r#"{{"jsonrpc":"2.0","result":{{"job_id":"abc-123","compute_socket":"{}"}},"id":1}}"#,
+            sock.display()
+        );
+        let handle = parse_submit_response(&response).unwrap();
         assert_eq!(handle.job_id, "abc-123");
-        assert_eq!(handle.compute_socket, Some(PathBuf::from("/tmp/gpu.sock")));
+        assert_eq!(handle.compute_socket, Some(sock));
     }
 
     #[test]

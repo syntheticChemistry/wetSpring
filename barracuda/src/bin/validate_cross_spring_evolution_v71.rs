@@ -149,7 +149,7 @@ fn main() {
         let pass = if val == 0.0 {
             err == 0.0
         } else {
-            err / val.abs() < tolerances::PYTHON_PARITY_TIGHT
+            err / val.abs() < tolerances::DF64_ROUNDTRIP_STRICT
         };
         v.check_pass(&format!("DF64 roundtrip {val:.6e} (err={err:.2e})"), pass);
     }
@@ -165,11 +165,11 @@ fn main() {
         unpacked.len() == test_values.len(),
     );
     v.check_pass(
-        "slice roundtrip max error < 1e-14",
+        "slice roundtrip max error < DF64_ROUNDTRIP_STRICT",
         test_values
             .iter()
             .zip(&unpacked)
-            .all(|(a, b)| (a - b).abs() < tolerances::PYTHON_PARITY_TIGHT),
+            .all(|(a, b)| (a - b).abs() < tolerances::DF64_ROUNDTRIP_STRICT),
     );
 
     let f32_err = (std::f64::consts::PI - f64::from(std::f64::consts::PI as f32)).abs();

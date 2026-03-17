@@ -273,7 +273,7 @@ fn main() {
             id: "kbs_lter".into(),
             name: "KBS LTER Anderson Temporal Model".into(),
             node_type: "time_series".into(),
-            family: "wetspring".into(),
+            family: wetspring_barracuda::PRIMAL_NAME.into(),
             status: "active".into(),
             health: 90,
             confidence: 80,

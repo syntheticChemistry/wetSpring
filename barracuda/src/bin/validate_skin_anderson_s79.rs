@@ -62,6 +62,7 @@ use barracuda::spectral::{
     level_spacing_ratio,
 };
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
 
@@ -465,11 +466,11 @@ fn main() {
 
         v.check_pass(
             "JAK inhibitor changes r from untreated",
-            (r_jak - r_untr).abs() > 0.001,
+            (r_jak - r_untr).abs() > tolerances::SPECTRAL_TREATMENT_EFFECT_MIN,
         );
         v.check_pass(
             "Anti-IL-31 changes r from untreated",
-            (r_anti - r_untr).abs() > 0.001,
+            (r_anti - r_untr).abs() > tolerances::SPECTRAL_TREATMENT_EFFECT_MIN,
         );
 
         println!("  ┌─ D7: Treatment as Anderson Intervention (3D, L={l})");

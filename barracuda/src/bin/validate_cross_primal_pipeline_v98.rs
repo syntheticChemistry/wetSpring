@@ -270,7 +270,10 @@ fn main() {
     v.check_pass("stage 4: pipeline complete", pipeline.contains("complete"));
 
     let metrics = rpc(&server_path, "metrics.snapshot", "{}");
-    v.check_pass("stage 5: metrics captured", metrics.contains("wetspring"));
+    v.check_pass(
+        "stage 5: metrics captured",
+        metrics.contains(wetspring_barracuda::ipc::primal_names::SELF),
+    );
 
     let pipeline_ms = t.elapsed().as_secs_f64() * 1000.0;
     println!("  Full pipeline: {pipeline_ms:.1}ms (5 stages via IPC)");

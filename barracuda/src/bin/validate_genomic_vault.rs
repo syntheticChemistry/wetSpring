@@ -41,6 +41,7 @@
 
 use std::time::Duration;
 
+use wetspring_barracuda::ipc::primal_names;
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::vault::consent::{ConsentScope, ConsentTicket};
@@ -250,7 +251,7 @@ fn main() {
 
     v.check_pass(
         "Provenance: filter by actor works",
-        chain.by_actor("wetspring").count() == chain.len(),
+        chain.by_actor(primal_names::SELF).count() == chain.len(),
     );
 
     v.section("Phase 5: Standalone Provenance Chain");
@@ -261,10 +262,34 @@ fn main() {
         standalone.verify_integrity(),
     );
 
-    standalone.append("ingest", "nestgate", [1u8; 32], [2u8; 32], "eastgate");
-    standalone.append("diversity", "wetspring", [1u8; 32], [3u8; 32], "eastgate");
-    standalone.append("anderson", "toadstool", [1u8; 32], [4u8; 32], "eastgate");
-    standalone.append("export", "wetspring", [1u8; 32], [5u8; 32], "eastgate");
+    standalone.append(
+        "ingest",
+        primal_names::NESTGATE,
+        [1u8; 32],
+        [2u8; 32],
+        "eastgate",
+    );
+    standalone.append(
+        "diversity",
+        primal_names::SELF,
+        [1u8; 32],
+        [3u8; 32],
+        "eastgate",
+    );
+    standalone.append(
+        "anderson",
+        primal_names::TOADSTOOL,
+        [1u8; 32],
+        [4u8; 32],
+        "eastgate",
+    );
+    standalone.append(
+        "export",
+        primal_names::SELF,
+        [1u8; 32],
+        [5u8; 32],
+        "eastgate",
+    );
 
     v.check_pass(
         "Provenance: 4-entry chain valid",
@@ -277,7 +302,7 @@ fn main() {
 
     v.check_pass(
         "Provenance: toadstool did 1 operation",
-        standalone.by_actor("toadstool").count() == 1,
+        standalone.by_actor(primal_names::TOADSTOOL).count() == 1,
     );
 
     v.section("Phase 6: Organ Model Summary");

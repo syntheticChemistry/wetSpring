@@ -51,7 +51,10 @@ fn bench<F: FnOnce() -> R, R>(label: &str, f: F) -> (R, f64) {
     (r, ms)
 }
 
-#[expect(clippy::too_many_lines)]
+#[expect(
+    clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single function"
+)]
 fn main() {
     let mut v = Validator::new("Exp166: Modern Systems Benchmark (S62+DF64)");
 

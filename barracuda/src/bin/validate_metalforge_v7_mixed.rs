@@ -408,7 +408,10 @@ fn validate_nucleus_coordination(v: &mut Validator) {
     let t = Instant::now();
 
     let health = dispatch::dispatch("health.check", &json!({})).or_exit("health");
-    v.check_pass("Tower: primal=wetspring", health["primal"] == "wetspring");
+    v.check_pass(
+        "Tower: primal=wetspring",
+        health["primal"] == wetspring_barracuda::ipc::primal_names::SELF,
+    );
     v.check_pass("Tower: status=healthy", health["status"] == "healthy");
 
     let caps = health["capabilities"].as_array().or_exit("caps");

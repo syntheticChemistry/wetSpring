@@ -473,7 +473,11 @@ fn convert_tree(tree: &TreeNode, mu: f64) -> TreeConversion {
     let mut depths: Vec<usize> = Vec::new();
     let mut is_leaf: Vec<bool> = Vec::new();
 
-    #[expect(clippy::too_many_arguments, clippy::items_after_statements)]
+    #[expect(
+        clippy::too_many_arguments,
+        clippy::items_after_statements,
+        reason = "validation: helper mirrors complex domain function signature; local helpers defined near use site"
+    )]
     fn walk(
         node: &TreeNode,
         parent_branch: f64,
@@ -506,7 +510,10 @@ fn convert_tree(tree: &TreeNode, mu: f64) -> TreeConversion {
                 il.push(false);
                 let left_idx = walk(left, *left_branch, depth + 1, lc, rc, bl, ls, dv, il);
                 let right_idx = walk(right, *right_branch, depth + 1, lc, rc, bl, ls, dv, il);
-                #[expect(clippy::cast_possible_wrap)]
+                #[expect(
+                    clippy::cast_possible_wrap,
+                    reason = "validation: small positive value fits in target signed type"
+                )]
                 {
                     lc[my_idx] = left_idx as i32;
                     rc[my_idx] = right_idx as i32;
@@ -539,7 +546,10 @@ fn convert_tree(tree: &TreeNode, mu: f64) -> TreeConversion {
     let max_depth = depths.iter().copied().max().unwrap_or(0);
     let mut levels: Vec<Vec<u32>> = Vec::with_capacity(max_depth + 1);
     for d in (0..=max_depth).rev() {
-        #[expect(clippy::cast_possible_truncation)]
+        #[expect(
+            clippy::cast_possible_truncation,
+            reason = "validation: bounded float→integer for index/count"
+        )]
         let group: Vec<u32> = (0..n_nodes)
             .filter(|&i| depths[i] == d)
             .map(|i| i as u32)

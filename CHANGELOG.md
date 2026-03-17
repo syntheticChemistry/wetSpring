@@ -3,6 +3,61 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V127] — 2026-03-17
+
+### IPC Resilience, 4-Format Capabilities, Anderson Spectral, Stable Numerics, Leverage Guide
+
+Ecosystem absorption round: sweetGrass IPC resilience patterns, airSpring 4-format
+capability standard, healthSpring centralized extraction, domain-specific Anderson
+helpers, and stable numerical primitives. Leverage guide published to wateringHole.
+1,443+ tests (0 failures on non-GPU). Zero warnings, zero unsafe.
+
+#### `RetryPolicy` + `CircuitBreaker` (sweetGrass pattern)
+- New `ipc::resilience` module with `RetryPolicy` (exponential backoff, max delay cap)
+  and `CircuitBreaker` (failure threshold, half-open probing, cooldown)
+- `RetryPolicy::quick()` (3 attempts, 100ms) and `RetryPolicy::standard()` (5 attempts, 500ms)
+- Non-retriable errors (`Codec`, `RpcReject`, `SocketPath`) short-circuit immediately
+- `CircuitBreaker::execute()` prevents retry storms against unhealthy primals
+- 14 new tests: retry success/failure/exhaustion, backoff growth/cap, circuit states
+
+#### 4-Format Capability Parsing (airSpring/sweetGrass standard)
+- Extended `extract_capabilities()` to parse Format C (`method_info` per-method metadata)
+  and Format D (`semantic_mappings` domain alias → method name)
+- New `MethodInfo` struct: `method`, `description`, `cost`
+- `CapabilityInfo` gains `method_info: Vec<MethodInfo>` and `semantic_mappings: Vec<(String, String)>`
+- 3 new tests: Format C parsing, Format D parsing, minimal with all formats
+
+#### `extract_rpc_result()` (healthSpring V29 pattern)
+- New `protocol::extract_rpc_result()` — extracts `"result"` from success responses
+- Complements existing `extract_rpc_error()` for complete JSON-RPC response handling
+- 3 new tests: success extraction, error response returns None, malformed returns None
+
+#### `anderson_spectral` Module — Batch Anderson Analysis
+- New `bio::anderson_spectral` wrapping `barracuda::spectral` for ecology domain
+- `analyze_single()` — single W point with Lanczos eigensolve and LSR
+- `sweep()` — batch disorder sweep with per-point seeding
+- `estimate_w_c()` — linear interpolation of GOE↔Poisson crossing
+- `pielou_to_disorder()` — maps Pielou J evenness to Anderson W
+- 5 new tests: weak disorder, strong disorder, sweep count, Pielou mapping, W_c estimation
+
+#### `numerics` Module — Stable Floating-Point Helpers
+- New `bio::numerics` for numerically stable biology computation
+- `stable_ln1p()`, `stable_expm1()` — IEEE 754 stable log(1+x), exp(x)-1
+- `log_sum_exp()`, `log_sum_exp_slice()` — overflow-safe log-probability combination
+- `relative_diff()` — zero-safe relative difference for tolerance comparison
+- `kahan_sum()` — compensated summation for O(1) error instead of O(n)
+- 10 new tests covering accuracy, edge cases, and cancellation resilience
+
+#### `GemmCached::execute_ex()` — Transpose Support
+- New `execute_ex(trans_a, trans_b)` for GPU GEMM with implicit transpose
+- Avoids materializing Aᵀ or Bᵀ in host memory
+- Primary use: Tikhonov regularization (AᵀA + λI)⁻¹Aᵀb
+
+#### Leverage Guide Published
+- `wateringHole/WETSPRING_LEVERAGE_GUIDE.md` — standalone, trio, foundation, post-NUCLEUS,
+  and cross-spring composition patterns across 14 primals and 6 sibling springs
+- 23 IPC methods documented with semantic naming, transport, and discovery
+
 ## [V126] — 2026-03-16
 
 ### DispatchOutcome, Health Probes, IpcError Query Helpers, Audit Sweep

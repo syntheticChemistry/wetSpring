@@ -20,7 +20,7 @@
 //! biomeOS orchestrates the niche directly from deploy graphs.
 
 /// Niche identity.
-pub const NICHE_NAME: &str = "wetspring";
+pub use crate::PRIMAL_NAME as NICHE_NAME;
 
 /// Human-readable niche description for biomeOS.
 pub const NICHE_DESCRIPTION: &str = "Life science and analytical chemistry validation environment";
@@ -28,7 +28,59 @@ pub const NICHE_DESCRIPTION: &str = "Life science and analytical chemistry valid
 /// Niche version (tracks the spring version, not the crate version).
 pub const NICHE_VERSION: &str = "1.0.0";
 
+#[cfg(feature = "ipc")]
+use crate::ipc::primal_names::{
+    BEARDOG, LOAMSPINE, NESTGATE, PETALTONGUE, RHIZOCRYPT, SONGBIRD, SWEETGRASS,
+};
+
 /// Primals this niche depends on (germination order matters).
+#[cfg(feature = "ipc")]
+pub const DEPENDENCIES: &[NicheDependency] = &[
+    NicheDependency {
+        name: BEARDOG,
+        role: "security",
+        required: true,
+        capability: "security",
+    },
+    NicheDependency {
+        name: SONGBIRD,
+        role: "discovery",
+        required: true,
+        capability: "discovery",
+    },
+    NicheDependency {
+        name: RHIZOCRYPT,
+        role: "dag",
+        required: true,
+        capability: "dag",
+    },
+    NicheDependency {
+        name: LOAMSPINE,
+        role: "commit",
+        required: true,
+        capability: "commit",
+    },
+    NicheDependency {
+        name: SWEETGRASS,
+        role: "provenance",
+        required: true,
+        capability: "provenance",
+    },
+    NicheDependency {
+        name: NESTGATE,
+        role: "storage",
+        required: false,
+        capability: "storage",
+    },
+    NicheDependency {
+        name: PETALTONGUE,
+        role: "visualization",
+        required: false,
+        capability: "visualization",
+    },
+];
+
+#[cfg(not(feature = "ipc"))]
 pub const DEPENDENCIES: &[NicheDependency] = &[
     NicheDependency {
         name: "beardog",

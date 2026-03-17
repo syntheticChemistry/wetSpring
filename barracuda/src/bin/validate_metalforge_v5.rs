@@ -119,13 +119,18 @@ fn validate_cooperation_mf(
 
     let params = CooperationParams::default();
     let tc = Instant::now();
-    let cpu = cooperation::scenario_equal_start(&params, 0.001);
+    let cpu = cooperation::scenario_equal_start(&params, tolerances::ODE_DEFAULT_DT);
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
     let gpu_engine = CooperationGpu::new(Arc::clone(device)).or_exit("shader compile");
     let results = gpu_engine
-        .integrate_params(&[params], &[[0.01, 0.01, 0.0, 0.0]], 48000, 0.001)
+        .integrate_params(
+            &[params],
+            &[[0.01, 0.01, 0.0, 0.0]],
+            48000,
+            tolerances::ODE_DEFAULT_DT,
+        )
         .or_exit("GPU integrate");
     let gpu_us = tg.elapsed().as_micros() as f64;
 
@@ -153,13 +158,18 @@ fn validate_capacitor_mf(
 
     let params = CapacitorParams::default();
     let tc = Instant::now();
-    let cpu = capacitor::scenario_normal(&params, 0.001);
+    let cpu = capacitor::scenario_normal(&params, tolerances::ODE_DEFAULT_DT);
     let cpu_us = tc.elapsed().as_micros() as f64;
 
     let tg = Instant::now();
     let gpu_engine = CapacitorGpu::new(Arc::clone(device)).or_exit("shader compile");
     let results = gpu_engine
-        .integrate_params(&[params], &[[0.01, 1.0, 0.0, 0.0, 0.5, 0.0]], 48000, 0.001)
+        .integrate_params(
+            &[params],
+            &[[0.01, 1.0, 0.0, 0.0, 0.5, 0.0]],
+            48000,
+            tolerances::ODE_DEFAULT_DT,
+        )
         .or_exit("GPU integrate");
     let gpu_us = tg.elapsed().as_micros() as f64;
 

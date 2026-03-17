@@ -266,9 +266,15 @@ async fn main() {
     // ═══ G09: Variance GPU (inherited) ═══════════════════════════════
     v.section("G09: Variance GPU (inherited)");
     let data: Vec<f64> = (1..=1000).map(f64::from).collect();
-    #[expect(clippy::cast_precision_loss)]
+    #[expect(
+        clippy::cast_precision_loss,
+        reason = "precision: bounded integer→f64 for validation metrics"
+    )]
     let cpu_mean = data.iter().sum::<f64>() / data.len() as f64;
-    #[expect(clippy::cast_precision_loss)]
+    #[expect(
+        clippy::cast_precision_loss,
+        reason = "precision: bounded integer→f64 for validation metrics"
+    )]
     let cpu_var: f64 = data.iter().map(|x| (x - cpu_mean).powi(2)).sum::<f64>() / data.len() as f64;
     let gpu_var = stats_gpu::variance_gpu(&gpu, &data).or_exit("unexpected error");
     v.check(

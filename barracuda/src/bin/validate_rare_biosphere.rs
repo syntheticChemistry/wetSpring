@@ -244,7 +244,7 @@ fn validate_rare_lineages(
         let total: f64 = counts.iter().sum();
         let rare = counts
             .iter()
-            .filter(|&&c| c > 0.0 && c / total < 0.001)
+            .filter(|&&c| c > 0.0 && c / total < tolerances::RARE_BIOSPHERE_THRESHOLD)
             .count();
         let obs = counts.iter().filter(|&&c| c > 0.0).count();
 
@@ -259,7 +259,7 @@ fn validate_rare_lineages(
     let vd_total: f64 = von_damm.iter().sum();
     let vd_rare = von_damm
         .iter()
-        .filter(|&&c| c > 0.0 && c / vd_total < 0.001)
+        .filter(|&&c| c > 0.0 && c / vd_total < tolerances::RARE_BIOSPHERE_THRESHOLD)
         .count();
     v.check_count("Von Damm: 8 rare lineages (<0.1%)", vd_rare, 8);
 }

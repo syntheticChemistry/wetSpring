@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used, clippy::module_inception)]
+#[expect(
+    clippy::unwrap_used,
+    clippy::module_inception,
+    reason = "test module: assertions use unwrap for clarity"
+)]
 mod tests {
     use crate::node::assembly;
     use crate::node::{

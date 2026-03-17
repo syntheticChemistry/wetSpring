@@ -243,6 +243,12 @@ pub const ODE_DEFAULT_DT: f64 = 0.001;
 /// Validated: Exp227 (Pure GPU Streaming v4), Exp228 (metalForge v8).
 pub const DF64_ROUNDTRIP: f64 = 1e-13;
 
+/// Strict DF64 roundtrip tolerance for bit-exact protocol validation.
+///
+/// Tighter than [`DF64_ROUNDTRIP`] for testing the DF64 host wire format
+/// itself (encode→decode) rather than end-to-end GEMM pipelines.
+pub const DF64_ROUNDTRIP_STRICT: f64 = 1e-14;
+
 /// GEMM pipeline compilation timeout (milliseconds).
 ///
 /// The GPU GEMM shader (via hotSpring f64 polyfills) must compile in

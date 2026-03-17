@@ -63,8 +63,8 @@ fn main() {
     v.check_pass("XDG_RUNTIME_DIR present", has_runtime);
 
     if has_runtime {
-        let biomeos_dir =
-            PathBuf::from(runtime_dir.as_ref().or_exit("unexpected error")).join("biomeos");
+        let biomeos_dir = PathBuf::from(runtime_dir.as_ref().or_exit("unexpected error"))
+            .join(wetspring_barracuda::ipc::primal_names::BIOMEOS);
         let dir_exists = biomeos_dir.exists();
         println!(
             "  biomeos socket dir: {} (exists: {dir_exists})",
@@ -318,13 +318,13 @@ fn main() {
     let snapshot = metrics.snapshot();
     v.check_pass(
         "snapshot: primal = wetspring",
-        snapshot["primal"] == "wetspring",
+        snapshot["primal"] == wetspring_barracuda::ipc::primal_names::SELF,
     );
 
     let metrics_rpc = rpc(&server_path, "metrics.snapshot", "{}");
     v.check_pass(
         "metrics.snapshot via RPC: wetspring",
-        metrics_rpc.contains("wetspring"),
+        metrics_rpc.contains(wetspring_barracuda::ipc::primal_names::SELF),
     );
 
     // ═══ §8: Songbird Discovery ═════════════════════════════════════════
@@ -461,7 +461,7 @@ fn discover_biomeos_bin() -> Option<PathBuf> {
             return Some(p);
         }
     }
-    if let Ok(path) = which("biomeos") {
+    if let Ok(path) = which(wetspring_barracuda::ipc::primal_names::BIOMEOS) {
         return Some(path);
     }
     let phase_dirs = ["phase1", "phase2"];

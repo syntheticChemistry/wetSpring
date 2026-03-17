@@ -52,6 +52,7 @@ pub mod metrics;
 pub mod primal_names;
 pub mod protocol;
 pub mod provenance;
+pub mod resilience;
 pub mod server;
 pub mod songbird;
 pub mod timeseries;

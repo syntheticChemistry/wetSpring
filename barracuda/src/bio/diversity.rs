@@ -406,7 +406,7 @@ mod tests {
             }
 
             #[test]
-            #[expect(clippy::cast_precision_loss)]
+            #[expect(clippy::cast_precision_loss, reason = "precision: species count→f64 for diversity index")]
             fn observed_features_leq_length(counts in non_negative_vec()) {
                 let obs = observed_features(&counts);
                 prop_assert!(obs <= counts.len() as f64);
@@ -471,7 +471,7 @@ mod tests {
             }
 
             #[test]
-            #[expect(clippy::cast_precision_loss)]
+            #[expect(clippy::cast_precision_loss, reason = "precision: species count→f64 for diversity index")]
             fn shannon_bounds(counts in proptest::collection::vec(0.01..1000.0_f64, 1..30)) {
                 let s = counts.iter().filter(|&&x| x > 0.0).count() as f64;
                 prop_assume!(s >= 1.0);

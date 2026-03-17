@@ -28,7 +28,10 @@ pub(super) fn base64_encode(data: &[u8]) -> String {
     result
 }
 
-#[expect(clippy::cast_possible_truncation)]
+#[expect(
+    clippy::cast_possible_truncation,
+    reason = "base64: 6-bit values always fit in u8"
+)]
 /// Decode base64 to bytes.
 pub(super) fn base64_decode(encoded: &str) -> Vec<u8> {
     let clean: Vec<u8> = encoded

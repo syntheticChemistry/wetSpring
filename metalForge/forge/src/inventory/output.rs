@@ -101,7 +101,10 @@ pub fn print_inventory(substrates: &[Substrate]) {
 }
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used)]
+#[expect(
+    clippy::unwrap_used,
+    reason = "test module: assertions use unwrap for clarity"
+)]
 mod tests {
     use super::*;
     use crate::substrate::{Capability, Identity, Properties};

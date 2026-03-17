@@ -51,7 +51,11 @@ struct OrganismQs {
     notes: &'static str,
 }
 
-#[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
+#[expect(
+    clippy::too_many_lines,
+    clippy::cast_precision_loss,
+    reason = "validation harness: sequential domain checks in single function; precision: bounded integer→f64 for validation metrics"
+)]
 fn main() {
     let mut v = Validator::new("Exp140: QS Gene Prevalence by Habitat Geometry");
 

@@ -48,7 +48,10 @@ use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::{self, Validator};
 
-#[expect(clippy::too_many_lines)] // sequential feature validation: parse → tracks → EIC → features → asari cross-reference
+#[expect(
+    clippy::too_many_lines,
+    reason = "validation harness: sequential feature validation parse→tracks→EIC→features→asari cross-reference"
+)]
 fn main() {
     let mut v = Validator::new("wetSpring Feature Pipeline Validation (Exp009)");
 
@@ -201,7 +204,10 @@ fn main() {
 
     if !asari_features.is_empty() && !table.features.is_empty() {
         let matched = count_matched_features(&table.features, &asari_features, 5.0, 50.0);
-        #[expect(clippy::cast_precision_loss)]
+        #[expect(
+            clippy::cast_precision_loss,
+            reason = "precision: bounded integer→f64 for validation metrics"
+        )]
         let match_pct = (matched as f64 / asari_features.len() as f64) * 100.0;
         println!(
             "  Matched {matched}/{} asari features ({match_pct:.1}%) by m/z+RT",
@@ -221,7 +227,10 @@ fn main() {
             .iter()
             .filter(|f| f.mz >= 80.0 && f.mz <= 1000.0)
             .count();
-        #[expect(clippy::cast_precision_loss)]
+        #[expect(
+            clippy::cast_precision_loss,
+            reason = "precision: bounded integer→f64 for validation metrics"
+        )]
         let range_pct = (rust_in_asari_range as f64 / table.features.len() as f64) * 100.0;
         v.check(
             "Rust features in asari m/z range (80-1000) >= 90%",

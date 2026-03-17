@@ -149,7 +149,10 @@ fn convert_tree(tree: &TreeNode, mu: f64) -> (PhyloTree, Vec<f64>, Vec<f64>, usi
                 il.push(false);
                 let left_idx = walk(left, *left_branch, depth + 1, lc, rc, bl, ls, dv, il);
                 let right_idx = walk(right, *right_branch, depth + 1, lc, rc, bl, ls, dv, il);
-                #[expect(clippy::cast_possible_wrap)]
+                #[expect(
+                    clippy::cast_possible_wrap,
+                    reason = "validation: small positive value fits in target signed type"
+                )]
                 {
                     lc[my_idx] = left_idx as i32;
                     rc[my_idx] = right_idx as i32;
@@ -182,7 +185,10 @@ fn convert_tree(tree: &TreeNode, mu: f64) -> (PhyloTree, Vec<f64>, Vec<f64>, usi
     let max_depth = depths.iter().copied().max().unwrap_or(0);
     let mut levels: Vec<Vec<u32>> = Vec::with_capacity(max_depth + 1);
     for d in (0..=max_depth).rev() {
-        #[expect(clippy::cast_possible_truncation)]
+        #[expect(
+            clippy::cast_possible_truncation,
+            reason = "validation: bounded float→integer for index/count"
+        )]
         let group: Vec<u32> = (0..n_nodes)
             .filter(|&i| depths[i] == d)
             .map(|i| i as u32)
@@ -268,7 +274,10 @@ fn bench_felsenstein(device: &Arc<barracuda::device::WgpuDevice>, v: &mut Valida
     match result {
         Ok(Ok(gpu_result)) => {
             let gpu_ll = gpu_result.log_likelihood(0, &PI);
-            #[expect(clippy::cast_precision_loss)]
+            #[expect(
+                clippy::cast_precision_loss,
+                reason = "precision: bounded integer→f64 for validation metrics"
+            )]
             {
                 let speedup = cpu_us as f64 / gpu_us.max(1) as f64;
                 println!("    CPU: {cpu_us} µs, GPU: {gpu_us} µs, speedup: {speedup:.2}×");
@@ -335,7 +344,10 @@ fn bench_bootstrap(device: &Arc<barracuda::device::WgpuDevice>, v: &mut Validato
         for (c, g) in cpu_lls.iter().zip(&gpu_lls) {
             max_diff = max_diff.max((c - g).abs());
         }
-        #[expect(clippy::cast_precision_loss)]
+        #[expect(
+            clippy::cast_precision_loss,
+            reason = "precision: bounded integer→f64 for validation metrics"
+        )]
         {
             let speedup = cpu_us as f64 / gpu_us.max(1) as f64;
             println!("    CPU: {cpu_us} µs, GPU: {gpu_us} µs, speedup: {speedup:.2}×");
@@ -425,7 +437,10 @@ fn bench_hmm_batch(device: &Arc<barracuda::device::WgpuDevice>, v: &mut Validato
             for (c, g) in cpu_lls.iter().zip(&gpu_result.log_likelihoods) {
                 max_diff = max_diff.max((c - g).abs());
             }
-            #[expect(clippy::cast_precision_loss)]
+            #[expect(
+                clippy::cast_precision_loss,
+                reason = "precision: bounded integer→f64 for validation metrics"
+            )]
             {
                 let speedup = cpu_us as f64 / gpu_us.max(1) as f64;
                 println!("    CPU: {cpu_us} µs, GPU: {gpu_us} µs, speedup: {speedup:.2}×");

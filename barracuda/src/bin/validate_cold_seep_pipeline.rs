@@ -93,6 +93,7 @@ fn main() {
     let mut all_shannon = Vec::with_capacity(N_SYNTHETIC_SAMPLES);
     let mut all_simpson = Vec::with_capacity(N_SYNTHETIC_SAMPLES);
     let mut all_obs = Vec::with_capacity(N_SYNTHETIC_SAMPLES);
+    #[cfg(feature = "gpu")]
     let mut all_pielou = Vec::with_capacity(N_SYNTHETIC_SAMPLES);
     println!(
         "  {:>6} {:>10} {:>10} {:>8} {:>8}",
@@ -108,6 +109,7 @@ fn main() {
         all_shannon.push(shannon_h);
         all_simpson.push(simpson_d);
         all_obs.push(observed);
+        #[cfg(feature = "gpu")]
         all_pielou.push(pielou);
 
         if i < 5 || i == N_SYNTHETIC_SAMPLES - 1 {

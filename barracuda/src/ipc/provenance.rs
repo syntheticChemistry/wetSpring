@@ -365,7 +365,10 @@ pub fn handle_provenance_complete(params: &Value) -> Result<Value, RpcError> {
 }
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used)]
+#[expect(
+    clippy::unwrap_used,
+    reason = "test module: assertions use unwrap for clarity"
+)]
 mod tests {
     use super::*;
 

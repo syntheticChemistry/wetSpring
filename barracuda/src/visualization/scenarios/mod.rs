@@ -97,7 +97,7 @@ fn node(id: &str, name: &str, node_type: &str, capabilities: &[&str]) -> Scenari
         id: id.into(),
         name: name.into(),
         node_type: node_type.into(),
-        family: "wetspring".into(),
+        family: crate::PRIMAL_NAME.into(),
         status: "healthy".into(),
         health: 100,
         confidence: 100,

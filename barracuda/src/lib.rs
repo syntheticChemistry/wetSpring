@@ -79,6 +79,9 @@
 //! ```
 
 /// This primal's canonical identifier — used for IPC, provenance, and metrics.
+#[cfg(feature = "ipc")]
+pub use ipc::primal_names::SELF as PRIMAL_NAME;
+#[cfg(not(feature = "ipc"))]
 pub const PRIMAL_NAME: &str = "wetspring";
 
 /// Key derivation context prefix — versioned for forward compatibility.

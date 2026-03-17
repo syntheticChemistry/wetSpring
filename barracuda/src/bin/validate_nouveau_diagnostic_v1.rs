@@ -302,7 +302,7 @@ fn main() {
             id: "dispatch_pipeline".into(),
             name: "GPU Dispatch Pipeline".into(),
             node_type: "pipeline".into(),
-            family: "wetspring".into(),
+            family: wetspring_barracuda::PRIMAL_NAME.into(),
             status: "degraded".into(),
             health: 60,
             confidence: 95,

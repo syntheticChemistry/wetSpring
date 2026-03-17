@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![expect(clippy::expect_used, clippy::too_many_lines)]
+#![expect(
+    clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single main()"
+)]
 //! Exp096: `ToadStool` Bio Op Absorption Validation
 //!
 //! # Provenance

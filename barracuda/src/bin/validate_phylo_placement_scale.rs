@@ -83,7 +83,10 @@ fn seq_to_states(seq: &[u8]) -> Vec<usize> {
         .collect()
 }
 
-#[expect(clippy::too_many_lines)]
+#[expect(
+    clippy::too_many_lines,
+    reason = "validation harness: sequential domain checks in single function"
+)]
 fn main() {
     let mut v = Validator::new("Exp109: Large-Scale Phylogenetic Placement");
 

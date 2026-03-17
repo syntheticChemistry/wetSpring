@@ -216,20 +216,22 @@ fn main() {
     let mut all_shannon = Vec::new();
     let mut all_simpson = Vec::new();
     let mut all_obs = Vec::new();
+    #[cfg(feature = "gpu")]
     let mut all_pielou = Vec::new();
 
     for (name, counts) in &sample_data {
-        let h = diversity::shannon(counts);
-        let d = diversity::simpson(counts);
+        let shannon = diversity::shannon(counts);
+        let simpson = diversity::simpson(counts);
         let s_obs = diversity::observed_features(counts);
-        let j = diversity::pielou_evenness(counts);
+        let pielou = diversity::pielou_evenness(counts);
 
-        println!("  {name:20} {h:>10.4} {d:>10.4} {s_obs:>8.0} {j:>8.4}");
+        println!("  {name:20} {shannon:>10.4} {simpson:>10.4} {s_obs:>8.0} {pielou:>8.4}");
 
-        all_shannon.push(h);
-        all_simpson.push(d);
+        all_shannon.push(shannon);
+        all_simpson.push(simpson);
         all_obs.push(s_obs);
-        all_pielou.push(j);
+        #[cfg(feature = "gpu")]
+        all_pielou.push(pielou);
     }
 
     for (i, h) in all_shannon.iter().enumerate() {
@@ -267,12 +269,13 @@ fn main() {
         .collect();
 
     let bc_matrix = diversity::bray_curtis_matrix(&padded);
-    let n = padded.len();
+    let n_samples = padded.len();
     let bc_is_symmetric = {
         let mut sym = true;
-        for i in 0..n {
-            for j in 0..n {
-                let diff = (bc_matrix[i * n + j] - bc_matrix[j * n + i]).abs();
+        for row in 0..n_samples {
+            for col in 0..n_samples {
+                let diff =
+                    (bc_matrix[row * n_samples + col] - bc_matrix[col * n_samples + row]).abs();
                 if diff > tolerances::EXACT_F64 {
                     sym = false;
                 }
@@ -282,7 +285,8 @@ fn main() {
     };
     v.check_pass("Bray-Curtis matrix is symmetric", bc_is_symmetric);
 
-    let diagonal_ok = (0..n).all(|i| bc_matrix[i * n + i].abs() < tolerances::EXACT_F64);
+    let diagonal_ok =
+        (0..n_samples).all(|idx| bc_matrix[idx * n_samples + idx].abs() < tolerances::EXACT_F64);
     v.check_pass("Bray-Curtis diagonal is zero", diagonal_ok);
 
     let in_range = bc_matrix
@@ -290,11 +294,11 @@ fn main() {
         .all(|&val| (0.0..=1.0 + tolerances::EXACT_F64).contains(&val));
     v.check_pass("Bray-Curtis values in [0, 1]", in_range);
 
-    println!("  Bray-Curtis distance matrix ({n}×{n}):");
-    for i in 0..n {
+    println!("  Bray-Curtis distance matrix ({n_samples}×{n_samples}):");
+    for row in 0..n_samples {
         print!("    ");
-        for j in 0..n {
-            print!("{:6.3} ", bc_matrix[i * n + j]);
+        for col in 0..n_samples {
+            print!("{:6.3} ", bc_matrix[row * n_samples + col]);
         }
         println!();
     }
@@ -310,49 +314,47 @@ fn main() {
         let midpoint = f64::midpoint(GOE_R, POISSON_R);
         println!("  GOE_R={GOE_R:.4}, POISSON_R={POISSON_R:.4}, midpoint={midpoint:.4}");
 
-        let l = 8;
-        let n_lattice = l * l * l;
+        let lattice_l = 8;
+        let n_lattice = lattice_l * lattice_l * lattice_l;
 
-        for (i, j) in all_pielou.iter().enumerate() {
-            let w = j.mul_add(-14.5, 15.0);
-            let mat = anderson_3d(l, l, l, w, 42 + i as u64);
+        for (idx, pielou) in all_pielou.iter().enumerate() {
+            let disorder = pielou.mul_add(-14.5, 15.0);
+            let mat = anderson_3d(lattice_l, lattice_l, lattice_l, disorder, 42 + idx as u64);
             let tri = lanczos(&mat, n_lattice, 42);
             let eigs = lanczos_eigenvalues(&tri);
-            let r = level_spacing_ratio(&eigs);
+            let spacing_r = level_spacing_ratio(&eigs);
 
-            let regime = if r > midpoint {
+            let regime = if spacing_r > midpoint {
                 "EXTENDED (QS viable)"
             } else {
                 "LOCALIZED (QS suppressed)"
             };
             println!(
-                "  {}: Pielou J={j:.3} → W={w:.2} → r={r:.4} → {regime}",
-                sample_data[i].0
+                "  {}: Pielou J={pielou:.3} → W={disorder:.2} → r={spacing_r:.4} → {regime}",
+                sample_data[idx].0
             );
 
             v.check_pass(
-                &format!("{} r in valid range", sample_data[i].0),
-                (POISSON_R - 0.05..=GOE_R + 0.05).contains(&r),
+                &format!("{} r in valid range", sample_data[idx].0),
+                (POISSON_R - 0.05..=GOE_R + 0.05).contains(&spacing_r),
             );
         }
 
-        let high_div_extended =
-            all_shannon
-                .iter()
-                .zip(all_pielou.iter())
-                .enumerate()
-                .all(|(i, (h, j))| {
-                    if *h > 3.0 {
-                        let w = j.mul_add(-14.5, 15.0);
-                        let mat = anderson_3d(l, l, l, w, 42 + i as u64);
-                        let tri = lanczos(&mat, n_lattice, 42);
-                        let eigs = lanczos_eigenvalues(&tri);
-                        let r = level_spacing_ratio(&eigs);
-                        r > midpoint
-                    } else {
-                        true
-                    }
-                });
+        let high_div_extended = all_shannon.iter().zip(all_pielou.iter()).enumerate().all(
+            |(idx, (shannon, pielou))| {
+                if *shannon > 3.0 {
+                    let disorder = pielou.mul_add(-14.5, 15.0);
+                    let mat =
+                        anderson_3d(lattice_l, lattice_l, lattice_l, disorder, 42 + idx as u64);
+                    let tri = lanczos(&mat, n_lattice, 42);
+                    let eigs = lanczos_eigenvalues(&tri);
+                    let spacing_r = level_spacing_ratio(&eigs);
+                    spacing_r > midpoint
+                } else {
+                    true
+                }
+            },
+        );
         v.check_pass(
             "high-diversity samples (H'>3) tend toward GOE",
             high_div_extended,
@@ -393,7 +395,7 @@ fn main() {
     );
     println!("  Samples processed: {}", sample_data.len());
     println!("  Diversity metrics: Shannon, Simpson, S_obs, Pielou J");
-    println!("  Distance matrix:   Bray-Curtis ({n}×{n})");
+    println!("  Distance matrix:   Bray-Curtis ({n_samples}×{n_samples})");
     #[cfg(feature = "gpu")]
     println!("  Spectral overlay:  Anderson 3D L=8 (GPU)");
     #[cfg(not(feature = "gpu"))]

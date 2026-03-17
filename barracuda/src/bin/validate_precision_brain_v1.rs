@@ -241,7 +241,7 @@ fn main() {
             id: "gpu_overview".into(),
             name: "GPU Capability Overview".into(),
             node_type: "compute".into(),
-            family: "wetspring".into(),
+            family: wetspring_barracuda::PRIMAL_NAME.into(),
             status: "healthy".into(),
             health: 100,
             confidence: 90,

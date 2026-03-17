@@ -250,7 +250,10 @@ pub fn extract_json_array_strings(json: &str, key: &str) -> Vec<String> {
 }
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used)]
+#[expect(
+    clippy::unwrap_used,
+    reason = "test module: assertions use unwrap for clarity"
+)]
 mod tests {
     use super::*;
 

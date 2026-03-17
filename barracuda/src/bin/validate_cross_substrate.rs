@@ -36,7 +36,11 @@ use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::{self, Validator};
 
 #[tokio::main]
-#[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
+#[expect(
+    clippy::too_many_lines,
+    clippy::cast_precision_loss,
+    reason = "validation harness: sequential domain checks in single function; precision: bounded integer→f64 for validation metrics"
+)]
 async fn main() {
     let mut v = Validator::new("Exp060: metalForge Cross-Substrate Validation");
 

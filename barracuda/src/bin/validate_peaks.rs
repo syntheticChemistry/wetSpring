@@ -159,7 +159,10 @@ fn validate_case(v: &mut Validator, dir: &Path, name: &str, params: &PeakParams)
     // Index matching: allow ±1 for boundary rounding
     let mut indices_matched = 0_usize;
     for (i, &sci_idx) in scipy_indices.iter().enumerate() {
-        #[expect(clippy::cast_possible_wrap)]
+        #[expect(
+            clippy::cast_possible_wrap,
+            reason = "validation: small positive value fits in target signed type"
+        )]
         let found = rust_peaks
             .iter()
             .any(|p| (p.index as i64 - sci_idx as i64).unsigned_abs() <= 1);
@@ -180,7 +183,10 @@ fn validate_case(v: &mut Validator, dir: &Path, name: &str, params: &PeakParams)
 
     // Height matching: Rust and scipy process identical data, heights should be very close
     for (i, &sci_height) in scipy_heights.iter().enumerate() {
-        #[expect(clippy::cast_possible_wrap)]
+        #[expect(
+            clippy::cast_possible_wrap,
+            reason = "validation: small positive value fits in target signed type"
+        )]
         if let Some(rp) = rust_peaks.iter().find(|p| {
             let sci_idx = scipy_indices[i];
             (p.index as i64 - sci_idx as i64).unsigned_abs() <= 1

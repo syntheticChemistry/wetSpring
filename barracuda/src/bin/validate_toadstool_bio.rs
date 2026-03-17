@@ -98,7 +98,10 @@ fn validate_tree_inference(device: &Arc<WgpuDevice>, v: &mut Validator) {
 
     match ti.predict(&forest, &samples, n_samples) {
         Ok(predictions) => {
-            #[expect(clippy::cast_precision_loss)]
+            #[expect(
+                clippy::cast_precision_loss,
+                reason = "precision: bounded integer→f64 for validation metrics"
+            )]
             {
                 v.check(
                     "TI: n_predictions = 4",
@@ -203,7 +206,10 @@ fn validate_gillespie(device: &Arc<WgpuDevice>, v: &mut Validator) {
 
     match result {
         Ok(Ok(result)) => {
-            #[expect(clippy::cast_precision_loss)]
+            #[expect(
+                clippy::cast_precision_loss,
+                reason = "precision: bounded integer→f64 for validation metrics"
+            )]
             {
                 v.check(
                     "SSA: n_trajectories",

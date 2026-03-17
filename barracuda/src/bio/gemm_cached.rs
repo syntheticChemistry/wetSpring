@@ -205,6 +205,72 @@ impl GemmCached {
         Ok(c_buf.into_buffer())
     }
 
+    /// Execute C = α·op(A)×op(B) + β·C with optional transpose.
+    ///
+    /// When `trans_a` is true, A is transposed before multiplication (i.e. op(A) = Aᵀ).
+    /// Same for `trans_b`. This avoids materializing the transpose — the shader
+    /// reads A/B in transposed order.
+    ///
+    /// Primary use: Tikhonov regularization `(AᵀA + λI)⁻¹Aᵀb` where `trans_a=true`
+    /// lets us compute Aᵀ·b without copying.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if GPU dispatch or readback fails.
+    #[expect(clippy::many_single_char_names, clippy::too_many_arguments)]
+    pub fn execute_ex(
+        &self,
+        a: &[f64],
+        b: &[f64],
+        m: usize,
+        k: usize,
+        n: usize,
+        batch_size: usize,
+        trans_a: bool,
+        trans_b: bool,
+    ) -> Result<Vec<f64>> {
+        if !trans_a && !trans_b {
+            return self.execute(a, b, m, k, n, batch_size);
+        }
+
+        let (eff_m, eff_k_a) = if trans_a { (k, m) } else { (m, k) };
+        let (eff_k_b, eff_n) = if trans_b { (n, k) } else { (k, n) };
+        debug_assert_eq!(
+            eff_k_a, eff_k_b,
+            "inner dimensions must match after transpose"
+        );
+
+        let inner = eff_k_a;
+        let out_rows = eff_m;
+        let out_cols = eff_n;
+
+        let a_t: Vec<f64> = if trans_a {
+            let mut buf = vec![0.0; m * k];
+            for r in 0..m {
+                for c in 0..k {
+                    buf[c * m + r] = a[r * k + c];
+                }
+            }
+            buf
+        } else {
+            a.to_vec()
+        };
+
+        let b_t: Vec<f64> = if trans_b {
+            let mut buf = vec![0.0; k * n];
+            for r in 0..k {
+                for c in 0..n {
+                    buf[c * k + r] = b[r * n + c];
+                }
+            }
+            buf
+        } else {
+            b.to_vec()
+        };
+
+        self.execute(&a_t, &b_t, out_rows, inner, out_cols, batch_size)
+    }
+
     #[expect(clippy::many_single_char_names, clippy::too_many_arguments)]
     fn acquire_and_upload(
         &self,

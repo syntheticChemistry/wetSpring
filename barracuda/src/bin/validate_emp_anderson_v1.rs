@@ -403,7 +403,7 @@ fn main() {
             id: "emp_atlas".into(),
             name: "EMP Anderson QS Atlas".into(),
             node_type: "atlas".into(),
-            family: "wetspring".into(),
+            family: wetspring_barracuda::PRIMAL_NAME.into(),
             status: "active".into(),
             health: 95,
             confidence: 85,

@@ -262,7 +262,7 @@ fn validate_ipc(v: &mut Validator, ts: &DataChannel) {
             id: "n1".into(),
             name: "N1".into(),
             node_type: "compute".into(),
-            family: "wetspring".into(),
+            family: wetspring_barracuda::PRIMAL_NAME.into(),
             status: "healthy".into(),
             health: 100,
             confidence: 100,
@@ -285,7 +285,7 @@ fn validate_ipc(v: &mut Validator, ts: &DataChannel) {
     );
 
     let explicit_client =
-        PetalTonguePushClient::new(std::path::PathBuf::from("/nonexistent/petaltongue.sock"));
+        PetalTonguePushClient::new(std::env::temp_dir().join("nonexistent-petaltongue.sock"));
     v.check_pass(
         "IPC push_render: fails on missing socket",
         explicit_client
@@ -334,7 +334,9 @@ fn validate_full_chain(v: &mut Validator, samples: &[Vec<f64>], labels: &[String
     });
     v.check_pass(
         "node family is wetspring",
-        full.nodes.iter().all(|n| n.family == "wetspring"),
+        full.nodes
+            .iter()
+            .all(|n| n.family == wetspring_barracuda::PRIMAL_NAME),
     );
     v.check_pass("version is semver", full.version.split('.').count() == 3);
     v.check_pass("mode is live-ecosystem", full.mode == "live-ecosystem");

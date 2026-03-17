@@ -117,28 +117,82 @@ impl Drop for Server {
     }
 }
 
-/// Handle a single client connection: read newline-delimited JSON-RPC, dispatch, respond.
-fn handle_connection(stream: &std::os::unix::net::UnixStream, metrics: &Metrics) {
-    if let Err(e) = stream.set_read_timeout(Some(CONNECTION_READ_TIMEOUT)) {
-        tracing::warn!(error = %e, "set read timeout");
-        return;
+/// Process a single JSON-RPC request. Returns `None` for notifications (no response).
+fn process_single(line: &str, metrics: &Metrics, start: std::time::Instant) -> Option<String> {
+    if protocol::is_notification(line) {
+        if let Ok(req) = protocol::parse_request(line) {
+            let result = if req.method == "metrics.snapshot" {
+                Ok(metrics.snapshot())
+            } else {
+                dispatch::dispatch(&req.method, &req.params)
+            };
+            match &result {
+                Ok(_) => metrics.record_success(&req.method, start.elapsed()),
+                Err(_) => metrics.record_error(&req.method, start.elapsed()),
+            }
+        }
+        return None;
     }
 
-    let reader = BufReader::new(stream);
-    let mut writer = std::io::BufWriter::new(stream);
+    Some(match protocol::parse_request(line) {
+        Ok(req) => {
+            let result = if req.method == "metrics.snapshot" {
+                Ok(metrics.snapshot())
+            } else {
+                dispatch::dispatch(&req.method, &req.params)
+            };
+            match result {
+                Ok(result) => {
+                    metrics.record_success(&req.method, start.elapsed());
+                    protocol::success_response(&req.id, &result)
+                }
+                Err(rpc_err) => {
+                    metrics.record_error(&req.method, start.elapsed());
+                    protocol::error_response(&req.id, rpc_err.code, &rpc_err.message)
+                }
+            }
+        }
+        Err(parse_err) => {
+            metrics.record_error("_parse", start.elapsed());
+            protocol::error_response(
+                &parse_err.id,
+                parse_err.error.code,
+                &parse_err.error.message,
+            )
+        }
+    })
+}
 
-    for line in reader.lines() {
-        let line = match line {
-            Ok(l) if l.trim().is_empty() => continue,
-            Ok(l) => l,
-            Err(_) => break,
-        };
+/// Process a JSON-RPC batch. Returns `None` if all requests are notifications.
+fn process_batch(line: &str, metrics: &Metrics, start: std::time::Instant) -> Option<String> {
+    let elements = protocol::parse_batch(line);
+    if elements.is_empty() {
+        return Some(protocol::error_response(
+            &serde_json::Value::Null,
+            -32600,
+            "Invalid Request",
+        ));
+    }
 
-        let start = std::time::Instant::now();
+    let mut responses: Vec<String> = Vec::new();
+    for elem in elements {
+        if protocol::is_notification(&elem) {
+            if let Ok(req) = protocol::parse_request(&elem) {
+                let result = if req.method == "metrics.snapshot" {
+                    Ok(metrics.snapshot())
+                } else {
+                    dispatch::dispatch(&req.method, &req.params)
+                };
+                match &result {
+                    Ok(_) => metrics.record_success(&req.method, start.elapsed()),
+                    Err(_) => metrics.record_error(&req.method, start.elapsed()),
+                }
+            }
+            continue;
+        }
 
-        let response = match protocol::parse_request(&line) {
+        let resp = match protocol::parse_request(&elem) {
             Ok(req) => {
-                // Server-level intercept for metrics (needs Metrics reference)
                 let result = if req.method == "metrics.snapshot" {
                     Ok(metrics.snapshot())
                 } else {
@@ -164,12 +218,49 @@ fn handle_connection(stream: &std::os::unix::net::UnixStream, metrics: &Metrics)
                 )
             }
         };
+        responses.push(resp);
+    }
 
-        let write_ok = writer.write_all(response.as_bytes()).is_ok()
-            && writer.write_all(b"\n").is_ok()
-            && writer.flush().is_ok();
-        if !write_ok {
-            break;
+    if responses.is_empty() {
+        return None;
+    }
+
+    let batch_resp = format!("[{}]", responses.join(","));
+    Some(batch_resp)
+}
+
+/// Handle a single client connection: read newline-delimited JSON-RPC, dispatch, respond.
+fn handle_connection(stream: &std::os::unix::net::UnixStream, metrics: &Metrics) {
+    if let Err(e) = stream.set_read_timeout(Some(CONNECTION_READ_TIMEOUT)) {
+        tracing::warn!(error = %e, "set read timeout");
+        return;
+    }
+
+    let reader = BufReader::new(stream);
+    let mut writer = std::io::BufWriter::new(stream);
+
+    for line in reader.lines() {
+        let line = match line {
+            Ok(l) if l.trim().is_empty() => continue,
+            Ok(l) => l,
+            Err(_) => break,
+        };
+
+        let start = std::time::Instant::now();
+
+        let response_opt = if protocol::is_batch(&line) {
+            process_batch(&line, metrics, start)
+        } else {
+            process_single(&line, metrics, start)
+        };
+
+        if let Some(response) = response_opt {
+            let write_ok = writer.write_all(response.as_bytes()).is_ok()
+                && writer.write_all(b"\n").is_ok()
+                && writer.flush().is_ok();
+            if !write_ok {
+                break;
+            }
         }
     }
 }
@@ -180,7 +271,10 @@ fn resolve_bind_path() -> PathBuf {
 }
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used)]
+#[expect(
+    clippy::unwrap_used,
+    reason = "test module: assertions use unwrap for clarity"
+)]
 mod tests {
     use super::*;
     use std::io::{BufRead, BufReader, Write};
@@ -407,5 +501,144 @@ mod tests {
             .total_calls
             .load(std::sync::atomic::Ordering::Relaxed);
         assert!(total >= 1, "expected at least 1 call, got {total}");
+    }
+
+    #[test]
+    fn server_empty_batch_returns_invalid_request() {
+        let dir = tempfile::tempdir().unwrap();
+        let sock = dir.path().join("test_empty_batch.sock");
+        let server = Server::bind(&sock).unwrap();
+        let server_path = server.socket_path().to_path_buf();
+
+        std::thread::spawn(move || server.run());
+        std::thread::sleep(Duration::from_millis(50));
+
+        let stream = UnixStream::connect(&server_path).unwrap();
+        let mut writer = std::io::BufWriter::new(&stream);
+        writer.write_all(b"[]\n").unwrap();
+        writer.flush().unwrap();
+
+        let mut reader = BufReader::new(&stream);
+        let mut response = String::new();
+        reader.read_line(&mut response).unwrap();
+
+        let val: serde_json::Value = serde_json::from_str(&response).unwrap();
+        assert_eq!(val["error"]["code"], -32600);
+    }
+
+    #[test]
+    fn server_all_notification_batch_no_response() {
+        let dir = tempfile::tempdir().unwrap();
+        let sock = dir.path().join("test_all_notif.sock");
+        let server = Server::bind(&sock).unwrap();
+        let server_path = server.socket_path().to_path_buf();
+
+        std::thread::spawn(move || server.run());
+        std::thread::sleep(Duration::from_millis(50));
+
+        let stream = UnixStream::connect(&server_path).unwrap();
+        let mut writer = std::io::BufWriter::new(&stream);
+        let mut reader = BufReader::new(&stream);
+
+        let batch = r#"[{"jsonrpc":"2.0","method":"health.check","params":{}},{"jsonrpc":"2.0","method":"health.check","params":{}}]"#;
+        writer.write_all(batch.as_bytes()).unwrap();
+        writer.write_all(b"\n").unwrap();
+        writer.flush().unwrap();
+
+        let probe = r#"{"jsonrpc":"2.0","method":"health.check","params":{},"id":999}"#;
+        writer.write_all(probe.as_bytes()).unwrap();
+        writer.write_all(b"\n").unwrap();
+        writer.flush().unwrap();
+
+        let mut response = String::new();
+        reader.read_line(&mut response).unwrap();
+        let val: serde_json::Value = serde_json::from_str(&response).unwrap();
+        assert_eq!(
+            val["id"], 999,
+            "probe after all-notification batch gets response"
+        );
+    }
+
+    #[test]
+    fn server_mixed_batch_returns_array() {
+        let dir = tempfile::tempdir().unwrap();
+        let sock = dir.path().join("test_mixed_batch.sock");
+        let server = Server::bind(&sock).unwrap();
+        let server_path = server.socket_path().to_path_buf();
+
+        std::thread::spawn(move || server.run());
+        std::thread::sleep(Duration::from_millis(50));
+
+        let stream = UnixStream::connect(&server_path).unwrap();
+        let mut writer = std::io::BufWriter::new(&stream);
+        let batch = r#"[{"jsonrpc":"2.0","method":"health.check","params":{}},{"jsonrpc":"2.0","method":"health.check","params":{},"id":42}]"#;
+        writer.write_all(batch.as_bytes()).unwrap();
+        writer.write_all(b"\n").unwrap();
+        writer.flush().unwrap();
+
+        let mut reader = BufReader::new(&stream);
+        let mut response = String::new();
+        reader.read_line(&mut response).unwrap();
+
+        let val: serde_json::Value = serde_json::from_str(&response).unwrap();
+        let arr = val.as_array().unwrap();
+        assert_eq!(arr.len(), 1);
+        assert_eq!(arr[0]["id"], 42);
+    }
+
+    #[test]
+    fn server_single_notification_no_response() {
+        let dir = tempfile::tempdir().unwrap();
+        let sock = dir.path().join("test_single_notif.sock");
+        let server = Server::bind(&sock).unwrap();
+        let server_path = server.socket_path().to_path_buf();
+
+        std::thread::spawn(move || server.run());
+        std::thread::sleep(Duration::from_millis(50));
+
+        let stream = UnixStream::connect(&server_path).unwrap();
+        let mut writer = std::io::BufWriter::new(&stream);
+        let mut reader = BufReader::new(&stream);
+
+        let req = r#"{"jsonrpc":"2.0","method":"health.check","params":{}}"#;
+        writer.write_all(req.as_bytes()).unwrap();
+        writer.write_all(b"\n").unwrap();
+        writer.flush().unwrap();
+
+        let probe = r#"{"jsonrpc":"2.0","method":"health.check","params":{},"id":888}"#;
+        writer.write_all(probe.as_bytes()).unwrap();
+        writer.write_all(b"\n").unwrap();
+        writer.flush().unwrap();
+
+        let mut response = String::new();
+        reader.read_line(&mut response).unwrap();
+        let val: serde_json::Value = serde_json::from_str(&response).unwrap();
+        assert_eq!(val["id"], 888, "probe after notification gets response");
+    }
+
+    #[test]
+    fn server_id_null_gets_response() {
+        let dir = tempfile::tempdir().unwrap();
+        let sock = dir.path().join("test_id_null.sock");
+        let server = Server::bind(&sock).unwrap();
+        let server_path = server.socket_path().to_path_buf();
+
+        std::thread::spawn(move || server.run());
+        std::thread::sleep(Duration::from_millis(50));
+
+        let stream = UnixStream::connect(&server_path).unwrap();
+        let mut writer = std::io::BufWriter::new(&stream);
+        let req = r#"{"jsonrpc":"2.0","method":"health.check","params":{},"id":null}"#;
+        writer.write_all(req.as_bytes()).unwrap();
+        writer.write_all(b"\n").unwrap();
+        writer.flush().unwrap();
+
+        let mut reader = BufReader::new(&stream);
+        let mut response = String::new();
+        reader.read_line(&mut response).unwrap();
+
+        let val: serde_json::Value = serde_json::from_str(&response).unwrap();
+        assert!(val.get("result").is_some());
+        assert!(val["id"].is_null());
     }
 }

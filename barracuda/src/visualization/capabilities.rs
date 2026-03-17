@@ -54,7 +54,7 @@ pub struct VisualizationAnnouncement {
 #[must_use]
 pub fn announcement() -> VisualizationAnnouncement {
     VisualizationAnnouncement {
-        primal: "wetspring".into(),
+        primal: crate::PRIMAL_NAME.into(),
         domain: "ecology".into(),
         version: "1.0.0".into(),
         capabilities: VISUALIZATION_CAPABILITIES

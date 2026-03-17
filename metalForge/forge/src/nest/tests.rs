@@ -2,7 +2,10 @@
 
 //! Nest module tests.
 
-#![expect(clippy::unwrap_used)]
+#![expect(
+    clippy::unwrap_used,
+    reason = "test module: assertions use unwrap for clarity"
+)]
 
 use super::{NestClient, default_socket_path, discover_nestgate_socket};
 use super::{base64, json, time};

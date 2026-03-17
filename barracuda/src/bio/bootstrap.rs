@@ -55,7 +55,8 @@ pub fn resample_columns(alignment: &Alignment, rng: &mut Lcg64) -> Alignment {
         #[expect(
             clippy::cast_precision_loss,
             clippy::cast_possible_truncation,
-            clippy::cast_sign_loss
+            clippy::cast_sign_loss,
+            reason = "precision: bootstrap sample sizes well below 2^53"
         )]
         let idx = ((rng.next_f64() * n as f64) as usize).min(n - 1);
         new_columns.push(alignment.columns[idx].clone());

@@ -151,3 +151,11 @@ pub const COLD_SEEP_SIMPSON_MIN: f64 = 0.7;
 /// Source: Ruff et al. 2019 (170 samples, median `S_obs` > 100).
 /// Validated: Exp185, commit `756df26`, 2026-02-26.
 pub const COLD_SEEP_OBS_FEATURES_MIN: f64 = 50.0;
+
+/// Rare biosphere lineage threshold (fraction of total abundance).
+///
+/// OTUs with relative abundance below this are classified as "rare"
+/// lineages. 0.001 (0.1%) matches Anderson, Sogin & Baross (2015)
+/// FEMS Microbiol Ecol 91:fiu016 methodology for vent community analysis.
+/// Validated: Exp051 (rare biosphere), commit `e4358c5`.
+pub const RARE_BIOSPHERE_THRESHOLD: f64 = 0.001;

@@ -36,7 +36,11 @@ use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
 
-#[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
+#[expect(
+    clippy::too_many_lines,
+    clippy::cast_precision_loss,
+    reason = "validation harness: sequential domain checks in single function; precision: bounded integer→f64 for validation metrics"
+)]
 fn main() {
     let mut v = Validator::new("BarraCuda CPU v3 — All 18 Domains");
     let mut timings: Vec<(&str, f64)> = Vec::new();

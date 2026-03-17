@@ -67,7 +67,10 @@ fn main() {
     validate_reconciliation(&mut v);
     validate_molecular_clock(&mut v);
 
-    #[expect(clippy::cast_precision_loss)]
+    #[expect(
+        clippy::cast_precision_loss,
+        reason = "precision: bounded integer→f64 for validation metrics"
+    )]
     let elapsed_us = t_total.elapsed().as_nanos() as f64 / 1000.0;
     println!("\n  Total v8 validation: {elapsed_us:.0} µs");
 
@@ -75,7 +78,10 @@ fn main() {
 }
 
 fn print_timing(label: &str, t0: Instant) {
-    #[expect(clippy::cast_precision_loss)]
+    #[expect(
+        clippy::cast_precision_loss,
+        reason = "precision: bounded integer→f64 for validation metrics"
+    )]
     let us = t0.elapsed().as_nanos() as f64 / 1000.0;
     println!("    {label}: {us:.0} µs");
 }

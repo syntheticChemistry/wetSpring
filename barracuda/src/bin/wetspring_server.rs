@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-//! wetSpring — biomeOS science primal (UniBin).
+//! wetSpring — biomeOS science primal (`UniBin`).
 //!
 //! Listens on a Unix socket (or TCP via `WETSPRING_TCP_ADDR`) and handles
 //! JSON-RPC 2.0 requests for science capabilities (diversity, QS model,

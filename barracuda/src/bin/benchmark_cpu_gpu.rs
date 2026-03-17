@@ -185,7 +185,10 @@ fn format_time(us: f64) -> String {
 const WARMUP: usize = 3;
 
 /// Time a closure with energy monitoring, returning (microseconds/iter, energy report).
-#[expect(clippy::cast_precision_loss)]
+#[expect(
+    clippy::cast_precision_loss,
+    reason = "precision: bounded integer→f64 for validation metrics"
+)]
 fn bench_with_energy<F: FnMut()>(mut f: F) -> (f64, EnergyReport) {
     for _ in 0..WARMUP {
         f();
@@ -239,7 +242,10 @@ fn bench_simpson(gpu: &GpuF64, report: &mut BenchReport) {
 
 // ── Variance ─────────────────────────────────────────────────────────
 
-#[expect(clippy::cast_precision_loss)]
+#[expect(
+    clippy::cast_precision_loss,
+    reason = "precision: bounded integer→f64 for validation metrics"
+)]
 fn bench_variance(gpu: &GpuF64, report: &mut BenchReport) {
     for &n in &[1_000, 10_000, 100_000, 1_000_000] {
         let data = generate_f64(n, 7);

@@ -227,7 +227,7 @@ impl LivePipelineSession {
                     id: stage.id.clone(),
                     name: stage.name.clone(),
                     node_type: "pipeline".into(),
-                    family: "wetspring".into(),
+                    family: crate::PRIMAL_NAME.into(),
                     status: stage.status.clone(),
                     health,
                     confidence: 100,

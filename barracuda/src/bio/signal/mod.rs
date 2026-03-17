@@ -23,6 +23,7 @@ mod prominence;
 mod smoothing;
 
 pub use peak_detect::{find_peaks, find_peaks_with_area, integrate_peak};
+pub use smoothing::{savitzky_golay, savitzky_golay_coefficients};
 
 /// Detected peak with its properties.
 #[derive(Debug, Clone, PartialEq)]

@@ -84,7 +84,10 @@ impl SubstrateRouter {
         }
     }
 
-    #[expect(clippy::match_same_arms)]
+    #[expect(
+        clippy::match_same_arms,
+        reason = "validation: explicit arms for documentation clarity"
+    )]
     const fn route(&self, class: WorkloadClass) -> Substrate {
         match class {
             WorkloadClass::BatchParallel | WorkloadClass::MatrixReduce => {

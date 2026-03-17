@@ -39,6 +39,7 @@
 //! - Slevin & Ohtsuki, PRL 82 (1999): `W_c` = 16.54 ± 0.10
 //! - Rodriguez et al., PRB 84 (2011): ν = 1.571 ± 0.004
 
+#[cfg(feature = "gpu")]
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 

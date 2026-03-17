@@ -55,7 +55,10 @@ impl IpcError {
     /// `false` for codec, socket-path, and RPC-reject errors (which are deterministic).
     #[must_use]
     pub const fn is_retriable(&self) -> bool {
-        matches!(self, Self::Connect(_) | Self::Transport(_) | Self::EmptyResponse)
+        matches!(
+            self,
+            Self::Connect(_) | Self::Transport(_) | Self::EmptyResponse
+        )
     }
 
     /// Whether this error is likely caused by a timeout or slow peer.
@@ -257,10 +260,26 @@ mod tests {
 
     #[test]
     fn ipc_error_display_all_variants() {
-        assert!(IpcError::SocketPath("bad".into()).to_string().contains("socket"));
-        assert!(IpcError::Connect("refused".into()).to_string().contains("connect"));
-        assert!(IpcError::Transport("broken pipe".into()).to_string().contains("transport"));
-        assert!(IpcError::Codec("invalid json".into()).to_string().contains("codec"));
+        assert!(
+            IpcError::SocketPath("bad".into())
+                .to_string()
+                .contains("socket")
+        );
+        assert!(
+            IpcError::Connect("refused".into())
+                .to_string()
+                .contains("connect")
+        );
+        assert!(
+            IpcError::Transport("broken pipe".into())
+                .to_string()
+                .contains("transport")
+        );
+        assert!(
+            IpcError::Codec("invalid json".into())
+                .to_string()
+                .contains("codec")
+        );
         assert!(
             IpcError::RpcReject {
                 code: -32601,
@@ -343,17 +362,21 @@ mod tests {
 
     #[test]
     fn ipc_method_not_found() {
-        assert!(IpcError::RpcReject {
-            code: -32601,
-            message: "method not found".into()
-        }
-        .is_method_not_found());
+        assert!(
+            IpcError::RpcReject {
+                code: -32601,
+                message: "method not found".into()
+            }
+            .is_method_not_found()
+        );
 
-        assert!(!IpcError::RpcReject {
-            code: -32602,
-            message: "invalid params".into()
-        }
-        .is_method_not_found());
+        assert!(
+            !IpcError::RpcReject {
+                code: -32602,
+                message: "invalid params".into()
+            }
+            .is_method_not_found()
+        );
 
         assert!(!IpcError::Connect("refused".into()).is_method_not_found());
     }

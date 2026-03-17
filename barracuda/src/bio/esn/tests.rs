@@ -7,6 +7,13 @@
     clippy::cast_lossless,
     reason = "test module: explicit casts for readability in ESN math"
 )]
+#![cfg_attr(
+    feature = "gpu",
+    expect(
+        clippy::expect_used,
+        reason = "test module: GPU assertions use expect for clarity"
+    )
+)]
 
 use super::*;
 
@@ -427,7 +434,7 @@ fn bio_esn_to_npu_weights() {
     };
     let mut bio_esn = BioEsn::new(&config).expect("BioEsn::new");
     let inputs: Vec<Vec<f64>> = (0..20)
-        .map(|i| vec![(i as f64) * 0.1, 1.0 - (i as f64) * 0.05])
+        .map(|i| vec![(i as f64) * 0.1, (i as f64).mul_add(-0.05, 1.0)])
         .collect();
     let targets: Vec<Vec<f64>> = (0..20)
         .map(|i| {

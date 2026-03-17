@@ -6,6 +6,8 @@
 //! `visualization.render.stream` JSON-RPC methods.
 
 #[cfg(feature = "ipc")]
+use crate::ipc::discover;
+#[cfg(feature = "ipc")]
 use crate::ipc::primal_names::PETALTONGUE;
 #[cfg(not(feature = "ipc"))]
 const PETALTONGUE: &str = "petaltongue";
@@ -55,6 +57,31 @@ impl std::error::Error for PushError {}
 /// Result type for push operations.
 pub type PushResult<T> = Result<T, PushError>;
 
+/// Standard discovery logic when `ipc` feature is disabled (no access to `discover` module).
+/// Mirrors `discover::discover_socket` resolution order.
+#[cfg(not(feature = "ipc"))]
+fn discover_petaltongue_fallback(env_var: &str, primal: &str) -> Option<PathBuf> {
+    if let Ok(path) = std::env::var(env_var) {
+        let p = PathBuf::from(path);
+        if p.exists() {
+            return Some(p);
+        }
+    }
+    if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
+        let p = PathBuf::from(xdg)
+            .join("biomeos")
+            .join(format!("{primal}-default.sock"));
+        if p.exists() {
+            return Some(p);
+        }
+    }
+    let fallback = std::env::temp_dir().join(format!("{primal}-default.sock"));
+    if fallback.exists() {
+        return Some(fallback);
+    }
+    None
+}
+
 fn build_render_params(
     session_id: &str,
     title: &str,
@@ -103,48 +130,34 @@ fn build_gauge_params(session_id: &str, binding_id: &str, value: f64) -> serde_j
 }
 
 impl PetalTonguePushClient {
-    /// Discover `petalTongue` socket at runtime.
+    /// Discover `petalTongue` socket at runtime using the standard discovery pattern.
     ///
-    /// Resolution order:
-    /// 1. `PETALTONGUE_SOCKET` env var
-    /// 2. `$XDG_RUNTIME_DIR/petaltongue/*.sock`
-    /// 3. `<temp_dir>/petaltongue-*.sock` (platform-agnostic fallback)
+    /// Resolution order (via [`crate::ipc::discover::discover_socket`]):
+    /// 1. `{PRIMAL}_SOCKET` env var (e.g. `PETALTONGUE_SOCKET`)
+    /// 2. `$XDG_RUNTIME_DIR/biomeos/{primal}-default.sock`
+    /// 3. `<temp_dir>/{primal}-default.sock` (platform-agnostic fallback)
     ///
     /// # Errors
     ///
     /// Returns [`PushError::NotFound`] if no `petalTongue` socket is found.
     pub fn discover() -> PushResult<Self> {
-        if let Ok(path) = std::env::var("PETALTONGUE_SOCKET") {
-            let path = PathBuf::from(path);
-            if path.exists() {
-                return Ok(Self { socket_path: path });
+        #[cfg(feature = "ipc")]
+        {
+            discover::discover_socket(&discover::socket_env_var(PETALTONGUE), PETALTONGUE)
+                .map_or_else(
+                    || Err(PushError::NotFound("no petalTongue socket found".into())),
+                    |p| Ok(Self { socket_path: p }),
+                )
+        }
+        #[cfg(not(feature = "ipc"))]
+        {
+            let env_var = format!("{}_SOCKET", PETALTONGUE.to_ascii_uppercase());
+            let path = discover_petaltongue_fallback(&env_var, PETALTONGUE);
+            match path {
+                Some(p) => Ok(Self { socket_path: p }),
+                None => Err(PushError::NotFound("no petalTongue socket found".into())),
             }
         }
-        if let Ok(runtime) = std::env::var("XDG_RUNTIME_DIR") {
-            let dir = PathBuf::from(runtime).join(PETALTONGUE);
-            if dir.is_dir() {
-                if let Ok(entries) = std::fs::read_dir(&dir) {
-                    for entry in entries.flatten() {
-                        let p = entry.path();
-                        if p.extension().is_some_and(|e| e == "sock") {
-                            return Ok(Self { socket_path: p });
-                        }
-                    }
-                }
-            }
-        }
-        if let Ok(entries) = std::fs::read_dir(std::env::temp_dir()) {
-            for entry in entries.flatten() {
-                let name = entry.file_name();
-                let name = name.to_string_lossy();
-                if name.starts_with(PETALTONGUE) && name.ends_with(".sock") {
-                    return Ok(Self {
-                        socket_path: entry.path(),
-                    });
-                }
-            }
-        }
-        Err(PushError::NotFound("no petalTongue socket found".into()))
     }
 
     /// Create client with an explicit socket path.

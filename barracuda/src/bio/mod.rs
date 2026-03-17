@@ -3,6 +3,7 @@
 
 pub mod adapter;
 pub mod alignment;
+pub mod anderson_spectral;
 pub mod ani;
 #[cfg(feature = "gpu")]
 pub mod ani_gpu;
@@ -88,6 +89,7 @@ pub mod ncbi_data;
 pub mod neighbor_joining;
 #[cfg(feature = "gpu")]
 pub mod neighbor_joining_gpu;
+pub mod numerics;
 pub mod ode;
 #[cfg(feature = "gpu")]
 pub mod ode_sweep_gpu;

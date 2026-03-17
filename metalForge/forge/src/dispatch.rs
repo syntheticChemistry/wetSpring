@@ -207,7 +207,10 @@ pub fn route_bandwidth_aware<'a>(
 }
 
 #[cfg(test)]
-#[expect(clippy::expect_used)]
+#[expect(
+    clippy::expect_used,
+    reason = "test module: assertions use expect for clarity"
+)]
 mod tests {
     use super::*;
     use crate::substrate::{Identity, Properties, SubstrateOrigin};

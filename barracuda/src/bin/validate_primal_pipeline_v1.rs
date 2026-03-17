@@ -58,7 +58,7 @@ use wetspring_barracuda::ipc::discover;
 use wetspring_barracuda::ipc::primal_names;
 use wetspring_barracuda::validation::{OrExit, Validator};
 
-/// Discover ToadStool socket (tries both .sock and .jsonrpc.sock).
+/// Discover `ToadStool` socket (tries both `.sock` and `.jsonrpc.sock`).
 #[must_use]
 fn discover_toadstool_socket() -> Option<PathBuf> {
     if let Ok(path) = std::env::var("TOADSTOOL_SOCKET") {
@@ -68,8 +68,7 @@ fn discover_toadstool_socket() -> Option<PathBuf> {
         }
     }
     let base = std::env::var("XDG_RUNTIME_DIR")
-        .map(PathBuf::from)
-        .unwrap_or_else(|_| std::env::temp_dir())
+        .map_or_else(|_| std::env::temp_dir(), PathBuf::from)
         .join(primal_names::BIOMEOS);
     for suffix in ["toadstool-default.sock", "toadstool-default.jsonrpc.sock"] {
         let p = base.join(suffix);
@@ -362,7 +361,7 @@ fn main() {
             id: "primal_pipeline".into(),
             name: "Primal Integration Pipeline".into(),
             node_type: "pipeline".into(),
-            family: "wetspring".into(),
+            family: primal_names::SELF.into(),
             status: if primals_found >= 3 {
                 "healthy"
             } else {

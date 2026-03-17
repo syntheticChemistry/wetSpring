@@ -299,7 +299,7 @@ fn validate_nucleus_atomics(v: &mut Validator) {
     );
     v.check_pass(
         "Tower: primal identity = wetspring",
-        health["primal"] == "wetspring",
+        health["primal"] == wetspring_barracuda::ipc::primal_names::SELF,
     );
 
     v.check_pass(

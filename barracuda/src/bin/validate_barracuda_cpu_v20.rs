@@ -37,6 +37,7 @@ use std::time::{Duration, Instant};
 
 use wetspring_barracuda::df64_host;
 use wetspring_barracuda::encoding;
+use wetspring_barracuda::ipc::primal_names;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
@@ -69,10 +70,34 @@ fn main() {
     v.check_pass("Provenance: empty chain is_empty", chain.is_empty());
     d27 += 1;
 
-    chain.append("ingest", "nestgate", [1u8; 32], [2u8; 32], "eastgate");
-    chain.append("diversity", "wetspring", [1u8; 32], [3u8; 32], "eastgate");
-    chain.append("anderson", "toadstool", [1u8; 32], [4u8; 32], "eastgate");
-    chain.append("export", "wetspring", [1u8; 32], [5u8; 32], "eastgate");
+    chain.append(
+        "ingest",
+        primal_names::NESTGATE,
+        [1u8; 32],
+        [2u8; 32],
+        "eastgate",
+    );
+    chain.append(
+        "diversity",
+        primal_names::SELF,
+        [1u8; 32],
+        [3u8; 32],
+        "eastgate",
+    );
+    chain.append(
+        "anderson",
+        primal_names::TOADSTOOL,
+        [1u8; 32],
+        [4u8; 32],
+        "eastgate",
+    );
+    chain.append(
+        "export",
+        primal_names::SELF,
+        [1u8; 32],
+        [5u8; 32],
+        "eastgate",
+    );
 
     v.check_count("Provenance: chain length", chain.len(), 4);
     d27 += 1;
@@ -85,13 +110,13 @@ fn main() {
     d27 += 1;
     v.check_count(
         "Provenance: wetspring actor count",
-        chain.by_actor("wetspring").count(),
+        chain.by_actor(primal_names::SELF).count(),
         2,
     );
     d27 += 1;
     v.check_count(
         "Provenance: toadstool actor count",
-        chain.by_actor("toadstool").count(),
+        chain.by_actor(primal_names::TOADSTOOL).count(),
         1,
     );
     d27 += 1;
@@ -118,7 +143,7 @@ fn main() {
     let ticket = ConsentTicket::new(
         "eastgate-family",
         ConsentScope::FullPipeline,
-        "wetspring",
+        primal_names::SELF,
         Duration::from_secs(3600),
     );
     v.check_pass("Consent: new ticket is valid", ticket.is_valid());

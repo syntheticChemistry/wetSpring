@@ -194,3 +194,13 @@ pub const FAO56_ET0_PARITY: f64 = 0.15;
 /// datasets with N < 100 samples.
 /// Validated: Exp157 (cross-spring S86).
 pub const INTERCEPT_NEAR_ZERO: f64 = 0.5;
+
+/// Minimum spectral change for Anderson treatment effect detection.
+///
+/// When comparing level-spacing ratio r before/after pharmacological
+/// intervention (e.g., JAK inhibitor, anti-IL-31), a change greater
+/// than this threshold indicates the treatment had a measurable
+/// effect on the Anderson regime. 0.001 distinguishes genuine
+/// spectral shifts from finite-size fluctuations.
+/// Validated: Exp273 (skin Anderson s79), Paper 12 immunological model.
+pub const SPECTRAL_TREATMENT_EFFECT_MIN: f64 = 0.001;
