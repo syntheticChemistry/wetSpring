@@ -48,6 +48,48 @@ impl fmt::Display for IpcError {
 
 impl std::error::Error for IpcError {}
 
+impl IpcError {
+    /// Whether this error is likely transient and the operation can be retried.
+    ///
+    /// Returns `true` for connection and transport failures;
+    /// `false` for codec, socket-path, and RPC-reject errors (which are deterministic).
+    #[must_use]
+    pub const fn is_retriable(&self) -> bool {
+        matches!(self, Self::Connect(_) | Self::Transport(_) | Self::EmptyResponse)
+    }
+
+    /// Whether this error is likely caused by a timeout or slow peer.
+    ///
+    /// Heuristic: checks for common timeout-related substrings in transport
+    /// and connect messages. Useful for circuit-breaker / backoff logic.
+    #[must_use]
+    pub fn is_timeout_likely(&self) -> bool {
+        match self {
+            Self::Transport(msg) | Self::Connect(msg) => {
+                let lower = msg.to_ascii_lowercase();
+                lower.contains("timeout")
+                    || lower.contains("timed out")
+                    || lower.contains("deadline")
+                    || lower.contains("wouldblock")
+            }
+            Self::EmptyResponse => true,
+            Self::SocketPath(_) | Self::Codec(_) | Self::RpcReject { .. } => false,
+        }
+    }
+
+    /// Whether the remote primal rejected the call as "method not found" (`-32601`).
+    #[must_use]
+    pub const fn is_method_not_found(&self) -> bool {
+        matches!(self, Self::RpcReject { code: -32601, .. })
+    }
+
+    /// Whether this is a connection-level failure (socket unreachable).
+    #[must_use]
+    pub const fn is_connection_error(&self) -> bool {
+        matches!(self, Self::Connect(_) | Self::SocketPath(_))
+    }
+}
+
 /// Errors produced by wetSpring parsers and algorithms.
 #[derive(Debug)]
 pub enum Error {
@@ -268,5 +310,59 @@ mod tests {
     fn ipc_variant_has_source() {
         let err = Error::Ipc(IpcError::EmptyResponse);
         assert!(std::error::Error::source(&err).is_some());
+    }
+
+    #[test]
+    fn ipc_retriable_variants() {
+        assert!(IpcError::Connect("refused".into()).is_retriable());
+        assert!(IpcError::Transport("broken pipe".into()).is_retriable());
+        assert!(IpcError::EmptyResponse.is_retriable());
+
+        assert!(!IpcError::SocketPath("bad".into()).is_retriable());
+        assert!(!IpcError::Codec("invalid".into()).is_retriable());
+        assert!(
+            !IpcError::RpcReject {
+                code: -32601,
+                message: "not found".into()
+            }
+            .is_retriable()
+        );
+    }
+
+    #[test]
+    fn ipc_timeout_detection() {
+        assert!(IpcError::Transport("read timeout exceeded".into()).is_timeout_likely());
+        assert!(IpcError::Connect("connection timed out".into()).is_timeout_likely());
+        assert!(IpcError::Transport("WouldBlock on read".into()).is_timeout_likely());
+        assert!(IpcError::EmptyResponse.is_timeout_likely());
+
+        assert!(!IpcError::Transport("broken pipe".into()).is_timeout_likely());
+        assert!(!IpcError::Connect("refused".into()).is_timeout_likely());
+        assert!(!IpcError::Codec("invalid json".into()).is_timeout_likely());
+    }
+
+    #[test]
+    fn ipc_method_not_found() {
+        assert!(IpcError::RpcReject {
+            code: -32601,
+            message: "method not found".into()
+        }
+        .is_method_not_found());
+
+        assert!(!IpcError::RpcReject {
+            code: -32602,
+            message: "invalid params".into()
+        }
+        .is_method_not_found());
+
+        assert!(!IpcError::Connect("refused".into()).is_method_not_found());
+    }
+
+    #[test]
+    fn ipc_connection_error() {
+        assert!(IpcError::Connect("refused".into()).is_connection_error());
+        assert!(IpcError::SocketPath("bad path".into()).is_connection_error());
+        assert!(!IpcError::Transport("broken pipe".into()).is_connection_error());
+        assert!(!IpcError::EmptyResponse.is_connection_error());
     }
 }

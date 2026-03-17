@@ -9,7 +9,9 @@
 //!
 //! | Method                          | Description                                  |
 //! |---------------------------------|----------------------------------------------|
-//! | `health.check`                  | Health/readiness probe                       |
+//! | `health.check`                  | Full health/readiness probe (legacy)         |
+//! | `health.liveness`               | Minimal liveness probe (`alive: true`)       |
+//! | `health.readiness`              | Deep readiness probe with subsystem status   |
 //! | `science.diversity`             | Alpha diversity metrics (Shannon, Simpson, …) |
 //! | `science.anderson`              | Anderson spectral analysis (GPU-preferred)    |
 //! | `science.qs_model`              | QS/c-di-GMP biofilm ODE integration          |

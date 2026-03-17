@@ -3,6 +3,49 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V126] — 2026-03-16
+
+### DispatchOutcome, Health Probes, IpcError Query Helpers, Audit Sweep
+
+Cross-ecosystem absorption: protocol vs application error separation, biomeOS health
+probes, circuit-breaker query methods, and comprehensive codebase audit.
+Zero new warnings, 1,443+ tests (0 failures on non-GPU). Full audit: zero unsafe,
+zero mocks in production, zero hardcoding in library code, zero TODO/FIXME.
+
+#### `DispatchOutcome<T>` Enum (groundSpring/airSpring/sweetGrass pattern)
+- New `DispatchOutcome<T>` in `compute_dispatch.rs`: separates protocol-level IPC
+  errors (retriable) from application-level errors (deterministic rejection)
+- Three variants: `Success(T)`, `Protocol(DispatchError)`, `Application { code, message }`
+- `is_success()`, `is_retriable()`, `into_result()` methods for ergonomic matching
+- `submit_outcome()` + `submit_outcome_to()` parallel the existing `submit()` API
+- Internal `rpc_call_outcome()` separates transport failures from JSON-RPC errors
+- 3 new tests: outcome variants, into_result conversion, no-primal fallback
+
+#### `health.liveness` + `health.readiness` Probes (healthSpring V32 pattern)
+- `health.liveness` — minimal `{"alive": true}` probe for fast biomeOS keep-alive
+- `health.readiness` — deep probe with per-subsystem status (`math`, `gpu`, `ipc`)
+- `health.check` delegates to `health.readiness` (backward compatible)
+- New `health` capability domain (3 methods) in domain registry
+- Updated CAPABILITIES: 24 methods across 16 domains (was 20/15)
+- 2 new dispatch tests: liveness alive check, readiness subsystem report
+- Capability domain tests updated: 5 families, 16 domains, 23 domain methods
+
+#### `IpcError` Query Helpers (sweetGrass circuit-breaker pattern)
+- `is_retriable()` — `Connect`, `Transport`, `EmptyResponse` are retriable
+- `is_timeout_likely()` — heuristic substring check for timeout/WouldBlock
+- `is_method_not_found()` — matches `RpcReject { code: -32601, .. }`
+- `is_connection_error()` — matches `Connect` and `SocketPath` variants
+- Enables circuit-breaker / exponential-backoff logic without string matching
+- 4 new tests: retriable variants, timeout detection, method-not-found, connection error
+
+#### Comprehensive Codebase Audit
+- **Unsafe**: Zero — `#![forbid(unsafe_code)]` in lib.rs + all binaries
+- **Mocks**: All properly isolated to `#[cfg(test)]` with production DI (`HttpGetFn`)
+- **Hardcoding**: Only in validation binaries (correct hotSpring pattern); zero in library
+- **TODO/FIXME/HACK**: Zero in production Rust code
+- **External deps**: All pure Rust or explicit `rust_backend` (flate2)
+- **File sizes**: Largest non-binary file 654 lines, all within single-responsibility cohesion
+
 ## [V125] — 2026-03-16
 
 ### Structured IpcError, Dual-Format Capabilities, Discovery Helpers, Binary Fixes

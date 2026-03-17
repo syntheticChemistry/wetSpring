@@ -30,6 +30,8 @@ pub use handlers::{extract_f64_array, extract_string_array};
 pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
     match method {
         "health.check" => handlers::handle_health(),
+        "health.liveness" => handlers::handle_health_liveness(),
+        "health.readiness" => handlers::handle_health_readiness(),
         "capability.list" => handlers::handle_capability_list(),
 
         // Core science capabilities
@@ -270,10 +272,11 @@ mod tests {
         assert_eq!(result["domain"], "ecology");
 
         let domains = result["domains"].as_array().unwrap();
-        assert_eq!(domains.len(), 15);
+        assert_eq!(domains.len(), 16);
 
         let domain_names: Vec<&str> = domains.iter().filter_map(|d| d["name"].as_str()).collect();
         assert!(domain_names.contains(&"ecology.diversity"));
+        assert!(domain_names.contains(&"health"));
         assert!(domain_names.contains(&"provenance"));
         assert!(domain_names.contains(&"brain"));
         assert!(domain_names.contains(&"metrics"));
@@ -290,6 +293,24 @@ mod tests {
             .filter_map(|d| d["methods"].as_array())
             .map(Vec::len)
             .sum();
-        assert_eq!(total_methods, 20);
+        assert_eq!(total_methods, 23);
+    }
+
+    #[test]
+    fn dispatch_health_liveness() {
+        let result = dispatch("health.liveness", &json!({})).unwrap();
+        assert_eq!(result["alive"], true);
+        assert_eq!(result["primal"], crate::ipc::primal_names::SELF);
+    }
+
+    #[test]
+    fn dispatch_health_readiness() {
+        let result = dispatch("health.readiness", &json!({})).unwrap();
+        assert_eq!(result["ready"], true);
+        assert_eq!(result["status"], "healthy");
+        assert_eq!(result["primal"], crate::ipc::primal_names::SELF);
+        let subs = &result["subsystems"];
+        assert_eq!(subs["math"], true);
+        assert_eq!(subs["ipc"], true);
     }
 }

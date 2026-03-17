@@ -2,7 +2,7 @@
 
 **Date:** March 16, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V125 — 376 experiments, 5,707+ validation checks, ALL PASS; 1,719+ tests (0 failures), 354 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 784+ WGSL shaders), toadStool S155, coralReef Phase 10. V125: structured `IpcError` enum (28 sites, healthSpring/biomeOS pattern), dual-format `extract_capabilities()` (groundSpring/ludoSpring), generic `socket_env_var()`/`discover_primal()` (sweetGrass pattern), 18 binary OrExit import fixes. V124: workspace `deny.toml`, typed `compute.dispatch` IPC client, structured `tracing`. V123: zero-panic `OrExit`, dual-format discovery, `extract_rpc_error()`. V122: `#[expect(reason)]`, clippy pedantic+nursery ZERO WARNINGS. 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL.
+**Status:** V126 — 376 experiments, 5,707+ validation checks, ALL PASS; 1,443+ tests (0 failures), 354 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 784+ WGSL shaders), toadStool S155, coralReef Phase 10. V126: `DispatchOutcome<T>` protocol vs application error separation (groundSpring/airSpring/sweetGrass), `health.liveness`/`health.readiness` probes (healthSpring V32), `IpcError` query helpers (`is_retriable()`, `is_timeout_likely()`, `is_method_not_found()`, `is_connection_error()`) for sweetGrass circuit-breaker pattern. 24 capabilities, 16 domains. V125: structured `IpcError` enum, dual-format capabilities, generic discovery. V124: `deny.toml`, `compute.dispatch`, `tracing`. V123: `OrExit`, `extract_rpc_error()`. V122: `#[expect(reason)]`, clippy ZERO WARNINGS. 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL.
 
 ---
 

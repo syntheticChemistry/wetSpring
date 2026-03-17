@@ -9,13 +9,10 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V125** | `handoffs/WETSPRING_V125_IPCERROR_CAPABILITIES_DISCOVERY_HANDOFF_MAR16_2026.md` | Mar 16 | **Structured IpcError + Dual-Format Capabilities + Discovery Helpers** — Typed `IpcError` enum (28 sites, healthSpring/biomeOS pattern). `extract_capabilities()` for flat + nested formats (groundSpring/ludoSpring). `socket_env_var()` + `discover_primal()` (sweetGrass pattern). 18 binary OrExit import fixes. |
-| | *V124 → `handoffs/archive/`* | | V124 handoff archived. |
-| | *V123 → `handoffs/archive/`* | | V123 handoff archived. |
-| | *V122 → `handoffs/archive/`* | | V122 handoff archived. |
-| | *V119–V121 → `handoffs/archive/`* | | V119–V121 handoffs archived. |
-| | *V113–V118 → `handoffs/archive/`* | | V113–V118 handoffs archived. |
-| | *V112 and earlier → `handoffs/archive/`* | | Fossil record: V7–V112 (95+ archived handoffs). 133 total archived. |
+| **V126** | `handoffs/WETSPRING_V126_DISPATCH_OUTCOME_HEALTH_PROBES_HANDOFF_MAR16_2026.md` | Mar 16 | **DispatchOutcome + Health Probes + IpcError Helpers** — `DispatchOutcome<T>` protocol vs application error separation (groundSpring/airSpring/sweetGrass). `health.liveness` + `health.readiness` probes (healthSpring V32). `IpcError` query helpers: `is_retriable()`, `is_timeout_likely()`, `is_method_not_found()`, `is_connection_error()` (sweetGrass circuit-breaker). 24 capabilities, 16 domains. |
+| | `handoffs/WETSPRING_V125_TOADSTOOL_BARRACUDA_ABSORPTION_HANDOFF_MAR16_2026.md` | Mar 16 | **toadStool/barraCuda absorption handoff** — IPC patterns, primitive consumption, ecosystem patterns. |
+| | *V125 → `handoffs/archive/`* | | V125 IpcError handoff archived. |
+| | *V124 and earlier → `handoffs/archive/`* | | Fossil record: V7–V124 (134 total archived). |
 
 ## Cross-Spring Documents
 
@@ -26,7 +23,7 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` — V7–V124 (133 files).
+Superseded handoffs in `handoffs/archive/` — V7–V125 (134 files).
 Preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda.
 
 ## Convention

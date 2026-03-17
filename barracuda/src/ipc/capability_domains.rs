@@ -15,12 +15,13 @@ pub const DOMAIN: &str = "ecology";
 
 /// Recognised domain prefixes for validation.
 #[cfg(test)]
-const VALID_DOMAIN_PREFIXES: &[&str] = &["ecology.", "provenance", "brain", "metrics"];
+const VALID_DOMAIN_PREFIXES: &[&str] = &["ecology.", "health", "provenance", "brain", "metrics"];
 
 /// All capability domains this primal registers with Songbird.
 ///
-/// Covers 4 domain families (19 capabilities total):
+/// Covers 5 domain families (23 capabilities total):
 /// - `ecology.*`   — 12 science capabilities (diversity, ODE, alignment, …)
+/// - `health`      — 3 health probes (check, liveness, readiness)
 /// - `provenance`  — 3 provenance-trio lifecycle methods
 /// - `brain`       — 3 neural sentinel methods
 /// - `metrics`     — 1 server metrics capability
@@ -80,6 +81,12 @@ pub const DOMAINS: &[CapabilityDomain] = &[
         name: "ecology.pipeline",
         description: "End-to-end 16S amplicon analysis pipeline",
         methods: &["science.full_pipeline"],
+    },
+    // ── health probes ──────────────────────────────────────────────
+    CapabilityDomain {
+        name: "health",
+        description: "Liveness and readiness probes for biomeOS orchestration",
+        methods: &["health.check", "health.liveness", "health.readiness"],
     },
     // ── provenance trio ─────────────────────────────────────────────
     CapabilityDomain {
@@ -170,9 +177,10 @@ mod tests {
     }
 
     #[test]
-    fn domains_cover_all_four_families() {
+    fn domains_cover_all_five_families() {
         let names: Vec<&str> = DOMAINS.iter().map(|d| d.name).collect();
         assert!(names.iter().any(|n| n.starts_with("ecology.")));
+        assert!(names.contains(&"health"));
         assert!(names.contains(&"provenance"));
         assert!(names.contains(&"brain"));
         assert!(names.contains(&"metrics"));
@@ -182,18 +190,20 @@ mod tests {
     fn total_capability_count_matches_registry() {
         assert_eq!(
             DOMAINS.len(),
-            15,
-            "15 domains (11 ecology + provenance + brain + metrics + ai_assist)"
+            16,
+            "16 domains (11 ecology + health + provenance + brain + metrics + ai_assist)"
         );
         let total_methods: usize = DOMAINS.iter().map(|d| d.methods.len()).sum();
-        assert_eq!(total_methods, 20, "20 total capability methods");
+        assert_eq!(total_methods, 23, "23 total capability methods");
     }
 
     #[test]
     fn all_methods_returns_flat_list() {
         let methods = all_methods();
-        assert_eq!(methods.len(), 20);
+        assert_eq!(methods.len(), 23);
         assert!(methods.contains(&"science.diversity"));
+        assert!(methods.contains(&"health.liveness"));
+        assert!(methods.contains(&"health.readiness"));
         assert!(methods.contains(&"provenance.begin"));
         assert!(methods.contains(&"brain.observe"));
         assert!(methods.contains(&"metrics.snapshot"));

@@ -43,6 +43,9 @@ use crate::ipc::protocol::RpcError;
 /// introspection method that is not itself a domain capability).
 pub const CAPABILITIES: &[&str] = &[
     "capability.list",
+    "health.check",
+    "health.liveness",
+    "health.readiness",
     "science.diversity",
     "science.anderson",
     "science.qs_model",
@@ -129,28 +132,55 @@ pub fn handle_capability_list() -> Result<Value, RpcError> {
     Ok(response)
 }
 
-/// Health/readiness probe.
+/// Health/readiness probe (legacy — delegates to full readiness).
 pub fn handle_health() -> Result<Value, RpcError> {
+    handle_health_readiness()
+}
+
+/// Minimal liveness probe — confirms the process is alive and responsive.
+///
+/// No subsystem checks — just an immediate `{"alive": true}` response.
+/// Used by biomeOS/sweetGrass orchestrators for fast keep-alive polling.
+pub fn handle_health_liveness() -> Result<Value, RpcError> {
+    Ok(json!({
+        "alive": true,
+        "primal": crate::PRIMAL_NAME,
+    }))
+}
+
+/// Deep readiness probe — checks subsystem health before reporting ready.
+///
+/// Reports per-subsystem status (`gpu`, `ipc`, `math`) so orchestrators
+/// can make routing decisions (e.g. degrade to CPU-only if GPU is lost).
+pub fn handle_health_readiness() -> Result<Value, RpcError> {
     #[cfg(feature = "gpu")]
-    let substrate = if try_gpu().is_some() {
-        "gpu"
+    let (substrate, gpu_ready) = if try_gpu().is_some() {
+        ("gpu", true)
     } else if GPU_CTX
         .get()
         .is_some_and(|g| g.as_ref().is_some_and(GpuF64::is_lost))
     {
-        "gpu_lost"
+        ("gpu_lost", false)
     } else {
-        "cpu"
+        ("cpu", false)
     };
     #[cfg(not(feature = "gpu"))]
-    let substrate = "cpu";
+    let (substrate, gpu_ready) = ("cpu", false);
+
+    let subsystems = json!({
+        "math": true,
+        "gpu": gpu_ready,
+        "ipc": true,
+    });
 
     Ok(json!({
+        "ready": true,
         "status": "healthy",
         "primal": crate::PRIMAL_NAME,
         "version": env!("CARGO_PKG_VERSION"),
         "substrate": substrate,
         "capabilities": CAPABILITIES,
+        "subsystems": subsystems,
     }))
 }
 

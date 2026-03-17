@@ -304,6 +304,155 @@ fn parse_capabilities_response(response: &str) -> Result<Vec<ComputeBackend>, Di
     Ok(backends)
 }
 
+/// Outcome of a compute dispatch operation that separates protocol-level
+/// IPC errors from application-level logic errors.
+///
+/// Following the groundSpring/airSpring/sweetGrass pattern, callers can:
+/// - **Retry** on [`Protocol`](Self::Protocol) (transient transport failures)
+/// - **Report** on [`Application`](Self::Application) (workload rejected, invalid params)
+/// - **Use** on [`Success`](Self::Success) (job handle, result, capabilities)
+#[derive(Debug)]
+pub enum DispatchOutcome<T> {
+    /// The RPC call succeeded and returned a valid payload.
+    Success(T),
+    /// Protocol-level failure (transport, codec, no primal found).
+    /// These are potentially retriable.
+    Protocol(DispatchError),
+    /// Application-level failure (toadStool accepted the call but the
+    /// workload itself failed — e.g. invalid params, unsupported type).
+    Application {
+        /// JSON-RPC error code from toadStool.
+        code: i64,
+        /// Human-readable error description.
+        message: String,
+    },
+}
+
+impl<T> DispatchOutcome<T> {
+    /// Whether the outcome represents a successful result.
+    #[must_use]
+    pub const fn is_success(&self) -> bool {
+        matches!(self, Self::Success(_))
+    }
+
+    /// Whether the error is potentially retriable (protocol-level).
+    #[must_use]
+    pub const fn is_retriable(&self) -> bool {
+        matches!(self, Self::Protocol(_))
+    }
+
+    /// Convert to a standard `Result`, collapsing both error kinds.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` for both [`Protocol`](Self::Protocol) and
+    /// [`Application`](Self::Application) outcomes.
+    pub fn into_result(self) -> Result<T, DispatchError> {
+        match self {
+            Self::Success(val) => Ok(val),
+            Self::Protocol(err) => Err(err),
+            Self::Application { code, message } => Err(DispatchError::Rpc { code, message }),
+        }
+    }
+}
+
+/// Submit a workload with outcome-based error separation.
+///
+/// Unlike [`submit`], this separates protocol errors (retriable) from
+/// application errors (deterministic rejection by toadStool).
+///
+/// # Errors
+///
+/// Never returns `Err`; all failure modes are encoded in the
+/// [`DispatchOutcome`] variants.
+#[must_use]
+pub fn submit_outcome(workload_type: &str, params_json: &str) -> DispatchOutcome<DispatchHandle> {
+    let Some(socket) = discover() else {
+        return DispatchOutcome::Protocol(DispatchError::NoComputePrimal);
+    };
+    submit_outcome_to(&socket, workload_type, params_json)
+}
+
+/// Submit a workload to a specific socket with outcome-based error separation.
+#[must_use]
+pub fn submit_outcome_to(
+    socket: &Path,
+    workload_type: &str,
+    params_json: &str,
+) -> DispatchOutcome<DispatchHandle> {
+    let request = format!(
+        r#"{{"jsonrpc":"2.0","method":"compute.dispatch.submit","params":{{"workload_type":"{workload_type}","params":{params_json}}},"id":1}}"#,
+    );
+    match rpc_call_outcome(socket, &request) {
+        DispatchOutcome::Success(resp) => match parse_submit_response(&resp) {
+            Ok(handle) => DispatchOutcome::Success(handle),
+            Err(e) => DispatchOutcome::Protocol(e),
+        },
+        DispatchOutcome::Protocol(e) => DispatchOutcome::Protocol(e),
+        DispatchOutcome::Application { code, message } => {
+            DispatchOutcome::Application { code, message }
+        }
+    }
+}
+
+/// Low-level RPC call returning [`DispatchOutcome`].
+///
+/// Separates transport errors ([`Protocol`](DispatchOutcome::Protocol)) from
+/// JSON-RPC error responses ([`Application`](DispatchOutcome::Application)).
+fn rpc_call_outcome(socket: &Path, request: &str) -> DispatchOutcome<String> {
+    let stream = match UnixStream::connect(socket) {
+        Ok(s) => s,
+        Err(e) => {
+            return DispatchOutcome::Protocol(DispatchError::Transport(format!(
+                "connect {}: {e}",
+                socket.display()
+            )));
+        }
+    };
+
+    if let Err(e) = stream.set_read_timeout(Some(RPC_TIMEOUT)) {
+        return DispatchOutcome::Protocol(DispatchError::Transport(format!(
+            "set read timeout: {e}"
+        )));
+    }
+    if let Err(e) = stream.set_write_timeout(Some(RPC_TIMEOUT)) {
+        return DispatchOutcome::Protocol(DispatchError::Transport(format!(
+            "set write timeout: {e}"
+        )));
+    }
+
+    let mut writer = std::io::BufWriter::new(&stream);
+    if let Err(e) = writer.write_all(request.as_bytes()) {
+        return DispatchOutcome::Protocol(DispatchError::Transport(format!("write: {e}")));
+    }
+    if let Err(e) = writer.write_all(b"\n") {
+        return DispatchOutcome::Protocol(DispatchError::Transport(format!(
+            "write newline: {e}"
+        )));
+    }
+    if let Err(e) = writer.flush() {
+        return DispatchOutcome::Protocol(DispatchError::Transport(format!("flush: {e}")));
+    }
+
+    let mut reader = BufReader::new(&stream);
+    let mut line = String::new();
+    if let Err(e) = reader.read_line(&mut line) {
+        return DispatchOutcome::Protocol(DispatchError::Transport(format!("read: {e}")));
+    }
+
+    if line.is_empty() {
+        return DispatchOutcome::Protocol(DispatchError::Transport(
+            "empty response from toadStool".to_string(),
+        ));
+    }
+
+    if let Some((code, message)) = super::protocol::extract_rpc_error(&line) {
+        return DispatchOutcome::Application { code, message };
+    }
+
+    DispatchOutcome::Success(line)
+}
+
 /// Extract a JSON string value for a given key (lightweight, no serde).
 fn extract_json_string(json: &str, key: &str) -> Option<String> {
     let needle = format!("\"{key}\":\"");
@@ -440,6 +589,49 @@ mod tests {
         assert_eq!(extract_json_string(json, "foo").as_deref(), Some("bar"));
         assert_eq!(extract_json_string(json, "baz").as_deref(), Some("qux"));
         assert!(extract_json_string(json, "missing").is_none());
+    }
+
+    #[test]
+    fn submit_outcome_no_primal() {
+        temp_env::with_vars(
+            [
+                ("TOADSTOOL_SOCKET", None::<&str>),
+                ("XDG_RUNTIME_DIR", None::<&str>),
+            ],
+            || {
+                let outcome = submit_outcome("gemm", "{}");
+                assert!(outcome.is_retriable());
+                assert!(!outcome.is_success());
+            },
+        );
+    }
+
+    #[test]
+    fn dispatch_outcome_into_result_success() {
+        let outcome: DispatchOutcome<i32> = DispatchOutcome::Success(42);
+        assert!(outcome.is_success());
+        assert_eq!(outcome.into_result().unwrap(), 42);
+    }
+
+    #[test]
+    fn dispatch_outcome_into_result_protocol() {
+        let outcome: DispatchOutcome<i32> =
+            DispatchOutcome::Protocol(DispatchError::NoComputePrimal);
+        assert!(outcome.is_retriable());
+        let err = outcome.into_result().unwrap_err();
+        assert!(matches!(err, DispatchError::NoComputePrimal));
+    }
+
+    #[test]
+    fn dispatch_outcome_into_result_application() {
+        let outcome: DispatchOutcome<i32> = DispatchOutcome::Application {
+            code: -32602,
+            message: "invalid params".into(),
+        };
+        assert!(!outcome.is_retriable());
+        assert!(!outcome.is_success());
+        let err = outcome.into_result().unwrap_err();
+        assert!(matches!(err, DispatchError::Rpc { code: -32602, .. }));
     }
 
     #[test]
