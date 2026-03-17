@@ -5,7 +5,7 @@
 GPU primitive (or explain why it stays CPU-only). This guides the
 absorption pipeline and identifies what ToadStool needs to build next.
 
-> **Mar 16 update (V125):** 150+ primitives consumed. 0 local WGSL, 0 local derivative math (fully lean). 28 petalTongue scenario builders. standalone barraCuda v0.3.5. 376 experiments, 5,707+ checks. All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed). Forge crate v0.3.0 (252 tests, 90%+ coverage). 1,719+ tests, 354 binaries, 214 named tolerances, clippy pedantic+nursery CLEAN. V125: structured `IpcError`, `extract_capabilities()`, `discover_primal()`, 18 binary fixes. V124: `deny.toml`, `compute.dispatch`, `tracing`. V123: zero-panic `OrExit`, dual-format discovery.
+> **Mar 16 update (V126):** 150+ primitives consumed. 0 local WGSL, 0 local derivative math (fully lean). 28 petalTongue scenario builders. standalone barraCuda v0.3.5. 376 experiments, 5,707+ checks. All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed). Forge crate v0.3.0 (252 tests, 90%+ coverage). 1,443+ tests, 354 binaries, 214 named tolerances, clippy pedantic+nursery CLEAN. V125: structured `IpcError`, `extract_capabilities()`, `discover_primal()`, 18 binary fixes. V126: `DispatchOutcome<T>` protocol vs application error separation, `health.liveness`/`health.readiness` probes, `IpcError` query helpers (`is_retriable()`/`is_timeout_likely()`/`is_method_not_found()`/`is_connection_error()`). V124: `deny.toml`, `compute.dispatch`, `tracing`. V123: zero-panic `OrExit`, dual-format discovery.
 
 ---
 

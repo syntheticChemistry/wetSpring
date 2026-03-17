@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
 **Last Updated**: March 16, 2026
-**Status**: V125 — 5,707+ checks (376 experiments, 354 binaries), 1,719+ tests. V125: structured `IpcError` enum (28 sites, healthSpring/biomeOS pattern), dual-format `extract_capabilities()` (groundSpring/ludoSpring), generic `socket_env_var()`/`discover_primal()` (sweetGrass pattern), 18 binary OrExit import fixes. V124: workspace `deny.toml`, typed `compute.dispatch` IPC client, structured `tracing`. V123: zero-panic `OrExit`, dual-format discovery, `extract_rpc_error()`. V122: `#[expect(reason)]` across 276+ binaries, zero `#[allow()]`. Zero unsafe, clippy pedantic+nursery zero warnings.
+**Status**: V126 — 5,707+ checks (376 experiments, 354 binaries), 1,443+ tests. V125: structured `IpcError` enum (28 sites, healthSpring/biomeOS pattern), dual-format `extract_capabilities()` (groundSpring/ludoSpring), generic `socket_env_var()`/`discover_primal()` (sweetGrass pattern), 18 binary OrExit import fixes. V126: `DispatchOutcome<T>` protocol vs application error separation, `health.liveness`/`health.readiness` probes, `IpcError` query helpers (`is_retriable()`/`is_timeout_likely()`/`is_method_not_found()`/`is_connection_error()`). V124: workspace `deny.toml`, typed `compute.dispatch` IPC client, structured `tracing`. V123: zero-panic `OrExit`, dual-format discovery, `extract_rpc_error()`. V122: `#[expect(reason)]` across 276+ binaries, zero `#[allow()]`. Zero unsafe, clippy pedantic+nursery zero warnings.
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

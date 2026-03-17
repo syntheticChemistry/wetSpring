@@ -2,7 +2,7 @@
 
 **Date:** March 16, 2026
 **Pattern:** Write → Absorb → Lean (from hotSpring)
-**Status:** V125 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 44 GPU modules, 0 Tier B/C, 0 Passthrough, standalone barraCuda v0.3.5, toadStool S155. 1,719+ tests, 354 binaries, 214 named tolerances, **zero `#[allow()]`**. V125: structured `IpcError` enum, `extract_capabilities()`, `discover_primal()`, 18 binary fixes. V124: `deny.toml`, `compute.dispatch`, `tracing`. V123: zero-panic `OrExit`, dual-format discovery. V122: `#[expect(reason)]`. All primal names via `primal_names::*`.
+**Status:** V126 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 44 GPU modules, 0 Tier B/C, 0 Passthrough, standalone barraCuda v0.3.5, toadStool S155. 1,443+ tests, 354 binaries, 214 named tolerances, **zero `#[allow()]`**. V125: structured `IpcError` enum, `extract_capabilities()`, `discover_primal()`, 18 binary fixes. V126: `DispatchOutcome<T>` protocol vs application error separation, `health.liveness`/`health.readiness` probes, `IpcError` query helpers (`is_retriable()`/`is_timeout_likely()`/`is_method_not_found()`/`is_connection_error()`). V124: `deny.toml`, `compute.dispatch`, `tracing`. V123: zero-panic `OrExit`, dual-format discovery. V122: `#[expect(reason)]`. All primal names via `primal_names::*`.
 
 ---
 
