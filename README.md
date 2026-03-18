@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 18, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V127 — **1,448+ tests** (0 failures), 376 experiments, 5,707+ validation checks across 354 binaries. Ecosystem: barraCuda v0.3.5, toadStool S155, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery), `cargo fmt` clean. **MCP tool definitions** — 8 typed tools for Squirrel AI integration (`ipc::mcp`). **Python baseline provenance** — centralized registry (`provenance.rs`, 14 records, canonical commit epochs). **`kahan_sum` delegation** — delegates to `barracuda::shaders::precision::cpu::kahan_sum`. **`RetryPolicy` + `CircuitBreaker`** — IPC resilience (sweetGrass pattern). **7 new tolerance constants** — magic numbers promoted to named, documented constants. **`unlicensed = "deny"`** — dependency policy tightened. **NPU device constant** — `niche::NPU_DEFAULT_DEVICE` replaces 3 hardcoded strings. 24 capabilities across 16 domains. Full audit executed: zero unsafe, zero mocks in production, zero hardcoding in library, zero TODO/FIXME, zero local math duplication.
+**Status:** V128 — **1,550+ tests** (0 failures), 376 experiments, 5,707+ validation checks across 354 binaries. Ecosystem: barraCuda v0.3.5, toadStool S155, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery), `cargo fmt` clean. V128 ecosystem absorption: **`cast` module** (9 safe numeric helpers, airSpring/groundSpring pattern — eliminates 40+ bare `as` casts). **`mul_add()` FMA sweep** (10 accumulation loops across 8 files — felsenstein, esn, gbm, unifrac, nanopore). **ecoBin C-dep ban** (14 C-dependency crates banned in `deny.toml`). **`PRIMAL_DOMAIN`** constant (`"science.ecology"` for biomeOS Neural API). **`FAMILY_ID`-aware socket paths** (discover, provenance, nestgate — multi-instance deployment). **IPC proptests** (7 property tests for protocol parsing + dispatch routing). **`ECOSYSTEM_LEVERAGE_GUIDE.md`** published. V127: MCP tool definitions (8 Squirrel AI tools), Python baseline provenance registry (14 records), `kahan_sum` upstream delegation, `RetryPolicy` + `CircuitBreaker` IPC resilience, 7 new tolerance constants, `unlicensed = "deny"` policy, NPU device constant. 24 capabilities across 16 domains. Full audit: zero unsafe, zero mocks in production, zero TODO/FIXME, zero local math duplication, 7 proptest modules.
 
 ---
 
@@ -133,10 +133,10 @@ integration point.
 | V100 viz + local evolution (Exp327-332) | 173 (petalTongue 45 + CPU/GPU 27 + metalForge 19 + biomeOS 34 + local evo 24 + mixed HW 24) |
 | V101 viz evolution (Exp333-334) | 78 (viz evolution 44 + science-to-viz 34) |
 | **Total validation checks** | **5,707+** |
-| Rust library unit tests | 1,353 (barracuda) |
+| Rust library unit tests | 1,450 (barracuda) |
 | metalForge forge tests | 252 |
 | Integration tests | 98 (72 barracuda + 26 forge) |
-| **Total Rust tests** | **1,703** (lib + forge + integration) |
+| **Total Rust tests** | **1,800** (lib + forge + integration) |
 | Library code coverage | **94.01% line** (barracuda), **90%+ line** (forge) (cargo-llvm-cov) |
 | Experiments completed | 376 |
 | Validation/benchmark binaries | 354 (332 barracuda + 22 forge) |
@@ -305,6 +305,27 @@ science-to-visualization IPC wiring:
 - **dump_wetspring_scenarios**: 13 scenarios (was 6), `--stream` flag for StreamSession demo
 
 **1,687 tests** | **376 experiments** | **354 binaries** | **5,707+ checks**
+
+### V128: Ecosystem Absorption + Modern Idiomatic Rust (2026-03-18)
+
+Ecosystem-wide absorption from airSpring, groundSpring, healthSpring, barraCuda patterns.
+Deep debt execution: safe casts, FMA precision, C-dep bans, multi-instance discovery, property tests.
+
+| Change | Detail |
+|--------|--------|
+| **`cast` module** | 9 safe numeric helpers (`usize_f64`, `f64_usize`, `usize_u32`, `u32_usize`, etc.) — centralizes 40+ bare `as` casts behind documented, `const fn` functions with `debug_assert!` guards. Adopted in `flat_tree.rs`, `quality_gpu.rs`, `dada2_gpu.rs`. airSpring/groundSpring pattern. |
+| **`mul_add()` FMA sweep** | 10 accumulation loops in 8 files evolved to fused multiply-add (`felsenstein`, `esn/reservoir`, `esn/mod`, `gbm`, `unifrac/distance`, `nanopore/types`). Precision + potential hardware FMA instruction. |
+| **ecoBin C-dep ban** | 14 C-dependency crates banned in `deny.toml` (`openssl-sys`, `libz-sys`, `bzip2-sys`, `cmake`, `bindgen`, `pkg-config`, etc.). groundSpring V115 pattern. |
+| **`PRIMAL_DOMAIN`** | `"science.ecology"` constant for biomeOS Neural API registration and Songbird discovery. healthSpring V34 pattern. |
+| **`FAMILY_ID` sockets** | `discover.rs`, `provenance.rs`, `nestgate/storage.rs` all resolve `FAMILY_ID` / `BIOMEOS_FAMILY_ID` from environment for multi-instance deployment. Zero hardcoded `"default"`. barraCuda v0.3.5 pattern. |
+| **IPC proptests** | 7 new property tests: `parse_request_never_panics`, `extract_capabilities_never_panics`, `is_notification_never_panics`, `extract_rpc_error_never_panics`, `valid_request_roundtrip`, `success_response_always_valid_json`, `capability_extraction_preserves_primal_name`, `unknown_method_returns_not_found`, `dispatch_never_panics`. Protocol + dispatch zero-panic guarantees. |
+| **Leverage guide** | `ECOSYSTEM_LEVERAGE_GUIDE.md` — documents full absorption/contribution surface between wetSpring and ecosystem. |
+| **Lint cleanup** | Unfulfilled `#[expect]` removed from `scenarios/mod.rs`, `validate_cpu_vs_gpu_v11.rs`. Test module `#[expect]` added to `mcp.rs`. |
+
+- `cargo check --all-features` — clean
+- `cargo clippy --all-features -D warnings` — **ZERO WARNINGS**
+- `cargo test --all-features --lib` — **1,550 passed**, 0 failed (5 pre-existing GPU/stochastic skips)
+- 22 files changed, 490 insertions, 84 deletions
 
 ### V119: Deep Debt Evolution Sprint (2026-03-15)
 

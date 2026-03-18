@@ -1,8 +1,8 @@
 # baseCamp Extension Plan: From Validated Math to Real-World Science
 
-**Date:** March 18, 2026 (V127 update)
-**Author:** wetSpring V127 (ecoPrimals)
-**Foundation:** 376 experiments, 5,707+ checks, 63 papers reproduced, 150+ primitives (standalone barraCuda v0.3.5), Python parity proven, cross-spring provenance validated, 1,448+ tests, 354 binaries. V127 audit execution: MCP tool definitions (8 Squirrel AI tools), Python baseline provenance registry (14 records, canonical commit epochs), `kahan_sum` delegation to barraCuda, 7 new tolerance constants, `unlicensed = "deny"`, NPU device constant, IPC integration tests, zero local math duplication. V126: `DispatchOutcome<T>`, health probes, `IpcError` query helpers. V125: structured `IpcError`, `discover_primal()`. V124: `deny.toml`, `compute.dispatch`, structured `tracing`. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). Ecosystem: barraCuda v0.3.5, toadStool S155, coralReef Phase 10.
+**Date:** March 18, 2026 (V128 update)
+**Author:** wetSpring V128 (ecoPrimals)
+**Foundation:** 376 experiments, 5,707+ checks, 63 papers reproduced, 150+ primitives (standalone barraCuda v0.3.5), Python parity proven, cross-spring provenance validated, 1,550+ tests, 354 binaries. V128 ecosystem absorption: `cast` module (9 safe numeric helpers), `mul_add()` FMA sweep, ecoBin C-dep ban (14 crates), `PRIMAL_DOMAIN` constant, `FAMILY_ID`-aware socket paths, 7 IPC proptests, `ECOSYSTEM_LEVERAGE_GUIDE.md`. V127: MCP tool definitions (8 Squirrel AI tools), Python baseline provenance registry (14 records), `kahan_sum` upstream delegation, 7 new tolerance constants, `unlicensed = "deny"`, NPU device constant, IPC integration tests, zero local math duplication. V126: `DispatchOutcome<T>`, health probes, `IpcError` query helpers. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). Ecosystem: barraCuda v0.3.5, toadStool S155, coralReef Phase 10.
 
 ---
 

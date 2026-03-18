@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-18 (V127: 376 experiments, 354 binaries, 5,707+ checks, 1,448+ tests. V127 audit execution: MCP tool definitions (8 Squirrel AI tools), Python baseline provenance registry (14 records), `kahan_sum` upstream delegation, 7 new tolerance constants, `unlicensed = "deny"` policy, NPU device constant, IPC integration tests. Zero local math duplication, zero `#[allow()]`, zero clippy warnings, zero unsafe.)
+**Updated**: 2026-03-18 (V128: 376 experiments, 354 binaries, 5,707+ checks, 1,550+ tests. V128 ecosystem absorption: `cast` module (9 safe numeric helpers), `mul_add()` FMA sweep (8 files), ecoBin C-dep ban (14 crates), `PRIMAL_DOMAIN` constant, `FAMILY_ID`-aware socket paths, 7 IPC proptests, `ECOSYSTEM_LEVERAGE_GUIDE.md`. Zero local math duplication, zero `#[allow()]`, zero clippy warnings, zero unsafe.)
 
 ---
 
