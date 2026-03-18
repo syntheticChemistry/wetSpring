@@ -282,7 +282,11 @@ mod tests {
     fn all_tools_have_input_schema() {
         for tool in TOOLS {
             let schema = (tool.input_schema)();
-            assert_eq!(schema["type"], "object", "{} schema must be object", tool.name);
+            assert_eq!(
+                schema["type"], "object",
+                "{} schema must be object",
+                tool.name
+            );
             assert!(
                 schema.get("properties").is_some(),
                 "{} schema must have properties",

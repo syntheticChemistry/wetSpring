@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
     clippy::too_many_lines,
     reason = "validation harness: sequential domain checks in single main()"
 )]
@@ -79,8 +75,11 @@ fn make_communities() -> Vec<Vec<f64>> {
         .map(|s| {
             (0..N_FEATURES)
                 .map(|f| {
-                    let base = ((s * N_FEATURES + f + 1) as f64).sqrt();
-                    let gradient = ((s as f64) / (N_SAMPLES as f64)) * 2.0;
+                    let base =
+                        (wetspring_barracuda::cast::usize_f64(s * N_FEATURES + f + 1)).sqrt();
+                    let gradient = (wetspring_barracuda::cast::usize_f64(s)
+                        / wetspring_barracuda::cast::usize_f64(N_SAMPLES))
+                        * 2.0;
                     (base * (1.0 + gradient)).max(0.01)
                 })
                 .collect()
@@ -114,8 +113,7 @@ async fn main() {
         validation::exit_skipped("No SHADER_F64 support on this GPU");
     }
 
-    let npu_device = std::env::var("WETSPRING_NPU_DEVICE")
-        .unwrap_or_else(|_| String::from(wetspring_barracuda::niche::NPU_DEFAULT_DEVICE));
+    let npu_device = wetspring_barracuda::niche::discover_npu_device();
     let npu_available = std::path::Path::new(&npu_device).exists();
     let communities = make_communities();
     let mut latencies: Vec<StageLatency> = Vec::new();
@@ -132,7 +130,7 @@ async fn main() {
     let t_upload = Instant::now();
     // Simulate upload cost: first GPU call includes buffer creation
     let mut gpu_results: Vec<(f64, f64, f64)> = Vec::with_capacity(N_SAMPLES);
-    let upload_us = t_upload.elapsed().as_micros() as f64;
+    let upload_us = wetspring_barracuda::cast::u128_f64(t_upload.elapsed().as_micros());
 
     let t_gpu_compute = Instant::now();
     for community in &communities {
@@ -145,16 +143,16 @@ async fn main() {
 
     let gpu_shannons: Vec<f64> = gpu_results.iter().map(|(s, _, _)| *s).collect();
     let gpu_variance = stats_gpu::variance_gpu(&gpu, &gpu_shannons).or_exit("variance GPU");
-    let gpu_compute_us = t_gpu_compute.elapsed().as_micros() as f64;
+    let gpu_compute_us = wetspring_barracuda::cast::u128_f64(t_gpu_compute.elapsed().as_micros());
 
     let t_bray = Instant::now();
     let gpu_bray =
         diversity_gpu::bray_curtis_condensed_gpu(&gpu, &communities).or_exit("Bray-Curtis GPU");
-    let bray_us = t_bray.elapsed().as_micros() as f64;
+    let bray_us = wetspring_barracuda::cast::u128_f64(t_bray.elapsed().as_micros());
 
     let t_readback = Instant::now();
     let _readback_copy = gpu_bray.clone();
-    let readback_us = t_readback.elapsed().as_micros() as f64;
+    let readback_us = wetspring_barracuda::cast::u128_f64(t_readback.elapsed().as_micros());
 
     latencies.push(StageLatency {
         name: "CPU→GPU upload",
@@ -268,7 +266,7 @@ async fn main() {
             classify_substrate,
         });
     }
-    let classify_us = t_classify.elapsed().as_micros() as f64;
+    let classify_us = wetspring_barracuda::cast::u128_f64(t_classify.elapsed().as_micros());
 
     latencies.push(StageLatency {
         name: "Classification",
@@ -310,10 +308,10 @@ async fn main() {
     v.section("Stage 3: CPU Aggregation");
 
     let t_agg = Instant::now();
-    let mean_shannon: f64 =
-        sample_results.iter().map(|r| r.shannon).sum::<f64>() / N_SAMPLES as f64;
-    let mean_simpson: f64 =
-        sample_results.iter().map(|r| r.simpson).sum::<f64>() / N_SAMPLES as f64;
+    let mean_shannon: f64 = sample_results.iter().map(|r| r.shannon).sum::<f64>()
+        / wetspring_barracuda::cast::usize_f64(N_SAMPLES);
+    let mean_simpson: f64 = sample_results.iter().map(|r| r.simpson).sum::<f64>()
+        / wetspring_barracuda::cast::usize_f64(N_SAMPLES);
     let n_high = sample_results
         .iter()
         .filter(|r| r.classification == "high_diversity")
@@ -326,7 +324,7 @@ async fn main() {
         .iter()
         .filter(|r| r.classification == "low_diversity")
         .count();
-    let agg_us = t_agg.elapsed().as_micros() as f64;
+    let agg_us = wetspring_barracuda::cast::u128_f64(t_agg.elapsed().as_micros());
 
     latencies.push(StageLatency {
         name: "CPU aggregation",
@@ -348,8 +346,8 @@ async fn main() {
     );
     v.check(
         "Aggregation: all samples classified",
-        (n_high + n_mod + n_low) as f64,
-        N_SAMPLES as f64,
+        wetspring_barracuda::cast::usize_f64(n_high + n_mod + n_low),
+        wetspring_barracuda::cast::usize_f64(N_SAMPLES),
         tolerances::EXACT,
     );
     v.check(
@@ -368,8 +366,8 @@ async fn main() {
     // ═══════════════════════════════════════════════════════════════════
     v.section("End-to-End Pipeline");
 
-    let cpu_mean_shannon: f64 =
-        cpu_results.iter().map(|(s, _, _)| s).sum::<f64>() / N_SAMPLES as f64;
+    let cpu_mean_shannon: f64 = cpu_results.iter().map(|(s, _, _)| s).sum::<f64>()
+        / wetspring_barracuda::cast::usize_f64(N_SAMPLES);
     v.check(
         "E2E: GPU pipeline mean Shannon == CPU",
         mean_shannon,

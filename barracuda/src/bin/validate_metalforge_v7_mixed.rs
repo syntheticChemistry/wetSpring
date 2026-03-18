@@ -58,7 +58,9 @@ fn synthetic_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     for i in 0..n_species {
         rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
         let noise = ((rng >> 33) as f64) / f64::from(u32::MAX);
-        let rank_weight = (-(i as f64) / (n_species as f64 * evenness)).exp();
+        let rank_weight = (-(wetspring_barracuda::cast::usize_f64(i))
+            / (wetspring_barracuda::cast::usize_f64(n_species) * evenness))
+            .exp();
         counts.push((rank_weight * 1000.0 * (0.5 + noise)).max(1.0));
     }
     counts
@@ -221,7 +223,7 @@ fn validate_cross_substrate_qs(v: &mut Validator) {
         );
         v.check_pass(
             &format!("{scenario} steps match"),
-            mf_steps == direct.steps as u64,
+            mf_steps == wetspring_barracuda::cast::usize_u64(direct.steps),
         );
 
         println!("  {scenario}: peak={cpu_peak:.4}, steps={mf_steps}");

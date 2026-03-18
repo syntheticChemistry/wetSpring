@@ -9,16 +9,16 @@
     reason = "validation harness: sequential domain checks in single main()"
 )]
 #![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
     clippy::items_after_statements,
     reason = "validation harness: local helpers defined near use site"
 )]
 #![expect(
     clippy::many_single_char_names,
     reason = "validation harness: mathematical variable names from papers"
+)]
+#![expect(
+    clippy::similar_names,
+    reason = "validation harness: paired CPU/GPU variables (h_cpu/h_gpu, s_cpu/s_gpu, bc_cpu/bc_gpu)"
 )]
 //! # Exp319: Cross-Spring Modern Evolution Validation + Benchmark (V98+)
 //!
@@ -477,7 +477,7 @@ fn main() {
         let (bs, ms) = bench("bootstrap CI", || {
             barracuda::stats::bootstrap_ci(
                 &data,
-                |d| d.iter().sum::<f64>() / d.len() as f64,
+                |d| d.iter().sum::<f64>() / wetspring_barracuda::cast::usize_f64(d.len()),
                 1000,
                 0.95,
                 42,
@@ -526,7 +526,9 @@ fn main() {
         let m = 20_usize;
         let n = 10_usize;
         let k = 3_usize;
-        let data: Vec<f64> = (0..m * n).map(|i| ((i % 7) as f64 + 1.0) / 7.0).collect();
+        let data: Vec<f64> = (0..m * n)
+            .map(|i| (wetspring_barracuda::cast::usize_f64(i % 7) + 1.0) / 7.0)
+            .collect();
         let config = barracuda::linalg::NmfConfig {
             rank: k,
             max_iter: 200,

@@ -143,12 +143,8 @@ fn probe_cpu_platform() -> CpuProbeResult {
     }
 }
 
-/// Default device node for NPU hardware.
-///
-/// `BrainChip` AKD1000 default device path: `/dev/akida0`. This is the primary
-/// NPU substrate in wetSpring's capability discovery. Overridable via
-/// `WETSPRING_NPU_DEVICE` for alternate installations or different NPU vendors.
-const DEFAULT_NPU_DEVICE: &str = "/dev/akida0";
+/// NPU environment variable name, sourced from the niche registry.
+const NPU_ENV_VAR: &str = wetspring_barracuda::niche::NPU_DEVICE_ENV_VAR;
 
 /// Probe for NPU devices via capability-based discovery.
 ///
@@ -190,7 +186,7 @@ pub fn probe_npus() -> Vec<Substrate> {
 
 /// Discover NPU device nodes via env var or filesystem scan.
 fn discover_npu_device_nodes() -> Vec<String> {
-    if let Ok(explicit) = std::env::var("WETSPRING_NPU_DEVICE") {
+    if let Ok(explicit) = std::env::var(NPU_ENV_VAR) {
         return vec![explicit];
     }
 
@@ -206,7 +202,7 @@ fn discover_npu_device_nodes() -> Vec<String> {
     }
 
     if nodes.is_empty() {
-        nodes.push(DEFAULT_NPU_DEVICE.to_string());
+        nodes.push(wetspring_barracuda::niche::discover_npu_device());
     }
     nodes
 }

@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
     clippy::cast_possible_truncation,
     reason = "validation harness: u128→u64 timing, f64→u32 counts"
 )]
@@ -37,6 +33,7 @@ use barracuda::device::WgpuDevice;
 use barracuda::{FelsensteinGpu, PhyloTree};
 use std::sync::Arc;
 use std::time::Instant;
+use wetspring_barracuda::cast;
 
 use wetspring_barracuda::bio::dada2::{self, Dada2Params};
 use wetspring_barracuda::bio::dada2_gpu::{self, Dada2Gpu};
@@ -136,20 +133,20 @@ fn validate_qs_ode_mf(
     let y0_single: [f64; N_VARS] = [0.01, 0.0, 0.0, 1.0, 0.0];
     let base = QsBiofilmParams::default();
 
-    let mut all_y0 = Vec::with_capacity(n_batches as usize * N_VARS);
-    let mut all_params = Vec::with_capacity(n_batches as usize * N_PARAMS);
-    let mut cpu_finals = Vec::with_capacity(n_batches as usize);
+    let mut all_y0 = Vec::with_capacity(cast::u32_usize(n_batches) * N_VARS);
+    let mut all_params = Vec::with_capacity(cast::u32_usize(n_batches) * N_PARAMS);
+    let mut cpu_finals = Vec::with_capacity(cast::u32_usize(n_batches));
 
     let tc = Instant::now();
-    for i in 0..n_batches as usize {
+    for i in 0..cast::u32_usize(n_batches) {
         all_y0.extend_from_slice(&y0_single);
         let mut p = base.clone();
-        p.mu_max = 0.05f64.mul_add(i as f64, 0.4);
+        p.mu_max = 0.05f64.mul_add(cast::usize_f64(i), 0.4);
         all_params.extend_from_slice(&params_to_flat(&p));
         let cpu_result = qs_biofilm::run_scenario(&y0_single, t_end, dt, &p);
         cpu_finals.push(cpu_result.y_final.clone());
     }
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = cast::u128_f64(tc.elapsed().as_micros());
 
     let config = OdeSweepConfig {
         n_batches,
@@ -165,14 +162,14 @@ fn validate_qs_ode_mf(
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         sweeper.integrate(&config, &all_y0, &all_params)
     }));
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = cast::u128_f64(tg.elapsed().as_micros());
 
     match result {
         Ok(Ok(gpu_finals)) => {
             v.check(
                 "QS ODE output size",
-                gpu_finals.len() as f64,
-                (n_batches as usize * N_VARS) as f64,
+                cast::usize_f64(gpu_finals.len()),
+                cast::usize_f64(cast::u32_usize(n_batches) * N_VARS),
                 tolerances::EXACT,
             );
 
@@ -245,14 +242,14 @@ fn validate_unifrac_mf(
         for s in 0..n_samples {
             let mut child_sum = 0.0;
             for child in 0..n_nodes {
-                if parent_array[child] as usize == node && child != node {
+                if cast::u32_usize(parent_array[child]) == node && child != node {
                     child_sum += cpu_sums[child * n_samples + s] * branch_lengths[child];
                 }
             }
             cpu_sums[node * n_samples + s] = child_sum;
         }
     }
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = cast::u128_f64(tc.elapsed().as_micros());
 
     let tg = Instant::now();
     let unifrac_gpu = UniFracGpu::new(device);
@@ -266,12 +263,12 @@ fn validate_unifrac_mf(
             n_leaves,
         )
         .or_exit("GPU UniFrac dispatch");
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = cast::u128_f64(tg.elapsed().as_micros());
 
     v.check(
         "UniFrac output size",
-        result.node_sums.len() as f64,
-        (n_nodes * n_samples) as f64,
+        cast::usize_f64(result.node_sums.len()),
+        cast::usize_f64(n_nodes * n_samples),
         tolerances::EXACT,
     );
 
@@ -329,39 +326,39 @@ fn validate_dada2_mf(
 
     let tc = Instant::now();
     let (cpu_asvs, cpu_stats) = dada2::denoise(&seqs, &params);
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = cast::u128_f64(tc.elapsed().as_micros());
 
     let tg = Instant::now();
     let dada2_engine = Dada2Gpu::new(device.clone()).or_exit("DADA2 shader compile");
     let gpu_result = dada2_gpu::denoise_gpu(&dada2_engine, &seqs, &params);
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = cast::u128_f64(tg.elapsed().as_micros());
 
     match gpu_result {
         Ok((gpu_asvs, gpu_stats)) => {
             v.check(
                 "DADA2 ASV count",
-                gpu_asvs.len() as f64,
-                cpu_asvs.len() as f64,
+                cast::usize_f64(gpu_asvs.len()),
+                cast::usize_f64(cpu_asvs.len()),
                 tolerances::EXACT,
             );
             v.check(
                 "DADA2 output reads",
-                gpu_stats.output_reads as f64,
-                cpu_stats.output_reads as f64,
+                cast::usize_f64(gpu_stats.output_reads),
+                cast::usize_f64(cpu_stats.output_reads),
                 tolerances::EXACT,
             );
             v.check(
                 "DADA2 iterations",
-                gpu_stats.iterations as f64,
-                cpu_stats.iterations as f64,
+                cast::usize_f64(gpu_stats.iterations),
+                cast::usize_f64(cpu_stats.iterations),
                 tolerances::EXACT,
             );
 
             for (i, (ca, ga)) in cpu_asvs.iter().zip(&gpu_asvs).enumerate() {
                 v.check(
                     &format!("DADA2 ASV[{i}] abundance"),
-                    ga.abundance as f64,
-                    ca.abundance as f64,
+                    cast::usize_f64(ga.abundance),
+                    cast::usize_f64(ca.abundance),
                     tolerances::EXACT,
                 );
             }
@@ -391,7 +388,7 @@ fn validate_kmer_mf(
 
     // Forward-only histogram (matches GPU bit-encoding, no canonicalization)
     let tc = Instant::now();
-    let kmer_space = 4_usize.pow(k as u32);
+    let kmer_space = 4_usize.pow(cast::usize_u32(k));
     let mut cpu_hist = vec![0_u32; kmer_space];
     let mut window = 0_u32;
     let mut valid = 0_usize;
@@ -410,22 +407,22 @@ fn validate_kmer_mf(
         window = ((window << 2) | encoded) & mask;
         valid += 1;
         if valid >= k {
-            cpu_hist[window as usize] += 1;
+            cpu_hist[cast::u32_usize(window)] += 1;
         }
     }
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = cast::u128_f64(tc.elapsed().as_micros());
 
     let tg = Instant::now();
     let kmer_gpu = KmerGpu::new(&gpu.to_wgpu_device());
     let gpu_result = kmer_gpu
-        .count_from_sequence(seq, k as u32)
+        .count_from_sequence(seq, cast::usize_u32(k))
         .or_exit("K-mer GPU dispatch");
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = cast::u128_f64(tg.elapsed().as_micros());
 
     v.check(
         "K-mer histogram length",
-        gpu_result.histogram.len() as f64,
-        kmer_space as f64,
+        cast::usize_f64(gpu_result.histogram.len()),
+        cast::usize_f64(kmer_space),
         tolerances::EXACT,
     );
 
@@ -546,13 +543,9 @@ fn convert_tree(tree: &TreeNode, mu: f64) -> TreeConversion {
     let max_depth = depths.iter().copied().max().unwrap_or(0);
     let mut levels: Vec<Vec<u32>> = Vec::with_capacity(max_depth + 1);
     for d in (0..=max_depth).rev() {
-        #[expect(
-            clippy::cast_possible_truncation,
-            reason = "validation: bounded float→integer for index/count"
-        )]
         let group: Vec<u32> = (0..n_nodes)
             .filter(|&i| depths[i] == d)
-            .map(|i| i as u32)
+            .map(cast::usize_u32)
             .collect();
         if !group.is_empty() {
             levels.push(group);
@@ -626,7 +619,7 @@ fn validate_felsenstein_mf(
 
     let tc = Instant::now();
     let cpu_ll = felsenstein::log_likelihood(&tree, MU);
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = cast::u128_f64(tc.elapsed().as_micros());
 
     v.check_pass("Felsenstein CPU LL finite", cpu_ll.is_finite());
     v.check_pass("Felsenstein CPU LL negative", cpu_ll < 0.0);
@@ -642,7 +635,7 @@ fn validate_felsenstein_mf(
         conv.n_sites,
         N_STATES,
     );
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = cast::u128_f64(tg.elapsed().as_micros());
 
     match gpu_result {
         Ok(result) => {

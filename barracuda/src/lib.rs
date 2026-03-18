@@ -79,10 +79,7 @@
 //! ```
 
 /// This primal's canonical identifier — used for IPC, provenance, and metrics.
-#[cfg(feature = "ipc")]
-pub use ipc::primal_names::SELF as PRIMAL_NAME;
-#[cfg(not(feature = "ipc"))]
-pub const PRIMAL_NAME: &str = "wetspring";
+pub const PRIMAL_NAME: &str = primal_names::SELF_NAME;
 
 /// Capability domain — used for biomeOS Neural API registration and Songbird discovery.
 pub const PRIMAL_DOMAIN: &str = "science.ecology";
@@ -105,6 +102,7 @@ pub mod ncbi;
 pub mod niche;
 #[cfg(feature = "npu")]
 pub mod npu;
+pub mod primal_names;
 #[cfg(feature = "gpu")]
 pub mod provenance;
 pub mod special;

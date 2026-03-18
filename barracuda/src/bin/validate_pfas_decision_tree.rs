@@ -27,6 +27,7 @@
 
 use std::fs;
 use wetspring_barracuda::bio::decision_tree::DecisionTree;
+use wetspring_barracuda::cast;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::{self, Validator};
@@ -46,7 +47,7 @@ fn load_tree() -> DecisionTree {
         serde_json::from_str(&tree_json).or_exit("cannot parse tree JSON");
 
     let nodes = tree_data["nodes"].as_array().or_exit("nodes array");
-    let n_features = tree_data["n_features"].as_u64().unwrap_or(28) as usize;
+    let n_features = cast::u64_usize(tree_data["n_features"].as_u64().unwrap_or(28));
 
     let mut features_arr = Vec::new();
     let mut thresholds_arr = Vec::new();
@@ -62,7 +63,7 @@ fn load_tree() -> DecisionTree {
         predictions_arr.push(
             node.get("prediction")
                 .and_then(serde_json::Value::as_u64)
-                .map(|p| p as usize),
+                .map(cast::u64_usize),
         );
     }
 
@@ -83,10 +84,6 @@ struct TestData {
     expected_f1: f64,
 }
 
-#[expect(
-    clippy::cast_possible_truncation,
-    reason = "validation: bounded float→integer for index/count"
-)]
 fn load_test_data() -> TestData {
     let test_path =
         validation::data_dir("WETSPRING_PFAS_ML_DIR", "experiments/results/008_pfas_ml")
@@ -109,8 +106,8 @@ fn load_test_data() -> TestData {
                 .iter()
                 .map(|v| v.as_f64().unwrap_or(0.0))
                 .collect();
-            let python_pred = s["predicted_label"].as_u64().unwrap_or(0) as usize;
-            let true_label = s["true_label"].as_u64().unwrap_or(0) as usize;
+            let python_pred = cast::u64_usize(s["predicted_label"].as_u64().unwrap_or(0));
+            let true_label = cast::u64_usize(s["true_label"].as_u64().unwrap_or(0));
             (feats, python_pred, true_label)
         })
         .collect();
@@ -164,31 +161,15 @@ fn main() {
     }
 
     let n_samples = data.samples.len();
-    #[expect(
-        clippy::cast_precision_loss,
-        reason = "precision: bounded integer→f64 for validation metrics"
-    )]
-    let parity_rate = match_count as f64 / n_samples as f64;
-    #[expect(
-        clippy::cast_precision_loss,
-        reason = "precision: bounded integer→f64 for validation metrics"
-    )]
-    let rust_accuracy = (true_pos + true_neg) as f64 / n_samples as f64;
-    #[expect(
-        clippy::cast_precision_loss,
-        reason = "precision: bounded integer→f64 for validation metrics"
-    )]
+    let parity_rate = cast::usize_f64(match_count) / cast::usize_f64(n_samples);
+    let rust_accuracy = cast::usize_f64(true_pos + true_neg) / cast::usize_f64(n_samples);
     let precision = if true_pos + false_pos > 0 {
-        true_pos as f64 / (true_pos + false_pos) as f64
+        cast::usize_f64(true_pos) / cast::usize_f64(true_pos + false_pos)
     } else {
         0.0
     };
-    #[expect(
-        clippy::cast_precision_loss,
-        reason = "precision: bounded integer→f64 for validation metrics"
-    )]
     let recall = if true_pos + false_neg > 0 {
-        true_pos as f64 / (true_pos + false_neg) as f64
+        cast::usize_f64(true_pos) / cast::usize_f64(true_pos + false_neg)
     } else {
         0.0
     };

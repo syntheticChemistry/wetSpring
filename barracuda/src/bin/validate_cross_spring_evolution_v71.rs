@@ -5,16 +5,8 @@
     reason = "validation harness: results printed to stdout"
 )]
 #![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
     clippy::cast_possible_truncation,
     reason = "validation harness: u128→u64 timing, f64→u32 counts"
-)]
-#![expect(
-    clippy::cast_sign_loss,
-    reason = "validation harness: non-negative values cast to unsigned"
 )]
 #![expect(
     clippy::too_many_lines,
@@ -54,6 +46,7 @@ use barracuda::shaders::Precision;
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::bio::diversity_fusion_gpu::{DiversityFusionGpu, diversity_fusion_cpu};
 use wetspring_barracuda::bio::gemm_cached::GemmCached;
+use wetspring_barracuda::cast::usize_f64;
 use wetspring_barracuda::df64_host;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
@@ -236,7 +229,7 @@ fn main() {
 
     let n_taxa = 500;
     let counts: Vec<f64> = (0..n_taxa)
-        .map(|i| f64::from(((i * 7 + 3) % 100 + 1) as u32))
+        .map(|i| usize_f64((i * 7 + 3) % 100 + 1))
         .collect();
 
     let (cpu_shannon, cpu_div_ms) = bench("CPU Shannon (500 taxa)", || diversity::shannon(&counts));
@@ -250,7 +243,7 @@ fn main() {
     let n_species = 10_000;
     let n_samples = 5;
     let large_counts: Vec<f64> = (0..n_samples * n_species)
-        .map(|i| ((i * 13 + 7) % 200 + 1) as f64)
+        .map(|i| usize_f64((i * 13 + 7) % 200 + 1))
         .collect();
 
     let (cpu_fusion, cpu_fusion_ms) = bench("CPU DiversityFusion (5×10k)", || {
@@ -387,7 +380,7 @@ fn main() {
     println!("  Pearson, MAE, RMSE, R² → barracuda::stats (airSpring S64)");
     println!("  trapz → barracuda::numerical (cross-spring)");
 
-    let obs: Vec<f64> = (0..200).map(|i| f64::from(i) * 0.05).collect();
+    let obs: Vec<f64> = (0..200).map(|i| usize_f64(i) * 0.05).collect();
     let sim: Vec<f64> = obs
         .iter()
         .map(|&x| 0.01f64.mul_add(x.sin(), 2.0f64.mul_add(x, 1.0)))
@@ -413,7 +406,7 @@ fn main() {
 
     let n_pts = 2000;
     let trap_x: Vec<f64> = (0..n_pts)
-        .map(|i| f64::from(i) / f64::from(n_pts - 1))
+        .map(|i| usize_f64(i) / usize_f64(n_pts - 1))
         .collect();
     let trap_y: Vec<f64> = trap_x.iter().map(|&xi| xi * xi).collect();
     let (trapz_val, trapz_ms) = bench("trapz(x², 2000 pts)", || {
@@ -445,10 +438,10 @@ fn main() {
     let k = 128;
     let n = 256;
     let a_mat: Vec<f64> = (0..m * k)
-        .map(|i| ((i * 7 + 3) % 100) as f64 / 100.0)
+        .map(|i| usize_f64((i * 7 + 3) % 100) / 100.0)
         .collect();
     let b_mat: Vec<f64> = (0..k * n)
-        .map(|i| ((i * 11 + 5) % 100) as f64 / 100.0)
+        .map(|i| usize_f64((i * 11 + 5) % 100) / 100.0)
         .collect();
 
     let gemm_f64 = GemmCached::new(Arc::clone(&device), Arc::clone(&ctx));
@@ -522,7 +515,7 @@ fn main() {
     println!("  Both used by: neuralSpring (ESN readout), airSpring (kriging)");
 
     let v_mat: Vec<f64> = (0..20 * 10)
-        .map(|i| f64::from(((i * 3 + 1) % 50) as u32) / 50.0)
+        .map(|i| usize_f64((i * 3 + 1) % 50) / 50.0)
         .collect();
     let nmf_cfg = barracuda::linalg::nmf::NmfConfig {
         rank: 3,
@@ -539,8 +532,8 @@ fn main() {
         nmf_res.w.iter().chain(&nmf_res.h).all(|&x| x >= 0.0),
     );
 
-    let ridge_x: Vec<f64> = (0..100).map(|i| f64::from(i) * 0.01).collect();
-    let ridge_y: Vec<f64> = (0..40).map(|i| f64::from(i).mul_add(0.25, 1.0)).collect();
+    let ridge_x: Vec<f64> = (0..100).map(|i| usize_f64(i) * 0.01).collect();
+    let ridge_y: Vec<f64> = (0..40).map(|i| usize_f64(i).mul_add(0.25, 1.0)).collect();
     let (ridge_res, ridge_ms) = bench("Ridge regression (20×5→2)", || {
         barracuda::linalg::ridge_regression(
             &ridge_x,

@@ -69,7 +69,7 @@ fn discover_petaltongue_fallback(env_var: &str, primal: &str) -> Option<PathBuf>
     }
     if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
         let p = PathBuf::from(xdg)
-            .join("biomeos")
+            .join(crate::primal_names::BIOMEOS)
             .join(format!("{primal}-default.sock"));
         if p.exists() {
             return Some(p);

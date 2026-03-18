@@ -4,10 +4,6 @@
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
-#![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
 //! # Exp214: NUCLEUS Mixed Hardware V8 — V66 I/O Evolution via IPC
 //!
 //! Extends Exp208 (74/74) with V66 I/O evolution through the IPC dispatch
@@ -40,6 +36,7 @@ use std::io::Write;
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
 use wetspring_barracuda::bio::{derep, diversity, quality};
+use wetspring_barracuda::cast::usize_f64;
 use wetspring_barracuda::io::fastq::{self, FastqRefRecord};
 use wetspring_barracuda::io::ms2;
 use wetspring_barracuda::io::nanopore::{self, NanoporeIter, SyntheticSignalGenerator};
@@ -131,7 +128,7 @@ fn validate_fastq_diversity_dispatch(v: &mut Validator) {
     })
     .or_exit("unexpected error");
 
-    let direct_counts: Vec<f64> = seq_counts.values().map(|&c| c as f64).collect();
+    let direct_counts: Vec<f64> = seq_counts.values().map(|&c| usize_f64(c)).collect();
     let direct_h = diversity::shannon(&direct_counts);
     let direct_d = diversity::simpson(&direct_counts);
 
@@ -182,7 +179,7 @@ fn validate_nanopore_signal(v: &mut Validator) {
     let stats = loaded[0].signal_stats();
     let raw_f64: Vec<f64> = loaded[0].signal.iter().map(|&s| f64::from(s)).collect();
     // Intentional: manual mean/variance as reference to validate signal_stats implementation.
-    let manual_mean: f64 = raw_f64.iter().sum::<f64>() / raw_f64.len() as f64;
+    let manual_mean: f64 = raw_f64.iter().sum::<f64>() / usize_f64(raw_f64.len());
 
     v.check(
         "raw signal mean: manual == signal_stats",
@@ -196,7 +193,7 @@ fn validate_nanopore_signal(v: &mut Validator) {
             .iter()
             .map(|x| (x - manual_mean).powi(2))
             .sum::<f64>()
-            / raw_f64.len() as f64;
+            / usize_f64(raw_f64.len());
         var.sqrt()
     };
     v.check(
@@ -207,7 +204,7 @@ fn validate_nanopore_signal(v: &mut Validator) {
     );
 
     let dur = loaded[0].duration_seconds();
-    let expected_dur = loaded[0].signal.len() as f64 / loaded[0].sample_rate;
+    let expected_dur = usize_f64(loaded[0].signal.len()) / loaded[0].sample_rate;
     v.check(
         "duration_seconds = len / sample_rate",
         dur,
@@ -468,7 +465,7 @@ fn validate_full_pipeline(v: &mut Validator) {
         dstats.unique_sequences <= 4,
     );
 
-    let counts: Vec<f64> = uniques.iter().map(|u| u.abundance as f64).collect();
+    let counts: Vec<f64> = uniques.iter().map(|u| usize_f64(u.abundance)).collect();
 
     let direct_h = diversity::shannon(&counts);
     let result = dispatch::dispatch("science.diversity", &json!({ "counts": counts }))

@@ -9,10 +9,6 @@
     reason = "validation harness: sequential domain checks in single main()"
 )]
 #![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
     clippy::items_after_statements,
     reason = "validation harness: local helpers defined near use site"
 )]
@@ -151,7 +147,8 @@ fn main() {
         let mut prev_h = t.base_shannon + t.perturbation_delta;
 
         for i in 0..n_points {
-            let year = i as f64 / points_per_year as f64;
+            let year = wetspring_barracuda::cast::usize_f64(i)
+                / wetspring_barracuda::cast::usize_f64(points_per_year);
 
             let h = if t.recovery_tau_years.is_infinite() {
                 t.base_shannon
@@ -197,7 +194,8 @@ fn main() {
             .collect();
         let initial_w = points.first().map_or(0.0, |p| p.w_h3);
         let final_w = points.last().map_or(0.0, |p| p.w_h3);
-        let mean_p_qs = points.iter().map(|p| p.p_qs).sum::<f64>() / points.len() as f64;
+        let mean_p_qs = points.iter().map(|p| p.p_qs).sum::<f64>()
+            / wetspring_barracuda::cast::usize_f64(points.len());
 
         println!(
             "  {}: W_initial={initial_w:.2} → W_final={final_w:.2}, mean P(QS)={mean_p_qs:.4}",
@@ -210,14 +208,14 @@ fn main() {
             .iter()
             .filter(|p| p.treatment == "T2_notill")
             .collect();
-        pts.iter().map(|p| p.p_qs).sum::<f64>() / pts.len() as f64
+        pts.iter().map(|p| p.p_qs).sum::<f64>() / wetspring_barracuda::cast::usize_f64(pts.len())
     };
     let conv_mean_p: f64 = {
         let pts: Vec<&TimePoint> = all_points
             .iter()
             .filter(|p| p.treatment == "T1_conventional")
             .collect();
-        pts.iter().map(|p| p.p_qs).sum::<f64>() / pts.len() as f64
+        pts.iter().map(|p| p.p_qs).sum::<f64>() / wetspring_barracuda::cast::usize_f64(pts.len())
     };
 
     // H3 model: no-till has higher diversity (H'=3.8 vs 3.2) AND lower O₂ (0.5 vs 0.8)

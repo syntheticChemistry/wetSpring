@@ -5,10 +5,6 @@
     reason = "validation harness: results printed to stdout"
 )]
 #![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
     clippy::too_many_lines,
     reason = "validation harness: sequential domain checks in single main()"
 )]
@@ -38,6 +34,7 @@
 //! Provenance: End-to-end pipeline integration test
 
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::cast;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
@@ -52,15 +49,15 @@ const EXPECTED_OBS_FEATURES_MIN: f64 = tolerances::COLD_SEEP_OBS_FEATURES_MIN;
 
 fn synthetic_cold_seep_community(sample_idx: usize) -> Vec<f64> {
     let n_species = 150 + (sample_idx % 100);
-    let evenness = 0.65 + (sample_idx as f64 * 0.003).min(0.25);
-    let seed = 42 + sample_idx as u64 * 137;
+    let evenness = 0.65 + (cast::usize_f64(sample_idx) * 0.003).min(0.25);
+    let seed = 42 + cast::usize_u64(sample_idx) * 137;
 
     let mut counts = Vec::with_capacity(n_species);
     let mut rng = seed;
     for i in 0..n_species {
         rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-        let noise = ((rng >> 33) as f64) / f64::from(u32::MAX);
-        let rank_weight = (-(i as f64) / (n_species as f64 * evenness)).exp();
+        let noise = cast::u64_f64(rng >> 33) / f64::from(u32::MAX);
+        let rank_weight = (-(cast::usize_f64(i)) / (cast::usize_f64(n_species) * evenness)).exp();
         counts.push((rank_weight * 500.0 * (0.3 + noise)).max(1.0));
     }
     counts
@@ -119,9 +116,9 @@ fn main() {
         }
     }
 
-    let mean_shannon = all_shannon.iter().sum::<f64>() / all_shannon.len() as f64;
-    let mean_simpson = all_simpson.iter().sum::<f64>() / all_simpson.len() as f64;
-    let mean_observed = all_obs.iter().sum::<f64>() / all_obs.len() as f64;
+    let mean_shannon = all_shannon.iter().sum::<f64>() / cast::usize_f64(all_shannon.len());
+    let mean_simpson = all_simpson.iter().sum::<f64>() / cast::usize_f64(all_simpson.len());
+    let mean_observed = all_obs.iter().sum::<f64>() / cast::usize_f64(all_obs.len());
 
     println!();
     println!("  Mean Shannon H': {mean_shannon:.4}");
@@ -163,7 +160,7 @@ fn main() {
         .all(|&d| (0.0..=1.0 + tolerances::EXACT).contains(&d));
     validator.check_pass("all Bray-Curtis distances in [0, 1]", bc_in_range);
 
-    let mean_bc = bc.iter().sum::<f64>() / bc.len() as f64;
+    let mean_bc = bc.iter().sum::<f64>() / cast::usize_f64(bc.len());
     println!("  Condensed Bray-Curtis: {n_pairs} pairs");
     println!("  Mean distance: {mean_bc:.4}");
 
@@ -196,8 +193,8 @@ fn main() {
             }
         }
 
-        let frac_extended = n_extended as f64 / N_SYNTHETIC_SAMPLES as f64;
-        let mean_r = r_values.iter().sum::<f64>() / r_values.len() as f64;
+        let frac_extended = cast::usize_f64(n_extended) / cast::usize_f64(N_SYNTHETIC_SAMPLES);
+        let mean_r = r_values.iter().sum::<f64>() / cast::usize_f64(r_values.len());
 
         println!(
             "  Extended (QS viable): {n_extended}/{N_SYNTHETIC_SAMPLES} ({:.1}%)",

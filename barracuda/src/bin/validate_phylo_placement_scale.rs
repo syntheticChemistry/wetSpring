@@ -4,10 +4,6 @@
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
-#![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
 //! # Exp109: Large-Scale Phylogenetic Placement with GPU Felsenstein
 //!
 //! Validates phylogenetic distance computation and NJ tree construction at
@@ -28,6 +24,7 @@
 use std::time::Instant;
 use wetspring_barracuda::bio::felsenstein::{self, TreeNode};
 use wetspring_barracuda::bio::neighbor_joining;
+use wetspring_barracuda::cast;
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
 
@@ -42,16 +39,16 @@ fn generate_alignment(n_taxa: usize, seq_len: usize, seed: u64) -> Vec<Vec<u8>> 
     let mut ancestor = Vec::with_capacity(seq_len);
     for _ in 0..seq_len {
         rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-        ancestor.push(bases[((rng >> 33) % 4) as usize]);
+        ancestor.push(bases[cast::u64_usize((rng >> 33) % 4)]);
     }
 
     for _ in 0..n_taxa {
         let mut seq = ancestor.clone();
         for site in &mut seq {
             rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-            if ((rng >> 33) as f64) / f64::from(u32::MAX) < 0.05 {
+            if cast::u64_f64(rng >> 33) / f64::from(u32::MAX) < 0.05 {
                 rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-                *site = bases[((rng >> 33) % 4) as usize];
+                *site = bases[cast::u64_usize((rng >> 33) % 4)];
             }
         }
         alignment.push(seq);
@@ -65,7 +62,7 @@ fn jukes_cantor_distance(a: &[u8], b: &[u8]) -> f64 {
         return 0.0;
     }
     let mismatches = a.iter().zip(b.iter()).filter(|(x, y)| x != y).count();
-    let p = mismatches as f64 / n as f64;
+    let p = cast::usize_f64(mismatches) / cast::usize_f64(n);
     if p >= 0.75 {
         return 3.0;
     }

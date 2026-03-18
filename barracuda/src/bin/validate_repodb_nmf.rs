@@ -4,10 +4,6 @@
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
-#![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
 //! # Exp160: repoDB NMF Reproduction (Gao et al. 2020)
 //!
 //! Validates the NMF drug repositioning pipeline at repoDB-proportional
@@ -27,6 +23,7 @@
 //! Provenance: Known-value formulas and algorithmic invariants
 
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
+use wetspring_barracuda::cast;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
@@ -45,13 +42,8 @@ impl LcgRng {
         let bits = (self.0 >> 11) | 0x3FF0_0000_0000_0000;
         f64::from_bits(bits) - 1.0
     }
-    #[expect(
-        clippy::cast_sign_loss,
-        clippy::cast_possible_truncation,
-        reason = "validation: value known non-negative from domain logic; bounded float→integer for index/count"
-    )]
     fn next_usize(&mut self, max: usize) -> usize {
-        (self.next_f64() * max as f64) as usize % max
+        cast::f64_usize(self.next_f64() * cast::usize_f64(max)) % max
     }
 }
 
@@ -140,18 +132,20 @@ fn validate_factorisation_and_structure(
 
     v.section("§4 Factor Quality Analysis");
 
-    let w_nonzero_frac = result
-        .w
-        .iter()
-        .filter(|&&x| x > tolerances::ANALYTICAL_LOOSE)
-        .count() as f64
-        / result.w.len() as f64;
-    let h_nonzero_frac = result
-        .h
-        .iter()
-        .filter(|&&x| x > tolerances::ANALYTICAL_LOOSE)
-        .count() as f64
-        / result.h.len() as f64;
+    let w_nonzero_frac = cast::usize_f64(
+        result
+            .w
+            .iter()
+            .filter(|&&x| x > tolerances::ANALYTICAL_LOOSE)
+            .count(),
+    ) / cast::usize_f64(result.w.len());
+    let h_nonzero_frac = cast::usize_f64(
+        result
+            .h
+            .iter()
+            .filter(|&&x| x > tolerances::ANALYTICAL_LOOSE)
+            .count(),
+    ) / cast::usize_f64(result.h.len());
 
     println!("  W factor density: {:.1}%", w_nonzero_frac * 100.0);
     println!("  H factor density: {:.1}%", h_nonzero_frac * 100.0);
@@ -245,7 +239,7 @@ fn main() {
     }
 
     let n_nonzero = matrix.iter().filter(|&&x| x > 0.0).count();
-    let fill_rate = n_nonzero as f64 / total as f64;
+    let fill_rate = cast::usize_f64(n_nonzero) / cast::usize_f64(total);
     println!("  Matrix: {N_DRUGS} × {N_DISEASES} ({total} entries)");
     println!("  Non-zero: {n_nonzero} ({:.1}% fill)", fill_rate * 100.0);
     println!("  Clusters: {N_CLUSTERS} blocks of ~{entries_per_cluster} each");

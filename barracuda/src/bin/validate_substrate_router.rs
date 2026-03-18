@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
     clippy::too_many_lines,
     reason = "validation harness: sequential domain checks in single main()"
 )]
@@ -124,7 +120,7 @@ fn route_shannon(router: &SubstrateRouter, gpu: Option<&GpuF64>, counts: &[f64])
     RouterResult {
         value,
         substrate: target,
-        us: t.elapsed().as_micros() as f64,
+        us: wetspring_barracuda::cast::u128_f64(t.elapsed().as_micros()),
     }
 }
 
@@ -139,7 +135,7 @@ fn route_simpson(router: &SubstrateRouter, gpu: Option<&GpuF64>, counts: &[f64])
     RouterResult {
         value,
         substrate: target,
-        us: t.elapsed().as_micros() as f64,
+        us: wetspring_barracuda::cast::u128_f64(t.elapsed().as_micros()),
     }
 }
 
@@ -158,7 +154,11 @@ fn route_bray_curtis(
         }
         Substrate::Cpu | Substrate::Npu => diversity::bray_curtis_condensed(samples),
     };
-    (value, target, t.elapsed().as_micros() as f64)
+    (
+        value,
+        target,
+        wetspring_barracuda::cast::u128_f64(t.elapsed().as_micros()),
+    )
 }
 
 #[tokio::main]
@@ -172,8 +172,7 @@ async fn main() {
     }
 
     let gpu_available = gpu.as_ref().is_some_and(|g| g.has_f64);
-    let npu_device = std::env::var("WETSPRING_NPU_DEVICE")
-        .unwrap_or_else(|_| String::from(wetspring_barracuda::niche::NPU_DEFAULT_DEVICE));
+    let npu_device = wetspring_barracuda::niche::discover_npu_device();
     let npu_available = std::path::Path::new(&npu_device).exists();
     let ada_lovelace = gpu_available;
 
@@ -334,7 +333,7 @@ async fn main() {
     );
     v.check(
         "Bray-Curtis: len = 15",
-        routed_bray.len() as f64,
+        wetspring_barracuda::cast::usize_f64(routed_bray.len()),
         15.0,
         tolerances::EXACT,
     );
@@ -368,7 +367,7 @@ async fn main() {
     let pipeline_start = Instant::now();
     let diversity_result = route_shannon(&router, gpu.as_ref(), &eco_counts);
     let classify_route = router.route(WorkloadClass::Inference, 1);
-    let pipeline_us = pipeline_start.elapsed().as_micros() as f64;
+    let pipeline_us = wetspring_barracuda::cast::u128_f64(pipeline_start.elapsed().as_micros());
 
     v.check(
         "Mixed: diversity via GPU",

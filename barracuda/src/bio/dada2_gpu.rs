@@ -287,8 +287,8 @@ pub fn denoise_gpu(
 
 // ── Data packing for GPU ─────────────────────────────────────────────────────
 
-const fn base_to_idx(b: u8) -> u32 {
-    dada2::base_to_idx(b) as u32
+fn base_to_idx(b: u8) -> u32 {
+    crate::cast::usize_u32(dada2::base_to_idx(b))
 }
 
 fn pack_sequences(seqs: &[&UniqueSequence], max_len: usize) -> (Vec<u32>, Vec<u32>, Vec<u32>) {

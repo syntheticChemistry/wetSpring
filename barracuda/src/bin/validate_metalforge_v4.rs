@@ -4,10 +4,6 @@
     clippy::too_many_lines,
     reason = "validation harness: sequential domain checks in single main()"
 )]
-#![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
 //! Exp100: `metalForge` Cross-Substrate v4 — 20 Domains + NPU Dispatch
 //!
 //! | Script  | `validate_metalforge_v4` |
@@ -219,8 +215,7 @@ async fn main() {
     {
         let t0 = Instant::now();
 
-        let npu_device = std::env::var("WETSPRING_NPU_DEVICE")
-            .unwrap_or_else(|_| String::from(wetspring_barracuda::niche::NPU_DEFAULT_DEVICE));
+        let npu_device = wetspring_barracuda::niche::discover_npu_device();
         let has_npu = std::path::Path::new(&npu_device).exists();
         let npu_substrate = if has_npu {
             "NPU (AKD1000)"
@@ -245,7 +240,12 @@ async fn main() {
             .max_by(|a, b| a.1.total_cmp(b.1))
             .map(|(i, _)| i)
             .or_exit("MetalForge v4");
-        v.check("NPU classify argmax", argmax as f64, 0.0, tolerances::EXACT);
+        v.check(
+            "NPU classify argmax",
+            wetspring_barracuda::cast::usize_f64(argmax),
+            0.0,
+            tolerances::EXACT,
+        );
 
         let us = t0.elapsed().as_micros();
         println!("  NPU routing: {us} µs");

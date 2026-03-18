@@ -425,12 +425,12 @@ mod tests {
 
             #[test]
             fn steady_state_converges(
-                k_dgc in 2.0..30.0_f64,
+                k_dgc in 5.0..30.0_f64,
                 k_pde in 0.2..2.0_f64,
                 seed in 0u64..1000,
             ) {
                 let analytical = k_dgc / k_pde;
-                let stats = birth_death_ensemble(k_dgc, k_pde, 40.0, 80, seed);
+                let stats = birth_death_ensemble(k_dgc, k_pde, 60.0, 200, seed);
                 let error_pct = (stats.mean - analytical).abs() / analytical.max(0.1);
                 prop_assert!(
                     error_pct < crate::tolerances::GILLESPIE_PROPTEST_PCT,

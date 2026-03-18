@@ -3,6 +3,67 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V129] — 2026-03-18
+
+### Deep Debt Evolution — Safe Casts, Primal Identity, Nautilus Fix, Pure Rust Discovery
+
+Comprehensive codebase evolution executing on deep audit findings: type-safe numeric
+casts across all 62 modified files, unconditional primal identity module, upstream
+nautilus serialization fix, pure Rust binary discovery, and validation binary
+hardening. Net -51 lines despite adding 15 cast helpers and a new module.
+
+#### `cast` Module Evolution (15 helpers, ~170 casts migrated)
+- Added `u64_u32`, `i64_f64`, `u128_f64`, `f64_i32` cast helpers to `barracuda/src/cast.rs`
+- Migrated ~25 raw casts in library code: `anderson_spectral.rs`, `esn/reservoir.rs`,
+  `dada2_gpu.rs`, `visualization/scenarios/profiles.rs`
+- Migrated ~145 raw casts across 35 validation binaries — systematic replacement of
+  every `as f64`, `as u32`, `as u64`, `as usize` with `cast::` module functions
+- Removed ~30 now-unnecessary `#[expect(clippy::cast_*)]` file-level attributes
+- Redundant closures replaced with function references (`.map(cast::usize_u32)`)
+
+#### `primal_names` Module — Unconditional Primal Identity
+- New top-level `barracuda/src/primal_names.rs` — always available, no feature gates
+- Eliminated duplicated `#[cfg(feature = "ipc")]` / `#[cfg(not(feature = "ipc"))]` DEPENDENCIES
+  tables in `niche.rs` — unified into single table using constants
+- Eliminated `local_primal_names` module hack in `ncbi/nestgate/discovery.rs`
+- `ipc/primal_names.rs` now re-exports from top-level for backward compatibility
+- Migrated hardcoded primal strings in `ipc/handlers/ai.rs`, `visualization/ipc_push.rs`,
+  `ncbi/nestgate/`, `vault/provenance.rs` — zero hardcoded primal names in library code
+
+#### Upstream `bingocube-nautilus` JSON Roundtrip Fix
+- Root cause: `to_json()` serialized `observations_count` (a number) but NOT actual
+  observations; `from_json()` created `Vec::with_capacity(count)` — zero elements
+- Fix: Added `Serialize`/`Deserialize` derives to `BetaObservation`, serialized actual
+  observations vector. `json_roundtrip` test now passes (was pre-existing failure)
+
+#### Pure Rust Binary Discovery (validate_nucleus_v4.rs)
+- Replaced `Command::new("which")` with `find_on_path()` using `std::env::split_paths`
+- Cross-platform, sovereign — no dependency on external `which` command
+
+#### Validation Framework Evolution
+- `skip_with_code()` returns `ExitCode` instead of diverging — composable skip handling
+- `SKIP_CODE` constant (u8 = 2) for modern `fn main() -> ExitCode` binaries
+- `exit_with_result()` deprecated in favor of `print_result()` + `ExitCode`
+
+#### Tolerance Centralization
+- `IPC_JSON_ROUNDTRIP` (1e-6) — JSON float round-trip tolerance
+- `SAVGOL_SCIPY_PARITY` (0.02) — Savitzky-Golay SciPy parity tolerance
+- Extracted from inline test constants in `ipc/protocol.rs` and `bio/signal/smoothing.rs`
+
+#### Other Fixes
+- Dorado basecaller: pure Rust `find_on_path()` replaces `Command::new("which")`
+- NPU device: `discover_npu_device()` centralizes env var + fallback resolution
+- `shannon_entropy_binned` in forge: delegates to `barracuda::stats::shannon_from_frequencies`
+- `log_sum_exp`: documented as intentional CPU-only implementation
+- Gillespie proptest: increased ensemble (80→200), tightened parameter space (k_dgc 2→5)
+- `deny.toml`: documented `renderdoc-sys` and `libfuzzer-sys` as infrastructure-only
+
+**62 files changed, 710 insertions, 761 deletions (net -51)**
+- `cargo fmt` — clean
+- `cargo clippy --pedantic --nursery` — **ZERO WARNINGS**
+- `cargo test` — **1,548 passed** (3 pre-existing GPU f32 hardware-dependent)
+- `cargo doc` — clean
+
 ## [V127] — 2026-03-17
 
 ### IPC Resilience, 4-Format Capabilities, Anderson Spectral, Stable Numerics, Leverage Guide

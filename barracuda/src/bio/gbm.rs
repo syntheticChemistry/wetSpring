@@ -275,7 +275,9 @@ impl GbmMultiClassifier {
         let mut scores = self.initial_predictions.clone();
         for (k, trees) in self.class_trees.iter().enumerate() {
             for tree in trees {
-                scores[k] = self.learning_rate.mul_add(tree.predict(features), scores[k]);
+                scores[k] = self
+                    .learning_rate
+                    .mul_add(tree.predict(features), scores[k]);
             }
         }
 

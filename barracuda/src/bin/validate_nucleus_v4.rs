@@ -73,25 +73,23 @@ fn discover_biomeos_bin() -> Option<PathBuf> {
         if p.exists() {
             return Some(p);
         }
-        if let Ok(output) = Command::new("which").arg(c).output() {
-            if output.status.success() {
-                let path = String::from_utf8_lossy(&output.stdout).trim().to_string();
-                if !path.is_empty() {
-                    return Some(PathBuf::from(path));
-                }
-            }
+        if let Some(found) = find_on_path(c) {
+            return Some(found);
         }
     }
     None
 }
 
 fn discover_primal_bin(name: &str) -> Option<PathBuf> {
-    if let Ok(output) = Command::new("which").arg(name).output() {
-        if output.status.success() {
-            let path = String::from_utf8_lossy(&output.stdout).trim().to_string();
-            if !path.is_empty() {
-                return Some(PathBuf::from(path));
-            }
+    find_on_path(name)
+}
+
+fn find_on_path(binary: &str) -> Option<PathBuf> {
+    let path_var = std::env::var("PATH").ok()?;
+    for dir in std::env::split_paths(&path_var) {
+        let candidate = dir.join(binary);
+        if candidate.is_file() {
+            return Some(candidate);
         }
     }
     None

@@ -9,10 +9,6 @@
     reason = "validation harness: sequential domain checks in single main()"
 )]
 #![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
     clippy::items_after_statements,
     reason = "validation harness: local helpers defined near use site"
 )]
@@ -329,7 +325,7 @@ fn main() {
     println!("\n── S3: Model-vs-biology correlation ──");
 
     fn correlation(predicted: &[f64], known: &[f64]) -> f64 {
-        let n = predicted.len() as f64;
+        let n = wetspring_barracuda::cast::usize_f64(predicted.len());
         let mean_p = predicted.iter().sum::<f64>() / n;
         let mean_k = known.iter().sum::<f64>() / n;
         let mut cov = 0.0;
@@ -471,7 +467,8 @@ fn main() {
         if indices.is_empty() {
             return 0.0;
         }
-        indices.iter().map(|&i| vals[i]).sum::<f64>() / indices.len() as f64
+        indices.iter().map(|&i| vals[i]).sum::<f64>()
+            / wetspring_barracuda::cast::usize_f64(indices.len())
     };
 
     println!("  Model H1 (inverse diversity):");
@@ -556,7 +553,7 @@ fn main() {
             .zip(known.iter())
             .map(|(p, k)| (p - k).abs())
             .sum::<f64>()
-            / predicted.len() as f64
+            / wetspring_barracuda::cast::usize_f64(predicted.len())
     };
 
     let mae_h1 = mae(&p1_vals, &known);

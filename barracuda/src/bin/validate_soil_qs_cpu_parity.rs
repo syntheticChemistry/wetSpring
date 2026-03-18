@@ -5,18 +5,6 @@
     reason = "validation harness: results printed to stdout"
 )]
 #![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
-    clippy::cast_possible_truncation,
-    reason = "validation harness: u128→u64 timing, f64→u32 counts"
-)]
-#![expect(
-    clippy::cast_sign_loss,
-    reason = "validation harness: non-negative values cast to unsigned"
-)]
-#![expect(
     clippy::too_many_lines,
     reason = "validation harness: sequential domain checks in single main()"
 )]
@@ -68,6 +56,7 @@ use std::time::Instant;
 use wetspring_barracuda::bio::cooperation::{self, CooperationParams};
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::bio::qs_biofilm::{self, QsBiofilmParams};
+use wetspring_barracuda::cast;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
@@ -160,7 +149,7 @@ fn main() {
         standard.states().count() > 100,
     );
 
-    let d01_us = t0.elapsed().as_micros() as f64;
+    let d01_us = cast::u128_f64(t0.elapsed().as_micros());
     timings.push(Timing {
         domain: "QS Biofilm ODE (4 scenarios)",
         cpu_us: d01_us,
@@ -205,7 +194,7 @@ fn main() {
     v.check_pass("Pure coop: freq > 90%", freq_pc > 0.9);
     v.check_pass("Pure cheat: freq < 10%", freq_pch < 0.1);
 
-    let d02_us = t0.elapsed().as_micros() as f64;
+    let d02_us = cast::u128_f64(t0.elapsed().as_micros());
     timings.push(Timing {
         domain: "Cooperation (5 scenarios)",
         cpu_us: d02_us,
@@ -263,7 +252,7 @@ fn main() {
         tolerances::EXACT,
     );
 
-    let d03_us = t0.elapsed().as_micros() as f64;
+    let d03_us = cast::u128_f64(t0.elapsed().as_micros());
     timings.push(Timing {
         domain: "Alpha diversity (8 checks)",
         cpu_us: d03_us,
@@ -304,7 +293,7 @@ fn main() {
         condensed.iter().all(|&x| (0.0..=1.0).contains(&x)),
     );
 
-    let d04_us = t0.elapsed().as_micros() as f64;
+    let d04_us = cast::u128_f64(t0.elapsed().as_micros());
     timings.push(Timing {
         domain: "Beta diversity (BC)",
         cpu_us: d04_us,
@@ -346,7 +335,7 @@ fn main() {
         prev_p = p;
     }
 
-    let d05_us = t0.elapsed().as_micros() as f64;
+    let d05_us = cast::u128_f64(t0.elapsed().as_micros());
     timings.push(Timing {
         domain: "Anderson mapping (norm_cdf/erf)",
         cpu_us: d05_us,
@@ -384,7 +373,7 @@ fn main() {
         p_value < 0.05,
     );
 
-    let d06_us = t0.elapsed().as_micros() as f64;
+    let d06_us = cast::u128_f64(t0.elapsed().as_micros());
     timings.push(Timing {
         domain: "Statistical inference",
         cpu_us: d06_us,
@@ -422,7 +411,7 @@ fn main() {
         tolerances::ODE_STEADY_STATE,
     );
 
-    let d07_us = t0.elapsed().as_micros() as f64;
+    let d07_us = cast::u128_f64(t0.elapsed().as_micros());
     timings.push(Timing {
         domain: "Temporal recovery",
         cpu_us: d07_us,
@@ -444,7 +433,7 @@ fn main() {
     for &till in &tillage_factors {
         for &cover in &cover_factors {
             for &n_fert in &n_factors {
-                let richness = (base_richness as f64 * till * cover) as usize;
+                let richness = cast::f64_usize(cast::usize_f64(base_richness) * till * cover);
                 let richness = richness.max(10);
                 let comm = generate_community(&mut rng, richness);
                 let h = diversity::shannon(&comm);
@@ -470,7 +459,7 @@ fn main() {
     v.check_pass("8 factorial combinations computed", shannons.len() == 8);
     v.check_pass("All H' > 0", shannons.iter().all(|s| s.3 > 0.0));
 
-    let d08_us = t0.elapsed().as_micros() as f64;
+    let d08_us = cast::u128_f64(t0.elapsed().as_micros());
     timings.push(Timing {
         domain: "Factorial design 2×2×2",
         cpu_us: d08_us,

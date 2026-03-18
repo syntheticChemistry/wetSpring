@@ -385,3 +385,28 @@ pub const LOG_PROB_FLOOR: f64 = 1e-300;
 /// (1e-15) because synthetic signals use a low-quality LCG whose
 /// output can cluster near zero. 1e-30 bounds the noise to ~11.7σ.
 pub const BOX_MULLER_U1_FLOOR_SYNTHETIC: f64 = 1e-30;
+
+// ═══════════════════════════════════════════════════════════════════
+// IPC / protocol test tolerances
+// ═══════════════════════════════════════════════════════════════════
+
+/// IPC JSON-RPC result extraction tolerance.
+///
+/// Used in protocol-layer unit tests to verify that f64 values survive
+/// JSON serialization round-trips. 1e-6 covers the 6-decimal-place
+/// precision of JSON number formatting.
+/// Validated: `ipc::protocol` `extract_rpc_result_success`.
+pub const IPC_JSON_ROUNDTRIP: f64 = 1e-6;
+
+// ═══════════════════════════════════════════════════════════════════
+// Signal processing reference tolerances
+// ═══════════════════════════════════════════════════════════════════
+
+/// Savitzky-Golay filter parity vs `SciPy` reference values.
+///
+/// `scipy.signal.savgol_filter` reference values (window=5, order=2)
+/// are given to 2 decimal places; 0.02 covers the last-digit rounding
+/// in the reference values and numerical differences in the
+/// least-squares polynomial coefficients.
+/// Validated: `bio::signal::smoothing` `edge_cases_and_scipy`.
+pub const SAVGOL_SCIPY_PARITY: f64 = 0.02;

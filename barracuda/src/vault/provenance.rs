@@ -204,12 +204,18 @@ mod tests {
         let ticket_id = [1u8; 32];
         let data_hash = [2u8; 32];
 
-        chain.append("ingest", "nestgate", ticket_id, data_hash, "eastgate");
+        chain.append(
+            "ingest",
+            crate::primal_names::NESTGATE,
+            ticket_id,
+            data_hash,
+            "eastgate",
+        );
         let first_hash = chain.head().unwrap().hash;
 
         chain.append(
             "diversity_analysis",
-            "wetspring",
+            crate::primal_names::SELF_NAME,
             ticket_id,
             data_hash,
             "eastgate",
@@ -218,7 +224,7 @@ mod tests {
 
         chain.append(
             "anderson_classification",
-            "toadstool",
+            crate::primal_names::TOADSTOOL,
             ticket_id,
             data_hash,
             "eastgate",
@@ -233,8 +239,20 @@ mod tests {
         let ticket_id = [1u8; 32];
         let data_hash = [2u8; 32];
 
-        chain.append("ingest", "nestgate", ticket_id, data_hash, "eastgate");
-        chain.append("analysis", "wetspring", ticket_id, data_hash, "eastgate");
+        chain.append(
+            "ingest",
+            crate::primal_names::NESTGATE,
+            ticket_id,
+            data_hash,
+            "eastgate",
+        );
+        chain.append(
+            "analysis",
+            crate::primal_names::SELF_NAME,
+            ticket_id,
+            data_hash,
+            "eastgate",
+        );
 
         // Tamper: change the first entry's hash
         chain.entries[0].hash = [99u8; 32];
@@ -246,10 +264,10 @@ mod tests {
         let mut chain = ProvenanceChain::new();
         let t = [0u8; 32];
         let d = [0u8; 32];
-        chain.append("op1", "wetspring", t, d, "eastgate");
-        chain.append("op2", "nestgate", t, d, "eastgate");
-        chain.append("op3", "wetspring", t, d, "eastgate");
+        chain.append("op1", crate::primal_names::SELF_NAME, t, d, "eastgate");
+        chain.append("op2", crate::primal_names::NESTGATE, t, d, "eastgate");
+        chain.append("op3", crate::primal_names::SELF_NAME, t, d, "eastgate");
 
-        assert_eq!(chain.by_actor("wetspring").count(), 2);
+        assert_eq!(chain.by_actor(crate::primal_names::SELF_NAME).count(), 2);
     }
 }

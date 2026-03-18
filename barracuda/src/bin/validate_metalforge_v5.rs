@@ -1,13 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
-    clippy::cast_possible_truncation,
-    reason = "validation harness: u128→u64 timing, f64→u32 counts"
-)]
 //! Exp103: `metalForge` Cross-Substrate v5 — 13 Pure GPU Promotion Domains
 //!
 //! Extends `metalForge` cross-substrate validation (Exp093: 16 domains) to
@@ -48,6 +40,7 @@ use wetspring_barracuda::bio::{
     signal::{self, PeakParams},
     unifrac::PhyloTree,
 };
+use wetspring_barracuda::cast::{u64_usize, u128_f64, usize_f64};
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::io::fastq::FastqRecord;
 use wetspring_barracuda::tolerances;
@@ -120,7 +113,7 @@ fn validate_cooperation_mf(
     let params = CooperationParams::default();
     let tc = Instant::now();
     let cpu = cooperation::scenario_equal_start(&params, tolerances::ODE_DEFAULT_DT);
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = u128_f64(tc.elapsed().as_micros());
 
     let tg = Instant::now();
     let gpu_engine = CooperationGpu::new(Arc::clone(device)).or_exit("shader compile");
@@ -132,7 +125,7 @@ fn validate_cooperation_mf(
             tolerances::ODE_DEFAULT_DT,
         )
         .or_exit("GPU integrate");
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = u128_f64(tg.elapsed().as_micros());
 
     for (i, (&g, &c)) in results[0]
         .iter()
@@ -159,7 +152,7 @@ fn validate_capacitor_mf(
     let params = CapacitorParams::default();
     let tc = Instant::now();
     let cpu = capacitor::scenario_normal(&params, tolerances::ODE_DEFAULT_DT);
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = u128_f64(tc.elapsed().as_micros());
 
     let tg = Instant::now();
     let gpu_engine = CapacitorGpu::new(Arc::clone(device)).or_exit("shader compile");
@@ -171,7 +164,7 @@ fn validate_capacitor_mf(
             tolerances::ODE_DEFAULT_DT,
         )
         .or_exit("GPU integrate");
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = u128_f64(tg.elapsed().as_micros());
 
     for (i, (&g, &c)) in results[0]
         .iter()
@@ -198,13 +191,13 @@ fn validate_kmd_mf(
     let masses = vec![412.966, 462.963, 512.960, 562.957, 612.954];
     let tc = Instant::now();
     let cpu = kmd::kendrick_mass_defect(&masses, units::CF2_EXACT, units::CF2_NOMINAL);
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = u128_f64(tc.elapsed().as_micros());
 
     let tg = Instant::now();
     let gpu_results =
         kmd_gpu::kendrick_mass_defect_gpu(gpu, &masses, units::CF2_EXACT, units::CF2_NOMINAL)
             .or_exit("KMD GPU");
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = u128_f64(tg.elapsed().as_micros());
 
     for (i, (c, g)) in cpu.iter().zip(&gpu_results).enumerate() {
         v.check(
@@ -249,11 +242,11 @@ fn validate_gbm_mf(
     let samples = vec![vec![0.8, 0.5], vec![0.2, 0.1], vec![0.6, 0.4]];
     let tc = Instant::now();
     let cpu: Vec<_> = model.predict_batch_proba(&samples);
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = u128_f64(tc.elapsed().as_micros());
 
     let tg = Instant::now();
     let gpu_results = gbm_gpu::predict_batch_gpu(gpu, &model, &samples).or_exit("GBM GPU");
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = u128_f64(tg.elapsed().as_micros());
 
     for (i, (c, g)) in cpu.iter().zip(&gpu_results).enumerate() {
         v.check(
@@ -290,23 +283,23 @@ fn validate_merge_pairs_mf(
     let params = MergeParams::default();
     let tc = Instant::now();
     let (cpu_merged, cpu_stats) = merge_pairs::merge_pairs(&fwd, &rev, &params);
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = u128_f64(tc.elapsed().as_micros());
 
     let tg = Instant::now();
     let (gpu_merged, gpu_stats) =
         merge_pairs_gpu::merge_pairs_gpu(gpu, &fwd, &rev, &params).or_exit("merge GPU");
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = u128_f64(tg.elapsed().as_micros());
 
     v.check(
         "merge count",
-        gpu_merged.len() as f64,
-        cpu_merged.len() as f64,
+        usize_f64(gpu_merged.len()),
+        usize_f64(cpu_merged.len()),
         tolerances::EXACT,
     );
     v.check(
         "merge input_pairs",
-        gpu_stats.input_pairs as f64,
-        cpu_stats.input_pairs as f64,
+        usize_f64(gpu_stats.input_pairs),
+        usize_f64(cpu_stats.input_pairs),
         tolerances::EXACT,
     );
     timings.push(("Merge Pairs", cpu_us, gpu_us, "CPU=GPU"));
@@ -339,23 +332,23 @@ fn validate_signal_mf(
 
     let tc = Instant::now();
     let cpu = signal::find_peaks(&data, &params);
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = u128_f64(tc.elapsed().as_micros());
 
     let tg = Instant::now();
     let gpu_peaks = signal_gpu::find_peaks_gpu(gpu, &data, &params).or_exit("signal GPU");
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = u128_f64(tg.elapsed().as_micros());
 
     v.check(
         "peak count",
-        gpu_peaks.len() as f64,
-        cpu.len() as f64,
+        usize_f64(gpu_peaks.len()),
+        usize_f64(cpu.len()),
         tolerances::EXACT,
     );
     for (i, (c, g)) in cpu.iter().zip(&gpu_peaks).enumerate() {
         v.check(
             &format!("peak[{i}] index"),
-            g.index as f64,
-            c.index as f64,
+            usize_f64(g.index),
+            usize_f64(c.index),
             tolerances::EXACT,
         );
     }
@@ -376,16 +369,16 @@ fn validate_feature_table_mf(
     let params = FeatureParams::default();
     let tc = Instant::now();
     let cpu = feature_table::extract_features(&[], &params);
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = u128_f64(tc.elapsed().as_micros());
 
     let tg = Instant::now();
     let gpu_ft = feature_table_gpu::extract_features_gpu(gpu, &[], &params).or_exit("FT GPU");
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = u128_f64(tg.elapsed().as_micros());
 
     v.check(
         "feature count",
-        gpu_ft.features.len() as f64,
-        cpu.features.len() as f64,
+        usize_f64(gpu_ft.features.len()),
+        usize_f64(cpu.features.len()),
         tolerances::EXACT,
     );
     timings.push(("Feature Table", cpu_us, gpu_us, "CPU=GPU"));
@@ -407,16 +400,16 @@ fn validate_robinson_foulds_mf(
 
     let tc = Instant::now();
     let cpu_dist = robinson_foulds::rf_distance(&t1, &t2);
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = u128_f64(tc.elapsed().as_micros());
 
     let tg = Instant::now();
     let gpu_dist = robinson_foulds_gpu::rf_distance_gpu(gpu, &t1, &t2).or_exit("RF GPU");
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = u128_f64(tg.elapsed().as_micros());
 
     v.check(
         "RF distance",
-        gpu_dist as f64,
-        cpu_dist as f64,
+        usize_f64(gpu_dist),
+        usize_f64(cpu_dist),
         tolerances::EXACT,
     );
     timings.push(("Robinson-Foulds", cpu_us, gpu_us, "CPU=GPU"));
@@ -453,23 +446,23 @@ fn validate_derep_mf(
 
     let tc = Instant::now();
     let (cpu_uniq, cpu_stats) = derep::dereplicate(&records, DerepSort::Abundance, 1);
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = u128_f64(tc.elapsed().as_micros());
 
     let tg = Instant::now();
     let (gpu_uniq, gpu_stats) =
         derep_gpu::dereplicate_gpu(gpu, &records, DerepSort::Abundance, 1).or_exit("derep GPU");
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = u128_f64(tg.elapsed().as_micros());
 
     v.check(
         "derep unique count",
-        gpu_uniq.len() as f64,
-        cpu_uniq.len() as f64,
+        usize_f64(gpu_uniq.len()),
+        usize_f64(cpu_uniq.len()),
         tolerances::EXACT,
     );
     v.check(
         "derep input_sequences",
-        gpu_stats.input_sequences as f64,
-        cpu_stats.input_sequences as f64,
+        usize_f64(gpu_stats.input_sequences),
+        usize_f64(cpu_stats.input_sequences),
         tolerances::EXACT,
     );
     timings.push(("Dereplication", cpu_us, gpu_us, "CPU=GPU"));
@@ -507,23 +500,23 @@ fn validate_chimera_mf(
 
     let tc = Instant::now();
     let (cpu_results, cpu_stats) = chimera::detect_chimeras(&asvs, &params);
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = u128_f64(tc.elapsed().as_micros());
 
     let tg = Instant::now();
     let (gpu_results, gpu_stats) =
         chimera_gpu::detect_chimeras_gpu(gpu, &asvs, &params).or_exit("chimera GPU");
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = u128_f64(tg.elapsed().as_micros());
 
     v.check(
         "chimera count",
-        gpu_results.len() as f64,
-        cpu_results.len() as f64,
+        usize_f64(gpu_results.len()),
+        usize_f64(cpu_results.len()),
         tolerances::EXACT,
     );
     v.check(
         "chimera found",
-        gpu_stats.chimeras_found as f64,
-        cpu_stats.chimeras_found as f64,
+        usize_f64(gpu_stats.chimeras_found),
+        usize_f64(cpu_stats.chimeras_found),
         tolerances::EXACT,
     );
     timings.push(("Chimera", cpu_us, gpu_us, "CPU=GPU"));
@@ -544,11 +537,11 @@ fn validate_neighbor_joining_mf(
 
     let tc = Instant::now();
     let cpu_dist = neighbor_joining::distance_matrix(&seqs);
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = u128_f64(tc.elapsed().as_micros());
 
     let tg = Instant::now();
     let gpu_dist = neighbor_joining_gpu::distance_matrix_gpu(gpu, &seqs).or_exit("NJ GPU");
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = u128_f64(tg.elapsed().as_micros());
 
     for (i, (c, g)) in cpu_dist.iter().zip(&gpu_dist).enumerate() {
         v.check(&format!("NJ dist[{i}]"), *g, *c, tolerances::ANALYTICAL_F64);
@@ -590,13 +583,13 @@ fn validate_reconciliation_mf(
 
     let tc = Instant::now();
     let cpu = reconciliation::reconcile_dtl(&host, &parasite, &tip_mapping, &costs);
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = u128_f64(tc.elapsed().as_micros());
 
     let tg = Instant::now();
     let gpu_result =
         reconciliation_gpu::reconcile_dtl_gpu(gpu, &host, &parasite, &tip_mapping, &costs)
             .or_exit("reconciliation GPU");
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = u128_f64(tg.elapsed().as_micros());
 
     v.check(
         "reconciliation cost",
@@ -622,19 +615,19 @@ fn validate_molecular_clock_mf(
     let parent_indices: Vec<i64> = vec![-1, 0, 0, 1, 1];
     let parent_opt: Vec<Option<usize>> = parent_indices
         .iter()
-        .map(|&p| u64::try_from(p).ok().map(|u| u as usize))
+        .map(|&p| u64::try_from(p).ok().map(u64_usize))
         .collect();
     let root_age = 100.0;
 
     let tc = Instant::now();
     let cpu = molecular_clock::strict_clock(&branch_lengths, &parent_opt, root_age, &[]);
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = u128_f64(tc.elapsed().as_micros());
 
     let tg = Instant::now();
     let gpu_result =
         molecular_clock_gpu::strict_clock_gpu(gpu, &branch_lengths, &parent_indices, root_age, &[])
             .or_exit("clock GPU");
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = u128_f64(tg.elapsed().as_micros());
 
     match (&cpu, &gpu_result) {
         (Some(c), Some(g)) => {

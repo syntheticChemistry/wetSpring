@@ -9,10 +9,6 @@
     reason = "validation harness: sequential domain checks in single main()"
 )]
 #![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
     clippy::cast_possible_truncation,
     reason = "validation harness: u128→u64 timing, f64→u32 counts"
 )]
@@ -50,6 +46,7 @@
 use std::time::Instant;
 
 use wetspring_barracuda::bio::{diversity, diversity_gpu};
+use wetspring_barracuda::cast;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
@@ -360,7 +357,7 @@ fn main() {
     v.section("Stage 8: Stats Integration (groundSpring)");
     let ci = barracuda::stats::bootstrap_ci(
         &gpu_shannons,
-        |d| d.iter().sum::<f64>() / d.len() as f64,
+        |d| d.iter().sum::<f64>() / cast::usize_f64(d.len()),
         5_000,
         0.95,
         42,

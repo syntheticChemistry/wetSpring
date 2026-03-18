@@ -8,10 +8,6 @@
     clippy::too_many_lines,
     reason = "validation harness: sequential domain checks in single main()"
 )]
-#![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
 //! # Exp354: Anderson QS Landscape — Flagship Visualization
 //!
 //! Builds the "one picture that tells the whole story" dashboard for the
@@ -43,6 +39,7 @@ use std::path::PathBuf;
 
 use barracuda::stats::norm_cdf;
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::cast::usize_f64;
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::visualization::ipc_push::PetalTonguePushClient;
@@ -256,13 +253,13 @@ fn main() {
     };
 
     let grid_size = 10;
-    let grid: Vec<f64> = (0..grid_size).map(|i| i as f64).collect();
+    let grid: Vec<f64> = (0..grid_size).map(usize_f64).collect();
     let mut field_values = Vec::with_capacity(grid_size * grid_size);
     for row in 0..grid_size {
         for col in 0..grid_size {
             let biome_idx = (row + col) % biomes.len();
             let base_w = w_values[biome_idx];
-            let noise = ((row * 7 + col * 13) % 10) as f64 * 0.3;
+            let noise = usize_f64((row * 7 + col * 13) % 10) * 0.3;
             field_values.push(base_w + noise);
         }
     }
@@ -330,7 +327,7 @@ fn main() {
 
     for (name, counts) in &biomes {
         let step = (counts.len() / 10).max(1);
-        let depths: Vec<f64> = (1..=counts.len()).step_by(step).map(|d| d as f64).collect();
+        let depths: Vec<f64> = (1..=counts.len()).step_by(step).map(usize_f64).collect();
         let curve = diversity::rarefaction_curve(counts, &depths);
         rare_node.data_channels.push(DataChannel::TimeSeries {
             id: format!("rare_{}", name.to_lowercase().replace(' ', "_")),

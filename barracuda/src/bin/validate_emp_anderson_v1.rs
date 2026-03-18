@@ -9,18 +9,6 @@
     reason = "validation harness: sequential domain checks in single main()"
 )]
 #![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
-    clippy::cast_possible_truncation,
-    reason = "validation harness: u128→u64 timing, f64→u32 counts"
-)]
-#![expect(
-    clippy::cast_sign_loss,
-    reason = "validation harness: non-negative values cast to unsigned"
-)]
-#![expect(
     clippy::similar_names,
     reason = "validation harness: domain variables from published notation"
 )]
@@ -129,20 +117,24 @@ fn generate_emp_scale_synthetic(n_per_biome: usize) -> Vec<OtuSample> {
 
     for (biome, o2, mean_h, o2_regime) in &biomes {
         for i in 0..n_per_biome {
-            let seed = (biome.len() as u64)
+            let seed = wetspring_barracuda::cast::usize_u64(biome.len())
                 .wrapping_mul(6_364_136_223_846_793_005)
-                .wrapping_add(i as u64);
+                .wrapping_add(wetspring_barracuda::cast::usize_u64(i));
             let mut counts = vec![0.0_f64; n_taxa];
             let richness_frac = (*mean_h / 4.5).clamp(0.1, 1.0);
-            let n_present = ((richness_frac * n_taxa as f64) as usize).max(3);
+            let n_present = wetspring_barracuda::cast::f64_usize(
+                richness_frac * wetspring_barracuda::cast::usize_f64(n_taxa),
+            )
+            .max(3);
 
             for (j, count) in counts.iter_mut().take(n_present).enumerate() {
-                let pseudo = ((seed
-                    .wrapping_mul(6_364_136_223_846_793_005)
-                    .wrapping_add(j as u64 * 1_442_695_040_888_963_407))
-                    as f64)
-                    / u64::MAX as f64;
-                let rank_weight = 1.0 / (1.0 + j as f64).powf(0.8 + pseudo * 0.4);
+                let pseudo = wetspring_barracuda::cast::u64_f64(
+                    seed.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(
+                        wetspring_barracuda::cast::usize_u64(j) * 1_442_695_040_888_963_407,
+                    ),
+                ) / wetspring_barracuda::cast::u64_f64(u64::MAX);
+                let rank_weight =
+                    1.0 / (1.0 + wetspring_barracuda::cast::usize_f64(j)).powf(0.8 + pseudo * 0.4);
                 *count = (rank_weight * 100.0 * (0.5 + pseudo)).max(1.0);
             }
 
@@ -192,7 +184,7 @@ fn compute_diversity(sample: &OtuSample) -> DiversityResult {
     let simpson = barracuda::stats::diversity::simpson(&sample.counts);
     let richness = sample.counts.iter().filter(|&&c| c > 0.0).count();
     let pielou = if richness > 1 {
-        shannon / (richness as f64).ln()
+        shannon / wetspring_barracuda::cast::usize_f64(richness).ln()
     } else {
         0.0
     };
@@ -267,11 +259,17 @@ fn main() {
 
     let results: Vec<DiversityResult> = samples.iter().map(compute_diversity).collect();
 
-    let mean_shannon: f64 = results.iter().map(|r| r.shannon).sum::<f64>() / results.len() as f64;
-    let mean_simpson: f64 = results.iter().map(|r| r.simpson).sum::<f64>() / results.len() as f64;
-    let mean_pielou: f64 = results.iter().map(|r| r.pielou).sum::<f64>() / results.len() as f64;
-    let mean_richness: f64 =
-        results.iter().map(|r| r.richness as f64).sum::<f64>() / results.len() as f64;
+    let mean_shannon: f64 = results.iter().map(|r| r.shannon).sum::<f64>()
+        / wetspring_barracuda::cast::usize_f64(results.len());
+    let mean_simpson: f64 = results.iter().map(|r| r.simpson).sum::<f64>()
+        / wetspring_barracuda::cast::usize_f64(results.len());
+    let mean_pielou: f64 = results.iter().map(|r| r.pielou).sum::<f64>()
+        / wetspring_barracuda::cast::usize_f64(results.len());
+    let mean_richness: f64 = results
+        .iter()
+        .map(|r| wetspring_barracuda::cast::usize_f64(r.richness))
+        .sum::<f64>()
+        / wetspring_barracuda::cast::usize_f64(results.len());
 
     println!("  {} samples processed", results.len());
     println!("  Mean Shannon: {mean_shannon:.4}");
@@ -295,9 +293,12 @@ fn main() {
     // ─── D103: Anderson W Mapping ───
     println!("\n  ── D103: Anderson W Mapping ──");
 
-    let mean_w_h1: f64 = results.iter().map(|r| r.w_h1).sum::<f64>() / results.len() as f64;
-    let mean_w_h2: f64 = results.iter().map(|r| r.w_h2).sum::<f64>() / results.len() as f64;
-    let mean_w_h3: f64 = results.iter().map(|r| r.w_h3).sum::<f64>() / results.len() as f64;
+    let mean_w_h1: f64 = results.iter().map(|r| r.w_h1).sum::<f64>()
+        / wetspring_barracuda::cast::usize_f64(results.len());
+    let mean_w_h2: f64 = results.iter().map(|r| r.w_h2).sum::<f64>()
+        / wetspring_barracuda::cast::usize_f64(results.len());
+    let mean_w_h3: f64 = results.iter().map(|r| r.w_h3).sum::<f64>()
+        / wetspring_barracuda::cast::usize_f64(results.len());
 
     println!("  Mean W(H1 inverse diversity): {mean_w_h1:.4}");
     println!("  Mean W(H2 signal dilution):   {mean_w_h2:.4}");
@@ -318,9 +319,12 @@ fn main() {
     let mut biome_summary: Vec<(String, f64, f64, f64, usize)> = biome_stats
         .iter()
         .map(|(biome, rs)| {
-            let mean_p_h3 = rs.iter().map(|r| r.p_qs_h3).sum::<f64>() / rs.len() as f64;
-            let mean_h = rs.iter().map(|r| r.shannon).sum::<f64>() / rs.len() as f64;
-            let mean_o2 = rs.iter().map(|r| r.oxygen_regime).sum::<f64>() / rs.len() as f64;
+            let mean_p_h3 = rs.iter().map(|r| r.p_qs_h3).sum::<f64>()
+                / wetspring_barracuda::cast::usize_f64(rs.len());
+            let mean_h = rs.iter().map(|r| r.shannon).sum::<f64>()
+                / wetspring_barracuda::cast::usize_f64(rs.len());
+            let mean_o2 = rs.iter().map(|r| r.oxygen_regime).sum::<f64>()
+                / wetspring_barracuda::cast::usize_f64(rs.len());
             (biome.clone(), mean_p_h3, mean_h, mean_o2, rs.len())
         })
         .collect();
@@ -350,12 +354,12 @@ fn main() {
     let mean_anaerobic = if anaerobic.is_empty() {
         0.0
     } else {
-        anaerobic.iter().sum::<f64>() / anaerobic.len() as f64
+        anaerobic.iter().sum::<f64>() / wetspring_barracuda::cast::usize_f64(anaerobic.len())
     };
     let mean_aerobic = if aerobic.is_empty() {
         0.0
     } else {
-        aerobic.iter().sum::<f64>() / aerobic.len() as f64
+        aerobic.iter().sum::<f64>() / wetspring_barracuda::cast::usize_f64(aerobic.len())
     };
 
     println!("\n  Oxygen regime comparison (H3):");
@@ -448,7 +452,7 @@ fn main() {
         atlas_node.data_channels.push(DataChannel::Gauge {
             id: "atlas_coverage".into(),
             label: "Biome Coverage".into(),
-            value: biome_summary.len() as f64,
+            value: wetspring_barracuda::cast::usize_f64(biome_summary.len()),
             min: 0.0,
             max: 30.0,
             unit: "biomes".into(),

@@ -4,10 +4,6 @@
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
-#![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
 //! # Exp159: NMF Drug-Disease Matrix Factorization
 //!
 //! Reproduces the core NMF pipeline from Yang et al. 2020 (Paper 41)
@@ -37,6 +33,7 @@
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
+use wetspring_barracuda::cast;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
@@ -57,18 +54,14 @@ impl LcgRng {
     }
 }
 
-#[expect(
-    clippy::cast_sign_loss,
-    clippy::cast_possible_truncation,
-    reason = "validation: value known non-negative from domain logic; bounded float→integer for index/count"
-)]
 fn build_block_matrix(rng: &mut LcgRng) -> (Vec<f64>, usize) {
     let n_drugs = 200;
     let n_diseases = 100;
     let target_sparsity = 0.05;
-    let n_known =
-        (f64::from(u32::try_from(n_drugs * n_diseases).or_exit("n_drugs*n_diseases fits u32"))
-            * target_sparsity) as usize;
+    let n_known = cast::f64_usize(
+        f64::from(u32::try_from(n_drugs * n_diseases).or_exit("n_drugs*n_diseases fits u32"))
+            * target_sparsity,
+    );
 
     let mut matrix = vec![0.0; n_drugs * n_diseases];
     let n_clusters = 5;
@@ -80,16 +73,20 @@ fn build_block_matrix(rng: &mut LcgRng) -> (Vec<f64>, usize) {
         let disease_start = c * diseases_per_cluster;
         for _ in 0..(n_known / n_clusters) {
             let d = drug_start
-                + (rng.next_f64()
-                    * f64::from(
-                        u32::try_from(drugs_per_cluster).or_exit("drugs_per_cluster fits u32"),
-                    )) as usize;
+                + cast::f64_usize(
+                    rng.next_f64()
+                        * f64::from(
+                            u32::try_from(drugs_per_cluster).or_exit("drugs_per_cluster fits u32"),
+                        ),
+                );
             let dis = disease_start
-                + (rng.next_f64()
-                    * f64::from(
-                        u32::try_from(diseases_per_cluster)
-                            .or_exit("diseases_per_cluster fits u32"),
-                    )) as usize;
+                + cast::f64_usize(
+                    rng.next_f64()
+                        * f64::from(
+                            u32::try_from(diseases_per_cluster)
+                                .or_exit("diseases_per_cluster fits u32"),
+                        ),
+                );
             if d < n_drugs && dis < n_diseases {
                 matrix[d * n_diseases + dis] = 1.0;
             }
@@ -104,7 +101,7 @@ fn validate_matrix_construction(v: &mut Validator, actual_nonzero: usize) -> f64
     let n_drugs: usize = 200;
     let n_diseases: usize = 100;
 
-    let actual_sparsity = actual_nonzero as f64 / (n_drugs * n_diseases) as f64;
+    let actual_sparsity = cast::usize_f64(actual_nonzero) / cast::usize_f64(n_drugs * n_diseases);
     println!("  Matrix: {n_drugs} drugs × {n_diseases} diseases");
     println!("  Known associations: {actual_nonzero}");
     println!("  Fill rate: {:.1}%", actual_sparsity * 100.0);
@@ -157,12 +154,12 @@ fn validate_factorisation(
         let precision = if novel_preds.is_empty() {
             0.0
         } else {
-            hits as f64 / novel_preds.len() as f64
+            cast::usize_f64(hits) / cast::usize_f64(novel_preds.len())
         };
         let recall = if test_pairs.is_empty() {
             0.0
         } else {
-            hits as f64 / test_pairs.len() as f64
+            cast::usize_f64(hits) / cast::usize_f64(test_pairs.len())
         };
 
         println!(
@@ -244,7 +241,7 @@ fn validate_kl_and_sparsity(
     let kl_precision = if kl_novel.is_empty() {
         0.0
     } else {
-        kl_hits as f64 / kl_novel.len() as f64
+        cast::usize_f64(kl_hits) / cast::usize_f64(kl_novel.len())
     };
     println!(
         "  KL-divergence NMF: hits={kl_hits}/{}, P@{n_test}={kl_precision:.3}",
@@ -265,18 +262,20 @@ fn validate_kl_and_sparsity(
     let result_best =
         nmf::nmf(train_matrix, n_drugs, n_diseases, &config_best).or_exit("NMF failed");
 
-    let w_sparsity = result_best
-        .w
-        .iter()
-        .filter(|&&x| x < tolerances::NMF_SPARSITY_THRESHOLD)
-        .count() as f64
-        / result_best.w.len() as f64;
-    let h_sparsity = result_best
-        .h
-        .iter()
-        .filter(|&&x| x < tolerances::NMF_SPARSITY_THRESHOLD)
-        .count() as f64
-        / result_best.h.len() as f64;
+    let w_sparsity = cast::usize_f64(
+        result_best
+            .w
+            .iter()
+            .filter(|&&x| x < tolerances::NMF_SPARSITY_THRESHOLD)
+            .count(),
+    ) / cast::usize_f64(result_best.w.len());
+    let h_sparsity = cast::usize_f64(
+        result_best
+            .h
+            .iter()
+            .filter(|&&x| x < tolerances::NMF_SPARSITY_THRESHOLD)
+            .count(),
+    ) / cast::usize_f64(result_best.h.len());
 
     println!("  W factor sparsity: {:.1}%", w_sparsity * 100.0);
     println!("  H factor sparsity: {:.1}%", h_sparsity * 100.0);
@@ -330,12 +329,7 @@ fn main() {
     let mut test_pairs: Vec<(usize, usize)> = Vec::new();
     let mut train_matrix = matrix.clone();
     let test_frac = 0.2;
-    #[expect(
-        clippy::cast_sign_loss,
-        clippy::cast_possible_truncation,
-        reason = "validation: value known non-negative from domain logic; bounded float→integer for index/count"
-    )]
-    let n_test = ((actual_nonzero as f64) * test_frac) as usize;
+    let n_test = cast::f64_usize(cast::usize_f64(actual_nonzero) * test_frac);
 
     let positives: Vec<(usize, usize)> = (0..n_drugs)
         .flat_map(|d| (0..n_diseases).map(move |dis| (d, dis)))

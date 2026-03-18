@@ -540,9 +540,14 @@ mod tests {
 
     #[test]
     fn extract_rpc_result_success() {
-        let resp = r#"{"jsonrpc":"2.0","result":{"shannon":1.386},"id":1}"#;
-        let result = extract_rpc_result(resp).unwrap();
-        assert!((result["shannon"].as_f64().unwrap() - 1.386).abs() < 1e-6);
+        let expected_shannon = 4.0_f64.ln();
+        let resp =
+            format!(r#"{{"jsonrpc":"2.0","result":{{"shannon":{expected_shannon}}},"id":1}}"#);
+        let result = extract_rpc_result(&resp).unwrap();
+        assert!(
+            (result["shannon"].as_f64().unwrap() - expected_shannon).abs()
+                < crate::tolerances::IPC_JSON_ROUNDTRIP
+        );
     }
 
     #[test]

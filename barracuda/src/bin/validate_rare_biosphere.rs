@@ -4,18 +4,6 @@
     clippy::similar_names,
     reason = "validation harness: domain variables from published notation"
 )]
-#![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
-    clippy::cast_possible_truncation,
-    reason = "validation harness: u128→u64 timing, f64→u32 counts"
-)]
-#![expect(
-    clippy::cast_sign_loss,
-    reason = "validation harness: non-negative values cast to unsigned"
-)]
 //! Exp051 — Anderson 2015: Rare biosphere at deep-sea hydrothermal vents.
 //!
 //! Validates diversity, rarefaction, and community comparison primitives
@@ -52,6 +40,7 @@
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::{diversity, pcoa};
+use wetspring_barracuda::cast::{f64_usize, usize_f64};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
@@ -106,7 +95,7 @@ fn validate_alpha_diversity(v: &mut Validator, name: &str, counts: &[f64]) {
 
     let h = diversity::shannon(counts);
     let s = diversity::simpson(counts);
-    let obs = diversity::observed_features(counts) as usize;
+    let obs = f64_usize(diversity::observed_features(counts));
     let c = diversity::chao1(counts);
 
     let expected_h = analytical_shannon(counts);
@@ -297,7 +286,7 @@ fn validate_pcoa(v: &mut Validator, piccard: &[f64], von_damm: &[f64], backgroun
     );
     v.check(
         "PCoA: coordinates have 3 samples",
-        result.n_samples as f64,
+        usize_f64(result.n_samples),
         3.0,
         0.0,
     );

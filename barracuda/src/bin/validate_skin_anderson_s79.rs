@@ -9,10 +9,6 @@
     reason = "validation harness: sequential domain checks in single main()"
 )]
 #![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
     clippy::float_cmp,
     reason = "validation harness: exact comparison with known analytical constants"
 )]
@@ -62,6 +58,7 @@ use barracuda::spectral::{
     level_spacing_ratio,
 };
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::cast::usize_f64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
@@ -195,8 +192,8 @@ fn main() {
             r_3d_avg += level_spacing_ratio(&eigs_3d);
         }
 
-        r_2d_avg /= seeds.len() as f64;
-        r_3d_avg /= seeds.len() as f64;
+        r_2d_avg /= usize_f64(seeds.len());
+        r_3d_avg /= usize_f64(seeds.len());
 
         // At W=18, 2D is well into localized regime while 3D is near transition
         v.check_pass(
@@ -343,7 +340,7 @@ fn main() {
 
         let h_healthy = diversity::shannon(&healthy_skin);
         let h_flare = diversity::shannon(&ad_flare);
-        let s = healthy_skin.len() as f64;
+        let s = usize_f64(healthy_skin.len());
         let pielou_healthy = h_healthy / s.ln();
         let pielou_flare = h_flare / s.ln();
 

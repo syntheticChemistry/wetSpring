@@ -172,6 +172,9 @@ fn std_dev(values: &[f64], _mean_val: f64) -> f64 {
 ///
 /// Used to quantify GC content diversity across an assembly collection.
 /// Higher entropy = more diverse GC distribution.
+///
+/// Bins continuous values into an equal-width histogram, then delegates
+/// the actual Shannon computation to `barracuda::stats::shannon_from_frequencies`.
 #[expect(
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
@@ -201,14 +204,8 @@ pub fn shannon_entropy_binned(values: &[f64], n_bins: usize) -> f64 {
     }
 
     let n = values.len() as f64;
-    let mut entropy = 0.0;
-    for &count in &bins {
-        if count > 0 {
-            let p = count as f64 / n;
-            entropy -= p * p.ln();
-        }
-    }
-    entropy
+    let frequencies: Vec<f64> = bins.iter().map(|&count| count as f64 / n).collect();
+    barracuda::stats::shannon_from_frequencies(&frequencies)
 }
 
 /// List `.fna.gz` assembly files in a directory.

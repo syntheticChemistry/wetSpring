@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
     clippy::cast_possible_truncation,
     reason = "validation harness: u128→u64 timing, f64→u32 counts"
 )]
@@ -59,6 +55,7 @@ use wetspring_barracuda::bio::phage_defense::{self, PhageDefenseParams};
 use wetspring_barracuda::bio::phage_defense_gpu::PhageDefenseGpu;
 use wetspring_barracuda::bio::qs_biofilm::{self, QsBiofilmParams};
 use wetspring_barracuda::bio::unifrac_gpu::UniFracGpu;
+use wetspring_barracuda::cast;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
@@ -150,10 +147,10 @@ fn validate_ode_streaming(
         flat_y0.extend_from_slice(&y0_init);
         flat_params.extend_from_slice(&params_to_flat(&p));
     }
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = cast::u128_f64(tc.elapsed().as_micros());
 
     let config = OdeSweepConfig {
-        n_batches: n_batch as u32,
+        n_batches: cast::usize_u32(n_batch),
         n_steps,
         h,
         t0: 0.0,
@@ -165,7 +162,7 @@ fn validate_ode_streaming(
     let gpu_out = ode_gpu
         .integrate(&config, &flat_y0, &flat_params)
         .or_exit("ODE GPU");
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = cast::u128_f64(tg.elapsed().as_micros());
 
     for batch_idx in 0..n_batch {
         let gpu_cell = gpu_out[batch_idx * N_VARS];
@@ -176,8 +173,8 @@ fn validate_ode_streaming(
     }
     v.check(
         "ODE output len",
-        gpu_out.len() as f64,
-        (n_batch * N_VARS) as f64,
+        cast::usize_f64(gpu_out.len()),
+        cast::usize_f64(n_batch * N_VARS),
         tolerances::EXACT,
     );
 
@@ -222,13 +219,13 @@ fn validate_phage_streaming(
 
     let tc = Instant::now();
     let _cpu = phage_defense::run_defense(&y0, f64::from(n_steps) * h, h, &params);
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = cast::u128_f64(tc.elapsed().as_micros());
 
     let tg = Instant::now();
     let gpu_result = phage_gpu
         .integrate_params(&[params], &[y0], n_steps, h)
         .or_exit("Phage GPU");
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = cast::u128_f64(tg.elapsed().as_micros());
 
     let gpu_final = &gpu_result[0];
     for (i, &g) in gpu_final.iter().enumerate() {
@@ -266,13 +263,13 @@ fn validate_bistable_streaming(
 
     let tc = Instant::now();
     let _cpu = bistable::run_bistable(&y0, f64::from(n_steps) * h, h, &params);
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = cast::u128_f64(tc.elapsed().as_micros());
 
     let tg = Instant::now();
     let gpu_result = bistable_gpu_inst
         .integrate_params(&[params], &[y0], n_steps, h)
         .or_exit("Bistable GPU");
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = cast::u128_f64(tg.elapsed().as_micros());
 
     let gpu_final = &gpu_result[0];
     for (i, &g) in gpu_final.iter().enumerate() {
@@ -313,13 +310,13 @@ fn validate_multi_signal_streaming(
 
     let tc = Instant::now();
     let _cpu = multi_signal::run_multi_signal(&y0, f64::from(n_steps) * h, h, &params);
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = cast::u128_f64(tc.elapsed().as_micros());
 
     let tg = Instant::now();
     let gpu_result = multi_gpu
         .integrate_params(&[params], &[y0], n_steps, h)
         .or_exit("MultiSignal GPU");
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = cast::u128_f64(tg.elapsed().as_micros());
 
     let gpu_final = &gpu_result[0];
     for (i, &g) in gpu_final.iter().enumerate() {
@@ -363,7 +360,7 @@ fn encode_dna(seq: &str) -> Vec<usize> {
 
 fn transition_matrix(t: f64, mu: f64) -> [[f64; N_STATES]; N_STATES] {
     let d = (-mu * t).exp();
-    let off = (1.0 - d) / N_STATES as f64;
+    let off = (1.0 - d) / cast::usize_f64(N_STATES);
     let diag = d + off;
     let mut m = [[off; N_STATES]; N_STATES];
     for i in 0..N_STATES {
@@ -467,7 +464,7 @@ fn convert_tree(tree: &TreeNode, mu: f64) -> TreeConversion {
     for d in (0..=max_depth).rev() {
         let group: Vec<u32> = (0..n_nodes)
             .filter(|&i| depths[i] == d)
-            .map(|i| i as u32)
+            .map(cast::usize_u32)
             .collect();
         if !group.is_empty() {
             levels.push(group);
@@ -542,7 +539,7 @@ fn validate_felsenstein_streaming(
 
     let tc = Instant::now();
     let cpu_ll = felsenstein::log_likelihood(&tree, MU);
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = cast::u128_f64(tc.elapsed().as_micros());
 
     v.check_pass("Felsenstein CPU LL finite", cpu_ll.is_finite());
     v.check_pass("Felsenstein CPU LL negative", cpu_ll < 0.0);
@@ -557,7 +554,7 @@ fn validate_felsenstein_streaming(
         conv.n_sites,
         N_STATES,
     );
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = cast::u128_f64(tg.elapsed().as_micros());
 
     let rel_tol = tolerances::PHYLO_GPU_RELATIVE;
 
@@ -654,14 +651,14 @@ fn validate_unifrac_streaming(
         for s in 0..n_samples {
             let mut child_sum = 0.0;
             for child in 0..n_nodes {
-                if parent_array[child] as usize == node && child != node {
+                if cast::u32_usize(parent_array[child]) == node && child != node {
                     child_sum += cpu_sums[child * n_samples + s] * branch_lengths[child];
                 }
             }
             cpu_sums[node * n_samples + s] = child_sum;
         }
     }
-    let cpu_us = tc.elapsed().as_micros() as f64;
+    let cpu_us = cast::u128_f64(tc.elapsed().as_micros());
 
     let tg = Instant::now();
     let result = unifrac_gpu
@@ -674,12 +671,12 @@ fn validate_unifrac_streaming(
             n_leaves,
         )
         .or_exit("UniFrac GPU");
-    let gpu_us = tg.elapsed().as_micros() as f64;
+    let gpu_us = cast::u128_f64(tg.elapsed().as_micros());
 
     v.check(
         "UniFrac output size",
-        result.node_sums.len() as f64,
-        (n_nodes * n_samples) as f64,
+        cast::usize_f64(result.node_sums.len()),
+        cast::usize_f64(n_nodes * n_samples),
         tolerances::EXACT,
     );
     v.check_pass(

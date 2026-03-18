@@ -57,7 +57,9 @@ const LITERATURE_NU: f64 = 1.57;
 
 #[cfg(feature = "gpu")]
 fn sweep_w(i: usize) -> f64 {
-    W_MIN + (i as f64) * (W_MAX - W_MIN) / (N_W_POINTS - 1) as f64
+    W_MIN
+        + wetspring_barracuda::cast::usize_f64(i) * (W_MAX - W_MIN)
+            / wetspring_barracuda::cast::usize_f64(N_W_POINTS - 1)
 }
 
 #[cfg(feature = "gpu")]
@@ -68,7 +70,7 @@ fn compute_r_stats(l: usize, w: f64, n_real: usize) -> (f64, f64) {
     let n = l * l * l;
     let mut r_values = Vec::with_capacity(n_real);
     for seed_offset in 0..n_real {
-        let seed = (42 + seed_offset * 1000 + l * 100) as u64;
+        let seed = wetspring_barracuda::cast::usize_u64(42 + seed_offset * 1000 + l * 100);
         let mat = anderson_3d(l, l, l, w, seed);
         let tri = lanczos(&mat, n, seed);
         let eigs = lanczos_eigenvalues(&tri);
@@ -76,7 +78,10 @@ fn compute_r_stats(l: usize, w: f64, n_real: usize) -> (f64, f64) {
     }
     let mean = mean(&r_values);
     let variance = correlation::variance(&r_values).unwrap_or(0.0);
-    (mean, (variance / n_real as f64).sqrt())
+    (
+        mean,
+        (variance / wetspring_barracuda::cast::usize_f64(n_real)).sqrt(),
+    )
 }
 
 fn main() {
@@ -154,8 +159,8 @@ fn main() {
         v.check_pass("W_c found for at least 3 sizes", w_c_values.len() >= 3);
 
         if w_c_values.len() >= 2 {
-            let mean_wc =
-                w_c_values.iter().map(|(_, wc)| wc).sum::<f64>() / w_c_values.len() as f64;
+            let mean_wc = w_c_values.iter().map(|(_, wc)| wc).sum::<f64>()
+                / wetspring_barracuda::cast::usize_f64(w_c_values.len());
             println!("  Mean W_c = {mean_wc:.2}");
 
             v.check_pass(
@@ -183,8 +188,8 @@ fn main() {
         v.section("── S3: Scaling collapse (ν estimate) ──");
 
         if w_c_values.len() >= 3 {
-            let mean_wc =
-                w_c_values.iter().map(|(_, wc)| wc).sum::<f64>() / w_c_values.len() as f64;
+            let mean_wc = w_c_values.iter().map(|(_, wc)| wc).sum::<f64>()
+                / wetspring_barracuda::cast::usize_f64(w_c_values.len());
 
             let nu_grid: Vec<f64> = (0..21).map(|i| f64::from(i).mul_add(0.05, 1.0)).collect();
             let mut best_nu = LITERATURE_NU;
@@ -195,7 +200,8 @@ fn main() {
                     .iter()
                     .flat_map(|sr| {
                         sr.sweep.iter().map(move |(w, r, _)| {
-                            let x = (w - mean_wc) * (sr.l as f64).powf(1.0 / nu);
+                            let x = (w - mean_wc)
+                                * wetspring_barracuda::cast::usize_f64(sr.l).powf(1.0 / nu);
                             (x, *r)
                         })
                     })

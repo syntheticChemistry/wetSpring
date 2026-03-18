@@ -41,7 +41,7 @@ mod tests {
     fn is_enabled_default_false() {
         assert!(
             !std::env::var("WETSPRING_DATA_PROVIDER")
-                .is_ok_and(|v| v.trim().eq_ignore_ascii_case("nestgate"))
+                .is_ok_and(|v| v.trim().eq_ignore_ascii_case(crate::primal_names::NESTGATE))
                 || is_enabled()
         );
     }

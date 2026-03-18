@@ -1,6 +1,6 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** March 16, 2026 (V126)
+**Date:** March 18, 2026 (V129)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
 **barraCuda:** standalone v0.3.5 (pure Rust, default-features=false), **toadStool:** S155
 **Status:** 150+ primitives consumed, 44 GPU modules (all lean), 0 local WGSL, 0 local ODE/regression math, 1,443+ tests, 376 experiments, 5,707+ checks, 354 binaries, 214 named tolerances (zero inline literals), `#![forbid(unsafe_code)]`, clippy pedantic+nursery CLEAN, **zero `#[allow()]` in entire codebase**. 24 capabilities across 16 domains. Deploy graph with `fallback = "skip"`. All primal names via `primal_names::*` constants. **V125:** Structured `IpcError` enum (28 sites), `extract_capabilities()` for dual-format parsing, `socket_env_var()`/`discover_primal()` generic helpers, 18 binary fixes. **V126:** `DispatchOutcome<T>` protocol vs application error separation, `health.liveness`/`health.readiness` probes, `IpcError` query helpers (`is_retriable()`/`is_timeout_likely()`/`is_method_not_found()`/`is_connection_error()`). **V124:** `deny.toml`, `compute.dispatch` IPC client, structured `tracing`. **V123:** Zero-panic `OrExit`, dual-format discovery, `extract_rpc_error()`. **See also:** `wateringHole/handoffs/WETSPRING_V125_IPCERROR_CAPABILITIES_DISCOVERY_HANDOFF_MAR16_2026.md`.

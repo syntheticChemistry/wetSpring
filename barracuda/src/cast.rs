@@ -13,7 +13,10 @@
 //!   in debug builds; saturating behavior in release
 
 /// `usize` → `f64`. Exact for values below 2^53.
-#[expect(clippy::cast_precision_loss, reason = "documented: exact for values < 2^53")]
+#[expect(
+    clippy::cast_precision_loss,
+    reason = "documented: exact for values < 2^53"
+)]
 #[inline]
 #[must_use]
 pub const fn usize_f64(v: usize) -> f64 {
@@ -68,7 +71,10 @@ pub fn u32_f64(v: u32) -> f64 {
 #[inline]
 #[must_use]
 pub fn f64_u32(v: f64) -> u32 {
-    debug_assert!(v >= 0.0 && v <= f64::from(u32::MAX), "f64_u32: {v} out of range");
+    debug_assert!(
+        v >= 0.0 && v <= f64::from(u32::MAX),
+        "f64_u32: {v} out of range"
+    );
     v as u32
 }
 
@@ -80,7 +86,10 @@ pub const fn u32_usize(v: u32) -> usize {
 }
 
 /// `u64` → `usize`. Exact on 64-bit; saturates on 32-bit targets.
-#[expect(clippy::cast_possible_truncation, reason = "saturates on 32-bit targets")]
+#[expect(
+    clippy::cast_possible_truncation,
+    reason = "saturates on 32-bit targets"
+)]
 #[inline]
 #[must_use]
 pub const fn u64_usize(v: u64) -> usize {
@@ -88,7 +97,10 @@ pub const fn u64_usize(v: u64) -> usize {
 }
 
 /// `u64` → `f64`. Exact for values below 2^53.
-#[expect(clippy::cast_precision_loss, reason = "documented: exact for values < 2^53")]
+#[expect(
+    clippy::cast_precision_loss,
+    reason = "documented: exact for values < 2^53"
+)]
 #[inline]
 #[must_use]
 pub const fn u64_f64(v: u64) -> f64 {
@@ -100,6 +112,52 @@ pub const fn u64_f64(v: u64) -> f64 {
 #[must_use]
 pub const fn usize_u64(v: usize) -> u64 {
     v as u64
+}
+
+/// `u64` → `u32`. Truncates; debug-asserts the value fits.
+#[expect(
+    clippy::cast_possible_truncation,
+    reason = "caller ensures v fits in u32"
+)]
+#[inline]
+#[must_use]
+pub fn u64_u32(v: u64) -> u32 {
+    debug_assert!(u32::try_from(v).is_ok(), "u64_u32: {v} overflows u32");
+    v as u32
+}
+
+/// `f64` → `i32`. Truncates toward zero; debug-asserts finite and in i32 range.
+#[expect(
+    clippy::cast_possible_truncation,
+    reason = "caller ensures v is finite and fits in i32"
+)]
+#[inline]
+#[must_use]
+pub fn f64_i32(v: f64) -> i32 {
+    debug_assert!(v.is_finite(), "f64_i32: {v} not finite");
+    v as i32
+}
+
+/// `i64` → `f64`. Exact for values with magnitude below 2^53.
+#[expect(
+    clippy::cast_precision_loss,
+    reason = "documented: exact for |v| < 2^53"
+)]
+#[inline]
+#[must_use]
+pub const fn i64_f64(v: i64) -> f64 {
+    v as f64
+}
+
+/// `u128` → `f64`. Exact for values below 2^53.
+#[expect(
+    clippy::cast_precision_loss,
+    reason = "documented: exact for values < 2^53"
+)]
+#[inline]
+#[must_use]
+pub const fn u128_f64(v: u128) -> f64 {
+    v as f64
 }
 
 #[cfg(test)]

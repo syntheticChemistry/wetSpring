@@ -17,7 +17,7 @@ impl Lcg {
             .0
             .wrapping_mul(6_364_136_223_846_793_005)
             .wrapping_add(1);
-        f64::from((self.0 >> 33) as u32) / f64::from(u32::MAX)
+        f64::from(crate::cast::u64_u32(self.0 >> 33)) / f64::from(u32::MAX)
     }
     pub(super) fn next_gaussian(&mut self) -> f64 {
         let u1 = self.next_f64().max(crate::tolerances::BOX_MULLER_U1_FLOOR);

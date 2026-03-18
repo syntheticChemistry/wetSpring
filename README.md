@@ -7,7 +7,7 @@ primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 **Date:** March 18, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V128 — **1,550+ tests** (0 failures), 376 experiments, 5,707+ validation checks across 354 binaries. Ecosystem: barraCuda v0.3.5, toadStool S155, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery), `cargo fmt` clean. V128 ecosystem absorption: **`cast` module** (9 safe numeric helpers, airSpring/groundSpring pattern — eliminates 40+ bare `as` casts). **`mul_add()` FMA sweep** (10 accumulation loops across 8 files — felsenstein, esn, gbm, unifrac, nanopore). **ecoBin C-dep ban** (14 C-dependency crates banned in `deny.toml`). **`PRIMAL_DOMAIN`** constant (`"science.ecology"` for biomeOS Neural API). **`FAMILY_ID`-aware socket paths** (discover, provenance, nestgate — multi-instance deployment). **IPC proptests** (7 property tests for protocol parsing + dispatch routing). **`ECOSYSTEM_LEVERAGE_GUIDE.md`** published. V127: MCP tool definitions (8 Squirrel AI tools), Python baseline provenance registry (14 records), `kahan_sum` upstream delegation, `RetryPolicy` + `CircuitBreaker` IPC resilience, 7 new tolerance constants, `unlicensed = "deny"` policy, NPU device constant. 24 capabilities across 16 domains. Full audit: zero unsafe, zero mocks in production, zero TODO/FIXME, zero local math duplication, 7 proptest modules.
+**Status:** V129 — **1,548+ tests** (0 code failures), 376 experiments, 5,707+ validation checks across 354 binaries. Ecosystem: barraCuda v0.3.5, toadStool S155, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery), `cargo fmt` clean. V129: **Deep debt evolution** — `cast` module expanded to 15 safe numeric helpers (~170 raw casts migrated across 62 files), unconditional `primal_names` module (zero hardcoded primal strings in library code), upstream `bingocube-nautilus` JSON roundtrip fix, pure Rust binary discovery (zero `Command::new("which")`), `skip_with_code()` composable validation exits, 2 new tolerance constants. V128: `cast` module (9 helpers), `mul_add()` FMA sweep (10 loops, 8 files), ecoBin C-dep ban (14 crates), `PRIMAL_DOMAIN`, `FAMILY_ID` sockets, 7 IPC proptests. V127: MCP tools, IPC resilience, 7 tolerance constants. 24 capabilities, 16 domains. Full audit: zero unsafe, zero mocks in production, zero TODO/FIXME, zero local math duplication, 7 proptest modules.
 
 ---
 
@@ -306,6 +306,24 @@ science-to-visualization IPC wiring:
 
 **1,687 tests** | **376 experiments** | **354 binaries** | **5,707+ checks**
 
+### V129: Deep Debt Evolution — Safe Casts, Primal Identity, Nautilus Fix (2026-03-18)
+
+Comprehensive codebase evolution: type-safe numeric casts across 62 files (~170 migrated),
+unconditional `primal_names` module, upstream nautilus serialization fix, pure Rust binary
+discovery, validation framework evolution.
+
+| Change | Detail |
+|--------|--------|
+| **`cast` module (15 helpers)** | Added `u64_u32`, `i64_f64`, `u128_f64`, `f64_i32`. Migrated ~170 raw casts across 35 validation binaries + library code. Removed ~30 now-unnecessary `#[expect]` attributes. |
+| **`primal_names` module** | Top-level, unconditionally available. Unified duplicated cfg-gated DEPENDENCIES tables in `niche.rs`. Eliminated `local_primal_names` hack. Zero hardcoded primal strings in library code. |
+| **Nautilus JSON fix** | `BetaObservation` now `Serialize`/`Deserialize`; `to_json`/`from_json` roundtrips actual observations. Pre-existing `json_roundtrip` test now passes. |
+| **Pure Rust discovery** | `Command::new("which")` → `find_on_path()` using `std::env::split_paths`. Cross-platform, sovereign. |
+| **Validation evolution** | `skip_with_code()` returns `ExitCode`; `SKIP_CODE` constant; `IPC_JSON_ROUNDTRIP` and `SAVGOL_SCIPY_PARITY` tolerance constants. |
+
+- 62 files changed, 710 insertions, 761 deletions (net -51)
+- `cargo clippy --pedantic --nursery` — **ZERO WARNINGS**
+- `cargo test` — **1,548 passed** (3 pre-existing GPU f32 hardware-dependent)
+
 ### V128: Ecosystem Absorption + Modern Idiomatic Rust (2026-03-18)
 
 Ecosystem-wide absorption from airSpring, groundSpring, healthSpring, barraCuda patterns.
@@ -511,7 +529,8 @@ wetSpring/
 │   │   ├── bench/               ← benchmark harness + power monitoring
 │   │   ├── bin/                 ← 318 validation/benchmark binaries (+ 22 forge)
 │   │   ├── niche.rs             ← self-knowledge: capabilities, dependencies, cost estimates
-│   │   ├── ipc/                 ← JSON-RPC dispatch (biomeOS integration, capability_domains.rs, primal_names.rs)
+│   │   ├── primal_names.rs      ← unconditional primal name constants (single source of truth)
+│   │   ├── ipc/                 ← JSON-RPC dispatch (biomeOS integration, capability_domains.rs)
 │   │   ├── visualization/       ← petalTongue schema types, 13 scenario builders, StreamSession, Songbird
 │   │   └── vault/               ← encrypted consent-gated data storage
 │   ├── rustfmt.toml             ← max_width = 100, edition = 2024

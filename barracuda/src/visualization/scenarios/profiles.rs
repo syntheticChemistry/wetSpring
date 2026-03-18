@@ -13,10 +13,6 @@ use crate::visualization::{EcologyScenario, ScenarioEdge, ScientificRange};
 /// Uses **classical MDS (`PCoA`)** when abundance data is valid: Bray-Curtis distance
 /// matrix → double-center D² → eigendecomposition → PC1, PC2. Falls back to
 /// Shannon-diversity-based 1D ordination when abundances are missing or inconsistent.
-#[expect(
-    clippy::cast_precision_loss,
-    reason = "precision: sample counts bounded for real datasets"
-)]
 fn ordination_coords(profile: &EnvironmentalProfile, shannons: &[f64]) -> (Vec<f64>, Vec<f64>) {
     let n = profile.sample_labels.len();
     if n < 2 {
@@ -39,7 +35,7 @@ fn ordination_coords(profile: &EnvironmentalProfile, shannons: &[f64]) -> (Vec<f
     }
 
     // Fallback: Shannon-based 1D ordination (PC1 = centered Shannon, PC2 = 0)
-    let mean_h: f64 = shannons.iter().sum::<f64>() / n as f64;
+    let mean_h: f64 = shannons.iter().sum::<f64>() / crate::cast::usize_f64(n);
     let xs: Vec<f64> = shannons.iter().map(|&h| h - mean_h).collect();
     let ys = vec![0.0; n];
     (xs, ys)
@@ -103,7 +99,6 @@ pub struct CalibrationProfile {
 /// Creates nodes for diversity, taxonomy, ordination, and rarefaction
 /// with real data from the profile.
 #[must_use]
-#[expect(clippy::cast_precision_loss)] // Precision: sample/ASV counts bounded
 pub fn environmental_study_scenario(
     profile: &EnvironmentalProfile,
 ) -> (EcologyScenario, Vec<ScenarioEdge>) {
@@ -147,7 +142,7 @@ pub fn environmental_study_scenario(
     let mean_shannon = if shannons.is_empty() {
         0.0
     } else {
-        shannons.iter().sum::<f64>() / shannons.len() as f64
+        shannons.iter().sum::<f64>() / crate::cast::usize_f64(shannons.len())
     };
     div_node.data_channels.push(gauge(
         "mean_shannon",
@@ -178,7 +173,7 @@ pub fn environmental_study_scenario(
                     .iter()
                     .map(|s| if t < s.len() { s[t] } else { 0.0 })
                     .sum();
-                sum / profile.abundances.len() as f64
+                sum / crate::cast::usize_f64(profile.abundances.len())
             })
             .collect();
         tax_node.data_channels.push(bar(

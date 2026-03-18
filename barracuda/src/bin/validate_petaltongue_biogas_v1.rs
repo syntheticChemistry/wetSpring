@@ -9,10 +9,6 @@
     reason = "validation harness: sequential domain checks in single main()"
 )]
 #![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
     clippy::items_after_statements,
     reason = "validation harness: local helpers defined near use site"
 )]
@@ -45,6 +41,7 @@ use std::path::PathBuf;
 
 use barracuda::stats::norm_cdf;
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::cast;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
@@ -356,12 +353,12 @@ fn main() {
     let temp_data: Vec<f64> = (0i32..50)
         .map(|i| f64::from(i).mul_add(0.2, 35.0) + f64::from((i * 7) % 10) * 0.1)
         .collect();
-    let temp_mean = temp_data.iter().sum::<f64>() / temp_data.len() as f64;
+    let temp_mean = temp_data.iter().sum::<f64>() / cast::usize_f64(temp_data.len());
     let temp_var = temp_data
         .iter()
         .map(|&x| (x - temp_mean).powi(2))
         .sum::<f64>()
-        / temp_data.len() as f64;
+        / cast::usize_f64(temp_data.len());
     ops_node.data_channels.push(DataChannel::Distribution {
         id: "temp_dist".into(),
         label: "Digester Temperature".into(),
@@ -374,8 +371,9 @@ fn main() {
     let ph_data: Vec<f64> = (0i32..50)
         .map(|i| f64::from(i).mul_add(0.02, 6.8) + f64::from((i * 3) % 10) * 0.02)
         .collect();
-    let ph_mean = ph_data.iter().sum::<f64>() / ph_data.len() as f64;
-    let ph_var = ph_data.iter().map(|&x| (x - ph_mean).powi(2)).sum::<f64>() / ph_data.len() as f64;
+    let ph_mean = ph_data.iter().sum::<f64>() / cast::usize_f64(ph_data.len());
+    let ph_var = ph_data.iter().map(|&x| (x - ph_mean).powi(2)).sum::<f64>()
+        / cast::usize_f64(ph_data.len());
     ops_node.data_channels.push(DataChannel::Distribution {
         id: "ph_dist".into(),
         label: "Digester pH".into(),

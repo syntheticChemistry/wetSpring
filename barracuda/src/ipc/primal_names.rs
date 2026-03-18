@@ -1,39 +1,18 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Primal name constants — single source of truth for IPC identifiers.
+//! Re-exports of primal name constants for IPC code.
 //!
-//! All primal names used in IPC discovery, registration, and capability
-//! routing are defined here. No hardcoded primal name strings elsewhere
-//! in library code.
+//! The canonical definitions live in [`crate::primal_names`] (unconditionally
+//! available). This module re-exports them so existing `use crate::ipc::primal_names::*`
+//! call sites continue to compile without changes.
 
-/// This primal's canonical identifier.
-pub const SELF: &str = "wetspring";
-
-/// biomeOS orchestrator.
-pub const BIOMEOS: &str = "biomeos";
-
-/// Songbird discovery mesh.
-pub const SONGBIRD: &str = "songbird";
-
-/// `NestGate` content-addressed storage.
-pub const NESTGATE: &str = "nestgate";
-
-/// `BearDog` security foundation.
-pub const BEARDOG: &str = "beardog";
-
-/// `ToadStool` compute orchestrator.
-pub const TOADSTOOL: &str = "toadstool";
-
-/// petalTongue visualization.
-pub const PETALTONGUE: &str = "petaltongue";
-
-/// rhizoCrypt DAG.
-pub const RHIZOCRYPT: &str = "rhizocrypt";
-
-/// loamSpine commit.
-pub const LOAMSPINE: &str = "loamspine";
-
-/// sweetGrass provenance.
-pub const SWEETGRASS: &str = "sweetgrass";
-
-/// Squirrel AI assistant.
-pub const SQUIRREL: &str = "squirrel";
+pub use crate::primal_names::BEARDOG;
+pub use crate::primal_names::BIOMEOS;
+pub use crate::primal_names::LOAMSPINE;
+pub use crate::primal_names::NESTGATE;
+pub use crate::primal_names::PETALTONGUE;
+pub use crate::primal_names::RHIZOCRYPT;
+pub use crate::primal_names::SELF_NAME as SELF;
+pub use crate::primal_names::SONGBIRD;
+pub use crate::primal_names::SQUIRREL;
+pub use crate::primal_names::SWEETGRASS;
+pub use crate::primal_names::TOADSTOOL;

@@ -5,10 +5,6 @@
     reason = "validation harness: results printed to stdout"
 )]
 #![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
     clippy::too_many_lines,
     reason = "validation harness: sequential domain checks in single main()"
 )]
@@ -36,6 +32,7 @@
 
 use std::collections::HashMap;
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::cast;
 use wetspring_barracuda::ncbi;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
@@ -53,8 +50,8 @@ fn synthetic_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     let mut rng = seed;
     for i in 0..n_species {
         rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-        let noise = ((rng >> 33) as f64) / f64::from(u32::MAX);
-        let rank_weight = (-(i as f64) / (n_species as f64 * evenness)).exp();
+        let noise = cast::u64_f64(rng >> 33) / f64::from(u32::MAX);
+        let rank_weight = (-(cast::usize_f64(i)) / (cast::usize_f64(n_species) * evenness)).exp();
         counts.push((rank_weight * 1000.0 * (0.5 + noise)).max(1.0));
     }
     counts
@@ -372,9 +369,9 @@ fn main() {
 
     v.section("── S5: Cross-reference with published values ──");
 
-    let mean_shannon = all_shannon.iter().sum::<f64>() / all_shannon.len() as f64;
-    let mean_simpson = all_simpson.iter().sum::<f64>() / all_simpson.len() as f64;
-    let mean_obs = all_obs.iter().sum::<f64>() / all_obs.len() as f64;
+    let mean_shannon = all_shannon.iter().sum::<f64>() / cast::usize_f64(all_shannon.len());
+    let mean_simpson = all_simpson.iter().sum::<f64>() / cast::usize_f64(all_simpson.len());
+    let mean_obs = all_obs.iter().sum::<f64>() / cast::usize_f64(all_obs.len());
 
     println!("  Mean Shannon H':       {mean_shannon:.4}");
     println!("  Mean Simpson D:        {mean_simpson:.4}");

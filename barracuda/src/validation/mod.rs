@@ -79,16 +79,39 @@ pub fn print_result(name: &str, passed: u32, total: u32) -> bool {
 /// Print summary banner and exit with appropriate code.
 ///
 /// Exit code 0 if all checks passed, 1 otherwise.
+///
+/// Prefer [`print_result`] + `ExitCode` for new binaries.
 pub fn exit_with_result(name: &str, passed: u32, total: u32) {
     let ok = print_result(name, passed, total);
     std::process::exit(i32::from(!ok));
 }
 
-/// Exit with code 2 indicating the test was skipped (data unavailable).
+/// Exit code for skipped validations (data unavailable, no GPU, etc.).
+///
+/// Use `return SKIP.into()` from `fn main() -> ExitCode` instead of
+/// the diverging `exit_skipped()`.
+pub const SKIP_CODE: u8 = 2;
+
+/// Print skip reason and exit with code 2 (skipped — not a failure).
+///
+/// For new binaries using `fn main() -> ExitCode`, prefer
+/// [`skip_with_code`] which returns `ExitCode` without calling
+/// `process::exit`.
 pub fn exit_skipped(reason: &str) -> ! {
     println!("  SKIP: {reason}");
     println!("  (exit 2 = skipped, not a failure)");
     std::process::exit(2)
+}
+
+/// Print skip reason and return `ExitCode` without calling `process::exit`.
+///
+/// Composable alternative to [`exit_skipped`] for the `fn main() -> ExitCode`
+/// pattern.
+#[must_use]
+pub fn skip_with_code(reason: &str) -> std::process::ExitCode {
+    println!("  SKIP: {reason}");
+    println!("  (exit 2 = skipped, not a failure)");
+    std::process::ExitCode::from(SKIP_CODE)
 }
 
 /// Initialize GPU and exit with code 2 if unavailable or lacking f64.

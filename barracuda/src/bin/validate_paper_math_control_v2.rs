@@ -8,14 +8,6 @@
     clippy::too_many_lines,
     reason = "validation harness: sequential domain checks in single main()"
 )]
-#![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
-    clippy::cast_sign_loss,
-    reason = "validation harness: non-negative values cast to unsigned"
-)]
 //! # Exp233: Paper Math Control v2 — 25 Papers Validated via `BarraCuda` CPU
 //!
 //! Extends v1 (18 papers, 58 checks) with 7 additional papers:
@@ -49,6 +41,7 @@ use wetspring_barracuda::bio::{
     multi_signal, neighbor_joining, pangenome, phage_defense, qs_biofilm, robinson_foulds, snp,
     spectral_match, unifrac,
 };
+use wetspring_barracuda::cast;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
@@ -78,7 +71,9 @@ fn main() {
     v.section("P2: Massie 2012 — Gillespie SSA");
     n_papers += 1;
     let emp_mean: f64 = (0..500_u64)
-        .map(|seed| gillespie::birth_death_ssa(10.0, 0.1, 100.0, seed).final_state()[0] as f64)
+        .map(|seed| {
+            cast::i64_f64(gillespie::birth_death_ssa(10.0, 0.1, 100.0, seed).final_state()[0])
+        })
         .sum::<f64>()
         / 500.0;
     v.check(
@@ -189,7 +184,7 @@ fn main() {
     v.section("P11: Fajgenbaum 2019 — NMF");
     n_papers += 1;
     let v_mat: Vec<f64> = (0..30 * 15)
-        .map(|i| f64::from(((i * 3 + 1) % 50) as u32) / 50.0)
+        .map(|i| f64::from(cast::usize_u32((i * 3 + 1) % 50)) / 50.0)
         .collect();
     let nmf_cfg = barracuda::linalg::nmf::NmfConfig {
         rank: 5,
@@ -209,7 +204,7 @@ fn main() {
     println!("  Paper: Yang X et al. Briefings Bioinf. 2020;21:1516–27.");
     println!("  Model: NMF rank selection via cophenetic correlation; W·H ≈ V");
     let yang_v: Vec<f64> = (0..50 * 20)
-        .map(|i| f64::from(((i * 7 + 3) % 80) as u32) / 80.0)
+        .map(|i| f64::from(cast::usize_u32((i * 7 + 3) % 80)) / 80.0)
         .collect();
     let yang_r3 = barracuda::linalg::nmf::nmf(
         &yang_v,
@@ -449,7 +444,9 @@ fn main() {
     v.check_pass("Burst: SSA produces events", burst_ssa.times.len() > 10);
 
     let burst_counts: Vec<f64> = (0..50)
-        .map(|seed| gillespie::birth_death_ssa(5.0, 0.3, 200.0, seed).final_state()[0] as f64)
+        .map(|seed| {
+            cast::i64_f64(gillespie::birth_death_ssa(5.0, 0.3, 200.0, seed).final_state()[0])
+        })
         .collect();
     let burst_h = diversity::shannon(&burst_counts.iter().map(|&x| x.max(1.0)).collect::<Vec<_>>());
     v.check_pass("Burst: entropy finite", burst_h.is_finite());
@@ -472,12 +469,7 @@ use wetspring_barracuda::validation::OrExit;
 fn ode_tail_mean(r: &OdeResult, var_idx: usize, tail_frac: f64) -> f64 {
     let states: Vec<&[f64]> = r.states().collect();
     let n = states.len();
-    #[expect(
-        clippy::cast_possible_truncation,
-        clippy::cast_sign_loss,
-        reason = "validation: bounded float→integer for index/count; value known non-negative from domain logic"
-    )]
-    let tail_start = (n as f64 * (1.0 - tail_frac)) as usize;
+    let tail_start = cast::f64_usize(cast::usize_f64(n) * (1.0 - tail_frac));
     let tail: Vec<f64> = states[tail_start..].iter().map(|s| s[var_idx]).collect();
-    tail.iter().sum::<f64>() / tail.len() as f64
+    tail.iter().sum::<f64>() / cast::usize_f64(tail.len())
 }

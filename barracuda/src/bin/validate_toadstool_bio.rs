@@ -1,13 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
-    clippy::cast_possible_truncation,
-    reason = "validation harness: u128→u64 timing, f64→u32 counts"
-)]
 //! Exp045: `ToadStool` Bio Absorption Validation
 //!
 //! Tests the 4 GPU bio primitives recently absorbed into `ToadStool`'s
@@ -45,6 +37,7 @@ use barracuda::{FlatForest, TreeInferenceGpu};
 use barracuda::{GillespieConfig, GillespieGpu};
 use barracuda::{SmithWatermanGpu, SwConfig};
 use std::sync::Arc;
+use wetspring_barracuda::cast;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
@@ -98,14 +91,10 @@ fn validate_tree_inference(device: &Arc<WgpuDevice>, v: &mut Validator) {
 
     match ti.predict(&forest, &samples, n_samples) {
         Ok(predictions) => {
-            #[expect(
-                clippy::cast_precision_loss,
-                reason = "precision: bounded integer→f64 for validation metrics"
-            )]
             {
                 v.check(
                     "TI: n_predictions = 4",
-                    predictions.len() as f64,
+                    cast::usize_f64(predictions.len()),
                     4.0,
                     tolerances::EXACT,
                 );
@@ -156,7 +145,7 @@ fn validate_tree_inference(device: &Arc<WgpuDevice>, v: &mut Validator) {
 
             let mut parity = true;
             for (i, (gpu_p, cpu_p)) in predictions.iter().zip(cpu_preds.iter()).enumerate() {
-                if *gpu_p as usize != *cpu_p {
+                if cast::u32_usize(*gpu_p) != *cpu_p {
                     println!("  [FAIL] Sample {i}: GPU={gpu_p}, CPU={cpu_p}");
                     parity = false;
                 }
@@ -186,7 +175,7 @@ fn validate_gillespie(device: &Arc<WgpuDevice>, v: &mut Validator) {
     let stoich_net = vec![1, -1]; // birth adds, death removes
     let n_traj: usize = 64;
     let initial_states: Vec<f64> = vec![100.0; n_traj]; // 1 species per trajectory
-    let prng_seeds: Vec<u32> = (0..n_traj as u32 * 4).collect();
+    let prng_seeds: Vec<u32> = (0..cast::usize_u32(n_traj) * 4).collect();
 
     let config = GillespieConfig {
         t_max: 10.0,
@@ -206,15 +195,11 @@ fn validate_gillespie(device: &Arc<WgpuDevice>, v: &mut Validator) {
 
     match result {
         Ok(Ok(result)) => {
-            #[expect(
-                clippy::cast_precision_loss,
-                reason = "precision: bounded integer→f64 for validation metrics"
-            )]
             {
                 v.check(
                     "SSA: n_trajectories",
-                    result.n_trajectories as f64,
-                    n_traj as f64,
+                    cast::usize_f64(result.n_trajectories),
+                    cast::usize_f64(n_traj),
                     tolerances::EXACT,
                 );
             }
@@ -222,7 +207,7 @@ fn validate_gillespie(device: &Arc<WgpuDevice>, v: &mut Validator) {
             let finals: Vec<f64> = (0..n_traj)
                 .map(|i| result.states[i * result.n_species])
                 .collect();
-            let mean_final: f64 = finals.iter().sum::<f64>() / finals.len() as f64;
+            let mean_final: f64 = finals.iter().sum::<f64>() / cast::usize_f64(finals.len());
             v.check(
                 "SSA: mean final > 50 (birth > death)",
                 f64::from(u8::from(mean_final > 50.0)),
@@ -295,8 +280,8 @@ fn validate_smith_waterman(device: &Arc<WgpuDevice>, v: &mut Validator) {
                 &wetspring_barracuda::bio::alignment::ScoringParams {
                     match_score: 2,
                     mismatch_penalty: -1,
-                    gap_open: config.gap_open as i32,
-                    gap_extend: config.gap_extend as i32,
+                    gap_open: cast::f64_i32(config.gap_open),
+                    gap_extend: cast::f64_i32(config.gap_extend),
                 },
             );
             v.check(

@@ -9,10 +9,6 @@
     reason = "validation harness: sequential domain checks in single main()"
 )]
 #![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
     clippy::cast_possible_truncation,
     reason = "validation harness: u128→u64 timing, f64→u32 counts"
 )]
@@ -54,6 +50,7 @@
 
 use std::path::{Path, PathBuf};
 use std::time::Instant;
+use wetspring_barracuda::cast;
 use wetspring_barracuda::ipc::discover;
 use wetspring_barracuda::ipc::primal_names;
 use wetspring_barracuda::validation::{OrExit, Validator};
@@ -400,7 +397,7 @@ fn main() {
         pipeline_node.data_channels.push(DataChannel::Gauge {
             id: "pipeline_readiness".into(),
             label: "Pipeline Readiness".into(),
-            value: primals_found as f64 / primal_sockets.len() as f64,
+            value: cast::usize_f64(primals_found) / cast::usize_f64(primal_sockets.len()),
             min: 0.0,
             max: 1.0,
             unit: "readiness".into(),

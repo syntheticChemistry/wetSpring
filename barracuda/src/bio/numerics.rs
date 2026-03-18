@@ -38,6 +38,11 @@ pub fn stable_expm1(x: f64) -> f64 {
 /// Uses the identity `max(a,b) + ln(1 + exp(-|a-b|))`.
 /// Essential for combining log-probabilities (taxonomy classifier,
 /// HMM forward algorithm).
+///
+/// Intentionally local: barraCuda provides `LogsumexpWgsl` (GPU shader)
+/// but not a CPU scalar equivalent. This is the CPU-side implementation
+/// used by HMM forward, taxonomy classification, and other per-element
+/// log-probability combiners that run on CPU.
 #[inline]
 #[must_use]
 pub fn log_sum_exp(a: f64, b: f64) -> f64 {

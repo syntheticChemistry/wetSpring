@@ -236,7 +236,7 @@ mod tests {
         assert!(savitzky_golay(&[1.0, 2.0, 3.0], 7, 2).is_err());
         let out = savitzky_golay(&[2.0, 2.0, 5.0, 2.0, 1.0, 0.0, 1.0, 4.0, 9.0], 5, 2).unwrap();
         for (i, &e) in [3.54, 2.86, 0.66, 0.17].iter().enumerate() {
-            assert!((out[i + 2] - e).abs() < 0.02);
+            assert!((out[i + 2] - e).abs() < crate::tolerances::SAVGOL_SCIPY_PARITY);
         }
     }
 }

@@ -28,13 +28,11 @@ pub const NICHE_DESCRIPTION: &str = "Life science and analytical chemistry valid
 /// Niche version (tracks the spring version, not the crate version).
 pub const NICHE_VERSION: &str = "1.0.0";
 
-#[cfg(feature = "ipc")]
-use crate::ipc::primal_names::{
+use crate::primal_names::{
     BEARDOG, LOAMSPINE, NESTGATE, PETALTONGUE, RHIZOCRYPT, SONGBIRD, SWEETGRASS,
 };
 
 /// Primals this niche depends on (germination order matters).
-#[cfg(feature = "ipc")]
 pub const DEPENDENCIES: &[NicheDependency] = &[
     NicheDependency {
         name: BEARDOG,
@@ -74,52 +72,6 @@ pub const DEPENDENCIES: &[NicheDependency] = &[
     },
     NicheDependency {
         name: PETALTONGUE,
-        role: "visualization",
-        required: false,
-        capability: "visualization",
-    },
-];
-
-#[cfg(not(feature = "ipc"))]
-pub const DEPENDENCIES: &[NicheDependency] = &[
-    NicheDependency {
-        name: "beardog",
-        role: "security",
-        required: true,
-        capability: "security",
-    },
-    NicheDependency {
-        name: "songbird",
-        role: "discovery",
-        required: true,
-        capability: "discovery",
-    },
-    NicheDependency {
-        name: "rhizocrypt",
-        role: "dag",
-        required: true,
-        capability: "dag",
-    },
-    NicheDependency {
-        name: "loamspine",
-        role: "commit",
-        required: true,
-        capability: "commit",
-    },
-    NicheDependency {
-        name: "sweetgrass",
-        role: "provenance",
-        required: true,
-        capability: "provenance",
-    },
-    NicheDependency {
-        name: "nestgate",
-        role: "storage",
-        required: false,
-        capability: "storage",
-    },
-    NicheDependency {
-        name: "petaltongue",
         role: "visualization",
         required: false,
         capability: "visualization",
@@ -258,12 +210,28 @@ pub const fn deploy_graph_path() -> &'static str {
     "graphs/wetspring_deploy.toml"
 }
 
-/// Default NPU device path when toadStool discovery is unavailable.
+/// Environment variable for explicit NPU device path override.
+pub const NPU_DEVICE_ENV_VAR: &str = "WETSPRING_NPU_DEVICE";
+
+/// Default NPU device path when neither env var nor toadStool discovery
+/// is available.
 ///
-/// Validation binaries check `WETSPRING_NPU_DEVICE` env var first, then
-/// fall back to this path for the `BrainChip` `AKD1000`. In production, NPU
+/// `BrainChip` `AKD1000` standard Linux device node. In production, NPU
 /// discovery goes through toadStool IPC (`toadstool.device.npu`).
-pub const NPU_DEFAULT_DEVICE: &str = "/dev/akida0";
+const NPU_DEFAULT_DEVICE: &str = "/dev/akida0";
+
+/// Discover the NPU device path using the standard cascade.
+///
+/// # Discovery cascade
+///
+/// 1. `$WETSPRING_NPU_DEVICE` — explicit operator override
+/// 2. toadStool IPC `toadstool.device.npu` — runtime hardware discovery
+///    (caller responsibility; this function handles the non-IPC fallback)
+/// 3. Default: `/dev/akida0` (`BrainChip` `AKD1000` standard path)
+#[must_use]
+pub fn discover_npu_device() -> String {
+    std::env::var(NPU_DEVICE_ENV_VAR).unwrap_or_else(|_| NPU_DEFAULT_DEVICE.to_owned())
+}
 
 /// Returns the number of required dependencies.
 #[must_use]

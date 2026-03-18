@@ -12,6 +12,7 @@ use std::time::Duration;
 use serde_json::{Value, json};
 
 use crate::ipc::discover;
+use crate::ipc::primal_names;
 use crate::ipc::protocol::RpcError;
 
 const RPC_TIMEOUT: Duration = Duration::from_secs(30);
@@ -102,7 +103,7 @@ pub fn handle_ai_ecology_interpret(params: &Value) -> Result<Value, RpcError> {
 
     let Some(socket) = discover::discover_squirrel() else {
         return Ok(json!({
-            "squirrel": "unavailable",
+            primal_names::SQUIRREL: "unavailable",
             "message": "Squirrel AI unavailable — socket not discovered",
             "query": query,
         }));
@@ -110,7 +111,7 @@ pub fn handle_ai_ecology_interpret(params: &Value) -> Result<Value, RpcError> {
 
     match squirrel_query(&socket, query, &context) {
         Ok(result) => Ok(json!({
-            "squirrel": "available",
+            primal_names::SQUIRREL: "available",
             "response": result,
             "query": query,
         })),
@@ -122,7 +123,7 @@ pub fn handle_ai_ecology_interpret(params: &Value) -> Result<Value, RpcError> {
                 ("error", msg)
             };
             Ok(json!({
-                "squirrel": status,
+                primal_names::SQUIRREL: status,
                 "message": message,
                 "query": query,
             }))
@@ -142,7 +143,7 @@ mod tests {
     fn handle_degrades_gracefully_when_squirrel_unavailable() {
         let result =
             handle_ai_ecology_interpret(&json!({"query": "Explain Shannon diversity"})).unwrap();
-        assert_eq!(result["squirrel"], "unavailable");
+        assert_eq!(result[primal_names::SQUIRREL], "unavailable");
         assert!(result["message"].as_str().unwrap().contains("unavailable"));
         assert_eq!(result["query"], "Explain Shannon diversity");
     }

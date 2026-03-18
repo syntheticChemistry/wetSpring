@@ -35,6 +35,7 @@
 //! Validation class: Analytical
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
+use wetspring_barracuda::cast;
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
 
@@ -53,8 +54,7 @@ struct OrganismQs {
 
 #[expect(
     clippy::too_many_lines,
-    clippy::cast_precision_loss,
-    reason = "validation harness: sequential domain checks in single function; precision: bounded integer→f64 for validation metrics"
+    reason = "validation harness: sequential domain checks in single function"
 )]
 fn main() {
     let mut v = Validator::new("Exp140: QS Gene Prevalence by Habitat Geometry");
@@ -480,7 +480,7 @@ fn main() {
         let n = subset.len();
         let with_qs = subset.iter().filter(|o| o.n_qs_systems > 0).count();
         let pct = if n > 0 {
-            (with_qs as f64 / n as f64) * 100.0
+            (cast::usize_f64(with_qs) / cast::usize_f64(n)) * 100.0
         } else {
             0.0
         };
@@ -489,12 +489,12 @@ fn main() {
                 .iter()
                 .map(|o| f64::from(o.n_qs_systems))
                 .sum::<f64>()
-                / n as f64
+                / cast::usize_f64(n)
         } else {
             0.0
         };
         let mean_mb = if n > 0 {
-            subset.iter().map(|o| o.genome_mb).sum::<f64>() / n as f64
+            subset.iter().map(|o| o.genome_mb).sum::<f64>() / cast::usize_f64(n)
         } else {
             0.0
         };

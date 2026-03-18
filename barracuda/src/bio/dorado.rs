@@ -85,36 +85,59 @@ pub struct BasecalledRead {
     pub quality: Vec<u8>,
 }
 
+/// Environment variable override for the Dorado binary path.
+const DORADO_ENV_VAR: &str = "WETSPRING_DORADO_BIN";
+
+/// Binary name to search for on `$PATH`.
+const DORADO_BIN_NAME: &str = "dorado";
+
+/// Standard ONT install locations (checked after `$PATH`).
+const STANDARD_DORADO_DIRS: &[&str] = &["/opt/ont/dorado/bin"];
+
 /// Discover the Dorado binary using capability-based resolution.
 ///
-/// Search order:
-/// 1. `$WETSPRING_DORADO_BIN` environment variable
-/// 2. `dorado` on `$PATH`
-/// 3. Standard install locations: `/opt/ont/dorado/bin/dorado`,
-///    `$HOME/.local/bin/dorado`
+/// # Discovery cascade
+///
+/// 1. **`$WETSPRING_DORADO_BIN`** — explicit override (gate operators, CI).
+/// 2. **`$PATH` search** — pure Rust directory scan, no subprocess.
+/// 3. **Standard install locations** — `/opt/ont/dorado/bin/dorado`,
+///    `$HOME/.local/bin/dorado`.
+///
+/// Returns `None` if Dorado is not found. No subprocess is spawned
+/// during discovery (the previous `which` call is replaced by a
+/// direct `$PATH` scan for cross-platform correctness).
 #[must_use]
 pub fn discover_dorado() -> Option<PathBuf> {
-    if let Ok(explicit) = std::env::var("WETSPRING_DORADO_BIN") {
+    if let Ok(explicit) = std::env::var(DORADO_ENV_VAR) {
         let p = PathBuf::from(&explicit);
         if p.is_file() {
             return Some(p);
         }
     }
 
-    if let Ok(output) = Command::new("which").arg("dorado").output() {
-        if output.status.success() {
-            let path_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
-            if !path_str.is_empty() {
-                return Some(PathBuf::from(path_str));
-            }
-        }
+    if let Some(found) = find_on_path(DORADO_BIN_NAME) {
+        return Some(found);
     }
 
-    let standard_paths = [
-        PathBuf::from("/opt/ont/dorado/bin/dorado"),
-        dirs_home().join(".local/bin/dorado"),
-    ];
-    standard_paths.into_iter().find(|p| p.is_file())
+    STANDARD_DORADO_DIRS
+        .iter()
+        .map(|d| Path::new(d).join(DORADO_BIN_NAME))
+        .chain(std::iter::once(
+            dirs_home().join(".local/bin").join(DORADO_BIN_NAME),
+        ))
+        .find(|p| p.is_file())
+}
+
+/// Search `$PATH` for a binary by name (pure Rust, no subprocess).
+fn find_on_path(binary: &str) -> Option<PathBuf> {
+    let path_var = std::env::var("PATH").ok()?;
+    for dir in std::env::split_paths(&path_var) {
+        let candidate = dir.join(binary);
+        if candidate.is_file() {
+            return Some(candidate);
+        }
+    }
+    None
 }
 
 /// Check whether Dorado is available on this system.

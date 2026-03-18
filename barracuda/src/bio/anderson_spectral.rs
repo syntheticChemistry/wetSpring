@@ -65,7 +65,7 @@ pub fn sweep(
         .iter()
         .enumerate()
         .map(|(i, &w)| {
-            let point_seed = seed.wrapping_add(i as u64);
+            let point_seed = seed.wrapping_add(crate::cast::usize_u64(i));
             analyze_single(lattice_l, w, n_lanczos, point_seed)
         })
         .collect()

@@ -17,9 +17,7 @@ use wetspring_barracuda::tolerances;
 
 fn rpc_roundtrip(socket_path: &std::path::Path, request: &str) -> serde_json::Value {
     let stream = UnixStream::connect(socket_path).expect("connect to server");
-    stream
-        .set_read_timeout(Some(Duration::from_secs(10)))
-        .ok();
+    stream.set_read_timeout(Some(Duration::from_secs(10))).ok();
 
     let mut writer = std::io::BufWriter::new(&stream);
     writer.write_all(request.as_bytes()).expect("write request");
@@ -108,10 +106,7 @@ fn capability_list_includes_all_domains() {
             domains.len()
         );
 
-        let domain_names: Vec<&str> = domains
-            .iter()
-            .filter_map(|d| d["name"].as_str())
-            .collect();
+        let domain_names: Vec<&str> = domains.iter().filter_map(|d| d["name"].as_str()).collect();
         assert!(domain_names.contains(&"ecology.diversity"));
         assert!(domain_names.contains(&"ecology.anderson"));
         assert!(domain_names.contains(&"health"));

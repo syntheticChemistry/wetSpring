@@ -30,6 +30,7 @@ use std::time::Instant;
 #[cfg(feature = "gpu")]
 use wetspring_barracuda::bio::ode_sweep_gpu::{N_PARAMS, N_VARS, OdeSweepConfig, OdeSweepGpu};
 use wetspring_barracuda::bio::qs_biofilm::{self, QsBiofilmParams};
+use wetspring_barracuda::cast;
 #[cfg(feature = "gpu")]
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
@@ -166,11 +167,7 @@ fn main() {
         let sweeper = OdeSweepGpu::new(device);
 
         let config = OdeSweepConfig {
-            #[expect(
-                clippy::cast_possible_truncation,
-                reason = "validation: bounded float→integer for index/count"
-            )]
-            n_batches: N_BATCHES as u32,
+            n_batches: cast::usize_u32(N_BATCHES),
             n_steps: N_STEPS,
             h: DT,
             t0: 0.0,
@@ -225,11 +222,7 @@ fn main() {
 
         println!("  Landscape classification ({N_BATCHES} genomes):");
         for (class, count) in &gpu_classes {
-            #[expect(
-                clippy::cast_precision_loss,
-                reason = "precision: bounded integer→f64 for validation metrics"
-            )]
-            let pct = (*count as f64) / (N_BATCHES as f64) * 100.0;
+            let pct = cast::usize_f64(*count) / cast::usize_f64(N_BATCHES) * 100.0;
             println!("    {class}: {count} ({pct:.1}%)");
         }
 
@@ -246,12 +239,9 @@ fn main() {
             1,
         );
 
-        #[expect(
-            clippy::cast_precision_loss,
-            reason = "precision: bounded integer→f64 for validation metrics"
-        )]
-        let cpu_extrapolated_ms =
-            cpu_elapsed.as_secs_f64() * 1000.0 * (N_BATCHES as f64 / cpu_subset_size as f64);
+        let cpu_extrapolated_ms = cpu_elapsed.as_secs_f64()
+            * 1000.0
+            * (cast::usize_f64(N_BATCHES) / cast::usize_f64(cpu_subset_size));
         println!("  Estimated CPU for {N_BATCHES}: {cpu_extrapolated_ms:.0} ms");
         println!(
             "  GPU speedup: {:.1}x (actual vs extrapolated)",

@@ -63,6 +63,10 @@ deny = [
     { crate = "libffi-sys", reason = "C dependency" },
     { crate = "bindgen", reason = "C header parser" },
     { crate = "pkg-config", reason = "C build tool" },
+    # Known transitive C deps:
+    # - renderdoc-sys: via wgpu-hal (GPU debug tooling, not application code)
+    # - libfuzzer-sys: in barracuda/fuzz/ (excluded from workspace, tooling only)
+    # Neither is banned because they are infrastructure, not application code.
 ]
 skip = []
 skip-tree = []

@@ -4,18 +4,6 @@
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
-#![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
-#![expect(
-    clippy::cast_possible_truncation,
-    reason = "validation harness: u128→u64 timing, f64→u32 counts"
-)]
-#![expect(
-    clippy::cast_sign_loss,
-    reason = "validation harness: non-negative values cast to unsigned"
-)]
 //! # Exp161: Knowledge Graph Embedding Baseline
 //!
 //! Builds a baseline for knowledge graph embedding applied to
@@ -131,8 +119,9 @@ impl KgEmbedding {
         let mut total_loss = 0.0;
         for &(h, r, t) in triples {
             let neg_t = loop {
-                let candidate =
-                    (rng.next_f64() * self.n_entities as f64) as usize % self.n_entities;
+                let candidate = wetspring_barracuda::cast::f64_usize(
+                    rng.next_f64() * wetspring_barracuda::cast::usize_f64(self.n_entities),
+                ) % self.n_entities;
                 if candidate != t {
                     break candidate;
                 }
@@ -166,7 +155,7 @@ impl KgEmbedding {
                 }
             }
         }
-        total_loss / triples.len() as f64
+        total_loss / wetspring_barracuda::cast::usize_f64(triples.len())
     }
 }
 
@@ -177,11 +166,6 @@ const N_PATHWAYS: usize = 10;
 const N_ENTITIES: usize = N_DRUGS + N_DISEASES + N_GENES + N_PATHWAYS;
 const N_RELATIONS: usize = 4;
 
-#[expect(
-    clippy::cast_sign_loss,
-    clippy::cast_possible_truncation,
-    reason = "validation: value known non-negative from domain logic; bounded float→integer for index/count"
-)]
 fn generate_triples(rng: &mut LcgRng) -> Vec<(usize, usize, usize)> {
     let mut triples: Vec<(usize, usize, usize)> = Vec::new();
 
@@ -192,23 +176,31 @@ fn generate_triples(rng: &mut LcgRng) -> Vec<(usize, usize, usize)> {
             let drug = cluster * drug_cluster_size + i;
             let disease = 100
                 + cluster * disease_cluster_size
-                + (rng.next_f64() * disease_cluster_size as f64) as usize % disease_cluster_size;
+                + wetspring_barracuda::cast::f64_usize(
+                    rng.next_f64() * wetspring_barracuda::cast::usize_f64(disease_cluster_size),
+                ) % disease_cluster_size;
             triples.push((drug, 0, disease));
         }
     }
 
     for d in 0..N_DRUGS {
-        let n_targets = 1 + (rng.next_f64() * 3.0) as usize;
+        let n_targets = 1 + wetspring_barracuda::cast::f64_usize(rng.next_f64() * 3.0);
         for _ in 0..n_targets {
-            let gene = 200 + (rng.next_f64() * N_GENES as f64) as usize % N_GENES;
+            let gene = 200
+                + wetspring_barracuda::cast::f64_usize(
+                    rng.next_f64() * wetspring_barracuda::cast::usize_f64(N_GENES),
+                ) % N_GENES;
             triples.push((d, 1, gene));
         }
     }
 
     for g in 0..N_GENES {
-        let n_assoc = 1 + (rng.next_f64() * 2.0) as usize;
+        let n_assoc = 1 + wetspring_barracuda::cast::f64_usize(rng.next_f64() * 2.0);
         for _ in 0..n_assoc {
-            let disease = 100 + (rng.next_f64() * N_DISEASES as f64) as usize % N_DISEASES;
+            let disease = 100
+                + wetspring_barracuda::cast::f64_usize(
+                    rng.next_f64() * wetspring_barracuda::cast::usize_f64(N_DISEASES),
+                ) % N_DISEASES;
             triples.push((200 + g, 2, disease));
         }
     }
@@ -247,11 +239,11 @@ fn validate_link_prediction(
         if rank <= 10 {
             hits_at_10 += 1;
         }
-        mean_rank += rank as f64;
+        mean_rank += wetspring_barracuda::cast::usize_f64(rank);
     }
 
-    let hits10_pct = f64::from(hits_at_10) / n_eval as f64;
-    mean_rank /= n_eval as f64;
+    let hits10_pct = f64::from(hits_at_10) / wetspring_barracuda::cast::usize_f64(n_eval);
+    mean_rank /= wetspring_barracuda::cast::usize_f64(n_eval);
 
     println!(
         "  Hits@10: {hits_at_10}/{n_eval} ({:.1}%)",
@@ -314,9 +306,18 @@ fn validate_gpu_transe(v: &mut Validator, kg: &KgEmbedding, triples: &[(usize, u
         .or_exit("GPU init");
     let device = gpu.to_wgpu_device();
 
-    let heads: Vec<u32> = triples.iter().map(|t| t.0 as u32).collect();
-    let rels: Vec<u32> = triples.iter().map(|t| t.1 as u32).collect();
-    let tails: Vec<u32> = triples.iter().map(|t| t.2 as u32).collect();
+    let heads: Vec<u32> = triples
+        .iter()
+        .map(|t| wetspring_barracuda::cast::usize_u32(t.0))
+        .collect();
+    let rels: Vec<u32> = triples
+        .iter()
+        .map(|t| wetspring_barracuda::cast::usize_u32(t.1))
+        .collect();
+    let tails: Vec<u32> = triples
+        .iter()
+        .map(|t| wetspring_barracuda::cast::usize_u32(t.2))
+        .collect();
 
     let scorer = barracuda::ops::transe_score_f64::TranseScoreF64 {
         entities: &kg.entity_embeddings,

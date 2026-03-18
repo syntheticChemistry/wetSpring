@@ -7,16 +7,7 @@
 
 use std::path::PathBuf;
 
-#[cfg(feature = "ipc")]
-use crate::ipc::primal_names::{BIOMEOS, NESTGATE};
-
-#[cfg(not(feature = "ipc"))]
-mod local_primal_names {
-    pub const BIOMEOS: &str = "biomeos";
-    pub const NESTGATE: &str = "nestgate";
-}
-#[cfg(not(feature = "ipc"))]
-use local_primal_names::{BIOMEOS, NESTGATE};
+use crate::primal_names::{BIOMEOS, NESTGATE};
 
 /// Whether `NestGate` routing is enabled via environment.
 #[must_use]
@@ -51,7 +42,7 @@ pub fn discover_biomeos_socket() -> Option<PathBuf> {
 #[cfg(test)]
 #[must_use]
 pub fn resolve_socket(explicit: Option<&str>, xdg_runtime: Option<&str>) -> Option<PathBuf> {
-    resolve_primal_socket(explicit, xdg_runtime, "nestgate")
+    resolve_primal_socket(explicit, xdg_runtime, NESTGATE)
 }
 
 /// Pure-logic biomeOS socket path resolution for testing.
@@ -61,7 +52,7 @@ pub fn resolve_biomeos_socket(
     explicit: Option<&str>,
     xdg_runtime: Option<&str>,
 ) -> Option<PathBuf> {
-    resolve_primal_socket(explicit, xdg_runtime, "biomeos")
+    resolve_primal_socket(explicit, xdg_runtime, BIOMEOS)
 }
 
 // ── Unified implementation ──────────────────────────────────────────────

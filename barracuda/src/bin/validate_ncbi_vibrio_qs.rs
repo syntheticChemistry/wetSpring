@@ -4,10 +4,6 @@
     clippy::print_stdout,
     reason = "validation harness: results printed to stdout"
 )]
-#![expect(
-    clippy::cast_precision_loss,
-    reason = "validation harness: f64 arithmetic for timing and metric ratios"
-)]
 //! # Exp121: NCBI Vibrio QS Parameter Landscape
 //!
 //! Loads Vibrio genome assembly metadata (NCBI or synthetic fallback), derives QS
@@ -84,14 +80,12 @@ fn classify_outcome(y_final: &[f64]) -> &'static str {
     }
 }
 
-#[expect(
-    clippy::cast_precision_loss,
-    reason = "precision: bounded integer→f64 for validation metrics"
-)]
 fn derive_params(assembly: &VibrioAssembly) -> QsBiofilmParams {
-    let density = f64::from(assembly.gene_count) / (assembly.genome_size_bp as f64 / 1e6);
+    let density = f64::from(assembly.gene_count)
+        / (wetspring_barracuda::cast::u64_f64(assembly.genome_size_bp) / 1e6);
     QsBiofilmParams {
-        mu_max: ((assembly.genome_size_bp as f64 - 3_500_000.0) / 5_000_000.0)
+        mu_max: ((wetspring_barracuda::cast::u64_f64(assembly.genome_size_bp) - 3_500_000.0)
+            / 5_000_000.0)
             .mul_add(-1.0, 1.2)
             .clamp(0.2, 1.2),
         k_ai_prod: (f64::from(assembly.gene_count) / 1000.0).clamp(0.5, 15.0),
@@ -198,7 +192,7 @@ fn main() {
         let device = gpu.to_wgpu_device();
         let sweeper = OdeSweepGpu::new(device);
         let config = OdeSweepConfig {
-            n_batches: n as u32,
+            n_batches: wetspring_barracuda::cast::usize_u32(n),
             n_steps: N_STEPS,
             h: DT,
             t0: 0.0,
@@ -294,12 +288,14 @@ fn main() {
     let env_total: usize = assemblies.len() - clinical_total;
 
     let clinical_frac = if clinical_total > 0 {
-        clinical_biofilm as f64 / clinical_total as f64
+        wetspring_barracuda::cast::usize_f64(clinical_biofilm)
+            / wetspring_barracuda::cast::usize_f64(clinical_total)
     } else {
         0.0
     };
     let env_frac = if env_total > 0 {
-        env_biofilm as f64 / env_total as f64
+        wetspring_barracuda::cast::usize_f64(env_biofilm)
+            / wetspring_barracuda::cast::usize_f64(env_total)
     } else {
         0.0
     };

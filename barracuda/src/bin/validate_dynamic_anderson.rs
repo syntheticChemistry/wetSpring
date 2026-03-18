@@ -74,7 +74,7 @@ fn compute_r_at_w(l: usize, w: f64, n_real: usize) -> (f64, f64) {
     let n = l * l * l;
     let mut r_values = Vec::with_capacity(n_real);
     for seed_offset in 0..n_real {
-        let seed = (42 + seed_offset * 1000) as u64;
+        let seed = wetspring_barracuda::cast::usize_u64(42 + seed_offset * 1000);
         let mat = anderson_3d(l, l, l, w, seed);
         let tri = lanczos(&mat, n, seed);
         let eigs = lanczos_eigenvalues(&tri);
@@ -82,11 +82,7 @@ fn compute_r_at_w(l: usize, w: f64, n_real: usize) -> (f64, f64) {
     }
     let mean = mean(&r_values);
     let variance = correlation::variance(&r_values).unwrap_or(0.0);
-    #[expect(
-        clippy::cast_precision_loss,
-        reason = "n_real is small (≤100); usize→f64 is lossless in this range"
-    )]
-    let stderr = (variance / n_real as f64).sqrt();
+    let stderr = (variance / wetspring_barracuda::cast::usize_f64(n_real)).sqrt();
     (mean, stderr)
 }
 
