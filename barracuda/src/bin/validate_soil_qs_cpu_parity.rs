@@ -139,7 +139,7 @@ fn main() {
         "Standard N → carrying capacity",
         std_n,
         params.k_cap,
-        params.k_cap * 0.3,
+        params.k_cap * tolerances::ODE_CARRYING_CAPACITY_REL,
     );
     v.check_pass("Standard: B ≥ 0 (biofilm initiated)", std_b >= 0.0);
     v.check_pass("High density B > standard B", high_b > std_b);

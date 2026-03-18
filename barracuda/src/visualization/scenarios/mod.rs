@@ -251,8 +251,12 @@ fn scatter3d(
 }
 
 /// Create a `FieldMap` channel.
-#[expect(dead_code)]
-fn fieldmap(
+#[expect(
+    dead_code,
+    reason = "spatial field scenarios (soil pore geometry, kriging output) not yet implemented; \
+              helper completes the DataChannel constructor set and is tested via visualization::tests"
+)]
+pub(crate) fn fieldmap(
     id: &str,
     label: &str,
     grid_x: &[f64],

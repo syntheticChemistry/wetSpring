@@ -45,6 +45,7 @@ use std::path::PathBuf;
 
 use barracuda::stats::norm_cdf;
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::visualization::ipc_push::PetalTonguePushClient;
@@ -430,17 +431,29 @@ fn main() {
     let g30 = gompertz(30.0, fs0.p, fs0.rm, fs0.lambda);
     v.check_pass("Gompertz t=30 > 0", g30 > 0.0);
     v.check_pass("Gompertz t=30 < P_max", g30 < fs0.p);
-    // Wide tolerance: visualization scenario, kinetics curve shape not baseline-parity
-    v.check("Gompertz corn stover t=30", g30, 250.0, 50.0);
+    v.check(
+        "Gompertz corn stover t=30",
+        g30,
+        250.0,
+        tolerances::VIZ_KINETICS_WIDE,
+    );
 
     let fo30 = first_order(30.0, fs0.b_max, fs0.k);
     v.check_pass("first-order t=30 > 0", fo30 > 0.0);
-    // Wide tolerance: visualization scenario, kinetics curve shape not baseline-parity
-    v.check("first-order corn stover t=30", fo30, 230.0, 50.0);
+    v.check(
+        "first-order corn stover t=30",
+        fo30,
+        230.0,
+        tolerances::VIZ_KINETICS_WIDE,
+    );
 
     let m100 = monod(100.0, fs0.mu_max, fs0.ks);
-    // Domain tolerance: Monod growth rate at S=100; μ_max·S/(K_s+S) ≈ 0.3 for corn stover
-    v.check("Monod S=100 (corn stover)", m100, 0.3, 0.1);
+    v.check(
+        "Monod S=100 (corn stover)",
+        m100,
+        0.3,
+        tolerances::VIZ_MONOD_RATE,
+    );
 
     let h100 = haldane(100.0, fs0.mu_max, fs0.ks, fs0.ki);
     v.check_pass("Haldane <= Monod at same S", h100 <= m100);

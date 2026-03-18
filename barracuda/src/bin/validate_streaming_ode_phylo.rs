@@ -559,9 +559,7 @@ fn validate_felsenstein_streaming(
     );
     let gpu_us = tg.elapsed().as_micros() as f64;
 
-    // Polynomial exp/log transcendental fallback compounds errors across
-    // multi-step recursive pruning; 10% relative tolerance covers extreme trees.
-    let rel_tol = 0.10;
+    let rel_tol = tolerances::PHYLO_GPU_RELATIVE;
 
     match gpu_result {
         Ok(result) => {

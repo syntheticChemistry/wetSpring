@@ -48,6 +48,7 @@ pub mod compute_dispatch;
 pub mod discover;
 pub mod dispatch;
 pub mod handlers;
+pub mod mcp;
 pub mod metrics;
 pub mod primal_names;
 pub mod protocol;

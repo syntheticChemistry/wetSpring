@@ -258,6 +258,13 @@ pub const fn deploy_graph_path() -> &'static str {
     "graphs/wetspring_deploy.toml"
 }
 
+/// Default NPU device path when toadStool discovery is unavailable.
+///
+/// Validation binaries check `WETSPRING_NPU_DEVICE` env var first, then
+/// fall back to this path for the `BrainChip` `AKD1000`. In production, NPU
+/// discovery goes through toadStool IPC (`toadstool.device.npu`).
+pub const NPU_DEFAULT_DEVICE: &str = "/dev/akida0";
+
 /// Returns the number of required dependencies.
 #[must_use]
 pub fn required_dependency_count() -> usize {

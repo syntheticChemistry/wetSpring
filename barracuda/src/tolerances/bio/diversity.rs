@@ -159,3 +159,21 @@ pub const COLD_SEEP_OBS_FEATURES_MIN: f64 = 50.0;
 /// FEMS Microbiol Ecol 91:fiu016 methodology for vent community analysis.
 /// Validated: Exp051 (rare biosphere), commit `e4358c5`.
 pub const RARE_BIOSPHERE_THRESHOLD: f64 = 0.001;
+
+/// Cold seep pipeline: minimum fraction classified as extended (QS viable).
+///
+/// Synthetic cold seep communities calibrated to Ruff et al. (2019)
+/// parameters should produce > 60% samples in the extended (GOE-like)
+/// spectral regime, confirming high-diversity deep-sea sediment supports
+/// QS signaling.
+/// Validated: Exp185 (cold seep pipeline), commit `756df26`.
+pub const COLD_SEEP_EXTENDED_MIN_FRACTION: f64 = 0.60;
+
+/// Minimum |Spearman ρ| for diversity–spectral-regime correlation.
+///
+/// Shannon H' and level-spacing ratio ⟨r⟩ should be positively correlated
+/// in ecology datasets (higher diversity → more extended → higher r).
+/// 0.1 is a weak-correlation floor that distinguishes genuine signal
+/// from noise in small-sample (N ≈ 100) synthetic pipelines.
+/// Validated: Exp185 (cold seep pipeline), commit `756df26`.
+pub const DIVERSITY_SPECTRAL_SPEARMAN_MIN: f64 = 0.1;

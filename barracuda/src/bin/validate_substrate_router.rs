@@ -172,8 +172,8 @@ async fn main() {
     }
 
     let gpu_available = gpu.as_ref().is_some_and(|g| g.has_f64);
-    let npu_device =
-        std::env::var("WETSPRING_NPU_DEVICE").unwrap_or_else(|_| String::from("/dev/akida0"));
+    let npu_device = std::env::var("WETSPRING_NPU_DEVICE")
+        .unwrap_or_else(|_| String::from(wetspring_barracuda::niche::NPU_DEFAULT_DEVICE));
     let npu_available = std::path::Path::new(&npu_device).exists();
     let ada_lovelace = gpu_available;
 

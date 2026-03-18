@@ -1,8 +1,8 @@
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** March 17, 2026
+**Date:** March 18, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V127 — 376 experiments, 5,707+ validation checks, ALL PASS; 1,443+ tests (0 failures), 354 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 806+ WGSL shaders), toadStool S155, coralReef Phase 10. V127: `RetryPolicy` + `CircuitBreaker` IPC resilience (sweetGrass pattern), 4-format capability parsing (airSpring/sweetGrass standard), `extract_rpc_result()` (healthSpring V29), `anderson_spectral` batch sweep module, `numerics` stable floating-point helpers, `GemmCached::execute_ex()` transpose support. V126: `DispatchOutcome<T>`, health probes, `IpcError` query helpers. 24 capabilities, 16 domains. 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL. Leverage guide published to `wateringHole/WETSPRING_LEVERAGE_GUIDE.md`.
+**Status:** V127 — 376 experiments, 5,707+ validation checks, ALL PASS; 1,448+ tests (0 failures), 354 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 806+ WGSL shaders), toadStool S155, coralReef Phase 10. V127 audit execution: MCP tool definitions (8 tools for Squirrel AI), Python baseline provenance registry (14 records), `kahan_sum` delegation to barraCuda upstream, 7 new tolerance constants, `unlicensed = "deny"` policy, NPU device constant, IPC integration tests. V127: `RetryPolicy` + `CircuitBreaker` IPC resilience (sweetGrass pattern), 4-format capability parsing (airSpring/sweetGrass standard), `extract_rpc_result()` (healthSpring V29), `anderson_spectral` batch sweep module, `numerics` stable floating-point helpers, `GemmCached::execute_ex()` transpose support. V126: `DispatchOutcome<T>`, health probes, `IpcError` query helpers. 24 capabilities, 16 domains. 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL, 0 local math duplication. Leverage guide published to `wateringHole/WETSPRING_LEVERAGE_GUIDE.md`.
 
 ---
 

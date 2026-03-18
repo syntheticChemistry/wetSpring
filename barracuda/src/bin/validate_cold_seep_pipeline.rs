@@ -207,7 +207,7 @@ fn main() {
 
         validator.check_pass(
             ">60% classified as extended (QS viable)",
-            frac_extended > 0.60,
+            frac_extended > tolerances::COLD_SEEP_EXTENDED_MIN_FRACTION,
         );
         validator.check_pass("mean r > midpoint", mean_r > midpoint);
 
@@ -216,8 +216,8 @@ fn main() {
 
         println!("  Spearman ρ(H', r) = {spearman_rho:.4}");
         validator.check_pass(
-            "|Spearman ρ(H', r)| > 0.1 (diversity correlates with spectral regime)",
-            spearman_rho.abs() > 0.1,
+            "|Spearman ρ(H', r)| > threshold (diversity correlates with spectral regime)",
+            spearman_rho.abs() > tolerances::DIVERSITY_SPECTRAL_SPEARMAN_MIN,
         );
     }
 

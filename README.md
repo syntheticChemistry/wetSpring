@@ -4,10 +4,10 @@
 against Rust implementations and GPU shaders via `barraCuda` (standalone math
 primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 
-**Date:** March 17, 2026
+**Date:** March 18, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V127 — **1,443+ tests** (0 failures), 376 experiments, 5,707+ validation checks across 354 binaries. Ecosystem: barraCuda v0.3.5, toadStool S155, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery), `cargo fmt` clean. **`RetryPolicy` + `CircuitBreaker`** — IPC resilience module (sweetGrass pattern). **4-format capability parsing** — `method_info` + `semantic_mappings` (airSpring/sweetGrass standard). **`extract_rpc_result()`** — centralized JSON-RPC result extraction (healthSpring V29 pattern). **`anderson_spectral` module** — batch Anderson sweep, W_c estimation, Pielou→disorder mapping. **`numerics` module** — stable `ln_1p`/`exp_m1`, `log_sum_exp`, Kahan summation. **`GemmCached::execute_ex()`** — transpose support for Tikhonov regularization. 24 capabilities across 16 domains. Full audit: zero unsafe, zero mocks in production, zero hardcoding in library, zero TODO/FIXME.
+**Status:** V127 — **1,448+ tests** (0 failures), 376 experiments, 5,707+ validation checks across 354 binaries. Ecosystem: barraCuda v0.3.5, toadStool S155, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery), `cargo fmt` clean. **MCP tool definitions** — 8 typed tools for Squirrel AI integration (`ipc::mcp`). **Python baseline provenance** — centralized registry (`provenance.rs`, 14 records, canonical commit epochs). **`kahan_sum` delegation** — delegates to `barracuda::shaders::precision::cpu::kahan_sum`. **`RetryPolicy` + `CircuitBreaker`** — IPC resilience (sweetGrass pattern). **7 new tolerance constants** — magic numbers promoted to named, documented constants. **`unlicensed = "deny"`** — dependency policy tightened. **NPU device constant** — `niche::NPU_DEFAULT_DEVICE` replaces 3 hardcoded strings. 24 capabilities across 16 domains. Full audit executed: zero unsafe, zero mocks in production, zero hardcoding in library, zero TODO/FIXME, zero local math duplication.
 
 ---
 
@@ -583,8 +583,10 @@ All validation data comes from public repositories:
 - **toadStool** — Hardware dispatch primal (GPU/NPU/CPU routing, adaptive tuning, S155 — 19,140+ tests, `science.*` IPC, coralReef proxy)
 - **coralReef** — Sovereign GPU shader compiler (WGSL/SPIR-V → native binary, Phase 10, SM70–SM89 + RDNA2, `shader.compile.*` IPC)
 - **wateringHole** — Inter-primal handoffs and cross-spring coordination
-  - `handoffs/WETSPRING_V122_MODERN_IDIOMATIC_RUST_HANDOFF_MAR16_2026.md` — V122 modern idiomatic Rust evolution + toadStool/barraCuda absorption
-  - `handoffs/archive/` — V7-V121 (fossil record)
+  - `handoffs/WETSPRING_V127_BARRACUDA_TOADSTOOL_EVOLUTION_HANDOFF_MAR18_2026.md` — V127 barraCuda evolution handoff (monod absorption, forge dispatch, learnings)
+  - `handoffs/WETSPRING_V127_RESILIENCE_MCP_AUDIT_HANDOFF_MAR18_2026.md` — V127 IPC resilience + MCP tools + audit debt resolution
+  - `handoffs/WETSPRING_V126_DISPATCH_OUTCOME_HEALTH_PROBES_HANDOFF_MAR16_2026.md` — V126 DispatchOutcome + health probes
+  - `handoffs/archive/` — V7–V125 (134 files, fossil record)
   - `CROSS_SPRING_SHADER_EVOLUTION.md` — 767+ shader provenance
 - **blueFish** — Chemistry as irreducible research programme (`whitePaper/blueFish/`)
 - **ecoPrimals** — Parent ecosystem

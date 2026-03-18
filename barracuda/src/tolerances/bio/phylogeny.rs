@@ -71,3 +71,12 @@ pub const SSA_SINGLE_RUN_ABSOLUTE: f64 = 30.0;
 /// additional sampling noise beyond jackknife leave-one-out.
 /// Validated: Exp292 (`BarraCuda` CPU v22, D40 statistics domain).
 pub const BOOTSTRAP_ESTIMATE_SMALL: f64 = 0.5;
+
+/// GPU phylogenetic pruning relative tolerance.
+///
+/// Felsenstein pruning on GPU vs CPU: polynomial exp/log transcendental
+/// fallback compounds errors across multi-step recursive pruning.
+/// For balanced trees with 4+ tips, the relative error
+/// `|CPU_LL − GPU_LL| / |CPU_LL|` stays below 10%.
+/// Validated: Exp250 (streaming ODE + phylo), commit `5e6a00b`.
+pub const PHYLO_GPU_RELATIVE: f64 = 0.10;

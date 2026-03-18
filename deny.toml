@@ -16,6 +16,7 @@ yanked = "deny"
 ignore = []
 
 [licenses]
+unlicensed = "deny"
 confidence-threshold = 0.8
 allow = [
     "AGPL-3.0",

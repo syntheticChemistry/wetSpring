@@ -1,6 +1,6 @@
 # wetSpring wateringHole
 
-**Date:** March 16, 2026
+**Date:** March 18, 2026
 **Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records.
 
 ---
@@ -9,10 +9,11 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V126** | `handoffs/WETSPRING_V126_DISPATCH_OUTCOME_HEALTH_PROBES_HANDOFF_MAR16_2026.md` | Mar 16 | **DispatchOutcome + Health Probes + IpcError Helpers** — `DispatchOutcome<T>` protocol vs application error separation (groundSpring/airSpring/sweetGrass). `health.liveness` + `health.readiness` probes (healthSpring V32). `IpcError` query helpers: `is_retriable()`, `is_timeout_likely()`, `is_method_not_found()`, `is_connection_error()` (sweetGrass circuit-breaker). 24 capabilities, 16 domains. |
-| | `handoffs/WETSPRING_V125_TOADSTOOL_BARRACUDA_ABSORPTION_HANDOFF_MAR16_2026.md` | Mar 16 | **toadStool/barraCuda absorption handoff** — IPC patterns, primitive consumption, ecosystem patterns. |
-| | *V125 → `handoffs/archive/`* | | V125 IpcError handoff archived. |
-| | *V124 and earlier → `handoffs/archive/`* | | Fossil record: V7–V124 (134 total archived). |
+| **V127** | `handoffs/WETSPRING_V127_RESILIENCE_MCP_AUDIT_HANDOFF_MAR18_2026.md` | Mar 18 | **IPC Resilience + MCP Tools + Audit Debt Resolution** — `RetryPolicy`/`CircuitBreaker` (sweetGrass), 8 MCP tool definitions for Squirrel AI, Python baseline provenance registry, 7 new tolerance constants, `kahan_sum` delegation to barraCuda, `unlicensed = "deny"` policy, NPU device constant, IPC integration tests. |
+| | `handoffs/WETSPRING_V127_BARRACUDA_TOADSTOOL_EVOLUTION_HANDOFF_MAR18_2026.md` | Mar 18 | **barraCuda/toadStool evolution handoff** — `monod()` absorption candidate, forge dispatch module, unwired primitives roadmap, learnings for upstream evolution. |
+| **V126** | `handoffs/WETSPRING_V126_DISPATCH_OUTCOME_HEALTH_PROBES_HANDOFF_MAR16_2026.md` | Mar 16 | **DispatchOutcome + Health Probes + IpcError Helpers** — `DispatchOutcome<T>` protocol vs application error separation (groundSpring/airSpring/sweetGrass). `health.liveness` + `health.readiness` probes (healthSpring V32). `IpcError` query helpers. 24 capabilities, 16 domains. |
+| | *V125 + V126 evolution → `handoffs/archive/`* | | Superseded by V127 barraCuda/toadStool evolution handoff. |
+| | *V124 and earlier → `handoffs/archive/`* | | Fossil record: V7–V126 (136 total archived). |
 
 ## Cross-Spring Documents
 
@@ -23,7 +24,7 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` — V7–V125 (134 files).
+Superseded handoffs in `handoffs/archive/` — V7–V126 (136 files).
 Preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda.
 
 ## Convention

@@ -204,3 +204,13 @@ pub const INTERCEPT_NEAR_ZERO: f64 = 0.5;
 /// spectral shifts from finite-size fluctuations.
 /// Validated: Exp273 (skin Anderson s79), Paper 12 immunological model.
 pub const SPECTRAL_TREATMENT_EFFECT_MIN: f64 = 0.001;
+
+/// Level-spacing ratio valid-range margin for pipeline assertions.
+///
+/// When checking that a computed ⟨r⟩ falls within `[POISSON_R − margin,
+/// GOE_R + margin]`, this symmetric margin accommodates finite-size
+/// lattice fluctuations and disorder-averaging noise in real-data
+/// pipelines (NCBI, cold seep). Wider than [`SPECTRAL_R_MARGIN`] (0.02)
+/// which targets clean phase identification in controlled sweeps.
+/// Validated: Exp185 (NCBI real pipeline), commit `756df26`.
+pub const SPECTRAL_R_PIPELINE_MARGIN: f64 = 0.05;

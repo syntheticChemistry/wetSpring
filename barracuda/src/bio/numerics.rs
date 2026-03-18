@@ -80,20 +80,13 @@ pub fn relative_diff(a: f64, b: f64) -> f64 {
 
 /// Kahan compensated summation for improved accuracy over large arrays.
 ///
-/// Standard `Iterator::sum()` accumulates O(n) floating-point error.
-/// Kahan summation reduces this to O(1). Used by diversity calculations
-/// and ODE trajectory analysis where nanosecond precision matters.
+/// Delegates to `barracuda::shaders::precision::cpu::kahan_sum` — the
+/// canonical implementation. Standard `Iterator::sum()` accumulates O(n)
+/// floating-point error; Kahan summation reduces this to O(1).
+#[inline]
 #[must_use]
 pub fn kahan_sum(values: &[f64]) -> f64 {
-    let mut sum = 0.0_f64;
-    let mut compensation = 0.0_f64;
-    for &v in values {
-        let y = v - compensation;
-        let t = sum + y;
-        compensation = (t - sum) - y;
-        sum = t;
-    }
-    sum
+    barracuda::shaders::precision::cpu::kahan_sum(values)
 }
 
 #[cfg(test)]

@@ -46,6 +46,160 @@ pub fn cross_spring_report() -> String {
     provenance::report::evolution_report()
 }
 
+// ═══════════════════════════════════════════════════════════════════
+// Python baseline provenance registry
+// ═══════════════════════════════════════════════════════════════════
+
+/// A Python baseline provenance record.
+pub struct PythonBaseline {
+    /// Rust validation binary name (e.g. `"validate_fastq"`).
+    pub binary: &'static str,
+    /// Python script path relative to workspace (e.g. `"scripts/validate_exp001.py"`).
+    pub script: Option<&'static str>,
+    /// Git commit of the baseline run.
+    pub commit: &'static str,
+    /// Date of the baseline run (ISO 8601).
+    pub date: &'static str,
+    /// Baseline category.
+    pub category: BaselineCategory,
+}
+
+/// Categories of validation baselines.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BaselineCategory {
+    /// Python parity — Rust reproduces Python/scipy results.
+    PythonParity,
+    /// GPU parity — GPU reproduces CPU Rust results.
+    GpuParity,
+    /// Analytical — Rust matches closed-form known values.
+    Analytical,
+    /// Published — Rust reproduces published paper values.
+    Published,
+    /// Visualization — scenario structure and curve-shape checks.
+    Visualization,
+}
+
+/// Canonical commit hashes for major baseline epochs.
+pub mod commits {
+    /// Initial Python parity baselines (Exp001–097, Track 1–3).
+    pub const PYTHON_PARITY_V1: &str = "e4358c5";
+    /// Python script generation commit (all 58 scripts).
+    pub const SCRIPTS_GENERATED: &str = "756df26";
+    /// GPU parity baselines (Exp074+, Track 4 QS).
+    pub const GPU_PARITY_V1: &str = "1f9f80e";
+    /// petalTongue visualization baselines (Exp355+).
+    pub const VIZ_V1: &str = "5e6a00b";
+}
+
+/// All registered Python baseline provenance records.
+///
+/// This is the single source of truth for which validation binaries
+/// correspond to which Python baselines. When a Python script is rerun,
+/// update the commit and date here.
+#[must_use]
+pub const fn python_baselines() -> &'static [PythonBaseline] {
+    &[
+        PythonBaseline {
+            binary: "validate_fastq",
+            script: Some("scripts/validate_exp001.py"),
+            commit: commits::PYTHON_PARITY_V1,
+            date: "2026-02-19",
+            category: BaselineCategory::PythonParity,
+        },
+        PythonBaseline {
+            binary: "validate_diversity",
+            script: Some("scripts/validate_exp001.py"),
+            commit: commits::PYTHON_PARITY_V1,
+            date: "2026-02-19",
+            category: BaselineCategory::PythonParity,
+        },
+        PythonBaseline {
+            binary: "validate_peaks",
+            script: Some("scripts/generate_peak_baselines.py"),
+            commit: commits::PYTHON_PARITY_V1,
+            date: "2026-02-19",
+            category: BaselineCategory::PythonParity,
+        },
+        PythonBaseline {
+            binary: "validate_qs_ode",
+            script: Some("scripts/waters2008_qs_ode.py"),
+            commit: commits::PYTHON_PARITY_V1,
+            date: "2026-02-19",
+            category: BaselineCategory::PythonParity,
+        },
+        PythonBaseline {
+            binary: "validate_rare_biosphere",
+            script: Some("scripts/anderson2015_rare_biosphere.py"),
+            commit: commits::PYTHON_PARITY_V1,
+            date: "2026-02-20",
+            category: BaselineCategory::PythonParity,
+        },
+        PythonBaseline {
+            binary: "validate_epa_pfas_ml",
+            script: Some("scripts/epa_pfas_ml_baseline.py"),
+            commit: commits::PYTHON_PARITY_V1,
+            date: "2026-02-20",
+            category: BaselineCategory::PythonParity,
+        },
+        PythonBaseline {
+            binary: "validate_sulfur_phylogenomics",
+            script: Some("scripts/mateos2023_sulfur_phylogenomics.py"),
+            commit: commits::PYTHON_PARITY_V1,
+            date: "2026-02-20",
+            category: BaselineCategory::PythonParity,
+        },
+        PythonBaseline {
+            binary: "validate_soil_qs_cpu_parity",
+            script: None,
+            commit: commits::GPU_PARITY_V1,
+            date: "2026-02-25",
+            category: BaselineCategory::GpuParity,
+        },
+        PythonBaseline {
+            binary: "validate_substrate_router",
+            script: None,
+            commit: commits::GPU_PARITY_V1,
+            date: "2026-02-21",
+            category: BaselineCategory::GpuParity,
+        },
+        PythonBaseline {
+            binary: "validate_streaming_ode_phylo",
+            script: None,
+            commit: commits::GPU_PARITY_V1,
+            date: "2026-02-23",
+            category: BaselineCategory::GpuParity,
+        },
+        PythonBaseline {
+            binary: "validate_dynamic_anderson",
+            script: None,
+            commit: "wetSpring Phase 59",
+            date: "2026-02-26",
+            category: BaselineCategory::Analytical,
+        },
+        PythonBaseline {
+            binary: "validate_cold_seep_pipeline",
+            script: None,
+            commit: commits::SCRIPTS_GENERATED,
+            date: "2026-02-26",
+            category: BaselineCategory::Analytical,
+        },
+        PythonBaseline {
+            binary: "validate_gonzales_ic50_s79",
+            script: None,
+            commit: "Gonzales 2014 Table 1",
+            date: "2026-03-02",
+            category: BaselineCategory::Published,
+        },
+        PythonBaseline {
+            binary: "validate_petaltongue_biogas_v1",
+            script: None,
+            commit: commits::VIZ_V1,
+            date: "2026-03-14",
+            category: BaselineCategory::Visualization,
+        },
+    ]
+}
+
 /// wetSpring-focused provenance summary for validation binaries and handoffs.
 #[must_use]
 pub fn wetspring_provenance_summary() -> String {
@@ -163,5 +317,44 @@ mod tests {
         let report = cross_spring_report();
         assert!(report.contains("Cross-Spring Shader Evolution Report"));
         assert!(report.contains("wetSpring"));
+    }
+
+    #[test]
+    fn python_baselines_not_empty() {
+        let baselines = python_baselines();
+        assert!(
+            baselines.len() >= 10,
+            "should have 10+ registered baselines"
+        );
+    }
+
+    #[test]
+    fn python_baselines_have_valid_dates() {
+        for b in python_baselines() {
+            assert!(
+                b.date.starts_with("2026-"),
+                "{}: date should be 2026-*",
+                b.binary
+            );
+        }
+    }
+
+    #[test]
+    fn python_baselines_have_nonempty_commits() {
+        for b in python_baselines() {
+            assert!(
+                !b.commit.is_empty(),
+                "{}: commit should not be empty",
+                b.binary
+            );
+        }
+    }
+
+    #[test]
+    fn canonical_commits_are_short_hashes() {
+        assert_eq!(commits::PYTHON_PARITY_V1.len(), 7);
+        assert_eq!(commits::SCRIPTS_GENERATED.len(), 7);
+        assert_eq!(commits::GPU_PARITY_V1.len(), 7);
+        assert_eq!(commits::VIZ_V1.len(), 7);
     }
 }

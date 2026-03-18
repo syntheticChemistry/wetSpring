@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-16 (V126: 376 experiments, 354 binaries, 5,707+ checks, 1,443+ tests. V125: structured `IpcError` enum, dual-format `extract_capabilities()`, generic `socket_env_var()`/`discover_primal()`, 18 binary OrExit import fixes — all 354 binaries compile clean. V126: `DispatchOutcome<T>` protocol vs application error separation, `health.liveness`/`health.readiness` probes, `IpcError` query helpers (`is_retriable()`/`is_timeout_likely()`/`is_method_not_found()`/`is_connection_error()`). V124: workspace `deny.toml`, typed `compute.dispatch` client, structured `tracing`. V123: zero-panic `OrExit`, dual-format discovery. V122: `#[expect(reason)]` across 276+ binaries. Zero `#[allow()]`, zero clippy warnings, zero unsafe.)
+**Updated**: 2026-03-18 (V127: 376 experiments, 354 binaries, 5,707+ checks, 1,448+ tests. V127 audit execution: MCP tool definitions (8 Squirrel AI tools), Python baseline provenance registry (14 records), `kahan_sum` upstream delegation, 7 new tolerance constants, `unlicensed = "deny"` policy, NPU device constant, IPC integration tests. Zero local math duplication, zero `#[allow()]`, zero clippy warnings, zero unsafe.)
 
 ---
 

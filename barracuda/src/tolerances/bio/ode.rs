@@ -175,3 +175,39 @@ pub const RK45_DEFAULT_REL_TOL: f64 = 1e-8;
 /// numerical floor. Matches `scipy.integrate.solve_ivp` default `atol`.
 /// Validated: Exp020/023/024/025/027/030 (all 6 ODE models).
 pub const RK45_DEFAULT_ABS_TOL: f64 = 1e-10;
+
+// ═══════════════════════════════════════════════════════════════════
+// Carrying capacity approach
+// ═══════════════════════════════════════════════════════════════════
+
+/// Relative tolerance for ODE approach to carrying capacity (±30%).
+///
+/// Standard-growth QS biofilm ODE: at `t = t_end`, population `N`
+/// should approximate `K_cap` but may undershoot by up to 30% if
+/// integration horizon is shorter than the characteristic timescale
+/// (`τ ≈ K_cap / r_max`). Used as `tolerance = K_cap × 0.3`.
+/// Validated: Exp179 D01 (Waters 2008 standard-growth scenario).
+pub const ODE_CARRYING_CAPACITY_REL: f64 = 0.3;
+
+// ═══════════════════════════════════════════════════════════════════
+// Visualization scenario kinetics
+// ═══════════════════════════════════════════════════════════════════
+
+/// Visualization scenario kinetics curve-shape tolerance (Gompertz/first-order).
+///
+/// Track 6 biogas visualization validates curve shape rather than
+/// baseline-parity. At t = 30 days, Gompertz H ≈ 250 and first-order
+/// B ≈ 230 mL/g VS for corn stover. 50.0 mL/g VS confirms the model
+/// produces a physically reasonable yield curve without requiring
+/// exact baseline match for a visualization context.
+/// Validated: Exp355 (petalTongue Biogas Dashboard v1), commit `5e6a00b`.
+pub const VIZ_KINETICS_WIDE: f64 = 50.0;
+
+/// Monod growth-rate domain tolerance at saturating substrate.
+///
+/// At S = 100 mg/L with corn stover parameters (`μ_max` = 0.45, `K_s` = 50),
+/// Monod predicts μ = 0.3 h⁻¹. 0.1 covers parameter uncertainty in
+/// the visualization scenario and confirms the Monod curve has the
+/// correct saturating shape.
+/// Validated: Exp355 (petalTongue Biogas Dashboard v1), commit `5e6a00b`.
+pub const VIZ_MONOD_RATE: f64 = 0.1;

@@ -336,7 +336,9 @@ fn main() {
 
             v.check_pass(
                 &format!("{} r in valid range", sample_data[idx].0),
-                (POISSON_R - 0.05..=GOE_R + 0.05).contains(&spacing_r),
+                (POISSON_R - tolerances::SPECTRAL_R_PIPELINE_MARGIN
+                    ..=GOE_R + tolerances::SPECTRAL_R_PIPELINE_MARGIN)
+                    .contains(&spacing_r),
             );
         }
 

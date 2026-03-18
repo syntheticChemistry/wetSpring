@@ -114,8 +114,8 @@ async fn main() {
         validation::exit_skipped("No SHADER_F64 support on this GPU");
     }
 
-    let npu_device =
-        std::env::var("WETSPRING_NPU_DEVICE").unwrap_or_else(|_| String::from("/dev/akida0"));
+    let npu_device = std::env::var("WETSPRING_NPU_DEVICE")
+        .unwrap_or_else(|_| String::from(wetspring_barracuda::niche::NPU_DEFAULT_DEVICE));
     let npu_available = std::path::Path::new(&npu_device).exists();
     let communities = make_communities();
     let mut latencies: Vec<StageLatency> = Vec::new();

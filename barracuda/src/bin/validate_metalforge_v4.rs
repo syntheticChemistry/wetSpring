@@ -219,8 +219,8 @@ async fn main() {
     {
         let t0 = Instant::now();
 
-        let npu_device =
-            std::env::var("WETSPRING_NPU_DEVICE").unwrap_or_else(|_| String::from("/dev/akida0"));
+        let npu_device = std::env::var("WETSPRING_NPU_DEVICE")
+            .unwrap_or_else(|_| String::from(wetspring_barracuda::niche::NPU_DEFAULT_DEVICE));
         let has_npu = std::path::Path::new(&npu_device).exists();
         let npu_substrate = if has_npu {
             "NPU (AKD1000)"

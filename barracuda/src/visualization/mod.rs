@@ -214,14 +214,14 @@ mod tests {
 
     #[test]
     fn data_channel_fieldmap_serializes() {
-        let ch = DataChannel::FieldMap {
-            id: "fm1".into(),
-            label: "Test Field".into(),
-            grid_x: vec![0.0, 1.0],
-            grid_y: vec![0.0, 1.0],
-            values: vec![1.0, 2.0, 3.0, 4.0],
-            unit: "mg/L".into(),
-        };
+        let ch = scenarios::fieldmap(
+            "fm1",
+            "Test Field",
+            &[0.0, 1.0],
+            &[0.0, 1.0],
+            &[1.0, 2.0, 3.0, 4.0],
+            "mg/L",
+        );
         let json = serde_json::to_string(&ch).expect("serialize");
         assert!(json.contains("\"channel_type\":\"fieldmap\""));
         assert!(json.contains("\"grid_x\""));
