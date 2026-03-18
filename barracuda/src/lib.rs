@@ -84,11 +84,15 @@ pub use ipc::primal_names::SELF as PRIMAL_NAME;
 #[cfg(not(feature = "ipc"))]
 pub const PRIMAL_NAME: &str = "wetspring";
 
+/// Capability domain — used for biomeOS Neural API registration and Songbird discovery.
+pub const PRIMAL_DOMAIN: &str = "science.ecology";
+
 /// Key derivation context prefix — versioned for forward compatibility.
 pub const VAULT_KEY_CONTEXT: &str = "wetspring-vault-encryption-v1";
 
 pub mod bench;
 pub mod bio;
+pub mod cast;
 pub mod df64_host;
 pub mod encoding;
 pub mod error;

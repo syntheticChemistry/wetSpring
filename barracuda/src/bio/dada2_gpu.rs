@@ -19,6 +19,7 @@ use crate::bio::dada2::{
     self, Asv, Dada2Params, Dada2Stats, ErrorModel, MAX_ERR_ITERS, MAX_QUAL, MIN_ERR, NUM_BASES,
 };
 use crate::bio::derep::UniqueSequence;
+use crate::cast;
 use crate::error::{Error, Result};
 use barracuda::Dada2EStepGpu;
 use barracuda::device::WgpuDevice;
@@ -47,7 +48,7 @@ impl Dada2Gpu {
     /// Compute `log_p_error` for all (seq, center) pairs in a single GPU dispatch.
     ///
     /// Returns an `n_seqs × n_centers` matrix (row-major).
-    #[expect(clippy::cast_possible_truncation, clippy::too_many_arguments)]
+    #[expect(clippy::too_many_arguments)]
     fn batch_log_p_error(
         &self,
         bases: &[u32],
@@ -96,9 +97,9 @@ impl Dada2Gpu {
         self.inner
             .dispatch(&Dada2DispatchArgs {
                 dimensions: Dada2Dimensions {
-                    n_seqs: n_seqs as u32,
-                    n_centers: n_centers as u32,
-                    max_len: max_len as u32,
+                    n_seqs: cast::usize_u32(n_seqs),
+                    n_centers: cast::usize_u32(n_centers),
+                    max_len: cast::usize_u32(max_len),
                 },
                 buffers: Dada2Buffers {
                     bases: &bases_buf,
@@ -130,7 +131,7 @@ impl Dada2Gpu {
 /// # Errors
 ///
 /// Returns an error if GPU dispatch fails or the device lacks f64 support.
-#[expect(clippy::cast_possible_truncation, clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 pub fn denoise_gpu(
     dada2: &Dada2Gpu,
     seqs: &[UniqueSequence],
@@ -170,7 +171,7 @@ pub fn denoise_gpu(
         iters += 1;
 
         let log_err_flat = flatten_log_error_model(&err);
-        let center_indices: Vec<u32> = centers.iter().map(|&c| c as u32).collect();
+        let center_indices: Vec<u32> = centers.iter().map(|&c| cast::usize_u32(c)).collect();
 
         let scores = dada2.batch_log_p_error(
             &bases,
@@ -207,7 +208,7 @@ pub fn denoise_gpu(
         }
 
         let split_log_err = flatten_log_error_model(&err);
-        let split_center_indices: Vec<u32> = centers.iter().map(|&c| c as u32).collect();
+        let split_center_indices: Vec<u32> = centers.iter().map(|&c| cast::usize_u32(c)).collect();
 
         let split_scores = dada2.batch_log_p_error(
             &bases,
@@ -242,7 +243,7 @@ pub fn denoise_gpu(
     }
 
     let log_err_flat = flatten_log_error_model(&err);
-    let center_indices: Vec<u32> = centers.iter().map(|&c| c as u32).collect();
+    let center_indices: Vec<u32> = centers.iter().map(|&c| cast::usize_u32(c)).collect();
     let scores = dada2.batch_log_p_error(
         &bases,
         &quals,
@@ -286,12 +287,10 @@ pub fn denoise_gpu(
 
 // ── Data packing for GPU ─────────────────────────────────────────────────────
 
-#[expect(clippy::cast_possible_truncation)] // Truncation: base_to_idx returns 0..4, fits u32
 const fn base_to_idx(b: u8) -> u32 {
     dada2::base_to_idx(b) as u32
 }
 
-#[expect(clippy::cast_possible_truncation)] // Truncation: read length fits u32 (typical < 500)
 fn pack_sequences(seqs: &[&UniqueSequence], max_len: usize) -> (Vec<u32>, Vec<u32>, Vec<u32>) {
     let n = seqs.len();
     let mut bases = vec![0u32; n * max_len];
@@ -299,7 +298,7 @@ fn pack_sequences(seqs: &[&UniqueSequence], max_len: usize) -> (Vec<u32>, Vec<u3
     let mut lengths = vec![0u32; n];
 
     for (i, seq) in seqs.iter().enumerate() {
-        lengths[i] = seq.sequence.len() as u32;
+        lengths[i] = cast::usize_u32(seq.sequence.len());
         let base_offset = i * max_len;
         for (j, &b) in seq.sequence.iter().enumerate() {
             bases[base_offset + j] = base_to_idx(b);
@@ -347,7 +346,6 @@ fn err_model_converged(old: &ErrorModel, new: &ErrorModel) -> bool {
     dada2::err_model_converged(old, new)
 }
 
-#[expect(clippy::cast_precision_loss)] // Precision: abundance bounded by partition size
 fn find_new_centers_from_matrix(
     seqs: &[&UniqueSequence],
     partition: &[usize],
@@ -368,7 +366,7 @@ fn find_new_centers_from_matrix(
             continue;
         };
         let log_p = scores[i * n_centers + center_slot];
-        let lambda = (seqs[center_idx].abundance as f64) * log_p.exp();
+        let lambda = cast::usize_f64(seqs[center_idx].abundance) * log_p.exp();
 
         if lambda <= 0.0 {
             new_centers.push(i);

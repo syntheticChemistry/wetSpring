@@ -19,6 +19,7 @@
 
 | File | Purpose |
 |------|---------|
+| `ECOSYSTEM_LEVERAGE_GUIDE.md` | **V128** — What wetSpring absorbs from ecosystem and contributes back |
 | `CROSS_SPRING_SHADER_EVOLUTION.md` | Cross-spring shader provenance map (767+ barraCuda WGSL shaders) |
 | `TOADSTOOL_WETSPRING_GAP_ANALYSIS.md` | Gap analysis: barraCuda exports vs wetSpring usage |
 

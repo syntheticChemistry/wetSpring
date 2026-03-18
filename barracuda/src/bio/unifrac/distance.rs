@@ -152,8 +152,8 @@ where
         }
         let bl = tree.nodes[i].branch_length;
         let diff = (prop_a[i] - prop_b[i]).abs();
-        numerator += bl * diff;
-        denominator += bl * prop_a[i].max(prop_b[i]);
+        numerator = bl.mul_add(diff, numerator);
+        denominator = bl.mul_add(prop_a[i].max(prop_b[i]), denominator);
     }
 
     if denominator > 0.0 {

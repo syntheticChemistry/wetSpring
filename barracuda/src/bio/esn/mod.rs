@@ -138,7 +138,7 @@ impl LegacyEsn {
         let mut output = vec![0.0_f64; n_out];
         for o in 0..n_out {
             for r in 0..n_res {
-                output[o] += self.w_out[o * n_res + r] * self.state[r];
+                output[o] = self.w_out[o * n_res + r].mul_add(self.state[r], output[o]);
             }
         }
         output

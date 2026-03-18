@@ -46,7 +46,24 @@ multiple-versions = "warn"
 wildcards = "deny"
 highlight = "all"
 allow = []
-deny = []
+deny = [
+    # ecoBin compliance: zero C dependencies in application code.
+    # These crates pull in C/C++ compilers or link native libraries.
+    { crate = "openssl-sys", reason = "C dependency — use rustls" },
+    { crate = "openssl", reason = "C dependency — use rustls" },
+    { crate = "libz-sys", reason = "C dependency — use flate2 rust_backend" },
+    { crate = "bzip2-sys", reason = "C dependency" },
+    { crate = "lzma-sys", reason = "C dependency" },
+    { crate = "zstd-sys", reason = "C dependency — use ruzstd" },
+    { crate = "curl-sys", reason = "C dependency — use ureq/reqwest" },
+    { crate = "libgit2-sys", reason = "C dependency — use gitoxide" },
+    { crate = "libssh2-sys", reason = "C dependency" },
+    { crate = "cmake", reason = "C build tool" },
+    { crate = "cc", wrappers = ["flate2"], reason = "C compiler — allowed only via flate2 rust_backend" },
+    { crate = "libffi-sys", reason = "C dependency" },
+    { crate = "bindgen", reason = "C header parser" },
+    { crate = "pkg-config", reason = "C build tool" },
+]
 skip = []
 skip-tree = []
 workspace-default-features = "allow"

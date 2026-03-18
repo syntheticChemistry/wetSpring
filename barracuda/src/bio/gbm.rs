@@ -178,7 +178,7 @@ impl GbmClassifier {
     fn predict_single_proba(&self, features: &[f64]) -> GbmPrediction {
         let mut score = self.initial_prediction;
         for tree in &self.trees {
-            score += self.learning_rate * tree.predict(features);
+            score = self.learning_rate.mul_add(tree.predict(features), score);
         }
         let prob = sigmoid(score);
         GbmPrediction {
@@ -275,7 +275,7 @@ impl GbmMultiClassifier {
         let mut scores = self.initial_predictions.clone();
         for (k, trees) in self.class_trees.iter().enumerate() {
             for tree in trees {
-                scores[k] += self.learning_rate * tree.predict(features);
+                scores[k] = self.learning_rate.mul_add(tree.predict(features), scores[k]);
             }
         }
 

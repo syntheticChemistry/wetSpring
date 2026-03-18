@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![expect(clippy::expect_used)]
 #![expect(clippy::print_stdout)]
 #![expect(clippy::too_many_lines)]
 #![expect(clippy::similar_names)]

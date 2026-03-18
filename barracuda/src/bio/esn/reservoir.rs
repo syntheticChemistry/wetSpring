@@ -74,10 +74,10 @@ pub(super) fn update_state(
     for j in 0..n_res {
         let mut val = 0.0;
         for i in 0..n_in.min(input.len()) {
-            val += w_in[i * n_res + j] * input[i];
+            val = w_in[i * n_res + j].mul_add(input[i], val);
         }
         for i in 0..n_res {
-            val += w_res[i * n_res + j] * state[i];
+            val = w_res[i * n_res + j].mul_add(state[i], val);
         }
         new_state[j] = (1.0 - leak).mul_add(state[j], leak * val.tanh());
     }

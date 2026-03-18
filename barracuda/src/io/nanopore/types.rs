@@ -88,7 +88,7 @@ impl NanoporeRead {
             let delta = x - welford_mean;
             welford_mean += delta / count;
             let delta2 = x - welford_mean;
-            m2 += delta * delta2;
+            m2 = delta.mul_add(delta2, m2);
         }
 
         let n = self.signal.len() as f64;

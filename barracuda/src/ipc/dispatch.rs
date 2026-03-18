@@ -316,4 +316,39 @@ mod tests {
         assert_eq!(subs["math"], true);
         assert_eq!(subs["ipc"], true);
     }
+
+    mod proptests {
+        use super::*;
+        use proptest::prelude::*;
+
+        proptest! {
+            #[test]
+            fn unknown_method_returns_not_found(
+                method in "[a-z]{1,8}\\.[a-z]{1,8}_[a-z]{1,8}",
+            ) {
+                let known = [
+                    "health.check", "health.liveness", "health.readiness",
+                    "capability.list", "science.diversity", "science.qs_model",
+                    "science.anderson", "science.kinetics", "science.alignment",
+                    "science.taxonomy", "science.phylogenetics", "science.nmf",
+                    "science.ncbi_fetch", "science.full_pipeline",
+                    "science.timeseries", "science.timeseries_diversity",
+                    "provenance.begin", "provenance.record", "provenance.complete",
+                    "brain.observe", "brain.attention", "brain.urgency",
+                    "ai.ecology_interpret",
+                ];
+                if !known.contains(&method.as_str()) {
+                    let err = dispatch(&method, &json!({})).unwrap_err();
+                    prop_assert_eq!(err.code, -32601);
+                }
+            }
+
+            #[test]
+            fn dispatch_never_panics(
+                method in "\\PC{0,64}",
+            ) {
+                let _ = dispatch(&method, &json!({}));
+            }
+        }
+    }
 }

@@ -3,13 +3,26 @@
 //!
 //! Resolves Unix domain socket paths using a cascading strategy:
 //! 1. Explicit env var override (e.g. `WETSPRING_SOCKET`)
-//! 2. `$XDG_RUNTIME_DIR/biomeos/{primal}-default.sock`
-//! 3. `<temp_dir>/{primal}-default.sock` (platform-agnostic fallback)
+//! 2. `$XDG_RUNTIME_DIR/biomeos/{primal}-{family_id}.sock`
+//! 3. `<temp_dir>/{primal}-{family_id}.sock` (platform-agnostic fallback)
+//!
+//! `FAMILY_ID` / `BIOMEOS_FAMILY_ID` env var selects the instance (defaults
+//! to `"default"`), enabling multi-instance deployments on the same host.
 //!
 //! No absolute paths or hardcoded primal names — discovery is parameterized
 //! by env var and primal name, following the Primal IPC Protocol.
 
 use std::path::PathBuf;
+
+/// Resolve the active family identifier for multi-instance discovery.
+///
+/// Priority: `FAMILY_ID` → `BIOMEOS_FAMILY_ID` → `"default"`.
+#[must_use]
+pub fn family_id() -> String {
+    std::env::var("FAMILY_ID")
+        .or_else(|_| std::env::var("BIOMEOS_FAMILY_ID"))
+        .unwrap_or_else(|_| "default".to_string())
+}
 
 /// Derive the standard env var name for a primal socket.
 ///
@@ -56,9 +69,11 @@ pub fn discover_socket(env_var: &str, primal: &str) -> Option<PathBuf> {
         }
     }
 
+    let fam = family_id();
+
     if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
         let p = PathBuf::from(xdg).join(format!(
-            "{}/{}-default.sock",
+            "{}/{}-{fam}.sock",
             super::primal_names::BIOMEOS,
             primal
         ));
@@ -67,7 +82,7 @@ pub fn discover_socket(env_var: &str, primal: &str) -> Option<PathBuf> {
         }
     }
 
-    let fallback = std::env::temp_dir().join(format!("{primal}-default.sock"));
+    let fallback = std::env::temp_dir().join(format!("{primal}-{fam}.sock"));
     if fallback.exists() {
         return Some(fallback);
     }
@@ -85,15 +100,17 @@ pub fn resolve_bind_path(env_var: &str, primal: &str) -> PathBuf {
         return PathBuf::from(path);
     }
 
+    let fam = family_id();
+
     if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
         return PathBuf::from(xdg).join(format!(
-            "{}/{}-default.sock",
+            "{}/{}-{fam}.sock",
             super::primal_names::BIOMEOS,
             primal
         ));
     }
 
-    std::env::temp_dir().join(format!("{primal}-default.sock"))
+    std::env::temp_dir().join(format!("{primal}-{fam}.sock"))
 }
 
 /// Pure-logic socket resolution for testing (no env reads).

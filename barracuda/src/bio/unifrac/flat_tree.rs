@@ -4,6 +4,7 @@
 use std::collections::HashMap;
 
 use super::tree::{PhyloTree, TreeNode};
+use crate::cast;
 
 /// GPU-compatible flat tree representation (CSR layout).
 ///
@@ -40,7 +41,6 @@ impl PhyloTree {
     ///
     /// Tree node counts fit in u32 for any realistic phylogeny.
     #[must_use]
-    #[expect(clippy::cast_possible_truncation)] // Truncation: node counts and indices fit u32
     pub fn to_flat_tree(&self) -> FlatTree {
         let n = self.nodes.len();
         let mut parent = Vec::with_capacity(n);
@@ -50,12 +50,12 @@ impl PhyloTree {
         let mut children_flat = Vec::new();
 
         for node in &self.nodes {
-            parent.push(node.parent as u32);
+            parent.push(cast::usize_u32(node.parent));
             branch_length.push(node.branch_length);
-            n_children.push(node.children.len() as u32);
-            children_offset.push(children_flat.len() as u32);
+            n_children.push(cast::usize_u32(node.children.len()));
+            children_offset.push(cast::usize_u32(children_flat.len()));
             for &c in &node.children {
-                children_flat.push(c as u32);
+                children_flat.push(cast::usize_u32(c));
             }
         }
 
@@ -63,7 +63,7 @@ impl PhyloTree {
         let mut leaf_labels = Vec::new();
         for (idx, node) in self.nodes.iter().enumerate() {
             if node.children.is_empty() && !node.label.is_empty() {
-                leaf_indices.push(idx as u32);
+                leaf_indices.push(cast::usize_u32(idx));
                 leaf_labels.push(node.label.clone());
             }
         }
@@ -74,8 +74,8 @@ impl PhyloTree {
             n_children,
             children_offset,
             children_flat,
-            n_nodes: n as u32,
-            root: self.root as u32,
+            n_nodes: cast::usize_u32(n),
+            root: cast::usize_u32(self.root),
             leaf_indices,
             leaf_labels,
         }
@@ -88,7 +88,6 @@ impl PhyloTree {
     ///
     /// Tree node counts fit in u32 for any realistic phylogeny.
     #[must_use]
-    #[expect(clippy::cast_possible_truncation)] // Truncation: node counts and indices fit u32
     pub fn into_flat_tree(self) -> FlatTree {
         let n = self.nodes.len();
         let mut parent = Vec::with_capacity(n);
@@ -98,12 +97,12 @@ impl PhyloTree {
         let mut children_flat = Vec::new();
 
         for node in &self.nodes {
-            parent.push(node.parent as u32);
+            parent.push(cast::usize_u32(node.parent));
             branch_length.push(node.branch_length);
-            n_children.push(node.children.len() as u32);
-            children_offset.push(children_flat.len() as u32);
+            n_children.push(cast::usize_u32(node.children.len()));
+            children_offset.push(cast::usize_u32(children_flat.len()));
             for &c in &node.children {
-                children_flat.push(c as u32);
+                children_flat.push(cast::usize_u32(c));
             }
         }
 
@@ -111,7 +110,7 @@ impl PhyloTree {
         let mut leaf_labels = Vec::new();
         for (idx, node) in self.nodes.into_iter().enumerate() {
             if node.children.is_empty() && !node.label.is_empty() {
-                leaf_indices.push(idx as u32);
+                leaf_indices.push(cast::usize_u32(idx));
                 leaf_labels.push(node.label);
             }
         }
@@ -122,8 +121,8 @@ impl PhyloTree {
             n_children,
             children_offset,
             children_flat,
-            n_nodes: n as u32,
-            root: self.root as u32,
+            n_nodes: cast::usize_u32(n),
+            root: cast::usize_u32(self.root),
             leaf_indices,
             leaf_labels,
         }
@@ -135,28 +134,27 @@ impl FlatTree {
     ///
     /// u32→usize is infallible widening on 64-bit; tree indices fit on 32-bit.
     #[must_use]
-    #[expect(clippy::cast_possible_truncation)] // loop index i < n_nodes, fits in u32
     pub fn to_phylo_tree(&self) -> PhyloTree {
-        let n = self.n_nodes as usize;
+        let n = cast::u32_usize(self.n_nodes);
         let mut nodes = Vec::with_capacity(n);
 
         for i in 0..n {
-            let nc = self.n_children[i] as usize;
-            let off = self.children_offset[i] as usize;
+            let nc = cast::u32_usize(self.n_children[i]);
+            let off = cast::u32_usize(self.children_offset[i]);
             let children: Vec<usize> = self.children_flat[off..off + nc]
                 .iter()
-                .map(|&c| c as usize)
+                .map(|&c| cast::u32_usize(c))
                 .collect();
 
             let label = self
                 .leaf_indices
                 .iter()
-                .position(|&li| li == i as u32)
+                .position(|&li| li == cast::usize_u32(i))
                 .map(|pos| self.leaf_labels[pos].clone())
                 .unwrap_or_default();
 
             nodes.push(TreeNode {
-                parent: self.parent[i] as usize,
+                parent: cast::u32_usize(self.parent[i]),
                 branch_length: self.branch_length[i],
                 label,
                 children,
@@ -172,7 +170,7 @@ impl FlatTree {
 
         PhyloTree {
             nodes,
-            root: self.root as usize,
+            root: cast::u32_usize(self.root),
             leaf_index,
         }
     }

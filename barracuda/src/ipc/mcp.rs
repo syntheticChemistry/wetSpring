@@ -264,6 +264,10 @@ pub fn tool_to_method(tool_name: &str) -> Option<&'static str> {
 }
 
 #[cfg(test)]
+#[expect(
+    clippy::unwrap_used,
+    reason = "test module: assertions use unwrap for clarity"
+)]
 mod tests {
     use super::*;
 

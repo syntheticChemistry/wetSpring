@@ -625,4 +625,73 @@ mod tests {
         assert_eq!(elems.len(), 1);
         assert!(elems[0].contains("nested"));
     }
+
+    mod proptests {
+        use super::*;
+        use proptest::prelude::*;
+
+        proptest! {
+            #[test]
+            fn parse_request_never_panics(input in "\\PC{0,512}") {
+                let _ = parse_request(&input);
+            }
+
+            #[test]
+            fn extract_capabilities_never_panics(input in "\\PC{0,512}") {
+                let _ = extract_capabilities(&input);
+            }
+
+            #[test]
+            fn is_notification_never_panics(input in "\\PC{0,512}") {
+                let _ = is_notification(&input);
+            }
+
+            #[test]
+            fn extract_rpc_error_never_panics(input in "\\PC{0,512}") {
+                let _ = extract_rpc_error(&input);
+            }
+
+            #[test]
+            fn valid_request_roundtrip(
+                method in "[a-z]{1,10}\\.[a-z]{1,10}",
+                id in 1..1000i64,
+            ) {
+                let json = format!(
+                    r#"{{"jsonrpc":"2.0","method":"{method}","params":{{}},"id":{id}}}"#
+                );
+                let req = parse_request(&json).unwrap();
+                prop_assert_eq!(req.method, method);
+                prop_assert_eq!(req.id, serde_json::json!(id));
+            }
+
+            #[test]
+            fn success_response_always_valid_json(
+                id in 1..1000i64,
+                key in "[a-z]{1,10}",
+                val in proptest::num::f64::NORMAL,
+            ) {
+                let resp = success_response(
+                    &serde_json::json!(id),
+                    &serde_json::json!({ key: val }),
+                );
+                let parsed: serde_json::Value = serde_json::from_str(&resp).unwrap();
+                prop_assert_eq!(parsed["jsonrpc"].as_str(), Some("2.0"));
+                prop_assert_eq!(&parsed["id"], &serde_json::json!(id));
+                prop_assert!(parsed.get("result").is_some());
+            }
+
+            #[test]
+            fn capability_extraction_preserves_primal_name(
+                primal in "[a-z]{3,12}",
+                version in "[0-9]{1,2}\\.[0-9]{1,2}\\.[0-9]{1,2}",
+            ) {
+                let resp = format!(
+                    r#"{{"jsonrpc":"2.0","result":{{"primal":"{primal}","version":"{version}","capabilities":[]}},"id":1}}"#
+                );
+                let info = extract_capabilities(&resp).unwrap();
+                prop_assert_eq!(info.primal.as_deref(), Some(primal.as_str()));
+                prop_assert_eq!(info.version.as_deref(), Some(version.as_str()));
+            }
+        }
+    }
 }

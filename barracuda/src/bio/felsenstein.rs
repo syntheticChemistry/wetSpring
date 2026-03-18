@@ -83,8 +83,8 @@ fn pruning_one_site(
         let mut left_sum = 0.0_f64;
         let mut right_sum = 0.0_f64;
         for x in 0..N_STATES {
-            left_sum += trans_left[s][x] * left_partial[x];
-            right_sum += trans_right[s][x] * right_partial[x];
+            left_sum = trans_left[s][x].mul_add(left_partial[x], left_sum);
+            right_sum = trans_right[s][x].mul_add(right_partial[x], right_sum);
         }
         *res = left_sum * right_sum;
     }
@@ -325,8 +325,8 @@ impl FlatTree {
                     let mut l_sum = 0.0_f64;
                     let mut r_sum = 0.0_f64;
                     for x in 0..N_STATES {
-                        l_sum += self.trans_left[base + s * 4 + x] * left_partial[x];
-                        r_sum += self.trans_right[base + s * 4 + x] * right_partial[x];
+                        l_sum = self.trans_left[base + s * 4 + x].mul_add(left_partial[x], l_sum);
+                        r_sum = self.trans_right[base + s * 4 + x].mul_add(right_partial[x], r_sum);
                     }
                     *partial = l_sum * r_sum;
                 }

@@ -41,9 +41,7 @@ pub struct ProvenanceResult {
 /// `$XDG_RUNTIME_DIR/biomeos/` → `/tmp/`.
 #[must_use]
 pub fn neural_api_socket() -> Option<PathBuf> {
-    let family_id = std::env::var("FAMILY_ID")
-        .or_else(|_| std::env::var("BIOMEOS_FAMILY_ID"))
-        .unwrap_or_else(|_| "default".to_string());
+    let family_id = super::discover::family_id();
 
     let sock_name = format!("neural-api-{family_id}.sock");
 

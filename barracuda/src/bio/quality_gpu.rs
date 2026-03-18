@@ -20,6 +20,7 @@
 //! ```
 
 use crate::bio::quality::{self, FilterStats, QualityParams};
+use crate::cast;
 use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
 use crate::io::fastq::FastqRecord;
@@ -52,7 +53,6 @@ impl QualityFilterCached {
     /// # Errors
     ///
     /// Returns an error if GPU dispatch or readback fails.
-    #[expect(clippy::cast_possible_truncation)] // Truncation: window_size, min_length, read len fit u32
     pub fn execute(
         &self,
         reads: &[FastqRecord],
@@ -70,8 +70,8 @@ impl QualityFilterCached {
             leading_min_quality: u32::from(params.leading_min_quality),
             trailing_min_quality: u32::from(params.trailing_min_quality),
             window_min_quality: u32::from(params.window_min_quality),
-            window_size: params.window_size as u32,
-            min_length: params.min_length as u32,
+            window_size: cast::usize_u32(params.window_size),
+            min_length: cast::usize_u32(params.min_length),
             phred_offset: u32::from(params.phred_offset),
         };
 
@@ -98,7 +98,7 @@ impl QualityFilterCached {
 
         self.inner
             .dispatch(
-                n as u32,
+                cast::usize_u32(n),
                 &config,
                 &qual_buf,
                 &offsets_buf,
@@ -123,8 +123,8 @@ impl QualityFilterCached {
                 if r == 0 {
                     None
                 } else {
-                    let start = (r >> 16) as usize;
-                    let end = (r & 0xFFFF) as usize;
+                    let start = cast::u32_usize(r >> 16);
+                    let end = cast::u32_usize(r & 0xFFFF);
                     Some((start, end))
                 }
             })
@@ -162,8 +162,8 @@ pub fn filter_reads_gpu(
 
         for (record, trim) in reads.iter().zip(trim_results.iter()) {
             if let Some((start, end)) = trim {
-                stats.leading_bases_trimmed += *start as u64;
-                stats.trailing_bases_trimmed += (record.quality.len() - end) as u64;
+                stats.leading_bases_trimmed += cast::usize_u64(*start);
+                stats.trailing_bases_trimmed += cast::usize_u64(record.quality.len() - end);
                 output.push(quality::apply_trim(record, *start, *end));
                 stats.output_reads += 1;
             } else {
@@ -178,7 +178,6 @@ pub fn filter_reads_gpu(
     }
 }
 
-#[expect(clippy::cast_possible_truncation)] // Truncation: read quality len fits u32
 fn pack_quality_data(reads: &[FastqRecord]) -> (Vec<u32>, Vec<u32>, Vec<u32>) {
     let mut offsets = Vec::with_capacity(reads.len());
     let mut lengths = Vec::with_capacity(reads.len());
@@ -186,11 +185,11 @@ fn pack_quality_data(reads: &[FastqRecord]) -> (Vec<u32>, Vec<u32>, Vec<u32>) {
 
     for read in reads {
         offsets.push(byte_offset);
-        lengths.push(read.quality.len() as u32);
-        byte_offset += read.quality.len() as u32;
+        lengths.push(cast::usize_u32(read.quality.len()));
+        byte_offset += cast::usize_u32(read.quality.len());
     }
 
-    let total_bytes = byte_offset as usize;
+    let total_bytes = cast::u32_usize(byte_offset);
     let n_words = total_bytes.div_ceil(4);
     let mut packed = vec![0u32; n_words.max(1)];
 
