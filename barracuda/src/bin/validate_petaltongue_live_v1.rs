@@ -50,6 +50,7 @@ use barracuda::stats::{covariance, mean, norm_cdf};
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::ipc::discover;
 use wetspring_barracuda::ipc::primal_names;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
 use wetspring_barracuda::visualization::ipc_push::PetalTonguePushClient;
@@ -516,10 +517,18 @@ fn main() {
     // ── S9: Real math validation in scenarios ──
     println!("\n── S9: Real math in scenarios ──");
 
-    // Wide tolerance: visualization scenario, not baseline-parity
-    v.check("Shannon H' algae > 0", h_algae, 1.55, 0.5);
-    // Wide tolerance: visualization scenario, not baseline-parity
-    v.check("Shannon H' soil > algae (more even)", h_soil, 2.0, 0.2);
+    v.check(
+        "Shannon H' algae > 0",
+        h_algae,
+        1.55,
+        tolerances::VISUALIZATION_SCENARIO,
+    );
+    v.check(
+        "Shannon H' soil > algae (more even)",
+        h_soil,
+        2.0,
+        tolerances::VISUALIZATION_SCENARIO_TIGHT,
+    );
     v.check_pass(
         "W inversely related to H' (low H → high W)",
         w_digester > w_soil && w_soil > w_algae || w_digester > w_algae,

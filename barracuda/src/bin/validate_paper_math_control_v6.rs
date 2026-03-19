@@ -38,6 +38,7 @@
 //! | Command | `cargo run --release --bin validate_paper_math_control_v6` |
 
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::bio::kinetics::{haldane, monod};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
@@ -61,16 +62,6 @@ fn gompertz(t: f64, p: f64, rm: f64, lambda: f64) -> f64 {
 /// First-order biogas kinetics: B(t) = `B_max` * (1 - exp(-k*t))
 fn first_order(t: f64, b_max: f64, k: f64) -> f64 {
     b_max * (1.0 - (-k).mul_add(t, 0.0).exp())
-}
-
-/// Monod growth kinetics: mu = `mu_max` * S / (Ks + S)
-fn monod(s: f64, mu_max: f64, ks: f64) -> f64 {
-    mu_max.mul_add(s, 0.0) / (ks + s)
-}
-
-/// Haldane substrate inhibition: mu = `mu_max` * S / (Ks + S + S²/Ki)
-fn haldane(s: f64, mu_max: f64, ks: f64, ki: f64) -> f64 {
-    mu_max.mul_add(s, 0.0) / (ks + s + s * s / ki)
 }
 
 fn main() {
@@ -283,7 +274,12 @@ fn main() {
         tolerances::EXACT_F64,
     );
     let b_long = first_order(200.0, b_max, k_rate);
-    v.check("P60: First-order B(∞) → B_max", b_long, b_max, 0.01);
+    v.check(
+        "P60: First-order B(∞) → B_max",
+        b_long,
+        b_max,
+        tolerances::ASYMPTOTIC_LIMIT,
+    );
 
     // Monotonicity
     v.check_pass(
@@ -411,7 +407,12 @@ fn main() {
         tolerances::EXACT_F64,
     );
     let mu_high_s = monod(50000.0, mu_max_fungal, ks_fungal);
-    v.check("P63: Monod mu(∞) → mu_max", mu_high_s, mu_max_fungal, 0.01);
+    v.check(
+        "P63: Monod mu(∞) → mu_max",
+        mu_high_s,
+        mu_max_fungal,
+        tolerances::ASYMPTOTIC_LIMIT,
+    );
 
     // Aerobic-anaerobic W transition: fungal (aerobic) community is more
     // ordered than bacterial (anaerobic) community

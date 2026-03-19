@@ -38,6 +38,7 @@ use std::time::{Duration, Instant};
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::ipc::Server;
+use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;
 
@@ -249,7 +250,7 @@ fn main() {
     );
     v.check_pass(
         "stage 2: diversity computed",
-        check_f64_in_json(&div_resp, "shannon", h, 0.01),
+        check_f64_in_json(&div_resp, "shannon", h, tolerances::PIPELINE_E2E),
     );
 
     let qs = rpc(

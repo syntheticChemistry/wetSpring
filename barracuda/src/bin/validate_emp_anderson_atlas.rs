@@ -366,7 +366,7 @@ fn main() {
 }
 
 fn check_nucleus_available() -> bool {
-    wetspring_barracuda::ipc::discover::discover_socket("BIOMEOS_SOCKET", "biomeos").is_some()
-        || wetspring_barracuda::ipc::discover::discover_socket("WETSPRING_SOCKET", "wetspring")
-            .is_some()
+    use wetspring_barracuda::ipc::{discover, primal_names};
+    discover::discover_primal(primal_names::BIOMEOS).is_some()
+        || discover::discover_primal(primal_names::SELF).is_some()
 }

@@ -9,6 +9,7 @@ pub mod ani;
 pub mod ani_gpu;
 #[cfg(feature = "gpu")]
 pub mod batch_fitness_gpu;
+pub mod binding_landscape;
 pub mod bistable;
 #[cfg(feature = "gpu")]
 pub mod bistable_gpu;
@@ -61,8 +62,10 @@ pub mod hamming_gpu;
 pub mod hmm;
 #[cfg(feature = "gpu")]
 pub mod hmm_gpu;
+pub mod hormesis;
 #[cfg(feature = "gpu")]
 pub mod jaccard_gpu;
+pub mod kinetics;
 pub mod kmd;
 #[cfg(feature = "gpu")]
 pub mod kmd_gpu;

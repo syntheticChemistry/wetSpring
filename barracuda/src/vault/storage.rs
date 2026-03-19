@@ -269,7 +269,10 @@ fn sovereign_hash(input: &[u8]) -> [u8; 32] {
 }
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used)]
+#[expect(
+    clippy::unwrap_used,
+    reason = "test module: assertions use unwrap for clarity"
+)]
 mod tests {
     use super::*;
     use crate::vault::consent::ConsentScope;

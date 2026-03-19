@@ -4,14 +4,11 @@
 //! Lightweight validator for single-paper math.
 
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::bio::kinetics::monod;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
 use barracuda::stats::norm_cdf;
-
-fn monod(s: f64, mu_max: f64, ks: f64) -> f64 {
-    mu_max * s / (ks + s)
-}
 
 fn main() {
     let mut v = Validator::new("Exp340: Zhong 2016 — Fungal Fermentation on Digestate");

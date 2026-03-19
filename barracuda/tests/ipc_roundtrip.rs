@@ -48,7 +48,7 @@ fn diversity_science_roundtrip() {
     with_server("diversity", |socket| {
         let resp = rpc_roundtrip(
             socket,
-            r#"{"jsonrpc":"2.0","method":"science.diversity","params":{"abundances":[0.25,0.25,0.25,0.25]},"id":1}"#,
+            r#"{"jsonrpc":"2.0","method":"science.diversity","params":{"counts":[0.25,0.25,0.25,0.25]},"id":1}"#,
         );
 
         assert_eq!(resp["jsonrpc"], "2.0");
@@ -120,7 +120,7 @@ fn qs_model_roundtrip() {
     with_server("qs_model", |socket| {
         let resp = rpc_roundtrip(
             socket,
-            r#"{"jsonrpc":"2.0","method":"science.qs_model","params":{"scenario":"standard","dt":0.01},"id":4}"#,
+            r#"{"jsonrpc":"2.0","method":"science.qs_model","params":{"scenario":"standard_growth","dt":0.01},"id":4}"#,
         );
 
         assert_eq!(resp["jsonrpc"], "2.0");

@@ -566,6 +566,149 @@ Full absorption map: `barracuda/EVOLUTION_READINESS.md`.
 Handoffs: `../wateringHole/handoffs/WETSPRING_V018_CROSS_SPRING_REWIRE_HANDOFF_FEB23_2026.md` (original),
 `wateringHole/handoffs/WETSPRING_TOADSTOOL_REWIRE_FEB22_2026.md` (rewire results).
 
+### 4.8 Computation as Experiment Preprocessor
+
+The conventional scientific pipeline runs in one direction:
+
+```
+wet lab → data → computational analysis → interpretation → next hypothesis
+```
+
+This pipeline was not designed — it was constrained. When computation was
+expensive and data was scarce, the only practical approach was to collect
+data physically and then squeeze insight from it computationally. As
+computation became cheaper relative to wet lab work, the field shifted
+toward less hands-on experimentation and more post-hoc analysis. But this
+shift was driven by the economics of computation and data, not by any
+principled argument that post-hoc analysis is the optimal strategy for
+finding novel solutions.
+
+The result is a methodological monoculture: high-throughput screens
+generate enormous datasets, and bioinformatics pipelines sift through
+them looking for statistical signals. This works when the signal is
+strong and the search space is well-characterized. It fails when the
+interesting biology lives in regimes that the screen was not designed
+to measure — because no one knew to look there.
+
+**We propose inverting the pipeline:**
+
+```
+computational model → predicted landscape → targeted experiment design →
+wet lab validation of specific predictions → refined model → repeat
+```
+
+The computation comes before the experiment. The model predicts where
+the interesting biology should be — which dose range, which affinity
+regime, which tissue geometry, which diversity threshold — and the
+experiment is designed to test that specific prediction. The plate
+screener, field trial, or clinical measurement becomes a validator of
+computational hypotheses rather than an undirected discovery engine.
+
+#### Why This Is Possible Now
+
+Three developments make computational preprocessing feasible in ways
+that were not available even a decade ago:
+
+1. **Sovereign compute on consumer hardware.** The wetSpring validation
+   chain demonstrates 926× GPU speedup on a $549 graphics card. Anderson
+   lattice simulations that would have required cluster access in 2015
+   run in seconds on consumer hardware. The economic barrier to
+   computational exploration has collapsed.
+
+2. **Mathematical frameworks that span scales.** Anderson localization
+   provides quantitative predictions across molecular binding, cellular
+   signaling, tissue geometry, population ecology, and trophic networks
+   — all using the same Hamiltonian, eigensolver, and diagnostic toolkit.
+   A single framework can generate predictions in domains that
+   traditionally required domain-specific models.
+
+3. **Validated computational infrastructure.** The 5,707+ quantitative
+   checks in this study, validated against published baselines with
+   documented tolerances, establish that the computational predictions
+   are trustworthy — not simulations of simulations, but validated
+   reproductions of known physics extended to new parameter regimes.
+
+#### The Stochastic Infinity Problem
+
+Reality is infinite-dimensional. An 8,000-compound plate screen with
+8-point dose-response curves generates 64,000 data points — a vanishingly
+thin slice of the possible chemical-biological interaction space. Even
+the largest screens explore only the subspace defined by their design
+choices: which compounds to include, which concentrations to test, which
+readouts to measure.
+
+The traditional approach accepts this constraint and asks: given this
+data, what can we learn? The computational preprocessing approach asks
+the prior question: given what we already know about the physics of the
+system, where in the stochastic infinity of reality should we point the
+screen?
+
+This is not merely an efficiency argument. Different pointing directions
+reveal fundamentally different biology:
+
+- **Traditional HTS**: optimizes for strong, specific binding (high-affinity
+  hits). Systematically discards compounds with IC50 > 10 µM as "inactive."
+  The entire low-affinity regime — where probiotic adhesion, innate immunity,
+  hormesis, and combinatorial cancer targeting operate — is invisible to
+  the screen by design.
+
+- **Anderson-preprocessed screen**: predicts that the delocalized binding
+  regime (IC50 > 10 µM, IPR < 0.15) produces safer therapeutics with
+  predictable pharmacokinetics, and that the near-critical disorder
+  regime (W ≈ W_c) is where hormetic benefit peaks. The screen is then
+  designed to measure in these specific regimes — not because we already
+  observed something there, but because the physics predicts it.
+
+#### The Arrow of Causality
+
+The computational model generates directional predictions:
+
+1. **Forward**: Given dose → predict Anderson regime → predict biological
+   response (hormetic peak, toxic threshold, colonization resistance).
+2. **Inverse**: Given observed response → infer effective disorder W →
+   infer where the system sits relative to W_c.
+3. **Causal test**: If the forward prediction matches the experimental
+   observation, the Anderson mechanism is consistent with the data. If
+   not, the discrepancy identifies missing physics — nonlinear feedback,
+   spatial structure, temporal dynamics — that the tight-binding model
+   does not capture.
+
+Each validated prediction strengthens the causal claim. Each falsification
+reveals where the model breaks down, which is itself informative. The
+computation finds the arrow; the experiment confirms the direction.
+
+#### Application: Anderson Hormesis Framework
+
+The biphasic dose-response model (`bio::hormesis`) demonstrates
+computational preprocessing for five domains:
+
+| Domain | Computation Predicts | Experiment Validates |
+|--------|---------------------|---------------------|
+| **Pesticide hormesis** | Sublethal dose pushes trophic lattice toward W_c; predators localize (collapse) before prey | Field observations of pest resurgence at sub-MIC pesticide doses |
+| **Immune calibration** | Early antigen exposure during lattice development sets appropriate W_c; insufficient exposure leaves W too low | LEAP study: 81% reduction in peanut allergy with early exposure |
+| **Caloric restriction** | Mild metabolic stress pushes cellular network to near-critical W; repair pathways activate | Published caloric restriction longevity data across species |
+| **Low-affinity binding** | Delocalized binders (IPR < 0.15) stay in linear clearance regime; safety emerges from delocalization | ADDRC 8K-compound library, Gonzales iPSC validation |
+| **Mithridatism** | Gradual toxin exposure shifts system W_c rather than changing W; cost is reduced adaptability | Published arsenic tolerance in Andean populations |
+
+In each case, the computation predicts specific, quantitative features
+of the dose-response landscape BEFORE the experiment is designed. The
+experiment then targets those predictions rather than scanning blindly.
+
+#### Connection to Existing Validation
+
+This methodological shift is grounded in the same validation infrastructure
+that produced 5,707+ passing checks. The hormesis model uses the same
+Hill equation validated in Exp280 (Gonzales IC50, 35/35 checks). The
+Anderson spectral analysis uses the same eigensolver validated across
+Exp107–156 (28-biome atlas, W_c ≈ 16.26). The diversity metrics use
+the same Shannon/Pielou/Bray-Curtis functions validated against
+scikit-bio to 1e-12 tolerance.
+
+The novelty is not in the primitives — it is in the direction of
+inference. We are using validated computational tools not to analyze
+data that already exists, but to predict where the data should be
+collected next.
+
 ---
 
 ## 5. Reproducibility

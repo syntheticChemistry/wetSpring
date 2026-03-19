@@ -274,6 +274,72 @@ Runtime dependencies: `flate2` (gzip), `bytemuck` (GPU casting), `serde_json`
 
 ---
 
+## 3b. Phase 4: Computational Preprocessing (Experiment Design)
+
+Phase 4 inverts the relationship between computation and experiment.
+Phases 1–3 validate computational infrastructure against known baselines.
+Phase 4 uses that validated infrastructure to generate predictions that
+guide new experiment design.
+
+### The Inversion
+
+| Phase | Direction | Purpose |
+|-------|-----------|---------|
+| 1 (Python/Galaxy) | Reality → computation | Establish baseline truth |
+| 2 (Rust CPU) | Computation → reality check | Prove Rust reproduces known results |
+| 3 (GPU) | Acceleration | Prove hardware independence |
+| **4 (Preprocessing)** | **Computation → reality design** | **Predict where to look** |
+
+### Protocol
+
+1. Identify a biological system and map it to the Anderson lattice model
+   (lattice sites = biological units, hopping = signal diffusion,
+   disorder W = heterogeneity, dimension d = tissue/habitat geometry)
+2. Run Anderson spectral analysis across the relevant parameter space
+   using validated primitives (`anderson_spectral::sweep`, `estimate_w_c`)
+3. Compute the phase diagram: where is the system extended (coordinated)
+   vs localized (fragmented)?
+4. Overlay the biological question onto the phase diagram:
+   - For **hormesis**: where does W cross W_c? That dose range is the
+     predicted hormetic zone
+   - For **binding**: where does delocalization (IPR < 0.15) achieve
+     therapeutic effect without localized toxicity?
+   - For **colonization**: where does diversity × adhesion × disorder
+     produce >90% occupancy?
+5. Design the wet lab experiment to test the specific prediction —
+   targeted assay in the predicted regime, not undirected screen
+6. Run the experiment and compare observation against prediction
+7. Discrepancy → refine the model (add missing physics) → repeat
+
+### Validation of Phase 4 Predictions
+
+Phase 4 predictions are validated the same way as Phases 1–3: hardcoded
+expected values, named tolerances, explicit pass/fail exit codes. The
+difference is what the expected values represent:
+
+- Phases 1–3: expected values come from published data or known baselines
+- Phase 4: expected values come from the computational model, and the
+  "baseline" is the wet lab observation
+
+The same tolerance infrastructure (`tolerances/mod.rs`) is used. New
+constants for hormesis and binding landscape experiments:
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `HORMESIS_PEAK_MARGIN` | 0.01 | Distinguish genuine hormetic stimulation from noise |
+| `COLONIZATION_RESISTANCE_THRESHOLD` | 0.9 | 90% site occupancy = resistant |
+| `BINDING_IPR_DELOCALIZED` | 0.15 | IPR below this = safely delocalized |
+| `COMPOSITE_BINDING_FLOOR` | 1e-6 | Minimum composite to register as signal |
+
+### New Modules Supporting Phase 4
+
+| Module | Purpose |
+|--------|---------|
+| `bio::hormesis` | Biphasic dose-response: stimulation × inhibition Hill model, dose → W mapping, hormetic zone prediction from W_c |
+| `bio::binding_landscape` | Composite binding, colonization resistance surface, IPR/localization length, selectivity from coincidence detection |
+
+---
+
 ## 4. Comparison Protocol
 
 1. Run Python / Galaxy reference with documented tool versions

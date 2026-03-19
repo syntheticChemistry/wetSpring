@@ -286,8 +286,76 @@ pub const IC50_RESPONSE_TOL: f64 = 0.01;
 pub const REGRESSION_FIT_PARITY: f64 = 0.01;
 
 // ═══════════════════════════════════════════════════════════════════
+// Hormesis / binding landscape
+// ═══════════════════════════════════════════════════════════════════
+
+/// Hormetic peak detection threshold.
+///
+/// A dose-response point is in the hormetic zone when the composite
+/// response exceeds baseline by at least this margin. Set at 1% to
+/// distinguish genuine stimulation from numerical noise while capturing
+/// subtle hormetic effects reported in Calabrese & Mattson (2017).
+pub const HORMESIS_PEAK_MARGIN: f64 = 0.01;
+
+/// Colonization resistance threshold.
+///
+/// Fraction of epithelial binding sites that must be occupied for the
+/// lattice to be classified as "resistant" to pathogen invasion. The
+/// 90% threshold follows the competitive exclusion principle: pathogens
+/// need unoccupied niches to establish, and 90% occupancy leaves
+/// insufficient niche space.
+/// Reference: healthSpring exp098 (colonization resistance surface).
+pub const COLONIZATION_RESISTANCE_THRESHOLD: f64 = 0.9;
+
+/// Binding delocalization IPR threshold.
+///
+/// Inverse participation ratio below this value indicates delocalized
+/// binding (load spread across tissues). From healthSpring TOXICITY.md:
+/// IPR < 0.15 corresponds to ξ > 6.7 tissues sharing the burden,
+/// which keeps per-tissue occupancy below repair capacity thresholds.
+pub const BINDING_IPR_DELOCALIZED: f64 = 0.15;
+
+/// Composite binding activation floor.
+///
+/// Minimum composite binding score (product of fractional occupancies)
+/// required to register as a biological signal. Below this, the
+/// coincidence detection model treats the composite as noise.
+pub const COMPOSITE_BINDING_FLOOR: f64 = 1e-6;
+
+// ═══════════════════════════════════════════════════════════════════
 // Bootstrap / rarefaction
 // ═══════════════════════════════════════════════════════════════════
+
+/// Asymptotic convergence tolerance for limit-approaching checks.
+///
+/// Covers tests of the form `f(large_x) ≈ f(∞)`, where the residual
+/// comes from finite evaluation point rather than numerical error.
+/// Examples: `first_order(200, B_max, k) ≈ B_max`, `monod(50000, mu_max, Ks) ≈ mu_max`.
+/// Validated: Exp020 (QS ODE), Exp039 (fungal kinetics).
+pub const ASYMPTOTIC_LIMIT: f64 = 0.01;
+
+/// Wide tolerance for visualization scenario smoke tests.
+///
+/// Visualization validators confirm that real math feeds into petalTongue
+/// scenarios without requiring baseline-parity precision. 0.5 accommodates
+/// intentionally approximate "visual plausibility" checks.
+/// Validated: Exp233 (petalTongue live v1), Exp241 (cross-primal viz).
+pub const VISUALIZATION_SCENARIO: f64 = 0.5;
+
+/// Tighter visualization tolerance for structural comparisons.
+///
+/// Used when visualization smoke tests compare values that should be
+/// close (e.g., soil Shannon > algae Shannon, expected ~2.0 vs ~1.55)
+/// but do not need baseline parity.
+pub const VISUALIZATION_SCENARIO_TIGHT: f64 = 0.2;
+
+/// End-to-end pipeline IPC roundtrip tolerance.
+///
+/// Wider than [`IPC_JSON_ROUNDTRIP`] (1e-6) because the full pipeline
+/// includes dispatch, handler computation, and JSON serialization. The
+/// 0.01 margin covers cumulative numerical drift through the pipeline.
+/// Validated: Exp298 (cross-primal pipeline v98).
+pub const PIPELINE_E2E: f64 = 0.01;
 
 /// Bootstrap Shannon mean tolerance (GPU extended rarefaction).
 ///

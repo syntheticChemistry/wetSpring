@@ -1,8 +1,8 @@
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** March 18, 2026
+**Date:** March 19, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V129 — 376 experiments, 5,707+ validation checks, ALL PASS; 1,548+ tests (0 code failures), 354 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 806+ WGSL shaders), toadStool S155, coralReef Phase 10. V129 deep debt evolution: `cast` module (15 safe numeric helpers, ~170 raw casts migrated across 62 files), unconditional `primal_names` module (zero hardcoded primal strings in library code), upstream `bingocube-nautilus` JSON roundtrip fix, pure Rust binary discovery, `skip_with_code()` composable exits, 2 new tolerance constants. V128: `cast` module (9 helpers), `mul_add()` FMA sweep, ecoBin C-dep ban (14 crates), `PRIMAL_DOMAIN`, `FAMILY_ID` sockets, 7 IPC proptests. V127: MCP tools, IPC resilience, tolerance constants. 24 capabilities, 16 domains. 63 papers reproduced, 46 at full CPU+GPU+metalForge. 0 local WGSL, 0 local math duplication.
+**Status:** V130 — 379 experiments, 5,707+ validation checks, ALL PASS; 1,579+ tests (0 code failures), 354 binaries, standalone `barraCuda` v0.3.5 (wgpu 28, 806+ WGSL shaders), toadStool S155, coralReef Phase 10. V130 Anderson Hormesis: `bio::hormesis` (biphasic dose-response, 14 tests), `bio::binding_landscape` (colonization resistance, IPR/localization, 17 tests), 4 new tolerance constants, Phase 4 methodology (computation as experiment preprocessor), 3 new experiments (377–379), cross-spring joint experiment with healthSpring. V129: deep debt evolution — `cast` module (15 safe numeric helpers, ~170 raw casts migrated across 62 files), unconditional `primal_names` module, nautilus fix. 24 capabilities, 16 domains. 64 papers reproduced (14 new: Anderson Hormesis), 46 at full CPU+GPU+metalForge. 0 local WGSL, 0 local math duplication, 109 bio modules.
 
 ---
 
@@ -53,7 +53,8 @@ All code is AGPL-3.0.
 | **V101 Viz Evolution** | — | viz | — | Exp333-334 | 78 | 9 DataChannel types, 33 scenario builders, StreamSession, Songbird, IPC science→viz, streaming pipeline |
 | **V108 Track 6 Anaerobic** | Liao (MSU BAE) | 6 | 5+6 | Exp336-346 | 183 | Gompertz, first-order, Monod, Haldane kinetics, anaerobic diversity, Anderson W mapping, full 6-tier chain |
 | **V110 petalTongue + Anderson H3** | — | viz+science | — | Exp353-356 | 111 | petalTongue live dashboards, Anderson QS O₂-modulated W model (H3, r=0.851), stream_ecology, 6 JSON scenarios |
-| **Total** | | | **63** | | **5,707+** | |
+| **V130 Anderson Hormesis** | Gonzales/Lisabeth/Waters/Jones/Kachkovskiy | cross | 1 | Exp377-379 | 31 | Biphasic dose-response via Anderson, colonization resistance surface, binding IPR/localization, computation as experiment preprocessor, healthSpring joint |
+| **Total** | | | **64** | | **5,707+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 

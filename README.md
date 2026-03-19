@@ -4,10 +4,10 @@
 against Rust implementations and GPU shaders via `barraCuda` (standalone math
 primal). Follows the **Write → Absorb → Lean** cycle adopted from hotSpring.
 
-**Date:** March 18, 2026
+**Date:** March 19, 2026
 **License:** AGPL-3.0-or-later
 **MSRV:** 1.87
-**Status:** V129 — **1,548+ tests** (0 code failures), 376 experiments, 5,707+ validation checks across 354 binaries. Ecosystem: barraCuda v0.3.5, toadStool S155, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery), `cargo fmt` clean. V129: **Deep debt evolution** — `cast` module expanded to 15 safe numeric helpers (~170 raw casts migrated across 62 files), unconditional `primal_names` module (zero hardcoded primal strings in library code), upstream `bingocube-nautilus` JSON roundtrip fix, pure Rust binary discovery (zero `Command::new("which")`), `skip_with_code()` composable validation exits, 2 new tolerance constants. V128: `cast` module (9 helpers), `mul_add()` FMA sweep (10 loops, 8 files), ecoBin C-dep ban (14 crates), `PRIMAL_DOMAIN`, `FAMILY_ID` sockets, 7 IPC proptests. V127: MCP tools, IPC resilience, 7 tolerance constants. 24 capabilities, 16 domains. Full audit: zero unsafe, zero mocks in production, zero TODO/FIXME, zero local math duplication, 7 proptest modules.
+**Status:** V130 — **1,579+ tests** (0 code failures), 379 experiments, 5,707+ validation checks across 354 binaries. Ecosystem: barraCuda v0.3.5, toadStool S155, coralReef Phase 10. Zero local WGSL, zero unsafe code, `cargo clippy` **ZERO WARNINGS** (pedantic + nursery), `cargo fmt` clean. V130: **Anderson Hormesis Framework** — `bio::hormesis` (biphasic dose-response via Anderson, 14 tests), `bio::binding_landscape` (colonization resistance, composite binding, IPR/localization, 17 tests), 4 new tolerance constants, Phase 4 methodology (computation as experiment preprocessor), 3 new experiments (377–379), cross-spring joint experiment with healthSpring. V129: Deep debt evolution — `cast` module (15 helpers), unconditional `primal_names`, nautilus fix. 24 capabilities, 16 domains, 109 bio modules. Full audit: zero unsafe, zero mocks in production, zero TODO/FIXME, zero local math duplication, 7 proptest modules.
 
 ---
 

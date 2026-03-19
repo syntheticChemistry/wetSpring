@@ -3,6 +3,50 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V130] — 2026-03-19
+
+### Anderson Hormesis Framework — Computation as Experiment Preprocessor
+
+New research direction: biphasic dose-response (hormesis) via Anderson localization,
+low-affinity binding landscape, and joint healthSpring×wetSpring colonization
+resistance experiments. Introduces computation-as-preprocessor methodology where
+computational models predict where to look before experiments are designed.
+
+#### New Modules
+- `bio::hormesis` — biphasic dose-response model combining stimulation and
+  inhibition Hill terms; hormetic zone detection; dose→Anderson disorder mapping;
+  predict hormetic zone from W_c; DoseRegime classification (14 tests)
+- `bio::binding_landscape` — composite binding from weak interactions (NK cell
+  coincidence model); colonization resistance on disordered 1D lattice; 3D
+  resistance surface sweep (affinity × diversity × disorder); binding IPR and
+  localization length for toxicity delocalization; selectivity index (17 tests)
+
+#### New Tolerances
+- `HORMESIS_PEAK_MARGIN` (0.01) — hormetic stimulation vs noise threshold
+- `COLONIZATION_RESISTANCE_THRESHOLD` (0.9) — 90% occupancy = resistant
+- `BINDING_IPR_DELOCALIZED` (0.15) — delocalized binding safety threshold
+- `COMPOSITE_BINDING_FLOOR` (1e-6) — minimum composite binding signal
+
+#### White Paper Extensions
+- STUDY.md §4.8: "Computation as Experiment Preprocessor" — methodological
+  argument for inverting the experiment→analyze pipeline
+- METHODOLOGY.md §3b: Phase 4 protocol for computational preprocessing
+- baseCamp paper_14_anderson_hormesis.md — unifying framework across scales
+
+#### Experiment Protocols
+- Exp377: Hormesis biphasic model validation
+- Exp378: Trophic cascade via Anderson lattice (pesticide hormesis)
+- Exp379: Joint colonization resistance surface (healthSpring × wetSpring)
+
+#### Research Framework
+- `work/anderson_hormesis/STUDY.md` — unified hormesis theory
+- `work/anderson_hormesis/JOINT_EXPERIMENT.md` — cross-spring experiment matrix
+
+#### Cross-Spring
+- healthSpring joint experiment: colonization resistance surface (exp097, exp098)
+- Tracks planned: pesticide hormesis (groundSpring × airSpring), immune
+  calibration (healthSpring), metabolic hormesis, mithridatism/tolerance
+
 ## [V129] — 2026-03-18
 
 ### Deep Debt Evolution — Safe Casts, Primal Identity, Nautilus Fix, Pure Rust Discovery

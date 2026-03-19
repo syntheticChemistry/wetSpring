@@ -176,7 +176,10 @@ fn matmul_t_b(m: usize, k: usize, n: usize, a: &[f64], b: &[f64]) -> Vec<f64> {
 }
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used)]
+#[expect(
+    clippy::unwrap_used,
+    reason = "test module: assertions use unwrap for clarity"
+)]
 mod tests {
     use super::*;
     use serde_json::json;

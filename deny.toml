@@ -16,7 +16,7 @@ yanked = "deny"
 ignore = []
 
 [licenses]
-unlicensed = "deny"
+version = 2
 confidence-threshold = 0.8
 allow = [
     "AGPL-3.0",
@@ -36,11 +36,6 @@ allow = [
     "Zlib",
 ]
 
-[[licenses.clarify]]
-crate = "ring"
-expression = "MIT AND ISC AND OpenSSL"
-license-files = [{ path = "LICENSE", hash = 0xbd0e_ed23 }]
-
 [bans]
 multiple-versions = "warn"
 wildcards = "deny"
@@ -59,7 +54,7 @@ deny = [
     { crate = "libgit2-sys", reason = "C dependency — use gitoxide" },
     { crate = "libssh2-sys", reason = "C dependency" },
     { crate = "cmake", reason = "C build tool" },
-    { crate = "cc", wrappers = ["flate2"], reason = "C compiler — allowed only via flate2 rust_backend" },
+    { crate = "cc", wrappers = ["flate2", "blake3"], reason = "C compiler — allowed only via flate2 rust_backend and blake3 build-time assembly" },
     { crate = "libffi-sys", reason = "C dependency" },
     { crate = "bindgen", reason = "C header parser" },
     { crate = "pkg-config", reason = "C build tool" },

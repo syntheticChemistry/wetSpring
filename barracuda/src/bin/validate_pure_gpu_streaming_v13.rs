@@ -47,6 +47,7 @@
 
 use std::time::Instant;
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::bio::kinetics::{haldane, monod};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{DomainResult, Validator};
 
@@ -62,14 +63,6 @@ fn gompertz(t: f64, p: f64, rm: f64, lambda: f64) -> f64 {
 
 fn first_order(t: f64, b_max: f64, k: f64) -> f64 {
     b_max * (1.0 - (-k * t).exp())
-}
-
-fn monod(s: f64, mu_max: f64, ks: f64) -> f64 {
-    mu_max * s / (ks + s)
-}
-
-fn haldane(s: f64, mu_max: f64, ks: f64, ki: f64) -> f64 {
-    mu_max * s / (ks + s + s * s / ki)
 }
 
 fn domain(

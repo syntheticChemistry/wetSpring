@@ -13,38 +13,15 @@ use crate::substrate::{
 
 const SONGBIRD_TIMEOUT: Duration = Duration::from_secs(3);
 
-const SONGBIRD_ENV_VAR: &str = "SONGBIRD_SOCKET";
-const BIOMEOS_DIR: &str = "biomeos";
-const SONGBIRD_PRIMAL: &str = "songbird";
+use wetspring_barracuda::ipc::{discover, primal_names};
 
 /// Discover the Songbird Unix socket path.
 ///
-/// 1. `SONGBIRD_SOCKET` env var
-/// 2. `$XDG_RUNTIME_DIR/biomeos/songbird-default.sock`
-/// 3. `<temp_dir>/songbird-default.sock`
+/// Delegates to the shared discovery logic in `wetspring_barracuda::ipc::discover`,
+/// which resolves via env var → XDG runtime → temp dir cascade.
 #[must_use]
 pub fn discover_songbird_socket() -> Option<PathBuf> {
-    if let Ok(path) = std::env::var(SONGBIRD_ENV_VAR) {
-        let p = PathBuf::from(path);
-        if p.exists() {
-            return Some(p);
-        }
-    }
-
-    let sock_name = format!("{SONGBIRD_PRIMAL}-default.sock");
-
-    if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
-        let p = PathBuf::from(xdg).join(BIOMEOS_DIR).join(&sock_name);
-        if p.exists() {
-            return Some(p);
-        }
-    }
-
-    let fallback = std::env::temp_dir().join(&sock_name);
-    if fallback.exists() {
-        return Some(fallback);
-    }
-    None
+    discover::discover_primal(primal_names::SONGBIRD)
 }
 
 /// Query Songbird for registered primals that expose compute capabilities.

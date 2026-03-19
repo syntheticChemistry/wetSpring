@@ -4,6 +4,7 @@
 //! Lightweight validator for single-paper math.
 
 use wetspring_barracuda::bio::diversity;
+use wetspring_barracuda::bio::kinetics::haldane;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
@@ -12,10 +13,6 @@ fn gompertz(t: f64, p: f64, rm: f64, lambda: f64) -> f64 {
         .mul_add(lambda - t, 1.0)
         .exp())
     .exp()
-}
-
-fn haldane(s: f64, mu_max: f64, ks: f64, ki: f64) -> f64 {
-    mu_max * s / (ks + s + s * s / ki)
 }
 
 fn main() {

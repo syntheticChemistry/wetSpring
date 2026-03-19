@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-18 (V128: 376 experiments, 354 binaries, 5,707+ checks, 1,550+ tests. V128 ecosystem absorption: `cast` module (9 safe numeric helpers), `mul_add()` FMA sweep (8 files), ecoBin C-dep ban (14 crates), `PRIMAL_DOMAIN` constant, `FAMILY_ID`-aware socket paths, 7 IPC proptests, `ECOSYSTEM_LEVERAGE_GUIDE.md`. Zero local math duplication, zero `#[allow()]`, zero clippy warnings, zero unsafe.)
+**Updated**: 2026-03-19 (V130: 379 experiments, 354 binaries, 5,707+ checks, 1,579+ tests. V130 Anderson Hormesis: `bio::hormesis` (biphasic dose-response, 14 tests), `bio::binding_landscape` (colonization resistance, 17 tests), 4 new tolerances, Phase 4 methodology. V129: Deep debt evolution — `cast` module (15 helpers), unconditional `primal_names`, nautilus fix. Zero local math duplication, zero `#[allow()]`, zero clippy warnings, zero unsafe.)
 
 ---
 
@@ -643,6 +643,32 @@ false-positives resolved (all `panic!()` and `unwrap()` confirmed test-only).
 31 IPC tests pass, 19 files changed (342+, 130−).
 
 **Totals: 376 experiments, 354 binaries, 5,707+ checks.**
+
+### Exp377: Hormesis Biphasic Dose-Response Model (PROPOSED)
+
+Biphasic dose-response via Anderson localization: `bio::hormesis` model combining
+Hill stimulation and inhibition terms. Validates hormetic zone detection, dose→disorder
+mapping, and `predict_hormetic_zone_from_wc`. Module: `bio::hormesis` (14 unit tests
+passing). Cross-reference: Paper 14 (Anderson Hormesis).
+
+### Exp378: Trophic Cascade via Anderson Lattice (PROPOSED)
+
+Multi-species trophic lattice under pesticide perturbation. Tests whether
+sublethal pesticide doses produce hormetic fitness increase in prey species
+(grasshopper hypothesis). Maps pesticide concentration to Anderson disorder W,
+predicts predator collapse before prey. Requires groundSpring soil transport
+and airSpring dispersal models.
+
+### Exp379: Joint Colonization Resistance Surface — healthSpring × wetSpring (PROPOSED)
+
+3D colonization resistance surface sweep over (affinity, diversity, disorder).
+wetSpring provides Anderson lattice and diversity metrics; healthSpring provides
+PK/PD and binding landscape. Validates that diverse weak-binding communities
+resist pathogen colonization better than low-diversity strong-binding communities.
+Module: `bio::binding_landscape` (17 unit tests passing). Joint with healthSpring
+exp097/exp098.
+
+**Totals: 379 experiments, 354 binaries, 5,707+ checks.**
 
 ---
 
