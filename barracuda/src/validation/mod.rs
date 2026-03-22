@@ -62,18 +62,22 @@ pub fn check_count(label: &str, actual: usize, expected: usize) -> bool {
 
 /// Print summary and return whether all checks passed.
 ///
+/// Returns `false` when `total == 0` — a validator that runs no checks
+/// is a failure (prevents silent pass-through when data is missing).
 /// Separates logic from exit behavior for testability.
 #[must_use]
 pub fn print_result(name: &str, passed: u32, total: u32) -> bool {
     println!("\n═══════════════════════════════════════════════════════════");
     println!("  {name}: {passed}/{total} checks passed");
-    if passed == total {
+    if total == 0 {
+        println!("  RESULT: FAIL (no checks executed)");
+    } else if passed == total {
         println!("  RESULT: PASS");
     } else {
         println!("  RESULT: FAIL ({} checks failed)", total - passed);
     }
     println!("═══════════════════════════════════════════════════════════");
-    passed == total
+    total > 0 && passed == total
 }
 
 /// Print summary banner and exit with appropriate code.

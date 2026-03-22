@@ -293,10 +293,6 @@ const fn splitmix64(mut x: u64) -> u64 {
 }
 
 #[cfg(test)]
-#[expect(
-    clippy::unwrap_used,
-    reason = "test module: assertions use unwrap for clarity"
-)]
 mod tests {
     use super::*;
     use crate::tolerances;
@@ -458,7 +454,7 @@ mod tests {
         for site in 0..100 {
             let d = deterministic_disorder(site, 42, 4.0);
             assert!(
-                d >= -2.0 && d <= 2.0,
+                (-2.0..=2.0).contains(&d),
                 "disorder should be in [-W/2, W/2]: site={site}, d={d}"
             );
         }

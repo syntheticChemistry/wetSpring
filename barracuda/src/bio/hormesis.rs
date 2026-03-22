@@ -404,7 +404,7 @@ mod tests {
         let w_half = dose_to_disorder(1.0, 0.0, 1.0, 0.5);
         let w_full = dose_to_disorder(4.0, 0.0, 1.0, 0.5);
         assert!(
-            w_full < 2.0 * w_half + tolerances::ANALYTICAL_F64,
+            w_full < 2.0f64.mul_add(w_half, tolerances::ANALYTICAL_F64),
             "saturating response should be sublinear: {w_full} < 2×{w_half}"
         );
     }
@@ -418,11 +418,11 @@ mod tests {
         let w_at_low = dose_to_disorder(d_low, 10.0, 1.0, 1.0);
         let w_at_high = dose_to_disorder(d_high, 10.0, 1.0, 1.0);
         assert!(
-            (w_at_low - 16.5 * 0.9).abs() < tolerances::ANALYTICAL_F64,
+            16.5f64.mul_add(-0.9, w_at_low).abs() < tolerances::ANALYTICAL_F64,
             "W at low boundary: {w_at_low}"
         );
         assert!(
-            (w_at_high - 16.5 * 1.1).abs() < tolerances::ANALYTICAL_F64,
+            16.5f64.mul_add(-1.1, w_at_high).abs() < tolerances::ANALYTICAL_F64,
             "W at high boundary: {w_at_high}"
         );
     }
@@ -437,7 +437,7 @@ mod tests {
     #[test]
     fn sweep_returns_correct_count() {
         let params = standard_params();
-        let doses: Vec<f64> = (0..20).map(|i| f64::from(i)).collect();
+        let doses: Vec<f64> = (0..20).map(f64::from).collect();
         let points = sweep(&doses, &params);
         assert_eq!(points.len(), 20);
     }

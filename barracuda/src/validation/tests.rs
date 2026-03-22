@@ -198,8 +198,8 @@ fn check_count_large() {
 }
 
 #[test]
-fn print_result_zero_total() {
-    assert!(print_result("empty", 0, 0));
+fn print_result_zero_total_is_failure() {
+    assert!(!print_result("empty", 0, 0));
 }
 
 #[test]

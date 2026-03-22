@@ -153,7 +153,7 @@ fn main() {
         g_vals.windows(2).all(|w| w[1] >= w[0]),
     );
     s3 += 1;
-    v.check("S3: Gompertz H(50) → P", g_vals[7], 350.0, 1.0);
+    v.check("S3: Gompertz H(50) → P", g_vals[7], 350.0, tolerances::BIOGAS_KINETICS_ASYMPTOTIC);
     s3 += 1;
     v.check_pass(
         "S3: First-order monotonic",
