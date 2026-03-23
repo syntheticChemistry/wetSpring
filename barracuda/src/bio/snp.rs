@@ -229,6 +229,7 @@ pub fn call_snps(sequences: &[&[u8]]) -> SnpResult {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::cast::usize_u32;
     use crate::tolerances;
 
     #[test]
@@ -311,9 +312,9 @@ mod tests {
         let flat = call_snps_flat(&seqs);
         assert_eq!(flat.positions.len(), structured.variants.len());
         for (i, v) in structured.variants.iter().enumerate() {
-            assert_eq!(flat.positions[i], v.position as u32);
+            assert_eq!(flat.positions[i], usize_u32(v.position));
             assert_eq!(flat.ref_alleles[i], v.ref_allele);
-            assert_eq!(flat.depths[i], v.depth as u32);
+            assert_eq!(flat.depths[i], usize_u32(v.depth));
             assert!((flat.alt_frequencies[i] - v.alt_frequency()).abs() < tolerances::EXACT_F64);
         }
     }

@@ -30,7 +30,12 @@ fn main() {
     v.check_pass("Gompertz H(0) ≈ 0", h0 < 5.0);
 
     let h_inf = gompertz(200.0, p, rm, lambda);
-    v.check("Gompertz H(∞) → P", h_inf, p, tolerances::BIOGAS_KINETICS_ASYMPTOTIC);
+    v.check(
+        "Gompertz H(∞) → P",
+        h_inf,
+        p,
+        tolerances::BIOGAS_KINETICS_ASYMPTOTIC,
+    );
 
     let h5 = gompertz(5.0, p, rm, lambda);
     let h10 = gompertz(10.0, p, rm, lambda);

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Vibrio genome assembly records (Exp121).
 
+use crate::cast;
+
 /// Vibrio genome assembly record (Exp121).
 #[derive(Debug, Clone)]
 pub struct VibrioAssembly {
@@ -23,17 +25,26 @@ impl VibrioAssembly {
     ///
     /// NCBI `gene_count` and `scaffold_count` fit in u32 for all known assemblies.
     #[must_use]
-    #[expect(clippy::cast_possible_truncation)] // Truncation: gene/scaffold counts fit u32
     pub fn from_json_obj(obj: &str) -> Self {
         Self {
             accession: super::json_str_value(obj, "accession"),
             organism: super::json_str_value(obj, "organism"),
             genome_size_bp: super::json_int_value(obj, "genome_size_bp"),
-            gene_count: super::json_int_value(obj, "gene_count") as u32,
-            scaffold_count: super::json_int_value(obj, "scaffold_count") as u32,
+            gene_count: cast::u64_u32(super::json_int_value(obj, "gene_count")),
+            scaffold_count: cast::u64_u32(super::json_int_value(obj, "scaffold_count")),
             isolation_source: super::json_str_value(obj, "isolation_source"),
         }
     }
+}
+
+#[expect(
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    reason = "synthetic Vibrio genome size from bounded noisy float fits u64"
+)]
+#[inline]
+const fn synthetic_genome_bp_f64_to_u64(x: f64) -> u64 {
+    x as u64
 }
 
 /// Load Vibrio assemblies from NCBI JSON data.
@@ -68,7 +79,6 @@ pub fn load_vibrio_assemblies() -> (Vec<VibrioAssembly>, bool) {
 /// synthetic from real data. Used only as offline/CI fallback.
 ///
 /// `rng>>33` yields ≤2^31; `genome_size`/`gene_count`/`scaffold_count` fit target types.
-#[expect(clippy::cast_precision_loss, clippy::cast_possible_truncation)] // Precision/Truncation: RNG and counts bounded
 pub fn gen_synthetic_vibrio() -> Vec<VibrioAssembly> {
     let mut rng = 42_u64;
     let species = [
@@ -94,14 +104,16 @@ pub fn gen_synthetic_vibrio() -> Vec<VibrioAssembly> {
     let mut assemblies = Vec::with_capacity(150);
     for i in 0..150_u32 {
         rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-        let sp = &species[(i as usize) % species.len()];
-        let size_var = (f64::from((rng >> 33) as u32) / f64::from(u32::MAX)).mul_add(0.2, -0.1);
-        let genome_size = ((sp.1 as f64) * (1.0 + size_var)) as u64;
+        let sp = &species[cast::u32_usize(i) % species.len()];
+        let size_var =
+            (f64::from(cast::u64_u32(rng >> 33)) / f64::from(u32::MAX)).mul_add(0.2, -0.1);
+        let genome_size = synthetic_genome_bp_f64_to_u64(cast::u64_f64(sp.1) * (1.0 + size_var));
         rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-        let gene_var = (f64::from((rng >> 33) as u32) / f64::from(u32::MAX)).mul_add(0.15, -0.075);
-        let gene_count = (f64::from(sp.2) * (1.0 + gene_var)) as u32;
+        let gene_var =
+            (f64::from(cast::u64_u32(rng >> 33)) / f64::from(u32::MAX)).mul_add(0.15, -0.075);
+        let gene_count = cast::f64_u32(f64::from(sp.2) * (1.0 + gene_var));
         rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-        let src_idx = ((rng >> 33) as usize) % sources.len();
+        let src_idx = cast::u64_usize(rng >> 33) % sources.len();
 
         assemblies.push(VibrioAssembly {
             accession: format!("GCF_SYN_{i:04}"),

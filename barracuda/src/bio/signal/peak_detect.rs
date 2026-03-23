@@ -97,12 +97,8 @@ pub fn find_peaks(data: &[f64], params: &PeakParams) -> Vec<Peak> {
 
 /// Keep only the highest peak within each `distance` window.
 pub(super) fn filter_by_distance(mut peaks: Vec<Peak>, data: &[f64], distance: usize) -> Vec<Peak> {
-    // Sort by height descending (highest priority first)
-    peaks.sort_by(|a, b| {
-        data[b.index]
-            .partial_cmp(&data[a.index])
-            .unwrap_or(std::cmp::Ordering::Equal)
-    });
+    // Sort by height descending (`f64::total_cmp` — total order for noisy/NaN signals).
+    peaks.sort_by(|a, b| data[b.index].total_cmp(&data[a.index]));
 
     let mut keep = vec![true; peaks.len()];
     for i in 0..peaks.len() {

@@ -44,7 +44,10 @@ use wetspring_barracuda::bio::kinetics::{haldane, monod};
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::Validator;
 
-#[expect(dead_code, reason = "benchmark: struct fields populated for future reporting")]
+#[expect(
+    dead_code,
+    reason = "benchmark: struct fields populated for future reporting"
+)]
 struct ParityBench {
     domain: &'static str,
     python_equiv: &'static str,
@@ -151,7 +154,12 @@ fn main() {
     let t0 = Instant::now();
     let b_200 = first_order(200.0, b_max, k);
     let us = t0.elapsed().as_nanos();
-    v.check("§24b: B(200) ≈ B_max", b_200, b_max, tolerances::ASYMPTOTIC_LIMIT);
+    v.check(
+        "§24b: B(200) ≈ B_max",
+        b_200,
+        b_max,
+        tolerances::ASYMPTOTIC_LIMIT,
+    );
     benches.push(ParityBench {
         domain: "First-order asymptote",
         python_equiv: "B_max * (1 - np.exp(-k * 200))",

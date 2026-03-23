@@ -13,6 +13,9 @@ categories = ["science", "command-line-utilities"]
 
 # Workspace root is wetSpring/Cargo.toml; fuzz is a workspace member there.
 
+[lints]
+workspace = true
+
 [features]
 default = []
 # GPU acceleration via barraCuda (standalone math primal).

@@ -22,6 +22,7 @@
 
 mod trim;
 
+use crate::cast::usize_u32;
 use crate::io::fastq::FastqRecord;
 
 pub use super::adapter::{find_adapter_3prime, trim_adapter_3prime};
@@ -87,11 +88,11 @@ pub struct QualityGpuParams {
 impl From<&QualityParams> for QualityGpuParams {
     fn from(p: &QualityParams) -> Self {
         Self {
-            window_size: p.window_size as u32,
+            window_size: usize_u32(p.window_size),
             window_min_quality: u32::from(p.window_min_quality),
             leading_min_quality: u32::from(p.leading_min_quality),
             trailing_min_quality: u32::from(p.trailing_min_quality),
-            min_length: p.min_length as u32,
+            min_length: usize_u32(p.min_length),
             phred_offset: u32::from(p.phred_offset),
         }
     }

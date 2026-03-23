@@ -13,7 +13,8 @@ fn efetch_base() -> String {
     std::env::var("WETSPRING_NCBI_EFETCH_URL").unwrap_or_else(|_| EFETCH_BASE_DEFAULT.to_owned())
 }
 
-/// Injectable HTTP GET function — enables mock injection for testing.
+/// HTTP GET function type for [`efetch_fasta_with`] and siblings — production
+/// uses [`super::http::get`]; unit tests pass deterministic responses without network I/O.
 pub type HttpGetFn = fn(&str) -> crate::error::Result<String>;
 
 /// Fetch a single FASTA record from NCBI by accession or UID.

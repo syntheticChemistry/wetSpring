@@ -162,8 +162,8 @@ mod tests {
 
     #[test]
     fn discover_explicit_env_override() {
-        let dir = tempfile::tempdir().unwrap();
-        let sock = dir.path().join("custom.sock");
+        let sock = crate::ipc::test_socket_path("discover_explicit_env_override");
+        crate::ipc::cleanup_test_socket(&sock);
         std::fs::write(&sock, "").unwrap();
 
         temp_env::with_var(
@@ -174,12 +174,13 @@ mod tests {
                 assert_eq!(found, Some(sock.clone()));
             },
         );
+        crate::ipc::cleanup_test_socket(&sock);
     }
 
     #[test]
     fn resolve_bind_path_uses_env() {
-        let dir = tempfile::tempdir().unwrap();
-        let sock_path = dir.path().join("test-bind.sock");
+        let sock_path = crate::ipc::test_socket_path("resolve_bind_path_uses_env");
+        crate::ipc::cleanup_test_socket(&sock_path);
         temp_env::with_var(
             "WETSPRING_BIND_TEST",
             Some(sock_path.to_str().unwrap()),
@@ -188,6 +189,7 @@ mod tests {
                 assert_eq!(p, sock_path);
             },
         );
+        crate::ipc::cleanup_test_socket(&sock_path);
     }
 
     #[test]
@@ -206,12 +208,13 @@ mod tests {
 
     #[test]
     fn resolve_socket_explicit_finds_existing() {
-        let dir = tempfile::tempdir().unwrap();
-        let sock = dir.path().join("test.sock");
+        let sock = crate::ipc::test_socket_path("resolve_socket_explicit_finds_existing");
+        crate::ipc::cleanup_test_socket(&sock);
         std::fs::write(&sock, "").unwrap();
 
         let found = resolve_socket_explicit(Some(sock.to_str().unwrap()), None, "unused", "unused");
-        assert_eq!(found, Some(sock));
+        assert_eq!(found, Some(sock.clone()));
+        crate::ipc::cleanup_test_socket(&sock);
     }
 
     #[test]

@@ -15,6 +15,7 @@
 //! - `McDonald` et al. 2012, *`GigaScience`* 1:7 (BIOM format)
 //! - `<http://biom-format.org/documentation/format_versions/biom-1.0.html>`
 
+use crate::cast::u64_usize;
 use crate::error::{Error, Result};
 use serde::Deserialize;
 use std::io::BufReader;
@@ -216,8 +217,8 @@ fn parse_sparse_data(val: &serde_json::Value, n_rows: usize, n_cols: usize) -> R
                 "BIOM: sparse triplet needs 3 elements".into(),
             ));
         }
-        let r = arr[0].as_u64().unwrap_or(0) as usize;
-        let c = arr[1].as_u64().unwrap_or(0) as usize;
+        let r = u64_usize(arr[0].as_u64().unwrap_or(0));
+        let c = u64_usize(arr[1].as_u64().unwrap_or(0));
         let v = arr[2].as_f64().unwrap_or(0.0);
         if r < n_rows && c < n_cols {
             data[r * n_cols + c] = v;

@@ -487,14 +487,15 @@ mod tests {
 
     #[test]
     fn discover_explicit_env() {
-        let dir = tempfile::tempdir().unwrap();
-        let sock = dir.path().join("toadstool.sock");
+        let sock = crate::ipc::test_socket_path("compute_dispatch_discover_explicit_env");
+        crate::ipc::cleanup_test_socket(&sock);
         std::fs::write(&sock, "").unwrap();
 
         temp_env::with_var("TOADSTOOL_SOCKET", Some(sock.to_str().unwrap()), || {
             let found = discover();
             assert_eq!(found, Some(sock.clone()));
         });
+        crate::ipc::cleanup_test_socket(&sock);
     }
 
     #[test]
@@ -544,14 +545,16 @@ mod tests {
 
     #[test]
     fn parse_submit_response_ok() {
-        let sock = std::env::temp_dir().join("toadstool-test-gpu.sock");
+        let sock = crate::ipc::test_socket_path("compute_dispatch_parse_submit_response_ok");
+        crate::ipc::cleanup_test_socket(&sock);
         let response = format!(
             r#"{{"jsonrpc":"2.0","result":{{"job_id":"abc-123","compute_socket":"{}"}},"id":1}}"#,
             sock.display()
         );
         let handle = parse_submit_response(&response).unwrap();
         assert_eq!(handle.job_id, "abc-123");
-        assert_eq!(handle.compute_socket, Some(sock));
+        assert_eq!(handle.compute_socket, Some(sock.clone()));
+        crate::ipc::cleanup_test_socket(&sock);
     }
 
     #[test]

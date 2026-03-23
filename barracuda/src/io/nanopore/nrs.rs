@@ -14,6 +14,7 @@
 //!     `signal`:             [i16; `signal_length`] (LE)
 
 use super::types::NanoporeRead;
+use crate::cast::u64_usize;
 use crate::error::{Error, Result};
 use std::io::{BufRead, BufReader, BufWriter, Read};
 use std::path::Path;
@@ -160,7 +161,7 @@ fn read_one_nrs_record(reader: &mut impl BufRead, path: &Path) -> Result<Nanopor
         )));
     }
 
-    let n = signal_length as usize;
+    let n = u64_usize(signal_length);
     let mut signal = vec![0i16; n];
 
     let byte_buf: &mut [u8] = bytemuck::cast_slice_mut(&mut signal);

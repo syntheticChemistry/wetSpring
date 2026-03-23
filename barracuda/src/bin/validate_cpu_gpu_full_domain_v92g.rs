@@ -82,7 +82,14 @@ fn main() {
 
     println!("  GPU: {}", gpu.adapter_name);
     println!("  Fp64Strategy: {:?}", gpu.fp64_strategy());
-    println!("  Driver: {:?}", gpu.driver_profile());
+    let caps = gpu.capabilities();
+    println!(
+        "  Backend: {:?}, device_type: {:?}, device_name: {}, f64_shaders: {}",
+        caps.backend,
+        caps.device_type,
+        caps.device_name,
+        caps.f64_shaders
+    );
     println!();
 
     // ═══ D01: Shannon/Simpson/Observed — FusedMapReduceF64 ══════════

@@ -12,6 +12,8 @@ use barracuda::device::WgpuDevice;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
+use crate::cast;
+
 /// Spatial payoff result for a cooperation grid.
 pub struct SpatialPayoffResult {
     /// Fitness value per cell, row-major `[grid_size × grid_size]`.
@@ -47,7 +49,6 @@ impl SpatialPayoffGpuWrapper {
     /// # Errors
     ///
     /// Returns an error if grid size mismatches or GPU read fails.
-    #[expect(clippy::cast_possible_truncation)] // Truncation: grid_size² fits u32 (wgpu)
     pub fn compute(
         &self,
         grid: &[u32],
@@ -78,8 +79,13 @@ impl SpatialPayoffGpuWrapper {
             mapped_at_creation: false,
         });
 
-        self.inner
-            .dispatch(&grid_buf, &fit_buf, grid_size as u32, benefit, cost);
+        self.inner.dispatch(
+            &grid_buf,
+            &fit_buf,
+            cast::usize_u32(grid_size),
+            benefit,
+            cost,
+        );
         let _ = d.poll(wgpu::PollType::Wait {
             submission_index: None,
             timeout: None,

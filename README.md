@@ -7,12 +7,12 @@ against Rust implementations, then promotes to GPU acceleration via
 
 ```
 Python/R baseline  →  Rust CPU parity  →  GPU acceleration  →  sovereign pipeline
-   (58 scripts)       (1,500+ tests)      (45 GPU modules)     (barraCuda/coralReef)
+   (58 scripts)       (1,776 tests)       (45 GPU modules)     (barraCuda/coralReef)
 ```
 
 | | |
 |---|---|
-| **Tests** | 1,500+ passed, 0 failed |
+| **Tests** | 1,776 passed, 0 failed |
 | **Validation checks** | 5,700+ across 354 binaries |
 | **Experiments** | 379 completed |
 | **Coverage** | 94% line (barracuda), 90%+ (forge) |
@@ -176,8 +176,8 @@ All parsers stream from disk — no full-file buffering.
 | `cargo fmt` | Clean |
 | `cargo clippy` (pedantic + nursery) | 0 warnings |
 | `cargo doc --no-deps` | 0 warnings |
-| `#![forbid(unsafe_code)]` | All 356 crate roots |
-| `#![deny(clippy::unwrap_used)]` | Enforced crate-wide |
+| `#![forbid(unsafe_code)]` | All crate roots (2 crates + 354 binaries) |
+| `#![deny(clippy::unwrap_used)]` | Workspace `[lints.clippy]` |
 | TODO/FIXME/HACK | 0 |
 | Inline tolerance literals | 0 (218 named constants) |
 | Max file size | All under 1,000 lines |

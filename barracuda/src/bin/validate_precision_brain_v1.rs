@@ -298,6 +298,7 @@ fn main() {
             let domain_tiers: Vec<f64> = domains
                 .iter()
                 .map(|d| match brain.route(*d) {
+                    barracuda::device::PrecisionTier::F16 => 0.5,
                     barracuda::device::PrecisionTier::F32 => 1.0,
                     barracuda::device::PrecisionTier::DF64 => 2.0,
                     barracuda::device::PrecisionTier::F64 => 3.0,

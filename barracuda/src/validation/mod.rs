@@ -17,6 +17,8 @@
 //!
 //! Prefer the [`Validator`] struct over bare [`check`] calls — it
 //! tracks pass/fail counts automatically and avoids manual bookkeeping.
+//! Route output with [`ValidationSink`] ([`StdoutSink`] by default, [`SilentSink`],
+//! or [`CollectingSink`]) when you need programmatic consumption instead of stdout.
 
 // ── Standalone helpers (for one-off use) ──────────────────────
 
@@ -260,6 +262,162 @@ pub fn print_timing_table(rows: &[(&str, f64, f64, &str)]) {
     }
 }
 
+// ── ValidationSink: programmatic output routing ─────────────
+
+/// One float [`Validator::check`] outcome for inspection (e.g. [`CollectingSink`]).
+#[derive(Clone, Debug, PartialEq)]
+pub struct CheckResult {
+    /// Human-readable check label.
+    pub label: String,
+    /// Whether the check passed.
+    pub passed: bool,
+    /// Observed value.
+    pub actual: f64,
+    /// Baseline or expected value.
+    pub expected: f64,
+    /// Tolerance used (absolute).
+    pub tolerance: f64,
+}
+
+/// Receives validation events so results can be routed to stdout, a buffer, or nowhere.
+///
+/// Used by [`Validator`] for CI, biomeOS integration, and tests without coupling to `println!`.
+pub trait ValidationSink: Send {
+    /// A single floating-point tolerance check completed.
+    fn on_check(
+        &mut self,
+        label: &str,
+        passed: bool,
+        actual: f64,
+        expected: f64,
+        tolerance: f64,
+    );
+
+    /// A single exact count check completed.
+    fn on_check_count(&mut self, label: &str, passed: bool, actual: usize, expected: usize);
+
+    /// A section header (not counted as a check).
+    fn on_section(&mut self, label: &str);
+
+    /// Validation run finished; `success` matches [`print_result`] semantics (`total > 0` and all passed).
+    fn on_finish(&mut self, name: &str, passed: u32, total: u32, success: bool);
+}
+
+/// [`ValidationSink`] that prints the same lines as the standalone [`check`], [`check_count`], and [`print_result`] helpers.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct StdoutSink;
+
+impl ValidationSink for StdoutSink {
+    fn on_check(
+        &mut self,
+        label: &str,
+        passed: bool,
+        actual: f64,
+        expected: f64,
+        tolerance: f64,
+    ) {
+        let tag = if passed { "OK" } else { "FAIL" };
+        println!("  [{tag}]  {label}: {actual:.6} (expected {expected:.6}, tol {tolerance:.6})");
+    }
+
+    fn on_check_count(&mut self, label: &str, passed: bool, actual: usize, expected: usize) {
+        let tag = if passed { "OK" } else { "FAIL" };
+        println!("  [{tag}]  {label}: {actual} (expected {expected})");
+    }
+
+    fn on_section(&mut self, label: &str) {
+        println!("\n{label}");
+    }
+
+    fn on_finish(&mut self, name: &str, passed: u32, total: u32, success: bool) {
+        println!("\n═══════════════════════════════════════════════════════════");
+        println!("  {name}: {passed}/{total} checks passed");
+        if total == 0 {
+            println!("  RESULT: FAIL (no checks executed)");
+        } else if passed == total {
+            println!("  RESULT: PASS");
+        } else {
+            println!("  RESULT: FAIL ({} checks failed)", total - passed);
+        }
+        println!("═══════════════════════════════════════════════════════════");
+        let _ = success;
+    }
+}
+
+/// [`ValidationSink`] that discards all events (programmatic runs with no console noise).
+#[derive(Clone, Copy, Debug, Default)]
+pub struct SilentSink;
+
+impl ValidationSink for SilentSink {
+    fn on_check(
+        &mut self,
+        _label: &str,
+        _passed: bool,
+        _actual: f64,
+        _expected: f64,
+        _tolerance: f64,
+    ) {
+    }
+
+    fn on_check_count(
+        &mut self,
+        _label: &str,
+        _passed: bool,
+        _actual: usize,
+        _expected: usize,
+    ) {
+    }
+
+    fn on_section(&mut self, _label: &str) {}
+
+    fn on_finish(&mut self, _name: &str, _passed: u32, _total: u32, _success: bool) {}
+}
+
+/// Collects float [`Validator::check`] results into a shared [`Vec`] for later inspection.
+///
+/// The buffer is wrapped in [`std::sync::Arc`] / [`std::sync::Mutex`] so you can clone the handle
+/// before passing the sink to [`Validator::with_sink`] and read captured rows after checks run
+/// (including from other threads if needed).
+#[derive(Clone, Debug, Default)]
+pub struct CollectingSink {
+    /// Captured float checks (`on_check` only).
+    pub results: std::sync::Arc<std::sync::Mutex<Vec<CheckResult>>>,
+}
+
+impl ValidationSink for CollectingSink {
+    fn on_check(
+        &mut self,
+        label: &str,
+        passed: bool,
+        actual: f64,
+        expected: f64,
+        tolerance: f64,
+    ) {
+        if let Ok(mut guard) = self.results.lock() {
+            guard.push(CheckResult {
+                label: label.to_string(),
+                passed,
+                actual,
+                expected,
+                tolerance,
+            });
+        }
+    }
+
+    fn on_check_count(
+        &mut self,
+        _label: &str,
+        _passed: bool,
+        _actual: usize,
+        _expected: usize,
+    ) {
+    }
+
+    fn on_section(&mut self, _label: &str) {}
+
+    fn on_finish(&mut self, _name: &str, _passed: u32, _total: u32, _success: bool) {}
+}
+
 // ── Validator: structured check accumulator ───────────────────
 
 /// Accumulated validation state, removing manual pass/fail bookkeeping.
@@ -279,10 +437,13 @@ pub struct Validator {
     name: String,
     passed: u32,
     total: u32,
+    sink: Box<dyn ValidationSink>,
 }
 
 impl Validator {
     /// Create a new validator for the given binary name.
+    ///
+    /// Uses [`StdoutSink`] and prints the opening banner (same behavior as before [`ValidationSink`]).
     #[must_use]
     pub fn new(name: impl Into<String>) -> Self {
         let name = name.into();
@@ -293,18 +454,40 @@ impl Validator {
             name,
             passed: 0,
             total: 0,
+            sink: Box::new(StdoutSink),
         }
     }
 
+    /// Create a validator with a custom [`ValidationSink`] (no opening banner).
+    #[must_use]
+    pub fn with_sink(name: impl Into<String>, sink: Box<dyn ValidationSink>) -> Self {
+        let name = name.into();
+        Self {
+            name,
+            passed: 0,
+            total: 0,
+            sink,
+        }
+    }
+
+    /// Shorthand for [`Self::with_sink`] with [`SilentSink`].
+    #[must_use]
+    pub fn silent(name: impl Into<String>) -> Self {
+        Self::with_sink(name, Box::new(SilentSink))
+    }
+
     /// Print a section header (no check counted).
-    pub fn section(&self, label: &str) {
-        println!("\n{label}");
+    pub fn section(&mut self, label: &str) {
+        self.sink.on_section(label);
     }
 
     /// Check an f64 value against expected within tolerance.
     pub fn check(&mut self, label: &str, actual: f64, expected: f64, tolerance: f64) {
         self.total += 1;
-        if check(label, actual, expected, tolerance) {
+        let pass = (actual - expected).abs() <= tolerance;
+        self.sink
+            .on_check(label, pass, actual, expected, tolerance);
+        if pass {
             self.passed += 1;
         }
     }
@@ -318,7 +501,9 @@ impl Validator {
     /// Check an exact count (`usize`) — no floating-point conversion.
     pub fn check_count(&mut self, label: &str, actual: usize, expected: usize) {
         self.total += 1;
-        if check_count(label, actual, expected) {
+        let pass = actual == expected;
+        self.sink.on_check_count(label, pass, actual, expected);
+        if pass {
             self.passed += 1;
         }
     }
@@ -327,8 +512,9 @@ impl Validator {
     pub fn check_count_u64(&mut self, label: &str, actual: u64, expected: u64) {
         self.total += 1;
         let pass = actual == expected;
-        let tag = if pass { "OK" } else { "FAIL" };
-        println!("  [{tag}]  {label}: {actual} (expected {expected})");
+        let a = usize::try_from(actual).unwrap_or(usize::MAX);
+        let e = usize::try_from(expected).unwrap_or(usize::MAX);
+        self.sink.on_check_count(label, pass, a, e);
         if pass {
             self.passed += 1;
         }
@@ -341,9 +527,11 @@ impl Validator {
     }
 
     /// Print summary and exit with 0 (pass) or 1 (fail).
-    pub fn finish(self) -> ! {
-        let ok = print_result(&self.name, self.passed, self.total);
-        std::process::exit(i32::from(!ok))
+    pub fn finish(mut self) -> ! {
+        let success = self.total > 0 && self.passed == self.total;
+        self.sink
+            .on_finish(&self.name, self.passed, self.total, success);
+        std::process::exit(i32::from(!success))
     }
 
     /// Print summary and return `ExitCode` without calling `process::exit`.
@@ -351,9 +539,11 @@ impl Validator {
     /// Prefer this over [`finish`](Self::finish) in binaries that use the
     /// `fn main() -> ExitCode` + `fn run()` zero-panic pattern.
     #[must_use]
-    pub fn finish_with_code(self) -> std::process::ExitCode {
-        let ok = print_result(&self.name, self.passed, self.total);
-        if ok {
+    pub fn finish_with_code(mut self) -> std::process::ExitCode {
+        let success = self.total > 0 && self.passed == self.total;
+        self.sink
+            .on_finish(&self.name, self.passed, self.total, success);
+        if success {
             std::process::ExitCode::SUCCESS
         } else {
             std::process::ExitCode::FAILURE

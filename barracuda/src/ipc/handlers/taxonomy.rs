@@ -3,6 +3,7 @@
 
 use serde_json::{Value, json};
 
+use crate::cast::u64_usize;
 use crate::ipc::protocol::RpcError;
 
 /// Handle `science.taxonomy` — Naive Bayes k-mer classification (RDP-style).
@@ -16,7 +17,7 @@ pub fn handle_taxonomy(params: &Value) -> Result<Value, RpcError> {
         .and_then(Value::as_str)
         .ok_or_else(|| RpcError::invalid_params("missing required param: sequence"))?;
 
-    let k = params.get("k").and_then(Value::as_u64).unwrap_or(8) as usize;
+    let k = u64_usize(params.get("k").and_then(Value::as_u64).unwrap_or(8));
 
     let ref_fasta = params.get("reference_fasta").and_then(Value::as_str);
 

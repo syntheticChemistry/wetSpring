@@ -25,7 +25,7 @@ evolution pipeline.
 - **Architecture:** 2 library crates + 354 validation/benchmark binaries
 - **Communication:** JSON-RPC 2.0 over Unix sockets (IPC feature-gated)
 - **License:** AGPL-3.0-or-later
-- **Tests:** 1,500+ (unit, integration, determinism, doctests)
+- **Tests:** 1,776 (unit, integration, determinism, doctests)
 - **Validation checks:** 5,700+ across 354 binaries
 - **MSRV:** 1.87 (Rust edition 2024)
 - **Crate count:** 2 workspace crates (wetspring-barracuda, wetspring-forge)
@@ -41,7 +41,8 @@ evolution pipeline.
 - **Math biology:** ODE systems (QS, bistable, cooperation, phage, capacitor)
 - **Anderson physics:** hormesis, binding landscapes, disorder mapping
 - **Drug repurposing:** NMF, TransE knowledge graph embedding, molecular docking
-- **GPU acceleration:** 45 GPU modules via barraCuda, 150+ primitives consumed
+- **GPU acceleration:** 45 GPU modules via barraCuda v0.3.7, 150+ primitives consumed
+- **Ecosystem wiring:** sweetGrass braids, toadStool performance surface, StreamItem NDJSON
 
 ## What This Does NOT Do
 
@@ -62,7 +63,7 @@ evolution pipeline.
 
 ```
 Python baseline → Rust CPU parity → GPU validation → sovereign pipeline
-     (40 scripts)    (1,500+ tests)    (45 GPU modules)   (barraCuda/coralReef)
+     (58 scripts)    (1,776 tests)     (45 GPU modules)   (barraCuda/coralReef)
 ```
 
 ## Design Philosophy

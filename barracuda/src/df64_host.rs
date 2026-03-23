@@ -25,7 +25,15 @@
 /// Matches `df64_from_f64()` in `df64_core.wgsl`.
 #[must_use]
 pub const fn pack(v: f64) -> [f32; 2] {
+    #[expect(
+        clippy::cast_possible_truncation,
+        reason = "DF64 hi/lo are intentional f32 truncations of f64 (wire format)"
+    )]
     let hi = v as f32;
+    #[expect(
+        clippy::cast_possible_truncation,
+        reason = "DF64 residual is stored as f32 (double-float decomposition)"
+    )]
     let lo = (v - hi as f64) as f32;
     [hi, lo]
 }
@@ -205,6 +213,10 @@ mod tests {
     #[test]
     fn df64_precision_vs_f32() {
         let v = 1.000_000_1_f64;
+        #[expect(
+            clippy::cast_possible_truncation,
+            reason = "baseline comparison uses raw f32 truncation of test scalar"
+        )]
         let f32_err = (v - f64::from(v as f32)).abs();
         let df64_err = roundtrip_error(v);
         assert!(

@@ -51,14 +51,36 @@ impl std::error::Error for IpcError {}
 impl IpcError {
     /// Whether this error is likely transient and the operation can be retried.
     ///
-    /// Returns `true` for connection and transport failures;
-    /// `false` for codec, socket-path, and RPC-reject errors (which are deterministic).
+    /// This is the coarse transport-layer view: [`Connect`](Self::Connect),
+    /// [`Transport`](Self::Transport), and [`EmptyResponse`](Self::EmptyResponse) only.
+    /// For JSON-RPC–aware classification (including when to retry
+    /// [`RpcReject`](Self::RpcReject)), see [`is_recoverable`](Self::is_recoverable).
     #[must_use]
     pub const fn is_retriable(&self) -> bool {
         matches!(
             self,
             Self::Connect(_) | Self::Transport(_) | Self::EmptyResponse
         )
+    }
+
+    /// Whether the failure may succeed on retry (transient) vs will not (permanent).
+    ///
+    /// Returns `true` for connection/transport/empty-response failures and for
+    /// JSON-RPC responses that are typically transient: internal error (`-32603`),
+    /// plus non-standard codes whose message suggests timeout, connection loss,
+    /// or temporary unavailability.
+    ///
+    /// Returns `false` for local configuration/codec errors and for JSON-RPC
+    /// client/request errors that will not change on retry: invalid request
+    /// (`-32600`), method not found (`-32601`), invalid params (`-32602`),
+    /// parse error (`-32700`).
+    #[must_use]
+    pub fn is_recoverable(&self) -> bool {
+        match self {
+            Self::Connect(_) | Self::Transport(_) | Self::EmptyResponse => true,
+            Self::SocketPath(_) | Self::Codec(_) => false,
+            Self::RpcReject { code, message } => rpc_reject_is_recoverable(*code, message),
+        }
     }
 
     /// Whether this error is likely caused by a timeout or slow peer.
@@ -91,6 +113,30 @@ impl IpcError {
     pub const fn is_connection_error(&self) -> bool {
         matches!(self, Self::Connect(_) | Self::SocketPath(_))
     }
+}
+
+/// JSON-RPC 2.0 recoverability for [`IpcError::RpcReject`].
+fn rpc_reject_is_recoverable(code: i64, message: &str) -> bool {
+    match code {
+        -32600 | -32601 | -32602 | -32700 => false,
+        -32603 => true,
+        _ => rpc_message_suggests_transient(message),
+    }
+}
+
+fn rpc_message_suggests_transient(message: &str) -> bool {
+    let lower = message.to_ascii_lowercase();
+    lower.contains("timeout")
+        || lower.contains("timed out")
+        || lower.contains("connection reset")
+        || lower.contains("reset by peer")
+        || lower.contains("econnreset")
+        || lower.contains("broken pipe")
+        || lower.contains("unavailable")
+        || lower.contains("temporarily unavailable")
+        || lower.contains("try again")
+        || lower.contains("overloaded")
+        || lower.contains("deadline exceeded")
 }
 
 /// Errors produced by wetSpring parsers and algorithms.
@@ -387,5 +433,66 @@ mod tests {
         assert!(IpcError::SocketPath("bad path".into()).is_connection_error());
         assert!(!IpcError::Transport("broken pipe".into()).is_connection_error());
         assert!(!IpcError::EmptyResponse.is_connection_error());
+    }
+
+    #[test]
+    fn ipc_recoverable_transport_and_empty() {
+        assert!(IpcError::Connect("refused".into()).is_recoverable());
+        assert!(IpcError::Transport("reset".into()).is_recoverable());
+        assert!(IpcError::EmptyResponse.is_recoverable());
+    }
+
+    #[test]
+    fn ipc_not_recoverable_socket_codec() {
+        assert!(!IpcError::SocketPath("/bad".into()).is_recoverable());
+        assert!(!IpcError::Codec("oops".into()).is_recoverable());
+    }
+
+    #[test]
+    fn ipc_recoverable_rpc_standard_codes() {
+        assert!(!IpcError::RpcReject {
+            code: -32600,
+            message: "bad".into()
+        }
+        .is_recoverable());
+        assert!(!IpcError::RpcReject {
+            code: -32601,
+            message: "nope".into()
+        }
+        .is_recoverable());
+        assert!(!IpcError::RpcReject {
+            code: -32602,
+            message: "bad params".into()
+        }
+        .is_recoverable());
+        assert!(IpcError::RpcReject {
+            code: -32603,
+            message: "internal".into()
+        }
+        .is_recoverable());
+        assert!(!IpcError::RpcReject {
+            code: -32700,
+            message: "parse".into()
+        }
+        .is_recoverable());
+    }
+
+    #[test]
+    fn ipc_recoverable_rpc_custom_code_uses_message_heuristic() {
+        assert!(IpcError::RpcReject {
+            code: -32000,
+            message: "upstream timeout".into()
+        }
+        .is_recoverable());
+        assert!(IpcError::RpcReject {
+            code: -32001,
+            message: "Service Unavailable: overloaded".into()
+        }
+        .is_recoverable());
+        assert!(!IpcError::RpcReject {
+            code: -32099,
+            message: "business rule violation".into()
+        }
+        .is_recoverable());
     }
 }

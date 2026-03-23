@@ -29,7 +29,7 @@ pub const NICHE_DESCRIPTION: &str = "Life science and analytical chemistry valid
 pub const NICHE_VERSION: &str = "1.0.0";
 
 use crate::primal_names::{
-    BEARDOG, LOAMSPINE, NESTGATE, PETALTONGUE, RHIZOCRYPT, SONGBIRD, SWEETGRASS,
+    BEARDOG, LOAMSPINE, NESTGATE, PETALTONGUE, RHIZOCRYPT, SONGBIRD, SWEETGRASS, TOADSTOOL,
 };
 
 /// Primals this niche depends on (germination order matters).
@@ -71,6 +71,12 @@ pub const DEPENDENCIES: &[NicheDependency] = &[
         capability: "storage",
     },
     NicheDependency {
+        name: TOADSTOOL,
+        role: "compute",
+        required: false,
+        capability: "compute",
+    },
+    NicheDependency {
         name: PETALTONGUE,
         role: "visualization",
         required: false,
@@ -108,6 +114,10 @@ pub const CAPABILITIES: &[&str] = &[
     "metrics.snapshot",
     // ── AI assist (Squirrel) ──
     "ai.ecology_interpret",
+    // ── ecosystem client integrations (optional primals) ──
+    "integration.sweetgrass.braid",
+    "integration.toadstool.performance_surface",
+    "protocol.stream_item",
     // ── niche infrastructure ──
     "capability.list",
 ];
@@ -266,8 +276,8 @@ mod tests {
     fn capabilities_count_matches_domains() {
         assert_eq!(
             CAPABILITIES.len(),
-            21,
-            "20 science/provenance/brain/metrics/ai + capability.list"
+            24,
+            "21 science/provenance/brain/metrics/ai + 3 ecosystem integrations + capability.list"
         );
     }
 

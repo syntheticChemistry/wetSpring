@@ -13,6 +13,10 @@ const fn build_decode_table() -> [u8; 256] {
     let mut table = [255_u8; 256];
     let mut i = 0_usize;
     while i < 64 {
+        #[expect(
+            clippy::cast_possible_truncation,
+            reason = "loop index is 0..64, always fits u8"
+        )]
         let val = i as u8;
         table[ENCODE_TABLE[i] as usize] = val;
         i += 1;
@@ -58,7 +62,12 @@ pub fn base64_decode(input: &str) -> crate::error::Result<Vec<u8>> {
         bits += 6;
         if bits >= 8 {
             bits -= 8;
-            buf.push((accum >> bits) as u8);
+            #[expect(
+                clippy::cast_possible_truncation,
+                reason = "extracting completed base64 output byte from accum"
+            )]
+            let out: u8 = (accum >> bits) as u8;
+            buf.push(out);
             accum &= (1 << bits) - 1;
         }
     }

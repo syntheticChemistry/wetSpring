@@ -65,8 +65,9 @@ pub fn savitzky_golay_coefficients(window_size: usize, poly_order: usize) -> Res
     let x_values: Vec<f64> = (0..window_size)
         .map(|i| {
             #[expect(
+                clippy::cast_possible_truncation,
                 clippy::cast_possible_wrap,
-                reason = "i < window_size ≤ i32::MAX checked above"
+                reason = "Savitzky–Golay window index fits i32 for bounded window sizes"
             )]
             let idx = i as i32;
             f64::from(idx - half_i32)
@@ -162,8 +163,9 @@ pub fn savitzky_golay(data: &[f64], window_size: usize, poly_order: usize) -> Re
         let x_values: Vec<f64> = (left..=right)
             .map(|j| {
                 #[expect(
+                    clippy::cast_possible_truncation,
                     clippy::cast_possible_wrap,
-                    reason = "j and i bounded by data.len() ≪ i32::MAX for chromatographic data"
+                    reason = "chromatogram indices fit i32 for bounded signal lengths"
                 )]
                 let offset = j as i32 - i as i32;
                 f64::from(offset)

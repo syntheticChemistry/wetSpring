@@ -12,28 +12,41 @@
 //! - **Primal Self-Knowledge**: wetSpring discovers NPU, never hardcodes
 //! - **Fast AND Safe**: Pure Rust driver (sourced from toadStool neuromorphic crates)
 
-#![expect(
-    clippy::cast_possible_truncation,
-    reason = "NPU interop: u128→u64 timing (valid for durations < 580 years), \
-              f64→i8 quantization where clamping guarantees [0,127] range"
-)]
-#![expect(
-    clippy::cast_possible_wrap,
-    reason = "NPU DMA: i8↔u8 bit reinterpretation for int8 data path"
-)]
-#![expect(
-    clippy::cast_precision_loss,
-    reason = "NPU metrics: usize→f64 for batch counts and timing ratios; \
-              values well within f64 53-bit significand"
-)]
-
 pub use akida_driver::{
     AkidaDevice, BackendSelection, BackendType, Capabilities, ChipVersion, DeviceManager,
     InferenceConfig, InferenceExecutor, InferenceResult, LoadConfig, ModelLoader, ModelProgram,
     NpuBackend, NpuConfig,
 };
 
+use crate::cast::{self, u32_usize, u64_f64, u128_f64, usize_f64};
 use crate::error::Error;
+
+#[expect(
+    clippy::cast_sign_loss,
+    reason = "DMA buffer reinterprets int8 weights as raw bytes for device write"
+)]
+#[inline]
+const fn i8_to_u8_dma_byte(x: i8) -> u8 {
+    x as u8
+}
+
+#[expect(
+    clippy::cast_possible_wrap,
+    reason = "DMA read bytes reinterpreted as int8 logits"
+)]
+#[inline]
+const fn u8_to_i8_dma_byte(b: u8) -> i8 {
+    b as i8
+}
+
+#[expect(
+    clippy::cast_possible_truncation,
+    reason = "ESN reservoir weights quantized to f32 for NPU SRAM"
+)]
+#[inline]
+const fn f64_to_f32_esn_weight(x: f64) -> f32 {
+    x as f32
+}
 
 /// NPU handle wrapping an opened `AkidaDevice` with its capabilities.
 ///
@@ -166,7 +179,8 @@ pub fn npu_available() -> bool {
 #[must_use]
 pub fn quantize_i8(val: f64, lo: f64, hi: f64) -> i8 {
     let normalized = ((val - lo) / (hi - lo)).clamp(0.0, 1.0);
-    (normalized * 127.0) as i8
+    let q = cast::f64_i32(normalized * 127.0).clamp(0, 127);
+    i8::try_from(q).unwrap_or(0)
 }
 
 /// Dequantize int8 back to `f64`.
@@ -247,18 +261,18 @@ pub fn npu_infer_i8(
     input_i8: &[i8],
     n_outputs: usize,
 ) -> Result<NpuInferResult, Error> {
-    let input_bytes: Vec<u8> = input_i8.iter().map(|&x| x as u8).collect();
+    let input_bytes: Vec<u8> = input_i8.iter().copied().map(i8_to_u8_dma_byte).collect();
 
     let t = std::time::Instant::now();
     handle.write_raw(&input_bytes)?;
-    let write_ns = t.elapsed().as_nanos() as u64;
+    let write_ns = u64::try_from(t.elapsed().as_nanos()).unwrap_or(u64::MAX);
 
     let mut out_buf = vec![0u8; n_outputs];
     let t = std::time::Instant::now();
     handle.read_raw(&mut out_buf)?;
-    let read_ns = t.elapsed().as_nanos() as u64;
+    let read_ns = u64::try_from(t.elapsed().as_nanos()).unwrap_or(u64::MAX);
 
-    let raw_i8: Vec<i8> = out_buf.iter().map(|&b| b as i8).collect();
+    let raw_i8: Vec<i8> = out_buf.iter().copied().map(u8_to_i8_dma_byte).collect();
     let class = raw_i8
         .iter()
         .enumerate()
@@ -282,20 +296,27 @@ pub fn npu_infer_i8(
 /// # Errors
 ///
 /// Returns error if the weights exceed SRAM capacity or DMA fails.
-#[expect(clippy::cast_possible_truncation)]
 pub fn load_reservoir_weights(
     handle: &mut NpuHandle,
     w_in_f64: &[f64],
     w_res_f64: &[f64],
 ) -> Result<ReservoirLoadResult, Error> {
-    let w_in_f32: Vec<f32> = w_in_f64.iter().map(|&x| x as f32).collect();
-    let w_res_f32: Vec<f32> = w_res_f64.iter().map(|&x| x as f32).collect();
+    let w_in_f32: Vec<f32> = w_in_f64
+        .iter()
+        .copied()
+        .map(f64_to_f32_esn_weight)
+        .collect();
+    let w_res_f32: Vec<f32> = w_res_f64
+        .iter()
+        .copied()
+        .map(f64_to_f32_esn_weight)
+        .collect();
 
     let w_in_bytes = bytemuck::cast_slice::<f32, u8>(&w_in_f32);
     let w_res_bytes = bytemuck::cast_slice::<f32, u8>(&w_res_f32);
 
     let total_bytes = w_in_bytes.len() + w_res_bytes.len();
-    let sram_bytes = handle.memory_mb() as usize * 1024 * 1024;
+    let sram_bytes = u32_usize(handle.memory_mb()) * 1024 * 1024;
     if total_bytes > sram_bytes {
         return Err(Error::Npu(format!(
             "reservoir weights ({total_bytes} bytes) exceed SRAM ({sram_bytes} bytes)"
@@ -305,10 +326,10 @@ pub fn load_reservoir_weights(
     let t = std::time::Instant::now();
     let written_in = handle.write_raw(w_in_bytes)?;
     let written_res = handle.write_raw(w_res_bytes)?;
-    let load_us = t.elapsed().as_micros() as f64;
+    let load_us = u128_f64(t.elapsed().as_micros());
 
     let throughput_mbps = if load_us > 0.0 {
-        (written_in + written_res) as f64 / load_us
+        usize_f64(written_in + written_res) / load_us
     } else {
         0.0
     };
@@ -342,12 +363,11 @@ pub struct ReservoirLoadResult {
 /// # Errors
 ///
 /// Returns error if DMA transfer fails.
-#[expect(clippy::cast_possible_truncation)]
 pub fn load_readout_weights(handle: &mut NpuHandle, w_out_i8: &[i8]) -> Result<u64, Error> {
-    let bytes: Vec<u8> = w_out_i8.iter().map(|&x| x as u8).collect();
+    let bytes: Vec<u8> = w_out_i8.iter().copied().map(i8_to_u8_dma_byte).collect();
     let t = std::time::Instant::now();
     handle.write_raw(&bytes)?;
-    Ok(t.elapsed().as_nanos() as u64)
+    Ok(u64::try_from(t.elapsed().as_nanos()).unwrap_or(u64::MAX))
 }
 
 /// Run a batch of int8 inferences and return aggregate metrics.
@@ -371,14 +391,15 @@ pub fn npu_batch_infer(
         total_read_ns += r.read_ns;
     }
 
-    let n = inputs_i8.len() as f64;
+    let n = usize_f64(inputs_i8.len());
+    let total_ns = total_write_ns + total_read_ns;
     Ok(NpuBatchResult {
         classes,
-        mean_write_ns: total_write_ns as f64 / n,
-        mean_read_ns: total_read_ns as f64 / n,
-        total_us: (total_write_ns + total_read_ns) as f64 / 1000.0,
-        throughput_hz: if total_write_ns + total_read_ns > 0 {
-            n * 1_000_000_000.0 / (total_write_ns + total_read_ns) as f64
+        mean_write_ns: u64_f64(total_write_ns) / n,
+        mean_read_ns: u64_f64(total_read_ns) / n,
+        total_us: u64_f64(total_ns) / 1000.0,
+        throughput_hz: if total_ns > 0 {
+            n * 1_000_000_000.0 / u64_f64(total_ns)
         } else {
             0.0
         },

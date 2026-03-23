@@ -36,6 +36,7 @@ mod tests {
     use std::collections::HashMap;
 
     use super::*;
+    use crate::cast::{u32_usize, usize_u32};
     use crate::tolerances;
 
     fn simple_tree() -> PhyloTree {
@@ -266,16 +267,17 @@ mod tests {
         let tree = simple_tree();
         let flat = tree.to_flat_tree();
 
-        for i in 0..flat.n_nodes as usize {
-            let nc = flat.n_children[i] as usize;
-            let off = flat.children_offset[i] as usize;
+        for i in 0..u32_usize(flat.n_nodes) {
+            let nc = u32_usize(flat.n_children[i]);
+            let off = u32_usize(flat.children_offset[i]);
             assert!(
                 off + nc <= flat.children_flat.len(),
                 "CSR overflow at node {i}"
             );
             for &child in &flat.children_flat[off..off + nc] {
                 assert_eq!(
-                    flat.parent[child as usize], i as u32,
+                    flat.parent[u32_usize(child)],
+                    usize_u32(i),
                     "parent mismatch for child {child}"
                 );
             }

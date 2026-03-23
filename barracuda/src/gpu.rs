@@ -45,8 +45,8 @@
 //! All ODE shaders are generated at runtime via `BatchedOdeRK4::generate_shader()`
 //! from `barraCuda`. wetSpring holds zero local `.wgsl` files.
 
-use barracuda::device::driver_profile::PrecisionRoutingAdvice;
-use barracuda::device::{GpuDriverProfile, TensorContext, WgpuDevice};
+use barracuda::device::capabilities::{DeviceCapabilities, PrecisionRoutingAdvice};
+use barracuda::device::{TensorContext, WgpuDevice};
 use std::sync::Arc;
 
 const DEVICE_LABEL: &str = "FP64 Science Device";
@@ -83,7 +83,7 @@ const MAX_STORAGE_BUFFERS_PER_STAGE: u32 = 16;
 /// WGSL via `BatchedOdeRK4::generate_shader()` (zero local shaders).
 ///
 /// Driver-specific capabilities (NVK workarounds, eigensolve strategy,
-/// latency model) are available via [`driver_profile`](Self::driver_profile).
+/// latency model) are available via [`capabilities`](Self::capabilities).
 pub struct GpuF64 {
     /// GPU adapter name (e.g., `"NVIDIA GeForce RTX 4070"`).
     pub adapter_name: String,
@@ -91,7 +91,7 @@ pub struct GpuF64 {
     pub has_f64: bool,
     wgpu_device: Arc<WgpuDevice>,
     tensor_ctx: Arc<TensorContext>,
-    driver_profile: GpuDriverProfile,
+    capabilities: DeviceCapabilities,
 }
 
 impl GpuF64 {
@@ -161,14 +161,14 @@ impl GpuF64 {
 
         let wgpu_device = Arc::new(WgpuDevice::from_existing(device, queue, info));
         let tensor_ctx = Arc::new(TensorContext::new(wgpu_device.clone()));
-        let driver_profile = GpuDriverProfile::from_device(&wgpu_device);
+        let capabilities = DeviceCapabilities::from_device(&wgpu_device);
 
         Ok(Self {
             adapter_name,
             has_f64,
             wgpu_device,
             tensor_ctx,
-            driver_profile,
+            capabilities,
         })
     }
 
@@ -184,13 +184,13 @@ impl GpuF64 {
         &self.tensor_ctx
     }
 
-    /// `barraCuda` driver profile for this GPU.
+    /// Runtime-detected device capabilities.
     ///
-    /// Provides driver-specific capabilities: f64 workarounds, optimal
-    /// eigensolve strategy, latency model for `WgslOptimizer`.
+    /// Provides hardware limits, f64 support status, precision routing,
+    /// latency model, and driver-specific workarounds.
     #[must_use]
-    pub const fn driver_profile(&self) -> &GpuDriverProfile {
-        &self.driver_profile
+    pub const fn capabilities(&self) -> &DeviceCapabilities {
+        &self.capabilities
     }
 
     /// Whether the underlying GPU device has been lost.
@@ -206,8 +206,8 @@ impl GpuF64 {
     /// Whether this GPU's driver needs f64 `exp`/`log` polyfills.
     #[must_use]
     pub fn needs_f64_workaround(&self) -> bool {
-        self.driver_profile.needs_exp_f64_workaround()
-            || self.driver_profile.needs_log_f64_workaround()
+        self.capabilities.needs_exp_f64_workaround()
+            || self.capabilities.needs_log_f64_workaround()
     }
 
     /// Runtime precision strategy for this GPU (`barraCuda` universal precision).
@@ -217,7 +217,7 @@ impl GpuF64 {
     /// DF64 (f32-pair, ~14 digits) on FP32 cores, native f64 for reductions.
     #[must_use]
     pub fn fp64_strategy(&self) -> barracuda::device::Fp64Strategy {
-        self.driver_profile.fp64_strategy()
+        self.capabilities.fp64_strategy()
     }
 
     /// Fine-grained precision routing advice from `barraCuda`.
@@ -232,7 +232,7 @@ impl GpuF64 {
     /// avoid silent precision loss.
     #[must_use]
     pub fn precision_routing(&self) -> PrecisionRoutingAdvice {
-        self.driver_profile.precision_routing()
+        self.capabilities.precision_routing()
     }
 
     /// Optimal `Precision` for `compile_shader_universal` on this GPU.
@@ -256,15 +256,15 @@ impl GpuF64 {
     pub fn print_info(&self) {
         println!("  GPU: {}", self.adapter_name);
         println!("  SHADER_F64: {}", if self.has_f64 { "YES" } else { "NO" });
-        println!("  Arch: {:?}", self.driver_profile.arch);
-        println!("  Driver: {:?}", self.driver_profile.driver);
+        println!("  Backend: {:?}", self.capabilities.backend);
+        println!("  DeviceType: {:?}", self.capabilities.device_type);
         println!("  Fp64Strategy: {:?}", self.fp64_strategy());
         println!("  PrecisionRouting: {:?}", self.precision_routing());
         println!("  Optimal precision: {:?}", self.optimal_precision());
         println!(
             "  f64 workarounds: exp={}, log={}",
-            self.driver_profile.needs_exp_f64_workaround(),
-            self.driver_profile.needs_log_f64_workaround()
+            self.capabilities.needs_exp_f64_workaround(),
+            self.capabilities.needs_log_f64_workaround()
         );
     }
 }
@@ -299,7 +299,7 @@ impl GpuF64 {
     pub fn dispatch_threshold(&self) -> usize {
         use barracuda::device::latency::WgslOpClass;
 
-        let model = self.driver_profile.latency_model();
+        let model = self.capabilities.latency_model();
         let dfma_cycles = model.raw_latency(WgslOpClass::F64Fma);
 
         // DFMA cycle ranges: 0..=4 fast, 5..=8 native, 9..=16 software, _ unknown

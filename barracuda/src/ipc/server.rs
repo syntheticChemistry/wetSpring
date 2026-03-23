@@ -121,14 +121,15 @@ impl Drop for Server {
 fn process_single(line: &str, metrics: &Metrics, start: std::time::Instant) -> Option<String> {
     if protocol::is_notification(line) {
         if let Ok(req) = protocol::parse_request(line) {
-            let result = if req.method == "metrics.snapshot" {
+            let method_key = protocol::normalize_method(&req.method);
+            let result = if method_key.as_ref() == "metrics.snapshot" {
                 Ok(metrics.snapshot())
             } else {
                 dispatch::dispatch(&req.method, &req.params)
             };
             match &result {
-                Ok(_) => metrics.record_success(&req.method, start.elapsed()),
-                Err(_) => metrics.record_error(&req.method, start.elapsed()),
+                Ok(_) => metrics.record_success(method_key.as_ref(), start.elapsed()),
+                Err(_) => metrics.record_error(method_key.as_ref(), start.elapsed()),
             }
         }
         return None;
@@ -136,18 +137,19 @@ fn process_single(line: &str, metrics: &Metrics, start: std::time::Instant) -> O
 
     Some(match protocol::parse_request(line) {
         Ok(req) => {
-            let result = if req.method == "metrics.snapshot" {
+            let method_key = protocol::normalize_method(&req.method);
+            let result = if method_key.as_ref() == "metrics.snapshot" {
                 Ok(metrics.snapshot())
             } else {
                 dispatch::dispatch(&req.method, &req.params)
             };
             match result {
                 Ok(result) => {
-                    metrics.record_success(&req.method, start.elapsed());
+                    metrics.record_success(method_key.as_ref(), start.elapsed());
                     protocol::success_response(&req.id, &result)
                 }
                 Err(rpc_err) => {
-                    metrics.record_error(&req.method, start.elapsed());
+                    metrics.record_error(method_key.as_ref(), start.elapsed());
                     protocol::error_response(&req.id, rpc_err.code, &rpc_err.message)
                 }
             }
@@ -178,14 +180,15 @@ fn process_batch(line: &str, metrics: &Metrics, start: std::time::Instant) -> Op
     for elem in elements {
         if protocol::is_notification(&elem) {
             if let Ok(req) = protocol::parse_request(&elem) {
-                let result = if req.method == "metrics.snapshot" {
+                let method_key = protocol::normalize_method(&req.method);
+                let result = if method_key.as_ref() == "metrics.snapshot" {
                     Ok(metrics.snapshot())
                 } else {
                     dispatch::dispatch(&req.method, &req.params)
                 };
                 match &result {
-                    Ok(_) => metrics.record_success(&req.method, start.elapsed()),
-                    Err(_) => metrics.record_error(&req.method, start.elapsed()),
+                    Ok(_) => metrics.record_success(method_key.as_ref(), start.elapsed()),
+                    Err(_) => metrics.record_error(method_key.as_ref(), start.elapsed()),
                 }
             }
             continue;
@@ -193,18 +196,19 @@ fn process_batch(line: &str, metrics: &Metrics, start: std::time::Instant) -> Op
 
         let resp = match protocol::parse_request(&elem) {
             Ok(req) => {
-                let result = if req.method == "metrics.snapshot" {
+                let method_key = protocol::normalize_method(&req.method);
+                let result = if method_key.as_ref() == "metrics.snapshot" {
                     Ok(metrics.snapshot())
                 } else {
                     dispatch::dispatch(&req.method, &req.params)
                 };
                 match result {
                     Ok(result) => {
-                        metrics.record_success(&req.method, start.elapsed());
+                        metrics.record_success(method_key.as_ref(), start.elapsed());
                         protocol::success_response(&req.id, &result)
                     }
                     Err(rpc_err) => {
-                        metrics.record_error(&req.method, start.elapsed());
+                        metrics.record_error(method_key.as_ref(), start.elapsed());
                         protocol::error_response(&req.id, rpc_err.code, &rpc_err.message)
                     }
                 }
@@ -277,13 +281,14 @@ fn resolve_bind_path() -> PathBuf {
 )]
 mod tests {
     use super::*;
+    use crate::ipc::{cleanup_test_socket, test_socket_path};
     use std::io::{BufRead, BufReader, Write};
     use std::os::unix::net::UnixStream;
 
     #[test]
     fn server_bind_and_health_check() {
-        let dir = tempfile::tempdir().unwrap();
-        let sock = dir.path().join("test_server.sock");
+        let sock = test_socket_path("server_bind_and_health_check");
+        cleanup_test_socket(&sock);
         let server = Server::bind(&sock).unwrap();
 
         assert!(sock.exists());
@@ -311,12 +316,40 @@ mod tests {
         assert_eq!(val["id"], 1);
 
         drop(handle);
+        cleanup_test_socket(&sock);
+    }
+
+    #[test]
+    fn server_diversity_wetspring_prefixed_method_normalized() {
+        let sock = test_socket_path("server_diversity_wetspring_prefixed_method_normalized");
+        cleanup_test_socket(&sock);
+        let server = Server::bind(&sock).unwrap();
+        let server_path = server.socket_path().to_path_buf();
+
+        std::thread::spawn(move || server.run());
+        std::thread::sleep(Duration::from_millis(50));
+
+        let stream = UnixStream::connect(&server_path).unwrap();
+        let mut writer = std::io::BufWriter::new(&stream);
+        let request = r#"{"jsonrpc":"2.0","method":"wetspring.science.diversity","params":{"counts":[25.0,25.0,25.0,25.0]},"id":2}"#;
+        writer.write_all(request.as_bytes()).unwrap();
+        writer.write_all(b"\n").unwrap();
+        writer.flush().unwrap();
+
+        let mut reader = BufReader::new(&stream);
+        let mut response = String::new();
+        reader.read_line(&mut response).unwrap();
+
+        let val: serde_json::Value = serde_json::from_str(&response).unwrap();
+        let shannon = val["result"]["shannon"].as_f64().unwrap();
+        assert!((shannon - 4.0_f64.ln()).abs() < tolerances::PYTHON_PARITY);
+        cleanup_test_socket(&sock);
     }
 
     #[test]
     fn server_diversity_over_socket() {
-        let dir = tempfile::tempdir().unwrap();
-        let sock = dir.path().join("test_diversity.sock");
+        let sock = test_socket_path("server_diversity_over_socket");
+        cleanup_test_socket(&sock);
         let server = Server::bind(&sock).unwrap();
         let server_path = server.socket_path().to_path_buf();
 
@@ -337,12 +370,13 @@ mod tests {
         let val: serde_json::Value = serde_json::from_str(&response).unwrap();
         let shannon = val["result"]["shannon"].as_f64().unwrap();
         assert!((shannon - 4.0_f64.ln()).abs() < tolerances::PYTHON_PARITY);
+        cleanup_test_socket(&sock);
     }
 
     #[test]
     fn server_qs_model_over_socket() {
-        let dir = tempfile::tempdir().unwrap();
-        let sock = dir.path().join("test_qs.sock");
+        let sock = test_socket_path("server_qs_model_over_socket");
+        cleanup_test_socket(&sock);
         let server = Server::bind(&sock).unwrap();
         let server_path = server.socket_path().to_path_buf();
 
@@ -363,12 +397,13 @@ mod tests {
         let val: serde_json::Value = serde_json::from_str(&response).unwrap();
         assert!(val["result"]["t_end"].as_f64().unwrap() > 0.0);
         assert!(val["result"]["peak_biofilm"].as_f64().unwrap() > 0.0);
+        cleanup_test_socket(&sock);
     }
 
     #[test]
     fn server_multiple_requests_single_connection() {
-        let dir = tempfile::tempdir().unwrap();
-        let sock = dir.path().join("test_multi.sock");
+        let sock = test_socket_path("server_multiple_requests_single_connection");
+        cleanup_test_socket(&sock);
         let server = Server::bind(&sock).unwrap();
         let server_path = server.socket_path().to_path_buf();
 
@@ -391,12 +426,13 @@ mod tests {
             let val: serde_json::Value = serde_json::from_str(&response).unwrap();
             assert_eq!(val["id"], i);
         }
+        cleanup_test_socket(&sock);
     }
 
     #[test]
     fn server_unknown_method_returns_error() {
-        let dir = tempfile::tempdir().unwrap();
-        let sock = dir.path().join("test_unknown.sock");
+        let sock = test_socket_path("server_unknown_method_returns_error");
+        cleanup_test_socket(&sock);
         let server = Server::bind(&sock).unwrap();
         let server_path = server.socket_path().to_path_buf();
 
@@ -416,12 +452,13 @@ mod tests {
 
         let val: serde_json::Value = serde_json::from_str(&response).unwrap();
         assert_eq!(val["error"]["code"], -32601);
+        cleanup_test_socket(&sock);
     }
 
     #[test]
     fn server_cleanup_on_drop() {
-        let dir = tempfile::tempdir().unwrap();
-        let sock = dir.path().join("test_cleanup.sock");
+        let sock = test_socket_path("server_cleanup_on_drop");
+        cleanup_test_socket(&sock);
         {
             let _server = Server::bind(&sock).unwrap();
             assert!(sock.exists());
@@ -431,8 +468,8 @@ mod tests {
 
     #[test]
     fn server_metrics_snapshot_via_rpc() {
-        let dir = tempfile::tempdir().unwrap();
-        let sock = dir.path().join("test_metrics_snap.sock");
+        let sock = test_socket_path("server_metrics_snapshot_via_rpc");
+        cleanup_test_socket(&sock);
         let server = Server::bind(&sock).unwrap();
         let server_path = server.socket_path().to_path_buf();
 
@@ -462,6 +499,7 @@ mod tests {
         let val: serde_json::Value = serde_json::from_str(&metrics_resp).unwrap();
         assert_eq!(val["result"]["primal"], super::super::primal_names::SELF);
         assert!(val["result"]["total_calls"].as_u64().unwrap() >= 1);
+        cleanup_test_socket(&sock);
     }
 
     #[test]
@@ -475,8 +513,8 @@ mod tests {
 
     #[test]
     fn metrics_tracked_after_requests() {
-        let dir = tempfile::tempdir().unwrap();
-        let sock = dir.path().join("test_metrics.sock");
+        let sock = test_socket_path("metrics_tracked_after_requests");
+        cleanup_test_socket(&sock);
         let server = Server::bind(&sock).unwrap();
         let server_path = server.socket_path().to_path_buf();
         let metrics = Arc::clone(server.metrics());
@@ -501,12 +539,13 @@ mod tests {
             .total_calls
             .load(std::sync::atomic::Ordering::Relaxed);
         assert!(total >= 1, "expected at least 1 call, got {total}");
+        cleanup_test_socket(&sock);
     }
 
     #[test]
     fn server_empty_batch_returns_invalid_request() {
-        let dir = tempfile::tempdir().unwrap();
-        let sock = dir.path().join("test_empty_batch.sock");
+        let sock = test_socket_path("server_empty_batch_returns_invalid_request");
+        cleanup_test_socket(&sock);
         let server = Server::bind(&sock).unwrap();
         let server_path = server.socket_path().to_path_buf();
 
@@ -524,12 +563,13 @@ mod tests {
 
         let val: serde_json::Value = serde_json::from_str(&response).unwrap();
         assert_eq!(val["error"]["code"], -32600);
+        cleanup_test_socket(&sock);
     }
 
     #[test]
     fn server_all_notification_batch_no_response() {
-        let dir = tempfile::tempdir().unwrap();
-        let sock = dir.path().join("test_all_notif.sock");
+        let sock = test_socket_path("server_all_notification_batch_no_response");
+        cleanup_test_socket(&sock);
         let server = Server::bind(&sock).unwrap();
         let server_path = server.socket_path().to_path_buf();
 
@@ -557,12 +597,13 @@ mod tests {
             val["id"], 999,
             "probe after all-notification batch gets response"
         );
+        cleanup_test_socket(&sock);
     }
 
     #[test]
     fn server_mixed_batch_returns_array() {
-        let dir = tempfile::tempdir().unwrap();
-        let sock = dir.path().join("test_mixed_batch.sock");
+        let sock = test_socket_path("server_mixed_batch_returns_array");
+        cleanup_test_socket(&sock);
         let server = Server::bind(&sock).unwrap();
         let server_path = server.socket_path().to_path_buf();
 
@@ -584,12 +625,13 @@ mod tests {
         let arr = val.as_array().unwrap();
         assert_eq!(arr.len(), 1);
         assert_eq!(arr[0]["id"], 42);
+        cleanup_test_socket(&sock);
     }
 
     #[test]
     fn server_single_notification_no_response() {
-        let dir = tempfile::tempdir().unwrap();
-        let sock = dir.path().join("test_single_notif.sock");
+        let sock = test_socket_path("server_single_notification_no_response");
+        cleanup_test_socket(&sock);
         let server = Server::bind(&sock).unwrap();
         let server_path = server.socket_path().to_path_buf();
 
@@ -614,12 +656,13 @@ mod tests {
         reader.read_line(&mut response).unwrap();
         let val: serde_json::Value = serde_json::from_str(&response).unwrap();
         assert_eq!(val["id"], 888, "probe after notification gets response");
+        cleanup_test_socket(&sock);
     }
 
     #[test]
     fn server_id_null_gets_response() {
-        let dir = tempfile::tempdir().unwrap();
-        let sock = dir.path().join("test_id_null.sock");
+        let sock = test_socket_path("server_id_null_gets_response");
+        cleanup_test_socket(&sock);
         let server = Server::bind(&sock).unwrap();
         let server_path = server.socket_path().to_path_buf();
 
@@ -640,5 +683,6 @@ mod tests {
         let val: serde_json::Value = serde_json::from_str(&response).unwrap();
         assert!(val.get("result").is_some());
         assert!(val["id"].is_null());
+        cleanup_test_socket(&sock);
     }
 }

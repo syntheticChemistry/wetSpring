@@ -43,7 +43,12 @@ fn main() {
     v.check_pass("AFEX more yield at t=20", h_afex_20 > h_untreated_20);
 
     let h_untreated_50 = gompertz(50.0, p_untreated, rm_untreated, lag_untreated);
-    v.check("Untreated H(50) ≈ P", h_untreated_50, p_untreated, tolerances::BIOGAS_KINETICS_ASYMPTOTIC);
+    v.check(
+        "Untreated H(50) ≈ P",
+        h_untreated_50,
+        p_untreated,
+        tolerances::BIOGAS_KINETICS_ASYMPTOTIC,
+    );
 
     v.section("First-order comparison");
     let b_max = 320.0;

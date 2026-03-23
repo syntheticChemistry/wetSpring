@@ -8,6 +8,7 @@
 use crate::bio::calibration;
 use crate::bio::eic;
 use crate::bio::signal::{self, PeakParams};
+use crate::cast::usize_f64;
 use crate::io::mzml::MzmlSpectrum;
 use crate::visualization::types::{EcologyScenario, ScenarioEdge};
 
@@ -203,15 +204,15 @@ pub fn eic_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     );
 
     // Synthetic MS1 spectra with two compounds
-    let n_scans = 60;
+    let n_scans: usize = 60;
     let target_mz = 200.0;
     let spectra: Vec<MzmlSpectrum> = (0..n_scans)
         .map(|i| {
-            let rt = f64::from(i).mul_add(0.2, 1.0);
+            let rt = usize_f64(i).mul_add(0.2, 1.0);
             let x = (rt - 6.0) / 0.5;
             let int = 80_000.0f64.mul_add((-0.5 * x * x).exp(), 200.0);
             MzmlSpectrum {
-                index: i as usize,
+                index: i,
                 ms_level: 1,
                 rt_minutes: rt,
                 tic: int,

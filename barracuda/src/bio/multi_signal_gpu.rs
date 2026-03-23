@@ -15,6 +15,8 @@ use barracuda::numerical::ode_generic::BatchedOdeRK4;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
+use crate::cast;
+
 use super::multi_signal::{self, MultiSignalParams};
 
 /// Number of state variables.
@@ -165,7 +167,7 @@ impl MultiSignalGpu {
             .collect();
 
         let config = MultiSignalOdeConfig {
-            n_batches: n as u32,
+            n_batches: cast::usize_u32(n),
             n_steps,
             h,
             t0: 0.0,

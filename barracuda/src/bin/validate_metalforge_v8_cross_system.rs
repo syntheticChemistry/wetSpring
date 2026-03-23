@@ -305,7 +305,7 @@ fn main() {
     let err = dispatch::dispatch("science.nonexistent", &json!({}));
     v.check_pass(
         "unknown method → -32601",
-        err.is_err() && err.unwrap_err().code == -32601,
+        err.as_ref().is_err_and(|e| e.code == -32601),
     );
 
     let empty_div = dispatch::dispatch("science.diversity", &json!({}));

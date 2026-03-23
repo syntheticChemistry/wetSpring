@@ -67,6 +67,10 @@ pub fn decision_tree_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     for i in 0..tree.n_nodes() {
         let n = tree.node_at(i);
         if !n.is_leaf() {
+            #[expect(
+                clippy::cast_sign_loss,
+                reason = "non-leaf decision tree nodes use non-negative sklearn feature indices"
+            )]
             let feat_idx = n.feature as usize;
             if feat_idx < importance.len() {
                 importance[feat_idx] += 1.0;

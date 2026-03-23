@@ -1,21 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
-#![deny(clippy::expect_used, clippy::unwrap_used)]
-#![deny(missing_docs)]
-#![warn(clippy::pedantic, clippy::nursery)]
 #![expect(
     clippy::module_name_repetitions,
     reason = "ecosystem convention: primal modules use domain-qualified names"
-)]
-#![expect(
-    clippy::cast_possible_truncation,
-    reason = "GPU interop: wgpu uses u32 for buffer sizes/dispatch counts; \
-              domain constraints guarantee values fit (n_samples < 2^32)"
-)]
-#![expect(
-    clippy::cast_sign_loss,
-    reason = "GPU interop: usize→u32 conversions for wgpu APIs; \
-              callers ensure non-negative values"
 )]
 //! wetSpring — Life Science + PFAS Analytical Chemistry Pipelines (via `barraCuda`)
 //!
@@ -96,13 +83,14 @@ pub mod error;
 #[cfg(feature = "gpu")]
 pub mod gpu;
 pub mod io;
-#[cfg(feature = "ipc")]
+#[cfg(any(feature = "ipc", feature = "json"))]
 pub mod ipc;
 pub mod ncbi;
 pub mod niche;
 #[cfg(feature = "npu")]
 pub mod npu;
 pub mod primal_names;
+pub mod provenance_registry;
 #[cfg(feature = "gpu")]
 pub mod provenance;
 pub mod special;

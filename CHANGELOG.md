@@ -3,6 +3,74 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V132] — 2026-03-23
+
+### Deep Evolution Sprint — Cross-Ecosystem Absorption
+
+Comprehensive deep evolution executing patterns absorbed from hotSpring, groundSpring,
+neuralSpring, airSpring, healthSpring, ludoSpring, and 12+ primals. Workspace lint
+infrastructure, per-site safe casts, validation framework evolution, IPC hardening,
+ecosystem wiring, and migration from deprecated barraCuda APIs to v0.3.7.
+
+#### Workspace Lint Infrastructure (Phase 1)
+- Moved all `#![deny/warn]` lint attributes from both `lib.rs` files to
+  `[workspace.lints.clippy]` / `[workspace.lints.rust]` in root `Cargo.toml`
+- Both crates inherit via `[lints] workspace = true` — single source of truth
+- Replaced crate-wide `#![expect(cast_possible_truncation)]` and
+  `#![expect(cast_sign_loss)]` blankets with per-site `crate::cast::*` helpers
+  across ~30 files (~75 cast sites migrated to safe wrappers)
+
+#### barraCuda v0.3.7 Migration
+- Bumped dependency from v0.3.5 to v0.3.7
+- Migrated `GpuF64` from deprecated `GpuDriverProfile` to `DeviceCapabilities`
+  (vendor-agnostic runtime hardware detection)
+- Added `PrecisionTier::F16` match arm in validation binaries
+- Fixed `GpuDriverProfile` import path change (`device::driver_profile::`)
+- Updated `print_info()` to use `.backend` / `.device_type` instead of deprecated
+  `.arch` / `.driver` fields
+
+#### Validation Framework Evolution (Phase 2)
+- `ValidationSink` trait: pluggable output for validation results (stdout, silent, collecting)
+- `StdoutSink`, `SilentSink`, `CollectingSink` implementations
+- `Validator::with_sink()` and `Validator::silent()` constructors (backward compatible)
+- `PROVENANCE_REGISTRY`: 58 Python baseline entries with SHA-256 digests and 4 integrity tests
+- `IpcError::is_recoverable()`: JSON-RPC code classification (transient vs permanent errors)
+  with message heuristic fallback for custom codes
+- Per-test IPC socket isolation: `test_socket_path()` / `cleanup_test_socket()` helpers;
+  all IPC tests migrated from shared socket paths
+- `f64::total_cmp` adopted for NaN-safe ordering in diversity, PCoA, peak detection,
+  EIC, KMD, chimera (7 files)
+
+#### IPC/Discovery Hardening (Phase 3)
+- `normalize_method()` strips legacy `wetspring.` / `barracuda.` prefixes for bare
+  `{domain}.{operation}` method names (barraCuda v0.3.7 alignment)
+- Wired into dispatch and server — both prefixed and bare names resolve correctly
+- Centralized primal name constants: replaced hardcoded `"petaltongue"` string literal
+  with `primal_names::PETALTONGUE` in `ipc_push.rs`
+- Documentation fixes for mock/injection patterns and temp-dir paths
+
+#### Ecosystem Wiring (Phase 5)
+- sweetGrass braid integration: `braid.create` / `braid.commit` client with graceful
+  degradation (unavailable sweetGrass is not fatal)
+- `StreamItem` NDJSON protocol: `Data` / `Progress` / `End` / `Error` enum for
+  pipeline-style structured streaming
+- `performance_surface.report` to toadStool: measured throughput tuples for
+  capability-aware routing decisions
+- Niche capabilities updated to 24 entries (added 3 integration points)
+
+#### Dependency & File Health
+- All external dependencies verified against `deny.toml` (zero banned sys-crates)
+- `flate2` confirmed `rust_backend` in all usages
+- No files over 800 lines; largest `ipc/protocol.rs` at 765 (cohesive)
+- Zero `TODO`/`FIXME`/`HACK`, zero `#[allow()]`, zero `panic!` outside tests
+
+#### Metrics
+- Tests: 1,776 passed (1,524 barracuda + 252 forge), 0 failed
+- Clippy: 0 warnings (pedantic + nursery, workspace lints)
+- Unsafe: 0 (`#![forbid(unsafe_code)]`)
+- barraCuda primitives consumed: 150+ (v0.3.7)
+- Local WGSL: 0
+
 ## [V130] — 2026-03-19
 
 ### Anderson Hormesis Framework — Computation as Experiment Preprocessor

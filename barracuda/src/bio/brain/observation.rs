@@ -6,6 +6,7 @@
 //! feature vectors for ESN inference.
 
 use crate::bio::esn::heads::{AttentionState, BioHeadGroupDisagreement, NUM_HEADS};
+use crate::cast::f64_usize;
 
 /// A single bio observation (analog to hotSpring `BetaObservation`).
 ///
@@ -113,7 +114,7 @@ impl BioBrain {
         self.attention = self.attention.transition(smoothed);
 
         DiversityUpdate {
-            n_species: obs.chao1 as usize,
+            n_species: f64_usize(obs.chao1),
             shannon_h: obs.shannon,
             evenness: obs.evenness,
             attention: self.attention,

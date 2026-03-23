@@ -5,6 +5,9 @@
 //! over Unix domain socket. Each registered capability maps to existing
 //! barracuda library functions; no math is duplicated.
 //!
+//! When only the `json` feature is enabled (without `ipc`), this module exposes
+//! the shared [`stream_item::StreamItem`] protocol type for pipeline NDJSON.
+//!
 //! # Capabilities
 //!
 //! | Method                          | Description                                  |
@@ -43,20 +46,66 @@
 //! - **Existing math unchanged**: the server is a thin JSON-RPC wrapper over
 //!   validated barracuda library functions.
 
+#[cfg(feature = "json")]
+pub mod stream_item;
+
+#[cfg(feature = "ipc")]
 pub mod capability_domains;
+#[cfg(feature = "ipc")]
 pub mod compute_dispatch;
+#[cfg(feature = "ipc")]
 pub mod discover;
+#[cfg(feature = "ipc")]
 pub mod dispatch;
+#[cfg(feature = "ipc")]
 pub mod handlers;
+#[cfg(feature = "ipc")]
 pub mod mcp;
+#[cfg(feature = "ipc")]
 pub mod metrics;
+#[cfg(feature = "ipc")]
+pub mod performance_surface;
+/// Re-exports primal name constants for `use crate::ipc::primal_names::*` in graph binaries.
+#[cfg(any(feature = "ipc", feature = "json"))]
 pub mod primal_names;
+#[cfg(feature = "ipc")]
 pub mod protocol;
+#[cfg(feature = "ipc")]
 pub mod provenance;
+#[cfg(feature = "ipc")]
 pub mod resilience;
+#[cfg(feature = "ipc")]
 pub mod server;
+#[cfg(feature = "ipc")]
 pub mod songbird;
+#[cfg(feature = "ipc")]
+pub mod sweetgrass;
+#[cfg(feature = "ipc")]
 pub mod timeseries;
+#[cfg(feature = "ipc")]
 pub mod transport;
 
+#[cfg(feature = "ipc")]
 pub use server::Server;
+
+#[cfg(all(test, feature = "ipc"))]
+use std::path::{Path, PathBuf};
+
+/// Create a unique socket path for this test, isolated from other tests.
+/// Uses the system temp directory + test-specific suffix to prevent collisions.
+#[cfg(all(test, feature = "ipc"))]
+#[must_use]
+pub fn test_socket_path(test_name: &str) -> PathBuf {
+    let dir = std::env::temp_dir().join("wetspring-test");
+    let _ = std::fs::create_dir_all(&dir);
+    dir.join(format!("{test_name}-{}.sock", std::process::id()))
+}
+
+/// Best-effort removal of a test socket path (see [`test_socket_path`]).
+///
+/// Call before bind to clear stale files from interrupted runs, and after tests
+/// that create a socket inode. Ignores errors (e.g. server still listening).
+#[cfg(all(test, feature = "ipc"))]
+pub fn cleanup_test_socket(path: &Path) {
+    let _ = std::fs::remove_file(path);
+}

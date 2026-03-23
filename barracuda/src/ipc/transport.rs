@@ -66,9 +66,10 @@ mod tests {
 
     #[test]
     fn display_format() {
-        let dir = tempfile::tempdir().unwrap();
-        let sock_path = dir.path().join("test.sock");
+        let sock_path = crate::ipc::test_socket_path("transport_display_format");
+        crate::ipc::cleanup_test_socket(&sock_path);
         let t = Transport::Unix(sock_path.clone());
         assert_eq!(t.to_string(), format!("unix:{}", sock_path.display()));
+        crate::ipc::cleanup_test_socket(&sock_path);
     }
 }

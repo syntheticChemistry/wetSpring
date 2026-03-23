@@ -26,16 +26,23 @@ pub fn handle_alignment(params: &Value) -> Result<Value, RpcError> {
         match_score: params
             .get("match_score")
             .and_then(Value::as_i64)
-            .unwrap_or(2) as i32,
+            .and_then(|v| i32::try_from(v).ok())
+            .unwrap_or(2),
         mismatch_penalty: params
             .get("mismatch_penalty")
             .and_then(Value::as_i64)
-            .unwrap_or(-1) as i32,
-        gap_open: params.get("gap_open").and_then(Value::as_i64).unwrap_or(-3) as i32,
+            .and_then(|v| i32::try_from(v).ok())
+            .unwrap_or(-1),
+        gap_open: params
+            .get("gap_open")
+            .and_then(Value::as_i64)
+            .and_then(|v| i32::try_from(v).ok())
+            .unwrap_or(-3),
         gap_extend: params
             .get("gap_extend")
             .and_then(Value::as_i64)
-            .unwrap_or(-1) as i32,
+            .and_then(|v| i32::try_from(v).ok())
+            .unwrap_or(-1),
     };
 
     let result: AlignmentResult =

@@ -7,10 +7,7 @@
 
 #[cfg(feature = "ipc")]
 use crate::ipc::discover;
-#[cfg(feature = "ipc")]
-use crate::ipc::primal_names::PETALTONGUE;
-#[cfg(not(feature = "ipc"))]
-const PETALTONGUE: &str = "petaltongue";
+use crate::primal_names::PETALTONGUE;
 
 use std::io::{Read, Write};
 use std::os::unix::net::UnixStream;

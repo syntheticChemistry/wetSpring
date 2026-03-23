@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Synthetic nanopore signal generation for pre-hardware validation.
 
+use crate::cast::{u64_f64, usize_u32};
 use crate::io::nanopore::types::NanoporeRead;
 
 /// Generates synthetic nanopore reads for pre-hardware validation.
@@ -23,7 +24,6 @@ impl SyntheticSignalGenerator {
     /// The signal consists of a baseline current with Gaussian-like noise,
     /// simulating an open channel at `channel_id`.
     #[must_use]
-    #[expect(clippy::cast_precision_loss)] // Precision: n_samples and RNG values fit f64
     pub fn generate_read(
         &self,
         channel_id: u32,
@@ -38,7 +38,12 @@ impl SyntheticSignalGenerator {
         let mut read_id = [0u8; 16];
         for byte in &mut read_id {
             rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-            *byte = (rng >> 33) as u8;
+            #[expect(
+                clippy::cast_possible_truncation,
+                reason = "PRNG high bits are taken as u8 for synthetic read_id entropy"
+            )]
+            let b: u8 = (rng >> 33) as u8;
+            *byte = b;
         }
         // RFC 4122 v4 variant bits
         read_id[6] = (read_id[6] & 0x0F) | 0x40;
@@ -48,9 +53,13 @@ impl SyntheticSignalGenerator {
         let baseline: i16 = 512;
         for _ in 0..n_samples {
             rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-            let u1 = ((rng >> 33) as f64) / f64::from(u32::MAX);
+            let u1 = u64_f64(rng >> 33) / f64::from(u32::MAX);
             rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-            let u2 = ((rng >> 33) as f64) / f64::from(u32::MAX);
+            let u2 = u64_f64(rng >> 33) / f64::from(u32::MAX);
+            #[expect(
+                clippy::cast_possible_truncation,
+                reason = "Box–Muller noise scaled to i16 ADC excursion around baseline"
+            )]
             let noise = ((-2.0
                 * u1.max(crate::tolerances::BOX_MULLER_U1_FLOOR_SYNTHETIC)
                     .ln())
@@ -80,8 +89,7 @@ impl SyntheticSignalGenerator {
     ) -> Vec<NanoporeRead> {
         (0..n_reads)
             .map(|i| {
-                #[expect(clippy::cast_possible_truncation)] // Truncation: i < n_reads, 512 fits u32
-                let ch = (i as u32) % 512 + 1;
+                let ch = usize_u32(i % 512).saturating_add(1);
                 self.generate_read(ch, samples_per_read, sample_rate)
             })
             .collect()
@@ -93,7 +101,6 @@ impl SyntheticSignalGenerator {
     /// T=700 ADC units) with `samples_per_base` samples per nucleotide,
     /// plus Gaussian noise. Used for basecalling validation.
     #[must_use]
-    #[expect(clippy::cast_precision_loss)] // Precision: sequence length and RNG fit f64
     pub fn generate_from_sequence(
         &self,
         channel_id: u32,
@@ -109,7 +116,12 @@ impl SyntheticSignalGenerator {
         let mut read_id = [0u8; 16];
         for byte in &mut read_id {
             rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-            *byte = (rng >> 33) as u8;
+            #[expect(
+                clippy::cast_possible_truncation,
+                reason = "PRNG high bits are taken as u8 for synthetic read_id entropy"
+            )]
+            let b: u8 = (rng >> 33) as u8;
+            *byte = b;
         }
         read_id[6] = (read_id[6] & 0x0F) | 0x40;
         read_id[8] = (read_id[8] & 0x3F) | 0x80;
@@ -128,9 +140,13 @@ impl SyntheticSignalGenerator {
 
             for _ in 0..samples_per_base {
                 rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-                let u1 = ((rng >> 33) as f64) / f64::from(u32::MAX);
+                let u1 = u64_f64(rng >> 33) / f64::from(u32::MAX);
                 rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-                let u2 = ((rng >> 33) as f64) / f64::from(u32::MAX);
+                let u2 = u64_f64(rng >> 33) / f64::from(u32::MAX);
+                #[expect(
+                    clippy::cast_possible_truncation,
+                    reason = "Box–Muller noise scaled to i16 ADC excursion around level"
+                )]
                 let noise = ((-2.0
                     * u1.max(crate::tolerances::BOX_MULLER_U1_FLOOR_SYNTHETIC)
                         .ln())

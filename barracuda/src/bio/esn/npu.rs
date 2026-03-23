@@ -60,7 +60,6 @@ impl NpuReadoutWeights {
     /// Run int8 inference on a reservoir state vector.
     /// Returns f64 outputs (dequantized from int8 accumulation).
     #[must_use]
-    #[expect(clippy::cast_precision_loss)] // Precision: reservoir_size, output_size bounded
     pub fn infer(&self, state: &[f64]) -> Vec<f64> {
         let n_res = self.reservoir_size;
         let n_out = self.output_size;
@@ -75,8 +74,9 @@ impl NpuReadoutWeights {
         let state_i8: Vec<i8> = state
             .iter()
             .map(|&v| {
-                let q = ((v - s_min) / s_scale).round() as i64 - 128;
-                q.clamp(-128, 127) as i8
+                let rounded = ((v - s_min) / s_scale).round();
+                let q = crate::cast::f64_i32(rounded) - 128;
+                i8::try_from(q.clamp(-128, 127)).unwrap_or(0)
             })
             .collect();
 
@@ -87,7 +87,7 @@ impl NpuReadoutWeights {
                 acc += i64::from(self.weights_i8[o * n_res + r]) * i64::from(state_i8[r]);
             }
             // Dequantize: real = (acc * w_scale * s_scale) + corrections
-            output[o] = acc as f64 * self.scale * s_scale;
+            output[o] = crate::cast::i64_f64(acc) * self.scale * s_scale;
         }
 
         output

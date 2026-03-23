@@ -6,6 +6,8 @@
 
 use std::collections::{HashMap, HashSet};
 
+use crate::cast::u64_usize;
+
 use super::kmers::extract_kmers;
 use super::types::{Classification, ClassifyParams, Lineage, NpuWeights, ReferenceSeq, TaxRank};
 
@@ -180,7 +182,7 @@ impl NaiveBayesClassifier {
             let row = ti * self.kmer_space;
             let mut log_score = self.log_priors[ti];
             for &kmer in query_kmers {
-                log_score += self.dense_log_probs[row + kmer as usize];
+                log_score += self.dense_log_probs[row + u64_usize(kmer)];
             }
             if log_score > best_score {
                 best_score = log_score;

@@ -134,18 +134,18 @@ pub fn pcoa(condensed: &[f64], n_samples: usize, n_axes: usize) -> Result<PcoaRe
     // 3. Eigendecomposition via Jacobi rotations
     let (eigenvalues, eigenvectors) = jacobi_eigen(&centered, n);
 
-    // 4. Sort descending by eigenvalue; NaN sorts to the end
+    // 4. Sort descending by eigenvalue. Finite values use `f64::total_cmp` (consistent
+    // ordering for all floats); NaNs are deferred to the end for ordination stability.
     let mut order: Vec<usize> = (0..n).collect();
     order.sort_by(|&a, &b| {
-        eigenvalues[b]
-            .partial_cmp(&eigenvalues[a])
-            .unwrap_or_else(|| {
-                if eigenvalues[a].is_nan() {
-                    std::cmp::Ordering::Greater
-                } else {
-                    std::cmp::Ordering::Less
-                }
-            })
+        let va = eigenvalues[a];
+        let vb = eigenvalues[b];
+        match (va.is_nan(), vb.is_nan()) {
+            (true, true) => a.cmp(&b),
+            (true, false) => std::cmp::Ordering::Greater,
+            (false, true) => std::cmp::Ordering::Less,
+            (false, false) => vb.total_cmp(&va),
+        }
     });
 
     let sorted_vals: Vec<f64> = order.iter().map(|&i| eigenvalues[i]).collect();

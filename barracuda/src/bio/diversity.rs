@@ -387,6 +387,7 @@ mod tests {
 
     mod prop {
         use super::*;
+        use crate::cast;
         use proptest::prelude::*;
 
         fn non_negative_vec() -> impl Strategy<Value = Vec<f64>> {
@@ -453,11 +454,14 @@ mod tests {
             ) {
                 let total: f64 = counts.iter().sum();
                 prop_assume!(total >= 2.0);
-                let n_depths = 15.min(total as usize);
+                let n_depths = 15.min(cast::f64_usize(total));
                 let mut depths: Vec<f64> = (1..=n_depths)
-                    .map(|i| i as f64 * total / (n_depths as f64 + 1.0))
+                    .map(|i| {
+                        cast::usize_f64(i) * total / (cast::usize_f64(n_depths) + 1.0)
+                    })
                     .collect();
-                depths.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+                // `f64::total_cmp`: total order for stable proptest sorting (NaN-safe).
+                depths.sort_by(|a, b| a.total_cmp(b));
                 prop_assume!(!depths.is_empty());
                 let curve = rarefaction_curve(&counts, &depths);
                 for i in 1..curve.len() {

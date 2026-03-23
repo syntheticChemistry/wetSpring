@@ -102,14 +102,9 @@ pub fn group_homologues(kmd_results: &[KmdResult], kmd_tolerance: f64) -> Vec<Ve
         return vec![];
     }
 
-    // Sort by KMD for efficient grouping
+    // Sort by KMD for efficient grouping (`f64::total_cmp` — total order on mass-defect keys).
     let mut sorted_indices: Vec<usize> = (0..kmd_results.len()).collect();
-    sorted_indices.sort_by(|&a, &b| {
-        kmd_results[a]
-            .kmd
-            .partial_cmp(&kmd_results[b].kmd)
-            .unwrap_or(std::cmp::Ordering::Equal)
-    });
+    sorted_indices.sort_by(|&a, &b| kmd_results[a].kmd.total_cmp(&kmd_results[b].kmd));
 
     let mut groups: Vec<Vec<usize>> = Vec::new();
     let mut current_group = vec![sorted_indices[0]];

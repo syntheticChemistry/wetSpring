@@ -193,38 +193,43 @@ mod tests {
 
     #[test]
     fn discover_socket_explicit() {
-        let dir = tempfile::tempdir().unwrap();
-        let sock = dir.path().join("songbird.sock");
+        let sock = crate::ipc::test_socket_path("songbird_discover_socket_explicit");
+        crate::ipc::cleanup_test_socket(&sock);
         std::fs::write(&sock, "").unwrap();
 
         temp_env::with_var("SONGBIRD_SOCKET", Some(sock.to_str().unwrap()), || {
             let found = discover_socket();
             assert_eq!(found, Some(sock.clone()));
         });
+        crate::ipc::cleanup_test_socket(&sock);
     }
 
     #[test]
     fn register_nonexistent_socket_errors() {
-        let dir = tempfile::tempdir().unwrap();
-        let bad_path = dir.path().join("wetspring_test_no_songbird.sock");
-        let ws_path = dir.path().join("wetspring.sock");
+        let bad_path = crate::ipc::test_socket_path("songbird_register_nonexistent_bad");
+        let ws_path = crate::ipc::test_socket_path("songbird_register_nonexistent_ws");
+        crate::ipc::cleanup_test_socket(&bad_path);
+        crate::ipc::cleanup_test_socket(&ws_path);
         let err = register(&bad_path, &ws_path).unwrap_err();
         let msg = err.to_string();
         assert!(
             msg.contains("connect") || msg.contains("socket"),
             "unexpected error: {msg}"
         );
+        crate::ipc::cleanup_test_socket(&bad_path);
+        crate::ipc::cleanup_test_socket(&ws_path);
     }
 
     #[test]
     fn heartbeat_nonexistent_socket_errors() {
-        let dir = tempfile::tempdir().unwrap();
-        let bad_path = dir.path().join("wetspring_test_no_songbird_hb.sock");
+        let bad_path = crate::ipc::test_socket_path("songbird_heartbeat_nonexistent");
+        crate::ipc::cleanup_test_socket(&bad_path);
         let err = heartbeat(&bad_path).unwrap_err();
         let msg = err.to_string();
         assert!(
             msg.contains("connect") || msg.contains("socket"),
             "unexpected error: {msg}"
         );
+        crate::ipc::cleanup_test_socket(&bad_path);
     }
 }

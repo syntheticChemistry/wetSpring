@@ -162,7 +162,7 @@ fn validate_pathway_identification(v: &mut Validator) {
     );
 }
 
-fn validate_drug_matching(v: &Validator) {
+fn validate_drug_matching(v: &mut Validator) {
     v.section("§2 Drug-Pathway Matching");
 
     println!(
@@ -272,7 +272,7 @@ fn main() {
     let mut v = Validator::new("Exp157: Fajgenbaum Pathway Scoring — PI3K/AKT/mTOR → Sirolimus");
 
     validate_pathway_identification(&mut v);
-    validate_drug_matching(&v);
+    validate_drug_matching(&mut v);
     validate_score_matrix(&mut v);
     validate_discovery_logic(&mut v);
 

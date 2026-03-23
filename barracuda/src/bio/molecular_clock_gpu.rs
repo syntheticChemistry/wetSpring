@@ -42,7 +42,7 @@ pub fn strict_clock_gpu(
     require_f64(gpu)?;
     let parent_opt: Vec<Option<usize>> = parent_indices
         .iter()
-        .map(|&p| if p < 0 { None } else { Some(p as usize) })
+        .map(|&p| if p < 0 { None } else { usize::try_from(p).ok() })
         .collect();
     Ok(molecular_clock::strict_clock(
         branch_lengths,
@@ -70,7 +70,7 @@ pub fn relaxed_clock_rates_gpu(
 
     let parent_opt: Vec<Option<usize>> = parent_indices
         .iter()
-        .map(|&p| if p < 0 { None } else { Some(p as usize) })
+        .map(|&p| if p < 0 { None } else { usize::try_from(p).ok() })
         .collect();
     let rates = molecular_clock::relaxed_clock_rates(branch_lengths, node_ages, &parent_opt);
 

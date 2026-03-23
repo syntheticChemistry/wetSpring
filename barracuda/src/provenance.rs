@@ -49,6 +49,9 @@ pub fn cross_spring_report() -> String {
 // ═══════════════════════════════════════════════════════════════════
 // Python baseline provenance registry
 // ═══════════════════════════════════════════════════════════════════
+//
+// Script file SHA-256 digests live in `crate::provenance_registry::PROVENANCE_REGISTRY`
+// (always built). This section maps validation binaries to scripts, commits, and categories.
 
 /// A Python baseline provenance record.
 pub struct PythonBaseline {

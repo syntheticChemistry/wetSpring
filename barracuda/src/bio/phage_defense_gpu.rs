@@ -15,6 +15,8 @@ use barracuda::numerical::ode_generic::BatchedOdeRK4;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
+use crate::cast;
+
 use super::phage_defense::{self, PhageDefenseParams};
 
 /// Number of state variables.
@@ -165,7 +167,7 @@ impl PhageDefenseGpu {
             .collect();
 
         let config = PhageDefenseOdeConfig {
-            n_batches: n as u32,
+            n_batches: cast::usize_u32(n),
             n_steps,
             h,
             t0: 0.0,

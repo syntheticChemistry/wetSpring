@@ -95,15 +95,15 @@ fn main() {
     let precision = gpu.optimal_precision();
     let is_lost = gpu.is_lost();
     let threshold = gpu.dispatch_threshold();
-    let profile = gpu.driver_profile();
-    let sin_workaround = profile.needs_sin_f64_workaround();
-    let cos_workaround = profile.needs_cos_f64_workaround();
+    let caps = gpu.capabilities();
+    let exp_workaround = caps.needs_exp_f64_workaround();
+    let log_workaround = caps.needs_log_f64_workaround();
 
     println!("  GPU: {}", gpu.adapter_name);
     println!("  Fp64Strategy: {strategy:?} (hotSpring S58 → ToadStool S67)");
     println!("  Precision: {precision:?} (ToadStool S68 universal)");
     println!("  is_lost: {is_lost}, dispatch_threshold: {threshold}");
-    println!("  NVK sin workaround: {sin_workaround}, cos: {cos_workaround}");
+    println!("  NVK exp workaround: {exp_workaround}, log: {log_workaround}");
     println!("  Origin: hotSpring → precision layer used by ALL springs");
 
     v.check_pass("GPU initialized", true);

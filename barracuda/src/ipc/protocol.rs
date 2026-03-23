@@ -1,9 +1,34 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! JSON-RPC 2.0 protocol types and serialization for the Primal IPC Protocol.
 
+use std::borrow::Cow;
 use std::fmt;
 
 use serde_json::Value;
+
+/// Normalize a JSON-RPC method name to the bare `{domain}.{operation}` form (barraCuda v0.3.7+).
+///
+/// Strips legacy product prefixes (`wetspring.`, `barracuda.`) when present so clients using
+/// either prefixed or bare names reach the same dispatch table. Repeated prefixes are stripped
+/// until stable (e.g. `wetspring.barracuda.science.diversity` → `science.diversity`).
+#[must_use]
+pub fn normalize_method(method: &str) -> Cow<'_, str> {
+    let mut s = method;
+    loop {
+        let next = s
+            .strip_prefix("wetspring.")
+            .or_else(|| s.strip_prefix("barracuda."));
+        match next {
+            Some(rest) => s = rest,
+            None => break,
+        }
+    }
+    if s == method {
+        Cow::Borrowed(method)
+    } else {
+        Cow::Owned(s.to_string())
+    }
+}
 
 /// Returns `true` if the JSON-RPC input is a notification (Request without "id").
 ///
@@ -381,6 +406,44 @@ pub fn extract_capabilities(response: &str) -> Option<CapabilityInfo> {
 )]
 mod tests {
     use super::*;
+
+    #[test]
+    fn normalize_method_bare_name_unchanged() {
+        assert_eq!(normalize_method("science.diversity").as_ref(), "science.diversity");
+        assert_eq!(normalize_method("metrics.snapshot").as_ref(), "metrics.snapshot");
+    }
+
+    #[test]
+    fn normalize_method_strips_wetspring_prefix() {
+        assert_eq!(
+            normalize_method("wetspring.science.diversity").as_ref(),
+            "science.diversity"
+        );
+    }
+
+    #[test]
+    fn normalize_method_strips_barracuda_prefix() {
+        assert_eq!(
+            normalize_method("barracuda.science.diversity").as_ref(),
+            "science.diversity"
+        );
+    }
+
+    #[test]
+    fn normalize_method_strips_chained_prefixes() {
+        assert_eq!(
+            normalize_method("wetspring.barracuda.science.diversity").as_ref(),
+            "science.diversity"
+        );
+    }
+
+    #[test]
+    fn normalize_method_no_false_strip_on_substring() {
+        assert_eq!(
+            normalize_method("wetspring_science.diversity").as_ref(),
+            "wetspring_science.diversity"
+        );
+    }
 
     #[test]
     fn parse_valid_request() {

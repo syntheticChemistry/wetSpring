@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Campylobacterota assembly records (Exp125).
 
+use crate::cast;
+
 /// Campylobacterota assembly record (Exp125).
 #[derive(Debug, Clone)]
 pub struct CampyAssembly {
@@ -27,10 +29,20 @@ impl CampyAssembly {
             organism: super::json_str_value(obj, "organism"),
             genus: super::json_str_value(obj, "genus"),
             genome_size_bp: super::json_int_value(obj, "genome_size_bp"),
-            gene_count: super::json_int_value(obj, "gene_count") as u32,
+            gene_count: cast::u64_u32(super::json_int_value(obj, "gene_count")),
             isolation_source: super::json_str_value(obj, "isolation_source"),
         }
     }
+}
+
+#[expect(
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    reason = "synthetic Campy genome size from bounded noisy float fits u64"
+)]
+#[inline]
+const fn synthetic_genome_bp_f64_to_u64(x: f64) -> u64 {
+    x as u64
 }
 
 /// Load Campylobacterota assemblies from NCBI JSON data.
@@ -57,7 +69,6 @@ pub fn load_campylobacterota() -> (Vec<CampyAssembly>, bool) {
 /// Synthetic data: 80 assemblies across genera and ecosystems.
 ///
 /// Deterministic accessions (`GCF_CAM_*`). Used only as offline/CI fallback.
-#[expect(clippy::cast_precision_loss)] // Precision: genome size and counts fit f64
 pub fn gen_synthetic_campy() -> Vec<CampyAssembly> {
     let genera = [
         (
@@ -122,15 +133,15 @@ pub fn gen_synthetic_campy() -> Vec<CampyAssembly> {
     let mut rng = 99_u64;
     let mut assemblies = Vec::with_capacity(80);
     for i in 0..80_u32 {
-        let g = &genera[(i as usize) % genera.len()];
+        let g = &genera[cast::u32_usize(i) % genera.len()];
         rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-        let var = (f64::from((rng >> 33) as u32) / f64::from(u32::MAX)).mul_add(0.1, -0.05);
+        let var = (f64::from(cast::u64_u32(rng >> 33)) / f64::from(u32::MAX)).mul_add(0.1, -0.05);
         assemblies.push(CampyAssembly {
             accession: format!("GCF_CAM_{i:04}"),
             organism: format!("{} strain SYN{i:03}", g.1),
             genus: g.0.to_string(),
-            genome_size_bp: ((g.2 as f64) * (1.0 + var)) as u64,
-            gene_count: (f64::from(g.3) * (1.0 + var)) as u32,
+            genome_size_bp: synthetic_genome_bp_f64_to_u64(cast::u64_f64(g.2) * (1.0 + var)),
+            gene_count: cast::f64_u32(f64::from(g.3) * (1.0 + var)),
             isolation_source: g.4.to_string(),
         });
     }

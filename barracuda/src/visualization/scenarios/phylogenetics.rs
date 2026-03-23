@@ -7,6 +7,7 @@ use crate::bio::felsenstein::{self, TreeNode};
 use crate::bio::molecular_clock;
 use crate::bio::placement;
 use crate::bio::reconciliation::{self, DtlCosts, FlatRecTree};
+use crate::cast::{f64_usize, usize_f64};
 use crate::visualization::types::{EcologyScenario, ScenarioEdge};
 
 use super::{bar, distribution, gauge, heatmap, node, scaffold, scatter, timeseries};
@@ -74,13 +75,13 @@ pub fn felsenstein_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
         "compute",
         &["science.phylogenetics"],
     );
-    let site_indices: Vec<f64> = (0..site_lls.len()).map(|i| i as f64).collect();
+    let site_indices: Vec<f64> = (0..site_lls.len()).map(usize_f64).collect();
     fels_node.data_channels.push(bar(
         "site_ll",
         "Site Log-Likelihoods",
         &site_indices
             .iter()
-            .map(|i| format!("site_{}", *i as usize))
+            .map(|i| format!("site_{}", f64_usize(*i)))
             .collect::<Vec<_>>(),
         &site_lls,
         "ln(L)",
@@ -95,7 +96,7 @@ pub fn felsenstein_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
         [total_ll * 1.5, total_ll * 0.5],
         [total_ll * 2.0, total_ll * 1.5],
     ));
-    let boot_mean = boot_lls.iter().sum::<f64>() / boot_lls.len() as f64;
+    let boot_mean = boot_lls.iter().sum::<f64>() / usize_f64(boot_lls.len());
     let boot_std = (boot_lls
         .iter()
         .map(|v| (v - boot_mean).powi(2))

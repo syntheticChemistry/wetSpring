@@ -11,7 +11,7 @@
 use serde_json::Value;
 
 use crate::ipc::handlers;
-use crate::ipc::protocol::RpcError;
+use crate::ipc::protocol::{normalize_method, RpcError};
 use crate::ipc::{provenance, timeseries};
 
 // Re-export for tests
@@ -28,7 +28,8 @@ pub use handlers::{extract_f64_array, extract_string_array};
 /// - `-32602`: Invalid params
 /// - `-32000` to `-32099`: Server errors (NCBI, GPU, etc.)
 pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
-    match method {
+    let method_norm = normalize_method(method);
+    match method_norm.as_ref() {
         "health.check" => handlers::handle_health(),
         "health.liveness" => handlers::handle_health_liveness(),
         "health.readiness" => handlers::handle_health_readiness(),
@@ -89,6 +90,20 @@ mod tests {
     fn dispatch_unknown_method() {
         let err = dispatch("nonexistent.method", &json!({})).unwrap_err();
         assert_eq!(err.code, -32601);
+    }
+
+    #[test]
+    fn diversity_prefixed_wetspring_normalized() {
+        let params = json!({"counts": [10.0, 20.0, 30.0, 40.0]});
+        let result = dispatch("wetspring.science.diversity", &params).unwrap();
+        assert!(result.get("shannon").is_some());
+    }
+
+    #[test]
+    fn diversity_prefixed_barracuda_normalized() {
+        let params = json!({"counts": [10.0, 20.0, 30.0, 40.0]});
+        let result = dispatch("barracuda.science.diversity", &params).unwrap();
+        assert!(result.get("shannon").is_some());
     }
 
     #[test]

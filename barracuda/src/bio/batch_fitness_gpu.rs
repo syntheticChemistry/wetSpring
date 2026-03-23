@@ -11,6 +11,8 @@ use barracuda::device::WgpuDevice;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
+use crate::cast;
+
 /// GPU-accelerated batch fitness evaluator.
 ///
 /// Cross-spring provenance: `neuralSpring` (Write) → `ToadStool` (Absorb) → `wetSpring` (Lean).
@@ -39,7 +41,6 @@ impl BatchFitnessGpuWrapper {
     /// # Errors
     ///
     /// Returns an error if size mismatches or GPU read fails.
-    #[expect(clippy::cast_possible_truncation)] // Truncation: pop_size, genome_len fit u32
     pub fn evaluate(
         &self,
         population: &[f32],
@@ -77,8 +78,8 @@ impl BatchFitnessGpuWrapper {
             &pop_buf,
             &w_buf,
             &fit_buf,
-            pop_size as u32,
-            genome_len as u32,
+            cast::usize_u32(pop_size),
+            cast::usize_u32(genome_len),
         );
         let _ = d.poll(wgpu::PollType::Wait {
             submission_index: None,

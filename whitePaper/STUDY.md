@@ -1,6 +1,6 @@
 # wetSpring: Replicable Life Science and Analytical Chemistry on Consumer GPU Hardware
 
-**Working Draft** — March 15, 2026
+**Working Draft** — March 23, 2026
 
 ---
 
@@ -18,7 +18,7 @@ and mathematical biology (Track 1b), deep-sea metagenomics and microbial
 evolution (Track 1c), and PFAS detection via LC-MS (Track 2),
 validating 94+ Rust modules (47 CPU + 47 GPU) against baselines from Galaxy,
 QIIME2, asari, FindPFAS, scipy, sklearn, dendropy, real NCBI SRA data, and
-published paper models with 5,707+ quantitative checks across 376 experiments
+published paper models with 5,707+ quantitative checks across 379 experiments
 and 354 validation binaries — all passing. The pipeline proves substrate independence: math produces
 identical results on CPU and GPU, validated via metalForge cross-substrate
 checks (Exp060). Random Forest ensemble and Gradient Boosting Machine

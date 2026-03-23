@@ -12,6 +12,8 @@ use barracuda::device::WgpuDevice;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
+use crate::cast;
+
 /// GPU-accelerated locus variance for FST decomposition.
 ///
 /// Cross-spring provenance: `neuralSpring` (Write) → `ToadStool` (Absorb) → `wetSpring` (Lean).
@@ -39,7 +41,6 @@ impl LocusVarianceGpuWrapper {
     /// # Errors
     ///
     /// Returns an error if matrix size mismatches or GPU read fails.
-    #[expect(clippy::cast_possible_truncation)] // Truncation: n_pops, n_loci fit u32
     pub fn compute(
         &self,
         allele_freqs: &[f32],
@@ -69,8 +70,12 @@ impl LocusVarianceGpuWrapper {
             mapped_at_creation: false,
         });
 
-        self.inner
-            .dispatch(&freq_buf, &var_buf, n_pops as u32, n_loci as u32);
+        self.inner.dispatch(
+            &freq_buf,
+            &var_buf,
+            cast::usize_u32(n_pops),
+            cast::usize_u32(n_loci),
+        );
         let _ = d.poll(wgpu::PollType::Wait {
             submission_index: None,
             timeout: None,

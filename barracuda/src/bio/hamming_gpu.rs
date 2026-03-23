@@ -12,6 +12,8 @@ use barracuda::device::WgpuDevice;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
+use crate::cast;
+
 /// Pairwise Hamming distance result.
 pub struct HammingGpuResult {
     /// Upper-triangle distances in row-major order, N*(N-1)/2 values.
@@ -50,7 +52,6 @@ impl HammingGpu {
     /// # Errors
     ///
     /// Returns an error if sequences have unequal lengths or GPU read fails.
-    #[expect(clippy::cast_possible_truncation)] // Truncation: n_seqs, seq_len fit u32
     pub fn pairwise_hamming(&self, sequences: &[&[u32]]) -> crate::error::Result<HammingGpuResult> {
         let n_seqs = sequences.len();
         if n_seqs < 2 {
@@ -82,8 +83,12 @@ impl HammingGpu {
             mapped_at_creation: false,
         });
 
-        self.inner
-            .dispatch(&seq_buf, &dist_buf, n_seqs as u32, seq_len as u32);
+        self.inner.dispatch(
+            &seq_buf,
+            &dist_buf,
+            cast::usize_u32(n_seqs),
+            cast::usize_u32(seq_len),
+        );
         let _ = d.poll(wgpu::PollType::Wait {
             submission_index: None,
             timeout: None,

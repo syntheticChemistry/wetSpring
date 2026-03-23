@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-19 (V130: 379 experiments, 354 binaries, 5,707+ checks, 1,579+ tests. V130 Anderson Hormesis: `bio::hormesis` (biphasic dose-response, 14 tests), `bio::binding_landscape` (colonization resistance, 17 tests), 4 new tolerances, Phase 4 methodology. V129: Deep debt evolution — `cast` module (15 helpers), unconditional `primal_names`, nautilus fix. Zero local math duplication, zero `#[allow()]`, zero clippy warnings, zero unsafe.)
+**Updated**: 2026-03-23 (V132: 379 experiments, 354 binaries, 5,707+ checks, **1,776** tests. V132: `ValidationSink`, `PROVENANCE_REGISTRY`, `IpcError::is_recoverable`, `normalize_method`, `DeviceCapabilities`, sweetGrass braids + `StreamItem` + `performance_surface`, workspace lints. V130 Anderson Hormesis: `bio::hormesis`, `bio::binding_landscape`, Phase 4 methodology. V129: Deep debt evolution — `cast` module (15 helpers), unconditional `primal_names`, nautilus fix. Zero local math duplication, zero `#[allow()]`, zero clippy warnings, zero unsafe.)
 
 ---
 
@@ -196,6 +196,9 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 318 | metalForge v16 | metalforge | DONE | Pipeline integration | Cross-system paper math, 6 domains, CPU=GPU=NPU | 24 |
 | 335 | R Industry Parity Baselines | cross | DONE | R/vegan + R/DADA2 + R/phyloseq | bio::diversity, bio::dada2, bio::phred, bio::unifrac | 53 |
 | 375 | [V115 Deep Audit](375_v115_deep_audit_unibin_capability_domains.md) | cross | DONE | V114 codebase audit | UniBin, capability_domains, tolerances, XDG, coverage | — |
+| 377 | [Hormesis Biphasic Model](377_hormesis_biphasic_model.md) | cross | PROPOSED | Calabrese & Mattson (2017) hormesis curves | `bio::hormesis` (unit tests) | — |
+| 378 | [Trophic Cascade Anderson](378_trophic_cascade_anderson.md) | cross | PROPOSED | Anderson lattice + pesticide perturbation | — | — |
+| 379 | [Joint Colonization Resistance](379_joint_colonization_resistance.md) | cross | PROPOSED | healthSpring × wetSpring joint surface | `bio::binding_landscape` (unit tests) | — |
 
 ---
 
@@ -410,9 +413,9 @@ thresholds from `src/tolerances.rs`.
 | `validate_r_industry_parity` | 335 | 53 | `cargo run --release --bin validate_r_industry_parity` |
 
 **Total validation checks**: 5,707+
-**Rust tests**: 1,638 total (1,404 barracuda lib + 234 forge)
+**Rust tests**: **1,776** total (workspace)
 **Binaries**: 354 total (332 barracuda + 22 forge)
-**barraCuda primitives**: 150+ consumed (standalone v0.3.5, wgpu 28, Fp64Strategy, fused ops)
+**barraCuda primitives**: 150+ consumed (standalone v0.3.7, wgpu 28, Fp64Strategy, fused ops)
 **Papers**: 63 (reproduced across 6 tracks)
 **Local WGSL shaders**: 0 (all absorbed)
 **GPU modules**: 47 total (35 lean + 12 compose + 5 write-to-lean ODE)
@@ -642,7 +645,7 @@ primal discovery (env → XDG → BIOMEOS_SOCKET_DIR → temp), forge lint parit
 false-positives resolved (all `panic!()` and `unwrap()` confirmed test-only).
 31 IPC tests pass, 19 files changed (342+, 130−).
 
-**Totals: 376 experiments, 354 binaries, 5,707+ checks.**
+**Totals through Exp376:** 376 experiments, 354 binaries, 5,707+ checks.
 
 ### Exp377: Hormesis Biphasic Dose-Response Model (PROPOSED)
 
@@ -668,7 +671,7 @@ resist pathogen colonization better than low-diversity strong-binding communitie
 Module: `bio::binding_landscape` (17 unit tests passing). Joint with healthSpring
 exp097/exp098.
 
-**Totals: 379 experiments, 354 binaries, 5,707+ checks.**
+**Totals: 379 experiments, 354 binaries, 5,707+ checks, 1,776 tests.**
 
 ---
 

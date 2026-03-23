@@ -6,6 +6,7 @@
 
 use serde_json::{Value, json};
 
+use crate::cast::u64_usize;
 use crate::ipc::protocol::RpcError;
 use crate::tolerances;
 
@@ -21,21 +22,25 @@ use super::extract_f64_array;
 /// Returns `RpcError::invalid_params` for dimension mismatches or invalid rank.
 pub fn handle_nmf(params: &Value) -> Result<Value, RpcError> {
     let data = extract_f64_array(params, "data")?;
-    let n_rows = params
-        .get("n_rows")
-        .and_then(Value::as_u64)
-        .ok_or_else(|| RpcError::invalid_params("missing required param: n_rows"))?
-        as usize;
-    let n_cols = params
-        .get("n_cols")
-        .and_then(Value::as_u64)
-        .ok_or_else(|| RpcError::invalid_params("missing required param: n_cols"))?
-        as usize;
-    let rank = params.get("rank").and_then(Value::as_u64).unwrap_or(2) as usize;
-    let max_iter = params
-        .get("max_iter")
-        .and_then(Value::as_u64)
-        .unwrap_or(200) as usize;
+    let n_rows = u64_usize(
+        params
+            .get("n_rows")
+            .and_then(Value::as_u64)
+            .ok_or_else(|| RpcError::invalid_params("missing required param: n_rows"))?,
+    );
+    let n_cols = u64_usize(
+        params
+            .get("n_cols")
+            .and_then(Value::as_u64)
+            .ok_or_else(|| RpcError::invalid_params("missing required param: n_cols"))?,
+    );
+    let rank = u64_usize(params.get("rank").and_then(Value::as_u64).unwrap_or(2));
+    let max_iter = u64_usize(
+        params
+            .get("max_iter")
+            .and_then(Value::as_u64)
+            .unwrap_or(200),
+    );
 
     if data.len() != n_rows * n_cols {
         return Err(RpcError::invalid_params(format!(

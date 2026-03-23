@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 #![forbid(unsafe_code)]
-#![deny(clippy::expect_used, clippy::unwrap_used)]
-#![deny(missing_docs)]
-#![warn(clippy::pedantic, clippy::nursery)]
 #![expect(
     clippy::module_name_repetitions,
     reason = "ecosystem convention: primal modules use domain-qualified names"

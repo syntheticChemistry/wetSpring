@@ -87,13 +87,9 @@ pub fn pcoa_gpu(
     }
     .map_err(|e| Error::Gpu(format!("eigendecomposition: {e}")))?;
 
-    // 3. Sort eigenvalues descending
+    // 3. Sort eigenvalues descending (`f64::total_cmp` — total order, no `None` from NaNs).
     let mut order: Vec<usize> = (0..n).collect();
-    order.sort_by(|&a, &b| {
-        raw_eigenvalues[b]
-            .partial_cmp(&raw_eigenvalues[a])
-            .unwrap_or(std::cmp::Ordering::Equal)
-    });
+    order.sort_by(|&a, &b| raw_eigenvalues[b].total_cmp(&raw_eigenvalues[a]));
 
     let sorted_vals: Vec<f64> = order.iter().map(|&i| raw_eigenvalues[i]).collect();
 

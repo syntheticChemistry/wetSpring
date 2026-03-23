@@ -41,11 +41,7 @@ fn print_result_fail() {
 
 #[test]
 fn validator_accumulates() {
-    let mut v = Validator {
-        name: String::from("test"),
-        passed: 0,
-        total: 0,
-    };
+    let mut v = Validator::with_sink("test", Box::new(SilentSink));
     v.check("ok", 1.0, 1.0, 0.0);
     v.check("fail", 2.0, 1.0, 0.0);
     v.check_count("count_ok", 5, 5);
@@ -55,11 +51,7 @@ fn validator_accumulates() {
 
 #[test]
 fn validator_section_does_not_count() {
-    let v = Validator {
-        name: String::from("test"),
-        passed: 0,
-        total: 0,
-    };
+    let mut v = Validator::with_sink("test", Box::new(SilentSink));
     v.section("── some section ──");
     assert_eq!(v.counts(), (0, 0));
 }
@@ -204,11 +196,7 @@ fn print_result_zero_total_is_failure() {
 
 #[test]
 fn validator_all_pass() {
-    let mut v = Validator {
-        name: String::from("all-pass"),
-        passed: 0,
-        total: 0,
-    };
+    let mut v = Validator::with_sink("all-pass", Box::new(SilentSink));
     for i in 0..10 {
         v.check(&format!("check {i}"), 1.0, 1.0, 0.0);
     }
@@ -217,15 +205,45 @@ fn validator_all_pass() {
 
 #[test]
 fn validator_all_fail() {
-    let mut v = Validator {
-        name: String::from("all-fail"),
-        passed: 0,
-        total: 0,
-    };
+    let mut v = Validator::with_sink("all-fail", Box::new(SilentSink));
     for i in 0..5 {
         v.check(&format!("fail {i}"), 999.0, 0.0, 0.0);
     }
     assert_eq!(v.counts(), (0, 5));
+}
+
+#[test]
+fn validator_silent_counts_without_stdout_side_effects() {
+    let mut v = Validator::silent("silent");
+    v.check("ok", 1.0, 1.0, 0.0);
+    v.check("bad", 2.0, 1.0, 0.5);
+    v.check_count("n", 3, 3);
+    assert_eq!(v.counts(), (2, 3));
+    assert!(!v.all_passed());
+}
+
+#[test]
+fn collecting_sink_captures_check_results() {
+    let sink = CollectingSink::default();
+    let results = std::sync::Arc::clone(&sink.results);
+    let mut v = Validator::with_sink("collect", Box::new(sink));
+    v.check("first", 1.0, 1.0, 0.0);
+    v.check("second", 2.0, 1.0, 0.01);
+    assert_eq!(v.counts(), (1, 2));
+    let borrowed = results.lock().expect("mutex");
+    assert_eq!(borrowed.len(), 2);
+    assert_eq!(
+        borrowed[0],
+        CheckResult {
+            label: "first".to_string(),
+            passed: true,
+            actual: 1.0,
+            expected: 1.0,
+            tolerance: 0.0,
+        }
+    );
+    assert_eq!(borrowed[1].label, "second");
+    assert!(!borrowed[1].passed);
 }
 
 // ── resolve_data_dir: explicit branch coverage ──────────────────

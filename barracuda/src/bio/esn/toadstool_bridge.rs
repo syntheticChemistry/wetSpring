@@ -112,6 +112,10 @@ impl From<&EsnConfig> for BioEsnConfig {
 impl BioEsnConfig {
     /// Convert to barraCuda `ESNConfig` (f32).
     #[must_use]
+    #[expect(
+        clippy::cast_possible_truncation,
+        reason = "bio ESN hyperparameters are narrowed to f32 for barraCuda tensor ops"
+    )]
     pub fn to_esn_config(&self) -> ESNConfig {
         ESNConfig {
             input_size: self.input_size,
@@ -169,6 +173,10 @@ impl BioEsn {
     }
 
     /// Run one reservoir update step.
+    #[expect(
+        clippy::cast_possible_truncation,
+        reason = "device tensors use f32; host f64 state is narrowed at the boundary"
+    )]
     pub fn update(&mut self, input: &[f64]) -> Result<(), barracuda::error::BarracudaError> {
         let input_f32: Vec<f32> = input.iter().map(|&x| x as f32).collect();
         let device = self.inner.state().device().clone();
@@ -185,6 +193,10 @@ impl BioEsn {
     }
 
     /// Train readout via ridge regression on collected states.
+    #[expect(
+        clippy::cast_possible_truncation,
+        reason = "ridge training uses f32 tensors in barraCuda"
+    )]
     pub fn train(
         &mut self,
         inputs: &[Vec<f64>],
@@ -202,6 +214,10 @@ impl BioEsn {
     }
 
     /// Predict on a sequence of inputs.
+    #[expect(
+        clippy::cast_possible_truncation,
+        reason = "inference uses f32 tensors on device; results widened back to f64"
+    )]
     pub fn predict(
         &mut self,
         inputs: &[Vec<f64>],

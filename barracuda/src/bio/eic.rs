@@ -49,11 +49,8 @@ pub struct Eic {
 pub fn extract_eics(spectra: &[MzmlSpectrum], target_mzs: &[f64], ppm: f64) -> Vec<Eic> {
     // Filter to MS1 only and sort by RT
     let mut ms1: Vec<&MzmlSpectrum> = spectra.iter().filter(|s| s.ms_level == 1).collect();
-    ms1.sort_by(|a, b| {
-        a.rt_minutes
-            .partial_cmp(&b.rt_minutes)
-            .unwrap_or(std::cmp::Ordering::Equal)
-    });
+    // Sort by retention time (`f64::total_cmp` — robust ordering across NaN/malformed RT).
+    ms1.sort_by(|a, b| a.rt_minutes.total_cmp(&b.rt_minutes));
 
     target_mzs
         .iter()

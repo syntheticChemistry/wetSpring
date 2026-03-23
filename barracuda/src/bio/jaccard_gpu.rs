@@ -12,6 +12,8 @@ use barracuda::device::WgpuDevice;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
+use crate::cast;
+
 /// Pairwise Jaccard distance result.
 pub struct JaccardGpuResult {
     /// Upper-triangle Jaccard distances, N*(N-1)/2 values.
@@ -48,7 +50,6 @@ impl JaccardGpu {
     /// # Errors
     ///
     /// Returns an error if matrix size mismatches or GPU read fails.
-    #[expect(clippy::cast_possible_truncation)] // Truncation: n_genomes, n_genes fit u32
     pub fn pairwise_jaccard(
         &self,
         pa_matrix: &[f32],
@@ -78,8 +79,12 @@ impl JaccardGpu {
             mapped_at_creation: false,
         });
 
-        self.inner
-            .dispatch(&pa_buf, &dist_buf, n_genomes as u32, n_genes as u32);
+        self.inner.dispatch(
+            &pa_buf,
+            &dist_buf,
+            cast::usize_u32(n_genomes),
+            cast::usize_u32(n_genes),
+        );
         let _ = d.poll(wgpu::PollType::Wait {
             submission_index: None,
             timeout: None,

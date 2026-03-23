@@ -10,6 +10,8 @@
 
 use std::collections::HashMap;
 
+use crate::cast::u64_usize;
+
 /// 2-bit DNA encoding: A=0, C=1, G=2, T=3.
 /// Returns `None` for ambiguous bases (N, etc).
 #[inline]
@@ -93,7 +95,7 @@ impl KmerCounts {
         let kmer_space = 1_usize << (2 * self.k);
         let mut hist = vec![0_u32; kmer_space];
         for (&kmer, &count) in &self.counts {
-            hist[kmer as usize] = count;
+            hist[u64_usize(kmer)] = count;
         }
         hist
     }

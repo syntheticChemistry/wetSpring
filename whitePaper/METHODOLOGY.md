@@ -428,7 +428,7 @@ All experiments run on a single consumer workstation:
 | `validate_barracuda_cpu_v8` | 175 | 13 promoted GPU domains (Exp102) |
 | **Total** | **1,476** | **All pass** |
 
-Current status: **1,476/1,476 CPU pass (historical milestone).** 1,638 total tests, 376 experiments across 6 tracks.
+Current status: **1,476/1,476 CPU pass (historical milestone).** 1,776 total tests, 379 experiments across 6 tracks.
 546/546 BarraCuda CPU parity checks across 36+ domains (v1-v27).
 33.4× Rust speedup over Python.
 
@@ -449,7 +449,7 @@ Current status: **1,476/1,476 CPU pass (historical milestone).** 1,638 total tes
 | `validate_cross_substrate` | 20 | metalForge cross-substrate CPU↔GPU parity (Exp060) |
 | `validate_gpu_rf` | 13 | RF batch inference shader (Exp063) |
 
-Current status: **702+/702+ pass (historical milestone).** 150+ barraCuda primitives consumed (v0.3.5).
+Current status: **702+/702+ pass (historical milestone).** 150+ barraCuda primitives consumed (v0.3.7).
 0 local WGSL shaders (all absorbed) + 12 Compose + 35 Lean = 47 GPU modules total.
 
 ### Grand Total: 5,707+/5,707+ quantitative checks pass
@@ -486,7 +486,7 @@ results, then exceed them via Rust + GPU.
 | asari | 1.13.1 | LC-MS feature extraction |
 | `PFΔScreen` | Latest | PFAS non-target screening |
 | flate2 | 1.0 | Pure Rust backend (`rust_backend`), no C dependencies |
-| barraCuda | v0.3.5 (standalone) | 150+ primitives consumed, 784+ WGSL shaders |
+| barraCuda | v0.3.7 (standalone) | 150+ primitives consumed, 784+ WGSL shaders |
 
 ---
 

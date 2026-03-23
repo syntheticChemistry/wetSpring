@@ -38,7 +38,7 @@ pub struct ProvenanceResult {
 /// Discover the biomeOS Neural API socket.
 ///
 /// Priority: `NEURAL_API_SOCKET` → `BIOMEOS_SOCKET_DIR` →
-/// `$XDG_RUNTIME_DIR/biomeos/` → `/tmp/`.
+/// `$XDG_RUNTIME_DIR/biomeos/` → `std::env::temp_dir()` (platform-specific temp).
 #[must_use]
 pub fn neural_api_socket() -> Option<PathBuf> {
     let family_id = super::discover::family_id();

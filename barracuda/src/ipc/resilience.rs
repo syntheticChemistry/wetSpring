@@ -11,9 +11,10 @@ use crate::error::IpcError;
 
 /// Configurable retry policy with exponential backoff and jitter.
 ///
-/// Intended for transient IPC failures (`IpcError::Connect`, `Transport`,
-/// `EmptyResponse`). Non-retriable errors (`Codec`, `RpcReject`, `SocketPath`)
-/// are never retried regardless of policy.
+/// Intended for transient IPC failures. Retries when [`IpcError::is_recoverable`]
+/// is true (transport/empty response, JSON-RPC internal error `-32603`, and
+/// similar). Permanent failures (`SocketPath`, `Codec`, JSON-RPC client errors
+/// `-32600`..`-32602`, `-32700`) are not retried.
 #[derive(Debug, Clone)]
 pub struct RetryPolicy {
     max_attempts: u32,
@@ -61,7 +62,7 @@ impl RetryPolicy {
 
     /// Execute a fallible operation with retry logic.
     ///
-    /// Only retries when `IpcError::is_retriable()` returns true.
+    /// Only retries when `IpcError::is_recoverable()` returns true.
     /// Returns the first success or the last error after all attempts.
     ///
     /// # Errors
@@ -76,7 +77,7 @@ impl RetryPolicy {
         for attempt in 0..self.max_attempts {
             match op() {
                 Ok(val) => return Ok(val),
-                Err(e) if !e.is_retriable() => return Err(e),
+                Err(e) if !e.is_recoverable() => return Err(e),
                 Err(e) => {
                     last_err = Some(e);
                     if attempt + 1 < self.max_attempts {
@@ -246,7 +247,7 @@ mod tests {
     }
 
     #[test]
-    fn retry_does_not_retry_non_retriable() {
+    fn retry_does_not_retry_non_recoverable() {
         let policy = RetryPolicy::new(5, Duration::from_millis(1), Duration::from_millis(10));
         let mut attempts = 0;
         let result = policy.execute(|| {
@@ -255,6 +256,40 @@ mod tests {
         });
         assert!(result.is_err());
         assert_eq!(attempts, 1);
+    }
+
+    #[test]
+    fn retry_does_not_retry_rpc_method_not_found() {
+        let policy = RetryPolicy::new(5, Duration::from_millis(1), Duration::from_millis(10));
+        let mut attempts = 0;
+        let result = policy.execute(|| {
+            attempts += 1;
+            Err::<i32, _>(IpcError::RpcReject {
+                code: -32601,
+                message: "nope".into(),
+            })
+        });
+        assert!(result.is_err());
+        assert_eq!(attempts, 1);
+    }
+
+    #[test]
+    fn retry_succeeds_after_rpc_internal_error() {
+        let policy = RetryPolicy::new(3, Duration::from_millis(1), Duration::from_millis(10));
+        let mut attempts = 0;
+        let result = policy.execute(|| {
+            attempts += 1;
+            if attempts < 2 {
+                Err(IpcError::RpcReject {
+                    code: -32603,
+                    message: "transient".into(),
+                })
+            } else {
+                Ok(7)
+            }
+        });
+        assert_eq!(result.unwrap(), 7);
+        assert_eq!(attempts, 2);
     }
 
     #[test]
