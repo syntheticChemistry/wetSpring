@@ -7,15 +7,16 @@ against Rust implementations, then promotes to GPU acceleration via
 
 ```
 Python/R baseline  →  Rust CPU parity  →  GPU acceleration  →  sovereign pipeline
-   (58 scripts)       (1,776 tests)       (45 GPU modules)     (barraCuda/coralReef)
+   (58 scripts)       (1,781 tests)       (44 GPU modules)     (barraCuda/coralReef)
 ```
 
 | | |
 |---|---|
-| **Tests** | 1,776 passed, 0 failed |
-| **Validation checks** | 5,700+ across 354 binaries |
-| **Experiments** | 379 completed |
-| **Coverage** | 94% line (barracuda), 90%+ (forge) |
+| **Tests** | 1,781 passed, 0 failed |
+| **Validation checks** | 5,700+ across 307 binaries |
+| **Experiments** | 376 completed + 3 proposed (379 indexed) |
+| **Coverage** | target 90%+ (llvm-cov gated) |
+| **Named tolerances** | 234 |
 | **Clippy** | 0 warnings (pedantic + nursery) |
 | **Unsafe** | 0 (`#![forbid(unsafe_code)]` all crates) |
 | **Local WGSL** | 0 — fully lean on barraCuda |
@@ -34,6 +35,8 @@ Python/R baseline  →  Rust CPU parity  →  GPU acceleration  →  sovereign p
 | **2** | Analytical Chemistry (LC-MS, PFAS) | 4 | mzML parsing, EIC, peak detection, spectral matching, KMD, PFAS screening |
 | **3** | Drug Repurposing | 5 | NMF, pathway scoring, knowledge graph embedding, TransE, SparseGEMM |
 | **4** | No-Till Soil & Anderson Geometry | 9 | Anderson localization, Lanczos, quorum sensing ODE, cooperation dynamics, pore geometry |
+| **5** | Anderson Extensions | 4 | Hormesis, binding landscapes, disorder mapping, colonization resistance |
+| **6** | Anaerobic Digestion | 5 | Gompertz kinetics, co-digestion, AFEX pretreatment, fungal fermentation |
 
 ---
 
@@ -53,7 +56,7 @@ WGSL      Python       in handoff   adds ops    upstream, delete local
 
 | Crate | Purpose | Modules |
 |-------|---------|---------|
-| `wetspring-barracuda` | Library: bio algorithms + I/O + validation | 47 CPU + 45 GPU + 6 I/O |
+| `wetspring-barracuda` | Library: bio algorithms + I/O + validation | 49 CPU + 44 GPU + 6 I/O |
 | `wetspring-forge` | Hardware discovery, dispatch, visualization | 13 modules |
 | `wetspring-barracuda-fuzz` | libFuzzer targets for parsers | 4 targets |
 
@@ -94,6 +97,12 @@ cargo fmt --all -- --check
 # Run a validation binary
 cargo run --release --bin validate_diversity
 
+# Run all validation binaries (meta-runner)
+cargo run --bin validate_all
+
+# Coverage gate (workspace alias)
+cargo coverage-check
+
 # GPU validation (requires gpu feature + compatible hardware)
 cargo run --features gpu --release --bin validate_barracuda_cpu_v27
 
@@ -103,7 +112,7 @@ cargo llvm-cov --workspace --html
 
 ---
 
-## CPU Modules (47)
+## CPU Modules (49)
 
 | Module | Algorithm | Validated Against |
 |--------|-----------|-------------------|
@@ -176,10 +185,10 @@ All parsers stream from disk — no full-file buffering.
 | `cargo fmt` | Clean |
 | `cargo clippy` (pedantic + nursery) | 0 warnings |
 | `cargo doc --no-deps` | 0 warnings |
-| `#![forbid(unsafe_code)]` | All crate roots (2 crates + 354 binaries) |
+| `#![forbid(unsafe_code)]` | All crate roots (2 crates + 307+ binaries) |
 | `#![deny(clippy::unwrap_used)]` | Workspace `[lints.clippy]` |
 | TODO/FIXME/HACK | 0 |
-| Inline tolerance literals | 0 (218 named constants) |
+| Inline tolerance literals | 0 (234 named constants) |
 | Max file size | All under 1,000 lines |
 | C dependencies | 0 (`flate2` uses `rust_backend`) |
 | SPDX headers | All `.rs` files |
@@ -218,6 +227,10 @@ All validation data from public repositories:
 | hotSpring | Physics validation — precision math, DF64, ESN |
 | neuralSpring | ML validation — eigensolvers, attention, TransE |
 | airSpring | Agriculture validation — Richards PDE, seasonal pipelines |
+| groundSpring | Soil and land-surface validation |
+| healthSpring | Health and physiology validation |
+| ludoSpring | Game-theoretic and strategic validation |
+| primalSpring | Primal ecosystem coordination |
 
 Detailed version history: [CHANGELOG.md](CHANGELOG.md)
 

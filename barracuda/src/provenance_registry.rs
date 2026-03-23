@@ -336,11 +336,7 @@ mod tests {
     #[test]
     fn provenance_registry_sha256_nonempty() {
         for p in PROVENANCE_REGISTRY {
-            assert!(
-                !p.sha256.is_empty(),
-                "empty sha256 for {}",
-                p.script
-            );
+            assert!(!p.sha256.is_empty(), "empty sha256 for {}", p.script);
             assert_eq!(
                 p.sha256.len(),
                 64,

@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** March 15, 2026 (V120 — barraCuda v0.3.5 standalone, toadStool S130+, coralReef Phase 10, wgpu 28. 1,638 tests (0 failures, 3 pre-existing GPU hw-specific), 354 binaries, 200+ tolerances. biomeOS niche — deploy graph with `fallback = "skip"`, niche self-knowledge (`niche.rs` + BYOB), 22 capabilities (16 domains), Squirrel AI + ToadStool optional deploy nodes, provenance trio, cross-spring time series. V120 Cross-Spring Absorption: typed errors completed (`NcbiError`, `DataError`, `Error::Ipc`), deploy graph hardened, `live_pipeline.rs` refactored, shared Python tolerance module, hardcoding eliminated. clippy ZERO WARNINGS pedantic+nursery.)
+**Updated:** March 23, 2026 (V133 — barraCuda v0.3.7 standalone, toadStool S155, coralReef Phase 10, wgpu 28. 1,781 tests (0 failures, 3 pre-existing GPU hw-specific), 307 validation binaries (333 total), 234 named tolerances. biomeOS niche — deploy graph with `fallback = "skip"`, niche self-knowledge (`niche.rs` + BYOB), 22 capabilities (16 domains), Squirrel AI + ToadStool optional deploy nodes, provenance trio, cross-spring time series. V133 Cross-Spring Absorption: typed errors completed (`NcbiError`, `DataError`, `Error::Ipc`), deploy graph hardened, `live_pipeline.rs` refactored, shared Python tolerance module, hardcoding eliminated. clippy ZERO WARNINGS pedantic+nursery.)
 
 ---
 
@@ -16,15 +16,15 @@ baseline through Rust CPU to GPU acceleration via barraCuda.
 
 ```
 wetspring-barracuda
-├── 47 CPU bio modules          (pure Rust math, no external C deps)
-├── 47 GPU bio modules          (47 Lean/Compose, 0 Passthrough)
+├── 49 CPU bio modules          (pure Rust math, no external C deps)
+├── 44 GPU bio modules          (44 Lean/Compose, 0 Passthrough)
 ├── 1 provenance module         (barracuda::shaders::provenance wiring)
 ├── 3 streaming I/O parsers     (FASTQ/gzip, mzML/base64, MS2)
-├── 354 validation/benchmark binaries
+├── 307 validation binaries (333 total)
 └── depends on: barracuda via path dependency
 ```
 
-47 Lean GPU modules delegate to `barracuda::ops::*` primitives.
+44 Lean GPU modules delegate to `barracuda::ops::*` primitives.
 Builder patterns wired: `HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`.
 `PrecisionRoutingAdvice` for shared-memory f64 safety.
 
@@ -104,7 +104,7 @@ Builder patterns wired: `HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`.
 | `tolerance_search` | ppm/Da m/z search | FindPFAS |
 | `unifrac` | UniFrac + Newick parser | QIIME2 |
 
-### GPU Bio (47 modules)
+### GPU Bio (44 modules)
 
 | Module | barraCuda Primitive | Status |
 |--------|-------------------|--------|
@@ -142,7 +142,7 @@ Builder patterns wired: `HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`.
 | Module | Purpose |
 |--------|---------|
 | `special` | Sovereign math (erf, ln_gamma, regularized_gamma, normal_cdf) |
-| `tolerances` | 179 named constants (scientifically justified) |
+| `tolerances` | 234 named constants (scientifically justified) |
 | `validation` | Structured test harness with provenance |
 | `encoding` | Sovereign base64 (zero dependencies) |
 | `error` | Error types (no external crates) |
@@ -159,10 +159,10 @@ Builder patterns wired: `HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`.
 | `#![deny(unsafe_code)]` | Enforced crate-wide (test-only `allow` for `env::set_var` in edition 2024) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | Enforced |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
-| Tests | 1,288 lib + 219 integration (plus forge + doc) |
+| Tests | 1,781 total (lib + integration + forge + doc) |
 | ESN ridge regression | Proper Cholesky solve (not diagonal approximation) |
 | I/O parsers | Streaming-first; buffering APIs deprecated |
-| Validation checks | 8,431+ across 354 binaries |
+| Validation checks | 8,431+ across 307 validation binaries (333 total) |
 
 ## Quick Start
 
@@ -197,7 +197,7 @@ cargo run --features gpu --release --bin validate_barracuda_gpu_full
 
 ## Dependencies
 
-- `barracuda` — standalone math primal via path: `../../barraCuda/crates/barracuda` (v0.3.3, `2a6c072`)
+- `barracuda` — standalone math primal via path: `../../barraCuda/crates/barracuda` (v0.3.7, `2a6c072`)
 - `flate2` (pure Rust backend) — gzip decompression
 - `serde_json` (optional, `json` feature) — model import for 2 binaries
 - `wgpu` 28 (via `gpu` feature) — GPU device management

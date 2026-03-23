@@ -5,8 +5,52 @@
 //! in the `wetspring_server` binary (`WETSPRING_TCP_ADDR`) but not yet
 //! implemented. This module provides the abstraction layer for future
 //! multi-transport support without changing the server or dispatch logic.
+//!
+//! [`unix_jsonrpc_line`] implements newline-delimited JSON-RPC 2.0 client
+//! calls to peer primals (shared by lightweight IPC helpers).
 
-use std::path::PathBuf;
+use std::io::{BufRead, BufReader, Write};
+use std::os::unix::net::UnixStream;
+use std::path::{Path, PathBuf};
+use std::time::Duration;
+
+/// Default timeout for client JSON-RPC over Unix sockets to peer primals
+/// (toadStool, sweetGrass, …) when not using workload-specific limits.
+pub const UNIX_JSONRPC_TIMEOUT: Duration = Duration::from_secs(10);
+
+/// Send one newline-terminated JSON-RPC request and read one response line.
+pub fn unix_jsonrpc_line(socket: &Path, request_line: &str) -> Result<String, String> {
+    let stream =
+        UnixStream::connect(socket).map_err(|e| format!("connect {}: {e}", socket.display()))?;
+
+    stream
+        .set_read_timeout(Some(UNIX_JSONRPC_TIMEOUT))
+        .map_err(|e| format!("set read timeout: {e}"))?;
+    stream
+        .set_write_timeout(Some(UNIX_JSONRPC_TIMEOUT))
+        .map_err(|e| format!("set write timeout: {e}"))?;
+
+    let mut writer = std::io::BufWriter::new(&stream);
+    writer
+        .write_all(request_line.as_bytes())
+        .map_err(|e| format!("write: {e}"))?;
+    writer
+        .write_all(b"\n")
+        .map_err(|e| format!("write newline: {e}"))?;
+    writer.flush().map_err(|e| format!("flush: {e}"))?;
+
+    let mut reader = BufReader::new(&stream);
+    let mut line = String::new();
+    reader
+        .read_line(&mut line)
+        .map_err(|e| format!("read: {e}"))?;
+
+    if line.is_empty() {
+        return Err("empty response from peer".to_string());
+    }
+
+    Ok(line)
+}
 
 /// Supported transport types for the Primal IPC Protocol.
 #[derive(Debug, Clone, PartialEq, Eq)]

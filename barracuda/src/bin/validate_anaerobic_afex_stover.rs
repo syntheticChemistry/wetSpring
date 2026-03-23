@@ -6,6 +6,14 @@
 )]
 //! Exp339: Rojas-Sossa 2019 — AFEX corn stover.
 //! Lightweight validator for single-paper math.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Type | Analytical |
+//! | Date | 2026-03-23 |
+//! | Command | `cargo run --bin validate_anaerobic_afex_stover` |
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;

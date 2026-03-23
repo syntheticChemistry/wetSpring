@@ -1,8 +1,13 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
 # wetSpring cargo config.
-# Coverage: cargo llvm-cov --workspace --html (from workspace root)
+# Coverage: `cargo coverage` (aliases below) from workspace root.
 # Requires: cargo install cargo-llvm-cov, rustup component add llvm-tools-preview
+
+[alias]
+coverage = "llvm-cov --workspace --html"
+coverage-check = "llvm-cov --workspace --fail-under-lines 80"
+coverage-json = "llvm-cov --workspace --json --output-path coverage.json"
 
 [build]
 # Uses default; coverage runs with debug profile via cargo-llvm-cov

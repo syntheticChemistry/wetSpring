@@ -6,6 +6,14 @@
 )]
 //! Exp337: Chen 2016 — Culture conditions response.
 //! Lightweight validator for single-paper math.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Type | Analytical |
+//! | Date | 2026-03-23 |
+//! | Command | `cargo run --bin validate_anaerobic_culture_response` |
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;

@@ -45,6 +45,10 @@
 //! All ODE shaders are generated at runtime via `BatchedOdeRK4::generate_shader()`
 //! from `barraCuda`. wetSpring holds zero local `.wgsl` files.
 
+mod context;
+
+pub use context::GpuContext;
+
 use barracuda::device::capabilities::{DeviceCapabilities, PrecisionRoutingAdvice};
 use barracuda::device::{TensorContext, WgpuDevice};
 use std::sync::Arc;
@@ -84,6 +88,8 @@ const MAX_STORAGE_BUFFERS_PER_STAGE: u32 = 16;
 ///
 /// Driver-specific capabilities (NVK workarounds, eigensolve strategy,
 /// latency model) are available via [`capabilities`](Self::capabilities).
+///
+/// For [`barracuda::session::TensorSession`] (ML op batching), use [`GpuContext::from_gpu_f64`].
 pub struct GpuF64 {
     /// GPU adapter name (e.g., `"NVIDIA GeForce RTX 4070"`).
     pub adapter_name: String,
@@ -206,8 +212,7 @@ impl GpuF64 {
     /// Whether this GPU's driver needs f64 `exp`/`log` polyfills.
     #[must_use]
     pub fn needs_f64_workaround(&self) -> bool {
-        self.capabilities.needs_exp_f64_workaround()
-            || self.capabilities.needs_log_f64_workaround()
+        self.capabilities.needs_exp_f64_workaround() || self.capabilities.needs_log_f64_workaround()
     }
 
     /// Runtime precision strategy for this GPU (`barraCuda` universal precision).

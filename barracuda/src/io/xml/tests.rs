@@ -23,9 +23,9 @@ fn events_from(xml: &str) -> Vec<XmlEvent> {
 fn simple_element_with_text() {
     let events = events_from("<root>hello</root>");
     assert_eq!(events.len(), 3);
-    assert!(matches!(&events[0], XmlEvent::StartElement { name, .. } if name == "root"));
+    assert!(matches!(&events[0], XmlEvent::StartElement { name, .. } if name.as_ref() == "root"));
     assert!(matches!(&events[1], XmlEvent::Text(t) if t == "hello"));
-    assert!(matches!(&events[2], XmlEvent::EndElement { name } if name == "root"));
+    assert!(matches!(&events[2], XmlEvent::EndElement { name } if name.as_ref() == "root"));
 }
 
 #[test]
@@ -35,9 +35,9 @@ fn self_closing_with_attr() {
     let XmlEvent::StartElement { name, attrs } = &events[0] else {
         panic!("events[0] should be StartElement");
     };
-    assert_eq!(name, "item");
+    assert_eq!(name.as_ref(), "item");
     assert_eq!(attrs, &[("key".to_owned(), "value".to_owned())]);
-    assert!(matches!(&events[1], XmlEvent::EndElement { name } if name == "item"));
+    assert!(matches!(&events[1], XmlEvent::EndElement { name } if name.as_ref() == "item"));
 }
 
 #[test]
@@ -55,29 +55,29 @@ fn multiple_attributes() {
 fn nested_elements() {
     let events = events_from("<a><b>text</b></a>");
     assert_eq!(events.len(), 5);
-    assert!(matches!(&events[0], XmlEvent::StartElement { name, .. } if name == "a"));
-    assert!(matches!(&events[1], XmlEvent::StartElement { name, .. } if name == "b"));
+    assert!(matches!(&events[0], XmlEvent::StartElement { name, .. } if name.as_ref() == "a"));
+    assert!(matches!(&events[1], XmlEvent::StartElement { name, .. } if name.as_ref() == "b"));
     assert!(matches!(&events[2], XmlEvent::Text(t) if t == "text"));
-    assert!(matches!(&events[3], XmlEvent::EndElement { name } if name == "b"));
-    assert!(matches!(&events[4], XmlEvent::EndElement { name } if name == "a"));
+    assert!(matches!(&events[3], XmlEvent::EndElement { name } if name.as_ref() == "b"));
+    assert!(matches!(&events[4], XmlEvent::EndElement { name } if name.as_ref() == "a"));
 }
 
 #[test]
 fn xml_declaration_skipped() {
     let events = events_from(r#"<?xml version="1.0"?><root/>"#);
     assert_eq!(events.len(), 2);
-    assert!(matches!(&events[0], XmlEvent::StartElement { name, .. } if name == "root"));
-    assert!(matches!(&events[1], XmlEvent::EndElement { name } if name == "root"));
+    assert!(matches!(&events[0], XmlEvent::StartElement { name, .. } if name.as_ref() == "root"));
+    assert!(matches!(&events[1], XmlEvent::EndElement { name } if name.as_ref() == "root"));
 }
 
 #[test]
 fn comment_skipped() {
     let events = events_from("<a><!-- comment --><b/></a>");
     assert_eq!(events.len(), 4);
-    assert!(matches!(&events[0], XmlEvent::StartElement { name, .. } if name == "a"));
-    assert!(matches!(&events[1], XmlEvent::StartElement { name, .. } if name == "b"));
-    assert!(matches!(&events[2], XmlEvent::EndElement { name } if name == "b"));
-    assert!(matches!(&events[3], XmlEvent::EndElement { name } if name == "a"));
+    assert!(matches!(&events[0], XmlEvent::StartElement { name, .. } if name.as_ref() == "a"));
+    assert!(matches!(&events[1], XmlEvent::StartElement { name, .. } if name.as_ref() == "b"));
+    assert!(matches!(&events[2], XmlEvent::EndElement { name } if name.as_ref() == "b"));
+    assert!(matches!(&events[3], XmlEvent::EndElement { name } if name.as_ref() == "a"));
 }
 
 #[test]
@@ -105,24 +105,24 @@ fn entity_unescape_attr() {
 fn whitespace_only_text_trimmed() {
     let events = events_from("<a>   \n\t  </a>");
     assert_eq!(events.len(), 2);
-    assert!(matches!(&events[0], XmlEvent::StartElement { name, .. } if name == "a"));
-    assert!(matches!(&events[1], XmlEvent::EndElement { name } if name == "a"));
+    assert!(matches!(&events[0], XmlEvent::StartElement { name, .. } if name.as_ref() == "a"));
+    assert!(matches!(&events[1], XmlEvent::EndElement { name } if name.as_ref() == "a"));
 }
 
 #[test]
 fn empty_element_with_space_before_slash() {
     let events = events_from(r"<br />");
     assert_eq!(events.len(), 2);
-    assert!(matches!(&events[0], XmlEvent::StartElement { name, .. } if name == "br"));
-    assert!(matches!(&events[1], XmlEvent::EndElement { name } if name == "br"));
+    assert!(matches!(&events[0], XmlEvent::StartElement { name, .. } if name.as_ref() == "br"));
+    assert!(matches!(&events[1], XmlEvent::EndElement { name } if name.as_ref() == "br"));
 }
 
 #[test]
 fn multiline_comment_skipped() {
     let events = events_from("<a><!-- multi\nline\ncomment --><b/></a>");
     assert_eq!(events.len(), 4);
-    assert!(matches!(&events[0], XmlEvent::StartElement { name, .. } if name == "a"));
-    assert!(matches!(&events[1], XmlEvent::StartElement { name, .. } if name == "b"));
+    assert!(matches!(&events[0], XmlEvent::StartElement { name, .. } if name.as_ref() == "a"));
+    assert!(matches!(&events[1], XmlEvent::StartElement { name, .. } if name.as_ref() == "b"));
 }
 
 #[test]
@@ -155,9 +155,9 @@ fn text_with_entities_apos_and_quot() {
 fn adjacent_elements_no_whitespace() {
     let events = events_from("<a/><b/><c/>");
     assert_eq!(events.len(), 6);
-    assert!(matches!(&events[0], XmlEvent::StartElement { name, .. } if name == "a"));
-    assert!(matches!(&events[2], XmlEvent::StartElement { name, .. } if name == "b"));
-    assert!(matches!(&events[4], XmlEvent::StartElement { name, .. } if name == "c"));
+    assert!(matches!(&events[0], XmlEvent::StartElement { name, .. } if name.as_ref() == "a"));
+    assert!(matches!(&events[2], XmlEvent::StartElement { name, .. } if name.as_ref() == "b"));
+    assert!(matches!(&events[4], XmlEvent::StartElement { name, .. } if name.as_ref() == "c"));
 }
 
 #[test]
@@ -165,8 +165,8 @@ fn comment_spanning_multiple_gt_chars() {
     // Comment with '>' inside it — exercises skip_to_comment_end loop
     let events = events_from("<a><!-- a > b > c --><b/></a>");
     assert_eq!(events.len(), 4);
-    assert!(matches!(&events[0], XmlEvent::StartElement { name, .. } if name == "a"));
-    assert!(matches!(&events[1], XmlEvent::StartElement { name, .. } if name == "b"));
+    assert!(matches!(&events[0], XmlEvent::StartElement { name, .. } if name.as_ref() == "a"));
+    assert!(matches!(&events[1], XmlEvent::StartElement { name, .. } if name.as_ref() == "b"));
 }
 
 #[test]
@@ -176,7 +176,7 @@ fn eof_after_text_no_close_tag() {
     let mut reader = XmlReader::new(std::io::Cursor::new(xml));
     reader.set_trim_text(true);
     let e1 = reader.next_event().unwrap();
-    assert!(matches!(e1, XmlEvent::StartElement { name, .. } if name == "a"));
+    assert!(matches!(e1, XmlEvent::StartElement { name, .. } if name.as_ref() == "a"));
     let e2 = reader.next_event().unwrap();
     assert!(matches!(e2, XmlEvent::Text(t) if t == "trailing text"));
 }
@@ -200,7 +200,7 @@ fn truncated_tag_eof() {
     let mut reader = XmlReader::new(std::io::Cursor::new(xml));
     reader.set_trim_text(true);
     let e1 = reader.next_event().unwrap();
-    assert!(matches!(e1, XmlEvent::StartElement { name, .. } if name == "a"));
+    assert!(matches!(e1, XmlEvent::StartElement { name, .. } if name.as_ref() == "a"));
     let e2 = reader.next_event();
     assert!(e2.is_err()); // "unexpected EOF inside tag"
 }
@@ -212,7 +212,7 @@ fn text_without_trim() {
     let mut reader = XmlReader::new(std::io::Cursor::new(xml));
     // trim_text defaults to false
     let e1 = reader.next_event().unwrap();
-    assert!(matches!(e1, XmlEvent::StartElement { name, .. } if name == "a"));
+    assert!(matches!(e1, XmlEvent::StartElement { name, .. } if name.as_ref() == "a"));
     let e2 = reader.next_event().unwrap();
     let XmlEvent::Text(t) = e2 else {
         panic!("e2 should be Text");
@@ -226,7 +226,7 @@ fn malformed_attribute_no_equals() {
     let XmlEvent::StartElement { name, attrs } = &events[0] else {
         panic!("events[0] should be StartElement");
     };
-    assert_eq!(name, "a");
+    assert_eq!(name.as_ref(), "a");
     assert!(attrs.is_empty());
 }
 
@@ -236,7 +236,7 @@ fn malformed_attribute_no_value() {
     let XmlEvent::StartElement { name, attrs } = &events[0] else {
         panic!("events[0] should be StartElement");
     };
-    assert_eq!(name, "a");
+    assert_eq!(name.as_ref(), "a");
     assert!(attrs.is_empty());
 }
 
@@ -246,7 +246,7 @@ fn malformed_attribute_no_quote() {
     let XmlEvent::StartElement { name, attrs } = &events[0] else {
         panic!("events[0] should be StartElement");
     };
-    assert_eq!(name, "a");
+    assert_eq!(name.as_ref(), "a");
     assert!(attrs.is_empty());
 }
 
@@ -256,7 +256,7 @@ fn malformed_attribute_unclosed_quote() {
     let XmlEvent::StartElement { name, attrs } = &events[0] else {
         panic!("events[0] should be StartElement");
     };
-    assert_eq!(name, "a");
+    assert_eq!(name.as_ref(), "a");
     assert!(attrs.is_empty());
 }
 
@@ -279,7 +279,7 @@ fn text_before_and_after_comment() {
 fn doctype_skipped() {
     let events = events_from("<!DOCTYPE html><root/>");
     assert_eq!(events.len(), 2);
-    assert!(matches!(&events[0], XmlEvent::StartElement { name, .. } if name == "root"));
+    assert!(matches!(&events[0], XmlEvent::StartElement { name, .. } if name.as_ref() == "root"));
 }
 
 #[test]
@@ -319,7 +319,7 @@ fn eof_inside_comment_is_error() {
     let mut reader = XmlReader::new(std::io::Cursor::new(xml));
     reader.set_trim_text(true);
     let e1 = reader.next_event().unwrap();
-    assert!(matches!(e1, XmlEvent::StartElement { name, .. } if name == "a"));
+    assert!(matches!(e1, XmlEvent::StartElement { name, .. } if name.as_ref() == "a"));
     let e2 = reader.next_event();
     assert!(e2.is_err());
     let err = e2.unwrap_err();

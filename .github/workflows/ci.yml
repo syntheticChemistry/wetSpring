@@ -52,6 +52,18 @@ jobs:
       - run: cargo check --features json
         working-directory: barracuda
 
+  validate-release:
+    name: Release validators (FMA/LTO drift)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Vulkan stack (wgpu with --features gpu)
+        run: sudo apt-get update && sudo apt-get install -y mesa-vulkan-drivers libvulkan1
+      - name: Run release validation suite
+        run: ./scripts/validate_release.sh
+
   coverage-barracuda:
     name: Coverage — barracuda (90% gate)
     runs-on: ubuntu-latest

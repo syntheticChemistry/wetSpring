@@ -2,7 +2,7 @@
 
 **Date:** March 23, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V132 — 379 experiments, 5,707+ validation checks, ALL PASS; **1,776** tests (0 code failures), 354 binaries, standalone `barraCuda` **v0.3.7** (wgpu 28, 806+ WGSL shaders), toadStool S155, coralReef Phase 10. **V132:** `ValidationSink`, `PROVENANCE_REGISTRY`, `IpcError::is_recoverable`, `normalize_method`, `DeviceCapabilities`, ecosystem wiring (sweetGrass braids, `StreamItem`, `performance_surface`), **workspace `lints.workspace` (first Spring to adopt)**. V130 Anderson Hormesis (carried forward): `bio::hormesis` (biphasic dose-response, 14 tests), `bio::binding_landscape` (colonization resistance, IPR/localization, 17 tests), 4 new tolerance constants, Phase 4 methodology (computation as experiment preprocessor), experiments 377–379, cross-spring joint experiment with healthSpring. V129: deep debt evolution — `cast` module (15 safe numeric helpers, ~170 raw casts migrated across 62 files), unconditional `primal_names` module, nautilus fix. 24 capabilities, 16 domains. 64 papers reproduced (14 new: Anderson Hormesis), 46 at full CPU+GPU+metalForge. 0 local WGSL, 0 local math duplication, 109 bio modules.
+**Status:** V133 — **379** experiments indexed (376 completed + 3 PROPOSED), **5,707+** validation checks, ALL PASS; **1,781** tests (1,529 barracuda + 252 forge; 0 code failures); **333** workspace binaries (**307** validate + 23 benchmark + 3 tools); standalone `barraCuda` **v0.3.7** (**150+** primitives consumed; wgpu 28, 806+ WGSL shaders), toadStool S155, coralReef Phase 10. **V133:** deep evolution sprint — `validate_all` meta-runner, `GpuContext` / `TensorSession` device sharing, `performance_surface` client wired to toadStool RPCs, zero-copy I/O on hot paths (`Arc<Path>`, `Arc<str>` pools), IPC `message` + `dispatch_strategy`, **234** named tolerances, **44** GPU modules, **49** CPU bio modules. **V132:** `ValidationSink`, `PROVENANCE_REGISTRY`, `IpcError::is_recoverable`, `normalize_method`, `DeviceCapabilities`, ecosystem wiring (sweetGrass braids, `StreamItem`, `performance_surface`), **workspace `lints.workspace` (first Spring to adopt)**. V130 Anderson Hormesis (carried forward): `bio::hormesis` (biphasic dose-response, 14 tests), `bio::binding_landscape` (colonization resistance, IPR/localization, 17 tests), 4 new tolerance constants, Phase 4 methodology (computation as experiment preprocessor), experiments 377–379, cross-spring joint experiment with healthSpring. V129: deep debt evolution — `cast` module (15 safe numeric helpers, ~170 raw casts migrated across 62 files), unconditional `primal_names` module, nautilus fix. 24 capabilities, 16 domains. 64 papers reproduced (14 new: Anderson Hormesis), 46 at full CPU+GPU+metalForge. 0 local WGSL, 0 local math duplication.
 
 ---
 
@@ -23,6 +23,21 @@ Python/Galaxy baseline
 
 Every stage is validated with explicit numerical checks. All data is open.
 All code is AGPL-3.0.
+
+## V133 — Deep evolution sprint
+
+V133 is a **deep evolution sprint** focused on cross-ecosystem absorption and debt
+resolution: a **`validate_all` meta-runner** (aggregate validation entry point),
+**`GpuContext` / `TensorSession`** layering over shared `Arc<WgpuDevice>`,
+**`check_relative` / `check_abs_or_rel`** on the validation `Validator` (groundSpring
+V120-style tolerances), **`performance_surface` fully implemented** and wired to
+toadStool `compute.performance_surface.*`, **zero-copy I/O** in MS2/XML (`Arc<Path>`,
+`Arc<str>` pools), **structured IPC** (`ipc/message`, `ipc/dispatch_strategy`),
+`scripts/validate_release.sh`, and **feature-gate cleanup** (GPU-heavy binaries;
+`--no-default-features` builds clean). Quality bar: **1,781** tests, **307** validation
+binaries with provenance discipline, **234** named tolerances, **0** clippy warnings
+(pedantic + nursery), **0** `unsafe`. See companion handoffs under `wateringHole/handoffs/`
+for barraCuda/toadStool asks and cross-primal absorption notes.
 
 ## Faculty Summary
 
@@ -112,13 +127,13 @@ Every paper goes through the full evolution. Status across all 63 papers:
 | Pure GPU streaming | Zero CPU round-trips, data stays on-device | 8 streaming experiments, unidirectional proof (0.10ms overhead, Exp255) |
 | metalForge | Same answer on CPU, GPU, NPU | 63/63 papers, 37+ domains |
 | NPU reservoir | ESN → int8 → NPU preserves classification (Cholesky solve) | 59 checks, 6 domains |
-| Cross-spring evolution | 767+ WGSL shaders traced to origin springs, 144 barraCuda primitives consumed | 21 checks |
+| Cross-spring evolution | 767+ WGSL shaders traced to origin springs, 150+ barraCuda primitives consumed | 21 checks |
 | NCBI-scale hypothesis | Real NCBI data + GPU-confirmed Anderson/QS/pangenome | 146 checks |
 | 3D Anderson dimensional QS | hotSpring spectral primitives → ecological predictions | 50 checks |
 | biomeOS IPC integration | JSON-RPC science primal, GPU-aware dispatch, Songbird registration | 321 checks (Exp203-208) |
 | petalTongue visualization | 9 DataChannel types, 33 scenario builders, StreamSession, Songbird capabilities, IPC science→viz wiring | 78 checks (Exp333-334) |
 | **V110 live viz + Anderson H3** | petalTongue live dashboards (IPC push + JSON export), all 9 DataChannel types validated with real math, stream_ecology module, Anderson QS O₂-modulated W model (H3, r=0.851 vs 10 environments), biomeOS/NUCLEUS readiness probing | 111 checks (Exp353-356) |
-| Code quality audit | 94.01% line (barracuda), 90%+ (forge), **streaming-only I/O** (buffering `parse_*` removed), 0 production mocks, standalone `barraCuda` v0.3.7, `deny(missing_docs)`, `forbid(unsafe_code)` on all 356 crate roots, clippy pedantic + nursery ZERO WARNINGS, 214 named tolerances, **capability-based runtime discovery**, typed error enums (`VaultError`/`NestError`/`SongbirdError`/`AssemblyError`), 7 large files refactored into domain submodules, `proptest` property-based testing, **zero `#[allow()]` in entire codebase** — all `#[expect(reason)]` with self-documenting justifications across 276+ binaries | 1,776 tests (workspace total; barracuda + forge + integration) |
+| Code quality audit | 94.01% line (barracuda), 90%+ (forge), **streaming-only I/O** (buffering `parse_*` removed), 0 production mocks, standalone `barraCuda` v0.3.7 (150+ primitives consumed), `deny(missing_docs)`, `forbid(unsafe_code)` on all 356 crate roots, clippy pedantic + nursery ZERO WARNINGS, **234** named tolerances, **44** GPU modules, **49** CPU bio modules, **capability-based runtime discovery**, typed error enums (`VaultError`/`NestError`/`SongbirdError`/`AssemblyError`), 7 large files refactored into domain submodules, `proptest` property-based testing, **zero `#[allow()]` in entire codebase** — all `#[expect(reason)]` with self-documenting justifications across **333** workspace binaries | **1,781** tests (1,529 barracuda + 252 forge + integration) |
 | V66 dispatch evolution | Forge dispatch routing (29 workloads), streaming topology (PCIe bypass), NUCLEUS Tower/Node/Nest model, absorption audit (0 local WGSL) | 49 checks (Exp213) |
 | V66 NUCLEUS V8 | IPC dispatch with V66 I/O evolution (byte-native FASTQ, bytemuck nanopore, streaming MS2), Nest metrics, CPU fallback parity, full pipeline chain | 49 checks (Exp214) |
 | **V84 pipeline buildout** | Paper→CPU→GPU→Streaming proven end-to-end: 32 papers, 26 CPU domains, 21 GPU domains, Python parity, 0.10ms streaming overhead | 172 checks (Exp251-255) |

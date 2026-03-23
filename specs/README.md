@@ -1,7 +1,7 @@
 # wetSpring Specifications
 
-**Last Updated**: March 16, 2026
-**Status**: V126 — 5,707+ checks (376 experiments, 354 binaries), 1,443+ tests. V125: structured `IpcError` enum (28 sites, healthSpring/biomeOS pattern), dual-format `extract_capabilities()` (groundSpring/ludoSpring), generic `socket_env_var()`/`discover_primal()` (sweetGrass pattern), 18 binary OrExit import fixes. V126: `DispatchOutcome<T>` protocol vs application error separation, `health.liveness`/`health.readiness` probes, `IpcError` query helpers (`is_retriable()`/`is_timeout_likely()`/`is_method_not_found()`/`is_connection_error()`). V124: workspace `deny.toml`, typed `compute.dispatch` IPC client, structured `tracing`. V123: zero-panic `OrExit`, dual-format discovery, `extract_rpc_error()`. V122: `#[expect(reason)]` across 276+ binaries, zero `#[allow()]`. Zero unsafe, clippy pedantic+nursery zero warnings.
+**Last Updated**: March 23, 2026
+**Status**: V133 — 5,707+ checks (379 experiments, 307 validation binaries, 333 total), 1,781 tests. V125: structured `IpcError` enum (28 sites, healthSpring/biomeOS pattern), dual-format `extract_capabilities()` (groundSpring/ludoSpring), generic `socket_env_var()`/`discover_primal()` (sweetGrass pattern), 18 binary OrExit import fixes. V126: `DispatchOutcome<T>` protocol vs application error separation, `health.liveness`/`health.readiness` probes, `IpcError` query helpers (`is_retriable()`/`is_timeout_likely()`/`is_method_not_found()`/`is_connection_error()`). V124: workspace `deny.toml`, typed `compute.dispatch` IPC client, structured `tracing`. V123: zero-panic `OrExit`, dual-format discovery, `extract_rpc_error()`. V122: `#[expect(reason)]` across 276+ binaries, zero `#[allow()]`. Zero unsafe, clippy pedantic+nursery zero warnings.
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -10,8 +10,8 @@
 
 | Metric | Value |
 |--------|-------|
-| CPU validation | 1,476+/1,476+ PASS — 47 modules, 334 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
-| GPU validation | 1,945+/1,945+ PASS — 150+ primitives (standalone barraCuda v0.3.5, always-on, 264 ComputeDispatch ops), 0 local WGSL (fully lean) |
+| CPU validation | 1,476+/1,476+ PASS — 47 modules, 379 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
+| GPU validation | 1,945+/1,945+ PASS — 150+ primitives (standalone barraCuda v0.3.7, always-on, 264 ComputeDispatch ops), 0 local WGSL (fully lean) |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 546/546 — 22.5x Rust speedup over Python (v1–v9) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/101/164) — pure GPU math proven |

@@ -6,6 +6,7 @@ use crate::error::{Error, Result};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
+use std::sync::Arc;
 
 /// Streaming iterator that yields one [`Ms2Spectrum`] at a time without
 /// buffering the entire file.
@@ -15,7 +16,7 @@ use std::path::Path;
 pub struct Ms2Iter {
     reader: Box<dyn BufRead>,
     line_buf: String,
-    path: std::path::PathBuf,
+    path: Arc<Path>,
     pending: Option<Ms2Spectrum>,
     done: bool,
 }
@@ -27,15 +28,16 @@ impl Ms2Iter {
     ///
     /// Returns [`Error::Io`] if the file cannot be opened.
     pub fn open(path: &Path) -> Result<Self> {
+        let arc_path: Arc<Path> = path.into();
         let file = File::open(path).map_err(|e| Error::Io {
-            path: path.to_path_buf(),
+            path: arc_path.to_path_buf(),
             source: e,
         })?;
         let reader: Box<dyn BufRead> = Box::new(BufReader::new(file));
         Ok(Self {
             reader,
             line_buf: String::new(),
-            path: path.to_path_buf(),
+            path: arc_path,
             pending: None,
             done: false,
         })
@@ -163,7 +165,7 @@ impl Iterator for Ms2Iter {
                 Err(e) => {
                     self.done = true;
                     return Some(Err(Error::Io {
-                        path: self.path.clone(),
+                        path: self.path.to_path_buf(),
                         source: e,
                     }));
                 }

@@ -45,7 +45,7 @@ serde = { version = "1", features = ["derive"], optional = true }
 # serde_json: JSON parsing for validation data and model import (2 binaries).
 serde_json = { version = "1", optional = true }
 
-# barraCuda — standalone math primal (v0.3.5, HEAD 03986ce). Pure math + GPU compute.
+# barraCuda — standalone math primal (v0.3.7). Pure math + GPU compute.
 # default-features = false: no wgpu/bytemuck pulled in for CPU builds.
 # When `gpu` feature is active, `barracuda/gpu` enables GPU ops.
 # 150+ primitives consumed. 694+ WGSL shaders. wgpu 28. MSRV 1.87.
@@ -113,6 +113,11 @@ path = "src/bin/validate_fastq.rs"
 [[bin]]
 name = "validate_diversity"
 path = "src/bin/validate_diversity.rs"
+
+# ── Meta-runner: core CPU validation suite ────────────────────────
+[[bin]]
+name = "validate_all"
+path = "src/bin/validate_all.rs"
 
 # ── Track 2 validation binaries ──────────────────────────────────
 [[bin]]
@@ -1651,11 +1656,13 @@ path = "src/bin/validate_metalforge_v16.rs"
 [[bin]]
 name = "validate_cross_spring_evolution_v98"
 path = "src/bin/validate_cross_spring_evolution_v98.rs"
+required-features = ["gpu"]
 
 # ── Exp320: V98+ Cross-Spring Evolution Benchmark ──
 [[bin]]
 name = "benchmark_cross_spring_evolution_v98"
 path = "src/bin/benchmark_cross_spring_evolution_v98.rs"
+required-features = ["gpu"]
 
 # ── Exp321: V98+ biomeOS/NUCLEUS Integration Validation ──
 [[bin]]
@@ -1684,6 +1691,7 @@ required-features = ["gpu"]
 [[bin]]
 name = "validate_metalforge_v17"
 path = "src/bin/validate_metalforge_v17.rs"
+required-features = ["ipc"]
 
 # ── petalTongue visualization scenarios ──
 [[bin]]
@@ -1804,14 +1812,17 @@ required-features = ["ipc"]
 [[bin]]
 name = "validate_petaltongue_anderson_v1"
 path = "src/bin/validate_petaltongue_anderson_v1.rs"
+required-features = ["json"]
 
 [[bin]]
 name = "validate_petaltongue_biogas_v1"
 path = "src/bin/validate_petaltongue_biogas_v1.rs"
+required-features = ["json"]
 
 [[bin]]
 name = "validate_anderson_qs_environments_v1"
 path = "src/bin/validate_anderson_qs_environments_v1.rs"
+required-features = ["json"]
 
 [[bin]]
 name = "validate_precision_brain_v1"
@@ -1846,6 +1857,7 @@ required-features = ["gpu", "ipc"]
 [[bin]]
 name = "validate_adaptive_dispatch_v1"
 path = "src/bin/validate_adaptive_dispatch_v1.rs"
+required-features = ["json"]
 
 [[bin]]
 name = "validate_emp_anderson_v1"

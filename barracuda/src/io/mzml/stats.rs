@@ -46,7 +46,7 @@ pub fn stats_from_file(path: &Path) -> Result<MzmlStats> {
             XmlEvent::StartElement {
                 ref name,
                 ref attrs,
-            } => match name.as_str() {
+            } => match name.as_ref() {
                 "spectrum" => {
                     in_spectrum = true;
                     current_ms_level = 1;
@@ -97,7 +97,7 @@ pub fn stats_from_file(path: &Path) -> Result<MzmlStats> {
                 }
                 _ => {}
             },
-            XmlEvent::EndElement { ref name } if name == "spectrum" => {
+            XmlEvent::EndElement { ref name } if name.as_ref() == "spectrum" => {
                 num_spectra += 1;
                 match current_ms_level {
                     1 => ms1 += 1,

@@ -33,6 +33,14 @@
 //! |-------|-------|
 //! | Date | 2026-03-05 |
 //! | Command | `cargo run --release --features gpu --bin validate_pure_gpu_streaming_v10` |
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Type | Pipeline |
+//! | Date | 2026-03-23 |
+//! | Command | `cargo run --features gpu --bin validate_pure_gpu_streaming_v10` |
 
 use std::time::Instant;
 use wetspring_barracuda::bio::diversity;

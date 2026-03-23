@@ -275,8 +275,25 @@ pub struct CheckResult {
     pub actual: f64,
     /// Baseline or expected value.
     pub expected: f64,
-    /// Tolerance used (absolute).
+    /// Absolute tol. ([`Validator::check`]) or relative fraction ([`Validator::check_relative`]).
     pub tolerance: f64,
+}
+
+/// Row from [`Validator::check_abs_or_rel`] (absolute and relative tolerances).
+#[derive(Clone, Debug, PartialEq)]
+pub struct CheckAbsOrRelResult {
+    /// Human-readable check label.
+    pub label: String,
+    /// Whether the check passed.
+    pub passed: bool,
+    /// Observed value.
+    pub actual: f64,
+    /// Baseline or expected value.
+    pub expected: f64,
+    /// Absolute tolerance bound.
+    pub abs_tolerance: f64,
+    /// Relative tolerance (fraction of `expected`).
+    pub rel_tolerance: f64,
 }
 
 /// Receives validation events so results can be routed to stdout, a buffer, or nowhere.
@@ -284,7 +301,13 @@ pub struct CheckResult {
 /// Used by [`Validator`] for CI, biomeOS integration, and tests without coupling to `println!`.
 pub trait ValidationSink: Send {
     /// A single floating-point tolerance check completed.
-    fn on_check(
+    fn on_check(&mut self, label: &str, passed: bool, actual: f64, expected: f64, tolerance: f64);
+
+    /// A single exact count check completed.
+    fn on_check_count(&mut self, label: &str, passed: bool, actual: usize, expected: usize);
+
+    /// A single relative-tolerance float check completed ([`Validator::check_relative`]).
+    fn on_check_relative(
         &mut self,
         label: &str,
         passed: bool,
@@ -293,8 +316,16 @@ pub trait ValidationSink: Send {
         tolerance: f64,
     );
 
-    /// A single exact count check completed.
-    fn on_check_count(&mut self, label: &str, passed: bool, actual: usize, expected: usize);
+    /// A single absolute-or-relative float check completed ([`Validator::check_abs_or_rel`]).
+    fn on_check_abs_or_rel(
+        &mut self,
+        label: &str,
+        passed: bool,
+        actual: f64,
+        expected: f64,
+        abs_tol: f64,
+        rel_tol: f64,
+    );
 
     /// A section header (not counted as a check).
     fn on_section(&mut self, label: &str);
@@ -308,7 +339,17 @@ pub trait ValidationSink: Send {
 pub struct StdoutSink;
 
 impl ValidationSink for StdoutSink {
-    fn on_check(
+    fn on_check(&mut self, label: &str, passed: bool, actual: f64, expected: f64, tolerance: f64) {
+        let tag = if passed { "OK" } else { "FAIL" };
+        println!("  [{tag}]  {label}: {actual:.6} (expected {expected:.6}, tol {tolerance:.6})");
+    }
+
+    fn on_check_count(&mut self, label: &str, passed: bool, actual: usize, expected: usize) {
+        let tag = if passed { "OK" } else { "FAIL" };
+        println!("  [{tag}]  {label}: {actual} (expected {expected})");
+    }
+
+    fn on_check_relative(
         &mut self,
         label: &str,
         passed: bool,
@@ -317,12 +358,24 @@ impl ValidationSink for StdoutSink {
         tolerance: f64,
     ) {
         let tag = if passed { "OK" } else { "FAIL" };
-        println!("  [{tag}]  {label}: {actual:.6} (expected {expected:.6}, tol {tolerance:.6})");
+        println!(
+            "  [{tag}]  {label}: {actual:.6} (expected {expected:.6}, rel_tol {tolerance:.6})"
+        );
     }
 
-    fn on_check_count(&mut self, label: &str, passed: bool, actual: usize, expected: usize) {
+    fn on_check_abs_or_rel(
+        &mut self,
+        label: &str,
+        passed: bool,
+        actual: f64,
+        expected: f64,
+        abs_tol: f64,
+        rel_tol: f64,
+    ) {
         let tag = if passed { "OK" } else { "FAIL" };
-        println!("  [{tag}]  {label}: {actual} (expected {expected})");
+        println!(
+            "  [{tag}]  {label}: {actual:.6} (expected {expected:.6}, abs_tol {abs_tol:.6}, rel_tol {rel_tol:.6})"
+        );
     }
 
     fn on_section(&mut self, label: &str) {
@@ -349,50 +402,32 @@ impl ValidationSink for StdoutSink {
 pub struct SilentSink;
 
 impl ValidationSink for SilentSink {
-    fn on_check(
-        &mut self,
-        _label: &str,
-        _passed: bool,
-        _actual: f64,
-        _expected: f64,
-        _tolerance: f64,
-    ) {
-    }
+    fn on_check(&mut self, _: &str, _: bool, _: f64, _: f64, _: f64) {}
 
-    fn on_check_count(
-        &mut self,
-        _label: &str,
-        _passed: bool,
-        _actual: usize,
-        _expected: usize,
-    ) {
-    }
+    fn on_check_count(&mut self, _: &str, _: bool, _: usize, _: usize) {}
 
-    fn on_section(&mut self, _label: &str) {}
+    fn on_check_relative(&mut self, _: &str, _: bool, _: f64, _: f64, _: f64) {}
 
-    fn on_finish(&mut self, _name: &str, _passed: u32, _total: u32, _success: bool) {}
+    fn on_check_abs_or_rel(&mut self, _: &str, _: bool, _: f64, _: f64, _: f64, _: f64) {}
+
+    fn on_section(&mut self, _: &str) {}
+
+    fn on_finish(&mut self, _: &str, _: u32, _: u32, _: bool) {}
 }
 
-/// Collects float [`Validator::check`] results into a shared [`Vec`] for later inspection.
-///
-/// The buffer is wrapped in [`std::sync::Arc`] / [`std::sync::Mutex`] so you can clone the handle
-/// before passing the sink to [`Validator::with_sink`] and read captured rows after checks run
-/// (including from other threads if needed).
+/// Collects [`Validator`] float checks into shared [`Vec`]s ([`std::sync::Arc`] / [`std::sync::Mutex`]).
 #[derive(Clone, Debug, Default)]
 pub struct CollectingSink {
-    /// Captured float checks (`on_check` only).
+    /// Captured float checks ([`ValidationSink::on_check`] only).
     pub results: std::sync::Arc<std::sync::Mutex<Vec<CheckResult>>>,
+    /// Relative checks ([`ValidationSink::on_check_relative`]); [`CheckResult::tolerance`] is the relative fraction.
+    pub relative_results: std::sync::Arc<std::sync::Mutex<Vec<CheckResult>>>,
+    /// Captured abs-or-rel checks ([`ValidationSink::on_check_abs_or_rel`]).
+    pub abs_or_rel_results: std::sync::Arc<std::sync::Mutex<Vec<CheckAbsOrRelResult>>>,
 }
 
 impl ValidationSink for CollectingSink {
-    fn on_check(
-        &mut self,
-        label: &str,
-        passed: bool,
-        actual: f64,
-        expected: f64,
-        tolerance: f64,
-    ) {
+    fn on_check(&mut self, label: &str, passed: bool, actual: f64, expected: f64, tolerance: f64) {
         if let Ok(mut guard) = self.results.lock() {
             guard.push(CheckResult {
                 label: label.to_string(),
@@ -404,13 +439,46 @@ impl ValidationSink for CollectingSink {
         }
     }
 
-    fn on_check_count(
+    fn on_check_count(&mut self, _label: &str, _passed: bool, _actual: usize, _expected: usize) {}
+
+    fn on_check_relative(
         &mut self,
-        _label: &str,
-        _passed: bool,
-        _actual: usize,
-        _expected: usize,
+        label: &str,
+        passed: bool,
+        actual: f64,
+        expected: f64,
+        tolerance: f64,
     ) {
+        if let Ok(mut guard) = self.relative_results.lock() {
+            guard.push(CheckResult {
+                label: label.to_string(),
+                passed,
+                actual,
+                expected,
+                tolerance,
+            });
+        }
+    }
+
+    fn on_check_abs_or_rel(
+        &mut self,
+        label: &str,
+        passed: bool,
+        actual: f64,
+        expected: f64,
+        abs_tol: f64,
+        rel_tol: f64,
+    ) {
+        if let Ok(mut guard) = self.abs_or_rel_results.lock() {
+            guard.push(CheckAbsOrRelResult {
+                label: label.to_string(),
+                passed,
+                actual,
+                expected,
+                abs_tolerance: abs_tol,
+                rel_tolerance: rel_tol,
+            });
+        }
     }
 
     fn on_section(&mut self, _label: &str) {}
@@ -485,8 +553,7 @@ impl Validator {
     pub fn check(&mut self, label: &str, actual: f64, expected: f64, tolerance: f64) {
         self.total += 1;
         let pass = (actual - expected).abs() <= tolerance;
-        self.sink
-            .on_check(label, pass, actual, expected, tolerance);
+        self.sink.on_check(label, pass, actual, expected, tolerance);
         if pass {
             self.passed += 1;
         }
@@ -515,6 +582,52 @@ impl Validator {
         let a = usize::try_from(actual).unwrap_or(usize::MAX);
         let e = usize::try_from(expected).unwrap_or(usize::MAX);
         self.sink.on_check_count(label, pass, a, e);
+        if pass {
+            self.passed += 1;
+        }
+    }
+
+    /// Check `actual` against `expected` with relative tolerance:
+    /// `|(actual - expected) / expected| <= tolerance`.
+    ///
+    /// When `expected == 0.0`, uses `|actual - expected| <= tolerance` instead (absolute bound;
+    /// avoids division by zero).
+    pub fn check_relative(&mut self, label: &str, actual: f64, expected: f64, tolerance: f64) {
+        self.total += 1;
+        let pass = if expected == 0.0 {
+            (actual - expected).abs() <= tolerance
+        } else {
+            ((actual - expected) / expected).abs() <= tolerance
+        };
+        self.sink
+            .on_check_relative(label, pass, actual, expected, tolerance);
+        if pass {
+            self.passed += 1;
+        }
+    }
+
+    /// Passes if **either** `|actual - expected| <= abs_tol` **or**
+    /// `|(actual - expected) / expected| <= rel_tol` (when `expected != 0.0`).
+    ///
+    /// When `expected == 0.0`, only the absolute branch applies.
+    pub fn check_abs_or_rel(
+        &mut self,
+        label: &str,
+        actual: f64,
+        expected: f64,
+        abs_tol: f64,
+        rel_tol: f64,
+    ) {
+        self.total += 1;
+        let pass_abs = (actual - expected).abs() <= abs_tol;
+        let pass_rel = if expected == 0.0 {
+            false
+        } else {
+            ((actual - expected) / expected).abs() <= rel_tol
+        };
+        let pass = pass_abs || pass_rel;
+        self.sink
+            .on_check_abs_or_rel(label, pass, actual, expected, abs_tol, rel_tol);
         if pass {
             self.passed += 1;
         }
@@ -557,23 +670,7 @@ impl Validator {
     }
 }
 
-/// Zero-panic error handling for validation infrastructure.
-///
-/// Replaces `.expect("msg")` and `.unwrap()` in validation binaries with
-/// clean stderr + `process::exit(1)` — no panic, deterministic exit code.
-/// Follows the groundSpring V109 zero-panic validation pattern.
-///
-/// # Examples
-///
-/// ```
-/// use wetspring_barracuda::validation::OrExit;
-///
-/// let val: Result<i32, &str> = Ok(42);
-/// assert_eq!(val.or_exit("should not fail"), 42);
-///
-/// let opt: Option<i32> = Some(7);
-/// assert_eq!(opt.or_exit("should not be None"), 7);
-/// ```
+/// Zero-panic error handling: [`Result::unwrap`]/[`Option::expect`] replacement via stderr + exit 1.
 pub trait OrExit<T> {
     /// Unwrap or print to stderr and `process::exit(1)`.
     fn or_exit(self, context: &str) -> T;
@@ -608,11 +705,7 @@ impl<T> OrExit<T> for Option<T> {
 
 pub mod test_data;
 
-/// Domain timing result for multi-domain validators.
-///
-/// Shared struct replacing duplicated `DomainResult` definitions across
-/// S79+ validation binaries (`validate_barrier_disruption_s79`,
-/// `validate_skin_anderson_s79`, etc.).
+/// Per-domain timing row for [`print_domain_summary`].
 #[derive(Debug)]
 pub struct DomainResult {
     /// Domain or section name.
@@ -625,19 +718,14 @@ pub struct DomainResult {
     pub checks: u32,
 }
 
-/// Print a formatted domain summary table.
-///
-/// Renders a box-drawing table with optional Spring column for cross-spring
-/// validators. Totals are computed from the supplied slice.
+/// Box-drawing domain summary table; optional Spring column when any row sets [`DomainResult::spring`].
 pub fn print_domain_summary(title: &str, domains: &[DomainResult]) {
     let has_spring = domains.iter().any(|d| d.spring.is_some());
     let mut total_checks: u32 = 0;
     let mut total_ms: f64 = 0.0;
-
     println!("\n╔════════════════════════════════════════════════════════════════════╗");
     println!("║  {title:<64} ║");
     println!("╠════════════════════════════════════════════════════════════════════╣");
-
     if has_spring {
         println!(
             "║ {:<22} │ {:<18} │ {:>7} │ {:>3} ║",
@@ -646,9 +734,7 @@ pub fn print_domain_summary(title: &str, domains: &[DomainResult]) {
     } else {
         println!("║ {:<22} │ {:>7} │ {:>3} ║", "Domain", "Time", "✓");
     }
-
     println!("╠════════════════════════════════════════════════════════════════════╣");
-
     for d in domains {
         total_checks += d.checks;
         total_ms += d.ms;
@@ -662,7 +748,6 @@ pub fn print_domain_summary(title: &str, domains: &[DomainResult]) {
             println!("║ {:<22} │ {:>5.1}ms │ {:>3} ║", d.name, d.ms, d.checks);
         }
     }
-
     println!("╠════════════════════════════════════════════════════════════════════╣");
     if has_spring {
         println!(

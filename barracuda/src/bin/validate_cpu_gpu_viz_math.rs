@@ -19,6 +19,14 @@
 //!
 //! Reference: Exp323 (CPU v25), Exp324 (GPU v14), Exp327 (Viz V1).
 //! Tolerances from `tolerances::GPU_VS_CPU_F64` (1e-6).
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Type | GPU parity |
+//! | Date | 2026-03-23 |
+//! | Command | `cargo run --features gpu,json --bin validate_cpu_gpu_viz_math` |
 
 use wetspring_barracuda::bio::{
     diversity, diversity_gpu, kmd, kmd_gpu, pcoa, pcoa_gpu, qs_biofilm,

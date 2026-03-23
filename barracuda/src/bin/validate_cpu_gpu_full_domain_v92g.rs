@@ -85,10 +85,7 @@ fn main() {
     let caps = gpu.capabilities();
     println!(
         "  Backend: {:?}, device_type: {:?}, device_name: {}, f64_shaders: {}",
-        caps.backend,
-        caps.device_type,
-        caps.device_name,
-        caps.f64_shaders
+        caps.backend, caps.device_type, caps.device_name, caps.f64_shaders
     );
     println!();
 

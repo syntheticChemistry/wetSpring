@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-23 (V132: 379 experiments, 354 binaries, 5,707+ checks, **1,776** tests. V132: `ValidationSink`, `PROVENANCE_REGISTRY`, `IpcError::is_recoverable`, `normalize_method`, `DeviceCapabilities`, sweetGrass braids + `StreamItem` + `performance_surface`, workspace lints. V130 Anderson Hormesis: `bio::hormesis`, `bio::binding_landscape`, Phase 4 methodology. V129: Deep debt evolution — `cast` module (15 helpers), unconditional `primal_names`, nautilus fix. Zero local math duplication, zero `#[allow()]`, zero clippy warnings, zero unsafe.)
+**Updated**: 2026-03-23 (V133: 379 experiments indexed (376 completed + 3 PROPOSED), **333** binaries (**307** validate + 23 benchmark + 3 tools), 5,707+ checks, **1,781** tests (1,529 barracuda + 252 forge). V133: deep evolution sprint — `validate_all`, `GpuContext`/`TensorSession`, `performance_surface` RPCs, zero-copy I/O, IPC routing modules, 234 tolerances / 44 GPU / 49 CPU bio modules. V132: `ValidationSink`, `PROVENANCE_REGISTRY`, `IpcError::is_recoverable`, `normalize_method`, `DeviceCapabilities`, sweetGrass braids + `StreamItem` + `performance_surface`, workspace lints. V130 Anderson Hormesis: `bio::hormesis`, `bio::binding_landscape`, Phase 4 methodology. V129: Deep debt evolution — `cast` module (15 helpers), unconditional `primal_names`, nautilus fix. Zero local math duplication, zero `#[allow()]`, zero clippy warnings, zero unsafe.)
 
 ---
 
@@ -413,13 +413,13 @@ thresholds from `src/tolerances.rs`.
 | `validate_r_industry_parity` | 335 | 53 | `cargo run --release --bin validate_r_industry_parity` |
 
 **Total validation checks**: 5,707+
-**Rust tests**: **1,776** total (workspace)
-**Binaries**: 354 total (332 barracuda + 22 forge)
+**Rust tests**: **1,781** total (1,529 barracuda + 252 forge)
+**Binaries**: **333** total (**307** validate + 23 benchmark + 3 tools)
 **barraCuda primitives**: 150+ consumed (standalone v0.3.7, wgpu 28, Fp64Strategy, fused ops)
 **Papers**: 63 (reproduced across 6 tracks)
 **Local WGSL shaders**: 0 (all absorbed)
-**GPU modules**: 47 total (35 lean + 12 compose + 5 write-to-lean ODE)
-**Named tolerances**: 200+ across 4 submodules (bio, gpu, spectral, instrument)
+**GPU modules**: **44** total
+**Named tolerances**: **234** across 4 submodules (bio, gpu, spectral, instrument)
 **Benchmark infrastructure**: `bench.rs` harness with RAPL + nvidia-smi energy profiling, JSON output
 
 ### V97c — Fused Ops Chain (Exp306-310)
@@ -645,7 +645,7 @@ primal discovery (env → XDG → BIOMEOS_SOCKET_DIR → temp), forge lint parit
 false-positives resolved (all `panic!()` and `unwrap()` confirmed test-only).
 31 IPC tests pass, 19 files changed (342+, 130−).
 
-**Totals through Exp376:** 376 experiments, 354 binaries, 5,707+ checks.
+**Totals (V133 index):** 379 experiments indexed (376 completed + 3 PROPOSED), 333 binaries, 5,707+ checks, 1,781 tests.
 
 ### Exp377: Hormesis Biphasic Dose-Response Model (PROPOSED)
 
@@ -671,7 +671,7 @@ resist pathogen colonization better than low-diversity strong-binding communitie
 Module: `bio::binding_landscape` (17 unit tests passing). Joint with healthSpring
 exp097/exp098.
 
-**Totals: 379 experiments, 354 binaries, 5,707+ checks, 1,776 tests.**
+**Totals: 379 experiments indexed, 333 binaries, 5,707+ checks, 1,781 tests.**
 
 ---
 

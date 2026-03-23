@@ -67,6 +67,14 @@
 //! # Quality Gate
 //!
 //! exit 0 = all checks pass; exit 1 = at least one failure
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Type | Cross-spring |
+//! | Date | 2026-03-23 |
+//! | Command | `cargo run --bin validate_cross_spring_s93` |
 
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};

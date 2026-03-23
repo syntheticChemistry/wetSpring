@@ -72,7 +72,12 @@ fn main() {
     let labels: Vec<String> = (1..=3).map(|i| format!("Sample{i}")).collect();
 
     let h = diversity::shannon(&samples[0]);
-    v.check("Shannon H' (sample 0)", h, 1.9024, tolerances::ASYMPTOTIC_LIMIT);
+    v.check(
+        "Shannon H' (sample 0)",
+        h,
+        1.9024,
+        tolerances::ASYMPTOTIC_LIMIT,
+    );
 
     let bc = diversity::bray_curtis_matrix(&samples);
     v.check_pass("Bray-Curtis matrix non-empty", !bc.is_empty());
@@ -86,7 +91,12 @@ fn main() {
     let y0 = [0.01, 0.0, 0.0, 0.0, 0.0];
     let ode_result = qs_biofilm::run_scenario(&y0, 10.0, tolerances::ODE_DEFAULT_DT, &params);
     v.check_pass("ODE integration completes", ode_result.steps > 0);
-    v.check("ODE final B > 0", ode_result.y_final[0], 0.938, tolerances::ODE_STEADY_STATE);
+    v.check(
+        "ODE final B > 0",
+        ode_result.y_final[0],
+        0.938,
+        tolerances::ODE_STEADY_STATE,
+    );
 
     // ── B3: Visualization Export ──
     v.section("B3 — petalTongue Visualization Export");

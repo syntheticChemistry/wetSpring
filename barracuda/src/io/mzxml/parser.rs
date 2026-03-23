@@ -63,7 +63,7 @@ impl Iterator for MzxmlIter {
                         ref name,
                         ref attrs,
                     } => {
-                        if name == "scan" {
+                        if name.as_ref() == "scan" {
                             let mut b = ScanBuilder::default();
                             for (k, v) in attrs {
                                 match k.as_str() {
@@ -81,7 +81,7 @@ impl Iterator for MzxmlIter {
                                 }
                             }
                             builder = Some(b);
-                        } else if name == "peaks" && builder.is_some() {
+                        } else if name.as_ref() == "peaks" && builder.is_some() {
                             in_peaks = true;
                             peaks_text.clear();
                             peaks_precision = 32;
@@ -117,7 +117,7 @@ impl Iterator for MzxmlIter {
                         }
                     }
                     XmlEvent::EndElement { ref name } => {
-                        if name == "peaks" {
+                        if name.as_ref() == "peaks" {
                             in_peaks = false;
                             if let Some(ref mut b) = builder {
                                 match decode_peaks(
@@ -134,7 +134,7 @@ impl Iterator for MzxmlIter {
                                     Err(e) => return Some(Err(e)),
                                 }
                             }
-                        } else if name == "scan" {
+                        } else if name.as_ref() == "scan" {
                             return builder.take().map(|b| Ok(b.build()));
                         }
                     }

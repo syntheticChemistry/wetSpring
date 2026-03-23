@@ -135,7 +135,7 @@ impl Iterator for MzmlIter {
                     XmlEvent::StartElement {
                         ref name,
                         ref attrs,
-                    } => match name.as_str() {
+                    } => match name.as_ref() {
                         "spectrum" => {
                             let idx = attrs
                                 .iter()
@@ -175,7 +175,7 @@ impl Iterator for MzmlIter {
                             binary_state.text.push_str(text);
                         }
                     }
-                    XmlEvent::EndElement { ref name } => match name.as_str() {
+                    XmlEvent::EndElement { ref name } => match name.as_ref() {
                         "spectrum" => {
                             return builder.take().map(|b| Ok(b.build()));
                         }

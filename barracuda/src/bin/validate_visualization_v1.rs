@@ -17,6 +17,14 @@
 //! Reference: `dump_wetspring_scenarios.rs` (Exp327 companion).
 //! Follows `hotSpring` validation pattern: hardcoded expected, explicit
 //! pass/fail, exit code 0/1.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Type | Visualization |
+//! | Date | 2026-03-23 |
+//! | Command | `cargo run --features json --bin validate_visualization_v1` |
 
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;

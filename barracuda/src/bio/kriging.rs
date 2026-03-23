@@ -14,21 +14,28 @@
 //!
 //! # Example
 //!
-//! ```ignore
+//! `no_run` — example compiles but does not execute (needs a real [`GpuF64`](crate::gpu::GpuF64)
+//! and crate feature `gpu`).
+//!
+//! ```no_run
 //! use wetspring_barracuda::bio::kriging::{interpolate_diversity, SpatialSample, VariogramConfig};
+//! use wetspring_barracuda::error::Result;
 //! use wetspring_barracuda::gpu::GpuF64;
 //!
-//! let sites = vec![
-//!     SpatialSample { x: 0.0, y: 0.0, value: 2.3 },   // Shannon at site A
-//!     SpatialSample { x: 100.0, y: 0.0, value: 1.8 },  // Shannon at site B
-//!     SpatialSample { x: 50.0, y: 80.0, value: 2.5 },   // Shannon at site C
-//! ];
-//! let targets = vec![(25.0, 40.0), (75.0, 40.0)];
-//! let config = VariogramConfig::spherical(0.0, 0.3, 120.0);
+//! fn main() -> Result<()> {
+//!     let gpu: GpuF64 = todo!();
+//!     let sites = vec![
+//!         SpatialSample { x: 0.0, y: 0.0, value: 2.3 },
+//!         SpatialSample { x: 100.0, y: 0.0, value: 1.8 },
+//!         SpatialSample { x: 50.0, y: 80.0, value: 2.5 },
+//!     ];
+//!     let targets = vec![(25.0, 40.0), (75.0, 40.0)];
+//!     let config = VariogramConfig::spherical(0.0, 0.3, 120.0);
 //!
-//! let result = interpolate_diversity(&gpu, &sites, &targets, &config)?;
-//! // result.values[0] = interpolated Shannon at (25, 40)
-//! // result.variances[0] = uncertainty estimate
+//!     let result = interpolate_diversity(&gpu, &sites, &targets, &config)?;
+//!     let _ = (result.values.get(0), result.variances.get(0));
+//!     Ok(())
+//! }
 //! ```
 
 use crate::error::{Error, Result};

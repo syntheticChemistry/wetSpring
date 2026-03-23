@@ -85,13 +85,29 @@ pub fn relative_diff(a: f64, b: f64) -> f64 {
 
 /// Kahan compensated summation for improved accuracy over large arrays.
 ///
-/// Delegates to `barracuda::shaders::precision::cpu::kahan_sum` — the
-/// canonical implementation. Standard `Iterator::sum()` accumulates O(n)
-/// floating-point error; Kahan summation reduces this to O(1).
+/// With the `gpu` feature, delegates to `barracuda::shaders::precision::cpu::kahan_sum`
+/// — the canonical implementation. Otherwise uses an equivalent local loop.
+/// Standard `Iterator::sum()` accumulates O(n) floating-point error; Kahan
+/// summation reduces this to O(1).
 #[inline]
 #[must_use]
 pub fn kahan_sum(values: &[f64]) -> f64 {
-    barracuda::shaders::precision::cpu::kahan_sum(values)
+    #[cfg(feature = "gpu")]
+    {
+        barracuda::shaders::precision::cpu::kahan_sum(values)
+    }
+    #[cfg(not(feature = "gpu"))]
+    {
+        let mut sum = 0.0_f64;
+        let mut c = 0.0_f64;
+        for &x in values {
+            let y = x - c;
+            let t = sum + y;
+            c = (t - sum) - y;
+            sum = t;
+        }
+        sum
+    }
 }
 
 #[cfg(test)]

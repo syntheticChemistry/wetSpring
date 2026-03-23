@@ -450,49 +450,65 @@ mod tests {
 
     #[test]
     fn ipc_recoverable_rpc_standard_codes() {
-        assert!(!IpcError::RpcReject {
-            code: -32600,
-            message: "bad".into()
-        }
-        .is_recoverable());
-        assert!(!IpcError::RpcReject {
-            code: -32601,
-            message: "nope".into()
-        }
-        .is_recoverable());
-        assert!(!IpcError::RpcReject {
-            code: -32602,
-            message: "bad params".into()
-        }
-        .is_recoverable());
-        assert!(IpcError::RpcReject {
-            code: -32603,
-            message: "internal".into()
-        }
-        .is_recoverable());
-        assert!(!IpcError::RpcReject {
-            code: -32700,
-            message: "parse".into()
-        }
-        .is_recoverable());
+        assert!(
+            !IpcError::RpcReject {
+                code: -32600,
+                message: "bad".into()
+            }
+            .is_recoverable()
+        );
+        assert!(
+            !IpcError::RpcReject {
+                code: -32601,
+                message: "nope".into()
+            }
+            .is_recoverable()
+        );
+        assert!(
+            !IpcError::RpcReject {
+                code: -32602,
+                message: "bad params".into()
+            }
+            .is_recoverable()
+        );
+        assert!(
+            IpcError::RpcReject {
+                code: -32603,
+                message: "internal".into()
+            }
+            .is_recoverable()
+        );
+        assert!(
+            !IpcError::RpcReject {
+                code: -32700,
+                message: "parse".into()
+            }
+            .is_recoverable()
+        );
     }
 
     #[test]
     fn ipc_recoverable_rpc_custom_code_uses_message_heuristic() {
-        assert!(IpcError::RpcReject {
-            code: -32000,
-            message: "upstream timeout".into()
-        }
-        .is_recoverable());
-        assert!(IpcError::RpcReject {
-            code: -32001,
-            message: "Service Unavailable: overloaded".into()
-        }
-        .is_recoverable());
-        assert!(!IpcError::RpcReject {
-            code: -32099,
-            message: "business rule violation".into()
-        }
-        .is_recoverable());
+        assert!(
+            IpcError::RpcReject {
+                code: -32000,
+                message: "upstream timeout".into()
+            }
+            .is_recoverable()
+        );
+        assert!(
+            IpcError::RpcReject {
+                code: -32001,
+                message: "Service Unavailable: overloaded".into()
+            }
+            .is_recoverable()
+        );
+        assert!(
+            !IpcError::RpcReject {
+                code: -32099,
+                message: "business rule violation".into()
+            }
+            .is_recoverable()
+        );
     }
 }

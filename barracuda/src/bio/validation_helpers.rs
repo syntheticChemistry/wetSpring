@@ -49,35 +49,38 @@ pub fn load_silva_classifier(ref_dir: &Path) -> Option<NaiveBayesClassifier> {
     let tax_path = ref_dir.join(SILVA_TAX_TSV);
 
     if !fasta_path.exists() || !tax_path.exists() {
-        println!(
-            "  [INFO] SILVA reference not found at {} — skipping taxonomy",
-            ref_dir.display()
+        tracing::info!(
+            ref_dir = %ref_dir.display(),
+            "SILVA reference not found — skipping taxonomy"
         );
         return None;
     }
 
-    println!("  Loading SILVA 138.1 NR99 reference database...");
+    tracing::info!("loading SILVA 138.1 NR99 reference database");
 
     let tax_map = stream_taxonomy_tsv(&tax_path)?;
-    println!("  Loaded {} taxonomy entries", tax_map.len());
+    tracing::info!(
+        taxonomy_entries = tax_map.len(),
+        "loaded SILVA taxonomy TSV"
+    );
 
     let refs = stream_fasta_subsampled(&fasta_path, &tax_map, SILVA_SUBSAMPLE_STRIDE)?;
     let n_total = refs.len().saturating_mul(SILVA_SUBSAMPLE_STRIDE);
 
-    println!(
-        "  Subsampled {} reference sequences from ~{} total",
-        refs.len(),
-        n_total
+    tracing::info!(
+        subsampled = refs.len(),
+        approx_total = n_total,
+        "subsampled SILVA reference sequences"
     );
 
     if refs.is_empty() {
-        println!("  [WARN] No reference sequences loaded — skipping taxonomy");
+        tracing::warn!("no reference sequences loaded — skipping taxonomy");
         return None;
     }
 
-    println!("  Training NaiveBayes classifier (k={SILVA_KMER_SIZE})...");
+    tracing::info!(k_mer = SILVA_KMER_SIZE, "training NaiveBayes classifier");
     let classifier = NaiveBayesClassifier::train(&refs, SILVA_KMER_SIZE);
-    println!("  Classifier ready: {} taxa", classifier.n_taxa());
+    tracing::info!(n_taxa = classifier.n_taxa(), "SILVA classifier ready");
     Some(classifier)
 }
 

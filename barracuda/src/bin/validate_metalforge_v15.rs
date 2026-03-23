@@ -30,6 +30,14 @@
 //! |-------|-------|
 //! | Date | 2026-03-05 |
 //! | Command | `cargo run --release --bin validate_metalforge_v15` |
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Type | Integration |
+//! | Date | 2026-03-23 |
+//! | Command | `cargo run --bin validate_metalforge_v15` |
 
 use std::time::Instant;
 use wetspring_barracuda::bio::diversity;

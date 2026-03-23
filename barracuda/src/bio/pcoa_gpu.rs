@@ -11,10 +11,24 @@
 //!
 //! # Usage
 //!
-//! ```ignore
-//! let condensed = bray_curtis_condensed_gpu(&gpu, &samples)?;
-//! let result = pcoa_gpu(&gpu, &condensed, n_samples, 2)?;
-//! // result.sample_coords(i) = &[axis1, axis2] for sample i
+//! `no_run` — example compiles but does not execute (needs a real [`GpuF64`](crate::gpu::GpuF64)
+//! and crate feature `gpu`).
+//!
+//! ```no_run
+//! use wetspring_barracuda::bio::diversity_gpu::bray_curtis_condensed_gpu;
+//! use wetspring_barracuda::bio::pcoa_gpu::pcoa_gpu;
+//! use wetspring_barracuda::error::Result;
+//! use wetspring_barracuda::gpu::GpuF64;
+//!
+//! fn main() -> Result<()> {
+//!     let gpu: GpuF64 = todo!();
+//!     let samples: Vec<Vec<f64>> = vec![vec![1.0, 2.0, 3.0], vec![2.0, 3.0, 4.0]];
+//!     let n_samples = samples.len();
+//!     let condensed = bray_curtis_condensed_gpu(&gpu, &samples)?;
+//!     let result = pcoa_gpu(&gpu, &condensed, n_samples, 2)?;
+//!     let _ = result.sample_coords(0);
+//!     Ok(())
+//! }
 //! ```
 
 use crate::bio::pcoa::PcoaResult;

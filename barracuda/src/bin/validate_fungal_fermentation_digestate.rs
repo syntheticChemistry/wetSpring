@@ -2,6 +2,14 @@
 #![forbid(unsafe_code)]
 //! Exp340: Zhong 2016 — Fungal fermentation on digestate.
 //! Lightweight validator for single-paper math.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Type | Analytical |
+//! | Date | 2026-03-23 |
+//! | Command | `cargo run --bin validate_fungal_fermentation_digestate` |
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::bio::kinetics::monod;

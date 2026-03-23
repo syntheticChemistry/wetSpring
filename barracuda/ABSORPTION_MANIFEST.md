@@ -1,9 +1,9 @@
 # Absorption Manifest: wetSpring → ToadStool/BarraCuda
 
-**Date:** March 18, 2026 (V129)
+**Date:** March 23, 2026 (V133)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**barraCuda:** standalone v0.3.5 (pure Rust, default-features=false), **toadStool:** S155
-**Status:** 150+ primitives consumed, 44 GPU modules (all lean), 0 local WGSL, 0 local ODE/regression math, 1,443+ tests, 376 experiments, 5,707+ checks, 354 binaries, 214 named tolerances (zero inline literals), `#![forbid(unsafe_code)]`, clippy pedantic+nursery CLEAN, **zero `#[allow()]` in entire codebase**. 24 capabilities across 16 domains. Deploy graph with `fallback = "skip"`. All primal names via `primal_names::*` constants. **V125:** Structured `IpcError` enum (28 sites), `extract_capabilities()` for dual-format parsing, `socket_env_var()`/`discover_primal()` generic helpers, 18 binary fixes. **V126:** `DispatchOutcome<T>` protocol vs application error separation, `health.liveness`/`health.readiness` probes, `IpcError` query helpers (`is_retriable()`/`is_timeout_likely()`/`is_method_not_found()`/`is_connection_error()`). **V124:** `deny.toml`, `compute.dispatch` IPC client, structured `tracing`. **V123:** Zero-panic `OrExit`, dual-format discovery, `extract_rpc_error()`. **See also:** `wateringHole/handoffs/WETSPRING_V125_IPCERROR_CAPABILITIES_DISCOVERY_HANDOFF_MAR16_2026.md`.
+**barraCuda:** standalone v0.3.7 (pure Rust, default-features=false), **toadStool:** S155
+**Status:** 150+ primitives consumed, 44 GPU modules (all lean), 0 local WGSL, 0 local ODE/regression math, 1,790+ tests, 379 indexed (376 completed + 3 proposed), 5,707+ checks, 307 validation binaries, 234 named tolerances (zero inline literals), `#![forbid(unsafe_code)]`, clippy pedantic+nursery CLEAN, **zero `#[allow()]` in entire codebase**. 24 capabilities across 16 domains. Deploy graph with `fallback = "skip"`. All primal names via `primal_names::*` constants. **V133:** `ipc/message.rs` and `ipc/dispatch_strategy.rs` (typed IPC surface), `gpu/context.rs` (`GpuContext` / `TensorSession`), aggregate `validate_all`, zero-copy I/O, complete `performance_surface`. **V125:** Structured `IpcError` enum (28 sites), `extract_capabilities()` for dual-format parsing, `socket_env_var()`/`discover_primal()` generic helpers, 18 binary fixes. **V126:** `DispatchOutcome<T>` protocol vs application error separation, `health.liveness`/`health.readiness` probes, `IpcError` query helpers (`is_retriable()`/`is_timeout_likely()`/`is_method_not_found()`/`is_connection_error()`). **V124:** `deny.toml`, `compute.dispatch` IPC client, structured `tracing`. **V123:** Zero-panic `OrExit`, dual-format discovery, `extract_rpc_error()`. **See also:** `wateringHole/handoffs/WETSPRING_V125_IPCERROR_CAPABILITIES_DISCOVERY_HANDOFF_MAR16_2026.md`.
 
 ---
 
@@ -37,7 +37,7 @@ WGSL          known physics   handoffs/                        delete local
 5. **Backward-compatible lean** — Re-exports and type aliases (not breaking changes)
    when switching from local to upstream.
 
-6. **Named tolerances** — Central constants in `tolerances.rs`, not magic numbers.
+6. **Named tolerances** — Central constants in `tolerances/` (`mod.rs`, `bio/`, `gpu.rs`, `instrument.rs`, `spectral.rs`, `tests.rs`), not magic numbers.
 
 ---
 
@@ -356,9 +356,9 @@ Patterns from hotSpring and neuralSpring that wetSpring leans on:
 - `ValidationHarness` (S59) available but not consumed — wetSpring keeps local `Validator`
   with simpler API (check/check_count/check_pass/section) suited to Python-baseline pattern.
   ToadStool's `ValidationHarness` (check_abs/check_rel/check_upper/check_lower) is
-  richer but would require rewiring 158 binaries for marginal benefit.
+  richer but would require rewiring 307 validation binaries for marginal benefit.
 - `barracuda::tolerances` module (S52) confirmed delivered — closes P2-9.
-  wetSpring's flat `tolerances.rs` (77 domain constants) is complementary.
+  wetSpring's `tolerances/` tree (domain-specific constants under `bio/`, `gpu`, `instrument`, `spectral`) is complementary.
 - All items absorbed. 9/9 evolution requests DONE.
 - 823 lib tests pass, 0 clippy warnings (pedantic+nursery), fmt clean
 

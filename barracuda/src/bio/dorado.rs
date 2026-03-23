@@ -122,9 +122,7 @@ pub fn discover_dorado() -> Option<PathBuf> {
     STANDARD_DORADO_DIRS
         .iter()
         .map(|d| Path::new(d).join(DORADO_BIN_NAME))
-        .chain(std::iter::once(
-            dirs_home().join(".local/bin").join(DORADO_BIN_NAME),
-        ))
+        .chain(dirs_home().map(|h| h.join(".local/bin").join(DORADO_BIN_NAME)))
         .find(|p| p.is_file())
 }
 
@@ -289,8 +287,40 @@ fn count_fastq_reads(data: &[u8]) -> (usize, usize) {
     (n_reads, total_bases)
 }
 
-fn dirs_home() -> PathBuf {
-    std::env::var("HOME").map_or_else(|_| PathBuf::from("/root"), PathBuf::from)
+/// User home for `~/.local/bin` discovery: `$HOME`, `$USERPROFILE`, Linux
+/// proc environ `HOME=`, else [`std::env::current_dir`]. [`None`] if unset.
+fn dirs_home() -> Option<PathBuf> {
+    if let Ok(h) = std::env::var("HOME") {
+        if !h.is_empty() {
+            return Some(PathBuf::from(h));
+        }
+    }
+    if let Ok(h) = std::env::var("USERPROFILE") {
+        if !h.is_empty() {
+            return Some(PathBuf::from(h));
+        }
+    }
+    #[cfg(target_os = "linux")]
+    {
+        if let Some(p) = home_from_proc_self_environ() {
+            return Some(p);
+        }
+    }
+    std::env::current_dir().ok()
+}
+
+#[cfg(target_os = "linux")]
+fn home_from_proc_self_environ() -> Option<PathBuf> {
+    let bytes = std::fs::read("/proc/self/environ").ok()?;
+    for entry in bytes.split(|b| *b == 0) {
+        let line = std::str::from_utf8(entry).ok()?;
+        if let Some(rest) = line.strip_prefix("HOME=") {
+            if !rest.is_empty() {
+                return Some(PathBuf::from(rest));
+            }
+        }
+    }
+    None
 }
 
 #[cfg(test)]

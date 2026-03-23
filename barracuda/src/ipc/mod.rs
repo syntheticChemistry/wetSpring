@@ -58,9 +58,13 @@ pub mod discover;
 #[cfg(feature = "ipc")]
 pub mod dispatch;
 #[cfg(feature = "ipc")]
+pub mod dispatch_strategy;
+#[cfg(feature = "ipc")]
 pub mod handlers;
 #[cfg(feature = "ipc")]
 pub mod mcp;
+#[cfg(feature = "ipc")]
+pub mod message;
 #[cfg(feature = "ipc")]
 pub mod metrics;
 #[cfg(feature = "ipc")]

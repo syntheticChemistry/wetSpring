@@ -1,7 +1,7 @@
 # Python Baseline Manifest
 
 **Generated:** February 27, 2026 (Phase 61 audit — SPDX headers + provenance metadata added)
-**Verified:** March 16, 2026 (V126 — 58 scripts, all present, no orphans. No new scripts since V120.)
+**Verified:** March 23, 2026 (V133 — 58 Python baseline scripts, all present, no orphans. `scripts/validate_release.sh` added in V133 for release validation; Python baselines last expanded at V120 with `tolerances.py`.)
 **Last scripts commit:** V120 (added `scripts/tolerances.py` — shared tolerance constants mirroring Rust)
 
 ## Commit History Clarification

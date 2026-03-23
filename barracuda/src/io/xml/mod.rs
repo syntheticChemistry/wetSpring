@@ -18,6 +18,7 @@ use crate::error::{Error, Result};
 use std::borrow::Cow;
 use std::collections::{HashMap, VecDeque};
 use std::io::BufRead;
+use std::sync::Arc;
 
 const INITIAL_TEXT_BUF_CAPACITY: usize = 4096;
 const INITIAL_TAG_BUF_CAPACITY: usize = 512;
@@ -30,14 +31,14 @@ pub enum XmlEvent {
     /// is queued immediately after.
     StartElement {
         /// Element name (local, no namespace prefix).
-        name: String,
+        name: Arc<str>,
         /// Attribute `(key, value)` pairs (values are XML-unescaped).
         attrs: Vec<(String, String)>,
     },
     /// End of an element.
     EndElement {
         /// Element name.
-        name: String,
+        name: Arc<str>,
     },
     /// Text content between tags (XML-unescaped).
     Text(String),
@@ -48,7 +49,7 @@ pub enum XmlEvent {
 /// Streaming XML pull parser over any [`BufRead`] source.
 ///
 /// Interns element names so repeated tags (e.g. mzML's `cvParam`,
-/// `spectrum`, `binaryDataArray`) share a single `String` allocation
+/// `spectrum`, `binaryDataArray`) share a single [`Arc<str>`] allocation
 /// rather than allocating on every open/close tag.
 pub struct XmlReader<R> {
     reader: R,
@@ -57,7 +58,7 @@ pub struct XmlReader<R> {
     text_buf: Vec<u8>,
     tag_buf: Vec<u8>,
     eof: bool,
-    name_pool: HashMap<Box<str>, String>,
+    name_pool: HashMap<Box<str>, Arc<str>>,
 }
 
 impl<R: BufRead> XmlReader<R> {
@@ -74,16 +75,16 @@ impl<R: BufRead> XmlReader<R> {
         }
     }
 
-    /// Return a `String` for `name`, reusing a prior allocation if the
+    /// Return an [`Arc<str>`] for `name`, reusing a prior allocation if the
     /// same element name was seen before. This avoids per-tag allocation
     /// for the ~6 element names that dominate mzML files.
-    fn intern_name(&mut self, name: &str) -> String {
+    fn intern_name(&mut self, name: &str) -> Arc<str> {
         if let Some(existing) = self.name_pool.get(name) {
             return existing.clone();
         }
-        let owned = name.to_owned();
-        self.name_pool.insert(name.into(), owned.clone());
-        owned
+        let arc = Arc::<str>::from(name.to_owned());
+        self.name_pool.insert(name.into(), arc.clone());
+        arc
     }
 
     /// Enable or disable whitespace trimming of text events.

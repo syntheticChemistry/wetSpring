@@ -47,10 +47,7 @@ pub struct BraidCommitRequest {
 /// Returns `None` when sweetGrass is not present (standalone mode).
 #[must_use]
 pub fn discover_socket() -> Option<PathBuf> {
-    super::discover::discover_socket(
-        &super::discover::socket_env_var(SWEETGRASS),
-        SWEETGRASS,
-    )
+    super::discover::discover_socket(&super::discover::socket_env_var(SWEETGRASS), SWEETGRASS)
 }
 
 /// Record experiment provenance on sweetGrass via `braid.create` then `braid.commit`.
@@ -59,7 +56,10 @@ pub fn discover_socket() -> Option<PathBuf> {
 /// callers should treat this as best-effort telemetry, not a hard error.
 pub fn record_experiment_provenance(create: &BraidRequest, commit: &BraidCommitRequest) {
     let Some(socket) = discover_socket() else {
-        tracing::debug!(primal = SWEETGRASS, "sweetGrass socket not found; skipping braid IPC");
+        tracing::debug!(
+            primal = SWEETGRASS,
+            "sweetGrass socket not found; skipping braid IPC"
+        );
         return;
     };
 
@@ -77,16 +77,16 @@ fn record_experiment_provenance_to(
     create: &BraidRequest,
     commit: &BraidCommitRequest,
 ) -> Result<(), String> {
-    let create_params = serde_json::to_value(create)
-        .map_err(|e| format!("serialize braid.create params: {e}"))?;
+    let create_params =
+        serde_json::to_value(create).map_err(|e| format!("serialize braid.create params: {e}"))?;
     let create_line = serde_json::json!({
         "jsonrpc": "2.0",
         "method": "braid.create",
         "params": create_params,
         "id": 1,
     });
-    let create_req = serde_json::to_string(&create_line)
-        .map_err(|e| format!("encode braid.create: {e}"))?;
+    let create_req =
+        serde_json::to_string(&create_line).map_err(|e| format!("encode braid.create: {e}"))?;
 
     let create_resp = rpc_call(socket, &create_req)?;
     let create_val: Value = serde_json::from_str(create_resp.trim())
@@ -117,8 +117,8 @@ fn record_experiment_provenance_to(
         "params": commit_params,
         "id": 2,
     });
-    let commit_req = serde_json::to_string(&commit_line)
-        .map_err(|e| format!("encode braid.commit: {e}"))?;
+    let commit_req =
+        serde_json::to_string(&commit_line).map_err(|e| format!("encode braid.commit: {e}"))?;
 
     let commit_resp = rpc_call(socket, &commit_req)?;
     let commit_val: Value = serde_json::from_str(commit_resp.trim())
@@ -137,8 +137,8 @@ fn record_experiment_provenance_to(
 }
 
 fn rpc_call(socket: &Path, request: &str) -> Result<String, String> {
-    let stream = UnixStream::connect(socket)
-        .map_err(|e| format!("connect {}: {e}", socket.display()))?;
+    let stream =
+        UnixStream::connect(socket).map_err(|e| format!("connect {}: {e}", socket.display()))?;
 
     stream
         .set_read_timeout(Some(RPC_TIMEOUT))

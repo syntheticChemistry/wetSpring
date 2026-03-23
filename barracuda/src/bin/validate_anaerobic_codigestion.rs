@@ -6,6 +6,14 @@
 )]
 //! Exp336: Yang 2016 — Anaerobic co-digestion phylogenetics.
 //! Lightweight validator for single-paper math.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Type | Analytical |
+//! | Date | 2026-03-23 |
+//! | Command | `cargo run --bin validate_anaerobic_codigestion` |
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;

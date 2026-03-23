@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 19, 2026 (V130 — barraCuda v0.3.5 + toadStool S155 + coralReef Phase 10)
+**Date:** March 23, 2026 (V133 — barraCuda v0.3.7 + toadStool S155 + coralReef Phase 10)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 44 GPU modules + CPU modules + IPC + vault + provenance + visualization (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.5, wgpu 28). 1,579+ tests (0 failures), 379 experiments, 5,707+ checks, 218 named tolerances (zero inline literals), 354 binaries, 109 bio modules. `cargo clippy -D warnings -W pedantic -W nursery` CLEAN, **0 silent fallbacks**, **0 `#[allow()]` in entire codebase**. `#![forbid(unsafe_code)]` on all crate roots. All primal names via `primal_names::*` constants. **V125:** Structured `IpcError` enum (28 sites, healthSpring/biomeOS pattern), dual-format `extract_capabilities()` (groundSpring/ludoSpring), generic `socket_env_var()`/`discover_primal()` (sweetGrass pattern), 18 binary OrExit import fixes — all 354 binaries compile clean. **V126:** `DispatchOutcome<T>` protocol vs application error separation, `health.liveness`/`health.readiness` probes, `IpcError` query helpers (`is_retriable()`/`is_timeout_likely()`/`is_method_not_found()`/`is_connection_error()`). **V124:** Workspace `deny.toml`, typed `compute.dispatch` IPC client, structured `tracing`. **V123:** Zero-panic `OrExit`, dual-format discovery, `extract_rpc_error()`. **V122:** `#[expect(reason)]` across 276+ binaries. **V130:** Anderson Hormesis framework — `bio::hormesis` (biphasic dose-response, 14 tests), `bio::binding_landscape` (colonization resistance, IPR/localization, 17 tests), `bio::kinetics` (centralized Monod/Haldane), 4 new tolerance constants, Phase 4 methodology (computation as experiment preprocessor), 3 new experiments (377–379), healthSpring joint experiment. **See also:** `wateringHole/handoffs/WETSPRING_V130_ANDERSON_HORMESIS_FRAMEWORK_HANDOFF_MAR19_2026.md`.
+**Status:** 44 `bio/*_gpu.rs` modules + CPU modules + IPC + vault + provenance + visualization (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.7, wgpu 28). 1,790+ tests (0 failures), 379 experiments, 5,707+ checks, 234 named tolerances (zero inline literals), 307 validation binaries, 109 bio modules. `cargo clippy -D warnings -W pedantic -W nursery` CLEAN, **0 silent fallbacks**, **0 `#[allow()]` in entire codebase**. `#![forbid(unsafe_code)]` on all crate roots. All primal names via `primal_names::*` constants. **V125:** Structured `IpcError` enum (28 sites, healthSpring/biomeOS pattern), dual-format `extract_capabilities()` (groundSpring/ludoSpring), generic `socket_env_var()`/`discover_primal()` (sweetGrass pattern), 18 binary OrExit import fixes — all 307 validation binaries compile clean. **V126:** `DispatchOutcome<T>` protocol vs application error separation, `health.liveness`/`health.readiness` probes, `IpcError` query helpers (`is_retriable()`/`is_timeout_likely()`/`is_method_not_found()`/`is_connection_error()`). **V124:** Workspace `deny.toml`, typed `compute.dispatch` IPC client, structured `tracing`. **V123:** Zero-panic `OrExit`, dual-format discovery, `extract_rpc_error()`. **V122:** `#[expect(reason)]` across 276+ binaries. **V130:** Anderson Hormesis framework — `bio::hormesis` (biphasic dose-response, 14 tests), `bio::binding_landscape` (colonization resistance, IPR/localization, 17 tests), `bio::kinetics` (centralized Monod/Haldane), 4 new tolerance constants, Phase 4 methodology (computation as experiment preprocessor), 3 new experiments (377–379), healthSpring joint experiment. **V133:** `GpuContext` / `TensorSession` layering; aggregate `validate_all` binary; `Validator::check_relative` / `check_abs_or_rel`; zero-copy I/O paths; IPC/GPU refactors; complete `performance_surface` implementation. **See also:** `wateringHole/handoffs/WETSPRING_V133_DEEP_EVOLUTION_CROSS_ECOSYSTEM_ABSORPTION_HANDOFF_MAR23_2026.md`.
 
 ### Full Lean Phase
 
@@ -69,7 +69,7 @@ ToadStool S39-S62+DF64 (55+ commits since V39) delivered massive infrastructure:
 6. ~~`BatchedOdeRK4Generic<N, P>`~~ → **DELIVERED** (S58) via `OdeSystem` trait + `generate_shader()`; all 5 ODE systems leaned
 7. ~~GPU Top-K selection~~ → **DELIVERED** (S60) — `ops::topk::TopK` (1D indices, WGSL bitonic sort)
 8. ~~NPU int8 quantization helpers~~ → **DELIVERED** (S39) — `quantize_affine_i8`
-9. Tolerance module pattern for ToadStool validation → **DELIVERED** (S52) — `barracuda::tolerances` module with `Tolerance` struct + `check()` + 12 named constants. wetSpring keeps its own flat `tolerances.rs` (77 domain-specific constants) which is complementary.
+9. Tolerance module pattern for ToadStool validation → **DELIVERED** (S52) — `barracuda::tolerances` module with `Tolerance` struct + `check()` + 12 named constants. wetSpring keeps its own `tolerances/` tree (`mod.rs`, `bio/`, `gpu.rs`, `instrument.rs`, `spectral.rs`, `tests.rs`; domain-specific constants) which is complementary.
 
 ### Next Lean Phase: Absorption Candidates
 
@@ -93,15 +93,15 @@ All GPU bio modules are now either Lean (upstream primitive) or Compose
 All modules pass `clippy::pedantic` + `clippy::nursery` (0 warnings, `-D` enforced
 in CI). Zero `#[allow()]` in production code — all lint suppressions use `#[expect(reason)]`.
 `cargo fmt` (0 diffs), `cargo doc` (0 warnings with and without `--all-features`).
-All tolerances centralized in `tolerances/` (214 named constants across 10 submodules —
-includes bio, gpu, spectral, instrument domains; zero inline literals remain).
+All tolerances centralized in `tolerances/` (234 named constants across the `tolerances/`
+tree — `mod`, `bio/*`, `gpu`, `instrument`, `spectral`, `tests`; zero inline literals remain).
 V121: 14 new tolerance constants, ~50 inline literal replacements, crate-level
 `#[allow()]` → `#[expect(reason)]`, all hardcoded primal names → `primal_names::*`.
 `bio::spectral_match` uses `special::{dot, l2_norm}` instead of inline computation.
 `#![deny(unsafe_code)]` enforced crate-wide — **zero unsafe blocks** in library or
 test code as of Feb 24, 2026. Test env-var manipulation refactored to pure-function
 `resolve_data_dir()` pattern, eliminating all `unsafe { set_var/remove_var }` calls.
-All 158 binaries carry `# Provenance` headers. Data paths use `validation::data_dir()`
+All 307 validation binaries carry `# Provenance` headers. Data paths use `validation::data_dir()`
 for capability-based discovery. NCBI API key resolution evolved to capability-based
 cascade (env var → `WETSPRING_DATA_ROOT` → XDG config → legacy paths).
 `flate2` uses `rust_backend` — zero C dependencies (ecoBin compliant). All 42
@@ -178,7 +178,7 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 
 ---
 
-## GPU Modules (42)
+## GPU Modules (44 `bio/*_gpu.rs`)
 
 | Module | Wraps | ToadStool Primitive | Status |
 |--------|-------|-------------------|--------|
@@ -190,13 +190,14 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 | `ani_gpu` | ANI pairwise | `AniBatchF64` | ✅ Lean (Feb 22) |
 | `chimera_gpu` | Chimera GEMM scoring | `GemmCachedF64` | ✅ Promoted (pure GPU) |
 | `dada2_gpu` | DADA2 E-step | `Dada2EStepGpu` | ✅ Lean (Feb 22) |
+| `diversity_fusion_gpu` | Fused Shannon/Simpson/evenness | `DiversityFusionGpu` | ✅ Lean (S63) |
 | `diversity_gpu` | α/β diversity | `BrayCurtisF64`, `FMR` | Lean |
 | `dnds_gpu` | dN/dS GPU | `DnDsBatchF64` | ✅ Lean (Feb 22) |
 | `eic_gpu` | EIC extraction | `FMR` | Lean |
-| `gemm_cached` | Matrix multiply | `GemmCachedF64` | Lean |
 | `hmm_gpu` | HMM forward | `HmmBatchForwardF64` | ✅ Lean (Feb 22) |
-| `kriging` | Spatial interpolation | `KrigingF64` | Lean |
+| `kmd_grouping_gpu` | Kendrick grouping | `KmdGroupingF64` | ✅ Lean |
 | `ode_sweep_gpu` | ODE parameter sweep | `BatchedOdeRK4F64` | ✅ Lean (ToadStool S41 fixed compile_shader_f64) |
+| `pairwise_l2_gpu` | Pairwise Euclidean | `PairwiseL2Gpu` | Lean |
 | `pangenome_gpu` | Pangenome classify | `PangenomeClassifyGpu` | ✅ Lean (Feb 22) |
 | `pcoa_gpu` | PCoA eigenvalues | `BatchedEighGpu` | Lean |
 | `quality_gpu` | Quality filtering | `QualityFilterGpu` | ✅ Lean (Feb 22) |
@@ -204,9 +205,10 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 | `random_forest_gpu` | RF batch inference | `RfBatchInferenceGpu` | ✅ Lean (Feb 22) |
 | `snp_gpu` | SNP calling | `SnpCallingF64` | ✅ Lean (Feb 22); gracefully skips on wgpu binding mismatch (catch_unwind) |
 | `spectral_match_gpu` | Spectral cosine | `FMR` | Lean |
+| `stats_extended_gpu` | Jackknife/bootstrap/Kimura/Hargreaves | `JackknifeMeanGpu`, `BootstrapMeanGpu`, … | Lean |
 | `stats_gpu` | Variance/correlation | `FMR` | Lean |
-| `streaming_gpu` | Streaming pipeline | Multiple | Lean |
 | `taxonomy_gpu` | Taxonomy scoring | `FMR` | Lean |
+| `tolerance_search_gpu` | m/z tolerance search | `BatchToleranceSearchF64` | Lean |
 | `kmer_gpu` | K-mer histogram | `KmerHistogramGpu` | ✅ Lean (Exp099) |
 | `unifrac_gpu` | UniFrac propagation | `UniFracPropagateGpu` | ✅ Lean (Exp099) |
 | `bistable_gpu` | Bistable QS ODE | `BatchedOdeRK4::<BistableOde>` | ✅ Lean (S58 → `generate_shader()`) |
@@ -224,6 +226,8 @@ See also: `ABSORPTION_MANIFEST.md` for the full absorption ledger.
 | `neighbor_joining_gpu` | NJ tree | `FusedMapReduceF64` | ✅ Promoted (pure GPU) |
 | `reconciliation_gpu` | DTL reconciliation | `BatchReconcileGpu` | ✅ Promoted (pure GPU) |
 | `molecular_clock_gpu` | Molecular clock | `FusedMapReduceF64` | ✅ Promoted (pure GPU) |
+
+Additional GPU entry points outside the `*_gpu.rs` naming convention: `gemm_cached`, `kriging`, `streaming_gpu/`.
 
 ---
 
@@ -358,13 +362,13 @@ no parallelism benefit) and `fastq_parsing` (I/O-bound).
 
 | Tier | CPU Modules | GPU Modules | CPU Checks | GPU Checks |
 |------|:-----------:|:-----------:|:----------:|:----------:|
-| ✅ Absorbed (Lean) | 41 | 42 (all lean on upstream) | 1,476+ | 1,578+ |
+| ✅ Absorbed (Lean) | 41 | 44 (all lean on upstream) | 1,476+ | 1,578+ |
 | Compose | — | 7 (wire ToadStool primitives) | — | — |
-| Passthrough | — | 3 (GPU buffers, CPU kernel) | — | — |
+| Passthrough | — | 0 | — | — |
 | Write (local WGSL) | 0 | 0 | — | — |
 | Dispatch routing | — | — | 80 | — |
 | Streaming/transfer | — | — | 57 | 82 |
-| **Total** | **41** | **42** | **1,476+** | **1,578+** |
+| **Total** | **41** | **44** | **1,476+** | **1,578+** |
 
 ---
 
@@ -476,7 +480,7 @@ no parallelism benefit) and `fastq_parsing` (I/O-bound).
 |--------|-----------|-----------|
 | Domain | Computational physics | Life science & analytical chemistry |
 | CPU modules | 50+ (physics, lattice, MD, spectral) | 41 (bio, signal, ML) |
-| GPU modules | 34 WGSL shaders | 42 modules (Lean phase) |
+| GPU modules | 34 WGSL shaders | 44 `bio/*_gpu.rs` modules (Lean phase) |
 | Absorbed | complex64, SU(3), plaquette, HMC, CellList | SW, Gillespie, DT, Felsenstein, GEMM, HMM, ANI, SNP, dN/dS, Pangenome, QF, DADA2, RF + 5 neuralSpring (PairwiseHamming, PairwiseJaccard, SpatialPayoff, BatchFitness, LocusVariance) |
 | WGSL pattern | `pub const WGSL: &str` inline | `include_str!("../shaders/...")` |
 | metalForge | GPU + NPU hardware characterization | GPU + NPU + cross-substrate validation |

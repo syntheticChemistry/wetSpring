@@ -11,7 +11,7 @@
 use serde_json::Value;
 
 use crate::ipc::handlers;
-use crate::ipc::protocol::{normalize_method, RpcError};
+use crate::ipc::protocol::{RpcError, normalize_method};
 use crate::ipc::{provenance, timeseries};
 
 // Re-export for tests

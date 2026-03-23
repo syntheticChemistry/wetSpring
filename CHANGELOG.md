@@ -3,6 +3,44 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V133] — 2026-03-23
+
+### Deep Evolution Sprint — Cross-Ecosystem Absorption + Deep Debt Resolution
+
+GPU session scaffolding, IPC message/dispatch layering, a `validate_all` meta-runner,
+release/coverage tooling, and documentation count corrections alongside refactors
+in protocol, compute dispatch, parsers, and ecosystem integration paths.
+
+#### Added
+- `validate_all` meta-runner binary to execute the full validation suite
+- `GpuContext` / `TensorSession` GPU session scaffolding (`gpu/context.rs`)
+- `check_relative` / `check_abs_or_rel` tolerance helpers for validation
+- `scripts/validate_release.sh` release validation script
+- Cargo coverage aliases (`coverage-check` and related workspace commands)
+- `ipc/message.rs` and `ipc/dispatch_strategy.rs` for structured IPC routing
+
+#### Changed
+- `performance_surface`: stub replaced with complete implementation wired to toadStool
+- `protocol.rs` and `compute_dispatch.rs` refactored for clarity and maintainability
+- `dorado.rs`: `/root`-style paths replaced with capability discovery
+- MS2 parser: `Arc<Path>` for shared path ownership; XML pool uses `Arc<str>`
+- Broad `println!` → `tracing` migration; doctest `ignore` → `no_run` where appropriate
+- 11 provenance headers added across the workspace; 7 binaries feature-gated
+- `barracuda/Cargo.toml` barraCuda version comment updated v0.3.5 → v0.3.7
+
+#### Fixed
+- `EVOLUTION_READINESS.md` metric counts corrected
+- `ABSORPTION_MANIFEST.md` tolerances and cross-references
+- Clippy issues in newly introduced code paths
+
+#### Metrics
+- Tests: 1,781 passed (1,529 barracuda + 252 forge), 0 failed
+- Validation binaries: 307; total binaries: 333
+- Named tolerances: 234; GPU modules: 44; CPU bio modules: 49
+- Experiments: 376 completed + 3 proposed (379 indexed)
+- barraCuda: v0.3.7, 150+ primitives consumed
+- `#![forbid(unsafe_code)]`: 2 crate roots + 307+ binaries
+
 ## [V132] — 2026-03-23
 
 ### Deep Evolution Sprint — Cross-Ecosystem Absorption

@@ -1,3 +1,44 @@
+# wetSpring Scripts
+
+This directory holds automation around wetSpring: Python baselines (below) and
+shell helpers for CI-style checks.
+
+## `validate_release.sh`
+
+Runs seven core `validate_*` binaries under `cargo run --release` with
+`--features gpu` (package `wetspring-barracuda`) to detect release-mode
+FMA/LTO float drift vs debug builds — same idea as groundSpring V120.
+
+From the workspace root:
+
+```bash
+./scripts/validate_release.sh
+```
+
+The script records pass/fail and elapsed seconds per binary, prints a summary
+table, and exits `0` only if every validator exits successfully.
+
+## Coverage (Rust)
+
+HTML coverage and an 80% line floor (ludoSpring V29 pattern) use
+[cargo-llvm-cov](https://github.com/taiki-e/cargo-llvm-cov) from the workspace
+root. One-time setup:
+
+```bash
+cargo install cargo-llvm-cov
+rustup component add llvm-tools-preview
+```
+
+Then:
+
+| Command | Purpose |
+|--------|---------|
+| `cargo coverage` | Workspace HTML report (`target/llvm-cov/html`) |
+| `cargo coverage-check` | Enforce **≥ 80%** line coverage (`--fail-under-lines 80`) |
+| `cargo coverage-json` | JSON report at `coverage.json` |
+
+---
+
 # wetSpring Python Baseline Scripts
 
 **Purpose:** Python/numpy/scipy/sklearn/vegan baselines for validation against

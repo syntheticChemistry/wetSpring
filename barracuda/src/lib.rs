@@ -90,9 +90,9 @@ pub mod niche;
 #[cfg(feature = "npu")]
 pub mod npu;
 pub mod primal_names;
-pub mod provenance_registry;
 #[cfg(feature = "gpu")]
 pub mod provenance;
+pub mod provenance_registry;
 pub mod special;
 pub mod tolerances;
 pub mod validation;
