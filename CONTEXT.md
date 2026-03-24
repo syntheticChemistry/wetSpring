@@ -22,15 +22,16 @@ evolution pipeline.
 ## Technical Facts
 
 - **Language:** 100% Rust, zero C dependencies (wgpu optional for GPU)
-- **Architecture:** 2 library crates + 333 validation/benchmark binaries
+- **Architecture:** 2 library crates + 355 validation/benchmark binaries (333 barracuda + 22 forge)
 - **Communication:** JSON-RPC 2.0 over Unix sockets (IPC feature-gated)
 - **License:** AGPL-3.0-or-later
-- **Tests:** 1,781 (unit, integration, determinism, doctests)
-- **Validation checks:** 5,700+ across 307 validation binaries
+- **Tests:** 1,891 (unit, integration, determinism, property, doctests)
+- **Validation checks:** 5,700+ across 355 binaries
 - **MSRV:** 1.87 (Rust edition 2024)
 - **Crate count:** 2 workspace crates (wetspring-barracuda, wetspring-forge)
-- **Clippy:** zero warnings (pedantic + nursery, all features)
-- **Unsafe code:** zero (`#![forbid(unsafe_code)]` on all crate roots)
+- **Clippy:** zero warnings (pedantic + nursery, all features, `-D warnings`)
+- **Unsafe code:** zero — `forbid(unsafe_code)` at workspace level + per-crate roots
+- **Coverage:** 91.20% line / 90.30% function (gated at 90%)
 
 ## Key Capabilities
 
@@ -42,7 +43,9 @@ evolution pipeline.
 - **Anderson physics:** hormesis, binding landscapes, disorder mapping
 - **Drug repurposing:** NMF, TransE knowledge graph embedding, molecular docking
 - **GPU acceleration:** 44 GPU modules via barraCuda v0.3.7, 150+ primitives consumed
+- **IPC:** 23 JSON-RPC methods, 8 MCP tools, Songbird discovery, capability-based primal coordination
 - **Ecosystem wiring:** sweetGrass braids, toadStool performance surface, StreamItem NDJSON
+- **Primal discovery:** coralReef, toadStool, petalTongue, Squirrel, sweetGrass, rhizoCrypt, loamSpine
 
 ## What This Does NOT Do
 
@@ -63,7 +66,7 @@ evolution pipeline.
 
 ```
 Python baseline → Rust CPU parity → GPU validation → sovereign pipeline
-     (58 scripts)    (1,781 tests)     (44 GPU modules)   (barraCuda/coralReef)
+     (58 scripts)    (1,891 tests)     (44 GPU modules)   (barraCuda/coralReef)
 ```
 
 ## Design Philosophy

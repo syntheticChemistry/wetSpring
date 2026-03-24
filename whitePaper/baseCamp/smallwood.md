@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # Dr. Chuck Smallwood — Sandia National Laboratories
 
 **Track:** 1 — Bloom Surveillance & Environmental Monitoring

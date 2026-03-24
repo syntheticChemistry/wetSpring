@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # Dr. Jesse Cahill — Sandia National Laboratories
 
 **Track:** 1 — Algal Pond Biocontrol & Environmental Surveillance

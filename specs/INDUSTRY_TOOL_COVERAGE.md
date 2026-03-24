@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # Industry Tool Coverage Matrix & Gap Analysis
 
 **Last Updated:** March 16, 2026

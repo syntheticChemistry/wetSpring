@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # Validation Methodology
 
 **Purpose**: Document the two-track validation approach used in the wetSpring study

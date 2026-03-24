@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # wetSpring LAN Expansion Plan — Metagenomics at Scale
 
 **Date:** February 28, 2026

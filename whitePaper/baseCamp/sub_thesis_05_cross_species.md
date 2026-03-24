@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # Sub-thesis 05: Cross-Species QS and Interspecies Eavesdropping
 
 **Date:** February 27, 2026

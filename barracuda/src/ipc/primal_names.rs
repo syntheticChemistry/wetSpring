@@ -7,6 +7,7 @@
 
 pub use crate::primal_names::BEARDOG;
 pub use crate::primal_names::BIOMEOS;
+pub use crate::primal_names::CORALREEF;
 pub use crate::primal_names::LOAMSPINE;
 pub use crate::primal_names::NESTGATE;
 pub use crate::primal_names::PETALTONGUE;

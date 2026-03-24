@@ -3,6 +3,60 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V135] — 2026-03-24
+
+### Documentation Reconciliation + Ecosystem Sync
+
+Canonical metrics aligned across all docs. V135 handoff crafted for
+wateringHole. ecoPrimals baseCamp updated with cross-ecosystem learnings.
+Archive reviewed — no debris found.
+
+#### Changed
+- README.md: test count 1,891, binary count 355 (333 barracuda + 22 forge),
+  workspace-level `forbid(unsafe_code)` language
+- CONTEXT.md: updated to V135 metrics, added IPC/discovery/coverage facts
+- whitePaper/README.md: status → V135, coverage → 91.20%, GPU modules → 44,
+  binary count → 355, crate roots → workspace-level forbid
+- whitePaper/baseCamp/README.md: status → V135, test count → 1,891,
+  V134–V135 evolution section replaces V133-only heading
+- whitePaper/baseCamp/EXTENSION_PLAN.md: author/date → V135, foundation
+  metrics updated, changelog condensed
+- experiments/README.md: updated header and totals lines to V135 (1,891 tests,
+  355 binaries)
+- specs/README.md: status → V135, condensed changelog
+- barracuda/README.md: updated → V135, test/binary/coverage metrics
+- barracuda/EVOLUTION_READINESS.md: date/status → V135, added V134/V135 bullets,
+  handoff pointer updated
+- barracuda/ABSORPTION_MANIFEST.md: date/status → V135, handoff pointer updated
+- metalForge/ABSORPTION_STRATEGY.md: status → V135, date updated
+- metalForge/PRIMITIVE_MAP.md: banner → V135, metrics updated
+- wateringHole/README.md: active handoffs table → V135, archive count → 144
+
+#### Added
+- wateringHole/handoffs/WETSPRING_V135_BARRACUDA_TOADSTOOL_ABSORPTION_HANDOFF_MAR24_2026.md:
+  V135 handoff with canonical metrics, V134 audit themes, evolution intelligence
+  (harness decomposition, primal discovery cascade, workspace forbid, expect-over-allow),
+  upstream asks and API stability surfaces
+- Copied V135 handoff to central ecoPrimals/wateringHole/handoffs/
+
+#### Archived
+- wateringHole/handoffs/WETSPRING_V134_BARRACUDA_TOADSTOOL_ABSORPTION_HANDOFF_MAR23_2026.md
+  → archive/
+
+#### External
+- ecoPrimals/whitePaper/gen3/baseCamp/README.md: wetSpring → V135 in date line,
+  summary line, data/reproducibility block, and cross-spring provenance tree
+
+#### Metrics
+- Tests: 1,891 (unit + integration + property + doc), 0 failed
+- Binaries: 355 (333 barracuda + 22 forge)
+- Coverage: 91.20% line / 90.30% function (gated at 90%)
+- Clippy: 0 warnings (pedantic + nursery, `-D warnings`)
+- Doc: 0 warnings
+- Format: clean
+- `#[allow()]`: 0 in production
+- Unsafe: 0 (workspace-level forbid)
+
 ## [V134] — 2026-03-23
 
 ### Deep Audit + Debt Resolution — Zero Clippy, Zero Duplicate Math

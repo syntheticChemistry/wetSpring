@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # NUCLEUS Local Deployment Plan — wetSpring V108+
 
 **Date:** March 10, 2026

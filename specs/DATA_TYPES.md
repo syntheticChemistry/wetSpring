@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # Biological Data Type Catalog — NestGate Evolution Primer
 
 **Last Updated:** February 26, 2026

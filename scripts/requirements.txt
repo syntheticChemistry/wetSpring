@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
 # Python baseline environment for wetSpring validation scripts.
-# All baselines were generated with Python 3.10.12 on Ubuntu 22.04.
+# Original baselines generated with Python 3.11+ on Pop!_OS 22.04.
 #
 # Install:  python3 -m pip install -r requirements.txt
 # Verify:   python3 -c "import numpy; print(numpy.__version__)"
@@ -9,8 +9,11 @@
 # Pin policy: major.minor pinned to match baseline generation environment.
 # Patch versions float for security fixes. If baseline drift is detected
 # after a patch update, pin exact versions and document the regression.
+#
+# Track 6 (biogas) baselines were frozen with numpy 2.2.6. If reproducing
+# Track 6 only, use numpy>=2.0. For all other tracks, numpy 1.x suffices.
 
-numpy>=1.24,<2
+numpy>=1.24
 scipy>=1.10,<2
 pandas>=2.0,<3
 scikit-learn>=1.2,<2

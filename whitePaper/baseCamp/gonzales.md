@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # Prof. Andrea J. Gonzales — MSU Pharmacology & Toxicology
 
 **Track:** 5 — Immunological Anderson & Drug Repurposing

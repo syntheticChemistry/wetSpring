@@ -43,14 +43,26 @@ jobs:
       - run: cargo test --workspace --verbose
 
   test-features:
-    name: Test (json feature)
+    name: Test (feature matrix)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        features: [json, ipc, vault]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --features ${{ matrix.features }} --verbose
+        working-directory: barracuda
+
+  test-all-features:
+    name: Test (all features, no GPU)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - run: cargo check --features json
-        working-directory: barracuda
+      - run: cargo test --workspace --all-features --verbose
 
   validate-release:
     name: Release validators (FMA/LTO drift)
@@ -76,10 +88,10 @@ jobs:
         with:
           workspaces: barracuda
       - uses: taiki-e/install-action@cargo-llvm-cov
-      - name: Run coverage and enforce 90% threshold
+      - name: Run coverage (lib + integration tests) and enforce 90% threshold
         working-directory: barracuda
         run: |
-          cargo llvm-cov --lib --fail-under-lines 90
+          cargo llvm-cov --lib --tests --fail-under-lines 90
 
   coverage-forge:
     name: Coverage — metalForge (90% gate)
@@ -93,10 +105,10 @@ jobs:
         with:
           workspaces: metalForge/forge
       - uses: taiki-e/install-action@cargo-llvm-cov
-      - name: Run coverage and enforce 90% threshold
+      - name: Run coverage (lib + integration tests) and enforce 90% threshold
         working-directory: metalForge/forge
         run: |
-          cargo llvm-cov --lib --fail-under-lines 90
+          cargo llvm-cov --lib --tests --fail-under-lines 90
 
   doc:
     name: Documentation

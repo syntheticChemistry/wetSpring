@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-23 (V134: 379 experiments indexed (376 completed + 3 PROPOSED), **333** binaries (**307** validate + 23 benchmark + 3 tools), 5,707+ checks, **1,530** unit + **27** doc tests. V134: deep audit + debt resolution — drug NMF delegated to `barracuda::linalg::nmf`, 26 clippy errors resolved, coverage 91.20%, zero duplicate math. V133: deep evolution sprint — `validate_all`, `GpuContext`/`TensorSession`, `performance_surface` RPCs, zero-copy I/O, IPC routing modules, 234 tolerances / 44 GPU / 49 CPU bio modules. Zero local math duplication, zero `#[allow()]`, zero clippy warnings, zero unsafe.)
+**Updated**: 2026-03-24 (V135: 379 experiments indexed (376 completed + 3 PROPOSED), **355** binaries (**333** barracuda + **22** forge), 5,707+ checks, **1,891** tests (unit + integration + property + doc, 0 failures). V135: doc reconciliation — canonical metrics aligned across all docs, V135 handoff, wateringHole sync. V134: deep audit + debt resolution — drug NMF → `barracuda::linalg::nmf`, 26 clippy errors resolved, coverage 91.20% gated at 90%, validation harness refactored, primal discovery extended. V133: `validate_all`, `GpuContext`/`TensorSession`, `performance_surface` RPCs, zero-copy I/O, IPC routing modules, 234 tolerances / 44 GPU / 49 CPU bio modules. Zero local math duplication, zero `#[allow()]`, zero clippy warnings, zero unsafe.)
 
 ---
 
@@ -645,7 +645,7 @@ primal discovery (env → XDG → BIOMEOS_SOCKET_DIR → temp), forge lint parit
 false-positives resolved (all `panic!()` and `unwrap()` confirmed test-only).
 31 IPC tests pass, 19 files changed (342+, 130−).
 
-**Totals (V133 index):** 379 experiments indexed (376 completed + 3 PROPOSED), 333 binaries, 5,707+ checks, 1,781 tests.
+**Totals (V135 index):** 379 experiments indexed (376 completed + 3 PROPOSED), 355 binaries (333 barracuda + 22 forge), 5,707+ checks, 1,891 tests.
 
 ### Exp377: Hormesis Biphasic Dose-Response Model (PROPOSED)
 
@@ -671,7 +671,7 @@ resist pathogen colonization better than low-diversity strong-binding communitie
 Module: `bio::binding_landscape` (17 unit tests passing). Joint with healthSpring
 exp097/exp098.
 
-**Totals: 379 experiments indexed, 333 binaries, 5,707+ checks, 1,781 tests.**
+**Totals: 379 experiments indexed, 355 binaries, 5,707+ checks, 1,891 tests.**
 
 ---
 

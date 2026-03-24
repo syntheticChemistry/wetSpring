@@ -1,7 +1,9 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # wetSpring White Paper
 
-**Date:** March 23, 2026
-**Status:** V133 — Validation study active — 5,707+ checks, **1,781** tests, 379 experiments indexed, **307 validation binaries (333 total)**, 44 GPU modules, 49 CPU bio modules, standalone `barraCuda` **v0.3.7** (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, **234** named tolerances (zero inline literals), clippy pedantic + nursery ZERO WARNINGS, **zero `#[allow()]` in entire codebase**, **workspace `lints.workspace` (first Spring)**. V132: `ValidationSink`, `PROVENANCE_REGISTRY`, `IpcError::is_recoverable`, `normalize_method`, `DeviceCapabilities`, ecosystem wiring (sweetGrass braids, `StreamItem`, `performance_surface`). V125: structured `IpcError` enum (healthSpring/biomeOS), dual-format `extract_capabilities()` (groundSpring/ludoSpring), generic `socket_env_var()`/`discover_primal()` (sweetGrass), 18 binary fixes. V126: `DispatchOutcome<T>` protocol vs application error separation, `health.liveness`/`health.readiness` probes, `IpcError` query helpers (`is_retriable()`/`is_timeout_likely()`/`is_method_not_found()`/`is_connection_error()`). V124: workspace `deny.toml`, typed `compute.dispatch` client, structured `tracing`. V123: zero-panic `OrExit`, dual-format discovery, `extract_rpc_error()`. V122: `#[expect(reason)]` across 276+ binaries. 63 papers reproduced, 46 fully validated at CPU + GPU + metalForge tiers.
+**Date:** March 24, 2026
+**Status:** V135 — Validation study active — 5,707+ checks, **1,891** tests, 379 experiments indexed, **355** binaries (333 barracuda + 22 forge), 44 GPU modules, 49 CPU bio modules, standalone `barraCuda` **v0.3.7** (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, **234** named tolerances (zero inline literals), clippy pedantic + nursery ZERO WARNINGS, **zero `#[allow()]` in entire codebase**, **workspace `lints.workspace` + `forbid(unsafe_code)` at workspace level**. **V135:** Comprehensive doc reconciliation, V135 handoff crafted, wateringHole sync, baseCamp/experiments updated to canonical metrics, ecoPrimals baseCamp cross-ecosystem update, archive review. **V134:** Deep audit + debt — drug NMF → `barracuda::linalg::nmf` (zero duplicate math), 26 clippy errors resolved, coverage 91.20% gated at 90%, provenance fixes, CI feature-matrix expansion, validation harness refactored into domain submodules, primal discovery extended (coralReef, rhizoCrypt, loamSpine, sweetGrass), SPDX on all specs/whitePaper. V133: `validate_all`, `GpuContext`/`TensorSession`, `performance_surface`, zero-copy I/O, IPC modules. V132: `ValidationSink`, `PROVENANCE_REGISTRY`, `DeviceCapabilities`, ecosystem wiring. 64 papers reproduced, 46 fully validated at CPU + GPU + metalForge tiers.
 **License:** AGPL-3.0-or-later
 
 ---
@@ -55,9 +57,9 @@ implementations into upstream `barraCuda` primitives:
 4. **Absorb** — `barraCuda` integrates as shared math primitives
 5. **Lean** — wetSpring rewires to upstream imports, deletes local code
 
-**Current status:** 45 GPU modules — Lean phase (fully absorbed). All 45 lean on
-upstream `barraCuda` primitives (150+ consumed, v0.3.7 standalone, 767+ WGSL shaders).
-7 compose `barraCuda` primitives for GPU-accelerated workflows. Zero Passthrough, zero
+**Current status:** 44 GPU modules — Lean phase (fully absorbed). All 44 lean on
+upstream `barraCuda` primitives (150+ consumed, v0.3.7 standalone, 784+ WGSL shaders).
+11 compose `barraCuda` primitives for GPU-accelerated workflows. Zero Passthrough, zero
 Tier B/C modules remain. The forge crate (`metalForge/forge/` v0.3.0) provides substrate
 discovery, capability-based dispatch, and shader origin tracking.
 
@@ -311,7 +313,7 @@ algorithms can be ported from interpreted languages to `barraCuda` (math)
 and `toadStool` (hardware dispatch):
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (62 WGSL shaders, 660 tests)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 150+ barraCuda primitives, **~1,781** tests workspace-wide)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 150+ barraCuda primitives, **1,891** tests workspace-wide)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **airSpring** — Precision agriculture, IoT, Richards PDE, Kriging
 
@@ -327,14 +329,14 @@ orchestrates hardware routing separately.
 | `cargo fmt --check` | Clean (0 diffs) |
 | `cargo clippy --pedantic --nursery -D warnings` | 0 diagnostics |
 | `cargo doc --no-deps` | 0 warnings |
-| Line coverage (`cargo-llvm-cov`) | **93.94% line / 91.85% fn / 93.60% branch** |
-| `#![forbid(unsafe_code)]` | Enforced on all 356 crate roots (edition 2024) |
+| Line coverage (`cargo-llvm-cov`) | **91.20% line / 90.30% fn** (gated at 90%) |
+| `#![forbid(unsafe_code)]` | Workspace-level (`[workspace.lints.rust]`) + all crate roots |
 | `#![deny(clippy::expect_used, clippy::unwrap_used)]` | Enforced crate-wide |
 | Named tolerance constants | **234** (all scientifically justified, zero inline literals) |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
 | Max file size | All under 1000 LOC |
 | SPDX headers | All `.rs` files |
-| Provenance headers | All 307 validation binaries (333 total benchmark/validation) |
+| Provenance headers | All 355 binaries (333 barracuda + 22 forge) |
 
 ## metalForge — Hardware Discovery
 

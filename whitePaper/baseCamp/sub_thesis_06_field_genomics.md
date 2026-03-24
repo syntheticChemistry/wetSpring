@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # Sub-thesis 06: Field Genomics — Sovereign Sequencing + Neuromorphic Edge Classification
 
 **Date:** February 27, 2026

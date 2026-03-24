@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # Prof. Ilya Kachkovskiy — MSU Computational Mathematics, Science & Engineering
 
 **Track:** Cross-Spring — Spectral Theory & Anderson Localization

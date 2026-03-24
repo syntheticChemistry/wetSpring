@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # Prof. Kevin Liu — MSU Computational Mathematics, Science & Engineering
 
 **Track:** 1b — Comparative Genomics & Phylogenetics

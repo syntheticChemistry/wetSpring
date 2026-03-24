@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # Prof. Rika Anderson — Carleton College Biology
 
 **Track:** 1c — Deep-Sea Metagenomics & Population Genomics

@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # Sub-thesis 03: BioAg — Rhizosphere QS and Agricultural Applications
 
 **Date:** February 27, 2026

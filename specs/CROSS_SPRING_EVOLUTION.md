@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # Cross-Spring Shader & Primitive Evolution
 
 > How five Springs contribute domain expertise to BarraCuda, and all benefit.

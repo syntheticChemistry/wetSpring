@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Commit: 48fb787
+# Date: 2026-02-23
 """
 Shared tolerance constants for wetSpring Python baseline scripts.
 

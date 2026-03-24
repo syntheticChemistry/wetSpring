@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # NCBI Anaerobic Digestion Datasets — Track 6 Extension Data
 
 **Date:** March 10, 2026

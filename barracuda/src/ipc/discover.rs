@@ -56,6 +56,61 @@ pub fn discover_squirrel() -> Option<PathBuf> {
     discover_primal(super::primal_names::SQUIRREL)
 }
 
+/// Discover coralReef sovereign shader compiler socket.
+///
+/// coralReef compiles WGSL to native ISA for sovereign GPU dispatch.
+/// Priority: `CORALREEF_SOCKET` env → XDG runtime → temp dir.
+#[must_use]
+pub fn discover_coralreef() -> Option<PathBuf> {
+    discover_primal(super::primal_names::CORALREEF)
+}
+
+/// Discover toadStool compute orchestrator socket.
+///
+/// toadStool handles hardware discovery, GPU/NPU routing, and compute dispatch.
+/// Priority: `TOADSTOOL_SOCKET` env → XDG runtime → temp dir.
+#[must_use]
+pub fn discover_toadstool() -> Option<PathBuf> {
+    discover_primal(super::primal_names::TOADSTOOL)
+}
+
+/// Discover petalTongue visualization socket.
+///
+/// Priority: `PETALTONGUE_SOCKET` env → XDG runtime → temp dir.
+#[must_use]
+pub fn discover_petaltongue() -> Option<PathBuf> {
+    discover_primal(super::primal_names::PETALTONGUE)
+}
+
+/// Discover rhizoCrypt derivation DAG socket.
+///
+/// rhizoCrypt tracks content lineage and derivation chains for
+/// scyBorg provenance trio integration.
+/// Priority: `RHIZOCRYPT_SOCKET` env → XDG runtime → temp dir.
+#[must_use]
+pub fn discover_rhizocrypt() -> Option<PathBuf> {
+    discover_primal(super::primal_names::RHIZOCRYPT)
+}
+
+/// Discover loamSpine immutable ledger socket.
+///
+/// loamSpine stores provenance certificates and license proofs for
+/// scyBorg provenance trio integration.
+/// Priority: `LOAMSPINE_SOCKET` env → XDG runtime → temp dir.
+#[must_use]
+pub fn discover_loamspine() -> Option<PathBuf> {
+    discover_primal(super::primal_names::LOAMSPINE)
+}
+
+/// Discover sweetGrass provenance socket.
+///
+/// sweetGrass handles W3C PROV-O attribution braids.
+/// Priority: `SWEETGRASS_SOCKET` env → XDG runtime → temp dir.
+#[must_use]
+pub fn discover_sweetgrass() -> Option<PathBuf> {
+    discover_primal(super::primal_names::SWEETGRASS)
+}
+
 /// Discover an existing primal socket by env var and primal name.
 ///
 /// Returns `Some(path)` if a socket file is found at one of the
@@ -236,5 +291,45 @@ mod tests {
     fn discover_primal_returns_none_when_no_socket() {
         let result = discover_primal("nonexistent_test_primal_xyzzy");
         assert!(result.is_none());
+    }
+
+    #[test]
+    fn discover_coralreef_returns_none_when_absent() {
+        assert!(discover_coralreef().is_none());
+    }
+
+    #[test]
+    fn discover_toadstool_returns_none_when_absent() {
+        assert!(discover_toadstool().is_none());
+    }
+
+    #[test]
+    fn discover_petaltongue_returns_none_when_absent() {
+        assert!(discover_petaltongue().is_none());
+    }
+
+    #[test]
+    fn discover_rhizocrypt_returns_none_when_absent() {
+        assert!(discover_rhizocrypt().is_none());
+    }
+
+    #[test]
+    fn discover_loamspine_returns_none_when_absent() {
+        assert!(discover_loamspine().is_none());
+    }
+
+    #[test]
+    fn discover_sweetgrass_returns_none_when_absent() {
+        assert!(discover_sweetgrass().is_none());
+    }
+
+    #[test]
+    fn all_primal_discovery_uses_standard_env_convention() {
+        assert_eq!(socket_env_var("coralreef"), "CORALREEF_SOCKET");
+        assert_eq!(socket_env_var("rhizocrypt"), "RHIZOCRYPT_SOCKET");
+        assert_eq!(socket_env_var("loamspine"), "LOAMSPINE_SOCKET");
+        assert_eq!(socket_env_var("sweetgrass"), "SWEETGRASS_SOCKET");
+        assert_eq!(socket_env_var("petaltongue"), "PETALTONGUE_SOCKET");
+        assert_eq!(socket_env_var("squirrel"), "SQUIRREL_SOCKET");
     }
 }

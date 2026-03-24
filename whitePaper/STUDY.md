@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # wetSpring: Replicable Life Science and Analytical Chemistry on Consumer GPU Hardware
 
 **Working Draft** — March 23, 2026

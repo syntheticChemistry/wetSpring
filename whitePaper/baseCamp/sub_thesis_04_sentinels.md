@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # Sub-thesis 04: Sentinels — Mechanical Wave Detection and NPU Deployment
 
 **Date:** February 27, 2026

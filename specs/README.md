@@ -1,7 +1,9 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # wetSpring Specifications
 
-**Last Updated**: March 23, 2026
-**Status**: V133 — 5,707+ checks (379 experiments, 307 validation binaries, 333 total), 1,781 tests. V125: structured `IpcError` enum (28 sites, healthSpring/biomeOS pattern), dual-format `extract_capabilities()` (groundSpring/ludoSpring), generic `socket_env_var()`/`discover_primal()` (sweetGrass pattern), 18 binary OrExit import fixes. V126: `DispatchOutcome<T>` protocol vs application error separation, `health.liveness`/`health.readiness` probes, `IpcError` query helpers (`is_retriable()`/`is_timeout_likely()`/`is_method_not_found()`/`is_connection_error()`). V124: workspace `deny.toml`, typed `compute.dispatch` IPC client, structured `tracing`. V123: zero-panic `OrExit`, dual-format discovery, `extract_rpc_error()`. V122: `#[expect(reason)]` across 276+ binaries, zero `#[allow()]`. Zero unsafe, clippy pedantic+nursery zero warnings.
+**Last Updated**: March 24, 2026
+**Status**: V135 — 5,707+ checks (379 experiments, 355 binaries), 1,891 tests, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, clippy pedantic+nursery zero warnings, zero `#[allow()]`. V135: doc reconciliation, canonical metrics, V135 handoff. V134: deep audit + debt (drug NMF → barracuda, 26 clippy fixes, validation harness refactored, primal discovery extended, SPDX on specs/whitePaper, CI feature-matrix). V133: `validate_all`, `GpuContext`/`TensorSession`, `performance_surface`, zero-copy I/O. V132: `ValidationSink`, `PROVENANCE_REGISTRY`, `DeviceCapabilities`, ecosystem wiring.
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # Prof. Christopher Waters — MSU Microbiology & Molecular Genetics
 
 **Track:** 1 — Microbial Ecology / Quorum Sensing

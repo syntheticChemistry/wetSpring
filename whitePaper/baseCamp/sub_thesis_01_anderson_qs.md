@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # Sub-thesis 01: Anderson Localization as QS Null Hypothesis
 
 **Date:** March 11, 2026

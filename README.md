@@ -7,18 +7,18 @@ against Rust implementations, then promotes to GPU acceleration via
 
 ```
 Python/R baseline  →  Rust CPU parity  →  GPU acceleration  →  sovereign pipeline
-   (58 scripts)       (1,530+ tests)      (44 GPU modules)     (barraCuda/coralReef)
+   (58 scripts)       (1,891 tests)       (44 GPU modules)     (barraCuda/coralReef)
 ```
 
 | | |
 |---|---|
-| **Tests** | 1,530 unit + 27 doc, 0 failed |
-| **Validation checks** | 5,700+ across 307 binaries |
+| **Tests** | 1,891 (unit + integration + property + doc), 0 failed |
+| **Validation checks** | 5,700+ across 355 binaries (333 barracuda + 22 forge) |
 | **Experiments** | 376 completed + 3 proposed (379 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
 | **Named tolerances** | 234 |
 | **Clippy** | 0 warnings (pedantic + nursery, `-D warnings`) |
-| **Unsafe** | 0 (`#![forbid(unsafe_code)]` all crates) |
+| **Unsafe** | 0 (`forbid(unsafe_code)` workspace-level + per-crate) |
 | **`#[allow()]`** | 0 in production (uses `#[expect(reason)]` exclusively) |
 | **Local WGSL** | 0 — fully lean on barraCuda |
 | **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
@@ -187,11 +187,11 @@ All parsers stream from disk — no full-file buffering.
 | `cargo fmt` | Clean |
 | `cargo clippy` (pedantic + nursery) | 0 warnings |
 | `cargo doc --no-deps` | 0 warnings |
-| `#![forbid(unsafe_code)]` | All crate roots (2 crates + 307+ binaries) |
+| `#![forbid(unsafe_code)]` | Workspace-level (`[workspace.lints.rust]`) + all crate roots |
 | `#![deny(clippy::unwrap_used)]` | Workspace `[lints.clippy]` |
 | TODO/FIXME/HACK | 0 |
 | Inline tolerance literals | 0 (234 named constants) |
-| Max file size | All under 1,000 lines |
+| Max file size | All `.rs` under 1,000 lines (largest: 939 LOC) |
 | C dependencies | 0 (`flate2` uses `rust_backend`) |
 | SPDX headers | All `.rs` files |
 

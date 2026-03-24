@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # Field Genomics Requirements — Sub-thesis 06 Systems
 
 **Last Updated:** February 27, 2026

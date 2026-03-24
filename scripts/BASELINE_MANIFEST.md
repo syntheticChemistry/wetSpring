@@ -1,7 +1,7 @@
 # Python Baseline Manifest
 
 **Generated:** February 27, 2026 (Phase 61 audit — SPDX headers + provenance metadata added)
-**Verified:** March 23, 2026 (V133 — 58 Python baseline scripts, all present, no orphans. `scripts/validate_release.sh` added in V133 for release validation; Python baselines last expanded at V120 with `tolerances.py`.)
+**Verified:** March 24, 2026 (V134 audit — SHA-256 hashes reconciled with `provenance_registry.rs`; `exp008_pfas_ml_baseline.py` and `python_anaerobic_biogas_baseline.py` hashes corrected; download script hashes added; numpy version matrix documented.)
 **Last scripts commit:** V120 (added `scripts/tolerances.py` — shared tolerance constants mirroring Rust)
 
 ## Commit History Clarification
@@ -36,8 +36,11 @@ All baselines were generated and frozen on the following environment:
 
 - **Hardware:** Eastgate i9-12900K, 64 GB DDR5, NVIDIA RTX 4070 (Ada)
 - **OS:** Pop!_OS 22.04 (Ubuntu 22.04 base, x86_64, kernel 6.17.9)
-- **Python:** 3.11+ (CPython)
-- **NumPy:** 1.26+ (where used)
+- **Python:** 3.11+ (CPython) — note: `requirements.txt` pins `>=1.24,<2` for numpy;
+  some frozen JSON baselines record `numpy 2.2.6` from a later environment.
+  When reproducing, install from `requirements.txt` for Track 1–4 baselines;
+  Track 6 (biogas) JSONs may require `numpy>=2.0` to match exact digits.
+- **NumPy:** 1.26+ for original baselines; 2.2.6 for Track 6 biogas baselines
 - **SciPy:** 1.12+ (where used — ODE, peaks, integration)
 - **Galaxy:** quay.io/galaxy/galaxy:latest (Exp001 only, with qiime2-2026 conda env)
 - **Baseline freeze:** commit `48fb787` (2026-02-23)
@@ -122,7 +125,7 @@ Compares current SHA-256 hashes against this manifest. Exit 0 = no drift.
 |--------|-------------|-----|------|---------------------|
 | `validate_track2.py` | `validate_mzml`, `validate_pfas` | 005-007 | mzML/PFAS | `658134aa4c67b848` |
 | `pfas_tree_export.py` | `validate_pfas_decision_tree` | 008 | sklearn DT | `4f816795f6a03b36` |
-| `exp008_pfas_ml_baseline.py` | `validate_epa_pfas_ml` | 008/041 | sklearn RF+GBM | `f836ccdc74ceb899` |
+| `exp008_pfas_ml_baseline.py` | `validate_epa_pfas_ml` | 008/041 | sklearn RF+GBM | `c957d9ec59cf2388` |
 | `generate_peak_baselines.py` | `validate_peaks` | 010 | scipy peaks | `e2f88fb9261ad247` |
 | `epa_pfas_ml_baseline.py` | `validate_epa_pfas_ml` | 041 | Jones F&T proxy | `b50075efd62d60c2` |
 | `massbank_spectral_baseline.py` | `validate_massbank_spectral` | 042 | Jones MS proxy | `9ca49c6fae456c88` |
@@ -146,7 +149,7 @@ Compares current SHA-256 hashes against this manifest. Exit 0 = no drift.
 
 | Script | Rust Binary | Exp | Tool | SHA-256 (first 16) |
 |--------|-------------|-----|------|---------------------|
-| `python_anaerobic_biogas_baseline.py` | `validate_barracuda_cpu_v27`, `validate_anaerobic_*` | 336-346 | scipy/numpy | `c6b8082fad3abc73` |
+| `python_anaerobic_biogas_baseline.py` | `validate_barracuda_cpu_v27`, `validate_anaerobic_*` | 336-346 | scipy/numpy | `5429ecaf2827b1d9` |
 
 ### Track 4 — No-Till Soil QS & Anderson Geometry
 
@@ -175,8 +178,8 @@ Compares current SHA-256 hashes against this manifest. Exit 0 = no drift.
 | `run_exp002.py` | SRA data download (Exp002) | `7fbcd4bf2f3ec2b6` |
 | `search_ncbi_datasets.py` | NCBI dataset search | `00f1e1133cdd14d4` |
 | `fetch_ncbi_phase35.py` | Phase 35 NCBI bulk fetch | `0c55e7fd85ede4e6` |
-| `download_priority1.py` | PFAS/Vibrio/Campy/SILVA downloads (Track 1/2 data) | — |
-| `download_priority2.py` | NCBI bulk download utility | — |
+| `download_priority1.py` | PFAS/Vibrio/Campy/SILVA downloads (Track 1/2 data) | `5d9adf95c2bf44df` |
+| `download_priority2.py` | NCBI bulk download utility | `c143a332ea7dad9a` |
 
 ---
 

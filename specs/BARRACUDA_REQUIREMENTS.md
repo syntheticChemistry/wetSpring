@@ -1,6 +1,8 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # wetSpring — BarraCuda Requirements
 
-**Last Updated**: March 3, 2026 (Phase 95, standalone barraCuda v0.3.5, 150+ primitives consumed (264 ComputeDispatch ops), fully lean, 1,044 lib tests, full 5-tier GREEN)
+**Last Updated**: March 24, 2026 (V134 audit — barraCuda v0.3.7, 150+ primitives consumed, fully lean, ~1,998 tests, full 5-tier GREEN)
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---
@@ -226,8 +228,8 @@ Tier classification for GPU shader promotion (Write → Absorb → Lean lifecycl
 - 47 CPU + 45 GPU Rust modules with 2 runtime dependencies (flate2 + bytemuck) — highest sovereignty ratio in the ecosystem
 - **V29 handoff**: cross-spring synthesis, deprecated API removal, dead-code cleanup, evolution handoff
 - **12 shaders absorbed + 5 ODE leaned (generate_shader) + 12 composed/lean wrappers (0 Passthrough)** — zero local WGSL remains; 8/9 P0-P3 requests delivered; see `barracuda/EVOLUTION_READINESS.md`
-- **Rust edition 2024**, MSRV 1.85 — `f64::midpoint()`, `usize::midpoint()`, `const fn` promotions
-- **`#![deny(unsafe_code)]`** — edition 2024 makes `std::env::set_var` unsafe; `#[allow]` confined to test env-var calls
+- **Rust edition 2024**, MSRV 1.87 — `f64::midpoint()`, `usize::midpoint()`, `const fn` promotions
+- **`#![forbid(unsafe_code)]`** — workspace-level since V134; edition 2024 makes `std::env::set_var` unsafe; `#[expect]` confined to test env-var calls
 
 ---
 

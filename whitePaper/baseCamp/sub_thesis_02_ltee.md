@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # Sub-thesis 02: LTEE Constrained Evolution and Anderson Anomalies
 
 **Date:** February 27, 2026

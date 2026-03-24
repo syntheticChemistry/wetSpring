@@ -24,16 +24,19 @@ pub const BEARDOG: &str = "beardog";
 /// `ToadStool` compute orchestrator.
 pub const TOADSTOOL: &str = "toadstool";
 
+/// coralReef sovereign shader compiler (WGSL → native ISA).
+pub const CORALREEF: &str = "coralreef";
+
 /// petalTongue visualization.
 pub const PETALTONGUE: &str = "petaltongue";
 
-/// rhizoCrypt DAG.
+/// rhizoCrypt derivation DAG — tracks content lineage and license metadata.
 pub const RHIZOCRYPT: &str = "rhizocrypt";
 
-/// loamSpine commit.
+/// loamSpine immutable ledger — certificate storage for provenance proofs.
 pub const LOAMSPINE: &str = "loamspine";
 
-/// sweetGrass provenance.
+/// sweetGrass provenance — W3C PROV-O attribution braids.
 pub const SWEETGRASS: &str = "sweetgrass";
 
 /// Squirrel AI assistant.

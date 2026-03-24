@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** March 23, 2026 (V133 — barraCuda v0.3.7 standalone, toadStool S155, coralReef Phase 10, wgpu 28. 1,781 tests (0 failures, 3 pre-existing GPU hw-specific), 307 validation binaries (333 total), 234 named tolerances. biomeOS niche — deploy graph with `fallback = "skip"`, niche self-knowledge (`niche.rs` + BYOB), 22 capabilities (16 domains), Squirrel AI + ToadStool optional deploy nodes, provenance trio, cross-spring time series. V133 Cross-Spring Absorption: typed errors completed (`NcbiError`, `DataError`, `Error::Ipc`), deploy graph hardened, `live_pipeline.rs` refactored, shared Python tolerance module, hardcoding eliminated. clippy ZERO WARNINGS pedantic+nursery.)
+**Updated:** March 24, 2026 (V135 — barraCuda v0.3.7 standalone, toadStool S155+, coralReef Phase 10, wgpu 28. 1,891 tests (0 failures), 355 binaries (333 barracuda + 22 forge), 234 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, zero `#[allow()]`, clippy ZERO WARNINGS pedantic+nursery. V135: doc reconciliation, canonical metrics aligned, V135 handoff. V134: deep audit — drug NMF → `barracuda::linalg::nmf`, 26 clippy fixes, validation harness refactored into domain submodules, primal discovery extended (7 primals), SPDX headers, CI feature-matrix. V133: `validate_all`, `GpuContext`/`TensorSession`, `performance_surface`, zero-copy I/O, typed errors, deploy graph hardened.)
 
 ---
 

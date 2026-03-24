@@ -55,16 +55,13 @@
 //! Validation class: Cross-spring
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
-use std::sync::Arc;
-use std::time::Instant;
-
 use barracuda::shaders::Precision;
+use std::sync::Arc;
 use wetspring_barracuda::bio::diversity_fusion_gpu::{DiversityFusionGpu, diversity_fusion_cpu};
 use wetspring_barracuda::bio::gemm_cached::GemmCached;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::OrExit;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{self, OrExit, Validator};
 
 struct Timing {
     label: &'static str,
@@ -74,21 +71,9 @@ struct Timing {
 }
 
 fn bench<T>(label: &str, f: impl FnOnce() -> T) -> (T, f64) {
-    let t0 = Instant::now();
-    let result = f();
-    let ms = t0.elapsed().as_secs_f64() * 1000.0;
+    let (result, ms) = validation::bench(f);
     println!("  {label}: {ms:.3} ms");
     (result, ms)
-}
-
-fn bench_n<T>(n: usize, mut f: impl FnMut() -> T) -> (T, f64) {
-    let t0 = Instant::now();
-    let mut result = None;
-    for _ in 0..n {
-        result = Some(f());
-    }
-    let us = t0.elapsed().as_nanos() as f64 / 1000.0 / n as f64;
-    (result.or_exit("unexpected error"), us)
 }
 
 fn main() {
@@ -521,7 +506,7 @@ fn main() {
         let jk = barracuda::stats::jackknife_mean_variance(&data).or_exit("unexpected error");
         v.check_pass("Jackknife: variance ≥ 0", jk.variance >= 0.0);
 
-        let (_, us_fix) = bench_n(10_000, || {
+        let (_, us_fix) = validation::bench_n_us(10_000, || {
             barracuda::stats::kimura_fixation_prob(1000, 0.0, 0.01)
         });
         v.check_pass("Kimura fixation", us_fix > 0.0);
@@ -721,35 +706,36 @@ fn main() {
         }
         let mut cpu_rows: Vec<CpuRow> = Vec::new();
 
-        let (_, us) = bench_n(1000, || barracuda::stats::shannon(&vec_1k));
+        let (_, us) = validation::bench_n_us(1000, || barracuda::stats::shannon(&vec_1k));
         cpu_rows.push(CpuRow {
             name: "Shannon",
             origin: "wetSpring→S63",
             us,
         });
 
-        let (_, us) = bench_n(1000, || barracuda::stats::simpson(&vec_1k));
+        let (_, us) = validation::bench_n_us(1000, || barracuda::stats::simpson(&vec_1k));
         cpu_rows.push(CpuRow {
             name: "Simpson",
             origin: "wetSpring→S63",
             us,
         });
 
-        let (_, us) = bench_n(1000, || barracuda::stats::bray_curtis(&vec_a, &vec_b));
+        let (_, us) =
+            validation::bench_n_us(1000, || barracuda::stats::bray_curtis(&vec_a, &vec_b));
         cpu_rows.push(CpuRow {
             name: "Bray-Curtis",
             origin: "wetSpring→S82",
             us,
         });
 
-        let (_, us) = bench_n(1000, || barracuda::stats::chao1(&vec_1k));
+        let (_, us) = validation::bench_n_us(1000, || barracuda::stats::chao1(&vec_1k));
         cpu_rows.push(CpuRow {
             name: "Chao1",
             origin: "wetSpring→S63",
             us,
         });
 
-        let (_, us) = bench_n(1000, || {
+        let (_, us) = validation::bench_n_us(1000, || {
             barracuda::stats::pearson_correlation(&vec_a, &vec_b)
         });
         cpu_rows.push(CpuRow {
@@ -760,7 +746,7 @@ fn main() {
 
         let x_fit: Vec<f64> = (0..500).map(f64::from).collect();
         let y_fit: Vec<f64> = x_fit.iter().map(|&xi| 3.0f64.mul_add(xi, 7.0)).collect();
-        let (_, us) = bench_n(1000, || barracuda::stats::fit_linear(&x_fit, &y_fit));
+        let (_, us) = validation::bench_n_us(1000, || barracuda::stats::fit_linear(&x_fit, &y_fit));
         cpu_rows.push(CpuRow {
             name: "Linear fit",
             origin: "neuralSpring→S66",
@@ -769,7 +755,8 @@ fn main() {
 
         let trap_x: Vec<f64> = (0..1000).map(|i| f64::from(i) * 0.001).collect();
         let trap_y: Vec<f64> = trap_x.iter().map(|x| x * x).collect();
-        let (_, us) = bench_n(5000, || barracuda::numerical::trapz(&trap_y, &trap_x));
+        let (_, us) =
+            validation::bench_n_us(5000, || barracuda::numerical::trapz(&trap_y, &trap_x));
         cpu_rows.push(CpuRow {
             name: "Trapz",
             origin: "hotSpring→S59",
@@ -777,7 +764,7 @@ fn main() {
         });
 
         let erf_pts: Vec<f64> = (0..1000).map(|i| (f64::from(i) - 500.0) / 500.0).collect();
-        let (_, us) = bench_n(5000, || {
+        let (_, us) = validation::bench_n_us(5000, || {
             let mut acc = 0.0;
             for &x in &erf_pts {
                 acc += barracuda::special::erf(x);
@@ -800,7 +787,7 @@ fn main() {
             })
             .collect();
         let y_ridge: Vec<f64> = (0..n_ridge).map(|i| (i as f64 * 0.2).cos()).collect();
-        let (_, us) = bench_n(100, || {
+        let (_, us) = validation::bench_n_us(100, || {
             barracuda::linalg::ridge_regression(&x_ridge, &y_ridge, n_ridge, n_cols, 1, 0.1)
         });
         cpu_rows.push(CpuRow {

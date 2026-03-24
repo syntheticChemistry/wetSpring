@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # baseCamp Paper 14: Anderson Hormesis — Biphasic Dose-Response as Near-Critical Disorder
 
 **Date:** March 19, 2026

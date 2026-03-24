@@ -21,6 +21,7 @@ license = "AGPL-3.0-or-later"
 
 [workspace.lints.rust]
 missing_docs = "deny"
+unsafe_code = "forbid"
 
 [workspace.lints.clippy]
 pedantic = { level = "warn", priority = -1 }

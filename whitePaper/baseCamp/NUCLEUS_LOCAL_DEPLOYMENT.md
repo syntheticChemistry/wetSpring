@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # NUCLEUS Local Deployment — Eastgate Tower
 
 **Date:** March 11, 2026

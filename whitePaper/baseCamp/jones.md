@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+
 # Prof. A. Daniel Jones — MSU Biochemistry & Molecular Biology
 
 **Track:** 2 — PFAS Mass Spectrometry & Environmental ML

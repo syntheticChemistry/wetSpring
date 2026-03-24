@@ -5,7 +5,7 @@
 GPU primitive (or explain why it stays CPU-only). This guides the
 absorption pipeline and identifies what ToadStool needs to build next.
 
-> **Mar 23 update (V133):** 150+ primitives consumed. 0 local WGSL, 0 local derivative math (fully lean). 28 petalTongue scenario builders. standalone barraCuda v0.3.7. 379 experiments, 5,707+ checks. All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed). Forge crate v0.3.0 (252 tests, 90%+ coverage). 1,781 tests, 307 validation binaries (333 total), 234 named tolerances, clippy pedantic+nursery CLEAN. V125: structured `IpcError`, `extract_capabilities()`, `discover_primal()`, 18 binary fixes. V126: `DispatchOutcome<T>` protocol vs application error separation, `health.liveness`/`health.readiness` probes, `IpcError` query helpers (`is_retriable()`/`is_timeout_likely()`/`is_method_not_found()`/`is_connection_error()`). V124: `deny.toml`, `compute.dispatch`, `tracing`. V123: zero-panic `OrExit`, dual-format discovery.
+> **Mar 24 update (V135):** 150+ primitives consumed. 0 local WGSL, 0 local derivative math (fully lean). 28 petalTongue scenario builders. standalone barraCuda v0.3.7. 379 experiments, 5,707+ checks. All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed). Forge crate v0.3.0. 1,891 tests, 355 binaries (333 barracuda + 22 forge), 234 named tolerances, 91.20% coverage (gated at 90%), clippy pedantic+nursery CLEAN. `forbid(unsafe_code)` at workspace level, zero `#[allow()]`. V135: doc reconciliation. V134: deep audit — drug NMF delegation, validation harness refactored, primal discovery extended. V133: `GpuContext`/`TensorSession`, `validate_all`, `performance_surface`.
 
 ---
 
