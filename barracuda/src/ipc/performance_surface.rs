@@ -235,7 +235,7 @@ mod tests {
         let h: PerformanceSurfaceHint = serde_json::from_str(json).unwrap();
         assert_eq!(h.op, "science.diversity");
         assert_eq!(h.recommended_precision, "df64");
-        assert_eq!(h.estimated_throughput, 12_000_000.0);
+        assert!((h.estimated_throughput - 12_000_000.0).abs() < f64::EPSILON);
     }
 
     #[test]

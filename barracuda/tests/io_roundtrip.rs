@@ -1,5 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-#![expect(clippy::redundant_closure_for_method_calls, clippy::unwrap_used)]
+#![expect(
+    clippy::redundant_closure_for_method_calls,
+    clippy::unwrap_used,
+    clippy::expect_used
+)]
 //! Integration tests for I/O parsers: round-trip, determinism, edge cases.
 //!
 //! Each test creates synthetic data in a temporary directory,

@@ -86,10 +86,6 @@ impl std::fmt::Display for Transport {
 }
 
 #[cfg(test)]
-#[expect(
-    clippy::unwrap_used,
-    reason = "test module: assertions use unwrap for clarity"
-)]
 mod tests {
     use super::*;
 

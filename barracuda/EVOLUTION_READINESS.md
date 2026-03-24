@@ -537,7 +537,7 @@ All production dependencies are pure Rust or have pure Rust backends.
 
 | Dependency | Version | Pure Rust? | Notes |
 |------------|---------|:----------:|-------|
-| `barracuda` | path (v0.3.5) | **Yes** | Standalone math primal, zero FFI |
+| `barracuda` | path (v0.3.7) | **Yes** | Standalone math primal, zero FFI |
 | `flate2` | 1.0 | **Yes** | `rust_backend` feature → miniz_oxide (no C zlib) |
 | `bytemuck` | 1 | **Yes** | Zero-copy GPU buffer casting |
 | `serde` | 1 (optional) | **Yes** | Derive only |

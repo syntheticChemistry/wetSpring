@@ -7,19 +7,21 @@ against Rust implementations, then promotes to GPU acceleration via
 
 ```
 Python/R baseline  →  Rust CPU parity  →  GPU acceleration  →  sovereign pipeline
-   (58 scripts)       (1,781 tests)       (44 GPU modules)     (barraCuda/coralReef)
+   (58 scripts)       (1,530+ tests)      (44 GPU modules)     (barraCuda/coralReef)
 ```
 
 | | |
 |---|---|
-| **Tests** | 1,781 passed, 0 failed |
+| **Tests** | 1,530 unit + 27 doc, 0 failed |
 | **Validation checks** | 5,700+ across 307 binaries |
 | **Experiments** | 376 completed + 3 proposed (379 indexed) |
-| **Coverage** | target 90%+ (llvm-cov gated) |
+| **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
 | **Named tolerances** | 234 |
-| **Clippy** | 0 warnings (pedantic + nursery) |
+| **Clippy** | 0 warnings (pedantic + nursery, `-D warnings`) |
 | **Unsafe** | 0 (`#![forbid(unsafe_code)]` all crates) |
+| **`#[allow()]`** | 0 in production (uses `#[expect(reason)]` exclusively) |
 | **Local WGSL** | 0 — fully lean on barraCuda |
+| **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 

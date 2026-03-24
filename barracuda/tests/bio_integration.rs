@@ -4,6 +4,15 @@
 //! feature extraction, EIC, paired-end merging, dereplication, and
 //! end-to-end 16S pipeline.
 
+#![expect(
+    clippy::unwrap_used,
+    reason = "integration test: unwrap for setup clarity — failures are test infra bugs"
+)]
+#![expect(
+    clippy::expect_used,
+    reason = "integration test: expect for parse/open clarity — failures are test infra bugs"
+)]
+
 use std::fs::File;
 use std::io::Write;
 use tempfile::TempDir;

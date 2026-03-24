@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! SHA-256 provenance for Python baseline scripts under `scripts/`.
 //!
-//! This registry lists every `*.py` file in the repository root [`scripts/`]
+//! This registry lists every `*.py` file in the repository root `scripts/`
 //! directory. Recompute digests after editing any script:
 //!
 //! ```text
@@ -366,7 +366,9 @@ mod tests {
     fn provenance_registry_scripts_end_with_py() {
         for p in PROVENANCE_REGISTRY {
             assert!(
-                p.script.ends_with(".py"),
+                std::path::Path::new(p.script)
+                    .extension()
+                    .is_some_and(|ext| ext.eq_ignore_ascii_case("py")),
                 "script path must end with .py: {}",
                 p.script
             );

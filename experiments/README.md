@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-23 (V133: 379 experiments indexed (376 completed + 3 PROPOSED), **333** binaries (**307** validate + 23 benchmark + 3 tools), 5,707+ checks, **1,781** tests (1,529 barracuda + 252 forge). V133: deep evolution sprint — `validate_all`, `GpuContext`/`TensorSession`, `performance_surface` RPCs, zero-copy I/O, IPC routing modules, 234 tolerances / 44 GPU / 49 CPU bio modules. V132: `ValidationSink`, `PROVENANCE_REGISTRY`, `IpcError::is_recoverable`, `normalize_method`, `DeviceCapabilities`, sweetGrass braids + `StreamItem` + `performance_surface`, workspace lints. V130 Anderson Hormesis: `bio::hormesis`, `bio::binding_landscape`, Phase 4 methodology. V129: Deep debt evolution — `cast` module (15 helpers), unconditional `primal_names`, nautilus fix. Zero local math duplication, zero `#[allow()]`, zero clippy warnings, zero unsafe.)
+**Updated**: 2026-03-23 (V134: 379 experiments indexed (376 completed + 3 PROPOSED), **333** binaries (**307** validate + 23 benchmark + 3 tools), 5,707+ checks, **1,530** unit + **27** doc tests. V134: deep audit + debt resolution — drug NMF delegated to `barracuda::linalg::nmf`, 26 clippy errors resolved, coverage 91.20%, zero duplicate math. V133: deep evolution sprint — `validate_all`, `GpuContext`/`TensorSession`, `performance_surface` RPCs, zero-copy I/O, IPC routing modules, 234 tolerances / 44 GPU / 49 CPU bio modules. Zero local math duplication, zero `#[allow()]`, zero clippy warnings, zero unsafe.)
 
 ---
 

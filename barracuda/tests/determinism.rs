@@ -2,6 +2,15 @@
 //! Determinism tests: rerun identical inputs, expect bitwise-identical output
 //! via `to_bits()` equality.
 
+#![expect(
+    clippy::unwrap_used,
+    reason = "integration test: unwrap for setup clarity — failures are test infra bugs"
+)]
+#![expect(
+    clippy::expect_used,
+    reason = "integration test: expect for parse/open clarity — failures are test infra bugs"
+)]
+
 use std::fmt::Write as _;
 use std::fs::File;
 use std::io::Write;

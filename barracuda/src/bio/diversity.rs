@@ -157,10 +157,6 @@ pub fn alpha_diversity(counts: &[f64]) -> AlphaDiversity {
 
 #[cfg(test)]
 #[expect(
-    clippy::cast_precision_loss,
-    reason = "test module: usize→f64 for proptest depth indices"
-)]
-#[expect(
     clippy::suboptimal_flops,
     reason = "test module: arithmetic clarity over mul_add in proptests"
 )]
@@ -461,7 +457,7 @@ mod tests {
                     })
                     .collect();
                 // `f64::total_cmp`: total order for stable proptest sorting (NaN-safe).
-                depths.sort_by(|a, b| a.total_cmp(b));
+                depths.sort_by(f64::total_cmp);
                 prop_assume!(!depths.is_empty());
                 let curve = rarefaction_curve(&counts, &depths);
                 for i in 1..curve.len() {

@@ -6,7 +6,7 @@
 
 [alias]
 coverage = "llvm-cov --workspace --html"
-coverage-check = "llvm-cov --workspace --fail-under-lines 80"
+coverage-check = "llvm-cov --workspace --fail-under-lines 90"
 coverage-json = "llvm-cov --workspace --json --output-path coverage.json"
 
 [build]

@@ -170,10 +170,6 @@ fn rpc_call(socket: &Path, request: &str) -> Result<String, String> {
 }
 
 #[cfg(test)]
-#[expect(
-    clippy::unwrap_used,
-    reason = "test module: assertions use unwrap for clarity"
-)]
 mod tests {
     use super::*;
 

@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![forbid(unsafe_code)]
 #![cfg(feature = "ipc")]
+#![expect(
+    clippy::expect_used,
+    reason = "integration test: expect for IPC setup/parse clarity — failures are test infra bugs"
+)]
 //! End-to-end IPC integration test: spin up a real Unix socket server,
 //! send JSON-RPC 2.0 requests for science handlers, and verify responses.
 //!

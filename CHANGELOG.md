@@ -3,6 +3,42 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V134] — 2026-03-23
+
+### Deep Audit + Debt Resolution — Zero Clippy, Zero Duplicate Math
+
+Full ecosystem audit against wateringHole standards, followed by systematic
+resolution of all findings. Drug handler NMF delegation to barraCuda, clippy
+pedantic+nursery clean, stale lint suppression cleanup, coverage threshold
+alignment.
+
+#### Changed
+- `ipc/handlers/drug.rs`: replaced 112 lines of local NMF (3 matmul functions +
+  `nmf_mu`) with delegation to `barracuda::linalg::nmf::nmf()` — zero duplicate
+  math remains in codebase
+- `bio/diversity.rs`: idiomatic `.sort_by(f64::total_cmp)` replaces redundant closure
+- `ipc/performance_surface.rs`: epsilon comparison replaces `assert_eq!` on f64
+- `provenance_registry.rs`: `Path::extension()` replaces `.ends_with(".py")` string match
+- `.cargo/config.toml`: coverage-check threshold aligned 80% → 90% to match CI gate
+
+#### Fixed
+- 26 clippy errors across 12 files (cast_possible_truncation, unwrap_used,
+  expect_used, float_cmp, case_sensitive_file_extension_comparisons,
+  redundant_closure_for_method_calls, unfulfilled_lint_expectations)
+- Broken intra-doc link in `provenance_registry.rs`
+- 3 stale `#[expect]` attributes removed (diversity.rs, sweetgrass.rs, transport.rs)
+- 4 integration test files given proper crate-level lint expectations
+
+#### Metrics
+- Tests: 1,530 unit + 27 doc, 0 failed
+- Clippy: 0 warnings (pedantic + nursery, `-D warnings`)
+- Doc: 0 warnings (`-D warnings`)
+- Coverage: 91.20% line / 90.30% function / 91.03% region
+- Cross-compile: musl PASS
+- Format: clean
+- Duplicate math: 0 (drug NMF → barracuda::linalg::nmf)
+- `#[allow()]`: 0 in production (all `#[expect(reason)]`)
+
 ## [V133] — 2026-03-23
 
 ### Deep Evolution Sprint — Cross-Ecosystem Absorption + Deep Debt Resolution

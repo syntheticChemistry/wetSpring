@@ -164,7 +164,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 - **NPU edge inference** — ESN reservoir on AKD1000, online evolution, adaptive sampling (V60)
 - **Field genomics** (planned) — Nanopore sequencing + NPU classification + metalForge routing. See [FIELD_GENOMICS_REQUIREMENTS.md](FIELD_GENOMICS_REQUIREMENTS.md)
 - **Data type profiling** — Biological data format catalog driving NestGate data primal evolution. See [DATA_TYPES.md](DATA_TYPES.md)
-- **Sovereign Rust bioinformatics** — 47 CPU + 47 GPU modules + 0 local WGSL (fully lean), 2 runtime dependencies (flate2 + bytemuck), 150+ primitives (standalone barraCuda v0.3.5, always-on, zero fallback, 264 ComputeDispatch ops)
+- **Sovereign Rust bioinformatics** — 47 CPU + 47 GPU modules + 0 local WGSL (fully lean), 2 runtime dependencies (flate2 + bytemuck), 150+ primitives (standalone barraCuda v0.3.7, always-on, zero fallback, 264 ComputeDispatch ops)
 
 ### wetSpring IS NOT:
 - Sensor noise analysis (groundSpring)
