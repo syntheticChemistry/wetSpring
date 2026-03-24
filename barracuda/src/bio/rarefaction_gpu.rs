@@ -20,6 +20,7 @@
 //! - barraCuda `batched_multinomial`, `diversity_fusion`.
 
 use crate::bio::diversity;
+use crate::cast::{f64_usize, u64_f64, u64_u32_truncate, usize_f64, usize_u64};
 use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
 use barracuda::ops::bio::{BatchedMultinomialGpu, DiversityFusionGpu};
@@ -94,11 +95,6 @@ fn require_f64(gpu: &GpuF64) -> Result<()> {
 /// # Errors
 ///
 /// Returns an error if GPU dispatch fails or the device lacks f64 support.
-#[expect(
-    clippy::cast_possible_truncation,
-    clippy::cast_precision_loss,
-    clippy::cast_sign_loss
-)]
 pub fn rarefaction_bootstrap_gpu(
     gpu: &GpuF64,
     counts: &[f64],
@@ -107,7 +103,7 @@ pub fn rarefaction_bootstrap_gpu(
     require_f64(gpu)?;
 
     let total: f64 = counts.iter().sum();
-    let depth = params.depth.unwrap_or(total as usize);
+    let depth = params.depth.unwrap_or_else(|| f64_usize(total));
 
     if counts.is_empty() || depth == 0 {
         return Ok(RarefactionResult {
@@ -184,8 +180,8 @@ pub fn rarefaction_bootstrap_gpu(
             .map(|i| {
                 let s = params
                     .seed
-                    .wrapping_add((i / 4) as u64 * 0x9e37_79b9_7f4a_7c15);
-                ((s >> ((i % 4) * 16)) as u32).wrapping_add(0x9e37_79b9)
+                    .wrapping_add(usize_u64(i / 4).wrapping_mul(0x9e37_79b9_7f4a_7c15));
+                u64_u32_truncate(s >> ((i % 4) * 16)).wrapping_add(0x9e37_79b9)
             })
             .collect();
 
@@ -208,7 +204,7 @@ pub fn rarefaction_bootstrap_gpu(
         let observed_samples: Vec<f64> = (0..n_reps)
             .map(|r| {
                 let row = &counts_u32[r * n_taxa..(r + 1) * n_taxa];
-                row.iter().filter(|&&c| c > 0).count() as f64
+                usize_f64(row.iter().filter(|&&c| c > 0).count())
             })
             .collect();
 
@@ -238,7 +234,6 @@ pub fn rarefaction_bootstrap_gpu(
 }
 
 /// Subsample a community to the given depth using multinomial sampling.
-#[expect(clippy::cast_precision_loss)] // Precision: u64 RNG bits / 2^53 fits f64
 fn subsample_community(counts: &[f64], depth: usize, rng: &mut u64) -> Vec<f64> {
     let total: f64 = counts.iter().sum();
     if total <= 0.0 {
@@ -260,7 +255,7 @@ fn subsample_community(counts: &[f64], depth: usize, rng: &mut u64) -> Vec<f64> 
         *rng = rng
             .wrapping_mul(6_364_136_223_846_793_005)
             .wrapping_add(1_442_695_040_888_963_407);
-        let u = (*rng >> 11) as f64 / (1_u64 << 53) as f64;
+        let u = u64_f64(*rng >> 11) / u64_f64(1_u64 << 53);
 
         // Binary search for the species
         let idx = match cumulative.binary_search_by(|p| p.total_cmp(&u)) {
@@ -307,7 +302,6 @@ fn compute_ci(samples: &[f64]) -> BootstrapCi {
 /// # Errors
 ///
 /// Returns an error if GPU dispatch fails or the device lacks f64 support.
-#[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss)] // Truncation/Sign: sample sizes fit u32
 pub fn batch_rarefaction_gpu(
     gpu: &GpuF64,
     samples: &[Vec<f64>],
@@ -316,7 +310,7 @@ pub fn batch_rarefaction_gpu(
     let min_depth = params.depth.unwrap_or_else(|| {
         samples
             .iter()
-            .map(|s| s.iter().sum::<f64>() as usize)
+            .map(|s| f64_usize(s.iter().sum::<f64>()))
             .filter(|&d| d > 0)
             .min()
             .unwrap_or(0)
@@ -332,17 +326,55 @@ pub fn batch_rarefaction_gpu(
         .enumerate()
         .map(|(i, sample)| {
             let mut p = effective_params.clone();
-            p.seed = params.seed.wrapping_add(i as u64 * 1_000_000);
+            p.seed = params.seed.wrapping_add(usize_u64(i).wrapping_mul(1_000_000));
             rarefaction_bootstrap_gpu(gpu, sample, &p)
         })
         .collect()
 }
 
 #[cfg(test)]
-#[expect(clippy::expect_used, clippy::unwrap_used)]
+#[expect(
+    clippy::expect_used,
+    clippy::unwrap_used,
+    reason = "tests: GPU init and rarefaction results"
+)]
 mod tests {
     use super::*;
     use crate::tolerances;
+
+    fn assert_bootstrap_ci_bits(a: &BootstrapCi, b: &BootstrapCi) {
+        assert_eq!(a.mean.to_bits(), b.mean.to_bits(), "bitwise determinism violated");
+        assert_eq!(a.lower.to_bits(), b.lower.to_bits(), "bitwise determinism violated");
+        assert_eq!(a.upper.to_bits(), b.upper.to_bits(), "bitwise determinism violated");
+        assert_eq!(a.se.to_bits(), b.se.to_bits(), "bitwise determinism violated");
+    }
+
+    /// CPU rarefaction path (community smaller than GPU dispatch threshold): same seed →
+    /// bit-identical bootstrap CIs via the CPU multinomial subsample path.
+    #[tokio::test]
+    async fn bitwise_deterministic_with_seed() {
+        let Ok(gpu) = crate::gpu::GpuF64::new().await else {
+            return;
+        };
+        if !gpu.has_f64 {
+            return;
+        }
+
+        let counts: Vec<f64> = (1..=10).map(|i| f64::from(i * 10)).collect();
+        let params = RarefactionGpuParams {
+            n_bootstrap: 64,
+            depth: Some(100),
+            seed: 42,
+        };
+
+        let result_a = rarefaction_bootstrap_gpu(&gpu, &counts, &params).expect("rarefaction");
+        let result_b = rarefaction_bootstrap_gpu(&gpu, &counts, &params).expect("rarefaction");
+
+        assert_eq!(result_a.depth, result_b.depth, "bitwise determinism violated");
+        assert_bootstrap_ci_bits(&result_a.shannon, &result_b.shannon);
+        assert_bootstrap_ci_bits(&result_a.simpson, &result_b.simpson);
+        assert_bootstrap_ci_bits(&result_a.observed, &result_b.observed);
+    }
 
     /// Single-species community: every bootstrap replicate yields the same
     /// rarefied vector, so `Shannon=0`, `Simpson=0`, `observed=1` deterministically.

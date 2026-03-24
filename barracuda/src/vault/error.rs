@@ -1,48 +1,31 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Typed errors for the Genomic Vault module.
 
-use std::fmt;
-
 /// Errors produced by vault storage operations.
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum VaultError {
     /// Consent ticket's owner does not match the requested owner.
+    #[error("consent ticket owner mismatch")]
     ConsentOwnerMismatch,
     /// Consent ticket has expired or been revoked.
+    #[error("consent ticket expired or revoked")]
     ConsentExpiredOrRevoked,
     /// Requested blob was not found in the vault.
+    #[error("blob not found")]
     BlobNotFound,
     /// Decryption failed (wrong key or tampered ciphertext).
+    #[error("decryption failed (wrong key or tampered ciphertext)")]
     DecryptionFailed,
     /// Post-decryption integrity check failed (content hash mismatch).
+    #[error("decryption integrity check failed")]
     IntegrityCheckFailed,
     /// Encryption failed.
+    #[error("encryption failed: {0}")]
     EncryptionFailed(String),
     /// Blob exists but no valid consent ticket was presented.
+    #[error("blob exists but no valid consent ticket presented")]
     Unauthorized,
     /// Invalid key length for cipher construction.
+    #[error("invalid key length")]
     InvalidKeyLength,
 }
-
-impl fmt::Display for VaultError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::ConsentOwnerMismatch => write!(f, "consent ticket owner mismatch"),
-            Self::ConsentExpiredOrRevoked => {
-                write!(f, "consent ticket expired or revoked")
-            }
-            Self::BlobNotFound => write!(f, "blob not found"),
-            Self::DecryptionFailed => {
-                write!(f, "decryption failed (wrong key or tampered ciphertext)")
-            }
-            Self::IntegrityCheckFailed => write!(f, "decryption integrity check failed"),
-            Self::EncryptionFailed(msg) => write!(f, "encryption failed: {msg}"),
-            Self::Unauthorized => {
-                write!(f, "blob exists but no valid consent ticket presented")
-            }
-            Self::InvalidKeyLength => write!(f, "invalid key length"),
-        }
-    }
-}
-
-impl std::error::Error for VaultError {}

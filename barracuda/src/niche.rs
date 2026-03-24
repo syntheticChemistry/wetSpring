@@ -217,7 +217,7 @@ pub fn ecology_semantic_mappings() -> serde_json::Value {
 /// Returns the deploy graph path for this niche.
 #[must_use]
 pub const fn deploy_graph_path() -> &'static str {
-    "graphs/wetspring_deploy.toml"
+    crate::primal_names::DEPLOY_GRAPH_REL_PATH
 }
 
 /// Environment variable for explicit NPU device path override.

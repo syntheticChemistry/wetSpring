@@ -117,43 +117,55 @@ impl Drop for Server {
     }
 }
 
+/// Dispatch a single parsed request, recording metrics.
+fn dispatch_request(
+    req: &super::message::Request,
+    metrics: &Metrics,
+    start: std::time::Instant,
+) -> String {
+    let method_key = protocol::normalize_method(&req.method);
+    let result = if method_key.as_ref() == "metrics.snapshot" {
+        Ok(metrics.snapshot())
+    } else {
+        dispatch::dispatch(&req.method, &req.params)
+    };
+    match result {
+        Ok(result) => {
+            metrics.record_success(method_key.as_ref(), start.elapsed());
+            protocol::success_response(&req.id, &result)
+        }
+        Err(rpc_err) => {
+            metrics.record_error(method_key.as_ref(), start.elapsed());
+            protocol::error_response(&req.id, rpc_err.code, &rpc_err.message)
+        }
+    }
+}
+
+/// Dispatch a notification (fire-and-forget, no response).
+fn dispatch_notification(line: &str, metrics: &Metrics, start: std::time::Instant) {
+    if let Ok(req) = protocol::parse_request(line) {
+        let method_key = protocol::normalize_method(&req.method);
+        let result = if method_key.as_ref() == "metrics.snapshot" {
+            Ok(metrics.snapshot())
+        } else {
+            dispatch::dispatch(&req.method, &req.params)
+        };
+        match &result {
+            Ok(_) => metrics.record_success(method_key.as_ref(), start.elapsed()),
+            Err(_) => metrics.record_error(method_key.as_ref(), start.elapsed()),
+        }
+    }
+}
+
 /// Process a single JSON-RPC request. Returns `None` for notifications (no response).
 fn process_single(line: &str, metrics: &Metrics, start: std::time::Instant) -> Option<String> {
     if protocol::is_notification(line) {
-        if let Ok(req) = protocol::parse_request(line) {
-            let method_key = protocol::normalize_method(&req.method);
-            let result = if method_key.as_ref() == "metrics.snapshot" {
-                Ok(metrics.snapshot())
-            } else {
-                dispatch::dispatch(&req.method, &req.params)
-            };
-            match &result {
-                Ok(_) => metrics.record_success(method_key.as_ref(), start.elapsed()),
-                Err(_) => metrics.record_error(method_key.as_ref(), start.elapsed()),
-            }
-        }
+        dispatch_notification(line, metrics, start);
         return None;
     }
 
     Some(match protocol::parse_request(line) {
-        Ok(req) => {
-            let method_key = protocol::normalize_method(&req.method);
-            let result = if method_key.as_ref() == "metrics.snapshot" {
-                Ok(metrics.snapshot())
-            } else {
-                dispatch::dispatch(&req.method, &req.params)
-            };
-            match result {
-                Ok(result) => {
-                    metrics.record_success(method_key.as_ref(), start.elapsed());
-                    protocol::success_response(&req.id, &result)
-                }
-                Err(rpc_err) => {
-                    metrics.record_error(method_key.as_ref(), start.elapsed());
-                    protocol::error_response(&req.id, rpc_err.code, &rpc_err.message)
-                }
-            }
-        }
+        Ok(req) => dispatch_request(&req, metrics, start),
         Err(parse_err) => {
             metrics.record_error("_parse", start.elapsed());
             protocol::error_response(
@@ -179,40 +191,12 @@ fn process_batch(line: &str, metrics: &Metrics, start: std::time::Instant) -> Op
     let mut responses: Vec<String> = Vec::new();
     for elem in elements {
         if protocol::is_notification(&elem) {
-            if let Ok(req) = protocol::parse_request(&elem) {
-                let method_key = protocol::normalize_method(&req.method);
-                let result = if method_key.as_ref() == "metrics.snapshot" {
-                    Ok(metrics.snapshot())
-                } else {
-                    dispatch::dispatch(&req.method, &req.params)
-                };
-                match &result {
-                    Ok(_) => metrics.record_success(method_key.as_ref(), start.elapsed()),
-                    Err(_) => metrics.record_error(method_key.as_ref(), start.elapsed()),
-                }
-            }
+            dispatch_notification(&elem, metrics, start);
             continue;
         }
 
         let resp = match protocol::parse_request(&elem) {
-            Ok(req) => {
-                let method_key = protocol::normalize_method(&req.method);
-                let result = if method_key.as_ref() == "metrics.snapshot" {
-                    Ok(metrics.snapshot())
-                } else {
-                    dispatch::dispatch(&req.method, &req.params)
-                };
-                match result {
-                    Ok(result) => {
-                        metrics.record_success(method_key.as_ref(), start.elapsed());
-                        protocol::success_response(&req.id, &result)
-                    }
-                    Err(rpc_err) => {
-                        metrics.record_error(method_key.as_ref(), start.elapsed());
-                        protocol::error_response(&req.id, rpc_err.code, &rpc_err.message)
-                    }
-                }
-            }
+            Ok(req) => dispatch_request(&req, metrics, start),
             Err(parse_err) => {
                 metrics.record_error("_parse", start.elapsed());
                 protocol::error_response(

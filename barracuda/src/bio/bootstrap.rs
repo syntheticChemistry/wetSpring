@@ -265,6 +265,42 @@ mod tests {
         }
     }
 
+    #[test]
+    fn bitwise_deterministic_with_seed() {
+        let aln = make_alignment();
+        let tree = make_tree(&aln);
+        let lls_a = bootstrap_likelihoods(&tree, &aln, 20, 1.0, 42);
+        let lls_b = bootstrap_likelihoods(&tree, &aln, 20, 1.0, 42);
+        assert_eq!(lls_a.len(), lls_b.len(), "bitwise determinism violated");
+        for (a, b) in lls_a.iter().zip(&lls_b) {
+            assert_eq!(a.to_bits(), b.to_bits(), "bitwise determinism violated");
+        }
+
+        let data: Vec<f64> = (0..30).map(|i| f64::from(i * 3 + 7)).collect();
+        let ci_a = barracuda::stats::bootstrap_ci(&data, barracuda::stats::mean, 200, 0.95, 42)
+            .expect("bootstrap_ci");
+        let ci_b = barracuda::stats::bootstrap_ci(&data, barracuda::stats::mean, 200, 0.95, 42)
+            .expect("bootstrap_ci");
+        assert_eq!(ci_a.estimate.to_bits(), ci_b.estimate.to_bits(), "bitwise determinism violated");
+        assert_eq!(ci_a.lower.to_bits(), ci_b.lower.to_bits(), "bitwise determinism violated");
+        assert_eq!(ci_a.upper.to_bits(), ci_b.upper.to_bits(), "bitwise determinism violated");
+        assert_eq!(
+            ci_a.confidence.to_bits(),
+            ci_b.confidence.to_bits(),
+            "bitwise determinism violated"
+        );
+        assert_eq!(
+            ci_a.std_error.to_bits(),
+            ci_b.std_error.to_bits(),
+            "bitwise determinism violated"
+        );
+        assert_eq!(ci_a.n_bootstrap, ci_b.n_bootstrap, "bitwise determinism violated");
+        assert_eq!(ci_a.distribution.len(), ci_b.distribution.len(), "bitwise determinism violated");
+        for (a, b) in ci_a.distribution.iter().zip(&ci_b.distribution) {
+            assert_eq!(a.to_bits(), b.to_bits(), "bitwise determinism violated");
+        }
+    }
+
     mod prop {
         use proptest::prelude::*;
 

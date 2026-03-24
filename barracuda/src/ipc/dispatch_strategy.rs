@@ -9,13 +9,16 @@
 use std::path::PathBuf;
 
 /// Errors from compute dispatch operations.
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum DispatchError {
     /// No toadStool compute socket found (standalone mode).
+    #[error("no toadStool compute primal discovered")]
     NoComputePrimal,
     /// Transport-level failure (socket connect, read, write).
+    #[error("compute dispatch transport: {0}")]
     Transport(String),
     /// toadStool returned a JSON-RPC error.
+    #[error("compute dispatch RPC [{code}]: {message}")]
     Rpc {
         /// JSON-RPC error code.
         code: i64,
@@ -23,25 +26,9 @@ pub enum DispatchError {
         message: String,
     },
     /// Response missing expected fields.
+    #[error("compute dispatch malformed response: {0}")]
     MalformedResponse(String),
 }
-
-impl std::fmt::Display for DispatchError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::NoComputePrimal => write!(f, "no toadStool compute primal discovered"),
-            Self::Transport(msg) => write!(f, "compute dispatch transport: {msg}"),
-            Self::Rpc { code, message } => {
-                write!(f, "compute dispatch RPC [{code}]: {message}")
-            }
-            Self::MalformedResponse(msg) => {
-                write!(f, "compute dispatch malformed response: {msg}")
-            }
-        }
-    }
-}
-
-impl std::error::Error for DispatchError {}
 
 /// Handle returned by `compute.dispatch.submit`.
 #[derive(Debug, Clone)]

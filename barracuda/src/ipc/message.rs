@@ -5,12 +5,11 @@
 //! `capability.list` results). Complements [`super::protocol`] helpers for
 //! normalization, framing, and response formatting.
 
-use std::fmt;
-
 use serde_json::Value;
 
 /// JSON-RPC 2.0 error with numeric code and human-readable message.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, thiserror::Error)]
+#[error("[{code}] {message}")]
 pub struct RpcError {
     /// Standard JSON-RPC error code (e.g. `-32601` method not found).
     pub code: i64,
@@ -46,14 +45,6 @@ impl RpcError {
         }
     }
 }
-
-impl fmt::Display for RpcError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "[{}] {}", self.code, self.message)
-    }
-}
-
-impl std::error::Error for RpcError {}
 
 /// Parse failure including the request `id` for correlating the error response.
 #[derive(Debug)]

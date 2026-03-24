@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+//! Provenance: Liu et al. 2014 HMM (forward, Viterbi, posterior) → `liu2014_hmm_baseline.py` → Rust sovereign (wetSpring V135)
+//! Validated against: `scripts/liu2014_hmm_baseline.py`; `liu2014_hmm_python_baseline.json`
 #![forbid(unsafe_code)]
 //! Validation: Liu 2014 HMM primitives (Exp026).
 //!

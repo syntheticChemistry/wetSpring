@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Core types for nanopore reads and signal statistics.
 
+use crate::cast::usize_f64;
+
 /// A single nanopore read with raw ionic current signal.
 ///
 /// The signal is stored as raw ADC values (int16). Use [`calibrated_signal`]
@@ -37,10 +39,9 @@ impl NanoporeRead {
 
     /// Duration of this read in seconds.
     #[must_use]
-    #[expect(clippy::cast_precision_loss)] // Precision: signal.len() fits f64
     pub fn duration_seconds(&self) -> f64 {
         if self.sample_rate > 0.0 {
-            self.signal.len() as f64 / self.sample_rate
+            usize_f64(self.signal.len()) / self.sample_rate
         } else {
             0.0
         }
@@ -63,7 +64,6 @@ impl NanoporeRead {
     /// Uses Welford's online algorithm for numerically stable single-pass
     /// computation — no intermediate `Vec<f64>` allocation.
     #[must_use]
-    #[expect(clippy::cast_precision_loss)] // Precision: signal.len() fits f64
     pub fn signal_stats(&self) -> SignalStats {
         if self.signal.is_empty() {
             return SignalStats {
@@ -84,14 +84,14 @@ impl NanoporeRead {
             lo = lo.min(s);
             hi = hi.max(s);
             let x = f64::from(s);
-            let count = (i + 1) as f64;
+            let count = usize_f64(i + 1);
             let delta = x - welford_mean;
             welford_mean += delta / count;
             let delta2 = x - welford_mean;
             m2 = delta.mul_add(delta2, m2);
         }
 
-        let n = self.signal.len() as f64;
+        let n = usize_f64(self.signal.len());
         let std_dev = if n > 1.0 { (m2 / n).sqrt() } else { 0.0 };
 
         SignalStats {

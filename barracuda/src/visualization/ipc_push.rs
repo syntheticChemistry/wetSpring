@@ -21,15 +21,19 @@ pub struct PetalTonguePushClient {
 }
 
 /// Error type for push operations.
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum PushError {
     /// `petalTongue` socket not found at any candidate path.
+    #[error("petalTongue not found: {0}")]
     NotFound(String),
     /// Connection to `petalTongue` socket failed.
-    ConnectionFailed(std::io::Error),
+    #[error("connection failed: {0}")]
+    ConnectionFailed(#[source] std::io::Error),
     /// JSON serialization error.
+    #[error("serialization error: {0}")]
     SerializationError(String),
     /// JSON-RPC error response from `petalTongue`.
+    #[error("RPC error {code}: {message}")]
     RpcError {
         /// JSON-RPC error code.
         code: i64,
@@ -37,19 +41,6 @@ pub enum PushError {
         message: String,
     },
 }
-
-impl std::fmt::Display for PushError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::NotFound(msg) => write!(f, "petalTongue not found: {msg}"),
-            Self::ConnectionFailed(e) => write!(f, "connection failed: {e}"),
-            Self::SerializationError(e) => write!(f, "serialization error: {e}"),
-            Self::RpcError { code, message } => write!(f, "RPC error {code}: {message}"),
-        }
-    }
-}
-
-impl std::error::Error for PushError {}
 
 /// Result type for push operations.
 pub type PushResult<T> = Result<T, PushError>;

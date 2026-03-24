@@ -4,6 +4,7 @@
 use serde_json::{Value, json};
 
 use crate::bio::alignment::{AlignmentResult, ScoringParams};
+use crate::cast::usize_f64;
 use crate::ipc::protocol::RpcError;
 
 /// Handle `science.alignment` — Smith-Waterman local alignment.
@@ -11,7 +12,6 @@ use crate::ipc::protocol::RpcError;
 /// # Errors
 ///
 /// Returns `RpcError::invalid_params` if `seq_a` or `seq_b` is missing.
-#[expect(clippy::cast_precision_loss)] // Precision: match count and aligned_len bounded by sequence length
 pub fn handle_alignment(params: &Value) -> Result<Value, RpcError> {
     let seq_a = params
         .get("seq_a")
@@ -56,7 +56,7 @@ pub fn handle_alignment(params: &Value) -> Result<Value, RpcError> {
             .zip(result.aligned_target.iter())
             .filter(|(a, b)| a == b && **a != b'-')
             .count();
-        matches as f64 / aligned_len as f64
+        usize_f64(matches) / usize_f64(aligned_len)
     } else {
         0.0
     };

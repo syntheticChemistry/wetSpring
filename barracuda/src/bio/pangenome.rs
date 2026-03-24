@@ -10,6 +10,7 @@
 //!
 //! Used in Moulana & Anderson 2020 (Sulfurovum pangenomics).
 
+use crate::cast::usize_f64;
 use crate::special::normal_cdf;
 
 /// A gene cluster with its presence across genomes.
@@ -138,7 +139,6 @@ pub fn clusters_from_matrix(
 /// `n(g)` is total gene count. Alpha < 1 indicates open pangenome.
 ///
 /// Uses simple linear regression on log-log data.
-#[expect(clippy::cast_precision_loss)] // usize → f64 for log-log regression
 fn fit_heaps_law(clusters: &[GeneCluster], n_genomes: usize) -> Option<f64> {
     if n_genomes < 3 || clusters.is_empty() {
         return None;
@@ -156,7 +156,7 @@ fn fit_heaps_law(clusters: &[GeneCluster], n_genomes: usize) -> Option<f64> {
         }
         let total = seen.iter().filter(|&&s| s).count();
         if total > 0 {
-            points.push(((g + 1) as f64, total as f64));
+            points.push((usize_f64(g + 1), usize_f64(total)));
         }
     }
 
@@ -176,32 +176,33 @@ fn fit_heaps_law(clusters: &[GeneCluster], n_genomes: usize) -> Option<f64> {
 /// Tests whether `k` successes in `n` draws from a population of `big_n`
 /// with `big_k` total successes is significant.
 #[must_use]
-#[expect(clippy::cast_precision_loss)] // usize → f64 for normal approximation
 pub fn hypergeometric_pvalue(k: usize, n: usize, big_k: usize, big_n: usize) -> f64 {
     if big_n == 0 || n == 0 || big_k == 0 {
         return 1.0;
     }
 
-    let expected = n as f64 * big_k as f64 / big_n as f64;
-    if (k as f64) <= expected {
+    let expected = usize_f64(n) * usize_f64(big_k) / usize_f64(big_n);
+    if usize_f64(k) <= expected {
         return 1.0;
     }
 
     // Normal approximation to hypergeometric
-    let var = n as f64 * big_k as f64 * (big_n - big_k) as f64 * (big_n - n) as f64
-        / (big_n as f64 * big_n as f64 * (big_n - 1).max(1) as f64);
+    let var = usize_f64(n)
+        * usize_f64(big_k)
+        * usize_f64(big_n - big_k)
+        * usize_f64(big_n - n)
+        / (usize_f64(big_n) * usize_f64(big_n) * usize_f64((big_n - 1).max(1)));
 
     if var <= 0.0 {
-        return if k as f64 > expected { 0.0 } else { 1.0 };
+        return if usize_f64(k) > expected { 0.0 } else { 1.0 };
     }
 
-    let z = (k as f64 - expected) / var.sqrt();
+    let z = (usize_f64(k) - expected) / var.sqrt();
     1.0 - normal_cdf(z)
 }
 
 /// Benjamini-Hochberg FDR correction.
 #[must_use]
-#[expect(clippy::cast_precision_loss)] // usize → f64 for rank adjustment
 pub fn benjamini_hochberg(pvalues: &[f64]) -> Vec<f64> {
     let n = pvalues.len();
     if n == 0 {
@@ -215,7 +216,7 @@ pub fn benjamini_hochberg(pvalues: &[f64]) -> Vec<f64> {
     let mut cummin = f64::INFINITY;
     for i in (0..n).rev() {
         let rank = i + 1;
-        let adj = indexed[i].1 * n as f64 / rank as f64;
+        let adj = indexed[i].1 * usize_f64(n) / usize_f64(rank);
         cummin = cummin.min(adj).min(1.0);
         adjusted[indexed[i].0] = cummin;
     }

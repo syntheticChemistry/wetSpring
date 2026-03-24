@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+//! Provenance: Analytical diversity metrics (Shannon, Simpson, Chao1) + skbio simulations → Python baseline → Rust sovereign (wetSpring V135)
+//! Validated against: skbio 0.6.0; Galaxy Exp002 `diversity_report.json`
 #![forbid(unsafe_code)]
 //! Validate diversity metrics against analytical known values and skbio baselines.
 //!

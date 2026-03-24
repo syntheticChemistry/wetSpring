@@ -160,6 +160,80 @@ pub const fn u128_f64(v: u128) -> f64 {
     v as f64
 }
 
+/// `f64` → `f32`. Intentional precision loss for GPU shader inputs.
+#[expect(
+    clippy::cast_possible_truncation,
+    reason = "intentional: GPU shaders require f32"
+)]
+#[inline]
+#[must_use]
+pub const fn f64_f32(v: f64) -> f32 {
+    v as f32
+}
+
+/// `usize` → `i32`. Debug-asserts the value fits.
+#[expect(
+    clippy::cast_possible_truncation,
+    clippy::cast_possible_wrap,
+    reason = "caller ensures v fits in i32; debug-asserted"
+)]
+#[inline]
+#[must_use]
+pub const fn usize_i32(v: usize) -> i32 {
+    debug_assert!(v <= i32::MAX as usize, "usize_i32: overflow");
+    v as i32
+}
+
+/// `u64` → `u32`, intentionally truncating to the low 32 bits.
+///
+/// Used for PRNG seed generation where only entropy matters.
+#[expect(
+    clippy::cast_possible_truncation,
+    reason = "intentional: low 32 bits for seed generation"
+)]
+#[inline]
+#[must_use]
+pub const fn u64_u32_truncate(v: u64) -> u32 {
+    v as u32
+}
+
+/// `f64` → `i64`. Truncates toward zero; debug-asserts finite.
+#[expect(
+    clippy::cast_possible_truncation,
+    reason = "caller ensures v is finite and fits in i64"
+)]
+#[inline]
+#[must_use]
+pub fn f64_i64(v: f64) -> i64 {
+    debug_assert!(v.is_finite(), "f64_i64: {v} not finite");
+    v as i64
+}
+
+/// `i32` → `usize`. Debug-asserts non-negative.
+#[expect(
+    clippy::cast_sign_loss,
+    reason = "caller ensures v is non-negative; debug-asserted"
+)]
+#[inline]
+#[must_use]
+pub const fn i32_usize(v: i32) -> usize {
+    debug_assert!(v >= 0, "i32_usize: negative value");
+    v as usize
+}
+
+/// `i64` → `usize`. Debug-asserts non-negative and in range.
+#[expect(
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    reason = "caller ensures v is non-negative; may narrow on 32-bit targets"
+)]
+#[inline]
+#[must_use]
+pub const fn i64_usize(v: i64) -> usize {
+    debug_assert!(v >= 0, "i64_usize: negative value");
+    v as usize
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -198,5 +272,38 @@ mod tests {
     #[test]
     fn usize_to_u64() {
         assert_eq!(usize_u64(42), 42_u64);
+    }
+
+    #[test]
+    fn f64_f32_precision() {
+        let v = f64_f32(1.5_f64);
+        assert!((v - 1.5_f32).abs() < f32::EPSILON);
+    }
+
+    #[test]
+    fn usize_i32_small() {
+        assert_eq!(usize_i32(42), 42_i32);
+    }
+
+    #[test]
+    fn u64_u32_truncate_low_bits() {
+        assert_eq!(u64_u32_truncate(0xFFFF_FFFF), u32::MAX);
+        assert_eq!(u64_u32_truncate(0x1_0000_0000), 0);
+    }
+
+    #[test]
+    fn f64_i64_truncates() {
+        assert_eq!(f64_i64(3.9), 3);
+        assert_eq!(f64_i64(-3.9), -3);
+    }
+
+    #[test]
+    fn i32_usize_positive() {
+        assert_eq!(i32_usize(42), 42_usize);
+    }
+
+    #[test]
+    fn i64_usize_positive() {
+        assert_eq!(i64_usize(100), 100_usize);
     }
 }

@@ -14,6 +14,7 @@ use crate::bio::taxonomy::{
     Classification, ClassifyParams, NaiveBayesClassifier, TaxRank, argmax_with_priors,
     extract_kmers,
 };
+use crate::cast::{f64_usize, u64_usize, usize_f64, usize_u64};
 use crate::error::{Error, Result};
 use crate::io::fastq::FastqRecord;
 use std::collections::HashSet;
@@ -45,8 +46,8 @@ impl GpuPipelineSession {
 
         for (record, trim) in reads.iter().zip(trim_results.iter()) {
             if let Some((start, end)) = trim {
-                stats.leading_bases_trimmed += *start as u64;
-                stats.trailing_bases_trimmed += (record.quality.len() - end) as u64;
+                stats.leading_bases_trimmed += usize_u64(*start);
+                stats.trailing_bases_trimmed += usize_u64(record.quality.len() - end);
                 output.push(crate::bio::quality::apply_trim(record, *start, *end));
                 stats.output_reads += 1;
             } else {
@@ -129,11 +130,6 @@ impl GpuPipelineSession {
     /// # Errors
     ///
     /// Returns an error if GPU dispatch fails or GEMM readback fails.
-    #[expect(
-        clippy::cast_possible_truncation,
-        clippy::cast_precision_loss,
-        clippy::cast_sign_loss
-    )]
     pub fn classify_batch(
         &self,
         classifier: &NaiveBayesClassifier,
@@ -155,14 +151,14 @@ impl GpuPipelineSession {
                 .collect());
         }
 
-        let k = (ks as f64).log(4.0).round() as usize;
+        let k = f64_usize(usize_f64(ks).log(4.0).round());
         let query_kmer_lists: Vec<Vec<u64>> =
             sequences.iter().map(|seq| extract_kmers(seq, k)).collect();
 
         let mut active_set = HashSet::new();
         for kmers in &query_kmer_lists {
             for &kmer in kmers {
-                active_set.insert(kmer as usize);
+                active_set.insert(u64_usize(kmer));
             }
         }
         let mut active_indices: Vec<usize> = active_set.into_iter().collect();
@@ -183,7 +179,7 @@ impl GpuPipelineSession {
             let base_row = qi * rows_per_query;
             let row_start = base_row * n_active;
             for &kmer in kmers {
-                q_compact[row_start + kmer_to_col[kmer as usize]] += 1.0;
+                q_compact[row_start + kmer_to_col[u64_usize(kmer)]] += 1.0;
             }
             let n_sample = (kmers.len() * 2 / 3).max(1);
             let mut seed: u64 = 42;
@@ -191,8 +187,8 @@ impl GpuPipelineSession {
                 let boot_start = (base_row + 1 + bi) * n_active;
                 for _ in 0..n_sample {
                     seed = seed.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-                    let idx = (seed >> 33) as usize % kmers.len();
-                    q_compact[boot_start + kmer_to_col[kmers[idx] as usize]] += 1.0;
+                    let idx = u64_usize(seed >> 33) % kmers.len();
+                    q_compact[boot_start + kmer_to_col[u64_usize(kmers[idx])]] += 1.0;
                 }
             }
         }
@@ -239,7 +235,7 @@ impl GpuPipelineSession {
 
             let confidence: Vec<f64> = rank_votes
                 .iter()
-                .map(|&v| v as f64 / n_boot as f64)
+                .map(|&v| usize_f64(v) / usize_f64(n_boot))
                 .collect();
 
             results.push(Classification {

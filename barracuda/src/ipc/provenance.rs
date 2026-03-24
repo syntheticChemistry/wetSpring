@@ -139,7 +139,7 @@ fn local_session_id() -> String {
         .duration_since(UNIX_EPOCH)
         .map(|d| d.as_millis())
         .unwrap_or(0);
-    format!("local-wetspring-{ts}")
+    format!("local-{}-{ts}", crate::PRIMAL_NAME)
 }
 
 /// Begin a provenance-tracked experiment session via rhizoCrypt.
@@ -378,7 +378,8 @@ mod tests {
     #[test]
     fn begin_session_degrades_gracefully() {
         let result = begin_session("test_experiment");
-        assert!(result.id.starts_with("local-wetspring-"));
+        let prefix = format!("local-{}-", crate::PRIMAL_NAME);
+        assert!(result.id.starts_with(&prefix));
         assert!(!result.available);
     }
 

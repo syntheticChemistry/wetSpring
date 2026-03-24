@@ -3,6 +3,59 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V136] — 2026-03-24
+
+### Deep Debt Resolution + Ecosystem Absorption Cycle
+
+Cross-spring absorption of patterns from groundSpring V122, neuralSpring S174,
+airSpring v0.10.0, healthSpring V42, ludoSpring V30. Error types evolved to
+modern idiomatic Rust. Bare `as` casts replaced with named helpers across 15
+library files. Hardcoded primal strings eliminated. Stochastic determinism
+tests added. CI pin assertion for upstream barraCuda.
+
+1,205 lib tests pass. 0 failures. Zero mocks in production code.
+
+#### Added
+- `upstream_contract` module: pins barraCuda v0.3.7, semver comparison utility,
+  CI-ready version drift detection (neuralSpring S174 pattern)
+- `scripts/check_barracuda_pin.sh`: CI script that verifies upstream barraCuda
+  version matches the wetSpring pin (healthSpring V42 pattern)
+- `CONTRIBUTING.md` + `SECURITY.md`: community docs (neuralSpring S174 pattern)
+- CI workflow: `barracuda-pin` job added to `.github/workflows/ci.yml`
+- `//! Provenance:` headers on 5 core validator binaries: `validate_fastq`,
+  `validate_diversity`, `validate_mzml`, `validate_gillespie`, `validate_hmm`
+  (airSpring v0.10.0 pattern)
+- 6 new cast helpers: `f64_f32`, `usize_i32`, `u64_u32_truncate`, `f64_i64`,
+  `i32_usize`, `i64_usize` — full coverage of all numeric cast patterns
+- 3 bitwise determinism tests: `gillespie`, `bootstrap`, `rarefaction_gpu` —
+  seeded algorithms verified bit-identical across runs (healthSpring V42 pattern)
+- `primal_names` constants: `LEGACY_SELF_METHOD_PREFIX`, `VAULT_KEY_CONTEXT`,
+  `DEPLOY_GRAPH_REL_PATH` — single source of truth for all primal identity strings
+
+#### Changed
+- Error types evolved to `thiserror` derives: `IpcError`, `Error`,
+  `DispatchError`, `PushError`, `VaultError`, `RpcError` — removes ~120 lines
+  of boilerplate Display/Error impls (ludoSpring V30 / ecosystem standard)
+- Bare `as` casts replaced with named `crate::cast::*` helpers in 15 library
+  files (bio/taxonomy, bio/pangenome, bio/chimera, bio/gillespie,
+  bio/streaming_gpu, bio/rarefaction_gpu, bio/random_forest_gpu, io/fastq,
+  io/nanopore, ipc/resilience, ipc/handlers, ipc/timeseries) — ~60 casts
+  replaced (groundSpring V122 pattern)
+- `ipc/server.rs` refactored: extracted `dispatch_request` + `dispatch_notification`
+  helpers, eliminating duplication between `process_single` and `process_batch`
+- `ipc/protocol.rs`: `normalize_method` now uses `primal_names::LEGACY_SELF_METHOD_PREFIX`
+  instead of hardcoded `"wetspring."` string
+- `ipc/provenance.rs`: `local_session_id()` now uses `crate::PRIMAL_NAME` instead
+  of hardcoded `"wetspring"` string
+- `niche.rs`: `deploy_graph_path()` now uses `primal_names::DEPLOY_GRAPH_REL_PATH`
+- `lib.rs`: `VAULT_KEY_CONTEXT` now aliases `primal_names::VAULT_KEY_CONTEXT`
+
+#### Audited — Confirmed Clean
+- Zero mocks/stubs in production code (all in `#[cfg(test)]`)
+- Zero hardcoded primal name strings in production code
+- No unsafe code (workspace-wide `#![forbid(unsafe_code)]`)
+- No files exceeding 700 LOC in library code
+
 ## [V135] — 2026-03-24
 
 ### Documentation Reconciliation + Ecosystem Sync

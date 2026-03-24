@@ -7,6 +7,8 @@ use std::borrow::Cow;
 
 use serde_json::Value;
 
+use crate::primal_names::LEGACY_SELF_METHOD_PREFIX;
+
 /// Normalize a JSON-RPC method name to the bare `{domain}.{operation}` form (barraCuda v0.3.7+).
 ///
 /// Strips legacy product prefixes (`wetspring.`, `barracuda.`) when present so clients using
@@ -17,7 +19,7 @@ pub fn normalize_method(method: &str) -> Cow<'_, str> {
     let mut s = method;
     loop {
         let next = s
-            .strip_prefix("wetspring.")
+            .strip_prefix(LEGACY_SELF_METHOD_PREFIX)
             .or_else(|| s.strip_prefix("barracuda."));
         match next {
             Some(rest) => s = rest,

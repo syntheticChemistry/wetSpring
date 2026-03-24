@@ -14,7 +14,7 @@
 //!     `signal`:             [i16; `signal_length`] (LE)
 
 use super::types::NanoporeRead;
-use crate::cast::u64_usize;
+use crate::cast::{u64_usize, usize_u64};
 use crate::error::{Error, Result};
 use std::io::{BufRead, BufReader, BufWriter, Read};
 use std::path::Path;
@@ -107,7 +107,7 @@ pub fn write_nrs(path: &Path, reads: &[NanoporeRead]) -> Result<()> {
         source: e,
     })?;
 
-    let n = reads.len() as u64;
+    let n = usize_u64(reads.len());
     writer.write_all(&n.to_le_bytes()).map_err(|e| Error::Io {
         path: path.to_path_buf(),
         source: e,
@@ -199,7 +199,7 @@ fn write_one_nrs_record(
     w(writer, &read.sample_rate.to_le_bytes())?;
     w(writer, &read.calibration_offset.to_le_bytes())?;
     w(writer, &read.calibration_scale.to_le_bytes())?;
-    w(writer, &(read.signal.len() as u64).to_le_bytes())?;
+    w(writer, &usize_u64(read.signal.len()).to_le_bytes())?;
 
     #[cfg(target_endian = "little")]
     {

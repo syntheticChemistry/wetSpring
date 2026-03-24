@@ -25,6 +25,8 @@
 //! - Massie et al. "Quantification of high-specificity cyclic diguanylate
 //!   signaling." *PNAS* 109, 12746–12751 (2012).
 
+use crate::cast::{i64_f64, u64_f64, usize_f64, usize_u64};
+
 /// Sovereign Lehmer LCG — deterministic, no external dependencies.
 ///
 /// Uses Knuth's constants for full-period 64-bit LCG.
@@ -52,10 +54,9 @@ impl Lcg64 {
     }
 
     /// Uniform `f64` in `[0, 1)`.
-    #[expect(clippy::cast_precision_loss)] // Precision: u64>>11 / 2^53 fits f64
     #[must_use]
     pub fn next_f64(&mut self) -> f64 {
-        (self.next_u64() >> 11) as f64 / ((1_u64 << 53) as f64)
+        u64_f64(self.next_u64() >> 11) / u64_f64(1_u64 << 53)
     }
 
     /// Exponential variate with rate `lambda` (mean = `1/lambda`).
@@ -228,8 +229,7 @@ pub fn birth_death_ssa(k_dgc: f64, k_pde: f64, t_max: f64, seed: u64) -> Traject
         },
         Reaction {
             propensity: Box::new(move |state: &[i64]| {
-                #[expect(clippy::cast_precision_loss)] // Precision: molecule count bounded
-                let count = state[0].max(0) as f64;
+                let count = i64_f64(state[0].max(0));
                 k_pde * count
             }),
             stoichiometry: vec![-1],
@@ -257,7 +257,6 @@ pub struct EnsembleStats {
 
 /// Run an ensemble of birth-death SSA and compute statistics.
 #[must_use]
-#[expect(clippy::cast_precision_loss)] // Precision: n_runs and counts fit f64
 pub fn birth_death_ensemble(
     k_dgc: f64,
     k_pde: f64,
@@ -267,17 +266,17 @@ pub fn birth_death_ensemble(
 ) -> EnsembleStats {
     let final_counts: Vec<i64> = (0..n_runs)
         .map(|i| {
-            let seed = base_seed + i as u64;
+            let seed = base_seed + usize_u64(i);
             let traj = birth_death_ssa(k_dgc, k_pde, t_max, seed);
             traj.final_state()[0]
         })
         .collect();
 
-    let n = final_counts.len() as f64;
-    let mean = final_counts.iter().sum::<i64>() as f64 / n;
+    let n = usize_f64(final_counts.len());
+    let mean = i64_f64(final_counts.iter().sum::<i64>()) / n;
     let variance = final_counts
         .iter()
-        .map(|&c| (c as f64 - mean).powi(2))
+        .map(|&c| (i64_f64(c) - mean).powi(2))
         .sum::<f64>()
         / n;
     let std_dev = variance.sqrt();
@@ -340,6 +339,18 @@ mod tests {
         let traj2 = birth_death_ssa(10.0, 0.1, 50.0, 42);
         assert_eq!(traj1.final_state(), traj2.final_state());
         assert_eq!(traj1.n_events(), traj2.n_events());
+    }
+
+    #[test]
+    fn bitwise_deterministic_with_seed() {
+        let result_a = birth_death_ssa(10.0, 0.1, 50.0, 42);
+        let result_b = birth_death_ssa(10.0, 0.1, 50.0, 42);
+        assert_eq!(result_a.n_species, result_b.n_species, "bitwise determinism violated");
+        assert_eq!(result_a.states, result_b.states, "bitwise determinism violated");
+        assert_eq!(result_a.times.len(), result_b.times.len(), "bitwise determinism violated");
+        for (ta, tb) in result_a.times.iter().zip(&result_b.times) {
+            assert_eq!(ta.to_bits(), tb.to_bits(), "bitwise determinism violated");
+        }
     }
 
     #[test]

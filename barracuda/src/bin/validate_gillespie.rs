@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+//! Provenance: Gillespie stochastic simulation (Massie 2012 c-di-GMP birth–death) → `gillespie_baseline.py` → Rust sovereign (wetSpring V135)
+//! Validated against: `scripts/gillespie_baseline.py` ensemble statistics
 #![forbid(unsafe_code)]
 //! Validation: Gillespie SSA — Massie 2012 c-di-GMP birth-death model.
 //!

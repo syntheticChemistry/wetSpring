@@ -2,9 +2,8 @@
 //! Error types for wetSpring I/O and computation.
 //!
 //! All parser and algorithm errors use [`Error`], with variants for each
-//! failure mode. No external error crates — zero-dependency error type.
+//! failure mode. Uses `thiserror` for derive-based error types (ecosystem standard).
 
-use std::fmt;
 use std::path::PathBuf;
 
 /// Typed IPC error variants for structured error recovery.
@@ -12,17 +11,22 @@ use std::path::PathBuf;
 /// Evolved from opaque `Ipc(String)` following the healthSpring/biomeOS pattern
 /// so callers can match on failure category (retry on [`Connect`](Self::Connect),
 /// degrade on [`RpcReject`](Self::RpcReject), abort on [`SocketPath`](Self::SocketPath)).
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum IpcError {
     /// Socket path is invalid or inaccessible (create/remove/bind).
+    #[error("socket: {0}")]
     SocketPath(String),
     /// Cannot connect to a primal socket.
+    #[error("connect: {0}")]
     Connect(String),
     /// I/O error during an established RPC exchange (write, read, flush, timeout, shutdown).
+    #[error("transport: {0}")]
     Transport(String),
     /// JSON serialization or deserialization failure.
+    #[error("codec: {0}")]
     Codec(String),
     /// Remote primal returned a JSON-RPC error response.
+    #[error("RPC reject [{code}]: {message}")]
     RpcReject {
         /// JSON-RPC error code.
         code: i64,
@@ -30,23 +34,9 @@ pub enum IpcError {
         message: String,
     },
     /// Remote primal returned an empty or missing response.
+    #[error("empty response")]
     EmptyResponse,
 }
-
-impl fmt::Display for IpcError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::SocketPath(msg) => write!(f, "socket: {msg}"),
-            Self::Connect(msg) => write!(f, "connect: {msg}"),
-            Self::Transport(msg) => write!(f, "transport: {msg}"),
-            Self::Codec(msg) => write!(f, "codec: {msg}"),
-            Self::RpcReject { code, message } => write!(f, "RPC reject [{code}]: {message}"),
-            Self::EmptyResponse => write!(f, "empty response"),
-        }
-    }
-}
-
-impl std::error::Error for IpcError {}
 
 impl IpcError {
     /// Whether this error is likely transient and the operation can be retried.
@@ -140,93 +130,60 @@ fn rpc_message_suggests_transient(message: &str) -> bool {
 }
 
 /// Errors produced by wetSpring parsers and algorithms.
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum Error {
     /// File I/O error with path context.
+    #[error("{path}: {source}")]
     Io {
         /// Path that caused the error.
         path: PathBuf,
         /// Underlying I/O error.
+        #[source]
         source: std::io::Error,
     },
     /// FASTQ parsing error (sovereign parser).
+    #[error("FASTQ parse error: {0}")]
     Fastq(String),
     /// mzML XML parsing error.
+    #[error("mzML parse error: {0}")]
     Xml(String),
     /// Base64 decoding error in binary arrays.
+    #[error("base64 decode error: {0}")]
     Base64(String),
     /// Zlib decompression error in binary arrays.
+    #[error("zlib decompress error: {0}")]
     Zlib(String),
     /// Binary data format error (wrong length, alignment).
+    #[error("binary format error: {0}")]
     BinaryFormat(String),
     /// MS2 text format parsing error.
+    #[error("MS2 parse error: {0}")]
     Ms2(String),
     /// GPU compute error (device creation, shader compilation, dispatch).
+    #[error("GPU compute error: {0}")]
     Gpu(String),
     /// Invalid input parameters (dimensions, ranges, constraints).
+    #[error("invalid input: {0}")]
     InvalidInput(String),
     /// NCBI Entrez / SRA / `NestGate` error (network, parsing, protocol).
+    #[error("NCBI error: {0}")]
     Ncbi(String),
     /// NPU compute error (discovery, model load, inference, DMA).
+    #[error("NPU error: {0}")]
     Npu(String),
     /// Nanopore raw signal parsing error (POD5/FAST5).
+    #[error("nanopore parse error: {0}")]
     Nanopore(String),
     /// Structured IPC server/client protocol error.
-    Ipc(IpcError),
+    #[error("IPC error: {0}")]
+    Ipc(#[from] IpcError),
     /// JCAMP-DX spectroscopy format parsing error.
+    #[error("JCAMP-DX parse error: {0}")]
     Jcamp(String),
-}
-
-impl From<IpcError> for Error {
-    fn from(e: IpcError) -> Self {
-        Self::Ipc(e)
-    }
 }
 
 /// Result type alias for wetSpring operations.
 pub type Result<T> = std::result::Result<T, Error>;
-
-impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Io { path, source } => write!(f, "{}: {source}", path.display()),
-            Self::Fastq(msg) => write!(f, "FASTQ parse error: {msg}"),
-            Self::Xml(msg) => write!(f, "mzML parse error: {msg}"),
-            Self::Base64(msg) => write!(f, "base64 decode error: {msg}"),
-            Self::Zlib(msg) => write!(f, "zlib decompress error: {msg}"),
-            Self::BinaryFormat(msg) => write!(f, "binary format error: {msg}"),
-            Self::Ms2(msg) => write!(f, "MS2 parse error: {msg}"),
-            Self::Gpu(msg) => write!(f, "GPU compute error: {msg}"),
-            Self::InvalidInput(msg) => write!(f, "invalid input: {msg}"),
-            Self::Ncbi(msg) => write!(f, "NCBI error: {msg}"),
-            Self::Npu(msg) => write!(f, "NPU error: {msg}"),
-            Self::Nanopore(msg) => write!(f, "nanopore parse error: {msg}"),
-            Self::Ipc(e) => write!(f, "IPC error: {e}"),
-            Self::Jcamp(msg) => write!(f, "JCAMP-DX parse error: {msg}"),
-        }
-    }
-}
-
-impl std::error::Error for Error {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match self {
-            Self::Io { source, .. } => Some(source),
-            Self::Fastq(_)
-            | Self::Xml(_)
-            | Self::Base64(_)
-            | Self::Zlib(_)
-            | Self::BinaryFormat(_)
-            | Self::Ms2(_)
-            | Self::Gpu(_)
-            | Self::InvalidInput(_)
-            | Self::Ncbi(_)
-            | Self::Npu(_)
-            | Self::Nanopore(_)
-            | Self::Jcamp(_) => None,
-            Self::Ipc(e) => Some(e),
-        }
-    }
-}
 
 #[cfg(test)]
 mod tests {

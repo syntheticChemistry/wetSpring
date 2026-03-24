@@ -1743,6 +1743,7 @@ dependencies = [
  "serde_json",
  "temp-env",
  "tempfile",
+ "thiserror",
  "tokio",
  "tracing",
  "tracing-subscriber",

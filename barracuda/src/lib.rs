@@ -72,7 +72,7 @@ pub const PRIMAL_NAME: &str = primal_names::SELF_NAME;
 pub const PRIMAL_DOMAIN: &str = "science.ecology";
 
 /// Key derivation context prefix — versioned for forward compatibility.
-pub const VAULT_KEY_CONTEXT: &str = "wetspring-vault-encryption-v1";
+pub const VAULT_KEY_CONTEXT: &str = primal_names::VAULT_KEY_CONTEXT;
 
 pub mod bench;
 pub mod bio;
@@ -95,6 +95,7 @@ pub mod provenance;
 pub mod provenance_registry;
 pub mod special;
 pub mod tolerances;
+pub mod upstream_contract;
 pub mod validation;
 #[cfg(feature = "vault")]
 pub mod vault;

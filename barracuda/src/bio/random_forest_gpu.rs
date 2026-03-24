@@ -12,6 +12,8 @@
 
 use barracuda::RfBatchInferenceGpu;
 use barracuda::device::WgpuDevice;
+
+use crate::cast::{u32_usize, usize_f64, usize_i32, usize_u32};
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
@@ -39,11 +41,6 @@ impl RandomForestGpu {
     /// # Errors
     ///
     /// Returns `Err` if GPU buffer creation or readback fails.
-    #[expect(
-        clippy::cast_possible_truncation,
-        clippy::cast_possible_wrap,
-        clippy::similar_names
-    )]
     pub fn predict_batch(
         &self,
         forest: &RandomForest,
@@ -77,7 +74,7 @@ impl RandomForestGpu {
                 node_thresh_flat[base + n] = node.threshold;
                 let coff = (base + n) * 2;
                 if node.feature < 0 {
-                    node_children_flat[coff] = node.prediction.unwrap_or(0) as i32;
+                    node_children_flat[coff] = usize_i32(node.prediction.unwrap_or(0));
                     node_children_flat[coff + 1] = -1;
                 } else {
                     node_children_flat[coff] = node.left_child;
@@ -129,10 +126,10 @@ impl RandomForestGpu {
             &nc_gpu,
             &feat_gpu,
             &out_gpu,
-            n_samples as u32,
-            n_trees as u32,
-            n_nodes_max as u32,
-            n_features as u32,
+            usize_u32(n_samples),
+            usize_u32(n_trees),
+            usize_u32(n_nodes_max),
+            usize_u32(n_features),
         );
 
         let _ = d.poll(wgpu::PollType::Wait {
@@ -149,7 +146,7 @@ impl RandomForestGpu {
         for s in 0..n_samples {
             let mut votes = vec![0usize; n_classes];
             for t in 0..n_trees {
-                let pred = raw[s * n_trees + t] as usize;
+                let pred = u32_usize(raw[s * n_trees + t]);
                 if pred < n_classes {
                     votes[pred] += 1;
                 }
@@ -160,8 +157,7 @@ impl RandomForestGpu {
                 .enumerate()
                 .max_by_key(|&(_, v)| v)
                 .unwrap_or((0, 0));
-            #[expect(clippy::cast_precision_loss)] // Precision: vote counts and n_trees bounded
-            let confidence = max_votes as f64 / n_trees as f64;
+            let confidence = usize_f64(max_votes) / usize_f64(n_trees);
             results.push(RfPrediction {
                 class,
                 votes,

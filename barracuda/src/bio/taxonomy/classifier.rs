@@ -6,7 +6,7 @@
 
 use std::collections::{HashMap, HashSet};
 
-use crate::cast::u64_usize;
+use crate::cast::{f64_i64, u64_usize, usize_f64};
 
 use super::kmers::extract_kmers;
 use super::types::{Classification, ClassifyParams, Lineage, NpuWeights, ReferenceSeq, TaxRank};
@@ -32,7 +32,6 @@ impl NaiveBayesClassifier {
     ///
     /// Groups reference sequences by genus-level lineage, extracts k-mers,
     /// and precomputes a flat log-probability table for O(1) scoring.
-    #[expect(clippy::cast_precision_loss, clippy::cast_possible_truncation)] // Precision/Truncation: kmer indices bounded
     #[must_use]
     pub fn train(refs: &[ReferenceSeq], k: usize) -> Self {
         let kmer_space = 1_usize << (2 * k);
@@ -65,27 +64,25 @@ impl NaiveBayesClassifier {
 
         let n_kmers_total = all_kmers.len();
         let n_taxa = taxon_labels.len();
-        #[expect(clippy::cast_precision_loss)] // Precision: n_kmers_total bounded
-        let default_log_p = (0.5 / (n_kmers_total.max(1) as f64 + 1.0))
+        let default_log_p = (0.5 / (usize_f64(n_kmers_total.max(1)) + 1.0))
             .max(crate::tolerances::LOG_PROB_FLOOR)
             .ln();
 
         let mut dense_log_probs = vec![default_log_p; n_taxa * kmer_space];
         for (ti, (sparse, count)) in taxon_sparse.iter().zip(taxon_counts.iter()).enumerate() {
-            let n_refs = *count as f64;
+            let n_refs = usize_f64(*count);
             let row_start = ti * kmer_space;
             for (&kmer, &presence) in sparse {
-                let p = (presence as f64 + 0.5) / (n_refs + 1.0);
-                dense_log_probs[row_start + kmer as usize] =
+                let p = (usize_f64(presence) + 0.5) / (n_refs + 1.0);
+                dense_log_probs[row_start + u64_usize(kmer)] =
                     p.max(crate::tolerances::LOG_PROB_FLOOR).ln();
             }
         }
 
-        #[expect(clippy::cast_precision_loss)] // Precision: taxon_counts sum bounded
-        let total_refs: f64 = taxon_counts.iter().sum::<usize>() as f64;
+        let total_refs: f64 = usize_f64(taxon_counts.iter().sum::<usize>());
         let taxon_priors: Vec<f64> = taxon_counts
             .iter()
-            .map(|&c| c as f64 / total_refs)
+            .map(|&c| usize_f64(c) / total_refs)
             .collect();
         let log_priors: Vec<f64> = taxon_priors
             .iter()
@@ -197,7 +194,6 @@ impl NaiveBayesClassifier {
     ///
     /// Repeatedly classifies random subsets of k-mers and counts how often
     /// each rank agrees with the full classification.
-    #[expect(clippy::cast_precision_loss)] // vote counts and n_boot are tiny
     fn bootstrap_confidence(
         &self,
         query_kmers: &[u64],
@@ -215,7 +211,7 @@ impl NaiveBayesClassifier {
             let subset: Vec<u64> = (0..n_sample)
                 .map(|_| {
                     seed = seed.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
-                    let idx = (seed >> 33) as usize % query_kmers.len();
+                    let idx = u64_usize(seed >> 33) % query_kmers.len();
                     query_kmers[idx]
                 })
                 .collect();
@@ -234,7 +230,7 @@ impl NaiveBayesClassifier {
 
         rank_votes
             .iter()
-            .map(|&v| v as f64 / n_boot as f64)
+            .map(|&v| usize_f64(v) / usize_f64(n_boot))
             .collect()
     }
 
@@ -243,7 +239,7 @@ impl NaiveBayesClassifier {
     /// Maps the f64 log-probability range to `[-128, 127]` using affine
     /// quantization: `q = round((x - zero_point) / scale)`.
     #[must_use]
-    #[expect(clippy::cast_possible_truncation)] // Truncation: q clamped to [-128,127]
+    #[expect(clippy::cast_possible_truncation, reason = "quantized q clamped to i8 range")]
     pub fn to_int8_weights(&self) -> NpuWeights {
         if self.dense_log_probs.is_empty() {
             return NpuWeights {
@@ -275,8 +271,8 @@ impl NaiveBayesClassifier {
             .dense_log_probs
             .iter()
             .map(|&v| {
-                let q = ((v - zero_point) / scale).round() as i64 - 128;
-                q.clamp(-128, 127) as i8
+                let q = f64_i64(((v - zero_point) / scale).round()) - 128;
+                (q.clamp(-128, 127)) as i8
             })
             .collect();
 
@@ -284,8 +280,8 @@ impl NaiveBayesClassifier {
             .log_priors
             .iter()
             .map(|&v| {
-                let q = ((v - zero_point) / scale).round() as i64 - 128;
-                q.clamp(-128, 127) as i8
+                let q = f64_i64(((v - zero_point) / scale).round()) - 128;
+                (q.clamp(-128, 127)) as i8
             })
             .collect();
 
@@ -304,7 +300,6 @@ impl NaiveBayesClassifier {
     /// Produces the same argmax as full-precision for well-separated taxa.
     /// Returns `None` when the query produces no k-mers or the classifier
     /// has no taxa (empty reference database).
-    #[expect(clippy::cast_possible_truncation)] // Truncation: kmer index fits u32
     #[must_use]
     pub fn classify_quantized(&self, sequence: &[u8]) -> Option<usize> {
         let query_kmers = extract_kmers(sequence, self.k);
@@ -323,7 +318,7 @@ impl NaiveBayesClassifier {
             let row = ti * ks;
             let mut acc = i64::from(npu.priors_i8[ti]);
             for &kmer in &query_kmers {
-                acc += i64::from(npu.weights_i8[row + kmer as usize]);
+                acc += i64::from(npu.weights_i8[row + u64_usize(kmer)]);
             }
             if acc > best_score {
                 best_score = acc;

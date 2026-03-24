@@ -41,3 +41,12 @@ pub const SWEETGRASS: &str = "sweetgrass";
 
 /// Squirrel AI assistant.
 pub const SQUIRREL: &str = "squirrel";
+
+/// Legacy JSON-RPC method prefix (`{SELF_NAME}.`) on the wire — must match [`SELF_NAME`] + `.`.
+pub const LEGACY_SELF_METHOD_PREFIX: &str = "wetspring.";
+
+/// Vault encryption / KDF context string (stable; do not change — existing ciphertext depends on it).
+pub const VAULT_KEY_CONTEXT: &str = "wetspring-vault-encryption-v1";
+
+/// Default niche deploy graph path (relative to repo / packaging layout).
+pub const DEPLOY_GRAPH_REL_PATH: &str = "graphs/wetspring_deploy.toml";

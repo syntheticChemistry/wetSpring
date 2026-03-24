@@ -12,6 +12,17 @@ env:
   RUSTDOCFLAGS: "-D warnings"
 
 jobs:
+  barracuda-pin:
+    name: barraCuda version pin
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Clone barraCuda (path dependency)
+        run: |
+          git clone --depth 1 https://github.com/ecoPrimals/barraCuda.git "${GITHUB_WORKSPACE}/../barraCuda"
+      - name: Check barraCuda version pin
+        run: bash scripts/check_barracuda_pin.sh
+
   fmt:
     name: Format (workspace)
     runs-on: ubuntu-latest

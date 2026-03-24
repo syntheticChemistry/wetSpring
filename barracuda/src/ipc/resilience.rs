@@ -53,8 +53,11 @@ impl RetryPolicy {
 
     /// Compute the delay for attempt `n` (0-indexed).
     #[must_use]
+    #[expect(
+        clippy::cast_possible_wrap,
+        reason = "attempt.min(10) ≤ 10, trivially fits in i32"
+    )]
     fn delay_for_attempt(&self, attempt: u32) -> Duration {
-        #[expect(clippy::cast_possible_wrap, reason = "attempt capped at 10, fits i32")]
         let multiplier = self.backoff_factor.powi(attempt.min(10) as i32);
         let delay = self.base_delay.mul_f64(multiplier);
         delay.min(self.max_delay)

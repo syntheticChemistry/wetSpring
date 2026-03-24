@@ -7,6 +7,7 @@
 
 use serde_json::{Value, json};
 
+use crate::cast::usize_f64;
 use crate::ipc::protocol::RpcError;
 
 /// Schema identifier for the cross-spring time series format.
@@ -119,12 +120,11 @@ pub struct TimeSeriesData {
 /// # Errors
 ///
 /// Returns `RpcError::invalid_params` if `time_series` is missing or empty.
-#[expect(clippy::cast_precision_loss)]
 pub fn handle_timeseries(params: &Value) -> Result<Value, RpcError> {
     let data = extract_ts_data(params)?;
     let values = &data.values;
 
-    let n = values.len() as f64;
+    let n = usize_f64(values.len());
     let mean = values.iter().sum::<f64>() / n;
     let variance = values.iter().map(|v| (v - mean).powi(2)).sum::<f64>() / n;
 

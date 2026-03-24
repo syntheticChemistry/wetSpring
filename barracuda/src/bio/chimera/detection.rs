@@ -6,6 +6,7 @@
 //! score evaluation per crossover.
 
 use crate::bio::dada2::Asv;
+use crate::cast::{u32_usize, usize_f64};
 
 use super::kmer_sketch::{KmerSketch, build_sketch, sketch_similarity};
 use super::{ChimeraParams, ChimeraResult};
@@ -16,7 +17,6 @@ const MAX_PARENT_CANDIDATES: usize = 8;
 ///
 /// Sequences must be sorted by abundance (descending). Returns chimera
 /// results for each sequence and the filtered non-chimeric sequences.
-#[expect(clippy::cast_precision_loss)]
 #[must_use]
 pub fn detect_chimeras(
     seqs: &[Asv],
@@ -46,7 +46,7 @@ pub fn detect_chimeras(
         // Find eligible parents (more abundant by min_parent_fold)
         let eligible: Vec<usize> = (0..i)
             .filter(|&j| {
-                seqs[j].abundance as f64 >= query.abundance as f64 * params.min_parent_fold
+                usize_f64(seqs[j].abundance) >= usize_f64(query.abundance) * params.min_parent_fold
             })
             .collect();
 
@@ -206,7 +206,6 @@ pub fn test_chimera_fast(
 }
 
 /// O(1) chimera score evaluation using precomputed prefix sums.
-#[expect(clippy::cast_precision_loss)]
 fn score_from_prefix(
     cum_left: &[u32],
     cum_right: &[u32],
@@ -214,10 +213,10 @@ fn score_from_prefix(
     len: usize,
     min_diffs: usize,
 ) -> f64 {
-    let left_match_l = cum_left[crossover] as usize;
-    let left_match_r = cum_right[crossover] as usize;
-    let right_match_l = (cum_left[len] - cum_left[crossover]) as usize;
-    let right_match_r = (cum_right[len] - cum_right[crossover]) as usize;
+    let left_match_l = u32_usize(cum_left[crossover]);
+    let left_match_r = u32_usize(cum_right[crossover]);
+    let right_match_l = u32_usize(cum_left[len] - cum_left[crossover]);
+    let right_match_r = u32_usize(cum_right[len] - cum_right[crossover]);
 
     // Chimera model: left from left_parent, right from right_parent
     let chimera_matches = left_match_l + right_match_r;
@@ -242,10 +241,10 @@ fn score_from_prefix(
 
     if chimera_mismatches == 0 {
         if best_single_mismatches > 0 {
-            return best_single_mismatches as f64 + 1.0;
+            return usize_f64(best_single_mismatches) + 1.0;
         }
         return 0.0;
     }
 
-    best_single_mismatches as f64 / chimera_mismatches as f64
+    usize_f64(best_single_mismatches) / usize_f64(chimera_mismatches)
 }

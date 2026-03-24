@@ -2,6 +2,7 @@
 //! FASTQ statistics computation — from records or streaming.
 
 use super::{FastqRecord, FastqStats, header_error_bytes, open_reader, read_byte_line, trim_end};
+use crate::cast::{u64_f64, usize_f64, usize_u64};
 use crate::error::Result;
 use std::collections::HashMap;
 use std::path::Path;
@@ -53,11 +54,11 @@ impl StatsAccumulator {
     #[inline]
     fn add_record_borrowed(&mut self, seq_len: usize, gc: usize, quality: &[u8]) {
         self.num_sequences += 1;
-        self.total_bases += seq_len as u64;
+        self.total_bases += usize_u64(seq_len);
         self.min_len = self.min_len.min(seq_len);
         self.max_len = self.max_len.max(seq_len);
         *self.length_dist.entry(seq_len).or_insert(0) += 1;
-        self.gc_count += gc as u64;
+        self.gc_count += usize_u64(gc);
 
         if !quality.is_empty() {
             let mut q_sum: u64 = 0;
@@ -65,18 +66,16 @@ impl StatsAccumulator {
                 q_sum += u64::from(q.saturating_sub(33));
             }
             self.total_quality_sum += q_sum;
-            self.total_quality_count += quality.len() as u64;
+            self.total_quality_count += usize_u64(quality.len());
 
-            #[expect(clippy::cast_precision_loss)]
             // Precision: quality.len() and q_sum bounded by read
-            let mean_q = q_sum as f64 / quality.len() as f64;
+            let mean_q = u64_f64(q_sum) / usize_f64(quality.len());
             if mean_q >= 30.0 {
                 self.q30_count += 1;
             }
         }
     }
 
-    #[expect(clippy::cast_precision_loss)] // Precision: num_sequences, total_bases, etc. fit f64
     fn finish(self) -> FastqStats {
         let n = self.num_sequences;
         FastqStats {
@@ -85,17 +84,17 @@ impl StatsAccumulator {
             min_length: if n == 0 { 0 } else { self.min_len },
             max_length: self.max_len,
             mean_length: if n > 0 {
-                self.total_bases as f64 / n as f64
+                u64_f64(self.total_bases) / usize_f64(n)
             } else {
                 0.0
             },
             mean_quality: if self.total_quality_count > 0 {
-                self.total_quality_sum as f64 / self.total_quality_count as f64
+                u64_f64(self.total_quality_sum) / u64_f64(self.total_quality_count)
             } else {
                 0.0
             },
             gc_content: if self.total_bases > 0 {
-                self.gc_count as f64 / self.total_bases as f64
+                u64_f64(self.gc_count) / u64_f64(self.total_bases)
             } else {
                 0.0
             },

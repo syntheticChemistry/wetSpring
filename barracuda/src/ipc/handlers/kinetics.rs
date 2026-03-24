@@ -6,6 +6,7 @@
 
 use serde_json::{Value, json};
 
+use crate::cast::{f64_usize, usize_f64};
 use crate::ipc::protocol::RpcError;
 
 /// Handle `science.kinetics` — biogas production curve fitting.
@@ -16,11 +17,6 @@ use crate::ipc::protocol::RpcError;
 /// # Errors
 ///
 /// Returns `RpcError::invalid_params` for unknown model names.
-#[expect(
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
-    clippy::cast_precision_loss
-)] // Cast: steps, indices bounded
 pub fn handle_kinetics(params: &Value) -> Result<Value, RpcError> {
     let model = params
         .get("model")
@@ -30,7 +26,7 @@ pub fn handle_kinetics(params: &Value) -> Result<Value, RpcError> {
     let t_max = params.get("t_max").and_then(Value::as_f64).unwrap_or(30.0);
     let dt = params.get("dt").and_then(Value::as_f64).unwrap_or(0.1);
 
-    let steps = (t_max / dt) as usize;
+    let steps = f64_usize(t_max / dt);
 
     match model {
         "gompertz" => {
@@ -40,7 +36,7 @@ pub fn handle_kinetics(params: &Value) -> Result<Value, RpcError> {
 
             let mut final_p = 0.0_f64;
             for i in 0..steps {
-                let t = i as f64 * dt;
+                let t = usize_f64(i) * dt;
                 let exponent = (r_max * std::f64::consts::E / p_max).mul_add(lag - t, 1.0);
                 final_p = p_max * (-(-exponent).exp()).exp();
             }
