@@ -35,6 +35,7 @@
 //! | Command | `cargo run --release --bin validate_nanopore_int8_quantization` |
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end pipeline integration test
 
 use wetspring_barracuda::bio::diversity;

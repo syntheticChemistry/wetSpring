@@ -47,6 +47,8 @@
 //! | Provenance type | Primal integration pipeline validation |
 //! | Date | 2026-03-11 |
 //! | Command | `cargo run --release --features gpu,json --bin validate_primal_pipeline_v1` |
+//!
+//! Provenance: Primal IPC pipeline integration validation
 
 use std::path::{Path, PathBuf};
 use std::time::Instant;

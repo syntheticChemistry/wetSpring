@@ -39,6 +39,8 @@
 //! | Provenance type | barraCuda v0.3.5 GPU infrastructure |
 //! | Date | 2026-03-11 |
 //! | Command | `cargo run --release --features gpu,json --bin validate_precision_brain_v1` |
+//!
+//! Provenance: Precision neural sentinel validation
 
 use std::time::Instant;
 use wetspring_barracuda::validation::{OrExit, Validator};

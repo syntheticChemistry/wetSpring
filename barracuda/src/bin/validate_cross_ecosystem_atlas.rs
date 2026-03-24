@@ -19,6 +19,7 @@
 //! | Command     | `cargo test --bin validate_cross_ecosystem_atlas -- --nocapture` |
 //!
 //! Validation class: Cross-spring
+//!
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use wetspring_barracuda::bio::diversity;

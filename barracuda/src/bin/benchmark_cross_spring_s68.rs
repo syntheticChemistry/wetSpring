@@ -50,6 +50,8 @@
 //! 9. Cross-spring evolution timeline (S39 → S68)
 //! 10. Architecture summary (S68)
 //! 11. Timing table
+//!
+//! Provenance: Cross-spring benchmark (S68 baseline)
 
 use std::sync::Arc;
 use std::time::Instant;

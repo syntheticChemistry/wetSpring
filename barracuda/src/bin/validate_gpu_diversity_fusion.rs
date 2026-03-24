@@ -31,6 +31,7 @@
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
 //! Validation class: GPU-parity
+//!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::sync::Arc;

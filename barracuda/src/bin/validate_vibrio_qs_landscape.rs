@@ -25,6 +25,8 @@
 //! | Date | 2026-03-14 |
 //! | Command | `cargo run --features gpu --bin validate_vibrio_qs_landscape` |
 //! | Validation class | Synthetic — analytical known-values (GPU vs CPU parity) |
+//!
+//! Provenance: Vibrio QS fitness landscape validation
 
 use std::time::Instant;
 #[cfg(feature = "gpu")]

@@ -24,6 +24,8 @@
 //! | Exact command | `cargo run --features gpu --release --bin benchmark_three_tier` |
 //! | Data | Synthetic vectors matching Python baseline |
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, Pop!\_OS 22.04 |
+//!
+//! Provenance: Three-tier (CPU/GPU/streaming) benchmark
 
 use std::time::Instant;
 

@@ -41,6 +41,8 @@
 //! | Provenance type | Analytical (mathematical invariants) |
 //! | Date | 2026-03-08 |
 //! | Command | `cargo run --release --bin validate_barracuda_cpu_v25` |
+//!
+//! Provenance: barraCuda CPU primitive validation (V25 NMF/ridge)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{cooperation, diversity, felsenstein, hmm, pcoa, qs_biofilm};

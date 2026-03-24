@@ -23,6 +23,7 @@
 //! | Paper       | 40 (Fajgenbaum et al. Lancet Haematology 2025) |
 //!
 //! Validation class: Synthetic
+//!
 //! Provenance: Generated data with known statistical properties
 
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective, NmfResult, cosine_similarity};

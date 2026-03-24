@@ -24,6 +24,7 @@
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070) |
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end pipeline integration test
 
 use wetspring_barracuda::validation::OrExit;

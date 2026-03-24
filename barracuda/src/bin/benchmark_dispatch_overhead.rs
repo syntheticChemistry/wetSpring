@@ -28,6 +28,8 @@
 //! | Exact command | `cargo run --features gpu --release --bin benchmark_dispatch_overhead` |
 //! | Data | Minimal test vectors |
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, Pop!\_OS 22.04 |
+//!
+//! Provenance: IPC dispatch overhead measurement
 
 use std::time::Instant;
 

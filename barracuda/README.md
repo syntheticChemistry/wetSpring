@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** March 24, 2026 (V136 — barraCuda v0.3.7 standalone, toadStool S155+, coralReef Phase 10, wgpu 28. 1,891 tests (0 failures), 355 binaries (333 barracuda + 22 forge), 234 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, zero `#[allow()]`, clippy ZERO WARNINGS pedantic+nursery. V136: thiserror migration, named cast helpers (~60 casts), upstream contract pinning, bitwise determinism tests, CI pin, provenance headers, hardcoding audit (zero hardcoded primal strings), `ipc/server.rs` refactored, CONTRIBUTING + SECURITY. V135: doc reconciliation, canonical metrics aligned, V135 handoff. V134: deep audit — drug NMF → `barracuda::linalg::nmf`, 26 clippy fixes, validation harness refactored into domain submodules, primal discovery extended (7 primals), SPDX headers, CI feature-matrix. V133: `validate_all`, `GpuContext`/`TensorSession`, `performance_surface`, zero-copy I/O, typed errors, deploy graph hardened.)
+**Updated:** March 24, 2026 (V137 — barraCuda v0.3.7 standalone, toadStool S155+, coralReef Phase 10, wgpu 28. 1,902 tests (0 failures), 355 binaries (333 barracuda + 22 forge), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, zero `#[allow()]`, clippy ZERO WARNINGS pedantic+nursery. V137: provenance headers on all 355 binaries, 8 new tolerance constants, `ipc/connection.rs` extraction, GPU buffer renames, doc link fixes. V136: thiserror migration, named cast helpers (~60 casts), upstream contract pinning, determinism tests, CI pin, hardcoding audit. V135: doc reconciliation, canonical metrics. V134: deep audit — drug NMF delegation, validation harness refactored, primal discovery extended. V133: `validate_all`, `GpuContext`/`TensorSession`, `performance_surface`, zero-copy I/O.)
 
 ---
 
@@ -20,7 +20,7 @@ wetspring-barracuda
 ├── 44 GPU bio modules          (44 Lean/Compose, 0 Passthrough)
 ├── 1 provenance module         (barracuda::shaders::provenance wiring)
 ├── 3 streaming I/O parsers     (FASTQ/gzip, mzML/base64, MS2)
-├── 307 validation binaries (333 total)
+├── 333 validation/benchmark binaries
 └── depends on: barracuda via path dependency
 ```
 
@@ -142,7 +142,7 @@ Builder patterns wired: `HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`.
 | Module | Purpose |
 |--------|---------|
 | `special` | Sovereign math (erf, ln_gamma, regularized_gamma, normal_cdf) |
-| `tolerances` | 234 named constants (scientifically justified) |
+| `tolerances` | 242 named constants (scientifically justified) |
 | `validation` | Structured test harness with provenance |
 | `encoding` | Sovereign base64 (zero dependencies) |
 | `error` | Error types (no external crates) |
@@ -159,10 +159,10 @@ Builder patterns wired: `HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`.
 | `#![deny(unsafe_code)]` | Enforced crate-wide (test-only `allow` for `env::set_var` in edition 2024) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | Enforced |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
-| Tests | 1,891 total (unit + integration + property + doc) |
+| Tests | 1,902 total (unit + integration + property + doc) |
 | ESN ridge regression | Proper Cholesky solve (not diagonal approximation) |
 | I/O parsers | Streaming-first; buffering APIs deprecated |
-| Validation checks | 8,431+ across 307 validation binaries (333 total) |
+| Validation checks | 8,431+ across 333 validation/benchmark binaries |
 
 ## Quick Start
 

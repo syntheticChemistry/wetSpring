@@ -55,6 +55,8 @@
 //! |-------|-------|
 //! | Date | 2026-03-01 |
 //! | Command | `cargo run --release --bin benchmark_python_vs_rust_v3` |
+//!
+//! Provenance: Python vs Rust parity benchmark (V3)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, dnds, hmm, kmer, pcoa};

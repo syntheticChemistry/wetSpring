@@ -37,6 +37,7 @@
 //! | Tolerances | `tolerances::ANALYTICAL_F64`, `tolerances::EXACT_F64` |
 //!
 //! Validation class: Analytical
+//!
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 //!
 //! # Python Baselines

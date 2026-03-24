@@ -45,6 +45,8 @@
 //! | Baseline date | 2026-02-22 |
 //! | Exact command | `cargo run --features gpu --release --bin benchmark_cross_spring_s65` |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Provenance: Cross-spring benchmark (S65 baseline)
 
 use std::sync::Arc;
 use std::time::Instant;

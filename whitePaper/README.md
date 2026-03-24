@@ -3,7 +3,7 @@
 # wetSpring White Paper
 
 **Date:** March 24, 2026
-**Status:** V136 — Validation study active — 5,707+ checks, **1,891** tests (**1,205** lib default, **1,569** lib ipc+vault+json), 379 experiments indexed, **355** binaries (333 barracuda + 22 forge), 44 GPU modules, 49 CPU bio modules, standalone `barraCuda` **v0.3.7** (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, **234** named tolerances (zero inline literals), clippy pedantic + nursery ZERO WARNINGS, **zero `#[allow()]` in entire codebase**, **workspace `lints.workspace` + `forbid(unsafe_code)` at workspace level**. **V136:** Deep debt resolution + ecosystem absorption — thiserror error derives, named cast helpers (~60 casts), upstream contract pinning, bitwise determinism tests, CI version pin, provenance headers, hardcoding audit, ipc/server.rs refactored, CONTRIBUTING.md + SECURITY.md. **V135:** Comprehensive doc reconciliation, V135 handoff crafted, wateringHole sync, baseCamp/experiments updated to canonical metrics, ecoPrimals baseCamp cross-ecosystem update, archive review. **V134:** Deep audit + debt — drug NMF → `barracuda::linalg::nmf` (zero duplicate math), 26 clippy errors resolved, coverage 91.20% gated at 90%, provenance fixes, CI feature-matrix expansion, validation harness refactored into domain submodules, primal discovery extended (coralReef, rhizoCrypt, loamSpine, sweetGrass), SPDX on all specs/whitePaper. V133: `validate_all`, `GpuContext`/`TensorSession`, `performance_surface`, zero-copy I/O, IPC modules. V132: `ValidationSink`, `PROVENANCE_REGISTRY`, `DeviceCapabilities`, ecosystem wiring. 64 papers reproduced, 46 fully validated at CPU + GPU + metalForge tiers.
+**Status:** V137 — Validation study active — 5,707+ checks, **1,902** tests, 379 experiments indexed, **355** binaries (333 barracuda + 22 forge), 44 GPU modules, 49 CPU bio modules, standalone `barraCuda` **v0.3.7** (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, **242** named tolerances (zero inline literals), clippy pedantic + nursery ZERO WARNINGS, **zero `#[allow()]` in entire codebase**, **workspace `forbid(unsafe_code)`**, **`//! Provenance:` on all 355 binaries**. **V137:** Full provenance headers on all 355 binaries, 8 new tolerance constants (242 total), `ipc/connection.rs` extraction, GPU buffer renames, doc link fixes. **V136:** thiserror derives, named cast helpers (~60 casts), upstream contract pinning, determinism tests, CI pin, hardcoding audit, CONTRIBUTING + SECURITY. **V135:** doc reconciliation. **V134:** drug NMF delegation, validation harness refactored, primal discovery extended. **V133:** `validate_all`, `GpuContext`/`TensorSession`, zero-copy I/O. 64 papers reproduced, 46 fully validated at CPU + GPU + metalForge tiers.
 **License:** AGPL-3.0-or-later
 
 ---
@@ -313,7 +313,7 @@ algorithms can be ported from interpreted languages to `barraCuda` (math)
 and `toadStool` (hardware dispatch):
 
 - **hotSpring** — Nuclear physics, plasma, lattice QCD (62 WGSL shaders, 660 tests)
-- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 150+ barraCuda primitives, **1,891** tests workspace-wide)
+- **wetSpring** — Life science, analytical chemistry, environmental monitoring (0 local WGSL, 150+ barraCuda primitives, **1,902** tests workspace-wide)
 - **neuralSpring** — ML inference, eigensolvers, TensorSession
 - **airSpring** — Precision agriculture, IoT, Richards PDE, Kriging
 

@@ -239,7 +239,10 @@ impl NaiveBayesClassifier {
     /// Maps the f64 log-probability range to `[-128, 127]` using affine
     /// quantization: `q = round((x - zero_point) / scale)`.
     #[must_use]
-    #[expect(clippy::cast_possible_truncation, reason = "quantized q clamped to i8 range")]
+    #[expect(
+        clippy::cast_possible_truncation,
+        reason = "quantized q clamped to i8 range"
+    )]
     pub fn to_int8_weights(&self) -> NpuWeights {
         if self.dense_log_probs.is_empty() {
             return NpuWeights {

@@ -61,6 +61,7 @@
 //! | Data | Synthetic test vectors (self-contained) |
 //!
 //! Validation class: GPU-parity
+//!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
 use barracuda::device::WgpuDevice;

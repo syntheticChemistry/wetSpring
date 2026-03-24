@@ -54,6 +54,7 @@
 //! | Command | `cargo test --bin validate_tillage_microbiome_2025 -- --nocapture` |
 //!
 //! Validation class: Analytical
+//!
 //! Provenance: Known-value formulas and algorithmic invariants
 
 use wetspring_barracuda::bio::diversity;

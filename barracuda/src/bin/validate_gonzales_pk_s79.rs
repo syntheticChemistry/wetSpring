@@ -49,6 +49,7 @@
 //! | Command | `cargo run --release --bin validate_gonzales_pk_s79` |
 //!
 //! Validation class: Analytical
+//!
 //! Provenance: Known-value formulas and algorithmic invariants
 
 use std::time::Instant;
@@ -147,11 +148,11 @@ fn main() {
 
         v.check_pass(
             &format!("Dose {dose:.3}: peak ≈ dose"),
-            (peak - dose).abs() / dose < 0.2,
+            (peak - dose).abs() / dose < wetspring_barracuda::tolerances::PK_PEAK_DOSE_RELATIVE,
         );
         v.check_pass(
             &format!("Dose {dose:.3}: final << peak"),
-            final_conc < peak * 0.15,
+            final_conc < peak * wetspring_barracuda::tolerances::PK_ELIMINATION_FLOOR,
         );
 
         let name = ["low", "mid", "high"][i];

@@ -14,6 +14,8 @@
 //! | Type | Analytical |
 //! | Date | 2026-03-23 |
 //! | Command | `cargo run --bin validate_anaerobic_codigestion` |
+//!
+//! Provenance: Anaerobic co-digestion kinetics validation (Track 6)
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;

@@ -48,6 +48,8 @@
 //! | Provenance type | KBS LTER Anderson temporal model |
 //! | Date | 2026-03-11 |
 //! | Command | `cargo run --release --features gpu,json --bin validate_kbs_lter_anderson_v1` |
+//!
+//! Provenance: KBS LTER soil Anderson disorder analysis
 
 use std::time::Instant;
 use wetspring_barracuda::tolerances;

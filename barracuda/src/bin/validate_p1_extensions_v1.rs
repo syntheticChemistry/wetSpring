@@ -49,6 +49,8 @@
 //! | Provenance type | P1 dataset extension framework |
 //! | Date | 2026-03-11 |
 //! | Command | `cargo run --release --features gpu,json --bin validate_p1_extensions_v1` |
+//!
+//! Provenance: Phase 1 extension validation
 
 use std::time::Instant;
 use wetspring_barracuda::validation::OrExit;

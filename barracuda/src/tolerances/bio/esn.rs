@@ -31,3 +31,12 @@ pub const ESN_GAUSSIAN_MEAN: f64 = 0.1;
 /// rescaling by `ρ/λ_max`).
 /// Validated: `esn/tests` `spectral_radius_scaling`.
 pub const ESN_SPECTRAL_RADIUS: f64 = 0.01;
+
+/// ESN prediction reasonableness ceiling for simple identity-like tasks.
+///
+/// A reservoir computing a near-identity function (sum of 2 inputs,
+/// 50 training steps) produces predictions within ±10 of the target.
+/// This is a smoke test ceiling, not a precision benchmark — it confirms
+/// the train/predict pipeline produces bounded, non-degenerate output.
+/// Validated: `esn/tests` `bio_esn_train_and_predict`.
+pub const ESN_PREDICTION_REASONABLE: f64 = 10.0;

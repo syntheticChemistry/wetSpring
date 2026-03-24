@@ -43,6 +43,7 @@
 //! | Command | `cargo run --release --features gpu --bin validate_pure_gpu_streaming_v4` |
 //!
 //! Validation class: GPU-parity
+//!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::sync::Arc;

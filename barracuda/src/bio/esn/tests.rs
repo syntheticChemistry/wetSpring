@@ -411,7 +411,7 @@ fn bio_esn_train_predict_roundtrip() {
     for (p, t) in predictions.iter().zip(targets.iter()) {
         assert_eq!(p.len(), 1);
         assert!(
-            (p[0] - t[0]).abs() < 10.0,
+            (p[0] - t[0]).abs() < crate::tolerances::ESN_PREDICTION_REASONABLE,
             "prediction should be reasonable"
         );
     }

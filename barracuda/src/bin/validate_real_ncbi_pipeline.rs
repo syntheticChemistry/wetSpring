@@ -28,6 +28,7 @@
 //! | Command        | `cargo run --release --bin validate_real_ncbi_pipeline` |
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end pipeline integration test
 
 use std::collections::HashMap;

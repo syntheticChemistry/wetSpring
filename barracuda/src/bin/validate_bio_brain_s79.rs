@@ -37,6 +37,8 @@
 //! | Provenance type | Analytical (mathematical invariants) |
 //! | Date | 2026-03-03 |
 //! | Command | `cargo run --release --bin validate_bio_brain_s79` |
+//!
+//! Provenance: Bio sentinel neural observation validation (S79)
 
 use std::time::Instant;
 

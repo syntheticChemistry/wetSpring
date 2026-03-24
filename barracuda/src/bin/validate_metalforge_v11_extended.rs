@@ -33,6 +33,8 @@
 //! | Provenance type | Analytical (mathematical invariants) |
 //! | Date | 2026-03-03 |
 //! | Command | `cargo run --release --bin validate_metalforge_v11_extended` |
+//!
+//! Provenance: metalForge extended validation (V11)
 
 use std::time::Instant;
 

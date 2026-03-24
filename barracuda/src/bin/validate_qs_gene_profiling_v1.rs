@@ -47,6 +47,8 @@
 //! | Provenance type | QS gene profiling and regulon cross-reference |
 //! | Date | 2026-03-11 |
 //! | Command | `cargo run --release --features gpu,json --bin validate_qs_gene_profiling_v1` |
+//!
+//! Provenance: Quorum-sensing gene prevalence profiling validation
 
 use std::time::Instant;
 use wetspring_barracuda::validation::OrExit;

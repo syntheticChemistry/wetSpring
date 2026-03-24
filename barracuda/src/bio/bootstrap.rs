@@ -281,9 +281,21 @@ mod tests {
             .expect("bootstrap_ci");
         let ci_b = barracuda::stats::bootstrap_ci(&data, barracuda::stats::mean, 200, 0.95, 42)
             .expect("bootstrap_ci");
-        assert_eq!(ci_a.estimate.to_bits(), ci_b.estimate.to_bits(), "bitwise determinism violated");
-        assert_eq!(ci_a.lower.to_bits(), ci_b.lower.to_bits(), "bitwise determinism violated");
-        assert_eq!(ci_a.upper.to_bits(), ci_b.upper.to_bits(), "bitwise determinism violated");
+        assert_eq!(
+            ci_a.estimate.to_bits(),
+            ci_b.estimate.to_bits(),
+            "bitwise determinism violated"
+        );
+        assert_eq!(
+            ci_a.lower.to_bits(),
+            ci_b.lower.to_bits(),
+            "bitwise determinism violated"
+        );
+        assert_eq!(
+            ci_a.upper.to_bits(),
+            ci_b.upper.to_bits(),
+            "bitwise determinism violated"
+        );
         assert_eq!(
             ci_a.confidence.to_bits(),
             ci_b.confidence.to_bits(),
@@ -294,8 +306,15 @@ mod tests {
             ci_b.std_error.to_bits(),
             "bitwise determinism violated"
         );
-        assert_eq!(ci_a.n_bootstrap, ci_b.n_bootstrap, "bitwise determinism violated");
-        assert_eq!(ci_a.distribution.len(), ci_b.distribution.len(), "bitwise determinism violated");
+        assert_eq!(
+            ci_a.n_bootstrap, ci_b.n_bootstrap,
+            "bitwise determinism violated"
+        );
+        assert_eq!(
+            ci_a.distribution.len(),
+            ci_b.distribution.len(),
+            "bitwise determinism violated"
+        );
         for (a, b) in ci_a.distribution.iter().zip(&ci_b.distribution) {
             assert_eq!(a.to_bits(), b.to_bits(), "bitwise determinism violated");
         }

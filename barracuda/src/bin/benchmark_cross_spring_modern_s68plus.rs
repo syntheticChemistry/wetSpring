@@ -40,6 +40,8 @@
 //! - `submit_and_poll` — resilient dispatch (S68+, transparent)
 //! - `DispatchSemaphore` — concurrency management (S68+, transparent)
 //! - `compile_shader_universal` — single entry for all precisions (S67/S68)
+//!
+//! Provenance: Modern cross-spring benchmark (S68+)
 
 use std::sync::Arc;
 use std::time::Instant;

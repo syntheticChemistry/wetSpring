@@ -42,6 +42,7 @@
 //! | Command | `cargo run --release --features gpu --bin validate_gonzales_streaming` |
 //!
 //! Validation class: Cross-spring
+//!
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::time::Instant;

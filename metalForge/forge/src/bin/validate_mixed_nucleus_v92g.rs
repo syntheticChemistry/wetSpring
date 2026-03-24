@@ -24,6 +24,7 @@
 //! | Command | `cargo run -p wetspring-forge --release --bin validate_mixed_nucleus_v92g` |
 //!
 //! Validation class: Integration + Mixed Hardware
+//!
 //! Provenance: metalForge NUCLEUS + biomeOS + ToadStool S86
 
 use wetspring_forge::bridge;

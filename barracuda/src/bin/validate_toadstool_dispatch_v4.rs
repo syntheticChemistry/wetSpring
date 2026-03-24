@@ -43,6 +43,8 @@
 //! | Provenance type | Cross-spring validation (ToadStool dispatch) |
 //! | Date | 2026-03-10 |
 //! | Command | `cargo run --release --bin validate_toadstool_dispatch_v4` |
+//!
+//! Provenance: ToadStool dispatch integration validation (V4)
 
 use std::time::Instant;
 

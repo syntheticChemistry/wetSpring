@@ -42,6 +42,7 @@
 //! | Command | `cargo run --features gpu --bin validate_barracuda_cpu_v17` |
 //!
 //! Validation class: Python-parity
+//!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use std::time::Instant;

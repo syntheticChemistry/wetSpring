@@ -14,6 +14,8 @@
 //! | Type | Analytical |
 //! | Date | 2026-03-23 |
 //! | Command | `cargo run --bin validate_anaerobic_afex_stover` |
+//!
+//! Provenance: AFEX corn stover anaerobic digestion kinetics (Track 6)
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::tolerances;

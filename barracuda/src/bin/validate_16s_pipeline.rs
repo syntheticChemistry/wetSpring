@@ -27,6 +27,7 @@
 //! 5. **Pipeline integration**: Stages compose correctly end-to-end
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end pipeline integration test
 
 use std::collections::HashMap;

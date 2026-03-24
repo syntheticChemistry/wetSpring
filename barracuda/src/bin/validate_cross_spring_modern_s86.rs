@@ -46,6 +46,7 @@
 //! | Command | `cargo run --release --bin validate_cross_spring_modern_s86` |
 //!
 //! Validation class: Cross-spring
+//!
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::sync::Arc;

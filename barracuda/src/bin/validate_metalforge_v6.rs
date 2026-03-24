@@ -27,6 +27,7 @@
 //! | Data | Synthetic test vectors (self-contained) |
 //!
 //! Validation class: Python-parity
+//!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use barracuda::device::WgpuDevice;

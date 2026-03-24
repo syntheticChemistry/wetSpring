@@ -37,6 +37,8 @@
 //! | Exact command | `cargo run --release --bin benchmark_python_vs_rust_v5` |
 //! | Data | Published model equations + Python baseline JSON |
 //! | Date | 2026-03-10 |
+//!
+//! Provenance: Python vs Rust parity benchmark (V5)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::diversity;

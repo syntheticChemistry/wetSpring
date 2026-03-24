@@ -24,6 +24,7 @@
 //! | Paper       | 37 (Rajagopalan et al. PNAS 2021) |
 //!
 //! Validation class: Analytical
+//!
 //! Provenance: Known-value formulas and algorithmic invariants
 
 use wetspring_barracuda::validation::Validator;

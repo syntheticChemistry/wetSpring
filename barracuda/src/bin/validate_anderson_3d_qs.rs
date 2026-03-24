@@ -30,6 +30,7 @@
 //! | Command     | `cargo test --bin validate_anderson_3d_qs -- --nocapture` |
 //!
 //! Validation class: Analytical
+//!
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use wetspring_barracuda::bio::diversity;

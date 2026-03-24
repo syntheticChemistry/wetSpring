@@ -31,6 +31,7 @@
 //! | Command | `cargo run -p wetspring-forge --release --bin validate_s86_metalforge_dispatch` |
 //!
 //! Validation class: Pipeline + Analytical
+//!
 //! Provenance: S86 ungated primitives via metalForge Node dispatch
 
 use wetspring_barracuda::validation::OrExit;

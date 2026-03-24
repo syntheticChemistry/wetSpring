@@ -326,7 +326,9 @@ pub fn batch_rarefaction_gpu(
         .enumerate()
         .map(|(i, sample)| {
             let mut p = effective_params.clone();
-            p.seed = params.seed.wrapping_add(usize_u64(i).wrapping_mul(1_000_000));
+            p.seed = params
+                .seed
+                .wrapping_add(usize_u64(i).wrapping_mul(1_000_000));
             rarefaction_bootstrap_gpu(gpu, sample, &p)
         })
         .collect()
@@ -343,10 +345,26 @@ mod tests {
     use crate::tolerances;
 
     fn assert_bootstrap_ci_bits(a: &BootstrapCi, b: &BootstrapCi) {
-        assert_eq!(a.mean.to_bits(), b.mean.to_bits(), "bitwise determinism violated");
-        assert_eq!(a.lower.to_bits(), b.lower.to_bits(), "bitwise determinism violated");
-        assert_eq!(a.upper.to_bits(), b.upper.to_bits(), "bitwise determinism violated");
-        assert_eq!(a.se.to_bits(), b.se.to_bits(), "bitwise determinism violated");
+        assert_eq!(
+            a.mean.to_bits(),
+            b.mean.to_bits(),
+            "bitwise determinism violated"
+        );
+        assert_eq!(
+            a.lower.to_bits(),
+            b.lower.to_bits(),
+            "bitwise determinism violated"
+        );
+        assert_eq!(
+            a.upper.to_bits(),
+            b.upper.to_bits(),
+            "bitwise determinism violated"
+        );
+        assert_eq!(
+            a.se.to_bits(),
+            b.se.to_bits(),
+            "bitwise determinism violated"
+        );
     }
 
     /// CPU rarefaction path (community smaller than GPU dispatch threshold): same seed →
@@ -370,7 +388,10 @@ mod tests {
         let result_a = rarefaction_bootstrap_gpu(&gpu, &counts, &params).expect("rarefaction");
         let result_b = rarefaction_bootstrap_gpu(&gpu, &counts, &params).expect("rarefaction");
 
-        assert_eq!(result_a.depth, result_b.depth, "bitwise determinism violated");
+        assert_eq!(
+            result_a.depth, result_b.depth,
+            "bitwise determinism violated"
+        );
         assert_bootstrap_ci_bits(&result_a.shannon, &result_b.shannon);
         assert_bootstrap_ci_bits(&result_a.simpson, &result_b.simpson);
         assert_bootstrap_ci_bits(&result_a.observed, &result_b.observed);

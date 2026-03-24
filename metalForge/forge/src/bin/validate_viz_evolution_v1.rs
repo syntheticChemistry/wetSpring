@@ -20,6 +20,8 @@
 //! | V8 Rarefaction  | Scenario builder: timeseries, gauge channels |
 //! | V9 NMF          | Scenario builder: heatmap W/H, bar top features |
 //! | V10 Pipeline    | Streaming pipeline scenario: multi-node graph |
+//!
+//! Provenance: Visualization evolution pathway validation
 
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;

@@ -43,6 +43,8 @@
 //! | Provenance type | barraCuda v0.3.5 stable specials |
 //! | Date | 2026-03-11 |
 //! | Command | `cargo run --release --features gpu --bin validate_stable_specials_v1` |
+//!
+//! Provenance: Stable special function (erf, norm_cdf, gamma) validation
 
 use std::time::Instant;
 use wetspring_barracuda::tolerances;

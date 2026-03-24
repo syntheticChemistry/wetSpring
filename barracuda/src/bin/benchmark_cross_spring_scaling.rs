@@ -41,6 +41,8 @@
 //! | `LocusVarianceGpu` | neuralSpring | Session 31f | wetSpring |
 //! | `FusedMapReduceF64` | hotSpring | Session 18 | wetSpring, neuralSpring |
 //! | `GemmF64` | wetSpring (60×) | Session 18 | hotSpring HFB |
+//!
+//! Provenance: Cross-spring scaling benchmark
 
 use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
 use barracuda::ops::linalg::gemm_f64::GemmF64;

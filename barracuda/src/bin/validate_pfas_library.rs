@@ -39,6 +39,7 @@
 //! - `GenX` (HFPO-DA): single compound
 //!
 //! Validation class: Synthetic
+//!
 //! Provenance: Generated data with known statistical properties
 
 use wetspring_barracuda::bio::{kmd, spectral_match, tolerance_search};

@@ -37,6 +37,7 @@
 //! (`Bray-Curtis`), rarefaction, and rare lineage detection.
 //!
 //! Validation class: Python-parity
+//!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::{diversity, pcoa};

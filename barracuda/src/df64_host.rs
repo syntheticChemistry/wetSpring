@@ -137,7 +137,10 @@ mod tests {
     fn pack_unpack_roundtrip_small_value() {
         let v = 1e-10_f64;
         let err = roundtrip_error(v);
-        assert!(err < 1e-25, "roundtrip error {err} for small value");
+        assert!(
+            err < tolerances::DF64_SMALL_VALUE_ROUNDTRIP,
+            "roundtrip error {err} for small value"
+        );
     }
 
     #[test]

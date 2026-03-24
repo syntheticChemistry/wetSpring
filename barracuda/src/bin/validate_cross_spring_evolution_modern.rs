@@ -35,6 +35,7 @@
 //! | Command | `cargo run --release --bin validate_cross_spring_evolution_modern` |
 //!
 //! Validation class: Cross-spring
+//!
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use wetspring_barracuda::tolerances;

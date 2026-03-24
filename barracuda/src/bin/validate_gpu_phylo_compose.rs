@@ -49,6 +49,7 @@
 //! `ToadStool` primitive: `FelsensteinGpu` (site-parallel pruning). GPU bootstrap + placement.
 //!
 //! Validation class: GPU-parity
+//!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
 use barracuda::device::WgpuDevice;

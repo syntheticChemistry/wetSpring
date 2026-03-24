@@ -22,6 +22,7 @@
 //! | Command | `cargo run --bin validate_pcie_bypass_mixed_hw` |
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end pipeline integration test
 
 use wetspring_forge::bridge;

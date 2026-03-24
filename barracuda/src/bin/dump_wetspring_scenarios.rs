@@ -14,6 +14,8 @@
 //! # Push to petalTongue via IPC (if socket is available)
 //! PETALTONGUE_SOCKET=/tmp/petaltongue.sock cargo run --features json --bin dump_wetspring_scenarios
 //! ```
+//!
+//! Provenance: Scenario dump utility for petalTongue visualization
 
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::visualization::ipc_push::PetalTonguePushClient;

@@ -29,6 +29,7 @@
 //! | Command | `cargo run --features ipc --release --bin validate_nucleus_v8_mixed` |
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end pipeline integration test
 
 use serde_json::{Value, json};

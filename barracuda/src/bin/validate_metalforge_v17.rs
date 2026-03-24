@@ -41,6 +41,8 @@
 //! | Provenance type | Cross-system (CPU reference from Exp323) |
 //! | Date | 2026-03-08 |
 //! | Command | `cargo run --release --bin validate_metalforge_v17` |
+//!
+//! Provenance: metalForge validation (V17)
 
 use std::path::PathBuf;
 use std::time::Instant;

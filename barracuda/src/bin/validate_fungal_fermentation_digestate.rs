@@ -10,6 +10,8 @@
 //! | Type | Analytical |
 //! | Date | 2026-03-23 |
 //! | Command | `cargo run --bin validate_fungal_fermentation_digestate` |
+//!
+//! Provenance: Fungal fermentation digestate kinetics (Track 6)
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::bio::kinetics::monod;

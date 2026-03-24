@@ -53,6 +53,8 @@
 //! | Provenance type | Anderson QS model validation against known biology |
 //! | Date | 2026-03-10 |
 //! | Command | `cargo run --features gpu --bin validate_anderson_qs_environments_v1` |
+//!
+//! Provenance: Anderson disorder + QS across environment types (Track 4/5)
 
 use std::path::PathBuf;
 

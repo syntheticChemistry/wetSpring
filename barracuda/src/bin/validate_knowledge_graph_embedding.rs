@@ -24,6 +24,7 @@
 //! | Command     | `cargo test --bin validate_knowledge_graph_embedding -- --nocapture` |
 //!
 //! Validation class: Analytical
+//!
 //! Provenance: Known-value formulas and algorithmic invariants
 
 use wetspring_barracuda::tolerances;

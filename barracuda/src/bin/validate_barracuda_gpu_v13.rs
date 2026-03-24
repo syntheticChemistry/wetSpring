@@ -39,6 +39,8 @@
 //! | Provenance type | CPU reference (Exp314 values) |
 //! | Date | 2026-03-07 |
 //! | Command | `cargo run --release --features gpu --bin validate_barracuda_gpu_v13` |
+//!
+//! Provenance: barraCuda GPU primitive validation (V13 ODE lean)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::diversity;

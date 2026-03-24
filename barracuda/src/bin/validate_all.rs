@@ -14,6 +14,8 @@
 //! | Type | Meta-validation |
 //! | Date | 2026-03-23 |
 //! | Command | `cargo run --bin validate_all` |
+//!
+//! Provenance: Meta-runner: executes all validation binaries and reports results
 
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode};

@@ -49,6 +49,7 @@
 //! | Command | `cargo run --release --features gpu --bin validate_skin_anderson_s79` |
 //!
 //! Validation class: Cross-spring
+//!
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::time::Instant;

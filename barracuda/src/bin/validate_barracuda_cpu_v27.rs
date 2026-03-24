@@ -49,6 +49,8 @@
 //! | D68 | barraCuda shaders::provenance | Registry cross-spring metadata |
 //! | D69 | `scripts/python_anaerobic_biogas_baseline.py` (V107, 2026-03-10) | Yang 2016: P=350/Rm=25/λ=3, B_max=320/k=0.08, μ_max=0.4/Ks=200/Ki=3000 |
 //! | D70 | `scripts/python_anaerobic_biogas_baseline.py` (V107, 2026-03-10) | W=20·(1−J), communities: anaerobic=[45,25,15,8,3,2,1,0.5,0.3,0.2] |
+//!
+//! Provenance: barraCuda CPU primitive validation (V27 pharmacology)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{

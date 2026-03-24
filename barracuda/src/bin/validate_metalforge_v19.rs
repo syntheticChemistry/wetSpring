@@ -42,6 +42,8 @@
 //! | Provenance type | Cross-system (CPU ref Exp347, GPU Exp348) |
 //! | Date | 2026-03-10 |
 //! | Command | `cargo run --release --bin validate_metalforge_v19` |
+//!
+//! Provenance: metalForge validation (V19)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{

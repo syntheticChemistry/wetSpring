@@ -71,8 +71,7 @@ mod tests {
     fn pinned_version_matches_linked() {
         assert!(check_barracuda_version());
 
-        let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("../../barraCuda/Cargo.toml");
+        let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../barraCuda/Cargo.toml");
         let Ok(content) = std::fs::read_to_string(&manifest) else {
             panic!(
                 "expected path dependency at {}; clone barraCuda alongside wetSpring",

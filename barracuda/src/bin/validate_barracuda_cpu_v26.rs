@@ -46,6 +46,8 @@
 //! | Provenance type | `BarraCuda` CPU (pure Rust math — zero external runtime) |
 //! | Date | 2026-03-10 |
 //! | Command | `cargo run --release --bin validate_barracuda_cpu_v26` |
+//!
+//! Provenance: barraCuda CPU primitive validation (V26 spectral)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{

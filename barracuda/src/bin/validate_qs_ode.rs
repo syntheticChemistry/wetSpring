@@ -21,6 +21,7 @@
 //! | Hardware | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04 |
 //!
 //! Validation class: Python-parity
+//!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::ode::steady_state_mean;

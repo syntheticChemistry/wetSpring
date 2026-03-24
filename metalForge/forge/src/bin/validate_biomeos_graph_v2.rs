@@ -25,6 +25,7 @@
 //! | Command | `cargo run -p wetspring-forge --bin validate_biomeos_graph_v2` |
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end biomeOS coordination test
 
 use wetspring_forge::dispatch;

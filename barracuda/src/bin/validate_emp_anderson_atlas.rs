@@ -63,6 +63,8 @@
 //! | Provenance type | Analytical (mathematical invariants) |
 //! | Date | 2026-03-03 |
 //! | Command | `cargo run --release --bin validate_emp_anderson_atlas` |
+//!
+//! Provenance: Earth Microbiome Project Anderson disorder atlas
 
 use std::time::Instant;
 

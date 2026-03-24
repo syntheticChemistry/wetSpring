@@ -27,6 +27,8 @@
 //! |------------|---------|----------|---------|---------|----------|
 //! | Exp001     | 20      | 124,249  | 71.5s   | 42.5s   | 10.5s    |
 //! | Exp002     | 10      | 820,548  | 95.6s   | 68.0s   | 9.5s     |
+//!
+//! Provenance: End-to-end pipeline benchmark
 
 use std::collections::HashMap;
 use std::path::Path;

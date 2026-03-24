@@ -54,6 +54,8 @@ pub mod capability_domains;
 #[cfg(feature = "ipc")]
 pub mod compute_dispatch;
 #[cfg(feature = "ipc")]
+mod connection;
+#[cfg(feature = "ipc")]
 pub mod discover;
 #[cfg(feature = "ipc")]
 pub mod dispatch;

@@ -49,6 +49,7 @@
 //! | `LocusVarianceGpu` | `neuralSpring` | Session 31f | `wetSpring` (new) |
 //!
 //! Validation class: Cross-spring
+//!
 //! Provenance: Validates across multiple primals/springs (`hotSpring`, `wetSpring`, `neuralSpring`, etc.)
 
 use barracuda::{

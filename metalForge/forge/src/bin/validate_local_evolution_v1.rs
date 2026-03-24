@@ -15,6 +15,8 @@
 //! | E3 NMF       | Re-exported from `bio::nmf` for domain-level access |
 //! | E4 Quality   | Test extraction: `quality_tests.rs` path wired correctly |
 //! | E5 Workloads | `data_bytes` wired into bandwidth-sensitive workloads |
+//!
+//! Provenance: Local GPU evolution pathway validation
 
 use wetspring_barracuda::bio::{hmm, pangenome};
 use wetspring_barracuda::tolerances;

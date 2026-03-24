@@ -41,6 +41,7 @@
 //! | Tolerances    | `tolerances::EXACT_F64` for CPU parity, structural for routing |
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end pipeline integration test
 
 use serde_json::json;

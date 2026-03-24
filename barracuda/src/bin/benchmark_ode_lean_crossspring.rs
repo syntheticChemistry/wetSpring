@@ -31,6 +31,8 @@
 //! The f64 emulation pattern in WGSL came from hotSpring's lattice QCD shaders.
 //! The generic `OdeSystem` trait + RK4 template came from `ToadStool` S51 absorption.
 //! neuralSpring's adaptive RK45 influenced the stepping architecture.
+//!
+//! Provenance: ODE lean pathway cross-spring benchmark
 
 use std::time::Instant;
 

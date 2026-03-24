@@ -19,6 +19,8 @@
 //! | P7 NMF         | nmf → nmf_scenario → JSON |
 //! | P8 Pipeline Viz | demo_streaming_pipeline → JSON roundtrip |
 //! | P9 Regression  | Existing scenarios still produce valid output |
+//!
+//! Provenance: Science + visualization pipeline integration
 
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;

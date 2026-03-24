@@ -48,6 +48,8 @@
 //! GEMM: wetSpring → `ToadStool` S62 (`GemmCached`, `DF64`-aware via hotSpring S58)
 //! Stats: airSpring/groundSpring → `ToadStool` S64/S66 (metrics, bootstrap)
 //! Precision: hotSpring → `ToadStool` S67 (`Fp64Strategy`, `compile_shader_universal`)
+//!
+//! Provenance: CPU → GPU → streaming progression benchmark
 
 use std::sync::Arc;
 use std::time::Instant;

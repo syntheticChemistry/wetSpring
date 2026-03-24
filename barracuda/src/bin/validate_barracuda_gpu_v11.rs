@@ -40,6 +40,8 @@
 //! | Provenance type | Analytical (mathematical invariants) |
 //! | Date | 2026-03-03 |
 //! | Command | `cargo run --release --bin validate_barracuda_gpu_v11` |
+//!
+//! Provenance: barraCuda GPU primitive validation (V11 spectral)
 
 use std::time::Instant;
 

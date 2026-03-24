@@ -31,6 +31,7 @@
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, Pop!\_OS 22.04 |
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end pipeline integration test
 
 use barracuda::stats::{correlation::variance as stats_variance, pearson_correlation};

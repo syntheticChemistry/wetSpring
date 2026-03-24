@@ -51,6 +51,8 @@
 //! | Type | GPU parity |
 //! | Date | 2026-03-23 |
 //! | Command | `cargo run --features gpu --bin validate_barracuda_gpu_v12` |
+//!
+//! Provenance: barraCuda GPU primitive validation (V12 phylogenetics)
 
 use std::time::Instant;
 

@@ -37,6 +37,8 @@
 //! | Provenance type | GPU dispatch pipeline diagnostic |
 //! | Date | 2026-03-11 |
 //! | Command | `cargo run --release --features gpu,json --bin validate_nouveau_diagnostic_v1` |
+//!
+//! Provenance: Nouveau GPU driver diagnostic validation
 
 use std::time::Instant;
 use wetspring_barracuda::validation::{OrExit, Validator};

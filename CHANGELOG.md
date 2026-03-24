@@ -3,6 +3,57 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V137] — 2026-03-24
+
+### Full Provenance + Tolerance Centralization + IPC Modularization
+
+Complete provenance headers on all 355 validation binaries. Remaining inline
+tolerance literals centralized into named constants. IPC connection pipeline
+extracted into focused module. Doc link fixes. Buffer naming improvements.
+
+1,902 tests pass. 0 failures. Zero mocks in production code.
+
+#### Added
+- `//! Provenance:` headers on **all 355** validation/benchmark binaries
+  (333 barracuda + 22 forge) — every binary now documents its experiment,
+  baseline tool, and validation scope (was 5 in V136)
+- 8 new named tolerance constants: `DF64_SMALL_VALUE_ROUNDTRIP`,
+  `STABLE_IDENTITY_TINY`, `ESN_PREDICTION_REASONABLE`, `PEAK_INDEX_PROXIMITY`,
+  `NPU_QUANTIZE_ROUNDTRIP`, `ABUNDANCE_SUM_TO_ONE`, `PK_PEAK_DOSE_RELATIVE`,
+  `PK_ELIMINATION_FLOOR` — 242 total (was 234)
+- `ipc/connection.rs`: connection processing pipeline extracted from
+  `ipc/server.rs` — handles reading, dispatching, and writing JSON-RPC
+  independently of server lifecycle (bind/run/drop)
+
+#### Changed
+- `ipc/server.rs`: `Server::run()` delegates to `connection::handle_connection()`;
+  `dispatch_request`, `dispatch_notification`, `process_single`, `process_batch`,
+  `handle_connection` moved to `ipc/connection.rs`
+- `bio/random_forest_gpu.rs`: GPU buffer variables renamed (`nf_gpu`/`nt_gpu`/
+  `nc_gpu`/`feat_gpu`/`out_gpu` → `features_buf`/`thresholds_buf`/`children_buf`/
+  `samples_buf`/`predictions_buf`) for `clippy::similar_names` compliance
+- All inline tolerance literals in tests replaced with named constants from
+  `crate::tolerances::*`
+- `specs/BARRACUDA_REQUIREMENTS.md`: corrected `diversity_fusion` absorption
+  status to "Done (absorbed by ToadStool S63)"
+
+#### Fixed
+- Broken intra-doc link in `tolerances/bio/misc.rs` (`VISUALIZATION_SCENARIO`)
+- Private item doc link in `ipc/server.rs` (connection module reference)
+- `clippy::doc_lazy_continuation` across all binary provenance headers
+
+#### Metrics
+- Tests: 1,902 (unit + integration + property + doc), 0 failed (was 1,891)
+- Named tolerances: 242 (was 234)
+- Provenance headers: 355/355 binaries (was 5/355)
+- Binaries: 355 (333 barracuda + 22 forge)
+- Coverage: 91.20% line / 90.30% function (gated at 90%)
+- Clippy: 0 warnings (pedantic + nursery, `-D warnings`)
+- Doc: 0 warnings
+- Format: clean
+- `#[allow()]`: 0 in production
+- Unsafe: 0 (workspace-level forbid)
+
 ## [V136] — 2026-03-24
 
 ### Deep Debt Resolution + Ecosystem Absorption Cycle

@@ -50,6 +50,7 @@
 //! | Command     | `cargo test --bin validate_correlated_disorder -- --nocapture` |
 //!
 //! Validation class: Analytical
+//!
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use wetspring_barracuda::validation::Validator;

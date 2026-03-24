@@ -39,6 +39,7 @@
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
 //!
 //! Validation class: Analytical
+//!
 //! Provenance: Known-value formulas and algorithmic invariants
 
 use wetspring_barracuda::tolerances;

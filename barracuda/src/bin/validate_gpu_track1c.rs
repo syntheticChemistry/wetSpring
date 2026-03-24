@@ -35,6 +35,7 @@
 //! `ToadStool` primitives: ANI batch, SNP calling, Pangenome classify, dN/dS batch (Nei-Gojobori).
 //!
 //! Validation class: GPU-parity
+//!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::time::Instant;

@@ -30,6 +30,7 @@
 //! | Tolerances    | `tolerances::EXACT_F64`, structural (pass/fail) |
 //!
 //! Validation class: Synthetic
+//!
 //! Provenance: Generated data with known statistical properties
 
 use std::time::Instant;

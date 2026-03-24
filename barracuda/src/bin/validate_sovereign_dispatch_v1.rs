@@ -32,6 +32,8 @@
 //! | Provenance type | barraCuda v0.3.5 sovereign dispatch probe |
 //! | Date | 2026-03-11 |
 //! | Command | `cargo run --release --features gpu --bin validate_sovereign_dispatch_v1` |
+//!
+//! Provenance: Sovereign GPU dispatch validation
 
 use std::time::Instant;
 use wetspring_barracuda::tolerances;

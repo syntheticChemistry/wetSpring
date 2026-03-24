@@ -54,6 +54,8 @@
 //! | Provenance type | LAN mesh + SRA atlas planning |
 //! | Date | 2026-03-11 |
 //! | Command | `cargo run --release --features gpu,json --bin validate_lan_mesh_plan_v1` |
+//!
+//! Provenance: LAN mesh deployment planning validation
 
 use std::time::Instant;
 use wetspring_barracuda::validation::OrExit;

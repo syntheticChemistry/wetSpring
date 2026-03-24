@@ -27,6 +27,8 @@
 //! | B3 Viz Export          | All scenarios → JSON → petalTongue schema |
 //! | B4 metalForge Merge    | Hardware + science scenarios composed |
 //! | B5 Full Graph          | End-to-end edges: discover → compute → visualize |
+//!
+//! Provenance: biomeOS + petalTongue full composition validation
 
 use wetspring_barracuda::bio::{diversity, pcoa, qs_biofilm};
 use wetspring_barracuda::tolerances;

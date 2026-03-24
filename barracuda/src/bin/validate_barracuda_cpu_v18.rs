@@ -31,6 +31,7 @@
 //! | Command | `cargo run --bin validate_barracuda_cpu_v18` |
 //!
 //! Validation class: GPU-parity
+//!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::time::Instant;

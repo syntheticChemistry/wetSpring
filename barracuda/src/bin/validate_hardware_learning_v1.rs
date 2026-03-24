@@ -48,6 +48,8 @@
 //! | Provenance type | Hardware learning prototype |
 //! | Date | 2026-03-11 |
 //! | Command | `cargo run --release --features gpu,json --bin validate_hardware_learning_v1` |
+//!
+//! Provenance: Hardware capability learning validation
 
 use std::time::Instant;
 use wetspring_barracuda::validation::{OrExit, Validator};

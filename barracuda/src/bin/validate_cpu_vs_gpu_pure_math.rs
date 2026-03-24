@@ -39,6 +39,7 @@
 //! | Command | `cargo run --release --bin validate_cpu_vs_gpu_pure_math` |
 //!
 //! Validation class: Cross-spring
+//!
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::time::Instant;

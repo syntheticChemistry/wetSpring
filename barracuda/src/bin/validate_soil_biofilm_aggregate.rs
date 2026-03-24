@@ -34,6 +34,7 @@
 //! | Command | `cargo test --bin validate_soil_biofilm_aggregate -- --nocapture` |
 //!
 //! Validation class: Analytical
+//!
 //! Provenance: Known-value formulas and algorithmic invariants
 
 use wetspring_barracuda::bio::qs_biofilm::{self, QsBiofilmParams};

@@ -33,6 +33,8 @@
 //! - **groundSpring primitives** (Welford, chi-squared CDF) → universal validation backbone
 //!
 //! Validation class: Cross-spring provenance + benchmark
+//!
+//! Provenance: Cross-spring provenance trio integration validation
 
 use barracuda::shaders::provenance::report::{evolution_report, shader_count};
 use barracuda::shaders::provenance::types::SpringDomain;

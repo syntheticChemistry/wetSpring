@@ -44,6 +44,7 @@
 //! | Command | `cargo run --release --bin validate_gonzales_ic50_s79` |
 //!
 //! Validation class: Analytical
+//!
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use std::time::Instant;

@@ -49,6 +49,7 @@
 //! | Command | `cargo run --features ipc --release --bin validate_metalforge_v8_cross_system` |
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: `metalForge` dispatch/routing validation
 
 use serde_json::json;

@@ -42,6 +42,8 @@
 //! | Provenance type | Analytical (mathematical invariants + published equations) |
 //! | Date | 2026-03-07 |
 //! | Command | `cargo run --release --bin validate_paper_math_control_v5` |
+//!
+//! Provenance: Paper math control validation (V5 statistics)
 
 use wetspring_barracuda::bio::{
     cooperation, diversity, kmer, phred, qs_biofilm, robinson_foulds, signal, snp,

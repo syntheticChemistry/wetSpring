@@ -25,6 +25,7 @@
 //! | Hardware | Eastgate i9-12900K, 64 GB DDR5, RTX 4070, Pop!\_OS 22.04 |
 //!
 //! Validation class: Analytical + GPU
+//!
 //! Provenance: `ToadStool` `KrigingF64` primitive
 
 use wetspring_barracuda::bio::kriging::{

@@ -38,6 +38,7 @@
 //! Run: `cargo run --features gpu --release --bin validate_16s_pipeline_gpu`
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end pipeline integration test
 
 #![expect(

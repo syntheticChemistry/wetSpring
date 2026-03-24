@@ -31,6 +31,8 @@
 //! |-------|-------|
 //! | Date | 2026-03-08 |
 //! | Command | `cargo run --features ipc --release --bin validate_cross_primal_pipeline_v98` |
+//!
+//! Provenance: Cross-primal pipeline integration (V98)
 
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixStream;

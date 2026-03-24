@@ -21,6 +21,7 @@
 //! - 25 unique PFAS precursor m/z values
 //!
 //! Validation class: Python-parity
+//!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use std::collections::HashSet;

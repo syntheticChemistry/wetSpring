@@ -43,6 +43,8 @@
 //! | Provenance type | Analytical (mathematical invariants) |
 //! | Date | 2026-03-03 |
 //! | Command | `cargo run --release --bin validate_nucleus_data_pipeline` |
+//!
+//! Provenance: NUCLEUS data pipeline integration validation
 
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixStream;

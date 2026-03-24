@@ -30,6 +30,7 @@
 //! | Command | `cargo run --release --bin validate_streaming_io_parity` |
 //!
 //! Validation class: GPU-parity
+//!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::io::Write;

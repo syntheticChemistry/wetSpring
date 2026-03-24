@@ -42,6 +42,8 @@
 //! | Provenance type | Analytical (mathematical invariants) |
 //! | Date | 2026-03-03 |
 //! | Command | `cargo run --release --bin validate_s86_streaming_pipeline` |
+//!
+//! Provenance: S86 streaming pipeline validation
 
 use std::time::Instant;
 

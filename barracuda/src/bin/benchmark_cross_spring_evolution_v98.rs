@@ -27,6 +27,8 @@
 //! | toadStool | S130+ `bfe7977b` |
 //! | coralReef | Iteration 10 `d29a734` |
 //! | Command | `cargo run --features gpu --release --bin benchmark_cross_spring_evolution_v98` |
+//!
+//! Provenance: Cross-spring evolution benchmark (V98)
 
 use std::time::Instant;
 

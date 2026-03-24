@@ -27,6 +27,7 @@
 //! | Command | `cargo run --bin validate_nucleus_v2_extended` |
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end pipeline integration test
 
 use wetspring_forge::dispatch;

@@ -430,7 +430,10 @@ mod tests {
         let val = 7.5_f64;
         let q = quantize_i8(val, 5.0, 10.0);
         let deq = dequantize_i8(q, 5.0, 10.0);
-        assert!((val - deq).abs() < 0.1, "roundtrip: {val} -> {q} -> {deq}");
+        assert!(
+            (val - deq).abs() < crate::tolerances::NPU_QUANTIZE_ROUNDTRIP,
+            "roundtrip: {val} -> {q} -> {deq}"
+        );
     }
 
     #[test]

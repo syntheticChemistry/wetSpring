@@ -38,6 +38,8 @@
 //! | Provenance type | Analytical (mathematical invariants) |
 //! | Date | 2026-03-03 |
 //! | Command | `cargo run --release --bin validate_genomic_vault` |
+//!
+//! Provenance: Genomic vault encrypted storage validation
 
 use std::time::Duration;
 

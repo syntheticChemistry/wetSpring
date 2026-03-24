@@ -33,6 +33,7 @@
 //! | Command | `cargo run --release --features gpu,ipc --bin validate_metalforge_v10_evolution` |
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end pipeline integration test
 
 use std::time::Instant;

@@ -121,6 +121,7 @@ pub fn kahan_sum(values: &[f64]) -> f64 {
 )]
 mod tests {
     use super::*;
+    use crate::tolerances;
 
     #[test]
     fn ln1p_small_x() {
@@ -128,7 +129,7 @@ mod tests {
         let naive = (1.0 + x).ln();
         let stable = stable_ln1p(x);
         assert!(
-            (stable - x).abs() < 1e-25,
+            (stable - x).abs() < tolerances::STABLE_IDENTITY_TINY,
             "ln(1+x) ≈ x for small x: stable={stable}"
         );
         assert!(
@@ -143,7 +144,7 @@ mod tests {
         let naive = x.exp() - 1.0;
         let stable = stable_expm1(x);
         assert!(
-            (stable - x).abs() < 1e-25,
+            (stable - x).abs() < tolerances::STABLE_IDENTITY_TINY,
             "exp(x)-1 ≈ x for small x: stable={stable}"
         );
         assert!(
@@ -155,13 +156,13 @@ mod tests {
     #[test]
     fn log_sum_exp_basic() {
         let result = log_sum_exp(0.0, 0.0);
-        assert!((result - 2.0_f64.ln()).abs() < 1e-12);
+        assert!((result - 2.0_f64.ln()).abs() < tolerances::ANALYTICAL_F64);
     }
 
     #[test]
     fn log_sum_exp_large_values() {
         let result = log_sum_exp(1000.0, 1000.0);
-        assert!((result - (1000.0 + 2.0_f64.ln())).abs() < 1e-10);
+        assert!((result - (1000.0 + 2.0_f64.ln())).abs() < tolerances::ANALYTICAL_LOOSE);
     }
 
     #[test]
@@ -179,13 +180,13 @@ mod tests {
 
     #[test]
     fn log_sum_exp_slice_single() {
-        assert!((log_sum_exp_slice(&[3.0]) - 3.0).abs() < 1e-15);
+        assert!((log_sum_exp_slice(&[3.0]) - 3.0).abs() < tolerances::EXACT_F64);
     }
 
     #[test]
     fn log_sum_exp_slice_multiple() {
         let result = log_sum_exp_slice(&[0.0, 0.0, 0.0]);
-        assert!((result - 3.0_f64.ln()).abs() < 1e-12);
+        assert!((result - 3.0_f64.ln()).abs() < tolerances::ANALYTICAL_F64);
     }
 
     #[test]
@@ -204,7 +205,7 @@ mod tests {
         let values = vec![1.0; 1_000_000];
         let naive: f64 = values.iter().sum();
         let kahan = kahan_sum(&values);
-        assert!((kahan - 1_000_000.0).abs() < 1e-10);
+        assert!((kahan - 1_000_000.0).abs() < tolerances::ANALYTICAL_LOOSE);
         assert!((kahan - 1_000_000.0).abs() <= (naive - 1_000_000.0).abs());
     }
 
@@ -214,6 +215,6 @@ mod tests {
             .map(|i| if i % 2 == 0 { 1.0 } else { -1.0 })
             .collect();
         let result = kahan_sum(&values);
-        assert!((result - 0.0).abs() < 1e-10);
+        assert!((result - 0.0).abs() < tolerances::ANALYTICAL_LOOSE);
     }
 }

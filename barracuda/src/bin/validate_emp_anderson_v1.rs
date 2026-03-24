@@ -52,6 +52,8 @@
 //! | Provenance type | EMP Anderson QS real-data validation |
 //! | Date | 2026-03-11 |
 //! | Command | `cargo run --release --features gpu,json --bin validate_emp_anderson_v1` |
+//!
+//! Provenance: Earth Microbiome Project Anderson analysis (V1)
 
 use std::collections::HashMap;
 use std::time::Instant;

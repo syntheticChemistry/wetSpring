@@ -24,6 +24,8 @@
 //! 5. Cross-spring evolution narrative with measured performance
 //!
 //! All GPU ops dispatch to `ToadStool` upstream — zero local WGSL shaders.
+//!
+//! Provenance: DF64 double-double precision benchmark
 
 use std::sync::Arc;
 use std::time::Instant;

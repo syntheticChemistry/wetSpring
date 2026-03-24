@@ -43,6 +43,8 @@
 //! | Date | 2026-03-14 |
 //! | Command | `cargo run --features gpu --bin validate_petaltongue_live_v1` |
 //! | Validation class | Visualization — synthetic data with analytical checks |
+//!
+//! Provenance: petalTongue live scenario push validation
 
 use std::path::PathBuf;
 

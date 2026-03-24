@@ -34,6 +34,7 @@
 //! | Command | `cargo run --release --bin validate_streaming_pipeline_v5` |
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end pipeline integration test
 
 use std::time::Instant;

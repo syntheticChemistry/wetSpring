@@ -18,6 +18,7 @@
 //! Python baseline on real phylogenetic gene trees with 25 leaves each.
 //!
 //! Validation class: Python-parity
+//!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::robinson_foulds::{rf_distance, rf_distance_normalized};

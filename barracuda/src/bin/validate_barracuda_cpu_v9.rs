@@ -31,6 +31,7 @@
 //! | Tolerances    | Structural (pass/fail) + `EXACT` for paper-derived constants |
 //!
 //! Validation class: Python-parity
+//!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};

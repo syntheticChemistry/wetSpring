@@ -38,6 +38,7 @@
 //! | Command | `cargo run --features gpu --release --bin validate_soil_qs_gpu` |
 //!
 //! Validation class: GPU-parity
+//!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::time::Instant;

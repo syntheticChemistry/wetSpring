@@ -94,38 +94,38 @@ impl RandomForestGpu {
 
         let d = self.device.device();
 
-        let nf_gpu = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        let features_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("RF node features"),
             contents: bytemuck::cast_slice(&node_features_flat),
             usage: wgpu::BufferUsages::STORAGE,
         });
-        let nt_gpu = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        let thresholds_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("RF node thresholds"),
             contents: bytemuck::cast_slice(&node_thresh_flat),
             usage: wgpu::BufferUsages::STORAGE,
         });
-        let nc_gpu = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        let children_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("RF node children"),
             contents: bytemuck::cast_slice(&node_children_flat),
             usage: wgpu::BufferUsages::STORAGE,
         });
-        let feat_gpu = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        let samples_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("RF features"),
             contents: bytemuck::cast_slice(&features_flat),
             usage: wgpu::BufferUsages::STORAGE,
         });
-        let out_gpu = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        let predictions_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("RF predictions"),
             contents: bytemuck::cast_slice(&vec![0u32; n_samples * n_trees]),
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
         });
 
         self.inner.dispatch(
-            &nf_gpu,
-            &nt_gpu,
-            &nc_gpu,
-            &feat_gpu,
-            &out_gpu,
+            &features_buf,
+            &thresholds_buf,
+            &children_buf,
+            &samples_buf,
+            &predictions_buf,
             usize_u32(n_samples),
             usize_u32(n_trees),
             usize_u32(n_nodes_max),
@@ -139,7 +139,7 @@ impl RandomForestGpu {
 
         let raw = self
             .device
-            .read_buffer_u32(&out_gpu, n_samples * n_trees)
+            .read_buffer_u32(&predictions_buf, n_samples * n_trees)
             .map_err(|e| crate::error::Error::Gpu(format!("{e}")))?;
 
         let mut results = Vec::with_capacity(n_samples);

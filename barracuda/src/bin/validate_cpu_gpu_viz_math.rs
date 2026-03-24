@@ -27,6 +27,8 @@
 //! | Type | GPU parity |
 //! | Date | 2026-03-23 |
 //! | Command | `cargo run --features gpu,json --bin validate_cpu_gpu_viz_math` |
+//!
+//! Provenance: CPU/GPU parity with visualization math checks
 
 use wetspring_barracuda::bio::{
     diversity, diversity_gpu, kmd, kmd_gpu, pcoa, pcoa_gpu, qs_biofilm,

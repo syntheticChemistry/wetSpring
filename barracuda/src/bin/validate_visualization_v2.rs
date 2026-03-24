@@ -13,6 +13,8 @@
 //! | Validation class  | Visualization V2 (`petalTongue` integration)|
 //! | Covers            | 28 scenario builders + streaming + types  |
 //! | Date              | 2026-03-09                                |
+//!
+//! Provenance: Visualization scenario generation validation (V2)
 
 use std::path::PathBuf;
 use std::process;

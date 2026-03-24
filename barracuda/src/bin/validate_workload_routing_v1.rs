@@ -44,6 +44,8 @@
 //! | Provenance type | barraCuda v0.3.5 + toadStool S146 concepts |
 //! | Date | 2026-03-11 |
 //! | Command | `cargo run --release --features gpu,json --bin validate_workload_routing_v1` |
+//!
+//! Provenance: Workload routing strategy validation
 
 use std::path::PathBuf;
 use std::time::Instant;

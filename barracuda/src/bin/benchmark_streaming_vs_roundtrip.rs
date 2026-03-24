@@ -27,6 +27,8 @@
 //! | Exact command | `cargo run --features gpu --release --bin benchmark_streaming_vs_roundtrip` |
 //! | Data | Synthetic communities (variable batch × 256 features) |
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, Pop!\_OS 22.04 |
+//!
+//! Provenance: Streaming vs roundtrip transfer benchmark
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, diversity_gpu, streaming_gpu, taxonomy};

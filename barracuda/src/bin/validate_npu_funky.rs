@@ -58,6 +58,8 @@
 //! | Provenance type | Analytical (mathematical invariants) |
 //! | Date | 2026-03-03 |
 //! | Command | `cargo run --release --bin validate_npu_funky` |
+//!
+//! Provenance: NPU int8 quantization functional validation
 
 use std::time::Instant;
 use wetspring_barracuda::bio::esn::{Esn, EsnConfig};

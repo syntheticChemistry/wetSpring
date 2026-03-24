@@ -38,6 +38,8 @@
 //! | Type | Integration |
 //! | Date | 2026-03-23 |
 //! | Command | `cargo run --bin validate_metalforge_v15` |
+//!
+//! Provenance: metalForge validation (V15 domain coverage)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::diversity;

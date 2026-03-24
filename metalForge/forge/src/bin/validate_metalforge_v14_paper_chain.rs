@@ -28,6 +28,7 @@
 //! | Command | `cargo run -p wetspring-forge --bin validate_metalforge_v14_paper_chain` |
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end paper-math cross-hardware chain
 
 use wetspring_forge::bridge;

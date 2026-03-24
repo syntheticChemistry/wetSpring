@@ -17,6 +17,8 @@
 //! | D3 Mixed Substrate  | GPU→NPU→CPU priority chain correct |
 //! | D4 NUCLEUS Topology | Tower/Node/Nest wired and renderable |
 //! | D5 petalTongue      | Dispatch + inventory scenarios serialize |
+//!
+//! Provenance: Mixed hardware (GPU/NPU/CPU) dispatch validation (V2)
 
 use barracuda::unified_hardware::BandwidthTier;
 use wetspring_barracuda::tolerances;

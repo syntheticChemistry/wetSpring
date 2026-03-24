@@ -30,6 +30,7 @@
 //! | Command        | `cargo run --release --features gpu --bin validate_df64_anderson` |
 //!
 //! Validation class: Cross-spring
+//!
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 //!
 //! # Python Baselines

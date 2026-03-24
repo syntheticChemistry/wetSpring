@@ -46,6 +46,8 @@
 //! | Provenance type | Liao group real data extension |
 //! | Date | 2026-03-11 |
 //! | Command | `cargo run --release --features gpu,json --bin validate_liao_real_data_v1` |
+//!
+//! Provenance: Liao et al. real digester community data (Track 6)
 
 use std::time::Instant;
 use wetspring_barracuda::validation::OrExit;
@@ -172,7 +174,7 @@ fn main() {
         "all abundances sum to ~1.0",
         communities.iter().all(|c| {
             let s: f64 = c.relative_abundances.iter().sum();
-            (s - 1.0).abs() < 0.05
+            (s - 1.0).abs() < wetspring_barracuda::tolerances::ABUNDANCE_SUM_TO_ONE
         }),
     );
 

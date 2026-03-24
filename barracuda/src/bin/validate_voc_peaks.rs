@@ -28,6 +28,7 @@
 //! 5. **Tolerance matching**: Use `bio::tolerance_search` for RI matching
 //!
 //! Validation class: Synthetic
+//!
 //! Provenance: Generated data with known statistical properties
 
 use std::path::Path;

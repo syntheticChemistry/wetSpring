@@ -30,6 +30,7 @@
 //! GPU modules: `diversity_gpu` (Pielou, Shannon, Simpson, Bray-Curtis), `spectral_match_gpu`, `stats_gpu`.
 //!
 //! Validation class: GPU-parity
+//!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
 use wetspring_barracuda::bio::{

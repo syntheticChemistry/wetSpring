@@ -25,6 +25,8 @@
 //! | Type | Visualization |
 //! | Date | 2026-03-23 |
 //! | Command | `cargo run --features json --bin validate_visualization_v1` |
+//!
+//! Provenance: Visualization scenario generation validation (V1)
 
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::Validator;

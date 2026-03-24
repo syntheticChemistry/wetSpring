@@ -34,6 +34,7 @@
 //! | Command | `cargo run -p wetspring-forge --bin validate_biomeos_graph` |
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end pipeline integration test
 
 use wetspring_forge::dispatch;

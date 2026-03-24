@@ -45,6 +45,8 @@
 //! | Provenance type | Analytical (mathematical invariants) |
 //! | Date | 2026-03-03 |
 //! | Command | `cargo run --release --bin validate_nucleus_tower_node` |
+//!
+//! Provenance: NUCLEUS Tower + Node Atomic composition validation
 
 use std::path::PathBuf;
 use std::process::Command;

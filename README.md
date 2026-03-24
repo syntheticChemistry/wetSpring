@@ -7,16 +7,16 @@ against Rust implementations, then promotes to GPU acceleration via
 
 ```
 Python/R baseline  →  Rust CPU parity  →  GPU acceleration  →  sovereign pipeline
-   (58 scripts)       (1,891 tests)       (44 GPU modules)     (barraCuda/coralReef)
+   (58 scripts)       (1,902 tests)       (44 GPU modules)     (barraCuda/coralReef)
 ```
 
 | | |
 |---|---|
-| **Tests** | 1,891 (unit + integration + property + doc), 0 failed |
+| **Tests** | 1,902 (unit + integration + property + doc), 0 failed |
 | **Validation checks** | 5,700+ across 355 binaries (333 barracuda + 22 forge) |
 | **Experiments** | 376 completed + 3 proposed (379 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
-| **Named tolerances** | 234 |
+| **Named tolerances** | 242 |
 | **Clippy** | 0 warnings (pedantic + nursery, `-D warnings`) |
 | **Unsafe** | 0 (`forbid(unsafe_code)` workspace-level + per-crate) |
 | **`#[allow()]`** | 0 in production (uses `#[expect(reason)]` exclusively) |
@@ -25,7 +25,7 @@ Python/R baseline  →  Rust CPU parity  →  GPU acceleration  →  sovereign p
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V136:** Deep debt resolution + ecosystem absorption: `thiserror` error derives (ecosystem standard), named cast helpers across 15 files (~60 casts replaced), upstream contract pinning for barraCuda, bitwise determinism tests, CI version pin script, provenance headers, hardcoded primal strings eliminated, `ipc/server.rs` refactored, CONTRIBUTING.md + SECURITY.md added.
+**Current release — V137:** Full provenance + tolerance centralization + IPC modularization: `//! Provenance:` headers on all 355 binaries, 8 new named tolerance constants (242 total), `ipc/connection.rs` extraction, GPU buffer renames, doc link fixes. V136: `thiserror` error derives, named cast helpers (~60 casts), upstream contract pinning, determinism tests, CI pin, hardcoded primal strings eliminated, CONTRIBUTING.md + SECURITY.md.
 
 ---
 
@@ -192,7 +192,7 @@ All parsers stream from disk — no full-file buffering.
 | `#![forbid(unsafe_code)]` | Workspace-level (`[workspace.lints.rust]`) + all crate roots |
 | `#![deny(clippy::unwrap_used)]` | Workspace `[lints.clippy]` |
 | TODO/FIXME/HACK | 0 |
-| Inline tolerance literals | 0 (234 named constants) |
+| Inline tolerance literals | 0 (242 named constants) |
 | Max file size | All `.rs` under 1,000 lines (largest: 939 LOC) |
 | C dependencies | 0 (`flate2` uses `rust_backend`) |
 | SPDX headers | All `.rs` files |

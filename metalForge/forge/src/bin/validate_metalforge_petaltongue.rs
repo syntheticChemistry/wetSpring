@@ -11,6 +11,8 @@
 //! | MF2 Dispatch  | Workload routing bar + coverage gauge |
 //! | MF3 NUCLEUS   | Tower→Node→Nest topology, substrate count gauge |
 //! | MF4 JSON      | Scenario serialization round-trips |
+//!
+//! Provenance: metalForge + petalTongue integration validation
 
 use wetspring_barracuda::visualization::{DataChannel, scenario_with_edges_json};
 use wetspring_forge::inventory;

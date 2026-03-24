@@ -60,6 +60,8 @@
 //! | Provenance type | Analytical (mathematical invariants) |
 //! | Date | 2026-03-05 |
 //! | Command | `cargo run --release --bin validate_barracuda_cpu_v23` |
+//!
+//! Provenance: barraCuda CPU primitive validation (V23 stats domain)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::diversity;

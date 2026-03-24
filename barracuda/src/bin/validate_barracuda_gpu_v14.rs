@@ -36,6 +36,8 @@
 //! | Provenance type | CPU reference (Exp323 values) |
 //! | Date | 2026-03-08 |
 //! | Command | `cargo run --release --features gpu --bin validate_barracuda_gpu_v14` |
+//!
+//! Provenance: barraCuda GPU primitive validation (V14 Track 3)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::diversity;

@@ -44,6 +44,8 @@
 //! | Provenance type | Analytical (mathematical invariants) |
 //! | Date | 2026-03-07 |
 //! | Command | `cargo run --release --bin validate_barracuda_cpu_v24` |
+//!
+//! Provenance: barraCuda CPU primitive validation (V24 extended)
 
 use std::collections::HashMap;
 use std::time::Instant;

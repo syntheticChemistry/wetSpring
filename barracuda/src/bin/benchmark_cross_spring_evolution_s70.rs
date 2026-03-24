@@ -68,6 +68,8 @@
 //! | Date | 2026-03-01 |
 //! | `ToadStool` | S70+++ (`1dd7e338`) |
 //! | Command | `cargo run --bin benchmark_cross_spring_evolution_s70` |
+//!
+//! Provenance: Cross-spring evolution benchmark (S70 baseline)
 
 use std::time::Instant;
 use wetspring_barracuda::tolerances;

@@ -35,6 +35,7 @@
 //! | Command | `cargo run --release --features gpu --bin validate_barracuda_gpu_v5` |
 //!
 //! Validation class: GPU-parity
+//!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
 use wetspring_barracuda::bio::{

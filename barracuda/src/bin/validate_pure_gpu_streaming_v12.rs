@@ -38,6 +38,8 @@
 //! | Provenance type | CPU + GPU reference (Exp342 + Exp344 values) |
 //! | Date | 2026-03-10 |
 //! | Command | `cargo run --release --bin validate_pure_gpu_streaming_v12` |
+//!
+//! Provenance: Pure GPU streaming pipeline (V12)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::diversity;

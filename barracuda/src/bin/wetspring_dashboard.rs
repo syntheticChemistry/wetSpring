@@ -11,6 +11,8 @@
 //! ```bash
 //! cargo run --features json --bin wetspring_dashboard
 //! ```
+//!
+//! Provenance: wetSpring metrics dashboard binary
 
 use std::fs;
 use std::path::Path;

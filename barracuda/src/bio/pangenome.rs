@@ -187,10 +187,7 @@ pub fn hypergeometric_pvalue(k: usize, n: usize, big_k: usize, big_n: usize) -> 
     }
 
     // Normal approximation to hypergeometric
-    let var = usize_f64(n)
-        * usize_f64(big_k)
-        * usize_f64(big_n - big_k)
-        * usize_f64(big_n - n)
+    let var = usize_f64(n) * usize_f64(big_k) * usize_f64(big_n - big_k) * usize_f64(big_n - n)
         / (usize_f64(big_n) * usize_f64(big_n) * usize_f64((big_n - 1).max(1)));
 
     if var <= 0.0 {

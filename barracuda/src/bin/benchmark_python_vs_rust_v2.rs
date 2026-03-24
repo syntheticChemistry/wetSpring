@@ -25,6 +25,8 @@
 //! | Date | 2026-02-27 |
 //! | Commit | wetSpring Phase 66+ |
 //! | Command | `cargo run --release --bin benchmark_python_vs_rust_v2` |
+//!
+//! Provenance: Python vs Rust parity benchmark (V2)
 
 use std::collections::HashMap;
 use std::time::Instant;

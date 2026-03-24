@@ -48,6 +48,8 @@
 //! | Provenance type | NUCLEUS atomic deployment (biomeOS coordination) |
 //! | Date | 2026-03-10 |
 //! | Command | `cargo run --release --features ipc --bin validate_nucleus_v4` |
+//!
+//! Provenance: NUCLEUS composition validation (V4)
 
 use std::path::PathBuf;
 use std::process::Command;

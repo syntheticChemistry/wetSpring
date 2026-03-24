@@ -31,6 +31,7 @@
 //! | Command | `cargo run --release --features gpu --bin validate_cold_seep_pipeline` |
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end pipeline integration test
 
 use wetspring_barracuda::bio::diversity;

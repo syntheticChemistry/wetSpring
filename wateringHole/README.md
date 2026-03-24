@@ -9,9 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V135** | `handoffs/WETSPRING_V135_BARRACUDA_TOADSTOOL_ABSORPTION_HANDOFF_MAR24_2026.md` | Mar 24 | **barraCuda + toadStool** — doc reconciliation, canonical metrics (1,891 tests, 355 binaries, 91.20% coverage), V134 audit themes (drug NMF delegation, validation harness refactor, 7-primal discovery, CI feature-matrix, SPDX), upstream asks (BatchReconcileGpu, DF64 GEMM, Jacobi eigen, BandwidthTier, BatchMergePairsGpu), evolution intelligence (harness decomposition pattern, primal discovery cascade, workspace forbid, `#[expect(reason)]`). |
-| **V133** | `handoffs/WETSPRING_V133_DEEP_EVOLUTION_CROSS_ECOSYSTEM_ABSORPTION_HANDOFF_MAR23_2026.md` | Mar 23 | **Deep evolution (all springs / primals)** — `validate_all`, `GpuContext`/`TensorSession`, `check_relative`/`check_abs_or_rel`, zero-copy I/O, `performance_surface` complete, IPC refactors, feature-gate cleanup, release/coverage tooling. |
-| | *Superseded → `handoffs/archive/`* | | V134, V132, V130 and earlier are archived (**144** files). |
+| **V137** | `handoffs/WETSPRING_V137_PROVENANCE_TOLERANCE_IPC_HANDOFF_MAR24_2026.md` | Mar 24 | **barraCuda + toadStool + spring teams + primal teams** — full provenance headers (355/355 binaries), 8 new named tolerance constants (242 total), `ipc/connection.rs` extraction, evolution intelligence (provenance header pattern, tolerance naming convention, IPC decomposition), upstream asks (BatchReconcileGpu, DF64 GEMM, Jacobi eigen, BandwidthTier, BatchMergePairsGpu), primal coordination patterns. |
+| | *Superseded → `handoffs/archive/`* | | V135, V134, V133 and earlier are archived (**146** files). |
 
 ## Cross-Spring Documents
 
@@ -23,7 +22,7 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` — **V134 and earlier** are archived (**144** files).  
+Superseded handoffs in `handoffs/archive/` — **V135 and earlier** are archived (**146** files).  
 Preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda.
 
 ## Convention

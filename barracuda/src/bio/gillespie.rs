@@ -345,9 +345,19 @@ mod tests {
     fn bitwise_deterministic_with_seed() {
         let result_a = birth_death_ssa(10.0, 0.1, 50.0, 42);
         let result_b = birth_death_ssa(10.0, 0.1, 50.0, 42);
-        assert_eq!(result_a.n_species, result_b.n_species, "bitwise determinism violated");
-        assert_eq!(result_a.states, result_b.states, "bitwise determinism violated");
-        assert_eq!(result_a.times.len(), result_b.times.len(), "bitwise determinism violated");
+        assert_eq!(
+            result_a.n_species, result_b.n_species,
+            "bitwise determinism violated"
+        );
+        assert_eq!(
+            result_a.states, result_b.states,
+            "bitwise determinism violated"
+        );
+        assert_eq!(
+            result_a.times.len(),
+            result_b.times.len(),
+            "bitwise determinism violated"
+        );
         for (ta, tb) in result_a.times.iter().zip(&result_b.times) {
             assert_eq!(ta.to_bits(), tb.to_bits(), "bitwise determinism violated");
         }

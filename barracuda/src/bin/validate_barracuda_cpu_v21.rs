@@ -39,6 +39,7 @@
 //! | Command | `cargo run --release --bin validate_barracuda_cpu_v21` |
 //!
 //! Validation class: Analytical
+//!
 //! Provenance: Known-value formulas
 
 use wetspring_barracuda::bio::diversity;

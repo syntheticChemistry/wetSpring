@@ -53,6 +53,7 @@
 //! | Command | `cargo run --release --bin validate_cross_spring_evolution_s87` |
 //!
 //! Validation class: Cross-spring
+//!
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use barracuda::shaders::Precision;

@@ -18,6 +18,8 @@
 //! - `WETSPRING_SOCKET` — Override the default socket path
 //! - `WETSPRING_TCP_ADDR` — Bind TCP instead of Unix socket (e.g. `127.0.0.1:9800`)
 //! - `SONGBIRD_SOCKET` — Override Songbird discovery socket
+//!
+//! Provenance: wetSpring IPC server entry point
 
 use wetspring_barracuda::ipc::handlers::CAPABILITIES;
 use wetspring_barracuda::ipc::{Server, discover, songbird};

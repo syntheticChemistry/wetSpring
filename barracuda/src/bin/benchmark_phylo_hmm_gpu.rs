@@ -42,6 +42,8 @@
 //! | Exact command | `cargo run --release --features gpu --bin benchmark_phylo_hmm_gpu` |
 //! | Data | synthetic trees, alignments, HMM models |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Provenance: Phylogenetics + HMM GPU benchmark
 
 use barracuda::{FelsensteinGpu, PhyloTree};
 use std::sync::Arc;

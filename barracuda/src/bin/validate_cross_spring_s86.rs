@@ -26,6 +26,8 @@
 //! | Provenance type | Analytical (mathematical invariants + cross-spring parity) |
 //! | Date | 2026-03-02 |
 //! | Command | `cargo run --release --bin validate_cross_spring_s86` |
+//!
+//! Provenance: Cross-spring validation (S86 modern baseline)
 
 use std::time::Instant;
 

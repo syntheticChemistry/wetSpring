@@ -47,6 +47,7 @@
 //! | Command | `cargo run --release --bin validate_cpu_gpu_full_domain_v92g` |
 //!
 //! Validation class: Cross-spring
+//!
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::sync::Arc;

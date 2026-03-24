@@ -55,6 +55,8 @@
 //! | Provenance type | Analytical (mathematical invariants) |
 //! | Date | 2026-03-03 |
 //! | Command | `cargo run --release --bin validate_barracuda_gpu_v10` |
+//!
+//! Provenance: barraCuda GPU primitive validation (V10 diversity)
 
 use std::sync::Arc;
 use std::time::Instant;

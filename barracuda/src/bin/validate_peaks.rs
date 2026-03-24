@@ -25,6 +25,7 @@
 //! Run: `cargo run --bin validate_peaks`
 //!
 //! Validation class: Python-parity
+//!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use std::path::Path;

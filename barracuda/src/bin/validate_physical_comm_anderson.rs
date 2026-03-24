@@ -23,6 +23,7 @@
 //! | Paper       | 30 (Biophys Rev Lett 2025) |
 //!
 //! Validation class: Analytical
+//!
 //! Provenance: Known-value formulas and algorithmic invariants
 
 use wetspring_barracuda::validation::Validator;

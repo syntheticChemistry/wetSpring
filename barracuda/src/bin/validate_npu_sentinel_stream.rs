@@ -39,6 +39,7 @@
 //! | Command        | `cargo run --release --bin validate_npu_sentinel_stream` |
 //!
 //! Validation class: Analytical
+//!
 //! Provenance: Known-value formulas and algorithmic invariants
 
 use wetspring_barracuda::bio::diversity;

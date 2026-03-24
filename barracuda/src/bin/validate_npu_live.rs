@@ -35,6 +35,7 @@
 //! | Command        | `cargo run --release --features npu --bin validate_npu_live` |
 //!
 //! Validation class: Cross-spring
+//!
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::time::Instant;

@@ -34,6 +34,7 @@
 //! | Command | `cargo run -p wetspring-forge --release --bin validate_nucleus_biomeos_v92g` |
 //!
 //! Validation class: Pipeline + Integration
+//!
 //! Provenance: metalForge NUCLEUS + biomeOS infrastructure
 
 use wetspring_forge::bridge;

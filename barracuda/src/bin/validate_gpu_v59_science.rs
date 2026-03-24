@@ -29,6 +29,7 @@
 //! | Tolerances    | `tolerances::GPU_CPU_F64` for GPU↔CPU, structural |
 //!
 //! Validation class: GPU-parity
+//!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
 use barracuda::spectral::{

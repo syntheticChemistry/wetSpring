@@ -49,6 +49,8 @@
 //! | toadStool | S130+ `bfe7977b` |
 //! | coralReef | Iteration 10 `d29a734` |
 //! | Command | `cargo run --features gpu --release --bin validate_cross_spring_evolution_v98` |
+//!
+//! Provenance: Cross-spring evolution validation (V98 all domains)
 
 use std::time::Instant;
 

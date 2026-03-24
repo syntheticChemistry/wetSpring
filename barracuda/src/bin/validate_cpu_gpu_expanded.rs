@@ -24,6 +24,7 @@
 //! 4. `metalForge` mixed-hardware dispatch: GPU→CPU→GPU pipeline
 //!
 //! Validation class: GPU-parity
+//!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
 use std::sync::Arc;

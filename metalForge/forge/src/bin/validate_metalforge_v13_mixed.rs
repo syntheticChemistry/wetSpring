@@ -22,6 +22,7 @@
 //! | Command | `cargo run -p wetspring-forge --bin validate_metalforge_v13_mixed` |
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end mixed-hardware pipeline integration
 
 use wetspring_forge::bridge;

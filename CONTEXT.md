@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V136:** Deep debt resolution + ecosystem absorption — `thiserror` derives, named cast helpers (~60 casts across 15 files), upstream barraCuda contract pinning, bitwise determinism tests, CI version pin, provenance headers, zero hardcoded primal strings, `ipc/server.rs` refactored, CONTRIBUTING.md + SECURITY.md.
+**Current release — V137:** Full provenance + tolerance centralization + IPC modularization — `//! Provenance:` headers on all 355 binaries, 8 new named tolerance constants (242 total), `ipc/connection.rs` extraction, GPU buffer renames, doc link fixes. V136: `thiserror` derives, named cast helpers (~60 casts), upstream contract pinning, determinism tests, CI pin, zero hardcoded primal strings, CONTRIBUTING.md + SECURITY.md.
 
 ## Role in the Ecosystem
 
@@ -27,7 +27,7 @@ evolution pipeline.
 - **Architecture:** 2 library crates + 355 validation/benchmark binaries (333 barracuda + 22 forge)
 - **Communication:** JSON-RPC 2.0 over Unix sockets (IPC feature-gated)
 - **License:** AGPL-3.0-or-later
-- **Tests:** 1,891 total (unit + integration + property + doc); 1,205 lib (default), 1,569 lib (ipc+vault+json)
+- **Tests:** 1,902 total (unit + integration + property + doc); 1,205+ lib (default), 1,569+ lib (ipc+vault+json)
 - **Validation checks:** 5,700+ across 355 binaries
 - **MSRV:** 1.87 (Rust edition 2024)
 - **Crate count:** 2 workspace crates (wetspring-barracuda, wetspring-forge)
@@ -68,7 +68,7 @@ evolution pipeline.
 
 ```
 Python baseline → Rust CPU parity → GPU validation → sovereign pipeline
-     (58 scripts)    (1,891 tests)     (44 GPU modules)   (barraCuda/coralReef)
+     (58 scripts)    (1,902 tests)     (44 GPU modules)   (barraCuda/coralReef)
 ```
 
 ## Design Philosophy

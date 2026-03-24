@@ -20,6 +20,7 @@
 //! | Tolerances    | `tolerances::EXACT_F64` for dispatch↔direct parity |
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end pipeline integration test
 
 use serde_json::json;

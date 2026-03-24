@@ -206,9 +206,13 @@ mod tests {
         // Peaks should be near 40, 100, 160
         #[expect(clippy::cast_precision_loss)]
         {
-            assert!((peaks[0].index as f64 - 40.0).abs() < 2.0);
-            assert!((peaks[1].index as f64 - 100.0).abs() < 2.0);
-            assert!((peaks[2].index as f64 - 160.0).abs() < 2.0);
+            assert!((peaks[0].index as f64 - 40.0).abs() < crate::tolerances::PEAK_INDEX_PROXIMITY);
+            assert!(
+                (peaks[1].index as f64 - 100.0).abs() < crate::tolerances::PEAK_INDEX_PROXIMITY
+            );
+            assert!(
+                (peaks[2].index as f64 - 160.0).abs() < crate::tolerances::PEAK_INDEX_PROXIMITY
+            );
         }
         // Heights should approximate the peak amplitudes + baseline
         assert!(peaks[1].height > peaks[2].height);

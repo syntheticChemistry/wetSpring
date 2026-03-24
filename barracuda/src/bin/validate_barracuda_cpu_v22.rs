@@ -45,6 +45,8 @@
 //! | Provenance type | Analytical (mathematical invariants) |
 //! | Date | 2026-03-03 |
 //! | Command | `cargo run --release --bin validate_barracuda_cpu_v22` |
+//!
+//! Provenance: barraCuda CPU primitive validation (V22 baseline)
 
 use wetspring_barracuda::bio::{cooperation, diversity, gillespie, qs_biofilm};
 use wetspring_barracuda::tolerances;

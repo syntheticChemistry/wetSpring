@@ -40,6 +40,8 @@
 //! | Provenance type | Analytical (mathematical invariants) |
 //! | Date | 2026-03-03 |
 //! | Command | `cargo run --release --bin validate_pure_gpu_streaming_v9` |
+//!
+//! Provenance: Pure GPU streaming pipeline (V9)
 
 use std::time::Instant;
 

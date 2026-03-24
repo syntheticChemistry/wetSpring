@@ -47,6 +47,8 @@
 //!
 //! ## Matrix algebra (GPU wins at matrix size)
 //! `PCoA` eigendecomposition
+//!
+//! Provenance: Core CPU vs GPU performance comparison
 
 use std::time::Instant;
 use wetspring_barracuda::bench::{

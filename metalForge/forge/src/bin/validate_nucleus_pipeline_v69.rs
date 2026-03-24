@@ -24,6 +24,7 @@
 //!       NUCLEUS data-driven domains dispatched correctly
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end pipeline integration test
 
 #![expect(

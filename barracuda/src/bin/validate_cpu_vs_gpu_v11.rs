@@ -32,6 +32,8 @@
 //! | Provenance type | Cross-substrate (CPU reference from Exp347) |
 //! | Date | 2026-03-10 |
 //! | Command | `cargo run --release --bin validate_cpu_vs_gpu_v11` |
+//!
+//! Provenance: CPU vs GPU numerical parity (V11 full domain)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::diversity;

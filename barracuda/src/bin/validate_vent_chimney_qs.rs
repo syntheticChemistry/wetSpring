@@ -22,6 +22,7 @@
 //! | GPU prims   | `anderson_3d`, `anderson_2d`, `lanczos`, `level_spacing_ratio` |
 //!
 //! Validation class: Analytical
+//!
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use wetspring_barracuda::tolerances;

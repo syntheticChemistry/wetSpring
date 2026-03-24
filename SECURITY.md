@@ -4,8 +4,8 @@
 
 | Version | Supported |
 |---------|-----------|
-| V136+   | Yes       |
-| < V136  | No        |
+| V137+   | Yes       |
+| < V137  | No        |
 
 ## Reporting a Vulnerability
 

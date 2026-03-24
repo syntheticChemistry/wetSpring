@@ -22,6 +22,7 @@
 //! | Python version | 3.10+ (pure Python, no external dependencies) |
 //!
 //! Validation class: Python-parity
+//!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::{diversity, dnds};

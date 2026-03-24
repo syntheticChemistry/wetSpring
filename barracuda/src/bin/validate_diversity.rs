@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+//!
 //! Provenance: Analytical diversity metrics (Shannon, Simpson, Chao1) + skbio simulations → Python baseline → Rust sovereign (wetSpring V135)
 //! Validated against: skbio 0.6.0; Galaxy Exp002 `diversity_report.json`
 #![forbid(unsafe_code)]
@@ -32,6 +33,7 @@
 //! report values from `experiments/results/002_phytoplankton/diversity_report.json`.
 //!
 //! Validation class: Python-parity
+//!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::{diversity, kmer, pcoa};

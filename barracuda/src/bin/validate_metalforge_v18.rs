@@ -37,6 +37,8 @@
 //! | Provenance type | Cross-system (CPU reference from Exp342, GPU from Exp344) |
 //! | Date | 2026-03-10 |
 //! | Command | `cargo run --release --bin validate_metalforge_v18` |
+//!
+//! Provenance: metalForge validation (V18)
 
 use std::time::Instant;
 use wetspring_barracuda::bio::{diversity, kinetics::monod, qs_biofilm};

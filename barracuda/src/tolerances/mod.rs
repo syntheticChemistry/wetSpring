@@ -220,6 +220,15 @@ pub const GAMMA_SERIES_MAX_ITER: usize = 1000;
 /// Validated: `validate_stable_specials_v1` (D80).
 pub const STABLE_SPECIAL_TINY: f64 = 1e-28;
 
+/// Stable `ln1p(x) ≈ x` and `expm1(x) ≈ x` test tolerance for |x| ~ 1e-15.
+///
+/// IEEE 754 `ln_1p` and `exp_m1` recover the identity `f(x) ≈ x` for tiny x
+/// with error bounded by x² / 2 ≈ 5e-31. We use 1e-25 (four orders above
+/// the theoretical bound) as a practical ceiling that accommodates any
+/// conforming implementation. Covers `numerics::stable_ln1p` and
+/// `stable_expm1` test assertions.
+pub const STABLE_IDENTITY_TINY: f64 = 1e-25;
+
 // ═══════════════════════════════════════════════════════════════════
 // ODE integration parameters
 // ═══════════════════════════════════════════════════════════════════
@@ -248,6 +257,15 @@ pub const DF64_ROUNDTRIP: f64 = 1e-13;
 /// Tighter than [`DF64_ROUNDTRIP`] for testing the DF64 host wire format
 /// itself (encode→decode) rather than end-to-end GEMM pipelines.
 pub const DF64_ROUNDTRIP_STRICT: f64 = 1e-14;
+
+/// DF64 small-value pack/unpack roundtrip precision.
+///
+/// For values near 1e-10 the DF64 hi/lo split preserves ~30 significant
+/// digits. 1e-25 is the empirical ceiling from `df64_host` tests at that
+/// magnitude. Tighter than [`STABLE_SPECIAL_TINY`] (1e-28) because the
+/// round-trip includes an f32 truncation step that widens error for
+/// non-zero values vs the sub-epsilon regime of `log1p`/`expm1`.
+pub const DF64_SMALL_VALUE_ROUNDTRIP: f64 = 1e-25;
 
 /// GEMM pipeline compilation timeout (milliseconds).
 ///

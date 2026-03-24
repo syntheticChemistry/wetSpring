@@ -26,6 +26,7 @@
 //! | Command | `cargo run -p wetspring-forge --bin validate_mixed_hw_dispatch` |
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end pipeline integration test
 
 use wetspring_forge::bridge;

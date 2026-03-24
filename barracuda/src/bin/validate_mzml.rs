@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+//!
 //! Provenance: mzML / MS1 centroid parsing (MT02 Orbitrap demo) → Python Track 2 baseline → Rust sovereign (wetSpring V135)
 //! Validated against: asari 1.13.1; `scripts/validate_track2.py`
 #![forbid(unsafe_code)]
@@ -24,6 +25,7 @@
 //! - ~6M total decoded peaks
 //!
 //! Validation class: Python-parity
+//!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use std::path::PathBuf;

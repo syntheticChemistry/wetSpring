@@ -33,6 +33,7 @@
 //! | Tolerances    | `tolerances::GPU_CPU_F64` for cross-substrate parity |
 //!
 //! Validation class: Analytical
+//!
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
 use barracuda::spectral::{

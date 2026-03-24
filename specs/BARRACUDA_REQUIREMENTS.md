@@ -2,7 +2,7 @@
 
 # wetSpring — BarraCuda Requirements
 
-**Last Updated**: March 24, 2026 (V136 — barraCuda v0.3.7, 150+ primitives consumed, fully lean, 1,891 tests, full 5-tier GREEN)
+**Last Updated**: March 24, 2026 (V137 — barraCuda v0.3.7, 150+ primitives consumed, fully lean, 1,902 tests, full 5-tier GREEN)
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---
@@ -121,7 +121,7 @@ Pure GPU promotion (Exp101) + S62 lean eliminated most Passthrough modules:
 | `ComputeDispatch` adoption | Migrate GPU ops from manual BGL to `ComputeDispatch` builder | **P3** | Medium |
 | DF64 GEMM adoption | Use `Fp64Strategy::Hybrid` for RTX 4070 GEMM dispatch | **P3** | Low |
 | `BandwidthTier` in metalForge | Wire PCIe-aware routing into forge dispatch | **P3** | Low |
-| `diversity_fusion` absorption | Hand off to ToadStool (P2-5) | **P2** | Low |
+| ~~`diversity_fusion` absorption~~ | ✅ Absorbed by ToadStool S63 (Tier C cleared) | Done | — |
 
 ### Track 3 — Drug Repurposing GPU Primitives (ALL DELIVERED)
 

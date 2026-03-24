@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+//!
 //! Provenance: Liu et al. 2014 HMM (forward, Viterbi, posterior) → `liu2014_hmm_baseline.py` → Rust sovereign (wetSpring V135)
 //! Validated against: `scripts/liu2014_hmm_baseline.py`; `liu2014_hmm_python_baseline.json`
 #![forbid(unsafe_code)]
@@ -16,6 +17,7 @@
 //! | Exact command | `python3 scripts/liu2014_hmm_baseline.py` |
 //!
 //! Validation class: Python-parity
+//!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
 use wetspring_barracuda::bio::hmm::{HmmModel, forward, posterior, viterbi};

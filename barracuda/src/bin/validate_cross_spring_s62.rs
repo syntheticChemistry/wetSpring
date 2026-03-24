@@ -62,6 +62,7 @@
 //! | Exact command | `cargo run --features gpu --release --bin validate_cross_spring_s62` |
 //!
 //! Validation class: Cross-spring
+//!
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::sync::Arc;

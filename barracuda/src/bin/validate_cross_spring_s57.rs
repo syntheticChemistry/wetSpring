@@ -45,6 +45,7 @@
 //! | airSpring | `pow_f64` fix, `acos_f64`, FMR buffer fix | All Springs |
 //!
 //! Validation class: Cross-spring
+//!
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use barracuda::linalg::{

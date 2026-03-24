@@ -47,6 +47,8 @@
 //! | Provenance type | Analytical (mathematical invariants) |
 //! | Date | 2026-03-03 |
 //! | Command | `cargo run --release --bin validate_paper_math_control_v4` |
+//!
+//! Provenance: Paper math control validation (V4 extended)
 
 use wetspring_barracuda::bio::{cooperation, diversity, qs_biofilm};
 use wetspring_barracuda::tolerances;

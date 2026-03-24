@@ -18,6 +18,7 @@
 //! baseline on synthetic 16S-like sequences at 5, 8, and 12 taxa.
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end pipeline integration test
 
 use wetspring_barracuda::bio::alignment::{ScoringParams, smith_waterman_score};

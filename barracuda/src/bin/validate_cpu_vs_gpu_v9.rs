@@ -31,6 +31,7 @@
 //! | Command | `cargo run --release --bin validate_cpu_vs_gpu_v9` |
 //!
 //! Validation class: Cross-spring
+//!
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use wetspring_barracuda::bio::diversity;

@@ -23,6 +23,7 @@
 //! | Paper       | 35 (npj Biofilms 2021) |
 //!
 //! Validation class: Analytical
+//!
 //! Provenance: Known-value formulas and algorithmic invariants
 
 use wetspring_barracuda::validation::Validator;

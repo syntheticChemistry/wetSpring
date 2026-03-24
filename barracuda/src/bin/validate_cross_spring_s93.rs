@@ -75,6 +75,8 @@
 //! | Type | Cross-spring |
 //! | Date | 2026-03-23 |
 //! | Command | `cargo run --bin validate_cross_spring_s93` |
+//!
+//! Provenance: Cross-spring validation (S93 barraCuda budding)
 
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::{self, Validator};

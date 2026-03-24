@@ -36,6 +36,8 @@
 //! | Provenance type | Analytical (mathematical invariants + published equations) |
 //! | Date | 2026-03-10 |
 //! | Command | `cargo run --release --bin validate_paper_math_control_v6` |
+//!
+//! Provenance: Paper math control validation (V6 numerical)
 
 use wetspring_barracuda::bio::diversity;
 use wetspring_barracuda::bio::kinetics::{haldane, monod};

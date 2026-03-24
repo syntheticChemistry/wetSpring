@@ -20,6 +20,7 @@
 //! | Command     | `cargo test --bin validate_repodb_nmf -- --nocapture` |
 //!
 //! Validation class: Analytical
+//!
 //! Provenance: Known-value formulas and algorithmic invariants
 
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};

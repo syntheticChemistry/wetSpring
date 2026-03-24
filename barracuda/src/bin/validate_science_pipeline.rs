@@ -32,6 +32,7 @@
 //! - **Pielou = 1.0**: Perfect evenness for uniform distribution.
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end pipeline integration test
 
 use std::io::{BufRead, BufReader, Write};

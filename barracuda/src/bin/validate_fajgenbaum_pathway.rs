@@ -28,6 +28,7 @@
 //! | Tolerances  | Structural only — ranking and pass/fail, no numeric ε |
 //!
 //! Validation class: Analytical
+//!
 //! Provenance: Known-value formulas and algorithmic invariants
 
 use wetspring_barracuda::validation::OrExit;

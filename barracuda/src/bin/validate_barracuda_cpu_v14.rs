@@ -43,6 +43,7 @@
 //!   `numerical_hessian` eps=1e-5. Analytical H\[0,0\]≈802, H\[1,1\]≈200; tolerance 2.0.
 //!
 //! Validation class: Analytical
+//!
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 //!
 //! # Python Baselines

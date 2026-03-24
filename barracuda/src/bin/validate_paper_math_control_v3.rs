@@ -42,6 +42,8 @@
 //! | Provenance type | Analytical (mathematical invariants) |
 //! | Date | 2026-03-03 |
 //! | Command | `cargo run --release --bin validate_paper_math_control_v3` |
+//!
+//! Provenance: Paper math control validation (V3 core algorithms)
 
 use wetspring_barracuda::bio::{
     diversity, dnds, felsenstein, gillespie, hmm, kmer, neighbor_joining, phage_defense,

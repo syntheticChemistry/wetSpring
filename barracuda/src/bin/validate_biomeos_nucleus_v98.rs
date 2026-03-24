@@ -27,6 +27,8 @@
 //! |-------|-------|
 //! | Date | 2026-03-08 |
 //! | Command | `cargo run --features ipc --release --bin validate_biomeos_nucleus_v98` |
+//!
+//! Provenance: biomeOS NUCLEUS composition validation (V98)
 
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixStream;

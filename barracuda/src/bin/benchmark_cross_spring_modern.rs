@@ -26,6 +26,8 @@
 //! | Baseline version | N/A (performance measurement, not correctness) |
 //! | Exact command | `cargo run --release --bin benchmark_cross_spring_modern` |
 //! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Provenance: Modern cross-spring coordination benchmark
 
 use std::time::Instant;
 use wetspring_barracuda::validation::OrExit;

@@ -410,3 +410,47 @@ pub const IPC_JSON_ROUNDTRIP: f64 = 1e-6;
 /// least-squares polynomial coefficients.
 /// Validated: `bio::signal::smoothing` `edge_cases_and_scipy`.
 pub const SAVGOL_SCIPY_PARITY: f64 = 0.02;
+
+/// Peak index proximity for Gaussian-peak detection tests (samples).
+///
+/// `find_peaks` returns the discrete sample index of the maximum; for
+/// a Gaussian centered at sample 40 with σ=5 the discrete peak can be
+/// ±1 sample from the continuous center. 2.0 samples provides margin
+/// for flat-top rounding in the peak detector.
+/// Validated: `bio::signal` `three_peaks_with_params`.
+pub const PEAK_INDEX_PROXIMITY: f64 = 2.0;
+
+/// NPU int8 quantize/dequantize round-trip tolerance.
+///
+/// Affine int8 quantization maps `[min, max]` → `[0, 127]`; the
+/// dequantized value differs from the original by at most
+/// `(max − min) / 127 ≈ 0.04` for a `[5, 10]` range. 0.1 covers
+/// boundary clamping effects.
+/// Validated: `npu` `test_quantize_roundtrip`.
+pub const NPU_QUANTIZE_ROUNDTRIP: f64 = 0.1;
+
+/// Abundance vector sum-to-one tolerance for parsed community profiles.
+///
+/// Relative abundances parsed from JSON/CSV should sum to 1.0. Rounding
+/// in the source data (often 3–4 decimal places) and floating-point
+/// accumulation across hundreds of taxa can produce residuals up to
+/// 0.05. Tighter than [`VISUALIZATION_SCENARIO`](crate::tolerances::VISUALIZATION_SCENARIO) but looser than
+/// [`DISTRIBUTION_SUM_TO_ONE`] because the error originates in the
+/// input data, not computation.
+/// Validated: Exp107 (Liao real data digester abundance profiles).
+pub const ABUNDANCE_SUM_TO_ONE: f64 = 0.05;
+
+/// Pharmacokinetic peak-concentration vs dose relative tolerance.
+///
+/// Single-compartment PK model peak concentration should approximate
+/// the administered dose. 20% relative error covers absorption-phase
+/// dynamics where `C_max < dose` due to ongoing elimination.
+/// Validated: Exp281 (Gonzales PK dose-response).
+pub const PK_PEAK_DOSE_RELATIVE: f64 = 0.2;
+
+/// Pharmacokinetic terminal elimination floor (fraction of peak).
+///
+/// At end-of-simulation the concentration should have decayed to
+/// < 15% of peak, confirming elimination-phase behavior.
+/// Validated: Exp281 (Gonzales PK dose-response).
+pub const PK_ELIMINATION_FLOOR: f64 = 0.15;

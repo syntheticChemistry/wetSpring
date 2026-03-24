@@ -4,20 +4,18 @@
 //! Accepts connections on a Unix domain socket and handles JSON-RPC 2.0
 //! requests (newline-delimited), dispatching to barracuda library functions.
 //! Each connection is handled in its own thread.
+//!
+//! Connection processing (read/dispatch/write pipeline) lives in the
+//! sibling `connection` module — this module owns only the server lifecycle.
 
-use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixListener;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-use std::time::Duration;
 
-use super::dispatch;
+use super::connection;
 use super::metrics::Metrics;
-use super::protocol;
 #[cfg(test)]
 use crate::tolerances;
-
-const CONNECTION_READ_TIMEOUT: Duration = Duration::from_secs(120);
 
 /// wetSpring IPC server.
 ///
@@ -100,7 +98,7 @@ impl Server {
                 Ok(stream) => {
                     let metrics = Arc::clone(&self.metrics);
                     std::thread::spawn(move || {
-                        handle_connection(&stream, &metrics);
+                        connection::handle_connection(&stream, &metrics);
                     });
                 }
                 Err(e) => {
@@ -114,142 +112,6 @@ impl Server {
 impl Drop for Server {
     fn drop(&mut self) {
         let _ = std::fs::remove_file(&self.socket_path);
-    }
-}
-
-/// Dispatch a single parsed request, recording metrics.
-fn dispatch_request(
-    req: &super::message::Request,
-    metrics: &Metrics,
-    start: std::time::Instant,
-) -> String {
-    let method_key = protocol::normalize_method(&req.method);
-    let result = if method_key.as_ref() == "metrics.snapshot" {
-        Ok(metrics.snapshot())
-    } else {
-        dispatch::dispatch(&req.method, &req.params)
-    };
-    match result {
-        Ok(result) => {
-            metrics.record_success(method_key.as_ref(), start.elapsed());
-            protocol::success_response(&req.id, &result)
-        }
-        Err(rpc_err) => {
-            metrics.record_error(method_key.as_ref(), start.elapsed());
-            protocol::error_response(&req.id, rpc_err.code, &rpc_err.message)
-        }
-    }
-}
-
-/// Dispatch a notification (fire-and-forget, no response).
-fn dispatch_notification(line: &str, metrics: &Metrics, start: std::time::Instant) {
-    if let Ok(req) = protocol::parse_request(line) {
-        let method_key = protocol::normalize_method(&req.method);
-        let result = if method_key.as_ref() == "metrics.snapshot" {
-            Ok(metrics.snapshot())
-        } else {
-            dispatch::dispatch(&req.method, &req.params)
-        };
-        match &result {
-            Ok(_) => metrics.record_success(method_key.as_ref(), start.elapsed()),
-            Err(_) => metrics.record_error(method_key.as_ref(), start.elapsed()),
-        }
-    }
-}
-
-/// Process a single JSON-RPC request. Returns `None` for notifications (no response).
-fn process_single(line: &str, metrics: &Metrics, start: std::time::Instant) -> Option<String> {
-    if protocol::is_notification(line) {
-        dispatch_notification(line, metrics, start);
-        return None;
-    }
-
-    Some(match protocol::parse_request(line) {
-        Ok(req) => dispatch_request(&req, metrics, start),
-        Err(parse_err) => {
-            metrics.record_error("_parse", start.elapsed());
-            protocol::error_response(
-                &parse_err.id,
-                parse_err.error.code,
-                &parse_err.error.message,
-            )
-        }
-    })
-}
-
-/// Process a JSON-RPC batch. Returns `None` if all requests are notifications.
-fn process_batch(line: &str, metrics: &Metrics, start: std::time::Instant) -> Option<String> {
-    let elements = protocol::parse_batch(line);
-    if elements.is_empty() {
-        return Some(protocol::error_response(
-            &serde_json::Value::Null,
-            -32600,
-            "Invalid Request",
-        ));
-    }
-
-    let mut responses: Vec<String> = Vec::new();
-    for elem in elements {
-        if protocol::is_notification(&elem) {
-            dispatch_notification(&elem, metrics, start);
-            continue;
-        }
-
-        let resp = match protocol::parse_request(&elem) {
-            Ok(req) => dispatch_request(&req, metrics, start),
-            Err(parse_err) => {
-                metrics.record_error("_parse", start.elapsed());
-                protocol::error_response(
-                    &parse_err.id,
-                    parse_err.error.code,
-                    &parse_err.error.message,
-                )
-            }
-        };
-        responses.push(resp);
-    }
-
-    if responses.is_empty() {
-        return None;
-    }
-
-    let batch_resp = format!("[{}]", responses.join(","));
-    Some(batch_resp)
-}
-
-/// Handle a single client connection: read newline-delimited JSON-RPC, dispatch, respond.
-fn handle_connection(stream: &std::os::unix::net::UnixStream, metrics: &Metrics) {
-    if let Err(e) = stream.set_read_timeout(Some(CONNECTION_READ_TIMEOUT)) {
-        tracing::warn!(error = %e, "set read timeout");
-        return;
-    }
-
-    let reader = BufReader::new(stream);
-    let mut writer = std::io::BufWriter::new(stream);
-
-    for line in reader.lines() {
-        let line = match line {
-            Ok(l) if l.trim().is_empty() => continue,
-            Ok(l) => l,
-            Err(_) => break,
-        };
-
-        let start = std::time::Instant::now();
-
-        let response_opt = if protocol::is_batch(&line) {
-            process_batch(&line, metrics, start)
-        } else {
-            process_single(&line, metrics, start)
-        };
-
-        if let Some(response) = response_opt {
-            let write_ok = writer.write_all(response.as_bytes()).is_ok()
-                && writer.write_all(b"\n").is_ok()
-                && writer.flush().is_ok();
-            if !write_ok {
-                break;
-            }
-        }
     }
 }
 
@@ -268,6 +130,7 @@ mod tests {
     use crate::ipc::{cleanup_test_socket, test_socket_path};
     use std::io::{BufRead, BufReader, Write};
     use std::os::unix::net::UnixStream;
+    use std::time::Duration;
 
     #[test]
     fn server_bind_and_health_check() {

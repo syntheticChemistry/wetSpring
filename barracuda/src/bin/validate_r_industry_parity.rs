@@ -37,6 +37,8 @@
 //! # Evolution Path
 //!
 //! R baseline → Rust CPU (this binary) → `BarraCuda` GPU → Sovereign pipeline
+//!
+//! Provenance: R/DADA2 + QIIME2 industry tool parity validation
 
 use std::collections::HashMap;
 use std::time::Instant;

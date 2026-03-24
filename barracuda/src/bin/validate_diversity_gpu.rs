@@ -44,6 +44,7 @@
 //! Run: `cargo run --features gpu --bin validate_diversity_gpu`
 //!
 //! Validation class: GPU-parity
+//!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
 use wetspring_barracuda::bio::{

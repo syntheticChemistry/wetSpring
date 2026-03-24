@@ -21,6 +21,8 @@
 //!
 //! This benchmark tracks where each primitive came from, measures
 //! CPU vs GPU performance, and documents the cross-spring synergy.
+//!
+//! Provenance: Cross-spring evolution benchmark
 
 use std::time::Instant;
 use wetspring_barracuda::bio::diversity;

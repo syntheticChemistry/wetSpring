@@ -29,6 +29,7 @@
 //! 4. `BatchedOdeRK4F64` — ODE RK4 integration via `OdeSweepGpu` (absorbed S41)
 //!
 //! Validation class: Cross-spring
+//!
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
 use std::time::Instant;

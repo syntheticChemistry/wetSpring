@@ -20,7 +20,7 @@ table, and exits `0` only if every validator exits successfully.
 
 ## Coverage (Rust)
 
-HTML coverage and an 80% line floor (ludoSpring V29 pattern) use
+HTML coverage and a 90% line floor use
 [cargo-llvm-cov](https://github.com/taiki-e/cargo-llvm-cov) from the workspace
 root. One-time setup:
 
@@ -34,7 +34,7 @@ Then:
 | Command | Purpose |
 |--------|---------|
 | `cargo coverage` | Workspace HTML report (`target/llvm-cov/html`) |
-| `cargo coverage-check` | Enforce **≥ 80%** line coverage (`--fail-under-lines 80`) |
+| `cargo coverage-check` | Enforce **≥ 90%** line coverage (`--fail-under-lines 90`) |
 | `cargo coverage-json` | JSON report at `coverage.json` |
 
 ---

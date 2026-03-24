@@ -30,6 +30,7 @@
 //! | Command | `cargo run --release --bin validate_dispatch_evolution_v67` |
 //!
 //! Validation class: Pipeline
+//!
 //! Provenance: End-to-end pipeline integration test
 
 use wetspring_barracuda::validation::OrExit;

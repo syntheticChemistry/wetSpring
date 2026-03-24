@@ -32,6 +32,8 @@
 //! | Exact command | `cargo run --features gpu --release --bin benchmark_all_domains_cpu_gpu` |
 //! | Data | Synthetic sequences at increasing sizes |
 //! | Hardware | i9-12900K, 64 GB DDR5, RTX 4070, Pop!\_OS 22.04 |
+//!
+//! Provenance: CPU vs GPU timing comparison across all domains
 
 use std::sync::Arc;
 use std::time::Instant;

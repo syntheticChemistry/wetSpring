@@ -50,6 +50,7 @@
 //! | Command | `cargo test --bin validate_notill_longterm_tillage -- --nocapture` |
 //!
 //! Validation class: Analytical
+//!
 //! Provenance: Known-value formulas and algorithmic invariants
 
 use std::time::Instant;

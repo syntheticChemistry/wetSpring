@@ -37,6 +37,7 @@
 //! | Command | `cargo run --release --bin validate_barracuda_cpu_v15` |
 //!
 //! Validation class: GPU-parity
+//!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 //!
 //! # Python Baselines

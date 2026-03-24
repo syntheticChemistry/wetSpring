@@ -49,6 +49,8 @@
 //! | Provenance type | Adaptive dispatch from hardware learning |
 //! | Date | 2026-03-11 |
 //! | Command | `cargo run --release --features gpu,json --bin validate_adaptive_dispatch_v1` |
+//!
+//! Provenance: Adaptive GPU/CPU dispatch strategy validation
 
 use std::time::Instant;
 use wetspring_barracuda::validation::Validator;

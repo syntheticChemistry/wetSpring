@@ -3,7 +3,7 @@
 # wetSpring Specifications
 
 **Last Updated**: March 24, 2026
-**Status**: V136 — 5,700+ checks (379 experiments, 355 binaries), 1,891 tests, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, clippy pedantic+nursery zero warnings, zero `#[allow()]`. V136: deep debt resolution + ecosystem absorption — thiserror derives, named cast helpers (~60 casts across 15 files), upstream contract pinning, bitwise determinism tests, CI pin, provenance headers, zero hardcoded primal strings, `ipc/server.rs` refactored, CONTRIBUTING + SECURITY. V135: doc reconciliation, canonical metrics, V135 handoff. V134: deep audit + debt (drug NMF → barracuda, 26 clippy fixes, validation harness refactored, primal discovery extended, SPDX on specs/whitePaper, CI feature-matrix). V133: `validate_all`, `GpuContext`/`TensorSession`, `performance_surface`, zero-copy I/O. V132: `ValidationSink`, `PROVENANCE_REGISTRY`, `DeviceCapabilities`, ecosystem wiring.
+**Status**: V137 — 5,700+ checks (379 experiments, 355 binaries), 1,902 tests, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, clippy pedantic+nursery zero warnings, zero `#[allow()]`. V137: provenance headers on all 355 binaries, 8 new tolerance constants (242 total), `ipc/connection.rs` extraction, doc link fixes. V136: thiserror derives, named cast helpers (~60 casts), upstream contract pinning, determinism tests, CI pin, hardcoding audit. V135: doc reconciliation. V134: deep audit (drug NMF delegation, validation harness refactored, primal discovery extended). V133: `validate_all`, `GpuContext`/`TensorSession`. V132: `ValidationSink`, `PROVENANCE_REGISTRY`, ecosystem wiring.
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -197,7 +197,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 DATA_TYPES.md → FIELD_GENOMICS_REQUIREMENTS.md → `../whitePaper/baseCamp/sub_thesis_06_field_genomics.md`
 
 **Integration partner**:
-`../wateringHole/handoffs/WETSPRING_TOADSTOOL_V92C_BLUEFISH_BRAIN_ARCH_HANDOFF_MAR02_2026.md` → `../specs/CROSS_SPRING_EVOLUTION.md`
+`../wateringHole/handoffs/archive/WETSPRING_TOADSTOOL_V92C_DEEP_AUDIT_HANDOFF_MAR02_2026.md` → `../specs/CROSS_SPRING_EVOLUTION.md`
 
 ---
 
