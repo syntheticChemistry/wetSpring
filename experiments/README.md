@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-24 (V135: 379 experiments indexed (376 completed + 3 PROPOSED), **355** binaries (**333** barracuda + **22** forge), 5,707+ checks, **1,891** tests (unit + integration + property + doc, 0 failures). V135: doc reconciliation — canonical metrics aligned across all docs, V135 handoff, wateringHole sync. V134: deep audit + debt resolution — drug NMF → `barracuda::linalg::nmf`, 26 clippy errors resolved, coverage 91.20% gated at 90%, validation harness refactored, primal discovery extended. V133: `validate_all`, `GpuContext`/`TensorSession`, `performance_surface` RPCs, zero-copy I/O, IPC routing modules, 234 tolerances / 44 GPU / 49 CPU bio modules. Zero local math duplication, zero `#[allow()]`, zero clippy warnings, zero unsafe.)
+**Updated**: 2026-03-24 (V136: 379 experiments indexed (376 completed + 3 PROPOSED), **355** binaries (**333** barracuda + **22** forge), 5,700+ checks, **1,891** tests (unit + integration + property + doc, 0 failures). V136: deep debt resolution + ecosystem absorption — thiserror derives, named cast helpers (~60 casts across 15 files), upstream contract pinning, bitwise determinism tests, CI pin, provenance headers, zero hardcoded primal strings, `ipc/server.rs` refactored, CONTRIBUTING + SECURITY. V135: doc reconciliation — canonical metrics aligned across all docs, V135 handoff, wateringHole sync. V134: deep audit + debt resolution — drug NMF → `barracuda::linalg::nmf`, 26 clippy errors resolved, coverage 91.20% gated at 90%, validation harness refactored, primal discovery extended. V133: `validate_all`, `GpuContext`/`TensorSession`, `performance_surface` RPCs, zero-copy I/O, IPC routing modules, 234 tolerances / 44 GPU / 49 CPU bio modules. Zero local math duplication, zero `#[allow()]`, zero clippy warnings, zero unsafe.)
 
 ---
 
@@ -412,8 +412,8 @@ thresholds from `src/tolerances.rs`.
 | `validate_cross_spring_evolution_s87` | 304 | 61 | `cargo run --release --features gpu --bin validate_cross_spring_evolution_s87` |
 | `validate_r_industry_parity` | 335 | 53 | `cargo run --release --bin validate_r_industry_parity` |
 
-**Total validation checks**: 5,707+
-**Rust tests**: **1,781** total (1,529 barracuda + 252 forge)
+**Total validation checks**: 5,700+
+**Rust tests**: **1,891** total (unit + integration + property + doc; 1,205 lib default, 1,569 lib ipc+vault+json)
 **Binaries**: **333** total (**307** validate + 23 benchmark + 3 tools)
 **barraCuda primitives**: 150+ consumed (standalone v0.3.7, wgpu 28, Fp64Strategy, fused ops)
 **Papers**: 63 (reproduced across 6 tracks)
@@ -645,7 +645,11 @@ primal discovery (env → XDG → BIOMEOS_SOCKET_DIR → temp), forge lint parit
 false-positives resolved (all `panic!()` and `unwrap()` confirmed test-only).
 31 IPC tests pass, 19 files changed (342+, 130−).
 
-**Totals (V135 index):** 379 experiments indexed (376 completed + 3 PROPOSED), 355 binaries (333 barracuda + 22 forge), 5,707+ checks, 1,891 tests.
+**Totals (V136 index):** 379 experiments indexed (376 completed + 3 PROPOSED), 355 binaries (333 barracuda + 22 forge), 5,700+ checks, 1,891 tests.
+
+### V136 — Deep debt resolution + ecosystem absorption
+
+thiserror error derives; named cast helpers across 15 files (~60 casts replaced); upstream contract pinning for barraCuda; bitwise determinism tests; CI version pin script; provenance headers; hardcoded primal strings eliminated; `ipc/server.rs` refactored; CONTRIBUTING.md + SECURITY.md added. Absorption: groundSpring V122 (named casts), neuralSpring S174 (upstream contract), airSpring v0.10.0 (provenance headers), healthSpring V42 (CI pin + determinism tests), ludoSpring V30 (thiserror).
 
 ### Exp377: Hormesis Biphasic Dose-Response Model (PROPOSED)
 
@@ -671,7 +675,7 @@ resist pathogen colonization better than low-diversity strong-binding communitie
 Module: `bio::binding_landscape` (17 unit tests passing). Joint with healthSpring
 exp097/exp098.
 
-**Totals: 379 experiments indexed, 355 binaries, 5,707+ checks, 1,891 tests.**
+**Totals: 379 experiments indexed, 355 binaries, 5,700+ checks, 1,891 tests.**
 
 ---
 

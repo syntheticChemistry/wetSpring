@@ -25,6 +25,8 @@ Python/R baseline  →  Rust CPU parity  →  GPU acceleration  →  sovereign p
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
+**Current release — V136:** Deep debt resolution + ecosystem absorption: `thiserror` error derives (ecosystem standard), named cast helpers across 15 files (~60 casts replaced), upstream contract pinning for barraCuda, bitwise determinism tests, CI version pin script, provenance headers, hardcoded primal strings eliminated, `ipc/server.rs` refactored, CONTRIBUTING.md + SECURITY.md added.
+
 ---
 
 ## Tracks

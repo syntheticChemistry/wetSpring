@@ -1,7 +1,7 @@
 # Python Baseline Manifest
 
 **Generated:** February 27, 2026 (Phase 61 audit — SPDX headers + provenance metadata added)
-**Verified:** March 24, 2026 (V134 audit — SHA-256 hashes reconciled with `provenance_registry.rs`; `exp008_pfas_ml_baseline.py` and `python_anaerobic_biogas_baseline.py` hashes corrected; download script hashes added; numpy version matrix documented.)
+**Verified:** March 24, 2026 (V136 — SHA-256 hashes reconciled with `provenance_registry.rs`; `exp008_pfas_ml_baseline.py` and `python_anaerobic_biogas_baseline.py` hashes corrected; download script hashes added; numpy version matrix documented.)
 **Last scripts commit:** V120 (added `scripts/tolerances.py` — shared tolerance constants mirroring Rust)
 
 ## Commit History Clarification

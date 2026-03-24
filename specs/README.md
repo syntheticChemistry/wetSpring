@@ -3,7 +3,7 @@
 # wetSpring Specifications
 
 **Last Updated**: March 24, 2026
-**Status**: V135 — 5,707+ checks (379 experiments, 355 binaries), 1,891 tests, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, clippy pedantic+nursery zero warnings, zero `#[allow()]`. V135: doc reconciliation, canonical metrics, V135 handoff. V134: deep audit + debt (drug NMF → barracuda, 26 clippy fixes, validation harness refactored, primal discovery extended, SPDX on specs/whitePaper, CI feature-matrix). V133: `validate_all`, `GpuContext`/`TensorSession`, `performance_surface`, zero-copy I/O. V132: `ValidationSink`, `PROVENANCE_REGISTRY`, `DeviceCapabilities`, ecosystem wiring.
+**Status**: V136 — 5,700+ checks (379 experiments, 355 binaries), 1,891 tests, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, clippy pedantic+nursery zero warnings, zero `#[allow()]`. V136: deep debt resolution + ecosystem absorption — thiserror derives, named cast helpers (~60 casts across 15 files), upstream contract pinning, bitwise determinism tests, CI pin, provenance headers, zero hardcoded primal strings, `ipc/server.rs` refactored, CONTRIBUTING + SECURITY. V135: doc reconciliation, canonical metrics, V135 handoff. V134: deep audit + debt (drug NMF → barracuda, 26 clippy fixes, validation harness refactored, primal discovery extended, SPDX on specs/whitePaper, CI feature-matrix). V133: `validate_all`, `GpuContext`/`TensorSession`, `performance_surface`, zero-copy I/O. V132: `ValidationSink`, `PROVENANCE_REGISTRY`, `DeviceCapabilities`, ecosystem wiring.
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

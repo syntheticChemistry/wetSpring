@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** March 24, 2026 (V135 — barraCuda v0.3.7 standalone, toadStool S155+, coralReef Phase 10, wgpu 28. 1,891 tests (0 failures), 355 binaries (333 barracuda + 22 forge), 234 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, zero `#[allow()]`, clippy ZERO WARNINGS pedantic+nursery. V135: doc reconciliation, canonical metrics aligned, V135 handoff. V134: deep audit — drug NMF → `barracuda::linalg::nmf`, 26 clippy fixes, validation harness refactored into domain submodules, primal discovery extended (7 primals), SPDX headers, CI feature-matrix. V133: `validate_all`, `GpuContext`/`TensorSession`, `performance_surface`, zero-copy I/O, typed errors, deploy graph hardened.)
+**Updated:** March 24, 2026 (V136 — barraCuda v0.3.7 standalone, toadStool S155+, coralReef Phase 10, wgpu 28. 1,891 tests (0 failures), 355 binaries (333 barracuda + 22 forge), 234 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, zero `#[allow()]`, clippy ZERO WARNINGS pedantic+nursery. V136: thiserror migration, named cast helpers (~60 casts), upstream contract pinning, bitwise determinism tests, CI pin, provenance headers, hardcoding audit (zero hardcoded primal strings), `ipc/server.rs` refactored, CONTRIBUTING + SECURITY. V135: doc reconciliation, canonical metrics aligned, V135 handoff. V134: deep audit — drug NMF → `barracuda::linalg::nmf`, 26 clippy fixes, validation harness refactored into domain submodules, primal discovery extended (7 primals), SPDX headers, CI feature-matrix. V133: `validate_all`, `GpuContext`/`TensorSession`, `performance_surface`, zero-copy I/O, typed errors, deploy graph hardened.)
 
 ---
 
@@ -159,7 +159,7 @@ Builder patterns wired: `HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`.
 | `#![deny(unsafe_code)]` | Enforced crate-wide (test-only `allow` for `env::set_var` in edition 2024) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | Enforced |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
-| Tests | 1,781 total (lib + integration + forge + doc) |
+| Tests | 1,891 total (unit + integration + property + doc) |
 | ESN ridge regression | Proper Cholesky solve (not diagonal approximation) |
 | I/O parsers | Streaming-first; buffering APIs deprecated |
 | Validation checks | 8,431+ across 307 validation binaries (333 total) |
