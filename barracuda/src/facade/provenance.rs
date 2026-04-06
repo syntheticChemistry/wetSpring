@@ -6,8 +6,15 @@
 //! - Tier 2 (trio reachable): rhizoCrypt session, loamSpine commit, sweetGrass braid
 //! - Tier 3 (full RootPulse): PROV-O export, Merkle inclusion proof, verify links
 //!
+//! Circuit breaker: epoch-based breaker prevents hammering the trio when it's
+//! partially reachable. After `BREAKER_THRESHOLD` consecutive failures the
+//! breaker opens for `BREAKER_COOLDOWN_SECS`, during which Tier 2/3 calls
+//! return `None` immediately without attempting socket I/O.
+//!
 //! NestGate integration: computation results are cached via `storage.store` with
 //! family-scoped keys so repeated identical queries skip recomputation.
+
+use std::sync::atomic::{AtomicU64, Ordering};
 
 use serde_json::{Value, json};
 
@@ -18,6 +25,43 @@ const WETSPRING_VERSION: &str = env!("CARGO_PKG_VERSION");
 const REPRODUCTION_MANIFEST: &str = include_str!("../../data/reproduction_manifest.toml");
 const DEPLOY_GRAPH: &str = "wetspring_science_nucleus.toml";
 const PLASMID_FETCH_TAG: &str = "v0.7.0";
+
+// ── Circuit breaker (epoch-based, pattern from primalSpring) ──────────
+
+const BREAKER_THRESHOLD: u64 = 3;
+const BREAKER_COOLDOWN_SECS: u64 = 30;
+
+/// Consecutive failure count for trio calls.
+static TRIO_FAILURES: AtomicU64 = AtomicU64::new(0);
+/// Unix timestamp when the breaker opened (0 = closed).
+static TRIO_BREAKER_OPENED: AtomicU64 = AtomicU64::new(0);
+
+fn trio_breaker_open() -> bool {
+    let opened_at = TRIO_BREAKER_OPENED.load(Ordering::Relaxed);
+    if opened_at == 0 {
+        return false;
+    }
+    let now = now_epoch();
+    if now.saturating_sub(opened_at) >= BREAKER_COOLDOWN_SECS {
+        TRIO_BREAKER_OPENED.store(0, Ordering::Relaxed);
+        TRIO_FAILURES.store(0, Ordering::Relaxed);
+        false
+    } else {
+        true
+    }
+}
+
+fn trio_record_success() {
+    TRIO_FAILURES.store(0, Ordering::Relaxed);
+    TRIO_BREAKER_OPENED.store(0, Ordering::Relaxed);
+}
+
+fn trio_record_failure() {
+    let prev = TRIO_FAILURES.fetch_add(1, Ordering::Relaxed);
+    if prev + 1 >= BREAKER_THRESHOLD {
+        TRIO_BREAKER_OPENED.store(now_epoch(), Ordering::Relaxed);
+    }
+}
 
 /// Tier 1 provenance: always available, computed locally.
 ///
@@ -60,8 +104,23 @@ pub fn tier1(method: &str, params: &Value, result: &Value) -> Value {
 /// Attempt Tier 2 provenance via the provenance trio.
 ///
 /// Calls `provenance.begin`, `provenance.record`, `provenance.complete` via
-/// the Neural API socket. Returns `None` if the trio is unreachable.
+/// the Neural API socket. Returns `None` if the trio is unreachable or
+/// the circuit breaker is open.
 pub fn try_tier2(method: &str, params: &Value, result_hash: &str) -> Option<Value> {
+    if trio_breaker_open() {
+        return None;
+    }
+
+    let result = try_tier2_inner(method, params, result_hash);
+    if result.is_some() {
+        trio_record_success();
+    } else {
+        trio_record_failure();
+    }
+    result
+}
+
+fn try_tier2_inner(method: &str, params: &Value, result_hash: &str) -> Option<Value> {
     let neural_socket = neural_api_socket()?;
 
     let session = call_neural(&neural_socket, "provenance.begin", &json!({
@@ -94,7 +153,24 @@ pub fn try_tier2(method: &str, params: &Value, result_hash: &str) -> Option<Valu
 }
 
 /// Attempt Tier 3: PROV-O export and Merkle inclusion proof.
+///
+/// Respects the circuit breaker — if the trio is already flagged as
+/// unreachable the call returns `None` immediately.
 pub fn try_tier3(braid_id: &str) -> Option<Value> {
+    if trio_breaker_open() {
+        return None;
+    }
+
+    let result = try_tier3_inner(braid_id);
+    if result.is_some() {
+        trio_record_success();
+    } else {
+        trio_record_failure();
+    }
+    result
+}
+
+fn try_tier3_inner(braid_id: &str) -> Option<Value> {
     let neural_socket = neural_api_socket()?;
 
     let provo = call_neural(&neural_socket, "capability.call", &json!({
@@ -108,6 +184,21 @@ pub fn try_tier3(braid_id: &str) -> Option<Value> {
         "prov_o": provo,
         "verify_url": format!("https://lab.primals.eco/api/v1/provenance/verify/{braid_id}"),
     }))
+}
+
+/// Circuit breaker status for diagnostic endpoints.
+pub fn breaker_status() -> Value {
+    let failures = TRIO_FAILURES.load(Ordering::Relaxed);
+    let opened_at = TRIO_BREAKER_OPENED.load(Ordering::Relaxed);
+    let is_open = trio_breaker_open();
+
+    json!({
+        "open": is_open,
+        "consecutive_failures": failures,
+        "threshold": BREAKER_THRESHOLD,
+        "cooldown_secs": BREAKER_COOLDOWN_SECS,
+        "opened_at_epoch": opened_at,
+    })
 }
 
 /// Structure a computation result as a Novel Ferment Transcript vertex.
@@ -201,12 +292,15 @@ fn blake3_hash_json(val: &Value) -> String {
     hash.to_hex().to_string()
 }
 
-fn now_iso8601() -> String {
-    let dur = std::time::SystemTime::now()
+fn now_epoch() -> u64 {
+    std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
-        .unwrap_or_default();
-    let secs = dur.as_secs();
-    format!("{secs}")
+        .unwrap_or_default()
+        .as_secs()
+}
+
+fn now_iso8601() -> String {
+    format!("{}", now_epoch())
 }
 
 fn neural_api_socket() -> Option<std::path::PathBuf> {

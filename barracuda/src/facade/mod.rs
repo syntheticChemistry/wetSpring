@@ -8,6 +8,7 @@
 
 pub mod dark_forest;
 pub mod grammar;
+pub mod graph_validate;
 pub mod ipc_client;
 pub mod provenance;
 pub mod routes;

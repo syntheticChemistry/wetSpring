@@ -24,14 +24,14 @@ coordination = "sequential"
 # ═══════════════════════════════════════════════════════════════
 
 [[graph.node]]
-name = "biomeos"
+name = "biomeos_neural_api"
 binary = "biomeos"
 order = 0
 required = true
 spawn = false
 health_method = "graph.list"
 by_capability = "orchestration"
-capabilities = ["capability.discover", "graph.list"]
+capabilities = ["graph.execute", "capability.discover", "graph.list", "topology.rescan"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 1: Tower Atomic — BearDog + Songbird (security + discovery)
@@ -39,23 +39,23 @@ capabilities = ["capability.discover", "graph.list"]
 
 [[graph.node]]
 name = "beardog"
-binary = "beardog_primal"
+binary = "beardog"
 order = 1
 required = true
-spawn = false
+depends_on = ["biomeos_neural_api"]
 health_method = "health.liveness"
 by_capability = "security"
-capabilities = ["crypto.sign", "crypto.verify", "birdsong.decrypt", "encryption.encrypt", "encryption.decrypt"]
+capabilities = ["crypto.sign", "crypto.verify", "crypto.blake3_hash", "birdsong.decrypt", "encryption.encrypt", "encryption.decrypt"]
 
 [[graph.node]]
 name = "songbird"
-binary = "songbird_primal"
+binary = "songbird"
 order = 2
 required = true
-spawn = false
+depends_on = ["biomeos_neural_api"]
 health_method = "health.liveness"
 by_capability = "discovery"
-capabilities = ["discovery.find_primals", "mesh.announce"]
+capabilities = ["net.discovery", "net.mesh", "discovery.find_primals", "mesh.announce"]
 
 [graph.node.env]
 BIRDSONG_MULTICAST = "239.255.0.1:4200"
@@ -66,10 +66,10 @@ BIRDSONG_MULTICAST = "239.255.0.1:4200"
 
 [[graph.node]]
 name = "nestgate"
-binary = "nestgate_primal"
+binary = "nestgate"
 order = 3
 required = false
-depends_on = ["beardog", "songbird"]
+depends_on = ["beardog"]
 health_method = "health.liveness"
 by_capability = "storage"
 capabilities = ["storage.store", "storage.retrieve", "storage.exists", "storage.list"]
@@ -80,13 +80,13 @@ capabilities = ["storage.store", "storage.retrieve", "storage.exists", "storage.
 
 [[graph.node]]
 name = "toadstool"
-binary = "toadstool_primal"
+binary = "toadstool"
 order = 4
 required = false
 depends_on = ["beardog", "songbird"]
 health_method = "health.liveness"
 by_capability = "compute"
-capabilities = ["compute.dispatch.gpu", "compute.dispatch.npu", "compute.dispatch.cpu"]
+capabilities = ["compute.dispatch.submit", "compute.dispatch.gpu", "compute.dispatch.npu", "compute.dispatch.cpu", "shader.dispatch", "ember.list"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 4: Provenance Trio — rhizoCrypt + loamSpine + sweetGrass
@@ -94,33 +94,36 @@ capabilities = ["compute.dispatch.gpu", "compute.dispatch.npu", "compute.dispatc
 
 [[graph.node]]
 name = "rhizocrypt"
-binary = "rhizocrypt_primal"
+binary = "rhizocrypt"
 order = 5
 required = false
-depends_on = ["beardog", "songbird"]
+depends_on = ["beardog"]
 health_method = "health.liveness"
 by_capability = "provenance"
-capabilities = ["dag.create_session", "dag.append_event", "dag.dehydrate"]
+args = ["--unix"]
+capabilities = ["dag.session.create", "dag.session.list", "dag.create_session", "dag.append_event", "dag.dehydrate"]
 
 [[graph.node]]
 name = "loamspine"
-binary = "loamspine_primal"
+binary = "loamspine"
 order = 6
 required = false
-depends_on = ["beardog", "songbird", "rhizocrypt"]
+depends_on = ["beardog", "rhizocrypt"]
 health_method = "health.liveness"
 by_capability = "ledger"
-capabilities = ["commit.session", "entry.get", "entry.verify"]
+args = ["server"]
+capabilities = ["entry.append", "ledger.status", "commit.session", "entry.get", "entry.verify"]
 
 [[graph.node]]
 name = "sweetgrass"
-binary = "sweetgrass_primal"
+binary = "sweetgrass"
 order = 7
 required = false
-depends_on = ["beardog", "songbird", "loamspine"]
+depends_on = ["beardog", "loamspine"]
 health_method = "health.liveness"
-by_capability = "semantic_provenance"
-capabilities = ["provenance.create_braid", "provenance.export_provo", "braid.get"]
+by_capability = "attribution"
+args = ["server"]
+capabilities = ["attribution.claim", "attribution.resolve", "provenance.create_braid", "provenance.export_provo", "braid.get"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 5: Science — wetSpring IPC (the data source)
@@ -133,7 +136,7 @@ order = 10
 required = true
 depends_on = ["beardog", "songbird"]
 health_method = "health.check"
-by_capability = "ecology"
+by_capability = "biology"
 args = ["server"]
 capabilities = [
     "science.gonzales.dose_response",
@@ -153,6 +156,10 @@ capabilities = [
     "vault.retrieve",
     "vault.consent.verify",
     "composition.science_health",
+    "composition.tower_health",
+    "composition.node_health",
+    "composition.nest_health",
+    "composition.nucleus_health",
 ]
 
 # ═══════════════════════════════════════════════════════════════
@@ -164,7 +171,7 @@ name = "petaltongue"
 binary = "petaltongue"
 order = 11
 required = false
-depends_on = ["beardog", "songbird"]
+depends_on = ["beardog"]
 health_method = "health.liveness"
 by_capability = "visualization"
 capabilities = ["visualization.render.grammar", "visualization.render.scene"]

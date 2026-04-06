@@ -41,7 +41,7 @@ nautilus = ["dep:bingocube-nautilus", "bingocube-nautilus/json"]
 vault = ["dep:chacha20poly1305", "dep:ed25519-dalek", "dep:blake3"]
 # Science facade: HTTP gateway for primals.eco live interactive science.
 # Adds Axum web server, tower-http CORS, tokio async runtime, BLAKE3 hashing.
-facade = ["json", "dep:axum", "dep:tower-http", "dep:tokio", "dep:tracing-subscriber", "dep:blake3"]
+facade = ["json", "dep:axum", "dep:tower-http", "dep:tokio", "dep:tracing-subscriber", "dep:blake3", "dep:toml"]
 
 [dependencies]
 # serde: derive Serialize/Deserialize for visualization types (petalTongue schema).
@@ -99,6 +99,9 @@ bytemuck = { version = "1", features = ["derive"] }
 # XML parsing is sovereign (src/io/xml.rs); base64 is sovereign (src/encoding.rs).
 flate2 = { version = "1.0", default-features = false, features = ["rust_backend"] }
 
+# toml: TOML parsing for deploy graph structural validation (facade startup).
+# Pure Rust, zero C deps, ecoBin compliant.
+toml = { version = "0.8", optional = true }
 # Axum: web framework for the science facade HTTP gateway.
 axum = { version = "0.8", optional = true, default-features = false, features = ["json", "query", "tokio", "http1"] }
 # tower-http: middleware for CORS headers on the science facade.

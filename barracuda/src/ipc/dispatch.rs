@@ -87,6 +87,10 @@ pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
 
         // Composition health (cross-spring validation)
         "composition.science_health" => handlers::handle_composition_science_health(params),
+        "composition.tower_health" => handlers::handle_composition_tower_health(params),
+        "composition.node_health" => handlers::handle_composition_node_health(params),
+        "composition.nest_health" => handlers::handle_composition_nest_health(params),
+        "composition.nucleus_health" => handlers::handle_composition_nucleus_health(params),
 
         _ => Err(RpcError::method_not_found(method)),
     }

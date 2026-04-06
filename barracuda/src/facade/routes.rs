@@ -507,7 +507,8 @@ pub async fn validation_chain(
 }
 
 /// System composition endpoint: returns deploy graph, primal versions,
-/// capabilities, and bonding metadata for reproducibility and ionic discovery.
+/// capabilities, bonding metadata, graph validation, and circuit breaker
+/// status for reproducibility and ionic discovery.
 ///
 /// `GET /api/v1/system/composition`
 pub async fn system_composition() -> Json<Value> {
@@ -533,6 +534,9 @@ pub async fn system_composition() -> Json<Value> {
     let composition_health = ipc_client::call("composition.science_health", &json!({}))
         .unwrap_or(json!({"status": "unavailable"}));
 
+    let graph_validation = super::graph_validate::validate_graph(DEPLOY_GRAPH).to_json();
+    let breaker = provenance::breaker_status();
+
     let prov = provenance::tier1(
         "system.composition",
         &json!({}),
@@ -549,6 +553,8 @@ pub async fn system_composition() -> Json<Value> {
             "facade": "online",
             "wetspring_ipc": if ipc_ok { "connected" } else { "unreachable" },
             "composition_health": composition_health,
+            "graph_validation": graph_validation,
+            "trio_circuit_breaker": breaker,
         },
         "capabilities": capabilities,
         "reproduction": {
