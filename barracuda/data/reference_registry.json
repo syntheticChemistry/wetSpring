@@ -1,0 +1,147 @@
+{
+  "registry_version": "1.0.0",
+  "description": "Published reference data for the wetSpring science pipeline — every value traceable from paper to code",
+  "papers": {
+    "gonzales_2014": {
+      "doi": "10.1111/jvp.12065",
+      "title": "Oclacitinib (APOQUEL) is a novel Janus kinase inhibitor with activity against cytokines involved in allergy",
+      "journal": "J Vet Pharmacol Ther",
+      "year": 2014,
+      "volume": "37",
+      "pages": "317-324",
+      "authors": ["Gonzales AJ", "Bowman JW", "Fici GJ", "Zhang M", "Mann DW", "Mitton-Fry M"],
+      "tables": {
+        "table_1": {
+          "description": "IC50 values for oclacitinib inhibition of cytokine-dependent signaling pathways",
+          "values": {
+            "JAK1_enzyme": {"ic50_nm": 10.0, "pathway": "JAK/STAT"},
+            "IL-2": {"ic50_nm": 36.0, "pathway": "JAK1/JAK3 → STAT5"},
+            "IL-31": {"ic50_nm": 71.0, "pathway": "JAK1/JAK2 → STAT3"},
+            "IL-6": {"ic50_nm": 80.0, "pathway": "JAK1/JAK2 → STAT3"},
+            "IL-4": {"ic50_nm": 150.0, "pathway": "JAK1/JAK3 → STAT6"},
+            "IL-13": {"ic50_nm": 249.0, "pathway": "JAK1/TYK2 → STAT6"}
+          },
+          "ordering": "JAK1 < IL-2 < IL-31 < IL-6 < IL-4 < IL-13",
+          "selectivity": {
+            "IL-31_over_JAK1": 7.1,
+            "IL-4_over_JAK1": 15.0
+          }
+        }
+      },
+      "python_baseline": {
+        "path": "healthSpring/control/discovery/exp093_chembl_jak_panel.py",
+        "description": "ChEMBL JAK panel retrieval and IC50 comparison",
+        "hash_algorithm": "blake3",
+        "hash": null
+      },
+      "rust_validation": {
+        "binary": "validate_gonzales_ic50_s79",
+        "path": "barracuda/src/bin/validate_gonzales_ic50_s79.rs",
+        "checks": 35,
+        "status": "35/35 PASS"
+      },
+      "guidestone": {
+        "binary": "wetspring_gonzales_guidestone",
+        "checks": 29,
+        "status": "29/29 PASS"
+      },
+      "chembl": {
+        "compound_id": "CHEMBL2366511",
+        "compound_name": "oclacitinib",
+        "trade_name": "Apoquel"
+      }
+    },
+    "fleck_gonzales_2021": {
+      "doi": "10.1111/vde.13028",
+      "title": "Pharmacokinetics of lokivetmab (Cytopoint) in healthy dogs",
+      "journal": "Vet Dermatol",
+      "year": 2021,
+      "volume": "32",
+      "pages": "681-e182",
+      "authors": ["Fleck TJ", "Norris LR", "Norris SM", "Gonzales AJ"],
+      "tables": {
+        "pk_parameters": {
+          "description": "Lokivetmab dose-dependent pharmacokinetic parameters",
+          "values": {
+            "low_dose": {"dose_mg_kg": 0.125, "duration_days": 14},
+            "mid_dose": {"dose_mg_kg": 0.5, "duration_days": 28},
+            "high_dose": {"dose_mg_kg": 2.0, "duration_days": 42}
+          }
+        }
+      },
+      "rust_validation": {
+        "binary": "validate_gonzales_ic50_s79",
+        "path": "barracuda/src/bin/validate_gonzales_ic50_s79.rs",
+        "checks": "included in gonzales_2014 validation suite"
+      }
+    },
+    "gonzales_2013": {
+      "doi": "10.1111/j.1365-3164.2012.01090.x",
+      "title": "Interleukin-31: its role in canine pruritus and naturally occurring canine atopic dermatitis",
+      "journal": "Vet Dermatol",
+      "year": 2013,
+      "volume": "24",
+      "pages": "48-53",
+      "authors": ["Gonzales AJ", "Humphrey WR", "Messamore JE", "Fleck TJ", "Fici GJ", "Shelly JA", "Teel JF", "Bammert GF", "Dunham SA", "Fuller TE", "Mccall RB"],
+      "tables": {
+        "serum_il31": {
+          "description": "Serum IL-31 levels in atopic vs healthy dogs",
+          "values": {
+            "note": "Elevated IL-31 correlates with pruritus severity"
+          }
+        }
+      }
+    }
+  },
+  "external_sources": {
+    "chembl": {
+      "base_url": "https://www.ebi.ac.uk/chembl/api/data/",
+      "compounds": {
+        "oclacitinib": "CHEMBL2366511",
+        "tofacitinib": "CHEMBL221959",
+        "ruxolitinib": "CHEMBL1789941",
+        "baricitinib": "CHEMBL3301610"
+      },
+      "fetch_method": "data.fetch.chembl"
+    },
+    "pubchem": {
+      "base_url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/",
+      "fetch_method": "data.fetch.pubchem"
+    },
+    "ncbi": {
+      "base_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/",
+      "fetch_method": "science.ncbi_fetch",
+      "note": "Future: canine AD genomics datasets"
+    }
+  },
+  "validation_chain": {
+    "description": "Paper → Python → Rust → ecoPrimals composition",
+    "stages": [
+      {
+        "name": "source",
+        "description": "Published peer-reviewed paper with DOI",
+        "artifact": "DOI + table values"
+      },
+      {
+        "name": "python_baseline",
+        "description": "Python script reproducing published values (healthSpring)",
+        "artifact": "BLAKE3 hash of script + output"
+      },
+      {
+        "name": "rust_validation",
+        "description": "Rust binary validating computations match published values",
+        "artifact": "Binary name + check count + PASS/FAIL"
+      },
+      {
+        "name": "guidestone",
+        "description": "guideStone scenario validation (29 domain checks)",
+        "artifact": "Binary name + check count + PASS/FAIL"
+      },
+      {
+        "name": "nucleus_composition",
+        "description": "Live NUCLEUS deployment with provenance trio wrapping",
+        "artifact": "Provenance braid ID + Merkle root"
+      }
+    ]
+  }
+}

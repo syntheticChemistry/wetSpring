@@ -1,0 +1,115 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Reproduction Manifest — pinned primal versions for wetSpring science pipeline.
+#
+# Mirrors plasmidBin manifest.lock format but scoped to ONLY the primals
+# required by wetspring_science_nucleus.toml. A visitor can reproduce the
+# entire science pipeline with these exact versions.
+#
+# Usage:
+#   cd plasmidBin && ./fetch.sh --tag v0.7.0
+#   biomeos deploy --graph graphs/wetspring_science_nucleus.toml
+
+[meta]
+generated = "2026-04-06T00:00:00Z"
+deploy_graph = "wetspring_science_nucleus.toml"
+pipeline_version = "1.0.0"
+source_manifest = "plasmidBin/manifest.lock"
+description = "Minimal reproduction set for wetSpring science NUCLEUS"
+
+# ── Orchestration ─────────────────────────────────────────────────────
+
+[primals.biomeos]
+version = "0.1.0"
+domain = "orchestration"
+tier = "genomeBin"
+required = true
+role = "Graph deployment and capability routing"
+
+# ── Tower Atomic (security + discovery) ───────────────────────────────
+
+[primals.beardog]
+version = "0.9.0"
+domain = "crypto"
+tier = "genomeBin"
+required = true
+role = "Dark Forest token verification, crypto identity"
+
+[primals.songbird]
+version = "0.2.1"
+domain = "discovery"
+tier = "genomeBin"
+required = true
+role = "Mesh discovery via BirdSong, TLS termination"
+
+# ── Nest Atomic (content-addressed storage) ───────────────────────────
+
+[primals.nestgate]
+version = "2.1.0"
+domain = "storage"
+tier = "genomeBin"
+required = false
+role = "Content-addressed storage for computation cache and reference data"
+
+# ── Node Atomic (compute dispatch) ────────────────────────────────────
+
+[primals.toadstool]
+version = "0.1.0"
+domain = "compute"
+tier = "genomeBin"
+required = false
+role = "GPU/NPU/CPU compute dispatch"
+
+# ── Provenance Trio ───────────────────────────────────────────────────
+
+[primals.rhizocrypt]
+version = "0.14.0-dev"
+domain = "dag"
+tier = "genomeBin"
+required = false
+role = "Ephemeral DAG sessions for provenance tracking"
+
+[primals.loamspine]
+version = "0.9.13"
+domain = "lineage"
+tier = "genomeBin"
+required = false
+role = "Immutable linear ledger commits"
+
+[primals.sweetgrass]
+version = "0.7.27"
+domain = "provenance"
+tier = "genomeBin"
+required = false
+role = "Semantic provenance braids (PROV-O aligned)"
+
+# ── Science + Visualization ───────────────────────────────────────────
+
+[springs.wetspring]
+version = "0.7.0"
+domain = "metagenomics"
+tier = "ecoBin"
+required = true
+role = "Life science IPC — dose-response, PK, tissue, Anderson"
+
+[primals.petaltongue]
+version = "1.6.6"
+domain = "visualization"
+tier = "genomeBin"
+required = false
+role = "Grammar-of-graphics server-side SVG rendering"
+
+# ── Facade (built from wetSpring source) ──────────────────────────────
+
+[facade]
+binary = "wetspring_science_facade"
+source = "springs/wetSpring/barracuda"
+features = ["facade"]
+role = "HTTP gateway — Dark Forest gated, CORS, progressive provenance"
+
+# ── Reproduction commands ─────────────────────────────────────────────
+
+[reproduce]
+fetch = "cd plasmidBin && ./fetch.sh --tag v0.7.0"
+deploy = "biomeos deploy --graph graphs/wetspring_science_nucleus.toml"
+verify = "curl -s https://lab.primals.eco/api/v1/health | jq .status"

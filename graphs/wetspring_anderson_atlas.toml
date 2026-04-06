@@ -1,0 +1,110 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Anderson Atlas Exploration — 28-biome QS atlas workflow.
+#
+# Explores the Anderson localization framework across 28 biomes:
+# disorder sweep → W_c estimation → finite-size scaling → O2-modulated W model.
+#
+# Also includes tissue geometry, hormesis, and cross-species for the
+# full immunological Anderson exploration (Papers 12, 14, Sub-thesis 01).
+#
+# Usage:
+#   biomeos deploy --graph graphs/wetspring_anderson_atlas.toml
+
+[graph]
+name = "wetspring_anderson_atlas"
+description = "28-biome Anderson atlas — disorder sweep + tissue + hormesis + cross-species"
+version = "1.0.0"
+coordination = "sequential"
+
+# ── Pre-existing substrate ───────────────────────────────────────
+
+[[graph.node]]
+name = "biomeos"
+binary = "biomeos"
+order = 0
+required = true
+spawn = false
+health_method = "graph.list"
+by_capability = "orchestration"
+capabilities = ["capability.discover"]
+
+# ── Tower ────────────────────────────────────────────────────────
+
+[[graph.node]]
+name = "beardog"
+binary = "beardog_primal"
+order = 1
+required = true
+depends_on = ["biomeos"]
+health_method = "health.liveness"
+by_capability = "security"
+capabilities = ["crypto.sign"]
+
+[[graph.node]]
+name = "songbird"
+binary = "songbird_primal"
+order = 2
+required = true
+depends_on = ["biomeos"]
+health_method = "health.liveness"
+by_capability = "discovery"
+capabilities = ["discovery.find_primals"]
+
+# ── Compute (GPU for Anderson spectral) ──────────────────────────
+
+[[graph.node]]
+name = "toadstool"
+binary = "toadstool_primal"
+order = 3
+required = true
+depends_on = ["beardog", "songbird"]
+health_method = "compute.health"
+by_capability = "compute"
+capabilities = ["compute.dispatch.submit", "compute.execute"]
+
+# ── Visualization ────────────────────────────────────────────────
+
+[[graph.node]]
+name = "petaltongue"
+binary = "petaltongue"
+order = 4
+required = true
+depends_on = ["beardog", "songbird"]
+health_method = "health.liveness"
+by_capability = "visualization"
+capabilities = ["visualization.render", "visualization.render.dashboard"]
+
+# ── Science primal ───────────────────────────────────────────────
+
+[[graph.node]]
+name = "wetspring"
+binary = "wetspring"
+order = 10
+required = true
+depends_on = ["beardog", "songbird", "toadstool"]
+health_method = "health.check"
+by_capability = "ecology"
+args = ["server"]
+capabilities = [
+    "science.anderson",
+    "science.anderson.biome_atlas",
+    "science.anderson.disorder_sweep",
+    "science.anderson.hormesis",
+    "science.anderson.cross_species",
+    "science.gonzales.tissue_lattice",
+    "science.diversity",
+]
+
+# ── Validation ───────────────────────────────────────────────────
+
+[[graph.node]]
+name = "validate_atlas"
+binary = "primalspring_primal"
+order = 99
+required = false
+spawn = false
+depends_on = ["wetspring", "petaltongue"]
+health_method = "capability.list"
+by_capability = "coordination"
+capabilities = ["coordination.validate_composition"]

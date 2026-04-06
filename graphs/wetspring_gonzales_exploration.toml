@@ -1,0 +1,111 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Gonzales Dermatitis Science Workflow — interactive exploration.
+#
+# Orchestrates the Gonzales dermatitis science pipeline:
+# dose-response sweep → PK decay → tissue lattice → Anderson spectral →
+# hormesis zone → cross-species comparison.
+#
+# Each step is a capability.call to existing science.* methods on wetSpring.
+# petalTongue renders the full_gonzales_scenario composite visualization.
+#
+# Requires: wetspring_niche.toml deployed first (Tower + wetSpring + petalTongue).
+#
+# Usage:
+#   biomeos deploy --graph graphs/wetspring_gonzales_exploration.toml
+
+[graph]
+name = "wetspring_gonzales_exploration"
+description = "Gonzales dermatitis interactive science — IC50 + PK + tissue + hormesis + cross-species"
+version = "1.0.0"
+coordination = "sequential"
+
+# ── Pre-existing substrate ───────────────────────────────────────
+
+[[graph.node]]
+name = "biomeos"
+binary = "biomeos"
+order = 0
+required = true
+spawn = false
+health_method = "graph.list"
+by_capability = "orchestration"
+capabilities = ["capability.discover"]
+
+# ── Tower ────────────────────────────────────────────────────────
+
+[[graph.node]]
+name = "beardog"
+binary = "beardog_primal"
+order = 1
+required = true
+depends_on = ["biomeos"]
+health_method = "health.liveness"
+by_capability = "security"
+capabilities = ["crypto.sign"]
+
+[[graph.node]]
+name = "songbird"
+binary = "songbird_primal"
+order = 2
+required = true
+depends_on = ["biomeos"]
+health_method = "health.liveness"
+by_capability = "discovery"
+capabilities = ["discovery.find_primals"]
+
+# ── Compute ──────────────────────────────────────────────────────
+
+[[graph.node]]
+name = "toadstool"
+binary = "toadstool_primal"
+order = 3
+required = false
+depends_on = ["beardog", "songbird"]
+health_method = "compute.health"
+by_capability = "compute"
+capabilities = ["compute.dispatch.submit"]
+
+# ── Visualization ────────────────────────────────────────────────
+
+[[graph.node]]
+name = "petaltongue"
+binary = "petaltongue"
+order = 4
+required = true
+depends_on = ["beardog", "songbird"]
+health_method = "health.liveness"
+by_capability = "visualization"
+capabilities = ["visualization.render", "visualization.render.dashboard"]
+
+# ── Science primal ───────────────────────────────────────────────
+
+[[graph.node]]
+name = "wetspring"
+binary = "wetspring"
+order = 10
+required = true
+depends_on = ["beardog", "songbird"]
+health_method = "health.check"
+by_capability = "ecology"
+args = ["server"]
+capabilities = [
+    "science.gonzales.dose_response",
+    "science.gonzales.pk_decay",
+    "science.gonzales.tissue_lattice",
+    "science.anderson.hormesis",
+    "science.anderson.cross_species",
+]
+
+# ── Validation ───────────────────────────────────────────────────
+
+[[graph.node]]
+name = "validate_gonzales"
+binary = "primalspring_primal"
+order = 99
+required = false
+spawn = false
+depends_on = ["wetspring", "petaltongue"]
+health_method = "capability.list"
+by_capability = "coordination"
+capabilities = ["coordination.validate_composition"]

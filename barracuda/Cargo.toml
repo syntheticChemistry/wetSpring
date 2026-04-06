@@ -31,13 +31,17 @@ npu = ["dep:akida-driver"]
 json = ["dep:serde", "dep:serde_json"]
 # IPC server for biomeOS science primal (wetspring-server binary).
 # Adds JSON-RPC 2.0 over Unix socket, Songbird registration, Neural API metrics.
-ipc = ["json", "dep:tracing-subscriber"]
+# BLAKE3 for data ingestion content hashing (data.fetch, vault handlers).
+ipc = ["json", "dep:tracing-subscriber", "dep:blake3"]
 # Nautilus Shell: evolutionary reservoir computing for bio sentinel monitoring.
 # Adds concept edge detection, drift monitoring, evolutionary adaptation.
 nautilus = ["dep:bingocube-nautilus", "bingocube-nautilus/json"]
 # Genomic vault: encrypted consent-gated data storage.
 # Adds ChaCha20-Poly1305 AEAD, Ed25519 signing, BLAKE3 hashing.
 vault = ["dep:chacha20poly1305", "dep:ed25519-dalek", "dep:blake3"]
+# Science facade: HTTP gateway for primals.eco live interactive science.
+# Adds Axum web server, tower-http CORS, tokio async runtime, BLAKE3 hashing.
+facade = ["json", "dep:axum", "dep:tower-http", "dep:tokio", "dep:tracing-subscriber", "dep:blake3"]
 
 [dependencies]
 # serde: derive Serialize/Deserialize for visualization types (petalTongue schema).
@@ -58,12 +62,12 @@ thiserror = "2"
 # New: shaders::provenance (27 cross-spring shader records, evolution_report()),
 #      BatchedOdeRK45F64 (adaptive Dormand-Prince), mean_variance_to_buffer(),
 #      builder patterns (HmmForwardArgs, Dada2DispatchArgs, GillespieModel, etc.).
-barracuda = { path = "../../barraCuda/crates/barracuda", default-features = false }
+barracuda = { path = "../../../primals/barraCuda/crates/barracuda", default-features = false }
 
 # akida-driver — pure Rust NPU access (BrainChip AKD1000/AKD1500).
 # Independent of barraCuda; sourced from toadStool neuromorphic crates.
 # Runtime discovery, capability-based dispatch, zero mocks.
-akida-driver = { path = "../../phase1/toadStool/crates/neuromorphic/akida-driver", optional = true }
+akida-driver = { path = "../../../primals/toadStool/crates/neuromorphic/akida-driver", optional = true }
 
 # wgpu: WebGPU compute — hardware-agnostic GPU via Vulkan/Metal/DX12.
 # Same version as barraCuda to prevent duplicate symbol linking errors.
@@ -78,7 +82,7 @@ tokio = { version = "1", features = ["rt", "macros"], optional = true }
 # Pure Rust + serde, no GPU deps. Used for Nautilus Shell bio bridge (concept edge
 # detection, drift monitoring, evolutionary adaptation for bio sentinel).
 # Cross-spring provenance: primalTools/bingoCube (shared ecosystem tool).
-bingocube-nautilus = { path = "../../primalTools/bingoCube/nautilus", optional = true }
+bingocube-nautilus = { path = "../../../primals/bingoCube/nautilus", optional = true }
 
 # tracing: structured diagnostic logging (replaces ad-hoc eprintln! in IPC/server code).
 # Pure Rust, zero C deps, ~4KB. Used by 4+ sibling springs (coralReef, neuralSpring, etc.).
@@ -94,6 +98,11 @@ bytemuck = { version = "1", features = ["derive"] }
 # Uses miniz_oxide (pure Rust) by default — no C zlib, ecoBin compliant.
 # XML parsing is sovereign (src/io/xml.rs); base64 is sovereign (src/encoding.rs).
 flate2 = { version = "1.0", default-features = false, features = ["rust_backend"] }
+
+# Axum: web framework for the science facade HTTP gateway.
+axum = { version = "0.8", optional = true, default-features = false, features = ["json", "query", "tokio", "http1"] }
+# tower-http: middleware for CORS headers on the science facade.
+tower-http = { version = "0.6", optional = true, default-features = false, features = ["cors"] }
 
 # Vault: sovereign crypto (pure Rust, ecoBin compliant).
 # ChaCha20-Poly1305 AEAD (RustCrypto), Ed25519 (dalek), BLAKE3 hashing.
@@ -1888,3 +1897,14 @@ path = "src/bin/validate_qs_gene_profiling_v1.rs"
 [[bin]]
 name = "validate_stable_specials_v1"
 path = "src/bin/validate_stable_specials_v1.rs"
+
+# ── guideStone: Gonzales Interactive Science Artifact ──
+[[bin]]
+name = "wetspring_gonzales_guidestone"
+path = "src/bin/wetspring_gonzales_guidestone.rs"
+
+# ── Science Facade: HTTP gateway for primals.eco live science ──
+[[bin]]
+name = "wetspring_science_facade"
+path = "src/bin/wetspring_science_facade.rs"
+required-features = ["facade"]

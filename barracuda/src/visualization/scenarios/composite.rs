@@ -184,6 +184,109 @@ pub fn full_ecology_scenario(
     (s, all_edges)
 }
 
+/// Full Gonzales dermatitis exploration scenario.
+///
+/// Composes dose-response, PK, tissue geometry, hormesis, and
+/// cross-species comparisons into a single interactive dashboard.
+#[must_use]
+pub fn full_gonzales_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
+    let mut s = scaffold(
+        "Gonzales Dermatitis Explorer",
+        "Full interactive dashboard: IC50 + PK + tissue + hormesis + cross-species",
+    );
+
+    let (gonzales, mut gonzales_edges) = super::gonzales_scenario();
+    let (tissue, mut tissue_edges) = super::tissue_geometry_scenario();
+    let (hormesis, mut hormesis_edges) = super::hormesis_scenario();
+    let (cross_sp, mut cross_edges) = super::cross_species_scenario();
+
+    for n in gonzales.nodes {
+        s.nodes.push(n);
+    }
+    for n in tissue.nodes {
+        s.nodes.push(n);
+    }
+    for n in hormesis.nodes {
+        s.nodes.push(n);
+    }
+    for n in cross_sp.nodes {
+        s.nodes.push(n);
+    }
+
+    let mut all_edges = Vec::new();
+    all_edges.append(&mut gonzales_edges);
+    all_edges.append(&mut tissue_edges);
+    all_edges.append(&mut hormesis_edges);
+    all_edges.append(&mut cross_edges);
+    all_edges.push(edge(
+        "gonzales_ic50",
+        "tissue_lattice",
+        "IC50 → tissue disorder",
+    ));
+    all_edges.push(edge(
+        "tissue_dimension",
+        "hormesis_response",
+        "tissue dimension → hormesis",
+    ));
+    all_edges.push(edge(
+        "cross_species_anderson",
+        "hormesis_disorder",
+        "species disorder → hormesis W",
+    ));
+
+    (s, all_edges)
+}
+
+/// Full Anderson exploration scenario.
+///
+/// Composes Anderson spectral + tissue geometry + hormesis + cross-species
+/// for the 28-biome atlas exploration (Papers 12, 14, Sub-thesis 01).
+#[must_use]
+pub fn full_anderson_exploration_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
+    let mut s = scaffold(
+        "Anderson Exploration Atlas",
+        "28-biome atlas + tissue geometry + hormesis + cross-species (Papers 12, 14)",
+    );
+
+    let w_values = [10.0, 12.0, 14.0, 16.0, 18.0, 20.0];
+    let t_values = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0];
+    let (anderson, _) = super::anderson_scenario(0.45, &w_values, &t_values);
+    let (tissue, mut tissue_edges) = super::tissue_geometry_scenario();
+    let (hormesis, mut hormesis_edges) = super::hormesis_scenario();
+    let (cross_sp, mut cross_edges) = super::cross_species_scenario();
+
+    for n in anderson.nodes {
+        s.nodes.push(n);
+    }
+    for n in tissue.nodes {
+        s.nodes.push(n);
+    }
+    for n in hormesis.nodes {
+        s.nodes.push(n);
+    }
+    for n in cross_sp.nodes {
+        s.nodes.push(n);
+    }
+
+    let mut all_edges = Vec::new();
+    all_edges.append(&mut tissue_edges);
+    all_edges.append(&mut hormesis_edges);
+    all_edges.append(&mut cross_edges);
+    all_edges.push(edge("anderson", "tissue_lattice", "spectral → tissue"));
+    all_edges.push(edge(
+        "tissue_dimension",
+        "hormesis_response",
+        "dimension → hormesis",
+    ));
+    all_edges.push(edge(
+        "cross_species_anderson",
+        "anderson",
+        "species W → spectral",
+    ));
+
+    (s, all_edges)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -217,6 +320,20 @@ mod tests {
         let labels = vec!["S1".into()];
         let (s, edges) = full_ecology_scenario(&samples, &labels);
         assert!(s.nodes.len() >= 10);
+        assert!(!edges.is_empty());
+    }
+
+    #[test]
+    fn full_gonzales_builds() {
+        let (s, edges) = full_gonzales_scenario();
+        assert!(s.nodes.len() >= 8);
+        assert!(!edges.is_empty());
+    }
+
+    #[test]
+    fn full_anderson_exploration_builds() {
+        let (s, edges) = full_anderson_exploration_scenario();
+        assert!(s.nodes.len() >= 6);
         assert!(!edges.is_empty());
     }
 }

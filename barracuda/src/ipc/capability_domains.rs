@@ -15,7 +15,13 @@ pub const DOMAIN: &str = "ecology";
 
 /// Recognised domain prefixes for validation.
 #[cfg(test)]
-const VALID_DOMAIN_PREFIXES: &[&str] = &["ecology.", "health", "provenance", "brain", "metrics"];
+const VALID_DOMAIN_PREFIXES: &[&str] = &[
+    "ecology.",
+    "health",
+    "provenance",
+    "brain",
+    "metrics",
+];
 
 /// All capability domains this primal registers with Songbird.
 ///
@@ -81,6 +87,25 @@ pub const DOMAINS: &[CapabilityDomain] = &[
         name: "ecology.pipeline",
         description: "End-to-end 16S amplicon analysis pipeline",
         methods: &["science.full_pipeline"],
+    },
+    CapabilityDomain {
+        name: "ecology.gonzales",
+        description: "Gonzales dermatitis: IC50 dose-response, PK decay, tissue lattice (Papers 53-58)",
+        methods: &[
+            "science.gonzales.dose_response",
+            "science.gonzales.pk_decay",
+            "science.gonzales.tissue_lattice",
+        ],
+    },
+    CapabilityDomain {
+        name: "ecology.anderson_exploration",
+        description: "Anderson localization exploration: biome atlas, disorder sweep, hormesis, cross-species",
+        methods: &[
+            "science.anderson.biome_atlas",
+            "science.anderson.disorder_sweep",
+            "science.anderson.hormesis",
+            "science.anderson.cross_species",
+        ],
     },
     // ── health probes ──────────────────────────────────────────────
     CapabilityDomain {
@@ -190,17 +215,17 @@ mod tests {
     fn total_capability_count_matches_registry() {
         assert_eq!(
             DOMAINS.len(),
-            16,
-            "16 domains (11 ecology + health + provenance + brain + metrics + ai_assist)"
+            18,
+            "18 domains (13 ecology + health + provenance + brain + metrics + ai_assist)"
         );
         let total_methods: usize = DOMAINS.iter().map(|d| d.methods.len()).sum();
-        assert_eq!(total_methods, 23, "23 total capability methods");
+        assert_eq!(total_methods, 30, "30 total capability methods");
     }
 
     #[test]
     fn all_methods_returns_flat_list() {
         let methods = all_methods();
-        assert_eq!(methods.len(), 23);
+        assert_eq!(methods.len(), 30);
         assert!(methods.contains(&"science.diversity"));
         assert!(methods.contains(&"health.liveness"));
         assert!(methods.contains(&"health.readiness"));
@@ -208,5 +233,8 @@ mod tests {
         assert!(methods.contains(&"brain.observe"));
         assert!(methods.contains(&"metrics.snapshot"));
         assert!(methods.contains(&"ai.ecology_interpret"));
+        assert!(methods.contains(&"science.gonzales.dose_response"));
+        assert!(methods.contains(&"science.anderson.biome_atlas"));
+        assert!(methods.contains(&"science.anderson.hormesis"));
     }
 }

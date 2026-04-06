@@ -1,0 +1,158 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# wetSpring Science Facade — HTTP gateway for primals.eco live science.
+#
+# Deploys the science facade as a thin Axum service that translates
+# browser REST requests into wetSpring JSON-RPC calls, with progressive
+# provenance from the trio and petalTongue grammar rendering.
+#
+# Sits behind cloudflared tunnel (lab.primals.eco) with Dark Forest gate.
+#
+# Prerequisites:
+#   1. wetSpring science primal running (JSON-RPC socket)
+#   2. biomeOS + Tower running for Dark Forest auth
+#   3. cloudflared configured with lab.primals.eco hostname
+#   4. Optional: petalTongue for grammar rendering
+#   5. Optional: provenance trio for Tier 2/3 lineage
+#
+# Usage:
+#   biomeos deploy --graph graphs/wetspring_science_facade.toml
+
+[graph]
+name = "wetspring_science_facade"
+description = "primals.eco live science — HTTP facade with provenance and petalTongue rendering"
+version = "1.0.0"
+coordination = "sequential"
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 0: Orchestration (pre-existing)
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.node]]
+name = "biomeos"
+binary = "biomeos"
+order = 0
+required = true
+spawn = false
+health_method = "graph.list"
+by_capability = "orchestration"
+capabilities = ["capability.discover", "graph.list"]
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 1: Security + Discovery (pre-existing)
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.node]]
+name = "beardog"
+binary = "beardog_primal"
+order = 1
+required = true
+spawn = false
+health_method = "health.liveness"
+by_capability = "security"
+capabilities = ["crypto.sign", "crypto.verify"]
+
+[[graph.node]]
+name = "songbird"
+binary = "songbird_primal"
+order = 2
+required = true
+spawn = false
+health_method = "health.liveness"
+by_capability = "discovery"
+capabilities = ["discovery.find_primals", "mesh.announce"]
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 2: Science (required — the facade's data source)
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.node]]
+name = "wetspring"
+binary = "wetspring"
+order = 10
+required = true
+depends_on = ["beardog", "songbird"]
+health_method = "health.check"
+by_capability = "ecology"
+args = ["server"]
+capabilities = [
+    "science.gonzales.dose_response",
+    "science.gonzales.pk_decay",
+    "science.gonzales.tissue_lattice",
+    "science.anderson.hormesis",
+    "science.anderson.cross_species",
+    "science.anderson.biome_atlas",
+    "science.anderson.disorder_sweep",
+]
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 3: Visualization (optional — petalTongue grammar rendering)
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.node]]
+name = "petaltongue"
+binary = "petaltongue"
+order = 11
+required = false
+depends_on = ["beardog", "songbird"]
+health_method = "health.liveness"
+by_capability = "visualization"
+capabilities = ["visualization.render.grammar"]
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 4: Provenance Trio (optional — progressive degradation)
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.node]]
+name = "rhizocrypt"
+binary = "rhizocrypt_primal"
+order = 12
+required = false
+depends_on = ["beardog", "songbird"]
+health_method = "health.liveness"
+by_capability = "provenance"
+capabilities = ["dag.create_session", "dag.append_event"]
+
+[[graph.node]]
+name = "loamspine"
+binary = "loamspine_primal"
+order = 13
+required = false
+depends_on = ["beardog", "songbird", "rhizocrypt"]
+health_method = "health.liveness"
+by_capability = "ledger"
+capabilities = ["session.commit", "entry.get"]
+
+[[graph.node]]
+name = "sweetgrass"
+binary = "sweetgrass_primal"
+order = 14
+required = false
+depends_on = ["beardog", "songbird", "loamspine"]
+health_method = "health.liveness"
+by_capability = "semantic_provenance"
+capabilities = ["braid.create", "provenance.export_provo"]
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 5: Science Facade (the HTTP gateway)
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.node]]
+name = "science_facade"
+binary = "wetspring_science_facade"
+order = 20
+required = true
+depends_on = ["wetspring"]
+health_method = "health.check"
+by_capability = "http_gateway"
+args = []
+capabilities = [
+    "http.science.gonzales",
+    "http.science.anderson",
+    "http.render.grammar",
+    "http.provenance.query",
+]
+
+[graph.node.env]
+FACADE_BIND = "127.0.0.1:3100"
+FACADE_CORS_ORIGIN = "https://primals.eco"

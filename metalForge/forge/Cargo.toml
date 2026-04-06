@@ -15,7 +15,7 @@ publish = false
 workspace = true
 
 [dependencies]
-barracuda = { path = "../../../barraCuda/crates/barracuda" }
+barracuda = { path = "../../../../primals/barraCuda/crates/barracuda" }
 tempfile = "3"
 wetspring-barracuda = { path = "../../barracuda", default-features = false, features = ["json", "ipc"] }
 

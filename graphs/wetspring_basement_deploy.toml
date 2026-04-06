@@ -1,0 +1,149 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# wetSpring Basement HPC Deployment — science niche on the mesh.
+#
+# Deploys the Gonzales interactive science substrate on the basement HPC.
+# Uses the covalent mesh (shared FAMILY_ID) with gate-specific assignments:
+#
+#   biomegate  — wetSpring science primal (TR 3970X, Titan V x2, MI50 x2, 256GB)
+#                Best for: Anderson spectral (HBM2 math), large disorder sweeps,
+#                28-biome atlas, GPU-accelerated diversity.
+#
+#   northgate  — petalTongue visualization (i9-14900K, RTX 5090, 192GB DDR5)
+#                Best for: egui rendering, dashboard display, LAN-accessible.
+#                The display gate — connect a monitor or access via LAN.
+#
+#   eastgate   — toadStool compute dispatch (i9-12900, RTX 4070, Akida NPU)
+#                Best for: heterogeneous dispatch, NPU inference, dev testing.
+#
+# Any gate with a GPU can run wetSpring; these are optimal assignments.
+# The mesh discovers peers via BirdSong UDP multicast (239.255.0.1:4200).
+#
+# Prerequisites:
+#   1. Tower (BearDog + Songbird) running on at least one gate
+#   2. Covalent mesh established (shared .family.seed)
+#   3. biomeos nucleus running on target gates
+#
+# Usage:
+#   # On biomegate:
+#   biomeos deploy --graph graphs/wetspring_basement_deploy.toml
+#
+#   # Or manually:
+#   wetspring server  # starts JSON-RPC on $XDG_RUNTIME_DIR/biomeos/wetspring.sock
+
+[graph]
+name = "wetspring_basement_deploy"
+description = "wetSpring Gonzales science on basement HPC mesh — biomegate + northgate + eastgate"
+version = "1.0.0"
+coordination = "sequential"
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 0: biomeOS (pre-existing on mesh)
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.node]]
+name = "biomeos"
+binary = "biomeos"
+order = 0
+required = true
+spawn = false
+health_method = "graph.list"
+by_capability = "orchestration"
+capabilities = ["capability.discover", "graph.list"]
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 1: Tower Atomic (already running on mesh)
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.node]]
+name = "beardog"
+binary = "beardog_primal"
+order = 1
+required = true
+spawn = false
+health_method = "health.liveness"
+by_capability = "security"
+capabilities = ["crypto.sign", "crypto.verify"]
+
+[[graph.node]]
+name = "songbird"
+binary = "songbird_primal"
+order = 2
+required = true
+spawn = false
+health_method = "health.liveness"
+by_capability = "discovery"
+capabilities = ["discovery.find_primals", "mesh.announce"]
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 2: Compute — toadStool on eastgate (GPU + NPU dispatch)
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.node]]
+name = "toadstool"
+binary = "toadstool_primal"
+order = 3
+required = false
+depends_on = ["beardog", "songbird"]
+health_method = "compute.health"
+by_capability = "compute"
+capabilities = ["compute.dispatch.submit", "compute.execute"]
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 3: Visualization — petalTongue on northgate (RTX 5090)
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.node]]
+name = "petaltongue"
+binary = "petaltongue"
+order = 4
+required = true
+depends_on = ["beardog", "songbird"]
+health_method = "health.liveness"
+by_capability = "visualization"
+capabilities = ["visualization.render", "visualization.render.dashboard"]
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 4: Science — wetSpring on biomegate (HBM2 math, 256GB)
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.node]]
+name = "wetspring"
+binary = "wetspring"
+order = 10
+required = true
+depends_on = ["beardog", "songbird"]
+health_method = "health.check"
+by_capability = "ecology"
+args = ["server"]
+capabilities = [
+    # Core science
+    "science.diversity",
+    "science.anderson",
+    "science.qs_model",
+    "science.full_pipeline",
+    # Gonzales dermatitis
+    "science.gonzales.dose_response",
+    "science.gonzales.pk_decay",
+    "science.gonzales.tissue_lattice",
+    # Anderson exploration
+    "science.anderson.biome_atlas",
+    "science.anderson.disorder_sweep",
+    "science.anderson.hormesis",
+    "science.anderson.cross_species",
+]
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 5: Validation
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.node]]
+name = "validate_basement"
+binary = "primalspring_primal"
+order = 99
+required = false
+spawn = false
+depends_on = ["wetspring", "petaltongue"]
+health_method = "capability.list"
+by_capability = "coordination"
+capabilities = ["coordination.validate_composition"]

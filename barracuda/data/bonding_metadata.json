@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0.0",
+  "spring": "wetSpring",
+  "facade": "wetspring_science_facade",
+  "description": "Bond type declarations for wetSpring science facade — defines how this NUCLEUS participates in inter-spring and external collaboration.",
+
+  "bond_types": {
+    "Covalent": {
+      "description": "LAN mesh bonding — same family, same biomeOS instance, full trust",
+      "trust_model": "GeneticLineage",
+      "discovery": "BirdSong multicast on 239.255.0.1:4200",
+      "auth": "Family seed — BearDog crypto.verify",
+      "capabilities": [
+        "science.gonzales.*",
+        "science.anderson.*",
+        "science.diversity",
+        "science.qs_model",
+        "science.full_pipeline",
+        "data.fetch.*",
+        "vault.*",
+        "provenance.*",
+        "composition.*"
+      ],
+      "data_egress": false,
+      "provenance_required": true
+    },
+    "Ionic": {
+      "description": "Cross-family / external researcher bonding — metered, contract-scoped, provenance-wrapped",
+      "trust_model": "Contractual",
+      "discovery": "cloudflared tunnel → lab.primals.eco",
+      "auth": "Dark Forest token → BearDog birdsong.decrypt",
+      "capabilities": [
+        "science.gonzales.dose_response",
+        "science.gonzales.pk_decay",
+        "science.gonzales.tissue_lattice",
+        "science.anderson.hormesis",
+        "science.anderson.cross_species",
+        "science.anderson.biome_atlas",
+        "science.anderson.disorder_sweep",
+        "composition.science_health",
+        "http.validation.chain"
+      ],
+      "data_egress": false,
+      "provenance_required": true,
+      "contract_fields": [
+        "collaborator_identity",
+        "capability_scope",
+        "duration",
+        "attribution_requirements",
+        "data_return_policy"
+      ],
+      "gap": "Ionic contract negotiation protocol not yet implemented — owned by primalSpring Track 4 (BondingConstraint + BondingPolicy)"
+    }
+  },
+
+  "trust_models": {
+    "GeneticLineage": {
+      "description": "Same family seed — implicit full trust within the biomeOS mesh",
+      "verification": "BearDog crypto.verify with family keypair"
+    },
+    "Contractual": {
+      "description": "Explicit contract with capability scoping and provenance audit trail",
+      "verification": "Dark Forest gate + per-request consent check",
+      "gap": "Contract negotiation and lifecycle management not yet implemented"
+    }
+  },
+
+  "provenance_policy": {
+    "all_responses_wrapped": true,
+    "minimum_tier": 1,
+    "trio_required_for_ionic": true,
+    "nft_vertex_emitted": true,
+    "license": {
+      "code": "AGPL-3.0-or-later",
+      "data_model": "ORC",
+      "content": "CC-BY-SA-4.0"
+    }
+  },
+
+  "gaps": [
+    {
+      "id": "ionic-negotiation",
+      "owner": "primalSpring Track 4",
+      "description": "No protocol for establishing, modifying, or terminating ionic bonds"
+    },
+    {
+      "id": "cross-spring-data-exchange",
+      "owner": "RootPulse team",
+      "description": "NestGate stores locally but no protocol for provenance-wrapped data pull by remote springs"
+    },
+    {
+      "id": "public-anchor",
+      "owner": "loamSpine team",
+      "description": "Provenance braids have no public chain anchor mechanism yet"
+    }
+  ]
+}

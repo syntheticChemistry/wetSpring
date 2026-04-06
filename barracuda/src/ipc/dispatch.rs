@@ -49,6 +49,15 @@ pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
         "science.phylogenetics" => handlers::handle_phylogenetics(params),
         "science.nmf" => handlers::handle_nmf(params),
 
+        // Gonzales dermatitis / immunological Anderson
+        "science.gonzales.dose_response" => handlers::handle_dose_response(params),
+        "science.gonzales.pk_decay" => handlers::handle_pk_decay(params),
+        "science.gonzales.tissue_lattice" => handlers::handle_tissue_lattice(params),
+        "science.anderson.biome_atlas" => handlers::handle_biome_atlas(params),
+        "science.anderson.disorder_sweep" => handlers::handle_disorder_sweep(params),
+        "science.anderson.hormesis" => handlers::handle_hormesis(params),
+        "science.anderson.cross_species" => handlers::handle_cross_species(params),
+
         // Cross-spring time series
         "science.timeseries" => timeseries::handle_timeseries(params),
         "science.timeseries_diversity" => timeseries::handle_timeseries_diversity(params),
@@ -65,6 +74,19 @@ pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
 
         // AI assist (Squirrel)
         "ai.ecology_interpret" => handlers::handle_ai_ecology_interpret(params),
+
+        // External data ingestion
+        "data.fetch.chembl" => handlers::handle_chembl_fetch(params),
+        "data.fetch.pubchem" => handlers::handle_pubchem_fetch(params),
+        "data.fetch.register_table" => handlers::handle_register_table(params),
+
+        // Vault operations
+        "vault.store" => handlers::handle_vault_store(params),
+        "vault.retrieve" => handlers::handle_vault_retrieve(params),
+        "vault.consent.verify" => handlers::handle_vault_consent_verify(params),
+
+        // Composition health (cross-spring validation)
+        "composition.science_health" => handlers::handle_composition_science_health(params),
 
         _ => Err(RpcError::method_not_found(method)),
     }
@@ -192,7 +214,7 @@ mod tests {
     fn health_lists_capabilities() {
         let result = dispatch("health.check", &json!({})).unwrap();
         let caps = result["capabilities"].as_array().unwrap();
-        assert!(caps.len() >= 5);
+        assert!(caps.len() >= 12);
     }
 
     #[test]
@@ -290,7 +312,7 @@ mod tests {
         assert_eq!(result["domain"], "ecology");
 
         let domains = result["domains"].as_array().unwrap();
-        assert_eq!(domains.len(), 16);
+        assert_eq!(domains.len(), 18);
 
         let domain_names: Vec<&str> = domains.iter().filter_map(|d| d["name"].as_str()).collect();
         assert!(domain_names.contains(&"ecology.diversity"));
@@ -311,7 +333,7 @@ mod tests {
             .filter_map(|d| d["methods"].as_array())
             .map(Vec::len)
             .sum();
-        assert_eq!(total_methods, 23);
+        assert_eq!(total_methods, 30);
     }
 
     #[test]
@@ -348,6 +370,10 @@ mod tests {
                     "science.taxonomy", "science.phylogenetics", "science.nmf",
                     "science.ncbi_fetch", "science.full_pipeline",
                     "science.timeseries", "science.timeseries_diversity",
+                    "science.gonzales.dose_response", "science.gonzales.pk_decay",
+                    "science.gonzales.tissue_lattice",
+                    "science.anderson.biome_atlas", "science.anderson.disorder_sweep",
+                    "science.anderson.hormesis", "science.anderson.cross_species",
                     "provenance.begin", "provenance.record", "provenance.complete",
                     "brain.observe", "brain.attention", "brain.urgency",
                     "ai.ecology_interpret",

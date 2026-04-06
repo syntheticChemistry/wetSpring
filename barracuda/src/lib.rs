@@ -101,3 +101,5 @@ pub mod validation;
 pub mod vault;
 #[cfg(feature = "json")]
 pub mod visualization;
+#[cfg(feature = "facade")]
+pub mod facade;

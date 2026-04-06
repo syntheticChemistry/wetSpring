@@ -1,0 +1,197 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# wetSpring Science NUCLEUS — full primal ecosystem deployment.
+#
+# Supersedes wetspring_science_facade.toml: deploys the entire NUCLEUS
+# composition (Tower + Node + Nest + provenance trio) alongside the
+# science facade and petalTongue renderer.
+#
+# Every primal is exercised: Tower authenticates, Node computes,
+# Nest stores, the provenance trio wraps every datum, petalTongue
+# renders, and the science facade serves it all through Dark Forest.
+#
+# Usage:
+#   biomeos deploy --graph graphs/wetspring_science_nucleus.toml
+
+[graph]
+name = "wetspring_science_nucleus"
+description = "Full NUCLEUS science pipeline — Tower + Node + Nest + provenance trio + facade + petalTongue"
+version = "1.0.0"
+coordination = "sequential"
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 0: Orchestration (pre-existing)
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.node]]
+name = "biomeos"
+binary = "biomeos"
+order = 0
+required = true
+spawn = false
+health_method = "graph.list"
+by_capability = "orchestration"
+capabilities = ["capability.discover", "graph.list"]
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 1: Tower Atomic — BearDog + Songbird (security + discovery)
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.node]]
+name = "beardog"
+binary = "beardog_primal"
+order = 1
+required = true
+spawn = false
+health_method = "health.liveness"
+by_capability = "security"
+capabilities = ["crypto.sign", "crypto.verify", "birdsong.decrypt", "encryption.encrypt", "encryption.decrypt"]
+
+[[graph.node]]
+name = "songbird"
+binary = "songbird_primal"
+order = 2
+required = true
+spawn = false
+health_method = "health.liveness"
+by_capability = "discovery"
+capabilities = ["discovery.find_primals", "mesh.announce"]
+
+[graph.node.env]
+BIRDSONG_MULTICAST = "239.255.0.1:4200"
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 2: Nest Atomic — NestGate (content-addressed storage)
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.node]]
+name = "nestgate"
+binary = "nestgate_primal"
+order = 3
+required = false
+depends_on = ["beardog", "songbird"]
+health_method = "health.liveness"
+by_capability = "storage"
+capabilities = ["storage.store", "storage.retrieve", "storage.exists", "storage.list"]
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 3: Node Atomic — ToadStool (compute dispatch to GPU/NPU)
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.node]]
+name = "toadstool"
+binary = "toadstool_primal"
+order = 4
+required = false
+depends_on = ["beardog", "songbird"]
+health_method = "health.liveness"
+by_capability = "compute"
+capabilities = ["compute.dispatch.gpu", "compute.dispatch.npu", "compute.dispatch.cpu"]
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 4: Provenance Trio — rhizoCrypt + loamSpine + sweetGrass
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.node]]
+name = "rhizocrypt"
+binary = "rhizocrypt_primal"
+order = 5
+required = false
+depends_on = ["beardog", "songbird"]
+health_method = "health.liveness"
+by_capability = "provenance"
+capabilities = ["dag.create_session", "dag.append_event", "dag.dehydrate"]
+
+[[graph.node]]
+name = "loamspine"
+binary = "loamspine_primal"
+order = 6
+required = false
+depends_on = ["beardog", "songbird", "rhizocrypt"]
+health_method = "health.liveness"
+by_capability = "ledger"
+capabilities = ["commit.session", "entry.get", "entry.verify"]
+
+[[graph.node]]
+name = "sweetgrass"
+binary = "sweetgrass_primal"
+order = 7
+required = false
+depends_on = ["beardog", "songbird", "loamspine"]
+health_method = "health.liveness"
+by_capability = "semantic_provenance"
+capabilities = ["provenance.create_braid", "provenance.export_provo", "braid.get"]
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 5: Science — wetSpring IPC (the data source)
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.node]]
+name = "wetspring"
+binary = "wetspring"
+order = 10
+required = true
+depends_on = ["beardog", "songbird"]
+health_method = "health.check"
+by_capability = "ecology"
+args = ["server"]
+capabilities = [
+    "science.gonzales.dose_response",
+    "science.gonzales.pk_decay",
+    "science.gonzales.tissue_lattice",
+    "science.anderson.hormesis",
+    "science.anderson.cross_species",
+    "science.anderson.biome_atlas",
+    "science.anderson.disorder_sweep",
+    "science.diversity",
+    "science.qs_model",
+    "science.full_pipeline",
+    "data.fetch.chembl",
+    "data.fetch.pubchem",
+    "data.fetch.register_table",
+    "vault.store",
+    "vault.retrieve",
+    "vault.consent.verify",
+    "composition.science_health",
+]
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 6: Visualization — petalTongue grammar rendering
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.node]]
+name = "petaltongue"
+binary = "petaltongue"
+order = 11
+required = false
+depends_on = ["beardog", "songbird"]
+health_method = "health.liveness"
+by_capability = "visualization"
+capabilities = ["visualization.render.grammar", "visualization.render.scene"]
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 7: Science Facade — HTTP gateway (the public interface)
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.node]]
+name = "science_facade"
+binary = "wetspring_science_facade"
+order = 20
+required = true
+depends_on = ["wetspring"]
+health_method = "health.check"
+by_capability = "http_gateway"
+args = []
+capabilities = [
+    "http.science.gonzales",
+    "http.science.anderson",
+    "http.render.grammar",
+    "http.provenance.query",
+    "http.validation.chain",
+    "http.system.composition",
+]
+
+[graph.node.env]
+FACADE_BIND = "127.0.0.1:3100"
+FACADE_CORS_ORIGIN = "https://primals.eco"
+FACADE_DARK_FOREST = "true"

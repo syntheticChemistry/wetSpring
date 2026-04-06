@@ -19,23 +19,34 @@ mod ai;
 mod alignment;
 mod anderson;
 mod brain;
+mod data_fetch;
 mod drug;
 mod expanded;
+mod gonzales;
 mod kinetics;
 mod phylogenetics;
 mod science;
 mod taxonomy;
+mod vault_ipc;
 
 pub use ai::handle_ai_ecology_interpret;
 pub use brain::{handle_brain_attention, handle_brain_observe, handle_brain_urgency};
+pub use data_fetch::{handle_chembl_fetch, handle_pubchem_fetch, handle_register_table};
 pub use expanded::{
     handle_alignment, handle_kinetics, handle_nmf, handle_phylogenetics, handle_taxonomy,
+};
+pub use gonzales::{
+    handle_biome_atlas, handle_cross_species, handle_disorder_sweep, handle_dose_response,
+    handle_hormesis, handle_pk_decay, handle_tissue_lattice,
 };
 pub use science::{
     handle_anderson, handle_diversity, handle_full_pipeline, handle_ncbi_fetch, handle_qs_model,
 };
+pub use vault_ipc::{handle_vault_consent_verify, handle_vault_retrieve, handle_vault_store};
 
 use serde_json::{Value, json};
+
+const DEPLOY_GRAPH_NAME: &str = "wetspring_science_nucleus.toml";
 
 use crate::ipc::protocol::RpcError;
 
@@ -61,6 +72,13 @@ pub const CAPABILITIES: &[&str] = &[
     "science.nmf",
     "science.timeseries",
     "science.timeseries_diversity",
+    "science.gonzales.dose_response",
+    "science.gonzales.pk_decay",
+    "science.gonzales.tissue_lattice",
+    "science.anderson.biome_atlas",
+    "science.anderson.disorder_sweep",
+    "science.anderson.hormesis",
+    "science.anderson.cross_species",
     "provenance.begin",
     "provenance.record",
     "provenance.complete",
@@ -69,6 +87,13 @@ pub const CAPABILITIES: &[&str] = &[
     "brain.urgency",
     "metrics.snapshot",
     "ai.ecology_interpret",
+    "data.fetch.chembl",
+    "data.fetch.pubchem",
+    "data.fetch.register_table",
+    "vault.store",
+    "vault.retrieve",
+    "vault.consent.verify",
+    "composition.science_health",
 ];
 
 #[cfg(feature = "gpu")]
@@ -184,6 +209,45 @@ pub fn handle_health_readiness() -> Result<Value, RpcError> {
         "substrate": substrate,
         "capabilities": CAPABILITIES,
         "subsystems": subsystems,
+    }))
+}
+
+/// Cross-spring composition health check following primalSpring's
+/// `composition.*_health` pattern. Reports subsystem readiness so
+/// remote springs or primalSpring validators can verify this NUCLEUS
+/// is operational before attempting ionic bond interactions.
+pub fn handle_composition_science_health(_params: &Value) -> Result<Value, RpcError> {
+    #[cfg(feature = "gpu")]
+    let gpu_status = if try_gpu().is_some() { "available" } else { "unavailable" };
+    #[cfg(not(feature = "gpu"))]
+    let gpu_status = "not_compiled";
+
+    let subsystems = json!({
+        "ipc": true,
+        "math": true,
+        "gpu": gpu_status,
+        "provenance_trio": "deferred_check",
+        "nestgate": "deferred_check",
+    });
+
+    let science_domains = json!([
+        "gonzales_dermatitis",
+        "anderson_localization",
+        "tissue_geometry",
+        "pharmacokinetics",
+        "hormesis",
+        "cross_species",
+    ]);
+
+    Ok(json!({
+        "healthy": true,
+        "spring": "wetSpring",
+        "deploy_graph": DEPLOY_GRAPH_NAME,
+        "version": env!("CARGO_PKG_VERSION"),
+        "subsystems": subsystems,
+        "science_domains": science_domains,
+        "capabilities_count": CAPABILITIES.len(),
+        "bonding_support": ["Covalent", "Ionic"],
     }))
 }
 

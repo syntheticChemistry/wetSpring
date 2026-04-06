@@ -12,8 +12,12 @@ pub mod calibration;
 pub mod chemistry;
 pub mod chromatography;
 pub mod composite;
+pub mod cross_species;
 pub mod dynamics;
 pub mod ecology;
+pub mod gonzales;
+pub mod hormesis_viz;
+
 pub mod hmm;
 pub mod lcms;
 pub mod ml_models;
@@ -32,6 +36,7 @@ pub mod similarity;
 pub mod spectroscopy;
 pub mod stochastic;
 pub mod streaming_pipeline;
+pub mod tissue_geometry;
 
 pub use anderson::anderson_scenario;
 pub use basecalling::basecalling_scenario;
@@ -71,7 +76,14 @@ pub use spectroscopy::{spectroscopy_scenario, spectroscopy_scenario_from_data};
 pub use stochastic::stochastic_scenario;
 
 pub use composite::{
-    full_16s_scenario, full_ecology_scenario, full_pfas_scenario, full_qs_scenario,
+    full_16s_scenario, full_anderson_exploration_scenario, full_ecology_scenario,
+    full_gonzales_scenario, full_pfas_scenario, full_qs_scenario,
+};
+pub use cross_species::cross_species_scenario;
+pub use gonzales::{gonzales_dose_response_scenario, gonzales_pk_scenario, gonzales_scenario};
+pub use hormesis_viz::hormesis_scenario;
+pub use tissue_geometry::{
+    barrier_promotion_scenario, tissue_geometry_scenario, tissue_lattice_scenario,
 };
 
 use super::types::{DataChannel, EcologyScenario, ScenarioEdge, ScenarioNode};
