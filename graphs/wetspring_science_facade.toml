@@ -121,7 +121,7 @@ required = false
 depends_on = ["beardog", "songbird", "rhizocrypt"]
 health_method = "health.liveness"
 by_capability = "ledger"
-capabilities = ["session.commit", "entry.get"]
+capabilities = ["commit.session", "entry.get"]
 
 [[graph.node]]
 name = "sweetgrass"
