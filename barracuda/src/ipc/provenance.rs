@@ -161,7 +161,7 @@ pub fn begin_session(experiment_name: &str) -> ProvenanceResult {
         "description": experiment_name,
     });
 
-    capability_call(&socket, "dag", "create_session", &args).map_or_else(
+    capability_call(&socket, "dag", "session.create", &args).map_or_else(
         |_| ProvenanceResult {
             id: local_session_id(),
             available: false,
@@ -191,7 +191,7 @@ pub fn record_step(session_id: &str, step: &Value) -> ProvenanceResult {
 
     let args = json!({"session_id": session_id, "event": step});
 
-    capability_call(&socket, "dag", "append_event", &args).map_or_else(
+    capability_call(&socket, "dag", "event.append", &args).map_or_else(
         |_| ProvenanceResult {
             id: "unavailable".to_string(),
             available: false,
@@ -240,11 +240,11 @@ pub fn complete_session(session_id: &str) -> Value {
 
     let merkle_root = json_str_or(&dehydration, "merkle_root", "").to_string();
 
-    // Phase 2: Commit (loamSpine)
+    // Phase 2: Commit (loamSpine — session.commit)
     let Ok(commit_result) = capability_call(
         &socket,
-        "commit",
         "session",
+        "commit",
         &json!({"summary": dehydration, "content_hash": merkle_root}),
     ) else {
         return json!({
@@ -272,7 +272,7 @@ pub fn complete_session(session_id: &str) -> Value {
             "contribution": 1.0,
         }],
     });
-    let braid_result = capability_call(&socket, "provenance", "create_braid", &braid_args);
+    let braid_result = capability_call(&socket, "braid", "create", &braid_args);
 
     let braid_id = braid_result
         .ok()

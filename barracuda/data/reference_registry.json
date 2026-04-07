@@ -54,7 +54,8 @@
         "compound_id_legacy": "CHEMBL2366511",
         "compound_name": "oclacitinib",
         "trade_name": "Apoquel",
-        "prefetched_data": "barracuda/data/chembl/oclacitinib_ic50_panel.json",
+        "reference_artifact": "barracuda/data/chembl/oclacitinib_ic50_panel.json",
+        "reference_artifact_note": "Reference snapshot — NOT a runtime fallback. NestGate fetches live via fetch_external.",
         "content_hash_blake3": "d78b2140a1bad88b3c13a3ddaea8205174953445beb7f956802f4ba6acebb6ea",
         "jak1_ic50_nm_chembl": [9.53, 9.53, 10.0, 10.0],
         "jak1_ic50_nm_paper": 10.0,
@@ -63,7 +64,8 @@
       "pubchem": {
         "cid": 44631938,
         "compound_name": "oclacitinib",
-        "prefetched_data": "barracuda/data/chembl/oclacitinib_pubchem.json",
+        "reference_artifact": "barracuda/data/chembl/oclacitinib_pubchem.json",
+        "reference_artifact_note": "Reference snapshot — NOT a runtime fallback. NestGate fetches live via fetch_external.",
         "content_hash_blake3": "b35704d8b67f2d8a56556cc6029fb67eb3e7b901cdfbf271ce21313709791220",
         "molecular_formula": "C15H23N5O2S",
         "molecular_weight": 337.4,
@@ -122,7 +124,7 @@
         "baricitinib": "CHEMBL3301610"
       },
       "fetch_method": "data.fetch.chembl",
-      "prefetch_method": "data.fetch.register_table"
+      "routing": "biomeOS → NestGate (fetch_external) — no fallbacks"
     },
     "pubchem": {
       "base_url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/",
@@ -135,7 +137,8 @@
     }
   },
   "validation_chain": {
-    "description": "Paper → Python → Rust → ecoPrimals composition",
+    "description": "Paper → Rust → NUCLEUS primal composition. Pure Rust pipeline — only data is not Rust. No fallbacks in springs.",
+    "philosophy": "Springs are science consumers. All infrastructure is primal composition. Missing primals produce gap reports for primalSpring.",
     "stages": [
       {
         "name": "source",
@@ -143,9 +146,12 @@
         "artifact": "DOI + table values"
       },
       {
-        "name": "python_baseline",
-        "description": "Python script reproducing published values (healthSpring)",
-        "artifact": "BLAKE3 hash of script + output"
+        "name": "public_data_ingestion",
+        "description": "ChEMBL/PubChem data fetched via NestGate (TLS) and cached content-addressed",
+        "artifact": "BLAKE3 hash of fetched payload, NestGate cache key",
+        "routing": "biomeOS → NestGate (no fallbacks — gap report if unavailable)",
+        "required_primals": ["biomeOS", "NestGate"],
+        "gap_action": "hand to primalSpring → primals evolve fetch_external capability"
       },
       {
         "name": "rust_validation",
@@ -160,8 +166,19 @@
       {
         "name": "nucleus_composition",
         "description": "Live NUCLEUS deployment with provenance trio wrapping",
-        "artifact": "Provenance braid ID + Merkle root"
+        "artifact": "Provenance braid ID + Merkle root",
+        "required_primals": ["rhizoCrypt", "loamSpine", "sweetGrass", "NestGate", "BearDog"],
+        "gap_action": "hand to primalSpring → primals teams evolve missing components"
       }
-    ]
+    ],
+    "python_cross_reference": {
+      "description": "healthSpring Python baseline exists as historical cross-reference only — not in the live pipeline",
+      "path": "healthSpring/control/discovery/exp093_chembl_jak_panel.py",
+      "note": "Pure Rust pipeline: even downloads route through Tower + Nest atomics"
+    },
+    "reference_data_on_disk": {
+      "description": "ChEMBL/PubChem JSON files in barracuda/data/chembl/ are reference artifacts, not runtime fallbacks",
+      "note": "These document what the external APIs return for oclacitinib. They are NOT loaded by wetSpring handlers — NestGate caches this data via fetch_external."
+    }
   }
 }

@@ -168,11 +168,11 @@ pub fn tier1(method: &str, params: &Value, result: &Value) -> Value {
 /// Attempt Tier 2 provenance via the provenance trio.
 ///
 /// Uses `capability.call` routing through Neural API:
-/// 1. `dag` domain → `create_session` (rhizoCrypt)
+/// 1. `dag` domain → `session.create` (rhizoCrypt)
 /// 2. `dag` domain → `event.append` (record computation step)
 /// 3. `dag` domain → `dehydrate` (Merkle root)
-/// 4. `commit` domain → `session` (loamSpine permanent commit)
-/// 5. `provenance` domain → `create_braid` (sweetGrass attribution)
+/// 4. `session` domain → `commit` (loamSpine permanent commit)
+/// 5. `braid` domain → `create` (sweetGrass attribution)
 ///
 /// Returns `None` if the trio is unreachable or the circuit breaker is open.
 pub fn try_tier2(method: &str, params: &Value, result_hash: &str) -> Option<Value> {
@@ -192,11 +192,11 @@ pub fn try_tier2(method: &str, params: &Value, result_hash: &str) -> Option<Valu
 fn try_tier2_inner(method: &str, params: &Value, result_hash: &str) -> Option<Value> {
     let neural_socket = neural_api_socket()?;
 
-    // 1. rhizoCrypt: create DAG session
+    // 1. rhizoCrypt: dag.session.create
     let session = capability_call(
         &neural_socket,
         "dag",
-        "create_session",
+        "session.create",
         &json!({
             "metadata": { "type": "science", "name": method },
             "session_type": { "Experiment": { "spring_id": "wetspring" } },
@@ -249,11 +249,11 @@ fn try_tier2_inner(method: &str, params: &Value, result_hash: &str) -> Option<Va
         .cloned()
         .unwrap_or(json!([]));
 
-    // 4. loamSpine: permanent commit
+    // 4. loamSpine: session.commit
     let commit_result = capability_call(
         &neural_socket,
-        "commit",
         "session",
+        "commit",
         &json!({
             "summary": dehydration,
             "content_hash": merkle_root,
@@ -267,11 +267,11 @@ fn try_tier2_inner(method: &str, params: &Value, result_hash: &str) -> Option<Va
         .unwrap_or("")
         .to_owned();
 
-    // 5. sweetGrass: attribution braid
+    // 5. sweetGrass: braid.create
     let braid_result = capability_call(
         &neural_socket,
-        "provenance",
-        "create_braid",
+        "braid",
+        "create",
         &json!({
             "commit_ref": commit_id,
             "agents": [{

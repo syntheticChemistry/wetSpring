@@ -10,14 +10,27 @@
 # Nest stores, the provenance trio wraps every datum, petalTongue
 # renders, and the science facade serves it all through Dark Forest.
 #
+# Witness wire: WireWitnessRef { agent, kind, evidence, witnessed_at,
+#   encoding, algorithm, tier, context }
+# BearDog crypto bridge: sign_ed25519 → evidence (base64), algorithm "ed25519"
+# Non-crypto witnesses: kind "checkpoint" | "observation" for pipeline steps
+#
+# References:
+#   wateringHole/handoffs/PRIMALSPRING_V082_WETSPRING_CAPABILITY_ROUTING_HANDOFF_APR07_2026.md
+#   primalSpring/config/capability_registry.toml
+#
 # Usage:
 #   biomeos deploy --graph graphs/wetspring_science_nucleus.toml
 
 [graph]
 name = "wetspring_science_nucleus"
 description = "Full NUCLEUS science pipeline — Tower + Node + Nest + provenance trio + facade + petalTongue"
-version = "1.0.0"
+version = "3.0.0"
 coordination = "sequential"
+
+[graph.metadata]
+pattern_version = "2026-04-07"
+witness_wire = "WireWitnessRef"
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 0: Orchestration (pre-existing)
@@ -29,9 +42,9 @@ binary = "biomeos"
 order = 0
 required = true
 spawn = false
-health_method = "graph.list"
+health_method = "health.liveness"
 by_capability = "orchestration"
-capabilities = ["graph.execute", "capability.discover", "graph.list", "topology.rescan"]
+capabilities = ["graph.deploy", "capability.discover", "topology.rescan"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 1: Tower Atomic — BearDog + Songbird (security + discovery)
@@ -45,7 +58,7 @@ required = true
 depends_on = ["biomeos_neural_api"]
 health_method = "health.liveness"
 by_capability = "security"
-capabilities = ["crypto.sign", "crypto.verify", "crypto.blake3_hash", "birdsong.decrypt", "encryption.encrypt", "encryption.decrypt"]
+capabilities = ["crypto.sign_ed25519", "crypto.verify_ed25519", "crypto.blake3_hash"]
 
 [[graph.node]]
 name = "songbird"
@@ -55,10 +68,7 @@ required = true
 depends_on = ["biomeos_neural_api"]
 health_method = "health.liveness"
 by_capability = "discovery"
-capabilities = ["net.discovery", "net.mesh", "discovery.find_primals", "mesh.announce"]
-
-[graph.node.env]
-BIRDSONG_MULTICAST = "239.255.0.1:4200"
+capabilities = ["discovery.find_primals", "discovery.announce"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 2: Nest Atomic — NestGate (content-addressed storage)
@@ -72,7 +82,7 @@ required = false
 depends_on = ["beardog"]
 health_method = "health.liveness"
 by_capability = "storage"
-capabilities = ["storage.store", "storage.retrieve", "storage.exists", "storage.list"]
+capabilities = ["storage", "storage.store", "storage.retrieve", "storage.exists", "storage.list", "storage.fetch_external"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 3: Node Atomic — ToadStool (compute dispatch to GPU/NPU)
@@ -99,9 +109,9 @@ order = 5
 required = false
 depends_on = ["beardog"]
 health_method = "health.liveness"
-by_capability = "provenance"
+by_capability = "dag"
 args = ["--unix"]
-capabilities = ["dag.session.create", "dag.session.list", "dag.create_session", "dag.append_event", "dag.dehydrate"]
+capabilities = ["dag", "dag.session.create", "dag.session.get", "dag.session.list", "dag.event.append", "dag.vertex.get", "dag.frontier.get", "dag.merkle.root", "dag.merkle.proof", "dag.merkle.verify", "dag.slice.checkout", "dag.dehydrate"]
 
 [[graph.node]]
 name = "loamspine"
@@ -112,7 +122,7 @@ depends_on = ["beardog", "rhizocrypt"]
 health_method = "health.liveness"
 by_capability = "ledger"
 args = ["server"]
-capabilities = ["entry.append", "ledger.status", "commit.session", "entry.get", "entry.verify"]
+capabilities = ["spine", "entry", "session", "certificate", "commit", "ledger", "spine.create", "spine.get", "spine.seal", "entry.append", "entry.get", "session.commit", "certificate.mint"]
 
 [[graph.node]]
 name = "sweetgrass"
@@ -123,7 +133,7 @@ depends_on = ["beardog", "loamspine"]
 health_method = "health.liveness"
 by_capability = "attribution"
 args = ["server"]
-capabilities = ["attribution.claim", "attribution.resolve", "provenance.create_braid", "provenance.export_provo", "braid.get"]
+capabilities = ["braid", "attribution", "provenance", "anchoring", "braid.create", "braid.get", "braid.commit", "provenance.graph", "provenance.export_provo", "attribution.chain", "anchoring.anchor", "anchoring.verify"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 5: Science — wetSpring IPC (the data source)

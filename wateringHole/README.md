@@ -1,7 +1,7 @@
 # wetSpring wateringHole
 
-**Date:** March 24, 2026  
-**Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records.
+**Date:** April 7, 2026  
+**Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records. Pattern library for primalSpring and primal teams.
 
 ---
 
@@ -9,8 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V137** | `handoffs/WETSPRING_V137_PROVENANCE_TOLERANCE_IPC_HANDOFF_MAR24_2026.md` | Mar 24 | **barraCuda + toadStool + spring teams + primal teams** — full provenance headers (355/355 binaries), 8 new named tolerance constants (242 total), `ipc/connection.rs` extraction, evolution intelligence (provenance header pattern, tolerance naming convention, IPC decomposition), upstream asks (BatchReconcileGpu, DF64 GEMM, Jacobi eigen, BandwidthTier, BatchMergePairsGpu), primal coordination patterns. |
-| | *Superseded → `handoffs/archive/`* | | V135, V134, V133 and earlier are archived (**146** files). |
+| **V138** | `handoffs/WETSPRING_V138_PRIMAL_COMPOSITION_PATTERNS_HANDOFF_APR07_2026.md` | Apr 7 | **primalSpring + primal teams + all springs** — pure primal composition patterns (7 worked well, 7 friction points, 7 evolution gaps), gap report pattern, wire format analysis, new spring onboarding guide. Gonzales pipeline as pure composition — no fallbacks, no sovereign HTTP. |
+| | *Superseded → `handoffs/archive/`* | | V137, V135, V134, V133 and earlier are archived (**147** files). |
 
 ## Cross-Spring Documents
 
@@ -22,7 +22,7 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` — **V135 and earlier** are archived (**146** files).  
+Superseded handoffs in `handoffs/archive/` — **V137 and earlier** are archived (**147** files).  
 Preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda.
 
 ## Convention
