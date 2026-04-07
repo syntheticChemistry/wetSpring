@@ -1901,6 +1901,18 @@ path = "src/bin/validate_qs_gene_profiling_v1.rs"
 name = "validate_stable_specials_v1"
 path = "src/bin/validate_stable_specials_v1.rs"
 
+# ── Exp310: Gonzales Provenance Chain — Paper → Python → Rust → NUCLEUS ──
+[[bin]]
+name = "validate_gonzales_provenance_chain"
+path = "src/bin/validate_gonzales_provenance_chain.rs"
+required-features = ["ipc"]
+
+# ── Exp311: Live NUCLEUS Gonzales — Full Stack Deployment Validation ──
+[[bin]]
+name = "validate_nucleus_live_gonzales"
+path = "src/bin/validate_nucleus_live_gonzales.rs"
+required-features = ["ipc"]
+
 # ── guideStone: Gonzales Interactive Science Artifact ──
 [[bin]]
 name = "wetspring_gonzales_guidestone"

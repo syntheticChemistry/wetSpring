@@ -32,7 +32,11 @@
         "path": "healthSpring/control/discovery/exp093_chembl_jak_panel.py",
         "description": "ChEMBL JAK panel retrieval and IC50 comparison",
         "hash_algorithm": "blake3",
-        "hash": null
+        "script_hash": "d9656ce1f827ae775609f720026c7e6894396153caf9e151f68467295a1ea1ef",
+        "output_hash": "dda54fd6efc8871a53b55c8ce1303f486a76c2fd16e2726ad1eca33d28c1fbb4",
+        "output_hash_note": "BLAKE3 of canonical JSON (science fields only, sorted keys, excludes _provenance metadata)",
+        "baseline_json": "healthSpring/control/discovery/exp093_baseline.json",
+        "validated": "2026-04-07"
       },
       "rust_validation": {
         "binary": "validate_gonzales_ic50_s79",
@@ -46,9 +50,24 @@
         "status": "29/29 PASS"
       },
       "chembl": {
-        "compound_id": "CHEMBL2366511",
+        "compound_id": "CHEMBL2103874",
+        "compound_id_legacy": "CHEMBL2366511",
         "compound_name": "oclacitinib",
-        "trade_name": "Apoquel"
+        "trade_name": "Apoquel",
+        "prefetched_data": "barracuda/data/chembl/oclacitinib_ic50_panel.json",
+        "content_hash_blake3": "d78b2140a1bad88b3c13a3ddaea8205174953445beb7f956802f4ba6acebb6ea",
+        "jak1_ic50_nm_chembl": [9.53, 9.53, 10.0, 10.0],
+        "jak1_ic50_nm_paper": 10.0,
+        "match_note": "ChEMBL assays CHEMBL4481924/CHEMBL5245505 report 10.0 nM, matching Gonzales 2014 Table 1"
+      },
+      "pubchem": {
+        "cid": 44631938,
+        "compound_name": "oclacitinib",
+        "prefetched_data": "barracuda/data/chembl/oclacitinib_pubchem.json",
+        "content_hash_blake3": "b35704d8b67f2d8a56556cc6029fb67eb3e7b901cdfbf271ce21313709791220",
+        "molecular_formula": "C15H23N5O2S",
+        "molecular_weight": 337.4,
+        "inchi_key": "HJWLJNBZVZDLAQ-UHFFFAOYSA-N"
       }
     },
     "fleck_gonzales_2021": {
@@ -97,12 +116,13 @@
     "chembl": {
       "base_url": "https://www.ebi.ac.uk/chembl/api/data/",
       "compounds": {
-        "oclacitinib": "CHEMBL2366511",
+        "oclacitinib": "CHEMBL2103874",
         "tofacitinib": "CHEMBL221959",
         "ruxolitinib": "CHEMBL1789941",
         "baricitinib": "CHEMBL3301610"
       },
-      "fetch_method": "data.fetch.chembl"
+      "fetch_method": "data.fetch.chembl",
+      "prefetch_method": "data.fetch.register_table"
     },
     "pubchem": {
       "base_url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/",

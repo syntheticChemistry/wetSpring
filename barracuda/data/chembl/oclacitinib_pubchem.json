@@ -1,0 +1,25 @@
+{
+  "source": "PubChem",
+  "cid": 44631938,
+  "compound_name": "oclacitinib",
+  "trade_name": "Apoquel",
+  "query_url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/oclacitinib/property/MolecularFormula,MolecularWeight,IUPACName,InChIKey,CanonicalSMILES,XLogP/JSON",
+  "properties": {
+    "molecular_formula": "C15H23N5O2S",
+    "molecular_weight": "337.4",
+    "iupac_name": "N-methyl-1-[4-[methyl(7H-pyrrolo[2,3-d]pyrimidin-4-yl)amino]cyclohexyl]methanesulfonamide",
+    "inchi_key": "HJWLJNBZVZDLAQ-UHFFFAOYSA-N",
+    "canonical_smiles": "CNS(=O)(=O)CC1CCC(CC1)N(C)C2=NC=NC3=C2C=CN3",
+    "xlogp": 1.7
+  },
+  "gonzales_2014_cross_reference": {
+    "doi": "10.1111/jvp.12065",
+    "compound_name_in_paper": "oclacitinib (APOQUEL)",
+    "note": "PubChem CID 44631938 is the free base form of oclacitinib used in Gonzales 2014"
+  },
+  "content_hash_blake3": "b35704d8b67f2d8a56556cc6029fb67eb3e7b901cdfbf271ce21313709791220",
+  "fetch_metadata": {
+    "fetched_at": "2026-04-07T13:12:48.530902+00:00",
+    "api_version": "PubChem PUG REST"
+  }
+}

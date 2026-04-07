@@ -1,0 +1,120 @@
+{
+  "source": "ChEMBL",
+  "molecule_chembl_id": "CHEMBL2103874",
+  "compound_name": "oclacitinib",
+  "trade_name": "Apoquel",
+  "query_url": "https://www.ebi.ac.uk/chembl/api/data/activity.json?molecule_chembl_id=CHEMBL2103874&limit=100&standard_type=IC50",
+  "total_activities": 14,
+  "jak_ic50_panel": {
+    "JAK1": [
+      {
+        "ic50_nm": 9.53,
+        "units": "nM",
+        "assay_chembl_id": "CHEMBL3887372",
+        "document_chembl_id": "CHEMBL3886293"
+      },
+      {
+        "ic50_nm": 9.53,
+        "units": "nM",
+        "assay_chembl_id": "CHEMBL3888063",
+        "document_chembl_id": "CHEMBL3886558"
+      },
+      {
+        "ic50_nm": 10.0,
+        "units": "nM",
+        "assay_chembl_id": "CHEMBL4481924",
+        "document_chembl_id": "CHEMBL4480435"
+      },
+      {
+        "ic50_nm": 10.0,
+        "units": "nM",
+        "assay_chembl_id": "CHEMBL5245505",
+        "document_chembl_id": "CHEMBL5244234"
+      }
+    ],
+    "JAK2": [
+      {
+        "ic50_nm": 17.5,
+        "units": "nM",
+        "assay_chembl_id": "CHEMBL3887373",
+        "document_chembl_id": "CHEMBL3886293"
+      },
+      {
+        "ic50_nm": 17.5,
+        "units": "nM",
+        "assay_chembl_id": "CHEMBL3888064",
+        "document_chembl_id": "CHEMBL3886558"
+      },
+      {
+        "ic50_nm": 18.0,
+        "units": "nM",
+        "assay_chembl_id": "CHEMBL4481925",
+        "document_chembl_id": "CHEMBL4480435"
+      },
+      {
+        "ic50_nm": 18.0,
+        "units": "nM",
+        "assay_chembl_id": "CHEMBL5245506",
+        "document_chembl_id": "CHEMBL5244234"
+      }
+    ],
+    "JAK3": [
+      {
+        "ic50_nm": 95.1,
+        "units": "nM",
+        "assay_chembl_id": "CHEMBL3887374",
+        "document_chembl_id": "CHEMBL3886293"
+      },
+      {
+        "ic50_nm": 95.1,
+        "units": "nM",
+        "assay_chembl_id": "CHEMBL3888065",
+        "document_chembl_id": "CHEMBL3886558"
+      },
+      {
+        "ic50_nm": 99.0,
+        "units": "nM",
+        "assay_chembl_id": "CHEMBL5245507",
+        "document_chembl_id": "CHEMBL5244234"
+      }
+    ],
+    "TYK2": [
+      {
+        "ic50_nm": 75.1,
+        "units": "nM",
+        "assay_chembl_id": "CHEMBL3887375",
+        "document_chembl_id": "CHEMBL3886293"
+      },
+      {
+        "ic50_nm": 75.1,
+        "units": "nM",
+        "assay_chembl_id": "CHEMBL3888066",
+        "document_chembl_id": "CHEMBL3886558"
+      },
+      {
+        "ic50_nm": 84.0,
+        "units": "nM",
+        "assay_chembl_id": "CHEMBL5245508",
+        "document_chembl_id": "CHEMBL5244234"
+      }
+    ]
+  },
+  "gonzales_2014_cross_reference": {
+    "doi": "10.1111/jvp.12065",
+    "table": "Table 1",
+    "published_jak1_enzyme_nm": 10.0,
+    "chembl_jak1_values_nm": [
+      9.53,
+      9.53,
+      10.0,
+      10.0
+    ],
+    "exact_match_found": true,
+    "note": "ChEMBL assays CHEMBL4481924 and CHEMBL5245505 report JAK1 IC50 = 10.0 nM, matching Gonzales 2014 Table 1 exactly. Earlier assays (CHEMBL3887372) report 9.53 nM from a different methodology."
+  },
+  "content_hash_blake3": "d78b2140a1bad88b3c13a3ddaea8205174953445beb7f956802f4ba6acebb6ea",
+  "fetch_metadata": {
+    "fetched_at": "2026-04-07T13:12:48.530525+00:00",
+    "api_version": "ChEMBL REST API"
+  }
+}
