@@ -14,12 +14,20 @@
 [graph]
 name = "wetspring_anderson_atlas"
 description = "28-biome Anderson atlas — disorder sweep + tissue + hormesis + cross-species"
-version = "1.0.0"
+version = "2.0.0"
 coordination = "sequential"
+
+[graph.metadata]
+pattern_version = "2026-04-11"
+schema = "canonical"
+composition_model = "nucleated"
+science_domain = "life_science_chemistry"
+owner = "wetSpring"
+fragments = ["tower_atomic"]
 
 # ── Pre-existing substrate ───────────────────────────────────────
 
-[[graph.node]]
+[[graph.nodes]]
 name = "biomeos"
 binary = "biomeos"
 order = 0
@@ -27,84 +35,96 @@ required = true
 spawn = false
 health_method = "graph.list"
 by_capability = "orchestration"
+security_model = "tower_delegated"
 capabilities = ["capability.discover"]
 
 # ── Tower ────────────────────────────────────────────────────────
 
-[[graph.node]]
+[[graph.nodes]]
 name = "beardog"
-binary = "beardog_primal"
+binary = "beardog"
 order = 1
 required = true
+spawn = false
 depends_on = ["biomeos"]
 health_method = "health.liveness"
 by_capability = "security"
-capabilities = ["crypto.sign"]
+security_model = "btsp"
+capabilities = ["crypto.sign_ed25519", "crypto.verify_ed25519"]
 
-[[graph.node]]
+[[graph.nodes]]
 name = "songbird"
-binary = "songbird_primal"
+binary = "songbird"
 order = 2
 required = true
+spawn = false
 depends_on = ["biomeos"]
 health_method = "health.liveness"
 by_capability = "discovery"
+security_model = "btsp"
 capabilities = ["discovery.find_primals"]
 
 # ── Compute (GPU for Anderson spectral) ──────────────────────────
 
-[[graph.node]]
+[[graph.nodes]]
 name = "toadstool"
-binary = "toadstool_primal"
+binary = "toadstool"
 order = 3
 required = true
+spawn = false
 depends_on = ["beardog", "songbird"]
-health_method = "compute.health"
+health_method = "health.liveness"
 by_capability = "compute"
+security_model = "tower_delegated"
 capabilities = ["compute.dispatch.submit", "compute.execute"]
 
 # ── Visualization ────────────────────────────────────────────────
 
-[[graph.node]]
+[[graph.nodes]]
 name = "petaltongue"
 binary = "petaltongue"
 order = 4
 required = true
+spawn = false
 depends_on = ["beardog", "songbird"]
 health_method = "health.liveness"
-by_capability = "visualization"
-capabilities = ["visualization.render", "visualization.render.dashboard"]
+by_capability = "render"
+security_model = "tower_delegated"
+capabilities = ["render.dashboard", "tui.push"]
 
 # ── Science primal ───────────────────────────────────────────────
 
-[[graph.node]]
+[[graph.nodes]]
 name = "wetspring"
 binary = "wetspring"
 order = 10
 required = true
+spawn = true
 depends_on = ["beardog", "songbird", "toadstool"]
 health_method = "health.check"
-by_capability = "ecology"
+by_capability = "life_science"
+security_model = "tower_delegated"
 args = ["server"]
 capabilities = [
     "science.anderson",
     "science.anderson.biome_atlas",
+    "science.anderson.cross_species",
     "science.anderson.disorder_sweep",
     "science.anderson.hormesis",
-    "science.anderson.cross_species",
-    "science.gonzales.tissue_lattice",
     "science.diversity",
+    "science.gonzales.tissue_lattice",
 ]
 
 # ── Validation ───────────────────────────────────────────────────
 
-[[graph.node]]
+[[graph.nodes]]
 name = "validate_atlas"
 binary = "primalspring_primal"
 order = 99
 required = false
 spawn = false
 depends_on = ["wetspring", "petaltongue"]
-health_method = "capability.list"
+health_method = "health.liveness"
 by_capability = "coordination"
+security_model = "tower_delegated"
 capabilities = ["coordination.validate_composition"]

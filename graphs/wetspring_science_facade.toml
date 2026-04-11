@@ -21,14 +21,23 @@
 [graph]
 name = "wetspring_science_facade"
 description = "primals.eco live science — HTTP facade with provenance and petalTongue rendering"
-version = "1.0.0"
+version = "2.0.0"
 coordination = "sequential"
+
+[graph.metadata]
+pattern_version = "2026-04-11"
+schema = "canonical"
+witness_wire = "WireWitnessRef"
+composition_model = "nucleated"
+science_domain = "life_science_chemistry"
+owner = "wetSpring"
+fragments = ["tower_atomic"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 0: Orchestration (pre-existing)
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "biomeos"
 binary = "biomeos"
 order = 0
@@ -36,123 +45,137 @@ required = true
 spawn = false
 health_method = "graph.list"
 by_capability = "orchestration"
+security_model = "tower_delegated"
 capabilities = ["capability.discover", "graph.list"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 1: Security + Discovery (pre-existing)
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "beardog"
-binary = "beardog_primal"
+binary = "beardog"
 order = 1
 required = true
 spawn = false
 health_method = "health.liveness"
 by_capability = "security"
-capabilities = ["crypto.sign", "crypto.verify"]
+security_model = "btsp"
+capabilities = ["crypto.sign_ed25519", "crypto.verify_ed25519"]
 
-[[graph.node]]
+[[graph.nodes]]
 name = "songbird"
-binary = "songbird_primal"
+binary = "songbird"
 order = 2
 required = true
 spawn = false
 health_method = "health.liveness"
 by_capability = "discovery"
-capabilities = ["discovery.find_primals", "mesh.announce"]
+security_model = "btsp"
+capabilities = ["discovery.find_primals", "discovery.announce"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 2: Science (required — the facade's data source)
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "wetspring"
 binary = "wetspring"
 order = 10
 required = true
+spawn = true
 depends_on = ["beardog", "songbird"]
 health_method = "health.check"
-by_capability = "ecology"
+by_capability = "life_science"
+security_model = "tower_delegated"
 args = ["server"]
 capabilities = [
+    "science.anderson.biome_atlas",
+    "science.anderson.cross_species",
+    "science.anderson.disorder_sweep",
+    "science.anderson.hormesis",
     "science.gonzales.dose_response",
     "science.gonzales.pk_decay",
     "science.gonzales.tissue_lattice",
-    "science.anderson.hormesis",
-    "science.anderson.cross_species",
-    "science.anderson.biome_atlas",
-    "science.anderson.disorder_sweep",
 ]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 3: Visualization (optional — petalTongue grammar rendering)
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "petaltongue"
 binary = "petaltongue"
 order = 11
 required = false
+spawn = false
 depends_on = ["beardog", "songbird"]
 health_method = "health.liveness"
-by_capability = "visualization"
-capabilities = ["visualization.render.grammar"]
+by_capability = "render"
+security_model = "tower_delegated"
+capabilities = ["render.dashboard", "tui.push"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 4: Provenance Trio (optional — progressive degradation)
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "rhizocrypt"
-binary = "rhizocrypt_primal"
+binary = "rhizocrypt"
 order = 12
 required = false
-depends_on = ["beardog", "songbird"]
+spawn = false
+depends_on = ["beardog"]
 health_method = "health.liveness"
-by_capability = "provenance"
-capabilities = ["dag.create_session", "dag.append_event"]
+by_capability = "dag"
+security_model = "tower_delegated"
+capabilities = ["dag.session.create", "dag.event.append"]
 
-[[graph.node]]
+[[graph.nodes]]
 name = "loamspine"
-binary = "loamspine_primal"
+binary = "loamspine"
 order = 13
 required = false
-depends_on = ["beardog", "songbird", "rhizocrypt"]
+spawn = false
+depends_on = ["beardog", "rhizocrypt"]
 health_method = "health.liveness"
 by_capability = "ledger"
-capabilities = ["commit.session", "entry.get"]
+security_model = "tower_delegated"
+capabilities = ["spine.create", "entry.append", "session.commit"]
 
-[[graph.node]]
+[[graph.nodes]]
 name = "sweetgrass"
-binary = "sweetgrass_primal"
+binary = "sweetgrass"
 order = 14
 required = false
-depends_on = ["beardog", "songbird", "loamspine"]
+spawn = false
+depends_on = ["beardog", "loamspine"]
 health_method = "health.liveness"
-by_capability = "semantic_provenance"
-capabilities = ["braid.create", "provenance.export_provo"]
+by_capability = "attribution"
+security_model = "tower_delegated"
+capabilities = ["braid.create", "braid.commit", "provenance.graph"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 5: Science Facade (the HTTP gateway)
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "science_facade"
 binary = "wetspring_science_facade"
 order = 20
 required = true
+spawn = true
 depends_on = ["wetspring"]
 health_method = "health.check"
 by_capability = "http_gateway"
-args = []
+security_model = "tower_delegated"
 capabilities = [
-    "http.science.gonzales",
-    "http.science.anderson",
-    "http.render.grammar",
     "http.provenance.query",
+    "http.render.grammar",
+    "http.science.anderson",
+    "http.science.gonzales",
 ]
 
-[graph.node.env]
+[graph.nodes.env]
 FACADE_BIND = "127.0.0.1:3100"
 FACADE_CORS_ORIGIN = "https://primals.eco"

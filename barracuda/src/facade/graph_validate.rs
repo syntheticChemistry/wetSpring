@@ -22,7 +22,8 @@ struct GraphBody {
         reason = "deserialized for structural completeness but not inspected"
     )]
     version: Option<String>,
-    node: Vec<GraphNode>,
+    #[serde(alias = "node")]
+    nodes: Vec<GraphNode>,
 }
 
 #[derive(Deserialize)]
@@ -45,7 +46,7 @@ pub struct ValidationResult {
     pub valid: bool,
     /// `[graph].name` from the TOML.
     pub graph_name: String,
-    /// Total number of `[[graph.node]]` entries.
+    /// Total number of `[[graph.nodes]]` entries.
     pub node_count: usize,
     /// Hard errors (duplicate names, missing by_capability, broken deps).
     pub errors: Vec<String>,
@@ -72,7 +73,7 @@ pub fn validate_graph(toml_source: &str) -> ValidationResult {
     };
 
     let graph_name = graph.graph.name.clone();
-    let nodes = &graph.graph.node;
+    let nodes = &graph.graph.nodes;
     let node_count = nodes.len();
 
     let mut names: HashSet<&str> = HashSet::new();

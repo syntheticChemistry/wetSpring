@@ -7,10 +7,10 @@ against Rust implementations, then promotes to GPU acceleration via
 
 ```
 Tier 1: Python/R baseline  →  Rust CPU parity  →  GPU acceleration
-           (58 scripts)        (1,946 tests)       (44 GPU modules)
+           (58 scripts)        (1,950 tests)       (44 GPU modules)
 
 Tier 2: Rust validation     →  NUCLEUS composition patterns
-           (356 binaries)      (97/97 proto-nucleate, 7 deploy graphs)
+           (360 binaries)      (141/141 proto-nucleate, 7 deploy graphs)
 
 Tier 3: Composition         →  ecoBin harvest to plasmidBin
            (all checks green)  (cargo build --release → infra/plasmidBin/)
@@ -18,8 +18,8 @@ Tier 3: Composition         →  ecoBin harvest to plasmidBin
 
 | | |
 |---|---|
-| **Tests** | 1,946 (unit + integration + property + doc), 0 failed |
-| **Validation checks** | 5,800+ across 356 binaries (334 barracuda + 22 forge) |
+| **Tests** | 1,950 (unit + integration + property + doc), 0 failed |
+| **Validation checks** | 5,800+ across 360 binaries (338 barracuda + 22 forge) |
 | **Experiments** | 377 completed + 3 proposed (380 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
 | **IPC capabilities** | 46 niche, 42 dispatch, 21 domains (Wire Standard L2+L3, V142) |
@@ -29,14 +29,14 @@ Tier 3: Composition         →  ecoBin harvest to plasmidBin
 | **`#[allow()]`** | 0 in production (uses `#[expect(reason)]` exclusively) |
 | **Local WGSL** | 0 — fully lean on barraCuda |
 | **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
-| **Composition** | 97/97 proto-nucleate alignment checks (Exp400, guard constant) |
-| **Deploy graphs** | 7 (all canonical `[[graph.node]]` schema) |
-| **Primal gaps** | 7 documented in `docs/PRIMAL_GAPS.md` (6 external, 1 resolved) |
+| **Composition** | 141/141 proto-nucleate alignment checks (Exp400, D01–D07, guard constant) |
+| **Deploy graphs** | 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata) |
+| **Primal gaps** | 5 open in `docs/PRIMAL_GAPS.md` (all external), 2 resolved |
 | **cargo-deny** | advisories ok, bans ok, licenses ok, sources ok |
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V142:** Capability Wire Standard v1.0 L2+L3 compliance (`methods` flat array, `provided_capabilities`, `consumed_capabilities`, `identity.get`). `WireWitnessRef` provenance encoding per Attestation Encoding Standard v2.0. barraCuda 0.3.11 alignment (GPU build fix). 22 consumed capabilities declared. Facade clippy cleanup (23 warnings → 0 on `--all-features`). Tolerance provenance TOML expanded. plasmidBin metadata aligned. V141: audit remediation, capability alignment, TensorSession PoC. V140: ecosystem audit. V139: NUCLEUS composition (97/97). V138: primal composition patterns.
+**Current release — V143:** Deploy graph canonical migration (`[[graph.nodes]]`), bonding policy + fragments metadata on all 7 graphs, capability string alignment to proto-nucleate, coralReef/barraCuda nodes in full-NUCLEUS graphs, composition validation D07 (44 new checks: metadata compliance, schema canonical, fragment declarations). 141/141 Exp400. V142: Wire Standard L2+L3, `identity.get`, `WireWitnessRef`, 22 consumed capabilities, barraCuda 0.3.11. V141: audit remediation, capability alignment, TensorSession PoC. V140: ecosystem audit. V139: NUCLEUS composition. V138: primal composition patterns.
 
 ---
 

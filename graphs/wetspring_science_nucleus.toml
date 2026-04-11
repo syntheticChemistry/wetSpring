@@ -25,18 +25,37 @@
 [graph]
 name = "wetspring_science_nucleus"
 description = "Full NUCLEUS science pipeline — Tower + Node + Nest + provenance trio + facade + petalTongue"
-version = "3.0.0"
+version = "4.0.0"
 coordination = "sequential"
 
 [graph.metadata]
-pattern_version = "2026-04-07"
+pattern_version = "2026-04-11"
+schema = "canonical"
 witness_wire = "WireWitnessRef"
+encoding_standard = "wateringHole/ATTESTATION_ENCODING_STANDARD.md"
+composition_model = "nucleated"
+science_domain = "life_science_chemistry"
+owner = "wetSpring"
+fragments = ["tower_atomic", "node_atomic", "nest_atomic", "meta_tier"]
+
+[graph.bonding_policy]
+bond_type = "Metallic"
+trust_model = "InternalNucleus"
+tower_internal = "covalent"
+tower_to_node = "metallic"
+tower_to_nest = "metallic"
+node_to_nest = "metallic"
+nucleus_internal = "weak"
+encryption_tiers.tower = "full"
+encryption_tiers.node = "delegated"
+encryption_tiers.nest = "delegated"
+encryption_tiers.meta = "delegated"
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 0: Orchestration (pre-existing)
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "biomeos_neural_api"
 binary = "biomeos"
 order = 0
@@ -44,171 +63,230 @@ required = true
 spawn = false
 health_method = "health.liveness"
 by_capability = "orchestration"
+security_model = "tower_delegated"
 capabilities = ["graph.deploy", "capability.discover", "topology.rescan"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 1: Tower Atomic — BearDog + Songbird (security + discovery)
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "beardog"
 binary = "beardog"
 order = 1
 required = true
+spawn = false
 depends_on = ["biomeos_neural_api"]
 health_method = "health.liveness"
 by_capability = "security"
+security_model = "btsp"
 capabilities = ["crypto.sign_ed25519", "crypto.verify_ed25519", "crypto.blake3_hash"]
 
-[[graph.node]]
+[[graph.nodes]]
 name = "songbird"
 binary = "songbird"
 order = 2
 required = true
+spawn = false
 depends_on = ["biomeos_neural_api"]
 health_method = "health.liveness"
 by_capability = "discovery"
+security_model = "btsp"
 capabilities = ["discovery.find_primals", "discovery.announce"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 2: Nest Atomic — NestGate (content-addressed storage)
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "nestgate"
 binary = "nestgate"
 order = 3
 required = false
+spawn = false
 depends_on = ["beardog"]
 health_method = "health.liveness"
 by_capability = "storage"
-capabilities = ["storage", "storage.store", "storage.retrieve", "storage.exists", "storage.list", "storage.fetch_external"]
+security_model = "tower_delegated"
+capabilities = ["storage.store", "storage.retrieve", "storage.list"]
 
 # ═══════════════════════════════════════════════════════════════
-# Phase 3: Node Atomic — ToadStool (compute dispatch to GPU/NPU)
+# Phase 3: Node Atomic — Compute (coralReef + toadStool + barraCuda)
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
+name = "coralreef"
+binary = "coralreef"
+order = 4
+required = false
+spawn = false
+depends_on = ["beardog"]
+health_method = "health.liveness"
+by_capability = "shader_compile"
+security_model = "tower_delegated"
+capabilities = ["shader.compile.wgsl", "shader.compile.spirv"]
+
+[[graph.nodes]]
 name = "toadstool"
 binary = "toadstool"
 order = 4
 required = false
+spawn = false
 depends_on = ["beardog", "songbird"]
 health_method = "health.liveness"
 by_capability = "compute"
-capabilities = ["compute.dispatch.submit", "compute.dispatch.gpu", "compute.dispatch.npu", "compute.dispatch.cpu", "shader.dispatch", "ember.list"]
+security_model = "tower_delegated"
+capabilities = ["compute.dispatch.submit", "compute.execute"]
+
+[[graph.nodes]]
+name = "barracuda"
+binary = "barracuda"
+order = 4
+required = false
+spawn = false
+depends_on = ["beardog"]
+health_method = "health.liveness"
+by_capability = "math"
+security_model = "tower_delegated"
+capabilities = ["math.tensor", "math.stats", "math.spectral", "math.fft"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 4: Provenance Trio — rhizoCrypt + loamSpine + sweetGrass
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "rhizocrypt"
 binary = "rhizocrypt"
 order = 5
 required = false
+spawn = false
 depends_on = ["beardog"]
 health_method = "health.liveness"
 by_capability = "dag"
-args = ["--unix"]
-capabilities = ["dag", "dag.session.create", "dag.session.get", "dag.session.list", "dag.event.append", "dag.vertex.get", "dag.frontier.get", "dag.merkle.root", "dag.merkle.proof", "dag.merkle.verify", "dag.slice.checkout", "dag.dehydrate"]
+security_model = "tower_delegated"
+capabilities = ["dag.session.create", "dag.event.append", "dag.merkle.root", "dag.dehydrate"]
 
-[[graph.node]]
+[[graph.nodes]]
 name = "loamspine"
 binary = "loamspine"
 order = 6
 required = false
+spawn = false
 depends_on = ["beardog", "rhizocrypt"]
 health_method = "health.liveness"
 by_capability = "ledger"
-args = ["server"]
-capabilities = ["spine", "entry", "session", "certificate", "commit", "ledger", "spine.create", "spine.get", "spine.seal", "entry.append", "entry.get", "session.commit", "certificate.mint"]
+security_model = "tower_delegated"
+capabilities = ["spine.create", "entry.append", "session.commit"]
 
-[[graph.node]]
+[[graph.nodes]]
 name = "sweetgrass"
 binary = "sweetgrass"
 order = 7
 required = false
+spawn = false
 depends_on = ["beardog", "loamspine"]
 health_method = "health.liveness"
 by_capability = "attribution"
-args = ["server"]
-capabilities = ["braid", "attribution", "provenance", "anchoring", "braid.create", "braid.get", "braid.commit", "provenance.graph", "provenance.export_provo", "attribution.chain", "anchoring.anchor", "anchoring.verify"]
+security_model = "tower_delegated"
+capabilities = ["braid.create", "braid.commit", "provenance.graph"]
 
 # ═══════════════════════════════════════════════════════════════
-# Phase 5: Science — wetSpring IPC (the data source)
+# Phase 5: Meta-tier — Squirrel (AI) + petalTongue (visualization)
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
+name = "squirrel"
+binary = "squirrel"
+order = 8
+required = false
+spawn = false
+depends_on = ["beardog", "songbird"]
+health_method = "health.liveness"
+by_capability = "ai"
+security_model = "tower_delegated"
+capabilities = ["ai.query", "inference.complete", "inference.embed"]
+
+[[graph.nodes]]
+name = "petaltongue"
+binary = "petaltongue"
+order = 8
+required = false
+spawn = false
+depends_on = ["beardog"]
+health_method = "health.liveness"
+by_capability = "render"
+security_model = "tower_delegated"
+capabilities = ["render.dashboard", "tui.push"]
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 6: Science — wetSpring IPC (the data source)
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.nodes]]
 name = "wetspring"
 binary = "wetspring"
 order = 10
 required = true
+spawn = true
 depends_on = ["beardog", "songbird"]
 health_method = "health.check"
-by_capability = "biology"
+by_capability = "life_science"
+security_model = "tower_delegated"
 args = ["server"]
 capabilities = [
-    "science.gonzales.dose_response",
-    "science.gonzales.pk_decay",
-    "science.gonzales.tissue_lattice",
-    "science.anderson.hormesis",
-    "science.anderson.cross_species",
-    "science.anderson.biome_atlas",
-    "science.anderson.disorder_sweep",
-    "science.diversity",
-    "science.qs_model",
-    "science.full_pipeline",
+    "composition.nest_health",
+    "composition.node_health",
+    "composition.nucleus_health",
+    "composition.science_health",
+    "composition.tower_health",
     "data.fetch.chembl",
     "data.fetch.pubchem",
     "data.fetch.register_table",
-    "vault.store",
-    "vault.retrieve",
+    "science.anderson",
+    "science.anderson.biome_atlas",
+    "science.anderson.cross_species",
+    "science.anderson.disorder_sweep",
+    "science.anderson.hormesis",
+    "science.diversity",
+    "science.full_pipeline",
+    "science.gonzales.dose_response",
+    "science.gonzales.pk_decay",
+    "science.gonzales.tissue_lattice",
+    "science.qs_model",
     "vault.consent.verify",
-    "composition.science_health",
-    "composition.tower_health",
-    "composition.node_health",
-    "composition.nest_health",
-    "composition.nucleus_health",
+    "vault.retrieve",
+    "vault.store",
 ]
 
 # ═══════════════════════════════════════════════════════════════
-# Phase 6: Visualization — petalTongue grammar rendering
+# Phase 7: Visualization — petalTongue grammar rendering
 # ═══════════════════════════════════════════════════════════════
-
-[[graph.node]]
-name = "petaltongue"
-binary = "petaltongue"
-order = 11
-required = false
-depends_on = ["beardog"]
-health_method = "health.liveness"
-by_capability = "visualization"
-capabilities = ["visualization.render.grammar", "visualization.render.scene"]
+# (petalTongue already declared in Phase 5 — no duplicate)
 
 # ═══════════════════════════════════════════════════════════════
-# Phase 7: Science Facade — HTTP gateway (the public interface)
+# Phase 8: Science Facade — HTTP gateway (the public interface)
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "science_facade"
 binary = "wetspring_science_facade"
 order = 20
 required = true
+spawn = true
 depends_on = ["wetspring"]
 health_method = "health.check"
 by_capability = "http_gateway"
-args = []
+security_model = "tower_delegated"
 capabilities = [
-    "http.science.gonzales",
-    "http.science.anderson",
-    "http.render.grammar",
     "http.provenance.query",
-    "http.validation.chain",
+    "http.render.grammar",
+    "http.science.anderson",
+    "http.science.gonzales",
     "http.system.composition",
+    "http.validation.chain",
 ]
 
-[graph.node.env]
+[graph.nodes.env]
 FACADE_BIND = "127.0.0.1:3100"
 FACADE_CORS_ORIGIN = "https://primals.eco"
 FACADE_DARK_FOREST = "true"

@@ -3,7 +3,7 @@
 # wetSpring Specifications
 
 **Last Updated**: April 11, 2026
-**Status**: V141 — 5,800+ checks (380 experiments, 356 binaries), 1,946 tests, 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 45 niche capabilities, 21 domains (8 families), 97/97 proto-nucleate (guard constant), 7 deploy graphs, 7 composition gaps in `docs/PRIMAL_GAPS.md`. V141: capability alignment, cross-check CI, proto-nucleate test, provenance run commands, TensorSession PoC. V140: ecosystem audit. V139: NUCLEUS composition. V138: primal composition patterns. V137: provenance headers, tolerance centralization. *(Detailed validation tables below reflect their respective phases.)*
+**Status**: V143 — 5,800+ checks (380 experiments, 360 binaries), 1,950 tests, 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 46 niche capabilities, 21 domains (8 families), 141/141 proto-nucleate (Exp400 D01–D07 guard constant), 7 deploy graphs (`[[graph.nodes]]` canonical, bonding + fragments metadata), 5 composition gaps open in `docs/PRIMAL_GAPS.md` (2 resolved). V143: deploy graph canonical migration, D07 metadata compliance. V142: Wire Standard L2+L3, `identity.get`, `WireWitnessRef`. V141: capability alignment, TensorSession PoC. V140: ecosystem audit. V139: NUCLEUS composition. V138: primal composition patterns. *(Detailed validation tables below reflect their respective phases.)*
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

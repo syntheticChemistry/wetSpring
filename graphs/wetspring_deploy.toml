@@ -1,18 +1,20 @@
-# wetSpring biomeOS Deploy Graph
-#
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
+# wetSpring biomeOS Deploy Graph
+#
 # Follows: wateringHole/SPRING_AS_NICHE_DEPLOYMENT_STANDARD.md
+# Schema:  primalSpring [[graph.nodes]] canonical (NA-016)
 #
 # Germination order:
 #   1. BearDog (security foundation)
 #   2. Songbird (discovery)
 #   3. rhizoCrypt + loamSpine + sweetGrass (provenance trio)
-#   4. nestGate (content-addressed cache)
-#   5. ToadStool + Squirrel (GPU compute + AI — optional)
-#   6. petalTongue (visualization — optional)
-#   7. wetSpring (science)
-#   8. Validation
+#   4. NestGate (content-addressed cache)
+#   5. coralReef + toadStool + barraCuda (Node Atomic compute — optional)
+#   6. Squirrel (AI — optional)
+#   7. petalTongue (visualization — optional)
+#   8. wetSpring (science)
+#   9. Validation
 #
 # Composition evolution opportunity: biomeOS can extend this graph
 # with additional primals (airSpring, healthSpring) that consume
@@ -20,120 +22,218 @@
 
 [graph]
 name = "wetspring_deploy"
-version = "2.0.0"
-description = "wetSpring life-science validation atop Node Atomic with provenance trio"
+version = "3.0.0"
+description = "wetSpring life-science validation — full NUCLEUS with provenance trio"
 coordination = "sequential"
 
 [graph.metadata]
-pattern_version = "2026-04-10"
+pattern_version = "2026-04-11"
 schema = "canonical"
+witness_wire = "WireWitnessRef"
+encoding_standard = "wateringHole/ATTESTATION_ENCODING_STANDARD.md"
+composition_model = "nucleated"
+science_domain = "life_science_chemistry"
+owner = "wetSpring"
+fragments = ["tower_atomic", "node_atomic", "nest_atomic", "meta_tier"]
+
+[graph.bonding_policy]
+bond_type = "Metallic"
+trust_model = "InternalNucleus"
+tower_internal = "covalent"
+tower_to_node = "metallic"
+tower_to_nest = "metallic"
+node_to_nest = "metallic"
+nucleus_internal = "weak"
+encryption_tiers.tower = "full"
+encryption_tiers.node = "delegated"
+encryption_tiers.nest = "delegated"
+encryption_tiers.meta = "delegated"
 
 # ── Phase 1: Tower Atomic ───────────────────────────────────────────
 
-[[graph.node]]
+[[graph.nodes]]
 name = "beardog"
+binary = "beardog"
 order = 1
 required = true
+spawn = false
+health_method = "health.liveness"
 by_capability = "security"
+security_model = "btsp"
 capabilities = ["crypto.sign_ed25519", "crypto.verify_ed25519", "crypto.blake3_hash"]
 
-[[graph.node]]
+[[graph.nodes]]
 name = "songbird"
+binary = "songbird"
 order = 2
 required = true
+spawn = false
 depends_on = ["beardog"]
+health_method = "health.liveness"
 by_capability = "discovery"
+security_model = "btsp"
 capabilities = ["discovery.find_primals", "discovery.announce"]
 
-# ── Phase 2: Provenance Trio ────────────────────────────────────────
+# ── Phase 2: Provenance Trio (Nest Atomic) ──────────────────────────
 
-[[graph.node]]
+[[graph.nodes]]
 name = "rhizocrypt"
+binary = "rhizocrypt"
 order = 3
 required = true
-depends_on = ["beardog", "songbird"]
+spawn = false
+depends_on = ["beardog"]
+health_method = "health.liveness"
 by_capability = "dag"
-capabilities = ["provenance.session", "provenance.vertex"]
+security_model = "tower_delegated"
+capabilities = ["dag.session.create", "dag.event.append", "dag.merkle.root"]
 
-[[graph.node]]
+[[graph.nodes]]
 name = "loamspine"
+binary = "loamspine"
 order = 3
 required = true
-depends_on = ["beardog", "songbird"]
-by_capability = "commit"
-capabilities = ["provenance.commit", "certificate.mint"]
+spawn = false
+depends_on = ["beardog", "rhizocrypt"]
+health_method = "health.liveness"
+by_capability = "ledger"
+security_model = "tower_delegated"
+capabilities = ["spine.create", "entry.append", "session.commit"]
 
-[[graph.node]]
+[[graph.nodes]]
 name = "sweetgrass"
+binary = "sweetgrass"
 order = 3
 required = true
-depends_on = ["beardog", "songbird"]
-by_capability = "provenance"
-capabilities = ["attribution.braid", "attribution.calculate"]
+spawn = false
+depends_on = ["beardog", "loamspine"]
+health_method = "health.liveness"
+by_capability = "attribution"
+security_model = "tower_delegated"
+capabilities = ["braid.create", "braid.commit", "provenance.graph"]
 
-# ── Phase 3: Compute & Cache (Optional Enrichment) ─────────────────
+# ── Phase 3: Nest Atomic — NestGate (storage) ──────────────────────
 
-[[graph.node]]
+[[graph.nodes]]
 name = "nestgate"
+binary = "nestgate"
 order = 4
 required = false
-depends_on = ["beardog", "songbird"]
+spawn = false
+depends_on = ["beardog"]
+health_method = "health.liveness"
 by_capability = "storage"
-capabilities = ["storage.put", "storage.get", "storage.list"]
+security_model = "tower_delegated"
+capabilities = ["storage.store", "storage.retrieve", "storage.list"]
 
-[[graph.node]]
-name = "petaltongue"
-order = 4
+# ── Phase 4: Node Atomic — Compute ─────────────────────────────────
+
+[[graph.nodes]]
+name = "coralreef"
+binary = "coralreef"
+order = 5
 required = false
-depends_on = ["beardog", "songbird"]
-by_capability = "visualization"
-capabilities = ["render.grammar", "render.scene"]
+spawn = false
+depends_on = ["beardog"]
+health_method = "health.liveness"
+by_capability = "shader_compile"
+security_model = "tower_delegated"
+capabilities = ["shader.compile.wgsl", "shader.compile.spirv"]
 
-# ── Phase 3b: Optional ToadStool + Squirrel ───────────────────────────
-
-[[graph.node]]
+[[graph.nodes]]
 name = "toadstool"
-order = 4
+binary = "toadstool"
+order = 5
 required = false
+spawn = false
 depends_on = ["beardog", "songbird"]
+health_method = "health.liveness"
 by_capability = "compute"
-capabilities = ["compute.dispatch", "compute.performance_surface"]
+security_model = "tower_delegated"
+capabilities = ["compute.dispatch.submit", "compute.execute"]
 
-[[graph.node]]
-name = "squirrel"
-order = 4
+[[graph.nodes]]
+name = "barracuda"
+binary = "barracuda"
+order = 5
 required = false
+spawn = false
+depends_on = ["beardog"]
+health_method = "health.liveness"
+by_capability = "math"
+security_model = "tower_delegated"
+capabilities = ["math.tensor", "math.stats", "math.spectral", "math.fft"]
+
+# ── Phase 5: Meta-tier ─────────────────────────────────────────────
+
+[[graph.nodes]]
+name = "squirrel"
+binary = "squirrel"
+order = 6
+required = false
+spawn = false
 depends_on = ["beardog", "songbird"]
+health_method = "health.liveness"
 by_capability = "ai"
+security_model = "tower_delegated"
 capabilities = ["ai.query", "inference.complete", "inference.embed"]
 
-# ── Phase 4: wetSpring Science ──────────────────────────────────────
+[[graph.nodes]]
+name = "petaltongue"
+binary = "petaltongue"
+order = 6
+required = false
+spawn = false
+depends_on = ["beardog"]
+health_method = "health.liveness"
+by_capability = "render"
+security_model = "tower_delegated"
+capabilities = ["render.dashboard", "tui.push"]
 
-[[graph.node]]
+# ── Phase 6: wetSpring Science ──────────────────────────────────────
+
+[[graph.nodes]]
 name = "wetspring"
+binary = "wetspring"
 order = 10
 required = true
-depends_on = [
-    "beardog",
-    "songbird",
-    "rhizocrypt",
-    "loamspine",
-    "sweetgrass",
-]
-by_capability = "science"
+spawn = true
+depends_on = ["beardog", "songbird", "rhizocrypt", "loamspine", "sweetgrass"]
+health_method = "health.liveness"
+by_capability = "life_science"
+security_model = "tower_delegated"
 capabilities = [
     "ai.ecology_interpret",
     "brain.attention",
     "brain.observe",
     "brain.urgency",
+    "composition.nest_health",
+    "composition.node_health",
+    "composition.nucleus_health",
+    "composition.science_health",
+    "composition.tower_health",
+    "data.fetch.chembl",
+    "data.fetch.pubchem",
+    "data.fetch.register_table",
+    "health.check",
+    "health.liveness",
+    "health.readiness",
+    "identity.get",
     "metrics.snapshot",
     "provenance.begin",
     "provenance.complete",
     "provenance.record",
     "science.alignment",
     "science.anderson",
+    "science.anderson.biome_atlas",
+    "science.anderson.cross_species",
+    "science.anderson.disorder_sweep",
+    "science.anderson.hormesis",
     "science.diversity",
     "science.full_pipeline",
+    "science.gonzales.dose_response",
+    "science.gonzales.pk_decay",
+    "science.gonzales.tissue_lattice",
     "science.kinetics",
     "science.ncbi_fetch",
     "science.nmf",
@@ -142,18 +242,21 @@ capabilities = [
     "science.taxonomy",
     "science.timeseries",
     "science.timeseries_diversity",
+    "vault.consent.verify",
+    "vault.retrieve",
+    "vault.store",
 ]
 
-# ── Phase 5: Validation ────────────────────────────────────────────
+# ── Phase 7: Validation ────────────────────────────────────────────
 
-[[graph.node]]
+[[graph.nodes]]
 name = "validate_wetspring_atomic"
-order = 20
-required = true
-depends_on = [
-    "beardog",
-    "songbird",
-    "wetspring",
-]
-by_capability = "validation"
-capabilities = ["validation.health_check"]
+binary = "primalspring_primal"
+order = 99
+required = false
+spawn = false
+depends_on = ["wetspring"]
+health_method = "health.liveness"
+by_capability = "coordination"
+security_model = "tower_delegated"
+capabilities = ["coordination.validate_composition"]

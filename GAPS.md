@@ -4,9 +4,10 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-04-11 (V142 — no architectural gaps closed, all 7 remain
-as external team dependencies. V142 handoff documents Wire Standard compliance
-and composition patterns for primal teams. Internal code quality fully green.)
+Last updated: 2026-04-11 (V143 — no architectural gaps closed, all 7 remain
+as external team dependencies. V143 handoff documents deploy graph canonical
+migration, bonding policy, fragments metadata, and D07 composition validation.
+V142 Wire Standard compliance. Internal code quality fully green.)
 
 ---
 

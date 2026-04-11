@@ -4,7 +4,7 @@
 
 **Date:** April 11, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V142 — Three-tier validation complete + Wire Standard compliance. **Tier 1:** Python→Rust (**1,946** tests, **5,800+** validation checks, **356** binaries). **Tier 2:** Rust→Primal composition (**97/97** proto-nucleate, **7** deploy graphs canonical, **46** niche capabilities, **42** dispatch methods, **21** domains, Wire Standard L2+L3). **Tier 3:** Composition→ecoBin harvest to `plasmidBin`. **380** experiments indexed (377 completed + 3 PROPOSED). `barraCuda` v0.3.11 (150+ primitives). **242** named tolerances with provenance trail (90+ with TOML provenance). **22** consumed capabilities declared. `WireWitnessRef` provenance events. `identity.get` handler. **5** primal composition gaps remaining (`docs/PRIMAL_GAPS.md`, 2 resolved). Clippy zero warnings (all-features), cargo-deny clean, `forbid(unsafe_code)`, zero `#[allow()]`. **V142:** Wire Standard, WireWitnessRef, barraCuda 0.3.11. **V141:** audit remediation. **V140:** ecosystem audit. **V139:** NUCLEUS composition. **V138:** primal composition patterns.
+**Status:** V143 — Three-tier validation complete + deploy graph canonical evolution. **Tier 1:** Python→Rust (**1,950** tests, **5,800+** validation checks, **360** binaries). **Tier 2:** Rust→Primal composition (**141/141** proto-nucleate D01–D07, **7** deploy graphs `[[graph.nodes]]` canonical with bonding policy + fragments metadata, **46** niche capabilities, **42** dispatch methods, **21** domains, Wire Standard L2+L3). **Tier 3:** Composition→ecoBin harvest to `plasmidBin`. **380** experiments indexed (377 completed + 3 PROPOSED). `barraCuda` v0.3.11 (150+ primitives). **242** named tolerances with provenance trail (90+ with TOML provenance). **22** consumed capabilities declared. `WireWitnessRef` provenance events. `identity.get` handler. **5** primal composition gaps remaining (`docs/PRIMAL_GAPS.md`, 2 resolved). Clippy zero warnings (all-features), cargo-deny clean, `forbid(unsafe_code)`, zero `#[allow()]`. **V143:** Deploy graph canonical, D07 metadata compliance, bonding + fragments. **V142:** Wire Standard, WireWitnessRef, barraCuda 0.3.11. **V141:** audit remediation. **V140:** ecosystem audit. **V139:** NUCLEUS composition.
 
 ---
 
@@ -25,10 +25,11 @@ Tier 1 — Python validates Rust (science fidelity)
 
 Tier 2 — Rust validates NUCLEUS composition (primal patterns)
   Rust validation binaries
-    → IPC capability surface (45 methods)
-      → Proto-nucleate alignment (11 primals)
-        → Deploy graph validation (7 graphs, graph_validate.rs)
-          → Composition health handlers (5: science, tower, node, nest, nucleus)
+    → IPC capability surface (46 methods, 21 domains)
+      → Proto-nucleate alignment (14 primals, 141/141 D01–D07)
+        → Deploy graph validation (7 graphs, [[graph.nodes]] canonical)
+          → Deploy graph metadata (bonding policy, fragments, composition model)
+            → Composition health handlers (5: science, tower, node, nest, nucleus)
 
 Tier 3 — Composition enables ecoBin harvest (deployment)
   All checks green
@@ -39,7 +40,7 @@ Tier 3 — Composition enables ecoBin harvest (deployment)
 Every stage is validated with explicit numerical checks. All data is open.
 All code is AGPL-3.0-or-later.
 
-## V138–V142 — Primal composition validation, Wire Standard, ecosystem evolution
+## V138–V143 — Primal composition validation, Wire Standard, deploy graph evolution
 
 **V142** completes Capability Wire Standard v1.0 compliance and composition
 self-description. `capabilities.list` now returns a canonical L2+L3 envelope:
@@ -55,9 +56,15 @@ aligned (manifest.lock, metadata.toml).
 **V141** completes the audit remediation cycle. Capability domain registry
 aligned (21 domains, 41 methods). Proto-nucleate validated at test time.
 
+**V143** migrates all 7 deploy graphs to primalSpring canonical `[[graph.nodes]]`
+schema (NA-016), adds bonding policy and fragments metadata to full-NUCLEUS
+graphs, aligns capability strings to proto-nucleate canonical form, adds
+coralReef/barraCuda as Node Atomic graph nodes, and extends Exp400 with D07
+deploy graph metadata compliance (44 new checks → 141/141 total).
+
 This is the validation narrative crystallised:
-- **Python was the validation target for Rust** (58 scripts → 1,946 tests).
-- **Rust + Python are now validation targets for NUCLEUS composition** (97/97
+- **Python was the validation target for Rust** (58 scripts → 1,950 tests).
+- **Rust + Python are now validation targets for NUCLEUS composition** (141/141
   proto-nucleate, 7 deploy graphs, 21 domains, cross-check tests).
 - **Composition self-describes via Wire Standard** (L2+L3: methods,
   provided/consumed capabilities, identity, witnesses).

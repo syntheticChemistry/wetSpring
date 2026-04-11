@@ -45,9 +45,9 @@
 use wetspring_barracuda::niche;
 use wetspring_barracuda::validation::Validator;
 
-/// Expected total checks — matches the "97/97" claim in README/CONTEXT.
+/// Expected total checks — matches the "141/141" claim in README/CONTEXT.
 /// Update this constant (and docs) whenever domains are added or removed.
-const EXPECTED_CHECKS: u32 = 97;
+const EXPECTED_CHECKS: u32 = 141;
 
 fn main() {
     let mut v = Validator::new("Exp400: NUCLEUS Composition — Proto-Nucleate Alignment");
@@ -113,7 +113,7 @@ fn main() {
     let caps = niche::CAPABILITIES;
     println!("  Total capabilities advertised: {}", caps.len());
 
-    v.check_pass("capabilities: 45 advertised", caps.len() == 45);
+    v.check_pass("capabilities: 46 advertised", caps.len() == 46);
 
     let required_caps = [
         "health.check",
@@ -242,11 +242,11 @@ fn main() {
             !source.trim().is_empty(),
         );
 
-        let has_graph_node = source.contains("[[graph.node]]");
-        let has_nodes = source.contains("[[nodes]]");
+        let has_graph_nodes =
+            source.contains("[[graph.nodes]]") || source.contains("[[graph.node]]");
         v.check_pass(
-            &format!("graph {name}: has [[graph.node]] or [[nodes]]"),
-            has_graph_node || has_nodes,
+            &format!("graph {name}: has [[graph.nodes]] (canonical) or [[graph.node]] (legacy)"),
+            has_graph_nodes,
         );
 
         let has_name_field = source.contains("name =") || source.contains("name=");
@@ -314,6 +314,107 @@ fn main() {
         "niche deploy graph: references science_nucleus",
         graph_path.contains("science_nucleus") || graph_path.contains("wetspring"),
     );
+
+    // ═══════════════════════════════════════════════════════════════
+    // D07: Deploy graph metadata compliance (V143 composition tier)
+    // ═══════════════════════════════════════════════════════════════
+    v.section("═══ D07: Deploy Graph Metadata Compliance ═══");
+
+    let metadata_graphs: &[(&str, &str)] = &[
+        (
+            "wetspring_deploy",
+            include_str!("../../../graphs/wetspring_deploy.toml"),
+        ),
+        (
+            "wetspring_science_nucleus",
+            include_str!("../../../graphs/wetspring_science_nucleus.toml"),
+        ),
+        (
+            "wetspring_science_facade",
+            include_str!("../../../graphs/wetspring_science_facade.toml"),
+        ),
+        (
+            "wetspring_niche",
+            include_str!("../../../graphs/wetspring_niche.toml"),
+        ),
+        (
+            "wetspring_anderson_atlas",
+            include_str!("../../../graphs/wetspring_anderson_atlas.toml"),
+        ),
+        (
+            "wetspring_basement_deploy",
+            include_str!("../../../graphs/wetspring_basement_deploy.toml"),
+        ),
+        (
+            "wetspring_gonzales_exploration",
+            include_str!("../../../graphs/wetspring_gonzales_exploration.toml"),
+        ),
+    ];
+
+    for (name, src) in metadata_graphs {
+        v.check_pass(
+            &format!("{name}: has composition_model"),
+            src.contains("composition_model"),
+        );
+        v.check_pass(
+            &format!("{name}: has owner = \"wetSpring\""),
+            src.contains("owner = \"wetSpring\""),
+        );
+        v.check_pass(
+            &format!("{name}: has fragments metadata"),
+            src.contains("fragments"),
+        );
+        v.check_pass(
+            &format!("{name}: uses [[graph.nodes]] canonical schema"),
+            src.contains("[[graph.nodes]]"),
+        );
+    }
+
+    let full_nucleus_graphs: &[(&str, &str)] = &[
+        (
+            "wetspring_deploy",
+            include_str!("../../../graphs/wetspring_deploy.toml"),
+        ),
+        (
+            "wetspring_science_nucleus",
+            include_str!("../../../graphs/wetspring_science_nucleus.toml"),
+        ),
+    ];
+
+    for (name, src) in full_nucleus_graphs {
+        v.check_pass(
+            &format!("{name}: has bonding_policy"),
+            src.contains("[graph.bonding_policy]"),
+        );
+        v.check_pass(
+            &format!("{name}: has witness_wire"),
+            src.contains("witness_wire"),
+        );
+        v.check_pass(
+            &format!("{name}: declares tower_atomic fragment"),
+            src.contains("tower_atomic"),
+        );
+        v.check_pass(
+            &format!("{name}: declares node_atomic fragment"),
+            src.contains("node_atomic"),
+        );
+        v.check_pass(
+            &format!("{name}: declares nest_atomic fragment"),
+            src.contains("nest_atomic"),
+        );
+        v.check_pass(
+            &format!("{name}: declares meta_tier fragment"),
+            src.contains("meta_tier"),
+        );
+        v.check_pass(
+            &format!("{name}: has coralreef node"),
+            src.contains("name = \"coralreef\""),
+        );
+        v.check_pass(
+            &format!("{name}: has barracuda node"),
+            src.contains("name = \"barracuda\""),
+        );
+    }
 
     // ═══════════════════════════════════════════════════════════════
     // Guard: total check count matches documented claim

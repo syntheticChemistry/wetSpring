@@ -3,6 +3,62 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V143] — 2026-04-11
+
+### Deploy Graph Canonical Migration + Composition Validation Tier
+
+Migrates all 7 deploy graphs from legacy `[[graph.node]]` to primalSpring
+canonical `[[graph.nodes]]` schema (NA-016). Adds bonding policy, fragments
+metadata, composition model, and security model declarations across all
+graphs. Aligns capability strings to proto-nucleate canonical form. Adds
+coralReef and barraCuda as Node Atomic nodes in full-NUCLEUS graphs. Extends
+Exp400 composition validation with D07 (44 new checks for deploy graph
+metadata compliance). Fixes niche capability count assertion (45 → 46).
+
+This version completes the third validation tier: Python validates Rust,
+Rust validates NUCLEUS composition, composition self-validates via
+programmatic deploy graph ↔ proto-nucleate cross-checks.
+
+#### Added
+- `[graph.bonding_policy]` section in `wetspring_deploy.toml` and
+  `wetspring_science_nucleus.toml` — declares bond types, trust model,
+  and encryption tiers per atomic boundary
+- `[graph.metadata]` fields across all 7 graphs: `composition_model`,
+  `owner`, `fragments`, `science_domain`, `witness_wire`, `encoding_standard`
+- `coralreef` and `barracuda` graph nodes in `wetspring_deploy.toml` and
+  `wetspring_science_nucleus.toml` (Node Atomic completeness)
+- Exp400 domain D07: deploy graph metadata compliance — 44 new validation
+  checks (composition_model, owner, fragments, canonical schema per graph;
+  bonding_policy, witness_wire, fragment declarations, coralReef/barraCuda
+  nodes per full-NUCLEUS graph)
+- `security_model` field on all graph nodes across all deploy graphs
+
+#### Changed
+- All 7 deploy graphs: `[[graph.node]]` → `[[graph.nodes]]` (primalSpring
+  canonical per NA-016; parser retains `#[serde(alias = "node")]` compat)
+- `graph_validate.rs`: `GraphBody::node` → `GraphBody::nodes` with
+  `#[serde(alias = "node")]` for backward compatibility
+- Capability strings aligned across all graphs:
+  - `storage.put`/`storage.get` → `storage.store`/`storage.retrieve`
+  - `provenance.session`/`provenance.vertex` → `dag.session.create`/`dag.event.append`
+  - `attribution.braid`/`attribution.calculate` → `braid.create`/`braid.commit`
+  - `compute.dispatch`/`compute.performance_surface` → `compute.dispatch.submit`/`compute.execute`
+  - `visualization.render`/`visualization.render.dashboard` → `render.dashboard`/`tui.push`
+- `by_capability` values aligned: `ecology` → `life_science` on wetspring
+  nodes (matches proto-nucleate `by_capability = "life_science"`)
+- Binary names aligned: `beardog_primal` → `beardog`, `songbird_primal` →
+  `songbird`, `toadstool_primal` → `toadstool` (matches proto-nucleate)
+- `EXPECTED_CHECKS` in `validate_composition_nucleus_v1.rs`: 97 → 141
+- Niche capability count assertion: 45 → 46 (was 1 behind since V142)
+- `validate_composition_nucleus_v1.rs`: schema check message updated to
+  reference `[[graph.nodes]]` as canonical
+
+#### Fixed
+- `graph_validate.rs` now parses canonical `[[graph.nodes]]` schema
+  (was only parsing legacy `[[graph.node]]`)
+- Niche capability count guard was pinned at 45 while actual count was 46
+  since `integration.sweetgrass.braid` was added
+
 ## [V142] — 2026-04-11
 
 ### Capability Wire Standard + Composition Evolution

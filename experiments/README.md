@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-04-11 (V142: 380 experiments indexed (377 completed + 3 PROPOSED), **356** binaries (**334** barracuda + **22** forge), 5,800+ checks, **1,946** tests (0 failures). Three-tier validation: Python→Rust (Tier 1), Rust+Python→NUCLEUS composition (Tier 2, 97/97 proto-nucleate, 21 domains, Wire Standard L2+L3), Composition→ecoBin (Tier 3). barraCuda v0.3.11. 46 niche capabilities. 22 consumed capabilities. `identity.get`. `WireWitnessRef`. Clippy 0 warnings all-features.)
+**Updated**: 2026-04-11 (V143: 380 experiments indexed (377 completed + 3 PROPOSED), **360** binaries (**338** barracuda + **22** forge), 5,800+ checks, **1,950** tests (0 failures). Three-tier validation: Python→Rust (Tier 1), Rust+Python→NUCLEUS composition (Tier 2, **141/141** proto-nucleate D01–D07, 21 domains, Wire Standard L2+L3, deploy graph metadata compliance), Composition→ecoBin (Tier 3). barraCuda v0.3.11. 46 niche capabilities. 22 consumed capabilities. `identity.get`. `WireWitnessRef`. `[[graph.nodes]]` canonical schema. Bonding policy + fragments metadata on all 7 graphs. Clippy 0 warnings all-features.)
 
 ---
 

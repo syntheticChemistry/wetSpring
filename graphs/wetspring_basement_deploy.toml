@@ -34,14 +34,22 @@
 [graph]
 name = "wetspring_basement_deploy"
 description = "wetSpring Gonzales science on basement HPC mesh — biomegate + northgate + eastgate"
-version = "1.0.0"
+version = "2.0.0"
 coordination = "sequential"
+
+[graph.metadata]
+pattern_version = "2026-04-11"
+schema = "canonical"
+composition_model = "nucleated"
+science_domain = "life_science_chemistry"
+owner = "wetSpring"
+fragments = ["tower_atomic"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 0: biomeOS (pre-existing on mesh)
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "biomeos"
 binary = "biomeos"
 order = 0
@@ -49,101 +57,108 @@ required = true
 spawn = false
 health_method = "graph.list"
 by_capability = "orchestration"
+security_model = "tower_delegated"
 capabilities = ["capability.discover", "graph.list"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 1: Tower Atomic (already running on mesh)
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "beardog"
-binary = "beardog_primal"
+binary = "beardog"
 order = 1
 required = true
 spawn = false
 health_method = "health.liveness"
 by_capability = "security"
-capabilities = ["crypto.sign", "crypto.verify"]
+security_model = "btsp"
+capabilities = ["crypto.sign_ed25519", "crypto.verify_ed25519"]
 
-[[graph.node]]
+[[graph.nodes]]
 name = "songbird"
-binary = "songbird_primal"
+binary = "songbird"
 order = 2
 required = true
 spawn = false
 health_method = "health.liveness"
 by_capability = "discovery"
-capabilities = ["discovery.find_primals", "mesh.announce"]
+security_model = "btsp"
+capabilities = ["discovery.find_primals", "discovery.announce"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 2: Compute — toadStool on eastgate (GPU + NPU dispatch)
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "toadstool"
-binary = "toadstool_primal"
+binary = "toadstool"
 order = 3
 required = false
+spawn = false
 depends_on = ["beardog", "songbird"]
-health_method = "compute.health"
+health_method = "health.liveness"
 by_capability = "compute"
+security_model = "tower_delegated"
 capabilities = ["compute.dispatch.submit", "compute.execute"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 3: Visualization — petalTongue on northgate (RTX 5090)
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "petaltongue"
 binary = "petaltongue"
 order = 4
 required = true
+spawn = false
 depends_on = ["beardog", "songbird"]
 health_method = "health.liveness"
-by_capability = "visualization"
-capabilities = ["visualization.render", "visualization.render.dashboard"]
+by_capability = "render"
+security_model = "tower_delegated"
+capabilities = ["render.dashboard", "tui.push"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 4: Science — wetSpring on biomegate (HBM2 math, 256GB)
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "wetspring"
 binary = "wetspring"
 order = 10
 required = true
+spawn = true
 depends_on = ["beardog", "songbird"]
 health_method = "health.check"
-by_capability = "ecology"
+by_capability = "life_science"
+security_model = "tower_delegated"
 args = ["server"]
 capabilities = [
-    # Core science
-    "science.diversity",
     "science.anderson",
-    "science.qs_model",
+    "science.anderson.biome_atlas",
+    "science.anderson.cross_species",
+    "science.anderson.disorder_sweep",
+    "science.anderson.hormesis",
+    "science.diversity",
     "science.full_pipeline",
-    # Gonzales dermatitis
     "science.gonzales.dose_response",
     "science.gonzales.pk_decay",
     "science.gonzales.tissue_lattice",
-    # Anderson exploration
-    "science.anderson.biome_atlas",
-    "science.anderson.disorder_sweep",
-    "science.anderson.hormesis",
-    "science.anderson.cross_species",
+    "science.qs_model",
 ]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 5: Validation
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "validate_basement"
 binary = "primalspring_primal"
 order = 99
 required = false
 spawn = false
 depends_on = ["wetspring", "petaltongue"]
-health_method = "capability.list"
+health_method = "health.liveness"
 by_capability = "coordination"
+security_model = "tower_delegated"
 capabilities = ["coordination.validate_composition"]

@@ -9,20 +9,20 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V141** | `handoffs/WETSPRING_V141_AUDIT_REMEDIATION_HANDOFF_APR11_2026.md` | Apr 11 | **Audit remediation**: capability alignment (21 domains), cross-check CI, proto-nucleate test-time validation, provenance run commands, TensorSession PoC, PRIMAL_GAPS.md (7 gaps), primal evolution per-primal, NUCLEUS deployment via biomeOS/neuralAPI, patterns for spring teams. |
-| | *Superseded → `handoffs/archive/`* | | V140 and earlier are archived (**151** files). |
+| **V143** | `handoffs/WETSPRING_V143_DEPLOY_GRAPH_EVOLUTION_HANDOFF_APR11_2026.md` | Apr 11 | **Deploy graph canonical migration**: `[[graph.nodes]]` schema (NA-016), bonding policy + fragments metadata, capability string alignment, coralReef/barraCuda Node Atomic nodes, Exp400 D07 metadata compliance (141/141), primal evolution asks. |
+| | *Superseded → `handoffs/archive/`* | | V142 and earlier are archived (**152** files). |
 
 ## Cross-Spring Documents
 
 | File | Purpose |
 |------|---------|
 | `ECOSYSTEM_LEVERAGE_GUIDE.md` | What wetSpring absorbs from ecosystem and contributes back |
-| `CROSS_SPRING_SHADER_EVOLUTION.md` | Cross-spring shader provenance map (784+ barraCuda WGSL shaders) |
+| `CROSS_SPRING_SHADER_EVOLUTION.md` | Cross-spring shader provenance map (826+ barraCuda WGSL shaders) |
 | `TOADSTOOL_WETSPRING_GAP_ANALYSIS.md` | Gap analysis: barraCuda exports vs wetSpring usage |
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` — **V140 and earlier** are archived (**151** files).  
+Superseded handoffs in `handoffs/archive/` — **V142 and earlier** are archived (**152** files).  
 Preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda → NUCLEUS composition → ecoBin harvest.
 
 ## Convention

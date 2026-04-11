@@ -3,7 +3,7 @@
 # wetSpring Niche Deploy — science primal + petalTongue + optional toadStool.
 #
 # Deploys wetSpring as a biomeOS science niche with visualization.
-# Follows the primalSpring BYOB graph schema (family A: [[graph.node]]).
+# Follows the primalSpring [[graph.nodes]] canonical schema (NA-016).
 #
 # Usage:
 #   biomeos deploy --graph graphs/wetspring_niche.toml
@@ -11,14 +11,22 @@
 [graph]
 name = "wetspring_science_niche"
 description = "wetSpring ecology/metagenomics niche — Tower + ToadStool + wetSpring + petalTongue"
-version = "1.0.0"
+version = "2.0.0"
 coordination = "sequential"
+
+[graph.metadata]
+pattern_version = "2026-04-11"
+schema = "canonical"
+composition_model = "nucleated"
+science_domain = "life_science_chemistry"
+owner = "wetSpring"
+fragments = ["tower_atomic"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 0: biomeOS substrate (pre-existing, not spawned)
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "biomeos"
 binary = "biomeos"
 order = 0
@@ -26,98 +34,110 @@ required = true
 spawn = false
 health_method = "graph.list"
 by_capability = "orchestration"
+security_model = "tower_delegated"
 capabilities = ["capability.discover", "graph.list", "graph.execute"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 1: Tower Atomic (BearDog + Songbird)
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "beardog"
-binary = "beardog_primal"
+binary = "beardog"
 order = 1
 required = true
+spawn = false
 depends_on = ["biomeos"]
 health_method = "health.liveness"
 by_capability = "security"
-capabilities = ["crypto.sign", "crypto.verify", "crypto.identity"]
+security_model = "btsp"
+capabilities = ["crypto.sign_ed25519", "crypto.verify_ed25519", "crypto.blake3_hash"]
 
-[[graph.node]]
+[[graph.nodes]]
 name = "songbird"
-binary = "songbird_primal"
+binary = "songbird"
 order = 2
 required = true
+spawn = false
 depends_on = ["biomeos"]
 health_method = "health.liveness"
 by_capability = "discovery"
-capabilities = ["discovery.find_primals", "network.tls_connect"]
+security_model = "btsp"
+capabilities = ["discovery.find_primals", "discovery.announce"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 2: Compute + Visualization
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "toadstool"
-binary = "toadstool_primal"
+binary = "toadstool"
 order = 3
 required = false
+spawn = false
 depends_on = ["beardog", "songbird"]
-health_method = "compute.health"
+health_method = "health.liveness"
 by_capability = "compute"
+security_model = "tower_delegated"
 capabilities = ["compute.dispatch.submit", "compute.execute"]
 
-[[graph.node]]
+[[graph.nodes]]
 name = "petaltongue"
 binary = "petaltongue"
 order = 4
 required = false
+spawn = false
 depends_on = ["beardog", "songbird"]
 health_method = "health.liveness"
-by_capability = "visualization"
-capabilities = ["visualization.render", "visualization.render.dashboard"]
+by_capability = "render"
+security_model = "tower_delegated"
+capabilities = ["render.dashboard", "tui.push"]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 3: wetSpring science primal
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "wetspring"
 binary = "wetspring"
 order = 10
 required = true
+spawn = true
 depends_on = ["beardog", "songbird"]
 health_method = "health.check"
-by_capability = "ecology"
+by_capability = "life_science"
+security_model = "tower_delegated"
 args = ["server"]
 capabilities = [
-    "science.diversity",
-    "science.anderson",
-    "science.qs_model",
-    "science.kinetics",
     "science.alignment",
-    "science.taxonomy",
-    "science.phylogenetics",
-    "science.nmf",
+    "science.anderson",
+    "science.anderson.biome_atlas",
+    "science.anderson.cross_species",
+    "science.anderson.disorder_sweep",
+    "science.anderson.hormesis",
+    "science.diversity",
     "science.gonzales.dose_response",
     "science.gonzales.pk_decay",
     "science.gonzales.tissue_lattice",
-    "science.anderson.biome_atlas",
-    "science.anderson.disorder_sweep",
-    "science.anderson.hormesis",
-    "science.anderson.cross_species",
+    "science.kinetics",
+    "science.nmf",
+    "science.phylogenetics",
+    "science.qs_model",
+    "science.taxonomy",
 ]
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 4: Validation (primalSpring)
 # ═══════════════════════════════════════════════════════════════
 
-[[graph.node]]
+[[graph.nodes]]
 name = "validate_wetspring"
 binary = "primalspring_primal"
 order = 99
 required = false
 spawn = false
 depends_on = ["wetspring"]
-health_method = "capability.list"
+health_method = "health.liveness"
 by_capability = "coordination"
+security_model = "tower_delegated"
 capabilities = ["coordination.validate_composition"]
